@@ -1,5 +1,5 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,8 +54,6 @@
 #include "tape.h"
 #include "trdos.h"
 #include "utils.h"
-
-#define PATHNAME_MAX_LENGTH 1024
 
 /* Open `filename' and do something sensible with it; autoload tapes
    if `autoload' is true and return the type of file found in `type' */
@@ -175,7 +174,7 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 {
   int fd;
 
-  char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
+  char fuse_path[ PATH_MAX ], path[ PATH_MAX ];
   char *fuse_dir; const char *path_segment;
 
   switch( type ) {
@@ -198,20 +197,20 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
      off where the Fuse executable is; (useful when Fuse hasn't been
      installed into /usr/local or wherever) */
   if( fuse_progname[0] == '/' ) {
-    strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+    strncpy( fuse_path, fuse_progname, PATH_MAX );
   } else {
-    strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
-    strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+    strncpy( fuse_path, fuse_directory, PATH_MAX );
+    strncat( fuse_path, fuse_progname, PATH_MAX );
   }
   fuse_dir = dirname( fuse_path );
 
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s/%s", fuse_dir, path_segment,
+  snprintf( path, PATH_MAX, "%s/%s/%s", fuse_dir, path_segment,
 	    filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
   /* Then in the defined Fuse data directory */
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", FUSEDATADIR, filename );
+  snprintf( path, PATH_MAX, "%s/%s", FUSEDATADIR, filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
@@ -219,7 +218,7 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
      Debian uses /usr/share/spectrum-roms/ here */
 #ifdef ROMSDIR
   if( type == UTILS_AUXILIARY_ROM ) {
-    snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", ROMSDIR, filename );
+    snprintf( path, PATH_MAX, "%s/%s", ROMSDIR, filename );
     fd = open( path, O_RDONLY | O_BINARY );
     if( fd != -1 ) return fd;
   }
