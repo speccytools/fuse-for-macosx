@@ -333,7 +333,12 @@ int machine_find_rom( const char *filename )
   /* If this is an absolute path, just look there */
   if( filename[0] == '/' ) return open( filename, O_RDONLY );
 
-  /* First look off the current directory */
+  /* If not, look in some likely places. Firstly, relative to the current
+     directory */
+  fd = open( filename, O_RDONLY ); if( fd != -1 ) return fd;
+
+  /* Then in a 'roms' subdirectory (very useful when Fuse hasn't been
+     installed into /usr/local or wherever) */
   snprintf( path, PATHNAME_MAX_LENGTH, "roms/%s", filename );
   fd = open( path, O_RDONLY );
   if( fd != -1 ) return fd;
