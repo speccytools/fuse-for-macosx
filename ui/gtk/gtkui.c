@@ -451,8 +451,6 @@ gtkui_rzx_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   free( recording );
 
-  ui_menu_activate_recording( 1 );
-
   fuse_emulation_unpause();
 }
 
@@ -476,13 +474,11 @@ gtkui_rzx_start_snap( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
     free( snap ); free( recording ); fuse_emulation_unpause(); return;
   }
 
-/*    rzx_start_recording( recording, 0 ); */
+  rzx_start_recording( recording, 0 );
 
   free( recording );
 
   display_refresh_all();
-
-  ui_menu_activate_recording( 1 );
 
   fuse_emulation_unpause();
 }
@@ -493,8 +489,6 @@ gtkui_rzx_stop( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback( 1 );
-
-  ui_menu_activate_recording( 0 );
 }
 
 /* Called when File/Recording/Play selected */

@@ -157,6 +157,8 @@ int rzx_stop_recording( void )
   /* Stop recording data */
   rzx_recording = 0;
 
+  ui_menu_activate_recording( 0 );
+
   length = 0;
   libspec_error = libspectrum_rzx_write( &buffer, &length,
 					 rzx, rzx_snap, rzx_creator,
@@ -270,6 +272,8 @@ start_playback( libspectrum_rzx *rzx, libspectrum_snap *snap )
   rzx_playback = 1;
   counter_reset();
 
+  ui_menu_activate_recording( 1 );
+
   return 0;
 }
 
@@ -278,6 +282,8 @@ int rzx_stop_playback( int add_interrupt )
   libspectrum_error libspec_error; int error;
 
   rzx_playback = 0;
+
+  ui_menu_activate_recording( 0 );
 
   /* We've now finished with the RZX file, so add an interrupt event
      back in if we've been requested to do so; we don't if we just run
