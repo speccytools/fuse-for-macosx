@@ -848,3 +848,5 @@
          loading.
 20040524 ui/gtk/Makefile.am: ensure config.h can be found when processing
 	 menu_data.c.
+20040524 zxcf.c: start the 'last memory control' byte off in the
+	 'ZXCF disabled' state.

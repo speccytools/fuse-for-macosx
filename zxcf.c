@@ -77,6 +77,8 @@ zxcf_init( void )
 
   error = libspectrum_ide_insert( zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
                                   settings_current.zxcf_pri_file );
+
+  last_memctl = 0x80;
                                 
   return error;
 }
