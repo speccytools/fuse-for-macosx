@@ -22,6 +22,8 @@ Fuse has been brought to you by:
 * Fredrick Meunier: for TC2048 support, the SDL user interface as well
   as other bug fixes and the like.
 
+* Martin Garton: making the GTK+ user interface compatible with GTK+ 2.0.
+
 * Philip Kendall: everything else.
 
 $Id$

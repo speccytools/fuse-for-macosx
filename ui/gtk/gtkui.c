@@ -502,6 +502,7 @@ static void
 gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_select_info dialog;
+  GtkAccelGroup *accel_group;
   GSList *button_group;
 
   GtkWidget *ok_button, *cancel_button;
@@ -564,9 +565,12 @@ gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) NULL );
 
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group(GTK_WINDOW(dialog.dialog), accel_group);
+
   /* Allow Esc to cancel */
   gtk_widget_add_accelerator( cancel_button, "clicked",
-                              gtk_accel_group_get_default(),
+                              accel_group,
                               GDK_Escape, 0, 0 );
 
   /* Set the window to be modal and display it */
@@ -729,6 +733,7 @@ typedef struct gktui_fileselector_info {
 static char* gtkui_fileselector_get_filename( const char *title )
 {
   gtkui_fileselector_info selector;
+  GtkAccelGroup *accel_group;
 
   selector.selector = gtk_file_selection_new( title );
   selector.filename = NULL;
@@ -749,11 +754,14 @@ static char* gtkui_fileselector_get_filename( const char *title )
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) &selector );
 
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group(GTK_WINDOW(selector.selector), accel_group);
+
   /* Allow Esc to cancel */
   gtk_widget_add_accelerator(
        GTK_FILE_SELECTION( selector.selector )->cancel_button,
        "clicked",
-       gtk_accel_group_get_default(),
+       accel_group,
        GDK_Escape, 0, 0 );
 
   gtk_window_set_modal( GTK_WINDOW( selector.selector ), TRUE );

@@ -44,6 +44,7 @@ int
 ui_verror( ui_error_level severity, const char *format, va_list ap )
 {
   GtkWidget *dialog, *ok_button, *label, *vbox;
+  GtkAccelGroup *accel_group;
   char message[ MESSAGE_MAX_LENGTH + 1 ];
 
   /* Create the message to be displayed */
@@ -110,11 +111,15 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
 			     GTK_OBJECT( dialog ) );
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
 		      GTK_SIGNAL_FUNC( gtk_widget_destroy ), (gpointer) NULL );
+
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group(GTK_WINDOW(dialog), accel_group);
+
   gtk_widget_add_accelerator( ok_button, "clicked",
-			      gtk_accel_group_get_default(),
+			      accel_group,
 			      GDK_Return, 0, 0 );
   gtk_widget_add_accelerator( ok_button, "clicked",
-			      gtk_accel_group_get_default(),
+			      accel_group,
 			      GDK_Escape, 0, 0 );
 
   gtk_widget_show_all( dialog );

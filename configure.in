@@ -125,6 +125,21 @@ if test -z "$ui"; then
   fi
 fi
 
+dnl Look for GTK+ 2.0 (default=no)
+if test -z "$ui"; then
+  AC_MSG_CHECKING(whether GTK2 UI requested)
+  AC_ARG_WITH(gtk2,
+  [  --with-gtk2             use GTK+ 2.x library for user interface],
+  if test "$withval" = no; then gtk2=no; else gtk2=yes; fi,
+  gtk2=no)
+  AC_MSG_RESULT($gtk2)
+  if test "$gtk2" = yes; then
+    AM_PATH_GTK_2_0(2.0.0,
+		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB) ui=gtk, 
+		AC_MSG_WARN([GTK+ 2.0 not found. Reverting to GTK+ 1.2]))
+  fi
+fi
+
 dnl Look for GTK+ (default=yes); fall back to Xlib if not found
 if test -z "$ui"; then
   AC_MSG_CHECKING(whether GTK UI requested)

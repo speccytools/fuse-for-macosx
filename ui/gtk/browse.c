@@ -54,6 +54,7 @@ void
 gtk_tape_browse( GtkWidget *widget, gpointer data )
 {
   GtkWidget *dialog;
+  GtkAccelGroup *accel_group;
   GtkWidget *scrolled_window, *clist;
   GtkWidget *ok_button, *cancel_button;
 
@@ -121,9 +122,12 @@ gtk_tape_browse( GtkWidget *widget, gpointer data )
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group(GTK_WINDOW(dialog), accel_group);
+
   /* Allow Esc to cancel */
   gtk_widget_add_accelerator( cancel_button, "clicked",
-			      gtk_accel_group_get_default(), GDK_Escape, 0, 0);
+			      accel_group, GDK_Escape, 0, 0);
 
   /* Make the window big enough to show at least some data */
   gtk_window_set_default_size( GTK_WINDOW( dialog ), 400, 200 );
