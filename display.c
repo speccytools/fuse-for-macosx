@@ -200,11 +200,10 @@ void display_line(void)
       for( i = 0, ptr = inactive_rectangle;
 	   i < inactive_rectangle_count;
 	   i++, ptr++ ) {
-	printf( "%d %d %d %d\n", ptr->x, ptr->y, ptr->w, ptr->h );
-	uidisplay_area( 8 * ptr->x, ptr->y + DISPLAY_BORDER_HEIGHT,
+	uidisplay_area( 8 * ptr->x + DISPLAY_BORDER_ASPECT_WIDTH,
+			ptr->y + DISPLAY_BORDER_HEIGHT,
 			8 * ptr->w, ptr->h );
       }
-      printf( "\n" );
 
       inactive_rectangle_count = 0;
 
