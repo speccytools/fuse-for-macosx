@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <SDL.h>
 
+#include "display.h"
 #include "fuse.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
