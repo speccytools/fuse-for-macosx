@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifdef HAVE_MMAP
@@ -293,4 +294,28 @@ int utils_write_file( const char *filename, const unsigned char *buffer,
   }
 
   return 0;
+}
+
+/* Get a path where we can reasonably create temporary files */
+const char*
+utils_get_temp_path( void )
+{
+#ifdef WIN32
+
+  const char *dir;
+
+  /* Something close to this algorithm specified at
+     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/gettemppath.asp
+  */
+  dir = getenv( "TMP" ); if( dir ) return dir;
+  dir = getenv( "TEMP" ); if( dir ) return dir;
+  return "./";
+
+#else				/* #ifdef WIN32 */
+
+  /* Unix-ish. Just use /tmp */
+  return "/tmp/";
+
+#endif				/* #ifdef WIN32 */
+  
 }

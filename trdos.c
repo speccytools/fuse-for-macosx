@@ -161,7 +161,7 @@ static discs_type discs[4];
 int trdos_active=0;
 
 /* The template used for naming the results of the SCL->TRD conversion */
-#define SCL_TMP_FILE_TEMPLATE "/tmp/fuse.scl.XXXXXX"
+#define SCL_TMP_FILE_TEMPLATE "fuse.scl.XXXXXX"
 
 static int Scl2Trd( const char *oldname, int TRD );
 static int insert_scl( trdos_drive_number which, const char *filename );
@@ -405,8 +405,21 @@ insert_trd( trdos_drive_number which, const char *filename )
 static int
 insert_scl( trdos_drive_number which, const char *filename )
 {
-  char trd_template[] = SCL_TMP_FILE_TEMPLATE;
+  const char *temp_path; size_t length;
+  char* trd_template;
   int ret;
+
+  temp_path = utils_get_temp_path();
+
+  length = strlen( temp_path ) + strlen( SCL_TMP_FILE_TEMPLATE ) + 1;
+
+  trd_template = malloc( length );
+  if( !trd_template ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
+
+  snprintf( trd_template, length, "%s%s", temp_path, SCL_TMP_FILE_TEMPLATE );
 
   discs[ which ].disc_ready = 0;
 
@@ -414,20 +427,24 @@ insert_scl( trdos_drive_number which, const char *filename )
   if( discs[ which ].fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't get a temporary filename: %s",
 	      strerror( errno ) );
+    free( trd_template );
     return 1;
   }
-  
+
   /* Unlink the file so it will be removed when the fd is closed */
   unlink( trd_template );
 
   if( ( ret = Scl2Trd( filename, discs[ which ].fd ) ) ) {
     close( discs[ which ].fd );
+    free( trd_template );
     return ret;
   }
 
   strcpy( discs[which].filename, trd_template );
   discs[which].disc_ready = 1;
   discs[which].ro = 1;
+
+  free( trd_template );
 
   return 0;
 }
