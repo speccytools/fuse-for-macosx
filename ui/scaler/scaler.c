@@ -188,8 +188,6 @@ static DWORD colorMask;
 static DWORD lowPixelMask;
 static DWORD qcolorMask;
 static DWORD qlowpixelMask;
-static DWORD redblueMask;
-static DWORD greenMask;
 
 int 
 scaler_select_bitformat( DWORD BitFormat )
@@ -201,8 +199,6 @@ scaler_select_bitformat( DWORD BitFormat )
     lowPixelMask = 0x00000821;
     qcolorMask = 0x0000E79C;
     qlowpixelMask = 0x00001863;
-    redblueMask = 0xF81F;
-    greenMask = 0x7E0;
     break;
 
   case 555:
@@ -210,8 +206,6 @@ scaler_select_bitformat( DWORD BitFormat )
     lowPixelMask = 0x00000421;
     qcolorMask = 0x0000739C;
     qlowpixelMask = 0x00000C63;
-    redblueMask = 0x7C1F;
-    greenMask = 0x3E0;
     break;
 
   case 888:
@@ -219,8 +213,6 @@ scaler_select_bitformat( DWORD BitFormat )
     lowPixelMask = 0x01010100;
     qcolorMask = 0xFCFCFC00;
     qlowpixelMask = 0x03030300;
-    redblueMask = 0xFF00FF00;
-    greenMask = 0x00FF0000;
     break;
 
   default:
