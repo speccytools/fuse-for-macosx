@@ -58,6 +58,9 @@ const static periph_t peripherals[] = {
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
+static libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
+static memory_page fake_mapping;
+
 static libspectrum_byte
 tc2048_unattached_port( void )
 {
@@ -130,6 +133,13 @@ int tc2048_init( fuse_machine_info *machine )
   machine->ram.port_contended	     = tc2048_port_contended;
   machine->ram.contend_delay	     = tc2048_contend_delay;
 
+  memset( fake_bank, 0xff, MEMORY_PAGE_SIZE );
+
+  fake_mapping.page = fake_bank;
+  fake_mapping.writable = 0;
+  fake_mapping.contended = 0;
+  fake_mapping.offset = 0x0000;
+
   machine->unattached_port = tc2048_unattached_port;
 
   machine->shutdown = NULL;
@@ -143,6 +153,7 @@ int tc2048_init( fuse_machine_info *machine )
 static int
 tc2048_reset( void )
 {
+  size_t i;
   int error;
 
   error = machine_load_rom( 0, 0, settings_current.rom_tc2048, 0x4000 );
@@ -153,8 +164,19 @@ tc2048_reset( void )
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
-  memory_current_screen = 5;
-  memory_screen_mask = 0xdfff;
+  for( i = 0; i < 8; i++ ) {
 
-  return spec48_common_reset();
+    timex_dock[i] = fake_mapping;
+    timex_dock[i].bank= MEMORY_BANK_DOCK;
+    timex_dock[i].page_num = i;
+    memory_map_dock[i] = &timex_dock[i];
+
+    timex_exrom[i] = fake_mapping;
+    timex_exrom[i].bank = MEMORY_BANK_EXROM;
+    timex_exrom[i].page_num = i;
+    memory_map_exrom[i] = &timex_exrom[i];
+
+  }
+
+  return tc2068_tc2048_common_reset();
 }

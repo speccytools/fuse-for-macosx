@@ -40,6 +40,7 @@
 #include "periph.h"
 #include "printer.h"
 #include "scld.h"
+#include "spec48.h"
 #include "settings.h"
 #include "ui/ui.h"
 
@@ -48,7 +49,6 @@ static libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
 static libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
 						 int *attached );
 static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
-static int dock_exrom_reset( void );
 
 static int tc2068_reset( void );
 
@@ -189,30 +189,10 @@ tc2068_init( fuse_machine_info *machine )
 }
 
 static int
-dock_exrom_reset( void )
-{
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
-
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
-
-  memory_map_home[6] = &memory_map_ram[ 0];
-  memory_map_home[7] = &memory_map_ram[ 1];
-
-  return 0;
-}
-
-static int
 tc2068_reset( void )
 {
   size_t i;
   int error;
-
-  error = dock_exrom_reset(); if( error ) return error;
 
   error = machine_load_rom( 0, 0, settings_current.rom_tc2068_0, 0x4000 );
   if( error ) return error;
@@ -231,6 +211,7 @@ tc2068_reset( void )
     memory_map_dock[i] = &timex_dock[i];
 
     timex_exrom[i] = memory_map_rom[2];
+    timex_exrom[i].bank = MEMORY_BANK_EXROM;
     timex_exrom[i].page_num = i;
     memory_map_exrom[i] = &timex_exrom[i];
 
@@ -244,14 +225,19 @@ tc2068_reset( void )
     }
   }
 
+  return tc2068_tc2048_common_reset();
+}
+
+int
+tc2068_tc2048_common_reset( void )
+{
   memory_current_screen = 5;
   memory_screen_mask = 0xdfff;
 
-  scld_dec_write( 0x00ff, 0x80 );
   scld_dec_write( 0x00ff, 0x00 );
   scld_hsr_write( 0x00f4, 0x00 );
 
-  return 0;
+  return spec48_common_reset();
 }
 
 int
