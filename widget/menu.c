@@ -147,23 +147,30 @@ menu_get_filename( const char *title )
 void
 menu_file_savesnapshot( int action )
 {
+  widget_filesel_data data;
+
   widget_end_all( WIDGET_FINISHED_OK );
 
-  if( settings_current.snaps_as_z80 ) {
-    snapshot_write( "snapshot.z80" );
-  } else {
-    snapshot_write( "snapshot.szx" );
-  }
-
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - save snapshot";
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  if( widget_filesel_name )
+    snapshot_write( widget_filesel_name );
 }
 
 void
 menu_file_recording_record( int action )
 {
+  widget_filesel_data data;
+
   if( rzx_playback || rzx_recording ) return;
 
   widget_end_all( WIDGET_FINISHED_OK );
-  rzx_start_recording( "record.rzx", 1 );
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - save recording file";
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  if( widget_filesel_name )
+    rzx_start_recording( widget_filesel_name, 1 );
 }
 
 void
@@ -177,7 +184,7 @@ menu_file_recording_recordfromsnapshot( int action )
   /* Get a snapshot name */
   data.exit_all_widgets = 1;
   data.title = "Fuse - record from snapshot";
-  widget_do( WIDGET_TYPE_FILESELECTOR, &data );
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
 
   if( !widget_filesel_name ) {
     widget_end_widget( WIDGET_FINISHED_CANCEL );
@@ -188,23 +195,40 @@ menu_file_recording_recordfromsnapshot( int action )
   if( error )
     return;
 
-  rzx_start_recording( "record.rzx", settings_current.embed_snapshot );
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - save recording file";
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  if( widget_filesel_name )
+    rzx_start_recording( widget_filesel_name, settings_current.embed_snapshot );
 }
 
 void
 menu_file_aylogging_record( int action )
 {
+  widget_filesel_data data;
+
   if( psg_recording ) return;
 
   widget_end_all( WIDGET_FINISHED_OK );
-  psg_start_recording( "ay.psg" );
+  
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - save sound chip file";
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  if( widget_filesel_name )
+    psg_start_recording( widget_filesel_name );
 }
 
 void
 menu_file_savescreenasscr( int action )
 {
+  widget_filesel_data data;
+
   widget_end_all( WIDGET_FINISHED_OK );
-  screenshot_scr_write( "fuse.scr" );
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - save screenshot as SCR";
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  if( widget_filesel_name )
+    screenshot_scr_write( widget_filesel_name );
 }
 
 void
@@ -218,12 +242,18 @@ menu_file_movies_recordmovieasscr( int action )
 void
 menu_file_savescreenaspng( int action )
 {
+  widget_filesel_data data;
+
   scaler_type scaler;
 
   scaler = menu_get_scaler( screenshot_available_scalers );
   if( scaler == SCALER_NUM ) return;
 
-  screenshot_write( "fuse.png", scaler );
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - save screenshot as PNG";
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  if( widget_filesel_name )
+    screenshot_write( widget_filesel_name, scaler );
 }
 
 void
@@ -412,30 +442,45 @@ menu_media_tape_browse( int action )
 int
 ui_tape_write( void )
 {
+  widget_filesel_data data;
+
   widget_end_all( WIDGET_FINISHED_OK );
-  return tape_write( "tape.tzx" );
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - write tape file";
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  return widget_filesel_name ? tape_write( widget_filesel_name ) : 0;
 }
 
 #ifdef HAVE_765_H
 int
 ui_plus3_disk_write( specplus3_drive_number which )
 {
-  char filename[ 20 ];
+  char title[ 30 ];
+  widget_filesel_data data;
 
-  snprintf( filename, 20, "drive%c.dsk", (char)( 'a' + which ) );
-
-  return specplus3_disk_write( which, filename );
+  snprintf( title, sizeof( title ), "Fuse - write +3 drive %c:",
+	    (char)( 'A' + which ) );
+  data.exit_all_widgets = 1;
+  data.title = title;
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  return widget_filesel_name
+	 ? specplus3_disk_write( which, widget_filesel_name ) : 0;
 }
 #endif				/* #ifdef HAVE_765_H */
 
 int
 ui_trdos_disk_write( trdos_drive_number which )
 {
-  char filename[ 20 ];
+  char title[ 30 ];
+  widget_filesel_data data;
 
-  snprintf( filename, 20, "drive%c.trd", (char)( 'a' + which ) );
-
-  return trdos_disk_write( which, filename );
+  snprintf( title, sizeof (title), "Fuse - write TRD drive %c:",
+	    (char)( 'A' + which ) );
+  data.exit_all_widgets = 1;
+  data.title = title;
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  return widget_filesel_name
+	 ? trdos_disk_write( which, widget_filesel_name ) : 0;
 }
 
 void

@@ -1,5 +1,5 @@
 /* text.c: simple text entry widget
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2005 Philip Kendall
 
    $Id$
 
@@ -29,12 +29,14 @@
 #ifdef USE_WIDGET
 
 #include <string.h>
+#include <ctype.h>
 
 #include "widget_internals.h"
 
 char *widget_text_text = NULL;	/* What we return the text in */
 
 static const char *title;	/* The window title */
+static widget_text_input_allow allow;
 static char text[40];		/* The current entry text */
 
 static void delete_character( void );
@@ -48,7 +50,8 @@ widget_text_draw( void *data )
 
   if( data ) {
     title = text_data->title;
-    strncpy( text, text_data->text, 39 ); text[39] = '\0';
+    allow = text_data->allow;
+    snprintf( text, sizeof( text ), "%s", text_data->text );
   }
 
   widget_dialog_with_border( 1, 2, 30, 3 );
@@ -90,8 +93,33 @@ widget_text_keyhandler( input_key key )
 
   }
 
-  if( key >= 0x20 && key < 0x7f ) append_character( key );
-
+  /* Input validation.
+   * We rely on various INPUT_KEY_* being mapped directly onto ASCII.
+   */
+ 
+  /* FIXME: we *don't* want keypresses filtered through the input layer */
+ 
+  /* First, return if the character isn't printable ASCII. */
+  if( key < ' ' || key > '~' ) return;
+ 
+  /* Return if the key isn't valid. */
+  switch( allow ) {
+  case WIDGET_INPUT_ASCII:
+    break;
+  case WIDGET_INPUT_DIGIT:
+    if( !isdigit( key ) ) return;
+    break;
+  case WIDGET_INPUT_ALPHA:
+    if( !isalpha( key ) ) return;
+    break;
+  case WIDGET_INPUT_ALNUM:
+    if( !isdigit( key ) && !isalpha( key ) ) return;
+    break;
+  }
+  
+  /* If we've got this far, we have a valid key */
+  append_character( key );
+ 
   widget_text_draw( NULL );
 }
 

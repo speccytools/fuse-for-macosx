@@ -95,7 +95,8 @@ typedef struct widget_filesel_data {
 extern struct widget_dirent **widget_filenames;
 extern size_t widget_numfiles;
 
-int widget_filesel_draw( void* data );
+int widget_filesel_load_draw( void* data );
+int widget_filesel_save_draw( void* data );
 int widget_filesel_finish( widget_finish_state finished );
 void widget_filesel_keyhandler( input_key key );
 
@@ -166,8 +167,16 @@ int widget_browse_finish( widget_finish_state finished );
 
 /* The text entry widget */
 
+typedef enum widget_text_input_allow {
+  WIDGET_INPUT_ASCII,
+  WIDGET_INPUT_DIGIT,
+  WIDGET_INPUT_ALPHA,
+  WIDGET_INPUT_ALNUM
+} widget_text_input_allow;
+
 typedef struct widget_text_t {
   const char *title;
+  widget_text_input_allow allow; 
   char text[40];
 } widget_text_t;
 

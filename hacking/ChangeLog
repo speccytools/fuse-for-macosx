@@ -1276,5 +1276,6 @@
 20050321 widget/{filesel.c,widget.c,widget_internals.h}: add arrows to
 	 show when the fileselector is scrollable (other half of patch
 	 #1150689) (Darren).
-
-    
+20050321 settings.dat,ui/options.dat,widget/{filesel.c,menu.c,options.pl,
+	 text.c,widget.[ch],widget_internals.h}: add selectable filenames
+	 when saving via the widget UI (patch #1150692) (Darren).

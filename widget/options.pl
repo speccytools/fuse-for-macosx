@@ -164,6 +164,7 @@ CODE
 	    print << "CODE";
   case $widget->{key}:
     text_data.title = "$title";
+    text_data.allow = WIDGET_INPUT_DIGIT;
     snprintf( text_data.text, 40, "%d",
 	      widget_options_settings.$widget->{value} );
     error = widget_do( WIDGET_TYPE_TEXT, &text_data ); if( error ) return;

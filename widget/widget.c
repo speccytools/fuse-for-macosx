@@ -428,7 +428,8 @@ int widget_options_finish( widget_finish_state finished )
 
 widget_t widget_data[] = {
 
-  { widget_filesel_draw,  widget_filesel_finish, widget_filesel_keyhandler  },
+  { widget_filesel_load_draw, widget_filesel_finish, widget_filesel_keyhandler  },
+  { widget_filesel_save_draw, widget_filesel_finish, widget_filesel_keyhandler  },
   { widget_general_draw,  widget_options_finish, widget_general_keyhandler  },
   { widget_picture_draw,  NULL,                  widget_picture_keyhandler  },
   { widget_menu_draw,	  NULL,			 widget_menu_keyhandler     },

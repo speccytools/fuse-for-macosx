@@ -52,6 +52,9 @@ size_t widget_numfiles;	  /* The number of files in the current
 			     directory */
 
 static const char *title;
+static int is_saving;
+
+#define PAGESIZE (is_saving ? 32 : 36)
 
 /* The number of the filename in the top-left corner of the current
    display, that of the filename which the `cursor' is on, and that
@@ -230,7 +233,7 @@ static int widget_scan_compare( const struct widget_dirent **a,
 
 /* File selection widget */
 
-int
+static int
 widget_filesel_draw( void *data )
 {
   widget_filesel_data *filesel_data = data;
@@ -267,6 +270,20 @@ int widget_filesel_finish( widget_finish_state finished ) {
   }
 
   return 0;
+}
+
+int
+widget_filesel_load_draw( void *data )
+{
+  is_saving = 0;
+  return widget_filesel_draw( data );
+}
+
+int
+widget_filesel_save_draw( void *data )
+{
+  is_saving = 1;
+  return widget_filesel_draw( data );
 }
 
 static char* widget_getcwd( void )
@@ -326,7 +343,7 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 
   /* Print the filenames, mostly normally, but with the currently
      selected file inverted */
-  for( i=top_left; i<n && i<top_left+36; i++ ) {
+  for( i = top_left; i < n && i < top_left + PAGESIZE; i++ ) {
     if( i == current ) {
       widget_print_filename( filenames[i], i-top_left, 1 );
     } else {
@@ -334,7 +351,12 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
     }
   }
 
-  if( i < n ) widget_down_arrow( 1, 21, WIDGET_COLOUR_FOREGROUND );
+  if( is_saving )
+    widget_printstring( 1, 21, WIDGET_COLOUR_FOREGROUND,
+			"Return=select   TAB=enter name" );
+
+  if( i < n )
+    widget_down_arrow( 1, is_saving ? 19 : 21, WIDGET_COLOUR_FOREGROUND );
 
   /* Display that lot */
   widget_display_lines( 2, 21 );
@@ -420,13 +442,13 @@ widget_filesel_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Page_Up:
-    new_current_file = ( current_file > 36 ) ?
-                       current_file - 36     :
+    new_current_file = ( current_file > PAGESIZE ) ?
+                       current_file - PAGESIZE     :
                        0;
     break;
 
   case INPUT_KEY_Page_Down:
-    new_current_file = current_file + 36;
+    new_current_file = current_file + PAGESIZE;
     if( new_current_file >= widget_numfiles )
       new_current_file = widget_numfiles - 1;
     break;
@@ -437,6 +459,36 @@ widget_filesel_keyhandler( input_key key )
 
   case INPUT_KEY_End:
     new_current_file = widget_numfiles - 1;
+    break;
+
+  case INPUT_KEY_Tab:
+    if( is_saving )
+    {
+      widget_text_t text_data;
+      text_data.title = title;
+      text_data.allow = WIDGET_INPUT_ASCII;
+      text_data.text[0] = 0;
+      if( widget_do( WIDGET_TYPE_TEXT, &text_data )
+          || !widget_text_text || !*widget_text_text )
+	break;
+      /* Get current dir name and allocate space for the leafname */
+      fn = widget_getcwd();
+      if( fn )
+        fn = realloc( fn, strlen( fn ) + strlen( widget_text_text ) + 2 );
+      if( !fn ) {
+	widget_end_widget( WIDGET_FINISHED_CANCEL );
+	return;
+      }
+      /* Append the leafname and return it */
+      strcat( fn, "/" );
+      strcat( fn, widget_text_text );
+      widget_filesel_name = fn;
+      if( exit_all_widgets ) {
+	widget_end_all( WIDGET_FINISHED_OK );
+      } else {
+	widget_end_widget( WIDGET_FINISHED_OK );
+      }
+    }
     break;
 
   case INPUT_KEY_Return:
@@ -503,9 +555,9 @@ widget_filesel_keyhandler( input_key key )
 				  top_left_file, new_current_file,
 				  widget_getcwd() );
 
-    } else if( new_current_file >= top_left_file+36 ) {
+    } else if( new_current_file >= top_left_file+PAGESIZE ) {
 
-      top_left_file = new_current_file & ~1; top_left_file -= 34;
+      top_left_file = new_current_file & ~1; top_left_file -= PAGESIZE - 2;
       widget_print_all_filenames( widget_filenames, widget_numfiles,
 				  top_left_file, new_current_file,
 				  widget_getcwd() );

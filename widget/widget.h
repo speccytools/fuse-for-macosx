@@ -51,7 +51,8 @@ int widget_end( void );
 /* The various widgets which are available */
 typedef enum widget_type {
 
-  WIDGET_TYPE_FILESELECTOR,	/* File selector */
+  WIDGET_TYPE_FILESELECTOR,	/* File selector (load) */
+  WIDGET_TYPE_FILESELECTOR_SAVE,/* File selector (save) */
   WIDGET_TYPE_GENERAL,		/* General options */
   WIDGET_TYPE_PICTURE,		/* Keyboard picture */
   WIDGET_TYPE_MENU,		/* General menu */
