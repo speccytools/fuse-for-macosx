@@ -152,7 +152,8 @@ debugger_next( void )
 
   /* And add a breakpoint after that */
   debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-			   PC + length, 0, DEBUGGER_BREAKPOINT_LIFE_ONESHOT );
+			   PC + length, 0, DEBUGGER_BREAKPOINT_LIFE_ONESHOT,
+			   NULL );
 
   debugger_run();
 
@@ -173,7 +174,8 @@ debugger_run( void )
 /* Add a breakpoint */
 int
 debugger_breakpoint_add( debugger_breakpoint_type type, libspectrum_word value,
-			 size_t ignore, debugger_breakpoint_life life )
+			 size_t ignore, debugger_breakpoint_life life,
+			 debugger_expression *condition )
 {
   debugger_breakpoint *bp;
 
@@ -185,7 +187,7 @@ debugger_breakpoint_add( debugger_breakpoint_type type, libspectrum_word value,
 
   bp->id = next_breakpoint_id++;
   bp->type = type; bp->value = value; bp->ignore = ignore; bp->life = life;
-  bp->condition = NULL;
+  bp->condition = condition;
 
   debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
 
@@ -322,7 +324,7 @@ debugger_breakpoint_exit( void )
   target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
 
   if( debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, target, 0,
-			       DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) )
+			       DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL ) )
     return 1;
 
   if( debugger_run() ) return 1;

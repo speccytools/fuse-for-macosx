@@ -59,6 +59,7 @@ del|dele|delet|delete { return DELETE; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
 	                                                  return DISASSEMBLE; }
 fi|fin|fini|finis|finish { return FINISH; }
+if { return IF; }
 i|ig|ign|igno|ignor|ignore { return IGNORE; }
 n|ne|nex|next { return NEXT; }
 o|ou|out { return DEBUGGER_OUT; }	/* Different name to avoid clashing

@@ -33,7 +33,8 @@
 
 int debugger_breakpoint_add( debugger_breakpoint_type type,
 			     libspectrum_word value, size_t ignore,
-			     debugger_breakpoint_life life );
+			     debugger_breakpoint_life life,
+			     debugger_expression *condition );
 int debugger_breakpoint_remove( size_t id );
 int debugger_breakpoint_remove_all( void );
 int debugger_breakpoint_clear( libspectrum_word address );

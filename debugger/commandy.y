@@ -73,6 +73,7 @@ void yyerror( char *s );
 %token		 DELETE
 %token		 DISASSEMBLE
 %token		 FINISH
+%token		 IF
 %token		 IGNORE
 %token		 NEXT
 %token		 DEBUGGER_OUT	/* Different name to avoid clashing with
@@ -97,6 +98,8 @@ void yyerror( char *s );
 %type  <integer> numberorpc
 %type  <integer> number
 
+%type  <exp>     optionalcondition
+
 %type  <exp>     expressionornull
 %type  <exp>     expression;
 
@@ -120,11 +123,11 @@ input:	 /* empty */
 ;
 
 command:   BASE number { debugger_output_base = $2; }
-	 | breakpointlife breakpointtype numberorpc {
-             debugger_breakpoint_add( $2, $3, 0, $1 );
+	 | breakpointlife breakpointtype numberorpc optionalcondition {
+             debugger_breakpoint_add( $2, $3, 0, $1, $4 );
 	   }
-	 | breakpointlife PORT portbreakpointtype number {
-	     debugger_breakpoint_add( $3, $4, 0, $1 );
+	 | breakpointlife PORT portbreakpointtype number optionalcondition {
+	     debugger_breakpoint_add( $3, $4, 0, $1, $5 );
            }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONDITION NUMBER expressionornull {
@@ -154,6 +157,10 @@ breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
 		    | WRITE { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE; }
+;
+
+optionalcondition:   /* empty */   { $$ = NULL; }
+		   | IF expression { $$ = $2; }
 ;
 
 numberorpc:   /* empty */ { $$ = PC; }
