@@ -47,7 +47,7 @@ BUILT_SOURCES = menu_data.c \
 		options.h
 
 menu_data.c: ../menu_data.c ../menu_data.pl
-	$(CPP) $(DEFS) ../menu_data.c | @PERL@ ../menu_data.pl widget > $@
+	$(CPP) $(DEFS) -I.. ../menu_data.c | @PERL@ ../menu_data.pl widget > $@
 
 options.c: options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
 	@PERL@ options.pl ../ui/options.dat > options.c
