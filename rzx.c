@@ -220,7 +220,10 @@ static int recording_frame( void )
 static int playback_frame( void )
 {
   /* Increment the frame count and see if we've finished with this file */
-  if( ++rzx_current_frame >= rzx.count ) return rzx_stop_playback();
+  if( ++rzx_current_frame >= rzx.count ) {
+    ui_error( "Finished RZX playback" );
+    return rzx_stop_playback();
+  }
 
   /* If we've got more frame to do, just reset the count and continue */
   rzx_instructions = 0;
