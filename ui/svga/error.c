@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#ifdef UI_SVGA			/* Use this iff we're using Xlib */
+#ifdef UI_SVGA			/* Use this iff we're using SVGAlib */
 
 #include <stdarg.h>
 #include <stdio.h>
