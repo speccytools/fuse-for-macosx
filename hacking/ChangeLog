@@ -217,3 +217,5 @@
 20030930 ChangeLog, README, man/fuse.1: put in release date for 0.6.1.1
 	 (Release-0_6_1-branch).
 20031001 ChangeLog, README, man/fuse.1: port 0.6.1.1 changes to HEAD.
+20031003 configure.in: bump version number to 0.6.1.1 (missed when porting
+	 the 0.6.1.1 changes to HEAD).
