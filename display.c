@@ -530,9 +530,9 @@ void display_dirty( WORD address )
 
     case ALTDFILE: /* second screen */
     case HIRESATTRALTD: /* strange mode using second screen */      
-      if( address >= 0x7b00 )
+      if( address < 0x6000 || address >= 0x7b00 )
         return;
-      if( address >= 0x6000 && address < 0x7800 ) {		/* 0x7800 = first attributes byte */
+      if( address < 0x7800 ) {		/* 0x7800 = first attributes byte */
         display_dirty8(address-ALTDFILE_OFFSET);
       } else {
         display_dirty64(address-ALTDFILE_OFFSET);
