@@ -10,7 +10,7 @@ Some thanks (in alphabetical order):
   emulation is based on xz80's.
 
 * Boris Donko: for spotting that I'd forgotten memory contention on the
-  LD (nnnn),A instruction.
+  LD (nnnn),A instruction and half the flags on SCF.
 
 * John Elliott: for lib765, which provides Fuse's emulation of the +3's
   FDC, and libdsk which provides support for more disk image formats:

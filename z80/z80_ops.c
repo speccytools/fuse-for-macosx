@@ -334,7 +334,8 @@ void z80_do_opcodes()
       writebyte(HL,readbyte(PC++));
       break;
     case 0x37:		/* SCF */
-      F = F | FLAG_C;
+      F &= ~( FLAG_N | FLAG_H );
+      F |= ( A & ( FLAG_3 | FLAG_5 ) ) | FLAG_C;
       break;
     case 0x38:		/* JR C,offset */
       contend( PC, 3 );
