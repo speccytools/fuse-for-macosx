@@ -31,8 +31,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/mman.h>
 
 #include "dck.h"
 #include "debugger/debugger.h"

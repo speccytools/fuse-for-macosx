@@ -32,10 +32,7 @@
 #include <fcntl.h>
 #include <settings.h>
 #include <string.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 #include "event.h"
 #include "fuse.h"

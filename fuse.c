@@ -29,8 +29,8 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
-#include <sys/mman.h>
 
 #ifdef UI_SDL
 #include <SDL.h>		/* Needed on MacOS X and Windows */
