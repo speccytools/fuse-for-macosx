@@ -60,7 +60,7 @@ int uidisplay_init(int width, int height)
   fd=open("/dev/fb",O_RDWR);
   ioctl(fd, FBIOGET_FSCREENINFO, &fi);
   gm=mmap(0, fi.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-  fbdisplay_allocate_image(DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_HEIGHT);
+  fbdisplay_allocate_image(DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT);
   fbdisplay_allocate_colours(16, colours);  
 
   return 0;
@@ -109,19 +109,20 @@ static int fbdisplay_allocate_image(int width, int height)
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
-  *(image+x+y*DISPLAY_SCREEN_WIDTH)=colours[colour];
+  if(x%2!=0) return;
+  *(image+x+y*DISPLAY_ASPECT_WIDTH)=colours[colour];
 }
 
 void uidisplay_lines( int start, int end )
 {
-  fbdisplay_area( 0, start, DISPLAY_SCREEN_WIDTH, ( end - start + 1 ) );
+  fbdisplay_area( 0, start, DISPLAY_ASPECT_WIDTH, ( end - start + 1 ) );
 }
 
 static void fbdisplay_area(int x, int y, int width, int height)
 {
     int yy;
     for(yy=y; yy<y+height; yy++)
-        memcpy(gm+yy*320+x, image+yy*DISPLAY_SCREEN_WIDTH+x, width*2);
+        memcpy(gm+yy*DISPLAY_ASPECT_WIDTH+x, image+yy*DISPLAY_ASPECT_WIDTH+x, width*2);
 }
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
@@ -129,7 +130,7 @@ void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
     int x;
 
     for(x=pixel_from;x<pixel_to;x++)
-        *(image+line*DISPLAY_SCREEN_WIDTH+x)=colours[colour];
+        *(image+line*DISPLAY_ASPECT_WIDTH+x)=colours[colour];
 }
 
 int uidisplay_end(void)

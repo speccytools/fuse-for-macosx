@@ -38,8 +38,11 @@ void uidisplay_spectrum_screen( const BYTE *screen, int border )
 
   for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
     for( x=0; x < DISPLAY_SCREEN_WIDTH; x++ ) {
-      uidisplay_putpixel( x, y, border );
-      uidisplay_putpixel( x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
+      uidisplay_putpixel( x<<1, y, border );
+      uidisplay_putpixel( (x<<1)+1, y, border );
+      uidisplay_putpixel( x<<1, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
+			  border );
+      uidisplay_putpixel( (x<<1)+1, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
 			  border );
     }
   }
@@ -47,13 +50,17 @@ void uidisplay_spectrum_screen( const BYTE *screen, int border )
   for( y=0; y<DISPLAY_HEIGHT; y++ ) {
 
     for( x=0; x < DISPLAY_BORDER_WIDTH; x++ ) {
-      uidisplay_putpixel( x,
+      uidisplay_putpixel( x<<1,
 			  y + DISPLAY_BORDER_HEIGHT, border );
-      uidisplay_putpixel( x + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
+      uidisplay_putpixel( (x<<1) + 1,
+			  y + DISPLAY_BORDER_HEIGHT, border );
+      uidisplay_putpixel( (x<<1) + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
+			  y + DISPLAY_BORDER_HEIGHT, border );
+      uidisplay_putpixel( (x<<1) + 1 + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
 			  y + DISPLAY_BORDER_HEIGHT, border );
     }
 
-    for( x=0; x < DISPLAY_WIDTH/8; x++ ) {
+    for( x=0; x < DISPLAY_WIDTH_COLS; x++ ) {
 
       /* Get the attribute byte */
       attr = screen[ display_attr_start[y] + x ];
@@ -64,7 +71,7 @@ void uidisplay_spectrum_screen( const BYTE *screen, int border )
 
       data = screen[ display_line_start[y]+x ];
 
-      display_plot8( x, y, data, ink, paper );
+      display_plot8( x<<1, y, data, ink, paper );
     }
   }
 

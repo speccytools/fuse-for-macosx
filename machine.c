@@ -39,10 +39,12 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "scld.h"
 #include "spec48.h"
 #include "spec128.h"
 #include "specplus2.h"
 #include "specplus3.h"
+#include "tc2048.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -72,6 +74,8 @@ int machine_init_machines( void )
   error = machine_add_machine( specplus2_init );
   if (error ) return error;
   error = machine_add_machine( specplus3_init );
+  if (error ) return error;
+  error = machine_add_machine( tc2048_init );
   if (error ) return error;
 
   return 0;
@@ -161,6 +165,7 @@ static int machine_select_machine( machine_info *machine )
   
   ROM = machine->roms;
 
+  scld_reset();
   machine->reset();
 
   return 0;

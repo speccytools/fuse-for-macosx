@@ -298,7 +298,7 @@ static int snapshot_copy_to( libspectrum_snap *snap )
 
   snap->iff1 = IFF1; snap->iff2 = IFF2; snap->im = IM;
 
-  snap->out_ula = display_border; /* FIXME: need to do this properly */
+  snap->out_ula = display_lores_border; /* FIXME: need to do this properly */
   
   if( machine_current->machine == SPECTRUM_MACHINE_128 ) {
     snap->out_128_memoryport = machine_current->ram.last_byte;

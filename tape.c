@@ -378,6 +378,8 @@ int trap_check_rom( void )
     return( ! machine_current->ram.special &&
 	    machine_current->ram.current_rom == 3 );
 
+  case SPECTRUM_MACHINE_2048:
+    return 1;		/* Always OK here */
   }
 
   ui_error( UI_ERROR_ERROR, "Impossible machine type %d",

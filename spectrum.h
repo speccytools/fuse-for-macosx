@@ -116,6 +116,6 @@ int slt_screen_level;		/* The level of the screenshot.
 
 /* The machines available */
 enum { SPECTRUM_MACHINE_48, SPECTRUM_MACHINE_128, SPECTRUM_MACHINE_PLUS2,
-       SPECTRUM_MACHINE_PLUS3 };
+       SPECTRUM_MACHINE_PLUS3, SPECTRUM_MACHINE_2048 };
 
 #endif			/* #ifndef FUSE_SPECTRUM_H */

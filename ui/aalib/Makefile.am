@@ -26,6 +26,6 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuiaalib.a
 
-libuiaalib_a_SOURCES = aalibdisplay.c aalibkeyboard.c aalibui.c
+libuiaalib_a_SOURCES = aalibdisplay.c aalibkeyboard.c aalibui.c error.c
 
 noinst_HEADERS = aalibkeyboard.h aalibui.h

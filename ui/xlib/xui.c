@@ -119,8 +119,8 @@ int ui_init(int *argc, char ***argv, int width, int height)
   sizeHints->min_aspect.y=height;
   sizeHints->max_aspect.x=width;
   sizeHints->max_aspect.y=height;
-  sizeHints->max_width=3*width;
-  sizeHints->max_height=3*height;
+  sizeHints->max_width=2*width;
+  sizeHints->max_height=2*height;
 
   wmHints->flags=StateHint | InputHint;
   wmHints->initial_state=NormalState;

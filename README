@@ -7,10 +7,10 @@ is Fuse (the Free Unix Spectrum Emulator), version 0.4.2.
 
 What Fuse does have:
 
-* Working 48K/128K/+2/+2A Speccy emulation, running at true Speccy
-  speed on any computer you're likely to try it on (it runs at full
-  speed on a SparcStation 4 unless you do too much graphics intensive
-  stuff).
+* Working 48K/128K/+2/+2A Speccy and Timex TC2048 emulation, running
+  at true Speccy speed on any computer you're likely to try it on (it
+  runs at full speed on a SparcStation 4 unless you do too much
+  graphics intensive stuff).
 * Support for loading from .tzx files.
 * Sound (on systems supporting the Open Sound System, or something
   like OpenBSD or Solaris's /dev/audio).

@@ -32,7 +32,7 @@ fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c rzx.c settings.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus3.c\
 	spectrum.c sunsound.c tape.c timer.c uidisplay.c utils.c\
-	joystick.c printer.c
+	joystick.c printer.c tc2048.c scld.c
 
 BUILT_SOURCES = keysyms.c
 

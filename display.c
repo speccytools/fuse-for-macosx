@@ -31,13 +31,16 @@
 
 #include "display.h"
 #include "event.h"
+#include "fuse.h"
 #include "machine.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+#include "scld.h"
 
 /* The current border colour */
-BYTE display_border;
+BYTE display_lores_border;
+BYTE display_hires_border;
 /* The border colour current displayed on every line */
 static BYTE display_current_border[DISPLAY_SCREEN_HEIGHT];
 
@@ -49,14 +52,14 @@ WORD display_attr_start[DISPLAY_HEIGHT];
 /* If you write to the byte at display_dirty_?table[n+0x4000], then
    the eight pixels starting at (8*xtable[n],ytable[n]) must be
    replotted */
-static WORD display_dirty_ytable[(DISPLAY_WIDTH*DISPLAY_HEIGHT)/8];
-static WORD display_dirty_xtable[(DISPLAY_WIDTH*DISPLAY_HEIGHT)/8];
+static WORD display_dirty_ytable[DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT];
+static WORD display_dirty_xtable[DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT];
 
 /* If you write to the byte at display_dirty_?table2[n+0x5800], then
    the 64 pixels starting at (8*xtable2[n],ytable2[n]) must be
    replotted */
-static WORD display_dirty_ytable2[ (DISPLAY_WIDTH/8) * (DISPLAY_HEIGHT/8) ];
-static WORD display_dirty_xtable2[ (DISPLAY_WIDTH/8) * (DISPLAY_HEIGHT/8) ];
+static WORD display_dirty_ytable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
+static WORD display_dirty_xtable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
 
 /* The number of frames mod 32 that have elapsed.
     0<=d_f_c<16 => Flashing characters are normal
@@ -69,7 +72,7 @@ static int display_flash_reversed;
    corresponds to pixels 0-7, bit 31 to pixels 248-255. */
 static DWORD display_is_dirty[DISPLAY_HEIGHT];
 /* This value signifies that the entire line must be redisplayed */
-static const DWORD display_all_dirty = 0xffffffffUL;
+static const DWORD display_all_dirty = ~0;
 
 /* Which border lines need to be redrawn */
 static int display_border_dirty[DISPLAY_SCREEN_HEIGHT];
@@ -94,18 +97,40 @@ static void display_dirty8(WORD address);
 static void display_dirty64(WORD address);
 
 static void display_get_attr(int x, int y, BYTE *ink, BYTE *paper);
-static void display_parse_attr(BYTE attr, BYTE *ink, BYTE *paper);
 
+static void display_set_border(void);
 static int display_border_line(void);
 
 static void display_dirty_flashing(void);
 static int display_border_column(int time_since_line);
 
+static WORD display_get_addr(int x, int y);
+
+static WORD display_get_addr(int x, int y)
+{
+  switch( scld_screenmode )
+  {
+    case HIRES:
+      return display_line_start[y]+x;
+      break;
+    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
+      return display_line_start[y]+x+ALTDFILE_OFFSET;
+      break;
+    case EXTCOLOUR:
+    default:  /* Standard Speccy screen */
+      return display_line_start[y]+x;
+      break;
+  }
+
+  ui_error( UI_ERROR_ERROR, "Impossible screenmode `%d'", scld_screenmode );
+  fuse_abort();
+}
+
 int display_init(int *argc, char ***argv)
 {
   int i,j,k,x,y;
 
-  if(ui_init(argc, argv, DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_HEIGHT))
+  if(ui_init(argc, argv, DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT))
     return 1;
 
   for(i=0;i<3;i++)
@@ -123,13 +148,13 @@ int display_init(int *argc, char ***argv)
   }
 
   for(y=0;y<DISPLAY_HEIGHT;y++)
-    for(x=0;x<(DISPLAY_WIDTH)/8;x++) {
+    for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
       display_dirty_ytable[display_line_start[y]+x]= y;
       display_dirty_xtable[display_line_start[y]+x]= x;
     }
 
-  for(y=0;y<(DISPLAY_HEIGHT/8);y++)
-    for(x=0;x<(DISPLAY_WIDTH/8);x++) {
+  for(y=0;y<DISPLAY_HEIGHT_ROWS;y++)
+    for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
       display_dirty_ytable2[ (32*y) + x ]= ( y * 8 );
       display_dirty_xtable2[ (32*y) + x ]= x;
     }
@@ -174,10 +199,12 @@ void display_line(void)
 static void display_draw_line(int y)
 {
 
-  int x, screen_y, redraw;
+  int x, screen_y, redraw, colour;
   BYTE data, ink, paper;
+  WORD hires_data;
 
   redraw = 0;
+  colour = scld_hires ? display_hires_border : display_lores_border;
   
   /* If we're in the main screen, see if anything redrawing; if so,
      copy the data to the image buffer, and flag that we need to copy
@@ -196,11 +223,18 @@ static void display_draw_line(int y)
 	/* Skip to next 8 pixel chunk if this chunk is clean */
 	if( ! ( display_is_dirty[screen_y] & 0x01 ) ) continue;
 
-	data = read_screen_memory( display_line_start[screen_y]+x );
+	data = read_screen_memory( display_get_addr( x, screen_y ) );
 	display_get_attr( x, screen_y, &ink, &paper );
 
-	display_plot8( x, screen_y, data, ink, paper );
+	if( scld_hires ) {
+	  hires_data = (data<<8) +
+	    read_screen_memory( display_get_addr( x, screen_y ) +
+				ALTDFILE_OFFSET
+			      );
 
+	  display_plot16( x<<1, screen_y, hires_data, ink, paper );
+	} else
+	  display_plot8( x<<1, screen_y, data, ink, paper );
       }
 
       /* Need to redraw this line */
@@ -231,24 +265,24 @@ static void display_draw_line(int y)
     display_blocked_write_start = display_blocked_write_none;
   }
   
-  if(display_current_border[y] != display_border) {
+  if(display_current_border[y] != colour) {
 
     /* See if we're in the top/bottom border */
     if(y < DISPLAY_BORDER_HEIGHT ||
        y >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
 
       /* Colour in all the border to the very right edge */
-      uidisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, display_border);
+      uidisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, colour);
 
     } else {			/* In main screen */
 
       /* Colour in the left and right borders */
-      uidisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, display_border);
+      uidisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, colour);
       uidisplay_set_border(y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
-	  	           DISPLAY_SCREEN_WIDTH, display_border);
+	  	           DISPLAY_SCREEN_WIDTH, colour);
     }
 
-    display_current_border[y] = display_border;
+    display_current_border[y] = colour;
     display_border_dirty[y]=1;	/* Need to redisplay this line next time */
 
   }
@@ -259,10 +293,35 @@ static void display_draw_line(int y)
    `address'; 0x4000 <= address < 0x5b00 */
 void display_dirty( WORD address )
 {
-  if(address<0x5800) {		/* 0x5800 = first attributes byte */
-    display_dirty8(address);
-  } else {
-    display_dirty64(address);
+  switch( scld_screenmode )
+  {
+    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
+      if( address >= 0x7b00 )
+        return;
+      if( address < 0x7800 ) {		/* 0x7800 = first attributes byte */
+        display_dirty8(address-ALTDFILE_OFFSET);
+      } else {
+        display_dirty64(address-ALTDFILE_OFFSET);
+      }
+      break;
+
+    case HIRES:
+    case EXTCOLOUR:
+      if((address>=0x7800) || ((address>=0x5800) && (address<0x6000)))
+        return;
+      if(address>=0x6000) address-=ALTDFILE_OFFSET;
+      display_dirty8(address);
+      break;
+    
+    default:  /* Standard Speccy screen */
+      if(address>=0x5b00)
+        return;
+      if(address<0x5800) {		/* 0x5800 = first attributes byte */
+        display_dirty8(address);
+      } else {
+        display_dirty64(address);
+      }
+      break;
   }
 }
 
@@ -292,28 +351,78 @@ static void display_dirty64(WORD address)
 
 void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper)
 {
-
   x = (x << 3) + DISPLAY_BORDER_WIDTH;
   y += DISPLAY_BORDER_HEIGHT;
   uidisplay_putpixel(x+0,y, ( data & 0x80 ) ? ink : paper );
-  uidisplay_putpixel(x+1,y, ( data & 0x40 ) ? ink : paper );
-  uidisplay_putpixel(x+2,y, ( data & 0x20 ) ? ink : paper );
-  uidisplay_putpixel(x+3,y, ( data & 0x10 ) ? ink : paper );
-  uidisplay_putpixel(x+4,y, ( data & 0x08 ) ? ink : paper );
-  uidisplay_putpixel(x+5,y, ( data & 0x04 ) ? ink : paper );
-  uidisplay_putpixel(x+6,y, ( data & 0x02 ) ? ink : paper );
-  uidisplay_putpixel(x+7,y, ( data & 0x01 ) ? ink : paper );
+  uidisplay_putpixel(x+1,y, ( data & 0x80 ) ? ink : paper );
+  uidisplay_putpixel(x+2,y, ( data & 0x40 ) ? ink : paper );
+  uidisplay_putpixel(x+3,y, ( data & 0x40 ) ? ink : paper );
+  uidisplay_putpixel(x+4,y, ( data & 0x20 ) ? ink : paper );
+  uidisplay_putpixel(x+5,y, ( data & 0x20 ) ? ink : paper );
+  uidisplay_putpixel(x+6,y, ( data & 0x10 ) ? ink : paper );
+  uidisplay_putpixel(x+7,y, ( data & 0x10 ) ? ink : paper );
+  uidisplay_putpixel(x+8,y, ( data & 0x08 ) ? ink : paper );
+  uidisplay_putpixel(x+9,y, ( data & 0x08 ) ? ink : paper );
+  uidisplay_putpixel(x+10,y, ( data & 0x04 ) ? ink : paper );
+  uidisplay_putpixel(x+11,y, ( data & 0x04 ) ? ink : paper );
+  uidisplay_putpixel(x+12,y, ( data & 0x02 ) ? ink : paper );
+  uidisplay_putpixel(x+13,y, ( data & 0x02 ) ? ink : paper );
+  uidisplay_putpixel(x+14,y, ( data & 0x01 ) ? ink : paper );
+  uidisplay_putpixel(x+15,y, ( data & 0x01 ) ? ink : paper );
+}
+
+/* Print the 16 pixels in `data' using ink colour `ink' and paper
+   colour `paper' to the screen at ( (16*x) , y ) */
+
+void display_plot16(int x, int y, WORD data, BYTE ink, BYTE paper)
+{
+  x = (x << 3) + DISPLAY_BORDER_WIDTH;
+  y += DISPLAY_BORDER_HEIGHT;
+  uidisplay_putpixel(x+0, y, ( data & 0x8000 ) ? ink : paper );
+  uidisplay_putpixel(x+1, y, ( data & 0x4000 ) ? ink : paper );
+  uidisplay_putpixel(x+2, y, ( data & 0x2000 ) ? ink : paper );
+  uidisplay_putpixel(x+3, y, ( data & 0x1000 ) ? ink : paper );
+  uidisplay_putpixel(x+4, y, ( data & 0x0800 ) ? ink : paper );
+  uidisplay_putpixel(x+5, y, ( data & 0x0400 ) ? ink : paper );
+  uidisplay_putpixel(x+6, y, ( data & 0x0200 ) ? ink : paper );
+  uidisplay_putpixel(x+7 ,y, ( data & 0x0100 ) ? ink : paper );
+  uidisplay_putpixel(x+8 ,y, ( data & 0x0080 ) ? ink : paper );
+  uidisplay_putpixel(x+9 ,y, ( data & 0x0040 ) ? ink : paper );
+  uidisplay_putpixel(x+10,y, ( data & 0x0020 ) ? ink : paper );
+  uidisplay_putpixel(x+11,y, ( data & 0x0010 ) ? ink : paper );
+  uidisplay_putpixel(x+12,y, ( data & 0x0008 ) ? ink : paper );
+  uidisplay_putpixel(x+13,y, ( data & 0x0004 ) ? ink : paper );
+  uidisplay_putpixel(x+14,y, ( data & 0x0002 ) ? ink : paper );
+  uidisplay_putpixel(x+15,y, ( data & 0x0001 ) ? ink : paper );
 }
 
 /* Get the attributes for the eight pixels starting at
    ( (8*x) , y ) */
 static void display_get_attr(int x,int y,BYTE *ink,BYTE *paper)
 {
-  BYTE attr=read_screen_memory(display_attr_start[y]+x);
+  BYTE attr;
+
+  switch( scld_screenmode )
+  {
+    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
+      attr=read_screen_memory(display_attr_start[y]+x+ALTDFILE_OFFSET);
+      break;
+    case EXTCOLOUR:
+      attr=read_screen_memory(display_line_start[y]+x+ALTDFILE_OFFSET);
+      break;
+    case HIRES:
+    case (HIRES|EXTCOLOUR):
+      attr=hires_get_attr();
+      break;
+    default: /* Standard Speccy screen */
+      attr=read_screen_memory(display_attr_start[y]+x);
+      break;
+  }
+
   display_parse_attr(attr,ink,paper);
 }
 
-static void display_parse_attr(BYTE attr,BYTE *ink,BYTE *paper)
+void display_parse_attr(BYTE attr,BYTE *ink,BYTE *paper)
 {
   if( (attr & 0x80) && display_flash_reversed ) {
     *ink  = (attr & ( 0x0f << 3 ) ) >> 3;
@@ -324,12 +433,25 @@ static void display_parse_attr(BYTE attr,BYTE *ink,BYTE *paper)
   }
 }
 
-void display_set_border(int colour)
+void display_set_lores_border(int colour)
 {
-  int current_line,time_since_line,current_pixel;
+  display_lores_border=colour;
 
-  display_border=colour;
+  display_set_border();
+}
 
+void display_set_hires_border(int colour)
+{
+  display_hires_border=colour;
+
+  display_set_border();
+}
+
+static void display_set_border(void)
+{
+  int current_line,time_since_line,current_pixel,colour;
+
+  colour = scld_hires ? display_hires_border : display_lores_border;
   current_line=display_border_line();
 
   /* Check if we're in vertical retrace; if we are, don't need to do
@@ -400,15 +522,15 @@ static int display_border_column(int time_since_line)
 
   /* But now need to correct because our displayed border isn't necessarily
      the same size as the ULA's. */
-  column -= ( 2*machine_current->timings.left_border_cycles -
-	      DISPLAY_BORDER_WIDTH );
+  column -= ( ((machine_current->timings.left_border_cycles)<<1) -
+	      DISPLAY_BORDER_ASPECT_WIDTH );
   if(column < 0) {
     column=0;
-  } else if(column > DISPLAY_SCREEN_WIDTH) {
-    column=DISPLAY_SCREEN_WIDTH;
+  } else if(column > DISPLAY_ASPECT_WIDTH) {
+    column=DISPLAY_ASPECT_WIDTH;
   }
 
-  return column;
+  return column<<1;
 }
 
 int display_dirty_border( void )
@@ -444,26 +566,54 @@ static void display_dirty_flashing(void)
 {
   int offset; BYTE attr;
 
-  for(offset=0x1800;offset<0x1b00;offset++) {
-    attr=read_screen_memory(offset);
-    if( attr & 0x80 )
-      display_dirty64(offset+0x4000);
+  switch (scld_screenmode)
+  {
+    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
+      for(offset=0x3800;offset<0x3b00;offset++) {
+        attr=read_screen_memory(offset);
+        if( attr & 0x80 )
+          display_dirty64(offset+ALTDFILE_OFFSET);
+      }
+      break;
+    case EXTCOLOUR:
+      for(offset=ALTDFILE_OFFSET;offset<0x3800;offset++) {
+        attr=read_screen_memory(offset);
+        if( attr & 0x80 )
+          display_dirty8(offset-ALTDFILE_OFFSET);
+      }
+      break;
+    case HIRES:
+      break;
+    default:  /* Standard Speccy screen */
+      for(offset=0x1800;offset<0x1b00;offset++) {
+        attr=read_screen_memory(offset);
+        if( attr & 0x80 )
+          display_dirty64(offset+0x4000);
+      }
+      break;
   }
 }
 
 void display_refresh_all(void)
 {
-  int x,y,z; BYTE ink,paper;
+  int x,y; BYTE ink,paper;
+  WORD hires_data;
 
-  for(y=0;y<DISPLAY_HEIGHT;y+=8) {
-    for(x=0;x<(DISPLAY_WIDTH/8);x++) {
-      display_parse_attr(read_screen_memory(display_attr_start[y]+x),
-			 &ink,&paper);
-      for(z=0;z<8;z++) {
-	display_plot8(x,y+z,read_screen_memory(display_line_start[y+z]+x),
-		      ink,paper);
-	display_is_dirty[y+z] = ~0;	/* Marks all pixels as dirty */
-      }
+  for(y=0;y<DISPLAY_SCREEN_HEIGHT;y++) {
+    display_border_dirty[y] = 1;
+  }
+
+  for(y=0;y<DISPLAY_HEIGHT;y++) {
+    for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
+      display_get_attr(x,y,&ink,&paper);
+	if( scld_hires ) {
+	  hires_data = (read_screen_memory( display_get_addr(x,y) ) << 8 ) +
+	    read_screen_memory( display_get_addr( x, y ) + ALTDFILE_OFFSET );
+	  display_plot16( x<<1, y, hires_data, ink, paper );
+	} else
+	  display_plot8( x<<1, y, read_screen_memory( display_get_addr(x,y) ),
+			 ink, paper );
     }
+    display_is_dirty[y] = display_all_dirty;	/* Marks all pixels as dirty */
   }
 }

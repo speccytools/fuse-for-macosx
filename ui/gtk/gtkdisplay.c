@@ -36,6 +36,7 @@
 #include "fuse.h"
 #include "gtkui.h"
 #include "ui/uidisplay.h"
+#include "scld.h"
 
 static GdkGC *gc;
 static GdkImage *image;
@@ -145,9 +146,10 @@ static int gtkdisplay_allocate_colours( unsigned long *pixel_values )
   
 static int gtkdisplay_configure_notify( int width )
 {
-  int y,size;
+  int y,size,colour;
 
-  size = width  / DISPLAY_SCREEN_WIDTH;
+  colour= scld_hires ? display_hires_border : display_lores_border;
+  size = width / DISPLAY_ASPECT_WIDTH;
 
   /* If we're the same size as before, nothing special needed */
   if( size == gtkdisplay_current_size ) return 0;
@@ -155,7 +157,7 @@ static int gtkdisplay_configure_notify( int width )
   /* Else set ourselves to the new height */
   gtkdisplay_current_size=size;
   gtk_drawing_area_size( GTK_DRAWING_AREA(gtkui_drawing_area),
-			 size * DISPLAY_SCREEN_WIDTH,
+			 size * DISPLAY_ASPECT_WIDTH,
 			 size * DISPLAY_SCREEN_HEIGHT );
 
   /* Redraw the entire screen... */
@@ -163,15 +165,15 @@ static int gtkdisplay_configure_notify( int width )
 
   /* And the entire border */
   for(y=0;y<DISPLAY_BORDER_HEIGHT;y++) {
-    uidisplay_set_border(y,0,DISPLAY_SCREEN_WIDTH,display_border);
+    uidisplay_set_border(y,0,DISPLAY_SCREEN_WIDTH,colour);
     uidisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y,0,
-			 DISPLAY_SCREEN_WIDTH,display_border);
+			 DISPLAY_SCREEN_WIDTH,colour);
   }
 
   for(y=DISPLAY_BORDER_HEIGHT;y<DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT;y++) {
-    uidisplay_set_border(y,0,DISPLAY_BORDER_WIDTH,display_border);
+    uidisplay_set_border(y,0,DISPLAY_BORDER_WIDTH,colour);
     uidisplay_set_border(y,DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
-			 DISPLAY_SCREEN_WIDTH,display_border);
+			 DISPLAY_SCREEN_WIDTH,colour);
   }
 
   return 0;
@@ -181,24 +183,12 @@ void uidisplay_putpixel(int x,int y,int colour)
 {
   switch(gtkdisplay_current_size) {
   case 1:
-    gdk_image_put_pixel(image,  x  ,  y  ,colours[colour]);
+    if(x%2!=0) return;
+    gdk_image_put_pixel(image, x>>1, y, colours[colour]);
     break;
   case 2:
-    gdk_image_put_pixel(image,2*x,  2*y  ,colours[colour]);
-    gdk_image_put_pixel(image,2*x+1,2*y  ,colours[colour]);
-    gdk_image_put_pixel(image,2*x  ,2*y+1,colours[colour]);
-    gdk_image_put_pixel(image,2*x+1,2*y+1,colours[colour]);
-    break;
-  case 3:
-    gdk_image_put_pixel(image,3*x,  3*y  ,colours[colour]);
-    gdk_image_put_pixel(image,3*x+1,3*y  ,colours[colour]);
-    gdk_image_put_pixel(image,3*x+2,3*y  ,colours[colour]);
-    gdk_image_put_pixel(image,3*x  ,3*y+1,colours[colour]);
-    gdk_image_put_pixel(image,3*x+1,3*y+1,colours[colour]);
-    gdk_image_put_pixel(image,3*x+2,3*y+1,colours[colour]);
-    gdk_image_put_pixel(image,3*x  ,3*y+2,colours[colour]);
-    gdk_image_put_pixel(image,3*x+1,3*y+2,colours[colour]);
-    gdk_image_put_pixel(image,3*x+2,3*y+2,colours[colour]);
+    gdk_image_put_pixel(image,x,  y<<1   ,colours[colour]);
+    gdk_image_put_pixel(image,x, (y<<1)+1,colours[colour]);
     break;
   }
 }
@@ -206,7 +196,7 @@ void uidisplay_putpixel(int x,int y,int colour)
 void uidisplay_lines( int start, int end )
 {
   gtkdisplay_area( 0, gtkdisplay_current_size*start,
-		   gtkdisplay_current_size*DISPLAY_SCREEN_WIDTH,
+		   gtkdisplay_current_size * DISPLAY_ASPECT_WIDTH,
 		   gtkdisplay_current_size * ( end - start + 1 ) );
 }
 
@@ -219,33 +209,8 @@ void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {
   int x;
   
-  switch(gtkdisplay_current_size) {
-  case 1:
-    for(x=pixel_from;x<pixel_to;x++) {
-      gdk_image_put_pixel(image,  x  ,  line  ,colours[colour]);
-    }
-    break;
-  case 2:
-    for(x=pixel_from;x<pixel_to;x++) {
-      gdk_image_put_pixel(image,2*x  ,2*line  ,colours[colour]);
-      gdk_image_put_pixel(image,2*x+1,2*line  ,colours[colour]);
-      gdk_image_put_pixel(image,2*x  ,2*line+1,colours[colour]);
-      gdk_image_put_pixel(image,2*x+1,2*line+1,colours[colour]);
-    }
-    break;
-  case 3:
-    for(x=pixel_from;x<pixel_to;x++) {
-      gdk_image_put_pixel(image,3*x  ,3*line  ,colours[colour]);
-      gdk_image_put_pixel(image,3*x+1,3*line  ,colours[colour]);
-      gdk_image_put_pixel(image,3*x+2,3*line  ,colours[colour]);
-      gdk_image_put_pixel(image,3*x  ,3*line+1,colours[colour]);
-      gdk_image_put_pixel(image,3*x+1,3*line+1,colours[colour]);
-      gdk_image_put_pixel(image,3*x+2,3*line+1,colours[colour]);
-      gdk_image_put_pixel(image,3*x  ,3*line+2,colours[colour]);
-      gdk_image_put_pixel(image,3*x+1,3*line+2,colours[colour]);
-      gdk_image_put_pixel(image,3*x+2,3*line+2,colours[colour]);
-    }
-    break;
+  for(x=pixel_from;x<pixel_to;x++) {
+    uidisplay_putpixel(x,line,colour);
   }
 }
 

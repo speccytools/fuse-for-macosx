@@ -137,7 +137,7 @@ BYTE spectrum_ula_read(WORD port)
 /* What happens when we write to the ULA? */
 void spectrum_ula_write(WORD port, BYTE b)
 {
-  display_set_border( b & 0x07 );
+  display_set_lores_border( b & 0x07 );
   sound_beeper( 0, b & 0x10 );
 
   if( settings_current.issue2 ) {

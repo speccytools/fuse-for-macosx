@@ -32,18 +32,36 @@
 #endif			/* #ifndef FUSE_TYPES_H */
 
 /* The width and height of the Speccy's screen */
-#define DISPLAY_WIDTH  256
-#define DISPLAY_HEIGHT 192
+#define DISPLAY_WIDTH_COLS  32
+#define DISPLAY_HEIGHT_ROWS 24
+
+/* The width and height of the Speccy's screen */
+/* Each main screen column can produce 16 pixels in hires mode */
+#define DISPLAY_WIDTH         ( DISPLAY_WIDTH_COLS * 16 )
+/* Each main screen row can produce only 8 pixels in any mode */
+#define DISPLAY_HEIGHT        ( DISPLAY_HEIGHT_ROWS * 8 )
 
 /* The width and height of the (emulated) border */
-#define DISPLAY_BORDER_WIDTH  32
-#define DISPLAY_BORDER_HEIGHT 24
+#define DISPLAY_BORDER_WIDTH_COLS  4
+#define DISPLAY_BORDER_HEIGHT_COLS 3
+
+/* The width and height of the (emulated) border */
+/* Each main screen column can produce 16 pixels in hires mode */
+#define DISPLAY_BORDER_WIDTH  ( DISPLAY_BORDER_WIDTH_COLS * 16 )
+/* Aspect corrected border width */
+#define DISPLAY_BORDER_ASPECT_WIDTH  ( DISPLAY_BORDER_WIDTH_COLS * 8 )
+/* Each main screen column can produce only 8 pixels in any mode */
+#define DISPLAY_BORDER_HEIGHT ( DISPLAY_BORDER_HEIGHT_COLS * 8 )
 
 /* The width and height of the window we'll be displaying */
 #define DISPLAY_SCREEN_WIDTH  ( DISPLAY_WIDTH  + 2 * DISPLAY_BORDER_WIDTH  )
 #define DISPLAY_SCREEN_HEIGHT ( DISPLAY_HEIGHT + 2 * DISPLAY_BORDER_HEIGHT )
 
-extern BYTE display_border;
+/* The aspect ratio corrected display width */
+#define DISPLAY_ASPECT_WIDTH  ( DISPLAY_SCREEN_WIDTH / 2 )
+
+extern BYTE display_lores_border;
+extern BYTE display_hires_border;
 
 /* Offsets as to where the data and the attributes for each pixel
    line start */
@@ -55,9 +73,13 @@ void display_line(void);
 
 void display_dirty( WORD address );
 void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper);
+void display_plot16(int x, int y, WORD data, BYTE ink, BYTE paper);
 
-void display_set_border(int colour);
-int display_dirty_border( void );
+void display_parse_attr(BYTE attr, BYTE *ink, BYTE *paper);
+
+void display_set_lores_border(int colour);
+void display_set_hires_border(int colour);
+int display_dirty_border(void);
 
 int display_frame(void);
 void display_refresh_all(void);

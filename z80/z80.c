@@ -33,6 +33,8 @@
 
 #include "z80_macros.h"
 
+#include "scld.h"
+
 /* Whether a half carry occured or not can be determined by looking at
    the 3rd bit of the two arguments and the result; these are hashed
    into this table in the form r12, where r is the 3rd bit of the
@@ -107,7 +109,7 @@ void z80_interrupt()
     PUSH16(PCL,PCH);
 
     switch(IM) {
-      case 0: PC = 0x0038; tstates+=12; break;
+      case 0: if( scld_intdisable ) break; PC = 0x0038; tstates+=12; break;
       case 1: PC = 0x0038; tstates+=13; break;
       case 2: 
 	{

@@ -94,9 +94,10 @@ void uidisplay_putpixel(int x,int y,int colour)
 {
   if( colour != 7 ) fprintf( stderr, "putpixel: %d %d %d\n", x, y, colour);
   if( y % 2 == 0 ) {
+    if(x%2!=0) return;
     x -= DISPLAY_BORDER_WIDTH;
     y -= DISPLAY_BORDER_HEIGHT;
-    aa_putpixel( aalibui_context, x, y/2, colour );
+    aa_putpixel( aalibui_context, x>>1, y/2, colour );
   }
 }
 

@@ -29,6 +29,7 @@
 #include "keyboard.h"
 #include "rzx.h"
 #include "types.h"
+#include "scld.h"
 
 /* What to return if no keys are pressed; depends on the last byte
    output to the ULA; see CSS FAQ | Technical Information | Port #FE
@@ -109,6 +110,8 @@ void fuse_keyboard_init(void)
 BYTE keyboard_read(BYTE porth)
 {
   BYTE data=keyboard_default_value; int i;
+
+  if ( scld_intdisable ) return data;
 
   /* If we're playing back a .rzx file, start with all bits one. If we're
      not, start with bit 6 possibly unset */

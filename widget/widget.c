@@ -111,7 +111,10 @@ static void printchar(int x, int y, int col, int ch) {
         int b;
         b=widget_font[ch*8+my];
         for(mx=0; mx<8; mx++) {
-            if(b&128) uidisplay_putpixel(mx+DISPLAY_BORDER_WIDTH+8*x, my+DISPLAY_BORDER_HEIGHT+8*y, col);
+            if(b&128) {
+	      uidisplay_putpixel((mx<<1)+DISPLAY_BORDER_WIDTH+16*x, my+DISPLAY_BORDER_HEIGHT+8*y, col);
+	      uidisplay_putpixel((mx<<1)+1+DISPLAY_BORDER_WIDTH+16*x, my+DISPLAY_BORDER_HEIGHT+8*y, col);
+	    }
             b<<=1;
         }
     }
@@ -133,8 +136,10 @@ void widget_printstring(int x, int y, int col, const char *s)
 void widget_rectangle( int x, int y, int w, int h, int col )
 {
     int mx, my;
-    for(my=0;my<h;my++)for(mx=0;mx<w;mx++)
-        uidisplay_putpixel(mx+DISPLAY_BORDER_WIDTH+x, my+DISPLAY_BORDER_HEIGHT+y, col);
+    for(my=0;my<h;my++)for(mx=0;mx<w;mx++) {
+        uidisplay_putpixel((mx<<1)+DISPLAY_BORDER_WIDTH+x, my+DISPLAY_BORDER_HEIGHT+y, col);
+        uidisplay_putpixel((mx<<1)+1+DISPLAY_BORDER_WIDTH+x, my+DISPLAY_BORDER_HEIGHT+y, col);
+    }
 }
 
 /* Global initialisation/end routines */
@@ -324,34 +329,58 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 		    WIDGET_COLOUR_BACKGROUND );
   
   for( i=(8*x)-1; i<(8*(x+width))+1; i++ ) {
-    uidisplay_putpixel( i                + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (i<<1)           + DISPLAY_BORDER_WIDTH,
 			(8* y        )-4 + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
-    uidisplay_putpixel( i                + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (i<<1)+1         + DISPLAY_BORDER_WIDTH,
+			(8* y        )-4 + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (i<<1)           + DISPLAY_BORDER_WIDTH,
+			(8*(y+height))+3 + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (i<<1)+1         + DISPLAY_BORDER_WIDTH,
 			(8*(y+height))+3 + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
   }
 
   for( i=(8*y)-1; i<(8*(y+height))+1; i++ ) {
-    uidisplay_putpixel( (8* x        )-4 + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (16* x       )-4 + DISPLAY_BORDER_WIDTH,
 			i                + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
-    uidisplay_putpixel( (8*(x+width ))+3 + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (16* x       )-3 + DISPLAY_BORDER_WIDTH,
+			i                + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (16*(x+width))+3 + DISPLAY_BORDER_WIDTH,
+			i                + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (16*(x+width))+4 + DISPLAY_BORDER_WIDTH,
 			i                + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
   }
 
   for( i=0; i<2; i++ ) {
-    uidisplay_putpixel( (8* x        )-3+i + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (16* x       )-3+i + DISPLAY_BORDER_WIDTH,
 			(8* y        )-2-i + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
-    uidisplay_putpixel( (8*(x+width) )+2-i + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (16* x       )-2+i + DISPLAY_BORDER_WIDTH,
 			(8* y        )-2-i + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
-    uidisplay_putpixel( (8* x        )-3+i + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (16*(x+width))+2-i + DISPLAY_BORDER_WIDTH,
+			(8* y        )-2-i + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (16*(x+width))+3-i + DISPLAY_BORDER_WIDTH,
+			(8* y        )-2-i + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (16* x       )-3+i + DISPLAY_BORDER_WIDTH,
 			(8*(y+height))+1+i + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
-    uidisplay_putpixel( (8*(x+width) )+2-i + DISPLAY_BORDER_WIDTH,
+    uidisplay_putpixel( (16* x       )-2+i + DISPLAY_BORDER_WIDTH,
+			(8*(y+height))+1+i + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (16*(x+width))+2-i + DISPLAY_BORDER_WIDTH,
+			(8*(y+height))+1+i + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (16*(x+width))+3-i + DISPLAY_BORDER_WIDTH,
 			(8*(y+height))+1+i + DISPLAY_BORDER_HEIGHT,
 			WIDGET_COLOUR_FOREGROUND );
   }
