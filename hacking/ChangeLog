@@ -1279,3 +1279,7 @@
 20050321 settings.dat,ui/options.dat,widget/{filesel.c,menu.c,options.pl,
 	 text.c,widget.[ch],widget_internals.h}: add selectable filenames
 	 when saving via the widget UI (patch #1150692) (Darren).
+20050321 machine.c,memory.c,machines/{scorpion.c,spec128.c,spec16.c,spec48.c,
+	 spec_se.c,specplus3.c},pokefinder/{pokefinder.[ch]},ui/ui.h,
+	 ui/gtk/{gtkinternals.h,gtkui.c,pokefinder.c},widget/widget.c:
+	 various pokefinder improvements (patch #1150701) (Darren).

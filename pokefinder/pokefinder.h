@@ -29,7 +29,8 @@
 
 #include <libspectrum.h>
 
-extern int pokefinder_possible[8][0x4000];
+extern libspectrum_byte pokefinder_possible[][0x4000];
+extern libspectrum_byte pokefinder_impossible[][0x4000/8];
 extern size_t pokefinder_count;
 
 int pokefinder_clear( void );

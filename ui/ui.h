@@ -69,6 +69,9 @@ int ui_debugger_deactivate( int interruptable );
 int ui_debugger_update( void );
 int ui_debugger_disassemble( libspectrum_word address );
 
+/* Reset anything in the UI which needs to be reset on machine selection */
+int ui_widgets_reset( void );
+
 /* Functions defined in ../ui.c */
 
 /* Confirm whether we want to save some data before overwriting it */

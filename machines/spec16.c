@@ -1,5 +1,5 @@
 /* spec16.c: Spectrum 16K specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2005 Philip Kendall
 
    $Id$
 
@@ -119,8 +119,11 @@ spec16_reset( void )
   memory_map_home[4] = memory_map_home[5] = &empty_mapping;
   memory_map_home[6] = memory_map_home[7] = &empty_mapping;
 
-  /* The RAM page is contended */
-  memory_map_home[2]->contended = memory_map_home[3]->contended = 1;
+  /* The RAM page is present/writable and contended */
+  for( i = 2; i <= 3; i++ ) {
+    memory_map_home[ i ]->writable = 1;
+    memory_map_home[ i ]->contended = 1;
+  }
 
   for( i = 0; i < 8; i++ )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];

@@ -876,6 +876,14 @@ ui_trdos_disk_write( trdos_drive_number which )
   return 0;
 }
 
+/* Called on machine selection */
+int
+ui_widgets_reset( void )
+{
+  gtkui_pokefinder_clear();
+  return 0;
+}
+
 void
 menu_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {

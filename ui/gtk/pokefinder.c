@@ -200,12 +200,12 @@ update_pokefinder( void )
 
     which = 0;
 
-    for( page = 0; page < SPECTRUM_RAM_PAGES; page++ )
-      for( offset = 0; offset < 0x4000; offset++ )
-	if( pokefinder_possible[page][offset] != -1 ) {
+    for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; page++ )
+      for( offset = 0; offset < 0x2000; offset++ )
+	if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
 
-	  possible_page[ which ] = page;
-	  possible_offset[ which ] = offset;
+	  possible_page[ which ] = page / 2;
+	  possible_offset[ which ] = offset + 8192 * (page & 1);
 	  which++;
 	
 	  snprintf( possible_text[0], 128, "%lu", (unsigned long)page );
@@ -243,4 +243,11 @@ possible_click( GtkCList *clist, gint row, gint column,
   if( error ) return;
 
   ui_debugger_update();
+}
+
+void
+gtkui_pokefinder_clear( void )
+{
+  pokefinder_clear();
+  if( dialog_created ) update_pokefinder();
 }

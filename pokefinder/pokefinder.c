@@ -30,9 +30,11 @@
 
 #include <libspectrum.h>
 
+#include "memory.h"
 #include "spectrum.h"
 
-int pokefinder_possible[ SPECTRUM_RAM_PAGES ][0x4000];
+libspectrum_byte pokefinder_possible[ 2 * SPECTRUM_RAM_PAGES ][0x2000];
+libspectrum_byte pokefinder_impossible[ 2 * SPECTRUM_RAM_PAGES ][0x2000/8];
 size_t pokefinder_count;
 
 int
@@ -40,11 +42,14 @@ pokefinder_clear( void )
 {
   size_t page, offset;
 
-  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ )
-    for( offset = 0; offset < 0x4000; offset++ ) 
-      pokefinder_possible[page][offset] = RAM[page][offset];
-
-  pokefinder_count = SPECTRUM_RAM_PAGES * 0x4000;
+  pokefinder_count = 0;
+  for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; ++page )
+    if( memory_map_ram[page].writable ) {
+      pokefinder_count += 8192;
+      memcpy( pokefinder_possible[page], memory_map_ram[page].page, 8192 );
+      memset( pokefinder_impossible[page], 0, 1024 );
+    } else
+      memset( pokefinder_impossible[page], 255, 1024 );
 
   return 0;
 }
@@ -54,13 +59,13 @@ pokefinder_search( libspectrum_byte value )
 {
   size_t page, offset;
 
-  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ )
-    for( offset = 0; offset < 0x4000; offset++ ) {
+  for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; page++ )
+    for( offset = 0; offset < 0x2000; offset++ ) {
 
-      if( pokefinder_possible[page][offset] == -1 ) continue;
+      if( pokefinder_impossible[page][offset/8] & 1 << (offset & 7) ) continue;
 
       if( RAM[page][offset] != value ) {
-	pokefinder_possible[page][offset] = -1;
+	pokefinder_impossible[page][offset/8] |= 1 << (offset & 7);
 	pokefinder_count--;
       }
     }
@@ -73,15 +78,15 @@ pokefinder_incremented( void )
 {
   size_t page, offset;
 
-  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ ) {
-    for( offset = 0; offset < 0x4000; offset++ ) {
+  for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; page++ ) {
+    for( offset = 0; offset < 0x2000; offset++ ) {
 
-      if( pokefinder_possible[page][offset] == -1 ) continue;
+      if( pokefinder_impossible[page][offset/8] & 1 << (offset & 7) ) continue;
 
       if( RAM[page][offset] > pokefinder_possible[page][offset] ) {
 	pokefinder_possible[page][offset] = RAM[page][offset];
       } else {
-	pokefinder_possible[page][offset] = -1;
+	pokefinder_impossible[page][offset/8] |= 1 << (offset & 7);
 	pokefinder_count--;
       }
 
@@ -96,15 +101,15 @@ pokefinder_decremented( void )
 {
   size_t page, offset;
 
-  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ ) {
-    for( offset = 0; offset < 0x4000; offset++ ) {
+  for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; page++ ) {
+    for( offset = 0; offset < 0x2000; offset++ ) {
 
-      if( pokefinder_possible[page][offset] == -1 ) continue;
+      if( pokefinder_impossible[page][offset/8] & 1 << (offset & 7) ) continue;
 
       if( RAM[page][offset] < pokefinder_possible[page][offset] ) {
 	pokefinder_possible[page][offset] = RAM[page][offset];
       } else {
-	pokefinder_possible[page][offset] = -1;
+	pokefinder_impossible[page][offset/8] |= 1 << (offset & 7);
 	pokefinder_count--;
       }
 

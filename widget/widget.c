@@ -514,4 +514,10 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   return (ui_confirm_joystick_t)info.result;
 }
 
+int
+ui_widgets_reset( void )
+{
+  return 0;
+}
+
 #endif				/* #ifdef USE_WIDGET */

@@ -226,6 +226,10 @@ spec_se_reset( void )
   memset( memory_map_home[4]->page, 0, MEMORY_PAGE_SIZE );
   memset( memory_map_home[5]->page, 0, MEMORY_PAGE_SIZE );
 
+  /* Mark as present/writeable */
+  for( i = 0; i < 34; ++i )
+    memory_map_ram[i].writable = 1;
+
   /* RAM pages 1, 3, 5 and 7 contended */
   for( i = 0; i < 8; i++ ) 
     memory_map_ram[ 2 * i ].contended =

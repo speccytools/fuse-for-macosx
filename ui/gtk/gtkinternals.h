@@ -182,4 +182,10 @@ int gtkstatusbar_set_visibility( int visible );
 
 void gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj );
 
+/*
+ * Dialog box reset
+ */
+
+void gtkui_pokefinder_clear( void );
+
 #endif				/* #ifndef FUSE_GTKINTERNALS_H */

@@ -129,7 +129,7 @@ scorpion_init( fuse_machine_info *machine )
 int
 scorpion_reset(void)
 {
-  int error;
+  int i, error;
 
   trdos_reset();
 
@@ -154,6 +154,10 @@ scorpion_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
+
+  /* Mark the second 128K as present/writeable */
+  for( i = 16; i < 32; i++ )
+    memory_map_ram[i].writable = 1;
 
   return spec128_common_reset( 0 );
 }

@@ -289,6 +289,10 @@ specplus3_plus2a_common_reset( void )
     memory_map_ram[ 2 * i     ].contended =
       memory_map_ram[ 2 * i + 1 ].contended = i & 4;
 
+  /* Mark as present/writeable */
+  for( i = 0; i < 16; i++ )
+    memory_map_ram[i].writable = 1;
+
   error = normal_memory_map( 0, 0 ); if( error ) return error;
 
   return 0;

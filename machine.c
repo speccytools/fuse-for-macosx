@@ -40,6 +40,7 @@
 #include "machines/spec48.h"
 #include "machines/specplus3.h"
 #include "machines/tc2068.h"
+#include "memory.h"
 #include "printer.h"
 #include "scld.h"
 #include "settings.h"
@@ -204,7 +205,7 @@ machine_get_id( libspectrum_machine type )
 static int
 machine_select_machine( fuse_machine_info *machine )
 {
-  int width, height;
+  int width, height, i;
   int capabilities;
   int plus3, trdos;
 
@@ -235,6 +236,12 @@ machine_select_machine( fuse_machine_info *machine )
 
   if( uidisplay_init( width, height ) ) return 1;
 
+  /* Mark RAM as not-present/read-only. The machine's reset function will
+   * mark available pages as present/writeable.
+   */
+  for( i = 0; i < 2 * SPECTRUM_RAM_PAGES; i++ )
+    memory_map_ram[i].writable = 0;
+
   if( machine_reset() ) return 1;
 
   /* Set the disk menu items and statusbar appropriately */
@@ -257,6 +264,9 @@ machine_select_machine( fuse_machine_info *machine )
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
   }
+
+  /* Reset any dialogue boxes etc. which contain machine-dependent state */
+  ui_widgets_reset();
 
   return 0;
 }

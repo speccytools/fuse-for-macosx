@@ -176,6 +176,10 @@ spec128_common_reset( int contention )
   memory_map_home[6] = &memory_map_ram[ 0];
   memory_map_home[7] = &memory_map_ram[ 1];
 
+  /* Mark as present/writeable */
+  for( i = 0; i < 16; i++ )
+    memory_map_ram[i].writable = 1;
+
   /* Odd pages contended on the 128K/+2; the loop is up to 16 to
      ensure all of the Scorpion's 256Kb RAM is not contended */
   for( i = 0; i < 16; i++ )

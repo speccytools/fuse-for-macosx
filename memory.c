@@ -73,8 +73,8 @@ int memory_current_screen;
 libspectrum_word memory_screen_mask;
 
 /* Set up the information about the normal page mappings.
-   Memory contention varies from machine to machine and must be set in
-   the appropriate _reset function */
+   Memory contention and useable pages vary from machine to machine and must
+   be set in the appropriate _reset function */
 int
 memory_init( void )
 {
@@ -104,7 +104,7 @@ memory_init( void )
     mapping1->page = &RAM[i][ 0x0000 ];
     mapping2->page = &RAM[i][ MEMORY_PAGE_SIZE ];
 
-    mapping1->writable = mapping2->writable = 1;
+    mapping1->writable = mapping2->writable = 0;
     mapping1->bank = mapping2->bank = MEMORY_BANK_HOME;
     mapping1->page_num = mapping2->page_num = i;
 
