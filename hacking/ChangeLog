@@ -176,3 +176,4 @@
 20030902 man/fuse.1: use \fB rather than .B for large bit of bold text
 	 in the 'competition mode' entry (works much better on Solaris).
 20030902 THANKS: Add Ivan Ruiz Etxabe and David Muriel.
+20030902 ChangeLog: bring up to date.

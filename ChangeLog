@@ -1,3 +1,47 @@
+2003-09-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* A Z80 core rewrite such that it's now generated from the regular
+	  patterns in the instruction set. This shouldn't have any effect
+	  as yet, but will make performance enhancements easier to do in
+	  the future (Philip Kendall).
+
+	* On the TC2068, the ROM traps apply only when in the EXROM and
+	  memory contention applies only in the HOME bank (Fredrick
+	  Meunier).
+
+	* On the 128K Spectrum, use the correct port mask when checking
+	  for contention on the 'memory control' port (Philip Kendall).
+
+	* RZX competition mode (Philip Kendall).
+
+	* Add AY logging to .psg files (Matthew Westcott)
+
+	* Optionally autoload +3 and TRDOS disks when they're inserted
+	  (Philip Kendall).
+
+	* Fall back to read(2) and malloc(3) if mmap(2) fails or is
+	  unavailable (Philip Kendall).
+
+	* Add 'out' and 'tbreakpoint' commands, conditional breakpoints
+	  and the ability to use general numeric expression to the GTK+
+	  debugger (Philip Kendall).
+
+	* Allow Fuse to work with GTK+ 2.x (Marek Januszewski).
+
+	* Add a scrollbar to the GTK+ debugger's disassembly window
+	  (Philip Kendall).
+
+	* New AdvMAME3x graphics scaler (Fredrick Meunier/ScummVM team)
+
+	* In the GTK+ UI, deactivate menu items when they're not
+	  appropriate (Philip Kendall).
+
+	* Make bright black be the same as 'normal' black in the
+	  framebuffer user interface (Witold Filipczyk).
+
+	* Add confirmation dialogs before resetting or quitting under the
+	  GTK+ UI (Philip Kendall).
+
 2003-05-31  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.6.0.1 released
