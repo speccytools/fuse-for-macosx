@@ -73,7 +73,7 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     if( rom_block->data == NULL ) {
       libspectrum_tape_free( tape );
       free( block );
-      return 1;
+      return LIBSPECTRUM_ERROR_MEMORY;
     }
 
     /* Copy the block data across, and move along */
@@ -84,7 +84,7 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     rom_block->pause = 1000;
 
     /* Finally, put the block into the block list */
-    tape->blocks = g_slist_append( tape->blocks, (gpointer)rom_block );
+    tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
 
   }
 
