@@ -161,8 +161,12 @@ static int xdisplay_allocate_image(int width, int height)
   int id = -1;
 #endif /* X_USE_SHM */
 
-  /* FIXME: should use sigaction */
-  signal( SIGINT, xdisplay_end );
+  struct sigaction handler;
+
+  handler.sa_handler = xdisplay_end;
+  sigemptyset( &handler.sa_mask );
+  handler.sa_flags = 0;
+  sigaction( SIGINT, &handler, NULL );
 
 #ifdef X_USE_SHM
   shm_used = XShmQueryExtension( display );
