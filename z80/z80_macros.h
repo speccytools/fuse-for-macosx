@@ -98,11 +98,8 @@
 
 /* Get the appropriate contended memory delay. Use this macro later
    to avoid a function call if memory contention is disabled */
-/*  #define contend(address,time) tstates += contend_memory( (address) ) + (time); */
-/*  #define contend_io(port,time) tstates += contend_port( (port) ) + (time); */
-
-#define contend(address,time) tstates += (time);
-#define contend_io(port,time) tstates += (time);
+#define contend(address,time) tstates += contend_memory( (address) ) + (time);
+#define contend_io(port,time) tstates += contend_port( (port) ) + (time);
 
 /* Some commonly used instructions */
 #define AND(value)\
