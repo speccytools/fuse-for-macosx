@@ -207,7 +207,7 @@ break
 {\
   F = ( F & FLAG_C ) | ( (value)&0x0f ? 0 : FLAG_H ) | FLAG_N;\
   (value)--;\
-  F |= ( (value)==0x79 ? FLAG_V : 0 ) | sz53_table[value];\
+  F |= ( (value)==0x7f ? FLAG_V : 0 ) | sz53_table[value];\
 }
 
 #define IN(reg,port)\

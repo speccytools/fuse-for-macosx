@@ -9,8 +9,8 @@ Some thanks (in alphabetical order):
   was very helpful for getting the z80 opcodes right; also the ZX Printer
   emulation is based on xz80's.
 
-* Boris Donko: for spotting that I'd forgotten memory contention on the
-  LD (nnnn),A instruction and half the flags on SCF.
+* Boris Donko: for various Z80 core fixes: missing memory contention
+  on LD (nnnn),A instruction, flags on SCF and FLAG_V on DEC.
 
 * John Elliott: for lib765, which provides Fuse's emulation of the +3's
   FDC, and libdsk which provides support for more disk image formats:
