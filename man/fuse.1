@@ -90,7 +90,7 @@ example
 .IR icewm (1))
 this prevents the window from being resized at all. (Enabled by
 default, but you can use
-.RI ` \-\-no-aspect\-hint '
+.RI ` \-\-no\-aspect\-hint '
 to disable).
 .RE
 .PP
@@ -106,7 +106,7 @@ option.
 .RS
 Specify whether tape and disk files should be automatically loaded
 when they are opened. (Enabled by default, but you can use
-.RI ` \-\-no-auto\-load '
+.RI ` \-\-no\-auto\-load '
 to disable). Same as the General Options dialog's
 .I "Auto-load media"
 option.
@@ -150,7 +150,7 @@ option.
 .RS
 Specify whether RZX files should be written out compressed. (Enabled
 by default, but you can use
-.RI ` \-\-no-compress\-rzx '
+.RI ` \-\-no\-compress\-rzx '
 to disable). Same as the RZX Options dialog's
 .I "Compress RZX data"
 option.
@@ -161,7 +161,7 @@ option.
 Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
 occuring. (Enabled by default, but you can use
-.RI ` \-\-no-confirm\-actions'
+.RI ` \-\-no\-confirm\-actions'
 to disable). This option is effective only under the GTK+ UI, and is
 the same as the General Options dialog's
 .I "Confirm actions"
@@ -179,7 +179,7 @@ the TC2068 on startup if available.
 Specify whether a snapshot should be embedded in an RZX file when
 recording is started from an existing snapshot. (Enabled by default,
 but you can use
-.RI ` \-\-no-embed\-snapshot '
+.RI ` \-\-no\-embed\-snapshot '
 to disable). Same as the RZX Options dialog's
 .I "Always embed snapshot"
 option.
@@ -191,7 +191,7 @@ Specify whether Fuse should run in full screen mode.
 This option is effective only under the SDL UI.
 .RE
 .PP
-.I "-g filter"
+.I "\-g filter"
 .br
 .I "\-\-graphics\-filter mode"
 .RS
@@ -226,7 +226,7 @@ printer. See the
 section for more details.
 .RE
 .PP
-.I -h
+.I \-h
 .br
 .I \-\-help
 .RS
@@ -252,7 +252,7 @@ Emulate an issue 2 keyboard. Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "-j device"
+.I "\-j device"
 .br
 .I "\-\-joystick\-1 device"
 .RS
@@ -293,13 +293,13 @@ option.
 .RS
 Specify whether the sound made while tapes are loading should be
 emulated. (Enabled by default, but you can use
-.RI ` \-\-no-loading\-sound '
+.RI ` \-\-no\-loading\-sound '
 to disable). Same as the Sound Option dialog's
 .I "Loading sound"
 option.
 .RE
 .PP
-.I "-m type"
+.I "\-m type"
 .br
 .I "\-\-machine type"
 .RS
@@ -318,7 +318,7 @@ and
 .IR pentagon .
 .RE
 .PP
-.I "-p file"
+.I "\-p file"
 .br
 .I "\-\-playback file"
 .RS
@@ -347,7 +347,7 @@ frame updates. Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "-r file"
+.I "\-r file"
 .br
 .I "\-\-record file"
 .RS
@@ -392,7 +392,7 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "-s file"
+.I "\-s file"
 .br
 .I "\-\-snapshot file"
 .RS
@@ -401,7 +401,7 @@ format supported by
 .IR libspectrum "(3)."
 .RE
 .PP
-.I \-\-snaps-as\-z80
+.I \-\-snaps\-as\-z80
 .RS
 Specify whether the widget based user interfaces should save snapshots
 as .szx or .z80 files. The same as the General Options dialog's
@@ -419,7 +419,7 @@ to disable). Same as the Sound Option dialog's
 option.
 .RE
 .PP
-.I \-\-sound-force\-8bit
+.I \-\-sound\-force\-8bit
 .RS
 Force the use of 8-bit sound, even if 16-bit is possible. Same as the
 Sound Option dialog's
@@ -427,7 +427,7 @@ Sound Option dialog's
 option.
 .RE
 .PP
-.I "-d device"
+.I "\-d device"
 .br
 .I "\-\-sound\-device device"
 .RS
@@ -455,7 +455,7 @@ being accessed. Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "-v mode"
+.I "\-v mode"
 .br
 .I "\-\-svgamode mode"
 .RS
@@ -465,7 +465,7 @@ are `320' (which corresponds to a 320x240x256 mode), the default and
 `640' (a 640x480x256 mode).
 .RE
 .PP
-.I "-D mode"
+.I "\-D mode"
 .br
 .I "\-\-doublescan\-mode mode"
 .RS
@@ -482,7 +482,7 @@ If your monitor displays a blank screen when using 1 or 2, press F10 then
 try a different option or say "\-\-svgamode 640".
 .RE
 .PP
-.I "-t file"
+.I "\-t file"
 .br
 .I "\-\-tape file"
 .RS
@@ -513,7 +513,7 @@ Insert the specified file into the emulated TR-DOS drive A: and select
 Pentagon mode on startup.
 .RE
 .PP
-.I -V
+.I \-V
 .br
 .I \-\-version
 .RS
@@ -544,7 +544,7 @@ Perpherals Option dialog's
 option.
 .RE
 .PP
-.I \-\-zxatasp-write\-protect
+.I \-\-zxatasp\-write\-protect
 .RS
 Specify the state of the ZXATASP write protect jumper. Same as the
 Perpherals Option dialog's
@@ -1430,7 +1430,7 @@ Start playing the TAP or TZX file, if required. (Choosing the option
 again pauses playback, and a further press resumes). To explain - if
 tape-loading traps have been disabled (in the General Options dialog),
 starting the loading process in the emulated machine isn't enough. You
-also have to `press play', so to speak :-), and this is how you do
+also have to `press play', so to speak :\-), and this is how you do
 that. You may also need to `press play' like this in certain other
 circumstances, e.g. TZXs containing multi-load games may have a
 stop-the-tape request (which Fuse obeys).
@@ -1698,9 +1698,9 @@ keyboard -
 .RI ` . ',
 .RI ` / ',
 .RI ` ; ',
-.RI ` ' ',
+.RI ` \(aq ',
 .RI ` # ',
-.RI ` - ',
+.RI ` \- ',
 and
 .RI ` = '.
 These are mapped to the appropriate symbol-shifted keys on the
@@ -1716,13 +1716,13 @@ section below.
 .SH "DISPLAY SIZE"
 Some of Fuse's UIs allow resizing of the emulated Spectrum's display.
 For the window-based ones (GTK+ and Xlib), you can resize the window
-by, well, resizing it. :-) Exactly how this works depends on your
+by, well, resizing it. :\-) Exactly how this works depends on your
 window manager; you may have to make the window over twice the width
 and height of the original size before it actually scales up. Fuse
-attempts to keep the window 'square', but with some window managers
+attempts to keep the window `square', but with some window managers
 this can mean the window will never resize at all. If you experience
 this problem, the
-.RI ` \-\-no-aspect\-hint '
+.RI ` \-\-no\-aspect\-hint '
 option may help.
 .PP
 If you're using the SDL UI under X11, the window will automatically
@@ -1840,7 +1840,7 @@ interfaces or when saving screenshots.
 The emulated Spectrum is, by default, an unmodified 48K Spectrum with
 a tape player and ZX Printer attached. Oh, and apparently some magical
 snapshot load/save machine which is probably best glossed over for the
-sake of the analogy. :-)
+sake of the analogy. :\-)
 .PP
 To emulate different kinds of Spectrum, select the
 .I "Machine, Select..."
@@ -2271,7 +2271,7 @@ is used for conditional breakpoints, with `0' being false and any
 other value being true. In numeric expressions, you can use integer
 constants (all calculations is done in integers), register names
 (which simply evaluate to the value of the register), parentheses, the
-standard four numeric operations (`+', `-', `*' and `/'), the
+standard four numeric operations (`+', `\-', `*' and `/'), the
 (non-)equality operators `==' and `!=', the comparision operators `>',
 `<', `>=' and `<=', bitwise and (`&'), or (`|') and exclusive or (`^')
 and logical and (`&&') and or (`||').
@@ -2360,9 +2360,9 @@ DSK format. However, this is actually an slight oversimplification;
 there in in fact
 .I two
 similar, but not identical, DSK formats. (The difference can be seen
-by doing `head -1
+by doing `head \-1
 .IR dskfile ':
-one format will start `MV - CPCEMU' and the other will start
+one format will start `MV \- CPCEMU' and the other will start
 `EXTENDED').
 .PP
 The `lib765' library used by Fuse to emulate the +3's FDC supports the
@@ -2411,7 +2411,7 @@ does work though, so use that instead.
 .PP
 Changing virtual consoles when using SVGAlib for joystick support
 causes Fuse to exit. If this is a problem, compile Fuse with the
-.RI ` \-\-disable-ui\-joystick '
+.RI ` \-\-disable\-ui\-joystick '
 option.
 .PP
 The poke finder can't search outside `normal' RAM.
@@ -2432,7 +2432,7 @@ warnings. This is a GTK+ bug (#144427), which is fixed in GTK+ 2.4.4.
 .\"
 .SH SEE ALSO
 .IR bzip2 "(3),"
-.IR fuse-utils "(1),"
+.IR fuse\-utils "(1),"
 .IR gzip "(3),"
 .IR libspectrum "(3),"
 .IR xspect "(1),"
@@ -2448,7 +2448,7 @@ The comp.sys.sinclair Spectrum FAQ, at
 .\" clear that Phil is the main author.
 .\"
 .SH AUTHOR
-Philip Kendall (pak21-fuse@srcf.ucam.org).
+Philip Kendall (pak21\-fuse@srcf.ucam.org).
 .PP
 Matan Ziv-Av wrote the svgalib and framebuffer UIs, the glib
 replacement code, and did some work on the OSS-specific sound code and

@@ -1177,3 +1177,5 @@
 20050104 screenshot.[ch]: Undo bogus changes from 20050103.
 20050105 sound/sdlsound.c: Use device to select SDL audio driver.
 20050105 man/fuse.1: tweak comment about select SDL audio output type.
+20050106 man/fuse.1: more hyphen fixups for UTF-8 and an open quote
+	 (patch #1096868) (Stuart Brady).
