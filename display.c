@@ -913,7 +913,8 @@ do_border_change( struct border_change_t *first,
       border_change_line_part( first->y, first->x, DISPLAY_SCREEN_WIDTH_COLS,
 			       first->colour );
     end_line( first->y );
-    first->y++;
+    /* Don't extend region past the end of the screen */
+    if( first->y < DISPLAY_SCREEN_HEIGHT - 1 ) first->y++;
   }
 
   for( ; first->y < second->y; first->y++ ) {
