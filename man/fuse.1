@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "15th December, 2001" "Version 0.4.0" "Emulators"
+.TH fuse 1 "20th January, 2002" "Version 0.4.1" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -33,9 +33,11 @@ fuse \- Sinclair ZX Spectrum emulator
 .\"------------------------------------------------------------------
 .\"
 .SH SYNOPSIS
+.\" the trend for long-option-using programs is to give a largely
+.\" generic synopsis, so...
 .PD 0
 .B fuse
-.RI [ snapshot ]
+.RI [ options ]
 .P
 .PD 1
 .\"
@@ -44,18 +46,127 @@ fuse \- Sinclair ZX Spectrum emulator
 .SH DESCRIPTION
 Fuse is a Sinclair ZX Spectrum emulator. It supports several models
 (including the 128), with quite faithful emulation of the display and
-sound. It can load Z80 and SNA snapshots, and TAP and TZX virtual-tape
-files. Saving to both Z80 snapshots and TZX tape files is supported.
-The SLT extension to the Z80 format is partly supported (enough for
-multi-load games); however, loading of DAT files is not.
+sound.
+.PP
+The emulator can load Z80 and SNA snapshots, and TAP and TZX
+virtual-tape files. Saving to both Z80 snapshots and TZX tape files is
+supported. The SLT extension to the Z80 format is partly supported
+(enough for multi-load games); however, loading of the old DAT-file
+variant is not.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH OPTIONS
-.TP
-.I snapshot
-specifies a snapshot file to load. The file must be in either Z80 or
-SNA format.
+.\" dual short/long option listings here reflect the GNU approach,
+.\" as used in info files. It does mean using RS/RE, though,
+.\" so this is used for all options (for consistency).
+.\"
+.\" the options list is in alphabetical order by long option name (or
+.\" short option name if none).
+.\"
+.I -h
+.br
+.I --help
+.RS
+Give brief usage help, listing available options.
+.RE
+.PP
+.I --issue2
+.RS
+Emulate an issue 2 keyboard. Same as the General Options dialog's
+.I "Issue 2 keyboard"
+option.
+.RE
+.PP
+.I --kempston
+.RS
+Emulate a Kempston joystick. Same as the General Options dialog's
+.I "Kempston joystick"
+option.
+.RE
+.PP
+.I "-o long_option"
+.RS
+Equivalent to
+.RI ` --long_option '.
+If
+.I getopt_long
+was not present when Fuse was compiled, this will be the only way of
+using long options on the command line.
+.RE
+.PP
+.I --separation
+.RS
+Give stereo separation of the 128's AY sound channels. Same as the
+General Options dialog's
+.I "AY stereo separation"
+option.
+.RE
+.PP
+.I --slt
+.RS
+Support the SLT trap instruction. (Enabled by default, but you can use
+.RI ` --no-slt '
+to disable.) Same as the General Options dialog's
+.I "Use .slt traps"
+option.
+.RE
+.PP
+.I "-s file"
+.br
+.I "--snapshot file"
+.RS
+Specify a snapshot file to load. The file must be in Z80,
+SNA, or SLT format.
+.RE
+.PP
+.I "-t file"
+.br
+.I "--tape file"
+.RS
+Specify a virtual tape file to use. It must be in TAP or TZX format.
+Note that unlike snapshots, tape files are
+.I not
+automatically loaded, even if specified on the command line.
+.RE
+.PP
+.I --traps
+.RS
+Support traps for ROM tape loading/saving. (Enabled by default, but
+you can use
+.RI ` --no-traps '
+to disable.) Same as the General Options dialog's
+.I "Use tape traps"
+option.
+.RE
+.PP
+.I -V
+.br
+.I --version
+.RS
+Show which version of Fuse is being used.
+.RE
+.PP
+All long options which control on/off settings can be disabled using
+.RI ` --no-foo '
+(for an option
+.RI ` --foo ').
+For example, the opposite of
+.RI ` --issue2 '
+is
+.RI ` --no-issue2 '.
+These options can also be modified while the emulator is running,
+using the General Options dialog - see the documentation for the
+.I Options, General...
+menu item in the
+.B "MENUS AND KEYS"
+section for details.
+.PP
+Long options listed above will not be present if the
+.I getopt_long
+function was not available when Fuse was compiled, but the
+.RI ` -o '
+option should allow you to use them all the same.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -68,35 +179,77 @@ The important difference to note is that the GTK+ version uses
 `native' dialog boxes etc. (behaving like a fairly normal GUI-based
 program) while the others use an alternative, Fuse-specific `widget
 UI'. This latter front-end is easily spotted by the way it uses the
-main Fuse window/screen for dialogs, and uses the Spectrum's own font.
+main Fuse window/screen for menus and dialogs, and uses the Spectrum's
+own font.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH "KEYS AND KEY MAPPING"
-When the Spectrum is being emulated, the following keys are available:
-.TP
-.I F2
-Save a snapshot (the current machine state, memory contents etc.). The
-GTK+ UI lets you select a filename, but the others just write the file
-as
-.IR snapshot.z80 .
-.TP
+.SH "MENUS AND KEYS"
+Since many of the keys available are devoted to emulation of the
+Spectrum's keyboard, the primary way of controlling Fuse itself
+(rather than the emulated machine) is via the menus. There are also
+function key shortcuts for some menu options.
+.PP
+In the GTK+ version, the menu bar is always visible at the top of the
+Fuse window. You can click on a menu name to pop it up.
+.PP
+In the widget UI you have to press
+.I F1
+to get the main menu, which is equivalent to the menu bar; and unlike
+the GTK+ version, the emulator pauses while the menus are being
+navigated. The menus show which key to press for each menu option in
+brackets. Pressing
+.I Esc
+exits a menu.
+.PP
+Here's what the menu options do, along with the function key mappings
+for those items which have them:
+.PP
+.\" function keys are listed first, by analogy with short options
+.\" being listed the same way.
+.\"
 .I F3
-Load a snapshot. See the
+.br
+.I "File, Open Snapshot..."
+.RS
+Load a snapshot (of machine state, memory contents etc.), which should
+be in Z80, SNA, or SLT format. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file.
-.TP
+.RE
+.PP
+.I F2
+.br
+.I "File, Save Snapshot..."
+.RS
+Save a snapshot in Z80 format. The GTK+ UI lets you select a filename,
+but the others just write the file as
+.IR snapshot.z80 ,
+and have a differently-named menu item to match.
+.RE
+.PP
+.I F10
+.br
+.I "File, Exit"
+.RS
+Exit the emulator.
+.RE
+.PP
 .I F4
+.br
+.I "Options, General..."
+.RS
 Display the General Options dialog, letting you configure Fuse. (With
-the widget UI, the keys shown in (brackets) toggle the options,
+the widget UI, the keys shown in brackets toggle the options,
 .I Enter
 confirms any changes, and
 .I Esc
 aborts.) Note that any changed settings only apply to the
-currently-running Fuse. The options available are:
+currently-running Fuse.
 .PP
-.RS
-.I "Issue 2 keyboard emulation"
+The options available are:
+.PP
+.I "Issue 2 keyboard"
 .RS
 Early versions of the Spectrum used a different value for unused bits
 on the keyboard input ports, and a few games depended on the old value
@@ -104,7 +257,7 @@ of these bits. Enabling this option switches to the old value, to let
 you run them.
 .RE
 .PP
-.I "Kempston joystick emulation"
+.I "Kempston joystick"
 .RS
 There were several types of joystick interface for the Spectrum;
 enabling this option lets you use what was probably the most
@@ -125,7 +278,7 @@ so it's probably best to only enable Kempston emulation when you
 really need it.
 .RE
 .PP
-.I "Use tape loading traps"
+.I "Use tape traps"
 .RS
 Ordinarily, Fuse intercepts calls to the ROM tape-loading routine in
 order to load from tape files more quickly when possible. But this can
@@ -133,10 +286,13 @@ order to load from tape files more quickly when possible. But this can
 problem at the cost of slower (i.e. always real-time) tape-loading.
 When tape-loading traps are disabled, you need to start tape playback
 manually, by pressing
-.IR F8 .
+.I F8
+or choosing the
+.I "Tape, Play"
+menu item.
 .RE
 .PP
-.I "Stereo separation for AY sound"
+.I "AY stereo separation"
 .RS
 This option is only available when Fuse is able to play sound. By
 default, the sound output is mono, since this is all you got from an
@@ -146,74 +302,137 @@ works a little better than ACB stereo modifications for the machine
 itself, since it uses stereo positioning rather than simply playing on
 one channel only.
 .RE
-.RE
-.TP
-.I F5
-Reset the emulated Spectrum.
-.TP
-.I F6
-Write the current virtual-tape contents to a TZX file. The GTK+ UI
-lets you select a filename (see
-.B "FILE SELECTION"
-below), the others just write the file as
-.IR tape.tzx .
-The virtual-tape contents are the contents of the previously-loaded
-tape (if any), followed by anything you've saved from the emulated
-machine since. These newly-saved files are
-.I not
-written to any tape file until you press
-.IR F6 .
-.TP
-.I F7
-Choose a TAP or TZX virtual-tape file to load from. Again, see
-.B "FILE SELECTION"
-below. The loading does not start automatically - you have to start
-the load in the emulated machine (with LOAD "" or the 128's Tape
-Loader option, though you may need to reset first).
 .PP
+.I "Use .slt traps"
 .RS
+The multi-load aspect of SLT files requires a trap instruction to be
+supported. This instruction is not generally used except for this
+trap, but since it's not inconceivable that a program could be wanting
+to use the real instruction instead, you can choose whether to support
+the trap or not.
+.RE
+.RE
+.PP
+.I F5
+.br
+.I "Machine, Reset"
+.RS
+Reset the emulated Spectrum.
+.RE
+.PP
+.I F9
+.br
+.I "Machine, Select..."
+.RS
+Choose a type of Spectrum to emulate. The machine initially emulated
+is the 48K Spectrum. The choices available are 48K, 128K, +2, and +2A,
+but most of the time you'll probably want to use the 48 or 128
+machines.
+.RE
+.PP
+.I F7
+.br
+.I "Tape, Open..."
+.RS
+Choose a TAP or TZX virtual-tape file to load from. See the
+.B "FILE SELECTION"
+section below for details on how to choose the file. The loading does
+not start automatically - you have to start the load in the emulated
+machine (with LOAD "" or the 128's Tape Loader option, though you may
+need to reset first).
+.PP
 To
 .I guarantee
 that TZX files will load properly, you should select the file, make
 sure tape-loading traps are disabled in the General Options dialog,
 then press
-.IR F8 .
+.I F8
+(or do
+.IR "Tape, Play" ).
 That said, most TZXs will work with tape-loading traps enabled (often
 quickly loading partway, then loading the rest real-time), so you
 might want to try it that way first.
 .RE
-.TP
+.PP
 .I F8
-Start playing the TAP or TZX file, if required. (Pressing
-.I F8
+.br
+.I "Tape, Play"
+.RS
+Start playing the TAP or TZX file, if required. (Choosing the option
+(or pressing
+.IR F8 )
 again pauses playback, and a further press resumes.) To explain - if
 tape-loading traps have been disabled (in the General Options dialog),
 starting the loading process in the emulated machine isn't enough. You
 also have to `press play', so to speak :-), and this is how you do
-that. You may also need to press
-.I F8
-to resume in certain other circumstances (e.g. TZXs containing
-multi-load games may have a stop-the-tape request, which Fuse obeys).
-.TP
-.I F9
-Choose the next machine type in sequence. The machine initially
-emulated is the 48k Spectrum. Pressing
-.I F9
-gives (in turn) the 128, +2, and +2A before returning to the 48.
-.TP
+that. You may also need to `press play' like this in certain other
+circumstances, e.g. TZXs containing multi-load games may have a
+stop-the-tape request (which Fuse obeys).
+.RE
+.PP
+.I "Tape, Rewind"
+.RS
+Rewind the current virtual tape, so it can be read again from the
+beginning.
+.RE
+.PP
+.I "Tape, Clear"
+.RS
+Clear the current virtual tape. This is particularly useful when you
+want a `clean slate' to add newly-saved files to, before doing
+.I "Tape, Write..."
+(or
+.IR F6 ).
+.RE
+.PP
+.I F6
+.br
+.I "Tape, Write..."
+.RS
+Write the current virtual-tape contents to a TZX file. The GTK+ UI
+lets you select a filename (see
+.B "FILE SELECTION"
+below), the others just write the file as
+.IR tape.tzx ,
+and have a slightly different menu item. The virtual-tape contents are
+the contents of the previously-loaded tape (if any has been loaded
+since you last did a
+.IR "Tape, Clear" ),
+followed by anything you've saved from the emulated machine since.
+These newly-saved files are
+.I not
+written to any tape file until you choose this option!
+.RE
+.PP
+.I "Help, Keyboard picture..."
+.RS
+Display a diagram showing the Spectrum keyboard, and the various
+keywords that can be generated with each key from (48K) BASIC. The
+picture remains onscreen (and the emulator paused) until you press
+.I Esc
+or
+.IR Enter .
+.PP
+(Currently the GTK+ UI does not support displaying this picture, and
+also lacks a
+.I Help
+menu.)
+.RE
+.PP
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "KEY MAPPINGS"
+When emulating the Spectrum, keys
+.I F1
+to
 .I F10
-Exit the emulator.
-.PP
-The GTK+ UI also has a menu bar, giving you an alternative way to do
-the same things. For example,
-.I File/Exit
-exits the emulator.
-.PP
-Returning to the keys, the alphanumeric ones (along with
+are used as shortcuts for various menu items, as described above. The
+alphanumeric keys (along with
 .I Enter
 and
 .IR Space )
-are mapped as-is to the Spectrum keys, with other mapped keys being:
+are mapped as-is to the Spectrum keys. The other key mappings are:
 .TP
 .I Shift
 emulated as Caps Shift
@@ -256,19 +475,19 @@ section below.
 .\"------------------------------------------------------------------
 .\"
 .SH "THE EMULATED SPECTRUM"
-The emulated Spectrum is, by default, an unmodified 48k Spectrum with
+The emulated Spectrum is, by default, an unmodified 48K Spectrum with
 no peripherals attached other than a tape player. Oh, and apparently
 some magical snapshot load/save machine which is probably best glossed
 over for the sake of the analogy. :-)
 .PP
-To emulate different kinds of Spectrum, press
-.I F9
-(or select the
-.I Machine/Switch
-menu option, in the GTK+ UI). This cycles through the different types.
-Pressing it once gets you a 128, for example.
+To emulate different kinds of Spectrum, select the
+.I "Machine, Select..."
+menu option, or press
+.IR F9 .
 .PP
-The Spectrum emulation is paused when any dialogs appear.
+The Spectrum emulation is paused when any dialogs appear. In the
+widget UI, it's also paused when menus or the keyboard picture are
+displayed.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -337,9 +556,6 @@ files are shown, whether Fuse would be able to load them or not.
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
-It doesn't emulate memory contention, so some `rainbow' and border
-effects don't look right.
-.PP
 Not many peripherals are supported.
 .PP
 The sound support is currently for OSS (e.g. Linux) only.
@@ -368,6 +584,8 @@ replacement code, and did some work on the OSS-specific sound code and
 the original widget UI code.
 .PP
 Russell Marks wrote the sound emulation and OSS-specific sound code,
-the joystick emulation, and this man page.
+the joystick emulation, some of the printer code, and this man page.
+.PP
+Ian Collier wrote the ZX Printer emulation (for xz80).
 .PP
 Darren Salt wrote the original SLT support code.

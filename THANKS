@@ -6,7 +6,8 @@ Some thanks (in alphabetical order):
 
 * Ian Collier: the source to his xz80
   (http://www.comlab.ox.ac.uk/oucl/users/ian.collier/Spectrum/index.html)
-  was very helpful for getting the z80 opcodes right.
+  was very helpful for getting the z80 opcodes right; also the ZX Printer
+  emulation is based on xz80's.
 
 * Ian Greenway: for information about reading from unattached ports. If
   you've got an Amiga, you may well like to check out Ian's Spectrum
