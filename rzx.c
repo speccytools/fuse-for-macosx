@@ -87,16 +87,9 @@ libspectrum_rzx_dsa_key rzx_key = {
   "9A4E53CC249750C3194A38A3BE3EDEED28B171A9"	       /* x */
 };
 
-/* The time we started recording this RZX file */
-static timer_type start_time;
-
-/* How many 1/50ths of a second do we expect to have elapsed since we
-   started recording? */
-static int expected_time;
-
 /* By how much is the speed allowed to deviate from 100% whilst recording
    a competition mode RZX file */
-static const float SPEED_TOLERANCE = 0.05;
+static const float SPEED_TOLERANCE = 5;
 
 static int start_playback( libspectrum_rzx *rzx );
 static int recording_frame( void );
@@ -167,9 +160,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
       ui_error( UI_ERROR_WARNING,
 		"gcrypt not available: recording will NOT be signed" );
 
-    expected_time = 0;
     settings_current.emulation_speed = 100;
-    timer_count = 0.0;
     rzx_competition_mode = 1;
     
   } else {
@@ -347,57 +338,16 @@ static int recording_frame( void )
 
   /* If we're in competition mode, check we're running at close to 100%
      speed */
-  if( rzx_competition_mode ) {
+  if( rzx_competition_mode && 
+      fabs( current_speed - 100.0 ) > SPEED_TOLERANCE ) {
 
-    expected_time++;
+    rzx_stop_recording();
 
-    /* We wait one second before starting time measurements at all.
-       This is to allow any initial speed fluctuations caused by the
-       menu system to settle down (notably, with a widget UI and OSS
-       sound, the first few frames run fast as the sound buffers fill
-       up) */
-    if( expected_time == 50 ) {
-
-      error = timer_get_real_time( &start_time );
-      if( error ) {
-	ui_error( UI_ERROR_ERROR, "stopping competition mode recording" );
-	rzx_stop_recording();
-	return error;
-      }
-      
-    /* Measuring small time intervals will be inaccurate, so don't
-       start checking for speed violations until at least one second
-       of measured time has elapsed (ie two seconds into recording) */
-    } else if( expected_time > 100 ) {
-
-      timer_type current_time;
-      float elapsed_seconds, expected_seconds;
-
-      error = timer_get_real_time( &current_time );
-      if( error ) {
-	ui_error( UI_ERROR_ERROR, "stopping competition mode recording" );
-	rzx_stop_recording();
-	return error;
-      }
-
-      /* -1 to account for the fact we don't time the first second */
-      expected_seconds = ( expected_time * 0.02 ) - 1;
-
-      elapsed_seconds =
-	timer_get_time_difference( &current_time, &start_time );
-
-      if( fabs( expected_seconds / elapsed_seconds - 1 ) > SPEED_TOLERANCE ) {
-
-	rzx_stop_recording();
-
-	ui_error(
-	  UI_ERROR_INFO,
-	  "emulator speed is %d%%: stopping competition mode RZX recording",
-	  (int)( 100 * ( expected_seconds / elapsed_seconds ) )
-	);
-
-      }
-    }
+    ui_error(
+      UI_ERROR_INFO,
+      "emulator speed is %d%%: stopping competition mode RZX recording",
+      (int)( current_speed )
+    );
 
   }
 

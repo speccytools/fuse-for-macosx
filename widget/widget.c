@@ -205,8 +205,6 @@ int widget_do( widget_type which, void *data )
     error = screenshot_save(); if( error ) { widget_level--; return error; }
 #endif				/* #ifdef USE_LIBPNG */
 
-    error = timer_push( 100, TIMER_FUNCTION_WAKE );
-    if( error ) { widget_level--; return error; }
   }
 
   /* Store what type of widget we are and what data we were given */
@@ -224,7 +222,7 @@ int widget_do( widget_type which, void *data )
   while( ! widget_return[widget_level].finished ) {
     
     /* Go to sleep for a bit */
-    timer_pause();
+    timer_sleep_ms( 10 );
 
     /* Process any events */
     ui_event();
@@ -252,11 +250,9 @@ int widget_do( widget_type which, void *data )
 
   } else {
 
-    /* Restore the old keyboard handler */
-    error = timer_pop(); if( error ) return error;
-
     /* Refresh the Spectrum's display, including the border */
     display_refresh_all();
+
   }
 
   return 0;

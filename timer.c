@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2004 Philip Kendall, Marek Januszewski
+   Copyright (c) 1999-2004 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
    $Id$
 
@@ -28,6 +28,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "fuse.h"
 #include "settings.h"
@@ -50,13 +51,14 @@ static int frames_until_update;
 /* The number of time samples we have for estimating speed */
 static int samples;
 
-/* Timer calibration */
-static float calibration_factor = 1000.0;
-static int calibrated = 0;
+static timer_type speccy_time;
+
+float current_speed = 100.0;
 
 int
 timer_estimate_reset( void )
 {
+  int error = timer_get_real_time( &speccy_time ); if( error ) return error;
   samples = 0;
   next_stored_time = 0;
   frames_until_update = 0;
@@ -67,7 +69,7 @@ int
 timer_estimate_speed( void )
 {
   timer_type current_time;
-  float difference, current_speed;
+  float difference;
   int error;
 
   if( frames_until_update-- ) return 0;
@@ -106,7 +108,35 @@ timer_estimate_speed( void )
   return 0;
 }
 
-#ifndef WIN32
+#ifdef UI_SDL
+
+int
+timer_get_real_time( timer_type *real_time )
+{
+  *real_time = SDL_GetTicks();
+
+  return 0;
+}
+
+float
+timer_get_time_difference( timer_type *a, timer_type *b )
+{
+  return ( *a - *b ) / 1000.0;
+}
+
+void
+timer_add_time_difference( timer_type *a, long usec )
+{
+  *a += usec / 1000;
+}
+
+void
+timer_sleep_ms( int ms )
+{
+  SDL_Delay( ms );
+}
+
+#else            /* #ifdef UI_SDL */
 
 int
 timer_get_real_time( timer_type *real_time )
@@ -128,81 +158,35 @@ timer_get_time_difference( timer_type *a, timer_type *b )
   return ( a->tv_sec - b->tv_sec ) + ( a->tv_usec - b->tv_usec ) / 1000000.0;
 }
 
-#else				/* #ifndef WIN32 */
-
-int
-timer_get_real_time( timer_type *time )
+void
+timer_add_time_difference( timer_type *a, long usec )
 {
-  *time = GetTickCount();
-  return 0;
+  a->tv_usec += usec;
+  if( a->tv_usec >= 1000000 ) {
+    a->tv_usec -= 1000000;
+    a->tv_sec += 1;
+  }
 }
 
-float
-timer_get_time_difference( timer_type *a, timer_type *b )
+void
+timer_sleep_ms( int ms )
 {
-  return ( *a - *b ) / 1000000.0;
+  usleep( ms * 1000 );
 }
 
-#endif				/* #ifndef WIN32 */
+#endif            /* #ifdef UI_SDL */
 
 /*
  * Routines for speed control; used either when sound is not in use, or
  * when the SDL sound routines are being used
  */
 
-volatile float timer_count;
-
-/* On some slower (Linux?) machines, the 20 ms tick set up by
-   setitimer runs around about 4% slow with respect to the time
-   returned by gettimeofday(). This routine guesses at the fudge
-   factor necessary to bring the two timers back into line.
-
-   We tweak the setitimer() results rather than the gettimeofday()
-   results as the SDL sound routines (which use setitimer() to get
-   their timing) appear to run off a timer much closer to that
-   returned by gettimeofday().
-*/
-
-static int
-calibrate( void )
-{
-  timer_type start, end;
-  int old_speed, error;
-  size_t i;
-
-  old_speed = settings_current.emulation_speed;
-
-  settings_current.emulation_speed = 100;
-  timer_count = 0.0;
-  error = timer_push( 20, TIMER_FUNCTION_TICK ); if( error ) return error;
-
-  timer_get_real_time( &start );
-  for( i = 0; i < 5; i++ ) timer_pause();
-  timer_get_real_time( &end );
-
-  timer_end();
-
-  calibration_factor = 100.0 / timer_get_time_difference( &end, &start );
-  calibrated = 1;
-
-  timer_count = 0.0;
-  settings_current.emulation_speed = old_speed;
-
-  return 0;
-}
-
 int
 timer_init( void )
 {
   int error;
 
-  if( !calibrated ) {
-    error = calibrate(); if( error ) return error;
-  }
-
-  error = timer_push( 20, TIMER_FUNCTION_TICK ); if( error ) return error;
-
-  timer_count = 0.0;
+  error = timer_get_real_time( &speccy_time ); if( error ) return error;
 
   return 0;
 }
@@ -210,284 +194,38 @@ timer_init( void )
 int
 timer_end( void )
 {
-  int error;
-
-  error = timer_pop(); return error;
-
   return 0;
 }
 
 void
 timer_sleep( void )
 {
-  int speed;
-  /* Go to sleep iff we're emulating things fast enough */
-  while( timer_count <= 0.0 ) timer_pause();
-
-  /* And note that we've done a frame's worth of instructions */
-  speed = settings_current.emulation_speed < 1 ?
-          100                                  :
-          settings_current.emulation_speed;
-
-  timer_count -= 100.0 / speed;
-}
-
-static void
-timer_tick( void )
-{
-  /* If the emulator is running, note that time has passed. Don't
-     allow too big a 'backlog' to build up though or things will run
-     too fast if the emulator suddenly receives more time */
-  if( !fuse_emulation_paused && timer_count < 10.0 ) timer_count += 1.0;
-}
-
-#ifdef DEBUG_MODE
-
-int timer_push( long usec, timer_function_type which ) { return 0; }
-int timer_pop( void ) { return 0; }
-void timer_pause( void ) { }
-
-#else				/* #ifdef DEBUG_MODE */
-
-#ifdef HAVE_LIB_GLIB
-#include <glib.h>
-#else				/* #ifdef HAVE_LIB_GLIB */
-#include <libspectrum.h>
-#endif				/* #ifdef HAVE_LIB_GLIB */
-
-#include "fuse.h"
-#include "timer.h"
-#include "ui/ui.h"
-
-#ifndef WIN32
-
-#include <errno.h>
-#include <signal.h>
-#include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
-
-#include "compat.h"
-
-/* Stacks for the old timers and signal handlers */
-static GSList *old_timers = NULL, *old_handlers = NULL;
-
-static void signal_wake( int signo );
-static void signal_tick( int signo );
-
-int
-timer_push( int msec, timer_function_type which )
-{
-  void (*func)( int );
-  struct sigaction handler, *old_handler;
-  struct itimerval timer, *old_timer;
   int error;
+  timer_type current_time;
+  float difference;
+  int speed = settings_current.emulation_speed < 1 ?
+              100                                  :
+              settings_current.emulation_speed;
 
-  switch( which ) {
+  int speccy_frame_time_usec = 20000.0 * 100.0 / speed;
 
-  case TIMER_FUNCTION_WAKE: func = signal_wake; break;
-  case TIMER_FUNCTION_TICK: func = signal_tick; break;
+start:
+  /* Get current time */
+  error = timer_get_real_time( &current_time ); if( error ) return;
 
-  default:
-    ui_error( UI_ERROR_ERROR, "attempt to install unknown timer function %d",
-	      which );
-    return 1;
+  /* Compare current time with emulation time */
+  difference = timer_get_time_difference( &current_time, &speccy_time );
+
+  /* If speccy is less than 2 frames ahead of real time don't sleep */
+  /* If the next frame is due in less than 5ms just do it now */
+  /* (linear interpolation) */
+  /* FIXME Can now have interrupts at true 48k 50.04Hz etc. */
+  if( difference < ( ( 2 * speccy_frame_time_usec / 1000000.0 ) - 0.005 ) ) {
+    /* Check at or around 100Hz (usual timer resolution on *IX) */
+    timer_sleep_ms( 10 );
+    goto start;
   }
 
-  old_handler = malloc( sizeof( struct sigaction ) );
-  if( !old_handler ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-
-  old_timer = malloc( sizeof( struct itimerval ) );
-  if( !old_timer ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    free( old_handler );
-    return 1;
-  }
-
-  handler.sa_handler = func;
-  sigemptyset( &handler.sa_mask );
-  handler.sa_flags = 0;
-
-  error = sigaction( SIGALRM, &handler, old_handler );
-  if( error ) {
-    ui_error( UI_ERROR_ERROR, "error setting signal handler: %s",
-	      strerror( errno ) );
-    free( old_handler ); free( old_timer );
-    return error;
-  }
-
-  timer.it_interval.tv_sec  = 0;
-  timer.it_interval.tv_usec = msec * calibration_factor;
-  timer.it_value.tv_sec     = 0;
-  timer.it_value.tv_usec    = msec * calibration_factor;
-
-  error = setitimer( ITIMER_REAL, &timer, old_timer );
-  if( error ) {
-    ui_error( UI_ERROR_ERROR, "error setting interval timer: %s",
-	      strerror( errno ) );
-    sigaction( SIGALRM, old_handler, NULL );
-    free( old_handler ); free( old_timer );
-    return error;
-  }
-
-  old_handlers = g_slist_prepend( old_handlers, old_handler );
-  old_timers   = g_slist_prepend( old_timers,   old_timer   );
-
-  return 0;
+  /* And note that we've done a frame's worth of Speccy time */
+  timer_add_time_difference( &speccy_time, speccy_frame_time_usec );
 }
-
-int
-timer_pop( void )
-{
-  struct sigaction *old_handler;
-  struct itimerval *old_timer;
-  int error1, error2;
-
-  if( old_handlers ) {
-
-    old_handler = old_handlers->data;
-    old_handlers = g_slist_remove( old_handlers, old_handler );
-
-    old_timer = old_timers->data;
-    old_timers = g_slist_remove( old_timers, old_timer );
-
-    error1 = sigaction( SIGALRM, old_handler, NULL );
-    if( error1 )
-      ui_error( UI_ERROR_ERROR, "error restoring old signal handler: %s",
-		strerror( errno ) );
-
-    error2 = setitimer( ITIMER_REAL, old_timer, NULL );
-    if( error2 )
-      ui_error( UI_ERROR_ERROR, "error restoring old interval timer: %s",
-		strerror( errno ) );
-
-    free( old_handler ); free( old_timer );
-
-    return error1 || error2;
-
-  } else {
-
-    return 0;
-
-  }
-}
-
-void
-timer_pause( void )
-{
-  pause();
-}
-
-static void signal_wake( int signo GCC_UNUSED ) { }
-
-static void
-signal_tick( int signo GCC_UNUSED )
-{
-  timer_tick();
-}
-
-#else				/* #ifndef WIN32 */
-
-/*
- * Win32-specific timing routines below here
- */
-
-#include <windows.h>
-
-static GSList *timer_ids;
-
-static void CALLBACK signal_wake( UINT wTimerID, UINT msg, DWORD dwUser,
-				  DWORD dw1, DWORD dw2 );
-static void CALLBACK signal_tick( UINT wTimerID, UINT msg, DWORD dwUser,
-				  DWORD dw1, DWORD dw2 );
-
-#define TARGET_RESOLUTION 1	/* 1-millisecond target resolution */
-
-int
-timer_push( int msec, timer_function_type which )
-{
-  void CALLBACK (*func)( UINT, UINT, DWORD, DWORD, DWORD );
-  MMRESULT *wTimerID;
-  TIMECAPS tc;
-  UINT wTimerRes;
-
-  switch( which ) {
-
-  case TIMER_FUNCTION_WAKE: func = signal_wake; break;
-  case TIMER_FUNCTION_TICK: func = signal_tick; break;
-
-  default:
-    ui_error( UI_ERROR_ERROR, "attempt to install unknown timer function %d",
-	      which );
-    return 1;
-  }
-
-  wTimerID = malloc( sizeof( MMRESULT ) );
-  if( !wTimerID ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-    
-  if( timeGetDevCaps( &tc, sizeof( TIMECAPS ) ) != TIMERR_NOERROR ) {
-    ui_error( UI_ERROR_ERROR, "error getting timer capabilities" );
-    free( wTimerID );
-    return 1;
-  }
-    
-  wTimerRes = min( max( tc.wPeriodMin, TARGET_RESOLUTION ), tc.wPeriodMax );
-
-  timeBeginPeriod( wTimerRes );
-
-  *wTimerID = timeSetEvent( msec, wTimerRes, func, (DWORD)NULL,
-			    TIME_PERIODIC );
-  if( !(*wTimerID) ) {
-    ui_error( UI_ERROR_ERROR, "error setting timer" );
-    free( wTimerID );
-    return 1;
-  }
-
-  timer_ids = g_slist_prepend( timer_ids, wTimerID );
-
-  return 0;
-}
-
-int
-timer_pop( void )
-{
-  MMRESULT *wTimerID;
-
-  if( timer_ids ) {
-
-    wTimerID = timer_ids->data;
-
-    timer_ids = g_slist_remove( timer_ids, wTimerID );
-
-    timeKillEvent( *wTimerID );	/* cancel the event */
-
-    free( wTimerID );
-  }
-
-  return 0;
-}
-
-void
-timer_pause( void )
-{
-  Sleep( 0 );
-}
-
-static void CALLBACK
-signal_wake( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 ) { }
-
-static void CALLBACK
-signal_tick( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 )
-{
-  timer_tick();
-}
-
-#endif				/* #ifndef WIN32 */
-
-#endif				/* #ifndef DEBUG_MODE */

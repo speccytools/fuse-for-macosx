@@ -26,34 +26,34 @@
 
 #ifdef SOUND_SDL
 
+#include <errno.h>
+#include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
 
 #include <SDL.h>
 
 #include "settings.h"
+#include "sfifo.h"
 #include "sound.h"
 #include "ui/ui.h"
 
 /* using (7) 32 byte frags for 8kHz, scale up for higher */
 #define BASE_SOUND_FRAG_PWR	7
 
-static void sdlwrite8( void *userdata, Uint8 *stream, int len );
-static void sdlwrite16( void *userdata, Uint8 *stream, int len );
+static void sdlwrite( void *userdata, Uint8 *stream, int len );
 
-/* ring buffer for SDL audio thread, make larger than standard buffer to *
- * try and avoid any buffer overruns, ideally should be dynamically set  *
- * based on the obtained sample rate */
-#define MAX_AUDIO_RB 8192*5
-static libspectrum_signed_word ringbuf[MAX_AUDIO_RB];
-
-volatile unsigned int ringbuffer_read = 0;
-volatile unsigned int ringbuffer_write = 0;
+static sfifo_t sound_fifo;
 
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
   SDL_AudioSpec requested;
   int frag;
+  int error;
 
   SDL_InitSubSystem( SDL_INIT_AUDIO );
 
@@ -61,14 +61,8 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 
   requested.freq = *freqptr;
   requested.channels = *stereoptr ? 2 : 1;
-
-  if( settings_current.sound_force_8bit ) {
-    requested.format = AUDIO_U8;
-    requested.callback = sdlwrite8;
-  } else {
-    requested.format = AUDIO_S16SYS;
-    requested.callback = sdlwrite16;
-  }
+  requested.format = AUDIO_S16SYS;
+  requested.callback = sdlwrite;
 
   frag = BASE_SOUND_FRAG_PWR;
   if (*freqptr > 8250)   
@@ -79,6 +73,14 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     frag++;
 
   requested.samples = 1 << frag;
+
+  /* Convert from 16-bit stereo samples to bytes plus some headroom */
+  frag = 1 << (frag+4);
+  if( ( error = sfifo_init( &sound_fifo, frag ) ) ) {
+    ui_error( UI_ERROR_ERROR, "Problem initialising sound fifo: %d",
+              strerror ( error ) );
+    return 1;
+  }
 
   if ( SDL_OpenAudio( &requested, NULL ) < 0 ) {
     settings_current.sound = 0;
@@ -99,60 +101,48 @@ sound_lowlevel_end( void )
   SDL_LockAudio();
   SDL_CloseAudio();
   SDL_QuitSubSystem( SDL_INIT_AUDIO );
+  sfifo_close( &sound_fifo );
 }
 
 /* Copy data to ringbuffer */
 void
 sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
-  int i;
+  int i = 0;
 
-  SDL_LockAudio();
+  /* Convert to bytes */
+  libspectrum_signed_byte* bytes = (libspectrum_signed_byte*)data;
+  len <<= 1;
 
-  for( i=0; i<len; i++ ) {
-    ringbuf[ ringbuffer_write++ ] = *data++;
-    if( ringbuffer_write == MAX_AUDIO_RB ) ringbuffer_write = 0;
-    /* Sound buffer overflow! - drop extra samples */
-    if( ringbuffer_write == ringbuffer_read ) break;
+  while( len ) {
+    if( ( i = sfifo_write( &sound_fifo, bytes, len ) ) < 0 ) {
+      break;
+    }
+    bytes += i;
+    len -= i;
   }
-
-  SDL_UnlockAudio();
+  if( i < 0 ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't write sound fifo: %d\n",
+              strerror( i ) );
+  }
 }
 
 /* Write len samples from ringbuffer into stream */
 void
-sdlwrite8( void *userdata, Uint8 *stream, int len )
+sdlwrite( void *userdata, Uint8 *stream, int len )
 {
   int f;
 
-  for( f=0; f<len; f++ ) {
-    if( ringbuffer_write == ringbuffer_read ) {
-      /* buffer underrun - send last sample available */
-      *stream++ = ringbuf[ ringbuffer_read ] >> 8;
-    } else {
-      *stream++ = ringbuf[ ringbuffer_read++ ] >> 8;
-      if( ringbuffer_read == MAX_AUDIO_RB ) ringbuffer_read = 0;
-    }
+  /* Read input_size bytes from fifo into sound stream */
+  while( ( f = sfifo_read( &sound_fifo, stream, len ) ) > 0 ) {
+    stream += f;
+    len -= f;
   }
-}
-
-void
-sdlwrite16( void *userdata, Uint8 *stream8, int len )
-{
-  int f;
-  libspectrum_signed_word *stream;
-
-  stream = (libspectrum_signed_word*)stream8;
-  len /= 2;
-
-  for( f=0; f<len; f++ ) {
-    if( ringbuffer_write == ringbuffer_read ) {
-      /* buffer underrun - send last sample available */
-      *stream++ = ringbuf[ ringbuffer_read ];
-    } else {
-      *stream++ = ringbuf[ ringbuffer_read++ ];
-      if( ringbuffer_read == MAX_AUDIO_RB ) ringbuffer_read = 0;
+  if( f < 0 ) {
+    for( f=0; f<len; f++ ) {
+      *stream++ = 0;
     }
+    return;
   }
 }
 

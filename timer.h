@@ -27,41 +27,31 @@
 #ifndef FUSE_TIMER_H
 #define FUSE_TIMER_H
 
-#ifndef WIN32
+#ifdef UI_SDL
+
+#include "SDL.h"
+
+typedef Uint32 timer_type;
+
+#else				/* #ifdef UI_SDL */
 
 #include <sys/time.h>
 #include <time.h>
 
 typedef struct timeval timer_type;
 
-#else				/* #ifndef WIN32 */
-
-#include <windows.h>
-
-typedef DWORD timer_type;
-
-#endif				/* #ifndef WIN32 */
+#endif				/* #ifdef UI_SDL */
 
 int timer_estimate_reset( void );
 int timer_estimate_speed( void );
 int timer_get_real_time( timer_type *real_time );
 float timer_get_time_difference( timer_type *a, timer_type *b );
 
-extern volatile float timer_count;
-
 int timer_init(void);
 void timer_sleep(void);
+void timer_sleep_ms( int ms );
 int timer_end(void);
 
-typedef enum timer_function_type {
-
-  TIMER_FUNCTION_WAKE,
-  TIMER_FUNCTION_TICK,
-
-} timer_function_type;
-
-int timer_push( int msec, timer_function_type which );
-int timer_pop( void );
-void timer_pause( void );
+extern float current_speed;
 
 #endif			/* #ifndef FUSE_TIMER_H */

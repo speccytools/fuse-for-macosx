@@ -33,6 +33,7 @@ libsound_a_SOURCES = dxsound.c \
 		     nullsound.c \
 		     osssound.c \
 		     sdlsound.c \
+		     sfifo.c \
 		     sunsound.c
 
-noinst_HEADERS = lowlevel.h
+noinst_HEADERS = lowlevel.h sfifo.h
