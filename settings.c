@@ -397,7 +397,7 @@ int settings_copy( settings_info *dest, settings_info *src )
 
   dest->rzx_compression = src->rzx_compression;
 
-  if( dest->sound_device ) {
+  if( src->sound_device ) {
     dest->sound_device  = strdup( src->sound_device );
     if( !dest->sound_device ) { settings_free( dest ); return 1; }
   }
@@ -407,27 +407,27 @@ int settings_copy( settings_info *dest, settings_info *src )
   dest->stereo_ay     = src->stereo_ay;
   dest->stereo_beeper = src->stereo_beeper;
 
-  if( dest->snapshot ) {
+  if( src->snapshot ) {
     dest->snapshot = src->snapshot;
     if( !dest->snapshot ) { settings_free( dest ); return 1; }
   }
 
-  if( dest->tape_file ) {
+  if( src->tape_file ) {
     dest->tape_file = src->tape_file;
     if( !dest->tape_file ) { settings_free( dest ); return 1; }
   }
 
-  if( dest->start_machine ) {
+  if( src->start_machine ) {
     dest->start_machine = src->start_machine;
     if( !dest->start_machine ) { settings_free( dest ); return 1; }
   }
 
-  if( dest->record_file ) {
+  if( src->record_file ) {
     dest->record_file = src->record_file;
     if( !dest->record_file ) { settings_free( dest ); return 1; }
   }
 
-  if( dest->playback_file ) {
+  if( src->playback_file ) {
     dest->playback_file = src->playback_file;
     if( !dest->playback_file ) { settings_free( dest ); return 1; }
   }
