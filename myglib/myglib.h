@@ -28,6 +28,7 @@
 #define FUSE_MYGLIB_H
 
 typedef int gint;
+typedef unsigned int guint;
 typedef const void * gconstpointer;
 typedef void * gpointer;
 
@@ -60,5 +61,11 @@ void	g_slist_foreach		(GSList		*list,
 				 gpointer	 user_data);
 
 void	g_slist_free		(GSList		*list);
+
+GSList* g_slist_nth		(GSList		*list,
+				 guint		n);
+
+gint	g_slist_position	(GSList		*list,
+				 GSList		*llink);
 
 #endif				/* #ifndef FUSE_MYGLIB_H */

@@ -164,4 +164,29 @@ void	g_slist_free		(GSList		*list) {
     }
 }
 
+GSList* g_slist_nth		(GSList		*list,
+				 guint		n) {
+  for( ; n; n-- ) {
+    if( list == NULL ) return NULL;
+    list = list->next;
+  }
+
+  return list;
+}
+
+gint	g_slist_position	(GSList		*list,
+				 GSList		*llink) {
+  int n;
+
+  n = 0;
+
+  while( list ) {
+    if( list == llink ) return n;
+    list = list->next;
+    n++;
+  }
+
+  return -1;
+}
+
 #endif				/* #ifndef HAVE_LIB_GLIB */
