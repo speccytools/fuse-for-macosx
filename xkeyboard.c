@@ -105,10 +105,6 @@ int xkeyboard_keypress(XKeyEvent *event)
     fuse_emulation_unpause();
     break;
   case XK_F8:
-    /* If tape traps active, do nothing */
-    if( settings_current.tape_traps ) return 0;
-
-    /* Otherwise, toggle whether the tape is playing or not */
     if( tape_playing ) {
       tape_stop();
     } else {

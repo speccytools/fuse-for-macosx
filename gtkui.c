@@ -375,16 +375,12 @@ static void gtkui_tape_open( GtkWidget *widget, gpointer data )
 /* Called by the menu when Tape/Play selected */
 static void gtkui_tape_play( GtkWidget *widget, gpointer data )
 {
-  /* If tape traps active, do nothing */
-  if( settings_current.tape_traps ) return;
-
-  /* Otherwise, toggle whether the tape is playing or not */
   if( tape_playing ) {
     tape_stop();
   } else {
-    tape_play();
+    tape_play();	/* Won't start the tape if traps are active
+			   and the next block is a ROM block */
   }
-
 }
 
 /* Called by the menu when Tape/Write selected */

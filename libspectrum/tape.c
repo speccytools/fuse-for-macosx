@@ -215,12 +215,16 @@ pure_data_init( libspectrum_tape_pure_data_block *block )
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+/* Some flags which may be set after calling libspectrum_tape_get_next_edge */
+const int LIBSPECTRUM_TAPE_FLAGS_BLOCK = 1 << 0; /* End of block */
+const int LIBSPECTRUM_TAPE_FLAGS_STOP  = 1 << 1; /* Stop tape */
+
 /* The main function: called with a tape object and returns the number of
    t-states until the next edge, and a marker if this was the last edge
    on the tape */
 libspectrum_error
 libspectrum_tape_get_next_edge( libspectrum_tape *tape,
-				libspectrum_dword *tstates, int *stop_tape )
+				libspectrum_dword *tstates, int *flags )
 {
   int error;
 
@@ -230,8 +234,8 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   /* Has this edge ended the block? */
   int end_of_block = 0;
 
-  /* By default, assume the tape will keep playing */
-  *stop_tape = 0;
+  /* Assume no special flags by default */
+  *flags = 0;
 
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
@@ -258,7 +262,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
     *tstates = block->types.pause.length; end_of_block = 1;
     /* 0 ms pause => stop tape */
-    if( *tstates == 0 ) { *stop_tape = 1; }
+    if( *tstates == 0 ) { *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP; }
     break;
 
   /* For blocks which contain no Spectrum-readable data, return zero
@@ -282,9 +286,12 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
   /* If that ended the block, move onto the next block */
   if( end_of_block ) {
+
+    *flags |= LIBSPECTRUM_TAPE_FLAGS_BLOCK;
+
     tape->current_block = tape->current_block->next;
     if( tape->current_block == NULL ) {
-      *stop_tape = 1;
+      *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP;
       /* `Rewind' to the start of the tape */
       tape->current_block = tape->blocks;
     } else {

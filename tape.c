@@ -232,18 +232,13 @@ int tape_load_trap( void )
 
   next_block = (libspectrum_tape_block*)(block_ptr->data);
 
-  /* If this block isn't a ROM loader, deactivate tape traps and start
-     it playing.
+  /* If this block isn't a ROM loader, start it playing
      Then return with `error' so that we actually do whichever instruction
      it was that caused the trap to hit */
   if( current_block->type != LIBSPECTRUM_TAPE_BLOCK_ROM ) {
 
-    settings_current.tape_traps = 0;
-
-    /* Start the tape playing; if we couldn't do this for some reason,
-       deactivate tape traps again */
     error = tape_play();
-    if( error ) { settings_current.tape_traps = 1; return 3; }
+    if( error ) return 3;
 
     return -1;
   }
@@ -263,15 +258,15 @@ int tape_load_trap( void )
     return 0;
   }
 
-  /* If the next block isn't a ROM block, deactivate tape traps and set
-     ourselves up such that the next thing to occur is the pause at
-     the end of the current block */
-  settings_current.tape_traps = 0;
+  /* If the next block isn't a ROM block, set ourselves up such that the
+     next thing to occur is the pause at the end of the current block */
   current_block->types.rom.state = LIBSPECTRUM_TAPE_STATE_PAUSE;
 
   /* And start the tape playing */
   error = tape_play();
-  if( error ) { settings_current.tape_traps = 1; return 3; }
+  /* On error, still return without error as we did sucessfully do
+     the tape trap, and so don't want to do the trigger instruction */
+  if( error ) return 0;
 
   return 0;
 
@@ -340,9 +335,6 @@ int tape_save_trap( void )
 
   int i;
 
-/*    fprintf( stderr, "Tape save trap active: saving %d bytes from 0x%04x\n", */
-/*  	   DE, IX ); */
-
   /* Do nothing if tape traps aren't active */
   if( ! settings_current.tape_traps ) return 2;
 
@@ -392,10 +384,24 @@ int tape_save_trap( void )
 
 int tape_play( void )
 {
+  libspectrum_tape_block* block;
+
   int error;
 
   if( tape.blocks == NULL ) return 1;
   
+  block = (libspectrum_tape_block*)(tape.current_block->data);
+
+  /* If tape traps are active and the current block is a ROM block, do
+     nothing, _unless_ the ROM block has already reached the pause at
+     its end which (hopefully) means we're in the magic state involving
+     starting slow loading whilst tape traps are active */
+  if( settings_current.tape_traps &&
+      block->type == LIBSPECTRUM_TAPE_BLOCK_ROM &&
+      block->types.rom.state != LIBSPECTRUM_TAPE_STATE_PAUSE )
+    return 0;
+
+  /* Otherwise, start the tape going */
   tape_playing = 1;
   tape_microphone = 0;
   sound_beeper( 1, tape_microphone );
@@ -416,31 +422,43 @@ int tape_next_edge( void )
   int error; libspectrum_error libspec_error;
 
   libspectrum_dword edge_tstates;
-  int stop_tape;
+  int flags;
 
   /* If the tape's not playing, just return */
   if( ! tape_playing ) return 0;
 
   /* Get the time until the next edge */
   libspec_error = libspectrum_tape_get_next_edge( &tape, &edge_tstates,
-						  &stop_tape );
+						  &flags );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;
 
   /* Invert the microphone state */
-  if( edge_tstates || stop_tape ) {
+  if( edge_tstates || ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ) {
     tape_microphone = !tape_microphone;
     sound_beeper( 1, tape_microphone );
   }
 
-  /* And put this into the event queue */
-  error = event_add( tstates + edge_tstates, EVENT_TYPE_EDGE );
-  if( error ) return error;
-
   /* If we've been requested to stop the tape, do so! */
-  if( stop_tape) {
+  if( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) {
     error = tape_stop();
     if( error ) return error;
   }
+
+  /* If that was the end of a block, tape traps are active _and_ the
+     new block is a ROM loader, return without putting another event
+     into the queue */
+  if( ( flags & LIBSPECTRUM_TAPE_FLAGS_BLOCK ) &&
+      settings_current.tape_traps &&
+      ((libspectrum_tape_block*)(tape.current_block->data))->type ==
+        LIBSPECTRUM_TAPE_BLOCK_ROM
+    ) {
+    return 0;
+  }
+
+  /* Otherwise, put this into the event queue which will cause the
+     next block to become active when it occurs */
+  error = event_add( tstates + edge_tstates, EVENT_TYPE_EDGE );
+  if( error ) return error;
 
   return 0;
 }
