@@ -39,9 +39,11 @@
 #include "display.h"
 #include "ui.h"
 #include "uidisplay.h"
-#include "font.h"
 #include "keyboard.h"
 #include "widget.h"
+
+/* Get the Spectrum font from its file */
+#include "font.c"
 
 int widget_keymode;
 
@@ -58,7 +60,7 @@ static void printchar(int x, int y, int col, int ch) {
     
     for(my=0; my<8; my++) {
         int b;
-        b=font[ch*8+my];
+        b=widget_font[ch*8+my];
         for(mx=0; mx<8; mx++) {
             if(b&128) uidisplay_putpixel(mx+DISPLAY_BORDER_WIDTH+8*x, my+DISPLAY_BORDER_HEIGHT+8*y, col);
             b<<=1;
