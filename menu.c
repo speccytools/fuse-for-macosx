@@ -269,10 +269,20 @@ MENU_CALLBACK( menu_machine_profiler_start )
   profile_start();
 }
 
-MENU_CALLBACK( menu_machine_profiler_end )
+MENU_CALLBACK( menu_machine_profiler_stop )
 {
-  WIDGET_END;
-  profile_finish( "profile.map" );
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Save profile data" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  profile_finish( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
 }
 
 MENU_CALLBACK( menu_machine_nmi )

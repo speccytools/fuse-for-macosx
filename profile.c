@@ -47,6 +47,8 @@ profile_start( void )
   profile_active = 1;
   profile_last_pc = z80.pc.w;
   profile_last_tstates = tstates;
+
+  ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 1 );
 }
 
 void
@@ -88,4 +90,5 @@ profile_finish( const char *filename )
   }
 
   profile_active = 0;
+  ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 0 );
 }

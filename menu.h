@@ -65,7 +65,7 @@ MENU_CALLBACK( menu_options_filter );
 MENU_CALLBACK( menu_options_save );
 
 MENU_CALLBACK( menu_machine_profiler_start );
-MENU_CALLBACK( menu_machine_profiler_end );
+MENU_CALLBACK( menu_machine_profiler_stop );
 MENU_CALLBACK( menu_machine_nmi );
 
 MENU_CALLBACK( menu_media_tape_browse );

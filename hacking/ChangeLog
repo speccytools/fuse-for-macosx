@@ -1283,3 +1283,5 @@
 	 spec_se.c,specplus3.c},pokefinder/{pokefinder.[ch]},ui/ui.h,
 	 ui/gtk/{gtkinternals.h,gtkui.c,pokefinder.c},widget/widget.c:
 	 various pokefinder improvements (patch #1150701) (Darren).
+20050325 menu.[ch],menu_data.c,profile.c,ui.c,ui/ui.h,ui/gtk/gtkui.c,
+	 widget/widget.c: improve profiler UI.

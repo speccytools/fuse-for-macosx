@@ -194,6 +194,7 @@ int widget_init( void )
 
   ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
 

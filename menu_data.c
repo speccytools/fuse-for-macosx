@@ -115,7 +115,7 @@ Machine/_Memory Browser..., Item
 
 Machine/Pro_filer, Branch
 Machine/Profiler/_Start, Item
-Machine/Profiler/_End, Item
+Machine/Profiler/_Stop, Item
 
 Machine/_NMI, Item
 
