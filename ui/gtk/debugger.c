@@ -48,7 +48,7 @@ static void gtkui_debugger_break( GtkWidget *widget, gpointer user_data );
 static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 
 /* The debugger dialog box and the PC printout */
-static GtkWidget *dialog, *continue_button, *break_button, *label;
+static GtkWidget *dialog, *continue_button, *break_button, *registers[10];
 
 /* Have we created the above yet? */
 static int dialog_created = 0;
@@ -76,10 +76,33 @@ ui_debugger_activate( void )
 static int
 create_dialog( void )
 {
-  GtkWidget *step_button, *close_button;
+  size_t i;
+  GtkWidget *step_button, *close_button, *table, *label;
+
+  const char *register_name[] = { "PC", "SP",
+				  "AF", "AF'",
+				  "BC", "BC'",
+				  "DE", "DE'",
+				  "HL", "HL'",
+                                };
 
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
+
+  table = gtk_table_new( 5, 4, FALSE );
+  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), table );
+
+  for( i = 0; i < 10; i++ ) {
+
+    label = gtk_label_new( register_name[i] );
+    gtk_table_attach_defaults( GTK_TABLE( table ), label,
+			       2*(i%2),   2*(i%2)+1, i/2, i/2+1 );
+
+    registers[i] = gtk_label_new( "" );
+    gtk_table_attach_defaults( GTK_TABLE( table ), registers[i],
+			       2*(i%2)+1, 2*(i%2)+2, i/2, i/2+1 );
+
+  }
 
   step_button = gtk_button_new_with_label( "Single Step" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
@@ -96,10 +119,6 @@ create_dialog( void )
   close_button = gtk_button_new_with_label( "Close" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     close_button );
-
-  label = gtk_label_new( NULL );
-
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label );
 
   gtk_signal_connect( GTK_OBJECT( step_button ), "clicked",
 		      GTK_SIGNAL_FUNC( gtkui_debugger_done_step ), NULL );
@@ -128,12 +147,24 @@ create_dialog( void )
 static int
 activate_debugger( void )
 {
+  size_t i;
   char buffer[80];
+
+  WORD *value_ptr[] = { &PC, &SP,
+			&AF, &AF_,
+			&BC, &BC_,
+			&DE, &DE_,
+			&HL, &HL_,
+                      };
 
   debugger_active = 1;
 
-  snprintf( buffer, 80, "PC = 0x%04x", PC );
-  gtk_label_set_text( GTK_LABEL( label ), buffer );
+  for( i = 0; i < 10; i++ ) {
+
+    snprintf( buffer, 80, "0x%04x", *value_ptr[i] );
+    gtk_label_set_text( GTK_LABEL( registers[i] ), buffer );
+
+  }
 
   gtk_main();
   return 0;
