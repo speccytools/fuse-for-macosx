@@ -1,4 +1,4 @@
-/* tape-widget.c: Widget for tape-related actions
+/* mainmenu.c: Main menu widget
    Copyright (c) 2001 Philip Kendall
 
    $Id$
@@ -30,28 +30,25 @@
 
 #include "display.h"
 #include "keyboard.h"
-#include "tape.h"
 #include "ui.h"
 #include "uidisplay.h"
 #include "widget.h"
 
-int widget_tape_draw( void )
+int widget_mainmenu_draw( void )
 {
-  /* Blank the main display area */
-  widget_dialog( 1, 2, 30, 2 );
+  /* Draw the dialog box */
+  widget_dialog_with_border( 1, 2, 30, 1 );
 
   widget_printstring( 2, 2, WIDGET_COLOUR_FOREGROUND,
-		      "(C)lear tape" );
-  widget_printstring( 2, 3, WIDGET_COLOUR_FOREGROUND,
-		      "(R)ewind tape" );
+		      "(T)ape control" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 8 );
 
   return 0;
 }
 
-void widget_tape_keyhandler( int key )
+void widget_mainmenu_keyhandler( int key )
 {
   switch( key ) {
     
@@ -59,12 +56,8 @@ void widget_tape_keyhandler( int key )
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     break;
 
-  case KEYBOARD_c:
-    tape_close();
-    break;
-
-  case KEYBOARD_r:
-    tape_rewind();
+  case KEYBOARD_t:
+    widget_do( WIDGET_TYPE_TAPE );
     break;
 
   case KEYBOARD_Enter:

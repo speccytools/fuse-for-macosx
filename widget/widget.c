@@ -137,16 +137,6 @@ void widget_rectangle( int x, int y, int w, int h, int col )
         uidisplay_putpixel(mx+DISPLAY_BORDER_WIDTH+x, my+DISPLAY_BORDER_HEIGHT+y, col);
 }
 
-/* Are we in a widget at the moment? (Used by the key handling routines
-   to know whether to call the Spectrum or widget key handler) */
-int widget_active;
-
-/* The keyhandler to use for the current widget */
-widget_keyhandler_fn widget_keyhandler;
-
-/* Have we finished with this widget, and if so in which way? */
-widget_finish_state widget_finished;
-
 /* Global initialisation/end routines */
 
 int widget_init( void )
@@ -177,6 +167,74 @@ int widget_end( void )
   return 0;
 }
 
+/* General widget routine */
+
+/* We don't start in a widget */
+int widget_level = -1;
+
+int widget_do( widget_type which )
+{
+  int error;
+
+  /* If we're recursing into widgets, set up what to return to. If this
+     is the first widget we've called, set the timer up.
+  */     
+  if( widget_level >= 0 ) {
+    widget_return[widget_level].parent = which;
+  } else {
+    error = widget_timer_init(); if( error ) return error;
+  }
+
+  /* We're now one widget level deeper */
+  widget_level++;
+
+  /* Draw this widget */
+  widget_data[ which ].draw();
+
+  /* Set up the keyhandler for this widget */
+  widget_keyhandler = widget_data[which].keyhandler;
+
+  /* Process this widget until it returns */
+  widget_return[widget_level].finished = 0;
+  while( ! widget_return[widget_level].finished ) {
+
+    /* Go to sleep for a bit */
+    pause();
+
+    /* Process any events */
+    ui_event();
+  }
+
+  /* Do any post-widget processing if it exists */
+  if( widget_data[which].finish ) {
+    widget_data[which].finish( widget_return[widget_level].finished );
+  }
+
+  /* Now return to the previous widget level */
+  widget_level--;
+    
+  if( widget_level >= 0 ) {
+
+    /* If we're going back to another widget, set up its keyhandler and
+       draw it again */
+    widget_keyhandler =
+      widget_data[ widget_return[widget_level].parent ].keyhandler;
+    widget_data[ widget_return[widget_level].parent ] . draw();
+
+  } else {
+
+    /* Restore the old keyboard handler */
+    error = widget_timer_end();
+    if( error ) return error;
+
+    /* Refresh the Spectrum's display */
+    display_refresh_all();
+
+  }
+
+  return 0;
+}
+    
 /* Widget timer routines */
 
 static struct sigaction widget_timer_old_handler;
@@ -273,3 +331,14 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 
   return 0;
 }
+
+/* The widgets actually available */
+
+widget_t widget_data[] = {
+
+  { widget_mainmenu_draw, NULL,                  widget_mainmenu_keyhandler },
+  { widget_filesel_draw,  widget_filesel_finish, widget_filesel_keyhandler  },
+  { widget_options_draw,  widget_options_finish, widget_options_keyhandler  },
+  { widget_tape_draw,     NULL,			 widget_tape_keyhandler     },
+
+};

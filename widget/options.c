@@ -43,58 +43,30 @@ static int widget_options_show_all( settings_info *settings );
 static int widget_options_print_option( int number, const char* string,
 					int value );
 static int widget_options_print_value( int number, int value );
-static void widget_options_keyhandler( int key );
 
-int widget_options( void )
+int widget_options_draw( void )
 {
   int error;
 
-  error = widget_timer_init();
-  if( error ) return error;
-
-  /* Set up the key handler */
-  widget_keyhandler = widget_options_keyhandler;
-
   /* Get a copy of the current settings */
   error = settings_copy( &settings, &settings_current );
-  if( error ) {
-    widget_timer_end();
-    return error;
-  }
+  if( error ) return error;
 
   /* Draw the dialog box */
   widget_dialog_with_border( 1, 2, 30, 4 );
   error = widget_options_show_all( &settings );
-  if( error ) {
-    widget_timer_end();
-    return error;
-  }
+  if( error ) return error;
 
-  /* And note we're in a widget */
-  widget_active = 1;
-  widget_finished = 0;
+  return 0;
 
-  while( ! widget_finished ) { 
+}
 
-    /* Go to sleep for a bit */
-    pause();
-
-    /* Process any events */
-    ui_event();
-
-  }
-
-  /* We've finished with the widget */
-  widget_active = 0;
-
-  /* Deactivate the widget's timer */
-  widget_timer_end();
-
-  /* Force the normal screen to be redisplayed */
-  display_refresh_all();
+int widget_options_finish( widget_finish_state finished )
+{
+  int error;
 
   /* If we exited normally, actually set the options */
-  if( widget_finished == WIDGET_FINISHED_OK ) {
+  if( finished == WIDGET_FINISHED_OK ) {
     error = settings_copy( &settings_current, &settings );
     if( error ) return error;
   }
@@ -159,14 +131,14 @@ static int widget_options_print_value( int number, int value )
 }
 
 
-static void widget_options_keyhandler( int key )
+void widget_options_keyhandler( int key )
 {
   int error;
 
   switch( key ) {
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    widget_finished = WIDGET_FINISHED_CANCEL;
+    widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     break;
 
   case KEYBOARD_2:
@@ -194,7 +166,7 @@ static void widget_options_keyhandler( int key )
     break;
 
   case KEYBOARD_Enter:
-    widget_finished = WIDGET_FINISHED_OK;
+    widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
     break;
 
   }

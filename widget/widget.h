@@ -35,14 +35,51 @@
 #define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
 #define WIDGET_COLOUR_FOREGROUND 7	/* White */
 
-extern int widget_active;
+/* The various widgets which are available */
+typedef enum widget_type {
 
+  WIDGET_TYPE_MAINMENU,		/* Main menu */
+  WIDGET_TYPE_FILESELECTOR,	/* File selector */
+  WIDGET_TYPE_OPTIONS,		/* General options */
+  WIDGET_TYPE_TAPE,		/* Tape options */
+
+} widget_type;
+
+/* The ways of finishing a widget */
+typedef enum widget_finish_state {
+  WIDGET_FINISHED_OK = 1,
+  WIDGET_FINISHED_CANCEL,
+} widget_finish_state;
+
+/* A function to handle keypresses */
 typedef void (*widget_keyhandler_fn)( int key );
 
-extern widget_keyhandler_fn widget_keyhandler;
+/* The information we need to store for each widget */
+typedef struct widget_t {
+  int (*draw)(void);			/* Draw this widget */
+  int (*finish)( widget_finish_state finished ); /* Post-widget processing */
+  widget_keyhandler_fn keyhandler;	/* Keyhandler */
+} widget_t;
+
+/* The information we need to store to recurse from a widget */
+typedef struct widget_recurse_t {
+  widget_type parent;		/* Which widget called us? */
+  int finished;			/* Have we finished this widget yet? */
+} widget_recurse_t;
+
+/* A `stack' so we can recurse through widgets */
+widget_recurse_t widget_return[10];
+
+/* How many levels deep have we recursed through widgets; -1 => none */
+extern int widget_level;
+
+/* The current widget keyhandler */
+widget_keyhandler_fn widget_keyhandler;
 
 int widget_init( void );
 int widget_end( void );
+
+int widget_do( widget_type which );
 
 int widget_timer_init( void );
 int widget_timer_end( void );
@@ -50,16 +87,15 @@ int widget_timer_end( void );
 void widget_rectangle( int x, int y, int w, int h, int col );
 void widget_printstring( int x, int y, int col, char *s );
 
-/* Two ways of finishing a widget */
-typedef enum widget_finish_state {
-  WIDGET_FINISHED_OK = 1,
-  WIDGET_FINISHED_CANCEL,
-} widget_finish_state;
-
 extern widget_finish_state widget_finished;;
 
 int widget_dialog( int x, int y, int width, int height );
 int widget_dialog_with_border( int x, int y, int width, int height );
+
+/* Main menu dialog */
+
+int widget_mainmenu_draw( void );
+void widget_mainmenu_keyhandler( int key );
 
 /* File selector */
 
@@ -68,17 +104,28 @@ typedef struct widget_dirent {
   char *name;
 } widget_dirent;
 
-const char* widget_selectfile(void);
-
 struct widget_dirent **widget_filenames;
 size_t widget_numfiles;
 
+int widget_filesel_draw( void );
+int widget_filesel_finish( widget_finish_state finished );
+void widget_filesel_keyhandler( int key );
+
+extern char* widget_filesel_name;
+
 /* Options dialog */
 
-int widget_options( void );
+int widget_options_draw( void );
+int widget_options_finish( widget_finish_state finished );
+void widget_options_keyhandler( int key );
 
 /* Tape dialog */
 
-int widget_tape( void );
+int widget_tape_draw( void );
+void widget_tape_keyhandler( int key );
+
+/* The widgets actually available */
+
+extern widget_t widget_data[];
 
 #endif				/* #ifndef FUSE_WIDGET_H */

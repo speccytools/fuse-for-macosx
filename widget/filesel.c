@@ -60,7 +60,9 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 				       int top_left, int current );
 static int widget_print_filename( struct widget_dirent *filename, int position,
 				  int inverted );
-static void widget_selectfile_keyhandler( int key );
+
+/* The filename to return */
+char* widget_filesel_name;
 
 int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 		    int (*select)(const struct dirent*) )
@@ -216,20 +218,14 @@ static int widget_scan_compare( const struct widget_dirent **a,
 
 /* File selection widget */
 
-const char* widget_selectfile( void )
+int widget_filesel_draw( void )
 {
   char *directory;
 
   int error;
 
-  error = widget_timer_init();
-  if( error ) return NULL;
-
   directory = widget_getcwd();
-  if( directory == NULL ) {
-    widget_timer_end();
-    return NULL;
-  }
+  if( directory == NULL ) return 1;
 
   widget_scan( directory );
   new_current_file = current_file = 0;
@@ -237,92 +233,25 @@ const char* widget_selectfile( void )
 
   /* Create the dialog box */
   error = widget_dialog_with_border( 1, 2, 30, 20 );
-  if( error ) {
-    free( directory );
-    widget_timer_end();
-    return NULL;
-  }
+  if( error ) { free( directory ); return error; }
     
-  /* And set up the key handler */
-  widget_keyhandler = widget_selectfile_keyhandler;
-
   /* Show all the filenames */
   widget_print_all_filenames( widget_filenames, widget_numfiles,
 			      top_left_file, current_file );
 
-  /* And note we're in a widget */
-  widget_active = 1;
-  widget_finished = 0;
+  return 0;
+}
 
-  while( 1 ) { 
-
-    /* Go to sleep for a bit */
-    pause();
-
-    /* Now process any events which have occured; the important one
-       here is a `keypress' event, which will call one of the
-       widget_*_keyhandler functions, which may change new_current_file or
-       set widget_finished */
-    ui_event();
-
-    /* If we're done, exit the loop */
-    if( widget_finished ) break;
-
-    /* If we did move the `cursor' */
-    if( new_current_file != current_file ) {
-
-      current_file = new_current_file;
-
-      /* If we've got off the top or bottom of the currently
-	 displayed file list, then reset the top-left corner and
-	 display the whole thing */
-      if( current_file <  top_left_file ) {
-
-	top_left_file = current_file & ~1;
-	widget_print_all_filenames( widget_filenames, widget_numfiles,
-				    top_left_file, current_file );
-
-      } else if( current_file >= top_left_file+36 ) {
-
-	top_left_file = current_file & ~1; top_left_file -= 34;
-	widget_print_all_filenames( widget_filenames, widget_numfiles,
-				    top_left_file, current_file );
-
-      } else {
-
-	/* Otherwise, print the new current file inverted, display the
-	   screen, and then print the current file back uninverted so
-	   we don't have to do so later */
-
-	widget_print_filename( widget_filenames[ current_file ],
-			       current_file - top_left_file, 1 );
-        
-	uidisplay_lines(DISPLAY_BORDER_HEIGHT,
-			DISPLAY_BORDER_HEIGHT + DISPLAY_SCREEN_HEIGHT );
-	  
-	widget_print_filename( widget_filenames[ current_file ],
-			       current_file - top_left_file, 0 );
-	  
-      }
-    }
-  }
-
-  /* We've finished with the widget */
-  widget_active = 0;
-
-  /* Deactivate the widget's timer */
-  widget_timer_end();
-
-  /* Force the normal screen to be redisplayed */
-  display_refresh_all();
+int widget_filesel_finish( widget_finish_state finished ) {
 
   /* Now return, either with a filename or without as appropriate */
-  if( widget_finished == WIDGET_FINISHED_OK ) {
-    return widget_filenames[ current_file ]->name;
+  if( finished == WIDGET_FINISHED_OK ) {
+    widget_filesel_name = widget_filenames[ current_file ]->name;
   } else {
-    return NULL;
+    widget_filesel_name = NULL;
   }
 
+  return 0;
 }
 
 static char* widget_getcwd( void )
@@ -420,7 +349,7 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
   return 0;
 }
 
-static void widget_selectfile_keyhandler( int key )
+void widget_filesel_keyhandler( int key )
 {
   char *fn, *ptr;
 
@@ -429,7 +358,7 @@ static void widget_selectfile_keyhandler( int key )
   switch(key) {
   case KEYBOARD_1:		/* 1 used as `Escape' generates `EDIT',
 				   which is Caps + 1 */
-    widget_finished = WIDGET_FINISHED_CANCEL;
+    widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     break;
   
   case KEYBOARD_5:		/* Left */
@@ -476,7 +405,7 @@ static void widget_selectfile_keyhandler( int key )
     /* Get the new directory name */
     fn = widget_getcwd();
     if( fn == NULL ) {
-      widget_finished = WIDGET_FINISHED_CANCEL;
+      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
       return;
     }
     ptr = fn;
@@ -486,7 +415,7 @@ static void widget_selectfile_keyhandler( int key )
     );
     if( fn == NULL ) {
       free( ptr );
-      widget_finished = WIDGET_FINISHED_CANCEL;
+      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
       return;
     }
     strcat( fn, "/" ); strcat( fn, widget_filenames[ current_file ]->name );
@@ -494,7 +423,7 @@ static void widget_selectfile_keyhandler( int key )
     if(chdir(fn)==-1) {
       if(errno==ENOTDIR) {
 	free( fn );
-	widget_finished = WIDGET_FINISHED_OK;
+	widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
       }
     } else {
       widget_scan( fn ); free( fn );
@@ -505,4 +434,43 @@ static void widget_selectfile_keyhandler( int key )
     break;
 
   }
+
+  /* If we moved the cursor */
+  if( new_current_file != current_file ) {
+
+    current_file = new_current_file;
+
+    /* If we've got off the top or bottom of the currently displayed
+       file list, then reset the top-left corner and display the whole
+       thing */
+    if( current_file < top_left_file ) {
+
+      top_left_file = current_file & ~1;
+      widget_print_all_filenames( widget_filenames, widget_numfiles,
+				  top_left_file, current_file );
+
+    } else if( current_file >= top_left_file+36 ) {
+
+      top_left_file = current_file & ~1; top_left_file -= 34;
+      widget_print_all_filenames( widget_filenames, widget_numfiles,
+				  top_left_file, current_file );
+
+    } else {
+
+      /* Otherwise, print the new current file inverted, display the
+	 screen, and then print the current file back uninverted so we
+	 don't have to do so later */
+
+      widget_print_filename( widget_filenames[ current_file ],
+			     current_file - top_left_file, 1 );
+        
+      uidisplay_lines(DISPLAY_BORDER_HEIGHT,
+		      DISPLAY_BORDER_HEIGHT + DISPLAY_SCREEN_HEIGHT );
+	  
+      widget_print_filename( widget_filenames[ current_file ],
+			     current_file - top_left_file, 0 );
+	  
+    }
+  }
+
 }
