@@ -84,6 +84,9 @@ int fuse_sound_in_use;
 /* The creator information we'll store in file formats that support this */
 libspectrum_creator *fuse_creator;
 
+/* The earliest version of libspectrum we need */
+static const char *LIBSPECTRUM_MIN_VERSION = "0.2.0.1";
+
 /* The various types of file we may want to run on startup */
 typedef struct start_files_t {
 
@@ -179,7 +182,14 @@ static int fuse_init(int argc, char **argv)
   
   if( display_init(&argc,&argv) ) return 1;
 
-  if( libspectrum_init() ) return 1;
+  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
+    if( libspectrum_init() ) return 1;
+  } else {
+    ui_error( UI_ERROR_ERROR,
+              "libspectrum version %s found, but %s required",
+	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
+    return 1;
+  }
 
 #ifdef HAVE_GETEUID
   /* Drop root privs if we have them */

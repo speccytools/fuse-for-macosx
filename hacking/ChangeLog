@@ -272,3 +272,4 @@
 20031011 Remove the now unused getopt/ directory.
 20031012 rzx.c: reset rzx_competition_mode when starting a non-competition
 	 mode recording.
+20031013 fuse.c: check libspectrum's version at startup.
