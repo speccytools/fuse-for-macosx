@@ -106,7 +106,7 @@ static unsigned int beeper_tick,beeper_tick_incr;
 /* tick/incr/periods are all fixed-point with low 16 bits as
  * fractional part, except ay_env_{tick,period} which count as the chip does.
  */
-static unsigned int ay_tone_tick[3],ay_noise_tick;
+static unsigned int ay_tone_tick[3],ay_tone_high[3],ay_noise_tick;
 static unsigned int ay_env_internal_tick,ay_env_tick,ay_env_subcycles;
 static unsigned int ay_tick_incr;
 static unsigned int ay_tone_period[3],ay_noise_period,ay_env_period;
@@ -154,7 +154,7 @@ ay_tone_levels[0]=0;
 ay_noise_tick=ay_noise_period=0;
 ay_env_internal_tick=ay_env_tick=ay_env_period=0;
 for(f=0;f<3;f++)
-  ay_tone_tick[f]=ay_tone_period[f]=0;
+  ay_tone_tick[f]=ay_tone_high[f]=0,ay_tone_period[f]=(8<<16);
 
 ay_tick_incr=(int)(65536.*AY_CLOCK/sound_freq);
 
@@ -308,31 +308,43 @@ if(pstereopos>=pstereobufsiz)
  * a fairly short routine, and it saves messing about.
  * (XXX ummm, possibly not so true any more :-))
  */
-#define AY_GET_SUBVAL(tick,period) \
-  (level*2*(tick-period)/ay_tick_incr)
+#define AY_GET_SUBVAL(tick)	(level*2*tick/ay_tick_incr)
 
 #define AY_DO_TONE(var,chan) \
   (var)=0;								\
   was_high=0;								\
   if(level)								\
     {									\
-    if(ay_tone_tick[chan]>=ay_tone_period[chan])			\
-      (var)=-(level),was_high=1;					\
-    else								\
+    if(ay_tone_high[chan])						\
       (var)= (level);							\
+    else								\
+      (var)=-(level),was_high=1;					\
     }									\
   									\
   ay_tone_tick[chan]+=ay_tick_incr;					\
-  if(level && !was_high && ay_tone_tick[chan]>=ay_tone_period[chan])	\
-    (var)-=AY_GET_SUBVAL(ay_tone_tick[chan],ay_tone_period[chan]);	\
-  									\
-  if(ay_tone_tick[chan]>=ay_tone_period[chan]*2)			\
+  count=0;								\
+  while(ay_tone_tick[chan]>=ay_tone_period[chan])			\
     {									\
-    ay_tone_tick[chan]-=ay_tone_period[chan]*2;				\
-    /* sanity check needed to avoid making samples sound terrible */ 	\
-    if(level && ay_tone_tick[chan]<ay_tone_period[chan]) 		\
-      (var)+=AY_GET_SUBVAL(ay_tone_tick[chan],0);			\
-    }
+    count++;								\
+    ay_tone_tick[chan]-=ay_tone_period[chan];				\
+    ay_tone_high[chan]=!ay_tone_high[chan];				\
+    									\
+    /* has to be here, unfortunately... */				\
+    if(count==1 && level && ay_tone_tick[chan]<ay_tone_period[chan])	\
+      {									\
+      if(was_high)							\
+        (var)+=AY_GET_SUBVAL(ay_tone_tick[chan]);			\
+      else								\
+        (var)-=AY_GET_SUBVAL(ay_tone_tick[chan]);			\
+      }									\
+    }									\
+  									\
+  /* if it's changed more than once during the sample, we can't */	\
+  /* represent it faithfully. So, just hope it's a sample.      */	\
+  /* (That said, this should also help avoid aliasing noise.)   */	\
+  if(count>1)								\
+    (var)=-(level)
+
 
 /* add val, correctly delayed on either left or right buffer,
  * to add the AY stereo positioning. This doesn't actually put
@@ -366,7 +378,7 @@ static int noise_toggle=0;
 static int env_first=1,env_rev=0,env_counter=15;
 int tone_level[3];
 int mixer,envshape;
-int f,g,level;
+int f,g,level,tmp,count;
 unsigned char *ptr;
 struct ay_change_tag *change_ptr=ay_change;
 int changes_left=ay_change_count;
@@ -399,14 +411,16 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
       {
       case 0: case 1: case 2: case 3: case 4: case 5:
         r=reg>>1;
-        ay_tone_period[r]=(8*(sound_ay_registers[reg&~1]|
-                              (sound_ay_registers[reg|1]&15)<<8))<<16;
+        /* a zero-len period is the same as 1 */
+        tmp=(sound_ay_registers[reg&~1]|(sound_ay_registers[reg|1]&15)<<8);
+        if(!tmp) tmp++;
+        ay_tone_period[r]=(8*tmp)<<16;
 
         /* important to get this right, otherwise e.g. Ghouls 'n' Ghosts
          * has really scratchy, horrible-sounding vibrato.
          */
-        if(ay_tone_period[r] && ay_tone_tick[r]>=ay_tone_period[r]*2)
-          ay_tone_tick[r]%=ay_tone_period[r]*2;
+        if(ay_tone_tick[r]>=ay_tone_period[r])
+          ay_tone_tick[r]%=ay_tone_period[r];
         break;
       case 6:
         ay_noise_tick=0;
@@ -568,8 +582,10 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
   
   /* update noise RNG/filter */
   ay_noise_tick+=ay_tick_incr;
-  if(ay_noise_tick>=ay_noise_period)
+  while(ay_noise_tick>=ay_noise_period)
     {
+    ay_noise_tick-=ay_noise_period;
+    
     if((rng&1)^((rng&2)?1:0))
       noise_toggle=!noise_toggle;
     
@@ -579,7 +595,8 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
     rng|=((rng&1)^((rng&4)?1:0))?0x20000:0;
     rng>>=1;
     
-    ay_noise_tick-=ay_noise_period;
+    /* don't keep trying if period is zero */
+    if(!ay_noise_period) break;
     }
   }
 }
@@ -618,6 +635,8 @@ if(!sound_enabled_ever) return;
 ay_change_count=0;
 for(f=0;f<15;f++)
   sound_ay_write(f,0,0);
+for(f=0;f<3;f++)
+  ay_tone_high[f]=0;
 }
 
 
