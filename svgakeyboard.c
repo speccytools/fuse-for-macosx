@@ -103,7 +103,11 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F7:
     fuse_emulation_pause();
-    tape_open( "tape.tap" );
+    filename = widget_selectfile();
+    if( filename ) {
+      tape_open( filename );
+      display_refresh_all();
+    }
     fuse_emulation_unpause();
     break;
   case SCANCODE_F8:

@@ -84,7 +84,11 @@ int xkeyboard_keypress(XKeyEvent *event)
     break;
   case XK_F7:
     fuse_emulation_pause();
-    tape_open( "tape.tap" );
+    filename = widget_selectfile();
+    if( filename ) {
+      tape_open( filename );
+      display_refresh_all();
+    }
     fuse_emulation_unpause();
     break;
   case XK_F8:
