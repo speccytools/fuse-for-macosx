@@ -1,0 +1,47 @@
+CVS tags for Fuse
+
+| Release-0_3_1
+| Release-0_3_2pre1
+| Release-0_3_2pre2
+| Release-0_3_2pre3
+| Release-0_3_2
+| Release-0_3_2_1			Bugfix release from 0.3.2
+| Release-0_4_0pre1
+| Release-0_4_0pre2
+| Release-0_4_0pre3
+| Release-0_4_0pre4
+| Release-0_4_0pre5
+| Release-0_4_0pre6
+| Release-0_4_0
+| Release-0_4_1pre1
+|
++-  Release-0_4_1pre1-qtopia-branch	Dave Ball's Sharp PDA port
+|						(dead?)
+| Release-0_4_1pre2
+| Release-0_4_1pre3
+| Release-0_4_1pre4
+| Release-0_4_1
+| Release-0_4_2pre1
+| Release-0_4_2pre2
+| Release-0_4_2pre3
+|
++-\ Release-0_4_2pre3-tc2048-branch	Fred's TC2048 stuff
+| | Release-0_4_2pre3-tc2048-branch-1	Changes merged to trunk
+|					at Release-0_4_2-merge-1
+| Release-0_4_2pre4
+| Release-0_4_2
+|
++-\ Release-0_4_2-rzx2-branch		Experiment with recording all
+| |					port reads
+| | Release-0_4_2-rzx2-branch-1		Z80 core fixes; merged
+| |					to trunk at Release-0_4_2-merge-2
+| | Release-0_4_2-rzx2-branch-2		RZX2 working. Merged to trunk
+|                     			at Release-0_5_0pre1-merge-1 
+| Release-0_4_2-merge-1			Merged from
+|					Release-0_4_2pre3-tc2048-branch-1
+| Release-0_4_2-merge-2			Merged from
+| 					Release-0_4_2-rzx2-branch-1
+| Release-0_5_0pre1
+| Release-0_5_0pre1-merge-1		Merged from
+|                                       Release-0_4_2-rzx2-branch-2
+HEAD
