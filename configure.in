@@ -115,7 +115,7 @@ if test -z "$ui"; then
   sdl=no)
   AC_MSG_RESULT($sdl)
   if test "$sdl" = yes; then
-    SDL_VERSION=1.2.5
+    SDL_VERSION=1.2.4
     AM_PATH_SDL($SDL_VERSION,
 		AC_DEFINE(UI_SDL) ui=sdl, 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
