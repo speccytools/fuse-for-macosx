@@ -32,6 +32,8 @@
 #include <string.h>
 #include <SDL.h>
 
+#include <libspectrum.h>
+
 #include "fuse.h"
 #include "display.h"
 #include "ui/uidisplay.h"
@@ -75,12 +77,12 @@ static SDL_Color colour_palette[] = {
 #define MAX_UPDATE_RECT 300
 static SDL_Rect updated_rects[MAX_UPDATE_RECT];
 static int num_rects = 0;
-static BYTE sdldisplay_force_full_refresh = 1;
+static libspectrum_byte sdldisplay_force_full_refresh = 1;
 
 /* The current size of the display (in units of DISPLAY_SCREEN_*) */
 static float sdldisplay_current_size = 1;
 
-static BYTE sdldisplay_is_full_screen = 0;
+static libspectrum_byte sdldisplay_is_full_screen = 0;
 
 static int image_width;
 static int image_height;
@@ -278,19 +280,20 @@ uidisplay_frame_end( void )
 
   for( r = updated_rects; r != last_rect; r++ ) {
 
-    WORD *dest_base, *dest;
+    libspectrum_word *dest_base, *dest;
     size_t xx,yy;
 
     dest_base =
-      (WORD*)( (BYTE*)tmp_screen->pixels + (r->x*2+2) +
-	       (r->y+1)*tmp_screen_pitch );
+      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels + (r->x*2+2) +
+			   (r->y+1)*tmp_screen_pitch );
 
     for( yy = r->y; yy < r->y + r->h; yy++ ) {
 
       for( xx = r->x, dest = dest_base; xx < r->x + r->w; xx++, dest++ )
 	*dest = colour_values[ display_image[yy][xx] ];
 
-      dest_base = (WORD*)( (BYTE*)dest_base + tmp_screen_pitch );
+      dest_base = (libspectrum_word*)
+	( (libspectrum_byte*)dest_base + tmp_screen_pitch );
     }
 	  
   }
@@ -304,10 +307,14 @@ uidisplay_frame_end( void )
     register int dst_h = r->h;
 
     scaler_proc16(
-     (BYTE*)tmp_screen->pixels + (r->x*2+2) + (r->y+1)*tmp_screen_pitch,
-     tmp_screen_pitch,
-     (BYTE*)sdldisplay_gc->pixels + r->x*(BYTE)(2*sdldisplay_current_size) +
-     dst_y*dstPitch, dstPitch, r->w, dst_h );
+      (libspectrum_byte*)tmp_screen->pixels + (r->x*2+2) +
+	                (r->y+1)*tmp_screen_pitch,
+      tmp_screen_pitch,
+      (libspectrum_byte*)sdldisplay_gc->pixels +
+	                 r->x*(libspectrum_byte)(2*sdldisplay_current_size) +
+			 dst_y*dstPitch,
+      dstPitch, r->w, dst_h
+    );
 
     /* Adjust rects for the destination rect size */
     r->x *= sdldisplay_current_size;
