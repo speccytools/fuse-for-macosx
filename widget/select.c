@@ -53,8 +53,8 @@ int widget_select_draw( void* data )
   widget_printstring( 8, 2, WIDGET_COLOUR_FOREGROUND, "Select Machine" );
 
   for( i=0; i<machine_count; i++ ) {
-    snprintf( descriptions[i], 40, "(%d): %s",
-	      i+1, machine_types[i]->description );
+    snprintf( descriptions[i], 40, "(%c): %s",
+	      ((char)i)+'A', machine_types[i]->description );
     descriptions[i][ 28 ] = '\0';
     
     if( machine_current->machine == machine_types[i]->machine ) {
@@ -74,13 +74,20 @@ int widget_select_draw( void* data )
 
 void widget_select_keyhandler( int key )
 {
-  if( key == KEYBOARD_Enter ) {
+  switch( key ) {
+
+  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
+    widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+    return;
+
+  case KEYBOARD_Enter:
     widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
     return;
+
   }
 
-  if( key > KEYBOARD_0 && key <= KEYBOARD_9 &&
-      key - '1' < machine_count ) {
+  if( key >= KEYBOARD_a && key <= KEYBOARD_z &&
+      key - KEYBOARD_a < machine_count ) {
     
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
@@ -89,7 +96,7 @@ void widget_select_keyhandler( int key )
 			descriptions[ highlight_line ] );
 
     /*  draw the new one */
-    highlight_line = key - '1';
+    highlight_line = key - KEYBOARD_a;
 
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
 		      WIDGET_COLOUR_FOREGROUND );
