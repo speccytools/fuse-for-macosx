@@ -324,22 +324,22 @@ static void
 disassemble_11xxx001( BYTE b, char *buffer, size_t buflen,
 		      size_t *length, enum hl_type use_hl )
 {
-  switch( b >> 3 ) {
+  switch( ( b >> 3 ) - 0x18 ) {
     
-  case 0x18: case 0x1a: case 0x1c:
+  case 0x00: case 0x02: case 0x04:
     snprintf( buffer, buflen, "POP %s", reg_pair( b, use_hl ) ); *length = 1;
     break;
 
-  case 0x19: snprintf( buffer, buflen, "RET" ); *length = 1; break;
-  case 0x1b: snprintf( buffer, buflen, "EXX" ); *length = 1; break;
+  case 0x01: snprintf( buffer, buflen, "RET" ); *length = 1; break;
+  case 0x03: snprintf( buffer, buflen, "EXX" ); *length = 1; break;
 
-  case 0x1d: 
+  case 0x05: 
     snprintf( buffer, buflen, "JP %s", hl_ix_iy( use_hl ) ); *length = 1;
     break;
 
-  case 0x1e: snprintf( buffer, buflen, "POP AF" ); *length = 1; break;
+  case 0x06: snprintf( buffer, buflen, "POP AF" ); *length = 1; break;
 
-  case 0x1f:
+  case 0x07:
     snprintf( buffer, buflen, "LD SP,%s", hl_ix_iy( use_hl ) ); *length = 1;
     break;
   }
@@ -353,14 +353,14 @@ disassemble_11xxx011( WORD address, char *buffer, size_t buflen,
   char buffer2[40];
   BYTE b = readbyte( address );
 
-  switch( b >> 3 ) {
+  switch( ( b >> 3 ) - 0x18 ) {
 
-  case 0x18:
+  case 0x00:
     get_word( buffer2, 40, address + 1 );
     snprintf( buffer, buflen, "JP %s", buffer2 ); *length = 3;
     break;
 
-  case 0x19:
+  case 0x01:
     if( use_hl != USE_HL ) {
       char offset = readbyte( address + 1 );
       disassemble_ddfd_cb( address+2, offset, use_hl, buffer, buflen,
@@ -371,30 +371,30 @@ disassemble_11xxx011( WORD address, char *buffer, size_t buflen,
     }
     break;
 
-  case 0x1a:
+  case 0x02:
     get_byte( buffer2, 40, readbyte( address + 1 ) );
     snprintf( buffer, buflen, "OUT (%s),A", buffer2 ); *length = 2;
     break;
 
-  case 0x1b:
+  case 0x03:
     get_byte( buffer2, 40, readbyte( address + 1 ) );
     snprintf( buffer, buflen, "IN A,(%s)", buffer2 ); *length = 2;
     break;
 
-  case 0x1c:
+  case 0x04:
     snprintf( buffer, buflen, "EX (SP),%s", hl_ix_iy( use_hl ) ); *length = 1;
     break;
 
-  case 0x1d:
+  case 0x05:
     /* Note: does not get modified by DD or FD */
     snprintf( buffer, buflen, "EX DE,HL" ); *length = 1;
     break;
 
-  case 0x1e:
+  case 0x06:
     snprintf( buffer, buflen, "DI" ); *length = 1;
     break;
 
-  case 0x1f:
+  case 0x07:
     snprintf( buffer, buflen, "EI" ); *length = 1;
     break;
   }
@@ -408,30 +408,30 @@ disassemble_11xxx101( WORD address, char *buffer, size_t buflen,
   char buffer2[40];
   BYTE b = readbyte( address );
 
-  switch( b >> 3 ) {
+  switch( ( b >> 3 ) - 0x18 ) {
 	
-  case 0x18: case 0x1a: case 0x1c:
+  case 0x00: case 0x02: case 0x04:
     snprintf( buffer, buflen, "PUSH %s", reg_pair( b, use_hl ) ); *length = 1;
     break;
 
-  case 0x19:
+  case 0x01:
     get_word( buffer2, 40, address + 1 );
     snprintf( buffer, buflen, "CALL %s", buffer2 ); *length = 3;
     break;
 
-  case 0x1b:
+  case 0x03:
     disassemble_main( address+1, buffer, buflen, length, USE_IX ); (*length)++;
     break;
 
-  case 0x1d:
+  case 0x05:
     disassemble_ed( address+1, buffer, buflen, length ); (*length)++;
     break;
 
-  case 0x1e:
+  case 0x06:
     snprintf( buffer, buflen, "PUSH AF" ); *length = 1;
     break;
 
-  case 0x1f:
+  case 0x07:
     disassemble_main( address+1, buffer, buflen, length, USE_IY ); (*length)++;
     break;
   }
