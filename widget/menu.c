@@ -251,7 +251,7 @@ int
 widget_menu_break( void *data GCC_UNUSED )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
-  widget_end_all( WIDGET_FINISHED_OK );
+  widget_do( WIDGET_TYPE_DEBUGGER, NULL );
   return 0;
 }
 

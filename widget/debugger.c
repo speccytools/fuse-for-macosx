@@ -99,12 +99,12 @@ widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   case KEYBOARD_c:
     debugger_run();
-    widget_end_widget( WIDGET_FINISHED_OK );
+    widget_end_all( WIDGET_FINISHED_OK );
     break;
 
   case KEYBOARD_s:
     debugger_mode = DEBUGGER_MODE_STEP;
-    widget_end_widget( WIDGET_FINISHED_OK );
+    widget_end_all( WIDGET_FINISHED_OK );
     break;
 
   default:	/* Keep gcc happy */
