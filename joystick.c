@@ -41,12 +41,16 @@
 /* Number of joysticks known about & initialised */
 int joysticks_supported = 0;
 
+/* The current state of the emulated Kempston joystick */
+static libspectrum_byte joystick_value;
+
 /* Init/shutdown functions. Errors aren't important here */
 
 void
 fuse_joystick_init (void)
 {
   joysticks_supported = ui_joystick_init();
+  joystick_value = 0x00;
 }
 
 void
@@ -55,28 +59,37 @@ fuse_joystick_end (void)
   ui_joystick_end();
 }
 
-/* Returns joystick direction/button state in Kempston format.
-   This is used if no (hardware) joysticks are found. */
+void
+joystick_press( joystick_button button, int press )
+{
+  libspectrum_byte mask;
+
+  switch( button ) {
+  case JOYSTICK_BUTTON_RIGHT: mask = 0x01; break;
+  case JOYSTICK_BUTTON_LEFT:  mask = 0x02; break;
+  case JOYSTICK_BUTTON_DOWN:  mask = 0x04; break;
+  case JOYSTICK_BUTTON_UP:    mask = 0x08; break;
+  case JOYSTICK_BUTTON_FIRE:  mask = 0x10; break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "Unknown joystick button %d", button );
+    fuse_abort();
+  }
+
+  if( press ) {
+    joystick_value |=  mask;
+  } else {
+    joystick_value &= ~mask;
+  }
+}
 
 libspectrum_byte
 joystick_default_read( libspectrum_word port, libspectrum_byte which )
 {
-  /* Offset/mask in keyboard_return_values[] for joystick keys,
-     in order right, left, down, up, fire. These are p/o/a/q/Space */
-  static const int offset[5] = {    5,    5,    1,    2,    7 };
-  static const int mask[5]   = { 0x01, 0x02, 0x01, 0x01, 0x01 };
-  libspectrum_byte return_value = 0, jmask = 1;
-  int i;
-
   /* We only support one "joystick" */
   if( which ) return 0;
 
-  for( i=0; i<5; i++, jmask<<=1 ) {
-    if( !(keyboard_return_values[offset[i]] & mask[i]) )
-      return_value|=jmask;
-  }
-
-  return return_value;
+  return joystick_value;
 }
 
 /* Read functions for specific interfaces */

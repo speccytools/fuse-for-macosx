@@ -28,6 +28,7 @@
 
 #include "fuse.h"
 #include "input.h"
+#include "joystick.h"
 #include "keyboard.h"
 #include "settings.h"
 #include "snapshot.h"
@@ -77,6 +78,18 @@ keypress( const input_event_key_t *event )
   if( ptr ) {
     keyboard_press( ptr->key1 );
     keyboard_press( ptr->key2 );
+  }
+
+  /* Joystick emulation via QAOP<space> */
+  switch( key ) {
+
+  case INPUT_KEY_q:     joystick_press( JOYSTICK_BUTTON_UP   , 1 ); break;
+  case INPUT_KEY_a:     joystick_press( JOYSTICK_BUTTON_DOWN , 1 ); break;
+  case INPUT_KEY_o:     joystick_press( JOYSTICK_BUTTON_LEFT , 1 ); break;
+  case INPUT_KEY_p:     joystick_press( JOYSTICK_BUTTON_RIGHT, 1 ); break;
+  case INPUT_KEY_space: joystick_press( JOYSTICK_BUTTON_FIRE , 1 ); break;
+
+  default: break;		/* Remove warning */
   }
 
 #ifdef USE_WIDGET
@@ -142,13 +155,28 @@ keypress( const input_event_key_t *event )
 static int
 keyrelease( const input_event_key_t *event )
 {
+  input_key key;
   const keysyms_key_info *ptr;
 
-  ptr = keysyms_get_data( event->key );
+  key = event->key;
+
+  ptr = keysyms_get_data( key );
 
   if( ptr ) {
     keyboard_release( ptr->key1 );
     keyboard_release( ptr->key2 );
+  }
+
+  /* Joystick emulation via QAOP<space> */
+  switch( key ) {
+
+  case INPUT_KEY_q:     joystick_press( JOYSTICK_BUTTON_UP   , 0 ); break;
+  case INPUT_KEY_a:     joystick_press( JOYSTICK_BUTTON_DOWN , 0 ); break;
+  case INPUT_KEY_o:     joystick_press( JOYSTICK_BUTTON_LEFT , 0 ); break;
+  case INPUT_KEY_p:     joystick_press( JOYSTICK_BUTTON_RIGHT, 0 ); break;
+  case INPUT_KEY_space: joystick_press( JOYSTICK_BUTTON_FIRE , 0 ); break;
+
+  default: break;		/* Remove warning */
   }
 
   return 0;

@@ -651,3 +651,5 @@
 20040320 snapshot.c,trdos.[ch]: support the Beta 128 block of the SZX format.
 20040320 machine.[ch],z80/{coretest.c,z80_ops.c}: use libspectrum's new
 	 'Even M1' capability.
+20040322 input.c,joystick.[ch]: convert the QAOP<space> joystick emulation
+	 over to using the new input layer.
