@@ -205,12 +205,14 @@ static int fuse_init(int argc, char **argv)
     rzx_start_recording( settings_current.record_file, 1 );
   }
 
+#ifdef HAVE_765_H
   if( settings_current.plus3disk_file ) {
     error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
     if( error ) return error;
 
     specplus3_disk_insert( SPECPLUS3_DRIVE_A, settings_current.plus3disk_file );
   }
+#endif				/* #ifdef HAVE_765_H */
 
   if( settings_current.trdosdisk_file ) {
     error = machine_select( LIBSPECTRUM_MACHINE_PENT );
@@ -381,12 +383,14 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
       error = tape_read_buffer( buffer, length, type, autoload );
       break;
 
+#ifdef HAVE_765_H
     case LIBSPECTRUM_ID_DISK_DSK:
       error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
       if( error ) return error;
 
       error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, argv[ first_arg ] );
       break;
+#endif				/* #ifdef HAVE_765_H */
 
     case LIBSPECTRUM_ID_DISK_SCL:
     case LIBSPECTRUM_ID_DISK_TRD:
