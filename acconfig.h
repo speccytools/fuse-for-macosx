@@ -65,6 +65,9 @@
 /* Defined if Xlib UI in use */
 #undef UI_X
 
+/* Defined if we're using hardware joysticks */
+#undef USE_JOYSTICK
+
 /* Defined if we're going to be using the installed libpng */
 #undef USE_LIBPNG
 

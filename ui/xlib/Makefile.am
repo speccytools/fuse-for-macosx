@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -26,7 +26,12 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuixlib.a
 
-libuixlib_a_SOURCES = xdisplay.c xerror.c xkeyboard.c xui.c keysyms.c
+libuixlib_a_SOURCES = xdisplay.c \
+		      xerror.c \
+		      xjoystick.c \
+		      xkeyboard.c \
+		      xui.c \
+		      keysyms.c
 
 BUILT_SOURCES = keysyms.c
 

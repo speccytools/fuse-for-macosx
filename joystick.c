@@ -35,16 +35,41 @@
 #include "settings.h"
 #include "spectrum.h"
 #include "machine.h"
+#include "ui/ui.h"
+#include "ui/uijoystick.h"
+
+/* Number of joysticks known about & initialised */
+int joysticks_supported = 0;
+
+/* Init/shutdown functions. Errors aren't important here */
+
+void
+fuse_joystick_init (void)
+{
+  joysticks_supported = ui_joystick_init();
+}
+
+void
+fuse_joystick_end (void)
+{
+  ui_joystick_end();
+}
+
+/* Returns joystick direction/button state in Kempston format.
+   This is used if no (hardware) joysticks are found. */
 
 libspectrum_byte
-joystick_kempston_read( libspectrum_word port )
+joystick_default_read( libspectrum_word port, libspectrum_byte which )
 {
   /* Offset/mask in keyboard_return_values[] for joystick keys,
      in order right, left, down, up, fire. These are p/o/a/q/Space */
-  static int offset[5] = {    5,    5,    1,    2,    7 };
-  static int mask[5]   = { 0x01, 0x02, 0x01, 0x01, 0x01 };
+  static const int offset[5] = {    5,    5,    1,    2,    7 };
+  static const int mask[5]   = { 0x01, 0x02, 0x01, 0x01, 0x01 };
   libspectrum_byte return_value = 0, jmask = 1;
   int i;
+
+  /* We only support one "joystick" */
+  if( which ) return 0;
 
   if( !settings_current.joy_kempston ) {
     /* Some machines have a built-in Kempston interface */
@@ -64,8 +89,23 @@ joystick_kempston_read( libspectrum_word port )
   return return_value;
 }
 
+/* Read functions for specific interfaces */
+
 libspectrum_byte
-joystick_timex_read( libspectrum_word port, int which )
+joystick_kempston_read( libspectrum_word port )
+{
+  /* If joysticks are disabled, return the floating bus value */
+  if( !settings_current.joy_kempston ) return spectrum_port_noread( port );
+
+  /* If we have no real joysticks, return the QAOP<space>-emulated value */
+  if( joysticks_supported == 0 ) return joystick_default_read( port, 0 );
+
+  /* Return the value from the actual joystick */
+  return ui_joystick_read( port, 0 );
+}
+
+libspectrum_byte
+joystick_timex_read( libspectrum_word port, libspectrum_byte which )
 {
   static const libspectrum_byte translate[] = {
     0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
@@ -74,8 +114,11 @@ joystick_timex_read( libspectrum_word port, int which )
     0x81, 0x89, 0x85, 0x8D, 0x83, 0x8B, 0x87, 0x8F,
   };
 
-  if( which == 0 )
-    return translate[ joystick_kempston_read( port ) ];
+  /* If we don't have a real joystick for this, use the QAOP<space>-emulated
+     value */
+  if( joysticks_supported <= which )
+    return translate[ joystick_default_read( port, which ) ];
 
-  return 0;
+  /* If we do have a real joystick, read it */
+  return translate[ ui_joystick_read( port, which ) ];
 }

@@ -36,6 +36,7 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "sdldisplay.h"
+#include "sdljoystick.h"
 #include "sdlkeyboard.h"
 #include "ui/scaler/scaler.h"
 
@@ -75,6 +76,21 @@ ui_event( void )
     case SDL_KEYUP:
       sdlkeyboard_keyrelease( &(event.key) );
       break;
+
+#if defined USE_JOYSTICK && !defined HAVE_JSW_H
+
+    case SDL_JOYBUTTONDOWN:
+      sdljoystick_buttonpress( &(event.jbutton) );
+      break;
+    case SDL_JOYBUTTONUP:
+      sdljoystick_buttonrelease( &(event.jbutton) );
+      break;
+    case SDL_JOYAXISMOTION:
+      sdljoystick_axismove( &(event.jaxis) );
+      break;
+
+#endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
+
     case SDL_QUIT:
       fuse_exiting = 1;
       break;

@@ -245,3 +245,4 @@
 20031006 debugger/command.c, debugger/commandy.y: better error recovery
 20031007 ui/fb/fbdisplay.c, ui/fb/fbkeyboard.c: fix up framebuffer UI
 	 (Darren).
+20031007 Real joystick support (Darren/Fred)

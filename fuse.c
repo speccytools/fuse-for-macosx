@@ -41,6 +41,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
@@ -147,6 +148,7 @@ static int fuse_init(int argc, char **argv)
      what */
   /* FIXME FIXME 20030407: really do this soon. This is getting *far* too
      hairy */
+  fuse_joystick_init ();
   fuse_keyboard_init();
 
   if( creator_init() ) return 1;
@@ -458,6 +460,7 @@ static int fuse_end(void)
 
   sound_end();
   event_end();
+  fuse_joystick_end ();
   ui_end();
 
 #ifdef USE_WIDGET

@@ -287,10 +287,48 @@ AC_CHECK_LIB( png, png_write_png,
 )
 AC_SUBST(PNG_LIBS)
 
+AC_MSG_CHECKING(whether hardware joystick support requested)
+  AC_ARG_WITH(joystick,
+  [  --with-joystick         use a real joystick for Kempston emulation etc.],
+  if test "$withval" = no; then stick=no; else stick=yes; fi,
+  stick=yes)
+AC_MSG_RESULT($stick)
+if test "$stick" = yes; then
+  dnl We prefer to use UI-specific joystick code. (Default.)
+  dnl If there is none, or you override this here, we use libjsw.
+  dnl (svgalib appears to dislike switched joysticks on the parallel port...)
+  AC_DEFINE(USE_JOYSTICK)
+  case "$ui" in
+    svga)
+      dnl Libraries such as svgalib provide their own joystick code.
+      AC_MSG_CHECKING([whether to use $UI's joystick support])
+      AC_ARG_ENABLE(ui-joystick,
+      [  --enable-ui-joystick    use UI-specific joystick code (where supported)],
+      if test "$enableval" = no; then libjsw=yes; else libjsw=no; fi,
+      libjsw=no)
+      if test "$libjsw" = yes; then
+	AC_MSG_RESULT([no, use libjsw])
+      else
+	AC_MSG_RESULT(yes)
+      fi
+      ;;
+    *)
+      dnl Our only option is libjsw.
+      libjsw=yes
+      ;;
+  esac
+  if test "$libjsw" = yes; then
+    dnl Look for libjsw. If missing, use QAOP<space>.
+    AC_CHECK_HEADERS(jsw.h,
+                     LIBS="$LIBS -ljsw",
+                     AC_MSG_WARN(jsw.h not found - joystick support disabled))
+  fi
+fi
+
 dnl See if libxml2 is available (for the config file handling)
 AM_PATH_XML2(2.0.0,AC_DEFINE(HAVE_LIB_XML2),
   AC_WARN(libxml2 not found - config file use disabled))
-	       
+
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
 AC_ARG_ENABLE(smallmem,

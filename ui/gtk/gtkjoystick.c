@@ -1,5 +1,4 @@
-/* joystick.h: Joystick emulation support
-   Copyright (c) 2001-2003 Russell Marks, Philip Kendall
+/* fbjoystick.c: Joystick emulation
    Copyright (c) 2003 Darren Salt
 
    $Id$
@@ -23,27 +22,14 @@
    E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
+   Darren: linux@youmustbejoking.demon.co.uk
+
 */
 
-#ifndef FUSE_JOYSTICK_H
-#define FUSE_JOYSTICK_H
+#include <config.h>
 
-#include <libspectrum.h>
+#ifdef UI_GTK
 
-/* Number of joysticks known about & initialised */
-extern int joysticks_supported;
+#include "../uijoystick.c"
 
-/* Init/shutdown functions. Errors aren't important here */
-void fuse_joystick_init( void );
-void fuse_joystick_end( void );
-
-/* Default read function (returns data in Kempston format) */
-libspectrum_byte joystick_default_read( libspectrum_word port,
-					libspectrum_byte which );
-
-/* Interface-specific read functions */
-libspectrum_byte joystick_kempston_read ( libspectrum_word port );
-libspectrum_byte joystick_timex_read ( libspectrum_word port,
-				       libspectrum_byte which );
-
-#endif			/* #ifndef FUSE_JOYSTICK_H */
+#endif				/* #ifdef UI_GTK */

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -26,9 +26,15 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuisdl.a
 
-INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@ @SDL_CFLAGS@
+LDADD = @SDL_LIBS@
 
-libuisdl_a_SOURCES = sdldisplay.c sdlkeyboard.c sdlui.c error.c keysyms.c
+libuisdl_a_SOURCES = sdldisplay.c \
+		     sdljoystick.c \
+		     sdlkeyboard.c \
+		     sdlui.c \
+		     error.c \
+		     keysyms.c
 
 BUILT_SOURCES = keysyms.c
 

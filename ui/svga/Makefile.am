@@ -28,7 +28,12 @@ noinst_LIBRARIES = libuisvga.a
 
 INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
-libuisvga_a_SOURCES = error.c svgadisplay.c svgakeyboard.c svgaui.c keysyms.c
+libuisvga_a_SOURCES = error.c \
+		      svgadisplay.c \
+		      svgajoystick.c \
+		      svgakeyboard.c \
+		      svgaui.c \
+		      keysyms.c
 
 BUILT_SOURCES = keysyms.c
 
