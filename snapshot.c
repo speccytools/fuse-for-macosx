@@ -177,7 +177,8 @@ snapshot_copy_from( libspectrum_snap *snap )
       0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
     );
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY )
+  if( capabilities & ( LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY |
+      LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY ) )
     scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )

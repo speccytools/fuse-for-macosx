@@ -860,3 +860,4 @@
 	 .z80.
 20040525 sound/hpsound.c: update for 16-bit sound (Stuart Brady).
 20040527 sound/hpsound.c: further small update (Stuart Brady).
+20040527 snapshot.c: Save Timex HSR register for the Spectrum SE.
