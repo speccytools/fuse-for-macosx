@@ -49,6 +49,7 @@
 
 #include "dck.h"
 #include "fuse.h"
+#include "if2.h"
 #include "machines/specplus3.h"
 #include "memory.h"
 #include "rzx.h"
@@ -179,6 +180,10 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
+  case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:
+    error = if2_insert( filename );
+    break;
+
     error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
     error = dck_insert( filename );
     break;
