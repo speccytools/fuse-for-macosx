@@ -226,7 +226,7 @@ read_snapshot_block( unsigned char **ptr, unsigned char *end )
 static int
 read_input_block( unsigned char **ptr, unsigned char *end )
 {
-  size_t i, frames;
+  size_t i, frames, length; int flags;
 
   if( end - *ptr < 17 ) {
     fprintf( stderr,
@@ -235,39 +235,57 @@ read_input_block( unsigned char **ptr, unsigned char *end )
   }
 
   printf( "Found an input recording block\n" );
-  printf( "  Length: %d bytes\n", read_dword( ptr ) );
+  
+  length = read_dword( ptr );
+  printf( "  Length: %d bytes\n", length );
 
   frames = read_dword( ptr );
   printf( "  Frame count: %d\n", frames );
 
   printf( "  Frame length (obsolete): %d bytes\n", *(*ptr)++ );
   printf( "  Tstate counter: %d\n", read_dword( ptr ) );
-  printf( "  Flags: %d\n", read_dword( ptr ) );
 
-  for( i=0; i<frames; i++ ) {
+  flags = read_dword( ptr );
+  printf( "  Flags: %d\n", flags );
 
-    size_t count;
+  /* Check there's enough data */
+  if( end - *ptr < length - 18 ) {
+    fprintf( stderr, "%s: not enough frame data\n", progname );
+    return 1;
+  }
 
-    printf( "Examining frame %d\n", i );
+  if( flags & 0x02 ) {		/* Data is compressed */
+    printf( "  Skipping compressed data\n" );
+    (*ptr) += length - 18;
+
+  } else {			/* Data is not compressed */
+
+    for( i=0; i<frames; i++ ) {
+
+      size_t count;
+
+      printf( "Examining frame %d\n", i );
     
-    if( end - *ptr < 4 ) {
-      fprintf( stderr, "%s: Not enough data for frame %d\n", progname, i );
-      return 1;
+      if( end - *ptr < 4 ) {
+	fprintf( stderr, "%s: Not enough data for frame %d\n", progname, i );
+	return 1;
+      }
+
+      printf( "  Instruction count: %d\n", read_word( ptr ) );
+
+      count = read_word( ptr );
+      printf( "  IN count: %d\n", count );
+
+      if( end - *ptr < count ) {
+	fprintf( stderr,
+		 "%s: Not enough data for frame %d (expected %d bytes)\n",
+		 progname, i, count );
+	return 1;
+      }
+
+      (*ptr) += count;
     }
 
-    printf( "  Instruction count: %d\n", read_word( ptr ) );
-
-    count = read_word( ptr );
-    printf( "  IN count: %d\n", count );
-
-    if( end - *ptr < count ) {
-      fprintf( stderr,
-	       "%s: Not enough data for frame %d (expected %d bytes)\n",
-	       progname, i, count );
-      return 1;
-    }
-
-    (*ptr) += count;
   }
 
   return 0;
