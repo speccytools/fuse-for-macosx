@@ -460,3 +460,7 @@
 	 gtkui_disk_eject(_write)_[ab] functions.
 20040106 tape.c: put the header type/name in the tape browser 'details'
 	 field.
+20040107 trdos.c: always non-busy just after a reset (part of patch
+	 #871182) (Fred).
+20040107 trdos.c: update the statusbar disk indicator (next part of patch
+	 #871182) (Fred).

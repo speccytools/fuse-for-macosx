@@ -197,6 +197,8 @@ trdos_reset( void )
 		    discs[ TRDOS_DRIVE_A ].disc_ready );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
 		    discs[ TRDOS_DRIVE_B ].disc_ready );
+
+  ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
 
 void
@@ -214,6 +216,10 @@ void trdos_update_index_impulse( void )
       vg_rs.bit.b1 = 1;
     }
   }
+
+  ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
+                       busy ? UI_STATUSBAR_STATE_ACTIVE :
+                              UI_STATUSBAR_STATE_INACTIVE );
 }
 
 libspectrum_byte
