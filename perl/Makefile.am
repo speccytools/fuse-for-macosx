@@ -26,4 +26,5 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = Fuse
 
-EXTRA_DIST = Fuse.pm
+EXTRA_DIST = cpp-perl.pl \
+	     Fuse.pm

@@ -127,6 +127,7 @@ noinst_HEADERS = ay.h \
 	display.h \
 	event.h \
 	fuse.h \
+	if2.h \
 	input.h \
 	keyboard.h \
 	machine.h \
@@ -153,5 +154,13 @@ noinst_HEADERS = ay.h \
 	zxatasp.h \
 	zxcf.h
 
-EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl \
-	     settings-header.pl settings.dat
+EXTRA_DIST = AUTHORS \
+	     README \
+	     THANKS \
+	     keysyms.dat \
+	     keysyms.pl \
+	     menu_data.c \
+	     menu_data.pl \
+	     settings.pl \
+	     settings-header.pl \
+	     settings.dat
