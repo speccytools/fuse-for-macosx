@@ -29,7 +29,6 @@
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <stdio.h>
-#include <string.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
@@ -154,9 +153,6 @@ static void cartridge_insert( GtkWidget *widget, gpointer data );
 static void cartridge_eject( GtkWidget *widget, gpointer data );
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
-
-static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
-static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
 /* Set a menu item (in)active in both the menu bar and the popup menus */
 static int set_menu_item_active( const char *path, int active );
@@ -1106,86 +1102,6 @@ void
 gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data GCC_UNUSED )
 {
   gtk_widget_destroy( widget );
-  gtk_main_quit();
-}
-
-/* Bits used for the file selection dialogs */
-
-typedef struct gktui_fileselector_info {
-
-  GtkWidget *selector;
-  gchar *filename;
-
-} gtkui_fileselector_info;
-
-char*
-gtkui_fileselector_get_filename( const char *title )
-{
-  gtkui_fileselector_info selector;
-  GtkAccelGroup *accel_group;
-
-  selector.selector = gtk_file_selection_new( title );
-  selector.filename = NULL;
-
-  gtk_signal_connect(
-      GTK_OBJECT( GTK_FILE_SELECTION( selector.selector )->ok_button ),
-      "clicked",
-      GTK_SIGNAL_FUNC( gtkui_fileselector_done ),
-      (gpointer) &selector );
-
-  gtk_signal_connect(
-       GTK_OBJECT( GTK_FILE_SELECTION( selector.selector )->cancel_button),
-       "clicked",
-       GTK_SIGNAL_FUNC(gtkui_fileselector_cancel ),
-       (gpointer) &selector );
-
-  gtk_signal_connect( GTK_OBJECT( selector.selector ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-		      (gpointer) &selector );
-
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group(GTK_WINDOW(selector.selector), accel_group);
-
-  /* Allow Esc to cancel */
-  gtk_widget_add_accelerator(
-       GTK_FILE_SELECTION( selector.selector )->cancel_button,
-       "clicked",
-       accel_group,
-       GDK_Escape, 0, 0 );
-
-  gtk_window_set_modal( GTK_WINDOW( selector.selector ), TRUE );
-
-  gtk_widget_show( selector.selector );
-
-  gtk_main();
-
-  return selector.filename;
-}
-
-static void
-gtkui_fileselector_done( GtkButton *button GCC_UNUSED, gpointer user_data )
-{
-  gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
-  const char *filename;
-
-  filename =
-    gtk_file_selection_get_filename( GTK_FILE_SELECTION( ptr->selector ) );
-
-  /* FIXME: what to do if this runs out of memory? */
-  ptr->filename = strdup( filename );
-
-  gtk_widget_destroy( ptr->selector );
-
-  gtk_main_quit();
-}
-
-static void
-gtkui_fileselector_cancel( GtkButton *button GCC_UNUSED, gpointer user_data )
-{
-  gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
-
-  gtk_widget_destroy( ptr->selector );
-
   gtk_main_quit();
 }
 

@@ -33,6 +33,7 @@ libuigtk_a_SOURCES = binary.c \
 		     confirm.c \
 	             debugger.c \
                      error.c \
+		     fileselector.c \
 		     gtkdisplay.c \
 		     gtkjoystick.c \
 		     gtkkeyboard.c \

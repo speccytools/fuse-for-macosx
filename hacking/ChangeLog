@@ -403,3 +403,6 @@
 	 (fixes bug #866403).
 20031228 fuse.c: must call machine_init_machines() before tape_init()
 	 (Witold).
+20031228 ui/gtk/{Makefile.am,fileselector.c,gtkui.c}: make the GTK+
+	 fileselector remember its previous directory. Also move the
+	 fileselector code into its own file and tidy up a bit.
