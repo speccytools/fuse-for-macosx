@@ -52,15 +52,14 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
 
   /* If this is a 'severe' error, print it to stderr with a program
      identifier and a level indicator */
-  if( severity >= UI_ERROR_ERROR ) {
+  if( severity > UI_ERROR_INFO ) {
 
     fprintf( stderr, "%s: ", fuse_progname );
 
     switch( severity ) {
-    case UI_ERROR_ERROR:
-      fprintf( stderr, "error: " ); break;
-    default:             
-      fprintf( stderr, "(unknown level): " ); break;
+    case UI_ERROR_WARNING: fprintf( stderr, "warning: " ); break;
+    case UI_ERROR_ERROR: fprintf( stderr, "error: " ); break;
+    default: fprintf( stderr, "(unknown error level %d): ", severity ); break;
     }
 
     fprintf( stderr, "%s\n", message );
@@ -78,10 +77,13 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
 
   case UI_ERROR_INFO:
     gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Info" ); break;
+  case UI_ERROR_WARNING:
+    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Warning" ); break;
   case UI_ERROR_ERROR:
     gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Error" ); break;
   default:
-    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - (Unknown error)" );
+    gtk_window_set_title( GTK_WINDOW( dialog ),
+			  "Fuse - (Unknown error level)" );
     break;
 
   }

@@ -268,9 +268,8 @@ print hashline( __LINE__ ), << 'CODE';
     if( !strcmp( node->name, (const xmlChar*)"text" ) ) {
       /* Do nothing */
     } else {
-      ui_error( UI_ERROR_ERROR, "Unknown setting '%s' in config file",
+      ui_error( UI_ERROR_WARNING, "Unknown setting '%s' in config file",
 		node->name );
-      return 1;
     }
 
     node = node->next;

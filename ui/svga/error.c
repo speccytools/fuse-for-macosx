@@ -52,12 +52,14 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
   /* If this is a 'severe' error, print it to stderr with a program
      identifier and a level indicator; however, don't if it's a terminal
      (and therefore the display which Fuse is using) unless we're exiting */
-  if( severity >= UI_ERROR_ERROR                   && 
+  if( severity > UI_ERROR_INFO                     && 
       ( !isatty( STDERR_FILENO ) || fuse_exiting )    ) {
 
     fprintf( stderr, "%s: ", fuse_progname );
 
     switch( severity ) {
+    case UI_ERROR_WARNING:
+      fprintf( stderr, "warning: " ); break;
     case UI_ERROR_ERROR:
       fprintf( stderr, "error: " ); break;
     default:             

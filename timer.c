@@ -109,7 +109,7 @@ timer_get_real_time( timer_type *real_time )
 
   error = gettimeofday( real_time, NULL );
   if( error ) {
-    ui_error( UI_ERROR_INFO, "error getting time: %s", strerror( errno ) );
+    ui_error( UI_ERROR_ERROR, "error getting time: %s", strerror( errno ) );
     return 1;
   }
 

@@ -160,7 +160,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   if( settings_current.competition_mode ) {
 
     if( !libspectrum_gcrypt_version() )
-      ui_error( UI_ERROR_INFO,
+      ui_error( UI_ERROR_WARNING,
 		"gcrypt not available: recording will NOT be signed" );
 
     expected_time = 0;

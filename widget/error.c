@@ -54,6 +54,9 @@ int widget_error_draw( void *data )
   case UI_ERROR_INFO:
     widget_printstring( 13, 2, WIDGET_COLOUR_FOREGROUND, "Info" );
     break;
+  case UI_ERROR_WARNING:
+    widget_printstring( 12, 2, WIDGET_COLOUR_FOREGROUND, "Warning" );
+    break;
   case UI_ERROR_ERROR:
     widget_printstring( 13, 2, WIDGET_COLOUR_FOREGROUND, "Error" );
     break;

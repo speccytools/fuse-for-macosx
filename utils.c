@@ -132,7 +132,8 @@ utils_open_file( const char *filename, int autoload,
     break;
 
 #else				/* #ifdef HAVE_765_H */
-    ui_error( UI_ERROR_INFO, "lib765 not present so can't handle .dsk files" );
+    ui_error( UI_ERROR_WARNING,
+	      "lib765 not present so can't handle .dsk files" );
 #endif				/* #ifdef HAVE_765_H */
     break;
 

@@ -41,6 +41,8 @@
 typedef enum ui_error_level {
 
   UI_ERROR_INFO,		/* Informational message */
+  UI_ERROR_WARNING,		/* Something is wrong, but it's not that
+				   important */
   UI_ERROR_ERROR,		/* An actual error */
 
 } ui_error_level;

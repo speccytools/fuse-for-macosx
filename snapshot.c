@@ -130,7 +130,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
 		  libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )    );
 	return 1;
       } else {
-	ui_error( UI_ERROR_INFO,
+	ui_error( UI_ERROR_WARNING,
 		  "Loading a %s snapshot, but that's not available. "
 		  "Using %s instead",
 		  libspectrum_machine_name( machine ),
@@ -256,12 +256,12 @@ int snapshot_write( const char *filename )
 
   if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS ) {
     ui_error(
-      UI_ERROR_INFO,
+      UI_ERROR_WARNING,
       "A large amount of information has been lost in conversion; the snapshot probably won't work"
     );
   } else if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS ) {
     ui_error(
-      UI_ERROR_INFO,
+      UI_ERROR_WARNING,
       "Some information has been lost in conversion; the snapshot may not work"
     );
   }

@@ -51,11 +51,13 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
 
   /* If this is a 'severe' error, print it to stderr with a program
      identifier and a level indicator */
-  if( severity >= UI_ERROR_ERROR ) {
+  if( severity > UI_ERROR_INFO ) {
 
     fprintf( stderr, "%s: ", fuse_progname );
 
     switch( severity ) {
+    case UI_ERROR_WARNING:
+      fprintf( stderr, "warning: " ); break;
     case UI_ERROR_ERROR:
       fprintf( stderr, "error: " ); break;
     default:

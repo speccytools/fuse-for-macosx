@@ -1077,7 +1077,7 @@ ui_plus3_disk_write( specplus3_drive_number which )
   drive = which == SPECPLUS3_DRIVE_A ? 'A' : 'B';
 
   if( !specplus3_disk_present( which ) ) {
-    ui_error( UI_ERROR_INFO, "No disk present in drive %c:", drive );
+    ui_error( UI_ERROR_WARNING, "No disk present in drive %c:", drive );
     return 0;
   }
 

@@ -544,7 +544,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       start_files->tape = filename; break;
 
     case LIBSPECTRUM_CLASS_UNKNOWN:
-      ui_error( UI_ERROR_INFO, "couldn't identify '%s'; ignoring it",
+      ui_error( UI_ERROR_WARNING, "couldn't identify '%s'; ignoring it",
 		filename );
       break;
 
@@ -567,7 +567,7 @@ do_start_files( start_files_t *start_files )
   /* Can't do both input recording and playback */
   if( start_files->playback && start_files->recording ) {
     ui_error(
-      UI_ERROR_INFO,
+      UI_ERROR_WARNING,
       "can't do both input playback and recording; recording disabled"
     );
     start_files->recording = NULL;
@@ -576,7 +576,7 @@ do_start_files( start_files_t *start_files )
   /* Can't use both +3 and TR-DOS disks simultaneously */
   if( start_files->disk_plus3 && start_files->disk_trdos ) {
     ui_error(
-      UI_ERROR_INFO,
+      UI_ERROR_WARNING,
       "can't use +3 and TR-DOS disks simultaneously; +3 disk ignored"
     );
     start_files->disk_plus3 = NULL;
@@ -586,7 +586,7 @@ do_start_files( start_files_t *start_files )
   if( ( start_files->disk_plus3 || start_files->disk_trdos ) &&
       start_files->dock                                         ) {
     ui_error(
-      UI_ERROR_INFO,
+      UI_ERROR_WARNING,
       "can't use disks and the dock simultaneously; dock cartridge ignored"
     );
     start_files->dock = NULL;

@@ -60,6 +60,8 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
 
   case UI_ERROR_INFO:
     MessageBox(hWnd, message, "Fuse - Info", MB_ICONINFORMATION|MB_OK ); break;
+  case UI_ERROR_WARNING:
+    MessageBox(hWnd, message, "Fuse - Warning", MB_ICONWARNING|MB_OK ); break;
   case UI_ERROR_ERROR:
     MessageBox(hWnd, message, "Fuse - Error", MB_ICONERROR|MB_OK ); break;
   default:

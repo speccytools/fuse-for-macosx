@@ -669,7 +669,8 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
       vg_rs.byte = 0x90;
       vg_portFF_in = 0x80; 
 
-      ui_error( UI_ERROR_INFO, "No disk in drive %c", 'A' + CurrentDiscNum );
+      ui_error( UI_ERROR_WARNING, "No disk in drive %c",
+		'A' + CurrentDiscNum );
 
       return;
     }
@@ -678,7 +679,7 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
       vg_rs.byte |= 0x10; /*  sector not found */
       vg_portFF_in = 0x80;
 
-      ui_error( UI_ERROR_INFO, "((vg_reg_sec==0)||(vg_reg_sec>16))" );
+      ui_error( UI_ERROR_ERROR, "((vg_reg_sec==0)||(vg_reg_sec>16))" );
 
       return;
     }
