@@ -71,6 +71,10 @@ plus3disk_file, string, NULL,, plus3disk
 trdosdisk_file, string, NULL,, trdosdisk
 dck_file, string, NULL,, dock
 
+simpleide_active, boolean, 0,, simpleide
+simpleide_master_file, string, NULL,, simpleide-masterfile
+simpleide_slave_file, string, NULL,, simpleide-slavefile
+
 printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
 printer_text_filename, string, strdup( "printout.txt" ),, textfile
 

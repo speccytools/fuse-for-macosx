@@ -639,3 +639,9 @@
 20040312 ay.c: unused bits of AY registers are silently zeroed (basically
 	 equivalent to patch #911206 by Stuart Brady).
 20040317 sound/Makefile.am: Add libspectrum path to includes.
+20040319 Makefile.am,fuse.c,machine.c,periph.c,settings.dat,ui/options.dat,
+	 ui/gtk/gtkui.c,widget/{menu.c,menu_data.c,widget_internals.h}:
+	 add support for the "simple 8-bit" IDE interface (part of patch
+	 #916816) (Garry Lancaster).
+
+	

@@ -57,6 +57,7 @@
 #include "psg.h"
 #include "rzx.h"
 #include "settings.h"
+#include "simpleide.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "sound/lowlevel.h"
@@ -220,6 +221,7 @@ static int fuse_init(int argc, char **argv)
   if( rzx_init() ) return 1;
   if( psg_init() ) return 1;
   if( trdos_init() ) return 1;
+  if( simpleide_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 
@@ -654,6 +656,7 @@ static int fuse_end(void)
   psg_end();
   rzx_end();
   debugger_end();
+  simpleide_end();
 
   machine_end();
 

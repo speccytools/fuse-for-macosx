@@ -41,6 +41,7 @@
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
+#include "simpleide.h"
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
@@ -489,6 +490,29 @@ ui_tape_write( void )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_write( "tape.tzx" );
+}
+
+/* IDE/Simple 8-bit/Master/Insert (called via widget_apply_to_file) */
+int
+widget_insert_ide_simple_master( const char *filename )
+{
+  return simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER );
+}
+
+/* IDE/Simple 8-bit/Slave/Insert (called via widget_apply_to_file) */
+int
+widget_insert_ide_simple_slave( const char *filename )
+{
+  return simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE );
+}
+
+/* IDE/Simple 8-bit/(unit)/Eject */
+int
+widget_menu_eject_ide_simple( void *data )
+{
+  libspectrum_ide_unit unit = *(libspectrum_ide_unit*)data;
+  
+  return simpleide_eject( unit );
 }
 
 /* Help/Keyboard Picture */

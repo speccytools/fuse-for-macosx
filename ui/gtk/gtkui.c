@@ -51,6 +51,7 @@
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
+#include "simpleide.h"
 #include "snapshot.h"
 #include "specplus3.h"
 #include "spectrum.h"
@@ -149,6 +150,9 @@ static void disk_eject( gpointer data, guint action, GtkWidget *widget );
 static void cartridge_insert( GtkWidget *widget, gpointer data );
 static void cartridge_eject( GtkWidget *widget, gpointer data );
 
+static void ide_open( gpointer data, guint action, GtkWidget *widget );
+static void ide_eject( gpointer data, guint actiom, GtkWidget *widget );
+
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
 /* Set a menu item (in)active in both the menu bar and the popup menus */
@@ -239,6 +243,15 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Media/Cartridge/_Insert...",
 				NULL , cartridge_insert,    0, NULL          },
   { "/Media/Cartridge/_Eject",	NULL , cartridge_eject,     0, NULL          },
+
+  { "/Media/_IDE",              NULL , NULL,                0, "<Branch>"    },
+  { "/Media/IDE/Simple _8-bit", NULL , NULL,                0, "<Branch>"    },
+  { "/Media/IDE/Simple 8-bit/_Master", NULL, NULL,          0, "<Branch>"    },
+  { "/Media/IDE/Simple 8-bit/Master/_Insert...", NULL, ide_open, 1, NULL     },
+  { "/Media/IDE/Simple 8-bit/Master/_Eject", NULL, ide_eject, 1, NULL        },
+  { "/Media/IDE/Simple 8-bit/_Slave", NULL, NULL,           0, "<Branch>"    },
+  { "/Media/IDE/Simple 8-bit/Slave/_Insert...", NULL, ide_open, 2, NULL      },
+  { "/Media/IDE/Simple 8-bit/Slave/_Eject", NULL, ide_eject, 2, NULL         },
 
   { "/Help",			NULL , NULL,		    0, "<Branch>"    },
   { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
@@ -1236,6 +1249,39 @@ static void
 cartridge_eject( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   dck_eject();
+}
+
+ static void
+ide_open( gpointer data GCC_UNUSED, guint action,
+          GtkWidget *widget GCC_UNUSED )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = gtkui_fileselector_get_filename( "Fuse - Insert hard disk file" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  switch ( action )
+  {
+    case 1: simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
+    case 2: simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE );  break;
+  }
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+static void
+ide_eject( gpointer data GCC_UNUSED, guint action,
+           GtkWidget *widget GCC_UNUSED )
+{
+  switch ( action )
+  {
+    case 1: simpleide_eject( LIBSPECTRUM_IDE_MASTER ); break;
+    case 2: simpleide_eject( LIBSPECTRUM_IDE_SLAVE );  break;
+  }
 }
 
 static void

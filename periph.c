@@ -33,6 +33,7 @@
 #include "periph.h"
 #include "rzx.h"
 #include "settings.h"
+#include "simpleide.h"
 #include "ui/ui.h"
 
 /*
@@ -259,7 +260,12 @@ periph_setup( const periph_t *peripherals_list, size_t n,
 
   periph_clear();
 
+  error =
+    periph_register_n( simpleide_peripherals, simpleide_peripherals_count );
+  if( error ) return error;
+
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
+
   kempston_present = kempston;
 
   periph_update();

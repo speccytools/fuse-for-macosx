@@ -55,6 +55,10 @@ static widget_menu_entry widget_menu_disk[];
 static widget_menu_entry widget_menu_disk_a[];
 static widget_menu_entry widget_menu_disk_b[];
 static widget_menu_entry widget_menu_cart[];
+static widget_menu_entry widget_menu_ide[];
+static widget_menu_entry widget_menu_simpleide[];
+static widget_menu_entry widget_menu_simple_master[];
+static widget_menu_entry widget_menu_simple_slave[];
 
 static widget_menu_entry widget_menu_help[];
 
@@ -221,6 +225,8 @@ static widget_menu_widget_t media_disk = { WIDGET_TYPE_MENU,
 					   &widget_menu_disk };
 static widget_menu_widget_t media_cart = { WIDGET_TYPE_MENU,
 					   &widget_menu_cart };
+static widget_menu_widget_t media_cart = { WIDGET_TYPE_MENU,
+					   &widget_menu_ide  };
 
 static widget_menu_entry widget_menu_media[] = {
   { "Media", 0, 0, NULL },		/* Menu title */
@@ -228,6 +234,7 @@ static widget_menu_entry widget_menu_media[] = {
   { "(T)ape",      INPUT_KEY_t, widget_menu_widget, &media_tape },
   { "(D)isk",      INPUT_KEY_d, widget_menu_widget, &media_disk },
   { "(C)artridge", INPUT_KEY_c, widget_menu_widget, &media_cart },
+  { "(I)DE",	   INPUT_KEY_i, widget_menu_widget, &media_ide  },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
@@ -304,6 +311,65 @@ static widget_menu_entry widget_menu_cart[] = {
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
+
+/* Media/IDE menu */
+
+static widget_menu_widget_t simpleide = { WIDGET_TYPE_MENU,
+					  &widget_menu_simpleide };
+
+static widget_menu_entry widget_menu_ide[] = {
+  { "IDE", 0, 0, NULL },               /* Menu title */
+
+  { "Simple (8)-bit", INPUT_KEY_8, widget_menu_widget, &simpleide },
+
+  { NULL, 0, 0, NULL }                 /* End marker: DO NOT REMOVE */
+};
+
+/* Media/IDE/Simple 8-bit menu */
+
+static widget_menu_widget_t simple_master = { WIDGET_TYPE_MENU,
+					      &widget_menu_simple_master };
+static widget_menu_widget_t simple_slave  = { WIDGET_TYPE_MENU,
+					      &widget_menu_simple_slave  };
+
+static widget_menu_entry widget_menu_simpleide[] = {
+  { "Simple 8-bit", 0, 0, NULL },      /* Menu title */
+
+  { "(M)aster", INPUT_KEY_m, widget_menu_widget, &simple_master },
+  { "(S)lave",  INPUT_KEY_s, widget_menu_widget, &simple_slave  },
+
+  { NULL, 0, 0, NULL }                 /* End marker: DO NOT REMOVE */
+};
+
+/* Media/IDE/Simple 8-bit/Master menu */
+
+static libspectrum_ide_unit simple_master_unit = LIBSPECTRUM_IDE_MASTER;
+
+static widget_menu_entry widget_menu_simple_master[] = {
+  { "Simple 8-bit Master", 0, 0, NULL },/* Menu title */
+
+  { "(I)nsert...", INPUT_KEY_i, widget_apply_to_file,
+                                             widget_insert_ide_simple_master },
+  { "(E)ject",    INPUT_KEY_e, widget_menu_eject_ide_simple,
+                                                         &simple_master_unit },
+
+  { NULL, 0, 0, NULL }                 /* End marker: DO NOT REMOVE */
+};
+
+static libspectrum_ide_unit simple_slave_unit = LIBSPECTRUM_IDE_SLAVE;
+
+static widget_menu_entry widget_menu_simple_slave[] = {
+  { "Simple 8-bit Slave", 0, 0, NULL },/* Menu title */
+
+  { "(I)nsert...", INPUT_KEY_i, widget_apply_to_file,
+                                              widget_insert_ide_simple_slave },
+  { "(E)ject",    INPUT_KEY_e, widget_menu_eject_ide_simple,
+                                                          &simple_slave_unit },
+
+  { NULL, 0, 0, NULL }                 /* End marker: DO NOT REMOVE */
+};
+
+/* Media/IDE/Simple 8-bit/Slave menu */
 
 /* Help menu */
 

@@ -13,6 +13,7 @@ Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
+Checkbox, Simple (8)-bit IDE, simpleide_active, INPUT_KEY_8
 Posthook, periph_update
 
 rzx

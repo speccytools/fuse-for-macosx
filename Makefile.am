@@ -71,6 +71,7 @@ fuse_SOURCES = ay.c \
 	scorpion.c \
 	screenshot.c \
 	settings.c \
+	simpleide.c \
 	snapshot.c \
 	sound.c \
 	spec128.c \
@@ -136,6 +137,7 @@ noinst_HEADERS = ay.h \
 	scorpion.h \
 	screenshot.h \
 	settings.h \
+	simpleide.h \
 	snapshot.h \
 	sound.h \
         spec128.h \

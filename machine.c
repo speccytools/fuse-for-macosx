@@ -37,6 +37,7 @@
 #include "scld.h"
 #include "scorpion.h"
 #include "settings.h"
+#include "simpleide.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "spec16.h"
@@ -300,6 +301,7 @@ machine_reset( void )
   printer_zxp_reset();
   scld_reset();
   tape_stop();
+  simpleide_reset();
 
   /* Load in the ROMs: remove any ROMs we've got in memory at the moment */
   for( i = 0; i < spectrum_rom_count; i++ ) { free( ROM[i] ); ROM[i] = NULL; }
