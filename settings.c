@@ -67,6 +67,12 @@ int settings_defaults( settings_info *settings )
   settings->joy_kempston = 0;
   settings->tape_traps = 1;
   settings->slt_traps = 1;
+  
+#ifdef HAVE_ZLIB_H
+  settings->rzx_compression = 1;
+#else			/* #ifdef HAVE_ZLIB_H */
+  settings->rzx_compression = 0;
+#endif			/* #ifdef HAVE_ZLIB_H */
 
   settings->sound_device = NULL;
   settings->sound = 1;
@@ -202,6 +208,8 @@ int settings_copy( settings_info *dest, settings_info *src )
   dest->joy_kempston  = src->joy_kempston;
   dest->tape_traps    = src->tape_traps;
   dest->slt_traps     = src->slt_traps;
+
+  dest->rzx_compression = src->rzx_compression;
 
   dest->sound_device  = src->sound_device;
   dest->sound	      = src->sound;

@@ -117,6 +117,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options",		        NULL , NULL,                0, "<Branch>"    },
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
+  { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
   { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },

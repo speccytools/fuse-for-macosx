@@ -61,6 +61,7 @@ typedef enum widget_type {
   WIDGET_TYPE_SELECT,		/* Select machine */
   WIDGET_TYPE_SOUND,		/* Sound options */
   WIDGET_TYPE_ERROR,		/* Error report */
+  WIDGET_TYPE_RZX,		/* RZX options */
 
 } widget_type;
 

@@ -38,6 +38,10 @@ typedef struct settings_info {
   int tape_traps;	/* Use tape loading traps? */
   int slt_traps;	/* Use .slt loading traps/ */
 
+  /* RZX options */
+
+  int rzx_compression;	/* Compress RZX data? */
+
   /* Sound options */
 
   const char *sound_device; /* Where to output sound */

@@ -40,6 +40,7 @@
 #include "libspectrum/libspectrum.h"
 #include "libspectrum/rzx.h"
 #include "rzx.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "types.h"
 #include "ui/ui.h"
@@ -173,7 +174,8 @@ int rzx_stop_recording( void )
   libspec_error = libspectrum_rzx_write( &rzx, &buffer, &length,
 					 rzx_snap, rzx_snap_length,
 					 rzx_creator, rzx_major_version,
-					 rzx_minor_version, 1 );
+					 rzx_minor_version,
+					 settings_current.rzx_compression );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "error during libspectrum_rzx_write: %s",
 	      libspectrum_error_message( libspec_error ) );

@@ -5,6 +5,10 @@ Checkbox, (K)empston joystick, joy_kempston, KEYBOARD_k
 Checkbox, Use (t)ape traps, tape_traps, KEYBOARD_t
 Checkbox, Use .(s)lt traps, slt_traps, KEYBOARD_s
 
+rzx
+RZX Options
+Checkbox, (C)ompress RZX data, rzx_compression, KEYBOARD_c
+
 sound
 Sound Options
 Checkbox, (S)ound enabled, sound, KEYBOARD_s
