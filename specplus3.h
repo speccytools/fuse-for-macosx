@@ -58,13 +58,15 @@ int specplus3_reset(void);
 
 void specplus3_memoryport_write(WORD port, BYTE b);
 
-#ifdef HAVE_765_H
-/* The +3's drives */
-
+/* We need these outside the HAVE_765_H guards as they're also used
+   for identifying the TRDOS drives */
 typedef enum specplus3_drive_number {
   SPECPLUS3_DRIVE_A = 0,	/* First drive must be number zero */
   SPECPLUS3_DRIVE_B,
 } specplus3_drive_number;
+
+#ifdef HAVE_765_H
+/* The +3's drives */
 
 typedef struct specplus3_drive_t {
   int fd;			/* Our file descriptor for this disk; note
