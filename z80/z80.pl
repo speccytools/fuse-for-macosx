@@ -576,13 +576,13 @@ IN
       tstates += 1;
       {
 	libspectrum_byte bytetemp;
-	IN(bytetemp,BC);
+	Z80_IN( bytetemp, BC );
       }
 IN
     } elsif( length $register == 1 and $port eq '(C)' ) {
 	print << "IN";
       tstates += 1;
-      IN($register,BC);
+      Z80_IN( $register, BC );
 IN
     }
 }
@@ -805,13 +805,13 @@ sub opcode_OUT (@) {
 	libspectrum_word outtemp;
 	contend( PC, 4 );
 	outtemp = readbyte( PC++ ) + ( A << 8 );
-	OUT( outtemp , A );
+	Z80_OUT( outtemp , A );
       }
 OUT
     } elsif( $port eq '(C)' and length $register == 1 ) {
 	print << "OUT";
       tstates += 1;
-      OUT(BC,$register);
+      Z80_OUT( BC, $register );
 OUT
     }
 }

@@ -213,7 +213,7 @@ break
   F |= ( (value)==0x7f ? FLAG_V : 0 ) | sz53_table[value];\
 }
 
-#define IN(reg,port)\
+#define Z80_IN( reg, port )\
 {\
   contend_io( port, 3 );\
   (reg)=readport((port));\
@@ -275,7 +275,7 @@ break
   F = sz53p_table[A];\
 }
 
-#define OUT(port,reg)\
+#define Z80_OUT( port, reg )\
 {\
   contend_io( port, 3 );\
   writeport(port,reg);\

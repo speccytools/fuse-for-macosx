@@ -322,3 +322,7 @@
 	 utils_find_auxiliary_file routine.
 20031030 ui/ui.h, ui/gtk/gtkui.c, ui/gtk/statusbar.c: add 'pause'
 	 functionality.
+20031101 dxsound.[ch], Makefile.am, configure.in: DirectX sound routines
+	 (Marek).
+20031102 debugger/commandy.y, z80/z80.pl, z80/z80_macros.h: rename the
+	 IN and OUT macros to avoid clashing with Win32's windows.h.

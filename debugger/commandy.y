@@ -81,7 +81,7 @@ void yyerror( char *s );
 %token		 IGNORE
 %token		 NEXT
 %token		 DEBUGGER_OUT	/* Different name to avoid clashing with
-				   OUT from z80/z80_macros.h */
+				   OUT from windows.h */
 %token		 PORT
 %token		 READ
 %token		 SET
