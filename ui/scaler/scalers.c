@@ -1,7 +1,11 @@
-/* ScummVM - Scumm Interpreter
+/* scalers.c: the actual graphics scalers
+ * Copyright (C) 2003 Fredrick Meunier, Philip Kendall
+ *
+ * $Id$
+ * 
+ * Originally taken from ScummVM - Scumm Interpreter
  * Copyright (C) 2001  Ludvig Strigeus
  * Copyright (C) 2001/2002 The ScummVM project
- * Copyright (C) 2003  Fredrick Meunier, Philip Kendall
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header$
- *
  */
 
 #include <config.h>
@@ -30,160 +32,13 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
-static void _2xSaI(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr, BYTE *dstPtr,
-                   DWORD dstPitch, int width, int height);
-static void Super2xSaI(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-	               BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void SuperEagle(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-	               BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void AdvMame2x(BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-	             BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void Half(BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-	             BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void Normal1x(BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-	             BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void Normal2x(BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-	             BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void Normal3x(BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-	             BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void TV2x(BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-               BYTE *dstPtr, DWORD dstPitch, int width, int height);
-static void TimexTV(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr,
-               DWORD dstPitch, int width, int height);
-
-static int scaler_supported[ SCALER_NUM ] = {0};
-
-int scalers_registered = 0;
-
-struct scaler_info {
-
-  const char *name;
-  const char *id;
-  enum scaler_flags_t flags;
-  ScalerProc *scaler;
-
-};
-
-/* Information on each of the available scalers. Make sure this array stays
-   in the same order as scaler.h:scaler_type */
-static struct scaler_info available_scalers[] = {
-
-  { "Timex Half size", "half",       SCALER_FLAGS_NONE,	       Half       },
-  { "Normal",	       "normal",     SCALER_FLAGS_NONE,	       Normal1x   },
-  { "Double size",     "2x",	     SCALER_FLAGS_NONE,	       Normal2x   },
-  { "Triple size",     "3x",	     SCALER_FLAGS_NONE,	       Normal3x   },
-  { "2xSaI",	       "2xsai",	     SCALER_EXPAND_1_PIXEL,    _2xSaI     },
-  { "Super 2xSaI",     "super2xsai", SCALER_EXPAND_1_PIXEL,    Super2xSaI },
-  { "SuperEagle",      "supereagle", SCALER_EXPAND_1_PIXEL,    SuperEagle },
-  { "AdvMAME 2x",      "advmame2x",  SCALER_EXPAND_1_PIXEL,    AdvMame2x  },
-  { "TV 2x",	       "tv2x",	     SCALER_EXPAND_1_PIXEL,    TV2x       },
-  { "Timex TV",	       "timextv",    SCALER_EXPAND_2_Y_PIXELS, TimexTV    },
-};
-
-scaler_type current_scaler = SCALER_NUM;
-ScalerProc *scaler_proc;
-scaler_flags_t scaler_flags;
-
-int
-scaler_select_scaler( scaler_type scaler )
-{
-  if( !scaler_is_supported( scaler ) ) return 1;
-
-  if( current_scaler == scaler ) return 0;
-
-  current_scaler = scaler;
-
-  if( settings_current.start_scaler_mode ) free( settings_current.start_scaler_mode );
-  settings_current.start_scaler_mode =
-    strdup( available_scalers[current_scaler].id );
-  if( !settings_current.start_scaler_mode ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-
-  scaler_proc = scaler_get_proc( current_scaler );
-  scaler_flags = scaler_get_flags( current_scaler );
-
-  uidisplay_hotswap_gfx_mode();
-
-  return 0;
-}
-
-int
-scaler_select_id( const char *id )
-{
-  scaler_type i;
-
-  for( i=0; i < SCALER_NUM; i++ ) {
-    if( ! strcmp( available_scalers[i].id, id ) ) {
-      scaler_select_scaler( i );
-      return 0;
-    }
-  }
-
-  ui_error( UI_ERROR_ERROR, "Scaler id '%s' unknown", id );
-  return 1;
-}
-
-void
-scaler_register_clear( void )
-{
-  scalers_registered = 0;
-  memset( scaler_supported, 0, sizeof(int) * SCALER_NUM );
-}
-
-void
-scaler_register( scaler_type scaler )
-{
-  if( scaler_supported[scaler] == 1 ) return;
-  scalers_registered++;
-  scaler_supported[scaler] = 1;
-}
-
-int
-scaler_is_supported( scaler_type scaler )
-{
-  return ( scaler >= SCALER_NUM ? 0 : scaler_supported[scaler] );
-}
-
-const char *
-scaler_name( scaler_type scaler )
-{
-  return available_scalers[scaler].name;
-}
-
-ScalerProc*
-scaler_get_proc( scaler_type scaler )
-{
-  return available_scalers[scaler].scaler;
-}
-
-scaler_flags_t
-scaler_get_flags( scaler_type scaler )
-{
-  return available_scalers[scaler].flags;
-}
-
 /* The actual code for the scalers starts here */
 
-/* FIXME: do this in a more maintainable fashion */
-#ifdef UI_GTK
-#define SCALER_DATA_SIZE 4
-#elif defined( UI_SDL ) || defined( UI_X ) /* #ifdef UI_GTK */
-#define SCALER_DATA_SIZE 2
-#else				/* #ifdef UI_GTK */
-#error Unknown scaler data size for this user interface
-#endif				/* #ifdef UI_GTK */
-
 #if SCALER_DATA_SIZE == 2
-typedef WORD scaler_data_type;
-#elif SCALER_DATA_SIZE == 4	/* #if SCALER_DATA_SIZE == 2 */
-typedef DWORD scaler_data_type;
-#else				/* #if SCALER_DATA_SIZE == 2 or 4 */
-#error Unknown scaler data size
-#endif				/* #if SCALER_DATA_SIZE == 2 or 4 */
 
-/********** 2XSAI Filter *****************/
+typedef WORD scaler_data_type
+#define FUNCTION( name ) name##_16
+
 static DWORD colorMask;
 static DWORD lowPixelMask;
 static DWORD qcolorMask;
@@ -208,13 +63,6 @@ scaler_select_bitformat( DWORD BitFormat )
     qlowpixelMask = 0x00000C63;
     break;
 
-  case 888:
-    colorMask = 0xFEFEFE00;
-    lowPixelMask = 0x01010100;
-    qcolorMask = 0xFCFCFC00;
-    qlowpixelMask = 0x03030300;
-    break;
-
   default:
     ui_error( UI_ERROR_ERROR, "unknown bitformat %d", BitFormat );
     return 1;
@@ -223,6 +71,20 @@ scaler_select_bitformat( DWORD BitFormat )
 
   return 0;
 }
+
+#elif SCALER_DATA_SIZE == 4	/* #if SCALER_DATA_SIZE == 2 */
+
+typedef DWORD scaler_data_type
+#define FUNCTION( name ) name##_32
+
+const static DWORD colorMask = 0xFEFEFE00;
+const static DWORD lowPixelMask = 0x01010100;
+const static DWORD qcolorMask = 0xFCFCFC00;
+const static DWORD qlowpixelMask = 0x03030300;
+
+#else				/* #if SCALER_DATA_SIZE == 2 or 4 */
+#error Unknown SCALER_DATA_SIZE
+#endif				/* #if SCALER_DATA_SIZE == 2 or 4 */
 
 static inline int 
 GetResult1(DWORD A, DWORD B, DWORD C, DWORD D, DWORD E)
@@ -312,7 +174,7 @@ Q_INTERPOLATE(DWORD A, DWORD B, DWORD C, DWORD D)
 }
 
 static void 
-Super2xSaI(BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_Super2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 	BYTE *deltaPtr, BYTE *dstPtr, DWORD dstPitch, int width, int height)
 {
   scaler_data_type *bP, *dP;
@@ -423,8 +285,9 @@ Super2xSaI(BYTE *srcPtr, DWORD srcPitch,
 }
 
 static void 
-SuperEagle(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-	   BYTE *dstPtr, DWORD dstPitch, int width, int height)
+FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
+			       BYTE *dstPtr, DWORD dstPitch,
+			       int width, int height )
 {
   scaler_data_type *bP, *dP;
 
@@ -533,8 +396,8 @@ SuperEagle(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 }
 
 static void 
-_2xSaI(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-       BYTE *dstPtr, DWORD dstPitch, int width, int height)
+FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
+			  BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   scaler_data_type *bP, *dP;
 
@@ -676,8 +539,9 @@ _2xSaI(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 }
 
 static void 
-AdvMame2x(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch,
-	  int width, int height)
+FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			      BYTE *dstPtr, DWORD dstPitch,
+			      int width, int height )
 {
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
   scaler_data_type *p = (scaler_data_type*) srcPtr;
@@ -709,8 +573,8 @@ AdvMame2x(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch
 }
 
 void 
-Half(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch,
-	 int width, int height)
+FUNCTION( scaler_Half )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   scaler_data_type *r;
 
@@ -732,9 +596,10 @@ Half(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch,
   }
 }
 
-static void 
-Normal1x( BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr,
-	  DWORD dstPitch, int width, int height )
+void 
+FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			     BYTE *dstPtr, DWORD dstPitch,
+			     int width, int height )
 {
   scaler_data_type i, *s, *d;
 
@@ -759,9 +624,10 @@ Normal1x( BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr,
   }
 }
 
-static void 
-Normal2x( BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr,
-	  DWORD dstPitch, int width, int height )
+void 
+FUNCTION( scaler_Normal2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			     BYTE *dstPtr, DWORD dstPitch,
+			     int width, int height )
 {
   scaler_data_type i, *s, *d, *d2;
 
@@ -780,9 +646,10 @@ Normal2x( BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr,
   }
 }
 
-static void 
-Normal3x(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch,
-	 int width, int height)
+void 
+FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			     BYTE *dstPtr, DWORD dstPitch,
+			     int width, int height )
 {
   BYTE *r;
   DWORD dstPitch2 = dstPitch * 2;
@@ -836,9 +703,10 @@ TV2x(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch,
   }
 }
 
-static void
-TimexTV(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch, 
-            int width, int height)
+void
+FUNCTION( scaler_TimexTV )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			    BYTE *dstPtr, DWORD dstPitch,
+			    int width, int height )
 {
   int i, j;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
