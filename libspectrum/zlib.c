@@ -48,21 +48,27 @@ libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
  * Returns:	error flag (libspectrum_error)
  */
 {
-  int allinone = *outlength != 0;
+  int known_length;
 
-  if (!allinone)
-    *outlength = 16384;
+  if( *outlength ) {
+    known_length = 1;
+  } else {
+    known_length = 0; *outlength = 16384;
+  }
 
-  *outptr = malloc (*outlength);
-  if (!*outptr)
-    return LIBSPECTRUM_ERROR_MEMORY;
+  if( !known_length ) *outlength = 16384;
 
-  if (allinone)
-  {
-    uLongf dl = *outlength;
+  *outptr = malloc( *outlength );
+  if (!*outptr) return LIBSPECTRUM_ERROR_MEMORY;
+
+  if( known_length ) {
+
     /* We were given the size of the output data; use the fast method */
-    switch (uncompress (*outptr, &dl, gzptr, gzlength))
-    {
+
+    uLongf dl = *outlength;
+
+    switch( uncompress( *outptr, &dl, gzptr, gzlength ) ) {
+
     case Z_OK:			/* successfully decompressed */
       *outlength = dl;
       return LIBSPECTRUM_ERROR_NONE;
@@ -71,13 +77,14 @@ libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
     default:			/* corrupt data or short length */
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
-  }
-  else
-  {
+
+  } else {
+
     /* We don't know how big the output data is; use the slow method */
     z_stream stream;
 
-    stream.next_in = gzptr;
+    /* Cast to remove warning about losing constness */
+    stream.next_in = (libspectrum_byte*)gzptr;
     stream.avail_in = gzlength;
     stream.next_out = *outptr;
     stream.avail_out = *outlength;
@@ -86,42 +93,42 @@ libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
     stream.zfree = 0;
     stream.opaque = 0;
 
-    switch (inflateInit (&stream))
-    {
+    switch( inflateInit (&stream) ) {
+
     case Z_OK:			/* initialised OK */
       break;
     case Z_MEM_ERROR:		/* out of memory */
-      inflateEnd (&stream);
+      inflateEnd( &stream );
       return LIBSPECTRUM_ERROR_MEMORY;
     case Z_VERSION_ERROR:	/* unrecognised version */
-      inflateEnd (&stream);
+      inflateEnd( &stream );
       return LIBSPECTRUM_ERROR_SIGNATURE;
     default:			/* some other error */
-      libspectrum_print_error ("libspectrum_zlib_inflate: %s\n", stream.msg);
-      inflateEnd (&stream);
+      libspectrum_print_error( "libspectrum_zlib_inflate: %s\n", stream.msg );
+      inflateEnd( &stream );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    for (;;)
-    {
-      switch (inflate (&stream, Z_SYNC_FLUSH))
-      {
+    while( 1 ) {
+
+      switch (inflate (&stream, Z_SYNC_FLUSH)) {
+
       case Z_OK:		/* more to decompress */
 	break;
       case Z_STREAM_END:	/* successfully decompressed */
 	*outlength = stream.next_out - *outptr;
-	*outptr = realloc (*outptr, *outlength);	/* truncate to fit */
-	inflateEnd (&stream);
+	*outptr = realloc( *outptr, *outlength );	/* truncate to fit */
+	inflateEnd( &stream );
 	return LIBSPECTRUM_ERROR_NONE;
       case Z_BUF_ERROR:		/* need more buffer space? */
 	{
 	  libspectrum_byte *new_out =
-	    realloc (*outptr, (*outlength += 16384));
-	  if (!new_out)
-	  {
-	    inflateEnd (&stream);
+	    realloc( *outptr, (*outlength += 16384) );
+	  if( !new_out ) {
+	    inflateEnd( &stream );
 	    return LIBSPECTRUM_ERROR_MEMORY;
 	  }
+
 	  /* Adjust from n bytes into *outptr to n bytes into new_out */
 	  stream.next_out += new_out - *outptr;
 	  *outptr = new_out;
@@ -129,12 +136,12 @@ libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
 	}
 	break;
       case Z_MEM_ERROR:		/* out of memory */
-	inflateEnd (&stream);
+	inflateEnd( &stream );
 	return LIBSPECTRUM_ERROR_MEMORY;
       default:			/* corrupt data or needs dictionary */
-	libspectrum_print_error ("libspectrum_zlib_inflate: %s\n",
+	libspectrum_print_error( "libspectrum_zlib_inflate: %s\n",
 				 stream.msg);
-	inflateEnd (&stream);
+	inflateEnd( &stream );
 	return LIBSPECTRUM_ERROR_CORRUPT;
       }
     }
