@@ -24,4 +24,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = aalib fb gtk svga xlib
+noinst_LIBRARIES = libuiaalib.a
+
+libuiaalib_a_SOURCES = aalibdisplay.c aalibkeyboard.c aalibui.c
+
+noinst_HEADERS = aalibkeyboard.h aalibui.h

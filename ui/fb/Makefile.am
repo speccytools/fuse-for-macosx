@@ -24,4 +24,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = aalib fb gtk svga xlib
+noinst_LIBRARIES = libuifb.a
+
+libuifb_a_SOURCES = fbdisplay.c fbkeyboard.c fbui.c
+
+noinst_HEADERS = fbkeyboard.h

@@ -28,11 +28,10 @@ bin_PROGRAMS = fuse
 
 SUBDIRS = libspectrum man myglib roms ui utils widget z80
 
-fuse_SOURCES = ay.c display.c event.c fbdisplay.c fbkeyboard.c fbui.c\
+fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c settings.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus3.c\
 	spectrum.c tape.c timer.c\
-	aalibui.c aalibdisplay.c aalibkeyboard.c\
 	joystick.c
 
 BUILT_SOURCES = keysyms.c
@@ -41,13 +40,15 @@ keysyms.c: keysyms.pl keysyms.dat
 	@PERL@ keysyms.pl keysyms.dat > keysyms.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DROMSDIR="\"${pkgdatadir}\""
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a myglib/libmyglib.a ui/gtk/libuigtk.a ui/svga/libuisvga.a ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a
+LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a myglib/libmyglib.a\
+ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/svga/libuisvga.a\
+ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a
 
-noinst_HEADERS = ay.h display.h event.h fbkeyboard.h\
+noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
 	machine.h osssound.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h\
 	tape.h timer.h types.h ui.h uidisplay.h\
-	aalibui.h aalibkeyboard.h joystick.h
+	joystick.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl
