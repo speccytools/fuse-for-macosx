@@ -410,10 +410,10 @@ create_memory_map( GtkBox *parent )
   label = gtk_label_new( "Source" );
   gtk_table_attach( GTK_TABLE( table ), label, 1, 2, 0, 1, 0, 0, 2, 2 );
 
-  label = gtk_label_new( "Writable?" );
+  label = gtk_label_new( "W?" );
   gtk_table_attach( GTK_TABLE( table ), label, 2, 3, 0, 1, 0, 0, 2, 2 );
 
-  label = gtk_label_new( "Contended?" );
+  label = gtk_label_new( "C?" );
   gtk_table_attach( GTK_TABLE( table ), label, 3, 4, 0, 1, 0, 0, 2, 2 );
 
   for( i = 0; i < 8; i++ ) {

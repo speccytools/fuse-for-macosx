@@ -993,3 +993,4 @@
 20040708 ui/fb/fbkeyboard.c: update for new input layer (Darren).
 20040708 ui/fb/fbui.c: add SIGTERM and SIGHUP handlers (Darren).
 20040708 input.h,keyboard.c,keysyms.dat: map Tab to Extended Mode (Darren).
+20040709 ui/gtk/debugger.c: shorten 'Writable?' and 'Contended?' headings.
