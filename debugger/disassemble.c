@@ -1,5 +1,5 @@
 /* disassemble.h: Fuse's disassembler
-   Copyright (c) 2002 Darren Salt, Philip Kendall
+   Copyright (c) 2002-2003 Darren Salt, Philip Kendall
 
    $Id$
 

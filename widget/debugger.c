@@ -1,5 +1,5 @@
 /* debugger.c: the debugger
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
