@@ -1,3 +1,51 @@
+2002-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Separate out libspectrum (the file format handling) into its own
+	  library; changes occuring solely in libspectrum's code will not
+	  be listed in this ChangeLog. For structural reasons, the glib
+	  replacement code is also in libspectrum (Philip Kendall).
+
+	* Add tzxconv utility to do a best-guess conversion of .tzx files
+	  to .tap (Philip Kendall).
+
+	* Add ability to load and save +2, +2A, +3 and TC2048 snapshots;
+	  also load Pentagon snaps as 128K (Philip Kendall).
+
+	* Use libspectrum's machine numbering and capabilities facilities
+	  (Philip Kendall).
+
+	* Make the framebuffer UI work (Darren Salt).
+
+	* Add File/Recording/Record from snap option to begin input
+	  recording from a snapshot (Philip Kendall).
+
+	* Fix possible segfault when displaying the keyboard widget
+	  (Russell Marks).
+
+	* Make widgets handle their window being resized (Darren Salt).
+
+	* Redraw the display only if the data has actually changed; can
+	  give a nice performance improvement (Philip Kendall).
+
+	* Z80 core fixes on SCF, DEC and INC SP (Boris Donko).
+
+	* Memory pages 1, 3, 5 and 7 (not 4, 5, 6 and 7) are contended
+	  on the 128K/+2 (Philip Kendall, with thanks to Steve Snake and
+	  Mark Woodmass).
+
+	* Get the mask right for the 128K/+2 memory control port (Philip
+	  Kendall, with thanks to Mark Woodmass).
+
+	* Add File/Save Screen option to save the current screen to a .png
+	  file (Philip Kendall).
+
+	* Additional options to configure to make it easier to have the
+	  support libraries (libspectrum, lib765, libdsk, etc) in
+	  non-system directories (Philip Kendall).
+
+	* Make keysyms.c be UI-specific, rather than containing
+	  information for all UIs (Darren Salt).
+	
 2002-08-22  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.5.0 released
