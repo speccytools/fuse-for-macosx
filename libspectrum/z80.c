@@ -686,7 +686,7 @@ int libspectrum_z80_write_base_header( uchar **buffer, size_t *offset,
   uchar *ptr = (*buffer) + (*offset);
 
   error = libspectrum_make_room( buffer,
-				 (*offset) + LIBSPECTRUM_Z80_HEADER_LENGTH,
+				 LIBSPECTRUM_Z80_HEADER_LENGTH,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -730,7 +730,7 @@ int libspectrum_z80_write_extended_header( uchar **buffer, size_t *offset,
 
   /* +2 here to deal with the two length bytes */
   error = libspectrum_make_room( buffer,
-				 (*offset) + LIBSPECTRUM_Z80_V3_LENGTH + 2,
+				 LIBSPECTRUM_Z80_V3_LENGTH + 2,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -845,7 +845,7 @@ int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
 
   if( compressed_length >= 0x4000 ) {
 
-    error = libspectrum_make_room( buffer, (*offset) + 3 + 0x4000, &ptr,
+    error = libspectrum_make_room( buffer, 3 + 0x4000, &ptr,
 				   length );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -857,7 +857,7 @@ int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
 
   } else {
 
-    libspectrum_make_room( buffer, (*offset) + 3 + compressed_length,
+    libspectrum_make_room( buffer, 3 + compressed_length,
 			   &ptr, length );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -889,7 +889,7 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   libspectrum_error error;
 
   /* Make room for the .slt signature */
-  error = libspectrum_make_room( buffer, (*offset) + slt_signature_length,
+  error = libspectrum_make_room( buffer, slt_signature_length,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -931,17 +931,17 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
     compressed_screen_length = 0;
     error = libspectrum_z80_compress_block(
               &compressed_screen, &compressed_screen_length,
-	      snap->slt_screen, 6192
+	      snap->slt_screen, 6912
 	    );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       for( i=0; i<256; i++ ) if(snap->slt_length[i]) free(compressed_data[i]);
       return error;
     }
 
-    /* If length >= 6192, write out uncompressed */
-    if( compressed_screen_length >= 6192 ) {
-      compressed_screen_length = 6192;
-      memcpy( compressed_screen, snap->slt_screen, 6192 );
+    /* If length >= 6912, write out uncompressed */
+    if( compressed_screen_length >= 6912 ) {
+      compressed_screen_length = 6912;
+      memcpy( compressed_screen, snap->slt_screen, 6912 );
     }
 
     /* Write the directory entry */
@@ -972,10 +972,8 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   for( i=0; i<256; i++ ) {
     if( snap->slt_length[i] ) {
       
-      fprintf( stderr, "%d %d\n", *offset, ptr-*buffer, *length );
-
       /* Make room for the data */
-      error = libspectrum_make_room( buffer, (*offset) + compressed_length[i],
+      error = libspectrum_make_room( buffer, compressed_length[i],
 				     &ptr, length 
 				   );
       if( error != LIBSPECTRUM_ERROR_NONE ) {
@@ -986,7 +984,7 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
 
       /* And copy it across */
       memcpy( ptr, compressed_data[i], compressed_length[i] );
-      (*offset) += compressed_length[i];
+      ptr += compressed_length[i];
     }
   }
 
@@ -994,7 +992,7 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   if( snap->slt_screen ) {
 
     /* Make room */
-    error = libspectrum_make_room( buffer, (*offset)+compressed_screen_length,
+    error = libspectrum_make_room( buffer, compressed_screen_length,
 				   &ptr, length
 				 );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
@@ -1005,12 +1003,15 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
 
     /* Copy the data */
     memcpy( ptr, compressed_screen, compressed_screen_length );
-    (*offset) += compressed_screen_length;
+    ptr += compressed_screen_length;
   }
 
   /* Free up the compressed data */
   for( i=0; i<256; i++ ) if( snap->slt_length[i] ) free( compressed_data[i] );
   if( snap->slt_screen ) free( compressed_screen );
+
+  /* And update our length pointer */
+  (*offset) = ptr - *buffer;
 
   /* That's your lot */
   return LIBSPECTRUM_ERROR_NONE;
@@ -1027,7 +1028,7 @@ static int libspectrum_z80_write_slt_entry( uchar **buffer, size_t *offset,
   libspectrum_error error;
 
   /* We need 8 bytes of space */
-  error = libspectrum_make_room( buffer, (*offset) + 8, &ptr, length );
+  error = libspectrum_make_room( buffer, 8, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   libspectrum_write_word( &ptr[0], type );

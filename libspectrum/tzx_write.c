@@ -233,7 +233,7 @@ tzx_write_rom( libspectrum_tape_rom_block *rom_block,
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte, the pause, the length and the actual data */
-  error = libspectrum_make_room( buffer, (*offset) + 5 + rom_block->length,
+  error = libspectrum_make_room( buffer, 5 + rom_block->length,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -259,7 +259,7 @@ tzx_write_turbo( libspectrum_tape_turbo_block *turbo_block,
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte, the metadata and the actual data */
-  error = libspectrum_make_room( buffer, (*offset) + 19 + turbo_block->length,
+  error = libspectrum_make_room( buffer, 19 + turbo_block->length,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -293,7 +293,7 @@ tzx_write_pure_tone( libspectrum_tape_pure_tone_block *tone_block,
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte and the data */
-  error = libspectrum_make_room( buffer, (*offset) + 5, &ptr, length );
+  error = libspectrum_make_room( buffer, 5, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_PURE_TONE;
@@ -318,7 +318,7 @@ tzx_write_pulses( libspectrum_tape_pulses_block *pulses_block,
   size_t block_length = 2 + 2 * pulses_block->count;
 
   /* Make room for the ID byte, the count and the data */
-  error = libspectrum_make_room( buffer, (*offset) + block_length, &ptr,
+  error = libspectrum_make_room( buffer, block_length, &ptr,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -341,7 +341,7 @@ tzx_write_data( libspectrum_tape_pure_data_block *data_block,
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte, the metadata and the actual data */
-  error = libspectrum_make_room( buffer, (*offset) + 11 + data_block->length,
+  error = libspectrum_make_room( buffer, 11 + data_block->length,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -370,7 +370,7 @@ tzx_write_pause( libspectrum_tape_pause_block *pause_block,
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte and the data */
-  error = libspectrum_make_room( buffer, (*offset) + 3, &ptr, length );
+  error = libspectrum_make_room( buffer, 3, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_PAUSE;
@@ -392,7 +392,7 @@ tzx_write_group_start( libspectrum_tape_group_start_block *start_block,
   size_t name_length = strlen( start_block->name );
 
   /* Make room for the ID byte, the length byte and the name */
-  error = libspectrum_make_room( buffer, (*offset) + 2 + name_length, &ptr,
+  error = libspectrum_make_room( buffer, 2 + name_length, &ptr,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -416,7 +416,7 @@ tzx_write_jump( libspectrum_tape_jump_block *block,
   int u_offset;
 
   /* Make room for the ID byte and the offset */
-  error = libspectrum_make_room( buffer, (*offset) + 3, &ptr, length );
+  error = libspectrum_make_room( buffer, 3, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_JUMP;
@@ -438,7 +438,7 @@ tzx_write_loop_start( libspectrum_tape_loop_start_block *block,
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte and the count */
-  error = libspectrum_make_room( buffer, (*offset) + 3, &ptr, length );
+  error = libspectrum_make_room( buffer, 3, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_LOOP_START;
@@ -466,7 +466,7 @@ tzx_write_select( libspectrum_tape_select_block *block,
     total_length += strlen( block->descriptions[i] );
 
   /* On top of that, we need an id byte and 2 length bytes */
-  error = libspectrum_make_room( buffer, (*offset) + total_length + 3, &ptr,
+  error = libspectrum_make_room( buffer, total_length + 3, &ptr,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -492,7 +492,7 @@ tzx_write_stop( libspectrum_byte **buffer, size_t *offset, size_t *length )
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte and four length bytes */
-  error = libspectrum_make_room( buffer, (*offset) + 5, &ptr, length );
+  error = libspectrum_make_room( buffer, 5, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_STOP48;
@@ -513,7 +513,7 @@ tzx_write_comment( libspectrum_tape_comment_block *comment_block,
   size_t comment_length = strlen( comment_block->text );
 
   /* Make room for the ID byte, the length byte and the name */
-  error = libspectrum_make_room( buffer, (*offset) + 2 + comment_length, &ptr,
+  error = libspectrum_make_room( buffer, 2 + comment_length, &ptr,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -537,7 +537,7 @@ tzx_write_message( libspectrum_tape_message_block *message_block,
   size_t text_length = strlen( message_block->text );
 
   /* Make room for the ID byte, the time byte, length byte and the name */
-  error = libspectrum_make_room( buffer, (*offset) + 3 + text_length, &ptr,
+  error = libspectrum_make_room( buffer, 3 + text_length, &ptr,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -570,7 +570,7 @@ tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
     total_length += strlen( info_block->strings[i] );
 
   /* Make room for all that, and two bytes storing the length */
-  error = libspectrum_make_room( buffer, (*offset) + total_length + 2,
+  error = libspectrum_make_room( buffer, total_length + 2,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -603,7 +603,7 @@ tzx_write_hardware( libspectrum_tape_hardware_block *block,
 
   /* We need one ID byte, one count byte and then three bytes for every
      entry */
-  error = libspectrum_make_room( buffer, (*offset) + 3 * block->count + 2,
+  error = libspectrum_make_room( buffer, 3 * block->count + 2,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -636,7 +636,7 @@ tzx_write_custom( libspectrum_tape_custom_block *block,
   size_t total_length = 1 + 16 + 4 + block->length;
 
   /* Make room for the block */
-  error = libspectrum_make_room( buffer, (*offset) + total_length, &ptr,
+  error = libspectrum_make_room( buffer, total_length, &ptr,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
@@ -659,7 +659,7 @@ tzx_write_empty_block( libspectrum_byte **buffer, size_t *offset,
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
   /* Make room for the ID byte */
-  error = libspectrum_make_room( buffer, (*offset) + 1, &ptr, length );
+  error = libspectrum_make_room( buffer, 1, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = id;

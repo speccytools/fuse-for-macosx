@@ -159,8 +159,6 @@ int libspectrum_make_room( uchar **dest, size_t requested, uchar **ptr,
 
   current_length = *ptr - *dest;
 
-  fprintf( stderr, "* %d %d\n", current_length, requested );
-
   if( *allocated == 0 ) {
 
     (*allocated) = requested;
