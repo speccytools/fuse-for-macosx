@@ -29,26 +29,49 @@
 #ifdef UI_FB			/* Use this iff we're using fbdev */
 
 #include <stdlib.h>
+#include <signal.h>
 
 #include "fbdisplay.h"
 #include "fbkeyboard.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
+static void end_handler( int signo );
 static void fb_end( void );
 
 int
 ui_init( int *argc, char ***argv )
 {
+  struct sigaction handler;
   int error;
 
-  atexit( fb_end );
+  error = atexit( fb_end );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "ui_init: couldn't set atexit function" );
+    return 1;
+  }
+  
+  handler.sa_handler = end_handler;
+
+  error = sigaction( SIGTERM, &handler, NULL );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "ui_init: couldn't set SIGTERM handler: %s",
+	      strerror( errno ) );
+    return 1;
+  }
+
+  error = sigaction( SIGHUP, &handler, NULL );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "ui_init: couldn't set SIGHUP handler: %s",
+	      strerror( errno ) );
+    return 1;
+  }
 
   error = fbkeyboard_init();
-  if(error) return error;
+  if( error ) return error;
 
   error = fbdisplay_init();
-  if(error) return error;
+  if( error ) return error;
 
   return 0;
 }
@@ -68,6 +91,12 @@ int ui_end(void)
   error = fbdisplay_end(); if( error ) return error;
 
   return 0;
+}
+
+static void
+end_handler( int signo )
+{
+  fb_end();
 }
 
 static void

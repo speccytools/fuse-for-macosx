@@ -991,3 +991,4 @@
 20040707 acinclude.m4: update SDL macros to latest upstream.
 20040708 timer.c: modify timer calibration slightly (Darren).
 20040708 ui/fb/fbkeyboard.c: update for new input layer (Darren).
+20040708 ui/fb/fbui.c: add SIGTERM and SIGHUP handlers (Darren).
