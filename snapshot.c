@@ -245,22 +245,33 @@ snapshot_copy_from( libspectrum_snap *snap )
 
 int snapshot_write( const char *filename )
 {
+  libspectrum_id_t type;
+  libspectrum_class_t class;
   libspectrum_snap *snap;
   unsigned char *buffer; size_t length;
   int flags;
 
   int error;
 
+  /* Work out what sort of file we want from the filename; default to
+     .z80 if we couldn't guess */
+  error = libspectrum_identify_file_with_class( &type, &class, filename, NULL,
+						0 );
+  if( error ) return error;
+
+  if( class != LIBSPECTRUM_CLASS_SNAPSHOT || type == LIBSPECTRUM_ID_UNKNOWN )
+    type = LIBSPECTRUM_ID_SNAPSHOT_Z80;
+
   error = libspectrum_snap_alloc( &snap ); if( error ) return error;
 
-  error = snapshot_copy_to( snap ); if( error ) return error;
+  error = snapshot_copy_to( snap );
+  if( error ) { libspectrum_snap_free( snap ); return error; }
 
   flags = 0;
   length = 0;
-  error = libspectrum_snap_write( &buffer, &length, &flags, snap,
-				  LIBSPECTRUM_ID_SNAPSHOT_Z80, fuse_creator,
-				  0 );
-  if( error ) return error;
+  error = libspectrum_snap_write( &buffer, &length, &flags, snap, type,
+				  fuse_creator, 0 );
+  if( error ) { libspectrum_snap_free( snap ); return error; }
 
   if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS ) {
     ui_error(

@@ -250,12 +250,40 @@ tape_get_current_block( void )
 /* Write the current in-memory tape file out to disk */
 int tape_write( const char* filename )
 {
+  libspectrum_id_t type;
+  libspectrum_class_t class;
   libspectrum_byte *buffer; size_t length;
 
   int error;
 
+  /* Work out what sort of file we want from the filename; default to
+     .tzx if we couldn't guess */
+  error = libspectrum_identify_file_with_class( &type, &class, filename, NULL,
+						0 );
+  if( error ) return error;
+
+  if( class != LIBSPECTRUM_CLASS_TAPE || type == LIBSPECTRUM_ID_UNKNOWN )
+    type = LIBSPECTRUM_ID_TAPE_TZX;
+
   length = 0;
-  error = libspectrum_tzx_write( &buffer, &length, tape );
+
+  switch( type ) {
+
+  case LIBSPECTRUM_ID_TAPE_TAP:
+    error = libspectrum_tap_write( &buffer, &length, tape );
+    break;
+
+  case LIBSPECTRUM_ID_TAPE_TZX:
+    error = libspectrum_tzx_write( &buffer, &length, tape );
+    break;
+
+  default:
+    ui_error( UI_ERROR_INFO,
+	      "Sorry: no support for writing that tape format" );
+    return 0;
+
+  }
+
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   error = utils_write_file( filename, buffer, length );

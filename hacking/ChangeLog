@@ -647,3 +647,4 @@
 	 widget_internals.h}: add a 'commit' menu option for the IDE
 	 disks.
 20040320 snapshot.c: copy RAM page 8-15 into the libspectrum_snap structure.
+20040320 snapshot.c,tape.c: select output format based on filename.
