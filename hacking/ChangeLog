@@ -973,3 +973,5 @@
 	 UIs.
 20040703 rzx.c: use libspectrum's new ability to select the embedded snap
 	 format.
+20040704 ui/uijoystick.h: remove unused kempston_bits and kempston_type
+	 types.

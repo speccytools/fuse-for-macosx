@@ -37,38 +37,6 @@
 
 #include <libspectrum.h>
 
-#ifdef WORDS_BIGENDIAN
-
-typedef struct
-{
-  unsigned unused : 3;
-  unsigned fire   : 1;
-  unsigned up     : 1;
-  unsigned down   : 1;
-  unsigned left   : 1;
-  unsigned right  : 1;
-} kempston_bits;
-
-#else				/* #ifdef WORDS_BIGENDIAN */
-
-typedef struct
-{
-  unsigned right  : 1;
-  unsigned left   : 1;
-  unsigned down   : 1;
-  unsigned up     : 1;
-  unsigned fire   : 1;
-  unsigned unused : 3;
-} kempston_bits;
-
-#endif				/* #ifdef WORDS_BIGENDIAN */
-
-typedef union
-{
-  libspectrum_byte byte;
-  kempston_bits bits;
-} kempston_type; 
-
 int ui_joystick_init( void ); /* returns no. of joysticks initialised */
 void ui_joystick_end( void );
 
