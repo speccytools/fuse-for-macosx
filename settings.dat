@@ -62,6 +62,7 @@ trdosdisk_file, string, NULL,, trdosdisk, trdosdiskfile
 printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
 printer_text_filename, string, strdup( "printout.txt" ),, textfile
 
+aspect_hint, boolean, 1
 svga_mode, numeric, 320, 'v', svgamode
 
 start_scaler_mode, string, strdup( "normal" ), 'g', graphics-filter

@@ -207,6 +207,7 @@ ui_init( int *argc, char ***argv )
   GtkWidget *box,*menu_bar;
   GtkAccelGroup *accel_group;
   GdkGeometry geometry;
+  GdkWindowHints hints;
 
   gtk_init(argc,argv);
 
@@ -257,6 +258,9 @@ ui_init( int *argc, char ***argv )
 
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, FALSE, FALSE, 0 );
 
+  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
+          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
+
   geometry.min_width = DISPLAY_ASPECT_WIDTH;
   geometry.min_height = DISPLAY_SCREEN_HEIGHT;
   geometry.max_width = 2 * DISPLAY_ASPECT_WIDTH;
@@ -265,15 +269,15 @@ ui_init( int *argc, char ***argv )
   geometry.base_height = 0;
   geometry.width_inc = DISPLAY_ASPECT_WIDTH;
   geometry.height_inc = DISPLAY_SCREEN_HEIGHT;
-  geometry.min_aspect = geometry.max_aspect =
-    ((float)DISPLAY_ASPECT_WIDTH)/DISPLAY_SCREEN_HEIGHT;
+
+  if( settings_current.aspect_hint ) {
+    hints |= GDK_HINT_ASPECT;
+    geometry.min_aspect = geometry.max_aspect =
+      ((float)DISPLAY_ASPECT_WIDTH)/DISPLAY_SCREEN_HEIGHT;
+  }
 
   gtk_window_set_geometry_hints( GTK_WINDOW(gtkui_window), gtkui_drawing_area,
-				 &geometry,
-				 GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
-				 GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC |
-				 GDK_HINT_ASPECT );
-
+				 &geometry, hints );
 
   if( gtkdisplay_init() ) return 1;
 
