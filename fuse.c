@@ -52,6 +52,7 @@
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "memory.h"
 #include "pokefinder/pokefinder.h"
 #include "printer.h"
 #include "psg.h"
@@ -213,6 +214,8 @@ static int fuse_init(int argc, char **argv)
   /* Drop root privs if we have them */
   if( !geteuid() ) { setuid( getuid() ); }
 #endif				/* #ifdef HAVE_GETEUID */
+
+  if( memory_init() ) return 1;
 
   if( debugger_init() ) return 1;
 

@@ -27,23 +27,14 @@
 #ifndef FUSE_MACHINE_H
 #define FUSE_MACHINE_H
 
-#ifndef _STDLIB_H
 #include <stdlib.h>
-#endif			/* #ifndef _STDLIB_H */
 
 #include <libspectrum.h>
 
-#ifndef FUSE_AY_H
 #include "ay.h"
-#endif			/* #ifndef FUSE_AY_H */
-
-#ifndef FUSE_DISPLAY_H
 #include "display.h"
-#endif			/* #ifndef FUSE_DISPLAY_H */
-
-#ifndef FUSE_SPECTRUM_H
+#include "memory.h"
 #include "spectrum.h"
-#endif			/* #ifndef FUSE_SPECTRUM_H */
 
 typedef libspectrum_byte (*spectrum_unattached_port_fn)( void );
 
@@ -80,9 +71,6 @@ typedef struct fuse_machine_info {
   spectrum_raminfo ram; /* How do we access memory, and what's currently
 			   paged in */
 
-  size_t rom_count;	/* How many ROMs does this machine use? */
-  size_t *rom_length;	/* And how long is each ROM? */
-
   spectrum_unattached_port_fn unattached_port; /* What to return if we read
 						  from a port which isn't
 						  attached to anything */
@@ -106,9 +94,7 @@ const char* machine_get_id( libspectrum_machine type );
 
 int machine_set_timings( fuse_machine_info *machine );
 
-int machine_allocate_roms( fuse_machine_info *machine, size_t count );
-int machine_load_rom( libspectrum_byte **data, char *filename,
-		      size_t expected_length );
+int machine_load_rom( size_t which, char *filename, size_t expected_length );
 
 int machine_reset( void );
 int machine_end( void );

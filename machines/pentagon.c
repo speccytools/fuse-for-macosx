@@ -42,8 +42,6 @@ static libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
 static libspectrum_byte pentagon_select_ff_read( libspectrum_word port,
 						 int *attached );
 static libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
-static void pentagon_memoryport_write( libspectrum_word port,
-				       libspectrum_byte b );
 static int pentagon_reset( void );
 static int pentagon_shutdown( void );
 
@@ -56,7 +54,7 @@ const static periph_t peripherals[] = {
   { 0x00ff, 0x00ff, pentagon_select_ff_read, trdos_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
-  { 0x8002, 0x0000, NULL, pentagon_memoryport_write },
+  { 0x8002, 0x0000, NULL, spec128_memoryport_write },
 };
 
 const static size_t peripherals_count =
@@ -107,8 +105,6 @@ pentagon_contend_delay( libspectrum_dword time GCC_UNUSED )
 int
 pentagon_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_PENT;
   machine->id = "pentagon";
 
@@ -117,11 +113,6 @@ pentagon_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.contend_port   = pentagon_contend_port;
   machine->ram.contend_delay  = pentagon_contend_delay;
-
-  error = machine_allocate_roms( machine, 3 );
-  if( error ) return error;
-  machine->rom_length[0] = machine->rom_length[1] = 
-    machine->rom_length[2] = 0x4000;
 
   machine->unattached_port = pentagon_unattached_port;
 
@@ -138,14 +129,11 @@ pentagon_reset(void)
 
   trdos_reset();
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_pentagon_0,
-			    machine_current->rom_length[0] );
+  error = machine_load_rom( 0, settings_current.rom_pentagon_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[1], settings_current.rom_pentagon_1,
-			    machine_current->rom_length[1] );
+  error = machine_load_rom( 2, settings_current.rom_pentagon_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[2], settings_current.rom_pentagon_2,
-			    machine_current->rom_length[2] );
+  error = machine_load_rom( 4, settings_current.rom_pentagon_2, 0x4000 );
   if( error ) return error;
 
   trdos_available = 1;
@@ -155,40 +143,6 @@ pentagon_reset(void)
   if( error ) return error;
 
   return spec128_common_reset( 0 );
-}
-
-void
-pentagon_memoryport_write( libspectrum_word port GCC_UNUSED,
-			   libspectrum_byte b )
-{
-  int page, rom, screen;
-
-  if( machine_current->ram.locked ) return;
-    
-  page = b & 0x07;
-  screen = ( b & 0x08 ) ? 7 : 5;
-  rom = ( b & 0x10 ) >> 4;
-
-  memory_map[0].page = &ROM[ rom ][0x0000];
-  memory_map[1].page = &ROM[ rom ][0x2000];
-  memory_map[0].reverse = memory_map[1].reverse = MEMORY_PAGE_OFFSET_ROM + rom;
-
-  memory_map[6].page = &RAM[ page ][0x0000];
-  memory_map[7].page = &RAM[ page ][0x2000];
-  memory_map[6].reverse = memory_map[7].reverse = page;
-
-  /* If we changed the active screen, mark the entire display file as
-     dirty so we redraw it on the next pass */
-  if( memory_current_screen != screen ) {
-    display_refresh_all();
-    memory_current_screen = screen;
-  }
-
-  machine_current->ram.current_page = page;
-  machine_current->ram.current_rom = rom;
-  machine_current->ram.locked = ( b & 0x20 );
-
-  machine_current->ram.last_byte = b;
 }
 
 static int

@@ -29,14 +29,15 @@
 
 #include <libspectrum.h>
 
-typedef enum memory_page_offsets {
+typedef enum memory_bank {
 
-  MEMORY_PAGE_OFFSET_RAM   = 0x00,
-  MEMORY_PAGE_OFFSET_ROM   = 0x40,
-  MEMORY_PAGE_OFFSET_DOCK  = 0x48,
-  MEMORY_PAGE_OFFSET_EXROM = 0x50,
+  MEMORY_BANK_NONE,
 
-} memory_page_offsets;
+  MEMORY_BANK_HOME,
+  MEMORY_BANK_DOCK,
+  MEMORY_BANK_EXROM,
+  
+} memory_bank;
 
 typedef struct memory_page {
 
@@ -45,20 +46,28 @@ typedef struct memory_page {
   int contended;		/* Are reads/writes to this page contended? */
   int allocated;		/* Do we own the memory for this page? */
 
-  /* For reverse mapping */
-
-  int reverse;			/* Which page is mapped in here; -1 => ROM */
+  memory_bank bank;		/* Which bank is mapped in here */
+  int page_num;			/* Which page from the bank */
   libspectrum_word offset;	/* How far into the page this chunk starts */
 
 } memory_page;
 
 extern memory_page memory_map[8];
 
+extern memory_page *memory_map_home[8];
+extern memory_page *memory_map_dock[8];
+extern memory_page *memory_map_exrom[8];
+
+extern memory_page memory_map_ram[32];
+extern memory_page memory_map_rom[ 8];
+
 /* Which RAM page contains the current screen */
 extern int memory_current_screen;
 
 /* Which bits to look at when working out where the screen is */
 extern libspectrum_word memory_screen_mask;
+
+int memory_init( void );
 
 libspectrum_byte readbyte( libspectrum_word address );
 

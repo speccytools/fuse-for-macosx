@@ -250,11 +250,11 @@ machine_select_machine( fuse_machine_info *machine )
 }
 
 int
-machine_load_rom( libspectrum_byte **data, char *filename,
-		  size_t expected_length )
+machine_load_rom( size_t which, char *filename, size_t expected_length )
 {
   int fd, error;
   utils_file rom;
+  size_t i, offset;
 
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_ROM );
   if( fd == -1 ) {
@@ -270,17 +270,29 @@ machine_load_rom( libspectrum_byte **data, char *filename,
 	      "ROM '%s' is %ld bytes long; expected %ld bytes",
 	      filename, (unsigned long)rom.length,
 	      (unsigned long)expected_length );
+    utils_close_file( &rom );
     return 1;
   }
 
   /* Take a copy of the ROM in case we want to write to it later */
-  *data = malloc( rom.length * sizeof( libspectrum_byte ) );
-  if( !(*data) ) {
+  memory_map_rom[ which ].page =
+    malloc( rom.length * sizeof( libspectrum_byte ) );
+  if( !memory_map_rom[ which ].page ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    utils_close_file( &rom );
     return 1;
   }
+  memory_map_rom[ which ].allocated = 1;
 
-  memcpy( *data, rom.buffer, rom.length );
+  memcpy( memory_map_rom[ which ].page, rom.buffer, rom.length );
+
+  for( i = 1, offset = 0x2000;
+       offset < expected_length;
+       i++, offset += 0x2000     ) {
+    memory_map_rom[ which + i ].offset = offset;
+    memory_map_rom[ which + i ].page = memory_map_rom[ which ].page + offset;
+    memory_map_rom[ which + i ].allocated = 0;
+  }
 
   if( utils_close_file( &rom ) ) return 1;
 
@@ -306,27 +318,14 @@ machine_reset( void )
   tape_stop();
   simpleide_reset();
 
-  /* Load in the ROMs: remove any ROMs we've got in memory at the moment */
-  for( i = 0; i < spectrum_rom_count; i++ ) { free( ROM[i] ); ROM[i] = NULL; }
-    
-  /* Make sure we have enough space for the new ROMs */
-  if( spectrum_rom_count < machine_current->rom_count ) {
-
-    libspectrum_byte **new_ROM =
-      realloc( ROM, machine_current->rom_count * sizeof( libspectrum_byte* ) );
-    if( !new_ROM ) {
-      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
+  /* Remove any ROMs we've got in memory at the moment */
+  for( i = 0; i < 8; i++ ) {
+    if( memory_map_rom[ i ].allocated ) {
+      free( memory_map_rom[ i ].page );
+      memory_map_rom[ i ].allocated = 0;
     }
-
-    ROM = new_ROM;
+    memory_map_rom[ i ].page = NULL;
   }
-
-  spectrum_rom_count = machine_current->rom_count;
-  
-  /* Zero all the ROMs; if an error occurs they won't be loaded with anything
-     and we don't want to attempt to unload them later */
-  for( i = 0; i < spectrum_rom_count; i++ ) ROM[i] = NULL;
 
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;
@@ -385,26 +384,12 @@ machine_set_timings( fuse_machine_info *machine )
   return 0;
 }
 
-int machine_allocate_roms( fuse_machine_info *machine, size_t count )
-{
-  machine->rom_count = count;
-
-  machine->rom_length = malloc( count * sizeof(size_t) );
-  if( machine->rom_length == NULL ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-
-  return 0;
-}
-
 int machine_end( void )
 {
   int i;
 
   for( i=0; i<machine_count; i++ ) {
     if( machine_types[i]->shutdown ) machine_types[i]->shutdown();
-    free( machine_types[i]->rom_length );
     free( machine_types[i] );
   }
 

@@ -40,14 +40,7 @@ extern libspectrum_byte spectrum_last_ula;
 
 /* Things relating to memory */
 
-/* The number of ROMs we have allocated space for; they might not all be
-   in use at the moment */
-extern size_t spectrum_rom_count;
-
-/* The ROMs themselves */
-extern libspectrum_byte **ROM;
-
-/* And the RAM */
+/* 256 Kb of RAM */
 extern libspectrum_byte RAM[16][0x4000];
 
 typedef libspectrum_dword

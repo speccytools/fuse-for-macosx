@@ -114,8 +114,6 @@ scorpion_contend_delay( libspectrum_dword time GCC_UNUSED )
 int
 scorpion_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_SCORP;
   machine->id = "scorpion";
 
@@ -124,11 +122,6 @@ scorpion_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.contend_port   = scorpion_contend_port;
   machine->ram.contend_delay  = scorpion_contend_delay;
-
-  error = machine_allocate_roms( machine, 4 );
-  if( error ) return error;
-  machine->rom_length[0] = machine->rom_length[1] = 
-    machine->rom_length[2] = machine->rom_length[3] = 0x4000;
 
   machine->unattached_port = scorpion_unattached_port;
 
@@ -144,18 +137,13 @@ scorpion_reset(void)
 
   trdos_reset();
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_scorpion_0,
-			    machine_current->rom_length[0] );
+  error = machine_load_rom( 0, settings_current.rom_scorpion_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[1], settings_current.rom_scorpion_1,
-			    machine_current->rom_length[1] );
+  error = machine_load_rom( 2, settings_current.rom_scorpion_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[2], settings_current.rom_scorpion_3,
-			    machine_current->rom_length[2] );
+  error = machine_load_rom( 4, settings_current.rom_scorpion_3, 0x4000 );
   if( error ) return error;
-  /* this is TR-DOS */
-  error = machine_load_rom( &ROM[3], settings_current.rom_scorpion_2,
-			    machine_current->rom_length[3] );
+  error = machine_load_rom( 6, settings_current.rom_scorpion_2, 0x4000 );
   if( error ) return error;
 
   trdos_available = 1;
@@ -188,20 +176,13 @@ scorpion_memoryport_write( libspectrum_word port GCC_UNUSED,
   if( ! ( machine_current->ram.last_byte2 & 0x02 ) ) {
     rom = ( b & 0x10 ) >> 4;
     machine_current->ram.current_rom = rom;
-    if( ! ( machine_current->ram.last_byte2 & 0x01 ) ) {
-      if ( ! ( trdos_active ) ) {
-        memory_map[0].page = &ROM[ rom ][0x0000];
-        memory_map[1].page = &ROM[ rom ][0x2000];
-	memory_map[0].reverse = memory_map[1].reverse =
-	  MEMORY_PAGE_OFFSET_ROM + rom;
-      }
-    }
+    if( !( machine_current->ram.last_byte2 & 0x01 ) &&
+	!trdos_active                                   )
+      spec128_select_rom( rom );
   }
-  
-  memory_map[6].page = &RAM[ page ][0x0000];
-  memory_map[7].page = &RAM[ page ][0x2000];
-  memory_map[6].reverse = memory_map[7].reverse = page;
 
+  spec128_select_page( page );
+  
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
   if( memory_current_screen != screen ) {
@@ -220,6 +201,7 @@ scorpion_memoryport2_write( libspectrum_word port GCC_UNUSED,
                             libspectrum_byte b )
 {
   int page, rom;
+  size_t i;
 
   /* Let the parallel printer code know about the strobe bit */
   printer_parallel_strobe_write( b & 0x20 );
@@ -234,28 +216,24 @@ scorpion_memoryport2_write( libspectrum_word port GCC_UNUSED,
     rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
   
   if( b & 0x01 ) { /* map 0x0000-0x3fff to RAM 0 */
-    memory_map[0].page = &RAM[ 0 ][0x0000];
-    memory_map[1].page = &RAM[ 0 ][0x2000];
-    memory_map[0].reverse = memory_map[1].reverse = 0;
-    memory_map[0].writable = memory_map[1].writable = 1;
+
+    memory_map_home[0] = &memory_map_ram[ 0 ];
+    memory_map_home[1] = &memory_map_ram[ 1 ];
     machine_current->ram.special = 1;
+
+    for( i = 0; i < 2; i++ )
+      if( memory_map[i].bank == MEMORY_BANK_HOME )
+	memory_map[i] = *memory_map_home[i];
+
   } else {
-    memory_map[0].page = &ROM[ rom ][0x0000];
-    memory_map[1].page = &ROM[ rom ][0x2000];
-    memory_map[0].reverse = memory_map[1].reverse =
-      MEMORY_PAGE_OFFSET_ROM + rom;
-    memory_map[0].writable = memory_map[1].writable = 0;
-    machine_current->ram.special = 0;
+    spec128_select_rom( rom );
   }
   
   /* I don't think the screen can change here. Rusfaq talks about
    * 0x4000-0x7fff and 0xc000-0xffff, rather than banks 3 and 5,
    * I'm sticking with the traditional behaviour for now. */
+  spec128_select_page( page );
  
-  memory_map[6].page = &RAM[ page ][0x0000];
-  memory_map[7].page = &RAM[ page ][0x2000];
-  memory_map[6].reverse = memory_map[7].reverse = page;
-  
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom = rom;
   

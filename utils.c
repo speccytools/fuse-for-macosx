@@ -81,6 +81,7 @@ utils_open_file( const char *filename, int autoload,
   libspectrum_id_t type;
   libspectrum_class_t class;
   int error;
+  size_t i;
 
   /* Read the file into a buffer */
   if( utils_read_file( filename, &file ) ) return 1;
@@ -167,13 +168,17 @@ utils_open_file( const char *filename, int autoload,
 
     error = trdos_disk_insert( TRDOS_DRIVE_A, filename ); if( error ) break;
     if( autoload ) {
+
       PC = 0;
       machine_current->ram.current_rom = 1;
       trdos_active = 1;
-      memory_map[0].page = &ROM[2][0x0000];
-      memory_map[1].page = &ROM[2][0x2000];
-      memory_map[0].reverse = memory_map[1].reverse =
-	MEMORY_PAGE_OFFSET_ROM + 2;
+
+      memory_map_home[0] = &memory_map_rom[4];
+      memory_map_home[1] = &memory_map_rom[5];
+
+      for( i = 0; i < 2; i++ )
+	if( memory_map[i].bank == MEMORY_BANK_HOME )
+	  memory_map[i] = *memory_map_home[i];
     }
     break;
 

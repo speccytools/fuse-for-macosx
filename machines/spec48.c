@@ -111,8 +111,6 @@ spec48_contend_delay( libspectrum_dword time )
 
 int spec48_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_48;
   machine->id = "48";
 
@@ -121,10 +119,6 @@ int spec48_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.contend_port          = spec48_contend_port;
   machine->ram.contend_delay	     = spec48_contend_delay;
-
-  error = machine_allocate_roms( machine, 1 );
-  if( error ) return error;
-  machine->rom_length[0] = 0x4000;
 
   machine->unattached_port = spec48_unattached_port;
 
@@ -138,42 +132,46 @@ static int
 spec48_reset( void )
 {
   int error;
-  size_t i;
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_48,
-			    machine_current->rom_length[0] );
+  error = machine_load_rom( 0, settings_current.rom_48, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count,
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
-  memory_map[0].page = &ROM[0][0x0000];
-  memory_map[1].page = &ROM[0][0x2000];
-  memory_map[0].reverse = memory_map[1].reverse = MEMORY_PAGE_OFFSET_ROM;
-
-  memory_map[2].page = &RAM[5][0x0000];
-  memory_map[3].page = &RAM[5][0x2000];
-  memory_map[2].reverse = memory_map[3].reverse = 5;
-
-  memory_map[4].page = &RAM[2][0x0000];
-  memory_map[5].page = &RAM[2][0x2000];
-  memory_map[4].reverse = memory_map[5].reverse = 2;
-
-  memory_map[6].page = &RAM[0][0x0000];
-  memory_map[7].page = &RAM[0][0x2000];
-  memory_map[6].reverse = memory_map[7].reverse = 0;
-
-  for( i = 0; i < 8; i++ ) memory_map[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
-
-  memory_map[0].writable = memory_map[1].writable = 0;
-  for( i = 2; i < 8; i++ ) memory_map[i].writable = 1;
-
-  for( i = 0; i < 8; i++ ) memory_map[i].contended = 0;
-  memory_map[2].contended = memory_map[3].contended = 1;
-
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
+
+  return spec48_common_reset();
+}
+
+int
+spec48_common_reset( void )
+{
+  size_t i;
+
+  /* ROM 0, RAM 5, RAM 2, RAM 0 */
+  memory_map_home[0] = &memory_map_rom[ 0];
+  memory_map_home[1] = &memory_map_rom[ 1];
+
+  memory_map_home[2] = &memory_map_ram[10];
+  memory_map_home[3] = &memory_map_ram[11];
+
+  memory_map_home[4] = &memory_map_ram[ 4];
+  memory_map_home[5] = &memory_map_ram[ 5];
+
+  memory_map_home[6] = &memory_map_ram[ 0];
+  memory_map_home[7] = &memory_map_ram[ 1];
+
+  /* 0x4000 - 0x7fff contended */
+  memory_map_home[2]->contended = memory_map_home[3]->contended = 1;
+
+  /* 0x8000 - 0xffff not contended */
+  memory_map_home[ 4]->contended = memory_map_home[ 5]->contended = 0;
+  memory_map_home[ 6]->contended = memory_map_home[ 7]->contended = 0;
+
+  for( i = 0; i < 8; i++ ) memory_map[i] = *memory_map_home[i];
 
   return 0;
 }

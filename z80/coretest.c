@@ -325,6 +325,8 @@ enum debugger_mode_t debugger_mode;
 
 libspectrum_byte **ROM = NULL;
 memory_page memory_map[8];
+memory_page *memory_map_home[8];
+memory_page memory_map_rom[8];
 int memory_contended[8] = { 1 };
 libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 
@@ -344,6 +346,18 @@ debugger_trap( void )
 
 int trdos_available = 0;
 int trdos_active = 0;
+
+void
+trdos_page( void )
+{
+  abort();
+}
+
+void
+trdos_unpage( void )
+{
+  abort();
+}
 
 int
 event_add( libspectrum_dword event_time, int type )
@@ -366,7 +380,9 @@ init_dummies( void )
 {
   size_t i;
 
-  for( i = 0; i < 8; i++ ) memory_map[i].page = &memory[ i * 0x2000 ];
+  for( i = 0; i < 8; i++ ) {
+    memory_map[i].page = &memory[ i * 0x2000 ];
+  }
 
   debugger_mode = DEBUGGER_MODE_INACTIVE;
   dummy_machine.capabilities = 0;

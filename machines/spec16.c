@@ -43,6 +43,7 @@
 static int spec16_reset( void );
 
 static libspectrum_byte empty_chunk[0x2000];
+static memory_page empty_mapping;
 
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -61,8 +62,6 @@ spec16_unattached_port( void )
 
 int spec16_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_16;
   machine->id = "16";
 
@@ -72,11 +71,13 @@ int spec16_init( fuse_machine_info *machine )
   machine->ram.contend_port   = spec48_contend_port;
   machine->ram.contend_delay  = spec48_contend_delay;
 
-  error = machine_allocate_roms( machine, 1 );
-  if( error ) return error;
-  machine->rom_length[0] = 0x4000;
-
   memset( empty_chunk, 0xff, 0x2000 );
+
+  empty_mapping.page = empty_chunk;
+  empty_mapping.writable = 0;
+  empty_mapping.contended = 0;
+  empty_mapping.allocated = 0;
+  empty_mapping.bank = MEMORY_BANK_NONE;
 
   machine->unattached_port = spec16_unattached_port;
 
@@ -92,39 +93,30 @@ spec16_reset( void )
   int error;
   size_t i;
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_16,
-			    machine_current->rom_length[0] );
+  error = machine_load_rom( 0, settings_current.rom_16, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count,
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
-  memory_map[0].page = &ROM[0][0x0000];
-  memory_map[1].page = &ROM[0][0x2000];
-  memory_map[0].reverse = memory_map[1].reverse = MEMORY_PAGE_OFFSET_ROM;
-
-  memory_map[2].page = &RAM[5][0x0000];
-  memory_map[3].page = &RAM[5][0x2000];
-  memory_map[2].reverse = memory_map[3].reverse = 5;
-
-  memory_map[4].page = empty_chunk;
-  memory_map[5].page = empty_chunk;
-  memory_map[6].page = empty_chunk;
-  memory_map[7].page = empty_chunk;
-  memory_map[4].reverse = memory_map[5].reverse =
-    memory_map[6].reverse = memory_map[7].reverse = -1;
-
-  for( i = 0; i < 8; i++ ) memory_map[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
-
-  for( i = 0; i < 8; i++ ) memory_map[i].writable = 0;
-  memory_map[2].writable = memory_map[3].writable = 1;
-
-  for( i = 0; i < 8; i++ ) memory_map[i].contended = 0;
-  memory_map[2].contended = memory_map[3].contended = 1;
-
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
+
+  /* ROM 0, RAM 5, nothing, nothing */
+  memory_map_home[0] = &memory_map_rom[ 0];
+  memory_map_home[1] = &memory_map_rom[ 1];
+
+  memory_map_home[2] = &memory_map_ram[10];
+  memory_map_home[3] = &memory_map_ram[11];
+
+  memory_map_home[4] = memory_map_home[5] = &empty_mapping;
+  memory_map_home[6] = memory_map_home[7] = &empty_mapping;
+
+  /* The RAM page is contended */
+  memory_map_home[2]->contended = memory_map_home[3]->contended = 1;
+
+  for( i = 0; i < 8; i++ ) memory_map[i] = *memory_map_home[i];
 
   return 0;
 }

@@ -85,7 +85,7 @@ dck_read( const char *filename )
   int error;
 
   int i;
-  memory_page *mem;
+  memory_page **mem;
 
   if ( !( libspectrum_machine_capabilities( machine_current->machine ) &
 	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
@@ -109,15 +109,16 @@ dck_read( const char *filename )
   }
 
   while( dck->dck[num_block] != NULL ) {
+
     switch( dck->dck[num_block]->bank ) {
     case LIBSPECTRUM_DCK_BANK_HOME:
-      mem = timex_home;
+      mem = memory_map_home;
       break;
     case LIBSPECTRUM_DCK_BANK_DOCK:
-      mem = timex_dock;
+      mem = memory_map_dock;
       break;
     case LIBSPECTRUM_DCK_BANK_EXROM:
-      mem = timex_exrom;
+      mem = memory_map_exrom;
       break;
     default:
       ui_error( UI_ERROR_INFO, "Sorry, bank ID %i is unsupported",
@@ -127,16 +128,16 @@ dck_read( const char *filename )
     }
 
     for( i = 0; i < 8; i++ ) {
+
       switch( dck->dck[num_block]->access[i] ) {
 
       case LIBSPECTRUM_DCK_PAGE_NULL:
         break;
 
       case LIBSPECTRUM_DCK_PAGE_ROM:
-        mem[i].page = dck->dck[num_block]->pages[i];
-        mem[i].allocated = 1;
-        mem[i].writable = 0;
-	mem[i].reverse = -1;
+        mem[i]->page = dck->dck[num_block]->pages[i];
+        mem[i]->allocated = 1;
+        mem[i]->writable = 0;
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
@@ -145,13 +146,12 @@ dck_read( const char *filename )
           /* Because the scr and snapshot code depends on the standard memory
              map being in the RAM[] array, we copy blocks from the HOME bank
              into the appropriate page via the timex_home structure */
-          memcpy( mem[i].page, dck->dck[num_block]->pages[i], 0x2000 );
+          memcpy( mem[i]->page, dck->dck[num_block]->pages[i], 0x2000 );
           free( dck->dck[num_block]->pages[i] );
         } else {
-          mem[i].page = dck->dck[num_block]->pages[i];
-          mem[i].allocated = 1;
-          mem[i].writable = 1;
-	  mem[i].reverse = -1;
+          mem[i]->page = dck->dck[num_block]->pages[i];
+          mem[i]->allocated = 1;
+          mem[i]->writable = 1;
         }
 
         break;

@@ -47,6 +47,9 @@ void trdos_reset( void );
 
 void trdos_end( void );
 
+void trdos_page( void );
+void trdos_unpage( void );
+
 void trdos_cr_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte trdos_sr_read( libspectrum_word port, int *attached );

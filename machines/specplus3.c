@@ -53,6 +53,7 @@
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"
+#include "spec128.h"
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -166,8 +167,6 @@ specplus3_contend_delay( libspectrum_dword time )
 
 int specplus3_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_PLUS3;
   machine->id = "plus3";
 
@@ -176,11 +175,6 @@ int specplus3_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.contend_port	     = specplus3_contend_port;
   machine->ram.contend_delay	     = specplus3_contend_delay;
-
-  error = machine_allocate_roms( machine, 4 );
-  if( error ) return error;
-  machine->rom_length[0] = machine->rom_length[1] = 
-    machine->rom_length[2] = machine->rom_length[3] = 0x4000;
 
   machine->unattached_port = specplus3_unattached_port;
 
@@ -236,17 +230,13 @@ specplus3_reset( void )
 {
   int error;
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_plus3_0,
-			    machine_current->rom_length[0] );
+  error = machine_load_rom( 0, settings_current.rom_plus3_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[1], settings_current.rom_plus3_1,
-			    machine_current->rom_length[1] );
+  error = machine_load_rom( 2, settings_current.rom_plus3_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[2], settings_current.rom_plus3_2,
-			    machine_current->rom_length[2] );
+  error = machine_load_rom( 4, settings_current.rom_plus3_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[3], settings_current.rom_plus3_3,
-			    machine_current->rom_length[3] );
+  error = machine_load_rom( 6, settings_current.rom_plus3_3, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count,
@@ -273,12 +263,18 @@ specplus3_plus2a_common_reset( void )
   machine_current->ram.locked=0;
   machine_current->ram.special=0;
 
-  error = normal_memory_map( 0, 0 ); if( error ) return error;
-  for( i = 2; i < 8; i++ ) memory_map[i].writable = 1;
-  for( i = 0; i < 8; i++ ) memory_map[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
-
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
+
+  /* All memory comes from the home bank */
+  for( i = 0; i < 8; i++ ) memory_map[i].bank = MEMORY_BANK_HOME;
+
+  /* RAM pages 4, 5, 6 and 7 contended */
+  for( i = 0; i < 8; i++ )
+    memory_map_ram[ 2 * i     ].contended =
+      memory_map_ram[ 2 * i + 1 ].contended = i & 4;
+
+  error = normal_memory_map( 0, 0 ); if( error ) return error;
 
   return 0;
 }
@@ -286,29 +282,27 @@ specplus3_plus2a_common_reset( void )
 static int
 normal_memory_map( int rom, int page )
 {
-  memory_map[0].page = &ROM[  rom ][0x0000];
-  memory_map[1].page = &ROM[  rom ][0x2000];
-  memory_map[0].reverse = memory_map[1].reverse = MEMORY_PAGE_OFFSET_ROM + rom;
+  size_t i;
 
-  memory_map[2].page = &RAM[    5 ][0x0000];
-  memory_map[3].page = &RAM[    5 ][0x2000];
-  memory_map[2].reverse = memory_map[3].reverse = 5;
+  /* ROM as specified */
+  memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
+  memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
 
-  memory_map[4].page = &RAM[    2 ][0x0000];
-  memory_map[5].page = &RAM[    2 ][0x2000];
-  memory_map[4].reverse = memory_map[5].reverse = 2;
+  /* RAM 5 */
+  memory_map_home[2] = &memory_map_ram[10];
+  memory_map_home[3] = &memory_map_ram[11];
 
-  memory_map[6].page = &RAM[ page ][0x0000];
-  memory_map[7].page = &RAM[ page ][0x2000];
-  memory_map[6].reverse = memory_map[7].reverse = page;
+  /* RAM 2 */
+  memory_map_home[4] = &memory_map_ram[ 4];
+  memory_map_home[5] = &memory_map_ram[ 5];
 
-  memory_map[0].writable = memory_map[1].writable = 0;
+  /* RAM as specified */
+  memory_map_home[6] = &memory_map_ram[ 2 * page     ];
+  memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
 
-  memory_map[0].contended = memory_map[1].contended = 0;
-  memory_map[2].contended = memory_map[3].contended = 1;
-  memory_map[4].contended = memory_map[5].contended = 0;
-  /* Pages 4, 5, 6 and 7 contended */
-  memory_map[6].contended = memory_map[7].contended = page & 0x04;
+  for( i = 0; i < 8; i++ )
+    if( memory_map[i].bank == MEMORY_BANK_HOME )
+      memory_map[i] = *memory_map_home[i];
 
   return 0;
 }
@@ -331,29 +325,23 @@ special_memory_map( int which )
 static int
 select_special_map( int page1, int page2, int page3, int page4 )
 {
-  memory_map[0].page = &RAM[ page1 ][0x0000];
-  memory_map[1].page = &RAM[ page1 ][0x2000];
-  memory_map[0].reverse = memory_map[1].reverse = page1;
+  size_t i;
 
-  memory_map[2].page = &RAM[ page2 ][0x0000];
-  memory_map[3].page = &RAM[ page2 ][0x2000];
-  memory_map[2].reverse = memory_map[3].reverse = page2;
+  memory_map_home[0] = &memory_map_ram[ 2 * page1     ];
+  memory_map_home[1] = &memory_map_ram[ 2 * page1 + 1 ];
 
-  memory_map[4].page = &RAM[ page3 ][0x0000];
-  memory_map[5].page = &RAM[ page3 ][0x2000];
-  memory_map[4].reverse = memory_map[5].reverse = page3;
+  memory_map_home[2] = &memory_map_ram[ 2 * page2     ];
+  memory_map_home[3] = &memory_map_ram[ 2 * page2 + 1 ];
 
-  memory_map[6].page = &RAM[ page4 ][0x0000];
-  memory_map[7].page = &RAM[ page4 ][0x2000];
-  memory_map[6].reverse = memory_map[7].reverse = page4;
+  memory_map_home[4] = &memory_map_ram[ 2 * page3     ];
+  memory_map_home[5] = &memory_map_ram[ 2 * page3 + 1 ];
 
-  memory_map[0].writable = memory_map[1].writable = 1;
+  memory_map_home[6] = &memory_map_ram[ 2 * page4     ];
+  memory_map_home[7] = &memory_map_ram[ 2 * page4 + 1 ];
 
-  /* Pages 4, 5, 6 and 7 contended */
-  memory_map[0].contended = memory_map[1].contended = page1 & 0x04;
-  memory_map[2].contended = memory_map[3].contended = page2 & 0x04;
-  memory_map[4].contended = memory_map[5].contended = page3 & 0x04;
-  memory_map[6].contended = memory_map[7].contended = page4 & 0x04;
+  for( i = 0; i < 8; i++ )
+    if( memory_map[i].bank == MEMORY_BANK_HOME )
+      memory_map[i] = *memory_map_home[i];
 
   return 0;
 }
@@ -370,23 +358,6 @@ specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
   screen = ( b & 0x08 ) ? 7 : 5;
   rom = ( machine_current->ram.current_rom & 0x02 ) | ( ( b & 0x10 ) >> 4 );
 
-  /* Change the memory map unless we're in a special RAM configuration */
-
-  if( !machine_current->ram.special ) {
-
-    memory_map[0].page = &ROM[ rom ][0x0000];
-    memory_map[1].page = &ROM[ rom ][0x2000];
-    memory_map[0].reverse = memory_map[1].reverse =
-      MEMORY_PAGE_OFFSET_ROM + rom;
-
-    memory_map[6].page = &RAM[ page ][0x0000];
-    memory_map[7].page = &RAM[ page ][0x2000];
-    memory_map[6].reverse = memory_map[7].reverse = page;
-
-    /* Pages 4, 5, 6 and 7 are contended */
-    memory_map[6].contended = memory_map[7].contended = page & 0x04;
-  }
-
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
   if( memory_current_screen != screen ) {
@@ -394,10 +365,13 @@ specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
     memory_current_screen = screen;
   }
 
-  machine_current->ram.current_page = page;
-  machine_current->ram.current_rom = rom;
-  machine_current->ram.locked = ( b & 0x20 );
+  /* Change the memory map unless we're in a special RAM configuration */
+  if( !machine_current->ram.special ) {
+    spec128_select_rom( rom );
+    spec128_select_page( page );
+  }
 
+  machine_current->ram.locked = b & 0x20;
   machine_current->ram.last_byte = b;
 }
 

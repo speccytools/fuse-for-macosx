@@ -37,8 +37,6 @@ static int specplus3e_reset( void );
 int
 specplus3e_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_PLUS3E;
   machine->id = "plus3e";
 
@@ -47,11 +45,6 @@ specplus3e_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.contend_port	     = specplus3_contend_port;
   machine->ram.contend_delay	     = specplus3_contend_delay;
-
-  error = machine_allocate_roms( machine, 4 );
-  if( error ) return error;
-  machine->rom_length[0] = machine->rom_length[1] = 
-    machine->rom_length[2] = machine->rom_length[3] = 0x4000;
 
   machine->unattached_port = specplus3_unattached_port;
 
@@ -67,17 +60,13 @@ specplus3e_reset( void )
 {
   int error;
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_plus3e_0,
-			    machine_current->rom_length[0] );
+  error = machine_load_rom( 0, settings_current.rom_plus3e_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[1], settings_current.rom_plus3e_1,
-			    machine_current->rom_length[1] );
+  error = machine_load_rom( 2, settings_current.rom_plus3e_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[2], settings_current.rom_plus3e_2,
-			    machine_current->rom_length[2] );
+  error = machine_load_rom( 4, settings_current.rom_plus3e_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[3], settings_current.rom_plus3e_3,
-			    machine_current->rom_length[3] );
+  error = machine_load_rom( 6, settings_current.rom_plus3e_3, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count,

@@ -803,7 +803,6 @@ static int
 update_memory_map( void )
 {
   size_t i;
-  int reverse;
   char buffer[ 40 ];
 
   for( i = 0; i < 8; i++ ) {
@@ -811,20 +810,8 @@ update_memory_map( void )
     snprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
     gtk_label_set_text( GTK_LABEL( map_label[i][0] ), buffer );
 
-    reverse = memory_map[i].reverse;
-
-    if( reverse == -1 ) {
-      snprintf( buffer, 40, "[Undefined]" );
-    } else if( reverse >= MEMORY_PAGE_OFFSET_EXROM ) {
-      snprintf( buffer, 40, "EXROM %d", reverse - MEMORY_PAGE_OFFSET_EXROM );
-    } else if( reverse >= MEMORY_PAGE_OFFSET_DOCK ) {
-      snprintf( buffer, 40, "DOCK %d", reverse - MEMORY_PAGE_OFFSET_DOCK );
-    } else if( reverse >= MEMORY_PAGE_OFFSET_ROM ) {
-      snprintf( buffer, 40, "ROM %d", reverse - MEMORY_PAGE_OFFSET_ROM );
-    } else {
-      snprintf( buffer, 40, "RAM %d", reverse );
-    }
-
+    snprintf( buffer, 40, "%d %d", memory_map[i].bank,
+	      memory_map[i].page_num );
     gtk_label_set_text( GTK_LABEL( map_label[i][1] ), buffer );
 
     gtk_label_set_text( GTK_LABEL( map_label[i][2] ),

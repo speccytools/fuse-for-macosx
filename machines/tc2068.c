@@ -69,6 +69,9 @@ const static periph_t peripherals[] = {
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
+static libspectrum_byte fake_bank[0x2000];
+static memory_page fake_mapping;
+
 static libspectrum_byte
 tc2068_ay_registerport_read( libspectrum_word port, int *attached )
 {
@@ -172,8 +175,6 @@ tc2068_contend_delay( libspectrum_dword time )
 int
 tc2068_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_TC2068;
   machine->id = "2068";
 
@@ -183,10 +184,14 @@ tc2068_init( fuse_machine_info *machine )
   machine->ram.contend_port	     = tc2068_contend_port;
   machine->ram.contend_delay	     = tc2068_contend_delay;
 
-  error = machine_allocate_roms( machine, 2 );
-  if( error ) return error;
-  machine->rom_length[0] = 0x4000;
-  machine->rom_length[1] = 0x2000;
+  memset( fake_bank, 0xff, 0x2000 );
+
+  fake_mapping.page = fake_bank;
+  fake_mapping.writable = 0;
+  fake_mapping.contended = 0;
+  fake_mapping.allocated = 0;
+  fake_mapping.bank = MEMORY_BANK_DOCK;
+  fake_mapping.offset = 0x0000;
 
   machine->unattached_port = tc2068_unattached_port;
 
@@ -198,58 +203,21 @@ tc2068_init( fuse_machine_info *machine )
 static int
 dock_exrom_reset( void )
 {
-  int i;
-  int error;
+  scld_bank_free( memory_map_home );
+  scld_bank_free( memory_map_dock );
+  scld_bank_free( memory_map_exrom );
 
-  scld_home_free();
-  scld_dock_free();
-  scld_exrom_free();
+  memory_map_home[0] = &memory_map_rom[ 0];
+  memory_map_home[1] = &memory_map_rom[ 1];
 
-  memset( timex_fake_bank, 0xff, 0x2000);
+  memory_map_home[2] = &memory_map_ram[10];
+  memory_map_home[3] = &memory_map_ram[11];
 
-  timex_home[0].page = ROM[0];
-  timex_home[1].page = ROM[0] + 0x2000;
-  timex_home[0].reverse = timex_home[1].reverse = MEMORY_PAGE_OFFSET_ROM;
+  memory_map_home[4] = &memory_map_ram[ 4];
+  memory_map_home[5] = &memory_map_ram[ 5];
 
-  timex_home[2].page = RAM[5];
-  timex_home[3].page = RAM[5] + 0x2000;
-  timex_home[2].reverse = timex_home[3].reverse = 5;
-
-  timex_home[4].page = RAM[2];
-  timex_home[5].page = RAM[2] + 0x2000;
-  timex_home[4].reverse = timex_home[5].reverse = 2;
-
-  timex_home[6].page = RAM[0];
-  timex_home[7].page = RAM[0] + 0x2000;
-  timex_home[6].reverse = timex_home[7].reverse = 0;
-
-  for( i = 0 ; i < 8; i++ ) timex_home[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
-
-  timex_home[0].writable = timex_home[1].writable = 0;
-  for( i = 2; i < 8; i++ ) timex_home[i].writable = 1;
-  for( i = 0; i < 8; i++ ) timex_home[i].allocated = 0;
-  for( i = 0; i < 8; i++ ) timex_home[i].contended = 0;
-  timex_home[2].contended = timex_home[3].contended = 1;
-
-  for( i = 0; i < 8; i++ ) {
-
-    timex_dock[i].page = timex_fake_bank;
-    timex_dock[i].writable = 0;
-    timex_dock[i].allocated = 0;
-    timex_dock[i].contended = 0;
-    timex_dock[i].reverse = MEMORY_PAGE_OFFSET_DOCK + i;
-
-    timex_exrom[i].page = ROM[1];
-    timex_exrom[i].writable = 0;
-    timex_exrom[i].allocated = 0;
-    timex_exrom[i].contended = 0;
-    timex_exrom[i].reverse = MEMORY_PAGE_OFFSET_EXROM + i;
-
-  }
-
-  if( settings_current.dck_file ) {
-    error = dck_read( settings_current.dck_file ); if( error ) return error;
-  }
+  memory_map_home[6] = &memory_map_ram[ 0];
+  memory_map_home[7] = &memory_map_ram[ 1];
 
   return 0;
 }
@@ -257,19 +225,35 @@ dock_exrom_reset( void )
 static int
 tc2068_reset( void )
 {
+  size_t i;
   int error;
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_tc2068_0,
-			    machine_current->rom_length[0] );
+  error = dock_exrom_reset(); if( error ) return error;
+
+  error = machine_load_rom( 0, settings_current.rom_tc2068_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[1], settings_current.rom_tc2068_1,
-			    machine_current->rom_length[1] );
+  error = machine_load_rom( 2, settings_current.rom_tc2068_1, 0x2000 );
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count, PERIPH_PRESENT_NEVER );
   if( error ) return error;
 
-  error = dock_exrom_reset(); if( error ) return error;
+  for( i = 0; i < 8; i++ ) {
+
+    timex_dock[i] = fake_mapping;
+    timex_dock[i].page_num = i;
+    memory_map_dock[i] = &timex_dock[i];
+
+    timex_exrom[i] = memory_map_rom[2];
+    timex_exrom[i].allocated = 0;
+    timex_exrom[i].page_num = i;
+    memory_map_exrom[i] = &timex_exrom[i];
+
+  }
+
+  if( settings_current.dck_file ) {
+    error = dck_read( settings_current.dck_file ); if( error ) return error;
+  }
 
   scld_dec_write( 0x00ff, 0x80 );
   scld_dec_write( 0x00ff, 0x00 );

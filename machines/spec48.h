@@ -33,5 +33,6 @@ libspectrum_dword spec48_contend_port( libspectrum_word port );
 libspectrum_byte spec48_contend_delay( libspectrum_dword time );
 
 int spec48_init( fuse_machine_info *machine );
+int spec48_common_reset( void );
 
 #endif			/* #ifndef FUSE_SPEC48_H */

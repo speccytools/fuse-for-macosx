@@ -42,12 +42,8 @@ scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
 libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 
-libspectrum_byte timex_fake_bank[0x2000];
-
-memory_page timex_exrom_dock[8];
 memory_page timex_exrom[8];
 memory_page timex_dock[8];
-memory_page timex_home[8];
 
 libspectrum_byte
 scld_dec_read( libspectrum_word port GCC_UNUSED, int *attached )
@@ -78,20 +74,8 @@ scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   if( old_dec.name.intdisable && !scld_last_dec.name.intdisable )
     z80_interrupt();
 
-  if( scld_last_dec.name.altmembank != old_dec.name.altmembank ) {
-    int i;
-    
-    if( scld_last_dec.name.altmembank ) {
-      for( i = 0; i < 8; i++ ) {
-        timex_exrom_dock[i] = timex_exrom[i];
-      }
-    } else {
-      for( i = 0; i < 8; i++ ) {
-        timex_exrom_dock[i] = timex_dock[i];
-      }
-    }
+  if( scld_last_dec.name.altmembank != old_dec.name.altmembank )
     scld_hsr_write( 0xf4, scld_last_hsr );
-  }
 
   display_parse_attr( hires_get_attr(), &ink, &paper );
   display_set_hires_border( paper );
@@ -107,13 +91,22 @@ void
 scld_hsr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int i;
+  memory_page **exrom_dock;
   
   scld_last_hsr = b;
 
+  exrom_dock =
+    scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
+
   if( libspectrum_machine_capabilities( machine_current->machine ) &
       LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK )
-    for( i = 0; i < 8; i++ )
-      memory_map[i] = ( b & ( 1 << i ) ) ? timex_exrom_dock[i] : timex_home[i];
+    for( i = 0; i < 8; i++ ) {
+      if( b & ( 1 << i ) ) {
+	memory_map[i] = *exrom_dock[i];
+      } else {
+	memory_map[i] = *memory_map_home[i];
+      }
+    }
 
 }
 
@@ -152,43 +145,15 @@ hires_convert_dec( libspectrum_byte attr )
 }
 
 void
-scld_dock_free( void )
+scld_bank_free( memory_page **bank )
 {
   size_t i;
 
   for( i = 0; i < 8; i++ ) {
-    if( timex_dock[i].allocated ) {
-      free( timex_dock[i].page );
-      timex_dock[i].page = 0;
-      timex_dock[i].allocated = 0;
-    }
-  }
-}
-
-void
-scld_exrom_free( void )
-{
-  size_t i;
-
-  for( i = 0; i < 8; i++ ) {
-    if( timex_exrom[i].allocated ) {
-      free( timex_exrom[i].page );
-      timex_exrom[i].page = 0;
-      timex_exrom[i].allocated = 0;
-    }
-  }
-}
-
-void
-scld_home_free( void )
-{
-  size_t i;
-
-  for( i = 0; i < 8; i++ ) {
-    if( timex_home[i].allocated ) {
-      free( timex_home[i].page );
-      timex_home[i].page = 0;
-      timex_home[i].allocated = 0;
+    if( bank[i]->allocated ) {
+      free( bank[i]->page );
+      bank[i]->page = NULL;
+      bank[i]->allocated = 0;
     }
   }
 }

@@ -229,7 +229,10 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
     if( page == -1 ) {
       if( bp->value.address.offset != value ) return 0;
     } else {
-      if( page != memory_map[ value >> 13 ].reverse ) return 0;
+
+      /* FIXME: handle different banks */
+      if( page != memory_map[ value >> 13 ].page_num ) return 0;
+
       if( bp->value.address.offset != ( value & 0x3fff ) ) return 0;
     }
     break;

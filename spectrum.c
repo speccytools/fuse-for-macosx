@@ -43,14 +43,7 @@
 #include "timer.h"
 #include "z80/z80.h"
 
-/* The number of ROMs we have allocated space for; they might not all be
-   in use at the moment */
-size_t spectrum_rom_count = 0;
-
-/* The ROMs themselves */
-libspectrum_byte **ROM = NULL;
-
-/* And the RAM */
+/* 256Kb of RAM */
 libspectrum_byte RAM[16][0x4000];
 
 /* How many tstates have elapsed since the last interrupt? (or more

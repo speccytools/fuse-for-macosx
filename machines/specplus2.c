@@ -40,8 +40,6 @@ static int specplus2_reset( void );
 
 int specplus2_init( fuse_machine_info *machine )
 {
-  int error;
-
   machine->machine = LIBSPECTRUM_MACHINE_PLUS2;
   machine->id = "plus2";
 
@@ -50,10 +48,6 @@ int specplus2_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.contend_port	     = spec128_contend_port;
   machine->ram.contend_delay	     = spec128_contend_delay;
-
-  error = machine_allocate_roms( machine, 2 );
-  if( error ) return error;
-  machine->rom_length[0] = machine->rom_length[1] = 0x4000;
 
   machine->unattached_port = spec128_unattached_port;
 
@@ -68,11 +62,9 @@ specplus2_reset( void )
 {
   int error;
 
-  error = machine_load_rom( &ROM[0], settings_current.rom_plus2_0,
-			    machine_current->rom_length[0] );
+  error = machine_load_rom( 0, settings_current.rom_plus2_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( &ROM[1], settings_current.rom_plus2_1,
-			    machine_current->rom_length[1] );
+  error = machine_load_rom( 2, settings_current.rom_plus2_1, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( spec128_peripherals, spec128_peripherals_count,
