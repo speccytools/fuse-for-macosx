@@ -154,6 +154,9 @@ int trdos_active=0;
 /* The filenames (if any) used for the results of our SCL->TRD conversions */
 static char *scl_files[2] = { NULL, NULL };
 
+/* The file descriptors used mkstemp(3) returned for those temporary files */
+static int scl_fds[2];
+
 /* The template used for naming the results of the SCL->TRD conversion */
 #define SCL_TMP_FILE_TEMPLATE "/tmp/fuse.scl.XXXXXX"
 
@@ -397,12 +400,19 @@ remove_scl( trdos_drive_number which )
   int error = 0;
 
   if( scl_files[ which ] ) {
+
+    if( close( scl_fds[ which ] ) ) {
+      ui_error( UI_ERROR_ERROR, "couldn't close temporary file %s: %s",
+		scl_files[ which ], strerror( errno ) );
+    }
+
     error = unlink( scl_files[ which ] );
     if( error ) {
       ui_error( UI_ERROR_ERROR, "couldn't remove temporary .trd file %s: %s",
 		scl_files[ which ], strerror( errno ) );
     }
     free( scl_files[ which ] ); scl_files[ which ] = 0;
+
   }
 
   return error;
@@ -416,8 +426,8 @@ trdos_disk_insert_scl( trdos_drive_number which, const char *filename )
 
   ret = remove_scl( which ); if( ret ) return ret;
 
-  ret = mkstemp( trd_template );
-  if( ret == -1 ) {
+  scl_fds[ which ] = mkstemp( trd_template );
+  if( scl_fds[ which ] == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't get a temporary filename: %s",
 	      strerror( errno ) );
     return ret;
@@ -426,6 +436,7 @@ trdos_disk_insert_scl( trdos_drive_number which, const char *filename )
   scl_files[ which ] = malloc( strlen( trd_template ) + 1 );
   if( !scl_files[ which ] ) {
     unlink( trd_template );
+    close( scl_fds[ which ] );
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
@@ -825,8 +836,6 @@ Scl2Trd( const char *oldname, const char *newname )
 
   FILE *fh;
   BYTE *mem;
-
-  unlink( newname );
 
   fh = fopen( newname, "w" );
   if( fh ) {
