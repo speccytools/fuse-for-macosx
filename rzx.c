@@ -153,6 +153,8 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   /* Note that we're recording */
   rzx_recording = 1;
 
+  ui_menu_activate_recording( 1 );
+
   if( settings_current.competition_mode ) {
 
     expected_time = 0;
@@ -171,8 +173,6 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
     
   }
     
-  ui_menu_activate_recording( 1 );
-
   return 0;
 }
 
