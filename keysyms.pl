@@ -79,8 +79,8 @@ sub ggi_keysym ($) {
 
     my $keysym = shift;
 
-    # GGI keysyms start with a capitial letter
-    $keysym = ucfirst $keysym;
+    # GGI 'long name' keysyms start with a capitial letter
+    $keysym = ucfirst $keysym if length $keysym > 1;
 
     # and have no underscores
     $keysym =~ s/_//g;
@@ -307,6 +307,11 @@ foreach( @keys ) {
 
 	printf "  { %-$ui_data{$ui}{max_length}s KEYBOARD_%-9s KEYBOARD_%-6s },\n",
             "$keysym,", "$key1,", $key2;
+
+	if( $ui eq 'ggi' and $keysym =~ /GIIUC_[a-z]/ ) {
+	    printf "  { %-$ui_data{$ui}{max_length}s KEYBOARD_%-9s KEYBOARD_%-6s },\n",
+	    uc $keysym . ",", "$key1,", $key2;
+	}
 
     }
 
