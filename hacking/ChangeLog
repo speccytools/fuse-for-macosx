@@ -392,3 +392,5 @@
 20031216 ui/svga/svgajoystick.c: remove use of BYTE, WORD (Witold).
 20031226 ui/gtk/debugger.c: use a smaller monospaced font under GTK 2.
 20031227 Add reverse page mappings to the memory_page structure.
+20031227 display.c, memory.c: make writes to the screen work when the
+	 screen is paged in other than at 0x4000.

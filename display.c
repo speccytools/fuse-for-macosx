@@ -518,71 +518,71 @@ end_line( int y )
   return 0;
 }
 
-/* Mark as `dirty' the pixels which have been changed by a write to byte
-   `address'; 0x4000 <= `address' */
+/* Mark as 'dirty' the pixels which have been changed by a write to
+   'offset' within the RAM page containing the screen */
 void
-display_dirty( libspectrum_word address )
+display_dirty( libspectrum_word offset )
 {
   switch ( scld_last_dec.mask.scrnmode ) {
+
     case STANDARD: /* standard Speccy screen */
     case HIRESATTR: /* strange mode */
-      if(address>=0x5b00)
-        return;
-      if(address<0x5800) {		/* 0x5800 = first attributes byte */
-        display_dirty8(address);
+      if( offset >= 0x1b00 ) break;
+      if( offset <  0x1800 ) {		/* 0x1800 = first attributes byte */
+        display_dirty8( offset );
       } else {
-        display_dirty64(address);
+        display_dirty64( offset );
       }
       break;
 
     case ALTDFILE: /* second screen */
     case HIRESATTRALTD: /* strange mode using second screen */      
-      if( address < 0x6000 || address >= 0x7b00 )
-        return;
-      if( address < 0x7800 ) {		/* 0x7800 = first attributes byte */
-        display_dirty8(address-ALTDFILE_OFFSET);
+      if( offset < 0x2000 || offset >= 0x3b00 ) break;
+      if( offset < 0x3800 ) {		/* 0x3800 = first attributes byte */
+        display_dirty8( offset - ALTDFILE_OFFSET );
       } else {
-        display_dirty64(address-ALTDFILE_OFFSET);
+        display_dirty64( offset - ALTDFILE_OFFSET );
       }
       break;
 
     case EXTCOLOUR: /* extended colours */
-    case HIRES: /* hires mode */     
-      if((address>=0x7800) || ((address>=0x5800) && (address<0x6000)))
-        return;
-      if(address>=0x6000) address-=ALTDFILE_OFFSET;
-      display_dirty8(address);
+    case HIRES: /* hires mode */
+      if( offset >= 0x3800 ) break;
+      if( offset >= 0x1800 && offset < 0x2000 ) break;
+      if( offset >= 0x2000 ) offset -= ALTDFILE_OFFSET;
+      display_dirty8( offset );
       break;
 
     default:
-    /* case EXTCOLALTD: extended colours, but attributes and data taken from second screen */
-    /* case HIRESDOUBLECOL: hires mode, but data taken only from second screen */
-      if( address >= 0x6000 && address < 0x7800 ) {		/* 0x7800 = first attributes byte */
-        display_dirty8(address-ALTDFILE_OFFSET);
-      }
+    /* case EXTCOLALTD: extended colours, but attributes and data
+       taken from second screen */
+    /* case HIRESDOUBLECOL: hires mode, but data taken only from
+       second screen */
+      if( offset >= 0x2000 && offset < 0x3800 )
+	display_dirty8( offset - ALTDFILE_OFFSET );
       break;
   }
 }
 
 static void
-display_dirty8( libspectrum_word address )
+display_dirty8( libspectrum_word offset )
 {
   int x, y;
 
-  x=display_dirty_xtable[address-0x4000];
-  y=display_dirty_ytable[address-0x4000];
+  x=display_dirty_xtable[ offset ];
+  y=display_dirty_ytable[ offset ];
 
   display_is_dirty[y] |= ( (libspectrum_qword)1 << x );
   
 }
 
 static void
-display_dirty64( libspectrum_word address )
+display_dirty64( libspectrum_word offset )
 {
   int i, x, y;
 
-  x=display_dirty_xtable2[address-0x5800];
-  y=display_dirty_ytable2[address-0x5800];
+  x=display_dirty_xtable2[ offset - 0x1800 ];
+  y=display_dirty_ytable2[ offset - 0x1800 ];
 
   for( i=0; i<8; i++ ) display_is_dirty[y+i] |= ( (libspectrum_qword)1 << x );
 }
@@ -904,20 +904,17 @@ static void display_dirty_flashing(void)
     if ( scld_last_dec.name.b1 ) {
       for(offset=ALTDFILE_OFFSET;offset<0x3800;offset++) {
         attr=read_screen_memory(offset);
-        if( attr & 0x80 )
-          display_dirty8(offset+ALTDFILE_OFFSET);
+        if( attr & 0x80 ) display_dirty8( offset - ALTDFILE_OFFSET );
       }
     } else if ( scld_last_dec.name.altdfile ) {
       for(offset=0x3800;offset<0x3b00;offset++) {
         attr=read_screen_memory(offset);
-        if( attr & 0x80 )
-          display_dirty64(offset+ALTDFILE_OFFSET);
+        if( attr & 0x80 ) display_dirty64( offset - ALTDFILE_OFFSET );
       }
     } else { /* Standard Speccy screen */
       for(offset=0x1800;offset<0x1b00;offset++) {
         attr=read_screen_memory(offset);
-        if( attr & 0x80 )
-          display_dirty64(offset+0x4000);
+        if( attr & 0x80 ) display_dirty64( offset );
       }
     }
   }

@@ -89,7 +89,7 @@ writebyte( libspectrum_word address, libspectrum_byte b )
     if( mapping->reverse == memory_current_screen &&
 	( offset2 & memory_screen_mask ) < 0x1b00 &&
 	memory[ offset ] != b )
-      display_dirty( address );
+      display_dirty( offset2 );
 
     memory[ offset ] = b;
   }
@@ -116,7 +116,7 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
     if( mapping->reverse == memory_current_screen &&
 	( offset2 & memory_screen_mask ) < 0x1b00 &&
 	memory[ offset ] != b )
-      display_dirty( address );
+      display_dirty( offset2 );
 
     memory[ offset ] = b;
   }
