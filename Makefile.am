@@ -38,9 +38,22 @@ SUBDIRS = compat \
 	  @WIDGET@ \
 	  z80
 
+DIST_SUBDIRS = compat \
+	       debugger \
+	       hacking \
+	       lib \
+	       man \
+	       perl \
+	       pokefinder \
+	       roms \
+	       ui \
+	       widget \
+	       z80
+
 fuse_SOURCES = ay.c \
 	dck.c \
 	display.c \
+	dxsound.c \
 	event.c \
 	fuse.c keyboard.c machine.c memory.c \
 	osssound.c \
@@ -103,6 +116,7 @@ noinst_HEADERS = ay.h \
 	compat.h \
 	dck.h \
 	display.h \
+	dxsound.h \
 	event.h \
 	fuse.h keyboard.h keysyms.h\
 	machine.h \
