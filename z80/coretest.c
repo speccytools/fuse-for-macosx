@@ -332,6 +332,14 @@ memory_page *memory_map_home[8];
 memory_page memory_map_rom[8];
 int memory_contended[8] = { 1 };
 libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
+int profile_active = 0;
+
+void
+profile_map( libspectrum_word pc )
+{
+  /* Should never be called */
+  abort();
+}
 
 int
 debugger_check( debugger_breakpoint_type type, libspectrum_dword value )

@@ -34,6 +34,7 @@
 #include "if1.h"
 #include "if2.h"
 #include "menu.h"
+#include "profile.h"
 #include "psg.h"
 #include "rzx.h"
 #include "simpleide.h"
@@ -261,6 +262,18 @@ MENU_CALLBACK( menu_options_save )
   settings_write_config( &settings_current );
 }
 #endif				/* #ifdef HAVE_LIB_XML2 */
+
+MENU_CALLBACK( menu_machine_profiler_start )
+{
+  WIDGET_END;
+  profile_start();
+}
+
+MENU_CALLBACK( menu_machine_profiler_end )
+{
+  WIDGET_END;
+  profile_finish( "profile.map" );
+}
 
 MENU_CALLBACK( menu_machine_nmi )
 {

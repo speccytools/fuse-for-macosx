@@ -113,6 +113,10 @@ Machine/P_oke Finder..., Item
 Machine/_Memory Browser..., Item
 #endif
 
+Machine/Pro_filer, Branch
+Machine/Profiler/_Start, Item
+Machine/Profiler/_End, Item
+
 Machine/_NMI, Item
 
 M_edia, Branch

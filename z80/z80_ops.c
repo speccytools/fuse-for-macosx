@@ -33,6 +33,7 @@
 #include "machine.h"
 #include "memory.h"
 #include "periph.h"
+#include "profile.h"
 #include "rzx.h"
 #include "if1.h"
 #include "settings.h"
@@ -104,25 +105,33 @@ z80_do_opcodes( void )
 #ifdef __GNUC__
 
   next = 0;
-  SETUP_CHECK( rzx, rzx_playback, 0 );
-  SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 1 );
-  SETUP_CHECK( trdos, trdos_available, 2 );
-  SETUP_CHECK( if1p, if1_available, 3 );
-  if( next != 4 ) { cgoto[ next ] = &&opcode_delay; }
+  SETUP_CHECK( profile, profile_active, 0 );
+  SETUP_CHECK( rzx, rzx_playback, 1 );
+  SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 );
+  SETUP_CHECK( trdos, trdos_available, 3 );
+  SETUP_CHECK( if1p, if1_available, 4 );
+  if( next != 5 ) { cgoto[ next ] = &&opcode_delay; }
 
-  next = 4;
-  SETUP_CHECK( evenm1, even_m1, 4 );
-  if( next != 5 ) { cgoto[ next ] = &&run_opcode; }
   next = 5;
-  SETUP_CHECK( if1u, if1_available, 5 );
-  if( next != 6 ) { cgoto[ next ] = &&end_opcode; }
+  SETUP_CHECK( evenm1, even_m1, 5 );
+  if( next != 6 ) { cgoto[ next ] = &&run_opcode; }
+  next = 6;
+  SETUP_CHECK( if1u, if1_available, 6 );
+  if( next != 7 ) { cgoto[ next ] = &&end_opcode; }
 
 #endif				/* #ifdef __GNUC__ */
 
   while( tstates < event_next_event ) {
 
+    /* Profiler */
+    CHECK( profile, profile_active, 0 )
+
+    profile_map( PC );
+
+    END_CHECK
+
     /* If we're due an end of frame from RZX playback, generate one */
-    CHECK( rzx, rzx_playback, 0 )
+    CHECK( rzx, rzx_playback, 1 )
 
     if( R + rzx_instructions_offset >= rzx_instruction_count ) {
       event_add( tstates, EVENT_TYPE_FRAME );
@@ -133,14 +142,14 @@ z80_do_opcodes( void )
     END_CHECK
 
     /* Check if the debugger should become active at this point */
-    CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 1 )
+    CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 )
 
     if( debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
       debugger_trap();
 
     END_CHECK
 
-    CHECK( trdos, trdos_available, 2 )
+    CHECK( trdos, trdos_available, 3 )
 
     if( trdos_active ) {
       if( machine_current->ram.current_rom &&
@@ -154,7 +163,7 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( if1p, if1_available, 3 )
+    CHECK( if1p, if1_available, 4 )
 
     if( PC == 0x0008 || PC == 0x1708 ) {
       if1_page();
@@ -167,7 +176,7 @@ z80_do_opcodes( void )
     contend_read( PC, 4 );
 
     /* Check to see if M1 cycles happen on even tstates */
-    CHECK( evenm1, even_m1, 4 )
+    CHECK( evenm1, even_m1, 5 )
 
     if( tstates & 1 ) tstates++;
 
@@ -178,7 +187,7 @@ z80_do_opcodes( void )
        triggering read breakpoints */
     opcode = readbyte_internal( PC );
 
-    CHECK( if1u, if1_available, 5 )
+    CHECK( if1u, if1_available, 6 )
 
     if( PC == 0x0700 ) {
       if1_unpage();

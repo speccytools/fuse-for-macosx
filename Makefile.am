@@ -70,6 +70,7 @@ fuse_SOURCES = ay.c \
 	menu.c \
 	periph.c \
 	printer.c \
+	profile.c \
 	psg.c \
 	rzx.c \
 	scld.c \
@@ -154,6 +155,7 @@ noinst_HEADERS = ay.h \
 	utils.h \
 	joystick.h \
 	printer.h \
+	profile.h \
 	scld.h \
 	ula.h \
 	zxatasp.h \

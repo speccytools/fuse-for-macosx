@@ -1209,3 +1209,6 @@
          putenv for Windows compatibility (Fred).
 20050212 ui/gtk/{gtkinternals.h,pixmaps.c,statusbar.c}: add mouse icon
 	 (Darren).
+20050216 Makefile.am,menu.[ch],menu_data.c,profile.[ch],z80/{coretest.c,
+	 z80_ops.c}: add very simple profiler; just records which
+	 locations where executed at the moment.
