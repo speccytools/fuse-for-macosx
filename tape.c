@@ -34,9 +34,10 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include <libspectrum.h>
+
 #include "event.h"
 #include "fuse.h"
-#include "libspectrum/tape.h"
 #include "machine.h"
 #include "settings.h"
 #include "sound.h"

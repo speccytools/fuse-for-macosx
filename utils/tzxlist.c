@@ -34,7 +34,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <libspectrum/tape.h>
+#include <libspectrum.h>
 
 #define DESCRIPTION_LENGTH 80
 

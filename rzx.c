@@ -33,12 +33,12 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#include <libspectrum.h>
+
 #include "event.h"
 #include "fuse.h"
 #include "keyboard.h"
 #include "machine.h"
-#include "libspectrum/libspectrum.h"
-#include "libspectrum/rzx.h"
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"

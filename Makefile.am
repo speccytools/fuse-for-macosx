@@ -40,9 +40,9 @@ keysyms.c: keysyms.pl perl/Fuse.pm keysyms.dat
 	@PERL@ keysyms.pl keysyms.dat > keysyms.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ myglib/libmyglib.a -lspectrum\
+LDADD = @GLIB_LIBS@ @GTK_LIBS@ myglib/libmyglib.a\
 ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/svga/libuisvga.a\
-ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@ @ZLIB_LIBS@
+ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\

@@ -52,6 +52,14 @@ AC_CHECK_SIZEOF(short, 2)
 AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_SIZEOF(long, 4)
 
+dnl Check that libspectrum is available
+AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS=-lspectrum,
+	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
+AC_SUBST(LIBSPEC_LIBS)
+
+dnl Check that zlib is available
+AC_CHECK_LIB(z,zlibVersion)
+
 dnl Select a user interface
 
 dnl Try various UI options; set the `ui' variable when we've got one
@@ -154,10 +162,6 @@ if test "$ui" != gtk; then
 	         AC_MSG_WARN(glib not found - using internal replacement))
   fi
 fi
-
-dnl Check for zlib
-AC_CHECK_HEADERS(zlib.h, ZLIB_LIBS=-lz)
-AC_SUBST(ZLIB_LIBS)
 
 dnl Do we want +3 disk support?
 AC_MSG_CHECKING(whether +3 disk support requested)

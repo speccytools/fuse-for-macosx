@@ -34,9 +34,10 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include <libspectrum.h>
+
 #include "display.h"
 #include "fuse.h"
-#include "libspectrum/libspectrum.h"
 #include "machine.h"
 #include "sound.h"
 #include "snapshot.h"

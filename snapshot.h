@@ -1,4 +1,4 @@
-/* snapshot.h: snapshot handling routines
+#/* snapshot.h: snapshot handling routines
    Copyright (c) 1999,2001-2002 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
@@ -25,8 +25,8 @@
 #ifndef FUSE_SNAPSHOT_H
 #define FUSE_SNAPSHOT_H
 
-#ifndef FUSE_LIBSPECTRUM_H
-#include "libspectrum/libspectrum.h"
+#ifndef LIBSPECTRUM_LIBSPECTRUM_H
+#include <libspectrum.h>
 #endif
 
 int snapshot_read( const char *filename );

@@ -35,8 +35,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "../libspectrum/libspectrum.h"
-#include "../libspectrum/rzx.h"
+#include <libspectrum.h>
 
 struct options {
 
