@@ -190,8 +190,9 @@ poll_joystick( int which )
 {
   js_data_struct *joystick;
   double position;
-  int fire;
+  int fire, buttons;
   input_event_t event;
+  size_t i;
 
   joystick = &jsd[which];
 
@@ -203,12 +204,22 @@ poll_joystick( int which )
   position = JSGetAxisCoeffNZ( joystick, 1 );
   do_axis( which, position, INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
 
-  fire = JSGetButtonState( joystick, 0 );
-
-  event.type = fire == JSButtonStateOn ? INPUT_EVENT_JOYSTICK_PRESS :
-                                         INPUT_EVENT_JOYSTICK_RELEASE;
   event.types.joystick.which = which;
-  event.types.joystick.button = INPUT_JOYSTICK_FIRE;
+
+  buttons = joystick->total_buttons;
+  if( buttons > 10 ) buttons = 10;	/* We support 'only' 10 fire buttons */
+
+  for( i = 0; i < buttons; i++ ) {
+
+    fire = JSGetButtonState( joystick, i );
+    if( fire == JSButtonStateOn ) {
+      event.type = INPUT_EVENT_JOYSTICK_PRESS;
+    } else {
+      event.type = INPUT_EVENT_JOYSTICK_RELEASE;
+    }
+
+    event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + i;
+  }
 
   input_event( &event );
 }

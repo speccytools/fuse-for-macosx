@@ -940,3 +940,6 @@
 20040618 joystick.c,widget/menu.c: don't set joystick type to an invalid
 	 value if the widget joystick selector cancelled.
 20040618 ui/svga/svgakeyboard.c: update for the new input layer scheme.
+20040618 input.[ch],ui/uijoystick.c,ui/sdl/sdljoystick.c: allow the libjsw
+	 and SDL joystick codes to pass more than one fire button through
+	 to the input layer.

@@ -100,28 +100,32 @@ ui_joystick_poll( void )
      system */
 }
 
-void
-sdljoystick_buttonpress( SDL_JoyButtonEvent *buttonevent )
+static void
+button_action( SDL_JoyButtonEvent *buttonevent, input_event_type type )
 {
+  int button;
   input_event_t event;
+  
+  button = buttonevent->button;
+  if( button > 10 ) return;	/* We support 'only' 10 fire buttons */
 
-  event.type = INPUT_EVENT_JOYSTICK_PRESS;
+  event.type = type;
   event.types.joystick.which = buttonevent->which;
-  event.types.joystick.button = INPUT_JOYSTICK_FIRE;
+  event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + button;
 
   input_event( &event );
 }
 
 void
+sdljoystick_buttonpress( SDL_JoyButtonEvent *buttonevent )
+{
+  button_action( buttonevent, INPUT_EVENT_JOYSTICK_PRESS );
+}
+
+void
 sdljoystick_buttonrelease( SDL_JoyButtonEvent *buttonevent )
 {
-  input_event_t event;
-
-  event.type = INPUT_EVENT_JOYSTICK_RELEASE;
-  event.types.joystick.which = buttonevent->which;
-  event.types.joystick.button = INPUT_JOYSTICK_FIRE;
-
-  input_event( &event );
+  button_action( buttonevent, INPUT_EVENT_JOYSTICK_RELEASE );
 }
 
 void

@@ -214,14 +214,32 @@ get_fire_button_key( int which, input_joystick_button button )
 
   case 0:
     switch( button ) {
-    case INPUT_JOYSTICK_FIRE: return settings_current.joystick_1_fire_1;
+    case INPUT_JOYSTICK_FIRE_1 : return settings_current.joystick_1_fire_1;
+    case INPUT_JOYSTICK_FIRE_2 : return settings_current.joystick_1_fire_2;
+    case INPUT_JOYSTICK_FIRE_3 : return settings_current.joystick_1_fire_3;
+    case INPUT_JOYSTICK_FIRE_4 : return settings_current.joystick_1_fire_4;
+    case INPUT_JOYSTICK_FIRE_5 : return settings_current.joystick_1_fire_5;
+    case INPUT_JOYSTICK_FIRE_6 : return settings_current.joystick_1_fire_6;
+    case INPUT_JOYSTICK_FIRE_7 : return settings_current.joystick_1_fire_7;
+    case INPUT_JOYSTICK_FIRE_8 : return settings_current.joystick_1_fire_8;
+    case INPUT_JOYSTICK_FIRE_9 : return settings_current.joystick_1_fire_9;
+    case INPUT_JOYSTICK_FIRE_10: return settings_current.joystick_1_fire_10;
     default: break;
     }
     break;
 
   case 1:
     switch( button ) {
-    case INPUT_JOYSTICK_FIRE: return settings_current.joystick_2_fire_1;
+    case INPUT_JOYSTICK_FIRE_1 : return settings_current.joystick_2_fire_1;
+    case INPUT_JOYSTICK_FIRE_2 : return settings_current.joystick_2_fire_2;
+    case INPUT_JOYSTICK_FIRE_3 : return settings_current.joystick_2_fire_3;
+    case INPUT_JOYSTICK_FIRE_4 : return settings_current.joystick_2_fire_4;
+    case INPUT_JOYSTICK_FIRE_5 : return settings_current.joystick_2_fire_5;
+    case INPUT_JOYSTICK_FIRE_6 : return settings_current.joystick_2_fire_6;
+    case INPUT_JOYSTICK_FIRE_7 : return settings_current.joystick_2_fire_7;
+    case INPUT_JOYSTICK_FIRE_8 : return settings_current.joystick_2_fire_8;
+    case INPUT_JOYSTICK_FIRE_9 : return settings_current.joystick_2_fire_9;
+    case INPUT_JOYSTICK_FIRE_10: return settings_current.joystick_2_fire_10;
     default: break;
     }
     break;
@@ -240,7 +258,7 @@ do_joystick( const input_event_joystick_t *joystick_event, int press )
 
   which = joystick_event->which;
 
-  if( joystick_event->button < INPUT_JOYSTICK_FIRE ) {
+  if( joystick_event->button < INPUT_JOYSTICK_FIRE_1 ) {
 
     joystick_button button;
 
