@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,13 +36,15 @@
 #include "z80.h"
 #include "z80_macros.h"
 
+static const char *progname;		/* argv[0] */
+
 static int init_dummies( void );
 
 DWORD tstates;
 DWORD event_next_event;
 
 /* 64Kb of RAM */
-BYTE initial_memory[ 0x10000 ], memory[ 0x10000 ];
+static BYTE initial_memory[ 0x10000 ], memory[ 0x10000 ];
 
 spectrum_memory_read_function readbyte, readbyte_internal;
 spectrum_memory_write_function writebyte;
@@ -54,13 +57,22 @@ static void trivial_writebyte( WORD address, BYTE b );
 static DWORD trivial_contend_memory( WORD address );
 static DWORD trivial_contend_port( WORD port );
 
-void dump_z80_state( void );
-void dump_memory_state( void );
+static int read_test_file( const char *filename, DWORD *end_tstates );
+
+static void dump_z80_state( void );
+static void dump_memory_state( void );
 
 int
-main( void )
+main( int argc, char **argv )
 {
   size_t i;
+
+  progname = argv[0];
+
+  if( argc < 2 ) {
+    fprintf( stderr, "Usage: %s <testfile>\n", progname );
+    return 1;
+  }
 
   if( init_dummies() ) return 1;
 
@@ -73,19 +85,18 @@ main( void )
   contend_memory = trivial_contend_memory;
   contend_port = trivial_contend_port;
 
-  /* Run one trivial test */
+  /* Get ourselves into a known state */
   z80_reset();
   for( i = 0; i < 0x10000; i += 4 ) {
-    initial_memory[ i     ] = 0xde;
-    initial_memory[ i + 1 ] = 0xad;
-    initial_memory[ i + 2 ] = 0xbe;
-    initial_memory[ i + 3 ] = 0xef;
+    memory[ i     ] = 0xde; memory[ i + 1 ] = 0xad;
+    memory[ i + 2 ] = 0xbe; memory[ i + 3 ] = 0xef;
   }
-  initial_memory[ 0x0000 ] = 0x00;
 
-  memcpy( memory, initial_memory, 0x10000 );
+  if( read_test_file( argv[1], &event_next_event ) ) return 1;
 
-  tstates = 0; event_next_event = 1;
+  /* Grab a copy of the memory for comparision at the end */
+  memcpy( initial_memory, memory, 0x10000 );
+
   z80_do_opcodes();
 
   /* And dump our final state */
@@ -138,7 +149,89 @@ writeport( WORD port, BYTE b )
   printf( "%5d PW %04x %02x\n", tstates, port, b );
 }
 
-void
+static int
+read_test_file( const char *filename, DWORD *end_tstates )
+{
+  FILE *f;
+
+  unsigned af, bc, de, hl, af_, bc_, de_, hl_, ix, iy, sp, pc;
+  unsigned i, r, iff1, iff2, im;
+  unsigned start_tstates, end_tstates2;
+  unsigned address;
+
+  f = fopen( filename, "r" );
+  if( !f ) {
+    fprintf( stderr, "%s: couldn't open `%s': %s\n", progname, filename,
+	     strerror( errno ) );
+    return 1;
+  }
+
+  /* FIXME: how should we read/write our data types? */
+  if( fscanf( f, "%x %x %x %x %x %x %x %x %x %x %x %x", &af, &bc,
+	      &de, &hl, &af_, &bc_, &de_, &hl_, &ix, &iy, &sp, &pc ) != 12 ) {
+    fprintf( stderr, "%s: first registers line in `%s' corrupt\n", progname,
+	     filename );
+    fclose( f );
+    return 1;
+  }
+
+  AF  = af;  BC  = bc;  DE  = de;  HL  = hl;
+  AF_ = af_; BC_ = bc_; DE_ = de_; HL_ = hl_;
+  IX  = ix;  IY  = iy;  SP  = sp;  PC  = pc;
+
+  if( fscanf( f, "%x %x %u %u %u %d %d %d", &i, &r, &iff1, &iff2, &im,
+	      &z80.halted, &start_tstates, &end_tstates2 ) != 8 ) {
+    fprintf( stderr, "%s: second registers line in `%s' corrupt\n", progname,
+	     filename );
+    fclose( f );
+    return 1;
+  }
+
+  I = i; R = R7 = r; IFF1 = iff1; IFF2 = iff2; IM = im;
+  tstates = start_tstates; *end_tstates = end_tstates2;
+
+  while( 1 ) {
+
+    if( fscanf( f, "%x", &address ) != 1 ) {
+
+      if( feof( f ) ) break;
+
+      fprintf( stderr, "%s: no address found in `%s'\n", progname, filename );
+      fclose( f );
+      return 1;
+    }
+
+    while( 1 ) {
+
+      unsigned byte;
+
+      if( fscanf( f, "%x", &byte ) != 1 ) {
+
+	if( feof( f ) ) break;
+
+	fprintf( stderr, "%s: no data byte found in `%s'\n", progname,
+		 filename );
+	fclose( f );
+	return 1;
+      }
+    
+      if( byte < 0 || byte > 255 ) break;
+
+      memory[ address++ ] = byte;
+
+    }
+  }
+
+  if( fclose( f ) ) {
+    fprintf( stderr, "%s: couldn't close `%s': %s\n", progname, filename,
+	     strerror( errno ) );
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
 dump_z80_state( void )
 {
   printf( "%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
@@ -147,7 +240,7 @@ dump_z80_state( void )
 	  IFF1, IFF2, IM, z80.halted, tstates );
 }
 
-void
+static void
 dump_memory_state( void )
 {
   size_t i;

@@ -62,3 +62,14 @@ EXTRA_DIST = opcodes_base.dat \
 noinst_PROGRAMS = coretest
 
 coretest_SOURCES = coretest.c z80.c z80_ops.c
+
+test: coretest
+	for input in tests/*.in; do \
+	  output=`echo $$input | sed -e 's/.in$$//'`.out; \
+	  ./coretest $$input > coretest.out; \
+	  if cmp -s coretest.out $$output; then \
+	    /bin/true; \
+	  else \
+	    echo "$$input failed"; \
+	  fi \
+	done
