@@ -57,6 +57,9 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *registers[16],			/* The register display */
   *disassembly;				/* The disassembly */
 
+/* The top line of the current disassembly */
+static WORD disassembly_top;
+
 /* Have we created the above yet? */
 static int dialog_created = 0;
 
@@ -214,6 +217,7 @@ activate_debugger( void )
 {
   debugger_active = 1;
 
+  disassembly_top = PC;
   ui_debugger_update();
 
   gtk_main();
@@ -252,7 +256,7 @@ ui_debugger_update( void )
   gtk_clist_freeze( GTK_CLIST( disassembly ) );
   gtk_clist_clear( GTK_CLIST( disassembly ) );
 
-  for( i = 0, address = PC; i < 20; i++ ) {
+  for( i = 0, address = disassembly_top; i < 20; i++ ) {
 
     size_t length;
 
@@ -274,6 +278,13 @@ deactivate_debugger( void )
   debugger_active = 0;
   fuse_emulation_unpause();
   return 0;
+}
+
+/* Set the disassembly to start at 'address' */
+int
+ui_debugger_disassemble( WORD address )
+{
+  disassembly_top = address;
 }
 
 /* Evaluate the command currently in the entry box */

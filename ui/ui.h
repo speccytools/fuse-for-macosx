@@ -55,10 +55,11 @@ int ui_verror( ui_error_level severity, const char *format, va_list ap )
      GCC_PRINTF( 2, 0 );
 int ui_end(void);
 
-/* Start and stop the debugger related UI functions */
+/* Callbacks used by the debugger */
 int ui_debugger_activate( void );
 int ui_debugger_deactivate( int interruptable );
 int ui_debugger_update( void );
+int ui_debugger_disassemble( WORD address );
 
 /* Functions defined in ../ui.c */
 int ui_error( ui_error_level severity, const char *format, ... )

@@ -33,6 +33,7 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
+#include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
@@ -53,6 +54,7 @@ void yyerror( char *s );
 %token		 BREAK
 %token		 CLEAR
 %token		 CONTINUE
+%token		 DISASSEMBLE
 %token		 EXIT
 %token		 NEXT
 %token		 PORT
@@ -118,6 +120,7 @@ command:   BREAK    { debugger_breakpoint_add(
 				);
 			      }
 	 | CONTINUE { debugger_run(); }
+	 | DISASSEMBLE NUMBER { ui_debugger_disassemble( $2 ); }
 	 | EXIT	    { debugger_breakpoint_exit(); }
 	 | NEXT	    { debugger_next(); }
 	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }

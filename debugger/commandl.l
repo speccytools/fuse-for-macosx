@@ -52,6 +52,8 @@ HEX	[0-9a-f]
 br|bre|brea|break { return BREAK; }
 co|con|cont|contin|continu|continue { return CONTINUE; }
 cl|cle|clea|clear { return CLEAR; }
+di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
+	                                                  return DISASSEMBLE; }
 ex|exi|exit { return EXIT; }
 n|ne|nex|next { return NEXT; }
 p|po|por|port { return PORT; }
