@@ -142,9 +142,9 @@ static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
 static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
-static void disk_open( GtkWidget *widget, gpointer data );
+static void disk_open( gpointer data, guint action, GtkWidget *widget );
 static void gtkui_disk_open( specplus3_drive_number drive );
-static void disk_eject( GtkWidget *widget, gpointer data );
+static void disk_eject( gpointer data, guint action, GtkWidget *widget );
 
 static void cartridge_insert( GtkWidget *widget, gpointer data );
 static void cartridge_eject( GtkWidget *widget, gpointer data );
@@ -214,19 +214,13 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 
   { "/Media/_Disk",		NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Disk/Drive A:",	NULL , NULL,		    0, "<Branch>"    },
-  { "/Media/Disk/Drive A:/_Insert...",
-			        NULL , disk_open,   0, GUINT_TO_POINTER( 0 ) },
-  { "/Media/Disk/Drive A:/_Eject",
-			        NULL , disk_eject,  0, GUINT_TO_POINTER( 0 ) },
-  { "/Media/Disk/Drive A:/Eject and _write...",
-		                NULL,  disk_eject,  0, GUINT_TO_POINTER( 2 ) },
+  { "/Media/Disk/Drive A:/_Insert...", NULL, disk_open,     1, NULL          },
+  { "/Media/Disk/Drive A:/_Eject", NULL, disk_eject,        1, NULL          },
+  { "/Media/Disk/Drive A:/Eject and _write...", NULL, disk_eject, 3, NULL    },
   { "/Media/Disk/Drive B:",	NULL , NULL,		    0, "<Branch>"    },
-  { "/Media/Disk/Drive B:/_Insert...",
-			        NULL , disk_open,   0, GUINT_TO_POINTER( 1 ) },
-  { "/Media/Disk/Drive B:/_Eject",
-			        NULL , disk_eject,  0, GUINT_TO_POINTER( 1 ) },
-  { "/Media/Disk/Drive B:/Eject and _write...",
-		                NULL , disk_eject , 0, GUINT_TO_POINTER( 3 ) },
+  { "/Media/Disk/Drive B:/_Insert...", NULL, disk_open,     2, NULL          },
+  { "/Media/Disk/Drive B:/_Eject", NULL, disk_eject,        2, NULL          },
+  { "/Media/Disk/Drive B:/Eject and _write...", NULL, disk_eject, 4, NULL    },
 
   { "/Media/_Cartridge",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Cartridge/_Insert...",
@@ -1020,11 +1014,12 @@ ui_tape_write( void )
 
 /* Called by the menu when Disk/Drive ?:/Open selected */
 static void
-disk_open( GtkWidget *widget GCC_UNUSED, gpointer data )
+disk_open( gpointer data GCC_UNUSED, guint action,
+	   GtkWidget *widget GCC_UNUSED )
 {
   guint which;
 
-  which = GPOINTER_TO_UINT( data );
+  which = action - 1;
 
   gtkui_disk_open( which );
 }
@@ -1053,11 +1048,12 @@ static void gtkui_disk_open( specplus3_drive_number drive )
 }
 
 static void
-disk_eject( GtkWidget *widget GCC_UNUSED, gpointer data )
+disk_eject( gpointer data GCC_UNUSED, guint action,
+	    GtkWidget *widget GCC_UNUSED )
 {
   guint parameter, which, write;
 
-  parameter = GPOINTER_TO_UINT( data );
+  parameter = action - 1;
   which = parameter & 0x01;
   write = parameter & 0x02;
 
