@@ -759,3 +759,6 @@
 20040419 Major memory mapping revamp (patch #932893).
 20040419 printer.c: stop output to the serial printer when printer
 	 emulation is disabled.
+20040420 utils.c: cartridges would be lost on reset if opened with
+	 File/Open (or from the command line) rather than with
+	 Media/Cartridge/Insert.
