@@ -393,11 +393,13 @@ menu_media_disk_insert( int action )
 
 #ifdef HAVE_765_H
   if( machine_current->capabilities &
-      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
-    return specplus3_disk_insert( which, widget_filesel_name );
+      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
+    specplus3_disk_insert( which, widget_filesel_name );
+    return;
+  }
 #endif			/* #ifdef HAVE_765_H */
 
-  return trdos_disk_insert( which, widget_filesel_name );
+  trdos_disk_insert( which, widget_filesel_name );
 }
 
 #ifdef HAVE_765_H
