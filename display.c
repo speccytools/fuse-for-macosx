@@ -35,6 +35,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -904,6 +905,21 @@ int display_frame(void)
   display_next_line=0;
   if( event_add( machine_current->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
+  if( screenshot_movie_record == 1 ) {
+
+    snprintf( screenshot_movie_name, 256, "%s-frame-%09ld.scr",
+	      screenshot_movie_file, screenshot_movie_frame++ );
+    screenshot_scr_write( screenshot_movie_name );
+
+  } else if( screenshot_movie_record == 2 ) {
+
+    snprintf( screenshot_movie_name, 256, "%s-frame-%09ld.png",
+	      screenshot_movie_file, screenshot_movie_frame++ );
+    screenshot_save();
+    screenshot_write_fast( screenshot_movie_name, screenshot_movie_scaler );
+
+  }
+
   display_frame_count++;
   if(display_frame_count==16) {
     display_flash_reversed=1;
@@ -913,6 +929,7 @@ int display_frame(void)
     display_dirty_flashing();
     display_frame_count=0;
   }
+  
   return 0;
 }
 

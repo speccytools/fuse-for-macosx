@@ -228,12 +228,11 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				 NULL);
   gtkui_menu_popup = gtk_item_factory_get_widget( popup_factory, "<main>" );
 
-  /* Start the recording menu off in the 'not playing' state */
+  /* Start various menus in the 'off' state */
+  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
-
-  /* Start the AY logging menu off in the 'not playing' state */
-  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
 
   return FALSE;
 }
@@ -459,6 +458,28 @@ menu_file_savescreenasscr( GtkWidget *widget GCC_UNUSED,
   fuse_emulation_unpause();
 }
 
+void
+menu_file_movies_recordmovieasscr( GtkWidget *widget GCC_UNUSED,
+				   gpointer data GCC_UNUSED )
+{
+
+  char *filename;
+  
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Record Movie as SCR" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  snprintf( screenshot_movie_file, 192, "%s", filename );
+
+  screenshot_movie_record = 1;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
 #ifdef USE_LIBPNG
 void
 menu_file_savescreenaspng( GtkWidget *widget GCC_UNUSED,
@@ -481,6 +502,33 @@ menu_file_savescreenaspng( GtkWidget *widget GCC_UNUSED,
 
   screenshot_save();
   screenshot_write( filename, scaler );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+void
+menu_file_movies_recordmovieaspng( GtkWidget *widget GCC_UNUSED,
+				   gpointer data GCC_UNUSED )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  screenshot_movie_scaler = menu_get_scaler( screenshot_available_scalers );
+  if( screenshot_movie_scaler == SCALER_NUM ) {
+    fuse_emulation_unpause();
+    return;
+  }
+
+  filename = menu_get_filename( "Fuse - Record Movie as PNG" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  snprintf( screenshot_movie_file, 192, "%s", filename );
+
+  screenshot_movie_record = 2;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
 
   free( filename );
 

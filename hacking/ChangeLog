@@ -1102,3 +1102,6 @@
 20041006 machine.c,menu.c,menu_data.c,trdos.c,ui.c,machines/specplus3.c,
 	 man/fuse.1,ui/ui.h: split the Media/Disk menu into separate +3 and
 	 TR-DOS entries.
+20041006 display.c,menu.[ch],menu_data.c,screenshot.[ch],ui.c,ui/ui.h,
+	 man/fuse.1,ui/gtk/gtkui.c,widget/{menu.c,widget.c}: add ability to
+	 save 'movies' as collections of screenshots (Gergely Szasz).

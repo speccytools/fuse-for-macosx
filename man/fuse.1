@@ -746,6 +746,29 @@ filename, while the others will use
 .IR "fuse.png" .
 .RE
 .PP
+.I "File, Movies, Record Movie as SCR..."
+.RS
+Start recording a `movie' as a series of SCR screenshots. The GTK+ UI
+will ask for a filename, and then save the screenshots to
+.RI ` <name>\-frame\-000000000.scr "', `" <name>\-frame\-000000001.scr '
+and so on, while the other UIs will use
+.RI ` fuse\-frame\-000000000.scr "', `" fuse\-frame\-000000001.scr '
+and so on.
+.RE
+.PP
+.I "File, Movies, Record Movie as PNG..."
+.RS
+Start recording a `movie' as a series of PNG images. The filenames used will be the same as for the SCR movie, but with a
+.RI ` .png '
+extension instead of
+.RI ` .scr '.
+.RE
+.PP
+.I "File, Movies, Stop Movie Recording"
+.RS
+Stop any movie recording which is currently in progress.
+.RE
+.PP
 .I "File, Load Binary Data..."
 .RS
 Load binary data from a file into the Spectrum's memory. After

@@ -198,6 +198,13 @@ menu_file_savescreenasscr( int action )
   screenshot_scr_write( "fuse.scr" );
 }
 
+void
+menu_file_movies_recordmovieasscr( int action )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+  screenshot_movie_record = 1;
+}
+
 #ifdef USE_LIBPNG
 void
 menu_file_savescreenaspng( int action )
@@ -208,6 +215,18 @@ menu_file_savescreenaspng( int action )
   if( scaler == SCALER_NUM ) return;
 
   screenshot_write( "fuse.png", scaler );
+}
+
+void
+menu_file_movies_recordmovieaspng( int action )
+{
+  scaler_type scaler;
+
+  scaler = menu_get_scaler( screenshot_available_scalers );
+  if( scaler == SCALER_NUM ) return;
+  
+  screenshot_movie_scaler = scaler;
+  screenshot_movie_record = 2;
 }
 #endif			/* #ifdef USE_LIBPNG */
 

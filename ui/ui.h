@@ -119,6 +119,7 @@ int ui_get_rollback_point( GSList *points );
 
 typedef enum ui_menu_item {
 
+  UI_MENU_ITEM_FILE_MOVIES_RECORDING,
   UI_MENU_ITEM_MEDIA_CARTRIDGE,
   UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK,
   UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT,

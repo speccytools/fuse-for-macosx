@@ -204,6 +204,14 @@ MENU_CALLBACK( menu_file_openscrscreenshot )
   fuse_emulation_unpause();
 }
 
+MENU_CALLBACK( menu_file_movies_stopmovierecording )
+{
+  WIDGET_END;
+
+  screenshot_movie_record = 0;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 0 );
+}
+
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
 {
   switch( action ) {

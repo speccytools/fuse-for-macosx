@@ -73,6 +73,12 @@ static libspectrum_byte
   rgb_data2[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
    png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 3 ];
 
+char screenshot_movie_name[256];
+char screenshot_movie_file[256] = {'f', 'u', 's', 'e', '\0'};
+long int screenshot_movie_frame = 0;
+int screenshot_movie_record = 0;
+scaler_type screenshot_movie_scaler = SCALER_NUM;
+
 int
 screenshot_save( void )
 {
@@ -80,8 +86,8 @@ screenshot_save( void )
   return 0;
 }
 
-int
-screenshot_write( const char *filename, scaler_type scaler )
+static int
+screenshot_write2( const char *filename, scaler_type scaler, int compression )
 {
   FILE *f;
 
@@ -156,7 +162,7 @@ screenshot_write( const char *filename, scaler_type scaler )
   png_init_io( png_ptr, f );
 
   /* Make files as small as possible */
-  png_set_compression_level( png_ptr, Z_BEST_COMPRESSION );
+  png_set_compression_level( png_ptr, compression );
 
   png_set_IHDR( png_ptr, info_ptr,
 		width, height, 8, 
@@ -178,6 +184,18 @@ screenshot_write( const char *filename, scaler_type scaler )
   }
 
   return 0;
+}
+
+int
+screenshot_write( const char *filename, scaler_type scaler )
+{
+  return screenshot_write2( filename, scaler, Z_BEST_COMPRESSION );
+}
+
+int
+screenshot_write_fast( const char *filename, scaler_type scaler )
+{
+  return screenshot_write2( filename, scaler, Z_BEST_SPEED );
 }
 
 static int

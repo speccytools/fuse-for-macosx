@@ -48,6 +48,13 @@ File/S_ave Screen as SCR..., Item
 File/Save S_creen as PNG..., Item
 #endif
 
+File/_Movies, Branch
+File/Movies/Record Movie as _SCR..., Item
+#ifdef USE_LIBPNG
+File/Movies/Record Movie as _PNG..., Item
+#endif
+File/Movies/S_top Movie Recording, Item
+
 #ifndef USE_WIDGET
 File/separator, Separator
 File/Loa_d binary data..., Item
