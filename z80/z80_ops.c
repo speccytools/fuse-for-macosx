@@ -30,6 +30,7 @@
 
 #include "debugger/debugger.h"
 #include "event.h"
+#include "machine.h"
 #include "rzx.h"
 #include "settings.h"
 #include "spectrum.h"
@@ -71,8 +72,12 @@ void z80_do_opcodes()
 	debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
       debugger_trap();
 
-    if( PC >= 16384 ) trdos_active = 0;
-    else if ( ( PC & 0xff00 ) == 0x3d00 ) trdos_active = 1;
+    if( machine_current->ram.current_rom == 1 && PC >= 16384 ) {
+      trdos_active = 0;
+    } else if ( machine_current->ram.current_rom == 1 && 
+		( PC & 0xff00 ) == 0x3d00 ) {
+      trdos_active = 1;
+    }
 
     /* Do the instruction fetch; readbyte_internal used here to avoid
        triggering read breakpoints */
