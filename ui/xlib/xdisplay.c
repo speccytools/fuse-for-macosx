@@ -236,7 +236,7 @@ try_shm( const int width, const int height )
 
   /* Now flag the chunk for deletion; this will take effect when
      everything has detached from it */
-  shmctl( id, IPC_RMID, NILL );
+  shmctl( id, IPC_RMID, NULL );
 
   return 1;
 }  
