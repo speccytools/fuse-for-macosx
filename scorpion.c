@@ -149,7 +149,6 @@ int
 scorpion_reset(void)
 {
   int error;
-  size_t i;
 
   trdos_reset();
 
@@ -177,11 +176,7 @@ scorpion_reset(void)
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
 
-  for( i = 0; i < 16; i++ ) memset( RAM[i], 0, 0x4000 );
-  
-  error = spec128_common_reset( 0 );
-
-  return error;
+  return spec128_common_reset( 0 );
 }
 
 void

@@ -613,3 +613,5 @@
 	 split the ROMs selection dialog into one dialog for each machine.
 20040303 Another change to the peripheral handling code to let each 'read'
 	 function determine whether it had a peripheral attached.
+20040303 scorpion.c: no need to zero memory in reset function (Stuart
+	 Brady).
