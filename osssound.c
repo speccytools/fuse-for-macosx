@@ -1,5 +1,7 @@
 /* osssound.c: OSS (e.g. Linux) sound I/O
-   Copyright (c) 2000-2002 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2003 Russell Marks, Matan Ziv-Av, Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +36,7 @@
 #include "osssound.h"
 #include "sound.h"
 #include "spectrum.h"
+#include "ui/ui.h"
 
 /* using (8) 64 byte frags for 8kHz, scale up for higher */
 #define BASE_SOUND_FRAG_PWR	6
@@ -58,15 +61,20 @@ if(device==NULL) device = "/dev/dsp";
  * we actually want
  */
 if((soundfd=open(device,O_WRONLY|O_NONBLOCK))==-1)
+  {
+  ui_error(UI_ERROR_ERROR,"couldn't open sound device '%s': %s",device,strerror(errno));
   return 1;
+  }
 if((flags=fcntl(soundfd,F_GETFL))==-1)
   {
+  ui_error(UI_ERROR_ERROR,"couldn't get flags from sound device: %s",strerror(errno));
   close(soundfd);
   return 1;
   }
 flags &= ~O_NONBLOCK;
 if(fcntl(soundfd,F_SETFL,flags)==-1)
   {
+  ui_error(UI_ERROR_ERROR,"couldn't set sound device non-blocking: %s",strerror(errno));
   close(soundfd);
   return 1;
   }
@@ -78,6 +86,7 @@ if(ioctl(soundfd,SNDCTL_DSP_SETFMT,&tmp)==-1)
   tmp=AFMT_S16_LE;
   if((ioctl(soundfd,SNDCTL_DSP_SETFMT,&tmp))==-1)
     {
+    ui_error(UI_ERROR_ERROR,"couldn't set sound device into 16-bit mode: %s",strerror(errno));
     close(soundfd);
     return 1;
     }
@@ -93,6 +102,7 @@ if(ioctl(soundfd,SNDCTL_DSP_STEREO,&tmp)<0)
   tmp=(*stereoptr)?0:1;
   if(ioctl(soundfd,SNDCTL_DSP_STEREO,&tmp)<0)
     {
+    ui_error(UI_ERROR_ERROR,"couldn't set sound device into either mono or stereo mode: %s",strerror(errno));
     close(soundfd);
     return 1;
     }
@@ -103,6 +113,7 @@ frag=(0x80000|BASE_SOUND_FRAG_PWR);
 
 if(ioctl(soundfd,SNDCTL_DSP_SPEED,freqptr)<0)
   {
+  ui_error(UI_ERROR_ERROR,"couldn't set sound device speed to %d: %s",*freqptr, strerror(errno));
   close(soundfd);
   return 1;
   }
@@ -115,6 +126,7 @@ if(sixteenbit) frag++;
 
 if(ioctl(soundfd,SNDCTL_DSP_SETFRAGMENT,&frag)<0)
   {
+  ui_error(UI_ERROR_ERROR,"couldn't set sound device fragment size to %d: %s",frag,strerror(errno));
   close(soundfd);
   return 1;
   }

@@ -401,7 +401,6 @@ int fuse_emulation_unpause(void)
        * (i.e. avoid the effects of fuse_emulation_{,un}pause).
        * Otherwise, we may be recursively reporting this error. */
       fuse_emulation_paused++;
-      ui_error( UI_ERROR_ERROR, "Couldn't reinitialise sound" );
       fuse_emulation_paused--;
       settings_current.sound = fuse_sound_in_use = 0;
       /* FIXME: How to deal with error return here? */

@@ -289,3 +289,5 @@
 	 where appropriate.
 20031020 utils.c: use TMPDIR before /tmp for temporary files.
 20031023 Add simple 'poke finder'.
+20031023 fuse.c, osssound.c: more useful error messages if we couldn't
+	 initialise the OSS sound code.
