@@ -633,3 +633,4 @@
 	 widgets and SDL UI working with the new input layer code.
 20040311 ui/xlib/{xdisplay.c,xkeyboard.c}: make Xlib UI work with new
 	 input layer code.
+20040311 ui/gtk/roms.c: make changing ROMs work.

@@ -1,5 +1,5 @@
 /* roms.c: ROM selector dialog box
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2004 Philip Kendall
 
    $Id$
 
@@ -41,12 +41,19 @@
 #include "ui/ui.h"
 
 static int select_roms( libspectrum_machine machine, size_t start, size_t n );
-static void add_rom( GtkWidget *table, gint row, const char *name );
+static void add_rom( GtkWidget *table, size_t start, gint row );
 static void select_new_rom( GtkWidget *widget, gpointer data );
-static void roms_done( GtkWidget *widget, gpointer data );
+static void roms_done( GtkButton *button, gpointer data );
 
 /* The labels used to display the current ROMs */
 GtkWidget *rom[ SETTINGS_ROM_COUNT ];
+
+struct callback_info {
+
+  GtkWidget *dialog;
+  size_t start, n;
+
+};
 
 void
 gtkui_roms( gpointer callback_data, guint callback_action, GtkWidget *widget )
@@ -78,6 +85,8 @@ select_roms( libspectrum_machine machine, size_t start, size_t n )
   GtkWidget *table;
   GtkWidget *ok_button, *cancel_button;
 
+  struct callback_info info;
+
   char buffer[ 256 ];
   size_t i;
 
@@ -91,13 +100,12 @@ select_roms( libspectrum_machine machine, size_t start, size_t n )
   gtk_window_set_title( GTK_WINDOW( dialog ), buffer );
 
   /* A table to put all the labels in */
-  table = gtk_table_new( SETTINGS_ROM_COUNT, 3, FALSE );
+  table = gtk_table_new( n, 3, FALSE );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
 		     table );
 
   /* And the current values of each of the ROMs */
-  for( i = start; n; i++, n-- )
-    add_rom( table, i, settings_rom_name[i] );
+  for( i = 0; i < n; i++ ) add_rom( table, start, i );
 
   /* Create the OK and Cancel buttons */
   ok_button = gtk_button_new_with_label( "OK" );
@@ -108,9 +116,12 @@ select_roms( libspectrum_machine machine, size_t start, size_t n )
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     cancel_button );
   
-  gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
-			     GTK_SIGNAL_FUNC( roms_done ),
-			     GTK_OBJECT( dialog ) );
+  info.dialog = dialog;
+  info.start = start;
+  info.n = n;
+  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
+		      GTK_SIGNAL_FUNC( roms_done ), &info );
+
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( dialog ) );
@@ -141,16 +152,17 @@ select_roms( libspectrum_machine machine, size_t start, size_t n )
 }
 
 static void
-add_rom( GtkWidget *table, gint row, const char *name )
+add_rom( GtkWidget *table, size_t start, gint row )
 {
   GtkWidget *label, *change_button;
+  char **setting;
 
-  label = gtk_label_new( name );
+  label = gtk_label_new( settings_rom_name[ start + row ] );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, row, row + 1,
 		    0, 0, 2, 2 );
 
-  rom[ row ] =
-    gtk_label_new( *( settings_get_rom_setting( &settings_current, row ) ) );
+  setting = settings_get_rom_setting( &settings_current, start + row );
+  rom[ row ] = gtk_label_new( *setting );
   gtk_table_attach( GTK_TABLE( table ), rom[ row ], 1, 2, row, row + 1,
 		    0, 0, 2, 2 );
 
@@ -176,22 +188,25 @@ select_new_rom( GtkWidget *widget GCC_UNUSED, gpointer data )
 }
 
 static void
-roms_done( GtkWidget *widget, gpointer data GCC_UNUSED )
+roms_done( GtkButton *button GCC_UNUSED, gpointer data )
 {
   size_t i;
   int error;
   
-  char *string;
+  char *string, **setting;
 
-  for( i = 0; i < SETTINGS_ROM_COUNT; i++ ) {
+  struct callback_info *info = data;
+
+  for( i = 0; i < info->n; i++ ) {
+
+    setting = settings_get_rom_setting( &settings_current, info->start + i );
     gtk_label_get( GTK_LABEL( rom[i] ), &string );
-    error =
-      settings_set_string( settings_get_rom_setting( &settings_current, i ),
-			   string );
-    if( error ) return;
+
+    error = settings_set_string( setting, string ); if( error ) return;
+
   }
 
-  gtkui_destroy_widget_and_quit( widget, NULL );
+  gtkui_destroy_widget_and_quit( info->dialog, NULL );
 }
 
 #endif			/* #ifdef UI_GTK */
