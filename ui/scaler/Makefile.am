@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001,2002 Philip Kendall
+## Copyright (c) 2001 Philip Kendall
 
 ## $Id$
 
@@ -24,21 +24,10 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-noinst_LIBRARIES = libwidget.a
-
-libwidget_a_SOURCES = browse.c debugger.c error.c filesel.c menu_data.c \
-picture.c widget.c menu.c options.c select.c text.c \
-	roms.c scaler.c
+noinst_LIBRARIES = libscaler.a
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
-BUILT_SOURCES = options.c options.h
+libscaler_a_SOURCES = scaler.c
 
-options.c: options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
-	@PERL@ options.pl ../ui/options.dat > options.c
-
-options.h: options-header.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
-	@PERL@ options-header.pl ../ui/options.dat > options.h
-
-noinst_HEADERS = widget.h widget_internals.h \
-		 options.h options.pl options-header.pl
+noinst_HEADERS = scaler.h

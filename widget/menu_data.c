@@ -49,10 +49,6 @@ static widget_menu_entry widget_menu_disk_a[];
 static widget_menu_entry widget_menu_disk_b[];
 #endif					/* #ifdef HAVE_765_H */
 
-#ifdef UI_SDL
-static widget_menu_entry widget_menu_window[];
-#endif					/* #ifdef UI_SDL */
-
 static widget_menu_entry widget_menu_help[];
 
 /* Main menu */
@@ -71,11 +67,6 @@ static widget_menu_widget_t main_disk =    { WIDGET_TYPE_MENU,
 					     &widget_menu_disk    };
 #endif
 
-#ifdef UI_SDL
-static widget_menu_widget_t main_window =  { WIDGET_TYPE_MENU,
-					     &widget_menu_window  };
-#endif					/* #ifdef UI_SDL */
-
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
 					     &widget_menu_help    };
 
@@ -90,10 +81,6 @@ widget_menu_entry widget_menu_main[] = {
 #ifdef HAVE_765_H
   { "(D)isk",	 KEYBOARD_d, widget_menu_widget, &main_disk    },
 #endif					/* #ifdef HAVE_765_H */
-
-#ifdef UI_SDL
-  { "(W)indow",	 KEYBOARD_w, widget_menu_widget, &main_window  },
-#endif					/* #ifdef UI_SDL */
 
   { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
 
@@ -145,6 +132,7 @@ static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 static widget_menu_widget_t options_sound   = { WIDGET_TYPE_SOUND,   NULL };
 static widget_menu_widget_t options_rzx     = { WIDGET_TYPE_RZX,     NULL };
 static widget_menu_widget_t options_roms    = { WIDGET_TYPE_ROM,     NULL };
+static widget_menu_widget_t options_scaler  = { WIDGET_TYPE_SCALER,  NULL };
 
 static widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
@@ -154,6 +142,10 @@ static widget_menu_entry widget_menu_options[] = {
   { "(R)ZX...",	    KEYBOARD_r, widget_menu_widget, &options_rzx     },
   { "S(e)lect ROMS...",
                     KEYBOARD_e, widget_menu_widget, &options_roms    },
+
+#if defined( UI_SDL ) || defined( UI_X )
+  { "(F)ilter...",  KEYBOARD_f, widget_menu_widget, &options_scaler  },
+#endif				/* #if defined( UI_SDL ) || defined( UI_X ) */
 
 #ifdef HAVE_LIB_XML2
   { "S(a)ve",	    KEYBOARD_a, widget_menu_save_options, NULL       },
@@ -238,21 +230,6 @@ static widget_menu_entry widget_menu_disk_b[] = {
 };
 
 #endif					/* #ifdef HAVE_765_H */
-
-#ifdef UI_SDL
-
-/* Window menu */
-
-static widget_menu_entry widget_menu_window[] = {
-  { "Window", 0, 0, NULL },		/* Menu title */
-
-  { "(T)oggle full screen", KEYBOARD_t, widget_menu_toggle_full_screen, NULL },
-
-  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
-
-};
-
-#endif					/* #ifdef UI_SDL */
 
 /* Help menu */
 

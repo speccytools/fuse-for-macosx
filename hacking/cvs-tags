@@ -1,5 +1,7 @@
 CVS tags for Fuse
 
+$Id$
+
 | Release-0_3_1
 | Release-0_3_2pre1
 | Release-0_3_2pre2
@@ -77,6 +79,11 @@ CVS tags for Fuse
 | Release-0_5_2pre1-trunk
 |
 +-\					Fred's UI scaling patches
+| | Release-0_5_2pre1-scaler-branch-1	Merged to trunk at
+| |					Release-0_5_2pre1-merge-1
 | | Release-0_5_2pre1-scaler-branch
+|
+| Release-0_5_2pre1-merge-1		Merged from
+|					Release-0_5_2pre1-scaler-branch-1
 |
 HEAD

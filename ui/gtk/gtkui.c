@@ -41,6 +41,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "gtkdisplay.h"
 #include "gtkkeyboard.h"
 #include "gtkui.h"
 #include "machine.h"
@@ -55,6 +56,7 @@
 #include "timer.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+#include "ui/scaler/scaler.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -64,6 +66,15 @@ GtkWidget *gtkui_drawing_area;
 
 /* Popup menu widget(s), as invoked by F1 */
 GtkWidget *gtkui_menu_popup;
+
+/* Structure used by the radio button selection widgets (Options/Filter
+   and Machine/Select) */
+typedef struct gtkui_select_info {
+
+  GtkWidget *dialog;
+  GtkWidget **buttons;
+
+} gtkui_select_info;
 
 static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				GtkWidget **menu_bar,
@@ -88,6 +99,9 @@ static void gtkui_save_screen( GtkWidget *widget, gpointer data );
 #endif				/* #ifdef USE_LIBPNG */
 
 static void gtkui_quit(GtkWidget *widget, gpointer data);
+
+static void select_filter(GtkWidget *widget, gpointer data);
+static void select_filter_done( GtkWidget *widget, gpointer user_data );
 
 #ifdef HAVE_LIB_XML2
 static void save_options( GtkWidget *widget, gpointer data );
@@ -146,6 +160,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
   { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
   { "/Options/S_elect ROMs...", NULL , gtkui_roms,          0, NULL          },
+  { "/Options/_Filter...",	NULL , select_filter,	    0, NULL          },
   { "/Options/separator",       NULL , NULL,                0, "<Separator>" },
 
 #ifdef HAVE_LIB_XML2
@@ -181,7 +196,8 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 static guint gtkui_menu_data_size =
   sizeof( gtkui_menu_data ) / sizeof( GtkItemFactoryEntry );
   
-int ui_init(int *argc, char ***argv, int width, int height)
+int
+ui_init( int *argc, char ***argv )
 {
   GtkWidget *box,*menu_bar;
   GtkAccelGroup *accel_group;
@@ -189,11 +205,19 @@ int ui_init(int *argc, char ***argv, int width, int height)
 
   gtk_init(argc,argv);
 
+  gdk_rgb_init();
+  gdk_rgb_set_install( TRUE );
+  gtk_widget_set_default_colormap( gdk_rgb_get_cmap() );
+  gtk_widget_set_default_visual( gdk_rgb_get_visual() );
+
   gtkui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
   gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
   gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
-  gtk_window_set_default_size( GTK_WINDOW(gtkui_window), width, height);
+
+  gtk_window_set_default_size( GTK_WINDOW(gtkui_window),
+			       DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
+
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "delete_event",
 		     GTK_SIGNAL_FUNC(gtkui_delete), NULL);
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "key-press-event",
@@ -224,18 +248,20 @@ int ui_init(int *argc, char ***argv, int width, int height)
     return 1;
   }
   gtk_drawing_area_size( GTK_DRAWING_AREA(gtkui_drawing_area),
-			 width, height );
+			 DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
+
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, FALSE, FALSE, 0 );
 
-  geometry.min_width = width;
-  geometry.min_height = height;
-  geometry.max_width = 2 * width;
-  geometry.max_height = 2 * height;
+  geometry.min_width = DISPLAY_ASPECT_WIDTH;
+  geometry.min_height = DISPLAY_SCREEN_HEIGHT;
+  geometry.max_width = 2 * DISPLAY_ASPECT_WIDTH;
+  geometry.max_height = 2 * DISPLAY_SCREEN_HEIGHT;
   geometry.base_width = 0;
   geometry.base_height = 0;
-  geometry.width_inc = width;
-  geometry.height_inc = height;
-  geometry.min_aspect = geometry.max_aspect = ((float)width)/height;
+  geometry.width_inc = DISPLAY_ASPECT_WIDTH;
+  geometry.height_inc = DISPLAY_SCREEN_HEIGHT;
+  geometry.min_aspect = geometry.max_aspect =
+    ((float)DISPLAY_ASPECT_WIDTH)/DISPLAY_SCREEN_HEIGHT;
 
   gtk_window_set_geometry_hints( GTK_WINDOW(gtkui_window), gtkui_drawing_area,
 				 &geometry,
@@ -244,11 +270,9 @@ int ui_init(int *argc, char ***argv, int width, int height)
 				 GDK_HINT_ASPECT );
 
 
-  gtk_widget_show(gtkui_drawing_area);
+  if( gtkdisplay_init() ) return 1;
 
-  if(uidisplay_init(width,height)) return 1;
-
-  gtk_widget_show(gtkui_window);
+  gtk_widget_show_all( gtkui_window );
 
   return 0;
 }
@@ -304,7 +328,7 @@ int ui_end(void)
   gtk_widget_hide(gtkui_window);
 
   /* Tidy up the low-level stuff */
-  error = uidisplay_end(); if(error) return error;
+  error = gtkdisplay_end(); if( error ) return error;
 
   /* Now free up the window itself */
 /*    XDestroyWindow(display,mainWindow); */
@@ -524,6 +548,116 @@ gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_exiting=1;
 }
 
+/* Called by the menu when Options/Filter selected */
+static void
+select_filter( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  gtkui_select_info dialog;
+  GtkAccelGroup *accel_group;
+  GSList *button_group = NULL;
+
+  GtkWidget *ok_button, *cancel_button;
+
+  int i, count;
+  
+  /* Some space to store the radio buttons in */
+  dialog.buttons = (GtkWidget**)malloc( SCALER_NUM * sizeof(GtkWidget* ) );
+  if( dialog.buttons == NULL ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return;
+  }
+
+  /* Stop emulation */
+  fuse_emulation_pause();
+
+  count = 0;
+
+  /* Create the necessary widgets */
+  dialog.dialog = gtk_dialog_new();
+  gtk_window_set_title( GTK_WINDOW( dialog.dialog ), "Fuse - Select Scaler" );
+
+  for( i = 0; i < SCALER_NUM; i++ ) {
+
+    if( !scaler_is_supported( i ) ) continue;
+
+    dialog.buttons[ count ] =
+      gtk_radio_button_new_with_label( button_group, scaler_name( i ) );
+    button_group =
+      gtk_radio_button_group( GTK_RADIO_BUTTON( dialog.buttons[ count ] ) );
+
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.buttons[ count ] ),
+				  current_scaler == i );
+
+    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		       dialog.buttons[ count ] );
+
+    count++;
+  }
+
+  /* Create and add the actions buttons to the dialog box */
+  ok_button = gtk_button_new_with_label( "OK" );
+  cancel_button = gtk_button_new_with_label( "Cancel" );
+
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
+		     ok_button );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
+		     cancel_button );
+
+  /* Add the necessary callbacks */
+  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
+		      GTK_SIGNAL_FUNC( select_filter_done ),
+		      (gpointer) &dialog );
+  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog.dialog ) );
+  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete_event",
+		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+		      (gpointer) NULL );
+
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( dialog.dialog ), accel_group);
+
+  /* Allow Esc to cancel */
+  gtk_widget_add_accelerator( cancel_button, "clicked",
+                              accel_group,
+                              GDK_Escape, 0, 0 );
+
+  /* Set the window to be modal and display it */
+  gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
+  gtk_widget_show_all( dialog.dialog );
+
+  /* Process events until the window is done with */
+  gtk_main();
+
+  /* And then carry on with emulation again */
+  fuse_emulation_unpause();
+}
+
+/* Callback used by the filter selection dialog */
+static void
+select_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
+{
+  int i, count;
+  gtkui_select_info *ptr = (gtkui_select_info*)user_data;
+
+  count = 0;
+
+  for( i = 0; i < SCALER_NUM; i++ ) {
+
+    if( !scaler_is_supported( i ) ) continue;
+
+    if( gtk_toggle_button_get_active(
+	  GTK_TOGGLE_BUTTON( ptr->buttons[ count ] )
+        ) && current_scaler != i                     )
+      scaler_select_scaler( i );
+
+    count++;
+  }
+
+  gtk_widget_destroy( ptr->dialog );
+  gtk_main_quit();
+}
+
 #ifdef HAVE_LIB_XML2
 /* Options/Save */
 static void
@@ -545,20 +679,12 @@ gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   }
 }
 
-typedef struct gtkui_select_info {
-
-  GtkWidget *dialog;
-  GtkWidget **buttons;
-
-} gtkui_select_info;
-
 /* Called by the menu when Machine/Select selected */
 static void
 gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_select_info dialog;
   GtkAccelGroup *accel_group;
-  GSList *button_group;
 
   GtkWidget *ok_button, *cancel_button;
 
@@ -582,8 +708,6 @@ gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
     gtk_radio_button_new_with_label(
       NULL, libspectrum_machine_name( machine_types[0]->machine )
     );
-  button_group =
-    gtk_radio_button_group( GTK_RADIO_BUTTON( dialog.buttons[0] ) );
 
   for( i=1; i<machine_count; i++ ) {
     dialog.buttons[i] =

@@ -27,6 +27,9 @@
 #ifndef FUSE_XDISPLAY_H
 #define FUSE_XDISPLAY_H
 
+int xdisplay_init( void );
+int xdisplay_end( void );
+
 int xdisplay_configure_notify(int width, int height);
 void xdisplay_area(int x, int y, int width, int height);
 

@@ -49,7 +49,7 @@ typedef enum ui_error_level {
 
 extern const keysyms_key_info keysyms_data[];
 
-int ui_init(int *argc, char ***argv, int width, int height);
+int ui_init(int *argc, char ***argv);
 int ui_event(void);
 int ui_verror( ui_error_level severity, const char *format, va_list ap )
      GCC_PRINTF( 2, 0 );

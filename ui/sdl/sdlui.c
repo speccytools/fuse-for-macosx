@@ -36,19 +36,37 @@
 #include "ui/uidisplay.h"
 #include "sdldisplay.h"
 #include "sdlkeyboard.h"
+#include "ui/scaler/scaler.h"
+
+void
+atexit_proc( void )
+{ 
+  SDL_ShowCursor(SDL_ENABLE);
+  SDL_Quit();
+}
 
 int 
-ui_init( int *argc, char ***argv, int width, int height )
+ui_init( int *argc, char ***argv )
 {
   int error;
+
+/* Comment out to Work around a bug in OS X 10.1 related to OpenGL in windowed
+   mode */
+  atexit(atexit_proc);
 
   error = SDL_Init( SDL_INIT_VIDEO );
   if ( error )
     return error;
 
-  error = uidisplay_init( width, height );
-  if ( error )
-    return error;
+  scaler_register_clear();
+
+  scaler_register( SCALER_NORMAL );
+  scaler_register( SCALER_DOUBLESIZE );
+  scaler_register( SCALER_TRIPLESIZE );
+  scaler_register( SCALER_2XSAI );
+  scaler_register( SCALER_SUPER2XSAI );
+  scaler_register( SCALER_SUPEREAGLE );
+  scaler_register( SCALER_ADVMAME2X );
 
   return 0;
 }
@@ -60,9 +78,6 @@ ui_event( void )
 
   while ( SDL_PollEvent( &event ) ) {
     switch ( event.type ) {
-    case SDL_VIDEORESIZE:
-      sdldisplay_resize_event( &(event.resize) );
-      break;
     case SDL_KEYDOWN:
       sdlkeyboard_keypress( &(event.key) );
       break;

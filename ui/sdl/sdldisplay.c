@@ -1,5 +1,5 @@
 /* sdldisplay.c: Routines for dealing with the SDL display
-   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
 
    $Id$
 
@@ -41,50 +41,17 @@
 #include "scld.h"
 #include "screenshot.h"
 #include "settings.h"
+#include "ui/scaler/scaler.h"
+#include "machine.h"
 
-static SDL_Surface *gc=NULL;
-static SDL_Surface *image=NULL;
+static SDL_Surface *gc=NULL;    /* Hardware screen */
+static SDL_Surface *tmp_screen=NULL; /* Temporary screen for scalers */
 
-static const SDL_VideoInfo *vidinfo = NULL;
+static int tmp_screen_width;
 
 static Uint32 colour_values[16];
 
-static SDL_Rect updated_rects[DISPLAY_SCREEN_HEIGHT];
-
-static BYTE sdldisplay_dirty_table[DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH];
-
-static int num_rects = 0;
-
-/* The current size of the display (in units of DISPLAY_SCREEN_*) */
-static int sdldisplay_current_size = 1;
-
-/* The last size of the window in windowed mode */
-static int sdldisplay_last_window_size = 1;
-
-static int sdldisplay_allocate_colours( int numColours, Uint32 *colour_values );
-static int sdldisplay_allocate_image( int width, int height );
-
-int
-uidisplay_init( int width, int height )
-{
-  vidinfo = SDL_GetVideoInfo();
-  gc = SDL_SetVideoMode( width, height, vidinfo->vfmt->BitsPerPixel, SDL_SWSURFACE|SDL_ANYFORMAT|SDL_HWPALETTE|SDL_RESIZABLE );
-  if ( gc == NULL ) return 1;
-
-  SDL_WM_SetCaption( "Fuse", "Fuse" );
-
-  sdldisplay_allocate_image( DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
-  sdldisplay_allocate_colours( 16, colour_values );
-  
-  memset( sdldisplay_dirty_table, 0, DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH );
-
-  return 0;
-}
-
-static int
-sdldisplay_allocate_colours( int numColours, Uint32 *colour_values )
-{
-  SDL_Color colour_palette[] = {
+static SDL_Color colour_palette[] = {
   { 000, 000, 000, 000 }, 
   { 000, 000, 192, 000 }, 
   { 192, 000, 000, 000 }, 
@@ -101,201 +68,331 @@ sdldisplay_allocate_colours( int numColours, Uint32 *colour_values )
   { 000, 255, 255, 000 }, 
   { 255, 255, 000, 000 }, 
   { 255, 255, 255, 000 }
-  };
+};
 
+/* This is a rule of thumb for the maximum number of rects that can be updated
+   each frame. If more are generated we just update the whole screen */
+#define MAX_UPDATE_RECT 300
+static SDL_Rect updated_rects[MAX_UPDATE_RECT];
+static int num_rects = 0;
+static BYTE sdldisplay_force_full_refresh = 1;
+
+/* The current size of the display (in units of DISPLAY_SCREEN_*) */
+static float sdldisplay_current_size = 1;
+
+static BYTE sdldisplay_is_full_screen = 0;
+
+static int image_width;
+static int image_height;
+
+static int timex;
+
+static int sdldisplay_allocate_colours( int numColours, Uint32 *colour_values );
+
+static int sdldisplay_load_gfx_mode( void );
+
+void
+uidisplay_init_scalers( void )
+{
+  scaler_register_clear();
+
+  scaler_register( SCALER_NORMAL );
+  scaler_register( SCALER_DOUBLESIZE );
+  scaler_register( SCALER_TRIPLESIZE );
+  scaler_register( SCALER_2XSAI );
+  scaler_register( SCALER_SUPER2XSAI );
+  scaler_register( SCALER_SUPEREAGLE );
+  scaler_register( SCALER_ADVMAME2X );
+  if( machine_current->timex ) {
+    scaler_register( SCALER_HALF );
+    scaler_register( SCALER_TIMEXTV );
+  } else {
+    scaler_register( SCALER_TV2X );
+  }
+}
+
+int
+uidisplay_init( int width, int height )
+{
+  int ret;
+  image_width = width;
+  image_height = height;
+
+  timex = machine_current->timex;
+
+  uidisplay_init_scalers();
+
+  if ( scaler_select_scaler( current_scaler ) ) return 1;
+
+  ret = sdldisplay_load_gfx_mode();
+
+  SDL_WM_SetCaption( "Fuse", "Fuse" );
+
+  /* We can now output error messages to our output device */
+  display_ui_initialised = 1;
+
+  return 0;
+}
+
+static int
+sdldisplay_allocate_colours( int numColours, Uint32 *colour_values )
+{
   int i;
 
-  SDL_SetColors(image, colour_palette, 0, 16);
-
   for( i = 0; i < numColours; i++ ) {
-    colour_values[i] = SDL_MapRGB( image->format,colour_palette[i].r,
+    colour_values[i] = SDL_MapRGB( tmp_screen->format, colour_palette[i].r,
                               colour_palette[i].g, colour_palette[i].b );
   }
 
   return 0;
 }
-  
-static
-int sdldisplay_allocate_image(int width, int height)
-{
-  image = SDL_CreateRGBSurface( SDL_SWSURFACE, 2*width, 2*height, 8, 0, 0, 0, 0 );
 
-  if( !image ) {
-    fprintf( stderr, "%s: couldn't create image\n", fuse_progname );
+static int
+sdldisplay_load_gfx_mode( void )
+{
+  Uint16 *tmp_screen_pixels;
+
+  sdldisplay_force_full_refresh = 1;
+
+  tmp_screen = NULL;
+  tmp_screen_width = (image_width + 3);
+
+  switch( current_scaler ) {
+  case SCALER_2XSAI:
+    sdldisplay_current_size = 2;
+    break;
+  case SCALER_SUPER2XSAI:
+    sdldisplay_current_size = 2;
+    break;
+  case SCALER_SUPEREAGLE:
+    sdldisplay_current_size = 2;
+    break;
+  case SCALER_ADVMAME2X:
+    sdldisplay_current_size = 2;
+    break;
+  case SCALER_TV2X:
+    sdldisplay_current_size = 2;
+    break;
+  case SCALER_TIMEXTV:
+    sdldisplay_current_size = 1;
+    break;
+  case SCALER_DOUBLESIZE:
+    sdldisplay_current_size = 2;
+    break;
+  case SCALER_TRIPLESIZE:
+    sdldisplay_current_size = 3;
+    break;
+  case SCALER_NORMAL:
+    sdldisplay_current_size = 1;
+    break;
+  case SCALER_HALF:
+    sdldisplay_current_size = 0.5;
+    break;
+  default:
+    fprintf( stderr, "%s: unknown gfx mode defaulting to normal\n", fuse_progname);
+    sdldisplay_current_size = 1;
+  }
+
+  /* Create the surface that contains the scaled graphics in 16 bit mode */
+  gc = SDL_SetVideoMode( image_width * sdldisplay_current_size,
+                         image_height * sdldisplay_current_size,
+                         16,
+                         settings_current.full_screen ? (SDL_FULLSCREEN|SDL_SWSURFACE) : SDL_SWSURFACE
+                       );
+  if( !gc ) {
+    fprintf( stderr, "%s: couldn't create gc\n", fuse_progname );
     return 1;
   }
 
-  return 0;
-}
+  /* Distinguish 555 and 565 mode */
+  if (gc->format->Rmask == 0x7C00)
+    scaler_select_bitformat( 555 );
+  else
+    scaler_select_bitformat( 565 );
 
-int
-uidisplay_toggle_fullscreen( void )
-{
-  int colour, vid_flags;
+  /* Create the surface used for the graphics in 16 bit before scaling */
 
-  fuse_emulation_pause();
+  /* Need some extra bytes around when using 2xSaI */
+  tmp_screen_pixels = (Uint16*)calloc(tmp_screen_width*(image_height+3), sizeof(Uint16));
+  tmp_screen = SDL_CreateRGBSurfaceFrom(tmp_screen_pixels,
+                                        tmp_screen_width,
+                                        image_height + 3,
+                                        16, tmp_screen_width*2,
+                                        gc->format->Rmask,
+                                        gc->format->Gmask,
+                                        gc->format->Bmask,
+                                        gc->format->Amask);
 
-  colour = scld_last_dec.name.hires ? display_hires_border :
-                                      display_lores_border;
-
-  settings_current.full_screen = !settings_current.full_screen;
-
-  vid_flags = SDL_SWSURFACE|SDL_ANYFORMAT|SDL_HWPALETTE;
-
-  if ( settings_current.full_screen ) {
-    sdldisplay_current_size = 2;
-    vid_flags |= SDL_FULLSCREEN;
-  } else {
-    sdldisplay_current_size = sdldisplay_last_window_size;
-    vid_flags |= SDL_RESIZABLE;
+  if( !tmp_screen ) {
+    fprintf( stderr, "%s: couldn't create tmp_screen\n", fuse_progname );
+    return 1;
   }
 
-  gc = SDL_SetVideoMode(
-      DISPLAY_ASPECT_WIDTH * sdldisplay_current_size,
-      DISPLAY_SCREEN_HEIGHT * sdldisplay_current_size,
-      vidinfo->vfmt->BitsPerPixel,
-      vid_flags
-    );
-
-/* Mac OS X resets the state of the cursor after a switch to full screen mode */
-  if ( settings_current.full_screen ) {
-    SDL_ShowCursor( SDL_DISABLE );
-  } else {
-    SDL_ShowCursor( SDL_ENABLE );
-  }
+  sdldisplay_allocate_colours( 16, colour_values );
 
   /* Redraw the entire screen... */
   display_refresh_all();
 
-  /* If widgets are active, redraw the widget */
-  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
-
-  fuse_emulation_unpause();
-
   return 0;
-}
-
-int
-sdldisplay_resize_event( SDL_ResizeEvent *resize )
-{
-  int size, colour;
-
-  fuse_emulation_pause();
-
-  colour = scld_last_dec.name.hires ? display_hires_border :
-                                      display_lores_border;
-  size = resize->w / DISPLAY_ASPECT_WIDTH;
-
-  if( size < 1 ) {
-  /* If we are being resized to smaller than a speccy screen go back to a
-   * sensible size */
-    size = 1;
-  } else if( size > 2 ) {
-  /* If we are being resized larger than we can support go back to our
-   * maximum size */
-    size = 2;
-  }
-
-  sdldisplay_current_size = sdldisplay_last_window_size = size;
-
-  gc = SDL_SetVideoMode(
-      DISPLAY_ASPECT_WIDTH * sdldisplay_current_size,
-      DISPLAY_SCREEN_HEIGHT * sdldisplay_current_size,
-      vidinfo->vfmt->BitsPerPixel,
-      SDL_SWSURFACE|SDL_ANYFORMAT|SDL_HWPALETTE|SDL_RESIZABLE
-    );
-
-
-  /* Redraw the entire screen... */
-  display_refresh_all();
-
-  /* If widgets are active, redraw the widget */
-  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
-
-  fuse_emulation_unpause();
-
-  return 0;
-
-}
-
-static void
-sdldisplay_putpixel( int x, int y, int colour )
-{
-  int bpp = image->format->BytesPerPixel;
-  Uint8 *p = (Uint8 *)image->pixels + y*image->pitch + x*bpp;
-
-  switch( bpp ) {
-  case 1:
-    *p = colour;
-    break;
-
-  case 2:
-    *(Uint16 *)p = colour;
-    break;
-
-  case 3:
-    if( SDL_BYTEORDER == SDL_BIG_ENDIAN ) {
-	  p[0] = ( colour >> 16 ) & 0xff;
-	  p[1] = ( colour >> 8 ) & 0xff;
-	  p[2] = colour & 0xff;
-    } else {
-	  p[0] = colour & 0xff;
-	  p[1] = ( colour >> 8 ) & 0xff;
-	  p[2] = ( colour >> 16 ) & 0xff;
-    }
-    break;
-
-  case 4:
-    *(Uint32 *)p = colour;
-    break;
-  }
 }
 
 void
-uidisplay_putpixel( int x, int y, int colour )
+uidisplay_hotswap_gfx_mode( void )
 {
-#ifdef HAVE_PNG_H
-  screenshot_screen[y][x] = colour;
-#endif                 /* #ifdef HAVE_PNG_H */
+  /* Keep around the old image & tmp_screen so we can restore the screen data
+     after the mode switch. */
+  SDL_Surface *oldtmp_screen = tmp_screen;
 
-  sdldisplay_dirty_table[y][x] = 1;
+  fuse_emulation_pause();
 
-  switch( sdldisplay_current_size ) {
-  case 1:
-    if( x%2!=0 ) return;
-    if( SDL_MUSTLOCK( image ) ) SDL_LockSurface( image );
-    sdldisplay_putpixel( x>>1, y, colour_values[colour] );
-    if( SDL_MUSTLOCK( image ) ) SDL_UnlockSurface( image );
-    break;
-  case 2:
-    if( SDL_MUSTLOCK( image ) ) SDL_LockSurface( image );
-    sdldisplay_putpixel( x, y<<1 , colour_values[colour] );
-    sdldisplay_putpixel( x, ( y<<1 ) + 1, colour_values[colour] );
-    if( SDL_MUSTLOCK( image ) ) SDL_UnlockSurface( image );
-    break;
-  }
+  /* Setup the new GFX mode */
+  sdldisplay_load_gfx_mode();
+
+  /* reset palette */
+  SDL_SetColors( gc, colour_palette, 0, 16 );
+
+  /* Restore old screen content */
+  SDL_BlitSurface(oldtmp_screen, NULL, tmp_screen, NULL);
+  SDL_UpdateRect(tmp_screen, 0,  0, 0, 0);
+
+  /* Free the old surfaces */
+  if( oldtmp_screen ) free( oldtmp_screen->pixels );
+  SDL_FreeSurface(oldtmp_screen);
+
+  /* Mac OS X resets the state of the cursor after a switch to full screen mode */
+  if ( settings_current.full_screen )
+    SDL_ShowCursor( SDL_DISABLE );
+  else
+    SDL_ShowCursor( SDL_ENABLE );
+
+  /* Redraw the entire screen... */
+  display_refresh_all();
+
+  fuse_emulation_unpause();
 }
 
 void
 uidisplay_frame_end( void )
 {
-  int i;
+  SDL_Rect *r;
+  Uint32 tmp_screen_pitch, dstPitch;
+  SDL_Rect *last_rect;
 
-  if (num_rects > 0) {
-    for( i = 0; i < num_rects; i++ )
-      SDL_BlitSurface( image, &updated_rects[i], gc, &updated_rects[i] );
-    SDL_UpdateRects( gc, num_rects, updated_rects );
-    num_rects = 0; 
+  /* We check for a switch to fullscreen here to give systems with a
+     windowed-only UI a chance to free menu etc. resources before
+     the switch to fullscreen (e.g. Mac OS X) */
+  if( sdldisplay_is_full_screen != settings_current.full_screen ) {
+    uidisplay_hotswap_gfx_mode();
+    sdldisplay_is_full_screen = !sdldisplay_is_full_screen;
   }
+
+  /* Force a full redraw if requested */
+  if ( sdldisplay_force_full_refresh ) {
+    num_rects = 1;
+
+    updated_rects[0].x = 0;
+    updated_rects[0].y = 0;
+    updated_rects[0].w = image_width;
+    updated_rects[0].h = image_height;
+  }
+
+#ifdef USE_WIDGET
+  if ( !(widget_level >= 0) && num_rects == 0 ) return;
+#else                   /* #ifdef USE_WIDGET */
+  if ( num_rects == 0 ) return;
+#endif                  /* #ifdef USE_WIDGET */
+
+  if( SDL_MUSTLOCK( tmp_screen ) ) SDL_LockSurface( tmp_screen );
+
+  tmp_screen_pitch = tmp_screen->pitch;
+
+  last_rect = updated_rects + num_rects;
+
+  for( r = updated_rects; r != last_rect; r++ ) {
+
+    WORD *dest_base, *dest;
+    size_t xx,yy;
+
+    dest_base =
+      (WORD*)( (BYTE*)tmp_screen->pixels + (r->x*2+2) +
+	       (r->y+1)*tmp_screen_pitch );
+
+    for( yy = r->y; yy < r->y + r->h; yy++ ) {
+
+      for( xx = r->x, dest = dest_base; xx < r->x + r->w; xx++, dest++ )
+	*dest = colour_values[ display_image[yy][xx] ];
+
+      dest_base = (WORD*)( (BYTE*)dest_base + tmp_screen_pitch );
+    }
+	  
+  }
+
+  if( SDL_MUSTLOCK( gc ) ) SDL_LockSurface( gc );
+
+  dstPitch = gc->pitch;
+
+  for( r = updated_rects; r != last_rect; ++r ) {
+    register int dst_y = r->y * sdldisplay_current_size;
+    register int dst_h = r->h;
+
+    scaler_proc(
+     (BYTE*)tmp_screen->pixels + (r->x*2+2) + (r->y+1)*tmp_screen_pitch,
+     tmp_screen_pitch, NULL,
+     (BYTE*)gc->pixels + r->x*(BYTE)(2*sdldisplay_current_size) +
+     dst_y*dstPitch, dstPitch, r->w, dst_h );
+
+    /* Adjust rects for the destination rect size */
+    r->x *= sdldisplay_current_size;
+    r->y = dst_y;
+    r->w *= sdldisplay_current_size;
+    r->h = dst_h * sdldisplay_current_size;
+  }
+
+  if( SDL_MUSTLOCK( tmp_screen ) ) SDL_UnlockSurface( tmp_screen );
+  if( SDL_MUSTLOCK( gc ) ) SDL_UnlockSurface( gc );
+
+  /* Finally, blit all our changes to the screen */
+  SDL_UpdateRects( gc, num_rects, updated_rects );
+
+  num_rects = 0;
+  sdldisplay_force_full_refresh = 0;
 }
 
 void
 uidisplay_area( int x, int y, int width, int height )
 {
-  updated_rects[num_rects].x = sdldisplay_current_size * x;
-  updated_rects[num_rects].y = sdldisplay_current_size * y;
-  updated_rects[num_rects].w = sdldisplay_current_size * width;
-  updated_rects[num_rects].h = sdldisplay_current_size * height;
+  if ( sdldisplay_force_full_refresh )
+    return;
+
+  if( num_rects == MAX_UPDATE_RECT ) {
+    sdldisplay_force_full_refresh = 1;
+    return;
+  }
+
+  /* Extend the dirty region by 1 pixel for scalers
+     that "smear" the screen, e.g. 2xSAI */
+  if( scaler_flags & SCALER_EXPAND_1_PIXEL ) {
+    x--;
+    y--;
+    width+=2;   
+    height+=2;
+  } else if ( scaler_flags & SCALER_EXPAND_2_Y_PIXELS ) {
+    y-=2;
+    height+=4;
+  }
+
+  /* clip */
+  if ( x < 0 ) { width+=x; x=0; }
+  if ( y < 0 ) { height+=y; y=0; }
+  if ( width > image_width - x )
+    width = image_width - x;
+  if ( height > image_height - y )
+    height = image_height - y;
+
+  updated_rects[num_rects].x = x;
+  updated_rects[num_rects].y = y;
+  updated_rects[num_rects].w = width;
+  updated_rects[num_rects].h = height;
 
   num_rects++;
 }
@@ -303,8 +400,12 @@ uidisplay_area( int x, int y, int width, int height )
 int
 uidisplay_end( void )
 {
-    SDL_FreeSurface( image );
-    return 0;
+  display_ui_initialised = 0;
+  if ( tmp_screen ) {
+    free(tmp_screen->pixels);
+    SDL_FreeSurface(tmp_screen);
+  }
+  return 0;
 }
 
-#endif				/* #ifdef UI_SDL */
+#endif        /* #ifdef UI_SDL */

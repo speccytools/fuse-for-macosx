@@ -61,6 +61,7 @@ printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
 printer_text_filename, string, strdup( "printout.txt" ),, textfile
 
 svga_mode, numeric, 320, 'v', svgamode
+start_scaler_mode, string, strdup( "normal" ), 'g', graphics-filter
 
 rom_16, string, strdup( "48.rom" ),
 rom_48, string, strdup( "48.rom" ),

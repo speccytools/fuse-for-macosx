@@ -27,6 +27,4 @@
 #ifndef FUSE_SDLDISPLAY_H
 #define FUSE_SDLDISPLAY_H
 
-int sdldisplay_resize_event(SDL_ResizeEvent *resize);
-
 #endif			/* #ifndef FUSE_SDLDISPLAY_H */

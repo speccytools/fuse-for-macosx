@@ -314,17 +314,6 @@ widget_menu_eject_disk( void *data )
 
 #endif				/* #ifdef HAVE_765_H */
 
-#ifdef UI_SDL
-
-int
-widget_menu_toggle_full_screen( void *data )
-{
-  widget_end_all( WIDGET_FINISHED_OK );
-  return uidisplay_toggle_fullscreen();
-}
-
-#endif				/* #ifdef UI_SDL */
-
 /* Tape/Clear */
 int widget_menu_clear_tape( void *data GCC_UNUSED )
 {

@@ -54,9 +54,11 @@
 #include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
+#include "machine.h"
 #include "screenshot.h"
 #include "xdisplay.h"
 #include "xui.h"
+#include "ui/scaler/scaler.h"
 #include "ui/uidisplay.h"
 #ifdef USE_WIDGET
 #include "widget/widget.h"
@@ -66,6 +68,18 @@
 static XImage *image = 0;	/* The image structure to draw the
 				   Speccy's screen on */
 static GC gc;			/* A graphics context to draw with */
+
+/* The size of a 1x1 image in units of
+   DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */
+int image_scale;
+
+/* The height and width of a 1x1 image in pixels */
+int image_width, image_height;
+
+/* A scaled copy of the image displayed on the Spectrum's screen */
+static WORD scaled_image[2*DISPLAY_SCREEN_HEIGHT][2*DISPLAY_SCREEN_WIDTH];
+static const ptrdiff_t scaled_pitch =
+                                     2 * DISPLAY_SCREEN_WIDTH * sizeof( WORD );
 
 static unsigned long colours[16];
 
@@ -88,14 +102,17 @@ static int xdisplay_allocate_colours( int numColours,
 static int xdisplay_allocate_gc( Window window, GC *new_gc );
 
 static int xdisplay_allocate_image(int width, int height);
+static int register_scalers( void );
 static void xdisplay_destroy_image( void );
-static void xdisplay_end( int );
+static void xdisplay_catch_signal( int sig );
 
-int uidisplay_init(int width, int height)
+int
+xdisplay_init( void )
 {
   if(xdisplay_allocate_colours(16,colours)) return 1;
   if(xdisplay_allocate_gc(xui_mainWindow,&gc)) return 1;
-  if(xdisplay_allocate_image(width,height)) return 1;
+  if( xdisplay_allocate_image( DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT ) )
+     return 1;
 
   return 0;
 }
@@ -168,7 +185,7 @@ static int xdisplay_allocate_image(int width, int height)
 {
   struct sigaction handler;
 
-  handler.sa_handler = xdisplay_end;
+  handler.sa_handler = xdisplay_catch_signal;
   sigemptyset( &handler.sa_mask );
   handler.sa_flags = 0;
   sigaction( SIGINT, &handler, NULL );
@@ -296,9 +313,67 @@ get_shm_id( const int size )
 #endif			/* #ifdef X_USE_SHM */
 
 int
+uidisplay_init( int width, int height )
+{
+  int error;
+
+  image_width = width; image_height = height;
+  image_scale = width / DISPLAY_ASPECT_WIDTH;
+
+  error = register_scalers(); if( error ) return error;
+
+  display_ui_initialised = 1;
+
+  display_refresh_all();
+
+  return 0;
+}
+
+static int
+register_scalers( void )
+{
+  scaler_register_clear();
+
+  switch( xdisplay_current_size ) {
+
+  case 1:
+
+    switch( image_scale ) {
+    case 1:
+      scaler_register( SCALER_NORMAL );
+      scaler_select_scaler( SCALER_NORMAL );
+      return 0;
+    case 2:
+      scaler_register( SCALER_HALF );
+      scaler_select_scaler( SCALER_HALF );
+      return 0;
+    }
+
+  case 2:
+
+    switch( image_scale ) {
+    case 1:
+      scaler_register( SCALER_DOUBLESIZE );
+      scaler_register( SCALER_ADVMAME2X );
+      scaler_select_scaler( SCALER_DOUBLESIZE );
+      return 0;
+    case 2:
+      scaler_register( SCALER_NORMAL );
+      scaler_select_scaler( SCALER_NORMAL );
+      return 0;
+    }
+
+  }
+
+  ui_error( UI_ERROR_ERROR, "Unknown display size/image size %d/%d",
+	    xdisplay_current_size, image_scale );
+  return 1;
+}
+
+int
 xdisplay_configure_notify( int width, int height GCC_UNUSED )
 {
-  int size, colour;
+  int error, size, colour;
 
   colour = scld_last_dec.name.hires ? display_hires_border :
                                       display_lores_border;
@@ -310,6 +385,9 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
   /* Else set ourselves to the new height */
   xdisplay_current_size=size;
 
+  /* Get a new scaler */
+  error = register_scalers(); if( error ) return error;
+
   /* Redraw the entire screen... */
   display_refresh_all();
 
@@ -317,24 +395,6 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
   if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
 
   return 0;
-}
-
-void uidisplay_putpixel(int x,int y,int colour)
-{
-#ifdef USE_LIBPNG
-  screenshot_screen[y][x] = colour;
-#endif			/* #ifdef USE_LIBPNG */
-
-  switch(xdisplay_current_size) {
-  case 1:
-    if(x%2!=0) return;
-    XPutPixel(image, x>>1,  y    ,colours[colour]);
-    break;
-  case 2:
-    XPutPixel(image, x  ,   y<<1 ,colours[colour]);
-    XPutPixel(image, x  ,(y<<1)+1,colours[colour]);
-    break;
-  }
 }
 
 void
@@ -346,8 +406,47 @@ uidisplay_frame_end( void )
 void
 uidisplay_area( int x, int y, int w, int h )
 {
-  xdisplay_area( xdisplay_current_size * x, xdisplay_current_size * y,
-		 xdisplay_current_size * w, xdisplay_current_size * h );
+  float scale = (float)xdisplay_current_size / image_scale;
+  int scaled_x, scaled_y, xx, yy;
+
+  if( scaler_flags ) {
+
+    /* Extend the dirty region by 1 pixel for scalers
+       that "smear" the screen, e.g. 2xSAI */
+    if( scaler_flags & SCALER_EXPAND_1_PIXEL ) {
+      x--;
+      y--;
+      w += 2;   
+      h += 2;
+    } else if ( scaler_flags & SCALER_EXPAND_2_Y_PIXELS ) {
+      y -= 2;
+      h += 4;
+    }
+
+    /* clip */
+    if ( x < 0 ) { w += x; x=0; }
+    if ( y < 0 ) { h += y; y=0; }
+    if ( w > image_width - x ) w = image_width - x;
+    if ( h > image_height - y ) h = image_height - y;
+  }
+
+  scaled_x = scale * x; scaled_y = scale * y;
+
+  /* Create scaled image */
+  scaler_proc( (BYTE*)&display_image[y][x], display_pitch, NULL, 
+	       (BYTE*)&scaled_image[scaled_y][scaled_x], scaled_pitch, w, h );
+
+  w *= scale; h *= scale;
+
+  /* Call putpixel multiple times */
+  for( yy = scaled_y; yy < scaled_y + h; yy++ )
+    for( xx = scaled_x; xx < scaled_x + w; xx++ ) {
+      int colour = scaled_image[yy][xx];
+      XPutPixel( image, xx, yy, colours[ colour ] );
+    }
+
+  /* Blit to the real screen */
+  xdisplay_area( scaled_x, scaled_y, w, h );
 }
 
 void
@@ -378,14 +477,29 @@ static void xdisplay_destroy_image (void)
   if( image ) XDestroyImage( image ); image = 0;
 }
 
-static void xdisplay_end (int sig)
+void
+uidisplay_hotswap_gfx_mode( void )
 {
-  uidisplay_end();
+  return;
+}
+
+int
+uidisplay_end( void )
+{
+  display_ui_initialised = 0;
+  return 0;
+}
+
+static void
+xdisplay_catch_signal( int sig )
+{
+  xdisplay_end();
   psignal( sig, fuse_progname );
   exit( 1 );
 }
 
-int uidisplay_end(void)
+int
+xdisplay_end( void )
 {
   xdisplay_destroy_image();
   /* Free the allocated GC */

@@ -26,6 +26,9 @@
 
 @TOP@
 
+/* Defined if we're in debugging mode */
+#undef DEBUG_MODE
+
 /* Defined if we've got enough memory to compile z80_ops.c */
 #undef HAVE_ENOUGH_MEMORY
 

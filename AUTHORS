@@ -24,6 +24,8 @@ Fuse has been brought to you by:
 
 * Martin Garton: making the GTK+ user interface compatible with GTK+ 2.0.
 
+* Ludvig Strigeus and The ScummVM project: the original graphics filter code.
+
 * Philip Kendall: everything else.
 
 $Id$

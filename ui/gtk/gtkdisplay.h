@@ -1,5 +1,5 @@
-/* uidisplay.h: Low-level display routines
-   Copyright (c) 2000-2003 Philip Kendall
+/* gtkdisplay.h: GTK+ routines for dealing with the user interface
+   Copyright (c) 2000-2002 Philip Kendall
 
    $Id$
 
@@ -24,25 +24,10 @@
 
 */
 
-#ifndef FUSE_UIDISPLAY_H
-#define FUSE_UIDISPLAY_H
+#ifndef FUSE_GTKDISPLAY_H
+#define FUSE_GTKDISPLAY_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+int gtkdisplay_init( void );
+int gtkdisplay_end( void );
 
-/* User interface specific functions */
-
-int uidisplay_init( int width, int height );
-
-void uidisplay_area( int x, int y, int w, int h );
-void uidisplay_frame_end( void );
-void uidisplay_hotswap_gfx_mode( void );
-
-int uidisplay_end(void);
-
-/* General functions */
-
-void uidisplay_spectrum_screen( const BYTE *screen, int border );
-
-#endif			/* #ifndef FUSE_UIDISPLAY_H */
+#endif				/* #ifndef FUSE_GTKDISPLAY_H */

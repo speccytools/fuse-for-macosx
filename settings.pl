@@ -153,6 +153,7 @@ CODE
 #endif			/* #ifdef HAVE_LIBZ */
 
   if( !settings->start_machine ) return 1;
+  if( !settings->start_scaler_mode ) return 1;
 
   return 0;
 }
@@ -358,7 +359,7 @@ print hashline( __LINE__ ), << 'CODE';
 
     int c;
 
-    c = getopt_long( argc, argv, "d:hm:o:p:r:s:t:v:V", long_options, NULL );
+    c = getopt_long( argc, argv, "d:hm:o:p:r:s:t:v:g:V", long_options, NULL );
 
     if( c == -1 ) break;	/* End of option list */
 
@@ -416,6 +417,7 @@ int settings_copy( settings_info *dest, settings_info *src )
 {
   if( settings_defaults( dest ) ) return 1;
   free( dest->start_machine ); dest->start_machine = NULL;
+  free( dest->start_scaler_mode ); dest->start_scaler_mode = NULL;
 
 CODE
 

@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -36,6 +36,7 @@
 
 volatile float timer_count;
 
+#ifndef DEBUG_MODE
 /* Just places to store the old timer and signal handlers; restored
    on exit */
 static struct itimerval timer_old_timer;
@@ -43,16 +44,20 @@ static struct sigaction timer_old_handler;
 
 static void timer_setup_timer(void);
 static void timer_setup_handler(void);
+#endif				/* #ifndef DEBUG_MODE */
 void timer_signal( int signo );
 
 int timer_init(void)
 {
+#ifndef DEBUG_MODE
   timer_count = 0.0;
   timer_setup_handler();
   timer_setup_timer();
+#endif				/* #ifndef DEBUG_MODE */
   return 0;
 }
 
+#ifndef DEBUG_MODE
 static void timer_setup_timer(void)
 {
   struct itimerval timer;
@@ -71,27 +76,35 @@ static void timer_setup_handler(void)
   handler.sa_flags=0;
   sigaction(SIGALRM,&handler,&timer_old_handler);
 }  
+#endif				/* #ifndef DEBUG_MODE */
 
 void
 timer_signal( int signo GCC_UNUSED )
 {
+#ifndef DEBUG_MODE
   /* If the emulator is running, note that time has passed */
   if( !fuse_emulation_paused ) timer_count += 1.0;
+#endif				/* #ifndef DEBUG_MODE */
 }
 
 void timer_sleep(void)
 {
+#ifndef DEBUG_MODE
   /* Go to sleep iff we're emulating things fast enough */
   while( timer_count <= 0.0 ) pause();
+#endif				/* #ifndef DEBUG_MODE */
 }
 
 int timer_end(void)
 {
+#ifndef DEBUG_MODE
   /* Restore the old timer */
   setitimer(ITIMER_REAL,&timer_old_timer,NULL);
 
   /* And the old signal handler */
   sigaction(SIGALRM,&timer_old_handler,NULL);
+
+#endif				/* #ifndef DEBUG_MODE */
 
   return 0;
 

@@ -169,8 +169,13 @@ int widget_insert_disk_a( const char *filename ); /* Disk/Drive A:/Insert */
 int widget_insert_disk_b( const char *filename ); /* Disk/Drive B:/Insert */
 int widget_menu_eject_disk( void *data );    /* Disk/Drive ?:/Eject */
 
-int widget_menu_toggle_full_screen( void *data ); /* Window/Toggle Full Screen */
 int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
+
+/* The select scaler widget */
+
+int widget_scaler_draw( void* data );
+void widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+int widget_scaler_finish( widget_finish_state finished );
 
 /* The select machine widget */
 
