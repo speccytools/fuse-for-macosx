@@ -49,6 +49,9 @@ typedef struct machine_timings {
   libspectrum_word left_border, horizontal_screen, right_border;
   libspectrum_word tstates_per_line;
 
+  /* Interrupt length */
+  libspectrum_word interrupt_length;
+
   /* Frame timing */
   libspectrum_dword tstates_per_frame;
 

@@ -382,6 +382,8 @@ machine_set_timings( fuse_machine_info *machine )
     libspectrum_timings_right_border( machine->machine );
   machine->timings.tstates_per_line =
     libspectrum_timings_tstates_per_line( machine->machine );
+  machine->timings.interrupt_length =
+    libspectrum_timings_interrupt_length( machine->machine );
   machine->timings.tstates_per_frame =
     libspectrum_timings_tstates_per_frame( machine->machine );
 

@@ -1256,3 +1256,5 @@
 	 to be used (patch #1150687) (Darren).
 20050305 widget/widget.c: 'round' widget corners (patch #1150690)
 	 (Darren).
+20050305 z80/z80.c: get interrupt length (closer) to correct (thanks,
+	 Woody, Jon Needle and Ramsoft).

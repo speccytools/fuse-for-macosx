@@ -110,7 +110,9 @@ z80_interrupt( void )
   /* An interrupt will occur if IFF1 is set and the /INT line hasn't
      gone high again. On a Timex machine, we also need the SCLD's
      INTDISABLE to be clear */
-  if( IFF1 && tstates < 48 && !scld_last_dec.name.intdisable ) {
+  if( IFF1 &&
+      tstates < machine_current->timings.interrupt_length &&
+      !scld_last_dec.name.intdisable ) {
 
     /* If interrupts have just been enabled, don't accept the interrupt now,
        but check after the next instruction has been executed */
