@@ -29,8 +29,6 @@
 #ifdef UI_X			/* Use this iff we're using Xlib */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -57,62 +55,35 @@ int ui_init(int *argc, char ***argv, int width, int height)
   XWMHints *wmHints;
   XSizeHints *sizeHints;
   XClassHint *classHint;
-  char *windowNameList, *iconNameList, *res_class;
+  char *windowNameList="Fuse",*iconNameList="Fuse";
   XTextProperty windowName, iconName;
   unsigned long windowFlags;
   XSetWindowAttributes windowAttributes;
 
   /* Allocate memory for various things */
 
-  windowNameList = strdup( "Fuse" );
-  if( !windowNameList ) {
-    fprintf( stderr, "%s: failure allocating memory\n", fuse_progname );
-    return 1;
-  }
-
-  iconNameList = strdup( "Fuse" );
-  if( !iconNameList ) {
-    free( windowNameList );
-    fprintf( stderr, "%s: failure allocating memory\n", fuse_progname );
-    return 1;
-  }
-
-  res_class = strdup( "Fuse" );
-  if( !res_class ) {
-    free( windowNameList ); free( iconNameList );
-    fprintf( stderr, "%s: failure allocating memory\n", fuse_progname );
-    return 1;
-  }
-
   if(!(wmHints = XAllocWMHints())) {
-    free( windowNameList ); free( iconNameList ); free( res_class );
     fprintf(stderr,"%s: failure allocating memory\n", fuse_progname);
     return 1;
   }
 
   if(!(sizeHints = XAllocSizeHints())) {
-    free( windowNameList ); free( iconNameList ); free( res_class );
     fprintf(stderr,"%s: failure allocating memory\n", fuse_progname);
     return 1;
   }
 
   if(!(classHint = XAllocClassHint())) {
-    free( windowNameList ); free( iconNameList ); free( res_class );
     fprintf(stderr,"%s: failure allocating memory\n", fuse_progname);
     return 1;
   }
 
   if(XStringListToTextProperty(&windowNameList,1,&windowName) == 0 ) {
-    free( windowNameList ); free( iconNameList ); free( res_class );
     fprintf(stderr,"%s: structure allocation for windowName failed\n",
 	    fuse_progname);
     return 1;
   }
 
-  free( windowNameList ); free( iconNameList );
-
   if(XStringListToTextProperty(&iconNameList,1,&iconName) == 0 ) {
-    free( res_class );
     fprintf(stderr,"%s: structure allocation for iconName failed\n",
 	    fuse_progname);
     return 1;
@@ -121,7 +92,6 @@ int ui_init(int *argc, char ***argv, int width, int height)
   /* Open a connection to the X server */
 
   if ( ( display=XOpenDisplay(displayName)) == NULL ) {
-    free( res_class );
     fprintf(stderr,"%s: cannot connect to X server %s\n", fuse_progname,
 	    XDisplayName(displayName));
     return 1;
@@ -158,11 +128,10 @@ int ui_init(int *argc, char ***argv, int width, int height)
   wmHints->input=True;
 
   classHint->res_name=fuse_progname;
-  classHint->res_class = res_class;
+  classHint->res_class="Fuse";
 
   XSetWMProperties(display, xui_mainWindow, &windowName, &iconName,
 		   *argv, *argc, sizeHints, wmHints, classHint);
-  free( res_class );
 
   /* Ask the server to use its backing store for this window */
 
