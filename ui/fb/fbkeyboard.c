@@ -1,5 +1,5 @@
 /* fbkeyboard.c: routines for dealing with the linux fbdev display
-   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Darren Salt
+   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Darren Salt
 
    $Id$
 
@@ -50,12 +50,54 @@
 #include "widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 
+#include "input.h"
+
 static struct termios old_ts;
 static int got_old_ts = 0;
 
-void fbkeyboard_keystroke(int scancode, int press);
-static void fbkeyboard_keypress( int keysym );
-void fbkeyboard_keyrelease( int keysym );
+static const enum input_key keymap[128] = {
+/* 0 */
+  0, INPUT_KEY_Escape, INPUT_KEY_1, INPUT_KEY_2,
+  INPUT_KEY_3, INPUT_KEY_4, INPUT_KEY_5, INPUT_KEY_6,
+  INPUT_KEY_7, INPUT_KEY_8, INPUT_KEY_9, INPUT_KEY_0,
+  INPUT_KEY_minus, INPUT_KEY_equal, INPUT_KEY_BackSpace, 0,
+/* 0x10 */
+  INPUT_KEY_q, INPUT_KEY_w, INPUT_KEY_e, INPUT_KEY_r,
+  INPUT_KEY_t, INPUT_KEY_y, INPUT_KEY_u, INPUT_KEY_i,
+  INPUT_KEY_o, INPUT_KEY_p, 0, 0,
+  INPUT_KEY_Return, INPUT_KEY_Control_L, INPUT_KEY_a, INPUT_KEY_s,
+/* 0x20 */
+  INPUT_KEY_d, INPUT_KEY_f, INPUT_KEY_g, INPUT_KEY_h,
+  INPUT_KEY_j, INPUT_KEY_k, INPUT_KEY_l, INPUT_KEY_semicolon,
+  INPUT_KEY_apostrophe, 0, INPUT_KEY_Shift_L, INPUT_KEY_numbersign,
+  INPUT_KEY_z, INPUT_KEY_x, INPUT_KEY_c, INPUT_KEY_v,
+/* 0x30 */
+  INPUT_KEY_b, INPUT_KEY_n, INPUT_KEY_m, INPUT_KEY_comma,
+  INPUT_KEY_period, INPUT_KEY_slash, INPUT_KEY_Shift_R, 0,
+  INPUT_KEY_Alt_L, INPUT_KEY_space, INPUT_KEY_Caps_Lock, INPUT_KEY_F1,
+  INPUT_KEY_F2, INPUT_KEY_F3, INPUT_KEY_F4, INPUT_KEY_F5,
+/* 0x40 */
+  INPUT_KEY_F6, INPUT_KEY_F7, INPUT_KEY_F8, INPUT_KEY_F9,
+  INPUT_KEY_F10, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+/* 0x50 */
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+/* 0x60 */
+  0, INPUT_KEY_Control_R, 0, 0,
+  INPUT_KEY_Alt_R, 0, INPUT_KEY_Home, INPUT_KEY_Up,
+  INPUT_KEY_Page_Up, INPUT_KEY_Left, INPUT_KEY_Right, INPUT_KEY_End,
+  INPUT_KEY_Down, INPUT_KEY_Page_Down, 0, 0,
+/* 0x70 */
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+  0, INPUT_KEY_Meta_L, INPUT_KEY_Meta_R, INPUT_KEY_Mode_switch,
+  /* logo/menu keys: somewhat arbitrary mapping for use as Symbol Shift */
+};
 
 int fbkeyboard_init(void)
 {
@@ -104,99 +146,6 @@ int fbkeyboard_init(void)
   return 0;
 }
 
-void fbkeyboard_keystroke(int scancode, int press)  {
-  if(press) {
-    fbkeyboard_keypress(scancode);
-  } else {
-    fbkeyboard_keyrelease(scancode);
-  }
-}
-
-static void
-fbkeyboard_keypress( int keysym )
-{
-  keysyms_key_info *ptr;
-
-  ptr=keysyms_get_data(keysym);
-
-  if( ptr ) {
-
-    if( widget_level >= 0 ) {
-      widget_keyhandler( ptr->key1, ptr->key2 );
-    } else {
-      if( ptr->key1 != KEYBOARD_NONE ) keyboard_press( ptr->key1 );
-      if( ptr->key2 != KEYBOARD_NONE ) keyboard_press( ptr->key2 );
-    }
-    return;
-
-  }
-
-  if( widget_level >= 0 ) return;
-
-  /* Now deal with the non-Speccy keys */
-  switch( keysym ) {
-  case 0x3B:			/* F1 */
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MENU, &widget_menu_main );
-    fuse_emulation_unpause();
-    break;
-  case 0x3C:			/* F2 */
-    fuse_emulation_pause();
-    snapshot_write( "snapshot.z80" );
-    fuse_emulation_unpause();
-    break;
-  case 0x3D:			/* F3 */
-    fuse_emulation_pause();
-    widget_apply_to_file( snapshot_read );
-    fuse_emulation_unpause();
-    break;
-  case 0x3E:			/* F4 */
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_GENERAL, NULL );
-    fuse_emulation_unpause();
-    break;
-  case 0x3F:			/* F5 */
-    machine_reset();
-    break;
-  case 0x40:			/* F6 */
-    fuse_emulation_pause();
-    tape_write( "tape.tzx" );
-    fuse_emulation_unpause();
-    break;
-  case 0x41:			/* F7 */
-    fuse_emulation_pause();
-    widget_apply_to_file( tape_open_default_autoload );
-    fuse_emulation_unpause();
-    break;
-  case 0x42:			/* F8 */
-    tape_toggle_play();
-    break;
-  case 0x43:			/* F9 */
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_SELECT, NULL );
-    fuse_emulation_unpause();
-    break;
-  case 0x44:			/* F10 */
-    fuse_exiting = 1;
-    break;
-  }
-}
-
-void fbkeyboard_keyrelease(int keysym)
-{
-  keysyms_key_info *ptr;
-
-  ptr=keysyms_get_data(keysym);
-
-  if(ptr) {
-    if(ptr->key1 != KEYBOARD_NONE) keyboard_release(ptr->key1);
-    if(ptr->key2 != KEYBOARD_NONE) keyboard_release(ptr->key2);
-  }
-
-  return;
-
-}
-
 int fbkeyboard_end(void)
 {
   int i = 0;
@@ -211,17 +160,29 @@ int fbkeyboard_end(void)
 void
 keyboard_update( void )
 {
-  char keybuf[64];
-  for (;;)
-  {
-    int p, i = read( STDIN_FILENO, &keybuf, sizeof( keybuf ) );
-    if( i <= 0 ) return;
+  unsigned char keybuf[64];
+  static int ignore = 0;
 
-    for( p = 0; p < i; p++ )
-      if( keybuf[p] & 0x80 ) {
-	fbkeyboard_keyrelease( keybuf[p] & 0x7F );
-      } else {
-	fbkeyboard_keypress( keybuf[p] & 0x7F );
+  while( 1 ) {
+    ssize_t available, i;
+
+    available = read( STDIN_FILENO, &keybuf, sizeof( keybuf ) );
+    if( available <= 0 ) return;
+
+    for( i = 0; i < available; i++ )
+      if( ignore ) {
+	ignore--;
+      } else if( ( keybuf[i] & 0x7f ) == 0 ) {
+	ignore = 2; /* ignore extended keysyms */
+      } else if( keymap[ keybuf[i] & 0x7f ] ) {
+	input_event_t fuse_event;
+
+	fuse_event.type = ( keybuf[i] & 0x80 ) ?
+                          INPUT_EVENT_KEYRELEASE :
+                          INPUT_EVENT_KEYPRESS;
+	fuse_event.types.key.key = keymap[ keybuf[i] & 0x7f ];
+
+	input_event( &fuse_event );
       }
   }
 }
