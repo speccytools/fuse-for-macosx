@@ -33,8 +33,6 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
-#include <libspectrum.h>
-
 #include "event.h"
 #include "fuse.h"
 #include "keyboard.h"

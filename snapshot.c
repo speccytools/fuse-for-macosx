@@ -34,6 +34,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include <glib.h>
 #include <libspectrum.h>
 
 #include "display.h"

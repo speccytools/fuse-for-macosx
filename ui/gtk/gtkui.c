@@ -35,6 +35,8 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
+#include <glib.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "gtkkeyboard.h"

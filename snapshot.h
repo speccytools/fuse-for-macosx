@@ -26,6 +26,7 @@
 #define FUSE_SNAPSHOT_H
 
 #ifndef LIBSPECTRUM_LIBSPECTRUM_H
+#include <glib.h>
 #include <libspectrum.h>
 #endif
 

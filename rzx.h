@@ -28,6 +28,7 @@
 #define FUSE_RZX_H
 
 #ifndef LIBSPECTRUM_LIBSPECTRUM_H
+#include <glib.h>
 #include <libspectrum.h>
 #endif			/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
