@@ -33,7 +33,6 @@
 #include "rzx.h"
 #include "screenshot.h"
 #include "snapshot.h"
-#include "specplus3.h"
 #include "tape.h"
 #include "ui/scaler/scaler.h"
 #include "widget_internals.h"

@@ -679,3 +679,4 @@
 20040329 sound/sdlsound.c: change to 16-bit sound.
 20040329 sound/sdlsound.c: make 8-bit sound work again.
 20040331 Move the machine-specific files into the machines/ directory.
+20040331 widget/{menu.c,menu_data.c}: fix up for the machines/ changes.
