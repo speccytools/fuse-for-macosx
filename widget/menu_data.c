@@ -192,7 +192,7 @@ static widget_menu_entry widget_menu_disk_a[] = {
 static specplus3_drive_number disk_b_number = SPECPLUS3_DRIVE_B;
 
 static widget_menu_entry widget_menu_disk_b[] = {
-  { "Disk/Drive A:", 0, 0, NULL },	/* Menu title */
+  { "Disk/Drive B:", 0, 0, NULL },	/* Menu title */
 
   { "(I)nsert...", KEYBOARD_i, widget_apply_to_file,   widget_insert_disk_b },
   { "(E)ject",	   KEYBOARD_e, widget_menu_eject_disk, &disk_b_number       },
