@@ -148,8 +148,6 @@ static char **filenames;
 
 #ifndef HAVE_SCANDIR
 
-/* FIXME: memory leaks on failure */
-
 int scandir( const char *dir, struct dirent ***namelist,
 	     int (*select)(const struct dirent *),
 	     int (*compar)(const struct dirent *, const struct dirent*))
@@ -157,6 +155,7 @@ int scandir( const char *dir, struct dirent ***namelist,
   DIR *directory; struct dirent *dirent;
 
   int allocated, number;
+  int i, error;
 
   (*namelist) = (struct dirent**)malloc( 32 * sizeof(struct dirent*) );
   if( *namelist == NULL ) return -1;
@@ -164,7 +163,10 @@ int scandir( const char *dir, struct dirent ***namelist,
   allocated = 32; number = 0;
 
   directory = opendir( dir );
-  if( directory == NULL ) return -1;
+  if( directory == NULL ) {
+    free( *namelist );
+    return -1;
+  }
 
   while( 1 ) {
     errno = 0;
@@ -174,27 +176,43 @@ int scandir( const char *dir, struct dirent ***namelist,
       if( errno == 0 ) {	/* End of directory */
 	break;
       } else {
+	for( i=0; i<number; i++ ) free( (*namelist)[number] );
+	free( *namelist );
 	return -1;
       }
     }
 
     if( select( dirent ) ) {
 
-      if( ++number == allocated ) {
+      if( ++number > allocated ) {
 	(*namelist)=
 	  (struct dirent**)realloc( (*namelist),
 				    2 * allocated * sizeof(struct dirent*) );
-	if( *namelist == NULL ) return -1;
+	if( *namelist == NULL ) {
+	  for( i=0; i<number-1; i++ ) free( (*namelist)[number] );
+	  free( *namelist );
+	  return -1;
+	}
 	allocated *= 2;
       }
 
-      (*namelist)[number] = (struct dirent*)malloc( sizeof(struct dirent) );
-      if( (*namelist)[number] == NULL ) return -1;
+      (*namelist)[number-1] = (struct dirent*)malloc( sizeof(struct dirent) );
+      if( (*namelist)[number-1] == NULL ) {
+	for( i=0; i<number-1; i++ ) free( (*namelist)[number] );
+	free( *namelist );
+	return -1;
+      }
 
-      memcpy( (*namelist)[number], dirent, sizeof(struct dirent) );
+      memcpy( (*namelist)[number-1], dirent, sizeof(struct dirent) );
 
     }
 
+  }
+
+  if( closedir( directory ) ) {
+    for( i=0; i<number; i++ ) free( (*namelist)[number] );
+    free( *namelist );
+    return -1;
   }
 
   if( compar != NULL ) { 
@@ -211,10 +229,11 @@ static int select_file(const struct dirent *dirent);
 static int widget_scan_compare( const void *a, const void *b );
 
 static void scan(char *dir) {
-    struct dirent **d;
+    struct dirent **d = NULL;
     numfiles=0;
     scandir(dir,&d,select_file,NULL);
     qsort(filenames, numfiles, sizeof(char*), widget_scan_compare);
+    if( d != NULL ) free( d );
 }
 
 static int select_file(const struct dirent *dirent){
@@ -271,6 +290,11 @@ int widget_init( void )
 
 int widget_end( void )
 {
+  int i;
+
+  for( i=0; i<8192; i++) free( filenames[i] );
+  free( filenames );
+
   return 0;
 }
 
@@ -323,8 +347,6 @@ static int widget_timer_end( void )
 }
 
 /* File selection widget */
-
-/* FIXME: memory leak when a new directory is selected */
 
 /* The number of the filename in the top-left corner of the current
    display, that of the filename which the `cursor' is on, and that
