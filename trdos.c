@@ -228,6 +228,9 @@ void trdos_update_index_impulse( void )
 libspectrum_byte
 trdos_sr_read( libspectrum_word port GCC_UNUSED )
 {
+  if( !trdos_active )
+    return machine_current->unattached_port();
+
   trdos_update_index_impulse();
 
   if ( !CurrentDisk.disc_ready ) {
@@ -240,6 +243,9 @@ trdos_sr_read( libspectrum_word port GCC_UNUSED )
 libspectrum_byte
 trdos_tr_read( libspectrum_word port GCC_UNUSED )
 {
+  if( !trdos_active )
+    return machine_current->unattached_port();
+
   trdos_update_index_impulse();
 
   return( vg_reg_trk );
@@ -248,12 +254,17 @@ trdos_tr_read( libspectrum_word port GCC_UNUSED )
 void
 trdos_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
+  if( !trdos_active ) return;
+
   vg_reg_trk = b;
 }
 
 libspectrum_byte
 trdos_sec_read( libspectrum_word port GCC_UNUSED )
 {
+  if( !trdos_active )
+    return machine_current->unattached_port();
+
   trdos_update_index_impulse();
 
   return( vg_reg_sec );
@@ -262,12 +273,17 @@ trdos_sec_read( libspectrum_word port GCC_UNUSED )
 void
 trdos_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
+  if( !trdos_active ) return;
+
   vg_reg_sec = b;
 }
 
 libspectrum_byte
 trdos_dr_read( libspectrum_word port GCC_UNUSED )
 {
+  if( !trdos_active )
+    return machine_current->unattached_port();
+
   trdos_update_index_impulse();
 
   if ( toread_position >= toread_num )
@@ -299,6 +315,8 @@ trdos_dr_read( libspectrum_word port GCC_UNUSED )
 void
 trdos_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
+  if( !trdos_active ) return;
+
   vg_reg_dat = b;
 
   if( towrite == 0 ) return;
@@ -328,6 +346,9 @@ trdos_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 libspectrum_byte
 trdos_sp_read( libspectrum_word port GCC_UNUSED )
 {
+  if( !trdos_active )
+    return machine_current->unattached_port();
+
   trdos_update_index_impulse();
 
   if ( busy == 1 ) {
@@ -340,6 +361,8 @@ trdos_sp_read( libspectrum_word port GCC_UNUSED )
 void
 trdos_sp_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
+  if( !trdos_active ) return;
+
   last_vg93_system = b;
 }
 
@@ -607,6 +630,8 @@ void
 trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int error;
+
+  if( !trdos_active ) return;
 
   if ( last_vg93_system & 0x10 )
     side = 0;
