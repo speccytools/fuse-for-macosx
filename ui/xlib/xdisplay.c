@@ -300,7 +300,8 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
 {
   int size, colour;
 
-  colour= scld_hires ? display_hires_border : display_lores_border;
+  colour = scld_last_dec.name.hires ? display_hires_border :
+                                      display_lores_border;
   size = width / DISPLAY_ASPECT_WIDTH;
 
   /* If we're the same size as before, nothing special needed */
@@ -311,9 +312,6 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
 
   /* Redraw the entire screen... */
   display_refresh_all();
-
-  /* And the entire border */
-  display_refresh_border();
 
   /* If widgets are active, redraw the widget */
   if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
@@ -345,23 +343,23 @@ uidisplay_frame_end( void )
   return;
 }
 
-void uidisplay_lines( int start, int end )
+void
+uidisplay_area( int x, int y, int w, int h )
 {
-  xdisplay_area( 0, xdisplay_current_size * start,
-		 xdisplay_current_size * DISPLAY_ASPECT_WIDTH,
-		 xdisplay_current_size * ( end - start + 1 ) );
+  xdisplay_area( xdisplay_current_size * x, xdisplay_current_size * y,
+		 xdisplay_current_size * w, xdisplay_current_size * h );
 }
 
-void xdisplay_area(int x, int y, int width, int height)
+void
+xdisplay_area( int x, int y, int w, int h )
 {
   if( shm_used ) {
 #ifdef X_USE_SHM
-    XShmPutImage( display, xui_mainWindow, gc, image,
-		  x, y, x, y, width, height, True );
+    XShmPutImage( display, xui_mainWindow, gc, image, x, y, x, y, w, h, True );
     /* FIXME: should wait for an ShmCompletion event here */
 #endif				/* #ifdef X_USE_SHM */
   } else {
-    XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
+    XPutImage( display, xui_mainWindow, gc, image, x, y, x, y, w, h );
   }
 }
 

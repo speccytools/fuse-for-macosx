@@ -161,8 +161,8 @@ void widget_rectangle( int x, int y, int w, int h, int col )
 void
 widget_display_lines( int y, int h )
 {
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 8 *  y,
-		   DISPLAY_BORDER_HEIGHT + 8 * (y+h) + 7 );
+  uidisplay_area( 0, DISPLAY_BORDER_HEIGHT + 8 * y,
+		  DISPLAY_ASPECT_WIDTH, 8 * ( h + 7 ) );
   uidisplay_frame_end();
 }
 
@@ -270,8 +270,6 @@ int widget_do( widget_type which, void *data )
 
     /* Refresh the Spectrum's display, including the border */
     display_refresh_all();
-    display_dirty_border();
-
   }
 
   return 0;

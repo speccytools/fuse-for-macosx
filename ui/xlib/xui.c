@@ -166,8 +166,8 @@ int ui_event(void)
 				event.xconfigure.height);
       break;
     case Expose:
-      xdisplay_area(event.xexpose.x,event.xexpose.y,
-		    event.xexpose.width,event.xexpose.height);
+      xdisplay_area( event.xexpose.x, event.xexpose.y,
+		     event.xexpose.width, event.xexpose.height );
       break;
     case FocusOut:
       keyboard_release_all();
