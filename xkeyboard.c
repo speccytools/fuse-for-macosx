@@ -40,6 +40,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "widget.h"
 
 int xkeyboard_keypress(XKeyEvent *event)
 {
@@ -48,6 +49,11 @@ int xkeyboard_keypress(XKeyEvent *event)
   keysym=XLookupKeysym(event,0);
 
   ptr=keysyms_get_data(keysym);
+
+  if( ptr && widget_keymode == 1 ) {
+      widget_handlekeys( ptr->key1 );
+      return 0;
+  }
 
   if(ptr) {
     if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
@@ -63,10 +69,8 @@ int xkeyboard_keypress(XKeyEvent *event)
     fuse_emulation_unpause();
     break;
   case XK_F3:
-    fuse_emulation_pause();
-    snapshot_read( "snapshot.z80" );
-    display_refresh_all();
-    fuse_emulation_unpause();
+    widget_keymode = 1;
+    widget_selectfile();
     break;
   case XK_F5:
     machine_current->reset();

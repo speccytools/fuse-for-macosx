@@ -32,7 +32,8 @@ fuse_SOURCES = ay.c display.c event.c fbdisplay.c fbkeyboard.c fbui.c\
 	fuse.c gtkdisplay.c gtkkeyboard.c gtkui.c keyboard.c keysyms.c\
 	machine.c myglib.c osssound.c settings.c snapshot.c sound.c spec128.c\
 	spec48.c specplus2.c specplus3.c spectrum.c svgadisplay.c\
-	svgakeyboard.c svgaui.c tape.c timer.c xdisplay.c xkeyboard.c xui.c
+	svgakeyboard.c svgaui.c tape.c timer.c xdisplay.c xkeyboard.c xui.c\
+	widget.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DROMSDIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a z80/libz80.a
@@ -42,6 +43,6 @@ noinst_HEADERS = ay.h display.h event.h fbkeyboard.h\
 	machine.h myglib.h osssound.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h svgakeyboard.h\
 	tape.h timer.h types.h ui.h uidisplay.h xdisplay.h\
-	xkeyboard.h xui.h
+	xkeyboard.h xui.h widget.h
 
 EXTRA_DIST = AUTHORS README THANKS

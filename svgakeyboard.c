@@ -42,15 +42,16 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "widget.h"
 
 void svgakeyboard_keystroke(int scancode, int press);
 int svgakeyboard_keypress(int keysym);
 void svgakeyboard_keyrelease(int keysym);
 
-
 int svgakeyboard_init(void)
 {
   keyboard_init();
+  widget_keymode=0;
   keyboard_seteventhandler(svgakeyboard_keystroke);
   return 0;
 }
@@ -69,6 +70,11 @@ int svgakeyboard_keypress(int keysym)
 
   ptr=keysyms_get_data(keysym);
 
+  if( ptr && widget_keymode == 1 ) {
+      widget_handlekeys( ptr->key1 );
+      return;
+  }
+
   if(ptr) {
     if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
     if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
@@ -83,10 +89,8 @@ int svgakeyboard_keypress(int keysym)
     fuse_emulation_unpause();
     break;
   case SCANCODE_F3:
-    fuse_emulation_pause();
-    snapshot_read( "snapshot.z80" );
-    display_refresh_all();
-    fuse_emulation_unpause();
+    widget_keymode = 1;
+    widget_selectfile();
     break;
   case SCANCODE_F5:
     machine_current->reset();
@@ -116,7 +120,6 @@ int svgakeyboard_keypress(int keysym)
   }
 
   return 0;
-
 }
 
 void svgakeyboard_keyrelease(int keysym)
