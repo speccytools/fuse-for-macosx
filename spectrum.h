@@ -66,7 +66,7 @@ typedef struct machine_info {
 int spectrum_init();
 void spectrum_set_timings(WORD cycles_per_line,WORD lines_per_frame,DWORD hz,
 			  DWORD first_line);
-void spectrum_interrupt(void);
+int spectrum_interrupt(void);
 
 BYTE (*readbyte)(WORD address);
 BYTE (*read_screen_memory)(WORD offset);

@@ -1,4 +1,12 @@
+2000-09-27  Philip Kendall  <pak@ast.cam.ac.uk>
+
+	* Lots of other changes as well.
+
+	* Loads of changes to remove Allegro and replace it with Xlib calls.
+
 1999-08-22  Philip Kendall  <pak21@cam.ac.uk>
+
+	* Version 0.1.3 released.
 
 	* Added +2A emulation.
 

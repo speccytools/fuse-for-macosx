@@ -1,4 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
+dnl $Id$
 
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -16,45 +17,43 @@ dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 dnl
 dnl Author contact information:
 dnl
-dnl E-mail: pak21@cam.ac.uk
+dnl E-mail: pak@ast.cam.ac.uk
 dnl Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 AC_INIT(fuse.c)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.1.3)
+AM_INIT_AUTOMAKE(fuse, 0.2.0)
 
 dnl Checks for programs.
 AC_PROG_CC
 
-dnl Checks for packages
-AC_ARG_WITH(x,[  --with-x                The X Window System],,with_x="yes")
+dnl Check for big endianness
+AC_C_BIGENDIAN
 
-if test "$with_x" = "no"; then
-  AC_DEFINE(X_DISPLAY_MISSING)
-  use_x="no";
-  with_x="yes";
-fi
-
-dnl Checks for libraries.
+dnl Find the X libraries
 AC_PATH_XTRA
 CFLAGS="$CFLAGS $X_CFLAGS";
 LDFLAGS="$LDFLAGS $X_LIBS";
 LIBS="$LIBS $X_PRE_LIBS -lX11 $X_EXTRA_LIBS";
 
-AC_CHECK_LIB(alleg, allegro_init, AC_DEFINE(HAVE_LIBALLEG) )
-
-if test "$ac_cv_lib_alleg_allegro_init" = "yes" -a "$use_x" = "no"; then
-  LIBS="$LIBS -lallegwip";
-else
-  LIBS="$LIBS -lalleg";
+dnl This apparently needed for SVR4 systems to link correctly
+dnl Basically the same as a part of AC_PATH_XTRA, but using `gethostname'
+dnl instead of `gethostbyname'.
+dnl Thanks to Erik Kunze for pointing out this problem
+AC_CHECK_FUNC(gethostname)
+if test $ac_cv_func_gethostname = no; then
+  AC_CHECK_LIB(nsl, gethostname, X_EXTRA_LIBS="$X_EXTRA_LIBS -lnsl")
 fi
-
-AC_CHECK_LIB(m, sin)
+AC_CHECK_FUNC(connect)
+if test $ac_cv_func_connect = no; then
+  AC_CHECK_LIB(socket, connect, X_EXTRA_LIBS="-lsocket $X_EXTRA_LIBS", ,
+	$X_EXTRA_LIBS)
+fi
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(sys/time.h unistd.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -66,7 +65,5 @@ AC_SUBST(X_CFLAGS)
 AC_SUBST(X_LIBS)
 AC_SUBST(X_EXTRA_LIBS)
 AC_SUBST(X_PRE_LIBS)
-
-CFLAGS="$CFLAGS -Wall"
 
 AC_OUTPUT(Makefile)

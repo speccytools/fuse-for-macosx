@@ -1,5 +1,5 @@
-/* display.h: Routines for printing the Spectrum's screen
-   Copyright (c) 1999-2000 Philip Kendall
+/* xdisplay.h: Routines for dealing with the X display
+   Copyright (c) 2000 Philip Kendall
 
    $Id$
 
@@ -24,21 +24,13 @@
 
 */
 
-#ifndef FUSE_DISPLAY_H
-#define FUSE_DISPLAY_H
+#ifndef FUSE_XDISPLAY_H
+#define FUSE_XDISPLAY_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+int xdisplay_init(int argc, char **argv, int width, int height);
+void xdisplay_putpixel(int x,int y,int colour);
+void xdisplay_line(int y);
+void xdisplay_area(int x, int y, int width, int height);
+void xdisplay_set_border(int colour);
 
-extern int display_border;
-extern int display_border_width,display_border_height;
-
-int display_init(int argc, char **argv);
-void display_line(void);
-void display_dirty(WORD address, BYTE data);
-void display_set_border(int colour);
-void display_frame(void);
-void display_refresh_all(void);
-
-#endif			/* #ifndef FUSE_DISPLAY_H */
+#endif			/* #ifndef FUSE_XDISPLAY_H */

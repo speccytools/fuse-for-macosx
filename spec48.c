@@ -1,5 +1,7 @@
 /* spec48.c: Spectrum 48K specific routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -61,7 +63,7 @@ void spec48_writebyte(WORD address, BYTE b)
       default: abort();
     }
     if(address<0x5b00) {	/* 0x4000 - 0x5aff = display file */
-      display_dirty(address);	/* Replot necessary pixels */
+      display_dirty(address,b);	/* Replot necessary pixels */
     }
   }
 }

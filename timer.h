@@ -1,5 +1,7 @@
 /* timer.h: Speed routines for Fuse
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -25,16 +27,9 @@
 #ifndef FUSE_TIMER_H
 #define FUSE_TIMER_H
 
-#include "alleg.h"
-
-#if defined(Xwin_ALLEGRO) || !defined(HAVE_SETITIMER)
-#define TIMER_HOGCPU
-
-extern DWORD next_delay;
-void timer_delay(void);
-
-#endif
+extern volatile int timer_count;
 
 void timer_init(void);
+void timer_sleep(void);
 
 #endif			/* #ifndef FUSE_TIMER_H */

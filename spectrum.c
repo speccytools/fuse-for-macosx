@@ -1,5 +1,7 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -76,19 +78,16 @@ void spectrum_set_timings(WORD cycles_per_line,WORD lines_per_frame,DWORD hz,
 
 }
 
-void spectrum_interrupt(void)
+int spectrum_interrupt(void)
 {
   if(tstates>=machine.cycles_per_frame) {
     tstates-=machine.cycles_per_frame;
-#ifdef TIMER_HOGCPU
-    if(next_delay>=machine.cycles_per_frame)
-      next_delay-=machine.cycles_per_frame;
-#else		/* #ifdef TIMER_HOGCPU */
-    sleep(1);
-#endif
+    timer_sleep(); timer_count--;
     display_frame();
     z80_interrupt();
+    return 1;
   }
+  return 0;
 }
 
 BYTE readport(WORD port)
@@ -116,7 +115,7 @@ void writeport(WORD port,BYTE b)
       machine.ram.current_rom=(machine.ram.current_rom & 0x02) |
 	( (b & 0x10) >> 4 );
       machine.ram.locked=( b & 0x20 );
-      if(machine.ram.current_screen!=old_screen) display_entire_screen();
+      if(machine.ram.current_screen!=old_screen) display_refresh_all();
     }
   if( port==machine.ram.port2 &&
       machine.ram.type==SPECTRUM_MACHINE_PLUS3 &&
@@ -141,4 +140,3 @@ void writeport(WORD port,BYTE b)
     }
   }
 }
-

@@ -1,5 +1,7 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,49 +19,19 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
 
-#include "alleg.h"
-#include "spectrum.h"
-#include "timer.h"
-
-/* XWinAllegro uses setitimer(ITIMER_REAL,...) for its own purposes,
-   so we have to use the CPU hogging method :-( */
-
-#ifdef TIMER_HOGCPU
-
-int last_retrace_count;
-DWORD next_delay;
-
-void timer_init(void)
-{
-  install_timer();
-
-  last_retrace_count=retrace_count;
-  next_delay=0;
-}
-
-/* If 1/70 of a second should have elapsed, wait until it has */
-void timer_delay(void)
-{
-  if(tstates>=next_delay) {
-    while(retrace_count==last_retrace_count) { rest(1); }
-    last_retrace_count=retrace_count;
-    next_delay+=(machine.hz)/70;
-  }
-}
-
-/* If we've got setitimer(...) available (and we're not using
-   XWinAllegro), we can use this to wake up again after sleeping =>
-   don't hog the CPU :-) */
-#else
-
 #include <signal.h>
 #include <sys/time.h>
 #include <unistd.h>
+
+#include "spectrum.h"
+#include "timer.h"
+
+volatile int timer_count;
 
 void timer_init(void);
 static void timer_setup_timer(void);
@@ -68,6 +40,7 @@ void timer_signal(int signal);
 
 void timer_init(void)
 {
+  timer_count=0;
   timer_setup_handler();
   timer_setup_timer();
 }
@@ -88,12 +61,15 @@ static void timer_setup_handler(void)
   handler.sa_handler=timer_signal;
   sigemptyset(&handler.sa_mask);
   handler.sa_flags=0;
-  sigaction(SIGALRM,&handler,0);
+  sigaction(SIGALRM,&handler,NULL);
 }  
 
 void timer_signal(int signal)
 {
-  return;
+  timer_count++;
 }
 
-#endif
+void timer_sleep(void)
+{
+  if(timer_count<=0) pause();
+}

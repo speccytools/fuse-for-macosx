@@ -29,10 +29,13 @@
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
-/* Union allowing a register pair to be accessed as bytes or as a word
-   *** WON'T WORK ON BIG ENDIAN MACHINES *** */
+/* Union allowing a register pair to be accessed as bytes or as a word */
 typedef union {
+#ifdef WORDS_BIGENDIAN
+  struct { BYTE h,l; } b;
+#else
   struct { BYTE l,h; } b;
+#endif
   WORD w;
 } regpair;
 

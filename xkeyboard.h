@@ -1,5 +1,5 @@
-/* display.h: Routines for printing the Spectrum's screen
-   Copyright (c) 1999-2000 Philip Kendall
+/* xkeyboard.h: X routines for dealing with the keyboard
+   Copyright (c) 2000 Philip Kendall
 
    $Id$
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
    Author contact information:
 
@@ -24,21 +24,10 @@
 
 */
 
-#ifndef FUSE_DISPLAY_H
-#define FUSE_DISPLAY_H
+#ifndef FUSE_XKEYBOARD_H
+#define FUSE_XKEYBOARD_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+int xkeyboard_keypress(XKeyEvent *event);
+void xkeyboard_keyrelease(XKeyEvent *event);
 
-extern int display_border;
-extern int display_border_width,display_border_height;
-
-int display_init(int argc, char **argv);
-void display_line(void);
-void display_dirty(WORD address, BYTE data);
-void display_set_border(int colour);
-void display_frame(void);
-void display_refresh_all(void);
-
-#endif			/* #ifndef FUSE_DISPLAY_H */
+#endif			/* #ifndef FUSE_XKEYBOARD_H */

@@ -1,5 +1,7 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -39,9 +41,9 @@ BYTE spec128_readbyte(WORD address)
   if(address<0x4000) return ROM[machine.ram.current_rom][address];
   bank=address/0x4000; address-=(bank*0x4000);
   switch(bank) {
-    case 1: return RAM[machine.ram.current_screen][address]; break;
-    case 2: return RAM[                         2][address]; break;
-    case 3: return RAM[machine.ram.current_page  ][address]; break;
+    case 1: return RAM[                       5][address]; break;
+    case 2: return RAM[                       2][address]; break;
+    case 3: return RAM[machine.ram.current_page][address]; break;
     default: abort();
   }
 }
@@ -58,13 +60,13 @@ void spec128_writebyte(WORD address, BYTE b)
   if(address>=0x4000) {		/* 0x4000 = 1st byte of RAM */
     bank=address/0x4000; address-=(bank*0x4000);
     switch(bank) {
-      case 1: bank=machine.ram.current_screen; break;
-      case 2: bank=2;                          break;
-      case 3: bank=machine.ram.current_page;   break;
+      case 1: bank=5;                        break;
+      case 2: bank=2;                        break;
+      case 3: bank=machine.ram.current_page; break;
     }
     RAM[bank][address]=b;
     if(bank==machine.ram.current_screen && address < 0x1b00) {
-      display_dirty(address+0x4000); /* Replot necessary pixels */
+      display_dirty(address+0x4000,b); /* Replot necessary pixels */
     }
   }
 }
