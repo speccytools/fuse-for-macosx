@@ -43,7 +43,7 @@
 #include "tape.h"
 #ifdef USE_WIDGET
 #include "widget/widget.h"
-#endif				/* #ifdef USE_WIDGET
+#endif				/* #ifdef USE_WIDGET */
 
 static void svgakeyboard_keystroke(int scancode, int press);
 static void svgakeyboard_keypress(int keysym);
