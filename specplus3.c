@@ -53,6 +53,11 @@ spectrum_port_info specplus3_peripherals[] = {
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
+static BYTE specplus3_unattached_port( void )
+{
+  return spectrum_unattached_port( 3 ); /* FIXME: is this right? */
+}
+
 BYTE specplus3_readbyte(WORD address)
 {
   int bank;
@@ -170,6 +175,7 @@ int specplus3_init( machine_info *machine )
   if( error ) return error;
 
   machine->peripherals=specplus3_peripherals;
+  machine->unattached_port = specplus3_unattached_port;
 
   machine->ay.present=1;
 

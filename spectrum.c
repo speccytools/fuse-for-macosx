@@ -141,3 +141,61 @@ void spectrum_ula_write(WORD port, BYTE b)
     }
   }
 }
+
+/* What happens if we read from an unattached port? */
+BYTE spectrum_unattached_port( int offset )
+{
+  int line, tstates_through_line, column;
+
+  /* Work out which line we're on, relative to the top of the screen */
+  line = ( (SDWORD)tstates -
+	   (SDWORD)machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] ) /
+    machine_current->timings.cycles_per_line;
+
+  /* Return 0xff (idle bus) if we're in the lower or upper borders */
+  if( line < 0 || line >= DISPLAY_HEIGHT )
+    return 0xff;
+
+  /* Work out where we are in this line */
+  tstates_through_line = tstates -
+    machine_current->line_times[ DISPLAY_BORDER_HEIGHT + line ];
+
+  /* Idle bus if we're in the left border */
+  if( tstates_through_line <
+      machine_current->timings.left_border_cycles - offset )
+    return 0xff;
+
+  /* Or the right border or retrace */
+  if( tstates_through_line >= machine_current->timings.left_border_cycles +
+                              machine_current->timings.screen_cycles - offset )
+    return 0xff;
+
+  column = ( ( tstates_through_line + 1 -
+	       machine_current->timings.left_border_cycles ) / 8) * 2;
+
+  switch( tstates_through_line % 8 ) {
+
+    /* FIXME: 25% of these should be screen data, 25% attribute bytes
+       and 50% idle bus, but the actual distribution is unknown. Also,
+       in each 8 T-state block, 16 pixels are displayed; when each of
+       these is read is also unknown. Thanks to Ian Greenway for this
+       information */
+
+    /* Attribute bytes */
+    case 1: column++;
+    case 0:
+      return read_screen_memory( display_attr_start[line] + column );
+
+    /* Screen data */
+    case 3: column++;
+    case 2:
+      return read_screen_memory( display_line_start[line] + column );
+
+    /* Idle bus */
+    case 4: case 5: case 6: case 7:
+      return 0xff;
+
+  }
+
+  return 0;		/* Keep gcc happy */
+}

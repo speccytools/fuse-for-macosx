@@ -49,6 +49,11 @@ spectrum_port_info spec128_peripherals[] = {
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
+BYTE spec128_unattached_port( void )
+{
+  return spectrum_unattached_port( 3 );
+}
+
 BYTE spec128_readbyte(WORD address)
 {
   WORD bank;
@@ -115,6 +120,7 @@ int spec128_init( machine_info *machine )
   if( error ) return error;
 
   machine->peripherals = spec128_peripherals;
+  machine->unattached_port = spec128_unattached_port;
 
   machine->ay.present = 1;
 

@@ -62,6 +62,7 @@ int specplus2_init( machine_info *machine )
   if( error ) return error;
 
   machine->peripherals = spec128_peripherals;
+  machine->unattached_port = spec128_unattached_port;
 
   machine->ay.present = 1;
 

@@ -98,6 +98,8 @@ BYTE spectrum_port_noread(WORD port);
 BYTE spectrum_ula_read(WORD port);
 void spectrum_ula_write(WORD port, BYTE b);
 
+BYTE spectrum_unattached_port( int offset );
+
 /* Miscellaneous stuff */
 
 int spectrum_interrupt(void);
