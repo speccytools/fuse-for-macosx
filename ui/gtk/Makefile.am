@@ -56,7 +56,7 @@ keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl gtk ../../keysyms.dat > $@
 
 menu_data.c: ../../menu_data.pl ../../menu_data.c
-	$(CPP) $(CPPFLAGS) $(DEFS) ../../menu_data.c | @PERL@ ../../menu_data.pl gtk > $@
+	$(CPP) $(CPPFLAGS) $(DEFS) -I../.. ../../menu_data.c | @PERL@ ../../menu_data.pl gtk > $@
 
 options.c: options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
 	@PERL@ options.pl ../options.dat > options.c

@@ -846,3 +846,5 @@
          snapshots.
 20040524 if2.c,snapshot.c: Fix Interface II eject menu state after snapshot
          loading.
+20040524 ui/gtk/Makefile.am: ensure config.h can be found when processing
+	 menu_data.c.
