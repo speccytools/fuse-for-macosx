@@ -267,13 +267,15 @@ int tape_next_edge( void )
   /* If the tape's not playing, just return */
   if( ! tape_playing ) return 0;
 
-  /* Invert the microphone state */
-  tape_microphone = !tape_microphone;
-
   /* Get the time until the next edge */
   libspec_error = libspectrum_tape_get_next_edge( &tape, &edge_tstates,
 						  &end_of_tape );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;
+
+  /* Invert the microphone state */
+  if( edge_tstates || end_of_tape ) {
+    tape_microphone = !tape_microphone;
+  }
 
   /* And put this into the event queue */
   error = event_add( tstates + edge_tstates, EVENT_TYPE_EDGE );

@@ -336,7 +336,7 @@ rom_edge( libspectrum_tape_rom_block *block, libspectrum_dword *tstates,
 
   case LIBSPECTRUM_TAPE_STATE_PAUSE:
     /* The pause at the end of the block */
-    *tstates = (block->pause * 69888)/50; /* FIXME: should vary with tstates
+    *tstates = (block->pause * 69888)/20; /* FIXME: should vary with tstates
 					     per frame */
     *end_of_block = 1;
     break;
@@ -428,7 +428,7 @@ turbo_edge( libspectrum_tape_turbo_block *block, libspectrum_dword *tstates,
 
   case LIBSPECTRUM_TAPE_STATE_PAUSE:
     /* The pause at the end of the block */
-    *tstates = (block->pause * 69888)/50; /* FIXME: should vary with tstates
+    *tstates = (block->pause * 69888)/20; /* FIXME: should vary with tstates
 					     per frame */
     *end_of_block = 1;
     break;
@@ -528,7 +528,7 @@ pure_data_edge( libspectrum_tape_pure_data_block *block,
 
   case LIBSPECTRUM_TAPE_STATE_PAUSE:
     /* The pause at the end of the block */
-    *tstates = (block->pause * 69888)/50; /* FIXME: should vary with tstates
+    *tstates = (block->pause * 69888)/20; /* FIXME: should vary with tstates
 					     per frame */
     *end_of_block = 1;
     break;
