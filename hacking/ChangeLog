@@ -432,3 +432,5 @@
 20040102 fuse.[ch], machine.c: make the buffer holding Fuse's starting
 	 directory be of length PATH_MAX (patch #868409) (Fred).
 20040102 fuse.c: remove unused variable 'autoload' from fuse_init().
+20040102 ui/scaler, ui/sdl/sdldisplay.c: add Timex 1.5x scaler (part of
+	 patch #868418) (Fred).

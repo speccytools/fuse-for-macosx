@@ -115,6 +115,7 @@ init_scalers( void )
     scaler_register( SCALER_HALF ); 
     scaler_register( SCALER_HALFSKIP );
     scaler_register( SCALER_TIMEXTV );
+    scaler_register( SCALER_TIMEX1_5X );
   } else {
     scaler_register( SCALER_TV2X );
   }

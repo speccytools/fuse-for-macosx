@@ -785,6 +785,43 @@ FUNCTION( scaler_Normal3x )( const libspectrum_byte *srcPtr,
   }
 }
 
+void 
+FUNCTION( scaler_Timex1_5x )( const libspectrum_byte *srcPtr,
+           libspectrum_dword srcPitch,
+           libspectrum_byte *dstPtr,
+           libspectrum_dword dstPitch,
+           int width, int height )
+{
+  libspectrum_byte *r;
+  libspectrum_dword dstPitch2 = dstPitch * 2;
+  libspectrum_dword dstPitch3 = dstPitch * 3;
+
+  while (height--) {
+    int i;
+    r = dstPtr;
+    if( ( height & 1 ) == 0 ) {
+      for (i = 0; i < width; i+=2, r += 3 * SCALER_DATA_SIZE ) {
+        /* Interpolate a new pixel inbetween the source pixels */
+        scaler_data_type color1 = *(((const scaler_data_type*) srcPtr) + i);
+        scaler_data_type color2 = *(((const scaler_data_type*) srcPtr) + i + 1);
+        scaler_data_type color3 = INTERPOLATE(color1, color2);
+
+        *(scaler_data_type*)( r +                    0             ) = color1;
+        *(scaler_data_type*)( r +     SCALER_DATA_SIZE             ) = color3;
+        *(scaler_data_type*)( r + 2 * SCALER_DATA_SIZE             ) = color2;
+        *(scaler_data_type*)( r +                    0 + dstPitch  ) = color1;
+        *(scaler_data_type*)( r +     SCALER_DATA_SIZE + dstPitch  ) = color3;
+        *(scaler_data_type*)( r + 2 * SCALER_DATA_SIZE + dstPitch  ) = color2;
+        *(scaler_data_type*)( r +                    0 + dstPitch2 ) = color1;
+        *(scaler_data_type*)( r +     SCALER_DATA_SIZE + dstPitch2 ) = color3;
+        *(scaler_data_type*)( r + 2 * SCALER_DATA_SIZE + dstPitch2 ) = color2;
+      }
+      dstPtr += dstPitch3;
+    }
+    srcPtr += srcPitch;
+  }
+}
+
 void
 FUNCTION( scaler_TV2x )( const libspectrum_byte *srcPtr,
 			 libspectrum_dword srcPitch, libspectrum_byte *dstPtr,

@@ -93,6 +93,8 @@ static struct scaler_info available_scalers[] = {
     scaler_TimexTV_16,    scaler_TimexTV_32,    NULL                },
   { "Dot Matrix",      "dotmatrix",  SCALER_FLAGS_EXPAND,      2.0,
     scaler_DotMatrix_16,  scaler_DotMatrix_32,  expand_dotmatrix    },
+  { "Timex 1.5x",      "timex15x",   SCALER_FLAGS_NONE,        1.5,
+    scaler_Timex1_5x_16,  scaler_Timex1_5x_32,  NULL                },
 };
 
 scaler_type current_scaler = SCALER_NUM;
