@@ -206,8 +206,22 @@ static int xdisplay_allocate_image(int width, int height)
     if( shm_used && image ) {
       shm_info.shmid = id;
       image->data = shm_info.shmaddr = shmat( id, 0, 0 );
-      if( !image->data || !XShmAttach( display, &shm_info ) )
+      if( image->data ) {
+
+	/* This may generate an X error */
+	xerror_error = 0; xerror_expecting = 1;
+	if( !XShmAttach( display, &shm_info ) ) xdisplay_destroy_image();
+
+	/* Force any errors to occur before we disable traps */
+	XSync( display, False );
+	xerror_expecting = 0;
+
+	/* If we caught an X error, don't use SHM */
+	if( xerror_error ) shm_used = 0;
+
+      } else {
 	xdisplay_destroy_image();
+      }
     } else {
       shm_used = 0;
     }

@@ -37,8 +37,6 @@ int xerror_error;
 int
 xerror_handler( Display *display, XErrorEvent *error )
 {
-  fprintf( stderr, "xerror_handler called!\n" );
-
   /* If we were expecting an error to occur, just set a flag. Otherwise,
      exit in a fairly spectacular fashion */
   if( xerror_expecting ) {
