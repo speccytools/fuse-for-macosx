@@ -48,5 +48,5 @@ void ay_registerport_write(WORD port, BYTE b)
 void ay_dataport_write(WORD port, BYTE b)
 {
   machine_current->ay.registers[ machine_current->ay.current_register ] = b;
-  sound_ay_write( machine_current->ay.current_register, b );
+  sound_ay_write( machine_current->ay.current_register, b, tstates );
 }

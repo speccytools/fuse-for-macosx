@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <sys/soundcard.h>
 
+#include "types.h"
 #include "sound.h"
 #include "spectrum.h"
 

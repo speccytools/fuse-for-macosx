@@ -33,6 +33,7 @@
 #include "fuse.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "sound.h"
 #include "spec48.h"
 #include "spectrum.h"
 #include "z80/z80.h"
@@ -119,6 +120,7 @@ int spec48_reset(void)
 		 EVENT_TYPE_LINE) ) return 1;
 
   z80_reset();
+  sound_ay_reset();	/* should happen for *all* resets */
 
   return 0;
 }

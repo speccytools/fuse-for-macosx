@@ -73,12 +73,18 @@ int fbkeyboard_keypress(int keysym)
 
   ptr=keysyms_get_data(keysym);
 
+  if(widget_active)
+    return 0;
+  
   if(ptr) {
     if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
     if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
     return 0;
   }
 
+  if(widget_active)
+    return 0;
+  
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
   case -1:

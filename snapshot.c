@@ -39,6 +39,7 @@
 #include "fuse.h"
 #include "libspectrum/libspectrum.h"
 #include "machine.h"
+#include "sound.h"
 #include "snapshot.h"
 #include "spec128.h"
 #include "spectrum.h"
@@ -206,8 +207,10 @@ static int snapshot_copy_from( libspectrum_snap *snap )
   if( machine_current->machine == SPECTRUM_MACHINE_128 ) {
     spec128_memoryport_write( 0x7ffd, snap->out_128_memoryport );
     ay_registerport_write( 0xfffd, snap->out_ay_registerport );
-    for( i=0; i<15; i++ )
+    for( i=0; i<15; i++ ) {
       machine_current->ay.registers[i] = snap->ay_registers[i];
+      sound_ay_write( i, snap->ay_registers[i], 0 );
+    }
   }
 
   tstates = snap->tstates;

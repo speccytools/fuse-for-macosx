@@ -33,6 +33,7 @@
 #include "event.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "sound.h"
 #include "spec128.h"
 #include "specplus3.h"
 #include "spectrum.h"
@@ -177,6 +178,7 @@ int specplus3_reset(void)
 		 EVENT_TYPE_LINE) ) return 1;
 
   z80_reset();
+  sound_ay_reset();
 
   return 0;
 }

@@ -27,10 +27,17 @@
 
 void sound_init(void);
 void sound_end(void);
-void sound_ay_write(int reg,int val);
+void sound_ay_write(int reg,int val,DWORD tstates);
+void sound_ay_reset(void);
 void sound_frame(void);
 void sound_beeper(int on);
 
-extern int sound_freq,sound_channels,sound_enabled;
+extern int sound_enabled;
+extern int sound_freq;
+extern int sound_stereo;
+extern int sound_stereo_beeper;
+extern int sound_stereo_ay;
+extern int sound_stereo_ay_abc;
+extern int sound_stereo_ay_narrow;
 
 #endif				/* #ifndef FUSE_SOUND_H */

@@ -60,17 +60,20 @@
 int sound_enabled=0;		/* Are we currently using the sound card;
 				   cf fuse.c:fuse_sound_in_use */
 int sound_freq=32000;
-int sound_stereo=0;
-int sound_stereo_acb=0;		/* 1 for ACB stereo, else 0 */
+int sound_stereo=0;		/* true for stereo *output sample* (only) */
+int sound_stereo_beeper=0;	/* beeper pseudo-stereo */
+int sound_stereo_ay=0;		/* AY stereo separation */
+int sound_stereo_ay_abc=0;	/* (AY stereo) true for ABC stereo, else ACB */
+int sound_stereo_ay_narrow=0;	/* (AY stereo) true for narrow AY st. sep. */
 
 
 #define AY_CLOCK		1773400
 
-/* assume all three tone channels together match the beeper volume.
- * Must be <=127 for all channels; 4 x 31 = 124.
+/* assume all three tone channels together match the beeper volume (ish).
+ * Must be <=127 for all channels; 52+(24*3) = 124.
  */
-#define AMPL_BEEPER		31
-#define AMPL_AY_TONE		31	/* three of these */
+#define AMPL_BEEPER		52
+#define AMPL_AY_TONE		24	/* three of these */
 
 /* full range of beeper volume */
 #define VOL_BEEPER		(AMPL_BEEPER*2)
@@ -122,6 +125,14 @@ static struct ay_change_tag ay_change[AY_CHANGE_MAX];
 static int ay_change_count;
 
 
+#define STEREO_BUF_SIZE 1024
+
+static int pstereobuf[STEREO_BUF_SIZE];
+static int pstereobufsiz,pstereopos;
+static int psgap=250;
+static int rstereobuf_l[STEREO_BUF_SIZE],rstereobuf_r[STEREO_BUF_SIZE];
+static int rstereopos,rchan1pos,rchan2pos,rchan3pos;
+
 
 static void sound_ay_init(void)
 {
@@ -151,7 +162,7 @@ ay_change_count=0;
 
 void sound_init(void)
 {
-int ret;
+int f,ret;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
 #if !defined(HAVE_SYS_SOUNDCARD_H)	/* only type for now */
@@ -167,7 +178,10 @@ if(ret)
 
 /* important to override this if not using stereo */
 if(!sound_stereo)
-  sound_stereo_acb=0;
+  {
+  sound_stereo_ay=0;
+  sound_stereo_beeper=0;
+  }
 
 sound_enabled=1;
 sound_channels=(sound_stereo?2:1);
@@ -189,6 +203,30 @@ beeper_tick_incr=(1<<24)/sound_freq;
 
 sound_ay_init();
 
+if(sound_stereo_beeper)
+  {  
+  for(f=0;f<STEREO_BUF_SIZE;f++)
+    pstereobuf[f]=0;
+  pstereopos=0;
+  pstereobufsiz=(sound_freq*psgap)/22000;
+  }
+
+if(sound_stereo_ay)
+  {
+  int pos=(sound_stereo_ay_narrow?3:6)*sound_freq/8000;
+
+  for(f=0;f<STEREO_BUF_SIZE;f++)
+    rstereobuf_l[f]=rstereobuf_r[f]=0;
+  rstereopos=0;
+
+  /* the actual ACB/ABC bit :-) */
+  rchan1pos=-pos;
+  if(sound_stereo_ay_abc)
+    rchan2pos=0,  rchan3pos=pos;
+  else
+    rchan2pos=pos,rchan3pos=0;
+  }
+
 fuse_sound_in_use=1;
 }
 
@@ -207,6 +245,28 @@ if(sound_enabled)
 }
 
 
+/* write sample to buffer as pseudo-stereo */
+void sound_write_buf_pstereo(unsigned char *out,int c)
+{
+int bl=(c-128-pstereobuf[pstereopos])/2;
+int br=(c-128+pstereobuf[pstereopos])/2;
+
+if(bl<-AMPL_BEEPER) bl=-AMPL_BEEPER;
+if(br<-AMPL_BEEPER) br=-AMPL_BEEPER;
+if(bl> AMPL_BEEPER) bl= AMPL_BEEPER;
+if(br> AMPL_BEEPER) br= AMPL_BEEPER;
+
+bl+=128; br+=128;
+*out=(unsigned char)bl; out[1]=(unsigned char)br;
+
+pstereobuf[pstereopos]=c-128;
+pstereopos++;
+if(pstereopos>=pstereobufsiz)
+  pstereopos=0;
+}
+
+
+
 /* not great having this as a macro to inline it, but it's only
  * a fairly short routine, and it saves messing about.
  * (XXX ummm, possibly not so true any more :-))
@@ -214,33 +274,50 @@ if(sound_enabled)
 #define AY_GET_SUBVAL(tick,period) \
   (level*2*(tick-period)/ay_tick_incr)
 
-#define AY_OVERLAY_TONE(ptr,chan,level) \
+#define AY_DO_TONE(var,chan) \
+  (var)=0;								\
   was_high=0;								\
   if(level)								\
     {									\
     if(ay_tone_tick[chan]>=ay_tone_period[chan])			\
-      (*(ptr))+=(level),was_high=1;					\
+      (var)=-(level),was_high=1;					\
     else								\
-      (*(ptr))-=(level);						\
+      (var)= (level);							\
     }									\
   									\
   ay_tone_tick[chan]+=ay_tick_incr;					\
   if(level && !was_high && ay_tone_tick[chan]>=ay_tone_period[chan])	\
-    (*(ptr))+=AY_GET_SUBVAL(ay_tone_tick[chan],ay_tone_period[chan]);	\
+    (var)-=AY_GET_SUBVAL(ay_tone_tick[chan],ay_tone_period[chan]);	\
   									\
   if(ay_tone_tick[chan]>=ay_tone_period[chan]*2)			\
     {									\
     ay_tone_tick[chan]-=ay_tone_period[chan]*2;				\
     /* sanity check needed to avoid making samples sound terrible */ 	\
     if(level && ay_tone_tick[chan]<ay_tone_period[chan]) 		\
-      (*(ptr))-=AY_GET_SUBVAL(ay_tone_tick[chan],0);			\
+      (var)+=AY_GET_SUBVAL(ay_tone_tick[chan],0);			\
+    }
+
+/* add val, correctly delayed on either left or right buffer,
+ * to add the AY stereo positioning. This doesn't actually put
+ * anything directly in sound_buf, though.
+ */
+#define GEN_STEREO(pos,val) \
+  if((pos)<0)							\
+    {								\
+    rstereobuf_l[rstereopos]+=(val);				\
+    rstereobuf_r[(rstereopos-pos)%STEREO_BUF_SIZE]+=(val);	\
+    }								\
+  else								\
+    {								\
+    rstereobuf_l[(rstereopos+pos)%STEREO_BUF_SIZE]+=(val);	\
+    rstereobuf_r[rstereopos]+=(val);				\
     }
 
 
 static void sound_ay_overlay(void)
 {
 static int rng=1;
-static int noise_toggle=1;
+static int noise_toggle=0;
 static int env_level=0;
 int tone_level[3];
 int mixer,envshape;
@@ -251,6 +328,7 @@ struct ay_change_tag *change_ptr=ay_change;
 int changes_left=ay_change_count;
 int reg,r;
 int was_high;
+int chan1,chan2,chan3;
 
 /* If no AY chip, don't produce any AY sound (!) */
 if(!machine_current->ay.present) return;
@@ -260,7 +338,7 @@ for(f=0;f<ay_change_count;f++)
   ay_change[f].ofs=(ay_change[f].tstates*sound_freq)/
                    machine_current->timings.hz;
 
-for(f=0,ptr=sound_buf;f<sound_framesiz;f++,ptr+=sound_channels)
+for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
   {
   /* update ay registers. All this sub-frame change stuff
    * is pretty hairy, but how else would you handle the
@@ -345,30 +423,77 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++,ptr+=sound_channels)
       }
     }
 
-  /* generate tone+noise */
-  /* channel C first to make ACB easier */
+  /* generate tone+noise... or neither.
+   * (if no tone/noise is selected, the chip just shoves the
+   * level out unmodified. This is used by some sample-playing
+   * stuff.)
+   */
+  chan1=tone_level[0];
+  chan2=tone_level[1];
+  chan3=tone_level[2];
   mixer=sound_ay_registers[7];
-  if((mixer&4)==0 || (mixer&0x20)==0)
+  
+  if((mixer&1)==0)
     {
-    level=(noise_toggle || (mixer&0x20))?tone_level[2]:0;
-    AY_OVERLAY_TONE(ptr,2,level);
-    if(sound_stereo && sound_stereo_acb)
-      ptr[1]=*ptr;
+    level=chan1;
+    AY_DO_TONE(chan1,0);
     }
-  if((mixer&1)==0 || (mixer&0x08)==0)
+  if((mixer&0x08)==0 && noise_toggle)
+    chan1=0;
+  
+  if((mixer&2)==0)
     {
-    level=(noise_toggle || (mixer&0x08))?tone_level[0]:0;
-    AY_OVERLAY_TONE(ptr,0,level);
+    level=chan2;
+    AY_DO_TONE(chan2,1);
     }
-  if((mixer&2)==0 || (mixer&0x10)==0)
+  if((mixer&0x10)==0 && noise_toggle)
+    chan2=0;
+  
+  if((mixer&4)==0)
     {
-    level=(noise_toggle || (mixer&0x10))?tone_level[1]:0;
-    AY_OVERLAY_TONE(ptr+sound_stereo_acb,1,level);
+    level=chan3;
+    AY_DO_TONE(chan3,2);
+    }
+  if((mixer&0x20)==0 && noise_toggle)
+    chan3=0;
+
+  /* write the sample(s) */
+  if(!sound_stereo)
+    {
+    /* mono */
+    (*ptr++)+=chan1+chan2+chan3;
+    }
+  else
+    {
+    if(!sound_stereo_ay)
+      {
+      /* stereo output, but mono AY sound; still,
+       * incr separately in case of beeper pseudostereo.
+       */
+      (*ptr++)+=chan1+chan2+chan3;
+      (*ptr++)+=chan1+chan2+chan3;
+      }
+    else
+      {
+      /* stereo with ACB/ABC AY positioning.
+       * Here we use real stereo positions for the channels.
+       * Just because, y'know, it's cool and stuff. No, really. :-)
+       * This is a little tricky, as it works by delaying sounds
+       * on the left or right channels to model the delay you get
+       * in the real world when sounds originate at different places.
+       */
+      GEN_STEREO(rchan1pos,chan1);
+      GEN_STEREO(rchan2pos,chan2);
+      GEN_STEREO(rchan3pos,chan3);
+      (*ptr++)+=rstereobuf_l[rstereopos];
+      (*ptr++)+=rstereobuf_r[rstereopos];
+      rstereobuf_l[rstereopos]=rstereobuf_r[rstereopos]=0;
+      rstereopos++;
+      if(rstereopos>=STEREO_BUF_SIZE)
+        rstereopos=0;
+      }
     }
   
-  if(sound_stereo && !sound_stereo_acb)
-    ptr[1]=*ptr;
-
   /* update noise RNG/filter */
   ay_noise_tick+=ay_tick_incr;
   if(ay_noise_tick>=ay_noise_period)
@@ -391,7 +516,7 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++,ptr+=sound_channels)
 /* don't make the change immediately; record it for later,
  * to be made by sound_frame() (via sound_ay_overlay()).
  */
-void sound_ay_write(int reg,int val)
+void sound_ay_write(int reg,int val,DWORD tstates)
 {
 if(!sound_enabled) return;
 
@@ -404,6 +529,20 @@ if(tstates>=0 && ay_change_count<AY_CHANGE_MAX)
   }
 }
 
+
+/* no need to call this initially, but should be called
+ * on reset otherwise.
+ */
+void sound_ay_reset(void)
+{
+int f;
+
+if(!sound_enabled) return;
+
+ay_change_count=0;
+for(f=0;f<15;f++)
+  sound_ay_write(f,0,0);
+}
 
 
 /* it should go without saying that the beeper was hardly capable of
@@ -434,6 +573,25 @@ if(tstates>=0 && ay_change_count<AY_CHANGE_MAX)
         sound_oldval++;			\
     }
 
+/* write stereo or mono beeper sample, and incr ptr */
+#define SOUND_WRITE_BUF_BEEPER(ptr,val) \
+  do						\
+    {						\
+    if(sound_stereo_beeper)			\
+      {						\
+      sound_write_buf_pstereo((ptr),(val));	\
+      (ptr)+=2;					\
+      }						\
+    else					\
+      {						\
+      *(ptr)++=(val);				\
+      if(sound_stereo)				\
+        *(ptr)++=(val);				\
+      }						\
+    }						\
+  while(0)
+
+
 void sound_frame(void)
 {
 unsigned char *ptr;
@@ -445,9 +603,7 @@ ptr=sound_buf+(sound_stereo?sound_fillpos*2:sound_fillpos);
 for(f=sound_fillpos;f<sound_framesiz;f++)
   {
   BEEPER_OLDVAL_ADJUST;
-  *ptr++=sound_oldval;
-  if(sound_stereo)
-    *ptr++=sound_oldval;
+  SOUND_WRITE_BUF_BEEPER(ptr,sound_oldval);
   }
 
 sound_ay_overlay();
@@ -481,8 +637,9 @@ if(val==sound_oldval_orig) return;
  * whenever cycles_per_frame were changed (i.e. when machine type changed).
  */
 newpos=(tstates*sound_framesiz)/machine_current->timings.cycles_per_frame;
-subpos=(tstates*sound_framesiz*VOL_BEEPER)/
-        machine_current->timings.cycles_per_frame-VOL_BEEPER*newpos;
+/* the >>1s are to avoid overflow when int is 32-bit */
+subpos=((tstates>>1)*sound_framesiz*VOL_BEEPER)/
+       (machine_current->timings.cycles_per_frame>>1)-VOL_BEEPER*newpos;
 
 /* if we already wrote here, adjust the level.
  */
@@ -509,20 +666,23 @@ if(newpos>=0)
   for(f=sound_fillpos;f<newpos && f<sound_framesiz;f++)
     {
     BEEPER_OLDVAL_ADJUST;
-    *ptr++=sound_oldval;
-    if(sound_stereo)
-      *ptr++=sound_oldval;
+    SOUND_WRITE_BUF_BEEPER(ptr,sound_oldval);
     }
 
   if(newpos<sound_framesiz)
     {
     /* newpos may be less than sound_fillpos, so... */
     ptr=sound_buf+(sound_stereo?newpos*2:newpos);
-    
+
+    /* limit subval in case of faded beeper level,
+     * to avoid slight spikes on ordinary tones.
+     */
+    if((sound_oldval<128 && subval<sound_oldval) ||
+       (sound_oldval>=128 && subval>sound_oldval))
+      subval=sound_oldval;
+
     /* write subsample value */
-    *ptr=subval;
-    if(sound_stereo)
-      *++ptr=subval;
+    SOUND_WRITE_BUF_BEEPER(ptr,subval);
     }
   }
 
