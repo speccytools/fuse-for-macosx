@@ -51,11 +51,11 @@ void yyerror( char *s );
 
 }
 
-%token		 ALL
 %token		 BASE
 %token		 BREAK
 %token		 CLEAR
 %token		 CONTINUE
+%token		 DELETE
 %token		 DISASSEMBLE
 %token		 EXIT
 %token		 IGNORE
@@ -85,14 +85,11 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 			DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 		      );
 		    }
-	 | BREAK CLEAR ALL { debugger_breakpoint_remove_all(); }
-	 | BREAK CLEAR NUMBER { debugger_breakpoint_remove( $3 ); }
 	 | BREAK NUMBER { debugger_breakpoint_add( 
 			    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, $2, 0,
 			    DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 			  );
 			}
-	 | BREAK IGNORE NUMBER NUMBER { debugger_breakpoint_ignore( $3, $4 ); }
 	 | BREAK PORT READ NUMBER {
              debugger_breakpoint_add(
                DEBUGGER_BREAKPOINT_TYPE_PORT_READ, $4, 0,
@@ -127,8 +124,11 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 				);
 			      }
 	 | CONTINUE { debugger_run(); }
+	 | DELETE { debugger_breakpoint_remove_all(); }
+	 | DELETE NUMBER { debugger_breakpoint_remove( $2 ); }
 	 | DISASSEMBLE NUMBER { ui_debugger_disassemble( $2 ); }
 	 | EXIT	    { debugger_breakpoint_exit(); }
+	 | IGNORE NUMBER NUMBER { debugger_breakpoint_ignore( $2, $3 ); }
 	 | NEXT	    { debugger_next(); }
 	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }

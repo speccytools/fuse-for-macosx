@@ -49,11 +49,11 @@ HEX	[0-9a-f]
 
 %%
 
-al|all { return ALL; }
 ba|bas|base { return BASE; }
 br|bre|brea|break|breakp|breakpo|breakpoi|breakpoin|breakpoint { return BREAK;}
 co|con|cont|contin|continu|continue { return CONTINUE; }
 cl|cle|clea|clear { return CLEAR; }
+del|dele|delet|delete { return DELETE; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
 	                                                  return DISASSEMBLE; }
 ex|exi|exit { return EXIT; }

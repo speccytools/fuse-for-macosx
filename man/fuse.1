@@ -976,23 +976,6 @@ If
 is omitted, it defaults to the current value of PC.
 .RE
 .PP
-br{eakpoint} cl{ear}
-.RI (al{l}| number )
-.RS
-Remove either all breakpoints or that with id
-.IR number .
-.RE
-.PP
-br{eakpoint} i{gnore}
-.I id count
-.RS
-Do not trigger the next
-.I count
-times that breakpoint
-.I id
-would have triggered.
-.RE
-.PP
 br{eakpoint} (r{ead}|w{rite})
 .RI [ number ]
 .RS
@@ -1010,6 +993,16 @@ Equivalent to the
 button.
 .RE
 .PP
+del{ete}
+.RI [ number ]
+.RS
+Remove the breakpoint with id
+.IR number ,
+or all breakpoints if
+.I number
+is omitted.
+.RE
+.PP
 di{sassemble}
 .I number
 .RS
@@ -1023,6 +1016,16 @@ Exit from the current CALL or equivalent. This works by setting a
 one-time only breakpoint at the current contents of the stack pointer,
 so will not work correctly if the code returns to some other point or
 plays with its stack in other ways.
+.RE
+.PP
+i{gnore}
+.I id count
+.RS
+Do not trigger the next
+.I count
+times that breakpoint
+.I id
+would have triggered.
 .RE
 .PP
 n{ext}
