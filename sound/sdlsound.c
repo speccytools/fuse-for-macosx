@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -46,7 +47,7 @@
 
 static void sdlwrite( void *userdata, Uint8 *stream, int len );
 
-static sfifo_t sound_fifo;
+sfifo_t sound_fifo;
 
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
@@ -54,6 +55,13 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   SDL_AudioSpec requested;
   int frag;
   int error;
+
+  if( device && ( error = setenv( "SDL_AUDIODRIVER", device, 1 ) ) ) {
+    settings_current.sound = 0;
+    ui_error( UI_ERROR_ERROR, "Couldn't set SDL_AUDIODRIVER: %s",
+              strerror ( error ) );
+    return 1;
+  }
 
   SDL_InitSubSystem( SDL_INIT_AUDIO );
 
@@ -77,7 +85,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   /* Convert from 16-bit stereo samples to bytes plus some headroom */
   frag = 1 << (frag+4);
   if( ( error = sfifo_init( &sound_fifo, frag ) ) ) {
-    ui_error( UI_ERROR_ERROR, "Problem initialising sound fifo: %d",
+    ui_error( UI_ERROR_ERROR, "Problem initialising sound fifo: %s",
               strerror ( error ) );
     return 1;
   }
@@ -104,7 +112,7 @@ sound_lowlevel_end( void )
   sfifo_close( &sound_fifo );
 }
 
-/* Copy data to ringbuffer */
+/* Copy data to fifo */
 void
 sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
@@ -122,12 +130,12 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
     len -= i;
   }
   if( i < 0 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't write sound fifo: %d\n",
+    ui_error( UI_ERROR_ERROR, "Couldn't write sound fifo: %s\n",
               strerror( i ) );
   }
 }
 
-/* Write len samples from ringbuffer into stream */
+/* Write len samples from fifo into stream */
 void
 sdlwrite( void *userdata, Uint8 *stream, int len )
 {

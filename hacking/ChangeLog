@@ -1175,3 +1175,4 @@
 20050103 rzx.c: Don't enable rollback in compo mode and disble rollback menu
          when playback ends.
 20050104 screenshot.[ch]: Undo bogus changes from 20050103.
+20050105 sound/sdlsound.c: Use device to select SDL audio driver.
