@@ -1,5 +1,5 @@
-/* options.c: Options dialog box
-   Copyright (c) 2001 Philip Kendall
+/* general.c: General options
+   Copyright (c) 2001,2002 Philip Kendall
 
    $Id$
 
@@ -38,12 +38,12 @@
 
 static settings_info settings;
 
-static int widget_options_show_all( settings_info *show );
-static int widget_options_print_option( int number, const char* string,
+static int widget_general_show_all( settings_info *show );
+static int widget_general_print_option( int number, const char* string,
 					int value );
-static int widget_options_print_value( int number, int value );
+static int widget_general_print_value( int number, int value );
 
-int widget_options_draw( void )
+int widget_general_draw( void )
 {
   int error;
 
@@ -53,7 +53,7 @@ int widget_options_draw( void )
 
   /* Draw the dialog box */
   widget_dialog_with_border( 1, 2, 30, 6 );
-  error = widget_options_show_all( &settings );
+  error = widget_general_show_all( &settings );
   if( error ) return error;
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
@@ -63,7 +63,7 @@ int widget_options_draw( void )
 
 }
 
-int widget_options_finish( widget_finish_state finished )
+int widget_general_finish( widget_finish_state finished )
 {
   int error;
 
@@ -76,32 +76,32 @@ int widget_options_finish( widget_finish_state finished )
   return 0;
 }
 
-static int widget_options_show_all( settings_info *show )
+static int widget_general_show_all( settings_info *show )
 {
   int error;
 
   widget_printstring( 9, 2, WIDGET_COLOUR_FOREGROUND, "General Options" );
 
-  error = widget_options_print_option( 0, "Issue (2) emulation",
+  error = widget_general_print_option( 0, "Issue (2) emulation",
 				       show->issue2 );
   if( error ) return error;
 
-  error = widget_options_print_option( 1, "(K)empston joystick",
+  error = widget_general_print_option( 1, "(K)empston joystick",
 				       show->joy_kempston );
   if( error ) return error;
 
-  error = widget_options_print_option( 2, "(F)ast tape loading",
+  error = widget_general_print_option( 2, "(F)ast tape loading",
 				       show->tape_traps );
   if( error ) return error;
 
-  error = widget_options_print_option( 3, "(A)Y stereo separation",
+  error = widget_general_print_option( 3, "(A)Y stereo separation",
 				       show->stereo_ay );
   if( error ) return error;
 
   return 0;
 }
 
-static int widget_options_print_option( int number, const char* string,
+static int widget_general_print_option( int number, const char* string,
 					int value )
 {
   char buffer[29];
@@ -118,7 +118,7 @@ static int widget_options_print_option( int number, const char* string,
   return 0;
 }
 
-static int widget_options_print_value( int number, int value )
+static int widget_general_print_value( int number, int value )
 {
   widget_rectangle( 27*8, (number+4)*8, 24, 8, WIDGET_COLOUR_BACKGROUND );
   widget_printstring( 27, number+4, WIDGET_COLOUR_FOREGROUND,
@@ -129,7 +129,7 @@ static int widget_options_print_value( int number, int value )
 }
 
 
-void widget_options_keyhandler( int key )
+void widget_general_keyhandler( int key )
 {
   int error;
 
@@ -141,25 +141,25 @@ void widget_options_keyhandler( int key )
 
   case KEYBOARD_2:
     settings.issue2 = ! settings.issue2;
-    error = widget_options_print_value( 0, settings.issue2 );
+    error = widget_general_print_value( 0, settings.issue2 );
     if( error ) return;
     break;
 
   case KEYBOARD_k:
     settings.joy_kempston = ! settings.joy_kempston;
-    error = widget_options_print_value( 1, settings.joy_kempston );
+    error = widget_general_print_value( 1, settings.joy_kempston );
     if( error ) return;
     break;
 
   case KEYBOARD_f:
     settings.tape_traps = ! settings.tape_traps;
-    error = widget_options_print_value( 2, settings.tape_traps );
+    error = widget_general_print_value( 2, settings.tape_traps );
     if( error ) return;
     break;
 
   case KEYBOARD_a:
     settings.stereo_ay = ! settings.stereo_ay;
-    error = widget_options_print_value( 3, settings.stereo_ay );
+    error = widget_general_print_value( 3, settings.stereo_ay );
     if( error ) return;
     break;
 

@@ -1,4 +1,4 @@
-/* snapshot-widget.c: Widget for snapshot-related actions
+/* file.c: File menu
    Copyright (c) 2001,2002 Philip Kendall
 
    $Id$
@@ -34,12 +34,12 @@
 #include "ui/uidisplay.h"
 #include "widget.h"
 
-int widget_snapshot_draw( void )
+int widget_file_draw( void )
 {
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, 4 );
 
-  widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Snapshot Menu" );
+  widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "File" );
 
   widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen snapshot" );
   widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND,
@@ -51,7 +51,7 @@ int widget_snapshot_draw( void )
   return 0;
 }
 
-void widget_snapshot_keyhandler( int key )
+void widget_file_keyhandler( int key )
 {
   switch( key ) {
     
