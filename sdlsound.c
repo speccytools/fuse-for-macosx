@@ -49,7 +49,7 @@ volatile unsigned int ringbuffer_write = 0;
 int
 sdlsound_init( const char *device, int *freqptr, int *stereoptr )
 {
-  SDL_AudioSpec requested, obtained;
+  SDL_AudioSpec requested;
   int frag;
 
   SDL_InitSubSystem( SDL_INIT_AUDIO );
@@ -71,27 +71,9 @@ sdlsound_init( const char *device, int *freqptr, int *stereoptr )
 
   requested.samples = 1 << frag;
 
-  if ( SDL_OpenAudio( &requested, &obtained ) < 0 ) {
+  if ( SDL_OpenAudio( &requested, NULL ) < 0 ) {
     return 1;
   }
-  *freqptr = obtained.freq;
-  switch ( obtained.format ) {
-  case AUDIO_U8:
-    break;
-  case AUDIO_S16MSB:
-    sixteenbit = 1;
-    soundmsb = 1;
-    break;
-  case AUDIO_S16:
-    sixteenbit = 1;
-    break;
-  default:
-    return 1;
-    break;
-  }
-  *stereoptr = obtained.channels == 1 ? 0 : 1;
-
-  memset( ringbuf, MAX_AUDIO_RB, obtained.silence );
 
   SDL_PauseAudio( 0 );
 

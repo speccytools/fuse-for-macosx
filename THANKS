@@ -28,6 +28,9 @@ Some thanks (in alphabetical order):
 * Shawn Hargreaves: for Allegro (http://www.talula.demon.co.uk/allegro/)
   (again, used by previous versions of Fuse for the graphical display)
 
+* Steven Harrison: for helping track down why the SDL sound routines
+  weren't working on IRIX.
+
 * Thomas Harte: for the much faster console display routines (Not present
   in the current version).
 
