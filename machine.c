@@ -131,7 +131,6 @@ int machine_select( int type )
     }
   }
 
-  ui_error( UI_ERROR_ERROR, "Machine type '%d' unavailable", type );
   return 1;
 }
 
