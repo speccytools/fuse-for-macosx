@@ -964,5 +964,5 @@
 20040702 man/fuse.1: debugger docs update.
 20040702 hacking/sound.txt,sound/sunsound.c: fix up for 16 bit sound
 	 (compiles, but untested).
-20040702 machines/tc2048.c,slt.c,zxatasp.c,zxcf.c: #include <string.h>
-	 for memcpy and memset prototypes.
+20040702 machines/tc2048.c,memory.c,scld.c,slt.c,zxatasp.c,zxcf.c:
+         #include <string.h> for memcpy and memset prototypes.
