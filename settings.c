@@ -26,22 +26,36 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #endif				/* #ifdef HAVE_GETOPT_LONG */
 
+#ifdef HAVE_LIB_XML2
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+#endif				/* #ifdef HAVE_LIB_XML2 */
+
 #include "fuse.h"
 #include "machine.h"
 #include "settings.h"
 #include "spectrum.h"
+#include "ui/ui.h"
 
 /* The current settings of options, etc */
 settings_info settings_current;
+
+#ifdef HAVE_LIB_XML2
+static int read_config_file( settings_info *settings );
+static int parse_xml( xmlDocPtr doc, settings_info *settings );
+#endif				/* #ifdef HAVE_LIB_XML2 */
 
 static int settings_command_line( int argc, char **argv,
 				  settings_info *settings );
@@ -53,6 +67,11 @@ int settings_init( int argc, char **argv )
 
   error = settings_defaults( &settings_current );
   if( error ) return error;
+
+#ifdef HAVE_LIB_XML2
+  error = read_config_file( &settings_current );
+  if( error ) return error;
+#endif				/* #ifdef HAVE_LIB_XML2 */
 
   error = settings_command_line( argc, argv, &settings_current );
   if( error ) return error;
@@ -91,6 +110,83 @@ int settings_defaults( settings_info *settings )
 
   return 0;
 }
+
+#ifdef HAVE_LIB_XML2
+
+/* Read options from the user's config file (if libxml2 is available) */
+
+static int
+read_config_file( settings_info *settings )
+{
+  const char *home; char path[256];
+  struct stat stat_info;
+
+  xmlDocPtr doc;
+
+  home = getenv( "HOME" );
+  if( !home ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get your home directory" );
+    return 1;
+  }
+
+  snprintf( path, 256, "%s/.fuserc", home );
+
+  /* See if the file exists; if it doesn't, return without error */
+  if( stat( path, &stat_info ) ) {
+    if( errno == ENOENT ) {
+      return 0;
+    } else {
+      ui_error( UI_ERROR_ERROR, "couldn't stat '%s': %s", path,
+		strerror( errno ) );
+      return 1;
+    }
+  }
+
+  doc = xmlParseFile( path );
+  if( !doc ) {
+    ui_error( UI_ERROR_ERROR, "error reading config file" );
+    return 1;
+  }
+
+  if( parse_xml( doc, settings ) ) { xmlFreeDoc( doc ); return 1; }
+
+  xmlFreeDoc( doc );
+
+  return 0;
+}
+
+static int
+parse_xml( xmlDocPtr doc, settings_info *settings )
+{
+  xmlNodePtr node;
+
+  node = xmlDocGetRootElement( doc );
+  if( xmlStrcmp( node->name, (const xmlChar*)"settings" ) ) {
+    ui_error( UI_ERROR_ERROR, "config file's root node is not 'settings'" );
+    return 1;
+  }
+
+  node = node->xmlChildrenNode;
+  while( node ) {
+
+    if( !strcmp( node->name, (const xmlChar*)"tapetraps" ) ) {
+      settings->tape_traps =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"text" ) ) {
+      /* Do nothing */
+    } else {
+      ui_error( UI_ERROR_ERROR, "Unknown setting '%s' in config file",
+		node->name );
+      return 1;
+    }
+
+    node = node->next;
+  }
+
+  return 0;
+}
+
+#endif				/* #ifdef HAVE_LIB_XML2 */
 
 /* Read options from the command line */
 static int settings_command_line( int argc, char **argv,

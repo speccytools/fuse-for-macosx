@@ -32,6 +32,9 @@
 /* Defined if we've got glib */
 #undef HAVE_LIB_GLIB
 
+/* Defined if we've got libxml2 */
+#undef HAVE_LIB_XML2
+
 /* Defined if Issue 2 emulation requested */
 #undef ISSUE2
 

@@ -208,6 +208,10 @@ dnl Check if libpng is available
 AC_CHECK_HEADERS(png.h,PNG_LIBS='-lpng -lm',
 		 AC_MSG_WARN(png.h not found - saving screenshots disable))
 AC_SUBST(PNG_LIBS)
+
+dnl See if libxml2 is available (for the config file handling)
+AM_PATH_XML(2.0.0,AC_DEFINE(HAVE_LIB_XML2),
+  AC_WARN(libxml2 not found - config file use disabled))
 	       
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)

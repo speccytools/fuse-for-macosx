@@ -35,8 +35,8 @@ fuse_SOURCES = ay.c display.c event.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
--DDATADIR="\"${pkgdatadir}\""
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@\
+@XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
+LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@\
 ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/svga/libuisvga.a\
 ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
