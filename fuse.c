@@ -402,10 +402,9 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
       break;
 
     case LIBSPECTRUM_ID_CARTRIDGE_DCK:
-      error = dck_read( argv[ first_arg ] );
+      error = machine_select( LIBSPECTRUM_MACHINE_TC2068 );
+      if( !error ) error = dck_read( argv[ first_arg ] );
 
-      if( !error )
-        error = machine_select( LIBSPECTRUM_MACHINE_TC2068 );
       break;
 
     default:
