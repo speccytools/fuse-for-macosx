@@ -1,5 +1,5 @@
 /* memory.h: memory access routines
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2004 Philip Kendall
 
    $Id$
 
@@ -38,6 +38,7 @@ typedef enum memory_bank {
   MEMORY_BANK_HOME,
   MEMORY_BANK_DOCK,
   MEMORY_BANK_EXROM,
+  MEMORY_BANK_ROMCS,
   
 } memory_bank;
 

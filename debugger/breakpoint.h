@@ -60,6 +60,7 @@ typedef enum breakpoint_page_offset {
   BREAKPOINT_PAGE_ROM = 32,
   BREAKPOINT_PAGE_DOCK = 40,
   BREAKPOINT_PAGE_EXROM = 48,
+  BREAKPOINT_PAGE_ROMCS = 56,
 } breakpoint_page_offset;
 
 typedef struct debugger_breakpoint_port {

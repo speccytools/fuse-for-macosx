@@ -220,6 +220,7 @@ encode_bank_and_page( libspectrum_word address )
     break;
   case MEMORY_BANK_DOCK: offset = BREAKPOINT_PAGE_DOCK; break;
   case MEMORY_BANK_EXROM: offset = BREAKPOINT_PAGE_EXROM; break;
+  case MEMORY_BANK_ROMCS: offset = BREAKPOINT_PAGE_ROMCS; break;
   default: return -1;
   }
 
@@ -229,7 +230,9 @@ encode_bank_and_page( libspectrum_word address )
 char*
 debugger_breakpoint_decode_page( char *buffer, size_t n, int page )
 {
-  if( page >= BREAKPOINT_PAGE_EXROM ) {
+  if( page >= BREAKPOINT_PAGE_ROMCS ) {
+    snprintf( buffer, n, "C%d", page - BREAKPOINT_PAGE_ROMCS );
+  } else if( page >= BREAKPOINT_PAGE_EXROM ) {
     snprintf( buffer, n, "X%d", page - BREAKPOINT_PAGE_EXROM );
   } else if( page >= BREAKPOINT_PAGE_DOCK ) {
     snprintf( buffer, n, "D%d", page - BREAKPOINT_PAGE_DOCK );

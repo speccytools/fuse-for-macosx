@@ -811,5 +811,5 @@
 20040514 if2.c,machine.[ch],memory.[ch],debugger/breakpoint.[ch],
 	 machines/,ui/gtk/debugger.c: allow breakpoints to be set for
 	 non-RAM pages.
-
-	 
+20040514 memory.[ch],debugger/breakpoint.[ch]: allow breakpoints to be set
+	 on the ROMCS pages.

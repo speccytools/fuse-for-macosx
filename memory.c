@@ -108,6 +108,8 @@ memory_init( void )
     memory_map_home[i] = memory_map_dock[i] = memory_map_exrom[i] =
       &memory_map_ram[0];
 
+  for( i = 0; i < 2; i++ ) memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
   return 0;
 }
 
@@ -150,6 +152,7 @@ memory_bank_name( memory_page *page )
   case MEMORY_BANK_HOME: return page->writable ? "RAM" : "ROM";
   case MEMORY_BANK_DOCK: return "Dock";
   case MEMORY_BANK_EXROM: return "Exrom";
+  case MEMORY_BANK_ROMCS: return "Chip Select";
   }
 
   return "[Undefined]";
