@@ -24,7 +24,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "31st May, 2003" "Version 0.6.0.1" "Emulators"
+.TH fuse 1 "1st September, 2003" "Version 0.6.1pre2" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -83,13 +83,21 @@ default, but you can use
 to disable).
 .RE
 .PP
+.I --autosave-settings
+.RS
+Specify whether Fuse's current settings should be automatically saved
+on exit. The same as the General Options dialog's
+.I "Auto-save settings"
+option.
+.RE
+.PP
 .I --auto-load
 .RS
-Specify whether tape files should be automatically loaded when they
-are opened. (Enabled by default, but you can use
+Specify whether tape and disk files should be automatically loaded
+when they are opened. (Enabled by default, but you can use
 .RI ` --no-auto-load '
-to disable). Same as the General Option dialog's
-.I "Auto-load tapes"
+to disable). Same as the General Options dialog's
+.I "Auto-load tapes/disks"
 option.
 .RE
 .PP
@@ -98,6 +106,22 @@ option.
 Specify whether fake stereo should be added to the emulation of the
 Spectrum beeper. Same as the Sound Option dialog's
 .I "Beeper pseudo-stereo"
+option.
+.RE
+.PP
+.I --competition-code
+.RS
+Specify the code to be written to competition mode RZX files. The same
+as the RZX Options dialog's
+.I "Competition code"
+option.
+.RE
+.PP
+.I --competition-mode
+.RS
+Specify whether input recordings should be made in `competition mode'.
+The same as the RZX Options dialog's
+.I "Competition mode"
 option.
 .RE
 .PP
@@ -322,6 +346,14 @@ Pentagon mode on startup.
 Show which version of Fuse is being used.
 .RE
 .PP
+.I --writable-roms
+.RS
+Allow Spectrum programs to overwrite the ROM(s). The same as the
+General Options dialog's
+.I "Allow writes to ROM"
+option.
+.RE
+.PP
 All long options which control on/off settings can be disabled using
 .RI ` --no-foo '
 (for an option
@@ -331,9 +363,9 @@ For example, the opposite of
 is
 .RI ` --no-issue2 '.
 These options can also be modified while the emulator is running,
-using the General Options dialog - see the documentation for the
-.I Options, General...
-menu item in the
+using the options dialogs - see the documentation for the
+.I Options
+menu in the
 .B "MENUS AND KEYS"
 section for details.
 .\"
@@ -389,10 +421,13 @@ for those items which have them:
 .RS
 Open a Spectrum file. Snapshots will be loaded into memory; tape
 images will be inserted into the emulated tape deck, and if the
-.I "Auto-load tapes"
+.I "Auto-load tapes/disks"
 option is set will being loading. Opening a disk image or a Timex dock
 image will cause the appropriate machine type (+3, Pentagon or TC2068)
-to be selected with the image inserted. See the
+to be selected with the image inserted, and disks will automatically
+load if the
+.I "Auto-load tapes/disks"
+option is set. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file. Note that this
 behaviour is different from previous versions of Fuse, when this
@@ -444,19 +479,50 @@ write to
 Stop any current AY logging.
 .RE
 .PP
-.I "File, Save Screen..."
+.I "File, Open SCR Screenshot..."
+.RS
+Load an SCR screenshot (essentially just a binary dump of the
+Spectrum's video memory) onto the current screen. Fuse supports
+screenshots saved in the Timex hi-colour and hi-res modes as well as
+`normal' Spectrum screens, and will make a simple conversion if a
+hi-colour or hi-res screenshot is loaded onto a non-Timex machine.
+.RE
+.PP
+.I "File, Save Screen as SCR..."
 .RS
 Save a copy of whatever's currently displayed on the Spectrum's screen
-as a PNG file. Once again, the GTK+ UI lets you choose a filename,
+as an SCR file. Once again, the GTK+ UI lets you choose a filename,
 while the others will just write to
+.IR "fuse.scr" .
+.RE
+.PP
+.I "File, Save Screen as PNG..."
+.RS
+Save the current screen as a PNG file. The GTK+ UI lets you choose a
+filename, while the others will use
 .IR "fuse.png" .
+.RE
+.PP
+.I "File, Load Binary Data..."
+.RS
+Load binary data from a file into the Spectrum's memory. After
+selecting the file to load data from, you can choose where to load the
+data and how much data to load.
+.RE
+.PP
+.I "File, Save Binary Data..."
+.RS
+Save an arbitrary chunk of the Spectrum's memory to a file. Select the
+file you wish to save to, followed by the location and length of data
+you wish to save.
 .RE
 .PP
 .I F10
 .br
 .I "File, Exit"
 .RS
-Exit the emulator.
+Exit the emulator. If you're using the GTK+ UI, a confirmation dialog
+will appear checking you actually want to do this.
 .RE
 .PP
 .I F4
@@ -532,13 +598,13 @@ or choosing the
 menu item.
 .RE
 .PP
-.I "Auto-load tapes"
+.I "Auto-load tapes/disks"
 .RS
-On many occasions when you open a tape file, it's because it's got a
-program in you want to load and run. If this option is selected, this
-will automatically happen for you when you open a tape file. If you
-want to use tapes for saving data to, or for loading data into an
-already running program, you'll want to turn this option off.
+On many occasions when you open a tape or disk file, it's because it's
+got a program in you want to load and run. If this option is selected,
+this will automatically happen for you when you open one of these
+files. To use tapes or disks for saving data to, or for loading data
+into an already running program, you'll want to turn this option off.
 .RE
 .PP
 .I "Use .slt traps"
@@ -548,6 +614,26 @@ supported. This instruction is not generally used except for this
 trap, but since it's not inconceivable that a program could be wanting
 to use the real instruction instead, you can choose whether to support
 the trap or not.
+.RE
+.PP
+.I "Allow writes to ROM"
+.RS
+If this option is selected, Fuse will happily allow programs to
+overwrite what would normally be ROM. This probably isn't very useful
+in most circumstances, especially as the 48K ROM overwrites parts of
+itself.
+.RE
+.PP
+.I "Auto-save settings"
+.RS
+If this option is selected, Fuse will automatically write its
+currently selected options to its configuration file on exit (if
+.I libxml2
+was available when Fuse was compiled). If you turn this option off,
+you'll have to manually use
+.I "Options, Save"
+afterwards to ensure that this setting gets written to Fuse's
+configuration file.
 .RE
 .RE
 .PP
@@ -616,6 +702,37 @@ files significantly smaller, and you probably want to turn it off only
 if you're debugging the RZX files or there's some other program which
 doesn't support compressed RZX files.
 .RE
+.PP
+.I "Competition mode"
+.RS
+Any input recordings which are started when this option is selected
+will be made in `competition mode'. In essence, this means that Fuse
+will act just like a real Spectrum would: you can't load snapshots,
+pause the emulation in any way, change the speed or anything that you
+couldn't do on the real machine. If any of these things are attempted,
+or if the emulated Fuse is running more than 5% faster or slower than
+normal Spectrum speed, then the recording will immediately be stopped.
+.PP
+If
+.I libgcrypt
+was available when Fuse was compiled, then recordings made with
+competition mode active will be digitally signed, in theory to
+`certify' that it was made with the above restrictions in place.
+.B However, this procedure is not secure (and cannot be made so), so
+.B the presence of any signature on an RZX file should not be taken as
+.B providing proof that it was made with competition mode active.
+This feature is included in Fuse solely as it was one of the
+requirements for Fuse to be used in an on-line tournament.
+.RE
+.PP
+.I "Competition code"
+.RS
+The numeric code entered here will be written into any RZX files made
+in competition mode. This is another feature for on-line tournaments
+which can be used to prove that the recording was made after a
+specific code was released. If you're not playing in such a
+tournament, you can safely ignore this option.
+.RE
 .RE
 .PP
 .I "Options, Save"
@@ -635,7 +752,8 @@ by hand if you really want to.
 .br
 .I "Machine, Reset"
 .RS
-Reset the emulated Spectrum.
+Reset the emulated Spectrum. Again, you get a chance to cancel this if
+you're using the GTK+ UI.
 .RE
 .PP
 .I F9
@@ -669,7 +787,7 @@ available which make use of this feature.
 Choose a TAP or TZX virtual-tape file to load from. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file. If
-.I "Auto-load tapes"
+.I "Auto-load tapes/disks"
 is set in the General Options dialog (as it is by default), the tape
 will begin loading. Otherwise, you have to start the load in the
 emulated machine (with LOAD "" or the 128's Tape Loader option, though
@@ -947,6 +1065,15 @@ A double-sizing, non-interpolating filter which attempts to smooth
 diagonal lines.
 .RE
 .PP
+.IR "AdvMAME3x " ( advmame3x )
+.RS
+Very similar to
+.IR AdvMAME2x ,
+except that it triples the size of the displayed screen. Available
+only with the SDL user interface or when saving screenshots of
+non-Timex machines.
+.RE
+.PP
 .IR "TV 2x " ( tv2x )
 .br
 .IR "Timex TV " ( timextv )
@@ -1101,7 +1228,9 @@ menu option. A debugger window will appear, showing the current state
 of the emulated machine: the top-left shows the current state of the
 Z80 and the last bytes written to any emulated peripherals. The
 bottom-left panel lists any active breakpoints. The centre panel gives
-a disassembly starting at the current program counter and the right
+a disassembly, which by default starts at the current program counter,
+although this can be modified either by the 'disassemble' command (see
+below) or by dragging the scrollbar next to it. Finally, the right
 panel shows the current stack. Below the displays are an entry box for
 debugger commands, and five buttons for controlling the debugger:
 .PP
@@ -1152,30 +1281,36 @@ Available values are 10 (decimal) or 16 (hex).
 .RE
 .PP
 br{eakpoint}
-.RI [ address ]
+.RI [ address "] [" condition ]
 .RS
 Set a breakpoint to stop emulation and return to the debugger whenever
 an opcode is executed at
-.IR address .
-If
+.I address
+and
+.I condition
+evaluates true. If
 .I address
 is omitted, it defaults to the current value of PC.
 .RE
 .PP
 br{eakpoint} p{ort} (r{ead}|w{rite})
-.I port
+.IR "port " [ condition ]
 .RS
 Set a breakpoint to trigger whenever IO port
 .I port
-is read from or written to.
+is read from or written to and
+.I condition
+evaluates true.
 .RE
 .PP
 br{eakpoint} (r{ead}|w{rite})
-.RI [ address ]
+.RI [ address "] [" condition ]
 .RS
 Set a breakpoint to trigger whenever memory location
 .I address
-is read from (other than via an opcode fetch) or written to.
+is read from (other than via an opcode fetch) or written to and
+.I condition
+evaluates true.
 .I Address
 again defaults to the current value of PC if omitted.
 .RE
@@ -1188,6 +1323,18 @@ Remove all breakpoints at
 or the current value of PC if
 .I address
 is omitted. Port read/write breakpoints are unaffected.
+.RE
+.PP
+cond{ition}
+.IR "id " [ condition ]
+.RS
+Set breakpoint
+.I id
+to trigger only when
+.I condition
+is true, or unconditionally if
+.I condition
+is omitted.
 .RE
 .PP
 co{ntinue}
@@ -1216,10 +1363,13 @@ Set the centre panel disassembly to begin at
 .PP
 fi{nish}
 .RS
-Exit from the current CALL or equivalent. This works by setting a
-one-time only breakpoint at the current contents of the stack pointer,
-so will not work correctly if the code returns to some other point or
-plays with its stack in other ways.
+Exit from the current CALL or equivalent. This isn't infallible: it
+works by setting a temporary breakpoint at the current contents of the
+stack pointer, so will not function correctly if the code returns to
+some other point or plays with its stack in other ways. Also, setting
+this breakpoint doesn't disable other breakpoints, which may trigger
+before this one. In that case, the temporary breakpoint remains, and
+the `continue' command can be used to return to it.
 .RE
 .PP
 i{gnore}
@@ -1234,11 +1384,18 @@ would have triggered.
 .PP
 n{ext}
 .RS
-Step to the opcode following the current one. Again, this works by
-setting a one-time breakpoint at the next opcode, so is not
-infalliable. Also, any other breakpoints can cause the debugger to be
-activated early; The one-time breakpoint will remain, so the
-`continue' command can be used to return to it.
+Step to the opcode following the current one. As with the `finish'
+command, this works by setting a temporary breakpoint at the next
+opcode, so is not infalliable.
+.RE
+.PP
+o{ut}
+.I port value
+.RS
+Write
+.I value
+to IO port
+.IR port .
 .RE
 .PP
 se{t}
@@ -1265,6 +1422,26 @@ Equivalent to the
 .I "Single Step"
 button.
 .RE
+.PP
+t{breakpoint}
+.RI [ options ]
+.RS
+This is the same as the `breakpoint' command in its various forms,
+except that that breakpoint is temporary: it will trigger once and
+once only, and then be removed.
+.RE
+.PP
+Anywhere the debugger is expecting a numeric value, except where it
+expects a breakpoint id, you can instead use a numeric expression,
+which uses a restricted version of C's syntax; exactly the same syntax
+is used for conditional breakpoints, with `0' being false and any
+other value being true. In numeric expressions, you can use integer
+constants (all calculations is done in integers), register names
+(which simply evaluate to the value of the register), parentheses, the
+standard four numeric operations (`+', `-', `*' and `/'), the
+(non-)equality operators `==' and `!=', the comparision operators `>',
+`<', `>=' and `<=', bitwise and (`&'), or (`|') and exclusive or (`^')
+and logical and (`&&') and or (`||').
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1307,8 +1484,15 @@ from the associated Fuse utilities.
 .SH BUGS
 Not many peripherals are supported.
 .br
-Selecting a startup filter doesn't work properly with the GTK+ or Xlib
-user interfaces.
+Selecting a startup filter doesn't work properly with user interfaces
+other than SDL.
+.br
+Attempting to replay an RZX file without an embedded snapshot for the
+command-line doesn't work if you do `./fuse
+.IR "rzxfile snapshot" '.
+`./fuse
+.IR "snapshot rzxfile" '
+does work though, so use that instead.
 .\"
 .\"------------------------------------------------------------------
 .\"
