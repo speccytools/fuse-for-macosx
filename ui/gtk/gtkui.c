@@ -938,13 +938,27 @@ static void gtkui_disk_open( specplus3_drive_number drive )
 static void
 gtkui_disk_eject_a( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  specplus3_disk_eject( SPECPLUS3_DRIVE_A );
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_disk_eject( SPECPLUS3_DRIVE_A );
+    return;
+  }
+#endif				/* #ifdef HAVE_765_H */
+
+  trdos_disk_eject( TRDOS_DRIVE_A );
 }
 
 static void
 gtkui_disk_eject_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  specplus3_disk_eject( SPECPLUS3_DRIVE_B );
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_disk_eject( SPECPLUS3_DRIVE_B );
+    return;
+  }
+#endif				/* #ifdef HAVE_765_H */
+
+  trdos_disk_eject( TRDOS_DRIVE_B );
 }
 
 /* Cartridge/Insert */

@@ -338,11 +338,12 @@ int
 widget_menu_eject_disk( void *data )
 {
   trdos_drive_number which = *(trdos_drive_number*)data;
+
 #ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( which );
-  }
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 )
+    return specplus3_disk_eject( which );
 #endif				/* #ifdef HAVE_765_H */
+
   return trdos_disk_eject( which );
 }
 
