@@ -237,8 +237,8 @@ show_breakpoint( gpointer data, gpointer user_data )
   debugger_breakpoint *bp = data;
   size_t *index = user_data;
 
-  printf( "%d: %d 0x%04x %ld %d\n", *index, bp->type, bp->value,
-	  (unsigned long)bp->ignore, bp->life );
+  printf( "%lu: %d 0x%04x %lu %d\n", (unsigned long)*index, bp->type,
+	  bp->value, (unsigned long)bp->ignore, bp->life );
 
   (*index)++;
 }

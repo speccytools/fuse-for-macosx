@@ -632,7 +632,7 @@ reg_pair( BYTE b, enum hl_type use_hl )
   case 2: return hl_ix_iy( use_hl );
   case 3: return "SP";
   }
-  fuse_abort();			/* Should never happen */
+  return "* INTERNAL ERROR *";	/* Should never happen */
 }
 
 /* Get whichever of HL, IX or IY is in use here */
@@ -644,7 +644,7 @@ hl_ix_iy( enum hl_type use_hl )
   case USE_IX: return "IX";
   case USE_IY: return "IY";
   }
-  fuse_abort();			/* Should never happen */
+  return "* INTERNAL ERROR *";	/* Should never happen */
 }
 
 /* Get a text representation of '(IX+03)' or similar things */
