@@ -36,11 +36,13 @@
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
+#ifndef UI_GTK			/* GTK+ has its own debugger */
 int
 ui_debugger_activate( void )
 {
   return widget_do( WIDGET_TYPE_DEBUGGER, NULL );
 }
+#endif				/* #ifndef UI_GTK */
 
 int
 widget_debugger_draw( void *data GCC_UNUSED )
