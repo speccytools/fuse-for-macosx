@@ -119,6 +119,8 @@ int widget_select_finish( widget_finish_state finished )
       machine_current->machine != new_machine )
     machine_select( new_machine );
 
+  if( finished == WIDGET_FINISHED_OK ) widget_end_all( WIDGET_FINISHED_OK );
+
   return 0;
 }
 

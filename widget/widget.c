@@ -219,12 +219,14 @@ int widget_do( widget_type which, void *data )
   if( widget_level >= 0 ) {
 
     /* If we're going back to another widget, set up its keyhandler and
-       draw it again */
-    widget_keyhandler =
-      widget_data[ widget_return[widget_level].type ].keyhandler;
-    widget_data[ widget_return[widget_level].type ].draw(
-      widget_return[widget_level].data
-    );
+       draw it again, unless it's already finished */
+    if( ! widget_return[widget_level].finished ) {
+      widget_keyhandler =
+	widget_data[ widget_return[widget_level].type ].keyhandler;
+      widget_data[ widget_return[widget_level].type ].draw(
+        widget_return[widget_level].data
+      );
+    }
 
   } else {
 
@@ -236,6 +238,17 @@ int widget_do( widget_type which, void *data )
     display_refresh_all();
 
   }
+
+  return 0;
+}
+
+/* End all currently running widgets */
+int widget_end_all( widget_finish_state state )
+{
+  int i;
+
+  for( i=0; i<=widget_level; i++ )
+    widget_return[i].finished = state;
 
   return 0;
 }

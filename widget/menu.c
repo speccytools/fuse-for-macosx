@@ -115,6 +115,7 @@ int widget_menu_open_snapshot( void *data )
 /* File/Save */
 int widget_menu_save_snapshot( void *data )
 {
+  widget_end_all( WIDGET_FINISHED_OK );
   return snapshot_write( "snapshot.z80" );
 }
 
@@ -122,12 +123,14 @@ int widget_menu_save_snapshot( void *data )
 int widget_menu_exit( void *data )
 {
   fuse_exiting = 1;
+  widget_end_all( WIDGET_FINISHED_OK );
   return 0;
 }
 
 /* Machine/Reset */
 int widget_menu_reset( void *data )
 {
+  widget_end_all( WIDGET_FINISHED_OK );
   return machine_current->reset();
 }
 
@@ -143,24 +146,28 @@ int widget_menu_open_tape( void *data )
 /* Tape/Play */
 int widget_menu_play_tape( void *data )
 {
+  widget_end_all( WIDGET_FINISHED_OK );
   return tape_toggle_play();
 }
 
 /* Tape/Rewind */
 int widget_menu_rewind_tape( void *data )
 {
+  widget_end_all( WIDGET_FINISHED_OK );
   return tape_rewind();
 }
 
 /* Tape/Clear */
 int widget_menu_clear_tape( void *data )
 {
+  widget_end_all( WIDGET_FINISHED_OK );
   return tape_close();
 }
 
 /* Tape/Write */
 int widget_menu_write_tape( void *data )
 {
+  widget_end_all( WIDGET_FINISHED_OK );
   return tape_write( "tape.tzx" );
 }
 

@@ -422,7 +422,7 @@ void widget_filesel_keyhandler( int key )
     if(chdir(fn)==-1) {
       if(errno==ENOTDIR) {
 	free( fn );
-	widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
+	widget_end_all( WIDGET_FINISHED_OK );
       }
     } else {
       widget_scan( fn ); free( fn );

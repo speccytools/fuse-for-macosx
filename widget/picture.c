@@ -47,7 +47,7 @@ void widget_picture_keyhandler( int key )
     break;
 
   case KEYBOARD_Enter:
-    widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
+    widget_end_all( WIDGET_FINISHED_OK );
     break;
 
   }

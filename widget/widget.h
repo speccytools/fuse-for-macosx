@@ -105,6 +105,7 @@ int widget_init( void );
 int widget_end( void );
 
 int widget_do( widget_type which, void *data );
+int widget_end_all( widget_finish_state state );
 
 int widget_timer_init( void );
 int widget_timer_end( void );
