@@ -5,7 +5,7 @@ Entry, F(r)ame rate (1:n), frame_rate, KEYBOARD_r, 1, frames
 Checkbox, Issue (2) Keyboard, issue2, KEYBOARD_2
 Checkbox, (K)empston joystick, joy_kempston, KEYBOARD_k
 Checkbox, Use (t)ape traps, tape_traps, KEYBOARD_t
-Checkbox, (A)uto-load tapes, auto_load, KEYBOARD_a
+Checkbox, (A)uto-load tapes/disks, auto_load, KEYBOARD_a
 Checkbox, Use .(s)lt traps, slt_traps, KEYBOARD_s
 Checkbox, Allow (w)rites to ROM, writable_roms, KEYBOARD_w
 Checkbox, A(u)to-save settings, autosave_settings, KEYBOARD_u
