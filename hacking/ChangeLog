@@ -1303,3 +1303,4 @@
 	 changes on exit via widget UIs.
 20050402 machines/specplus3.c: stop cancelled attempts to save a +3 disk
 	 from silently ejecting the disk.
+20050402 ui/gtk/gtkui.c: remove unused variable from menu_file_exit().

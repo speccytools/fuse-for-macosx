@@ -545,8 +545,6 @@ menu_file_movies_recordmovieaspng( GtkWidget *widget GCC_UNUSED,
 void
 menu_file_exit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  int confirm;
-
   if( gtkui_confirm( "Exit Fuse?" ) ) {
 
     if( menu_check_media_changed() ) return;
