@@ -1097,3 +1097,4 @@
 20041025 hacking/input.txt: Fix typo.
 20041029 rzx.c,ui.c,ui/ui.h,ui/gtk/gtkui.c,widget/widget.c: (de)activate
 	 rollback menu items appropriately.
+20041031 .cvsignore,z80/.cvsignore: ignore .libs directories.
