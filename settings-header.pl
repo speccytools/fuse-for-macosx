@@ -79,6 +79,8 @@ foreach my $name ( sort keys %options ) {
 	print "   int $name;\n";
     } elsif( $type eq 'string' ) {
 	print "  char *$name;\n";
+    } elsif( $type eq 'null' ) {
+	# Do nothing
     } else {
 	die "Unknown setting type `$type'";
     }

@@ -39,6 +39,7 @@ joy_kempston, boolean, 0,, kempston
 tape_traps, boolean, 1,, traps, tapetraps
 auto_load, boolean, 1
 slt_traps, boolean, 1,, slt, slttraps
+double_screen, null, 0
 full_screen, boolean, 0
 writable_roms, boolean, 0
 

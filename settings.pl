@@ -143,6 +143,7 @@ int settings_defaults( settings_info *settings )
 CODE
 
     foreach my $name ( sort keys %options ) {
+	next if $options{$name}->{type} eq 'null';
 	print "  settings->$name = $options{$name}->{default};\n";
     }
 
@@ -237,6 +238,15 @@ CODE
       settings->$name = strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else
 CODE
+
+    } elsif( $type eq 'null' ) {
+
+	    print << "CODE";
+    if( !strcmp( node->name, (const xmlChar*)"$options{$name}->{configfile}" ) ) {
+      /* Do nothing */
+    } else
+CODE
+
     } else {
 	die "Unknown setting type `$type'";
     }
@@ -299,6 +309,8 @@ CODE
     xmlNewTextChild( root, NULL, "$options{$name}->{configfile}", buffer );
   }
 CODE
+    } elsif( $type eq 'null' ) {
+	# Do nothing
     } else {
 	die "Unknown setting type `$type'";
     }
@@ -342,6 +354,8 @@ CODE
     } elsif( $type eq 'string' or $type eq 'numeric' ) {
 
 	print "    { \"$commandline\", 1, NULL, $short },\n";
+    } elsif( $type eq 'null' ) {
+	# Do nothing
     } else {
 	die "Unknown setting type `$type'";
     }
@@ -384,6 +398,8 @@ foreach my $name ( sort keys %options ) {
 	print "    case $short: settings_set_string( &settings->$name, optarg ); break;\n";
     } elsif( $type eq 'numeric' ) {
 	print "    case $short: settings->$name = atoi( optarg ); break;\n";
+    } elsif( $type eq 'null' ) {
+	# Do nothing
     } else {
 	die "Unknown setting type `$type'";
     }
