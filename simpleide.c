@@ -32,6 +32,7 @@
 #include "periph.h"
 #include "settings.h"
 #include "simpleide.h"
+#include "ui/ui.h"
 
 /* Private function prototypes */
 
@@ -59,13 +60,22 @@ simpleide_init( void )
   error = libspectrum_ide_alloc( &simpleide_idechn, LIBSPECTRUM_IDE_DATA8 );
   if( error ) return error;
 
-  error = libspectrum_ide_insert( simpleide_idechn, LIBSPECTRUM_IDE_MASTER,
-                                  settings_current.simpleide_master_file );
-  if( error ) return error;
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT, 0 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT, 0 );
 
-  error = libspectrum_ide_insert( simpleide_idechn, LIBSPECTRUM_IDE_SLAVE,
-                                  settings_current.simpleide_slave_file );
-  if( error ) return error;
+  if( settings_current.simpleide_master_file ) {
+    error = libspectrum_ide_insert( simpleide_idechn, LIBSPECTRUM_IDE_MASTER,
+				    settings_current.simpleide_master_file );
+    if( error ) return error;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT, 1 );
+  }
+
+  if( settings_current.simpleide_slave_file ) {
+    error = libspectrum_ide_insert( simpleide_idechn, LIBSPECTRUM_IDE_SLAVE,
+				    settings_current.simpleide_slave_file );
+    if( error ) return error;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT, 1 );
+  }
 
   return 0;
 }
@@ -85,29 +95,34 @@ simpleide_reset( void )
 int
 simpleide_insert( const char *filename, libspectrum_ide_unit unit )
 {
+  ui_menu_item item;
   int error;
 
   switch( unit ) {
 
-    case LIBSPECTRUM_IDE_MASTER:
-      error = settings_set_string( &settings_current.simpleide_master_file,
-				   filename );
+  case LIBSPECTRUM_IDE_MASTER:
+    error = settings_set_string( &settings_current.simpleide_master_file,
+				 filename );
+    item = UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT;
     break;
     
-    case LIBSPECTRUM_IDE_SLAVE:
-      error = settings_set_string( &settings_current.simpleide_slave_file,
-				   filename );
+  case LIBSPECTRUM_IDE_SLAVE:
+    error = settings_set_string( &settings_current.simpleide_slave_file,
+				 filename );
+    item = UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT;
     break;
     
-    default:
-      error = 1;
+    default: return 1;
   }
   
   if( error ) return error;
 
   error = libspectrum_ide_insert( simpleide_idechn, unit, filename );
+  if( error ) return error;
 
-  return error;
+  error = ui_menu_activate( item, 1 ); if( error ) return error;
+
+  return 0;
 }
 
 int
@@ -123,31 +138,32 @@ simpleide_commit( libspectrum_ide_unit unit )
 int
 simpleide_eject( libspectrum_ide_unit unit )
 {
-  int error = 0;
+  ui_menu_item item;
+  int error;
   
   switch( unit ) {
 
-    case LIBSPECTRUM_IDE_MASTER:
-      if( settings_current.simpleide_master_file )
-        free( settings_current.simpleide_master_file );
-      settings_current.simpleide_master_file = NULL;
+  case LIBSPECTRUM_IDE_MASTER:
+    free( settings_current.simpleide_master_file );
+    settings_current.simpleide_master_file = NULL;
+    item = UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT;
     break;
     
-    case LIBSPECTRUM_IDE_SLAVE:
-      if( settings_current.simpleide_slave_file )
-        free( settings_current.simpleide_slave_file );
-      settings_current.simpleide_slave_file = NULL;
+  case LIBSPECTRUM_IDE_SLAVE:
+    free( settings_current.simpleide_slave_file );
+    settings_current.simpleide_slave_file = NULL;
+    item = UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT;
     break;
     
-    default:
-      error = 1;
+  default: return 1;
   }
   
-  if( error ) return error;
-  
   error = libspectrum_ide_eject( simpleide_idechn, unit );
-  
-  return error;
+  if( error ) return error;
+
+  error = ui_menu_activate( item, 0 ); if( error ) return error;
+
+  return 0;
 }
 
 /* Port read/writes */

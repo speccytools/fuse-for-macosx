@@ -908,6 +908,58 @@ int ui_menu_activate( ui_menu_item item, int active )
     return set_menu_item_active( "/Media/Disk/Drive B:/Eject and write...",
 				 active );
 
+  case UI_MENU_ITEM_MEDIA_IDE:
+    return set_menu_item_active( "/Media/IDE", active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT:
+    return set_menu_item_active( "/Media/IDE/Simple 8-bit", active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT:
+    error = set_menu_item_active( "/Media/IDE/Simple 8-bit/Master/Commit",
+				  active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/Media/IDE/Simple 8-bit/Master/Eject",
+				 active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT:
+    error = set_menu_item_active( "/Media/IDE/Simple 8-bit/Slave/Commit",
+				  active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/Media/IDE/Simple 8-bit/Slave/Eject",
+				 active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_ZXATASP:
+    return set_menu_item_active( "/Media/IDE/ZXATASP", active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT:
+    error = set_menu_item_active( "/Media/IDE/ZXATASP/Master/Commit",
+				  active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/Media/IDE/ZXATASP/Master/Eject",
+				 active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT:
+    error = set_menu_item_active( "/Media/IDE/ZXATASP/Slave/Commit",
+				  active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/Media/IDE/ZXATASP/Slave/Eject",
+				 active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_ZXCF:
+    return set_menu_item_active( "/Media/IDE/ZXCF CompactFlash", active );
+
+  case UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT:
+    error = set_menu_item_active( "/Media/IDE/ZXCF CompactFlash/Commit",
+				  active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/Media/IDE/ZXCF CompactFlash/Eject",
+				 active );
+
   case UI_MENU_ITEM_RECORDING:
     error = set_menu_item_active( "/File/Recording/Record...", !active );
     if( error ) return error;

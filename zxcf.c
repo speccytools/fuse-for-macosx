@@ -33,6 +33,7 @@
 #include "memory.h"
 #include "periph.h"
 #include "settings.h"
+#include "ui/ui.h"
 #include "zxcf.h"
 
 /*
@@ -74,15 +75,21 @@ zxcf_init( void )
 {
   int error;
 
+  last_memctl = 0x80;
+                                
   error = libspectrum_ide_alloc( &zxcf_idechn, LIBSPECTRUM_IDE_DATA16 );
   if( error ) return error;
 
-  error = libspectrum_ide_insert( zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
-                                  settings_current.zxcf_pri_file );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 0 );
 
-  last_memctl = 0x80;
-                                
-  return error;
+  if( settings_current.zxcf_pri_file ) {
+    error = libspectrum_ide_insert( zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
+				    settings_current.zxcf_pri_file );
+    if( error ) return error;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 1 );
+  }
+
+  return 0;
 }
 
 int
@@ -110,8 +117,12 @@ zxcf_insert( const char *filename )
 
   error = libspectrum_ide_insert( zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
 				  filename );
+  if( error ) return error;
 
-  return error;
+  error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 1 );
+  if( error ) return error;
+
+  return 0;
 }
 
 int
@@ -129,14 +140,16 @@ zxcf_eject( void )
 {
   int error;
   
-  if( settings_current.simpleide_master_file )
-    free( settings_current.simpleide_master_file );
-  
+  free( settings_current.simpleide_master_file );
   settings_current.simpleide_master_file = NULL;
   
   error = libspectrum_ide_eject( zxcf_idechn, LIBSPECTRUM_IDE_MASTER );
-  
-  return error;
+  if( error ) return error;
+
+  error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 1 );
+  if( error ) return error;
+
+  return 0;
 }
 
 static void

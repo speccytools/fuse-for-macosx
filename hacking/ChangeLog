@@ -869,3 +869,5 @@
 	 simplify the handling of /ROMCS memory mapping.
 20040527 utils.c: make TRDOS autoloading work again.
 20040527 zxatasp.c: ZXATASP write protect should protect only the odd pages.
+20040528 menu_data.c,periph.c,simpleide.c,zxatasp.c,zxcf.c,ui/ui.h,
+	 ui/gtk/gtkui.c: (De)activate IDE menu items as appropriate.

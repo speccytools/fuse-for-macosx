@@ -33,6 +33,7 @@
 #include "memory.h"
 #include "periph.h"
 #include "settings.h"
+#include "ui/ui.h"
 #include "zxatasp.h"
 
 /*
@@ -124,13 +125,23 @@ zxatasp_init( void )
   error = libspectrum_ide_alloc( &zxatasp_idechn1, LIBSPECTRUM_IDE_DATA16 );
   if( error ) return error;
   
-  error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_MASTER,
-                                  settings_current.zxatasp_master_file );
-  if( error ) return error;
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT, 0 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT, 0 );
 
-  error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_SLAVE,
-                                  settings_current.zxatasp_slave_file );
-                                  
+  if( settings_current.zxatasp_master_file ) {
+    error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_MASTER,
+				    settings_current.zxatasp_master_file );
+    if( error ) return error;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT, 1 );
+  }
+
+  if( settings_current.zxatasp_slave_file ) {
+    error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_SLAVE,
+				    settings_current.zxatasp_slave_file );
+    if( error ) return error;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT, 1 );
+  }
+
   return error;
 }
 
@@ -159,28 +170,33 @@ zxatasp_reset( void )
 int
 zxatasp_insert( const char *filename, libspectrum_ide_unit unit )
 {
+  ui_menu_item item;
   int error;
 
   switch( unit ) {
   case LIBSPECTRUM_IDE_MASTER:
     error = settings_set_string( &settings_current.zxatasp_master_file,
 				 filename );
+    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT;
     break;
     
   case LIBSPECTRUM_IDE_SLAVE:
     error = settings_set_string( &settings_current.zxatasp_slave_file,
 				 filename );
+    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT;
     break;
     
-  default:
-    error = 1;
+  default: return 1;
   }
   
   if( error ) return error;
 
   error = libspectrum_ide_insert( zxatasp_idechn0, unit, filename );
+  if( error ) return error;
 
-  return error;
+  error = ui_menu_activate( item, 1 ); if( error ) return error;
+
+  return 0;
 }
 
 int
@@ -196,30 +212,31 @@ zxatasp_commit( libspectrum_ide_unit unit )
 int
 zxatasp_eject( libspectrum_ide_unit unit )
 {
-  int error = 0;
+  ui_menu_item item;
+  int error;
   
   switch( unit ) {
   case LIBSPECTRUM_IDE_MASTER:
-    if( settings_current.zxatasp_master_file )
-      free( settings_current.zxatasp_master_file );
+    free( settings_current.zxatasp_master_file );
     settings_current.zxatasp_master_file = NULL;
+    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT;
     break;
     
   case LIBSPECTRUM_IDE_SLAVE:
-    if( settings_current.zxatasp_slave_file )
-      free( settings_current.zxatasp_slave_file );
+    free( settings_current.zxatasp_slave_file );
     settings_current.zxatasp_slave_file = NULL;
+    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT;
     break;
     
-  default:
-    error = 1;
+  default: return 1;
   }
   
+  error = libspectrum_ide_eject( zxatasp_idechn0, unit );
   if( error ) return error;
   
-  error = libspectrum_ide_eject( zxatasp_idechn0, unit );
-  
-  return error;
+  error = ui_menu_activate( item, 0 ); if( error ) return error;
+
+  return 0;
 }
 
 /* Port read/writes */

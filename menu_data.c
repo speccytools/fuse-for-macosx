@@ -142,27 +142,27 @@ Media/_IDE, Branch
 Media/IDE/Simple _8-bit, Branch
 Media/IDE/Simple 8-bit/_Master, Branch
 Media/IDE/Simple 8-bit/Master/_Insert..., Item,, menu_media_ide_insert, 1
-Media/IDE/Simple 8-bit/Master/_Commit..., Item,, menu_media_ide_commit, 1
+Media/IDE/Simple 8-bit/Master/_Commit, Item,, menu_media_ide_commit, 1
 Media/IDE/Simple 8-bit/Master/_Eject, Item,, menu_media_ide_eject, 1
 Media/IDE/Simple 8-bit/_Slave, Branch
 Media/IDE/Simple 8-bit/Slave/_Insert..., Item,, menu_media_ide_insert, 2
-Media/IDE/Simple 8-bit/Slave/_Commit..., Item,, menu_media_ide_commit, 2
+Media/IDE/Simple 8-bit/Slave/_Commit, Item,, menu_media_ide_commit, 2
 Media/IDE/Simple 8-bit/Slave/_Eject, Item,, menu_media_ide_eject, 2
 
 Media/IDE/ZX_ATASP, Branch
 Media/IDE/ZXATASP/_Master, Branch
 Media/IDE/ZXATASP/Master/_Insert..., Item,, menu_media_ide_insert, 3
-Media/IDE/ZXATASP/Master/_Commit..., Item,, menu_media_ide_commit, 3
-Media/IDE/ZXATASP/Master/_Eject..., Item,, menu_media_ide_eject, 3
+Media/IDE/ZXATASP/Master/_Commit, Item,, menu_media_ide_commit, 3
+Media/IDE/ZXATASP/Master/_Eject, Item,, menu_media_ide_eject, 3
 Media/IDE/ZXATASP/_Slave, Branch
 Media/IDE/ZXATASP/Slave/_Insert..., Item,, menu_media_ide_insert, 4
-Media/IDE/ZXATASP/Slave/_Commit..., Item,, menu_media_ide_commit, 4
-Media/IDE/ZXATASP/Slave/_Eject..., Item,, menu_media_ide_eject, 4
+Media/IDE/ZXATASP/Slave/_Commit, Item,, menu_media_ide_commit, 4
+Media/IDE/ZXATASP/Slave/_Eject, Item,, menu_media_ide_eject, 4
 
 Media/IDE/ZX_CF CompactFlash, Branch
 Media/IDE/ZXCF CompactFlash/_Insert..., Item,, menu_media_ide_insert, 5
-Media/IDE/ZXCF CompactFlash/_Commit..., Item,, menu_media_ide_commit, 5
-Media/IDE/ZXCF CompactFlash/_Eject..., Item,, menu_media_ide_eject, 5
+Media/IDE/ZXCF CompactFlash/_Commit, Item,, menu_media_ide_commit, 5
+Media/IDE/ZXCF CompactFlash/_Eject, Item,, menu_media_ide_eject, 5
 
 _Help, Branch
 Help/_Keyboard..., Item
