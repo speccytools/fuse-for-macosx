@@ -293,11 +293,13 @@ int specplus3_reset(void)
 			    machine_current->rom_length[3] );
   if( error ) return error;
 
+#ifdef HAVE_765_H
   /* We can eject disks only if they are currently present */
   ui_menu_activate_media_disk_eject( SPECPLUS3_DRIVE_A,
 				     drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
   ui_menu_activate_media_disk_eject( SPECPLUS3_DRIVE_B,
 				     drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
+#endif				/* #ifdef HAVE_765_H */
 
   return 0;
 }
