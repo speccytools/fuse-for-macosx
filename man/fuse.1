@@ -966,31 +966,31 @@ Available values are 10 (decimal) or 16 (hex).
 .RE
 .PP
 br{eakpoint}
-.RI [ number ]
+.RI [ address ]
 .RS
 Set a breakpoint to stop emulation and return to the debugger whenever
 an opcode is executed at
-.IR number .
+.IR address .
 If
-.I number
+.I address
 is omitted, it defaults to the current value of PC.
 .RE
 .PP
 br{eakpoint} p{ort} (r{ead}|w{rite})
-.I number
+.I port
 .RS
 Set a breakpoint to trigger whenever IO port
-.I number
+.I port
 is read from or written to.
 .RE
 .PP
 br{eakpoint} (r{ead}|w{rite})
-.RI [ number ]
+.RI [ address ]
 .RS
 Set a breakpoint to trigger whenever memory location
-.I number
+.I address
 is read from (other than via an opcode fetch) or written to.
-.I Number
+.I Address
 again defaults to the current value of PC if omitted.
 .RE
 .PP
@@ -1002,20 +1002,20 @@ button.
 .RE
 .PP
 del{ete}
-.RI [ number ]
+.RI [ id ]
 .RS
-Remove the breakpoint with id
-.IR number ,
+Remove breakpoint
+.IR id ,
 or all breakpoints if
-.I number
+.I id
 is omitted.
 .RE
 .PP
 di{sassemble}
-.I number
+.I address
 .RS
 Set the centre panel disassembly to begin at
-.IR number .
+.IR address .
 .RE
 .PP
 ex{it}
@@ -1046,12 +1046,12 @@ activated early; The one-time breakpoint will remain, so the
 .RE
 .PP
 se{t}
-.I register number
+.I register value
 .RS
 Set the value of the Z80 register
 .I register
 to
-.IR number .
+.IR value .
 .RE
 .PP
 s{tep}
