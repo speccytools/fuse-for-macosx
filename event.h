@@ -38,7 +38,12 @@ typedef struct event_t {
 } event_t;
 
 /* The various types of event which can occur */
-enum event_types { EVENT_TYPE_INTERRUPT, EVENT_TYPE_LINE, EVENT_TYPE_EDGE };
+enum event_types {
+  EVENT_TYPE_NULL,
+  EVENT_TYPE_INTERRUPT,
+  EVENT_TYPE_LINE,
+  EVENT_TYPE_EDGE,
+};
 
 /* A large value to mean `no events due' */
 extern const DWORD event_no_events;
@@ -57,6 +62,9 @@ int event_do_events(void);
 
 /* Called on interrupt to reduce T-state count of all entries */
 int event_interrupt( DWORD tstates_per_frame );
+
+/* Remove all events of a specific type from the stack */
+int event_remove_type( int type );
 
 /* Clear the event stack */
 int event_reset(void);

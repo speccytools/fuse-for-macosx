@@ -78,14 +78,10 @@ int main(int argc,char **argv)
   if( settings_current.show_help ||
       settings_current.show_version ) return 0;
 
-  rzx_start_recording();
-
   while( !fuse_exiting ) {
     z80_do_opcodes();
     event_do_events();
   }
-
-  rzx_stop_recording();
 
   fuse_end();
   
@@ -229,6 +225,7 @@ static int fuse_end(void)
   if(!sound_enabled) timer_end();
   sound_end();
   printer_end();
+  rzx_end();
   event_end();
   ui_end();
 

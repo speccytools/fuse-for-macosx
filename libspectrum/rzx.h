@@ -53,6 +53,10 @@ libspectrum_error libspectrum_rzx_frame( libspectrum_rzx *rzx,
 libspectrum_error libspectrum_rzx_free( libspectrum_rzx *rzx );
 
 libspectrum_error
+libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
+		      const size_t length );
+
+libspectrum_error
 libspectrum_rzx_write( libspectrum_rzx *rzx,
 		       libspectrum_byte **buffer, size_t *length );
 

@@ -38,6 +38,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "machine.h"
 #include "rzx.h"
 #include "tape.h"
 #include "ui/ui.h"
@@ -55,8 +56,14 @@ gint event_add_cmp(gconstpointer a, gconstpointer b);
 /* User function for event_interrupt(...) */
 void event_reduce_tstates(gpointer data,gpointer user_data);
 
+/* Make the event have no effect if it matches the given type */
+static void set_event_null( gpointer data, gpointer user_data );
+
 /* Free the memory used by a specific entry */
 void event_free_entry(gpointer data, gpointer user_data);
+
+/* Force events between now and the next interrupt to happen */
+static int event_force_events( void );
 
 /* Set up the event list */
 int event_init(void)
@@ -110,29 +117,39 @@ int event_do_events(void)
     /* Remove the event from the list *before* processing */
     event_list=g_slist_remove(event_list,ptr);
 
+    if( event_list == NULL ) {
+      event_next_event = event_no_events;
+    } else {
+      event_next_event= ( (event_t*) (event_list->data) ) -> tstates;
+    }
+
     switch(ptr->type) {
+
+    case EVENT_TYPE_NULL:
+      /* Do nothing */
+      break;
+
     case EVENT_TYPE_INTERRUPT:
+      if( rzx_playback ) event_force_events();
       spectrum_interrupt();
       ui_event();
       rzx_frame();
       break;
+
     case EVENT_TYPE_LINE:
       display_line();
       break;
+
     case EVENT_TYPE_EDGE:
       tape_next_edge();
       break;
+
     default:
       fprintf( stderr, "%s: unknown event type %d\n", fuse_progname,
 	       ptr->type );
       break;
     }
     free(ptr);
-    if(event_list == NULL) {
-      event_next_event = event_no_events;
-    } else {
-      event_next_event= ( (event_t*) (event_list->data) ) -> tstates;
-    }
   }
 
   return 0;
@@ -154,6 +171,23 @@ void event_reduce_tstates(gpointer data,gpointer user_data)
   ptr->tstates -= (*tstates_per_frame) ;
 }
 
+/* Remove all events of a specific type from the stack */
+int event_remove_type( int type )
+{
+  /* FIXME: this is an ugly hack. Just set all events of the given
+     type to be of a null type, meaning they do nothing */
+  g_slist_foreach( event_list, set_event_null, &type );
+  return 0;
+}
+
+static void set_event_null( gpointer data, gpointer user_data )
+{
+  event_t *ptr = (event_t*)data;
+  int type = *(int*)user_data;
+
+  if( ptr->type == type ) ptr->type = EVENT_TYPE_NULL;
+}
+
 /* Clear the event stack */
 int event_reset(void)
 {
@@ -169,6 +203,27 @@ void event_free_entry(gpointer data, gpointer user_data)
 {
   event_t *ptr=(event_t*)data;
   free(ptr);
+}
+
+/* Do all events that would happen between the current time and when
+   the next interrupt will occur; called only when RZX playback is in
+   effect */
+static int event_force_events( void )
+{
+  while( event_next_event < machine_current->timings.cycles_per_frame ) {
+
+    /* Jump along to the next event */
+    tstates = event_next_event;
+    
+    /* And do that event */
+    event_do_events();
+
+  }
+
+  /* Finally, jump to the interrupt time */
+  tstates = machine_current->timings.cycles_per_frame;
+
+  return 0;
 }
 
 /* Tidy-up function called at end of emulation */

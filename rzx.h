@@ -27,17 +27,35 @@
 #ifndef FUSE_RZX_H
 #define FUSE_RZX_H
 
+#ifndef LIBSPECTRUM_RZX_H
+#include "libspectrum/rzx.h"
+#endif			/* #ifndef LIBSPECTRUM_RZX_H */
+
 /* The count of instruction fetches needed for .rzx files */
 extern size_t rzx_instructions;
 
 /* Are we currently recording a .rzx file? */
 extern int rzx_recording;
 
+/* Are we currently playing back a .rzx file? */
+extern int rzx_playback;
+
+/* The .rzx frame we're currently playing */
+extern size_t rzx_current_frame;
+
+/* The actual RZX data */
+extern libspectrum_rzx rzx;
+
 int rzx_init( void );
 
 int rzx_start_recording( void );
 int rzx_stop_recording( void );
 
+int rzx_start_playback( void );
+int rzx_stop_playback( void );
+
 int rzx_frame( void );
+
+int rzx_end( void );
 
 #endif			/* #ifndef FUSE_RZX_H */
