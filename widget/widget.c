@@ -359,7 +359,6 @@ widget_t widget_data[] = {
   { widget_filesel_draw,  widget_filesel_finish, widget_filesel_keyhandler  },
   { widget_general_draw,  widget_general_finish, widget_general_keyhandler  },
   { widget_tape_draw,     NULL,			 widget_tape_keyhandler     },
-  { widget_file_draw,     NULL,			 widget_file_keyhandler     },
   { widget_machine_draw,  NULL,			 widget_machine_keyhandler  },
   { widget_picture_draw,  NULL,                  widget_picture_keyhandler  },
   { widget_help_draw,     NULL,                  widget_help_keyhandler     },

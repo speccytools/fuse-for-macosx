@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include "display.h"
+#include "snapshot.h"
 #include "widget.h"
 #include "ui/uidisplay.h"
 
@@ -92,3 +93,19 @@ int widget_menu_widget( void *data )
   return widget_do( ptr->widget, ptr->data );
 }
 
+/* File menu callbacks */
+
+/* File/Open */
+int widget_menu_open_snapshot( void *data )
+{
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  if( widget_filesel_name ) snapshot_read( widget_filesel_name );
+
+  return 0;
+}
+
+/* File/Save */
+int widget_menu_save_snapshot( void *data )
+{
+  return snapshot_write( "snapshot.z80" );
+}

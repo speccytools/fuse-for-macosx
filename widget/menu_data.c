@@ -34,7 +34,8 @@
 
 /* Main menu */
 
-static widget_menu_widget_t main_file =    { WIDGET_TYPE_FILE,    NULL };
+static widget_menu_widget_t main_file =    { WIDGET_TYPE_MENU,
+					     &widget_menu_file    };
 static widget_menu_widget_t main_options = { WIDGET_TYPE_MENU,
 					     &widget_menu_options };
 static widget_menu_widget_t main_machine = { WIDGET_TYPE_MACHINE, NULL };
@@ -49,6 +50,17 @@ widget_menu_entry widget_menu_main[] = {
   { "(M)achine", KEYBOARD_m, widget_menu_widget, &main_machine },
   { "(T)ape",	 KEYBOARD_t, widget_menu_widget, &main_tape    },
   { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* File menu */
+
+widget_menu_entry widget_menu_file[] = {
+  { "File", 0, 0, NULL },		/* Menu title */
+
+  { "(O)pen snapshot...",       KEYBOARD_o, widget_menu_open_snapshot, NULL },
+  { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
