@@ -8,9 +8,6 @@
 	* Also separate the Fuse utilities (tzxlist, etc) into their
 	  own package (Philip Kendall).
 
-	* Add tzxconv utility to do a best-guess conversion of .tzx files
-	  to .tap (Philip Kendall).
-
 	* Add ability to load and save +2, +2A, +3 and TC2048 snapshots;
 	  also load Pentagon snaps as 128K (Philip Kendall).
 
@@ -64,6 +61,15 @@
 	  UI (Philip Kendall).
 
 	* Changable emulation speed (Philip Kendall).
+
+	* Change to lib765 0.3.0 for Mac OS X compatability
+	  (Frederick Meunier).
+
+	* Reset the Timex's SCLD when loading snapshot (Philip Kendall,
+	  Frederick Meunier).
+
+	* Distribute glibc's getopt so that long options are available
+	  even if the native libc doesn't provide them (Philip Kendall).
 	
 2002-08-22  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
