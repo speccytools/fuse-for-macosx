@@ -127,7 +127,7 @@ uidisplay_init( int width, int height )
 
   timex = machine_current->timex;
 
-  uidisplay_init_scalers();
+  init_scalers();
   sdldisplay_load_gfx_mode();
 
   SDL_WM_SetCaption( "Fuse", "Fuse" );
