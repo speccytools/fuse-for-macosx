@@ -53,7 +53,10 @@ spectrum_memory_contention_function contend_memory;
 spectrum_port_contention_function contend_port;
 
 static libspectrum_byte trivial_readbyte( libspectrum_word address );
+static libspectrum_byte trivial_readbyte_internal( libspectrum_word address );
 static void trivial_writebyte( libspectrum_word address, libspectrum_byte b );
+static void trivial_writebyte_internal( libspectrum_word address,
+					libspectrum_byte b );
 static libspectrum_dword trivial_contend_memory( libspectrum_word address );
 static libspectrum_dword trivial_contend_port( libspectrum_word port );
 
@@ -81,7 +84,8 @@ main( int argc, char **argv )
   z80_init();
 
   /* Set up our trivial machine */
-  readbyte = readbyte_internal = trivial_readbyte;
+  readbyte = trivial_readbyte;
+  readbyte_internal = trivial_readbyte_internal;
   writebyte = trivial_writebyte;
   contend_memory = trivial_contend_memory;
   contend_port = trivial_contend_port;
@@ -110,12 +114,28 @@ main( int argc, char **argv )
 static libspectrum_byte
 trivial_readbyte( libspectrum_word address )
 {
+  trivial_contend_memory( address );
+  tstates += 3;
+  return trivial_readbyte_internal( address );
+}
+
+static libspectrum_byte
+trivial_readbyte_internal( libspectrum_word address )
+{
   printf( "%5d MR %04x %02x\n", tstates, address, memory[ address ] );
   return memory[ address ];
 }
 
 static void
 trivial_writebyte( libspectrum_word address, libspectrum_byte b )
+{
+  trivial_contend_memory( address );
+  tstates += 3;
+  trivial_writebyte_internal( address, b );
+}
+
+static void
+trivial_writebyte_internal( libspectrum_word address, libspectrum_byte b )
 {
   printf( "%5d MW %04x %02x\n", tstates, address, b );
   memory[ address ] = b;

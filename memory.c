@@ -59,90 +59,118 @@
 libspectrum_byte
 FUNCTION( spec16_readbyte )( libspectrum_word address )
 {
+  libspectrum_byte b;
+
+  switch( address >> 14 ) {
+  case 0: b = ROM[0][ address & 0x3fff ]; break;
+  case 1:
+#ifndef INTERNAL
+    tstates += contend_memory( address );
+#endif				/* #ifndef INTERNAL */
+    b = RAM[5][ address & 0x3fff ]; break;
+  case 2: case 3: b = 0xff; break;
+
+  default: b = 0; break;	/* Keep gcc happy */
+  }
 
 #ifndef INTERNAL
+  tstates += 3;
+
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
-  switch( address >> 14 ) {
-  case 0: return ROM[0][ address & 0x3fff ];
-  case 1: return RAM[5][ address & 0x3fff ];
-  case 2: return 0xff;
-  case 3: return 0xff;
-  }
-  return 0; /* Keep gcc happy */
+  return b;
 }
 
 void
 FUNCTION( spec16_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
-
-#ifndef INTERNAL
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
-#endif				/* #ifndef INTERNAL */
-
   switch( address >> 14 ) {
   case 0:
     if( settings_current.writable_roms ) ROM[0][ address & 0x3fff ] = b;
     break;
   case 1:
+#ifndef INTERNAL
+    tstates += contend_memory( address );
+#endif				/* #ifndef INTERNAL */
     if( ( address & 0x3fff ) < 0x1b00 && RAM[5][ address & 0x3fff ] != b )
       display_dirty( address );
     RAM[5][ address & 0x3fff ] = b; break;
-  case 2: break;
-  case 3: break;
+  case 2: case 3: break;
   }
+
+#ifndef INTERNAL
+  tstates += 3;
+
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
 }
 
 libspectrum_byte
 FUNCTION( spec48_readbyte )( libspectrum_word address )
 {
+  libspectrum_byte b;
+
+  switch( address >> 14 ) {
+  case 0: b = ROM[0][ address & 0x3fff ]; break;
+  case 1:
+#ifndef INTERNAL
+    tstates += contend_memory( address );
+#endif				/* #ifndef INTERNAL */
+    b = RAM[5][ address & 0x3fff ]; break;
+  case 2: b = RAM[2][ address & 0x3fff ]; break;
+  case 3: b = RAM[0][ address & 0x3fff ]; break;
+  default: b = 0; break;	/* Keep gcc happy */
+  }
 
 #ifndef INTERNAL
+  tstates += 3;
+
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
-  switch( address >> 14 ) {
-  case 0: return ROM[0][ address & 0x3fff ];
-  case 1: return RAM[5][ address & 0x3fff ];
-  case 2: return RAM[2][ address & 0x3fff ];
-  case 3: return RAM[0][ address & 0x3fff ];
-  }
-  return 0; /* Keep gcc happy */
+  return b;
 }
 
 void
 FUNCTION( spec48_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
-
-#ifndef INTERNAL
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
-#endif				/* #ifndef INTERNAL */
-
   switch( address >> 14 ) {
   case 0:
     if( settings_current.writable_roms ) ROM[0][ address & 0x3fff ] = b;
     break;
   case 1:
+#ifndef INTERNAL
+    tstates += contend_memory( address );
+#endif				/* #ifndef INTERNAL */
     if( ( address & 0x3fff ) < 0x1b00 && RAM[5][ address & 0x3fff ] != b )
       display_dirty( address );
     RAM[5][ address & 0x3fff ] = b; break;
   case 2: RAM[2][ address & 0x3fff ] = b; break;
   case 3: RAM[0][ address & 0x3fff ] = b; break;
   }
+
+#ifndef INTERNAL
+  tstates += 3;
+
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
 }
 
 libspectrum_byte
 FUNCTION( spec128_readbyte )( libspectrum_word address )
 {
+  int bank;
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
@@ -151,12 +179,25 @@ FUNCTION( spec128_readbyte )( libspectrum_word address )
 #endif				/* #ifndef INTERNAL */
 
   switch( address >> 14 ) {
-  case 0: return ROM[ machine_current->ram.current_rom][ address & 0x3fff ];
-  case 1: return RAM[                                5][ address & 0x3fff ];
-  case 2: return RAM[                                2][ address & 0x3fff ];
-  case 3: return RAM[machine_current->ram.current_page][ address & 0x3fff ];
+
+  case 0:
+#ifndef INTERNAL
+    tstates += 3;
+#endif				/* #ifndef INTERNAL */
+    return ROM[machine_current->ram.current_rom][ address & 0x3fff ];
+
+  case 1: bank = 5; break;
+  case 2: bank = 2; break;
+  case 3: bank = machine_current->ram.current_page; break;
+  default: bank = 0; break;	/* Keep gcc happy */
   }
-  return 0; /* Keep gcc happy */
+
+#ifndef INTERNAL
+  if( bank & 0x01 ) tstates += contend_memory( address );
+  tstates += 3;
+#endif				/* #ifndef INTERNAL */
+
+  return RAM[bank][ address & 0x3fff ];
 }
 
 void
@@ -175,6 +216,9 @@ FUNCTION( spec128_writebyte )( libspectrum_word address, libspectrum_byte b )
   case 0:
     if( settings_current.writable_roms )
       ROM[ machine_current->ram.current_rom ][ address & 0x3fff ] = b;
+#ifndef INTERNAL
+    tstates += 3;
+#endif				/* #ifndef INTERNAL */
     return;
 
   case 1: bank = 5;				    break;
@@ -187,12 +231,18 @@ FUNCTION( spec128_writebyte )( libspectrum_word address, libspectrum_byte b )
       RAM[ bank ][ address & 0x3fff ] != b )
     display_dirty( ( address & 0x3fff ) | 0x4000 );
     
+#ifndef INTERNAL
+  if( bank & 0x01 ) tstates += contend_memory( address );
+  tstates += 3;
+#endif				/* #ifndef INTERNAL */
+
   RAM[ bank ][ address & 0x3fff ] = b;
 }
 
 libspectrum_byte
 FUNCTION( specplus3_readbyte )( libspectrum_word address )
 {
+  int bank = address >> 14;
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
@@ -202,35 +252,54 @@ FUNCTION( specplus3_readbyte )( libspectrum_word address )
 
   if( machine_current->ram.special ) {
     switch( machine_current->ram.specialcfg ) {
-      case 0: return RAM[   address >> 14       ][ address & 0x3fff ];
-      case 1: return RAM[ ( address >> 14 ) + 4 ][ address & 0x3fff ];
-      case 2: switch( address >> 14 ) {
-	case 0: return RAM[4][ address & 0x3fff ];
-	case 1: return RAM[5][ address & 0x3fff ];
-	case 2: return RAM[6][ address & 0x3fff ];
-	case 3: return RAM[3][ address & 0x3fff ];
+
+    case 0: break;
+    case 1: bank += 4; break;
+
+    case 2:
+      switch( bank ) {
+      case 0: bank = 4; break;
+      case 1: bank = 5; break;
+      case 2: bank = 6; break; 
+      case 3: bank = 3; break;
       }
-      case 3: switch( address >> 14 ) {
-	case 0: return RAM[4][ address & 0x3fff ];
-	case 1: return RAM[7][ address & 0x3fff ];
-	case 2: return RAM[6][ address & 0x3fff ];
-	case 3: return RAM[3][ address & 0x3fff ];
+      break;
+
+    case 3:
+      switch( bank ) {
+      case 0: bank = 4; break;
+      case 1: bank = 7; break;
+      case 2: bank = 6; break; 
+      case 3: bank = 3; break;
       }
-      default:
-	ui_error( UI_ERROR_ERROR, "Unknown +3 special configuration %d",
-		  machine_current->ram.specialcfg );
-	fuse_abort();
+
+    default:
+      ui_error( UI_ERROR_ERROR, "Unknown +3 special configuration %d",
+		machine_current->ram.specialcfg );
+      fuse_abort();
     }
+
   } else {
-    switch( address >> 14 ) {
-    case 0: return ROM[ machine_current->ram.current_rom][ address & 0x3fff ];
-    case 1: return RAM[				       5][ address & 0x3fff ];
-    case 2: return RAM[				       2][ address & 0x3fff ];
-    case 3: return RAM[machine_current->ram.current_page][ address & 0x3fff ];
+    switch( bank ) {
+    case 0:
+#ifndef INTERNAL
+    tstates += 3;
+#endif				/* #ifndef INTERNAL */
+    return ROM[machine_current->ram.current_rom][ address & 0x3fff ];
+
+    case 1: bank = 5; break;
+    case 2: bank = 2; break;
+    case 3: bank = machine_current->ram.current_page;
+
     }
   }
 
-  return 0; /* Keep gcc happy */
+#ifndef INTERNAL
+  if( bank & 0x04 ) tstates += contend_memory( address );
+  tstates += 3;
+#endif				/* #ifndef INTERNAL */
+
+  return RAM[bank][ address & 0x3fff ];
 }
 
 void
@@ -270,6 +339,9 @@ FUNCTION( specplus3_writebyte )( libspectrum_word address, libspectrum_byte b )
       case 0:
 	if( settings_current.writable_roms )
 	  ROM[ machine_current->ram.current_rom ][ address & 0x3fff ] = b;
+#ifndef INTERNAL
+	tstates += 3;
+#endif				/* #ifndef INTERNAL */
 	return;
 
       case 1: bank=5;				      break;
@@ -283,6 +355,11 @@ FUNCTION( specplus3_writebyte )( libspectrum_word address, libspectrum_byte b )
       RAM[ bank ][ address & 0x3fff ] != b )
     display_dirty( ( address & 0x3fff ) | 0x4000 );
     
+#ifndef INTERNAL
+  if( bank & 0x04 ) tstates += contend_memory( address );
+  tstates += 3;
+#endif				/* #ifndef INTERNAL */
+
   RAM[ bank ][ address & 0x3fff ] = b;
 }
 
@@ -290,44 +367,55 @@ FUNCTION( specplus3_writebyte )( libspectrum_word address, libspectrum_byte b )
 libspectrum_byte
 FUNCTION( tc2048_readbyte )( libspectrum_word address )
 {
-  libspectrum_word offset = address & 0x3fff;
+  libspectrum_byte b;
+
+  switch( address >> 14 ) {
+  case 0: b = ROM[0][ address & 0x3fff ]; break;
+  case 1:
+#ifndef INTERNAL
+    tstates += contend_memory( address );
+#endif				/* #ifndef INTERNAL */
+    b = RAM[5][ address & 0x3fff ]; break;
+  case 2: b = RAM[2][ address & 0x3fff ]; break;
+  case 3: b = RAM[0][ address & 0x3fff ]; break;
+  default: b = 0; break;	/* Keep gcc happy */
+  }
 
 #ifndef INTERNAL
+  tstates += 3;
+
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
-  switch( address >> 14 ) {
-  case 0: return ROM[0][offset];
-  case 1: return RAM[5][offset];
-  case 2: return RAM[2][offset];
-  case 3: return RAM[0][offset];
-  }
-  return 0; /* Keep gcc happy */
+  return b;
 }
 
 void
 FUNCTION( tc2048_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
-  libspectrum_word offset = address & 0x3fff;
-
-#ifndef INTERNAL
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
-#endif				/* #ifndef INTERNAL */
-
   switch( address >> 14 ) {
   case 0:
     if( settings_current.writable_roms ) ROM[0][ address & 0x3fff ] = b;
     break;
-  case 1: 
-    if( RAM[5][offset] != b ) { display_dirty( address ); RAM[5][offset] = b; }
-    break;
-  case 2: RAM[2][offset]=b; break;
-  case 3: RAM[0][offset]=b; break;
+  case 1:
+#ifndef INTERNAL
+    tstates += contend_memory( address );
+#endif				/* #ifndef INTERNAL */
+    if( RAM[5][ address & 0x3fff ] != b ) display_dirty( address );
+    RAM[5][ address & 0x3fff ] = b; break;
+  case 2: RAM[2][ address & 0x3fff ] = b; break;
+  case 3: RAM[0][ address & 0x3fff ] = b; break;
   }
+
+#ifndef INTERNAL
+  tstates += 3;
+
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
 }
 
 libspectrum_byte
@@ -338,6 +426,8 @@ FUNCTION( pentagon_readbyte )( libspectrum_word address )
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
+
+  tstates += 3;
 #endif				/* #ifndef INTERNAL */
 
   switch( address >> 14 ) {
@@ -361,6 +451,8 @@ FUNCTION( pentagon_writebyte )( libspectrum_word address, libspectrum_byte b )
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
+
+  tstates += 3;
 #endif				/* #ifndef INTERNAL */
 
   switch( bank ) {
@@ -392,6 +484,9 @@ FUNCTION( tc2068_readbyte )( libspectrum_word address )
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
+
+  if( chunk == 2 || chunk == 3 ) tstates += contend_memory( address );
+  tstates += 3;
 #endif				/* #ifndef INTERNAL */
 
   return timex_memory[chunk].page[offset];
@@ -407,6 +502,9 @@ FUNCTION( tc2068_writebyte )( libspectrum_word address, libspectrum_byte b )
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
+
+  if( chunk == 2 || chunk == 3 ) tstates += contend_memory( address );
+  tstates += 3;
 #endif				/* #ifndef INTERNAL */
 
 /* Need to take check if write is to home bank screen area for display

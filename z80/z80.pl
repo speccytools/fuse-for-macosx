@@ -58,7 +58,7 @@ sub arithmetic_logical ($$$) {
 	    print "      $opcode($arg2);\n";
 	} elsif( $arg2 eq '(REGISTER+dd)' ) {
 	    print << "CODE";
-      tstates += 11;		/* FIXME: how is this contended? */
+      tstates += 5;		/* FIXME: how is this contended? */
       {
 	libspectrum_byte bytetemp = 
 	    readbyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ) );
@@ -69,7 +69,6 @@ CODE
 	    my $register = ( $arg2 eq '(HL)' ? 'HL' : 'PC' );
 	    my $increment = ( $register eq 'PC' ? '++' : '' );
 	    print << "CODE";
-      contend( $register, 3 );
       {
 	libspectrum_byte bytetemp = readbyte( $register$increment );
 	$opcode(bytetemp);
@@ -87,17 +86,22 @@ sub call_jp ($$$) {
 
     my( $opcode, $condition, $offset ) = @_;
 
-    print "      contend( PC, 3 ); contend( PC+1, 3 );\n";
-
     if( not defined $offset ) {
 	print "      $opcode();\n";
     } else {
+	my $condition_string;
 	if( defined $not{$condition} ) {
-	    print "      if( ! ( F & FLAG_$flag{$condition} ) ) { $opcode(); }\n";
+	    $condition_string = "! ( F & FLAG_$flag{$condition} )";
 	} else {
-	    print "      if( F & FLAG_$flag{$condition} ) { $opcode(); }\n";
+	    $condition_string = "F & FLAG_$flag{$condition}";
 	}
-	print "      else PC+=2;\n";
+	print << "CALL";
+      if( $condition_string ) {
+	$opcode();
+      } else {
+	contend( PC, 3 ); contend( PC + 1, 3 ); PC += 2;
+      }
+CALL
     }
 }
 
@@ -113,8 +117,8 @@ sub cpi_cpd ($) {
 	  lookup = ( (        A & 0x08 ) >> 3 ) |
 	           ( (  (value) & 0x08 ) >> 2 ) |
 	           ( ( bytetemp & 0x08 ) >> 1 );
-	contend( HL, 3 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
-	contend( HL, 1 ); contend( HL, 1 );
+	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	contend( HL, 1 );
 	HL$modifier; BC--;
 	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
 	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
@@ -137,8 +141,8 @@ sub cpir_cpdr ($) {
 	  lookup = ( (        A & 0x08 ) >> 3 ) |
 		   ( (  (value) & 0x08 ) >> 2 ) |
 		   ( ( bytetemp & 0x08 ) >> 1 );
-	contend( HL, 3 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
-	contend( HL, 1 ); contend( HL, 1 );
+	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	contend( HL, 1 );
 	HL$modifier; BC--;
 	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
 	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
@@ -166,17 +170,16 @@ sub inc_dec ($$) {
 	print "      tstates += 2;\n      ${arg}$modifier;\n";
     } elsif( $arg eq '(HL)' ) {
 	print << "CODE";
-      contend( HL, 4 );
       {
 	libspectrum_byte bytetemp = readbyte( HL );
+	tstates++;
 	$opcode(bytetemp);
-	contend( HL, 3 );
 	writebyte(HL,bytetemp);
       }
 CODE
     } elsif( $arg eq '(REGISTER+dd)' ) {
 	print << "CODE";
-      tstates += 15;		/* FIXME: how is this contended? */
+      tstates += 6;		/* FIXME: how is this contended? */
       {
 	libspectrum_word wordtemp =
 	    REGISTER + (libspectrum_signed_byte)readbyte( PC++ );
@@ -198,7 +201,7 @@ sub ini_ind ($) {
     print << "CODE";
       {
 	libspectrum_word initemp = readport( BC );
-	tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
+	tstates += 2; contend_io( BC, 3 );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
 	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -216,7 +219,7 @@ sub inir_indr ($) {
     print << "CODE";
       {
 	libspectrum_word initemp=readport( BC );
-	tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
+	tstates += 2; contend_io( BC, 3 );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
 	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -240,9 +243,9 @@ sub ldi_ldd ($) {
     print << "CODE";
       {
 	libspectrum_byte bytetemp=readbyte( HL );
-	contend( HL, 3 ); contend( DE, 3 ); contend( DE, 1 ); contend( DE, 1 );
 	BC--;
 	writebyte(DE,bytetemp);
+	contend( DE, 1 ); contend( DE, 1 );
 	DE$modifier; HL$modifier;
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
@@ -260,8 +263,8 @@ sub ldir_lddr ($) {
     print << "CODE";
       {
 	libspectrum_byte bytetemp=readbyte( HL );
-	contend( HL, 3 ); contend( DE, 3 ); contend( DE, 1 ); contend( DE, 1 );
 	writebyte(DE,bytetemp);
+	contend( DE, 1 ); contend( DE, 1 );
 	HL$modifier; DE$modifier; BC--;
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
@@ -283,8 +286,9 @@ sub otir_otdr ($) {
 
     print << "CODE";
       {
-	libspectrum_word outitemp=readbyte( HL );
-	tstates++; contend( HL, 4 );
+	libspectrum_word outitemp;
+	tstates++;
+	outitemp = readbyte( HL ); tstates++;
 	B--; HL$modifier; /* This does happen first, despite what the specs say */
 	writeport(BC,outitemp);
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -310,9 +314,11 @@ sub outi_outd ($) {
 
     print << "CODE";
       {
-	libspectrum_word outitemp=readbyte( HL );
+	libspectrum_word outitemp;
+	tstates++;
+	outitemp = readbyte( HL ); tstates++;
 	B--;	/* This does happen first, despite what the specs say */
-	tstates++; contend( HL, 4 ); contend_io( BC, 3 );
+	contend_io( BC, 3 );
 	HL$modifier;
 	writeport(BC,outitemp);
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -358,12 +364,15 @@ sub res_set ($$$) {
 	print "      $register $operator= $hex_mask;\n";
     } elsif( $register eq '(HL)' ) {
 	print << "CODE";
-      contend( HL, 4 ); contend( HL, 3 );
-      writebyte(HL, readbyte(HL) $operator $hex_mask);
+      {
+	libspectrum_byte bytetemp = readbyte( HL );
+	tstates++;
+	writebyte( HL, bytetemp $operator $hex_mask );
+      }
 CODE
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "CODE";
-      tstates += 8;
+      tstates += 2;
       writebyte(tempaddr, readbyte(tempaddr) $operator $hex_mask);
 CODE
     }
@@ -379,14 +388,14 @@ sub rotate_shift ($$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte(HL);
-	contend( HL, 4 ); contend( HL, 3 );
+	tstates++;
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
       }
 CODE
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "CODE";
-      tstates += 8;
+      tstates += 2;
       {
 	libspectrum_byte bytetemp = readbyte(tempaddr);
 	$opcode(bytetemp);
@@ -414,7 +423,7 @@ sub opcode_BIT (@) {
 	print "      BIT$macro$register);\n";
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "BIT";
-      tstates += 5;
+      tstates += 2;
       {
 	libspectrum_byte bytetemp = readbyte( tempaddr );
 	BIT${macro}bytetemp);
@@ -424,7 +433,7 @@ BIT
 	print << "BIT";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 4 );
+	tstates++;
 	BIT${macro}bytetemp);
       }
 BIT
@@ -482,9 +491,13 @@ sub opcode_DI (@) { print "      IFF1=IFF2=0;\n"; }
 
 sub opcode_DJNZ (@) {
     print << "DJNZ";
-      tstates++; contend( PC, 3 );
+      tstates++;
       B--;
-      if(B) { JR(); }
+      if(B) {
+	JR();
+      } else {
+	contend( PC, 3 );
+      }
       PC++;
 DJNZ
 }
@@ -528,11 +541,11 @@ EX
 
 	print << "EX";
       {
-	libspectrum_byte bytetempl = readbyte( SP     ),
-	                 bytetemph = readbyte( SP + 1 );
-	contend( SP, 3 ); contend( SP+1, 4 );
-	contend( SP, 3 ); contend( SP+1, 5 );
-	writebyte(SP,$low); writebyte(SP+1,$high);
+	libspectrum_byte bytetempl, bytetemph;
+	bytetempl = readbyte( SP );
+	bytetemph = readbyte( SP + 1 ); tstates++;
+	writebyte( SP,    $low  );
+	writebyte( SP + 1,$high ); tstates += 2;
 	$low=bytetempl; $high=bytetemph;
       }
 EX
@@ -573,8 +586,7 @@ sub opcode_IN (@) {
 	print << "IN";
       { 
 	libspectrum_word intemp;
-	contend( PC, 4 );
-	intemp = readbyte( PC++ ) + ( A << 8 );
+	intemp = readbyte( PC++ ) + ( A << 8 ); tstates++;
 	contend_io( intemp, 3 );
         A=readport( intemp );
       }
@@ -623,14 +635,22 @@ sub opcode_JR (@) {
 
     if( not defined $offset ) { $offset = $condition; $condition = ''; }
 
-    print "      contend( PC, 3 );\n";
-
     if( !$condition ) {
 	print "      JR();\n";
-    } elsif( defined $not{$condition} ) {
-	print "      if( ! ( F & FLAG_$flag{$condition} ) ) { JR(); }\n";
     } else {
-	print "      if( F & FLAG_$flag{$condition} ) { JR(); }\n";
+	my $condition_string;
+	if( defined $not{$condition} ) {
+	    $condition_string = "! ( F & FLAG_$flag{$condition} )";
+	} else {
+	    $condition_string = "F & FLAG_$flag{$condition}";
+	}
+	print << "JR";
+      if( $condition_string ) {
+        JR();
+      } else {
+        contend( PC, 3 );
+      }
+JR
     }
 
     print "      PC++;\n";
@@ -665,28 +685,24 @@ LD
 		}
 	    }
 	} elsif( $src eq 'nn' ) {
-	    print "      contend( PC, 3 );\n      $dest=readbyte(PC++);\n";
+	    print "      $dest = readbyte( PC++ );\n";
 	} elsif( $src =~ /^\(..\)$/ ) {
 	    my $register = substr $src, 1, 2;
 	    print << "LD";
-      contend( $register, 3 );
       $dest=readbyte($register);
 LD
         } elsif( $src eq '(nnnn)' ) {
 	    print << "LD";
       {
 	libspectrum_word wordtemp;
-	contend( PC, 3 );
 	wordtemp = readbyte(PC++);
-	contend( PC, 3 );
 	wordtemp|= ( readbyte(PC++) << 8 );
-	contend( wordtemp, 3 );
 	A=readbyte(wordtemp);
       }
 LD
         } elsif( $src eq '(REGISTER+dd)' ) {
 	    print << "LD";
-      tstates += 11;		/* FIXME: how is this contended? */
+      tstates += 5;		/* FIXME: how is this contended? */
       $dest = readbyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ) );
 LD
         }
@@ -704,9 +720,7 @@ LD
 	if( $src eq 'nnnn' ) {
 
 	    print << "LD";
-      contend( PC, 3 );
       $low=readbyte(PC++);
-      contend( PC, 3 );
       $high=readbyte(PC++);
 LD
         } elsif( $src eq 'HL' or $src eq 'REGISTER' ) {
@@ -721,12 +735,10 @@ LD
 
 	if( length $src == 1 ) {
 	    print << "LD";
-      contend( $register, 3 );
       writebyte($register,$src);
 LD
 	} elsif( $src eq 'nn' ) {
 	    print << "LD";
-      contend( PC, 3 ); contend( $register, 3 );
       writebyte($register,readbyte(PC++));
 LD
         }
@@ -735,12 +747,9 @@ LD
 
 	if( $src eq 'A' ) {
 	    print << "LD";
-      contend( PC, 3 );
       {
 	libspectrum_word wordtemp = readbyte( PC++ );
-	contend( PC, 3 );
 	wordtemp|=readbyte(PC++) << 8;
-	contend( wordtemp, 3 );
 	writebyte(wordtemp,A);
       }
 LD
@@ -760,12 +769,12 @@ LD
 
 	if( length $src == 1 ) {
 	print << "LD";
-      tstates += 11;		/* FIXME: how is this contended? */
+      tstates += 5;		/* FIXME: how is this contended? */
       writebyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ), $src );
 LD
         } elsif( $src eq 'nn' ) {
 	    print << "LD";
-      tstates += 11;		/* FIXME: how is this contended? */
+      tstates += 2;		/* FIXME: how is this contended? */
       {
 	libspectrum_word wordtemp =
 	    REGISTER + (libspectrum_signed_byte)readbyte( PC++ );
@@ -811,8 +820,8 @@ sub opcode_OUT (@) {
 	print << "OUT";
       { 
 	libspectrum_word outtemp;
-	contend( PC, 4 );
 	outtemp = readbyte( PC++ ) + ( A << 8 );
+	tstates++;
 	Z80_OUT( outtemp , A );
       }
 OUT
@@ -901,7 +910,7 @@ sub opcode_RLD (@) {
     print << "RLD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 7 ); contend( HL, 3 );
+	tstates += 4;
 	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
 	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
 	F = ( F & FLAG_C ) | sz53p_table[A];
@@ -936,7 +945,7 @@ sub opcode_RRD (@) {
     print << "RRD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 7 ); contend( HL, 3 );
+	tstates += 4;
 	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
 	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
 	F = ( F & FLAG_C ) | sz53p_table[A];
@@ -1116,7 +1125,7 @@ while(<>) {
 	    my $hexmask = res_set_hexmask( $opcode, $bit );
 
 	    print << "CODE";
-      tstates += 8;
+      tstates += 2;
       $register=readbyte(tempaddr) $operator $hexmask;
       writebyte(tempaddr, $register);
       break;
@@ -1124,7 +1133,7 @@ CODE
 	} else {
 
 	    print << "CODE";
-      tstates += 8;
+      tstates += 2;
       $register=readbyte(tempaddr);
       $opcode($register);
       writebyte(tempaddr, $register);

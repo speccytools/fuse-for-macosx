@@ -177,8 +177,8 @@
 {\
   libspectrum_byte calltempl, calltemph; \
   calltempl=readbyte(PC++);\
-  contend( PC, 1 );\
-  calltemph=readbyte(PC++);\
+  calltemph=readbyte( PC ); \
+  contend( PC, 1 ); PC++;\
   PUSH16(PCL,PCH);\
   PCL=calltempl; PCH=calltemph;\
 }
@@ -230,13 +230,9 @@ break
 #define LD16_NNRR(regl,regh)\
 {\
   libspectrum_word ldtemp; \
-  contend( PC, 3 );\
   ldtemp=readbyte(PC++);\
-  contend( PC, 3 );\
   ldtemp|=readbyte(PC++) << 8;\
-  contend( ldtemp, 3 );\
   writebyte(ldtemp++,(regl));\
-  contend( ldtemp, 3 );\
   writebyte(ldtemp,(regh));\
   break;\
 }
@@ -244,13 +240,9 @@ break
 #define LD16_RRNN(regl,regh)\
 {\
   libspectrum_word ldtemp; \
-  contend( PC, 3 );\
   ldtemp=readbyte(PC++);\
-  contend( PC, 3 );\
   ldtemp|=readbyte(PC++) << 8;\
-  contend( ldtemp, 3 );\
   (regl)=readbyte(ldtemp++);\
-  contend( ldtemp, 3 );\
   (regh)=readbyte(ldtemp);\
   break;\
 }
@@ -264,9 +256,10 @@ break
 
 #define JR()\
 {\
+  libspectrum_signed_byte jrtemp = readbyte( PC ); \
   contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );\
   contend( PC, 1 );\
-  PC += (libspectrum_signed_byte)readbyte( PC ); \
+  PC += jrtemp; \
 }
 
 #define OR(value)\
@@ -283,18 +276,14 @@ break
 
 #define POP16(regl,regh)\
 {\
-  contend( SP, 3 );\
   (regl)=readbyte(SP++);\
-  contend( SP, 3 );\
   (regh)=readbyte(SP++);\
 }
 
 #define PUSH16(regl,regh)\
 {\
-  SP--; contend( SP, 3 );\
-  writebyte(SP,(regh));\
-  SP--; contend( SP, 3 );\
-  writebyte(SP,(regl));\
+  writebyte( --SP, (regh) );\
+  writebyte( --SP, (regl) );\
 }
 
 #define RET()\

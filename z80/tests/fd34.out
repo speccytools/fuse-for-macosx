@@ -2,8 +2,11 @@
     4 MR 0000 fd
     4 MC 0001
     8 MR 0001 34
-   23 MR 0002 b8
-   23 MR ef7c e0
+   14 MC 0002
+   17 MR 0002 b8
+   17 MC ef7c
+   20 MR ef7c e0
+   20 MC ef7c
    23 MW ef7c e1
 d5a0 6f24 7df7 74f0 0000 0000 0000 0000 365a efc4 0000 0003
 00 02 0 0 0 0 23

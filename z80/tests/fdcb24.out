@@ -6,7 +6,9 @@
    11 MR 0002 b4
    11 MC 0003
    15 MR 0003 24
-   23 MR afb2 7e
+   17 MC afb2
+   20 MR afb2 7e
+   20 MC afb2
    23 MW afb2 fc
 1cac da3e cc7c fc19 0000 0000 0000 0000 572c affe 0000 0004
 00 02 0 0 0 0 23

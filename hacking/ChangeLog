@@ -348,3 +348,6 @@
 	 EI' flag.
 20031111 event.c, z80/z80.[ch]: further changes to the interrupt code to
 	 allow old Fuse recordings to play back successfully.
+20031112 memory.c, z80/Makefile.am, z80/coretest.c, z80/harness.pl,
+	 z80/z80.pl, z80/z80_macros.h, z80/tests/: Z80 core improvements
+	 to reduce the number of calls made to contend_memory().
