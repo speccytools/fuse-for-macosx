@@ -380,7 +380,8 @@ ui_debugger_update( void )
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) {
     sprintf( format_string, "\nTmxDec %s", format_8_bit );
     length = strlen( buffer );
-    snprintf( &buffer[length], 1024-length, format_string, scld_last_dec );
+    snprintf( &buffer[length], 1024-length, format_string,
+	      scld_last_dec.byte );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO ) {
