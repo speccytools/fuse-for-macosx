@@ -105,24 +105,21 @@ specplus3_unattached_port( void )
 
 BYTE specplus3_readbyte(WORD address)
 {
-  int bank;
-
   if(machine_current->ram.special) {
-    bank=address/0x4000; address-=(bank*0x4000);
     switch(machine_current->ram.specialcfg) {
-      case 0: return RAM[bank  ][address];
-      case 1: return RAM[bank+4][address];
-      case 2: switch(bank) {
-	case 0: return RAM[4][address];
-	case 1: return RAM[5][address];
-	case 2: return RAM[6][address];
-	case 3: return RAM[3][address];
+      case 0: return RAM[   address >> 14       ][ address & 0x3fff ];
+      case 1: return RAM[ ( address >> 14 ) + 4 ][ address & 0x3fff ];
+      case 2: switch( address >> 14 ) {
+	case 0: return RAM[4][ address & 0x3fff ];
+	case 1: return RAM[5][ address & 0x3fff ];
+	case 2: return RAM[6][ address & 0x3fff ];
+	case 3: return RAM[3][ address & 0x3fff ];
       }
-      case 3: switch(bank) {
-	case 0: return RAM[4][address];
-	case 1: return RAM[7][address];
-	case 2: return RAM[6][address];
-	case 3: return RAM[3][address];
+      case 3: switch( address >> 14 ) {
+	case 0: return RAM[4][ address & 0x3fff ];
+	case 1: return RAM[7][ address & 0x3fff ];
+	case 2: return RAM[6][ address & 0x3fff ];
+	case 3: return RAM[3][ address & 0x3fff ];
       }
       default:
 	ui_error( UI_ERROR_ERROR, "Unknown +3 special configuration %d",
@@ -130,13 +127,11 @@ BYTE specplus3_readbyte(WORD address)
 	fuse_abort();
     }
   } else {
-    if(address<0x4000) return ROM[machine_current->ram.current_rom][address];
-    bank=address/0x4000; address-=(bank*0x4000);
-    switch(bank) {
-      case 1: return RAM[				 5][address]; break;
-      case 2: return RAM[				 2][address]; break;
-      case 3: return RAM[machine_current->ram.current_page][address]; break;
-      default: fuse_abort();
+    switch( address >> 14 ) {
+    case 0: return ROM[ machine_current->ram.current_rom][ address & 0x3fff ];
+    case 1: return RAM[				       5][ address & 0x3fff ];
+    case 2: return RAM[				       2][ address & 0x3fff ];
+    case 3: return RAM[machine_current->ram.current_page][ address & 0x3fff ];
     }
   }
 

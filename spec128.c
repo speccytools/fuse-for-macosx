@@ -58,15 +58,11 @@ BYTE spec128_unattached_port( void )
 
 BYTE spec128_readbyte(WORD address)
 {
-  WORD bank;
-
-  if(address<0x4000) return ROM[machine_current->ram.current_rom][address];
-  bank=address/0x4000; address-=(bank*0x4000);
-  switch(bank) {
-  case 1: return RAM[                                5][address]; break;
-  case 2: return RAM[                                2][address]; break;
-  case 3: return RAM[machine_current->ram.current_page][address]; break;
-  default: fuse_abort();
+  switch( address >> 14 ) {
+  case 0: return ROM[ machine_current->ram.current_rom][ address & 0x3fff ];
+  case 1: return RAM[                                5][ address & 0x3fff ];
+  case 2: return RAM[                                2][ address & 0x3fff ];
+  case 3: return RAM[machine_current->ram.current_page][ address & 0x3fff ];
   }
   return 0; /* Keep gcc happy */
 }

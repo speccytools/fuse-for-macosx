@@ -57,18 +57,11 @@ static BYTE spec48_unattached_port( void )
 
 BYTE spec48_readbyte(WORD address)
 {
-  WORD bank;
-
-  if(address<0x4000) return ROM[0][address];
-  bank=address/0x4000; address-=(bank*0x4000);
-  switch(bank) {
-    case 1: return RAM[5][address]; break;
-    case 2: return RAM[2][address]; break;
-    case 3: return RAM[0][address]; break;
-    default:
-      ui_error( UI_ERROR_ERROR, "access to impossible bank %d at %s:%d",
-		bank, __FILE__, __LINE__ );
-      fuse_abort();
+  switch( address >> 14 ) {
+  case 0: return ROM[0][ address & 0x3fff ];
+  case 1: return RAM[5][ address & 0x3fff ];
+  case 2: return RAM[2][ address & 0x3fff ];
+  case 3: return RAM[0][ address & 0x3fff ];
   }
   return 0; /* Keep gcc happy */
 }
