@@ -41,9 +41,13 @@ enum debugger_mode_t debugger_mode;
 /* The current breakpoints */
 GSList *debugger_breakpoints;
 
+/* The next breakpoint ID to use */
+static size_t next_breakpoint_id;
+
 /* Which base should we display things in */
 int debugger_output_base;
 
+static gint find_breakpoint( gconstpointer data, gconstpointer user_data );
 static void free_breakpoint( gpointer data, gpointer user_data );
 static void show_breakpoint( gpointer data, gpointer user_data );
 
@@ -51,6 +55,7 @@ int
 debugger_init( void )
 {
   debugger_breakpoints = NULL;
+  next_breakpoint_id = 1;
   debugger_output_base = 16;
   return debugger_reset();
 }
@@ -167,6 +172,7 @@ debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
     return 1;
   }
 
+  bp->id = next_breakpoint_id++;
   bp->type = type; bp->value = value; bp->ignore = ignore; bp->life = life;
 
   debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
@@ -177,16 +183,16 @@ debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
   return 0;
 }
 
-/* Remove the 'n'th breakpoint */
+/* Remove breakpoint with the given ID */
 int
-debugger_breakpoint_remove( size_t n )
+debugger_breakpoint_remove( size_t id )
 {
   GSList *ptr;
 
-  ptr = g_slist_nth( debugger_breakpoints, n );
+  ptr = g_slist_find_custom( debugger_breakpoints, &id, find_breakpoint );
   if( !ptr ) {
     ui_error( UI_ERROR_ERROR, "Breakpoint %ld does not exist",
-	      (unsigned long)n );
+	      (unsigned long)id );
     return 1;
   }
 
@@ -199,6 +205,15 @@ debugger_breakpoint_remove( size_t n )
   return 0;
 }
 
+static gint
+find_breakpoint( gconstpointer data, gconstpointer user_data )
+{
+  const debugger_breakpoint *bp = data;
+  size_t id = *(size_t*)user_data;
+
+  return bp->id - id;
+}
+
 /* Remove all breakpoints */
 int
 debugger_breakpoint_remove_all( void )
@@ -208,6 +223,9 @@ debugger_breakpoint_remove_all( void )
 
   if( debugger_mode == DEBUGGER_MODE_ACTIVE )
     debugger_mode = DEBUGGER_MODE_INACTIVE;
+
+  /* Restart the breakpoint numbering */
+  next_breakpoint_id = 1;
 
   return 0;
 }
@@ -222,11 +240,9 @@ free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 int
 debugger_breakpoint_show( void )
 {
-  size_t index = 0;
-
   printf( "Current breakpoints:\n" );
 
-  g_slist_foreach( debugger_breakpoints, show_breakpoint, &index );
+  g_slist_foreach( debugger_breakpoints, show_breakpoint, NULL );
 
   return 0;
 }
@@ -235,12 +251,9 @@ static void
 show_breakpoint( gpointer data, gpointer user_data )
 {
   debugger_breakpoint *bp = data;
-  size_t *index = user_data;
 
-  printf( "%lu: %d 0x%04x %lu %d\n", (unsigned long)*index, bp->type,
+  printf( "%lu: %d 0x%04x %lu %d\n", (unsigned long)bp->id, bp->type,
 	  bp->value, (unsigned long)bp->ignore, bp->life );
-
-  (*index)++;
 }
 
 /* Exit from the last CALL etc by setting a oneshot breakpoint at
@@ -259,16 +272,16 @@ debugger_breakpoint_exit( void )
   return 0;
 }
 
-/* Ignore breakpoint 'which' the next 'ignore' times it hits */
+/* Ignore breakpoint 'id' the next 'ignore' times it hits */
 int
-debugger_breakpoint_ignore( size_t which, size_t ignore )
+debugger_breakpoint_ignore( size_t id, size_t ignore )
 {
   GSList *ptr; debugger_breakpoint *bp;
 
-  ptr = g_slist_nth( debugger_breakpoints, which );
+  ptr = g_slist_find_custom( debugger_breakpoints, &id, find_breakpoint );
   if( !ptr ) {
     ui_error( UI_ERROR_ERROR, "Breakpoint %ld does not exist",
-	      (unsigned long)which );
+	      (unsigned long)id );
     return 1;
   }
 

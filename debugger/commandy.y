@@ -51,6 +51,7 @@ void yyerror( char *s );
 
 }
 
+%token		 ALL
 %token		 BASE
 %token		 BREAK
 %token		 CLEAR
@@ -84,7 +85,7 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 			DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 		      );
 		    }
-	 | BREAK CLEAR { debugger_breakpoint_remove_all(); }
+	 | BREAK CLEAR ALL { debugger_breakpoint_remove_all(); }
 	 | BREAK CLEAR NUMBER { debugger_breakpoint_remove( $3 ); }
 	 | BREAK NUMBER { debugger_breakpoint_add( 
 			    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, $2, 0,

@@ -29,11 +29,11 @@
 
 int debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
 			     size_t ignore, debugger_breakpoint_life life );
-int debugger_breakpoint_remove( size_t n );
+int debugger_breakpoint_remove( size_t id );
 int debugger_breakpoint_remove_all( void );
 int debugger_breakpoint_show( void );
 int debugger_breakpoint_exit( void );
-int debugger_breakpoint_ignore( size_t which, size_t ignore );
+int debugger_breakpoint_ignore( size_t id, size_t ignore );
 
 /* Utility functions called by the flex scanner */
 
