@@ -50,6 +50,8 @@ static int create_dialog( void );
 static int activate_debugger( void );
 static int deactivate_debugger( void );
 
+static void move_disassembly( GtkAdjustment *adjustment, gpointer user_data );
+
 static void evaluate_command( GtkWidget *widget, gpointer user_data );
 static void gtkui_debugger_done_step( GtkWidget *widget, gpointer user_data );
 static void gtkui_debugger_done_continue( GtkWidget *widget,
@@ -112,6 +114,8 @@ create_dialog( void )
   GtkAccelGroup *accel_group;
   GtkStyle *style;
 
+  GtkObject *adjustment; GtkWidget *scrollbar;
+
   gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life" },
     *disassembly_titles[] = { "Address", "Instruction" },
     *stack_titles[] = { "Address", "Value" };
@@ -157,6 +161,13 @@ create_dialog( void )
   gtk_widget_set_style( disassembly, style );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
+
+  /* The disassembly scrollbar */
+  adjustment = gtk_adjustment_new( PC, 0x0000, 0xffff, 0.5, 20, 20 );
+  gtk_signal_connect( GTK_OBJECT( adjustment ), "value-changed",
+		      GTK_SIGNAL_FUNC( move_disassembly ), NULL );
+  scrollbar = gtk_vscrollbar_new( GTK_ADJUSTMENT( adjustment ) );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), scrollbar );
 
   /* And the stack CList */
   stack = gtk_clist_new_with_titles( 2, stack_titles );
@@ -406,6 +417,68 @@ ui_debugger_disassemble( WORD address )
 {
   disassembly_top = address;
   return 0;
+}
+
+/* Called when the disassembly scrollbar is moved */
+static void
+move_disassembly( GtkAdjustment *adjustment, gpointer user_data GCC_UNUSED )
+{
+  float value = adjustment->value;
+  size_t length;
+
+  /* disassembly_top < value < disassembly_top + 1 => 'down' button pressed
+     Move the disassembly on by one instruction */
+  if( value > disassembly_top && value - disassembly_top < 1 ) {
+
+    debugger_disassemble( NULL, 0, &length, disassembly_top );
+    disassembly_top += length;
+
+  /* disassembly_top - 1 < value < disassembly_top => 'up' button pressed
+     
+     The desired state after this is for the current top instruction
+     to be the second instruction shown in the disassembly.
+
+     Unfortunately, it's not trivial to determine where disassembly
+     should now start, as we have variable length instructions of
+     unbounded length (multiple DD and FD prefixes on one instruction
+     are possible).
+
+     In general, we want the _longest_ opcode which produces the
+     current top in second place (consider something like LD A,nn:
+     we're not interested if nn happens to represent a one-byte
+     opcode), so look back a reasonable length (say, 8 bytes) and see
+     what we find.
+
+     In some cases (eg if we're currently pointing to a data byte of a
+     multi-byte opcode), it will be impossible to get the current top
+     second. In this case, just move back a byte.
+
+  */
+  } else if( value < disassembly_top && disassembly_top - value < 1 ) {
+
+    size_t i, longest = 1;
+
+    for( i = 1; i <= 8; i++ ) {
+
+      debugger_disassemble( NULL, 0, &length, disassembly_top - i );
+      if( length == i ) longest = i;
+
+    }
+
+    disassembly_top -= longest;
+
+  /* Anything else, just set disassembly_top to that value */
+  } else {
+
+    disassembly_top = value;
+
+  }
+
+  /* Reset the adjustment value to what we're now actually using */
+  adjustment->value = disassembly_top;
+
+  /* And update the disassembly */
+  ui_debugger_update();
 }
 
 /* Evaluate the command currently in the entry box */
