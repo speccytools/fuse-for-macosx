@@ -12,6 +12,10 @@ these guidelines.
 
 * Indents are two spaces
 
+* Variable names should be all_lowercase_and_separated_with_underscores,
+  except for #define and enum constants which should be
+  IN_UPPERCASE_AND_SEPARATED_WITH_UNDERSCORES.
+
 * There should be a space after the opening parenthesis of function
   calls (unless there are no arguments), after operators (apart from
   increments and decrements) and before the closing parenthesis of
