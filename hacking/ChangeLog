@@ -1299,3 +1299,5 @@
 	 #1150708) (Darren).
 20050327 z80/z80.c: page in TR-DOS ROM on NMI (enables Pentagon snapshot
 	 function to work).
+20050327 menu.[ch],ui/gtk/gtkui.c,widget/menu.c: check all media types for
+	 changes on exit via widget UIs.

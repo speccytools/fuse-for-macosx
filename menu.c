@@ -1,5 +1,5 @@
 /* menu.c: general menu callbacks
-   Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2004-2005 Philip Kendall
 
    $Id$
 
@@ -603,4 +603,54 @@ menu_open_snap( void )
   error = snapshot_read( filename );
   free( filename );
   return error;
+}
+
+int
+menu_check_media_changed( void )
+{
+  int confirm;
+
+  confirm = tape_close(); if( confirm ) return 1;
+
+#ifdef HAVE_765_H
+
+  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
+  if( confirm ) return 1;
+
+  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
+  if( confirm ) return 1;
+
+#endif			/* #ifdef HAVE_765_H */
+
+  confirm = trdos_disk_eject( TRDOS_DRIVE_A, 0 );
+  if( confirm ) return 1;
+
+  confirm = trdos_disk_eject( TRDOS_DRIVE_B, 0 );
+  if( confirm ) return 1;
+
+  if( settings_current.simpleide_master_file ) {
+    confirm = simpleide_eject( LIBSPECTRUM_IDE_MASTER );
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.simpleide_slave_file ) {
+    confirm = simpleide_eject( LIBSPECTRUM_IDE_SLAVE );
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.zxatasp_master_file ) {
+    confirm = zxatasp_eject( LIBSPECTRUM_IDE_MASTER );
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.zxatasp_slave_file ) {
+    confirm = zxatasp_eject( LIBSPECTRUM_IDE_SLAVE );
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.zxcf_pri_file ) {
+    confirm = zxcf_eject(); if( confirm ) return 1;
+  }
+
+  return 0;
 }

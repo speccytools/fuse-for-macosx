@@ -304,12 +304,15 @@ menu_get_scaler( scaler_available_fn selector )
 void
 menu_file_exit( int action )
 {
-  if( widget_do( WIDGET_TYPE_QUERY, "Exit Fuse?" ) ||
-      !widget_query.confirm ||
-      tape_close() )
+  int confirm;
+
+  if( widget_do( WIDGET_TYPE_QUERY, "Exit Fuse?" ) || !widget_query.confirm )
     return;
 
+  if( menu_check_media_changed() ) return;
+
   fuse_exiting = 1;
+
   widget_end_all( WIDGET_FINISHED_OK );
 }
 

@@ -549,47 +549,7 @@ menu_file_exit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   if( gtkui_confirm( "Exit Fuse?" ) ) {
 
-    confirm = tape_close(); if( confirm ) return;
-
-#ifdef HAVE_765_H
-
-    confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
-    if( confirm ) return;
-
-    confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
-    if( confirm ) return;
-
-#endif			/* #ifdef HAVE_765_H */
-
-    confirm = trdos_disk_eject( TRDOS_DRIVE_A, 0 );
-    if( confirm ) return;
-
-    confirm = trdos_disk_eject( TRDOS_DRIVE_B, 0 );
-    if( confirm ) return;
-
-    if( settings_current.simpleide_master_file ) {
-      confirm = simpleide_eject( LIBSPECTRUM_IDE_MASTER );
-      if( confirm ) return;
-    }
-
-    if( settings_current.simpleide_slave_file ) {
-      confirm = simpleide_eject( LIBSPECTRUM_IDE_SLAVE );
-      if( confirm ) return;
-    }
-
-    if( settings_current.zxatasp_master_file ) {
-      confirm = zxatasp_eject( LIBSPECTRUM_IDE_MASTER );
-      if( confirm ) return;
-    }
-
-    if( settings_current.zxatasp_slave_file ) {
-      confirm = zxatasp_eject( LIBSPECTRUM_IDE_SLAVE );
-      if( confirm ) return;
-    }
-
-    if( settings_current.zxcf_pri_file ) {
-      confirm = zxcf_eject(); if( confirm ) return;
-    }
+    if( menu_check_media_changed() ) return;
 
     fuse_exiting = 1;
 
