@@ -36,7 +36,7 @@
 extern DWORD tstates;
 
 /* The last byte written to the ULA */
-BYTE spectrum_last_ula;
+extern BYTE spectrum_last_ula;
 
 /* Things relating to memory */
 
