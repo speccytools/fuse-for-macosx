@@ -32,6 +32,10 @@
 #include <stdlib.h>
 #include "myglib.h"
 
+static
+gint	last_function		(gconstpointer	 a,
+				 gconstpointer	 b);
+
 GSList * free_list = NULL;
 
 GSList* g_slist_insert_sorted	(GSList		*list,
@@ -94,6 +98,19 @@ GSList* g_slist_insert_sorted	(GSList		*list,
       new_list->next = list;
       return new_list;
     }
+}
+
+GSList* g_slist_append		(GSList		*list,
+				 gpointer	 data) {
+
+  return g_slist_insert_sorted(list, data, last_function);
+}
+
+static
+gint	last_function		(gconstpointer	 a,
+				 gconstpointer	 b) {
+
+  return 1;
 }
 
 GSList* g_slist_remove		(GSList		*list,

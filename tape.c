@@ -39,6 +39,7 @@
 #endif
 
 #include "fuse.h"
+#include "settings.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "z80/z80.h"
@@ -216,7 +217,10 @@ static void tape_free_entry( gpointer data, gpointer user_data )
   free(ptr);
 }
 
-/* Load the next tape block into memory */
+/* Load the next tape block into memory; returns 0 if a block was
+   loaded (even if it had an tape loading error or equivalent) or
+   non-zero if there was an error at the emulator level, or tape traps
+   are not active */
 int tape_trap( void )
 {
   tape_block_t *current_block;
@@ -226,6 +230,10 @@ int tape_trap( void )
 
   int i;
 
+  /* Do nothing if tape traps aren't active */
+  if( ! settings_current.tape_traps ) return 2;
+
+  /* Return with error if no tape file loaded */
   if( tape_block_list == NULL ) return 1;
 
   current_block = (tape_block_t*)(tape_block_pointer->data);
@@ -248,7 +256,7 @@ int tape_trap( void )
   ptr = current_block->data;
   parity = *ptr;
 
-  /* If the flag byte does not match, reset carry and return */
+  /* If the flag byte (stored in A') does not match, reset carry and return */
   if( *ptr++ != A_ ) {
     F = ( F & ~FLAG_C );
     return 0;

@@ -49,6 +49,9 @@ GSList* g_slist_insert_sorted	(GSList		*list,
 				 gpointer	 data,
 				 GCompareFunc	 func);
 
+GSList* g_slist_append		(GSList		*list,
+				 gpointer	 data);
+
 GSList* g_slist_remove		(GSList		*list,
 				 gpointer	 data);
 
