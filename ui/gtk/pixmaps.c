@@ -24,6 +24,8 @@
 
 */
 
+#include <config.h>
+
 #include "gtkinternals.h"
 
 char *gtkpixmap_tape_inactive[] = {
