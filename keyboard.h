@@ -29,6 +29,10 @@
 
 #include <libspectrum.h>
 
+#ifndef FUSE_INPUT_H
+#include "input.h"
+#endif			/* #ifndef FUSE_INPUT_H */
+
 extern libspectrum_byte keyboard_default_value;
 extern libspectrum_byte keyboard_return_values[8];
 
@@ -102,5 +106,32 @@ libspectrum_byte keyboard_read( libspectrum_byte porth );
 void keyboard_press(keyboard_key_name key);
 void keyboard_release(keyboard_key_name key);
 int keyboard_release_all( void );
+
+/* Which Spectrum keys should be emulated as pressed when each input
+   layer key is pressed */
+
+typedef struct keysyms_key_info {
+
+  input_key keysym;
+  keyboard_key_name key1,key2;
+
+} keysyms_key_info;
+
+const keysyms_key_info* keysyms_get_data( input_key keysym );
+
+/* The mapping from UI layer keysyms to Fuse input layer keysyms */
+
+typedef struct keysyms_map_t {
+
+  /* FIXME: this should really be the UI specific type used for keysyms */
+  libspectrum_dword ui;
+
+  input_key fuse;
+
+} keysyms_map_t;
+
+extern const keysyms_map_t keysyms_map[];
+
+input_key keysyms_remap( libspectrum_dword ui_keysym );
 
 #endif			/* #ifndef FUSE_KEYBOARD_H */

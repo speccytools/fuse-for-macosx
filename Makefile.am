@@ -57,6 +57,7 @@ fuse_SOURCES = ay.c \
 	display.c \
 	event.c \
 	fuse.c \
+	input.c \
 	joystick.c \
 	keyboard.c \
 	machine.c \
@@ -124,7 +125,8 @@ noinst_HEADERS = ay.h \
 	dck.h \
 	display.h \
 	event.h \
-	fuse.h keyboard.h keysyms.h\
+	fuse.h \
+	keyboard.h \
 	machine.h \
 	memory.h \
 	pentagon.h \

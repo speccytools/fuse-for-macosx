@@ -42,6 +42,86 @@ libspectrum_byte keyboard_default_value;
 */
 libspectrum_byte keyboard_return_values[8];
 
+/* Which Spectrum keys should be pressed for each key passed from the
+   Fuse input layer */
+const static keysyms_key_info keysyms_data[] = {
+
+  { INPUT_KEY_Escape,      KEYBOARD_1,     KEYBOARD_Caps   },
+  { INPUT_KEY_1,           KEYBOARD_1,     KEYBOARD_NONE   },
+  { INPUT_KEY_2,           KEYBOARD_2,     KEYBOARD_NONE   },
+  { INPUT_KEY_3,           KEYBOARD_3,     KEYBOARD_NONE   },
+  { INPUT_KEY_4,           KEYBOARD_4,     KEYBOARD_NONE   },
+  { INPUT_KEY_5,           KEYBOARD_5,     KEYBOARD_NONE   },
+  { INPUT_KEY_6,           KEYBOARD_6,     KEYBOARD_NONE   },
+  { INPUT_KEY_7,           KEYBOARD_7,     KEYBOARD_NONE   },
+  { INPUT_KEY_8,           KEYBOARD_8,     KEYBOARD_NONE   },
+  { INPUT_KEY_9,           KEYBOARD_9,     KEYBOARD_NONE   },
+  { INPUT_KEY_0,           KEYBOARD_0,     KEYBOARD_NONE   },
+  { INPUT_KEY_minus,       KEYBOARD_j,     KEYBOARD_Symbol },
+  { INPUT_KEY_equal,       KEYBOARD_l,     KEYBOARD_Symbol },
+  { INPUT_KEY_BackSpace,   KEYBOARD_0,     KEYBOARD_Caps   },
+
+  { INPUT_KEY_q,           KEYBOARD_q,     KEYBOARD_NONE   },
+  { INPUT_KEY_w,           KEYBOARD_w,     KEYBOARD_NONE   },
+  { INPUT_KEY_e,           KEYBOARD_e,     KEYBOARD_NONE   },
+  { INPUT_KEY_r,           KEYBOARD_r,     KEYBOARD_NONE   },
+  { INPUT_KEY_t,           KEYBOARD_t,     KEYBOARD_NONE   },
+  { INPUT_KEY_y,           KEYBOARD_y,     KEYBOARD_NONE   },
+  { INPUT_KEY_u,           KEYBOARD_u,     KEYBOARD_NONE   },
+  { INPUT_KEY_i,           KEYBOARD_i,     KEYBOARD_NONE   },
+  { INPUT_KEY_o,           KEYBOARD_o,     KEYBOARD_NONE   },
+  { INPUT_KEY_p,           KEYBOARD_p,     KEYBOARD_NONE   },
+
+  { INPUT_KEY_Caps_Lock,   KEYBOARD_2,     KEYBOARD_Caps   },
+  { INPUT_KEY_a,           KEYBOARD_a,     KEYBOARD_NONE   },
+  { INPUT_KEY_s,           KEYBOARD_s,     KEYBOARD_NONE   },
+  { INPUT_KEY_d,           KEYBOARD_d,     KEYBOARD_NONE   },
+  { INPUT_KEY_f,           KEYBOARD_f,     KEYBOARD_NONE   },
+  { INPUT_KEY_g,           KEYBOARD_g,     KEYBOARD_NONE   },
+  { INPUT_KEY_h,           KEYBOARD_h,     KEYBOARD_NONE   },
+  { INPUT_KEY_j,           KEYBOARD_j,     KEYBOARD_NONE   },
+  { INPUT_KEY_k,           KEYBOARD_k,     KEYBOARD_NONE   },
+  { INPUT_KEY_l,           KEYBOARD_l,     KEYBOARD_NONE   },
+  { INPUT_KEY_semicolon,   KEYBOARD_o,     KEYBOARD_Symbol },
+  { INPUT_KEY_apostrophe,  KEYBOARD_7,     KEYBOARD_Symbol },
+  { INPUT_KEY_numbersign,  KEYBOARD_3,     KEYBOARD_Symbol },
+  { INPUT_KEY_Return,      KEYBOARD_Enter, KEYBOARD_NONE   },
+
+  { INPUT_KEY_Shift_L,     KEYBOARD_NONE,  KEYBOARD_Caps   },
+  { INPUT_KEY_z,           KEYBOARD_z,     KEYBOARD_NONE   },
+  { INPUT_KEY_x,           KEYBOARD_x,     KEYBOARD_NONE   },
+  { INPUT_KEY_c,           KEYBOARD_c,     KEYBOARD_NONE   },
+  { INPUT_KEY_v,           KEYBOARD_v,     KEYBOARD_NONE   },
+  { INPUT_KEY_b,           KEYBOARD_b,     KEYBOARD_NONE   },
+  { INPUT_KEY_n,           KEYBOARD_n,     KEYBOARD_NONE   },
+  { INPUT_KEY_m,           KEYBOARD_m,     KEYBOARD_NONE   },
+  { INPUT_KEY_comma,       KEYBOARD_n,     KEYBOARD_Symbol },
+  { INPUT_KEY_period,      KEYBOARD_m,     KEYBOARD_Symbol },
+  { INPUT_KEY_slash,       KEYBOARD_v,     KEYBOARD_Symbol },
+  { INPUT_KEY_Shift_R,     KEYBOARD_NONE,  KEYBOARD_Caps   },
+
+  { INPUT_KEY_Control_L,   KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Alt_L,       KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Meta_L,      KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Super_L,     KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Hyper_L,     KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_space,       KEYBOARD_space, KEYBOARD_NONE   },
+  { INPUT_KEY_Hyper_R,     KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Super_R,     KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Meta_R,      KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Alt_R,       KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Control_R,   KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Mode_switch, KEYBOARD_NONE,  KEYBOARD_Symbol },
+
+  { INPUT_KEY_Left,        KEYBOARD_5,     KEYBOARD_Caps   },
+  { INPUT_KEY_Down,        KEYBOARD_6,     KEYBOARD_Caps   },
+  { INPUT_KEY_Up,          KEYBOARD_7,     KEYBOARD_Caps   },
+  { INPUT_KEY_Right,       KEYBOARD_8,     KEYBOARD_Caps   },
+
+  { 0, 0, 0 }		/* End marker */
+
+};
+
 /* When each Spectrum key is pressed, twiddle this {port,bit} pair
    in `keyboard_return_values'. 
 */
@@ -161,7 +241,7 @@ int keyboard_release_all( void )
 }
 
 const keysyms_key_info*
-keysyms_get_data( unsigned keysym )
+keysyms_get_data( input_key keysym )
 {
   const keysyms_key_info *ptr;
 
@@ -171,5 +251,19 @@ keysyms_get_data( unsigned keysym )
     }
   }
 
-  return 0;
+  return NULL;
 }
+
+input_key
+keysyms_remap( libspectrum_dword ui_keysym )
+{
+  const keysyms_map_t *ptr;
+
+  for( ptr = keysyms_map; ptr->ui; ptr++ )
+    if( ui_keysym == ptr->ui )
+      return ptr->fuse;
+
+  return INPUT_KEY_NONE;
+}
+
+    

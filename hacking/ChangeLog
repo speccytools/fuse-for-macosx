@@ -626,3 +626,6 @@
 	 detection logic into the new sound/lowlevel.h.
 20040310 configure.in,sound/{Makefile.am,hpsound.c,lowlevel.h}: add HP-UX
          sound support (patch #911651) (Stuart Brady).
+20040311 Makefile.am,input.[ch],keyboard.[ch],keysyms.{dat,pl},ui/ui.h,
+	 ui/gtk/gtkkeyboard.c: first changes to introduce a generalised
+	 input layer.

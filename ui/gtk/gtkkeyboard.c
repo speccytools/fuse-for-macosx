@@ -34,7 +34,8 @@
 
 #include "compat.h"
 #include "gtkinternals.h"
-#include "keysyms.h"
+#include "input.h"
+#include "keyboard.h"
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);
 
@@ -42,49 +43,42 @@ int
 gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 		      gpointer data GCC_UNUSED )
 {
-  guint keysym; const keysyms_key_info *ptr;
+  guint gdk_keysym;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
-  keysym=gtkkeyboard_unshift_keysym(event->key.keyval);
+  gdk_keysym = gtkkeyboard_unshift_keysym( event->key.keyval );
 
-  ptr=keysyms_get_data(keysym);
+  fuse_keysym = keysyms_remap( gdk_keysym );
 
-  if(ptr) {
+  if( fuse_keysym == INPUT_KEY_NONE ) return 0;
 
-    if( ptr->key1 != KEYBOARD_NONE ) keyboard_press( ptr->key1 );
-    if( ptr->key2 != KEYBOARD_NONE ) keyboard_press( ptr->key2 );
+  fuse_event.type = INPUT_EVENT_KEYPRESS;
+  fuse_event.types.key.key = fuse_keysym;
 
-    return TRUE;
-  }
+  return input_event( &fuse_event );
 
-  /* Now deal with the non-Speccy keys. Most are dealt with by
-     menu shortcuts in gtkui.c, but F1 can't be done that way. */
-  
-  if( keysym == GDK_F1 ) {
-    gtkui_popup_menu();
-    return TRUE;
-  }
-
-  return FALSE;
+  /* FIXME: handle F1 to deal with the pop-up menu */
 }
 
 int
 gtkkeyboard_keyrelease( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
-		        gpointer data GCC_UNUSED )
+			gpointer data GCC_UNUSED )
 {
-  guint keysym; const keysyms_key_info *ptr;
+  guint gdk_keysym;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
-  keysym=gtkkeyboard_unshift_keysym(event->key.keyval);
+  gdk_keysym = gtkkeyboard_unshift_keysym( event->key.keyval );
 
-  ptr=keysyms_get_data(keysym);
+  fuse_keysym = keysyms_remap( gdk_keysym );
 
-  if(ptr) {
-    if(ptr->key1 != KEYBOARD_NONE) keyboard_release(ptr->key1);
-    if(ptr->key2 != KEYBOARD_NONE) keyboard_release(ptr->key2);
-    return TRUE;
-  } else {
-    return FALSE;
-  }
+  if( fuse_keysym == INPUT_KEY_NONE ) return 0;
 
+  fuse_event.type = INPUT_EVENT_KEYRELEASE;
+  fuse_event.types.key.key = fuse_keysym;
+
+  return input_event( &fuse_event );
 }
 
 /* Given a keysym, return the keysym which would have been returned if

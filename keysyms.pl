@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # keysyms.pl: generate keysyms.c from keysyms.dat
-# Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Russell Marks,
+# Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Russell Marks,
 #			  Fredrick Meunier
 
 # $Id$
@@ -249,8 +249,8 @@ my $declare = "const keysyms_key_info keysyms_data[] =\n{";
 my $define = uc $ui;
 
 print Fuse::GPL(
-    'keysyms.c: keysym to Spectrum key mappings for both Xlib and GDK',
-    "2000-2003 Philip Kendall, Matan Ziv-Av, Russell Marks,\n" .
+    'keysyms.c: UI keysym to Fuse input layer keysym mappings',
+    "2000-2004 Philip Kendall, Matan Ziv-Av, Russell Marks,\n" .
     "                           Fredrick Meunier, Catalin Mihaila"  ),
     << "CODE";
 
@@ -261,10 +261,8 @@ print Fuse::GPL(
 
 #ifdef UI_$define
 
-#include <stdlib.h>
-
+#include "input.h"
 #include "keyboard.h"
-#include "ui/ui.h"
 
 CODE
 
@@ -274,48 +272,50 @@ foreach my $header ( @{ $ui_data{$ui}{headers} } ) {
     print "#include <$header>\n";
 }
 
-print "\nconst keysyms_key_info keysyms_data[] = {\n\n";
+print "\nconst keysyms_map_t keysyms_map[] = {\n\n";
 
 KEY:
 foreach( @keys ) {
 
-    my( $keysym, $key1, $key2 ) = @$_;
+    my( $keysym ) = @$_;
 
     next if $ui_data{$ui}{skips}{$keysym};
 
-    $keysym = $ui_data{$ui}{translations}{$keysym} if
+    my $ui_keysym = $keysym;
+
+    $ui_keysym = $ui_data{$ui}{translations}{$keysym} if
 	$ui_data{$ui}{translations}{$keysym};
 
-    $keysym = $ui_data{$ui}{function}->( $keysym );
+    $ui_keysym = $ui_data{$ui}{function}->( $ui_keysym );
 
-    if( $ui eq 'svga' and $keysym =~ /WIN$/ ) {
-	print "#ifdef $keysym\n";
+    if( $ui eq 'svga' and $ui_keysym =~ /WIN$/ ) {
+	print "#ifdef $ui_keysym\n";
     }
 
     if( $ui eq 'fb' ) {
 
 	for( my $i = 0; $i <= $#cooked_keysyms; $i++ ) {
 	    if( defined $cooked_keysyms[$i] and
-		$cooked_keysyms[$i] eq $keysym ) {
-		printf "  { %3i, KEYBOARD_%-9s KEYBOARD_%-6s },\n", $i,
-		    "$key1,", $key2;
+		$cooked_keysyms[$i] eq $ui_keysym ) {
+#		printf "  { %3i, KEYBOARD_%-9s KEYBOARD_%-6s },\n", $i,
+#		    "$key1,", $key2;
 		last;
 	    }
 	}
 
     } else {
 
-	printf "  { %-$ui_data{$ui}{max_length}s KEYBOARD_%-9s KEYBOARD_%-6s },\n",
-            "$keysym,", "$key1,", $key2;
+	printf "  { %-$ui_data{$ui}{max_length}s INPUT_KEY_%-11s },\n",
+            "$ui_keysym,", $keysym;
 
-	if( $ui eq 'ggi' and $keysym =~ /GIIUC_[a-z]/ ) {
-	    printf "  { %-$ui_data{$ui}{max_length}s KEYBOARD_%-9s KEYBOARD_%-6s },\n",
-	    uc $keysym . ",", "$key1,", $key2;
+	if( $ui eq 'ggi' and $ui_keysym =~ /GIIUC_[a-z]/ ) {
+#	    printf "  { %-$ui_data{$ui}{max_length}s KEYBOARD_%-9s KEYBOARD_%-6s },\n",
+#	    uc $keysym . ",", "$key1,", $key2;
 	}
 
     }
 
-    if( $ui eq 'svga' and $keysym =~ /WIN$/ ) {
+    if( $ui eq 'svga' and $ui_keysym =~ /WIN$/ ) {
 	print "#endif                          /* #ifdef $keysym */\n";
     }
 
@@ -323,7 +323,7 @@ foreach( @keys ) {
 
 print << "CODE";
 
-  { 0, 0, 0 }                   /* End marker: DO NOT MOVE! */
+  { 0, 0 }			/* End marker: DO NOT MOVE! */
 
 };
 

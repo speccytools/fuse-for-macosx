@@ -1,5 +1,5 @@
 # keysyms.dat: data file for use by keysyms.pl to generate keysyms.c
-# Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av, Russell Marks
+# Copyright (c) 2000-2001,2004 Philip Kendall, Matan Ziv-Av, Russell Marks
 
 # $Id$
 
@@ -22,91 +22,85 @@
 # E-mail: pak21-fuse@srcf.ucam.org
 # Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
-# Format here is <keysym>, <key1>, <key2>.
+# This file is a list of GDK GDK_ keysyms which should be mapped to
+# the Fuse input layer (INPUT_KEY) keysym with the same name.
+# keysyms.pl must do the appropriate work to convert things for other
+# user interfaces.
 
-# <keysym> should be a Xlib XK_ keysym; keysyms.pl must convert any which
-# differ for svgalib
+Escape
 
-# <key1> and <key2> are two Spectrum keys as defined in keyboard.h (or
-# NONE for no key). The widget handlers consider only the first key
-# specified, so put the `main' key in as <key1> and the modifier as <key2>
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+minus
+equal
+BackSpace
 
-Escape      , 1,     Caps
+q
+w
+e
+r
+t
+y
+u
+i
+o
+p
 
-1           , 1,     NONE
-2           , 2,     NONE
-3           , 3,     NONE
-4           , 4,     NONE
-5           , 5,     NONE
-6           , 6,     NONE
-7           , 7,     NONE
-8           , 8,     NONE
-9           , 9,     NONE
-0           , 0,     NONE
-minus       , j,     Symbol
-equal       , l,     Symbol
-BackSpace   , 0,     Caps
+Caps_Lock
+a
+s
+d
+f
+g
+h
+j
+k
+l
+semicolon
+apostrophe
+numbersign
+Return
 
-q           , q,     NONE
-w           , w,     NONE
-e           , e,     NONE
-r           , r,     NONE
-t           , t,     NONE
-y           , y,     NONE
-u           , u,     NONE
-i           , i,     NONE
-o           , o,     NONE
-p           , p,     NONE
+Shift_L
+z
+x
+c
+v
+b
+n
+m
+comma
+period
+slash
+Shift_R
 
-Caps_Lock   , 2,     Caps
-a           , a,     NONE
-s           , s,     NONE
-d           , d,     NONE
-f           , f,     NONE
-g           , g,     NONE
-h           , h,     NONE
-j           , j,     NONE
-k           , k,     NONE
-l           , l,     NONE
-semicolon   , o,     Symbol
-apostrophe  , 7,     Symbol
-numbersign  , 3,     Symbol
-Return      , Enter, NONE
+Control_L
+Alt_L
+Meta_L
+Super_L
+Hyper_L
+space
+Hyper_R
+Super_R
+Meta_R
+Alt_R
+Control_R
+Mode_switch
 
-Shift_L     , NONE,  Caps
-z           , z,     NONE
-x           , x,     NONE
-c           , c,     NONE
-v           , v,     NONE
-b           , b,     NONE
-n           , n,     NONE
-m           , m,     NONE
-comma       , n,     Symbol
-period      , m,     Symbol
-slash       , v,     Symbol
-Shift_R     , NONE,  Caps
+Left
+Down
+Up
+Right
 
-Control_L   , NONE,  Symbol
-Alt_L       , NONE,  Symbol
-Meta_L      , NONE,  Symbol
-Super_L     , NONE,  Symbol
-Hyper_L     , NONE,  Symbol
-space       , space, NONE
-Hyper_R     , NONE,  Symbol
-Super_R     , NONE,  Symbol
-Meta_R      , NONE,  Symbol
-Alt_R       , NONE,  Symbol
-Control_R   , NONE,  Symbol
-Mode_switch , NONE,  Symbol
-
-Left        , 5,     Caps
-Down        , 6,     Caps
-Up          , 7,     Caps
-Right       , 8,     Caps
-
-# Non-Spectrum keys, but used by the widget code
-
-Page_Up	    , PageUp,   NONE
-Page_Down   , PageDown, NONE
-Home	    , Home,     NONE
-End	    , End,      NONE
+Page_Up
+Page_Down
+Home
+End

@@ -32,7 +32,6 @@
 #include <libspectrum.h>
 
 #include "compat.h"
-#include "keysyms.h"
 #include "specplus3.h"
 #include "trdos.h"
 #include "ui/scaler/scaler.h"
@@ -46,8 +45,6 @@ typedef enum ui_error_level {
   UI_ERROR_ERROR,		/* An actual error */
 
 } ui_error_level;
-
-extern const keysyms_key_info keysyms_data[];
 
 int ui_init(int *argc, char ***argv);
 int ui_event(void);
