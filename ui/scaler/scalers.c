@@ -36,7 +36,7 @@
 
 #if SCALER_DATA_SIZE == 2
 
-typedef WORD scaler_data_type
+typedef WORD scaler_data_type;
 #define FUNCTION( name ) name##_16
 
 static DWORD colorMask;
@@ -74,7 +74,7 @@ scaler_select_bitformat( DWORD BitFormat )
 
 #elif SCALER_DATA_SIZE == 4	/* #if SCALER_DATA_SIZE == 2 */
 
-typedef DWORD scaler_data_type
+typedef DWORD scaler_data_type;
 #define FUNCTION( name ) name##_32
 
 const static DWORD colorMask = 0xFEFEFE00;
@@ -173,7 +173,7 @@ Q_INTERPOLATE(DWORD A, DWORD B, DWORD C, DWORD D)
   return x + y;
 }
 
-static void 
+void 
 FUNCTION( scaler_Super2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 	BYTE *deltaPtr, BYTE *dstPtr, DWORD dstPitch, int width, int height)
 {
@@ -284,7 +284,7 @@ FUNCTION( scaler_Super2xSaI )( BYTE *srcPtr, DWORD srcPitch,
   }
 }
 
-static void 
+void 
 FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 			       BYTE *dstPtr, DWORD dstPitch,
 			       int width, int height )
@@ -395,7 +395,7 @@ FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
   }
 }
 
-static void 
+void 
 FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 			  BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
@@ -538,7 +538,7 @@ FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
   }
 }
 
-static void 
+void 
 FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			      BYTE *dstPtr, DWORD dstPitch,
 			      int width, int height )
@@ -676,9 +676,9 @@ FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
   }
 }
 
-static void
-TV2x(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch, 
-            int width, int height)
+void
+FUNCTION( scaler_TV2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   int i, j;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );

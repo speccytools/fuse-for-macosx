@@ -135,9 +135,7 @@ gtkdisplay_init( void )
 static int
 init_colours( void )
 {
-  size_t i; int error;
-
-  error = scaler_select_bitformat( 888 ); if( error ) return error;
+  size_t i;
 
   for( i = 0; i < 16; i++ ) {
 
@@ -287,10 +285,10 @@ uidisplay_area( int x, int y, int w, int h )
     }
 
   /* Create scaled image */
-  scaler_proc( (BYTE*)&rgb_image[ ( y + 2 ) * rgb_pitch + 4 * ( x + 1 ) ],
-	       rgb_pitch, NULL, 
-	       (BYTE*)&scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
-	       scaled_pitch, w, h );
+  scaler_proc32( &rgb_image[ ( y + 2 ) * rgb_pitch + 4 * ( x + 1 ) ],
+		 rgb_pitch, NULL, 
+		 &scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
+		 scaled_pitch, w, h );
 
   w *= scale; h *= scale;
 

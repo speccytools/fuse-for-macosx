@@ -73,7 +73,7 @@ static struct scaler_info available_scalers[] = {
 };
 
 scaler_type current_scaler = SCALER_NUM;
-ScalerProc *scaler_proc;
+ScalerProc *scaler_proc16, *scaler_proc32;
 scaler_flags_t scaler_flags;
 
 int
@@ -93,7 +93,8 @@ scaler_select_scaler( scaler_type scaler )
     return 1;
   }
 
-  scaler_proc = scaler_get_proc( current_scaler );
+  scaler_proc16 = scaler_get_proc16( current_scaler );
+  scaler_proc32 = scaler_get_proc32( current_scaler );
   scaler_flags = scaler_get_flags( current_scaler );
 
   uidisplay_hotswap_gfx_mode();
@@ -145,9 +146,15 @@ scaler_name( scaler_type scaler )
 }
 
 ScalerProc*
-scaler_get_proc( scaler_type scaler )
+scaler_get_proc16( scaler_type scaler )
 {
-  return available_scalers[scaler].scaler;
+  return available_scalers[scaler].scaler16;
+}
+
+ScalerProc*
+scaler_get_proc32( scaler_type scaler )
+{
+  return available_scalers[scaler].scaler32;
 }
 
 scaler_flags_t
