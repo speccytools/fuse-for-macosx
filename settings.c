@@ -169,7 +169,42 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
   node = node->xmlChildrenNode;
   while( node ) {
 
-    if( !strcmp( node->name, (const xmlChar*)"tapetraps" ) ) {
+    /* FIXME: memory leak on string settings */
+
+    if( !strcmp( node->name, (const xmlChar*)"issue2" ) ) {
+      settings->issue2 =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"kempston" ) ) {
+      settings->tape_traps =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"machine" ) ) {
+      settings->start_machine =
+	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"playbackfile" ) ) {
+      settings->playback_file =
+	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"recordfile" ) ) {
+      settings->record_file =
+	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"separation" ) ) {
+      settings->stereo_ay =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"slt_traps" ) ) {
+      settings->slt_traps =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"snapshot" ) ) {
+      settings->snapshot =
+	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"sounddevice" ) ) {
+      settings->sound_device =
+	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"svgamode" ) ) {
+      settings->svga_mode =
+	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"tapefile" ) ) {
+      settings->tape_file =
+	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"tapetraps" ) ) {
       settings->tape_traps =
 	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"text" ) ) {
