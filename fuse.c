@@ -52,7 +52,11 @@
 #include "timer.h"
 #include "ui/ui.h"
 #include "utils.h"
+
+#ifndef UI_GTK
 #include "widget/widget.h"
+#endif				/* #ifndef UI_GTK */
+
 #include "z80/z80.h"
 
 /* What name were we called under? */
@@ -129,7 +133,9 @@ static int fuse_init(int argc, char **argv)
 
   if( tape_init() ) return 1;
 
+#ifndef UI_GTK
   if( widget_init() ) return 1;
+#endif					/* #ifndef UI_GTK */
 
   if(display_init(&argc,&argv)) return 1;
 
@@ -390,7 +396,9 @@ static int fuse_end(void)
   event_end();
   ui_end();
 
+#ifndef UI_GTK
   widget_end();
+#endif				/* #ifndef UI_GTK */
 
   return 0;
 }

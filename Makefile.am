@@ -34,8 +34,7 @@ fuse_SOURCES = ay.c display.c event.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c
 
-fuse_DEPENDENCIES = @UI_LIBS@ debugger/libdebugger.a widget/libwidget.a \
-                    z80/libz80.a
+fuse_DEPENDENCIES = @UI_LIBS@ debugger/libdebugger.a z80/libz80.a
 
 BUILT_SOURCES = settings.c settings.h
 
@@ -49,7 +48,7 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ @GETOPT_LIBS@\
 debugger/libdebugger.a \
-@UI_LIBS@ widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
+@UI_LIBS@ z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\

@@ -37,7 +37,6 @@
 #include "gtkui.h"
 #include "screenshot.h"
 #include "ui/uidisplay.h"
-#include "widget/widget.h"
 #include "scld.h"
 
 GdkGC *gtkdisplay_gc;
@@ -168,11 +167,6 @@ static int gtkdisplay_configure_notify( int width )
 
   /* And the entire border */
   display_refresh_border();
-
-  /* Redraw widgets if they're active. Needed here as the keyboard help
-     is implemented as a widget */
-  if( widget_level >= 0 )
-    widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
 
   return 0;
 }
