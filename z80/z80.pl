@@ -120,6 +120,45 @@ sub push_pop ($$) {
     print "      ${opcode}16($low,$high);\n";
 }
 
+sub res_set ($$$) {
+
+    my( $opcode, $bit, $register ) = @_;
+
+    my $operator = ( $opcode eq 'RES' ? '&' : '|' );
+
+    my $mask = 1 << $bit;
+    $mask = 0xff - $mask if $opcode eq 'RES';
+    
+    my $hex_mask = sprintf '0x%02x', $mask;
+
+    if( length $register == 1 ) {
+	print "      $register $operator= $hex_mask;\n";
+    } elsif( $register eq '(HL)' ) {
+	print << "CODE";
+      contend( HL, 4 ); contend( HL, 3 );
+      writebyte(HL, readbyte(HL) $operator $hex_mask);
+CODE
+    }
+}
+
+sub rotate_shift ($$) {
+
+    my( $opcode, $register ) = @_;
+
+    if( length $register == 1 ) {
+	print "      $opcode($register);\n";
+    } elsif( $register eq '(HL)' ) {
+	print << "CODE";
+      {
+	BYTE bytetemp = readbyte(HL);
+	contend( HL, 4 ); contend( HL, 3 );
+	$opcode(bytetemp);
+	writebyte(HL,bytetemp);
+      }
+CODE
+    }
+}
+
 # Individual opcode routines
 
 sub opcode_ADC (@) { arithmetic_logical( 'ADC', $_[0], $_[1] ); }
@@ -127,6 +166,25 @@ sub opcode_ADC (@) { arithmetic_logical( 'ADC', $_[0], $_[1] ); }
 sub opcode_ADD (@) { arithmetic_logical( 'ADD', $_[0], $_[1] ); }
 
 sub opcode_AND (@) { arithmetic_logical( 'AND', $_[0], $_[1] ); }
+
+sub opcode_BIT (@) {
+
+    my( $bit, $register ) = @_;
+
+    my $macro = ( $bit == 7 ? '7(' : "($bit," );
+
+    if( length $register == 1 ) {
+	print "      BIT$macro$register);\n";
+    } else {
+	print << "BIT";
+      {
+	BYTE bytetemp = readbyte(HL);
+	contend( HL, 4 );
+	BIT${macro}bytetemp);
+      }
+BIT
+    }
+}
 
 sub opcode_CALL (@) { call_jp( 'CALL', $_[0], $_[1] ); }
 
@@ -398,6 +456,8 @@ sub opcode_PUSH (@) {
     push_pop( 'PUSH', $regpair );
 }
 
+sub opcode_RES (@) { res_set( 'RES', $_[0], $_[1] ); }
+
 sub opcode_RET (@) {
 
     my( $condition ) = @_;
@@ -423,6 +483,10 @@ RET
     }
 }
 
+sub opcode_RL (@) { rotate_shift( 'RL', $_[0] ); }
+
+sub opcode_RLC (@) { rotate_shift( 'RLC', $_[0] ); }
+
 sub opcode_RLCA (@) {
     print << "RLCA";
       A = ( A << 1 ) | ( A >> 7 );
@@ -442,6 +506,8 @@ sub opcode_RLA (@) {
 RLA
 }
 
+sub opcode_RR (@) { rotate_shift( 'RR', $_[0] ); }
+
 sub opcode_RRA (@) {
     print << "RRA";
       {
@@ -452,6 +518,8 @@ sub opcode_RRA (@) {
       }
 RRA
 }
+
+sub opcode_RRC (@) { rotate_shift( 'RRC', $_[0] ); }
 
 sub opcode_RRCA (@) {
     print << "RRCA";
@@ -476,6 +544,16 @@ sub opcode_SCF (@) {
       F |= ( A & ( FLAG_3 | FLAG_5 ) ) | FLAG_C;
 SCF
 }
+
+sub opcode_SET (@) { res_set( 'SET', $_[0], $_[1] ); }
+
+sub opcode_SLA (@) { rotate_shift( 'SLA', $_[0] ); }
+
+sub opcode_SLL (@) { rotate_shift( 'SLL', $_[0] ); }
+
+sub opcode_SRA (@) { rotate_shift( 'SRA', $_[0] ); }
+
+sub opcode_SRL (@) { rotate_shift( 'SRL', $_[0] ); }
 
 sub opcode_SUB (@) { arithmetic_logical( 'SUB', $_[0], $_[1] ); }
 
@@ -521,10 +599,18 @@ shift
 shift
 }
 
+# Description of each file
+
+my %description = (
+
+    'opcodes_cb.dat'   => 'opcodes_cb.c: Z80 CBxx opcodes',
+    'opcodes_base.dat' => 'opcodes_base.c: unshifted Z80 opcodes',
+
+);
+
 # Main program
 
-print Fuse::GPL( 'opcodes_base.c: unshifted Z80 opcodes',
-                 '1999-2003 Philip Kendall' );
+print Fuse::GPL( $description{ $ARGV[0] }, '1999-2003 Philip Kendall' );
 
 print << "COMMENT";
 
