@@ -97,7 +97,7 @@ option.
 .RS
 Specify whether fake stereo should be added to the emulation of the
 Spectrum beeper. Same as the Sound Option dialog's
-.I "Beeper psuedo-stereo"
+.I "Beeper pseudo-stereo"
 option.
 .RE
 .PP
@@ -276,7 +276,7 @@ option.
 .PP
 .I "-v mode"
 .br
-.I "--svga-mode mode"
+.I "--svgamode mode"
 .RS
 Specify which mode to use for the SVGAlib UI. Available values for
 .I mode
@@ -606,9 +606,9 @@ was available when Fuse was compiled, this will cause Fuse's current
 options to be written to
 .I .fuserc
 in your home directory, from which they will be picked up again when
-Fuse is restarted. The best way to update this file is by this option,
-but it's a simple XML file and shouldn't be too hard to edit by hand
-if you really want to.
+Fuse is restarted. The best way to update this file is by using this
+option, but it's a simple XML file and shouldn't be too hard to edit
+by hand if you really want to.
 .RE
 .PP
 .I F5
@@ -648,10 +648,12 @@ available which make use of this feature.
 .RS
 Choose a TAP or TZX virtual-tape file to load from. See the
 .B "FILE SELECTION"
-section below for details on how to choose the file. The loading does
-not start automatically - you have to start the load in the emulated
-machine (with LOAD "" or the 128's Tape Loader option, though you may
-need to reset first).
+section below for details on how to choose the file. If
+.I "Auto-load tapes"
+is set in the General Options dialog (as it is by default), the tape
+will begin loading. Otherwise, you have to start the load in the
+emulated machine (with LOAD "" or the 128's Tape Loader option, though
+you may need to reset first).
 .PP
 To
 .I guarantee
@@ -733,9 +735,14 @@ written to any tape file until you choose this option!
 .PP
 .I "Disk"
 .RS
-Even then, the Virtual disk images are only accessible when emulating
-a +3 or Pentagon.
-(See
+Virtual disk images are only accessible when emulating a +3 or
+Pentagon. If any of the disk options are selected whilst emulating a
++3, they refer to the +3's disk drives, which are both of the 3" type
+(in effect, the internal drive plus an external FD-1). With the usual
++3 format, these have a capacity of 173K. If any other machine is
+being emulated, these options refer to the Pentagon's disk drives,
+although these cannot be accessed unless the Pentagon is being
+emulated. (See
 .B "THE .DSK FORMAT"
 ,
 .B "THE .TRD FORMAT"
@@ -746,19 +753,14 @@ sections below for notes on the file formats supported).
 .PP
 .I "Disk, Drive A:, Insert"
 .RS
-Select a disk-image file (in DSK format) to read/write in the emulated
-+3's drive A:. Currently Fuse provides no way to create these files,
-though it's possible to format an existing one from the emulated +3.
-.PP
-Both emulated drives are the 3" type (in effect, the internal drive
-plus an external FD-1). With the usual +3 format, these have a
-capacity of 173K.
+Select a disk-image file to read/write in the emulated drive
+A:.
 .RE
 .PP
 .I "Disk, Drive A:, Eject"
 .RS
-Deselect the disk image currently in drive A: - or from the +3's
-perspective, eject it.
+Deselect the disk image currently in drive A: - or from the emulated
+machine;s perspective, eject it.
 .RE
 .PP
 .I "Disk, Drive B:, Insert"
@@ -840,15 +842,18 @@ section below.
 .\"
 .SH "DISPLAY SIZE"
 Some of Fuse's UIs allow resizing of the emulated Spectrum's display.
-Since these are the window-based ones (GTK+ and Xlib), you can resize
-the window by, well, resizing it. :-) Exactly how this works depends
-on your window manager; you may have to make the window over twice the
-width and height of the original size before it actually scales
-up. Fuse attempts to keep the window 'square', but with some window
-managers this can mean the window will never resize at all. If you
-experience this problem, the
+For the window-based ones (GTK+ and Xlib), you can resize the window
+by, well, resizing it. :-) Exactly how this works depends on your
+window manager; you may have to make the window over twice the width
+and height of the original size before it actually scales up. Fuse
+attempts to keep the window 'square', but with some window managers
+this can mean the window will never resize at all. If you experience
+this problem, the
 .RI ` --no-aspect-hint '
 option may help.
+.PP
+If you're using the SDL UI under X11, the window will automatically
+resize to be the correct size for the graphics filter selected.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1318,7 +1323,8 @@ replacement code, and did some work on the OSS-specific sound code and
 the original widget UI code.
 .PP
 Russell Marks wrote the sound emulation and OSS-specific sound code,
-the joystick emulation, some of the printer code, and this man page.
+the joystick emulation, some of the printer code, and the original
+version of this man page.
 .PP
 John Elliott's lib765 library emulates the +3's disk controller chip,
 providing Fuse's +3 disk support, and his libdsk library provides
