@@ -33,6 +33,6 @@ BUILT_SOURCES = keysyms.c
 keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl x ../../keysyms.dat > $@
 
-INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@
+INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_HEADERS = xdisplay.h xkeyboard.h xui.h
