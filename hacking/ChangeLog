@@ -1289,3 +1289,5 @@
 	 widget_internals.h}: add widget pokefinder (patch #1150703)
 	 (Darren).
 20050325 ChangeLog: bring up to date.
+20050325 ui/gtk/gtkui.c,widget/widget.c: add GTK+ joystick confirmation
+	 dialog.

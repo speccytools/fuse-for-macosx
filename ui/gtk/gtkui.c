@@ -75,8 +75,8 @@ GtkItemFactory *popup_factory;
 /* True if we were paused via the Machine/Pause menu item */
 static int paused = 0;
 
-/* Structure used by the radio button selection widgets (the graphics
-   filter selectors and Machine/Select) */
+/* Structure used by the radio button selection widgets (eg the
+   graphics filter selectors and Machine/Select) */
 typedef struct gtkui_select_info {
 
   GtkWidget *dialog;
@@ -85,6 +85,9 @@ typedef struct gtkui_select_info {
   /* Used by the graphics filter selectors */
   scaler_available_fn selector;
   scaler_type selected;
+
+  /* Used by the joystick confirmation */
+  ui_confirm_joystick_t joystick;
 
 } gtkui_select_info;
 
@@ -925,11 +928,88 @@ ui_menu_item_set_active( const char *path, int active )
   return 0;
 }
 
-/* FIXME: make this do something useful */
+static const char *joystick_connection[] = {
+  "None",
+  "Keyboard",
+  "Joystick 1",
+  "Joystick 2",
+};
+
+static const size_t joystick_connection_size =
+  sizeof( joystick_connection ) / sizeof( joystick_connection[0] );
+
+static void
+confirm_joystick_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
+{
+  int i;
+  gtkui_select_info *ptr = user_data;
+
+  for( i = 0; i < joystick_connection_size; i++ ) {
+
+    GtkToggleButton *button = GTK_TOGGLE_BUTTON( ptr->buttons[ i ] );
+
+    if( gtk_toggle_button_get_active( button ) ) {
+      ptr->joystick = i;
+      break;
+    }
+  }
+
+  gtk_widget_destroy( ptr->dialog );
+  gtk_main_quit();
+}
+
 ui_confirm_joystick_t
 ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
-  return UI_CONFIRM_JOYSTICK_NONE;
+  gtkui_select_info dialog;
+  char title[ 80 ];
+  int i;
+  GSList *group = NULL;
+  
+  /* Some space to store the radio buttons in */
+  dialog.buttons =
+    malloc( joystick_connection_size * sizeof( *dialog.buttons ) );
+  if( !dialog.buttons ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return UI_CONFIRM_JOYSTICK_NONE;
+  }
+
+  /* Stop emulation */
+  fuse_emulation_pause();
+
+  /* Create the necessary widgets */
+  snprintf( title, sizeof( title ), "Fuse - configure %s joystick",
+	    libspectrum_joystick_name( libspectrum_type ) );
+  dialog.dialog = gtkstock_dialog_new( title, NULL );
+
+  for( i = 0; i < joystick_connection_size; i++ ) {
+
+    GtkWidget **button = &( dialog.buttons[ i ] );
+
+    *button =
+      gtk_radio_button_new_with_label( group, joystick_connection[ i ] );
+    group = gtk_radio_button_get_group( GTK_RADIO_BUTTON( *button ) );
+
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( *button ), i == 0 );
+    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		       *button );
+  }
+
+  /* Create and add the actions buttons to the dialog box */
+  gtkstock_create_ok_cancel( dialog.dialog, NULL,
+			     GTK_SIGNAL_FUNC( confirm_joystick_done ),
+			     (gpointer) &dialog, NULL );
+
+  gtk_widget_show_all( dialog.dialog );
+
+  /* Process events until the window is done with */
+  dialog.joystick = UI_CONFIRM_JOYSTICK_NONE;
+  gtk_main();
+
+  /* And then carry on with emulation again */
+  fuse_emulation_unpause();
+
+  return dialog.joystick;
 }
 
 /*

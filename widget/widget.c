@@ -486,29 +486,29 @@ ui_get_rollback_point( GSList *points )
   return -1;
 }
 
-const char *joystick_connection[] = {
+static const char *joystick_connection[] = {
   "None",
   "Keyboard",
   "Joystick 1",
-  "Joystick 2"
+  "Joystick 2",
 };
 
 ui_confirm_joystick_t
 ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
   widget_select_t info;
-  int *setting, error;
+  int error;
   char title[80];
-  char* joystick_name = strdup( libspectrum_joystick_name( libspectrum_type ) );
 
-  joystick_name[0] = tolower( joystick_name[0] );
-  setting = NULL;
+  if( !settings_current.joy_prompt ) return UI_CONFIRM_JOYSTICK_NONE;
 
-  sprintf(title, "Configure %s joystick", joystick_name);
+  snprintf( title, sizeof( title ), "Configure %s joystick",
+	    libspectrum_joystick_name( libspectrum_type ) );
 
   info.title = title;
   info.options = joystick_connection;
-  info.count = sizeof( joystick_connection ) / sizeof (const char *);
+  info.count = sizeof( joystick_connection    ) /
+	       sizeof( joystick_connection[0] );
   info.current = UI_CONFIRM_JOYSTICK_NONE;
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );
