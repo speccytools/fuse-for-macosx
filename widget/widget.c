@@ -106,7 +106,7 @@ static void printchar(int x, int y, int col, int ch) {
 
     if((ch<32)||(ch>127)) ch=33;
     ch-=32;
-    
+
     for(my=0; my<8; my++) {
         int b;
         b=widget_font[ch*8+my];
@@ -136,9 +136,12 @@ void widget_printstring(int x, int y, int col, const char *s)
 void widget_rectangle( int x, int y, int w, int h, int col )
 {
     int mx, my;
+    
     for(my=0;my<h;my++)for(mx=0;mx<w;mx++) {
-        uidisplay_putpixel((mx<<1)+DISPLAY_BORDER_WIDTH+x, my+DISPLAY_BORDER_HEIGHT+y, col);
-        uidisplay_putpixel((mx<<1)+1+DISPLAY_BORDER_WIDTH+x, my+DISPLAY_BORDER_HEIGHT+y, col);
+        uidisplay_putpixel( DISPLAY_BORDER_WIDTH  + ( (x+mx) << 1 )    ,
+			    DISPLAY_BORDER_HEIGHT +    y+my, col );
+        uidisplay_putpixel( DISPLAY_BORDER_WIDTH  + ( (x+mx) << 1 ) + 1,
+			    DISPLAY_BORDER_HEIGHT +    y+my, col );
     }
 }
 
