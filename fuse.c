@@ -39,7 +39,7 @@
 #include "tape.h"
 #include "timer.h"
 #include "ui.h"
-#include "widget.h"
+#include "widget/widget.h"
 #include "z80/z80.h"
 
 /* What name were we called under? */

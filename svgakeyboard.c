@@ -42,7 +42,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
-#include "widget.h"
+#include "widget/widget.h"
 
 void svgakeyboard_keystroke(int scancode, int press);
 int svgakeyboard_keypress(int keysym);

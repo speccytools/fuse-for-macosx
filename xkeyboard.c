@@ -40,7 +40,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
-#include "widget.h"
+#include "widget/widget.h"
 
 int xkeyboard_keypress(XKeyEvent *event)
 {
