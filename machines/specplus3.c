@@ -591,29 +591,36 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
 
 #ifdef LIB765_EXPOSES_DIRTY
 
-  if( fd_dirty( drives[which].drive ) == FD_D_DIRTY ) {
+  if( write ) {
 
-    ui_confirm_save_t confirm = ui_confirm_save(
-      "Disk has been modified.\nDo you want to save it?"
-    );
+    fd_eject( drives[which].drive );
+    ui_plus3_disk_write( which );
+
+  } else {
+
+    if( fd_dirty( drives[which].drive ) == FD_D_DIRTY ) {
+
+      ui_confirm_save_t confirm = ui_confirm_save(
+        "Disk has been modified.\nDo you want to save it?"
+      );
   
-    switch( confirm ) {
+      switch( confirm ) {
 
-    case UI_CONFIRM_SAVE_SAVE:
-      fd_eject( drives[which].drive );
-      if( ui_plus3_disk_write( which ) ) return 1;
-      break;
+      case UI_CONFIRM_SAVE_SAVE:
+	fd_eject( drives[which].drive );
+	if( ui_plus3_disk_write( which ) ) return 1;
+	break;
 
-    case UI_CONFIRM_SAVE_DONTSAVE: fd_eject( drives[which].drive ); break;
-    case UI_CONFIRM_SAVE_CANCEL: return 1;
+      case UI_CONFIRM_SAVE_DONTSAVE: fd_eject( drives[which].drive ); break;
+      case UI_CONFIRM_SAVE_CANCEL: return 1;
 
+      }
     }
   }
-
+  
 #else			/* #ifdef LIB765_EXPOSES_DIRTY */
 
   fd_eject( drives[which].drive );
-
   if( write ) ui_plus3_disk_write( which );
 
 #endif			/* #ifdef LIB765_EXPOSES_DIRTY */

@@ -1225,3 +1225,7 @@
 20050219 machines/specplus3.c,ui/gtk/gtkui.c: check for modified +3 disks
 	 before exit.
 20050219 snapshot.c: ensure all menus etc are updated after snapshot load.
+20050219 trdos.c,ui/gtk/gtkui.c: add "Save, Don't Save, Cancel"
+	 functionality for TR-DOS disks.
+
+	

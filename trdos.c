@@ -66,6 +66,8 @@ typedef struct
   int ro;			/* True if we have read-only access to this
 				   disk */
 
+  int dirty;			/* Has this disk been written to? */
+
   libspectrum_byte trk;
 
 } discs_type;
@@ -399,6 +401,7 @@ trdos_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   }
 
   write( CurrentDisk.fd, &b, 1 );
+  CurrentDisk.dirty = 1;
 
   towrite--;
   towriteaddr++;
@@ -553,6 +556,8 @@ trdos_disk_insert( trdos_drive_number which, const char *filename,
     error = 1;
   }
 
+  discs[ which ].dirty = 0;
+
   if( error ) return error;
 
   /* Set the `eject' item active */
@@ -577,14 +582,38 @@ trdos_disk_eject( trdos_drive_number which, int write )
   int error;
 
   if( write ) {
-    ui_trdos_disk_write( which );
+
+    if( ui_trdos_disk_write( which ) ) return 1;
+
   } else {
-    error = close( discs[ which ].fd );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "Error closing '%s': %s",
-		discs[which].filename, strerror( errno ) );
-      return 1;
+
+    if( discs[ which ].dirty ) {
+    
+      ui_confirm_save_t confirm = ui_confirm_save(
+        "Disk has been modified.\nDo you want to save it?"
+      );
+  
+      switch( confirm ) {
+
+      case UI_CONFIRM_SAVE_SAVE:
+	if( ui_trdos_disk_write( which ) ) return 1;
+	break;
+
+      case UI_CONFIRM_SAVE_DONTSAVE:
+	error = close( discs[ which ].fd );
+	if( error ) {
+	  ui_error( UI_ERROR_ERROR, "Error closing '%s': %s",
+		    discs[which].filename, strerror( errno ) );
+	  return 1;
+	}
+	discs[ which ].fd = -1;
+	break;
+
+      case UI_CONFIRM_SAVE_CANCEL: return 1;
+
+      }
     }
+
   }
 
   discs[which].disc_ready = 0;
@@ -773,10 +802,6 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
     if ( !CurrentDisk.disc_ready ) {
       vg_rs.byte = 0x90;
       vg_portFF_in = 0x80; 
-
-      ui_error( UI_ERROR_WARNING, "No disk in drive %c",
-		'A' + CurrentDiscNum );
-
       return;
     }
 
