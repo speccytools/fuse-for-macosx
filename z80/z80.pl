@@ -246,8 +246,8 @@ sub opcode_EX (@) {
 	print << "EX";
       /* Tape saving trap: note this traps the EX AF,AF\' at #04d0, not
 	 #04d1 as PC has already been incremented */
-     /* 0x76 - Timex 2068 save routine in EXROM */
-      if( PC == 0x04d1 || PC == 0x0077) {
+      /* 0x76 - Timex 2068 save routine in EXROM */
+      if( PC == 0x04d1 || PC == 0x0077 ) {
 	if( tape_save_trap() == 0 ) break;
       }
 
@@ -469,7 +469,7 @@ sub opcode_RET (@) {
 	
 	if( $condition eq 'NZ' ) {
 	    print << "RET";
-      if( PC==0x056c || PC == 0x0112) {
+      if( PC==0x056c || PC == 0x0112 ) {
 	if( tape_load_trap() == 0 ) break;
       }
 RET
