@@ -72,14 +72,16 @@ static int xdisplay_current_size=1;
 static XShmSegmentInfo shm_info;
 int shm_eventtype;
 int shm_finished;
-#endif
+
+static int try_shm( const int width, const int height );
+static int get_shm_id( const int size );
+#endif				/* #ifdef X_USE_SHM */
 
 static int shm_used = 0;
 
 static int xdisplay_allocate_colours(int numColours, unsigned long *colours);
 static int xdisplay_allocate_gc(Window window, GC *gc);
 static int xdisplay_allocate_image(int width, int height);
-static int get_shm_id( const int size );
 static void xdisplay_destroy_image( void );
 static void xdisplay_end( int );
 
@@ -158,62 +160,13 @@ static int xdisplay_allocate_image(int width, int height)
 {
   struct sigaction handler;
 
-#ifdef X_USE_SHM
-  int id = -1;
-  int error;
-#endif			/* #ifdef X_USE_SHM */
-
   handler.sa_handler = xdisplay_end;
   sigemptyset( &handler.sa_mask );
   handler.sa_flags = 0;
   sigaction( SIGINT, &handler, NULL );
 
 #ifdef X_USE_SHM
-  shm_used = XShmQueryExtension( display );
-
-  if( shm_used ) {
-    shm_eventtype = XShmGetEventBase( display ) + ShmCompletion;
-    image = XShmCreateImage( display, DefaultVisual( display, xui_screenNum ),
-			     DefaultDepth( display, xui_screenNum ), ZPixmap,
-			     0, &shm_info, 3 * width, 3 * height);
-    if( !image ) shm_used = 0;
-  }
-
-  if( shm_used ) {
-    
-    id = get_shm_id( image->bytes_per_line * image->height );
-
-    shm_used = ( id == -1 ? 0 : 1 );
-
-    if( shm_used ) {
-      shm_info.shmid = id;
-      image->data = shm_info.shmaddr = shmat( id, 0, 0 );
-
-      /* Flag the chunk for removal; won't happen until we detach */
-      shmctl( id, IPC_RMID, 0 );
-
-      if( image->data ) {
-
-	/* This may generate an X error */
-	xerror_error = 0; xerror_expecting = 1;
-	error = XShmAttach( display, &shm_info );
-
-	/* Force any X errors to occur before we disable traps */
-	XSync( display, False );
-	xerror_expecting = 0;
-
-	/* If we caught an error, don't use SHM */
-	if( error || xerror_error ) {
-	  shmdt( image->data ); shm_used = 0;
-	  image->data = NULL;
-	}
-
-      } else {
-	shm_used = 0;
-      }
-    }
-  }
-
+  shm_used = try_shm( width, height );
 #endif				/* #ifdef X_USE_SHM */
 
   /* If SHM isn't available, or we're not using it for some reason,
@@ -237,6 +190,51 @@ static int xdisplay_allocate_image(int width, int height)
 }
 
 #ifdef X_USE_SHM
+static int
+try_shm( const int width, const int height )
+{
+  int id;
+  int error;
+
+  if( !XShmQueryExtension( display ) ) return 0;
+
+  shm_eventtype = XShmGetEventBase( display ) + ShmCompletion;
+  image = XShmCreateImage( display, DefaultVisual( display, xui_screenNum ),
+			   DefaultDepth( display, xui_screenNum ), ZPixmap,
+			   0, &shm_info, 3 * width, 3 * height);
+  if( !image ) return 0;
+
+  /* Get an SHM to work with */
+  id = get_shm_id( image->bytes_per_line * image->height );
+  if( id == -1 ) return 0;
+
+  /* Attempt to attach to the shared memory */
+  shm_info.shmid = id;
+  image->data = shm_info.shmaddr = shmat( id, 0, 0 );
+
+  /* Flag the chunk for removal; it won't actually be removed until
+     we detach (unless the above attach failed) */
+  shmctl( id, IPC_RMID, 0 );
+
+  if( !image->data ) return 0;
+
+  /* This may generate an X error */
+  xerror_error = 0; xerror_expecting = 1;
+  error = XShmAttach( display, &shm_info );
+
+  /* Force any X errors to occur before we disable traps */
+  XSync( display, False );
+  xerror_expecting = 0;
+
+  /* If we caught an error, don't use SHM */
+  if( error || xerror_error ) {
+    shmdt( image->data ); image->data = NULL;
+    return 0;
+  }
+
+  return 1;
+}  
+
 /* Get an SHM ID; also attempt to reclaim any stale chunks we find */
 static int
 get_shm_id( const int size )
