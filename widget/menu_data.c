@@ -193,7 +193,7 @@ static widget_menu_entry widget_menu_tape[] = {
   { "(B)rowse tape...",		KEYBOARD_b, widget_menu_widget, &tape_browse },
   { "(R)ewind tape",            KEYBOARD_r, widget_menu_rewind_tape, NULL },
   { "(C)lear tape",             KEYBOARD_c, widget_menu_clear_tape,  NULL },
-  { "Write tape to 'tape.tzx'", KEYBOARD_w, widget_menu_write_tape,  NULL },
+  { "(W)rite tape to 'tape.tzx'", KEYBOARD_w, widget_menu_write_tape,  NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
