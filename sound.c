@@ -137,21 +137,16 @@ static int rstereopos,rchan1pos,rchan2pos,rchan3pos;
 static void sound_ay_init(void)
 {
 /* AY output doesn't match the claimed levels; these levels are based
- * on the formula (x/15)^2.66+0.0125, scaled to fit 0..0xffff, with
- * 0 and 15 forced to 0 and 0xffff respectively. This seems to be a
- * pretty good fit for the actual AY output [1], and should tide us over
- * until we can get independent measurements of that without having
- * to rely on values reverse-engineered from other emulators.
- *
- * [1] Except for a slight blip around volume level 8 or so which isn't
- * easy to mimic this way.
+ * on the measurements posted to comp.sys.sinclair in Dec 2001 by
+ * Matthew Westcott, adjusted as I described in a followup to his post,
+ * then scaled to 0..0xffff.
  */
 static int levels[16]=
   {
-  0x0000, 0x0363, 0x0467, 0x06BD,
-  0x0ACF, 0x10F9, 0x1992, 0x24E9,
-  0x334A, 0x44FB, 0x5A43, 0x7362,
-  0x9099, 0xB227, 0xD846, 0xFFFF
+  0x0000, 0x0385, 0x053D, 0x0770,
+  0x0AD7, 0x0FD5, 0x15B0, 0x230C,
+  0x2B4C, 0x43C1, 0x5A4B, 0x732F,
+  0x9204, 0xAFF1, 0xD921, 0xFFFF
   };
 int f;
 
