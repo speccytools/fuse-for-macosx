@@ -42,9 +42,9 @@ ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
-	machine.h osssound.h rzx.h settings.h snapshot.h sound.h spec128.h\
-	spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h sunsound.h\
-	tape.h timer.h types.h utils.h\
+	machine.h osssound.h rzx.h screenshot.h settings.h snapshot.h sound.h\
+        spec128.h spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h\
+	sunsound.h tape.h timer.h types.h utils.h\
 	joystick.h printer.h tc2048.h scld.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl

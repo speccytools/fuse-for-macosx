@@ -208,6 +208,7 @@ widget_menu_rzx_stop( void *data GCC_UNUSED )
   return 0;
 }  
 
+#ifdef HAVE_PNG_H
 /* File/Save Screenshot */
 int
 widget_menu_save_screen( void *data GCC_UNUSED )
@@ -215,6 +216,7 @@ widget_menu_save_screen( void *data GCC_UNUSED )
   widget_end_all( WIDGET_FINISHED_OK );
   return screenshot_write( "fuse.png" );
 }
+#endif			/* #ifdef HAVE_PNG_H */
 
 /* File/Exit */
 int widget_menu_exit( void *data GCC_UNUSED )

@@ -99,7 +99,10 @@ static widget_menu_entry widget_menu_file[] = {
   { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
   { "(R)ecording",		KEYBOARD_r, widget_menu_widget,
 					    &file_recording                 },
+#ifdef HAVE_PNG_H
   { "Save S(c)reen to 'fuse.png'",KEYBOARD_c, widget_menu_save_screen, NULL },
+#endif				/* #ifdef HAVE_PNG_H */
+
   { "E(x)it",			KEYBOARD_x, widget_menu_exit,          NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */

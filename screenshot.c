@@ -30,12 +30,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <png.h>
-
 #include "types.h"
 #include "ui/ui.h"
 
 #ifdef HAVE_PNG_H
+
+#include <png.h>
 
 BYTE screenshot_screen[240][640];
 
