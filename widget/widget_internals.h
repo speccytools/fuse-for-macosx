@@ -1,4 +1,4 @@
-/* widget.h: Simple dialog boxes for all user interfaces.
+/* widget_internals.h: Functions internal to the widget code
    Copyright (c) 2001,2002 Matan Ziv-Av, Philip Kendall
 
    $Id$
@@ -24,8 +24,8 @@
 
 */
 
-#ifndef FUSE_WIDGET_H
-#define FUSE_WIDGET_H
+#ifndef FUSE_WIDGET_INTERNALS_H
+#define FUSE_WIDGET_INTERNALS_H
 
 #ifndef _DIRENT_H
 #include <sys/types.h>
@@ -36,37 +36,17 @@
 #include <stdlib.h>
 #endif				/* #ifndef _STDLIB_H */
 
-#ifndef FUSE_KEYBOARD_H
-#include "keyboard.h"
-#endif				/* #ifndef FUSE_KEYBOARD_H */
-
 #ifndef FUSE_SETTINGS_H
 #include "settings.h"
 #endif				/* #ifndef FUSE_SETTINGS_H */
 
-#ifndef FUSE_UI_H
-#include "ui/ui.h"
-#endif
+#ifndef FUSE_WIDGET_H
+#include "widget.h"
+#endif				/* #ifndef FUSE_WIDGET_H */
 
 /* The default colours used in the widget */
 #define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
 #define WIDGET_COLOUR_FOREGROUND 7	/* White */
-
-/* The various widgets which are available */
-typedef enum widget_type {
-
-  WIDGET_TYPE_FILESELECTOR,	/* File selector */
-  WIDGET_TYPE_GENERAL,		/* General options */
-  WIDGET_TYPE_PICTURE,		/* Keyboard picture */
-  WIDGET_TYPE_MENU,		/* General menu */
-  WIDGET_TYPE_SELECT,		/* Select machine */
-  WIDGET_TYPE_SOUND,		/* Sound options */
-  WIDGET_TYPE_ERROR,		/* Error report */
-  WIDGET_TYPE_RZX,		/* RZX options */
-  WIDGET_TYPE_BROWSE,		/* Browse tape */
-  WIDGET_TYPE_TEXT,		/* Text entry widget */
-
-} widget_type;
 
 /* The ways of finishing a widget */
 typedef enum widget_finish_state {
@@ -74,25 +54,8 @@ typedef enum widget_finish_state {
   WIDGET_FINISHED_CANCEL,
 } widget_finish_state;
 
-/* A generic callback function */
-typedef int (*widget_menu_callback_fn)( void *data );
-
-/* A general menu */
-typedef struct widget_menu_entry {
-  const char *text;		/* Menu entry text */
-  keyboard_key_name key;	/* Which key to activate this widget */
-
-  widget_menu_callback_fn action; /* What to do */
-  void *data;			/* And with which arguments */
-
-} widget_menu_entry;
-
 /* A function to draw a widget */
 typedef int (*widget_draw_fn)( void *data );
-
-/* A function to handle keypresses */
-typedef void (*widget_keyhandler_fn)( keyboard_key_name key,
-				      keyboard_key_name key2 );
 
 /* The information we need to store for each widget */
 typedef struct widget_t {
@@ -114,16 +77,6 @@ typedef struct widget_recurse_t {
 /* A `stack' so we can recurse through widgets */
 extern widget_recurse_t widget_return[];
 
-/* How many levels deep have we recursed through widgets; -1 => none */
-extern int widget_level;
-
-/* The current widget keyhandler */
-extern widget_keyhandler_fn widget_keyhandler;
-
-int widget_init( void );
-int widget_end( void );
-
-int widget_do( widget_type which, void *data );
 int widget_end_all( widget_finish_state state );
 
 int widget_timer_init( void );
@@ -151,8 +104,6 @@ int widget_filesel_draw( void* data );
 int widget_filesel_finish( widget_finish_state finished );
 void widget_filesel_keyhandler( keyboard_key_name key,
 				keyboard_key_name key2 );
-
-extern char* widget_filesel_name;
 
 /* Tape menu */
 
@@ -231,10 +182,6 @@ int widget_menu_eject_disk( void *data );    /* Disk/Drive ?:/Eject */
 
 int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
 
-/* The data for the main menu */
-
-extern widget_menu_entry widget_menu_main[];
-
 /* The select machine widget */
 
 int widget_select_draw( void* data );
@@ -268,11 +215,6 @@ int widget_options_finish( widget_finish_state finished );
 
 /* The error widget */
 
-typedef struct widget_error_t {
-  ui_error_level severity;
-  const char *message;
-} widget_error_t;
-
 int widget_error_draw( void *data );
 void widget_error_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
 
@@ -280,4 +222,4 @@ void widget_error_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
 
 extern widget_t widget_data[];
 
-#endif				/* #ifndef FUSE_WIDGET_H */
+#endif				/* #ifndef FUSE_WIDGET_INTERNALS_H */
