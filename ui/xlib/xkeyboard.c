@@ -102,7 +102,8 @@ void xkeyboard_keypress(XKeyEvent *event)
   case XK_F7:
     fuse_emulation_pause();
     widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-    if( widget_filesel_name ) tape_open( widget_filesel_name );
+    if( widget_filesel_name )
+      tape_open( widget_filesel_name, settings_current.auto_load );
     fuse_emulation_unpause();
     break;
   case XK_F8:
