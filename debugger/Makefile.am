@@ -33,4 +33,4 @@ disassemble.c
 
 commandl.c: commandy.h
 
-noinst_HEADERS = commandy.h debugger.h
+noinst_HEADERS = commandy.h debugger.h debugger_internals.h
