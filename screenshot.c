@@ -27,7 +27,6 @@
 #include <config.h>
 
 #include <errno.h>
-#include <setjmp.h>
 #include <stdio.h>
 #include <string.h>
 

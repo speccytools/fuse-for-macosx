@@ -43,6 +43,7 @@
 #include "ui/uidisplay.h"
 #include "keyboard.h"
 #include "options.h"
+#include "screenshot.h"
 #include "timer.h"
 #include "widget.h"
 
