@@ -27,6 +27,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -77,7 +78,7 @@
 char *fuse_progname;
 
 /* Which directory were we started in? */
-char fuse_directory[ 1024 ];
+char fuse_directory[ PATH_MAX ];
 
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;
@@ -155,12 +156,12 @@ static int fuse_init(int argc, char **argv)
   fuse_progname=argv[0];
   libspectrum_error_function = ui_libspectrum_error;
 
-  if( !getcwd( fuse_directory, 1024 ) ) {
+  if( !getcwd( fuse_directory, PATH_MAX - 1 ) ) {
     ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
 	      strerror( errno ) );
     return 1;
   }
-  strncat( fuse_directory, "/", 1024 );
+  strcat( fuse_directory, "/" );
 
   if( settings_init( &first_arg, argc, argv ) ) return 1;
   autoload = settings_current.auto_load;

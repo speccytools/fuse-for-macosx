@@ -429,3 +429,5 @@
          two loops increasing the chance that the data processed by the
 	 first is still available in cache for the second (patch #868414)
 	 (Fred).
+20040102 fuse.[ch], machine.c: make the buffer holding Fuse's starting
+	 directory be of length PATH_MAX (patch #868409) (Fred).

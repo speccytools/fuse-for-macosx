@@ -52,8 +52,6 @@
 #include "utils.h"
 #include "z80/z80.h"
 
-#define PATHNAME_MAX_LENGTH 1024
-
 fuse_machine_info **machine_types = NULL; /* Array of available machines */
 int machine_count = 0;
 
