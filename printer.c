@@ -67,6 +67,11 @@ static unsigned char zxplast8[32*8];
 /* for parallel */
 static unsigned char parallel_data=0;
 
+/* see printer_parallel_strobe_write() comment; must be less than one
+ * frame's worth.
+ */
+#define PARALLEL_STROBE_MAX_CYCLES	10000
+
 
 
 static void printer_zxp_init(void)
@@ -549,10 +554,63 @@ else /* reading */
 }
 
 
+/* The +2A/+3 ROM writes the strobe the wrong way, which doesn't work on
+ * some printers. But some programs (notably Ian Collier's 48K Disk BASIC)
+ * write it the *right* way. This means we can't treat either edge *alone*
+ * as a signal to print, otherwise we'll print a junk byte when 48KDB
+ * starts up. Realistically, we have to look for two close together.
+ *
+ * The Centronics spec seems to require that the strobe `goes low' for
+ * a minimum of 1us to give the printer time to read the data. But that's
+ * not even a NOP's worth on the speccy, so we need to allow for longer;
+ * 10000 cycles seems reasonable, being thousands of times longer. :-)
+ * (And the longest delay I've seen was just over 5000 cycles.)
+ */
 void printer_parallel_strobe_write(int on)
 {
-if(on)
-  printer_text_output_char(parallel_data);
+static int old_on=0;
+static int second_edge=0;
+static int last_frames=0;
+static DWORD last_tstates=0;
+static unsigned char last_data=0;
+DWORD diff;
+
+if((old_on && !on) || (!old_on && on))
+  {
+  /* got an edge */
+
+  if(!second_edge)
+    {
+    /* the ROM also seems to assume the printer is reading at the first
+     * edge, breaking the spec (sigh). So we need to save current
+     * data or we lose CRs in LPRINT/LLIST.
+     */
+    last_data=parallel_data;
+    second_edge=1;
+    }
+  else
+    {
+    second_edge=0;
+    diff=tstates;
+    if(frames!=last_frames)
+      diff+=machine_current->timings.cycles_per_frame;
+    diff-=last_tstates;
+
+    if(diff<=PARALLEL_STROBE_MAX_CYCLES)
+      printer_text_output_char(last_data);
+    else
+      {
+      /* too long ago, treat it as first edge */
+      last_data=parallel_data;
+      second_edge=1;
+      }
+    }
+
+  last_frames=frames;
+  last_tstates=tstates;
+  }
+
+old_on=on;
 }
 
 
