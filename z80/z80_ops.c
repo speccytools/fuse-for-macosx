@@ -989,6 +989,7 @@ void z80_do_opcodes()
       }
       break;
     case 0xde:		/* SBC A,nn */
+      contend( PC, 3 );
       {
 	BYTE bytetemp=readbyte(PC++);
 	SBC(bytetemp);
