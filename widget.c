@@ -321,9 +321,9 @@ static int widget_timer_init( void )
   sigaction( SIGALRM, &handler, &widget_timer_old_handler );
 
   timer.it_interval.tv_sec = 0;
-  timer.it_interval.tv_usec = 20000;
+  timer.it_interval.tv_usec = 100000UL;
   timer.it_value.tv_sec = 0;
-  timer.it_value.tv_usec = 20000;
+  timer.it_value.tv_usec = 100000UL;
   setitimer( ITIMER_REAL, &timer, &widget_timer_old_timer );
 
   return 0;
