@@ -28,10 +28,17 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include <libspectrum.h>
 
+#include "fuse.h"
 #include "ui/ui.h"
+
+#define MESSAGE_MAX_LENGTH 256
+
+static int
+print_error_to_stderr( ui_error_level severity, const char *message );
 
 int
 ui_error( ui_error_level severity, const char *format, ... )
@@ -44,6 +51,54 @@ ui_error( ui_error_level severity, const char *format, ... )
   va_end( ap );
 
   return error;
+}
+
+int
+ui_verror( ui_error_level severity, const char *format, va_list ap )
+{
+  char message[ MESSAGE_MAX_LENGTH ];
+
+  vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
+
+#ifndef UI_WIN32
+  print_error_to_stderr( severity, message );
+#endif			/* #ifndef UI_WIN32 */
+
+  /* Do any UI-specific bits as well */
+  ui_error_specific( severity, message );
+
+  return 0;
+}
+
+static int
+print_error_to_stderr( ui_error_level severity, const char *message )
+{
+  /* Print the error to stderr if it's more significant than just
+     informational */
+  if( severity > UI_ERROR_INFO ) {
+
+    /* For the fb and svgalib UIs, we don't want to write to stderr if
+       it's a terminal, as it's then likely to be what we're currently
+       using for graphics output, and writing text to it isn't a good
+       idea. Things are OK if we're exiting though */
+#if defined( UI_FB ) || defined( UI_SVGA )
+    if( isatty( STDERR_FILENO ) && !fuse_exiting ) return;
+#endif			/* #if defined( UI_FB ) || defined( UI_SVGA ) */
+
+    fprintf( stderr, "%s: ", fuse_progname );
+
+    switch( severity ) {
+
+    case UI_ERROR_INFO: break;		/* Shouldn't happen */
+
+    case UI_ERROR_WARNING: fprintf( stderr, "warning: " ); break;
+    case UI_ERROR_ERROR: fprintf( stderr, "error: " ); break;
+    }
+
+    fprintf( stderr, "%s\n", message );
+  }
+
+  return 0;
 }
 
 libspectrum_error

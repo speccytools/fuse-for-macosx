@@ -40,6 +40,21 @@ static int split_message( const char *message, char ***lines, size_t *count,
 
 widget_error_t *error_info;
 
+int
+ui_error_specific( ui_error_level severity, const char *message )
+{
+  widget_error_t error_info;
+
+  error_info.severity = severity;
+  error_info.message  = message;
+
+  fuse_emulation_pause();
+  widget_do( WIDGET_TYPE_ERROR, &error_info );
+  fuse_emulation_unpause();
+
+  return 0;
+}
+
 int widget_error_draw( void *data )
 {
   char **lines; size_t count;

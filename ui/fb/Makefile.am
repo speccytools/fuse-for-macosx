@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2002 Philip Kendall
+## Copyright (c) 2001-2004 Philip Kendall
 
 ## $Id$
 
@@ -32,7 +32,6 @@ libuifb_a_SOURCES = fbdisplay.c \
 		    fbjoystick.c \
 	 	    fbkeyboard.c \
 		    fbui.c \
-		    error.c \
 		    keysyms.c
 
 BUILT_SOURCES = keysyms.c

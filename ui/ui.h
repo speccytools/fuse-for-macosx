@@ -51,9 +51,15 @@ extern const keysyms_key_info keysyms_data[];
 
 int ui_init(int *argc, char ***argv);
 int ui_event(void);
-int ui_verror( ui_error_level severity, const char *format, va_list ap )
-     GCC_PRINTF( 2, 0 );
 int ui_end(void);
+
+/* Error handling routines */
+int ui_error( ui_error_level severity, const char *format, ... )
+     GCC_PRINTF( 2, 3 );
+libspectrum_error ui_libspectrum_error( libspectrum_error error,
+					const char *format, va_list ap );
+int ui_verror( ui_error_level severity, const char *format, va_list ap );
+int ui_error_specific( ui_error_level severity, const char *message );
 
 /* Callbacks used by the debugger */
 int ui_debugger_activate( void );
@@ -62,10 +68,6 @@ int ui_debugger_update( void );
 int ui_debugger_disassemble( libspectrum_word address );
 
 /* Functions defined in ../ui.c */
-int ui_error( ui_error_level severity, const char *format, ... )
-     GCC_PRINTF( 2, 3 );
-libspectrum_error ui_libspectrum_error( libspectrum_error error,
-					const char *format, va_list ap );
 
 /* Confirm whether we want to save some data before overwriting it */
 typedef enum ui_confirm_save_t {

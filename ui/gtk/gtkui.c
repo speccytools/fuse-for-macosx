@@ -390,6 +390,76 @@ int ui_end(void)
   return 0;
 }
 
+/* Create a dialog box with the given error message */
+int
+ui_error_specific( ui_error_level severity, const char *message )
+{
+  GtkWidget *dialog, *ok_button, *label, *vbox;
+  GtkAccelGroup *accel_group;
+
+  /* If we don't have a UI yet, we can't output widgets */
+  if( !display_ui_initialised ) return 0;
+
+  /* Create the dialog box */
+  dialog = gtk_dialog_new();
+
+  /* Set the appropriate title */
+  switch( severity ) {
+
+  case UI_ERROR_INFO:
+    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Info" ); break;
+  case UI_ERROR_WARNING:
+    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Warning" ); break;
+  case UI_ERROR_ERROR:
+    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Error" ); break;
+  default:
+    gtk_window_set_title( GTK_WINDOW( dialog ),
+			  "Fuse - (Unknown error level)" );
+    break;
+
+  }
+  
+  /* Add the OK button into the lower half */
+  ok_button = gtk_button_new_with_label( "OK" );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+		     ok_button );
+
+  /* Create a label with that message */
+  label = gtk_label_new( message );
+
+  /* Make a new vbox for the top part for saner spacing */
+  vbox=gtk_vbox_new( FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+                      vbox, TRUE, TRUE, 0 );
+  gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
+  gtk_container_set_border_width( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+                                  5 );
+
+  /* Put the label in it */
+  gtk_container_add( GTK_CONTAINER( vbox ), label );
+
+  /* Add some ways to finish the dialog box */
+  gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtk_widget_destroy ),
+			     GTK_OBJECT( dialog ) );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      GTK_SIGNAL_FUNC( gtk_widget_destroy ), (gpointer) NULL );
+
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group(GTK_WINDOW(dialog), accel_group);
+
+  gtk_widget_add_accelerator( ok_button, "clicked",
+			      accel_group,
+			      GDK_Return, 0, 0 );
+  gtk_widget_add_accelerator( ok_button, "clicked",
+			      accel_group,
+			      GDK_Escape, 0, 0 );
+
+  gtk_widget_show_all( dialog );
+
+  return 0;
+}
+  
 /* The callbacks used by various routines */
 
 /* Called by the main window on a "delete-event" */

@@ -1,5 +1,5 @@
 /* xerror.c: handle X errors
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -67,44 +67,6 @@ xerror_handler( Display *display, XErrorEvent *error )
     exit( 1 );
 
   }
-
-  return 0;
-}
-
-int
-ui_verror( ui_error_level severity, const char *format, va_list ap )
-{
-  char message[ MESSAGE_MAX_LENGTH + 1 ];
-  widget_error_t error_info;
-  
-  /* Create the message from the given arguments */
-  vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
-
-  /* If this is a 'severe' error, print it to stderr with a program
-     identifier and a level indicator */
-  if( severity > UI_ERROR_INFO ) {
-
-    fprintf( stderr, "%s: ", fuse_progname );
-
-    switch( severity ) {
-    case UI_ERROR_WARNING:
-      fprintf( stderr, "warning: " ); break;
-    case UI_ERROR_ERROR:
-      fprintf( stderr, "error: " ); break;
-    default:             
-      fprintf( stderr, "(unknown level): " ); break;
-    }
-
-    fprintf( stderr, "%s\n", message );
-
-  }
-
-  error_info.severity = severity;
-  error_info.message  = message;
-
-  fuse_emulation_pause();
-  widget_do( WIDGET_TYPE_ERROR, &error_info );
-  fuse_emulation_unpause();
 
   return 0;
 }

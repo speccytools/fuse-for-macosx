@@ -28,7 +28,10 @@ noinst_LIBRARIES = libuiggi.a
 
 INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
-libuiggi_a_SOURCES = error.c ggidisplay.c ggikeyboard.c ggiui.c keysyms.c
+libuiggi_a_SOURCES = ggidisplay.c \
+		     ggikeyboard.c \
+		     ggiui.c \
+		     keysyms.c
 
 BUILT_SOURCES = keysyms.c
 
