@@ -422,12 +422,6 @@ menu_media_tape_browse( int action )
   widget_do( WIDGET_TYPE_BROWSE, NULL );
 }
 
-void
-menu_media_tape_write( int action )
-{
-  ui_tape_write();
-}
-
 int
 ui_tape_write( void )
 {

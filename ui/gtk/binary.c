@@ -36,6 +36,7 @@
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "memory.h"
+#include "menu.h"
 #include "ui/ui.h"
 #include "utils.h"
 
@@ -67,7 +68,7 @@ menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
 
   fuse_emulation_pause();
 
-  info.filename = gtkui_fileselector_get_filename( "Fuse - Load Binary Data" );
+  info.filename = menu_get_filename( "Fuse - Load Binary Data" );
   if( !info.filename ) { fuse_emulation_unpause(); return; }
 
   error = utils_read_file( info.filename, &info.file );
@@ -158,7 +159,7 @@ change_load_filename( GtkButton *button GCC_UNUSED, gpointer user_data )
   char buffer[80];
   int error;
 
-  new_filename = gtkui_fileselector_get_filename( "Fuse - Load Binary Data" );
+  new_filename = menu_get_filename( "Fuse - Load Binary Data" );
   if( !new_filename ) return;
 
   error = utils_read_file( new_filename, &new_file );
@@ -214,7 +215,7 @@ menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
 
   fuse_emulation_pause();
 
-  info.filename = gtkui_fileselector_get_filename( "Fuse - Save Binary Data" );
+  info.filename = menu_get_filename( "Fuse - Save Binary Data" );
   if( !info.filename ) { fuse_emulation_unpause(); return; }
 
   info.dialog = gtk_dialog_new();
@@ -295,7 +296,7 @@ change_save_filename( GtkButton *button GCC_UNUSED, gpointer user_data )
   struct binary_info *info = user_data;
   char *new_filename;
 
-  new_filename = gtkui_fileselector_get_filename( "Fuse - Save Binary Data" );
+  new_filename = menu_get_filename( "Fuse - Save Binary Data" );
   if( !new_filename ) return;
 
   free( info->filename );

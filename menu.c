@@ -9,9 +9,12 @@
 #include "psg.h"
 #include "rzx.h"
 #include "simpleide.h"
+#include "screenshot.h"
 #include "settings.h"
+#include "snapshot.h"
 #include "tape.h"
 #include "ui/ui.h"
+#include "utils.h"
 #include "widget/widget.h"
 
 #ifdef USE_WIDGET
@@ -19,6 +22,46 @@
 #else				/* #ifdef USE_WIDGET */
 #define WIDGET_END
 #endif				/* #ifdef USE_WIDGET */
+
+MENU_CALLBACK( menu_file_open )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Open Spectrum File" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  utils_open_file( filename, settings_current.auto_load, NULL );
+
+  free( filename );
+
+  display_refresh_all();
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK( menu_file_recording_play )
+{
+  char *recording;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  recording = menu_get_filename( "Fuse - Start Replay" );
+  if( !recording ) { fuse_emulation_unpause(); return; }
+
+  rzx_start_playback( recording );
+
+  free( recording );
+
+  display_refresh_all();
+
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
+
+  fuse_emulation_unpause();
+}
 
 MENU_CALLBACK( menu_file_recording_stop )
 {
@@ -38,6 +81,22 @@ MENU_CALLBACK( menu_file_aylogging_stop )
 
   psg_stop_recording();
   ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
+}
+
+MENU_CALLBACK( menu_file_openscrscreenshot )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Open SCR Screenshot" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_scr_read( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
@@ -92,6 +151,22 @@ MENU_CALLBACK( menu_machine_nmi )
   event_add( 0, EVENT_TYPE_NMI );
 }
 
+MENU_CALLBACK( menu_media_tape_open )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Open Tape" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  tape_open_default_autoload( filename, NULL );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
 MENU_CALLBACK( menu_media_tape_play )
 {
   WIDGET_END;
@@ -108,6 +183,11 @@ MENU_CALLBACK( menu_media_tape_clear )
 {
   WIDGET_END;
   tape_close();
+}
+
+MENU_CALLBACK( menu_media_tape_write )
+{
+  ui_tape_write();
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
@@ -131,10 +211,45 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
   trdos_disk_eject( which, write );
 }
 
+MENU_CALLBACK( menu_media_cartridge_insert )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Insert Cartridge" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  dck_insert( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
 MENU_CALLBACK( menu_media_cartridge_eject )
 {
   WIDGET_END;
   dck_eject();
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_insert )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Insert hard disk file" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  switch( action ) {
+  case 1: simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
+  case 2: simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
+  }
+
+  free( filename );
+
+  fuse_emulation_unpause();
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_commit )
@@ -163,4 +278,18 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_eject )
   fuse_emulation_unpause();
 
   WIDGET_END;
+}
+
+int
+menu_open_snap( void )
+{
+  char *filename;
+  int error;
+
+  filename = menu_get_filename( "Fuse - Load Snapshot" );
+  if( !filename ) return -1;
+
+  error = snapshot_read( filename );
+  free( filename );
+  return error;
 }

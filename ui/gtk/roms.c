@@ -37,6 +37,7 @@
 #include "compat.h"
 #include "fuse.h"
 #include "gtkinternals.h"
+#include "menu.h"
 #include "settings.h"
 #include "ui/ui.h"
 
@@ -160,7 +161,7 @@ select_new_rom( GtkWidget *widget GCC_UNUSED, gpointer data )
 
   GtkWidget *label = data;
 
-  filename = gtkui_fileselector_get_filename( "Fuse - Select ROM" );
+  filename = menu_get_filename( "Fuse - Select ROM" );
   if( !filename ) return;
 
   gtk_label_set( GTK_LABEL( label ), filename );

@@ -52,7 +52,7 @@ typedef struct fileselector_info {
 } fileselector_info;
 
 char*
-gtkui_fileselector_get_filename( const char *title )
+menu_get_filename( const char *title )
 {
   fileselector_info selector;
   GtkAccelGroup *accel_group;

@@ -37,6 +37,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "menu.h"
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
@@ -218,7 +219,7 @@ int rzx_stop_recording( void )
   return 0;
 }
 
-int rzx_start_playback( const char *filename, int (*load_snap)(void) )
+int rzx_start_playback( const char *filename )
 {
   utils_file file;
   libspectrum_error libspec_error; int error;
@@ -244,8 +245,8 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
     return 1;
   }
 
-  if( !snap && load_snap ) {
-    error = load_snap();
+  if( !snap ) {
+    error = menu_open_snap();
     if( error ) { libspectrum_rzx_free( rzx ); return 1; }
   }
 

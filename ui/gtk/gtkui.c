@@ -38,31 +38,20 @@
 
 #include <libspectrum.h>
 
-#include "dck.h"
 #include "debugger/debugger.h"
-#include "display.h"
-#include "event.h"
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "machine.h"
 #include "menu.h"
-#include "options.h"
-#include "pokefinder/pokefinder.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "snapshot.h"
 #include "machines/specplus3.h"
-#include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
-#include "trdos.h"
 #include "ui/ui.h"
-#include "ui/uidisplay.h"
-#include "ui/scaler/scaler.h"
-#include "utils.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -103,7 +92,6 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 static gboolean gtkui_delete( GtkWidget *widget, GdkEvent *event,
 			      gpointer data );
 
-static int gtkui_open_snap( void );
 static void gtkui_disk_open( specplus3_drive_number drive );
 
 static void menu_options_filter_done( GtkWidget *widget, gpointer user_data );
@@ -350,25 +338,6 @@ gtkui_delete( GtkWidget *widget, GdkEvent *event GCC_UNUSED, gpointer data )
 }
 
 void
-menu_file_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename = gtkui_fileselector_get_filename( "Fuse - Open Spectrum File" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  utils_open_file( filename, settings_current.auto_load, NULL );
-
-  free( filename );
-
-  display_refresh_all();
-
-  fuse_emulation_unpause();
-}
-
-void
 menu_file_savesnapshot( GtkWidget *widget GCC_UNUSED,
 			gpointer data GCC_UNUSED )
 {
@@ -376,7 +345,7 @@ menu_file_savesnapshot( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename( "Fuse - Save Snapshot" );
+  filename = menu_get_filename( "Fuse - Save Snapshot" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snapshot_write( filename );
@@ -396,7 +365,7 @@ menu_file_recording_record( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  recording = gtkui_fileselector_get_filename( "Fuse - Start Recording" );
+  recording = menu_get_filename( "Fuse - Start Recording" );
   if( !recording ) { fuse_emulation_unpause(); return; }
 
   rzx_start_recording( recording, 1 );
@@ -416,10 +385,10 @@ menu_file_recording_recordfromsnapshot( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  snap = gtkui_fileselector_get_filename( "Fuse - Load Snapshot " );
+  snap = menu_get_filename( "Fuse - Load Snapshot " );
   if( !snap ) { fuse_emulation_unpause(); return; }
 
-  recording = gtkui_fileselector_get_filename( "Fuse - Start Recording" );
+  recording = menu_get_filename( "Fuse - Start Recording" );
   if( !recording ) { free( snap ); fuse_emulation_unpause(); return; }
 
   if( snapshot_read( snap ) ) {
@@ -436,30 +405,6 @@ menu_file_recording_recordfromsnapshot( GtkWidget *widget GCC_UNUSED,
 }
 
 void
-menu_file_recording_play( GtkWidget *widget GCC_UNUSED,
-			  gpointer data GCC_UNUSED )
-{
-  char *recording;
-
-  if( rzx_playback || rzx_recording ) return;
-
-  fuse_emulation_pause();
-
-  recording = gtkui_fileselector_get_filename( "Fuse - Start Replay" );
-  if( !recording ) { fuse_emulation_unpause(); return; }
-
-  rzx_start_playback( recording, gtkui_open_snap );
-
-  free( recording );
-
-  display_refresh_all();
-
-  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
-
-  fuse_emulation_unpause();
-}
-
-void
 menu_file_aylogging_record( GtkWidget *widget GCC_UNUSED,
 			    gpointer data GCC_UNUSED )
 {
@@ -469,7 +414,7 @@ menu_file_aylogging_record( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  psgfile = gtkui_fileselector_get_filename( "Fuse - Start AY log" );
+  psgfile = menu_get_filename( "Fuse - Start AY log" );
   if ( !psgfile ) { fuse_emulation_unpause(); return; }
 
   psg_start_recording( psgfile );
@@ -483,39 +428,6 @@ menu_file_aylogging_record( GtkWidget *widget GCC_UNUSED,
   fuse_emulation_unpause();
 }
 
-static int
-gtkui_open_snap( void )
-{
-  char *filename;
-  int error;
-
-  filename = gtkui_fileselector_get_filename( "Fuse - Load Snapshot" );
-  if( !filename ) return -1;
-
-  error = snapshot_read( filename );
-  free( filename );
-  return error;
-}
-
-void
-menu_file_openscrscreenshot( GtkWidget *widget GCC_UNUSED,
-			     gpointer data GCC_UNUSED )
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename =
-    gtkui_fileselector_get_filename( "Fuse - Open SCR Screenshot" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  screenshot_scr_read( filename );
-
-  free( filename );
-
-  fuse_emulation_unpause();
-}
-
 void
 menu_file_savescreenasscr( GtkWidget *widget GCC_UNUSED,
 			   gpointer data GCC_UNUSED )
@@ -524,8 +436,7 @@ menu_file_savescreenasscr( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  filename =
-    gtkui_fileselector_get_filename( "Fuse - Save Screenshot as SCR" );
+  filename = menu_get_filename( "Fuse - Save Screenshot as SCR" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_scr_write( filename );
@@ -552,7 +463,7 @@ menu_file_savescreenaspng( GtkWidget *widget GCC_UNUSED,
   }
 
   filename =
-    gtkui_fileselector_get_filename( "Fuse - Save Screenshot as PNG" );
+    menu_get_filename( "Fuse - Save Screenshot as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_save();
@@ -850,29 +761,6 @@ menu_machine_debugger( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   if( paused ) ui_debugger_activate();
 }
 
-void
-menu_media_tape_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename = gtkui_fileselector_get_filename( "Fuse - Open Tape" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  tape_open_default_autoload( filename, NULL );
-
-  free( filename );
-
-  fuse_emulation_unpause();
-}
-
-void
-menu_media_tape_write( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  ui_tape_write();
-}
-
 int
 ui_tape_write( void )
 {
@@ -880,7 +768,7 @@ ui_tape_write( void )
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename( "Fuse - Write Tape" );
+  filename = menu_get_filename( "Fuse - Write Tape" );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   tape_write( filename );
@@ -910,7 +798,7 @@ gtkui_disk_open( specplus3_drive_number drive )
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename(
+  filename = menu_get_filename(
     ( drive == SPECPLUS3_DRIVE_A ? "Fuse - Insert disk into drive A:" :
                                    "Fuse - Insert disk into drive B:" ) );
   if( !filename ) { fuse_emulation_unpause(); return; }
@@ -944,7 +832,7 @@ ui_plus3_disk_write( specplus3_drive_number which )
 
   snprintf( title, 80, "Fuse - Write +3 Disk %c:", drive );
 
-  filename = gtkui_fileselector_get_filename( title );
+  filename = menu_get_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   specplus3_disk_write( which, filename );
@@ -968,7 +856,7 @@ ui_trdos_disk_write( trdos_drive_number which )
 
   snprintf( title, 80, "Fuse - Write TR-DOS Disk %c:", drive );
 
-  filename = gtkui_fileselector_get_filename( title );
+  filename = menu_get_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   trdos_disk_write( which, filename );
@@ -978,45 +866,6 @@ ui_trdos_disk_write( trdos_drive_number which )
   fuse_emulation_unpause();
 
   return 0;
-}
-
-void
-menu_media_cartridge_insert( GtkWidget *widget GCC_UNUSED,
-			     gpointer data GCC_UNUSED )
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename = gtkui_fileselector_get_filename( "Fuse - Insert Cartridge" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  dck_insert( filename );
-
-  free( filename );
-
-  fuse_emulation_unpause();
-}
-
-void
-menu_media_ide_simple8bit_insert( gpointer data GCC_UNUSED, guint action,
-				  GtkWidget *widget GCC_UNUSED )
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename = gtkui_fileselector_get_filename( "Fuse - Insert hard disk file" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  switch( action ) {
-  case 1: simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
-  case 2: simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
-  }
-
-  free( filename );
-
-  fuse_emulation_unpause();
 }
 
 void

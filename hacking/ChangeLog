@@ -746,3 +746,6 @@
 	 to Simon Stuart for reporting this (fixes bug #890838).
 20040415 menu_data.pl,widget/{menu.c,widget.h}: fix up widget compilation
 	 of the new menu code.
+20040415 menu.[ch],rzx.[ch],ui/gtk/{binary.c,fileselector.c,gtkinternals.h,
+	 gtkui.c,roms.c},widget/menu.c: generalise more functions into
+	 menu.c (GTK+ changes).
