@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -141,6 +141,9 @@ int tape_rewind( void )
   if( tape.blocks == NULL ) return 1;
 
   tape.current_block = tape.blocks;
+  libspectrum_tape_init_block(
+    (libspectrum_tape_block*)tape.current_block->data
+  );
 
   return 0;
 }

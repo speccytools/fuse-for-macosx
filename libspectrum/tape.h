@@ -1,5 +1,5 @@
 /* tape.h: Routines for handling tape files
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001, 2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -49,6 +49,7 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_PURE_TONE,
   LIBSPECTRUM_TAPE_BLOCK_PULSES,
   LIBSPECTRUM_TAPE_BLOCK_PURE_DATA,
+  LIBSPECTRUM_TAPE_BLOCK_RAW_DATA,
 
   LIBSPECTRUM_TAPE_BLOCK_PAUSE = 0x20,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START,
@@ -197,6 +198,28 @@ typedef struct libspectrum_tape_pure_data_block {
 
 } libspectrum_tape_pure_data_block;
 
+/* A raw data block */
+typedef struct libspectrum_tape_raw_data_block {
+
+  size_t length;		/* Length of data */
+  size_t bits_in_last_byte;	/* How many bits are in the last byte? */
+  libspectrum_byte *data;	/* The actual data */
+  libspectrum_dword pause;	/* Pause after data (in ms) */
+
+  libspectrum_dword bit_length; /* Bit length. *Not* pulse length! */
+
+  /* Private data */
+
+  libspectrum_tape_state_type state;
+
+  size_t bytes_through_block;
+  size_t bits_through_byte;	/* How far through the data are we? */
+
+  libspectrum_byte last_bit;	/* The last bit which was read */
+  libspectrum_dword bit_tstates; /* How long is an edge for the current bit */
+
+} libspectrum_tape_raw_data_block;
+
 /* A pause block */
 typedef struct libspectrum_tape_pause_block {
 
@@ -308,6 +331,7 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_pure_tone_block pure_tone;
     libspectrum_tape_pulses_block pulses;
     libspectrum_tape_pure_data_block pure_data;
+    libspectrum_tape_raw_data_block raw_data;
 
     libspectrum_tape_pause_block pause;
     libspectrum_tape_group_start_block group_start;

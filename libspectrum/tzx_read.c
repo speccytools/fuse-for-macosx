@@ -1,5 +1,5 @@
 /* tzx_read.c: Routines for reading .tzx files
-   Copyright (c) 2001,2002 Philip Kendall
+   Copyright (c) 2001, 2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -49,6 +49,9 @@ tzx_read_pulses_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 static libspectrum_error
 tzx_read_pure_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		    const libspectrum_byte *end );
+static libspectrum_error
+tzx_read_raw_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		   const libspectrum_byte *end );
 static libspectrum_error
 tzx_read_pause( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		const libspectrum_byte *end );
@@ -153,6 +156,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
       error = tzx_read_pure_data( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+      error = tzx_read_raw_data( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -478,6 +485,51 @@ tzx_read_pure_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
   /* And return with no error */
   return LIBSPECTRUM_ERROR_NONE;
 
+}
+
+static libspectrum_error
+tzx_read_raw_data (libspectrum_tape *tape, const libspectrum_byte **ptr,
+		   const libspectrum_byte *end)
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_raw_data_block *data_block;
+  libspectrum_error error;
+
+  /* Check there's enough left in the buffer for all the metadata */
+  if (end - (*ptr) < 8) {
+    libspectrum_print_error(
+      "tzx_read_raw_data: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if (block == NULL) {
+    libspectrum_print_error( "tzx_read_raw_data: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* This is a raw data block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_RAW_DATA;
+  data_block = &(block->types.raw_data);
+
+  /* Get the metadata */
+  data_block->bit_length = (*ptr)[0] + (*ptr)[1] * 0x100;
+  data_block->pause      = (*ptr)[2] + (*ptr)[3] * 0x100;
+  data_block->bits_in_last_byte = (*ptr)[4];
+  (*ptr) += 5;
+
+  /* And the actual data */
+  error = tzx_read_data( ptr, end,
+			 &(data_block->length), 3, &(data_block->data) );
+  if( error ) { free( block ); return error; }
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  /* And return with no error */
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 static libspectrum_error

@@ -1,5 +1,5 @@
 /* tape.c: Routines for handling tape files
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001, 2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -43,6 +43,8 @@ static libspectrum_error
 turbo_init( libspectrum_tape_turbo_block *block );
 static libspectrum_error
 pure_data_init( libspectrum_tape_pure_data_block *block );
+static libspectrum_error
+raw_data_init( libspectrum_tape_raw_data_block *block );
 
 /* Functions to get the next edge */
 
@@ -71,6 +73,12 @@ pure_data_edge( libspectrum_tape_pure_data_block *block,
 		libspectrum_dword *tstates, int *end_of_block );
 static libspectrum_error
 pure_data_next_bit( libspectrum_tape_pure_data_block *block );
+
+static libspectrum_error
+raw_data_edge( libspectrum_tape_raw_data_block *block,
+	       libspectrum_dword *tstates, int *end_of_block );
+static libspectrum_error
+raw_data_next_bit( libspectrum_tape_raw_data_block *block );
 
 static libspectrum_error
 jump_blocks( libspectrum_tape *tape, int offset );
@@ -110,6 +118,9 @@ block_free( gpointer data, gpointer user_data )
     break;
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
     free( block->types.pure_data.data );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+    free( block->types.raw_data.data );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
@@ -184,6 +195,8 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
     break;
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
     return pure_data_init( &(block->types.pure_data) );
+  case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+    return raw_data_init( &(block->types.raw_data) );
 
   /* These blocks need no initialisation */
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
@@ -253,6 +266,21 @@ pure_data_init( libspectrum_tape_pure_data_block *block )
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+raw_data_init( libspectrum_tape_raw_data_block *block )
+{
+  libspectrum_error error;
+
+  /* We're just before the start of the data */
+  block->state = LIBSPECTRUM_TAPE_STATE_DATA1;
+  block->bytes_through_block = -1; block->bits_through_byte = 7;
+  block->last_bit = 0x7f & block->data[0];
+  /* Set up the next bit */
+  error = raw_data_next_bit( block ); if( error ) return error;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 /* Some flags which may be set after calling libspectrum_tape_get_next_edge */
 const int LIBSPECTRUM_TAPE_FLAGS_BLOCK  = 1 << 0; /* End of block */
 const int LIBSPECTRUM_TAPE_FLAGS_STOP   = 1 << 1; /* Stop tape */
@@ -299,6 +327,10 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
     error = pure_data_edge( &(block->types.pure_data), tstates, &end_of_block);
+    if( error ) return error;
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+    error = raw_data_edge( &(block->types.raw_data), tstates, &end_of_block );
     if( error ) return error;
     break;
 
@@ -692,6 +724,66 @@ pure_data_next_bit( libspectrum_tape_pure_data_block *block )
 }
 
 static libspectrum_error
+raw_data_edge( libspectrum_tape_raw_data_block *block,
+	       libspectrum_dword *tstates, int *end_of_block )
+{
+  int error;
+
+  switch (block->state) {
+  case LIBSPECTRUM_TAPE_STATE_DATA1:
+    *tstates = block->bit_tstates;
+    error = raw_data_next_bit( block ); if( error ) return error;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_PAUSE:
+    /* The pause at the end of the block */
+    *tstates = ( block->pause * 69888 )/20; /* FIXME: should vary with tstates
+					       per frame */
+    *end_of_block = 1;
+    break;
+
+  default:
+    libspectrum_print_error( "raw_edge: unknown state %d\n", block->state );
+    return LIBSPECTRUM_ERROR_LOGIC;
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+raw_data_next_bit( libspectrum_tape_raw_data_block *block )
+{
+  int length = 0;
+
+  if( block->bytes_through_block == block->length ) {
+    block->state = LIBSPECTRUM_TAPE_STATE_PAUSE;
+    return LIBSPECTRUM_ERROR_NONE;
+  }
+
+  block->state = LIBSPECTRUM_TAPE_STATE_DATA1;
+
+  /* Step through the data until we find an edge */
+  do {
+    length++;
+    if( ++block->bits_through_byte == 8 ) {
+      if( ++block->bytes_through_block == block->length - 1 ) {
+	block->bits_through_byte = 8 - block->bits_in_last_byte;
+      } else {
+	block->bits_through_byte = 0;
+      }
+      if( block->bytes_through_block == block->length )
+	break;
+    }
+  } while( (block->data[block->bytes_through_block] << block->bits_through_byte
+            & 0x7f ) != block->last_bit) ;
+
+  block->bit_tstates = length * block->bit_length;
+  block->last_bit ^= 0x7f;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
 jump_blocks( libspectrum_tape *tape, int offset )
 {
   gint current_position; GSList *new_block;
@@ -726,6 +818,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
     strncpy( buffer, "Pure Data Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+    strncpy( buffer, "Raw Data Block", length );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
