@@ -34,8 +34,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <glib.h>
-
 #include <libspectrum.h>
 
 #define DESCRIPTION_LENGTH 80

@@ -150,6 +150,7 @@ if test -z "$ui"; then
 fi
 
 # If we're not using GTK+, must either find glib or use the replacement
+# (as supplied by libspectrum)
 if test "$ui" != gtk; then
   AC_MSG_CHECKING(whether to use glib)
   AC_ARG_WITH(glib,
@@ -159,7 +160,7 @@ if test "$ui" != gtk; then
   AC_MSG_RESULT($glib)
   if test "$glib" = yes; then
     AM_PATH_GLIB(1.2.0,AC_DEFINE(HAVE_LIB_GLIB),
-	         AC_MSG_WARN(glib not found - using internal replacement))
+	         AC_MSG_WARN(glib not found - using libspectrum's replacement))
   fi
 fi
 
@@ -216,6 +217,6 @@ if test "$ac_cv_prog_gcc" = yes; then
 fi
 
 AC_OUTPUT(Makefile hacking/Makefile lib/Makefile \
-man/Makefile myglib/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \
+man/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \
 ui/Makefile ui/aalib/Makefile ui/fb/Makefile ui/gtk/Makefile ui/svga/Makefile \
 ui/xlib/Makefile utils/Makefile widget/Makefile z80/Makefile)

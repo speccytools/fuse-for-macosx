@@ -26,9 +26,8 @@
 #define FUSE_SNAPSHOT_H
 
 #ifndef LIBSPECTRUM_LIBSPECTRUM_H
-#include <glib.h>
 #include <libspectrum.h>
-#endif
+#endif				/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
 int snapshot_read( const char *filename );
 int snapshot_copy_from( libspectrum_snap *snap );
