@@ -32,7 +32,13 @@ int debugger_breakpoint_remove( size_t n );
 int debugger_breakpoint_remove_all( void );
 int debugger_breakpoint_show( void );
 
-/* Callback used by the flex parser to get input */
+/* Utility functions called by the flex scanner */
+
 int debugger_command_input( char *buf, int *result, int max_size );
+int debugger_reg16_index( char *reg );
+
+/* Utility functions called by the bison parser */
+
+void debugger_register_set( int which, int value );
 
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */

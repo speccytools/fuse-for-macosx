@@ -28,6 +28,8 @@
 
 #include <config.h>
 
+#include <ctype.h>
+
 #include "commandy.h"
 #include "debugger.h"
 #include "debugger_internals.h"
@@ -47,12 +49,17 @@ HEX	[0-9a-f]
 
 %%
 
-b|br|bre|brea|break { return BREAK; }
-c|co|con|cont|contin|continu|continue { return CONTINUE; }
+br|bre|brea|break { return BREAK; }
+co|con|cont|contin|continu|continue { return CONTINUE; }
 cl|cle|clea|clear { return CLEAR; }
 n|ne|nex|next { return NEXT; }
+se|set { return SET; }
 sh|sho|show { return SHOW; }
 s|st|ste|step { return STEP; }
+
+a|b|c|d|e|f|h|l { yylval.integer = tolower( *yytext ); return REGISTER; }
+af|bc|de|hl|sp|pc|ix|iy { yylval.integer = debugger_reg16_index( yytext );
+	                  return REGISTER; }
 
 ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  return NUMBER; }

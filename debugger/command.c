@@ -26,11 +26,14 @@
 
 #include <config.h>
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "debugger.h"
 #include "ui/ui.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
 /* The last debugger command we were given to execute */
 static char *command_buffer = NULL;
@@ -40,26 +43,6 @@ static char *command_ptr;
 
 /* Necessary declaration */
 int yyparse( void );
-
-/* Called by the Flex parser (via YY_INPUT as defined at the top of
-   commandl.l) to get up to 'max_size' bytes of the command to be parsed */
-int
-debugger_command_input( char *buf, int *result, int max_size )
-{
-  size_t length = strlen( command_ptr );
-
-  if( !length ) {
-    return 0;
-  } else if( length < max_size ) {
-    memcpy( buf, command_ptr, length );
-    *result = length; command_ptr += length;
-    return 1;
-  } else {
-    memcpy( buf, command_ptr, max_size );
-    *result = max_size; command_ptr += max_size;
-    return 1;
-  }
-}
 
 /* Evaluate the debugger command given in 'command' */
 int
@@ -78,8 +61,54 @@ debugger_command_evaluate( const char *command )
     
   yyparse();
 
+  ui_debugger_update();
+
   return 0;
 }
+
+/* Utility functions called from the flex scanner */
+
+/* Called to get up to 'max_size' bytes of the command to be parsed */
+int
+debugger_command_input( char *buf, int *result, int max_size )
+{
+  size_t length = strlen( command_ptr );
+
+  if( !length ) {
+    return 0;
+  } else if( length < max_size ) {
+    memcpy( buf, command_ptr, length );
+    *result = length; command_ptr += length;
+    return 1;
+  } else {
+    memcpy( buf, command_ptr, max_size );
+    *result = max_size; command_ptr += max_size;
+    return 1;
+  }
+}
+
+/* Convert a 16-bit register name to a useful index value */
+int
+debugger_reg16_index( char *name )
+{
+  int hash = 0x100 * tolower( name[0] ) + tolower( name[1] );
+
+  switch( hash ) {
+    case 0x6166:	/* AF */
+    case 0x6263:	/* BC */
+    case 0x6465:	/* DE */
+    case 0x686c:	/* HL */
+    case 0x7370:	/* SP */
+    case 0x7063:	/* PC */
+    case 0x6978:	/* IX */
+    case 0x6979:	/* IY */
+      return hash;
+
+    default: return -1;
+  }
+}
+
+/* Utility functions called by the bison parser */
 
 /* The error callback if yyparse finds an error */
 void
@@ -88,3 +117,34 @@ yyerror( char *s )
   ui_error( UI_ERROR_ERROR, "Invalid debugger command: %s", s );
 }
 
+/* Called to set a register or similar */
+void
+debugger_register_set( int which, int value )
+{
+  switch( which ) {
+
+    /* 8-bit registers */
+    case 'a': A = value; break;
+    case 'b': B = value; break;
+    case 'c': C = value; break;
+    case 'd': D = value; break;
+    case 'e': E = value; break;
+    case 'f': F = value; break;
+    case 'h': H = value; break;
+    case 'l': L = value; break;
+
+    /* 16-bit registers */
+    case 0x6166: AF = value; break;
+    case 0x6263: BC = value; break;
+    case 0x6465: DE = value; break;
+    case 0x686c: HL = value; break;
+    case 0x7370: SP = value; break;
+    case 0x7063: PC = value; break;
+    case 0x6978: IX = value; break;
+    case 0x6979: IY = value; break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "attempt to set unknown register '%d'", which );
+    break;
+  }
+}

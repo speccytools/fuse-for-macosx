@@ -212,6 +212,18 @@ create_dialog( void )
 static int
 activate_debugger( void )
 {
+  debugger_active = 1;
+
+  ui_debugger_update();
+
+  gtk_main();
+  return 0;
+}
+
+/* Update the debugger's display */
+int
+ui_debugger_update( void )
+{
   size_t i;
   char buffer[80];
   gchar *text[] = { &buffer[0], &buffer[40] };
@@ -221,8 +233,6 @@ activate_debugger( void )
 			&BC, &BC_, &DE, &DE_,
 			&HL, &HL_, &IX, &IY,
                       };
-
-  debugger_active = 1;
 
   for( i = 0; i < 12; i++ ) {
     snprintf( buffer, 80, "0x%04x", *value_ptr[i] );
@@ -239,6 +249,8 @@ activate_debugger( void )
   gtk_label_set_text( GTK_LABEL( registers[15] ), buffer );
 
   /* Put some disassembly in */
+  gtk_clist_clear( GTK_CLIST( disassembly ) );
+
   for( i = 0, address = PC; i < 20; i++ ) {
 
     size_t length;
@@ -250,7 +262,6 @@ activate_debugger( void )
     gtk_clist_append( GTK_CLIST( disassembly ), text );
   }
 
-  gtk_main();
   return 0;
 }
 
@@ -258,7 +269,6 @@ static int
 deactivate_debugger( void )
 {
   gtk_main_quit();
-  gtk_clist_clear( GTK_CLIST( disassembly ) );
   debugger_active = 0;
   fuse_emulation_unpause();
   return 0;

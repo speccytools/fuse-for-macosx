@@ -54,8 +54,11 @@ void yyerror( char *s );
 %token		 CLEAR
 %token		 CONTINUE
 %token		 NEXT
+%token		 SET
 %token		 SHOW
 %token		 STEP
+
+%token <integer> REGISTER
 
 %token <integer> NUMBER
 
@@ -76,6 +79,7 @@ command:   BREAK    { debugger_breakpoint_add( PC,
 	 | BREAK SHOW { debugger_breakpoint_show(); }
 	 | CONTINUE { debugger_run(); }
 	 | NEXT	    { debugger_next(); }
+         | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;
 

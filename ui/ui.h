@@ -58,6 +58,7 @@ int ui_end(void);
 /* Start and stop the debugger related UI functions */
 int ui_debugger_activate( void );
 int ui_debugger_deactivate( int interruptable );
+int ui_debugger_update( void );
 
 /* Functions defined in ../ui.c */
 int ui_error( ui_error_level severity, const char *format, ... )
