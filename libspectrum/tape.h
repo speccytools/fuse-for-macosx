@@ -54,6 +54,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_END,
 
+  LIBSPECTRUM_TAPE_BLOCK_COMMENT = 0x30,
+
   LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO = 0x32,
 } libspectrum_tape_type;
 
@@ -197,6 +199,13 @@ typedef struct libspectrum_tape_group_start_block {
 
 /* No group end block needed as it contains no data */
 
+/* A comment block */
+typedef struct libspectrum_tape_comment_block {
+
+  libspectrum_byte *text;
+
+} libspectrum_tape_comment_block;
+
 /* An archive info block */
 typedef struct libspectrum_tape_archive_info_block {
 
@@ -226,6 +235,8 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_pause_block pause;
     libspectrum_tape_group_start_block group_start;
     /* No group end block needed as it contains no data */
+
+    libspectrum_tape_comment_block comment;
 
     libspectrum_tape_archive_info_block archive_info;
   } types;

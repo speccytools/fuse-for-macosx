@@ -192,6 +192,10 @@ main( int argc, char **argv )
       /* Do nothing */
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
+      printf("  Comment: %s\n", block->types.comment.text );
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       info_block = &(block->types.archive_info);
       for( i=0; i<info_block->count; i++ ) {
