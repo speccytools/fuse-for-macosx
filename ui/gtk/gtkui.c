@@ -54,6 +54,7 @@
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "ui/scaler/scaler.h"
@@ -915,7 +916,13 @@ static void gtkui_disk_open( specplus3_drive_number drive )
                                    "Fuse - Insert disk into drive B:" ) );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  specplus3_disk_insert( drive, filename );
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_disk_insert( drive, filename );
+  } else
+#endif				/* #ifdef HAVE_765_H */
+    trdos_disk_insert( drive, filename );
+
   free( filename );
 
   fuse_emulation_unpause();
