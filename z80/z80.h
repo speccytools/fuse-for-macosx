@@ -49,6 +49,11 @@ typedef struct {
   regpair sp,pc;
   libspectrum_byte iff1, iff2, im;
   int halted;
+
+  /* Interrupts were enabled at this time; do not accept any interrupts
+     until tstates > this value */
+  libspectrum_signed_dword interrupts_enabled_at;
+
 } processor;
 
 void z80_init(void);

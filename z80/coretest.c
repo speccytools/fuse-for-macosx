@@ -333,8 +333,8 @@ int trdos_active;
 int
 event_add( libspectrum_dword event_time, int type )
 {
-  /* Should never be called */
-  abort();
+  /* Do nothing */
+  return 0;
 }
 
 fuse_machine_info *machine_current;

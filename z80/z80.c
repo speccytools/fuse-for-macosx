@@ -26,6 +26,7 @@
 
 #include <libspectrum.h>
 
+#include "event.h"
 #include "fuse.h"
 #include "rzx.h"
 #include "scld.h"
@@ -97,16 +98,8 @@ z80_reset( void )
   SP=PC=0;
   IFF1=IFF2=IM=0;
   z80.halted=0;
-}
 
-/* Allow z80 interrupts to be accepted */
-void
-z80_enable_interrupts( void )
-{
-  IFF1 = IFF2 = 1;
-
-  /* Check for retriggered interrupts */
-  z80_interrupt();
+  z80.interrupts_enabled_at = -1;
 }
 
 /* Process a z80 maskable interrupt */
@@ -117,6 +110,13 @@ z80_interrupt( void )
      gone high again. On a Timex machine, we also need the SCLD's
      INTDISABLE to be clear */
   if( IFF1 && tstates < 48 && !scld_last_dec.name.intdisable ) {
+
+    /* If interrupts have just been enabled, don't accept the interrupt now,
+       but check after the next instruction has been executed */
+    if( tstates == z80.interrupts_enabled_at ) {
+      event_add( tstates + 1, EVENT_TYPE_INTERRUPT );
+      return;
+    }
 
     if( z80.halted ) { PC++; z80.halted = 0; }
     

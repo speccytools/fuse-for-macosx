@@ -341,3 +341,6 @@
 20031106 debugger/command.c, debugger/commandl.l: remove use of %option
 	 noyywrap.
 20031107 ui/uijoystick.c: fix typos (thanks, Erik Kunze).
+20031107 event.[ch], spectrum.c, z80/coretest.c, z80/z80.[ch], z80/z80.pl:
+	 improved retrigged interrupt support: interrupts no longer
+	 accepted after an EI/EI or EI/DI sequence.

@@ -490,11 +490,12 @@ DJNZ
 }
 
 sub opcode_EI (@) {
-    print << "EI"
+    print << "EI";
       /* Interrupts are not accepted immediately after an EI, but are
 	 accepted after the next instruction */
-      IFF1 = IFF2 = 0;
-      event_add( tstates + 1, EVENT_TYPE_ENABLE_INTERRUPTS );
+      IFF1 = IFF2 = 1;
+      z80.interrupts_enabled_at = tstates;
+      event_add( tstates + 1, EVENT_TYPE_INTERRUPT );
 EI
 }
 

@@ -129,8 +129,6 @@ int event_do_events(void)
 
     case EVENT_TYPE_EDGE: tape_next_edge( ptr->tstates ); break;
 
-    case EVENT_TYPE_ENABLE_INTERRUPTS: z80_enable_interrupts(); break;
-
     case EVENT_TYPE_FRAME:
       if( rzx_playback ) event_force_events();
       rzx_frame();
@@ -140,6 +138,7 @@ int event_do_events(void)
       ui_event();
       break;
 
+    case EVENT_TYPE_INTERRUPT: z80_interrupt(); break;
     case EVENT_TYPE_LINE: display_line(); break;
     case EVENT_TYPE_NMI: z80_nmi(); break;
     case EVENT_TYPE_NULL: /* Do nothing */ break;
