@@ -1,5 +1,5 @@
 /* xdisplay.c: Routines for dealing with drawing the Speccy's screen via Xlib
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000,2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -28,18 +28,33 @@
 
 #ifdef UI_X			/* Use this iff we're using Xlib */
 
+#define X_USE_SHM
+
+#include <siginfo.h>
+#include <signal.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#ifdef X_USE_SHM
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <X11/extensions/XShm.h>
+#endif /* X_USE_SHM */
+
 #include "display.h"
 #include "fuse.h"
+#include "keyboard.h"
 #include "xdisplay.h"
 #include "xui.h"
 #include "ui/uidisplay.h"
+#include "widget/widget.h"
 
-static XImage *image;		/* The image structure to draw the
+static XImage *image = 0;	/* The image structure to draw the
 				   Speccy's screen on */
 static GC gc;			/* A graphics context to draw with */
 
@@ -48,9 +63,19 @@ static unsigned long colours[16];
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int xdisplay_current_size=1;
 
+#ifdef X_USE_SHM
+static XShmSegmentInfo shm_info;
+int shm_eventtype;
+int shm_finished;
+#endif
+
+static int shm_used = 0;
+
 static int xdisplay_allocate_colours(int numColours, unsigned long *colours);
 static int xdisplay_allocate_gc(Window window, GC *gc);
 static int xdisplay_allocate_image(int width, int height);
+static void xdisplay_destroy_image( void );
+static void xdisplay_end( int );
 
 int uidisplay_init(int width, int height)
 {
@@ -125,19 +150,90 @@ static int xdisplay_allocate_gc(Window window,GC *gc)
 
 static int xdisplay_allocate_image(int width, int height)
 {
-  image=XCreateImage(display, DefaultVisual(display, xui_screenNum),
-		     DefaultDepth(display, xui_screenNum), ZPixmap, 0, NULL,
-		     3*width,3*height,8,0);
+#ifdef X_USE_SHM
+  key_t key = 'F' << 24 | 'u' << 16 | 's' << 8 | 'e';
+  struct shmid_ds shm;
+  int id = -1;
+#endif /* X_USE_SHM */
 
-  if(!image) {
-    fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
-    return 1;
+  /* FIXME: should use sigaction */
+  signal( SIGINT, xdisplay_end );
+
+#ifdef X_USE_SHM
+  shm_used = XShmQueryExtension( display );
+
+  /* Don't try to use SHM if the display isn't local */
+/*    if (shm_used && !ui_is_display_local ()) */
+/*      shm_used = 0; */
+
+  if( shm_used ) {
+    shm_eventtype = XShmGetEventBase( display ) + ShmCompletion;
+    image = XShmCreateImage( display, DefaultVisual( display, xui_screenNum ),
+			     DefaultDepth( display, xui_screenNum ), ZPixmap,
+			     0, &shm_info, 3 * width, 3 * height);
+    if( !image ) shm_used = 0;
   }
 
-  if( (image->data=(char*)malloc(image->bytes_per_line*3*height)) == NULL ) {
-    fprintf(stderr, "%s: out of memory for image data\n", fuse_progname);
-    return 1;
+  /* Claim some memory (try to reclaim a stale chunk) */
+  if( shm_used )
+  {
+    int pollution = 5;
+    const int size = image->bytes_per_line * image->height;
+    do {
+
+      id = shmget( key, size, 0777 );	/* just get the id */
+
+      if( id == -1 ) id = shmget( key, size, IPC_CREAT | 0777 );
+      else if( !shmctl( id, IPC_STAT, &shm ) ) {
+	if( shm.shm_nattch ) key++;
+	else {
+	  if( getuid() == shm.shm_perm.cuid ) {
+	    if( shmctl( id, IPC_RMID, 0) ) id = -1;
+	    else {
+	      id = shmget( key, size, IPC_CREAT | 0777 );
+	      if( id != -1 ) shmctl (id, IPC_STAT, &shm);
+	      break;
+	    }
+	  }
+	  if( size >= shm.shm_segsz ) break;
+	  key++;
+	}
+      }
+    }
+    while( id == -1 && --pollution );
+
+    shm_used = ( id == -1 ? 0 : 1 );
+
+    if( shm_used && image ) {
+      shm_info.shmid = id;
+      image->data = shm_info.shmaddr = shmat( id, 0, 0 );
+      if( !image->data || !XShmAttach( display, &shm_info ) )
+	xdisplay_destroy_image();
+    } else {
+      shm_used = 0;
+    }
   }
+
+  if( shm_used ) puts ("\nUsing SHM extension.");
+  else if( image ) xdisplay_destroy_image ();
+
+#endif				/* #ifdef X_USE_SHM */
+
+  /* If SHM isn't available, or we're not using it for some reason,
+     just get a normal image */
+  if( !shm_used ) {
+    image=XCreateImage(display, DefaultVisual(display, xui_screenNum),
+		       DefaultDepth(display, xui_screenNum), ZPixmap, 0, NULL,
+		       3*width,3*height,8,0);
+    if(!image) {
+      fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
+      return 1;
+    }
+
+    if( (image->data=(char*)malloc(image->bytes_per_line*3*height)) == NULL ) {
+      fprintf(stderr, "%s: out of memory for image data\n", fuse_progname);
+      return 1;
+    }
 
   return 0;
 }
@@ -216,7 +312,16 @@ void uidisplay_lines( int start, int end )
 
 void xdisplay_area(int x, int y, int width, int height)
 {
+#ifdef X_USE_SHM
+  if( shm_used ) {
+    XShmPutImage( display, xui_mainWindow, gc, image,
+		  x, y, x, y, width, height, True );
+    /*shmfinished = 0;*/
+    /*do { ui_event (); } while (!shmfinished);*/
+  }
+#else				/* #ifdef X_USE_SHM */
   XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
+#endif				/* #ifdef X_USE_SHM */
 }
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
@@ -253,14 +358,34 @@ void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
   }
 }
 
-int uidisplay_end(void)
+static void xdisplay_destroy_image (void)
 {
   /* Free the XImage used to store screen data; also frees the malloc'd
      data */
-  XDestroyImage(image);
+#ifdef X_USE_SHM
+  if( shm_used ) {
+    XShmDetach( display, &shm_info );
+    shmdt( shm_info.shmaddr );
+    shmctl( shm_info.shmid, IPC_RMID, 0 );
+    image->data = NULL;
+    shm_used = 0;
+  }
+#endif
+  if( image ) XDestroyImage( image ); image = 0;
+}
 
+static void xdisplay_end (int sig)
+{
+  uidisplay_end();
+  psignal( sig, fuse_progname );
+  exit( 1 );
+}
+
+int uidisplay_end(void)
+{
+  xdisplay_destroy_image();
   /* Free the allocated GC */
-  XFreeGC(display,gc);
+  if( gc ) XFreeGC( display, gc ); gc = 0;
 
   return 0;
 }
