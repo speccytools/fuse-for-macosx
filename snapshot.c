@@ -188,6 +188,12 @@ int snapshot_copy_from( libspectrum_snap *snap )
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY )
     specplus3_memoryport_write( 0x1ffd, snap->out_plus3_memoryport );
 
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY )
+    scld_hsr_write( 0x00fd, snap->out_scld_hsr );
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
+    scld_dec_write( 0x00ff, snap->out_scld_dec );
+
   tstates = snap->tstates;
 
   for( i=0; i<8; i++ ) {
