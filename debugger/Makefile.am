@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2002 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -24,7 +24,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_LIBRARIES = libdebugger.a
 
