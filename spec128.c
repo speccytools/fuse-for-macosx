@@ -60,6 +60,7 @@ BYTE spec128_readbyte(WORD address)
   case 3: return RAM[machine_current->ram.current_page][address]; break;
   default: fuse_abort();
   }
+  return 0; /* Keep gcc happy */
 }
 
 BYTE spec128_read_screen_memory(WORD offset)

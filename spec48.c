@@ -59,6 +59,7 @@ BYTE spec48_readbyte(WORD address)
 	      fuse_progname, bank, __FILE__, __LINE__);
       fuse_abort();
   }
+  return 0; /* Keep gcc happy */
 }
 
 BYTE spec48_read_screen_memory(WORD offset)

@@ -87,7 +87,7 @@ BYTE specplus3_readbyte(WORD address)
     }
   }
 
-  fuse_abort(); /* To keep gcc quiet; should never be reached */
+  return 0; /* Keep gcc happy */
 }
 
 BYTE specplus3_read_screen_memory(WORD offset)
