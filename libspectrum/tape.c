@@ -24,6 +24,8 @@
 
 */
 
+#include <string.h>
+
 #include "tape.h"
 
 /*** Local function prototypes ***/
@@ -382,3 +384,23 @@ turbo_next_bit( libspectrum_tape_turbo_block *block )
 
   return LIBSPECTRUM_ERROR_NONE;
 }
+
+libspectrum_error
+libspectrum_tape_block_description( libspectrum_tape_block *block,
+				    char *buffer, size_t length )
+{
+  switch( block->type ) {
+  case LIBSPECTRUM_TAPE_BLOCK_ROM:
+    strncpy( buffer, "Standard Speed Data Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+    strncpy( buffer, "Turbo Speed Data Block", length );
+    break;
+  default:
+    return LIBSPECTRUM_ERROR_LOGIC;
+  }
+
+  buffer[ length-1 ] = '\0';
+  return LIBSPECTRUM_ERROR_NONE;
+}
+

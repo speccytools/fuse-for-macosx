@@ -36,6 +36,8 @@ static const libspectrum_byte *signature = "ZXTape!\x1a";
 typedef enum tzx_block_type {
   TZX_ROM = 0x10,
   TZX_TURBO,
+
+  TZX_ARCHIVE_INFO = 0x32,
 } tzx_block_type;
 
 /*** Local function prototypes ***/
@@ -75,6 +77,8 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     /* Get the ID of the next block */
     tzx_block_type id = *ptr++;
 
+    fprintf( stderr, "Block type 0x%02x\n", id );
+
     switch( id ) {
     case TZX_ROM:
       error = tzx_read_rom_block( tape, &ptr, end );
@@ -82,6 +86,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case TZX_TURBO:
       error = tzx_read_turbo_block( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case TZX_ARCHIVE_INFO:
+      error = tzx_read_archive_info( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
     default:	/* For now, don't handle anything else */
@@ -127,7 +135,6 @@ tzx_read_rom_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* Have we got enough bytes left in buffer? */
   if( ( end - (*ptr) ) < rom_block->length ) {
-    libspectrum_tape_free( tape );
     free( block );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -136,7 +143,6 @@ tzx_read_rom_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
   rom_block->data = (libspectrum_byte*)malloc( rom_block->length *
 					       sizeof( libspectrum_byte ) );
   if( rom_block->data == NULL ) {
-    libspectrum_tape_free( tape );
     free( block );
     return LIBSPECTRUM_ERROR_MEMORY;
   }
@@ -186,7 +192,6 @@ tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* Have we got enough bytes left in buffer? */
   if( ( end - (*ptr) ) < turbo_block->length ) {
-    libspectrum_tape_free( tape );
     free( block );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -195,7 +200,6 @@ tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
   turbo_block->data = (libspectrum_byte*)malloc( turbo_block->length *
 						 sizeof( libspectrum_byte ) );
   if( turbo_block->data == NULL ) {
-    libspectrum_tape_free( tape );
     free( block );
     return LIBSPECTRUM_ERROR_MEMORY;
   }
@@ -211,3 +215,44 @@ tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
   return LIBSPECTRUM_ERROR_NONE;
 
 }
+
+static libspectrum_error
+tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		       const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_archive_info_block *info_block;
+
+  /* Check there's enough left in the buffer for the length */
+  if( end - (*ptr) < 2 ) return LIBSPECTRUM_ERROR_CORRUPT;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  /* This is an archive info loader */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO;
+  info_block = &(block->types.archive_info);
+
+  /* Skip the length, as I don't care about it */
+  (*ptr) += 2;
+
+  /* Get the number of string */
+  info_block->count = **ptr; (*ptr)++;
+
+  /* Allocate memory */
+  info_block->ids = (int*)malloc( info_block->count * sizeof( int ) );
+  if( info_block->ids == NULL ) {
+    free( block );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+  info_block->strings = (char**)malloc( info_block->count * sizeof( char* ) );
+  if( info_block->strings == NULL ) {
+    free( info_block->ids );
+    free( block );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  
+
+  

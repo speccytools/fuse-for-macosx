@@ -46,6 +46,8 @@
 typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_ROM = 0x10,
   LIBSPECTRUM_TAPE_BLOCK_TURBO,
+
+  LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO = 0x32,
 } libspectrum_tape_type;
 
 /* A huge number of states available; encompasses all possible block types */
@@ -125,6 +127,20 @@ typedef struct libspectrum_tape_turbo_block {
 
 } libspectrum_tape_turbo_block;
 
+/* An archive info block */
+typedef struct libspectrum_tape_archive_info_block {
+
+  /* Number of strings */
+  size_t count;
+
+  /* ID for each string */
+  int *ids;
+
+  /* Text of each string */
+  unsigned char **strings;
+
+} libspectrum_tape_archive_info_block;
+
 /* A generic tape block */
 typedef struct libspectrum_tape_block {
 
@@ -133,6 +149,7 @@ typedef struct libspectrum_tape_block {
   union {
     libspectrum_tape_rom_block rom;
     libspectrum_tape_turbo_block turbo;
+    libspectrum_tape_archive_info_block archive_info;
   } types;
 
 } libspectrum_tape_block;
@@ -159,6 +176,10 @@ libspectrum_tape_init_block( libspectrum_tape_block *block );
 libspectrum_error
 libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 				libspectrum_dword *tstates, int *end_of_tape );
+
+libspectrum_error
+libspectrum_tape_block_description( libspectrum_tape_block *block,
+				    char *buffer, size_t length );
 
 /*** Routines for .tap format files ***/
 
