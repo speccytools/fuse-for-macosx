@@ -42,7 +42,6 @@
 /* The various widgets which are available */
 typedef enum widget_type {
 
-  WIDGET_TYPE_MAINMENU,		/* Main menu */
   WIDGET_TYPE_FILESELECTOR,	/* File selector */
   WIDGET_TYPE_GENERAL,		/* General options */
   WIDGET_TYPE_TAPE,		/* Tape menu */
@@ -116,11 +115,6 @@ extern widget_finish_state widget_finished;;
 int widget_dialog( int x, int y, int width, int height );
 int widget_dialog_with_border( int x, int y, int width, int height );
 
-/* Main menu dialog */
-
-int widget_mainmenu_draw( void* data );
-void widget_mainmenu_keyhandler( int key );
-
 /* File selector */
 
 typedef struct widget_dirent {
@@ -176,6 +170,11 @@ void widget_help_keyhandler( int key );
 
 int widget_menu_draw( void* data );
 void widget_menu_keyhandler( int key );
+
+/* Available menus */
+
+extern widget_menu_entry widget_menu_main[];
+extern widget_menu_entry widget_menu_options[];
 
 /* The widgets actually available */
 

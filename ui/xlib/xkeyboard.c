@@ -70,7 +70,7 @@ int xkeyboard_keypress(XKeyEvent *event)
   switch(keysym) {
   case XK_F1:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MAINMENU, NULL );
+    widget_do( WIDGET_TYPE_MENU, &widget_menu_main );
     fuse_emulation_unpause();
     break;
   case XK_F2:

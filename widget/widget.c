@@ -356,7 +356,6 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 
 widget_t widget_data[] = {
 
-  { widget_mainmenu_draw, NULL,                  widget_mainmenu_keyhandler },
   { widget_filesel_draw,  widget_filesel_finish, widget_filesel_keyhandler  },
   { widget_general_draw,  widget_general_finish, widget_general_keyhandler  },
   { widget_tape_draw,     NULL,			 widget_tape_keyhandler     },

@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#include <string.h>
+
 #include "display.h"
 #include "widget.h"
 #include "ui/uidisplay.h"
