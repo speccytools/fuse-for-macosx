@@ -1593,7 +1593,7 @@ tzx_write_stop( libspectrum_byte **buffer, size_t *offset, size_t *length )
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_STOP48;
-  *ptr++ = *ptr++ = *ptr++ = *ptr++ = '\0';
+  *ptr++ = '\0'; *ptr++ = '\0'; *ptr++ = '\0'; *ptr++ = '\0';
 
   (*offset) += 5;
 
