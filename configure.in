@@ -41,7 +41,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(setitimer)
+AC_CHECK_FUNCS(scandir setitimer)
 
 dnl Check sizes of various types; second parameter is a `default' for
 dnl cross-compiling. Will obviously break everything if this is wrong...

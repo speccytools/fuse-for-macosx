@@ -91,6 +91,64 @@ static void rect(int x, int y, int w, int h, int col) {
 static int numfiles;
 static char **filenames;
 
+#ifndef HAVE_SCANDIR
+int scandir( const char *dir, struct dirent ***namelist,
+	     int (*select)(const struct dirent *),
+	     int (*compar)(const struct dirent *, const struct dirent*))
+{
+  DIR *directory; struct dirent *dirent;
+
+  int allocated, number;
+
+  (*namelist) = (struct dirent**)malloc( 32 * sizeof(struct dirent*) );
+  if( *namelist == NULL ) return -1;
+
+  allocated = 32; number = 0;
+
+  directory = opendir( dir );
+  if( directory == NULL ) return -1;
+
+  while( 1 ) {
+    errno = 0;
+    dirent = readdir( directory );
+
+    if( dirent == NULL ) {
+      if( errno == 0 ) {	/* End of directory */
+	break;
+      } else {
+	return -1;
+      }
+    }
+
+    if( select( dirent ) ) {
+
+      if( ++number == allocated ) {
+	(*namelist)=
+	  (struct dirent**)realloc( (*namelist),
+				    2 * allocated * sizeof(struct dirent*) );
+	if( *namelist == NULL ) return -1;
+	allocated *= 2;
+      }
+
+      (*namelist)[number] = (struct dirent*)malloc( sizeof(struct dirent) );
+      if( (*namelist)[number] == NULL ) return -1;
+
+      memcpy( (*namelist)[number], dirent, sizeof(struct dirent) );
+
+    }
+
+  }
+
+  if( compar != NULL ) { 
+    qsort( (*namelist), number, sizeof(struct dirent*),
+	   (int(*)(const void*,const void*))compar );
+  }
+
+  return number;
+
+}
+#endif				/* #ifndef HAVE_SCANDIR */
+
 static int select_file(const struct dirent *dirent);
 static int widget_scan_compare( const void *a, const void *b );
 
