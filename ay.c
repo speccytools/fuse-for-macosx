@@ -27,19 +27,29 @@
 #include <config.h>
 
 #include "machine.h"
+#include "printer.h"
 #include "sound.h"
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
 BYTE ay_registerport_read(WORD port)
 {
-  /* For R14, return input val if relevant I/O bit is zero */
-  if(machine_current->ay.current_register == 14 &&
-     !(machine_current->ay.registers[7] & 0x40))
-    return 0xff;
+  static BYTE port_input = 0xbf;	/* always allow serial output */
 
-  /* Similarly for R15, but since the 8912 lacks the second I/O port,
-     input-mode input is always 0xff */
+  /* The AY I/O ports return input directly from the port when in
+     input mode; but in output mode, they return an AND between the
+     register value and the port input. So, allow for this when
+     reading R14... */
+
+  if(machine_current->ay.current_register == 14) {
+    if(machine_current->ay.registers[7] & 0x40)
+      return (port_input & machine_current->ay.registers[14]);
+    else
+      return port_input;
+  }
+
+  /* R15 is simpler to do, as the 8912 lacks the second I/O port, and
+     the input-mode input is always 0xff */
   if(machine_current->ay.current_register == 15 &&
      !(machine_current->ay.registers[7] & 0x80))
     return 0xff;
@@ -61,4 +71,7 @@ void ay_dataport_write(WORD port, BYTE b)
 {
   machine_current->ay.registers[ machine_current->ay.current_register ] = b;
   sound_ay_write( machine_current->ay.current_register, b, tstates );
+
+  if(machine_current->ay.current_register==14)
+    printer_serial_write( b );
 }

@@ -34,6 +34,7 @@
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "printer.h"
 #include "sound.h"
 #include "spec128.h"
 #include "specplus3.h"
@@ -47,6 +48,7 @@ spectrum_port_info specplus3_peripherals[] = {
   { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
   { 0xc002, 0x4000, spectrum_port_noread, spec128_memoryport_write },
   { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport_write },
+  { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
@@ -184,8 +186,10 @@ int specplus3_reset(void)
 
 void specplus3_memoryport_write(WORD port, BYTE b)
 {
+  /* Let the parallel printer code know about the strobe bit */
+  printer_parallel_strobe_write( b & 0x10 );
 
-  /* Do nothing if we've locked the RAM configuration */
+  /* Do nothing else if we've locked the RAM configuration */
   if( machine_current->ram.locked ) return;
 
   /* Store the last byte written in case we need it */

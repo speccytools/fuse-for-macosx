@@ -32,6 +32,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "keyboard.h"
+#include "printer.h"
 #include "settings.h"
 #include "sound.h"
 #include "spec128.h"
@@ -60,6 +61,7 @@ int spectrum_interrupt(void)
   }
 
   if(display_frame()) return 1;
+  printer_frame();
   z80_interrupt();
 
   if(event_add(machine_current->timings.cycles_per_frame,

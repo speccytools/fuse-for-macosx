@@ -32,6 +32,7 @@
 #include "event.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "printer.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -110,6 +111,8 @@ static int fuse_init(int argc, char **argv)
 
   if(display_init(&argc,&argv)) return 1;
   if(event_init()) return 1;
+  
+  if( printer_init() ) return 1;
 
   fuse_sound_in_use = 0;
   sound_init();
@@ -218,6 +221,7 @@ static int fuse_end(void)
 
   if(!sound_enabled) timer_end();
   sound_end();
+  printer_end();
   event_end();
   ui_end();
 

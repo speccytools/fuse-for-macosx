@@ -33,6 +33,7 @@
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "printer.h"
 #include "sound.h"
 #include "spec48.h"
 #include "spectrum.h"
@@ -40,6 +41,7 @@
 
 spectrum_port_info spec48_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
   { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
@@ -118,6 +120,7 @@ int spec48_reset(void)
 {
   z80_reset();
   sound_ay_reset();	/* should happen for *all* resets */
+  printer_zxp_reset();
 
   return 0;
 }

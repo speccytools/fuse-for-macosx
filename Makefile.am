@@ -32,7 +32,7 @@ fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c settings.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus3.c\
 	spectrum.c tape.c timer.c\
-	joystick.c
+	joystick.c printer.c
 
 BUILT_SOURCES = keysyms.c
 
@@ -49,6 +49,6 @@ noinst_HEADERS = ay.h display.h event.h\
 	machine.h osssound.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h\
 	tape.h timer.h types.h\
-	joystick.h
+	joystick.h printer.h
 
 EXTRA_DIST = AUTHORS README THANKS hacking/ui.txt keysyms.dat keysyms.pl
