@@ -117,8 +117,6 @@ extern scld scld_last_dec;           /* The last byte sent to Timex DEC port */
 
 extern libspectrum_byte scld_last_hsr; /* Last byte sent to Timex HSR port */
 
-extern libspectrum_byte timex_fake_bank[ 8192 ];
-
 extern memory_page timex_exrom[8];
 extern memory_page timex_dock[8];
 
@@ -128,6 +126,8 @@ libspectrum_byte scld_dec_read( libspectrum_word port, int *attached );
 
 void scld_hsr_write( libspectrum_word port, libspectrum_byte b );
 libspectrum_byte scld_hsr_read( libspectrum_word port, int *attached );
+
+void scld_memory_map( void );
 
 libspectrum_byte hires_get_attr( void );
 libspectrum_byte hires_convert_dec( libspectrum_byte attr );

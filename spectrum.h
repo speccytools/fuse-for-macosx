@@ -64,6 +64,8 @@ typedef struct spectrum_raminfo {
 
   int special;			/* Is a +3 special config in use? */
 
+  int romcs;			/* Is the /ROMCS line low? */
+
 } spectrum_raminfo;
 
 /* How much contention do we get at every tstate? */

@@ -39,6 +39,9 @@
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map[8];
 
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+memory_page memory_map_romcs[2];
+
 /* Mappings for the 'home' (normal ROM/RAM) pages, the Timex DOCK and
    the Timex EXROM */
 memory_page *memory_map_home[8];
@@ -89,14 +92,14 @@ memory_init( void )
     mapping2 = &memory_map_ram[ 2 * i + 1 ];
 
     mapping1->page = &RAM[i][ 0x0000 ];
-    mapping2->page = &RAM[i][ 0x2000 ];
+    mapping2->page = &RAM[i][ MEMORY_PAGE_SIZE ];
 
     mapping1->writable = mapping2->writable = 1;
     mapping1->bank = mapping2->bank = MEMORY_BANK_HOME;
     mapping1->page_num = mapping2->page_num = i;
 
     mapping1->offset = 0x0000;
-    mapping2->offset = 0x2000;
+    mapping2->offset = MEMORY_PAGE_SIZE;
 
   }
 
@@ -202,5 +205,14 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
       display_dirty( offset2 );
 
     memory[ offset ] = b;
+  }
+}
+
+void
+memory_romcs_map( void )
+{
+  if( machine_current->ram.romcs ) {
+    memory_map[0] = memory_map_romcs[0];
+    memory_map[1] = memory_map_romcs[1];
   }
 }

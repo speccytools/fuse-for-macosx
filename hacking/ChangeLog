@@ -790,3 +790,7 @@
 	 z80_macros.h},z80/tests/{d3,db,ed[4567][0189],ed[ab][23ab]}.out:
 	 improved contention on IO port access (thanks again, Mark
 	 Woodmass and Jonathan Needle).
+20040512 dck.c,machine.[ch],memory.[ch],scld.[ch],snapshot.c,spectrum.h,
+	 machines/,z80/coretest.c: new page mapping control scheme where
+	 each machine has a function which can be called to set the
+	 current page mapping (part of patch #937338) (Fred).

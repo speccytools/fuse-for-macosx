@@ -86,7 +86,7 @@ const periph_t specplus3_peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
-  { 0xc002, 0x4000, NULL, specplus3_memoryport_write },
+  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
 
 #ifdef HAVE_765_H
   { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
@@ -181,6 +181,8 @@ int specplus3_init( fuse_machine_info *machine )
 
   machine->shutdown = specplus3_shutdown;
 
+  machine->memory_map = specplus3_memory_map;
+
   return 0;
 
 }
@@ -261,6 +263,8 @@ specplus3_plus2a_common_reset( void )
   machine_current->ram.current_page=0; machine_current->ram.current_rom=0;
   machine_current->ram.locked=0;
   machine_current->ram.special=0;
+  machine_current->ram.last_byte=0;
+  machine_current->ram.last_byte2=0;
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
@@ -346,35 +350,6 @@ select_special_map( int page1, int page2, int page3, int page4 )
 }
 
 void
-specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
-			    libspectrum_byte b )
-{
-  int page, rom, screen;
-
-  if( machine_current->ram.locked ) return;
-
-  page = b & 0x07;
-  screen = ( b & 0x08 ) ? 7 : 5;
-  rom = ( machine_current->ram.current_rom & 0x02 ) | ( ( b & 0x10 ) >> 4 );
-
-  /* If we changed the active screen, mark the entire display file as
-     dirty so we redraw it on the next pass */
-  if( memory_current_screen != screen ) {
-    display_refresh_all();
-    memory_current_screen = screen;
-  }
-
-  /* Change the memory map unless we're in a special RAM configuration */
-  if( !machine_current->ram.special ) {
-    spec128_select_rom( rom );
-    spec128_select_page( page );
-  }
-
-  machine_current->ram.locked = b & 0x20;
-  machine_current->ram.last_byte = b;
-}
-
-void
 specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
 			     libspectrum_byte b )
 {
@@ -382,9 +357,9 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
   printer_parallel_strobe_write( b & 0x10 );
 
 #ifdef HAVE_765_H
-  /* If this was called by a machine which has a +3-style disk (ie the +3
-     as opposed to the +2A), set the state of both floppy drive motors */
-  if( libspectrum_machine_capabilities( machine_current->machine ) &&
+  /* If this was called by a machine which has a +3-style disk, set
+     the state of both floppy drive motors */
+  if( machine_current->capabilities &&
       LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
 
     fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
@@ -401,23 +376,46 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
   /* Store the last byte written in case we need it */
   machine_current->ram.last_byte2 = b;
 
-  if( b & 0x01 ) {	/* Check whether we want a special RAM configuration */
+  machine_current->memory_map();
+}
+
+int
+specplus3_memory_map( void )
+{
+  int page, rom, screen;
+
+  page = machine_current->ram.last_byte & 0x07;
+  screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
+  rom =
+    ( ( machine_current->ram.last_byte  & 0x10 ) >> 4 ) |
+    ( ( machine_current->ram.last_byte2 & 0x04 ) >> 1 );
+
+  /* If we changed the active screen, mark the entire display file as
+     dirty so we redraw it on the next pass */
+  if( memory_current_screen != screen ) {
+    display_refresh_all();
+    memory_current_screen = screen;
+  }
+
+  /* Check whether we want a special RAM configuration */
+  if( machine_current->ram.last_byte2 & 0x01 ) {
 
     /* If so, select it */
     machine_current->ram.special = 1;
-    special_memory_map( ( b & 0x06 ) >> 1 );
+    special_memory_map( ( machine_current->ram.last_byte2 & 0x06 ) >> 1 );
 
   } else {
 
     /* If not, we're selecting the high bit of the current ROM */
     machine_current->ram.special = 0;
-    machine_current->ram.current_rom = 
-      ( machine_current->ram.current_rom & 0x01 ) | ( ( b & 0x04 ) >> 1 );
+    normal_memory_map( rom, page );
 
-    normal_memory_map( machine_current->ram.current_rom,
-		       machine_current->ram.current_page );
   }
 
+  machine_current->ram.current_page = page;
+  machine_current->ram.current_rom  = rom;
+
+  return 0;
 }
 
 #if HAVE_765_H

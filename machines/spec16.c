@@ -41,8 +41,9 @@
 #include "spec48.h"
 
 static int spec16_reset( void );
+static int spec16_memory_map( void );
 
-static libspectrum_byte empty_chunk[0x2000];
+static libspectrum_byte empty_chunk[ MEMORY_PAGE_SIZE ];
 static memory_page empty_mapping;
 
 const static periph_t peripherals[] = {
@@ -71,7 +72,7 @@ int spec16_init( fuse_machine_info *machine )
   machine->ram.port_contended = spec48_port_contended;
   machine->ram.contend_delay  = spec48_contend_delay;
 
-  memset( empty_chunk, 0xff, 0x2000 );
+  memset( empty_chunk, 0xff, MEMORY_PAGE_SIZE );
 
   empty_mapping.page = empty_chunk;
   empty_mapping.writable = 0;
@@ -81,6 +82,8 @@ int spec16_init( fuse_machine_info *machine )
   machine->unattached_port = spec16_unattached_port;
 
   machine->shutdown = NULL;
+
+  machine->memory_map = spec16_memory_map;
 
   return 0;
 
@@ -99,9 +102,6 @@ spec16_reset( void )
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
-  memory_current_screen = 5;
-  memory_screen_mask = 0xffff;
-
   /* ROM 0, RAM 5, nothing, nothing */
   memory_map_home[0] = &memory_map_rom[ 0];
   memory_map_home[1] = &memory_map_rom[ 1];
@@ -116,6 +116,17 @@ spec16_reset( void )
   memory_map_home[2]->contended = memory_map_home[3]->contended = 1;
 
   for( i = 0; i < 8; i++ ) memory_map[i] = *memory_map_home[i];
+
+  memory_current_screen = 5;
+  memory_screen_mask = 0xffff;
+
+  return 0;
+}
+
+static int
+spec16_memory_map( void )
+{
+  memory_romcs_map();
 
   return 0;
 }

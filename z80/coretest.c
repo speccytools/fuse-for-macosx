@@ -377,7 +377,7 @@ init_dummies( void )
   size_t i;
 
   for( i = 0; i < 8; i++ ) {
-    memory_map[i].page = &memory[ i * 0x2000 ];
+    memory_map[i].page = &memory[ i * MEMORY_PAGE_SIZE ];
   }
 
   debugger_mode = DEBUGGER_MODE_INACTIVE;

@@ -136,9 +136,10 @@ dck_read( const char *filename )
         break;
 
       case LIBSPECTRUM_DCK_PAGE_ROM:
-        mem[i]->page = memory_pool_allocate( 0x2000 );
+        mem[i]->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
 	if( !mem[i]->page ) return 1;
-	memcpy( mem[i]->page, dck->dck[num_block]->pages[i], 0x2000 );
+	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
+		MEMORY_PAGE_SIZE );
         mem[i]->writable = 0;
         break;
 
@@ -150,12 +151,13 @@ dck_read( const char *filename )
 	   other cases, we allocate ourselves a new page to store the
 	   contents in */
         if( dck->dck[num_block]->bank != LIBSPECTRUM_DCK_BANK_HOME || i < 2 ) {
-          mem[i]->page = memory_pool_allocate( 0x2000 );
+          mem[i]->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
 	  if( !mem[i]->page ) return 1;
           mem[i]->writable = 1;
         }
 	
-	memcpy( mem[i]->page, dck->dck[num_block]->pages[i], 0x2000 );
+	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
+		MEMORY_PAGE_SIZE );
         break;
 
       }

@@ -117,6 +117,8 @@ pentagon_init( fuse_machine_info *machine )
 
   machine->shutdown = pentagon_shutdown;
 
+  machine->memory_map = spec128_memory_map;
+
   return 0;
 
 }

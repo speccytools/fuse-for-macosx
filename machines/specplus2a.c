@@ -32,6 +32,7 @@
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"
+#include "spec128.h"
 #include "specplus3.h"
 
 static int specplus2a_reset( void );
@@ -41,7 +42,7 @@ const static periph_t peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
-  { 0xc002, 0x4000, NULL, specplus3_memoryport_write },
+  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
   { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
 };
@@ -64,6 +65,8 @@ specplus2a_init( fuse_machine_info *machine )
   machine->unattached_port = specplus3_unattached_port;
 
   machine->shutdown = NULL;
+
+  machine->memory_map = specplus3_memory_map;
 
   return 0;
 

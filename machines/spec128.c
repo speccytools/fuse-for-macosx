@@ -39,6 +39,7 @@
 #include "settings.h"
 #include "spec128.h"
 #include "spec48.h"
+#include "trdos.h"
 
 static int spec128_reset( void );
 
@@ -118,6 +119,8 @@ int spec128_init( fuse_machine_info *machine )
 
   machine->shutdown = NULL;
 
+  machine->memory_map = spec128_memory_map;
+
   return 0;
 
 }
@@ -181,26 +184,13 @@ void
 spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
 			  libspectrum_byte b )
 {
-  int page, rom, screen;
-
   if( machine_current->ram.locked ) return;
 
-  page = b & 0x07;
-  screen = ( b & 0x08 ) ? 7 : 5;
-  rom = ( b & 0x10 ) >> 4;
+  machine_current->ram.last_byte = b;
 
-  /* If we changed the active screen, mark the entire display file as
-     dirty so we redraw it on the next pass */
-  if( memory_current_screen != screen ) {
-    display_refresh_all();
-    memory_current_screen = screen;
-  }
-
-  spec128_select_rom( rom );
-  spec128_select_page( page );
+  machine_current->memory_map();
 
   machine_current->ram.locked = b & 0x20;
-  machine_current->ram.last_byte = b;
 }
 
 void
@@ -231,4 +221,32 @@ spec128_select_page( int page )
       memory_map[i] = *memory_map_home[i];
 
   machine_current->ram.current_page = page;
+}
+
+int
+spec128_memory_map( void )
+{
+  int page = machine_current->ram.last_byte & 0x07;
+  int screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
+  int rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
+
+  if( ( machine_current->capabilities &
+      LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) &&
+      trdos_active )
+    rom = 2;
+
+  /* If we changed the active screen, mark the entire display file as
+     dirty so we redraw it on the next pass */
+  /* FIXME: Could do better with checksumming and rect submitting */
+  if( memory_current_screen != screen ) {
+    display_refresh_all();
+    memory_current_screen = screen;
+  }
+
+  spec128_select_rom( rom );
+  spec128_select_page( page );
+
+  memory_romcs_map();
+
+  return 0;
 }

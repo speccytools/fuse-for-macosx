@@ -51,6 +51,7 @@ static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
 
 static int tc2068_reset( void );
+static int tc2068_memory_map( void );
 
 const static periph_t peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
@@ -70,7 +71,7 @@ const static periph_t peripherals[] = {
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-static libspectrum_byte fake_bank[0x2000];
+static libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
 static memory_page fake_mapping;
 
 static libspectrum_byte
@@ -171,7 +172,7 @@ tc2068_init( fuse_machine_info *machine )
   machine->ram.port_contended	     = tc2048_port_contended;
   machine->ram.contend_delay	     = tc2068_contend_delay;
 
-  memset( fake_bank, 0xff, 0x2000 );
+  memset( fake_bank, 0xff, MEMORY_PAGE_SIZE );
 
   fake_mapping.page = fake_bank;
   fake_mapping.writable = 0;
@@ -182,6 +183,8 @@ tc2068_init( fuse_machine_info *machine )
   machine->unattached_port = tc2068_unattached_port;
 
   machine->shutdown = NULL;
+
+  machine->memory_map = tc2068_memory_map;
 
   return 0;
 }
@@ -240,12 +243,22 @@ tc2068_reset( void )
     }
   }
 
+  memory_current_screen = 5;
+  memory_screen_mask = 0xdfff;
+
   scld_dec_write( 0x00ff, 0x80 );
   scld_dec_write( 0x00ff, 0x00 );
   scld_hsr_write( 0x00f4, 0x00 );
 
-  memory_current_screen = 5;
-  memory_screen_mask = 0xdfff;
+  return 0;
+}
+
+static int
+tc2068_memory_map( void )
+{
+  scld_memory_map();
+
+  memory_romcs_map();
 
   return 0;
 }

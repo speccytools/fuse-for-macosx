@@ -51,7 +51,13 @@ typedef struct memory_page {
 
 } memory_page;
 
+#define MEMORY_PAGE_SIZE 0x2000
+
+/* Each 8Kb RAM chunk accessible by the Z80 */
 extern memory_page memory_map[8];
+
+/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+extern memory_page memory_map_romcs[2];
 
 extern memory_page *memory_map_home[8];
 extern memory_page *memory_map_dock[8];
@@ -69,6 +75,9 @@ extern libspectrum_word memory_screen_mask;
 int memory_init( void );
 libspectrum_byte *memory_pool_allocate( size_t length );
 void memory_pool_free( void );
+
+/* Map in alternate bank if ROMCS is set */
+void memory_romcs_map( void );
 
 libspectrum_byte readbyte( libspectrum_word address );
 

@@ -54,6 +54,8 @@ int specplus2_init( fuse_machine_info *machine )
 
   machine->shutdown = NULL;
 
+  machine->memory_map = spec128_memory_map;
+
   return 0;
 
 }

@@ -36,6 +36,7 @@
 #include "machine.h"
 #include "memory.h"
 #include "scld.h"
+#include "spectrum.h"
 #include "z80/z80.h"
 
 scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
@@ -75,7 +76,7 @@ scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
     z80_interrupt();
 
   if( scld_last_dec.name.altmembank != old_dec.name.altmembank )
-    scld_hsr_write( 0xf4, scld_last_hsr );
+    machine_current->memory_map();
 
   display_parse_attr( hires_get_attr(), &ink, &paper );
   display_set_hires_border( paper );
@@ -90,24 +91,9 @@ scld_reset(void)
 void
 scld_hsr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  int i;
-  memory_page **exrom_dock;
-  
   scld_last_hsr = b;
 
-  exrom_dock =
-    scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
-
-  if( libspectrum_machine_capabilities( machine_current->machine ) &
-      LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK )
-    for( i = 0; i < 8; i++ ) {
-      if( b & ( 1 << i ) ) {
-	memory_map[i] = *exrom_dock[i];
-      } else {
-	memory_map[i] = *memory_map_home[i];
-      }
-    }
-
+  machine_current->memory_map();
 }
 
 libspectrum_byte
@@ -141,5 +127,23 @@ hires_convert_dec( libspectrum_byte attr )
     case CYANRED:      return 0x6a;
     case YELLOWBLUE:   return 0x71;
     default:	       return 0x78; /* WHITEBLACK */
+  }
+}
+
+void
+scld_memory_map( void )
+{
+  int i;
+  memory_page **exrom_dock;
+  
+  exrom_dock =
+    scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
+
+  for( i = 0; i < 8; i++ ) {
+    if( scld_last_hsr & ( 1 << i ) ) {
+      memory_map[i] = *exrom_dock[i];
+    } else {
+      memory_map[i] = *memory_map_home[i];
+    }
   }
 }

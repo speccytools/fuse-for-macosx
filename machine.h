@@ -79,6 +79,8 @@ typedef struct fuse_machine_info {
 
   int (*shutdown)( void );
 
+  int (*memory_map)( void );
+
 } fuse_machine_info;
 
 extern fuse_machine_info **machine_types;	/* All available machines */

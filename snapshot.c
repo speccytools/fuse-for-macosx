@@ -177,13 +177,9 @@ snapshot_copy_from( libspectrum_snap *snap )
     spec128_memoryport_write( 0x7ffd,
 			      libspectrum_snap_out_128_memoryport( snap ) );
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY )
+  if( ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) ||
+      ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY )    )
     specplus3_memoryport2_write(
-      0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
-    );
-
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY )
-    scorpion_memoryport2_write(
       0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
     );
 

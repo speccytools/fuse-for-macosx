@@ -52,6 +52,8 @@ specplus3e_init( fuse_machine_info *machine )
 
   machine->shutdown = specplus3_shutdown;
 
+  machine->memory_map = specplus3_memory_map;
+
   return 0;
 }
 

@@ -280,9 +280,9 @@ machine_load_rom( size_t which, char *filename, size_t expected_length )
 
   memcpy( memory_map_rom[ which ].page, rom.buffer, rom.length );
 
-  for( i = 1, offset = 0x2000;
+  for( i = 1, offset = MEMORY_PAGE_SIZE;
        offset < expected_length;
-       i++, offset += 0x2000     ) {
+       i++, offset += MEMORY_PAGE_SIZE   ) {
     memory_map_rom[ which + i ].offset = offset;
     memory_map_rom[ which + i ].page = memory_map_rom[ which ].page + offset;
   }
@@ -313,8 +313,12 @@ machine_reset( void )
 
   memory_pool_free();
 
+  machine_current->ram.romcs = 0;
+
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;
+
+  error = machine_current->memory_map(); if( error ) return error;
 
   /* Set up the contention array */
   for( i = 0; i < machine_current->timings.tstates_per_frame; i++ )

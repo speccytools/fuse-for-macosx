@@ -50,4 +50,6 @@ void spec128_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void spec128_select_rom( int rom );
 void spec128_select_page( int page );
 
+int spec128_memory_map( void );
+
 #endif			/* #ifndef FUSE_SPEC128_H */

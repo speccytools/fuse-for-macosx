@@ -41,6 +41,7 @@
 #include "settings.h"
 #include "scorpion.h"
 #include "spec128.h"
+#include "specplus3.h"
 #include "spectrum.h"
 #include "trdos.h"
 
@@ -49,10 +50,9 @@ static libspectrum_byte scorpion_select_1f_read( libspectrum_word port,
 static libspectrum_byte scorpion_select_ff_read( libspectrum_word port,
 						 int *attached );
 static libspectrum_byte scorpion_contend_delay( libspectrum_dword time );
-static void scorpion_memoryport_write( libspectrum_word port,
-				       libspectrum_byte b );
 static int scorpion_reset( void );
 static int scorpion_shutdown( void );
+static int scorpion_memory_map( void );
 
 const static periph_t peripherals[] = {
   { 0x00ff, 0x001f, scorpion_select_1f_read, trdos_cr_write },
@@ -63,8 +63,8 @@ const static periph_t peripherals[] = {
   { 0x00ff, 0x00ff, scorpion_select_ff_read, trdos_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
-  { 0xc002, 0x4000, NULL, scorpion_memoryport_write },
-  { 0xf002, 0x1000, NULL, scorpion_memoryport2_write },
+  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
+  { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
 };
 
 const static size_t peripherals_count =
@@ -120,6 +120,8 @@ scorpion_init( fuse_machine_info *machine )
 
   machine->shutdown = scorpion_shutdown;
 
+  machine->memory_map = scorpion_memory_map;
+
   return 0;
 }
 
@@ -152,22 +154,21 @@ scorpion_reset(void)
   return spec128_common_reset( 0 );
 }
 
-void
-scorpion_memoryport_write( libspectrum_word port GCC_UNUSED,
-			   libspectrum_byte b )
+static int
+scorpion_memory_map( void )
 {
-  int page, rom, screen;
+  size_t i;
+  int rom;
 
-  if( machine_current->ram.locked ) return;
-    
-  page = ( b & 0x07 ) | ( ( machine_current->ram.last_byte2 & 0x10 ) >> 1 );
-  screen = ( b & 0x08 ) ? 7 : 5;
+  int page = ( machine_current->ram.last_byte & 0x07 ) |
+          ( ( machine_current->ram.last_byte2 & 0x10 ) >> 1 );
+  int screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   
   /* ROM 2 is TR-DOS because that's hardcoded elsewhere
    * ROM 3 is the extended ROM
    * 64k RAM mode takes priority over ROM 3 */
   if( ! ( machine_current->ram.last_byte2 & 0x02 ) ) {
-    rom = ( b & 0x10 ) >> 4;
+    rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
     machine_current->ram.current_rom = rom;
     if( !( machine_current->ram.last_byte2 & 0x01 ) &&
 	!trdos_active                                   )
@@ -184,31 +185,17 @@ scorpion_memoryport_write( libspectrum_word port GCC_UNUSED,
   }
 
   machine_current->ram.current_page = page;
-  machine_current->ram.locked = ( b & 0x20 );
 
-  machine_current->ram.last_byte = b;
-}
-
-void
-scorpion_memoryport2_write( libspectrum_word port GCC_UNUSED,
-                            libspectrum_byte b )
-{
-  int page, rom;
-  size_t i;
-
-  /* Let the parallel printer code know about the strobe bit */
-  printer_parallel_strobe_write( b & 0x20 );
-
-  if( machine_current->ram.locked ) return;
+  page = ( ( machine_current->ram.last_byte2 & 0x10 ) >> 1 ) |
+          ( machine_current->ram.last_byte & 0x07 );
   
-  page = ( ( b & 0x10 ) >> 1 ) | ( machine_current->ram.last_byte & 0x07 );
-  
-  if ( b & 0x02 )
+  if ( machine_current->ram.last_byte2 & 0x02 )
     rom = 3;
   else
     rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
   
-  if( b & 0x01 ) { /* map 0x0000-0x3fff to RAM 0 */
+  if( machine_current->ram.last_byte2 & 0x01 ) {
+    /* map 0x0000-0x3fff to RAM 0 */
 
     memory_map_home[0] = &memory_map_ram[ 0 ];
     memory_map_home[1] = &memory_map_ram[ 1 ];
@@ -229,8 +216,8 @@ scorpion_memoryport2_write( libspectrum_word port GCC_UNUSED,
  
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom = rom;
-  
-  machine_current->ram.last_byte2 = b;
+ 
+  return 0;
 }
 
 static int

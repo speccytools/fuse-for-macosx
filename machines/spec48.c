@@ -40,6 +40,7 @@
 #include "spectrum.h"
 
 static int spec48_reset( void );
+static int spec48_memory_map( void );
 
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -122,6 +123,8 @@ int spec48_init( fuse_machine_info *machine )
 
   machine->shutdown = NULL;
 
+  machine->memory_map = spec48_memory_map;
+
   return 0;
 
 }
@@ -170,6 +173,14 @@ spec48_common_reset( void )
   memory_map_home[ 6]->contended = memory_map_home[ 7]->contended = 0;
 
   for( i = 0; i < 8; i++ ) memory_map[i] = *memory_map_home[i];
+
+  return 0;
+}
+
+static int
+spec48_memory_map( void )
+{
+  memory_romcs_map();
 
   return 0;
 }

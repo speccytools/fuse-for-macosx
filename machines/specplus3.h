@@ -57,6 +57,8 @@ int specplus3_shutdown( void );
 void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );
 
+int specplus3_memory_map( void );
+
 /* We need these outside the HAVE_765_H guards as they're also used
    for identifying the TRDOS drives */
 typedef enum specplus3_drive_number {
