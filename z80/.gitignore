@@ -4,4 +4,5 @@
 /opcodes_base.c
 /z80_cb.c
 /z80_ddfd.c
+/z80_ddfdcb.c
 /z80_ed.c

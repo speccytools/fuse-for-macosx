@@ -330,16 +330,23 @@ sub push_pop ($$) {
     print "      ${opcode}16($low,$high);\n";
 }
 
+sub res_set_hexmask ($$) {
+
+    my( $opcode, $bit ) = @_;
+
+    my $mask = 1 << $bit;
+    $mask = 0xff - $mask if $opcode eq 'RES';
+
+    sprintf '0x%02x', $mask;
+}
+
 sub res_set ($$$) {
 
     my( $opcode, $bit, $register ) = @_;
 
     my $operator = ( $opcode eq 'RES' ? '&' : '|' );
 
-    my $mask = 1 << $bit;
-    $mask = 0xff - $mask if $opcode eq 'RES';
-    
-    my $hex_mask = sprintf '0x%02x', $mask;
+    my $hex_mask = res_set_hexmask( $opcode, $bit );
 
     if( length $register == 1 ) {
 	print "      $register $operator= $hex_mask;\n";
@@ -347,6 +354,11 @@ sub res_set ($$$) {
 	print << "CODE";
       contend( HL, 4 ); contend( HL, 3 );
       writebyte(HL, readbyte(HL) $operator $hex_mask);
+CODE
+    } elsif( $register eq '(REGISTER+dd)' ) {
+	print << "CODE";
+      tstates += 8;
+      writebyte(tempaddr, readbyte(tempaddr) $operator $hex_mask);
 CODE
     }
 }
@@ -364,6 +376,15 @@ sub rotate_shift ($$) {
 	contend( HL, 4 ); contend( HL, 3 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
+      }
+CODE
+    } elsif( $register eq '(REGISTER+dd)' ) {
+	print << "CODE";
+      tstates += 8;
+      {
+	BYTE bytetemp = readbyte(tempaddr);
+	$opcode(bytetemp);
+	writebyte(tempaddr,bytetemp);
       }
 CODE
     }
@@ -385,6 +406,14 @@ sub opcode_BIT (@) {
 
     if( length $register == 1 ) {
 	print "      BIT$macro$register);\n";
+    } elsif( $register eq '(REGISTER+dd)' ) {
+	print << "BIT";
+      tstates += 5;
+      {
+	BYTE bytetemp=readbyte(tempaddr);
+	BIT${macro}bytetemp);
+      }
+BIT
     } else {
 	print << "BIT";
       {
@@ -1006,10 +1035,11 @@ shift
 
 my %description = (
 
-    'opcodes_cb.dat'   => 'opcodes_cb.c: Z80 CBxx opcodes',
-    'opcodes_ddfd.dat' => 'opcodes_ddfd.c Z80 {DD,FD}xx opcodes',
-    'opcodes_ed.dat'   => 'opcodes_ed.c: Z80 CBxx opcodes',
-    'opcodes_base.dat' => 'opcodes_base.c: unshifted Z80 opcodes',
+    'opcodes_cb.dat'     => 'opcodes_cb.c: Z80 CBxx opcodes',
+    'opcodes_ddfd.dat'   => 'opcodes_ddfd.c Z80 {DD,FD}xx opcodes',
+    'opcodes_ddfdcb.dat' => 'opcodes_ddfdcb.c Z80 {DD,FD}CBxx opcodes',
+    'opcodes_ed.dat'     => 'opcodes_ed.c: Z80 CBxx opcodes',
+    'opcodes_base.dat'   => 'opcodes_base.c: unshifted Z80 opcodes',
 
 );
 
@@ -1036,7 +1066,7 @@ while(<>) {
 
     chomp;
 
-    my( $number, $opcode, $arguments ) = split;
+    my( $number, $opcode, $arguments, $extra ) = split;
 
     if( not defined $opcode ) {
 	print "    case $number:\n";
@@ -1049,8 +1079,42 @@ while(<>) {
     print "    case $number:\t\t/* $opcode";
 
     print ' ', join ',', @arguments if @arguments;
+    print " $extra" if defined $extra;
 
     print " */\n";
+
+    # Handle the undocumented rotate-shift-or-bit and store-in-register
+    # opcodes specially
+
+    if( defined $extra ) {
+
+	my( $register, $opcode ) = @arguments;
+
+	if( $opcode eq 'RES' or $opcode eq 'SET' ) {
+
+	    my( $bit ) = split ',', $extra;
+
+	    my $operator = ( $opcode eq 'RES' ? '&' : '|' );
+	    my $hexmask = res_set_hexmask( $opcode, $bit );
+
+	    print << "CODE";
+      tstates += 8;
+      $register=readbyte(tempaddr) $operator $hexmask;
+      writebyte(tempaddr, $register);
+      break;
+CODE
+	} else {
+
+	    print << "CODE";
+      tstates += 8;
+      $register=readbyte(tempaddr);
+      $opcode($register);
+      writebyte(tempaddr, $register);
+      break;
+CODE
+	}
+	next;
+    }
 
     {
 	no strict qw( refs );
