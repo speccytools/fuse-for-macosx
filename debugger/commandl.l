@@ -78,4 +78,6 @@ ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 
 [ \n]+		/* Swallow whitespace */
 
-.		{ return ERROR; }
+.		{ if( 0 ) unput( '\0' ); /* Prevent warning about yyunput
+					    being defined and not used */
+		  return ERROR; }
