@@ -35,13 +35,14 @@
 
 #include "display.h"
 #include "fuse.h"
+#include "if2.h"
 #include "machine.h"
-#include "scld.h"
 #include "machines/scorpion.h"
 #include "machines/spec128.h"
+#include "scld.h"
 #include "settings.h"
-#include "sound.h"
 #include "snapshot.h"
+#include "sound.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -249,7 +250,35 @@ snapshot_copy_from( libspectrum_snap *snap )
       if( libspectrum_snap_zxcf_ram( snap, i ) )
 	memcpy( zxcf_ram( i ), libspectrum_snap_zxcf_ram( snap, i ), 0x4000 );
   }
-	  
+  
+  if( libspectrum_snap_interface2_active( snap ) ) {
+
+    if2_active = 1;
+    machine_current->ram.romcs = 1;
+
+    if( libspectrum_snap_interface2_rom( snap, 0 ) ) {
+      memory_map_romcs[0].offset = 0;
+      memory_map_romcs[0].page_num = 0;
+      memory_map_romcs[0].page = memory_pool_allocate(
+                                  2 * MEMORY_PAGE_SIZE *
+                                    sizeof( libspectrum_byte ) );
+      if( !memory_map_romcs[0].page ) {
+        ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+        return 1;
+      }
+
+      memcpy( memory_map_romcs[0].page,
+              libspectrum_snap_interface2_rom( snap, 0 ),
+              2 * MEMORY_PAGE_SIZE );
+
+      memory_map_romcs[1].offset = MEMORY_PAGE_SIZE;
+      memory_map_romcs[1].page_num = 0;
+      memory_map_romcs[1].page = memory_map_romcs[0].page + MEMORY_PAGE_SIZE;
+    }
+
+    machine_current->memory_map();
+  }
+  
   return 0;
 }
 
@@ -435,6 +464,25 @@ snapshot_copy_to( libspectrum_snap *snap )
 
     }
   }
-    
+
+  if( if2_active ) {
+
+    libspectrum_snap_set_interface2_active( snap, 1 );
+
+    buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+    if( !buffer ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                __LINE__ );
+      return 1;
+    }
+
+    memcpy( buffer, memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
+    memcpy( buffer + MEMORY_PAGE_SIZE,
+            memory_map_romcs[1].page,
+            MEMORY_PAGE_SIZE );
+    libspectrum_snap_set_interface2_rom( snap, 0, buffer );
+
+  }
+
   return 0;
 }

@@ -39,6 +39,9 @@
 #include "settings.h"
 #include "ui/ui.h"
 
+/* IF2 cart inserted? */
+int if2_active = 0;
+
 int
 if2_insert( const char *filename )
 {
@@ -83,6 +86,7 @@ if2_reset( void )
   int error;
 
   if( !settings_current.if2_file ) {
+    if2_active = 0;
     ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 0 );
     return 0;
   }
@@ -90,6 +94,8 @@ if2_reset( void )
   if ( !periph_interface2_active ) {
     return 0;
   }
+
+  if2_active = 1;
 
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
 				 settings_current.if2_file,

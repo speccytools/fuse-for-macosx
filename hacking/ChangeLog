@@ -842,5 +842,5 @@
 	 let ZXCF work there.
 20040521 machines/{machines.h,tc2048.c,tc2068.c}: get the dock/exrom
 	 working properly again.
-
-	
+20040521 if2.[ch],snapshot.c: Add support for saving interface 2 cart in
+         snapshots.
