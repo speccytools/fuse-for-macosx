@@ -121,19 +121,9 @@ zxcf_reset( void )
 int
 zxcf_insert( const char *filename )
 {
-  int error;
-
-  error = settings_set_string( &settings_current.zxcf_pri_file, filename );
-  if( error ) return error;
-
-  error = libspectrum_ide_insert( zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
-				  filename );
-  if( error ) return error;
-
-  error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 1 );
-  if( error ) return error;
-
-  return 0;
+  return ide_insert( filename, zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
+		     &settings_current.zxcf_pri_file,
+		     UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT );
 }
 
 int

@@ -30,6 +30,10 @@
 #include "ui/ui.h"
 
 int
+ide_insert( const char *filename, libspectrum_ide_channel *chn,
+	    libspectrum_ide_unit unit, char **setting, ui_menu_item item );
+
+int
 ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
 	   int (*commit_fn)( libspectrum_ide_unit unit ), char **setting,
 	   ui_menu_item item );

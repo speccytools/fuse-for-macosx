@@ -96,34 +96,25 @@ simpleide_reset( void )
 int
 simpleide_insert( const char *filename, libspectrum_ide_unit unit )
 {
+  char **setting;
   ui_menu_item item;
-  int error;
 
   switch( unit ) {
 
   case LIBSPECTRUM_IDE_MASTER:
-    error = settings_set_string( &settings_current.simpleide_master_file,
-				 filename );
+    setting = &settings_current.simpleide_master_file;
     item = UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT;
     break;
     
   case LIBSPECTRUM_IDE_SLAVE:
-    error = settings_set_string( &settings_current.simpleide_slave_file,
-				 filename );
+    setting = &settings_current.simpleide_slave_file;
     item = UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT;
     break;
     
     default: return 1;
   }
-  
-  if( error ) return error;
 
-  error = libspectrum_ide_insert( simpleide_idechn, unit, filename );
-  if( error ) return error;
-
-  error = ui_menu_activate( item, 1 ); if( error ) return error;
-
-  return 0;
+  return ide_insert( filename, simpleide_idechn, unit, setting, item );
 }
 
 int

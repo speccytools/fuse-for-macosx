@@ -1215,3 +1215,4 @@
 20050217 profile.[ch],spectrum.c: make the profiler actually profile.
 20050218 Makefile.am,ide.[ch],simpleide.c,zxatasp.c,zxcf.c: add "Save,
 	 Don't Save, Cancel" functionality on IDE disk eject.
+20050228 ide.[ch],simpleide.c,zxatasp.c,zxcf.c: add ide_insert function.

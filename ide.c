@@ -31,6 +31,22 @@
 #include "ui/ui.h"
 
 int
+ide_insert( const char *filename, libspectrum_ide_channel *chn,
+	    libspectrum_ide_unit unit, char **setting, ui_menu_item item )
+{
+  int error;
+
+  error = settings_set_string( setting, filename ); if( error ) return error;
+
+  error = libspectrum_ide_insert( chn, unit, filename );
+  if( error ) return error;
+
+  error = ui_menu_activate( item, 1 ); if( error ) return error;
+
+  return 0;
+}
+
+int
 ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
 	   int (*commit_fn)( libspectrum_ide_unit unit ), char **setting,
 	   ui_menu_item item )
