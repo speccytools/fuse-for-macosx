@@ -36,7 +36,6 @@
 #include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
-#include "keysyms.h"
 #include "machine.h"
 #include "settings.h"
 #include "snapshot.h"

@@ -36,7 +36,6 @@
 #include "gtkkeyboard.h"
 #include "gtkui.h"
 #include "keyboard.h"
-#include "keysyms.h"
 #include "widget/widget.h"
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);
@@ -45,7 +44,7 @@ int
 gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 		      gpointer data GCC_UNUSED )
 {
-  guint keysym; keysyms_key_info *ptr;
+  guint keysym; const keysyms_key_info *ptr;
 
   keysym=gtkkeyboard_unshift_keysym(event->key.keyval);
 
@@ -78,7 +77,7 @@ int
 gtkkeyboard_keyrelease( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 		        gpointer data GCC_UNUSED )
 {
-  guint keysym; keysyms_key_info *ptr;
+  guint keysym; const keysyms_key_info *ptr;
 
   keysym=gtkkeyboard_unshift_keysym(event->key.keyval);
 

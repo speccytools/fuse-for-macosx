@@ -26,6 +26,11 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuiaalib.a
 
-libuiaalib_a_SOURCES = aalibdisplay.c aalibkeyboard.c aalibui.c error.c
+libuiaalib_a_SOURCES = aalibdisplay.c aalibkeyboard.c aalibui.c error.c keysyms.c
+
+BUILT_SOURCES = keysyms.c
+
+keysyms.c: ../../keysyms.pl ../../keysyms.dat
+	@PERL@ ../../keysyms.pl aa ../../keysyms.dat > $@
 
 noinst_HEADERS = aalibkeyboard.h aalibui.h

@@ -26,7 +26,12 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuixlib.a
 
-libuixlib_a_SOURCES = xdisplay.c xerror.c xkeyboard.c xui.c
+libuixlib_a_SOURCES = xdisplay.c xerror.c xkeyboard.c xui.c keysyms.c
+
+BUILT_SOURCES = keysyms.c
+
+keysyms.c: ../../keysyms.pl ../../keysyms.dat
+	@PERL@ ../../keysyms.pl x ../../keysyms.dat > $@
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@
 

@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include "ui/ui.h"
 #include "keyboard.h"
 #include "types.h"
 #include "scld.h"
@@ -155,6 +156,20 @@ int keyboard_release_all( void )
   int i;
 
   for( i=0; i<8; i++ ) keyboard_return_values[i] = 0xff;
+
+  return 0;
+}
+
+const keysyms_key_info*
+keysyms_get_data( unsigned keysym )
+{
+  const keysyms_key_info *ptr;
+
+  for( ptr=keysyms_data; ptr->keysym; ptr++ ) {
+    if( keysym == ptr->keysym ) {
+      return ptr;
+    }
+  }
 
   return 0;
 }

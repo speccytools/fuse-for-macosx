@@ -10,7 +10,6 @@
 /configure
 /fuse
 /install-sh
-/keysyms.c
 /libtool
 /missing
 /mkinstalldirs

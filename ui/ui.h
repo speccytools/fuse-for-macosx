@@ -31,6 +31,10 @@
 
 #include <libspectrum.h>
 
+#ifndef FUSE_KEYBOARD_H
+#include "keyboard.h"
+#endif			        /* #ifndef FUSE_KEYBOARD_H */
+
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {
 
@@ -38,6 +42,8 @@ typedef enum ui_error_level {
   UI_ERROR_ERROR,		/* An actual error */
 
 } ui_error_level;
+
+extern const keysyms_key_info keysyms_data[];
 
 int ui_init(int *argc, char ***argv, int width, int height);
 int ui_event(void);

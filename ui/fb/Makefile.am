@@ -28,6 +28,11 @@ noinst_LIBRARIES = libuifb.a
 
 INCLUDES = @GLIB_CFLAGS@
 
-libuifb_a_SOURCES = fbdisplay.c fbkeyboard.c fbui.c error.c
+libuifb_a_SOURCES = fbdisplay.c fbkeyboard.c fbui.c error.c keysyms.c
+
+BUILT_SOURCES = keysyms.c
+
+keysyms.c: ../../keysyms.pl ../../keysyms.dat
+	@PERL@ ../../keysyms.pl fb ../../keysyms.dat > $@
 
 noinst_HEADERS = fbkeyboard.h

@@ -28,9 +28,12 @@ noinst_LIBRARIES = libuigtk.a
 
 INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
-libuigtk_a_SOURCES = error.c gtkdisplay.c gtkkeyboard.c gtkui.c options.c
+libuigtk_a_SOURCES = error.c gtkdisplay.c gtkkeyboard.c gtkui.c options.c keysyms.c
 
-BUILT_SOURCES = options.c options.h
+BUILT_SOURCES = keysyms.c options.c options.h
+
+keysyms.c: ../../keysyms.pl ../../keysyms.dat
+	@PERL@ ../../keysyms.pl gtk ../../keysyms.dat > $@
 
 options.c: options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
 	@PERL@ options.pl ../options.dat > options.c

@@ -26,6 +26,11 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuisvga.a
 
-libuisvga_a_SOURCES = error.c svgadisplay.c svgakeyboard.c svgaui.c
+libuisvga_a_SOURCES = error.c svgadisplay.c svgakeyboard.c svgaui.c keysyms.c
+
+BUILT_SOURCES = keysyms.c
+
+keysyms.c: ../../keysyms.pl ../../keysyms.dat
+	@PERL@ ../../keysyms.pl svga ../../keysyms.dat > $@
 
 noinst_HEADERS = svgakeyboard.h
