@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2005 Philip Kendall
 
    $Id$
 
@@ -233,6 +233,7 @@ static int fuse_init(int argc, char **argv)
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
+  if( if1_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 

@@ -52,6 +52,7 @@ confirm_actions, boolean, 1
 printer, boolean, 0
 statusbar, boolean, 1
 interface1, boolean, 0
+mdr_len, numeric, 180
 interface2, boolean, 1
 snaps_as_z80, boolean, 0
 

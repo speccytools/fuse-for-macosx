@@ -1153,3 +1153,6 @@
 20041229 display.c: get Timex borders working properly again.
 20041230 configure.in: improved libao checking (Gergely Szasz).
 20041231 ui/gtk/{gtkkeyboard.c,stock.c}: add appropriate header files.
+20050102 fuse.c, if1.[ch], settings.dat, utils.c, ui/options.dat: variable
+	 length microdrive cartridge handling (rest of patch #1085429)
+	 (Gergely Szasz).

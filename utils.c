@@ -1,5 +1,5 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2005 Philip Kendall
 
    $Id$
 
@@ -51,6 +51,7 @@
 
 #include "dck.h"
 #include "fuse.h"
+#include "if1.h"
 #include "if2.h"
 #include "machines/specplus3.h"
 #include "memory.h"
@@ -149,6 +150,10 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:
     error = if2_insert( filename );
+    break;
+
+  case LIBSPECTRUM_CLASS_MICRODRIVE:
+    if1_mdr_insert( filename, 0 );
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:

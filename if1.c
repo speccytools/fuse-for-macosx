@@ -1,5 +1,5 @@
 /* if2.c: Interface I handling routines
-   Copyright (c) 2004 Gergely Szasz
+   Copyright (c) 2004-2005 Gergely Szasz, Philip Kendall
 
    $Id$
 
@@ -29,12 +29,14 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "if1.h"
 #include "machine.h"
 #include "memory.h"
 #include "periph.h"
 #include "settings.h"
+#include "utils.h"
 #include "ui/ui.h"
 
 #define RS232_RAW 0
@@ -43,26 +45,26 @@
 #define S_NET_RAW 0
 #define S_NET_INT 1
 
-#define LINE_SINCLAIR 0
-#define LINE_RS232 1
-
-/* #define IF1_DEBUG 1 */
-
-#define CARTRIDGE_LEN 137922
+#define MDR_OK 0
+#define MDR_BAD 1
+#define MDR_OUT 2
 
 typedef struct microdrive_t {
   char *filename;
+  utils_file file;
   int inserted;
   int motor_on;
-  int wp;
   long int head_pos;
   int transfered;
   int modified;
   long int max_bytes;
+  libspectrum_byte bad[128];	/* bad sectors */
   libspectrum_byte last;
   libspectrum_byte gap;
-  libspectrum_byte nogap;
-  libspectrum_byte cartridge[CARTRIDGE_LEN + 1];
+  libspectrum_byte sync;
+
+  libspectrum_microdrive *cartridge;	/* write protect, len, blocks */
+
 } microdrive_t;
 
 typedef struct if1_ula_t {
@@ -76,17 +78,22 @@ typedef struct if1_ula_t {
   int comms_clk;	/* the previouse data comms state */
   int cts;	/* CTS */
   int dtr;	/* DTR */
-  int tx;	/* TxD */
-  int rx;	/* RxD */
+  int tx;	/* TxD the name is very kind, because this is the read end of
+                   the TxD wire of DATA machine (really RxD the view of
+		   spectrum */
+  int rx;	/* RxD the name is very kind, because this is the write end of
+                   the RxD wire of DATA machine (really TxD the view of
+		   spectrum */
   int data_in;	/* interpreted incoming data */
   int count_in;
   int data_out; /* interpreted outgoing data */
   int count_out;
   
-  int net_o;	/* Network out */
-  int net_i;	/* Network in */
+  int net;	/* Network in/out (really 1 wire bus :-) */
+  int net_data;	/* Interpreted network data */
+  int net_state;	/* Interpreted network data */
   int wait;	/* Wait state */
-  int busy;	/* Indicate busy */
+  int busy;	/* Indicate busy; if1 software never poll it ... */
 } if1_ula_t;
 
 /* IF1 paged out ROM activated? */
@@ -94,15 +101,18 @@ int if1_active = 0;
 int if1_available = 0;
 static int if1_mdr_status = 0;
 
+unsigned int mdr_seed;
+int rnd_factor = ( ( RAND_MAX >> 2 ) << 2 ) / 19 + 1;
+
 static microdrive_t microdrive[8] = {
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 }
+  { .filename = NULL, .inserted = 0, .modified = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0 }
 };		/* We have 8 microdrive */
 
 static if1_ula_t if1_ula = {
@@ -114,6 +124,7 @@ static if1_ula_t if1_ula = {
   .comms_data = 0, /* realy? */
   .fd_net = -1,
   .s_net_mode = S_NET_INT,
+  .net = 0,
 };
 
 static void microdrives_reset( void );
@@ -121,7 +132,7 @@ static void microdrives_restart( void );
 static void increment_head( int m );
 
 #define IN(m) microdrive[m - 1].inserted
-#define WP(m) microdrive[m - 1].wp
+#define WP(m) libspectrum_microdrive_write_protect( microdrive[m - 1].cartridge )
 
 enum if1_menu_item {
 
@@ -135,7 +146,6 @@ enum if1_menu_item {
   UMENU_MDRV7,
   UMENU_MDRV8,
   UMENU_RS232,
-
 };
 
 enum if1_port {
@@ -198,6 +208,20 @@ update_menu( enum if1_menu_item what )
   }
 }
 
+int
+if1_init( void )
+{
+  size_t i;
+
+  for( i = 0; i < 8; i++ ) {
+    libspectrum_error error =
+      libspectrum_microdrive_alloc( &( microdrive[i].cartridge ) );
+    if( error ) return error;
+  }
+
+  return 0;
+}
+
 void
 if1_update_menu( void )
 {
@@ -228,6 +252,7 @@ if1_reset( void )
   update_menu( UMENU_ALL );
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_INACTIVE );
+
   if1_mdr_status = 0;
   
   if1_available = 1;
@@ -262,16 +287,10 @@ microdrives_reset( void )
   int m;
 
   for( m = 0; m < 8; m++ ) {
-    
     microdrive[m].head_pos = 0;
     microdrive[m].motor_on = 0; /* motor off */
     microdrive[m].gap      = 15;
-    microdrive[m].nogap    = 15;
-/*
-    microdrive[m].wp       = 0;  no write protected 
-    microdrive[m].modified = 0;  not modified 
-    microdrive[m].filename = NULL;
-    microdrive[m].inserted = 0;  no cartridge  */
+    microdrive[m].sync     = 15;
   }
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_INACTIVE );
@@ -286,8 +305,8 @@ microdrives_reset( void )
 /*  if1_ula.dtr = 0; */
   if1_ula.wait = 0;
   if1_ula.busy = 0;
-  if1_ula.net_o = 0;
-  if1_ula.net_i = 0;
+  if1_ula.net  = 0;
+  if1_ula.net_state  = 0;
 
 }
 
@@ -315,7 +334,8 @@ port_mdr_in( void )
     if( drive->motor_on && drive->inserted ) {
 
       if( drive->transfered < drive->max_bytes ) {
-	drive->last = drive->cartridge[ drive->head_pos ];
+	drive->last = libspectrum_microdrive_data( drive->cartridge,
+						   drive->head_pos );
 	increment_head( i );
       }
 
@@ -344,14 +364,15 @@ port_ctr_in( void )
 	drive->gap--;
       } else {
 	ret &= 0xf9; /* GAP and SYNC low */
-	if( drive->nogap ) {
-	  drive->nogap--;
+	if( drive->sync ) {
+	  drive->sync--;
 	} else {
 	  drive->gap = 15;
-	  drive->nogap = 15;
+	  drive->sync = 15;
 	}
       }
-      if( drive->wp ) /* if write protected */
+      /* if write protected */
+      if( libspectrum_microdrive_write_protect( drive->cartridge) )
 	ret &= 0xfe; /* active bit */
     }
   }
@@ -377,19 +398,19 @@ port_net_in( void )
 {
   libspectrum_byte ret = 0xff;
 
-  /*  fprintf( stderr, "Read PORT NET .. " );*/
+/* */
   if( if1_ula.rs232_mode == RS232_RAW ) {		/* if we do raw */
     /* Here is the input routine */
-    read( if1_ula.fd_r, &if1_ula.tx, 1 );	/* Ok, if no byte, we send last*/
-  } else if( if1_ula.rs232_mode == RS232_INT ) {	/* if we do interpreted */
+    read( if1_ula.fd_r, &if1_ula.tx, 1 );	  /* Ok, if no byte, we send last*/
+  } else if( if1_ula.rs232_mode == RS232_INT ) {  /* if we do interpreted */
     /* Here is the input routine */
-    if( if1_ula.cts ) {	/* If CTS == 1 */
+    if( if1_ula.cts ) {				  /* If CTS == 1 */
       if( if1_ula.count_in == 0 ) {
 	if( if1_ula.fd_r >= 0 && read( if1_ula.fd_r, &if1_ula.data_in, 1 ) == 1 ) {
 	  if1_ula.count_in++;	/* Ok, if read a byte, we begin */
-	  /*	    fprintf( stderr, "Receive: %d\n", if1_ula.data_in ); */
 	}
-	if1_ula.tx = 0;				/* send __ later we raise :-) */
+	if1_ula.tx = 0;				/* now send __ to if1
+	                                           later we raise :-) */
       } else if( if1_ula.count_in >= 1 && if1_ula.count_in < 5 ) {
 	if1_ula.tx = 1;				/* send ~~ (start bit :-) */
 	if1_ula.count_in++;
@@ -407,16 +428,54 @@ port_net_in( void )
   }
   if( if1_ula.s_net_mode == S_NET_RAW ) {		/* if we do raw */
     /* Here is the input routine */
-    read( if1_ula.fd_net, &if1_ula.net_i, 1 );	/* Ok, if no byte, we send last*/
+    read( if1_ula.fd_net, &if1_ula.net, 1 );	/* Ok, if no byte, we send last*/
+  } else {/* if( if1_ula.s_net_mode == S_NET_INT ) if we do interpreted */
+/* Here is the input routine. There are several stage in input
+   and output. So first for output. if1 first do SEND-SC 
+   (http://www.wearmouth.demon.co.uk/if1_2.htm#L101E) to send
+   a Sync-Out signal and SEND-SC do first a NET-STATE
+   (http://www.wearmouth.demon.co.uk/if1_2.htm#L0FBC) to see
+   the line activity:
+     11xxxxxx times (192-255) have to get a zero (bit for network)
+     plus 1 times more from SEND-SC. Next SEND-SC send a 0 wich is
+     a 1 on the net wire (negated output, straight input!!!)
+
+   OK. In input first if1 call WT-SC-E to check Network activity
+   (http://www.wearmouth.demon.co.uk/if1_2.htm#L0FD3). Now check
+   128 times the net wire (we do two round, because to differentiate
+   net out routines...)
+*/
+  
+    if( if1_ula.net_state < 0x0100 ) {	/* if1 may in NET-STATE */
+      if1_ula.net_state++;
+      if1_ula.net = 0;
 #ifdef IF1_DEBUGX
-    fprintf( stderr, "Received: %d\n", if1_ula.net_o );
+      fprintf( stderr, "NET-STAT(%03d)? We send 0!\n", if1_ula.net_state );
 #endif
-  } else if( if1_ula.s_net_mode == S_NET_INT ) {	/* if we do interpreted */
-    /* Here is the input routine */
+    } else if( if1_ula.net_state == 0x0100 ) { /* probably waiting for input */
+      if( read( if1_ula.fd_net, &if1_ula.net_data, 1 ) == 1 ) {
+        if1_ula.net_state++;
+	if1_ula.net = 1;	/* Start with __/~~ */
+      } 	/* Ok, if have a byte, we send it! */
+    } else if( if1_ula.net_state == 0x0101 ) {
+        if1_ula.net_state++;
+	if1_ula.net = 1;	/* one more ~~ */
+    } else if( if1_ula.net_state > 0x0101 &&
+               if1_ula.net_state < 0x010a ) { /* we send the data bits...  */
+        if1_ula.net_state++;
+	if1_ula.net = if1_ula.net_data & 1;
+	if1_ula.net_data >>= 1;
+    } else if( if1_ula.net_state == 0x010a ) {
+      if1_ula.net = 0;
+      if1_ula.net_state = 0;	/* OK, we starting a new byte... */
+#ifdef IF1_DEBUG
+      fprintf( stderr, "NET-STAT(%03d)? Get a byte!\n", if1_ula.net_state );
+#endif
+    }
   }
   if( !if1_ula.tx )
     ret &= 0x7f;
-  if( !if1_ula.net_i )
+  if( !if1_ula.net )
     ret &= 0xfe;
   microdrives_restart();
 
@@ -458,7 +517,8 @@ port_mdr_out( libspectrum_byte val )
       if( drive->transfered > 11 &&
 	  drive->transfered < drive->max_bytes + 12 ) {
 
-	drive->cartridge[ drive->head_pos ] = val;			
+	libspectrum_microdrive_set_data( drive->cartridge, drive->head_pos,
+					 val );
 	increment_head( i );
 	drive->modified = 1;
 
@@ -528,10 +588,7 @@ port_ctr_out( libspectrum_byte val )
       if1_ula.data_out = 0;
       if1_ula.count_in = 0;
       if1_ula.data_in = 0;
-      /*        if1_ula.status = LINE_RS232; */
     }
-    /*    } else {	 ( val & 0x01 )  comms_data == 0 
-	  if1_ula.status = LINE_SINCLAIR; */
   }
   if1_ula.cts = ( val & 0x10 ) ? 1 : 0;
   if1_ula.wait = ( val & 0x20 ) ? 1 : 0;
@@ -577,17 +634,45 @@ port_net_out( libspectrum_byte val )
       write( if1_ula.fd_t, &if1_ula.rx, 1 );
     }
   } else {	/* if( if1_ula.comms_data == 1 ) SinclairNET :-)*/
-    if( if1_ula.s_net_mode == S_NET_INT ) {	/* if we out byte by byte, do it */
+    if( if1_ula.s_net_mode == S_NET_RAW ) {	/* if we out bit by bit, do it */
+        /* Here is the output routine */
 
-      if1_ula.net_o = val & 0x01;		/* set rx */
-    } else { /* if( if1_ula.s_net_mode == S_NET_RAW )  if we out bit by bit, do it */
-      /* Here is the output routine */
-      if1_ula.net_o = val & 0x01;		/* set rx */
-      write( if1_ula.fd_net, &if1_ula.net_o, 1 );
-      lseek( if1_ula.fd_net, 1, SEEK_CUR );	/* This is MY bit :-) */
-#ifdef IF1_DEBUG
-      fprintf( stderr, "Send SinclairNET: %d\n", if1_ula.net_o );
+/* OK, examining the schematics of if1 and the dissasembly of if1 ROM, I
+   see that the Q1 and Q2 transistors negate the RX DATA signal, and the
+   floating state of the net wire is the ~0V level, the forced is the ~3V.
+   The if1 software send complemented data and read straight data.
+*/
+      if1_ula.net = ( val & 0x01 ) ? 0 : 1;		/* set rx */
+      lseek( if1_ula.fd_net, 0, SEEK_SET );		/* we save only the state of the wire*/
+      do ; while( write( if1_ula.fd_net, &if1_ula.net, 1 ) == -1 );
+      fdatasync( if1_ula.fd_net );
+#ifdef IF1_DEBUGX
+      fprintf( stderr, "Send SinclairNET: %d\n", if1_ula.net );
 #endif
+    } else { /* if( if1_ula.s_net_mode == S_NET_RAW )  if we out byte by byte, do it */
+      if( if1_ula.net_state >= 0x0200 && if1_ula.net_state < 0x0208 ) {
+	if1_ula.net_state++;
+	if1_ula.net_data <<= 1;
+	if1_ula.net_data |= ( val & 0x01 ) ? 0 : 1;
+      } else if( if1_ula.net_state == 0x0208 ) {
+	if1_ula.net_data &= 0xff;
+	if1_ula.net_state++;		/* OK, now we get data bytes... */
+        
+/*	lseek( if1_ula.fd_net, 0, SEEK_SET );  start a packet */
+		/* first we send the station number */
+        do ; while( write( if1_ula.fd_net, &if1_ula.net_data, 1 ) == -1 );
+        fdatasync( if1_ula.fd_net );
+#ifdef IF1_DEBUG
+	fprintf( stderr, "SC-OUT send network number: %d\n",
+	                                   if1_ula.net_data ^ 0xff );
+#endif
+      } else if( if1_ula.net_state > 192 && if1_ula.net_state < 0x0200 && 
+        ( ( val & 0x01 ) == 0 ) ) {
+	/* NET-STATE ask as many times.... and now send a 0 */
+/*	  if1_ula.net = 1; */
+	if1_ula.net_state = 0x0200;	/* Send the station number */
+      }
+      if1_ula.net = ( val & 0x01 ) ? 0 : 1;		/* set rx */
     }
   }
   microdrives_restart();
@@ -598,7 +683,7 @@ if1_port_out( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
   if( !if1_active ) return;
 
-#ifdef IF1_DEBUG
+#ifdef IF1_DEBUGX
   fprintf( stderr, "In if1_port_out( %%%d%d%d%d%d%d%d%d => 0x%04x ).\n", 
 	!!(val & 128), !!(val & 64), !!(val & 32), !!(val & 16),
 	!!(val & 8), !!(val & 4), !!(val & 2), !!(val & 1), port);
@@ -616,7 +701,10 @@ static void
 increment_head( int m )
 {
   microdrive[m].head_pos++;
-  if( microdrive[m].head_pos >= CARTRIDGE_LEN ) microdrive[m].head_pos = 0;
+  if( microdrive[m].head_pos >=
+      libspectrum_microdrive_cartridge_len( microdrive[m].cartridge ) *
+      LIBSPECTRUM_MICRODRIVE_BLOCK_LEN )
+    microdrive[m].head_pos = 0;
 }
 
 static void
@@ -642,7 +730,8 @@ microdrives_restart( void )
 void
 if1_mdr_writep( int w, int drive )
 {
-  microdrive[drive].wp = w ? 1 : 0;
+  libspectrum_microdrive_set_write_protect( microdrive[drive].cartridge,
+					    w ? 1 : 0 );
   microdrive[drive].modified = 1;
 
   update_menu( UMENU_MDRV1 + drive );
@@ -651,68 +740,67 @@ if1_mdr_writep( int w, int drive )
 void
 if1_mdr_new( int drive )
 {
-  if( microdrive[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
+  libspectrum_byte len;
+  size_t i;
+
+  microdrive_t *mdr = &microdrive[drive];
+
+  if( mdr->inserted && if1_mdr_eject( NULL, drive ) ) {
     ui_error( UI_ERROR_ERROR,
 	      "New cartridge in drive, please eject manually" );
     return;
   }
+  
+  mdr_seed = time( 0 );
 
+  if( settings_current.mdr_len == 0 ) {	/* Random length */
+    len = 171 + ( ( rand_r( &mdr_seed ) >> 2 ) + ( rand_r( &mdr_seed ) >> 2 ) +
+                  ( rand_r( &mdr_seed ) >> 2 ) + ( rand_r( &mdr_seed ) >> 2 ) )
+		  / rnd_factor;
+  } else
+    len = settings_current.mdr_len = settings_current.mdr_len < 10 ? 10 : 
+	    settings_current.mdr_len > 254 ? 254 : settings_current.mdr_len;
+  
   /* Erase the entire cartridge */
-  memset( microdrive[drive].cartridge, 0xff, CARTRIDGE_LEN );
-  microdrive[drive].wp = 0; /* but don't write-protect */
+  libspectrum_microdrive_set_cartridge_len( mdr->cartridge, len );
 
-  microdrive[drive].filename = NULL;
-  microdrive[drive].inserted = 1;
-  microdrive[drive].modified = 1;
+  for( i = 0; i < len * LIBSPECTRUM_MICRODRIVE_BLOCK_LEN; i++ )
+    libspectrum_microdrive_set_data( mdr->cartridge, i, 0xff );
+
+  /* but don't write-protect */
+  libspectrum_microdrive_set_write_protect( mdr->cartridge, 0 );
+
+  mdr->filename = NULL;
+  mdr->inserted = 1;
+  mdr->modified = 1;
 
   update_menu( UMENU_MDRV1 + drive );
 }
 
 void
-if1_mdr_insert( char *filename, int drive )
+if1_mdr_insert( const char *filename, int drive )
 {
-  FILE *file;
-  char wp;
+  microdrive_t *mdr = &microdrive[drive];
 
-  if( microdrive[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
+  if( mdr->inserted && if1_mdr_eject( NULL, drive ) ) {
     ui_error( UI_ERROR_ERROR,
 	      "New cartridge in drive, please eject manually" );
     return;
   }
 
-  file = fopen( filename, "r" );
-  if( !file ) {
-    ui_error( UI_ERROR_ERROR, "Error opening '%s': %s", filename,
-	      strerror( errno ) );
+  if( utils_read_file( filename, &mdr->file ) ) return;
+
+  if( libspectrum_microdrive_mdr_read( mdr->cartridge, mdr->file.buffer,
+				       mdr->file.length                  ) )
     return;
-  }
 
-  /* FIXME: should check for short read count; however, we'll replace
-     this with libspectrum routines soon so probably not worth it */
-  if( !fread( microdrive[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
-    ui_error( UI_ERROR_ERROR, "Error reading data from '%s': %s", filename,
-	      strerror( errno ) );
-    return;
-  }
+  if( utils_close_file( &mdr->file ) ) return;
 
-  if( !fread( &wp, 1, 1, file) ) {
-    ui_error( UI_ERROR_ERROR, "Error reading write protection flag '%s': %s",
-	      filename, strerror( errno ) );
-    return;
-  }
+  mdr->inserted = 1;
 
-  if( fclose( file ) ) {
-    ui_error( UI_ERROR_ERROR, "Error closing '%s': %s", filename,
-	      strerror( errno ) );
-    return;
-  }
-
-  microdrive[drive].wp = wp ? 1 : 0;
-  microdrive[drive].inserted = 1;
-
-  microdrive[drive].filename = malloc( strlen( filename ) + 1 );
-  if( microdrive[drive].filename ) {
-    strcpy( microdrive[drive].filename, filename );
+  mdr->filename = malloc( strlen( filename ) + 1 );
+  if( mdr->filename ) {
+    strcpy( mdr->filename, filename );
   } else {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d\n", __FILE__, __LINE__ );
   }
@@ -721,52 +809,29 @@ if1_mdr_insert( char *filename, int drive )
 }
 
 int
-if1_mdr_sync( char *filename, int drive )
+if1_mdr_sync( const char *filename, int drive )
 {
-  FILE *file;
-  char wp;
+  microdrive_t *mdr = &microdrive[drive];  
   
-  if( microdrive[drive].modified ) {
+  if( mdr->modified ) {
 
-    if( !microdrive[drive].filename ) {	/* New cartridge */
+    if( !mdr->filename ) {	/* New cartridge */
       if( !filename ) return 1;		/* We need a filename :-) */
     } else {
-      filename = microdrive[drive].filename;
+      filename = mdr->filename;
     }
 
-    wp = microdrive[drive].wp ? 0xff : 0;
-    file = fopen( filename, "w" );
+    if( libspectrum_microdrive_mdr_write( mdr->cartridge, &mdr->file.buffer,
+					  &mdr->file.length ) )
+      return 0;
+    
+    if( utils_write_file( filename, mdr->file.buffer, mdr->file.length ) )
+      return 0;
 
-    if( !file ) {
-      ui_error( UI_ERROR_ERROR, "Error opening '%s': %s",
-		filename, strerror( errno ) );
-      return 1;
-    }
-
-  /* FIXME: should check for short write count; however, we'll replace
-     this with libspectrum routines soon so probably not worth it */
-    if( !fwrite( microdrive[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
-      ui_error( UI_ERROR_ERROR, "Error writing data to '%s': %s",
-		filename, strerror( errno ) );
-      return 1;
-    }
-
-    if( !fwrite( &wp, 1, 1, file) ) {
-      ui_error( UI_ERROR_ERROR, "Error writing write protection flag '%s': %s",
-		filename, strerror( errno ) );
-      return 1;
-    }
-
-    if( fclose( file ) ) {
-      ui_error( UI_ERROR_ERROR, "Error closing '%s': %s",
-		filename, strerror( errno ) );
-      return 1;
-    }
-
-    if( !microdrive[drive].filename ) {	/* New cartridge */
-      microdrive[drive].filename = malloc( strlen( filename ) + 1 );
-      if( microdrive[drive].filename )
-        strcpy( microdrive[drive].filename, filename );
+    if( !mdr->filename ) {	/* New cartridge */
+      mdr->filename = malloc( strlen( filename ) + 1 );
+      if( mdr->filename )
+        strcpy( mdr->filename, filename );
     }
   }
 
@@ -775,7 +840,7 @@ if1_mdr_sync( char *filename, int drive )
 
 
 int
-if1_mdr_eject( char *filename, int drive )
+if1_mdr_eject( const char *filename, int drive )
 {
   /* Report if we need a filename */
   if( if1_mdr_sync( filename, drive ) ) return 1;  
@@ -789,7 +854,7 @@ if1_mdr_eject( char *filename, int drive )
 }
 
 void
-if1_plug( char *filename, int what )
+if1_plug( const char *filename, int what )
 {
   int fd = -1;
 
