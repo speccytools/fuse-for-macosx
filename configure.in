@@ -52,11 +52,6 @@ AC_CHECK_SIZEOF(short, 2)
 AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_SIZEOF(long, 4)
 
-dnl Check that libspectrum is available
-AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS=-lspectrum,
-	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
-AC_SUBST(LIBSPEC_LIBS)
-
 dnl Check that zlib is available
 AC_CHECK_LIB(z,zlibVersion)
 
@@ -163,6 +158,14 @@ if test "$ui" != gtk; then
 	         AC_MSG_WARN(glib not found - using libspectrum's replacement))
   fi
 fi
+
+dnl Check that libspectrum is available
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CFLAGS $GTK_CFLAGS $GLIB_CFLAGS"
+AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS=-lspectrum,
+	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
+CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(LIBSPEC_LIBS)
 
 dnl Do we want +3 disk support?
 AC_MSG_CHECKING(whether +3 disk support requested)
