@@ -171,5 +171,5 @@ if test "$ac_cv_prog_CC" = gcc; then
 fi
 
 AC_OUTPUT(Makefile libspectrum/Makefile man/Makefile myglib/Makefile \
-roms/Makefile ui/Makefile ui/gtk/Makefile ui/xlib/Makefile utils/Makefile \
-widget/Makefile z80/Makefile)
+roms/Makefile ui/Makefile ui/gtk/Makefile ui/svga/Makefile ui/xlib/Makefile \
+utils/Makefile widget/Makefile z80/Makefile)

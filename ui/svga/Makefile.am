@@ -24,4 +24,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = gtk svga xlib
+noinst_LIBRARIES = libuisvga.a
+
+libuisvga_a_SOURCES = svgadisplay.c svgakeyboard.c svgaui.c
+
+noinst_HEADERS = svgakeyboard.h
