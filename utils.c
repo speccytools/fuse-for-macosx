@@ -28,7 +28,9 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#ifdef HAVE_LIBGEN_H
 #include <libgen.h>
+#endif				/* #ifdef HAVE_LIBGEN_H */
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -29,7 +29,9 @@
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <errno.h>
+#ifdef HAVE_LIBGEN_H
 #include <libgen.h>
+#endif			/* #ifdef HAVE_LIBGEN_H */
 #include <string.h>
 
 #include <gdk/gdkkeysyms.h>
