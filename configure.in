@@ -84,7 +84,7 @@ svgalib=no)
 AC_MSG_RESULT($svgalib)
 if test "$svgalib" = yes; then
   AC_CHECK_HEADER(vga.h,
-                  LIBS="$LIBS -lvga"; AC_DEFINE(UI_SVGA)
+                  LIBS="$LIBS -lvga"; AC_DEFINE(UI_SVGA) AC_DEFINE(USE_WIDGET)
                   ui=svga; UI_LIBS="ui/svga/libuisvga.a widget/libwidget.a",
                   AC_MSG_ERROR([svgalib not found]))
 fi
@@ -98,7 +98,7 @@ aalib=no)
 AC_MSG_RESULT($aalib)
 if test "$aalib" = yes; then
   AC_CHECK_HEADER(aalib.h,
-                  LIBS="$LIBS -laa"; AC_DEFINE(UI_AALIB)
+                  LIBS="$LIBS -laa"; AC_DEFINE(UI_AALIB) AC_DEFINE(USE_WIDGET)
 		  ui=aalib; UI_LIBS="ui/aalib/libuiaalib.a widget/libwidget.a",
                   AC_MSG_ERROR([aalib not found]))
 fi
@@ -112,7 +112,7 @@ if test -z "$ui"; then
   fb=no)
   AC_MSG_RESULT($fb)
   if test "$fb" = yes; then
-    AC_DEFINE(UI_FB) ui=fb; UI_LIBS="ui/fb/libuifb.a widget/libwidget.a"
+    AC_DEFINE(UI_FB) AC_DEFINE(USE_WIDGET) ui=fb; UI_LIBS="ui/fb/libuifb.a widget/libwidget.a"
   fi
 fi
 
@@ -127,7 +127,7 @@ if test -z "$ui"; then
   if test "$sdl" = yes; then
     SDL_VERSION=1.2.4
     AM_PATH_SDL($SDL_VERSION,
-		AC_DEFINE(UI_SDL) ui=sdl
+		AC_DEFINE(UI_SDL) AC_DEFINE(USE_WIDGET) ui=sdl
 	        UI_LIBS="ui/sdl/libuisdl.a widget/libwidget.a", 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
     CFLAGS="$CFLAGS $SDL_CFLAGS"
@@ -198,6 +198,7 @@ if test -z "$ui"; then
 
   AC_DEFINE(UI_X)
   ui=xlib
+  AC_DEFINE(USE_WIDGET)
   UI_LIBS="ui/xlib/libuixlib.a widget/libwidget.a"
 fi
 

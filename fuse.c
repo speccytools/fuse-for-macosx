@@ -53,9 +53,9 @@
 #include "ui/ui.h"
 #include "utils.h"
 
-#ifndef UI_GTK
+#ifdef USE_WIDGET
 #include "widget/widget.h"
-#endif				/* #ifndef UI_GTK */
+#endif                          /* #ifdef USE_WIDGET */
 
 #include "z80/z80.h"
 
@@ -133,9 +133,9 @@ static int fuse_init(int argc, char **argv)
 
   if( tape_init() ) return 1;
 
-#ifndef UI_GTK
+#ifdef USE_WIDGET
   if( widget_init() ) return 1;
-#endif					/* #ifndef UI_GTK */
+#endif				/* #ifdef USE_WIDGET */
 
   if(display_init(&argc,&argv)) return 1;
 
@@ -397,9 +397,9 @@ static int fuse_end(void)
   event_end();
   ui_end();
 
-#ifndef UI_GTK
+#ifdef USE_WIDGET
   widget_end();
-#endif				/* #ifndef UI_GTK */
+#endif                          /* #ifdef USE_WIDGET */
 
   return 0;
 }

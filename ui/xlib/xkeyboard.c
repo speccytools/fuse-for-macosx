@@ -1,5 +1,5 @@
 /* xkeyboard.c: X routines for dealing with the keyboard
-   Copyright (c) 2000-2002 Philip Kendall
+   Copyright (c) 2000-2003 Philip Kendall
 
    $Id$
 
@@ -41,7 +41,9 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#ifdef USE_WIDGET
 #include "widget/widget.h"
+#endif				/* #ifdef USE_WIDGET */
 #include "xkeyboard.h"
 
 void xkeyboard_keypress(XKeyEvent *event)

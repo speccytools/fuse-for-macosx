@@ -35,7 +35,9 @@
 #include "fuse.h"
 #include "display.h"
 #include "ui/uidisplay.h"
+#ifdef USE_WIDGET
 #include "widget/widget.h"
+#endif				/* #ifdef USE_WIDGET */
 #include "scld.h"
 #include "screenshot.h"
 #include "settings.h"

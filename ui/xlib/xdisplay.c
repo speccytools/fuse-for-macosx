@@ -58,7 +58,9 @@
 #include "xdisplay.h"
 #include "xui.h"
 #include "ui/uidisplay.h"
+#ifdef USE_WIDGET
 #include "widget/widget.h"
+#endif				/* #ifdef USE_WIDGET */
 #include "scld.h"
 
 static XImage *image = 0;	/* The image structure to draw the

@@ -58,3 +58,6 @@
 
 /* Defined if we're going to be using the installed libpng */
 #undef USE_LIBPNG
+
+/* Defined if we're using a widget-based UI */
+#undef USE_WIDGET

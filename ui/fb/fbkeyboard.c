@@ -45,7 +45,9 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#ifdef USE_WIDGET
 #include "widget/widget.h"
+#endif				/* #ifdef USE_WIDGET */
 
 static struct termios old_ts;
 static int got_old_ts = 0;

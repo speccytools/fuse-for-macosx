@@ -34,7 +34,9 @@
 
 #include "fuse.h"
 #include "ui/ui.h"
+#ifdef USE_WIDGET
 #include "widget/widget.h"
+#endif				/* #ifdef USE_WIDGET */
 
 #define MESSAGE_MAX_LENGTH 256
 

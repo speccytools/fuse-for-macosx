@@ -55,7 +55,6 @@
 #include "timer.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
-#include "widget/widget.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
