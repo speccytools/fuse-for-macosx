@@ -351,3 +351,4 @@
 20031112 memory.c, z80/Makefile.am, z80/coretest.c, z80/harness.pl,
 	 z80/z80.pl, z80/z80_macros.h, z80/tests/: Z80 core improvements
 	 to reduce the number of calls made to contend_memory().
+20031113 printer.c: readbyte() should be readbyte_internal().

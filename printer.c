@@ -285,7 +285,7 @@ chars+=256*readbyte_internal(SYSV_CHARS+1);
 memset(charset,0,sizeof(charset));
 ptr=charset+32*8;
 for(f=32*8;f<128*8;f++)
-  *ptr++=readbyte(chars+f);
+  *ptr++=readbyte_internal(chars+f);
 
 for(x=0;x<32;x++)
   {
