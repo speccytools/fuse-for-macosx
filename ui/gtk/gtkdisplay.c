@@ -62,8 +62,8 @@ static const gint rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
 static guchar scaled_image[4 * 2 * DISPLAY_SCREEN_HEIGHT *
-			       2 * DISPLAY_SCREEN_WIDTH    ];
-static const ptrdiff_t scaled_pitch = 4 * 2 * DISPLAY_SCREEN_WIDTH;
+			           DISPLAY_SCREEN_WIDTH    ];
+static const ptrdiff_t scaled_pitch = 4 * DISPLAY_SCREEN_WIDTH;
 
 /* The colour palette */
 static guchar rgb_colours[16][3] = {
