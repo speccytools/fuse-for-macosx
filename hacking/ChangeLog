@@ -998,3 +998,4 @@
 20040709 TAG: Release-0_7_0pre1
 20040710 ui/fb/fbui.c: #include <errno.h> and <string.h>
 20040715 ui/svga/svgajoystick.c: fix up for new input layer (Darren).
+20040715 ChangeLog,README,man/fuse.1: more 0.7.0 doc updates.

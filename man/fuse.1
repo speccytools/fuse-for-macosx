@@ -24,7 +24,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "19th February, 2004" "Version 0.6.2.1" "Emulators"
+.TH fuse 1 "16th July, 2004" "Version 0.7.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -130,7 +130,7 @@ as the General Option dialog's
 option.
 .RE
 .PP
-.I --competition-code
+.I "--competition-code code"
 .RS
 Specify the code to be written to competition mode RZX files. The same
 as the RZX Options dialog's
@@ -246,7 +246,7 @@ Emulate an issue 2 keyboard. Same as the General Options dialog's
 option.
 .RE
 .PP
-.I -j
+.I "-j device"
 .br
 .I "--joystick-1 device"
 .RS
@@ -1930,13 +1930,17 @@ menu option. A debugger window will appear, showing the current state
 of the emulated machine: the top-left `pane' shows the current state
 of the Z80 and the last bytes written to any emulated peripherals. The
 bottom-left pane lists any active breakpoints. Moving right, the next
-pane shows where the Spectrum's 64K memory map, and the next a
-disassembly, which by default starts at the current program counter,
-although this can be modified either by the `disassemble' command (see
-below) or by dragging the scrollbar next to it. The next pane shows
-the current stack, and the final pane any `events' which are due to
-occur and could affect emulation. Any of these panes can be removed by
-use of the
+pane shows where the Spectrum's 64K memory map (the
+.RI ` W? '
+and
+.RI ` C? '
+indicate whether each 8K chunk is writable or contended respectively),
+and the next a disassembly, which by default starts at the current
+program counter, although this can be modified either by the
+`disassemble' command (see below) or by dragging the scrollbar next to
+it. The next pane shows the current stack, and the final pane any
+`events' which are due to occur and could affect emulation. Any of
+these panes can be removed by use of the
 .I View
 menu. Below the displays are an entry box for debugger commands, and
 five buttons for controlling the debugger:
@@ -2207,9 +2211,20 @@ locations and, if there are less than 20 possible locations, a list of
 the possible locations (in `page:offset' format). The three buttons
 act as follows:
 .PP
+.I Incremented
+.RS
+Remove from the list of possible locations all addresses which have
+not been incremented since the last search.
+.RE
+.I Decremented
+.RS
+Remove from the list of possible locations all addresses which have
+not been decremented since the last search.
+.RE
+.PP
 .I Search
 .RS
-Remove from the list of possible locations any addresses which do not
+Remove from the list of possible locations all addresses which do not
 contain the value specified in the `Search for' field.
 .RE
 .PP
@@ -2301,8 +2316,6 @@ images.
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
-Not many peripherals are supported.
-.PP
 Selecting a startup filter doesn't work properly with user interfaces
 other than SDL.
 .PP
@@ -2317,6 +2330,15 @@ Changing virtual consoles when using SVGAlib for joystick support
 causes Fuse to exit. If this is a problem, compile Fuse with the
 .RI ` --disable-ui-joystick '
 option.
+.PP
+The poke finder can't search outside `normal' RAM.
+.PP
+Using the 
+.I "Options, Joysticks, Joystick 1..."
+or
+.I "Options, Joysticks, Joystick 2..."
+options under GTK+ 2.x produces a large number of GTK+ critical
+warnings. This is a GTK+ bug (#144427), which is fixed in GTK+ 2.4.4.
 .\"
 .\"------------------------------------------------------------------
 .\"
