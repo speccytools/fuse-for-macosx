@@ -28,6 +28,7 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
+#include "event.h"
 #include "memory.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -46,16 +47,18 @@ static size_t next_breakpoint_id;
 /* Which base should we display things in */
 int debugger_output_base;
 
+static void remove_time( gpointer data, gpointer user_data );
 static debugger_breakpoint* get_breakpoint_by_id( size_t id );
 static gint find_breakpoint_by_id( gconstpointer data,
 				   gconstpointer user_data );
 static gint find_breakpoint_by_address( gconstpointer data,
 					gconstpointer user_data );
 static void free_breakpoint( gpointer data, gpointer user_data );
+static void add_time_event( gpointer data, gpointer user_data );
 
 /* Textual represenations of the breakpoint types and lifetimes */
 const char *debugger_breakpoint_type_text[] = {
-  "Execute", "Read", "Write", "Port Read", "Port Write",
+  "Execute", "Read", "Write", "Port Read", "Port Write", "Time",
 };
 
 const char *debugger_breakpoint_life_text[] = {
@@ -89,7 +92,7 @@ debugger_end( void )
 
 /* Check whether the debugger should become active at this point */
 int
-debugger_check( debugger_breakpoint_type type, libspectrum_word value )
+debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 {
   GSList *ptr; debugger_breakpoint *bp;
 
@@ -104,15 +107,19 @@ debugger_check( debugger_breakpoint_type type, libspectrum_word value )
 
       if( bp->type != type ) continue;
 
-      if( bp->page == -1 ) {
-	/* If the breakpoint doesn't have a page specified, the value
-	   must match exactly */
-	if( bp->value != value ) continue;
+      if( type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
+	if( tstates < bp->value ) continue;
       } else {
-	/* If it has a page specified, the page and offset must both
-	   match */
-	if( bp->page != memory_map[ value >> 13 ].reverse ) continue;
-	if( bp->value != ( value & 0x3fff ) ) continue;
+	if( bp->page == -1 ) {
+	  /* If the breakpoint doesn't have a page specified, the value
+	     must match exactly */
+	  if( bp->value != value ) continue;
+	} else {
+	  /* If it has a page specified, the page and offset must both
+	     match */
+	  if( bp->page != memory_map[ value >> 13 ].reverse ) continue;
+	  if( bp->value != ( value & 0x3fff ) ) continue;
+	}
       }
 
       if( bp->ignore ) { bp->ignore--; continue; }
@@ -185,7 +192,7 @@ debugger_run( void )
 /* Add a breakpoint */
 int
 debugger_breakpoint_add( debugger_breakpoint_type type, int page,
-			 libspectrum_word value, size_t ignore,
+			 libspectrum_dword value, size_t ignore,
 			 debugger_breakpoint_life life,
 			 debugger_expression *condition )
 {
@@ -198,7 +205,14 @@ debugger_breakpoint_add( debugger_breakpoint_type type, int page,
   }
 
   bp->id = next_breakpoint_id++; bp->type = type;
-  bp->page = page; bp->value = value;
+  bp->page = page;
+
+  if( type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
+    bp->value = value;
+  } else {
+    bp->value = (libspectrum_word)value;
+  }
+
   bp->ignore = ignore; bp->life = life;
   bp->condition = condition;
 
@@ -207,8 +221,24 @@ debugger_breakpoint_add( debugger_breakpoint_type type, int page,
   if( debugger_mode == DEBUGGER_MODE_INACTIVE )
     debugger_mode = DEBUGGER_MODE_ACTIVE;
 
+  /* If this was a timed breakpoint, set an event to stop emulation
+     at that point */
+  if( type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
+    int error;
+
+    error = event_add( value, EVENT_TYPE_BREAKPOINT );
+    if( error ) return error;
+  }
+
   return 0;
 }
+
+struct remove_t {
+
+  libspectrum_dword tstates;
+  int done;
+
+};
 
 /* Remove breakpoint with the given ID */
 int
@@ -222,9 +252,37 @@ debugger_breakpoint_remove( size_t id )
   if( debugger_mode == DEBUGGER_MODE_ACTIVE && !debugger_breakpoints )
     debugger_mode = DEBUGGER_MODE_INACTIVE;
 
+  /* If this was a timed breakpoint, remove the event as well */
+  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
+
+    struct remove_t remove;
+
+    remove.tstates = bp->value;
+    remove.done = 0;
+
+    event_foreach( remove_time, &remove );
+  }
+
   free( bp );
 
   return 0;
+}
+
+static void
+remove_time( gpointer data, gpointer user_data )
+{
+  event_t *event;
+  struct remove_t *remove;
+
+  event = data; remove = user_data;
+
+  if( remove->done ) return;
+
+  if( event->type == EVENT_TYPE_BREAKPOINT &&
+      event->tstates == remove->tstates ) {
+    event->type = EVENT_TYPE_NULL;
+    remove->done = 1;
+  }
 }
 
 static debugger_breakpoint*
@@ -389,4 +447,22 @@ debugger_port_write( libspectrum_word port, libspectrum_byte value )
 {
   writeport( port, value );
   return 0;
+}
+
+/* Add events corresponding to all the time events to happen during
+   this frame */
+int
+debugger_add_time_events( void )
+{
+  g_slist_foreach( debugger_breakpoints, add_time_event, NULL );
+  return 0;
+}
+
+static void
+add_time_event( gpointer data, gpointer user_data GCC_UNUSED )
+{
+  debugger_breakpoint *bp = data;
+
+  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME )
+    event_add( bp->value, EVENT_TYPE_BREAKPOINT );
 }

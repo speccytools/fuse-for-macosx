@@ -31,6 +31,7 @@
 
 #include <libspectrum.h>
 
+#include "debugger/debugger.h"
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
@@ -133,6 +134,7 @@ int event_do_events(void)
       spectrum_frame();
       z80_interrupt();
       timer_estimate_speed();
+      debugger_add_time_events();
       ui_event();
       break;
 
@@ -154,6 +156,10 @@ int event_do_events(void)
       break;
 
     case EVENT_TYPE_TRDOS_INDEX: trdos_event_index( ptr->tstates ); break;
+
+    case EVENT_TYPE_BREAKPOINT:
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );
+      break;
 
     default:
       ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );
@@ -269,10 +275,11 @@ event_name( event_type type )
   case EVENT_TYPE_NULL: return "[Deleted event]";
   case EVENT_TYPE_TRDOS_CMD_DONE: return "End of TR-DOS command";
   case EVENT_TYPE_TRDOS_INDEX: return "TR-DOS index";
+  case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
 
-  default:
-    return "Unknown event";
   }
+
+  return "[Unknown event type]";
 }
 
 /* Tidy-up function called at end of emulation */

@@ -69,6 +69,7 @@ se|set { return SET; }
 s|st|ste|step { return STEP; }
 t|tb|tbr|tbre|tbrea|tbreak|tbreakp|tbreakpo|tbreakpoi|tbreakpoin|tbreakpoint {
 							       return TBREAK; }
+ti|tim|time { return TIME; }
 w|wr|wri|writ|write { return WRITE; }
 
 a|b|c|d|e|f|h|l { yylval.reg = debugger_register_hash( yytext );

@@ -48,7 +48,7 @@
   int token;
   int reg;
 
-  libspectrum_word integer;
+  libspectrum_dword integer;
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
   debugger_breakpoint_value bpvalue;
@@ -84,6 +84,7 @@
 %token		 READ
 %token		 SET
 %token		 STEP
+%token		 TIME
 %token		 WRITE
 
 %token <reg>	 REGISTER
@@ -137,6 +138,10 @@ command:   BASE number { debugger_output_base = $2; }
 	 | breakpointlife PORT portbreakpointtype number optionalcondition {
 	     debugger_breakpoint_add( $3, -1, $4, 0, $1, $5 );
            }
+	 | breakpointlife TIME number optionalcondition {
+	     debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_TIME, -1, $3,
+				      0, $1, $4 );
+	   }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONDITION NUMBER expressionornull {
 	     debugger_breakpoint_set_condition( $2, $3 );

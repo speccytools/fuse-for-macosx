@@ -42,6 +42,7 @@ typedef struct event_t {
 /* The various types of event which can occur */
 typedef enum event_type {
 
+  EVENT_TYPE_BREAKPOINT,
   EVENT_TYPE_EDGE,
   EVENT_TYPE_FRAME,
   EVENT_TYPE_INTERRUPT,

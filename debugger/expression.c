@@ -89,8 +89,8 @@ struct debugger_expression {
 
 };
 
-static libspectrum_word evaluate_unaryop( struct unaryop_type *unaryop );
-static libspectrum_word evaluate_binaryop( struct binaryop_type *binary );
+static libspectrum_dword evaluate_unaryop( struct unaryop_type *unaryop );
+static libspectrum_dword evaluate_binaryop( struct binaryop_type *binary );
 
 static int deparse_unaryop( char *buffer, size_t length,
 			    const struct unaryop_type *unaryop );
@@ -140,7 +140,7 @@ binaryop_precedence( int operation )
 }
 
 debugger_expression*
-debugger_expression_new_number( libspectrum_word number )
+debugger_expression_new_number( libspectrum_dword number )
 {
   debugger_expression *exp;
 
@@ -242,7 +242,7 @@ debugger_expression_delete( debugger_expression *exp )
   free( exp );
 }
 
-libspectrum_word
+libspectrum_dword
 debugger_expression_evaluate( debugger_expression *exp )
 {
   switch( exp->type ) {
@@ -267,7 +267,7 @@ debugger_expression_evaluate( debugger_expression *exp )
   return 0;			/* Keep gcc happy */
 }
 
-static libspectrum_word
+static libspectrum_dword
 evaluate_unaryop( struct unaryop_type *unary )
 {
   switch( unary->operation ) {
@@ -284,7 +284,7 @@ evaluate_unaryop( struct unaryop_type *unary )
   return 0;			/* Keep gcc happy */
 }
 
-static libspectrum_word
+static libspectrum_dword
 evaluate_binaryop( struct binaryop_type *binary )
 {
   switch( binary->operation ) {

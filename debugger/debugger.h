@@ -52,6 +52,7 @@ typedef enum debugger_breakpoint_type {
   DEBUGGER_BREAKPOINT_TYPE_WRITE,
   DEBUGGER_BREAKPOINT_TYPE_PORT_READ,
   DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE,
+  DEBUGGER_BREAKPOINT_TYPE_TIME,
 } debugger_breakpoint_type;
 
 extern const char *debugger_breakpoint_type_text[];
@@ -67,7 +68,7 @@ extern const char *debugger_breakpoint_life_text[];
 typedef struct debugger_breakpoint_value {
 
   int page;
-  libspectrum_word value;
+  libspectrum_dword value;
 
 } debugger_breakpoint_value;
 
@@ -79,7 +80,7 @@ typedef struct debugger_breakpoint {
   enum debugger_breakpoint_type type;
 
   int page;
-  libspectrum_word value;
+  libspectrum_dword value;
 
   size_t ignore;		/* Ignore this breakpoint this many times */
   enum debugger_breakpoint_life life;
@@ -98,7 +99,7 @@ int debugger_reset( void );
 
 int debugger_end( void );
 
-int debugger_check( debugger_breakpoint_type type, libspectrum_word value );
+int debugger_check( debugger_breakpoint_type type, libspectrum_dword value );
 
 int debugger_trap( void );	/* Activate the debugger */
 
@@ -109,7 +110,7 @@ int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
 /* Add a new breakpoint */
 int
 debugger_breakpoint_add( debugger_breakpoint_type type, int page,
-			 libspectrum_word value, size_t ignore,
+			 libspectrum_dword value, size_t ignore,
 			 debugger_breakpoint_life life,
 			 debugger_expression *condition );
 
@@ -124,5 +125,9 @@ int debugger_command_evaluate( const char *command );
 /* Get a deparsed expression */
 int debugger_expression_deparse( char *buffer, size_t length,
 				 const debugger_expression *exp );
+
+/* Add events corresponding to all the time events to happen during
+   this frame */
+int debugger_add_time_events( void );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */

@@ -331,7 +331,7 @@ int memory_contended[8] = { 1 };
 libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 
 int
-debugger_check( debugger_breakpoint_type type, libspectrum_word value )
+debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 {
   /* Should never be called */
   abort();

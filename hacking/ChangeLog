@@ -408,3 +408,5 @@
 	 fileselector code into its own file and tidy up a bit.
 20031229 ui/gtk/debugger.c: double-clicking on the stack display causes
 	 emulation to run to that address.
+20031229 event.[ch], debugger/, ui/gtk/debugger.c: new breakpoint type to
+	 trigger when tstates is greater than a certain value.

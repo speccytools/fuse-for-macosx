@@ -54,7 +54,8 @@ void yyerror( const char *s );
 
 /* Numeric expression stuff */
 
-debugger_expression* debugger_expression_new_number( libspectrum_word number );
+debugger_expression*
+debugger_expression_new_number( libspectrum_dword number );
 debugger_expression* debugger_expression_new_register( int which );
 debugger_expression*
 debugger_expression_new_unaryop( int operation, debugger_expression *operand );
@@ -64,7 +65,7 @@ debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 
 void debugger_expression_delete( debugger_expression* expression );
 
-libspectrum_word
+libspectrum_dword
 debugger_expression_evaluate( debugger_expression* expression );
 
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */
