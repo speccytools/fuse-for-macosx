@@ -22,6 +22,9 @@
 	  keep the Xlib/GTK+ and svgalib key tables in sync (Philip
 	  Kendall).
 
+	* Beginnings of `widgets': dialog boxes etc. for non-GTK+ user
+  	  interfaces (Matan Ziv-Av, Philip Kendall).
+
 2001-08-13  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.3.1 released.
