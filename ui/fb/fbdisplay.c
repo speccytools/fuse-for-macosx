@@ -65,11 +65,8 @@ static int hires;
 
 static int register_scalers( void );
 
-/* rrrrrggggggbbbbb */
-static const short colours[] = {
-  0x0000, 0x0018, 0xC000, 0xC018, 0x0600, 0x0618, 0xC600, 0xC618,
-  0x0000, 0x001F, 0xF800, 0xF81F, 0x07E0, 0x07FF, 0xFFE0, 0xFFFF
-};
+/* probably 0rrrrrgggggbbbbb */
+static short colours[16];
 
 static int fb_fd = -1;		/* The framebuffer's file descriptor */
 static libspectrum_word *gm = 0;
@@ -156,10 +153,23 @@ int fbdisplay_init(void)
   fputs( "\x1B[H\x1B[J", stdout );	/* clear tty */
   memset( gm, 0, display.xres_virtual * display.yres_virtual * 2 );
 
-  if( ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ) {
+  for( i = 0; i < 16; i++ ) {
+    int v = ( i & 8 ) ? 2 : 1;
+
+    colours[i] = 0;
+    if( i & 1 ) colours[i] |= v << display.blue.offset;
+    if( i & 2 ) colours[i] |= v << display.red.offset;
+    if( i & 4 ) colours[i] |= v << display.green.offset;
+  }
+
+  display.activate = FB_ACTIVATE_NOW;
+  if( ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ||
+      ioctl( fb_fd, FBIOPUTCMAP, &fb_cmap )            ) {
     fprintf( stderr, "%s: couldn't set framebuffer mode\n", fuse_progname );
     return 1;
   }
+  ioctl( fb_fd, FBIOGET_VSCREENINFO, &display );
+
   sleep( 1 ); /* give the monitor time to sync before we start emulating */
   fputs( "\x1B[?25l", stdout );		/* hide cursor */
   fflush( stdout );
@@ -186,18 +196,11 @@ fb_select_mode( size_t index )
   
   display.xoffset = display.yoffset = 0;
   display.bits_per_pixel = 16;
-  display.red.length = display.blue.length = 5;
-  display.green.length = 6;
-  
-#if 0				/* VIDC20 */
+  display.red.length = display.green.length = display.blue.length = 5;
+
   display.red.offset = 0;
   display.green.offset = 5;
   display.blue.offset = 10;
-#else				/* VIDC20 */
-  display.red.offset = 11;     
-  display.green.offset = 5;
-  display.blue.offset = 0;
-#endif				/* VIDC20 */
 
   gm = mmap( 0, fixed.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fb_fd, 0 );
   if( gm == (void*)-1 ) {
