@@ -116,10 +116,10 @@ debugger_register_hash( const char *name )
     case 0x0065: case 0x8065:	/* E, E' */
     case 0x0068: case 0x8068:	/* H, H' */
     case 0x006c: case 0x806c:	/* L, L' */
-    case 0x6166: case 0xd166:	/* AF, AF' */
-    case 0x6263: case 0xd263:	/* BC, BC' */
-    case 0x6465: case 0xd465:	/* DE, DE' */
-    case 0x686c: case 0xd86c:	/* HL, HL' */
+    case 0x6166: case 0xe166:	/* AF, AF' */
+    case 0x6263: case 0xe263:	/* BC, BC' */
+    case 0x6465: case 0xe465:	/* DE, DE' */
+    case 0x686c: case 0xe86c:	/* HL, HL' */
     case 0x7370:		/* SP */
     case 0x7063:		/* PC */
     case 0x6978:		/* IX */
@@ -165,13 +165,13 @@ debugger_register_get( int which )
     
     /* 16-bit registers */
   case 0x6166: return AF;
-  case 0xd166: return AF_;
+  case 0xe166: return AF_;
   case 0x6263: return BC;
-  case 0xd263: return BC_;
+  case 0xe263: return BC_;
   case 0x6465: return DE;
-  case 0xd465: return DE_;
+  case 0xe465: return DE_;
   case 0x686c: return HL;
-  case 0xd86c: return HL_;
+  case 0xe86c: return HL_;
 
   case 0x7370: return SP;
   case 0x7063: return PC;
@@ -210,13 +210,13 @@ debugger_register_set( int which, libspectrum_word value )
 
     /* 16-bit registers */
     case 0x6166: AF = value; break;
-    case 0xd166: AF_ = value; break;
+    case 0xe166: AF_ = value; break;
     case 0x6263: BC = value; break;
-    case 0xd263: BC_ = value; break;
+    case 0xe263: BC_ = value; break;
     case 0x6465: DE = value; break;
-    case 0xd465: DE_ = value; break;
+    case 0xe465: DE_ = value; break;
     case 0x686c: HL = value; break;
-    case 0xd86c: HL_ = value; break;
+    case 0xe86c: HL_ = value; break;
 
     case 0x7370: SP = value; break;
     case 0x7063: PC = value; break;
@@ -255,13 +255,13 @@ debugger_register_text( int which )
     
     /* 16-bit registers */
   case 0x6166: return "AF";
-  case 0xd166: return "AF'";
+  case 0xe166: return "AF'";
   case 0x6263: return "BC";
-  case 0xd263: return "BC'";
+  case 0xe263: return "BC'";
   case 0x6465: return "DE";
-  case 0xd465: return "DE'";
+  case 0xe465: return "DE'";
   case 0x686c: return "HL";
-  case 0xd86c: return "HL'";
+  case 0xe86c: return "HL'";
 
   case 0x7370: return "SP";
   case 0x7063: return "PC";
