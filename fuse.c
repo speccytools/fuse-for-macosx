@@ -279,38 +279,39 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
 
     if( utils_read_file( argv[ first_arg ], &buffer, &length ) ) return 1;
 
-    if( utils_identify_file( &type, argv[ first_arg ], buffer, length ) ) {
+    if( libspectrum_identify_file( &type, argv[ first_arg ], buffer,
+				   length ) ) {
       munmap( buffer, length );
       return 1;
     }
 
     switch( type ) {
 
-    case UTILS_TYPE_UNKNOWN:
+    case LIBSPECTRUM_ID_UNKNOWN:
       fprintf( stderr, "%s: couldn't identify `%s'\n", fuse_progname,
 	       argv[ first_arg ] );
       munmap( buffer, length );
       return 1;
 
-    case UTILS_TYPE_RECORDING_RZX:
+    case LIBSPECTRUM_ID_RECORDING_RZX:
       error = rzx_start_playback_from_buffer( buffer, length );
       break;
 
-    case UTILS_TYPE_SNAPSHOT_SNA:
+    case LIBSPECTRUM_ID_SNAPSHOT_SNA:
       error = snapshot_open_sna_buffer( buffer, length );
       if( !error ) autoload = 0;
       break;
 
-    case UTILS_TYPE_SNAPSHOT_Z80:
+    case LIBSPECTRUM_ID_SNAPSHOT_Z80:
       error = snapshot_open_z80_buffer( buffer, length );
       if( !error ) autoload = 0;
       break;
 
-    case UTILS_TYPE_TAPE_TAP:
+    case LIBSPECTRUM_ID_TAPE_TAP:
       error = tape_open_tap_buffer( buffer, length, autoload );
       break;
 
-    case UTILS_TYPE_TAPE_TZX:
+    case LIBSPECTRUM_ID_TAPE_TZX:
       error = tape_open_tzx_buffer( buffer, length, autoload );
       break;
 

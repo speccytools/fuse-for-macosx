@@ -36,27 +36,4 @@ int utils_read_fd( int fd, const char *filename,
 int utils_write_file( const char *filename, const unsigned char *buffer,
 		      size_t length );
 
-/* Various types of file we might manage to identify */
-typedef enum utils_type_t {
-
-  /* Unidentified file */
-  UTILS_TYPE_UNKNOWN = 0,
-  
-  /* Input recording files */
-  UTILS_TYPE_RECORDING_RZX,
-
-  /* Snapshot files */
-  UTILS_TYPE_SNAPSHOT_SNA,
-  UTILS_TYPE_SNAPSHOT_Z80,
-
-  /* Tape files */
-  UTILS_TYPE_TAPE_TAP,
-  UTILS_TYPE_TAPE_TZX,
-
-} utils_type_t;
-
-/* Attempt to identify a file from its filename and contents */
-int utils_identify_file( int *type, const char *filename,
-			 const unsigned char *buffer, size_t length );
-
 #endif			/* #ifndef FUSE_UTILS_H */
