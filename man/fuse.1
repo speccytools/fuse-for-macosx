@@ -52,14 +52,15 @@ sound.
 The emulator can load any of the formats supported by
 .IR libspectrum (3)
 - this includes Z80, SNA and SZX snapshots, and TAP and TZX
-virtual-tape files. Saving to both Z80 snapshots and TZX tape files is
-supported. The SLT extension to the Z80 format is partly supported
-(enough for multi-load games); however, loading of the old DAT-file
-variant is not. DSK disk images are supported when emulating a +3, TRD
-and SCL disk images are supported when emulating a Pentagon and DCK
-cartridge images are supported when emulating a TC2068.
+virtual-tape files. Saving to SZX, Z80 and SNA snapshots and TZX and
+TAP tape files is supported. The SLT extension to the Z80 format is
+partly supported (enough for multi-load games); however, loading of
+the old DAT-file variant is not. DSK disk images are supported when
+emulating a +3, TRD and SCL disk images are supported when emulating
+a Pentagon or Scorpion and DCK cartridge images are supported when
+emulating a TC2068. Interface II ROM cartridges are also supported.
 .PP
-There is also support for reading and writing the RZX input recording
+Finally, there is also support for reading and writing the RZX input recording
 format.
 .PP
 See the
@@ -1287,17 +1288,17 @@ written to any tape file until you choose this option!
 .PP
 .I "Media, Disk"
 .RS
-Virtual disk images are only accessible when emulating a +3 or
-Pentagon. If any of the disk options are selected while emulating a
-+3, they refer to the +3's disk drives, which are both of the 3\" type
-(in effect, the internal drive plus an external FD-1). With the usual
-+3 format, these have a capacity of 173K. If any other machine is
-being emulated, these options refer to the Pentagon's disk drives,
-although these cannot be accessed unless the Pentagon is being
-emulated. (See
+Virtual disk images are only accessible when emulating a +3,
+Pentagon or Scorpion. If any of the disk options are selected while
+emulating a +3, they refer to the +3's disk drives, which are both
+of the 3\" type (in effect, the internal drive plus an external FD-1).
+With the usual +3 format, these have a capacity of 173K. If the
+Pentagon or Scorpion is being emulated, these options refer to the
+TR-DOS disk drives.  If any other machine is being emulated, this
+menu cannot be selected. (See
 .B "THE .DSK FORMAT"
 and
-.B "PENTAGON DISK FORMATS"
+.B "TR-DOS DISK FORMATS"
 sections below for notes on the file formats supported).
 .PP
 Note that (since version 0.6.2), Fuse works with true virtual disk
@@ -2135,11 +2136,11 @@ compressed disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH PENTAGON DISK FORMATS
+.SH TR-DOS DISK FORMATS
 .PP
-Fuse supports .SCL and .TRD images in its Pentagon emulation;
-truncated .TRD files need to be expanded with another utility before
-use.
+Fuse supports .SCL and .TRD images in its Pentagon and Scorpion
+emulation; truncated .TRD files need to be expanded with another
+utility before use with Fuse.
 .\"
 .\"------------------------------------------------------------------
 .\"
