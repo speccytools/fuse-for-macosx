@@ -43,6 +43,7 @@
 
 static libspectrum_byte pentagon_select_1f_read( libspectrum_word port );
 static libspectrum_byte pentagon_select_ff_read( libspectrum_word port );
+static libspectrum_dword pentagon_contend_delay( void );
 static int pentagon_shutdown( void );
 
 spectrum_port_info pentagon_peripherals[] = {
@@ -91,18 +92,17 @@ pentagon_read_screen_memory( libspectrum_word offset )
 }
 
 libspectrum_dword
-pentagon_contend_memory( libspectrum_word address GCC_UNUSED )
-{
-  /* No contended memory */
-
-  return 0;
-}
-
-libspectrum_dword
 pentagon_contend_port( libspectrum_word port GCC_UNUSED )
 {
   /* No contention on ports AFAIK */
 
+  return 0;
+}
+
+static libspectrum_dword
+pentagon_contend_delay( void )
+{
+  /* No contention */
   return 0;
 }
 
@@ -120,8 +120,8 @@ pentagon_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.read_screen    = pentagon_read_screen_memory;
-  machine->ram.contend_memory = pentagon_contend_memory;
   machine->ram.contend_port   = pentagon_contend_port;
+  machine->ram.contend_delay  = pentagon_contend_delay;
 
   error = machine_allocate_roms( machine, 3 );
   if( error ) return error;

@@ -68,8 +68,8 @@ libspectrum_byte spectrum_last_ula;
    structure lookup too often */
 spectrum_screen_read_function read_screen_memory;
 
-spectrum_memory_contention_function contend_memory;
 spectrum_port_contention_function contend_port;
+spectrum_contention_delay_function contend_delay;
 
 /* Level data from .slt files */
 

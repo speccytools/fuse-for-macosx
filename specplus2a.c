@@ -66,8 +66,8 @@ specplus2a_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.read_screen	     = specplus3_read_screen_memory;
-  machine->ram.contend_memory	     = specplus3_contend_memory;
   machine->ram.contend_port	     = specplus3_contend_port;
+  machine->ram.contend_delay	     = specplus3_contend_delay;
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;

@@ -52,17 +52,17 @@ libspectrum_byte readbyte_internal( libspectrum_word address );
 void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
-spectrum_memory_contention_function contend_memory;
-spectrum_port_contention_function contend_port;
-
-static libspectrum_dword trivial_contend_memory( libspectrum_word address );
 static libspectrum_dword trivial_contend_port( libspectrum_word port );
+static libspectrum_dword trivial_contend_delay( void );
 
 static int read_test_file( const char *filename,
 			   libspectrum_dword *end_tstates );
 
 static void dump_z80_state( void );
 static void dump_memory_state( void );
+
+spectrum_port_contention_function contend_port = trivial_contend_port;
+spectrum_contention_delay_function contend_delay = trivial_contend_delay;
 
 int
 main( int argc, char **argv )
@@ -80,10 +80,6 @@ main( int argc, char **argv )
 
   /* Initialise the tables used by the Z80 core */
   z80_init();
-
-  /* Set up our trivial machine */
-  contend_memory = trivial_contend_memory;
-  contend_port = trivial_contend_port;
 
   /* Get ourselves into a known state */
   z80_reset(); tstates = 0;
@@ -109,7 +105,7 @@ main( int argc, char **argv )
 libspectrum_byte
 readbyte( libspectrum_word address )
 {
-  trivial_contend_memory( address );
+  printf( "%5d MC %04x\n", tstates, address );
   tstates += 3;
   return readbyte_internal( address );
 }
@@ -124,7 +120,7 @@ readbyte_internal( libspectrum_word address )
 void
 writebyte( libspectrum_word address, libspectrum_byte b )
 {
-  trivial_contend_memory( address );
+  printf( "%5d MC %04x\n", tstates, address );
   tstates += 3;
   writebyte_internal( address, b );
 }
@@ -137,16 +133,16 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 }
 
 static libspectrum_dword
-trivial_contend_memory( libspectrum_word address )
+trivial_contend_port( libspectrum_word port )
 {
-  printf( "%5d MC %04x\n", tstates, address );
+  printf( "%5d PC %04x\n", tstates, port );
   return 0;
 }
 
 static libspectrum_dword
-trivial_contend_port( libspectrum_word port )
+trivial_contend_delay( void )
 {
-  printf( "%5d PC %04x\n", tstates, port );
+  printf( "%5d MC %04x\n", tstates, 0 );
   return 0;
 }
 
@@ -330,7 +326,8 @@ int rzx_instructions_offset;
 enum debugger_mode_t debugger_mode;
 
 libspectrum_byte **ROM = NULL;
-libspectrum_byte **memory_map = NULL;
+libspectrum_byte *memory_map[8];
+int memory_contended[8] = { 1, 1, 1, 1, 1, 1, 1, 1 };
 
 int
 debugger_check( debugger_breakpoint_type type, libspectrum_word value )
@@ -366,6 +363,10 @@ settings_info settings_current;
 static int
 init_dummies( void )
 {
+  size_t i;
+
+  for( i = 0; i < 8; i++ ) memory_map[i] = &memory[ i * 0x2000 ];
+
   debugger_mode = DEBUGGER_MODE_INACTIVE;
   dummy_machine.ram.current_rom = 0;
   machine_current = &dummy_machine;

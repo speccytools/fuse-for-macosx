@@ -38,8 +38,6 @@
 #include "spec48.h"
 #include "spectrum.h"
 
-static libspectrum_dword spec48_contend_delay( void );
-
 spectrum_port_info spec48_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
@@ -60,14 +58,6 @@ spec48_read_screen_memory( libspectrum_word offset )
 }
 
 libspectrum_dword
-spec48_contend_memory( libspectrum_word address )
-{
-  if( memory_contended[ address >> 13 ] ) return spec48_contend_delay();
-
-  return 0;
-}
-
-libspectrum_dword
 spec48_contend_port( libspectrum_word port )
 {
   /* Contention occurs only for even-numbered ports */
@@ -76,7 +66,7 @@ spec48_contend_port( libspectrum_word port )
   return 0;
 }
 
-static libspectrum_dword
+libspectrum_dword
 spec48_contend_delay( void )
 {
   libspectrum_word tstates_through_line;
@@ -133,8 +123,8 @@ int spec48_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.read_screen           = spec48_read_screen_memory;
-  machine->ram.contend_memory        = spec48_contend_memory;
   machine->ram.contend_port          = spec48_contend_port;
+  machine->ram.contend_delay	     = spec48_contend_delay;
   machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 1 );

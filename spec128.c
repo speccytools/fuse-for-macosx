@@ -39,8 +39,6 @@
 #include "spec128.h"
 #include "spectrum.h"
 
-static libspectrum_dword spec128_contend_delay( void );
-
 spectrum_port_info spec128_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
@@ -63,14 +61,6 @@ spec128_read_screen_memory( libspectrum_word offset )
 }
 
 libspectrum_dword
-spec128_contend_memory( libspectrum_word address )
-{
-  if( memory_contended[ address >> 13 ] ) return spec128_contend_delay();
-
-  return 0;
-}
-
-libspectrum_dword
 spec128_contend_port( libspectrum_word port )
 {
   /* Contention occurs for the ULA, or for the memory paging port */
@@ -80,7 +70,7 @@ spec128_contend_port( libspectrum_word port )
   return 0;
 }
 
-static libspectrum_dword
+libspectrum_dword
 spec128_contend_delay( void )
 {
   libspectrum_word tstates_through_line;
@@ -137,8 +127,8 @@ int spec128_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.read_screen	     = spec128_read_screen_memory;
-  machine->ram.contend_memory	     = spec128_contend_memory;
   machine->ram.contend_port	     = spec128_contend_port;
+  machine->ram.contend_delay	     = spec128_contend_delay;
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;

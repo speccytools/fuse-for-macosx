@@ -120,19 +120,6 @@ tc2068_read_screen_memory( libspectrum_word offset )
 }
 
 libspectrum_dword
-tc2068_contend_memory( libspectrum_word address )
-{
-  int chunk = ADDR_TO_CHUNK(address);
-
-  /* Contention occurs only in the lowest 16Kb of RAM in the HOME bank */
-  if( address < 0x4000 || address > 0x7fff ) return 0;
-
-  if( timex_memory[chunk].page != timex_home[chunk].page ) return 0;
-
-  return tc2068_contend_delay();
-}
-
-libspectrum_dword
 tc2068_contend_port( libspectrum_word port )
 {
   /* Contention occurs for ports F4, FE and FF (HSR, ULA and DEC) */
@@ -204,8 +191,8 @@ tc2068_init( fuse_machine_info *machine )
 
   machine->timex = 1;
   machine->ram.read_screen	     = tc2068_read_screen_memory;
-  machine->ram.contend_memory	     = tc2068_contend_memory;
   machine->ram.contend_port	     = tc2068_contend_port;
+  machine->ram.contend_delay	     = tc2068_contend_delay;
   machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 2 );

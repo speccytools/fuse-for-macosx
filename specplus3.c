@@ -59,8 +59,6 @@
 #include "spectrum.h"
 #include "ui/ui.h"
 
-static libspectrum_dword specplus3_contend_delay( void );
-
 static int normal_memory_map( int rom, int page );
 static int special_memory_map( int which );
 static int select_special_map( int page1, int page2, int page3, int page4 );
@@ -112,13 +110,6 @@ libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset )
   return RAM[machine_current->ram.current_screen][offset];
 }
 
-libspectrum_dword specplus3_contend_memory( libspectrum_word address )
-{
-  if( memory_contended[ address >> 13 ] ) return specplus3_contend_delay();
-
-  return 0;
-}
-
 libspectrum_dword
 specplus3_contend_port( libspectrum_word port GCC_UNUSED )
 {
@@ -127,7 +118,8 @@ specplus3_contend_port( libspectrum_word port GCC_UNUSED )
   return 0;
 }
 
-static libspectrum_dword specplus3_contend_delay( void )
+libspectrum_dword
+specplus3_contend_delay( void )
 {
   libspectrum_word tstates_through_line;
   
@@ -186,8 +178,8 @@ int specplus3_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.read_screen	     = specplus3_read_screen_memory;
-  machine->ram.contend_memory	     = specplus3_contend_memory;
   machine->ram.contend_port	     = specplus3_contend_port;
+  machine->ram.contend_delay	     = specplus3_contend_delay;
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;

@@ -46,6 +46,7 @@ void spec128_writebyte_internal( libspectrum_word address,
 
 libspectrum_dword spec128_contend_memory( libspectrum_word address );
 libspectrum_dword spec128_contend_port( libspectrum_word port );
+libspectrum_dword spec128_contend_delay( void );
 
 int spec128_init( fuse_machine_info *machine );
 int spec128_reset(void);

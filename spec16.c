@@ -68,8 +68,8 @@ int spec16_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.read_screen    = spec48_read_screen_memory;
-  machine->ram.contend_memory = spec48_contend_memory;
   machine->ram.contend_port   = spec48_contend_port;
+  machine->ram.contend_delay  = spec48_contend_delay;
   machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 1 );

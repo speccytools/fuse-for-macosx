@@ -54,19 +54,19 @@ typedef libspectrum_byte
   (*spectrum_screen_read_function)( libspectrum_word offset );
 
 typedef libspectrum_dword
-  (*spectrum_memory_contention_function)( libspectrum_word address );
-typedef libspectrum_dword
   (*spectrum_port_contention_function)( libspectrum_word port );
+typedef libspectrum_dword (*spectrum_contention_delay_function)( void );
 
 typedef struct spectrum_raminfo {
 
   spectrum_screen_read_function read_screen; /* Read a byte from the
 						current screen */
 
-  spectrum_memory_contention_function contend_memory; /* How long must we wait
-							 to access memory? */
   spectrum_port_contention_function contend_port; /* And how long to access
 						     an IO port? */
+
+  /* What's the actual delay at the current tstate */
+  spectrum_contention_delay_function contend_delay;
 
   int locked;			/* Is the memory configuration locked? */
   int current_page,current_rom,current_screen; /* Current paged memory */
@@ -82,8 +82,8 @@ typedef struct spectrum_raminfo {
    structure lookup too often */
 extern spectrum_screen_read_function read_screen_memory;
 
-extern spectrum_memory_contention_function contend_memory;
 extern spectrum_port_contention_function contend_port;
+extern spectrum_contention_delay_function contend_delay;
 
 /* Things relating to peripherals */
 

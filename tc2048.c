@@ -71,14 +71,6 @@ tc2048_read_screen_memory( libspectrum_word offset )
 }
 
 libspectrum_dword
-tc2048_contend_memory( libspectrum_word address )
-{
-  if( memory_contended[ address >> 13 ] ) return tc2048_contend_delay();
-
-  return 0;
-}
-
-libspectrum_dword
 tc2048_contend_port( libspectrum_word port )
 {
   /* Contention occurs for ports FE and F4 (SCLD and HSR) */
@@ -147,8 +139,8 @@ int tc2048_init( fuse_machine_info *machine )
 
   machine->timex = 1;
   machine->ram.read_screen	     = tc2048_read_screen_memory;
-  machine->ram.contend_memory	     = tc2048_contend_memory;
   machine->ram.contend_port	     = tc2048_contend_port;
+  machine->ram.contend_delay	     = tc2048_contend_delay;
   machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 1 );
