@@ -147,12 +147,20 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
   vbox = gtk_vbox_new( FALSE, 2 );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
 
-  for( i = 0; i < 10; i++ )
-    if( info.button[i].setting ) {
-      snprintf( buffer, 80, "Button %lu", (unsigned long)i + 1 );
-      create_fire_button_selector( buffer, &( info.button[i] ),
-				   GTK_BOX( vbox ) );
-    }
+  for( i = 0; i < 10; i += 5 ) {
+    
+    int j;
+    
+    vbox = gtk_vbox_new( FALSE, 2 );
+    gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
+    
+    for( j = i; j < i + 5; j++ )
+      if( info.button[j].setting ) {
+	snprintf( buffer, 80, "Button %lu", (unsigned long)j + 1 );
+	create_fire_button_selector( buffer, &( info.button[j] ),
+				     GTK_BOX( vbox ) );
+      }
+  }
 
   gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( joystick_done ),
 			     &info, NULL );

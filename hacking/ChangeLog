@@ -1236,5 +1236,6 @@
 20050226 input.c: drive the joystick from the Spectrum keysym, not the
 	 native one, or (the emulating machine's) Caps Lock causes
 	 problems.
-
-	 
+20050226 ui/gtk/gtkjoystick.c: use two columns of five rather than one
+	 column of ten for the fire button configuration (patch #1150711)
+	 (Darren).
