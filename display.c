@@ -1,5 +1,5 @@
 /* display.c: Routines for printing the Spectrum screen
-   Copyright (c) 1999-2000 Philip Kendall and Thomas Harte
+   Copyright (c) 1999-2001 Philip Kendall and Thomas Harte
 
    $Id$
 
@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -35,10 +35,6 @@
 #include "spectrum.h"
 #include "ui.h"
 #include "uidisplay.h"
-
-/* Testing: define this to send blocks to lines to the screen, rather than
-   a line at a time */
-#define BLOCKED_WRITES
 
 /* The current border colour */
 BYTE display_border;
@@ -87,15 +83,11 @@ const static int display_border_retrace=-1;
 /* Value used to signify a border line has more than one colour on it. */
 const static int display_border_mixed = 0xff;
 
-#ifdef BLOCKED_WRITES
-
 /* Where the current block of lines to send to the screen starts */
 static int display_blocked_write_start;
 
 /* Value to signify `no block to send to screen' */
 const static int display_blocked_write_none = -1;
-
-#endif			/* #ifdef BLOCKED_WRITES */
 
 static void display_draw_line(int y);
 static void display_dirty8(WORD address);
@@ -150,9 +142,7 @@ int display_init(int *argc, char ***argv)
     display_border_dirty[y]=1;
   }
 
-#ifdef BLOCKED_WRITES
   display_blocked_write_start = display_blocked_write_none;
-#endif			/* #ifdef BLOCKED_WRITES */
 
   return 0;
 
@@ -169,14 +159,12 @@ void display_line(void)
 	       EVENT_TYPE_LINE );
   } 
 
-#ifdef BLOCKED_WRITES
   /* If we're at the end of the frame, and we've got some data to
      send to the screen, send it now */
   else if( display_blocked_write_start != display_blocked_write_none ) {
     uidisplay_lines( display_blocked_write_start, display_next_line-1 );
     display_blocked_write_start = display_blocked_write_none;
   }
-#endif			/* #ifdef BLOCKED_WRITES */
 
   display_next_line++;
 
@@ -227,35 +215,22 @@ static void display_draw_line(int y)
      been changed since we were last here... */
   if( redraw || display_border_dirty[y] ) {
 
-#ifdef BLOCKED_WRITES
-    /* If we're doing blocked writes, and we haven't currently got a 
-       block, note this line as the start; if we have currently
-       got a block, just carry on until we find a line we don't
-       want to copy to the screen. */
+    /* If we're haven't currently got a block, note this line as the
+       start; if we have currently got a block, just carry on until we
+       find a line we don't want to copy to the screen. */
     if( display_blocked_write_start == display_blocked_write_none ) {
       display_blocked_write_start = y;
     }
-#else
-    /* If we're not doing blocked writes, copy this line to the
-       screen immediately */
-    uidisplay_line( y );
-#endif
 
     display_border_dirty[y]=0;
 
   }
-
-#ifdef BLOCKED_WRITES
-
-  /* This else matches `if( redraw || display_border_dirty[y] ) {' above */
-
-  /* If we're doing blocked writes and _don't_ need to redraw this line,
-     copy any block with exists to the screen */
+  /* If we're _don't_ need to redraw this line, copy any block with
+     exists to the screen */
   else if( display_blocked_write_start != display_blocked_write_none ) {
     uidisplay_lines( display_blocked_write_start, y-1 );
     display_blocked_write_start = display_blocked_write_none;
   }
-#endif
   
   if(display_current_border[y] != display_border) {
 

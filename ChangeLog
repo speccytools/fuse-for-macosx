@@ -1,4 +1,4 @@
-2001-xx-yy  Philip Kendall  <pak@ast.cam.ac.uk>
+2001-08-13  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.3.1 released.
 
@@ -23,8 +23,8 @@
 	  lines which have changed are copied to the screen in one
 	  block, rather than as separate lines (Philip Kendall).
 
-	* Complete rewrite of the snapshot code - now handles .z80
-	  snapshots (but not .sna at the moment) (Philip Kendall).
+	* Complete rewrite of the snapshot code; now handles .z80
+	  and .sna snapshots (Philip Kendall).
 
 	* Started separating some bits of code into subdirectories;
 	  currently `libspectrum' for the snapshot code, and `z80'

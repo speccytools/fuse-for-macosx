@@ -17,14 +17,14 @@ dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 dnl
 dnl Author contact information:
 dnl
-dnl E-mail: pak@ast.cam.ac.uk
+dnl E-mail: pak21-fuse@srcf.ucam.org
 dnl Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.3.1-pre2)
+AM_INIT_AUTOMAKE(fuse, 0.3.1)
 
 dnl Use '/usr' as the default prefix, rather than '/usr/local'
 AC_PREFIX_DEFAULT(/usr)

@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -43,9 +43,8 @@ int libspectrum_sna_read( uchar *buffer, size_t buffer_length,
 			  libspectrum_snap *snap )
 {
   int error;
-  libspectrum_machine type; /* Is this a 48K or 128K snap? */
 
-  error = libspectrum_sna_identify( buffer_length, &type );
+  error = libspectrum_sna_identify( buffer_length, &snap->machine );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   error = libspectrum_sna_read_header( buffer, buffer_length, snap );
@@ -53,7 +52,7 @@ int libspectrum_sna_read( uchar *buffer, size_t buffer_length,
 
   error = libspectrum_sna_read_data(
     &buffer[LIBSPECTRUM_SNA_HEADER_LENGTH],
-    buffer_length - LIBSPECTRUM_SNA_HEADER_LENGTH, type, snap );
+    buffer_length - LIBSPECTRUM_SNA_HEADER_LENGTH, snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   return LIBSPECTRUM_ERROR_NONE;
@@ -107,7 +106,6 @@ int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
 }
 
 int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
-			       libspectrum_machine type,
 			       libspectrum_snap *snap )
 {
   int error;
@@ -116,7 +114,7 @@ int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
 
   if( buffer_length < 0xc000 ) return LIBSPECTRUM_ERROR_CORRUPT;
 
-  switch( type ) {
+  switch( snap->machine ) {
   case LIBSPECTRUM_MACHINE_48:
 
     /* Rescue PC from the stack */

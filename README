@@ -48,14 +48,16 @@ $ make
 
 To run fuse:
 
-$ fuse
+$ fuse [snapshot]
 
 Not too difficult. You should then be presented with the familiar
 
 `(c) 1982 Sinclair Research Ltd'
 
-message. Numbers, letters, etc should now work as they do on the
-Speccy (plus a few others eg Backspace = CAPS + 0). Also:
+message, unless you gave a .z80 or .sna snapshot on the command line,
+in which case you should get that instead. Numbers, letters, etc
+should now work as they do on the Speccy (plus a few others eg
+Backspace = CAPS + 0). Also:
 
  F2: Save snapshot (see below)
  F3: Load snapshot (see below)
@@ -64,11 +66,11 @@ Speccy (plus a few others eg Backspace = CAPS + 0). Also:
  F9: Switch between 48K/128K/+2/+2A emulation
 F10: Quit Fuse
 
-The snapshot loading is _very_ simple: it loads from a .sna snapshot
-(either 48K or 128K) called `snapshot.sna' in the current
-directory. (If you need to convert your snaps to .sna, try SnapConv:
+The snapshot loading is _very_ simple: it loads from a .z80 snapshot
+(either 48K or 128K) called `snapshot.z80' in the current
+directory. (If you need to convert your snaps to .z80, try SnapConv:
 http://www.srcf.ucam.org/~pak21/spectrum/snapconv.html). Saving is
-also to `snapshot.sna', and will happily overwrite any other file you
+also to `snapshot.z80', and will happily overwrite any other file you
 may have with that name.
 
 The tape loading is also simple: it reads from a .tap file called
@@ -84,8 +86,8 @@ free distribution with emulators is permitted.
 
 If you have any bug reports, suggestions or (particularly
 appreciated!) patches for Fuse, mail them to me at
-pak@ast.cam.ac.uk. For more general Speccy related discussions, visit
-the Usenet group `comp.sys.sinclair', but do read the FAQ
+pak21-fuse@srcf.ucam.org. For more general Speccy related discussions,
+visit the Usenet group `comp.sys.sinclair', but do read the FAQ
 (http://www.srcf.ucam.org/~pak21/cssfaq/index.html) first!
 
 Fuse has its own home page, which you can find at:
@@ -93,14 +95,14 @@ Fuse has its own home page, which you can find at:
 http://www.srcf.ucam.org/~pak21/spectrum/fuse.html
 
 or the latest version should be available from the World of Spectrum
-(http://www.void.jump.org/) FTP site:
+(http://www.worldofspectrum.org/) FTP site:
 
-ftp://ftp.void.jump.org/pub/sinclair/emulators/unix/
+ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/
 
 Finally, if you want to see how a Unix Speccy emulator should be done,
 check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
 
 Philip Kendall <pak@ast.cam.ac.uk>
-<Day> <Month> 2001
+13 August 2001
 
 $Id$

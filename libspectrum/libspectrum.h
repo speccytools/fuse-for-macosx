@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -140,7 +140,6 @@ int libspectrum_sna_read( uchar *buffer, size_t buffer_length,
 int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
 				 libspectrum_snap *snap );
 int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
-			       libspectrum_machine type,
 			       libspectrum_snap *snap );
 
 /* .z80 specific routines */

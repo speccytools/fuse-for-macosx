@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -360,7 +360,7 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
     int error;
 
     /* Check we're not going to run over the end of the buffer */
-    if( buffer + 3 + length2 >= end ) return LIBSPECTRUM_ERROR_CORRUPT;
+    if( buffer + 3 + length2 > end ) return LIBSPECTRUM_ERROR_CORRUPT;
 
     (*length)=0;
     error = libspectrum_z80_uncompress_block(

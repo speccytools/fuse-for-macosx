@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -94,12 +94,26 @@ int snapshot_read( char *filename )
     return 1;
   }
 
-  error = libspectrum_z80_read( buffer, file_info.st_size, &snap );
-  if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: Error from libspectrum_z80_read: %s\n",
-	    fuse_progname, libspectrum_error_message(error) );
-    munmap( buffer, file_info.st_size );
-    return 1;
+  if( strncmp( &filename[ strlen(filename) - 4 ], ".sna", 4 ) == 0 ) {
+
+    error = libspectrum_sna_read( buffer, file_info.st_size, &snap );
+    if( error != LIBSPECTRUM_ERROR_NONE ) {
+      fprintf(stderr, "%s: Error from libspectrum_sna_read: %s\n",
+	      fuse_progname, libspectrum_error_message(error) );
+      munmap( buffer, file_info.st_size );
+      return 1;
+    }
+
+  } else {
+
+    error = libspectrum_z80_read( buffer, file_info.st_size, &snap );
+    if( error != LIBSPECTRUM_ERROR_NONE ) {
+      fprintf(stderr, "%s: Error from libspectrum_z80_read: %s\n",
+	      fuse_progname, libspectrum_error_message(error) );
+      munmap( buffer, file_info.st_size );
+      return 1;
+    }
+
   }
 
   if( munmap( buffer, file_info.st_size ) == -1 ) {
