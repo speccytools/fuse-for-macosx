@@ -210,7 +210,7 @@ AC_CHECK_HEADERS(png.h,PNG_LIBS='-lpng -lm',
 AC_SUBST(PNG_LIBS)
 
 dnl See if libxml2 is available (for the config file handling)
-AM_PATH_XML(2.0.0,AC_DEFINE(HAVE_LIB_XML2),
+AM_PATH_XML2(2.0.0,AC_DEFINE(HAVE_LIB_XML2),
   AC_WARN(libxml2 not found - config file use disabled))
 	       
 dnl Do we want the low memory compile?
