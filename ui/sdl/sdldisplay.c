@@ -216,7 +216,8 @@ uidisplay_init( int width, int height )
 
   init_scalers();
 
-  if ( scaler_select_scaler( current_scaler ) ) scaler_select_scaler( SCALER_NORMAL );
+  if ( scaler_select_scaler( current_scaler ) )
+    scaler_select_scaler( SCALER_NORMAL );
 
   sdldisplay_load_gfx_mode();
 
@@ -279,7 +280,8 @@ sdldisplay_load_gfx_mode( void )
     return 1;
   }
 
-  sdldisplay_is_full_screen = settings_current.full_screen = !!(sdldisplay_gc->flags & SDL_FULLSCREEN);
+  sdldisplay_is_full_screen =
+      settings_current.full_screen = !!(sdldisplay_gc->flags & SDL_FULLSCREEN);
 
   /* Distinguish 555 and 565 mode */
   if( sdldisplay_gc->format->Gmask >> sdldisplay_gc->format->Gshift == 0x1f )

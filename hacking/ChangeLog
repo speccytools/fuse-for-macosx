@@ -1061,3 +1061,4 @@
 20040816 machine.c,periph.c,ui.c,ui/ui.h: deactivate Media/Cartridge menu
 	 if neither Dock nor If2 available.
 20040817 ui/sdl/{sdldisplay.c,sdlui.c}: SDL mouse support updates.
+20040818 ui/sdl/sdldisplay.c: Wrap long lines.
