@@ -30,7 +30,11 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef HAVE_MMAP
 #include <sys/mman.h>
+#endif
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <ui/ui.h>
@@ -237,12 +241,17 @@ utils_close_file( utils_file *file )
   switch( file->mode ) {
 
   case UTILS_FILE_OPEN_MMAP:
+#ifdef HAVE_MMAP
     if( file->length ) {
       if( munmap( file->buffer, file->length ) ) {
 	ui_error( UI_ERROR_ERROR, "Couldn't munmap: %s\n", strerror( errno ) );
 	return 1;
       }
     }
+#else				/* #ifdef HAVE_MMAP */
+    ui_error( UI_ERROR_ERROR, "utils_close_file: file->mode == UTILS_FILE_OPEN_MMAP, but mmap not available?!" );
+    fuse_abort();
+#endif
     break;
 
   case UTILS_FILE_OPEN_MALLOC:
