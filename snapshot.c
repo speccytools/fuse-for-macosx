@@ -313,7 +313,7 @@ int snapshot_copy_to( libspectrum_snap *snap )
 
   snap->iff1 = IFF1; snap->iff2 = IFF2; snap->im = IM;
 
-  snap->out_ula = display_lores_border; /* FIXME: need to do this properly */
+  snap->out_ula = spectrum_last_ula;
   
   /* These won't necessarily be valid in some machine configurations, but
      this shouldn't cause anything to go wrong */

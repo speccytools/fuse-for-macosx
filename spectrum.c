@@ -50,6 +50,9 @@ BYTE **ROM;
 BYTE RAM[8][0x4000];
 DWORD tstates;
 
+/* The last byte written to the ULA */
+BYTE spectrum_last_ula;
+
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
 spectrum_memory_read_function readbyte;
@@ -180,6 +183,8 @@ BYTE spectrum_ula_read(WORD port)
 void
 spectrum_ula_write( WORD port GCC_UNUSED, BYTE b )
 {
+  spectrum_last_ula = b;
+
   display_set_lores_border( b & 0x07 );
   sound_beeper( 0, b & 0x10 );
 
