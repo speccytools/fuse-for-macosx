@@ -35,9 +35,9 @@
 #include "fuse.h"
 #endif
 
-#ifndef FUSE_KEYBOARD_H
-#include "keyboard.h"
-#endif			        /* #ifndef FUSE_KEYBOARD_H */
+#ifndef FUSE_KEYSYMS_H
+#include "keysyms.h"
+#endif			        /* #ifndef FUSE_KEYSYMS_H */
 
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {

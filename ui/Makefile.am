@@ -24,6 +24,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = aalib fb gtk svga xlib
+SUBDIRS = aalib fb gtk sdl svga xlib
 
 noinst_HEADERS = ui.h uidisplay.h options.dat
