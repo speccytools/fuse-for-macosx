@@ -1,5 +1,5 @@
 /* pokefinder.c: GTK+ interface to the poke finder
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2004 Philip Kendall
 
    $Id$
 
@@ -231,10 +231,10 @@ possible_click( GtkCList *clist, gint row, gint column,
   /* Ignore events which aren't a double-click */
   if( event->type != GDK_2BUTTON_PRESS ) return;
 
-  error =
-    debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_WRITE,
-			     possible_page[ row ], possible_offset[ row ],
-			     0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL );
+  error = debugger_breakpoint_add_address(
+    DEBUGGER_BREAKPOINT_TYPE_WRITE, possible_page[ row ],
+    possible_offset[ row ], 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL
+  );
   if( error ) return;
 
   ui_debugger_update();

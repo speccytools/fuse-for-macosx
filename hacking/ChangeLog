@@ -592,3 +592,6 @@
 20040225 z80/{z80.pl,z80_macros.h,tests/README,tests/*cb*}: BIT
 	 instructions should set bits 3 and 5 only for BIT 3,<arg> and BIT
 	 5,<arg> respectively.
+20040226 debugger/{breakpoint.[ch],Makefile.am,commandy.y,debugger.[ch]},
+	 ui/gtk/{debugger.c,pokefinder.c}: stop the evil multiplexing of
+	 the 'value' parameter to debugger_breakpoint_add().

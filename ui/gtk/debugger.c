@@ -1,5 +1,5 @@
 /* debugger.c: the GTK+ debugger
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -447,9 +447,10 @@ stack_click( GtkCList *clist, gint row, gint column,
   destination =
     readbyte_internal( address ) + readbyte_internal( address + 1 ) * 0x100;
 
-  error = debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-				   -1, destination, 0,
-				   DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL );
+  error = debugger_breakpoint_add_address(
+    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, destination, 0,
+    DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
+  );
   if( error ) return;
 
   debugger_run();
@@ -491,10 +492,10 @@ events_click( GtkCList *clist, gint row, gint column,
   }
 
   tstates = atoi( buffer );
-
-  error = debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_TIME,
-				   -1, tstates, 0,
-				   DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL );
+  error = debugger_breakpoint_add_time(
+    DEBUGGER_BREAKPOINT_TYPE_TIME, tstates, 0,
+    DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
+  );
   if( error ) return;
 
   debugger_run();
@@ -687,15 +688,30 @@ ui_debugger_update( void )
     snprintf( breakpoint_text[1], 40, "%s",
 	      debugger_breakpoint_type_text[ bp->type ] );
 
-    if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
-      snprintf( breakpoint_text[2], 40, "%5d", bp->value );
-    } else {
-      if( bp->page == -1 ) {
-	snprintf( breakpoint_text[2], 40, format_16_bit, bp->value );
+    switch( bp->type ) {
+
+    case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
+    case DEBUGGER_BREAKPOINT_TYPE_READ:
+    case DEBUGGER_BREAKPOINT_TYPE_WRITE:
+      if( bp->value.address.page == -1 ) {
+	snprintf( breakpoint_text[2], 40, format_16_bit,
+		  bp->value.address.offset );
       } else {
 	sprintf( format_string, "%%d:%s", format_16_bit );
-	snprintf( breakpoint_text[2], 40, format_string, bp->page, bp->value );
+	snprintf( breakpoint_text[2], 40, format_string,
+		  bp->value.address.page, bp->value.address.offset );
       }
+      break;
+
+    case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
+    case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
+      snprintf( breakpoint_text[2], 40, format_16_bit, bp->value.port );
+      break;
+
+    case DEBUGGER_BREAKPOINT_TYPE_TIME:
+      snprintf( breakpoint_text[2], 40, "%5d", bp->value.tstates );
+      break;
+
     }
 
     snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );

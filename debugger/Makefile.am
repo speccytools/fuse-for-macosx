@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2003 Philip Kendall
+## Copyright (c) 2001-2004 Philip Kendall
 
 ## $Id$
 
@@ -28,7 +28,8 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_LIBRARIES = libdebugger.a
 
-libdebugger_a_SOURCES = command.c \
+libdebugger_a_SOURCES = breakpoint.c \
+		        command.c \
 			commandl.l \
 			commandy.y \
 			debugger.c \

@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -35,6 +35,8 @@
 
 #include <libspectrum.h>
 
+#include "breakpoint.h"
+
 /* The current state of the debugger */
 enum debugger_mode_t
 {
@@ -45,52 +47,6 @@ enum debugger_mode_t
 
 extern enum debugger_mode_t debugger_mode;
 
-/* Types of breakpoint */
-typedef enum debugger_breakpoint_type {
-  DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-  DEBUGGER_BREAKPOINT_TYPE_READ,
-  DEBUGGER_BREAKPOINT_TYPE_WRITE,
-  DEBUGGER_BREAKPOINT_TYPE_PORT_READ,
-  DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE,
-  DEBUGGER_BREAKPOINT_TYPE_TIME,
-} debugger_breakpoint_type;
-
-extern const char *debugger_breakpoint_type_text[];
-
-/* Lifetime of a breakpoint */
-typedef enum debugger_breakpoint_life {
-  DEBUGGER_BREAKPOINT_LIFE_PERMANENT,
-  DEBUGGER_BREAKPOINT_LIFE_ONESHOT,
-} debugger_breakpoint_life;
-
-extern const char *debugger_breakpoint_life_text[];
-
-typedef struct debugger_breakpoint_value {
-
-  int page;
-  libspectrum_dword value;
-
-} debugger_breakpoint_value;
-
-typedef struct debugger_expression debugger_expression;
-
-/* The breakpoint structure */
-typedef struct debugger_breakpoint {
-  size_t id;
-  enum debugger_breakpoint_type type;
-
-  int page;
-  libspectrum_dword value;
-
-  size_t ignore;		/* Ignore this breakpoint this many times */
-  enum debugger_breakpoint_life life;
-  debugger_expression *condition; /* Conditional expression to activate this
-				     breakpoint */
-} debugger_breakpoint;
-
-/* The current breakpoints */
-extern GSList *debugger_breakpoints;
-
 /* Which base should we display things in */
 extern int debugger_output_base;
 
@@ -99,20 +55,11 @@ int debugger_reset( void );
 
 int debugger_end( void );
 
-int debugger_check( debugger_breakpoint_type type, libspectrum_dword value );
-
 int debugger_trap( void );	/* Activate the debugger */
 
 int debugger_step( void );	/* Single step */
 int debugger_next( void );	/* Go to next instruction, ignoring CALL etc */
 int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
-
-/* Add a new breakpoint */
-int
-debugger_breakpoint_add( debugger_breakpoint_type type, int page,
-			 libspectrum_dword value, size_t ignore,
-			 debugger_breakpoint_life life,
-			 debugger_expression *condition );
 
 /* Disassemble the instruction at 'address', returning its length in
    '*length' */
@@ -125,9 +72,5 @@ int debugger_command_evaluate( const char *command );
 /* Get a deparsed expression */
 int debugger_expression_deparse( char *buffer, size_t length,
 				 const debugger_expression *exp );
-
-/* Add events corresponding to all the time events to happen during
-   this frame */
-int debugger_add_time_events( void );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */

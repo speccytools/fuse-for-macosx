@@ -1,5 +1,5 @@
 /* commandy.y: Parse a debugger command
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -51,7 +51,7 @@
   libspectrum_dword integer;
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
-  debugger_breakpoint_value bpvalue;
+  struct { int page; libspectrum_word offset; } bpaddress;
 
   debugger_expression* exp;
 
@@ -97,7 +97,7 @@
 
 %type  <bplife>  breakpointlife
 %type  <bptype>  breakpointtype
-%type  <bpvalue> breakpointvalue
+%type  <bpaddress> breakpointaddress
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
 %type  <integer> number
@@ -132,15 +132,16 @@ input:	 /* empty */
 ;
 
 command:   BASE number { debugger_output_base = $2; }
-	 | breakpointlife breakpointtype breakpointvalue optionalcondition {
-             debugger_breakpoint_add( $2, $3.page, $3.value, 0, $1, $4 );
+	 | breakpointlife breakpointtype breakpointaddress optionalcondition {
+             debugger_breakpoint_add_address( $2, $3.page, $3.offset, 0, $1,
+					      $4 );
 	   }
 	 | breakpointlife PORT portbreakpointtype number optionalcondition {
-	     debugger_breakpoint_add( $3, -1, $4, 0, $1, $5 );
+	     debugger_breakpoint_add_port( $3, $4, 0, $1, $5 );
            }
 	 | breakpointlife TIME number optionalcondition {
-	     debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_TIME, -1, $3,
-				      0, $1, $4 );
+	     debugger_breakpoint_add_time( DEBUGGER_BREAKPOINT_TYPE_TIME,
+					   $3, 0, $1, $4 );
 	   }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONDITION NUMBER expressionornull {
@@ -168,8 +169,8 @@ breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
                 | WRITE       { $$ = DEBUGGER_BREAKPOINT_TYPE_WRITE; }
 ;
 
-breakpointvalue:   numberorpc { $$.page = -1; $$.value = $1; }
-		 | number ':' number { $$.page = $1; $$.value = $3; }
+breakpointaddress:   numberorpc { $$.page = -1; $$.offset = $1; }
+		   | number ':' number { $$.page = $1; $$.offset = $3; }
 ;
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
