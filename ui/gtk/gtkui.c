@@ -617,7 +617,7 @@ ui_get_scaler( ui_scaler_available available )
 
   for( scaler = 0; scaler < SCALER_NUM; scaler++ ) {
 
-    if( !available( i ) ) continue;
+    if( !available( scaler ) ) continue;
 
     dialog.buttons[ count ] =
       gtk_radio_button_new_with_label( button_group, scaler_name( scaler ) );
