@@ -174,6 +174,7 @@ int widget_menu_eject_write_disk( void *data ); /* Disk/Drive ?:/Eject and
 
 int widget_insert_ide_simple_master( const char *filename );
 int widget_insert_ide_simple_slave( const char *filename );
+int widget_menu_commit_ide_simple( void *data );
 int widget_menu_eject_ide_simple( void *data );
 
 int widget_insert_dock( const char *filename ); /* Cart/Timex Dock/Insert */

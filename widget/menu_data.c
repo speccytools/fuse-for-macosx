@@ -350,7 +350,9 @@ static widget_menu_entry widget_menu_simple_master[] = {
 
   { "(I)nsert...", INPUT_KEY_i, widget_apply_to_file,
                                              widget_insert_ide_simple_master },
-  { "(E)ject",    INPUT_KEY_e, widget_menu_eject_ide_simple,
+  { "(C)ommit",    INPUT_KEY_c, widget_menu_commit_ide_simple,
+                                                         &simple_master_unit },
+  { "(E)ject",     INPUT_KEY_e, widget_menu_eject_ide_simple,
                                                          &simple_master_unit },
 
   { NULL, 0, 0, NULL }                 /* End marker: DO NOT REMOVE */
@@ -363,7 +365,9 @@ static widget_menu_entry widget_menu_simple_slave[] = {
 
   { "(I)nsert...", INPUT_KEY_i, widget_apply_to_file,
                                               widget_insert_ide_simple_slave },
-  { "(E)ject",    INPUT_KEY_e, widget_menu_eject_ide_simple,
+  { "(C)ommit",    INPUT_KEY_c, widget_menu_commit_ide_simple,
+                                                          &simple_slave_unit },
+  { "(E)ject",     INPUT_KEY_e, widget_menu_eject_ide_simple,
                                                           &simple_slave_unit },
 
   { NULL, 0, 0, NULL }                 /* End marker: DO NOT REMOVE */

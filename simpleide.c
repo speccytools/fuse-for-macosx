@@ -111,6 +111,16 @@ simpleide_insert( const char *filename, libspectrum_ide_unit unit )
 }
 
 int
+simpleide_commit( libspectrum_ide_unit unit )
+{
+  int error;
+
+  error = libspectrum_ide_commit( simpleide_idechn, unit );
+
+  return error;
+}
+
+int
 simpleide_eject( libspectrum_ide_unit unit )
 {
   int error = 0;

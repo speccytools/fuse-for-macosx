@@ -643,5 +643,6 @@
 	 ui/gtk/gtkui.c,widget/{menu.c,menu_data.c,widget_internals.h}:
 	 add support for the "simple 8-bit" IDE interface (part of patch
 	 #916816) (Garry Lancaster).
-
-	
+20040319 simpleide.[ch],ui/gtk/gtkui.c,widget/{menu.c,menu_data.c,
+	 widget_internals.h}: add a 'commit' menu option for the IDE
+	 disks.

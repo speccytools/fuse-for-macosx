@@ -506,6 +506,15 @@ widget_insert_ide_simple_slave( const char *filename )
   return simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE );
 }
 
+/* IDE/Simple 8-bit/(unit)/Commit */
+int
+widget_menu_commit_ide_simple( void *data )
+{
+  libspectrum_ide_unit unit = *(libspectrum_ide_unit*)data;
+  
+  return simpleide_commit( unit );
+}
+
 /* IDE/Simple 8-bit/(unit)/Eject */
 int
 widget_menu_eject_ide_simple( void *data )

@@ -151,6 +151,7 @@ static void cartridge_insert( GtkWidget *widget, gpointer data );
 static void cartridge_eject( GtkWidget *widget, gpointer data );
 
 static void ide_open( gpointer data, guint action, GtkWidget *widget );
+static void ide_commit( gpointer data, guint action, GtkWidget *widget );
 static void ide_eject( gpointer data, guint actiom, GtkWidget *widget );
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
@@ -248,9 +249,11 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Media/IDE/Simple _8-bit", NULL , NULL,                0, "<Branch>"    },
   { "/Media/IDE/Simple 8-bit/_Master", NULL, NULL,          0, "<Branch>"    },
   { "/Media/IDE/Simple 8-bit/Master/_Insert...", NULL, ide_open, 1, NULL     },
+  { "/Media/IDE/Simple 8-bit/Master/_Commit...", NULL, ide_commit, 1, NULL   },
   { "/Media/IDE/Simple 8-bit/Master/_Eject", NULL, ide_eject, 1, NULL        },
   { "/Media/IDE/Simple 8-bit/_Slave", NULL, NULL,           0, "<Branch>"    },
   { "/Media/IDE/Simple 8-bit/Slave/_Insert...", NULL, ide_open, 2, NULL      },
+  { "/Media/IDE/Simple 8-bit/Slave/_Commit...", NULL, ide_commit, 2, NULL    },
   { "/Media/IDE/Simple 8-bit/Slave/_Eject", NULL, ide_eject, 2, NULL         },
 
   { "/Help",			NULL , NULL,		    0, "<Branch>"    },
@@ -1251,7 +1254,7 @@ cartridge_eject( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   dck_eject();
 }
 
- static void
+static void
 ide_open( gpointer data GCC_UNUSED, guint action,
           GtkWidget *widget GCC_UNUSED )
 {
@@ -1262,10 +1265,9 @@ ide_open( gpointer data GCC_UNUSED, guint action,
   filename = gtkui_fileselector_get_filename( "Fuse - Insert hard disk file" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  switch ( action )
-  {
-    case 1: simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
-    case 2: simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE );  break;
+  switch( action ) {
+  case 1: simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
+  case 2: simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
   free( filename );
@@ -1274,13 +1276,26 @@ ide_open( gpointer data GCC_UNUSED, guint action,
 }
 
 static void
+ide_commit( gpointer data GCC_UNUSED, guint action,
+	    GtkWidget *widget GCC_UNUSED )
+{
+  fuse_emulation_pause();
+
+  switch( action ) {
+  case 1: simpleide_commit( LIBSPECTRUM_IDE_MASTER ); break;
+  case 2: simpleide_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
+  }
+
+  fuse_emulation_unpause();
+}
+
+static void
 ide_eject( gpointer data GCC_UNUSED, guint action,
            GtkWidget *widget GCC_UNUSED )
 {
-  switch ( action )
-  {
-    case 1: simpleide_eject( LIBSPECTRUM_IDE_MASTER ); break;
-    case 2: simpleide_eject( LIBSPECTRUM_IDE_SLAVE );  break;
+  switch( action ) {
+  case 1: simpleide_eject( LIBSPECTRUM_IDE_MASTER ); break;
+  case 2: simpleide_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 }
 
