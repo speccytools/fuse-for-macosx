@@ -30,6 +30,7 @@
 
 #include "ay.h"
 #include "display.h"
+#include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
@@ -89,6 +90,7 @@ int spec128_init( machine_info *machine )
   int error;
 
   machine->machine = SPECTRUM_MACHINE_128;
+  machine->description = "Spectrum 128K";
 
   machine->reset = spec128_reset;
 

@@ -36,18 +36,39 @@
 #include "uidisplay.h"
 #include "widget.h"
 
+static int widget_machine_show_machine( void );
+
 int widget_machine_draw( void )
 {
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, 4 );
+  widget_dialog_with_border( 1, 2, 30, 6 );
 
   widget_printstring( 9, 2, WIDGET_COLOUR_FOREGROUND, "Machine Control" );
 
   widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(R)eset machine" );
-  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(S)witch machines" );
+  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(S)witch machines" );
+
+  widget_machine_show_machine();
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 40 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 64 );
+
+  return 0;
+}
+
+static int widget_machine_show_machine( void )
+{
+  char buffer[29];
+
+  widget_rectangle( 2*8, 7*8, 28*8, 1*8, WIDGET_COLOUR_BACKGROUND );
+
+  snprintf( buffer, 28, "Current: %s", machine_current->description );
+  buffer[28]='\0';
+
+  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, buffer );
+
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 56 ,
+		   DISPLAY_BORDER_HEIGHT + 64 );
 
   return 0;
 }
@@ -66,6 +87,7 @@ void widget_machine_keyhandler( int key )
 
   case KEYBOARD_s:
     machine_select_next();
+    widget_machine_show_machine();
     break;
 
   case KEYBOARD_Enter:

@@ -140,6 +140,7 @@ int specplus3_init( machine_info *machine )
   int error;
 
   machine->machine = SPECTRUM_MACHINE_PLUS3;
+  machine->description = "Spectrum +2A";
 
   machine->reset = specplus3_reset;
 

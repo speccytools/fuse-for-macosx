@@ -66,6 +66,7 @@ typedef struct machine_timings {
 typedef struct machine_info {
 
   int machine;		/* which machine type is this? */
+  char *description;	/* Textual description of this machine */
 
   int (*reset)(void);	/* Reset function */
 
