@@ -58,7 +58,10 @@ AC_CHECK_LIB(z,zlibVersion)
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,
 [  --with-local-prefix=PFX local libraries installed in PFX (optional)],
-CFLAGS="$CFLAGS -I$withval/include"; LDFLAGS="$LDFLAGS -L$withval/lib")
+CFLAGS="$CFLAGS -I$withval/include"; LDFLAGS="$LDFLAGS -L$withval/lib",
+if test "$prefix" != "$ac_default_prefix"; then
+  CFLAGS="$CFLAGS -I$prefix/include"; LDFLAGS="$LDFLAGS -L$prefix/lib"
+fi)
 
 dnl Select a user interface
 
