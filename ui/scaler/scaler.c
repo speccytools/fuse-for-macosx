@@ -331,20 +331,18 @@ static void
 Super2xSaI(BYTE *srcPtr, DWORD srcPitch,
 	BYTE *deltaPtr, BYTE *dstPtr, DWORD dstPitch, int width, int height)
 {
-  WORD *bP;
-  BYTE *dP;
-  DWORD inc_bP;
+  scaler_data_type *bP, *dP;
 
   {
-    DWORD Nextline = srcPitch >> 1;
+    DWORD Nextline = srcPitch / sizeof( scaler_data_type );
+    DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
     DWORD finish;
-    inc_bP = 1;
 
     while (height--) {
-      bP = (WORD *) srcPtr;
-      dP = (BYTE *) dstPtr;
+      bP = (scaler_data_type*)srcPtr;
+      dP = (scaler_data_type*)dstPtr;
 
-      for (finish = width; finish; finish -= inc_bP) {
+      for( finish = width; finish; finish-- ) {
 	DWORD color4, color5, color6;
 	DWORD color1, color2, color3;
 	DWORD colorA0, colorA1, colorA2, colorA3, colorB0, colorB1, colorB2,
@@ -354,10 +352,10 @@ Super2xSaI(BYTE *srcPtr, DWORD srcPitch,
 /*---------------------------------------    B1 B2
                                            4  5  6 S2
                                            1  2  3 S1
-	                                           A1 A2
+	                                     A1 A2
 */
 
-	 colorB0 = *(bP - Nextline - 1);
+        colorB0 = *(bP - Nextline - 1);
 	colorB1 = *(bP - Nextline);
 	colorB2 = *(bP - Nextline + 1);
 	colorB3 = *(bP - Nextline + 2);
@@ -427,18 +425,10 @@ Super2xSaI(BYTE *srcPtr, DWORD srcPitch,
 	else
 	  product1a = color5;
 
-#ifdef WORDS_BIGENDIAN
-	product1a = product1b | (product1a << 16);
-	product2a = product2b | (product2a << 16);
-#else
-	product1a = product1a | (product1b << 16);
-	product2a = product2a | (product2b << 16);
-#endif
-	*((DWORD *) dP) = product1a;
-	*((DWORD *) (dP + dstPitch)) = product2a;
+	*dP = product1a; *(dP+nextDstLine) = product2a; dP++;
+	*dP = product1b; *(dP+nextDstLine) = product2b; dP++;
 
-	bP += inc_bP;
-	dP += sizeof(DWORD);
+	bP++;
       }				/* end of for ( finish= width etc..) */
 
       srcPtr += srcPitch;
