@@ -1,5 +1,5 @@
 /* error.c: The error reporting widget
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2005 Philip Kendall
 
    $Id$
 
@@ -28,15 +28,13 @@
 
 #ifdef USE_WIDGET
 
+#include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "fuse.h"
 #include "widget_internals.h"
-
-static int split_message( const char *message, char ***lines, size_t *count,
-			  const size_t line_length );
 
 widget_error_t *error_info;
 
@@ -92,7 +90,7 @@ int widget_error_draw( void *data )
   return 0;
 }
 
-static int
+int
 split_message( const char *message, char ***lines, size_t *count,
 	       const size_t line_length )
 {
@@ -106,10 +104,10 @@ split_message( const char *message, char ***lines, size_t *count,
   while( *ptr ) {
 
     /* Skip any whitespace */
-    while( *ptr == ' ' ) ptr++; message = ptr;
+    while( *ptr && isspace( *ptr ) ) ptr++; message = ptr;
 
     /* Find end of word */
-    while( *ptr && *ptr != ' ' ) ptr++;
+    while( *ptr && !isspace( *ptr ) ) ptr++;
 
     /* message now points to a word of length (ptr-message); if
        that's longer than an entire line (most likely filenames), just
@@ -118,6 +116,7 @@ split_message( const char *message, char ***lines, size_t *count,
 
     /* Check we've got room for the word, plus the prefixing space */
     if( position + ( ptr - message + 1 ) > (ptrdiff_t)line_length ) {
+
       char **new_lines; size_t i;
 
       /* If we've filled the screen, stop */
@@ -165,12 +164,6 @@ widget_error_keyhandler( input_key key )
 {
   switch( key ) {
 
-#if 0
-  case INPUT_KEY_Resize:	/* Fake keypress generated on window resize */
-    widget_error_draw( error_info );
-    break;
-#endif
-    
   case INPUT_KEY_Escape:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;

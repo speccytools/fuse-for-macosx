@@ -304,6 +304,11 @@ menu_get_scaler( scaler_available_fn selector )
 void
 menu_file_exit( int action )
 {
+  if( widget_do( WIDGET_TYPE_QUERY, "Exit Fuse?" ) ||
+      !widget_query.confirm ||
+      tape_close() )
+    return;
+
   fuse_exiting = 1;
   widget_end_all( WIDGET_FINISHED_OK );
 }
@@ -377,6 +382,10 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t count )
 void
 menu_machine_reset( int action )
 {
+  if( widget_do( WIDGET_TYPE_QUERY, "Reset machine?" ) ||
+      !widget_query.confirm )
+    return;
+
   widget_end_all( WIDGET_FINISHED_OK );
   machine_reset();
 }

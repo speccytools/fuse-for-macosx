@@ -1294,3 +1294,6 @@
 20050325 ui/gtk/gtkui.c: don't prompt for joysticks if disabled in config.
 20050325 ui/gtk/picture.c: allow input to continue while the keyboard help
 	 is being displayed (fixes bug #1145084).
+20050326 ChangeLog,widget/{Makefile.am,error.c,menu.c,query.c,widget.[ch],
+	 widget_internals.h}: add widget query confirmation dialog (patch
+	 #1150708) (Darren).

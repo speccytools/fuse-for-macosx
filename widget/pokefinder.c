@@ -155,7 +155,7 @@ scroll( int step )
 }
 
 void
-widget_pokefinder_keyhandler( input_key key, long rawkey )
+widget_pokefinder_keyhandler( input_key key )
 {
   switch ( key ) {
   case INPUT_KEY_Escape:	/* Close widget */

@@ -39,6 +39,7 @@
 	    (Darren Salt).
 	  * Correctly quote '-' characters in the man page (needed for
 	    UTF-8 environments) (Darren Salt, Stuart Brady).
+	  * Widget query confirmation dialog (Darren Salt).
 	  * Use separate menus for controlling +3 and TR-DOS disks (Philip
 	    Kendall).
 	  * Fix behaviour of ZXATASP and ZXCF on reset (Garry Lancaster).

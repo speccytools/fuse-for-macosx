@@ -446,6 +446,8 @@ widget_t widget_data[] = {
   { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
   { widget_peripherals_draw, widget_options_finish,
 			                      widget_peripherals_keyhandler },
+  { widget_query_draw,    NULL,			 widget_query_keyhandler    },
+  { widget_query_save_draw,NULL,		 widget_query_save_keyhandler },
 };
 
 #ifndef UI_SDL
@@ -472,11 +474,12 @@ ui_tape_browser_update( void )
   return 0;
 }
 
-/* FIXME: make this do something useful */
 ui_confirm_save_t
 ui_confirm_save( const char *message )
 {
-  return UI_CONFIRM_SAVE_DONTSAVE;
+  if( widget_do( WIDGET_TYPE_QUERY_SAVE, (void *) message ) )
+    return UI_CONFIRM_SAVE_CANCEL;
+  return widget_query.save;
 }
 
 /* FIXME: make this do something useful */

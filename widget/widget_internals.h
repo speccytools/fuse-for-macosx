@@ -80,6 +80,9 @@ extern widget_finish_state widget_finished;
 int widget_dialog( int x, int y, int width, int height );
 int widget_dialog_with_border( int x, int y, int width, int height );
 
+int split_message( const char *message, char ***lines, size_t *count,
+		   const size_t line_length );
+
 /* File selector */
 
 typedef struct widget_dirent {
@@ -207,7 +210,7 @@ void widget_debugger_keyhandler( input_key key );
 /* The poke finder widget */
 
 int widget_pokefinder_draw( void *data );
-void widget_pokefinder_keyhandler( input_key key, long rawkey );
+void widget_pokefinder_keyhandler( input_key key );
 
 /* The ROM selector widget */
 
@@ -223,6 +226,20 @@ typedef struct widget_roms_info {
 int widget_roms_draw( void *data );
 void widget_roms_keyhandler( input_key key );
 int widget_roms_finish( widget_finish_state finished );
+
+/* The query widgets */
+
+typedef union {
+  int confirm;
+  ui_confirm_save_t save;
+} widget_query_t;
+
+extern widget_query_t widget_query;
+
+int widget_query_draw( void *data );
+void widget_query_keyhandler( input_key key );
+int widget_query_save_draw( void *data );
+void widget_query_save_keyhandler( input_key key );
 
 /* The widgets actually available */
 
