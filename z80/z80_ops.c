@@ -93,6 +93,7 @@ z80_do_opcodes( void )
 {
   int even_m1;
   void *cgoto[6]; size_t next;
+  libspectrum_byte opcode = 0x00;
 
   /* Avoid 'variable not used' warnings if we're not using gcc */
   cgoto[0] = cgoto[0]; next = next;
@@ -119,8 +120,6 @@ z80_do_opcodes( void )
 #endif				/* #ifdef __GNUC__ */
 
   while( tstates < event_next_event ) {
-
-    libspectrum_byte opcode;
 
     /* If we're due an end of frame from RZX playback, generate one */
     CHECK( rzx, rzx_playback, 0 )

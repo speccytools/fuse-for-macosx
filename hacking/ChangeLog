@@ -1129,3 +1129,6 @@
 20041128 if1.c,machine.c,lib/{Makefile.am,microdrive.bmp},ui/ui.h,
 	 ui/gtk/statusbar.c,ui/sdl/sdldisplay.c: global rename of
 	 'microdrv' to 'microdrive'.
+20041201 z80/z80_ops.c: remove 'opcode may be used uninitialized'
+         warning. There's no chance that it is, but gcc doesn't realise
+	 that.
