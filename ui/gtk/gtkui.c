@@ -146,7 +146,7 @@ static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/_File",		        NULL , NULL,                0, "<Branch>"    },
+  { "/File",		        NULL , NULL,                0, "<Branch>"    },
   { "/File/_Open...",		"F3" , gtkui_open,          0, NULL          },
   { "/File/_Save Snapshot..." , "F2" , gtkui_save,          0, NULL          },
   { "/File/_Recording",		NULL , NULL,		    0, "<Branch>"    },
@@ -165,7 +165,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
-  { "/_Options",	        NULL , NULL,                0, "<Branch>"    },
+  { "/Options",			NULL , NULL,                0, "<Branch>"    },
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
   { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
@@ -177,13 +177,13 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/S_ave",		NULL , save_options,	    0, NULL          },
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
-  { "/_Machine",	        NULL , NULL,                0, "<Branch>"    },
+  { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
   { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
   { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
 
-  { "/M_edia",			NULL , NULL,                0, "<Branch>"    },
+  { "/Media",			NULL , NULL,                0, "<Branch>"    },
 
   { "/Media/_Tape",		NULL , NULL,                0, "<Branch>"    },
   { "/Media/Tape/_Open...",	"F7" , gtkui_tape_open,     0, NULL          },
@@ -210,7 +210,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 				NULL , cartridge_insert,    0, NULL          },
   { "/Media/Cartridge/_Eject",	NULL , cartridge_eject,     0, NULL          },
 
-  { "/_Help",			NULL , NULL,		    0, "<Branch>"    },
+  { "/Help",			NULL , NULL,		    0, "<Branch>"    },
   { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
 };
 static guint gtkui_menu_data_size =
