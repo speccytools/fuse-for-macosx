@@ -32,6 +32,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "keyboard.h"
+#include "settings.h"
 #include "sound.h"
 #include "spec128.h"
 #include "spec48.h"
@@ -113,17 +114,17 @@ void spectrum_ula_write(WORD port, BYTE b)
   display_set_border( b & 0x07 );
   sound_beeper( b & 0x10 );
 
-#ifdef ISSUE2
-  if( b & 0x18 ) {
-    keyboard_default_value=0xff;
+  if( settings_current.issue2 ) {
+    if( b & 0x18 ) {
+      keyboard_default_value=0xff;
+    } else {
+      keyboard_default_value=0xbf;
+    }
   } else {
-    keyboard_default_value=0xbf;
+    if( b & 0x10 ) {
+      keyboard_default_value=0xff;
+    } else {
+      keyboard_default_value=0xbf;
+    }
   }
-#else				/* #ifdef ISSUE2 */
-  if( b & 0x10 ) {
-    keyboard_default_value=0xff;
-  } else {
-    keyboard_default_value=0xbf;
-  }
-#endif				/* #ifdef ISSUE2 */
 }

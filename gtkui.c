@@ -38,6 +38,7 @@
 #include "fuse.h"
 #include "gtkkeyboard.h"
 #include "machine.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
@@ -61,27 +62,33 @@ static void gtkui_open(GtkWidget *widget, gpointer data);
 static void gtkui_save(GtkWidget *widget, gpointer data);
 static void gtkui_tape(GtkWidget *widget, gpointer data);
 static void gtkui_quit(GtkWidget *widget, gpointer data);
+static void gtkui_options( GtkWidget *widget, gpointer data );
 static void gtkui_reset(GtkWidget *widget, gpointer data);
 static void gtkui_switch(GtkWidget *widget, gpointer data);
 
-static char* gtkui_fileselector_get_filename( void );
 static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
+
+static char* gtkui_fileselector_get_filename( void );
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
+static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data );
+
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		     NULL , NULL,         0, "<Branch>"    },
-  { "/File/_Open Snapshot" , "F3" , gtkui_open,   0, NULL          },
-  { "/File/_Save Snapshot" , "F2" , gtkui_save,   0, NULL          },
-  { "/File/separator1",      NULL , NULL,         0, "<Separator>" },
-  { "/File/Open _Tape File", "F7" , gtkui_tape,   0, NULL          },
-  { "/File/separator2",      NULL , NULL,         0, "<Separator>" },
-  { "/File/E_xit",	     "F10", gtkui_quit,   0, NULL          },
-  { "/Machine",		     NULL , NULL,         0, "<Branch>"    },
-  { "/Machine/_Reset",	     "F5" , gtkui_reset,  0, NULL          },
-  { "/Machine/_Switch",      "F9" , gtkui_switch, 0, NULL          },
+  { "/File",		     NULL , NULL,          0, "<Branch>"    },
+  { "/File/_Open Snapshot" , "F3" , gtkui_open,    0, NULL          },
+  { "/File/_Save Snapshot" , "F2" , gtkui_save,    0, NULL          },
+  { "/File/separator1",      NULL , NULL,          0, "<Separator>" },
+  { "/File/Open _Tape File", "F7" , gtkui_tape,    0, NULL          },
+  { "/File/separator2",      NULL , NULL,          0, "<Separator>" },
+  { "/File/E_xit",	     "F10", gtkui_quit,    0, NULL          },
+  { "/Options",		     NULL , NULL,          0, "<Branch>"    },
+  { "/Options/_General",     "F4",  gtkui_options, 0, NULL	    },
+  { "/Machine",		     NULL , NULL,          0, "<Branch>"    },
+  { "/Machine/_Reset",	     "F5" , gtkui_reset,   0, NULL          },
+  { "/Machine/_Switch",      "F9" , gtkui_switch,  0, NULL          },
 };
-static guint gtkui_menu_data_size = 10;
+static guint gtkui_menu_data_size = 12;
   
 int ui_init(int *argc, char ***argv, int width, int height)
 {
@@ -263,6 +270,65 @@ static void gtkui_quit(GtkWidget *widget, gpointer data)
   fuse_exiting=1;
 }
 
+typedef struct gtkui_options_info {
+
+  GtkWidget *dialog;
+  GtkWidget *issue2;
+
+} gtkui_options_info;
+
+/* Called by the menu when Options/General selected */
+static void gtkui_options( GtkWidget *widget, gpointer data )
+{
+  gtkui_options_info dialog;
+  GtkWidget *ok_button, *cancel_button;
+  
+  /* Firstly, stop emulation */
+  fuse_emulation_pause();
+
+  /* Create the necessary widgets */
+  dialog.dialog = gtk_dialog_new();
+  gtk_window_set_title( GTK_WINDOW( dialog.dialog ),
+			"Fuse - General Options" );
+
+  dialog.issue2 =
+    gtk_check_button_new_with_label( "Issue 2 keyboard emulation" );
+  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.issue2 ),
+				settings_current.issue2 );
+
+  ok_button = gtk_button_new_with_label( "OK" );
+  cancel_button = gtk_button_new_with_label( "Cancel" );
+
+  /* Put everything into the dialog box */
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		     dialog.issue2 );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
+		     ok_button );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
+		     cancel_button );
+
+  /* Add the necessary callbacks */
+  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
+		      GTK_SIGNAL_FUNC( gtkui_options_done ),
+		      (gpointer) &dialog );
+  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog.dialog ) );
+  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete_event",
+		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+		      (gpointer) NULL );
+
+  /* Set the window to be modal and display it */
+  gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
+  gtk_widget_show_all( dialog.dialog );
+
+  /* Process events until the window is done with */
+  gtk_main();
+
+  /* And then carry on with emulation again */
+  fuse_emulation_unpause();
+}
+
 /* Called by the menu when Machine/Reset selected */
 static void gtkui_reset(GtkWidget *widget, gpointer data)
 {
@@ -275,13 +341,19 @@ static void gtkui_switch(GtkWidget *widget, gpointer data)
   machine_select_next();
 }
 
+/* Generic `tidy-up' callback */
+static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data )
+{
+  gtk_widget_destroy( widget );
+  gtk_main_quit();
+}
+
 /* Bits used for the file selection dialogs */
 
 typedef struct gktui_fileselector_info {
 
   GtkWidget *selector;
   gchar *filename;
-  int done;
 
 } gtkui_fileselector_info;
 
@@ -291,7 +363,6 @@ static char* gtkui_fileselector_get_filename( void )
 
   selector.selector = gtk_file_selection_new( "Select File" );
   selector.filename = NULL;
-  selector.done = 0;
 
   gtk_signal_connect(
       GTK_OBJECT( GTK_FILE_SELECTION( selector.selector )->ok_button ),
@@ -315,13 +386,7 @@ static char* gtkui_fileselector_get_filename( void )
 
   gtk_main();
 
-  return selector.done ? selector.filename : NULL;
-}
-
-static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data )
-{
-  gtk_widget_destroy( widget );
-  gtk_main_quit();
+  return selector.filename;
 }
 
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data )
@@ -337,8 +402,6 @@ static void gtkui_fileselector_done( GtkButton *button, gpointer user_data )
 
   gtk_widget_destroy( ptr->selector );
 
-  ptr->done = 1;
-
   gtk_main_quit();
 }
 
@@ -347,6 +410,19 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data )
   gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
 
   gtk_widget_destroy( ptr->selector );
+
+  gtk_main_quit();
+}
+
+/* Callbacks used by the Options dialog */
+static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data )
+{
+  gtkui_options_info *ptr = (gtkui_options_info*) user_data;
+
+  settings_current.issue2 =
+    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->issue2 ) );
+
+  gtk_widget_destroy( ptr->dialog );
 
   gtk_main_quit();
 }

@@ -138,19 +138,6 @@ if test "$ui" != gtk; then
   fi
 fi
 	       
-dnl Do we want issue 2 keyboard emulation?
-AC_MSG_CHECKING(whether Issue 2 emulation requested)
-AC_ARG_ENABLE(issue2,
-[  --enable-issue2         emulate an Issue 2 Spectrum],
-if test "$enableval" = yes; then
-    issue2=yes;
-    AC_DEFINE(ISSUE2)
-else
-    issue2=no;
-fi,
-issue2=no)
-AC_MSG_RESULT($issue2)
-
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
 AC_ARG_ENABLE(smallmem,
