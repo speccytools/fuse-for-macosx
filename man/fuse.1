@@ -976,13 +976,21 @@ If
 is omitted, it defaults to the current value of PC.
 .RE
 .PP
+br{eakpoint} p{ort} (r{ead}|w{rite})
+.I number
+.RS
+Set a breakpoint to trigger whenever IO port
+.I number
+is read from or written to.
+.RE
+.PP
 br{eakpoint} (r{ead}|w{rite})
 .RI [ number ]
 .RS
-Set a breakpoint to trigger whenever
+Set a breakpoint to trigger whenever memory location
 .I number
 is read from (other than via an opcode fetch) or written to.
-.I number
+.I Number
 again defaults to the current value of PC if omitted.
 .RE
 .PP
