@@ -1,5 +1,5 @@
-/* printer.c: Printer support
-   Copyright (c) 2001 Ian Collier, Russell Marks, Philip Kendall
+/* printer.h: Printer support
+   Copyright (c) 2001,2002 Ian Collier, Russell Marks, Philip Kendall
 
    $Id$
 
