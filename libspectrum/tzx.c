@@ -792,7 +792,7 @@ tzx_read_message( libspectrum_tape *tape, const libspectrum_byte **ptr,
   memcpy( message_block->text, (*ptr), length ); (*ptr) += length;
   message_block->text[length] = '\0';
 
-  /* Translate all '\r's in the message to '\n's */
+  /* Translate line endings */
   for( ptr2 = message_block->text; *ptr2; ptr2++ )
     if( *ptr2 == '\r' ) *ptr2 = '\n';
 
@@ -1298,13 +1298,14 @@ tzx_write_stop( libspectrum_byte **buffer, size_t *offset, size_t *length )
   libspectrum_error error;
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
-  /* Make room for the ID byte */
-  error = libspectrum_make_room( buffer, (*offset) + 1, &ptr, length );
+  /* Make room for the ID byte and four length bytes */
+  error = libspectrum_make_room( buffer, (*offset) + 5, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_STOP48;
+  *ptr++ = *ptr++ = *ptr++ = *ptr++ = '\0';
 
-  (*offset)++;
+  (*offset) += 5;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -1346,14 +1347,14 @@ tzx_write_message( libspectrum_tape_message_block *message_block,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_COMMENT;
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_MESSAGE;
   *ptr++ = message_block->time;
   *ptr++ = text_length;
 
   memcpy( ptr, message_block->text, text_length );
-  /* Translate all '\n's in the message to '\r's */
-  for( i=0; i<text_length; i++ )
-    if( *ptr == '\n' ) *ptr = '\r';
+  /* Translate line endings */
+  for( i=0; i<text_length; i++, ptr++ )
+    if( *ptr == '\x0a' ) *ptr = '\x0d';
 
   (*offset) += 3 + text_length;
 
