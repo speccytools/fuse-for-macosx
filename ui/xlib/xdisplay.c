@@ -296,7 +296,7 @@ get_shm_id( const int size )
 int
 xdisplay_configure_notify( int width, int height GCC_UNUSED )
 {
-  int y,size,colour;
+  int size, colour;
 
   colour= scld_hires ? display_hires_border : display_lores_border;
   size = width / DISPLAY_ASPECT_WIDTH;
