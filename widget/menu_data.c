@@ -113,7 +113,7 @@ widget_menu_entry widget_menu_tape[] = {
 widget_menu_entry widget_menu_help[] = {
   { "Help", 0, 0, NULL },		/* Menu title */
 
-  { "(K)eyboard picture...", KEYBOARD_k, widget_menu_keyboard, "keyboard.scr"},
+  { "(K)eyboard...", KEYBOARD_k, widget_menu_keyboard, "keyboard.scr" },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

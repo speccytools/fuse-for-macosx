@@ -35,6 +35,7 @@
 #include "gtkkeyboard.h"
 #include "keyboard.h"
 #include "keysyms.h"
+#include "widget/widget.h"
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);
 
@@ -48,9 +49,15 @@ int gtkkeyboard_keypress(GtkWidget *widget, GdkEvent *event,
   ptr=keysyms_get_data(keysym);
 
   if(ptr) {
-    if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
-    if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
+
+    if( widget_level >= 0 ) {
+      widget_keyhandler( ptr->key1 );
+    } else {
+      if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
+      if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
+    }
     return TRUE;
+
   } else {
     return FALSE;
   }

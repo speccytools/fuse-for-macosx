@@ -45,6 +45,7 @@
 #include "tape.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+#include "widget/widget.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -74,6 +75,8 @@ static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
 static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
+static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
+
 static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
 
 static char* gtkui_fileselector_get_filename( void );
@@ -83,24 +86,26 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 static void gtkui_options_done( GtkWidget *widget, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		        NULL , NULL,              0, "<Branch>"    },
-  { "/File/_Open Snapshot..." , "F3" , gtkui_open,        0, NULL          },
-  { "/File/_Save Snapshot..." , "F2" , gtkui_save,        0, NULL          },
-  { "/File/separator",          NULL , NULL,              0, "<Separator>" },
-  { "/File/E_xit",	        "F10", gtkui_quit,        0, NULL          },
-  { "/Options",		        NULL , NULL,              0, "<Branch>"    },
-  { "/Options/_General...",     "F4" , gtkui_options,     0, NULL          },
-  { "/Machine",		        NULL , NULL,              0, "<Branch>"    },
-  { "/Machine/_Reset",	        "F5" , gtkui_reset,       0, NULL          },
-  { "/Machine/_Select...",      "F9" , gtkui_select,      0, NULL          },
-  { "/Tape",                    NULL , NULL,              0, "<Branch>"    },
-  { "/Tape/_Open...",	        "F7" , gtkui_tape_open,   0, NULL          },
-  { "/Tape/_Play",	        "F8" , gtkui_tape_play,   0, NULL          },
-  { "/Tape/_Rewind",		NULL , gtkui_tape_rewind, 0, NULL          },
-  { "/Tape/_Clear",		NULL , gtkui_tape_clear,  0, NULL          },
-  { "/Tape/_Write...",		"F6" , gtkui_tape_write,  0, NULL          },
+  { "/File",		        NULL , NULL,                0, "<Branch>"    },
+  { "/File/_Open Snapshot..." , "F3" , gtkui_open,          0, NULL          },
+  { "/File/_Save Snapshot..." , "F2" , gtkui_save,          0, NULL          },
+  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
+  { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
+  { "/Options",		        NULL , NULL,                0, "<Branch>"    },
+  { "/Options/_General...",     "F4" , gtkui_options,       0, NULL          },
+  { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
+  { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
+  { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
+  { "/Tape",                    NULL , NULL,                0, "<Branch>"    },
+  { "/Tape/_Open...",	        "F7" , gtkui_tape_open,     0, NULL          },
+  { "/Tape/_Play",	        "F8" , gtkui_tape_play,     0, NULL          },
+  { "/Tape/_Rewind",		NULL , gtkui_tape_rewind,   0, NULL          },
+  { "/Tape/_Clear",		NULL , gtkui_tape_clear,    0, NULL          },
+  { "/Tape/_Write...",		"F6" , gtkui_tape_write,    0, NULL          },
+  { "/Help",			NULL , NULL,		    0, "<Branch>"    },
+  { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
 };
-static guint gtkui_menu_data_size = 16;
+static guint gtkui_menu_data_size = 18;
   
 int ui_init(int *argc, char ***argv, int width, int height)
 {
@@ -533,6 +538,11 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data )
   free( filename );
 
   fuse_emulation_unpause();
+}
+
+static void gtkui_help_keyboard( GtkWidget *widget, gpointer data )
+{
+  widget_menu_keyboard( "keyboard.scr" );
 }
 
 /* Generic `tidy-up' callback */
