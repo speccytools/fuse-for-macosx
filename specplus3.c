@@ -34,6 +34,7 @@
 #include <limits.h>		/* Needed to get PATH_MAX */
 #include <stdarg.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -86,14 +87,11 @@ spectrum_port_info specplus3_peripherals[] = {
 };
 
 #if HAVE_765_H
-static FDC_PTR fdc;
-
-static FDRV_PTR drive_a, drive_b;
-static int drive_a_fd, drive_b_fd;	/* File descriptors used to lock
-					   each disk file before inserting it
-					*/
-static FDRV_PTR drive_null;
-#endif			/* #ifdef HAVE_765_H */
+static FDC_PTR fdc;		/* The FDC */
+static specplus3_drive_t drives[ SPECPLUS3_DRIVE_B+1 ]; /* Drives A: and B: */
+static FDRV_PTR drive_null;	/* A null drive for drives 2 and 3 of the
+				   FDC */
+#endif				/* #ifdef HAVE_765_H */
 
 BYTE
 specplus3_unattached_port( void )
@@ -276,6 +274,9 @@ static DWORD specplus3_contend_delay( void )
 int specplus3_init( machine_info *machine )
 {
   int error;
+#ifdef HAVE_765_H
+  int i;
+#endif			/* #ifdef HAVE_765_H */
 
   machine->machine = SPECTRUM_MACHINE_PLUS3;
   machine->description = "Spectrum +3";
@@ -313,20 +314,16 @@ int specplus3_init( machine_info *machine )
   /* Create the FDC */
   fdc = fdc_new();
 
-  /* Setup the appropriate parameters for two floppy drives */
-  drive_a = fd_newdsk();		/* Use .DSK files for emulation */
-  fd_settype( drive_a, FD_30 );		/* FD_30 => 3" drive */
-  fd_setheads( drive_a, 1 );
-  fd_setcyls( drive_a, 40 );
-  fd_setreadonly( drive_a, 0 );
-  drive_a_fd = -1;			/* Nothing inserted */
+  for( i = SPECPLUS3_DRIVE_A; i <= SPECPLUS3_DRIVE_B; i++ ) {
 
-  drive_b = fd_newdsk();
-  fd_settype( drive_b, FD_30 );
-  fd_setheads( drive_b, 1 );
-  fd_setcyls( drive_b, 40 );
-  fd_setreadonly( drive_b, 0 );
-  drive_b_fd = -1;
+    drives[i].drive = fd_newdsk();		/* Use .DSK files */
+    fd_settype( drives[i].drive, FD_30 );	/* FD_30 => 3" drive */
+    fd_setheads( drives[i].drive, 1 );
+    fd_setcyls( drives[i].drive, 40 );
+    fd_setreadonly( drives[i].drive, 0 );
+    drives[i].fd = -1;				/* Nothing inserted */
+
+  }
 
   /* And a null drive to use for the other two drives lib765 supports */
   drive_null = fd_new();
@@ -400,8 +397,8 @@ specplus3_fdc_reset( void )
   /* Reset the FDC and set up the four drives (of which only drives 0 and
      1 exist on the +3 */
   fdc_reset( fdc );
-  fdc_setdrive( fdc, 0, drive_a );
-  fdc_setdrive( fdc, 1, drive_b );
+  fdc_setdrive( fdc, 0, drives[ SPECPLUS3_DRIVE_A ].drive );
+  fdc_setdrive( fdc, 1, drives[ SPECPLUS3_DRIVE_B ].drive );
   fdc_setdrive( fdc, 2, drive_null );
   fdc_setdrive( fdc, 3, drive_null );
 }
@@ -447,28 +444,70 @@ fdc_dprintf( int debug, char *format, ... )
 int
 specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 {
-  FDRV_PTR drive = NULL;
-  int *fd = NULL;
+  struct stat buf;
+  struct flock lock;
+  int i,error;
 
-  struct flock lock; int error;
-
-  switch( which ) {
-  case SPECPLUS3_DRIVE_A: drive = drive_a; fd = &drive_a_fd; break;
-  case SPECPLUS3_DRIVE_B: drive = drive_b; fd = &drive_b_fd; break;
-  default:
+  if( which < SPECPLUS3_DRIVE_A || which > SPECPLUS3_DRIVE_B ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d\n",
 	      which );
     fuse_abort();
   }
 
   /* Eject any disk already in the drive */
-  if( *fd != -1 ) specplus3_disk_eject( which );
+  if( drives[which].fd != -1 ) specplus3_disk_eject( which );
 
-  *fd = open( filename, O_RDWR );
-  if( *fd == -1 ) {
+  /* Open the disk file */
+  drives[which].fd = open( filename, O_RDWR );
+  if( drives[which].fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
 	      strerror( errno ) );
     return 1;
+  }
+
+  /* We now have to do two sorts of locking:
+
+     1) stop the same disk being put into more than one drive on this
+     copy of Fuse. Do this by looking at the st_dev (device) and
+     st_ino (inode) results from fstat(2) and assuming that each file
+     returns a persistent unique pair. This assumption isn't quite
+     true (I can break it with smbfs, and nmm1@cam.ac.uk has pointed
+     out some other cases), but it's right most of the time, and it's
+     POSIX compliant.
+
+     2) stop the same disk being accessed by other programs. Without
+     mandatory locking (ugh), can't enforce this, so just lock the
+     entire file with fcntl. Therefore two copies of Fuse (or anything
+     else using fcntl) can't access the file whilst it's in a
+     drive. Again, this is POSIX compliant.
+  */
+
+  error = fstat( drives[which].fd, &buf );
+  if( error == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't fstat '%s': %s", filename,
+	      strerror( errno ) );
+    close( drives[which].fd ); drives[which].fd = -1;
+    return 1;
+  }
+
+  drives[which].device = buf.st_dev;
+  drives[which].inode  = buf.st_ino;
+
+  for( i = SPECPLUS3_DRIVE_A; i <= SPECPLUS3_DRIVE_B; i++ ) {
+
+    /* Don't compare this drive with itself */
+    if( i == which ) continue;
+
+    /* If there's no file in this drive, it can't clash */
+    if( drives[i].fd == -1 ) continue;
+
+    if( drives[i].device == drives[which].device &&
+	drives[i].inode  == drives[which].inode ) {
+      ui_error( UI_ERROR_ERROR, "'%s' is already in drive %c:", filename,
+		(char)( 'A' + i ) );
+      close( drives[which].fd ); drives[which].fd = -1;
+      return 1;
+    }
   }
 
   /* Exclusively lock the entire file */
@@ -477,16 +516,16 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
   lock.l_whence = SEEK_SET;
   lock.l_len = 0;		/* Entire file */
 
-  error = fcntl( *fd, F_SETLK, &lock );
+  error = fcntl( drives[which].fd, F_SETLK, &lock );
   if( error == -1 ) {
     ui_error( UI_ERROR_ERROR, "Couldn't lock '%s': %s", filename,
 	      strerror( errno ) );
-    close( *fd );
+    close( drives[which].fd ); drives[which].fd = -1;
     return 1;
   }
 
   /* And now insert the disk */
-  fdd_setfilename( drive, filename );
+  fdd_setfilename( drives[which].drive, filename );
 
   return 0;
 }
@@ -494,15 +533,9 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 int
 specplus3_disk_eject( specplus3_drive_number which )
 {
-  FDRV_PTR drive = NULL;
-  int *fd = NULL;
-  
   int error;
 
-  switch( which ) {
-  case SPECPLUS3_DRIVE_A: drive = drive_a; fd = &drive_a_fd; break;
-  case SPECPLUS3_DRIVE_B: drive = drive_b; fd = &drive_b_fd; break;
-  default:
+  if( which < SPECPLUS3_DRIVE_A || which > SPECPLUS3_DRIVE_B ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_eject: unknown drive %d\n",
 	      which );
     fuse_abort();
@@ -510,16 +543,16 @@ specplus3_disk_eject( specplus3_drive_number which )
 
   /* NB: the fclose() called here will cause the lock on the file to
      be released */
-  fd_eject( drive );
+  fd_eject( drives[which].drive );
 
-  if( *fd != -1 ) {
-    error = close( *fd );
+  if( drives[which].fd != -1 ) {
+    error = close( drives[which].fd );
     if( error == -1 ) {
       ui_error( UI_ERROR_ERROR, "Couldn't close the disk: %s\n",
 		strerror( errno ) );
       return 1;
     }
-    *fd = -1;
+    drives[which].fd = -1;
   }
 
   return 0;
@@ -531,8 +564,8 @@ static int
 specplus3_shutdown( void )
 {
 #ifdef HAVE_765_H
-  fd_destroy( &drive_a );
-  fd_destroy( &drive_b );
+  fd_destroy( &drives[ SPECPLUS3_DRIVE_A ].drive );
+  fd_destroy( &drives[ SPECPLUS3_DRIVE_B ].drive );
   fd_destroy( &drive_null );
 
   fdc_destroy( &fdc );

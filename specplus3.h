@@ -31,6 +31,11 @@
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
+#ifdef HAVE_765_H
+#include <limits.h>	/* Needed to get PATH_MAX */
+#include <765.h>
+#endif			/* #ifdef HAVE_765_H */
+
 BYTE specplus3_unattached_port( void );
 
 BYTE specplus3_readbyte(WORD address);
@@ -45,14 +50,28 @@ int specplus3_reset(void);
 
 void specplus3_memoryport_write(WORD port, BYTE b);
 
+#ifdef HAVE_765_H
 /* The +3's drives */
+
 typedef enum specplus3_drive_number {
   SPECPLUS3_DRIVE_A = 0,
   SPECPLUS3_DRIVE_B,
 } specplus3_drive_number;
 
+typedef struct specplus3_drive_t {
+  int fd;			/* Our file descriptor for this disk; note
+				   that lib765 will use a stdio stream
+				   as well internally; if -1 => no disk
+				   in drive */
+  dev_t device;			/* The device and inode where this disk file */
+  ino_t inode;			/* resides. Used to check for the same file
+				   being put into both drives */
+  FDRV_PTR drive;		/* The lib765 structure for this drive */
+} specplus3_drive_t;
+
 int specplus3_disk_insert( specplus3_drive_number which,
 			   const char *filename );
 int specplus3_disk_eject( specplus3_drive_number which );
+#endif			/* #ifdef HAVE_765_H */
 
 #endif			/* #ifndef FUSE_SPECPLUS3_H */
