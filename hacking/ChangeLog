@@ -477,3 +477,4 @@
 	 BRANCH: Release-0_6_2-branch (from Release-0_6_2-trunk)
 20040207 Create and use a new UI_ERROR_WARNING error level.
 20040207 Remove duplicated ui_verror code.
+20040207 widget/error.c: #include "fuse.h".

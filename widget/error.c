@@ -1,5 +1,5 @@
 /* error.c: The error reporting widget
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "fuse.h"
 #include "keyboard.h"
 #include "widget_internals.h"
 
