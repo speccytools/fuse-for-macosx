@@ -254,7 +254,7 @@ dump_memory_state( void )
     while( i < 0x10000 && memory[ i ] != initial_memory[ i ] )
       printf( "%2x ", memory[ i++ ] );
 
-    printf( "\n" );
+    printf( "-1\n" );
   }
 }
 
