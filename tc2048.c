@@ -1,5 +1,5 @@
 /* tc2048.c: Timex TC2048 specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
    Copyright (c) 2002 Fredrick Meunier
 
    $Id$
@@ -101,16 +101,16 @@ static DWORD tc2048_contend_delay( void )
 
   /* Work out where we are in this line */
   tstates_through_line =
-    ( tstates + machine_current->timings.left_border_cycles ) %
-    machine_current->timings.cycles_per_line;
+    ( tstates + machine_current->timings.left_border ) %
+    machine_current->timings.tstates_per_line;
 
   /* No contention if we're in the left border */
-  if( tstates_through_line < machine_current->timings.left_border_cycles - 1 ) 
+  if( tstates_through_line < machine_current->timings.left_border - 1 ) 
     return 0;
 
   /* Or the right border or retrace */
-  if( tstates_through_line >= machine_current->timings.left_border_cycles +
-                              machine_current->timings.screen_cycles - 1 )
+  if( tstates_through_line >= machine_current->timings.left_border +
+                              machine_current->timings.horizontal_screen - 1 )
     return 0;
 
   /* We now know the ULA is reading the screen, so put in the appropriate
@@ -138,7 +138,7 @@ int tc2048_init( fuse_machine_info *machine )
 
   machine->reset = tc2048_reset;
 
-  machine_set_timings( machine, 3.528e6, 24, 128, 24, 48, 312, 8936 );
+  error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 1;
   machine->ram.read_memory	     = tc2048_readbyte;

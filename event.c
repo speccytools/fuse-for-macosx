@@ -217,7 +217,7 @@ event_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
    effect */
 static int event_force_events( void )
 {
-  while( event_next_event < machine_current->timings.cycles_per_frame ) {
+  while( event_next_event < machine_current->timings.tstates_per_frame ) {
 
     /* Jump along to the next event */
     tstates = event_next_event;
@@ -228,7 +228,7 @@ static int event_force_events( void )
   }
 
   /* Finally, jump to the interrupt time */
-  tstates = machine_current->timings.cycles_per_frame;
+  tstates = machine_current->timings.tstates_per_frame;
 
   return 0;
 }

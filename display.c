@@ -474,9 +474,9 @@ static void display_set_border(void)
 
   /* Now check we're not in horizonal retrace. Again, do nothing
      if we are */
-  if(time_since_line >= machine_current->timings.left_border_cycles +
-                        machine_current->timings.screen_cycles +
-                        machine_current->timings.right_border_cycles ) return;
+  if(time_since_line >= machine_current->timings.left_border +
+                        machine_current->timings.horizontal_screen +
+                        machine_current->timings.right_border ) return;
       
   current_pixel=display_border_column(time_since_line);
 
@@ -531,8 +531,9 @@ static int display_border_column(int time_since_line)
 
   /* But now need to correct because our displayed border isn't necessarily
      the same size as the ULA's. */
-  column -= ( ((machine_current->timings.left_border_cycles)<<1) -
-	      DISPLAY_BORDER_ASPECT_WIDTH );
+  column -= ( machine_current->timings.left_border << 1 ) -
+    DISPLAY_BORDER_ASPECT_WIDTH;
+
   if(column < 0) {
     column=0;
   } else if(column > DISPLAY_ASPECT_WIDTH) {

@@ -49,22 +49,6 @@
 #include "spectrum.h"
 #endif			/* #ifndef FUSE_SPECTRUM_H */
 
-typedef struct machine_timings {
-
-  DWORD hz;		    /* Processor speed in Hz */
-
-  WORD left_border_cycles;  /* T-states spent drawing left border */
-  WORD screen_cycles;	    /* T-states spent drawing screen */
-  WORD right_border_cycles; /* T-states spent drawing right border */
-  WORD retrace_cycles;	    /* T-states spent in horizontal retrace */
-  WORD cycles_per_line;	    /* = sum of above four values */
-
-  WORD lines_per_frame;
-
-  DWORD cycles_per_frame;   /* = cycles_per_line * lines_per_frame */
-
-} machine_timings;  
-
 typedef BYTE (*spectrum_unattached_port_fn)( void );
 
 typedef struct fuse_machine_info {
@@ -76,7 +60,7 @@ typedef struct fuse_machine_info {
 
   int timex;            /* Timex machine (keyboard emulation/loading sounds etc.) */
 
-  machine_timings timings; /* How long do things take to happen? */
+  libspectrum_timings timings; /* How long do things take to happen? */
   /* Redraw line y this many tstates after interrupt */
   DWORD	line_times[DISPLAY_SCREEN_HEIGHT+1];
 
@@ -108,10 +92,7 @@ int machine_select( int type );
 int machine_select_id( const char *id );
 const char* machine_get_id( libspectrum_machine type );
 
-void machine_set_timings( fuse_machine_info *machine, DWORD hz,
-			  WORD left_border_cycles,  WORD screen_cycles,
-			  WORD right_border_cycles, WORD retrace_cycles,
-			  WORD lines_per_frame, DWORD first_line);
+int machine_set_timings( fuse_machine_info *machine );
 
 int machine_allocate_roms( fuse_machine_info *machine, size_t count );
 int machine_load_rom( BYTE **ROM, char *filename, size_t expected_length );

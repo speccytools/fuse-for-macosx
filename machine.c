@@ -175,7 +175,7 @@ static int machine_select_machine( fuse_machine_info *machine )
 
   /* Reset the event stack */
   event_reset();
-  if( event_add( machine->timings.cycles_per_frame, EVENT_TYPE_INTERRUPT) )
+  if( event_add( machine->timings.tstates_per_frame, EVENT_TYPE_INTERRUPT ) )
     return 1;
   if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
@@ -274,37 +274,39 @@ machine_reset( void )
   return 0;
 }
 
-void machine_set_timings( fuse_machine_info *machine, DWORD hz,
-			  WORD left_border_cycles,  WORD screen_cycles,
-			  WORD right_border_cycles, WORD retrace_cycles,
-			  WORD lines_per_frame, DWORD first_line)
+int
+machine_set_timings( fuse_machine_info *machine )
 {
-  int y;
+  libspectrum_error error;
+  size_t y;
 
-  machine->timings.hz=hz;
+  error = libspectrum_machine_timings( &machine->timings, machine->machine );
+  if( error ) return error;
 
-  machine->timings.left_border_cycles  = left_border_cycles;
-  machine->timings.screen_cycles       = screen_cycles;
-  machine->timings.right_border_cycles = right_border_cycles;
-  machine->timings.retrace_cycles      = retrace_cycles;
+  /* Magic number alert
 
-  machine->timings.cycles_per_line     = left_border_cycles +
-                                         screen_cycles +
-                                         right_border_cycles +
-					 retrace_cycles;
+     libspectrum_machine_timings gives us the number of tstates after the
+     interrupt at which the top-left pixel of the screen is displayed.
+     However, what's more useful for Fuse is when the first pixel of the
+     top line of the border is displayed.
 
-  machine->timings.lines_per_frame     = lines_per_frame;
+     Fuse is currently hard-wired to show 24 lines of top and bottom border,
+     hence we subtract 24 times the line length. We also subtract the
+     appropriate number of left border cycles; the difference between this
+     and the actually displayed width is accounted for in
+     display.c:display_border_column()
+  */
 
-  machine->timings.cycles_per_frame    = 
-    machine->timings.cycles_per_line * 
-    (DWORD)lines_per_frame;
+  machine->line_times[0]= machine->timings.top_left_pixel -
+                          24 * machine->timings.tstates_per_line -
+                          machine->timings.left_border;
 
-  machine->line_times[0]=first_line;
   for( y=1; y<DISPLAY_SCREEN_HEIGHT+1; y++ ) {
     machine->line_times[y] = machine->line_times[y-1] + 
-                             machine->timings.cycles_per_line;
+                             machine->timings.tstates_per_line;
   }
 
+  return 0;
 }
 
 int machine_allocate_roms( fuse_machine_info *machine, size_t count )

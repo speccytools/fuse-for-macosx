@@ -756,10 +756,10 @@ if(val==sound_oldval_orig[bchan]) return;
 /* XXX a lookup table might help here, but would need to regenerate it
  * whenever cycles_per_frame were changed (i.e. when machine type changed).
  */
-newpos=(tstates*sound_framesiz)/machine_current->timings.cycles_per_frame;
+newpos=(tstates*sound_framesiz)/machine_current->timings.tstates_per_frame;
 /* the >>1s are to avoid overflow when int is 32-bit */
 subpos=((tstates>>1)*sound_framesiz*vol)/
-       (machine_current->timings.cycles_per_frame>>1)-vol*newpos;
+       (machine_current->timings.tstates_per_frame>>1)-vol*newpos;
 
 /* if we already wrote here, adjust the level.
  */

@@ -64,7 +64,7 @@ int spec16_init( fuse_machine_info *machine )
 
   machine->reset = spec16_reset;
 
-  machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
+  error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
   machine->ram.read_memory    = spec16_readbyte;

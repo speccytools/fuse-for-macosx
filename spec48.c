@@ -89,16 +89,16 @@ static DWORD spec48_contend_delay( void )
 
   /* Work out where we are in this line */
   tstates_through_line =
-    ( tstates + machine_current->timings.left_border_cycles ) %
-    machine_current->timings.cycles_per_line;
+    ( tstates + machine_current->timings.left_border ) %
+    machine_current->timings.tstates_per_line;
 
   /* No contention if we're in the left border */
-  if( tstates_through_line < machine_current->timings.left_border_cycles - 1 ) 
+  if( tstates_through_line < machine_current->timings.left_border - 1 ) 
     return 0;
 
   /* Or the right border or retrace */
-  if( tstates_through_line >= machine_current->timings.left_border_cycles +
-                              machine_current->timings.screen_cycles - 1 )
+  if( tstates_through_line >= machine_current->timings.left_border +
+                              machine_current->timings.horizontal_screen - 1 )
     return 0;
 
   /* We now know the ULA is reading the screen, so put in the appropriate
@@ -126,7 +126,7 @@ int spec48_init( fuse_machine_info *machine )
 
   machine->reset = spec48_reset;
 
-  machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
+  error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
   machine->ram.read_memory           = spec48_readbyte;

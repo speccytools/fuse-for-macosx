@@ -286,7 +286,7 @@ int rzx_stop_playback( int add_interrupt )
      out of frames, as this occurs just before a normal interrupt will
      do this for us */
   if( add_interrupt ) {
-    error = event_add( machine_current->timings.cycles_per_frame,
+    error = event_add( machine_current->timings.tstates_per_frame,
 		       EVENT_TYPE_INTERRUPT );
     if( error ) return error;
   }

@@ -391,7 +391,7 @@ else
       
   if(frame>400)
     frame=400;
-  cycles+=frame*machine_current->timings.cycles_per_frame;
+  cycles+=frame*machine_current->timings.tstates_per_frame;
   x=cycles/cpp-64;        /* x-coordinate reached */
       
   while(x>320)
@@ -440,7 +440,7 @@ else
       
   if(frame>400)
     frame=400; /* limit height of blank paper */
-  cycles+=frame*machine_current->timings.cycles_per_frame;
+  cycles+=frame*machine_current->timings.tstates_per_frame;
   x=cycles/cpp-64;        /* x-coordinate reached */
   for(i=zxppixel;i<x && i<256;i++)
     if(i>=0)		/* should be, but just in case */
@@ -451,8 +451,8 @@ else
   while(x>=320)
     {          /* move to next line */
     zxpcycles+=cpp*384;
-    if(zxpcycles>=machine_current->timings.cycles_per_frame)
-      zxpcycles-=machine_current->timings.cycles_per_frame,zxpframes++;
+    if(zxpcycles>=machine_current->timings.tstates_per_frame)
+      zxpcycles-=machine_current->timings.tstates_per_frame,zxpframes++;
     x-=384;
     if(zxpnewspeed)
       {
@@ -588,7 +588,7 @@ if((old_on && !on) || (!old_on && on))
     second_edge=0;
     diff=tstates;
     if(frames!=last_frames)
-      diff+=machine_current->timings.cycles_per_frame;
+      diff+=machine_current->timings.tstates_per_frame;
     diff-=last_tstates;
 
     if(diff<=PARALLEL_STROBE_MAX_CYCLES)
