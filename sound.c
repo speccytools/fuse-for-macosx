@@ -1,5 +1,5 @@
 /* sound.c: Sound support
-   Copyright (c) 2000-2001 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2002 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@
  * very high at all. And I speak as a Cyrix owner. :-)
  */
 
+#include <config.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -42,20 +44,13 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
-#include <config.h>
-
-#if defined(HAVE_SYS_SOUNDCARD_H)
-#include "osssound.h"
-#endif
-#if defined(HAVE_SYS_AUDIOIO_H)
-#include "sunsound.h"
-#endif
-
 #include "fuse.h"
 #include "machine.h"
+#include "osssound.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
+#include "sunsound.h"
 
 /* configuration */
 int sound_enabled=0;		/* Are we currently using the sound card;
