@@ -9,6 +9,9 @@ Some thanks (in alphabetical order):
   was very helpful for getting the z80 opcodes right; also the ZX Printer
   emulation is based on xz80's.
 
+* Boris Donko: for spotting that I'd forgotten memory contention on the
+  LD (nnnn),A instruction.
+
 * John Elliott: for lib765, which provides Fuse's emulation of the +3's
   FDC: see http://www.seasip.demon.co.uk/Unix/LibDsk/
 

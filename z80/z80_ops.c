@@ -300,10 +300,12 @@ void z80_do_opcodes()
       SPH=readbyte(PC++);
       break;
     case 0x32:		/* LD (nnnn),A */
-      tstates+=13;
+      contend( PC, 3 );
       {
 	WORD wordtemp=readbyte(PC++);
+	contend( PC, 3 );
 	wordtemp|=readbyte(PC++) << 8;
+	contend( wordtemp, 3 );
 	writebyte(wordtemp,A);
       }
       break;
