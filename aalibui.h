@@ -1,5 +1,5 @@
-/* acconfig.h: Descriptions of macros produced by autoconf
-   Copyright (c) 2000 Philip Kendall
+/* aalibui.h: Routines for dealing with the aalib user interface
+   Copyright (c) 2001 Philip Kendall
 
    $Id$
 
@@ -24,26 +24,13 @@
 
 */
 
-/* Defined if we've got enough memory to compile z80_ops.c */
-#undef HAVE_ENOUGH_MEMORY
+#ifndef FUSE_AALIBUI_H
+#define FUSE_AALIBUI_H
 
-/* Defined if we've got glib */
-#undef HAVE_LIB_GLIB
+#ifndef __AALIB_INCLUDED__
+#include <aalib.h>
+#endif
 
-/* Defined if Issue 2 emulation requested */
-#undef ISSUE2
+extern aa_context *aalibui_context;
 
-/* Defined if aalib UI in use */
-#undef UI_AALIB
-
-/* Defined if framebuffer UI in use */
-#undef UI_FB
-
-/* Defined if GTK+ UI in use */
-#undef UI_GTK
-
-/* Defined if svgalib UI in use */
-#undef UI_SVGA
-
-/* Defined if Xlib UI in use */
-#undef UI_X
+#endif			/* #ifndef FUSE_GTKUI_H */

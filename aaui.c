@@ -1,5 +1,5 @@
-/* acconfig.h: Descriptions of macros produced by autoconf
-   Copyright (c) 2000 Philip Kendall
+/* aaui.c: Routines for dealing with the aalib user interface
+   Copyright (c) 2001 Philip Kendall
 
    $Id$
 
@@ -24,26 +24,46 @@
 
 */
 
-/* Defined if we've got enough memory to compile z80_ops.c */
-#undef HAVE_ENOUGH_MEMORY
+#include <config.h>
 
-/* Defined if we've got glib */
-#undef HAVE_LIB_GLIB
+#ifdef UI_AALIB			/* Use this iff we're using svgalib */
 
-/* Defined if Issue 2 emulation requested */
-#undef ISSUE2
+#include <stdio.h>
 
-/* Defined if aalib UI in use */
-#undef UI_AALIB
+#include "fuse.h"
+#include "ui.h"
+#include "uidisplay.h"
 
-/* Defined if framebuffer UI in use */
-#undef UI_FB
+int ui_init(int *argc, char ***argv, int width, int height)
+{
+  int error;
 
-/* Defined if GTK+ UI in use */
-#undef UI_GTK
+  error = uidisplay_init(width, height);
+  if(error) return error;
 
-/* Defined if svgalib UI in use */
-#undef UI_SVGA
+  error = aalibkeyboard_init();
+  if(error) return error;
 
-/* Defined if Xlib UI in use */
-#undef UI_X
+  return 0;
+}
+
+int ui_event()
+{
+  keyboard_update();
+  return 0;
+}
+
+int ui_end(void)
+{
+  int error;
+
+  error = svgakeyboard_end();
+  if(error) return error;
+
+  error = uidisplay_end();
+  if(error) return error;
+
+  return 0;
+}
+
+#endif				/* #ifdef UI_AALIB */

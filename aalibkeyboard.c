@@ -1,5 +1,5 @@
-/* acconfig.h: Descriptions of macros produced by autoconf
-   Copyright (c) 2000 Philip Kendall
+/* aalibkeyboard.c: aalib routines for dealing with the keyboard
+   Copyright (c) 2001 Philip Kendall
 
    $Id$
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
    Author contact information:
 
@@ -24,26 +24,35 @@
 
 */
 
-/* Defined if we've got enough memory to compile z80_ops.c */
-#undef HAVE_ENOUGH_MEMORY
+#include <config.h>
 
-/* Defined if we've got glib */
-#undef HAVE_LIB_GLIB
+#ifdef UI_AALIB			/* Use this iff we're using svgalib */
 
-/* Defined if Issue 2 emulation requested */
-#undef ISSUE2
+#include <stdio.h>
 
-/* Defined if aalib UI in use */
-#undef UI_AALIB
+#include <aalib.h>
 
-/* Defined if framebuffer UI in use */
-#undef UI_FB
+#include "aalibui.h"
+#include "display.h"
+#include "fuse.h"
+#include "keyboard.h"
+#include "keysyms.h"
+#include "machine.h"
+#include "settings.h"
+#include "snapshot.h"
+#include "spectrum.h"
+#include "tape.h"
 
-/* Defined if GTK+ UI in use */
-#undef UI_GTK
+int aalibkeyboard_init(void)
+{
+  aa_autoinitkbd( aalibui_context, AA_SENDRELEASE );
+  return 0;
+}
 
-/* Defined if svgalib UI in use */
-#undef UI_SVGA
+int aalibkeyboard_end(void)
+{
+  aa_uninitkbd( aalibui_context );
+  return 0;
+}
 
-/* Defined if Xlib UI in use */
-#undef UI_X
+#endif				/* #ifdef UI_SVGA */

@@ -1,5 +1,5 @@
-/* acconfig.h: Descriptions of macros produced by autoconf
-   Copyright (c) 2000 Philip Kendall
+/* aalibkeyboard.h: aalib routines for dealing with the keyboard
+   Copyright (c) 2001 Philip Kendall
 
    $Id$
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
    Author contact information:
 
@@ -24,26 +24,10 @@
 
 */
 
-/* Defined if we've got enough memory to compile z80_ops.c */
-#undef HAVE_ENOUGH_MEMORY
+#ifndef FUSE_AALIBKEYBOARD_H
+#define FUSE_AALIBKEYBOARD_H
 
-/* Defined if we've got glib */
-#undef HAVE_LIB_GLIB
+int aalibkeyboard_init(void);
+int aalibkeyboard_end(void);
 
-/* Defined if Issue 2 emulation requested */
-#undef ISSUE2
-
-/* Defined if aalib UI in use */
-#undef UI_AALIB
-
-/* Defined if framebuffer UI in use */
-#undef UI_FB
-
-/* Defined if GTK+ UI in use */
-#undef UI_GTK
-
-/* Defined if svgalib UI in use */
-#undef UI_SVGA
-
-/* Defined if Xlib UI in use */
-#undef UI_X
+#endif			/* #ifndef FUSE_AALIBKEYBOARD_H */
