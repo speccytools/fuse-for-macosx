@@ -42,11 +42,14 @@ sub read ($) {
 	my( $name, $title, @widgets ) = split /\n/;
 
 	foreach( @widgets ) {
-	    my( $widget_type, $text, $value, $key ) = split /\s*,\s*/;
+	    my( $widget_type, $text, $value, $key, $data1, $data2 ) =
+		split /\s*,\s*/;
 	    $_ = { type => $widget_type,
 		   text => $text,
 		   value => $value,
 		   key => $key,
+		   data1 => $data1,
+		   data2 => $data2,
 	         };
 	}
 

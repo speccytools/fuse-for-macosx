@@ -64,11 +64,11 @@ void
 gtkoptions_$_->{name}( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkoptions_$_->{name}_t dialog;
-  GtkWidget *ok_button, *cancel_button, *hbox, *text;
-  gchar buffer[4];
+  GtkWidget *ok_button, *cancel_button, *hbox, *text, *text2;
+  gchar buffer[80];
 
-  hbox = NULL; text = NULL;
-  buffer[0] = '\0';		/* Shut gcc up */
+  hbox = text = text2 = NULL;
+  buffer[0] = '\\0';		/* Shut gcc up */
   
   /* Firstly, stop emulation */
   fuse_emulation_pause();
@@ -99,17 +99,24 @@ CODE
 CODE
             } elsif( $type eq "Entry" ) {
 
+                # FIXME: Make the entry widget resize sensibly
+
 		print << "CODE";
-  dialog.$widget->{value} = gtk_entry_new_with_max_length( 3 );
-  snprintf( buffer, 4, "%d", settings_current.emulation_speed );
+  dialog.$widget->{value} = gtk_entry_new();
+  gtk_entry_set_max_length( GTK_ENTRY( dialog.$widget->{value} ),
+	   		    $widget->{data1} );
+  snprintf( buffer, $widget->{data1} + 1, "%d",
+	    settings_current.$widget->{value} );
   gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
 
   text = gtk_label_new( "$text" );
+  text2 = gtk_label_new( "$widget->{data2}" );
 
   hbox = gtk_hbox_new( FALSE, 5 );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), text );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), dialog.$widget->{value} );
-  
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), text2 );
+
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
 		     hbox );
 CODE
