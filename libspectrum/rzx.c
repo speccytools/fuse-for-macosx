@@ -86,7 +86,7 @@ libspectrum_rzx_frame( libspectrum_rzx *rzx, size_t instructions,
 libspectrum_error
 libspectrum_rzx_free( libspectrum_rzx *rzx )
 {
-  free( rzx->frames );
+  free( rzx->frames ); rzx->frames = NULL;
   rzx->count = rzx->allocated = 0;
   return LIBSPECTRUM_ERROR_NONE;
 }
