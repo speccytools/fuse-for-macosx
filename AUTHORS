@@ -28,6 +28,8 @@ Fuse has been brought to you by:
 
 * Witold Filipczyk: TC2068 support and more.
 
+* Matthew Wescott: the AY logging code.
+
 * Marek Januszewski: Some patches making Fuse much closer to compiling under
   Win32, and fixing up the GTK+ 2.0 interface.
 
