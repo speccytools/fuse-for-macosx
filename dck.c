@@ -1,5 +1,5 @@
 /* dck.c: dock snapshot (Warajevo .DCK) handling routines
-   Copyright (c) 2003 Darren Salt, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2004 Darren Salt, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -37,6 +37,7 @@
 
 #include "dck.h"
 #include "machine.h"
+#include "memory.h"
 #include "settings.h"
 #include "scld.h"
 #include "ui/ui.h"
@@ -135,25 +136,26 @@ dck_read( const char *filename )
         break;
 
       case LIBSPECTRUM_DCK_PAGE_ROM:
-        mem[i]->page = dck->dck[num_block]->pages[i];
-        mem[i]->allocated = 1;
+        mem[i]->page = memory_pool_allocate( 0x2000 );
+	if( !mem[i]->page ) return 1;
+	memcpy( mem[i]->page, dck->dck[num_block]->pages[i], 0x2000 );
         mem[i]->writable = 0;
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
       case LIBSPECTRUM_DCK_PAGE_RAM:
-        if( dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME && i > 1 ) {
-          /* Because the scr and snapshot code depends on the standard memory
-             map being in the RAM[] array, we copy blocks from the HOME bank
-             into the appropriate page via the timex_home structure */
-          memcpy( mem[i]->page, dck->dck[num_block]->pages[i], 0x2000 );
-          free( dck->dck[num_block]->pages[i] );
-        } else {
-          mem[i]->page = dck->dck[num_block]->pages[i];
-          mem[i]->allocated = 1;
+	/* Because the scr and snapshot code depends on the standard
+	   memory map being in the RAM[] array, we just copy RAM
+	   blocks from the HOME bank into the appropriate page; in
+	   other cases, we allocate ourselves a new page to store the
+	   contents in */
+        if( dck->dck[num_block]->bank != LIBSPECTRUM_DCK_BANK_HOME || i < 2 ) {
+          mem[i]->page = memory_pool_allocate( 0x2000 );
+	  if( !mem[i]->page ) return 1;
           mem[i]->writable = 1;
         }
-
+	
+	memcpy( mem[i]->page, dck->dck[num_block]->pages[i], 0x2000 );
         break;
 
       }
@@ -164,6 +166,5 @@ dck_read( const char *filename )
   /* Make the menu item to eject the cartridge active */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT, 1 );
 
-  /* Don't deallocate the memory banks! */
-  return libspectrum_dck_free( dck, 1 );
+  return libspectrum_dck_free( dck, 0 );
 }

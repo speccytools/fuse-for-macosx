@@ -44,7 +44,6 @@ typedef struct memory_page {
   libspectrum_byte *page;	/* The data for this page */
   int writable;			/* Can we write to this data? */
   int contended;		/* Are reads/writes to this page contended? */
-  int allocated;		/* Do we own the memory for this page? */
 
   memory_bank bank;		/* Which bank is mapped in here */
   int page_num;			/* Which page from the bank */
@@ -68,6 +67,8 @@ extern int memory_current_screen;
 extern libspectrum_word memory_screen_mask;
 
 int memory_init( void );
+libspectrum_byte *memory_pool_allocate( size_t length );
+void memory_pool_free( void );
 
 libspectrum_byte readbyte( libspectrum_word address );
 

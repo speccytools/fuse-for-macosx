@@ -76,7 +76,6 @@ int spec16_init( fuse_machine_info *machine )
   empty_mapping.page = empty_chunk;
   empty_mapping.writable = 0;
   empty_mapping.contended = 0;
-  empty_mapping.allocated = 0;
   empty_mapping.bank = MEMORY_BANK_NONE;
 
   machine->unattached_port = spec16_unattached_port;

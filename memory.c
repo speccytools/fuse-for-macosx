@@ -34,6 +34,7 @@
 #include "memory.h"
 #include "settings.h"
 #include "spectrum.h"
+#include "ui/ui.h"
 
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map[8];
@@ -50,6 +51,9 @@ memory_page memory_map_ram[32];
 /* Standard mappings for the ROMs */
 memory_page memory_map_rom[8];
 
+/* All the memory we've allocated for this machine */
+static GSList *pool;
+
 /* Which RAM page contains the current screen */
 int memory_current_screen;
 
@@ -65,14 +69,15 @@ memory_init( void )
   size_t i;
   memory_page *mapping1, *mapping2;
 
+  /* Nothing in the memory pool as yet */
+  pool = NULL;
+
   for( i = 0; i < 8; i++ ) {
 
     mapping1 = &memory_map_rom[ i ];
 
     mapping1->page = NULL;
-    mapping1->allocated = 0;
     mapping1->writable = 0;
-    mapping1->allocated = 0;
     mapping1->bank = MEMORY_BANK_HOME;
     mapping1->page_num = i;
 
@@ -87,7 +92,6 @@ memory_init( void )
     mapping2->page = &RAM[i][ 0x2000 ];
 
     mapping1->writable = mapping2->writable = 1;
-    mapping1->allocated = mapping2->allocated = 0;
     mapping1->bank = mapping2->bank = MEMORY_BANK_HOME;
     mapping1->page_num = mapping2->page_num = i;
 
@@ -102,6 +106,37 @@ memory_init( void )
       &memory_map_ram[0];
 
   return 0;
+}
+
+/* Allocate some memory from the pool */
+libspectrum_byte*
+memory_pool_allocate( size_t length )
+{
+  libspectrum_byte *ptr;
+
+  ptr = malloc( length * sizeof( libspectrum_byte ) );
+  if( !ptr ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    return NULL;
+  }
+
+  pool = g_slist_prepend( pool, ptr );
+
+  return ptr;
+}
+
+static void
+free_memory( gpointer data, gpointer user_data )
+{
+  free( data );
+}
+
+void
+memory_pool_free( void )
+{
+  g_slist_foreach( pool, free_memory, NULL );
+  g_slist_free( pool );
+  pool = NULL;
 }
 
 libspectrum_byte

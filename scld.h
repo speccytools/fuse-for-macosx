@@ -132,6 +132,4 @@ libspectrum_byte scld_hsr_read( libspectrum_word port, int *attached );
 libspectrum_byte hires_get_attr( void );
 libspectrum_byte hires_convert_dec( libspectrum_byte attr );
 
-void scld_bank_free( memory_page **bank );
-
 #endif                  /* #ifndef FUSE_SCLD_H */

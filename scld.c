@@ -143,17 +143,3 @@ hires_convert_dec( libspectrum_byte attr )
     default:	       return 0x78; /* WHITEBLACK */
   }
 }
-
-void
-scld_bank_free( memory_page **bank )
-{
-  size_t i;
-
-  for( i = 0; i < 8; i++ ) {
-    if( bank[i]->allocated ) {
-      free( bank[i]->page );
-      bank[i]->page = NULL;
-      bank[i]->allocated = 0;
-    }
-  }
-}

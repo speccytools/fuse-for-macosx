@@ -762,3 +762,7 @@
 20040420 utils.c: cartridges would be lost on reset if opened with
 	 File/Open (or from the command line) rather than with
 	 Media/Cartridge/Insert.
+20040420 dck.c,machine.c,memory.[ch],scld.[ch],utils.c,
+	 machines/{spec16.c,tc2068.c}: simplify memory handling by
+	 allocating all memory from a pool and then just throwing the pool
+	 away on reset.
