@@ -735,18 +735,18 @@ FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
   while (height--) {
     int i;
     r = dstPtr;
-    for (i = 0; i < width; ++i, r += 6) {
-      WORD color = *(((WORD *) srcPtr) + i);
+    for (i = 0; i < width; ++i, r += 3 * SCALER_DATA_SIZE ) {
+      scaler_data_type color = *(((scaler_data_type*) srcPtr) + i);
 
-      *(WORD *) (r + 0) = color;
-      *(WORD *) (r + 2) = color;
-      *(WORD *) (r + 4) = color;
-      *(WORD *) (r + 0 + dstPitch) = color;
-      *(WORD *) (r + 2 + dstPitch) = color;
-      *(WORD *) (r + 4 + dstPitch) = color;
-      *(WORD *) (r + 0 + dstPitch2) = color;
-      *(WORD *) (r + 2 + dstPitch2) = color;
-      *(WORD *) (r + 4 + dstPitch2) = color;
+      *(scaler_data_type*)( r +                    0             ) = color;
+      *(scaler_data_type*)( r +     SCALER_DATA_SIZE             ) = color;
+      *(scaler_data_type*)( r + 2 * SCALER_DATA_SIZE             ) = color;
+      *(scaler_data_type*)( r +                    0 + dstPitch  ) = color;
+      *(scaler_data_type*)( r +     SCALER_DATA_SIZE + dstPitch  ) = color;
+      *(scaler_data_type*)( r + 2 * SCALER_DATA_SIZE + dstPitch  ) = color;
+      *(scaler_data_type*)( r +                    0 + dstPitch2 ) = color;
+      *(scaler_data_type*)( r +     SCALER_DATA_SIZE + dstPitch2 ) = color;
+      *(scaler_data_type*)( r + 2 * SCALER_DATA_SIZE + dstPitch2 ) = color;
     }
     srcPtr += srcPitch;
     dstPtr += dstPitch3;

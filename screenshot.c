@@ -55,9 +55,21 @@ static int rgb32_to_rgb24( BYTE *rgb24_data, size_t rgb24_stride,
 			   BYTE *rgb32_data, size_t rgb32_stride,
 			   size_t height, size_t width );
 
+/* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
+   DISPLAY_SCREEN_HEIGHT ie a Timex screen is size 2) we will be
+   creating via the scalers */
+#define MAX_SIZE 3
+
 /* A copy of display.c:display_image, taken so we can draw widgets on
    display_image */
 static WORD saved_screen[2*DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH];
+
+/* The space used for drawing the screen image on. Out here to avoid placing
+   these large objects on the stack */
+static BYTE
+  rgb_data1[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
+  rgb_data2[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
+   png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 3 ];
 
 int
 screenshot_save( void )
@@ -74,12 +86,9 @@ screenshot_write( const char *filename, scaler_type scaler )
   png_structp png_ptr;
   png_infop info_ptr;
 
-  BYTE rgb_data1[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 4 ],
-       rgb_data2[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 4 ],
-       png_data[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 3 ],
-       *row_pointers[480];
-  size_t rgb_stride = DISPLAY_SCREEN_WIDTH * 4,
-         png_stride = DISPLAY_SCREEN_WIDTH * 3;
+  BYTE *row_pointers[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT ];
+  size_t rgb_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4,
+         png_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 3;
   size_t y, base_height, base_width, height, width;
   int error;
 
