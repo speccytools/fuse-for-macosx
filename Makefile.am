@@ -36,7 +36,7 @@ fuse_SOURCES = ay.c display.c event.c\
 
 BUILT_SOURCES = keysyms.c
 
-keysyms.c: keysyms.pl keysyms.dat
+keysyms.c: keysyms.pl perl/Fuse.pm keysyms.dat
 	@PERL@ keysyms.pl keysyms.dat > keysyms.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
