@@ -36,6 +36,7 @@ emulation_speed, numeric, 100, 256, speed
 issue2, boolean, 0
 joy_kempston, boolean, 0,, kempston
 tape_traps, boolean, 1,, traps, tapetraps
+auto_load, boolean, 1
 slt_traps, boolean, 1,, slt, slttraps
 double_screen, boolean, 0
 

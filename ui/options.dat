@@ -4,6 +4,7 @@ Entry, (E)mulation speed, emulation_speed, KEYBOARD_e
 Checkbox, Issue (2) Keyboard, issue2, KEYBOARD_2
 Checkbox, (K)empston joystick, joy_kempston, KEYBOARD_k
 Checkbox, Use (t)ape traps, tape_traps, KEYBOARD_t
+Checkbox, (A)uto-load tapes, auto_load, KEYBOARD_a
 Checkbox, Use .(s)lt traps, slt_traps, KEYBOARD_s
 Checkbox, (D)ouble-sized screens, double_screen, KEYBOARD_d
 
