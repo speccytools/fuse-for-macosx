@@ -31,6 +31,12 @@
 
 #include <stdlib.h>
 
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#else				/* #ifdef HAVE_LIB_GLIB */
+#include <libspectrum.h>	/* Use libspectrum's replacement */
+#endif				/* #ifdef HAVE_LIB_GLIB */
+
 #ifndef FUSE_TYPES_H
 #include "types.h"
 #endif
@@ -48,8 +54,11 @@ enum debugger_mode_t
 
 extern enum debugger_mode_t debugger_mode;
 
-extern size_t debugger_breakpoint;
-extern const size_t DEBUGGER_BREAKPOINT_UNSET;
+/* Types of breakpoint */
+enum debugger_breakpoint_type {
+  DEBUGGER_BREAKPOINT_TYPE_PERMANENT,
+  DEBUGGER_BREAKPOINT_TYPE_ONESHOT,
+};
 
 int debugger_init( void );
 int debugger_reset( void );
@@ -70,5 +79,8 @@ void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
 
 /* Parse a debugger command */
 int debugger_command_parse( const char *command );
+
+/* Add a breakpoint */
+int debugger_breakpoint_add( WORD pc, enum debugger_breakpoint_type type );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */
