@@ -93,18 +93,18 @@ widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     if( key2 == KEYBOARD_Caps ) {
       debugger_run();
-      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+      widget_end_widget( WIDGET_FINISHED_CANCEL );
     }
     break;
 
   case KEYBOARD_c:
     debugger_run();
-    widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
+    widget_end_widget( WIDGET_FINISHED_OK );
     break;
 
   case KEYBOARD_s:
     debugger_mode = DEBUGGER_MODE_STEP;
-    widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
+    widget_end_widget( WIDGET_FINISHED_OK );
     break;
 
   default:	/* Keep gcc happy */

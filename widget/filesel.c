@@ -363,8 +363,7 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     
   case KEYBOARD_1:		/* 1 used as `Escape' generates `EDIT',
 				   which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) 
-      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
   
   case KEYBOARD_5:		/* Left */
@@ -411,7 +410,7 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     /* Get the new directory name */
     fn = widget_getcwd();
     if( fn == NULL ) {
-      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+      widget_end_widget( WIDGET_FINISHED_CANCEL );
       return;
     }
     ptr = fn;
@@ -421,7 +420,7 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     );
     if( fn == NULL ) {
       free( ptr );
-      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+      widget_end_widget( WIDGET_FINISHED_CANCEL );
       return;
     }
     strcat( fn, "/" ); strcat( fn, widget_filenames[ current_file ]->name );

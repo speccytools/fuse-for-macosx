@@ -260,6 +260,14 @@ int widget_do( widget_type which, void *data )
   return 0;
 }
 
+/* End the currently running widget */
+int
+widget_end_widget( widget_finish_state state )
+{
+  widget_return[ widget_level ].finished = state;
+  return 0;
+}
+
 /* End all currently running widgets */
 int widget_end_all( widget_finish_state state )
 {

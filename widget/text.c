@@ -88,13 +88,13 @@ widget_text_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   case KEYBOARD_1:		/* `Esc' generates EDIT which is Caps + 1 */
     if( key2 == KEYBOARD_Caps ) {
-      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+      widget_end_widget( WIDGET_FINISHED_CANCEL );
       return;
     }
     break;
 
   case KEYBOARD_Enter:
-    widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
+    widget_end_widget( WIDGET_FINISHED_OK );
     return;
 
   default:			/* Keep gcc happy */

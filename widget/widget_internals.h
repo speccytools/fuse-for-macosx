@@ -77,6 +77,7 @@ typedef struct widget_recurse_t {
 /* A `stack' so we can recurse through widgets */
 extern widget_recurse_t widget_return[];
 
+int widget_end_widget( widget_finish_state state );
 int widget_end_all( widget_finish_state state );
 
 int widget_timer_init( void );
