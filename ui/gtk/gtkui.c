@@ -1113,6 +1113,7 @@ gtkui_disk_eject_write_b( GtkWidget *widget GCC_UNUSED,
   trdos_disk_eject( TRDOS_DRIVE_B );
 }
 
+#ifdef HAVE_765_H
 int
 ui_plus3_disk_write( specplus3_drive_number which )
 {
@@ -1139,7 +1140,8 @@ ui_plus3_disk_write( specplus3_drive_number which )
   fuse_emulation_unpause();
 
   return 0;
-}  
+}
+#endif				/* #ifdef HAVE_765_H */  
 
 /* Cartridge/Insert */
 static void

@@ -375,10 +375,34 @@ widget_menu_eject_disk( void *data )
 
 #ifdef HAVE_765_H
   if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 )
-    return specplus3_disk_eject( which );
+    return specplus3_disk_eject( which, 0 );
 #endif				/* #ifdef HAVE_765_H */
 
   return trdos_disk_eject( which );
+}
+
+/* Disk/Drive ?:/Eject and write */
+int
+widget_menu_eject_write_disk( void *data )
+{
+  trdos_drive_number which = *(trdos_drive_number*)data;
+
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 )
+    return specplus3_disk_eject( which, 1 );
+#endif				/* #ifdef HAVE_765_H */
+
+  return trdos_disk_eject( which );
+}
+
+int
+ui_plus3_disk_write( specplus3_drive_number which )
+{
+  char filename[ 20 ];
+
+  snprintf( filename, 20, "drive%c.dsk", (char)( 'a' + which ) );
+
+  return specplus3_disk_write( which, filename );
 }
 
 /* Cartridge/Timex Dock/Insert (called via widget_apply_to_file) */

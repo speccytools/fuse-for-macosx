@@ -453,3 +453,6 @@
 	 on exit.
 20040105 specplus3.[ch], ui/ui.h, ui/gtk/gtkui.c: make writes to +3 disks
 	 only be committed when explicitly requested by the user.
+20040105 ui/gtk/gtkui.c, widget/{menu.c,menu_data.c,widget_internals.h}:
+	 fix up the widget UIs and non-lib765 systems wrt the disk writing
+	 changes.

@@ -235,6 +235,8 @@ static widget_menu_entry widget_menu_disk_a[] = {
 
   { "(I)nsert...", KEYBOARD_i, widget_apply_to_file,   widget_insert_disk_a },
   { "(E)ject",	   KEYBOARD_e, widget_menu_eject_disk, &disk_a_number       },
+  { "Eject and (w)rite...", KEYBOARD_w, widget_menu_eject_write_disk,
+						       &disk_a_number       },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
@@ -248,6 +250,8 @@ static widget_menu_entry widget_menu_disk_b[] = {
 
   { "(I)nsert...", KEYBOARD_i, widget_apply_to_file,   widget_insert_disk_b },
   { "(E)ject",	   KEYBOARD_e, widget_menu_eject_disk, &disk_b_number       },
+  { "Eject and (w)rite...", KEYBOARD_w, widget_menu_eject_write_disk,
+						       &disk_b_number       },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

@@ -171,6 +171,8 @@ int widget_menu_write_tape( void *data );    /* Tape/Write */
 int widget_insert_disk_a( const char *filename ); /* Disk/Drive A:/Insert */
 int widget_insert_disk_b( const char *filename ); /* Disk/Drive B:/Insert */
 int widget_menu_eject_disk( void *data );    /* Disk/Drive ?:/Eject */
+int widget_menu_eject_write_disk( void *data ); /* Disk/Drive ?:/Eject and
+						   write */
 
 int widget_insert_dock( const char *filename ); /* Cart/Timex Dock/Insert */
 int widget_menu_eject_dock( void *data );    /* Cart/Timex Dock/Eject */
