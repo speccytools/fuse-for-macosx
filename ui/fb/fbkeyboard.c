@@ -69,7 +69,8 @@ int fbkeyboard_init(void)
   }
 
   /* check for character special, major 4, minor 0..63 */
-  if( !isatty(STDIN_FILENO) || !S_ISCHR(st.st_mode) || (st.st_rdev > 63) ) {
+  if( !isatty(STDIN_FILENO) || !S_ISCHR(st.st_mode) ||
+      ( st.st_rdev & ~63 ) != 0x4000 ) {
     fprintf( stderr, "%s: stdin isn't a local tty\n", fuse_progname );
     return 1;
   }

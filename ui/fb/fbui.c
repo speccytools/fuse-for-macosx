@@ -42,10 +42,10 @@ int ui_init(int *argc, char ***argv, int width, int height)
 
   atexit( fb_end );
 
-  error = uidisplay_init(width, height);
+  error = fbkeyboard_init();
   if(error) return error;
 
-  error = fbkeyboard_init();
+  error = uidisplay_init( width, height );
   if(error) return error;
 
   return 0;
