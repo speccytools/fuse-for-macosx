@@ -78,20 +78,21 @@ BYTE spec128_read_screen_memory(WORD offset)
 
 void spec128_writebyte(WORD address, BYTE b)
 {
-  int bank;
+  int bank = address >> 14;
 
-  if(address>=0x4000) {		/* 0x4000 = 1st byte of RAM */
-    bank=address/0x4000; address-=(bank*0x4000);
-    switch(bank) {
-    case 1: bank=5;                                 break;
-    case 2: bank=2;                                 break;
-    case 3: bank=machine_current->ram.current_page; break;
-    }
-    RAM[bank][address]=b;
-    if(bank==machine_current->ram.current_screen && address < 0x1b00) {
-      display_dirty( address+0x4000 ); /* Replot necessary pixels */
-    }
+  switch( bank ) {
+  case 0: return;
+  case 1: bank = 5;				    break;
+  case 2: bank = 2;				    break;
+  case 3: bank = machine_current->ram.current_page; break;
   }
+
+  if( bank == machine_current->ram.current_screen &&
+      ( address & 0x3fff ) < 0x1b00 &&
+      RAM[ bank ][ address & 0x3fff ] != b )
+    display_dirty( ( address & 0x3fff ) | 0x4000 );
+    
+  RAM[ bank ][ address & 0x3fff ] = b;
 }
 
 DWORD spec128_contend_memory( WORD address )

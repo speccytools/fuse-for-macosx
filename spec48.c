@@ -80,20 +80,14 @@ BYTE spec48_read_screen_memory(WORD offset)
 
 void spec48_writebyte(WORD address, BYTE b)
 {
-  if(address>=0x4000) {		/* 0x4000 = 1st byte of RAM */
-    WORD bank=address/0x4000,offset=address-(bank*0x4000);
-    switch(bank) {
-    case 1: RAM[5][offset]=b; break;
-    case 2: RAM[2][offset]=b; break;
-    case 3: RAM[0][offset]=b; break;
-    default:
-      ui_error( UI_ERROR_ERROR, "access to impossible bank %d at %s:%d",
-		bank, __FILE__, __LINE__ );
-      fuse_abort();
-    }
-    if(address<0x5b00) {	/* 0x4000 - 0x5aff = display file */
-      display_dirty( address );	/* Replot necessary pixels */
-    }
+  switch( address >> 14 ) {
+  case 0: break;
+  case 1:
+    if( ( address & 0x3fff ) < 0x1b00 && RAM[5][ address & 0x3fff ] != b )
+      display_dirty( address );
+    RAM[5][ address & 0x3fff ] = b; break;
+  case 2: RAM[2][ address & 0x3fff ] = b; break;
+  case 3: RAM[0][ address & 0x3fff ] = b; break;
   }
 }
 
