@@ -44,6 +44,11 @@ Some thanks (in alphabetical order):
   (http://www.worldofspectrum.org/) -- simply the best Speccy Web site out
   there.
 
+* Mark Woodmass: for putting me on the track of (and finding the
+  solution to) bugs with regard to Fuse's R register emulation during
+  HALTs and interrupts. Mark's another one who's written an emulator:
+  see http://www.geocities.com/specemu/.
+
 * Alexander Yurchenko: for the OpenBSD/Solaris sound code (see `AUTHORS')
 
 * Matan Ziv-Av: for various bits of code (see `AUTHORS')
