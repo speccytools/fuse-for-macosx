@@ -37,6 +37,7 @@
 
 #include <glib.h>
 
+#include "dck.h"
 #include "debugger/debugger.h"
 #include "display.h"
 #include "event.h"
