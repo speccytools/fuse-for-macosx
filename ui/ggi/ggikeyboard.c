@@ -33,6 +33,7 @@
 #include <ggi/ggi.h>
 
 #include "ggi_internals.h"
+#include "fuse.h"
 #include "keysyms.h"
 #include "machine.h"
 #include "settings.h"

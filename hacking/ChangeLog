@@ -246,3 +246,4 @@
 20031007 ui/fb/fbdisplay.c, ui/fb/fbkeyboard.c: fix up framebuffer UI
 	 (Darren).
 20031007 Real joystick support (Darren/Fred)
+20031008 ui/ggi/ggikeyboard.c: #include "fuse.h" (thanks, cmdzod)
