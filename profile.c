@@ -31,31 +31,46 @@
 #include <libspectrum.h>
 
 #include "ui/ui.h"
+#include "z80/z80.h"
 
 int profile_active = 0;
 
-static char executed[ 0x10000 ];
+static int total_tstates[ 0x10000 ];
+static libspectrum_word profile_last_pc;
+static libspectrum_dword profile_last_tstates;
 
 void
 profile_start( void )
 {
-  memset( executed, 0, sizeof( executed ) );
+  memset( total_tstates, 0, sizeof( total_tstates ) );
 
   profile_active = 1;
+  profile_last_pc = z80.pc.w;
+  profile_last_tstates = tstates;
 }
 
 void
 profile_map( libspectrum_word pc )
 {
-  executed[ pc ] = 1;
+  if( tstates - profile_last_tstates > 256 ) abort();
+
+  total_tstates[ profile_last_pc ] += tstates - profile_last_tstates;
+
+  profile_last_pc = z80.pc.w;
+  profile_last_tstates = tstates;
+}
+
+void
+profile_frame( libspectrum_dword frame_length )
+{
+  profile_last_tstates -= frame_length;
 }
 
 void
 profile_finish( const char *filename )
 {
   FILE *f;
-  char data[ 0x2000 ];
-  size_t i, j, bytes;
+  size_t i;
 
   f = fopen( filename, "wb" );
   if( !f ) {
@@ -64,24 +79,12 @@ profile_finish( const char *filename )
     return;
   }
 
-  for( i = 0; i < 8192; i++ ) {
+  for( i = 0; i < 0x10000; i++ ) {
 
-    libspectrum_byte b = 0;
+    if( !total_tstates[ i ] ) continue;
 
-    for( j = 0; j < 8; j++ ) {
-      b <<= 1;
-      b |= executed[ 8 * i + j ];
-    }
+    fprintf( f, "0x%04x,%d\n", i, total_tstates[ i ] );
 
-    data[ i ] = b;
-  }
-
-  bytes = fwrite( data, 1, 0x2000, f );
-  if( bytes != 0x2000 ) {
-    ui_error( UI_ERROR_ERROR,
-	      "could write only %d bytes of %d to profile map '%s'",
-	      bytes, 0x2000, filename );
-    return;
   }
 
   profile_active = 0;

@@ -1212,3 +1212,4 @@
 20050216 Makefile.am,menu.[ch],menu_data.c,profile.[ch],z80/{coretest.c,
 	 z80_ops.c}: add very simple profiler; just records which
 	 locations where executed at the moment.
+20050217 profile.[ch],spectrum.c: make the profiler actually profile.
