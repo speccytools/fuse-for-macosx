@@ -164,6 +164,7 @@ int spec128_init( machine_info *machine )
 
   machine->machine = SPECTRUM_MACHINE_128;
   machine->description = "Spectrum 128K";
+  machine->id = "128";
 
   machine->reset = spec128_reset;
 

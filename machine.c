@@ -135,6 +135,22 @@ int machine_select( int type )
   return 1;
 }
 
+int machine_select_id( const char *id )
+{
+  int i, error;
+
+  for( i=0; i < machine_count; i++ ) {
+    if( ! strcmp( machine_types[i]->id, id ) ) {
+      error = machine_select_machine( machine_types[i] );
+      if( error ) return error;
+      return 0;
+    }
+  }
+
+  fprintf( stderr, "%s: Machine id `%s' unknown\n", fuse_progname, id );
+  return 1;
+}
+
 static int machine_select_machine( machine_info *machine )
 {
   machine_current = machine;

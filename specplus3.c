@@ -238,6 +238,7 @@ int specplus3_init( machine_info *machine )
 
   machine->machine = SPECTRUM_MACHINE_PLUS3;
   machine->description = "Spectrum +2A";
+  machine->id = "plus2a";
 
   machine->reset = specplus3_reset;
 

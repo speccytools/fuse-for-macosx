@@ -69,6 +69,7 @@ typedef struct machine_info {
 
   int machine;		/* which machine type is this? */
   const char *description; /* Textual description of this machine */
+  const char *id;	/* Used used to select from command line */
 
   int (*reset)(void);	/* Reset function */
 
@@ -100,6 +101,7 @@ int machine_init_machines( void );
 
 int machine_select_first( void );
 int machine_select( int type );
+int machine_select_id( const char *id );
 
 void machine_set_timings( machine_info *machine, DWORD hz,
 			  WORD left_border_cycles,  WORD screen_cycles,

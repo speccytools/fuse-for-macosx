@@ -36,7 +36,9 @@
 #endif				/* #ifdef HAVE_GETOPT_LONG */
 
 #include "fuse.h"
+#include "machine.h"
 #include "settings.h"
+#include "spectrum.h"
 
 /* The current settings of options, etc */
 settings_info settings_current;
@@ -69,6 +71,7 @@ int settings_defaults( settings_info *settings )
 
   settings->snapshot = NULL;
   settings->tape_file = NULL;
+  settings->start_machine = "48";
 
   return 0;
 }
@@ -91,6 +94,7 @@ static int settings_command_line( int argc, char **argv,
 
   struct option long_options[] = {
 
+    {	    "machine", 1, NULL, 'm' },
     {      "snapshot", 1, NULL, 's' },
     {          "tape", 1, NULL, 't' },
 
@@ -121,9 +125,9 @@ static int settings_command_line( int argc, char **argv,
     int c;
 
 #ifdef HAVE_GETOPT_LONG
-    c = getopt_long( argc, argv, "ho:s:t:V", long_options, NULL );
+    c = getopt_long( argc, argv, "hm:o:s:t:V", long_options, NULL );
 #else				/* #ifdef HAVE_GETOPT_LONG */
-    c = getopt( argc, argv, "ho:s:t:V" );
+    c = getopt( argc, argv, "hm:o:s:t:V" );
 #endif				/* #ifdef HAVE_GETOPT_LONG */
 
     if( c == -1 ) break;	/* End of option list */
@@ -131,6 +135,10 @@ static int settings_command_line( int argc, char **argv,
     switch( c ) {
 
     case 0: break;	/* Used for long option returns */
+
+    case 'm':
+      settings->start_machine = optarg;
+      break;
 
     case 'o':
       for( ptr = long_options; ptr->name; ptr++ ) {

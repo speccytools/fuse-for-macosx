@@ -41,6 +41,7 @@ typedef struct settings_info {
 
   char *snapshot;
   char *tape_file;
+  const char *start_machine;
 
   int show_version;
   int show_help;

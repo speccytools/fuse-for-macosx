@@ -131,7 +131,7 @@ static int fuse_init(int argc, char **argv)
 
   error = machine_init_machines();
   if( error ) return error;
-  error = machine_select_first();
+  error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
 
   if( settings_current.snapshot ) snapshot_read( settings_current.snapshot );
