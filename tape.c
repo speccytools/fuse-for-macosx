@@ -43,6 +43,7 @@
 #include "sound.h"
 #include "spectrum.h"
 #include "settings.h"
+#include "snapshot.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -60,6 +61,7 @@ int tape_microphone;
 
 /* Function prototypes */
 
+static int tape_autoload( libspectrum_machine hardware );
 static int trap_load_block( libspectrum_tape_rom_block *block );
 int trap_check_rom( void );
 
@@ -121,8 +123,10 @@ int tape_open( const char *filename )
     return 1;
   }
 
-  /* And the tape is stopped */
-  if( tape_playing ) tape_stop();
+  if( settings_current.auto_load ) {
+    error = tape_autoload( machine_current->machine );
+    if( error ) return error;
+  }
 
   return 0;
 
@@ -152,6 +156,53 @@ tape_open_tzx_buffer( unsigned char *buffer, size_t length )
   }
 
   return libspectrum_tzx_read( tape, buffer, length );
+}
+
+/* Load a snap to start the current tape autoloading */
+static int
+tape_autoload( libspectrum_machine hardware )
+{
+  int error; const char *id; int fd;
+  char filename[80];
+  unsigned char *snap; size_t length;
+
+  /* If no hardware specified, get a best guess from the tape */
+  if( hardware == LIBSPECTRUM_MACHINE_UNKNOWN ) {
+    error = libspectrum_tape_guess_hardware( &hardware, tape );
+    if( error ) return error;
+
+    /* If we still don't know, default to 48K */
+    if( hardware == LIBSPECTRUM_MACHINE_UNKNOWN )
+      hardware = LIBSPECTRUM_MACHINE_48;
+  }
+
+  id = machine_get_id( hardware );
+  if( !id ) {
+    ui_error( UI_ERROR_ERROR, "Unknown machine type %d!", hardware );
+    return 1;
+  }
+
+  snprintf( filename, 80, "tape_%s.z80", id );
+  fd = utils_find_lib( filename );
+  if( fd == -1 ) {
+    ui_error( UI_ERROR_ERROR,
+	      "Couldn't find autoload snap for machine type '%s'", id );
+    return 1;
+  }
+
+  error = utils_read_fd( fd, filename, &snap, &length );
+  if( error ) return error;
+
+  error = snapshot_open_z80_buffer( snap, length );
+  if( error ) { munmap( snap, length ); return error; }
+
+  if( munmap( snap, length ) ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
+	      strerror( errno ) );
+    return 1;
+  }
+    
+  return 0;
 }
 
 /* Close the active tape file */

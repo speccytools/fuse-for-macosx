@@ -31,6 +31,8 @@
 #include <stdlib.h>
 #endif			/* #ifndef _STDLIB_H */
 
+#include <libspectrum.h>
+
 #ifndef FUSE_AY_H
 #include "ay.h"
 #endif			/* #ifndef FUSE_AY_H */
@@ -111,6 +113,7 @@ int machine_init_machines( void );
 
 int machine_select( int type );
 int machine_select_id( const char *id );
+const char* machine_get_id( libspectrum_machine type );
 
 void machine_set_timings( fuse_machine_info *machine, DWORD hz,
 			  WORD left_border_cycles,  WORD screen_cycles,

@@ -150,6 +150,17 @@ int machine_select_id( const char *id )
   return 1;
 }
 
+const char*
+machine_get_id( libspectrum_machine type )
+{
+  int i;
+
+  for( i=0; i<machine_count; i++ )
+    if( machine_types[i]->machine == type ) return machine_types[i]->id;
+
+  return NULL;
+}
+
 static int machine_select_machine( fuse_machine_info *machine )
 {
   machine_current = machine;
