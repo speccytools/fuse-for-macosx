@@ -68,11 +68,11 @@ int settings_defaults( settings_info *settings )
   settings->tape_traps = 1;
   settings->slt_traps = 1;
   
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_LIBZ
   settings->rzx_compression = 1;
-#else			/* #ifdef HAVE_ZLIB_H */
+#else			/* #ifdef HAVE_LIBZ */
   settings->rzx_compression = 0;
-#endif			/* #ifdef HAVE_ZLIB_H */
+#endif			/* #ifdef HAVE_LIBZ */
 
   settings->sound_device = NULL;
   settings->sound = 1;
