@@ -45,6 +45,7 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80.h"
@@ -446,6 +447,10 @@ int trap_check_rom( void )
        ROM 3 */
     return( ! machine_current->ram.special &&
 	    machine_current->ram.current_rom == 3 );
+
+  case LIBSPECTRUM_MACHINE_PENT:
+    /* OK if we're in ROM 1  and TRDOS is not active */
+    return( machine_current->ram.current_rom == 1 && !trdos_active );
 
     return 1;		/* Always OK here */
   }

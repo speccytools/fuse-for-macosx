@@ -41,6 +41,7 @@
 #include "machine.h"
 #include "rzx.h"
 #include "tape.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "spectrum.h"
 #include "z80/z80.h"
@@ -142,6 +143,14 @@ int event_do_events(void)
 
     case EVENT_TYPE_NMI:
       z80_nmi();
+      break;
+
+    case EVENT_TYPE_TRDOS_CMD_DONE:
+      trdos_event_cmd_done( ptr->tstates );
+      break;
+
+    case EVENT_TYPE_TRDOS_INDEX:
+      trdos_event_index( ptr->tstates );
       break;
 
     default:

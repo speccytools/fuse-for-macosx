@@ -48,8 +48,10 @@
 #include "snapshot.h"
 #include "sound.h"
 #include "spectrum.h"
+#include "specplus3.h"
 #include "tape.h"
 #include "timer.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "ui/scaler/scaler.h"
 #include "utils.h"
@@ -192,6 +194,20 @@ static int fuse_init(int argc, char **argv)
     rzx_start_playback( settings_current.playback_file, NULL );
   } else if( settings_current.record_file ) {
     rzx_start_recording( settings_current.record_file, 1 );
+  }
+
+  if( settings_current.plus3disk_file ) {
+    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
+    if( error ) return error;
+
+    specplus3_disk_insert( SPECPLUS3_DRIVE_A, settings_current.plus3disk_file );
+  }
+
+  if( settings_current.trdosdisk_file ) {
+    error = machine_select( LIBSPECTRUM_MACHINE_PENT );
+    if( error ) return error;
+
+    trdos_disk_insert( TRDOS_DRIVE_A, settings_current.trdosdisk_file );
   }
 
   if( parse_nonoption_args( argc, argv, first_arg, autoload ) ) return 1;
@@ -354,6 +370,21 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
     case LIBSPECTRUM_ID_TAPE_TAP:
     case LIBSPECTRUM_ID_TAPE_TZX:
       error = tape_read_buffer( buffer, length, type, autoload );
+      break;
+
+    case LIBSPECTRUM_ID_DISK_DSK:
+      error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
+      if( error ) return error;
+
+      error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, argv[ first_arg ] );
+      break;
+
+    case LIBSPECTRUM_ID_DISK_SCL:
+    case LIBSPECTRUM_ID_DISK_TRD:
+      error = machine_select( LIBSPECTRUM_MACHINE_PENT );
+      if( error ) return error;
+
+      error = trdos_disk_insert( TRDOS_DRIVE_A, argv[ first_arg ] );
       break;
 
     default:

@@ -34,6 +34,7 @@
 #include "settings.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "trdos.h"
 #include "z80.h"
 
 #include "z80_macros.h"
@@ -69,6 +70,9 @@ void z80_do_opcodes()
     if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
 	debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
       debugger_trap();
+
+    if( PC >= 16384 ) trdos_active = 0;
+    else if ( ( PC & 0xff00 ) == 0x3d00 ) trdos_active = 1;
 
     /* Do the instruction fetch; readbyte_internal used here to avoid
        triggering read breakpoints */

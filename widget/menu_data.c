@@ -44,11 +44,9 @@ static widget_menu_entry widget_menu_machine[];
 static widget_menu_entry widget_menu_options[];
 static widget_menu_entry widget_menu_tape[];
 
-#ifdef HAVE_765_H
 static widget_menu_entry widget_menu_disk[];
 static widget_menu_entry widget_menu_disk_a[];
 static widget_menu_entry widget_menu_disk_b[];
-#endif					/* #ifdef HAVE_765_H */
 
 static widget_menu_entry widget_menu_help[];
 
@@ -63,10 +61,8 @@ static widget_menu_widget_t main_machine = { WIDGET_TYPE_MENU,
 static widget_menu_widget_t main_tape =    { WIDGET_TYPE_MENU,
 					     &widget_menu_tape    };
 
-#ifdef HAVE_765_H
 static widget_menu_widget_t main_disk =    { WIDGET_TYPE_MENU,
 					     &widget_menu_disk    };
-#endif
 
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
 					     &widget_menu_help    };
@@ -79,9 +75,7 @@ widget_menu_entry widget_menu_main[] = {
   { "(M)achine", KEYBOARD_m, widget_menu_widget, &main_machine },
   { "(T)ape",	 KEYBOARD_t, widget_menu_widget, &main_tape    },
 
-#ifdef HAVE_765_H
   { "(D)isk",	 KEYBOARD_d, widget_menu_widget, &main_disk    },
-#endif					/* #ifdef HAVE_765_H */
 
   { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
 
@@ -133,6 +127,7 @@ static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 static widget_menu_widget_t options_sound   = { WIDGET_TYPE_SOUND,   NULL };
 static widget_menu_widget_t options_rzx     = { WIDGET_TYPE_RZX,     NULL };
 static widget_menu_widget_t options_roms    = { WIDGET_TYPE_ROM,     NULL };
+static widget_menu_widget_t options_scaler  = { WIDGET_TYPE_SCALER,  NULL };
 
 static widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
@@ -187,8 +182,6 @@ static widget_menu_entry widget_menu_tape[] = {
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 
-#ifdef HAVE_765_H
-
 /* Disk menu */
 
 static widget_menu_widget_t disk_a = { WIDGET_TYPE_MENU, &widget_menu_disk_a };
@@ -205,7 +198,7 @@ static widget_menu_entry widget_menu_disk[] = {
 
 /* Disk/Drive A: menu */
 
-static specplus3_drive_number disk_a_number = SPECPLUS3_DRIVE_A;
+static int disk_a_number = 0;
 
 static widget_menu_entry widget_menu_disk_a[] = {
   { "Disk/Drive A:", 0, 0, NULL },	/* Menu title */
@@ -218,7 +211,7 @@ static widget_menu_entry widget_menu_disk_a[] = {
 
 /* Disk/Drive B: menu */
 
-static specplus3_drive_number disk_b_number = SPECPLUS3_DRIVE_B;
+static int disk_b_number = 1;
 
 static widget_menu_entry widget_menu_disk_b[] = {
   { "Disk/Drive B:", 0, 0, NULL },	/* Menu title */
@@ -228,8 +221,6 @@ static widget_menu_entry widget_menu_disk_b[] = {
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
-
-#endif					/* #ifdef HAVE_765_H */
 
 /* Help menu */
 

@@ -53,6 +53,7 @@ virtual-tape files. Saving to both Z80 snapshots and TZX tape files is
 supported. The SLT extension to the Z80 format is partly supported
 (enough for multi-load games); however, loading of the old DAT-file
 variant is not. DSK disk images are supported when emulating a +3.
+TRD and SCL disk images are supported when emulating a Pentagon.
 .PP
 There is also support for reading and writing the RZX input recording
 format.
@@ -160,8 +161,9 @@ a 48K Spectrum. The available options are
 .IR plus2 ,
 .IR plus2a ,
 .IR plus3 ,
+.IR 2048 ,
 and
-.IR 2048 .
+.IR pentagon .
 .RE
 .PP
 .I "-p file"
@@ -684,12 +686,15 @@ written to any tape file until you choose this option!
 .PP
 .I "Disk"
 .RS
-Note that the Disk menu and associated submenus are available only if
-Fuse was compiled with +3 support. (This won't have happened if the
-`lib765' library couldn't be found at compile time.) Even then, the
-virtual disk images are only accessible when emulating a +3. (See
+Even then, the Virtual disk images are only accessible when emulating
+a +3 or Pentagon.
+(See
 .B "THE .DSK FORMAT"
-section below for notes on the file formats supported).
+,
+.B "THE .TRD FORMAT"
+and
+.B "THE .SCL FORMAT"
+sections below for notes on the file formats supported).
 .RE
 .PP
 .I "Disk, Drive A:, Insert"
@@ -818,10 +823,10 @@ The various models of Spectrum supported a range of ways to connect
 printers, three of which are supported by Fuse. Different printers are
 made available for the different models:
 .TP
-.IR 48 ", " TC2048
+.IR 16 ", " 48 ", " TC2048
 ZX Printer
 .TP
-.IR 128 / +2
+.IR 128 / +2 / Pentagon
 Serial printer (text-only)
 .TP
 .IR +2A ", " +3
@@ -1109,6 +1114,20 @@ compressed disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH THE .TRD FORMAT
+.PP
+Fuse supports .TRD images in it's Pentagon emulation, truncated files
+need to be expanded with another utility before use.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH THE .SCL FORMAT
+.PP
+Fuse has read-only support for .SCL images in it's Pentagon emulation,
+you can create a read-write .TRD file using scl2trd in fuse-utils.
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH BUGS
 Not many peripherals are supported.
 .\"
@@ -1120,6 +1139,7 @@ Not many peripherals are supported.
 .\"------------------------------------------------------------------
 .\"
 .SH SEE ALSO
+.IR scl2trd "(1),"
 .IR tzxconv "(1),"
 .IR tzxlist "(1),"
 .IR rzxdump "(1),"
@@ -1162,3 +1182,5 @@ Frederick Meunier wrote the TC2048 support
 .PP
 Ludvig Strigeus and The ScummVM project wrote the original graphics
 filter code.
+.PP
+Dmitry Sanarin wrote the orignial TR-DOS emulation (for Glukalka).

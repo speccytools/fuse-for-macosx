@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 FILES = keyboard.scr tape_128.z80 \
 	tape_16.z80 tape_2048.z80 tape_48.z80 tape_plus2.z80 \
-	tape_plus2a.z80 tape_plus3.z80
+	tape_plus2a.z80 tape_plus3.z80 tape_pentagon.z80
 
 pkgdata_DATA = $(FILES)
 

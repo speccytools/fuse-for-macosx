@@ -40,6 +40,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "pentagon.h"
 #include "printer.h"
 #include "scld.h"
 #include "snapshot.h"
@@ -93,6 +94,8 @@ int machine_init_machines( void )
 #endif				/* #ifdef HAVE_765_H */
 
   error = machine_add_machine( tc2048_init );
+  if (error ) return error;
+  error = machine_add_machine( pentagon_init );
   if (error ) return error;
 
   return 0;

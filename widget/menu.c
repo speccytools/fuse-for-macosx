@@ -41,6 +41,7 @@
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
+#include "trdos.h"
 #include "ui/uidisplay.h"
 #include "utils.h"
 #include "widget_internals.h"
@@ -307,31 +308,42 @@ int widget_menu_rewind_tape( void *data GCC_UNUSED )
   return tape_select_block( 0 );
 }
 
-#ifdef HAVE_765_H
-
 /* Disk/Drive A:/Insert (called via widget_apply_to_file) */
 int
 widget_insert_disk_a( const char *filename )
 {
-  return specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    return specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
+  }
+#endif				/* #ifdef HAVE_765_H */
+  return trdos_disk_insert( TRDOS_DRIVE_A, filename );
 }
 
 /* Disk/Drive B:/Insert (called via widget_apply_to_file) */
 int
 widget_insert_disk_b( const char *filename )
 {
-  return specplus3_disk_insert( SPECPLUS3_DRIVE_B, filename );
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    return specplus3_disk_insert( SPECPLUS3_DRIVE_B, filename );
+  }
+#endif				/* #ifdef HAVE_765_H */
+  return trdos_disk_insert( TRDOS_DRIVE_B, filename );
 }
 
 /* Disk/Drive ?:/Eject */
 int
 widget_menu_eject_disk( void *data )
 {
-  specplus3_drive_number which = *(specplus3_drive_number*)data;
-  return specplus3_disk_eject( which );
-}
-
+  trdos_drive_number which = *(trdos_drive_number*)data;
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_disk_eject( which );
+  }
 #endif				/* #ifdef HAVE_765_H */
+  return trdos_disk_eject( which );
+}
 
 /* Tape/Clear */
 int widget_menu_clear_tape( void *data GCC_UNUSED )

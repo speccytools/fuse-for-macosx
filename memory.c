@@ -37,6 +37,7 @@
 #include "machine.h"
 #include "settings.h"
 #include "spectrum.h"
+#include "trdos.h"
 #include "types.h"
 #include "ui/ui.h"
 
@@ -318,4 +319,56 @@ FUNCTION( tc2048_writebyte )( WORD address, BYTE b )
   case 2: RAM[2][offset]=b; break;
   case 3: RAM[0][offset]=b; break;
   }
+}
+
+BYTE
+FUNCTION( pentagon_readbyte )( WORD address )
+{
+
+#ifndef INTERNAL
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
+  switch( address >> 14 ) {
+  case 0: if ( trdos_active )
+            return ROM[                                2][ address & 0x3fff ];
+          else
+            return ROM[ machine_current->ram.current_rom][ address & 0x3fff ];
+  case 1:   return RAM[                                5][ address & 0x3fff ];
+  case 2:   return RAM[                                2][ address & 0x3fff ];
+  case 3:   return RAM[machine_current->ram.current_page][ address & 0x3fff ];
+  }
+  return 0; /* Keep gcc happy */
+}
+
+void
+FUNCTION( pentagon_writebyte )( WORD address, BYTE b )
+{
+  int bank = address >> 14;
+
+#ifndef INTERNAL
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
+  switch( bank ) {
+  case 0:
+    if( settings_current.writable_roms )
+      ROM[ machine_current->ram.current_rom ][ address & 0x3fff ] = b;
+    return;
+
+  case 1: bank = 5;				    break;
+  case 2: bank = 2;				    break;
+  case 3: bank = machine_current->ram.current_page; break;
+  }
+
+  if( bank == machine_current->ram.current_screen &&
+      ( address & 0x3fff ) < 0x1b00 &&
+      RAM[ bank ][ address & 0x3fff ] != b )
+    display_dirty( ( address & 0x3fff ) | 0x4000 );
+    
+  RAM[ bank ][ address & 0x3fff ] = b;
 }

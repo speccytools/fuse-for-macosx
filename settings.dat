@@ -56,11 +56,14 @@ tape_file, string, NULL, 't', tape, tapefile
 start_machine, string, strdup( "48" ), 'm', machine
 record_file, string, NULL, 'r', record, recordfile
 playback_file, string, NULL, 'p', playback, playbackfile
+plus3disk_file, string, NULL,, plus3disk, plus3diskfile
+trdosdisk_file, string, NULL,, trdosdisk, trdosdiskfile
 
 printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
 printer_text_filename, string, strdup( "printout.txt" ),, textfile
 
 svga_mode, numeric, 320, 'v', svgamode
+
 start_scaler_mode, string, strdup( "normal" ), 'g', graphics-filter
 
 rom_16, string, strdup( "48.rom" ),
@@ -78,3 +81,6 @@ rom_plus3_1, string, strdup( "plus3-1.rom" ),
 rom_plus3_2, string, strdup( "plus3-2.rom" ),
 rom_plus3_3, string, strdup( "plus3-3.rom" ),
 rom_tc2048, string, strdup( "tc2048.rom" ),
+rom_pentagon_0, string, strdup( "128p-0.rom" ),
+rom_pentagon_1, string, strdup( "128p-1.rom" ),
+rom_pentagon_2, string, strdup( "trdos.rom" ),

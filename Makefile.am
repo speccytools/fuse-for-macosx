@@ -30,10 +30,20 @@ SUBDIRS = debugger getopt hacking lib man perl roms ui widget z80
 
 fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c machine.c memory.c \
-        osssound.c rzx.c settings.c\
+	osssound.c \
+	pentagon.c \
+	rzx.c \
+	settings.c \
 	snapshot.c sound.c spec128.c \
 	spec16.c spec48.c specplus2.c specplus2a.c\
-	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
+	specplus3.c \
+	spectrum.c \
+	sunsound.c \
+	tape.c \
+	timer.c \
+	trdos.c \
+	ui.c \
+	uidisplay.c \
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c
 
 fuse_LDADD = memory_internal.o @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ \
@@ -61,10 +71,23 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
-	machine.h osssound.h rzx.h screenshot.h settings.h snapshot.h sound.h\
+	machine.h \
+	osssound.h \
+	pentagon.h \
+	rzx.h \
+	screenshot.h \
+	settings.h \
+	snapshot.h \
+	sound.h \
         spec128.h \
 	spec16.h spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h\
-	sunsound.h tape.h timer.h types.h utils.h sdlsound.h\
+	sunsound.h \
+	tape.h \
+	timer.h \
+	trdos.h \
+	types.h \
+	utils.h \
+	sdlsound.h \
 	joystick.h printer.h tc2048.h scld.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl \
