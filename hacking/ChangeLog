@@ -277,3 +277,4 @@
 20031013 fuse.c, rzx.c: put gcrypt version into creator custom data. Give
 	 warning if a competition mode recording is started, but gcrypt is
 	 not available.
+20031014 configure.in: no longer need to explicitly link against zlib

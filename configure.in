@@ -53,9 +53,6 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 AC_CHECK_FUNCS(geteuid getopt_long mkstemp)
 
-dnl Check that zlib is available
-AC_CHECK_LIB(z,zlibVersion)
-
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,
 [  --with-local-prefix=PFX local libraries installed in PFX (optional)],
