@@ -307,3 +307,4 @@
 	 current directory.
 20031029 sdlsound.c: fix memset typo (Marek).
 20031029 timer.c: restore old timers only if they exist in timer_pop().
+20031029 timer.c: ensure we have the prototype for strerror().

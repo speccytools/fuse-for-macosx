@@ -98,6 +98,7 @@ void timer_pause( void ) { }
 
 #include <errno.h>
 #include <signal.h>
+#include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
 
