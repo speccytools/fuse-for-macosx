@@ -694,3 +694,4 @@
 	 specplus3.[ch],specplus3e.c}: Spectrum +3e support.
 20040403 widget/roms.c: Fix ROM name lookup for labels
 20040403 widget/select.c: Add <string.h> for strlen
+20040403 ui/sdl/sdldisplay.c: Fix icon overlays for timex machines

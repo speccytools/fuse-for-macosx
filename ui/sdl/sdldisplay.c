@@ -52,8 +52,8 @@
 SDL_Surface *sdldisplay_gc = NULL;   /* Hardware screen */
 static SDL_Surface *tmp_screen=NULL; /* Temporary screen for scalers */
 
-static SDL_Surface *red_cassette, *green_cassette = NULL;
-static SDL_Surface *red_disk, *green_disk = NULL;
+static SDL_Surface *red_cassette[2], *green_cassette[2];
+static SDL_Surface *red_disk[2], *green_disk[2];
 
 static ui_statusbar_state sdl_disk_state, sdl_tape_state;
 
@@ -136,12 +136,51 @@ init_scalers( void )
 }
 
 static int
+sdl_convert_icon( SDL_Surface *source, SDL_Surface **icon, int red )
+{
+  SDL_Surface *copy;   /* Copy with altered palette */
+  int i;
+
+  SDL_Color colors[ source->format->palette->ncolors ];
+
+  copy = SDL_ConvertSurface( source, source->format, SDL_SWSURFACE );
+
+  for( i = 0; i < copy->format->palette->ncolors; i++ ) {
+    colors[i].r = red ? copy->format->palette->colors[i].r : 0;
+    colors[i].g = red ? 0 : copy->format->palette->colors[i].g;
+    colors[i].b = 0;
+  }
+
+  SDL_SetPalette( copy, SDL_LOGPAL, colors, 0, i );
+
+  icon[0] = SDL_ConvertSurface( copy, tmp_screen->format, SDL_SWSURFACE );
+
+  SDL_FreeSurface( copy );
+
+  icon[1] = SDL_CreateRGBSurface( SDL_SWSURFACE,
+                                  (icon[0]->w)<<1, (icon[0]->h)<<1,
+                                  icon[0]->format->BitsPerPixel,
+                                  icon[0]->format->Rmask,
+                                  icon[0]->format->Gmask,
+                                  icon[0]->format->Bmask,
+                                  icon[0]->format->Amask
+                                );
+
+  ( scaler_get_proc16( SCALER_DOUBLESIZE ) )(
+        (libspectrum_byte*)icon[0]->pixels,
+        icon[0]->pitch,
+        (libspectrum_byte*)icon[1]->pixels,
+        icon[1]->pitch, icon[0]->w, icon[0]->h
+      );
+
+  return 0;
+}
+
+static int
 sdl_load_status_icon( const char*filename, SDL_Surface **red, SDL_Surface **green )
 {
   char path[ PATH_MAX ];
   SDL_Surface *temp;    /* Copy of image as loaded */
-  SDL_Surface *temp2;   /* Copy with altered palette */
-  int i;
 
   if( utils_find_file_path( filename, path, UTILS_AUXILIARY_LIB ) ) {
     fprintf( stderr, "%s: Error getting path for icons\n", fuse_progname );
@@ -159,37 +198,8 @@ sdl_load_status_icon( const char*filename, SDL_Surface **red, SDL_Surface **gree
     return -1;
   }
 
-  {
-    SDL_Color colors[ temp->format->palette->ncolors ];
-    temp2 = SDL_ConvertSurface( temp, temp->format, SDL_SWSURFACE );
-    for( i = 0; i < temp2->format->palette->ncolors; i++ ) {
-      colors[i].r = temp2->format->palette->colors[i].r;
-      colors[i].g = 0;
-      colors[i].b = 0;
-    }
-
-    SDL_SetPalette( temp2, SDL_LOGPAL, colors, 0, i );
-
-    *red = SDL_ConvertSurface( temp2, tmp_screen->format, SDL_SWSURFACE );
-
-    SDL_FreeSurface( temp2 );
-  }
-
-  {
-    SDL_Color colors[ temp->format->palette->ncolors ];
-    temp2 = SDL_ConvertSurface( temp, temp->format, SDL_SWSURFACE );
-    for( i = 0; i < temp2->format->palette->ncolors; i++ ) {
-      colors[i].r = 0;
-      colors[i].g = temp2->format->palette->colors[i].g;
-      colors[i].b = 0;
-    }
-
-    SDL_SetPalette( temp2, SDL_LOGPAL, colors, 0, i );
-
-    *green = SDL_ConvertSurface( temp2, tmp_screen->format, SDL_SWSURFACE );
-
-    SDL_FreeSurface( temp2 );
-  }
+  sdl_convert_icon( temp, red, 1 );
+  sdl_convert_icon( temp, green, 0 );
 
   SDL_FreeSurface( temp );
 
@@ -212,8 +222,8 @@ uidisplay_init( int width, int height )
   /* We can now output error messages to our output device */
   display_ui_initialised = 1;
 
-  sdl_load_status_icon( "cassette.bmp", &red_cassette, &green_cassette );
-  sdl_load_status_icon( "plus3disk.bmp", &red_disk, &green_disk );
+  sdl_load_status_icon( "cassette.bmp", red_cassette, green_cassette );
+  sdl_load_status_icon( "plus3disk.bmp", red_disk, green_disk );
 
   return 0;
 }
@@ -315,7 +325,7 @@ uidisplay_hotswap_gfx_mode( void )
   /* reset palette */
   SDL_SetColors( sdldisplay_gc, colour_palette, 0, 16 );
 
-  /* Mac OS X resets the state of the cursor after a switch to full screen
+  /* Mac OS  resets the state of the cursor after a switch to full screen
      mode */
   if ( settings_current.full_screen )
     SDL_ShowCursor( SDL_DISABLE );
@@ -326,20 +336,27 @@ uidisplay_hotswap_gfx_mode( void )
 }
 
 static void
-sdl_blit_icon( SDL_Surface *icon, SDL_Rect *r, Uint32 tmp_screen_pitch,
+sdl_blit_icon( SDL_Surface **icon,
+               SDL_Rect *r, Uint32 tmp_screen_pitch,
                Uint32 dstPitch )
 {
-  int x = r->x;
-  int y = r->y;
-  int w = r->w;
-  int h = r->h;
-  int dst_y;
-  int dst_h;
+  int x, y, w, h, dst_y, dst_h;
 
+  if( timex ) {
+    r->x<<=1;
+    r->y<<=1;
+    r->w<<=1;
+    r->h<<=1;
+  }
+
+  x = r->x;
+  y = r->y;
+  w = r->w;
+  h = r->h;
   r->x++;
   r->y++;
 
-  if( SDL_BlitSurface( icon, NULL, tmp_screen, r ) ) return;
+  if( SDL_BlitSurface( icon[timex], NULL, tmp_screen, r ) ) return;
 
   /* Extend the dirty region by 1 pixel for scalers
      that "smear" the screen, e.g. 2xSAI */
@@ -362,13 +379,12 @@ sdl_blit_icon( SDL_Surface *icon, SDL_Rect *r, Uint32 tmp_screen_pitch,
 	dstPitch, w, dst_h
   );
 
-  /* Adjust rects for the destination rect size */
-
   if( num_rects == MAX_UPDATE_RECT ) {
     sdldisplay_force_full_refresh = 1;
     return;
   }
 
+  /* Adjust rects for the destination rect size */
   updated_rects[num_rects].x = x * sdldisplay_current_size;
   updated_rects[num_rects].y = dst_y;
   updated_rects[num_rects].w = w * sdldisplay_current_size;
@@ -380,7 +396,7 @@ sdl_blit_icon( SDL_Surface *icon, SDL_Rect *r, Uint32 tmp_screen_pitch,
 static void
 sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
 {
-  SDL_Rect r = { 264, 218, red_disk->w, red_disk->h };
+  SDL_Rect r = { 264, 218, red_disk[0]->w, red_disk[0]->h };
 
   switch( sdl_disk_state ) {
   case UI_STATUSBAR_STATE_ACTIVE:
@@ -395,8 +411,8 @@ sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
 
   r.x = 285;
   r.y = 220;
-  r.w = red_cassette->w;
-  r.h = red_cassette->h;
+  r.w = red_cassette[0]->w;
+  r.h = red_cassette[0]->h;
 
   switch( sdl_tape_state ) {
   case UI_STATUSBAR_STATE_ACTIVE:
@@ -533,22 +549,25 @@ uidisplay_area( int x, int y, int width, int height )
 int
 uidisplay_end( void )
 {
+  int i;
   display_ui_initialised = 0;
   if ( tmp_screen ) {
     free( tmp_screen->pixels );
     SDL_FreeSurface( tmp_screen ); tmp_screen = NULL;
   }
-  if ( red_cassette ) {
-    SDL_FreeSurface( red_cassette ); red_cassette = NULL;
-  }
-  if ( green_cassette ) {
-    SDL_FreeSurface( green_cassette ); green_cassette = NULL;
-  }
-  if ( red_disk ) {
-    SDL_FreeSurface( red_disk ); red_disk = NULL;
-  }
-  if ( green_disk ) {
-    SDL_FreeSurface( green_disk ); green_disk = NULL;
+  for( i=0; i<2; i++ ) {
+    if ( red_cassette[i] ) {
+      SDL_FreeSurface( red_cassette[i] ); red_cassette[i] = NULL;
+    }
+    if ( green_cassette[i] ) {
+      SDL_FreeSurface( green_cassette[i] ); green_cassette[i] = NULL;
+    }
+    if ( red_disk[i] ) {
+      SDL_FreeSurface( red_disk[i] ); red_disk[i] = NULL;
+    }
+    if ( green_disk[i] ) {
+      SDL_FreeSurface( green_disk[i] ); green_disk[i] = NULL;
+    }
   }
   return 0;
 }
