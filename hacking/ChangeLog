@@ -986,3 +986,5 @@
 20040706 menu.h: get initial comment filename right (thanks, Marek).
 20040706 acinclude.m4: distribute the Glib 1.2, Glib 2.x, GTK+ 1.2, GTK+
 	 2.x and libxml2 autoconf macros.
+20040707 z80/z80.pl,z80/tests/edb[3b].out: make INI, OUTI, INIR, OTIR and
+	 the D variants timings consistent with the FAQ.

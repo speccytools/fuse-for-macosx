@@ -206,11 +206,15 @@ sub ini_ind ($) {
 
     print << "CODE";
       {
-	libspectrum_word initemp = readport( BC );
-	tstates++; ula_contend_port( BC );
-	writebyte(HL,initemp);
+	libspectrum_word initemp;
+
+	tstates++;
+	ula_contend_port( BC );
+	initemp = readport( BC );
+	writebyte( HL, initemp );
+
 	B--; HL$modifier;
-	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
+	F = ( initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
       }
 CODE
@@ -224,17 +228,22 @@ sub inir_indr ($) {
 
     print << "CODE";
       {
-	libspectrum_word initemp=readport( BC );
-	tstates++; ula_contend_port( BC );
-	writebyte(HL,initemp);
+	libspectrum_word initemp;
+
+	tstates++;
+	ula_contend_port( BC );
+	initemp = readport( BC );
+	writebyte( HL, initemp );
+
 	B--; HL$modifier;
-	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
+	F = ( initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
-	if(B) {
+
+	if( B ) {
 	  contend_write( HL, 1 ); contend_write( HL, 1 );
 	  contend_write( HL, 1 ); contend_write( HL, 1 );
 	  contend_write( HL, 1 );
-	  PC-=2;
+	  PC -= 2;
 	}
       }
 CODE
@@ -295,17 +304,21 @@ sub otir_otdr ($) {
     print << "CODE";
       {
 	libspectrum_word outitemp;
+
 	tstates++;
 	outitemp = readbyte( HL );
-	B--; HL$modifier; /* This does happen first, despite what the specs say */
+	B--;	/* This does happen first, despite what the specs say */
+	ula_contend_port( BC );
 	writeport(BC,outitemp);
+
+	HL$modifier;
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
-	ula_contend_port( BC );
-	if(B) {
-	  contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
-	  contend_read( PC, 1 ); contend_read( PC - 1, 1 );
-	  PC-=2;
+
+	if( B ) {
+	  contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
+	  contend_read( HL, 1 ); contend_read( HL, 1 );
+	  PC -= 2;
 	}
       }
 CODE
@@ -320,12 +333,14 @@ sub outi_outd ($) {
     print << "CODE";
       {
 	libspectrum_word outitemp;
+
 	tstates++;
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
 	ula_contend_port( BC );
-	HL$modifier;
 	writeport(BC,outitemp);
+
+	HL$modifier;
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
       }
