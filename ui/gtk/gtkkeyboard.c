@@ -1,5 +1,5 @@
 /* gtkkeyboard.c: GTK+ routines for dealing with the keyboard
-   Copyright (c) 2000-2001 Philip Kendall
+   Copyright (c) 2000-2002 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -33,6 +33,7 @@
 #include <gtk/gtk.h>
 
 #include "gtkkeyboard.h"
+#include "gtkui.h"
 #include "keyboard.h"
 #include "keysyms.h"
 #include "widget/widget.h"
@@ -57,11 +58,18 @@ int gtkkeyboard_keypress(GtkWidget *widget, GdkEvent *event,
       if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
     }
     return TRUE;
-
-  } else {
-    return FALSE;
+    
   }
 
+  /* Now deal with the non-Speccy keys. Most are dealt with by
+     menu shortcuts in gtkui.c, but F1 can't be done that way. */
+  
+  if( keysym == GDK_F1 ) {
+    gtkui_popup_menu();
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 int gtkkeyboard_keyrelease(GtkWidget *widget, GdkEvent *event,

@@ -1,5 +1,5 @@
 /* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2001 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2002 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -53,6 +53,9 @@ GtkWidget *gtkui_window;
 
 /* The area into which the screen will be drawn */
 GtkWidget *gtkui_drawing_area;
+
+/* Popup menu widget(s), as invoked by F1 */
+GtkWidget *gtkui_menu_popup;
 
 static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				GtkWidget **menu_bar,
@@ -201,11 +204,29 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
   *accel_group = gtk_accel_group_new();
   item_factory = gtk_item_factory_new( GTK_TYPE_MENU_BAR, "<main>",
 				       *accel_group );
-
   gtk_item_factory_create_items(item_factory, menu_data_size, menu_data, NULL);
   *menu_bar = gtk_item_factory_get_widget( item_factory, "<main>" );
 
+  /* We have to recreate the menus for the popup, unfortunately... */
+  item_factory = gtk_item_factory_new( GTK_TYPE_MENU, "<main>", NULL );
+  gtk_item_factory_create_items(item_factory, menu_data_size, menu_data, NULL);
+  gtkui_menu_popup = gtk_item_factory_get_widget( item_factory, "<main>" );
+
   return FALSE;
+}
+
+static void gtkui_popup_menu_pos( GtkMenu *menu, gint *xp, gint *yp,
+				  GtkWidget *data)
+{
+  gdk_window_get_position( gtkui_window->window, xp, yp );
+}
+
+/* Popup main menu, as invoked by F1. */
+void gtkui_popup_menu(void)
+{
+  gtk_menu_popup( GTK_MENU(gtkui_menu_popup), NULL, NULL,
+		  (GtkMenuPositionFunc)gtkui_popup_menu_pos, NULL,
+		  0, 0 );
 }
 
 int ui_event(void)
