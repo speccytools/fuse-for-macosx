@@ -1,7 +1,8 @@
 .\" -*- nroff -*-
 .\"
 .\" fuse.1: Fuse man page
-.\" Copyright (c) 2001,2002 Russell Marks, Philip Kendall, Darren Salt
+.\" Copyright (c) 2001-2003 Russell Marks, Philip Kendall, Darren Salt,
+.\"                         Fredrick Meunier
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "17th August, 2002" "Version 0.5.0" "Emulators"
+.TH fuse 1 "12th April, 2003" "Version 0.6.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -117,8 +118,9 @@ option.
 Specify which graphics filter to use if available. The default is
 .IR normal ,
 which uses no filtering. The available options are
+.IR half ,
+.IR halfskip ,
 .IR normal ,
-.IR timexhalf ,
 .IR 2x ,
 .IR 3x ,
 .IR 2xsai ,
@@ -128,7 +130,10 @@ which uses no filtering. The available options are
 .IR tv2x ,
 .IR timextv ,
 and
-.IR dotmatrix
+.IR dotmatrix .
+See the
+.B "GRAPHICS FILTERS"
+section for more details.
 .RE
 .PP
 .I -h
@@ -598,7 +603,7 @@ and TC2048 but most of the time you'll probably want to use the 48 or
 .RS
 (Available only under the GTK+ or Mac OS X user interfaces). Start the
 emulated debugger/monitor. See the
-.B MONITOR/DEBUGGER
+.B "MONITOR/DEBUGGER"
 section for more information.
 .RE
 .PP
@@ -808,10 +813,101 @@ section below.
 .SH "DISPLAY SIZE"
 Some of Fuse's UIs allow resizing of the emulated Spectrum's display.
 Since these are the window-based ones (GTK+ and Xlib), you can resize
-the window by, well, resizing it. :-) You do have to make the window
-twice the width before the Fuse window actually scales up; you don't
-.I have
-to make it twice the height as well, but generally you'd want to.
+the window by, well, resizing it. :-) Exactly how this works depends
+on your window manager; you may have to make the window over twice the
+width and height of the original size before it actually scales
+up. Fuse attempts to keep the window 'square', but with some window
+managers this can mean the window will never resize at all. If you
+experience this problem, the
+.RI ` --no-aspect-hint '
+option may help.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "GRAPHICS FILTERS"
+Fuse has the ability to apply essentially arbitrary filters between
+building its image of the Spectrum's screen, and displaying it on the
+emulating machine's monitor. These filters can be used to do various
+forms of smoothing, emulation of TV scanlines and various other
+possibilities. Support for graphics filters varies between the
+different user interfaces, but there are two general classes: the GTK+
+and SDL user interfaces (and the saving of .png screenshots) support
+`interpolating' filters which use a palette larger than the Spectrum's
+16 colours, whilst the Xlib and SVGAlib user interfaces support only
+`non-interpolating' filters. The framebuffer user interface currently
+does not support filters at all.
+.PP
+A further complication arises due to the fact that the Timex machines
+have their high-resolution video mode with twice the horizontal
+resolution. To deal with this, Fuse treats these machines as having a
+`normal' display size which is twice the size of a normal Spectrum's
+screen, leading to a different set of filters being available for
+these machines. Note that any of the double-sizing filters are
+available for Timex machines only when using the SDL user interface.
+.PP
+The available filters, along with their short name used to select them
+from the command line, are:
+.PP
+.IR "Timex half (smoothed) " ( half )
+.br
+.IR "Timex half (skipping) " ( halfskip )
+.RS
+Two Timex-machine specific filters which scale the screen down to half
+normal (Timex) size; that is, the same size as a normal Spectrum
+screen. The difference between these two filters is in how they handle
+the high-resolution mode: the `smoothed' version is an interpolating
+filter which averages pairs of adjacent pixels, whilst the `skipping'
+version is a non-interpolating filter which simply drops every other
+pixel.
+.RE
+.PP
+.IR "Normal " ( normal )
+.RS
+The simplest filter: just display one pixel for every pixel on the
+Spectrum's screen.
+.RE
+.PP
+.IR "Double size " ( 2x )
+.RS
+Scale the displayed screen up to double size.
+.RE
+.PP
+.IR "Triple size " ( 3x )
+.RS
+Scale the displayed screen up to triple size. Available only with the
+SDL user interface or when saving screenshots of non-Timex machines.
+.RE
+.PP
+.IR "2xSaI " ( 2xsai )
+.br
+.IR "Super 2xSaI " ( super2xsai )
+.br
+.IR "SuperEagle " ( supereagle )
+.RS
+Three interpolating filters which apply successively more
+smoothing. All three double the size of the displayed screen.
+.RE
+.PP
+.IR "AdvMAME2x " ( advmame2x )
+.RS
+A double-sizing, non-interpolating filter which attempts to smooth
+diagonal lines.
+.RE
+.PP
+.IR "TV 2x " ( tv2x )
+.br
+.IR "Timex TV " ( timextv )
+.RS
+Two filters which attempt to emulate the effect of television
+scanlines. The former is a double-sizing filter for non-Timex
+machines, whilst the latter is a single-sizing filter for Timex
+machines (note that this means both produce the same size output).
+.RE
+.PP
+.IR "Dot matrix " ( dotmatrix )
+.RS
+A double-sizing filter which emulates the effect of a dot-matrix
+display.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1130,20 +1226,25 @@ compressed disk images.
 .\"
 .SH THE .TRD FORMAT
 .PP
-Fuse supports .TRD images in it's Pentagon emulation, truncated files
+Fuse supports .TRD images in its Pentagon emulation; truncated files
 need to be expanded with another utility before use.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH THE .SCL FORMAT
 .PP
-Fuse has read-only support for .SCL images in it's Pentagon emulation,
-you can create a read-write .TRD file using scl2trd in fuse-utils.
+Fuse has read-only support for .SCL images in its Pentagon emulation,
+you can create a read-write .TRD file using 
+.I scl2trd 
+from the associated Fuse utilities.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
 Not many peripherals are supported.
+.br
+Selecting a startup filter doesn't work properly with the GTK+ or Xlib
+user interfaces.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1163,7 +1264,7 @@ Not many peripherals are supported.
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br
-.IR "http://www.srcf.ucam.org/~pak21/cssfaq/index.html" .
+.IR "http://www.sinclairfaq.com/cssfaq/index.html" .
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1192,9 +1293,12 @@ and RZX embedded snapshots and compression.
 .PP
 Alexander Yurchenko wrote the OpenBSD/Solaris-specific sound code.
 .PP
-Frederick Meunier wrote the TC2048 support
+Frederick Meunier wrote the TC2048 support.
 .PP
 Ludvig Strigeus and The ScummVM project wrote the original graphics
 filter code.
 .PP
 Dmitry Sanarin wrote the orignial TR-DOS emulation (for Glukalka).
+.PP
+Witold Filipczyk wrote the TC2068 support.
+
