@@ -174,6 +174,11 @@ widget_menu_rzx_recording_snap( void *data GCC_UNUSED )
   /* Get a snapshot name */
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
 
+  if( !widget_filesel_name ) {
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
+    return 0;
+  }
+
   error = snapshot_read( widget_filesel_name );
   if( error ) {
     if( widget_filesel_name ) free( widget_filesel_name );
