@@ -31,6 +31,10 @@
 #include <dirent.h>
 #endif				/* #ifndef _DIRENT_H */
 
+#ifndef _STDLIB_H
+#include <stdlib.h>
+#endif				/* #ifndef _STDLIB_H */
+
 #ifndef FUSE_KEYBOARD_H
 #include "keyboard.h"
 #endif				/* #ifndef FUSE_KEYBOARD_H */
