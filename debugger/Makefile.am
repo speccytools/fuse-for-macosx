@@ -32,5 +32,6 @@ libdebugger_a_SOURCES = command.c commandl.l commandy.y debugger.c \
 disassemble.c
 
 commandl.c: commandy.c
+commandy.h: commandy.c
 
 noinst_HEADERS = commandy.h debugger.h debugger_internals.h
