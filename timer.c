@@ -42,36 +42,60 @@
 static timer_type stored_times[10];
 
 /* Which is the next entry in 'stored_times' that we will update */
-static size_t next_stored_time = 0;
+static size_t next_stored_time;
 
 /* The number of frames until we next update 'stored_times' */
-static int frames_until_update = 0;
+static int frames_until_update;
 
-/* The current running speed */
-float timer_current_speed;
+/* The number of time samples we have for estimating speed */
+static int samples;
+
+int
+timer_estimate_reset( void )
+{
+  samples = 0;
+  next_stored_time = 0;
+  frames_until_update = 0;
+  return 0;
+}
 
 int
 timer_estimate_speed( void )
 {
   timer_type current_time;
-  float difference;
+  float difference, current_speed;
   int error;
 
   if( frames_until_update-- ) return 0;
 
   error = timer_get_real_time( &current_time ); if( error ) return error;
 
-  difference = timer_get_time_difference( &current_time, 
-					  &stored_times[ next_stored_time ] );
+  if( samples == 0 ) {
 
-  timer_current_speed = 100 * ( 10.0 / difference );
+    current_speed = 0;
 
-  ui_statusbar_update_speed( timer_current_speed );
+  } else if( samples < 10 ) {
+
+    difference = timer_get_time_difference( &current_time, &stored_times[0] );
+    current_speed = 100 * ( samples / difference );
+
+  } else {
+
+    difference =
+      timer_get_time_difference( &current_time,
+				 &stored_times[ next_stored_time ] );
+      current_speed = 100 * ( 10.0 / difference );
+
+  }
+
+  ui_statusbar_update_speed( current_speed );
 
   stored_times[ next_stored_time ] = current_time;
 
   next_stored_time = ( next_stored_time + 1 ) % 10;
   frames_until_update = 49;
+
+  samples++;
 
   return 0;
 }

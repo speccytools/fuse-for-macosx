@@ -42,6 +42,7 @@ typedef DWORD timer_type;
 
 #endif				/* #ifndef WIN32 */
 
+int timer_estimate_reset( void );
 int timer_estimate_speed( void );
 int timer_get_real_time( timer_type *time );
 float timer_get_time_difference( timer_type *a, timer_type *b );

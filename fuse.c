@@ -242,6 +242,8 @@ static int fuse_init(int argc, char **argv)
   }
 #endif			/* #ifdef UI_SDL */
 
+  error = timer_estimate_reset(); if( error ) return error;
+
   error = machine_init_machines();
   if( error ) return error;
 
@@ -430,6 +432,8 @@ int fuse_emulation_pause(void)
 /* Restart emulation activities */
 int fuse_emulation_unpause(void)
 {
+  int error;
+
   /* If this doesn't start us running again, just return. In any case,
      decrement the pause count */
   if( --fuse_emulation_paused ) return 0;
@@ -473,6 +477,9 @@ int fuse_emulation_unpause(void)
     fuse_sound_in_use = 0;
   }
 #endif				/* #ifndef UI_SDL */
+
+  /* Restart speed estimation with no information */
+  error = timer_estimate_reset(); if( error ) return error;
 
   return 0;
 }

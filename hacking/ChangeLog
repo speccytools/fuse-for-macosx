@@ -360,3 +360,5 @@
 20031114 Precalculate the contention at every tstate.
 20031115 event.c, rzx.c, timer.[ch], ui/ui.h, ui/gtk/statusbar.c,
 	 widget/widget.c: add current emulation speed to GTK+ statusbar.
+20031116 fuse.c, timer.[ch]: better speed estimation just after emulation
+	 unpause (or startup).
