@@ -34,12 +34,15 @@
 #include <X11/Xlib.h>
 
 #include "fuse.h"
+#include "widget/widget.h"
 
 /* Are we expecting an X error to occur? */
 int xerror_expecting;
 
 /* Which error occured? */
 int xerror_error;
+
+#define MESSAGE_MAX_LENGTH 256
 
 int
 xerror_handler( Display *display, XErrorEvent *error )
@@ -66,14 +69,20 @@ xerror_handler( Display *display, XErrorEvent *error )
 int
 ui_error( const char *format, ... )
 {
+  char message[ MESSAGE_MAX_LENGTH + 1 ];
   va_list ap;
   
+  /* Create the message from the given arguments */
   va_start( ap, format );
-
-   fprintf( stderr, "%s: error: ", fuse_progname );
-  vfprintf( stderr, format, ap );
-
+  vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
   va_end( ap );
+
+  /* Print the message to stderr, along with a program identifier */
+  fprintf( stderr, "%s: error: %s", fuse_progname, message );
+
+  fuse_emulation_pause();
+  widget_do( WIDGET_TYPE_ERROR, message );
+  fuse_emulation_unpause();
 
   return 0;
 }

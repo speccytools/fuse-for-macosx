@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libwidget.a
 
-libwidget_a_SOURCES = filesel.c menu_data.c\
+libwidget_a_SOURCES = error.c filesel.c menu_data.c\
 picture.c widget.c menu.c options.c select.c
 
 BUILT_SOURCES = options.c options.h

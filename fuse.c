@@ -51,8 +51,8 @@ char* fuse_progname;
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;
 
-/* Is Spectrum emulation currently running? */
-int fuse_emulation_running;
+/* Is Spectrum emulation currently paused, and if so, how many times? */
+int fuse_emulation_paused;
 
 /* Are we going to try and use the sound card; this differs from
    sound.c:sound_enabled in that this gives a desire, whereas sound_enabled
@@ -143,7 +143,7 @@ static int fuse_init(int argc, char **argv)
     rzx_start_recording( settings_current.record_file );
   }
 
-  fuse_emulation_running = 1;
+  fuse_emulation_paused = 0;
 
   return 0;
 
@@ -189,7 +189,9 @@ static void fuse_show_help( void )
 /* Stop all activities associated with actual Spectrum emulation */
 int fuse_emulation_pause(void)
 {
-  fuse_emulation_running = 0;
+  /* If we were already paused, just return. In any case, increment
+     the pause count */
+  if( fuse_emulation_paused++ ) return 0;
 
   /* If we had sound enabled (and hence doing the speed regulation),
      turn it off */
@@ -201,6 +203,10 @@ int fuse_emulation_pause(void)
 /* Restart emulation activities */
 int fuse_emulation_unpause(void)
 {
+  /* If this doesn't start us running again, just return. In any case,
+     decrement the pause count */
+  if( --fuse_emulation_paused ) return 0;
+
   /* If we now want sound, enable it */
   if( settings_current.sound ) {
 
@@ -226,8 +232,6 @@ int fuse_emulation_unpause(void)
     timer_init();
     fuse_sound_in_use = 0;
   }
-
-  fuse_emulation_running = 1;
 
   return 0;
 }

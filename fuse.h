@@ -31,7 +31,7 @@ extern char* fuse_progname;		/* argv[0] */
 
 extern int fuse_exiting;		/* Shall we exit now? */
 
-extern int fuse_emulation_running;	/* Is Spectrum emulation running? */
+extern int fuse_emulation_paused;	/* Is Spectrum emulation paused? */
 int fuse_emulation_pause(void);		/* Stop and start emulation */
 int fuse_emulation_unpause(void);
 

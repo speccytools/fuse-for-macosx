@@ -56,6 +56,7 @@ typedef enum widget_type {
   WIDGET_TYPE_MENU,		/* General menu */
   WIDGET_TYPE_SELECT,		/* Select machine */
   WIDGET_TYPE_SOUND,		/* Sound options */
+  WIDGET_TYPE_ERROR,		/* Error report */
 
 } widget_type;
 
@@ -224,6 +225,10 @@ extern settings_info widget_options_settings;
 int widget_options_print_option( int number, const char* string, int value );
 int widget_options_print_value( int number, int value );
 int widget_options_finish( widget_finish_state finished );
+
+/* The error widget */
+int widget_error_draw( void *data );
+void widget_error_keyhandler( keyboard_key_name key );
 
 /* The widgets actually available */
 
