@@ -52,4 +52,4 @@ noinst_HEADERS = ay.h display.h event.h\
 	joystick.h printer.h
 
 EXTRA_DIST = AUTHORS README THANKS hacking/coding_style.txt hacking/ui.txt\
-	keysyms.dat keysyms.pl
+	hacking/tc2048_tech_notes.txt keysyms.dat keysyms.pl
