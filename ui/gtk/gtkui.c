@@ -142,14 +142,9 @@ static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
 static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
-static void gtkui_disk_open_a( GtkWidget *widget, gpointer data );
-static void gtkui_disk_open_b( GtkWidget *widget, gpointer data );
-static void gtkui_disk_eject_a( GtkWidget *widget, gpointer data );
-static void gtkui_disk_eject_write_a( GtkWidget *widget, gpointer data );
-static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data );
-static void gtkui_disk_eject_write_b( GtkWidget *widget, gpointer data );
-
+static void disk_open( GtkWidget *widget, gpointer data );
 static void gtkui_disk_open( specplus3_drive_number drive );
+static void disk_eject( GtkWidget *widget, gpointer data );
 
 static void cartridge_insert( GtkWidget *widget, gpointer data );
 static void cartridge_eject( GtkWidget *widget, gpointer data );
@@ -220,18 +215,18 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Media/_Disk",		NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Disk/Drive A:",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Disk/Drive A:/_Insert...",
-				NULL , gtkui_disk_open_a,   0, NULL          },
+			        NULL , disk_open,   0, GUINT_TO_POINTER( 0 ) },
   { "/Media/Disk/Drive A:/_Eject",
-				NULL , gtkui_disk_eject_a,  0, NULL          },
+			        NULL , disk_eject,  0, GUINT_TO_POINTER( 0 ) },
   { "/Media/Disk/Drive A:/Eject and _write...",
-			        NULL , gtkui_disk_eject_write_a, 0, NULL     },
+		                NULL,  disk_eject,  0, GUINT_TO_POINTER( 2 ) },
   { "/Media/Disk/Drive B:",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Disk/Drive B:/_Insert...",
-				NULL , gtkui_disk_open_b,   0, NULL          },
+			        NULL , disk_open,   0, GUINT_TO_POINTER( 1 ) },
   { "/Media/Disk/Drive B:/_Eject",
-				NULL , gtkui_disk_eject_b,  0, NULL          },
+			        NULL , disk_eject,  0, GUINT_TO_POINTER( 1 ) },
   { "/Media/Disk/Drive B:/Eject and _write...",
-			        NULL , gtkui_disk_eject_write_b, 0, NULL     },
+		                NULL , disk_eject , 0, GUINT_TO_POINTER( 3 ) },
 
   { "/Media/_Cartridge",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Cartridge/_Insert...",
@@ -1023,17 +1018,15 @@ ui_tape_write( void )
   return 0;
 }
 
-/* Called by the mnu when Disk/Drive ?:/Open selected */
+/* Called by the menu when Disk/Drive ?:/Open selected */
 static void
-gtkui_disk_open_a( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+disk_open( GtkWidget *widget GCC_UNUSED, gpointer data )
 {
-  gtkui_disk_open( SPECPLUS3_DRIVE_A );
-}
+  guint which;
 
-static void
-gtkui_disk_open_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  gtkui_disk_open( SPECPLUS3_DRIVE_B );
+  which = GPOINTER_TO_UINT( data );
+
+  gtkui_disk_open( which );
 }
 
 static void gtkui_disk_open( specplus3_drive_number drive )
@@ -1060,57 +1053,22 @@ static void gtkui_disk_open( specplus3_drive_number drive )
 }
 
 static void
-gtkui_disk_eject_a( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+disk_eject( GtkWidget *widget GCC_UNUSED, gpointer data )
 {
+  guint parameter, which, write;
+
+  parameter = GPOINTER_TO_UINT( data );
+  which = parameter & 0x01;
+  write = parameter & 0x02;
+
 #ifdef HAVE_765_H
   if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
+    specplus3_disk_eject( which, write );
     return;
   }
 #endif				/* #ifdef HAVE_765_H */
 
-  trdos_disk_eject( TRDOS_DRIVE_A );
-}
-
-static void
-gtkui_disk_eject_write_a( GtkWidget *widget GCC_UNUSED,
-			  gpointer data GCC_UNUSED )
-{
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( SPECPLUS3_DRIVE_A, 1 );
-    return;
-  }
-#endif				/* #ifdef HAVE_765_H */
-
-  trdos_disk_eject( TRDOS_DRIVE_A );
-}
-
-static void
-gtkui_disk_eject_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
-    return;
-  }
-#endif				/* #ifdef HAVE_765_H */
-
-  trdos_disk_eject( TRDOS_DRIVE_B );
-}
-
-static void
-gtkui_disk_eject_write_b( GtkWidget *widget GCC_UNUSED,
-			  gpointer data GCC_UNUSED )
-{
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( SPECPLUS3_DRIVE_B, 1 );
-    return;
-  }
-#endif				/* #ifdef HAVE_765_H */
-
-  trdos_disk_eject( TRDOS_DRIVE_B );
+  trdos_disk_eject( which );
 }
 
 #ifdef HAVE_765_H

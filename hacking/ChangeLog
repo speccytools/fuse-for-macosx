@@ -456,3 +456,7 @@
 20040105 ui/gtk/gtkui.c, widget/{menu.c,menu_data.c,widget_internals.h}:
 	 fix up the widget UIs and non-lib765 systems wrt the disk writing
 	 changes.
+20040106 ui/gtk/gtkui.c: merge the gtkui_disk_open_[ab] and
+	 gtkui_disk_eject(_write)_[ab] functions.
+
+	 
