@@ -1301,3 +1301,5 @@
 	 function to work).
 20050327 menu.[ch],ui/gtk/gtkui.c,widget/menu.c: check all media types for
 	 changes on exit via widget UIs.
+20050402 machines/specplus3.c: stop cancelled attempts to save a +3 disk
+	 from silently ejecting the disk.

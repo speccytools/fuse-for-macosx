@@ -597,8 +597,7 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
 
   if( write ) {
 
-    fd_eject( drives[which].drive );
-    ui_plus3_disk_write( which );
+    if( ui_plus3_disk_write( which ) ) return 1;
 
   } else {
 
@@ -607,11 +606,10 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
       ui_confirm_save_t confirm = ui_confirm_save(
         "Disk has been modified.\nDo you want to save it?"
       );
-  
+
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	fd_eject( drives[which].drive );
 	if( ui_plus3_disk_write( which ) ) return 1;
 	break;
 
@@ -624,8 +622,9 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
   
 #else			/* #ifdef LIB765_EXPOSES_DIRTY */
 
-  fd_eject( drives[which].drive );
-  if( write ) ui_plus3_disk_write( which );
+  if( write ) {
+    if( ui_plus3_disk_write( which ) ) return 1;
+  }
 
 #endif			/* #ifdef LIB765_EXPOSES_DIRTY */
 
@@ -655,6 +654,8 @@ specplus3_disk_write( specplus3_drive_number which, const char *filename )
   FILE *f;
   int error;
   size_t bytes_written;
+
+  fd_eject( drives[ which ].drive );
 
   f = fopen( filename, "wb" );
   if( !f ) {
