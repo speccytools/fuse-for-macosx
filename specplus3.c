@@ -138,6 +138,8 @@ void specplus3_writebyte(WORD address, BYTE b)
   }
 }
 
+/* Temporary hack */ DWORD spec48_contention( WORD address );
+
 int specplus3_init( machine_info *machine )
 {
   int error;
@@ -149,9 +151,10 @@ int specplus3_init( machine_info *machine )
 
   machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865 );
 
-  machine->ram.read_memory = specplus3_readbyte;
-  machine->ram.read_screen = specplus3_read_screen_memory;
+  machine->ram.read_memory  = specplus3_readbyte;
+  machine->ram.read_screen  = specplus3_read_screen_memory;
   machine->ram.write_memory = specplus3_writebyte;
+  machine->ram.contention   = spec48_contention;
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;

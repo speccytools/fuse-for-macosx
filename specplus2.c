@@ -34,6 +34,8 @@
 
 /* The +2 emulation just uses the 128K routines */
 
+/* Temporary hack */ DWORD spec48_contention( WORD address );
+
 int specplus2_init( machine_info *machine )
 {
   int error;
@@ -45,9 +47,10 @@ int specplus2_init( machine_info *machine )
 
   machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865);
 
-  machine->ram.read_memory = spec128_readbyte;
-  machine->ram.read_screen = spec128_read_screen_memory;
+  machine->ram.read_memory  = spec128_readbyte;
+  machine->ram.read_screen  = spec128_read_screen_memory;
   machine->ram.write_memory = spec128_writebyte;
+  machine->ram.contention   = spec48_contention;
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;

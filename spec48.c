@@ -89,6 +89,52 @@ void spec48_writebyte(WORD address, BYTE b)
   }
 }
 
+DWORD spec48_contention( WORD address )
+{
+  DWORD tstates_through_line;
+  
+  /* Contention occurs only in the lowest 16Kb of RAM */
+  if( address < 0x4000 || address > 0x7fff ) return 0;
+
+  /* No contention in the upper border */
+  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+    return 0;
+
+  /* Or the lower border */
+  if( tstates >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
+                                              DISPLAY_HEIGHT          ] )
+    return 0;
+
+  /* Work out where we are in this line */
+  tstates_through_line =
+    ( tstates + machine_current->timings.left_border_cycles ) %
+    machine_current->timings.cycles_per_line;
+
+  /* No contention if we're in the left border */
+  if( tstates_through_line < machine_current->timings.left_border_cycles - 1 ) 
+    return 0;
+
+  /* Or the right border or retrace */
+  if( tstates_through_line >= machine_current->timings.left_border_cycles +
+                              machine_current->timings.screen_cycles - 1 )
+    return 0;
+
+  /* We now know the ULA is reading the screen, so put in the appropriate
+     delay */
+  switch( tstates_through_line % 8 ) {
+    case 7: return 6; break;
+    case 0: return 5; break;
+    case 1: return 4; break;
+    case 2: return 3; break;
+    case 3: return 2; break;
+    case 4: return 1; break;
+    case 5: return 0; break;
+    case 6: return 0; break;
+  }
+
+  return 0;	/* Shut gcc up */
+}
+
 int spec48_init( machine_info *machine )
 {
   int error;
@@ -103,6 +149,7 @@ int spec48_init( machine_info *machine )
   machine->ram.read_memory  = spec48_readbyte;
   machine->ram.read_screen  = spec48_read_screen_memory;
   machine->ram.write_memory = spec48_writebyte;
+  machine->ram.contention   = spec48_contention;
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;

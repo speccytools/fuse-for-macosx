@@ -34,6 +34,7 @@
 BYTE spec48_readbyte(WORD address);
 BYTE spec48_read_screen_memory(WORD offset);
 void spec48_writebyte(WORD address, BYTE b);
+DWORD spec48_contention( WORD address );
 int spec48_init( machine_info *machine );
 int spec48_reset(void);
 

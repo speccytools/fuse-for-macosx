@@ -43,6 +43,7 @@ extern BYTE RAM[8][0x4000];
 typedef BYTE (*spectrum_memory_read_function) ( WORD address );
 typedef BYTE (*spectrum_screen_read_function) ( WORD offset );
 typedef void (*spectrum_memory_write_function)( WORD address, BYTE data );
+typedef DWORD (*spectrum_memory_contention_function)( WORD address );
 
 typedef struct spectrum_raminfo {
 
@@ -51,6 +52,8 @@ typedef struct spectrum_raminfo {
   spectrum_screen_read_function read_screen; /* Read a byte from the
 						current screen */
   spectrum_memory_write_function write_memory; /* Write to paged-in memory */
+  spectrum_memory_contention_function contention; /* How long must we wait
+						     to access memory? */
 
   int locked;			/* Is the memory configuration locked? */
   int current_page,current_rom,current_screen; /* Current paged memory */
@@ -68,6 +71,7 @@ typedef struct spectrum_raminfo {
 spectrum_memory_read_function readbyte;
 spectrum_screen_read_function read_screen_memory;
 spectrum_memory_write_function writebyte;
+spectrum_memory_contention_function contention;
 
 /* Things relating to peripherals */
 
