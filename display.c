@@ -151,9 +151,6 @@ int display_init(int *argc, char ***argv)
   if(ui_init(argc, argv))
     return 1;
 
-  /* We can now output error messages to our output device */
-  display_ui_initialised = 0;
-
   /* Set up the 'all pixels must be refreshed' marker */
   display_all_dirty = 0;
   for( i = 0; i < DISPLAY_SCREEN_WIDTH_COLS; i++ )
