@@ -466,13 +466,11 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
 
   if( utils_read_file( filename, &file ) ) return 1;
 
-  if( libspectrum_identify_file( &type, filename, file.buffer, file.length ) ) {
+  if( libspectrum_identify_file_with_class( &type, &class, filename,
+					    file.buffer, file.length ) ) {
     utils_close_file( &file );
     return 1;
   }
-
-  error = libspectrum_identify_class( &class, type );
-  if( error ) return 1;
 
   if( class != LIBSPECTRUM_CLASS_DISK_TRDOS ) {
     ui_error( UI_ERROR_ERROR,

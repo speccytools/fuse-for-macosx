@@ -460,13 +460,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     error = utils_read_file( filename, &file );
     if( error ) return error;
 
-    error = libspectrum_identify_file( &type, filename,
-				       file.buffer, file.length );
-    if( error ) return error;
-
-    error = utils_close_file( &file ); if( error ) return error;
-
-    error = libspectrum_identify_class( &class, type );
+    error = libspectrum_identify_file_with_class( &type, &class, filename,
+						  file.buffer, file.length );
     if( error ) return error;
 
     switch( class ) {

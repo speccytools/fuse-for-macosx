@@ -70,14 +70,11 @@ utils_open_file( const char *filename, int autoload,
   if( utils_read_file( filename, &file ) ) return 1;
 
   /* See if we can work out what it is */
-  if( libspectrum_identify_file( &type, filename,
-				 file.buffer, file.length ) ) {
+  if( libspectrum_identify_file_with_class( &type, &class, filename,
+					    file.buffer, file.length ) ) {
     utils_close_file( &file );
     return 1;
   }
-
-  error = libspectrum_identify_class( &class, type );
-  if( error ) { utils_close_file( &file ); return error; }
 
   error = 0;
 
