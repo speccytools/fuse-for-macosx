@@ -38,7 +38,7 @@
 int widget_tape_draw( void )
 {
   /* Blank the main display area */
-  widget_dialog( 1, 2, 30, 2 );
+  widget_dialog_with_border( 1, 2, 30, 2 );
 
   widget_printstring( 2, 2, WIDGET_COLOUR_FOREGROUND,
 		      "(C)lear tape" );

@@ -218,8 +218,8 @@ int widget_do( widget_type which )
     /* If we're going back to another widget, set up its keyhandler and
        draw it again */
     widget_keyhandler =
-      widget_data[ widget_return[widget_level].parent ].keyhandler;
-    widget_data[ widget_return[widget_level].parent ] . draw();
+      widget_data[ widget_return[widget_level+1].parent ].keyhandler;
+    widget_data[ widget_return[widget_level+1].parent ] . draw();
 
   } else {
 
