@@ -60,11 +60,6 @@ to the Spectrum's colours 0-7, whilst 8-15 are the bright
 versions. Note that `x' and `y' are offsets from the top-level pixel
 of the border, not of the screen.
 
-* void uidisplay_line( int y )
-
-This should copy line `y' of the buffered copy of the Spectrum's
-screen to the emulating machine's screen.
-
 * void uidisplay_lines( int start, int end )
 
 This should copy lines `start' to `end' (inclusive) of the Spectrum's

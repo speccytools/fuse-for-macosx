@@ -112,11 +112,6 @@ void uidisplay_putpixel(int x,int y,int colour)
   *(image+x+y*DISPLAY_SCREEN_WIDTH)=colours[colour];
 }
 
-void uidisplay_line(int y)
-{
-    memcpy(gm+y*320, image+y*DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_WIDTH*2);
-}
-
 void uidisplay_lines( int start, int end )
 {
   fbdisplay_area( 0, start, DISPLAY_SCREEN_WIDTH, ( end - start + 1 ) );

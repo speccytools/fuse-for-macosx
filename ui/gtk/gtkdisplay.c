@@ -203,15 +203,6 @@ void uidisplay_putpixel(int x,int y,int colour)
   }
 }
 
-void uidisplay_line(int y)
-{
-  gdk_draw_image(gtkui_drawing_area->window, gc, image,
-		 0,gtkdisplay_current_size*y,
-		 0,gtkdisplay_current_size*y,
-		 gtkdisplay_current_size*DISPLAY_SCREEN_WIDTH,
-		 gtkdisplay_current_size);
-}
-
 void uidisplay_lines( int start, int end )
 {
   gtkdisplay_area( 0, gtkdisplay_current_size*start,

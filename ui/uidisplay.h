@@ -36,7 +36,6 @@
 int uidisplay_init(int width, int height);
 
 void uidisplay_putpixel(int x,int y,int colour);
-void uidisplay_line(int y);
 void uidisplay_lines( int start, int end );
 void uidisplay_set_border(int line, int pixel_from, int pixel_to,
 			  int colour);

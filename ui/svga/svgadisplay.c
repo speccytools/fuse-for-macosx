@@ -115,11 +115,6 @@ void uidisplay_putpixel(int x,int y,int colour)
   *(image+x+y*DISPLAY_SCREEN_WIDTH)=colour;
 }
 
-void uidisplay_line(int y)
-{
-    vga_drawscansegment(image+y*DISPLAY_SCREEN_WIDTH,0,y,DISPLAY_SCREEN_WIDTH);
-}
-
 void uidisplay_lines( int start, int end )
 {
   svgadisplay_area( 0, start, DISPLAY_SCREEN_WIDTH, ( end - start + 1 ) );

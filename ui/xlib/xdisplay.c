@@ -295,14 +295,6 @@ void uidisplay_putpixel(int x,int y,int colour)
   }
 }
 
-void uidisplay_line(int y)
-{
-  XPutImage(display, xui_mainWindow, gc, image,
-	    0, xdisplay_current_size*y,
-	    0, xdisplay_current_size*y,
-	    xdisplay_current_size*DISPLAY_SCREEN_WIDTH, xdisplay_current_size);
-}
-
 void uidisplay_lines( int start, int end )
 {
   xdisplay_area( 0, xdisplay_current_size * start,
