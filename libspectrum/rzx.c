@@ -319,8 +319,8 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
 
-  /* Free the decompressed buffer */
-  free( gzsnap );
+  /* Free the decompressed data (if we created it) */
+  if( compressed ) free( gzsnap );
 
   /* Skip over the data */
   (*ptr) += blocklength - 9;
