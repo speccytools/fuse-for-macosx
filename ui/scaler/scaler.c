@@ -1055,18 +1055,18 @@ TimexTV(BYTE *srcPtr, DWORD srcPitch, BYTE *null, BYTE *dstPtr, DWORD dstPitch,
             int width, int height)
 {
   int i, j;
-  unsigned int nextlineSrc = srcPitch / sizeof(short);
-  short *p = (short *)srcPtr;
+  unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
+  scaler_data_type *p = (scaler_data_type *)srcPtr;
 
-  unsigned int nextlineDst = dstPitch / sizeof(short);
-  short *q = (short *)dstPtr;
+  unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
+  scaler_data_type *q = (scaler_data_type *)dstPtr;
 
   while(height--) {
     if( ( height & 1 ) == 0 ) {
       for (i = 0, j = 0; i < width; ++i, j++ ) {
-        unsigned short p1 = *(p + i);
-        unsigned short p2 = *(p + i + nextlineSrc + nextlineSrc);
-        unsigned short pi = (unsigned short)((INTERPOLATE(p1, p2) & colorMask) >> 1);
+        scaler_data_type p1 = *(p + i);
+        scaler_data_type p2 = *(p + i + nextlineSrc + nextlineSrc);
+        scaler_data_type pi = ((INTERPOLATE(p1, p2) & colorMask) >> 1);
 
         *(q + j) = p1;
         *(q + j + nextlineDst) = pi;

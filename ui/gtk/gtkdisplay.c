@@ -56,8 +56,8 @@ int image_width, image_height;
 
 /* An RGB image of the Spectrum screen; slightly bigger than the real
    screen to handle the smoothing filters which read around each pixel */
-static guchar rgb_image[ 4 * DISPLAY_SCREEN_HEIGHT *
-		           ( DISPLAY_SCREEN_WIDTH + 3 ) ];
+static guchar rgb_image[ 4 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
+		             ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
 static const gint rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
@@ -123,7 +123,7 @@ gtkdisplay_init( void )
 
   error = init_colours(); if( error ) return error;
 
-  for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 3; y++ )
+  for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
     for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
       rgb_image[ y + rgb_pitch + 4 * x ] = colours[0];
 
@@ -228,6 +228,7 @@ register_scalers( void )
       return 0;
     case 2:
       scaler_register( SCALER_NORMAL );
+      scaler_register( SCALER_TIMEXTV );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_NORMAL );
       return 0;
