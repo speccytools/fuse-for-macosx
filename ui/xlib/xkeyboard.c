@@ -43,6 +43,7 @@
 #include "spectrum.h"
 #include "tape.h"
 #include "widget/widget.h"
+#include "xkeyboard.h"
 
 void xkeyboard_keypress(XKeyEvent *event)
 {
