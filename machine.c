@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -302,9 +302,7 @@ machine_reset( void )
   tape_stop();
 
   /* Load in the ROMs: remove any ROMs we've got in memory at the moment */
-  for( i = 0; i < spectrum_rom_count; i++ ) {
-    if( ROM[i] ) { free( ROM[i] ); ROM[i] = 0; }
-  }
+  for( i = 0; i < spectrum_rom_count; i++ ) { free( ROM[i] ); ROM[i] = NULL; }
     
   /* Make sure we have enough space for the new ROMs */
   if( spectrum_rom_count < machine_current->rom_count ) {
@@ -318,7 +316,12 @@ machine_reset( void )
 
     ROM = new_ROM;
   }
+
   spectrum_rom_count = machine_current->rom_count;
+  
+  /* Zero all the ROMs; if an error occurs they won't be loaded with anything
+     and we don't want to attempt to unload them later */
+  for( i = 0; i < spectrum_rom_count; i++ ) ROM[i] = NULL;
 
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;

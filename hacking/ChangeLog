@@ -634,3 +634,5 @@
 20040311 ui/xlib/{xdisplay.c,xkeyboard.c}: make Xlib UI work with new
 	 input layer code.
 20040311 ui/gtk/roms.c: make changing ROMs work.
+20040311 machine.c: remove the segfault which would occur if one of the
+	 ROMs of a multi-ROM machine didn't load.
