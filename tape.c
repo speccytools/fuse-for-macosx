@@ -180,7 +180,7 @@ int tape_close( void )
   ui_confirm_save_t confirm;
 
   /* If the tape has been modified, check if we want to do this */
-  if( settings_current.confirm_dangerous && tape_modified ) {
+  if( tape_modified ) {
 
     confirm = ui_confirm_save( "Tape has been modified" );
     switch( confirm ) {

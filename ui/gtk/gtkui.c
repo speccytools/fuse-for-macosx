@@ -1,5 +1,5 @@
 /* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2003 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2004 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -644,7 +644,12 @@ gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
+  int error;
+
   if( gtkui_confirm( "Exit Fuse?" ) ) {
+
+    error = tape_close(); if( error ) return;
+
     fuse_exiting = 1;
 
     /* Stop the paused state to allow us to exit (occurs from main

@@ -449,3 +449,5 @@
 20040104 tape.[ch], utils.c, ui/ui.h, ui/gtk/{confirm,gtkui.c}: confirm
 	 before an attempt is made to close a modified tape.
 20040104 widget/{menu,widget}.c: fix up widget UIs for new confirm code.
+20040105 tape.c, ui/gtk/{confirm,gtkui}.c: check for tape modification
+	 on exit.

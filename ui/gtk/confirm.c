@@ -113,6 +113,8 @@ ui_confirm_save( const char *message )
   GtkAccelGroup *accelerators;
   ui_confirm_save_t confirm;
 
+  if( !settings_current.confirm_dangerous ) return UI_CONFIRM_SAVE_DONTSAVE;
+
   fuse_emulation_pause();
 
   confirm = UI_CONFIRM_SAVE_CANCEL;
