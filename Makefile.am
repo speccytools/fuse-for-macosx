@@ -81,7 +81,9 @@ fuse_SOURCES = ay.c \
 	trdos.c \
 	ui.c \
 	uidisplay.c \
-	utils.c
+	utils.c \
+	zxatasp.c \
+	zxcf.c
 
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
@@ -141,7 +143,9 @@ noinst_HEADERS = ay.h \
 	utils.h \
 	joystick.h \
 	printer.h \
-	scld.h
+	scld.h \
+	zxatasp.h \
+	zxcf.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl \
 	     settings-header.pl settings.dat

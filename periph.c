@@ -35,6 +35,8 @@
 #include "settings.h"
 #include "simpleide.h"
 #include "ui/ui.h"
+#include "zxatasp.h"
+#include "zxcf.h"
 
 /*
  * General peripheral list handling routines
@@ -270,6 +272,9 @@ periph_setup( const periph_t *peripherals_list, size_t n,
   error =
     periph_register_n( simpleide_peripherals, simpleide_peripherals_count );
   if( error ) return error;
+
+  periph_register_n( zxatasp_peripherals, zxatasp_peripherals_count );
+  periph_register_n( zxcf_peripherals, zxcf_peripherals_count );
 
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
 

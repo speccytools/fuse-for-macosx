@@ -49,6 +49,8 @@
 #include "ui/uidisplay.h"
 #include "utils.h"
 #include "z80/z80.h"
+#include "zxatasp.h"
+#include "zxcf.h"
 
 fuse_machine_info **machine_types = NULL; /* Array of available machines */
 int machine_count = 0;
@@ -325,6 +327,8 @@ machine_reset( void )
   scld_reset();
   tape_stop();
   simpleide_reset();
+  zxatasp_reset();
+  zxcf_reset();
 
   memory_pool_free();
 

@@ -43,6 +43,8 @@
 #include "ui/ui.h"
 #include "utils.h"
 #include "widget/widget.h"
+#include "zxatasp.h"
+#include "zxcf.h"
 
 #ifdef USE_WIDGET
 #define WIDGET_END widget_finish()
@@ -307,7 +309,7 @@ MENU_CALLBACK( menu_media_cartridge_interfaceii_eject )
   if2_eject();
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_insert )
+MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
 {
   char *filename;
 
@@ -319,6 +321,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_insert )
   switch( action ) {
   case 1: simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
   case 2: simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 3: zxatasp_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
+  case 4: zxatasp_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 5: zxcf_insert( filename ); break;
   }
 
   free( filename );
@@ -326,13 +331,16 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_insert )
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_commit )
+MENU_CALLBACK_WITH_ACTION( menu_media_ide_commit )
 {
   fuse_emulation_pause();
 
   switch( action ) {
   case 1: simpleide_commit( LIBSPECTRUM_IDE_MASTER ); break;
   case 2: simpleide_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 3: zxatasp_commit( LIBSPECTRUM_IDE_MASTER ); break;
+  case 4: zxatasp_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 5: zxcf_commit(); break;
   }
 
   fuse_emulation_unpause();
@@ -340,17 +348,38 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_commit )
   WIDGET_END;
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_eject )
+MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject )
 {
   fuse_emulation_pause();
 
   switch( action ) {
   case 1: simpleide_eject( LIBSPECTRUM_IDE_MASTER ); break;
   case 2: simpleide_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 3: zxatasp_eject( LIBSPECTRUM_IDE_MASTER ); break;
+  case 4: zxatasp_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
+  case 5: zxcf_eject(); break;
   }
 
   fuse_emulation_unpause();
 
+  WIDGET_END;
+}
+
+MENU_CALLBACK( menu_media_ide_zxatasp_upload )
+{
+  settings_current.zxatasp_upload = !settings_current.zxatasp_upload;
+  WIDGET_END;
+}
+
+MENU_CALLBACK( menu_media_ide_zxatasp_writeprotect )
+{
+  settings_current.zxatasp_wp = !settings_current.zxatasp_wp;
+  WIDGET_END;
+}
+
+MENU_CALLBACK( menu_media_ide_zxcf_upload )
+{
+  settings_current.zxcf_upload = !settings_current.zxcf_upload;
   WIDGET_END;
 }
 

@@ -14,6 +14,8 @@ Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Simple (8)-bit IDE, simpleide_active, INPUT_KEY_8
+Checkbox, (Z)XATASP, zxatasp_active, INPUT_KEY_z
+Checkbox, ZXC(F), zxcf_active, INPUT_KEY_f
 Checkbox, (I)nterface II, interface2, INPUT_KEY_i
 Posthook, periph_update
 

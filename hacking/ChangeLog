@@ -821,3 +821,6 @@
 	 specplus3.c},ui/gtk/debugger.c,z80/{coretest.c,z80.pl,z80_macros.h,
 	 z80_ops.c}: refactor to introduce separate mappings for reading
 	 and writing.
+20040517 Makefile.am,fuse.c,machine.c,memory.c,menu.[ch],menu_data.c,
+	 periph.c,settings.dat,zxatasp.[ch],zxcf.[ch],ui/options.dat:
+	 first commit of ZXATASP/ZXCF code. Not working yet.

@@ -69,6 +69,8 @@
 #include "ui/ui.h"
 #include "ui/scaler/scaler.h"
 #include "utils.h"
+#include "zxatasp.h"
+#include "zxcf.h"
 
 #ifdef USE_WIDGET
 #include "widget/widget.h"
@@ -224,6 +226,8 @@ static int fuse_init(int argc, char **argv)
   if( psg_init() ) return 1;
   if( trdos_init() ) return 1;
   if( simpleide_init() ) return 1;
+  if( zxatasp_init() ) return 1;
+  if( zxcf_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 
@@ -660,6 +664,8 @@ static int fuse_end(void)
   rzx_end();
   debugger_end();
   simpleide_end();
+  zxatasp_end();
+  zxcf_end();
 
   machine_end();
 

@@ -35,6 +35,8 @@
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+#include "zxatasp.h"
+#include "zxcf.h"
 
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map_read[8];
@@ -239,9 +241,23 @@ memory_update_home( size_t start, size_t n )
 void
 memory_romcs_map( void )
 {
-  if( machine_current->ram.romcs ) {
-    memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
-    memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
-  }
-}
+  int zxatasp, zxcf;
 
+  /* Nothing changes if /ROMCS is not set */
+  if( !machine_current->ram.romcs ) return;
+
+  zxatasp = settings_current.zxatasp_active && zxatasp_memenable &&
+    settings_current.zxatasp_upload;
+  zxcf = settings_current.zxcf_active && settings_current.zxcf_upload;
+
+  /* If we're not uploading to either the ZXATASP or ZXCF interfaces,
+     reads come from the chip select bank */
+  if( !zxatasp && !zxcf ) {
+    memory_map_read[0] = memory_map_romcs[0];
+    memory_map_read[1] = memory_map_romcs[1];
+  }
+
+  /* Writes always go to the chip select bank */
+  memory_map_write[0] = memory_map_romcs[0];
+  memory_map_write[1] = memory_map_romcs[1];
+}
