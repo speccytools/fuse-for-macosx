@@ -43,10 +43,8 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include <stdio.h>
 
-#include "display.h"
 #include "fuse.h"
 #include "options.h"
-#include "ui/uidisplay.h"
 #include "widget_internals.h"
 
 CODE
@@ -71,9 +69,7 @@ int widget_$_->{name}_draw( void *data GCC_UNUSED )
   error = widget_$_->{name}_show_all( &widget_options_settings );
   if( error ) { settings_free( &widget_options_settings ); return error; }
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 32 + $count * 8 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, 2 + $count );
 
   return 0;
 }
