@@ -545,7 +545,8 @@ snapshot_copy_to( libspectrum_snap *snap )
 
     for( i = 0; i < 8; i++ ) {
 
-      if( memory_map_exrom[i]->source == MEMORY_SOURCE_CARTRIDGE ) {
+      if( memory_map_exrom[i]->source == MEMORY_SOURCE_CARTRIDGE ||
+	  memory_map_exrom[i]->writable ) {
         buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
@@ -559,7 +560,8 @@ snapshot_copy_to( libspectrum_snap *snap )
         libspectrum_snap_set_exrom_cart( snap, i, buffer );
       }
 
-      if( memory_map_dock[i]->source == MEMORY_SOURCE_CARTRIDGE ) {
+      if( memory_map_dock[i]->source == MEMORY_SOURCE_CARTRIDGE ||
+	  memory_map_dock[i]->writable ) {
         buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,

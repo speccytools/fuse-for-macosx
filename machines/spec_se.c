@@ -34,6 +34,7 @@
 
 #include <libspectrum.h>
 
+#include "dck.h"
 #include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
@@ -163,6 +164,9 @@ dock_exrom_reset( void )
   memory_map_home[6] = &memory_map_ram[ 0];
   memory_map_home[7] = &memory_map_ram[ 1];
 
+  /* The dock is always active on the SE */
+  dck_active = 1;
+
   return 0;
 }
 
@@ -197,9 +201,20 @@ spec_se_reset( void )
     timex_exrom[i].bank = MEMORY_BANK_EXROM;
     timex_exrom[i].page_num = i;
     timex_exrom[i].contended = 0;
-    timex_dock[i].source = MEMORY_SOURCE_SYSTEM;
+    timex_exrom[i].source = MEMORY_SOURCE_SYSTEM;
     memory_map_exrom[i] = &timex_exrom[i];
   }
+
+  /* The dock and exrom aren't cleared by the reset routine, so do
+     so manually (only really necessary to keep snapshot sizes down) */
+  for( i = 0; i < 8; i++ ) {
+    memset( memory_map_dock[i]->page,  0, MEMORY_PAGE_SIZE );
+    memset( memory_map_exrom[i]->page, 0, MEMORY_PAGE_SIZE );
+  }
+
+  /* Similarly for 0x8000 to 0xbfff (RAM page 8) */
+  memset( memory_map_home[4]->page, 0, MEMORY_PAGE_SIZE );
+  memset( memory_map_home[5]->page, 0, MEMORY_PAGE_SIZE );
 
   /* RAM pages 1, 3, 5 and 7 contended */
   for( i = 0; i < 8; i++ ) 

@@ -853,3 +853,7 @@
 20040525 dck.[ch],if2.c,memory.[ch],snapshot.c,
          machines/{spec16.c,spec_se.c,tc2048.c,tc2068.c}: Add Timex Dock
          snapshot support per patch #959422.
+20040525 snapshot.c,machines/spec_se.c: allow saving of the dock/exrom
+	 from the Spectrum SE.
+
+	
