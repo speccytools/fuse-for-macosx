@@ -58,10 +58,12 @@ sub arithmetic_logical ($$$) {
 	    print "      $opcode($arg2);\n";
 	} elsif( $arg2 eq '(REGISTER+dd)' ) {
 	    print << "CODE";
-      tstates += 5;		/* FIXME: how is this contended? */
       {
-	libspectrum_byte bytetemp = 
-	    readbyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ) );
+	libspectrum_byte offset, bytetemp;
+	offset = readbyte( PC );
+	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
+	contend( PC, 1 ); PC++;
+	bytetemp = readbyte( REGISTER + (libspectrum_signed_byte)offset );
 	$opcode(bytetemp);
       }
 CODE
@@ -179,11 +181,15 @@ sub inc_dec ($$) {
 CODE
     } elsif( $arg eq '(REGISTER+dd)' ) {
 	print << "CODE";
-      tstates += 6;		/* FIXME: how is this contended? */
       {
-	libspectrum_word wordtemp =
-	    REGISTER + (libspectrum_signed_byte)readbyte( PC++ );
-	libspectrum_byte bytetemp = readbyte( wordtemp );
+	libspectrum_byte offset, bytetemp;
+	libspectrum_word wordtemp;
+	offset = readbyte( PC );
+	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
+	contend( PC, 1 ); PC++;
+	wordtemp = REGISTER + (libspectrum_signed_byte)offset;
+	bytetemp = readbyte( wordtemp );
+	contend( wordtemp, 1 );
 	$opcode(bytetemp);
 	writebyte(wordtemp,bytetemp);
       }
@@ -372,8 +378,12 @@ sub res_set ($$$) {
 CODE
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "CODE";
-      tstates += 2;
-      writebyte(tempaddr, readbyte(tempaddr) $operator $hex_mask);
+      {
+	libspectrum_byte bytetemp;
+	bytetemp = readbyte( tempaddr );
+	contend( tempaddr, 1 );
+	writebyte( tempaddr, bytetemp $operator $hex_mask );
+      }
 CODE
     }
 }
@@ -395,9 +405,9 @@ sub rotate_shift ($$) {
 CODE
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "CODE";
-      tstates += 2;
       {
 	libspectrum_byte bytetemp = readbyte(tempaddr);
+	contend( tempaddr, 1 );
 	$opcode(bytetemp);
 	writebyte(tempaddr,bytetemp);
       }
@@ -421,9 +431,9 @@ sub opcode_BIT (@) {
 	print "      BIT( $bit, $register );\n";
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "BIT";
-      tstates += 2;
       {
 	libspectrum_byte bytetemp = readbyte( tempaddr );
+	contend( tempaddr, 1 );
 	BIT( $bit, bytetemp );
       }
 BIT
@@ -700,8 +710,13 @@ LD
 LD
         } elsif( $src eq '(REGISTER+dd)' ) {
 	    print << "LD";
-      tstates += 5;		/* FIXME: how is this contended? */
-      $dest = readbyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ) );
+      {
+	libspectrum_byte offset;
+	offset = readbyte( PC );
+	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
+	contend( PC, 1 ); PC++;
+	$dest = readbyte( REGISTER + (libspectrum_signed_byte)offset );
+      }
 LD
         }
 
@@ -767,16 +782,22 @@ LD
 
 	if( length $src == 1 ) {
 	print << "LD";
-      tstates += 5;		/* FIXME: how is this contended? */
-      writebyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ), $src );
+      {
+	libspectrum_byte offset;
+	offset = readbyte( PC );
+	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
+	contend( PC, 1 ); PC++;
+	writebyte( REGISTER + (libspectrum_signed_byte)offset, $src );
+      }
 LD
         } elsif( $src eq 'nn' ) {
 	    print << "LD";
-      tstates += 2;		/* FIXME: how is this contended? */
       {
-	libspectrum_word wordtemp =
-	    REGISTER + (libspectrum_signed_byte)readbyte( PC++ );
-	writebyte(wordtemp,readbyte(PC++));
+	libspectrum_byte offset, value;
+	offset = readbyte( PC++ );
+	value = readbyte( PC );
+	contend( PC, 1 ); contend( PC, 1 ); PC++;
+	writebyte( REGISTER + (libspectrum_signed_byte)offset, value );
       }
 LD
         }
@@ -1004,14 +1025,14 @@ sub opcode_shift (@) {
     if( $opcode eq 'DDFDCB' ) {
 
 	print << "shift";
-      /* FIXME: contention here is just a guess */
       {
 	libspectrum_word tempaddr; libspectrum_byte opcode3;
 	contend( PC, 3 );
 	tempaddr =
 	    REGISTER + (libspectrum_signed_byte)readbyte_internal( PC );
-	PC++; contend( PC, 4 );
-	opcode3 = readbyte_internal( PC ); PC++;
+	PC++; contend( PC, 3 );
+	opcode3 = readbyte_internal( PC );
+	contend( PC, 1 ); contend( PC, 1 ); PC++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode3) {
 #include "z80_ddfdcb.c"
@@ -1124,16 +1145,16 @@ while(<>) {
 	    my $hexmask = res_set_hexmask( $opcode, $bit );
 
 	    print << "CODE";
-      tstates += 2;
-      $register=readbyte(tempaddr) $operator $hexmask;
+      $register = readbyte(tempaddr) $operator $hexmask;
+      contend( tempaddr, 1 );
       writebyte(tempaddr, $register);
       break;
 CODE
 	} else {
 
 	    print << "CODE";
-      tstates += 2;
       $register=readbyte(tempaddr);
+      contend( tempaddr, 1 );
       $opcode($register);
       writebyte(tempaddr, $register);
       break;

@@ -5,9 +5,12 @@
     8 MC 0002
    11 MR 0002 c6
    11 MC 0003
-   15 MR 0003 0e
-   17 MC fd0f
-   20 MR fd0f ad
+   14 MR 0003 0e
+   14 MC 0003
+   15 MC 0003
+   16 MC fd0f
+   19 MR fd0f ad
+   19 MC fd0f
    20 MC fd0f
    23 MW fd0f d6
 1c81 890b 7830 060c 0000 0000 0000 0000 fd49 5d07 0000 0004
