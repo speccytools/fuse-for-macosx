@@ -98,11 +98,12 @@ static int read_config_file( settings_info *settings );
 static int parse_xml( xmlDocPtr doc, settings_info *settings );
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
-static int settings_command_line( int argc, char **argv,
-				  settings_info *settings );
+static int settings_command_line( settings_info *settings, int *first_arg,
+				  int argc, char **argv );
 
 /* Called on emulator startup */
-int settings_init( int argc, char **argv )
+int
+settings_init( int *first_arg, int argc, char **argv )
 {
   int error;
 
@@ -114,7 +115,7 @@ int settings_init( int argc, char **argv )
   if( error ) return error;
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
-  error = settings_command_line( argc, argv, &settings_current );
+  error = settings_command_line( &settings_current, first_arg, argc, argv );
   if( error ) return error;
 
   return 0;
@@ -296,8 +297,9 @@ CODE
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
 /* Read options from the command line */
-static int settings_command_line( int argc, char **argv,
-				  settings_info *settings )
+static int
+settings_command_line( settings_info *settings, int *first_arg,
+                       int argc, char **argv )
 {
 
 #ifndef HAVE_GETOPT_LONG
@@ -405,6 +407,9 @@ print << 'CODE';
 
     }
   }
+
+  /* Store the location of the first non-option argument */
+  *first_arg = optind;
 
   return 0;
 }
