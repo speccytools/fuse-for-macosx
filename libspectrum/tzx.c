@@ -101,6 +101,8 @@ static libspectrum_error
 tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
 		     size_t *length );
 static libspectrum_error
+tzx_write_stop( libspectrum_byte **buffer, size_t *offset, size_t *length );
+static libspectrum_error
 tzx_write_comment( libspectrum_tape_comment_block *comment_block,
 		   libspectrum_byte **buffer, size_t *offset, size_t *length );
 static libspectrum_error
@@ -649,7 +651,7 @@ tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
   libspectrum_tape_block *block;
 
   /* Check the length field exists */
-  if( end - (*ptr) < 2 ) {
+  if( end - (*ptr) < 4 ) {
     libspectrum_print_error(
       "tzx_read_stop: not enough data in buffer\n"
     );
@@ -657,7 +659,7 @@ tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
   }
 
   /* But then just skip over it, as I don't care what it is */
-  (*ptr) += 2;
+  (*ptr) += 4;
 
   /* Get memory for a new block */
   block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
@@ -741,8 +743,9 @@ tzx_read_message( libspectrum_tape *tape, const libspectrum_byte **ptr,
 {
   libspectrum_tape_block* block;
   libspectrum_tape_message_block *message_block;
-
+  
   size_t length;
+  libspectrum_byte *ptr2;
 
   /* Check the time and length byte exists */
   if( end - (*ptr) < 2 ) {
@@ -785,10 +788,13 @@ tzx_read_message( libspectrum_tape *tape, const libspectrum_byte **ptr,
     return LIBSPECTRUM_ERROR_MEMORY;
   }
 
-  /* Copy the string across, and move along */
-  memcpy( message_block->text, (*ptr), length );
+  /* Copy the string across and move along */
+  memcpy( message_block->text, (*ptr), length ); (*ptr) += length;
   message_block->text[length] = '\0';
-  (*ptr) += length;
+
+  /* Translate all '\r's in the message to '\n's */
+  for( ptr2 = message_block->text; *ptr2; ptr2++ )
+    if( *ptr2 == '\r' ) *ptr2 = '\n';
 
   /* Finally, put the block into the block list */
   tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
@@ -1041,6 +1047,11 @@ libspectrum_tzx_write( libspectrum_tape *tape,
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+      error = tzx_write_stop( buffer, &offset, length );
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
       error = tzx_write_comment( &(block->types.comment), buffer, &offset,
 				 length);
@@ -1282,6 +1293,23 @@ tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
 }
 
 static libspectrum_error
+tzx_write_stop( libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte */
+  error = libspectrum_make_room( buffer, (*offset) + 1, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_STOP48;
+
+  (*offset)++;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
 tzx_write_comment( libspectrum_tape_comment_block *comment_block,
 		   libspectrum_byte **buffer, size_t *offset, size_t *length )
 {
@@ -1311,7 +1339,7 @@ tzx_write_message( libspectrum_tape_message_block *message_block,
   libspectrum_error error;
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
-  size_t text_length = strlen( message_block->text );
+  size_t i, text_length = strlen( message_block->text );
 
   /* Make room for the ID byte, the time byte, length byte and the name */
   error = libspectrum_make_room( buffer, (*offset) + 3 + text_length, &ptr,
@@ -1321,7 +1349,11 @@ tzx_write_message( libspectrum_tape_message_block *message_block,
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_COMMENT;
   *ptr++ = message_block->time;
   *ptr++ = text_length;
-  memcpy( ptr, message_block->text, text_length ); ptr += text_length;
+
+  memcpy( ptr, message_block->text, text_length );
+  /* Translate all '\n's in the message to '\r's */
+  for( i=0; i<text_length; i++ )
+    if( *ptr == '\n' ) *ptr = '\r';
 
   (*offset) += 3 + text_length;
 
