@@ -71,12 +71,18 @@ input:   /* empty */
        | command
 ;
 
-command:   BREAK    { debugger_breakpoint_add( PC,
-		        DEBUGGER_BREAKPOINT_TYPE_PERMANENT ); }
+command:   BREAK    { debugger_breakpoint_add(
+			DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC,
+		        DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+                      );
+                    }
          | BREAK CLEAR { debugger_breakpoint_remove_all(); }
          | BREAK CLEAR NUMBER { debugger_breakpoint_remove( $3 ); }
-	 | BREAK NUMBER { debugger_breakpoint_add( $2,
-			    DEBUGGER_BREAKPOINT_TYPE_PERMANENT ); }
+	 | BREAK NUMBER { debugger_breakpoint_add( 
+			    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, $2,
+			    DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+                          );
+                        }
 	 | BREAK SHOW { debugger_breakpoint_show(); }
 	 | CONTINUE { debugger_run(); }
          | EXIT     { debugger_breakpoint_exit(); }

@@ -51,7 +51,7 @@ FUNCTION( spec48_readbyte )( WORD address )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_read( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
@@ -70,7 +70,7 @@ FUNCTION( spec48_writebyte )( WORD address, BYTE b )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_write( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
@@ -91,7 +91,7 @@ FUNCTION( spec128_readbyte )( WORD address )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_read( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
@@ -111,7 +111,7 @@ FUNCTION( spec128_writebyte )( WORD address, BYTE b )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_write( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
@@ -136,7 +136,7 @@ FUNCTION( specplus3_readbyte )( WORD address )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_read( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
@@ -180,7 +180,7 @@ FUNCTION( specplus3_writebyte )( WORD address, BYTE b )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_write( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
@@ -229,7 +229,7 @@ FUNCTION( tc2048_readbyte )( WORD address )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_read( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
@@ -249,7 +249,7 @@ FUNCTION( tc2048_writebyte )( WORD address, BYTE b )
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check_write( address ) )
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 

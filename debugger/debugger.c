@@ -69,7 +69,7 @@ debugger_end( void )
 
 /* Check whether the debugger should become active at this point */
 int
-debugger_check( void )
+debugger_check( debugger_breakpoint_type type, WORD value )
 {
   GSList *ptr; debugger_breakpoint *bp, *active;
 
@@ -81,10 +81,12 @@ debugger_check( void )
     active = NULL;
     for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
       bp = ptr->data;
-      if( bp->pc == PC ) { active = bp; break; }
+      if( bp->type == type && bp->value == value ) {
+	active = bp; break;
+      }
     }
     if( active ) {
-      if( active->type == DEBUGGER_BREAKPOINT_TYPE_ONESHOT ) {
+      if( active->life == DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) {
 	debugger_breakpoints = g_slist_remove( debugger_breakpoints, active );
 	free( active );
       }
@@ -97,22 +99,6 @@ debugger_check( void )
 
   }
   return 0;	/* Keep gcc happy */
-}
-
-/* Check for a read breakpoint */
-int
-debugger_check_read( WORD address )
-{
-  /* TODO */
-  return 0;
-}
-
-/* Check for a write breakpoint */
-int
-debugger_check_write( WORD address )
-{
-  /* TODO */
-  return 0;
 }
 
 /* Activate the debugger */
@@ -141,7 +127,8 @@ debugger_next( void )
   debugger_disassemble( NULL, 0, &length, PC );
 
   /* And add a breakpoint after that */
-  debugger_breakpoint_add( PC + length, DEBUGGER_BREAKPOINT_TYPE_ONESHOT );
+  debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
+			   PC + length, DEBUGGER_BREAKPOINT_LIFE_ONESHOT );
 
   debugger_run();
 
@@ -161,7 +148,8 @@ debugger_run( void )
 
 /* Add a breakpoint */
 int
-debugger_breakpoint_add( WORD pc, debugger_breakpoint_type type )
+debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
+			 debugger_breakpoint_life life )
 {
   debugger_breakpoint *bp;
 
@@ -171,7 +159,7 @@ debugger_breakpoint_add( WORD pc, debugger_breakpoint_type type )
     return 1;
   }
 
-  bp->pc = pc; bp->type = type;
+  bp->type = type; bp->value = value; bp->life = life;
 
   debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
 
@@ -237,7 +225,7 @@ show_breakpoint( gpointer data, gpointer user_data )
   debugger_breakpoint *bp = data;
   size_t *index = user_data;
 
-  printf( "%d: 0x%04x %d\n", *index, bp->pc, bp->type );
+  printf( "%d: %d 0x%04x %d\n", *index, bp->type, bp->value, bp->life );
 
   (*index)++;
 }
@@ -249,7 +237,8 @@ debugger_breakpoint_exit( void )
 {
   WORD target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
 
-  if( debugger_breakpoint_add( target, DEBUGGER_BREAKPOINT_TYPE_ONESHOT ) )
+  if( debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
+			       target, DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) )
     return 1;
 
   if( debugger_run() ) return 1;

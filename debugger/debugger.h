@@ -51,14 +51,22 @@ extern enum debugger_mode_t debugger_mode;
 
 /* Types of breakpoint */
 typedef enum debugger_breakpoint_type {
-  DEBUGGER_BREAKPOINT_TYPE_PERMANENT,
-  DEBUGGER_BREAKPOINT_TYPE_ONESHOT,
+  DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
+  DEBUGGER_BREAKPOINT_TYPE_READ,
+  DEBUGGER_BREAKPOINT_TYPE_WRITE,
 } debugger_breakpoint_type;
+
+/* Lifetime of a breakpoint */
+typedef enum debugger_breakpoint_life {
+  DEBUGGER_BREAKPOINT_LIFE_PERMANENT,
+  DEBUGGER_BREAKPOINT_LIFE_ONESHOT,
+} debugger_breakpoint_life;
 
 /* The breakpoint structure */
 typedef struct debugger_breakpoint {
-  WORD pc;
   enum debugger_breakpoint_type type;
+  WORD value;
+  enum debugger_breakpoint_life life;
 } debugger_breakpoint;
 
 /* The current breakpoints */
@@ -69,9 +77,7 @@ int debugger_reset( void );
 
 int debugger_end( void );
 
-int debugger_check( void );	/* See if the debugger should become active */
-int debugger_check_read( WORD address );
-int debugger_check_write( WORD address );
+int debugger_check( debugger_breakpoint_type type, WORD value );
 
 int debugger_trap( void );	/* Activate the debugger */
 
