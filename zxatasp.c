@@ -46,12 +46,20 @@
 
 /* Private function prototypes */
 
+static libspectrum_byte zxatasp_portA_read( libspectrum_word port,
+					    int *attached );
 static void zxatasp_portA_write( libspectrum_word port,
 				 libspectrum_byte data );
+static libspectrum_byte zxatasp_portB_read( libspectrum_word port,
+					    int *attached );
 static void zxatasp_portB_write( libspectrum_word port,
 				 libspectrum_byte data );
+static libspectrum_byte zxatasp_portC_read( libspectrum_word port,
+					    int *attached );
 static void zxatasp_portC_write( libspectrum_word port,
 				 libspectrum_byte data );
+static libspectrum_byte zxatasp_control_read( libspectrum_word port,
+					      int *attached );
 static void zxatasp_control_write( libspectrum_word port,
 				   libspectrum_byte data );
 static void zxatasp_resetports( void );
@@ -463,17 +471,6 @@ zxatasp_restore( libspectrum_byte portA, libspectrum_byte portB,
 		 libspectrum_byte portC, libspectrum_byte control,
 		 size_t page )
 {
-  zxatasp_portA   = portA;
-  zxatasp_portB   = portB;
-  zxatasp_portC   = portC;
-  zxatasp_control = control;
-
-  if( page != 255 ) {
-    machine_current->ram.romcs = 1;
-    set_zxatasp_bank( page );
-  }
-
-  machine_current->memory_map();
 }
 
 void
@@ -496,4 +493,73 @@ zxatasp_memory_map( void )
 
   memory_map_write[0] = memory_map_romcs[0];
   memory_map_write[1] = memory_map_romcs[1];
+}
+
+int
+zxatasp_from_snapshot( libspectrum_snap *snap )
+{
+  size_t i, page;
+
+  if( !libspectrum_snap_zxatasp_active( snap ) ) return 0;
+
+  settings_current.zxatasp_active = 1;
+  settings_current.zxatasp_upload = libspectrum_snap_zxatasp_upload( snap );
+  settings_current.zxatasp_wp = libspectrum_snap_zxatasp_writeprotect( snap );
+
+  zxatasp_portA   = libspectrum_snap_zxatasp_port_a ( snap );
+  zxatasp_portB   = libspectrum_snap_zxatasp_port_b ( snap );
+  zxatasp_portC   = libspectrum_snap_zxatasp_port_c ( snap );
+  zxatasp_control = libspectrum_snap_zxatasp_control( snap );
+
+  page = libspectrum_snap_zxatasp_current_page( snap );
+
+  if( page != 255 ) {
+    machine_current->ram.romcs = 1;
+    set_zxatasp_bank( page );
+  }
+
+  for( i = 0; i < libspectrum_snap_zxatasp_pages( snap ); i++ )
+    if( libspectrum_snap_zxatasp_ram( snap, i ) )
+      memcpy( ZXATASPMEM[ i ], libspectrum_snap_zxatasp_ram( snap, i ),
+	      0x4000 );
+
+  machine_current->memory_map();
+
+  return 0;
+}
+
+int
+zxatasp_to_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
+
+  if( !settings_current.zxatasp_active ) return 0;
+
+  libspectrum_snap_set_zxatasp_active( snap, 1 );
+  libspectrum_snap_set_zxatasp_upload( snap, settings_current.zxatasp_upload );
+  libspectrum_snap_set_zxatasp_writeprotect( snap,
+					     settings_current.zxatasp_wp );
+
+  libspectrum_snap_set_zxatasp_port_a( snap, zxatasp_portA );
+  libspectrum_snap_set_zxatasp_port_b( snap, zxatasp_portB );
+  libspectrum_snap_set_zxatasp_port_c( snap, zxatasp_portC );
+  libspectrum_snap_set_zxatasp_control( snap, zxatasp_control );
+  libspectrum_snap_set_zxatasp_current_page( snap, current_page );
+
+  libspectrum_snap_set_zxatasp_pages( snap, 32 );
+
+  for( i = 0; i < 32; i++ ) {
+
+    buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+    if( !buffer ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    memcpy( buffer, ZXATASPMEM[ i ], 0x4000 );
+    libspectrum_snap_set_zxatasp_ram( snap, i, buffer );
+  }
+  
+  return 0;
 }

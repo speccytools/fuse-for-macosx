@@ -167,3 +167,54 @@ z80_nmi( void )
   tstates += 11; PC = 0x0066;
 }
 
+/* Routines for transferring the Z80 contents to and from snapshots */
+int
+z80_from_snapshot( libspectrum_snap *snap )
+{
+  A  = libspectrum_snap_a ( snap ); F  = libspectrum_snap_f ( snap );
+  A_ = libspectrum_snap_a_( snap ); F_ = libspectrum_snap_f_( snap );
+
+  BC  = libspectrum_snap_bc ( snap ); DE  = libspectrum_snap_de ( snap );
+  HL  = libspectrum_snap_hl ( snap ); BC_ = libspectrum_snap_bc_( snap );
+  DE_ = libspectrum_snap_de_( snap ); HL_ = libspectrum_snap_hl_( snap );
+
+  IX = libspectrum_snap_ix( snap ); IY = libspectrum_snap_iy( snap );
+  I  = libspectrum_snap_i ( snap ); R   = libspectrum_snap_r( snap );
+  SP = libspectrum_snap_sp( snap ); PC = libspectrum_snap_pc( snap );
+
+  IFF1 = libspectrum_snap_iff1( snap ); IFF2 = libspectrum_snap_iff2( snap );
+  IM = libspectrum_snap_im( snap );
+
+  z80.halted = libspectrum_snap_halted( snap );
+
+  z80.interrupts_enabled_at =
+    libspectrum_snap_last_instruction_ei( snap ) ? tstates : -1;
+
+  return 0;
+}
+  
+int
+z80_to_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_snap_set_a  ( snap, A   ); libspectrum_snap_set_f  ( snap, F   );
+  libspectrum_snap_set_a_ ( snap, A_  ); libspectrum_snap_set_f_ ( snap, F_  );
+
+  libspectrum_snap_set_bc ( snap, BC  ); libspectrum_snap_set_de ( snap, DE  );
+  libspectrum_snap_set_hl ( snap, HL  ); libspectrum_snap_set_bc_( snap, BC_ );
+  libspectrum_snap_set_de_( snap, DE_ ); libspectrum_snap_set_hl_( snap, HL_ );
+
+  libspectrum_snap_set_ix ( snap, IX  ); libspectrum_snap_set_iy ( snap, IY  );
+  libspectrum_snap_set_i  ( snap, I   ); libspectrum_snap_set_r  ( snap, R   );
+  libspectrum_snap_set_sp ( snap, SP  ); libspectrum_snap_set_pc ( snap, PC  );
+
+  libspectrum_snap_set_iff1( snap, IFF1 );
+  libspectrum_snap_set_iff2( snap, IFF2 );
+  libspectrum_snap_set_im( snap, IM );
+
+  libspectrum_snap_set_halted( snap, z80.halted );
+  libspectrum_snap_set_last_instruction_ei(
+    snap, z80.interrupts_enabled_at == tstates
+  );
+
+  return 0;
+}

@@ -97,3 +97,38 @@ ay_dataport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
   if( current == 14 ) printer_serial_write( b );
 }
+
+int
+ay_from_snapshot( libspectrum_snap *snap, int capabilities )
+{
+  size_t i;
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
+
+    ay_registerport_write( 0xfffd,
+			   libspectrum_snap_out_ay_registerport( snap ) );
+
+    for( i = 0; i < 16; i++ ) {
+      machine_current->ay.registers[i] =
+	libspectrum_snap_ay_registers( snap, i );
+      sound_ay_write( i, machine_current->ay.registers[i], 0 );
+    }
+
+  }
+
+  return 0;
+}
+
+int
+ay_to_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+
+  libspectrum_snap_set_out_ay_registerport(
+    snap, machine_current->ay.current_register
+  );
+
+  for( i = 0; i < 16; i++ )
+    libspectrum_snap_set_ay_registers( snap, i,
+				       machine_current->ay.registers[i] );
+}

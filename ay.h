@@ -39,4 +39,7 @@ void ay_registerport_write( libspectrum_word port, libspectrum_byte b );
 
 void ay_dataport_write( libspectrum_word port, libspectrum_byte b );
 
+int ay_from_snapshot( libspectrum_snap *snap, int capabilities );
+int ay_to_snapshot( libspectrum_snap *snap );
+
 #endif			/* #ifndef FUSE_AY_H */

@@ -32,11 +32,13 @@
 #include <stdlib.h>
 
 #include "compat.h"
+#include "dck.h"
 #include "display.h"
 #include "machine.h"
 #include "memory.h"
 #include "scld.h"
 #include "spectrum.h"
+#include "ui/ui.h"
 #include "z80/z80.h"
 
 scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
@@ -146,4 +148,124 @@ scld_memory_map( void )
       memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
     }
   }
+}
+
+int
+scld_from_snapshot( libspectrum_snap *snap, int capabilities )
+{
+  size_t i;
+
+  if( capabilities & ( LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY |
+      LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY ) )
+    scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
+    scld_dec_write( 0x00ff, libspectrum_snap_out_scld_dec( snap ) );
+
+  if( libspectrum_snap_dock_active( snap ) ) {
+
+    dck_active = 1;
+
+    for( i = 0; i < 8; i++ ) {
+
+      if( libspectrum_snap_dock_cart( snap, i ) ) {
+        if( !memory_map_dock[i]->page ) {
+          memory_map_dock[i]->offset = 0;
+          memory_map_dock[i]->page_num = 0;
+          memory_map_dock[i]->writable = libspectrum_snap_dock_ram( snap, i );
+          memory_map_dock[i]->source = MEMORY_SOURCE_CARTRIDGE;
+          memory_map_dock[i]->page = memory_pool_allocate(
+                                      MEMORY_PAGE_SIZE *
+                                      sizeof( libspectrum_byte ) );
+          if( !memory_map_dock[i]->page ) {
+            ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                      __LINE__ );
+            return 1;
+          }
+        }
+
+        memcpy( memory_map_dock[i]->page, libspectrum_snap_dock_cart( snap, i ),
+                MEMORY_PAGE_SIZE );
+      }
+
+      if( libspectrum_snap_exrom_cart( snap, i ) ) {
+        if( !memory_map_dock[i]->page ) {
+          memory_map_exrom[i]->offset = 0;
+          memory_map_exrom[i]->page_num = 0;
+          memory_map_exrom[i]->writable = libspectrum_snap_exrom_ram( snap, i );
+          memory_map_exrom[i]->source = MEMORY_SOURCE_CARTRIDGE;
+          memory_map_exrom[i]->page = memory_pool_allocate(
+                                      MEMORY_PAGE_SIZE *
+                                      sizeof( libspectrum_byte ) );
+          if( !memory_map_exrom[i]->page ) {
+            ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                      __LINE__ );
+            return 1;
+          }
+        }
+
+        memcpy( memory_map_exrom[i]->page,
+                libspectrum_snap_exrom_cart( snap, i ), MEMORY_PAGE_SIZE );
+      }
+
+    }
+
+    if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK )
+      ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 1 );
+
+    machine_current->memory_map();
+  }
+
+  return 0;
+}
+
+int
+scld_to_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
+
+  libspectrum_snap_set_out_scld_hsr( snap, scld_last_hsr );
+  libspectrum_snap_set_out_scld_dec( snap, scld_last_dec.byte );
+
+  if( dck_active ) {
+
+    libspectrum_snap_set_dock_active( snap, 1 );
+
+    for( i = 0; i < 8; i++ ) {
+
+      if( memory_map_exrom[i]->source == MEMORY_SOURCE_CARTRIDGE ||
+	  memory_map_exrom[i]->writable ) {
+        buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
+        if( !buffer ) {
+          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                    __LINE__ );
+          return 1;
+        }
+
+        libspectrum_snap_set_exrom_ram( snap, i,
+                                        memory_map_exrom[i]->writable );
+        memcpy( buffer, memory_map_exrom[i]->page, MEMORY_PAGE_SIZE );
+        libspectrum_snap_set_exrom_cart( snap, i, buffer );
+      }
+
+      if( memory_map_dock[i]->source == MEMORY_SOURCE_CARTRIDGE ||
+	  memory_map_dock[i]->writable ) {
+        buffer = malloc( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
+        if( !buffer ) {
+          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                    __LINE__ );
+          return 1;
+        }
+
+        libspectrum_snap_set_dock_ram( snap, i, memory_map_dock[i]->writable );
+        memcpy( buffer, memory_map_dock[i]->page, MEMORY_PAGE_SIZE );
+        libspectrum_snap_set_dock_cart( snap, i, buffer );
+      }
+
+    }
+
+  }
+
+  return 0;
 }

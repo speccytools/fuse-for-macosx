@@ -39,11 +39,10 @@ int zxcf_insert( const char *filename );
 int zxcf_commit();
 int zxcf_eject( void );
 void zxcf_memory_map( void );
-
-void zxcf_memctl_write( libspectrum_word port, libspectrum_byte data );
 libspectrum_byte zxcf_last_memctl( void );
 
-libspectrum_byte* zxcf_ram( size_t page );
+int zxcf_from_snapshot( libspectrum_snap *snap );
+int zxcf_to_snapshot( libspectrum_snap *snap );
 
 #endif			/* #ifndef FUSE_ZXCF_H */
 

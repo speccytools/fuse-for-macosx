@@ -899,3 +899,8 @@
 20040604 widget/Makefile.am: ensure config.h can be found when building
 	 menu_data.c
 20040604 ui/uijoystick.c: #include "joystick.h"
+20040606 Makefile.am,ay.[ch],if2.[ch],memory.[ch],scld.[ch],snapshot.c,
+	 spectrum.[ch],trdos.[ch],zxatasp.[ch],zxcf.[ch],
+	 z80/{Makefile.am,z80.[ch]}: move routines to (de)serialise
+	 each bit of the snapshot structure into their own source files.
+	 Improves encapsulation somewhat.

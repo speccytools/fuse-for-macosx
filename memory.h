@@ -93,10 +93,12 @@ void memory_pool_free( void );
 
 const char *memory_bank_name( memory_page *page );
 
-void memory_update_home( size_t start, size_t n );
-
 /* Map in alternate bank if ROMCS is set */
 void memory_romcs_map( void );
+
+/* Copy RAM to and from snapshots */
+int memory_ram_from_snapshot( libspectrum_snap *snap, int capabilities );
+int memory_ram_to_snapshot( libspectrum_snap *snap );
 
 libspectrum_byte readbyte( libspectrum_word address );
 

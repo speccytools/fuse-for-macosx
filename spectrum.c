@@ -146,6 +146,24 @@ spectrum_ula_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   }
 }
 
+int
+spectrum_ula_from_snapshot( libspectrum_snap *snap )
+{
+  spectrum_ula_write( 0x00fe, libspectrum_snap_out_ula( snap ) );
+  tstates = libspectrum_snap_tstates( snap );
+
+  return 0;
+}
+
+int
+spectrum_ula_to_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_snap_set_out_ula( snap, spectrum_last_ula );
+  libspectrum_snap_set_tstates( snap, tstates );
+
+  return 0;
+}  
+
 void
 spectrum_contend_port( libspectrum_word port )
 {

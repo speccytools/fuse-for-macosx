@@ -47,6 +47,7 @@
 static void set_zxcf_bank( int bank );
 static libspectrum_byte zxcf_memctl_read( libspectrum_word port,
 					  int *attached );
+static void zxcf_memctl_write( libspectrum_word port, libspectrum_byte data );
 static libspectrum_byte zxcf_ide_read( libspectrum_word port, int *attached );
 static void zxcf_ide_write( libspectrum_word port, libspectrum_byte data );
 
@@ -184,7 +185,7 @@ zxcf_memctl_read( libspectrum_word port GCC_UNUSED, int *attached )
   return 0xff;
 }
 
-void
+static void
 zxcf_memctl_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   if( !settings_current.zxcf_active ) return;
@@ -232,12 +233,6 @@ zxcf_ide_write( libspectrum_word port, libspectrum_byte data )
   libspectrum_ide_write( zxcf_idechn, idereg, data ); 
 }
 
-libspectrum_byte*
-zxcf_ram( size_t page )
-{
-  return ZXCFMEM[ page ];
-}
-
 void
 zxcf_memory_map( void )
 {
@@ -248,4 +243,51 @@ zxcf_memory_map( void )
 
   memory_map_write[0] = memory_map_romcs[0];
   memory_map_write[1] = memory_map_romcs[1];
+}
+
+int
+zxcf_from_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+
+  if( !libspectrum_snap_zxcf_active( snap ) ) return 0;
+
+  settings_current.zxcf_active = 1;
+  settings_current.zxcf_upload = libspectrum_snap_zxcf_upload( snap );
+
+  zxcf_memctl_write( 0x10bf, libspectrum_snap_zxcf_memctl( snap ) );
+
+  for( i = 0; i < libspectrum_snap_zxcf_pages( snap ); i++ )
+    if( libspectrum_snap_zxcf_ram( snap, i ) )
+      memcpy( ZXCFMEM[ i ], libspectrum_snap_zxcf_ram( snap, i ), 0x4000 );
+  
+  return 0;
+}
+
+int
+zxcf_to_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
+
+  if( !settings_current.zxcf_active ) return 0;
+
+  libspectrum_snap_set_zxcf_active( snap, 1 );
+  libspectrum_snap_set_zxcf_upload( snap, settings_current.zxcf_upload );
+  libspectrum_snap_set_zxcf_memctl( snap, last_memctl );
+  libspectrum_snap_set_zxcf_pages( snap, 64 );
+
+  for( i = 0; i < 64; i++ ) {
+
+    buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+    if( !buffer ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    memcpy( buffer, ZXCFMEM[ i ], 0x4000 );
+    libspectrum_snap_set_zxcf_ram( snap, i, buffer );
+  }
+
+  return 0;
 }

@@ -40,15 +40,7 @@ int zxatasp_commit( libspectrum_ide_unit unit );
 int zxatasp_eject( libspectrum_ide_unit unit );
 void zxatasp_memory_map( void );
 
-libspectrum_byte zxatasp_portA_read( libspectrum_word port, int *attached );
-libspectrum_byte zxatasp_portB_read( libspectrum_word port, int *attached );
-libspectrum_byte zxatasp_portC_read( libspectrum_word port, int *attached );
-libspectrum_byte zxatasp_control_read( libspectrum_word port, int *attached );
-size_t zxatasp_current_page( void );
-libspectrum_byte* zxatasp_ram( size_t page );
-
-void zxatasp_restore( libspectrum_byte portA, libspectrum_byte portB,
-		      libspectrum_byte portC, libspectrum_byte control,
-		      size_t page );
+int zxatasp_from_snapshot( libspectrum_snap *snap );
+int zxatasp_to_snapshot( libspectrum_snap *snap );
 
 #endif			/* #ifndef FUSE_ZXATASP_H */

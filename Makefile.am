@@ -73,6 +73,7 @@ fuse_SOURCES = ay.c \
 	screenshot.c \
 	settings.c \
 	simpleide.c \
+	slt.c \
 	snapshot.c \
 	sound.c \
 	spectrum.c \
@@ -134,6 +135,7 @@ noinst_HEADERS = ay.h \
 	screenshot.h \
 	settings.h \
 	simpleide.h \
+	slt.h \
 	snapshot.h \
 	sound.h \
 	spectrum.h \

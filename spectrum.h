@@ -38,6 +38,9 @@ extern libspectrum_dword tstates;
 /* The last byte written to the ULA */
 extern libspectrum_byte spectrum_last_ula;
 
+int spectrum_ula_from_snapshot( libspectrum_snap *snap );
+int spectrum_ula_to_snapshot( libspectrum_snap *snap );
+
 /* Things relating to memory */
 
 /* 272 Kb of RAM */

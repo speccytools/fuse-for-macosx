@@ -231,17 +231,6 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 }
 
 void
-memory_update_home( size_t start, size_t n )
-{
-  for( ; n; start++, n-- ) {
-    if( memory_map_read[start].bank == MEMORY_BANK_HOME )
-      memory_map_read[start] = *memory_map_home[start];
-    if( memory_map_write[start].bank == MEMORY_BANK_HOME )
-      memory_map_write[start] = *memory_map_home[start];
-  }
-}
-
-void
 memory_romcs_map( void )
 {
   /* Nothing changes if /ROMCS is not set */
@@ -256,4 +245,55 @@ memory_romcs_map( void )
   if( if2_active ) if2_memory_map();
   if( settings_current.zxatasp_active ) zxatasp_memory_map();
   if( settings_current.zxcf_active ) zxcf_memory_map();
+}
+
+int
+memory_ram_from_snapshot( libspectrum_snap *snap, int capabilities )
+{
+  size_t i;
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )
+    spec128_memoryport_write( 0x7ffd,
+			      libspectrum_snap_out_128_memoryport( snap ) );
+
+  if( ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) ||
+      ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY )    )
+    specplus3_memoryport2_write(
+      0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
+    );
+
+  for( i = 0; i < 16; i++ )
+    if( libspectrum_snap_pages( snap, i ) )
+      memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
+
+  return 0;
+}
+
+int
+memory_ram_to_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
+
+  libspectrum_snap_set_out_128_memoryport( snap,
+					   machine_current->ram.last_byte );
+  libspectrum_snap_set_out_plus3_memoryport( snap,
+					     machine_current->ram.last_byte2 );
+
+  for( i = 0; i < 16; i++ ) {
+    if( RAM[i] != NULL ) {
+
+      buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+      if( !buffer ) {
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+		  __LINE__ );
+	return 1;
+      }
+
+      memcpy( buffer, RAM[i], 0x4000 );
+      libspectrum_snap_set_pages( snap, i, buffer );
+    }
+  }
+
+  return 0;
 }
