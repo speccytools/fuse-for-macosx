@@ -43,10 +43,11 @@ typedef enum joystick_type_t {
   
   JOYSTICK_TYPE_CURSOR,
   JOYSTICK_TYPE_KEMPSTON,
+  JOYSTICK_TYPE_TIMEX,
 
 } joystick_type_t;
 
-#define JOYSTICK_TYPE_COUNT 3
+#define JOYSTICK_TYPE_COUNT 4
 
 extern char *joystick_name[];
 
@@ -63,10 +64,6 @@ typedef enum joystick_button {
 /* Called whenever the (Spectrum) joystick is moved or the fire button
    pressed */
 int joystick_press( joystick_button button, int press );
-
-/* Default read function (returns data in Kempston format) */
-libspectrum_byte joystick_default_read( libspectrum_word port,
-					libspectrum_byte which );
 
 /* Interface-specific read functions */
 libspectrum_byte joystick_kempston_read ( libspectrum_word port,

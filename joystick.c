@@ -43,7 +43,7 @@
 int joysticks_supported = 0;
 
 /* The current state of the emulated Kempston joystick */
-static libspectrum_byte joystick_value;
+static libspectrum_byte kempston_value;
 
 /* Bits used by the Kempston joystick */
 static const libspectrum_byte KEMPSTON_MASK_RIGHT = 0x01;
@@ -52,7 +52,19 @@ static const libspectrum_byte KEMPSTON_MASK_DOWN  = 0x04;
 static const libspectrum_byte KEMPSTON_MASK_UP    = 0x08;
 static const libspectrum_byte KEMPSTON_MASK_FIRE  = 0x10;
 
-char *joystick_name[ JOYSTICK_TYPE_COUNT ] = { "None", "Cursor", "Kempston" };
+/* The current state of the emulated Timex joystick */
+static libspectrum_byte timex_value;
+
+/* Bits used by the Kempston joystick */
+static const libspectrum_byte TIMEX_MASK_RIGHT = 0x08;
+static const libspectrum_byte TIMEX_MASK_LEFT  = 0x04;
+static const libspectrum_byte TIMEX_MASK_DOWN  = 0x02;
+static const libspectrum_byte TIMEX_MASK_UP    = 0x01;
+static const libspectrum_byte TIMEX_MASK_FIRE  = 0x80;
+
+char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
+  "None", "Cursor", "Kempston", "Timex"
+};
 
 /* Init/shutdown functions. Errors aren't important here */
 
@@ -60,7 +72,7 @@ void
 fuse_joystick_init (void)
 {
   joysticks_supported = ui_joystick_init();
-  joystick_value = 0x00;
+  kempston_value = timex_value = 0x00;
 }
 
 void
@@ -108,9 +120,28 @@ joystick_press( joystick_button button, int press )
     }
 
     if( press ) {
-      joystick_value |=  mask;
+      kempston_value |=  mask;
     } else {
-      joystick_value &= ~mask;
+      kempston_value &= ~mask;
+    }
+
+    return 1;
+
+  case JOYSTICK_TYPE_TIMEX:
+    mask = 0x00;		/* Avoid warning */
+
+    switch( button ) {
+    case JOYSTICK_BUTTON_UP:    mask = TIMEX_MASK_UP; break;
+    case JOYSTICK_BUTTON_DOWN:  mask = TIMEX_MASK_DOWN; break;
+    case JOYSTICK_BUTTON_LEFT:  mask = TIMEX_MASK_LEFT; break;
+    case JOYSTICK_BUTTON_RIGHT: mask = TIMEX_MASK_RIGHT; break;
+    case JOYSTICK_BUTTON_FIRE:  mask = TIMEX_MASK_FIRE; break;
+    }
+
+    if( press ) {
+      timex_value |=  mask;
+    } else {
+      timex_value &= ~mask;
     }
 
     return 1;
@@ -125,15 +156,6 @@ joystick_press( joystick_button button, int press )
   return 0;			/* Avoid warning */
 }
 
-libspectrum_byte
-joystick_default_read( libspectrum_word port, libspectrum_byte which )
-{
-  /* We only support one "joystick" */
-  if( which ) return 0;
-
-  return joystick_value;
-}
-
 /* Read functions for specific interfaces */
 
 libspectrum_byte
@@ -144,7 +166,7 @@ joystick_kempston_read( libspectrum_word port, int *attached )
   *attached = 1;
 
   /* If we have no real joysticks, return the QAOP<space>-emulated value */
-  if( joysticks_supported == 0 ) return joystick_default_read( port, 0 );
+  if( joysticks_supported == 0 ) return kempston_value;
 
   /* Return the value from the actual joystick */
   return ui_joystick_read( port, 0 );
@@ -160,11 +182,7 @@ joystick_timex_read( libspectrum_word port, libspectrum_byte which )
     0x81, 0x89, 0x85, 0x8D, 0x83, 0x8B, 0x87, 0x8F,
   };
 
-  /* If we don't have a real joystick for this, use the QAOP<space>-emulated
-     value */
-  if( joysticks_supported <= which )
-    return translate[ joystick_default_read( port, which ) ];
+  if( joysticks_supported == 0 ) return which ? 0x00 : timex_value;
 
-  /* If we do have a real joystick, read it */
   return translate[ ui_joystick_read( port, which ) ];
 }

@@ -658,3 +658,5 @@
 	 multiple joystick types.
 20040324 joystick.[ch],ui/gtk/gtkjoystick.c: generalise the joystick
 	 selection code.
+20040324 joystick.[ch]: start merging the Timex joystick emulation into
+	 the new scheme of things.
