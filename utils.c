@@ -104,6 +104,34 @@ utils_open_file( const char *filename, int autoload,
 #ifdef HAVE_765_H
     error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 ); if( error ) break;
     error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
+    if( autoload ) {
+
+      int fd; utils_file snap;
+
+      fd = utils_find_lib( "disk_plus3.z80" );
+      if( fd == -1 ) {
+	ui_error( UI_ERROR_ERROR, "Couldn't find +3 disk autoload snap" );
+	error = 1;
+	goto escape;
+      }
+
+      error = utils_read_fd( fd, "disk_plus3.z80", &snap );
+      if( error ) { utils_close_file( &snap ); goto escape; }
+
+      error = snapshot_read_buffer( snap.buffer, snap.length,
+				    LIBSPECTRUM_ID_SNAPSHOT_Z80 );
+      if( error ) { utils_close_file( &snap ); goto escape; }
+
+      if( utils_close_file( &snap ) ) {
+	ui_error( UI_ERROR_ERROR, "Couldn't munmap 'disk_plus3.z80': %s",
+		  strerror( errno ) );
+	error = 1;
+	goto escape;
+      }
+    }
+  escape:
+    break;
+
 #else				/* #ifdef HAVE_765_H */
     ui_error( UI_ERROR_INFO, "lib765 not present so can't handle .dsk files" );
 #endif				/* #ifdef HAVE_765_H */
