@@ -153,55 +153,47 @@ utils_identify_file( int *type, const char *filename,
     char *extension;
 
     char *signature; size_t offset, length; int sig_score;
-
-    int score;
-
   };
 
   struct type *ptr,
     types[] = {
       
-      { UTILS_TYPE_RECORDING_RZX, "rzx", "RZX!",     0, 4, 3, 0 },
+      { UTILS_TYPE_RECORDING_RZX, "rzx", "RZX!",     0, 4, 3 },
 
-      { UTILS_TYPE_SNAPSHOT_SNA,  "sna", NULL,       0, 0, 0, 0 },
-      { UTILS_TYPE_SNAPSHOT_Z80,  "z80", "\0\0",     6, 2, 1, 0 },
+      { UTILS_TYPE_SNAPSHOT_SNA,  "sna", NULL,       0, 0, 0 },
+      { UTILS_TYPE_SNAPSHOT_Z80,  "z80", "\0\0",     6, 2, 1 },
 
-      { UTILS_TYPE_TAPE_TAP,      "tap", "\x13\0\0", 0, 3, 1, 0 },
-      { UTILS_TYPE_TAPE_TZX,      "tzx", "ZXTape!",  0, 7, 3, 0 },
+      { UTILS_TYPE_TAPE_TAP,      "tap", "\x13\0\0", 0, 3, 1 },
+      { UTILS_TYPE_TAPE_TZX,      "tzx", "ZXTape!",  0, 7, 3 },
 
-      { -1, NULL, NULL, 0, 0, 0, 0 }, /* End marker */
+      { -1, NULL, NULL, 0, 0, 0 }, /* End marker */
 
     };
 
   const char *extension;
-  int best_guess, best_score, duplicate_best;
+  int score, best_score, best_guess, duplicate_best;
 
   /* Get the filename extension, if it exists */
   extension = strrchr( filename, '.' ); if( extension ) extension++;
 
+  best_guess = UTILS_TYPE_UNKNOWN; best_score = 0; duplicate_best = 0;
+
   /* Compare against known extensions and signatures */
   for( ptr = types; ptr->type != -1; ptr++ ) {
 
+    score = 0;
+
     if( extension && ptr->extension &&
 	!strcasecmp( extension, ptr->extension ) )
-      ptr->score += 2;
+      score += 2;
 
     if( ptr->signature && length >= ptr->offset + ptr->length &&
 	!memcmp( &buffer[ ptr->offset ], ptr->signature, ptr->length ) )
-      ptr->score += ptr->sig_score;
+      score += ptr->sig_score;
 
-  }
-
-  best_guess = UTILS_TYPE_UNKNOWN;
-  best_score = 0;
-  duplicate_best = 0;
-
-  /* See what the best match was */
-  for( ptr = types; ptr->type != -1; ptr++ ) {
-
-    if( ptr->score > best_score ) {
-      best_guess = ptr->type; best_score = ptr->score; duplicate_best = 0;
-    } else if( ptr->score == best_score ) {
+    if( score > best_score ) {
+      best_guess = ptr->type; best_score = score; duplicate_best = 0;
+    } else if( score == best_score ) {
       duplicate_best = 1;
     }
   }
