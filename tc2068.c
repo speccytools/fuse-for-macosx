@@ -90,15 +90,17 @@ tc2068_ay_dataport_read( libspectrum_word port, int *attached )
     return ay_registerport_read( port, attached );
   } else {
 
+    libspectrum_byte ret;
+
     /* In theory, we may need to distinguish cases where some data
        is returned here and were it isn't. In practice, this doesn't
        matter for the TC2068 as it doesn't have a floating bus, so we'll
        get 0xff in both cases anwyay */
     *attached = 1;
 
-    libspectrum_byte ret =   machine_current->ay.registers[7] & 0x40
-			   ? machine_current->ay.registers[14]
-			   : 0xff;
+    ret =   machine_current->ay.registers[7] & 0x40
+	  ? machine_current->ay.registers[14]
+	  : 0xff;
 
     if( port & 0x0100 ) ret &= ~joystick_timex_read( port, 0 );
     if( port & 0x0200 ) ret &= ~joystick_timex_read( port, 1 );
