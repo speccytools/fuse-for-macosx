@@ -62,23 +62,23 @@ widget_roms_draw( void *data )
   }
 
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, SETTINGS_ROM_COUNT + 2 );
+  widget_dialog_with_border( 1, 1, 30, SETTINGS_ROM_COUNT + 2 );
 
-  widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Select ROMs" );
+  widget_printstring( 10, 1, WIDGET_COLOUR_FOREGROUND, "Select ROMs" );
 
   for( i=0; i<SETTINGS_ROM_COUNT; i++ ) {
 
-    /* Get the last thirteen characters of the ROM filename */
+    /* Get the last twelve characters of the ROM filename */
     setting = *( settings_get_rom_setting( widget_settings, i ) );
-    length = strlen( setting ); if( length > 13 ) setting += length - 13;
+    length = strlen( setting ); if( length > 12 ) setting += length - 12;
 
     snprintf( buffer, 32, "(%c) %10s: %s", ((char)i)+'A',
 	      settings_rom_name[i], setting );
 
-    widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND, buffer );
+    widget_printstring( 2, i+3, WIDGET_COLOUR_FOREGROUND, buffer );
   }
 
-  widget_display_lines( 2, SETTINGS_ROM_COUNT + 2 );
+  widget_display_lines( 1, SETTINGS_ROM_COUNT + 2 );
 
   return 0;
 }

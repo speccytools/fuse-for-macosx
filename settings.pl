@@ -115,8 +115,8 @@ settings_rom_name[ SETTINGS_ROM_COUNT ] = {
   "+2A ROM 0",  "+2A ROM 1", "+2A ROM 2", "+2A ROM 3",
   "+3 ROM 0",   "+3 ROM 1",  "+3 ROM 2",  "+3 ROM 3",
   "TC2048",
-  "TC2068 ROM 0", "TC2068 ROM 1"
-  "P128K ROM 0", "P128K ROM 1", "P128K ROM 2",
+  "2068 ROM 0", "2068 ROM 1",
+  "P128 ROM 0", "P128 ROM 1", "P128 ROM 2",
 };
 
 /* Called on emulator startup */
