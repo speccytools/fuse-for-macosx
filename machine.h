@@ -54,11 +54,11 @@ typedef BYTE (*spectrum_unattached_port_fn)( void );
 typedef struct fuse_machine_info {
 
   int machine;		/* which machine type is this? */
-  const char *id;	/* Used used to select from command line */
+  const char *id;	/* Used to select from command line */
 
   int (*reset)(void);	/* Reset function */
 
-  int timex;            /* Timex machine (keyboard emulation/loading sounds etc.) */
+  int timex;      /* Timex machine (keyboard emulation/loading sounds etc.) */
 
   libspectrum_timings timings; /* How long do things take to happen? */
   /* Redraw line y this many tstates after interrupt */
