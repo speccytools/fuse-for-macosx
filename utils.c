@@ -56,6 +56,8 @@
 #include "tape.h"
 #include "trdos.h"
 #include "utils.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
 typedef struct path_context {
 
@@ -115,7 +117,12 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_CLASS_DISK_PLUS3:
 #ifdef HAVE_765_H
-    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 ); if( error ) break;
+
+    if( !( machine_current->capabilities &
+	   LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) ) {
+      error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 ); if( error ) break;
+    }
+
     error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
     if( autoload ) {
 
@@ -152,9 +159,15 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_DISK_TRDOS:
-    error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
+
+    if( !( machine_current->capabilities &
+	   LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) ) {
+      error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
+    }
+
     error = trdos_disk_insert( TRDOS_DRIVE_A, filename ); if( error ) break;
     if( autoload ) {
+      PC = 0;
       machine_current->ram.current_rom = 1;
       trdos_active = 1;
       memory_map[0].page = &ROM[2][0x0000];
