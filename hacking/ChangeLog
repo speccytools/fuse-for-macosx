@@ -1132,3 +1132,10 @@
 20041201 z80/z80_ops.c: remove 'opcode may be used uninitialized'
          warning. There's no chance that it is, but gcc doesn't realise
 	 that.
+20041207 lib/{Makefile.am, disk_plus3.[szx|z80], tape_128.[szx|z80],
+         tape_16.[szx|z80], tape_2048.[szx|z80], tape_2068.[szx|z80],
+         tape_48.[szx|z80], tape_pentagon.[szx|z80], tape_plus2.[szx|z80],
+         tape_plus2a.[szx|z80], tape_plus3.[szx|z80], tape_scorpion.[szx|z80]}:
+         Change z80 snaps to szx snaps without joystick information to prevent
+         Fuse attempting to change joystick settings when auto-loading tapes or
+         disks.

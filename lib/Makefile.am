@@ -25,20 +25,22 @@
 AUTOMAKE_OPTIONS = foreign
 
 FILES = cassette.bmp \
-	microdrive.bmp \
-	disk_plus3.z80 \
+	disk_plus3.szx \
 	keyboard.scr \
+	microdrive.bmp \
 	plus3disk.bmp \
-	tape_128.z80 \
-	tape_16.z80 \
-	tape_2048.z80 \
-	tape_2068.z80 \
-	tape_48.z80 \
-	tape_plus2.z80 \
-	tape_plus2a.z80 \
-	tape_plus3.z80 \
-	tape_pentagon.z80 \
-	tape_scorpion.z80
+	tape_128.szx \
+	tape_16.szx \
+	tape_2048.szx \
+	tape_2068.szx \
+	tape_48.szx \
+	tape_plus2.szx \
+	tape_plus2a.szx \
+	tape_plus3.szx \
+	tape_plus3e.szx \
+	tape_pentagon.szx \
+	tape_scorpion.szx \
+	tape_se.szx
 
 pkgdata_DATA = $(FILES)
 
