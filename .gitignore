@@ -1,4 +1,5 @@
 /.deps
+/.gdb_history
 /.libs
 /Makefile
 /Makefile.in

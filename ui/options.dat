@@ -15,7 +15,7 @@ Checkbox, Raw Sinclair(N)ET, raw_s_net, INPUT_KEY_n
 Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
-Checkbox, Set (j)oysticks on snap load, joy_prompt, INPUT_KEY_j
+Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
 
 peripherals
 Peripheral Options

@@ -133,6 +133,8 @@ if(*freqptr>33000) frag++;
 if(*stereoptr) frag++;
 if(sixteenbit) frag++;
 
+/* FIXME: OSS API docs say you should write to the soundcard in frag size
+   blocks */
 if(ioctl(soundfd,SNDCTL_DSP_SETFRAGMENT,&frag)<0)
   {
   settings_current.sound = 0;
