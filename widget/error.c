@@ -77,15 +77,15 @@ split_message( const char *message, char ***lines, size_t *count,
     while( *ptr == ' ' ) ptr++; message = ptr;
 
     /* Find end of word */
-    while( *ptr && *ptr++ != ' ' ) /* Do nothing */;
+    while( *ptr && *ptr != ' ' ) ptr++;
 
-    /* message now points to a word of length (ptr-message-1); if
+    /* message now points to a word of length (ptr-message); if
        that's longer than an entire line (most likely filenames), just
        take the last bit */
-    if( ptr - message - 1 > line_length ) message = ptr - line_length - 1;
+    if( ptr - message > line_length ) message = ptr - line_length;
 
     /* Check we've got room for the word, plus the prefixing space */
-    if( position + ( ptr - message ) > line_length ) {
+    if( position + ( ptr - message + 1 ) > line_length ) {
       char **new_lines; int i;
 
       /* If we've filled the screen, stop */
@@ -106,8 +106,8 @@ split_message( const char *message, char ***lines, size_t *count,
 	return 1;
       }
       
-      strncpy( (*lines)[*count], message, ptr - message - 1 );
-      position = ptr - message - 1;
+      strncpy( (*lines)[*count], message, ptr - message );
+      position = ptr - message;
       (*lines)[*count][position] = '\0';
 
       (*count)++;
@@ -115,8 +115,8 @@ split_message( const char *message, char ***lines, size_t *count,
     } else {		/* Enough room on this line */
 
       strcat( (*lines)[*count-1], " " );
-      strncat( (*lines)[*count-1], message, ptr-message-1 );
-      position += ptr-message;
+      strncat( (*lines)[*count-1], message, ptr - message );
+      position += ptr - message + 1;
       (*lines)[*count-1][position] = '\0';
 
     }

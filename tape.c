@@ -97,14 +97,14 @@ int tape_open( const char *filename )
   }
 
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    ui_error( "error reading '%s': %s\n",
+    ui_error( "error reading '%s': %s",
 	      filename, libspectrum_error_message(error) );
     munmap( buffer, length );
     return error;
   }
 
   if( munmap( buffer, length ) == -1 ) {
-    ui_error( "Couldn't munmap '%s': %s\n", filename, strerror( errno ) );
+    ui_error( "Couldn't munmap '%s': %s", filename, strerror( errno ) );
     return 1;
   }
 
@@ -153,7 +153,7 @@ int tape_write( const char* filename )
   length = 0;
   error = libspectrum_tzx_write( &tape, &buffer, &length );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    ui_error( "error during libspectrum_tzx_write: %s\n",
+    ui_error( "error during libspectrum_tzx_write: %s",
 	      libspectrum_error_message(error) );
     return error;
   }

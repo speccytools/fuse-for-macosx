@@ -78,7 +78,7 @@ ui_error( const char *format, ... )
   va_end( ap );
 
   /* Print the message to stderr, along with a program identifier */
-  fprintf( stderr, "%s: error: %s", fuse_progname, message );
+  fprintf( stderr, "%s: error: %s\n", fuse_progname, message );
 
   fuse_emulation_pause();
   widget_do( WIDGET_TYPE_ERROR, message );

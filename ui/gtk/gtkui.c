@@ -395,7 +395,7 @@ static void gtkui_select(GtkWidget *widget, gpointer data)
   /* Some space to store the radio buttons in */
   dialog.buttons = (GtkWidget**)malloc( machine_count * sizeof(GtkWidget* ) );
   if( dialog.buttons == NULL ) {
-    ui_error( "out of memory at %s:%d\n", __FILE__, __LINE__ );
+    ui_error( "out of memory at %s:%d", __FILE__, __LINE__ );
     return;
   }
 

@@ -66,7 +66,7 @@ BYTE spec48_readbyte(WORD address)
     case 2: return RAM[2][address]; break;
     case 3: return RAM[0][address]; break;
     default:
-      ui_error( "access to impossible bank %d at %s:%d\n",
+      ui_error( "access to impossible bank %d at %s:%d",
 		bank, __FILE__, __LINE__ );
       fuse_abort();
   }
@@ -87,7 +87,7 @@ void spec48_writebyte(WORD address, BYTE b)
     case 2: RAM[2][offset]=b; break;
     case 3: RAM[0][offset]=b; break;
     default:
-      ui_error( "access to impossible bank %d at %s:%d\n",
+      ui_error( "access to impossible bank %d at %s:%d",
 		bank, __FILE__, __LINE__ );
       fuse_abort();
     }

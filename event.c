@@ -144,7 +144,7 @@ int event_do_events(void)
       break;
 
     default:
-      ui_error( "unknown event type %d\n", ptr->type );
+      ui_error( "unknown event type %d", ptr->type );
       break;
     }
     free(ptr);

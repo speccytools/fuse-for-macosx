@@ -50,7 +50,7 @@ int ui_error( const char *format, ... )
   va_end( ap );
 
   /* Print the message to stderr, along with a program identifier */
-  fprintf( stderr, "%s: error: %s", fuse_progname, message );
+  fprintf( stderr, "%s: error: %s\n", fuse_progname, message );
 
   /* Create the dialog box */
   dialog = gtk_dialog_new();
