@@ -259,3 +259,4 @@
 20031009 fuse.c, settings.dat, ui/options.dat, ui/gtk/gtkui.c,
 	 widget/menu.c: add option as to whether to embed snapshot when
 	 creating RZX files from a given snapshot.
+20031009 fuse.c: add information from uname() into creator custom data.

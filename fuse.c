@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/utsname.h>
 #include <unistd.h>
 
 #ifdef UI_SDL
@@ -236,12 +237,21 @@ int creator_init( void )
 {
   size_t i;
   unsigned int version[4] = { 0, 0, 0, 0 };
-  libspectrum_error error;
+  char *custom;
+  struct utsname buf;
+  libspectrum_error error; int sys_error;
 
   sscanf( VERSION, "%u.%u.%u.%u",
 	  &version[0], &version[1], &version[2], &version[3] );
 
   for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
+
+  sys_error = uname( &buf );
+  if( sys_error ) {
+    ui_error( UI_ERROR_ERROR, "error getting system information: %s",
+	      strerror( errno ) );
+    return 1;
+  }
 
   error = libspectrum_creator_alloc( &fuse_creator ); if( error ) return error;
 
@@ -255,6 +265,23 @@ int creator_init( void )
   error = libspectrum_creator_set_minor( fuse_creator,
 					 version[2] * 0x100 + version[3] );
   if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
+
+  custom = malloc( 256 );
+  if( !custom ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    libspectrum_creator_free( fuse_creator );
+    return 1;
+  }
+
+  snprintf( custom, 256, "uname: %s %s %s\n", buf.sysname, buf.machine,
+	    buf.release );
+
+  error = libspectrum_creator_set_custom( fuse_creator,
+					  custom, strlen( custom ) );
+  if( error ) {
+    free( custom ); libspectrum_creator_free( fuse_creator );
+    return error;
+  }
 
   return 0;
 }
