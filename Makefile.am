@@ -56,4 +56,4 @@ noinst_HEADERS = ay.h display.h event.h\
 	joystick.h printer.h tc2048.h scld.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl \
-	     settings_header.pl settings.dat
+	     settings-header.pl settings.dat
