@@ -648,3 +648,4 @@
 	 disks.
 20040320 snapshot.c: copy RAM page 8-15 into the libspectrum_snap structure.
 20040320 snapshot.c,tape.c: select output format based on filename.
+20040320 snapshot.c,trdos.[ch]: support the Beta 128 block of the SZX format.

@@ -195,6 +195,27 @@ snapshot_copy_from( libspectrum_snap *snap )
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
     scld_dec_write( 0x00ff, libspectrum_snap_out_scld_dec( snap ) );
 
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) {
+
+    trdos_active = libspectrum_snap_beta_paged( snap );
+
+    if( trdos_active ) {
+      memory_map[0].page = &ROM[2][0x0000];
+      memory_map[1].page = &ROM[2][0x2000];
+    } else {
+      memory_map[0].page = &ROM[ machine_current->ram.current_rom ][0x0000];
+      memory_map[1].page = &ROM[ machine_current->ram.current_rom ][0x2000];
+    }
+
+    trdos_direction = libspectrum_snap_beta_direction( snap );
+
+    trdos_cr_write ( 0x001f, libspectrum_snap_beta_status( snap ) );
+    trdos_tr_write ( 0x003f, libspectrum_snap_beta_track ( snap ) );
+    trdos_sec_write( 0x005f, libspectrum_snap_beta_sector( snap ) );
+    trdos_dr_write ( 0x007f, libspectrum_snap_beta_data  ( snap ) );
+    trdos_sp_write ( 0x00ff, libspectrum_snap_beta_system( snap ) );
+  }
+
   tstates = libspectrum_snap_tstates( snap );
 
   z80.interrupts_enabled_at =
@@ -341,6 +362,14 @@ int snapshot_copy_to( libspectrum_snap *snap )
 
   libspectrum_snap_set_out_scld_hsr( snap, scld_last_hsr );
   libspectrum_snap_set_out_scld_dec( snap, scld_last_dec.byte );
+
+  libspectrum_snap_set_beta_paged( snap, trdos_active );
+  libspectrum_snap_set_beta_direction( snap, trdos_direction );
+  libspectrum_snap_set_beta_status( snap, trdos_status_register );
+  libspectrum_snap_set_beta_track ( snap, trdos_system_register );
+  libspectrum_snap_set_beta_sector( snap, trdos_track_register );
+  libspectrum_snap_set_beta_data  ( snap, trdos_sector_register );
+  libspectrum_snap_set_beta_system( snap, trdos_data_register );
 
   libspectrum_snap_set_tstates( snap, tstates );
 

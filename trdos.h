@@ -34,6 +34,13 @@
 extern int trdos_available;	/* Is TRDOS available for use? */
 extern int trdos_active;     /* TRDOS enabled? */
 
+extern int trdos_direction;		       /* FDC seek direction */
+extern libspectrum_byte trdos_status_register; /* Betadisk status register */
+extern libspectrum_byte trdos_track_register;  /* FDC track register */
+extern libspectrum_byte trdos_sector_register; /* FDC sector register */
+extern libspectrum_byte trdos_data_register;   /* FDC data register */
+extern libspectrum_byte trdos_system_register; /* FDC system register */
+
 int trdos_init( void );
 
 void trdos_reset( void );

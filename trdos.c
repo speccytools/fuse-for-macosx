@@ -126,7 +126,7 @@ typedef struct
 
 #endif				/* #ifdef WORDS_BIGENDIAN */
 
-# define CurrentDiscNum (last_vg93_system & 3)
+# define CurrentDiscNum ( trdos_system_register & 3 )
 # define CurrentDisk discs[CurrentDiscNum]
 
 static int busy = 0;
@@ -145,13 +145,13 @@ static unsigned int toread_position = 0;
 static libspectrum_byte six_bytes[6];
 
 static int vg_spin;
-static int vg_direction; /* 0 - spindlewards 1 - rimwards */
-static libspectrum_byte vg_reg_trk; /* The last byte sent to VG93 track reg */
-static libspectrum_byte vg_reg_sec; /* The last byte sent to VG93 sector reg */
-static libspectrum_byte vg_reg_dat; /* The last byte sent to VG93 data reg */
+int trdos_direction; /* 0 - spindlewards 1 - rimwards */
+libspectrum_byte trdos_status_register; /* Betadisk status register */
+libspectrum_byte trdos_track_register;  /* FDC track register */
+libspectrum_byte trdos_sector_register; /* FDC sector register */
+libspectrum_byte trdos_data_register;   /* FDC data register */
 static libspectrum_byte vg_portFF_in;
-static libspectrum_byte last_vg93_system = 0; /* Last byte sent to VG93 system
-						 port */
+libspectrum_byte trdos_system_register; /* FDC system register */
 
 union
 {
@@ -250,7 +250,7 @@ trdos_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 
   trdos_update_index_impulse();
 
-  return( vg_reg_trk );
+  return trdos_track_register;
 }
 
 void
@@ -258,7 +258,7 @@ trdos_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !trdos_active ) return;
 
-  vg_reg_trk = b;
+  trdos_track_register = b;
 }
 
 libspectrum_byte
@@ -270,7 +270,7 @@ trdos_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 
   trdos_update_index_impulse();
 
-  return( vg_reg_sec );
+  return trdos_sector_register;
 }
 
 void
@@ -278,7 +278,7 @@ trdos_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !trdos_active ) return;
 
-  vg_reg_sec = b;
+  trdos_sector_register = b;
 }
 
 libspectrum_byte
@@ -290,15 +290,14 @@ trdos_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 
   trdos_update_index_impulse();
 
-  if ( toread_position >= toread_num )
-    return ( vg_reg_dat );
+  if( toread_position >= toread_num ) return trdos_data_register;
 
-  vg_reg_dat = toread[toread_position];
+  trdos_data_register = toread[toread_position];
 
   if ( ( ( toread_position & 0x00ff ) == 0 ) && toread_position != 0 )
-    vg_reg_sec++;
+    trdos_sector_register++;
 
-  if ( vg_reg_sec > 16 ) vg_reg_sec = 1;
+  if( trdos_sector_register > 16 ) trdos_sector_register = 1;
 
   toread_position++;
 
@@ -313,7 +312,7 @@ trdos_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
     vg_rs.bit.b1 = 1; /*  DRQ copy */
   }
 
-  return( vg_reg_dat );
+  return trdos_data_register;
 }
 
 void
@@ -321,7 +320,7 @@ trdos_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !trdos_active ) return;
 
-  vg_reg_dat = b;
+  trdos_data_register = b;
 
   if( towrite == 0 ) return;
 
@@ -368,7 +367,7 @@ trdos_sp_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !trdos_active ) return;
 
-  last_vg93_system = b;
+  trdos_system_register = b;
 }
 
 static int
@@ -595,18 +594,17 @@ vg_seek_delay( libspectrum_byte dst_track )
 {
   int error;
 
-  if ( ( dst_track - CurrentDisk.trk ) > 0 )
-    vg_direction = 1;
-  if ( ( dst_track - CurrentDisk.trk ) < 0 )
-    vg_direction = 0;
+  if( ( dst_track - CurrentDisk.trk ) > 0 ) trdos_direction = 1;
+  if( ( dst_track - CurrentDisk.trk ) < 0 ) trdos_direction = 0;
 
   busy = 1;
 
+  /* FIXME: is this code really what was meant? */
   if ( !CurrentDisk.disc_ready ) vg_portFF_in = 0x80;
   else vg_portFF_in = 0x80;
 
   CurrentDisk.trk = dst_track;
-  vg_reg_trk = dst_track;
+  trdos_track_register = dst_track;
 
   /* schedule event */
   error = event_add( tstates +
@@ -638,11 +636,9 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
   if( !trdos_active ) return;
 
-  if ( last_vg93_system & 0x10 )
-    side = 0;
-  else
-    side = 1;
+  trdos_status_register = b;
 
+  side = trdos_system_register & 0x10 ? 0 : 1;
 
   if ( (b & 0xF0) == 0xD0 ) { /*  interrupt */
     vg_portFF_in = 0x80;
@@ -661,7 +657,7 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   }
 
   if ( (b & 0xF0) == 0x10 ) { /*  seek track */
-    vg_seek_delay( vg_reg_dat );
+    vg_seek_delay( trdos_data_register );
     vg_rs.bit.b5 = b & 8 ? 1 : 0;
     vg_setFlagsSeeks();
     if ( b & 8 ) vg_spin = 1;
@@ -670,15 +666,15 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   }
 
   if ( (b & 0xE0) == 0x40 ) { /*  fwd */
-    vg_direction = 1;
+    trdos_direction = 1;
     b = 0x20; /*  step */
   }
   if ( (b & 0xE0) == 0x60 ) { /*  back */
-    vg_direction = 0;
+    trdos_direction = 0;
     b = 0x20; /*  step */
   }
   if ( (b & 0xE0) == 0x20 ) { /*  step */
-    if ( vg_direction )
+    if ( trdos_direction )
       vg_seek_delay( ++CurrentDisk.trk );
     else
       vg_seek_delay( --CurrentDisk.trk );
@@ -705,17 +701,19 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
       return;
     }
 
-    if ( ( vg_reg_sec == 0 ) || ( vg_reg_sec > 16 ) ) {
+    if( ( trdos_sector_register == 0 ) || ( trdos_sector_register > 16 ) ) {
       vg_rs.byte |= 0x10; /*  sector not found */
       vg_portFF_in = 0x80;
 
-      ui_error( UI_ERROR_ERROR, "((vg_reg_sec==0)||(vg_reg_sec>16))" );
+      ui_error( UI_ERROR_ERROR,
+		"Attempt to read TRDOS sector with sector register 0x%02x",
+		trdos_sector_register );
 
       return;
     }
 
-    pointer = ( CurrentDisk.trk * 2 + side ) * 256 * 16 + ( vg_reg_sec - 1 ) *
-              256;
+    pointer = ( CurrentDisk.trk * 2 + side ) * 256 * 16 +
+              ( trdos_sector_register - 1 ) * 256;
 
     if( lseek( CurrentDisk.fd, pointer, SEEK_SET) == -1 ) {
       ui_error( UI_ERROR_ERROR,
@@ -730,15 +728,21 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
     if ( b & 0x10 ) {
       ui_error( UI_ERROR_ERROR,
-                "Unimplemented multi sector read:read vg_reg_sec=%d",
-                vg_reg_sec );
+                "Unimplemented TRDOS multisector read: sector register = %d",
+                trdos_sector_register );
 
-      read( CurrentDisk.fd, track, 256 * ( 17 - vg_reg_sec ) );
+      read( CurrentDisk.fd, track, 256 * ( 17 - trdos_sector_register ) );
 
       lseek( CurrentDisk.fd,
-	     -256 * ( ( 17 - vg_reg_sec ) + ( vg_reg_sec - 1 ) ),
+
+	     /* This line used to say:
+	        -256 * ( ( 17 - vg_reg_sec ) + ( vg_reg_sec - 1 ) ),
+		which is fairly nonsensical */
+             -256 * 16,
+
              SEEK_CUR );
-      read( CurrentDisk.fd, track, 256 * ( vg_reg_sec - 1 ) );
+
+      read( CurrentDisk.fd, track, 256 * ( trdos_sector_register - 1 ) );
  
       toread = track;
       toread_num = 256 * ( 16 );
@@ -777,7 +781,7 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 
     six_bytes[0] = CurrentDisk.trk;
     six_bytes[1] = 0; 
-    six_bytes[2] = vg_reg_sec;
+    six_bytes[2] = trdos_sector_register;
     six_bytes[3] = 1;
     six_bytes[4] = 0; /*  todo : crc !!! */
     six_bytes[5] = 0; /*  todo : crc !!! */
@@ -818,17 +822,19 @@ trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
       return;
     }
 
-    if ( ( vg_reg_sec == 0 ) || ( vg_reg_sec > 16 ) ) {
+    if ( ( trdos_sector_register == 0 ) || ( trdos_sector_register > 16 ) ) {
       vg_rs.byte |= 0x10; /*  sector not found */
       vg_portFF_in = 0x80;
 
-      ui_error( UI_ERROR_ERROR, "((vg_reg_sec==0)||(vg_reg_sec>16))" );
+      ui_error( UI_ERROR_ERROR,
+		"Attempt to write TRDOS sector with sector register 0x%02x",
+		trdos_sector_register );
 
       return;
     }
 
     towriteaddr = ( CurrentDisk.trk * 2 + side ) * 256 * 16
-                    + ( vg_reg_sec - 1 ) * 256;
+                    + ( trdos_sector_register - 1 ) * 256;
     towrite = 256;
 
     vg_spin = 0;
