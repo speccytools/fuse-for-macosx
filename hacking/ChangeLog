@@ -1083,3 +1083,4 @@
 20041014 ui/scaler/scalers.c: Fix typo.
 20041014 man/fuse.1: Add documentation of --full-screen command line option.
 20041019 man/fuse.1: Quote '-'s for UTF-8 environments (Darren).
+20041019 widget/widget.c: Add dummy ui_get_rollback_point function.

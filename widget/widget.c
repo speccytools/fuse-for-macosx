@@ -443,4 +443,11 @@ ui_confirm_save( const char *message )
   return UI_CONFIRM_SAVE_DONTSAVE;
 }
 
+/* FIXME: make this do something useful */
+int
+ui_get_rollback_point( GSList *points )
+{
+  return -1;
+}
+
 #endif				/* #ifdef USE_WIDGET */
