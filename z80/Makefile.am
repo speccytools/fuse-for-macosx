@@ -56,3 +56,9 @@ EXTRA_DIST = opcodes_base.dat \
 	     opcodes_ddfdcb.dat \
              opcodes_ed.dat \
 	     z80.pl
+
+## The core tester
+
+noinst_PROGRAMS = coretest
+
+coretest_SOURCES = coretest.c z80.c z80_ops.c

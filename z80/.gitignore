@@ -1,6 +1,7 @@
 /.deps
 /Makefile
 /Makefile.in
+/coretest
 /opcodes_base.c
 /z80_cb.c
 /z80_ddfd.c
