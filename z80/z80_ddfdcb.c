@@ -1,5 +1,7 @@
 /* z80_ddfdcb.c: z80 DDCBxx and FDCBxx opcodes
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
+   
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,10 +19,12 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
+
+/* FIXME: Most timings. Contention on the ones I do have timings for */
 
 case 0x00:	/* LD B,RLC (REGISTER+dd) */
 B=readbyte(tempaddr);
@@ -59,7 +63,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x06:	/* RLC (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   RLC(bytetemp);
@@ -110,7 +114,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x0e:	/* RRC (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   RRC(bytetemp);
@@ -161,7 +165,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x16:	/* RL (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   RL(bytetemp);
@@ -212,7 +216,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x1e:	/* RR (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   RR(bytetemp);
@@ -263,7 +267,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x26:	/* SLA (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   SLA(bytetemp);
@@ -314,7 +318,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x2e:	/* SRA (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   SRA(bytetemp);
@@ -365,7 +369,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x36:	/* SLL (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   SLL(bytetemp);
@@ -416,7 +420,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x3e:	/* SRL (REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 {
   BYTE bytetemp = readbyte(tempaddr);
   SRL(bytetemp);
@@ -438,7 +442,7 @@ case 0x44:
 case 0x45:
 case 0x46:
 case 0x47:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT(0,bytetemp);
@@ -453,7 +457,7 @@ case 0x4c:
 case 0x4d:
 case 0x4e:
 case 0x4f:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT(1,bytetemp);
@@ -468,7 +472,7 @@ case 0x54:
 case 0x55:
 case 0x56:
 case 0x57:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT(2,bytetemp);
@@ -483,7 +487,7 @@ case 0x5c:
 case 0x5d:
 case 0x5e:
 case 0x5f:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT(3,bytetemp);
@@ -498,7 +502,7 @@ case 0x64:
 case 0x65:
 case 0x66:
 case 0x67:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT(4,bytetemp);
@@ -513,7 +517,7 @@ case 0x6c:
 case 0x6d:
 case 0x6e:
 case 0x6f:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT(5,bytetemp);
@@ -528,7 +532,7 @@ case 0x74:
 case 0x75:
 case 0x76:
 case 0x77:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT(6,bytetemp);
@@ -543,7 +547,7 @@ case 0x7c:
 case 0x7d:
 case 0x7e:
 case 0x7f:
-tstates+=20;
+tstates += 5;
 {
   BYTE bytetemp=readbyte(tempaddr);
   BIT7(bytetemp);
@@ -581,7 +585,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x86:	/* RES 0,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0xfe);
 break;
 
@@ -621,7 +625,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x8e:	/* RES 1,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0xfd);
 break;
 
@@ -661,7 +665,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x96:	/* RES 2,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0xfb);
 break;
 
@@ -701,7 +705,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0x9e:	/* RES 3,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0xf7);
 break;
 
@@ -741,7 +745,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xa6:	/* RES 4,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0xef);
 break;
 
@@ -781,7 +785,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xae:	/* RES 5,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0xdf);
 break;
 
@@ -821,7 +825,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xb6:	/* RES 6,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0xbf);
 break;
 
@@ -861,7 +865,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xbe:	/* RES 7,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) & 0x7f);
 break;
 
@@ -901,7 +905,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xc6:	/* SET 0,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x01);
 break;
 
@@ -941,7 +945,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xce:	/* SET 1,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x02);
 break;
 
@@ -981,7 +985,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xd6:	/* SET 2,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x04);
 break;
 
@@ -1021,7 +1025,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xde:	/* SET 3,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x08);
 break;
 
@@ -1061,7 +1065,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xe6:	/* SET 4,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x10);
 break;
 
@@ -1101,7 +1105,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xee:	/* SET 5,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x20);
 break;
 
@@ -1141,7 +1145,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xf6:	/* SET 6,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x40);
 break;
 
@@ -1181,7 +1185,7 @@ writebyte(tempaddr, L);
 break;
 
 case 0xfe:	/* SET 7,(REGISTER+dd) */
-tstates+=23;
+tstates += 8;
 writebyte(tempaddr, readbyte(tempaddr) | 0x80);
 break;
 

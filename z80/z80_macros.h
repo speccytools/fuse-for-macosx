@@ -96,6 +96,11 @@
 #define FLAG_Z	0x40
 #define FLAG_S	0x80
 
+/* Get the appropriate contended memory delay. Use this macro later
+   to avoid a function call if memory contention is disabled */
+#define contend(address,time) tstates += contention( (address) + (time) )
+
+/* Some commonly used instructions */
 #define AND(value)\
 {\
   A &= (value);\
@@ -144,6 +149,7 @@
   BYTE lookup = ( ( (value1) & 0x0800 ) >> 11 ) |\
     ( ( (value2) & 0x0800 ) >> 10 ) |\
     ( ( add16temp & 0x0800 ) >> 9 );\
+  tstates += 7;\
   (value1) = add16temp;\
   F = ( F & ( FLAG_V | FLAG_Z | FLAG_S ) ) |\
     ( add16temp & 0x10000 ? FLAG_C : 0 )|\
@@ -166,8 +172,10 @@
 
 #define CALL()\
 {\
-  BYTE calltempl=readbyte(PC++);\
-  BYTE calltemph=readbyte(PC++);\
+  BYTE calltempl, calltemph;\
+  calltempl=readbyte(PC++);\
+  contend( PC, 1 );\
+  calltemph=readbyte(PC++);\
   PUSH16(PCL,PCH);\
   PCL=calltempl; PCH=calltemph;\
 }
@@ -217,18 +225,28 @@ break
 
 #define LD16_NNRR(regl,regh)\
 {\
-  WORD ldtemp=readbyte(PC++);\
+  WORD ldtemp;\
+  contend( PC, 3 );\
+  ldtemp=readbyte(PC++);\
+  contend( PC, 3 );\
   ldtemp|=readbyte(PC++) << 8;\
+  contend( ldtemp, 3 );\
   writebyte(ldtemp++,(regl));\
+  contend( ldtemp, 3 );\
   writebyte(ldtemp,(regh));\
   break;\
 }
 
 #define LD16_RRNN(regl,regh)\
 {\
-  WORD ldtemp=readbyte(PC++);\
+  WORD ldtemp;\
+  contend( PC, 3 );\
+  ldtemp=readbyte(PC++);\
+  contend( PC, 3 );\
   ldtemp|=readbyte(PC++) << 8;\
+  contend( ldtemp, 3 );\
   (regl)=readbyte(ldtemp++);\
+  contend( ldtemp, 3 );\
   (regh)=readbyte(ldtemp);\
   break;\
 }
@@ -242,6 +260,8 @@ break
 
 #define JR()\
 {\
+  contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );\
+  contend( PC, 1 );\
   PC+=(SBYTE)readbyte(PC);\
 }
 
@@ -253,13 +273,17 @@ break
 
 #define POP16(regl,regh)\
 {\
+  contend( SP, 3 );\
   (regl)=readbyte(SP++);\
+  contend( SP, 3 );\
   (regh)=readbyte(SP++);\
 }
 
 #define PUSH16(regl,regh)\
 {\
-  writebyte(--SP,(regh));\
+  contend( --SP, 3 );\
+  writebyte(SP,(regh));\
+  contend( --SP, 3 );\
   writebyte(--SP,(regl));\
 }
 
