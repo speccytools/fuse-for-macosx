@@ -92,23 +92,70 @@ doing so, press
 to confirm the new options or
 .I Esc
 to abort.) Note that any changed settings only apply to the
-currently-running Fuse.
+currently-running Fuse. The options available are:
+.PP
+.RS
+.I "Issue 2 keyboard emulation"
+.RS
+Early versions of the Spectrum used a different value for unused bits
+on the keyboard input ports, and a few games depended on the old value
+of these bits. Enabling this option switches to the old value, to let
+you run them.
+.RE
+.PP
+.I "Use tape loading traps"
+.RS
+Ordinarily, Fuse intercepts calls to the ROM tape-loading routine in
+order to load from TAP files quickly. But this can interfere with TZX
+loading; disabling this option avoids the problem at the cost of much
+slower (i.e. real-time) tape-loading. When tape-loading traps are
+disabled, you need to start tape playback manually, by pressing
+.IR F8 .
+.RE
+.PP
+.I "Stereo separation for AY sound"
+.RS
+This option is only available when Fuse is able to play sound. By
+default, the sound output is mono, since this is all you got from an
+unmodified Spectrum. But enabling this option gives you so-called ACB
+stereo (for sound from the 128's AY-3-8912 sound chip). This actually
+works a little better than ACB stereo modifications for the machine
+itself, since it uses stereo positioning rather than simply playing on
+one channel only.
+.RE
+.RE
 .TP
 .I F5
 Reset the emulated Spectrum.
 .TP
 .I F7
-Choose a TAP file to load from. Again, see
+Choose a TAP or TZX virtual-tape file to load from. Again, see
 .B "FILE SELECTION"
 below. The loading does not start automatically - you have to start
 the load in the emulated machine (with LOAD "" or the 128's Tape
 Loader option, though you may need to reset first).
+.PP
+.RS
+To load TZX files properly, you should select the file, make sure
+tape-loading traps are disabled in the General Options dialog, then
+press
+.IR F8 .
+Some TZXs will work with tape-loading traps enabled, or will load
+partway such that you can press
+.I F8
+to load the rest, but it's best to do things properly unless you
+.I know
+this is the case.
+.RE
 .TP
 .I F8
-Start playing the TAP file, if required. To explain - if tape-loading
-traps have been disabled (in the General Options dialog), starting the
-loading process in the emulated machine isn't enough. You also have to
-`press play', so to speak :-), and this is how you do that.
+Start playing the TAP or TZX file, if required. (Pressing
+.I F8
+again pauses playback, and a further press resumes.) To explain - if
+tape-loading traps have been disabled (in the General Options dialog),
+starting the loading process in the emulated machine isn't enough. You
+also have to `press play', so to speak :-), and this is how you do
+that.
 .TP
 .I F9
 Choose the next machine type in sequence. The machine initially
@@ -188,7 +235,7 @@ The Spectrum emulation is paused when any dialogs appear.
 .\"------------------------------------------------------------------
 .\"
 .SH "FILE SELECTION"
-The way you select a file (either snapshot or TAP file) depends on
+The way you select a file (whether snapshot or tape file) depends on
 which UI you're using. So firstly, here's how to use the GTK+ file
 selector.
 .PP
