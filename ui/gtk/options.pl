@@ -65,6 +65,7 @@ gtkoptions_$_->{name}( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkoptions_$_->{name}_t dialog;
   GtkWidget *ok_button, *cancel_button, *hbox, *text, *text2;
+  GtkAccelGroup *accel_group;
   gchar buffer[80];
 
   hbox = text = text2 = NULL;
@@ -148,9 +149,11 @@ CODE
 		      (gpointer) NULL );
 
   /* Allow Esc to cancel */
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( dialog.dialog ), accel_group );
+
   gtk_widget_add_accelerator( cancel_button, "clicked",
-                              gtk_accel_group_get_default(),
-                              GDK_Escape, 0, 0 );
+			      accel_group, GDK_Escape, 0, 0);
 
   /* Set the window to be modal and display it */
   gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
