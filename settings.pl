@@ -328,7 +328,7 @@ foreach my $name ( sort keys %options ) {
 CODE
     } elsif( $type eq 'string' or $type eq 'numeric' ) {
 
-	print "    { \"$commandline\", 1, NULL, '$options{$name}->{short}' },\n";
+	print "    { \"$commandline\", 1, NULL, $options{$name}->{short} },\n";
     } else {
 	die "Unknown setting type `$type'";
     }
@@ -369,9 +369,9 @@ foreach my $name ( sort keys %options ) {
     if( $type eq 'boolean' ) {
 	# Do nothing
     } elsif( $type eq 'string' ) {
-	print "    case '$short': settings->$name = optarg; break;\n";
+	print "    case $short: settings->$name = optarg; break;\n";
     } elsif( $type eq 'numeric' ) {
-	print "    case '$short': settings->$name = atoi( optarg ); break;\n";
+	print "    case $short: settings->$name = atoi( optarg ); break;\n";
     } else {
 	die "Unknown setting type `$type'";
     }

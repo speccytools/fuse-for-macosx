@@ -27,7 +27,7 @@
 #ifndef FUSE_TIMER_H
 #define FUSE_TIMER_H
 
-extern volatile int timer_count;
+extern volatile float timer_count;
 
 int timer_init(void);
 void timer_sleep(void);

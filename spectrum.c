@@ -89,7 +89,7 @@ int spectrum_interrupt(void)
     sound_frame();
   } else {
     timer_sleep();
-    timer_count--;
+    timer_count -= 100.0 / settings_current.emulation_speed;
   }
 
   if(display_frame()) return 1;

@@ -34,7 +34,7 @@
 #include "spectrum.h"
 #include "timer.h"
 
-volatile int timer_count;
+volatile float timer_count;
 
 /* Just places to store the old timer and signal handlers; restored
    on exit */
@@ -47,7 +47,7 @@ void timer_signal( int signo );
 
 int timer_init(void)
 {
-  timer_count=0;
+  timer_count = 0.0;
   timer_setup_handler();
   timer_setup_timer();
   return 0;
@@ -76,13 +76,13 @@ void
 timer_signal( int signo GCC_UNUSED )
 {
   /* If the emulator is running, note that time has passed */
-  if( !fuse_emulation_paused ) timer_count++;
+  if( !fuse_emulation_paused ) timer_count += 1.0;
 }
 
 void timer_sleep(void)
 {
   /* Go to sleep iff we're emulating things fast enough */
-  if ( timer_count <= 0 ) pause();
+  while( timer_count <= 0.0 ) pause();
 }
 
 int timer_end(void)

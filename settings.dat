@@ -31,13 +31,15 @@
 # <name on command line>, (defaults to <settings_info name> =~ s/_/-/g)
 # <name in config file>, (defaults to <command line> =~ s/-//g)
 
+emulation_speed, numeric, 100, 256, speed
+
 issue2, boolean, 0
 joy_kempston, boolean, 0,, kempston
 tape_traps, boolean, 1,, traps, tapetraps
 slt_traps, boolean, 1,, slt, slttraps
 double_screen, boolean, 0
 
-sound_device, string, NULL, d
+sound_device, string, NULL, 'd'
 sound, boolean, 1
 sound_load, boolean, 1,, loading-sound
 stereo_ay, boolean, 0,, separation
@@ -45,10 +47,10 @@ stereo_beeper, boolean, 0,, beeper-stereo
 
 rzx_compression, boolean, 0,, compress-rzx
 
-snapshot, string, NULL, s
-tape_file, string, NULL, t, tape, tapefile
-start_machine, string, strdup( "48" ), m, machine
-record_file, string, NULL, r, record, recordfile
-playback_file, string, NULL, p, playback, playbackfile
+snapshot, string, NULL, 's'
+tape_file, string, NULL, 't', tape, tapefile
+start_machine, string, strdup( "48" ), 'm', machine
+record_file, string, NULL, 'r', record, recordfile
+playback_file, string, NULL, 'p', playback, playbackfile
 
-svga_mode, numeric, 320, v, svgamode
+svga_mode, numeric, 320, 'v', svgamode
