@@ -105,29 +105,20 @@ int tape_open( const char *filename )
     return 1;
   }
 
-  if(    strlen( filename ) < 4
-      || strncasecmp( &filename[ strlen(filename)-4 ], ".tap", 4 ) ) {
-    
-    error = libspectrum_tzx_create( &tape, buffer, file_info.st_size );
-    if( error != LIBSPECTRUM_ERROR_NONE ) {
-      fprintf( stderr,
-	       "%s: error from libspectrum_tzx_create whilst reading `%s': %s\n",
-	       fuse_progname, filename, libspectrum_error_message(error) );
-      munmap( buffer, file_info.st_size );
-      return error;
-    }
-
-  } else {
-
+  /* First, try opening the file as a .tzx file; if we get back an
+     error saying it didn't have the .tzx signature, then try opening
+     it as a .tap file */
+  error = libspectrum_tzx_create( &tape, buffer, file_info.st_size );
+  if( error == LIBSPECTRUM_ERROR_SIGNATURE ) {
     error = libspectrum_tap_create( &tape, buffer, file_info.st_size );
-    if( error != LIBSPECTRUM_ERROR_NONE ) {
-      fprintf( stderr,
-	       "%s: error from libspectrum_tap_create whilst reading `%s': %s\n",
-	       fuse_progname, filename, libspectrum_error_message(error) );
+  }
+
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf( stderr,
+	     "%s: error reading `%s': %s\n",
+	     fuse_progname, filename, libspectrum_error_message(error) );
       munmap( buffer, file_info.st_size );
       return error;
-    }
-
   }
 
   if( munmap( buffer, file_info.st_size ) == -1 ) {

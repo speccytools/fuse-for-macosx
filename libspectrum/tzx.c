@@ -83,7 +83,7 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 
   /* Now check the signature */
   if( memcmp( ptr, signature, strlen( signature ) ) )
-    return LIBSPECTRUM_ERROR_CORRUPT;
+    return LIBSPECTRUM_ERROR_SIGNATURE;
   ptr += strlen( signature );
   
   /* Just skip the version numbers */
