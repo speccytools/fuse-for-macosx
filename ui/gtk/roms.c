@@ -37,21 +37,47 @@
 #include "gtkui.h"
 #include "settings.h"
 
-static void add_rom( GtkWidget *table, GtkWidget **value, gint row,
-		     const char *name );
+static void add_rom( GtkWidget *table, gint row, const char *name );
 static void select_new_rom( GtkWidget *widget, gpointer data );
+static void roms_done( GtkWidget *widget, gpointer data );
+
+/* The number of ROMs we can change
+#define ROM_COUNT 14
+
+/* The ROM filenames as selected */
+GtkWidget *rom[ ROM_COUNT ];
+
+/* And which settings entries these correspond to */
+char **settings[] = {
+
+  &settings_current.rom_48,
+  &settings_current.rom_128_0,
+  &settings_current.rom_128_1,
+  &settings_current.rom_plus2_0,
+  &settings_current.rom_plus2_1,
+  &settings_current.rom_plus2a_0,
+  &settings_current.rom_plus2a_1,
+  &settings_current.rom_plus2a_2,
+  &settings_current.rom_plus2a_3,
+  &settings_current.rom_plus3_0,
+  &settings_current.rom_plus3_1,
+  &settings_current.rom_plus3_2,
+  &settings_current.rom_plus3_3,
+  &settings_current.rom_tc2048,
+
+};
 
 void
 gtkui_roms( GtkWidget *widget, gpointer data )
 {
   GtkWidget *dialog;
   GtkAccelGroup *accel_group;
-  GtkWidget *table, *label[14];
+  GtkWidget *table;
   GtkWidget *ok_button, *cancel_button;
 
   size_t i;
 
-  const char *name[] = {
+  const char *name[ ROM_COUNT ] = {
     "48K ROM", 
     "128K ROM 0", "128K ROM 1",
     "+2 ROM 0",   "+2 ROM 1",
@@ -68,27 +94,12 @@ gtkui_roms( GtkWidget *widget, gpointer data )
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Select ROMs" );
 
   /* A table to put all the labels in */
-  table = gtk_table_new( 14, 3, FALSE );
+  table = gtk_table_new( ROM_COUNT, 3, FALSE );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
 		     table );
 
   /* And the current values of each of the ROMs */
-  for( i = 0; i < 14; i++ ) add_rom( table, label, i, name[i] );
-
-  gtk_label_set( GTK_LABEL( label[ 0] ), settings_current.rom_48       );
-  gtk_label_set( GTK_LABEL( label[ 1] ), settings_current.rom_128_0    );
-  gtk_label_set( GTK_LABEL( label[ 2] ), settings_current.rom_128_1    );
-  gtk_label_set( GTK_LABEL( label[ 3] ), settings_current.rom_plus2_0  );
-  gtk_label_set( GTK_LABEL( label[ 4] ), settings_current.rom_plus2_1  );
-  gtk_label_set( GTK_LABEL( label[ 5] ), settings_current.rom_plus2a_0 );
-  gtk_label_set( GTK_LABEL( label[ 6] ), settings_current.rom_plus2a_1 );
-  gtk_label_set( GTK_LABEL( label[ 7] ), settings_current.rom_plus2a_2 );
-  gtk_label_set( GTK_LABEL( label[ 8] ), settings_current.rom_plus2a_3 );
-  gtk_label_set( GTK_LABEL( label[ 9] ), settings_current.rom_plus3_0  );
-  gtk_label_set( GTK_LABEL( label[10] ), settings_current.rom_plus3_1  );
-  gtk_label_set( GTK_LABEL( label[11] ), settings_current.rom_plus3_2  );
-  gtk_label_set( GTK_LABEL( label[12] ), settings_current.rom_plus3_3  );
-  gtk_label_set( GTK_LABEL( label[13] ), settings_current.rom_tc2048   );
+  for( i = 0; i < ROM_COUNT; i++ ) add_rom( table, i, name[i] );
 
   /* Create the OK and Cancel buttons */
   ok_button = gtk_button_new_with_label( "OK" );
@@ -100,7 +111,7 @@ gtkui_roms( GtkWidget *widget, gpointer data )
 		     cancel_button );
   
   gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_SIGNAL_FUNC( roms_done ),
 			     GTK_OBJECT( dialog ) );
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
@@ -129,21 +140,21 @@ gtkui_roms( GtkWidget *widget, gpointer data )
 }
 
 static void
-add_rom( GtkWidget *table, GtkWidget **value, gint row, const char *name )
+add_rom( GtkWidget *table, gint row, const char *name )
 {
   GtkWidget *label, *change_button;
 
   label = gtk_label_new( name );
   gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1, row, row + 1 );
 
-  value[ row ] = gtk_label_new( "" );
-  gtk_table_attach_defaults( GTK_TABLE( table ), value[ row ], 1, 2,
+  rom[ row ] = gtk_label_new( *(settings[ row ]) );
+  gtk_table_attach_defaults( GTK_TABLE( table ), rom[ row ], 1, 2,
 			     row, row + 1 );
 
   change_button = gtk_button_new_with_label( "Change" );
   gtk_signal_connect( GTK_OBJECT( change_button ), "clicked",
 		      GTK_SIGNAL_FUNC( select_new_rom ),
-		      value[ row ] );
+		      rom[ row ] );
   gtk_table_attach_defaults( GTK_TABLE( table ), change_button, 2, 3,
 			     row, row + 1 );
 }
@@ -158,7 +169,13 @@ select_new_rom( GtkWidget *widget, gpointer data )
   filename = gtkui_fileselector_get_filename( "Fuse - Select ROM" );
   if( !filename ) return;
 
-  printf( "Ha! You selected '%s'\n", filename );
+  gtk_label_set( GTK_LABEL( label ), filename );
+}
+
+static void
+roms_done( GtkWidget *widget, gpointer data )
+{
+  gtkui_destroy_widget_and_quit( widget, NULL );
 }
 
 #endif			/* #ifdef UI_GTK */
