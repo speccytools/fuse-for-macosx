@@ -136,7 +136,7 @@ int tape_close( void )
   }
 
   /* And then remove it from memory */
-  error = libspectrum_tape_free( tape ); tape = NULL;
+  error = libspectrum_tape_clear( tape );
   if( error ) return error;
 
   return 0;
