@@ -64,9 +64,6 @@ if test "$prefix" != "NONE"; then
   CPPFLAGS="$CPPFLAGS -I$prefix/include"; LDFLAGS="$LDFLAGS -L$prefix/lib"
 fi)
 
-dnl Check that libgcrypt is available
-AC_CHECK_LIB(gcrypt,gcry_check_version)
-
 dnl Select a user interface
 
 dnl Try various UI options; set the `ui' variable when we've got one
