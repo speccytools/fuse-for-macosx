@@ -214,13 +214,20 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   spectrum_ula_write( 0x00fe, snap->out_ula );
 
-  if( machine_current->machine == SPECTRUM_MACHINE_128 ) {
+  if( machine_current->machine >= SPECTRUM_MACHINE_128   &&
+      machine_current->machine <= SPECTRUM_MACHINE_PLUS3    ) {
     spec128_memoryport_write( 0x7ffd, snap->out_128_memoryport );
     ay_registerport_write( 0xfffd, snap->out_ay_registerport );
     for( i=0; i<16; i++ ) {
       machine_current->ay.registers[i] = snap->ay_registers[i];
       sound_ay_write( i, snap->ay_registers[i], 0 );
     }
+  }
+
+  if( machine_current->machine == SPECTRUM_MACHINE_PLUS2A ) {
+    specplus2a_memoryport_write( 0x1ffd, snap->out_plus3_memoryport );
+  } else if( machine_current->machine == SPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_memoryport_write( 0x1ffd, snap->out_plus3_memoryport );
   }
 
   tstates = snap->tstates;
@@ -339,12 +346,13 @@ int snapshot_copy_to( libspectrum_snap *snap )
 
   snap->out_ula = display_lores_border; /* FIXME: need to do this properly */
   
-  if( machine_current->machine == SPECTRUM_MACHINE_128 ) {
-    snap->out_128_memoryport = machine_current->ram.last_byte;
-    snap->out_ay_registerport = machine_current->ay.current_register;
-    for( i=0; i<16; i++ )
-      snap->ay_registers[i] = machine_current->ay.registers[i];
-  }
+  /* These won't necessarily be valid in some machine configurations, but
+     this shouldn't cause anything to go wrong */
+  snap->out_128_memoryport = machine_current->ram.last_byte;
+  snap->out_ay_registerport = machine_current->ay.current_register;
+  for( i=0; i<16; i++ )
+    snap->ay_registers[i] = machine_current->ay.registers[i];
+  snap->out_plus3_memoryport = machine_current->ram.last_byte2;
 
   snap->tstates = tstates;
 
