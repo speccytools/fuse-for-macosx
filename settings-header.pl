@@ -1,28 +1,66 @@
-/* settings.h: Handling configuration settings
-   Copyright (c) 2001-2002 Philip Kendall
+#!/usr/bin/perl -w
 
-   $Id$
+# settings-header.pl: generate settings.h from settings.dat
+# Copyright (c) 2002 Philip Kendall
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+# $Id$
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-   Author contact information:
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-   E-mail: pak21-fuse@srcf.ucam.org
-   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+# Author contact information:
 
-*/
+# E-mail: pak21-fuse@srcf.ucam.org
+# Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+use strict;
+
+use lib 'perl';
+
+use Fuse;
+
+my %options;
+
+while(<>) {
+
+    next if /^\s*$/;
+    next if /^\s*#/;
+
+    chomp;
+
+    my( $name, $type, $default, $short, $commandline, $configfile ) =
+	split /\s*,\s*/;
+
+    if( not defined $commandline ) {
+	$commandline = $name;
+	$commandline =~ s/_/-/g;
+    }
+
+    if( not defined $configfile ) {
+	$configfile = $commandline;
+	$configfile =~ s/-//g;
+    }
+
+    $options{$name} = { type => $type, default => $default, short => $short,
+			commandline => $commandline,
+			configfile => $configfile };
+}
+
+print Fuse::GPL( 'settings.h: Handling configuration settings',
+		 'Copyright (c) 2001-2002 Philip Kendall' );
+
+print << 'CODE';
 
 #include <config.h>
 
@@ -31,38 +69,26 @@
 
 typedef struct settings_info {
 
-  /* General options */
+CODE
 
-  int issue2;		/* Issue 2 keyboard emulation? */
-  int joy_kempston;	/* Kempston joystick emulation? */
-  int tape_traps;	/* Use tape loading traps? */
-  int slt_traps;	/* Use .slt loading traps/ */
+foreach my $name ( sort keys %options ) {
 
-  /* RZX options */
+    my $type = $options{$name}->{type};
 
-  int rzx_compression;	/* Compress RZX data? */
+    if( $type eq 'boolean' or $type eq 'numeric' ) {
+	print "   int $name;\n";
+    } elsif( $type eq 'string' ) {
+	print "  char *$name;\n";
+    } else {
+	die "Unknown setting type `$type'";
+    }
 
-  /* Sound options */
+}
 
-  char *sound_device;   /* Where to output sound */
-  int sound;		/* Is sound enabled */
-  int sound_load;	/* Is loading noise enabled? */
-  int stereo_ay;	/* Stereo separation for AY channels? */
-  int stereo_beeper;	/* Beeper pseudo-stereo? */
+print << 'CODE';
 
-  /* Used on startup */
-
-  char *snapshot;
-  char *tape_file;
-  char *start_machine;
-
-  char *record_file;
-  char *playback_file;
-
-  int show_version;
   int show_help;
-
-  int svga_mode;
+  int show_version;
 
 } settings_info;
 
@@ -76,3 +102,4 @@ int settings_free( settings_info *settings );
 int settings_write_config( settings_info *settings );
 
 #endif				/* #ifndef FUSE_SETTINGS_H */
+CODE
