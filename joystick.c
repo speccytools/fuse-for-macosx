@@ -54,6 +54,12 @@ static const libspectrum_byte timex_mask[5] =
 static const keyboard_key_name cursor_key[5] =
   { KEYBOARD_5, KEYBOARD_8, KEYBOARD_7, KEYBOARD_6, KEYBOARD_0 };
 
+/* The keys used by the two Sinclair joysticks */
+static const keyboard_key_name sinclair1_key[5] =
+  { KEYBOARD_1, KEYBOARD_2, KEYBOARD_4, KEYBOARD_3, KEYBOARD_5 };
+static const keyboard_key_name sinclair2_key[5] =
+  { KEYBOARD_6, KEYBOARD_7, KEYBOARD_9, KEYBOARD_8, KEYBOARD_0 };
+
 /* The current values for the joysticks we can emulate */
 static libspectrum_byte kempston_value;
 static libspectrum_byte timex1_value;
@@ -62,7 +68,11 @@ static libspectrum_byte timex2_value;
 /* The names of the joysticks we can emulate. Order must correspond to
    that of joystick.h:joystick_type_t */
 const char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
-  "None", "Cursor", "Kempston", "Timex 1", "Timex 2"
+  "None",
+  "Cursor",
+  "Kempston",
+  "Sinclair 1", "Sinclair 2",
+  "Timex 1", "Timex 2"
 };
 
 /* Init/shutdown functions. Errors aren't important here */
@@ -111,6 +121,22 @@ joystick_press( int which, joystick_button button, int press )
       kempston_value |=  kempston_mask[ button ];
     } else {
       kempston_value &= ~kempston_mask[ button ];
+    }
+    return 1;
+
+  case JOYSTICK_TYPE_SINCLAIR_1:
+    if( press ) {
+      keyboard_press( sinclair1_key[ button ] );
+    } else {
+      keyboard_release( sinclair1_key[ button ] );
+    }
+    return 1;
+
+  case JOYSTICK_TYPE_SINCLAIR_2:
+    if( press ) {
+      keyboard_press( sinclair2_key[ button ] );
+    } else {
+      keyboard_release( sinclair2_key[ button ] );
     }
     return 1;
 

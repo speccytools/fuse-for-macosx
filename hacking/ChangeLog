@@ -716,3 +716,4 @@
 20040407 ui/gtk/{browse.c,debugger.c,pokefinder.c}: prevent segfault if
 	 the keyboard (space) is used to select things from a GtkCList
 	 (Darren).
+20040407 joystick.[ch]: add emulation of the two Sinclair-type joysticks.
