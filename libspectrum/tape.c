@@ -80,6 +80,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     return rom_init( &(block->types.rom) );
+    break;
   default:
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
@@ -119,6 +120,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     error = rom_edge( &(block->types.rom), tstates, &end_of_block );
     if( error ) return error;
+    break;
   default:
     *tstates = 0;
     return LIBSPECTRUM_ERROR_UNKNOWN;
