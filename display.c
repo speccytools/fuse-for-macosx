@@ -91,11 +91,16 @@ static const int display_border_retrace=-1;
 /* Value used to signify a border line has more than one colour on it. */
 static const int display_border_mixed = 0xff;
 
-/* Where the current block of lines to send to the screen starts */
-static int display_blocked_write_start;
+/* Used for grouping screen writes together */
+struct rectangle { int x,y; int w,h; };
 
-/* Value to signify `no block to send to screen' */
-static const int display_blocked_write_none = -1;
+/* Those rectangles which were modified on the last line to be displayed */
+struct rectangle *active_rectangle = NULL;
+size_t active_rectangle_count = 0, active_rectangle_allocated = 0;
+
+/* Those rectangles which weren't */
+struct rectangle *inactive_rectangle = NULL;
+size_t inactive_rectangle_count = 0, inactive_rectangle_allocated = 0;
 
 static void display_draw_line(int y);
 static void display_dirty8(WORD address);
@@ -105,6 +110,8 @@ static void display_get_attr(int x, int y, BYTE *ink, BYTE *paper);
 
 static void display_set_border(void);
 static int display_border_line(void);
+static int add_rectangle( int y, int x, int w );
+static int end_line( int y );
 
 static void display_dirty_flashing(void);
 static int display_border_column(int time_since_line);
@@ -162,10 +169,7 @@ int display_init(int *argc, char ***argv)
     display_border_dirty[y]=1;
   }
 
-  display_blocked_write_start = display_blocked_write_none;
-
   return 0;
-
 }
 
 /* Draw the current screen line, and increment the line count. Called
@@ -174,6 +178,8 @@ int display_init(int *argc, char ***argv)
 void display_line(void)
 {
   static int frame_count = 0;
+  size_t i; struct rectangle *ptr;
+  int error;
 
   if( display_next_line < DISPLAY_SCREEN_HEIGHT ) {
     display_draw_line(display_next_line);
@@ -184,12 +190,24 @@ void display_line(void)
   /* If we're at the end of the frame, and we've got some data to
      send to the screen, send it now */
   else {
-    if( display_blocked_write_start != display_blocked_write_none ) {
-      uidisplay_lines( display_blocked_write_start, display_next_line-1 );
-      display_blocked_write_start = display_blocked_write_none;
-    }
+
+    /* Force all rectangles into the inactive list */
+    error = end_line( display_next_line ); if( error ) return;
+
     if( settings_current.frame_rate <= ++frame_count ) {
       frame_count = 0;
+
+      for( i = 0, ptr = inactive_rectangle;
+	   i < inactive_rectangle_count;
+	   i++, ptr++ ) {
+	printf( "%d %d %d %d\n", ptr->x, ptr->y, ptr->w, ptr->h );
+	uidisplay_area( 8 * ptr->x, ptr->y + DISPLAY_BORDER_HEIGHT,
+			8 * ptr->w, ptr->h );
+      }
+      printf( "\n" );
+
+      inactive_rectangle_count = 0;
+
       uidisplay_frame_end();
     }
   }
@@ -199,11 +217,10 @@ void display_line(void)
 }   
 
 /* Redraw pixel line y if it is flagged as `dirty' */
-
-static void display_draw_line(int y)
+static void
+display_draw_line( int y )
 {
-
-  int x, screen_y, redraw, colour;
+  int start, x, screen_y, redraw, colour, error;
   BYTE data, data2, ink, paper;
   WORD hires_data;
 
@@ -218,16 +235,23 @@ static void display_draw_line(int y)
       y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
 
     screen_y = y - DISPLAY_BORDER_HEIGHT;
+
+    x = 0;
+
+    while( display_is_dirty[screen_y] ) {
+
+      /* Find the first dirty chunk on this row */
+      while( ! (display_is_dirty[screen_y] & 0x01) ) {
+	display_is_dirty[screen_y] >>= 1;
+	x++;
+      }
+
+      start = x;
+
+      /* Walk to the end of the dirty region, writing the bytes to the
+         drawing area along the way */
+      do {
       
-    if( display_is_dirty[screen_y] ) {
-
-      for( x=0;
-	   display_is_dirty[screen_y];
-	   display_is_dirty[screen_y] >>= 1, x++ ) {
-
-	/* Skip to next 8 pixel chunk if this chunk is clean */
-        if( ! ( display_is_dirty[screen_y] & 0x01 ) ) continue;
-
         display_get_attr( x, screen_y, &ink, &paper );
         data = read_screen_memory( display_get_addr( x, screen_y ) );
         if ( scld_last_dec.name.hires ) {
@@ -250,58 +274,115 @@ static void display_draw_line(int y)
         } else {
           display_plot8( x<<1, screen_y, data, ink, paper );
         }    
+
+	display_is_dirty[screen_y] >>= 1;
+	x++;
+
+      } while( display_is_dirty[screen_y] & 0x01 );
+
+      error = add_rectangle( screen_y, start, x-start ); if( error ) return;
+    }
+
+    error = end_line( screen_y ); if( error ) return;
+
+  }
+
+}
+
+/* Add the rectangle { x, line, w, 1 } to the list of rectangles to be
+   redrawn, either by extending an existing rectangle or creating a
+   new one */
+static int
+add_rectangle( int y, int x, int w )
+{
+  size_t i;
+  struct rectangle *ptr;
+
+  /* Check through all 'active' rectangles (those which were modified
+     on the previous line) and see if we can use this new rectangle
+     to extend them */
+  for( i = 0; i < active_rectangle_count; i++ ) {
+
+    if( active_rectangle[i].x == x &&
+	active_rectangle[i].w == w    ) {
+      active_rectangle[i].h++;
+      return 0;
+    }
+  }
+
+  /* We couldn't find a rectangle to extend, so create a new one */
+  if( ++active_rectangle_count > active_rectangle_allocated ) {
+
+    size_t new_alloc;
+
+    new_alloc = active_rectangle_allocated     ?
+                2 * active_rectangle_allocated :
+                8;
+
+    ptr = realloc( active_rectangle, new_alloc * sizeof( struct rectangle ) );
+    if( !ptr ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    active_rectangle_allocated = new_alloc; active_rectangle = ptr;
+  }
+
+  ptr = &active_rectangle[ active_rectangle_count - 1 ];
+
+  ptr->x = x; ptr->y = y;
+  ptr->w = w; ptr->h = 1;
+
+  return 0;
+}
+
+/* Move all rectangles not updated on this line to the inactive list */
+static int
+end_line( int y )
+{
+  size_t i;
+  struct rectangle *ptr;
+
+  for( i = 0; i < active_rectangle_count; i++ ) {
+
+    /* Skip if this rectangle was updated this line */
+    if( active_rectangle[i].y + active_rectangle[i].h == y + 1 ) continue;
+
+    /* We couldn't find a rectangle to extend, so create a new one */
+    if( ++inactive_rectangle_count > inactive_rectangle_allocated ) {
+
+      size_t new_alloc;
+
+      new_alloc = inactive_rectangle_allocated     ?
+	          2 * inactive_rectangle_allocated :
+	          8;
+
+      ptr = realloc( inactive_rectangle,
+		     new_alloc * sizeof( struct rectangle ) );
+      if( !ptr ) {
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d",
+		  __FILE__, __LINE__ );
+	return 1;
       }
 
-      /* Need to redraw this line */
-      redraw = 1;
-
+      inactive_rectangle_allocated = new_alloc; inactive_rectangle = ptr;
     }
 
+    inactive_rectangle[ inactive_rectangle_count - 1 ] = active_rectangle[i];
+
+    /* Mark the active rectangle as done */
+    active_rectangle[i].h = 0;
   }
 
-  /* We need to redraw this line if the main screen or border has
-     been changed since we were last here... */
-  if( redraw || display_border_dirty[y] ) {
-
-    /* If we're haven't currently got a block, note this line as the
-       start; if we have currently got a block, just carry on until we
-       find a line we don't want to copy to the screen. */
-    if( display_blocked_write_start == display_blocked_write_none ) {
-      display_blocked_write_start = y;
-    }
-
-    display_border_dirty[y]=0;
-
-  }
-  /* If we're _don't_ need to redraw this line, copy any block with
-     exists to the screen */
-  else if( display_blocked_write_start != display_blocked_write_none ) {
-    uidisplay_lines( display_blocked_write_start, y-1 );
-    display_blocked_write_start = display_blocked_write_none;
-  }
-  
-  if(display_current_border[y] != colour) {
-
-    /* See if we're in the top/bottom border */
-    if(y < DISPLAY_BORDER_HEIGHT ||
-       y >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
-
-      /* Colour in all the border to the very right edge */
-      uidisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, colour);
-
-    } else {			/* In main screen */
-
-      /* Colour in the left and right borders */
-      uidisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, colour);
-      uidisplay_set_border(y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
-	  	           DISPLAY_SCREEN_WIDTH, colour);
-    }
-
-    display_current_border[y] = colour;
-    display_border_dirty[y]=1;	/* Need to redisplay this line next time */
-
+  /* Compress the list of active rectangles */
+  for( i = 0, ptr = active_rectangle; i < active_rectangle_count; i++ ) {
+    if( active_rectangle[i].h == 0 ) continue;
+    *ptr = active_rectangle[i]; ptr++;
   }
 
+  active_rectangle_count = ptr - active_rectangle;
+
+  return 0;
 }
 
 /* Mark as `dirty' the pixels which have been changed by a write to byte

@@ -75,5 +75,5 @@ void uidisplay_spectrum_screen( const BYTE *screen, int border )
     }
   }
 
-  uidisplay_lines( 0, DISPLAY_SCREEN_HEIGHT - 1 );
+  uidisplay_area( 0, 0, DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_HEIGHT );
 }

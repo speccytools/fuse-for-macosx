@@ -196,11 +196,13 @@ uidisplay_frame_end( void )
   return;
 }
 
-void uidisplay_lines( int start, int end )
+void
+uidisplay_area( int x, int y, int w, int h )
 {
-  gtkdisplay_area( 0, gtkdisplay_current_size*start,
-		   gtkdisplay_current_size * DISPLAY_ASPECT_WIDTH,
-		   gtkdisplay_current_size * ( end - start + 1 ) );
+  gtkdisplay_area( gtkdisplay_current_size * x,
+		   gtkdisplay_current_size * y,
+		   gtkdisplay_current_size * w,
+		   gtkdisplay_current_size * h );
 }
 
 static void gtkdisplay_area(int x, int y, int width, int height)
