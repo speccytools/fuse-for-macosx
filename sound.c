@@ -59,6 +59,8 @@
 /* configuration */
 int sound_enabled=0;		/* Are we currently using the sound card;
 				   cf fuse.c:fuse_sound_in_use */
+int sound_enabled_ever=0;	/* if it's *ever* been in use; see
+                                   sound_ay_write() and sound_ay_reset() */
 int sound_freq=32000;
 int sound_stereo=0;		/* true for stereo *output sample* (only) */
 int sound_stereo_beeper=0;	/* beeper pseudo-stereo */
@@ -162,6 +164,7 @@ ay_change_count=0;
 
 void sound_init(void)
 {
+static int first_init=1;
 int f,ret;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
@@ -192,7 +195,8 @@ if(!sound_stereo)
   sound_stereo_beeper=0;
   }
 
-sound_enabled=1;
+sound_enabled=sound_enabled_ever=1;
+
 sound_channels=(sound_stereo?2:1);
 sound_framesiz=sound_freq/50;
 
@@ -202,15 +206,29 @@ if((sound_buf=malloc(sound_framesiz*sound_channels))==NULL)
   return;
   }
 
-sound_oldval=sound_oldval_orig=128;
+/* if we're resuming, we need to be careful about what
+ * gets reset. The minimum we can do is the beeper
+ * buffer positions, so that's here.
+ */
 sound_oldpos=-1;
 sound_fillpos=0;
 sound_ptr=sound_buf;
 
-beeper_tick=0;
-beeper_tick_incr=(1<<24)/sound_freq;
+/* this stuff should only happen on the initial call.
+ * (We currently assume the new sample rate will be the
+ * same as the previous one, hence no need to recalculate
+ * things dependent on that.)
+ */
+if(first_init)
+  {
+  first_init=0;
 
-sound_ay_init();
+  sound_oldval=sound_oldval_orig=128;
+  beeper_tick=0;
+  beeper_tick_incr=(1<<24)/sound_freq;
+  
+  sound_ay_init();
+  }
 
 if(sound_stereo_beeper)
   {  
@@ -527,9 +545,12 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
  */
 void sound_ay_write(int reg,int val,DWORD tstates)
 {
-if(!sound_enabled) return;
+/* have to allow it across pauses for snap-loading to work,
+ * so see if sound has *ever* been enabled.
+ */
+if(!sound_enabled_ever) return;
 
-if(tstates>=0 && ay_change_count<AY_CHANGE_MAX)
+if(ay_change_count<AY_CHANGE_MAX)
   {
   ay_change[ay_change_count].tstates=tstates;
   ay_change[ay_change_count].reg=reg;
@@ -546,7 +567,8 @@ void sound_ay_reset(void)
 {
 int f;
 
-if(!sound_enabled) return;
+/* as above... */
+if(!sound_enabled_ever) return;
 
 ay_change_count=0;
 for(f=0;f<15;f++)
