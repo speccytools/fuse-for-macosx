@@ -30,20 +30,17 @@
 
 #include <libspectrum.h>
 
-#include "display.h"
-#include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "memory.h"
 #include "printer.h"
 #include "settings.h"
-#include "snapshot.h"
-#include "sound.h"
 #include "spec16.h"
 #include "spec48.h"
 #include "spectrum.h"
-#include "ui/ui.h"
-#include "z80/z80.h"
+
+static libspectrum_byte empty_chunk[0x2000];
 
 spectrum_port_info spec16_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -70,11 +67,7 @@ int spec16_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_memory    = spec16_readbyte;
-  machine->ram.read_memory_internal  = spec16_readbyte_internal;
   machine->ram.read_screen    = spec48_read_screen_memory;
-  machine->ram.write_memory   = spec16_writebyte;
-  machine->ram.write_memory_internal = spec16_writebyte_internal;
   machine->ram.contend_memory = spec48_contend_memory;
   machine->ram.contend_port   = spec48_contend_port;
   machine->ram.current_screen = 5;
@@ -82,6 +75,8 @@ int spec16_init( fuse_machine_info *machine )
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
   machine->rom_length[0] = 0x4000;
+
+  memset( empty_chunk, 0xff, 0x2000 );
 
   machine->peripherals = spec16_peripherals;
   machine->unattached_port = spec16_unattached_port;
@@ -98,10 +93,30 @@ int
 spec16_reset( void )
 {
   int error;
+  size_t i;
 
   error = machine_load_rom( &ROM[0], settings_current.rom_16,
 			    machine_current->rom_length[0] );
   if( error ) return error;
+
+  memory_map[0] = &ROM[0][0x0000];
+  memory_map[1] = &ROM[0][0x2000];
+  memory_map[2] = &RAM[5][0x0000];
+  memory_map[3] = &RAM[5][0x2000];
+  memory_map[4] = empty_chunk;
+  memory_map[5] = empty_chunk;
+  memory_map[6] = empty_chunk;
+  memory_map[7] = empty_chunk;
+
+  for( i = 0; i < 8; i++ ) memory_writable[i] = 0;
+  memory_writable[2] = memory_writable[3] = 1;
+
+  for( i = 0; i < 8; i++ ) memory_contended[i] = 0;
+  memory_contended[2] = memory_contended[3] = 1;
+
+  memory_screen_chunk1 = RAM[5];
+  memory_screen_chunk2 = NULL;
+  memory_screen_top = 0x1b00;
 
   return 0;
 }

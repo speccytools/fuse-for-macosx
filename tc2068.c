@@ -203,11 +203,7 @@ tc2068_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 1;
-  machine->ram.read_memory	     = tc2068_readbyte;
-  machine->ram.read_memory_internal  = tc2068_readbyte_internal;
   machine->ram.read_screen	     = tc2068_read_screen_memory;
-  machine->ram.write_memory          = tc2068_writebyte;
-  machine->ram.write_memory_internal = tc2068_writebyte_internal;
   machine->ram.contend_memory	     = tc2068_contend_memory;
   machine->ram.contend_port	     = tc2068_contend_port;
   machine->ram.current_screen = 5;

@@ -161,6 +161,7 @@ union
 
 static discs_type discs[4];
 
+int trdos_available = 0;
 int trdos_active=0;
 
 /* The template used for naming the results of the SCL->TRD conversion */
@@ -200,7 +201,7 @@ trdos_reset( void )
 void
 trdos_end( void )
 {
-  ;
+  trdos_available = 0;
 }
 
 static

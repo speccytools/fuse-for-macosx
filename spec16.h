@@ -29,6 +29,10 @@
 
 #include <libspectrum.h>
 
+#ifndef FUSE_MACHINE_H
+#include "machine.h"
+#endif			/* #ifndef FUSE_MACHINE_H */
+
 libspectrum_byte spec16_readbyte( libspectrum_word address );
 libspectrum_byte spec16_readbyte_internal( libspectrum_word address );
 void spec16_writebyte( libspectrum_word address, libspectrum_byte b );

@@ -80,8 +80,7 @@ fuse_SOURCES = ay.c \
 	screenshot.c \
 	sdlsound.c
 
-fuse_LDADD = memory_internal.o \
-debugger/libdebugger.a \
+fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
 pokefinder/libpokefinder.a \
 ui/scaler/libscaler.a \
@@ -100,9 +99,6 @@ fuse_DEPENDENCIES = memory_internal.o @UI_LIBS@ debugger/libdebugger.a \
 
 BUILT_SOURCES = settings.c settings.h
 
-memory_internal.o: memory.c
-	$(COMPILE) -DINTERNAL -c memory.c -o memory_internal.o
-
 settings.c: settings.pl settings.dat
 	@PERL@ settings.pl settings.dat > settings.c
 
@@ -120,6 +116,7 @@ noinst_HEADERS = ay.h \
 	event.h \
 	fuse.h keyboard.h keysyms.h\
 	machine.h \
+	memory.h \
 	osssound.h \
 	pentagon.h \
 	psg.h \

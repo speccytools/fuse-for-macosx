@@ -35,7 +35,7 @@
 
 #include "fuse.h"
 #include "gtkinternals.h"
-#include "spectrum.h"
+#include "memory.h"
 #include "ui/ui.h"
 #include "utils.h"
 

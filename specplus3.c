@@ -48,19 +48,22 @@
 #include <libspectrum.h>
 
 #include "ay.h"
-#include "display.h"
+#include "compat.h"
 #include "fuse.h"
 #include "joystick.h"
 #include "machine.h"
+#include "memory.h"
 #include "printer.h"
 #include "settings.h"
-#include "spec128.h"
-#include "specplus2a.h"
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 
 static libspectrum_dword specplus3_contend_delay( void );
+
+static int normal_memory_map( int rom, int page );
+static int special_memory_map( int which );
+static int select_special_map( int page1, int page2, int page3, int page4 );
 
 #ifdef HAVE_765_H
 static void specplus3_fdc_reset( void );
@@ -79,14 +82,14 @@ spectrum_port_info specplus3_peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
-  { 0xc002, 0x4000, spectrum_port_noread, spec128_memoryport_write },
+  { 0xc002, 0x4000, spectrum_port_noread, specplus3_memoryport_write },
 
 #ifdef HAVE_765_H
   { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
   { 0xf002, 0x2000, specplus3_fdc_status, spectrum_port_nowrite },
 #endif			/* #ifdef HAVE_765_H */
 
-  { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport_write },
+  { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport2_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
@@ -111,37 +114,7 @@ libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset )
 
 libspectrum_dword specplus3_contend_memory( libspectrum_word address )
 {
-  int bank;
-
-  /* Contention occurs in pages 4 to 7. If we're not in a special
-     RAM configuration, the logic is the same as for the 128K machine.
-     If we are, just enumerate the cases */
-  if( machine_current->ram.special ) {
-
-    switch( machine_current->ram.specialcfg ) {
-
-    case 0: /* Pages 0, 1, 2, 3 */
-      return 0;
-    case 1: /* Pages 4, 5, 6, 7 */
-      return specplus3_contend_delay();
-    case 2: /* Pages 4, 5, 6, 3 */
-    case 3: /* Pages 4, 7, 6, 3 */
-      bank = address / 0x4000;
-      switch( bank ) {
-      case 0: case 1: case 2:
-	return specplus3_contend_delay();
-      case 3:
-	return 0;
-      }
-    }
-
-  } else {
-
-    if( ( address >= 0x4000 && address < 0x8000 ) ||
-	( address >= 0xc000 && machine_current->ram.current_page >= 4 )
-	)
-      return specplus3_contend_delay();
-  }
+  if( memory_contended[ address >> 13 ] ) return specplus3_contend_delay();
 
   return 0;
 }
@@ -212,11 +185,7 @@ int specplus3_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_memory	     = specplus3_readbyte;
-  machine->ram.read_memory_internal  = specplus3_readbyte_internal;
   machine->ram.read_screen	     = specplus3_read_screen_memory;
-  machine->ram.write_memory          = specplus3_writebyte;
-  machine->ram.write_memory_internal = specplus3_writebyte_internal;
   machine->ram.contend_memory	     = specplus3_contend_memory;
   machine->ram.contend_port	     = specplus3_contend_port;
 
@@ -272,15 +241,6 @@ int specplus3_reset(void)
 {
   int error;
 
-  machine_current->ram.current_page=0; machine_current->ram.current_rom=0;
-  machine_current->ram.current_screen=5;
-  machine_current->ram.locked=0;
-  machine_current->ram.special=0; machine_current->ram.specialcfg=0;
-
-#ifdef HAVE_765_H
-  specplus3_fdc_reset();
-#endif
-
   error = machine_load_rom( &ROM[0], settings_current.rom_plus3_0,
 			    machine_current->rom_length[0] );
   if( error ) return error;
@@ -295,12 +255,98 @@ int specplus3_reset(void)
   if( error ) return error;
 
 #ifdef HAVE_765_H
+
+  specplus3_fdc_reset();
+
   /* We can eject disks only if they are currently present */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
 		    drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
 		    drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
+
 #endif				/* #ifdef HAVE_765_H */
+
+  return specplus3_plus2a_common_reset();
+}
+
+int
+specplus3_plus2a_common_reset()
+{
+  int error;
+  size_t i;
+
+  machine_current->ram.current_page=0; machine_current->ram.current_rom=0;
+  machine_current->ram.current_screen=5;
+  machine_current->ram.locked=0;
+  machine_current->ram.special=0;
+
+  error = normal_memory_map( 0, 0 ); if( error ) return error;
+  for( i = 2; i < 8; i++ ) memory_writable[i] = 1;
+
+  memory_screen_chunk1 = RAM[5];
+  memory_screen_chunk2 = NULL;
+  memory_screen_top = 0x1b00;
+
+  return 0;
+}
+
+static int
+normal_memory_map( int rom, int page )
+{
+  memory_map[0] = &ROM[  rom ][0x0000];
+  memory_map[1] = &ROM[  rom ][0x2000];
+  memory_map[2] = &RAM[    5 ][0x0000];
+  memory_map[3] = &RAM[    5 ][0x2000];
+  memory_map[4] = &RAM[    2 ][0x0000];
+  memory_map[5] = &RAM[    2 ][0x2000];
+  memory_map[6] = &RAM[ page ][0x0000];
+  memory_map[7] = &RAM[ page ][0x2000];
+
+  memory_writable[0] = memory_writable[1] = 0;
+
+  memory_contended[0] = memory_contended[1] = 0;
+  memory_contended[2] = memory_contended[3] = 1;
+  memory_contended[4] = memory_contended[5] = 0;
+  /* Pages 4, 5, 6 and 7 contended */
+  memory_contended[6] = memory_contended[7] = page & 0x04;
+
+  return 0;
+}
+
+static int
+special_memory_map( int which )
+{
+  switch( which ) {
+  case 0: return select_special_map( 0, 1, 2, 3 );
+  case 1: return select_special_map( 4, 5, 6, 7 );
+  case 2: return select_special_map( 4, 5, 6, 3 );
+  case 3: return select_special_map( 4, 7, 6, 3 );
+
+  default:
+    ui_error( UI_ERROR_ERROR, "unknown +3 special configuration %d", which );
+    return 1;
+  }
+}
+
+static int
+select_special_map( int page1, int page2, int page3, int page4 )
+{
+  memory_map[0] = &RAM[ page1 ][0x0000];
+  memory_map[1] = &RAM[ page1 ][0x0000];
+  memory_map[2] = &RAM[ page2 ][0x0000];
+  memory_map[3] = &RAM[ page2 ][0x0000];
+  memory_map[4] = &RAM[ page3 ][0x0000];
+  memory_map[5] = &RAM[ page3 ][0x0000];
+  memory_map[6] = &RAM[ page4 ][0x0000];
+  memory_map[7] = &RAM[ page4 ][0x0000];
+
+  memory_writable[0] = memory_writable[1] = 1;
+
+  /* Pages 4, 5, 6 and 7 contended */
+  memory_contended[0] = memory_contended[1] = page1 & 0x04;
+  memory_contended[2] = memory_contended[3] = page2 & 0x04;
+  memory_contended[4] = memory_contended[5] = page3 & 0x04;
+  memory_contended[5] = memory_contended[7] = page4 & 0x04;
 
   return 0;
 }
@@ -309,48 +355,85 @@ void
 specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
 			    libspectrum_byte b )
 {
+  int page, rom, screen;
+
+  if( machine_current->ram.locked ) return;
+
+  page = b & 0x07;
+  screen = ( b & 0x08 ) ? 7 : 5;
+  rom = ( machine_current->ram.current_rom & 0x02 ) | ( ( b & 0x10 ) >> 4 );
+
+  /* Change the memory map unless we're in a special RAM configuration */
+
+  if( !machine_current->ram.special ) {
+
+    memory_map[0] = &ROM[ rom ][0x0000];
+    memory_map[1] = &ROM[ rom ][0x2000];
+
+    memory_map[6] = &RAM[ page ][0x0000];
+    memory_map[7] = &RAM[ page ][0x2000];
+
+    /* Pages 4, 5, 6 and 7 are contended */
+    memory_contended[6] = memory_contended[7] = page & 0x04;
+  }
+
+  memory_screen_chunk1 = RAM[ screen ];
+
+  /* If we changed the active screen, mark the entire display file as
+     dirty so we redraw it on the next pass */
+  if( screen != machine_current->ram.current_screen )
+    display_refresh_all();
+
+  machine_current->ram.current_page = page;
+  machine_current->ram.current_screen = screen;
+  machine_current->ram.current_rom = rom;
+  machine_current->ram.locked = ( b & 0x20 );
+
+  machine_current->ram.last_byte = b;
+}
+
+void
+specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
+			     libspectrum_byte b )
+{
   /* Let the parallel printer code know about the strobe bit */
   printer_parallel_strobe_write( b & 0x10 );
+
+#ifdef HAVE_765_H
+  /* If this was called by a machine which has a +3-style disk (ie the +3
+     as opposed to the +2A), set the state of both floppy drive motors */
+  if( libspectrum_machine_capabilities( machine_current->machine ) &&
+      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
+
+    fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
+
+    ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
+			 b & 0x08 ? UI_STATUSBAR_STATE_ACTIVE :
+			            UI_STATUSBAR_STATE_INACTIVE );
+  }
+#endif				/* #ifdef HAVE_765_H */
 
   /* Do nothing else if we've locked the RAM configuration */
   if( machine_current->ram.locked ) return;
 
   /* Store the last byte written in case we need it */
-  machine_current->ram.last_byte2=b;
+  machine_current->ram.last_byte2 = b;
 
-#ifdef HAVE_765_H
-  /* If this was called by a machine which has a +3-style disk (ie the +3
-     as opposed to the +2A), set the state of both ( 3 = ( 1<<0 ) + ( 1<<1 ) )
-     floppy drive motors */
-  if( libspectrum_machine_capabilities( machine_current->machine ) &&
-      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
-
-    int capabilities;
-
-    fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
-
-    capabilities =
-      libspectrum_machine_capabilities( machine_current->machine );
-    if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
-      ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
-			   b & 0x08 ? UI_STATUSBAR_STATE_ACTIVE :
-				      UI_STATUSBAR_STATE_INACTIVE );
-  }
-#endif			/* #ifdef HAVE_765_H */
-
-  if( b & 0x01) {	/* Check whether we want a special RAM configuration */
+  if( b & 0x01 ) {	/* Check whether we want a special RAM configuration */
 
     /* If so, select it */
-    machine_current->ram.special=1;
-    machine_current->ram.specialcfg= ( b & 0x06 ) >> 1;
+    machine_current->ram.special = 1;
+    special_memory_map( ( b & 0x06 ) >> 1 );
 
   } else {
 
     /* If not, we're selecting the high bit of the current ROM */
-    machine_current->ram.special=0;
-    machine_current->ram.current_rom=(machine_current->ram.current_rom & 0x01) |
-      ( (b & 0x04) >> 1 );
+    machine_current->ram.special = 0;
+    machine_current->ram.current_rom = 
+      ( machine_current->ram.current_rom & 0x01 ) | ( ( b & 0x04 ) >> 1 );
 
+    normal_memory_map( machine_current->ram.current_rom,
+		       machine_current->ram.current_page );
   }
 
 }

@@ -46,6 +46,7 @@
 
 #include "dck.h"
 #include "fuse.h"
+#include "memory.h"
 #include "rzx.h"
 #include "snapshot.h"
 #include "specplus3.h"
@@ -141,6 +142,8 @@ utils_open_file( const char *filename, int autoload,
     if( autoload ) {
       machine_current->ram.current_rom = 1;
       trdos_active = 1;
+      memory_map[0] = &ROM[2][0x0000];
+      memory_map[1] = &ROM[2][0x2000];
     }
     break;
 

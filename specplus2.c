@@ -48,11 +48,7 @@ int specplus2_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_memory	     = spec128_readbyte;
-  machine->ram.read_memory_internal  = spec128_readbyte_internal;
   machine->ram.read_screen	     = spec128_read_screen_memory;
-  machine->ram.write_memory          = spec128_writebyte;
-  machine->ram.write_memory_internal = spec128_writebyte_internal;
   machine->ram.contend_memory	     = spec128_contend_memory;
   machine->ram.contend_port	     = spec128_contend_port;
 
@@ -76,11 +72,6 @@ specplus2_reset( void )
 {
   int error;
 
-  machine_current->ram.locked=0;
-  machine_current->ram.current_page=0;
-  machine_current->ram.current_rom=0;
-  machine_current->ram.current_screen=5;
-
   error = machine_load_rom( &ROM[0], settings_current.rom_plus2_0,
 			    machine_current->rom_length[0] );
   if( error ) return error;
@@ -88,5 +79,5 @@ specplus2_reset( void )
 			    machine_current->rom_length[1] );
   if( error ) return error;
 
-  return 0;
+  return spec128_common_reset( 1 );
 }

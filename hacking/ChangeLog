@@ -352,3 +352,5 @@
 	 z80/z80.pl, z80/z80_macros.h, z80/tests/: Z80 core improvements
 	 to reduce the number of calls made to contend_memory().
 20031113 printer.c: readbyte() should be readbyte_internal().
+20031114 Make the memory access routines both simpler and more flexible.
+	 TODO: TC2068 routines.

@@ -31,10 +31,10 @@
 
 #include <libspectrum.h>
 
-#include "display.h"
 #include "fuse.h"
 #include "joystick.h"
 #include "machine.h"
+#include "memory.h"
 #include "printer.h"
 #include "settings.h"
 #include "scld.h"
@@ -73,10 +73,9 @@ tc2048_read_screen_memory( libspectrum_word offset )
 libspectrum_dword
 tc2048_contend_memory( libspectrum_word address )
 {
-  /* Contention occurs only in the lowest 16Kb of RAM */
-  if( address < 0x4000 || address > 0x7fff ) return 0;
+  if( memory_contended[ address >> 13 ] ) return tc2048_contend_delay();
 
-  return tc2048_contend_delay();
+  return 0;
 }
 
 libspectrum_dword
@@ -147,11 +146,7 @@ int tc2048_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 1;
-  machine->ram.read_memory	     = tc2048_readbyte;
-  machine->ram.read_memory_internal  = tc2048_readbyte_internal;
   machine->ram.read_screen	     = tc2048_read_screen_memory;
-  machine->ram.write_memory          = tc2048_writebyte;
-  machine->ram.write_memory_internal = tc2048_writebyte_internal;
   machine->ram.contend_memory	     = tc2048_contend_memory;
   machine->ram.contend_port	     = tc2048_contend_port;
   machine->ram.current_screen = 5;
@@ -175,10 +170,30 @@ int
 tc2048_reset( void )
 {
   int error;
+  size_t i;
 
   error = machine_load_rom( &ROM[0], settings_current.rom_tc2048,
 			    machine_current->rom_length[0] );
   if( error ) return error;
+
+  memory_map[0] = &ROM[0][0x0000];
+  memory_map[1] = &ROM[0][0x2000];
+  memory_map[2] = &RAM[5][0x0000];
+  memory_map[3] = &RAM[5][0x2000];
+  memory_map[4] = &RAM[2][0x0000];
+  memory_map[5] = &RAM[2][0x2000];
+  memory_map[6] = &RAM[0][0x0000];
+  memory_map[7] = &RAM[0][0x2000];
+
+  memory_writable[0] = memory_writable[1] = 0;
+  for( i = 2; i < 8; i++ ) memory_writable[i] = 1;
+
+  for( i = 0; i < 8; i++ ) memory_contended[i] = 0;
+  memory_contended[2] = memory_contended[3] = 1;
+
+  memory_screen_chunk1 = &RAM[5][0x0000];
+  memory_screen_chunk2 = &RAM[5][0x2000];
+  memory_screen_top = 0x1b00;
 
   return 0;
 }

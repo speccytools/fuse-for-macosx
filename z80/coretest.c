@@ -46,17 +46,15 @@ libspectrum_dword event_next_event;
 /* 64Kb of RAM */
 static libspectrum_byte initial_memory[ 0x10000 ], memory[ 0x10000 ];
 
-spectrum_memory_read_function readbyte, readbyte_internal;
-spectrum_memory_write_function writebyte;
+libspectrum_byte readbyte( libspectrum_word address );
+libspectrum_byte readbyte_internal( libspectrum_word address );
+
+void writebyte( libspectrum_word address, libspectrum_byte b );
+void writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
 spectrum_memory_contention_function contend_memory;
 spectrum_port_contention_function contend_port;
 
-static libspectrum_byte trivial_readbyte( libspectrum_word address );
-static libspectrum_byte trivial_readbyte_internal( libspectrum_word address );
-static void trivial_writebyte( libspectrum_word address, libspectrum_byte b );
-static void trivial_writebyte_internal( libspectrum_word address,
-					libspectrum_byte b );
 static libspectrum_dword trivial_contend_memory( libspectrum_word address );
 static libspectrum_dword trivial_contend_port( libspectrum_word port );
 
@@ -84,9 +82,6 @@ main( int argc, char **argv )
   z80_init();
 
   /* Set up our trivial machine */
-  readbyte = trivial_readbyte;
-  readbyte_internal = trivial_readbyte_internal;
-  writebyte = trivial_writebyte;
   contend_memory = trivial_contend_memory;
   contend_port = trivial_contend_port;
 
@@ -111,31 +106,31 @@ main( int argc, char **argv )
   return 0;
 }
 
-static libspectrum_byte
-trivial_readbyte( libspectrum_word address )
+libspectrum_byte
+readbyte( libspectrum_word address )
 {
   trivial_contend_memory( address );
   tstates += 3;
-  return trivial_readbyte_internal( address );
+  return readbyte_internal( address );
 }
 
-static libspectrum_byte
-trivial_readbyte_internal( libspectrum_word address )
+libspectrum_byte
+readbyte_internal( libspectrum_word address )
 {
   printf( "%5d MR %04x %02x\n", tstates, address, memory[ address ] );
   return memory[ address ];
 }
 
-static void
-trivial_writebyte( libspectrum_word address, libspectrum_byte b )
+void
+writebyte( libspectrum_word address, libspectrum_byte b )
 {
   trivial_contend_memory( address );
   tstates += 3;
-  trivial_writebyte_internal( address, b );
+  writebyte_internal( address, b );
 }
 
-static void
-trivial_writebyte_internal( libspectrum_word address, libspectrum_byte b )
+void
+writebyte_internal( libspectrum_word address, libspectrum_byte b )
 {
   printf( "%5d MW %04x %02x\n", tstates, address, b );
   memory[ address ] = b;
@@ -334,6 +329,9 @@ int rzx_instructions_offset;
 
 enum debugger_mode_t debugger_mode;
 
+libspectrum_byte **ROM = NULL;
+libspectrum_byte **memory_map = NULL;
+
 int
 debugger_check( debugger_breakpoint_type type, libspectrum_word value )
 {
@@ -348,7 +346,8 @@ debugger_trap( void )
   abort();
 }
 
-int trdos_active;
+int trdos_available = 0;
+int trdos_active = 0;
 
 int
 event_add( libspectrum_dword event_time, int type )

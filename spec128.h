@@ -49,6 +49,7 @@ libspectrum_dword spec128_contend_port( libspectrum_word port );
 
 int spec128_init( fuse_machine_info *machine );
 int spec128_reset(void);
+int spec128_common_reset( int contention );
 
 void spec128_memoryport_write( libspectrum_word port, libspectrum_byte b );
 

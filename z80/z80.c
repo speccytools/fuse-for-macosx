@@ -28,6 +28,7 @@
 
 #include "event.h"
 #include "fuse.h"
+#include "memory.h"
 #include "rzx.h"
 #include "scld.h"
 #include "spectrum.h"

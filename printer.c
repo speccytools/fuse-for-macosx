@@ -37,9 +37,9 @@
 
 #include "fuse.h"
 #include "machine.h"
+#include "memory.h"
 #include "printer.h"
 #include "settings.h"
-#include "spectrum.h"
 #include "ui/ui.h"
 
 static int printer_graphics_enabled=0;

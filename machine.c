@@ -208,11 +208,7 @@ machine_select_machine( fuse_machine_info *machine )
     return 1;
   if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
-  readbyte = machine->ram.read_memory;
-  readbyte_internal = machine->ram.read_memory_internal;
   read_screen_memory = machine->ram.read_screen;
-  writebyte = machine->ram.write_memory;
-  writebyte_internal = machine->ram.write_memory_internal;
   contend_memory = machine->ram.contend_memory;
   contend_port = machine->ram.contend_port;
   

@@ -32,9 +32,9 @@
 
 #include "ay.h"
 #include "compat.h"
-#include "display.h"
 #include "joystick.h"
 #include "machine.h"
+#include "memory.h"
 #include "settings.h"
 #include "spec128.h"
 #include "spectrum.h"
@@ -65,12 +65,7 @@ spec128_read_screen_memory( libspectrum_word offset )
 libspectrum_dword
 spec128_contend_memory( libspectrum_word address )
 {
-  /* Contention occurs in pages 1,3, 5 and 7. 0x4000 to 0x7fff is always page
-     5, whilst 0xc000 to 0xffff could have one of the contended pages in */
-  if( ( address >= 0x4000 && address < 0x8000 ) ||
-      ( address >= 0xc000 && ( machine_current->ram.current_page & 0x01 ) )
-    )
-    return spec128_contend_delay();
+  if( memory_contended[ address >> 13 ] ) return spec128_contend_delay();
 
   return 0;
 }
@@ -141,11 +136,7 @@ int spec128_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_memory	     = spec128_readbyte;
-  machine->ram.read_memory_internal  = spec128_readbyte_internal;
   machine->ram.read_screen	     = spec128_read_screen_memory;
-  machine->ram.write_memory          = spec128_writebyte;
-  machine->ram.write_memory_internal = spec128_writebyte_internal;
   machine->ram.contend_memory	     = spec128_contend_memory;
   machine->ram.contend_port	     = spec128_contend_port;
 
@@ -168,17 +159,47 @@ int spec128_reset(void)
 {
   int error;
 
-  machine_current->ram.locked=0;
-  machine_current->ram.current_page=0;
-  machine_current->ram.current_rom=0;
-  machine_current->ram.current_screen=5;
-
   error = machine_load_rom( &ROM[0], settings_current.rom_128_0,
 			    machine_current->rom_length[0] );
   if( error ) return error;
   error = machine_load_rom( &ROM[1], settings_current.rom_128_1,
 			    machine_current->rom_length[1] );
   if( error ) return error;
+
+  return spec128_common_reset( 1 );
+}
+
+int
+spec128_common_reset( int contention )
+{
+  size_t i;
+
+  machine_current->ram.locked=0;
+  machine_current->ram.current_page=0;
+  machine_current->ram.current_rom=0;
+  machine_current->ram.current_screen=5;
+
+  memory_map[0] = &ROM[0][0x0000];
+  memory_map[1] = &ROM[0][0x2000];
+  memory_map[2] = &RAM[5][0x0000];
+  memory_map[3] = &RAM[5][0x2000];
+  memory_map[4] = &RAM[2][0x0000];
+  memory_map[5] = &RAM[2][0x2000];
+  memory_map[6] = &RAM[0][0x0000];
+  memory_map[7] = &RAM[0][0x2000];
+
+  memory_writable[0] = memory_writable[1] = 0;
+  for( i = 2; i < 8; i++ ) memory_writable[i] = 1;
+
+  for( i = 0; i < 8; i++ ) memory_contended[i] = 0;
+
+  if( contention ) {
+    memory_contended[2] = memory_contended[3] = 1;
+  }
+
+  memory_screen_chunk1 = RAM[5];
+  memory_screen_chunk2 = NULL;
+  memory_screen_top = 0x1b00;
 
   return 0;
 }
@@ -187,26 +208,34 @@ void
 spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
 			  libspectrum_byte b )
 {
-  int old_screen;
+  int page, rom, screen;
 
-  /* Do nothing if we've locked the RAM configuration */
-  if(machine_current->ram.locked) return;
+  if( machine_current->ram.locked ) return;
     
-  old_screen=machine_current->ram.current_screen;
+  page = b & 0x07;
+  screen = ( b & 0x08 ) ? 7 : 5;
+  rom = ( b & 0x10 ) >> 4;
 
-  /* Store the last byte written in case we need it */
-  machine_current->ram.last_byte=b;
+  memory_map[0] = &ROM[ rom ][0x0000];
+  memory_map[1] = &ROM[ rom ][0x2000];
 
-  /* Work out which page, screen and ROM are selected */
-  machine_current->ram.current_page= b & 0x07;
-  machine_current->ram.current_screen=( b & 0x08 ) ? 7 : 5;
-  machine_current->ram.current_rom=(machine_current->ram.current_rom & 0x02) |
-    ( (b & 0x10) >> 4 );
+  memory_map[6] = &RAM[ page ][0x0000];
+  memory_map[7] = &RAM[ page ][0x2000];
 
-  /* Are we locking the RAM configuration? */
-  machine_current->ram.locked=( b & 0x20 );
+  /* Pages 1, 3, 5 and 7 are contended */
+  memory_contended[6] = memory_contended[7] = page & 0x01;
+
+  memory_screen_chunk1 = RAM[ screen ];
 
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
-  if(machine_current->ram.current_screen!=old_screen) display_refresh_all();
+  if( screen != machine_current->ram.current_screen )
+    display_refresh_all();
+
+  machine_current->ram.current_page = page;
+  machine_current->ram.current_rom = rom;
+  machine_current->ram.current_screen = screen;
+  machine_current->ram.locked = ( b & 0x20 );
+
+  machine_current->ram.last_byte = b;
 }

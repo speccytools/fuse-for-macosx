@@ -33,17 +33,13 @@
 
 #include "ay.h"
 #include "compat.h"
-#include "display.h"
 #include "joystick.h"
-#include "keyboard.h"
-#include "machine.h"
+#include "memory.h"
 #include "settings.h"
-#include "snapshot.h"
-#include "sound.h"
 #include "pentagon.h"
+#include "spec128.h"
 #include "spectrum.h"
 #include "trdos.h"
-#include "z80/z80.h"
 
 static libspectrum_byte pentagon_select_1f_read( libspectrum_word port );
 static libspectrum_byte pentagon_select_ff_read( libspectrum_word port );
@@ -123,11 +119,7 @@ pentagon_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_memory    = pentagon_readbyte;
-  machine->ram.read_memory_internal  = pentagon_readbyte_internal;
   machine->ram.read_screen    = pentagon_read_screen_memory;
-  machine->ram.write_memory   = pentagon_writebyte;
-  machine->ram.write_memory_internal  = pentagon_writebyte_internal;
   machine->ram.contend_memory = pentagon_contend_memory;
   machine->ram.contend_port   = pentagon_contend_port;
 
@@ -152,11 +144,6 @@ pentagon_reset(void)
 {
   int error;
 
-  machine_current->ram.locked=0;
-  machine_current->ram.current_page=0;
-  machine_current->ram.current_rom=0;
-  machine_current->ram.current_screen=5;
-
   trdos_reset();
 
   error = machine_load_rom( &ROM[0], settings_current.rom_pentagon_0,
@@ -169,35 +156,42 @@ pentagon_reset(void)
 			    machine_current->rom_length[2] );
   if( error ) return error;
 
-  return 0;
+  trdos_available = 1;
+
+  return spec128_common_reset( 0 );
 }
 
 void
 pentagon_memoryport_write( libspectrum_word port GCC_UNUSED,
 			   libspectrum_byte b )
 {
-  int old_screen;
+  int page, rom, screen;
 
-  /* Do nothing if we've locked the RAM configuration */
-  if(machine_current->ram.locked) return;
+  if( machine_current->ram.locked ) return;
     
-  old_screen=machine_current->ram.current_screen;
+  page = b & 0x07;
+  screen = ( b & 0x08 ) ? 7 : 5;
+  rom = ( b & 0x10 ) >> 4;
 
-  /* Store the last byte written in case we need it */
-  machine_current->ram.last_byte=b;
+  memory_map[0] = &ROM[ rom ][0x0000];
+  memory_map[1] = &ROM[ rom ][0x2000];
 
-  /* Work out which page, screen and ROM are selected */
-  machine_current->ram.current_page= b & 0x07;
-  machine_current->ram.current_screen=( b & 0x08 ) ? 7 : 5;
-  machine_current->ram.current_rom=(machine_current->ram.current_rom & 0x02) |
-    ( (b & 0x10) >> 4 );
+  memory_map[6] = &RAM[ page ][0x0000];
+  memory_map[7] = &RAM[ page ][0x2000];
 
-  /* Are we locking the RAM configuration? */
-  machine_current->ram.locked=( b & 0x20 );
+  memory_screen_chunk1 = RAM[ screen ];
 
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
-  if(machine_current->ram.current_screen!=old_screen) display_refresh_all();
+  if( screen != machine_current->ram.current_screen )
+    display_refresh_all();
+
+  machine_current->ram.current_page = page;
+  machine_current->ram.current_rom = rom;
+  machine_current->ram.current_screen = screen;
+  machine_current->ram.locked = ( b & 0x20 );
+
+  machine_current->ram.last_byte = b;
 }
 
 static int

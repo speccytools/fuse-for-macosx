@@ -28,6 +28,7 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
+#include "memory.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80/z80.h"

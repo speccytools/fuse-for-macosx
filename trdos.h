@@ -31,6 +31,7 @@
 
 #include <libspectrum.h>
 
+extern int trdos_available;	/* Is TRDOS available for use? */
 extern int trdos_active;     /* TRDOS enabled? */
 
 int trdos_init( void );

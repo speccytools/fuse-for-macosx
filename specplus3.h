@@ -55,7 +55,10 @@ libspectrum_dword specplus3_contend_port( libspectrum_word address );
 int specplus3_init( fuse_machine_info *machine );
 int specplus3_reset(void);
 
+int specplus3_plus2a_common_reset();
+
 void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
+void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );
 
 /* We need these outside the HAVE_765_H guards as they're also used
    for identifying the TRDOS drives */
