@@ -188,8 +188,6 @@ tc2068_init( fuse_machine_info *machine )
 
   machine->unattached_port = tc2068_unattached_port;
 
-  machine->ay.present = 1;
-
   machine->shutdown = NULL;
 
   return 0;

@@ -707,3 +707,6 @@
 20040403 widget/select.c: Add <string.h> for strlen
 20040403 ui/sdl/sdldisplay.c: Fix icon overlays for timex machines
 20040403 ui.c: Add <string.h> for strncpy and strcmp
+20040404 ay.h,sound.h,machines/{pentagon.c,scorpion.c,spec128.c,spec16.c,
+	 spec48.c,specplus2.c,specplus2a.c,specplus3.c,specplus3e.c,
+	 tc2048.c,tc2068.c}: remove use of ayinfo.present.

@@ -57,8 +57,6 @@ int specplus2_init( fuse_machine_info *machine )
 
   machine->unattached_port = spec128_unattached_port;
 
-  machine->ay.present = 1;
-
   machine->shutdown = NULL;
 
   return 0;

@@ -140,8 +140,6 @@ int tc2048_init( fuse_machine_info *machine )
 
   machine->unattached_port = tc2048_unattached_port;
 
-  machine->ay.present = 0;
-
   machine->shutdown = NULL;
 
   return 0;

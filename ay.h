@@ -30,7 +30,6 @@
 #include <libspectrum.h>
 
 typedef struct ayinfo {
-  int present;
   int current_register;
   libspectrum_byte registers[16];
 } ayinfo;

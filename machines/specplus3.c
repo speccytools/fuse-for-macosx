@@ -184,8 +184,6 @@ int specplus3_init( fuse_machine_info *machine )
 
   machine->unattached_port = specplus3_unattached_port;
 
-  machine->ay.present=1;
-
   specplus3_765_init();
 
   machine->shutdown = specplus3_shutdown;

@@ -80,8 +80,6 @@ int spec16_init( fuse_machine_info *machine )
 
   machine->unattached_port = spec16_unattached_port;
 
-  machine->ay.present = 0;
-
   machine->shutdown = NULL;
 
   return 0;

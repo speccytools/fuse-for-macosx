@@ -132,8 +132,6 @@ scorpion_init( fuse_machine_info *machine )
 
   machine->unattached_port = scorpion_unattached_port;
 
-  machine->ay.present = 1;
-
   machine->shutdown = scorpion_shutdown;
 
   return 0;

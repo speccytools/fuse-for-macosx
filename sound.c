@@ -377,7 +377,7 @@ int chan1,chan2,chan3;
 unsigned int tone_count,noise_count;
 
 /* If no AY chip, don't produce any AY sound (!) */
-if(!machine_current->ay.present) return;
+if(!machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY) return;
 
 /* convert change times to sample offsets */
 for(f=0;f<ay_change_count;f++)
