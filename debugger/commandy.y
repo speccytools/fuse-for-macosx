@@ -109,6 +109,9 @@ void yyerror( char *s );
 
 /* Low precedence */
 
+%left '|'
+%left '^'
+%left '&'
 %left EQUALITY
 %left COMPARISION
 %left '+' '-'
@@ -208,6 +211,18 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 	      }
 	    | expression COMPARISION expression {
 	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression '&' expression {
+	        $$ = debugger_expression_new_binaryop( '&', $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression '^' expression {
+	        $$ = debugger_expression_new_binaryop( '^', $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression '|' expression {
+	        $$ = debugger_expression_new_binaryop( '|', $1, $3 );
 		if( !$$ ) YYABORT;
 	      }
 ;

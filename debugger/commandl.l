@@ -107,6 +107,10 @@ sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 "*"		{ yylval.token = '*'; return TIMES_DIVIDE; }
 "/"		{ yylval.token = '/'; return TIMES_DIVIDE; }
 
+"&"		{ return '&'; }
+"^"		{ return '^'; }
+"|"		{ return '|'; }
+
 ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  return NUMBER; }
 0x{HEX}+	{ yylval.integer = strtol( yytext+2, NULL, 16 );
