@@ -64,19 +64,6 @@ typedef struct widget_t {
   widget_keyhandler_fn keyhandler;	/* Keyhandler */
 } widget_t;
 
-/* The information we need to store to recurse from a widget */
-typedef struct widget_recurse_t {
-
-  widget_type type;		/* Which type of widget are we? */
-  void *data;			/* What data were we passed? */
-
-  int finished;			/* Have we finished this widget yet? */
-
-} widget_recurse_t;
-
-/* A `stack' so we can recurse through widgets */
-extern widget_recurse_t widget_return[];
-
 int widget_end_widget( widget_finish_state state );
 int widget_end_all( widget_finish_state state );
 

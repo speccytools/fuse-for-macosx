@@ -55,7 +55,16 @@ static char widget_font[768];
 widget_keyhandler_fn widget_keyhandler;
 
 /* The data used for recursive widgets */
-widget_recurse_t widget_return[10];
+typedef struct widget_recurse_t {
+
+  widget_type type;		/* Which type of widget are we? */
+  void *data;			/* What data were we passed? */
+
+  int finished;			/* Have we finished this widget yet? */
+
+} widget_recurse_t;
+
+static widget_recurse_t widget_return[10]; /* The stack to recurse on */
 
 /* The settings used whilst playing with an options dialog box */
 settings_info widget_options_settings;
