@@ -1,5 +1,5 @@
 /* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2002 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2003 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -46,6 +46,7 @@
 #include "fuse.h"
 #include "gtkdisplay.h"
 #include "gtkkeyboard.h"
+#include "gtkinternals.h"
 #include "gtkui.h"
 #include "machine.h"
 #include "options.h"
@@ -240,7 +241,7 @@ static guint gtkui_menu_data_size =
 int
 ui_init( int *argc, char ***argv )
 {
-  GtkWidget *box,*menu_bar;
+  GtkWidget *box, *menu_bar, *status_bar;
   GtkAccelGroup *accel_group;
   GdkGeometry geometry;
   GdkWindowHints hints;
@@ -293,6 +294,12 @@ ui_init( int *argc, char ***argv )
 			 DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
 
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, FALSE, FALSE, 0 );
+
+  status_bar = gtk_hbox_new( FALSE, 3 );
+  gtk_box_pack_start_defaults( GTK_BOX( box ), status_bar );
+
+  gtkstatusbar_tape = gtk_label_new( "Tape: 0" );
+  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), gtkstatusbar_tape );
 
   hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
           GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;

@@ -73,6 +73,8 @@ int tape_init( void )
   error = libspectrum_tape_alloc( &tape );
   if( !tape ) return error;
 
+  /* Don't call tape_stop() here as the UI hasn't been initialised yet,
+     so we can't update the statusbar */
   tape_playing = 0;
   tape_microphone = 0;
   if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
@@ -481,6 +483,9 @@ int tape_play( void )
   tape_playing = 1;
   tape_microphone = 0;
 
+  /* Update the status bar */
+  ui_statusbar_tape( 1 );
+
   /* Timex machines have no loading noise */
   if( ( !( machine_current->timex ) ) && settings_current.sound_load )
     sound_beeper( 1, tape_microphone );
@@ -502,6 +507,7 @@ int tape_toggle_play( void )
 int tape_stop( void )
 {
   tape_playing = 0;
+  ui_statusbar_tape( 0 );
   return 0;
 }
 
@@ -553,7 +559,7 @@ tape_next_edge( libspectrum_dword last_tstates )
       settings_current.tape_traps &&
       libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
     ) {
-    tape_playing = 0;
+    error = tape_stop(); if( error ) return error;
     return 0;
   }
 

@@ -221,3 +221,5 @@
 	 the 0.6.1.1 changes to HEAD).
 20031004 timer.c: remove duplicated Win32 code (Marek)
 20031004 tape.c, tape.h: make tape and tape_playing static.
+20031004 tape.c, ui/ui.h, ui/gtk: add very simple statusbar showing tape
+	 status.

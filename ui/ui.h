@@ -83,4 +83,7 @@ int ui_menu_activate_media_disk_eject( int which, int active );
 int ui_menu_activate_recording( int recording );
 int ui_menu_activate_ay_logging( int recording );
 
+/* Functions to update the statusbar */
+int ui_statusbar_tape( int running );
+
 #endif			/* #ifndef FUSE_UI_H */

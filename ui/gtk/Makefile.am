@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2002 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -37,7 +37,8 @@ libuigtk_a_SOURCES = binary.c \
 		     gtkkeyboard.c \
                      gtkui.c \
 	             options.c keysyms.c picture.c \
-		     roms.c
+		     roms.c \
+		     statusbar.c
 
 BUILT_SOURCES = keysyms.c options.c options.h
 
@@ -51,4 +52,9 @@ options.h: options-header.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/D
 	@PERL@ options-header.pl ../options.dat > options.h
 
 noinst_HEADERS = gtkdisplay.h \
-	         gtkkeyboard.h gtkui.h options.h options.pl options-header.pl
+	         gtkkeyboard.h \
+		 gtkinternals.h \
+		 gtkui.h \
+		 options.h \
+		 options.pl \
+		 options-header.pl
