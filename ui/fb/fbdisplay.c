@@ -1,6 +1,6 @@
 /* fbdisplay.c: Routines for dealing with the linux fbdev display
    Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Darren Salt,
-			   Witold Filipczy
+			   Witold Filipczyk
 
    $Id$
 
@@ -43,8 +43,26 @@
 #include "fuse.h"
 #include "display.h"
 #include "screenshot.h"
+#include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "settings.h"
+
+/* The size of a 1x1 image in units of
+   DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */
+int image_scale;
+
+/* The height and width of a 1x1 image in pixels */
+int image_width, image_height;
+
+/* A scaled copy of the image displayed on the Spectrum's screen */
+static WORD scaled_image[2*DISPLAY_SCREEN_HEIGHT][2*DISPLAY_SCREEN_WIDTH];
+static const ptrdiff_t scaled_pitch =
+                                     2 * DISPLAY_SCREEN_WIDTH * sizeof( WORD );
+
+/* Are we in a Timex display mode? */
+static int hires;
+
+static int register_scalers( void );
 
 /* rrrrrggggggbbbbb */
 static const short colours[] = {
@@ -80,7 +98,33 @@ static const struct {
 
 static int fb_set_mode( void );
 
-int uidisplay_init(int width, int height)
+int uidisplay_init( int width, int height )
+{
+  int error;
+
+  hires = ( width == 640 ? 1 : 0 );
+
+  scaler_register_clear();
+  
+  image_width = width; image_height = height;
+  image_scale = width / DISPLAY_ASPECT_WIDTH;
+
+  error = register_scalers(); if( error ) return error;
+
+  display_ui_initialised = 1;
+
+  display_refresh_all();
+
+  return 0;
+}
+
+static int
+register_scalers( void )
+{
+  return 0;
+}
+
+int fbdisplay_init(void)
 {
   fb_fd = open( "/dev/fb0", O_RDWR );
   if( fb_fd == -1 ) {
@@ -197,6 +241,12 @@ fb_set_mode( void )
 }
 
 void
+uidisplay_hotswap_gfx_mode( void )
+{
+  return;
+}
+
+void
 uidisplay_frame_end( void ) 
 {
   return;
@@ -206,31 +256,85 @@ void
 uidisplay_area( int x, int start, int width, int height)
 {
   int y;
+  
   switch( fb_resolution ) {
   case FB_RES( 640, 480 ):
     for( y = start; y < start + height; y++ )
     {
-      memcpy( gm +   2 * y       * display.xres_virtual + x * 2, image + y * 640 + x * 2,
-	      width * 4                                                     );
-      memcpy( gm + ( 2 * y + 1 ) * display.xres_virtual + x * 2, image + y * 640 + x * 2,
-	      width * 4                                                     );
+      int i;
+      WORD *point;
+
+      if( hires ) {
+
+	for( i = 0, point = gm + y * display.xres_virtual + x;
+	     i < width;
+	     i++, point++ )
+	  *point = colours[display_image[y][x+i]];
+
+      } else {
+
+	for( i = 0, point = gm + 2 * y * display.xres_virtual + x * 2;
+	     i < width;
+	     i++, point += 2 )
+	  *  point       = *( point +     display.xres_virtual ) =
+	  *( point + 1 ) = *( point + 1 + display.xres_virtual ) = 
+	    colours[display_image[y][x+i]];
+
+      }
     }
     break;
+
   case FB_RES( 640, 240 ):
     for( y = start; y < start + height; y++ )
-      memcpy( gm +       y       * display.xres_virtual + x * 2, image + y * 640 + x * 2,
-	      width * 4                                                     );
+    {
+      int i;
+      WORD *point;
+
+      if( hires ) {
+
+	for ( i = 0, point = gm + y * display.xres_virtual + x;
+	      i < width;
+	      i++, point++ )
+	  *point = colours[display_image[y*2][x+i]];
+
+      } else {
+
+	for( i = 0, point = gm + 2 * y * display.xres_virtual + x * 2;
+	     i < width;
+	     i++, point+=2 )
+	  *point = *(point+1) = colours[display_image[y][x+i]];
+
+      }
+    }
     break;
+
   case FB_RES( 320, 240 ):
     for( y = start; y < start + height; y++ )
-      memcpy( gm +       y       * display.xres_virtual + x, image + y * 320 + x,
-	     width * 2                                                    );
+    {
+      int i;
+      WORD *point;
+
+      for( i = 0, point = gm + y * display.xres_virtual + x;
+	   i < width;
+	   i++, point++ )
+        *point = colours[display_image[y][x+i]];
+
+    }
     break;
+
   default:;		/* Shut gcc up */
   }
 }
 
-int uidisplay_end(void)
+int
+uidisplay_end( void )
+{
+  display_ui_initialised = 0;
+  return 0;
+}
+
+int
+fbdisplay_end( void )
 {
   if( fb_fd != -1 ) {
     if( got_orig_display ) ioctl( fb_fd, FBIOPUT_VSCREENINFO, &orig_display );

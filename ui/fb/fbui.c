@@ -1,5 +1,5 @@
 /* fbui.c: Routines for dealing with the linux fbdev user interface
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Witold Filipczyk
 
    $Id$
 
@@ -30,13 +30,15 @@
 
 #include <stdlib.h>
 
+#include "fbdisplay.h"
 #include "fbkeyboard.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
 static void fb_end( void );
 
-int ui_init(int *argc, char ***argv, int width, int height)
+int
+ui_init( int *argc, char ***argv )
 {
   int error;
 
@@ -45,7 +47,7 @@ int ui_init(int *argc, char ***argv, int width, int height)
   error = fbkeyboard_init();
   if(error) return error;
 
-  error = uidisplay_init( width, height );
+  error = fbdisplay_init();
   if(error) return error;
 
   return 0;
@@ -60,6 +62,11 @@ int ui_event()
 int ui_end(void)
 {
   /* Cleanup handled by atexit function */
+  int error;
+  
+  error = fbkeyboard_end(); if( error ) return error;
+  error = fbdisplay_end(); if( error ) return error;
+
   return 0;
 }
 
