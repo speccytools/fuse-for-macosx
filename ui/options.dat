@@ -13,9 +13,15 @@ Entry, (M)DR cartridge len, mdr_len, INPUT_KEY_m, 3, block
 Checkbox, Raw RS-2(3)2, raw_rs232, INPUT_KEY_3
 Checkbox, Raw Sinclair(N)ET, raw_s_net, INPUT_KEY_n
 Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
+#ifdef UI_SDL
+Checkbox, (F)ull screen, full_screen, INPUT_KEY_f
+#endif
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
+#ifdef UI_SDL
+Posthook, uidisplay_hotswap_gfx_mode
+#endif
 
 peripherals
 Peripheral Options

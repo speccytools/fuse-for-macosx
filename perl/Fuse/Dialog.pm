@@ -1,4 +1,6 @@
 # Fuse::Dialog: routines for creating Fuse dialog boxes
+# Copyright (c) 2003-2005 Philip Kendall
+
 # $Id$
 
 # This program is free software; you can redistribute it and/or modify
@@ -27,12 +29,18 @@ use strict;
 use English;
 use IO::File;
 
-sub read ($) {
+sub read (;$) {
 
     my $filename = shift;
 
-    my $fh = new IO::File( "< $filename" )
-	or die "Couldn't open `$filename': $!";
+    my $fh;
+    if( defined $filename && $filename ne '-' ) {
+	$fh = new IO::File( "< $filename" )
+	    or die "Couldn't open '$filename': $!";
+    } else {
+	$fh = new IO::Handle;
+	$fh->fdopen( fileno( STDIN ), "r" ) or die "Couldn't read stdin: $!";
+    }
 
     local $INPUT_RECORD_SEPARATOR = ""; # Paragraph mode
 

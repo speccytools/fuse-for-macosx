@@ -66,7 +66,6 @@ sub parse_file ($;$) {
 
 	s/^#.*$//;
 
-	next if /^\s*$/;
 
 	print if $conditions[-1] and not $inhibit;
     }

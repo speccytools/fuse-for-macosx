@@ -1251,3 +1251,6 @@
 20050226 ui/gtk/debugger.c: pad disassembled instructions to fixed width
 	 so debugger pane stays a constant width (patch #1150686)
 	 (Darren).
+20050226 perl/cpp-perl.pl,perl/Fuse/Dialog.pm,ui/options.dat,
+	 ui/gtk/Makefile.am,widget/Makefile.am: allow SDL full-screen mode
+	 to be used (patch #1150687) (Darren).

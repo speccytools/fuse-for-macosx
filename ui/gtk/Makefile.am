@@ -63,11 +63,11 @@ keysyms.c: ../../keysyms.pl ../../keysyms.dat
 menu_data.c: ../../perl/cpp-perl.pl ../../menu_data.pl ../../menu_data.c ../../config.h
 	@PERL@ ../../perl/cpp-perl.pl ../../config.h ../../menu_data.c | @PERL@ ../../menu_data.pl gtk > $@
 
-options.c: options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
-	@PERL@ options.pl ../options.dat > options.c
+options.c: ../../perl/cpp-perl.pl ../../config.h options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
+	@PERL@ ../../perl/cpp-perl.pl ../../config.h ../options.dat | @PERL@ options.pl - > options.c
 
-options.h: options-header.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
-	@PERL@ options-header.pl ../options.dat > options.h
+options.h: ../../perl/cpp-perl.pl ../../config.h options-header.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
+	@PERL@ ../../perl/cpp-perl.pl ../../config.h ../options.dat | @PERL@ options-header.pl - > options.h
 
 noinst_HEADERS = gtkinternals.h \
 		 options.h \

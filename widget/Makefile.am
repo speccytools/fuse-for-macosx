@@ -49,11 +49,11 @@ BUILT_SOURCES = menu_data.c \
 menu_data.c: ../perl/cpp-perl.pl ../menu_data.c ../menu_data.pl ../config.h
 	@PERL@ ../perl/cpp-perl.pl ../config.h ../menu_data.c | @PERL@ ../menu_data.pl widget > $@
 
-options.c: options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
-	@PERL@ options.pl ../ui/options.dat > options.c
+options.c: ../perl/cpp-perl.pl ../config.h options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
+	@PERL@ ../perl/cpp-perl.pl ../config.h ../ui/options.dat | @PERL@ options.pl - > options.c
 
-options.h: options-header.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
-	@PERL@ options-header.pl ../ui/options.dat > options.h
+options.h: ../perl/cpp-perl.pl ../config.h options-header.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
+	@PERL@ ../perl/cpp-perl.pl ../config.h ../ui/options.dat | @PERL@ options-header.pl - > options.h
 
 noinst_HEADERS = widget.h widget_internals.h \
 		 options.h options.pl options-header.pl
