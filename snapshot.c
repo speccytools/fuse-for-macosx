@@ -148,8 +148,6 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   capabilities = libspectrum_machine_capabilities( machine_current->machine );
 
-  z80.halted = 0;
-
   A  = libspectrum_snap_a ( snap ); F  = libspectrum_snap_f ( snap );
   A_ = libspectrum_snap_a_( snap ); F_ = libspectrum_snap_f_( snap );
 
@@ -163,6 +161,8 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   IFF1 = libspectrum_snap_iff1( snap ); IFF2 = libspectrum_snap_iff2( snap );
   IM = libspectrum_snap_im( snap );
+
+  z80.halted = libspectrum_snap_halted( snap );
 
   spectrum_ula_write( 0x00fe, libspectrum_snap_out_ula( snap ) );
 
@@ -239,20 +239,26 @@ int snapshot_write( const char *filename )
 {
   libspectrum_snap *snap;
   unsigned char *buffer; size_t length;
+  int flags;
 
   int error;
 
-  libspectrum_snap_alloc( &snap );
+  error = libspectrum_snap_alloc( &snap ); if( error ) return error;
 
-  error = snapshot_copy_to( snap );
-  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  error = snapshot_copy_to( snap ); if( error ) return error;
 
+  flags = 0;
   length = 0;
-  error = libspectrum_z80_write( &buffer, &length, snap );
-  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  error = libspectrum_snap_write( &buffer, &length, &flags, snap,
+				  LIBSPECTRUM_ID_SNAPSHOT_Z80, 0 );
+  if( error ) return error;
+
+  if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS )
+    ui_error( UI_ERROR_INFO,
+	      "Some information may have been lost in conversion" );
 
   error = libspectrum_snap_free( snap );
-  if( error != LIBSPECTRUM_ERROR_NONE ) { free( buffer ); return 1; }
+  if( error ) { free( buffer ); return 1; }
 
   error = utils_write_file( filename, buffer, length );
   if( error ) { free( buffer ); return error; }
@@ -281,6 +287,8 @@ int snapshot_copy_to( libspectrum_snap *snap )
   libspectrum_snap_set_iff1( snap, IFF1 );
   libspectrum_snap_set_iff2( snap, IFF2 );
   libspectrum_snap_set_im( snap, IM );
+
+  libspectrum_snap_set_halted( snap, z80.halted );
 
   libspectrum_snap_set_out_ula( snap, spectrum_last_ula );
   
