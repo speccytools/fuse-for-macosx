@@ -31,6 +31,10 @@
 #include <dirent.h>
 #endif				/* #ifndef _DIRENT_H */
 
+#ifndef FUSE_KEYBOARD_H
+#include "keyboard.h"
+#endif				/* #ifndef FUSE_KEYBOARD_H */
+
 /* The default colours used in the widget */
 #define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
 #define WIDGET_COLOUR_FOREGROUND 7	/* White */
@@ -45,8 +49,8 @@ typedef enum widget_type {
   WIDGET_TYPE_FILE,		/* File menu */
   WIDGET_TYPE_MACHINE,		/* Machine menu */
   WIDGET_TYPE_PICTURE,		/* Keyboard picture */
-  WIDGET_TYPE_OPTIONS,		/* Options menu */
   WIDGET_TYPE_HELP,		/* Help menu */
+  WIDGET_TYPE_MENU,		/* General menu */
 
 } widget_type;
 
@@ -55,6 +59,14 @@ typedef enum widget_finish_state {
   WIDGET_FINISHED_OK = 1,
   WIDGET_FINISHED_CANCEL,
 } widget_finish_state;
+
+/* A general menu */
+typedef struct widget_menu_entry {
+  const char *text;		/* Menu entry text */
+  keyboard_key_name key;	/* Which key to activate this widget */
+  widget_type widget;		/* Which widget to call */
+  void *widget_args;		/* And with which arguments */
+} widget_menu_entry;
 
 /* A function to draw a widget */
 typedef int (*widget_draw_fn)( void *data );
@@ -155,15 +167,15 @@ void widget_picture_keyhandler( int key );
 
 extern BYTE widget_keyboard_picture[6912];
 
-/* Options menu */
-
-int widget_options_draw( void* data );
-void widget_options_keyhandler( int key );
-
 /* Help menu */
 
 int widget_help_draw( void* data );
 void widget_help_keyhandler( int key );
+
+/* General menu code */
+
+int widget_menu_draw( void* data );
+void widget_menu_keyhandler( int key );
 
 /* The widgets actually available */
 

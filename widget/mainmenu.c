@@ -54,6 +54,12 @@ int widget_mainmenu_draw( void* data )
 
 void widget_mainmenu_keyhandler( int key )
 {
+  widget_menu_entry option_menu[] = {
+    { "Options", 0, 0, NULL },		/* Menu title */
+    { "(G)eneral", KEYBOARD_g, WIDGET_TYPE_GENERAL, NULL },
+    { NULL, 0, 0, NULL }		/* End marker: DO NOT REMOVE */
+  };
+
   switch( key ) {
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
@@ -73,7 +79,7 @@ void widget_mainmenu_keyhandler( int key )
     break;
 
   case KEYBOARD_o:
-    widget_do( WIDGET_TYPE_OPTIONS, NULL );
+    widget_do( WIDGET_TYPE_MENU, &option_menu );
     break;
 
   case KEYBOARD_t:

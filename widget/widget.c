@@ -363,7 +363,7 @@ widget_t widget_data[] = {
   { widget_file_draw,     NULL,			 widget_file_keyhandler     },
   { widget_machine_draw,  NULL,			 widget_machine_keyhandler  },
   { widget_picture_draw,  NULL,                  widget_picture_keyhandler  },
-  { widget_options_draw,  NULL,                  widget_options_keyhandler  },
   { widget_help_draw,     NULL,                  widget_help_keyhandler     },
+  { widget_menu_draw,	  NULL,			 widget_menu_keyhandler     },
 
 };
