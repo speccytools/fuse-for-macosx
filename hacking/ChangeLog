@@ -1119,3 +1119,4 @@
 	 Interface I and microdrive emulation (patch #1060831)
 	 (Gergely Szasz)
 20041128 if1.c,ui.c,ui/ui.h: simplify menu item (de)activation code.
+20041128 if1.c: add void to prototypes where appropriate.

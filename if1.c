@@ -241,7 +241,7 @@ if1_memory_map( void )
 }
 
 void
-microdrives_reset()
+microdrives_reset( void )
 {
   int m;
 
@@ -553,7 +553,7 @@ increment_head ( int m )
 }
 
 void
-microdrives_restart()
+microdrives_restart( void )
 {
   int m;
 
