@@ -280,10 +280,6 @@ int specplus3_reset(void)
   machine_current->ram.locked=0;
   machine_current->ram.special=0; machine_current->ram.specialcfg=0;
 
-  z80_reset();
-  sound_ay_reset();
-  snapshot_flush_slt();
-
 #ifdef HAVE_765_H
   specplus3_fdc_reset();
 #endif

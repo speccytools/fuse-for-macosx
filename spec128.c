@@ -170,10 +170,6 @@ int spec128_reset(void)
   machine_current->ram.current_rom=0;
   machine_current->ram.current_screen=5;
 
-  z80_reset();
-  sound_ay_reset();
-  snapshot_flush_slt();
-
   return 0;
 }
 

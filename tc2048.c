@@ -138,7 +138,7 @@ int tc2048_init( fuse_machine_info *machine )
   machine->machine = LIBSPECTRUM_MACHINE_TC2048;
   machine->id = "2048";
 
-  machine->reset = tc2048_reset;
+  machine->reset = NULL;
 
   machine_set_timings( machine, 3.528e6, 24, 128, 24, 48, 312, 8936 );
 
@@ -165,14 +165,4 @@ int tc2048_init( fuse_machine_info *machine )
 
   return 0;
 
-}
-
-int tc2048_reset(void)
-{
-  z80_reset();
-  sound_ay_reset();	/* should happen for *all* resets */
-  snapshot_flush_slt();
-  printer_zxp_reset();
-
-  return 0;
 }

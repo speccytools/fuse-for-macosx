@@ -40,7 +40,10 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "printer.h"
 #include "scld.h"
+#include "snapshot.h"
+#include "sound.h"
 #include "spec48.h"
 #include "spec128.h"
 #include "specplus2.h"
@@ -181,9 +184,6 @@ static int machine_select_machine( fuse_machine_info *machine )
     return 1;
   if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
-  /* Stop the tape playing */
-  tape_stop();
-
   readbyte = machine->ram.read_memory;
   readbyte_internal = machine->ram.read_memory_internal;
   read_screen_memory = machine->ram.read_screen;
@@ -194,8 +194,16 @@ static int machine_select_machine( fuse_machine_info *machine )
   
   ROM = machine->roms;
 
+  /* These things should happen on all resets */
+  z80_reset();
+  sound_ay_reset();
+  snapshot_flush_slt();
+  printer_zxp_reset();
   scld_reset();
-  machine->reset();
+  tape_stop();
+
+  /* Do any machine-specific bits */
+  if( machine->reset ) machine->reset();
 
   return 0;
 }
