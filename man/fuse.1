@@ -1899,12 +1899,13 @@ menu option. A debugger window will appear, showing the current state
 of the emulated machine: the top-left `pane' shows the current state
 of the Z80 and the last bytes written to any emulated peripherals. The
 bottom-left pane lists any active breakpoints. Moving right, the next
-pane gives a disassembly, which by default starts at the current
-program counter, although this can be modified either by the
-`disassemble' command (see below) or by dragging the scrollbar next to
-it. The next pane shows the current stack, and the final pane any
-`events' which are due to occur and could affect emulation. Any of
-these panes can be removed by use of the
+pane shows where the Spectrum's 64K memory map, and the next a
+disassembly, which by default starts at the current program counter,
+although this can be modified either by the `disassemble' command (see
+below) or by dragging the scrollbar next to it. The next pane shows
+the current stack, and the final pane any `events' which are due to
+occur and could affect emulation. Any of these panes can be removed by
+use of the
 .I View
 menu. Below the displays are an entry box for debugger commands, and
 five buttons for controlling the debugger:
@@ -2129,10 +2130,21 @@ combination, which refers to a location
 .I offset
 bytes into into memory bank
 .IR page ,
-independent of where that bank is currently paged into memory. The 48K
-machines are treated as having a permanent mapping of page 5 at
-0x4000, page 2 at 0x8000 and page 0 at 0xC000; the 16K Spectrum is
-treated as having page 5 at 0x4000 and no page at 0x8000 and 0xC000.
+independent of where that bank is currently paged into memory. RAM
+pages are indicated simply by an integer, while ROMs are prefixed by
+.RI ` R '
+(eg offset 0x1234 in ROM 1 is specified as
+.RI ` R1:0x1234 "')."
+Pages selected via the /ROMCS line are prefixed with
+.RI ` C "',"
+while the Timex Dock and Exrom use prefixes
+.RI ` D '
+and
+.RI ` X '
+respectively. The 48K machines are treated as having a permanent
+mapping of page 5 at 0x4000, page 2 at 0x8000 and page 0 at 0xC000;
+the 16K Spectrum is treated as having page 5 at 0x4000 and no page at
+0x8000 and 0xC000.
 .PP
 Anywhere the debugger is expecting a numeric value, except where it
 expects a breakpoint id, you can instead use a numeric expression,
