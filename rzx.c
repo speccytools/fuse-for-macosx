@@ -143,6 +143,8 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
       libspectrum_snap_free( rzx_snap ); rzx_snap = NULL;
       return 1;
     }
+  } else {
+    rzx_snap = NULL;
   }
 
   /* Start the count of instruction fetches here */
@@ -180,6 +182,8 @@ int rzx_stop_recording( void )
 {
   libspectrum_byte *buffer; size_t length;
   libspectrum_error libspec_error; int error;
+
+  if( !rzx_recording ) return 0;
 
   /* Stop recording data */
   rzx_recording = 0;
@@ -379,12 +383,15 @@ static int recording_frame( void )
       elapsed_time =   current_time.tv_sec  - start_time.tv_sec +
 	             ( current_time.tv_usec - start_time.tv_usec ) / 1000000.0;
       if( fabs( expected_time / elapsed_time - 1 ) > SPEED_TOLERANCE ) {
+
+	rzx_stop_recording();
+
 	ui_error(
 	  UI_ERROR_INFO,
 	  "emulator speed is %d%%: stopping competition mode RZX recording",
 	  (int)( 100 * ( expected_time / elapsed_time ) )
 	);
-	rzx_stop_recording();
+
       }
     }
 
