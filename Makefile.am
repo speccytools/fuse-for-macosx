@@ -94,7 +94,8 @@ z80/libz80.a \
 @XML_LIBS@ \
 compat/libcompat.a
 
-fuse_DEPENDENCIES = memory_internal.o @UI_LIBS@ debugger/libdebugger.a \
+fuse_DEPENDENCIES = @UI_LIBS@ \
+		    debugger/libdebugger.a \
 	            z80/libz80.a
 
 BUILT_SOURCES = settings.c settings.h
