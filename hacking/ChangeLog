@@ -1019,3 +1019,4 @@
 20040720 ui/fb/fbdisplay.c: Timex rendering fixes (Darren).
 20040720 settings.dat,man/fuse.1,ui/fb/fbdisplay.c,ui/svga/svgadisplay.c:
 	 optionally use doublescan modes for SVGAlib and fb (Darren).
+20040720 tape.c: improve 'tape modified' confirmation message (Darren).

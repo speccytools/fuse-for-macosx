@@ -192,7 +192,8 @@ int tape_close( void )
   /* If the tape has been modified, check if we want to do this */
   if( tape_modified ) {
 
-    confirm = ui_confirm_save( "Tape has been modified" );
+    confirm =
+      ui_confirm_save( "Tape has been modified.\nDo you want to save it?" );
     switch( confirm ) {
 
     case UI_CONFIRM_SAVE_SAVE:
