@@ -34,7 +34,61 @@
 extern BYTE keyboard_default_value;
 extern BYTE keyboard_return_values[8];
 
+/* A numeric identifier for each Spectrum key. Basically chosen to map
+   to ASCII */
+typedef enum keyboard_key_name {
+
+  KEYBOARD_NONE = 0x00,		/* No key */
+
+  KEYBOARD_space = 0x20,
+
+  KEYBOARD_0 = 0x30,
+  KEYBOARD_1,
+  KEYBOARD_2,
+  KEYBOARD_3,
+  KEYBOARD_4,
+  KEYBOARD_5,
+  KEYBOARD_6,
+  KEYBOARD_7,
+  KEYBOARD_8,
+  KEYBOARD_9,
+
+  KEYBOARD_a = 0x61,
+  KEYBOARD_b,
+  KEYBOARD_c,
+  KEYBOARD_d,
+  KEYBOARD_e,
+  KEYBOARD_f,
+  KEYBOARD_g,
+  KEYBOARD_h,
+  KEYBOARD_i,
+  KEYBOARD_j,
+  KEYBOARD_k,
+  KEYBOARD_l,
+  KEYBOARD_m,
+  KEYBOARD_n,
+  KEYBOARD_o,
+  KEYBOARD_p,
+  KEYBOARD_q,
+  KEYBOARD_r,
+  KEYBOARD_s,
+  KEYBOARD_t,
+  KEYBOARD_u,
+  KEYBOARD_v,
+  KEYBOARD_w,
+  KEYBOARD_x,
+  KEYBOARD_y,
+  KEYBOARD_z,
+
+  KEYBOARD_Enter = 0x100,
+  KEYBOARD_Caps,
+  KEYBOARD_Symbol,
+
+} keyboard_key_name;
+
 void keyboard_init(void);
 BYTE keyboard_read(BYTE porth);
+void keyboard_press(keyboard_key_name key);
+void keyboard_release(keyboard_key_name key);
 
 #endif			/* #ifndef FUSE_KEYBOARD_H */
