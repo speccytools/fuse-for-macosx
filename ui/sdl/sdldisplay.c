@@ -109,21 +109,24 @@ uidisplay_init_scalers( void )
   } else {
     scaler_register( SCALER_TV2X );
   }
-
-  if( !scaler_is_supported( current_scaler ) )
+  
+  if( scaler_is_supported( current_scaler ) ) {
+    scaler_select_scaler( current_scaler );
+  } else {
     scaler_select_scaler( SCALER_NORMAL );
+  }
 }
 
 int
 uidisplay_init( int width, int height )
 {
-  int ret;
   image_width = width;
   image_height = height;
 
   timex = machine_current->timex;
 
   uidisplay_init_scalers();
+  sdldisplay_load_gfx_mode();
 
   SDL_WM_SetCaption( "Fuse", "Fuse" );
 
