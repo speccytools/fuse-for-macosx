@@ -230,6 +230,7 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 
   /* Start the recording menu off in the 'not playing' state */
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
 
   /* Start the AY logging menu off in the 'not playing' state */
   ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );

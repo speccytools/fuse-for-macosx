@@ -242,6 +242,11 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/File/Recording/Record from snapshot...", 1,
     "/File/Recording/Play...", 1 },
 
+  { UI_MENU_ITEM_RECORDING_ROLLBACK,
+    "/File/Recording/Insert Snapshot",
+    "/File/Recording/Rollback", 0,
+    "/File/Recording/Rollback to...", 0 },
+
   { UI_MENU_ITEM_AY_LOGGING,
     "/File/AY Logging/Stop",
     "/File/AY Logging/Record...", 1, },

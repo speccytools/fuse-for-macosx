@@ -153,6 +153,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   rzx_recording = 1;
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 1 );
 
   if( settings_current.competition_mode ) {
 
@@ -183,6 +184,7 @@ int rzx_stop_recording( void )
   rzx_recording = 0;
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
 
   libspectrum_creator_set_competition_code(
     fuse_creator, settings_current.competition_code
