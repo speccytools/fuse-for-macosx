@@ -247,6 +247,8 @@ snapshot_copy_from( libspectrum_snap *snap )
   if( libspectrum_snap_zxcf_active( snap ) ) {
 
     settings_current.zxcf_active = 1;
+    settings_current.zxcf_upload = libspectrum_snap_zxcf_upload( snap );
+
     zxcf_memctl_write( 0x10bf, libspectrum_snap_zxcf_memctl( snap ) );
 
     for( i = 0; i < libspectrum_snap_zxcf_pages( snap ); i++ )
@@ -507,6 +509,7 @@ snapshot_copy_to( libspectrum_snap *snap )
 
   if( settings_current.zxcf_active ) {
 
+    libspectrum_snap_set_zxcf_upload( snap, settings_current.zxcf_upload );
     libspectrum_snap_set_zxcf_active( snap, 1 );
     libspectrum_snap_set_zxcf_memctl( snap, zxcf_last_memctl() );
     libspectrum_snap_set_zxcf_pages( snap, 64 );

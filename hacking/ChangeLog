@@ -888,3 +888,4 @@
 20040601 utils.c,fuse.c: Add handling of LIBSPECTRUM_CLASS_CARTRIDGE_IF2.
 20040601 machines/spec_se.c: Add include <string.h> for memset.
 20040601 utils.c: Fix bad merge of IF2 patch.
+20040602 snapshot.c: save/restore ZXCF upload state.
