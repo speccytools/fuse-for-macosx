@@ -140,11 +140,27 @@ int machine_select( int type )
     if( machine_types[i]->machine == type ) {
       machine_location = i;
       error = machine_select_machine( machine_types[i] );
-      if( error ) return error;
+
+      if( !error ) return 0;
+
+      /* If we couldn't select the new machine type, try falling back
+	 to plain old 48K */
+      error = machine_select( LIBSPECTRUM_MACHINE_48 );
+	
+      /* If that still didn't work, give up */
+      if( error ) {
+	ui_error( UI_ERROR_ERROR, "can't select 48K either. Giving up" );
+	fuse_abort();
+      } else {
+	ui_error( UI_ERROR_INFO, "selecting 48K machine" );
+	return 0;
+      }
+      
       return 0;
     }
   }
 
+  ui_error( UI_ERROR_ERROR, "machine type %d unknown", type );
   return 1;
 }
 
