@@ -96,6 +96,7 @@ int rzx_start_recording( const char *filename )
 
   /* Start the count of instruction fetches here */
   counter_reset();
+  rzx.tstates = tstates;
 
   /* Store the filename */
   rzx_filename = strdup( filename );
@@ -169,6 +170,7 @@ int rzx_start_playback( const char *filename )
   if( error ) return error;
 
   /* We're now playing this RZX file */
+  tstates = rzx.tstates;
   rzx_playback = 1;
   rzx_current_frame = 0;
   counter_reset();

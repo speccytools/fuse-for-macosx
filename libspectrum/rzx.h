@@ -46,6 +46,8 @@ typedef struct libspectrum_rzx {
   size_t count;
   size_t allocated;
 
+  size_t tstates;
+
 } libspectrum_rzx;
 
 libspectrum_error libspectrum_rzx_frame( libspectrum_rzx *rzx,

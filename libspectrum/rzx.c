@@ -191,8 +191,15 @@ rzx_read_input( libspectrum_rzx *rzx,
   }
   rzx->allocated = rzx->count;
 
-  /* Skip more stuff */
-  (*ptr) += 8;
+  /* Fetch the T-state counter */
+  rzx->tstates = (*ptr)[0]             +
+                 (*ptr)[1] *     0x100 +
+                 (*ptr)[2] *   0x10000 +
+                 (*ptr)[3] * 0x1000000 ;
+  (*ptr) += 4;
+
+  /* Skip flags */
+  (*ptr) += 4;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -330,7 +337,7 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
   libspectrum_write_dword( ptr, rzx->count );
 
   /* T-state counter. Zero for now */
-  libspectrum_write_dword( ptr, 0 );
+  libspectrum_write_dword( ptr, rzx->tstates );
 
   /* Flags. Also zero */
   libspectrum_write_dword( ptr, 0 );
