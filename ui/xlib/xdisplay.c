@@ -318,6 +318,8 @@ void xdisplay_area(int x, int y, int width, int height)
 		  x, y, x, y, width, height, True );
     /*shmfinished = 0;*/
     /*do { ui_event (); } while (!shmfinished);*/
+  } else {
+    XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
   }
 #else				/* #ifdef X_USE_SHM */
   XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
