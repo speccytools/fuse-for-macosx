@@ -804,3 +804,4 @@
 	 settings.pl,spectrum.[ch],tape.c,machines/{Makefile.am,
 	 machines.h,spec_se.c,tc2068.c}: Spectrum SE support (hacked
 	 version of the rest of patch #929112) (Fred/Phil).
+20040513 roms/{Makefile.am,plus3e-[0123].rom}: add +3e ROMs.
