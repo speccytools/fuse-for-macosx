@@ -63,6 +63,10 @@ int ui_error( const char *format, ... )
 
   /* Create a label with that message */
   label = gtk_label_new( message );
+
+  /* Add some padding to the vbox, and put the label in it */
+  gtk_container_set_border_width( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
+				  10 );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ), label );
 
   /* Add some ways to finish the dialog box */
