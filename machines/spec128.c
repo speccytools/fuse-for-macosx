@@ -169,7 +169,7 @@ spec128_common_reset( int contention )
 
   memory_map[0].page = &ROM[0][0x0000];
   memory_map[1].page = &ROM[0][0x2000];
-  memory_map[0].reverse = memory_map[1].reverse = -1;
+  memory_map[0].reverse = memory_map[1].reverse = MEMORY_PAGE_OFFSET_ROM;
 
   memory_map[2].page = &RAM[5][0x0000];
   memory_map[3].page = &RAM[5][0x2000];
@@ -214,6 +214,7 @@ spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
 
   memory_map[0].page = &ROM[ rom ][0x0000];
   memory_map[1].page = &ROM[ rom ][0x2000];
+  memory_map[0].reverse = memory_map[1].reverse = MEMORY_PAGE_OFFSET_ROM + rom;
 
   memory_map[6].page = &RAM[ page ][0x0000];
   memory_map[7].page = &RAM[ page ][0x2000];

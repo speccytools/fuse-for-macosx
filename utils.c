@@ -172,6 +172,8 @@ utils_open_file( const char *filename, int autoload,
       trdos_active = 1;
       memory_map[0].page = &ROM[2][0x0000];
       memory_map[1].page = &ROM[2][0x2000];
+      memory_map[0].reverse = memory_map[1].reverse =
+	MEMORY_PAGE_OFFSET_ROM + 2;
     }
     break;
 

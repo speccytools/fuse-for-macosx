@@ -379,23 +379,26 @@ create_register_display( GtkBox *parent, gtkui_font font )
 static int
 create_memory_map( GtkBox *parent )
 {
-  GtkWidget *label;
+  GtkWidget *table, *label;
   size_t i;
   char buffer[ 40 ];
 
-  memorymap = gtk_table_new( 8, 2, FALSE );
+  memorymap = gtk_frame_new( "Memory Map" );
   gtk_box_pack_start( parent, memorymap, FALSE, FALSE, 0 );
+
+  table = gtk_table_new( 8, 2, FALSE );
+  gtk_container_add( GTK_CONTAINER( memorymap ), table );
 
   for( i = 0; i < 8; i++ ) {
 
-    snprintf( buffer, 40, "0x%04x", (unsigned)i * 0x2000 );
+    snprintf( buffer, 40, "0x%04X", (unsigned)i * 0x2000 );
     label = gtk_label_new( buffer );
-    gtk_table_attach( GTK_TABLE( memorymap ), label, 0, 1, 7 - i, 8 - i,
+    gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 7 - i, 8 - i,
 		      0, 0, 2, 2 );
 
     page_label[i] = gtk_label_new( "" );
-    gtk_table_attach( GTK_TABLE( memorymap ), page_label[i],
-		      1, 2, 7 - i, 8 - i, 0, 0, 2, 2 );
+    gtk_table_attach( GTK_TABLE( table ), page_label[i], 1, 2, 7 - i, 8 - i,
+		      0, 0, 2, 2 );
 
   }
 
@@ -801,18 +804,29 @@ static int
 update_memory_map( void )
 {
   size_t i;
+  int reverse;
   char buffer[ 40 ];
 
   for( i = 0; i < 8; i++ ) {
 
-    if( memory_map[i].reverse == -1 ) {
+    reverse = memory_map[i].reverse;
+
+    if( reverse == -1 ) {
       snprintf( buffer, 40, "[Undefined]" );
+    } else if( reverse >= MEMORY_PAGE_OFFSET_EXROM ) {
+      snprintf( buffer, 40, "EXROM %d", reverse - MEMORY_PAGE_OFFSET_EXROM );
+    } else if( reverse >= MEMORY_PAGE_OFFSET_DOCK ) {
+      snprintf( buffer, 40, "DOCK %d", reverse - MEMORY_PAGE_OFFSET_DOCK );
+    } else if( reverse >= MEMORY_PAGE_OFFSET_ROM ) {
+      snprintf( buffer, 40, "ROM %d", reverse - MEMORY_PAGE_OFFSET_ROM );
     } else {
-      snprintf( buffer, 40, "RAM %d", memory_map[i].reverse );
+      snprintf( buffer, 40, "RAM %d", reverse );
     }
 
     gtk_label_set_text( GTK_LABEL( page_label[i] ), buffer );
   }
+
+  return 0;
 }
 
 static int

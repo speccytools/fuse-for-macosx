@@ -720,3 +720,8 @@
 20040408 input.c,keyboard.[ch],keysyms.pl: use hash tables rather than
 	 linear lookup to do the three levels of keyboard remapping.
 20040408 ui/gtk/debugger.c: add a simple memory map pane.
+20040409 memory.h,snapshot.c,utils.c,machines/{pentagon.c,scorpion.c,
+	 spec128.c,spec16.c,spec48.c,specplus3.c,tc2048.c,tc2068.c},
+	 ui/gtk/debugger.c,z80/z80_ops.c: add the beginnings of code to
+	 allow breakpoints to be set on pages other than RAM (eg ROM,
+	 DOCK, EXROM).

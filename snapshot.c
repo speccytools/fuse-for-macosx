@@ -198,11 +198,19 @@ snapshot_copy_from( libspectrum_snap *snap )
     trdos_active = libspectrum_snap_beta_paged( snap );
 
     if( trdos_active ) {
+
       memory_map[0].page = &ROM[2][0x0000];
       memory_map[1].page = &ROM[2][0x2000];
+      memory_map[0].reverse = memory_map[1].reverse =
+	MEMORY_PAGE_OFFSET_ROM + 2;
+
     } else {
+
       memory_map[0].page = &ROM[ machine_current->ram.current_rom ][0x0000];
       memory_map[1].page = &ROM[ machine_current->ram.current_rom ][0x2000];
+      memory_map[0].reverse = memory_map[1].reverse =
+	MEMORY_PAGE_OFFSET_ROM + machine_current->ram.current_rom;
+
     }
 
     trdos_direction = libspectrum_snap_beta_direction( snap );

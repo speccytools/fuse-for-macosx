@@ -192,6 +192,8 @@ scorpion_memoryport_write( libspectrum_word port GCC_UNUSED,
       if ( ! ( trdos_active ) ) {
         memory_map[0].page = &ROM[ rom ][0x0000];
         memory_map[1].page = &ROM[ rom ][0x2000];
+	memory_map[0].reverse = memory_map[1].reverse =
+	  MEMORY_PAGE_OFFSET_ROM + rom;
       }
     }
   }
@@ -240,7 +242,8 @@ scorpion_memoryport2_write( libspectrum_word port GCC_UNUSED,
   } else {
     memory_map[0].page = &ROM[ rom ][0x0000];
     memory_map[1].page = &ROM[ rom ][0x2000];
-    memory_map[0].reverse = memory_map[1].reverse = -1;
+    memory_map[0].reverse = memory_map[1].reverse =
+      MEMORY_PAGE_OFFSET_ROM + rom;
     memory_map[0].writable = memory_map[1].writable = 0;
     machine_current->ram.special = 0;
   }

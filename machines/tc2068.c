@@ -207,7 +207,7 @@ dock_exrom_reset( void )
 
   timex_home[0].page = ROM[0];
   timex_home[1].page = ROM[0] + 0x2000;
-  timex_home[0].reverse = timex_home[1].reverse = -1;
+  timex_home[0].reverse = timex_home[1].reverse = MEMORY_PAGE_OFFSET_ROM;
 
   timex_home[2].page = RAM[5];
   timex_home[3].page = RAM[5] + 0x2000;
@@ -235,11 +235,13 @@ dock_exrom_reset( void )
     timex_dock[i].writable = 0;
     timex_dock[i].allocated = 0;
     timex_dock[i].contended = 0;
+    timex_dock[i].reverse = MEMORY_PAGE_OFFSET_DOCK + i;
 
     timex_exrom[i].page = ROM[1];
     timex_exrom[i].writable = 0;
     timex_exrom[i].allocated = 0;
     timex_exrom[i].contended = 0;
+    timex_exrom[i].reverse = MEMORY_PAGE_OFFSET_EXROM + i;
 
   }
 

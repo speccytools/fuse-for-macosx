@@ -29,6 +29,15 @@
 
 #include <libspectrum.h>
 
+typedef enum memory_page_offsets {
+
+  MEMORY_PAGE_OFFSET_RAM   = 0x00,
+  MEMORY_PAGE_OFFSET_ROM   = 0x40,
+  MEMORY_PAGE_OFFSET_DOCK  = 0x48,
+  MEMORY_PAGE_OFFSET_EXROM = 0x50,
+
+} memory_page_offsets;
+
 typedef struct memory_page {
 
   libspectrum_byte *page;	/* The data for this page */
