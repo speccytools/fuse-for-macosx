@@ -468,3 +468,42 @@ int rzx_end( void )
 
   return 0;
 }
+
+GSList*
+rzx_get_rollback_list( libspectrum_rzx *rzx )
+{
+  libspectrum_rzx_iterator it;
+  GSList *rollback_points;
+  size_t frames;
+
+  it = libspectrum_rzx_iterator_begin( rzx );
+  rollback_points = NULL;
+  frames = 0;
+
+  while( it ) {
+    libspectrum_rzx_block_id id = libspectrum_rzx_iterator_get_type( it );
+
+    switch( id ) {
+
+    case LIBSPECTRUM_RZX_INPUT_BLOCK:
+      frames += libspectrum_rzx_iterator_get_frames( it ); break;
+      
+    case LIBSPECTRUM_RZX_SNAPSHOT_BLOCK:
+      rollback_points = g_slist_append( rollback_points,
+					GINT_TO_POINTER( frames ) );
+      break;
+
+    default:
+      break;
+    }
+
+    it = libspectrum_rzx_iterator_next( it );
+  }
+
+  /* Add the final IRB in, if any */
+  if( frames )
+    rollback_points = g_slist_append( rollback_points,
+				      GINT_TO_POINTER( frames ) );
+  
+  return rollback_points;
+}

@@ -27,9 +27,11 @@
 #ifndef FUSE_RZX_H
 #define FUSE_RZX_H
 
-#ifndef LIBSPECTRUM_LIBSPECTRUM_H
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#endif			/* #ifdef HAVE_LIB_GLIB */
+
 #include <libspectrum.h>
-#endif				/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
 /* The offset used to get the count of instructions from the R register */
 extern int rzx_instructions_offset;
@@ -74,5 +76,7 @@ int rzx_frame( void );
 int rzx_store_byte( libspectrum_byte value );
 
 int rzx_end( void );
+
+GSList* rzx_get_rollback_list( libspectrum_rzx *rzx );
 
 #endif			/* #ifndef FUSE_RZX_H */

@@ -30,8 +30,9 @@ File/_Save Snapshot..., Item, F2
 File/_Recording, Branch
 File/Recording/_Record..., Item
 File/Recording/Record _from snapshot..., Item
-File/Recording/Insert Snapshot, Item, Insert
-File/Recording/Rollback, Item, Delete
+File/Recording/_Insert Snapshot, Item, Insert
+File/Recording/Roll_back, Item, Delete
+File/Recording/Rollback _to..., Item
 File/Recording/_Play..., Item
 File/Recording/_Stop, Item
 

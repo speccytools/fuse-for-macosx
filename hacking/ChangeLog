@@ -1071,3 +1071,6 @@
 20040909 machines/specplus3.c: #include "snapshot.h"
 20040910 input.h,keysyms.dat,menu.[ch],menu_data.c: implement RZX
 	 rollback.
+20040918 menu.[ch],menu_data.c,rzx.[ch],machine/Makefile.am,sound/Makefile.am,
+	 ui/ui.h,ui/gtk/{Makefile.am,rollback.c}: allow RZX rollback to
+	 arbitrary points.

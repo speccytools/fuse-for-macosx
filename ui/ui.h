@@ -29,6 +29,10 @@
 
 #include <stdarg.h>
 
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#endif
+
 #include <libspectrum.h>
 
 #include "compat.h"
@@ -94,6 +98,9 @@ int ui_tape_write( void );
 /* Write a +3 or TRDOS disk out */
 int ui_plus3_disk_write( specplus3_drive_number which );
 int ui_trdos_disk_write( trdos_drive_number which );
+
+/* Get a rollback point from the given list */
+int ui_get_rollback_point( GSList *points );
 
 /* Routines to (de)activate certain menu items */
 
