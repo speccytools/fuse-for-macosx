@@ -549,6 +549,16 @@ menu_file_exit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
     confirm = tape_close(); if( confirm ) return;
 
+#ifdef HAVE_765_H
+
+    confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A, 1 );
+    if( confirm ) return;
+
+    confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B, 1 );
+    if( confirm ) return;
+
+#endif			/* #ifdef HAVE_765_H */
+
     if( settings_current.simpleide_master_file ) {
       confirm = simpleide_eject( LIBSPECTRUM_IDE_MASTER );
       if( confirm ) return;

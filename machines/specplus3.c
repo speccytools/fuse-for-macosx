@@ -601,7 +601,7 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
 
     case UI_CONFIRM_SAVE_SAVE:
       fd_eject( drives[which].drive );
-      ui_plus3_disk_write( which );
+      if( ui_plus3_disk_write( which ) ) return 1;
       break;
 
     case UI_CONFIRM_SAVE_DONTSAVE: fd_eject( drives[which].drive ); break;
