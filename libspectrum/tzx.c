@@ -62,6 +62,9 @@ static libspectrum_error
 tzx_read_comment( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		  const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_message( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		  const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		       const libspectrum_byte *end );
 static libspectrum_error
@@ -183,7 +186,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       error = tzx_read_comment( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
-
+    case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
+      error = tzx_read_message( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       error = tzx_read_archive_info( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
@@ -677,6 +683,67 @@ tzx_read_comment( libspectrum_tape *tape, const libspectrum_byte **ptr,
   /* Copy the string across, and move along */
   memcpy( comment_block->text, (*ptr), length );
   comment_block->text[length] = '\0';
+  (*ptr) += length;
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_read_message( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		  const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_message_block *message_block;
+
+  size_t length;
+
+  /* Check the time and length byte exists */
+  if( end - (*ptr) < 2 ) {
+    libspectrum_print_error(
+      "tzx_read_message: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) {
+    libspectrum_print_error( "tzx_read_message: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* This is a message block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_MESSAGE;
+  message_block = &(block->types.message);
+
+  /* Get the time and the length */
+  message_block->time = **ptr; (*ptr)++;
+  length = **ptr; (*ptr)++;
+
+  /* Check we've got enough bytes left for the string */
+  if( end - (*ptr) < length ) {
+    free( block );
+    libspectrum_print_error(
+      "tzx_read_message: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Allocate memory */
+  message_block->text =
+    (libspectrum_byte*)malloc( (length+1) * sizeof( libspectrum_byte ) );
+  if( message_block->text == NULL ) {
+    free( block );
+    libspectrum_print_error( "tzx_read_message: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* Copy the string across, and move along */
+  memcpy( message_block->text, (*ptr), length );
+  message_block->text[length] = '\0';
   (*ptr) += length;
 
   /* Finally, put the block into the block list */

@@ -224,6 +224,11 @@ main( int argc, char **argv )
       printf("  Comment: %s\n", block->types.comment.text );
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
+      printf("  Display for %d seconds\n", block->types.message.time );
+      printf("  Comment: %s\n", block->types.message.text );
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       info_block = &(block->types.archive_info);
       for( i=0; i<info_block->count; i++ ) {

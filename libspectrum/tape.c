@@ -119,7 +119,9 @@ block_free( gpointer data, gpointer user_data )
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
     free( block->types.comment.text );
     break;
-
+  case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
+    free( block->types.message.text );
+    break;
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     for( i=0; i<block->types.archive_info.count; i++ ) {
       free( block->types.archive_info.strings[i] );
@@ -159,6 +161,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
+  case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
   case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
     return LIBSPECTRUM_ERROR_NONE;
@@ -270,6 +273,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START: 
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
+  case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
   case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
     *tstates = 0; end_of_block = 1;
@@ -648,7 +652,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
     strncpy( buffer, "Comment Block", length );
     break;
-
+  case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
+    strncpy( buffer, "Message Block", length );
+    break;
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     strncpy( buffer, "Archive Info Block", length );
     break;
