@@ -433,6 +433,7 @@ void widget_filesel_keyhandler( keyboard_key_name key )
     break;
 
   default:	/* Keep gcc happy */
+    break;
 
   }
 

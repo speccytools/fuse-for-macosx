@@ -84,6 +84,7 @@ void widget_menu_keyhandler( keyboard_key_name key )
     return;
 
   default:	/* Keep gcc happy */
+    break;
 
   }
 

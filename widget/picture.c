@@ -51,6 +51,7 @@ void widget_picture_keyhandler( keyboard_key_name key )
     break;
 
   default:	/* Keep gcc happy */
+    break;
 
   }
 }

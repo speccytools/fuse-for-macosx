@@ -178,6 +178,7 @@ void widget_general_keyhandler( keyboard_key_name key )
     break;
 
   default:	/* Keep gcc happy */
+    break;
 
   }
 }
