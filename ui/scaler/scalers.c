@@ -5,7 +5,7 @@
  * 
  * Originally taken from ScummVM - Scumm Interpreter
  * Copyright (C) 2001  Ludvig Strigeus
- * Copyright (C) 2001/2002 The ScummVM project
+ * Copyright (C) 2001-2003 The ScummVM project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -612,29 +612,34 @@ FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
   scaler_data_type *p = (scaler_data_type*) srcPtr;
 
-  unsigned nextlineDst = dstPitch / sizeof( scaler_data_type );
+  unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*) dstPtr;
+
+  scaler_data_type A, B, C;
+  scaler_data_type D, E, F;
+  scaler_data_type G, H, I;
 
   while (height--) {
     int i;
-    for (i = 0; i < width; ++i) {
-      /* short A = *(p + i - nextlineSrc - 1); */
-      scaler_data_type B = *(p + i - nextlineSrc);
-      /* short C = *(p + i - nextlineSrc + 1); */
-      scaler_data_type D = *(p + i - 1);
-      scaler_data_type E = *(p + i);
-      scaler_data_type F = *(p + i + 1);
-      /* short G = *(p + i + nextlineSrc - 1); */
-      scaler_data_type H = *(p + i + nextlineSrc);
-      /* short I = *(p + i + nextlineSrc + 1); */
 
-      *(q + (i << 1)) = D == B && B != F && D != H ? D : E;
-      *(q + (i << 1) + 1) = B == F && B != D && F != H ? F : E;
-      *(q + (i << 1) + nextlineDst) = D == H && D != B && H != F ? D : E;
-      *(q + (i << 1) + nextlineDst + 1) = H == F && D != H && B != F ? F : E;
+    B = C = *(p - nextlineSrc);
+    E = F = *(p);
+    H = I = *(p + nextlineSrc);
+
+    for (i = 0; i < width; ++i) {
+      p++;
+      A = B; B = C; C = *(p - nextlineSrc);
+      D = E; E = F; F = *(p);
+      G = H; H = I; I = *(p + nextlineSrc);
+
+      *(q) = D == B && B != F && D != H ? D : E;
+      *(q + 1) = B == F && B != D && F != H ? F : E;
+      *(q + nextlineDst) = D == H && D != B && H != F ? D : E;
+      *(q + nextlineDst + 1) = H == F && D != H && B != F ? F : E;
+      q += 2;
     }
-    p += nextlineSrc;
-    q += nextlineDst << 1;
+    p += nextlineSrc - width;
+    q += (nextlineDst - width) << 1;
   }
 }
 
