@@ -406,3 +406,5 @@
 20031228 ui/gtk/{Makefile.am,fileselector.c,gtkui.c}: make the GTK+
 	 fileselector remember its previous directory. Also move the
 	 fileselector code into its own file and tidy up a bit.
+20031229 ui/gtk/debugger.c: double-clicking on the stack display causes
+	 emulation to run to that address.

@@ -79,6 +79,8 @@ static int create_register_display( GtkBox *parent, font_spec font );
 static int create_breakpoints( GtkBox *parent );
 static int create_disassembly( GtkBox *parent, font_spec font );
 static int create_stack_display( GtkBox *parent, font_spec font );
+static void stack_click( GtkCList *clist, gint row, gint column,
+			 GdkEventButton *event, gpointer user_data );
 static int create_events( GtkBox *parent );
 static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
@@ -451,7 +453,33 @@ create_stack_display( GtkBox *parent, font_spec font )
     gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
   gtk_box_pack_start( parent, stack, TRUE, TRUE, 5 );
 
+  gtk_signal_connect( GTK_OBJECT( stack ), "select-row",
+		      GTK_SIGNAL_FUNC( stack_click ), NULL );
+
   return 0;
+}
+
+static void
+stack_click( GtkCList *clist, gint row, gint column,
+	     GdkEventButton *event, gpointer user_data )
+{
+  libspectrum_word address, destination;
+  int error;
+
+  /* Ignore events which aren't a double-click */
+  if( event->type != GDK_2BUTTON_PRESS ) return;
+
+  address = SP + ( 19 - row ) * 2;
+
+  destination =
+    readbyte_internal( address ) + readbyte_internal( address + 1 ) * 0x100;
+
+  error = debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
+				   -1, destination, 0,
+				   DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL );
+  if( error ) return;
+
+  debugger_run();
 }
 
 static int
