@@ -51,31 +51,27 @@
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
-typedef enum snapshot_type {
-  SNAPSHOT_TYPE_SNA,
-  SNAPSHOT_TYPE_Z80,
-} snapshot_type;
-
-static snapshot_type snapshot_identify( const char *filename );
-
 int snapshot_read( const char *filename )
 {
-  unsigned char *buffer; size_t length;
+  unsigned char *buffer; size_t length; int type;
   int error;
 
   error = utils_read_file( filename, &buffer, &length );
   if( error ) return error;
 
-  switch( snapshot_identify( filename ) ) {
+  error = utils_identify_file( &type, filename, buffer, length );
+  if( error ) { munmap( buffer, length ); return error; }
 
-  case SNAPSHOT_TYPE_SNA:
+  switch( type ) {
+
+  case UTILS_TYPE_SNAPSHOT_SNA:
 
     snapshot_flush_slt();
     error = snapshot_open_sna_buffer( buffer, length );
     if( error ) { munmap( buffer, length ); return 1; }
     break;
 
-  case SNAPSHOT_TYPE_Z80:
+  case UTILS_TYPE_SNAPSHOT_Z80:
 
     snapshot_flush_slt();
     error = snapshot_open_z80_buffer( buffer, length );
@@ -84,7 +80,7 @@ int snapshot_read( const char *filename )
 
   default:
 
-    ui_error( UI_ERROR_ERROR, "Unknown snapshot type for '%s'", filename );
+    ui_error( UI_ERROR_ERROR, "Unknown type %d for '%s'", type, filename );
     munmap( buffer, length );
     return 1;
 
@@ -97,16 +93,6 @@ int snapshot_read( const char *filename )
   }
 
   return 0;
-}
-
-static snapshot_type snapshot_identify( const char *filename )
-{
-  if(    strlen( filename ) < 4
-      || strncasecmp( &filename[ strlen(filename) - 4 ], ".sna", 4 ) ) {
-    return SNAPSHOT_TYPE_Z80;
-  } else {
-    return SNAPSHOT_TYPE_SNA;
-  }
 }
 
 void snapshot_flush_slt (void)
