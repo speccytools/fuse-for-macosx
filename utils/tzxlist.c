@@ -106,6 +106,13 @@ main( int argc, char **argv )
     return error;
   }
 
+  if( munmap( buffer, file_info.st_size ) == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't munmap `%s'", progname, filename );
+    perror( error_message );
+    return 1;
+  }
+
   printf("Listing of `%s':\n\n", filename );
 
   ptr = tape.blocks;
@@ -116,6 +123,7 @@ main( int argc, char **argv )
 
     libspectrum_tape_rom_block *rom_block;
     libspectrum_tape_turbo_block *turbo_block;
+    libspectrum_tape_pure_tone_block *tone_block;
     libspectrum_tape_archive_info_block *info_block;
 
     error = libspectrum_tape_block_description(
@@ -146,6 +154,12 @@ main( int argc, char **argv )
       printf("  Data length: %d bytes (%d bits in last byte used)\n",
 	     turbo_block->length, turbo_block->bits_in_last_byte );
       printf("  Pause length: %d ms\n", turbo_block->pause );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+      tone_block = &(block->types.pure_tone);
+      printf("  %d pulses of %d tstates\n",
+	     tone_block->pulses, tone_block->length );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -180,13 +194,6 @@ main( int argc, char **argv )
     }
 
     ptr = ptr->next;
-  }
-
-  if( munmap( buffer, file_info.st_size ) == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't munmap `%s'", progname, filename );
-    perror( error_message );
-    return 1;
   }
 
   return 0;

@@ -40,11 +40,12 @@ tzx_read_rom_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 static libspectrum_error
 tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
-
+static libspectrum_error
+tzx_read_pure_tone( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		    const libspectrum_byte *end );
 static libspectrum_error
 tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
-
 static libspectrum_error
 tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		       const libspectrum_byte *end );
@@ -90,6 +91,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_TURBO:
       error = tzx_read_turbo_block( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+      error = tzx_read_pure_tone( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -225,6 +230,35 @@ tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 }
 
 static libspectrum_error
+tzx_read_pure_tone( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		    const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_pure_tone_block *tone_block;
+
+  /* Check we've got enough bytes */
+  if( end - (*ptr) < 4 ) return LIBSPECTRUM_ERROR_CORRUPT;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  /* This is a turbo loader */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_PURE_TONE;
+  tone_block = &(block->types.pure_tone);
+
+  /* Read in the data, and move along */
+  tone_block->length = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  tone_block->pulses = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  /* And return with no error */
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
 tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end )
 {
@@ -232,6 +266,9 @@ tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
   libspectrum_tape_group_start_block *start_block;
 
   size_t length;
+
+  /* Check the length byte exists */
+  if( (*ptr) == end ) return LIBSPECTRUM_ERROR_CORRUPT;
 
   /* Get memory for a new block */
   block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));

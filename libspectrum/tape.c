@@ -36,7 +36,6 @@ block_free( gpointer data, gpointer user_data );
 
 /* Functions to initialise block types */
 
-/* Standard ROM loader */
 static libspectrum_error
 rom_init( libspectrum_tape_rom_block *block );
 static libspectrum_error
@@ -44,7 +43,6 @@ turbo_init( libspectrum_tape_turbo_block *block );
 
 /* Functions to get the next edge */
 
-/* Standard ROM loader */
 static libspectrum_error
 rom_edge( libspectrum_tape_rom_block *block, libspectrum_dword *tstates,
 	  int *end_of_block );
@@ -56,6 +54,10 @@ turbo_edge( libspectrum_tape_turbo_block *block, libspectrum_dword *tstates,
 	    int *end_of_block );
 static libspectrum_error
 turbo_next_bit( libspectrum_tape_turbo_block *block );
+
+static libspectrum_error
+tone_edge( libspectrum_tape_pure_tone_block *block, libspectrum_dword *tstates,
+	   int *end_of_block );
 
 /*** Function definitions ****/
 
@@ -94,6 +96,10 @@ block_free( gpointer data, gpointer user_data )
     free( block->types.archive_info.ids );
     free( block->types.archive_info.strings );
     break;
+
+  /* Nothing needs doing for these blocks */
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+    break;
   }
 }
 
@@ -106,6 +112,8 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
     return rom_init( &(block->types.rom) );
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     return turbo_init( &(block->types.turbo) );
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+    block->types.pure_tone.edge_count = block->types.pure_tone.pulses;
 
   /* These blocks need no initialisation */
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -170,6 +178,10 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     error = turbo_edge( &(block->types.turbo), tstates, &end_of_block );
+    if( error ) return error;
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+    error = tone_edge( &(block->types.pure_tone), tstates, &end_of_block );
     if( error ) return error;
     break;
 
@@ -406,6 +418,18 @@ turbo_next_bit( libspectrum_tape_turbo_block *block )
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+tone_edge( libspectrum_tape_pure_tone_block *block, libspectrum_dword *tstates,
+	   int *end_of_block )
+{
+  /* The next edge occurs in one pilot edge timing */
+  *tstates = block->length;
+  /* If that was the last edge, the block is finished */
+  if( --(block->edge_count) == 0 ) (*end_of_block) = 1;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 libspectrum_error
 libspectrum_tape_block_description( libspectrum_tape_block *block,
 				    char *buffer, size_t length )
@@ -416,6 +440,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     strncpy( buffer, "Turbo Speed Data Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+    strncpy( buffer, "Pure Tone Block", length );
     break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
     strncpy( buffer, "Group Start Block", length );
