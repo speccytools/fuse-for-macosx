@@ -132,6 +132,10 @@ if test -z "$ui"; then
     AC_CHECK_LIB(socket, connect, X_EXTRA_LIBS="-lsocket $X_EXTRA_LIBS", ,
 	         $X_EXTRA_LIBS)
   fi
+
+  dnl Check for the MIT-SHM extension
+  AC_CHECK_LIB( Xext, XShmAttach, LIBS="$LIBS -lXext" )
+
   AC_DEFINE(UI_X)
   ui=xlib
 fi

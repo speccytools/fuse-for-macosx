@@ -30,7 +30,6 @@
 
 #define X_USE_SHM
 
-#include <siginfo.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -234,6 +233,7 @@ static int xdisplay_allocate_image(int width, int height)
       fprintf(stderr, "%s: out of memory for image data\n", fuse_progname);
       return 1;
     }
+  }
 
   return 0;
 }
