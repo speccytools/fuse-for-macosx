@@ -84,7 +84,6 @@ create_dialog( void )
   size_t i;
   GtkWidget *hbox;
   GtkWidget *table, *label;
-  GtkWidget *scrolled_window;
   GtkWidget *step_button, *close_button;
   GtkAccelGroup *accel_group;
 
@@ -118,17 +117,10 @@ create_dialog( void )
 
   }
 
-  /* A scrolled window to pack the disassembly CList into */
-  scrolled_window = gtk_scrolled_window_new( NULL, NULL );
-  gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolled_window ),
-				  GTK_POLICY_AUTOMATIC,
-				  GTK_POLICY_AUTOMATIC );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), scrolled_window );
-
-  /* And the CList itself */
+  /* Create the disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, titles );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
-  gtk_container_add( GTK_CONTAINER( scrolled_window ), disassembly );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
 
   /* The action buttons for the dialog box */
 
@@ -199,7 +191,7 @@ activate_debugger( void )
   }
 
   /* Put some disassembly in */
-  for( i = 0, address = PC; i < 10; i++ ) {
+  for( i = 0, address = PC; i < 20; i++ ) {
 
     size_t length;
 
