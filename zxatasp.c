@@ -27,6 +27,8 @@
 
 #include <compat.h>
 
+#include <string.h>
+
 #include <libspectrum.h>
 
 #include "machine.h"
