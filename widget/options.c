@@ -63,7 +63,7 @@ int widget_options( void )
   }
 
   /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 2 );
+  widget_dialog_with_border( 1, 2, 30, 3 );
   error = widget_options_show_all( &settings );
   if( error ) {
     widget_timer_end();
@@ -107,7 +107,7 @@ static int widget_options_show_all( settings_info *settings )
   int error;
 
   /* Blank the main display area */
-  widget_dialog( 1, 2, 30, 2 );
+  widget_dialog( 1, 2, 30, 3 );
 
   error = widget_options_print_option( 0, "Issue (2) emulation",
 				       settings->issue2 );
@@ -115,6 +115,10 @@ static int widget_options_show_all( settings_info *settings )
 
   error = widget_options_print_option( 1, "(F)ast tape loading",
 				       settings->tape_traps );
+  if( error ) return error;
+
+  error = widget_options_print_option( 2, "(A)Y stereo separation",
+				       settings->stereo_ay );
   if( error ) return error;
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
@@ -170,6 +174,12 @@ static void widget_options_keyhandler( int key )
   case KEYBOARD_f:
     settings.tape_traps = ! settings.tape_traps;
     error = widget_options_print_value( 1, settings.tape_traps );
+    if( error ) return;
+    break;
+
+  case KEYBOARD_a:
+    settings.stereo_ay = ! settings.stereo_ay;
+    error = widget_options_print_value( 2, settings.stereo_ay );
     if( error ) return;
     break;
 

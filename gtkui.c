@@ -262,6 +262,7 @@ typedef struct gtkui_options_info {
 
   GtkWidget *issue2;
   GtkWidget *tape_traps;
+  GtkWidget *stereo_ay;
 
 } gtkui_options_info;
 
@@ -289,6 +290,14 @@ static void gtkui_options( GtkWidget *widget, gpointer data )
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.tape_traps ),
 				settings_current.tape_traps );
 
+  dialog.stereo_ay =
+    gtk_check_button_new_with_label( "Stereo separation for AY sound" );
+  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.stereo_ay ),
+				settings_current.stereo_ay );
+
+  if( !fuse_sound_in_use )
+    gtk_widget_set_sensitive( dialog.stereo_ay, FALSE );
+
   ok_button = gtk_button_new_with_label( "OK" );
   cancel_button = gtk_button_new_with_label( "Cancel" );
 
@@ -297,6 +306,8 @@ static void gtkui_options( GtkWidget *widget, gpointer data )
 		     dialog.issue2 );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
 		     dialog.tape_traps );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		     dialog.stereo_ay );
 
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
 		     ok_button );
@@ -464,6 +475,9 @@ static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data )
 
   settings_current.tape_traps =
     gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->tape_traps ) );
+
+  settings_current.stereo_ay =
+    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->stereo_ay ) );
 
   gtk_widget_destroy( ptr->dialog );
 

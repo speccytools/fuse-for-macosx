@@ -53,6 +53,7 @@
 
 #include "fuse.h"
 #include "machine.h"
+#include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
 
@@ -64,9 +65,10 @@ int sound_enabled_ever=0;	/* if it's *ever* been in use; see
 int sound_freq=32000;
 int sound_stereo=0;		/* true for stereo *output sample* (only) */
 int sound_stereo_beeper=0;	/* beeper pseudo-stereo */
-int sound_stereo_ay=0;		/* AY stereo separation */
 int sound_stereo_ay_abc=0;	/* (AY stereo) true for ABC stereo, else ACB */
 int sound_stereo_ay_narrow=0;	/* (AY stereo) true for narrow AY st. sep. */
+
+static int sound_stereo_ay=0;	/* local copy of settings_current.stereo_ay */
 
 
 #define AY_CLOCK		1773400
@@ -105,11 +107,9 @@ static unsigned int beeper_tick,beeper_tick_incr;
  * fractional part, except ay_env_{tick,period} which count as the chip does.
  */
 static unsigned int ay_tone_tick[3],ay_noise_tick;
-static unsigned int ay_env_tick,ay_env_subcycles;
+static unsigned int ay_env_internal_tick,ay_env_tick,ay_env_subcycles;
 static unsigned int ay_tick_incr;
 static unsigned int ay_tone_period[3],ay_noise_period,ay_env_period;
-
-static int env_held=0,env_alternating=0;
 
 static int beeper_last_subpos=0;
 
@@ -152,7 +152,7 @@ for(f=15;f>0;f--)
 ay_tone_levels[0]=0;
 
 ay_noise_tick=ay_noise_period=0;
-ay_env_tick=ay_env_period=0;
+ay_env_internal_tick=ay_env_tick=ay_env_period=0;
 for(f=0;f<3;f++)
   ay_tone_tick[f]=ay_tone_period[f]=0;
 
@@ -181,6 +181,12 @@ if(sound_enabled)
   return;
   }
 
+sound_stereo_ay=settings_current.stereo_ay;
+
+/* only try for stereo if we need it */
+if(sound_stereo_ay || sound_stereo_beeper)
+  sound_stereo=1;
+
 #if defined(HAVE_SYS_SOUNDCARD_H)
 ret=osssound_init(&sound_freq,&sound_stereo);
 #endif
@@ -188,7 +194,11 @@ ret=osssound_init(&sound_freq,&sound_stereo);
 if(ret)
   return;
 
-/* important to override this if not using stereo */
+/* important to override these settings if not using stereo
+ * (it would probably be confusing to mess with the AY stereo
+ * setting in settings_current though, which is why we make a copy
+ * rather than using the real one).
+ */
 if(!sound_stereo)
   {
   sound_stereo_ay=0;
@@ -341,15 +351,22 @@ if(pstereopos>=pstereobufsiz)
     }
 
 
+
+/* bitmasks for envelope */
+#define AY_ENV_CONT	8
+#define AY_ENV_ATTACK	4
+#define AY_ENV_ALT	2
+#define AY_ENV_HOLD	1
+
+
 static void sound_ay_overlay(void)
 {
 static int rng=1;
 static int noise_toggle=0;
-static int env_level=0;
+static int env_first=1,env_rev=0,env_counter=15;
 int tone_level[3];
 int mixer,envshape;
 int f,g,level;
-int v=0;
 unsigned char *ptr;
 struct ay_change_tag *change_ptr=ay_change;
 int changes_left=ay_change_count;
@@ -400,8 +417,10 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
         ay_env_period=sound_ay_registers[11]|(sound_ay_registers[12]<<8);
         break;
       case 13:
-        ay_env_tick=ay_env_subcycles=0;
-        env_held=env_alternating=0;
+        ay_env_internal_tick=ay_env_tick=ay_env_subcycles=0;
+        env_first=1;
+        env_rev=0;
+        env_counter=(sound_ay_registers[13]&AY_ENV_ATTACK)?0:15;
         break;
       }
     }
@@ -411,42 +430,68 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
     tone_level[g]=ay_tone_levels[sound_ay_registers[8+g]&15];
 
   /* envelope */
-  if(ay_env_period)
-    {
-    envshape=sound_ay_registers[13];
-    if(!env_held)
-      {
-      v=((int)ay_env_tick*15)/ay_env_period;
-      if(v<0) v=0;
-      if(v>15) v=15;
-      if((envshape&4)==0) v=15-v;
-      if(env_alternating) v=15-v;
-      env_level=ay_tone_levels[v];
-      }
+  envshape=sound_ay_registers[13];
+  level=ay_tone_levels[env_counter];
   
-    for(g=0;g<3;g++)
-      if(sound_ay_registers[8+g]&16)
-        tone_level[g]=env_level;
+  for(g=0;g<3;g++)
+    if(sound_ay_registers[8+g]&16)
+      tone_level[g]=level;
 
-    /* envelope gets incr'd every 256 AY cycles */
-    ay_env_subcycles+=ay_tick_incr;
-    if(ay_env_subcycles>=(256<<16))
+  /* envelope output counter gets incr'd every 16 AY cycles.
+   * Has to be a while, as this is sub-output-sample res.
+   */
+  ay_env_subcycles+=ay_tick_incr;
+  while(ay_env_subcycles>=(16<<16))
+    {
+    ay_env_subcycles-=(16<<16);
+
+    ay_env_tick++;
+    while(ay_env_tick>=ay_env_period)
       {
-      ay_env_subcycles-=(256<<16);
-      
-      ay_env_tick++;
-      if(ay_env_tick>=ay_env_period)
+      ay_env_tick-=ay_env_period;
+
+      /* do a 1/16th-of-period incr/decr if needed */
+      if(env_first ||
+         ((envshape&AY_ENV_CONT) && !(envshape&AY_ENV_HOLD)))
         {
-        ay_env_tick-=ay_env_period;
-        if(!env_held && ((envshape&1) || (envshape&8)==0))
-          {
-          env_held=1;
-          if((envshape&2) || (envshape&0xc)==4)
-            env_level=ay_tone_levels[15-v];
-          }
-        if(!env_held && (envshape&2))
-          env_alternating=!env_alternating;
+        if(env_rev)
+          env_counter-=(envshape&AY_ENV_ATTACK)?1:-1;
+        else
+          env_counter+=(envshape&AY_ENV_ATTACK)?1:-1;
+        if(env_counter<0) env_counter=0;
+        if(env_counter>15) env_counter=15;
         }
+      
+      ay_env_internal_tick++;
+      while(ay_env_internal_tick>=16)
+        {
+        ay_env_internal_tick-=16;
+
+        /* end of cycle */
+        if(!(envshape&AY_ENV_CONT))
+          env_counter=0;
+        else
+          {
+          if(envshape&AY_ENV_HOLD)
+            {
+            if(env_first && (envshape&AY_ENV_ALT))
+              env_counter=(env_counter?0:15);
+            }
+          else
+            {
+            /* non-hold */
+            if(envshape&AY_ENV_ALT)
+              env_rev=!env_rev;
+            else
+              env_counter=(envshape&AY_ENV_ATTACK)?0:15;
+            }
+          }
+        
+        env_first=0;
+        }
+
+      /* don't keep trying if period is zero */
+      if(!ay_env_period) break;
       }
     }
 
@@ -660,7 +705,7 @@ int f;
 
 if(!sound_enabled) return;
 
-val=(on?128+AMPL_BEEPER:128-AMPL_BEEPER);
+val=(on?128-AMPL_BEEPER:128+AMPL_BEEPER);
 
 if(val==sound_oldval_orig) return;
 
@@ -688,7 +733,7 @@ if(newpos==sound_oldpos)
 else
   beeper_last_subpos=(on?VOL_BEEPER-subpos:subpos);
 
-subval=128-AMPL_BEEPER+beeper_last_subpos;
+subval=128+AMPL_BEEPER-beeper_last_subpos;
 
 if(newpos>=0)
   {

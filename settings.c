@@ -47,6 +47,7 @@ int settings_defaults( settings_info *settings )
 {
   settings->issue2 = 0;
   settings->tape_traps = 1;
+  settings->stereo_ay = 0;
 
   return 0;
 }
@@ -56,6 +57,7 @@ int settings_copy( settings_info *dest, settings_info *src )
 {
   dest->issue2     = src->issue2;
   dest->tape_traps = src->tape_traps;
+  dest->stereo_ay  = src->stereo_ay;
 
   return 0;
 }
