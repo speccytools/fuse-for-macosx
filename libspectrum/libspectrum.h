@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21-fuse.ucam.org
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */

@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21-fuse.ucam.org
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -99,7 +99,7 @@ static void fuse_show_copyright(void)
 {
   printf(
    "\nThe Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n"
-   "Copyright (c) 1999-2001 Philip Kendall <pak21-fuse.ucam.org> and others;\n"
+   "Copyright (c) 1999-2001 Philip Kendall <pak21-fuse@srcf.ucam.org> and others;\n"
    "See the file `AUTHORS' for more details.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"

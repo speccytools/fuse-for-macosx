@@ -17,7 +17,7 @@ Some thanks (in alphabetical order):
 * Erik Kunze: for lots of helpful hints on how to program under Unix.
 
 * Gerton Lunter: his wonderful z80
-  (ftp://ftp.void.jump.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
+  (ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
   got me started on this emulation lark all those years ago...
 
 * Russell Marks: for various bits of code (see `AUTHORS')
@@ -29,8 +29,9 @@ Some thanks (in alphabetical order):
   gave the inspiration for an important rewrite of the Z80 core, and was
   also _very_ useful whilst trying to track down some bugs.
 
-* Martijn van der Heide: for World of Spectrum (http://www.void.jump.org/)
-  -- simply the best Speccy Web site out there.
+* Martijn van der Heide: for World of Spectrum
+  (http://www.worldofspectrum.org/) -- simply the best Speccy Web site out
+  there.
 
 * Matan Ziv-Av: for various bits of code (see `AUTHORS')
 
