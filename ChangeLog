@@ -10,6 +10,14 @@
 	* Basically complete rewrite of the tape handling routines (Philip
  	  Kendall).
 
+	* Allow `slow' tape loading with border effects, sound, et al.
+	  The code should work for all user interfaces, but there's no
+	  way of turning off the tape traps unless you're using GTK+ at
+	  the moment (Philip Kendall).
+
+	* Changed the default install location to `/usr/local' (Philip
+ 	  Kendall).
+
 2001-08-13  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.3.1 released.
