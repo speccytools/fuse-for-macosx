@@ -51,7 +51,7 @@ sdlsound_init( const char *device, int *freqptr, int *stereoptr )
 
   SDL_InitSubSystem( SDL_INIT_AUDIO );
 
-  memset( &requested, sizeof( SDL_AudioSpec ), 0 );
+  memset( &requested, 0, sizeof( SDL_AudioSpec ) );
 
   requested.freq = *freqptr;
   requested.format = AUDIO_U8;
