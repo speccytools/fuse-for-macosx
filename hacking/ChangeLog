@@ -1258,3 +1258,13 @@
 	 (Darren).
 20050305 z80/z80.c: get interrupt length (closer) to correct (thanks,
 	 Woody, Jon Needle and Ramsoft).
+20050305 configure.in,lib/{Makefile.am,disk_plus3.[szx|z80],tape_128.[szx|z80],
+         tape_16.[szx|z80], tape_2048.[szx|z80], tape_2068.[szx|z80],
+         tape_48.[szx|z80], tape_pentagon.[szx|z80], tape_plus2.[szx|z80],
+         tape_plus2a.[szx|z80], tape_plus3.[szx|z80], tape_scorpion.[szx|z80]},
+         lib/[un]compressed/{disk_plus3.[szx|z80],tape_128.[szx|z80],
+         tape_16.[szx|z80], tape_2048.[szx|z80], tape_2068.[szx|z80],
+         tape_48.[szx|z80], tape_pentagon.[szx|z80], tape_plus2.[szx|z80],
+         tape_plus2a.[szx|z80], tape_plus3.[szx|z80], tape_scorpion.[szx|z80]}:
+         Make configure choose compressed or uncompressed auto-load snapshots
+         based on libspectrum support for the feature (Fred).

@@ -305,6 +305,50 @@ CPPFLAGS="$ac_save_CPPFLAGS"
 AC_SUBST(LIBSPEC_CFLAGS)
 AC_SUBST(LIBSPEC_LIBS)
 
+dnl Check if supplied libspectrum has support for compressed szx files
+AC_MSG_CHECKING(whether libspectrum supports compressed szx snaps)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_TRY_COMPILE([#include <libspectrum.h>],[
+void test()
+{
+  int test = LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION;
+}
+],
+  AUTOLOAD_SNAPS=compressed; AC_MSG_RESULT(yes),
+  AUTOLOAD_SNAPS=uncompressed; AC_MSG_RESULT(no))
+CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(AUTOLOAD_SNAPS)
+AC_LINK_FILES([
+	"$AUTOLOAD_SNAPS"/disk_plus3.szx
+	"$AUTOLOAD_SNAPS"/tape_128.szx
+	"$AUTOLOAD_SNAPS"/tape_16.szx
+	"$AUTOLOAD_SNAPS"/tape_2048.szx
+	"$AUTOLOAD_SNAPS"/tape_2068.szx
+	"$AUTOLOAD_SNAPS"/tape_48.szx
+	"$AUTOLOAD_SNAPS"/tape_plus2.szx
+	"$AUTOLOAD_SNAPS"/tape_plus2a.szx
+	"$AUTOLOAD_SNAPS"/tape_plus3.szx
+	"$AUTOLOAD_SNAPS"/tape_plus3e.szx
+	"$AUTOLOAD_SNAPS"/tape_pentagon.szx
+	"$AUTOLOAD_SNAPS"/tape_scorpion.szx
+	"$AUTOLOAD_SNAPS"/tape_se.szx
+	"$AUTOLOAD_SNAPS"/tape_ts2068.szx],
+	[lib/disk_plus3.szx
+	lib/tape_128.szx
+	lib/tape_16.szx
+	lib/tape_2048.szx
+	lib/tape_2068.szx
+	lib/tape_48.szx
+	lib/tape_plus2.szx
+	lib/tape_plus2a.szx
+	lib/tape_plus3.szx
+	lib/tape_plus3e.szx
+	lib/tape_pentagon.szx
+	lib/tape_scorpion.szx
+	lib/tape_se.szx
+	lib/tape_ts2068.szx])
+
 dnl Do we want +3 disk support?
 AC_MSG_CHECKING(whether +3 disk support requested)
 AC_ARG_WITH(plus3-disk,

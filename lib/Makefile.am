@@ -25,24 +25,53 @@
 AUTOMAKE_OPTIONS = foreign
 
 FILES = cassette.bmp \
-	disk_plus3.szx \
 	keyboard.scr \
 	microdrive.bmp \
-	plus3disk.bmp \
-	tape_128.szx \
-	tape_16.szx \
-	tape_2048.szx \
-	tape_2068.szx \
-	tape_48.szx \
-	tape_plus2.szx \
-	tape_plus2a.szx \
-	tape_plus3.szx \
-	tape_plus3e.szx \
-	tape_pentagon.szx \
-	tape_scorpion.szx \
-	tape_se.szx \
-	tape_ts2068.szx
+	plus3disk.bmp
+
+noinst_FILES = @AUTOLOAD_SNAPS@/disk_plus3.szx \
+	@AUTOLOAD_SNAPS@/tape_128.szx \
+	@AUTOLOAD_SNAPS@/tape_16.szx \
+	@AUTOLOAD_SNAPS@/tape_2048.szx \
+	@AUTOLOAD_SNAPS@/tape_2068.szx \
+	@AUTOLOAD_SNAPS@/tape_48.szx \
+	@AUTOLOAD_SNAPS@/tape_plus2.szx \
+	@AUTOLOAD_SNAPS@/tape_plus2a.szx \
+	@AUTOLOAD_SNAPS@/tape_plus3.szx \
+	@AUTOLOAD_SNAPS@/tape_plus3e.szx \
+	@AUTOLOAD_SNAPS@/tape_pentagon.szx \
+	@AUTOLOAD_SNAPS@/tape_scorpion.szx \
+	@AUTOLOAD_SNAPS@/tape_se.szx \
+	@AUTOLOAD_SNAPS@/tape_ts2068.szx
 
 pkgdata_DATA = $(FILES)
 
-EXTRA_DIST = $(FILES)
+EXTRA_DIST = $(FILES) \
+	compressed/disk_plus3.szx \
+	compressed/tape_128.szx \
+	compressed/tape_16.szx \
+	compressed/tape_2048.szx \
+	compressed/tape_2068.szx \
+	compressed/tape_48.szx \
+	compressed/tape_plus2.szx \
+	compressed/tape_plus2a.szx \
+	compressed/tape_plus3.szx \
+	compressed/tape_plus3e.szx \
+	compressed/tape_pentagon.szx \
+	compressed/tape_scorpion.szx \
+	compressed/tape_se.szx \
+	compressed/tape_ts2068.szx \
+	uncompressed/disk_plus3.szx \
+	uncompressed/tape_128.szx \
+	uncompressed/tape_16.szx \
+	uncompressed/tape_2048.szx \
+	uncompressed/tape_2068.szx \
+	uncompressed/tape_48.szx \
+	uncompressed/tape_plus2.szx \
+	uncompressed/tape_plus2a.szx \
+	uncompressed/tape_plus3.szx \
+	uncompressed/tape_plus3e.szx \
+	uncompressed/tape_pentagon.szx \
+	uncompressed/tape_scorpion.szx \
+	uncompressed/tape_se.szx \
+	uncompressed/tape_ts2068.szx
