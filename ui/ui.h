@@ -85,10 +85,6 @@ int ui_tape_write( void );
 int ui_plus3_disk_write( specplus3_drive_number which );
 int ui_trdos_disk_write( trdos_drive_number which );
 
-/* Select a scaler from those for which `available' returns true */
-typedef int (*ui_scaler_available)( scaler_type scaler );
-scaler_type ui_get_scaler( ui_scaler_available available );
-
 /* Routines to (de)activate certain menu items */
 
 typedef enum ui_menu_item {

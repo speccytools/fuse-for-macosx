@@ -39,6 +39,7 @@ libuigtk_a_SOURCES = binary.c \
                      gtkui.c \
 		     keysyms.c \
 		     memory.c \
+		     menu_data.c \
 	             options.c \
 		     picture.c \
 		     pixmaps.c \
@@ -46,10 +47,16 @@ libuigtk_a_SOURCES = binary.c \
 		     roms.c \
 		     statusbar.c
 
-BUILT_SOURCES = keysyms.c options.c options.h
+BUILT_SOURCES = keysyms.c \
+		menu_data.c \
+		options.c \
+		options.h
 
 keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl gtk ../../keysyms.dat > $@
+
+menu_data.c: ../../menu_data.pl ../../menu_data.c
+	$(CPP) $(CPPFLAGS) $(DEFS) ../../menu_data.c | @PERL@ ../../menu_data.pl gtk > $@
 
 options.c: options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
 	@PERL@ options.pl ../options.dat > options.c

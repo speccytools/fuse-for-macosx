@@ -129,60 +129,7 @@ void widget_help_keyhandler( input_key key );
 int widget_menu_draw( void* data );
 void widget_menu_keyhandler( input_key key );
 
-/* General callbacks */
-
-/* The callback function to call another widget */
-int widget_menu_widget( void *data );
-
-/* The data type passed to widget_menu_widget */
-typedef struct widget_menu_widget_t {
-  widget_type widget;	/* The widget to call */
-  void *data;		/* with this data parameter */
-} widget_menu_widget_t;
-
 /* More callbacks */
-int widget_menu_open( const char *filename ); /* File/Open */
-int widget_menu_save_snapshot( void *data ); /* File/Save Snapshot */
-int widget_menu_rzx_recording( void *data ); /* File/Recording/Record */
-int widget_menu_rzx_recording_snap( void *data ); /* File/Recording/Record
-						     from snap */
-int widget_menu_rzx_playback( void *data );  /* File/Recording/Play */
-int widget_menu_rzx_stop( void *data );	     /* File/Recording/Stop */
-int widget_menu_psg_record( void *data );    /* File/AY Logging/Record */
-int widget_menu_psg_stop( void *data );	     /* File/AY Logging/Stop */
-int widget_menu_save_screen( void *data );   /* File/Save Screenshot */
-int widget_menu_save_scr( void *data );	     /* File/Save Scr */
-int widget_menu_exit( void *data );	     /* File/Exit */
-
-int widget_menu_joystick( void *data );	     /* Options/Joysticks/<which> */
-int widget_menu_save_options( void *data );  /* Options/Save */
-int widget_menu_select_roms( void *data );   /* Options/Select ROMs/<type> */
-
-int widget_menu_reset( void *data );	     /* Machine/Reset */
-int widget_menu_break( void *data );	     /* Machine/Break */
-int widget_menu_nmi( void *data );	     /* Machine/NMI */
-
-int widget_menu_play_tape( void *data );     /* Tape/Play */
-int widget_menu_rewind_tape( void *data );   /* Tape/Rewind */
-int widget_menu_clear_tape( void *data );    /* Tape/Close */
-int widget_menu_write_tape( void *data );    /* Tape/Write */
-
-int widget_insert_disk_a( const char *filename ); /* Disk/Drive A:/Insert */
-int widget_insert_disk_b( const char *filename ); /* Disk/Drive B:/Insert */
-int widget_menu_eject_disk( void *data );    /* Disk/Drive ?:/Eject */
-int widget_menu_eject_write_disk( void *data ); /* Disk/Drive ?:/Eject and
-						   write */
-
-int widget_insert_ide_simple_master( const char *filename );
-int widget_insert_ide_simple_slave( const char *filename );
-int widget_menu_commit_ide_simple( void *data );
-int widget_menu_eject_ide_simple( void *data );
-
-int widget_insert_dock( const char *filename ); /* Cart/Timex Dock/Insert */
-int widget_menu_eject_dock( void *data );    /* Cart/Timex Dock/Eject */
-
-int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
-
 scaler_type widget_select_scaler( int (*selector)( scaler_type ) );
 
 /* The generalised selector widget */

@@ -51,9 +51,9 @@ CODE
 foreach( @dialogs ) {
 
     print << "CODE";
-void gtkoptions_$_->{name}( GtkWidget *widget, gpointer data );
+void menu_options_$_->{name}( GtkWidget *widget, gpointer data );
 
-typedef struct gtkoptions_$_->{name}_t \{
+typedef struct menu_options_$_->{name}_t \{
 
   GtkWidget *dialog;
 
@@ -70,7 +70,7 @@ CODE
 
     }
 
-    print "\n} gtkoptions_$_->{name}_t;\n\n"
+    print "\n} menu_options_$_->{name}_t;\n\n"
 }
 
 print << "CODE";

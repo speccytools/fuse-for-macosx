@@ -64,12 +64,14 @@ foreach( @dialogs ) {
 
     print << "CODE";
 
-static void gtkoptions_$_->{name}_done( GtkWidget *widget, gpointer user_data );
+static void menu_options_$_->{name}_done( GtkWidget *widget,
+					  gpointer user_data );
 
 void
-gtkoptions_$_->{name}( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_options_$_->{name}( GtkWidget *widget GCC_UNUSED,
+			 gpointer data GCC_UNUSED )
 {
-  gtkoptions_$_->{name}_t dialog;
+  menu_options_$_->{name}_t dialog;
   GtkWidget *ok_button, *cancel_button, *hbox, *text, *text2;
   GtkAccelGroup *accel_group;
   gchar buffer[80];
@@ -145,7 +147,7 @@ CODE
 
   /* Add the necessary callbacks */
   gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkoptions_$_->{name}_done ),
+		      GTK_SIGNAL_FUNC( menu_options_$_->{name}_done ),
 		      (gpointer) &dialog );
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
@@ -175,9 +177,10 @@ CODE
 }
 
 static void
-gtkoptions_$_->{name}_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
+menu_options_$_->{name}_done( GtkWidget *widget GCC_UNUSED,
+			      gpointer user_data )
 {
-  gtkoptions_$_->{name}_t *ptr = (gtkoptions_$_->{name}_t*)user_data;
+  menu_options_$_->{name}_t *ptr = user_data;
 
 CODE
 

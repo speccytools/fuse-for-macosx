@@ -45,6 +45,7 @@
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "machine.h"
+#include "menu.h"
 #include "options.h"
 #include "pokefinder/pokefinder.h"
 #include "psg.h"
@@ -89,7 +90,7 @@ typedef struct gtkui_select_info {
   GtkWidget **buttons;
 
   /* Used by the graphics filter selectors */
-  ui_scaler_available available;
+  scaler_available_fn selector;
   scaler_type selected;
 
 } gtkui_select_info;
@@ -101,172 +102,16 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 
 static gboolean gtkui_delete( GtkWidget *widget, GdkEvent *event,
 			      gpointer data );
-static void gtkui_open(GtkWidget *widget, gpointer data);
-static void gtkui_save(GtkWidget *widget, gpointer data);
 
-static void gtkui_rzx_start( GtkWidget *widget, gpointer data );
-static void gtkui_rzx_start_snap( GtkWidget *widget, gpointer data );
-static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
-static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
 static int gtkui_open_snap( void );
-
-static void gtkui_psg_start( GtkWidget *widget, gpointer data );
-static void gtkui_psg_stop( GtkWidget *widget, gpointer data );
-
-static void gtkui_open_scr( GtkWidget *widget, gpointer data );
-static void gtkui_save_scr( GtkWidget *widget, gpointer data );
-#ifdef USE_LIBPNG
-static void gtkui_save_screen( GtkWidget *widget, gpointer data );
-#endif				/* #ifdef USE_LIBPNG */
-
-static void gtkui_quit(GtkWidget *widget, gpointer data);
-
-static void select_filter(GtkWidget *widget, gpointer data);
-static void select_filter_done( GtkWidget *widget, gpointer user_data );
-
-#ifdef HAVE_LIB_XML2
-static void save_options( GtkWidget *widget, gpointer data );
-#endif				/* #ifdef HAVE_LIB_XML2 */
-
-static void gtkui_pause( GtkWidget *widget, gpointer data );
-static void gtkui_reset(GtkWidget *widget, gpointer data);
-
-static void gtkui_select(GtkWidget *widget, gpointer data);
-static void gtkui_select_done( GtkWidget *widget, gpointer user_data );
-
-static void gtkui_break( GtkWidget *widget, gpointer data );
-static void gtkui_nmi( GtkWidget *widget, gpointer data );
-
-static void gtkui_tape_open( GtkWidget *widget, gpointer data );
-static void gtkui_tape_play( GtkWidget *widget, gpointer data );
-static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
-static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
-static void gtkui_tape_write( GtkWidget *widget, gpointer data );
-
-static void disk_open( gpointer data, guint action, GtkWidget *widget );
 static void gtkui_disk_open( specplus3_drive_number drive );
-static void disk_eject( gpointer data, guint action, GtkWidget *widget );
 
-static void cartridge_insert( GtkWidget *widget, gpointer data );
-static void cartridge_eject( GtkWidget *widget, gpointer data );
-
-static void ide_open( gpointer data, guint action, GtkWidget *widget );
-static void ide_commit( gpointer data, guint action, GtkWidget *widget );
-static void ide_eject( gpointer data, guint actiom, GtkWidget *widget );
-
-static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
+static void menu_options_filter_done( GtkWidget *widget, gpointer user_data );
+static void menu_machine_select_done( GtkWidget *widget, gpointer user_data );
 
 /* Set a menu item (in)active in both the menu bar and the popup menus */
 static int set_menu_item_active( const char *path, int active );
 
-static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		        NULL , NULL,                0, "<Branch>"    },
-  { "/File/_Open...",		"F3" , gtkui_open,          0, NULL          },
-  { "/File/_Save Snapshot..." , "F2" , gtkui_save,          0, NULL          },
-  { "/File/_Recording",		NULL , NULL,		    0, "<Branch>"    },
-  { "/File/Recording/_Record...",NULL, gtkui_rzx_start,     0, NULL	     },
-  { "/File/Recording/Record _from snapshot...",
-                                NULL , gtkui_rzx_start_snap,0, NULL          },
-  { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
-  { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
-  { "/File/A_Y Logging",        NULL , NULL,                0, "<Branch>"    },
-  { "/File/AY Logging/_Record...",NULL, gtkui_psg_start,    0, NULL          },
-  { "/File/AY Logging/_Stop",   NULL , gtkui_psg_stop,      0, NULL          },
-
-  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
-  { "/File/O_pen SCR Screenshot...", NULL, gtkui_open_scr,  0, NULL          },
-  { "/File/S_ave Screen as SCR...", NULL, gtkui_save_scr,   0, NULL          },
-#ifdef USE_LIBPNG
-  { "/File/Save S_creen as PNG...", NULL,gtkui_save_screen, 0, NULL          },
-#endif				/* #ifdef USE_LIBPNG */
-
-  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
-  { "/File/Loa_d binary data...",NULL, gtkui_load_binary_data, 0, NULL       },
-  { "/File/Save _binary data...",NULL, gtkui_save_binary_data, 0, NULL       },
-
-  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
-  { "/File/E_xit...",	        "F10", gtkui_quit,          0, NULL          },
-
-  { "/Options",			NULL , NULL,                0, "<Branch>"    },
-  { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
-  { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
-  { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
-
-  { "/Options/_Joysticks",	NULL , NULL,		    0, "<Branch>"    },
-  { "/Options/Joysticks/Joystick _1...", NULL, gtkjoystick_select, 1, NULL   },
-  { "/Options/Joysticks/Joystick _2...", NULL, gtkjoystick_select, 2, NULL   },
-  { "/Options/Joysticks/_Keyboard...",   NULL, gtkjoystick_select, 3, NULL   },
-
-  { "/Options/S_elect ROMs",    NULL , NULL,                0, "<Branch>"    },
-  { "/Options/Select ROMs/Spectrum 1_6K...", NULL, gtkui_roms, 1, NULL       },
-  { "/Options/Select ROMs/Spectrum _48K...", NULL, gtkui_roms, 2, NULL       },
-  { "/Options/Select ROMs/Spectrum 12_8K...", NULL, gtkui_roms, 3, NULL      },
-  { "/Options/Select ROMs/Spectrum +_2...", NULL, gtkui_roms, 4, NULL        },
-  { "/Options/Select ROMs/Spectrum +2_A...", NULL, gtkui_roms, 5, NULL       },
-  { "/Options/Select ROMs/Spectrum +_3...", NULL, gtkui_roms, 6, NULL        },
-  { "/Options/Select ROMs/Timex _TC2048...", NULL, gtkui_roms, 7, NULL       },
-  { "/Options/Select ROMs/Timex T_C2068...", NULL, gtkui_roms, 8, NULL       },
-  { "/Options/Select ROMs/_Pentagon 128K...", NULL, gtkui_roms, 9, NULL      },
-  { "/Options/Select ROMs/_Scorpion ZS 256...", NULL, gtkui_roms, 10, NULL   },
-
-  { "/Options/_Filter...",	NULL , select_filter,	    0, NULL          },
-
-#ifdef HAVE_LIB_XML2
-  { "/Options/separator",       NULL , NULL,                0, "<Separator>" },
-  { "/Options/S_ave",		NULL , save_options,	    0, NULL          },
-#endif				/* #ifdef HAVE_LIB_XML2 */
-
-  { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
-  { "/Machine/_Pause...",       "Pause", gtkui_pause,	    0, NULL          },
-  { "/Machine/_Reset...",       "F5" , gtkui_reset,         0, NULL          },
-  { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
-  { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
-  { "/Machine/P_oke Finder...",	NULL , gtkui_pokefinder,    0, NULL	     },
-  { "/Machine/_Memory Browser...", NULL, gtkui_memory_browser, 0, NULL       },
-  { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
-
-  { "/Media",			NULL , NULL,                0, "<Branch>"    },
-
-  { "/Media/_Tape",		NULL , NULL,                0, "<Branch>"    },
-  { "/Media/Tape/_Open...",	"F7" , gtkui_tape_open,     0, NULL          },
-  { "/Media/Tape/_Play",	"F8" , gtkui_tape_play,     0, NULL          },
-  { "/Media/Tape/_Browse...",	NULL , gtk_tape_browse,     0, NULL          },
-  { "/Media/Tape/_Rewind",	NULL , gtkui_tape_rewind,   0, NULL          },
-  { "/Media/Tape/_Clear",	NULL , gtkui_tape_clear,    0, NULL          },
-  { "/Media/Tape/_Write...",	"F6" , gtkui_tape_write,    0, NULL          },
-
-  { "/Media/_Disk",		NULL , NULL,		    0, "<Branch>"    },
-  { "/Media/Disk/Drive A:",	NULL , NULL,		    0, "<Branch>"    },
-  { "/Media/Disk/Drive A:/_Insert...", NULL, disk_open,     1, NULL          },
-  { "/Media/Disk/Drive A:/_Eject", NULL, disk_eject,        1, NULL          },
-  { "/Media/Disk/Drive A:/Eject and _write...", NULL, disk_eject, 3, NULL    },
-  { "/Media/Disk/Drive B:",	NULL , NULL,		    0, "<Branch>"    },
-  { "/Media/Disk/Drive B:/_Insert...", NULL, disk_open,     2, NULL          },
-  { "/Media/Disk/Drive B:/_Eject", NULL, disk_eject,        2, NULL          },
-  { "/Media/Disk/Drive B:/Eject and _write...", NULL, disk_eject, 4, NULL    },
-
-  { "/Media/_Cartridge",	NULL , NULL,		    0, "<Branch>"    },
-  { "/Media/Cartridge/_Insert...",
-				NULL , cartridge_insert,    0, NULL          },
-  { "/Media/Cartridge/_Eject",	NULL , cartridge_eject,     0, NULL          },
-
-  { "/Media/_IDE",              NULL , NULL,                0, "<Branch>"    },
-  { "/Media/IDE/Simple _8-bit", NULL , NULL,                0, "<Branch>"    },
-  { "/Media/IDE/Simple 8-bit/_Master", NULL, NULL,          0, "<Branch>"    },
-  { "/Media/IDE/Simple 8-bit/Master/_Insert...", NULL, ide_open, 1, NULL     },
-  { "/Media/IDE/Simple 8-bit/Master/_Commit...", NULL, ide_commit, 1, NULL   },
-  { "/Media/IDE/Simple 8-bit/Master/_Eject", NULL, ide_eject, 1, NULL        },
-  { "/Media/IDE/Simple 8-bit/_Slave", NULL, NULL,           0, "<Branch>"    },
-  { "/Media/IDE/Simple 8-bit/Slave/_Insert...", NULL, ide_open, 2, NULL      },
-  { "/Media/IDE/Simple 8-bit/Slave/_Commit...", NULL, ide_commit, 2, NULL    },
-  { "/Media/IDE/Simple 8-bit/Slave/_Eject", NULL, ide_eject, 2, NULL         },
-
-  { "/Help",			NULL , NULL,		    0, "<Branch>"    },
-  { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
-};
-static guint gtkui_menu_data_size =
-  sizeof( gtkui_menu_data ) / sizeof( GtkItemFactoryEntry );
-  
 int
 ui_init( int *argc, char ***argv )
 {
@@ -306,8 +151,8 @@ ui_init( int *argc, char ***argv )
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);
   gtk_widget_show(box);
 
-  gtkui_make_menu(&accel_group, &menu_bar, gtkui_menu_data,
-		  gtkui_menu_data_size);
+  gtkui_make_menu( &accel_group, &menu_bar, gtkui_menu_data,
+		   gtkui_menu_data_size );
 
   gtk_window_add_accel_group( GTK_WINDOW(gtkui_window), accel_group );
   gtk_box_pack_start( GTK_BOX(box), menu_bar, FALSE, FALSE, 0 );
@@ -500,13 +345,12 @@ ui_error_specific( ui_error_level severity, const char *message )
 static gboolean
 gtkui_delete( GtkWidget *widget, GdkEvent *event GCC_UNUSED, gpointer data )
 {
-  gtkui_quit( widget, data );
+  menu_file_exit( widget, data );
   return TRUE;
 }
 
-/* Called by the menu when File/Open selected */
-static void
-gtkui_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -524,9 +368,9 @@ gtkui_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* Called by the menu when File/Save selected */
-static void
-gtkui_save( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_savesnapshot( GtkWidget *widget GCC_UNUSED,
+			gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -542,9 +386,9 @@ gtkui_save( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* Called when File/Recording/Record selected */
-static void
-gtkui_rzx_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_recording_record( GtkWidget *widget GCC_UNUSED,
+			    gpointer data GCC_UNUSED )
 {
   char *recording;
 
@@ -562,9 +406,9 @@ gtkui_rzx_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* Called when `File/Recording/Record from snapshot' selected */
-static void
-gtkui_rzx_start_snap( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_recording_recordfromsnapshot( GtkWidget *widget GCC_UNUSED,
+					gpointer data GCC_UNUSED )
 {
   char *snap, *recording;
 
@@ -591,17 +435,9 @@ gtkui_rzx_start_snap( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* Called when File/Recording/Stop selected */
-static void
-gtkui_rzx_stop( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  if( rzx_recording ) rzx_stop_recording();
-  if( rzx_playback  ) rzx_stop_playback( 1 );
-}
-
-/* Called when File/Recording/Play selected */
-static void
-gtkui_rzx_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_recording_play( GtkWidget *widget GCC_UNUSED,
+			  gpointer data GCC_UNUSED )
 {
   char *recording;
 
@@ -623,9 +459,9 @@ gtkui_rzx_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* Called when File/AY Logging/Record selected */
-static void
-gtkui_psg_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_aylogging_record( GtkWidget *widget GCC_UNUSED,
+			    gpointer data GCC_UNUSED )
 {
   char *psgfile;
 
@@ -647,18 +483,6 @@ gtkui_psg_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* Called when File/AY Logging/Stop selected */
-static void
-gtkui_psg_stop( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  if ( !psg_recording ) return;
-  psg_stop_recording();
-
-  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
-
-  return;
-}
-
 static int
 gtkui_open_snap( void )
 {
@@ -673,9 +497,9 @@ gtkui_open_snap( void )
   return error;
 }
 
-/* File/Open SCR Screenshot */
-static void
-gtkui_open_scr( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_openscrscreenshot( GtkWidget *widget GCC_UNUSED,
+			     gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -692,9 +516,9 @@ gtkui_open_scr( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* File/Save Screenshot as SCR */
-static void
-gtkui_save_scr( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_savescreenasscr( GtkWidget *widget GCC_UNUSED,
+			   gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -712,16 +536,16 @@ gtkui_save_scr( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 }
 
 #ifdef USE_LIBPNG
-/* File/Save Screenshot as PNG */
-static void
-gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_savescreenaspng( GtkWidget *widget GCC_UNUSED,
+			   gpointer data GCC_UNUSED )
 {
   scaler_type scaler;
   char *filename;
 
   fuse_emulation_pause();
 
-  scaler = ui_get_scaler( screenshot_available_scalers );
+  scaler = menu_get_scaler( screenshot_available_scalers );
   if( scaler == SCALER_NUM ) {
     fuse_emulation_unpause();
     return;
@@ -741,8 +565,8 @@ gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 #endif				/* #ifdef USE_LIBPNG */
 
 /* Called by the menu when File/Exit selected */
-static void
-gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_file_exit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   int error;
 
@@ -754,31 +578,14 @@ gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
     /* Stop the paused state to allow us to exit (occurs from main
        emulation loop) */
-    if( paused ) gtkui_pause( NULL, NULL );
+    if( paused ) menu_machine_pause( NULL, NULL );
   }
-}
-
-/* Called by the menu when Options/Filter selected */
-static void
-select_filter( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  scaler_type scaler;
-
-  /* Stop emulation */
-  fuse_emulation_pause();
-
-  scaler = ui_get_scaler( scaler_is_supported );
-  if( scaler != SCALER_NUM && scaler != current_scaler )
-    scaler_select_scaler( scaler );
-
-  /* Carry on with emulation again */
-  fuse_emulation_unpause();
 }
 
 /* Select a graphics filter from those for which `available' returns
    true */
 scaler_type
-ui_get_scaler( ui_scaler_available available )
+menu_get_scaler( scaler_available_fn selector )
 {
   gtkui_select_info dialog;
   GtkAccelGroup *accel_group;
@@ -791,7 +598,7 @@ ui_get_scaler( ui_scaler_available available )
 
   /* Store the function which tells us which scalers are currently
      available */
-  dialog.available = available;
+  dialog.selector = selector;
 
   /* No scaler currently selected */
   dialog.selected = SCALER_NUM;
@@ -811,7 +618,7 @@ ui_get_scaler( ui_scaler_available available )
 
   for( scaler = 0; scaler < SCALER_NUM; scaler++ ) {
 
-    if( !available( scaler ) ) continue;
+    if( !selector( scaler ) ) continue;
 
     dialog.buttons[ count ] =
       gtk_radio_button_new_with_label( button_group, scaler_name( scaler ) );
@@ -838,7 +645,7 @@ ui_get_scaler( ui_scaler_available available )
 
   /* Add the necessary callbacks */
   gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( select_filter_done ),
+		      GTK_SIGNAL_FUNC( menu_options_filter_done ),
 		      (gpointer) &dialog );
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
@@ -867,7 +674,7 @@ ui_get_scaler( ui_scaler_available available )
 
 /* Callback used by the filter selection dialog */
 static void
-select_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
+menu_options_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 {
   int i, count;
   gtkui_select_info *ptr = (gtkui_select_info*)user_data;
@@ -876,7 +683,7 @@ select_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 
   for( i = 0; i < SCALER_NUM; i++ ) {
 
-    if( !ptr->available( i ) ) continue;
+    if( !ptr->selector( i ) ) continue;
 
     if( gtk_toggle_button_get_active(
 	  GTK_TOGGLE_BUTTON( ptr->buttons[ count ] )
@@ -892,18 +699,9 @@ select_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
   gtk_main_quit();
 }
 
-#ifdef HAVE_LIB_XML2
-/* Options/Save */
-static void
-save_options( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  settings_write_config( &settings_current );
-}
-#endif				/* #ifdef HAVE_LIB_XML2 */
-
 /* Machine/Pause */
-static void
-gtkui_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_machine_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   int error;
 
@@ -930,8 +728,8 @@ gtkui_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 }
 
 /* Called by the menu when Machine/Reset selected */
-static void
-gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_machine_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   if( gtkui_confirm( "Reset?" ) && machine_reset() ) {
     ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
@@ -942,8 +740,8 @@ gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 }
 
 /* Called by the menu when Machine/Select selected */
-static void
-gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_select_info dialog;
   GtkAccelGroup *accel_group;
@@ -997,7 +795,7 @@ gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   /* Add the necessary callbacks */
   gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_select_done ),
+		      GTK_SIGNAL_FUNC( menu_machine_select_done ),
 		      (gpointer) &dialog );
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
@@ -1027,10 +825,10 @@ gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
 /* Callback used by the machine selection dialog */
 static void
-gtkui_select_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
+menu_machine_select_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 {
   int i;
-  gtkui_select_info *ptr = (gtkui_select_info*)user_data;
+  gtkui_select_info *ptr = user_data;
 
   for( i=0; i<machine_count; i++ ) {
     if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(ptr->buttons[i]) ) &&
@@ -1045,25 +843,15 @@ gtkui_select_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
   gtk_main_quit();
 }
 
-/* Machine/Break */
-static void
-gtkui_break( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_machine_debugger( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
   if( paused ) ui_debugger_activate();
 }
 
-/* Machine/NMI */
-static void
-gtkui_nmi( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  /* Add an NMI to go off as soon as possible */
-  if( event_add( 0, EVENT_TYPE_NMI ) ) return;
-}
-    
-/* Called by the menu when Tape/Open selected */
-static void
-gtkui_tape_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_media_tape_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -1072,37 +860,15 @@ gtkui_tape_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   filename = gtkui_fileselector_get_filename( "Fuse - Open Tape" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  tape_open_default_autoload( filename );
+  tape_open_default_autoload( filename, NULL );
 
   free( filename );
 
   fuse_emulation_unpause();
 }
 
-/* Called by the menu when Tape/Play selected */
-static void
-gtkui_tape_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  tape_toggle_play();
-}
-
-/* Called by the menu when Tape/Rewind selected */
-static void
-gtkui_tape_rewind( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  tape_select_block( 0 );
-}
-
-/* Called by the menu when Tape/Clear selected */
-static void
-gtkui_tape_clear( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  tape_close();
-}
-
-/* Called by the menu when Tape/Write selected */
-static void
-gtkui_tape_write( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_media_tape_write( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   ui_tape_write();
 }
@@ -1126,10 +892,9 @@ ui_tape_write( void )
   return 0;
 }
 
-/* Called by the menu when Disk/Drive ?:/Open selected */
-static void
-disk_open( gpointer data GCC_UNUSED, guint action,
-	   GtkWidget *widget GCC_UNUSED )
+void
+menu_media_disk_insert( gpointer data GCC_UNUSED, guint action,
+			GtkWidget *widget GCC_UNUSED )
 {
   guint which;
 
@@ -1138,7 +903,8 @@ disk_open( gpointer data GCC_UNUSED, guint action,
   gtkui_disk_open( which );
 }
 
-static void gtkui_disk_open( specplus3_drive_number drive )
+void
+gtkui_disk_open( specplus3_drive_number drive )
 {
   char *filename;
 
@@ -1159,26 +925,6 @@ static void gtkui_disk_open( specplus3_drive_number drive )
   free( filename );
 
   fuse_emulation_unpause();
-}
-
-static void
-disk_eject( gpointer data GCC_UNUSED, guint action,
-	    GtkWidget *widget GCC_UNUSED )
-{
-  guint parameter, which, write;
-
-  parameter = action - 1;
-  which = parameter & 0x01;
-  write = parameter & 0x02;
-
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( which, write );
-    return;
-  }
-#endif				/* #ifdef HAVE_765_H */
-
-  trdos_disk_eject( which, write );
 }
 
 #ifdef HAVE_765_H
@@ -1234,9 +980,9 @@ ui_trdos_disk_write( trdos_drive_number which )
   return 0;
 }
 
-/* Cartridge/Insert */
-static void
-cartridge_insert( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_media_cartridge_insert( GtkWidget *widget GCC_UNUSED,
+			     gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -1252,16 +998,9 @@ cartridge_insert( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-/* Cartridge/Eject */
-static void
-cartridge_eject( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  dck_eject();
-}
-
-static void
-ide_open( gpointer data GCC_UNUSED, guint action,
-          GtkWidget *widget GCC_UNUSED )
+void
+menu_media_ide_simple8bit_insert( gpointer data GCC_UNUSED, guint action,
+				  GtkWidget *widget GCC_UNUSED )
 {
   char *filename;
 
@@ -1280,32 +1019,8 @@ ide_open( gpointer data GCC_UNUSED, guint action,
   fuse_emulation_unpause();
 }
 
-static void
-ide_commit( gpointer data GCC_UNUSED, guint action,
-	    GtkWidget *widget GCC_UNUSED )
-{
-  fuse_emulation_pause();
-
-  switch( action ) {
-  case 1: simpleide_commit( LIBSPECTRUM_IDE_MASTER ); break;
-  case 2: simpleide_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
-  }
-
-  fuse_emulation_unpause();
-}
-
-static void
-ide_eject( gpointer data GCC_UNUSED, guint action,
-           GtkWidget *widget GCC_UNUSED )
-{
-  switch( action ) {
-  case 1: simpleide_eject( LIBSPECTRUM_IDE_MASTER ); break;
-  case 2: simpleide_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
-  }
-}
-
-static void
-gtkui_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+void
+menu_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_picture( "keyboard.scr", 0 );
 }

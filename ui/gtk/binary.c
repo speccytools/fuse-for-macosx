@@ -55,8 +55,8 @@ static void change_save_filename( GtkButton *button, gpointer user_data );
 static void save_data( GtkButton *button, gpointer user_data );
 
 void
-gtkui_load_binary_data( GtkWidget *widget GCC_UNUSED, gpointer data
-			GCC_UNUSED )
+menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
+			  GCC_UNUSED )
 {
   struct binary_info info;
 
@@ -205,8 +205,8 @@ load_data( GtkButton *button GCC_UNUSED, gpointer user_data )
 }
   
 void
-gtkui_save_binary_data( GtkWidget *widget GCC_UNUSED, gpointer data
-			GCC_UNUSED )
+menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
+			  GCC_UNUSED )
 {
   struct binary_info info;
 

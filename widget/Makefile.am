@@ -42,7 +42,12 @@ libwidget_a_SOURCES = \
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
-BUILT_SOURCES = options.c options.h
+BUILT_SOURCES = menu_data.c \
+		options.c \
+		options.h
+
+menu_data.c: ../menu_data.c ../menu_data.pl
+	$(CPP) $(DEFS) ../menu_data.c | @PERL@ ../menu_data.pl widget > $@
 
 options.c: options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
 	@PERL@ options.pl ../ui/options.dat > options.c

@@ -89,7 +89,7 @@ scroller( GtkAdjustment *adjustment, gpointer user_data )
 }
 
 void
-gtkui_memory_browser( void )
+menu_machine_memorybrowser( void )
 {
   GtkWidget *dialog, *button, *box, *clist, *scrollbar;
   GtkAccelGroup *accel_group;

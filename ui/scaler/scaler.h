@@ -63,6 +63,8 @@ extern scaler_flags_t scaler_flags;
 extern scaler_expand_fn *scaler_expander;
 extern int scalers_registered;
 
+typedef int (*scaler_available_fn)( scaler_type scaler );
+
 int scaler_select_id( const char *scaler_mode );
 void scaler_register_clear( void );
 int scaler_select_scaler( scaler_type scaler );

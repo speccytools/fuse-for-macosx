@@ -2,5 +2,6 @@
 /Makefile
 /Makefile.in
 /keysyms.c
+/menu_data.c
 /options.c
 /options.h

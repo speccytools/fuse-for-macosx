@@ -50,8 +50,8 @@ struct joystick_info {
 };
 
 void
-gtkjoystick_select( gpointer callback_data, guint callback_action,
-		    GtkWidget *widget )
+menu_options_joysticks_select( gpointer callback_data, guint callback_action,
+			       GtkWidget *widget )
 {
   GtkWidget *dialog, *button;
   GSList *button_group;

@@ -1,0 +1,145 @@
+#if 0
+
+# menu_data.c: Menu structure for Fuse
+# Copyright (c) 2004 Philip Kendall
+
+# $Id$
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+# USA
+
+# Author contact information:
+
+# Philip Kendall <pak21-fuse@srcf.ucam.org>
+# Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+#endif
+
+#include <config.h>
+
+_File, Branch
+File/_Open..., Item, F3
+File/_Save Snapshot..., Item, F2
+
+File/_Recording, Branch
+File/Recording/_Record..., Item
+File/Recording/Record _from snapshot..., Item
+File/Recording/_Play..., Item
+File/Recording/_Stop, Item
+
+File/A_Y Logging, Branch
+File/AY Logging/_Record..., Item
+File/AY Logging/_Stop, Item
+
+File/separator, Separator
+File/O_pen SCR Screenshot..., Item
+File/S_ave Screen as SCR..., Item
+
+#ifdef USE_LIBPNG
+File/Save S_creen as PNG..., Item
+#endif				/* #ifdef USE_LIBPNG */
+
+#ifndef USE_WIDGET
+File/separator, Separator
+File/Loa_d binary data..., Item
+File/Save _binary data..., Item
+#endif				/* #ifndef USE_WIDGET */
+
+File/separator, Separator
+File/E_xit..., Item, F10
+
+_Options, Branch
+Options/_General..., Item, F4
+Options/_Sound..., Item
+Options/_RZX..., Item
+
+Options/_Joysticks, Branch
+Options/Joysticks/Joystick _1..., Item,, menu_options_joysticks_select, 1
+Options/Joysticks/Joystick _2..., Item,, menu_options_joysticks_select, 2
+Options/Joysticks/_Keyboard..., Item,, menu_options_joysticks_select, 3
+
+Options/S_elect ROMs, Branch
+Options/Select ROMs/Spectrum 1_6K..., Item,, menu_options_selectroms_select, 1
+Options/Select ROMs/Spectrum _48K..., Item,, menu_options_selectroms_select, 2
+Options/Select ROMs/Spectrum 12_8K..., Item,, menu_options_selectroms_select, 3
+Options/Select ROMs/Spectrum +_2..., Item,, menu_options_selectroms_select, 4
+Options/Select ROMs/Spectrum +2_A..., Item,, menu_options_selectroms_select, 5
+Options/Select ROMs/Spectrum +_3..., Item,, menu_options_selectroms_select, 6
+Options/Select ROMs/Timex _TC2048..., Item,, menu_options_selectroms_select, 7
+Options/Select ROMs/Timex T_C2068..., Item,, menu_options_selectroms_select, 8
+Options/Select ROMs/_Pentagon 128K..., Item,, menu_options_selectroms_select, 9
+Options/Select ROMs/_Scorpion ZS 256..., Item,, menu_options_selectroms_select, 10
+
+Options/_Filter..., Item
+
+#ifdef HAVE_LIB_XML2
+Options/separator, Separator
+Options/S_ave, Item
+#endif				/* #ifdef HAVE_LIB_XML2 */
+
+_Machine, Branch
+
+#ifndef USE_WIDGET
+Machine/_Pause..., Item, Pause
+#endif				/* #ifndef USE_WIDGET */
+
+Machine/_Reset..., Item, F5
+Machine/_Select..., Item, F9
+Machine/_Debugger..., Item
+
+#ifndef USE_WIDGET
+Machine/P_oke Finder..., Item
+Machine/_Memory Browser..., Item
+#endif				/* #ifndef USE_WIDGET */
+
+Machine/_NMI, Item
+
+M_edia, Branch
+
+Media/_Tape, Branch
+Media/Tape/_Open..., Item, F7
+Media/Tape/_Play, Item, F8
+Media/Tape/_Browse..., Item
+Media/Tape/_Rewind, Item
+Media/Tape/_Clear, Item
+Media/Tape/_Write..., Item, F6
+
+Media/_Disk, Branch
+Media/Disk/Drive _A:, Branch
+Media/Disk/Drive A:/_Insert..., Item,, menu_media_disk_insert, 1
+Media/Disk/Drive A:/_Eject, Item,, menu_media_disk_eject, 1
+Media/Disk/Drive A:/Eject and _write..., Item,, menu_media_disk_eject, 3
+Media/Disk/Drive _B:, Branch
+Media/Disk/Drive B:/_Insert..., Item,, menu_media_disk_insert, 2
+Media/Disk/Drive B:/_Eject, Item,, menu_media_disk_eject, 2
+Media/Disk/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 4
+
+Media/_Cartridge, Branch
+Media/Cartridge/_Insert..., Item
+Media/Cartridge/_Eject, Item
+
+Media/_IDE, Branch
+Media/IDE/Simple _8-bit, Branch
+Media/IDE/Simple 8-bit/_Master, Branch
+Media/IDE/Simple 8-bit/Master/_Insert..., Item,, menu_media_ide_simple8bit_insert, 1
+Media/IDE/Simple 8-bit/Master/_Commit..., Item,, menu_media_ide_simple8bit_commit, 1
+Media/IDE/Simple 8-bit/Master/_Eject, Item,, menu_media_ide_simple8bit_eject, 1
+Media/IDE/Simple 8-bit/_Slave, Branch
+Media/IDE/Simple 8-bit/Slave/_Insert..., Item,, menu_media_ide_simple8bit_insert, 2
+Media/IDE/Simple 8-bit/Slave/_Commit..., Item,, menu_media_ide_simple8bit_commit, 2
+Media/IDE/Simple 8-bit/Slave/_Eject, Item,, menu_media_ide_simple8bit_eject, 2
+
+_Help, Branch
+Help/_Keyboard..., Item

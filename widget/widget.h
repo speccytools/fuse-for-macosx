@@ -69,6 +69,9 @@ typedef enum widget_type {
 /* Activate a widget */
 int widget_do( widget_type which, void *data );
 
+/* Finish with widgets for now */
+void widget_finish( void );
+
 /* A function to handle keypresses */
 typedef void (*widget_keyhandler_fn)( input_key key );
 
@@ -80,27 +83,28 @@ extern widget_keyhandler_fn widget_keyhandler;
 /* Menu widget */
 
 /* A generic callback function */
-typedef int (*widget_menu_callback_fn)( void *data );
+typedef void (*widget_menu_callback_fn)( int action );
 
 /* A general menu */
 typedef struct widget_menu_entry {
   const char *text;		/* Menu entry text */
   input_key key;		/* Which key to activate this widget */
 
-  widget_menu_callback_fn action; /* What to do */
-  void *data;			/* And with which arguments */
+  const struct widget_menu_entry *submenu;
+  widget_menu_callback_fn callback;
+
+  int action;
 
 } widget_menu_entry;
 
 /* The main menu as activated with F1 */
-extern widget_menu_entry widget_menu_main[];
+extern const widget_menu_entry widget_menu[];
 
 /* The name returned from the file selector */
-
 extern char* widget_filesel_name;
 
 /* Get a filename and do something with it */
-int widget_apply_to_file( void *data );
+int widget_apply_to_file( int (*func)( const char *, void * ), void *data );
 
 /* Select a machine */
 int widget_select_machine( void *data );

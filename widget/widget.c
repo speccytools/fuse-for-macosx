@@ -277,7 +277,13 @@ int widget_end_all( widget_finish_state state )
 
   return 0;
 }
-    
+
+void
+widget_finish( void )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+}
+
 int widget_dialog( int x, int y, int width, int height )
 {
   widget_rectangle( 8*x, 8*y, 8*width, 8*height, WIDGET_COLOUR_BACKGROUND );

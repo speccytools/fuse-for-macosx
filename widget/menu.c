@@ -53,8 +53,6 @@
 
 widget_menu_entry *menu;
 
-static int widget_load_snapshot( void );
-
 int widget_menu_draw( void *data )
 {
   widget_menu_entry *ptr;
@@ -108,7 +106,13 @@ widget_menu_keyhandler( input_key key )
 
   for( ptr=&menu[1]; ptr->text; ptr++ ) {
     if( key == ptr->key ) {
-      (ptr->action)( ptr->data );	/* function pointer call */
+
+      if( ptr->submenu ) {
+	widget_do( WIDGET_TYPE_MENU, ptr->submenu );
+      } else {
+	ptr->callback( ptr->action );
+      }
+
       break;
     }
   }
@@ -116,154 +120,139 @@ widget_menu_keyhandler( input_key key )
 
 /* General callbacks */
 
-/* The callback used to call another widget */
-int widget_menu_widget( void *data )
-{
-  widget_menu_widget_t *ptr = (widget_menu_widget_t*)data;
-
-  return widget_do( ptr->widget, ptr->data );
-}
-
 /* The callback to get a file name and do something with it */
-int widget_apply_to_file( void *data )
+int
+widget_apply_to_file( int (*func)( const char *, void * ), void *data )
 {
-  typedef int (*fn_ptr)(const char*);
-
-  fn_ptr ptr = (fn_ptr)data;
-
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
   if( widget_filesel_name ) {
-    ptr( widget_filesel_name );
+    func( widget_filesel_name, data );
     free( widget_filesel_name );
   }
 
   return 0;
 }
 
-/* File menu callbacks */
-
-/* File/Open (called via widget_apply_to_file) */
-int
-widget_menu_open( const char *filename )
+static int
+open_file( const char *filename, void *data )
 {
   return utils_open_file( filename, settings_current.auto_load, NULL );
 }
 
-/* File/Save Snapshot*/
-int
-widget_menu_save_snapshot( void *data GCC_UNUSED )
+void
+menu_file_open( int action )
 {
-  widget_end_all( WIDGET_FINISHED_OK );
-  return snapshot_write( "snapshot.z80" );
+  widget_apply_to_file( open_file, NULL );
 }
 
-/* File/Recording/Record */
-int
-widget_menu_rzx_recording( void *data GCC_UNUSED )
+void
+menu_file_savesnapshot( int action )
 {
-  if( rzx_playback || rzx_recording ) return 0;
-
   widget_end_all( WIDGET_FINISHED_OK );
-
-  return rzx_start_recording( "record.rzx", 1 );
+  snapshot_write( "snapshot.z80" );
 }
 
-/* File/Recording/Record from snap */
-int
-widget_menu_rzx_recording_snap( void *data GCC_UNUSED )
+void
+menu_file_recording_record( int action )
+{
+  if( rzx_playback || rzx_recording ) return;
+
+  widget_end_all( WIDGET_FINISHED_OK );
+  rzx_start_recording( "record.rzx", 1 );
+}
+
+void
+menu_file_recording_recordfromsnapshot( int action )
 {
   int error;
 
-  if( rzx_playback || rzx_recording ) return 0;
+  if( rzx_playback || rzx_recording ) return;
 
   /* Get a snapshot name */
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
 
-  if( !widget_filesel_name ) {
-    widget_end_widget( WIDGET_FINISHED_CANCEL );
-    return 0;
-  }
+  if( !widget_filesel_name ) widget_end_widget( WIDGET_FINISHED_CANCEL );
 
   error = snapshot_read( widget_filesel_name );
   if( error ) {
     if( widget_filesel_name ) free( widget_filesel_name );
-    return error;
+    return;
   }
 
-  return rzx_start_recording( "record.rzx", settings_current.embed_snapshot );
+  rzx_start_recording( "record.rzx", settings_current.embed_snapshot );
 }
 
-/* File/Recording/Play */
-int
-widget_menu_rzx_playback( void *data GCC_UNUSED )
+static int
+load_snapshot( const char *filename, void *data )
+{
+  return snapshot_read( filename );
+}
+
+static int
+get_snapshot( void )
+{
+  return widget_apply_to_file( load_snapshot, NULL );
+}
+
+void
+menu_file_recording_play( int action )
 {
   int error;
 
-  if( rzx_playback || rzx_recording ) return 0;
+  if( rzx_playback || rzx_recording ) return;
 
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
 
   if( widget_filesel_name ) {
-    error = rzx_start_playback( widget_filesel_name, widget_load_snapshot );
+    error = rzx_start_playback( widget_filesel_name, get_snapshot );
     free( widget_filesel_name );
-    return error;
-  } else {
-    return 0;
   }
+
 }
 
-static int widget_load_snapshot( void )
+void
+menu_file_aylogging_record( int action )
 {
-  return widget_apply_to_file( snapshot_read );
-}
-
-/* File/Recording/Stop */
-int
-widget_menu_rzx_stop( void *data GCC_UNUSED )
-{
-  if( rzx_recording ) rzx_stop_recording();
-  if( rzx_playback  ) rzx_stop_playback( 1 );
+  if( psg_recording ) return;
 
   widget_end_all( WIDGET_FINISHED_OK );
-  return 0;
-}  
-
-/* File/AY Logging/Record */
-int
-widget_menu_psg_record( void *data GCC_UNUSED )
-{
-  if( psg_recording ) return 0;
-
-  widget_end_all( WIDGET_FINISHED_OK );
-
-  return psg_start_recording( "ay.psg" );
+  psg_start_recording( "ay.psg" );
 }
 
-/* File/AY Logging/Stop */
-int
-widget_menu_psg_stop( void *data GCC_UNUSED )
+static int
+open_screenshot( const char *filename, void *data )
 {
-  if( !psg_recording ) return 0;
-  
-  return psg_stop_recording();
-}  
+  return screenshot_scr_read( filename );
+}
+
+void
+menu_file_openscrscreenshot( int action )
+{
+  widget_apply_to_file( open_screenshot, NULL );
+}
+
+void
+menu_file_savescreenasscr( int action )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+  screenshot_scr_write( "fuse.scr" );
+}
 
 #ifdef USE_LIBPNG
-/* File/Save Screenshot */
-int
-widget_menu_save_screen( void *data GCC_UNUSED )
+void
+menu_file_savescreenaspng( int action )
 {
   scaler_type scaler;
 
-  scaler = widget_select_scaler( screenshot_available_scalers );
-  if( scaler == -1 ) return 0;
+  scaler = menu_get_scaler( screenshot_available_scalers );
+  if( scaler == SCALER_NUM ) return;
 
-  return screenshot_write( "fuse.png", scaler );
+  screenshot_write( "fuse.png", scaler );
 }
 #endif			/* #ifdef USE_LIBPNG */
 
 scaler_type
-widget_select_scaler( int (*selector)( scaler_type ) )
+menu_get_scaler( scaler_available_fn selector )
 {
   size_t count, i;
   const char *options[ SCALER_NUM ];
@@ -283,9 +272,9 @@ widget_select_scaler( int (*selector)( scaler_type ) )
   info.count = count;
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );
-  if( error ) return -1;
+  if( error ) return SCALER_NUM;
 
-  if( info.result == -1 ) return info.result;
+  if( info.result == -1 ) return SCALER_NUM;
 
   for( i = 0; i < SCALER_NUM; i++ )
     if( selector( i ) && !info.result-- ) return i;
@@ -293,37 +282,43 @@ widget_select_scaler( int (*selector)( scaler_type ) )
   ui_error( UI_ERROR_ERROR, "widget_select_scaler: ran out of scalers" );
   fuse_abort();
 
-  return -1;
+  return SCALER_NUM;
 }
 
-/* File/Save Scr */
-int
-widget_menu_save_scr( void *data GCC_UNUSED )
-{
-  widget_end_all( WIDGET_FINISHED_OK );
-  return screenshot_scr_write( "fuse.scr" );
-}
-
-/* File/Exit */
-int widget_menu_exit( void *data GCC_UNUSED )
+void
+menu_file_exit( int action )
 {
   fuse_exiting = 1;
   widget_end_all( WIDGET_FINISHED_OK );
-  return 0;
 }
 
-/* Options/Joysticks/<which> */
-int
-widget_menu_joystick( void *data )
+void
+menu_options_general( int action )
 {
-  int which = *(int*)data;
+  widget_do( WIDGET_TYPE_GENERAL, NULL );
+}
 
+void
+menu_options_sound( int action )
+{
+  widget_do( WIDGET_TYPE_SOUND, NULL );
+}
+
+void
+menu_options_rzx( int action )
+{
+  widget_do( WIDGET_TYPE_RZX, NULL );
+}
+
+void
+menu_options_joysticks_select( int action )
+{
   widget_select_t info;
   int *setting, error;
 
   setting = NULL;
 
-  switch( which ) {
+  switch( action - 1 ) {
 
   case 0: setting = &( settings_current.joystick_1_output ); break;
   case 1: setting = &( settings_current.joystick_2_output ); break;
@@ -338,83 +333,34 @@ widget_menu_joystick( void *data )
   info.current = *setting;
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );
-  if( error ) return error;
+  if( error ) return;
 
   *setting = info.result;
-
-  return 0;
 }
 
 /* Options/Select ROMs/<type> */
 int
-widget_menu_select_roms( void *data )
+menu_select_roms( libspectrum_machine machine, size_t start, size_t count )
 {
-  libspectrum_machine machine = *(libspectrum_machine*)data;
-
   widget_roms_info info;
 
   info.machine = machine;
-  info.count = 0;
-
-  switch( machine ) {
-  case LIBSPECTRUM_MACHINE_16:     info.start =  0; info.count = 1; break;
-  case LIBSPECTRUM_MACHINE_48:     info.start =  1; info.count = 1; break;
-  case LIBSPECTRUM_MACHINE_128:    info.start =  2; info.count = 2; break;
-  case LIBSPECTRUM_MACHINE_PLUS2:  info.start =  4; info.count = 2; break;
-  case LIBSPECTRUM_MACHINE_PLUS2A: info.start =  6; info.count = 4; break;
-  case LIBSPECTRUM_MACHINE_PLUS3:  info.start = 10; info.count = 4; break;
-  case LIBSPECTRUM_MACHINE_TC2048: info.start = 14; info.count = 1; break;
-  case LIBSPECTRUM_MACHINE_TC2068: info.start = 15; info.count = 2; break;
-  case LIBSPECTRUM_MACHINE_PENT:   info.start = 17; info.count = 3; break;
-  case LIBSPECTRUM_MACHINE_SCORP:  info.start = 20; info.count = 4; break;
-
-  case LIBSPECTRUM_MACHINE_UNKNOWN: break;
-  }
-
-  if( !info.count ) {
-    ui_error( UI_ERROR_ERROR, "widget_menu_select_roms: unknown machine %u\n",
-	      machine );
-    fuse_abort();
-  }
-
+  info.start = start;
+  info.count = count;
   info.initialised = 0;
+
   return widget_do( WIDGET_TYPE_ROM, &info );
 }
 
-/* Options/Filter */
-int
-widget_menu_filter( void *data GCC_UNUSED )
-{
-  scaler_type scaler;
-
-  scaler = widget_select_scaler( scaler_is_supported );
-  if( scaler == -1 ) return 0;
-
-  if( scaler != current_scaler ) return scaler_select_scaler( scaler );
-
-  return 0;
-}
-
-#ifdef HAVE_LIB_XML2
-/* Options/Save */
-int
-widget_menu_save_options( void *data GCC_UNUSED )
+void
+menu_machine_reset( int action )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  return settings_write_config( &settings_current );
-}
-#endif				/* #ifdef HAVE_LIB_XML2 */
-
-/* Machine/Reset */
-int widget_menu_reset( void *data GCC_UNUSED )
-{
-  widget_end_all( WIDGET_FINISHED_OK );
-  return machine_reset();
+  machine_reset();
 }
 
-/* Machine/Select */
-int
-widget_select_machine( void *data GCC_UNUSED )
+void
+menu_machine_select( int action )
 {
   widget_select_t info;
   char **options, *buffer;
@@ -425,14 +371,14 @@ widget_select_machine( void *data GCC_UNUSED )
   options = malloc( machine_count * sizeof( const char * ) );
   if( !options ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
+    return;
   }
 
   buffer = malloc( 40 * machine_count );
   if( !buffer ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     free( options );
-    return 1;
+    return;
   }
 
   for( i = 0; i < machine_count; i++ ) {
@@ -449,104 +395,77 @@ widget_select_machine( void *data GCC_UNUSED )
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );
   free( buffer ); free( options );
-  if( error ) return error;
+  if( error ) return;
 
-  if( info.result == -1 ) return 0;
+  if( info.result == -1 ) return;
 
   new_machine = machine_types[ info.result ]->machine;
 
   if( machine_current->machine != new_machine ) machine_select( new_machine );
-
-  return 0;
 }
 
-/* Machine/Break */
-int
-widget_menu_break( void *data GCC_UNUSED )
+void
+menu_machine_debugger( int action )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
   widget_do( WIDGET_TYPE_DEBUGGER, NULL );
-  return 0;
 }
 
-/* Machine/NMI */
+void
+menu_media_tape_open( int action )
+{
+  widget_apply_to_file( tape_open_default_autoload, NULL );
+}
+
+void
+menu_media_tape_browse( int action )
+{
+  widget_do( WIDGET_TYPE_BROWSE, NULL );
+}
+
+void
+menu_media_tape_write( int action )
+{
+  ui_tape_write();
+}
+
 int
-widget_menu_nmi( void *data GCC_UNUSED )
-{
-  int error;
-
-  widget_end_all( WIDGET_FINISHED_OK );
-
-  error = event_add( 0, EVENT_TYPE_NMI );
-  if( error ) return error;
-
-  return 0;
-}
-
-/* Tape/Play */
-int widget_menu_play_tape( void *data GCC_UNUSED )
+ui_tape_write( void )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  return tape_toggle_play();
+  return tape_write( "tape.tzx" );
 }
 
-/* Tape/Rewind */
-int widget_menu_rewind_tape( void *data GCC_UNUSED )
+static int
+insert_disk( const char *filename, void *data )
 {
-  widget_end_all( WIDGET_FINISHED_OK );
-  return tape_select_block( 0 );
-}
+  specplus3_drive_number which = *(specplus3_drive_number*)data;
 
-/* Disk/Drive A:/Insert (called via widget_apply_to_file) */
-int
-widget_insert_disk_a( const char *filename )
-{
 #ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    return specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
+  if( machine_current->capabilities &
+      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
+    return specplus3_disk_insert( which, filename );
+#endif			/* #ifdef HAVE_765_H */
+
+  return trdos_disk_insert( which, filename );
+}
+
+void
+menu_media_disk_insert( int action )
+{
+  specplus3_drive_number which;
+
+  switch( action ) {
+  case 1: which = SPECPLUS3_DRIVE_A; break;
+  case 2: which = SPECPLUS3_DRIVE_B; break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "menu_media_disk_insert: unknown action %d",
+	      action );
+    fuse_abort();
   }
-#endif				/* #ifdef HAVE_765_H */
-  return trdos_disk_insert( TRDOS_DRIVE_A, filename );
-}
 
-/* Disk/Drive B:/Insert (called via widget_apply_to_file) */
-int
-widget_insert_disk_b( const char *filename )
-{
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    return specplus3_disk_insert( SPECPLUS3_DRIVE_B, filename );
-  }
-#endif				/* #ifdef HAVE_765_H */
-  return trdos_disk_insert( TRDOS_DRIVE_B, filename );
-}
-
-/* Disk/Drive ?:/Eject */
-int
-widget_menu_eject_disk( void *data )
-{
-  trdos_drive_number which = *(trdos_drive_number*)data;
-
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 )
-    return specplus3_disk_eject( which, 0 );
-#endif				/* #ifdef HAVE_765_H */
-
-  return trdos_disk_eject( which, 0 );
-}
-
-/* Disk/Drive ?:/Eject and write */
-int
-widget_menu_eject_write_disk( void *data )
-{
-  trdos_drive_number which = *(trdos_drive_number*)data;
-
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 )
-    return specplus3_disk_eject( which, 1 );
-#endif				/* #ifdef HAVE_765_H */
-
-  return trdos_disk_eject( which, 1 );
+  widget_apply_to_file( insert_disk, &which );
 }
 
 #ifdef HAVE_765_H
@@ -571,106 +490,79 @@ ui_trdos_disk_write( trdos_drive_number which )
   return trdos_disk_write( which, filename );
 }
 
-/* Cartridge/Timex Dock/Insert (called via widget_apply_to_file) */
-int
-widget_insert_dock( const char *filename )
+static int
+insert_cartridge( const char *filename, void *data )
 {
   return dck_insert( filename );
 }
 
-/* Cartridge/Timex Dock/Eject */
-int
-widget_menu_eject_dock( void *data )
+void
+menu_media_cartridge_insert( int action )
 {
-  dck_eject();
-
-  return 0;
+  widget_apply_to_file( insert_cartridge, NULL );
 }
 
-/* Tape/Clear */
-int widget_menu_clear_tape( void *data GCC_UNUSED )
+static libspectrum_ide_unit
+action_to_ideunit( int action )
 {
-  widget_end_all( WIDGET_FINISHED_OK );
-  return tape_close();
+  switch( action ) {
+  case 1: return LIBSPECTRUM_IDE_MASTER;
+  case 2: return LIBSPECTRUM_IDE_SLAVE;
+  }
+
+  ui_error( UI_ERROR_ERROR, "action_to_ideunit: unknown action %d", action );
+  fuse_abort();
+  return 0;			/* Keep gcc happy */
 }
 
-/* Tape/Write */
-int widget_menu_write_tape( void *data GCC_UNUSED )
-{
-  return ui_tape_write();
-}
-
-int
-ui_tape_write( void )
-{
-  widget_end_all( WIDGET_FINISHED_OK );
-  return tape_write( "tape.tzx" );
-}
-
-/* IDE/Simple 8-bit/Master/Insert (called via widget_apply_to_file) */
-int
-widget_insert_ide_simple_master( const char *filename )
-{
-  return simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER );
-}
-
-/* IDE/Simple 8-bit/Slave/Insert (called via widget_apply_to_file) */
-int
-widget_insert_ide_simple_slave( const char *filename )
-{
-  return simpleide_insert( filename, LIBSPECTRUM_IDE_SLAVE );
-}
-
-/* IDE/Simple 8-bit/(unit)/Commit */
-int
-widget_menu_commit_ide_simple( void *data )
+static int
+insert_simpleide( const char *filename, void *data )
 {
   libspectrum_ide_unit unit = *(libspectrum_ide_unit*)data;
-  
-  return simpleide_commit( unit );
+
+  return simpleide_insert( filename, unit );
 }
 
-/* IDE/Simple 8-bit/(unit)/Eject */
-int
-widget_menu_eject_ide_simple( void *data )
+void
+menu_media_ide_simple8bit_insert( int action )
 {
-  libspectrum_ide_unit unit = *(libspectrum_ide_unit*)data;
-  
-  return simpleide_eject( unit );
+  libspectrum_ide_unit unit;
+
+  unit = action_to_ideunit( action );
+  widget_apply_to_file( insert_simpleide, &unit );
 }
 
-/* Help/Keyboard Picture */
-int widget_menu_keyboard( void *data )
+void
+menu_help_keyboard( int action )
 {
-  widget_picture_data *ptr = (widget_picture_data*)data;
-
   int error, fd;
   utils_file file;
+  widget_picture_data info;
 
-  fd = utils_find_auxiliary_file( ptr->filename, UTILS_AUXILIARY_LIB );
+  static const char *filename = "keyboard.scr";
+
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
-	      ptr->filename );
-    return 1;
+	      filename );
+    return;
   }
   
-  error = utils_read_fd( fd, ptr->filename, &file );
-  if( error ) return error;
+  error = utils_read_fd( fd, filename, &file ); if( error ) return;
 
   if( file.length != 6912 ) {
     ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
-	      ptr->filename );
+	      filename );
     utils_close_file( &file );
-    return 1;
+    return;
   }
 
-  ptr->screen = file.buffer;
+  info.filename = filename;
+  info.screen = file.buffer;
 
-  widget_do( WIDGET_TYPE_PICTURE, ptr );
+  widget_do( WIDGET_TYPE_PICTURE, &info );
 
-  if( utils_close_file( &file ) ) return 1;
-
-  return 0;
+  if( utils_close_file( &file ) ) return;
 }
 
 /* Function to (de)activate specific menu items */

@@ -40,7 +40,6 @@
 #include "settings.h"
 #include "ui/ui.h"
 
-static int select_roms( libspectrum_machine machine, size_t start, size_t n );
 static void add_rom( GtkWidget *table, size_t start, gint row );
 static void select_new_rom( GtkWidget *widget, gpointer data );
 static void roms_done( GtkButton *button, gpointer data );
@@ -50,35 +49,12 @@ GtkWidget *rom[ SETTINGS_ROM_COUNT ];
 
 struct callback_info {
 
-  GtkWidget *dialog;
   size_t start, n;
 
 };
 
-void
-gtkui_roms( gpointer callback_data, guint callback_action, GtkWidget *widget )
-{
-  switch( callback_action ) {
-
-  case  1: select_roms( LIBSPECTRUM_MACHINE_16,      0, 1 ); return;
-  case  2: select_roms( LIBSPECTRUM_MACHINE_48,      1, 1 ); return;
-  case  3: select_roms( LIBSPECTRUM_MACHINE_128,     2, 2 ); return;
-  case  4: select_roms( LIBSPECTRUM_MACHINE_PLUS2,   4, 2 ); return;
-  case  5: select_roms( LIBSPECTRUM_MACHINE_PLUS2A,  6, 4 ); return;
-  case  6: select_roms( LIBSPECTRUM_MACHINE_PLUS3,  10, 4 ); return;
-  case  7: select_roms( LIBSPECTRUM_MACHINE_TC2048, 14, 1 ); return;
-  case  8: select_roms( LIBSPECTRUM_MACHINE_TC2068, 15, 2 ); return;
-  case  9: select_roms( LIBSPECTRUM_MACHINE_PENT,   17, 3 ); return;
-  case 10: select_roms( LIBSPECTRUM_MACHINE_SCORP,  20, 4 ); return;
-
-  }
-
-  ui_error( UI_ERROR_ERROR, "gtkui_roms: unknown action %u", callback_action );
-  fuse_abort();
-}
-
-static int
-select_roms( libspectrum_machine machine, size_t start, size_t n )
+int
+menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
 {
   GtkWidget *dialog;
   GtkAccelGroup *accel_group;
@@ -116,11 +92,14 @@ select_roms( libspectrum_machine machine, size_t start, size_t n )
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     cancel_button );
   
-  info.dialog = dialog;
   info.start = start;
   info.n = n;
   gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
 		      GTK_SIGNAL_FUNC( roms_done ), &info );
+
+  gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog ) );
 
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
@@ -205,8 +184,6 @@ roms_done( GtkButton *button GCC_UNUSED, gpointer data )
     error = settings_set_string( setting, string ); if( error ) return;
 
   }
-
-  gtkui_destroy_widget_and_quit( info->dialog, NULL );
 }
 
 #endif			/* #ifdef UI_GTK */

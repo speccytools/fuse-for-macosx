@@ -30,6 +30,7 @@
 #include "input.h"
 #include "joystick.h"
 #include "keyboard.h"
+#include "menu.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
@@ -118,52 +119,49 @@ keypress( const input_event_key_t *event )
   switch( key ) {
   case INPUT_KEY_F1:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MENU, &widget_menu_main );
+    widget_do( WIDGET_TYPE_MENU, &widget_menu );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F2:
     fuse_emulation_pause();
-    snapshot_write( "snapshot.z80" );
+    menu_file_savesnapshot( 0 );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F3:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-    if( widget_filesel_name ) {
-      utils_open_file( widget_filesel_name, settings_current.auto_load, NULL );
-      free( widget_filesel_name );
-      display_refresh_all();
-    }
+    menu_file_open( 0 );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F4:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_GENERAL, NULL );
+    menu_options_general( 0 );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F5:
-    machine_reset();
+    fuse_emulation_pause();
+    menu_machine_reset( 0 );
+    fuse_emulation_unpause();
     break;
   case INPUT_KEY_F6:
     fuse_emulation_pause();
-    tape_write( "tape.tzx" );
+    menu_media_tape_write( 0 );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F7:
     fuse_emulation_pause();
-    widget_apply_to_file( tape_open_default_autoload );
+    menu_media_tape_open( 0 );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F8:
-    tape_toggle_play();
+    menu_media_tape_play( 0 );
     break;
   case INPUT_KEY_F9:
     fuse_emulation_pause();
-    widget_select_machine( NULL );
+    menu_machine_select( 0 );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F10:
-    fuse_exiting = 1;
+    menu_file_exit( 0 );
     break;
 
   default: break;		/* Remove gcc warning */

@@ -728,4 +728,6 @@
 20040409 ui/gtk/debugger.c: add indications of whether a chunk is writable
 	 and/or contended to the memory map pane.
 20040409 machines/tc2068.c: #include <string.h> for memset.
-20040410 ui/gtk/browse.c: #include <string.g> for strcpy.
+20040410 ui/gtk/browse.c: #include <string.h> for strcpy.
+20040111 Revamp of menu system to share code between the GTK+ and widget
+	 implementations (patch #931017).

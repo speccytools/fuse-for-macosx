@@ -41,13 +41,6 @@ int gtkdisplay_init( void );
 int gtkdisplay_end( void );
 
 /*
- * Joystick routines (gtkjoystick.c)
- */
-
-void gtkjoystick_select( gpointer callback_data, guint callback_action,
-			 GtkWidget *widget );
-
-/*
  * Keyboard routines (gtkkeyboard.c)
  */
 
@@ -59,36 +52,6 @@ int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
 			     gpointer data );
 
 /*
- * Statusbar routines (statusbar.c)
- */
-
-int gtkstatusbar_create( GtkBox *parent );
-int gtkstatusbar_set_visibility( int visible );
-
-/*
- * The icon pixmaps (pixmaps.c)
- */
-extern char *gtkpixmap_tape_inactive[];
-extern char *gtkpixmap_tape_active[];
-extern char *gtkpixmap_disk_inactive[];
-extern char *gtkpixmap_disk_active[];
-extern char *gtkpixmap_pause_inactive[];
-extern char *gtkpixmap_pause_active[];
-extern char *gtkpixmap_tape_marker[];
-
-/*
- * Poke finder routines (pokefinder.c)
- */
-
-void gtkui_pokefinder( GtkWidget *widget, gpointer data );
-
-/*
- * Memory browser routines (memory.c)
- */
-
-void gtkui_memory_browser( void );
-
-/*
  * General user interface routines (gtkui.c)
  */
 
@@ -98,12 +61,7 @@ extern GtkWidget *gtkui_drawing_area;
 void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
 char* gtkui_fileselector_get_filename( const char *title );
 
-void gtkui_load_binary_data( GtkWidget *widget, gpointer data );
-void gtkui_save_binary_data( GtkWidget *widget, gpointer data );
 int gtkui_confirm( const char *string );
-void gtk_tape_browse( GtkWidget *widget, gpointer data );
-void gtkui_roms( gpointer callback_data, guint callback_action,
-		 GtkWidget *widget );
 
 int gtkui_picture( const char *filename, int border );
 
@@ -118,5 +76,30 @@ typedef GtkStyle *gtkui_font;
 int gtkui_get_monospaced_font( gtkui_font *font );
 void gtkui_free_font( gtkui_font font );
 void gtkui_set_font( GtkWidget *widget, gtkui_font font );
+
+/*
+ * The menu data (menu_data.c)
+ */
+
+extern GtkItemFactoryEntry gtkui_menu_data[];
+extern guint gtkui_menu_data_size;
+
+/*
+ * The icon pixmaps (pixmaps.c)
+ */
+extern char *gtkpixmap_tape_inactive[];
+extern char *gtkpixmap_tape_active[];
+extern char *gtkpixmap_disk_inactive[];
+extern char *gtkpixmap_disk_active[];
+extern char *gtkpixmap_pause_inactive[];
+extern char *gtkpixmap_pause_active[];
+extern char *gtkpixmap_tape_marker[];
+
+/*
+ * Statusbar routines (statusbar.c)
+ */
+
+int gtkstatusbar_create( GtkBox *parent );
+int gtkstatusbar_set_visibility( int visible );
 
 #endif				/* #ifndef FUSE_GTKINTERNALS_H */
