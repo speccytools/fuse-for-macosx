@@ -142,12 +142,20 @@ int tape_close( void )
   return 0;
 }
 
-/* Rewind the current tape file to the start */
-int tape_rewind( void )
+/* Select the nth block on the tape; 0 => 1st block */
+int
+tape_select_block( size_t n )
 {
   if( !tape->blocks ) return 0;
 
   tape->current_block = tape->blocks;
+  while( n-- ) {
+    tape->current_block = tape->current_block->next;
+    if( !tape->current_block ) {
+      tape->current_block = tape->blocks;
+    }
+  }
+
   libspectrum_tape_init_block(
     (libspectrum_tape_block*)tape->current_block->data
   );
@@ -496,6 +504,163 @@ int tape_next_edge( DWORD last_tstates )
      events between instructions). */
   error = event_add( last_tstates + edge_tstates, EVENT_TYPE_EDGE );
   if( error ) return error;
+
+  return 0;
+}
+
+int
+tape_get_block_list( char ****list, size_t *n )
+{
+  GSList *block_list = tape->blocks;
+  size_t allocated;
+
+  *list = NULL; *n = 0; allocated = 0;
+
+  while( block_list ) {
+
+    libspectrum_tape_block *block =
+      (libspectrum_tape_block*)(block_list->data);
+    
+    /* Get more space if we need it */
+    if( *n == allocated ) {
+      size_t new_size = allocated ? 2 * allocated : 1;
+      char ***new_list = (char***)realloc( (*list),
+					   new_size * sizeof( char** ) );
+      if( !new_list ) {
+	tape_free_block_list( *list, *n );
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d",
+		  __FILE__, __LINE__ );
+	return 1;
+      }
+
+      (*list) = new_list; allocated = new_size;
+    }
+
+    (*list)[*n] = (char**)malloc( 2 * sizeof( char* ) );
+    if( !(*list)[*n] ) {
+      tape_free_block_list( *list, *n );
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    (*list)[*n][0] = malloc( 80 * sizeof( char ) );
+    if( !(*list)[*n][0] ) {
+      free( (*list)[*n] ); tape_free_block_list( *list, *n );
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    (*list)[*n][1] = malloc( 80 * sizeof( char ) );
+    if( !(*list)[*n][1] ) {
+      free( (*list)[*n][0] ); free( (*list)[*n] );
+      tape_free_block_list( *list, *n );
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    libspectrum_tape_block_description( block, (*list)[*n][0], 80 );
+
+    switch( block->type ) {
+
+    case LIBSPECTRUM_TAPE_BLOCK_ROM:
+      snprintf( (*list)[*n][1], 80, "%lu bytes",
+		(unsigned long)block->types.rom.length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+      snprintf( (*list)[*n][1], 80, "%lu bytes",
+		(unsigned long)block->types.turbo.length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+      snprintf( (*list)[*n][1], 80, "%lu tstates",
+		(unsigned long)block->types.pure_tone.length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+      snprintf( (*list)[*n][1], 80, "%lu pulses",
+		(unsigned long)block->types.pulses.count );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+      snprintf( (*list)[*n][1], 80, "%lu bytes",
+		(unsigned long)block->types.pure_data.length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+      snprintf( (*list)[*n][1], 80, "%lu bytes",
+		(unsigned long)block->types.raw_data.length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+      snprintf( (*list)[*n][1], 80, "%lu ms",
+		(unsigned long)block->types.pause.length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+      snprintf( (*list)[*n][1], 80, "%s", block->types.group_start.name );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_JUMP:
+      if( block->types.jump.offset > 0 ) {
+	snprintf( (*list)[*n][1], 80, "Forward %d blocks",
+		  block->types.jump.offset );
+      } else {
+	snprintf( (*list)[*n][1], 80, "Backward %d blocks",
+		  -block->types.jump.offset );
+      }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
+      snprintf( (*list)[*n][1], 80, "%d iterations",
+		block->types.loop_start.count );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+      snprintf( (*list)[*n][1], 80, "%lu options",
+		(unsigned long)block->types.select.count );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
+      snprintf( (*list)[*n][1], 80, "%s", block->types.comment.text );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
+      snprintf( (*list)[*n][1], 80, "%s", block->types.message.text );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+      snprintf( (*list)[*n][1], 80, "%s", block->types.custom.description );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+    case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
+    case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+    case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+    case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+    default:
+      (*list)[*n][1][0] = '\0';
+      break;
+
+    }
+
+    (*n)++; block_list = block_list->next;
+  }
+
+  return 0;
+}
+
+int
+tape_free_block_list( char ***list, size_t n )
+{
+  size_t i;
+
+  for( i=0; i<n; i++ ) {
+    free( list[i][0] ); free( list[i][1] );
+    free( list[i] );
+  }
+
+  free( list );
 
   return 0;
 }

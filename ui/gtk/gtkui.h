@@ -39,6 +39,7 @@ extern GtkWidget* gtkui_window;
 extern GtkWidget* gtkui_drawing_area;
 
 void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
+void gtk_tape_browse( GtkWidget *widget, gpointer data );
 
 extern void gtkui_popup_menu(void);
 

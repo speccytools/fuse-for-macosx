@@ -28,7 +28,8 @@ noinst_LIBRARIES = libuigtk.a
 
 INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
-libuigtk_a_SOURCES = error.c gtkdisplay.c gtkkeyboard.c gtkui.c options.c keysyms.c
+libuigtk_a_SOURCES = browse.c error.c gtkdisplay.c gtkkeyboard.c gtkui.c\
+options.c keysyms.c
 
 BUILT_SOURCES = keysyms.c options.c options.h
 

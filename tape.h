@@ -35,7 +35,7 @@ int tape_init( void );
 
 int tape_open( const char *filename );
 int tape_close( void );
-int tape_rewind( void );
+int tape_select_block( size_t n );
 int tape_write( const char *filename );
 
 int tape_load_trap( void );
@@ -47,6 +47,9 @@ int tape_toggle_play( void );
 int tape_next_edge( DWORD last_tstates );
 
 int tape_stop( void );
+
+int tape_get_block_list( char ****list, size_t *n );
+int tape_free_block_list( char ***list, size_t n );
 
 extern int tape_playing;
 extern int tape_microphone;

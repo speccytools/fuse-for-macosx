@@ -242,7 +242,7 @@ int widget_menu_play_tape( void *data GCC_UNUSED )
 int widget_menu_rewind_tape( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  return tape_rewind();
+  return tape_select_block( 0 );
 }
 
 #ifdef HAVE_765_H

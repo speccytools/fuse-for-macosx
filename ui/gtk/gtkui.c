@@ -139,6 +139,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Tape",                    NULL , NULL,                0, "<Branch>"    },
   { "/Tape/_Open...",	        "F7" , gtkui_tape_open,     0, NULL          },
   { "/Tape/_Play",	        "F8" , gtkui_tape_play,     0, NULL          },
+  { "/Tape/_Browse...",		NULL , gtk_tape_browse,     0, NULL          },
   { "/Tape/_Rewind",		NULL , gtkui_tape_rewind,   0, NULL          },
   { "/Tape/_Clear",		NULL , gtkui_tape_clear,    0, NULL          },
   { "/Tape/_Write...",		"F6" , gtkui_tape_write,    0, NULL          },
@@ -609,7 +610,7 @@ gtkui_tape_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_tape_rewind( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  tape_rewind();
+  tape_select_block( 0 );
 }
 
 /* Called by the menu when Tape/Clear selected */
