@@ -69,7 +69,6 @@ void yyerror( char *s );
 %token		 PORT
 %token		 READ
 %token		 SET
-%token		 SHOW
 %token		 STEP
 %token		 WRITE
 
@@ -102,7 +101,6 @@ command:   BASE NUMBER { debugger_output_base = $2; }
                $3, $4, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 	     );
            }
-	 | BREAK SHOW { debugger_breakpoint_show(); }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONTINUE { debugger_run(); }
 	 | DELETE { debugger_breakpoint_remove_all(); }

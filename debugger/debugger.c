@@ -298,17 +298,6 @@ free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
   free( data );
 }
 
-/* Show all breakpoints */
-int
-debugger_breakpoint_show( void )
-{
-  printf( "Current breakpoints:\n" );
-
-  g_slist_foreach( debugger_breakpoints, show_breakpoint, NULL );
-
-  return 0;
-}
-
 static void
 show_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 {

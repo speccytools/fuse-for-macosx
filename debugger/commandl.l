@@ -65,7 +65,6 @@ o|ou|out { return DEBUGGER_OUT; }	/* Different name to avoid clashing
 p|po|por|port { return PORT; }
 r|re|rea|read { return READ; }
 se|set { return SET; }
-sh|sho|show { return SHOW; }
 s|st|ste|step { return STEP; }
 w|wr|wri|writ|write { return WRITE; }
 
