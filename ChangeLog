@@ -1,4 +1,4 @@
-2003-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+2003-04-27  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.6.0 released.
 
@@ -6,7 +6,7 @@
 	  Dmitry Sanarin for Glukalka from which the TR-DOS emulation was
 	  taken).
 
-	* TC2068 support (Witold Filipczyk).
+	* TC2068 support (Witold Filipczyk/Darren Salt/Fredrick Meunier).
 
 	* Graphics filters: essentially arbitrary filters which can be
 	  applied to the Spectrum's screen to give scanlines, smoothing
