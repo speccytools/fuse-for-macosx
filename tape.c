@@ -243,7 +243,7 @@ int tape_load_trap( void )
   libspectrum_tape_block *current_block;
   libspectrum_tape_rom_block *rom_block;
 
-  GSList *block_ptr; libspectrum_tape_block *next_block;
+  GSList *block_ptr;
 
   int error;
 
@@ -257,12 +257,6 @@ int tape_load_trap( void )
   if( !libspectrum_tape_present( tape ) ) return 1;
 
   current_block = (libspectrum_tape_block*)(tape->current_block->data);
-
-  block_ptr = tape->current_block->next;
-  /* Loop if we hit the end of the tape */
-  if( block_ptr == NULL ) { block_ptr = tape->blocks; }
-
-  libspectrum_tape_init_block( block_ptr );
 
   /* If this block isn't a ROM loader, start it playing
      Then return with `error' so that we actually do whichever instruction
@@ -283,16 +277,23 @@ int tape_load_trap( void )
   error = trap_load_block( rom_block );
   if( error ) return error;
 
-  /* Peek at the next block. If it's a ROM block, just move along and
-     return */
-  if( next_block->type == LIBSPECTRUM_TAPE_BLOCK_ROM ) {
+  /* Peek at the next block. If it's a ROM block, move along, initialise
+     the block, and return */
+  block_ptr = tape->current_block->next;
+  if( block_ptr == NULL ) block_ptr = tape->blocks;
+
+  if( ((libspectrum_tape_block*)block_ptr->data)->type ==
+      LIBSPECTRUM_TAPE_BLOCK_ROM ) {
     tape->current_block = block_ptr;
+    error = libspectrum_tape_init_block( tape->current_block );
+    if( error ) return error;
+
     return 0;
   }
 
   /* If the next block isn't a ROM block, set ourselves up such that the
      next thing to occur is the pause at the end of the current block */
-  current_block->types.rom.state = LIBSPECTRUM_TAPE_STATE_PAUSE;
+  rom_block->state = LIBSPECTRUM_TAPE_STATE_PAUSE;
 
   /* And start the tape playing */
   error = tape_play();
