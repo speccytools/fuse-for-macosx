@@ -433,8 +433,9 @@ uidisplay_area( int x, int y, int w, int h )
   scaled_x = scale * x; scaled_y = scale * y;
 
   /* Create scaled image */
-  scaler_proc( (BYTE*)&display_image[y][x], display_pitch, NULL, 
-	       (BYTE*)&scaled_image[scaled_y][scaled_x], scaled_pitch, w, h );
+  scaler_proc16( (BYTE*)&display_image[y][x], display_pitch, NULL, 
+		 (BYTE*)&scaled_image[scaled_y][scaled_x], scaled_pitch,
+		 w, h );
 
   w *= scale; h *= scale;
 
