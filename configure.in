@@ -78,7 +78,8 @@ svgalib=no)
 AC_MSG_RESULT($svgalib)
 if test "$svgalib" = yes; then
   AC_CHECK_HEADER(vga.h,
-                  LIBS="$LIBS -lvga"; AC_DEFINE(UI_SVGA) ui=svga,
+                  LIBS="$LIBS -lvga"; AC_DEFINE(UI_SVGA)
+                  ui=svga; UI_LIBS="ui/svga/libuisvga.a",
                   AC_MSG_ERROR([svgalib not found]))
 fi
 
@@ -91,7 +92,8 @@ aalib=no)
 AC_MSG_RESULT($aalib)
 if test "$aalib" = yes; then
   AC_CHECK_HEADER(aalib.h,
-                  LIBS="$LIBS -laa"; AC_DEFINE(UI_AALIB) ui=aalib,
+                  LIBS="$LIBS -laa"; AC_DEFINE(UI_AALIB)
+		  ui=aalib; UI_LIBS="ui/aalib/libuiaalib.a",
                   AC_MSG_ERROR([aalib not found]))
 fi
 
@@ -103,7 +105,9 @@ if test -z "$ui"; then
   if test "$withval" = no; then fb=no; else fb=yes; fi,
   fb=no)
   AC_MSG_RESULT($fb)
-  if test "$fb" = yes; then AC_DEFINE(UI_FB) ui=fb; fi
+  if test "$fb" = yes; then
+    AC_DEFINE(UI_FB) ui=fb; UI_LIBS="ui/libuifb.a"
+  fi
 fi
 
 dnl Look for SDL (default=no)
@@ -117,7 +121,7 @@ if test -z "$ui"; then
   if test "$sdl" = yes; then
     SDL_VERSION=1.2.4
     AM_PATH_SDL($SDL_VERSION,
-		AC_DEFINE(UI_SDL) ui=sdl, 
+		AC_DEFINE(UI_SDL) ui=sdl UI_LIBS="ui/libuisdl.a", 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
     CFLAGS="$CFLAGS $SDL_CFLAGS"
     CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
@@ -150,7 +154,8 @@ if test -z "$ui"; then
   AC_MSG_RESULT($gtk)
   if test "$gtk" = yes; then
     AM_PATH_GTK(1.2.0,
-		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB) ui=gtk, 
+		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB)
+		ui=gtk; UI_LIBS="ui/gtk/libuigtk.a",
 		AC_MSG_WARN([GTK+ not found. Reverting to Xlib UI]))
   fi
 fi
@@ -185,7 +190,10 @@ if test -z "$ui"; then
 
   AC_DEFINE(UI_X)
   ui=xlib
+  UI_LIBS="ui/xlib/libuixlib.a"
 fi
+
+AC_SUBST(UI_LIBS)
 
 # If we're not using GTK+, must either find glib or use the replacement
 # (as supplied by libspectrum)

@@ -45,9 +45,7 @@ settings.h: settings-header.pl settings.dat
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ @GETOPT_LIBS@\
-ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/sdl/libuisdl.a \
-ui/svga/libuisvga.a\
-ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
+@UI_LIBS@ widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
