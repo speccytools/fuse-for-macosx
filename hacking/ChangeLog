@@ -1120,3 +1120,4 @@
 	 (Gergely Szasz)
 20041128 if1.c,ui.c,ui/ui.h: simplify menu item (de)activation code.
 20041128 if1.c: add void to prototypes where appropriate.
+20041128 if1.[ch]: declare local functions as static.

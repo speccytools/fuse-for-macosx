@@ -40,10 +40,6 @@ void if1_memory_map( void );
 void if1_port_out( libspectrum_word, libspectrum_byte );
 libspectrum_byte if1_port_in( libspectrum_word, int * );
 
-void microdrives_reset( void );
-void increment_head( int );
-void microdrives_restart( void );
-
 void if1_mdr_new( int );
 void if1_mdr_insert( char *, int );
 int if1_mdr_sync( char *, int );

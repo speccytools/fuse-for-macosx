@@ -240,7 +240,7 @@ if1_memory_map( void )
   memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
 }
 
-void
+static void
 microdrives_reset( void )
 {
   int m;
@@ -274,8 +274,8 @@ microdrives_reset( void )
 
 }
 
-libspectrum_word
-if1_decode_port( libspectrum_word port )
+static libspectrum_word
+decode_port( libspectrum_word port )
 {
     port &= 0x0018;
     switch( port ) {
@@ -301,7 +301,7 @@ if1_port_in( libspectrum_word port GCC_UNUSED, int *attached )
 
   *attached = 1;
 
-  port = if1_decode_port( port );
+  port = decode_port( port );
 
   /* allow access to the port only if motor 1 is ON and there's a file open */
   if( port == PORT_MDR ) {
@@ -411,7 +411,7 @@ if1_port_out( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 	!!(val & 128), !!(val & 64), !!(val & 32), !!(val & 16),
 	!!(val & 8), !!(val & 4), !!(val & 2), !!(val & 1), port);
 #endif
-  port = if1_decode_port( port );
+  port = decode_port( port );
 
 
   /* allow access to the port only if motor 1 is ON and there's a file open */
@@ -544,15 +544,15 @@ if1_port_out( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
   }
 }
 
-void
-increment_head ( int m )
+static void
+increment_head( int m )
 {
   microdrv[m].head_pos++;
   if( microdrv[m].head_pos >= CARTRIDGE_LEN )
     microdrv[m].head_pos = 0;	
 }
 
-void
+static void
 microdrives_restart( void )
 {
   int m;
