@@ -1,5 +1,5 @@
 /* keysyms.c: keysym to Spectrum key mappings for both Xlib and GDK
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -30,15 +30,25 @@
 
 #include "keysyms.h"
 
-/* The keysyms are specified either as GDK_<xx> (if we're using GTK+) or
-   XK_<xx> if we're using Xlib. One quick macro so I don't have to repeat
-   the entire table... */
-#ifdef HAVE_LIBGTK
+/* Work out which UI we're using and get the appropriate header file. As
+   GTK+ and Xlib use the same keysyms (only the prefix is different), define
+   a small macro to mean I don't have to repeat the table...
+
+   However, the svgalib keysyms are different enough that I need a separate
+   table.
+
+   FIXME: Need some way to keep the two tables consistent
+*/
+#if defined( UI_GTK )
 #include <gdk/gdkkeysyms.h>
 #define KEY(keysym) GDK_ ## keysym
-#else                   /* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
 #include <X11/keysym.h>
 #define KEY(keysym) XK_ ## keysym
+#elif defined( UI_SVGA )
+#include <vgakeyboard.h>
+#else
+#error No user interface selected
 #endif
 
 /* The mappings from keysyms to Spectrum keys. The keysym `keysym'
@@ -48,6 +58,8 @@
    These mappings are ordered basically like a standard (English) PC keyboard,
    top to bottom, left to right, but with a few additions for other keys
 */
+
+#if defined( UI_GTK ) || defined( UI_X )
 
 static keysyms_key_info keysyms_data[] = {
 
@@ -117,9 +129,88 @@ static keysyms_key_info keysyms_data[] = {
   { KEY(Control_R)  , KEYBOARD_Symbol, KEYBOARD_NONE },
   { KEY(Mode_switch), KEYBOARD_Symbol, KEYBOARD_NONE },
 
-  { 0, 0, 0 }			 /* End marker: DO NOT MOVE! */
+  { 0, 0, 0 }			/* End marker: DO NOT MOVE! */
 
 };
+
+#else				/* #if defined( UI_GTK ) || defined( UI_X ) */
+
+static keysyms_key_info keysyms_data[] = {
+
+  { SCANCODE_1            , KEYBOARD_1,      KEYBOARD_NONE },
+  { SCANCODE_2            , KEYBOARD_2,      KEYBOARD_NONE },
+  { SCANCODE_3            , KEYBOARD_3,      KEYBOARD_NONE },
+  { SCANCODE_4            , KEYBOARD_4,      KEYBOARD_NONE },
+  { SCANCODE_5            , KEYBOARD_5,      KEYBOARD_NONE },
+  { SCANCODE_6            , KEYBOARD_6,      KEYBOARD_NONE },
+  { SCANCODE_7            , KEYBOARD_7,      KEYBOARD_NONE },
+  { SCANCODE_8            , KEYBOARD_8,      KEYBOARD_NONE },
+  { SCANCODE_9            , KEYBOARD_9,      KEYBOARD_NONE },
+  { SCANCODE_0            , KEYBOARD_0,      KEYBOARD_NONE },
+  { SCANCODE_MINUS        , KEYBOARD_Symbol, KEYBOARD_j    },
+  { SCANCODE_EQUAL        , KEYBOARD_Symbol, KEYBOARD_l    },
+  { SCANCODE_BACKSPACE    , KEYBOARD_Caps,   KEYBOARD_0    },
+
+  { SCANCODE_Q            , KEYBOARD_q,      KEYBOARD_NONE },
+  { SCANCODE_W            , KEYBOARD_w,      KEYBOARD_NONE },
+  { SCANCODE_E            , KEYBOARD_e,      KEYBOARD_NONE },
+  { SCANCODE_R            , KEYBOARD_r,      KEYBOARD_NONE },
+  { SCANCODE_T            , KEYBOARD_t,      KEYBOARD_NONE },
+  { SCANCODE_Y            , KEYBOARD_y,      KEYBOARD_NONE },
+  { SCANCODE_U            , KEYBOARD_u,      KEYBOARD_NONE },
+  { SCANCODE_I            , KEYBOARD_i,      KEYBOARD_NONE },
+  { SCANCODE_O            , KEYBOARD_o,      KEYBOARD_NONE },
+  { SCANCODE_P            , KEYBOARD_p,      KEYBOARD_NONE },
+
+  { SCANCODE_CAPSLOCK     , KEYBOARD_Caps,   KEYBOARD_2    },
+  { SCANCODE_A            , KEYBOARD_a,      KEYBOARD_NONE },
+  { SCANCODE_S            , KEYBOARD_s,      KEYBOARD_NONE },
+  { SCANCODE_D            , KEYBOARD_d,      KEYBOARD_NONE },
+  { SCANCODE_F            , KEYBOARD_f,      KEYBOARD_NONE },
+  { SCANCODE_G            , KEYBOARD_g,      KEYBOARD_NONE },
+  { SCANCODE_H            , KEYBOARD_h,      KEYBOARD_NONE },
+  { SCANCODE_J            , KEYBOARD_j,      KEYBOARD_NONE },
+  { SCANCODE_K            , KEYBOARD_k,      KEYBOARD_NONE },
+  { SCANCODE_L            , KEYBOARD_l,      KEYBOARD_NONE },
+  { SCANCODE_SEMICOLON    , KEYBOARD_Symbol, KEYBOARD_o    },
+  { SCANCODE_APOSTROPHE   , KEYBOARD_Symbol, KEYBOARD_7    },
+  { SCANCODE_ENTER	  , KEYBOARD_Enter,  KEYBOARD_NONE },
+
+  { SCANCODE_LEFTSHIFT    , KEYBOARD_Caps,   KEYBOARD_NONE },
+  { SCANCODE_Z            , KEYBOARD_z,      KEYBOARD_NONE },
+  { SCANCODE_X            , KEYBOARD_x,      KEYBOARD_NONE },
+  { SCANCODE_C            , KEYBOARD_c,      KEYBOARD_NONE },
+  { SCANCODE_V            , KEYBOARD_v,      KEYBOARD_NONE },
+  { SCANCODE_B            , KEYBOARD_b,      KEYBOARD_NONE },
+  { SCANCODE_N            , KEYBOARD_n,      KEYBOARD_NONE },
+  { SCANCODE_M            , KEYBOARD_m,      KEYBOARD_NONE },
+  { SCANCODE_COMMA        , KEYBOARD_Symbol, KEYBOARD_n    },
+  { SCANCODE_PERIOD       , KEYBOARD_Symbol, KEYBOARD_m    },
+  { SCANCODE_SLASH        , KEYBOARD_Symbol, KEYBOARD_v    },
+  { SCANCODE_RIGHTSHIFT   , KEYBOARD_Caps,   KEYBOARD_NONE },
+
+  { SCANCODE_LEFTCONTROL  , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { SCANCODE_LEFTALT      , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { SCANCODE_SPACE        , KEYBOARD_space,  KEYBOARD_NONE },
+  { SCANCODE_RIGHTALT     , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { SCANCODE_RIGHTCONTROL , KEYBOARD_Symbol, KEYBOARD_NONE },
+
+  /* These not available in svgalib??
+  { KEY(numbersign)	, KEYBOARD_Symbol, KEYBOARD_3    },
+  { KEY(Meta_L)         , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { KEY(Super_L)        , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { KEY(Hyper_L)        , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { KEY(Hyper_R)        , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { KEY(Super_R)        , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { KEY(Meta_R)         , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { KEY(Mode_switch)    , KEYBOARD_Symbol, KEYBOARD_NONE },
+  */
+
+  { 0, 0, 0 }			/* End marker: DO NOT MOVE! */
+
+};
+
+#endif				/* #if defined( UI_GTK ) || defined( UI_X ) */
 
 keysyms_key_info* keysyms_get_data(unsigned keysym)
 {

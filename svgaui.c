@@ -1,5 +1,5 @@
-/* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+/* svgaui.c: Routines for dealing with the svgalib user interface
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -24,19 +24,41 @@
 
 */
 
-#ifndef FUSE_SPECPLUS3_H
-#define FUSE_SPECPLUS3_H
+#include <config.h>
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#ifdef UI_SVGA			/* Use this iff we're using svgalib */
 
-BYTE specplus3_readbyte(WORD address);
-BYTE specplus3_read_screen_memory(WORD offset);
-void specplus3_writebyte(WORD address, BYTE b);
-int specplus3_init(void);
-int specplus3_reset(void);
+#include <stdio.h>
 
-void specplus3_memoryport_write(WORD port, BYTE b);
+#include "fuse.h"
+#include "svgadisplay.h"
+#include "svgakeyboard.h"
+#include "svgaui.h"
 
-#endif			/* #ifndef FUSE_SPECPLUS3_H */
+int svgaui_init(int argc, char **argv, int width, int height)
+{
+  int error;
+
+  error = svgadisplay_init(width, height);
+  if(error) return error;
+
+  error = svgakeyboard_init();
+  if(error) return error;
+
+  return 0;
+}
+
+int svgaui_end(void)
+{
+  int error;
+
+  error = svgakeyboard_end();
+  if(error) return error;
+
+  error = svgadisplay_end();
+  if(error) return error;
+
+  return 0;
+}
+
+#endif				/* #ifdef UI_SVGA */

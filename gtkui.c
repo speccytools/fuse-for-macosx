@@ -1,5 +1,5 @@
 /* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000-2001 Philip Kendall
 
    $Id$
 
@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#ifdef HAVE_LIBGTK	/* Use this file iff we're using GTK+ */
+#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <stdio.h>
 
@@ -42,7 +42,7 @@
 #include "tape.h"
 
 /* The main Fuse window */
-static GtkWidget *window;
+GtkWidget *gtkui_window;
 
 /* The area into which the screen will be drawn */
 GtkWidget *gtkui_drawing_area;
@@ -83,36 +83,27 @@ int gtkui_init(int *argc, char ***argv, int width, int height)
 
   gtk_init(argc,argv);
 
-  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  if(!window) {
-    fprintf(stderr,"%s: Couldn't create main window at %s:%d\n",
-	    fuse_progname,__FILE__,__LINE__);
-    return 1;
-  }
+  gtkui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-  gtk_window_set_title( GTK_WINDOW(window), "Fuse" );
-  gtk_window_set_wmclass( GTK_WINDOW(window), fuse_progname, "Fuse" );
-  gtk_window_set_default_size( GTK_WINDOW(window), width, height);
-  gtk_signal_connect(GTK_OBJECT(window), "delete_event",
+  gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
+  gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
+  gtk_window_set_default_size( GTK_WINDOW(gtkui_window), width, height);
+  gtk_signal_connect(GTK_OBJECT(gtkui_window), "delete_event",
 		     GTK_SIGNAL_FUNC(gtkui_delete), NULL);
-  gtk_signal_connect(GTK_OBJECT(window), "key-press-event",
+  gtk_signal_connect(GTK_OBJECT(gtkui_window), "key-press-event",
 		     GTK_SIGNAL_FUNC(gtkkeyboard_keypress), NULL);
-  gtk_widget_add_events( window, GDK_KEY_RELEASE_MASK );
-  gtk_signal_connect(GTK_OBJECT(window), "key-release-event",
+  gtk_widget_add_events( gtkui_window, GDK_KEY_RELEASE_MASK );
+  gtk_signal_connect(GTK_OBJECT(gtkui_window), "key-release-event",
 		     GTK_SIGNAL_FUNC(gtkkeyboard_keyrelease), NULL);
 
   box = gtk_vbox_new( FALSE, 0 );
-  gtk_container_add(GTK_CONTAINER(window), box);
+  gtk_container_add(GTK_CONTAINER(gtkui_window), box);
   gtk_widget_show(box);
 
-  if(gtkui_make_menu(&accel_group, &menu_bar ,
-		     gtkui_menu_data, gtkui_menu_data_size) ) {
-    fprintf(stderr,"%s: Couldn't create menu at %s:%d\n",
-	    fuse_progname,__FILE__,__LINE__);
-    return 1;
-  }
+  gtkui_make_menu(&accel_group, &menu_bar, gtkui_menu_data,
+		  gtkui_menu_data_size);
 
-  gtk_window_add_accel_group( GTK_WINDOW(window), accel_group );
+  gtk_window_add_accel_group( GTK_WINDOW(gtkui_window), accel_group );
   gtk_box_pack_start( GTK_BOX(box), menu_bar, FALSE, FALSE, 0 );
   gtk_widget_show(menu_bar);
   
@@ -136,7 +127,7 @@ int gtkui_init(int *argc, char ***argv, int width, int height)
   geometry.height_inc = height;
   geometry.min_aspect = geometry.max_aspect = ((float)width)/height;
 
-  gtk_window_set_geometry_hints( GTK_WINDOW(window), gtkui_drawing_area,
+  gtk_window_set_geometry_hints( GTK_WINDOW(gtkui_window), gtkui_drawing_area,
 				 &geometry,
 				 GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
 				 GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC |
@@ -147,7 +138,7 @@ int gtkui_init(int *argc, char ***argv, int width, int height)
 
   if(gtkdisplay_init(width,height)) return 1;
 
-  gtk_widget_show(window);
+  gtk_widget_show(gtkui_window);
 
   return 0;
 }
@@ -174,7 +165,7 @@ int gtkui_end(void)
   int error;
   
   /* Don't display the window whilst doing all this! */
-  gtk_widget_hide(window);
+  gtk_widget_hide(gtkui_window);
 
   error=gtkdisplay_end(); if(error) return error;
 
@@ -248,4 +239,4 @@ static void gtkui_switch(GtkWidget *widget, gpointer data)
   spectrum_init(); machine.reset();
 }
 
-#endif			/* #ifdef HAVE_LIBGTK */
+#endif			/* #ifdef UI_GTK */

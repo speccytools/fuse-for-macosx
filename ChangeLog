@@ -6,6 +6,11 @@
 
 	* Added rudimentary GTK+ interface.
 
+	* Added svgalib interface (thanks to Matan Ziv-Av).
+
+	* Made peripheral emulation much more modular, and added proper
+	  decoding of ports.
+
 2000-12-17  Philip Kendall  <pak@ast.cam.ac.uk>
 
 	* Version 0.2.1 released.

@@ -1,5 +1,5 @@
 /* spec48.c: Spectrum 48K specific routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -34,6 +34,11 @@
 #include "spec48.h"
 #include "spectrum.h"
 #include "z80.h"
+
+spectrum_port_info spec48_peripherals[] = {
+  { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
+};
 
 BYTE spec48_readbyte(WORD address)
 {
@@ -87,8 +92,7 @@ int spec48_init(void)
   spectrum_set_timings(24,128,24,48,312,3.5e6,8936);
   machine.reset=spec48_reset;
 
-  machine.ram.type=SPECTRUM_MACHINE_48;
-  machine.ay.present=0;
+  machine.peripherals=spec48_peripherals;
 
   return 0;
 

@@ -30,13 +30,18 @@
 #include "event.h"
 #include "spectrum.h"
 
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
 #include "gtkdisplay.h"
 #include "gtkui.h"
-#else				/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
 #include "xdisplay.h"
 #include "xui.h"
-#endif				/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+#include "svgadisplay.h"
+#include "svgaui.h"
+#else
+#error No user interface selected
+#endif				/* #if defined( UI_GTK ) */
 
 /* The current border colour */
 BYTE display_border;
@@ -96,13 +101,16 @@ int display_init(int *argc, char ***argv)
 {
   int i,j,k,x,y;
 
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
   if(gtkui_init(argc,argv,DISPLAY_SCREEN_WIDTH,DISPLAY_SCREEN_HEIGHT))
     return 1;
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )		
   if( xui_init(*argc, *argv, DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_HEIGHT) )
     return 1;
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+  if( svgaui_init( *argc, *argv, DISPLAY_SCREEN_WIDTH,
+		   DISPLAY_SCREEN_HEIGHT ) ) return 1;
+#endif			/* #if defined( UI_GTK ) */
 
   for(i=0;i<3;i++)
     for(j=0;j<8;j++)
@@ -150,11 +158,13 @@ void display_line(void)
 static void display_draw_line(int y)
 {
   if(display_is_dirty[y]) {
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
     gtkdisplay_line(y);
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
     xdisplay_line(y);
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+    svgadisplay_line(y);
+#endif			/* #if defined( UI_GTK ) */
     display_is_dirty[y]=0;
   }
 
@@ -165,24 +175,30 @@ static void display_draw_line(int y)
        y >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
 
       /* Colour in all the border to the very right edge */
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
       gtkdisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, display_border);
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
       xdisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, display_border);
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+      svgadisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, display_border);
+#endif			/* #if defined( UI_GTK ) */
 
     } else {			/* In main screen */
 
       /* Colour in the left and right borders */
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
       gtkdisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, display_border);
       gtkdisplay_set_border(y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
 			    DISPLAY_SCREEN_WIDTH, display_border);
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
       xdisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, display_border);
       xdisplay_set_border(y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
 			  DISPLAY_SCREEN_WIDTH, display_border);
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+      svgadisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, display_border);
+      svgadisplay_set_border(y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
+			     DISPLAY_SCREEN_WIDTH, display_border);
+#endif			/* #if defined( UI_GTK ) */
 
     }
 
@@ -241,7 +257,7 @@ static void display_plot8(int x,int y,BYTE data,BYTE ink,BYTE paper)
 {
   x = (8*x) + DISPLAY_BORDER_WIDTH;
   y += DISPLAY_BORDER_HEIGHT;
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
   gtkdisplay_putpixel(x+0,y, ( data & 0x80 ) ? ink : paper );
   gtkdisplay_putpixel(x+1,y, ( data & 0x40 ) ? ink : paper );
   gtkdisplay_putpixel(x+2,y, ( data & 0x20 ) ? ink : paper );
@@ -250,7 +266,7 @@ static void display_plot8(int x,int y,BYTE data,BYTE ink,BYTE paper)
   gtkdisplay_putpixel(x+5,y, ( data & 0x04 ) ? ink : paper );
   gtkdisplay_putpixel(x+6,y, ( data & 0x02 ) ? ink : paper );
   gtkdisplay_putpixel(x+7,y, ( data & 0x01 ) ? ink : paper );
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
   xdisplay_putpixel(x+0,y, ( data & 0x80 ) ? ink : paper );
   xdisplay_putpixel(x+1,y, ( data & 0x40 ) ? ink : paper );
   xdisplay_putpixel(x+2,y, ( data & 0x20 ) ? ink : paper );
@@ -259,7 +275,16 @@ static void display_plot8(int x,int y,BYTE data,BYTE ink,BYTE paper)
   xdisplay_putpixel(x+5,y, ( data & 0x04 ) ? ink : paper );
   xdisplay_putpixel(x+6,y, ( data & 0x02 ) ? ink : paper );
   xdisplay_putpixel(x+7,y, ( data & 0x01 ) ? ink : paper );
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+  svgadisplay_putpixel(x+0,y, ( data & 0x80 ) ? ink : paper );
+  svgadisplay_putpixel(x+1,y, ( data & 0x40 ) ? ink : paper );
+  svgadisplay_putpixel(x+2,y, ( data & 0x20 ) ? ink : paper );
+  svgadisplay_putpixel(x+3,y, ( data & 0x10 ) ? ink : paper );
+  svgadisplay_putpixel(x+4,y, ( data & 0x08 ) ? ink : paper );
+  svgadisplay_putpixel(x+5,y, ( data & 0x04 ) ? ink : paper );
+  svgadisplay_putpixel(x+6,y, ( data & 0x02 ) ? ink : paper );
+  svgadisplay_putpixel(x+7,y, ( data & 0x01 ) ? ink : paper );
+#endif			/* #if defined( UI_GTK ) */
 }
 
 /* Get the attributes for the eight pixels starting at
@@ -310,38 +335,47 @@ void display_set_border(int colour)
      current_line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
 
     /* Colour in all the border to the very right edge */
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
     gtkdisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
 			  colour);
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
     xdisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
 			colour);
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+    svgadisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
+			   colour);
+#endif			/* #if defined( UI_GTK ) */
 
   } else {			/* In main screen */
 
     /* If we're in the left border, colour that bit in */
     if(current_pixel < DISPLAY_BORDER_WIDTH)
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
       gtkdisplay_set_border(current_line, current_pixel, DISPLAY_BORDER_WIDTH,
 			    colour);
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
       xdisplay_set_border(current_line, current_pixel, DISPLAY_BORDER_WIDTH,
 			  colour);
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+      svgadisplay_set_border(current_line, current_pixel, DISPLAY_BORDER_WIDTH,
+			     colour);
+#endif			/* #if defined( UI_GTK ) */
 
     /* Advance to the right edge of the screen */
     if(current_pixel < DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH)
       current_pixel = DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH;
 
     /* Draw the right border */
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
     gtkdisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
 			  colour);
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
     xdisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
 			colour);
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+    svgadisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
+			   colour);
+#endif			/* #if defined( UI_GTK ) */
 
   }
 
@@ -426,11 +460,13 @@ int display_end(void)
 {
   int error;
 
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
   if( (error=gtkdisplay_end()) != 0 ) return error;
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
   if( (error=xdisplay_end()) != 0 ) return error;
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+  if( (error=svgadisplay_end()) != 0 ) return error;
+#endif			/* #if defined( UI_GTK ) */
 
   return 0;
 }

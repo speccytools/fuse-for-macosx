@@ -1,5 +1,5 @@
 /* spec128.h: Spectrum 128K specific routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -27,14 +27,18 @@
 #ifndef FUSE_SPEC128_H
 #define FUSE_SPEC128_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#ifndef FUSE_SPECTRUM_H
+#include "spectrum.h"
+#endif			/* #ifndef FUSE_SPECTRUM_H */
+
+extern spectrum_port_info spec128_peripherals[];
 
 BYTE spec128_readbyte(WORD address);
 BYTE spec128_read_screen_memory(WORD offset);
 void spec128_writebyte(WORD address, BYTE b);
 int spec128_init(void);
 int spec128_reset(void);
+
+void spec128_memoryport_write(WORD port, BYTE b);
 
 #endif			/* #ifndef FUSE_SPEC128_H */

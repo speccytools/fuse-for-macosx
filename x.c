@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#ifndef HAVE_LIBGTK		/* Use this iff we're not using GTK+ */
+#ifdef UI_X			/* Use this iff we're using Xlib */
 
 #include <X11/Xlib.h>
 
@@ -65,4 +65,4 @@ Bool x_trueFunction()
   return True;
 }
 
-#endif				/* #ifndef HAVE_LIBGTK */
+#endif				/* #ifdef UI_X */

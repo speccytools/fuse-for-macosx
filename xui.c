@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#ifndef HAVE_LIBGTK		/* Use this iff we're not using GTK+ */
+#ifdef UI_X			/* Use this iff we're using Xlib */
 
 #include <stdio.h>
 
@@ -163,4 +163,4 @@ int xui_end(void)
   return 0;
 }
 
-#endif				/* #ifndef HAVE_LIBGTK */
+#endif				/* #ifdef UI_X */

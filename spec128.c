@@ -1,5 +1,5 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -35,6 +35,14 @@
 #include "spec128.h"
 #include "spectrum.h"
 #include "z80.h"
+
+spectrum_port_info spec128_peripherals[] = {
+  { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
+  { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
+  { 0xc002, 0x4000, spectrum_port_noread, spec128_memoryport_write },
+  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
+};
 
 BYTE spec128_readbyte(WORD address)
 {
@@ -95,12 +103,7 @@ int spec128_init(void)
   spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
   machine.reset=spec128_reset;
 
-  machine.ram.type=SPECTRUM_MACHINE_128;
-  machine.ram.port=0x7ffd;
-
-  machine.ay.present=1;
-  machine.ay.readport=0xfffd;
-  machine.ay.writeport=0xbffd;
+  machine.peripherals=spec128_peripherals;
 
   return 0;
 
@@ -116,4 +119,30 @@ int spec128_reset(void)
   if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
   z80_reset();
   return 0;
+}
+
+void spec128_memoryport_write(WORD port, BYTE b)
+{
+  int old_screen;
+
+  /* Do nothing if we've locked the RAM configuration */
+  if(machine.ram.locked) return;
+    
+  old_screen=machine.ram.current_screen;
+
+  /* Store the last byte written in case we need it */
+  machine.ram.last_byte=b;
+
+  /* Work out which page, screen and ROM are selected */
+  machine.ram.current_page= b & 0x07;
+  machine.ram.current_screen=( b & 0x08) ? 7 : 5;
+  machine.ram.current_rom=(machine.ram.current_rom & 0x02) |
+    ( (b & 0x10) >> 4 );
+
+  /* Are we locking the RAM configuration? */
+  machine.ram.locked=( b & 0x20 );
+
+  /* If we changed the active screen, mark the entire display file as
+     dirty so we redraw it on the next pass */
+  if(machine.ram.current_screen!=old_screen) display_refresh_all();
 }

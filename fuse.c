@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -77,7 +77,7 @@ static int fuse_init(int argc, char **argv)
   if(timer_init()) return 1;
 
   machine.machine=SPECTRUM_MACHINE_48; spectrum_init(); machine.reset();
-  keyboard_init();
+  fuse_keyboard_init();
   z80_init();
 
   return 0;

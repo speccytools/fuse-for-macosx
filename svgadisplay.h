@@ -1,5 +1,5 @@
-/* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+/* svgadisplay.h: Routines for dealing with the svgalib display
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -24,19 +24,17 @@
 
 */
 
-#ifndef FUSE_SPECPLUS3_H
-#define FUSE_SPECPLUS3_H
+#ifndef FUSE_SVGADISPLAY_H
+#define FUSE_SVGADISPLAY_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+int svgadisplay_init(int width, int height);
 
-BYTE specplus3_readbyte(WORD address);
-BYTE specplus3_read_screen_memory(WORD offset);
-void specplus3_writebyte(WORD address, BYTE b);
-int specplus3_init(void);
-int specplus3_reset(void);
+void svgadisplay_putpixel(int x,int y,int colour);
+void svgadisplay_line(int y);
+void svgadisplay_area(int x, int y, int width, int height);
+void svgadisplay_set_border(int line, int pixel_from, int pixel_to,
+			    int colour);
 
-void specplus3_memoryport_write(WORD port, BYTE b);
+int svgadisplay_end(void);
 
-#endif			/* #ifndef FUSE_SPECPLUS3_H */
+#endif			/* #ifndef FUSE_SVGADISPLAY_H */

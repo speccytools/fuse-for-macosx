@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#ifdef HAVE_LIBGTK	/* Use this file iff we're using GTK+ */
+#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <gtk/gtk.h>
 
@@ -35,4 +35,4 @@ int gtk_event(void)
   return gtk_main_iteration_do( FALSE );
 }
 
-#endif			/* #ifdef HAVE_LIBGTK */
+#endif			/* #ifdef UI_GTK */

@@ -1,5 +1,5 @@
 /* ay.c: AY-8-3912 routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -24,6 +24,27 @@
 
 */
 
-#include "config.h"
+#include <config.h>
 
-/* Hmmm... nothing here yet... :-) */
+#include "spectrum.h"
+
+/* What happens when the AY register port (traditionally 0xfffd on the 128K
+   machines) is read from */
+BYTE ay_registerport_read(WORD port)
+{
+  return machine.ay.registers[machine.ay.current_register];
+}
+
+/* And when it's written to */
+void ay_registerport_write(WORD port, BYTE b)
+{
+  if(b < 15) machine.ay.current_register=b;
+}
+
+/* What happens when the AY data port (traditionally 0xbffd on the 128K
+   machines) is written to; no corresponding read function as this
+   always returns 0xff */
+void ay_dataport_write(WORD port, BYTE b)
+{
+  machine.ay.registers[machine.ay.current_register]=b;
+}

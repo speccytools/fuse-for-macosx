@@ -1,5 +1,5 @@
 /* specplus2.c: Spectrum +2 specific routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -56,12 +56,7 @@ int specplus2_init(void)
   spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
   machine.reset=spec128_reset;
 
-  machine.ram.type=SPECTRUM_MACHINE_128;
-  machine.ram.port=0x7ffd;
-
-  machine.ay.present=1;
-  machine.ay.readport=0xfffd;
-  machine.ay.writeport=0xbffd;
+  machine.peripherals=spec128_peripherals;
 
   return 0;
 

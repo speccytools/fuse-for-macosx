@@ -30,4 +30,7 @@ Some thanks (in alphabetical order):
 * Martijn van der Heide: for World of Spectrum (http://www.void.jump.org/)
   -- simply the best Speccy Web site out there.
 
+* Matan Ziv-Av: for adding svgalib (http://www.svgalib.org/) support to
+  Fuse.
+
 $Id$

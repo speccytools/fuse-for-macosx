@@ -97,7 +97,9 @@ static keyboard_key_info keyboard_data[] = {
 
 };
 
-void keyboard_init(void)
+/* Called `fuse_keyboard_init' as svgalib pollutes the global namespace
+   with keyboard_init... */
+void fuse_keyboard_init(void)
 {
   int i;
   

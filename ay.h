@@ -1,5 +1,7 @@
 /* ay.h: AY-8-3912 routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -30,10 +32,13 @@
 #endif			/* #ifndef FUSE_TYPES_H */
 
 typedef struct ayinfo {
-  int present;
-  WORD readport,writeport;
   int current_register;
   BYTE registers[15];
 } ayinfo;
+
+BYTE ay_registerport_read(WORD port);
+void ay_registerport_write(WORD port, BYTE b);
+
+void ay_dataport_write(WORD port, BYTE b);
 
 #endif			/* #ifndef FUSE_AY_H */

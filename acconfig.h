@@ -24,8 +24,14 @@
 
 */
 
-/* Defined if GTK requested and found */
-#undef HAVE_LIBGTK
+/* Defined if GTK+ UI in use */
+#undef UI_GTK
+
+/* Defined if Xlib UI in use */
+#undef UI_X
+
+/* Defined if svgalib UI in use */
+#undef UI_SVGA
 
 /* Defined if Issue 2 emulation requested */
 #undef ISSUE2

@@ -1,5 +1,5 @@
 /* spectrum.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -40,16 +40,24 @@
 #endif			/* #ifndef FUSE_TYPES_H */
 
 typedef struct raminfo {
-  int type;
-  WORD port;			/* The main paging port */
-  WORD port2;			/* The special paging port */
   int locked;
   int current_page,current_rom,current_screen;
-  BYTE last_byte;		/* The last byte sent to `port' */
-  BYTE last_byte2;		/* The last byte sent to `port2' */
+  BYTE last_byte;		/* The last byte sent to the 128K port */
+  BYTE last_byte2;		/* The last byte sent to +3 port */
   int special;			/* Is a +3 special config in use? */
   int specialcfg;		/* If so, which one? */
 } raminfo;
+
+typedef BYTE (*spectrum_port_read_function)(WORD port);
+typedef void (*spectrum_port_write_function)(WORD port, BYTE data);
+
+/* The peripherals that may be available */
+typedef struct spectrum_port_info {
+  WORD mask;			/* Mask port with these bits */
+  WORD data;			/* Then see if it's equal to these bits */
+  spectrum_port_read_function read; /* If so, call this function on read */
+  spectrum_port_write_function write; /* Or this one on write */
+} spectrum_port_info;
 
 typedef struct machine_info {
   int machine;
@@ -70,6 +78,8 @@ typedef struct machine_info {
 
   int (*reset)(void);	/* Reset function */
 
+  spectrum_port_info *peripherals; /* Which peripherals do we have? */
+
   raminfo ram;          /* RAM paging information */
   ayinfo ay;		/* The AY-8-3912 chip */
 
@@ -84,8 +94,14 @@ int spectrum_interrupt(void);
 BYTE (*readbyte)(WORD address);
 BYTE (*read_screen_memory)(WORD offset);
 void (*writebyte)(WORD address,BYTE b);
+
 BYTE readport(WORD port);
-void writeport(WORD port,BYTE b);
+void writeport(WORD port, BYTE b);
+
+BYTE spectrum_port_noread(WORD port);
+
+BYTE spectrum_ula_read(WORD port);
+void spectrum_ula_write(WORD port, BYTE b);
 
 extern BYTE ROM[4][0x4000];
 extern BYTE RAM[8][0x4000];

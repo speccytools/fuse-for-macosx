@@ -1,5 +1,5 @@
-/* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+/* svga.c: Main svgalib routines
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -24,19 +24,20 @@
 
 */
 
-#ifndef FUSE_SPECPLUS3_H
-#define FUSE_SPECPLUS3_H
+/* Should this file really exist? At the moment, it's here more for
+   symmetry with the GTK+/Xlib versions that for any good reason of its
+   own
+*/
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <config.h>
 
-BYTE specplus3_readbyte(WORD address);
-BYTE specplus3_read_screen_memory(WORD offset);
-void specplus3_writebyte(WORD address, BYTE b);
-int specplus3_init(void);
-int specplus3_reset(void);
+#ifdef UI_SVGA			/* Use this iff we're using svgalib */
 
-void specplus3_memoryport_write(WORD port, BYTE b);
+#include <vgakeyboard.h>
 
-#endif			/* #ifndef FUSE_SPECPLUS3_H */
+int svga_event() {
+    keyboard_update();
+    return 0;
+}
+
+#endif				/* #ifdef UI_SVGA */

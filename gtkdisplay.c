@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#ifdef HAVE_LIBGTK	/* Use this file iff we're using GTK+ */
+#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <stdio.h>
 
@@ -61,11 +61,6 @@ int gtkdisplay_init(int width, int height)
 
   image = gdk_image_new(GDK_IMAGE_FASTEST, gdk_visual_get_system(),
 			3*width, 3*height );
-  if(!image) {
-    fprintf(stderr,"%s: Couldn't create image at %s:%d\n",
-	    fuse_progname,__FILE__,__LINE__);
-    return 1;
-  }
 
   gtk_signal_connect( GTK_OBJECT(gtkui_drawing_area), "expose_event", 
 		      GTK_SIGNAL_FUNC(gtkdisplay_expose), NULL);
@@ -132,9 +127,10 @@ static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
 	      fuse_progname);
       return 1;
     }
-    gtk_widget_set_colormap( gtkui_drawing_area, current_map );
-    for(i=0;i<16;i++) colours[i]=gdk_colours[i].pixel;
+    gtk_widget_set_colormap( gtkui_window, current_map );
   }
+
+  for(i=0;i<16;i++) colours[i]=gdk_colours[i].pixel;
 
   return 0;
 
@@ -279,4 +275,4 @@ static gint gtkdisplay_configure(GtkWidget *widget, GdkEvent *event,
   return FALSE;
 }
 
-#endif			/* #ifdef HAVE_LIBGTK */
+#endif			/* #ifdef UI_GTK */

@@ -24,7 +24,7 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.2.2-pre1)
+AM_INIT_AUTOMAKE(fuse, 0.2.2-pre2)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -55,9 +55,8 @@ gtk=yes)
 AC_MSG_RESULT($gtk)
 if test "$gtk" = yes; then
     AM_PATH_GTK(1.2.0,
-		AC_DEFINE(HAVE_LIBGTK),
-		gtk=no;
-		AC_MSG_WARN([GTK+ not found. Reverting to Xlib UI]))
+		AC_DEFINE(UI_GTK), 
+		gtk=no; AC_MSG_WARN([GTK+ not found. Reverting to Xlib UI]))
 fi
 
 dnl If we're not using GTK+, go and look for X ourselves
@@ -84,18 +83,11 @@ if test "$gtk" = no; then
 	    $X_EXTRA_LIBS)
     fi
 
-    dnl Also need to find glib ourselves
-    AC_CHECK_PROG(glibconfig, glib-config, "yes")
-    if test "$glibconfig" = yes; then
-	AC_CHECK_LIB(glib, g_slist_alloc,
-		     CFLAGS="$CFLAGS `glib-config --cflags`";
-		     LIBS="$LIBS `glib-config --libs`"
-		     ,
-		     ,[`glib-config --libs`])
-    fi
-    if test "$ac_cv_lib_glib_g_slist_alloc" != yes; then
-	AC_MSG_ERROR([Necessary library glib not found])
-    fi
+    dnl Also need glib
+    AM_PATH_GLIB(1.2.0,
+		 AC_DEFINE(UI_X),
+		 AC_MSG_ERROR([Fuse cannot run without glib. Sorry.]))
+
 fi
 
 dnl Do we want issue 2 keyboard emulation?

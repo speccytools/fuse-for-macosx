@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#ifdef HAVE_LIBGTK	/* Use this file iff we're using GTK+ */
+#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
@@ -89,4 +89,4 @@ static guint gtkkeyboard_unshift_keysym(guint keysym)
 			  0);
 }
 			  
-#endif			/* #ifdef HAVE_LIBGTK */
+#endif			/* #ifdef UI_GTK */

@@ -1,5 +1,5 @@
-/* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+/* svgakeyboard.h: svgalib routines for dealing with the keyboard
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
    Author contact information:
 
@@ -24,19 +24,14 @@
 
 */
 
-#ifndef FUSE_SPECPLUS3_H
-#define FUSE_SPECPLUS3_H
+#ifndef FUSE_SVGAKEYBOARD_H
+#define FUSE_SVGAKEYBOARD_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+int svgakeyboard_init(void);
 
-BYTE specplus3_readbyte(WORD address);
-BYTE specplus3_read_screen_memory(WORD offset);
-void specplus3_writebyte(WORD address, BYTE b);
-int specplus3_init(void);
-int specplus3_reset(void);
+int svgakeyboard_keypress(int keysym);
+void svgakeyboard_keyrelease(int keysym);
 
-void specplus3_memoryport_write(WORD port, BYTE b);
+int svgakeyboard_end(void);
 
-#endif			/* #ifndef FUSE_SPECPLUS3_H */
+#endif			/* #ifndef FUSE_SVGAKEYBOARD_H */

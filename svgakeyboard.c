@@ -1,5 +1,5 @@
-/* xkeyboard.c: X routines for dealing with the keyboard
-   Copyright (c) 2000 Philip Kendall
+/* svgakeyboard.c: svgalib routines for dealing with the keyboard
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -26,25 +26,40 @@
 
 #include <config.h>
 
-#ifdef UI_X			/* Use this iff we're using Xlib */
+#ifdef UI_SVGA			/* Use this iff we're using svgalib */
 
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
+#include <stdio.h>
+
+#include <vga.h>
+#include <vgakeyboard.h>
 
 #include "display.h"
 #include "keyboard.h"
-#include "keysyms.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
 
-int xkeyboard_keypress(XKeyEvent *event)
+static int exitcode=0;
+
+int svgakeyboard_init(void)
 {
-  KeySym keysym; keysyms_key_info *ptr;
+  keyboard_init();
+  keyboard_seteventhandler(svgakeyboard_keystroke);
+}
 
-  keysym=XLookupKeysym(event,0);
+void svgakeyboard_keystroke(int scancode, int press)  {
+  if(press) {
+    svgakeyboard_keypress(scancode);
+  } else {
+    svgakeyboard_keyrelease(scancode);
+  }
+}
 
-  ptr=keysyms_get_data(keysym);
+int svgakeyboard_keypress(int keysym)
+{
+  keysyms_key_info *ptr;
+
+  ptr=keysyms_get_info(keysym);
 
   if(ptr) {
     if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
@@ -54,20 +69,20 @@ int xkeyboard_keypress(XKeyEvent *event)
 
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
-  case XK_F2:
+  case SCANCODE_F2:
     snapshot_write();
     break;
-  case XK_F3:
+  case SCANCODE_F3:
     snapshot_read();
     display_refresh_all();
     break;
-  case XK_F5:
+  case SCANCODE_F5:
     machine.reset();
     break;
-  case XK_F7:
+  case SCANCODE_F7:
     tape_open();
     break;
-  case XK_F9:
+  case SCANCODE_F9:
     switch(machine.machine) {
     case SPECTRUM_MACHINE_48:
       machine.machine=SPECTRUM_MACHINE_128;
@@ -84,7 +99,8 @@ int xkeyboard_keypress(XKeyEvent *event)
     }
     spectrum_init(); machine.reset();
     break;
-  case XK_F10:
+  case SCANCODE_F10:
+    fuse_exiting=1;
     return 1;
   }
 
@@ -92,11 +108,9 @@ int xkeyboard_keypress(XKeyEvent *event)
 
 }
 
-void xkeyboard_keyrelease(XKeyEvent *event)
+void svgakeyboard_keyrelease(int keysym)
 {
-  KeySym keysym; keysyms_key_info *ptr;
-
-  keysym=XLookupKeysym(event,0);
+  keysyms_key_info *ptr;
 
   ptr=keysyms_get_data(keysym);
 
@@ -109,4 +123,9 @@ void xkeyboard_keyrelease(XKeyEvent *event)
 
 }
 
-#endif				/* #ifdef UI_X */
+int svgakeyboard_end(void)
+{
+  keyboard_close();
+}
+
+#endif				/* #ifdef UI_SVGA */

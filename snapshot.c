@@ -1,5 +1,5 @@
 /* snapshot.c: snapshot handling routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -86,7 +86,10 @@ int snapshot_read(void)
     int i,page;
     fread(buffer2,0x4000,1,f);
     fread(buffer,4,1,f); PCL=buffer[0]; PCH=buffer[1];
-    writeport(machine.ram.port,buffer[2]);
+
+    /* Write to the 128K's memory; the port number here is ignored */
+    spec128_memoryport_write( 0x7ffd, buffer[2]);
+
     page=buffer[2]&0x07;
     memcpy(RAM[page],buffer2,0x4000);
     for(i=0;i<8;i++) {

@@ -35,11 +35,15 @@
 #include "fuse.h"
 #include "spectrum.h"
 
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
 #include "gtk.h"
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
 #include "x.h"
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+#include "svga.h"
+#else
+#error No user interface selected
+#endif			/* #if defined( UI_GTK ) */
 
 /* A large value to mean `no events due' */
 const DWORD event_no_events = 0xffffffff;
@@ -111,11 +115,13 @@ int event_do_events(void)
     switch(ptr->type) {
     case EVENT_TYPE_INTERRUPT:
       spectrum_interrupt();
-#ifdef HAVE_LIBGTK
+#if defined( UI_GTK )
       gtk_event();
-#else			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_X )
       fuse_exiting=x_event();
-#endif			/* #ifdef HAVE_LIBGTK */
+#elif defined( UI_SVGA )
+      svga_event();
+#endif			/* #if defined( UI_GTK ) */
       break;
     case EVENT_TYPE_LINE:
       display_line();

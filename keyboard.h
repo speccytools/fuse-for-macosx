@@ -35,7 +35,7 @@ extern BYTE keyboard_default_value;
 extern BYTE keyboard_return_values[8];
 
 /* A numeric identifier for each Spectrum key. Basically chosen to map
-   to ASCII */
+   to ASCII, but no necessity for this to be true */
 typedef enum keyboard_key_name {
 
   KEYBOARD_NONE = 0x00,		/* No key */
@@ -86,7 +86,7 @@ typedef enum keyboard_key_name {
 
 } keyboard_key_name;
 
-void keyboard_init(void);
+void fuse_keyboard_init(void);
 BYTE keyboard_read(BYTE porth);
 void keyboard_press(keyboard_key_name key);
 void keyboard_release(keyboard_key_name key);

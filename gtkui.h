@@ -1,5 +1,5 @@
 /* gtkui.h: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000-2001 Philip Kendall
 
    $Id$
 
@@ -31,6 +31,7 @@
 #include <gtk/gtk.h>
 #endif
 
+extern GtkWidget* gtkui_window;
 extern GtkWidget* gtkui_drawing_area;
 
 int gtkui_init(int *argc, char ***argv, int width, int height);

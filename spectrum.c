@@ -104,68 +104,62 @@ int spectrum_interrupt(void)
 
 BYTE readport(WORD port)
 {
-  if ( ! (port & 0x01) ) {
-    return keyboard_read( ( port >> 8 ) );
-  } else if ( machine.ay.present && port==machine.ay.readport ) {
-    return machine.ay.registers[machine.ay.current_register];
+  spectrum_port_info *ptr;
+
+  BYTE return_value = 0xff;
+
+  for( ptr = machine.peripherals; ptr->mask; ptr++ ) {
+    if( ( port & ptr->mask ) == ptr->data ) {
+      return_value &= ptr->read(port);
+    }
   }
+
+  return return_value;
+
+}
+
+void writeport(WORD port, BYTE b)
+{
+  
+  spectrum_port_info *ptr;
+
+  for( ptr = machine.peripherals; ptr->mask; ptr++ ) {
+    if( ( port & ptr->mask ) == ptr->data ) {
+      ptr->write(port, b);
+    }
+  }
+
+}
+
+/* A dummy function for non-readable ports */
+BYTE spectrum_port_noread(WORD port)
+{
   return 0xff;
 }
 
-void writeport(WORD port,BYTE b)
+/* What do we get if we read from the ULA? */
+BYTE spectrum_ula_read(WORD port)
 {
-  if( ! (port & 0x01) ) {
-    display_set_border(b&0x07);
+  return keyboard_read( port >> 8 );
+}
+
+/* What happens when we write to the ULA? */
+void spectrum_ula_write(WORD port, BYTE b)
+{
+  display_set_border( b & 0x07 );
 
 #ifdef ISSUE2
-    if( b & 0x18 ) {
-      keyboard_default_value=0xff;
-    } else {
-      keyboard_default_value=0xbf;
-    }
+  if( b & 0x18 ) {
+    keyboard_default_value=0xff;
+  } else {
+    keyboard_default_value=0xbf;
+  }
 #else				/* #ifdef ISSUE2 */
-    if( b & 0x10 ) {
-      keyboard_default_value=0xff;
-    } else {
-      keyboard_default_value=0xbf;
-    }
+  if( b & 0x10 ) {
+    keyboard_default_value=0xff;
+  } else {
+    keyboard_default_value=0xbf;
+  }
 #endif				/* #ifdef ISSUE2 */
-  }
 
-  if( port==machine.ram.port && 
-      ( machine.ram.type==SPECTRUM_MACHINE_128 || 
-	machine.ram.type==SPECTRUM_MACHINE_PLUS3 ) &&
-      !(machine.ram.locked) )
-    {
-      int old_screen=machine.ram.current_screen;
-      machine.ram.last_byte=b;
-      machine.ram.current_page=b&0x07;
-      machine.ram.current_screen=( b & 0x08) ? 7 : 5;
-      machine.ram.current_rom=(machine.ram.current_rom & 0x02) |
-	( (b & 0x10) >> 4 );
-      machine.ram.locked=( b & 0x20 );
-      if(machine.ram.current_screen!=old_screen) display_refresh_all();
-    }
-  if( port==machine.ram.port2 &&
-      machine.ram.type==SPECTRUM_MACHINE_PLUS3 &&
-      !(machine.ram.locked) )
-    {
-      machine.ram.last_byte2=b;
-      if(b&0x01) {
-	machine.ram.special=1;
-	machine.ram.specialcfg=(b&0x06)>>1;
-      } else {
-	machine.ram.special=0;
-	machine.ram.current_rom=(machine.ram.current_rom & 0x01) |
-	  ( (b & 0x04) >> 1 );
-      }
-    }
-  if(machine.ay.present) {
-    if( port==machine.ay.readport && 0<b<15) {
-      machine.ay.current_register=b;
-    }
-    if( port==machine.ay.writeport ) {
-      machine.ay.registers[machine.ay.current_register]=b;
-    }
-  }
 }

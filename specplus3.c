@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -32,9 +32,19 @@
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"
+#include "spec128.h"
 #include "specplus3.h"
 #include "spectrum.h"
 #include "z80.h"
+
+spectrum_port_info specplus3_peripherals[] = {
+  { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
+  { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
+  { 0xc002, 0x4000, spectrum_port_noread, spec128_memoryport_write },
+  { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport_write },
+  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
+};
 
 BYTE specplus3_readbyte(WORD address)
 {
@@ -150,13 +160,7 @@ int specplus3_init(void)
   spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
   machine.reset=specplus3_reset;
 
-  machine.ram.type=SPECTRUM_MACHINE_PLUS3;
-  machine.ram.port=0x7ffd;
-  machine.ram.port2=0x1ffd;
-
-  machine.ay.present=1;
-  machine.ay.readport=0xfffd;
-  machine.ay.writeport=0xbffd;
+  machine.peripherals=specplus3_peripherals;
 
   return 0;
 
@@ -174,3 +178,31 @@ int specplus3_reset(void)
   z80_reset();
   return 0;
 }
+
+void specplus3_memoryport_write(WORD port, BYTE b)
+{
+
+  /* Do nothing if we've locked the RAM configuration */
+  if( machine.ram.locked ) return;
+
+  /* Store the last byte written in case we need it */
+  machine.ram.last_byte2=b;
+
+  if( b & 0x01) {	/* Check whether we want a special RAM configuration */
+
+    /* If so, select it */
+    machine.ram.special=1;
+    machine.ram.specialcfg= ( b & 0x06 ) >> 1;
+
+  } else {
+
+    /* If not, we're selecting the high bit of the current ROM */
+    machine.ram.special=0;
+    machine.ram.current_rom=(machine.ram.current_rom & 0x01) |
+      ( (b & 0x04) >> 1 );
+
+  }
+
+}
+
+
