@@ -30,7 +30,7 @@
 
 #include "display.h"
 #include "ui/uidisplay.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 char *widget_text_text;		/* What we return the text in */
 

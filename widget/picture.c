@@ -29,7 +29,7 @@
 #include "display.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 static widget_picture_data *ptr;
 

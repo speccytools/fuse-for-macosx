@@ -41,7 +41,7 @@
 #include "specplus3.h"
 #include "tape.h"
 #include "utils.h"
-#include "widget.h"
+#include "widget_internals.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 

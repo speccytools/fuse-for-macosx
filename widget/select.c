@@ -38,7 +38,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "ui/uidisplay.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 /* Data for drawing the cursor */
 static int highlight_line;

@@ -45,7 +45,7 @@
 #include "options.h"
 #include "screenshot.h"
 #include "timer.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 static void printchar(int x, int y, int col, int ch);
 

@@ -33,7 +33,7 @@
 #include "display.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 static int split_message( const char *message, char ***lines, size_t *count,
 			  const size_t line_length );

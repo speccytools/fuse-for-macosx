@@ -34,7 +34,7 @@
 #include "keyboard.h"
 #include "tape.h"
 #include "ui/uidisplay.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 /* The descriptions of the blocks */
 static char ***block_descriptions;

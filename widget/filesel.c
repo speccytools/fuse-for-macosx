@@ -39,7 +39,7 @@
 #include "fuse.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 struct widget_dirent **widget_filenames; /* Filenames in the current
 					    directory */

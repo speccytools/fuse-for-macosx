@@ -32,7 +32,7 @@
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
-#include "widget.h"
+#include "widget_internals.h"
 
 /* FIXME: there must be a better way of initialising all the menu data */
 
