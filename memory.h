@@ -46,8 +46,7 @@ extern libspectrum_word memory_screen_top;
 libspectrum_byte readbyte( libspectrum_word address );
 
 #define readbyte_internal( address ) \
-  memory_map[ (libspectrum_word)(address) >> 13 ] . \
-    page[ (libspectrum_word)(address) & 0x1fff ]
+  memory_map[ (libspectrum_word)(address) >> 13 ].page[ (address) & 0x1fff ]
 
 void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );
