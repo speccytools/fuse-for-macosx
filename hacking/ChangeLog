@@ -988,3 +988,4 @@
 	 2.x and libxml2 autoconf macros.
 20040707 z80/z80.pl,z80/tests/edb[3b].out: make INI, OUTI, INIR, OTIR and
 	 the D variants timings consistent with the FAQ.
+20040707 acinclude.m4: update SDL macros to latest upstream.
