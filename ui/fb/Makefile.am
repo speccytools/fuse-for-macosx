@@ -35,4 +35,5 @@ BUILT_SOURCES = keysyms.c
 keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl fb ../../keysyms.dat > $@
 
-noinst_HEADERS = fbkeyboard.h
+noinst_HEADERS = fbdisplay.h \
+	         fbkeyboard.h
