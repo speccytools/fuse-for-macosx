@@ -366,7 +366,7 @@ print hashline( __LINE__ ), << 'CODE';
 
     int c;
 
-    c = getopt_long( argc, argv, "d:hm:o:p:r:s:t:v:g:V", long_options, NULL );
+    c = getopt_long( argc, argv, "d:hm:o:p:f:r:s:t:v:g:V", long_options, NULL );
 
     if( c == -1 ) break;	/* End of option list */
 

@@ -1200,3 +1200,4 @@
          ui/sdl/sdldisplay.c: Undo accidental commit (Fred).
 20050113 menu_data.c: add TS2068 to change ROMs menu.
 20050114 ui/scaler/scalers.c: Undo accidental commit again (Fred).
+20050115 settings.pl: Add short option for sound frequency (Fred).
