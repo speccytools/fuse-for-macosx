@@ -119,7 +119,39 @@ yyerror( char *s )
   ui_error( UI_ERROR_ERROR, "Invalid debugger command: %s", s );
 }
 
-/* Called to set a register or similar */
+/* Get the value of a register */
+int
+debugger_register_get( int which )
+{
+  switch( which ) {
+
+    /* 8-bit registers */
+  case 'a': return A;
+  case 'b': return B;
+  case 'c': return C;
+  case 'd': return D;
+  case 'e': return E;
+  case 'f': return F;
+  case 'h': return H;
+  case 'l': return L;
+    
+    /* 16-bit registers */
+  case 0x6166: return AF;
+  case 0x6263: return BC;
+  case 0x6465: return DE;
+  case 0x686c: return HL;
+  case 0x7370: return SP;
+  case 0x7063: return PC;
+  case 0x6978: return IX;
+  case 0x6979: return IY;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "attempt to get unknown register '%d'", which );
+    return 0;
+  }
+}
+
+/* Set the value of a register */
 void
 debugger_register_set( int which, int value )
 {

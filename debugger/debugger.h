@@ -29,11 +29,7 @@
 
 #include <stdlib.h>
 
-#ifdef HAVE_LIB_GLIB
-#include <glib.h>
-#else				/* #ifdef HAVE_LIB_GLIB */
-#include <libspectrum.h>	/* Use libspectrum's replacement */
-#endif				/* #ifdef HAVE_LIB_GLIB */
+#include <libspectrum.h>
 
 #ifndef FUSE_TYPES_H
 #include "types.h"
@@ -68,6 +64,8 @@ typedef enum debugger_breakpoint_life {
 
 extern const char *debugger_breakpoint_life_text[];
 
+typedef struct debugger_expression debugger_expression;
+
 /* The breakpoint structure */
 typedef struct debugger_breakpoint {
   size_t id;
@@ -75,6 +73,8 @@ typedef struct debugger_breakpoint {
   WORD value;
   size_t ignore;		/* Ignore this breakpoint this many times */
   enum debugger_breakpoint_life life;
+  debugger_expression *condition; /* Conditional expression to activate this
+				     breakpoint */
 } debugger_breakpoint;
 
 /* The current breakpoints */

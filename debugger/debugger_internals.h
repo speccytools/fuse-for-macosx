@@ -27,6 +27,10 @@
 #ifndef FUSE_DEBUGGER_INTERNALS_H
 #define FUSE_DEBUGGER_INTERNALS_H
 
+#ifndef FUSE_DEBUGGER_H
+#include "debugger.h"
+#endif				/* #ifndef FUSE_DEBUGGER_H */
+
 int debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
 			     size_t ignore, debugger_breakpoint_life life );
 int debugger_breakpoint_remove( size_t id );
@@ -34,16 +38,25 @@ int debugger_breakpoint_remove_all( void );
 int debugger_breakpoint_clear( WORD address );
 int debugger_breakpoint_exit( void );
 int debugger_breakpoint_ignore( size_t id, size_t ignore );
+int debugger_breakpoint_set_condition( size_t id,
+				       debugger_expression *condition );
 int debugger_poke( WORD address, BYTE value );
 int debugger_port_write( WORD address, BYTE value );
+int debugger_register_get( int which );
+void debugger_register_set( int which, int value );
 
 /* Utility functions called by the flex scanner */
 
 int debugger_command_input( char *buf, int *result, int max_size );
 int debugger_reg16_index( char *reg );
 
-/* Utility functions called by the bison parser */
+/* Numeric expression stuff */
 
-void debugger_register_set( int which, int value );
+debugger_expression* debugger_expression_new_number( int number );
+debugger_expression* debugger_expression_new_register( int which );
+
+void debugger_expression_delete( debugger_expression* expression );
+
+int debugger_expression_evaluate( debugger_expression* expression );
 
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */

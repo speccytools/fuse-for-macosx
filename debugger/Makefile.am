@@ -28,8 +28,12 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_LIBRARIES = libdebugger.a
 
-libdebugger_a_SOURCES = command.c commandl.l commandy.y debugger.c \
-disassemble.c
+libdebugger_a_SOURCES = command.c \
+			commandl.l \
+			commandy.y \
+			debugger.c \
+			disassemble.c \
+			expression.c
 
 commandl.c: commandy.c
 commandy.h: commandy.c

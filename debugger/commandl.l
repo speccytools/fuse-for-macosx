@@ -53,6 +53,7 @@ HEX	[0-9a-f]
 ba|bas|base { return BASE; }
 br|bre|brea|break|breakp|breakpo|breakpoi|breakpoin|breakpoint { return BREAK;}
 co|con|cont|contin|continu|continue { return CONTINUE; }
+cond|condi|condit|conditi|conditio|condition { return CONDITION; }
 cl|cle|clea|clear { return CLEAR; }
 del|dele|delet|delete { return DELETE; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {

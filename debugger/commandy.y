@@ -52,6 +52,8 @@ void yyerror( char *s );
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
 
+  debugger_expression* exp;
+
 }
 
 /* Tokens as returned from the Flex scanner (commandl.l) */
@@ -60,6 +62,7 @@ void yyerror( char *s );
 %token		 BREAK
 %token		 TBREAK
 %token		 CLEAR
+%token		 CONDITION
 %token		 CONTINUE
 %token		 DELETE
 %token		 DISASSEMBLE
@@ -87,6 +90,9 @@ void yyerror( char *s );
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
 
+%type  <exp>     expressionornull;
+%type  <exp>     expression;
+
 %%
 
 input:	 /* empty */
@@ -101,6 +107,9 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 	     debugger_breakpoint_add( $3, $4, 0, $1 );
            }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
+	 | CONDITION NUMBER expressionornull {
+	     debugger_breakpoint_set_condition( $2, $3 );
+           }
 	 | CONTINUE { debugger_run(); }
 	 | DELETE { debugger_breakpoint_remove_all(); }
 	 | DELETE NUMBER { debugger_breakpoint_remove( $2 ); }
@@ -127,4 +136,13 @@ portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
 numberorpc:   /* empty */ { $$ = PC; }
             | NUMBER	  { $$ = $1; }
 
+expressionornull:   /* empty */ { $$ = NULL; }
+	          | expression  { $$ = $1; }
+
+expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
+		       if( !$$ ) YYABORT;
+		     }
+	    | REGISTER { $$ = debugger_expression_new_register( $1 );
+			 if( !$$ ) YYABORT;
+		       }
 %%
