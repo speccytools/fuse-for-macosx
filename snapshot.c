@@ -253,8 +253,8 @@ int snapshot_write( const char *filename )
   length = 0;
   error = libspectrum_z80_write( &buffer, &length, &snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: error libspectrum_z80_write: %s\n", fuse_progname,
-	    libspectrum_error_message(error) );
+    fprintf(stderr, "%s: error from libspectrum_z80_write: %s\n",
+	    fuse_progname, libspectrum_error_message(error) );
     return error;
   }
 
@@ -330,6 +330,9 @@ static int snapshot_copy_to( libspectrum_snap *snap )
 
   /* FIXME: should copy to new memory */
   for( i=0; i<8; i++ ) snap->pages[i] = RAM[i];
+
+  memcpy( snap->slt,        slt,        sizeof(snap->slt)        );
+  memcpy( snap->slt_length, slt_length, sizeof(snap->slt_length) );
 
   return 0;
 }
