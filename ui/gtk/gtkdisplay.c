@@ -209,6 +209,7 @@ register_scalers( void )
       return 0;
     case 2:
       scaler_register( SCALER_HALF );
+      scaler_register( SCALER_HALFSKIP );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_HALF );
       return 0;

@@ -44,6 +44,8 @@ void scaler_AdvMame2x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			  int width, int height );
 void scaler_Half_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 	             BYTE *dstPtr, DWORD dstPitch, int width, int height );
+void scaler_HalfSkip_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
 void scaler_Normal1x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
 void scaler_Normal2x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
@@ -68,6 +70,8 @@ void scaler_AdvMame2x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			  int width, int height );
 void scaler_Half_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 	             BYTE *dstPtr, DWORD dstPitch, int width, int height );
+void scaler_HalfSkip_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
 void scaler_Normal1x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
 void scaler_Normal2x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,

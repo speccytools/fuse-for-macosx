@@ -104,7 +104,8 @@ uidisplay_init_scalers( void )
   scaler_register( SCALER_SUPEREAGLE );
   scaler_register( SCALER_ADVMAME2X );
   if( machine_current->timex ) {
-    scaler_register( SCALER_HALF );
+    scaler_register( SCALER_HALF ); 
+    scaler_register( SCALER_HALFSKIP );
     scaler_register( SCALER_TIMEXTV );
   } else {
     scaler_register( SCALER_TV2X );

@@ -28,6 +28,7 @@
 
 typedef enum scaler_type {
   SCALER_HALF = 0,
+  SCALER_HALFSKIP,
   SCALER_NORMAL,
   SCALER_DOUBLESIZE,
   SCALER_TRIPLESIZE,

@@ -597,6 +597,28 @@ FUNCTION( scaler_Half )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 }
 
 void 
+FUNCTION( scaler_HalfSkip )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			     BYTE *dstPtr, DWORD dstPitch, int width,
+			     int height )
+{
+  scaler_data_type *r;
+
+  while (height--) {
+    int i;
+    r = (scaler_data_type*) dstPtr;
+
+    if( ( height & 1 ) == 0 ) {
+      for (i = 0; i < width; i+=2, ++r) {
+        *r = *(((scaler_data_type*) srcPtr) + i + 1);
+      }
+      dstPtr += dstPitch;
+    }
+
+    srcPtr += srcPitch;
+  }
+}
+
+void 
 FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )

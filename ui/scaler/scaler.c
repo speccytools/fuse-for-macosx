@@ -51,8 +51,10 @@ struct scaler_info {
    in the same order as scaler.h:scaler_type */
 static struct scaler_info available_scalers[] = {
 
-  { "Timex Half size", "half",       SCALER_FLAGS_NONE,	       0.5,
+  { "Timex Half (smoothed)", "half", SCALER_FLAGS_NONE,	       0.5,
     scaler_Half_16,       scaler_Half_32                            },
+  { "Timex Half (skipping)", "halfskip", SCALER_FLAGS_NONE,    0.5,
+    scaler_HalfSkip_16,   scaler_HalfSkip_32                        },
   { "Normal",	       "normal",     SCALER_FLAGS_NONE,	       1.0, 
     scaler_Normal1x_16,   scaler_Normal1x_32                        },
   { "Double size",     "2x",	     SCALER_FLAGS_NONE,	       2.0, 

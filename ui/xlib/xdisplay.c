@@ -344,8 +344,8 @@ register_scalers( void )
       scaler_select_scaler( SCALER_NORMAL );
       return 0;
     case 2:
-      scaler_register( SCALER_HALF );
-      scaler_select_scaler( SCALER_HALF );
+      scaler_register( SCALER_HALFSKIP );
+      scaler_select_scaler( SCALER_HALFSKIP );
       return 0;
     }
 
