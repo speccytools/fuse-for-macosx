@@ -389,3 +389,4 @@
 	 control, so always use the timer_* routines.
 20031214 Generalise the low-level sound routines.
 20031215 machine.c: remove unused #includes.
+20031216 ui/svga/svgajoystick.c: remove use of BYTE, WORD (Witold).

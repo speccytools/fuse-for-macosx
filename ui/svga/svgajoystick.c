@@ -89,10 +89,10 @@ ui_joystick_end( void )
   return 0;
 }
 
-BYTE
-ui_joystick_read( WORD port, BYTE which )
+libspectrum_byte
+ui_joystick_read( libspectrum_word port, libspectrum_byte which )
 {
-  BYTE ret = 0;
+  libspectrum_byte ret = 0;
   int x, y;
 
   joystick_update();
