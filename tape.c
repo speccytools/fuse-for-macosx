@@ -186,7 +186,7 @@ int tape_write( const char* filename )
   int error;
 
   length = 0;
-  error = libspectrum_tzx_write( tape, &buffer, &length );
+  error = libspectrum_tzx_write( &buffer, &length, tape );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "error during libspectrum_tzx_write: %s",
 	      libspectrum_error_message(error) );
@@ -479,8 +479,8 @@ int tape_next_edge( DWORD last_tstates )
   if( ! tape_playing ) return 0;
 
   /* Get the time until the next edge */
-  libspec_error = libspectrum_tape_get_next_edge( tape, &edge_tstates,
-						  &flags );
+  libspec_error = libspectrum_tape_get_next_edge( &edge_tstates, &flags,
+						  tape );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;
 
   /* Invert the microphone state */
@@ -573,7 +573,7 @@ tape_get_block_list( char ****list, size_t *n )
       return 1;
     }
 
-    libspectrum_tape_block_description( block, (*list)[*n][0], 80 );
+    libspectrum_tape_block_description( (*list)[*n][0], 80, block );
 
     switch( block->type ) {
 

@@ -176,8 +176,8 @@ int rzx_stop_recording( void )
   rzx_recording = 0;
 
   length = 0;
-  libspec_error = libspectrum_rzx_write( rzx, &buffer, &length,
-					 rzx_snap, rzx_snap_length,
+  libspec_error = libspectrum_rzx_write( &buffer, &length,
+					 rzx, rzx_snap, rzx_snap_length,
 					 rzx_creator, rzx_major_version,
 					 rzx_minor_version,
 					 settings_current.rzx_compression );
@@ -215,7 +215,7 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
   error = utils_read_file( filename, &buffer, &length );
   if( error ) return error;
 
-  libspec_error = libspectrum_rzx_read( rzx, buffer, length, &snap );
+  libspec_error = libspectrum_rzx_read( rzx, &snap, buffer, length );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "error during libspectrum_rzx_read: %s",
 	      libspectrum_error_message( libspec_error ) );

@@ -76,7 +76,7 @@ int snapshot_read( const char *filename )
   case SNAPSHOT_TYPE_SNA:
 
     snapshot_flush_slt();
-    error = libspectrum_sna_read( buffer, length, snap );
+    error = libspectrum_sna_read( snap, buffer, length );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       ui_error( UI_ERROR_ERROR, "Error reading '%s': %s", filename,
 		libspectrum_error_message(error) );
@@ -88,7 +88,7 @@ int snapshot_read( const char *filename )
   case SNAPSHOT_TYPE_Z80:
 
     snapshot_flush_slt();
-    error = libspectrum_z80_read( buffer, length, snap );
+    error = libspectrum_z80_read( snap, buffer, length );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       ui_error( UI_ERROR_ERROR, "Error reading '%s': %s", filename, 
 		libspectrum_error_message(error) );
