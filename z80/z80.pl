@@ -52,8 +52,16 @@ sub arithmetic_logical ($$$) {
     unless( $arg2 ) { $arg2 = $arg1; $arg1 = 'A'; }
 
     if( length $arg1 == 1 ) {
-	if( length $arg2 == 1 ) {
+	if( length $arg2 == 1 or $arg2 =~ /^REGISTER[HL]$/ ) {
 	    print "      $opcode($arg2);\n";
+	} elsif( $arg2 eq '(REGISTER+dd)' ) {
+	    print << "CODE";
+      tstates += 11;		/* FIXME: how is this contended? */
+      {
+	BYTE bytetemp=readbyte( REGISTER + (SBYTE)readbyte(PC++) );
+	$opcode(bytetemp);
+      }
+CODE
 	} else {
 	    my $register = ( $arg2 eq '(HL)' ? 'HL' : 'PC' );
 	    my $increment = ( $register eq 'PC' ? '++' : '' );
@@ -147,9 +155,9 @@ sub inc_dec ($$) {
 
     my $modifier = ( $opcode eq 'INC' ? '++' : '--' );
 
-    if( length $arg == 1 ) {
+    if( length $arg == 1 or $arg =~ /^REGISTER[HL]$/ ) {
 	print "      $opcode($arg);\n";
-    } elsif( length $arg == 2 ) {
+    } elsif( length $arg == 2 or $arg eq 'REGISTER' ) {
 	print "      tstates += 2;\n      ${arg}$modifier;\n";
     } elsif( $arg eq '(HL)' ) {
 	print << "CODE";
@@ -161,7 +169,18 @@ sub inc_dec ($$) {
 	writebyte(HL,bytetemp);
       }
 CODE
+    } elsif( $arg eq '(REGISTER+dd)' ) {
+	print << "CODE";
+      tstates += 15;		/* FIXME: how is this contended? */
+      {
+	WORD wordtemp=REGISTER+(SBYTE)readbyte(PC++);
+	BYTE bytetemp=readbyte(wordtemp);
+	$opcode(bytetemp);
+	writebyte(wordtemp,bytetemp);
+      }
+CODE
     }
+
 }
 
 sub ini_ind ($) {
@@ -300,7 +319,13 @@ sub push_pop ($$) {
 
     my( $opcode, $regpair ) = @_;
 
-    my( $high, $low ) = ( $regpair =~ /^(.)(.)$/ );
+    my( $high, $low );
+
+    if( $regpair eq 'REGISTER' ) {
+	( $high, $low ) = ( 'REGISTERH', 'REGISTERL' );
+    } else {
+	( $high, $low ) = ( $regpair =~ /^(.)(.)$/ );
+    }
 
     print "      ${opcode}16($low,$high);\n";
 }
@@ -448,14 +473,23 @@ sub opcode_EX (@) {
 	WORD wordtemp=AF; AF=AF_; AF_=wordtemp;
       }
 EX
-    } elsif( $arg1 eq '(SP)' and $arg2 eq 'HL' ) {
+    } elsif( $arg1 eq '(SP)' and ( $arg2 eq 'HL' or $arg2 eq 'REGISTER' ) ) {
+
+	my( $high, $low );
+
+	if( $arg2 eq 'HL' ) {
+	    ( $high, $low ) = qw( H L );
+	} else {
+	    ( $high, $low ) = qw( REGISTERH REGISTERL );
+	}
+
 	print << "EX";
       {
 	BYTE bytetempl=readbyte(SP), bytetemph=readbyte(SP+1);
 	contend( SP, 3 ); contend( SP+1, 4 );
 	contend( SP, 3 ); contend( SP+1, 5 );
-	writebyte(SP,L); writebyte(SP+1,H);
-	L=bytetempl; H=bytetemph;
+	writebyte(SP,$low); writebyte(SP+1,$high);
+	$low=bytetempl; $high=bytetemph;
       }
 EX
     } elsif( $arg1 eq 'DE' and $arg2 eq 'HL' ) {
@@ -530,8 +564,8 @@ sub opcode_JP (@) {
 
     my( $condition, $offset ) = @_;
 
-    if( $condition eq 'HL' ) {
-	print "      PC=HL;\t\t/* NB: NOT INDIRECT! */\n";
+    if( $condition eq 'HL' or $condition eq 'REGISTER' ) {
+	print "      PC=$condition;\t\t/* NB: NOT INDIRECT! */\n";
 	return;
     } else {
 	call_jp( 'JP', $condition, $offset );
@@ -561,9 +595,9 @@ sub opcode_LD (@) {
 
     my( $dest, $src ) = @_;
 
-    if( length $dest == 1 ) {
+    if( length $dest == 1 or $dest =~ /^REGISTER[HL]$/ ) {
 
-	if( length $src == 1 ) {
+	if( length $src == 1 or $src =~ /^REGISTER[HL]$/ ) {
 
 	    if( $dest eq 'R' and $src eq 'A' ) {
 		print << "LD";
@@ -605,14 +639,19 @@ LD
 	A=readbyte(wordtemp);
       }
 LD
+        } elsif( $src eq '(REGISTER+dd)' ) {
+	    print << "LD";
+      tstates += 11;		/* FIXME: how is this contended? */
+      $dest=readbyte( REGISTER + (SBYTE)readbyte(PC++) );
+LD
         }
 
-    } elsif( length $dest == 2 ) {
+    } elsif( length $dest == 2 or $dest eq 'REGISTER' ) {
 
 	my( $high, $low );
 
-	if( $dest eq 'SP' ) {
-	    ( $high, $low ) = qw( SPH SPL );
+	if( $dest eq 'SP' or $dest eq 'REGISTER' ) {
+	    ( $high, $low ) = ( "${dest}H", "${dest}L" );
 	} else {
 	    ( $high, $low ) = ( $dest =~ /^(.)(.)$/ );
 	}
@@ -625,8 +664,8 @@ LD
       contend( PC, 3 );
       $high=readbyte(PC++);
 LD
-        } elsif( $src eq 'HL' ) {
-	    print "      tstates += 2;\n      SP=HL;\n";
+        } elsif( $src eq 'HL' or $src eq 'REGISTER' ) {
+	    print "      tstates += 2;\n      SP=$src;\n";
         } elsif( $src eq '(nnnn)' ) {
 	    print "      LD16_RRNN($low,$high);\n";
 	}
@@ -660,18 +699,34 @@ LD
 	writebyte(wordtemp,A);
       }
 LD
-        } elsif( $src =~ /^(.)(.)$/ ) {
+        } elsif( $src =~ /^(.)(.)$/ or $src eq 'REGISTER' ) {
 
 	    my( $high, $low );
 
-	    if( $src eq 'SP' ) {
-		( $high, $low ) = qw( SPH SPL );
+	    if( $src eq 'SP' or $src eq 'REGISTER' ) {
+		( $high, $low ) = ( "${src}H", "${src}L" );
 	    } else {
 		( $high, $low ) = ( $1, $2 );
 	    }
 
 	    print "      LD16_NNRR($low,$high);\n";
 	}
+    } elsif( $dest eq '(REGISTER+dd)' ) {
+
+	if( length $src == 1 ) {
+	print << "LD";
+      tstates += 11;		/* FIXME: how is this contended? */
+      writebyte( REGISTER + (SBYTE)readbyte(PC++), $src);
+LD
+        } elsif( $src eq 'nn' ) {
+	    print << "LD";
+      tstates += 11;		/* FIXME: how is this contended? */
+      {
+	WORD wordtemp=REGISTER+(SBYTE)readbyte(PC++);
+	writebyte(wordtemp,readbyte(PC++));
+      }
+LD
+        }
     }
 
 }
@@ -892,7 +947,27 @@ sub opcode_shift (@) {
 
     my $lc_opcode = lc $opcode;
 
-    print << "shift";
+    if( $opcode eq 'DDFDCB' ) {
+
+	print << "shift";
+      /* FIXME: contention here is just a guess */
+      {
+	WORD tempaddr; BYTE opcode3;
+	contend( PC, 3 );
+	tempaddr = REGISTER + (SBYTE)readbyte_internal( PC++ );
+	contend( PC, 4 );
+	opcode3 = readbyte_internal( PC++ );
+#ifdef HAVE_ENOUGH_MEMORY
+	switch(opcode3) {
+#include "z80_ddfdcb.c"
+	}
+#else			/* #ifdef HAVE_ENOUGH_MEMORY */
+	z80_ddfdcbxx(opcode3,tempaddr);
+#endif			/* #ifdef HAVE_ENOUGH_MEMORY */
+      }
+shift
+    } else {
+	print << "shift";
       {
 	BYTE opcode2;
 	contend( PC, 4 );
@@ -913,17 +988,18 @@ shift
 #undef REGISTERL
 #undef REGISTER
 shift
-    } else {
-	print "#include \"z80_$lc_opcode.c\"\n";
-    }
+        } elsif( $opcode eq 'CB' or $opcode eq 'ED' ) {
+	    print "#include \"z80_$lc_opcode.c\"\n";
+        }
 
-    print << "shift"
+        print << "shift"
 	}
 #else			/* #ifdef HAVE_ENOUGH_MEMORY */
 	z80_${lc_opcode}xx(opcode2);
 #endif			/* #ifdef HAVE_ENOUGH_MEMORY */
       }
 shift
+    }
 }
 
 # Description of each file
@@ -931,6 +1007,7 @@ shift
 my %description = (
 
     'opcodes_cb.dat'   => 'opcodes_cb.c: Z80 CBxx opcodes',
+    'opcodes_ddfd.dat' => 'opcodes_ddfd.c Z80 {DD,FD}xx opcodes',
     'opcodes_ed.dat'   => 'opcodes_ed.c: Z80 CBxx opcodes',
     'opcodes_base.dat' => 'opcodes_base.c: unshifted Z80 opcodes',
 
@@ -986,10 +1063,19 @@ while(<>) {
     print "      break;\n";
 }
 
-if( $data_file eq 'opcodes_ed.dat' ) {
+if( $data_file eq 'opcodes_ddfd.dat' ) {
+
+    print << "CODE";
+    default:		/* Instruction did not involve H or L, so backtrack
+			   one instruction and parse again */
+      PC--;		/* FIXME: will be contended again */
+      R--;		/* Decrement the R register as well */
+      break;
+CODE
+
+} elsif( $data_file eq 'opcodes_ed.dat' ) {
     print << "NOPD";
     default:		/* All other opcodes are NOPD */
       break;
 NOPD
 }
-

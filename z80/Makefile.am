@@ -30,13 +30,16 @@ libz80_a_SOURCES = z80.c z80_ops.c
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
-BUILT_SOURCES = opcodes_base.c z80_cb.c z80_ed.c
+BUILT_SOURCES = opcodes_base.c z80_cb.c z80_ddfd.c z80_ed.c
 
 opcodes_base.c: z80.pl opcodes_base.dat
 	@PERL@ z80.pl opcodes_base.dat > opcodes_base.c
 
 z80_cb.c: z80.pl opcodes_cb.dat
 	@PERL@ z80.pl opcodes_cb.dat > z80_cb.c
+
+z80_ddfd.c: z80.pl opcodes_ddfd.dat
+	@PERL@ z80.pl opcodes_ddfd.dat > z80_ddfd.c
 
 z80_ed.c: z80.pl opcodes_ed.dat
 	@PERL@ z80.pl opcodes_ed.dat > z80_ed.c
