@@ -1,5 +1,5 @@
 /* fbdisplay.c: Routines for dealing with the linux fbdev display
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Darren Salt
 
    $Id$
 
@@ -28,6 +28,7 @@
 
 #ifdef UI_FB			/* Use this iff we're using fbdev */
 
+#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -45,98 +46,212 @@
 static unsigned short *image, *gm;
 
 static int colours[16];
-static int fd;
+static int fb_fd = -1;		/* The framebuffer's file descriptor */
 
-static int fbdisplay_allocate_colours(int numColours, int *colours);
-static int fbdisplay_allocate_image(int width, int height);
+static struct fb_fix_screeninfo fixed;
+static struct fb_var_screeninfo orig_display, display;
+static int got_orig_display = 0;
 
-static void fbdisplay_area(int x, int y, int width, int height);
+/* The resolutions we'll try and select (in order) */
+enum {
+  FB_640_240,
+  FB_640_480,
+  FB_320_240,
+  FB_FAILED
+} fb_resolution;
+
+static int fb_set_mode( void );
 
 int uidisplay_init(int width, int height)
 {
-  struct fb_fix_screeninfo fi;
-
-/* fb is assumed to be in 320x240x65K colour mode */
-  fd=open("/dev/fb",O_RDWR);
-  ioctl(fd, FBIOGET_FSCREENINFO, &fi);
-  gm=mmap(0, fi.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-  fbdisplay_allocate_image(DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT);
-  fbdisplay_allocate_colours(16, colours);  
-
-  return 0;
-}
-
-static int fbdisplay_allocate_colours(int numColours, int *colours)
-{
-  int colour_palette[] = {
-  0x0000,
-  0x0018,
-  0xc000,
-  0xc018,
-  0x0600,
-  0x0618,
-  0xc600,
-  0xc618,
-  0x0000,
-  0x001f,
-  0xf800,
-  0xf81f,
-  0x07e0,
-  0x07ff,
-  0xffe0,
-  0xffff
-};
-  int i;
-
-  for(i=0;i<numColours;i++) {
-    colours[i]=colour_palette[i];
+  fb_fd = open( "/dev/fb0", O_RDWR );
+  if( fb_fd == -1 ) {
+    fprintf( stderr, "%s: couldn't open framebuffer device\n", fuse_progname );
+    return 1;
+  }
+  if( ioctl( fb_fd, FBIOGET_FSCREENINFO, &fixed )        ||
+      ioctl( fb_fd, FBIOGET_VSCREENINFO, &orig_display )    ) {
+    fprintf( stderr, "%s: couldn't read framebuffer device info\n",
+	     fuse_progname );
+    return 1;
   }
 
-  return 0;
-}
-  
-static int fbdisplay_allocate_image(int width, int height)
-{
-  image=malloc(width*height*2);
+  if( fb_set_mode() ) return 1;
 
-  if(!image) {
-    fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
+  fputs( "\x1B[H\x1B[J", stdout );	/* clear tty */
+  memset( gm, 0, display.xres_virtual * display.yres_virtual * 2 );
+
+  if( ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ) {
+    fprintf( stderr, "%s: couldn't set framebuffer mode\n", fuse_progname );
     return 1;
   }
 
   return 0;
 }
 
+static int
+fb_set_mode( void )
+{
+  fb_resolution = 0;
+
+  while( fb_resolution != FB_FAILED )
+  {
+    display = orig_display;
+
+    if( fb_resolution == FB_320_240 ) {
+      display.xres_virtual = display.xres = 320;
+      display.yres_virtual = display.yres = 240;
+      display.pixclock = 82440;
+      display.left_margin = 30;
+      display.right_margin = 16;
+      display.upper_margin = 20;
+      display.lower_margin = 4;
+      display.hsync_len = 48;
+      display.vsync_len = 1;
+      display.sync = 0;
+      display.vmode = (display.vmode & ~FB_VMODE_MASK) | FB_VMODE_DOUBLE;
+    } else {
+      display.xres_virtual = display.xres = 640;
+      display.pixclock = 32052;
+      display.left_margin = 112;
+      display.right_margin = 40;
+      display.upper_margin = 28;
+      display.lower_margin = 9;
+      display.hsync_len = 40;
+      display.vsync_len = 3;
+      display.sync = 0;
+      display.vmode &= ~FB_VMODE_MASK;
+      if( fb_resolution == FB_640_480 ) {
+	display.yres_virtual = display.yres = 480;
+      } else {
+	display.vmode |= FB_VMODE_DOUBLE;
+	display.yres_virtual = display.yres = 240;
+      }
+    }
+
+    display.xoffset = display.yoffset = 0;
+    display.bits_per_pixel = 16;
+    display.red.length = display.blue.length = 5;
+    display.green.length = 6;
+
+    display.red.offset = 11;
+    display.green.offset = 5;
+    display.blue.offset = 0;
+
+    gm =
+      mmap( 0, fixed.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fb_fd, 0 );
+    if( gm == (void *)-1 ) {
+      fprintf (stderr, "%s: couldn't mmap for framebuffer: %s\n",
+	       fuse_progname, strerror( errno ) );
+      return 1;
+    }
+
+    image = malloc( display.xres_virtual * display.yres_virtual * 2 );
+    if( !image ) {
+      munmap( gm, fixed.smem_len );
+      fprintf( stderr, "%s: couldn't create image\n", fuse_progname );
+      return 1;
+    }
+
+    if( !ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ) return 0;
+
+    fb_resolution += 1;
+  }
+
+  fprintf( stderr, "%s: couldn't set framebuffer mode\n", fuse_progname );
+
+  return 1;
+}
+
 void uidisplay_putpixel(int x,int y,int colour)
 {
-  if(x%2!=0) return;
-  *(image+x+y*DISPLAY_ASPECT_WIDTH)=colours[colour];
+  if( fb_resolution == FB_320_240 ) {
+    if( ( x & 1 ) == 0 )
+      *( image + 320 * y + (x >> 1) ) = colours[colour];
+  } else {
+    *( image + 640 * y + x ) = colours[colour];
+  }
 }
 
-void uidisplay_lines( int start, int end )
+void
+uidisplay_line( int y )
 {
-  fbdisplay_area( 0, start, DISPLAY_ASPECT_WIDTH, ( end - start + 1 ) );
+  switch( fb_resolution )
+  {
+  case FB_640_480:
+    memcpy( gm +  2 * y      * display.xres_virtual, image + y * 640,
+	    640 * 2                                                   );
+    memcpy( gm + (2 * y + 1) * display.xres_virtual, image + y * 640,
+	    640 * 2                                                   );
+    break;
+  case FB_640_240:
+    memcpy( gm +      y      * display.xres_virtual, image + y * 640,
+	    640 * 2                                                   );
+    break;
+  case FB_320_240:
+    memcpy( gm +      y      * display.xres_virtual, image + y * 320,
+	    320 * 2                                                   );
+    break;
+  default:;		/* Shut gcc up */
+  }
 }
 
-static void fbdisplay_area(int x, int y, int width, int height)
+void
+uidisplay_lines( int start, int end )
 {
-    int yy;
-    for(yy=y; yy<y+height; yy++)
-        memcpy(gm+yy*DISPLAY_ASPECT_WIDTH+x, image+yy*DISPLAY_ASPECT_WIDTH+x, width*2);
+  int y;
+  switch( fb_resolution ) {
+  case FB_640_480:
+    for( y = start; y <= end; y++ )
+    {
+      memcpy( gm +   2 * y       * display.xres_virtual, image + y * 640,
+	      640 * 2                                                     );
+      memcpy( gm + ( 2 * y + 1 ) * display.xres_virtual, image + y * 640,
+	      640 * 2                                                     );
+    }
+    break;
+  case FB_640_240:
+    for( y = start; y <= end; y++ )
+      memcpy( gm +       y       * display.xres_virtual, image + y * 640,
+	      640 * 2                                                     );
+    break;
+  case FB_320_240:
+    for( y = start; y <= end; y++ )
+      memcpy( gm +       y       * display.xres_virtual, image + y * 320,
+	      320 * 2                                                     );
+    break;
+  default:;		/* Shut gcc up */
+  }
 }
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {
-    int x;
+  int i;
+  WORD *ptr;
+  colour = colours[colour];
 
-    for(x=pixel_from;x<pixel_to;x++)
-        *(image+line*DISPLAY_ASPECT_WIDTH+x)=colours[colour];
+  switch( fb_resolution ) {
+  case FB_640_480:
+  case FB_640_240:
+    ptr = image + line * 640 + pixel_from;
+    for( i = pixel_from; i < pixel_to; i++ ) *ptr++ = colour;
+    break;
+  case FB_320_240:
+    ptr = image + line * 320 + pixel_from / 2;
+    for( i = pixel_from / 2; i < pixel_to / 2; i++ ) *ptr++ = colour;
+    break;
+  default:;		/* Shut gcc up */
+  }
 }
 
 int uidisplay_end(void)
 {
-    close(fd);
-    return 0;
+  if( fb_fd != -1 ) {
+    if( got_orig_display ) ioctl( fb_fd, FBIOPUT_VSCREENINFO, &orig_display );
+    close( fb_fd );
+    fb_fd = -1;
+  }
+  return 0;
 }
 
 #endif				/* #ifdef UI_FB */

@@ -26,6 +26,8 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuifb.a
 
+INCLUDES = @GLIB_CFLAGS@
+
 libuifb_a_SOURCES = fbdisplay.c fbkeyboard.c fbui.c error.c
 
 noinst_HEADERS = fbkeyboard.h

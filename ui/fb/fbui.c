@@ -28,16 +28,19 @@
 
 #ifdef UI_FB			/* Use this iff we're using fbdev */
 
-#include <stdio.h>
+#include <stdlib.h>
 
-#include "fuse.h"
 #include "fbkeyboard.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
+static void fb_end( void );
+
 int ui_init(int *argc, char ***argv, int width, int height)
 {
   int error;
+
+  atexit( fb_end );
 
   error = uidisplay_init(width, height);
   if(error) return error;
@@ -56,15 +59,15 @@ int ui_event()
 
 int ui_end(void)
 {
-  int error;
-
-  error = fbkeyboard_end();
-  if(error) return error;
-
-  error = uidisplay_end();
-  if(error) return error;
-
+  /* Cleanup handled by atexit function */
   return 0;
+}
+
+static void
+fb_end( void )
+{
+  fbkeyboard_end();
+  uidisplay_end();
 }
 
 #endif				/* #ifdef UI_FB */
