@@ -33,8 +33,7 @@
 #include "display.h"
 #include "keyboard.h"
 #include "settings.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 #include "widget.h"
 
 static settings_info settings;

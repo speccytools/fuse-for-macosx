@@ -34,8 +34,8 @@
 #include <X11/Xutil.h>
 
 #include "fuse.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 #include "xdisplay.h"
 #include "xkeyboard.h"
 #include "xui.h"

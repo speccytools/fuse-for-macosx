@@ -33,7 +33,7 @@
 #include "display.h"
 #include "keyboard.h"
 #include "machine.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 #include "widget.h"
 
 static int widget_machine_show_machine( void );

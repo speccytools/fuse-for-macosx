@@ -36,8 +36,7 @@
 
 #include "display.h"
 #include "keyboard.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 #include "widget.h"
 
 struct widget_dirent **widget_filenames; /* Filenames in the current

@@ -38,7 +38,7 @@
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "widget/widget.h"
 #include "z80/z80.h"
 

@@ -31,8 +31,7 @@
 #include "display.h"
 #include "keyboard.h"
 #include "tape.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 #include "widget.h"
 
 int widget_tape_draw( void )

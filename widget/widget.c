@@ -39,8 +39,8 @@
 #include "fuse.h"
 #include "display.h"
 #include "machine.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 #include "keyboard.h"
 #include "widget.h"
 

@@ -34,8 +34,8 @@
 
 #include "aalibkeyboard.h"
 #include "fuse.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 
 aa_context *aalibui_context;
 

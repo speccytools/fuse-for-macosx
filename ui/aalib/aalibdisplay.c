@@ -36,7 +36,7 @@
 #include "aalibui.h"
 #include "fuse.h"
 #include "display.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 
 static int colours[16];
 

@@ -31,7 +31,7 @@
 #include "display.h"
 #include "keyboard.h"
 #include "snapshot.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 #include "widget.h"
 
 int widget_snapshot_draw( void )

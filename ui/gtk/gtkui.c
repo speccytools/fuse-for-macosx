@@ -43,8 +43,8 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;

@@ -37,7 +37,7 @@
 #include "fuse.h"
 #include "xdisplay.h"
 #include "xui.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 
 static XImage *image;		/* The image structure to draw the
 				   Speccy's screen on */

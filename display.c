@@ -33,8 +33,8 @@
 #include "event.h"
 #include "machine.h"
 #include "spectrum.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 
 /* The current border colour */
 BYTE display_border;

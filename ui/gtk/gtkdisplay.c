@@ -35,7 +35,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "gtkui.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 
 static GdkGC *gc;
 static GdkImage *image;

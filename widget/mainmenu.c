@@ -30,8 +30,7 @@
 
 #include "display.h"
 #include "keyboard.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/uidisplay.h"
 #include "widget.h"
 
 int widget_mainmenu_draw( void )

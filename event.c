@@ -39,7 +39,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "tape.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "spectrum.h"
 
 /* A large value to mean `no events due' */

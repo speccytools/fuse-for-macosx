@@ -48,7 +48,7 @@ noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
 	machine.h osssound.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h\
-	tape.h timer.h types.h ui.h uidisplay.h\
+	tape.h timer.h types.h\
 	joystick.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl

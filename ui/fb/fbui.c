@@ -32,8 +32,8 @@
 
 #include "fuse.h"
 #include "fbkeyboard.h"
-#include "ui.h"
-#include "uidisplay.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 
 int ui_init(int *argc, char ***argv, int width, int height)
 {
