@@ -201,8 +201,6 @@ int libspectrum_write_word( uchar **buffer, libspectrum_word w )
 /* Write an LSB dword to buffer */
 int libspectrum_write_dword( libspectrum_byte **buffer, libspectrum_dword d )
 {
-  fprintf( stderr, "%d\n", d );
-
   *(*buffer)++ = ( d & 0x000000ff )      ;
   *(*buffer)++ = ( d & 0x0000ff00 ) >>  8;
   *(*buffer)++ = ( d & 0x00ff0000 ) >> 16;

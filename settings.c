@@ -71,6 +71,9 @@ int settings_defaults( settings_info *settings )
 
   settings->snapshot = NULL;
   settings->tape_file = NULL;
+
+  settings->record_file = settings->playback_file = NULL;
+
   settings->start_machine = "48";
 
   return 0;
@@ -95,8 +98,12 @@ static int settings_command_line( int argc, char **argv,
   struct option long_options[] = {
 
     {	    "machine", 1, NULL, 'm' },
+
     {      "snapshot", 1, NULL, 's' },
     {          "tape", 1, NULL, 't' },
+
+    {      "playback", 1, NULL, 'p' },
+    {        "record", 1, NULL, 'r' },
 
     {        "issue2", 0, &(settings->issue2), 1 },
     {     "no-issue2", 0, &(settings->issue2), 0 },
@@ -153,6 +160,9 @@ static int settings_command_line( int argc, char **argv,
       break;
 
     case 'h': settings->show_help = 1; break;
+
+    case 'p': settings->playback_file = optarg; break;
+    case 'r': settings->record_file = optarg; break;
 
     case 's': settings->snapshot = optarg; break;
     case 't': settings->tape_file = optarg; break;

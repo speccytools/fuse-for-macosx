@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/mman.h>
 
@@ -46,6 +47,9 @@ size_t rzx_instructions;
 
 /* Are we currently recording a .rzx file? */
 int rzx_recording;
+
+/* The filename we'll save this recording into */
+static char *rzx_filename;
 
 /* Are we currently playing back a .rzx file? */
 int rzx_playback;
@@ -68,7 +72,7 @@ int rzx_init( void )
   return 0;
 }
 
-int rzx_start_recording( void )
+int rzx_start_recording( const char *filename )
 {
   libspectrum_error error;
 
@@ -87,6 +91,15 @@ int rzx_start_recording( void )
 
   /* Start the count of instruction fetches here */
   rzx_instructions = 0;
+
+  /* Store the filename */
+  rzx_filename = (char*)malloc( strlen(filename) + 1 );
+  if( rzx_filename == NULL ) {
+    fprintf( stderr, "%s: out of memory in rzx_start_recording\n",
+	     fuse_progname );
+    return 1;
+  }
+  strcpy( rzx_filename, filename );
 
   return 0;
 }
@@ -108,7 +121,8 @@ int rzx_stop_recording( void )
     return libspec_error;
   }
 
-  error = utils_write_file( "test.rzx", buffer, length );
+  error = utils_write_file( rzx_filename, buffer, length );
+  free( rzx_filename );
   if( error ) { free( buffer ); libspectrum_rzx_free( &rzx ); return error; }
 
   free( buffer );
@@ -123,7 +137,7 @@ int rzx_stop_recording( void )
   return 0;
 }
 
-int rzx_start_playback( void )
+int rzx_start_playback( const char *filename )
 {
   libspectrum_byte *buffer; size_t length;
   libspectrum_error libspec_error; int error;
@@ -131,7 +145,7 @@ int rzx_start_playback( void )
 
   if( rzx_recording) return 1;
 
-  error = utils_read_file( "test.rzx", &buffer, &length );
+  error = utils_read_file( filename, &buffer, &length );
   if( error ) return error;
 
   libspec_error = libspectrum_rzx_read( &rzx, buffer, length );
@@ -144,7 +158,7 @@ int rzx_start_playback( void )
 
   if( munmap( buffer, length ) == -1 ) {
     snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't munmap `%s'", fuse_progname, "test.rzx" );
+	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
     perror( error_message );
     return 1;
   }

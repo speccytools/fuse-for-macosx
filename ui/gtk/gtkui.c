@@ -39,6 +39,7 @@
 #include "fuse.h"
 #include "gtkkeyboard.h"
 #include "machine.h"
+#include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "spectrum.h"
@@ -62,6 +63,11 @@ static gint gtkui_delete(GtkWidget *widget, GdkEvent *event,
 			      gpointer data);
 static void gtkui_open(GtkWidget *widget, gpointer data);
 static void gtkui_save(GtkWidget *widget, gpointer data);
+
+static void gtkui_rzx_start( GtkWidget *widget, gpointer data );
+static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
+static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
+
 static void gtkui_quit(GtkWidget *widget, gpointer data);
 static void gtkui_options( GtkWidget *widget, gpointer data );
 static void gtkui_reset(GtkWidget *widget, gpointer data);
@@ -90,6 +96,11 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/_Open Snapshot..." , "F3" , gtkui_open,          0, NULL          },
   { "/File/_Save Snapshot..." , "F2" , gtkui_save,          0, NULL          },
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
+  { "/File/_Recording",		NULL , NULL,		    0, "<Branch>"    },
+  { "/File/Recording/_Start...",NULL , gtkui_rzx_start,	    0, NULL	     },
+  { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
+  { "/File/Recording/S_top",    NULL , gtkui_rzx_stop,	    0, NULL          },
+  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
   { "/Options",		        NULL , NULL,                0, "<Branch>"    },
   { "/Options/_General...",     "F4" , gtkui_options,       0, NULL          },
@@ -105,7 +116,8 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Help",			NULL , NULL,		    0, "<Branch>"    },
   { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
 };
-static guint gtkui_menu_data_size = 18;
+static guint gtkui_menu_data_size =
+  sizeof( gtkui_menu_data ) / sizeof( GtkItemFactoryEntry );
   
 int ui_init(int *argc, char ***argv, int width, int height)
 {
@@ -266,6 +278,57 @@ static void gtkui_save(GtkWidget *widget, gpointer data)
   free( filename );
 
   fuse_emulation_unpause();
+}
+
+/* Called when File/Recording/Start selected */
+static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
+{
+  char *filename;
+
+  if( rzx_playback ) return;
+
+  fuse_emulation_pause();
+  
+  filename = gtkui_fileselector_get_filename();
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  rzx_start_recording( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return;
+}
+
+/* Called when File/Recording/Stop selected */
+static void gtkui_rzx_stop( GtkWidget *widget, gpointer data )
+{
+  if( rzx_recording ) rzx_stop_recording();
+  if( rzx_playback  ) rzx_stop_playback();
+  return;
+}
+
+/* Called when File/Recording/Play selected */
+static void gtkui_rzx_play( GtkWidget *widget, gpointer data )
+{
+  char *filename;
+
+  if( rzx_recording ) return;
+
+  fuse_emulation_pause();
+  
+  filename = gtkui_fileselector_get_filename();
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  rzx_start_playback( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return;
+
 }
 
 /* Called by the menu when File/Exit selected */

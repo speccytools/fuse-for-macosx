@@ -43,6 +43,9 @@ typedef struct settings_info {
   char *tape_file;
   const char *start_machine;
 
+  char *record_file;
+  char *playback_file;
+
   int show_version;
   int show_help;
 
