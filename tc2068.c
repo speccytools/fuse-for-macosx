@@ -275,9 +275,9 @@ tc2068_reset( void )
 
   error = tc2068_dock_exrom_reset(); if( error ) return error;
 
-  scld_dec_write(255, 128);
-  scld_dec_write(255, 0);
-  scld_hsr_write(244, 0);
+  scld_dec_write( 0x00ff, 0x80 );
+  scld_dec_write( 0x00ff, 0x00 );
+  scld_hsr_write( 0x00f4, 0x00 );
 
   return 0;
 }
