@@ -151,30 +151,39 @@ int snapshot_copy_from( libspectrum_snap *snap )
   int i,j; int error;
   int capabilities;
 
-  error = machine_select( snap->machine );
+  libspectrum_machine machine = snap->machine;
+
+  if( machine == LIBSPECTRUM_MACHINE_PENT ) {
+    ui_error( UI_ERROR_INFO, "%s not supported; trying %s instead",
+	      libspectrum_machine_name( snap->machine ),
+	      libspectrum_machine_name( LIBSPECTRUM_MACHINE_128 ) );
+    machine = LIBSPECTRUM_MACHINE_128;
+  }
+
+  error = machine_select( machine );
   if( error ) {
 
     /* If we failed on a +3 snapshot, try falling back to +2A (in case
        we were compiled without lib765) */
-    if( snap->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    if( machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
       error = machine_select( LIBSPECTRUM_MACHINE_PLUS2A );
       if( error ) {
 	ui_error( UI_ERROR_ERROR,
 		  "Loading a %s snapshot, but neither that nor %s available",
-		  libspectrum_machine_name( snap->machine ),
+		  libspectrum_machine_name( machine ),
 		  libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )    );
 	return 1;
       } else {
 	ui_error( UI_ERROR_INFO,
 		  "Loading a %s snapshot, but that's not available. "
 		  "Using %s instead",
-		  libspectrum_machine_name( snap->machine ),
+		  libspectrum_machine_name( machine ),
 		  libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )  );
       }
     } else {			/* Not trying a +3 snapshot */
       ui_error( UI_ERROR_ERROR,
 		"Loading a %s snapshot, but that's not available",
-		libspectrum_machine_name( snap->machine ) );
+		libspectrum_machine_name( machine ) );
     }
   }
 
