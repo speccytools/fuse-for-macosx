@@ -77,9 +77,6 @@ size_t rzx_instruction_count;
 /* The current RZX data */
 libspectrum_rzx *rzx;
 
-/* The information to be used as the creator in the RZX file */
-static libspectrum_creator *creator;
-
 static int start_playback( libspectrum_rzx *rzx, libspectrum_snap *snap );
 static int recording_frame( void );
 static int playback_frame( void );
@@ -87,30 +84,9 @@ static int counter_reset( void );
 
 int rzx_init( void )
 {
-  unsigned version[4] = { 0, 0, 0, 0 };
-  int i;
   libspectrum_error error;
 
-  sscanf( VERSION, "%u.%u.%u.%u",
-	  &version[0], &version[1], &version[2], &version[3] );
-
-  for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
-
-  error = libspectrum_creator_alloc( &creator ); if( error ) return error;
-
-  error = libspectrum_creator_set_program( creator, "Fuse" );
-  if( error ) { libspectrum_creator_free( creator ); return error; }
-
-  error = libspectrum_creator_set_major( creator,
-					 version[0] * 0x100 + version[1] );
-  if( error ) { libspectrum_creator_free( creator ); return error; }
-
-  error = libspectrum_creator_set_minor( creator,
-					 version[2] * 0x100 + version[3] );
-  if( error ) { libspectrum_creator_free( creator ); return error; }
-
-  error = libspectrum_rzx_alloc( &rzx );
-  if( error ) { libspectrum_creator_free( creator ); return error; }
+  error = libspectrum_rzx_alloc( &rzx ); if( error ) return error;
 
   rzx_recording = rzx_playback = 0;
 
@@ -171,7 +147,7 @@ int rzx_stop_recording( void )
 
   length = 0;
   libspec_error = libspectrum_rzx_write( &buffer, &length,
-					 rzx, rzx_snap, creator,
+					 rzx, rzx_snap, fuse_creator,
 					 settings_current.rzx_compression );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     libspectrum_rzx_free( rzx );
@@ -394,7 +370,6 @@ int rzx_end( void )
   if( rzx_playback  ) return rzx_stop_playback( 0 );
 
   libspectrum_rzx_free( rzx );
-  libspectrum_creator_free( creator );
 
   return 0;
 }

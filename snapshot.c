@@ -250,7 +250,8 @@ int snapshot_write( const char *filename )
   flags = 0;
   length = 0;
   error = libspectrum_snap_write( &buffer, &length, &flags, snap,
-				  LIBSPECTRUM_ID_SNAPSHOT_Z80, 0 );
+				  LIBSPECTRUM_ID_SNAPSHOT_Z80, fuse_creator,
+				  0 );
   if( error ) return error;
 
   if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS ) {

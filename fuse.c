@@ -79,8 +79,12 @@ int fuse_emulation_paused;
    stores whether we try to reenable the sound card afterwards */
 int fuse_sound_in_use;
 
+/* The creator information we'll store in file formats that support this */
+libspectrum_creator *fuse_creator;
+
 static int fuse_init(int argc, char **argv);
 
+static int creator_init( void );
 static void fuse_show_copyright(void);
 static void fuse_show_version( void );
 static void fuse_show_help( void );
@@ -145,6 +149,7 @@ static int fuse_init(int argc, char **argv)
      hairy */
   fuse_keyboard_init();
 
+  if( creator_init() ) return 1;
   if( tape_init() ) return 1;
 
 #ifdef USE_WIDGET
@@ -231,6 +236,34 @@ static int fuse_init(int argc, char **argv)
 
   return 0;
 
+}
+
+static
+int creator_init( void )
+{
+  size_t i;
+  unsigned int version[4] = { 0, 0, 0, 0 };
+  libspectrum_error error;
+
+  sscanf( VERSION, "%u.%u.%u.%u",
+	  &version[0], &version[1], &version[2], &version[3] );
+
+  for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
+
+  error = libspectrum_creator_alloc( &fuse_creator ); if( error ) return error;
+
+  error = libspectrum_creator_set_program( fuse_creator, "Fuse" );
+  if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
+
+  error = libspectrum_creator_set_major( fuse_creator,
+					 version[0] * 0x100 + version[1] );
+  if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
+
+  error = libspectrum_creator_set_minor( fuse_creator,
+					 version[2] * 0x100 + version[3] );
+  if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
+
+  return 0;
 }
 
 static void fuse_show_copyright(void)
@@ -402,6 +435,8 @@ static int fuse_end(void)
 #ifdef USE_WIDGET
   widget_end();
 #endif                          /* #ifdef USE_WIDGET */
+
+  libspectrum_creator_free( fuse_creator );
 
   return 0;
 }

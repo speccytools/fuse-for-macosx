@@ -27,6 +27,8 @@
 #ifndef FUSE_FUSE_H
 #define FUSE_FUSE_H
 
+#include <libspectrum.h>
+
 #ifdef __GNUC__
 #define GCC_UNUSED __attribute__ ((unused))
 #define GCC_PRINTF( fmtstring, args ) __attribute__ ((format( printf, fmtstring, args )))
@@ -46,5 +48,8 @@ int fuse_emulation_unpause(void);
 int fuse_abort( void );			/* Emergency shutdown */
 
 extern int fuse_sound_in_use;		/* Are we trying to produce sound? */
+
+extern libspectrum_creator *fuse_creator; /* Creator information for file
+					     formats which support this */
 
 #endif			/* #ifndef FUSE_FUSE_H */
