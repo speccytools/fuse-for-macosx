@@ -37,7 +37,8 @@
 /* using (7) 32 byte frags for 8kHz, scale up for higher */
 #define BASE_SOUND_FRAG_PWR	7
 
-static void sdlwrite( void *userdata, Uint8 *stream, int len );
+static void sdlwrite8( void *userdata, Uint8 *stream, int len );
+static void sdlwrite16( void *userdata, Uint8 *stream, int len );
 
 /* ring buffer for SDL audio thread, make larger than standard buffer to *
  * try and avoid any buffer overruns, ideally should be dynamically set  *
@@ -59,9 +60,15 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   memset( &requested, 0, sizeof( SDL_AudioSpec ) );
 
   requested.freq = *freqptr;
-  requested.format = settings_current.sound_force_8bit ? AUDIO_U8 : AUDIO_U16;
   requested.channels = *stereoptr ? 2 : 1;
-  requested.callback = sdlwrite;
+
+  if( settings_current.sound_force_8bit ) {
+    requested.format = AUDIO_U8;
+    requested.callback = sdlwrite8;
+  } else {
+    requested.format = AUDIO_U16;
+    requested.callback = sdlwrite16;
+  }
 
   frag = BASE_SOUND_FRAG_PWR;
   if (*freqptr > 8250)   
@@ -114,20 +121,36 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 
 /* Write len samples from ringbuffer into stream */
 void
-sdlwrite( void *userdata, Uint8 *stream, int len )
+sdlwrite8( void *userdata, Uint8 *stream, int len )
 {
   int f;
 
-  libspectrum_signed_word *ptr = (libspectrum_signed_word*)stream;
-  len /= sizeof( libspectrum_signed_word ) / sizeof( Uint8 );
-
-  for( f=0; f<len; f++ )
-  {
+  for( f=0; f<len; f++ ) {
     if( ringbuffer_write == ringbuffer_read ) {
       /* buffer underrun - send last sample available */
-      *ptr++ = ringbuf[ ringbuffer_read ];
+      *stream++ = ringbuf[ ringbuffer_read ] >> 8;
     } else {
-      *ptr++ = ringbuf[ ringbuffer_read++ ];
+      *stream++ = ringbuf[ ringbuffer_read++ ] >> 8;
+      if( ringbuffer_read == MAX_AUDIO_RB ) ringbuffer_read = 0;
+    }
+  }
+}
+
+void
+sdlwrite16( void *userdata, Uint8 *stream8, int len )
+{
+  int f;
+  libspectrum_signed_word *stream;
+
+  stream = (libspectrum_signed_word*)stream8;
+  len /= 2;
+
+  for( f=0; f<len; f++ ) {
+    if( ringbuffer_write == ringbuffer_read ) {
+      /* buffer underrun - send last sample available */
+      *stream++ = ringbuf[ ringbuffer_read ];
+    } else {
+      *stream++ = ringbuf[ ringbuffer_read++ ];
       if( ringbuffer_read == MAX_AUDIO_RB ) ringbuffer_read = 0;
     }
   }

@@ -677,3 +677,4 @@
 	 ui/options.dat: full 16-bit sound code (Rus).
 20040329 ui/sdl/sdljoystick.c: compilation fixes.
 20040329 sound/sdlsound.c: change to 16-bit sound.
+20040329 sound/sdlsound.c: make 8-bit sound work again.
