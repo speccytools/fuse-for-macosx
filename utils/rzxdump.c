@@ -17,7 +17,15 @@
 
 char *progname;
 
-const char *rzx2_signature = "RZX2";
+const char *rzx_signature = "RZX!";
+
+static int
+do_file( const char *filename );
+
+static int
+read_creator_block( unsigned char **ptr, unsigned char *end );
+static int
+read_input_block( unsigned char **ptr, unsigned char *end );
 
 WORD read_word( unsigned char **ptr )
 {
@@ -36,13 +44,31 @@ DWORD read_dword( unsigned char **ptr )
   return result;
 }
 
-int do_file( const char *filename )
+
+int main( int argc, char **argv )
+{
+  int i;
+
+  progname = argv[0];
+
+  if( argc < 2 ) {
+    fprintf( stderr, "%s: Usage: %s <rzx file(s)>\n", progname, progname );
+    return 1;
+  }
+
+  for( i=1; i<argc; i++ ) {
+    do_file( argv[i] );
+  }    
+
+  return 0;
+}
+
+static int
+do_file( const char *filename )
 {
   int fd; struct stat file_info;
 
   unsigned char *buffer, *ptr, *end;
-
-  size_t i, frames;
 
   printf( "Examining file %s\n", filename );
 
@@ -79,82 +105,54 @@ int do_file( const char *filename )
 
   /* Read the RZX header */
 
-  if( end - ptr < strlen( rzx2_signature ) + 6 ) {
+  if( end - ptr < strlen( rzx_signature ) + 6 ) {
     fprintf( stderr,
-	     "%s: Not enough bytes for RZX2 header (%d bytes)\n",
-	     progname, strlen( rzx2_signature ) + 6 );
+	     "%s: Not enough bytes for RZX header (%d bytes)\n",
+	     progname, strlen( rzx_signature ) + 6 );
     munmap( buffer, file_info.st_size );
     return 1;
   }
 
-  if( memcmp( ptr, rzx2_signature, strlen( rzx2_signature ) ) ) {
+  if( memcmp( ptr, rzx_signature, strlen( rzx_signature ) ) ) {
     fprintf( stderr, "%s: Wrong signature: expected `%s'\n", progname,
-	     rzx2_signature );
+	     rzx_signature );
     munmap( buffer, file_info.st_size );
     return 1;
   }
 
-  printf( "Found RZX2 signature\n" );
-  ptr += strlen( rzx2_signature );
+  printf( "Found RZX signature\n" );
+  ptr += strlen( rzx_signature );
 
   printf( "  Major version: %d\n", (int)*ptr++ );
   printf( "  Minor version: %d\n", (int)*ptr++ );
   printf( "  Flags: %d\n", read_dword( &ptr ) );
 
-  /* Read the input recording block */
+  while( ptr < end ) {
 
-  if( end - ptr < 18 ) {
-    fprintf( stderr,
-	     "%s: Not enough bytes for input recording block (%d bytes)\n",
-	     progname, 18 );
-    munmap( buffer, file_info.st_size );
-    return 1;
-  }
+    unsigned char id;
+    int error;
 
-  if( *ptr != 0x80 ) {
-    fprintf( stderr,
-	     "%s: Got ID 0x%02x, not input recording block (0x80)\n",
-	     progname, *ptr );
-    munmap( buffer, file_info.st_size );
-    return 1;
-  }
-  ptr++;
+    id = *ptr++;
 
-  printf( "Found an input recording block\n" );
-  printf( "  Length: %d bytes\n", read_dword( &ptr ) );
-  printf( "  Frame length (obsolete): %d bytes\n", *ptr++ );
+    switch( id ) {
 
-  frames = read_dword( &ptr );
-  printf( "  Frame count: %d\n", frames );
-  printf( "  Tstate counter: %d\n", read_dword( &ptr ) );
-  printf( "  Flags: %d\n", read_dword( &ptr ) );
+    case 0x10:
+      error = read_creator_block( &ptr, end );
+      if( error ) { munmap( buffer, file_info.st_size ); return 1; }
+      break;
 
-  for( i=0; i<frames; i++ ) {
+    case 0x80:
+      error = read_input_block( &ptr, end );
+      if( error ) { munmap( buffer, file_info.st_size ); return 1; }
+      break;
 
-    size_t count;
-
-    printf( "Examining frame %d\n", i );
-    
-    if( end - ptr < 8 ) {
-      fprintf( stderr, "%s: Not enough data for frame %d\n", progname, i );
+    default:
+      fprintf( stderr, "%s: Unknown block type 0x%02x\n", progname, id );
       munmap( buffer, file_info.st_size );
       return 1;
+
     }
 
-    printf( "  Instruction count: %d\n", read_word( &ptr ) );
-
-    count = read_word( &ptr );
-    printf( "  IN count: %d\n", count );
-
-    if( end - ptr < count ) {
-      fprintf( stderr,
-	       "%s: Not enough data for frame %d (expected %d bytes)\n",
-	       progname, i, count );
-      munmap( buffer, file_info.st_size );
-      return 1;
-    }
-
-    ptr += count;
   }
 
   if( munmap( buffer, file_info.st_size ) == -1 ) {
@@ -166,21 +164,74 @@ int do_file( const char *filename )
   return 0;
 }
 
-int main( int argc, char **argv )
+static int
+read_creator_block( unsigned char **ptr, unsigned char *end )
 {
-  int i;
+  size_t length;
 
-  progname = argv[0];
-
-  if( argc < 2 ) {
-    fprintf( stderr, "%s: Usage: %s <rzx file(s)>\n", progname, progname );
+  if( end - *ptr < 28 ) {
+    fprintf( stderr,
+	     "%s: Not enough bytes for creator block\n", progname );
     return 1;
   }
 
-  for( i=1; i<argc; i++ ) {
-    do_file( argv[i] );
-  }    
+  printf( "Found a creator block\n" );
+
+  length = read_dword( ptr ); printf( "  Length: %d bytes\n", length );
+  printf( "  Creator: `%s'\n", *ptr ); (*ptr) += 20;
+  printf( "  Creator major version: %d\n", read_word( ptr ) );
+  printf( "  Creator minor version: %d\n", read_word( ptr ) );
+  printf( "  Creator custom data: %d bytes\n", length - 29 );
+  (*ptr) += length - 29;
 
   return 0;
 }
 
+static int
+read_input_block( unsigned char **ptr, unsigned char *end )
+{
+  size_t i, frames;
+
+  if( end - *ptr < 17 ) {
+    fprintf( stderr,
+	     "%s: Not enough bytes for input recording block\n", progname );
+    return 1;
+  }
+
+  printf( "Found an input recording block\n" );
+  printf( "  Length: %d bytes\n", read_dword( ptr ) );
+  printf( "  Frame length (obsolete): %d bytes\n", *(*ptr)++ );
+
+  frames = read_dword( ptr );
+  printf( "  Frame count: %d\n", frames );
+  printf( "  Tstate counter: %d\n", read_dword( ptr ) );
+  printf( "  Flags: %d\n", read_dword( ptr ) );
+
+  for( i=0; i<frames; i++ ) {
+
+    size_t count;
+
+    printf( "Examining frame %d\n", i );
+    
+    if( end - *ptr < 8 ) {
+      fprintf( stderr, "%s: Not enough data for frame %d\n", progname, i );
+      return 1;
+    }
+
+    printf( "  Instruction count: %d\n", read_word( ptr ) );
+
+    count = read_word( ptr );
+    printf( "  IN count: %d\n", count );
+
+    if( end - *ptr < count ) {
+      fprintf( stderr,
+	       "%s: Not enough data for frame %d (expected %d bytes)\n",
+	       progname, i, count );
+      return 1;
+    }
+
+    (*ptr) += count;
+  }
+
+  return 0;
+}
