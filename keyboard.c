@@ -26,6 +26,10 @@
 
 #include <config.h>
 
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#endif				/* #ifdef HAVE_LIB_GLIB */
+
 #include <libspectrum.h>
 
 #include "ui/ui.h"
@@ -42,150 +46,189 @@ libspectrum_byte keyboard_default_value;
 */
 libspectrum_byte keyboard_return_values[8];
 
+/* The hash used for storing the UI -> Fuse input layer key mappings */
+static GHashTable *keysyms_hash;
+
+struct spectrum_keys_wrapper {
+  input_key input;
+  keyboard_spectrum_keys_t spectrum;
+};
+
 /* Which Spectrum keys should be pressed for each key passed from the
    Fuse input layer */
-const static keysyms_key_info keysyms_data[] = {
+static struct spectrum_keys_wrapper spectrum_keys_table[] = {
 
-  { INPUT_KEY_Escape,      KEYBOARD_1,     KEYBOARD_Caps   },
-  { INPUT_KEY_1,           KEYBOARD_1,     KEYBOARD_NONE   },
-  { INPUT_KEY_2,           KEYBOARD_2,     KEYBOARD_NONE   },
-  { INPUT_KEY_3,           KEYBOARD_3,     KEYBOARD_NONE   },
-  { INPUT_KEY_4,           KEYBOARD_4,     KEYBOARD_NONE   },
-  { INPUT_KEY_5,           KEYBOARD_5,     KEYBOARD_NONE   },
-  { INPUT_KEY_6,           KEYBOARD_6,     KEYBOARD_NONE   },
-  { INPUT_KEY_7,           KEYBOARD_7,     KEYBOARD_NONE   },
-  { INPUT_KEY_8,           KEYBOARD_8,     KEYBOARD_NONE   },
-  { INPUT_KEY_9,           KEYBOARD_9,     KEYBOARD_NONE   },
-  { INPUT_KEY_0,           KEYBOARD_0,     KEYBOARD_NONE   },
-  { INPUT_KEY_minus,       KEYBOARD_j,     KEYBOARD_Symbol },
-  { INPUT_KEY_equal,       KEYBOARD_l,     KEYBOARD_Symbol },
-  { INPUT_KEY_BackSpace,   KEYBOARD_0,     KEYBOARD_Caps   },
+  { INPUT_KEY_Escape,      { KEYBOARD_1,     KEYBOARD_Caps   } },
+  { INPUT_KEY_1,           { KEYBOARD_1,     KEYBOARD_NONE   } },
+  { INPUT_KEY_2,           { KEYBOARD_2,     KEYBOARD_NONE   } },
+  { INPUT_KEY_3,           { KEYBOARD_3,     KEYBOARD_NONE   } },
+  { INPUT_KEY_4,           { KEYBOARD_4,     KEYBOARD_NONE   } },
+  { INPUT_KEY_5,           { KEYBOARD_5,     KEYBOARD_NONE   } },
+  { INPUT_KEY_6,           { KEYBOARD_6,     KEYBOARD_NONE   } },
+  { INPUT_KEY_7,           { KEYBOARD_7,     KEYBOARD_NONE   } },
+  { INPUT_KEY_8,           { KEYBOARD_8,     KEYBOARD_NONE   } },
+  { INPUT_KEY_9,           { KEYBOARD_9,     KEYBOARD_NONE   } },
+  { INPUT_KEY_0,           { KEYBOARD_0,     KEYBOARD_NONE   } },
+  { INPUT_KEY_minus,       { KEYBOARD_j,     KEYBOARD_Symbol } },
+  { INPUT_KEY_equal,       { KEYBOARD_l,     KEYBOARD_Symbol } },
+  { INPUT_KEY_BackSpace,   { KEYBOARD_0,     KEYBOARD_Caps   } },
 
-  { INPUT_KEY_q,           KEYBOARD_q,     KEYBOARD_NONE   },
-  { INPUT_KEY_w,           KEYBOARD_w,     KEYBOARD_NONE   },
-  { INPUT_KEY_e,           KEYBOARD_e,     KEYBOARD_NONE   },
-  { INPUT_KEY_r,           KEYBOARD_r,     KEYBOARD_NONE   },
-  { INPUT_KEY_t,           KEYBOARD_t,     KEYBOARD_NONE   },
-  { INPUT_KEY_y,           KEYBOARD_y,     KEYBOARD_NONE   },
-  { INPUT_KEY_u,           KEYBOARD_u,     KEYBOARD_NONE   },
-  { INPUT_KEY_i,           KEYBOARD_i,     KEYBOARD_NONE   },
-  { INPUT_KEY_o,           KEYBOARD_o,     KEYBOARD_NONE   },
-  { INPUT_KEY_p,           KEYBOARD_p,     KEYBOARD_NONE   },
+  { INPUT_KEY_q,           { KEYBOARD_q,     KEYBOARD_NONE   } },
+  { INPUT_KEY_w,           { KEYBOARD_w,     KEYBOARD_NONE   } },
+  { INPUT_KEY_e,           { KEYBOARD_e,     KEYBOARD_NONE   } },
+  { INPUT_KEY_r,           { KEYBOARD_r,     KEYBOARD_NONE   } },
+  { INPUT_KEY_t,           { KEYBOARD_t,     KEYBOARD_NONE   } },
+  { INPUT_KEY_y,           { KEYBOARD_y,     KEYBOARD_NONE   } },
+  { INPUT_KEY_u,           { KEYBOARD_u,     KEYBOARD_NONE   } },
+  { INPUT_KEY_i,           { KEYBOARD_i,     KEYBOARD_NONE   } },
+  { INPUT_KEY_o,           { KEYBOARD_o,     KEYBOARD_NONE   } },
+  { INPUT_KEY_p,           { KEYBOARD_p,     KEYBOARD_NONE   } },
 
-  { INPUT_KEY_Caps_Lock,   KEYBOARD_2,     KEYBOARD_Caps   },
-  { INPUT_KEY_a,           KEYBOARD_a,     KEYBOARD_NONE   },
-  { INPUT_KEY_s,           KEYBOARD_s,     KEYBOARD_NONE   },
-  { INPUT_KEY_d,           KEYBOARD_d,     KEYBOARD_NONE   },
-  { INPUT_KEY_f,           KEYBOARD_f,     KEYBOARD_NONE   },
-  { INPUT_KEY_g,           KEYBOARD_g,     KEYBOARD_NONE   },
-  { INPUT_KEY_h,           KEYBOARD_h,     KEYBOARD_NONE   },
-  { INPUT_KEY_j,           KEYBOARD_j,     KEYBOARD_NONE   },
-  { INPUT_KEY_k,           KEYBOARD_k,     KEYBOARD_NONE   },
-  { INPUT_KEY_l,           KEYBOARD_l,     KEYBOARD_NONE   },
-  { INPUT_KEY_semicolon,   KEYBOARD_o,     KEYBOARD_Symbol },
-  { INPUT_KEY_apostrophe,  KEYBOARD_7,     KEYBOARD_Symbol },
-  { INPUT_KEY_numbersign,  KEYBOARD_3,     KEYBOARD_Symbol },
-  { INPUT_KEY_Return,      KEYBOARD_Enter, KEYBOARD_NONE   },
+  { INPUT_KEY_Caps_Lock,   { KEYBOARD_2,     KEYBOARD_Caps   } },
+  { INPUT_KEY_a,           { KEYBOARD_a,     KEYBOARD_NONE   } },
+  { INPUT_KEY_s,           { KEYBOARD_s,     KEYBOARD_NONE   } },
+  { INPUT_KEY_d,           { KEYBOARD_d,     KEYBOARD_NONE   } },
+  { INPUT_KEY_f,           { KEYBOARD_f,     KEYBOARD_NONE   } },
+  { INPUT_KEY_g,           { KEYBOARD_g,     KEYBOARD_NONE   } },
+  { INPUT_KEY_h,           { KEYBOARD_h,     KEYBOARD_NONE   } },
+  { INPUT_KEY_j,           { KEYBOARD_j,     KEYBOARD_NONE   } },
+  { INPUT_KEY_k,           { KEYBOARD_k,     KEYBOARD_NONE   } },
+  { INPUT_KEY_l,           { KEYBOARD_l,     KEYBOARD_NONE   } },
+  { INPUT_KEY_semicolon,   { KEYBOARD_o,     KEYBOARD_Symbol } },
+  { INPUT_KEY_apostrophe,  { KEYBOARD_7,     KEYBOARD_Symbol } },
+  { INPUT_KEY_numbersign,  { KEYBOARD_3,     KEYBOARD_Symbol } },
+  { INPUT_KEY_Return,      { KEYBOARD_Enter, KEYBOARD_NONE   } },
 
-  { INPUT_KEY_Shift_L,     KEYBOARD_NONE,  KEYBOARD_Caps   },
-  { INPUT_KEY_z,           KEYBOARD_z,     KEYBOARD_NONE   },
-  { INPUT_KEY_x,           KEYBOARD_x,     KEYBOARD_NONE   },
-  { INPUT_KEY_c,           KEYBOARD_c,     KEYBOARD_NONE   },
-  { INPUT_KEY_v,           KEYBOARD_v,     KEYBOARD_NONE   },
-  { INPUT_KEY_b,           KEYBOARD_b,     KEYBOARD_NONE   },
-  { INPUT_KEY_n,           KEYBOARD_n,     KEYBOARD_NONE   },
-  { INPUT_KEY_m,           KEYBOARD_m,     KEYBOARD_NONE   },
-  { INPUT_KEY_comma,       KEYBOARD_n,     KEYBOARD_Symbol },
-  { INPUT_KEY_period,      KEYBOARD_m,     KEYBOARD_Symbol },
-  { INPUT_KEY_slash,       KEYBOARD_v,     KEYBOARD_Symbol },
-  { INPUT_KEY_Shift_R,     KEYBOARD_NONE,  KEYBOARD_Caps   },
+  { INPUT_KEY_Shift_L,     { KEYBOARD_NONE,  KEYBOARD_Caps   } },
+  { INPUT_KEY_z,           { KEYBOARD_z,     KEYBOARD_NONE   } },
+  { INPUT_KEY_x,           { KEYBOARD_x,     KEYBOARD_NONE   } },
+  { INPUT_KEY_c,           { KEYBOARD_c,     KEYBOARD_NONE   } },
+  { INPUT_KEY_v,           { KEYBOARD_v,     KEYBOARD_NONE   } },
+  { INPUT_KEY_b,           { KEYBOARD_b,     KEYBOARD_NONE   } },
+  { INPUT_KEY_n,           { KEYBOARD_n,     KEYBOARD_NONE   } },
+  { INPUT_KEY_m,           { KEYBOARD_m,     KEYBOARD_NONE   } },
+  { INPUT_KEY_comma,       { KEYBOARD_n,     KEYBOARD_Symbol } },
+  { INPUT_KEY_period,      { KEYBOARD_m,     KEYBOARD_Symbol } },
+  { INPUT_KEY_slash,       { KEYBOARD_v,     KEYBOARD_Symbol } },
+  { INPUT_KEY_Shift_R,     { KEYBOARD_NONE,  KEYBOARD_Caps   } },
 
-  { INPUT_KEY_Control_L,   KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Alt_L,       KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Meta_L,      KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Super_L,     KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Hyper_L,     KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_space,       KEYBOARD_space, KEYBOARD_NONE   },
-  { INPUT_KEY_Hyper_R,     KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Super_R,     KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Meta_R,      KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Alt_R,       KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Control_R,   KEYBOARD_NONE,  KEYBOARD_Symbol },
-  { INPUT_KEY_Mode_switch, KEYBOARD_NONE,  KEYBOARD_Symbol },
+  { INPUT_KEY_Control_L,   { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Alt_L,       { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Meta_L,      { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Super_L,     { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Hyper_L,     { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_space,       { KEYBOARD_space, KEYBOARD_NONE   } },
+  { INPUT_KEY_Hyper_R,     { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Super_R,     { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Meta_R,      { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Alt_R,       { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Control_R,   { KEYBOARD_NONE,  KEYBOARD_Symbol } },
+  { INPUT_KEY_Mode_switch, { KEYBOARD_NONE,  KEYBOARD_Symbol } },
 
-  { INPUT_KEY_Left,        KEYBOARD_5,     KEYBOARD_Caps   },
-  { INPUT_KEY_Down,        KEYBOARD_6,     KEYBOARD_Caps   },
-  { INPUT_KEY_Up,          KEYBOARD_7,     KEYBOARD_Caps   },
-  { INPUT_KEY_Right,       KEYBOARD_8,     KEYBOARD_Caps   },
+  { INPUT_KEY_Left,        { KEYBOARD_5,     KEYBOARD_Caps   } },
+  { INPUT_KEY_Down,        { KEYBOARD_6,     KEYBOARD_Caps   } },
+  { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_Caps   } },
+  { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_Caps   } },
 
-  { 0, 0, 0 }		/* End marker */
+  { INPUT_KEY_NONE, { KEYBOARD_NONE, KEYBOARD_NONE } } /* End marker */
 
 };
+
+static GHashTable *spectrum_keys;
 
 /* When each Spectrum key is pressed, twiddle this {port,bit} pair
    in `keyboard_return_values'. 
 */
-typedef struct keyboard_key_info {
+struct key_bit {
+  int port;
+  libspectrum_byte bit;
+};
+
+struct key_info {
   keyboard_key_name key;
-  int port; libspectrum_byte bit;
-} keyboard_key_info;
+  struct key_bit bit;
+};
 
-static keyboard_key_info keyboard_data[] = {
+static struct key_info keyboard_data_table[] = {
 
-  { KEYBOARD_1      , 3, 0x01 },
-  { KEYBOARD_2      , 3, 0x02 },
-  { KEYBOARD_3      , 3, 0x04 },
-  { KEYBOARD_4      , 3, 0x08 },
-  { KEYBOARD_5      , 3, 0x10 },
-  { KEYBOARD_6      , 4, 0x10 },
-  { KEYBOARD_7      , 4, 0x08 },
-  { KEYBOARD_8      , 4, 0x04 },
-  { KEYBOARD_9      , 4, 0x02 },
-  { KEYBOARD_0      , 4, 0x01 },
+  { KEYBOARD_1,      { 3, 0x01 } },
+  { KEYBOARD_2,      { 3, 0x02 } },
+  { KEYBOARD_3,      { 3, 0x04 } },
+  { KEYBOARD_4,      { 3, 0x08 } },
+  { KEYBOARD_5,      { 3, 0x10 } },
+  { KEYBOARD_6,      { 4, 0x10 } },
+  { KEYBOARD_7,      { 4, 0x08 } },
+  { KEYBOARD_8,      { 4, 0x04 } },
+  { KEYBOARD_9,      { 4, 0x02 } },
+  { KEYBOARD_0,      { 4, 0x01 } },
 
-  { KEYBOARD_q      , 2, 0x01 },
-  { KEYBOARD_w      , 2, 0x02 },
-  { KEYBOARD_e      , 2, 0x04 },
-  { KEYBOARD_r      , 2, 0x08 },
-  { KEYBOARD_t      , 2, 0x10 },
-  { KEYBOARD_y      , 5, 0x10 },
-  { KEYBOARD_u      , 5, 0x08 },
-  { KEYBOARD_i      , 5, 0x04 },
-  { KEYBOARD_o      , 5, 0x02 },
-  { KEYBOARD_p      , 5, 0x01 },
+  { KEYBOARD_q,      { 2, 0x01 } },
+  { KEYBOARD_w,      { 2, 0x02 } },
+  { KEYBOARD_e,      { 2, 0x04 } },
+  { KEYBOARD_r,      { 2, 0x08 } },
+  { KEYBOARD_t,      { 2, 0x10 } },
+  { KEYBOARD_y,      { 5, 0x10 } },
+  { KEYBOARD_u,      { 5, 0x08 } },
+  { KEYBOARD_i,      { 5, 0x04 } },
+  { KEYBOARD_o,      { 5, 0x02 } },
+  { KEYBOARD_p,      { 5, 0x01 } },
 
-  { KEYBOARD_a      , 1, 0x01 },
-  { KEYBOARD_s      , 1, 0x02 },
-  { KEYBOARD_d      , 1, 0x04 },
-  { KEYBOARD_f      , 1, 0x08 },
-  { KEYBOARD_g      , 1, 0x10 },
-  { KEYBOARD_h      , 6, 0x10 },
-  { KEYBOARD_j      , 6, 0x08 },
-  { KEYBOARD_k      , 6, 0x04 },
-  { KEYBOARD_l      , 6, 0x02 },
-  { KEYBOARD_Enter  , 6, 0x01 },
+  { KEYBOARD_a,      { 1, 0x01 } },
+  { KEYBOARD_s,      { 1, 0x02 } },
+  { KEYBOARD_d,      { 1, 0x04 } },
+  { KEYBOARD_f,      { 1, 0x08 } },
+  { KEYBOARD_g,      { 1, 0x10 } },
+  { KEYBOARD_h,      { 6, 0x10 } },
+  { KEYBOARD_j,      { 6, 0x08 } },
+  { KEYBOARD_k,      { 6, 0x04 } },
+  { KEYBOARD_l,      { 6, 0x02 } },
+  { KEYBOARD_Enter,  { 6, 0x01 } },
 
-  { KEYBOARD_Caps   , 0, 0x01 },
-  { KEYBOARD_z      , 0, 0x02 },
-  { KEYBOARD_x      , 0, 0x04 },
-  { KEYBOARD_c      , 0, 0x08 },
-  { KEYBOARD_v      , 0, 0x10 },
-  { KEYBOARD_b      , 7, 0x10 },
-  { KEYBOARD_n      , 7, 0x08 },
-  { KEYBOARD_m      , 7, 0x04 },
-  { KEYBOARD_Symbol , 7, 0x02 },
-  { KEYBOARD_space  , 7, 0x01 },
+  { KEYBOARD_Caps,   { 0, 0x01 } },
+  { KEYBOARD_z,      { 0, 0x02 } },
+  { KEYBOARD_x,      { 0, 0x04 } },
+  { KEYBOARD_c,      { 0, 0x08 } },
+  { KEYBOARD_v,      { 0, 0x10 } },
+  { KEYBOARD_b,      { 7, 0x10 } },
+  { KEYBOARD_n,      { 7, 0x08 } },
+  { KEYBOARD_m,      { 7, 0x04 } },
+  { KEYBOARD_Symbol, { 7, 0x02 } },
+  { KEYBOARD_space,  { 7, 0x01 } },
 
-  { 0               , 0, 0x00 } /* End marker: DO NOT MOVE! */
+  { KEYBOARD_NONE,   { 0, 0x00 } }	/* End marker */
 
 };
+
+/* The hash used for storing keyboard_data_table */
+static GHashTable *keyboard_data;
 
 /* Called `fuse_keyboard_init' as svgalib pollutes the global namespace
    with keyboard_init... */
 void fuse_keyboard_init(void)
 {
+  struct key_info *ptr;
+  struct spectrum_keys_wrapper *ptr2;
+  keysyms_map_t *ptr3;
+
   keyboard_default_value=0xff;
   keyboard_release_all();
+
+  keyboard_data = g_hash_table_new( g_int_hash, g_int_equal );
+
+  for( ptr = keyboard_data_table; ptr->key != KEYBOARD_NONE; ptr++ )
+    g_hash_table_insert( keyboard_data, &( ptr->key ), &( ptr->bit ) );
+
+  spectrum_keys = g_hash_table_new( g_int_hash, g_int_equal );
+
+  for( ptr2 = spectrum_keys_table; ptr2->input != INPUT_KEY_NONE; ptr2++ )
+    g_hash_table_insert( spectrum_keys,
+			 &( ptr2->input ), &( ptr2->spectrum ) );
+
+  keysyms_hash = g_hash_table_new( g_int_hash, g_int_equal );
+
+  for( ptr3 = keysyms_map; ptr3->ui; ptr3++ )
+    g_hash_table_insert( keysyms_hash, &( ptr3->ui ), &( ptr3->fuse ) );
+
 }
 
 libspectrum_byte
@@ -201,34 +244,24 @@ keyboard_read( libspectrum_byte porth )
 
 }
 
-void keyboard_press(keyboard_key_name key)
+void
+keyboard_press( keyboard_key_name key )
 {
-  keyboard_key_info *ptr;
+  struct key_bit *ptr;
 
-  if(key==KEYBOARD_NONE) return;
+  ptr = g_hash_table_lookup( keyboard_data, &key );
 
-  for( ptr=keyboard_data; ptr->key; ptr++ ) {
-    if( key == ptr->key ) {
-      keyboard_return_values[ptr->port] &= ~(ptr->bit);
-      return;
-    }
-  }
-  return;
+  if( ptr ) keyboard_return_values[ ptr->port ] &= ~( ptr->bit );
 }
 
-void keyboard_release(keyboard_key_name key)
+void
+keyboard_release( keyboard_key_name key )
 {
-  keyboard_key_info *ptr;
+  struct key_bit *ptr;
 
-  if(key==KEYBOARD_NONE) return;
+  ptr = g_hash_table_lookup( keyboard_data, &key );
 
-  for( ptr=keyboard_data; ptr->key; ptr++ ) {
-    if( key == ptr->key ) {
-      keyboard_return_values[ptr->port] |= ptr->bit;
-      return;
-    }
-  }
-  return;
+  if( ptr ) keyboard_return_values[ ptr->port ] |= ptr->bit;
 }
 
 int keyboard_release_all( void )
@@ -240,30 +273,18 @@ int keyboard_release_all( void )
   return 0;
 }
 
-const keysyms_key_info*
-keysyms_get_data( input_key keysym )
+const keyboard_spectrum_keys_t*
+keyboard_get_spectrum_keys( input_key keysym )
 {
-  const keysyms_key_info *ptr;
-
-  for( ptr=keysyms_data; ptr->keysym; ptr++ ) {
-    if( keysym == ptr->keysym ) {
-      return ptr;
-    }
-  }
-
-  return NULL;
+  return g_hash_table_lookup( spectrum_keys, &keysym );
 }
 
 input_key
 keysyms_remap( libspectrum_dword ui_keysym )
 {
-  const keysyms_map_t *ptr;
+  const input_key *ptr;
 
-  for( ptr = keysyms_map; ptr->ui; ptr++ )
-    if( ui_keysym == ptr->ui )
-      return ptr->fuse;
+  ptr = g_hash_table_lookup( keysyms_hash, &ui_keysym );
 
-  return INPUT_KEY_NONE;
+  return ptr ? *ptr : INPUT_KEY_NONE;
 }
-
-    

@@ -102,14 +102,13 @@ int keyboard_release_all( void );
 /* Which Spectrum keys should be emulated as pressed when each input
    layer key is pressed */
 
-typedef struct keysyms_key_info {
+typedef struct keyboard_spectrum_keys_t {
 
-  input_key keysym;
   keyboard_key_name key1,key2;
 
-} keysyms_key_info;
+} keyboard_spectrum_keys_t;
 
-const keysyms_key_info* keysyms_get_data( input_key keysym );
+const keyboard_spectrum_keys_t* keyboard_get_spectrum_keys( input_key keysym );
 
 /* The mapping from UI layer keysyms to Fuse input layer keysyms */
 
@@ -122,7 +121,7 @@ typedef struct keysyms_map_t {
 
 } keysyms_map_t;
 
-extern const keysyms_map_t keysyms_map[];
+extern keysyms_map_t keysyms_map[];
 
 input_key keysyms_remap( libspectrum_dword ui_keysym );
 

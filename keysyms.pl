@@ -244,8 +244,6 @@ while(<>) {
 
 }
 
-my $declare = "const keysyms_key_info keysyms_data[] =\n{";
-
 my $define = uc $ui;
 
 print Fuse::GPL(
@@ -272,7 +270,7 @@ foreach my $header ( @{ $ui_data{$ui}{headers} } ) {
     print "#include <$header>\n";
 }
 
-print "\nconst keysyms_map_t keysyms_map[] = {\n\n";
+print "\nkeysyms_map_t keysyms_map[] = {\n\n";
 
 KEY:
 foreach( @keys ) {

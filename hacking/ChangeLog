@@ -717,3 +717,5 @@
 	 the keyboard (space) is used to select things from a GtkCList
 	 (Darren).
 20040407 joystick.[ch]: add emulation of the two Sinclair-type joysticks.
+20040408 input.c,keyboard.[ch],keysyms.pl: use hash tables rather than
+	 linear lookup to do the three levels of keyboard remapping.

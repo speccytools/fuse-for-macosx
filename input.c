@@ -70,7 +70,7 @@ keypress( const input_event_key_t *event )
 {
   input_key key;
   int swallow;
-  const keysyms_key_info *ptr;
+  const keyboard_spectrum_keys_t *ptr;
 
   key = event->key;
 
@@ -107,7 +107,7 @@ keypress( const input_event_key_t *event )
 
   if( swallow ) return 0;
 
-  ptr = keysyms_get_data( key );
+  ptr = keyboard_get_spectrum_keys( key );
 
   if( ptr ) {
     keyboard_press( ptr->key1 );
@@ -178,11 +178,11 @@ static int
 keyrelease( const input_event_key_t *event )
 {
   input_key key;
-  const keysyms_key_info *ptr;
+  const keyboard_spectrum_keys_t *ptr;
 
   key = event->key;
 
-  ptr = keysyms_get_data( key );
+  ptr = keyboard_get_spectrum_keys( key );
 
   if( ptr ) {
     keyboard_release( ptr->key1 );
