@@ -26,12 +26,19 @@
 
 #include <config.h>
 
+#include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "snapshot.h"
+#include "tape.h"
+#include "utils.h"
 #include "widget.h"
 #include "ui/uidisplay.h"
+
+#define ERROR_MESSAGE_MAX_LENGTH 1024
 
 widget_menu_entry *menu;
 
@@ -108,4 +115,76 @@ int widget_menu_open_snapshot( void *data )
 int widget_menu_save_snapshot( void *data )
 {
   return snapshot_write( "snapshot.z80" );
+}
+
+/* Tape/Open */
+int widget_menu_open_tape( void *data )
+{
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  if( widget_filesel_name ) tape_open( widget_filesel_name );
+
+  return 0;
+}
+
+/* Tape/Play */
+int widget_menu_play_tape( void *data )
+{
+  return tape_toggle_play();
+}
+
+/* Tape/Rewind */
+int widget_menu_rewind_tape( void *data )
+{
+  return tape_rewind();
+}
+
+/* Tape/Clear */
+int widget_menu_clear_tape( void *data )
+{
+  return tape_close();
+}
+
+/* Tape/Write */
+int widget_menu_write_tape( void *data )
+{
+  return tape_write( "tape.tzx" );
+}
+
+/* Help/Keyboard Picture */
+int widget_menu_keyboard( void *data )
+{
+  const char *filename = (const char*)data;
+
+  int error, fd;
+  BYTE *screen; size_t length;
+
+  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  fd = utils_find_lib( filename );
+  if( fd == -1 ) {
+    fprintf( stderr, "%s: couldn't find keyboard picture (`%s')\n",
+	     fuse_progname, filename );
+    return 1;
+  }
+  
+  error = utils_read_fd( fd, filename, &screen, &length );
+  if( error ) return error;
+
+  if( length != 6912 ) {
+    fprintf( stderr, "%s: keyboard picture (`%s') is not 6912 bytes long\n",
+	     fuse_progname, filename );
+    return 1;
+  }
+
+  widget_do( WIDGET_TYPE_PICTURE, screen );
+
+  if( munmap( screen, length ) == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't munmap keyboard picture (`%s')",
+	      fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
+
+  return 0;
 }

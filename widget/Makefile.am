@@ -27,6 +27,6 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libwidget.a
 
 libwidget_a_SOURCES = filesel.c machine_widget.c menu_data.c\
-picture.c tape_widget.c widget.c general.c help.c menu.c
+picture.c widget.c general.c menu.c
 
 noinst_HEADERS = widget.h

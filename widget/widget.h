@@ -44,10 +44,8 @@ typedef enum widget_type {
 
   WIDGET_TYPE_FILESELECTOR,	/* File selector */
   WIDGET_TYPE_GENERAL,		/* General options */
-  WIDGET_TYPE_TAPE,		/* Tape menu */
   WIDGET_TYPE_MACHINE,		/* Machine menu */
   WIDGET_TYPE_PICTURE,		/* Keyboard picture */
-  WIDGET_TYPE_HELP,		/* Help menu */
   WIDGET_TYPE_MENU,		/* General menu */
 
 } widget_type;
@@ -188,11 +186,21 @@ typedef struct widget_menu_widget_t {
 int widget_menu_open_snapshot( void *data ); /* File/Open */
 int widget_menu_save_snapshot( void *data ); /* File/Save */
 
+int widget_menu_open_tape( void *data );     /* Tape/Open */
+int widget_menu_play_tape( void *data );     /* Tape/Play */
+int widget_menu_rewind_tape( void *data );   /* Tape/Rewind */
+int widget_menu_clear_tape( void *data );    /* Tape/Close */
+int widget_menu_write_tape( void *data );    /* Tape/Write */
+
+int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
+
 /* Available menus */
 
 extern widget_menu_entry widget_menu_main[];
 extern widget_menu_entry widget_menu_file[];
 extern widget_menu_entry widget_menu_options[];
+extern widget_menu_entry widget_menu_tape[];
+extern widget_menu_entry widget_menu_help[];
 
 /* The widgets actually available */
 

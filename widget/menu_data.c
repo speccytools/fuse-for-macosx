@@ -39,8 +39,10 @@ static widget_menu_widget_t main_file =    { WIDGET_TYPE_MENU,
 static widget_menu_widget_t main_options = { WIDGET_TYPE_MENU,
 					     &widget_menu_options };
 static widget_menu_widget_t main_machine = { WIDGET_TYPE_MACHINE, NULL };
-static widget_menu_widget_t main_tape =    { WIDGET_TYPE_TAPE,    NULL };
-static widget_menu_widget_t main_help =    { WIDGET_TYPE_HELP,    NULL };
+static widget_menu_widget_t main_tape =    { WIDGET_TYPE_MENU,
+					     &widget_menu_tape    };
+static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
+					     &widget_menu_help    };
 
 widget_menu_entry widget_menu_main[] = {
   { "Main menu", 0, 0, NULL },		/* Menu title */
@@ -73,6 +75,30 @@ widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
 
   { "(G)eneral...", KEYBOARD_g, widget_menu_widget, &options_general },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Tape menu */
+
+widget_menu_entry widget_menu_tape[] = {
+  { "Tape", 0, 0, NULL },		/* Menu title */
+
+  { "(O)pen tape...",           KEYBOARD_o, widget_menu_open_tape,   NULL },
+  { "(P)lay tape",              KEYBOARD_p, widget_menu_play_tape,   NULL },
+  { "(R)ewind tape",            KEYBOARD_r, widget_menu_rewind_tape, NULL },
+  { "(C)lear tape",             KEYBOARD_c, widget_menu_clear_tape,  NULL },
+  { "Write tape to 'tape.tzx'", KEYBOARD_w, widget_menu_write_tape,  NULL },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Help menu */
+
+widget_menu_entry widget_menu_help[] = {
+  { "Help", 0, 0, NULL },		/* Menu title */
+
+  { "(K)eyboard picture...", KEYBOARD_k, widget_menu_keyboard, "keyboard.scr"},
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
