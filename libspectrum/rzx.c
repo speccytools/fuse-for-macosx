@@ -236,11 +236,7 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  blocklength = (*ptr)[0]             +
-                (*ptr)[1] *     0x100 +
-	        (*ptr)[2] *   0x10000 +
-                (*ptr)[3] * 0x1000000 ;
-  (*ptr) += 4;
+  blocklength = libspectrum_read_dword( ptr );
 
   if( end - (*ptr) < blocklength - 5 ) {
     libspectrum_print_error("rzx_read_snapshot: not enough data in buffer\n");
@@ -248,18 +244,13 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
   }
 
   /* See if we want a compressed snap */
-  flags = (*ptr)[0]             +
-          (*ptr)[1] *     0x100 +
-	  (*ptr)[2] *   0x10000 +
-          (*ptr)[3] * 0x1000000 ;
-  (*ptr) += 4;
-
+  flags = libspectrum_read_dword( ptr );
   compressed = flags & 0x02;
 
-  snaplength = (*ptr)[4]             +
-               (*ptr)[5] *     0x100 +
-	       (*ptr)[6] *   0x10000 +
-               (*ptr)[7] * 0x1000000 ;
+  /* How long is the (uncompressed) snap? */
+  (*ptr) += 4;
+  snaplength = libspectrum_read_dword( ptr );
+  (*ptr) -= 8;
 
   /* If compressed, uncompress the data */
   if( compressed ) {
@@ -344,19 +335,9 @@ rzx_read_input( libspectrum_rzx *rzx,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  /* Get the length */
-  blocklength = (*ptr)[0]             +
-                (*ptr)[1] *     0x100 +
-                (*ptr)[2] *   0x10000 +
-                (*ptr)[3] * 0x1000000 ;
-  (*ptr) += 4;
-
-  /* Get the number of frames */
-  rzx->count = (*ptr)[0]             +
-               (*ptr)[1] *     0x100 +
-               (*ptr)[2] *   0x10000 +
-               (*ptr)[3] * 0x1000000 ;
-  (*ptr) += 4;
+  /* Get the length and number of frames */
+  blocklength = libspectrum_read_dword( ptr );
+  rzx->count = libspectrum_read_dword( ptr );
 
   /* Frame size is undefined, so just skip it */
   (*ptr)++;
@@ -373,20 +354,10 @@ rzx_read_input( libspectrum_rzx *rzx,
   }
   rzx->allocated = rzx->count;
 
-  /* Fetch the T-state counter */
-  rzx->tstates = (*ptr)[0]             +
-                 (*ptr)[1] *     0x100 +
-                 (*ptr)[2] *   0x10000 +
-                 (*ptr)[3] * 0x1000000 ;
-  (*ptr) += 4;
+  /* Fetch the T-state counter and the flags */
+  rzx->tstates = libspectrum_read_dword( ptr );
 
-  /* and the flags */
-  flags = (*ptr)[0]             +
-          (*ptr)[1] *     0x100 +
-          (*ptr)[2] *   0x10000 +
-          (*ptr)[3] * 0x1000000 ;
-  (*ptr) += 4;
-
+  flags = libspectrum_read_dword( ptr );
   compressed = flags & 0x02;
 
   if( compressed ) {

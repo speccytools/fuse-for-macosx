@@ -190,6 +190,22 @@ int libspectrum_make_room( uchar **dest, size_t requested, uchar **ptr,
 
 }
 
+/* Read an LSB dword from buffer */
+libspectrum_dword
+libspectrum_read_dword( const libspectrum_byte **buffer )
+{
+  libspectrum_dword value;
+
+  value = (*buffer)[0]             +
+          (*buffer)[1] *     0x100 +
+	  (*buffer)[2] *   0x10000 +
+          (*buffer)[3] * 0x1000000 ;
+
+  (*buffer) += 4;
+
+  return value;
+}
+
 /* Write an (LSB) word to buffer */
 int libspectrum_write_word( uchar **buffer, libspectrum_word w )
 {

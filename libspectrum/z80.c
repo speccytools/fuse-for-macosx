@@ -302,13 +302,14 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
 
     type =   (*next_block)[0] + (*next_block)[1] * 0x100;
     level =  (*next_block)[2] + (*next_block)[3] * 0x100;
-    length = (*next_block)[4]             +
-             (*next_block)[5] *     0x100 +
-             (*next_block)[6] *   0x10000 +
-             (*next_block)[7] * 0x1000000;
+    (*next_block) += 4;
+    length = libspectrum_read_dword( next_block );
 
-    /* If this ends the table, exit. But remember to skip this entry */
-    if( type == LIBSPECTRUM_SLT_TYPE_END ) { *next_block += 8; break; }
+    /* If this ends the table, exit */
+    if( type == LIBSPECTRUM_SLT_TYPE_END ) break;
+
+    /* Reset the pointer back to the start of the block */
+    (*next_block) -= 8;
 
     switch( type ) {
 
