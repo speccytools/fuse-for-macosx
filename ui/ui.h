@@ -99,6 +99,7 @@ int ui_trdos_disk_write( trdos_drive_number which );
 
 typedef enum ui_menu_item {
 
+  UI_MENU_ITEM_MEDIA_CARTRIDGE,
   UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK,
   UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT,
   UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,

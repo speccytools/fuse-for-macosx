@@ -186,6 +186,8 @@ struct menu_item_entries {
 
 static const struct menu_item_entries menu_item_lookup[] = {
   
+  { UI_MENU_ITEM_MEDIA_CARTRIDGE, "/Media/Cartridge" },
+
   { UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, "/Media/Cartridge/Timex Dock" },
 
   { UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT,

@@ -291,6 +291,22 @@ periph_setup( const periph_t *peripherals_list, size_t n,
 }
 
 static void
+update_cartridge_menu( void )
+{
+  int cartridge, dock, if2;
+
+  dock = machine_current->capabilities &
+         LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK;
+  if2 = settings_current.interface2;
+
+  cartridge = dock || if2;
+
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE, cartridge );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, dock );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, if2 );
+}
+
+static void
 update_ide_menu( void )
 {
   int ide, simpleide, zxatasp, zxcf;
@@ -341,5 +357,6 @@ periph_update( void )
     }
   }
 
+  update_cartridge_menu();
   update_ide_menu();
 }

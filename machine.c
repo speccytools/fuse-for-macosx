@@ -244,11 +244,8 @@ machine_select_machine( fuse_machine_info *machine )
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, 1 );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
-  } else {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, 0 );
-  };
+  }
 
   return 0;
 }

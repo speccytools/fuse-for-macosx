@@ -1058,3 +1058,5 @@
 20040816 ui.c,ui/ui.h,ui/gtk/gtkui.c,widget/{menu.c,widget.[ch],
 	 widget_internals.h}: (de)activate widget menu items where
 	 appropriate (mostly Darren).
+20040816 machine.c,periph.c,ui.c,ui/ui.h: deactivate Media/Cartridge menu
+	 if neither Dock nor If2 available.
