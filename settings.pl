@@ -94,6 +94,13 @@ print hashline( __LINE__ ), << 'CODE';
 #include "spectrum.h"
 #include "ui/ui.h"
 
+/* The name of our configuration file */
+#ifdef WIN32
+#define CONFIG_FILE_NAME "fuse.cfg"
+#else				/* #ifdef WIN32 */
+#define CONFIG_FILE_NAME ".fuserc"
+#endif				/* #ifdef WIN32 */
+
 /* The current settings of options, etc */
 settings_info settings_current;
 
@@ -186,7 +193,7 @@ read_config_file( settings_info *settings )
     return 1;
   }
 
-  snprintf( path, 256, "%s/.fuserc", home );
+  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* See if the file exists; if doesn't, it's not a problem */
   if( stat( path, &stat_info ) ) {
@@ -289,7 +296,7 @@ settings_write_config( settings_info *settings )
     return 1;
   }
 
-  snprintf( path, 256, "%s/.fuserc", home );
+  snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* Create the XML document */
   doc = xmlNewDoc( "1.0" );
