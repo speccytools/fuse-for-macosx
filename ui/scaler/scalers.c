@@ -52,12 +52,14 @@ scaler_select_bitformat( DWORD BitFormat )
   switch( BitFormat ) {
 
     /* FIXME(?): there is an assumption here that our colour fields
-       are (LSb) xxxx|xyyy|yyyz|zzzz (MSb) for the 565 mode
-       and (LSb) xxxx|xyyy|yyzz|zzz0 (MSb) for the 555 mode. This is
-       currently (April 2003) OK as the other user interface to use
-       this code is SDL, which hides all variation in SDL_MapRGB(3),
-       but be very careful (especially about endianness) if we ever
-       use the "interpolating" scalers from another user interface */
+       are (*) xxxx|xyyy|yyyz|zzzz for the 565 mode
+       and (*) xxxx|xyyy|yyzz|zzz0 for the 555 mode, where (*) is the
+       least significant bit on LSB machines and the most significant
+       bit on MSB machines. This is currently (April 2003) OK as the
+       other user interface to use this code is SDL, which hides all
+       variation in SDL_MapRGB(3), but be very careful (especially
+       about endianness) if we ever use the "interpolating" scalers
+       from another user interface */
 
   case 565:
     colorMask = 0x0000F7DE;
