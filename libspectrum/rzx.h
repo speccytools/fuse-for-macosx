@@ -74,6 +74,6 @@ libspectrum_rzx_write( libspectrum_rzx *rzx,
 		       libspectrum_byte **buffer, size_t *length,
 		       libspectrum_byte *snap, size_t snap_length,
 		       const char *program, libspectrum_word major,
-		       libspectrum_word minor );
+		       libspectrum_word minor, int compress );
 
 #endif			/* #ifndef LIBSPECTRUM_RZX_H */

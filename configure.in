@@ -155,6 +155,10 @@ if test "$ui" != gtk; then
   fi
 fi
 
+dnl Check for zlib
+AC_CHECK_HEADERS(zlib.h, ZLIB_LIBS=-lz)
+AC_SUBST(ZLIB_LIBS)
+
 dnl Do we want +3 disk support?
 AC_MSG_CHECKING(whether +3 disk support requested)
 AC_ARG_WITH(plus3-disk,

@@ -214,4 +214,11 @@ int libspectrum_z80_uncompress_block( libspectrum_byte **dest,
 				      const libspectrum_byte *src,
 				      size_t src_length);
 
+libspectrum_error 
+libspectrum_zlib_inflate( const libspectrum_byte *gzptr, size_t gzlength,
+			  libspectrum_byte **outptr, size_t *outlength );
+libspectrum_error
+libspectrum_zlib_compress( const libspectrum_byte *data, size_t length,
+			   libspectrum_byte **gzptr, size_t *gzlength );
+
 #endif				/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
