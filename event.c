@@ -98,11 +98,14 @@ event_add( libspectrum_dword event_time, int type )
   return 0;
 }
 
-/* Comparision function so events stay in t-state order */
+/* Comparision function so events stay in t-state and event type order */
 static gint
-event_add_cmp( gconstpointer a, gconstpointer b )
+event_add_cmp( gconstpointer a1, gconstpointer b1 )
 {
-  return ((const event_t*)a)->tstates - ((const event_t*)b)->tstates;
+  const event_t *a = a1, *b = b1;
+
+  return a->tstates != b->tstates ? a->tstates - b->tstates
+		                  : a->type - b->type;
 }
 
 /* Do all events which have passed */

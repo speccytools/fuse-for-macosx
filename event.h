@@ -38,8 +38,12 @@ typedef struct event_t {
 /* The various types of event which can occur */
 enum event_types {
 
-  EVENT_TYPE_EDGE,
+  /* This must come first before EVENT_TYPE_INTERRUPT to ensure that
+     interrupts are re-enabled before we try and process one if both
+     events occur at the same tstate */
   EVENT_TYPE_ENABLE_INTERRUPTS,
+
+  EVENT_TYPE_EDGE,
   EVENT_TYPE_INTERRUPT,
   EVENT_TYPE_LINE,
   EVENT_TYPE_NMI,

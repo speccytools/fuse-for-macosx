@@ -334,3 +334,5 @@
 20031105 configure.in: explicitly link in zlib if using libpng.
 20031105 event.[ch], z80/z80.[ch], z80/z80.pl: prevent interrupts from
 	 being accepted immediately after an EI.
+20031106 event.[ch]: always reenable interrupts before sampling if both
+	 events occur at the same tstate.
