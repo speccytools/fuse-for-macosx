@@ -356,8 +356,9 @@ trap_load_block( libspectrum_tape_block *block )
   int loading, i;
 
   /* If the block's too short, give up and go home (with carry reset
-     to indicate error */
-  if( libspectrum_tape_block_data_length( block ) < DE ) { 
+     to indicate error. The +2 is to deal with the party and checksum
+     bytes which aren't accounted for in DE */
+  if( libspectrum_tape_block_data_length( block ) < DE + 2 ) { 
     F = ( F & ~FLAG_C );
     return 0;
   }

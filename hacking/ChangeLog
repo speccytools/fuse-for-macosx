@@ -738,3 +738,5 @@
 20040411 menu.c,menu_data.c,settings-header.pl,settings.pl: allow the
 	 +3e ROMs to be selected from the user interfaces.
 20040413 menu_data.pl: Perl 5.6 fixup.
+20040415 tape.c: when loading a block via the tape traps, we must have at
+	 least DE + 2 bytes due to the flag and parity bytes.
