@@ -100,6 +100,8 @@ static int settings_command_line( int argc, char **argv,
 
     switch( c ) {
 
+    case 0: break;	/* Used for long option returns */
+
     case 's': settings->snapshot = optarg; break;
     case 't': settings->tape_file = optarg; break;
 
