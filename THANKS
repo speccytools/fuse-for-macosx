@@ -13,7 +13,8 @@ Some thanks (in alphabetical order):
   LD (nnnn),A instruction.
 
 * John Elliott: for lib765, which provides Fuse's emulation of the +3's
-  FDC: see http://www.seasip.demon.co.uk/Unix/LibDsk/
+  FDC, and libdsk which provides support for more disk image formats:
+  see http://www.seasip.demon.co.uk/Unix/LibDsk/
 
 * Ian Greenway: for information about reading from unattached ports. If
   you've got an Amiga, you may well like to check out Ian's Spectrum
@@ -33,7 +34,7 @@ Some thanks (in alphabetical order):
 
 * Anders Holmberg: for reporting a bug in the z80 v1.45 load routines. Anders
   has done what is basically a port of Fuse 0.4.0 to the PocketPC: see
-  http://pocketclive.emuunlim.com/.
+  http://pocketclive.emuunlim.com/
 
 * Russell Marks: for various bits of code (see `AUTHORS')
 
@@ -42,7 +43,7 @@ Some thanks (in alphabetical order):
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
 
-* Darren Salt: some bits of code (see `AUTHORS')
+* Darren Salt: quite a few bits of code (see `AUTHORS')
 
 * Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)
   gave the inspiration for an important rewrite of the Z80 core, and was
@@ -55,7 +56,7 @@ Some thanks (in alphabetical order):
 * Mark Woodmass: for putting me on the track of (and finding the
   solution to) bugs with regard to Fuse's R register emulation during
   HALTs and interrupts. Mark's another one who's written an emulator:
-  see http://www.geocities.com/specemu/.
+  see 'SPIN' at http://www.worldofspectrum.org/emulators.html#pcwin
 
 * Alexander Yurchenko: for the OpenBSD/Solaris sound code (see `AUTHORS')
 

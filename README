@@ -1,22 +1,21 @@
-The Free Unix Spectrum Emulator (Fuse) 0.4.2
+The Free Unix Spectrum Emulator (Fuse) 0.5.0
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.4.2.
+is Fuse (the Free Unix Spectrum Emulator), version 0.5.0.
 
 What Fuse does have:
 
-* Working 48K/128K/+2/+2A Speccy and Timex TC2048 emulation, running
-  at true Speccy speed on any computer you're likely to try it on (it
-  runs at full speed on a SparcStation 4 unless you do too much
-  graphics intensive stuff).
+* Working 48K/128K/+2/+2A/+3 Speccy and Timex TC2048 emulation,
+  running at true Speccy speed on any computer you're likely to try it
+  on.
 * Support for loading from .tzx files.
 * Sound (on systems supporting the Open Sound System, or something
   like OpenBSD or Solaris's /dev/audio).
 * Kempston joystick emulation.
 * Emulation of some of the printers you could attach to a Spectrum.
-* Very basic support for RZX files.
+* Support for the new RZX input recording file format.
 
 What Fuse doesn't have:
 
@@ -27,8 +26,13 @@ What you'll need to run Fuse:
 
 * A version of Unix with either X or svgalib. If you have GTK+
   installed, you'll get a nicer user interface under X.
+* If you want +3 support, you'll need John Elliott's lib765 installed;
+  this is available from http://www.seasip.demon.co.uk/Unix/LibDsk/
+  If you also have libdsk (from the same location) installed, you'll also
+  get support for extended .dsk files (see 'THE .DSK FORMAT' section in
+  fuse(1) for more details on this).
 
-To compile Fuse (see below if you're using FreeBSD):
+To compile Fuse:
 
 $ ./configure
 
@@ -59,31 +63,20 @@ if you want to place Fuse into the main directories on your system
 --prefix argument to `configure'). You'll probably need to be root to
 do this bit.
 
-If you're using FreeBSD, you may have to rebuild the configure script
-due to FreeBSD's different naming conventions for the GTK+ scripts; if
-configure can't find GTK+, try:
-
-$ aclocal
-$ autoheader
-$ automake --add-missing
-$ autoconf
-
-and then follow the instruction above.
-
 Once you've got Fuse configured and built, read the man page :-)
 
 If you have any bug reports, suggestions or (particularly
 appreciated!) patches for Fuse, mail them to me at
 pak21-fuse@srcf.ucam.org. For more general Speccy related discussions,
 visit the Usenet group `comp.sys.sinclair', but do read the FAQ
-(http://www.srcf.ucam.org/~pak21/cssfaq/index.html) first!
+( http://www.srcf.ucam.org/~pak21/cssfaq/index.html ) first!
 
 Fuse has its own home page, which you can find at:
 
 http://www.srcf.ucam.org/~pak21/spectrum/fuse.html
 
 or the latest version should be available from the World of Spectrum
-(http://www.worldofspectrum.org/) FTP site:
+( http://www.worldofspectrum.org/ ) FTP site:
 
 ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/
 
@@ -92,6 +85,6 @@ may be useful (information on internals, etc) are in the hacking/
 directory.
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-26 March 2002
+17 August 2002
 
 $Id$

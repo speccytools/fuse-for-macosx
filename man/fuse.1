@@ -519,7 +519,9 @@ written to any tape file until you choose this option!
 Note that the Disk menu and associated submenus are available only if
 Fuse was compiled with +3 support. (This won't have happened if the
 `lib765' library couldn't be found at compile time.) Even then, the
-virtual disk images are only accessible when emulating a +3.
+virtual disk images are only accessible when emulating a +3. (See
+.B "THE .DSK FORMAT"
+section below for notes on the file formats supported).
 .RE
 .PP
 .I "Disk, Drive A:, Insert"
@@ -742,6 +744,26 @@ files are shown, whether Fuse would be able to load them or not.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH THE .DSK FORMAT
+.PP
+In general, disk images for the +3 Spectrum are thought of as being in
+DSK format. However, this is actually an slight oversimplification;
+there in in fact
+.I two
+similar, but not identical, DSK formats. (The difference can be seen
+by doing `head -1
+.IR dskfile ':
+one format will start `MV - CPCEMU' and the other will start
+`EXTENDED'.)
+.PP
+The `lib765' library used by Fuse to emulate the +3's FDC supports the
+`CPCEMU' format, but not the extended format. If the `libdsk' library
+was also found whilst compiling Fuse, this is used to provide support
+for the extended format, as well as for other goodies such as gzip
+compressed disk images.
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH BUGS
 Not many peripherals are supported.
 .\"
@@ -774,7 +796,8 @@ Russell Marks wrote the sound emulation and OSS-specific sound code,
 the joystick emulation, some of the printer code, and this man page.
 .PP
 John Elliott's lib765 library emulates the +3's disk controller chip,
-providing Fuse's +3 disk support.
+providing Fuse's +3 disk support, and his libdsk library provides
+support for more disk image formats.
 .PP
 Ian Collier wrote the ZX Printer emulation (for xz80).
 .PP
