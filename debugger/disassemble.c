@@ -186,7 +186,7 @@ disassemble_00xxxxxx( WORD address, char *buffer, size_t buflen,
 
   case 0x06: case 0x0e:
     *length = 2 + dest_reg( address, use_hl, buffer2, 40 );
-    get_byte( buffer3, 40, address + *length - 1 );
+    get_byte( buffer3, 40, readbyte( address + *length - 1 ) );
     snprintf( buffer, buflen, "LD %s,%s", buffer2, buffer3 );
     break;
 
@@ -307,7 +307,7 @@ disassemble_11xxxxxx( WORD address, char *buffer, size_t buflen,
     break;
 
   case 0x06:
-    get_byte( buffer2, 40, address+1 );
+    get_byte( buffer2, 40, readbyte( address + 1 ) );
     snprintf( buffer, buflen, addition_op( b ), buffer2 );
     *length = 2;
     break;
@@ -372,12 +372,12 @@ disassemble_11xxx011( WORD address, char *buffer, size_t buflen,
     break;
 
   case 0x1a:
-    get_byte( buffer2, 40, address + 1 );
+    get_byte( buffer2, 40, readbyte( address + 1 ) );
     snprintf( buffer, buflen, "OUT (%s),A", buffer2 ); *length = 2;
     break;
 
   case 0x1b:
-    get_byte( buffer2, 40, address + 1 );
+    get_byte( buffer2, 40, readbyte( address + 1 ) );
     snprintf( buffer, buflen, "IN A,(%s)", buffer2 ); *length = 2;
     break;
 
