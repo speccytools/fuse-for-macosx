@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <signal.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
 #include <errno.h>
@@ -62,6 +63,16 @@ static void rect(int x, int y, int w, int h, int col) {
 static int numfiles;
 static char **filenames;
 
+static int select_file(const struct dirent *dirent);
+static int widget_scan_compare( const void *a, const void *b );
+
+static void scan(char *dir) {
+    struct dirent **d;
+    numfiles=0;
+    scandir(dir,&d,select_file,NULL);
+    qsort(filenames, numfiles, sizeof(char*), widget_scan_compare);
+}
+
 static int select_file(const struct dirent *dirent){
     if(dirent->d_name && strcmp(dirent->d_name,".")) {
         strncpy(filenames[numfiles], dirent->d_name, 63);
@@ -70,11 +81,12 @@ static int select_file(const struct dirent *dirent){
     return 0;
 }
 
-static void scan(char *dir) {
-    struct dirent **d;
-    numfiles=0;
-    scandir(dir,&d,select_file,NULL);
-    qsort(filenames[0], numfiles, 64, strcmp);
+static int widget_scan_compare( const void *a, const void *b )
+{
+  const char *ptr1 = *(const char**)a;
+  const char *ptr2 = *(const char**)b;
+
+  return strcmp( ptr1, ptr2 );
 }
 
 /* Are we in a widget at the moment? (Used by the key handling routines
@@ -86,7 +98,7 @@ widget_keyhandler_fn widget_keyhandler;
 
 /* Two ways of finishing a widget */
 typedef enum widget_finish_state {
-  WIDGET_FINISHED_OK,
+  WIDGET_FINISHED_OK = 1,
   WIDGET_FINISHED_CANCEL,
 } widget_finish_state;
 
@@ -228,10 +240,15 @@ const char* widget_selectfile( void )
       /* If we've got off the top or bottom of the currently
 	 displayed file list, then reset the top-left corner and
 	 display the whole thing */
-      if( current_file <  top_left_file    ||
-	  current_file >= top_left_file+36    ) {
+      if( current_file <  top_left_file ) {
 
 	top_left_file = current_file & ~1;
+	widget_print_all_filenames( filenames, numfiles,
+				    top_left_file, current_file );
+
+      } else if( current_file >= top_left_file+36 ) {
+
+	top_left_file = current_file & ~1; top_left_file -= 34;
 	widget_print_all_filenames( filenames, numfiles,
 				    top_left_file, current_file );
 
@@ -258,6 +275,9 @@ const char* widget_selectfile( void )
 
   /* Deactivate the widget's timer */
   widget_timer_end();
+
+  /* Force the normal screen to be redisplayed */
+  display_refresh_all();
 
   /* Now return, either with a filename or without as appropriate */
   if( widget_finished == WIDGET_FINISHED_OK ) {
