@@ -49,7 +49,7 @@ HEX	[0-9a-f]
 
 %%
 
-br|bre|brea|break { return BREAK; }
+br|bre|brea|break|breakp|breakpo|breakpoi|breakpoin|breakpoint { return BREAK;}
 co|con|cont|contin|continu|continue { return CONTINUE; }
 cl|cle|clea|clear { return CLEAR; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
