@@ -422,3 +422,4 @@
 20031231 rzx.c, ui/gkt/gtkui.c: always assign float values to timer_count.
 	 (patch #868415) (Fred).
 20031231 ui/win32: first (simple!) native Win32 user interface (Marek).
+20031231 ChangeLog: bring up-to-date.
