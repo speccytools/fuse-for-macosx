@@ -32,12 +32,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifdef HAVE_LIB_GLIB		/* If we're using glib */
-#include <glib.h>
-#else				/* #ifdef HAVE_LIB_GLIB */
-#include "myglib.h"		/* If not, use the local replacement */
-#endif
-
 #include "event.h"
 #include "fuse.h"
 #include "libspectrum/tape.h"

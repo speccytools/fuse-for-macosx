@@ -29,7 +29,11 @@
 
 #include <config.h>
 
-#include <glib.h>	/* FIXME: what to do if we don't have glib? */
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#else				/* #ifdef HAVE_LIB_GLIB */
+#include <myglib/myglib.h>	/* if not, use the local replacement */
+#endif				/* #ifdef HAVE_LIB_GLIB */
 
 #ifndef LIBSPECTRUM_LIBSPECTRUM_H
 #include "libspectrum.h"
