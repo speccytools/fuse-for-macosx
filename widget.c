@@ -155,7 +155,7 @@ int scandir( const char *dir, struct dirent ***namelist,
   DIR *directory; struct dirent *dirent;
 
   int allocated, number;
-  int i, error;
+  int i;
 
   (*namelist) = (struct dirent**)malloc( 32 * sizeof(struct dirent*) );
   if( *namelist == NULL ) return -1;
