@@ -1147,3 +1147,6 @@
 20041229 display.c,machine.c,memory.c,periph.[ch],ula.[ch],debugger/debugger.c,
 	 z80/{z80.pl,z80_macros.h}: fixes for display timings with the
 	 character-accurate renderer.
+20041229 display.[ch]: reduce display_is_dirty to being 32-bit again as it's
+	 no longer needed for the border. Various other bug fixes, leading
+	 to the Overscan demo now looking pretty much perfect :-)

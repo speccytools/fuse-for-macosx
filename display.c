@@ -59,14 +59,6 @@ libspectrum_byte display_hires_border;
    or display_border_mixed (see below) if it's not */
 static libspectrum_byte display_current_border[ DISPLAY_SCREEN_HEIGHT ];
 
-/* The colours of each eight pixel chunk in the top and bottom borders */
-static int top_border[DISPLAY_BORDER_HEIGHT][DISPLAY_SCREEN_WIDTH_COLS];
-static int bottom_border[DISPLAY_BORDER_HEIGHT][DISPLAY_SCREEN_WIDTH_COLS];
-
-/* And in the left and right borders */
-static int left_border[DISPLAY_HEIGHT][DISPLAY_BORDER_WIDTH_COLS];
-static int right_border[DISPLAY_HEIGHT][DISPLAY_BORDER_WIDTH_COLS];
-
 /* Offsets as to where the data and the attributes for each pixel
    line start */
 libspectrum_word display_line_start[ DISPLAY_HEIGHT ];
@@ -97,18 +89,12 @@ static int display_flash_reversed;
 
 /* Which eight-pixel chunks on each line need to be redisplayed. Bit 0
    corresponds to pixels 0-7, bit 31 to pixels 248-255. */
-static libspectrum_qword display_is_dirty[ DISPLAY_SCREEN_HEIGHT ];
+static libspectrum_dword display_is_dirty[ DISPLAY_HEIGHT ];
 /* This value signifies that the entire line must be redisplayed */
-static libspectrum_qword display_all_dirty;
+static libspectrum_dword display_all_dirty;
 
 /* Used to signify that we're redrawing the entire screen */
 static int display_redraw_all;
-
-/* The next line to be replotted */
-static int display_next_line;
-
-/* Value used to signify we're in vertical retrace */
-static const int display_border_retrace=-1;
 
 /* Value used to signify a border line has more than one colour on it. */
 static const int display_border_mixed = 0xff;
@@ -141,23 +127,16 @@ GSList *border_changes;
 /* The current border colour */
 int current_border[ DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH_COLS ];
 
-static void display_draw_line(int y);
 static void display_dirty8( libspectrum_word address );
 static void display_dirty64( libspectrum_word address );
 
 static void display_get_attr( int x, int y,
 			      libspectrum_byte *ink, libspectrum_byte *paper);
 
-static void display_set_border(void);
-static int display_border_line(void);
 static int add_rectangle( int y, int x, int w );
 static int end_line( int y );
 
-static void set_border( int x, int y, libspectrum_byte colour );
-
 static void display_dirty_flashing(void);
-static int display_border_column(int time_since_line);
-static void set_border_pixels( int line, int column, int colour );
 
 libspectrum_word
 display_get_addr( int x, int y )
@@ -198,7 +177,7 @@ display_init( int *argc, char ***argv )
 
   /* Set up the 'all pixels must be refreshed' marker */
   display_all_dirty = 0;
-  for( i = 0; i < DISPLAY_SCREEN_WIDTH_COLS; i++ )
+  for( i = 0; i < DISPLAY_WIDTH_COLS; i++ )
     display_all_dirty = ( display_all_dirty << 1 ) | 0x01;
 
   for(i=0;i<3;i++)
@@ -213,24 +192,23 @@ display_init( int *argc, char ***argv )
 
   for(y=0;y<DISPLAY_HEIGHT;y++)
     for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
-      display_dirty_ytable[ display_line_start[y]+x ] =
-	y + DISPLAY_BORDER_HEIGHT;
-      display_dirty_xtable[ display_line_start[y]+x ] =
-	x + DISPLAY_BORDER_WIDTH_COLS;
+      display_dirty_ytable[ display_line_start[y]+x ] =	y;
+      display_dirty_xtable[ display_line_start[y]+x ] = x;
     }
 
   for(y=0;y<DISPLAY_HEIGHT_ROWS;y++)
     for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
-      display_dirty_ytable2[ (32*y) + x ] = ( y * 8 ) + DISPLAY_BORDER_HEIGHT;
-      display_dirty_xtable2[ (32*y) + x ] = x + DISPLAY_BORDER_WIDTH_COLS;
+      display_dirty_ytable2[ (32*y) + x ] = y * 8;
+      display_dirty_xtable2[ (32*y) + x ] = x;
     }
 
   display_frame_count=0; display_flash_reversed=0;
 
-  for(y=0;y<DISPLAY_SCREEN_HEIGHT;y++) {
-    display_current_border[y]=display_border_mixed;
-    display_is_dirty[y] = display_all_dirty;
-  }
+  for( y = 0; y < DISPLAY_HEIGHT; y++ )
+    display_is_dirty[ y ] = display_all_dirty;
+
+  for( y = 0; y < DISPLAY_SCREEN_HEIGHT; y++ )
+    display_current_border[ y ] = display_border_mixed;
 
   display_redraw_all = 0;
 
@@ -238,127 +216,6 @@ display_init( int *argc, char ***argv )
   error = add_border_sentinel(); if( error ) return error;
 
   return 0;
-}
-
-/* Redraw pixel line y if it is flagged as `dirty' */
-static void
-display_draw_line( int y )
-{
-  int start, x, border_colour, error;
-  libspectrum_byte data, data2, ink, paper;
-  libspectrum_word hires_data;
-
-  x = 0;
-
-  while( display_is_dirty[y] ) {
-
-    /* Find the first dirty chunk on this row */
-    while( ! (display_is_dirty[y] & 0x01) ) {
-      display_is_dirty[y] >>= 1;
-      x++;
-    }
-
-    start = x;
-
-    /* Walk to the end of the dirty region, writing the bytes to the
-       drawing area along the way */
-    do {
-
-      if( y >= DISPLAY_BORDER_HEIGHT &&
-	  y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
-
-	if( x >= DISPLAY_BORDER_WIDTH_COLS &&
-	    x < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
-
-	  int screen_x, screen_y;
-	  libspectrum_word offset;
-	  libspectrum_byte *screen;
-
-	  screen_x = x - DISPLAY_BORDER_WIDTH_COLS;
-	  screen_y = y - DISPLAY_BORDER_HEIGHT;
-
-	  screen = RAM[ memory_current_screen ];
-      
-	  display_get_attr( screen_x, screen_y, &ink, &paper );
-
-	  offset = display_get_addr( screen_x, screen_y );
-	  data = screen[ offset ];
-
-	  if( scld_last_dec.name.hires ) {
-	    switch( scld_last_dec.mask.scrnmode ) {
-
-            case HIRESATTRALTD:
-	      offset =
-		display_attr_start[ screen_y ] + screen_x + ALTDFILE_OFFSET;
-              data2 = screen[ offset ];
-              break;
-
-            case HIRES:
-              data2 = screen[ offset + ALTDFILE_OFFSET ];
-              break;
-
-            case HIRESDOUBLECOL:
-              data2 = data;
-              break;
-
-            default: /* case HIRESATTR: */
-	      offset = display_attr_start[ screen_y ] + screen_x;
-	      data2 = screen[ offset ];
-              break;
-
-	    }
-	    hires_data = (data << 8) + data2;
-	    display_plot16( screen_x, screen_y, hires_data, ink, paper );
-	  } else {
-	    display_plot8( screen_x, screen_y, data, ink, paper );
-	  }    
-
-	} else if( x < DISPLAY_BORDER_WIDTH_COLS ) {
-
-	  border_colour = left_border[ y - DISPLAY_BORDER_HEIGHT ][x];
-	  set_border( x, y, border_colour );
-
-	} else {
-
-	  border_colour =
-	    right_border[ y - DISPLAY_BORDER_HEIGHT ]
-                        [ x - DISPLAY_BORDER_WIDTH_COLS - DISPLAY_WIDTH_COLS ];
-	  set_border( x, y, border_colour );
-	}
-
-      } else if( y < DISPLAY_BORDER_HEIGHT ) {
-
-	border_colour = top_border[y][x];
-	set_border( x, y, border_colour );
-
-      } else {
-
-	border_colour =
-	  bottom_border[y - DISPLAY_BORDER_HEIGHT - DISPLAY_HEIGHT ][x];
-	set_border( x, y, border_colour );
-      }
-
-      display_is_dirty[y] >>= 1;
-      x++;
-
-    } while( display_is_dirty[y] & 0x01 );
-
-    error = add_rectangle( y, start, x-start ); if( error ) return;
-
-  }
-  
-  error = end_line( y ); if( error ) return;
-
-  /* We've drawn the current line to the screen. Now overwrite the
-     border on this line with the current border colour */
-  border_colour = scld_last_dec.name.hires ? display_hires_border :
-                                             display_lores_border;
-  
-  if( border_colour != display_current_border[y] ) {
-    set_border_pixels( y, 0, border_colour );
-    display_current_border[y] = border_colour;
-  }
-
 }
 
 /* Add the rectangle { x, line, w, 1 } to the list of rectangles to be
@@ -573,23 +430,31 @@ display_dirty( libspectrum_word offset )
 static void
 copy_critical_region_line( int y, int x, int end )
 {
-  int start, border_colour, error;
+  int start, error;
   libspectrum_byte data, data2, ink, paper;
   libspectrum_word hires_data;
-  libspectrum_qword bit_mask, dirty;
+  libspectrum_dword bit_mask, dirty;
 
-  /* Build a mask for the bits we're interested in */
-  bit_mask = display_all_dirty;
+  if( x < DISPLAY_WIDTH_COLS ) {
 
-  bit_mask >>= x;
-  bit_mask <<= x + ( 64 - end );
-  bit_mask >>= ( 64 - end );
+    /* Build a mask for the bits we're interested in */
+    bit_mask = display_all_dirty;
 
-  /* Get the bits we're interested in */
-  dirty = ( display_is_dirty[y] & bit_mask ) >> x;
+    bit_mask >>= x;
+    bit_mask <<= x + ( 32 - end );
+    bit_mask >>= ( 32 - end );
 
-  /* And remove those bits from the dirty mask */
-  display_is_dirty[y] &= ~bit_mask;
+    /* Get the bits we're interested in */
+    dirty = ( display_is_dirty[y] & bit_mask ) >> x;
+
+    /* And remove those bits from the dirty mask */
+    display_is_dirty[y] &= ~bit_mask;
+
+  } else {
+
+    dirty = 0;
+
+  }
 
   while( dirty ) {
 
@@ -605,92 +470,58 @@ copy_critical_region_line( int y, int x, int end )
        drawing area along the way */
     do {
 
-      if( y >= DISPLAY_BORDER_HEIGHT &&
-	  y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
+      libspectrum_word offset;
+      libspectrum_byte *screen;
 
-	if( x >= DISPLAY_BORDER_WIDTH_COLS &&
-	    x < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
-
-	  int screen_x, screen_y;
-	  libspectrum_word offset;
-	  libspectrum_byte *screen;
-
-	  screen_x = x - DISPLAY_BORDER_WIDTH_COLS;
-	  screen_y = y - DISPLAY_BORDER_HEIGHT;
-
-	  screen = RAM[ memory_current_screen ];
+      screen = RAM[ memory_current_screen ];
       
-	  display_get_attr( screen_x, screen_y, &ink, &paper );
+      display_get_attr( x, y, &ink, &paper );
 
-	  offset = display_get_addr( screen_x, screen_y );
-	  data = screen[ offset ];
+      offset = display_get_addr( x, y );
+      data = screen[ offset ];
 
-	  if( scld_last_dec.name.hires ) {
-	    switch( scld_last_dec.mask.scrnmode ) {
+      if( scld_last_dec.name.hires ) {
+	switch( scld_last_dec.mask.scrnmode ) {
 
-            case HIRESATTRALTD:
-	      offset =
-		display_attr_start[ screen_y ] + screen_x + ALTDFILE_OFFSET;
-              data2 = screen[ offset ];
-              break;
+	case HIRESATTRALTD:
+	  offset = display_attr_start[ y ] + x + ALTDFILE_OFFSET;
+	  data2 = screen[ offset ];
+	  break;
 
-            case HIRES:
-              data2 = screen[ offset + ALTDFILE_OFFSET ];
-              break;
+	case HIRES:
+	  data2 = screen[ offset + ALTDFILE_OFFSET ];
+	  break;
 
-            case HIRESDOUBLECOL:
-              data2 = data;
-              break;
+	case HIRESDOUBLECOL:
+	  data2 = data;
+	  break;
 
-            default: /* case HIRESATTR: */
-	      offset = display_attr_start[ screen_y ] + screen_x;
-	      data2 = screen[ offset ];
-              break;
+	default: /* case HIRESATTR: */
+	  offset = display_attr_start[ y ] + x;
+	  data2 = screen[ offset ];
+	  break;
 
-	    }
-	    hires_data = (data << 8) + data2;
-	    display_plot16( screen_x, screen_y, hires_data, ink, paper );
-	  } else {
-	    display_plot8( screen_x, screen_y, data, ink, paper );
-	  }    
-
-	} else if( x < DISPLAY_BORDER_WIDTH_COLS ) {
-
-	  border_colour = left_border[ y - DISPLAY_BORDER_HEIGHT ][x];
-	  set_border( x, y, border_colour );
-
-	} else {
-
-	  border_colour =
-	    right_border[ y - DISPLAY_BORDER_HEIGHT ]
-                        [ x - DISPLAY_BORDER_WIDTH_COLS - DISPLAY_WIDTH_COLS ];
-	  set_border( x, y, border_colour );
 	}
-
-      } else if( y < DISPLAY_BORDER_HEIGHT ) {
-
-	border_colour = top_border[y][x];
-	set_border( x, y, border_colour );
-
+	hires_data = (data << 8) + data2;
+	display_plot16( x, y, hires_data, ink, paper );
       } else {
-
-	border_colour =
-	  bottom_border[y - DISPLAY_BORDER_HEIGHT - DISPLAY_HEIGHT ][x];
-	set_border( x, y, border_colour );
-      }
+	display_plot8( x, y, data, ink, paper );
+      }    
 
       dirty >>= 1;
       x++;
 
     } while( dirty & 0x01 );
 
-    error = add_rectangle( y, start, x - start ); if( error ) return;
+    error = add_rectangle( DISPLAY_BORDER_HEIGHT + y,
+			   DISPLAY_BORDER_WIDTH_COLS + start, x - start );
+    if( error ) return;
   }
   
   /* If that was the end of the line, compress the active rectangles
      list */
-  if( end == DISPLAY_SCREEN_WIDTH_COLS ) {
-    error = end_line( y ); if( error ) return;
+  if( end == DISPLAY_WIDTH_COLS ) {
+    error = end_line( DISPLAY_BORDER_HEIGHT + y ); if( error ) return;
   }
 }
 
@@ -698,15 +529,21 @@ copy_critical_region_line( int y, int x, int end )
 static void
 copy_critical_region( int beam_x, int beam_y )
 {
-  copy_critical_region_line( critical_region_y++, critical_region_x,
-			     DISPLAY_SCREEN_WIDTH_COLS );
-  
-  for( ; critical_region_y < beam_y; critical_region_y++ )
-    copy_critical_region_line( critical_region_y, 0,
-			       DISPLAY_SCREEN_WIDTH_COLS );
+  if( critical_region_y == beam_y ) {
 
-  if( critical_region_y < DISPLAY_SCREEN_HEIGHT )
+    copy_critical_region_line( critical_region_y, critical_region_x, beam_x );
+
+  } else {
+
+    copy_critical_region_line( critical_region_y++, critical_region_x,
+			       DISPLAY_WIDTH_COLS );
+  
+    for( ; critical_region_y < beam_y; critical_region_y++ )
+      copy_critical_region_line( critical_region_y, 0,
+				 DISPLAY_WIDTH_COLS );
+
     copy_critical_region_line( critical_region_y, 0, beam_x );
+  }
 
   critical_region_x = beam_x;
 }
@@ -745,12 +582,28 @@ display_dirty_chunk( int x, int y )
 
     get_beam_position( &beam_x, &beam_y );
 
+    beam_x -= DISPLAY_BORDER_WIDTH_COLS;
+    beam_y -= DISPLAY_BORDER_HEIGHT;
+
+    if( beam_y < 0 ) {
+      beam_x = beam_y = 0;
+    } else if( beam_y >= DISPLAY_HEIGHT ) {
+      beam_x = DISPLAY_WIDTH_COLS;
+      beam_y = DISPLAY_HEIGHT - 1;
+    }
+
+    if( beam_x < 0 ) {
+      beam_x = 0;
+    } else if( beam_x > DISPLAY_WIDTH_COLS ) {
+      beam_x = DISPLAY_WIDTH_COLS;
+    }
+
     if(   y <  beam_y                 ||
 	( y == beam_y && x < beam_x )    )
       copy_critical_region( beam_x, beam_y );
   }
 
-  display_is_dirty[y] |= ( (libspectrum_qword)1 << x );
+  display_is_dirty[y] |= ( (libspectrum_dword)1 << x );
 }
 
 static void
@@ -894,24 +747,6 @@ display_plot16( int x, int y, libspectrum_word data,
   display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
 }
 
-static void
-set_border( int x, int y, libspectrum_byte colour )
-{
-  size_t i;
-
-  if( machine_current->timex ) {
-    x <<= 4; y <<= 1;
-    for( i = 0; i < 16; i++ ) {
-      display_image[y  ][x+i] = colour;
-      display_image[y+1][x+i] = colour;
-    }
-  } else {
-    x <<= 3;
-    for( i = 0; i < 8; i++ ) display_image[y][x+i] = colour;
-  }
-
-}
-
 /* Get the attributes for the eight pixels starting at
    ( (8*x) , y ) */
 static void
@@ -996,117 +831,9 @@ display_set_hires_border( int colour )
   }
 }
 
-static void display_set_border(void)
-{
-  int current_line, time_since_line, column, colour;
-
-  colour = scld_last_dec.name.hires ? display_hires_border : display_lores_border;
-  current_line=display_border_line();
-
-  /* Check if we're in vertical retrace; if we are, don't need to do
-     change anything in the display buffer */
-  if(current_line==display_border_retrace) return;
-
-  /* If the current line is already this colour, don't need to do anything */
-  if(display_current_border[current_line] == colour) return;
-
-  time_since_line = tstates - machine_current->line_times[current_line];
-
-  /* Now check we're not in horizonal retrace. Again, do nothing
-     if we are */
-  if(time_since_line >= machine_current->timings.left_border +
-                        machine_current->timings.horizontal_screen +
-                        machine_current->timings.right_border ) return;
-      
-  column = display_border_column( time_since_line );
-
-  set_border_pixels( current_line, column, colour );
-
-  /* Note this line has more than one colour on it */
-  display_current_border[current_line]=display_border_mixed;
-}
-
-static int display_border_line(void)
-{
-  if( 0 < display_next_line && display_next_line <= DISPLAY_SCREEN_HEIGHT ) {
-    return display_next_line-1;
-  } else {
-    return display_border_retrace;
-  }
-}
-
-static int display_border_column(int time_since_line)
-{
-  int column;
-
-  /* 2 pixels per T-state */
-  column = time_since_line / 4;
-
-  /* But now need to correct because our displayed border isn't necessarily
-     the same size as the ULA's. */
-  column -= 
-    ( machine_current->timings.left_border >> 2 ) - DISPLAY_BORDER_WIDTH_COLS;
-
-  if(column < 0) {
-    column=0;
-  } else if( column > DISPLAY_SCREEN_WIDTH_COLS ) {
-    column = DISPLAY_SCREEN_WIDTH_COLS;
-  }
-
-  return column;
-}
-
-static void
-set_border_pixels( int line, int column, int colour )
-{
-  const libspectrum_qword right_edge =
-    (libspectrum_qword)1 << ( DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS );
-
-  /* See if we're in the top/bottom border */
-  if( line < DISPLAY_BORDER_HEIGHT ) {
-
-    for( ; column < DISPLAY_SCREEN_WIDTH_COLS; column++ ) {
-      top_border[line][column] = colour;
-      display_is_dirty[line] |= (libspectrum_qword)1 << column;
-    }
-
-  } else if( line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
-
-    for( ; column < DISPLAY_SCREEN_WIDTH_COLS; column++ ) {
-      bottom_border[ line - DISPLAY_BORDER_HEIGHT - DISPLAY_HEIGHT ][column] =
-	colour;
-      display_is_dirty[line] |= (libspectrum_qword)1 << column;
-    }
-
-  } else {			/* In main screen */
-
-    /* If we're in the left border, colour that bit in */
-    for( ; column < DISPLAY_BORDER_WIDTH_COLS; column++ ) {
-      left_border[ line - DISPLAY_BORDER_HEIGHT ][column] = colour;
-      display_is_dirty[line] |= 1 << column;
-    }
-
-    /* Rebase our coordinate: zero is now the right edge of the screen */
-
-    /* Got to the right edge of the screen if we're past it already */
-    if( column <= DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
-      column = 0;
-    } else {
-      column -= DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS;
-    }
-
-    /* Colour in the right border */
-    for( ; column < DISPLAY_BORDER_WIDTH_COLS; column++ ) {
-      right_border[ line - DISPLAY_BORDER_HEIGHT ][column] = colour;
-      display_is_dirty[line] |= right_edge << column;
-    }
-  }
-}
-
 static void
 border_change_write( int y, int start, int end, int colour )
 {
-/*   fprintf( stderr, "%s( %d, %d, %d, %d )\n", __FUNCTION__, y, start, end, colour ); */
   int scaled_start = start << 3, scaled_end = end << 3;
 
   if(   y <  DISPLAY_BORDER_HEIGHT                    ||
@@ -1255,12 +982,14 @@ display_frame( void )
 {
   int error;
 
+  assert( display_all_dirty == 0xffffffff );
+
   /* Copy all the critical region to display_image[] */
-  copy_critical_region( DISPLAY_SCREEN_WIDTH_COLS, DISPLAY_SCREEN_HEIGHT - 1 );
+  copy_critical_region( DISPLAY_WIDTH_COLS, DISPLAY_HEIGHT - 1 );
   critical_region_x = critical_region_y = 0;
 
   /* Force all rectangles into the inactive list */
-  error = end_line( DISPLAY_SCREEN_HEIGHT ); if( error ) return error;
+  error = end_line( DISPLAY_HEIGHT ); if( error ) return error;
 
   update_border();
 
@@ -1337,6 +1066,6 @@ void display_refresh_all(void)
 
   display_redraw_all = 1;
 
-  for( i = 0; i < DISPLAY_SCREEN_HEIGHT; i++ )
+  for( i = 0; i < DISPLAY_HEIGHT; i++ )
     display_is_dirty[i] = display_all_dirty;
 }

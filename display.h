@@ -50,7 +50,7 @@
 #define DISPLAY_BORDER_WIDTH  ( DISPLAY_BORDER_WIDTH_COLS * 16 )
 /* Aspect corrected border width */
 #define DISPLAY_BORDER_ASPECT_WIDTH  ( DISPLAY_BORDER_WIDTH_COLS * 8 )
-/* Each main screen column can produce only 8 pixels in any mode */
+/* Each main screen row can produce only 8 pixels in any mode */
 #define DISPLAY_BORDER_HEIGHT ( DISPLAY_BORDER_HEIGHT_COLS * 8 )
 
 /* The width and height of the window we'll be displaying */
