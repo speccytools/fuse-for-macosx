@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = debugger getopt hacking lib man perl roms ui widget z80
+SUBDIRS = compat debugger getopt hacking lib man perl roms ui widget z80
 
 fuse_SOURCES = ay.c \
 	dck.c \
