@@ -78,9 +78,9 @@ spectrum_port_info specplus3_peripherals[] = {
 };
 
 #if HAVE_765_H
-static FDC_765 fdc;
-static DSK_FLOPPY_DRIVE drive_a, drive_b;
-static FLOPPY_DRIVE drive_null;
+static FDC_PTR fdc;
+static FDRV_PTR drive_a, drive_b;
+static FDRV_PTR drive_null;
 #endif			/* #ifdef HAVE_765_H */
 
 static BYTE specplus3_unattached_port( void )
@@ -296,27 +296,26 @@ int specplus3_init( machine_info *machine )
   machine->ay.present=1;
 
 #ifdef HAVE_765_H
-  /* Setup the appropriate parameters for two floppy drives */
-  fdd_init( &drive_a );
-  drive_a.fdd.fd_type = FD_30;		/* FD_30 => 3" drive */
-  drive_a.fdd.fd_heads = 1;
-  drive_a.fdd.fd_cylinders = 40;
-  drive_a.fdd.fd_readonly = 0;
-  drive_a.fdd_filename[0] = '\0';
 
-  fdd_init( &drive_b );
-  drive_b.fdd.fd_type = FD_30;
-  drive_b.fdd.fd_heads = 1;
-  drive_b.fdd.fd_cylinders = 40;
-  drive_b.fdd.fd_readonly = 0;
-  drive_b.fdd_filename[0] = '\0';
+  /* Create the FDC */
+  fdc = fdc_new();
+
+  /* Setup the appropriate parameters for two floppy drives */
+  drive_a = fd_newdsk();		/* Use .DSK files for emulation */
+  fd_settype( drive_a, FD_30 );		/* FD_30 => 3" drive */
+  fd_setheads( drive_a, 1 );
+  fd_setcyls( drive_a, 40 );
+  fd_setreadonly( drive_a, 0 );
+
+  drive_b = fd_newdsk();
+  fd_settype( drive_b, FD_30 );
+  fd_setheads( drive_b, 1 );
+  fd_setcyls( drive_b, 40 );
+  fd_setreadonly( drive_b, 0 );
 
   /* And a null drive to use for the other two drives lib765 supports */
-  fd_init( &drive_null );
+  drive_null = fd_new();
   
-  /* No FDC interrupts */
-  fdc.fdc_isr = NULL;
-
   /* And reset the FDC */
   specplus3_fdc_reset();
 #endif				/* #ifdef HAVE_765_H */
@@ -356,7 +355,7 @@ void specplus3_memoryport_write(WORD port, BYTE b)
 
 #ifdef HAVE_765_H
   /* Set the state of both ( 3 = (1<<0) + (1<<1) ) floppy drive motors */
-  fdc_set_motor( &fdc, ( b & 8 ) ? 3 : 0 );
+  fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
 #endif			/* #ifdef HAVE_765_H */
 
   if( b & 0x01) {	/* Check whether we want a special RAM configuration */
@@ -383,29 +382,29 @@ specplus3_fdc_reset( void )
 {
   /* Reset the FDC and set up the four drives (of which only drives 0 and
      1 exist on the +3 */
-  fdc_reset( &fdc );
-  fdc.fdc_drive[0] = (FLOPPY_DRIVE*)&drive_a;
-  fdc.fdc_drive[1] = (FLOPPY_DRIVE*)&drive_b;
-  fdc.fdc_drive[2] = &drive_null;
-  fdc.fdc_drive[3] = &drive_null;
+  fdc_reset( fdc );
+  fdc_setdrive( fdc, 0, drive_a );
+  fdc_setdrive( fdc, 1, drive_b );
+  fdc_setdrive( fdc, 2, drive_null );
+  fdc_setdrive( fdc, 3, drive_null );
 }
 
 static BYTE
 specplus3_fdc_status( WORD port )
 {
-  return fdc_read_ctrl( &fdc );
+  return fdc_read_ctrl( fdc );
 }
 
 static BYTE
 specplus3_fdc_read( WORD port )
 {
-  return fdc_read_data( &fdc );
+  return fdc_read_data( fdc );
 }
 
 static void
 specplus3_fdc_write( WORD port, BYTE data )
 {
-  fdc_write_data( &fdc, data );
+  fdc_write_data( fdc, data );
 }
 
 /* lib765's `print an error message' callback */
