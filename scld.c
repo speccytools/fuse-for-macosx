@@ -67,6 +67,10 @@ scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
     display_refresh_all();
   }
 
+  /* If we just reenabled interrupts, check for a retriggered interrupt */
+  if( old_dec.name.intdisable && !scld_last_dec.name.intdisable )
+    z80_interrupt();
+
   if( scld_last_dec.name.altmembank != old_dec.name.altmembank ) {
     int i;
     

@@ -131,11 +131,12 @@ int event_do_events(void)
 
     case EVENT_TYPE_ENABLE_INTERRUPTS: z80_enable_interrupts(); break;
 
-    case EVENT_TYPE_INTERRUPT:
+    case EVENT_TYPE_FRAME:
       if( rzx_playback ) event_force_events();
       rzx_frame();
       psg_frame();
-      spectrum_interrupt();
+      spectrum_frame();
+      z80_interrupt();
       ui_event();
       break;
 
@@ -159,9 +160,9 @@ int event_do_events(void)
   return 0;
 }
 
-/* Called on interrupt to reduce T-state count of all entries */
+/* Called at end of frame to reduce T-state count of all entries */
 int
-event_interrupt( libspectrum_dword tstates_per_frame )
+event_frame( libspectrum_dword tstates_per_frame )
 {
   g_slist_foreach(event_list, event_reduce_tstates, &tstates_per_frame );
 

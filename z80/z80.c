@@ -104,15 +104,20 @@ void
 z80_enable_interrupts( void )
 {
   IFF1 = IFF2 = 1;
+
+  /* Check for retriggered interrupts */
+  z80_interrupt();
 }
 
 /* Process a z80 maskable interrupt */
 void
 z80_interrupt( void )
 {
-  /* Process if IFF1 set && (if a Timex machine, SCLD INTDISABLE is clear) */
-  if( IFF1 && !scld_last_dec.name.intdisable ) {
-    
+  /* An interrupt will occur if IFF1 is set and the /INT line hasn't
+     gone high again. On a Timex machine, we also need the SCLD's
+     INTDISABLE to be clear */
+  if( IFF1 && tstates < 48 && !scld_last_dec.name.intdisable ) {
+
     if( z80.halted ) { PC++; z80.halted = 0; }
     
     IFF1=IFF2=0;

@@ -127,7 +127,7 @@ libspectrum_byte spectrum_unattached_port( int offset );
 
 /* Miscellaneous stuff */
 
-int spectrum_interrupt(void);
+int spectrum_frame( void );
 
 /* Data from .slt files */
 

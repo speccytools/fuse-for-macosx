@@ -38,13 +38,13 @@ typedef struct event_t {
 /* The various types of event which can occur */
 enum event_types {
 
-  /* This must come first before EVENT_TYPE_INTERRUPT to ensure that
-     interrupts are re-enabled before we try and process one if both
-     events occur at the same tstate */
+  /* This must come before EVENT_TYPE_FRAME EVENT_TYPE_INTERRUPT to
+     ensure that interrupts are re-enabled before we try and process
+     one if both events occur at the same tstate */
   EVENT_TYPE_ENABLE_INTERRUPTS,
 
   EVENT_TYPE_EDGE,
-  EVENT_TYPE_INTERRUPT,
+  EVENT_TYPE_FRAME,
   EVENT_TYPE_LINE,
   EVENT_TYPE_NMI,
   EVENT_TYPE_NULL,
@@ -68,8 +68,8 @@ int event_add( libspectrum_dword event_time, int type );
 /* Do all events which have passed */
 int event_do_events(void);
 
-/* Called on interrupt to reduce T-state count of all entries */
-int event_interrupt( libspectrum_dword tstates_per_frame );
+/* Called at end of frame to reduce T-state count of all entries */
+int event_frame( libspectrum_dword tstates_per_frame );
 
 /* Remove all events of a specific type from the stack */
 int event_remove_type( int type );

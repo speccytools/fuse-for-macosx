@@ -46,7 +46,6 @@ DIGIT	[0-9]
 HEX	[0-9a-f]
 
 %option caseless
-%option noyywrap
 
 %%
 

@@ -57,11 +57,11 @@ void z80_do_opcodes()
 
     libspectrum_byte opcode;
 
-    /* If we're due an interrupt from RZX playback, generate one */
+    /* If we're due an end of frame from RZX playback, generate one */
     if( rzx_playback &&
 	R + rzx_instructions_offset >= rzx_instruction_count
       ) {
-      event_add( tstates, EVENT_TYPE_INTERRUPT );
+      event_add( tstates, EVENT_TYPE_FRAME );
       break;		/* And break out of the execution loop to let
 			   the interrupt happen */
     }
