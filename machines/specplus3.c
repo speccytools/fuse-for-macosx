@@ -241,7 +241,8 @@ specplus3_reset( void )
   if( error ) return error;
 
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count,
-			PERIPH_PRESENT_OPTIONAL );
+			PERIPH_PRESENT_OPTIONAL,
+			PERIPH_PRESENT_NEVER );
   if( error ) return error;
 
 #ifdef HAVE_765_H

@@ -150,7 +150,8 @@ tc2048_reset( void )
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count,
-			PERIPH_PRESENT_ALWAYS );
+			PERIPH_PRESENT_ALWAYS,
+			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
   memory_current_screen = 5;

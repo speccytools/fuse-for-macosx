@@ -58,6 +58,7 @@ fuse_SOURCES = ay.c \
 	display.c \
 	event.c \
 	fuse.c \
+	if2.c \
 	input.c \
 	joystick.c \
 	keyboard.c \

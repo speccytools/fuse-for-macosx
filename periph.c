@@ -246,15 +246,22 @@ write_peripheral( gpointer data, gpointer user_data )
  * The more Fuse-specific peripheral handling routines
  */
 
-/* What sort of Kempston interface does the current machine has */
+/* What sort of Kempston interface does the current machine have */
 static periph_present kempston_present;
 
 /* Is the Kempston interface currently active */
 int periph_kempston_active;
 
+/* What sort of Interface II does the current machine have */
+static periph_present interface2_present;
+
+/* Is the Interface II currently active */
+int periph_interface2_active;
+
 int
 periph_setup( const periph_t *peripherals_list, size_t n,
-	      periph_present kempston )
+	      periph_present kempston,
+	      periph_present interface2 )
 {
   int error;
 
@@ -267,6 +274,7 @@ periph_setup( const periph_t *peripherals_list, size_t n,
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
 
   kempston_present = kempston;
+  interface2_present = interface2;
 
   periph_update();
 
@@ -281,5 +289,11 @@ periph_update( void )
   case PERIPH_PRESENT_OPTIONAL:
     periph_kempston_active = settings_current.joy_kempston; break;
   case PERIPH_PRESENT_ALWAYS: periph_kempston_active = 1; break;
+  }
+  switch( interface2_present ) {
+  case PERIPH_PRESENT_NEVER: periph_interface2_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_interface2_active = settings_current.interface2; break;
+  case PERIPH_PRESENT_ALWAYS: periph_interface2_active = 1; break;
   }
 }

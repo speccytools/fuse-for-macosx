@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "spec48.h"
 
+static int spec16_memory_map( void );
 static int spec16_reset( void );
 static int spec16_memory_map( void );
 
@@ -99,6 +100,7 @@ spec16_reset( void )
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 

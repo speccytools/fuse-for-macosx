@@ -794,3 +794,7 @@
 	 machines/,z80/coretest.c: new page mapping control scheme where
 	 each machine has a function which can be called to set the
 	 current page mapping (part of patch #937338) (Fred).
+20040513 Makefile.am,dck.c,if2.[ch],machine.[ch],menu.[ch],menu_data.c,
+	 periph.[ch],settings.dat,machines/,ui/{options.dat,ui.h},
+	 ui/gtk/gtkui.c: add Interface II support (rest of patch #937338)
+	 (Fred).

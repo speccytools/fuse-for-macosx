@@ -128,8 +128,12 @@ Media/Disk/Drive B:/_Eject, Item,, menu_media_disk_eject, 2
 Media/Disk/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 4
 
 Media/_Cartridge, Branch
-Media/Cartridge/_Insert..., Item
-Media/Cartridge/_Eject, Item
+Media/Cartridge/_Timex Dock, Branch
+Media/Cartridge/Timex Dock/_Insert..., Item
+Media/Cartridge/Timex Dock/_Eject, Item
+Media/Cartridge/_Interface II, Branch
+Media/Cartridge/Interface II/_Insert..., Item
+Media/Cartridge/Interface II/_Eject, Item
 
 Media/_IDE, Branch
 Media/IDE/Simple _8-bit, Branch

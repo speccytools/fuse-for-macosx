@@ -879,11 +879,17 @@ int ui_menu_activate( ui_menu_item item, int active )
 
   switch( item ) {
 
-  case UI_MENU_ITEM_MEDIA_CARTRIDGE:
-    return set_menu_item_active( "/Media/Cartridge", active );
+  case UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK:
+    return set_menu_item_active( "/Media/Cartridge/Timex Dock", active );
 
-  case UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT:
-    return set_menu_item_active( "/Media/Cartridge/Eject", active );
+  case UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT:
+    return set_menu_item_active( "/Media/Cartridge/Timex Dock/Eject", active );
+
+  case UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2:
+    return set_menu_item_active( "/Media/Cartridge/Interface II", active );
+
+  case UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT:
+    return set_menu_item_active( "/Media/Cartridge/Interface II/Eject", active );
 
   case UI_MENU_ITEM_MEDIA_DISK:
     return set_menu_item_active( "/Media/Disk", active );

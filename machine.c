@@ -31,11 +31,12 @@
 
 #include "event.h"
 #include "fuse.h"
+#include "if2.h"
 #include "machine.h"
 #include "machines/machines.h"
 #include "machines/scorpion.h"
-#include "machines/spec48.h"
 #include "machines/spec128.h"
+#include "machines/spec48.h"
 #include "machines/specplus3.h"
 #include "printer.h"
 #include "scld.h"
@@ -238,17 +239,18 @@ machine_select_machine( fuse_machine_info *machine )
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE, 1 );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT, 0 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
   } else {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE, 0 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, 0 );
   };
 
   return 0;
 }
 
 int
-machine_load_rom( size_t which, char *filename, size_t expected_length )
+machine_load_rom_bank( memory_page* bank_map, size_t which,
+		       const char *filename, size_t expected_length )
 {
   int fd, error;
   utils_file rom;
@@ -272,24 +274,31 @@ machine_load_rom( size_t which, char *filename, size_t expected_length )
     return 1;
   }
 
-  memory_map_rom[ which ].page = memory_pool_allocate( rom.length );
-  if( !memory_map_rom[ which ].page ) {
+  bank_map[ which ].page = memory_pool_allocate( rom.length );
+  if( !bank_map[ which ].page ) {
     utils_close_file( &rom );
     return 1;
   }
 
-  memcpy( memory_map_rom[ which ].page, rom.buffer, rom.length );
+  memcpy( bank_map[ which ].page, rom.buffer, rom.length );
 
   for( i = 1, offset = MEMORY_PAGE_SIZE;
        offset < expected_length;
        i++, offset += MEMORY_PAGE_SIZE   ) {
-    memory_map_rom[ which + i ].offset = offset;
-    memory_map_rom[ which + i ].page = memory_map_rom[ which ].page + offset;
+    bank_map[ which + i ].offset = offset;
+    bank_map[ which + i ].page = bank_map[ which ].page + offset;
   }
 
   if( utils_close_file( &rom ) ) return 1;
 
   return 0;
+}
+
+int
+machine_load_rom( size_t which, const char *filename, size_t expected_length )
+{
+  return machine_load_rom_bank( memory_map_rom, which, filename,
+				expected_length );
 }
 
 int
@@ -323,6 +332,9 @@ machine_reset( void )
   /* Set up the contention array */
   for( i = 0; i < machine_current->timings.tstates_per_frame; i++ )
     spectrum_contention[ i ] = machine_current->ram.contend_delay( i );
+
+  /* Check for an Interface II ROM */
+  error = if2_reset(); if( error ) return error;
 
   return 0;
 }

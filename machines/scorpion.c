@@ -145,7 +145,8 @@ scorpion_reset(void)
   trdos_active = 0;
 
   error = periph_setup( peripherals, peripherals_count,
-			PERIPH_PRESENT_OPTIONAL );
+			PERIPH_PRESENT_OPTIONAL,
+			PERIPH_PRESENT_NEVER );
   if( error ) return error;
 
   machine_current->ram.last_byte2 = 0;

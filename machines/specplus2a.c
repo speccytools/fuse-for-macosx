@@ -87,7 +87,8 @@ specplus2a_reset( void )
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count,
-			PERIPH_PRESENT_OPTIONAL );
+			PERIPH_PRESENT_OPTIONAL,
+			PERIPH_PRESENT_NEVER );
   if( error ) return error;
 
   return specplus3_plus2a_common_reset();

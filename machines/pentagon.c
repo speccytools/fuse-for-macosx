@@ -140,7 +140,8 @@ pentagon_reset(void)
   trdos_available = 1;
 
   error = periph_setup( peripherals, peripherals_count,
-			PERIPH_PRESENT_OPTIONAL );
+			PERIPH_PRESENT_OPTIONAL,
+			PERIPH_PRESENT_NEVER );
   if( error ) return error;
 
   return spec128_common_reset( 0 );

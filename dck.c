@@ -50,7 +50,11 @@ dck_insert( const char *filename )
 {
   int error;
 
-  error = dck_read( filename ); if( error ) return error;
+  if ( !( libspectrum_machine_capabilities( machine_current->machine ) &
+	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
+    ui_error( UI_ERROR_ERROR, "This machine does not support the dock" );
+    return 1;
+  }
 
   error = settings_set_string( &settings_current.dck_file, filename );
   if( error ) return error;
@@ -72,7 +76,7 @@ dck_eject( void )
   if( settings_current.dck_file ) free( settings_current.dck_file );
   settings_current.dck_file = NULL;
 
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT, 0 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
 
   machine_reset();
 }
@@ -87,12 +91,6 @@ dck_read( const char *filename )
 
   int i;
   memory_page **mem;
-
-  if ( !( libspectrum_machine_capabilities( machine_current->machine ) &
-	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
-    ui_error( UI_ERROR_ERROR, "This machine does not support the dock" );
-    return 1;
-  }
 
   error = libspectrum_dck_alloc( &dck ); if( error ) return error;
 
@@ -166,7 +164,7 @@ dck_read( const char *filename )
   }
 
   /* Make the menu item to eject the cartridge active */
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT, 1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 1 );
 
   return libspectrum_dck_free( dck, 0 );
 }

@@ -80,8 +80,12 @@ typedef enum periph_present {
 /* Is the Kempston interface active */
 extern int periph_kempston_active;
 
+/* Is the Interface II active */
+extern int periph_interface2_active;
+
 int periph_setup( const periph_t *peripherals_list, size_t n,
-		  periph_present kempston );
+		  periph_present kempston,
+		  periph_present interface2 );
 void periph_update( void );
 
 #endif				/* #ifndef FUSE_PERIPH_H */

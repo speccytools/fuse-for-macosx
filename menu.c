@@ -31,6 +31,7 @@
 #include "dck.h"
 #include "event.h"
 #include "fuse.h"
+#include "if2.h"
 #include "menu.h"
 #include "psg.h"
 #include "rzx.h"
@@ -261,13 +262,13 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
   trdos_disk_eject( which, write );
 }
 
-MENU_CALLBACK( menu_media_cartridge_insert )
+MENU_CALLBACK( menu_media_cartridge_timexdock_insert )
 {
   char *filename;
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Insert Cartridge" );
+  filename = menu_get_filename( "Fuse - Insert Timex Dock Cartridge" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   dck_insert( filename );
@@ -277,10 +278,32 @@ MENU_CALLBACK( menu_media_cartridge_insert )
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK( menu_media_cartridge_eject )
+MENU_CALLBACK( menu_media_cartridge_timexdock_eject )
 {
   WIDGET_END;
   dck_eject();
+}
+
+MENU_CALLBACK( menu_media_cartridge_interfaceii_insert )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Insert Interface II Cartridge" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  if2_insert( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK( menu_media_cartridge_interfaceii_eject )
+{
+  WIDGET_END;
+  if2_eject();
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_insert )

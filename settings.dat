@@ -47,6 +47,7 @@ bw_tv, boolean, 0
 confirm_actions, boolean, 1
 printer, boolean, 0
 statusbar, boolean, 1
+interface2, boolean, 1
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1
@@ -76,6 +77,7 @@ playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
 trdosdisk_file, string, NULL,, trdosdisk
 dck_file, string, NULL,, dock
+if2_file, string, NULL,, if2cart
 
 simpleide_active, boolean, 0,, simpleide
 simpleide_master_file, string, NULL,, simpleide-masterfile

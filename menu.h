@@ -71,8 +71,10 @@ MENU_CALLBACK( menu_media_tape_write );
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert );
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject );
 
-MENU_CALLBACK( menu_media_cartridge_insert );
-MENU_CALLBACK( menu_media_cartridge_eject );
+MENU_CALLBACK( menu_media_cartridge_timexdock_insert );
+MENU_CALLBACK( menu_media_cartridge_timexdock_eject );
+MENU_CALLBACK( menu_media_cartridge_interfaceii_insert );
+MENU_CALLBACK( menu_media_cartridge_interfaceii_eject );
 
 MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_insert );
 MENU_CALLBACK_WITH_ACTION( menu_media_ide_simple8bit_commit );

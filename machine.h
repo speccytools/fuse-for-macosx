@@ -96,7 +96,10 @@ const char* machine_get_id( libspectrum_machine type );
 
 int machine_set_timings( fuse_machine_info *machine );
 
-int machine_load_rom( size_t which, char *filename, size_t expected_length );
+int machine_load_rom_bank( memory_page* bank_map, size_t which,
+			   const char *filename, size_t expected_length );
+int machine_load_rom( size_t which, const char *filename,
+		      size_t expected_length );
 
 int machine_reset( void );
 int machine_end( void );

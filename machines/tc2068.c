@@ -220,7 +220,9 @@ tc2068_reset( void )
   error = machine_load_rom( 2, settings_current.rom_tc2068_1, 0x2000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count, PERIPH_PRESENT_NEVER );
+  error = periph_setup( peripherals, peripherals_count,
+                        PERIPH_PRESENT_OPTIONAL,
+                        PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
   for( i = 0; i < 8; i++ ) {
