@@ -236,6 +236,7 @@ int tape_load_trap( void )
   }
 
   next_block = (libspectrum_tape_block*)(block_ptr->data);
+  libspectrum_tape_init_block( next_block );
 
   /* If this block isn't a ROM loader, start it playing
      Then return with `error' so that we actually do whichever instruction
