@@ -24,6 +24,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = fb ggi gtk sdl svga xlib scaler
+SUBDIRS = @UI@ scaler
 
 noinst_HEADERS = ui.h uidisplay.h options.dat
