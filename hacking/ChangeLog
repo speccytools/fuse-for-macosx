@@ -893,3 +893,4 @@
 20040602 menu_data.c: use proper C comment rather than #if 0/#endif.
 20040602 widget/{menu.c,widget.[ch]}: make Options/Peripherals work.
 20040603 snapshot.c: refactor snapshot_copy_to into multiple functions.
+20040603 snapshot.c: refactor snapshot_copy_from into multiple functions.

@@ -103,43 +103,42 @@ snapshot_read_buffer( const unsigned char *buffer, size_t length,
   return 0;
 }
 
-int
-snapshot_copy_from( libspectrum_snap *snap )
+static int
+try_fallback_machine( libspectrum_machine machine )
 {
-  int i, error;
-  int capabilities;
+  int error;
 
-  libspectrum_machine machine = libspectrum_snap_machine( snap );
+  /* If we failed on a +3 snapshot, try falling back to +2A (in case
+     we were compiled without lib765) */
+  if( machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
 
-  error = machine_select( machine );
-  if( error ) {
-
-    /* If we failed on a +3 snapshot, try falling back to +2A (in case
-       we were compiled without lib765) */
-    if( machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-      error = machine_select( LIBSPECTRUM_MACHINE_PLUS2A );
-      if( error ) {
-	ui_error( UI_ERROR_ERROR,
-		  "Loading a %s snapshot, but neither that nor %s available",
-		  libspectrum_machine_name( machine ),
-		  libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )    );
-	return 1;
-      } else {
-	ui_error( UI_ERROR_WARNING,
-		  "Loading a %s snapshot, but that's not available. "
-		  "Using %s instead",
-		  libspectrum_machine_name( machine ),
-		  libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )  );
-      }
-    } else {			/* Not trying a +3 snapshot */
+    error = machine_select( LIBSPECTRUM_MACHINE_PLUS2A );
+    if( error ) {
       ui_error( UI_ERROR_ERROR,
-		"Loading a %s snapshot, but that's not available",
-		libspectrum_machine_name( machine ) );
+		"Loading a %s snapshot, but neither that nor %s available",
+		libspectrum_machine_name( machine ),
+		libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )    );
+      return 1;
+    } else {
+      ui_error( UI_ERROR_WARNING,
+		"Loading a %s snapshot, but that's not available. "
+		"Using %s instead",
+		libspectrum_machine_name( machine ),
+		libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )  );
     }
+
+  } else {			/* Not trying a +3 snapshot */
+    ui_error( UI_ERROR_ERROR,
+	      "Loading a %s snapshot, but that's not available",
+	      libspectrum_machine_name( machine ) );
   }
+  
+  return 0;
+}
 
-  capabilities = libspectrum_machine_capabilities( machine_current->machine );
-
+static int
+copy_z80_from( libspectrum_snap *snap )
+{
   A  = libspectrum_snap_a ( snap ); F  = libspectrum_snap_f ( snap );
   A_ = libspectrum_snap_a_( snap ); F_ = libspectrum_snap_f_( snap );
 
@@ -156,17 +155,25 @@ snapshot_copy_from( libspectrum_snap *snap )
 
   z80.halted = libspectrum_snap_halted( snap );
 
-  spectrum_ula_write( 0x00fe, libspectrum_snap_out_ula( snap ) );
+  z80.interrupts_enabled_at =
+    libspectrum_snap_last_instruction_ei( snap ) ? tstates : -1;
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
-    ay_registerport_write( 0xfffd,
-			   libspectrum_snap_out_ay_registerport( snap ) );
-    for( i=0; i<16; i++ ) {
-      machine_current->ay.registers[i] =
-	libspectrum_snap_ay_registers( snap, i );
-      sound_ay_write( i, machine_current->ay.registers[i], 0 );
-    }
-  }
+  return 0;
+}
+
+static int
+copy_ula_from( libspectrum_snap *snap )
+{
+  spectrum_ula_write( 0x00fe, libspectrum_snap_out_ula( snap ) );
+  tstates = libspectrum_snap_tstates( snap );
+
+  return 0;
+}
+
+static int
+copy_128k_from( libspectrum_snap *snap, int capabilities )
+{
+  size_t i;
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )
     spec128_memoryport_write( 0x7ffd,
@@ -178,17 +185,29 @@ snapshot_copy_from( libspectrum_snap *snap )
       0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
     );
 
-  if( capabilities & ( LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY |
-      LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY ) )
-    scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
-    scld_dec_write( 0x00ff, libspectrum_snap_out_scld_dec( snap ) );
+    ay_registerport_write( 0xfffd,
+			   libspectrum_snap_out_ay_registerport( snap ) );
 
+    for( i=0; i<16; i++ ) {
+      machine_current->ay.registers[i] =
+	libspectrum_snap_ay_registers( snap, i );
+      sound_ay_write( i, machine_current->ay.registers[i], 0 );
+    }
+
+  }
+
+  return 0;
+}
+
+static int
+copy_betadisk_from( libspectrum_snap *snap, int capabilities )
+{
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) {
 
     trdos_active = libspectrum_snap_beta_paged( snap );
-
+  
     if( trdos_active ) {
       trdos_page();
     } else {
@@ -202,17 +221,29 @@ snapshot_copy_from( libspectrum_snap *snap )
     trdos_sec_write( 0x005f, libspectrum_snap_beta_sector( snap ) );
     trdos_dr_write ( 0x007f, libspectrum_snap_beta_data  ( snap ) );
     trdos_sp_write ( 0x00ff, libspectrum_snap_beta_system( snap ) );
+
   }
 
-  tstates = libspectrum_snap_tstates( snap );
+  return 0;
+}
 
-  z80.interrupts_enabled_at =
-    libspectrum_snap_last_instruction_ei( snap ) ? tstates : -1;
+static int
+copy_ram_from( libspectrum_snap *snap )
+{
+  size_t i;
 
   for( i=0; i<8; i++ ) {
     if( libspectrum_snap_pages( snap, i ) )
       memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
   }
+
+  return 0;
+}
+
+static int
+copy_slt_from( libspectrum_snap *snap )
+{
+  size_t i;
 
   for( i=0; i<256; i++ ) {
 
@@ -245,6 +276,14 @@ snapshot_copy_from( libspectrum_snap *snap )
     slt_screen_level = libspectrum_snap_slt_screen_level( snap );
   }
 
+  return 0;
+}
+
+static int
+copy_zxatasp_from( libspectrum_snap *snap )
+{
+  size_t i;
+
   if( libspectrum_snap_zxatasp_active( snap ) ) {
 
     libspectrum_byte portA, portB, portC, control;
@@ -268,7 +307,15 @@ snapshot_copy_from( libspectrum_snap *snap )
 	memcpy( zxatasp_ram( i ), libspectrum_snap_zxatasp_ram( snap, i ),
 		0x4000 );
   }
-    
+
+  return 0;
+}
+
+static int
+copy_zxcf_from( libspectrum_snap *snap )
+{
+  size_t i;
+
   if( libspectrum_snap_zxcf_active( snap ) ) {
 
     settings_current.zxcf_active = 1;
@@ -281,6 +328,12 @@ snapshot_copy_from( libspectrum_snap *snap )
 	memcpy( zxcf_ram( i ), libspectrum_snap_zxcf_ram( snap, i ), 0x4000 );
   }
   
+  return 0;
+}
+
+static int
+copy_if2_from( libspectrum_snap *snap )
+{
   if( libspectrum_snap_interface2_active( snap ) ) {
 
     if2_active = 1;
@@ -312,6 +365,21 @@ snapshot_copy_from( libspectrum_snap *snap )
 
     machine_current->memory_map();
   }
+
+  return 0;
+}
+
+static int
+copy_timex_from( libspectrum_snap *snap, int capabilities )
+{
+  size_t i;
+
+  if( capabilities & ( LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY |
+      LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY ) )
+    scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
+    scld_dec_write( 0x00ff, libspectrum_snap_out_scld_dec( snap ) );
 
   if( libspectrum_snap_dock_active( snap ) ) {
 
@@ -366,6 +434,35 @@ snapshot_copy_from( libspectrum_snap *snap )
 
     machine_current->memory_map();
   }
+
+  return 0;
+}
+
+int
+snapshot_copy_from( libspectrum_snap *snap )
+{
+  int capabilities, error;
+  libspectrum_machine machine;
+
+  machine = libspectrum_snap_machine( snap );
+
+  error = machine_select( machine );
+  if( error ) {
+    error = try_fallback_machine( machine ); if( error ) return error;
+  }
+
+  capabilities = machine_current->capabilities;
+
+  error = copy_z80_from( snap ); if( error ) return error;
+  error = copy_ula_from( snap ); if( error ) return error;
+  error = copy_128k_from( snap, capabilities ); if( error ) return error;
+  error = copy_betadisk_from( snap, capabilities ); if( error ) return error;
+  error = copy_ram_from( snap ); if( error ) return error;
+  error = copy_slt_from( snap ); if( error ) return error;
+  error = copy_zxatasp_from( snap ); if( error ) return error;
+  error = copy_zxcf_from( snap ); if( error ) return error;
+  error = copy_if2_from( snap ); if( error ) return error;
+  error = copy_timex_from( snap, capabilities ); if( error ) return error;
 
   return 0;
 }
