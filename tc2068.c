@@ -41,6 +41,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "printer.h"
+#include "scld.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "tc2068.h"
