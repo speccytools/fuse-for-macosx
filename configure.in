@@ -370,7 +370,7 @@ if test "$stick" = yes; then
     AC_CHECK_HEADERS(jsw.h,
                      LIBS="$LIBS -ljsw";
 		     AC_DEFINE([USE_JOYSTICK], 1,
-		               [Defined if we're using hardware joysticks])
+		               [Defined if we're using hardware joysticks]),
                      AC_MSG_WARN(jsw.h not found - joystick support disabled))
   fi
 fi

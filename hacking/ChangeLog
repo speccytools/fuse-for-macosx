@@ -982,3 +982,4 @@
 	 z80/z80.[ch]: make some variables static and/or const where
 	 appropriate (Darren).
 20040704 timer.c: add calibration for the setitimer() routines (Darren).
+20040705 configure.in: add missing comma.
