@@ -68,7 +68,7 @@ static BYTE specplus3_fdc_status( WORD port );
 static BYTE specplus3_fdc_read( WORD port );
 static void specplus3_fdc_write( WORD port, BYTE data );
 
-void specplus3_fdc_error( int debug, char *format, ... );
+void specplus3_fdc_error( int debug, char *format, va_list ap );
 #endif			/* #ifdef HAVE_765_H */
 
 static int specplus3_shutdown( void );
@@ -378,16 +378,12 @@ specplus3_fdc_write( WORD port GCC_UNUSED, BYTE data )
 
 /* Used as lib765's `print an error message' callback */
 void
-specplus3_fdc_error( int debug, char *format, ... )
+specplus3_fdc_error( int debug, char *format, va_list ap )
 {
-  va_list ap;
-
   /* Report only serious errors */
   if( debug != 0 ) return;
 
-  va_start( ap, format );
   ui_verror( UI_ERROR_ERROR, format, ap );
-  va_end( ap );
 }
 
 int
