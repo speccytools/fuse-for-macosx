@@ -33,7 +33,9 @@ fuse_SOURCES = ay.c display.c event.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus2a.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c
-fuse_DEPENDENCIES = @UI_LIBS@
+
+fuse_DEPENDENCIES = @UI_LIBS@ debugger/libdebugger.a widget/libwidget.a \
+                    z80/libz80.a
 
 BUILT_SOURCES = settings.c settings.h
 
