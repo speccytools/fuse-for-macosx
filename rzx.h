@@ -31,8 +31,8 @@
 #include "libspectrum/rzx.h"
 #endif			/* #ifndef LIBSPECTRUM_RZX_H */
 
-/* The count of instruction fetches needed for .rzx files */
-extern size_t rzx_instructions;
+/* The offset used to get the count of instructions from the R register */
+extern size_t rzx_instructions_offset;
 
 /* Are we currently recording a .rzx file? */
 extern int rzx_recording;

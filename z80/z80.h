@@ -1,5 +1,5 @@
 /* z80.h: z80 emulation core
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
 
@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -46,7 +46,10 @@ typedef struct {
   regpair af,bc,de,hl;
   regpair af_,bc_,de_,hl_;
   regpair ix,iy;
-  BYTE i,r,r7; /* r is the lower 7 bits of R; r7 is the high bit */
+  BYTE i;
+  WORD r;		/* The low seven bits of the R register. 16 bits long
+			   so it can also act as an RZX instruction counter */
+  BYTE r7;		/* The high bit of the R register */
   regpair sp,pc;
   BYTE iff1,iff2,im;
   int halted;

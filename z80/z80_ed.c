@@ -1,5 +1,5 @@
 /* z80_ed.c: z80 EDxx opcodes
-   Copyright (c) 1999,2002 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
 
@@ -103,6 +103,10 @@ break;
 
 case 0x4f:	/* LD R,A */
 tstates += 1;
+
+/* Keep the RZX instruction counter right */
+rzx_instructions_offset += ( R - A );
+
 R=R7=A;
 break;
 

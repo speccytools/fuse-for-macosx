@@ -42,10 +42,12 @@
 #include "types.h"
 #include "ui/ui.h"
 #include "utils.h"
+#include "z80/z80.h"
 #include "z80/z80_macros.h"
 
-/* The count of instruction fetches needed for .rzx files */
-size_t rzx_instructions;
+/* The offset used to get the count of instructions from the R register;
+   (instruction count) = R + rzx_instructions_offset */
+size_t rzx_instructions_offset;
 
 /* Are we currently recording a .rzx file? */
 int rzx_recording;
@@ -64,6 +66,7 @@ libspectrum_rzx rzx;
 
 static int recording_frame( void );
 static int playback_frame( void );
+static int counter_reset( void );
 
 int rzx_init( void )
 {
@@ -90,7 +93,7 @@ int rzx_start_recording( const char *filename )
   if( error ) return error;
 
   /* Start the count of instruction fetches here */
-  rzx_instructions = 0;
+  counter_reset();
 
   /* Store the filename */
   rzx_filename = strdup( filename );
@@ -165,7 +168,8 @@ int rzx_start_playback( const char *filename )
 
   /* We're now playing this RZX file */
   rzx_playback = 1;
-  rzx_current_frame = 0; rzx_instructions = 0;
+  rzx_current_frame = 0;
+  counter_reset();
 
   return 0;
 }
@@ -208,11 +212,12 @@ static int recording_frame( void )
   for( i=0; i<8; i++ )
     keyboard[i] = keyboard_default_value & keyboard_return_values[i];
 
-  error = libspectrum_rzx_frame( &rzx, rzx_instructions, keyboard );
+  error = libspectrum_rzx_frame( &rzx, R + rzx_instructions_offset,
+				 keyboard );
   if( error ) return error;
 
   /* Reset the instruction counter */
-  rzx_instructions = 0;
+  counter_reset();
 
   return 0;
 }
@@ -226,8 +231,17 @@ static int playback_frame( void )
   }
 
   /* If we've got more frame to do, just reset the count and continue */
-  rzx_instructions = 0;
+  counter_reset();
 
+  return 0;
+}
+
+/* Reset the RZX instruction counter; also, take this opportunity to
+   normalise the R register */
+static int counter_reset( void )
+{
+  R &= ~0x7f;		/* Clear all but the 7 lowest bits of the R register */
+  rzx_instructions_offset = -R; /* Gives us a zero count */
   return 0;
 }
 

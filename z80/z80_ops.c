@@ -19,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -55,13 +55,16 @@ void z80_do_opcodes()
 
     /* If we're due an interrupt from RZX playback, generate one */
     if( rzx_playback &&
-	rzx_instructions >= rzx.frames[ rzx_current_frame ].instructions ) {
+	( R + rzx_instructions_offset >=
+	  rzx.frames[ rzx_current_frame ].instructions
+        )
+      ) {
       event_add( tstates, EVENT_TYPE_INTERRUPT );
       break;		/* And break out of the execution loop to let
 			   the interrupt happen */
     }
 
-    R++; rzx_instructions++;
+    R++;
 
     /* If the z80 is HALTed, execute a NOP-equivalent and loop again */
     if(z80.halted) {
@@ -849,7 +852,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 );
 	opcode2 = readbyte(PC++);
-	R++; rzx_instructions++;
+	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #include "z80_cb.c"
@@ -954,7 +957,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 );
 	opcode2 = readbyte(PC++);
-	R++; rzx_instructions++;
+	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #define REGISTER  IX
@@ -1048,7 +1051,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 );
 	opcode2 = readbyte(PC++);
-	R++; rzx_instructions++;
+	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #include "z80_ed.c"
@@ -1130,7 +1133,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 ); 
 	opcode2 = readbyte(PC++);
-	R++; rzx_instructions++;
+	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #define REGISTER  IY

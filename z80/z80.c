@@ -108,7 +108,7 @@ void z80_interrupt()
 
     writebyte( --SP, PCH ); writebyte( --SP, PCL );
 
-    R++; rzx_instructions++;
+    R++;
 
     switch(IM) {
       case 0: if( scld_intdisable ) break; PC = 0x0038; tstates+=12; break;
