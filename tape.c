@@ -484,6 +484,7 @@ int trap_check_rom( void )
 
   case LIBSPECTRUM_MACHINE_PLUS2A:
   case LIBSPECTRUM_MACHINE_PLUS3:
+  case LIBSPECTRUM_MACHINE_PLUS3E:
     /* OK if we're not in a 64Kb RAM configuration and we're in
        ROM 3 */
     return( ! machine_current->ram.special &&
@@ -494,13 +495,14 @@ int trap_check_rom( void )
     /* OK if we're in ROM 1  and TRDOS is not active */
     return( machine_current->ram.current_rom == 1 && !trdos_active );
 
-  default:
-    ui_error( UI_ERROR_ERROR, "Unknown machine type %d\n",
-	      machine_current->machine );
-    abort();
+  case LIBSPECTRUM_MACHINE_UNKNOWN:	/* should never happen */
+    ui_error( UI_ERROR_ERROR,
+	      "trap_check_rom: machine type is LIBSPECTRUM_MACHINE_UNKNOWN" );
+    fuse_abort();
+
   }
 
-  ui_error( UI_ERROR_ERROR, "Impossible machine type %d",
+  ui_error( UI_ERROR_ERROR, "trap_check_rom: unknown machine type %d",
 	    machine_current->machine );
   fuse_abort();
   return 0; /* Keep gcc happy */
