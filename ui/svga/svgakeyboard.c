@@ -97,7 +97,12 @@ static void svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F3:
     fuse_emulation_pause();
-    widget_apply_to_file( snapshot_read );
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+    if( widget_filesel_name ) {
+      utils_open_file( widget_filesel_name, settings_current.auto_load, NULL );
+      free( widget_filesel_name );
+      display_refresh_all();
+    }
     fuse_emulation_unpause();
     break;
   case SCANCODE_F4:

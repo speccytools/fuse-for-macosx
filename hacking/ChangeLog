@@ -253,3 +253,5 @@
 	 now only one place at which each type of file is opened.
 20031008 configure.in: correct joystick code detection if libjsw not
 	 present.
+20031008 ui/svga/svgakeyboard.c: F3 should open all files, not just
+	 snapshots.
