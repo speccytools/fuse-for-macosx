@@ -194,11 +194,10 @@ int rzx_stop_recording( void )
   );
 
   length = 0;
-  libspec_error =
-    libspectrum_rzx_write( &buffer, &length, rzx, rzx_snap, fuse_creator,
-			   settings_current.rzx_compression,
-			   rzx_competition_mode ? &rzx_key : NULL
-			 );
+  libspec_error = libspectrum_rzx_write2(
+    &buffer, &length, rzx, rzx_snap, LIBSPECTRUM_ID_UNKNOWN, fuse_creator,
+    settings_current.rzx_compression, rzx_competition_mode ? &rzx_key : NULL
+  );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     libspectrum_rzx_free( rzx );
     if( rzx_snap ) libspectrum_snap_free( rzx_snap );

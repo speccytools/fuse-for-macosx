@@ -971,3 +971,5 @@
 20040703 settings.dat,man/fuse.1,ui/options.dat,widget/menu.c: allow
 	 selection between .szx and .z80 for snaps saved by the widget
 	 UIs.
+20040703 rzx.c: use libspectrum's new ability to select the embedded snap
+	 format.
