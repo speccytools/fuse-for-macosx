@@ -78,8 +78,7 @@ size_t rzx_instruction_count;
 libspectrum_rzx *rzx;
 
 /* The information to be used as the creator in the RZX file */
-static const char *rzx_creator = "Fuse";
-static libspectrum_word rzx_major_version, rzx_minor_version;
+static libspectrum_creator *creator;
 
 static int start_playback( libspectrum_rzx *rzx, libspectrum_snap *snap );
 static int recording_frame( void );
@@ -92,22 +91,32 @@ int rzx_init( void )
   int i;
   libspectrum_error error;
 
+  sscanf( VERSION, "%u.%u.%u.%u",
+	  &version[0], &version[1], &version[2], &version[3] );
+
+  for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
+
+  error = libspectrum_creator_alloc( &creator ); if( error ) return error;
+
+  error = libspectrum_creator_set_program( creator, "Fuse" );
+  if( error ) { libspectrum_creator_free( creator ); return error; }
+
+  error = libspectrum_creator_set_major( creator,
+					 version[0] * 0x100 + version[1] );
+  if( error ) { libspectrum_creator_free( creator ); return error; }
+
+  error = libspectrum_creator_set_minor( creator,
+					 version[2] * 0x100 + version[3] );
+  if( error ) { libspectrum_creator_free( creator ); return error; }
+
   error = libspectrum_rzx_alloc( &rzx );
-  if( error ) return 1;
+  if( error ) { libspectrum_creator_free( creator ); return error; }
 
   rzx_recording = rzx_playback = 0;
 
   rzx_in_bytes = NULL;
   rzx_in_allocated = 0;
   rzx_snap = NULL;
-
-  sscanf( VERSION, "%u.%u.%u.%u",
-	  &version[0], &version[1], &version[2], &version[3] );
-
-  for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
-
-  rzx_major_version = version[0] * 0x100 + version[1];
-  rzx_minor_version = version[2] * 0x100 + version[3];
 
   return 0;
 }
@@ -161,8 +170,7 @@ int rzx_stop_recording( void )
 
   length = 0;
   libspec_error = libspectrum_rzx_write( &buffer, &length,
-					 rzx, rzx_snap, rzx_creator,
-					 rzx_major_version, rzx_minor_version,
+					 rzx, rzx_snap, creator,
 					 settings_current.rzx_compression );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     libspectrum_rzx_free( rzx );
@@ -383,5 +391,9 @@ int rzx_end( void )
 {
   if( rzx_recording ) return rzx_stop_recording();
   if( rzx_playback  ) return rzx_stop_playback( 0 );
+
+  libspectrum_rzx_free( rzx );
+  libspectrum_creator_free( creator );
+
   return 0;
 }
