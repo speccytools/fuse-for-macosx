@@ -223,6 +223,7 @@ static int
 parse_xml( xmlDocPtr doc, settings_info *settings )
 {
   xmlNodePtr node;
+  const char *string;
 
   node = xmlDocGetRootElement( doc );
   if( xmlStrcmp( node->name, (const xmlChar*)"settings" ) ) {
@@ -251,7 +252,8 @@ CODE
 
 	    print << "CODE";
     if( !strcmp( node->name, (const xmlChar*)"$options{$name}->{configfile}" ) ) {
-      settings->$name = strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+      string = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
+      settings->$name = string ? strdup( string ) : NULL;
     } else
 CODE
 
