@@ -58,16 +58,6 @@ ui_init( int *argc, char ***argv )
   if ( error )
     return error;
 
-  scaler_register_clear();
-
-  scaler_register( SCALER_NORMAL );
-  scaler_register( SCALER_DOUBLESIZE );
-  scaler_register( SCALER_TRIPLESIZE );
-  scaler_register( SCALER_2XSAI );
-  scaler_register( SCALER_SUPER2XSAI );
-  scaler_register( SCALER_SUPEREAGLE );
-  scaler_register( SCALER_ADVMAME2X );
-
   return 0;
 }
 
