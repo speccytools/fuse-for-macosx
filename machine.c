@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <settings.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -164,6 +165,13 @@ machine_get_id( libspectrum_machine type )
 static int machine_select_machine( fuse_machine_info *machine )
 {
   machine_current = machine;
+
+  if( settings_current.start_machine ) free( settings_current.start_machine );
+  settings_current.start_machine = strdup( machine_current->id );
+  if( !settings_current.start_machine ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
 
   tstates = 0;
 
