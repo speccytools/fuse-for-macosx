@@ -53,6 +53,12 @@ CVS tags for Fuse
 | Release-0_5_0-trunk
 |
 +-\					Branch for the 0.5.0 release
+| | Release-0_5_0pre3
+| | Release-0_5_0
+| | Release-0_5_0-branch-1		Changes merged to trunk at
+| |                                     Release-0_5_0-merge-1
 | | Release-0_5_0-branch
 |
+| Release-0_5_0-merge-1			Merged from
+|                                       Release-0_5_0-branch-1
 HEAD

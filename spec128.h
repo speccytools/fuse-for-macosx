@@ -42,7 +42,7 @@ void spec128_writebyte(WORD address, BYTE b);
 DWORD spec128_contend_memory( WORD address );
 DWORD spec128_contend_port( WORD port );
 
-int spec128_init( machine_info *machine );
+int spec128_init( fuse_machine_info *machine );
 int spec128_reset(void);
 
 void spec128_memoryport_write(WORD port, BYTE b);

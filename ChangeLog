@@ -1,3 +1,41 @@
+2002-08-22  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Version 0.5.0 released
+
+	* Support for RZX v0.12 (Recording/playback code by Philip
+	  Kendall, file support by Darren Salt and Philip Kendall).
+
+	* +3 support using John Elliott's lib765 and libdsk libraries
+	  (Darren Salt/Philip Kendall).
+
+	* TC2048 support (Fredrick Meunier).
+
+	* Z80 core fixes: timing of OTDR and interrupt routines,
+	  R register during interrupt and HALT and contention of
+	  LD (nnnn),A (Philip Kendall, with thanks to Mark Woodmass
+	  and Boris Donko).
+
+	* Sound improvements: add beeper pseudo stereo and remove
+	  beeper fade out (Russell Marks).
+
+	* Add two new utilities for dealing with RZX files: rzxdump(1) and
+	  rzxtool(1) (Philip Kendall).
+
+	* Support for TZX raw data blocks (Darren Salt).
+
+	* Patches to make Fuse compile and run on OS X. You'll need the
+	  latest version of the auto* tools, XFree86 and GTK+ 1.2
+	  installed (Fredrick Meunier).
+
+	* Add an explanation of Fuse's main emulation loop and events
+	  system to hacking/implementation_notes.txt
+
+	* Add optional use of 640x480 mode with the SVGAlib UI (Darren
+	  Salt/Philip Kendall).
+
+	* Lots of other minor bugfixes (Darren Salt, Russell Marks,
+	  Philip Kendall and probably some other people as well).
+
 2002-03-26  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.4.2 released

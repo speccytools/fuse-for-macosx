@@ -38,7 +38,7 @@ void spec48_writebyte(WORD address, BYTE b);
 DWORD spec48_contend_memory( WORD address );
 DWORD spec48_contend_port( WORD port );
 
-int spec48_init( machine_info *machine );
+int spec48_init( fuse_machine_info *machine );
 int spec48_reset(void);
 
 #endif			/* #ifndef FUSE_SPEC48_H */

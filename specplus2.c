@@ -34,7 +34,7 @@
 
 /* The +2 emulation just uses the 128K routines */
 
-int specplus2_init( machine_info *machine )
+int specplus2_init( fuse_machine_info *machine )
 {
   int error;
 

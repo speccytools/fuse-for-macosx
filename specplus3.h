@@ -51,7 +51,7 @@ void specplus3_writebyte(WORD address, BYTE b);
 DWORD specplus3_contend_memory( WORD address );
 DWORD specplus3_contend_port( WORD address );
 
-int specplus3_init( machine_info *machine );
+int specplus3_init( fuse_machine_info *machine );
 int specplus3_reset(void);
 
 void specplus3_memoryport_write(WORD port, BYTE b);

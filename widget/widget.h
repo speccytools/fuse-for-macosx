@@ -28,6 +28,7 @@
 #define FUSE_WIDGET_H
 
 #ifndef _DIRENT_H
+#include <sys/types.h>
 #include <dirent.h>
 #endif				/* #ifndef _DIRENT_H */
 

@@ -167,7 +167,7 @@ static DWORD tc2048_contend_delay( void )
   return 0;	/* Shut gcc up */
 }
 
-int tc2048_init( machine_info *machine )
+int tc2048_init( fuse_machine_info *machine )
 {
   int error;
 

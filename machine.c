@@ -53,16 +53,16 @@
 
 #define PATHNAME_MAX_LENGTH 1024
 
-machine_info **machine_types = NULL; /* Array of available machines */
+fuse_machine_info **machine_types = NULL; /* Array of available machines */
 int machine_count = 0;
 
-machine_info *machine_current = NULL; /* The currently selected machine */
+fuse_machine_info *machine_current = NULL; /* The currently selected machine */
 static int machine_location;	/* Where is the current machine in
 				   machine_types[...]? */
 
-static int machine_add_machine( int (*init_function)(machine_info *machine) );
-static int machine_select_machine( machine_info *machine );
-static int machine_free_machine( machine_info *machine );
+static int machine_add_machine( int (*init_function)(fuse_machine_info *machine) );
+static int machine_select_machine( fuse_machine_info *machine );
+static int machine_free_machine( fuse_machine_info *machine );
 
 int machine_init_machines( void )
 {
@@ -90,22 +90,22 @@ int machine_init_machines( void )
   return 0;
 }
 
-static int machine_add_machine( int (*init_function)( machine_info *machine ) )
+static int machine_add_machine( int (*init_function)( fuse_machine_info *machine ) )
 {
   int error;
 
   machine_count++;
 
   machine_types = 
-    (machine_info**)realloc( machine_types, 
-			     machine_count * sizeof( machine_info* ) );
+    (fuse_machine_info**)realloc( machine_types, 
+			     machine_count * sizeof( fuse_machine_info* ) );
   if( machine_types == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
   machine_types[ machine_count - 1 ] =
-    (machine_info*)malloc( sizeof( machine_info ) );
+    (fuse_machine_info*)malloc( sizeof( fuse_machine_info ) );
   if( machine_types[ machine_count - 1 ] == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
@@ -151,7 +151,7 @@ int machine_select_id( const char *id )
   return 1;
 }
 
-static int machine_select_machine( machine_info *machine )
+static int machine_select_machine( fuse_machine_info *machine )
 {
   machine_current = machine;
 
@@ -180,7 +180,7 @@ static int machine_select_machine( machine_info *machine )
   return 0;
 }
 
-void machine_set_timings( machine_info *machine, DWORD hz,
+void machine_set_timings( fuse_machine_info *machine, DWORD hz,
 			  WORD left_border_cycles,  WORD screen_cycles,
 			  WORD right_border_cycles, WORD retrace_cycles,
 			  WORD lines_per_frame, DWORD first_line)
@@ -213,7 +213,7 @@ void machine_set_timings( machine_info *machine, DWORD hz,
 
 }
 
-int machine_allocate_roms( machine_info *machine, size_t count )
+int machine_allocate_roms( fuse_machine_info *machine, size_t count )
 {
   machine->rom_count = count;
 
@@ -233,7 +233,7 @@ int machine_allocate_roms( machine_info *machine, size_t count )
   return 0;
 }
 
-int machine_read_rom( machine_info *machine, size_t number,
+int machine_read_rom( fuse_machine_info *machine, size_t number,
 		      const char* filename )
 {
   int fd;
@@ -301,7 +301,7 @@ int machine_end( void )
   return 0;
 }
 
-static int machine_free_machine( machine_info *machine )
+static int machine_free_machine( fuse_machine_info *machine )
 {
   size_t i;
 

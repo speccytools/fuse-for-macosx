@@ -65,7 +65,7 @@ typedef struct machine_timings {
 
 typedef BYTE (*spectrum_unattached_port_fn)( void );
 
-typedef struct machine_info {
+typedef struct fuse_machine_info {
 
   int machine;		/* which machine type is this? */
   const char *description; /* Textual description of this machine */
@@ -95,25 +95,25 @@ typedef struct machine_info {
 
   int (*shutdown)( void );
 
-} machine_info;
+} fuse_machine_info;
 
-extern machine_info **machine_types;	/* All available machines */
+extern fuse_machine_info **machine_types;	/* All available machines */
 extern int machine_count;		/* of which there are this many */
 
-extern machine_info *machine_current;	/* The currently selected machine */
+extern fuse_machine_info *machine_current;	/* The currently selected machine */
 
 int machine_init_machines( void );
 
 int machine_select( int type );
 int machine_select_id( const char *id );
 
-void machine_set_timings( machine_info *machine, DWORD hz,
+void machine_set_timings( fuse_machine_info *machine, DWORD hz,
 			  WORD left_border_cycles,  WORD screen_cycles,
 			  WORD right_border_cycles, WORD retrace_cycles,
 			  WORD lines_per_frame, DWORD first_line);
 
-int machine_allocate_roms( machine_info *machine, size_t count );
-int machine_read_rom( machine_info *machine, size_t number,
+int machine_allocate_roms( fuse_machine_info *machine, size_t count );
+int machine_read_rom( fuse_machine_info *machine, size_t number,
 		      const char* filename );
 int machine_find_rom( const char *filename );
 

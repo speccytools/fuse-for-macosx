@@ -158,7 +158,7 @@ static DWORD spec128_contend_delay( void )
   return 0;	/* Shut gcc up */
 }
 
-int spec128_init( machine_info *machine )
+int spec128_init( fuse_machine_info *machine )
 {
   int error;
 

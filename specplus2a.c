@@ -56,7 +56,7 @@ specplus2a_peripherals[] = {
 };
 
 int
-specplus2a_init( machine_info *machine )
+specplus2a_init( fuse_machine_info *machine )
 {
   int error;
 

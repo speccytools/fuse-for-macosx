@@ -27,6 +27,7 @@
 #include <config.h>
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "display.h"
 #include "event.h"
@@ -116,6 +117,10 @@ static int fuse_init(int argc, char **argv)
   if( widget_init() ) return 1;
 
   if(display_init(&argc,&argv)) return 1;
+
+  /* Drop root privs if we have them */
+  if( !geteuid() ) { setuid( getuid() ); }
+
   if(event_init()) return 1;
   
   if( printer_init() ) return 1;

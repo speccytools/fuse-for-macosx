@@ -156,7 +156,7 @@ static DWORD spec48_contend_delay( void )
   return 0;	/* Shut gcc up */
 }
 
-int spec48_init( machine_info *machine )
+int spec48_init( fuse_machine_info *machine )
 {
   int error;
 

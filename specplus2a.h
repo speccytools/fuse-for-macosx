@@ -31,7 +31,7 @@
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
-int specplus2a_init( machine_info *machine );
+int specplus2a_init( fuse_machine_info *machine );
 int specplus2a_reset(void);
 
 void specplus2a_memoryport_write(WORD port, BYTE b);

@@ -276,7 +276,7 @@ static DWORD specplus3_contend_delay( void )
   return 0;	/* Shut gcc up */
 }
 
-int specplus3_init( machine_info *machine )
+int specplus3_init( fuse_machine_info *machine )
 {
   int error;
 #ifdef HAVE_765_H
