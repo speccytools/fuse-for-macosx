@@ -227,8 +227,6 @@ static widget_menu_entry widget_menu_roms[] = {
 
 /* Machine menu */
 
-static widget_menu_widget_t machine_sel = { WIDGET_TYPE_SELECT, NULL };
-
 static widget_menu_entry widget_menu_machine[] = {
   { "Machine", 0, 0, NULL },		/* Menu title */
 
