@@ -79,7 +79,7 @@ static int sound_framesiz;
 
 static int sound_channels;
 
-static unsigned char ay_tone_levels[16];
+static unsigned int ay_tone_levels[16];
 
 static unsigned char *sound_buf,*tape_buf;
 
@@ -139,7 +139,7 @@ int f;
 
 /* scale the values down to fit */
 for(f=0;f<16;f++)
-  ay_tone_levels[f]=(levels[f]*AMPL_AY_TONE+0x8000)/0xffff;
+  ay_tone_levels[f]=((unsigned long)levels[f]*AMPL_AY_TONE+0x80)/0xff;
 
 ay_noise_tick=ay_noise_period=0;
 ay_env_internal_tick=ay_env_tick=ay_env_period=0;
@@ -542,7 +542,7 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
   if(!sound_stereo)
     {
     /* mono */
-    (*ptr++)+=chan1+chan2+chan3;
+    (*ptr++)+=(chan1+chan2+chan3)>>8;
     }
   else
     {
@@ -551,8 +551,8 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
       /* stereo output, but mono AY sound; still,
        * incr separately in case of beeper pseudostereo.
        */
-      (*ptr++)+=chan1+chan2+chan3;
-      (*ptr++)+=chan1+chan2+chan3;
+      (*ptr++)+=(chan1+chan2+chan3)>>8;
+      (*ptr++)+=(chan1+chan2+chan3)>>8;
       }
     else
       {
@@ -566,8 +566,8 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
       GEN_STEREO(rchan1pos,chan1);
       GEN_STEREO(rchan2pos,chan2);
       GEN_STEREO(rchan3pos,chan3);
-      (*ptr++)+=rstereobuf_l[rstereopos];
-      (*ptr++)+=rstereobuf_r[rstereopos];
+      (*ptr++)+=rstereobuf_l[rstereopos] >> 8;
+      (*ptr++)+=rstereobuf_r[rstereopos] >> 8;
       rstereobuf_l[rstereopos]=rstereobuf_r[rstereopos]=0;
       rstereopos++;
       if(rstereopos>=STEREO_BUF_SIZE)
