@@ -163,6 +163,21 @@ tape_select_block( size_t n )
   return 0;
 }
 
+/* Which block is current? */
+int
+tape_get_current_block( void )
+{
+  GSList *block; int n;
+
+  if( !tape->blocks ) return -1;
+
+  for( block = tape->blocks, n = 0; block; block = block->next, n++ ) {
+    if( block == tape->current_block ) return n;
+  }
+
+  return -1;
+}
+
 /* Write the current in-memory tape file out to disk */
 int tape_write( const char* filename )
 {

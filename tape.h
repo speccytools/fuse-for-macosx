@@ -36,6 +36,7 @@ int tape_init( void );
 int tape_open( const char *filename );
 int tape_close( void );
 int tape_select_block( size_t n );
+int tape_get_current_block( void );
 int tape_write( const char *filename );
 
 int tape_load_trap( void );

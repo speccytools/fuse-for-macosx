@@ -61,7 +61,8 @@ widget_browse_draw( void *data GCC_UNUSED )
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Browse Tape" );
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16, DISPLAY_BORDER_HEIGHT + 23 );
 
-  top_line = 0; highlight = 0;
+  highlight = tape_get_current_block();
+  top_line = highlight - 8; if( top_line < 0 ) top_line = 0;
 
   show_blocks();
 
@@ -72,6 +73,8 @@ static void
 show_blocks( void )
 {
   int i; char buffer[30];
+
+  widget_rectangle( 2*8, 4*8, 28*8, 18*8, WIDGET_COLOUR_BACKGROUND );
 
   for( i=0; i<18 && top_line+i<blocks; i++ ) {
     snprintf( buffer, 29, "%2lu: %s", (unsigned long)(top_line+i+1),
@@ -103,18 +106,51 @@ widget_browse_keyhandler( keyboard_key_name key )
 
   case KEYBOARD_6:
   case KEYBOARD_j:
-    if( highlight < blocks - 1 ) highlight++;
-    if( highlight >= top_line + 18 ) { top_line += 18; show_blocks(); }
+    if( highlight < blocks - 1 ) {
+      highlight++;
+      if( highlight >= top_line + 18 ) top_line += 18;
+      show_blocks();
+    }
     break;
     
   case KEYBOARD_7:
   case KEYBOARD_k:
-    if( highlight > 0 ) highlight--;
-    if( highlight < top_line ) {
-      top_line -= 18;
-      if( top_line < 0 ) top_line = 0;
+    if( highlight > 0 ) { 
+      highlight--;
+      if( highlight < top_line )
+	{
+	  top_line -= 18;
+	  if( top_line < 0 ) top_line = 0;
+	}
       show_blocks();
     }
+    break;
+
+  case KEYBOARD_PageUp:
+    highlight -= 18; if( highlight < 0 ) highlight = 0;
+    top_line  -= 18; if( top_line  < 0 ) top_line = 0;
+    show_blocks();
+    break;
+
+  case KEYBOARD_PageDown:
+    highlight += 18; if( highlight >= blocks ) highlight = blocks - 1;
+    top_line  += 18;
+    if( top_line  >= blocks ) {
+      top_line = blocks - 18;
+      if( top_line < 0 ) top_line = 0;
+    }
+    show_blocks();
+    break;
+
+  case KEYBOARD_Home:
+    highlight = top_line = 0;
+    show_blocks();
+    break;
+
+  case KEYBOARD_End:
+    highlight = blocks - 1;
+    top_line = blocks - 18; if( top_line < 0 ) top_line = 0;
+    show_blocks();
     break;
 
   case KEYBOARD_Enter:
@@ -132,7 +168,10 @@ widget_browse_finish( widget_finish_state finished )
 {
   tape_free_block_list( block_descriptions, blocks );
 
-  if( finished == WIDGET_FINISHED_OK ) widget_end_all( WIDGET_FINISHED_OK );
+  if( finished == WIDGET_FINISHED_OK ) {
+    tape_select_block( highlight );
+    widget_end_all( WIDGET_FINISHED_OK );
+  }
     
   return 0;
 }
