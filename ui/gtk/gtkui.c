@@ -74,6 +74,7 @@ static void gtkui_save(GtkWidget *widget, gpointer data);
 static void gtkui_rzx_start( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
+static int gtkui_open_snap( void );
 
 static void gtkui_quit(GtkWidget *widget, gpointer data);
 static void gtkui_reset(GtkWidget *widget, gpointer data);
@@ -350,30 +351,36 @@ static void gtkui_rzx_stop( GtkWidget *widget, gpointer data )
 /* Called when File/Recording/Play selected */
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data )
 {
-  char *snapshot, *recording;
+  char *recording;
 
   if( rzx_playback || rzx_recording ) return;
 
   fuse_emulation_pause();
 
-  snapshot = gtkui_fileselector_get_filename( "Fuse - Replay Snapshot" );
-  if( !snapshot ) { fuse_emulation_unpause(); return; }
-  
   recording = gtkui_fileselector_get_filename( "Fuse - Start Replay" );
-  if( !recording ) { free( snapshot ); fuse_emulation_unpause(); return; }
+  if( !recording ) { fuse_emulation_unpause(); return; }
 
-  if( snapshot_read( snapshot ) ) {
-    free( snapshot ); free( recording );
-    return;
-  }
+  rzx_start_playback( recording, gtkui_open_snap );
 
-  rzx_start_playback( recording );
-
-  free( snapshot ); free( recording );
+  free( recording );
 
   display_refresh_all();
 
   fuse_emulation_unpause();
+}
+
+static int
+gtkui_open_snap( void )
+{
+  char *filename;
+  int error;
+
+  filename = gtkui_fileselector_get_filename( "Fuse - Load Snapshot" );
+  if( !filename ) return -1;
+
+  error = snapshot_read( filename );
+  free( filename );
+  return error;
 }
 
 /* Called by the menu when File/Exit selected */
