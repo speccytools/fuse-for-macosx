@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -30,4 +30,15 @@ libz80_a_SOURCES = z80.c z80_ops.c
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
-noinst_HEADERS = z80.h z80_cb.c z80_ddfd.c z80_ddfdcb.c z80_ed.c z80_macros.h 
+opcodes_base.c: z80.pl opcodes_base.dat
+	@PERL@ z80.pl opcodes_base.dat > opcodes_base.c
+
+noinst_HEADERS = opcodes_base.c \
+		 z80.h \
+		 z80_cb.c \
+		 z80_ddfd.c \
+		 z80_ddfdcb.c \
+		 z80_ed.c \
+		 z80_macros.h 
+
+EXTRA_DIST = opcodes_base.dat
