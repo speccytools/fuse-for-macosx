@@ -85,7 +85,10 @@ typedef struct machine_info {
 
 } machine_info;
 
-extern machine_info *machine_current;
+extern machine_info **machine_types;	/* All available machines */
+extern int machine_count;		/* of which there are this many */
+
+extern machine_info *machine_current;	/* The currently selected machine */
 
 int machine_init_machines( void );
 

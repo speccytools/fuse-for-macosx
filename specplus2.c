@@ -38,7 +38,7 @@ int specplus2_init( machine_info *machine )
 {
   int error;
 
-  machine->machine = SPECTRUM_MACHINE_128;
+  machine->machine = SPECTRUM_MACHINE_PLUS2;
   machine->description = "Spectrum +2";
 
   machine->reset = spec128_reset;

@@ -48,8 +48,8 @@
 #define ERROR_MESSAGE_MAX_LENGTH 1024
 #define PATHNAME_MAX_LENGTH 1024
 
-static machine_info **machine_types = NULL; /* Array of available machines */
-static int machine_count = 0;
+machine_info **machine_types = NULL; /* Array of available machines */
+int machine_count = 0;
 
 machine_info *machine_current;  /* The currently selected machine */
 static int machine_location;	/* Where is the current machine in

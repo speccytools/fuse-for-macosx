@@ -64,7 +64,9 @@ static void gtkui_save(GtkWidget *widget, gpointer data);
 static void gtkui_quit(GtkWidget *widget, gpointer data);
 static void gtkui_options( GtkWidget *widget, gpointer data );
 static void gtkui_reset(GtkWidget *widget, gpointer data);
-static void gtkui_switch(GtkWidget *widget, gpointer data);
+
+static void gtkui_select(GtkWidget *widget, gpointer data);
+static void gtkui_select_done( GtkWidget *widget, gpointer user_data );
 
 static void gtkui_tape_open( GtkWidget *widget, gpointer data );
 static void gtkui_tape_play( GtkWidget *widget, gpointer data );
@@ -78,7 +80,7 @@ static char* gtkui_fileselector_get_filename( void );
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
-static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data );
+static void gtkui_options_done( GtkWidget *widget, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File",		        NULL , NULL,              0, "<Branch>"    },
@@ -90,7 +92,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/_General...",     "F4" , gtkui_options,     0, NULL          },
   { "/Machine",		        NULL , NULL,              0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,       0, NULL          },
-  { "/Machine/_Switch",         "F9" , gtkui_switch,      0, NULL          },
+  { "/Machine/_Select...",      "F9" , gtkui_select,      0, NULL          },
   { "/Tape",                    NULL , NULL,              0, "<Branch>"    },
   { "/Tape/_Open...",	        "F7" , gtkui_tape_open,   0, NULL          },
   { "/Tape/_Play",	        "F8" , gtkui_tape_play,   0, NULL          },
@@ -362,12 +364,113 @@ static void gtkui_reset(GtkWidget *widget, gpointer data)
   machine_current->reset();
 }
 
-/* Called by the menu when Machine/Switch selected */
-static void gtkui_switch(GtkWidget *widget, gpointer data)
+typedef struct gtkui_select_info {
+
+  GtkWidget *dialog;
+  GtkWidget **buttons;
+
+} gtkui_select_info;
+
+/* Called by the menu when Machine/Select selected */
+static void gtkui_select(GtkWidget *widget, gpointer data)
 {
-  machine_select_next();
+  gtkui_select_info dialog;
+  GSList *button_group;
+
+  GtkWidget *ok_button, *cancel_button;
+
+  int i;
+  
+  /* Some space to store the radio buttons in */
+  dialog.buttons = (GtkWidget**)malloc( machine_count * sizeof(GtkWidget* ) );
+  if( dialog.buttons == NULL ) {
+    fprintf( stderr, "%s: out of memory at %s:%d\n",
+	     fuse_progname, __FILE__, __LINE__ );
+    return;
+  }
+
+  /* Stop emulation */
+  fuse_emulation_pause();
+
+  /* Create the necessary widgets */
+  dialog.dialog = gtk_dialog_new();
+  gtk_window_set_title( GTK_WINDOW( dialog.dialog ), "Fuse - Select Machine" );
+
+  dialog.buttons[0] =
+    gtk_radio_button_new_with_label( NULL, machine_types[0]->description );
+  button_group =
+    gtk_radio_button_group( GTK_RADIO_BUTTON( dialog.buttons[0] ) );
+
+  for( i=1; i<machine_count; i++ ) {
+    dialog.buttons[i] =
+      gtk_radio_button_new_with_label(
+        gtk_radio_button_group (GTK_RADIO_BUTTON (dialog.buttons[i-1] ) ),
+	machine_types[i]->description
+      );
+  }
+
+  for( i=0; i<machine_count; i++ ) {
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.buttons[i] ),
+				  machine_current == machine_types[i] );
+    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		       dialog.buttons[i] );
+  }
+
+  /* Create and add the actions buttons to the dialog box */
+  ok_button = gtk_button_new_with_label( "OK" );
+  cancel_button = gtk_button_new_with_label( "Cancel" );
+
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
+		     ok_button );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
+		     cancel_button );
+
+  /* Add the necessary callbacks */
+  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
+		      GTK_SIGNAL_FUNC( gtkui_select_done ),
+		      (gpointer) &dialog );
+  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog.dialog ) );
+  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete_event",
+		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+		      (gpointer) NULL );
+
+  /* Allow Esc to cancel */
+  gtk_widget_add_accelerator( cancel_button, "clicked",
+                              gtk_accel_group_get_default(),
+                              GDK_Escape, 0, 0 );
+
+  /* Set the window to be modal and display it */
+  gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
+  gtk_widget_show_all( dialog.dialog );
+
+  /* Process events until the window is done with */
+  gtk_main();
+
+  /* And then carry on with emulation again */
+  fuse_emulation_unpause();
 }
 
+/* Callback used by the machine selection dialog */
+static void gtkui_select_done( GtkWidget *widget, gpointer user_data )
+{
+  int i;
+  gtkui_select_info *ptr = (gtkui_select_info*)user_data;
+
+  for( i=0; i<machine_count; i++ ) {
+    if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(ptr->buttons[i]) ) &&
+        machine_current != machine_types[i]
+      )
+    {
+      machine_select( machine_types[i]->machine );
+    }
+  }
+
+  gtk_widget_destroy( ptr->dialog );
+  gtk_main_quit();
+}
+    
 /* Called by the menu when Tape/Open selected */
 static void gtkui_tape_open( GtkWidget *widget, gpointer data )
 {
@@ -501,7 +604,7 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data )
 }
 
 /* Callbacks used by the Options dialog */
-static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data )
+static void gtkui_options_done( GtkWidget *widget, gpointer user_data )
 {
   gtkui_options_info *ptr = (gtkui_options_info*) user_data;
 
