@@ -212,6 +212,10 @@ int widget_menu_rewind_tape( void *data );   /* Tape/Rewind */
 int widget_menu_clear_tape( void *data );    /* Tape/Close */
 int widget_menu_write_tape( void *data );    /* Tape/Write */
 
+int widget_insert_disk_a( const char *filename ); /* Disk/Drive A:/Insert */
+int widget_insert_disk_b( const char *filename ); /* Disk/Drive B:/Insert */
+int widget_menu_eject_disk( void *data );    /* Disk/Drive ?:/Eject */
+
 int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
 
 /* The data for the main menu */

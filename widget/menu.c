@@ -37,6 +37,7 @@
 #include "machine.h"
 #include "rzx.h"
 #include "snapshot.h"
+#include "specplus3.h"
 #include "tape.h"
 #include "utils.h"
 #include "widget.h"
@@ -216,6 +217,32 @@ int widget_menu_rewind_tape( void *data )
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_rewind();
 }
+
+#ifdef HAVE_765_H
+
+/* Disk/Drive A:/Insert (called via widget_apply_to_file) */
+int
+widget_insert_disk_a( const char *filename )
+{
+  return specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
+}
+
+/* Disk/Drive B:/Insert (called via widget_apply_to_file) */
+int
+widget_insert_disk_b( const char *filename )
+{
+  return specplus3_disk_insert( SPECPLUS3_DRIVE_B, filename );
+}
+
+/* Disk/Drive ?:/Eject */
+int
+widget_menu_eject_disk( void *data )
+{
+  specplus3_drive_number which = *(specplus3_drive_number*)data;
+  return specplus3_disk_eject( which );
+}
+
+#endif				/* #ifdef HAVE_765_H */
 
 /* Tape/Clear */
 int widget_menu_clear_tape( void *data )

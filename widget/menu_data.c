@@ -30,6 +30,7 @@
 
 #include "rzx.h"
 #include "snapshot.h"
+#include "specplus3.h"
 #include "tape.h"
 #include "widget.h"
 
@@ -40,6 +41,13 @@ static widget_menu_entry widget_menu_file_recording[];
 static widget_menu_entry widget_menu_machine[];
 static widget_menu_entry widget_menu_options[];
 static widget_menu_entry widget_menu_tape[];
+
+#ifdef HAVE_765_H
+static widget_menu_entry widget_menu_disk[];
+static widget_menu_entry widget_menu_disk_a[];
+static widget_menu_entry widget_menu_disk_b[];
+#endif					/* #ifdef HAVE_765_H */
+
 static widget_menu_entry widget_menu_help[];
 
 /* Main menu */
@@ -52,6 +60,8 @@ static widget_menu_widget_t main_machine = { WIDGET_TYPE_MENU,
 					     &widget_menu_machine };
 static widget_menu_widget_t main_tape =    { WIDGET_TYPE_MENU,
 					     &widget_menu_tape    };
+static widget_menu_widget_t main_disk =    { WIDGET_TYPE_MENU,
+					     &widget_menu_disk    };
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
 					     &widget_menu_help    };
 
@@ -62,6 +72,11 @@ widget_menu_entry widget_menu_main[] = {
   { "(O)ptions", KEYBOARD_o, widget_menu_widget, &main_options },
   { "(M)achine", KEYBOARD_m, widget_menu_widget, &main_machine },
   { "(T)ape",	 KEYBOARD_t, widget_menu_widget, &main_tape    },
+
+#ifdef HAVE_765_H
+  { "(D)isk",	 KEYBOARD_d, widget_menu_widget, &main_disk    },
+#endif					/* #ifdef HAVE_765_H */
+
   { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
@@ -113,13 +128,13 @@ static widget_menu_entry widget_menu_options[] = {
 
 /* Machine menu */
 
-static widget_menu_widget_t machine_select = { WIDGET_TYPE_SELECT, NULL };
+static widget_menu_widget_t machine_sel = { WIDGET_TYPE_SELECT, NULL };
 
 static widget_menu_entry widget_menu_machine[] = {
   { "Machine", 0, 0, NULL },		/* Menu title */
 
-  { "(R)eset",     KEYBOARD_r, widget_menu_reset,  NULL            },
-  { "(S)elect...", KEYBOARD_s, widget_menu_widget, &machine_select },
+  { "(R)eset",     KEYBOARD_r, widget_menu_reset,  NULL         },
+  { "(S)elect...", KEYBOARD_s, widget_menu_widget, &machine_sel },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
@@ -138,6 +153,50 @@ static widget_menu_entry widget_menu_tape[] = {
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
+
+#ifdef HAVE_765_H
+
+/* Disk menu */
+
+static widget_menu_widget_t disk_a = { WIDGET_TYPE_MENU, &widget_menu_disk_a };
+static widget_menu_widget_t disk_b = { WIDGET_TYPE_MENU, &widget_menu_disk_b };
+
+static widget_menu_entry widget_menu_disk[] = {
+  { "Disk", 0, 0, NULL },		/* Menu title */
+
+  { "Drive (A):", KEYBOARD_a, widget_menu_widget, &disk_a },
+  { "Drive (B):", KEYBOARD_b, widget_menu_widget, &disk_b },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Disk/Drive A: menu */
+
+static specplus3_drive_number disk_a_number = SPECPLUS3_DRIVE_A;
+
+static widget_menu_entry widget_menu_disk_a[] = {
+  { "Disk/Drive A:", 0, 0, NULL },	/* Menu title */
+
+  { "(I)nsert...", KEYBOARD_i, widget_apply_to_file,   widget_insert_disk_a },
+  { "(E)ject",	   KEYBOARD_e, widget_menu_eject_disk, &disk_a_number       },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Disk/Drive B: menu */
+
+static specplus3_drive_number disk_b_number = SPECPLUS3_DRIVE_B;
+
+static widget_menu_entry widget_menu_disk_b[] = {
+  { "Disk/Drive A:", 0, 0, NULL },	/* Menu title */
+
+  { "(I)nsert...", KEYBOARD_i, widget_apply_to_file,   widget_insert_disk_b },
+  { "(E)ject",	   KEYBOARD_e, widget_menu_eject_disk, &disk_b_number       },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+#endif					/* #ifdef HAVE_765_H */
 
 /* Help menu */
 

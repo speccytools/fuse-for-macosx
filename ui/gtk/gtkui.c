@@ -127,11 +127,11 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 #ifdef HAVE_765_H
   { "/Disk",			NULL , NULL,		    0, "<Branch>"    },
   { "/Disk/Drive A:",		NULL , NULL,		    0, "<Branch>"    },
-  { "/Disk/Drive A:/_Open...",  NULL , gtkui_disk_open_a,   0, NULL          },
-  { "/Disk/Drive A:/_Eject...", NULL , gtkui_disk_eject_a,  0, NULL          },
+  { "/Disk/Drive A:/_Insert...",NULL , gtkui_disk_open_a,   0, NULL          },
+  { "/Disk/Drive A:/_Eject",    NULL , gtkui_disk_eject_a,  0, NULL          },
   { "/Disk/Drive B:",		NULL , NULL,		    0, "<Branch>"    },
-  { "/Disk/Drive B:/_Open...",  NULL , gtkui_disk_open_b,   0, NULL          },
-  { "/Disk/Drive B:/_Eject...", NULL , gtkui_disk_eject_b,  0, NULL          },
+  { "/Disk/Drive B:/_Insert...",NULL , gtkui_disk_open_b,   0, NULL          },
+  { "/Disk/Drive B:/_Eject",    NULL , gtkui_disk_eject_b,  0, NULL          },
 #endif				/* #ifdef HAVE_765_H */
 
   { "/Help",			NULL , NULL,		    0, "<Branch>"    },

@@ -31,6 +31,10 @@
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
+#ifndef FUSE_MACHINE_H
+#include "machine.h"
+#endif			/* #ifndef FUSE_MACHINE_H */
+
 #ifdef HAVE_765_H
 #include <limits.h>	/* Needed to get PATH_MAX */
 #include <765.h>
