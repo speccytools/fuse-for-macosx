@@ -28,20 +28,19 @@
 
 #include <libspectrum.h>
 
-#include "debugger/debugger.h"
+#include "compat.h"
 #include "display.h"
 #include "event.h"
-#include "fuse.h"
 #include "keyboard.h"
+#include "machine.h"
+#include "memory.h"
 #include "printer.h"
 #include "rzx.h"
 #include "settings.h"
 #include "sound.h"
-#include "sound/lowlevel.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
-#include "ui/ui.h"
 #include "z80/z80.h"
 
 /* The number of ROMs we have allocated space for; they might not all be
@@ -63,8 +62,6 @@ libspectrum_byte spectrum_last_ula;
 
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
-spectrum_screen_read_function read_screen_memory;
-
 spectrum_port_contention_function contend_port;
 spectrum_contention_delay_function contend_delay;
 
@@ -205,12 +202,12 @@ spectrum_unattached_port( int offset )
     /* Attribute bytes */
     case 1: column++;
     case 0:
-      return read_screen_memory( display_attr_start[line] + column );
+      return RAM[ memory_current_screen ][ display_attr_start[line] + column ];
 
     /* Screen data */
     case 3: column++;
     case 2:
-      return read_screen_memory( display_line_start[line] + column );
+      return RAM[ memory_current_screen ][ display_line_start[line] + column ];
 
     /* Idle bus */
     case 4: case 5: case 6: case 7:

@@ -207,7 +207,6 @@ machine_select_machine( fuse_machine_info *machine )
     return 1;
   if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
-  read_screen_memory = machine->ram.read_screen;
   contend_port = machine->ram.contend_port;
   
   if( uidisplay_end() ) return 1;

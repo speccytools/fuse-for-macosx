@@ -96,12 +96,6 @@ scorpion_unattached_port( void )
   return spectrum_unattached_port( 3 );
 }
 
-static libspectrum_byte
-scorpion_read_screen_memory( libspectrum_word offset )
-{
-  return RAM[ memory_current_screen ][offset];
-}
-
 static libspectrum_dword
 scorpion_contend_port( libspectrum_word port GCC_UNUSED )
 {
@@ -130,7 +124,6 @@ scorpion_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_screen    = scorpion_read_screen_memory;
   machine->ram.contend_port   = scorpion_contend_port;
   machine->ram.contend_delay  = scorpion_contend_delay;
 

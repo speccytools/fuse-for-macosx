@@ -40,8 +40,6 @@
 #include "scld.h"
 #include "settings.h"
 
-#define ADDR_TO_CHUNK(addr) 2 + (addr >> 13)
-
 static libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
 						     int *attached );
 static libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
@@ -109,16 +107,6 @@ tc2068_unattached_port( void )
   /* TC2068 does not have floating ULA values on any port (despite
      rumours to the contrary), it returns 0xff on unattached ports */
   return 0xff;
-}
-
-libspectrum_byte
-tc2068_read_screen_memory( libspectrum_word offset )
-{
-  /* The SCLD always reads the real screen memory regardless of paging
-     activity */
-  libspectrum_word off = offset & 0x1fff;
-
-  return timex_home[ADDR_TO_CHUNK(offset)].page[off];
 }
 
 libspectrum_dword
@@ -192,7 +180,6 @@ tc2068_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 1;
-  machine->ram.read_screen	     = tc2068_read_screen_memory;
   machine->ram.contend_port	     = tc2068_contend_port;
   machine->ram.contend_delay	     = tc2068_contend_delay;
 

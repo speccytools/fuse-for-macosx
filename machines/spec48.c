@@ -56,12 +56,6 @@ spec48_unattached_port( void )
   return spectrum_unattached_port( 1 );
 }
 
-libspectrum_byte
-spec48_read_screen_memory( libspectrum_word offset )
-{
-  return RAM[5][offset];
-}
-
 libspectrum_dword
 spec48_contend_port( libspectrum_word port )
 {
@@ -127,7 +121,6 @@ int spec48_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_screen           = spec48_read_screen_memory;
   machine->ram.contend_port          = spec48_contend_port;
   machine->ram.contend_delay	     = spec48_contend_delay;
 

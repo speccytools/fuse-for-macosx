@@ -1,5 +1,5 @@
 /* spec48.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -29,7 +29,6 @@
 
 #include <libspectrum.h>
 
-libspectrum_byte spec48_read_screen_memory( libspectrum_word offset );
 libspectrum_dword spec48_contend_port( libspectrum_word port );
 libspectrum_byte spec48_contend_delay( libspectrum_dword time );
 

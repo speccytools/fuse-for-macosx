@@ -112,11 +112,6 @@ specplus3_unattached_port( void )
   return 0xff;
 }
 
-libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset )
-{
-  return RAM[ memory_current_screen ][offset];
-}
-
 libspectrum_dword
 specplus3_contend_port( libspectrum_word port GCC_UNUSED )
 {
@@ -181,7 +176,6 @@ int specplus3_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 0;
-  machine->ram.read_screen	     = specplus3_read_screen_memory;
   machine->ram.contend_port	     = specplus3_contend_port;
   machine->ram.contend_delay	     = specplus3_contend_delay;
 

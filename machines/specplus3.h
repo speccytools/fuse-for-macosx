@@ -43,7 +43,6 @@ extern const periph_t specplus3_peripherals[];
 extern const size_t specplus3_peripherals_count;
 
 libspectrum_byte specplus3_unattached_port( void );
-libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset );
 libspectrum_dword specplus3_contend_port( libspectrum_word address );
 libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
 

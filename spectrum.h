@@ -50,18 +50,12 @@ extern libspectrum_byte **ROM;
 /* And the RAM */
 extern libspectrum_byte RAM[16][0x4000];
 
-typedef libspectrum_byte
-  (*spectrum_screen_read_function)( libspectrum_word offset );
-
 typedef libspectrum_dword
   (*spectrum_port_contention_function)( libspectrum_word port );
 typedef libspectrum_byte
   (*spectrum_contention_delay_function)( libspectrum_dword time );
 
 typedef struct spectrum_raminfo {
-
-  spectrum_screen_read_function read_screen; /* Read a byte from the
-						current screen */
 
   spectrum_port_contention_function contend_port; /* And how long to access
 						     an IO port? */
@@ -81,7 +75,6 @@ typedef struct spectrum_raminfo {
 
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
-extern spectrum_screen_read_function read_screen_memory;
 extern spectrum_port_contention_function contend_port;
 
 /* How much contention do we get at every tstate? */

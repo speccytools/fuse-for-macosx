@@ -65,12 +65,6 @@ tc2048_unattached_port( void )
   return 0xff;
 }
 
-libspectrum_byte
-tc2048_read_screen_memory( libspectrum_word offset )
-{
-  return RAM[5][offset];
-}
-
 libspectrum_dword
 tc2048_contend_port( libspectrum_word port )
 {
@@ -139,7 +133,6 @@ int tc2048_init( fuse_machine_info *machine )
   error = machine_set_timings( machine ); if( error ) return error;
 
   machine->timex = 1;
-  machine->ram.read_screen	     = tc2048_read_screen_memory;
   machine->ram.contend_port	     = tc2048_contend_port;
   machine->ram.contend_delay	     = tc2048_contend_delay;
 

@@ -279,29 +279,42 @@ display_draw_line( int y )
 	if( x >= DISPLAY_BORDER_WIDTH_COLS &&
 	    x < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
 
-	  int screen_x = x - DISPLAY_BORDER_WIDTH_COLS,
-	    screen_y = y - DISPLAY_BORDER_HEIGHT;
+	  int screen_x, screen_y;
+	  libspectrum_word offset;
+	  libspectrum_byte *screen;
+
+	  screen_x = x - DISPLAY_BORDER_WIDTH_COLS;
+	  screen_y = y - DISPLAY_BORDER_HEIGHT;
+
+	  screen = RAM[ memory_current_screen ];
       
 	  display_get_attr( screen_x, screen_y, &ink, &paper );
-	  data = read_screen_memory( display_get_addr( screen_x, screen_y ) );
-	  if ( scld_last_dec.name.hires ) {
-	    switch ( scld_last_dec.mask.scrnmode ) {
+
+	  offset = display_get_addr( screen_x, screen_y );
+	  data = screen[ offset ];
+
+	  if( scld_last_dec.name.hires ) {
+	    switch( scld_last_dec.mask.scrnmode ) {
+
             case HIRESATTRALTD:
-              data2 = read_screen_memory( display_attr_start[screen_y] +
-					  screen_x + ALTDFILE_OFFSET     );
+	      offset =
+		display_attr_start[ screen_y ] + screen_x + ALTDFILE_OFFSET;
+              data2 = screen[ offset ];
               break;
+
             case HIRES:
-              data2 =
-		read_screen_memory( display_get_addr( screen_x, screen_y ) +
-				    ALTDFILE_OFFSET                          );
+              data2 = screen[ offset + ALTDFILE_OFFSET ];
               break;
+
             case HIRESDOUBLECOL:
               data2 = data;
               break;
+
             default: /* case HIRESATTR: */
-              data2 =
-		read_screen_memory( display_attr_start[screen_y] + screen_x );
+	      offset = display_attr_start[ screen_y ] + screen_x;
+	      data2 = screen[ offset ];
               break;
+
 	    }
 	    hires_data = (data << 8) + data2;
 	    display_plot16( screen_x, screen_y, hires_data, ink, paper );
@@ -735,11 +748,18 @@ display_get_attr( int x, int y,
   if ( scld_last_dec.name.hires ) {
     attr = hires_get_attr();
   } else {
-    if ( scld_last_dec.name.b1 ) {
-      attr = read_screen_memory(display_line_start[y]+x+ALTDFILE_OFFSET);
-    } else if ( scld_last_dec.name.altdfile ) {
-      attr = read_screen_memory(display_attr_start[y]+x+ALTDFILE_OFFSET);
-    } else attr = read_screen_memory(display_attr_start[y]+x);
+
+    libspectrum_word offset;
+
+    if( scld_last_dec.name.b1 ) {
+      offset = display_line_start[y] + x + ALTDFILE_OFFSET;
+    } else if( scld_last_dec.name.altdfile ) {
+      offset = display_attr_start[y] + x + ALTDFILE_OFFSET;
+    } else {
+      offset = display_attr_start[y] + x;
+    }
+
+    attr = RAM[ memory_current_screen ][ offset ];
   }
 
   display_parse_attr(attr,ink,paper);
@@ -898,24 +918,33 @@ int display_frame(void)
 
 static void display_dirty_flashing(void)
 {
-  int offset; libspectrum_byte attr;
+  libspectrum_word offset;
+  libspectrum_byte *screen, attr;
+
+  screen = RAM[ memory_current_screen ];
   
-  if ( !scld_last_dec.name.hires ) {
-    if ( scld_last_dec.name.b1 ) {
-      for(offset=ALTDFILE_OFFSET;offset<0x3800;offset++) {
-        attr=read_screen_memory(offset);
+  if( !scld_last_dec.name.hires ) {
+    if( scld_last_dec.name.b1 ) {
+
+      for( offset = ALTDFILE_OFFSET; offset < 0x3800; offset++ ) {
+        attr = screen[ offset ];
         if( attr & 0x80 ) display_dirty8( offset - ALTDFILE_OFFSET );
       }
-    } else if ( scld_last_dec.name.altdfile ) {
-      for(offset=0x3800;offset<0x3b00;offset++) {
-        attr=read_screen_memory(offset);
+
+    } else if( scld_last_dec.name.altdfile ) {
+
+      for( offset= 0x3800; offset < 0x3b00; offset++ ) {
+        attr = screen[ offset ];
         if( attr & 0x80 ) display_dirty64( offset - ALTDFILE_OFFSET );
       }
+
     } else { /* Standard Speccy screen */
-      for(offset=0x1800;offset<0x1b00;offset++) {
-        attr=read_screen_memory(offset);
+
+      for( offset = 0x1800; offset < 0x1b00; offset++ ) {
+	attr = screen[ offset ];
         if( attr & 0x80 ) display_dirty64( offset );
       }
+
     }
   }
 }
