@@ -61,8 +61,11 @@ CODE
 
     foreach my $widget ( @{ $_->{widgets} } ) {
 
-	if( $widget->{type} eq "Checkbox" ) {
+	if( $widget->{type} eq "Checkbox" or
+	    $widget->{type} eq "Entry"       ) {
 	    print "  GtkWidget *$widget->{value};\n";
+	} else {
+	    die "Unknown type `$widget->{type}'";
 	}
 
     }

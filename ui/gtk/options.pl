@@ -43,6 +43,9 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -61,7 +64,11 @@ void
 gtkoptions_$_->{name}( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkoptions_$_->{name}_t dialog;
-  GtkWidget *ok_button, *cancel_button;
+  GtkWidget *ok_button, *cancel_button, *hbox, *text;
+  gchar buffer[4];
+
+  hbox = NULL; text = NULL;
+  buffer[0] = '\0';		/* Shut gcc up */
   
   /* Firstly, stop emulation */
   fuse_emulation_pause();
@@ -77,9 +84,9 @@ CODE
 
 	foreach my $type ( $widget->{type} ) {
 
-	    if( $type eq "Checkbox" ) {
+	    my $text = $widget->{text}; $text =~ tr/()//d;
 
-		my $text = $widget->{text}; $text =~ tr/()//d;
+	    if( $type eq "Checkbox" ) {
 
 		print << "CODE";
   dialog.$widget->{value} =
@@ -90,9 +97,24 @@ CODE
 		     dialog.$widget->{value} );
 
 CODE
+            } elsif( $type eq "Entry" ) {
 
+		print << "CODE";
+  dialog.$widget->{value} = gtk_entry_new_with_max_length( 3 );
+  snprintf( buffer, 4, "%d", settings_current.emulation_speed );
+  gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
+
+  text = gtk_label_new( "$text" );
+
+  hbox = gtk_hbox_new( FALSE, 5 );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), text );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), dialog.$widget->{value} );
+  
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		     hbox );
+CODE
 	    } else {
-		die "Unknown type `$type'\n";
+		die "Unknown type `$type'";
 	    }
 	}
     }
@@ -150,8 +172,14 @@ CODE
     gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->$widget->{value} ) );
 
 CODE
+        } elsif( $widget->{type} eq "Entry" ) {
 
-	} else {
+	    print << "CODE";
+  settings_current.$widget->{value} =
+    atoi( gtk_entry_get_text( GTK_ENTRY( ptr->$widget->{value} ) ) );
+
+CODE
+    	} else {
 	    die "Unknown type `$widget->{type}'";
 	}
     }

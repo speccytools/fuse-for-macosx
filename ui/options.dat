@@ -1,5 +1,6 @@
 general
 General Options
+Entry, (E)mulation speed, emulation_speed, KEYBOARD_e
 Checkbox, Issue (2) Keyboard, issue2, KEYBOARD_2
 Checkbox, (K)empston joystick, joy_kempston, KEYBOARD_k
 Checkbox, Use (t)ape traps, tape_traps, KEYBOARD_t

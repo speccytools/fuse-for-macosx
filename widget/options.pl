@@ -94,6 +94,8 @@ CODE
 
 CODE
             $which++;
+	} elsif( $widget->{type} eq "Entry" ) {
+	    # FIXME: Make this work
 	} else {
 	    die "Unknown type `$widget->{type}'";
 	}
@@ -136,6 +138,8 @@ CODE
 
 CODE
            $which++;
+	} elsif( $widget->{type} eq "Entry" ) {
+	    # FIXME: Make this work
 	} else {
 	    die "Unknown type `$widget->{type}'";
 	}
