@@ -68,6 +68,20 @@ format.
 .\" the options list is in alphabetical order by long option name (or
 .\" short option name if none).
 .\"
+.I --aspect-hint
+.RS
+Specify whether the GTK+ and Xlib user interfaces should `hint' to the
+window manager about the preferred aspect ratio for the top-level
+window, thus preventing resizing to non-square sizes which lead to
+Fuse not displaying correctly. However, with some window managers (for
+example
+.IR icewm (1))
+this prevents the window from being resized at all. (Enabled by
+default, but you can use
+.RI ` --no-aspect-hint '
+to disable.)
+.RE
+.PP
 .I --auto-load
 .RS
 Specify whether tape files should be automatically loaded when they
