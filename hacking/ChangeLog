@@ -1184,5 +1184,7 @@
 	 simply execute enough tstates to match the (real) elapsed time.
 	 Also allows variable frame rates (ie 60Hz for the TS2068)
 	 (rest of patch #1080531) (Fred).
-20050107 zxcf.c: Stop zxcf_reset overwriting romcs bank when zxcf isn't active
+20050111 zxcf.c: Stop zxcf_reset overwriting romcs bank when zxcf isn't active
 	 (fixes TR-DOS machines) (Fred).
+20050111 machines/pentagon.c: Don't allow Interface I to be used with the
+	 Pentagon, it masks the TR-DOS interface (Fred).
