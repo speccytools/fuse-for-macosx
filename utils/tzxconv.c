@@ -45,7 +45,7 @@ main( int argc, char **argv )
   int fd; struct stat file_info;
   libspectrum_byte *buffer; size_t length;
 
-  libspectrum_tape tzx;
+  libspectrum_tape *tzx;
 
   progname = argv[0];
 
@@ -91,31 +91,36 @@ main( int argc, char **argv )
     return 1;
   }
 
-  tzx.blocks = NULL;
-  if( libspectrum_tzx_create( &tzx, buffer, length ) ) {
+  if( libspectrum_tape_alloc( &tzx ) ) {
     munmap( buffer, length );
+    return 1;
+  }
+
+  if( libspectrum_tzx_read( tzx, buffer, length ) ) {
+    munmap( buffer, length );
+    libspectrum_tape_free( tzx );
     return 1;
   }
 
   if( munmap( buffer, length ) == -1 ) {
     fprintf( stderr, "%s: couldn't munmap `%s': %s\n", progname, argv[1],
 	     strerror( errno ) );
-    libspectrum_tape_free( &tzx );
+    libspectrum_tape_free( tzx );
     return 1;
   }
 
   length = 0;
-  if( libspectrum_tap_write( &tzx, &buffer, &length ) ) {
-    libspectrum_tape_free( &tzx );
+  if( libspectrum_tap_write( tzx, &buffer, &length ) ) {
+    libspectrum_tape_free( tzx );
     return 1;
   }
 
   if( fwrite( buffer, 1, length, stdout ) != length ) {
-    free( buffer ); libspectrum_tape_free( &tzx );
+    free( buffer ); libspectrum_tape_free( tzx );
     return 1;
   }
 
-  free( buffer ); libspectrum_tape_free( &tzx );
+  free( buffer ); libspectrum_tape_free( tzx );
 
   return 0;
 }

@@ -65,7 +65,7 @@ main( int argc, char **argv )
   unsigned char *buffer; size_t length;
   unsigned char *snap_buffer = NULL; size_t snap_length;
 
-  libspectrum_rzx rzx;
+  libspectrum_rzx *rzx;
   libspectrum_snap *snap = NULL;
 
   struct options options;
@@ -82,9 +82,11 @@ main( int argc, char **argv )
     return 1;
   }
 
+  if( libspectrum_rzx_alloc( &rzx ) ) return 1;
+
   if( mmap_file( options.rzxfile, &buffer, &length ) ) return 1;
 
-  if( libspectrum_rzx_read( &rzx, buffer, length, &snap ) ) {
+  if( libspectrum_rzx_read( rzx, buffer, length, &snap ) ) {
     munmap( buffer, length );
     return 1;
   }
@@ -92,7 +94,7 @@ main( int argc, char **argv )
   if( munmap( buffer, length ) == -1 ) {
     fprintf( stderr, "%s: couldn't munmap `%s': %s\n", progname,
 	     options.rzxfile, strerror( errno ) );
-    if( snap ) { libspectrum_snap_destroy( snap ); free( snap ); }
+    if( snap ) libspectrum_snap_free( snap );
     return 1;
   }
 
@@ -101,12 +103,12 @@ main( int argc, char **argv )
     if( !snap ) {
       fprintf( stderr, "%s: no snapshot in `%s' to extract\n", progname,
 	       options.rzxfile );
-      libspectrum_rzx_free( &rzx );
+      libspectrum_rzx_free( rzx );
       return 1;
     }
     if( write_snapshot( snap ) ) {
-      libspectrum_rzx_free( &rzx );
-      libspectrum_snap_destroy( snap ); free( snap );
+      libspectrum_rzx_free( rzx );
+      libspectrum_snap_free( snap );
       return 1;
     }
 
@@ -116,21 +118,18 @@ main( int argc, char **argv )
       if( !snap ) {
 	fprintf( stderr, "%s: warning: no snapshot to remove\n", progname );
       } else {
-	libspectrum_snap_destroy( snap ); free( snap ); snap = NULL;
+	libspectrum_snap_free( snap ); snap = NULL;
       }
     }
 
     if( options.add ) {
       
       /* Don't want the old snap anymore */
-      if( snap ) {
-	libspectrum_snap_destroy( snap ); free( snap );
-	snap = NULL;
-      }
+      if( snap ) { libspectrum_snap_free( snap ); snap = NULL; }
 
       /* Get the new snap */
       if( mmap_file( options.add, &snap_buffer, &snap_length ) ) {
-	libspectrum_rzx_free( &rzx );
+	libspectrum_rzx_free( rzx );
 	return 1;
       }
       
@@ -142,7 +141,7 @@ main( int argc, char **argv )
 	
 	if( libspectrum_z80_read( snap_buffer, snap_length, snap ) ) {
 	  munmap( snap_buffer, snap_length );
-	  libspectrum_rzx_free( &rzx );
+	  libspectrum_rzx_free( rzx );
 	  return 1;
 	}
 	
@@ -150,7 +149,7 @@ main( int argc, char **argv )
 
 	if( libspectrum_sna_read( snap_buffer, snap_length, snap ) ) {
 	  munmap( snap_buffer, snap_length );
-	  libspectrum_rzx_free( &rzx );
+	  libspectrum_rzx_free( rzx );
 	  return 1;
 	}
 
@@ -158,8 +157,8 @@ main( int argc, char **argv )
 
       /* Now done with this buffer */
       if( munmap( snap_buffer, snap_length ) ) {
-	libspectrum_snap_destroy( snap ); free( snap );
-	libspectrum_rzx_free( &rzx );
+	libspectrum_snap_free( snap );
+	libspectrum_rzx_free( rzx );
 	return 1;
       }
 
@@ -169,19 +168,19 @@ main( int argc, char **argv )
     if( snap ) {
       snap_length = 0;
       if( libspectrum_z80_write( &snap_buffer, &snap_length, snap ) ) {
-	libspectrum_snap_destroy( snap ); free( snap );
-	libspectrum_rzx_free( &rzx );
+	libspectrum_snap_free( snap );
+	libspectrum_rzx_free( rzx );
 	return 1;
       }
     }
 
     /* Serialise the RZX file */
     length = 0;
-    if( libspectrum_rzx_write( &rzx, &buffer, &length, snap_buffer,
+    if( libspectrum_rzx_write( rzx, &buffer, &length, snap_buffer,
 			       snap_length, "rzxtool", 0, 1,
 			       !options.uncompress ) ) {
       free( snap_buffer );
-      libspectrum_rzx_free( &rzx );
+      libspectrum_rzx_free( rzx );
       return 1;
     }
 
@@ -190,7 +189,7 @@ main( int argc, char **argv )
     /* And (finally!) write it */
     if( fwrite( buffer, 1, length, stdout ) != length ) {
       free( buffer );
-      libspectrum_rzx_free( &rzx );
+      libspectrum_rzx_free( rzx );
       return 1;
     }
 
@@ -199,8 +198,8 @@ main( int argc, char **argv )
   }
 
   /* Tidy up */
-  libspectrum_rzx_free( &rzx );
-  if( snap ) { libspectrum_snap_destroy( snap ); free( snap ); }
+  libspectrum_rzx_free( rzx );
+  if( snap ) libspectrum_snap_free( snap );
 
   return 0;
 }

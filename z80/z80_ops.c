@@ -56,7 +56,7 @@ void z80_do_opcodes()
     /* If we're due an interrupt from RZX playback, generate one */
     if( rzx_playback &&
 	( R + rzx_instructions_offset >=
-	  rzx.frames[ rzx_current_frame ].instructions
+	  rzx->frames[ rzx_current_frame ].instructions
         )
       ) {
       event_add( tstates, EVENT_TYPE_INTERRUPT );

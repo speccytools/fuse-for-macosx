@@ -56,7 +56,7 @@ extern size_t rzx_current_frame;
 extern size_t rzx_data_frame;
 
 /* The actual RZX data */
-extern libspectrum_rzx rzx;
+extern libspectrum_rzx *rzx;
 
 int rzx_init( void );
 

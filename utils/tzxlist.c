@@ -81,13 +81,11 @@ process_tzx( char *filename )
   int error;
 
   unsigned char *buffer;
-  libspectrum_tape tape;
+  libspectrum_tape *tape;
 
   GSList *ptr;
 
   size_t i;
-
-  tape.blocks = NULL;
 
   fd = open( filename, O_RDONLY );
   if( fd == -1 ) {
@@ -118,9 +116,16 @@ process_tzx( char *filename )
     return 1;
   }
 
-  error = libspectrum_tzx_create( &tape, buffer, file_info.st_size );
+  error = libspectrum_tape_alloc( &tape );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     munmap( buffer, file_info.st_size );
+    return 1;
+  }
+
+  error = libspectrum_tzx_read( tape, buffer, file_info.st_size );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    munmap( buffer, file_info.st_size );
+    libspectrum_tape_free( tape );
     return error;
   }
 
@@ -132,7 +137,7 @@ process_tzx( char *filename )
 
   printf("Listing of `%s':\n\n", filename );
 
-  ptr = tape.blocks;
+  ptr = tape->blocks;
 
   while( ptr ) {
     libspectrum_tape_block *block = (libspectrum_tape_block*)ptr->data;
@@ -308,7 +313,7 @@ process_tzx( char *filename )
     ptr = ptr->next;
   }
 
-  error = libspectrum_tape_free( &tape );
+  error = libspectrum_tape_free( tape );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     munmap( buffer, file_info.st_size );
     return error;

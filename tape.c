@@ -50,7 +50,7 @@
 #include "z80/z80_macros.h"
 
 /* The current tape */
-libspectrum_tape tape;
+libspectrum_tape *tape;
 
 /* Is the emulated tape deck playing? */
 int tape_playing;
@@ -67,7 +67,11 @@ int trap_check_rom( void );
 
 int tape_init( void )
 {
-  tape.blocks = NULL;
+  libspectrum_error error;
+
+  error = libspectrum_tape_alloc( &tape );
+  if( !tape ) return error;
+
   tape_playing = 0;
   tape_microphone = 0;
   if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
@@ -85,7 +89,7 @@ int tape_open( const char *filename )
   if( error ) return error;
 
   /* If we already have a tape file open, close it */
-  if( tape.blocks ) {
+  if( tape->blocks ) {
     error = tape_close();
     if( error ) { munmap( buffer, length ); return error; }
   }
@@ -93,19 +97,21 @@ int tape_open( const char *filename )
   /* First, try opening the file as a .tzx file; if we get back an
      error saying it didn't have the .tzx signature, then try opening
      it as a .tap file */
-  error = libspectrum_tzx_create( &tape, buffer, length );
+  error = libspectrum_tzx_read( tape, buffer, length );
   if( error == LIBSPECTRUM_ERROR_SIGNATURE ) {
-    error = libspectrum_tap_create( &tape, buffer, length );
+    error = libspectrum_tap_read( tape, buffer, length );
   }
 
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "error reading '%s': %s",
 	      filename, libspectrum_error_message(error) );
+    tape_close();
     munmap( buffer, length );
     return error;
   }
 
   if( munmap( buffer, length ) == -1 ) {
+    tape_close();
     ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
 	      strerror( errno ) );
     return 1;
@@ -130,7 +136,7 @@ int tape_close( void )
   }
 
   /* And then remove it from memory */
-  error = libspectrum_tape_free( &tape );
+  error = libspectrum_tape_free( tape ); tape = NULL;
   if( error ) return error;
 
   return 0;
@@ -139,11 +145,11 @@ int tape_close( void )
 /* Rewind the current tape file to the start */
 int tape_rewind( void )
 {
-  if( tape.blocks == NULL ) return 1;
+  if( !tape->blocks ) return 0;
 
-  tape.current_block = tape.blocks;
+  tape->current_block = tape->blocks;
   libspectrum_tape_init_block(
-    (libspectrum_tape_block*)tape.current_block->data
+    (libspectrum_tape_block*)tape->current_block->data
   );
 
   return 0;
@@ -157,7 +163,7 @@ int tape_write( const char* filename )
   int error;
 
   length = 0;
-  error = libspectrum_tzx_write( &tape, &buffer, &length );
+  error = libspectrum_tzx_write( tape, &buffer, &length );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "error during libspectrum_tzx_write: %s",
 	      libspectrum_error_message(error) );
@@ -191,15 +197,13 @@ int tape_load_trap( void )
   if( ! trap_check_rom() ) return 3;
 
   /* Return with error if no tape file loaded */
-  if( tape.blocks == NULL ) return 1;
+  if( !tape->blocks ) return 1;
 
-  current_block = (libspectrum_tape_block*)(tape.current_block->data);
+  current_block = (libspectrum_tape_block*)(tape->current_block->data);
 
-  block_ptr = tape.current_block->next;
+  block_ptr = tape->current_block->next;
   /* Loop if we hit the end of the tape */
-  if( block_ptr == NULL ) {
-    block_ptr = tape.blocks;
-  }
+  if( block_ptr == NULL ) { block_ptr = tape->blocks; }
 
   next_block = (libspectrum_tape_block*)(block_ptr->data);
   libspectrum_tape_init_block( next_block );
@@ -226,7 +230,7 @@ int tape_load_trap( void )
   /* Peek at the next block. If it's a ROM block, just move along and
      return */
   if( next_block->type == LIBSPECTRUM_TAPE_BLOCK_ROM ) {
-    tape.current_block = block_ptr;
+    tape->current_block = block_ptr;
     return 0;
   }
 
@@ -348,14 +352,14 @@ int tape_save_trap( void )
   rom_block->pause = 1000;
 
   /* Add the block to the current tape file */
-  tape.blocks = g_slist_append( tape.blocks, (gpointer)block );
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
 
   /* If we previously didn't have a tape loaded ( implied by
-     tape.current_block == NULL ), set up so that we point to the
+     tape->current_block == NULL ), set up so that we point to the
      start of the tape */
-  if( tape.current_block == NULL ) {
-    tape.current_block = tape.blocks;
-    libspectrum_tape_init_block((libspectrum_tape_block*)tape.blocks->data);
+  if( !tape->current_block ) {
+    tape->current_block = tape->blocks;
+    libspectrum_tape_init_block((libspectrum_tape_block*)tape->blocks->data);
   }
 
   /* And then return via the RET at #053E */
@@ -400,9 +404,9 @@ int tape_play( void )
 
   int error;
 
-  if( tape.blocks == NULL ) return 1;
+  if( !tape->blocks ) return 1;
   
-  block = (libspectrum_tape_block*)(tape.current_block->data);
+  block = (libspectrum_tape_block*)(tape->current_block->data);
 
   /* If tape traps are active and the current block is a ROM block, do
      nothing, _unless_ the ROM block has already reached the pause at
@@ -452,7 +456,7 @@ int tape_next_edge( DWORD last_tstates )
   if( ! tape_playing ) return 0;
 
   /* Get the time until the next edge */
-  libspec_error = libspectrum_tape_get_next_edge( &tape, &edge_tstates,
+  libspec_error = libspectrum_tape_get_next_edge( tape, &edge_tstates,
 						  &flags );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;
 
@@ -479,7 +483,7 @@ int tape_next_edge( DWORD last_tstates )
      into the queue */
   if( ( flags & LIBSPECTRUM_TAPE_FLAGS_BLOCK ) &&
       settings_current.tape_traps &&
-      ((libspectrum_tape_block*)(tape.current_block->data))->type ==
+      ((libspectrum_tape_block*)(tape->current_block->data))->type ==
         LIBSPECTRUM_TAPE_BLOCK_ROM
     ) {
     tape_playing = 0;

@@ -62,11 +62,11 @@ int snapshot_read( const char *filename )
 {
   unsigned char *buffer; size_t length;
 
-  libspectrum_snap snap;
+  libspectrum_snap *snap;
 
   int error;
 
-  libspectrum_snap_initalise( &snap );
+  libspectrum_snap_alloc( &snap );
 
   error = utils_read_file( filename, &buffer, &length );
   if( error ) return error;
@@ -76,7 +76,7 @@ int snapshot_read( const char *filename )
   case SNAPSHOT_TYPE_SNA:
 
     snapshot_flush_slt();
-    error = libspectrum_sna_read( buffer, length, &snap );
+    error = libspectrum_sna_read( buffer, length, snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       ui_error( UI_ERROR_ERROR, "Error reading '%s': %s", filename,
 		libspectrum_error_message(error) );
@@ -88,7 +88,7 @@ int snapshot_read( const char *filename )
   case SNAPSHOT_TYPE_Z80:
 
     snapshot_flush_slt();
-    error = libspectrum_z80_read( buffer, length, &snap );
+    error = libspectrum_z80_read( buffer, length, snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       ui_error( UI_ERROR_ERROR, "Error reading '%s': %s", filename, 
 		libspectrum_error_message(error) );
@@ -111,10 +111,10 @@ int snapshot_read( const char *filename )
     return 1;
   }
 
-  error = snapshot_copy_from( &snap );
+  error = snapshot_copy_from( snap );
   if( error ) return error;
 
-  error = libspectrum_snap_destroy( &snap );
+  error = libspectrum_snap_free( snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "Error from libspectrum_snap_destroy: %s",
 	      libspectrum_error_message(error) );
@@ -263,25 +263,25 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
 int snapshot_write( const char *filename )
 {
-  libspectrum_snap snap;
+  libspectrum_snap *snap;
   unsigned char *buffer; size_t length;
 
   int error;
 
-  libspectrum_snap_initalise( &snap );
+  libspectrum_snap_alloc( &snap );
 
-  error = snapshot_copy_to( &snap );
+  error = snapshot_copy_to( snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   length = 0;
-  error = libspectrum_z80_write( &buffer, &length, &snap );
+  error = libspectrum_z80_write( &buffer, &length, snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "Error writing '%s': %s", filename,
 	      libspectrum_error_message(error) );
     return error;
   }
 
-  error = libspectrum_snap_destroy( &snap );
+  error = libspectrum_snap_free( snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "Error from libspectrum_snap_destroy: %s",
 	      libspectrum_error_message(error) );
