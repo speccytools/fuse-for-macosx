@@ -30,7 +30,6 @@
 
 #include "ay.h"
 #include "display.h"
-#include "event.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "sound.h"
@@ -118,12 +117,6 @@ int spec128_reset(void)
   machine_current->ram.current_page=0;
   machine_current->ram.current_rom=0;
   machine_current->ram.current_screen=5;
-
-  event_reset();
-  if( event_add( machine_current->timings.cycles_per_frame,
-		 EVENT_TYPE_INTERRUPT) ) return 1;
-  if( event_add( machine_current->line_times[0],
-		 EVENT_TYPE_LINE) ) return 1;
 
   z80_reset();
   sound_ay_reset();

@@ -29,7 +29,6 @@
 #include <stdio.h>
 
 #include "display.h"
-#include "event.h"
 #include "fuse.h"
 #include "keyboard.h"
 #include "machine.h"
@@ -113,12 +112,6 @@ int spec48_init( machine_info *machine )
 
 int spec48_reset(void)
 {
-  event_reset();
-  if( event_add( machine_current->timings.cycles_per_frame,
-		 EVENT_TYPE_INTERRUPT) ) return 1;
-  if( event_add( machine_current->line_times[0],
-		 EVENT_TYPE_LINE) ) return 1;
-
   z80_reset();
   sound_ay_reset();	/* should happen for *all* resets */
 

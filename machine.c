@@ -35,12 +35,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "event.h"
 #include "fuse.h"
 #include "machine.h"
 #include "spec48.h"
 #include "spec128.h"
 #include "specplus2.h"
 #include "specplus3.h"
+#include "tape.h"
 #include "z80/z80.h"
 
 #define ERROR_MESSAGE_MAX_LENGTH 1024
@@ -145,6 +147,15 @@ static int machine_select_machine( machine_info *machine )
   machine_current = machine;
 
   tstates = 0;
+
+  /* Reset the event stack */
+  event_reset();
+  if( event_add( machine->timings.cycles_per_frame, EVENT_TYPE_INTERRUPT) )
+    return 1;
+  if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
+
+  /* Stop the tape playing */
+  tape_stop();
 
   readbyte = machine->ram.read_memory;
   read_screen_memory = machine->ram.read_screen;
