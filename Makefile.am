@@ -134,6 +134,7 @@ noinst_HEADERS = ay.h \
 	if2.h \
 	input.h \
 	keyboard.h \
+	kempmouse.h \
 	machine.h \
 	memory.h \
 	menu.h \
