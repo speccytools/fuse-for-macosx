@@ -71,9 +71,9 @@ static const struct {
   int hsync_len, vsync_len;
   int sync, doublescan;
 } fb_modes[] = {
-  { 640, 240, 32052,  112, 40, 28, 9,  40, 3,  0, 1 },
-  { 640, 480, 32052,  112, 40, 28, 9,  40, 3,  0, 0 },
-  { 320, 240, 82440,   30, 16, 20, 4,  48, 1,  0, 1 },
+  { 640, 240, 32052,  128, 24, 28, 9,  40, 3,  0, 1 }, /* 640x240, 72Hz */
+  { 640, 480, 32052,  128, 24, 28, 9,  40, 3,  0, 0 }, /* 640x480, 72Hz */
+  { 320, 240, 64104,   64, 12, 14, 4,  20, 3,  0, 1 }, /* 320x240, 72Hz */
   { 0 }
 };
 
@@ -110,6 +110,7 @@ int uidisplay_init(int width, int height)
 static int
 fb_select_mode( size_t index )
 {
+  display = orig_display;
   display.xres_virtual = display.xres = fb_modes[index].xres;
   display.yres_virtual = display.yres = fb_modes[index].yres;
   display.pixclock = fb_modes[index].pixclock;
