@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -90,7 +91,7 @@ void widget_select_keyhandler( keyboard_key_name key )
   }
 
   if( key >= KEYBOARD_a && key <= KEYBOARD_z &&
-      key - KEYBOARD_a < machine_count ) {
+      key - KEYBOARD_a < (ptrdiff_t)machine_count ) {
     
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,

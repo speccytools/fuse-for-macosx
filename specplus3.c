@@ -456,7 +456,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 {
   struct stat buf;
   struct flock lock;
-  int i,error;
+  size_t i; int error;
 
   if( which < SPECPLUS3_DRIVE_A || which > SPECPLUS3_DRIVE_B ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d\n",

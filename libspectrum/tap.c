@@ -24,6 +24,7 @@
 
 */
 
+#include <stddef.h>
 #include <string.h>
 
 #include "tape.h"
@@ -67,7 +68,7 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     rom_block->length = ptr[0] + ptr[1] * 0x100; ptr += 2;
 
     /* Have we got enough bytes left in buffer? */
-    if( ( end - ptr ) < rom_block->length ) {
+    if( end - ptr < (ptrdiff_t)rom_block->length ) {
       libspectrum_tape_free( tape );
       free( block );
       libspectrum_print_error(

@@ -570,7 +570,7 @@ void printer_parallel_strobe_write(int on)
 {
 static int old_on=0;
 static int second_edge=0;
-static int last_frames=0;
+static unsigned int last_frames=0;
 static DWORD last_tstates=0;
 static unsigned char last_data=0;
 DWORD diff;

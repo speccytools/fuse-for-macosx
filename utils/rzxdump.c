@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <stddef.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -41,6 +42,9 @@
 char *progname;
 
 const char *rzx_signature = "RZX!";
+
+WORD read_word( unsigned char **ptr );
+DWORD read_dword( unsigned char **ptr );
 
 static int
 do_file( const char *filename );
@@ -130,7 +134,7 @@ do_file( const char *filename )
 
   /* Read the RZX header */
 
-  if( end - ptr < strlen( rzx_signature ) + 6 ) {
+  if( end - ptr < (ptrdiff_t)strlen( rzx_signature ) + 6 ) {
     fprintf( stderr,
 	     "%s: Not enough bytes for RZX header (%d bytes)\n",
 	     progname, strlen( rzx_signature ) + 6 );

@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -94,11 +95,11 @@ split_message( const char *message, char ***lines, size_t *count,
     /* message now points to a word of length (ptr-message); if
        that's longer than an entire line (most likely filenames), just
        take the last bit */
-    if( ptr - message > line_length ) message = ptr - line_length;
+    if( ptr - message > (ptrdiff_t)line_length ) message = ptr - line_length;
 
     /* Check we've got room for the word, plus the prefixing space */
-    if( position + ( ptr - message + 1 ) > line_length ) {
-      char **new_lines; int i;
+    if( position + ( ptr - message + 1 ) > (ptrdiff_t)line_length ) {
+      char **new_lines; size_t i;
 
       /* If we've filled the screen, stop */
       if( *count == 18 ) return 0;

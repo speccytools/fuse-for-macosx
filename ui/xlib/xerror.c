@@ -45,6 +45,9 @@ int xerror_error;
 #define MESSAGE_MAX_LENGTH 256
 
 int
+xerror_handler( Display *display, XErrorEvent *error );
+
+int
 xerror_handler( Display *display, XErrorEvent *error )
 {
   /* If we were expecting an error to occur, just set a flag. Otherwise,

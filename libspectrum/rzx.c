@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -36,8 +37,8 @@ rzx_read_header( const libspectrum_byte **ptr, const libspectrum_byte *end );
 static libspectrum_error
 rzx_read_creator( const libspectrum_byte **ptr, const libspectrum_byte *end );
 static libspectrum_error
-rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
-		   const libspectrum_byte *end, libspectrum_snap **snap );
+rzx_read_snapshot( const libspectrum_byte **ptr, const libspectrum_byte *end,
+		   libspectrum_snap **snap );
 static libspectrum_error
 rzx_read_input( libspectrum_rzx *rzx,
 		const libspectrum_byte **ptr, const libspectrum_byte *end );
@@ -157,7 +158,7 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
       break;
       
     case LIBSPECTRUM_RZX_SNAPSHOT_BLOCK:
-      error = rzx_read_snapshot( rzx, &ptr, end, snap );
+      error = rzx_read_snapshot( &ptr, end, snap );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
       break;
 
@@ -219,7 +220,7 @@ rzx_read_creator( const libspectrum_byte **ptr, const libspectrum_byte *end )
 
   /* Check there's still enough data (the -1 is because we've already read
      the block ID) */
-  if( end - (*ptr) < length - 1 ) {
+  if( end - (*ptr) < (ptrdiff_t)length - 1 ) {
     libspectrum_print_error(
       "rzx_read_creator: not enough data in buffer\n"
     );
@@ -232,8 +233,8 @@ rzx_read_creator( const libspectrum_byte **ptr, const libspectrum_byte *end )
 }
 
 static libspectrum_error
-rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
-		   const libspectrum_byte *end, libspectrum_snap **snap )
+rzx_read_snapshot( const libspectrum_byte **ptr, const libspectrum_byte *end,
+		   libspectrum_snap **snap )
 {
   size_t blocklength, snaplength; libspectrum_error error;
   libspectrum_dword flags;
@@ -250,7 +251,7 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
 
   blocklength = libspectrum_read_dword( ptr );
 
-  if( end - (*ptr) < blocklength - 5 ) {
+  if( end - (*ptr) < (ptrdiff_t)blocklength - 5 ) {
     libspectrum_print_error("rzx_read_snapshot: not enough data in buffer\n");
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
@@ -378,13 +379,12 @@ rzx_read_input( libspectrum_rzx *rzx,
 
     libspectrum_byte *data; const libspectrum_byte *data_ptr;
     size_t data_length = 0;
-    libspectrum_error error;
 
     /* Discount the block intro */
     blocklength -= 18;
 
     /* Check that we've got enough compressed data */
-    if( end - (*ptr) < blocklength ) {
+    if( end - (*ptr) < (ptrdiff_t)blocklength ) {
       libspectrum_print_error( "rzx_read_input: not enough data in buffer" );
       libspectrum_rzx_free( rzx );
       return LIBSPECTRUM_ERROR_CORRUPT;
@@ -458,7 +458,7 @@ rzx_read_frames( libspectrum_rzx *rzx,
 
     rzx->frames[i].repeat_last = 0;
 
-    if( end - (*ptr) < rzx->frames[i].count ) {
+    if( end - (*ptr) < (ptrdiff_t)rzx->frames[i].count ) {
       libspectrum_print_error(
 	"rzx_read_frames: not enough data in buffer\n"
       );
@@ -677,7 +677,8 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
       return error;
     }
 
-    if( gzlength >= *ptr - data_ptr ) { /* Compression made it bigger :-( */
+    if( (ptrdiff_t)gzlength >= *ptr - data_ptr ) { /* Compression made it
+						      bigger :-( */
       *(*buffer + flags_offset) &= ~0x02; /* Clear `compressed' bit */
     } else {
       /* Write the compressed data in */

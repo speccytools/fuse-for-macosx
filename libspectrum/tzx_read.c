@@ -24,6 +24,7 @@
 
 */
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -412,7 +413,7 @@ tzx_read_pulses_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
   pulses_block->count = **ptr; (*ptr)++;
 
   /* Check enough data exists for every pulse */
-  if( end - (*ptr) < 2 * pulses_block->count ) {
+  if( end - (*ptr) < 2 * (ptrdiff_t)pulses_block->count ) {
     free( block );
     libspectrum_print_error(
       "tzx_read_pulses_block: not enough data in buffer\n"
@@ -696,7 +697,7 @@ tzx_read_select( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* Get the length, and check we've got that many bytes in the buffer */
   length = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
-  if( end - (*ptr) < length ) {
+  if( end - (*ptr) < (ptrdiff_t)length ) {
     libspectrum_print_error(
       "tzx_read_select: not enough data in buffer\n"
     );
@@ -996,7 +997,7 @@ tzx_read_hardware( libspectrum_tape *tape, const libspectrum_byte **ptr,
   hardware_block->count = **ptr; (*ptr)++;
 
   /* Check there's enough data in the buffer for all the data */
-  if( end - (*ptr) < 3*hardware_block->count ) {
+  if( end - (*ptr) < 3 * (ptrdiff_t)hardware_block->count ) {
     libspectrum_print_error(
       "tzx_read_hardware: not enough data in buffer\n"
     );
@@ -1088,7 +1089,7 @@ tzx_read_concat( const libspectrum_byte **ptr, const libspectrum_byte *end )
 {
   /* Check there's enough data left; the -1 here is because we've already
      read the first byte of the signature as the block ID */
-  if( end - (*ptr) < strlen( signature ) + 2 - 1 ) {
+  if( end - (*ptr) < (ptrdiff_t)strlen( signature ) + 2 - 1 ) {
     libspectrum_print_error(
       "tzx_read_concat: not enough data in buffer\n"
     );
@@ -1141,7 +1142,7 @@ tzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
   }
 
   /* Have we got enough bytes left in buffer? */
-  if( ( end - (*ptr) ) < (*length) ) {
+  if( ( end - (*ptr) ) < (ptrdiff_t)(*length) ) {
     libspectrum_print_error(
       "tzx_read_data: not enough data in buffer\n"
     );

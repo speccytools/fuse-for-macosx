@@ -80,8 +80,10 @@ static int get_shm_id( const int size );
 
 static int shm_used = 0;
 
-static int xdisplay_allocate_colours(int numColours, unsigned long *colours);
-static int xdisplay_allocate_gc(Window window, GC *gc);
+static int xdisplay_allocate_colours( int numColours,
+				      unsigned long *colour_values );
+static int xdisplay_allocate_gc( Window window, GC *new_gc );
+
 static int xdisplay_allocate_image(int width, int height);
 static void xdisplay_destroy_image( void );
 static void xdisplay_end( int );
@@ -95,12 +97,13 @@ int uidisplay_init(int width, int height)
   return 0;
 }
 
-static int xdisplay_allocate_colours(int numColours, unsigned long *colours)
+static int
+xdisplay_allocate_colours( int numColours, unsigned long *colour_values )
 {
   XColor colour;
   Colormap currentMap;
 
-  char *colour_names[] = {
+  const char *colour_names[] = {
     "black",
     "blue3",
     "red3",
@@ -141,18 +144,19 @@ static int xdisplay_allocate_colours(int numColours, unsigned long *colours)
 	return 1;
       }
     }
-    colours[i]=colour.pixel;
+    colour_values[i] = colour.pixel;
   }
 
   return 0;
 }
   
-static int xdisplay_allocate_gc(Window window,GC *gc)
+static int
+xdisplay_allocate_gc( Window window, GC *new_gc )
 {
   unsigned valuemask=0;
   XGCValues values;
 
-  *gc=XCreateGC(display,window,valuemask,&values);
+  *new_gc = XCreateGC( display, window, valuemask, &values );
 
   return 0;
 }
