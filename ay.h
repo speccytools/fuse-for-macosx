@@ -34,7 +34,7 @@
 typedef struct ayinfo {
   int present;
   int current_register;
-  BYTE registers[15];
+  BYTE registers[16];
 } ayinfo;
 
 BYTE ay_registerport_read(WORD port);

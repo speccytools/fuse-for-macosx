@@ -108,7 +108,7 @@ typedef struct libspectrum_snap {
 
   libspectrum_byte out_128_memoryport;
 
-  libspectrum_byte out_ay_registerport, ay_registers[15];
+  libspectrum_byte out_ay_registerport, ay_registers[16];
 
   libspectrum_byte out_plus3_memoryport;
 

@@ -115,7 +115,7 @@ static unsigned int ay_tone_period[3],ay_noise_period,ay_env_period;
 static int beeper_last_subpos[2]={0,0};
 
 /* Local copy of the AY registers */
-static BYTE sound_ay_registers[15];
+static BYTE sound_ay_registers[16];
 
 struct ay_change_tag
   {
@@ -632,7 +632,7 @@ if(!sound_enabled_ever) return;
 if(ay_change_count<AY_CHANGE_MAX)
   {
   ay_change[ay_change_count].tstates=tstates;
-  ay_change[ay_change_count].reg=reg;
+  ay_change[ay_change_count].reg=(reg&15);
   ay_change[ay_change_count].val=val;
   ay_change_count++;
   }
@@ -650,7 +650,7 @@ int f;
 if(!sound_enabled_ever) return;
 
 ay_change_count=0;
-for(f=0;f<15;f++)
+for(f=0;f<16;f++)
   sound_ay_write(f,0,0);
 for(f=0;f<3;f++)
   ay_tone_high[f]=0;

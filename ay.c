@@ -39,7 +39,7 @@ BYTE ay_registerport_read(WORD port)
 /* And when it's written to */
 void ay_registerport_write(WORD port, BYTE b)
 {
-  if(b < 15) machine_current->ay.current_register = b;
+  machine_current->ay.current_register = (b & 15);
 }
 
 /* What happens when the AY data port (traditionally 0xbffd on the 128K

@@ -174,7 +174,7 @@ int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
 
       snap->out_128_memoryport  = extra_header[ 3];
       snap->out_ay_registerport = extra_header[ 6];
-      memcpy( snap->ay_registers, &extra_header[ 7], 15 );
+      memcpy( snap->ay_registers, &extra_header[ 7], 16 );
 
     }
 
@@ -564,8 +564,7 @@ int libspectrum_z80_write_extended_header( uchar **buffer, size_t *offset,
   ptr[6] = 0;			/* IF1 disabled */
   ptr[7] = 0;			/* No special emulation features */
   ptr[8] = snap->out_ay_registerport;
-  memcpy( &ptr[9], snap->ay_registers, 15 );
-  ptr[24] = 0;			/* The non-existent 16th AY register */
+  memcpy( &ptr[9], snap->ay_registers, 16 );
 
   /* Number of T-states in 1/4 of a frame */
   quarter_states = ( snap->machine == LIBSPECTRUM_MACHINE_48 ) ?
