@@ -84,7 +84,7 @@ int snapshot_read( const char *filename )
 
   default:
 
-    ui_error( UI_ERROR_ERROR, "Unknown snapshot type for '%s'" );
+    ui_error( UI_ERROR_ERROR, "Unknown snapshot type for '%s'", filename );
     munmap( buffer, length );
     return 1;
 

@@ -29,8 +29,10 @@
 
 #ifdef __GNUC__
 #define GCC_UNUSED __attribute__ ((unused))
+#define GCC_PRINTF( fmtstring, args ) __attribute__ ((format( printf, fmtstring, args )))
 #else				/* #ifdef __GNUC__ */
 #define GCC_UNUSED
+#define GCC_PRINTF( fmtstring, args )
 #endif				/* #ifdef __GNUC__ */
 
 extern char* fuse_progname;		/* argv[0] */
