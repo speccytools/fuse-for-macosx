@@ -41,6 +41,7 @@
 #include <unistd.h>
 
 #include "sunsound.h"
+#include "ui/ui.h"
 
 /* using (8) 64 byte frags for 8kHz, scale up for higher */
 #define BASE_SOUND_FRAG_PWR	6
@@ -63,14 +64,22 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 	/* Open the sound device non-blocking to avoid hangs if it is
 	   being used by something else, but then set it blocking
 	   again as that's what we actually want */
-	if ((soundfd = open(device, O_WRONLY | O_NONBLOCK )) == -1)
+	if ((soundfd = open(device, O_WRONLY | O_NONBLOCK )) == -1) {
+	        ui_error( UI_ERROR_ERROR, "Couldn't open sound device '%s'",
+			  device );
 		return 1;
+	}
 	if ((flags = fcntl(soundfd, F_GETFL)) == -1) {
+	        ui_error( UI_ERROR_ERROR, "Couldn't fcntl sound device '%s'",
+			  device );
 	        close(soundfd);
 	        return 1;
 	}
 	flags &= ~O_NONBLOCK;
 	if (fcntl(soundfd, F_SETFL, flags) == -1) {
+	        ui_error( UI_ERROR_ERROR,
+			  "Couldn't set sound device '%s' blocking",
+			  device );
 	        close(soundfd);
 		return 1;
 	}
@@ -84,6 +93,9 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 		ai.play.encoding = AUDIO_ENCODING_LINEAR;
 		ai.play.precision = 16;
 		if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+		        ui_error( UI_ERROR_ERROR,
+				"Couldn't set bit size of sound device '%s'",
+				  device );
 			close(soundfd);
 			return 1;
 		}
@@ -95,6 +107,9 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 		/* if it failed make sure the opposite is ok */
 		ai.play.channels = *stereoptr ? 1 : 2;
 		if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+		        ui_error( UI_ERROR_ERROR,
+				"Couldn't set channels of sound device '%s'",
+				  device );
 			close(soundfd);
 			return 1;
 		}
@@ -103,6 +118,9 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 
 	ai.play.sample_rate = *freqptr;
 	if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+	        ui_error( UI_ERROR_ERROR,
+			  "Couldn't set sample rate of sound device '%s'",
+			  device );
 		close(soundfd);
 		return 1;
 	}
@@ -124,6 +142,9 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 	if (ai.hiwat == 0)
 		ai.hiwat = 65536;
 	if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+	        ui_error( UI_ERROR_ERROR,
+			  "Couldn't set block size of sound device '%s'",
+			  device );
 		close(soundfd);
 		return 1;
 	}

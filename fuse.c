@@ -127,6 +127,13 @@ static int fuse_init(int argc, char **argv)
   if( printer_init() ) return 1;
   if( rzx_init() ) return 1;
 
+  z80_init();
+
+  error = machine_init_machines();
+  if( error ) return error;
+  error = machine_select_id( settings_current.start_machine );
+  if( error ) return error;
+
   settings_current.sound = fuse_sound_in_use = 0;
   sound_init( settings_current.sound_device );
   if(sound_enabled) {
@@ -134,13 +141,6 @@ static int fuse_init(int argc, char **argv)
   } else {
     if(timer_init()) return 1;
   }
-
-  z80_init();
-
-  error = machine_init_machines();
-  if( error ) return error;
-  error = machine_select_id( settings_current.start_machine );
-  if( error ) return error;
 
   if( settings_current.snapshot ) snapshot_read( settings_current.snapshot );
   if( settings_current.tape_file ) tape_open( settings_current.tape_file );
