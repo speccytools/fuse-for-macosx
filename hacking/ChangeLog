@@ -807,3 +807,4 @@
 20040513 roms/{Makefile.am,plus3e-[0123].rom}: add +3e ROMs.
 20040514 spectrum.[ch]: Correct RAM array size comments.
 20040514 dck.c: Move i and mem variables to loop that uses them.
+20040514 roms/{Makefile.am,se-[01].rom}: add SE ROMs.
