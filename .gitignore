@@ -13,5 +13,6 @@
 /libtool
 /missing
 /mkinstalldirs
+/settings.c
 /stamp-h
 /stamp-h.in
