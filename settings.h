@@ -35,6 +35,7 @@ typedef struct settings_info {
   int joy_kempston;	/* Kempston joystick emulation? */
   int tape_traps;	/* Use tape loading traps? */
   int stereo_ay;	/* Stereo separation for AY channels? */
+  int slt_traps;	/* Use .slt loading traps/ */
 
   /* Used on startup */
 

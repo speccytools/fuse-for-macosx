@@ -65,6 +65,7 @@ int settings_defaults( settings_info *settings )
   settings->joy_kempston = 0;
   settings->tape_traps = 1;
   settings->stereo_ay = 0;
+  settings->slt_traps = 1;
 
   settings->snapshot = NULL;
   settings->tape_file = NULL;
@@ -169,6 +170,7 @@ int settings_copy( settings_info *dest, settings_info *src )
   dest->joy_kempston = src->joy_kempston;
   dest->tape_traps   = src->tape_traps;
   dest->stereo_ay    = src->stereo_ay;
+  dest->slt_traps    = src->slt_traps;
 
   return 0;
 }

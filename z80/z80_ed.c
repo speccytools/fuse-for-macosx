@@ -484,8 +484,8 @@ tstates+=16;
 break;
 
 case 0xfb:	/* Emulator trap to load .slt data */
-/* Takes no t-states */
-{
+if( settings_current.slt_traps ) {
+
   if( slt_length[A] ) {
     WORD base = HL;
     BYTE *data = slt[A];
@@ -493,6 +493,9 @@ case 0xfb:	/* Emulator trap to load .slt data */
 
     while( length-- ) writebyte( base++, *data++ );
   }
+
+} else {
+  tstates += 8;	/* NOPD */
 }
 break;
 
