@@ -65,9 +65,8 @@ int rzx_recording;
 /* The filename we'll save this recording into */
 static char *rzx_filename;
 
-/* The .z80 format snapshot taken when we started the recording */
-static libspectrum_byte *rzx_snap;
-static size_t rzx_snap_length;
+/* The snapshot taken when we started the recording */
+static libspectrum_snap *rzx_snap;
 
 /* Are we currently playing back a .rzx file? */
 int rzx_playback;
@@ -99,7 +98,7 @@ int rzx_init( void )
 
   rzx_in_bytes = NULL;
   rzx_in_allocated = 0;
-  rzx_snap = 0;
+  rzx_snap = NULL;
 
   sscanf( VERSION, "%u.%u.%u.%u",
 	  &version[0], &version[1], &version[2], &version[3] );
@@ -114,38 +113,26 @@ int rzx_init( void )
 
 int rzx_start_recording( const char *filename, int embed_snapshot )
 {
+  int error; libspectrum_error libspec_error;
+
   if( rzx_playback ) return 1;
 
-  /* Note that we're recording */
-  rzx_recording = 1;
-
-  if( rzx_snap ) free( rzx_snap ); rzx_snap = 0;
+  /* Store the filename */
+  rzx_filename = strdup( filename );
+  if( rzx_filename == NULL ) {
+    ui_error( UI_ERROR_ERROR, "out of memory in rzx_start_recording" );
+    return 1;
+  }
 
   /* If we're embedding a snapshot, create it now */
   if( embed_snapshot ) {
     
-    libspectrum_snap *snap;
-    int error;
-    libspectrum_error libspec_error;
-
-    libspec_error = libspectrum_snap_alloc( &snap );
+    libspec_error = libspectrum_snap_alloc( &rzx_snap );
     if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return 1;
 
-    error = snapshot_copy_to( snap ); if( error ) return 1;
-
-    libspec_error = libspectrum_z80_write( &rzx_snap, &rzx_snap_length, snap );
-    if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-      ui_error( UI_ERROR_ERROR, "Error creating RZX embedded snapshot: %s",
-		libspectrum_error_message( libspec_error ) );
-      libspectrum_snap_free( snap ); rzx_snap = 0;
-      return 1;
-    }
-    
-    libspec_error = libspectrum_snap_free( snap );
-    if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-      ui_error( UI_ERROR_ERROR, "Error from libspectrum_snap_destroy: %s",
-		libspectrum_error_message( libspec_error ) );
-      free( rzx_snap ); rzx_snap = 0;
+    error = snapshot_copy_to( rzx_snap );
+    if( error ) {
+      libspectrum_snap_free( rzx_snap ); rzx_snap = NULL;
       return 1;
     }
   }
@@ -155,12 +142,8 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
 
   libspectrum_rzx_set_tstates( rzx, tstates );
 
-  /* Store the filename */
-  rzx_filename = strdup( filename );
-  if( rzx_filename == NULL ) {
-    ui_error( UI_ERROR_ERROR, "out of memory in rzx_start_recording" );
-    return 1;
-  }
+  /* Note that we're recording */
+  rzx_recording = 1;
 
   return 0;
 }
@@ -175,16 +158,18 @@ int rzx_stop_recording( void )
 
   length = 0;
   libspec_error = libspectrum_rzx_write( &buffer, &length,
-					 rzx, rzx_snap, rzx_snap_length,
-					 rzx_creator, rzx_major_version,
-					 rzx_minor_version,
+					 rzx, rzx_snap, rzx_creator,
+					 rzx_major_version, rzx_minor_version,
 					 settings_current.rzx_compression );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "error during libspectrum_rzx_write: %s",
 	      libspectrum_error_message( libspec_error ) );
     libspectrum_rzx_free( rzx );
+    if( rzx_snap ) libspectrum_snap_free( rzx_snap );
     return libspec_error;
   }
+
+  if( rzx_snap ) libspectrum_snap_free( rzx_snap );
 
   error = utils_write_file( rzx_filename, buffer, length );
   free( rzx_filename );
