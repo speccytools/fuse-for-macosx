@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <settings.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -400,7 +401,8 @@ int machine_allocate_roms( fuse_machine_info *machine, size_t count )
 int machine_find_rom( const char *filename )
 {
   int fd;
-  char path[ PATHNAME_MAX_LENGTH ];
+  char fuse_path[ PATHNAME_MAX_LENGTH], path[ PATHNAME_MAX_LENGTH ];
+  char *fuse_dir;
 
   /* If this is an absolute path, just look there */
   if( filename[0] == '/' ) return open( filename, O_RDONLY | O_BINARY );
@@ -409,9 +411,13 @@ int machine_find_rom( const char *filename )
      directory */
   fd = open( filename, O_RDONLY | O_BINARY ); if( fd != -1 ) return fd;
 
-  /* Then in a 'roms' subdirectory (very useful when Fuse hasn't been
-     installed into /usr/local or wherever) */
-  snprintf( path, PATHNAME_MAX_LENGTH, "roms/%s", filename );
+  /* Then in a 'roms' subdirectory off where the Fuse executable is
+     (useful when Fuse hasn't been installed into /usr/local or
+     wherever) */
+  strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  fuse_dir = dirname( fuse_path );
+
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/roms/%s", fuse_dir, filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 

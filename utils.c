@@ -28,6 +28,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -166,16 +167,21 @@ utils_open_file( const char *filename, int autoload,
   return 0;
 }
 
-/* Find a ROM called `filename'; look in the current directory, ./roms
-   and the defined roms directory; returns a fd for the ROM on success,
-   -1 if it couldn't find the ROM */
+/* Find the auxillary file called `filename'; look in the lib
+   directory below where the Fuse executable is and the defined
+   package data directory; returns a fd for the ROM on success, -1 if
+   it couldn't find the ROM */
 int utils_find_lib( const char *filename )
 {
   int fd;
 
-  char path[ PATHNAME_MAX_LENGTH ];
+  char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
+  char *fuse_dir;
 
-  snprintf( path, PATHNAME_MAX_LENGTH, "lib/%s", filename );
+  strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  fuse_dir = dirname( fuse_path );
+
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/lib/%s", fuse_dir, filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
