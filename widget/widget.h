@@ -61,10 +61,8 @@ typedef enum widget_type {
   WIDGET_TYPE_RZX,		/* RZX options */
   WIDGET_TYPE_BROWSE,		/* Browse tape */
   WIDGET_TYPE_TEXT,		/* Text entry widget */
-  WIDGET_TYPE_SCALER,		/* Select scaler */
   WIDGET_TYPE_DEBUGGER,		/* Debugger widget */
   WIDGET_TYPE_ROM,		/* ROM selector widget */
-  WIDGET_TYPE_JOYSTICK,		/* Joystick selection widget */
 
 } widget_type;
 
@@ -103,6 +101,9 @@ extern char* widget_filesel_name;
 
 /* Get a filename and do something with it */
 int widget_apply_to_file( void *data );
+
+/* Select a machine */
+int widget_select_machine( void *data );
      
 /* The error widget data type */
 

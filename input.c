@@ -159,7 +159,7 @@ keypress( const input_event_key_t *event )
     break;
   case INPUT_KEY_F9:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_SELECT, NULL );
+    widget_select_machine( NULL );
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F10:

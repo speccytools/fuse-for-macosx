@@ -154,6 +154,7 @@ int widget_menu_save_screen( void *data );   /* File/Save Screenshot */
 int widget_menu_save_scr( void *data );	     /* File/Save Scr */
 int widget_menu_exit( void *data );	     /* File/Exit */
 
+int widget_menu_joystick( void *data );	     /* Options/Joysticks/<which> */
 int widget_menu_save_options( void *data );  /* Options/Save */
 int widget_menu_select_roms( void *data );   /* Options/Select ROMs/<type> */
 
@@ -182,15 +183,22 @@ int widget_menu_eject_dock( void *data );    /* Cart/Timex Dock/Eject */
 
 int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
 
-/* The select scaler widget */
+scaler_type widget_select_scaler( int (*selector)( scaler_type ) );
 
-int widget_scaler_draw( void* data );
-void widget_scaler_keyhandler( input_key key );
-int widget_scaler_finish( widget_finish_state finished );
+/* The generalised selector widget */
 
-/* The select machine widget */
+typedef struct widget_select_t {
 
-int widget_select_draw( void* data );
+  const char *title;	/* Dialog title */
+  const char **options;	/* The available options */
+  size_t count;		/* The number of options */
+  size_t current;	/* Which option starts active? */
+
+  int result;		/* What was selected? ( -1 if dialog cancelled ) */
+
+} widget_select_t;
+
+int widget_select_draw( void *data );
 void widget_select_keyhandler( input_key key );
 int widget_select_finish( widget_finish_state finished );
 
@@ -245,12 +253,6 @@ typedef struct widget_roms_info {
 int widget_roms_draw( void *data );
 void widget_roms_keyhandler( input_key key );
 int widget_roms_finish( widget_finish_state finished );
-
-/* Joystick selection widget */
-
-int widget_joystick_draw( void *data );
-void widget_joystick_keyhandler( input_key key );
-int widget_joystick_finish( widget_finish_state finished );
 
 /* The widgets actually available */
 

@@ -36,6 +36,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "joystick.h"
 #include "machine.h"
 #include "machines/specplus3.h"
 #include "psg.h"
@@ -252,12 +253,48 @@ widget_menu_psg_stop( void *data GCC_UNUSED )
 int
 widget_menu_save_screen( void *data GCC_UNUSED )
 {
-  widget_do( WIDGET_TYPE_SCALER, screenshot_available_scalers );
-  if( widget_scaler == SCALER_NUM ) return 0;
+  scaler_type scaler;
 
-  return screenshot_write( "fuse.png", widget_scaler );
+  scaler = widget_select_scaler( screenshot_available_scalers );
+  if( scaler == -1 ) return 0;
+
+  return screenshot_write( "fuse.png", scaler );
 }
 #endif			/* #ifdef USE_LIBPNG */
+
+scaler_type
+widget_select_scaler( int (*selector)( scaler_type ) )
+{
+  size_t count, i;
+  const char *options[ SCALER_NUM ];
+  widget_select_t info;
+  int error;
+
+  count = 0; info.current = 0;
+
+  for( i = 0; i < SCALER_NUM; i++ )
+    if( selector( i ) ) {
+      if( current_scaler == i ) info.current = count;
+      options[ count++ ] = scaler_name( i );
+    }
+
+  info.title = "Select scaler";
+  info.options = options;
+  info.count = count;
+
+  error = widget_do( WIDGET_TYPE_SELECT, &info );
+  if( error ) return -1;
+
+  if( info.result == -1 ) return info.result;
+
+  for( i = 0; i < SCALER_NUM; i++ )
+    if( selector( i ) && !info.result-- ) return i;
+
+  ui_error( UI_ERROR_ERROR, "widget_select_scaler: ran out of scalers" );
+  fuse_abort();
+
+  return -1;
+}
 
 /* File/Save Scr */
 int
@@ -272,6 +309,39 @@ int widget_menu_exit( void *data GCC_UNUSED )
 {
   fuse_exiting = 1;
   widget_end_all( WIDGET_FINISHED_OK );
+  return 0;
+}
+
+/* Options/Joysticks/<which> */
+int
+widget_menu_joystick( void *data )
+{
+  int which = *(int*)data;
+
+  widget_select_t info;
+  int *setting, error;
+
+  setting = NULL;
+
+  switch( which ) {
+
+  case 0: setting = &( settings_current.joystick_1_output ); break;
+  case 1: setting = &( settings_current.joystick_2_output ); break;
+  case JOYSTICK_KEYBOARD:
+    setting = &( settings_current.joystick_keyboard_output ); break;
+
+  }
+
+  info.title = "Select joystick";
+  info.options = joystick_name;
+  info.count = JOYSTICK_TYPE_COUNT;
+  info.current = *setting;
+
+  error = widget_do( WIDGET_TYPE_SELECT, &info );
+  if( error ) return error;
+
+  *setting = info.result;
+
   return 0;
 }
 
@@ -315,15 +385,12 @@ widget_menu_select_roms( void *data )
 int
 widget_menu_filter( void *data GCC_UNUSED )
 {
-  int error;
+  scaler_type scaler;
 
-  error = widget_do( WIDGET_TYPE_SCALER, scaler_is_supported );
-  if( error ) return error;
+  scaler = widget_select_scaler( scaler_is_supported );
+  if( scaler == -1 ) return 0;
 
-  if( widget_scaler == SCALER_NUM ) return 0;
-
-  if( widget_scaler != current_scaler )
-    return scaler_select_scaler( widget_scaler );
+  if( scaler != current_scaler ) return scaler_select_scaler( scaler );
 
   return 0;
 }
@@ -343,6 +410,54 @@ int widget_menu_reset( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return machine_reset();
+}
+
+/* Machine/Select */
+int
+widget_select_machine( void *data GCC_UNUSED )
+{
+  widget_select_t info;
+  char **options, *buffer;
+  size_t i;
+  int error;
+  libspectrum_machine new_machine;
+
+  options = malloc( machine_count * sizeof( const char * ) );
+  if( !options ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
+
+  buffer = malloc( 40 * machine_count );
+  if( !buffer ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    free( options );
+    return 1;
+  }
+
+  for( i = 0; i < machine_count; i++ ) {
+    options[i] = &buffer[ i * 40 ];
+    snprintf( options[i], 40,
+	      libspectrum_machine_name( machine_types[i]->machine ) );
+    if( machine_current->machine == machine_types[i]->machine )
+      info.current = i;
+  }
+
+  info.title = "Select machine";
+  info.options = (const char**)options;
+  info.count = machine_count;
+
+  error = widget_do( WIDGET_TYPE_SELECT, &info );
+  free( buffer ); free( options );
+  if( error ) return error;
+
+  if( info.result == -1 ) return 0;
+
+  new_machine = machine_types[ info.result ]->machine;
+
+  if( machine_current->machine != new_machine ) machine_select( new_machine );
+
+  return 0;
 }
 
 /* Machine/Break */

@@ -53,7 +53,7 @@ typedef enum joystick_type_t {
 
 #define JOYSTICK_TYPE_COUNT 5
 
-extern char *joystick_name[];
+extern const char *joystick_name[];
 
 typedef enum joystick_button {
 

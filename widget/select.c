@@ -28,40 +28,61 @@
 
 #ifdef USE_WIDGET
 
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-
-#include "fuse.h"
-#include "keyboard.h"
-#include "machine.h"
 #include "widget_internals.h"
 
 /* Data for drawing the cursor */
-static int highlight_line;
-static char descriptions[10][40];
+static size_t highlight_line;
+static char **descriptions;
+static char *buffer;
 
-/* Machine type we're going to switch to */
-int new_machine;
+const char *title;
+const char **options;
+static size_t count;
+static int *result;
 
-int widget_select_draw( void* data GCC_UNUSED )
+int
+widget_select_draw( void *data )
 {
   int i;
 
+  if( data ) {
+
+    widget_select_t *ptr = data;
+
+    title = ptr->title;
+    options = ptr->options;
+    count = ptr->count;
+    result = &( ptr->result );
+
+    highlight_line = ptr->current;
+
+    descriptions = malloc( count * sizeof( char* ) );
+    if( !descriptions ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    buffer = malloc( count * 40 );
+    if( !buffer ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      free( descriptions );
+      return 1;
+    }
+
+  }
+
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, machine_count+2 );
+  widget_dialog_with_border( 1, 2, 30, count + 2 );
 
-  widget_printstring( 8, 2, WIDGET_COLOUR_FOREGROUND, "Select Machine" );
+  widget_printstring( 15 - strlen( title ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
+		      title );
 
-  for( i=0; i<machine_count; i++ ) {
-    snprintf( descriptions[i], 40, "(%c): %s",
-	      ((char)i)+'A',
-	      libspectrum_machine_name( machine_types[i]->machine ) );
+  for( i = 0; i < count; i++ ) {
+    descriptions[i] = &buffer[ i * 40 ];
+    snprintf( descriptions[i], 40, "(%c): %s", ((char)i)+'A', options[ i ] );
     descriptions[i][ 28 ] = '\0';
     
-    if( machine_current->machine == machine_types[i]->machine ) {
-      highlight_line = i;
+    if( i == highlight_line ) {
       widget_rectangle( 2*8, (i+4)*8, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
       widget_printstring( 2, i+4, WIDGET_COLOUR_BACKGROUND, descriptions[i] );
     } else {
@@ -69,7 +90,7 @@ int widget_select_draw( void* data GCC_UNUSED )
     }
   }
 
-  widget_display_lines( 2, machine_count + 2 );
+  widget_display_lines( 2, count + 2 );
 
   return 0;
 }
@@ -116,8 +137,10 @@ widget_select_keyhandler( input_key key )
 
   }
 
-  if( cursor_pressed || ( key >= INPUT_KEY_a && key <= INPUT_KEY_z &&
-      key - INPUT_KEY_a < (ptrdiff_t)machine_count )) {
+  if( cursor_pressed                                  ||
+      ( key >= INPUT_KEY_a && key <= INPUT_KEY_z &&
+	key - INPUT_KEY_a < (ptrdiff_t)count        )
+    ) {
     
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
@@ -126,7 +149,7 @@ widget_select_keyhandler( input_key key )
 			descriptions[ highlight_line ] );
 
     /*  draw the new one */
-    if (cursor_pressed) {
+    if( cursor_pressed ) {
       highlight_line = new_highlight_line;
     } else {
       highlight_line = key - INPUT_KEY_a;
@@ -137,22 +160,21 @@ widget_select_keyhandler( input_key key )
     widget_printstring( 2, highlight_line+4, WIDGET_COLOUR_BACKGROUND,
 			descriptions[ highlight_line ] );
     
-    widget_display_lines( 2, machine_count + 2 );
-
-    /* And set this as the new machine type */
-    new_machine = machine_types[highlight_line]->machine;
+    widget_display_lines( 2, count + 2 );
   }
 }
 
 int widget_select_finish( widget_finish_state finished )
 {
-  /* If we exited normally and we're not on the same machine type as
-     we started on, force a reset */
-  if( finished == WIDGET_FINISHED_OK &&
-      machine_current->machine != new_machine )
-    machine_select( new_machine );
+  free( buffer );
+  free( descriptions );
 
-  if( finished == WIDGET_FINISHED_OK ) widget_end_all( WIDGET_FINISHED_OK );
+  if( finished == WIDGET_FINISHED_OK ) {
+    *result = highlight_line;
+    widget_end_all( WIDGET_FINISHED_OK );
+  } else {
+    *result = -1;
+  }
 
   return 0;
 }

@@ -685,3 +685,7 @@
 	 joystick.c,menu_data.c,widget.c,widget.h,widget_internals.h}:
 	 add widget code to select joysticks and match up the GTK+
 	 interface.
+20040401 input.c,joystick.[ch],widget/{Makefile.am,joystick.c,menu.c,
+	 menu_data.c,scaler.c,select.c,widget.[ch],widget_internals.h}:
+	 replace the three 'select' widgets (machine, scaler, joystick)
+	 with one generalised one.

@@ -397,10 +397,8 @@ widget_t widget_data[] = {
   { widget_rzx_draw,      widget_options_finish, widget_rzx_keyhandler      },
   { widget_browse_draw,   widget_browse_finish,  widget_browse_keyhandler   },
   { widget_text_draw,	  widget_text_finish,	 widget_text_keyhandler     },
-  { widget_scaler_draw,   widget_scaler_finish,  widget_scaler_keyhandler   },
   { widget_debugger_draw, NULL,			 widget_debugger_keyhandler },
   { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
-  { widget_joystick_draw, widget_joystick_finish, widget_joystick_keyhandler },
 
 };
 

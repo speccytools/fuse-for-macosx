@@ -176,23 +176,16 @@ static widget_menu_entry widget_menu_options[] = {
 /* Options/Joysticks menu */
 
 static int
-  first_joystick = 0,
-  second_joystick = 1,
-  keyboard_joystick = JOYSTICK_KEYBOARD;
-
-static widget_menu_widget_t joystick_1 =
-  { WIDGET_TYPE_JOYSTICK, &first_joystick };
-static widget_menu_widget_t joystick_2 =
-  { WIDGET_TYPE_JOYSTICK, &second_joystick };
-static widget_menu_widget_t joystick_keyboard =
-  { WIDGET_TYPE_JOYSTICK, &keyboard_joystick };
+  joystick_1 = 0,
+  joystick_2 = 1,
+  joystick_keyboard = JOYSTICK_KEYBOARD;
 
 static widget_menu_entry widget_menu_joysticks[] = {
   { "Configure joysticks", 0, 0, NULL },	/* Menu title */
 
-  { "Joystick (1)...", INPUT_KEY_1, widget_menu_widget, &joystick_1	   },
-  { "Joystick (2)...", INPUT_KEY_2, widget_menu_widget, &joystick_2	   },
-  { "(K)eyboard...",   INPUT_KEY_k, widget_menu_widget, &joystick_keyboard },
+  { "Joystick (1)...", INPUT_KEY_1, widget_menu_joystick, &joystick_1	     },
+  { "Joystick (2)...", INPUT_KEY_2, widget_menu_joystick, &joystick_2	     },
+  { "(K)eyboard...",   INPUT_KEY_k, widget_menu_joystick, &joystick_keyboard },
 
   { NULL, 0, 0, NULL }			/* End marker */
 };
@@ -239,10 +232,10 @@ static widget_menu_widget_t machine_sel = { WIDGET_TYPE_SELECT, NULL };
 static widget_menu_entry widget_menu_machine[] = {
   { "Machine", 0, 0, NULL },		/* Menu title */
 
-  { "(R)eset",     INPUT_KEY_r, widget_menu_reset,  NULL         },
-  { "(S)elect...", INPUT_KEY_s, widget_menu_widget, &machine_sel },
-  { "(D)ebugger...", INPUT_KEY_d, widget_menu_break, NULL        },
-  { "(N)MI",       INPUT_KEY_n, widget_menu_nmi,    NULL         },
+  { "(R)eset",	     INPUT_KEY_r, widget_menu_reset,	 NULL },
+  { "(S)elect...",   INPUT_KEY_s, widget_select_machine, NULL },
+  { "(D)ebugger...", INPUT_KEY_d, widget_menu_break,	 NULL },
+  { "(N)MI",	     INPUT_KEY_n, widget_menu_nmi,	 NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

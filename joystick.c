@@ -61,7 +61,7 @@ static libspectrum_byte timex2_value;
 
 /* The names of the joysticks we can emulate. Order must correspond to
    that of joystick.h:joystick_type_t */
-char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
+const char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
   "None", "Cursor", "Kempston", "Timex 1", "Timex 2"
 };
 

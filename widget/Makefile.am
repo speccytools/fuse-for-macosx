@@ -31,13 +31,11 @@ libwidget_a_SOURCES = \
 	debugger.c \
 	error.c \
 	filesel.c \
-	joystick.c \
 	menu.c \
 	menu_data.c \
 	options.c \
 	picture.c \
 	roms.c \
-	scaler.c \
 	select.c \
 	text.c \
 	widget.c
