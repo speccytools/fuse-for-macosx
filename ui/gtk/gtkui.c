@@ -74,6 +74,7 @@ static void gtkui_open(GtkWidget *widget, gpointer data);
 static void gtkui_save(GtkWidget *widget, gpointer data);
 
 static void gtkui_rzx_start( GtkWidget *widget, gpointer data );
+static void gtkui_rzx_start_snap( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
 static int gtkui_open_snap( void );
@@ -112,6 +113,8 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/_Recording",		NULL , NULL,		    0, "<Branch>"    },
   { "/File/Recording/_Record...",NULL, gtkui_rzx_start,     0, NULL	     },
+  { "/File/Recording/Record _from snapshot...",
+                                NULL , gtkui_rzx_start_snap,0, NULL          },
   { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
   { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
@@ -345,6 +348,35 @@ gtkui_rzx_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   rzx_start_recording( recording, 1 );
 
   free( recording );
+
+  fuse_emulation_unpause();
+}
+
+/* Called when `File/Recording/Record from snapshot' selected */
+static void
+gtkui_rzx_start_snap( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  char *snap, *recording;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  snap = gtkui_fileselector_get_filename( "Fuse - Load Snapshot " );
+  if( !snap ) { fuse_emulation_unpause(); return; }
+
+  recording = gtkui_fileselector_get_filename( "Fuse - Start Recording" );
+  if( !recording ) { free( snap ); fuse_emulation_unpause(); return; }
+
+  if( snapshot_read( snap ) ) {
+    free( snap ); free( recording ); fuse_emulation_unpause(); return;
+  }
+
+/*    rzx_start_recording( recording, 0 ); */
+
+  free( recording );
+
+  display_refresh_all();
 
   fuse_emulation_unpause();
 }

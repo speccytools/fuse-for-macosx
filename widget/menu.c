@@ -148,6 +148,26 @@ widget_menu_rzx_recording( void *data GCC_UNUSED )
   return rzx_start_recording( "record.rzx", 1 );
 }
 
+/* File/Recording/Record from snap */
+int
+widget_menu_rzx_recording_snap( void *data GCC_UNUSED )
+{
+  int error;
+
+  if( rzx_playback || rzx_recording ) return 0;
+
+  /* Get a snapshot name */
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+
+  error = snapshot_read( widget_filesel_name );
+  if( error ) {
+    if( widget_filesel_name ) free( widget_filesel_name );
+    return error;
+  }
+
+  return rzx_start_recording( "record.rzx", 0 );
+}
+
 /* File/Recording/Play */
 int
 widget_menu_rzx_playback( void *data GCC_UNUSED )

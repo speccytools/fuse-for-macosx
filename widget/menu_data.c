@@ -110,6 +110,7 @@ static widget_menu_entry widget_menu_file_recording[] = {
   { "Recording", 0, 0, NULL },		/* Menu title */
 
   { "(R)ecord...", KEYBOARD_r, widget_menu_rzx_recording,  NULL },
+  { "Record (f)rom snap...", KEYBOARD_f, widget_menu_rzx_recording_snap,NULL },
   { "(P)lay...",   KEYBOARD_p, widget_menu_rzx_playback,   NULL },
   { "(S)top",	   KEYBOARD_s, widget_menu_rzx_stop,       NULL },
 
