@@ -125,7 +125,7 @@ ui_libspectrum_error( libspectrum_error error GCC_UNUSED, const char *format,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int
+void
 ui_error_frame( void )
 {
   frames_since_last_message++;
