@@ -213,7 +213,8 @@ zxatasp_insert( const char *filename, libspectrum_ide_unit unit )
   default: return 1;
   }
 
-  return ide_insert( filename, zxatasp_idechn0, unit, setting, item );
+  return ide_insert( filename, zxatasp_idechn0, unit, zxatasp_commit, setting,
+		     item );
 }
 
 int

@@ -114,7 +114,8 @@ simpleide_insert( const char *filename, libspectrum_ide_unit unit )
     default: return 1;
   }
 
-  return ide_insert( filename, simpleide_idechn, unit, setting, item );
+  return ide_insert( filename, simpleide_idechn, unit, simpleide_commit,
+		     setting, item );
 }
 
 int

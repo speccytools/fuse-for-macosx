@@ -28,13 +28,23 @@
 
 #include <libspectrum.h>
 
+#include "ide.h"
 #include "ui/ui.h"
+#include "settings.h"
 
 int
 ide_insert( const char *filename, libspectrum_ide_channel *chn,
-	    libspectrum_ide_unit unit, char **setting, ui_menu_item item )
+	    libspectrum_ide_unit unit,
+	    int (*commit_fn)( libspectrum_ide_unit unit ), char **setting,
+	    ui_menu_item item )
 {
   int error;
+
+  /* Remove any currently inserted disk; abort if we want to keep the current
+     disk */
+  if( *setting )
+    if( ide_eject( chn, unit, commit_fn, setting, item ) )
+      return 0;
 
   error = settings_set_string( setting, filename ); if( error ) return error;
 
@@ -66,7 +76,7 @@ ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
       break;
 
     case UI_CONFIRM_SAVE_DONTSAVE: break;
-    case UI_CONFIRM_SAVE_CANCEL: return 0;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
     }
   }

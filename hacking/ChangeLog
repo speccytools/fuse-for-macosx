@@ -1219,3 +1219,5 @@
 20050219 machines/specplus3.c: add "Save, Don't Save, Cancel" functionality on
 	 +3 disk eject.
 20050219 machines/specplus3.c: the +3 disk autoload snap is now an SZX file.
+20050219 ide.[ch],simpleide.c,zxatasp.c,zxcf.c: make ide_insert check whether
+	 the currently inserted disk is dirty before doing the insert.
