@@ -57,12 +57,18 @@ int widget_options( void )
 
   /* Get a copy of the current settings */
   error = settings_copy( &settings, &settings_current );
-  if( error ) return error;
+  if( error ) {
+    widget_timer_end();
+    return error;
+  }
 
   /* Draw the dialog box */
   widget_dialog_with_border( 1, 2, 30, 2 );
   error = widget_options_show_all( &settings );
-  if( error ) return error;
+  if( error ) {
+    widget_timer_end();
+    return error;
+  }
 
   /* And note we're in a widget */
   widget_active = 1;

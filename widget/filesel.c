@@ -226,7 +226,10 @@ const char* widget_selectfile( void )
   if( error ) return NULL;
 
   directory = widget_getcwd();
-  if( directory == NULL ) return NULL;
+  if( directory == NULL ) {
+    widget_timer_end();
+    return NULL;
+  }
 
   widget_scan( directory );
   new_current_file = current_file = 0;
@@ -236,6 +239,7 @@ const char* widget_selectfile( void )
   error = widget_dialog_with_border( 1, 2, 30, 20 );
   if( error ) {
     free( directory );
+    widget_timer_end();
     return NULL;
   }
     
