@@ -243,10 +243,9 @@ int widget_filesel_draw( void* data )
 
 int widget_filesel_finish( widget_finish_state finished ) {
 
-  /* Now return, either with a filename or without as appropriate */
-  if( finished == WIDGET_FINISHED_OK ) {
-    widget_filesel_name = widget_filenames[ current_file ]->name;
-  } else {
+  /* Return with null if we didn't finish cleanly */
+  if( finished != WIDGET_FINISHED_OK ) {
+    if( widget_filesel_name ) free( widget_filesel_name );
     widget_filesel_name = NULL;
   }
 
@@ -417,7 +416,7 @@ void widget_filesel_keyhandler( keyboard_key_name key )
 			
     if(chdir(fn)==-1) {
       if(errno==ENOTDIR) {
-	free( fn );
+	widget_filesel_name = fn;
 	widget_end_all( WIDGET_FINISHED_OK );
       }
     } else {

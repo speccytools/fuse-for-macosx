@@ -119,7 +119,10 @@ int widget_apply_to_file( void *data )
   fn_ptr ptr = (fn_ptr)data;
 
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( widget_filesel_name ) ptr( widget_filesel_name );
+  if( widget_filesel_name ) {
+    ptr( widget_filesel_name );
+    free( widget_filesel_name );
+  }
 
   return 0;
 }
@@ -146,12 +149,16 @@ int widget_menu_rzx_recording( void *data )
 /* File/Recording/Play */
 int widget_menu_rzx_playback( void *data )
 {
+  int error;
+
   if( rzx_playback || rzx_recording ) return 0;
 
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
 
   if( widget_filesel_name ) {
-    return rzx_start_playback( widget_filesel_name, widget_load_snapshot );
+    error = rzx_start_playback( widget_filesel_name, widget_load_snapshot );
+    free( widget_filesel_name );
+    return error;
   } else {
     return 0;
   }
