@@ -28,7 +28,7 @@ What you'll need to run Fuse:
 * A version of Unix with either X or svgalib. If you have GTK+
   installed, you'll get a nicer user interface under X.
 
-To compile Fuse:
+To compile Fuse (see below if you're using FreeBSD):
 
 $ ./configure
 
@@ -59,7 +59,18 @@ if you want to place Fuse into the main directories on your system
 --prefix argument to `configure'). You'll probably need to be root to
 do this bit.
 
-Then, read the man page :-)
+If you're using FreeBSD, you may have to rebuild the configure script
+due to FreeBSD's different naming conventions for the GTK+ scripts; if
+configure can't find GTK+, try:
+
+$ aclocal
+$ autoheader
+$ automake --add-missing
+$ autoconf
+
+and then follow the instruction above.
+
+Once you've got Fuse configured and built, read the man page :-)
 
 If you have any bug reports, suggestions or (particularly
 appreciated!) patches for Fuse, mail them to me at
@@ -81,6 +92,6 @@ may be useful (information on internals, etc) are in the hacking/
 directory.
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-23 March 2002
+26 March 2002
 
 $Id$
