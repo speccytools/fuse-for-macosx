@@ -111,7 +111,11 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_CLASS_DISK_TRDOS:
     error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
-    error = trdos_disk_insert( TRDOS_DRIVE_A, filename );
+    error = trdos_disk_insert( TRDOS_DRIVE_A, filename ); if( error ) break;
+    if( autoload ) {
+      machine_current->ram.current_rom = 1;
+      trdos_active = 1;
+    }
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
