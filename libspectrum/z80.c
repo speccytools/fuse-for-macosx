@@ -280,14 +280,14 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
     int type, level;
 
     /* Check we've got enough data left */
-    if( *next_block + 8 >= end ) {
+    if( *next_block + 8 > end ) {
       libspectrum_print_error(
 	"libspectrum_z80_read_slt: out of data in directory\n"
       );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    type = *next_block[0] + *next_block[1] * 0x100;
+    type = (*next_block)[0] + (*next_block)[1] * 0x100;
 
     /* Type of zero => end of table. But remember to skip this entry */
     if( type == 0 ) { *next_block += 8; break; }
@@ -300,7 +300,7 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
       return LIBSPECTRUM_ERROR_UNKNOWN;
     }
 
-    level = *next_block[2] + *next_block[3] * 0x100;
+    level = (*next_block)[2] + (*next_block)[3] * 0x100;
     if( level >= 0x100 ) {
       libspectrum_print_error(
         "libspectrum_z80_read_slt: unexpected level number %d\n", level
@@ -316,10 +316,10 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    slt_length[ level ] = *next_block[4]             +
-                          *next_block[5] *     0x100 +
-                          *next_block[6] *   0x10000 +
-                          *next_block[7] * 0x1000000;
+    slt_length[ level ] = (*next_block)[4]             +
+                          (*next_block)[5] *     0x100 +
+                          (*next_block)[6] *   0x10000 +
+                          (*next_block)[7] * 0x1000000;
 
     /* and move along to the next block */
     *next_block += 8;
@@ -332,7 +332,7 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
       libspectrum_error error;
 
       /* Check this data actually exists */
-      if( *next_block + slt_length[i] >= end ) {
+      if( *next_block + slt_length[i] > end ) {
 	libspectrum_print_error(
           "libspectrum_z80_read_slt: out of data reading level %d\n", i
 	);
@@ -561,7 +561,7 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
   } else { /* Uncompressed block */
 
     /* Check we're not going to run over the end of the buffer */
-    if( buffer + 3 + 0x4000 >= end ) {
+    if( buffer + 3 + 0x4000 > end ) {
       libspectrum_print_error( "read_v2_block: not enough data in buffer\n" );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
