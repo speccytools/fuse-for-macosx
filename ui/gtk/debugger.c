@@ -254,7 +254,7 @@ create_dialog( void )
   /* Try and get a monospaced font */
 #ifdef UI_GTK2
 
-  font = pango_font_description_from_string( "Monospace 12" );
+  font = pango_font_description_from_string( "Monospace 10" );
   if( !font ) {
     ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
     return 1;
