@@ -123,6 +123,8 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 				  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 				);
 			      }
+	 | CLEAR { debugger_breakpoint_clear( PC ); }
+	 | CLEAR NUMBER { debugger_breakpoint_clear( $2 ); }
 	 | CONTINUE { debugger_run(); }
 	 | DELETE { debugger_breakpoint_remove_all(); }
 	 | DELETE NUMBER { debugger_breakpoint_remove( $2 ); }

@@ -47,7 +47,10 @@ static size_t next_breakpoint_id;
 /* Which base should we display things in */
 int debugger_output_base;
 
-static gint find_breakpoint( gconstpointer data, gconstpointer user_data );
+static gint find_breakpoint_by_id( gconstpointer data,
+				   gconstpointer user_data );
+static gint find_breakpoint_by_address( gconstpointer data,
+					gconstpointer user_data );
 static void free_breakpoint( gpointer data, gpointer user_data );
 static void show_breakpoint( gpointer data, gpointer user_data );
 
@@ -198,7 +201,8 @@ debugger_breakpoint_remove( size_t id )
 {
   GSList *ptr;
 
-  ptr = g_slist_find_custom( debugger_breakpoints, &id, find_breakpoint );
+  ptr = g_slist_find_custom( debugger_breakpoints, &id,
+			     find_breakpoint_by_id );
   if( !ptr ) {
     ui_error( UI_ERROR_ERROR, "Breakpoint %ld does not exist",
 	      (unsigned long)id );
@@ -215,12 +219,61 @@ debugger_breakpoint_remove( size_t id )
 }
 
 static gint
-find_breakpoint( gconstpointer data, gconstpointer user_data )
+find_breakpoint_by_id( gconstpointer data, gconstpointer user_data )
 {
   const debugger_breakpoint *bp = data;
   size_t id = *(size_t*)user_data;
 
   return bp->id - id;
+}
+
+/* Remove all breakpoints at the given address */
+int
+debugger_breakpoint_clear( WORD address )
+{
+  GSList *ptr;
+
+  int found = 0;
+
+  while( 1 ) {
+
+    ptr = g_slist_find_custom( debugger_breakpoints, &address,
+			       find_breakpoint_by_address );
+    if( !ptr ) break;
+
+    found++;
+
+    debugger_breakpoints = g_slist_remove( debugger_breakpoints, ptr->data );
+    if( debugger_mode == DEBUGGER_MODE_ACTIVE && !debugger_breakpoints )
+      debugger_mode = DEBUGGER_MODE_INACTIVE;
+
+    free( ptr->data );
+  }
+
+  if( !found ) {
+    if( debugger_output_base == 10 ) {
+      ui_error( UI_ERROR_ERROR, "No breakpoint at %d", address );
+    } else {
+      ui_error( UI_ERROR_ERROR, "No breakpoint at 0x%04x", address );
+    }
+  }
+
+  return 0;
+}
+
+static gint
+find_breakpoint_by_address( gconstpointer data, gconstpointer user_data )
+{
+  const debugger_breakpoint *bp = data;
+  WORD address = *(WORD*)user_data;
+
+  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_EXECUTE ||
+      bp->type == DEBUGGER_BREAKPOINT_TYPE_READ ||
+      bp->type == DEBUGGER_BREAKPOINT_TYPE_WRITE ) {
+    return( bp->value - address );
+  }
+
+  return 1;
 }
 
 /* Remove all breakpoints */
@@ -287,7 +340,8 @@ debugger_breakpoint_ignore( size_t id, size_t ignore )
 {
   GSList *ptr; debugger_breakpoint *bp;
 
-  ptr = g_slist_find_custom( debugger_breakpoints, &id, find_breakpoint );
+  ptr = g_slist_find_custom( debugger_breakpoints, &id,
+			     find_breakpoint_by_id );
   if( !ptr ) {
     ui_error( UI_ERROR_ERROR, "Breakpoint %ld does not exist",
 	      (unsigned long)id );

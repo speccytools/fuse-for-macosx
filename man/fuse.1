@@ -994,6 +994,16 @@ is read from (other than via an opcode fetch) or written to.
 again defaults to the current value of PC if omitted.
 .RE
 .PP
+cl{ear}
+.RI [ address ]
+.RS
+Remove all breakpoints at 
+.I address
+or the current value of PC if
+.I address
+is omitted. Port read/write breakpoints are unaffected.
+.RE
+.PP
 co{ntinue}
 .RS
 Equivalent to the
