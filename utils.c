@@ -356,3 +356,24 @@ utils_get_temp_path( void )
 #endif				/* #ifdef WIN32 */
   
 }
+
+/* Return the path where we will store our configuration information etc */
+const char*
+utils_get_home_path( void )
+{
+  const char *dir;
+
+#ifdef WIN32
+
+  dir = getenv( "USERPROFILE" ); if( dir ) return dir;
+  dir = getenv( "WINDIR" ); if( dir ) return dir;
+
+#else				/* #ifdef WIN32 */
+
+  dir = getenv( "HOME" ); if( dir ) return dir;
+
+#endif				/* #ifdef WIN32 */
+
+  ui_error( UI_ERROR_ERROR, "couldn't find a plausible home directory" );
+  return NULL;
+}

@@ -314,3 +314,5 @@
 20031029 timer.c: fix typos in Win32 time routines (Marek).
 20031029 trdos.c, utils.c: don't assume temp path ends with a slash
 	 (Marek).
+20031029 settings.pl, utils.[ch], ui/uijoystick.c: add and use
+	 utils_get_home_path function.

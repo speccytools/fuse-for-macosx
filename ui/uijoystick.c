@@ -118,13 +118,10 @@ init_stick( int which, const char *const device,
 int
 ui_joystick_init( void )
 {
-  const char *home = getenv( "HOME" );
+  const char *home;
   char *calibration;
 
-  /* FIXME: generalise both how this and the config file code look for
-     files */
-
-  if( !home ) home = ".";
+  home = utils_get_home_path(); if( !home ) return 1;
 
   /* Default calibration file is ~/.joystick */
   calibration = malloc( strlen( home ) + strlen( JSDefaultCalibration ) + 2 );

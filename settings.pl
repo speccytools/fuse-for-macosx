@@ -93,6 +93,7 @@ print hashline( __LINE__ ), << 'CODE';
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 /* The name of our configuration file */
 #ifdef WIN32
@@ -169,9 +170,6 @@ CODE
   settings->rzx_compression = 1;
 #endif			/* #ifdef HAVE_LIBZ */
 
-  if( !settings->start_machine ) return 1;
-  if( !settings->start_scaler_mode ) return 1;
-
   return 0;
 }
 
@@ -187,11 +185,7 @@ read_config_file( settings_info *settings )
 
   xmlDocPtr doc;
 
-  home = getenv( "HOME" );
-  if( !home ) {
-    ui_error( UI_ERROR_ERROR, "couldn't get your home directory" );
-    return 1;
-  }
+  home = utils_get_home_path(); if( !home ) return 1;
 
   snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
 
@@ -292,11 +286,7 @@ settings_write_config( settings_info *settings )
 
   xmlDocPtr doc; xmlNodePtr root;
 
-  home = getenv( "HOME" );
-  if( !home ) {
-    ui_error( UI_ERROR_ERROR, "couldn't get your home directory" );
-    return 1;
-  }
+  home = utils_get_home_path(); if( !home ) return 1;
 
   snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
 
