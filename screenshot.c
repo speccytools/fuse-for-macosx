@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "settings.h"
 #include "types.h"
 #include "ui/ui.h"
 
@@ -118,7 +119,8 @@ screenshot_write( const char *filename )
   png_set_compression_level( png_ptr, Z_BEST_COMPRESSION );
 
   png_set_IHDR( png_ptr, info_ptr,
-		640, 480,               /* height and width */
+		settings_current.double_screen ? 640 : 320, /* height */
+		settings_current.double_screen ? 480 : 240, /* width */
 		4,			/* 2^4 colours */
 		PNG_COLOR_TYPE_PALETTE,
 		PNG_INTERLACE_NONE,
@@ -128,11 +130,19 @@ screenshot_write( const char *filename )
   png_set_PLTE( png_ptr, info_ptr, palette, 16 );
  
   for( y=0; y<240; y++ ) {
-    row_pointers[2*y] = row_pointers[2*y+1] = png_data[y];
-    for( x=0; x<320; x++ ) {
-      png_data[y][x] = (   saved_screen[y][2*x  ] & 0x1f )        |
-	               ( ( saved_screen[y][2*x+1] & 0x1f ) << 4 );
+
+    if( settings_current.double_screen ) {
+      row_pointers[2*y] = row_pointers[2*y+1] = png_data[y];
+      for( x=0; x<320; x++ )
+	png_data[y][x] = (   saved_screen[y][2*x  ] & 0x1f )        |
+	                 ( ( saved_screen[y][2*x+1] & 0x1f ) << 4 );
+    } else {
+      row_pointers[y] = png_data[y];
+      for( x=0; x<160; x++ )
+	png_data[y][x] = (   saved_screen[y][4*x+2] & 0x1f )        |
+	                 ( ( saved_screen[y][4*x  ] & 0x1f ) << 4 );
     }
+
   }
   
   png_set_rows( png_ptr, info_ptr, row_pointers );

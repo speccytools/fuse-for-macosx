@@ -35,6 +35,7 @@ issue2, boolean, 0
 joy_kempston, boolean, 0,, kempston
 tape_traps, boolean, 1,, traps, tapetraps
 slt_traps, boolean, 1,, slt, slttraps
+double_screen, boolean, 0
 
 sound_device, string, NULL, d
 sound, boolean, 1
