@@ -60,8 +60,13 @@ const char* libspectrum_error_message( libspectrum_error error )
     return "unknown data";
   case LIBSPECTRUM_ERROR_CORRUPT:
     return "corrupt data";
+
+  case LIBSPECTRUM_ERROR_SIGNATURE:
+    return "invalid signature";
+
   case LIBSPECTRUM_ERROR_LOGIC:
     return "internal logic error";
+
   default:
     return "unknown error";
   }
