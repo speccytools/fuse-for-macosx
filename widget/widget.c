@@ -296,9 +296,13 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 {
   int i;
 
-  widget_rectangle( 8*(x-1), 8*(y-1), 8*(width+2), 8*(height+2),
-		    WIDGET_COLOUR_BACKGROUND );
-  
+  widget_rectangle( 8*x-5, 8*y, 8*width+10, 8*height, WIDGET_COLOUR_BACKGROUND );
+
+  for( i = 0; i < 5; ++i) {
+    widget_rectangle (8*x+i-5, 8*y-i-1, 8*width+10-2*i, 1, WIDGET_COLOUR_BACKGROUND );
+    widget_rectangle (8*x+i-5, 8*(y+height)+i, 8*width+10-2*i, 1, WIDGET_COLOUR_BACKGROUND );
+  }
+
   for( i=(8*x)-1; i<(8*(x+width))+1; i++ ) {
     widget_putpixel( i, 8 *   y            - 4, WIDGET_COLOUR_FOREGROUND );
     widget_putpixel( i, 8 * ( y + height ) + 3, WIDGET_COLOUR_FOREGROUND );
