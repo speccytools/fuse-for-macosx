@@ -47,6 +47,9 @@
 #if defined(HAVE_SYS_SOUNDCARD_H)
 #include "osssound.h"
 #endif
+#if defined(HAVE_SYS_AUDIOIO_H)
+#include "sunsound.h"
+#endif
 
 #include "fuse.h"
 #include "machine.h"
@@ -172,7 +175,7 @@ static int first_init=1;
 int f,ret;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
-#if !defined(HAVE_SYS_SOUNDCARD_H)	/* only type for now */
+#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SYS_AUDIOIO_H)
 return;
 #endif
 
@@ -193,6 +196,9 @@ if(sound_stereo_ay || sound_stereo_beeper)
 
 #if defined(HAVE_SYS_SOUNDCARD_H)
 ret=osssound_init(&sound_freq,&sound_stereo);
+#endif
+#if defined(HAVE_SYS_AUDIOIO_H)
+ret=sunsound_init(&sound_freq,&sound_stereo);
 #endif
 
 if(ret)
@@ -288,6 +294,9 @@ if(sound_enabled)
     free(sound_buf);
 #if defined(HAVE_SYS_SOUNDCARD_H)
   osssound_end();
+#endif
+#if defined(HAVE_SYS_AUDIOIO_H)
+  sunsound_end();
 #endif
   sound_enabled=0;
   }
@@ -753,6 +762,9 @@ sound_ay_overlay();
 
 #if defined(HAVE_SYS_SOUNDCARD_H)
 osssound_frame(sound_buf,sound_framesiz*sound_channels);
+#endif
+#if defined(HAVE_SYS_AUDIOIO_H)
+sunsound_frame(sound_buf,sound_framesiz*sound_channels);
 #endif
 
 sound_oldpos[0]=sound_oldpos[1]=-1;
