@@ -310,10 +310,15 @@ settings_command_line( settings_info *settings, int *first_arg,
 
 CODE
 
+my $fake_short_option = 256;
+
 foreach my $name ( sort keys %options ) {
 
     my $type = $options{$name}->{type};
     my $commandline = $options{$name}->{commandline};
+    my $short = $options{$name}->{short};
+
+    unless( $type eq 'boolean' or $short ) { $short = $fake_short_option++ }
 
     if( $type eq 'boolean' ) {
 
@@ -323,7 +328,7 @@ foreach my $name ( sort keys %options ) {
 CODE
     } elsif( $type eq 'string' or $type eq 'numeric' ) {
 
-	print "    { \"$commandline\", 1, NULL, $options{$name}->{short} },\n";
+	print "    { \"$commandline\", 1, NULL, $short },\n";
     } else {
 	die "Unknown setting type `$type'";
     }
@@ -351,10 +356,14 @@ print hashline( __LINE__ ), << 'CODE';
 
 CODE
 
+$fake_short_option = 256;
+
 foreach my $name ( sort keys %options ) {
 
     my $type = $options{$name}->{type};
     my $short = $options{$name}->{short};
+
+    unless( $type eq 'boolean' or $short ) { $short = $fake_short_option++ }
 
     if( $type eq 'boolean' ) {
 	# Do nothing

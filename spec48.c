@@ -34,6 +34,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "spec48.h"
@@ -141,7 +142,7 @@ int spec48_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, "48.rom" );
+  error = machine_read_rom( machine, 0, settings_current.rom_48 );
   if( error ) return error;
 
   machine->peripherals = spec48_peripherals;
