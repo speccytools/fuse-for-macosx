@@ -47,6 +47,12 @@
 #include "ui/uidisplay.h"
 #include "settings.h"
 
+/* The environment variable specifying which device to use */
+static const char *DEVICE_VARIABLE = "FRAMEBUFFER";
+
+/* The device we will use if device_env_variable is not specified */
+static const char *DEFAULT_DEVICE = "/dev/fb0";
+
 /* The size of a 1x1 image in units of
    DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */
 int image_scale;
@@ -127,7 +133,18 @@ register_scalers( void )
 
 int fbdisplay_init(void)
 {
-  fb_fd = open( "/dev/fb0", O_RDWR );
+  int i;
+  char *dev;
+
+  static libspectrum_word paldata[4] = { 0, 0xBBBB, 0xFFFF };
+  static const struct fb_cmap fb_cmap = {
+    0, 4, paldata, paldata, paldata, NULL
+  };
+
+  dev = getenv( DEVICE_VARIABLE );
+  if( !dev || !*dev ) dev = DEFAULT_DEVICE;
+
+  fb_fd = open( dev, O_RDWR | O_EXCL );
   if( fb_fd == -1 ) {
     fprintf( stderr, "%s: couldn't open framebuffer device\n", fuse_progname );
     return 1;

@@ -1007,3 +1007,6 @@
 20040716 configure.in: bump version number to 0.7.0.
 20040716 gtkjoystick.c: add delete-event handler (thanks, Darren).
 20040717 ui/fb/fbkeyboard.c: support Tab (Darren).
+20040719 ui/fb/fbdisplay.c: check FRAMEBUFFER environment variable for
+	 framebuffer device to use (Darren).
+
