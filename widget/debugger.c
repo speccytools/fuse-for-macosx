@@ -64,19 +64,13 @@ widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     if( key2 == KEYBOARD_Caps ) {
-      debugger_mode = 
-	debugger_breakpoint == DEBUGGER_BREAKPOINT_UNSET ?
-	DEBUGGER_MODE_INACTIVE			         :
-	DEBUGGER_MODE_ACTIVE;
+      debugger_run();
       widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     }
     return;
 
   case KEYBOARD_Enter:
-    debugger_mode = 
-      debugger_breakpoint == DEBUGGER_BREAKPOINT_UNSET ?
-      DEBUGGER_MODE_INACTIVE			       :
-      DEBUGGER_MODE_ACTIVE;
+    debugger_run();
     widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
     return;
 

@@ -55,4 +55,6 @@ int debugger_end( void );
 int debugger_check( void );	/* See if the debugger should become active */
 int debugger_trap( void );	/* Activate the debugger */
 
+int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
+
 #endif				/* #ifndef FUSE_DEBUGGER_H */

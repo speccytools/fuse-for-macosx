@@ -191,10 +191,7 @@ static void
 gtkui_debugger_done_continue( GtkWidget *widget GCC_UNUSED,
 			      gpointer user_data GCC_UNUSED )
 {
-  debugger_mode = 
-    debugger_breakpoint == DEBUGGER_BREAKPOINT_UNSET ?
-    DEBUGGER_MODE_INACTIVE			     :
-    DEBUGGER_MODE_ACTIVE;
+  debugger_run();
   gtk_widget_set_sensitive( continue_button, 0 );
   gtk_widget_set_sensitive( break_button, 1 );
   if( debugger_active ) deactivate_debugger();

@@ -95,3 +95,14 @@ debugger_trap( void )
   return ui_debugger_activate();
 }
 
+/* Set debugger_mode so that emulation will occur */
+int
+debugger_run( void )
+{
+  debugger_mode = 
+    debugger_breakpoint == DEBUGGER_BREAKPOINT_UNSET ?
+    DEBUGGER_MODE_INACTIVE			     :
+    DEBUGGER_MODE_ACTIVE;
+  return 0;
+}
+
