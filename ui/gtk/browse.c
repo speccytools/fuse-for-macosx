@@ -1,5 +1,5 @@
 /* browse.c: tape browser dialog box
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -37,45 +37,55 @@
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "tape.h"
+#include "ui/ui.h"
 
-struct browse_data {
-
-  GtkWidget *dialog;
-  gint row;		/* The selected row; -1 => none */
-
-};
-
-static void select_row( GtkWidget *widget, gint row, gint column,
+static int create_dialog( void );
+static void add_block_details( libspectrum_tape_block *block,
+			       void *user_data );
+static void select_row( GtkCList *widget, gint row, gint column,
 			GdkEventButton *event, gpointer data );
-static void unselect_row( GtkWidget *widget, gint row, gint column,
-			  GdkEventButton *event, gpointer data );
 static void browse_done( GtkWidget *widget, gpointer data );
+static gboolean delete_dialog( GtkWidget *widget, GdkEvent *event,
+			       gpointer user_data );
+
+static GtkWidget
+  *dialog,			/* The dialog box itself */
+  *blocks;			/* The list of blocks */
+
+static int dialog_created;	/* Have we created the dialog box yet? */
 
 void
 gtk_tape_browse( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  GtkWidget *dialog;
-  GtkAccelGroup *accel_group;
-  GtkWidget *scrolled_window, *clist;
-  GtkWidget *ok_button, *cancel_button;
-
-  struct browse_data callback_data;
-  int current_block;
-
-  gchar *titles[2] = { "Block type", "Data" };
-
-  char ***text; size_t i,n;
-  int error;
-
-  error = tape_get_block_list( &text, &n );
-  if( error ) return;
-
   /* Firstly, stop emulation */
   fuse_emulation_pause();
+
+  if( !dialog_created )
+    if( create_dialog() ) { fuse_emulation_unpause(); return; }
+
+  if( ui_tape_browser_update() ) { fuse_emulation_unpause(); return; }
+
+  gtk_widget_show_all( dialog );
+
+  /* Carry on with emulation */
+  fuse_emulation_unpause();
+}
+
+static int
+create_dialog( void )
+{
+  GtkAccelGroup *accel_group;
+  GtkWidget *scrolled_window;
+  GtkWidget *ok_button;
+
+  size_t i;
+  gchar *titles[3] = { "", "Block type", "Data" };
 
   /* Give me a new dialog box */
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Browse Tape" );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
 
   /* And a scrolled window to pack the CList into */
   scrolled_window = gtk_scrolled_window_new( NULL, NULL );
@@ -85,106 +95,114 @@ gtk_tape_browse( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 		     scrolled_window );
 
   /* And the CList itself */
-  clist = gtk_clist_new_with_titles( 2, titles );
-  gtk_clist_column_titles_passive( GTK_CLIST( clist ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( clist ), i, TRUE );
+  blocks = gtk_clist_new_with_titles( 3, titles );
+  gtk_clist_column_titles_passive( GTK_CLIST( blocks ) );
+  for( i = 0; i < 3; i++ )
+    gtk_clist_set_column_auto_resize( GTK_CLIST( blocks ), i, TRUE );
+  gtk_signal_connect( GTK_OBJECT( blocks ), "select-row",
+		      GTK_SIGNAL_FUNC( select_row ), NULL );
+  gtk_container_add( GTK_CONTAINER( scrolled_window ), blocks );
 
-  for( i=0; i<n; i++ ) {
-    gtk_clist_append( GTK_CLIST( clist ), text[i] );
-  }
-
-  gtk_container_add( GTK_CONTAINER( scrolled_window ), clist );
-
-  /* Create the OK and Cancel buttons */
+  /* Create the OK button */
   ok_button = gtk_button_new_with_label( "OK" );
-  cancel_button = gtk_button_new_with_label( "Cancel" );
-
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     ok_button );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     cancel_button );
-  
-  /* Add the necessary callbacks */
-  callback_data.dialog = dialog;
-  callback_data.row = -1;
-
-  gtk_signal_connect( GTK_OBJECT( clist ), "select_row",
-		      GTK_SIGNAL_FUNC( select_row ), &callback_data.row );
-  gtk_signal_connect( GTK_OBJECT( clist ), "unselect_row",
-		      GTK_SIGNAL_FUNC( unselect_row ), &callback_data.row );
-
   gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( browse_done ),
-		      (gpointer)(&callback_data) );
-  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+		      GTK_SIGNAL_FUNC( browse_done ), NULL );
 
+  /* Esc will close the dialog box */
   accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group(GTK_WINDOW(dialog), accel_group);
-
-  /* Allow Esc to cancel */
-  gtk_widget_add_accelerator( cancel_button, "clicked",
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
+  gtk_widget_add_accelerator( ok_button, "clicked",
 			      accel_group, GDK_Escape, 0, 0);
 
   /* Make the window big enough to show at least some data */
   gtk_window_set_default_size( GTK_WINDOW( dialog ), -1, 200 );
 
-  current_block = tape_get_current_block();
-  if( current_block != -1 ) {
-    /* FIXME: Why doesn't this work? */
-    gtk_clist_moveto( GTK_CLIST( clist ), current_block, -1,
-		      0.5, 0.0 );
+  dialog_created = 1;
 
-    gtk_clist_select_row( GTK_CLIST( clist ), current_block, 0 );
+  return 0;
+}
+
+int
+ui_tape_browser_update( void )
+{
+  int error, current_block;
+
+  if( !dialog_created ) return 0;
+
+  fuse_emulation_pause();
+  gtk_clist_freeze( GTK_CLIST( blocks ) );
+
+  gtk_clist_clear( GTK_CLIST( blocks ) );
+
+  error = tape_foreach( add_block_details, blocks );
+  if( error ) {
+    gtk_clist_thaw( GTK_CLIST( blocks ) );
+    fuse_emulation_unpause();
+    return 1;
   }
 
-  /* Set the window to be modal and display it */
-  gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
-  gtk_widget_show_all( dialog );
+  current_block = tape_get_current_block();
+  if( current_block != -1 )
+    gtk_clist_set_text( GTK_CLIST( blocks ), current_block, 0, "X" );
 
-  /* Process events until the window is done with */
-  gtk_main();
-
-  /* Free up the block list */
-  tape_free_block_list( text, n );
-
-  /* And then carry on with emulation again */
+  gtk_clist_thaw( GTK_CLIST( blocks ) );
   fuse_emulation_unpause();
 
-  return;
+  return 0;
+}
+
+static void
+add_block_details( libspectrum_tape_block *block, void *user_data )
+{
+  GtkWidget *clist = user_data;
+
+  gchar buffer[256];
+  gchar *details[3] = { &buffer[0], &buffer[80], &buffer[160] };
+
+  strcpy( details[0], "" );
+  libspectrum_tape_block_description( details[1], 80, block );
+  tape_block_details( details[2], 80, block );
+
+  gtk_clist_append( GTK_CLIST( clist ), details );
 }
 
 /* Called when a row is selected */
 static void
-select_row( GtkWidget *widget GCC_UNUSED, gint row, gint column GCC_UNUSED,
-	    GdkEventButton *event GCC_UNUSED, gpointer data )
+select_row( GtkCList *clist, gint row, gint column GCC_UNUSED,
+	    GdkEventButton *event, gpointer data GCC_UNUSED )
 {
-  *( (gint*)data ) = row;
-}
+  int current_block;
 
-/* Called when a row is unselected */
-static void
-unselect_row( GtkWidget *widget GCC_UNUSED, gint row GCC_UNUSED,
-	      gint column GCC_UNUSED, GdkEventButton *event GCC_UNUSED,
-	      gpointer data )
-{
-  *( (gint*)data ) = -1;
+  /* Ignore events which aren't double-clicks */
+  if( event->type != GDK_2BUTTON_PRESS ) return;
+
+  /* Don't do anything if the current block was clicked on */
+  current_block = tape_get_current_block();
+  if( row == current_block ) return;
+
+  /* Otherwise, select the new block */
+  tape_select_block_no_update( row );
+
+  gtk_clist_set_text( clist, row, 0, "X" );
+  if( current_block != -1 ) gtk_clist_set_text( clist, current_block, 0, "" );
 }
 
 /* Called if the OK button is clicked */
 static void
 browse_done( GtkWidget *widget GCC_UNUSED, gpointer data )
 {
-  struct browse_data *callback_data = (struct browse_data*)data;
+  gtk_widget_hide_all( dialog );
+}
 
-  /* Set the tape to the appropriate block */
-  if( callback_data->row != -1 ) tape_select_block( callback_data->row );
-
-  gtkui_destroy_widget_and_quit( callback_data->dialog, NULL );
+/* Catch attempts to delete the window and just hide it instead */
+static gboolean
+delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
+	       gpointer user_data GCC_UNUSED )
+{
+  gtk_widget_hide_all( widget );
+  return TRUE;
 }
 
 #endif			/* #ifdef UI_GTK */

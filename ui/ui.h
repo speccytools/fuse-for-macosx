@@ -1,5 +1,5 @@
 /* ui.h: General UI event handling routines
-   Copyright (c) 2000-2003 Philip Kendall
+   Copyright (c) 2000-2004 Philip Kendall
 
    $Id$
 
@@ -111,5 +111,8 @@ typedef enum ui_statusbar_state {
 
 int ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state );
 int ui_statusbar_update_speed( float speed );
+
+/* Cause the tape browser to be updated */
+int ui_tape_browser_update( void );
 
 #endif			/* #ifndef FUSE_UI_H */

@@ -440,3 +440,5 @@
 20040102 ui/gtk/gtkdisplay.c: in uidisplay_area, reorder the loop to
 	 improve cache localisation and then apply the obvious
 	 optimisations.
+20040104 tape.[ch], ui/ui.h, ui/gtk/browse.c: make the GTK+ tape browser
+	 no longer modal.

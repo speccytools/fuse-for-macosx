@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2003 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 1999-2004 Philip Kendall, Darren Salt, Witold Filipczyk
 
    $Id$
 
@@ -115,6 +115,8 @@ int tape_open( const char *filename, int autoload )
     return 1;
   }
 
+  ui_tape_browser_update();
+
   if( autoload ) {
     error = tape_autoload( machine_current->machine );
     if( error ) return error;
@@ -136,6 +138,8 @@ tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
 
   error = libspectrum_tape_read( tape, buffer, length, type, NULL );
   if( error ) return error;
+
+  ui_tape_browser_update();
 
   if( autoload ) {
     error = tape_autoload( machine_current->machine );
@@ -198,12 +202,27 @@ int tape_close( void )
   error = libspectrum_tape_clear( tape );
   if( error ) return error;
 
+  ui_tape_browser_update();
+
   return 0;
 }
 
 /* Select the nth block on the tape; 0 => 1st block */
 int
 tape_select_block( size_t n )
+{
+  int error;
+
+  error = tape_select_block_no_update( n ); if( error ) return error;
+
+  ui_tape_browser_update();
+
+  return 0;
+}
+
+/* The same, but without updating the browser display */
+int
+tape_select_block_no_update( size_t n )
 {
   return libspectrum_tape_nth_block( tape, n );
 }
@@ -287,8 +306,11 @@ int tape_load_trap( void )
   next_block = libspectrum_tape_peek_next_block( tape );
 
   if( libspectrum_tape_block_type(next_block) == LIBSPECTRUM_TAPE_BLOCK_ROM ) {
+
     next_block = libspectrum_tape_select_next_block( tape );
     if( !next_block ) return 1;
+
+    ui_tape_browser_update();
 
     return 0;
   }
@@ -407,6 +429,8 @@ int tape_save_trap( void )
   /* Add the block to the current tape file */
   error = libspectrum_tape_append_block( tape, block );
   if( error ) return error;
+
+  ui_tape_browser_update();
 
   /* And then return via the RET at #053E, except on Timex 2068 at #00E4 */
   if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) {
@@ -551,16 +575,20 @@ tape_next_edge( libspectrum_dword last_tstates )
     return 0;
   }
 
-  /* If that was the end of a block, tape traps are active _and_ the
-     new block is a ROM loader, return without putting another event
-     into the queue */
-  block = libspectrum_tape_current_block( tape );
-  if( ( flags & LIBSPECTRUM_TAPE_FLAGS_BLOCK ) &&
-      settings_current.tape_traps &&
-      libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
-    ) {
-    error = tape_stop(); if( error ) return error;
-    return 0;
+  /* If that was the end of a block, update the browser */
+  if( flags & LIBSPECTRUM_TAPE_FLAGS_BLOCK ) {
+
+    ui_tape_browser_update();
+
+    /* If tape traps are active _and_ the new block is a ROM loader,
+     return without putting another event into the queue */
+    block = libspectrum_tape_current_block( tape );
+    if( settings_current.tape_traps &&
+	libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
+      ) {
+      error = tape_stop(); if( error ) return error;
+      return 0;
+    }
   }
 
   /* Otherwise, put this into the event queue; remember that this edge
@@ -573,124 +601,89 @@ tape_next_edge( libspectrum_dword last_tstates )
   return 0;
 }
 
+/* Call a user-supplied function for every block in the current tape */
 int
-tape_get_block_list( char ****list, size_t *n )
+tape_foreach( void (*function)( libspectrum_tape_block *block,
+				void *user_data),
+	      void *user_data )
 {
-  libspectrum_tape_iterator iterator;
   libspectrum_tape_block *block;
-  size_t allocated;
-  int offset;
-
-  *list = NULL; *n = 0; allocated = 0;
+  libspectrum_tape_iterator iterator;
 
   for( block = libspectrum_tape_iterator_init( &iterator, tape );
        block;
        block = libspectrum_tape_iterator_next( &iterator ) )
-  {
+    function( block, user_data );
 
-    /* Get more space if we need it */
-    if( *n == allocated ) {
-      size_t new_size = allocated ? 2 * allocated : 1;
-      char ***new_list = (char***)realloc( (*list),
-					   new_size * sizeof( char** ) );
-      if( !new_list ) {
-	tape_free_block_list( *list, *n );
-	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d",
-		  __FILE__, __LINE__ );
-	return 1;
-      }
+  return 0;
+}
 
-      (*list) = new_list; allocated = new_size;
+int
+tape_block_details( char *buffer, size_t length,
+		    libspectrum_tape_block *block )
+{
+  int offset;
+
+  switch( libspectrum_tape_block_type( block ) ) {
+
+  case LIBSPECTRUM_TAPE_BLOCK_ROM:
+  case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+  case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+    snprintf( buffer, length, "%lu bytes",
+	      (unsigned long)libspectrum_tape_block_data_length( block ) );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+    snprintf( buffer, length, "%lu tstates",
+	      (unsigned long)libspectrum_tape_block_pulse_length( block ) );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+    snprintf( buffer, length, "%lu pulses",
+	      (unsigned long)libspectrum_tape_block_count( block ) );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+    snprintf( buffer, length, "%lu ms",
+	      (unsigned long)libspectrum_tape_block_pause( block ) );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+  case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
+  case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
+  case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+    snprintf( buffer, length, "%s", libspectrum_tape_block_text( block ) );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_JUMP:
+    offset = libspectrum_tape_block_offset( block );
+    if( offset > 0 ) {
+      snprintf( buffer, length, "Forward %d blocks", offset );
+    } else {
+      snprintf( buffer, length, "Backward %d blocks", -offset );
     }
+    break;
 
-    (*list)[*n] = (char**)malloc( 2 * sizeof( char* ) );
-    if( !(*list)[*n] ) {
-      tape_free_block_list( *list, *n );
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
-    }
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
+    snprintf( buffer, length, "%lu iterations",
+	      (unsigned long)libspectrum_tape_block_count( block ) );
+    break;
 
-    (*list)[*n][0] = malloc( 80 * sizeof( char ) );
-    if( !(*list)[*n][0] ) {
-      free( (*list)[*n] ); tape_free_block_list( *list, *n );
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
-    }
+  case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+    snprintf( buffer, length, "%lu options",
+	      (unsigned long)libspectrum_tape_block_count( block ) );
+    break;
 
-    (*list)[*n][1] = malloc( 80 * sizeof( char ) );
-    if( !(*list)[*n][1] ) {
-      free( (*list)[*n][0] ); free( (*list)[*n] );
-      tape_free_block_list( *list, *n );
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
-    }
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
+  case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+  case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+  case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+  default:
+    buffer[0] = '\0';
+    break;
 
-    libspectrum_tape_block_description( (*list)[*n][0], 80, block );
-
-    switch( libspectrum_tape_block_type( block ) ) {
-
-    case LIBSPECTRUM_TAPE_BLOCK_ROM:
-    case LIBSPECTRUM_TAPE_BLOCK_TURBO:
-    case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
-    case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
-      snprintf( (*list)[*n][1], 80, "%lu bytes",
-		(unsigned long)libspectrum_tape_block_data_length( block ) );
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
-      snprintf( (*list)[*n][1], 80, "%lu tstates",
-		(unsigned long)libspectrum_tape_block_pulse_length( block ) );
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_PULSES:
-      snprintf( (*list)[*n][1], 80, "%lu pulses",
-		(unsigned long)libspectrum_tape_block_count( block ) );
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
-      snprintf( (*list)[*n][1], 80, "%lu ms",
-		(unsigned long)libspectrum_tape_block_pause( block ) );
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
-    case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
-    case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
-    case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
-      snprintf( (*list)[*n][1], 80, "%s",
-		libspectrum_tape_block_text( block ) );
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_JUMP:
-      offset = libspectrum_tape_block_offset( block );
-      if( offset > 0 ) {
-	snprintf( (*list)[*n][1], 80, "Forward %d blocks", offset );
-      } else {
-	snprintf( (*list)[*n][1], 80, "Backward %d blocks", -offset );
-      }
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
-      snprintf( (*list)[*n][1], 80, "%lu iterations",
-		(unsigned long)libspectrum_tape_block_count( block ) );
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_SELECT:
-      snprintf( (*list)[*n][1], 80, "%lu options",
-		(unsigned long)libspectrum_tape_block_count( block ) );
-      break;
-
-    case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
-    case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
-    case LIBSPECTRUM_TAPE_BLOCK_STOP48:
-    case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
-    case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
-    default:
-      (*list)[*n][1][0] = '\0';
-      break;
-
-    }
-
-    (*n)++;
   }
 
   return 0;

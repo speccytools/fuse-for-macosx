@@ -1,5 +1,5 @@
 /* tape.h: tape handling routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -39,6 +39,7 @@ int tape_read_buffer( unsigned char *buffer, size_t length,
 
 int tape_close( void );
 int tape_select_block( size_t n );
+int tape_select_block_no_update( size_t n );
 int tape_get_current_block( void );
 int tape_write( const char *filename );
 
@@ -52,8 +53,16 @@ int tape_next_edge( libspectrum_dword last_tstates );
 
 int tape_stop( void );
 
-int tape_get_block_list( char ****list, size_t *n );
-int tape_free_block_list( char ***list, size_t n );
+/* Call a user-supplied function for every block in the current tape */
+int
+tape_foreach( void (*function)( libspectrum_tape_block *block,
+				void *user_data),
+	      void *user_data );
+
+/* Fill 'buffer' with up a maximum of 'length' characters of
+   information about 'block' */
+int tape_block_details( char *buffer, size_t length,
+			libspectrum_tape_block *block );
 
 extern int tape_microphone;
 
