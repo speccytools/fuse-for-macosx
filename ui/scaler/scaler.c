@@ -42,6 +42,7 @@ struct scaler_info {
   const char *name;
   const char *id;
   enum scaler_flags_t flags;
+  float scaling_factor;
   ScalerProc *scaler16, *scaler32;
 
 };
@@ -50,26 +51,26 @@ struct scaler_info {
    in the same order as scaler.h:scaler_type */
 static struct scaler_info available_scalers[] = {
 
-  { "Timex Half size", "half",       SCALER_FLAGS_NONE,	       
-    scaler_Half_16,       scaler_Half_32                       },
-  { "Normal",	       "normal",     SCALER_FLAGS_NONE,
-    scaler_Normal1x_16,   scaler_Normal1x_32                   },
-  { "Double size",     "2x",	     SCALER_FLAGS_NONE,
-    scaler_Normal2x_16,   scaler_Normal2x_32                   },
-  { "Triple size",     "3x",	     SCALER_FLAGS_NONE,
-    scaler_Normal3x_16,   scaler_Normal3x_32                   },
-  { "2xSaI",	       "2xsai",	     SCALER_EXPAND_1_PIXEL,
-    scaler_2xSaI_16,      scaler_2xSaI_32                      },
-  { "Super 2xSaI",     "super2xsai", SCALER_EXPAND_1_PIXEL, 
-    scaler_Super2xSaI_16, scaler_2xSaI_32                      },
-  { "SuperEagle",      "supereagle", SCALER_EXPAND_1_PIXEL,
-    scaler_SuperEagle_16, scaler_SuperEagle_32                 },
-  { "AdvMAME 2x",      "advmame2x",  SCALER_EXPAND_1_PIXEL, 
-    scaler_AdvMame2x_16,  scaler_AdvMame2x_32		       },
-  { "TV 2x",	       "tv2x",	     SCALER_EXPAND_1_PIXEL, 
-    scaler_TV2x_16,       scaler_TV2x_32                       },
-  { "Timex TV",	       "timextv",    SCALER_EXPAND_2_Y_PIXELS, 
-    scaler_TimexTV_16,    scaler_TimexTV_32		       },
+  { "Timex Half size", "half",       SCALER_FLAGS_NONE,	       0.5,
+    scaler_Half_16,       scaler_Half_32                            },
+  { "Normal",	       "normal",     SCALER_FLAGS_NONE,	       1.0, 
+    scaler_Normal1x_16,   scaler_Normal1x_32                        },
+  { "Double size",     "2x",	     SCALER_FLAGS_NONE,	       2.0, 
+    scaler_Normal2x_16,   scaler_Normal2x_32                        },
+  { "Triple size",     "3x",	     SCALER_FLAGS_NONE,	       3.0, 
+    scaler_Normal3x_16,   scaler_Normal3x_32			    },
+  { "2xSaI",	       "2xsai",	     SCALER_EXPAND_1_PIXEL,    2.0, 
+    scaler_2xSaI_16,      scaler_2xSaI_32                           },
+  { "Super 2xSaI",     "super2xsai", SCALER_EXPAND_1_PIXEL,    2.0, 
+    scaler_Super2xSaI_16, scaler_2xSaI_32                           },
+  { "SuperEagle",      "supereagle", SCALER_EXPAND_1_PIXEL,    2.0, 
+    scaler_SuperEagle_16, scaler_SuperEagle_32                      },
+  { "AdvMAME 2x",      "advmame2x",  SCALER_EXPAND_1_PIXEL,    2.0, 
+    scaler_AdvMame2x_16,  scaler_AdvMame2x_32		            },
+  { "TV 2x",	       "tv2x",	     SCALER_EXPAND_1_PIXEL,    2.0, 
+    scaler_TV2x_16,       scaler_TV2x_32                            },
+  { "Timex TV",	       "timextv",    SCALER_EXPAND_2_Y_PIXELS, 1.0, 
+    scaler_TimexTV_16,    scaler_TimexTV_32		            },
 };
 
 scaler_type current_scaler = SCALER_NUM;
@@ -161,4 +162,10 @@ scaler_flags_t
 scaler_get_flags( scaler_type scaler )
 {
   return available_scalers[scaler].flags;
+}
+
+float
+scaler_get_scaling_factor( scaler_type scaler )
+{
+  return available_scalers[scaler].scaling_factor;
 }

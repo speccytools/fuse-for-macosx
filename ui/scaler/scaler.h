@@ -60,6 +60,7 @@ const char *scaler_name( scaler_type scaler );
 ScalerProc *scaler_get_proc16( scaler_type scaler );
 ScalerProc *scaler_get_proc32( scaler_type scaler );
 scaler_flags_t scaler_get_flags( scaler_type scaler );
+float scaler_get_scaling_factor( scaler_type scaler );
 
 int scaler_select_bitformat( DWORD BitFormat );
 

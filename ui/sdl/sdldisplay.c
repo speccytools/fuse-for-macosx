@@ -159,41 +159,7 @@ sdldisplay_load_gfx_mode( void )
   tmp_screen = NULL;
   tmp_screen_width = (image_width + 3);
 
-  switch( current_scaler ) {
-  case SCALER_2XSAI:
-    sdldisplay_current_size = 2;
-    break;
-  case SCALER_SUPER2XSAI:
-    sdldisplay_current_size = 2;
-    break;
-  case SCALER_SUPEREAGLE:
-    sdldisplay_current_size = 2;
-    break;
-  case SCALER_ADVMAME2X:
-    sdldisplay_current_size = 2;
-    break;
-  case SCALER_TV2X:
-    sdldisplay_current_size = 2;
-    break;
-  case SCALER_TIMEXTV:
-    sdldisplay_current_size = 1;
-    break;
-  case SCALER_DOUBLESIZE:
-    sdldisplay_current_size = 2;
-    break;
-  case SCALER_TRIPLESIZE:
-    sdldisplay_current_size = 3;
-    break;
-  case SCALER_NORMAL:
-    sdldisplay_current_size = 1;
-    break;
-  case SCALER_HALF:
-    sdldisplay_current_size = 0.5;
-    break;
-  default:
-    fprintf( stderr, "%s: unknown gfx mode defaulting to normal\n", fuse_progname);
-    sdldisplay_current_size = 1;
-  }
+  sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
 
   /* Create the surface that contains the scaled graphics in 16 bit mode */
   gc = SDL_SetVideoMode( image_width * sdldisplay_current_size,
