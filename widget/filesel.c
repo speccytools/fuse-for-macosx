@@ -387,9 +387,9 @@ void widget_filesel_keyhandler( keyboard_key_name key )
     break;
 
   case KEYBOARD_PageDown:
-    new_current_file = ( current_file < widget_numfiles-36 ) ?
-                       current_file + 36 :
-		       widget_numfiles - 1;
+    new_current_file = current_file + 36;
+    if( new_current_file >= widget_numfiles )
+      new_current_file = widget_numfiles - 1;
     break;
 
   case KEYBOARD_Home:
