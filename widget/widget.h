@@ -64,6 +64,7 @@ typedef enum widget_type {
   WIDGET_TYPE_ERROR,		/* Error report */
   WIDGET_TYPE_RZX,		/* RZX options */
   WIDGET_TYPE_BROWSE,		/* Browse tape */
+  WIDGET_TYPE_TEXT,		/* Text entry widget */
 
 } widget_type;
 
@@ -245,6 +246,19 @@ int widget_select_finish( widget_finish_state finished );
 int widget_browse_draw( void* data );
 void widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
 int widget_browse_finish( widget_finish_state finished );
+
+/* The text entry widget */
+
+typedef struct widget_text_t {
+  char *title;
+  char text[40];
+} widget_text_t;
+
+int widget_text_draw( void* data );
+void widget_text_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+int widget_text_finish( widget_finish_state finished );
+
+extern char *widget_text_text;	/* The returned text */
 
 /* General functions used by options dialogs */
 extern settings_info widget_options_settings;
