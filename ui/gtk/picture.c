@@ -61,7 +61,7 @@ gtkui_picture( const char *filename, int border )
 
   GtkWidget *dialog;
   GtkWidget *ok_button;
-  struct picture_data callback_data;
+  struct picture_data *callback_data;
 
   fuse_emulation_pause();
 
@@ -88,24 +88,32 @@ gtkui_picture( const char *filename, int border )
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Keyboard" );
   gtk_widget_set_colormap( dialog, gtk_widget_get_colormap( gtkui_window ) );
 
-  callback_data.drawing_area = gtk_drawing_area_new();
-  gtk_drawing_area_size( GTK_DRAWING_AREA( callback_data.drawing_area ),
-			 DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
-  gtk_signal_connect( GTK_OBJECT( callback_data.drawing_area ),
-		      "expose_event", GTK_SIGNAL_FUNC( picture_expose ),
-		      &callback_data );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
-		     callback_data.drawing_area );
+  callback_data =
+    (struct picture_data*)malloc( sizeof( struct picture_data ) );
+  if( !callback_data ) {
+    ui_error( UI_ERROR_ERROR, "out of memory in gtkui_picture" );
+    fuse_emulation_unpause();
+    return 1;
+  }
 
-  callback_data.image =
+  callback_data->drawing_area = gtk_drawing_area_new();
+  gtk_drawing_area_size( GTK_DRAWING_AREA( callback_data->drawing_area ),
+			 DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
+  gtk_signal_connect( GTK_OBJECT( callback_data->drawing_area ),
+		      "expose_event", GTK_SIGNAL_FUNC( picture_expose ),
+		      callback_data );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
+		     callback_data->drawing_area );
+
+  callback_data->image =
     gdk_image_new( GDK_IMAGE_FASTEST, gdk_visual_get_system(),
 		   DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
 
   for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
     for( x=0; x < DISPLAY_ASPECT_WIDTH; x ++ ) {
-      gdk_image_put_pixel( callback_data.image, x, y, 
+      gdk_image_put_pixel( callback_data->image, x, y, 
 			   gtkdisplay_colours[ border ] );
-      gdk_image_put_pixel( callback_data.image,
+      gdk_image_put_pixel( callback_data->image,
 			   x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
 			   gtkdisplay_colours[ border ] );
     }
@@ -115,11 +123,12 @@ gtkui_picture( const char *filename, int border )
 
     for( x=0; x < DISPLAY_BORDER_WIDTH; x+=2 ) {
       gdk_image_put_pixel(
-        callback_data.image, x >> 1, y + DISPLAY_BORDER_HEIGHT,
+        callback_data->image, x >> 1, y + DISPLAY_BORDER_HEIGHT,
 	gtkdisplay_colours[ border ]
       );
       gdk_image_put_pixel(
-        callback_data.image, ( x + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH ) >> 1,
+        callback_data->image,
+	( x + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH ) >> 1,
 	y + DISPLAY_BORDER_HEIGHT, gtkdisplay_colours[ border ]
       );
     }
@@ -134,7 +143,7 @@ gtkui_picture( const char *filename, int border )
       data = screen[ display_line_start[y]+x ];
 
       for( i=0; i<8; i++ ) {
-	gdk_image_put_pixel( callback_data.image,
+	gdk_image_put_pixel( callback_data->image,
 			     ( DISPLAY_BORDER_WIDTH >> 1 ) + ( 8 * x ) + i,
 			     y + DISPLAY_BORDER_HEIGHT,
 			     ( data & 0x80 ) ? gtkdisplay_colours[ ink ]
