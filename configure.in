@@ -167,8 +167,11 @@ AC_ARG_WITH(plus3-disk,
   plus3disk=yes)
 AC_MSG_RESULT($plus3disk)
 if test "$plus3disk" = yes; then
-  AC_CHECK_HEADERS(765.h, DSKLIBS=-l765,
+  AC_CHECK_HEADERS(765.h, DSKLIBS=-l765; lib765=yes,
                    AC_MSG_WARN(765.h not found - disk support disabled))
+  if test "$lib765" = yes; then
+    AC_CHECK_HEADERS(libdsk.h, DSKLIBS="$DSKLIBS -ldsk")
+  fi
 fi
 AC_SUBST(DSKLIBS)
 	       

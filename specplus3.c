@@ -38,6 +38,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#ifdef HAVE_LIBDSK_H
+#include <libdsk.h>
+#endif				/* #ifdef HAVE_LIBDSK_H */
+
 #include <765.h>
 #endif				/* #ifdef HAVE_765_H */
 
@@ -314,9 +318,15 @@ int specplus3_init( machine_info *machine )
   /* Create the FDC */
   fdc = fdc_new();
 
+  /* Populate the drives */
   for( i = SPECPLUS3_DRIVE_A; i <= SPECPLUS3_DRIVE_B; i++ ) {
 
-    drives[i].drive = fd_newdsk();		/* Use .DSK files */
+#ifdef HAVE_LIBDSK_H
+    drives[i].drive = fd_newldsk();
+#else				/* #ifdef HAVE_LIBDSK_H */
+    drives[i].drive = fd_newdsk();
+#endif				/* #ifdef HAVE_LIBDSK_H */
+
     fd_settype( drives[i].drive, FD_30 );	/* FD_30 => 3" drive */
     fd_setheads( drives[i].drive, 1 );
     fd_setcyls( drives[i].drive, 40 );
@@ -525,7 +535,12 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
   }
 
   /* And now insert the disk */
+#ifdef HAVE_LIBDSK_H
+  fdl_settype( drives[which].drive, NULL ); /* Autodetect disk format */
+  fdl_setfilename( drives[which].drive, filename );
+#else				/* #ifdef HAVE_LIBDSK_H */
   fdd_setfilename( drives[which].drive, filename );
+#endif				/* #ifdef HAVE_LIBDSK_H */
 
   return 0;
 }
