@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
-.\" tzxlist.1: tzxlist man page
-.\" Copyright (c) 2001,2002 Darren Salt, Philip Kendall
+.\" rzxdump.1: rzxdump man page
+.\" Copyright (C) 2002 Philip Kendall
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -23,44 +23,46 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH tzxlist 1 "16th August, 2002" "Version 0.5.0" "Emulators"
+.TH rzxdump 1 "16th August, 2002" "Version 0.5.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH NAME
-tzxlist \- Sinclair ZX Spectrum "real" tape file lister
+rzxdump \- List contents of Sinclair ZX Spectrum input recording files
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH SYNOPSIS
 .PD 0
-.B tzxlist
-.IR "tzxfile" ...
+.B rzxdump
+.IR "rzxfile" ...
 .P
 .PD 1
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH DESCRIPTION
-Tzxlist outputs a description of the contents of TZX tape files.
+Rzxdump outputs a description of the contents of RZX input recording
+files.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH OPTIONS
 .TP
-.I tzxfile
-specifies a tape file whose contents are to be listed.
+.I rzxfile
+specifies an input recording file whose contents are to be listed.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
-None known.
+The contents of compressed blocks are not displayed with in a useful
+fashion.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH SEE ALSO
 .IR fuse "(1),"
-.IR rzxdump "(1),"
+.IR tzxlist "(1),"
 .IR rzxtool "(1),"
 .IR xspect "(1),"
 .IR xzx "(1)"
@@ -73,5 +75,3 @@ The comp.sys.sinclair Spectrum FAQ, at
 .\"
 .SH AUTHOR
 Philip Kendall (pak21-fuse@srcf.ucam.org).
-.PP
-Darren Salt wrote this man page.

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2001 Philip Kendall
+## Copyright (c) 1999-2002 Philip Kendall
 
 ## $Id$
 
@@ -24,6 +24,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-man_MANS = fuse.1 tzxlist.1
+man_MANS = fuse.1 rzxdump.1 tzxlist.1
 
 EXTRA_DIST = $(man_MANS)
