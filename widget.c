@@ -143,8 +143,9 @@ static void rect(int x, int y, int w, int h, int col) {
 
 /* ------------------------------------------------------------------ */
 
-static int numfiles;
-static char **filenames;
+static struct dirent **filenames; /* Filenames in the current directory */
+static size_t numfiles;		  /* The number of files in the current
+				     directory */
 
 #ifndef HAVE_SCANDIR
 
@@ -235,28 +236,43 @@ int scandir( const char *dir, struct dirent ***namelist,
 static int select_file(const struct dirent *dirent);
 static int widget_scan_compare( const void *a, const void *b );
 
-static void scan(char *dir) {
-    struct dirent **d = NULL;
-    numfiles=0;
-    scandir(dir,&d,select_file,NULL);
-    qsort(filenames, numfiles, sizeof(char*), widget_scan_compare);
-    if( d != NULL ) free( d );
+static void scan( char *dir ) {
+  size_t i;
+
+  /* Free the memory belonging to the files in the previous directory */
+  for( i=0; i<numfiles; i++ ) free( filenames[i] );
+
+  numfiles = scandir( dir, &filenames, select_file, widget_scan_compare );
 }
 
 static int select_file(const struct dirent *dirent){
-    if(dirent->d_name && strcmp(dirent->d_name,".")) {
-        strncpy(filenames[numfiles], dirent->d_name, 63);
-        numfiles++;
-    }
-    return 0;
+  return( dirent->d_name && strcmp( dirent->d_name, "." ) );
 }
 
 static int widget_scan_compare( const void *a, const void *b )
 {
-  const char *ptr1 = *(const char**)a;
-  const char *ptr2 = *(const char**)b;
+  const char *name1 = (*(const struct dirent**)a)->d_name;
+  const char *name2 = (*(const struct dirent**)b)->d_name;
 
-  return strcmp( ptr1, ptr2 );
+  struct stat file_info;
+  int isdir1, isdir2;
+
+  int error;
+
+  error = stat( name1, &file_info ); if( error ) return 0;
+  isdir1 = S_ISDIR( file_info.st_mode );
+  
+  error = stat( name2, &file_info ); if( error ) return 0;
+  isdir2 = S_ISDIR( file_info.st_mode );
+  
+  if( isdir1 && !isdir2 ) {
+    return -1;
+  } else if( isdir2 && !isdir1 ) {
+    return 1;
+  } else {
+    return strcmp( name1, name2 );
+  }
+
 }
 
 /* Are we in a widget at the moment? (Used by the key handling routines
@@ -279,18 +295,12 @@ static widget_finish_state widget_finished;
 
 int widget_init( void )
 {
-  int i, error;
+  int error;
 
   error = widget_read_font( "roms/48.rom", 15617 );
   if( error ) return error;
 
-  filenames = (char**)malloc( 8192 * sizeof( char* ) );
-  if( filenames == NULL ) return ENOMEM;
-
-  for( i=0; i<8192; i++ ) {
-    filenames[i] = (char*)malloc( 64 * sizeof( char ) );
-    if( filenames[i] == NULL ) return ENOMEM;
-  }
+  numfiles = 0;
 
   return 0;
 }
@@ -299,8 +309,7 @@ int widget_end( void )
 {
   int i;
 
-  for( i=0; i<8192; i++) free( filenames[i] );
-  free( filenames );
+  for( i=0; i<numfiles; i++) free( filenames[i] );
 
   return 0;
 }
@@ -360,27 +369,26 @@ static int widget_timer_end( void )
    which it will be on after this keypress */
 static int top_left_file, current_file, new_current_file;
 
-static int widget_print_all_filenames( char **filenames, int n,
+static char* widget_getcwd( void );
+static int widget_print_all_filenames( struct dirent **filenames, int n,
 				       int top_left, int current );
-static int widget_print_filename( char *filename, int position, int colour );
+static int widget_print_filename( struct dirent *filename, int position,
+				  int colour );
 static void widget_selectfile_keyhandler( int key );
 
 const char* widget_selectfile( void )
 {
-  char d[512], *ptr;
+  char *directory;
 
   int error;
 
   error = widget_timer_init();
   if( error ) return NULL;
 
-  ptr = getcwd( d, 510 );
-  /* FIXME: do something proper if the path is too long (errno == ERANGE) */
-  if( ptr == NULL ) {
-    return NULL;
-  }
+  directory = widget_getcwd();
+  if( directory == NULL ) return NULL;
 
-  scan(d);
+  scan( directory );
   current_file = 0;
   top_left_file = 0;
     
@@ -462,14 +470,46 @@ const char* widget_selectfile( void )
 
   /* Now return, either with a filename or without as appropriate */
   if( widget_finished == WIDGET_FINISHED_OK ) {
-    return filenames[ current_file ];
+    return filenames[ current_file ]->d_name;
   } else {
     return NULL;
   }
 
 }
 
-static int widget_print_all_filenames( char **filenames, int n,
+static char* widget_getcwd( void )
+{
+  char *directory; size_t directory_length;
+  char *ptr;
+
+  directory_length = 64;
+  directory = (char*)malloc( directory_length * sizeof( char ) );
+  if( directory == NULL ) {
+    return NULL;
+  }
+
+  do {
+    ptr = getcwd( directory, directory_length );
+    if( ptr ) break;
+    if( errno == ERANGE ) {
+      ptr = directory;
+      directory_length *= 2;
+      directory =
+	(char*)realloc( directory, directory_length * sizeof( char ) );
+      if( directory == NULL ) {
+	free( ptr );
+	return NULL;
+      }
+    } else {
+      free( directory );
+      return NULL;
+    }
+  } while(1);
+
+  return directory;
+}
+
+static int widget_print_all_filenames( struct dirent **filenames, int n,
 				       int top_left, int current )
 {
   int i;
@@ -499,11 +539,12 @@ static int widget_print_all_filenames( char **filenames, int n,
 }
 
 /* Print a filename onto the dialog box */
-static int widget_print_filename( char *filename, int position, int colour )
+static int widget_print_filename( struct dirent *filename, int position,
+				  int colour )
 {
   char buffer[14];
 
-  strncpy( buffer, filename, 13 ); buffer[13] = '\0';
+  strncpy( buffer, filename->d_name, 13 ); buffer[13] = '\0';
   printstring( 2 + ( position & 1 ) * 15, 3 + position/2, colour, buffer );
 
   return 0;
@@ -511,7 +552,7 @@ static int widget_print_filename( char *filename, int position, int colour )
 
 static void widget_selectfile_keyhandler( int key )
 {
-  char fn[1024];
+  char *fn, *ptr;
 
   new_current_file = current_file;
 
@@ -539,16 +580,30 @@ static void widget_selectfile_keyhandler( int key )
 
   case KEYBOARD_Enter:
     /* Get the new directory name */
-    /* FIXME: handle out of length errors properly */
-    getcwd( fn, 500 ); strcat( fn, "/" );
-    strncat( fn, filenames[ current_file ], 500 );
-
+    fn = widget_getcwd();
+    if( fn == NULL ) {
+      widget_finished = WIDGET_FINISHED_CANCEL;
+      return;
+    }
+    ptr = fn;
+    fn = realloc( fn,
+       ( strlen(fn) + 1 + strlen( filenames[ current_file ]->d_name ) + 1 ) *
+       sizeof(char)
+    );
+    if( fn == NULL ) {
+      free( ptr );
+      widget_finished = WIDGET_FINISHED_CANCEL;
+      return;
+    }
+    strcat( fn, "/" ); strcat( fn, filenames[ current_file ]->d_name );
+			
     if(chdir(fn)==-1) {
       if(errno==ENOTDIR) {
+	free( fn );
 	widget_finished = WIDGET_FINISHED_OK;
       }
     } else {
-      scan( fn );
+      scan( fn ); free( fn );
       new_current_file = 0;
       /* Force a redisplay of all filenames */
       current_file = 1; top_left_file = 1;
