@@ -890,3 +890,4 @@
 20040601 utils.c: Fix bad merge of IF2 patch.
 20040602 snapshot.c: save/restore ZXCF upload state.
 20040602 snapshot.c,zxatasp.[ch]: save/restore ZXATASP state.
+20040602 menu_data.c: use proper C comment rather than #if 0/#endif.
