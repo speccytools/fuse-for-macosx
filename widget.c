@@ -40,6 +40,7 @@
 
 #include "fuse.h"
 #include "display.h"
+#include "machine.h"
 #include "ui.h"
 #include "uidisplay.h"
 #include "keyboard.h"
@@ -61,12 +62,10 @@ static int widget_read_font( const char *filename, size_t offset )
 
   char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
 
-  fd = open( filename, O_RDONLY );
+  fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: couldn't open `%s'", fuse_progname, filename );
-    perror( error_message );
-    return errno;
+    fprintf( stderr,"%s: couldn't find ROM `%s'", fuse_progname, filename );
+    return 1;
   }
 
   if( fstat( fd, &file_info) ) {
