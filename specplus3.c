@@ -83,7 +83,8 @@ static FDRV_PTR drive_a, drive_b;
 static FDRV_PTR drive_null;
 #endif			/* #ifdef HAVE_765_H */
 
-static BYTE specplus3_unattached_port( void )
+BYTE
+specplus3_unattached_port( void )
 {
   return 0xff;
 }

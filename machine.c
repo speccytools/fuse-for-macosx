@@ -43,6 +43,7 @@
 #include "spec48.h"
 #include "spec128.h"
 #include "specplus2.h"
+#include "specplus2a.h"
 #include "specplus3.h"
 #include "tc2048.h"
 #include "tape.h"
@@ -73,8 +74,16 @@ int machine_init_machines( void )
   if (error ) return error;
   error = machine_add_machine( specplus2_init );
   if (error ) return error;
+  error = machine_add_machine( specplus2a_init );
+  if( error ) return error;
+
+#ifdef HAVE_765_H
+  /* Add the +3 only if we have FDC support; otherwise the +2A and +3
+     emulations are identical */
   error = machine_add_machine( specplus3_init );
   if (error ) return error;
+#endif				/* #ifdef HAVE_765_H */
+
   error = machine_add_machine( tc2048_init );
   if (error ) return error;
 

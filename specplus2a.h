@@ -1,4 +1,4 @@
-/* specplus3.h: Spectrum +2A/+3 specific routines
+/* specplus2a.h: Spectrum +2A specific routines
    Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
@@ -24,25 +24,16 @@
 
 */
 
-#ifndef FUSE_SPECPLUS3_H
-#define FUSE_SPECPLUS3_H
+#ifndef FUSE_SPECPLUS2A_H
+#define FUSE_SPECPLUS2A_H
 
 #ifndef FUSE_TYPES_H
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
-BYTE specplus3_unattached_port( void );
+int specplus2a_init( machine_info *machine );
+int specplus2a_reset(void);
 
-BYTE specplus3_readbyte(WORD address);
-BYTE specplus3_read_screen_memory(WORD offset);
-void specplus3_writebyte(WORD address, BYTE b);
+void specplus2a_memoryport_write(WORD port, BYTE b);
 
-DWORD specplus3_contend_memory( WORD address );
-DWORD specplus3_contend_port( WORD address );
-
-int specplus3_init( machine_info *machine );
-int specplus3_reset(void);
-
-void specplus3_memoryport_write(WORD port, BYTE b);
-
-#endif			/* #ifndef FUSE_SPECPLUS3_H */
+#endif			/* #ifndef FUSE_SPECPLUS2A_H */
