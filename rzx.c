@@ -163,6 +163,10 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
     timer_count = 0;
     rzx_competition_mode = 1;
     
+  } else {
+
+    rzx_competition_mode = 0;
+
   }
     
   return 0;

@@ -270,3 +270,5 @@
 	 in the roms/ or lib/ directory off where the Fuse executable is,
 	 not off the current directory.
 20031011 Remove the now unused getopt/ directory.
+20031012 rzx.c: reset rzx_competition_mode when starting a non-competition
+	 mode recording.
