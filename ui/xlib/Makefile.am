@@ -24,4 +24,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = gtk xlib
+noinst_LIBRARIES = libuixlib.a
+
+libuixlib_a_SOURCES = xdisplay.c xkeyboard.c xui.c
+
+noinst_HEADERS = xdisplay.h xkeyboard.h xui.h
