@@ -381,3 +381,4 @@
 20031206 event.[ch], ui/gtk/debugger.c: add a 'pending events' pane to the
 	 debugger.
 20031207 event.[ch]: use the defined enum for event type variables.
+20031209 ui/gtk/gtkjoystick.c: fix filename in initial comment.
