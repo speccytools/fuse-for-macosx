@@ -69,8 +69,8 @@ fuse_SOURCES = ay.c \
 
 fuse_LDADD = memory_internal.o \
 debugger/libdebugger.a \
-pokefinder/libpokefinder.a \
 @UI_LIBS@ \
+pokefinder/libpokefinder.a \
 ui/scaler/libscaler.a \
 debugger/libdebugger.a \
 z80/libz80.a \
