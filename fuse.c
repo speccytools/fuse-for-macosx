@@ -222,6 +222,8 @@ static int fuse_init(int argc, char **argv)
   if( psg_init() ) return 1;
   if( trdos_init() ) return 1;
 
+  error = pokefinder_clear(); if( error ) return error;
+
   z80_init();
 
   fuse_sound_in_use = 0;
