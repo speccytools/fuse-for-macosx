@@ -1239,3 +1239,6 @@
 20050226 ui/gtk/gtkjoystick.c: use two columns of five rather than one
 	 column of ten for the fire button configuration (patch #1150711)
 	 (Darren).
+20050226 ui/gtk/{gtkdisplay.c,gtkui.c},ui/xlib/xdisplay.c: make the size
+	 of the Spectrum screen be the smaller of the width and height of
+	 our window (patch #1150684) (Darren).

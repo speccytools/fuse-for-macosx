@@ -141,14 +141,12 @@ ui_init( int *argc, char ***argv )
 
   box = gtk_vbox_new( FALSE, 0 );
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);
-  gtk_widget_show(box);
 
   gtkui_make_menu( &accel_group, &menu_bar, gtkui_menu_data,
 		   gtkui_menu_data_size );
 
   gtk_window_add_accel_group( GTK_WINDOW(gtkui_window), accel_group );
   gtk_box_pack_start( GTK_BOX(box), menu_bar, FALSE, FALSE, 0 );
-  gtk_widget_show(menu_bar);
   
   gtkui_drawing_area = gtk_drawing_area_new();
   if(!gtkui_drawing_area) {
@@ -168,7 +166,7 @@ ui_init( int *argc, char ***argv )
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "button-release-event",
 		      GTK_SIGNAL_FUNC( gtkmouse_button ), NULL );
 
-  gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, FALSE, FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, TRUE, TRUE, 0 );
 
   /* Create the statusbar */
   gtkstatusbar_create( GTK_BOX( box ) );

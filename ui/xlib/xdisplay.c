@@ -1,5 +1,5 @@
 /* xdisplay.c: Routines for dealing with drawing the Speccy's screen via Xlib
-   Copyright (c) 2000,2002 Philip Kendall, Darren Salt
+   Copyright (c) 2000-2005 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -395,13 +395,13 @@ register_scalers( void )
 }
 
 int
-xdisplay_configure_notify( int width, int height GCC_UNUSED )
+xdisplay_configure_notify( int width, int height )
 {
-  int error, size, colour;
+  int error, size, x, y;
 
-  colour = scld_last_dec.name.hires ? display_hires_border :
-                                      display_lores_border;
   size = width / DISPLAY_ASPECT_WIDTH;
+  if( size > height / DISPLAY_SCREEN_HEIGHT )
+    size = height / DISPLAY_SCREEN_HEIGHT;
 
   /* If we're the same size as before, nothing special needed */
   if( size == xdisplay_current_size ) return 0;
@@ -413,12 +413,15 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
   error = register_scalers(); if( error ) return error;
 
   /* Redraw the entire screen... */
-  display_refresh_all();
+  for( y = 0; y < 3 * DISPLAY_SCREEN_HEIGHT; y++ )
+    for( x = 0; x < 3 * DISPLAY_ASPECT_WIDTH; x++ )
+      XPutPixel( image, x, y, colours[0] );
 
-#if 0
-  /* If widgets are active, redraw the widget */
-  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
-#endif
+  if( machine_current->timex )
+    uidisplay_area( 0, 0,
+		    2 * DISPLAY_ASPECT_WIDTH, 2 * DISPLAY_SCREEN_HEIGHT );
+  else
+    uidisplay_area( 0, 0, DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
 
   return 0;
 }

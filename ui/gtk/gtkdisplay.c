@@ -1,5 +1,5 @@
 /* gtkdisplay.c: GTK+ routines for dealing with the Speccy screen
-   Copyright (c) 2000-2003 Philip Kendall
+   Copyright (c) 2000-2005 Philip Kendall
 
    $Id$
 
@@ -93,15 +93,14 @@ static int gtkdisplay_current_size=1;
 
 static int init_colours( void );
 static void gtkdisplay_area(int x, int y, int width, int height);
-static int gtkdisplay_configure_notify( int width );
 static int register_scalers( void );
 
 /* Callbacks */
 
 static gint gtkdisplay_expose(GtkWidget *widget, GdkEvent *event,
 			      gpointer data);
-static gint gtkdisplay_configure(GtkWidget *widget, GdkEvent *event,
-				 gpointer data);
+static gint drawing_area_resize_callback( GtkWidget *widget, GdkEvent *event,
+					  gpointer data );
 
 int
 gtkdisplay_init( void )
@@ -112,7 +111,7 @@ gtkdisplay_init( void )
   gtk_signal_connect( GTK_OBJECT(gtkui_drawing_area), "expose_event", 
 		      GTK_SIGNAL_FUNC(gtkdisplay_expose), NULL);
   gtk_signal_connect( GTK_OBJECT(gtkui_drawing_area), "configure_event", 
-		      GTK_SIGNAL_FUNC(gtkdisplay_configure), NULL);
+		      GTK_SIGNAL_FUNC( drawing_area_resize_callback ), NULL);
 
   error = init_colours(); if( error ) return error;
 
@@ -133,6 +132,7 @@ init_colours( void )
   size_t i;
 
   for( i = 0; i < 16; i++ ) {
+
 
     guchar red, green, blue, grey;
 
@@ -161,6 +161,7 @@ init_colours( void )
 }
 
 int
+
 uidisplay_init( int width, int height )
 {
   int error;
@@ -175,24 +176,23 @@ uidisplay_init( int width, int height )
   return 0;
 }
 
-static int gtkdisplay_configure_notify( int width )
+static int
+drawing_area_resize( int width, int height )
 {
   int size, error;
 
   size = width / DISPLAY_ASPECT_WIDTH;
+  if( size > height / DISPLAY_SCREEN_HEIGHT )
+    size = height / DISPLAY_SCREEN_HEIGHT;
 
-  /* If we're the same size as before, nothing special needed */
+  /* If we're the same size as before, no need to do anything else */
   if( size == gtkdisplay_current_size ) return 0;
 
-  /* Else set ourselves to the new height */
-  gtkdisplay_current_size=size;
-  gtk_drawing_area_size( GTK_DRAWING_AREA(gtkui_drawing_area),
-			 size * DISPLAY_ASPECT_WIDTH,
-			 size * DISPLAY_SCREEN_HEIGHT );
+  gtkdisplay_current_size = size;
 
   error = register_scalers(); if( error ) return error;
 
-  /* Redraw the entire screen... */
+  memset( scaled_image, 0, sizeof( scaled_image ) );
   display_refresh_all();
 
   return 0;
@@ -359,11 +359,11 @@ gtkdisplay_expose( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 
 /* Called by gtkui_drawing_area on "configure_event" */
 static gint
-gtkdisplay_configure( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
-		      gpointer data GCC_UNUSED )
+drawing_area_resize_callback( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
+			      gpointer data GCC_UNUSED )
 {
-  gtkdisplay_configure_notify( event->configure.width );
-  return FALSE;
+  drawing_area_resize( event->configure.width, event->configure.height );
+  return TRUE;
 }
 
 #endif			/* #ifdef UI_GTK */
