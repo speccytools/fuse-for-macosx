@@ -77,6 +77,9 @@ ui_event( void )
     case SDL_QUIT:
       fuse_exiting = 1;
       break;
+    case SDL_VIDEOEXPOSE:
+      display_refresh_all();
+      break;
     default:
       break;
     }
