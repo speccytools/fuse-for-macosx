@@ -24,6 +24,7 @@
 
 */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "tape.h"
@@ -71,6 +72,9 @@ pure_data_edge( libspectrum_tape_pure_data_block *block,
 static libspectrum_error
 pure_data_next_bit( libspectrum_tape_pure_data_block *block );
 
+static libspectrum_error
+jump_blocks( libspectrum_tape *tape, int offset );
+
 /*** Function definitions ****/
 
 /* Free up a list of blocks */
@@ -114,6 +118,8 @@ block_free( gpointer data, gpointer user_data )
     free( block->types.group_start.name );
     break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_JUMP:
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_SELECT:
@@ -179,6 +185,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+  case LIBSPECTRUM_TAPE_BLOCK_JUMP:
   case LIBSPECTRUM_TAPE_BLOCK_SELECT:
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
@@ -261,6 +268,9 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   /* Has this edge ended the block? */
   int end_of_block = 0;
 
+  /* After getting a new block, do we want to advance to the next one? */
+  int no_advance = 0;
+
   /* Assume no special flags by default */
   *flags = 0;
 
@@ -290,6 +300,12 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     *tstates = ( block->types.pause.length * 69888 ) / 20; end_of_block = 1;
     /* 0 ms pause => stop tape */
     if( *tstates == 0 ) { *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP; }
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_JUMP:
+    error = jump_blocks( tape, block->types.jump.offset );
+    if( error ) return error;
+    *tstates = 0; end_of_block = 1; no_advance = 1;
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
@@ -323,13 +339,17 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
     *flags |= LIBSPECTRUM_TAPE_FLAGS_BLOCK;
 
-    tape->current_block = tape->current_block->next;
+    /* Advance to the next block, unless we've been told not to */
+    if( !no_advance ) {
 
-    /* If we've just hit the end of the tape, stop the tape (and
-       then `rewind' to the start) */
-    if( tape->current_block == NULL ) {
-      *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP;
-      tape->current_block = tape->blocks;
+      tape->current_block = tape->current_block->next;
+
+      /* If we've just hit the end of the tape, stop the tape (and
+	 then `rewind' to the start) */
+      if( tape->current_block == NULL ) {
+	*flags |= LIBSPECTRUM_TAPE_FLAGS_STOP;
+	tape->current_block = tape->blocks;
+      }
     }
 
     /* Initialise the new block */
@@ -651,6 +671,22 @@ pure_data_next_bit( libspectrum_tape_pure_data_block *block )
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+jump_blocks( libspectrum_tape *tape, int offset )
+{
+  gint current_position; GSList *new_block;
+
+  current_position = g_slist_position( tape->blocks, tape->current_block );
+  if( current_position == -1 ) return LIBSPECTRUM_ERROR_LOGIC;
+
+  new_block = g_slist_nth( tape->blocks, current_position + offset );
+  if( new_block == NULL ) return LIBSPECTRUM_ERROR_CORRUPT;
+
+  tape->current_block = new_block;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 libspectrum_error
 libspectrum_tape_block_description( libspectrum_tape_block *block,
 				    char *buffer, size_t length )
@@ -680,6 +716,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
     strncpy( buffer, "Group End Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_JUMP:
+    strncpy( buffer, "Jump Block", length );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_SELECT:

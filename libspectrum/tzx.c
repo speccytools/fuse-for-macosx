@@ -59,6 +59,9 @@ static libspectrum_error
 tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		    const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_jump( libspectrum_tape *tape, const libspectrum_byte **ptr,
+	       const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_select( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		 const libspectrum_byte *end );
 static libspectrum_error
@@ -115,6 +118,9 @@ tzx_write_group_start( libspectrum_tape_group_start_block *start_block,
 static libspectrum_error
 tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
 		     size_t *length );
+static libspectrum_error
+tzx_write_jump( libspectrum_tape_jump_block *block,
+		libspectrum_byte **buffer, size_t *offset, size_t *length );
 static libspectrum_error
 tzx_write_select( libspectrum_tape_select_block *block,
 		  libspectrum_byte **buffer, size_t *offset, size_t *length );
@@ -214,6 +220,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
       error = tzx_read_group_end( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_JUMP:
+      error = tzx_read_jump( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -608,6 +618,39 @@ tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   return LIBSPECTRUM_ERROR_NONE;
 }  
+
+static libspectrum_error
+tzx_read_jump( libspectrum_tape *tape, const libspectrum_byte **ptr,
+	       const libspectrum_byte *end )
+{
+  libspectrum_tape_block *block;
+  
+  /* Check the offset exists */
+  if( end - (*ptr) < 2 ) {
+    libspectrum_print_error(
+      "tzx_read_jump: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) {
+    libspectrum_print_error( "tzx_read_jump: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* This is a jump block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_JUMP;
+
+  /* Get the offset */
+  block->types.jump.offset = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
 
 static libspectrum_error
 tzx_read_select( libspectrum_tape *tape, const libspectrum_byte **ptr,
@@ -1157,6 +1200,10 @@ libspectrum_tzx_write( libspectrum_tape *tape,
       error = tzx_write_group_end( buffer, &offset, length );
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
       break;
+    case LIBSPECTRUM_TAPE_BLOCK_JUMP:
+      error = tzx_write_jump( &(block->types.jump), buffer, &offset, length );
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
 
     case LIBSPECTRUM_TAPE_BLOCK_SELECT:
       error = tzx_write_select( &(block->types.select), buffer, &offset,
@@ -1405,6 +1452,25 @@ tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_GROUP_END;
 
   (*offset)++;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_jump( libspectrum_tape_jump_block *block,
+		libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte and the offset */
+  error = libspectrum_make_room( buffer, (*offset) + 3, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_JUMP;
+  libspectrum_write_word( ptr, block->offset ); ptr += 2;
+  
+  (*offset) += 3;
 
   return LIBSPECTRUM_ERROR_NONE;
 }

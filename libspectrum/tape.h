@@ -53,6 +53,7 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_PAUSE = 0x20,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_END,
+  LIBSPECTRUM_TAPE_BLOCK_JUMP,
 
   LIBSPECTRUM_TAPE_BLOCK_SELECT = 0x28,
 
@@ -210,6 +211,13 @@ typedef struct libspectrum_tape_group_start_block {
 
 /* No group end block needed as it contains no data */
 
+/* A jump block */
+typedef struct libspectrum_tape_jump_block {
+
+  int offset;
+
+} libspectrum_tape_jump_block;
+
 /* A select block */
 typedef struct libspectrum_tape_select_block {
 
@@ -293,6 +301,7 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_pause_block pause;
     libspectrum_tape_group_start_block group_start;
     /* No group end block needed as it contains no data */
+    libspectrum_tape_jump_block jump;
 
     libspectrum_tape_select_block select;
 
