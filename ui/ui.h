@@ -55,6 +55,8 @@ int ui_verror( ui_error_level severity, const char *format, va_list ap )
      GCC_PRINTF( 2, 0 );
 int ui_end(void);
 
+int ui_debugger_activate( void );
+
 /* Functions defined in ../ui.c */
 int ui_error( ui_error_level severity, const char *format, ... )
      GCC_PRINTF( 2, 3 );

@@ -63,7 +63,15 @@ CVS tags for Fuse
 |                                       Release-0_5_0-branch-1
 | Release-0_5_1pre1
 | Release-0_5_1pre2
+|
++-\					First bits of debugger
+| | Release-0_5_1pre2-debugger-branch-1 Merged to trunk at
+| |                                     Release-0_5_1-merge-1
+| | Release-0_5_1pre2-debugger-branch
+|
 | Release-0_5_1pre3
 | Release-0_5_1
+| Release-0_5_1-merge-1			Merged from
+|					Release-0_5_1pre2-debugger-branch-1
 |
 HEAD

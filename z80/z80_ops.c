@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 
+#include "debugger/debugger.h"
 #include "event.h"
 #include "rzx.h"
 #include "settings.h"
@@ -61,6 +62,12 @@ void z80_do_opcodes()
       break;		/* And break out of the execution loop to let
 			   the interrupt happen */
     }
+
+    /* Check if the debugger should become active at this point;
+       special case DEBUGGER_MODE_INACTIVE for alleged performance
+       reasons */
+    if( debugger_mode != DEBUGGER_MODE_INACTIVE && debugger_check() )
+      debugger_trap();
 
     /* If the z80 is HALTed, repeat the HALT instruction */
     if( z80.halted ) PC--;

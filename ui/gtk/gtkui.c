@@ -37,6 +37,7 @@
 
 #include <glib.h>
 
+#include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
 #include "gtkkeyboard.h"
@@ -95,6 +96,8 @@ static void gtkui_reset(GtkWidget *widget, gpointer data);
 static void gtkui_select(GtkWidget *widget, gpointer data);
 static void gtkui_select_done( GtkWidget *widget, gpointer user_data );
 
+static void gtkui_break( GtkWidget *widget, gpointer data );
+
 static void gtkui_tape_open( GtkWidget *widget, gpointer data );
 static void gtkui_tape_play( GtkWidget *widget, gpointer data );
 static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
@@ -146,6 +149,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
+  { "/Machine/_Break...",	NULL , gtkui_break,	    0, NULL          },
   { "/Tape",                    NULL , NULL,                0, "<Branch>"    },
   { "/Tape/_Open...",	        "F7" , gtkui_tape_open,     0, NULL          },
   { "/Tape/_Play",	        "F8" , gtkui_tape_play,     0, NULL          },
@@ -602,6 +606,13 @@ gtkui_select_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 
   gtk_widget_destroy( ptr->dialog );
   gtk_main_quit();
+}
+
+/* Machine/Break */
+static void
+gtkui_break( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  debugger_mode = DEBUGGER_MODE_HALTED;
 }
     
 /* Called by the menu when Tape/Open selected */

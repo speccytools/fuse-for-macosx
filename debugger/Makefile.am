@@ -24,23 +24,10 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-noinst_LIBRARIES = libuigtk.a
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
 
-INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+noinst_LIBRARIES = libdebugger.a
 
-libuigtk_a_SOURCES = browse.c debugger.c error.c gtkdisplay.c gtkkeyboard.c \
-                     gtkui.c \
-options.c keysyms.c picture.c
+libdebugger_a_SOURCES = debugger.c
 
-BUILT_SOURCES = keysyms.c options.c options.h
-
-keysyms.c: ../../keysyms.pl ../../keysyms.dat
-	@PERL@ ../../keysyms.pl gtk ../../keysyms.dat > $@
-
-options.c: options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
-	@PERL@ options.pl ../options.dat > options.c
-
-options.h: options-header.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
-	@PERL@ options-header.pl ../options.dat > options.h
-
-noinst_HEADERS = gtkkeyboard.h gtkui.h options.h options.pl options-header.pl
+noinst_HEADERS = debugger.h
