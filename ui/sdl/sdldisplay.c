@@ -300,15 +300,6 @@ uidisplay_area( int x, int y, int width, int height )
   num_rects++;
 }
 
-void
-uidisplay_set_border( int line, int pixel_from, int pixel_to, int colour )
-{
-  int x;
-
-  for( x = pixel_from; x < pixel_to; x++ )
-    uidisplay_putpixel( x, line, colour );
-}
-
 int
 uidisplay_end( void )
 {

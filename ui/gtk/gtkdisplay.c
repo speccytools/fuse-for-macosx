@@ -208,15 +208,6 @@ static void gtkdisplay_area(int x, int y, int width, int height)
 		  width, height );
 }
 
-void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
-{
-  int x;
-  
-  for(x=pixel_from;x<pixel_to;x++) {
-    uidisplay_putpixel(x,line,colour);
-  }
-}
-
 int uidisplay_end(void)
 {
   /* Free the XImage used to store screen data; also frees the malloc'd

@@ -363,15 +363,6 @@ xdisplay_area( int x, int y, int w, int h )
   }
 }
 
-void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
-{
-  int x;
-  
-  for(x=pixel_from;x<pixel_to;x++) {
-    uidisplay_putpixel(x,line,colour);
-  }
-}
-
 static void xdisplay_destroy_image (void)
 {
   /* Free the XImage used to store screen data; also frees the malloc'd
