@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#include "dck.h"
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
