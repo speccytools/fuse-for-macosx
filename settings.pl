@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# settings.pl: generate settings.[ch] from settings.dat
+# settings.pl: generate settings.c from settings.dat
 # Copyright (c) 2002 Philip Kendall
 
 # $Id$

@@ -34,10 +34,13 @@ fuse_SOURCES = ay.c display.c event.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c
 
-BUILT_SOURCES = settings.c
+BUILT_SOURCES = settings.c settings.h
 
 settings.c: settings.pl settings.dat
 	@PERL@ settings.pl settings.dat > settings.c
+
+settings.h: settings-header.pl settings.dat
+	@PERL@ settings-header.pl settings.dat > settings.h
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
