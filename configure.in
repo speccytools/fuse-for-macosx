@@ -154,6 +154,19 @@ if test "$ui" != gtk; then
 	         AC_MSG_WARN(glib not found - using internal replacement))
   fi
 fi
+
+dnl Do we want +3 disk support?
+AC_MSG_CHECKING(whether +3 disk support requested)
+AC_ARG_WITH(plus3-disk,
+  [  --without-plus3-disk    disable +3 disk support],
+  if test "$withval" = no; then plus3disk = no; else plus3disk=yes; fi,
+  plus3disk=yes)
+AC_MSG_RESULT($plus3disk)
+if test "$plus3disk" = yes; then
+  AC_CHECK_HEADERS(765.h, DSKLIBS=-l765,
+                   AC_MSG_WARN(765.h not found - disk support disabled))
+fi
+AC_SUBST(DSKLIBS)
 	       
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)

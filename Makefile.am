@@ -42,7 +42,7 @@ keysyms.c: keysyms.pl perl/Fuse.pm keysyms.dat
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a myglib/libmyglib.a\
 ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/svga/libuisvga.a\
-ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a
+ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\

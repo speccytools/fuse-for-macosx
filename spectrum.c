@@ -125,7 +125,14 @@ void writeport(WORD port, BYTE b)
 /* A dummy function for non-readable ports */
 BYTE spectrum_port_noread(WORD port)
 {
+  /* FIXME: should this return the floating bus value? */
   return 0xff;
+}
+
+/* And one for non-writable ports */
+void spectrum_port_nowrite( WORD port, BYTE value )
+{
+  return;
 }
 
 /* What do we get if we read from the ULA? */

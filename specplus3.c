@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -28,6 +28,13 @@
 
 #include <stdio.h>
 
+#ifdef HAVE_765_H
+#include <limits.h>		/* Needed to get PATH_MAX */
+#include <stdarg.h>
+
+#include <765.h>
+#endif				/* #ifdef HAVE_765_H */
+
 #include "ay.h"
 #include "display.h"
 #include "fuse.h"
@@ -45,16 +52,36 @@
 
 static DWORD specplus3_contend_delay( void );
 
+#ifdef HAVE_765_H
+static void specplus3_fdc_reset( void );
+static BYTE specplus3_fdc_status( WORD port );
+static BYTE specplus3_fdc_read( WORD port );
+static void specplus3_fdc_write( WORD port, BYTE data );
+void fdc_dprintf( int debug, char *format, ... );
+#endif			/* #ifdef HAVE_765_H */
+
 spectrum_port_info specplus3_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
+  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
   { 0xc002, 0x4000, spectrum_port_noread, spec128_memoryport_write },
+
+#ifdef HAVE_765_H
+  { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
+  { 0xf002, 0x2000, specplus3_fdc_status, spectrum_port_nowrite },
+#endif			/* #ifdef HAVE_765_H */
+
   { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
+
+#if HAVE_765_H
+static FDC_765 fdc;
+static DSK_FLOPPY_DRIVE drive_a, drive_b;
+static FLOPPY_DRIVE drive_null;
+#endif			/* #ifdef HAVE_765_H */
 
 static BYTE specplus3_unattached_port( void )
 {
@@ -238,8 +265,8 @@ int specplus3_init( machine_info *machine )
   int error;
 
   machine->machine = SPECTRUM_MACHINE_PLUS3;
-  machine->description = "Spectrum +2A";
-  machine->id = "plus2a";
+  machine->description = "Spectrum +3";
+  machine->id = "plus3";
 
   machine->reset = specplus3_reset;
 
@@ -268,6 +295,32 @@ int specplus3_init( machine_info *machine )
 
   machine->ay.present=1;
 
+#ifdef HAVE_765_H
+  /* Setup the appropriate parameters for two floppy drives */
+  fdd_init( &drive_a );
+  drive_a.fdd.fd_type = FD_30;		/* FD_30 => 3" drive */
+  drive_a.fdd.fd_heads = 1;
+  drive_a.fdd.fd_cylinders = 40;
+  drive_a.fdd.fd_readonly = 0;
+  drive_a.fdd_filename[0] = NULL;
+
+  fdd_init( &drive_b );
+  drive_b.fdd.fd_type = FD_30;
+  drive_b.fdd.fd_heads = 1;
+  drive_b.fdd.fd_cylinders = 40;
+  drive_b.fdd.fd_readonly = 0;
+  drive_b.fdd_filename[0] = NULL;
+
+  /* And a null drive to use for the other two drives lib765 supports */
+  fd_init( &drive_null );
+  
+  /* No FDC interrupts */
+  fdc.fdc_isr = NULL;
+
+  /* And reset the FDC */
+  specplus3_fdc_reset();
+#endif				/* #ifdef HAVE_765_H */
+
   return 0;
 
 }
@@ -283,6 +336,10 @@ int specplus3_reset(void)
   sound_ay_reset();
   snapshot_flush_slt();
 
+#ifdef HAVE_765_H
+  specplus3_fdc_reset();
+#endif
+
   return 0;
 }
 
@@ -296,6 +353,11 @@ void specplus3_memoryport_write(WORD port, BYTE b)
 
   /* Store the last byte written in case we need it */
   machine_current->ram.last_byte2=b;
+
+#ifdef HAVE_765_H
+  /* Set the state of both ( 3 = (1<<0) + (1<<1) ) floppy drive motors */
+  fdc_set_motor( &fdc, ( b & 8 ) ? 3 : 0 );
+#endif			/* #ifdef HAVE_765_H */
 
   if( b & 0x01) {	/* Check whether we want a special RAM configuration */
 
@@ -313,3 +375,55 @@ void specplus3_memoryport_write(WORD port, BYTE b)
   }
 
 }
+
+#if HAVE_765_H
+
+static void
+specplus3_fdc_reset( void )
+{
+  /* Reset the FDC and set up the four drives (of which only drives 0 and
+     1 exist on the +3 */
+  fdc_reset( &fdc );
+  fdc.fdc_drive[0] = (FLOPPY_DRIVE*)&drive_a;
+  fdc.fdc_drive[1] = (FLOPPY_DRIVE*)&drive_b;
+  fdc.fdc_drive[2] = &drive_null;
+  fdc.fdc_drive[3] = &drive_null;
+}
+
+static BYTE
+specplus3_fdc_status( WORD port )
+{
+  return fdc_read_ctrl( &fdc );
+}
+
+static BYTE
+specplus3_fdc_read( WORD port )
+{
+  return fdc_read_data( &fdc );
+}
+
+static void
+specplus3_fdc_write( WORD port, BYTE data )
+{
+  fdc_write_data( &fdc, data );
+}
+
+/* lib765's `print an error message' callback */
+void
+fdc_dprintf( int debug, char *format, ... )
+{
+  va_list ap;
+  char error_message[1024];
+
+  /* Report only serious errors */
+  if( debug != 0 ) return;
+
+  /* FIXME: need a ui_verror function */
+  va_start( ap, format );
+  vsnprintf( error_message, 1024, format, ap );
+  va_end( ap );
+
+  ui_error( UI_ERROR_ERROR, error_message );
+}
+
+#endif			/* #ifdef HAVE_765_H */

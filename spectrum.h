@@ -94,6 +94,7 @@ BYTE readport(WORD port);
 void writeport(WORD port, BYTE b);
 
 BYTE spectrum_port_noread(WORD port);
+void spectrum_port_nowrite( WORD port, BYTE b );
 
 BYTE spectrum_ula_read(WORD port);
 void spectrum_ula_write(WORD port, BYTE b);

@@ -46,7 +46,7 @@ static DWORD spec48_contend_delay( void );
 spectrum_port_info spec48_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
+  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
