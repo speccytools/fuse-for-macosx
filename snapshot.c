@@ -157,6 +157,8 @@ snapshot_copy_from( libspectrum_snap *snap )
   error = scld_from_snapshot( snap, capabilities ); if( error ) return error;
   error = joystick_from_snapshot( snap ); if( error ) return error;
 
+  periph_update();
+
   return 0;
 }
 
