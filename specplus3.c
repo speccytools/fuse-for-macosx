@@ -57,6 +57,7 @@ static void specplus3_fdc_reset( void );
 static BYTE specplus3_fdc_status( WORD port );
 static BYTE specplus3_fdc_read( WORD port );
 static void specplus3_fdc_write( WORD port, BYTE data );
+
 void fdc_dprintf( int debug, char *format, ... );
 #endif			/* #ifdef HAVE_765_H */
 
@@ -408,6 +409,8 @@ specplus3_fdc_write( WORD port, BYTE data )
   fdc_write_data( fdc, data );
 }
 
+/* FDC UI related functions */
+
 /* lib765's `print an error message' callback */
 void
 fdc_dprintf( int debug, char *format, ... )
@@ -424,6 +427,22 @@ fdc_dprintf( int debug, char *format, ... )
   va_end( ap );
 
   ui_error( UI_ERROR_ERROR, error_message );
+}
+
+int
+specplus3_disk_insert( specplus3_drive_number drive, const char *filename )
+{
+  fprintf( stderr, "%s: specplus3_disk_insert not implemented yet. Sorry.\n",
+	   fuse_progname );
+  return 0;
+}
+
+int
+specplus3_disk_eject( specplus3_drive_number drive )
+{
+  fprintf( stderr, "%s: specplus3_disk_eject not implemented yet. Sorry.\n",
+	   fuse_progname );
+  return 0;
 }
 
 #endif			/* #ifdef HAVE_765_H */

@@ -45,4 +45,14 @@ int specplus3_reset(void);
 
 void specplus3_memoryport_write(WORD port, BYTE b);
 
+/* The +3's drives */
+typedef enum specplus3_drive_number {
+  SPECPLUS3_DRIVE_A = 0,
+  SPECPLUS3_DRIVE_B,
+} specplus3_drive_number;
+
+int specplus3_disk_insert( specplus3_drive_number drive,
+			   const char *filename );
+int specplus3_disk_eject( specplus3_drive_number drive );
+
 #endif			/* #ifndef FUSE_SPECPLUS3_H */

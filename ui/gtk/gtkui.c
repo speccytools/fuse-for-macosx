@@ -44,6 +44,7 @@
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
+#include "specplus3.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
@@ -86,6 +87,13 @@ static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
 static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
+static void gtkui_disk_open_a( GtkWidget *widget, gpointer data );
+static void gtkui_disk_open_b( GtkWidget *widget, gpointer data );
+static void gtkui_disk_eject_a( GtkWidget *widget, gpointer data );
+static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data );
+
+static void gtkui_disk_open( specplus3_drive_number drive );
+
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
 static char* gtkui_fileselector_get_filename( const char *title );
@@ -115,6 +123,17 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Tape/_Rewind",		NULL , gtkui_tape_rewind,   0, NULL          },
   { "/Tape/_Clear",		NULL , gtkui_tape_clear,    0, NULL          },
   { "/Tape/_Write...",		"F6" , gtkui_tape_write,    0, NULL          },
+
+#ifdef HAVE_765_H
+  { "/Disk",			NULL , NULL,		    0, "<Branch>"    },
+  { "/Disk/Drive A:",		NULL , NULL,		    0, "<Branch>"    },
+  { "/Disk/Drive A:/_Open...",  NULL , gtkui_disk_open_a,   0, NULL          },
+  { "/Disk/Drive A:/_Eject...", NULL , gtkui_disk_eject_a,  0, NULL          },
+  { "/Disk/Drive B:",		NULL , NULL,		    0, "<Branch>"    },
+  { "/Disk/Drive B:/_Open...",  NULL , gtkui_disk_open_b,   0, NULL          },
+  { "/Disk/Drive B:/_Eject...", NULL , gtkui_disk_eject_b,  0, NULL          },
+#endif				/* #ifdef HAVE_765_H */
+
   { "/Help",			NULL , NULL,		    0, "<Branch>"    },
   { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
 };
@@ -532,6 +551,48 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data )
 
   fuse_emulation_unpause();
 }
+
+#ifdef HAVE_765_H
+
+/* Called by the mnu when Disk/Drive ?:/Open selected */
+static void gtkui_disk_open_a( GtkWidget *widget, gpointer data )
+{
+  gtkui_disk_open( SPECPLUS3_DRIVE_A );
+}
+
+static void gtkui_disk_open_b( GtkWidget *widget, gpointer data )
+{
+  gtkui_disk_open( SPECPLUS3_DRIVE_B );
+}
+
+static void gtkui_disk_open( specplus3_drive_number drive )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = gtkui_fileselector_get_filename(
+    ( drive == SPECPLUS3_DRIVE_A ? "Fuse - Insert disk into drive A:" :
+                                   "Fuse - Insert disk into drive B:" ) );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  specplus3_disk_insert( drive, filename );
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+static void gtkui_disk_eject_a( GtkWidget *widget, gpointer data )
+{
+  specplus3_disk_eject( SPECPLUS3_DRIVE_A );
+}
+
+static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data )
+{
+  specplus3_disk_eject( SPECPLUS3_DRIVE_B );
+}
+
+#endif			/* #ifdef HAVE_765_H */
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data )
 {
