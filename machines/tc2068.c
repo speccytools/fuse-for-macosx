@@ -115,20 +115,6 @@ tc2068_unattached_port( void )
   return 0xff;
 }
 
-libspectrum_dword
-tc2068_contend_port( libspectrum_word port )
-{
-  /* Contention occurs for ports F4, FE and FF (HSR, ULA and DEC) */
-  /* It's a guess that contention occurs for ports F5 and F6, too */
-  if( ( port & 0xff ) == 0xf4 ||
-      ( port & 0xff ) == 0xf5 ||
-      ( port & 0xff ) == 0xf6 ||
-      ( port & 0xff ) == 0xfe ||
-      ( port & 0xff ) == 0xff    ) return tc2068_contend_delay( tstates );
-
-  return 0;
-}
-
 static libspectrum_byte
 tc2068_contend_delay( libspectrum_dword time )
 {
@@ -182,7 +168,7 @@ tc2068_init( fuse_machine_info *machine )
   machine->reset = tc2068_reset;
 
   machine->timex = 1;
-  machine->ram.contend_port	     = tc2068_contend_port;
+  machine->ram.port_contended	     = tc2048_port_contended;
   machine->ram.contend_delay	     = tc2068_contend_delay;
 
   memset( fake_bank, 0xff, 0x2000 );

@@ -66,16 +66,13 @@ tc2048_unattached_port( void )
   return 0xff;
 }
 
-libspectrum_dword
-tc2048_contend_port( libspectrum_word port )
+int
+tc2048_port_contended( libspectrum_word port )
 {
-  /* Contention occurs for ports FE and F4 (SCLD and HSR) */
-  /* Contention occurs for port FF (SCLD DEC) */
-  if( ( port & 0xff ) == 0xf4 ||
-      ( port & 0xff ) == 0xfe ||
-      ( port & 0xff ) == 0xff    ) return tc2048_contend_delay( tstates );
+  /* Contention occurs for ports F4 (HSR), FE (SCLD) and FF (DEC) */
+  port &= 0xff;
 
-  return 0;
+  return( port == 0xf4 || port == 0xfe || port == 0xff );
 }
 
 static libspectrum_byte
@@ -130,7 +127,7 @@ int tc2048_init( fuse_machine_info *machine )
   machine->reset = tc2048_reset;
 
   machine->timex = 1;
-  machine->ram.contend_port	     = tc2048_contend_port;
+  machine->ram.port_contended	     = tc2048_port_contended;
   machine->ram.contend_delay	     = tc2048_contend_delay;
 
   machine->unattached_port = tc2048_unattached_port;

@@ -786,3 +786,7 @@
 20040505 z80.c: fix times for interrupt acknowledgement.
 20040508 display.c,z80/z80_macros.h: improved display timings (thanks,
 	 Mark Woodmass and Jonathan Needle).
+20040511 machine.c,spectrum.[ch],machines/,z80/{coretest.c,z80.pl,
+	 z80_macros.h},z80/tests/{d3,db,ed[4567][0189],ed[ab][23ab]}.out:
+	 improved contention on IO port access (thanks again, Mark
+	 Woodmass and Jonathan Needle).

@@ -207,7 +207,7 @@ sub ini_ind ($) {
     print << "CODE";
       {
 	libspectrum_word initemp = readport( BC );
-	tstates += 2; contend_io( BC, 3 );
+	tstates++; spectrum_contend_port( BC );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
 	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -225,7 +225,7 @@ sub inir_indr ($) {
     print << "CODE";
       {
 	libspectrum_word initemp=readport( BC );
-	tstates += 2; contend_io( BC, 3 );
+	tstates++; spectrum_contend_port( BC );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
 	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -294,19 +294,16 @@ sub otir_otdr ($) {
       {
 	libspectrum_word outitemp;
 	tstates++;
-	outitemp = readbyte( HL ); tstates++;
+	outitemp = readbyte( HL );
 	B--; HL$modifier; /* This does happen first, despite what the specs say */
 	writeport(BC,outitemp);
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
+	spectrum_contend_port( BC );
 	if(B) {
-	  contend_io( BC, 1 );
 	  contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
-	  contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
-	  contend( PC - 1, 1 );
+	  contend( PC, 1 ); contend( PC - 1, 1 );
 	  PC-=2;
-	} else {
-	  contend_io( BC, 3 );
 	}
       }
 CODE
@@ -322,9 +319,9 @@ sub outi_outd ($) {
       {
 	libspectrum_word outitemp;
 	tstates++;
-	outitemp = readbyte( HL ); tstates++;
+	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
-	contend_io( BC, 3 );
+	spectrum_contend_port( BC );
 	HL$modifier;
 	writeport(BC,outitemp);
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -594,14 +591,13 @@ sub opcode_IN (@) {
 	print << "IN";
       { 
 	libspectrum_word intemp;
-	intemp = readbyte( PC++ ) + ( A << 8 ); tstates++;
-	contend_io( intemp, 3 );
+	intemp = readbyte( PC++ ) + ( A << 8 );
+	spectrum_contend_port( intemp );
         A=readport( intemp );
       }
 IN
     } elsif( $register eq 'F' and $port eq '(C)' ) {
 	print << "IN";
-      tstates += 1;
       {
 	libspectrum_byte bytetemp;
 	Z80_IN( bytetemp, BC );
@@ -609,7 +605,6 @@ IN
 IN
     } elsif( length $register == 1 and $port eq '(C)' ) {
 	print << "IN";
-      tstates += 1;
       Z80_IN( $register, BC );
 IN
     }
@@ -840,13 +835,11 @@ sub opcode_OUT (@) {
       { 
 	libspectrum_word outtemp;
 	outtemp = readbyte( PC++ ) + ( A << 8 );
-	tstates++;
 	Z80_OUT( outtemp , A );
       }
 OUT
     } elsif( $port eq '(C)' and length $register == 1 ) {
 	print << "OUT";
-      tstates += 1;
       Z80_OUT( BC, $register );
 OUT
     }

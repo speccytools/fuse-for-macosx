@@ -38,6 +38,7 @@
 #include "periph.h"
 #include "settings.h"
 #include "spec128.h"
+#include "spec48.h"
 
 static int spec128_reset( void );
 
@@ -56,16 +57,6 @@ libspectrum_byte
 spec128_unattached_port( void )
 {
   return spectrum_unattached_port( 3 );
-}
-
-libspectrum_dword
-spec128_contend_port( libspectrum_word port )
-{
-  /* Contention occurs for the ULA, or for the memory paging port */
-  if( ( port & 0x0001 ) == 0x0000 ||
-      ( port & 0x8002 ) == 0x0000    ) return spec128_contend_delay( tstates );
-
-  return 0;
 }
 
 libspectrum_byte
@@ -120,7 +111,7 @@ int spec128_init( fuse_machine_info *machine )
   machine->reset = spec128_reset;
 
   machine->timex = 0;
-  machine->ram.contend_port	     = spec128_contend_port;
+  machine->ram.port_contended	     = spec48_port_contended;
   machine->ram.contend_delay	     = spec128_contend_delay;
 
   machine->unattached_port = spec128_unattached_port;

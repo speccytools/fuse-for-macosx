@@ -87,11 +87,10 @@ pentagon_unattached_port( void )
   return spectrum_unattached_port( 3 );
 }
 
-static libspectrum_dword
-pentagon_contend_port( libspectrum_word port GCC_UNUSED )
+int
+pentagon_port_contended( libspectrum_word port GCC_UNUSED )
 {
-  /* No contention on ports AFAIK */
-
+  /* No contended ports */
   return 0;
 }
 
@@ -111,7 +110,7 @@ pentagon_init( fuse_machine_info *machine )
   machine->reset = pentagon_reset;
 
   machine->timex = 0;
-  machine->ram.contend_port   = pentagon_contend_port;
+  machine->ram.port_contended = pentagon_port_contended;
   machine->ram.contend_delay  = pentagon_contend_delay;
 
   machine->unattached_port = pentagon_unattached_port;

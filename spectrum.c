@@ -55,7 +55,6 @@ libspectrum_byte spectrum_last_ula;
 
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
-spectrum_port_contention_function contend_port;
 spectrum_contention_delay_function contend_delay;
 
 libspectrum_byte spectrum_contention[ 80000 ];
@@ -144,6 +143,33 @@ spectrum_ula_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
     } else {
       keyboard_default_value=0xbf;
     }
+  }
+}
+
+void
+spectrum_contend_port( libspectrum_word port )
+{
+  if( machine_current->ram.port_contended( port ) ) {
+
+    if( ( port & 0xc000 ) == 0x4000 ) {
+      tstates += spectrum_contention[ tstates ]; tstates++;
+      tstates += spectrum_contention[ tstates ]; tstates += 3;
+    } else {
+      tstates++;
+      tstates += spectrum_contention[ tstates ]; tstates += 3;
+    }
+
+  } else {
+
+    if( ( port & 0xc000 ) == 0x4000 ) {
+      tstates += spectrum_contention[ tstates ]; tstates++;
+      tstates += spectrum_contention[ tstates ]; tstates++;
+      tstates += spectrum_contention[ tstates ]; tstates++;
+      tstates += spectrum_contention[ tstates ]; tstates++;
+    } else {
+      tstates += 4;
+    }
+
   }
 }
 

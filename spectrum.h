@@ -43,15 +43,15 @@ extern libspectrum_byte spectrum_last_ula;
 /* 256 Kb of RAM */
 extern libspectrum_byte RAM[16][0x4000];
 
-typedef libspectrum_dword
-  (*spectrum_port_contention_function)( libspectrum_word port );
+typedef int
+  (*spectrum_port_contented_function)( libspectrum_word port );
 typedef libspectrum_byte
   (*spectrum_contention_delay_function)( libspectrum_dword time );
 
 typedef struct spectrum_raminfo {
 
-  spectrum_port_contention_function contend_port; /* And how long to access
-						     an IO port? */
+  /* Is this port result supplied by the ULA? */
+  spectrum_port_contented_function port_contended;
 
   /* What's the actual delay at the current tstate */
   spectrum_contention_delay_function contend_delay;
@@ -66,16 +66,13 @@ typedef struct spectrum_raminfo {
 
 } spectrum_raminfo;
 
-/* Set these every time we change machine to avoid having to do a
-   structure lookup too often */
-extern spectrum_port_contention_function contend_port;
-
 /* How much contention do we get at every tstate? */
 extern libspectrum_byte spectrum_contention[ 80000 ];
 
 libspectrum_byte spectrum_ula_read( libspectrum_word port, int *attached );
 void spectrum_ula_write( libspectrum_word port, libspectrum_byte b );
 
+void spectrum_contend_port( libspectrum_word port );
 libspectrum_byte spectrum_unattached_port( int offset );
 
 /* Miscellaneous stuff */

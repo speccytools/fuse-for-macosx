@@ -35,6 +35,7 @@
 #include "ay.h"
 #include "compat.h"
 #include "joystick.h"
+#include "machines.h"
 #include "memory.h"
 #include "printer.h"
 #include "settings.h"
@@ -96,14 +97,6 @@ scorpion_unattached_port( void )
   return spectrum_unattached_port( 3 );
 }
 
-static libspectrum_dword
-scorpion_contend_port( libspectrum_word port GCC_UNUSED )
-{
-  /* No contention on ports AFAIK */
-
-  return 0;
-}
-
 static libspectrum_byte
 scorpion_contend_delay( libspectrum_dword time GCC_UNUSED )
 {
@@ -120,7 +113,7 @@ scorpion_init( fuse_machine_info *machine )
   machine->reset = scorpion_reset;
 
   machine->timex = 0;
-  machine->ram.contend_port   = scorpion_contend_port;
+  machine->ram.port_contended = pentagon_port_contended;
   machine->ram.contend_delay  = scorpion_contend_delay;
 
   machine->unattached_port = scorpion_unattached_port;

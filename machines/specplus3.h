@@ -1,5 +1,5 @@
 /* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -43,7 +43,7 @@ extern const periph_t specplus3_peripherals[];
 extern const size_t specplus3_peripherals_count;
 
 libspectrum_byte specplus3_unattached_port( void );
-libspectrum_dword specplus3_contend_port( libspectrum_word address );
+int specplus3_port_contended( libspectrum_word port );
 libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
 
 int specplus3_init( fuse_machine_info *machine );

@@ -56,13 +56,11 @@ spec48_unattached_port( void )
   return spectrum_unattached_port( 1 );
 }
 
-libspectrum_dword
-spec48_contend_port( libspectrum_word port )
+int
+spec48_port_contended( libspectrum_word port )
 {
-  /* Contention occurs only for even-numbered ports */
-  if( ( port & 0x01 ) == 0 ) return spectrum_contention[ tstates ];
-
-  return 0;
+  /* All even ports contended */
+  return !( port & 0x0001 );
 }
 
 libspectrum_byte
@@ -117,7 +115,7 @@ int spec48_init( fuse_machine_info *machine )
   machine->reset = spec48_reset;
 
   machine->timex = 0;
-  machine->ram.contend_port          = spec48_contend_port;
+  machine->ram.port_contended        = spec48_port_contended;
   machine->ram.contend_delay	     = spec48_contend_delay;
 
   machine->unattached_port = spec48_unattached_port;

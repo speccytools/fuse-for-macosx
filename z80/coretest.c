@@ -52,15 +52,11 @@ libspectrum_byte readbyte_internal( libspectrum_word address );
 void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
-static libspectrum_dword trivial_contend_port( libspectrum_word port );
-
 static int read_test_file( const char *filename,
 			   libspectrum_dword *end_tstates );
 
 static void dump_z80_state( void );
 static void dump_memory_state( void );
-
-spectrum_port_contention_function contend_port = trivial_contend_port;
 
 int
 main( int argc, char **argv )
@@ -130,11 +126,11 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   memory[ address ] = b;
 }
 
-static libspectrum_dword
-trivial_contend_port( libspectrum_word port )
+void
+spectrum_contend_port( libspectrum_word port )
 {
   printf( "%5d PC %04x\n", tstates, port );
-  return 0;
+  tstates += 4;
 }
 
 void

@@ -209,8 +209,6 @@ machine_select_machine( fuse_machine_info *machine )
     return 1;
   if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
-  contend_port = machine->ram.contend_port;
-  
   if( uidisplay_end() ) return 1;
 
   capabilities = libspectrum_machine_capabilities( machine->machine );
@@ -357,12 +355,16 @@ machine_set_timings( fuse_machine_info *machine )
      appropriate number of left border cycles; the difference between this
      and the actually displayed width is accounted for in
      display.c:display_border_column()
+
+     The addition of 3 at the end accounts for the fact that the ULA
+     receives the new data at T2 of the IO cycle of an OUT, but the
+     Z80 core doesn't actually output it until after T4.
   */
 
   machine->line_times[0]=
     libspectrum_timings_top_left_pixel( machine->machine ) -
     24 * machine->timings.tstates_per_line -
-    machine->timings.left_border;
+    machine->timings.left_border + 3;
 
   for( y=1; y<DISPLAY_SCREEN_HEIGHT+1; y++ ) {
     machine->line_times[y] = machine->line_times[y-1] + 

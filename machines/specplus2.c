@@ -33,6 +33,7 @@
 #include "machines.h"
 #include "settings.h"
 #include "spec128.h"
+#include "spec48.h"
 
 /* The +2 emulation just uses the 128K routines */
 
@@ -46,7 +47,7 @@ int specplus2_init( fuse_machine_info *machine )
   machine->reset = specplus2_reset;
 
   machine->timex = 0;
-  machine->ram.contend_port	     = spec128_contend_port;
+  machine->ram.port_contended	     = spec48_port_contended;
   machine->ram.contend_delay	     = spec128_contend_delay;
 
   machine->unattached_port = spec128_unattached_port;

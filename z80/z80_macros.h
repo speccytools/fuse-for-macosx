@@ -113,8 +113,6 @@ void contend( libspectrum_word address, libspectrum_dword time );
 
 #endif				/* #ifndef CORETEST */
 
-#define contend_io(port,time) tstates += contend_port( (port) ) + (time);
-
 /* Some commonly used instructions */
 #define AND(value)\
 {\
@@ -227,7 +225,7 @@ break
 
 #define Z80_IN( reg, port )\
 {\
-  contend_io( port, 3 );\
+  spectrum_contend_port( port ); \
   (reg)=readport((port));\
   F = ( F & FLAG_C) | sz53p_table[(reg)];\
 }
@@ -282,9 +280,8 @@ break
 
 #define Z80_OUT( port, reg )\
 {\
-  contend_io( port, 0 );\
+  spectrum_contend_port( port ); \
   writeport(port,reg);\
-  tstates += 3;\
 }
 
 #define POP16(regl,regh)\

@@ -113,11 +113,10 @@ specplus3_unattached_port( void )
   return 0xff;
 }
 
-libspectrum_dword
-specplus3_contend_port( libspectrum_word port GCC_UNUSED )
+int
+specplus3_port_contended( libspectrum_word port )
 {
-  /* Contention does not occur for the ULA.
-     FIXME: Unknown for other ports, so let's assume it doesn't for now */
+  /* No contended ports */
   return 0;
 }
 
@@ -173,7 +172,7 @@ int specplus3_init( fuse_machine_info *machine )
   machine->reset = specplus3_reset;
 
   machine->timex = 0;
-  machine->ram.contend_port	     = specplus3_contend_port;
+  machine->ram.port_contended	     = specplus3_port_contended;
   machine->ram.contend_delay	     = specplus3_contend_delay;
 
   machine->unattached_port = specplus3_unattached_port;
