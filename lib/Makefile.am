@@ -40,7 +40,8 @@ FILES = cassette.bmp \
 	tape_plus3e.szx \
 	tape_pentagon.szx \
 	tape_scorpion.szx \
-	tape_se.szx
+	tape_se.szx \
+	tape_ts2068.szx
 
 pkgdata_DATA = $(FILES)
 

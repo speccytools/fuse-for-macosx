@@ -322,7 +322,8 @@ int tape_load_trap( void )
   }
 
   /* All returns made via the RET at #05E2, except on Timex 2068 at #0136 */
-  if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) {
+  if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ||
+       machine_current->machine == LIBSPECTRUM_MACHINE_TS2068 ) {
     PC = 0x0136;
   } else {
     PC = 0x05e2;
@@ -506,7 +507,8 @@ int tape_save_trap( void )
   ui_tape_browser_update();
 
   /* And then return via the RET at #053E, except on Timex 2068 at #00E4 */
-  if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) {
+  if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ||
+       machine_current->machine == LIBSPECTRUM_MACHINE_TS2068 ) {
     PC = 0x00e4;
   } else {
     PC = 0x053e;
