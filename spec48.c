@@ -28,19 +28,16 @@
 
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "joystick.h"
-#include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
 #include "settings.h"
-#include "snapshot.h"
-#include "sound.h"
 #include "spec48.h"
 #include "spectrum.h"
-#include "ui/ui.h"
-#include "z80/z80.h"
 
 static DWORD spec48_contend_delay( void );
 

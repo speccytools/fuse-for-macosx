@@ -28,20 +28,17 @@
 
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "ay.h"
 #include "display.h"
-#include "fuse.h"
 #include "joystick.h"
-#include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
-#include "snapshot.h"
-#include "sound.h"
 #include "spec128.h"
 #include "specplus2a.h"
 #include "specplus3.h"
 #include "spectrum.h"
-#include "z80/z80.h"
 
 spectrum_port_info
 specplus2a_peripherals[] = {

@@ -29,19 +29,16 @@
 
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "joystick.h"
-#include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
-#include "snapshot.h"
-#include "sound.h"
-#include "tc2048.h"
-#include "spectrum.h"
 #include "scld.h"
-#include "z80/z80.h"
-#include "ui/ui.h"
+#include "spectrum.h"
+#include "tc2048.h"
 
 static DWORD tc2048_contend_delay( void );
 

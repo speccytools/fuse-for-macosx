@@ -28,17 +28,15 @@
 
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "ay.h"
 #include "display.h"
 #include "fuse.h"
 #include "joystick.h"
-#include "keyboard.h"
 #include "machine.h"
-#include "snapshot.h"
-#include "sound.h"
 #include "spec128.h"
 #include "spectrum.h"
-#include "z80/z80.h"
 
 static DWORD spec128_contend_delay( void );
 

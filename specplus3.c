@@ -45,20 +45,19 @@
 #include <765.h>
 #endif				/* #ifdef HAVE_765_H */
 
+#include <libspectrum.h>
+
 #include "ay.h"
 #include "display.h"
 #include "fuse.h"
 #include "joystick.h"
-#include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
-#include "snapshot.h"
-#include "sound.h"
+#include "ui/ui.h"
 #include "spec128.h"
+#include "specplus2a.h"
 #include "specplus3.h"
 #include "spectrum.h"
-#include "ui/ui.h"
-#include "z80/z80.h"
 
 static DWORD specplus3_contend_delay( void );
 
