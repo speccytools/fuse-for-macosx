@@ -105,17 +105,6 @@ static int machine_add_machine( int (*init_function)( machine_info *machine ) )
   return 0;
 }
 
-int machine_select_first( void )
-{
-  int error;
-
-  machine_location = 0;
-  error = machine_select_machine( machine_types[0] );
-  if( error ) return error;
-
-  return 0;
-}
-
 int machine_select( int type )
 {
   int i;

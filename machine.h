@@ -99,7 +99,6 @@ extern machine_info *machine_current;	/* The currently selected machine */
 
 int machine_init_machines( void );
 
-int machine_select_first( void );
 int machine_select( int type );
 int machine_select_id( const char *id );
 
