@@ -91,7 +91,7 @@ int fbkeyboard_keypress(int keysym)
     machine_current->reset();
     break;
   case -4:
-    tape_open();
+    tape_open( "tape.tap" );
     break;
   case 1<<14:
     machine_select_next();

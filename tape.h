@@ -1,5 +1,5 @@
 /* tape.h: tape handling routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #ifndef FUSE_TAPE_H
 #define FUSE_TAPE_H
 
-int tape_open(void);
+int tape_open( const char *filename );
 int tape_trap(void);
 
 #endif

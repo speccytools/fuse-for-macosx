@@ -42,7 +42,7 @@ int tape_trap(void)
   if(!buffer) return 2;
   ptr=buffer;
 
-  if(!tape_file) if(tape_open()) { free(buffer); return 1; }
+  if(!tape_file) return 1;
 
   load= ( F_ & FLAG_C );
 
@@ -102,9 +102,11 @@ int tape_trap(void)
 
 }
 
-int tape_open(void)
+int tape_open( const char *filename )
 {
   if(tape_file) fclose(tape_file);
-  tape_file=fopen("tape.tap","rb");
+
+  tape_file=fopen( filename, "rb" );
+
   return !tape_file;
 }

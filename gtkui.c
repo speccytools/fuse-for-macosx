@@ -29,6 +29,7 @@
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <stdio.h>
+#include <string.h>
 
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
@@ -62,6 +63,10 @@ static void gtkui_tape(GtkWidget *widget, gpointer data);
 static void gtkui_quit(GtkWidget *widget, gpointer data);
 static void gtkui_reset(GtkWidget *widget, gpointer data);
 static void gtkui_switch(GtkWidget *widget, gpointer data);
+
+static char* gtkui_fileselector_get_filename( void );
+static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
+static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File",		     NULL , NULL,         0, "<Branch>"    },
@@ -201,20 +206,42 @@ static gint gtkui_delete(GtkWidget *widget, GdkEvent *event,
 /* Called by the menu when File/Open selected */
 static void gtkui_open(GtkWidget *widget, gpointer data)
 {
-  snapshot_read( "snapshot.z80" );
+  char *filename;
+
+  filename = gtkui_fileselector_get_filename();
+  if( !filename ) return;
+
+  snapshot_read( filename );
+
+  free( filename );
+
   display_refresh_all();
 }
 
 /* Called by the menu when File/Save selected */
 static void gtkui_save(GtkWidget *widget, gpointer data)
 {
-  snapshot_write( "snapshot.z80" );
+  char *filename;
+
+  filename = gtkui_fileselector_get_filename();
+  if( !filename ) return;
+
+  snapshot_write( filename );
+
+  free( filename );
 }
 
 /* Called by the menu when File/Tape selected */
 static void gtkui_tape(GtkWidget *widget, gpointer data)
 {
-  tape_open();
+  char *filename;
+
+  filename = gtkui_fileselector_get_filename();
+  if( !filename ) return;
+
+  tape_open( filename );
+
+  free( filename );
 }
 
 /* Called by the menu when File/Exit selected */
@@ -233,6 +260,72 @@ static void gtkui_reset(GtkWidget *widget, gpointer data)
 static void gtkui_switch(GtkWidget *widget, gpointer data)
 {
   machine_select_next();
+}
+
+/* Bits used for the file selection dialogs */
+
+typedef struct gktui_fileselector_info {
+
+  GtkWidget *selector;
+  gchar *filename;
+  int done;
+
+} gtkui_fileselector_info;
+
+static char* gtkui_fileselector_get_filename( void )
+{
+  gtkui_fileselector_info selector;
+
+  selector.selector = gtk_file_selection_new( "Select File" );
+  selector.filename = NULL;
+  selector.done = 0;
+
+  gtk_signal_connect(
+      GTK_OBJECT( GTK_FILE_SELECTION( selector.selector )->ok_button ),
+      "clicked",
+      GTK_SIGNAL_FUNC( gtkui_fileselector_done ),
+      (gpointer) &selector );
+
+  gtk_signal_connect(
+       GTK_OBJECT( GTK_FILE_SELECTION( selector.selector )->cancel_button),
+       "clicked",
+       GTK_SIGNAL_FUNC (gtkui_fileselector_cancel),
+       (gpointer) &selector );
+
+  gtk_window_set_modal( GTK_WINDOW( selector.selector ), TRUE );
+
+  gtk_widget_show( selector.selector );
+
+  gtk_main();
+
+  return selector.done ? selector.filename : NULL;
+}
+
+static void gtkui_fileselector_done( GtkButton *button, gpointer user_data )
+{
+  gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
+  char *filename;
+
+  filename =
+    gtk_file_selection_get_filename( GTK_FILE_SELECTION( ptr->selector ) );
+
+  /* FIXME: what to do if this runs out of memory? */
+  ptr->filename = strdup( filename );
+
+  gtk_widget_destroy( ptr->selector );
+
+  ptr->done = 1;
+
+  gtk_main_quit();
+}
+
+static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data )
+{
+  gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
+
+  gtk_widget_destroy( ptr->selector );
+
+  gtk_main_quit();
 }
 
 #endif			/* #ifdef UI_GTK */

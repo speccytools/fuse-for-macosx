@@ -87,7 +87,7 @@ int svgakeyboard_keypress(int keysym)
     machine_current->reset();
     break;
   case SCANCODE_F7:
-    tape_open();
+    tape_open( "tape.tap" );
     break;
   case SCANCODE_F9:
     machine_select_next();
