@@ -63,8 +63,8 @@ libspectrum_error libspectrum_print_error( const char *format, ... )
   /* Initialise the varargs list */
   va_start( ap, format );
 
-  fprintf( stderr, "libspectrum error: " );
-  vprintf( format, ap );
+   fprintf( stderr, "libspectrum error: " );
+  vfprintf( stderr, format, ap );
 
   va_end( ap );
 
