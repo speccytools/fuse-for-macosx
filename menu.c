@@ -256,10 +256,10 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
 
 #ifdef HAVE_765_H
   if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_insert( which, filename );
+    specplus3_disk_insert_default_autoload( which, filename );
   } else
 #endif				/* #ifdef HAVE_765_H */
-    trdos_disk_insert( which, filename );
+    trdos_disk_insert_default_autoload( which, filename );
 
   free( filename );
 

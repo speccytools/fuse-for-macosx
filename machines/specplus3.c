@@ -494,7 +494,15 @@ specplus3_disk_present( specplus3_drive_number which )
 }
 
 int
-specplus3_disk_insert( specplus3_drive_number which, const char *filename )
+specplus3_disk_insert_default_autoload( specplus3_drive_number which,
+                                        const char *filename )
+{
+  return specplus3_disk_insert( which, filename, settings_current.auto_load );
+}
+
+int
+specplus3_disk_insert( specplus3_drive_number which, const char *filename,
+                       int autoload )
 {
   char template[ PATH_MAX ];
   int fd, error;
@@ -530,7 +538,30 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
     1
   );
 
-  return 0;
+  if( autoload ) {
+    int fd; utils_file snap;
+
+    fd = utils_find_auxiliary_file( "disk_plus3.z80", UTILS_AUXILIARY_LIB );
+    if( fd == -1 ) {
+      ui_error( UI_ERROR_ERROR, "Couldn't find +3 disk autoload snap" );
+      return 1;
+    }
+
+    error = utils_read_fd( fd, "disk_plus3.z80", &snap );
+    if( error ) { utils_close_file( &snap ); return error; }
+
+    error = snapshot_read_buffer( snap.buffer, snap.length,
+                                  LIBSPECTRUM_ID_SNAPSHOT_Z80 );
+    if( error ) { utils_close_file( &snap ); return error; }
+
+    if( utils_close_file( &snap ) ) {
+      ui_error( UI_ERROR_ERROR, "Couldn't munmap 'disk_plus3.z80': %s",
+                strerror( errno ) );
+      return 1;
+    }
+  }
+
+  return error;
 }
 
 int

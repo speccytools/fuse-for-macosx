@@ -61,8 +61,6 @@
 #include "tape.h"
 #include "trdos.h"
 #include "utils.h"
-#include "z80/z80.h"
-#include "z80/z80_macros.h"
 #include "zxatasp.h"
 #include "zxcf.h"
 
@@ -130,33 +128,7 @@ utils_open_file( const char *filename, int autoload,
       error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 ); if( error ) break;
     }
 
-    error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
-    if( autoload ) {
-
-      int fd; utils_file snap;
-
-      fd = utils_find_auxiliary_file( "disk_plus3.z80", UTILS_AUXILIARY_LIB );
-      if( fd == -1 ) {
-	ui_error( UI_ERROR_ERROR, "Couldn't find +3 disk autoload snap" );
-	error = 1;
-	goto escape;
-      }
-
-      error = utils_read_fd( fd, "disk_plus3.z80", &snap );
-      if( error ) { utils_close_file( &snap ); goto escape; }
-
-      error = snapshot_read_buffer( snap.buffer, snap.length,
-				    LIBSPECTRUM_ID_SNAPSHOT_Z80 );
-      if( error ) { utils_close_file( &snap ); goto escape; }
-
-      if( utils_close_file( &snap ) ) {
-	ui_error( UI_ERROR_ERROR, "Couldn't munmap 'disk_plus3.z80': %s",
-		  strerror( errno ) );
-	error = 1;
-	goto escape;
-      }
-    }
-  escape:
+    error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename, autoload );
     break;
 
 #else				/* #ifdef HAVE_765_H */
@@ -172,13 +144,7 @@ utils_open_file( const char *filename, int autoload,
       error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     }
 
-    error = trdos_disk_insert( TRDOS_DRIVE_A, filename ); if( error ) break;
-    if( autoload ) {
-
-      PC = 0;
-      machine_current->ram.last_byte |= 0x10;	/* Select ROM 1 */
-      trdos_page();
-    }
+    error = trdos_disk_insert( TRDOS_DRIVE_A, filename, autoload );
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:

@@ -46,10 +46,13 @@
 #include "event.h"
 #include "machine.h"
 #include "memory.h"
+#include "settings.h"
 #include "spectrum.h"
 #include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
 #define TRDOS_DISC_SIZE 655360
 
@@ -502,7 +505,15 @@ insert_scl( trdos_drive_number which, const char *filename )
 }
 
 int
-trdos_disk_insert( trdos_drive_number which, const char *filename )
+trdos_disk_insert_default_autoload( trdos_drive_number which,
+                                    const char *filename )
+{
+  return trdos_disk_insert( which, filename, settings_current.auto_load );
+}
+
+int
+trdos_disk_insert( trdos_drive_number which, const char *filename,
+                   int autoload )
 {
   int error;
   utils_file file;
@@ -550,6 +561,12 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
 			     UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
     1
   );
+
+  if( autoload ) {
+    PC = 0;
+    machine_current->ram.last_byte |= 0x10;   /* Select ROM 1 */
+    trdos_page();
+  }
 
   return 0;
 }

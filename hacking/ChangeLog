@@ -1065,3 +1065,5 @@
 20040905 fuse.c,menu.[ch],menu_data.c,rzx.c: support multiple input
 	 recording blocks in an RZX file.
 20040907 trdos.c: Fix disk ejection (thanks Paul van der Laan).
+20040908 menu.c,trdos.[ch],utils.c,machines/specplus3.[ch]: change +3 and
+         TR-DOS autoload to work for any disk insert operation ala tapes.
