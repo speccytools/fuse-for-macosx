@@ -102,6 +102,9 @@ gtkui_picture( const char *filename, int border )
 			     GTK_SIGNAL_FUNC( gtk_widget_destroy ),
 			     GTK_OBJECT( dialog ) );
 
+  /* Stop users resizing this window */
+  gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
+
   gtk_widget_show_all( dialog );
 
   if( munmap( screen, length ) == -1 ) {
