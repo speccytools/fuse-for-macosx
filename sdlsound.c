@@ -29,8 +29,8 @@
 #include "sdlsound.h"
 #include "ui/ui.h"
 
-/* using (8) 64 byte frags for 8kHz, scale up for higher */
-#define BASE_SOUND_FRAG_PWR	8
+/* using (7) 32 byte frags for 8kHz, scale up for higher */
+#define BASE_SOUND_FRAG_PWR	7
 
 static int sixteenbit = 0;
 static int soundmsb = 0;
