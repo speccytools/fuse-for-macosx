@@ -83,12 +83,12 @@ simpleide_active, boolean, 0,, simpleide
 simpleide_master_file, string, NULL,, simpleide-masterfile
 simpleide_slave_file, string, NULL,, simpleide-slavefile
 zxatasp_active, boolean, 0,, zxatasp
-zxatasp_upload, boolean, 1,, zxatasp-upload
-zxatasp_wp, boolean, 1,, zxatasp-write-protect
+zxatasp_upload, boolean, 0,, zxatasp-upload
+zxatasp_wp, boolean, 0,, zxatasp-write-protect
 zxatasp_master_file, string, NULL,, zxatasp-masterfile
 zxatasp_slave_file, string, NULL,, zxatasp-slavefile
 zxcf_active, boolean, 0,, zxcf
-zxcf_upload, boolean, 1,, zxcf-upload
+zxcf_upload, boolean, 0,, zxcf-upload
 zxcf_pri_file, string, NULL,, zxcf-cffile
 
 printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
