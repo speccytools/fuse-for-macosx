@@ -446,4 +446,11 @@ ui_get_rollback_point( GSList *points )
   return -1;
 }
 
+/* FIXME: make this do something useful */
+ui_confirm_joystick_t
+ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
+{
+  return UI_CONFIRM_JOYSTICK_NONE;
+}
+
 #endif				/* #ifdef USE_WIDGET */

@@ -56,9 +56,9 @@ static const keyboard_key_name cursor_key[5] =
 
 /* The keys used by the two Sinclair joysticks */
 static const keyboard_key_name sinclair1_key[5] =
-  { KEYBOARD_1, KEYBOARD_2, KEYBOARD_4, KEYBOARD_3, KEYBOARD_5 };
-static const keyboard_key_name sinclair2_key[5] =
   { KEYBOARD_6, KEYBOARD_7, KEYBOARD_9, KEYBOARD_8, KEYBOARD_0 };
+static const keyboard_key_name sinclair2_key[5] =
+  { KEYBOARD_1, KEYBOARD_2, KEYBOARD_4, KEYBOARD_3, KEYBOARD_5 };
 
 /* The current values for the joysticks we can emulate */
 static libspectrum_byte kempston_value;
@@ -180,4 +180,130 @@ libspectrum_byte
 joystick_timex_read( libspectrum_word port, libspectrum_byte which )
 {
   return which ? timex2_value : timex1_value;
+}
+
+int
+joystick_from_snapshot( libspectrum_snap* snap )
+{
+  size_t i;
+  size_t num_joysticks = libspectrum_snap_joystick_active_count( snap );
+  joystick_type_t fuse_type;
+
+  for( i = 0; i < num_joysticks; i++ ) {
+    switch( libspectrum_snap_joystick_list( snap, i ) ) {
+    case LIBSPECTRUM_JOYSTICK_CURSOR:
+      fuse_type = JOYSTICK_TYPE_CURSOR;
+      break;
+    case LIBSPECTRUM_JOYSTICK_KEMPSTON:            
+      fuse_type = JOYSTICK_TYPE_KEMPSTON;
+      break;
+    case LIBSPECTRUM_JOYSTICK_SINCLAIR_1:
+      fuse_type = JOYSTICK_TYPE_SINCLAIR_1;
+      break;
+    case LIBSPECTRUM_JOYSTICK_SINCLAIR_2:           
+      fuse_type = JOYSTICK_TYPE_SINCLAIR_2;
+      break;
+    case LIBSPECTRUM_JOYSTICK_TIMEX_1:
+      fuse_type = JOYSTICK_TYPE_TIMEX_1;
+      break;
+    case LIBSPECTRUM_JOYSTICK_TIMEX_2:
+      fuse_type = JOYSTICK_TYPE_TIMEX_2;
+      break;
+    case LIBSPECTRUM_JOYSTICK_FULLER:
+    default:
+      ui_error( UI_ERROR_INFO, "Ignoring unsupported joystick in snapshot %s", 
+        libspectrum_joystick_name( libspectrum_snap_joystick_list( snap, i ) ));
+      continue;
+    };
+
+    if( settings_current.joystick_keyboard_output != fuse_type &&
+        settings_current.joystick_1_output != fuse_type &&
+        settings_current.joystick_2_output != fuse_type ) {
+      switch( ui_confirm_joystick( libspectrum_snap_joystick_list(snap,i),
+                                   libspectrum_snap_joystick_inputs(snap,i)) ) {
+      case UI_CONFIRM_JOYSTICK_KEYBOARD:
+        settings_current.joystick_keyboard_output = fuse_type;
+        break;
+      case UI_CONFIRM_JOYSTICK_JOYSTICK_1:
+        settings_current.joystick_1_output = fuse_type;
+        break;
+      case UI_CONFIRM_JOYSTICK_JOYSTICK_2:
+        settings_current.joystick_2_output = fuse_type;
+        break;
+      case UI_CONFIRM_JOYSTICK_NONE:
+        break;
+      }
+    }
+
+    /* If the snap was configured for a Kempston joystick, enable
+       our Kempston emulation in case the snap was reading from
+       the joystick to prevent things going haywire */
+    if( fuse_type == JOYSTICK_TYPE_KEMPSTON )
+      settings_current.joy_kempston = 1;
+  }
+
+  return 0;
+}
+
+static void
+add_joystick( libspectrum_snap *snap, joystick_type_t fuse_type, int inputs )
+{
+  size_t i;
+  size_t num_joysticks = libspectrum_snap_joystick_active_count( snap );
+  libspectrum_joystick libspectrum_type;
+
+  switch( fuse_type ) {
+  case JOYSTICK_TYPE_CURSOR:
+    libspectrum_type = LIBSPECTRUM_JOYSTICK_CURSOR;
+    break;
+  case JOYSTICK_TYPE_KEMPSTON:
+    libspectrum_type = LIBSPECTRUM_JOYSTICK_KEMPSTON;
+    break;
+  case JOYSTICK_TYPE_SINCLAIR_1:
+    libspectrum_type = LIBSPECTRUM_JOYSTICK_SINCLAIR_1;
+    break;
+  case JOYSTICK_TYPE_SINCLAIR_2:
+    libspectrum_type = LIBSPECTRUM_JOYSTICK_SINCLAIR_2;
+    break;
+  case JOYSTICK_TYPE_TIMEX_1:
+    libspectrum_type = LIBSPECTRUM_JOYSTICK_TIMEX_1;
+    break;
+  case JOYSTICK_TYPE_TIMEX_2:
+    libspectrum_type = LIBSPECTRUM_JOYSTICK_TIMEX_2;
+    break;
+  
+  case JOYSTICK_TYPE_NONE:
+  default:
+    return;
+    break;
+  }
+
+  for( i = 0; i < num_joysticks; i++ ) {
+    if( libspectrum_snap_joystick_list( snap, i ) == libspectrum_type ) {
+      libspectrum_snap_set_joystick_inputs( snap, i, inputs |
+                                  libspectrum_snap_joystick_inputs( snap, i ) );
+      return;
+    }
+  }
+
+  libspectrum_snap_set_joystick_list( snap, num_joysticks, libspectrum_type );
+  libspectrum_snap_set_joystick_inputs( snap, num_joysticks, inputs );
+  libspectrum_snap_set_joystick_active_count( snap, num_joysticks + 1 );
+}
+
+int
+joystick_to_snapshot( libspectrum_snap *snap )
+{
+  if( settings_current.joy_kempston ) {
+    add_joystick( snap, JOYSTICK_TYPE_KEMPSTON,
+                  LIBSPECTRUM_JOYSTICK_INPUT_NONE );
+  }
+  add_joystick( snap, settings_current.joystick_keyboard_output,
+                LIBSPECTRUM_JOYSTICK_INPUT_KEYBOARD );
+  add_joystick( snap, settings_current.joystick_1_output,
+                LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_1 );
+  add_joystick( snap, settings_current.joystick_2_output,
+                LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_2 );
+				
+  return 0;
 }

@@ -826,6 +826,13 @@ ui_menu_item_set_active( const char *path, int active )
   return 0;
 }
 
+/* FIXME: make this do something useful */
+ui_confirm_joystick_t
+ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
+{
+  return UI_CONFIRM_JOYSTICK_NONE;
+}
+
 /*
  * Font code
  */

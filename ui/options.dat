@@ -12,6 +12,7 @@ Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
 Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
+Checkbox, Set (j)oysticks on snap load, joy_prompt, INPUT_KEY_j
 
 peripherals
 Peripheral Options

@@ -31,6 +31,7 @@
 #include "ay.h"
 #include "fuse.h"
 #include "if2.h"
+#include "joystick.h"
 #include "machine.h"
 #include "memory.h"
 #include "scld.h"
@@ -154,6 +155,7 @@ snapshot_copy_from( libspectrum_snap *snap )
   error = zxcf_from_snapshot( snap ); if( error ) return error;
   error = if2_from_snapshot( snap ); if( error ) return error;
   error = scld_from_snapshot( snap, capabilities ); if( error ) return error;
+  error = joystick_from_snapshot( snap ); if( error ) return error;
 
   return 0;
 }
@@ -227,6 +229,7 @@ snapshot_copy_to( libspectrum_snap *snap )
   error = zxcf_to_snapshot( snap ); if( error ) return error;
   error = if2_to_snapshot( snap ); if( error ) return error;
   error = scld_to_snapshot( snap ); if( error ) return error;
+  error = joystick_to_snapshot( snap ); if( error ) return error;
 
   return 0;
 }

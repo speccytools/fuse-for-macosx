@@ -1088,3 +1088,8 @@
          sound/{sdlsound.c,sfifo.[ch]},ui/gtk/gtkui.c,widget/widget.c:
          Sort out time problems with compo mode RZX recordings being aborted,
          add OSS-style latency to timer mode, remove sound glitches in SDL.
+20041025 joystick.[ch],settings.dat,snapshot.c,ui/{options.dat,ui.h},
+         ui/gtk/gtkui.c,widget/widget.c: Add support for filing joystick
+         connection in snapshots, need to implement GTK+ and widget dialogs
+         so users can reconfig joysticks on snap loading. Switch Sinclair
+         joysticks to match Sinclair documentation and other emulators.

@@ -82,6 +82,19 @@ typedef enum ui_confirm_save_t {
 
 ui_confirm_save_t ui_confirm_save( const char *message );
 
+/* Confirm whether we want to change a joystick setting */
+typedef enum ui_confirm_joystick_t {
+
+  UI_CONFIRM_JOYSTICK_NONE,	        /* Don't map joystick */
+  UI_CONFIRM_JOYSTICK_KEYBOARD,	        /* Map the joystick to the keyboard */
+  UI_CONFIRM_JOYSTICK_JOYSTICK_1,	/* Map the joystick to joystick 1 */
+  UI_CONFIRM_JOYSTICK_JOYSTICK_2,	/* Map the joystick to joystick 2 */
+
+} ui_confirm_joystick_t;
+
+ui_confirm_joystick_t
+ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs );
+
 /* Mouse handling */
 
 extern int ui_mouse_present, ui_mouse_grabbed;
