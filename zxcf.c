@@ -1,6 +1,6 @@
 /* zxcf.c: ZXCF interface routines
-   Copyright (c) 2003-2004 Garry Lancaster,
-		 2004 Philip Kendall
+   Copyright (c) 2003-2005 Garry Lancaster,
+		 2004-2005 Philip Kendall
 		 
    $Id$
 
@@ -80,7 +80,7 @@ zxcf_init( void )
 {
   int error;
 
-  last_memctl = 0x80;
+  last_memctl = 0x00;
                                 
   error = libspectrum_ide_alloc( &zxcf_idechn, LIBSPECTRUM_IDE_DATA16 );
   if( error ) return error;
@@ -106,8 +106,11 @@ zxcf_end( void )
 void
 zxcf_reset( void )
 {
+  if( settings_current.zxcf_active ) machine_current->ram.romcs = 1;
+
   set_zxcf_bank( 0 );
   zxcf_writeenable = 0;
+  machine_current->memory_map();
 
   libspectrum_ide_reset( zxcf_idechn );
 }

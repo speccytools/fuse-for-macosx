@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2005 Philip Kendall
 
    $Id$
 
@@ -331,8 +331,6 @@ machine_reset( void )
   scld_reset();
   tape_stop();
   simpleide_reset();
-  zxatasp_reset();
-  zxcf_reset();
 
   memory_pool_free();
 
@@ -355,6 +353,11 @@ machine_reset( void )
 
   /* Check for an Interface II ROM */
   error = if2_reset(); if( error ) return error;
+
+  /* Other interfaces that may assert /ROMCS */
+  zxatasp_reset();
+  zxcf_reset();
+
   return 0;
 }
 

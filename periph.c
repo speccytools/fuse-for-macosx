@@ -1,5 +1,5 @@
 /* periph.c: code for handling peripherals
-   Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2005 Philip Kendall
 
    $Id$
 
@@ -400,4 +400,5 @@ periph_update( void )
   update_cartridge_menu();
   update_ide_menu();
   if1_update_menu();
+  machine_current->memory_map();
 }

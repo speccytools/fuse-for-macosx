@@ -1157,3 +1157,5 @@
 	 length microdrive cartridge handling (rest of patch #1085429)
 	 (Gergely Szasz).
 20050102 fuse.c: update copyright date to 2005.
+20050102 machine.c,periph.c,zxatasp.c,zxcf.c: fix ZXATASP/ZXCF upload/reset
+	 behaviour (patch #1094632) (Garry Lancaster).

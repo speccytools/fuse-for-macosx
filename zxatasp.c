@@ -1,6 +1,6 @@
 /* zxatasp.c: ZXATASP interface routines
-   Copyright (c) 2003-2004 Garry Lancaster,
-		 2004 Philip Kendall
+   Copyright (c) 2003-2005 Garry Lancaster,
+		 2004-2005 Philip Kendall
 
    $Id$
 
@@ -177,7 +177,13 @@ zxatasp_end( void )
 void
 zxatasp_reset( void )
 {
-  set_zxatasp_bank( 0 ); current_page = ZXATASP_NOT_PAGED;
+  if( !settings_current.zxatasp_active ) return;
+  
+  machine_current->ram.romcs = 1;
+
+  set_zxatasp_bank( 0 ); current_page = 0;
+  machine_current->memory_map();
+
   zxatasp_control = MC8255_SETMODE | MC8255_PORT_A_IO | MC8255_PORT_B_IO |
                     MC8255_PORT_C_HI_IO | MC8255_PORT_C_LOW_IO;
   zxatasp_resetports();
