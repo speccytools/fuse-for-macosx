@@ -79,7 +79,7 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
   if( length < strlen(signature) + 2 ) return LIBSPECTRUM_ERROR_CORRUPT;
 
   /* Now check the signature */
-  if( strncmp( ptr, signature, strlen( signature ) ) )
+  if( memcmp( ptr, signature, strlen( signature ) ) )
     return LIBSPECTRUM_ERROR_CORRUPT;
   ptr += strlen( signature );
   
