@@ -324,13 +324,13 @@ static int
 select_special_map( int page1, int page2, int page3, int page4 )
 {
   memory_map[0].page = &RAM[ page1 ][0x0000];
-  memory_map[1].page = &RAM[ page1 ][0x0000];
+  memory_map[1].page = &RAM[ page1 ][0x2000];
   memory_map[2].page = &RAM[ page2 ][0x0000];
-  memory_map[3].page = &RAM[ page2 ][0x0000];
+  memory_map[3].page = &RAM[ page2 ][0x2000];
   memory_map[4].page = &RAM[ page3 ][0x0000];
-  memory_map[5].page = &RAM[ page3 ][0x0000];
+  memory_map[5].page = &RAM[ page3 ][0x2000];
   memory_map[6].page = &RAM[ page4 ][0x0000];
-  memory_map[7].page = &RAM[ page4 ][0x0000];
+  memory_map[7].page = &RAM[ page4 ][0x2000];
 
   memory_map[0].writable = memory_map[1].writable = 1;
 

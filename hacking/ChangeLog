@@ -368,3 +368,4 @@
 	 pause function is used.
 20031119 Merge the 'generic' and TC2068 paging schemes.
 20031120 psg.c: write pause lengths out correctly.
+20031120 specplus3.c: make the 64Kb RAM configurations work again.
