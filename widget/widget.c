@@ -331,7 +331,8 @@ int widget_dialog_with_border( int x, int y, int width, int height )
   return 0;
 }
 
-/* The widgets actually available */
+/* The widgets actually available. Make sure the order here matches the
+   order defined in enum widget_type (widget.h) */
 
 widget_t widget_data[] = {
 
@@ -340,5 +341,6 @@ widget_t widget_data[] = {
   { widget_options_draw,  widget_options_finish, widget_options_keyhandler  },
   { widget_tape_draw,     NULL,			 widget_tape_keyhandler     },
   { widget_snapshot_draw, NULL,			 widget_snapshot_keyhandler },
+  { widget_machine_draw,  NULL,			 widget_machine_keyhandler  },
 
 };

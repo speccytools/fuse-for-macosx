@@ -1,4 +1,4 @@
-/* mainmenu.c: Main menu widget
+/* machine_widget.c: Machine control widget
    Copyright (c) 2001 Philip Kendall
 
    $Id$
@@ -26,39 +26,33 @@
 
 #include <config.h>
 
+#include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "display.h"
 #include "keyboard.h"
-#include "ui.h"
+#include "machine.h"
 #include "uidisplay.h"
 #include "widget.h"
 
-int widget_mainmenu_draw( void )
+int widget_machine_draw( void )
 {
-  /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 6 );
+  /* Blank the main display area */
+  widget_dialog_with_border( 1, 2, 30, 4 );
 
-  widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Main menu" );
+  widget_printstring( 9, 2, WIDGET_COLOUR_FOREGROUND, "Machine Control" );
 
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(S)napshot menu" );
-
-  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND,
-		      "General (o)ptions" );
-
-  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND,
-		      "(M)achine control" );
-
-  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND,
-		      "(T)ape control" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(R)eset machine" );
+  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(S)witch machines" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 48 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 40 );
 
   return 0;
 }
 
-void widget_mainmenu_keyhandler( int key )
+void widget_machine_keyhandler( int key )
 {
   switch( key ) {
     
@@ -66,20 +60,12 @@ void widget_mainmenu_keyhandler( int key )
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     break;
 
-  case KEYBOARD_m:
-    widget_do( WIDGET_TYPE_MACHINE );
-    break;
-
-  case KEYBOARD_o:
-    widget_do( WIDGET_TYPE_OPTIONS );
+  case KEYBOARD_r:
+    machine_current->reset();
     break;
 
   case KEYBOARD_s:
-    widget_do( WIDGET_TYPE_SNAPSHOT );
-    break;
-
-  case KEYBOARD_t:
-    widget_do( WIDGET_TYPE_TAPE );
+    machine_select_next();
     break;
 
   case KEYBOARD_Enter:

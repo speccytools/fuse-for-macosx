@@ -43,6 +43,7 @@ typedef enum widget_type {
   WIDGET_TYPE_OPTIONS,		/* General options */
   WIDGET_TYPE_TAPE,		/* Tape options */
   WIDGET_TYPE_SNAPSHOT,		/* Snapshot options */
+  WIDGET_TYPE_MACHINE,		/* Machine control */
 
 } widget_type;
 
@@ -129,6 +130,11 @@ void widget_tape_keyhandler( int key );
 
 int widget_snapshot_draw( void );
 void widget_snapshot_keyhandler( int key );
+
+/* Machine dialog */
+
+int widget_machine_draw( void );
+void widget_machine_keyhandler( int key );
 
 /* The widgets actually available */
 
