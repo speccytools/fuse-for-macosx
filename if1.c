@@ -95,14 +95,14 @@ int if1_available = 0;
 static int if1_mdr_status = 0;
 
 static microdrv_t microdrv[8] = {
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
-  {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0}
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
+  { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 }
 };		/* We have 8 microdrive */
 
 static if1_ula_t if1_ula = {
@@ -212,9 +212,7 @@ if1_reset( void )
   if1_active = 0;
   if1_available = 0;
 
-  if ( !periph_interface1_active ) {
-    return 0;
-  }
+  if( !periph_interface1_active ) return 0;
 
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
 				 settings_current.rom_interface_i,
@@ -227,10 +225,9 @@ if1_reset( void )
   
   microdrives_reset();
 
-
-/*  ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1, 1 ); */
   update_menu( UMENU_ALL );
-  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV, UI_STATUSBAR_STATE_INACTIVE );
+  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
+		       UI_STATUSBAR_STATE_INACTIVE );
   if1_mdr_status = 0;
   
   if1_available = 1;
@@ -276,7 +273,8 @@ microdrives_reset( void )
     microdrv[m].filename = NULL;
     microdrv[m].inserted = 0;  no cartridge  */
   }
-  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV, UI_STATUSBAR_STATE_INACTIVE );
+  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
+		       UI_STATUSBAR_STATE_INACTIVE );
   if1_mdr_status = 0;
 
   if1_ula.rs232_mode = settings_current.raw_rs232 ? RS232_RAW : RS232_INT;
@@ -296,16 +294,11 @@ microdrives_reset( void )
 static enum if1_port
 decode_port( libspectrum_word port )
 {
-    port &= 0x0018;
-    switch( port ) {
-    case 0x0000:
-      return PORT_MDR;
-    case 0x0008:
-      return PORT_CTR;
-    case 0x0010:
-      return PORT_NET;
-    default:
-      return PORT_UNKNOWN;
+    switch( port & 0x0018 ) {
+    case 0x0000: return PORT_MDR;
+    case 0x0008: return PORT_CTR;
+    case 0x0010: return PORT_NET;
+        default: return PORT_UNKNOWN;
     }
 }
 
@@ -461,12 +454,16 @@ port_mdr_out( libspectrum_byte val )
     microdrv_t *drive = &microdrv[ i ];
 
     if( drive->motor_on && drive->inserted ) {
+
       if( drive->transfered > 11 &&
 	  drive->transfered < drive->max_bytes + 12 ) {
-	drive->cartridge[drive->head_pos] = val;			
+
+	drive->cartridge[ drive->head_pos ] = val;			
 	increment_head( i );
 	drive->modified = 1;
+
       }
+
       drive->transfered++;
     }
   }
@@ -625,22 +622,24 @@ microdrives_restart( void )
   int m;
 
   for( m = 0; m < 8; m++ ) {
-    while( ( microdrv[m].head_pos % 543 ) != 0 &&
-           ( microdrv[m].head_pos % 543 ) != 15 )
+    while( ( microdrv[m].head_pos % 543 ) != 0  &&
+           ( microdrv[m].head_pos % 543 ) != 15    )
       increment_head( m ); /* put head in the start of a block */
 	
     microdrv[m].transfered = 0; /* reset current number of bytes written */
-    if( ( microdrv[m].head_pos % 543 ) == 0 )
+
+    if( ( microdrv[m].head_pos % 543 ) == 0 ) {
       microdrv[m].max_bytes = 15; /* up to 15 bytes for header blocks */
-    else
+    } else {
       microdrv[m].max_bytes = 528; /* up to 528 bytes for data blocks */
+    }
   }	
 }
 
 void
 if1_mdr_writep( int w, int drive )
 {
-  microdrv[drive].wp = ( w ) ? 1 : 0;
+  microdrv[drive].wp = w ? 1 : 0;
   microdrv[drive].modified = 1;
 
   update_menu( UMENU_MDRV1 + drive );
@@ -649,16 +648,15 @@ if1_mdr_writep( int w, int drive )
 void
 if1_mdr_new( int drive )
 {
-  int n;
-  
   if( microdrv[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
-    ui_error( UI_ERROR_ERROR, "New cartridge in drive, please eject manually." );
+    ui_error( UI_ERROR_ERROR,
+	      "New cartridge in drive, please eject manually" );
     return;
   }
 
-  for( n = 0; n < CARTRIDGE_LEN; n++ )
-    microdrv[drive].cartridge[n] = 0xff; /* cartridge erased */
-  microdrv[drive].wp = 0; /* but not write-protected */
+  /* Erase the entire cartridge */
+  memset( microdrv[drive].cartridge, 0xff, CARTRIDGE_LEN );
+  microdrv[drive].wp = 0; /* but don't write-protect */
 
   microdrv[drive].filename = NULL;
   microdrv[drive].inserted = 1;
@@ -674,37 +672,47 @@ if1_mdr_insert( char *filename, int drive )
   char wp;
 
   if( microdrv[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
-    ui_error( UI_ERROR_ERROR, "New cartridge in drive, please eject manually." );
+    ui_error( UI_ERROR_ERROR,
+	      "New cartridge in drive, please eject manually" );
     return;
   }
 
   file = fopen( filename, "r" );
   if( !file ) {
-    ui_error( UI_ERROR_ERROR, "Error opening '%s': %s",
-		filename, strerror( errno ) );
+    ui_error( UI_ERROR_ERROR, "Error opening '%s': %s", filename,
+	      strerror( errno ) );
     return;
   }
+
+  /* FIXME: should check for short read count; however, we'll replace
+     this with libspectrum routines soon so probably not worth it */
   if( !fread( microdrv[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
-    ui_error( UI_ERROR_ERROR, "Error reading data from '%s': %s",
-		filename, strerror( errno ) );
+    ui_error( UI_ERROR_ERROR, "Error reading data from '%s': %s", filename,
+	      strerror( errno ) );
     return;
   }
+
   if( !fread( &wp, 1, 1, file) ) {
     ui_error( UI_ERROR_ERROR, "Error reading write protection flag '%s': %s",
-		filename, strerror( errno ) );
+	      filename, strerror( errno ) );
     return;
   }
+
   if( fclose( file ) ) {
-    ui_error( UI_ERROR_ERROR, "Error closing '%s': %s",
-		filename, strerror( errno ) );
+    ui_error( UI_ERROR_ERROR, "Error closing '%s': %s", filename,
+	      strerror( errno ) );
     return;
   }
 
   microdrv[drive].wp = wp ? 1 : 0;
   microdrv[drive].inserted = 1;
+
   microdrv[drive].filename = malloc( strlen( filename ) + 1 );
-  if( microdrv[drive].filename )
+  if( microdrv[drive].filename ) {
     strcpy( microdrv[drive].filename, filename );
+  } else {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d\n", __FILE__, __LINE__ );
+  }
   
   update_menu( UMENU_MDRV1 + drive );
 }
@@ -716,34 +724,42 @@ if1_mdr_sync( char *filename, int drive )
   char wp;
   
   if( microdrv[drive].modified ) {
-    if( !microdrv[drive].filename ) {	/* New cartridge */
-      if( !filename ) 	
-        return 1;			/* We need a filename :-) */
-    } else
-      filename = microdrv[drive].filename;
 
-    wp = microdrv[drive].wp ? 255 : 0;
+    if( !microdrv[drive].filename ) {	/* New cartridge */
+      if( !filename ) return 1;		/* We need a filename :-) */
+    } else {
+      filename = microdrv[drive].filename;
+    }
+
+    wp = microdrv[drive].wp ? 0xff : 0;
     file = fopen( filename, "w" );
+
     if( !file ) {
       ui_error( UI_ERROR_ERROR, "Error opening '%s': %s",
 		filename, strerror( errno ) );
-      return 0;
+      return 1;
     }
+
+  /* FIXME: should check for short write count; however, we'll replace
+     this with libspectrum routines soon so probably not worth it */
     if( !fwrite( microdrv[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
       ui_error( UI_ERROR_ERROR, "Error writing data to '%s': %s",
 		filename, strerror( errno ) );
-      return 0;
+      return 1;
     }
+
     if( !fwrite( &wp, 1, 1, file) ) {
       ui_error( UI_ERROR_ERROR, "Error writing write protection flag '%s': %s",
 		filename, strerror( errno ) );
-      return 0;
+      return 1;
     }
+
     if( fclose( file ) ) {
       ui_error( UI_ERROR_ERROR, "Error closing '%s': %s",
 		filename, strerror( errno ) );
-      return 0;
+      return 1;
     }
+
     if( !microdrv[drive].filename ) {	/* New cartridge */
       microdrv[drive].filename = malloc( strlen( filename ) + 1 );
       if( microdrv[drive].filename )
@@ -758,13 +774,11 @@ if1_mdr_sync( char *filename, int drive )
 int
 if1_mdr_eject( char *filename, int drive )
 {
-  
-  if( if1_mdr_sync( filename, drive ) )		/* Report, we need a filename */
-    return 1;  
+  /* Report if we need a filename */
+  if( if1_mdr_sync( filename, drive ) ) return 1;  
 
   microdrv[drive].inserted = 0;
-  if( microdrv[drive].filename )
-    free( microdrv[drive].filename );
+  free( microdrv[drive].filename );
   microdrv[drive].filename = NULL;
   
   update_menu( UMENU_MDRV1 + drive );
