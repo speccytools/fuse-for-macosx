@@ -55,12 +55,13 @@ gtkui_pokefinder( GtkWidget *widget, gpointer data )
   }
 
   gtk_widget_show_all( dialog );
+  update_pokefinder();
 }
 
 static int
 create_dialog( void )
 {
-  GtkWidget *hbox, *vbox, *entry, *button;
+  GtkWidget *hbox, *vbox, *label, *entry, *button;
   int error;
   size_t i;
 
@@ -74,20 +75,23 @@ create_dialog( void )
   hbox = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
 
+  label = gtk_label_new( "Search for:" );
+  gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
+
   entry = gtk_entry_new();
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), entry );
+  gtk_box_pack_start( GTK_BOX( hbox ), entry, TRUE, TRUE, 5 );
 
   vbox = gtk_vbox_new( FALSE, 0 );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
+  gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
 
   count_label = gtk_label_new( "" );
-  gtk_box_pack_start_defaults( GTK_BOX( vbox ), count_label );
+  gtk_box_pack_start( GTK_BOX( vbox ), count_label, TRUE, TRUE, 5 );
 
   location_list = gtk_clist_new_with_titles( 2, location_titles );
   gtk_clist_column_titles_passive( GTK_CLIST( location_list ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( location_list ), i, TRUE );
-  gtk_box_pack_start_defaults( GTK_BOX( vbox ), location_list );
+  gtk_box_pack_start( GTK_BOX( vbox ), location_list, TRUE, TRUE, 5 );
 
   button = gtk_button_new_with_label( "Search" );
   gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
@@ -109,7 +113,8 @@ create_dialog( void )
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     button );
 
-  update_pokefinder();
+  /* Users shouldn't be able to resize this window */
+  gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
 
   dialog_created = 1;
 
@@ -145,7 +150,7 @@ update_pokefinder( void )
   gtk_clist_freeze( GTK_CLIST( location_list ) );
   gtk_clist_clear( GTK_CLIST( location_list ) );
 
-  if( pokefinder_count < 20 ) {
+  if( pokefinder_count && pokefinder_count < 20 ) {
 
     for( page = 0; page < 8; page++ )
       for( offset = 0; offset < 0x4000; offset++ )
@@ -156,6 +161,11 @@ update_pokefinder( void )
 
 	  gtk_clist_append( GTK_CLIST( location_list ), possible_text );
 	}
+
+    gtk_widget_show( location_list );
+
+  } else {
+    gtk_widget_hide( location_list );
   }
 
   gtk_clist_thaw( GTK_CLIST( location_list ) );
