@@ -1,5 +1,5 @@
 /* z80.c: z80 supplementary functions
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999, 2000, 2002 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
    Author contact information:
 
-   E-mail: pak@ast.cam.ac.uk
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -26,11 +26,11 @@
 
 #include <stdio.h>
 
-#include "../fuse.h"
-#include "../spectrum.h"
+#include "fuse.h"
+#include "rzx.h"
+#include "spectrum.h"
 #include "ui/ui.h"
 #include "z80.h"
-
 #include "z80_macros.h"
 
 #include "scld.h"
@@ -106,7 +106,9 @@ void z80_interrupt()
     
     IFF1=IFF2=0;
 
-    PUSH16(PCL,PCH);
+    writebyte( --SP, PCH ); writebyte( --SP, PCL );
+
+    R++; rzx_instructions++;
 
     switch(IM) {
       case 0: if( scld_intdisable ) break; PC = 0x0038; tstates+=12; break;

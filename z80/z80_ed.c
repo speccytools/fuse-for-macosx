@@ -497,7 +497,6 @@ case 0xba:	/* INDR */
 break;
 
 case 0xbb:	/* OTDR */
-tstates+=16;
 {
   WORD outitemp=readbyte(HL);
   tstates++; contend( HL, 4 );

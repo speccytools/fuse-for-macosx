@@ -61,14 +61,15 @@ void z80_do_opcodes()
 			   the interrupt happen */
     }
 
+    R++; rzx_instructions++;
+
     /* If the z80 is HALTed, execute a NOP-equivalent and loop again */
     if(z80.halted) {
       tstates+=4;
       continue;
     }
 
-    contend( PC, 4 );
-    opcode=readbyte(PC++); R++; rzx_instructions++;
+    contend( PC, 4 ); opcode=readbyte( PC++ );
 
     switch(opcode) {
     case 0x00:		/* NOP */
