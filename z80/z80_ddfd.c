@@ -426,11 +426,11 @@ break;
 /* FIXME: contention here is just a guess */
 case 0xcb:		/* {DD,FD}CBxx opcodes */
 {
-  WORD tempaddr;
+  WORD tempaddr; BYTE opcode3;
   contend( PC, 3 );
   tempaddr = REGISTER + (SBYTE)readbyte(PC++);
   contend( PC, 4 );
-  BYTE opcode3=readbyte(PC++);
+  opcode3 = readbyte( PC++ );
 #ifdef HAVE_ENOUGH_MEMORY
   switch(opcode3) {
 #include "z80_ddfdcb.c"
