@@ -1,5 +1,5 @@
 /* tzxlist.c: Produce a listing of the blocks in a .tzx file
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -37,6 +37,8 @@
 #define ERROR_MESSAGE_MAX_LENGTH 1024
 #define DESCRIPTION_LENGTH 80
 
+static const char *progname;
+
 const char* hardware_desc( int type, int id )
 {
   switch( type ) {
@@ -68,12 +70,10 @@ const char* hardware_desc( int type, int id )
   }
 }
 
-int
-main( int argc, char **argv )
+static int
+process_tzx( char *filename )
 {
-  char *progname = argv[0];
-
-  char *filename; int fd;
+  int fd;
   struct stat file_info;
 
   int error;
@@ -86,17 +86,7 @@ main( int argc, char **argv )
 
   int i;
 
-  /* Show libspectrum error messages */
-  libspectrum_show_errors = 1;
-
   tape.blocks = NULL;
-
-  if( argc < 2 ) {
-    fprintf( stderr, "%s: usage: %s <tzx file>\n", progname, progname );
-    return 1;
-  }
-
-  filename = argv[1];
 
   fd = open( filename, O_RDONLY );
   if( fd == -1 ) {
@@ -307,5 +297,33 @@ main( int argc, char **argv )
     ptr = ptr->next;
   }
 
+  error = libspectrum_tape_free( &tape );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    munmap( buffer, file_info.st_size );
+    return error;
+  }
+
   return 0;
+}
+
+int
+main( int argc, char **argv )
+{
+  int ret = 0;
+  int arg = 0;
+
+  progname = argv[0];
+
+  /* Show libspectrum error messages */
+  libspectrum_show_errors = 1;
+
+  if( argc < 2 ) {
+    fprintf( stderr, "%s: usage: %s <tzx files>...\n", progname, progname );
+    return 1;
+  }
+
+  while( ++arg < argc )
+    ret |= process_tzx( argv[arg] );
+
+  return ret;
 }
