@@ -75,6 +75,7 @@ static void
 block_free( gpointer data, gpointer user_data )
 {
   libspectrum_tape_block *block = (libspectrum_tape_block*)data;
+  int i;
 
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
@@ -82,6 +83,11 @@ block_free( gpointer data, gpointer user_data )
     break;
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     free( block->types.turbo.data );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+    for( i=0; i<block->types.archive_info.count; i++ ) {
+      free( block->types.archive_info.strings[i] );
+    }
     break;
   default:
     /* Do nothing */
@@ -95,10 +101,13 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     return rom_init( &(block->types.rom) );
-    break;
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     return turbo_init( &(block->types.turbo) );
-    break;
+
+  /* These blocks need no initialisation */
+  case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+    return LIBSPECTRUM_ERROR_NONE;
+
   default:
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
@@ -159,6 +168,13 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     error = turbo_edge( &(block->types.turbo), tstates, &end_of_block );
     if( error ) return error;
     break;
+
+  /* For blocks which contain no Spectrum-readable data, return zero
+     tstates and end of block set so we instantly get the next block */
+  case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+    *tstates = 0; end_of_block = 1;
+    break;
+
   default:
     *tstates = 0;
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -395,6 +411,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     strncpy( buffer, "Turbo Speed Data Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+    strncpy( buffer, "Archive Info Block", length );
     break;
   default:
     return LIBSPECTRUM_ERROR_LOGIC;

@@ -137,7 +137,7 @@ typedef struct libspectrum_tape_archive_info_block {
   int *ids;
 
   /* Text of each string */
-  unsigned char **strings;
+  libspectrum_byte **strings;
 
 } libspectrum_tape_archive_info_block;
 

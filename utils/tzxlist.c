@@ -53,6 +53,8 @@ main( int argc, char **argv )
 
   GSList *ptr;
 
+  int i;
+
   tape.blocks = NULL;
 
   if( argc < 2 ) {
@@ -114,6 +116,7 @@ main( int argc, char **argv )
 
     libspectrum_tape_rom_block *rom_block;
     libspectrum_tape_turbo_block *turbo_block;
+    libspectrum_tape_archive_info_block *info_block;
 
     error = libspectrum_tape_block_description(
       block, description, DESCRIPTION_LENGTH
@@ -131,6 +134,7 @@ main( int argc, char **argv )
       printf("  Data length: %d bytes\n", rom_block->length );
       printf("  Pause length: %d ms\n", rom_block->pause );
       break;
+
     case LIBSPECTRUM_TAPE_BLOCK_TURBO:
       turbo_block = &(block->types.turbo);
       printf("  %d pilot pulses of %d tstates\n",
@@ -143,6 +147,28 @@ main( int argc, char **argv )
 	     turbo_block->length, turbo_block->bits_in_last_byte );
       printf("  Pause length: %d ms\n", turbo_block->pause );
       break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+      info_block = &(block->types.archive_info);
+      for( i=0; i<info_block->count; i++ ) {
+	printf("  ");
+	switch( info_block->ids[i] ) {
+	case   0: printf("Full Title:"); break;
+	case   1: printf(" Publisher:"); break;
+	case   2: printf("    Author:"); break;
+	case   3: printf("      Year:"); break;
+	case   4: printf(" Langugage:"); break;
+	case   5: printf("  Category:"); break;
+	case   6: printf("    Budget:"); break;
+	case   7: printf("    Loader:"); break;
+	case   8: printf("    Origin:"); break;
+	case 255: printf("   Comment:"); break;
+	 default: printf("(Unknown string): "); break;
+	}
+	printf(" `%s'\n", info_block->strings[i] );
+      }
+      break;
+
     default:
       printf("  (Sorry -- %s can't handle that kind of block. Skipping it)\n",
 	     progname );

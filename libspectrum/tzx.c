@@ -49,6 +49,14 @@ static libspectrum_error
 tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
 
+static libspectrum_error
+tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		       const libspectrum_byte *end );
+
+/*** Function definitions ***/
+
+/* The main function */
+
 libspectrum_error
 libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 			const size_t length )
@@ -76,8 +84,6 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 
     /* Get the ID of the next block */
     tzx_block_type id = *ptr++;
-
-    fprintf( stderr, "Block type 0x%02x\n", id );
 
     switch( id ) {
     case TZX_ROM:
@@ -223,6 +229,8 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
   libspectrum_tape_block* block;
   libspectrum_tape_archive_info_block *info_block;
 
+  int i;
+
   /* Check there's enough left in the buffer for the length */
   if( end - (*ptr) < 2 ) return LIBSPECTRUM_ERROR_CORRUPT;
 
@@ -246,13 +254,60 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
     free( block );
     return LIBSPECTRUM_ERROR_MEMORY;
   }
-  info_block->strings = (char**)malloc( info_block->count * sizeof( char* ) );
+  info_block->strings =
+    (libspectrum_byte**)malloc( info_block->count * sizeof(libspectrum_byte*));
   if( info_block->strings == NULL ) {
     free( info_block->ids );
     free( block );
     return LIBSPECTRUM_ERROR_MEMORY;
   }
 
-  
+  for( i=0; i<info_block->count; i++ ) {
 
-  
+    size_t length;
+
+    /* Must be ID byte and length byte */
+    if( end - (*ptr) < 2 ) {
+      int j;
+      for( j=0; j<i; j++ ) free( info_block->strings[i] );
+      free( info_block->strings ); free( info_block->ids );
+      free( block );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+
+    /* Get the ID and length bytes */
+    info_block->ids[i] = **ptr; (*ptr)++;
+    length = **ptr; (*ptr)++;
+
+    /* Must be enough bytes for the string */
+    if( end - (*ptr) < length ) {
+      int j;
+      for( j=0; j<i; j++ ) free( info_block->strings[i] );
+      free( info_block->strings ); free( info_block->ids );
+      free( block );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+
+    /* Allocate some memory for the string */
+    info_block->strings[i] =
+      (libspectrum_byte*)malloc( ( length + 1 ) * sizeof( libspectrum_byte ) );
+    if( info_block->strings[i] == NULL ) {
+      int j;
+      for( j=0; j<i; j++ ) free( info_block->strings[i] );
+      free( info_block->strings ); free( info_block->ids );
+      free( block );
+      return LIBSPECTRUM_ERROR_MEMORY;
+    }
+
+    /* Copy it across, and move along */
+    strncpy( info_block->strings[i], (*ptr), length );
+    info_block->strings[i][length] = '\0';
+    (*ptr) += length;
+
+  }
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
