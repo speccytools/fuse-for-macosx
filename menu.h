@@ -1,4 +1,4 @@
-/* menu.c: general menu callbacks
+/* menu.h: general menu callbacks
    Copyright (c) 2004 Philip Kendall
 
    $Id$

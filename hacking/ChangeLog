@@ -983,3 +983,4 @@
 	 appropriate (Darren).
 20040704 timer.c: add calibration for the setitimer() routines (Darren).
 20040705 configure.in: add missing comma.
+20040706 menu.h: get initial comment filename right (thanks, Marek).
