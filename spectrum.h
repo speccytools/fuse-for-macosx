@@ -93,11 +93,15 @@ void spectrum_ula_write(WORD port, BYTE b);
 
 int spectrum_interrupt(void);
 
-/* Level data from .slt files */
+/* Data from .slt files */
 
 size_t slt_length[256];		/* Length of data for this value of A
 				   0 => no data */
 BYTE *slt[256];			/* Actual data for each value of A */
+
+BYTE *slt_screen;		/* The screenshot from the .slt file */
+int slt_screen_level;		/* The level of the screenshot.
+				   Not used for anything AFAIK */
 
 /* The machines available */
 enum { SPECTRUM_MACHINE_48, SPECTRUM_MACHINE_128, SPECTRUM_MACHINE_PLUS2,

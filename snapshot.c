@@ -147,7 +147,7 @@ void snapshot_flush_slt (void)
 
 static int snapshot_copy_from( libspectrum_snap *snap )
 {
-  int i; int error;
+  int i,j; int error;
 
   switch( snap->machine ) {
   case LIBSPECTRUM_MACHINE_48:
@@ -201,9 +201,36 @@ static int snapshot_copy_from( libspectrum_snap *snap )
     if( snap->pages[i] != NULL ) memcpy( RAM[i], snap->pages[i], 0x4000 );
   }
 
-  memcpy( slt,        snap->slt,        sizeof(slt)        );
   memcpy( slt_length, snap->slt_length, sizeof(slt_length) );
+  for( i=0; i<256; i++ ) {
+    if( slt_length[i] ) {
 
+      slt[i] = (BYTE*)malloc( slt_length[i] * sizeof( BYTE ) );
+      if( slt[i] == NULL ) {
+	for( j=0; j<i; j++ ) {
+	  if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }
+	  return 1;
+	}
+      }
+
+      memcpy( slt[i], snap->slt[i], slt_length[i] );
+    }
+  }
+
+  if( snap->slt_screen ) {
+
+    slt_screen = (BYTE*)malloc( 6192 * sizeof( BYTE ) );
+    if( slt_screen == NULL ) {
+      for( i=0; i<256; i++ ) {
+	if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }
+	return 1;
+      }
+    }
+
+    memcpy( slt_screen, snap->slt_screen, 6192 );
+    slt_screen_level = snap->slt_screen_level;
+  }
+	  
   return 0;
 }
 

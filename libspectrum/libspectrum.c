@@ -41,6 +41,7 @@ int libspectrum_snap_initalise( libspectrum_snap *snap )
 
   for( i=0; i<8; i++ ) snap->pages[i]=NULL;
   for( i=0; i<256; i++ ) { snap->slt[i]=NULL; snap->slt_length[i]=0; }
+  snap->slt_screen = NULL;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -51,6 +52,12 @@ int libspectrum_snap_destroy( libspectrum_snap *snap )
   int i;
 
   for( i=0; i<8; i++ ) if( snap->pages[i] ) free( snap->pages[i] );
+  for( i=0; i<256; i++ ) {
+    if( snap->slt_length[i] ) {
+      free( snap->slt[i] );
+      snap->slt_length[i] = 0;
+    }
+  }
 
   return LIBSPECTRUM_ERROR_NONE;
 }
