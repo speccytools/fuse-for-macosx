@@ -92,9 +92,9 @@ typedef struct if1_ula_s {
 /* IF1 paged out ROM activated? */
 int if1_active = 0;
 int if1_available = 0;
-int if1_mdr_status = 0;
+static int if1_mdr_status = 0;
 
-microdrv_t microdrv[8] = {
+static microdrv_t microdrv[8] = {
   {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
   {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
   {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0},
@@ -105,9 +105,16 @@ microdrv_t microdrv[8] = {
   {.filename = NULL, .inserted = 0, .modified = 0, .wp = 0}
 };		/* We have 8 microdrive */
 
-if1_ula_t if1_ula = { .fd_r = -1, .fd_t = -1, .rs232_mode = RS232_INT,
-		   .dtr = 0, .comms_clk = 0, .comms_data = 0, /* realy? */
-		  .fd_net = -1, .s_net_mode = S_NET_INT, };
+static if1_ula_t if1_ula = {
+  .fd_r = -1,
+  .fd_t = -1,
+  .rs232_mode = RS232_INT,
+  .dtr = 0,
+  .comms_clk = 0,
+  .comms_data = 0, /* realy? */
+  .fd_net = -1,
+  .s_net_mode = S_NET_INT,
+};
 
 static void microdrives_reset( void );
 static void microdrives_restart( void );
