@@ -46,8 +46,18 @@ int display_ui_initialised = 0;
 /* The current border colour */
 BYTE display_lores_border;
 BYTE display_hires_border;
-/* The border colour current displayed on every line */
+
+/* The border colour displayed on every line if it is homogeneous,
+   or display_border_mixed (see below) if it's not */
 static BYTE display_current_border[DISPLAY_SCREEN_HEIGHT];
+
+/* The colours of each eight pixel chunk in the top and bottom borders */
+static int top_border[DISPLAY_BORDER_HEIGHT][DISPLAY_SCREEN_WIDTH_COLS];
+static int bottom_border[DISPLAY_BORDER_HEIGHT][DISPLAY_SCREEN_WIDTH_COLS];
+
+/* And in the left and right borders */
+static int left_border[DISPLAY_HEIGHT][DISPLAY_BORDER_WIDTH_COLS];
+static int right_border[DISPLAY_HEIGHT][DISPLAY_BORDER_WIDTH_COLS];
 
 /* Offsets as to where the data and the attributes for each pixel
    line start */
@@ -75,12 +85,9 @@ static int display_flash_reversed;
 
 /* Which eight-pixel chunks on each line need to be redisplayed. Bit 0
    corresponds to pixels 0-7, bit 31 to pixels 248-255. */
-static DWORD display_is_dirty[DISPLAY_HEIGHT];
+static QWORD display_is_dirty[DISPLAY_SCREEN_HEIGHT];
 /* This value signifies that the entire line must be redisplayed */
-static const DWORD display_all_dirty = ~0;
-
-/* Which border lines need to be redrawn */
-static int display_border_dirty[DISPLAY_SCREEN_HEIGHT];
+static QWORD display_all_dirty;
 
 /* The next line to be replotted */
 static int display_next_line;
@@ -115,6 +122,7 @@ static int end_line( int y );
 
 static void display_dirty_flashing(void);
 static int display_border_column(int time_since_line);
+static void set_border_pixels( int line, int column, int colour );
 
 WORD
 display_get_addr( int x, int y )
@@ -136,6 +144,11 @@ int display_init(int *argc, char ***argv)
   /* We can now output error messages to our output device */
   display_ui_initialised = 1;
 
+  /* Set up the 'all pixels must be refreshed' marker */
+  display_all_dirty = 0;
+  for( i = 0; i < DISPLAY_SCREEN_WIDTH_COLS; i++ )
+    display_all_dirty = ( display_all_dirty << 1 ) | 0x01;
+
   for(i=0;i<3;i++)
     for(j=0;j<8;j++)
       for(k=0;k<8;k++)
@@ -144,29 +157,27 @@ int display_init(int *argc, char ***argv)
 
   for(y=0;y<DISPLAY_HEIGHT;y++) {
     display_attr_start[y]=6144 + (32*(y/8));
-    display_is_dirty[y]=display_all_dirty;
-
-    display_current_border[y]=display_border_mixed;
-    display_border_dirty[y]=1;
   }
 
   for(y=0;y<DISPLAY_HEIGHT;y++)
     for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
-      display_dirty_ytable[display_line_start[y]+x]= y;
-      display_dirty_xtable[display_line_start[y]+x]= x;
+      display_dirty_ytable[ display_line_start[y]+x ] =
+	y + DISPLAY_BORDER_HEIGHT;
+      display_dirty_xtable[ display_line_start[y]+x ] =
+	x + DISPLAY_BORDER_WIDTH_COLS;
     }
 
   for(y=0;y<DISPLAY_HEIGHT_ROWS;y++)
     for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
-      display_dirty_ytable2[ (32*y) + x ]= ( y * 8 );
-      display_dirty_xtable2[ (32*y) + x ]= x;
+      display_dirty_ytable2[ (32*y) + x ] = ( y * 8 ) + DISPLAY_BORDER_HEIGHT;
+      display_dirty_xtable2[ (32*y) + x ] = x + DISPLAY_BORDER_WIDTH_COLS;
     }
 
   display_frame_count=0; display_flash_reversed=0;
 
   for(y=0;y<DISPLAY_SCREEN_HEIGHT;y++) {
     display_current_border[y]=display_border_mixed;
-    display_border_dirty[y]=1;
+    display_is_dirty[y] = display_all_dirty;
   }
 
   return 0;
@@ -200,9 +211,7 @@ void display_line(void)
       for( i = 0, ptr = inactive_rectangle;
 	   i < inactive_rectangle_count;
 	   i++, ptr++ ) {
-	uidisplay_area( 8 * ptr->x + DISPLAY_BORDER_ASPECT_WIDTH,
-			ptr->y + DISPLAY_BORDER_HEIGHT,
-			8 * ptr->w, ptr->h );
+	uidisplay_area( 8 * ptr->x, ptr->y, 8 * ptr->w, ptr->h );
       }
 
       inactive_rectangle_count = 0;
@@ -219,71 +228,116 @@ void display_line(void)
 static void
 display_draw_line( int y )
 {
-  int start, x, screen_y, redraw, colour, error;
+  int i, start, x, border_colour, error;
   BYTE data, data2, ink, paper;
   WORD hires_data;
 
-  redraw = 0;
-  colour = scld_last_dec.name.hires ? display_hires_border :
-                                      display_lores_border;
-  
-  /* If we're in the main screen, see if anything redrawing; if so,
-     copy the data to the image buffer, and flag that we need to copy
-     this line to the screen */
-  if( y >= DISPLAY_BORDER_HEIGHT &&
-      y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
+  x = 0;
 
-    screen_y = y - DISPLAY_BORDER_HEIGHT;
+  while( display_is_dirty[y] ) {
 
-    x = 0;
+    /* Find the first dirty chunk on this row */
+    while( ! (display_is_dirty[y] & 0x01) ) {
+      display_is_dirty[y] >>= 1;
+      x++;
+    }
 
-    while( display_is_dirty[screen_y] ) {
+    start = x;
 
-      /* Find the first dirty chunk on this row */
-      while( ! (display_is_dirty[screen_y] & 0x01) ) {
-	display_is_dirty[screen_y] >>= 1;
-	x++;
-      }
+    /* Walk to the end of the dirty region, writing the bytes to the
+       drawing area along the way */
+    do {
 
-      start = x;
+      if( y >= DISPLAY_BORDER_HEIGHT &&
+	  y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
 
-      /* Walk to the end of the dirty region, writing the bytes to the
-         drawing area along the way */
-      do {
+	if( x >= DISPLAY_BORDER_WIDTH_COLS &&
+	    x < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
+
+	  int screen_x = x - DISPLAY_BORDER_WIDTH_COLS,
+	    screen_y = y - DISPLAY_BORDER_HEIGHT;
       
-        display_get_attr( x, screen_y, &ink, &paper );
-        data = read_screen_memory( display_get_addr( x, screen_y ) );
-        if ( scld_last_dec.name.hires ) {
-          switch ( scld_last_dec.mask.scrnmode ) {
+	  display_get_attr( screen_x, screen_y, &ink, &paper );
+	  data = read_screen_memory( display_get_addr( screen_x, screen_y ) );
+	  if ( scld_last_dec.name.hires ) {
+	    switch ( scld_last_dec.mask.scrnmode ) {
             case HIRESATTRALTD:
-              data2 = read_screen_memory( display_attr_start[screen_y] + x + ALTDFILE_OFFSET );
+              data2 = read_screen_memory( display_attr_start[screen_y] +
+					  screen_x + ALTDFILE_OFFSET     );
               break;
             case HIRES:
-              data2 = read_screen_memory( display_get_addr( x, screen_y ) + ALTDFILE_OFFSET );
+              data2 =
+		read_screen_memory( display_get_addr( screen_x, screen_y ) +
+				    ALTDFILE_OFFSET                          );
               break;
             case HIRESDOUBLECOL:
               data2 = data;
               break;
             default: /* case HIRESATTR: */
-              data2 = read_screen_memory( display_attr_start[screen_y] + x );
+              data2 =
+		read_screen_memory( display_attr_start[screen_y] + screen_x );
               break;
-          }
-          hires_data = (data << 8) + data2;
-          display_plot16( x<<1, screen_y, hires_data, ink, paper );    
-        } else {
-          display_plot8( x<<1, screen_y, data, ink, paper );
-        }    
+	    }
+	    hires_data = (data << 8) + data2;
+	    display_plot16( screen_x<<1, screen_y, hires_data, ink, paper );
+	  } else {
+	    display_plot8( screen_x<<1, screen_y, data, ink, paper );
+	  }    
 
-	display_is_dirty[screen_y] >>= 1;
-	x++;
+	} else if( x < DISPLAY_BORDER_WIDTH_COLS ) {
 
-      } while( display_is_dirty[screen_y] & 0x01 );
+	  border_colour = left_border[ y - DISPLAY_BORDER_HEIGHT ][x];
 
-      error = add_rectangle( screen_y, start, x-start ); if( error ) return;
-    }
+	  for( i = 0; i < 16; i++ )
+	    uidisplay_putpixel( ( x << 4 ) + i, y, border_colour );
 
-    error = end_line( screen_y ); if( error ) return;
+	} else {
 
+	  border_colour =
+	    right_border[ y - DISPLAY_BORDER_HEIGHT ]
+                        [ x - DISPLAY_BORDER_WIDTH_COLS - DISPLAY_WIDTH_COLS ];
+
+	  for( i = 0; i < 16; i++ )
+	    uidisplay_putpixel( ( x << 4 ) + i, y, border_colour );
+
+	}
+
+      } else if( y < DISPLAY_BORDER_HEIGHT ) {
+
+	border_colour = top_border[y][x];
+
+	for( i = 0; i < 16; i++ )
+	  uidisplay_putpixel( ( x << 4 ) + i, y, border_colour );
+
+      } else {
+
+	border_colour =
+	  bottom_border[y - DISPLAY_BORDER_HEIGHT - DISPLAY_HEIGHT ][x];
+
+	for( i = 0; i < 16; i++ )
+	  uidisplay_putpixel( ( x << 4 ) + i, y, border_colour );
+
+      }
+
+      display_is_dirty[y] >>= 1;
+      x++;
+
+    } while( display_is_dirty[y] & 0x01 );
+
+    error = add_rectangle( y, start, x-start ); if( error ) return;
+
+  }
+  
+  error = end_line( y ); if( error ) return;
+
+  /* We've drawn the current line to the screen. Now overwrite the
+     border on this line with the current border colour */
+  border_colour = scld_last_dec.name.hires ? display_hires_border :
+                                             display_lores_border;
+  
+  if( border_colour != display_current_border[y] ) {
+    set_border_pixels( y, 0, border_colour );
+    display_current_border[y] = border_colour;
   }
 
 }
@@ -546,7 +600,7 @@ void display_set_hires_border(int colour)
 
 static void display_set_border(void)
 {
-  int current_line,time_since_line,current_pixel,colour;
+  int current_line, time_since_line, column, colour;
 
   colour = scld_last_dec.name.hires ? display_hires_border : display_lores_border;
   current_line=display_border_line();
@@ -566,39 +620,12 @@ static void display_set_border(void)
                         machine_current->timings.horizontal_screen +
                         machine_current->timings.right_border ) return;
       
-  current_pixel=display_border_column(time_since_line);
+  column = display_border_column( time_since_line );
 
-  /* See if we're in the top/bottom border */
-  if(current_line < DISPLAY_BORDER_HEIGHT ||
-     current_line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
-
-    /* Colour in all the border to the very right edge */
-    uidisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
-	         	 colour);
-
-  } else {			/* In main screen */
-
-    /* If we're in the left border, colour that bit in */
-    if(current_pixel < DISPLAY_BORDER_WIDTH)
-      uidisplay_set_border(current_line, current_pixel, DISPLAY_BORDER_WIDTH,
-			   colour);
-
-    /* Advance to the right edge of the screen */
-    if(current_pixel < DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH)
-      current_pixel = DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH;
-
-    /* Draw the right border */
-    uidisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
-			 colour);
-
-  }
+  set_border_pixels( current_line, column, colour );
 
   /* Note this line has more than one colour on it */
   display_current_border[current_line]=display_border_mixed;
-
-  /* And that it needs to be copied to the display */
-  display_border_dirty[current_line] = 1;
-
 }
 
 static int display_border_line(void)
@@ -614,34 +641,69 @@ static int display_border_column(int time_since_line)
 {
   int column;
 
-  /* 2 pixels per T-state, rounded _up_ to the next multiple of eight */
-  column = ( (time_since_line+3)/4 ) * 8;
+  /* 2 pixels per T-state */
+  column = ( time_since_line + 3 ) / 4;
 
   /* But now need to correct because our displayed border isn't necessarily
      the same size as the ULA's. */
-  column -= ( machine_current->timings.left_border << 1 ) -
-    DISPLAY_BORDER_ASPECT_WIDTH;
+  column -= 
+    ( machine_current->timings.left_border >> 2 ) - DISPLAY_BORDER_WIDTH_COLS;
 
   if(column < 0) {
     column=0;
-  } else if(column > DISPLAY_ASPECT_WIDTH) {
-    column=DISPLAY_ASPECT_WIDTH;
+  } else if( column > DISPLAY_SCREEN_WIDTH_COLS ) {
+    column = DISPLAY_SCREEN_WIDTH_COLS;
   }
 
-  return column<<1;
+  return column;
 }
 
-int display_dirty_border( void )
+static void
+set_border_pixels( int line, int column, int colour )
 {
-  int y;
+  const QWORD right_edge =
+    (QWORD)1 << ( DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS );
 
-  for( y=0; y<DISPLAY_SCREEN_HEIGHT; y++ ) {
-    display_current_border[y] = display_border_mixed;
-    display_border_dirty[y] = 1;
+  /* See if we're in the top/bottom border */
+  if( line < DISPLAY_BORDER_HEIGHT ) {
+
+    for( ; column < DISPLAY_SCREEN_WIDTH_COLS; column++ ) {
+      top_border[line][column] = colour;
+      display_is_dirty[line] |= (QWORD)1 << column;
+    }
+
+  } else if( line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
+
+    for( ; column < DISPLAY_SCREEN_WIDTH_COLS; column++ ) {
+      bottom_border[ line - DISPLAY_BORDER_HEIGHT - DISPLAY_HEIGHT ][column] =
+	colour;
+      display_is_dirty[line] |= (QWORD)1 << column;
+    }
+
+  } else {			/* In main screen */
+
+    /* If we're in the left border, colour that bit in */
+    for( ; column < DISPLAY_BORDER_WIDTH_COLS; column++ ) {
+      left_border[ line - DISPLAY_BORDER_HEIGHT ][column] = colour;
+      display_is_dirty[line] |= 1 << column;
+    }
+
+    /* Rebase our coordinate: zero is now the right edge of the screen */
+
+    /* Got to the right edge of the screen if we're past it already */
+    if( column <= DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
+      column = 0;
+    } else {
+      column -= DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS;
+    }
+
+    /* Colour in the right border */
+    for( ; column < DISPLAY_BORDER_WIDTH_COLS; column++ ) {
+      right_border[ line - DISPLAY_BORDER_HEIGHT ][column] = colour;
+      display_is_dirty[line] |= right_edge << column;
+    }
   }
-
-  return 0;
-}
+}  
 
 int display_frame(void)
 {
@@ -689,47 +751,8 @@ static void display_dirty_flashing(void)
 
 void display_refresh_all(void)
 {
-  int x,y; BYTE ink,paper;
-  WORD hires_data;
+  size_t y;
 
-  for(y=0;y<DISPLAY_SCREEN_HEIGHT;y++) {
-    display_border_dirty[y] = 1;
-  }
-
-  for(y=0;y<DISPLAY_HEIGHT;y++) {
-    for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
-      display_get_attr(x,y,&ink,&paper);
-	if( scld_last_dec.name.hires ) {
-	  hires_data = (read_screen_memory( display_get_addr(x,y) ) << 8 ) +
-	    read_screen_memory( display_get_addr( x, y ) + ALTDFILE_OFFSET );
-	  display_plot16( x<<1, y, hires_data, ink, paper );
-	} else
-	  display_plot8( x<<1, y, read_screen_memory( display_get_addr(x,y) ),
-			 ink, paper );
-    }
-    display_is_dirty[y] = display_all_dirty;	/* Marks all pixels as dirty */
-  }
-}
-
-void
-display_refresh_border( void )
-{
-  int y;
-  int colour = scld_last_dec.name.hires ? display_hires_border : display_lores_border;
-
-  /* Redraw the top and bottom borders */
-  for( y = 0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
-    uidisplay_set_border( y, 0, DISPLAY_SCREEN_WIDTH, colour );    
-    uidisplay_set_border( DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT + y, 0,
-                          DISPLAY_SCREEN_WIDTH, colour );
-  }
-
-  /* And the bits to the left and right of the main screen */
-  for( y = DISPLAY_BORDER_HEIGHT;
-       y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT;
-       y++ ) {
-    uidisplay_set_border( y, 0, DISPLAY_BORDER_WIDTH, colour );
-    uidisplay_set_border( y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
-                          DISPLAY_SCREEN_WIDTH, colour );
-  }
+  for( y = 0; y < DISPLAY_SCREEN_HEIGHT ; y++ )
+    display_is_dirty[y] = display_all_dirty;
 }

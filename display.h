@@ -57,6 +57,9 @@
 #define DISPLAY_SCREEN_WIDTH  ( DISPLAY_WIDTH  + 2 * DISPLAY_BORDER_WIDTH  )
 #define DISPLAY_SCREEN_HEIGHT ( DISPLAY_HEIGHT + 2 * DISPLAY_BORDER_HEIGHT )
 
+/* And the width in columns */
+#define DISPLAY_SCREEN_WIDTH_COLS ( DISPLAY_WIDTH_COLS + 2 * DISPLAY_BORDER_WIDTH_COLS )
+
 /* The aspect ratio corrected display width */
 #define DISPLAY_ASPECT_WIDTH  ( DISPLAY_SCREEN_WIDTH / 2 )
 
@@ -85,8 +88,6 @@ int display_dirty_border(void);
 
 int display_frame(void);
 void display_refresh_all(void);
-
-void display_refresh_border( void );
 
 WORD display_get_addr( int x, int y );
 

@@ -166,9 +166,6 @@ static int gtkdisplay_configure_notify( int width )
   /* Redraw the entire screen... */
   display_refresh_all();
 
-  /* And the entire border */
-  display_refresh_border();
-
   return 0;
 }
 
