@@ -138,13 +138,13 @@ create_dialog( void )
 
   /* 'table' contains the register display */
   table = gtk_table_new( 9, 2, FALSE );
-  gtk_box_pack_start_defaults( GTK_BOX( vbox ), table );
+  gtk_box_pack_start( GTK_BOX( vbox ), table, FALSE, FALSE, 0 );
 
   for( i = 0; i < 18; i++ ) {
     registers[i] = gtk_label_new( "" );
     gtk_widget_set_style( registers[i], style );
-    gtk_table_attach_defaults( GTK_TABLE( table ), registers[i],
-			       i%2, i%2+1, i/2, i/2+1 );
+    gtk_table_attach( GTK_TABLE( table ), registers[i], i%2, i%2+1, i/2, i/2+1,
+		      0, 0, 2, 2 );
   }
 
   /* The breakpoint CList */
