@@ -249,6 +249,7 @@ ui_debugger_update( void )
   gtk_label_set_text( GTK_LABEL( registers[15] ), buffer );
 
   /* Put some disassembly in */
+  gtk_clist_freeze( GTK_CLIST( disassembly ) );
   gtk_clist_clear( GTK_CLIST( disassembly ) );
 
   for( i = 0, address = PC; i < 20; i++ ) {
@@ -261,6 +262,7 @@ ui_debugger_update( void )
 
     gtk_clist_append( GTK_CLIST( disassembly ), text );
   }
+  gtk_clist_thaw( GTK_CLIST( disassembly ) );
 
   return 0;
 }
