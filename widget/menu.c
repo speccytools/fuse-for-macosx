@@ -174,6 +174,7 @@ int widget_menu_rzx_playback( void *data )
   }
 
   /* Recording file selector cancelled */
+  free( snapshot );
   return 0;
 }
 
