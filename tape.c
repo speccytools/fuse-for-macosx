@@ -218,8 +218,8 @@ int tape_load_trap( void )
 
   int error;
 
-  /* Do nothing if tape traps aren't active */
-  if( ! settings_current.tape_traps ) return 2;
+  /* Do nothing if tape traps aren't active, or the tape is already playing */
+  if( ! settings_current.tape_traps || tape_playing ) return 2;
 
   /* Do nothing if we're not in the correct ROM */
   if( ! trap_check_rom() ) return 3;
@@ -498,6 +498,7 @@ int tape_next_edge( void )
       ((libspectrum_tape_block*)(tape.current_block->data))->type ==
         LIBSPECTRUM_TAPE_BLOCK_ROM
     ) {
+    tape_playing = 0;
     return 0;
   }
 
