@@ -55,7 +55,7 @@ int widget_error_draw( void *data )
   free( lines );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + (count+2)*8 );
+		   DISPLAY_BORDER_HEIGHT + 15 + count*8 );
 
   return 0;
 }
@@ -71,12 +71,6 @@ split_message( const char *message, char ***lines, size_t *count,
      word */
   *lines = NULL; *count = 0; position = line_length;
 
-  *lines = (char**)malloc( sizeof(char**) );
-  if( *lines == NULL ) return 1;
-
-  (*lines)[0] = (char*)malloc( line_length * sizeof(char) );
-  if( (*lines)[0] == NULL ) { free( *lines ); return 1; }
-
   while( *ptr ) {
 
     /* Skip any whitespace */
@@ -85,10 +79,17 @@ split_message( const char *message, char ***lines, size_t *count,
     /* Find end of word */
     while( *ptr && *ptr++ != ' ' ) /* Do nothing */;
 
-    /* message now points to a word of length (ptr-message-1), so check
-       we've got room for that, plus the prefixing space */
+    /* message now points to a word of length (ptr-message-1); if
+       that's longer than an entire line (most likely filenames), just
+       take the last bit */
+    if( ptr - message - 1 > line_length ) message = ptr - line_length - 1;
+
+    /* Check we've got room for the word, plus the prefixing space */
     if( position + ( ptr - message ) > line_length ) {
       char **new_lines; int i;
+
+      /* If we've filled the screen, stop */
+      if( *count == 20 ) return 0;
 
       new_lines = (char**)realloc( (*lines), (*count + 1) * sizeof( char** ) );
       if( new_lines == NULL ) {
@@ -96,6 +97,7 @@ split_message( const char *message, char ***lines, size_t *count,
 	if(*lines) free( (*lines) );
 	return 1;
       }
+      (*lines) = new_lines;
 
       (*lines)[*count] = (char*)malloc( (line_length+1) * sizeof(char) );
       if( (*lines)[*count] == NULL ) {
@@ -105,9 +107,9 @@ split_message( const char *message, char ***lines, size_t *count,
       }
       
       strncpy( (*lines)[*count], message, ptr - message - 1 );
+      position = ptr - message - 1;
       (*lines)[*count][position] = '\0';
 
-      position = ptr - message - 1;
       (*count)++;
 
     } else {		/* Enough room on this line */

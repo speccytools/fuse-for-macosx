@@ -352,8 +352,8 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 			WIDGET_COLOUR_FOREGROUND );
   }
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 8*(y       -1),
-		   DISPLAY_BORDER_HEIGHT + 8*(y+height+1)  );
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT    + 8*(y       -1),
+		   DISPLAY_BORDER_HEIGHT -1 + 8*(y+height+1)  );
 
   return 0;
 }
