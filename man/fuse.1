@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "6th November, 2001" "Version 0.3.3" "Emulators"
+.TH fuse 1 "16th November, 2001" "Version 0.4.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -44,8 +44,8 @@ fuse \- Sinclair ZX Spectrum emulator
 .SH DESCRIPTION
 Fuse is a Sinclair ZX Spectrum emulator. It supports several models
 (including the 128), with quite faithful emulation of the display and
-sound. It can load Z80 and SNA snapshots, and TAP virtual-tape files.
-But currently, it can only save Z80 snapshots.
+sound. It can load Z80 and SNA snapshots, and TAP and TZX virtual-tape
+files.  But currently, it can only save Z80 snapshots.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -225,8 +225,6 @@ files are shown, whether Fuse would be able to load them or not.
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
-TZX files aren't yet supported.
-.PP
 It can't currently save to TAP files.
 .PP
 It doesn't emulate memory contention, so some `rainbow' and border
