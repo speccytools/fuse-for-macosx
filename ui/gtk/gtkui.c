@@ -127,14 +127,12 @@ static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
 static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
-#ifdef HAVE_765_H
 static void gtkui_disk_open_a( GtkWidget *widget, gpointer data );
 static void gtkui_disk_open_b( GtkWidget *widget, gpointer data );
 static void gtkui_disk_eject_a( GtkWidget *widget, gpointer data );
 static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data );
 
 static void gtkui_disk_open( specplus3_drive_number drive );
-#endif				/* #ifdef HAVE_765_H */
 
 static void cartridge_insert( GtkWidget *widget, gpointer data );
 static void cartridge_eject( GtkWidget *widget, gpointer data );
@@ -189,7 +187,6 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Tape/_Clear",		NULL , gtkui_tape_clear,    0, NULL          },
   { "/Tape/_Write...",		"F6" , gtkui_tape_write,    0, NULL          },
 
-#ifdef HAVE_765_H
   { "/Disk",			NULL , NULL,		    0, "<Branch>"    },
   { "/Disk/Drive A:",		NULL , NULL,		    0, "<Branch>"    },
   { "/Disk/Drive A:/_Insert...",NULL , gtkui_disk_open_a,   0, NULL          },
@@ -197,7 +194,6 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Disk/Drive B:",		NULL , NULL,		    0, "<Branch>"    },
   { "/Disk/Drive B:/_Insert...",NULL , gtkui_disk_open_b,   0, NULL          },
   { "/Disk/Drive B:/_Eject",    NULL , gtkui_disk_eject_b,  0, NULL          },
-#endif				/* #ifdef HAVE_765_H */
 
   { "/Cartridge",		NULL , NULL,		    0, "<Branch>"    },
   { "/Cartridge/_Insert...",	NULL , cartridge_insert,    0, NULL          },
@@ -903,8 +899,6 @@ gtkui_tape_write( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_unpause();
 }
 
-#ifdef HAVE_765_H
-
 /* Called by the mnu when Disk/Drive ?:/Open selected */
 static void
 gtkui_disk_open_a( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
@@ -952,8 +946,6 @@ gtkui_disk_eject_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   specplus3_disk_eject( SPECPLUS3_DRIVE_B );
 }
-
-#endif			/* #ifdef HAVE_765_H */
 
 /* Cartridge/Insert */
 static void
