@@ -37,6 +37,8 @@ block_free( gpointer data, gpointer user_data );
 /* Standard ROM loader */
 static libspectrum_error
 rom_init( libspectrum_tape_rom_block *block );
+static libspectrum_error
+turbo_init( libspectrum_tape_turbo_block *block );
 
 /* Functions to get the next edge */
 
@@ -46,6 +48,12 @@ rom_edge( libspectrum_tape_rom_block *block, libspectrum_dword *tstates,
 	  int *end_of_block );
 static libspectrum_error
 rom_next_bit( libspectrum_tape_rom_block *block );
+
+static libspectrum_error
+turbo_edge( libspectrum_tape_turbo_block *block, libspectrum_dword *tstates,
+	    int *end_of_block );
+static libspectrum_error
+turbo_next_bit( libspectrum_tape_turbo_block *block );
 
 /*** Function definitions ****/
 
@@ -70,6 +78,11 @@ block_free( gpointer data, gpointer user_data )
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     free( block->types.rom.data );
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+    free( block->types.turbo.data );
+    break;
+  default:
+    /* Do nothing */
   }
 }
 
@@ -80,6 +93,9 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     return rom_init( &(block->types.rom) );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+    return turbo_init( &(block->types.turbo) );
     break;
   default:
     return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -93,6 +109,19 @@ rom_init( libspectrum_tape_rom_block *block )
   block->edge_count = block->data[0] & 0x80         ?
                       LIBSPECTRUM_TAPE_PILOTS_DATA  :
                       LIBSPECTRUM_TAPE_PILOTS_HEADER;
+
+  /* And that we're just before the start of the data */
+  block->bytes_through_block = -1; block->bits_through_byte = 7;
+  block->state = LIBSPECTRUM_TAPE_STATE_PILOT;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+turbo_init( libspectrum_tape_turbo_block *block )
+{
+  /* Initialise the number of pilot pulses */
+  block->edge_count = block->pilot_pulses;
 
   /* And that we're just before the start of the data */
   block->bytes_through_block = -1; block->bits_through_byte = 7;
@@ -122,6 +151,10 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     error = rom_edge( &(block->types.rom), tstates, &end_of_block );
+    if( error ) return error;
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+    error = turbo_edge( &(block->types.turbo), tstates, &end_of_block );
     if( error ) return error;
     break;
   default:
@@ -247,6 +280,104 @@ rom_next_bit( libspectrum_tape_rom_block *block )
   /* And set the timing and state for another data bit */
   block->bit_tstates = ( next_bit ? LIBSPECTRUM_TAPE_TIMING_DATA1
 			          : LIBSPECTRUM_TAPE_TIMING_DATA0 );
+  block->state = LIBSPECTRUM_TAPE_STATE_DATA1;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+turbo_edge( libspectrum_tape_turbo_block *block, libspectrum_dword *tstates,
+	    int *end_of_block )
+{
+  int error;
+
+  switch( block->state ) {
+
+  case LIBSPECTRUM_TAPE_STATE_PILOT:
+    /* The next edge occurs in one pilot edge timing */
+    *tstates = block->pilot_length;
+    /* If that was the last pilot edge, change state */
+    if( --(block->edge_count) == 0 )
+      block->state = LIBSPECTRUM_TAPE_STATE_SYNC1;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_SYNC1:
+    /* The first short sync pulse */
+    *tstates = block->sync1_length;
+    /* Followed by the second sync pulse */
+    block->state = LIBSPECTRUM_TAPE_STATE_SYNC2;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_SYNC2:
+    /* The second short sync pulse */
+    *tstates = block->sync2_length;
+    /* Followed by the first bit of data */
+    error = turbo_next_bit( block ); if( error ) return error;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_DATA1:
+    /* The first edge for a bit of data */
+    *tstates = block->bit_tstates;
+    /* Followed by the second edge */
+    block->state = LIBSPECTRUM_TAPE_STATE_DATA2;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_DATA2:
+    /* The second edge for a bit of data */
+    *tstates = block->bit_tstates;
+    /* Followed by the next bit of data (or the end of data) */
+    error = turbo_next_bit( block ); if( error ) return error;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_PAUSE:
+    /* The pause at the end of the block */
+    *tstates = (block->pause * 69888)/50; /* FIXME: should vary with tstates
+					     per frame */
+    *end_of_block = 1;
+    break;
+
+  default:
+    return LIBSPECTRUM_ERROR_LOGIC;
+
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+turbo_next_bit( libspectrum_tape_turbo_block *block )
+{
+  int next_bit;
+
+  /* Have we finished the current byte? */
+  if( ++(block->bits_through_byte) == 8 ) {
+
+    /* If so, have we finished the entire block? If so, all we've got
+       left after this is the pause at the end */
+    if( ++(block->bytes_through_block) == block->length ) {
+      block->state = LIBSPECTRUM_TAPE_STATE_PAUSE;
+      return LIBSPECTRUM_ERROR_NONE;
+    }
+    
+    /* If we've finished the current byte, but not the entire block,
+       get the next byte */
+    block->current_byte = block->data[ block->bytes_through_block ];
+
+    /* If we're looking at the last byte, take account of the fact it
+       may have less than 8 bits in it */
+    if( block->bytes_through_block == block->length-1 ) {
+      block->bits_through_byte = 8 - block->bits_in_last_byte;
+    } else {
+      block->bits_through_byte = 0;
+    }
+  }
+
+  /* Get the high bit, and shift the byte out leftwards */
+  next_bit = block->current_byte & 0x80;
+  block->current_byte <<= 1;
+
+  /* And set the timing and state for another data bit */
+  block->bit_tstates = ( next_bit ? block->bit1_length : block->bit0_length );
   block->state = LIBSPECTRUM_TAPE_STATE_DATA1;
 
   return LIBSPECTRUM_ERROR_NONE;

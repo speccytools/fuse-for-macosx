@@ -37,9 +37,11 @@
 
 /*** Generic tape routines ***/
 
-/* The various types of block available */
+/* The various types of block available
+   The values here are chosen to be the same as used in the .tzx format */
 typedef enum libspectrum_tape_type {
-  LIBSPECTRUM_TAPE_BLOCK_ROM,
+  LIBSPECTRUM_TAPE_BLOCK_ROM = 0x10,
+  LIBSPECTRUM_TAPE_BLOCK_TURBO,
 } libspectrum_tape_type;
 
 /* A huge number of states available; encompasses all possible block types */
@@ -86,13 +88,38 @@ extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC2; /* Sync 2 */
 extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA0; /* Reset bit */
 extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA1; /* Set bit */
 
-/* The number of pilot pulses for the standard ROM loader
-   NB: These disagree with the .tzx specification (they're one less), but
-       are correct. Entering the loop at #04D8 in the 48K ROM with HL == #0001
-       will produce the first sync pulse, not a pilot pulse.
-*/
+/* The number of pilot pulses for the standard ROM loader */
 extern const size_t LIBSPECTRUM_TAPE_PILOTS_HEADER;
 extern const size_t LIBSPECTRUM_TAPE_PILOTS_DATA;
+
+/* A turbo loading block */
+typedef struct libspectrum_tape_turbo_block {
+
+  size_t length;		/* Length of data */
+  size_t bits_in_last_byte;	/* How many bits are in the last byte? */
+  libspectrum_byte *data;	/* The actual data */
+  libspectrum_dword pause;	/* Pause after data (in ms) */
+
+  libspectrum_dword pilot_length; /* Length of pilot pulse (in tstates) */
+  size_t pilot_pulses;		/* Number of pilot pulses */
+
+  libspectrum_dword sync1_length, sync2_length; /* Length of the sync pulses */
+  libspectrum_dword bit0_length, bit1_length; /* Length of (re)set bits */
+
+  /* Private data */
+
+  libspectrum_tape_state_type state;
+
+  size_t edge_count;		/* Number of pilot pulses to go */
+
+  size_t bytes_through_block;
+  size_t bits_through_byte;	/* How far through the data are we? */
+
+  libspectrum_byte current_byte; /* The current data byte; gets shifted out
+				    as we read bits from it */
+  libspectrum_dword bit_tstates; /* How long is an edge for the current bit */
+
+} libspectrum_tape_turbo_block;
 
 /* A generic tape block */
 typedef struct libspectrum_tape_block {
@@ -101,6 +128,7 @@ typedef struct libspectrum_tape_block {
 
   union {
     libspectrum_tape_rom_block rom;
+    libspectrum_tape_turbo_block turbo;
   } types;
 
 } libspectrum_tape_block;
@@ -132,6 +160,12 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
 libspectrum_error
 libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
+			const size_t length );
+
+/*** Routines for .tzx format files ***/
+
+libspectrum_error
+libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 			const size_t length );
 
 #endif				/* #ifndef LIBSPECTRUM_TAPE_H */
