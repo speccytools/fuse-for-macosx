@@ -79,6 +79,7 @@ static int shm_used = 0;
 static int xdisplay_allocate_colours(int numColours, unsigned long *colours);
 static int xdisplay_allocate_gc(Window window, GC *gc);
 static int xdisplay_allocate_image(int width, int height);
+static int get_shm_id( const int size );
 static void xdisplay_destroy_image( void );
 static void xdisplay_end( int );
 
@@ -155,13 +156,12 @@ static int xdisplay_allocate_gc(Window window,GC *gc)
 
 static int xdisplay_allocate_image(int width, int height)
 {
-#ifdef X_USE_SHM
-  key_t key = 'F' << 24 | 'u' << 16 | 's' << 8 | 'e';
-  struct shmid_ds shm;
-  int id = -1;
-#endif /* X_USE_SHM */
-
   struct sigaction handler;
+
+#ifdef X_USE_SHM
+  int id = -1;
+  int error;
+#endif			/* #ifdef X_USE_SHM */
 
   handler.sa_handler = xdisplay_end;
   sigemptyset( &handler.sa_mask );
@@ -179,61 +179,40 @@ static int xdisplay_allocate_image(int width, int height)
     if( !image ) shm_used = 0;
   }
 
-  /* Claim some memory (try to reclaim a stale chunk) */
-  if( shm_used )
-  {
-    int pollution = 5;
-    const int size = image->bytes_per_line * image->height;
-    do {
-
-      id = shmget( key, size, 0777 );	/* just get the id */
-
-      if( id == -1 ) id = shmget( key, size, IPC_CREAT | 0777 );
-      else if( !shmctl( id, IPC_STAT, &shm ) ) {
-	if( shm.shm_nattch ) key++;
-	else {
-	  if( getuid() == shm.shm_perm.cuid ) {
-	    if( shmctl( id, IPC_RMID, 0) ) id = -1;
-	    else {
-	      id = shmget( key, size, IPC_CREAT | 0777 );
-	      if( id != -1 ) shmctl (id, IPC_STAT, &shm);
-	      break;
-	    }
-	  }
-	  if( size >= shm.shm_segsz ) break;
-	  key++;
-	}
-      }
-    }
-    while( id == -1 && --pollution );
+  if( shm_used ) {
+    
+    id = get_shm_id( image->bytes_per_line * image->height );
 
     shm_used = ( id == -1 ? 0 : 1 );
 
-    if( shm_used && image ) {
+    if( shm_used ) {
       shm_info.shmid = id;
       image->data = shm_info.shmaddr = shmat( id, 0, 0 );
+
+      /* Flag the chunk for removal; won't happen until we detach */
+      shmctl( id, IPC_RMID, 0 );
+
       if( image->data ) {
 
 	/* This may generate an X error */
 	xerror_error = 0; xerror_expecting = 1;
-	if( !XShmAttach( display, &shm_info ) ) xdisplay_destroy_image();
+	error = XShmAttach( display, &shm_info );
 
-	/* Force any errors to occur before we disable traps */
+	/* Force any X errors to occur before we disable traps */
 	XSync( display, False );
 	xerror_expecting = 0;
 
-	/* If we caught an X error, don't use SHM */
-	if( xerror_error ) shm_used = 0;
+	/* If we caught an error, don't use SHM */
+	if( error || xerror_error ) {
+	  shmdt( image->data ); shm_used = 0;
+	  image->data = NULL;
+	}
 
       } else {
-	xdisplay_destroy_image();
+	shm_used = 0;
       }
-    } else {
-      shm_used = 0;
     }
   }
-
-  if( !shm_used && image ) xdisplay_destroy_image ();
 
 #endif				/* #ifdef X_USE_SHM */
 
@@ -256,6 +235,53 @@ static int xdisplay_allocate_image(int width, int height)
 
   return 0;
 }
+
+#ifdef X_USE_SHM
+/* Get an SHM ID; also attempt to reclaim any stale chunks we find */
+static int
+get_shm_id( const int size )
+{
+  key_t key = 'F' << 24 | 'u' << 16 | 's' << 8 | 'e';
+  struct shmid_ds shm;
+
+  int id;
+
+  int pollution = 5;
+  
+  do {
+    /* See if a chunk already exists with this key */
+    id = shmget( key, size, 0777 );
+
+    /* If the chunk didn't already exist, try and create one for our
+       use */
+    if( id == -1 ) {
+      id = shmget( key, size, IPC_CREAT | 0777 );
+      continue;			/* And then jump to the end of the loop */
+    }
+
+    /* If the chunk already exists, try and get information about it */
+    if( shmctl( id, IPC_STAT, &shm ) != -1 ) {
+
+      /* If something's actively using this chunk, try another key */
+      if( shm.shm_nattch ) {
+	key++;
+      } else {		/* Otherwise, attempt to remove the chunk */
+	
+	/* If we couldn't remove that chunk, try another key. If we
+	   could, just try again */
+	if( shmctl( id, IPC_RMID, NULL ) != 0 ) key++;
+      }
+    } else {		/* Couldn't get info on the chunk, so try next key */
+      key++;
+    }
+    
+    id = -1;		/* To prevent early exit from loop */
+
+  } while( id == -1 && --pollution );
+
+  return id;
+}
+#endif			/* #ifdef X_USE_SHM */
 
 int xdisplay_configure_notify(int width, int height)
 {
@@ -376,7 +402,6 @@ static void xdisplay_destroy_image (void)
   if( shm_used ) {
     XShmDetach( display, &shm_info );
     shmdt( shm_info.shmaddr );
-    shmctl( shm_info.shmid, IPC_RMID, 0 );
     image->data = NULL;
     shm_used = 0;
   }
