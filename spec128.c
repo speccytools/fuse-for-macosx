@@ -76,7 +76,7 @@ DWORD spec128_contend_port( WORD port )
 {
   /* Contention occurs for the ULA, or for the memory paging port */
   if( ( port & 0x0001 ) == 0x0000 ||
-      ( port & 0xc002 ) == 0x4000    ) return spec128_contend_delay();
+      ( port & 0x8002 ) == 0x0000    ) return spec128_contend_delay();
 
   return 0;
 }
