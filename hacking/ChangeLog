@@ -225,3 +225,5 @@
 	 status.
 20031004 ui/gtk: merge gtkdisplay.h, gtkkeyboard.h and gtkui.h into
 	 gtkinternals.h.
+20031004 specplus3.c, ui/ui.h, ui/gtk: add disk motor indicator to the
+	 status bar.

@@ -85,5 +85,6 @@ int ui_menu_activate_ay_logging( int recording );
 
 /* Functions to update the statusbar */
 int ui_statusbar_tape( int running );
+int ui_statusbar_disk( int running );
 
 #endif			/* #ifndef FUSE_UI_H */

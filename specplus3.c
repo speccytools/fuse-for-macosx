@@ -323,8 +323,10 @@ specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
      as opposed to the +2A), set the state of both ( 3 = ( 1<<0 ) + ( 1<<1 ) )
      floppy drive motors */
   if( libspectrum_machine_capabilities( machine_current->machine ) &&
-      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
+      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
     fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
+    ui_statusbar_disk( b & 0x08 );
+  }
 #endif			/* #ifdef HAVE_765_H */
 
   if( b & 0x01) {	/* Check whether we want a special RAM configuration */

@@ -32,8 +32,19 @@
 
 #include "gtkinternals.h"
 
+/* Is the disk motor running? */
+GtkWidget *gtkstatusbar_disk;
+
 /* Is the tape running? */
-GtkWidget *gtkstatusbar_tape = NULL;
+GtkWidget *gtkstatusbar_tape;
+
+int
+ui_statusbar_disk( int running )
+{
+  gtk_label_set( GTK_LABEL( gtkstatusbar_disk ),
+		 running ? "Disk: 1" : "Disk: 0" );
+  return 0;
+}
 
 int
 ui_statusbar_tape( int running )

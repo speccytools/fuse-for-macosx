@@ -292,8 +292,13 @@ ui_init( int *argc, char ***argv )
 
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, FALSE, FALSE, 0 );
 
+  /* Create the statusbar */
+
   status_bar = gtk_hbox_new( FALSE, 3 );
   gtk_box_pack_start_defaults( GTK_BOX( box ), status_bar );
+
+  gtkstatusbar_disk = gtk_label_new( "Disk: 0" );
+  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), gtkstatusbar_disk );
 
   gtkstatusbar_tape = gtk_label_new( "Tape: 0" );
   gtk_box_pack_start_defaults( GTK_BOX( status_bar ), gtkstatusbar_tape );
