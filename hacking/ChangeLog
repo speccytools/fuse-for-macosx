@@ -1093,3 +1093,4 @@
          connection in snapshots, need to implement GTK+ and widget dialogs
          so users can reconfig joysticks on snap loading. Switch Sinclair
          joysticks to match Sinclair documentation and other emulators.
+20041025 timer.c: Use proper machine interrupt rate (e.g. 48k uses 50.08Hz).

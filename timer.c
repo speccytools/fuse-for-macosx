@@ -207,7 +207,12 @@ timer_sleep( void )
               100                                  :
               settings_current.emulation_speed;
 
-  int speccy_frame_time_usec = 20000.0 * 100.0 / speed;
+  /* Interrupts at true 48k 50.08Hz etc. */
+  int speccy_frame_time_usec = ( 
+    1000000.0 *
+    libspectrum_timings_tstates_per_frame( machine_current->machine ) /
+    libspectrum_timings_processor_speed( machine_current->machine ) ) *
+    100.0 / speed;
 
 start:
   /* Get current time */
@@ -219,8 +224,7 @@ start:
   /* If speccy is less than 2 frames ahead of real time don't sleep */
   /* If the next frame is due in less than 5ms just do it now */
   /* (linear interpolation) */
-  /* FIXME Can now have interrupts at true 48k 50.04Hz etc. */
-  if( difference < ( ( 2 * speccy_frame_time_usec / 1000000.0 ) - 0.005 ) ) {
+  if( difference < ( ( 2.0 * speccy_frame_time_usec / 1000000.0 ) - 0.005 ) ) {
     /* Check at or around 100Hz (usual timer resolution on *IX) */
     timer_sleep_ms( 10 );
     goto start;
