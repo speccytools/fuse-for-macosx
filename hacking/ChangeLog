@@ -768,3 +768,5 @@
 	 away on reset.
 20040420 dck.c: when inserting a cartridge, change the setting only after
 	 we have verified that the file loads successfully.
+20040423 tape.c: further improvements to the register values after the
+	 tape loading trap (patch #939572) (Darren).

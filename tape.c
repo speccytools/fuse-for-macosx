@@ -353,55 +353,93 @@ static int
 trap_load_block( libspectrum_tape_block *block )
 {
   libspectrum_byte parity, *data;
-  int loading, i;
+  int i = 0, length, read;
 
-  /* If the block's too short, give up and go home (with carry reset
-     to indicate error. The +2 is to deal with the party and checksum
-     bytes which aren't accounted for in DE */
-  if( libspectrum_tape_block_data_length( block ) < DE + 2 ) { 
-    F = ( F & ~FLAG_C );
-    return 0;
-  }
+  /* On exit:
+   *  A = calculated parity byte if parity checked, else 0 (CHECKME)
+   *  F : if parity checked, all flags are modified
+   *      else carry only is modified (FIXME)
+   *  B = 0xB0 (success) or 0x00 (failure)
+   *  C = 0x01 (confirmed), 0x21, 0xFE or 0xDE (CHECKME)
+   * DE : decremented by number of bytes loaded or verified
+   *  H = calculated parity byte or undefined
+   *  L = last byte read, or 1 if none
+   * IX : incremented by number of bytes loaded or verified
+   * A' = unchanged on error + no flag byte, else 0x01
+   * F' = 0x01      on error + no flag byte, else 0x45
+   *  R = no point in altering it :-)
+   * Other registers unchanged.
+   */
 
   data = libspectrum_tape_block_data( block );
-  parity = *data;
+  length = libspectrum_tape_block_data_length( block );
 
-  /* If the flag byte (stored in A') does not match, reset carry and return */
-  if( *data++ != A_ ) {
-    F = ( F & ~FLAG_C );
+  /* Number of bytes to load or verify */
+  read = length - 1;
+  if( read > DE )
+    read = DE;
+
+  /* If there's no data in the block (!), set L then error exit.
+   * We don't need to alter H, IX or DE here */
+  if( !length ) {
+    L = F_ = 1;
+    F &= ~FLAG_C;
     return 0;
   }
 
-  /* Loading or verifying determined by the carry flag of F' */
-  loading = ( F_ & FLAG_C );
+  i = A_; /* i = A' (flag byte) */
+  AF_ = 0x0145;
+  A = 0;
 
-  if( loading ) {
-    for( i=0; i<DE; i++ ) {
-      writebyte_internal( IX+i, *data );
-      parity ^= *data++;
+  /* Initialise the parity check and L to the block ID byte */
+  L = parity = *data++;
+
+  /* If the block ID byte != the flag byte, clear carry and return */
+  if( parity != i )
+    goto error_ret;
+
+  /* Now set L to the *last* byte in the block */
+  L = data[read - 1];
+
+  /* Loading or verifying determined by the carry flag of F' */
+  if( F_ & FLAG_C ) {
+    for( i = 0; i < read; i++ ) {
+      parity ^= data[i];
+      writebyte_internal( IX+i, data[i] );
     }
   } else {		/* verifying */
-    for( i=0; i<DE; i++) {
-      parity ^= *data;
-      if( *data++ != readbyte_internal(IX+i) ) {
-	F = ( F & ~FLAG_C );
-	return 0;
+    for( i = 0; i < read; i++ ) {
+      parity ^= data[i];
+      if( data[i] != readbyte_internal(IX+i) ) {
+        /* Verification failure */
+        L = data[i];
+	goto error_ret;
       }
     }
   }
 
-  /* If the parity byte does not match, reset carry and return */
-  if( *data++ != parity ) {
-    F = ( F & ~FLAG_C );
-    return 0;
+  /* At this point, i == number of bytes actually read or verified */
+
+  /* If |DE| bytes have been read and there's more data, do the parity check */
+  if( DE == i && read + 1 < length ) {
+    parity ^= data[read];
+    A = parity;
+    CP( 1 ); /* parity check is successful if A==0 */
+    B = 0xB0;
+  } else {
+    /* Failure to read first bit of the next byte (ref. 48K ROM, 0x5EC) */
+    B = 255;
+    L = 1;
+    INC( B );
+error_ret:
+    F &= ~FLAG_C;
   }
 
-  /* Else return with carry set, and DE (the byte counter) set equal
-     to zero. Setting DE is required by 'The Rats' as it explicitly
-     checks for this after loading the 40502 byte long block */
-  F |= FLAG_C;
-  DE = 0;
-
+  /* At this point, AF, AF', B and L are already modified */
+  C = 1;
+  H = parity;
+  DE -= i;
+  IX += i;
   return 0;
 }
 
