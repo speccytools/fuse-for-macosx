@@ -175,6 +175,9 @@ int tape_open( const char *filename )
   /* Current block is the first block on the tape */
   tape_block_pointer = tape_block_list;
 
+  /* And the tape is stopped */
+  if( tape_playing ) tape_stop();
+
   return 0;
 
 }
@@ -346,6 +349,7 @@ int tape_play( void )
   if( tape_block_list == NULL ) return 1;
   
   tape_playing = 1;
+  tape_microphone = 0;
 
   error = tape_start_block(); if( error ) return error;
   error = tape_next_edge(); if( error ) return error;
@@ -364,8 +368,8 @@ int tape_next_edge( void )
 {
   int error;
 
-  /* If the tape's not playing, return with an error */
-  if( ! tape_playing ) return 2;
+  /* If the tape's not playing, just return */
+  if( ! tape_playing ) return 0;
 
   /* Invert the microphone state */
   tape_microphone = !tape_microphone;
