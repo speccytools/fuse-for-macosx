@@ -36,6 +36,7 @@
 #include "debugger/debugger.h"
 #include "fuse.h"
 #include "gtkui.h"
+#include "spectrum.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -53,7 +54,7 @@ static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 
 static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
-  *registers[10],			/* The register display */
+  *registers[16],			/* The register display */
   *disassembly;				/* The disassembly */
 
 /* Have we created the above yet? */
@@ -105,6 +106,9 @@ create_dialog( void )
 				  "BC", "BC'",
 				  "DE", "DE'",
 				  "HL", "HL'",
+				  "IX", "IY",
+				  "I",  "R",
+				  "T-states", 
                                 };
 
   gchar *titles[] = { "Address", "Instruction" };
@@ -117,10 +121,10 @@ create_dialog( void )
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
 
   /* 'table' contains the register display */
-  table = gtk_table_new( 5, 4, FALSE );
+  table = gtk_table_new( 6, 4, FALSE );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), table );
 
-  for( i = 0; i < 10; i++ ) {
+  for( i = 0; i < 15; i++ ) {
 
     label = gtk_label_new( register_name[i] );
     gtk_table_attach_defaults( GTK_TABLE( table ), label,
@@ -131,6 +135,9 @@ create_dialog( void )
 			       2*(i%2)+1, 2*(i%2)+2, i/2, i/2+1 );
 
   }
+
+  registers[15] = gtk_label_new( "" );
+  gtk_table_attach_defaults( GTK_TABLE( table ), registers[15], 2, 4, 7, 8 );
 
   /* Create the disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, titles );
@@ -210,21 +217,26 @@ activate_debugger( void )
   gchar *text[] = { &buffer[0], &buffer[40] };
   WORD address;
 
-  WORD *value_ptr[] = { &PC, &SP,
-			&AF, &AF_,
-			&BC, &BC_,
-			&DE, &DE_,
-			&HL, &HL_,
+  WORD *value_ptr[] = { &PC, &SP,  &AF, &AF_,
+			&BC, &BC_, &DE, &DE_,
+			&HL, &HL_, &IX, &IY,
                       };
 
   debugger_active = 1;
 
-  for( i = 0; i < 10; i++ ) {
-
+  for( i = 0; i < 12; i++ ) {
     snprintf( buffer, 80, "0x%04x", *value_ptr[i] );
     gtk_label_set_text( GTK_LABEL( registers[i] ), buffer );
-
   }
+
+  snprintf( buffer, 80, "0x%02x", I );
+  gtk_label_set_text( GTK_LABEL( registers[12] ), buffer );
+  snprintf( buffer, 80, "0x%02x", R & 0xff );
+  gtk_label_set_text( GTK_LABEL( registers[13] ), buffer );
+  snprintf( buffer, 80, "%d", tstates );
+  gtk_label_set_text( GTK_LABEL( registers[14] ), buffer );
+  snprintf( buffer, 80, "IM %d", IM );
+  gtk_label_set_text( GTK_LABEL( registers[15] ), buffer );
 
   /* Put some disassembly in */
   for( i = 0, address = PC; i < 20; i++ ) {
