@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "16th November, 2001" "Version 0.4.0" "Emulators"
+.TH fuse 1 "18th November, 2001" "Version 0.4.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -52,8 +52,8 @@ files.  But currently, it can only save Z80 snapshots.
 .SH OPTIONS
 .TP
 .I snapshot
-specifies a snapshot file to load. The file may be in Z80 or SNA
-format.
+specifies a snapshot file to load. The file must be in either Z80 or
+SNA format.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -120,7 +120,9 @@ gives (in turn) the 128, +2, and +2A before returning to the 48.
 Exit the emulator.
 .PP
 The GTK+ UI also has a menu bar, giving you an alternative way to do
-the same things. For example, File/Exit exits the emulator.
+the same things. For example,
+.I File/Exit
+exits the emulator.
 .PP
 Returning to the keys, the alphanumeric ones (along with
 .I Enter
@@ -176,9 +178,10 @@ over for the sake of the analogy. :-)
 .PP
 To emulate different kinds of Spectrum, press
 .I F9
-(or the Machine/Switch menu option, in the GTK+ UI). This cycles
-through the different types. Pressing it once gets you a 128, for
-example.
+(or select the
+.I Machine/Switch
+menu option, in the GTK+ UI). This cycles through the different types.
+Pressing it once gets you a 128, for example.
 .PP
 The Spectrum emulation is paused when any dialogs appear.
 .\"
@@ -192,21 +195,31 @@ selector.
 The selector shows the directories and files in the current directory
 in two separate subwindows. If either list is too big to fit in the
 window, you can use the scrollbar to see the rest (by dragging the
-slider, for example), or you can use Shift-Tab (to move the keyboard
-focus to a subwindow) and use the cursor keys. To change directory,
-double-click it.
+slider, for example), or you can use
+.I Shift-Tab
+(to move the keyboard focus to a subwindow) and use the cursor keys.
+To change directory, double-click it.
 .PP
 To choose a file to load you can either double-click it, or click it
-then click `Ok'. Or click `Cancel' to abort.
+then click
+.IR Ok .
+Or click
+.I Cancel
+to abort.
 .PP
 If you're using the keyboard, probably the easiest way to use the
 selector is to just ignore it and type in the name. This isn't as
 irksome as it sounds, since the filename input box has filename
-completion - type part of a directory or file name, then press Tab. It
-should complete it. If it was a directory, it moves to that directory;
-if the completion was ambiguous, it completes as much as possible, and
-narrows the filenames shown to those which match. You should press
-Enter when you've finished typing the filename, or Esc to abort.
+completion - type part of a directory or file name, then press
+.IR Tab .
+It should complete it. If it was a directory, it moves to that
+directory; if the completion was ambiguous, it completes as much as
+possible, and narrows the filenames shown to those which match. You
+should press
+.I Enter
+when you've finished typing the filename, or
+.I Esc
+to abort.
 .PP
 Now, if you're using the widget UI - the one using the Spectrum font -
 the selector works a bit differently. The files and directories are
@@ -214,9 +227,16 @@ all listed in a single two-column-wide window (the directories are
 shown at the top, ending in `/') - the names may be truncated onscreen
 if they're too long to fit.
 .PP
-To move the cursor, you can either use the cursor keys or the
-Spectrum equivalent (5/6/7/8). To select a file or directory, press
-Enter. To abort, press Esc (or 1).
+To move the cursor, you can either use the cursor keys, or the
+Spectrum equivalents
+.\" too many to portably risk using IR...
+\fI5\fR/\fI6\fR/\fI7\fR/\fI8\fR, or (similarly)
+\fIh\fR/\fIj\fR/\fIk\fR/\fIl\fR. To select a file or directory, press
+.IR Enter .
+To abort, press
+.I Esc
+(or
+.IR 1 ).
 .PP
 With both selectors, do bear in mind that
 .I all
