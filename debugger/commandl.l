@@ -54,6 +54,7 @@ co|con|cont|contin|continu|continue { return CONTINUE; }
 cl|cle|clea|clear { return CLEAR; }
 ex|exi|exit { return EXIT; }
 n|ne|nex|next { return NEXT; }
+p|po|por|port { return PORT; }
 r|re|rea|read { return READ; }
 se|set { return SET; }
 sh|sho|show { return SHOW; }

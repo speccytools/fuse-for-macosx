@@ -54,6 +54,8 @@ typedef enum debugger_breakpoint_type {
   DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
   DEBUGGER_BREAKPOINT_TYPE_READ,
   DEBUGGER_BREAKPOINT_TYPE_WRITE,
+  DEBUGGER_BREAKPOINT_TYPE_PORT_READ,
+  DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE,
 } debugger_breakpoint_type;
 
 /* Lifetime of a breakpoint */

@@ -10,7 +10,7 @@
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
@@ -55,6 +55,7 @@ void yyerror( char *s );
 %token		 CONTINUE
 %token		 EXIT
 %token		 NEXT
+%token		 PORT
 %token		 READ
 %token		 SET
 %token		 SHOW
@@ -69,47 +70,57 @@ void yyerror( char *s );
 
 %%
 
-input:   /* empty */
+input:	 /* empty */
        | command
 ;
 
 command:   BREAK    { debugger_breakpoint_add(
 			DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC,
-		        DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-                      );
-                    }
-         | BREAK CLEAR { debugger_breakpoint_remove_all(); }
-         | BREAK CLEAR NUMBER { debugger_breakpoint_remove( $3 ); }
+			DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+		      );
+		    }
+	 | BREAK CLEAR { debugger_breakpoint_remove_all(); }
+	 | BREAK CLEAR NUMBER { debugger_breakpoint_remove( $3 ); }
 	 | BREAK NUMBER { debugger_breakpoint_add( 
 			    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, $2,
 			    DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-                          );
-                        }
+			  );
+			}
+	 | BREAK PORT READ NUMBER { debugger_breakpoint_add(
+				      DEBUGGER_BREAKPOINT_TYPE_PORT_READ, $4,
+				      DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+				    );
+				  }
+	 | BREAK PORT WRITE NUMBER { debugger_breakpoint_add(
+				       DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, $4,
+				       DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+				     );
+				   }
 	 | BREAK READ { debugger_breakpoint_add(
 			  DEBUGGER_BREAKPOINT_TYPE_READ, PC,
 			  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 			);
-	              }
+		      }
 	 | BREAK READ NUMBER { debugger_breakpoint_add(
 				 DEBUGGER_BREAKPOINT_TYPE_READ, $3,
 				 DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-                               );
+			       );
 			     }
 	 | BREAK SHOW { debugger_breakpoint_show(); }
 	 | BREAK WRITE { debugger_breakpoint_add(
 			   DEBUGGER_BREAKPOINT_TYPE_WRITE, PC,
 			   DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 			 );
-	               }
+		       }
 	 | BREAK WRITE NUMBER { debugger_breakpoint_add(
 				  DEBUGGER_BREAKPOINT_TYPE_WRITE, $3,
 				  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-                                );
+				);
 			      }
 	 | CONTINUE { debugger_run(); }
-         | EXIT     { debugger_breakpoint_exit(); }
+	 | EXIT	    { debugger_breakpoint_exit(); }
 	 | NEXT	    { debugger_next(); }
-         | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
+	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;
 

@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 
+#include "debugger/debugger.h"
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
@@ -125,6 +126,11 @@ BYTE readport(WORD port)
   BYTE return_value = 0xff;
   int attached = 0;		/* Is this port attached to anything? */
 
+  /* Trigger the debugger if wanted */
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_READ, port ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+
   /* If we're doing RZX playback, get a byte from the RZX file */
   if( rzx_playback ) {
 
@@ -154,8 +160,12 @@ BYTE readport(WORD port)
 
 void writeport(WORD port, BYTE b)
 {
-  
   spectrum_port_info *ptr;
+
+  /* Trigger the debugger if wanted */
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, port ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
 
   for( ptr = machine_current->peripherals; ptr->mask; ptr++ ) {
     if( ( port & ptr->mask ) == ptr->data ) {
