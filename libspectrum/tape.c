@@ -137,6 +137,10 @@ block_free( gpointer data, gpointer user_data )
     free( block->types.hardware.ids    );
     free( block->types.hardware.values );
     break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+    free( block->types.custom.data );
+    break;
   }
 }
 
@@ -168,6 +172,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
   case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+  case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
     return LIBSPECTRUM_ERROR_NONE;
 
   default:
@@ -286,6 +291,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
   case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+  case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
     *tstates = 0; end_of_block = 1;
     break;
 
@@ -674,6 +680,10 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
     strncpy( buffer, "Hardware Information Block", length );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+    strncpy( buffer, "Custom Info Block", length );
     break;
 
   default:

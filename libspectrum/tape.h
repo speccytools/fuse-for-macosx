@@ -42,7 +42,7 @@
 /*** Generic tape routines ***/
 
 /* The various types of block available
-   The values here are chosen to be the same as used in the .tzx format */
+   The values here must be the same as used in the .tzx format */
 typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_ROM = 0x10,
   LIBSPECTRUM_TAPE_BLOCK_TURBO,
@@ -60,6 +60,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_MESSAGE,
   LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO,
   LIBSPECTRUM_TAPE_BLOCK_HARDWARE,
+
+  LIBSPECTRUM_TAPE_BLOCK_CUSTOM = 0x35,
 } libspectrum_tape_type;
 
 /* The states which a block can be in */
@@ -245,6 +247,18 @@ typedef struct libspectrum_tape_hardware_block {
 
 } libspectrum_tape_hardware_block;
 
+/* A custom block */
+typedef struct libspectrum_tape_custom_block {
+
+  /* Description of this block */
+  char description[17];
+
+  /* And the data for it; currently, no attempt is made to interpret
+     this data */
+  size_t length; libspectrum_byte *data;
+
+} libspectrum_tape_custom_block;
+
 /* A generic tape block */
 typedef struct libspectrum_tape_block {
 
@@ -267,6 +281,8 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_message_block message;
     libspectrum_tape_archive_info_block archive_info;
     libspectrum_tape_hardware_block hardware;
+
+    libspectrum_tape_custom_block custom;
   } types;
 
 } libspectrum_tape_block;

@@ -73,6 +73,9 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 static libspectrum_error
 tzx_read_hardware( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		   const libspectrum_byte *end );
+static libspectrum_error
+tzx_read_custom( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		 const libspectrum_byte *end );
 
 static libspectrum_error
 tzx_write_rom( libspectrum_tape_rom_block *rom_block,
@@ -115,6 +118,9 @@ tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
 static libspectrum_error
 tzx_write_hardware( libspectrum_tape_hardware_block *hardware_block,
 		    libspectrum_byte **buffer, size_t *offset, size_t *length);
+static libspectrum_error
+tzx_write_custom( libspectrum_tape_custom_block *block,
+		  libspectrum_byte **buffer, size_t *offset, size_t *length );
 
 /*** Function definitions ***/
 
@@ -209,6 +215,11 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
       error = tzx_read_hardware( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+      error = tzx_read_custom( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -985,6 +996,73 @@ tzx_read_hardware( libspectrum_tape *tape, const libspectrum_byte **ptr,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+tzx_read_custom( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		 const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_custom_block *custom_block;
+
+  /* Check the description (16) and length bytes (4) exist */
+  if( end - (*ptr) < 20 ) {
+    libspectrum_print_error(
+      "tzx_read_custom: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) {
+    libspectrum_print_error( "tzx_read_custom: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* This is a custom info block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_CUSTOM;
+  custom_block = &(block->types.custom);
+
+  /* Get the description */
+  memcpy( custom_block->description, *ptr, 16 ); (*ptr) += 16;
+  custom_block->description[16] = '\0';
+
+  /* Get the length */
+  custom_block->length = (*ptr)[0]              +
+                         (*ptr)[1] * 0x100      +
+                         (*ptr)[2] * 0x10000    +
+                         (*ptr)[3] * 0x1000000;
+  (*ptr) += 4;
+
+  /* Check we've got enough bytes left for the data */
+  if( end - (*ptr) < custom_block->length ) {
+    free( block );
+    libspectrum_print_error(
+      "tzx_read_custom: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Allocate memory */
+  custom_block->data =
+    (libspectrum_byte*)malloc( (custom_block->length) *
+			       sizeof( libspectrum_byte )
+			     );
+  if( custom_block->data == NULL ) {
+    free( block );
+    libspectrum_print_error( "tzx_read_custom: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* Copy the data across, and move along */
+  memcpy( custom_block->data, (*ptr), custom_block->length );
+  (*ptr) += custom_block->length;
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 /* The main write function */
 
 libspectrum_error
@@ -1070,6 +1148,12 @@ libspectrum_tzx_write( libspectrum_tape *tape,
     case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
       error = tzx_write_hardware( &(block->types.hardware),
 				  buffer, &offset, length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+      error = tzx_write_custom( &(block->types.custom), buffer, &offset,
+				length);
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
       break;
 
@@ -1431,6 +1515,37 @@ tzx_write_hardware( libspectrum_tape_hardware_block *block,
 
   /* Update offset and return */
   (*offset) += 3 * block->count + 2;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_custom( libspectrum_tape_custom_block *block,
+		  libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* An ID byte, 16 description bytes, 4 length bytes and the data
+     itself */
+  size_t total_length = 1 + 16 + 4 + block->length;
+
+  /* Make room for the block */
+  error = libspectrum_make_room( buffer, (*offset) + total_length, &ptr,
+				 length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_CUSTOM;
+  memcpy( ptr, block->description, 16 ); ptr += 16;
+
+  *ptr++ = ( block->length &       0xff )      ;
+  *ptr++ = ( block->length &     0xff00 ) >>  8;
+  *ptr++ = ( block->length &   0xff0000 ) >> 16;
+  *ptr++ = ( block->length & 0xff000000 ) >> 24;
+
+  memcpy( ptr, block->data, block->length ); ptr += block->length;
+
+  (*offset) += total_length;
 
   return LIBSPECTRUM_ERROR_NONE;
 }

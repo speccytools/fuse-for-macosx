@@ -272,6 +272,11 @@ main( int argc, char **argv )
       }
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
+      printf( "  Description: %s\n", block->types.custom.description );
+      printf( "       Length: %d bytes\n", block->types.custom.length );
+      break;
+
     default:
       printf("  (Sorry -- %s can't handle that kind of block. Skipping it)\n",
 	     progname );
