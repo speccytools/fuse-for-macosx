@@ -107,6 +107,10 @@ static int fuse_init(int argc, char **argv)
 
   fuse_show_copyright();
 
+  /* FIXME: order of these initialisation calls. Work out what depends on
+     what */
+  fuse_keyboard_init();
+
   if( tape_init() ) return 1;
 
   if( widget_init() ) return 1;
@@ -124,8 +128,6 @@ static int fuse_init(int argc, char **argv)
   } else {
     if(timer_init()) return 1;
   }
-
-  fuse_keyboard_init();
 
   z80_init();
 
