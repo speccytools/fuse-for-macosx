@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
 #include "fuse.h"
@@ -46,6 +47,7 @@ gtkui_confirm( const char *string )
   struct confirm_data data;
 
   GtkWidget *label, *button;
+  GtkAccelGroup *accelerators;
 
   fuse_emulation_pause();
 
@@ -56,6 +58,9 @@ gtkui_confirm( const char *string )
   gtk_signal_connect( GTK_OBJECT( data.dialog ), "delete_event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
+  accelerators = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( data.dialog ), accelerators );
+
   label = gtk_label_new( string );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( data.dialog )->vbox ),
 		      label, TRUE, TRUE, 5 );
@@ -65,6 +70,8 @@ gtkui_confirm( const char *string )
 		     button );
   gtk_signal_connect( GTK_OBJECT( button ), "clicked",
 		      GTK_SIGNAL_FUNC( set_confirmed ), &data );
+  gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Return, 0,
+			      0);
 
   button = gtk_button_new_with_label( "Cancel" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( data.dialog )->action_area ),
@@ -72,6 +79,8 @@ gtkui_confirm( const char *string )
   gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( data.dialog ) );
+  gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Escape, 0,
+			      0);
 
   gtk_window_set_modal( GTK_WINDOW( data.dialog ), TRUE );
   gtk_widget_show_all( data.dialog );
