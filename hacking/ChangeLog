@@ -798,3 +798,5 @@
 	 periph.[ch],settings.dat,machines/,ui/{options.dat,ui.h},
 	 ui/gtk/gtkui.c: add Interface II support (rest of patch #937338)
 	 (Fred).
+20040513 machines/machines.h: use correct #include guard name (part of
+	 patch #929112) (Fred).

@@ -24,8 +24,8 @@
 
 */
 
-#ifndef FUSE_SPEC16_H
-#define FUSE_SPEC16_H
+#ifndef FUSE_MACHINES_H
+#define FUSE_MACHINES_H
 
 #include <libspectrum.h>
 
@@ -44,4 +44,4 @@ int tc2048_port_contended( libspectrum_word port );
 
 int tc2068_init( fuse_machine_info *machine );
 
-#endif			/* #ifndef FUSE_SPEC16_H */
+#endif			/* #ifndef FUSE_MACHINES_H */
