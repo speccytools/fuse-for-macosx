@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "16th August, 2002" "Version 0.5.0" "Emulators"
+.TH fuse 1 "17th August, 2002" "Version 0.5.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -159,6 +159,16 @@ SNA, or SLT format.
 .RS
 Specify the sound output device to use. Generally you shouldn't need
 to specify this, but it might be useful if you have more than one.
+.RE
+.PP
+.I "-v mode"
+.br
+.I "--svga-mode mode"
+.RS
+Specify which mode to use for the SVGAlib UI. Available values for
+.I mode
+are `320' (which corresponds to a 320x240x256 mode), the default and
+`640' (a 640x480x256 mode).
 .RE
 .PP
 .I "-t file"

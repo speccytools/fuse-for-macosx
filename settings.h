@@ -62,6 +62,8 @@ typedef struct settings_info {
   int show_version;
   int show_help;
 
+  int svga_mode;
+
 } settings_info;
 
 extern settings_info settings_current;

@@ -87,6 +87,8 @@ int settings_defaults( settings_info *settings )
 
   settings->start_machine = "48";
 
+  settings->svga_mode = 320;
+
   return 0;
 }
 
@@ -136,6 +138,8 @@ static int settings_command_line( int argc, char **argv,
     {          "help", 0, NULL, 'h' },
     {       "version", 0, NULL, 'V' },
 
+    {     "svga-mode", 1, NULL, 'v' },
+
     { 0, 0, 0, 0 }		/* End marker: DO NOT REMOVE */
   };
 
@@ -145,9 +149,9 @@ static int settings_command_line( int argc, char **argv,
     int c;
 
 #ifdef HAVE_GETOPT_LONG
-    c = getopt_long( argc, argv, "d:hm:o:p:r:s:t:V", long_options, NULL );
+    c = getopt_long( argc, argv, "d:hm:o:p:r:s:t:v:V", long_options, NULL );
 #else				/* #ifdef HAVE_GETOPT_LONG */
-    c = getopt( argc, argv, "d:hm:o:p:r:s:t:V" );
+    c = getopt( argc, argv, "d:hm:o:p:r:s:t:v:V" );
 #endif				/* #ifdef HAVE_GETOPT_LONG */
 
     if( c == -1 ) break;	/* End of option list */
@@ -183,6 +187,8 @@ static int settings_command_line( int argc, char **argv,
 
     case 's': settings->snapshot = optarg; break;
     case 't': settings->tape_file = optarg; break;
+
+    case 'v': settings->svga_mode = atoi( optarg ); break;
 
     case 'V': settings->show_version = 1; break;
 

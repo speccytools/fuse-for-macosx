@@ -36,6 +36,8 @@
 
 #include "fuse.h"
 #include "display.h"
+#include "settings.h"
+#include "ui/ui.h"
 #include "ui/uidisplay.h"
 
 static unsigned char *image;
@@ -46,26 +48,55 @@ static int svgadisplay_allocate_image(int width, int height);
 
 static void svgadisplay_area(int x, int y, int width, int height);
 
+typedef struct svga_mode_t {
+  int fuse_id;
+  int svgalib_id;
+  int hires;
+} svga_mode_t;
+
+svga_mode_t available_modes[] = {
+#ifdef G640x480x256
+  { 640, G640x480x256,  1 },
+#endif				/* #ifdef G640x480x256 */
+#ifdef G320x240x256V
+  { 320, G320x240x256V, 0 },
+#endif				/* #ifdef G320x240x256V */
+  {   0, G320x240x256,  0 },
+};
+
+size_t mode_count = sizeof( available_modes ) / sizeof( svga_mode_t );
+
 int uidisplay_init(int width, int height)
 {
+  size_t i;
+  int found_mode = 0;
 
   vga_init();
 
-#ifdef G640x480x256
-  if( vga_hasmode( G640x480x256 ) ) {
-    vga_setmode( G640x480x256 );
-    hires = 1;
-  } else 
-#endif				/* #ifdef G640x480x256 */
-#ifdef G320x240x256V
-  if( vga_hasmode( G320x240x256V ) ) {
-    vga_setmode( G320x240x256V );
-    hires = 0;
-  } else
-#endif				/* #ifdef G320x240x256V */
-  {
-    vga_setmode( G320x240x256 );
-    hires = 0;
+  /* First, see if our preferred mode exists */
+  for( i=0; i<mode_count && !found_mode; i++ ) {
+    if( available_modes[i].fuse_id == settings_current.svga_mode ) {
+      if( vga_hasmode( available_modes[i].svgalib_id ) ) {
+	vga_setmode( available_modes[i].svgalib_id );
+	hires = available_modes[i].hires;
+	found_mode = 1;
+      }
+    }
+  }
+
+  /* If we haven't found a mode yet, try each in order */
+  for( i=0; i<mode_count && !found_mode; i++ ) {
+    if( vga_hasmode( available_modes[i].svgalib_id ) ) {
+      vga_setmode( available_modes[i].svgalib_id );
+      hires = available_modes[i].hires;
+      found_mode = 1;
+    }
+  }
+
+  /* Error out if we couldn't find a VGA mode */
+  if( !found_mode ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find a mode to start in" );
+    return 1;
   }
 
   if( hires ) {
