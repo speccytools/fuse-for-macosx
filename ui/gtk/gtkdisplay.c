@@ -40,10 +40,10 @@
 #include "widget/widget.h"
 #include "scld.h"
 
-static GdkGC *gc;
+GdkGC *gtkdisplay_gc;
 static GdkImage *image;
 
-static unsigned long colours[16];
+unsigned long gtkdisplay_colours[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int gtkdisplay_current_size=1;
@@ -74,10 +74,11 @@ int uidisplay_init(int width, int height)
 
   gdk_window_get_geometry( gtkui_drawing_area->window, &x, &y,
 			   &get_width, &get_height, &depth );
-  gc = gtk_gc_get(depth, gtk_widget_get_colormap(gtkui_drawing_area),
-		  &gc_values, (GdkGCValuesMask) 0 );
+  gtkdisplay_gc =
+    gtk_gc_get( depth, gtk_widget_get_colormap( gtkui_drawing_area ),
+		&gc_values, (GdkGCValuesMask) 0 );
 
-  if( gtkdisplay_allocate_colours( colours ) ) return 1;
+  if( gtkdisplay_allocate_colours( gtkdisplay_colours ) ) return 1;
 
   return 0;
 }
@@ -195,11 +196,11 @@ void uidisplay_putpixel(int x,int y,int colour)
   switch(gtkdisplay_current_size) {
   case 1:
     if(x%2!=0) return;
-    gdk_image_put_pixel(image, x>>1, y, colours[colour]);
+    gdk_image_put_pixel( image, x>>1, y, gtkdisplay_colours[colour] );
     break;
   case 2:
-    gdk_image_put_pixel(image,x,  y<<1   ,colours[colour]);
-    gdk_image_put_pixel(image,x, (y<<1)+1,colours[colour]);
+    gdk_image_put_pixel( image,x,  y<<1   , gtkdisplay_colours[colour] );
+    gdk_image_put_pixel( image,x, (y<<1)+1, gtkdisplay_colours[colour] );
     break;
   }
 }
@@ -213,7 +214,8 @@ void uidisplay_lines( int start, int end )
 
 static void gtkdisplay_area(int x, int y, int width, int height)
 {
-  gdk_draw_image(gtkui_drawing_area->window,gc,image,x,y,x,y,width,height);
+  gdk_draw_image( gtkui_drawing_area->window, gtkdisplay_gc, image, x, y, x, y,
+		  width, height );
 }
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
@@ -232,7 +234,7 @@ int uidisplay_end(void)
 /*    XDestroyImage(image); */
 
   /* Free the allocated GC */
-  gtk_gc_release(gc);
+  gtk_gc_release( gtkdisplay_gc );
 
   return 0;
 }

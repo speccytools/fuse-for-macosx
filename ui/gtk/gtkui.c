@@ -706,9 +706,7 @@ gtkui_disk_eject_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  widget_picture_data picture_data = { "keyboard.scr", NULL, 0 };
-
-  widget_menu_keyboard( &picture_data );
+  gtkui_picture( "keyboard.scr", 0 );
 }
 
 /* Generic `tidy-up' callback */

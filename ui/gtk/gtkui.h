@@ -38,8 +38,13 @@
 extern GtkWidget* gtkui_window;
 extern GtkWidget* gtkui_drawing_area;
 
+extern GdkGC *gtkdisplay_gc;
+extern unsigned long gtkdisplay_colours[];
+
 void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
 void gtk_tape_browse( GtkWidget *widget, gpointer data );
+
+int gtkui_picture( const char *filename, int border );
 
 extern void gtkui_popup_menu(void);
 
