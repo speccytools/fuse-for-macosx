@@ -37,7 +37,6 @@
 #include "zxatasp.h"
 
 /*
-  TBD: Allow save/load of memory
   TBD: Allow memory size selection (128K/512K)
   TBD: Should support for secondary channel be removed?
        No software ever supported it, and v2.0+ boards don't have it.
@@ -91,28 +90,44 @@ static size_t current_page;
 static libspectrum_ide_channel *zxatasp_idechn0;
 static libspectrum_ide_channel *zxatasp_idechn1;
 
-static libspectrum_byte ZXATASPMEM[ 32 ][ 0x4000 ];
+#define ZXATASP_PAGES 32
+#define ZXATASP_PAGE_LENGTH 0x4000
+static libspectrum_byte ZXATASPMEM[ ZXATASP_PAGES ][ ZXATASP_PAGE_LENGTH ];
+
+static const size_t ZXATASP_NOT_PAGED = 0xff;
 
 /* We're ignoring all mode bits and only emulating mode 0, basic I/O */
-#define MC8255_PORT_C_LOW_IO  0x01
-#define MC8255_PORT_B_IO      0x02
-#define MC8255_PORT_C_HI_IO   0x08
-#define MC8255_PORT_A_IO      0x10
-#define MC8255_SETMODE        0x80
+static const libspectrum_byte MC8255_PORT_C_LOW_IO  = 0x01;
+static const libspectrum_byte MC8255_PORT_B_IO      = 0x02;
+static const libspectrum_byte MC8255_PORT_C_HI_IO   = 0x08;
+static const libspectrum_byte MC8255_PORT_A_IO      = 0x10;
+static const libspectrum_byte MC8255_SETMODE        = 0x80;
 
-#define ZXATASP_IDE_REG       0x07
-#define ZXATASP_RAM_BANK      0x1f
-#define ZXATASP_IDE_WR        0x08
-#define ZXATASP_IDE_RD        0x10
-#define ZXATASP_IDE_PRIMARY   0x20
-#define ZXATASP_RAM_LATCH     0x40
-#define ZXATASP_RAM_DISABLE   0x80
-#define ZXATASP_IDE_SECONDARY 0x80
+static const libspectrum_byte ZXATASP_IDE_REG       = 0x07;
+static const libspectrum_byte ZXATASP_RAM_BANK      = 0x1f;
+static const libspectrum_byte ZXATASP_IDE_WR        = 0x08;
+static const libspectrum_byte ZXATASP_IDE_RD        = 0x10;
+static const libspectrum_byte ZXATASP_IDE_PRIMARY   = 0x20;
+static const libspectrum_byte ZXATASP_RAM_LATCH     = 0x40;
+static const libspectrum_byte ZXATASP_RAM_DISABLE   = 0x80;
+static const libspectrum_byte ZXATASP_IDE_SECONDARY = 0x80;
 
-#define ZXATASP_READ_PRIMARY( x )     ( ( x & 0x78 ) == 0x30 )
-#define ZXATASP_WRITE_PRIMARY( x )    ( ( x & 0x78 ) == 0x28 )
-#define ZXATASP_READ_SECONDARY( x )   ( ( x & 0xd8 ) == 0x90 )
-#define ZXATASP_WRITE_SECONDARY( x )  ( ( x & 0xd8 ) == 0x88 )
+#define ZXATASP_READ_PRIMARY( x )    \
+  ( ( x & ( ZXATASP_IDE_PRIMARY   | ZXATASP_RAM_LATCH |        \
+            ZXATASP_IDE_RD        | ZXATASP_IDE_WR      ) ) == \
+          ( ZXATASP_IDE_PRIMARY   | ZXATASP_IDE_RD )             )
+#define ZXATASP_WRITE_PRIMARY( x )   \
+  ( ( x & ( ZXATASP_IDE_PRIMARY   | ZXATASP_RAM_LATCH |        \
+            ZXATASP_IDE_RD        | ZXATASP_IDE_WR      ) ) == \
+          ( ZXATASP_IDE_PRIMARY   | ZXATASP_IDE_WR )             )
+#define ZXATASP_READ_SECONDARY( x )  \
+  ( ( x & ( ZXATASP_IDE_SECONDARY | ZXATASP_RAM_LATCH |        \
+            ZXATASP_IDE_RD        | ZXATASP_IDE_WR      ) ) == \
+          ( ZXATASP_IDE_SECONDARY | ZXATASP_IDE_RD )             )
+#define ZXATASP_WRITE_SECONDARY( x ) \
+  ( ( x & ( ZXATASP_IDE_SECONDARY | ZXATASP_RAM_LATCH |        \
+            ZXATASP_IDE_RD        | ZXATASP_IDE_WR      ) ) == \
+          ( ZXATASP_IDE_SECONDARY | ZXATASP_IDE_WR )             )
 
 /* Housekeeping functions */
 
@@ -160,8 +175,9 @@ zxatasp_end( void )
 void
 zxatasp_reset( void )
 {
-  set_zxatasp_bank( 0 ); current_page = 255;
-  zxatasp_control = 0x9b;
+  set_zxatasp_bank( 0 ); current_page = ZXATASP_NOT_PAGED;
+  zxatasp_control = MC8255_SETMODE | MC8255_PORT_A_IO | MC8255_PORT_B_IO |
+                    MC8255_PORT_C_HI_IO | MC8255_PORT_C_LOW_IO;
   zxatasp_resetports();
 
   libspectrum_ide_reset( zxatasp_idechn0 );
@@ -339,7 +355,7 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 
     if( newC & ZXATASP_RAM_DISABLE ) {
       machine_current->ram.romcs = 0;
-      current_page = 255;
+      current_page = ZXATASP_NOT_PAGED;
     } else {
       machine_current->ram.romcs = 1;
       current_page = newC & ZXATASP_RAM_BANK;
@@ -467,13 +483,6 @@ zxatasp_ram( size_t page )
 }
 
 void
-zxatasp_restore( libspectrum_byte portA, libspectrum_byte portB,
-		 libspectrum_byte portC, libspectrum_byte control,
-		 size_t page )
-{
-}
-
-void
 zxatasp_memory_map( void )
 {
   int writable;
@@ -513,7 +522,7 @@ zxatasp_from_snapshot( libspectrum_snap *snap )
 
   page = libspectrum_snap_zxatasp_current_page( snap );
 
-  if( page != 255 ) {
+  if( page != ZXATASP_NOT_PAGED ) {
     machine_current->ram.romcs = 1;
     set_zxatasp_bank( page );
   }
@@ -521,7 +530,7 @@ zxatasp_from_snapshot( libspectrum_snap *snap )
   for( i = 0; i < libspectrum_snap_zxatasp_pages( snap ); i++ )
     if( libspectrum_snap_zxatasp_ram( snap, i ) )
       memcpy( ZXATASPMEM[ i ], libspectrum_snap_zxatasp_ram( snap, i ),
-	      0x4000 );
+	      ZXATASP_PAGE_LENGTH );
 
   machine_current->memory_map();
 
@@ -547,17 +556,17 @@ zxatasp_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_zxatasp_control( snap, zxatasp_control );
   libspectrum_snap_set_zxatasp_current_page( snap, current_page );
 
-  libspectrum_snap_set_zxatasp_pages( snap, 32 );
+  libspectrum_snap_set_zxatasp_pages( snap, ZXATASP_PAGES );
 
-  for( i = 0; i < 32; i++ ) {
+  for( i = 0; i < ZXATASP_PAGES; i++ ) {
 
-    buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+    buffer = malloc( ZXATASP_PAGE_LENGTH * sizeof( libspectrum_byte ) );
     if( !buffer ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;
     }
 
-    memcpy( buffer, ZXATASPMEM[ i ], 0x4000 );
+    memcpy( buffer, ZXATASPMEM[ i ], ZXATASP_PAGE_LENGTH );
     libspectrum_snap_set_zxatasp_ram( snap, i, buffer );
   }
   

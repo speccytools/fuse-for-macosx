@@ -65,7 +65,9 @@ static int zxcf_writeenable;
 
 static libspectrum_ide_channel *zxcf_idechn;
 
-static libspectrum_byte ZXCFMEM[ 64 ][ 0x4000 ];
+#define ZXCF_PAGES 64
+#define ZXCF_PAGE_LENGTH 0x4000
+static libspectrum_byte ZXCFMEM[ ZXCF_PAGES ][ ZXCF_PAGE_LENGTH ];
 
 static libspectrum_byte last_memctl;
 
@@ -259,7 +261,8 @@ zxcf_from_snapshot( libspectrum_snap *snap )
 
   for( i = 0; i < libspectrum_snap_zxcf_pages( snap ); i++ )
     if( libspectrum_snap_zxcf_ram( snap, i ) )
-      memcpy( ZXCFMEM[ i ], libspectrum_snap_zxcf_ram( snap, i ), 0x4000 );
+      memcpy( ZXCFMEM[ i ], libspectrum_snap_zxcf_ram( snap, i ),
+	      ZXCF_PAGE_LENGTH );
   
   return 0;
 }
@@ -275,17 +278,17 @@ zxcf_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_zxcf_active( snap, 1 );
   libspectrum_snap_set_zxcf_upload( snap, settings_current.zxcf_upload );
   libspectrum_snap_set_zxcf_memctl( snap, last_memctl );
-  libspectrum_snap_set_zxcf_pages( snap, 64 );
+  libspectrum_snap_set_zxcf_pages( snap, ZXCF_PAGES );
 
-  for( i = 0; i < 64; i++ ) {
+  for( i = 0; i < ZXCF_PAGES; i++ ) {
 
-    buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+    buffer = malloc( ZXCF_PAGE_LENGTH * sizeof( libspectrum_byte ) );
     if( !buffer ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;
     }
 
-    memcpy( buffer, ZXCFMEM[ i ], 0x4000 );
+    memcpy( buffer, ZXCFMEM[ i ], ZXCF_PAGE_LENGTH );
     libspectrum_snap_set_zxcf_ram( snap, i, buffer );
   }
 
