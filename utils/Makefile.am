@@ -26,11 +26,12 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = rzxdump rzxtool tzxlist
 
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
+
 rzxdump_SOURCES = rzxdump.c
 
 rzxtool_SOURCES = rzxtool.c
 rzxtool_LDADD = ../libspectrum/libspectrum.a @ZLIB_LIBS@
 
 tzxlist_SOURCES = tzxlist.c
-tzxlist_INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
 tzxlist_LDADD = @GLIB_LIBS@ @GTK_LIBS@ ../libspectrum/libspectrum.a ../myglib/libmyglib.a
