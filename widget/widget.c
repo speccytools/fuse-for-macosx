@@ -58,7 +58,7 @@ static int widget_read_font( const char *filename, size_t offset )
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    fprintf( stderr,"%s: couldn't find ROM `%s'", fuse_progname, filename );
+    fprintf( stderr,"%s: couldn't find ROM `%s'\n", fuse_progname, filename );
     return 1;
   }
 
@@ -153,7 +153,7 @@ int widget_init( void )
 {
   int error;
 
-  error = widget_read_font( "roms/48.rom", 15617 );
+  error = widget_read_font( "48.rom", 15617 );
   if( error ) return error;
 
   widget_filenames = NULL;
