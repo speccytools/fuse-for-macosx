@@ -29,6 +29,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "if2.h"
 #include "joystick.h"
 #include "periph.h"
 #include "rzx.h"
@@ -255,7 +256,7 @@ static periph_present kempston_present;
 int periph_kempston_active;
 
 /* What sort of Interface II does the current machine have */
-static periph_present interface2_present;
+periph_present interface2_present;
 
 /* Is the Interface II currently active */
 int periph_interface2_active;
@@ -313,13 +314,20 @@ periph_update( void )
   case PERIPH_PRESENT_ALWAYS: periph_kempston_active = 1; break;
   }
   switch( interface2_present ) {
-  case PERIPH_PRESENT_NEVER: periph_interface2_active = 0; break;
+  case PERIPH_PRESENT_NEVER:
+    periph_interface2_active = 0;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, 0 );
+    break;
   case PERIPH_PRESENT_OPTIONAL:
-    periph_interface2_active = settings_current.interface2; break;
-  case PERIPH_PRESENT_ALWAYS: periph_interface2_active = 1; break;
+    periph_interface2_active = settings_current.interface2;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
+                      periph_interface2_active );
+    break;
+  case PERIPH_PRESENT_ALWAYS:
+    periph_interface2_active = 1;
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, 1 );
+    break;
   }
 
   update_ide_menu();
-
-  machine_current->memory_map();
 }

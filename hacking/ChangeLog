@@ -874,3 +874,5 @@
 20040528 ui/gtk/gtkui.c: refactor the menu item (de)activation code.
 20040528 settings.pl: Make 2048 ROM label consistent with the others.
 20040528 ui/gtk/debugger.c: Fix Timex HSR and DEC register display.
+20040528 periph.c: Enable/disable Interface II menu items as interface is
+         enabled and disabled.
