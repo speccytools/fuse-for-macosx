@@ -163,10 +163,9 @@ my %ui_data = (
 
     sdl  => { headers => [ 'SDL.h' ],
 	      max_length => 15,
-	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R ) },
+	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R Caps_Lock ) },
 	      translations => {
 		  apostrophe  => 'QUOTE',
-		  Caps_Lock   => 'CAPSLOCK',
 		  Control_L   => 'LCTRL',	 
 		  Control_R   => 'RCTRL',	 
 		  equal       => 'EQUALS',

@@ -1074,3 +1074,4 @@
 20040918 menu.[ch],menu_data.c,rzx.[ch],machine/Makefile.am,sound/Makefile.am,
 	 ui/ui.h,ui/gtk/{Makefile.am,rollback.c}: allow RZX rollback to
 	 arbitrary points.
+20041002 keysyms.pl: SDL does not support caps lock as used in Fuse.
