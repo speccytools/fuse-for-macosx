@@ -30,6 +30,8 @@ libz80_a_SOURCES = z80.c z80_ops.c
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
+BUILT_SOURCES = opcodes_base.c
+
 opcodes_base.c: z80.pl opcodes_base.dat
 	@PERL@ z80.pl opcodes_base.dat > opcodes_base.c
 
