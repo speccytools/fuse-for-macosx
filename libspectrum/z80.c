@@ -43,9 +43,10 @@ static const int LIBSPECTRUM_Z80_HEADER_LENGTH = 30;
 #define LIBSPECTRUM_Z80_V3X_LENGTH 55
 
 static int read_v1_block( uchar *buffer, int is_compressed, 
-			  uchar **uncompressed, uchar **next_block );
+			  uchar **uncompressed, uchar **next_block,
+			  uchar *end );
 static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
-			  int *page, uchar **next_block );
+			  int *page, uchar **next_block, uchar *end );
 
 int libspectrum_z80_read( uchar *buffer, size_t buffer_length,
 			  libspectrum_snap *snap )
@@ -171,7 +172,7 @@ int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
        `z80dump'; thanks to Pedro Gimeno for pointing this out when
        this code was part of SnapConv */
     snap->tstates= ( ( (extra_header[25]+1) % 4 ) + 1 ) * quarter_tstates -
-      1 - extra_header[23] - extra_header[24]*0x100;
+      ( extra_header[23] + extra_header[24]*0x100 + 1 );
 
     (*data) = buffer + LIBSPECTRUM_Z80_HEADER_LENGTH + 2 + extra_length;
 
@@ -206,7 +207,7 @@ int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
 
     int error;
 
-    error = libspectrum_z80_read_block( next_block, snap, &next_block );
+    error = libspectrum_z80_read_block( next_block, snap, &next_block, end );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   }
@@ -216,7 +217,7 @@ int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
 }
 
 int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
-				uchar **next_block )
+				uchar **next_block, uchar *end )
 {
   int error;
   uchar *uncompressed;
@@ -224,7 +225,7 @@ int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
   if( snap->version == 1 ) {
 
     error = read_v1_block( buffer, snap->compressed, &uncompressed,
-			   next_block );
+			   next_block, end );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
     libspectrum_split_to_48k_pages( snap, uncompressed );
@@ -236,7 +237,8 @@ int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
     size_t length;
     int page;
 
-    error = read_v2_block( buffer, &uncompressed, &length, &page, next_block );
+    error = read_v2_block( buffer, &uncompressed, &length, &page, next_block,
+			   end );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
     if( page <= 0 || page > 11 ) return LIBSPECTRUM_ERROR_UNKNOWN;
@@ -281,7 +283,8 @@ int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
 }
 
 static int read_v1_block( uchar *buffer, int is_compressed, 
-			  uchar **uncompressed, uchar **next_block )
+			  uchar **uncompressed, uchar **next_block,
+			  uchar *end )
 {
   if( is_compressed ) {
     
@@ -292,6 +295,8 @@ static int read_v1_block( uchar *buffer, int is_compressed,
     state = 0; ptr = buffer;
 
     while( state != 4 ) {
+
+      if( ptr == end ) return LIBSPECTRUM_ERROR_CORRUPT;
 
       switch( state ) {
       case 0:
@@ -342,7 +347,7 @@ static int read_v1_block( uchar *buffer, int is_compressed,
 }
 
 static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
-			  int *page, uchar **next_block )
+			  int *page, uchar **next_block, uchar *end )
 {
   size_t length2;
 
@@ -354,6 +359,9 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
 
     int error;
 
+    /* Check we're not going to run over the end of the buffer */
+    if( buffer + 3 + length2 >= end ) return LIBSPECTRUM_ERROR_CORRUPT;
+
     (*length)=0;
     error = libspectrum_z80_uncompress_block(
       block, length, buffer+3, length2
@@ -363,6 +371,9 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
     (*next_block) = buffer + 3 + length2;
 
   } else { /* Uncompressed block */
+
+    /* Check we're not going to run over the end of the buffer */
+    if( buffer + 3 + 0x4000 >= end ) return LIBSPECTRUM_ERROR_CORRUPT;
 
     (*block) = (uchar*)malloc( 0x4000 * sizeof(uchar) );
     if( (*block) == NULL ) return LIBSPECTRUM_ERROR_MEMORY;

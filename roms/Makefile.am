@@ -30,4 +30,3 @@ ROMS = 128-0.rom 128-1.rom 48.rom plus2-0.rom plus2-1.rom plus3-0.rom\
 pkgdata_DATA = $(ROMS)
 
 EXTRA_DIST = $(ROMS)
-

@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libspectrum.a
 
-libspectrum_a_SOURCES = libspectrum.c z80.c
+libspectrum_a_SOURCES = libspectrum.c sna.c z80.c
 
 noinst_HEADERS = libspectrum.h
 

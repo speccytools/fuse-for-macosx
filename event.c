@@ -32,7 +32,7 @@
 #ifdef HAVE_LIB_GLIB		/* If we're using glib */
 #include <glib.h>
 #else				/* #ifdef HAVE_LIB_GLIB */
-#include "glib.h"		/* If not, use the local replacement */
+#include "myglib.h"		/* If not, use the local replacement */
 #endif
 
 #include "display.h"

@@ -29,6 +29,10 @@
 
 #include <config.h>
 
+#ifndef _STDLIB_H
+#include <stdlib.h>
+#endif			/* #ifndef _STDLIB_H */
+
 #if   SIZEOF_CHAR  == 1
 typedef unsigned  char libspectrum_byte;
 #elif SIZEOF_SHORT == 1
@@ -129,6 +133,16 @@ int libspectrum_make_room( uchar **dest, size_t requested, uchar **ptr,
 
 int libspectrum_write_word( uchar *buffer, libspectrum_word w );
 
+/* .sna specific routines */
+
+int libspectrum_sna_read( uchar *buffer, size_t buffer_length,
+			  libspectrum_snap *snap );
+int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
+				 libspectrum_snap *snap );
+int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
+			       libspectrum_machine type,
+			       libspectrum_snap *snap );
+
 /* .z80 specific routines */
 
 int libspectrum_z80_read( uchar *buffer, size_t buffer_length,
@@ -138,7 +152,7 @@ int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
 int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
 				 libspectrum_snap *snap );
 int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
-				uchar **next_block );
+				uchar **next_block, uchar *end );
 
 int libspectrum_z80_write( uchar **buffer, size_t *length,
 			   libspectrum_snap *snap );
