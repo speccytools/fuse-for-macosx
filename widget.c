@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <signal.h>
 #include <string.h>
+#include <sys/time.h>
 #include <errno.h>
 
 #include "fuse.h"
@@ -12,7 +14,7 @@
 #include "uidisplay.h"
 #include "font.h"
 #include "keyboard.h"
-#include "snapshot.h"
+#include "widget.h"
 
 int widget_keymode;
 
@@ -58,7 +60,7 @@ static void rect(int x, int y, int w, int h, int col) {
 /* ------------------------------------------------------------------ */
 
 static int numfiles;
-static char filenames[8192][64];
+static char **filenames;
 
 static int select_file(const struct dirent *dirent){
     if(dirent->d_name && strcmp(dirent->d_name,".")) {
@@ -75,102 +77,281 @@ static void scan(char *dir) {
     qsort(filenames[0], numfiles, 64, strcmp);
 }
 
-static int i,k;
+/* Are we in a widget at the moment? (Used by the key handling routines
+   to know whether to call the Spectrum or widget key handler) */
+int widget_active;
 
-void widget_selectfile(void) {
-    char d[512];
-    int j;
-    char s[14];
-    
-    getcwd(d,510);
-    scan(d);
-    i=0;
-    k=0;
-    
-    rect(6,6,244,180,9);
-    rect(8,8,240,176,8);
-    for(j=0;j<36;j++) if(i+j<numfiles){
-        strncpy(s,filenames[i+j],13);
-        s[13]=0;
-        printstring(2+(j&1)*15, 3+j/2, 2, s);
-    }
-    strncpy(s,filenames[k],13);
-    s[13]=0;
-    printstring(2+(k&1)*15, 3+k/2, 1, s);
-    uidisplay_lines(DISPLAY_BORDER_HEIGHT, DISPLAY_BORDER_HEIGHT+192);
-    strncpy(s,filenames[k],13);
-    s[13]=0;
-    printstring(2+(k&1)*15, 3+k/2, 2, s);
+/* The keyhandler to use for the current widget */
+widget_keyhandler_fn widget_keyhandler;
+
+/* Two ways of finishing a widget */
+typedef enum widget_finish_state {
+  WIDGET_FINISHED_OK,
+  WIDGET_FINISHED_CANCEL,
+} widget_finish_state;
+
+/* Have we finished with this widget, and if so in which way? */
+static widget_finish_state widget_finished;
+
+/* Global initialisation/end routines */
+
+int widget_init( void )
+{
+  int i;
+
+  filenames = (char**)malloc( 8192 * sizeof( char* ) );
+  if( filenames == NULL ) return 1;
+
+  for( i=0; i<8192; i++ ) {
+    filenames[i] = (char*)malloc( 64 * sizeof( char ) );
+    if( filenames[i] == NULL ) return 1;
+  }
+
+  return 0;
 }
 
-void widget_handlekeys(int key) {
-    int nk;
-    char fn[1024];
-    nk=k;
-    switch(key) {
-        case KEYBOARD_1:
-            widget_keymode=0;
-            display_refresh_all();
-            break;
-        case KEYBOARD_8:
-            if(k<numfiles-1)nk++;
-            break;
-        case KEYBOARD_6:
-            if(k<numfiles-2)nk+=2;
-            break;
-        case KEYBOARD_5:
-            if(k>0)nk--;
-            break;
-        case KEYBOARD_7:
-            if(k>1)nk-=2;
-            break;
-        case KEYBOARD_Enter:
-            getcwd(fn,500);
-            strcat(fn,"/");
-            strncat(fn,filenames[k],500);
-            if(chdir(fn)==-1) {
-                if(errno==ENOTDIR) {
-                    snapshot_read(fn);
-                    widget_keymode=0;
-                    display_refresh_all();
-                }
-            } else {
-                widget_selectfile();
-                nk=0;
-            }
-            break;
-    }
-    if(nk!=k) {
-        char s[14];
-        int r;
+int widget_end( void )
+{
+  return 0;
+}
+
+/* Widget timer routines */
+
+/* FIXME: race conditions */
+
+static struct sigaction widget_timer_old_handler;
+static struct itimerval widget_timer_old_timer;
+
+static void widget_timer_signal( int signo );
+
+static int widget_timer_init( void )
+{
+  struct sigaction handler;
+  struct itimerval timer;
+
+  handler.sa_handler = widget_timer_signal;
+  sigemptyset( &handler.sa_mask );
+  handler.sa_flags = 0;
+  sigaction( SIGALRM, &handler, &widget_timer_old_handler );
+
+  timer.it_interval.tv_sec = 0;
+  timer.it_interval.tv_usec = 20000;
+  timer.it_value.tv_sec = 0;
+  timer.it_value.tv_usec = 20000;
+  setitimer( ITIMER_REAL, &timer, &widget_timer_old_timer );
+
+  return 0;
+}
+
+/* The signal handler: just wake up */
+static void widget_timer_signal( int signo )
+{
+  return;
+}
+
+static int widget_timer_end( void )
+{
+  /* Restore the old timer */
+  setitimer( ITIMER_REAL, &widget_timer_old_timer, NULL);
+
+  /* And the old signal handler */
+  sigaction( SIGALRM, &widget_timer_old_handler, NULL);
+
+  return 0;
+}
+
+/* File selection widget */
+
+/* The number of the filename in the top-left corner of the current
+   display, that of the filename which the `cursor' is on, and that
+   which it will be on after this keypress */
+static int top_left_file, current_file, new_current_file;
+
+static int widget_print_all_filenames( char **filenames, int n,
+				       int top_left, int current );
+static int widget_print_filename( char *filename, int position, int colour );
+static void widget_selectfile_keyhandler( int key );
+
+const char* widget_selectfile( void )
+{
+  char d[512], *ptr;
+
+  int error;
+
+  error = widget_timer_init();
+  if( error ) return NULL;
+
+  ptr = getcwd( d, 510 );
+  /* FIXME: do something proper if the path is too long (errno == ERANGE) */
+  if( ptr == NULL ) {
+    return NULL;
+  }
+
+  scan(d);
+  current_file = 0;
+  top_left_file = 0;
+    
+  /* A bright blue border */
+  /* FIXME: Do this more efficiently! */
+  rect(6,6,244,180,9);
+
+  /* And set up the key handler */
+  widget_keyhandler = widget_selectfile_keyhandler;
+
+  /* Show all the filenames */
+  widget_print_all_filenames( filenames, numfiles,
+			      top_left_file, current_file );
+
+  /* And note we're in a widget */
+  widget_active = 1;
+  widget_finished = 0;
+
+  while( 1 ) { 
+
+    /* Go to sleep for a bit */
+    pause();
+
+    /* Now process any events which have occured; the important one
+       here is a `keypress' event, which will call one of the
+       widget_*_keyhandler functions, which may change new_current_file or
+       set widget_finished */
+    ui_event();
+
+    /* If we're done, exit the loop */
+    if( widget_finished ) break;
+
+    /* If we did move the `cursor' */
+    if( new_current_file != current_file ) {
+
+      current_file = new_current_file;
+
+      /* If we've got off the top or bottom of the currently
+	 displayed file list, then reset the top-left corner and
+	 display the whole thing */
+      if( current_file <  top_left_file    ||
+	  current_file >= top_left_file+36    ) {
+
+	top_left_file = current_file & ~1;
+	widget_print_all_filenames( filenames, numfiles,
+				    top_left_file, current_file );
+
+      } else {
+
+	/* Otherwise, just reprint the new current file, display the
+	   screen, and then print the current file back in red so
+	   we don't have to do so later */
+
+	widget_print_filename( filenames[ current_file ],
+			       current_file - top_left_file, 1 );
         
-        r=0;
-        if(nk<i) {
-            i=nk&~1;
-            r=1;
-        }
-        if(nk>i+35) {
-            i=nk&~1;
-            i-=34;
-            r=1;
-        }
-        if(r) {
-            int j;
-            rect(8,8,240,176,8);
-            for(j=0;j<36;j++) if(i+j<numfiles){
-                strncpy(s,filenames[i+j],13);
-                s[13]=0;
-                printstring(2+(j&1)*15, 3+j/2, 2, s);
-            }
-        }
-        
-        strncpy(s,filenames[nk],13);
-        s[13]=0;
-        printstring(2+((nk-i)&1)*15, 3+(nk-i)/2, 1, s);
-        uidisplay_lines(DISPLAY_BORDER_HEIGHT, DISPLAY_BORDER_HEIGHT+192);
-        strncpy(s,filenames[nk],13);
-        s[13]=0;
-        printstring(2+((nk-i)&1)*15, 3+(nk-i)/2, 2, s);
-        k=nk;
+	uidisplay_lines(DISPLAY_BORDER_HEIGHT, DISPLAY_BORDER_HEIGHT+192);
+	  
+	widget_print_filename( filenames[ current_file ],
+			       current_file - top_left_file, 2 );
+	  
+      }
     }
+  }
+
+  /* We've finished with the widget */
+  widget_active = 0;
+
+  /* Deactivate the widget's timer */
+  widget_timer_end();
+
+  /* Now return, either with a filename or without as appropriate */
+  if( widget_finished == WIDGET_FINISHED_OK ) {
+    return filenames[ current_file ];
+  } else {
+    return NULL;
+  }
+
+}
+
+static int widget_print_all_filenames( char **filenames, int n,
+				       int top_left, int current )
+{
+  int i;
+
+  /* Give us a nice black box to start with */
+  rect( 8, 8, 240, 176, 8 );
+
+  /* Print the filenames, mostly in red, but with the currently selected
+     file in blue */
+  for( i=top_left; i<n && i<top_left+36; i++ ) {
+    if( i == current ) {
+      widget_print_filename( filenames[i], i-top_left, 1 );
+    } else {
+      widget_print_filename( filenames[i], i-top_left, 2 );
+    }
+  }
+
+  /* Display that lot */
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT,
+		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
+
+  /* Now print the currently selected file in red, so we don't have
+     to worry about doing it later */
+  widget_print_filename( filenames[ current_file ], current_file-top_left, 2 );
+
+  return 0;
+}
+
+static int widget_print_filename( char *filename, int position, int colour )
+{
+  char buffer[14];
+
+  strncpy( buffer, filename, 13 ); buffer[13] = '\0';
+  printstring( 2 + ( position & 1 ) * 15, 3 + position/2, colour, buffer );
+
+  return 0;
+}
+
+static void widget_selectfile_keyhandler( int key )
+{
+  char fn[1024];
+
+  new_current_file = current_file;
+
+  switch(key) {
+  case KEYBOARD_1:		/* 1 used as `Escape' generates `EDIT',
+				   which is Caps + 1 */
+    widget_finished = WIDGET_FINISHED_CANCEL;
+    break;
+  
+  case KEYBOARD_5:		/* Left */
+    if( current_file > 0          ) new_current_file--;
+    break;
+
+  case KEYBOARD_6:		/* Down */
+    if( current_file < numfiles-2 ) new_current_file += 2;
+    break;
+
+  case KEYBOARD_7:		/* Up */
+    if( current_file > 1          ) new_current_file -= 2;
+    break;
+
+  case KEYBOARD_8:		/* Right */
+    if( current_file < numfiles-1 ) new_current_file++;
+    break;
+
+  case KEYBOARD_Enter:
+    /* Get the new directory name */
+    /* FIXME: handle out of length errors properly */
+    getcwd( fn, 500 ); strcat( fn, "/" );
+    strncat( fn, filenames[ current_file ], 500 );
+
+    if(chdir(fn)==-1) {
+      if(errno==ENOTDIR) {
+	widget_finished = WIDGET_FINISHED_OK;
+      }
+    } else {
+      scan( fn );
+      new_current_file = 0;
+      /* Force a redisplay of all filenames */
+      current_file = 1; top_left_file = 1;
+    }
+    break;
+
+  }
 }

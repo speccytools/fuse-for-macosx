@@ -45,19 +45,21 @@
 int xkeyboard_keypress(XKeyEvent *event)
 {
   KeySym keysym; keysyms_key_info *ptr;
+  const char *filename;
 
   keysym=XLookupKeysym(event,0);
 
   ptr=keysyms_get_data(keysym);
 
-  if( ptr && widget_keymode == 1 ) {
-      widget_handlekeys( ptr->key1 );
-      return 0;
-  }
+  if( ptr ) {
 
-  if(ptr) {
-    if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
-    if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
+    if( widget_active ) {
+      widget_keyhandler( ptr->key1 );
+    } else {
+      if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
+      if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
+    }
+
     return 0;
   }
 
@@ -69,8 +71,10 @@ int xkeyboard_keypress(XKeyEvent *event)
     fuse_emulation_unpause();
     break;
   case XK_F3:
-    widget_keymode = 1;
-    widget_selectfile();
+    fuse_emulation_pause();
+    filename = widget_selectfile();
+    if( filename ) snapshot_read( filename );
+    fuse_emulation_unpause();
     break;
   case XK_F5:
     machine_current->reset();

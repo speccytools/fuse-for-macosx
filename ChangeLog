@@ -18,6 +18,10 @@
 	* Changed the default install location to `/usr/local' (Philip
  	  Kendall).
 
+	* Generate keysyms.c from keysyms.dat; allows me automatically 
+	  keep the Xlib/GTK+ and svgalib key tables in sync (Philip
+	  Kendall).
+
 2001-08-13  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.3.1 released.

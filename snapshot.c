@@ -57,7 +57,7 @@ static int snapshot_copy_to( libspectrum_snap *snap );
 
 #define ERROR_MESSAGE_MAX_LENGTH 1024
 
-int snapshot_read( char *filename )
+int snapshot_read( const char *filename )
 {
   struct stat file_info; int fd; uchar *buffer;
 

@@ -1,4 +1,10 @@
-extern int widget_keymode;
+extern int widget_active;
 
-void widget_selectfile(void);
-void widget_handlekeys(int ksy);
+typedef void (*widget_keyhandler_fn)( int key );
+
+extern widget_keyhandler_fn widget_keyhandler;
+
+int widget_init( void );
+int widget_end( void );
+
+const char* widget_selectfile(void);

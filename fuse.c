@@ -39,6 +39,7 @@
 #include "tape.h"
 #include "timer.h"
 #include "ui.h"
+#include "widget.h"
 #include "z80/z80.h"
 
 /* What name were we called under? */
@@ -89,6 +90,8 @@ static int fuse_init(int argc, char **argv)
   if( settings_init() ) return 1;
 
   if( tape_init() ) return 1;
+
+  if( widget_init() ) return 1;
 
   if(display_init(&argc,&argv)) return 1;
   if(event_init()) return 1;
@@ -178,6 +181,8 @@ static int fuse_end(void)
   sound_end();
   event_end();
   ui_end();
+
+  widget_end();
 
   return 0;
 }
