@@ -247,7 +247,7 @@ int creator_init( void )
   for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
 
   sys_error = uname( &buf );
-  if( sys_error ) {
+  if( sys_error == -1 ) {
     ui_error( UI_ERROR_ERROR, "error getting system information: %s",
 	      strerror( errno ) );
     return 1;

@@ -265,3 +265,4 @@
 	 libspectrum_byte. Add missing ; to configure.in (Darren).
 20031010 printer.c, settings.dat, ui/options.dat: add option to disable
 	 ZX (etc) printer.
+20031010 fuse.c: On Solaris, uname() returns 1 to indicate success.
