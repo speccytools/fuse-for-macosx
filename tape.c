@@ -50,10 +50,10 @@
 #include "z80/z80_macros.h"
 
 /* The current tape */
-libspectrum_tape *tape;
+static libspectrum_tape *tape;
 
 /* Is the emulated tape deck playing? */
-int tape_playing;
+static int tape_playing;
 
 /* Is there a high input to the EAR socket? */
 int tape_microphone;

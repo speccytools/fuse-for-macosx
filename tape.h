@@ -55,7 +55,6 @@ int tape_stop( void );
 int tape_get_block_list( char ****list, size_t *n );
 int tape_free_block_list( char ***list, size_t n );
 
-extern int tape_playing;
 extern int tape_microphone;
 
 #endif
