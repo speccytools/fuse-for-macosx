@@ -27,21 +27,18 @@
 
 #include <config.h>
 
-#include <stdio.h>
-
 #include <libspectrum.h>
 
-#include "fuse.h"
 #include "joystick.h"
 #include "machine.h"
+#include "machines.h"
 #include "memory.h"
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"
 #include "scld.h"
-#include "spectrum.h"
-#include "tc2048.h"
 
+static int tc2048_reset( void );
 static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );
 
 const static periph_t peripherals[] = {
@@ -160,7 +157,7 @@ int tc2048_init( fuse_machine_info *machine )
 
 }
 
-int
+static int
 tc2048_reset( void )
 {
   int error;

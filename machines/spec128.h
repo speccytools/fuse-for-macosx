@@ -41,22 +41,12 @@ extern const periph_t spec128_peripherals[];
 extern const size_t spec128_peripherals_count;
 
 libspectrum_byte spec128_unattached_port( void );
-
-libspectrum_byte spec128_readbyte( libspectrum_word address );
-libspectrum_byte spec128_readbyte_internal( libspectrum_word address );
 libspectrum_byte spec128_read_screen_memory( libspectrum_word offset );
-void spec128_writebyte( libspectrum_word address, libspectrum_byte b );
-void spec128_writebyte_internal( libspectrum_word address,
-				 libspectrum_byte b );
-
-libspectrum_dword spec128_contend_memory( libspectrum_word address );
 libspectrum_dword spec128_contend_port( libspectrum_word port );
 libspectrum_byte spec128_contend_delay( libspectrum_dword time );
 
 int spec128_init( fuse_machine_info *machine );
-int spec128_reset(void);
 int spec128_common_reset( int contention );
-
 void spec128_memoryport_write( libspectrum_word port, libspectrum_byte b );
 
 #endif			/* #ifndef FUSE_SPEC128_H */

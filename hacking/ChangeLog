@@ -689,3 +689,4 @@
 	 menu_data.c,scaler.c,select.c,widget.[ch],widget_internals.h}:
 	 replace the three 'select' widgets (machine, scaler, joystick)
 	 with one generalised one.
+20040401 machine.c,machines/: general tidy-up of the machines/ directory.

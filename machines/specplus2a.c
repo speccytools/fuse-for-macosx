@@ -26,20 +26,15 @@
 
 #include <config.h>
 
-#include <stdio.h>
-
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "joystick.h"
-#include "machine.h"
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"
-#include "spec128.h"
-#include "specplus2a.h"
 #include "specplus3.h"
-#include "spectrum.h"
+
+static int specplus2a_reset( void );
 
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -86,7 +81,8 @@ specplus2a_init( fuse_machine_info *machine )
 
 }
 
-int specplus2a_reset(void)
+static int
+specplus2a_reset( void )
 {
   int error;
 

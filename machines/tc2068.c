@@ -29,24 +29,16 @@
 
 #include <config.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "dck.h"
-#include "display.h"
-#include "fuse.h"
 #include "joystick.h"
 #include "machine.h"
-#include "memory.h"
+#include "machines.h"
 #include "periph.h"
 #include "printer.h"
 #include "scld.h"
 #include "settings.h"
-#include "spectrum.h"
-#include "tc2068.h"
 
 #define ADDR_TO_CHUNK(addr) 2 + (addr >> 13)
 
@@ -56,6 +48,8 @@ static libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
 						 int *attached );
 static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
+
+static int tc2068_reset( void );
 
 const static periph_t peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
@@ -273,7 +267,7 @@ dock_exrom_reset( void )
   return 0;
 }
 
-int
+static int
 tc2068_reset( void )
 {
   int error;

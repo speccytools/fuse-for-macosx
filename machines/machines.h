@@ -1,5 +1,5 @@
-/* specplus2a.h: Spectrum +2A specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+/* spec16.h: Spectrum 16K specific routines
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -24,14 +24,18 @@
 
 */
 
-#ifndef FUSE_SPECPLUS2A_H
-#define FUSE_SPECPLUS2A_H
+#ifndef FUSE_SPEC16_H
+#define FUSE_SPEC16_H
 
-#ifndef FUSE_MACHINE_H
+#include <libspectrum.h>
+
 #include "machine.h"
-#endif			/* #ifndef FUSE_MACHINE_H */
 
+int pentagon_init( fuse_machine_info *machine );
+int spec16_init( fuse_machine_info *machine );
+int specplus2_init( fuse_machine_info *machine );
 int specplus2a_init( fuse_machine_info *machine );
-int specplus2a_reset(void);
+int tc2048_init( fuse_machine_info *machine );
+int tc2068_init( fuse_machine_info *machine );
 
-#endif			/* #ifndef FUSE_SPECPLUS2A_H */
+#endif			/* #ifndef FUSE_SPEC16_H */

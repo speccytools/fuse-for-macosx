@@ -26,18 +26,14 @@
 
 #include <config.h>
 
-#include <stdio.h>
-#include <unistd.h>
-
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "compat.h"
 #include "joystick.h"
+#include "machine.h"
 #include "memory.h"
 #include "periph.h"
 #include "settings.h"
-#include "pentagon.h"
 #include "spec128.h"
 #include "trdos.h"
 
@@ -46,6 +42,9 @@ static libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
 static libspectrum_byte pentagon_select_ff_read( libspectrum_word port,
 						 int *attached );
 static libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
+static void pentagon_memoryport_write( libspectrum_word port,
+				       libspectrum_byte b );
+static int pentagon_reset( void );
 static int pentagon_shutdown( void );
 
 const static periph_t peripherals[] = {
@@ -84,19 +83,19 @@ pentagon_select_ff_read( libspectrum_word port, int *attached )
   return 0xff;
 }
 
-libspectrum_byte
+static libspectrum_byte
 pentagon_unattached_port( void )
 {
   return spectrum_unattached_port( 3 );
 }
 
-libspectrum_byte
+static libspectrum_byte
 pentagon_read_screen_memory( libspectrum_word offset )
 {
   return RAM[ memory_current_screen ][offset];
 }
 
-libspectrum_dword
+static libspectrum_dword
 pentagon_contend_port( libspectrum_word port GCC_UNUSED )
 {
   /* No contention on ports AFAIK */
@@ -143,7 +142,7 @@ pentagon_init( fuse_machine_info *machine )
 
 }
 
-int
+static int
 pentagon_reset(void)
 {
   int error;

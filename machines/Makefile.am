@@ -39,14 +39,8 @@ libmachines_a_SOURCES = pentagon.c \
 			tc2048.c \
 			tc2068.c
 
-noinst_HEADERS = pentagon.h \
+noinst_HEADERS = machines.h \
 		 scorpion.h \
 		 spec128.h \
-		 spec16.h \
 		 spec48.h \
-		 specplus2.h \
-		 specplus2a.h \
-		 specplus3.h \
-		 tc2048.h \
-		 tc2068.h
-
+		 specplus3.h

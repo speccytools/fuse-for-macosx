@@ -30,12 +30,13 @@
 
 #include <libspectrum.h>
 
-#include "periph.h"
+#include "machines.h"
 #include "settings.h"
 #include "spec128.h"
-#include "specplus2.h"
 
 /* The +2 emulation just uses the 128K routines */
+
+static int specplus2_reset( void );
 
 int specplus2_init( fuse_machine_info *machine )
 {
@@ -67,7 +68,7 @@ int specplus2_init( fuse_machine_info *machine )
 
 }
 
-int
+static int
 specplus2_reset( void )
 {
   int error;

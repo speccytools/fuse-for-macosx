@@ -32,22 +32,7 @@
 #include "machine.h"
 #endif			/* #ifndef FUSE_MACHINE_H */
 
-libspectrum_byte scorpion_unattached_port( void );
-
-libspectrum_byte scorpion_readbyte( libspectrum_word address );
-libspectrum_byte scorpion_readbyte_internal( libspectrum_word address );
-libspectrum_byte scorpion_read_screen_memory( libspectrum_word offset );
-void scorpion_writebyte( libspectrum_word address, libspectrum_byte b );
-void scorpion_writebyte_internal( libspectrum_word address,
-				  libspectrum_byte b);
-
-libspectrum_dword scorpion_contend_memory( libspectrum_word address );
-libspectrum_dword scorpion_contend_port( libspectrum_word port );
-
 int scorpion_init( fuse_machine_info *machine );
-int scorpion_reset(void);
-
-void scorpion_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void scorpion_memoryport2_write( libspectrum_word port, libspectrum_byte b );
 
 #endif			/* #ifndef FUSE_SCORPION_H */

@@ -29,17 +29,10 @@
 
 #include <libspectrum.h>
 
-libspectrum_byte spec48_readbyte( libspectrum_word address );
-libspectrum_byte spec48_readbyte_internal( libspectrum_word address );
 libspectrum_byte spec48_read_screen_memory( libspectrum_word offset );
-void spec48_writebyte( libspectrum_word address, libspectrum_byte b );
-void spec48_writebyte_internal( libspectrum_word address, libspectrum_byte b );
-
-libspectrum_dword spec48_contend_memory( libspectrum_word address );
 libspectrum_dword spec48_contend_port( libspectrum_word port );
 libspectrum_byte spec48_contend_delay( libspectrum_dword time );
 
 int spec48_init( fuse_machine_info *machine );
-int spec48_reset( void );
 
 #endif			/* #ifndef FUSE_SPEC48_H */

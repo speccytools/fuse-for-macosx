@@ -32,15 +32,15 @@
 #include <libspectrum.h>
 
 #include "joystick.h"
-#include "keyboard.h"
 #include "machine.h"
+#include "machines.h"
 #include "memory.h"
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"
-#include "spec16.h"
 #include "spec48.h"
-#include "spectrum.h"
+
+static int spec16_reset( void );
 
 static libspectrum_byte empty_chunk[0x2000];
 
@@ -91,7 +91,7 @@ int spec16_init( fuse_machine_info *machine )
 
 }
 
-int
+static int
 spec16_reset( void )
 {
   int error;

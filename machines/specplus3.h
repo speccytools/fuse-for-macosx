@@ -41,20 +41,11 @@
 #endif			/* #ifdef HAVE_765_H */
 
 libspectrum_byte specplus3_unattached_port( void );
-
-libspectrum_byte specplus3_readbyte( libspectrum_word address );
-libspectrum_byte specplus3_readbyte_internal( libspectrum_word address );
 libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset );
-void specplus3_writebyte( libspectrum_word address, libspectrum_byte b );
-void specplus3_writebyte_internal( libspectrum_word address,
-				   libspectrum_byte b );
-
-libspectrum_dword specplus3_contend_memory( libspectrum_word address );
 libspectrum_dword specplus3_contend_port( libspectrum_word address );
 libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
 
 int specplus3_init( fuse_machine_info *machine );
-int specplus3_reset(void);
 
 int specplus3_plus2a_common_reset( void );
 

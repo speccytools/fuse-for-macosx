@@ -39,6 +39,8 @@
 #include "settings.h"
 #include "spec128.h"
 
+static int spec128_reset( void );
+
 const periph_t spec128_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
@@ -146,7 +148,8 @@ int spec128_init( fuse_machine_info *machine )
 
 }
 
-int spec128_reset(void)
+static int
+spec128_reset( void )
 {
   int error;
 

@@ -48,6 +48,9 @@ static libspectrum_byte scorpion_select_1f_read( libspectrum_word port,
 static libspectrum_byte scorpion_select_ff_read( libspectrum_word port,
 						 int *attached );
 static libspectrum_byte scorpion_contend_delay( libspectrum_dword time );
+static void scorpion_memoryport_write( libspectrum_word port,
+				       libspectrum_byte b );
+static int scorpion_reset( void );
 static int scorpion_shutdown( void );
 
 const static periph_t peripherals[] = {
@@ -87,19 +90,19 @@ scorpion_select_ff_read( libspectrum_word port, int *attached )
   return 0xff;
 }
 
-libspectrum_byte
+static libspectrum_byte
 scorpion_unattached_port( void )
 {
   return spectrum_unattached_port( 3 );
 }
 
-libspectrum_byte
+static libspectrum_byte
 scorpion_read_screen_memory( libspectrum_word offset )
 {
   return RAM[ memory_current_screen ][offset];
 }
 
-libspectrum_dword
+static libspectrum_dword
 scorpion_contend_port( libspectrum_word port GCC_UNUSED )
 {
   /* No contention on ports AFAIK */

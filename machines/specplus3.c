@@ -79,6 +79,7 @@ static const char *dsk_template = "fuse.dsk.XXXXXX";
 
 #endif			/* #ifdef HAVE_765_H */
 
+static int specplus3_reset( void );
 static int specplus3_shutdown( void );
 
 const static periph_t peripherals[] = {
@@ -236,7 +237,8 @@ int specplus3_init( fuse_machine_info *machine )
 
 }
 
-int specplus3_reset(void)
+static int
+specplus3_reset( void )
 {
   int error;
 

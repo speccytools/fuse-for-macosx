@@ -39,6 +39,8 @@
 #include "spec48.h"
 #include "spectrum.h"
 
+static int spec48_reset( void );
+
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
@@ -143,7 +145,7 @@ int spec48_init( fuse_machine_info *machine )
 
 }
 
-int
+static int
 spec48_reset( void )
 {
   int error;
