@@ -33,6 +33,8 @@
 	    Needle) (Philip Kendall).
 	  + Improved floating bus timings; Arkanoid and Sidewize now work
 	    (Philip Kendall).
+	  + Save/restore the high bit of the R register; Bruce Lee now
+	    works (thanks, Jan Samohýl) (Philip Kendall).
 	  + Fuse can now save snapshot formats other than .z80 and tape
 	    formats other than .tap; the appropriate format will be
 	    selected according to the extension given (Philip Kendall).
