@@ -186,8 +186,10 @@ timer_sleep( void )
 static void
 timer_tick( void )
 {
-  /* If the emulator is running, note that time has passed */
-  if( !fuse_emulation_paused ) timer_count += 1.0;
+  /* If the emulator is running, note that time has passed. Don't
+     allow too big a 'backlog' to build up though or things will run
+     too fast if the emulator suddenly receives more time */
+  if( !fuse_emulation_paused && timer_count < 10.0 ) timer_count += 1.0;
 }
 
 #ifdef DEBUG_MODE
