@@ -116,6 +116,13 @@ int event_do_events(void)
     case EVENT_TYPE_LINE:
       display_line();
       break;
+    case EVENT_TYPE_EDGE:
+      tape_next_edge();
+      break;
+    default:
+      fprintf( stderr, "%s: unknown event type %d\n", fuse_progname,
+	       ptr->type );
+      break;
     }
     free(ptr);
     if(event_list == NULL) {

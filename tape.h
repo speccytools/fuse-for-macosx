@@ -36,7 +36,13 @@ int tape_init( void );
 
 int tape_open( const char *filename );
 int tape_close( void );
-
 int tape_trap( void );
+
+int tape_play( void );
+int tape_stop( void );
+int tape_next_edge( void );
+
+extern int tape_playing;
+extern int tape_microphone;
 
 #endif

@@ -39,6 +39,7 @@
 #include "specplus2.h"
 #include "specplus3.h"
 #include "spectrum.h"
+#include "tape.h"
 #include "timer.h"
 #include "z80/z80.h"
 
@@ -105,7 +106,7 @@ BYTE spectrum_port_noread(WORD port)
 /* What do we get if we read from the ULA? */
 BYTE spectrum_ula_read(WORD port)
 {
-  return keyboard_read( port >> 8 );
+  return ( keyboard_read( port >> 8 ) ^ ( tape_microphone ? 0x40 : 0x00 ) );
 }
 
 /* What happens when we write to the ULA? */

@@ -38,7 +38,7 @@ typedef struct event_t {
 } event_t;
 
 /* The various types of event which can occur */
-enum event_types { EVENT_TYPE_INTERRUPT, EVENT_TYPE_LINE };
+enum event_types { EVENT_TYPE_INTERRUPT, EVENT_TYPE_LINE, EVENT_TYPE_EDGE };
 
 /* A large value to mean `no events due' */
 extern const DWORD event_no_events;

@@ -1,3 +1,15 @@
+2001-09-xx  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Added file selection dialog boxes for snapshot opening and
+	  closing, and opening tape files. GTK+ only (Philip Kendall).
+
+	* Allowed changing of Issue 2/3 keyboard at run-time. There's only
+	  any way of changing this if you're using GTK+ at the moment,
+	  though (Philip Kendall).
+	
+	* Basically complete rewrite of the tape handling routines (Philip
+ 	  Kendall).
+
 2001-08-13  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.3.1 released.

@@ -359,15 +359,12 @@ static void gtkui_tape_play( GtkWidget *widget, gpointer data )
   /* If tape traps active, do nothing */
   if( settings_current.tape_traps ) return;
 
-  /* For now, just return anyway... */
-  return;
-
   /* Otherwise, toggle whether the tape is playing or not */
-/*    if( tape_playing() ) { */
-/*      tape_stop(); */
-/*    } else { */
-/*      tape_play(); */
-/*    } */
+  if( tape_playing ) {
+    tape_stop();
+  } else {
+    tape_play();
+  }
 
 }
 

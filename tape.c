@@ -38,6 +38,7 @@
 #include "myglib.h"		/* If not, use the local replacement */
 #endif
 
+#include "event.h"
 #include "fuse.h"
 #include "settings.h"
 #include "spectrum.h"
@@ -51,6 +52,45 @@ static GSList* tape_block_list;
 /* The current tape block */
 static GSList* tape_block_pointer;
 
+/* Is the emulated tape deck playing? */
+int tape_playing;
+
+/* Is there a high input to the EAR socket? */
+int tape_microphone;
+
+/* Some states for the edge generator */
+typedef enum tape_edge_state_t {
+  TAPE_EDGE_STATE_PILOT,
+  TAPE_EDGE_STATE_SYNC1,
+  TAPE_EDGE_STATE_SYNC2,
+  TAPE_EDGE_STATE_DATA1,
+  TAPE_EDGE_STATE_DATA2,
+} tape_edge_state_t;
+/* And the current state of the generator */
+static tape_edge_state_t tape_edge_state;
+
+/* How many pilot pulses are still to be generated? */
+static int tape_edge_count;
+
+/* How far through the current block are we? */
+static int tape_bytes_through_block;
+static int tape_bits_through_byte;
+
+/* The current byte we're loading (gets shifted out rightwards) */
+static int tape_current_byte;
+
+/* The length of the current data bit (in T-states) */
+static int tape_next_bit_timing;
+
+/* The lengths of various pulses */
+static const int tape_timings_pilot = 2168;
+static const int tape_timings_sync1 =  667;
+static const int tape_timings_sync2 =  735;
+static const int tape_timings_data0 =  855;
+static const int tape_timings_data1 = 1710;
+static const int tape_timings_pause = 69888 * 50; /* FIXME: should vary
+						     with T-states per frame */
+
 #define ERROR_MESSAGE_MAX_LENGTH 1024
 
 static int tape_buffer_to_block_list( GSList **block_list_ptr,
@@ -59,9 +99,14 @@ static int tape_buffer_to_block_list( GSList **block_list_ptr,
 static int tape_block_list_clear( GSList **block_list_ptr );
 static void tape_free_entry( gpointer data, gpointer user_data );
 
+static int tape_start_block( void );
+static int tape_get_next_bit( void );
+
 int tape_init( void )
 {
   tape_block_list = NULL;
+  tape_playing = 0;
+  tape_microphone = 0;
   return 0;
 }
 
@@ -291,4 +336,135 @@ int tape_trap( void )
 
   return 0;
 
+}
+
+int tape_play( void )
+{
+  int error;
+
+  if( tape_block_list == NULL ) return 1;
+  
+  tape_playing = 1;
+
+  error = tape_start_block(); if( error ) return error;
+  error = tape_next_edge(); if( error ) return error;
+
+  return 0;
+}
+
+int tape_stop( void )
+{
+  tape_playing = 0;
+  tape_microphone = 0;
+  return 0;
+}
+
+int tape_next_edge( void )
+{
+  int error;
+
+  /* If the tape's not playing, return with an error */
+  if( ! tape_playing ) return 2;
+
+  /* Invert the microphone state */
+  tape_microphone = !tape_microphone;
+
+  switch( tape_edge_state ) {
+
+  case TAPE_EDGE_STATE_PILOT:
+    /* The next edge occurs after one pilot pulse */
+    error = event_add( tstates + tape_timings_pilot, EVENT_TYPE_EDGE );
+    if( error ) return 1;
+
+    /* If that was the last pilot pulse, the next one is the first sync
+       pulse. If not, it's another pilot pulse. */
+    if( --tape_edge_count == 0 ) tape_edge_state = TAPE_EDGE_STATE_SYNC1;
+
+    break;
+
+  case TAPE_EDGE_STATE_SYNC1:
+    /* The first short sync pulse, followed by the second sync pulse */
+    error = event_add( tstates + tape_timings_sync1, EVENT_TYPE_EDGE );
+    if( error ) return 1;
+    tape_edge_state = TAPE_EDGE_STATE_SYNC2;
+    break;
+
+  case TAPE_EDGE_STATE_SYNC2:
+    /* The second sync pulse, followed by the first pulse for one
+       bit of data */
+    error = event_add( tstates + tape_timings_sync2, EVENT_TYPE_EDGE );
+    if( error ) return 1;
+    error = tape_get_next_bit(); if( error ) return error;
+    break;
+
+  case TAPE_EDGE_STATE_DATA1:
+    error = event_add( tstates + tape_next_bit_timing, EVENT_TYPE_EDGE );
+    if( error ) return error;
+    tape_edge_state = TAPE_EDGE_STATE_DATA2;
+    break;
+
+  case TAPE_EDGE_STATE_DATA2:
+    error = event_add( tstates + tape_next_bit_timing, EVENT_TYPE_EDGE );
+    if( error ) return error;
+    error = tape_get_next_bit(); if( error ) return error;
+    break;
+  }
+
+  return 0;
+}
+
+static int tape_start_block( void )
+{
+  tape_block_t *ptr;
+
+  ptr = (tape_block_t*)(tape_block_pointer->data);
+
+  tape_microphone = 0;
+
+  if( ptr->data[0] & 0x80 ) {	/* program or data */
+    tape_edge_count = 0x0c97;
+  } else {			/* header */
+    tape_edge_count = 0x1f79;
+  }
+
+  tape_bytes_through_block = -1; tape_bits_through_byte = 7;
+  tape_edge_state = TAPE_EDGE_STATE_PILOT;
+
+  return 0;
+}
+
+static int tape_get_next_bit( void )
+{
+  tape_block_t *ptr;
+  int next_bit;
+
+  int error;
+
+  ptr = (tape_block_t*)(tape_block_pointer->data);
+
+  if( ++tape_bits_through_byte == 8 ) {
+    if( ++tape_bytes_through_block == ptr->length ) {
+      tape_block_pointer = tape_block_pointer->next;
+      if( tape_block_pointer == NULL ) {
+	tape_stop();
+	tape_block_pointer = tape_block_list;
+	return 0;
+      }
+      error = event_add( tstates + tape_timings_pause, EVENT_TYPE_EDGE );
+      if( error ) return error;
+      error = tape_start_block(); if( error ) return error;
+      return 0;
+    }
+    tape_current_byte = ptr->data[ tape_bytes_through_block ];
+    tape_bits_through_byte = 0;
+  }
+
+  next_bit = tape_current_byte & 0x01;
+  tape_current_byte >>= 1;
+
+  tape_next_bit_timing = ( next_bit ? tape_timings_data1
+			            : tape_timings_data0 );
+  tape_edge_state = TAPE_EDGE_STATE_DATA1;
+
+  return 0;
 }
