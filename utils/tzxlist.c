@@ -1,5 +1,5 @@
 /* tzxlist.c: Produce a listing of the blocks in a .tzx file
-   Copyright (c) 2001 Philip Kendall, Darren Salt
+   Copyright (c) 2001-2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -157,49 +157,54 @@ process_tzx( char *filename )
     switch( block->type ) {
     case LIBSPECTRUM_TAPE_BLOCK_ROM:
       rom_block = &(block->types.rom);
-      printf("  Data length: %d bytes\n", rom_block->length );
+      printf("  Data length: %ld bytes\n", (unsigned long)rom_block->length );
       printf("  Pause length: %d ms\n", rom_block->pause );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_TURBO:
       turbo_block = &(block->types.turbo);
-      printf("  %d pilot pulses of %d tstates\n",
-	     turbo_block->pilot_pulses, turbo_block->pilot_length );
+      printf("  %ld pilot pulses of %d tstates\n",
+	     (unsigned long)turbo_block->pilot_pulses,
+	     turbo_block->pilot_length );
       printf("  Sync pulses of %d and %d tstates\n",
 	     turbo_block->sync1_length, turbo_block->sync2_length );
       printf("  Data bits are %d (reset) and %d (set) tstates\n",
 	     turbo_block->bit0_length, turbo_block->bit1_length );
-      printf("  Data length: %d bytes (%d bits in last byte used)\n",
-	     turbo_block->length, turbo_block->bits_in_last_byte );
+      printf("  Data length: %ld bytes (%ld bits in last byte used)\n",
+	     (unsigned long)turbo_block->length,
+	     (unsigned long)turbo_block->bits_in_last_byte );
       printf("  Pause length: %d ms\n", turbo_block->pause );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
       tone_block = &(block->types.pure_tone);
-      printf("  %d pulses of %d tstates\n",
-	     tone_block->pulses, tone_block->length );
+      printf("  %ld pulses of %ld tstates\n",
+	     (unsigned long)tone_block->pulses,
+	     (unsigned long)tone_block->length );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_PULSES:
       pulses_block = &(block->types.pulses);
       for( i=0; i<pulses_block->count; i++ )
-	printf("  Pulse %3d: length %d tstates\n",
-	       i, pulses_block->lengths[i] );
+	printf("  Pulse %3ld: length %d tstates\n",
+	       (unsigned long)i, pulses_block->lengths[i] );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
       data_block = &(block->types.pure_data);
       printf("  Data bits are %d (reset) and %d (set) tstates\n",
 	     data_block->bit0_length, data_block->bit1_length );
-      printf("  Data length: %d bytes (%d bits in last byte used)\n",
-	     data_block->length, data_block->bits_in_last_byte );
+      printf("  Data length: %ld bytes (%ld bits in last byte used)\n",
+	     (unsigned long)data_block->length,
+	     (unsigned long)data_block->bits_in_last_byte );
       printf("  Pause length: %d ms\n", data_block->pause );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
       raw_block = &(block->types.raw_data);
-      printf("  Length: %d bytes\n", raw_block->length );
-      printf("  Bits in last byte: %d\n", raw_block->bits_in_last_byte );
+      printf("  Length: %ld bytes\n", (unsigned long)raw_block->length );
+      printf("  Bits in last byte: %ld\n",
+	     (unsigned long)raw_block->bits_in_last_byte );
       printf("  Each bit is %d tstates\n", raw_block->bit_length );
       printf("  Pause length: %d ms\n", raw_block->pause );
       break;
@@ -231,8 +236,8 @@ process_tzx( char *filename )
     case LIBSPECTRUM_TAPE_BLOCK_SELECT:
       select_block = &(block->types.select);
       for( i=0; i<select_block->count; i++ ) {
-	printf("  Choice %2d: Offset %d: %s\n", i, select_block->offsets[i],
-	       select_block->descriptions[i] );
+	printf("  Choice %2ld: Offset %d: %s\n", (unsigned long)i,
+	       select_block->offsets[i], select_block->descriptions[i] );
       }
       break;
 
@@ -290,7 +295,8 @@ process_tzx( char *filename )
 
     case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
       printf( "  Description: %s\n", block->types.custom.description );
-      printf( "       Length: %d bytes\n", block->types.custom.length );
+      printf( "       Length: %ld bytes\n",
+	      (unsigned long)block->types.custom.length );
       break;
 
     default:

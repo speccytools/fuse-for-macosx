@@ -136,8 +136,8 @@ do_file( const char *filename )
 
   if( end - ptr < (ptrdiff_t)strlen( rzx_signature ) + 6 ) {
     fprintf( stderr,
-	     "%s: Not enough bytes for RZX header (%d bytes)\n",
-	     progname, strlen( rzx_signature ) + 6 );
+	     "%s: Not enough bytes for RZX header (%ld bytes)\n",
+	     progname, (unsigned long)strlen( rzx_signature ) + 6 );
     munmap( buffer, file_info.st_size );
     return 1;
   }
@@ -211,11 +211,12 @@ read_creator_block( unsigned char **ptr, unsigned char *end )
 
   printf( "Found a creator block\n" );
 
-  length = read_dword( ptr ); printf( "  Length: %d bytes\n", length );
+  length = read_dword( ptr );
+  printf( "  Length: %ld bytes\n", (unsigned long)length );
   printf( "  Creator: `%s'\n", *ptr ); (*ptr) += 20;
   printf( "  Creator major version: %d\n", read_word( ptr ) );
   printf( "  Creator minor version: %d\n", read_word( ptr ) );
-  printf( "  Creator custom data: %d bytes\n", length - 29 );
+  printf( "  Creator custom data: %ld bytes\n", (unsigned long)length - 29 );
   (*ptr) += length - 29;
 
   return 0;
@@ -235,7 +236,7 @@ read_snapshot_block( unsigned char **ptr, unsigned char *end )
   printf( "Found a snapshot block\n" );
 
   block_length = read_dword( ptr );
-  printf( "  Length: %d bytes\n", block_length );
+  printf( "  Length: %ld bytes\n", (unsigned long)block_length );
 
   printf( "  Flags: %d\n", read_dword( ptr ) );
   printf( "  Snapshot extension: `%s'\n", *ptr ); (*ptr) += 4;
@@ -260,10 +261,10 @@ read_input_block( unsigned char **ptr, unsigned char *end )
   printf( "Found an input recording block\n" );
   
   length = read_dword( ptr );
-  printf( "  Length: %d bytes\n", length );
+  printf( "  Length: %ld bytes\n", (unsigned long)length );
 
   frames = read_dword( ptr );
-  printf( "  Frame count: %d\n", frames );
+  printf( "  Frame count: %ld\n", (unsigned long)frames );
 
   printf( "  Frame length (obsolete): %d bytes\n", *(*ptr)++ );
   printf( "  Tstate counter: %d\n", read_dword( ptr ) );
@@ -287,10 +288,11 @@ read_input_block( unsigned char **ptr, unsigned char *end )
 
       size_t count;
 
-      printf( "Examining frame %d\n", i );
+      printf( "Examining frame %ld\n", (unsigned long)i );
     
       if( end - *ptr < 4 ) {
-	fprintf( stderr, "%s: Not enough data for frame %d\n", progname, i );
+	fprintf( stderr, "%s: Not enough data for frame %ld\n", progname,
+		 (unsigned long)i );
 	return 1;
       }
 
@@ -302,12 +304,12 @@ read_input_block( unsigned char **ptr, unsigned char *end )
 	continue;
       }
 
-      printf( "  IN count: %d\n", count );
+      printf( "  IN count: %ld\n", (unsigned long)count );
 
       if( end - *ptr < count ) {
 	fprintf( stderr,
-		 "%s: Not enough data for frame %d (expected %d bytes)\n",
-		 progname, i, count );
+		 "%s: Not enough data for frame %ld (expected %ld bytes)\n",
+		 progname, (unsigned long)i, (unsigned long)count );
 	return 1;
       }
 
