@@ -87,6 +87,7 @@
 %token		 TIME
 %token		 WRITE
 
+%token <integer> PAGE
 %token <reg>	 REGISTER
 
 %token <integer> NUMBER
@@ -97,6 +98,7 @@
 
 %type  <bplife>  breakpointlife
 %type  <bptype>  breakpointtype
+%type  <integer> pageornumber
 %type  <pair>    breakpointpair
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
@@ -173,8 +175,11 @@ breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
 ;
 
 breakpointpair:   numberorpc { $$.value1 = -1; $$.value2 = $1; }
-		| number ':' number { $$.value1 = $1; $$.value2 = $3; }
+		| pageornumber ':' number { $$.value1 = $1; $$.value2 = $3; }
 ;
+
+pageornumber:   PAGE { $$ = $1; }
+	      | number { $$ = $1; }
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
 		    | WRITE { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE; }

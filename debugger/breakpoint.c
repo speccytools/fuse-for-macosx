@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#include <ctype.h>
+
 #include <libspectrum.h>
 
 #include "debugger_internals.h"
@@ -241,6 +243,30 @@ encode_bank_and_page( debugger_breakpoint_type type, libspectrum_word address )
   }
 
   return offset + page->page_num;
+}
+
+int
+debugger_page_hash( const char *text )
+{
+  int offset;
+
+  switch( tolower( (unsigned char)text[0] ) ) {
+    
+  case 'c': offset = BREAKPOINT_PAGE_ROMCS; break;
+  case 'd': offset = BREAKPOINT_PAGE_DOCK; break;
+  case 'r': offset = BREAKPOINT_PAGE_ROM; break;
+  case 'x': offset = BREAKPOINT_PAGE_EXROM; break;
+
+  default:
+    ui_error( UI_ERROR_ERROR,
+	      "%s:debugger_page_hash: unknown page letter '%c'", __FILE__,
+	      text[0] );
+    fuse_abort();
+  }
+
+  offset += atoi( &text[1] );
+
+  return offset;
 }
 
 char*

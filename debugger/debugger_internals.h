@@ -49,6 +49,7 @@ const char* debugger_register_text( int which );
 /* Utility functions called by the flex scanner */
 
 int debugger_command_input( char *buf, int *result, int max_size );
+int debugger_page_hash( const char *text );
 int yylex( void );
 void yyerror( const char *s );
 

@@ -125,6 +125,8 @@ ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 	          return NUMBER; }
 {DIGIT}+	{ yylval.integer = atoi( yytext ); return NUMBER; }
 
+[cdrx]{DIGIT}+	{ yylval.integer = debugger_page_hash( yytext ); return PAGE; }
+
 [ \n]+		/* Swallow whitespace */
 
 .		{ if( 0 ) unput( '\0' ); /* Prevent warning about yyunput

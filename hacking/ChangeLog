@@ -930,3 +930,6 @@
 	 as OS X 10.1(?)'s preprocessor requires proper C syntax.
 20040616 debugger/{commandl.l,commandy.y,debugger_internals,h,expression.c}:
 	 remove duplicated literal constants.
+20040616 debugger/{breakpoint.c,commandl.l,commandy.y,debugger_internals.h}:
+	 make setting breakpoints in non-RAM pages slightly more user
+	 friendly.
