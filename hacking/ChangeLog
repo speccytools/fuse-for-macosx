@@ -1174,3 +1174,4 @@
 20050103 screenshot.[ch], ui.c: Further fixes for compiling without libpng.
 20050103 rzx.c: Don't enable rollback in compo mode and disble rollback menu
          when playback ends.
+20050104 screenshot.[ch]: Undo bogus changes from 20050103.
