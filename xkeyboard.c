@@ -79,6 +79,11 @@ int xkeyboard_keypress(XKeyEvent *event)
     }
     fuse_emulation_unpause();
     break;
+  case XK_F4:
+    fuse_emulation_pause();
+    widget_options();
+    fuse_emulation_unpause();
+    break;
   case XK_F5:
     machine_current->reset();
     break;

@@ -98,6 +98,11 @@ int svgakeyboard_keypress(int keysym)
     }
     fuse_emulation_unpause();
     break;
+  case SCANCODE_F4:
+    fuse_emulation_pause();
+    widget_options();
+    fuse_emulation_unpause();
+    break;
   case SCANCODE_F5:
     machine_current->reset();
     break;

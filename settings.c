@@ -50,3 +50,14 @@ int settings_defaults( settings_info *settings )
 
   return 0;
 }
+
+/* Copy one settings object to another */
+int settings_copy( settings_info *dest, settings_info *src )
+{
+  dest->issue2     = src->issue2;
+  dest->tape_traps = src->tape_traps;
+
+  return 0;
+}
+
+    

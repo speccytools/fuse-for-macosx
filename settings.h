@@ -40,5 +40,6 @@ extern settings_info settings_current;
 
 int settings_init( void );
 int settings_defaults( settings_info *settings );
+int settings_copy( settings_info *dest, settings_info *src );
 
 #endif				/* #ifndef FUSE_SETTINGS_H */

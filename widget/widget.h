@@ -27,6 +27,10 @@
 #ifndef FUSE_WIDGET_H
 #define FUSE_WIDGET_H
 
+#ifndef _DIRENT_H
+#include <dirent.h>
+#endif				/* #ifndef _DIRENT_H */
+
 extern int widget_active;
 
 typedef void (*widget_keyhandler_fn)( int key );
@@ -56,5 +60,9 @@ const char* widget_selectfile(void);
 
 struct dirent **widget_filenames;
 size_t widget_numfiles;
+
+/* Options dialog */
+
+int widget_options( void );
 
 #endif				/* #ifndef FUSE_WIDGET_H */
