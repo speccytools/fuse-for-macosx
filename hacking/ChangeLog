@@ -1098,12 +1098,12 @@
 20041029 rzx.c,ui.c,ui/ui.h,ui/gtk/gtkui.c,widget/widget.c: (de)activate
 	 rollback menu items appropriately.
 20041031 .cvsignore,z80/.cvsignore: ignore .libs directories.
-20041006 settings.dat: make RZX files be compressed by default.
-20041006 machine.c,menu.c,menu_data.c,trdos.c,ui.c,machines/specplus3.c,
+20041106 settings.dat: make RZX files be compressed by default.
+20041106 machine.c,menu.c,menu_data.c,trdos.c,ui.c,machines/specplus3.c,
 	 man/fuse.1,ui/ui.h: split the Media/Disk menu into separate +3 and
 	 TR-DOS entries.
-20041006 display.c,menu.[ch],menu_data.c,screenshot.[ch],ui.c,ui/ui.h,
+20041106 display.c,menu.[ch],menu_data.c,screenshot.[ch],ui.c,ui/ui.h,
 	 man/fuse.1,ui/gtk/gtkui.c,widget/{menu.c,widget.c}: add ability to
 	 save 'movies' as collections of screenshots (Gergely Szasz).
-20041013 AUTHORS,Makefile.am,THANKS,configure.in,sound/{Makefile.am,
+20041113 AUTHORS,Makefile.am,THANKS,configure.in,sound/{Makefile.am,
 	 aosound.c,lowlevel.h}: add ao sound driver (Gergely Szasz).
