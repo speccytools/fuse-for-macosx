@@ -152,7 +152,7 @@ utils_identify_file( int *type, const char *filename,
 
     char *extension;
 
-    char *signature; size_t offset, length;
+    char *signature; size_t offset, length; int sig_score;
 
     int score;
 
@@ -161,17 +161,17 @@ utils_identify_file( int *type, const char *filename,
   struct type *ptr,
     types[] = {
       
-      { UTILS_TYPE_UNKNOWN,       NULL,  NULL,       0, 0, 0 },
+      { UTILS_TYPE_UNKNOWN,       NULL,  NULL,       0, 0, 0, 0 },
 
-      { UTILS_TYPE_RECORDING_RZX, "rzx", "RZX!",     0, 4, 0 },
+      { UTILS_TYPE_RECORDING_RZX, "rzx", "RZX!",     0, 4, 3, 0 },
 
-      { UTILS_TYPE_SNAPSHOT_SNA,  "sna", NULL,       0, 0, 0 },
-      { UTILS_TYPE_SNAPSHOT_Z80,  "z80", "\0\0",     6, 2, 0 },
+      { UTILS_TYPE_SNAPSHOT_SNA,  "sna", NULL,       0, 0, 0, 0 },
+      { UTILS_TYPE_SNAPSHOT_Z80,  "z80", "\0\0",     6, 2, 1, 0 },
 
-      { UTILS_TYPE_TAPE_TAP,      "tap", "\x13\0\0", 0, 3, 0 },
-      { UTILS_TYPE_TAPE_TZX,      "tzx", "ZXTape!",  0, 7, 0 },
+      { UTILS_TYPE_TAPE_TAP,      "tap", "\x13\0\0", 0, 3, 1, 0 },
+      { UTILS_TYPE_TAPE_TZX,      "tzx", "ZXTape!",  0, 7, 3, 0 },
 
-      { -1, NULL, NULL, 0, 0, 0 }, /* End marker */
+      { -1, NULL, NULL, 0, 0, 0, 0 }, /* End marker */
 
     };
 
@@ -186,11 +186,11 @@ utils_identify_file( int *type, const char *filename,
 
     if( extension && ptr->extension &&
 	!strcasecmp( extension, ptr->extension ) )
-      ptr->score++;
+      ptr->score += 2;
 
     if( ptr->signature && length >= ptr->offset + ptr->length &&
 	!memcmp( &buffer[ ptr->offset ], ptr->signature, ptr->length ) )
-      ptr->score += 2;
+      ptr->score += ptr->sig_score;
 
   }
 
