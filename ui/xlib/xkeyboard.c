@@ -101,7 +101,6 @@ void xkeyboard_keypress(XKeyEvent *event)
     break;
   case XK_F7:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     widget_apply_to_file( tape_open_default_autoload );
     fuse_emulation_unpause();
     break;
