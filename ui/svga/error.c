@@ -33,7 +33,7 @@
 
 #include "fuse.h"
 #include "ui/ui.h"
-#include "widget.h"
+#include "widget/widget.h"
 
 #define MESSAGE_MAX_LENGTH 256
 
