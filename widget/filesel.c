@@ -68,7 +68,7 @@ int widget_scandir( const char *dir, struct widget_dirent ***namelist,
   DIR *directory; struct dirent *dirent;
 
   int allocated, number;
-  int i;
+  int i; size_t length;
 
   (*namelist) =
     (struct widget_dirent**)malloc( 32 * sizeof(struct widget_dirent*) );
@@ -135,8 +135,10 @@ int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 	return -1;
       }
 
-      (*namelist)[number-1]->name =
-	(char*)malloc( strlen(dirent->d_name)+1 * sizeof(char) );
+      length = strlen( dirent->d_name ) + 1;
+      if( length < 16 ) length = 16;
+
+      (*namelist)[number-1]->name = (char*)malloc( length * sizeof(char) );
       if( (*namelist)[number-1]->name == NULL ) {
 	free( (*namelist)[number-1] );
 	for( i=0; i<number-1; i++ ) {
@@ -400,6 +402,15 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
   widget_rectangle( 8 * x, 8 * y, 8 * 13, 8, background );
 
   strncpy( buffer, filename->name, 13 ); buffer[13] = '\0';
+
+  if( S_ISDIR( filename->mode ) ) {
+    if( strlen( buffer ) >= 13 ) {
+      buffer[12] = '/';
+    } else {
+      strcat( buffer, "/" );
+    }
+  }
+
   widget_printstring( x, y, foreground, buffer );
 
   return 0;
