@@ -333,7 +333,7 @@ int snapshot_copy_to( libspectrum_snap *snap )
 
   libspectrum_snap_set_tstates( snap, tstates );
 
-  for( i=0; i<8; i++ ) {
+  for( i = 0; i < 16; i++ ) {
     if( RAM[i] != NULL ) {
 
       libspectrum_byte *buffer;

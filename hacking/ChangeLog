@@ -646,3 +646,4 @@
 20040319 simpleide.[ch],ui/gtk/gtkui.c,widget/{menu.c,menu_data.c,
 	 widget_internals.h}: add a 'commit' menu option for the IDE
 	 disks.
+20040320 snapshot.c: copy RAM page 8-15 into the libspectrum_snap structure.
