@@ -32,7 +32,6 @@
 
 #include "compat.h"
 #include "fuse.h"
-#include "spectrum.h"
 #include "timer.h"
 
 volatile float timer_count;
