@@ -53,8 +53,9 @@
 #endif
 
 /* The mappings from keysyms to Spectrum keys. The keysym `keysym'
-   maps to one or two Spectrum keys, specified by {port,bit}{1,2}. 
-   Unused second keys are specified by having `bit2' being zero
+   maps to one or two Spectrum keys, specified by one of the
+   keyboard_key_name enum (keyboard.h); unused second keys are specified
+   by KEYBOARD_NONE.
 
    These mappings are ordered basically like a standard (English) PC keyboard,
    top to bottom, left to right, but with a few additions for other keys
@@ -134,7 +135,7 @@ static keysyms_key_info keysyms_data[] = {
 
 };
 
-#elif defined( UI_SVGA )		/* #if defined( UI_GTK ) || defined( UI_X ) */
+#elif defined( UI_SVGA )	/* #if defined( UI_GTK ) || defined( UI_X ) */
 
 static keysyms_key_info keysyms_data[] = {
 
@@ -175,10 +176,12 @@ static keysyms_key_info keysyms_data[] = {
   { SCANCODE_L            , KEYBOARD_l,      KEYBOARD_NONE },
   { SCANCODE_SEMICOLON    , KEYBOARD_Symbol, KEYBOARD_o    },
   { SCANCODE_APOSTROPHE   , KEYBOARD_Symbol, KEYBOARD_7    },
-  /* this is what `#' returns on a UK keyboard
-   * (`\' returns SCANCODE_LESS).
-   */
+
+  /* `#' returns SCANCODE_BACKSLASH on a UK keyboard
+     (`\' returns SCANCODE_LESS).
+  */
   { SCANCODE_BACKSLASH    , KEYBOARD_Symbol, KEYBOARD_3    },
+
   { SCANCODE_ENTER	  , KEYBOARD_Enter,  KEYBOARD_NONE },
 
   { SCANCODE_LEFTSHIFT    , KEYBOARD_Caps,   KEYBOARD_NONE },

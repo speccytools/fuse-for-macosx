@@ -208,14 +208,18 @@ static void gtkui_open(GtkWidget *widget, gpointer data)
 {
   char *filename;
 
+  fuse_emulation_pause();
+
   filename = gtkui_fileselector_get_filename();
-  if( !filename ) return;
+  if( !filename ) { fuse_emulation_unpause(); return; }
 
   snapshot_read( filename );
 
   free( filename );
 
   display_refresh_all();
+
+  fuse_emulation_unpause();
 }
 
 /* Called by the menu when File/Save selected */
@@ -223,12 +227,16 @@ static void gtkui_save(GtkWidget *widget, gpointer data)
 {
   char *filename;
 
+  fuse_emulation_pause();
+
   filename = gtkui_fileselector_get_filename();
-  if( !filename ) return;
+  if( !filename ) { fuse_emulation_unpause(); return; }
 
   snapshot_write( filename );
 
   free( filename );
+
+  fuse_emulation_unpause();
 }
 
 /* Called by the menu when File/Tape selected */
@@ -236,12 +244,16 @@ static void gtkui_tape(GtkWidget *widget, gpointer data)
 {
   char *filename;
 
+  fuse_emulation_pause();
+
   filename = gtkui_fileselector_get_filename();
-  if( !filename ) return;
+  if( !filename ) { fuse_emulation_unpause(); return; }
 
   tape_open( filename );
 
   free( filename );
+
+  fuse_emulation_unpause();
 }
 
 /* Called by the menu when File/Exit selected */

@@ -27,7 +27,14 @@
 #ifndef FUSE_FUSE_H
 #define FUSE_FUSE_H
 
-extern int fuse_exiting;
-extern char* fuse_progname;
+extern char* fuse_progname;		/* argv[0] */
+
+extern int fuse_exiting;		/* Shall we exit now? */
+
+extern int fuse_emulation_running;	/* Is Spectrum emulation running? */
+int fuse_emulation_pause(void);		/* Stop and start emulation */
+int fuse_emulation_unpause(void);
+
+extern int fuse_sound_in_use;		/* Are we trying to produce sound? */
 
 #endif			/* #ifndef FUSE_FUSE_H */

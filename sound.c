@@ -51,12 +51,14 @@
 #include "osssound.h"
 #endif
 
+#include "fuse.h"
 #include "machine.h"
 #include "sound.h"
 #include "spectrum.h"
 
 /* configuration */
-int sound_enabled=0;
+int sound_enabled=0;		/* Are we currently using the sound card;
+				   cf fuse.c:fuse_sound_in_use */
 int sound_freq=32000;
 int sound_stereo=0;
 int sound_stereo_acb=0;		/* 1 for ACB stereo, else 0 */
@@ -186,6 +188,8 @@ beeper_tick=0;
 beeper_tick_incr=(1<<24)/sound_freq;
 
 sound_ay_init();
+
+fuse_sound_in_use=1;
 }
 
 

@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -24,11 +24,13 @@
 
 */
 
+#include <config.h>
+
 #include <signal.h>
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "config.h"
+#include "fuse.h"
 #include "spectrum.h"
 #include "timer.h"
 
@@ -72,12 +74,14 @@ static void timer_setup_handler(void)
 
 void timer_signal( int signo )
 {
-  timer_count++;
+  /* If the emulator is running, note that time has passed */
+  if( fuse_emulation_running ) timer_count++;
 }
 
 void timer_sleep(void)
 {
-  if(timer_count<=0) pause();
+  /* Go to sleep iff we're emulating things fast enough */
+  if ( timer_count <= 0 ) pause();
 }
 
 int timer_end(void)
