@@ -48,6 +48,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "display.h"
 #include "fuse.h"
 #include "options.h"
+#include "periph.h"
 #include "widget_internals.h"
 
 CODE
@@ -180,8 +181,9 @@ CODE
 	$which++;
     }
 
+    print "  case KEYBOARD_Enter:\n";
+    print "    $_->{posthook}();\n" if $_->{posthook};
     print << "CODE";
-  case KEYBOARD_Enter:
     display_refresh_all();
     widget_end_all( WIDGET_FINISHED_OK );
     break;

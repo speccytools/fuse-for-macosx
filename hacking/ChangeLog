@@ -482,5 +482,5 @@
 	 peripheral list.
 20040215 Use the new peripheral code to (de)activate the Kempston
 	 interface at run-time where appropriate.
-
-	
+20040216 widget/{options.pl,widget.c}: update peripherals list when widget
+	 options dialog exited.

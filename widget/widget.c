@@ -44,6 +44,7 @@
 #include "ui/uidisplay.h"
 #include "keyboard.h"
 #include "options.h"
+#include "periph.h"
 #include "screenshot.h"
 #include "timer.h"
 #include "utils.h"
@@ -373,6 +374,9 @@ int widget_options_finish( widget_finish_state finished )
     error = settings_copy( &settings_current, &widget_options_settings );
     settings_free( &widget_options_settings );
     if( error ) return error;
+
+    /* Bring the peripherals list into sync with the new options */
+    periph_update();
   }
 
   return 0;
