@@ -357,6 +357,14 @@ to disable). Same as the Sound Option dialog's
 option.
 .RE
 .PP
+.I --sound-force-8bit
+.RS
+Force the use of 8-bit sound, even if 16-bit is possible. Same as the
+Sound Option dialog's
+.I "Force 8-bit"
+option.
+.RE
+.PP
 .I "-d device"
 .br
 .I "--sound-device device"
@@ -802,6 +810,14 @@ The Spectrum beeper is inherently mono, but enabling this option adds
 a simple fake-stereo effect. While the slight echo involved can
 sometimes make beeper noise sound worse, in many cases it gives an
 acceptable result.
+.RE
+.PP
+.I "Force 8-bit"
+.RS
+Force the use of 8-bit sound even if 16-bit (the default) is
+available. Note that (when the option is enabled) if 8-bit sound isn't
+available then there will be no sound at all, so it's best not to use
+this option unless you have a specific need for it.
 .RE
 .RE
 .PP

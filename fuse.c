@@ -398,6 +398,7 @@ static void fuse_show_help( void )
    "--loading-sound        Emulate the sound of tapes loading.\n"
    "--separation           Use ACB stereo for the AY-3-8912 sound chip.\n"
    "--sound                Produce sound.\n"
+   "--sound-force-8bit     Generate 8-bit sound even if 16-bit is available.\n"
    "--slt                  Turn SLT traps on.\n"
    "--traps                Turn tape traps on.\n\n"
    "Other options:\n\n"

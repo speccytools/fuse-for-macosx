@@ -64,10 +64,11 @@ static int sound_stereo_beeper=0;   /* and settings_current.stereo_beeper */
 
 /* assume all three tone channels together match the beeper volume (ish).
  * Must be <=127 for all channels; 50+2+(24*3) = 124.
+ * (Now scaled up for 16-bit.)
  */
-#define AMPL_BEEPER		50
-#define AMPL_TAPE		2
-#define AMPL_AY_TONE		24	/* three of these */
+#define AMPL_BEEPER		(50*256)
+#define AMPL_TAPE		(2*256)
+#define AMPL_AY_TONE		(24*256)	/* three of these */
 
 /* max. number of sub-frame AY port writes allowed;
  * given the number of port writes theoretically possible in a
@@ -81,7 +82,7 @@ static int sound_channels;
 
 static unsigned int ay_tone_levels[16];
 
-static unsigned char *sound_buf,*tape_buf;
+static libspectrum_signed_word *sound_buf,*tape_buf;
 
 /* beeper stuff */
 static int sound_oldpos[2],sound_fillpos[2];
@@ -139,7 +140,7 @@ int f;
 
 /* scale the values down to fit */
 for(f=0;f<16;f++)
-  ay_tone_levels[f]=((unsigned long)levels[f]*AMPL_AY_TONE+0x80)/0xff;
+  ay_tone_levels[f]=(levels[f]*AMPL_AY_TONE+0x8000)/0xffff;
 
 ay_noise_tick=ay_noise_period=0;
 ay_env_internal_tick=ay_env_tick=ay_env_period=0;
@@ -198,8 +199,9 @@ sound_enabled=sound_enabled_ever=1;
 sound_channels=(sound_stereo?2:1);
 sound_framesiz=sound_freq/50;
 
-if((sound_buf=malloc(sound_framesiz*sound_channels))==NULL ||
-   (tape_buf=malloc(sound_framesiz))==NULL)
+if((sound_buf=malloc(sizeof(libspectrum_signed_word)*
+                     sound_framesiz*sound_channels))==NULL ||
+   (tape_buf=malloc(sizeof(libspectrum_signed_word)*sound_framesiz))==NULL)
   {
   if(sound_buf)
     {
@@ -227,7 +229,7 @@ if(first_init)
   first_init=0;
 
   for(f=0;f<2;f++)
-    sound_oldval[f]=sound_oldval_orig[f]=128;
+    sound_oldval[f]=sound_oldval_orig[f]=0;
   }
 
 if(sound_stereo_beeper)
@@ -271,20 +273,19 @@ if(sound_enabled)
 
 
 /* write sample to buffer as pseudo-stereo */
-static void sound_write_buf_pstereo(unsigned char *out,int c)
+static void sound_write_buf_pstereo(libspectrum_signed_word *out,int c)
 {
-int bl=(c-128-pstereobuf[pstereopos])/2;
-int br=(c-128+pstereobuf[pstereopos])/2;
+int bl=(c-pstereobuf[pstereopos])/2;
+int br=(c+pstereobuf[pstereopos])/2;
 
 if(bl<-AMPL_BEEPER) bl=-AMPL_BEEPER;
 if(br<-AMPL_BEEPER) br=-AMPL_BEEPER;
 if(bl> AMPL_BEEPER) bl= AMPL_BEEPER;
 if(br> AMPL_BEEPER) br= AMPL_BEEPER;
 
-bl+=128; br+=128;
-*out=(unsigned char)bl; out[1]=(unsigned char)br;
+*out=bl; out[1]=br;
 
-pstereobuf[pstereopos]=c-128;
+pstereobuf[pstereopos]=c;
 pstereopos++;
 if(pstereopos>=pstereobufsiz)
   pstereopos=0;
@@ -367,7 +368,7 @@ static int env_first=1,env_rev=0,env_counter=15;
 int tone_level[3];
 int mixer,envshape;
 int f,g,level,count;
-unsigned char *ptr;
+libspectrum_signed_word *ptr;
 struct ay_change_tag *change_ptr=ay_change;
 int changes_left=ay_change_count;
 int reg,r;
@@ -542,7 +543,7 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
   if(!sound_stereo)
     {
     /* mono */
-    (*ptr++)+=(chan1+chan2+chan3)>>8;
+    (*ptr++)+=chan1+chan2+chan3;
     }
   else
     {
@@ -551,8 +552,8 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
       /* stereo output, but mono AY sound; still,
        * incr separately in case of beeper pseudostereo.
        */
-      (*ptr++)+=(chan1+chan2+chan3)>>8;
-      (*ptr++)+=(chan1+chan2+chan3)>>8;
+      (*ptr++)+=chan1+chan2+chan3;
+      (*ptr++)+=chan1+chan2+chan3;
       }
     else
       {
@@ -566,8 +567,8 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
       GEN_STEREO(rchan1pos,chan1);
       GEN_STEREO(rchan2pos,chan2);
       GEN_STEREO(rchan3pos,chan3);
-      (*ptr++)+=rstereobuf_l[rstereopos] >> 8;
-      (*ptr++)+=rstereobuf_r[rstereopos] >> 8;
+      (*ptr++)+=rstereobuf_l[rstereopos];
+      (*ptr++)+=rstereobuf_r[rstereopos];
       rstereobuf_l[rstereopos]=rstereobuf_r[rstereopos]=0;
       rstereopos++;
       if(rstereopos>=STEREO_BUF_SIZE)
@@ -669,7 +670,7 @@ ay_tone_subcycles=ay_env_subcycles=0;
 
 void sound_frame(void)
 {
-unsigned char *ptr,*tptr;
+libspectrum_signed_word *ptr,*tptr;
 int f,bchan;
 int ampl=AMPL_BEEPER;
 
@@ -691,9 +692,9 @@ ptr=sound_buf;
 tptr=tape_buf;
 for(f=0;f<sound_framesiz;f++,tptr++)
   {
-  (*ptr++)+=*tptr-128;
+  (*ptr++)+=*tptr;
   if(sound_stereo)
-    (*ptr++)+=*tptr-128;
+    (*ptr++)+=*tptr;
   }
 
 /* overlay AY sound */
@@ -713,7 +714,7 @@ ay_change_count=0;
  */
 void sound_beeper(int is_tape,int on)
 {
-unsigned char *ptr;
+libspectrum_signed_word *ptr;
 int newpos,subpos;
 int val,subval;
 int f;
@@ -723,7 +724,7 @@ int vol=ampl*2;
 
 if(!sound_enabled) return;
 
-val=(on?128-ampl:128+ampl);
+val=(on?-ampl:ampl);
 
 if(val==sound_oldval_orig[bchan]) return;
 
@@ -731,9 +732,8 @@ if(val==sound_oldval_orig[bchan]) return;
  * whenever cycles_per_frame were changed (i.e. when machine type changed).
  */
 newpos=(tstates*sound_framesiz)/machine_current->timings.tstates_per_frame;
-/* the >>1s are to avoid overflow when int is 32-bit */
-subpos=((tstates>>1)*sound_framesiz*vol)/
-       (machine_current->timings.tstates_per_frame>>1)-vol*newpos;
+subpos=(((libspectrum_signed_qword)tstates)*sound_framesiz*vol)/
+       (machine_current->timings.tstates_per_frame)-vol*newpos;
 
 /* if we already wrote here, adjust the level.
  */
@@ -751,7 +751,7 @@ if(newpos==sound_oldpos[bchan])
 else
   beeper_last_subpos[bchan]=(on?vol-subpos:subpos);
 
-subval=128+ampl-beeper_last_subpos[bchan];
+subval=ampl-beeper_last_subpos[bchan];
 
 if(newpos>=0)
   {
