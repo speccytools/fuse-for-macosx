@@ -180,25 +180,33 @@ timer_pop( void )
   struct itimerval *old_timer;
   int error1, error2;
 
-  old_handler = old_handlers->data;
-  old_handlers = g_slist_remove( old_handlers, old_handler );
+  if( old_handlers ) {
 
-  old_timer = old_timers->data;
-  old_timers = g_slist_remove( old_timers, old_timer );
+    old_handler = old_handlers->data;
+    old_handlers = g_slist_remove( old_handlers, old_handler );
 
-  error1 = sigaction( SIGALRM, old_handler, NULL );
-  if( error1 )
-    ui_error( UI_ERROR_ERROR, "error restoring old signal handler: %s",
-	      strerror( errno ) );
+    old_timer = old_timers->data;
+    old_timers = g_slist_remove( old_timers, old_timer );
 
-  error2 = setitimer( ITIMER_REAL, old_timer, NULL );
-  if( error2 )
-    ui_error( UI_ERROR_ERROR, "error restoring old interval timer: %s",
-	      strerror( errno ) );
+    error1 = sigaction( SIGALRM, old_handler, NULL );
+    if( error1 )
+      ui_error( UI_ERROR_ERROR, "error restoring old signal handler: %s",
+		strerror( errno ) );
 
-  free( old_handler ); free( old_timer );
+    error2 = setitimer( ITIMER_REAL, old_timer, NULL );
+    if( error2 )
+      ui_error( UI_ERROR_ERROR, "error restoring old interval timer: %s",
+		strerror( errno ) );
 
-  return error1 || error2;
+    free( old_handler ); free( old_timer );
+
+    return error1 || error2;
+
+  } else {
+
+    return 0;
+
+  }
 }
 
 void
@@ -285,13 +293,16 @@ timer_pop( void )
 {
   MMRESULT *wTimerID;
 
-  wTimerID = timer_ids->data;
+  if( timer_ids ) {
 
-  timer_ids = g_slist_remove( timer_ids, wTimerID );
+    wTimerID = timer_ids->data;
 
-  timeKillEvent( *wTimerID );	/* cancel the event */
+    timer_ids = g_slist_remove( timer_ids, wTimerID );
 
-  free( wTimerID );
+    timeKillEvent( *wTimerID );	/* cancel the event */
+
+    free( wTimerID );
+  }
 
   return 0;
 }
