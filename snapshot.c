@@ -59,19 +59,19 @@ int snapshot_read( const char *filename )
   error = utils_read_file( filename, &buffer, &length );
   if( error ) return error;
 
-  error = utils_identify_file( &type, filename, buffer, length );
+  error = libspectrum_identify_file( &type, filename, buffer, length );
   if( error ) { munmap( buffer, length ); return error; }
 
   switch( type ) {
 
-  case UTILS_TYPE_SNAPSHOT_SNA:
+  case LIBSPECTRUM_ID_SNAPSHOT_SNA:
 
     snapshot_flush_slt();
     error = snapshot_open_sna_buffer( buffer, length );
     if( error ) { munmap( buffer, length ); return 1; }
     break;
 
-  case UTILS_TYPE_SNAPSHOT_Z80:
+  case LIBSPECTRUM_ID_SNAPSHOT_Z80:
 
     snapshot_flush_slt();
     error = snapshot_open_z80_buffer( buffer, length );
