@@ -73,10 +73,6 @@ static libspectrum_byte
   rgb_data2[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
    png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 3 ];
 
-char screenshot_movie_name[256];
-char screenshot_movie_file[256] = {'f', 'u', 's', 'e', '\0'};
-long int screenshot_movie_frame = 0;
-int screenshot_movie_record = 0;
 scaler_type screenshot_movie_scaler = SCALER_NUM;
 
 int
@@ -311,6 +307,11 @@ screenshot_available_scalers( scaler_type scaler )
 }
 
 #endif				/* #ifdef USE_LIBPNG */
+
+char screenshot_movie_name[256];
+char screenshot_movie_file[256] = {'f', 'u', 's', 'e', '\0'};
+long int screenshot_movie_frame = 0;
+int screenshot_movie_record = 0;
 
 int
 screenshot_scr_write( const char *filename )

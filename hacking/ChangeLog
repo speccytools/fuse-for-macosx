@@ -1139,3 +1139,4 @@
          Change z80 snaps to szx snaps without joystick information to prevent
          Fuse attempting to change joystick settings when auto-loading tapes or
          disks.
+20041222 display.c,screenshot.c: Fix compilation without libpng.
