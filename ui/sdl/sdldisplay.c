@@ -241,14 +241,12 @@ uidisplay_hotswap_gfx_mode( void )
   /* reset palette */
   SDL_SetColors( sdldisplay_gc, colour_palette, 0, 16 );
 
-  /* Mac OS X resets the state of the cursor after a switch to full screen mode */
+  /* Mac OS X resets the state of the cursor after a switch to full screen
+     mode */
   if ( settings_current.full_screen )
     SDL_ShowCursor( SDL_DISABLE );
   else
     SDL_ShowCursor( SDL_ENABLE );
-
-  /* Redraw the entire screen... */
-  display_refresh_all();
 
   fuse_emulation_unpause();
 }
@@ -287,8 +285,11 @@ uidisplay_frame_end( void )
 #endif                  /* #ifdef USE_WIDGET */
 
   if( SDL_MUSTLOCK( tmp_screen ) ) SDL_LockSurface( tmp_screen );
+  if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_LockSurface( sdldisplay_gc );
 
   tmp_screen_pitch = tmp_screen->pitch;
+
+  dstPitch = sdldisplay_gc->pitch;
 
   last_rect = updated_rects + num_rects;
 
@@ -296,9 +297,12 @@ uidisplay_frame_end( void )
 
     libspectrum_word *dest_base, *dest;
     size_t xx,yy;
+    int dst_y = r->y * sdldisplay_current_size;
+    int dst_h = r->h;
 
     dest_base =
-      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels + (r->x*2+2) +
+      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
+                           (r->x+1) * tmp_screen->format->BytesPerPixel +
 			   (r->y+1)*tmp_screen_pitch );
 
     for( yy = r->y; yy < r->y + r->h; yy++ ) {
@@ -310,22 +314,15 @@ uidisplay_frame_end( void )
 	( (libspectrum_byte*)dest_base + tmp_screen_pitch );
     }
 	  
-  }
-
-  if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_LockSurface( sdldisplay_gc );
-
-  dstPitch = sdldisplay_gc->pitch;
-
-  for( r = updated_rects; r != last_rect; ++r ) {
-    register int dst_y = r->y * sdldisplay_current_size;
-    register int dst_h = r->h;
-
     scaler_proc16(
-      (libspectrum_byte*)tmp_screen->pixels + (r->x*2+2) +
+      (libspectrum_byte*)tmp_screen->pixels +
+                        (r->x+1) * tmp_screen->format->BytesPerPixel +
 	                (r->y+1)*tmp_screen_pitch,
       tmp_screen_pitch,
       (libspectrum_byte*)sdldisplay_gc->pixels +
-	                 r->x*(libspectrum_byte)(2*sdldisplay_current_size) +
+	                 r->x*(libspectrum_byte)
+                               (sdldisplay_gc->format->BytesPerPixel *
+                                sdldisplay_current_size) +
 			 dst_y*dstPitch,
       dstPitch, r->w, dst_h
     );

@@ -425,3 +425,7 @@
 20031231 ChangeLog: bring up-to-date.
 20040101 ui/sdl/sdlui.c, widget/widget.c: put speed in SDL title (patch
 	 #868412) (Fred).
+20040101 ui/sdl/sdldisplay.c: simplify uidisplay_frame_end by combining the
+         two loops increasing the chance that the data processed by the
+	 first is still available in cache for the second (patch #868414)
+	 (Fred).
