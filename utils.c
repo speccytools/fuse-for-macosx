@@ -179,11 +179,11 @@ utils_open_file( const char *filename, int autoload,
     }
     break;
 
-  case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
   case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:
     error = if2_insert( filename );
     break;
 
+  case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
     error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
     error = dck_insert( filename );
     break;
