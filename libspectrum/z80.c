@@ -751,7 +751,12 @@ int libspectrum_z80_write_pages( uchar **buffer, size_t *offset,
   /* If we've got any .slt data, add that to the end of the buffer */
   for( i=0; i<256; i++ ) {
     if( snap->slt_length[i] ) {
-      libspectrum_z80_write_slt( buffer, offset, length, snap );
+
+      /* This call will write all the .slt data */
+      error = libspectrum_z80_write_slt( buffer, offset, length, snap );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+      /* so now quit the loop */
       break;
     }
   }
@@ -811,8 +816,11 @@ int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
 static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
 				      size_t *length, libspectrum_snap *snap )
 {
-  int i;
+  int i,j;
   uchar *ptr = *buffer + *offset;
+
+  size_t compressed_length[256];
+  uchar* compressed_data[256];
 
   libspectrum_error error;
 
@@ -824,18 +832,39 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   memcpy( ptr, slt_signature, slt_signature_length );
   (*offset) += slt_signature_length;
 
-  /* Now write out the .slt directory */
+  /* Now write out the .slt directory, compressing the data along
+     the way */
   for( i=0; i<256; i++ ) {
     if( snap->slt_length[i] ) {
+
+      /* Zero the compressed length so it will be allocated memory
+	 by libspectrum_z80_compress_block */
+      compressed_length[i] = 0;
+
+      error = libspectrum_z80_compress_block(
+                &compressed_data[i], &compressed_length[i],
+		snap->slt[i], snap->slt_length[i]
+	      );
+      if( error != LIBSPECTRUM_ERROR_NONE ) {
+	for( j=0; j<i; j++ ) if(snap->slt_length[j]) free(compressed_data[j]);
+	return error;
+      }
+					     
       error = libspectrum_z80_write_slt_entry( buffer, offset, length,
-					       1, i, snap->slt_length[i] );
-      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+					       1, i, compressed_length[i] );
+      if( error != LIBSPECTRUM_ERROR_NONE ) {
+	for( j=0; j<i; j++ ) if(snap->slt_length[j]) free(compressed_data[j]);
+	return error;
+      }
     }
   }
 
   /* and the directory end marker */
   error = libspectrum_z80_write_slt_entry( buffer, offset, length, 0, 0, 0);
-  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    for( i=0; i<256; i++ ) if( snap->slt_length[i] ) free(compressed_data[i]);
+    return error;
+  }
 
   /* Reset the current data pointer */
   ptr = *buffer + *offset;
@@ -845,15 +874,22 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
     if( snap->slt_length[i] ) {
       
       /* Make room for the data */
-      error = libspectrum_make_room( buffer, (*offset) + snap->slt_length[i],
+      error = libspectrum_make_room( buffer, (*offset) + compressed_length[i],
 				     &ptr, length 
 				   );
-      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+      if( error != LIBSPECTRUM_ERROR_NONE ) {
+	for(j=0; j<256; j++) if(snap->slt_length[j]) free(compressed_data[j]);
+	return error;
+      }
 
       /* And copy it across */
-      memcpy( ptr, snap->slt[i], snap->slt_length[i] );
+      memcpy( ptr, compressed_data[i], compressed_length[i] );
+      (*offset) += compressed_length[i];
     }
   }
+
+  /* Free up the compressed data */
+  for( i=0; i<256; i++ ) if( snap->slt_length[i] ) free( compressed_data[i] );
 
   /* That's your lot */
   return LIBSPECTRUM_ERROR_NONE;
@@ -877,6 +913,7 @@ static int libspectrum_z80_write_slt_entry( uchar **buffer, size_t *offset,
   libspectrum_write_word( &ptr[2], id );
   libspectrum_write_word( &ptr[4], slt_length & 0xffff );
   libspectrum_write_word( &ptr[6], slt_length >> 16 );
+  (*offset) += 8;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
