@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = libspectrum myglib roms widget z80
+SUBDIRS = libspectrum myglib roms utils widget z80
 
 fuse_SOURCES = ay.c display.c event.c fbdisplay.c fbkeyboard.c fbui.c\
 	fuse.c gtkdisplay.c gtkkeyboard.c gtkui.c keyboard.c keysyms.c\

@@ -170,4 +170,5 @@ if test "$ac_cv_prog_CC" = gcc; then
     CFLAGS="$CFLAGS -Wall"
 fi
 
-AC_OUTPUT(Makefile libspectrum/Makefile myglib/Makefile roms/Makefile widget/Makefile z80/Makefile)
+AC_OUTPUT(Makefile libspectrum/Makefile myglib/Makefile roms/Makefile \
+utils/Makefile widget/Makefile z80/Makefile)
