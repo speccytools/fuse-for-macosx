@@ -38,6 +38,7 @@
 #include "settings.h"
 #include "simpleide.h"
 #include "ui/ui.h"
+#include "ula.h"
 #include "zxatasp.h"
 #include "zxcf.h"
 
@@ -164,6 +165,18 @@ struct peripheral_data_t {
 libspectrum_byte
 readport( libspectrum_word port )
 {
+  libspectrum_byte b;
+
+  ula_contend_port_preio( port );
+  b = readport_internal( port );
+  ula_contend_port_postio( port );
+
+  return b;
+}
+
+libspectrum_byte
+readport_internal( libspectrum_word port )
+{
   struct peripheral_data_t callback_info;
 
   /* Trigger the debugger if wanted */
@@ -178,7 +191,7 @@ readport( libspectrum_word port )
     libspectrum_byte value;
 
     error = libspectrum_rzx_playback( rzx, &value );
-    if( error ) { rzx_stop_playback( 1 ); return readport( port ); }
+    if( error ) { rzx_stop_playback( 1 ); return readport_internal( port ); }
 
     return value;
   }
@@ -218,6 +231,14 @@ read_peripheral( gpointer data, gpointer user_data )
 
 void
 writeport( libspectrum_word port, libspectrum_byte b )
+{
+  ula_contend_port_preio( port );
+  writeport_internal( port, b );
+  ula_contend_port_postio( port );
+}
+
+void
+writeport_internal( libspectrum_word port, libspectrum_byte b )
 {
   struct peripheral_data_t callback_info;
 

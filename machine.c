@@ -385,21 +385,15 @@ machine_set_timings( fuse_machine_info *machine )
      displayed. However, what's more useful for Fuse is when the first
      pixel of the top line of the border is displayed.
 
-     Fuse is currently hard-wired to show 24 lines of top and bottom border,
-     hence we subtract 24 times the line length. We also subtract the
-     appropriate number of left border cycles; the difference between this
-     and the actually displayed width is accounted for in
-     display.c:display_border_column()
-
-     The addition of 3 at the end accounts for the fact that the ULA
-     receives the new data at T2 of the IO cycle of an OUT, but the
-     Z80 core doesn't actually output it until after T4.
+     Fuse shows 24 lines of top border and DISPLAY_BORDER_WIDTH_COLS
+     columns of left border, so we subtract the appropriate offset to
+     get when the top-left pixel of the border is displayed.
   */
 
   machine->line_times[0]=
     libspectrum_timings_top_left_pixel( machine->machine ) -
-    24 * machine->timings.tstates_per_line -
-    machine->timings.left_border + 3;
+    24 * machine->timings.tstates_per_line -	/* 24 lines of top border */
+    4 * DISPLAY_BORDER_WIDTH_COLS; /* Left border at 4 tstates per column */
 
   for( y=1; y<DISPLAY_SCREEN_HEIGHT+1; y++ ) {
     machine->line_times[y] = machine->line_times[y-1] + 

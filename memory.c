@@ -202,9 +202,10 @@ writebyte( libspectrum_word address, libspectrum_byte b )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
   if( mapping->contended ) tstates += ula_contention[ tstates ];
-  tstates += 3;
 
   writebyte_internal( address, b );
+
+  tstates += 3;
 }
 
 void

@@ -3,7 +3,7 @@
 # z80.pl: generate C code for Z80 opcodes
 # $Id$
 
-# Copyright (c) 1999-2003 Philip Kendall
+# Copyright (c) 1999-2004 Philip Kendall
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -209,7 +209,6 @@ sub ini_ind ($) {
 	libspectrum_word initemp;
 
 	tstates++;
-	ula_contend_port( BC );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
@@ -231,7 +230,6 @@ sub inir_indr ($) {
 	libspectrum_word initemp;
 
 	tstates++;
-	ula_contend_port( BC );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
@@ -308,7 +306,6 @@ sub otir_otdr ($) {
 	tstates++;
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
-	ula_contend_port( BC );
 	writeport(BC,outitemp);
 
 	HL$modifier;
@@ -337,7 +334,6 @@ sub outi_outd ($) {
 	tstates++;
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
-	ula_contend_port( BC );
 	writeport(BC,outitemp);
 
 	HL$modifier;
@@ -610,7 +606,6 @@ sub opcode_IN (@) {
       { 
 	libspectrum_word intemp;
 	intemp = readbyte( PC++ ) + ( A << 8 );
-	ula_contend_port( intemp );
         A=readport( intemp );
       }
 IN
@@ -853,13 +848,11 @@ sub opcode_OUT (@) {
       { 
 	libspectrum_word outtemp;
 	outtemp = readbyte( PC++ ) + ( A << 8 );
-	Z80_OUT( outtemp , A );
+	writeport( outtemp, A );
       }
 OUT
     } elsif( $port eq '(C)' and length $register == 1 ) {
-	print << "OUT";
-      Z80_OUT( BC, $register );
-OUT
+	print "      writeport( BC, $register );\n";
     }
 }
 

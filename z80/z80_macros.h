@@ -1,5 +1,5 @@
 /* z80_macros.h: Some commonly used z80 things as macros
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -231,7 +231,6 @@ break
 
 #define Z80_IN( reg, port )\
 {\
-  ula_contend_port( port ); \
   (reg)=readport((port));\
   F = ( F & FLAG_C) | sz53p_table[(reg)];\
 }
@@ -282,12 +281,6 @@ break
 {\
   A |= (value);\
   F = sz53p_table[A];\
-}
-
-#define Z80_OUT( port, reg )\
-{\
-  ula_contend_port( port ); \
-  writeport(port,reg);\
 }
 
 #define POP16(regl,regh)\

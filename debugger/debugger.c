@@ -144,6 +144,6 @@ debugger_poke( libspectrum_word address, libspectrum_byte value )
 int
 debugger_port_write( libspectrum_word port, libspectrum_byte value )
 {
-  writeport( port, value );
+  writeport_internal( port, value );
   return 0;
 }

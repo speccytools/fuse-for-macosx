@@ -962,7 +962,7 @@ push_border_change( int colour )
   get_beam_position( &beam_x, &beam_y );
 
   if( beam_x < 0 ) beam_x = 0;
-  if( beam_x > DISPLAY_BORDER_WIDTH_COLS ) beam_x = DISPLAY_BORDER_WIDTH_COLS;
+  if( beam_x > DISPLAY_SCREEN_WIDTH_COLS ) beam_x = DISPLAY_SCREEN_WIDTH_COLS;
   if( beam_y < 0 ) beam_y = 0;
 
   change = malloc( sizeof( *change ) );

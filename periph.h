@@ -61,7 +61,10 @@ void periph_clear( void );
  */
 
 libspectrum_byte readport( libspectrum_word port );
+libspectrum_byte readport_internal( libspectrum_word port );
+
 void writeport( libspectrum_word port, libspectrum_byte b );
+void writeport_internal( libspectrum_word port, libspectrum_byte b );
 
 /*
  * The more Fuse-specific peripheral handling routines

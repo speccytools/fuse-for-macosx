@@ -1144,3 +1144,6 @@
 	 rendering.
 20041225 widget/widget.c: Add joystick prompt when loading snaps for widget UI.
 20041227 display.c: reenable border emulation.
+20041229 display.c,machine.c,memory.c,periph.[ch],ula.[ch],debugger/debugger.c,
+	 z80/{z80.pl,z80_macros.h}: fixes for display timings with the
+	 character-accurate renderer.
