@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "18th November, 2001" "Version 0.4.0" "Emulators"
+.TH fuse 1 "29th November, 2001" "Version 0.4.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -45,7 +45,7 @@ fuse \- Sinclair ZX Spectrum emulator
 Fuse is a Sinclair ZX Spectrum emulator. It supports several models
 (including the 128), with quite faithful emulation of the display and
 sound. It can load Z80 and SNA snapshots, and TAP and TZX virtual-tape
-files.  But currently, it can only save Z80 snapshots.
+files. Saving to both Z80 snapshots and TZX tape files is supported.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -86,12 +86,11 @@ section below for details on how to choose the file.
 .TP
 .I F4
 Display the General Options dialog, letting you configure Fuse. (With
-the widget UI, the keys shown in (brackets) toggle the option - after
-doing so, press
+the widget UI, the keys shown in (brackets) toggle the options,
 .I Enter
-to confirm the new options or
+confirms any changes, and
 .I Esc
-to abort.) Note that any changed settings only apply to the
+aborts.) Note that any changed settings only apply to the
 currently-running Fuse. The options available are:
 .PP
 .RS
@@ -106,10 +105,11 @@ you run them.
 .I "Use tape loading traps"
 .RS
 Ordinarily, Fuse intercepts calls to the ROM tape-loading routine in
-order to load from TAP files quickly. But this can interfere with TZX
-loading; disabling this option avoids the problem at the cost of much
-slower (i.e. real-time) tape-loading. When tape-loading traps are
-disabled, you need to start tape playback manually, by pressing
+order to load from tape files more quickly when possible. But this can
+(rarely) interfere with TZX loading; disabling this option avoids the
+problem at the cost of slower (i.e. always real-time) tape-loading.
+When tape-loading traps are disabled, you need to start tape playback
+manually, by pressing
 .IR F8 .
 .RE
 .PP
@@ -128,6 +128,19 @@ one channel only.
 .I F5
 Reset the emulated Spectrum.
 .TP
+.I F6
+Write the current virtual-tape contents to a TZX file. The GTK+ UI
+lets you select a filename (see
+.B "FILE SELECTION"
+below), the others just write the file as
+.IR tape.tzx .
+The virtual-tape contents are the contents of the previously-loaded
+tape (if any), followed by anything you've saved from the emulated
+machine since. These newly-saved files are
+.I not
+written to any tape file until you press
+.IR F6 .
+.TP
 .I F7
 Choose a TAP or TZX virtual-tape file to load from. Again, see
 .B "FILE SELECTION"
@@ -136,16 +149,15 @@ the load in the emulated machine (with LOAD "" or the 128's Tape
 Loader option, though you may need to reset first).
 .PP
 .RS
-To load TZX files properly, you should select the file, make sure
-tape-loading traps are disabled in the General Options dialog, then
-press
+To
+.I guarantee
+that TZX files will load properly, you should select the file, make
+sure tape-loading traps are disabled in the General Options dialog,
+then press
 .IR F8 .
-Some TZXs will work with tape-loading traps enabled, or will load
-partway such that you can press
-.I F8
-to load the rest, but it's best to do things properly unless you
-.I know
-this is the case.
+That said, most TZXs will work with tape-loading traps enabled (often
+quickly loading partway, then loading the rest real-time), so you
+might want to try it that way first.
 .RE
 .TP
 .I F8
@@ -155,7 +167,10 @@ again pauses playback, and a further press resumes.) To explain - if
 tape-loading traps have been disabled (in the General Options dialog),
 starting the loading process in the emulated machine isn't enough. You
 also have to `press play', so to speak :-), and this is how you do
-that.
+that. You may also need to press
+.I F8
+to resume in certain other circumstances (e.g. TZXs containing
+multi-load games may have a stop-the-tape request, which Fuse obeys).
 .TP
 .I F9
 Choose the next machine type in sequence. The machine initially
@@ -278,7 +293,14 @@ To move the cursor, you can either use the cursor keys, or the
 Spectrum equivalents
 .\" too many to portably risk using IR...
 \fI5\fR/\fI6\fR/\fI7\fR/\fI8\fR, or (similarly)
-\fIh\fR/\fIj\fR/\fIk\fR/\fIl\fR. To select a file or directory, press
+\fIh\fR/\fIj\fR/\fIk\fR/\fIl\fR. For faster movement, the
+.IR "Page Up" ,
+.IR "Page Down" ,
+.IR Home ,
+and
+.I End
+keys are supported and do what you'd expect. To select a file or
+directory, press
 .IR Enter .
 To abort, press
 .I Esc
@@ -292,16 +314,12 @@ files are shown, whether Fuse would be able to load them or not.
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
-It can't currently save to TAP files.
-.PP
 It doesn't emulate memory contention, so some `rainbow' and border
 effects don't look right.
 .PP
 No peripherals (except the tape player) are supported.
 .PP
 The sound support is currently for OSS (e.g. Linux) only.
-.PP
-There's no way to page up or down in the widget-UI selector.
 .\"
 .\"------------------------------------------------------------------
 .\"
