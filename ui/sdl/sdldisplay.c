@@ -150,16 +150,16 @@ sdldisplay_allocate_colours( int numColours, Uint32 *colour_values,
                              Uint32 *bw_values )
 {
   int i;
-
   Uint8 red, green, blue, grey;
 
-    red = colour_palette[i].r;
-  green = colour_palette[i].g;
-   blue = colour_palette[i].b;
-
-   grey = 0.299 * red + 0.587 * green + 0.114 * blue;
-
   for( i = 0; i < numColours; i++ ) {
+
+      red = colour_palette[i].r;
+    green = colour_palette[i].g;
+     blue = colour_palette[i].b;
+
+     grey = 0.299 * red + 0.587 * green + 0.114 * blue;
+
     colour_values[i] = SDL_MapRGB( tmp_screen->format,  red, green, blue );
     bw_values[i]     = SDL_MapRGB( tmp_screen->format, grey,  grey, grey );
   }
