@@ -55,7 +55,8 @@ typedef libspectrum_byte
 
 typedef libspectrum_dword
   (*spectrum_port_contention_function)( libspectrum_word port );
-typedef libspectrum_dword (*spectrum_contention_delay_function)( void );
+typedef libspectrum_byte
+  (*spectrum_contention_delay_function)( libspectrum_dword time );
 
 typedef struct spectrum_raminfo {
 
@@ -81,9 +82,10 @@ typedef struct spectrum_raminfo {
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
 extern spectrum_screen_read_function read_screen_memory;
-
 extern spectrum_port_contention_function contend_port;
-extern spectrum_contention_delay_function contend_delay;
+
+/* How much contention do we get at every tstate? */
+extern libspectrum_byte spectrum_contention[ 80000 ];
 
 /* Things relating to peripherals */
 

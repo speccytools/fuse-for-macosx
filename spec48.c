@@ -61,28 +61,28 @@ libspectrum_dword
 spec48_contend_port( libspectrum_word port )
 {
   /* Contention occurs only for even-numbered ports */
-  if( ( port & 0x01 ) == 0 ) return spec48_contend_delay();
+  if( ( port & 0x01 ) == 0 ) return spectrum_contention[ tstates ];
 
   return 0;
 }
 
-libspectrum_dword
-spec48_contend_delay( void )
+libspectrum_byte
+spec48_contend_delay( libspectrum_dword time )
 {
   libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
-  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+  if( time < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
     return 0;
 
   /* Or the lower border */
-  if( tstates >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
-                                              DISPLAY_HEIGHT          ] )
+  if( time >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
+					   DISPLAY_HEIGHT          ] )
     return 0;
 
   /* Work out where we are in this line */
   tstates_through_line =
-    ( tstates + machine_current->timings.left_border ) %
+    ( time + machine_current->timings.left_border ) %
     machine_current->timings.tstates_per_line;
 
   /* No contention if we're in the left border */

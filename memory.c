@@ -61,7 +61,7 @@ readbyte( libspectrum_word address )
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
-  if( memory_contended[ bank ] ) tstates += contend_delay();
+  if( memory_contended[ bank ] ) tstates += spectrum_contention[ tstates ];
   tstates += 3;
 
   return memory_map[ bank ][ address & 0x1fff ];
@@ -80,7 +80,7 @@ writebyte( libspectrum_word address, libspectrum_byte b )
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
-  if( memory_contended[ bank ] ) tstates += contend_delay();
+  if( memory_contended[ bank ] ) tstates += spectrum_contention[ tstates ];
   tstates += 3;
 
   if( memory_writable[ bank ] || settings_current.writable_roms ) {

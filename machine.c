@@ -210,7 +210,6 @@ machine_select_machine( fuse_machine_info *machine )
 
   read_screen_memory = machine->ram.read_screen;
   contend_port = machine->ram.contend_port;
-  contend_delay = machine->ram.contend_delay;
   
   if( uidisplay_end() ) return 1;
 
@@ -327,6 +326,10 @@ machine_reset( void )
 
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;
+
+  /* Set up the contention array */
+  for( i = 0; i < machine_current->timings.tstates_per_frame; i++ )
+    spectrum_contention[ i ] = machine_current->ram.contend_delay( i );
 
   return 0;
 }

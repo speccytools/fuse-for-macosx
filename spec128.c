@@ -65,28 +65,28 @@ spec128_contend_port( libspectrum_word port )
 {
   /* Contention occurs for the ULA, or for the memory paging port */
   if( ( port & 0x0001 ) == 0x0000 ||
-      ( port & 0x8002 ) == 0x0000    ) return spec128_contend_delay();
+      ( port & 0x8002 ) == 0x0000    ) return spec128_contend_delay( tstates );
 
   return 0;
 }
 
-libspectrum_dword
-spec128_contend_delay( void )
+libspectrum_byte
+spec128_contend_delay( libspectrum_dword time )
 {
   libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
-  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+  if( time < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
     return 0;
 
   /* Or the lower border */
-  if( tstates >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
-                                              DISPLAY_HEIGHT          ] )
+  if( time >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
+					   DISPLAY_HEIGHT          ] )
     return 0;
 
   /* Work out where we are in this line */
   tstates_through_line =
-    ( tstates + machine_current->timings.left_border ) %
+    ( time + machine_current->timings.left_border ) %
     machine_current->timings.tstates_per_line;
 
   /* No contention if we're in the left border */

@@ -327,7 +327,8 @@ enum debugger_mode_t debugger_mode;
 
 libspectrum_byte **ROM = NULL;
 libspectrum_byte *memory_map[8];
-int memory_contended[8] = { 1, 1, 1, 1, 1, 1, 1, 1 };
+int memory_contended[8] = { 1 };
+libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 
 int
 debugger_check( debugger_breakpoint_type type, libspectrum_word value )

@@ -37,7 +37,7 @@ void spec48_writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
 libspectrum_dword spec48_contend_memory( libspectrum_word address );
 libspectrum_dword spec48_contend_port( libspectrum_word port );
-libspectrum_dword spec48_contend_delay( void );
+libspectrum_byte spec48_contend_delay( libspectrum_dword time );
 
 int spec48_init( fuse_machine_info *machine );
 int spec48_reset( void );

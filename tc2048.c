@@ -41,7 +41,7 @@
 #include "spectrum.h"
 #include "tc2048.h"
 
-static libspectrum_dword tc2048_contend_delay( void );
+static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );
 
 spectrum_port_info tc2048_peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
@@ -77,28 +77,28 @@ tc2048_contend_port( libspectrum_word port )
   /* Contention occurs for port FF (SCLD DEC) */
   if( ( port & 0xff ) == 0xf4 ||
       ( port & 0xff ) == 0xfe ||
-      ( port & 0xff ) == 0xff    ) return tc2048_contend_delay();
+      ( port & 0xff ) == 0xff    ) return tc2048_contend_delay( tstates );
 
   return 0;
 }
 
-static libspectrum_dword
-tc2048_contend_delay( void )
+static libspectrum_byte
+tc2048_contend_delay( libspectrum_dword time )
 {
   libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
-  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+  if( time < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
     return 0;
 
   /* Or the lower border */
-  if( tstates >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
-                                              DISPLAY_HEIGHT          ] )
+  if( time >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
+					   DISPLAY_HEIGHT          ] )
     return 0;
 
   /* Work out where we are in this line */
   tstates_through_line =
-    ( tstates + machine_current->timings.left_border ) %
+    ( time + machine_current->timings.left_border ) %
     machine_current->timings.tstates_per_line;
 
   /* No contention if we're in the left border */

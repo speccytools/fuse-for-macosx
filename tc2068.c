@@ -48,7 +48,7 @@
 
 #define ADDR_TO_CHUNK(addr) 2 + (addr >> 13)
 
-static libspectrum_dword tc2068_contend_delay( void );
+static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 
 spectrum_port_info tc2068_peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
@@ -128,28 +128,28 @@ tc2068_contend_port( libspectrum_word port )
       ( port & 0xff ) == 0xf5 ||
       ( port & 0xff ) == 0xf6 ||
       ( port & 0xff ) == 0xfe ||
-      ( port & 0xff ) == 0xff    ) return tc2068_contend_delay();
+      ( port & 0xff ) == 0xff    ) return tc2068_contend_delay( tstates );
 
   return 0;
 }
 
-static libspectrum_dword
-tc2068_contend_delay( void )
+static libspectrum_byte
+tc2068_contend_delay( libspectrum_dword time )
 {
   libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
-  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+  if( time < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
     return 0;
 
   /* Or the lower border */
-  if( tstates >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
-                                              DISPLAY_HEIGHT          ] )
+  if( time >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
+					   DISPLAY_HEIGHT          ] )
     return 0;
 
   /* Work out where we are in this line */
   tstates_through_line =
-    ( tstates + machine_current->timings.left_border ) %
+    ( time + machine_current->timings.left_border ) %
     machine_current->timings.tstates_per_line;
 
   /* No contention if we're in the left border */

@@ -43,7 +43,7 @@
 
 static libspectrum_byte pentagon_select_1f_read( libspectrum_word port );
 static libspectrum_byte pentagon_select_ff_read( libspectrum_word port );
-static libspectrum_dword pentagon_contend_delay( void );
+static libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
 static int pentagon_shutdown( void );
 
 spectrum_port_info pentagon_peripherals[] = {
@@ -99,8 +99,8 @@ pentagon_contend_port( libspectrum_word port GCC_UNUSED )
   return 0;
 }
 
-static libspectrum_dword
-pentagon_contend_delay( void )
+static libspectrum_byte
+pentagon_contend_delay( libspectrum_dword time )
 {
   /* No contention */
   return 0;

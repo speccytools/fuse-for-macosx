@@ -51,7 +51,7 @@ void specplus3_writebyte_internal( libspectrum_word address,
 
 libspectrum_dword specplus3_contend_memory( libspectrum_word address );
 libspectrum_dword specplus3_contend_port( libspectrum_word address );
-libspectrum_dword specplus3_contend_delay( void );
+libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
 
 int specplus3_init( fuse_machine_info *machine );
 int specplus3_reset(void);

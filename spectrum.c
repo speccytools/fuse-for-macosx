@@ -71,6 +71,8 @@ spectrum_screen_read_function read_screen_memory;
 spectrum_port_contention_function contend_port;
 spectrum_contention_delay_function contend_delay;
 
+libspectrum_byte spectrum_contention[ 80000 ];
+
 /* Level data from .slt files */
 
 libspectrum_byte *slt[256];

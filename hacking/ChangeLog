@@ -357,3 +357,4 @@
 20031114 memory.[ch], z80/z80.pl, z80/z80_ops.c: macroise
          readbyte_internal().
 20031114 Remove use of *_contend_memory().
+20031114 Precalculate the contention at every tstate.
