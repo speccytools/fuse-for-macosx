@@ -383,3 +383,5 @@
 20031207 event.[ch]: use the defined enum for event type variables.
 20031209 ui/gtk/gtkjoystick.c: fix filename in initial comment.
 20031209 ChangeLog: bring up-to-date.
+20031214 widget/filesel.c: on Win32, chdir does not return ENOTDIR for not
+	 a directory, so check explicitly (Marek).

@@ -1,5 +1,5 @@
 /* filesel.c: File selection dialog box
-   Copyright (c) 2001,2002 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2001-2003 Matan Ziv-Av, Philip Kendall, Russell Marks, Marek Januszewski
 
    $Id$
 
@@ -36,6 +36,10 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#ifdef WIN32
+#include <windows.h>
+#endif				/* #ifdef WIN32 */
 
 #include "fuse.h"
 #include "keyboard.h"
@@ -434,8 +438,18 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     }
     strcat( fn, "/" ); strcat( fn, widget_filenames[ current_file ]->name );
 			
+/*
+  in Win32 errno resulting from chdir on file is EINVAL which may mean many things
+  this will not be fixed in mingw - must use native function instead
+  http://thread.gmane.org/gmane.comp.gnu.mingw.user/9197
+*/ 
+
     if(chdir(fn)==-1) {
+#ifndef WIN32
       if(errno==ENOTDIR) {
+#else
+      if( GetFileAttributes( fn ) != FILE_ATTRIBUTE_DIRECTORY	) {
+#endif
 	widget_filesel_name = fn;
 	if( exit_all_widgets ) {
 	  widget_end_all( WIDGET_FINISHED_OK );
