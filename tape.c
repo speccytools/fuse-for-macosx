@@ -452,7 +452,10 @@ int trap_check_rom( void )
     /* OK if we're in ROM 1  and TRDOS is not active */
     return( machine_current->ram.current_rom == 1 && !trdos_active );
 
-    return 1;		/* Always OK here */
+  default:
+    ui_error( UI_ERROR_ERROR, "Unknown machine type %d\n",
+	      machine_current->machine );
+    abort();
   }
 
   ui_error( UI_ERROR_ERROR, "Impossible machine type %d",

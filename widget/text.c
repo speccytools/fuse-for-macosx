@@ -32,7 +32,7 @@
 
 char *widget_text_text;		/* What we return the text in */
 
-static char *title;		/* The window title */
+static const char *title;	/* The window title */
 static char text[40];		/* The current entry text */
 
 static void delete_character( void );
