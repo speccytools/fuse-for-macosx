@@ -129,7 +129,7 @@ foreach( @keys ) {
 
     my( $keysym, $key1, $key2 ) = @$_;
 
-    printf "  { KEY(%-12s , KEYBOARD_%-6s KEYBOARD_%-6s },\n",
+    printf "  { KEY(%-12s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
       "$keysym)", "$key1,", $key2;
 }
 
@@ -158,6 +158,7 @@ foreach( @keys ) {
     $keysym =~ s/(.*)_L$/LEFT$1/;
     $keysym =~ s/(.*)_R$/RIGHT$1/;
     $keysym =~ s/META$/WIN/;		# Fairly sensible mapping
+    $keysym =~ s/^PAGE_/PAGE/;
 
     # Some specific translations
     $keysym = $svga_keysyms{$keysym} if $svga_keysyms{$keysym};
@@ -172,7 +173,7 @@ foreach( @keys ) {
 	print "#ifdef $keysym\n";
     }
 
-    printf "  { %-25s , KEYBOARD_%-6s KEYBOARD_%-6s },\n",
+    printf "  { %-25s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
       $keysym, "$key1,", $key2;
 
     if( $keysym =~ /WIN$/ ) {

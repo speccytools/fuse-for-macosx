@@ -84,6 +84,14 @@ typedef enum keyboard_key_name {
   KEYBOARD_Caps,
   KEYBOARD_Symbol,
 
+  /* Below here, keys don't actually correspond to Spectrum keys, but
+     are used by the widget code */
+
+  KEYBOARD_PageUp = 0x200,
+  KEYBOARD_PageDown,
+  KEYBOARD_Home,
+  KEYBOARD_End,
+
 } keyboard_key_name;
 
 void fuse_keyboard_init(void);

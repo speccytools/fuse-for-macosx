@@ -452,6 +452,26 @@ static void widget_selectfile_keyhandler( int key )
     if( current_file < widget_numfiles-1 ) new_current_file++;
     break;
 
+  case KEYBOARD_PageUp:
+    new_current_file = ( current_file > 36 ) ?
+                       current_file - 36     :
+                       0;
+    break;
+
+  case KEYBOARD_PageDown:
+    new_current_file = ( current_file < widget_numfiles-36 ) ?
+                       current_file + 36 :
+		       widget_numfiles - 1;
+    break;
+
+  case KEYBOARD_Home:
+    new_current_file = 0;
+    break;
+
+  case KEYBOARD_End:
+    new_current_file = widget_numfiles - 1;
+    break;
+
   case KEYBOARD_Enter:
     /* Get the new directory name */
     fn = widget_getcwd();

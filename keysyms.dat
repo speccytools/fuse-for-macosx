@@ -103,3 +103,10 @@ Left        , 5,     Caps
 Down        , 6,     Caps
 Up          , 7,     Caps
 Right       , 8,     Caps
+
+# Non-Spectrum keys, but used by the widget code
+
+Page_Up	    , PageUp,   NONE
+Page_Down   , PageDown, NONE
+Home	    , Home,     NONE
+End	    , End,      NONE
