@@ -1,5 +1,5 @@
 /* trdos.c: Routines for handling the Betadisk interface
-   Copyright (c) 2002-2003 Dmitry Sanarin, Fredrick Meunier
+   Copyright (c) 2002-2003 Dmitry Sanarin, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -19,8 +19,11 @@
 
    Author contact information:
 
-   E-mail: sdb386@hotmail.com, fredm@spamcop.net
+   Philip: pak21-fuse@srcf.ucam.org
+     Post: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
+   Dmitry: sdb386@hotmail.com
+   Fred: fredm@spamcop.net
 */
 
 #include <config.h>
@@ -148,6 +151,15 @@ static discs_type discs[4];
 
 int trdos_active=0;
 
+/* The filenames (if any) used for the results of our SCL->TRD conversions */
+static char *scl_files[2] = { NULL, NULL };
+
+/* The template used for naming the results of the SCL->TRD conversion */
+#define SCL_TMP_FILE_TEMPLATE "/tmp/fuse.scl.XXXXXX"
+
+/* Remove any temporary file associated with drive 'which' */
+static int remove_scl( trdos_drive_number which );
+
 int Scl2Trd( const char *oldname, const char *newname );
 
 void
@@ -166,12 +178,9 @@ trdos_reset( void )
 void
 trdos_end( void )
 {
-  char trd_template[] = SCL_TMP_FILE_TEMPLATE;
+  int i;
 
-  unlink(trd_template);
-
-  trd_template[SCL_TMP_FILE_OFFSET] = 'B';
-  unlink(trd_template);
+  for( i=0; i<2; i++ ) remove_scl( i );
 }
 
 static
@@ -382,13 +391,45 @@ trdos_disk_insert_trd( trdos_drive_number which, const char *filename )
   return 0;
 }
 
+static int
+remove_scl( trdos_drive_number which )
+{
+  int error = 0;
+
+  if( scl_files[ which ] ) {
+    error = unlink( scl_files[ which ] );
+    if( error ) {
+      ui_error( UI_ERROR_ERROR, "couldn't remove temporary .trd file %s: %s",
+		scl_files[ which ], strerror( errno ) );
+    }
+    free( scl_files[ which ] ); scl_files[ which ] = 0;
+  }
+
+  return error;
+}  
+
 int
 trdos_disk_insert_scl( trdos_drive_number which, const char *filename )
 {
   char trd_template[] = SCL_TMP_FILE_TEMPLATE;
   int ret;
 
-  trd_template[SCL_TMP_FILE_OFFSET] = 'A' + which;
+  ret = remove_scl( which ); if( ret ) return ret;
+
+  ret = mkstemp( trd_template );
+  if( ret == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get a temporary filename: %s",
+	      strerror( errno ) );
+    return ret;
+  }
+
+  scl_files[ which ] = malloc( strlen( trd_template ) + 1 );
+  if( !scl_files[ which ] ) {
+    unlink( trd_template );
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
+  strcpy( scl_files[ which ], trd_template );
 
   if( ( ret = Scl2Trd( filename, trd_template ) ) ) {
     return ret;
@@ -418,6 +459,8 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
 int
 trdos_disk_eject( trdos_drive_number which )
 {
+  remove_scl( which );
+
   discs[which].disc_ready = 0;
 
   return 0;

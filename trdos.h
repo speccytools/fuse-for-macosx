@@ -58,7 +58,4 @@ int trdos_disk_eject( trdos_drive_number which );
 int trdos_event_cmd_done( DWORD last_tstates );
 int trdos_event_index( DWORD last_tstates );
 
-#define SCL_TMP_FILE_TEMPLATE "/tmp/Fuse_SCL_DiskA_Image.trd"
-#define SCL_TMP_FILE_OFFSET 18
-
 #endif                  /* #ifndef FUSE_TRDOS_H */
