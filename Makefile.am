@@ -26,14 +26,14 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = libspectrum man myglib roms utils widget z80
+SUBDIRS = libspectrum man myglib roms ui utils widget z80
 
 fuse_SOURCES = ay.c display.c event.c fbdisplay.c fbkeyboard.c fbui.c\
-	fuse.c gtkdisplay.c gtkkeyboard.c gtkui.c keyboard.c keysyms.c\
-	machine.c osssound.c settings.c snapshot.c sound.c spec128.c\
-	spec48.c specplus2.c specplus3.c spectrum.c svgadisplay.c\
-	svgakeyboard.c svgaui.c tape.c timer.c xdisplay.c xkeyboard.c xui.c\
-	aalibui.c aalibdisplay.c aalibkeyboard.c joystick.c
+	fuse.c keyboard.c keysyms.c machine.c osssound.c settings.c\
+	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus3.c\
+	spectrum.c svgadisplay.c svgakeyboard.c svgaui.c tape.c timer.c\
+	xdisplay.c xkeyboard.c xui.c aalibui.c aalibdisplay.c aalibkeyboard.c\
+	joystick.c
 
 BUILT_SOURCES = keysyms.c
 
@@ -41,10 +41,10 @@ keysyms.c: keysyms.pl keysyms.dat
 	@PERL@ keysyms.pl keysyms.dat > keysyms.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DROMSDIR="\"${pkgdatadir}\""
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a myglib/libmyglib.a widget/libwidget.a z80/libz80.a
+LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a myglib/libmyglib.a ui/gtk/libuigtk.a widget/libwidget.a z80/libz80.a
 
 noinst_HEADERS = ay.h display.h event.h fbkeyboard.h\
-	fuse.h gtkkeyboard.h gtkui.h keyboard.h keysyms.h\
+	fuse.h keyboard.h keysyms.h\
 	machine.h osssound.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h svgakeyboard.h\
 	tape.h timer.h types.h ui.h uidisplay.h xdisplay.h\
