@@ -115,7 +115,7 @@ void
 menu_options_joysticks_select( gpointer callback_data, guint callback_action,
 			       GtkWidget *widget )
 {
-  GtkWidget *dialog, *table, *label, *menu, *button;
+  GtkWidget *dialog, *frame, *box, *menu, *button;
   GSList *button_group;
   GtkItemFactory *factory;
   struct joystick_info info;
@@ -142,17 +142,15 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
     info.type = &( settings_current.joystick_keyboard_output );
     info.fire = NULL;
     break;
-    
 
   }
 
-  table = gtk_table_new( JOYSTICK_TYPE_COUNT + 2, 2, FALSE );
+  frame = gtk_frame_new( "Joystick type" );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-			       table );
+			       frame );
 
-  label = gtk_label_new( "Joystick type" );
-  gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1,
-			     0, JOYSTICK_TYPE_COUNT );
+  box = gtk_vbox_new( FALSE, 0 );
+  gtk_container_add( GTK_CONTAINER( frame ), box );
 
   button_group = NULL;
 
@@ -162,8 +160,7 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
       gtk_radio_button_new_with_label( button_group, joystick_name[ i ] );
     button_group =
       gtk_radio_button_group( GTK_RADIO_BUTTON( info.radio[ i ] ) );
-    gtk_table_attach_defaults( GTK_TABLE( table ), info.radio[ i ], 1, 2,
-			       i, i + 1 );
+    gtk_box_pack_start_defaults( GTK_BOX( box ), info.radio[ i ] );
 
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( info.radio[ i ] ),
 				    i == *( info.type ) );
@@ -174,9 +171,12 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
 
   if( info.fire ) {
 
-    label = gtk_label_new( "Button 1" );
-    gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1,
-			       JOYSTICK_TYPE_COUNT, JOYSTICK_TYPE_COUNT + 1 );
+    frame = gtk_frame_new( "Button 1" );
+    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+				 frame );
+
+    box = gtk_hbox_new( FALSE, 0 );
+    gtk_container_add( GTK_CONTAINER( frame ), box );
 
     info.key = *( info.fire );
     info.fire_label = gtk_label_new( "" );
@@ -198,16 +198,13 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
 
     }
 
-    gtk_table_attach_defaults( GTK_TABLE( table ), info.fire_label, 0, 1,
-			       JOYSTICK_TYPE_COUNT + 1,
-			       JOYSTICK_TYPE_COUNT + 2 );
+    gtk_box_pack_start_defaults( GTK_BOX( box ), info.fire_label );
 
     factory = gtk_item_factory_new( GTK_TYPE_OPTION_MENU, "<fire>", NULL );
     gtk_item_factory_create_items( factory, key_menu_count, key_menu, &info );
 
     menu = gtk_item_factory_get_widget( factory, "<fire>" );
-    gtk_table_attach_defaults( GTK_TABLE( table ), menu, 1, 2,
-			       JOYSTICK_TYPE_COUNT, JOYSTICK_TYPE_COUNT + 2 );
+    gtk_box_pack_start_defaults( GTK_BOX( box ), menu );
   }
 
   /* Create and add the action buttons to the dialog box */
@@ -243,7 +240,7 @@ set_key_text( GtkWidget *label, keyboard_key_name key )
 
   text = keyboard_key_text( key );
 
-  snprintf( buffer, 40, "(currently: %s)", text );
+  snprintf( buffer, 40, "%s", text );
 
   gtk_label_set_text( GTK_LABEL( label ), buffer );
 }
