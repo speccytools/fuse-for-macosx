@@ -31,11 +31,9 @@
 #include <time.h>
 #include <unistd.h>
 
-/* Use Fuse's types rather than glibc's (PAK) */
-#include "types.h"
+#include <libspectrum.h>
 
-#define uint64_t QWORD
-/* End of Fuse compatability section */
+#define uint64_t libspectrum_qword
 
 /* These are the characters used in temporary filenames.  */
 static const char letters[] =
