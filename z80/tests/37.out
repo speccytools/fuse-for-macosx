@@ -1,4 +1,69 @@
     0 MC 0000
     4 MR 0000 37
-0001 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0001
-00 01 0 0 0 0 4
+    4 MC 0001
+    8 MR 0001 f5
+    9 MC ffff
+   12 MW ffff 00
+   12 MC fffe
+   15 MW fffe 01
+   15 MC 0002
+   19 MR 0002 e5
+   20 MC fffd
+   23 MW fffd 00
+   23 MC fffc
+   26 MW fffc ff
+   26 MC 0003
+   30 MR 0003 f1
+   30 MC fffc
+   33 MR fffc ff
+   33 MC fffd
+   36 MR fffd 00
+   36 MC 0004
+   40 MR 0004 37
+   40 MC 0005
+   44 MR 0005 f5
+   45 MC fffd
+   48 MW fffd 00
+   48 MC fffc
+   51 MW fffc c5
+   51 MC 0006
+   55 MR 0006 65
+   55 MC 0007
+   59 MR 0007 e5
+   60 MC fffb
+   63 MW fffb ff
+   63 MC fffa
+   66 MW fffa ff
+   66 MC 0008
+   70 MR 0008 f1
+   70 MC fffa
+   73 MR fffa ff
+   73 MC fffb
+   76 MR fffb ff
+   76 MC 0009
+   80 MR 0009 37
+   80 MC 000a
+   84 MR 000a f5
+   85 MC fffb
+   88 MW fffb ff
+   88 MC fffa
+   91 MW fffa ed
+   91 MC 000b
+   95 MR 000b 68
+   95 MC 000c
+   99 MR 000c e5
+  100 MC fff9
+  103 MW fff9 ff
+  103 MC fff8
+  106 MW fff8 00
+  106 MC 000d
+  110 MR 000d f1
+  110 MC fff8
+  113 MR fff8 00
+  113 MC fff9
+  116 MR fff9 ff
+  116 MC 000e
+  120 MR 000e 37
+ff29 0000 0000 ff00 0000 0000 0000 0000 0000 0000 fffa 000f
+00 0f 0 0 0 0 120
+fff8 00 ff ed ff c5 00 01 00 -1

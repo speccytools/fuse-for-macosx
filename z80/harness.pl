@@ -122,5 +122,6 @@ sub do_test ($) {
 # Main program begins here
 
 foreach my $testfile ( @ARGV ) {
+    next if $testfile =~ /Makefile/;
     print "$testfile\n" unless do_test( $testfile );
 }

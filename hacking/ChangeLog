@@ -584,3 +584,6 @@
 20040219 TAG: Release-0_6_2_1 (Release-0_6_2-branch).
 20040223 Merge changes from Release-0_6_2_1 to HEAD.
 20040223 TAG: Release-0_6_2-merge-1
+20040225 z80/{harness.pl,z80.pl,tests/37.in,tests/37.out}: SCF should copy
+	 bits 3 and 5 from the A register, not OR them (thanks, Erik Kunze
+	 and Thomas Harte).

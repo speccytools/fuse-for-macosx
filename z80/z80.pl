@@ -964,8 +964,9 @@ sub opcode_SBC (@) { arithmetic_logical( 'SBC', $_[0], $_[1] ); }
 
 sub opcode_SCF (@) {
     print << "SCF";
-      F &= ~( FLAG_N | FLAG_H );
-      F |= ( A & ( FLAG_3 | FLAG_5 ) ) | FLAG_C;
+      F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
+	  ( A & ( FLAG_3 | FLAG_5          ) ) |
+	  FLAG_C;
 SCF
 }
 
