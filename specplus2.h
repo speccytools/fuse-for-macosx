@@ -30,5 +30,6 @@
 #endif			/* #ifndef FUSE_MACHINE_H */
 
 int specplus2_init( fuse_machine_info *machine );
+int specplus2_reset( void );
 
 #endif			/* #ifndef FUSE_SPECPLUS2_H */

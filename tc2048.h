@@ -42,5 +42,6 @@ DWORD tc2048_contend_memory( WORD address );
 DWORD tc2048_contend_port( WORD port );
 
 int tc2048_init( fuse_machine_info *machine );
+int tc2048_reset( void );
 
 #endif			/* #ifndef FUSE_TC2048_H */

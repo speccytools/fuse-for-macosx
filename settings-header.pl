@@ -97,6 +97,7 @@ extern settings_info settings_current;
 int settings_init( int *first_arg, int argc, char **argv );
 int settings_defaults( settings_info *settings );
 int settings_copy( settings_info *dest, settings_info *src );
+int settings_set_string( char **string_setting, char *value );
 int settings_free( settings_info *settings );
 
 int settings_write_config( settings_info *settings );

@@ -136,7 +136,7 @@ int tc2048_init( fuse_machine_info *machine )
   machine->machine = LIBSPECTRUM_MACHINE_TC2048;
   machine->id = "2048";
 
-  machine->reset = NULL;
+  machine->reset = tc2048_reset;
 
   machine_set_timings( machine, 3.528e6, 24, 128, 24, 48, 312, 8936 );
 
@@ -151,9 +151,7 @@ int tc2048_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
-  error = machine_allocate_rom( machine, 0, settings_current.rom_tc2048,
-				0x4000 );
-  if( error ) return error;
+  machine->rom_length[0] = 0x4000;
 
   machine->peripherals = tc2048_peripherals;
   machine->unattached_port = tc2048_unattached_port;
@@ -164,4 +162,16 @@ int tc2048_init( fuse_machine_info *machine )
 
   return 0;
 
+}
+
+int
+tc2048_reset( void )
+{
+  int error;
+
+  error = machine_load_rom( &ROM[0], settings_current.rom_tc2048,
+			    machine_current->rom_length[0] );
+  if( error ) return error;
+
+  return 0;
 }

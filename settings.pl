@@ -429,6 +429,19 @@ print hashline( __LINE__ ), << 'CODE';
 }
 
 int
+settings_set_string( char **string_setting, char *value )
+{
+  if( *string_setting) free( *string_setting );
+  *string_setting = strdup( value );
+  if( !( *string_setting ) ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
+
+  return 0;
+}
+
+int
 settings_free( settings_info *settings )
 {
 CODE

@@ -43,7 +43,7 @@ int specplus2_init( fuse_machine_info *machine )
   machine->machine = LIBSPECTRUM_MACHINE_PLUS2;
   machine->id = "plus2";
 
-  machine->reset = spec128_reset;
+  machine->reset = specplus2_reset;
 
   machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865);
 
@@ -58,12 +58,7 @@ int specplus2_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;
-  error = machine_allocate_rom( machine, 0, settings_current.rom_plus2_0,
-				0x4000 );
-  if( error ) return error;
-  error = machine_allocate_rom( machine, 1, settings_current.rom_plus2_1,
-				0x4000 );
-  if( error ) return error;
+  machine->rom_length[0] = machine->rom_length[1] = 0x4000;
 
   machine->peripherals = spec128_peripherals;
   machine->unattached_port = spec128_unattached_port;
@@ -74,4 +69,24 @@ int specplus2_init( fuse_machine_info *machine )
 
   return 0;
 
+}
+
+int
+specplus2_reset( void )
+{
+  int error;
+
+  machine_current->ram.locked=0;
+  machine_current->ram.current_page=0;
+  machine_current->ram.current_rom=0;
+  machine_current->ram.current_screen=5;
+
+  error = machine_load_rom( &ROM[0], settings_current.rom_plus2_0,
+			    machine_current->rom_length[0] );
+  if( error ) return error;
+  error = machine_load_rom( &ROM[1], settings_current.rom_plus2_1,
+			    machine_current->rom_length[1] );
+  if( error ) return error;
+
+  return 0;
 }

@@ -41,14 +41,14 @@ static void add_rom( GtkWidget *table, gint row, const char *name );
 static void select_new_rom( GtkWidget *widget, gpointer data );
 static void roms_done( GtkWidget *widget, gpointer data );
 
-/* The number of ROMs we can change
+/* The number of ROMs we can change */
 #define ROM_COUNT 14
 
 /* The ROM filenames as selected */
 GtkWidget *rom[ ROM_COUNT ];
 
 /* And which settings entries these correspond to */
-char **settings[] = {
+char **settings[ ROM_COUNT ] = {
 
   &settings_current.rom_48,
   &settings_current.rom_128_0,
@@ -175,6 +175,17 @@ select_new_rom( GtkWidget *widget, gpointer data )
 static void
 roms_done( GtkWidget *widget, gpointer data )
 {
+  size_t i;
+  int error;
+  
+  char *string;
+
+  for( i = 0; i < ROM_COUNT; i++ ) {
+    gtk_label_get( GTK_LABEL( rom[i] ), &string );
+    error = settings_set_string( settings[i], string );
+    if( error ) return;
+  }
+
   gtkui_destroy_widget_and_quit( widget, NULL );
 }
 

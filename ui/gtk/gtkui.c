@@ -495,7 +495,12 @@ save_options( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  machine_reset();
+  if( machine_reset() ) {
+    ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
+
+    /* FIXME: abort() seems a bit extreme here, but it'll do for now */
+    fuse_abort();
+  }
 }
 
 typedef struct gtkui_select_info {

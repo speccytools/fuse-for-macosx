@@ -76,18 +76,8 @@ specplus2a_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;
-  error = machine_allocate_rom( machine, 0, settings_current.rom_plus2a_0,
-				0x4000 );
-  if( error ) return error;
-  error = machine_allocate_rom( machine, 1, settings_current.rom_plus2a_1,
-				0x4000 );
-  if( error ) return error;
-  error = machine_allocate_rom( machine, 2, settings_current.rom_plus2a_2,
-				0x4000 );
-  if( error ) return error;
-  error = machine_allocate_rom( machine, 3, settings_current.rom_plus2a_3,
-				0x4000 );
-  if( error ) return error;
+  machine->rom_length[0] = machine->rom_length[1] = 
+    machine->rom_length[2] = machine->rom_length[3] = 0x4000;
 
   machine->peripherals = specplus2a_peripherals;
   machine->unattached_port = specplus3_unattached_port;
@@ -102,12 +92,27 @@ specplus2a_init( fuse_machine_info *machine )
 
 int specplus2a_reset(void)
 {
+  int error;
+
   machine_current->ram.current_page = 0;
   machine_current->ram.current_rom = 0;
   machine_current->ram.current_screen = 5;
   machine_current->ram.locked = 0;
   machine_current->ram.special = 0;
   machine_current->ram.specialcfg = 0;
+
+  error = machine_load_rom( &ROM[0], settings_current.rom_plus2a_0,
+			    machine_current->rom_length[0] );
+  if( error ) return error;
+  error = machine_load_rom( &ROM[1], settings_current.rom_plus2a_1,
+			    machine_current->rom_length[1] );
+  if( error ) return error;
+  error = machine_load_rom( &ROM[2], settings_current.rom_plus2a_2,
+			    machine_current->rom_length[2] );
+  if( error ) return error;
+  error = machine_load_rom( &ROM[3], settings_current.rom_plus2a_3,
+			    machine_current->rom_length[3] );
+  if( error ) return error;
 
   return 0;
 }

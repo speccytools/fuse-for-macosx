@@ -66,9 +66,6 @@ static int machine_location;	/* Where is the current machine in
 
 static int machine_add_machine( int (*init_function)(fuse_machine_info *machine) );
 static int machine_select_machine( fuse_machine_info *machine );
-static int machine_load_roms( fuse_machine_info *machine );
-static int machine_load_rom( BYTE **ROM, char *filename,
-			     size_t expected_length );
 
 int machine_init_machines( void )
 {
@@ -199,42 +196,7 @@ static int machine_select_machine( fuse_machine_info *machine )
   return 0;
 }
 
-static int
-machine_load_roms( fuse_machine_info *machine )
-{
-  size_t i;
-  int error;
-
-  /* Remove any ROMs we've got in memory at the moment */
-  for( i = 0; i < spectrum_rom_count; i++ ) {
-    if( ROM[i] ) { free( ROM[i] ); ROM[i] = 0; }
-  }
-    
-  /* Make sure we have enough space for the new ROMs */
-  if( spectrum_rom_count < machine->rom_count ) {
-
-    BYTE **new_ROM = realloc( ROM, machine->rom_count * sizeof( BYTE* ) );
-    if( !new_ROM ) {
-      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
-    }
-
-    ROM = new_ROM;
-  }
-  spectrum_rom_count = machine->rom_count;
-
-  /* And actually load the ROMs in */
-  for( i = 0; i < spectrum_rom_count; i++ ) {
-
-    error = machine_load_rom( &ROM[i], machine->rom_name[i],
-			      machine->rom_length[i] );
-    if( error ) return error;
-  }
-
-  return 0;
-}
-
-static int
+int
 machine_load_rom( BYTE **ROM, char *filename, size_t expected_length )
 {
   int fd, error;
@@ -278,6 +240,7 @@ machine_load_rom( BYTE **ROM, char *filename, size_t expected_length )
 int
 machine_reset( void )
 {
+  size_t i;
   int error;
 
   /* These things should happen on all resets */
@@ -288,11 +251,27 @@ machine_reset( void )
   scld_reset();
   tape_stop();
 
-  /* Load in the ROMs */
-  error = machine_load_roms( machine_current ); if( error ) return error;
+  /* Load in the ROMs: remove any ROMs we've got in memory at the moment */
+  for( i = 0; i < spectrum_rom_count; i++ ) {
+    if( ROM[i] ) { free( ROM[i] ); ROM[i] = 0; }
+  }
+    
+  /* Make sure we have enough space for the new ROMs */
+  if( spectrum_rom_count < machine_current->rom_count ) {
 
-  /* Do any machine-specific bits */
-  if( machine_current->reset ) machine_current->reset();
+    BYTE **new_ROM = realloc( ROM,
+			      machine_current->rom_count * sizeof( BYTE* ) );
+    if( !new_ROM ) {
+      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    ROM = new_ROM;
+  }
+  spectrum_rom_count = machine_current->rom_count;
+
+  /* Do the machine-specific bits, including loading the ROMs */
+  error = machine_current->reset(); if( error ) return error;
 
   return 0;
 }
@@ -334,12 +313,6 @@ int machine_allocate_roms( fuse_machine_info *machine, size_t count )
 {
   machine->rom_count = count;
 
-  machine->rom_name = malloc( count * sizeof(char*) );
-  if( !machine->rom_name ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-
   machine->rom_length = malloc( count * sizeof(size_t) );
   if( machine->rom_length == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
@@ -350,30 +323,15 @@ int machine_allocate_roms( fuse_machine_info *machine, size_t count )
   return 0;
 }
 
-int
-machine_allocate_rom( fuse_machine_info *machine, size_t number,
-		      const char *filename, size_t length )
-{
-  machine->rom_name[ number ] = malloc( strlen( filename ) + 1 );
-  if( !machine->rom_name[ number ] ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
-
-  strcpy( machine->rom_name[ number ], filename );
-  machine->rom_length[ number ] = length;
-
-  return 0;
-
-}
-
 /* Find a ROM called `filename' in some likely locations; returns a fd
    for the ROM on success or -1 if it couldn't find the ROM */
 int machine_find_rom( const char *filename )
 {
   int fd;
-
   char path[ PATHNAME_MAX_LENGTH ];
+
+  /* If this is an absolute path, just look there */
+  if( filename[0] == '/' ) return open( filename, O_RDONLY );
 
   /* First look off the current directory */
   snprintf( path, PATHNAME_MAX_LENGTH, "roms/%s", filename );

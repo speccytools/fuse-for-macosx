@@ -124,7 +124,7 @@ int spec48_init( fuse_machine_info *machine )
   machine->machine = LIBSPECTRUM_MACHINE_48;
   machine->id = "48";
 
-  machine->reset = NULL;
+  machine->reset = spec48_reset;
 
   machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
 
@@ -139,8 +139,7 @@ int spec48_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
-  error = machine_allocate_rom( machine, 0, settings_current.rom_48, 0x4000 );
-  if( error ) return error;
+  machine->rom_length[0] = 0x4000;
 
   machine->peripherals = spec48_peripherals;
   machine->unattached_port = spec48_unattached_port;
@@ -151,4 +150,16 @@ int spec48_init( fuse_machine_info *machine )
 
   return 0;
 
+}
+
+int
+spec48_reset( void )
+{
+  int error;
+
+  error = machine_load_rom( &ROM[0], settings_current.rom_48,
+			    machine_current->rom_length[0] );
+  if( error ) return error;
+
+  return 0;
 }
