@@ -1015,3 +1015,4 @@
 20040720 ui.c: fix missing return value (Darren).
 20040720 ui/fb/fbdisplay.c: generate palette dynamically (Darren).
 20040720 widget/select.c: stop cursor at correct bottom limit (Darren).
+20040720 rzx.c: change back to the RZX test key.
