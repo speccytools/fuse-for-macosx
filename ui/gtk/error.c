@@ -42,7 +42,7 @@
 int ui_error( ui_error_level severity, const char *format, ... )
 {
   va_list ap;
-  GtkWidget *dialog, *ok_button, *label;
+  GtkWidget *dialog, *ok_button, *label, *vbox;
   char message[ MESSAGE_MAX_LENGTH + 1 ];
 
   /* Create the message from the given arguments */
@@ -91,10 +91,16 @@ int ui_error( ui_error_level severity, const char *format, ... )
   /* Create a label with that message */
   label = gtk_label_new( message );
 
-  /* Add some padding to the vbox, and put the label in it */
-  gtk_container_set_border_width( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
-				  10 );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ), label );
+  /* Make a new vbox for the top part for saner spacing */
+  vbox=gtk_vbox_new( FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+                      vbox, TRUE, TRUE, 0 );
+  gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
+  gtk_container_set_border_width( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+                                  5 );
+
+  /* Put the label in it */
+  gtk_container_add( GTK_CONTAINER( vbox ), label );
 
   /* Add some ways to finish the dialog box */
   gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
