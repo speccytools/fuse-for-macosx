@@ -55,6 +55,12 @@ int tape_microphone;
 
 #define ERROR_MESSAGE_MAX_LENGTH 1024
 
+/* Function prototypes */
+
+static int trap_load_block( libspectrum_tape_rom_block *block );
+
+/* Function defintions */
+
 int tape_init( void )
 {
   tape.blocks = NULL;
@@ -206,10 +212,9 @@ int tape_load_trap( void )
   libspectrum_tape_block *current_block;
   libspectrum_tape_rom_block *rom_block;
 
-  int loading;			/* Load (true) or verify (false) */
-  BYTE parity, *ptr;
+  GSList *block_ptr; libspectrum_tape_block *next_block;
 
-  int i;
+  int error;
 
   /* Do nothing if tape traps aren't active */
   if( ! settings_current.tape_traps ) return 2;
@@ -219,31 +224,76 @@ int tape_load_trap( void )
 
   current_block = (libspectrum_tape_block*)(tape.current_block->data);
 
-  /* We've done this block; move onto the next one. If we hit the end
-     of the tape, loop back to the start */
-  tape.current_block = tape.current_block->next;
-  if( tape.current_block == NULL ) tape.current_block = tape.blocks;
+  block_ptr = tape.current_block->next;
+  /* Loop if we hit the end of the tape */
+  if( block_ptr == NULL ) {
+    block_ptr = tape.blocks;
+  }
 
-  /* If this block isn't a ROM loader, return with error */
-  if( current_block->type != LIBSPECTRUM_TAPE_BLOCK_ROM ) return 3;
+  next_block = (libspectrum_tape_block*)(block_ptr->data);
+
+  /* If this block isn't a ROM loader, deactivate tape traps and start
+     it playing.
+     Then return with `error' so that we actually do whichever instruction
+     it was that caused the trap to hit */
+  if( current_block->type != LIBSPECTRUM_TAPE_BLOCK_ROM ) {
+
+    settings_current.tape_traps = 0;
+
+    /* Start the tape playing; if we couldn't do this for some reason,
+       deactivate tape traps again */
+    error = tape_play();
+    if( error ) { settings_current.tape_traps = 1; return 3; }
+
+    return -1;
+  }
 
   rom_block = &(current_block->types.rom);
 
   /* All returns made via the RET at #05E2 */
   PC = 0x05e2;
 
+  error = trap_load_block( rom_block );
+  if( error ) return error;
+
+  /* Peek at the next block. If it's a ROM block, just move along and
+     return */
+  if( next_block->type == LIBSPECTRUM_TAPE_BLOCK_ROM ) {
+    tape.current_block = block_ptr;
+    return 0;
+  }
+
+  /* If the next block isn't a ROM block, deactivate tape traps and set
+     ourselves up such that the next thing to occur is the pause at
+     the end of the current block */
+  settings_current.tape_traps = 0;
+  current_block->types.rom.state = LIBSPECTRUM_TAPE_STATE_PAUSE;
+
+  /* And start the tape playing */
+  error = tape_play();
+  if( error ) { settings_current.tape_traps = 1; return 3; }
+
+  return 0;
+
+}
+
+static int trap_load_block( libspectrum_tape_rom_block *block )
+{
+  libspectrum_byte parity, *data;
+  int loading, i;
+
   /* If the block's too short, give up and go home (with carry reset
      to indicate error */
-  if( rom_block->length < DE ) { 
+  if( block->length < DE ) { 
     F = ( F & ~FLAG_C );
     return 0;
   }
 
-  ptr = rom_block->data;
-  parity = *ptr;
+  data = block->data;
+  parity = *data;
 
   /* If the flag byte (stored in A') does not match, reset carry and return */
-  if( *ptr++ != A_ ) {
+  if( *data++ != A_ ) {
     F = ( F & ~FLAG_C );
     return 0;
   }
@@ -253,13 +303,13 @@ int tape_load_trap( void )
 
   if( loading ) {
     for( i=0; i<DE; i++ ) {
-      writebyte( IX+i, *ptr );
-      parity ^= *ptr++;
+      writebyte( IX+i, *data );
+      parity ^= *data++;
     }
   } else {		/* verifying */
     for( i=0; i<DE; i++) {
-      parity ^= *ptr;
-      if( *ptr++ != readbyte(IX+i) ) {
+      parity ^= *data;
+      if( *data++ != readbyte(IX+i) ) {
 	F = ( F & ~FLAG_C );
 	return 0;
       }
@@ -267,7 +317,7 @@ int tape_load_trap( void )
   }
 
   /* If the parity byte does not match, reset carry and return */
-  if( *ptr++ != parity ) {
+  if( *data++ != parity ) {
     F = ( F & ~FLAG_C );
     return 0;
   }
@@ -276,7 +326,6 @@ int tape_load_trap( void )
   F |= FLAG_C;
 
   return 0;
-
 }
 
 /* Append to the current tape file in memory; returns 0 if a block was
