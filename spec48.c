@@ -57,7 +57,7 @@ BYTE spec48_readbyte(WORD address)
     default:
       fprintf(stderr, "%s: access to impossible bank %d at %s:%d\n",
 	      fuse_progname, bank, __FILE__, __LINE__);
-      abort();
+      fuse_abort();
   }
 }
 
@@ -77,7 +77,7 @@ void spec48_writebyte(WORD address, BYTE b)
     default:
       fprintf(stderr, "%s: access to impossible bank %d at %s:%d\n",
 	      fuse_progname, bank, __FILE__, __LINE__);
-      abort();
+      fuse_abort();
     }
     if(address<0x5b00) {	/* 0x4000 - 0x5aff = display file */
       display_dirty(address,b);	/* Replot necessary pixels */

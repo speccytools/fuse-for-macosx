@@ -437,7 +437,7 @@ int trap_check_rom( void )
   }
 
   fprintf( stderr, "Impossible machine type %d", machine_current->machine );
-  abort();
+  fuse_abort();
 
 }
 

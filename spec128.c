@@ -57,7 +57,7 @@ BYTE spec128_readbyte(WORD address)
   case 1: return RAM[                                5][address]; break;
   case 2: return RAM[                                2][address]; break;
   case 3: return RAM[machine_current->ram.current_page][address]; break;
-  default: abort();
+  default: fuse_abort();
   }
 }
 

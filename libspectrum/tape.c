@@ -162,7 +162,7 @@ block_free( gpointer data, gpointer user_data )
 
   /* This should never actually occur */
   case LIBSPECTRUM_TAPE_BLOCK_CONCAT:
-    abort();
+    break;
   }
 }
 

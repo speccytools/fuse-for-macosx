@@ -30,6 +30,7 @@
 
 #include "ay.h"
 #include "display.h"
+#include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
@@ -73,7 +74,7 @@ BYTE specplus3_readbyte(WORD address)
       default:
 	fprintf(stderr,"Unknown +3 special configuration %d\n",
 		machine_current->ram.specialcfg);
-	abort();
+	fuse_abort();
     }
   } else {
     if(address<0x4000) return ROM[machine_current->ram.current_rom][address];
@@ -82,9 +83,11 @@ BYTE specplus3_readbyte(WORD address)
       case 1: return RAM[				 5][address]; break;
       case 2: return RAM[				 2][address]; break;
       case 3: return RAM[machine_current->ram.current_page][address]; break;
-      default: abort();
+      default: fuse_abort();
     }
   }
+
+  fuse_abort(); /* To keep gcc quiet; should never be reached */
 }
 
 BYTE specplus3_read_screen_memory(WORD offset)

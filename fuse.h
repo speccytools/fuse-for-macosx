@@ -35,6 +35,8 @@ extern int fuse_emulation_running;	/* Is Spectrum emulation running? */
 int fuse_emulation_pause(void);		/* Stop and start emulation */
 int fuse_emulation_unpause(void);
 
+int fuse_abort();			/* Emergency shutdown */
+
 extern int fuse_sound_in_use;		/* Are we trying to produce sound? */
 
 #endif			/* #ifndef FUSE_FUSE_H */

@@ -187,3 +187,10 @@ static int fuse_end(void)
 
   return 0;
 }
+
+/* Emergency shutdown */
+int fuse_abort( void )
+{
+  fuse_end();
+  abort();
+}
