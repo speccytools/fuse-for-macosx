@@ -133,9 +133,6 @@ main( int argc, char **argv )
 
   error = libspectrum_tzx_create( &tape, buffer, file_info.st_size );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf( stderr,
-	     "%s: error from libspectrum_tzx_create whilst reading `%s': %s\n",
-	     progname, filename, libspectrum_error_message(error) );
     munmap( buffer, file_info.st_size );
     return error;
   }
@@ -166,11 +163,7 @@ main( int argc, char **argv )
     error = libspectrum_tape_block_description(
       block, description, DESCRIPTION_LENGTH
     );
-    if( error ) {
-      fprintf( stderr, "%s: error from libspectrum_tape_block_description: %s\n",
-	       progname, libspectrum_error_message( error ) );
-      return 1;
-    }
+    if( error ) return 1;
     printf( "Block type 0x%02x (%s)\n", block->type, description );
 
     switch( block->type ) {
