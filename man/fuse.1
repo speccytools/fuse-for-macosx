@@ -441,10 +441,194 @@ option.
 .br
 .I "\-\-sound\-device device"
 .RS
-Specify the sound output device to use. Generally you shouldn't need
-to specify this, but it might be useful if you have more than one. If
-you are using the SDL UI, this allows you to specify the audio driver
-(e.g. dsp, alsa, dma, esd and arts).
+Specify the sound output device to use and any options to give that
+device. If you are not using the SDL UI or using
+.I libao
+for sound output,
+then the
+.I "device"
+parameter just specifies the device to be used for sound output.
+.PP
+If you are using the SDL UI, the
+.I "device"
+parameter allows you to specify the
+audio driver to be used (e.g. dsp, alsa, dma, esd and arts).
+.PP
+If you are using
+.I libao
+for sound output, the
+.I "device"
+parameter allows you to specify the device used for sound output
+(either `live' to a speaker or to a file) and the parameters to be
+used for that device. In general, the
+.I "device"
+parameter has the form
+.IR driver[:param[=value][,param[=value][,...]] .
+.I "driver"
+selects the libao driver to be used, either one of the `live' drivers
+.RI ( aixs ", " alsa ", " alsa09 ", " arts ", " esd ", " irix
+.RI  ", " macosx ", " nas ", " oss " or " sun )
+or a file driver
+.RI ( au ", " raw ", " wav " or " null ).
+The available parameter and value pairs for each device are:
+.IP \[bu]
+.IR aixs :
+AIX audio system
+.RS
+.IP \[bu]
+.RI dev= device
+.br
+.RI ` device '
+gives the AIX sound device.
+.RE
+.IP \[bu]
+.IR alsa :
+Advanced Linux Sound Architecture version 0.5.x
+.RS
+.IP \[bu]
+.RI card= num
+.br
+.RI ` num '
+gives the ALSA card number.
+.IP \[bu]
+.RI dev= num
+.br
+.RI ` num '
+gives the ALSA device number.
+.IP \[bu]
+.RI buf_size= num
+.br
+.RI ` num '
+gives the ALSA buffer size in bytes.
+.RE
+.IP \[bu]
+.IR alsa09 :
+Advanced Linux Sound Architecture version 0.9+
+.RS
+.IP \[bu]
+.RI dev= string
+.br
+.RI ` string '
+specfies the ALSA device e.g. hw:1.2
+.IP \[bu]
+.RI buffer_time= num
+.br
+.RI ` num '
+gives the ALSA buffer time.
+.IP \[bu]
+.RI period_time= num
+.br
+.RI ` num '
+gives the ALSA period time.
+.RE
+.IP \[bu]
+.IR arts :
+aRts soundserver: no parameters.
+.IP \[bu]
+.IR esd :
+Enlightened Sound Daemon.
+.RS
+.IP \[bu]
+.RI host= string
+.br
+.RI ` string '
+gives the ESD host specification.
+.RE
+.IP \[bu]
+.IR irix :
+IRIX Audio Library: no parameters.
+.IP \[bu]
+.IR macosx :
+MacOS X CoreAudio: no parameters.
+.IP \[bu]
+.IR nas :
+Network Audio System.
+.RS
+.IP \[bu]
+.RI host= string
+.br
+.RI ` string '
+gives the NAS host specification.
+.IP \[bu]
+.RI buf_size= num
+.br
+.RI ` num '
+gives the buffer size on the server.
+.RE
+.IP \[bu]
+.IR oss :
+Open Sound System.
+.RS
+.IP \[bu]
+.RI dsp= string
+.br
+.RI ` string '
+gives the OSS device to be sued e.g. /dev/sound/dsp1
+.RE
+.IP \[bu]
+.IR sun :
+SUN audio system.
+.RS
+.IP \[bu]
+.RI dev= string
+.br
+.RI ` string '
+gives the audio device to be used.
+.RE
+.IP \[bu]
+.IR au :
+SUN Sparc audio file: no parameters.
+.IP \[bu]
+.IR raw :
+raw file.
+.RS
+.IP \[bu]
+.RI byteorder= string
+.br
+.RI ` string '
+can be any of
+.I native
+(host native byteorder),
+.I big
+(big endian) or
+.I little
+(little endian).
+.RE
+.IP \[bu]
+.IR wav :
+Microsoft audio file: no parameters.
+.IP \[bu]
+.IR null :
+null output: no parameters.
+.IP \[bu]
+.RI debug :
+for debugging libao.
+.PP
+Finally, each of the file output types
+.RI ( au ", " raw " and " wav )
+have an extra option
+.RI `file= filename '
+where
+.RI ` filename '
+gives the file output will be directed to. This defaults to
+.RI ` fuse-sound.ao '
+if it is not specified.
+.PP
+Some examples of use:
+.PP
+.I fuse -d alsa09:dev=hw:1
+.PP
+causes Fuse to use ALSA 0.9+ output with the second (#1) sound card.
+.PP
+.I fuse -d raw:byteorder=little,file=enigma.raw
+.PP
+causes Fuse to save little endian words to
+.RI ` enigma.raw "'."
+.PP
+See the `DEVICE' section of
+.I ogg123(1)
+for up to date information of devices and options (except for the
+`file' option which is provided by Fuse itself).
 .RE
 .PP
 .I "\-\-speed percentage"
@@ -2432,6 +2616,12 @@ or
 .I "Options, Joysticks, Joystick 2..."
 options under GTK+ 2.x produces a large number of GTK+ critical
 warnings. This is a GTK+ bug (#144427), which is fixed in GTK+ 2.4.4.
+.PP
+The libao file output devices not work properly with the GTK+ UI.
+No error reporting, but the created file does not contain any sound data.
+If you use a "weak" machine alsa09 make a lot of click and pop with
+.RI ' "ALSA: underrun, at least 0ms." '
+error messages.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -2445,6 +2635,7 @@ warnings. This is a GTK+ bug (#144427), which is fixed in GTK+ 2.4.4.
 .IR fuse\-utils "(1),"
 .IR gzip "(3),"
 .IR libspectrum "(3),"
+.IR ogg123 "(1),"
 .IR xspect "(1),"
 .IR xzx "(1)"
 .PP
