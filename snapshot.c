@@ -61,12 +61,7 @@ static snapshot_type snapshot_identify( const char *filename );
 int snapshot_read( const char *filename )
 {
   unsigned char *buffer; size_t length;
-
-  libspectrum_snap *snap;
-
   int error;
-
-  libspectrum_snap_alloc( &snap );
 
   error = utils_read_file( filename, &buffer, &length );
   if( error ) return error;
@@ -101,14 +96,7 @@ int snapshot_read( const char *filename )
     return 1;
   }
 
-  error = snapshot_copy_from( snap );
-  if( error ) return error;
-
-  error = libspectrum_snap_free( snap );
-  if( error != LIBSPECTRUM_ERROR_NONE ) return 1;
-
   return 0;
-
 }
 
 static snapshot_type snapshot_identify( const char *filename )
@@ -225,6 +213,8 @@ int snapshot_copy_from( libspectrum_snap *snap )
   SP = snap->sp; PC = snap->pc;
 
   IFF1 = snap->iff1; IFF2 = snap->iff2; IM = snap->im;
+
+  fprintf( stderr, "%u\n", (unsigned)snap->im );
 
   spectrum_ula_write( 0x00fe, snap->out_ula );
 
