@@ -167,7 +167,8 @@ create_dialog( void )
   /* Another hbox to hold the command entry widget and the 'evaluate'
      button */
   hbox = gtk_hbox_new( FALSE, 5 );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
+  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox,
+		      FALSE, FALSE, 0 );
 
   /* The command entry widget */
   entry = gtk_entry_new();
