@@ -41,6 +41,9 @@ typedef struct settings_info {
   char *snapshot;
   char *tape_file;
 
+  int show_version;
+  int show_help;
+
 } settings_info;
 
 extern settings_info settings_current;

@@ -74,6 +74,9 @@ static int settings_command_line( int argc, char **argv,
 
   struct option long_options[] = {
 
+    {          "help", 0, &(settings->show_help), 1 },
+    {       "version", 0, &(settings->show_version), 1 },
+
     {        "issue2", 0, &(settings->issue2), 1 },
     {     "no-issue2", 0, &(settings->issue2), 0 },
 
@@ -134,5 +137,3 @@ int settings_copy( settings_info *dest, settings_info *src )
 
   return 0;
 }
-
-    

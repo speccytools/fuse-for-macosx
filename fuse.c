@@ -58,7 +58,11 @@ int fuse_emulation_running;
 int fuse_sound_in_use;
 
 static int fuse_init(int argc, char **argv);
+
 static void fuse_show_copyright(void);
+static void fuse_show_version( void );
+static void fuse_show_help( void );
+
 static int fuse_end(void);
 
 int main(int argc,char **argv)
@@ -67,6 +71,9 @@ int main(int argc,char **argv)
     fprintf(stderr,"%s: error initalising -- giving up!\n", fuse_progname);
     return 1;
   }
+
+  if( settings_current.show_help ||
+      settings_current.show_version ) return 0;
 
   while( !fuse_exiting ) {
     z80_do_opcodes();
@@ -83,11 +90,19 @@ static int fuse_init(int argc, char **argv)
 {
   int error;
 
-  fuse_show_copyright();
-
   fuse_progname=argv[0];
   
   if( settings_init( argc, argv ) ) return 1;
+
+  if( settings_current.show_version ) {
+    fuse_show_version();
+    return 0;
+  } else if( settings_current.show_help ) {
+    fuse_show_help();
+    return 0;
+  }
+
+  fuse_show_copyright();
 
   if( tape_init() ) return 1;
 
@@ -124,8 +139,9 @@ static int fuse_init(int argc, char **argv)
 
 static void fuse_show_copyright(void)
 {
+  printf( "\n" );
+  fuse_show_version();
   printf(
-   "\nThe Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n"
    "Copyright (c) 1999-2001 Philip Kendall <pak21-fuse@srcf.ucam.org> and others;\n"
    "See the file `AUTHORS' for more details.\n"
    "\n"
@@ -133,7 +149,29 @@ static void fuse_show_copyright(void)
    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
    "GNU General Public License for more details.\n\n");
+}
 
+static void fuse_show_version( void )
+{
+  printf( "The Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n" );
+}
+
+static void fuse_show_help( void )
+{
+  printf( "\n" );
+  fuse_show_version();
+  printf(
+   "\nAvailable command-line options:\n\n"
+   "Boolean options (use `--no-<option>' to turn off):\n\n"
+   "--issue2               Emulate an Issue 2 Spectrum.\n"
+   "--kempston             Emulate the Kempston joystick on QAOP<space>.\n"
+   "--separation           Use ACB stereo for the AY-3-8912 sound chip.\n"
+   "--traps                Turn tape traps on.\n\n"
+   "Other options:\n\n"
+   "--help                 This information.\n"
+   "--snapshot <filename>  Load snapshot <filename>.\n"
+   "--tape <filename>      Open tape file <filename>.\n"
+   "--version              Print version number and exit.\n\n" );
 }
 
 /* Stop all activities associated with actual Spectrum emulation */
