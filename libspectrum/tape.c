@@ -320,16 +320,19 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     *flags |= LIBSPECTRUM_TAPE_FLAGS_BLOCK;
 
     tape->current_block = tape->current_block->next;
+
+    /* If we've just hit the end of the tape, stop the tape (and
+       then `rewind' to the start) */
     if( tape->current_block == NULL ) {
       *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP;
-      /* `Rewind' to the start of the tape */
       tape->current_block = tape->blocks;
-    } else {
-      /* Initialise the new block */
-      block = (libspectrum_tape_block*)tape->current_block->data;
-      error = libspectrum_tape_init_block( block );
-      if( error ) return error;
     }
+
+    /* Initialise the new block */
+    block = (libspectrum_tape_block*)tape->current_block->data;
+    error = libspectrum_tape_init_block( block );
+    if( error ) return error;
+
   }
 
   return LIBSPECTRUM_ERROR_NONE;

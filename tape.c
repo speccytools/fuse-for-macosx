@@ -383,6 +383,14 @@ int tape_save_trap( void )
   /* Add the block to the current tape file */
   tape.blocks = g_slist_append( tape.blocks, (gpointer)block );
 
+  /* If we previously didn't have a tape loaded ( implied by
+     tape.current_block == NULL ), set up so that we point to the
+     start of the tape */
+  if( tape.current_block == NULL ) {
+    tape.current_block = tape.blocks;
+    libspectrum_tape_init_block((libspectrum_tape_block*)tape.blocks->data);
+  }
+
   /* And then return via the RET at #053E */
   PC = 0x053e;
 
@@ -471,13 +479,14 @@ int tape_next_edge( void )
     sound_beeper( 1, tape_microphone );
   }
 
-  /* If we've been requested to stop the tape, do so! */
+  /* If we've been requested to stop the tape, do so and then
+     return without stacking another edge */
   if( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ||
       ( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP48 ) && 
 	machine_current->machine == SPECTRUM_MACHINE_48 )
     ) {
-    error = tape_stop();
-    if( error ) return error;
+    error = tape_stop(); if( error ) return error;
+    return 0;
   }
 
   /* If that was the end of a block, tape traps are active _and_ the
