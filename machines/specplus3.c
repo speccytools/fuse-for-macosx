@@ -519,12 +519,15 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
     fuse_abort();
   }
 
+  /* Eject any disk already in the drive */
+  if( drives[which].fd != -1 ) {
+    /* Abort the insert if we want to keep the current disk */
+    if( specplus3_disk_eject( which, 0 ) ) return 0;
+  }
+
   /* Make a temporary copy of the disk file */
   error = utils_make_temp_file( &fd, template, filename, dsk_template );
   if( error ) return error;
-
-  /* Eject any disk already in the drive */
-  if( drives[which].fd != -1 ) specplus3_disk_eject( which, 0 );
 
   /* And now insert the disk */
   drives[ which ].fd = fd;
@@ -583,9 +586,34 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
 
   if( drives[ which ].fd == -1 ) return 0;
 
+#ifdef LIB765_EXPOSES_DIRTY
+
+  if( fd_dirty( drives[which].drive ) == FD_D_DIRTY ) {
+
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Disk has been modified.\nDo you want to save it?"
+    );
+  
+    switch( confirm ) {
+
+    case UI_CONFIRM_SAVE_SAVE:
+      fd_eject( drives[which].drive );
+      ui_plus3_disk_write( which );
+      break;
+
+    case UI_CONFIRM_SAVE_DONTSAVE: fd_eject( drives[which].drive ); break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
+
+    }
+  }
+
+#else			/* #ifdef LIB765_EXPOSES_DIRTY */
+
   fd_eject( drives[which].drive );
 
   if( write ) ui_plus3_disk_write( which );
+
+#endif			/* #ifdef LIB765_EXPOSES_DIRTY */
 
   error = close( drives[which].fd );
   if( error == -1 ) {
