@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = lib libspectrum man myglib perl roms ui utils widget z80
+SUBDIRS = hacking lib libspectrum man myglib perl roms ui utils widget z80
 
 fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c rzx.c settings.c\
@@ -51,5 +51,4 @@ noinst_HEADERS = ay.h display.h event.h\
 	tape.h timer.h types.h utils.h\
 	joystick.h printer.h tc2048.h scld.h
 
-EXTRA_DIST = AUTHORS README THANKS hacking/coding_style.txt hacking/ui.txt\
-	hacking/tc2048_tech_notes.txt keysyms.dat keysyms.pl
+EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl
