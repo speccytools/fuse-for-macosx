@@ -659,24 +659,8 @@ FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )
 {
-  scaler_data_type i, *s, *d;
-
   while( height-- ) {
-
-    /* FIXME: should we use memcpy(3) here? For 32-bit data, this loop
-       is as efficient as it's going to get, so we probably want to
-       avoid the overhead of the function call. For 16-bit data, we'd
-       really like to copy it in 32-bit chunks (and 1 16-bit chunk at
-       the end if necessary), which memcpy will get right for us.
-
-       Currently, this code is going to be at least as efficient as the
-       old version, so I'll leave this for now
-    */
-    for( i = 0, s = (scaler_data_type*)srcPtr, d = (scaler_data_type*)dstPtr;
-	 i < width;
-	 i++ )
-      *d++ = *s++;
-
+    memcpy( dstPtr, srcPtr, SCALER_DATA_SIZE * width );
     srcPtr += srcPitch;
     dstPtr += dstPitch;
   }
