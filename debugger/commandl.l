@@ -72,24 +72,25 @@ t|tb|tbr|tbre|tbrea|tbreak|tbreakp|tbreakpo|tbreakpoi|tbreakpoin|tbreakpoint {
 							       return TBREAK; }
 w|wr|wri|writ|write { return WRITE; }
 
-a|b|c|d|e|f|h|l { yylval.integer = debugger_register_hash( yytext );
+a|b|c|d|e|f|h|l { yylval.reg = debugger_register_hash( yytext );
 		  return REGISTER; }
 
 "a'"|"b'"|"c'"|"d'"|"e'"|"f'"|"h'"|"l'" {
-                             yylval.integer = debugger_register_hash( yytext );
+                             yylval.reg = debugger_register_hash( yytext );
 			     return REGISTER; }
 
 af|bc|de|hl|"af\'"|"bc\'"|"de\'"|"hl\'" {
-                             yylval.integer = debugger_register_hash( yytext );
+                             yylval.reg = debugger_register_hash( yytext );
 			     return REGISTER; }
 
-sp|pc|ix|iy { yylval.integer = debugger_register_hash( yytext );
+sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 	      return REGISTER; }
 
 "("		{ return '('; }
 ")"		{ return ')'; }
 
-"!"		{ return '!'; }
+"!"		{ yylval.token = '!'; return NEGATE; }
+"~"		{ yylval.token = '~'; return NEGATE; }
 
  /* The hex constants used here are the appropriate Unicode characters */
 

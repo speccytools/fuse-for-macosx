@@ -85,8 +85,8 @@ struct debugger_expression {
 
 };
 
-static int evaluate_unaryop( struct unaryop_type *unaryop );
-static int evaluate_binaryop( struct binaryop_type *binary );
+static libspectrum_word evaluate_unaryop( struct unaryop_type *unaryop );
+static libspectrum_word evaluate_binaryop( struct binaryop_type *binary );
 
 static int deparse_unaryop( char *buffer, size_t length,
 			    const struct unaryop_type *unaryop );
@@ -98,7 +98,7 @@ unaryop_precedence( int operation )
 {
   switch( operation ) {
 
-  case '!': return PRECEDENCE_NOT;
+  case '!': case '~': return PRECEDENCE_NOT;
   case '-': return PRECEDENCE_UNARY_MINUS;
 
   default:
@@ -129,7 +129,7 @@ binaryop_precedence( int operation )
 }
 
 debugger_expression*
-debugger_expression_new_number( int number )
+debugger_expression_new_number( libspectrum_word number )
 {
   debugger_expression *exp;
 
@@ -242,7 +242,7 @@ debugger_expression_delete( debugger_expression *exp )
   free( exp );
 }
 
-int
+libspectrum_word
 debugger_expression_evaluate( debugger_expression *exp )
 {
   switch( exp->type ) {
@@ -267,12 +267,13 @@ debugger_expression_evaluate( debugger_expression *exp )
   return 0;			/* Keep gcc happy */
 }
 
-static int
+static libspectrum_word
 evaluate_unaryop( struct unaryop_type *unary )
 {
   switch( unary->operation ) {
 
   case '!': return !debugger_expression_evaluate( unary->op );
+  case '~': return ~debugger_expression_evaluate( unary->op );
   case '-': return -debugger_expression_evaluate( unary->op );
 
   }
@@ -283,7 +284,7 @@ evaluate_unaryop( struct unaryop_type *unary )
   return 0;			/* Keep gcc happy */
 }
 
-static int
+static libspectrum_word
 evaluate_binaryop( struct binaryop_type *binary )
 {
   switch( binary->operation ) {
@@ -378,6 +379,7 @@ deparse_unaryop( char *buffer, size_t length,
 
   switch( unaryop->operation ) {
   case '!': operation_string = "!"; break;
+  case '~': operation_string = "~"; break;
   case '-': operation_string = "-"; break;
 
   default:

@@ -46,8 +46,8 @@ int debugger_poke( libspectrum_word address, libspectrum_byte value );
 int debugger_port_write( libspectrum_word address, libspectrum_byte value );
 
 int debugger_register_hash( const char *reg );
-int debugger_register_get( int which );
-void debugger_register_set( int which, int value );
+libspectrum_word debugger_register_get( int which );
+void debugger_register_set( int which, libspectrum_word value );
 const char* debugger_register_text( int which );
 
 /* Utility functions called by the flex scanner */
@@ -56,7 +56,7 @@ int debugger_command_input( char *buf, int *result, int max_size );
 
 /* Numeric expression stuff */
 
-debugger_expression* debugger_expression_new_number( int number );
+debugger_expression* debugger_expression_new_number( libspectrum_word number );
 debugger_expression* debugger_expression_new_register( int which );
 debugger_expression*
 debugger_expression_new_unaryop( int operation, debugger_expression *operand );
@@ -66,6 +66,7 @@ debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 
 void debugger_expression_delete( debugger_expression* expression );
 
-int debugger_expression_evaluate( debugger_expression* expression );
+libspectrum_word
+debugger_expression_evaluate( debugger_expression* expression );
 
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */

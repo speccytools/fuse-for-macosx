@@ -49,8 +49,9 @@ void yyerror( char *s );
 %union {
 
   int token;
+  int reg;
 
-  int integer;
+  libspectrum_word integer;
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
 
@@ -62,7 +63,8 @@ void yyerror( char *s );
 
 %token <token>	 COMPARISION	/* < > <= >= */
 %token <token>   EQUALITY	/* == != */
-%token <token>	 TIMES_DIVIDE	/* '*' or '/' */
+%token <token>   NEGATE		/* ! ~ */
+%token <token>	 TIMES_DIVIDE	/* * / */
 
 %token		 BASE
 %token		 BREAK
@@ -84,7 +86,7 @@ void yyerror( char *s );
 %token		 STEP
 %token		 WRITE
 
-%token <integer> REGISTER
+%token <reg>	 REGISTER
 
 %token <integer> NUMBER
 
@@ -111,8 +113,7 @@ void yyerror( char *s );
 %left COMPARISION
 %left '+' '-'
 %left TIMES_DIVIDE
-%left NEG		/* Unary minus (also unary plus) */
-%left '!'
+%right NEGATE		/* Unary minus, unary plus, !, ~ */
 
 /* High precedence */
 
@@ -180,13 +181,13 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 			 if( !$$ ) YYABORT;
 		       }
 	    | '(' expression ')' { $$ = $2; }
-	    | '+' expression %prec NEG { $$ = $2; }
-	    | '-' expression %prec NEG {
+	    | '+' expression %prec NEGATE { $$ = $2; }
+	    | '-' expression %prec NEGATE {
 	        $$ = debugger_expression_new_unaryop( '-', $2 );
 		if( !$$ ) YYABORT;
 	      }
-	    | '!' expression {
-	        $$ = debugger_expression_new_unaryop( '!', $2 );
+	    | NEGATE expression {
+	        $$ = debugger_expression_new_unaryop( $1, $2 );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression '+' expression {

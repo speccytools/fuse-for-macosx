@@ -140,7 +140,7 @@ yyerror( char *s )
 }
 
 /* Get the value of a register */
-int
+libspectrum_word
 debugger_register_get( int which )
 {
   switch( which ) {
@@ -186,7 +186,7 @@ debugger_register_get( int which )
 
 /* Set the value of a register */
 void
-debugger_register_set( int which, int value )
+debugger_register_set( int which, libspectrum_word value )
 {
   switch( which ) {
 
