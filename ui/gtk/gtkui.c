@@ -190,7 +190,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/S_elect ROMs",    NULL , NULL,                0, "<Branch>"    },
   { "/Options/Select ROMs/Spectrum 1_6K...", NULL, gtkui_roms, 1, NULL       },
   { "/Options/Select ROMs/Spectrum _48K...", NULL, gtkui_roms, 2, NULL       },
-  { "/Options/Select ROMs/Spectrum _128K...", NULL, gtkui_roms, 3, NULL      },
+  { "/Options/Select ROMs/Spectrum 12_8K...", NULL, gtkui_roms, 3, NULL      },
   { "/Options/Select ROMs/Spectrum +_2...", NULL, gtkui_roms, 4, NULL        },
   { "/Options/Select ROMs/Spectrum +2_A...", NULL, gtkui_roms, 5, NULL       },
   { "/Options/Select ROMs/Spectrum +_3...", NULL, gtkui_roms, 6, NULL        },

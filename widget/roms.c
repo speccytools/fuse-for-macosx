@@ -1,5 +1,5 @@
 /* roms.c: select ROMs widget
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2004 Philip Kendall
 
    $Id$
 
@@ -39,16 +39,24 @@
 #include "widget_internals.h"
 
 static settings_info *widget_settings;
+static widget_roms_info *info;
+
+static size_t first_rom, rom_count;
+
+static void print_rom( int which );
 
 int
 widget_roms_draw( void *data )
 {
   int i, error;
   char buffer[32];
-  const char *setting; size_t length;
+  const char *name;
 
-  /* Get a copy of the current settings, unless we're given one already */
-  if( !data ) {
+  if( data ) info = data;
+
+  /* Get a copy of the current settings */
+  if( !info->initialised ) {
+
     widget_settings = malloc( sizeof( settings_info ) );
     if( !widget_settings ) {
       ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
@@ -59,30 +67,46 @@ widget_roms_draw( void *data )
       settings_free( widget_settings ); free( widget_settings );
       return error;
     }
-  } else {
-    widget_settings = data;
+
+    info->initialised = 1;
   }
+
+  first_rom = info->start;
+  rom_count = info->count;
 
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 1, 30, SETTINGS_ROM_COUNT + 2 );
+  widget_dialog_with_border( 1, 2, 30, rom_count + 3 );
 
-  widget_printstring( 10, 1, WIDGET_COLOUR_FOREGROUND, "Select ROMs" );
+  name = libspectrum_machine_name( info->machine );
+  widget_printstring( 15 - strlen( name ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
+		      name );
 
-  for( i=0; i<SETTINGS_ROM_COUNT; i++ ) {
+  for( i = 0; i < info->count; i++ ) {
 
-    /* Get the last twelve characters of the ROM filename */
-    setting = *( settings_get_rom_setting( widget_settings, i ) );
-    length = strlen( setting ); if( length > 12 ) setting += length - 12;
+    snprintf( buffer, 32, "(%c) %10s:", ((char)i) + 'A',
+	      settings_rom_name[i] );
+    widget_printstring( 2, i + 4, WIDGET_COLOUR_FOREGROUND, buffer );
 
-    snprintf( buffer, 32, "(%c) %10s: %s", ((char)i)+'A',
-	      settings_rom_name[i], setting );
-
-    widget_printstring( 2, i+3, WIDGET_COLOUR_FOREGROUND, buffer );
+    print_rom( i );
   }
 
-  widget_display_lines( 1, SETTINGS_ROM_COUNT + 2 );
-
   return 0;
+}
+
+static void
+print_rom( int which )
+{
+  const char *setting;
+  size_t length;
+
+  setting = *( settings_get_rom_setting( widget_settings,
+					 which + first_rom ) );
+  length = strlen( setting ); if( length > 12 ) setting += length - 12;
+
+  widget_rectangle( 18 * 8, ( which + 4 ) * 8, 12 * 8, 1 * 8,
+		    WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 18, which + 4, WIDGET_COLOUR_FOREGROUND, setting );
+  widget_display_lines( which + 4, 1 );
 }
 
 void
@@ -91,7 +115,7 @@ widget_roms_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
   switch( key ) {
 
   case KEYBOARD_Resize:		/* Fake keypress used on window resize */
-    widget_select_draw( widget_settings );
+    widget_roms_draw( NULL );
     break;
 
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
@@ -108,20 +132,22 @@ widget_roms_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
   }
 
   if( key >= KEYBOARD_a && key <= KEYBOARD_z &&
-      key - KEYBOARD_a < (ptrdiff_t)SETTINGS_ROM_COUNT ) {
+      key - KEYBOARD_a < (ptrdiff_t)rom_count ) {
 
     char **setting;
     int error;
     int constant_zero = 0;
 
+    key -= KEYBOARD_a;
+
     widget_do( WIDGET_TYPE_FILESELECTOR, &constant_zero );
     if( !widget_filesel_name ) return;
 
-    setting = settings_get_rom_setting( widget_settings, key - KEYBOARD_a );
+    setting = settings_get_rom_setting( widget_settings, key + first_rom );
     error = settings_set_string( setting, widget_filesel_name );
     if( error ) return;
-  
-    widget_roms_draw( widget_settings );
+
+    print_rom( key );
   }
 }
 

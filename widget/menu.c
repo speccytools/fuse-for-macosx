@@ -272,6 +272,42 @@ int widget_menu_exit( void *data GCC_UNUSED )
   return 0;
 }
 
+/* Options/Select ROMs/<type> */
+int
+widget_menu_select_roms( void *data )
+{
+  libspectrum_machine machine = *(libspectrum_machine*)data;
+
+  widget_roms_info info;
+
+  info.machine = machine;
+  info.count = 0;
+
+  switch( machine ) {
+  case LIBSPECTRUM_MACHINE_16:     info.start =  0; info.count = 1; break;
+  case LIBSPECTRUM_MACHINE_48:     info.start =  1; info.count = 1; break;
+  case LIBSPECTRUM_MACHINE_128:    info.start =  2; info.count = 2; break;
+  case LIBSPECTRUM_MACHINE_PLUS2:  info.start =  4; info.count = 2; break;
+  case LIBSPECTRUM_MACHINE_PLUS2A: info.start =  6; info.count = 4; break;
+  case LIBSPECTRUM_MACHINE_PLUS3:  info.start = 10; info.count = 4; break;
+  case LIBSPECTRUM_MACHINE_TC2048: info.start = 14; info.count = 1; break;
+  case LIBSPECTRUM_MACHINE_TC2068: info.start = 15; info.count = 2; break;
+  case LIBSPECTRUM_MACHINE_PENT:   info.start = 17; info.count = 3; break;
+  case LIBSPECTRUM_MACHINE_SCORP:  info.start = 20; info.count = 4; break;
+
+  case LIBSPECTRUM_MACHINE_UNKNOWN: break;
+  }
+
+  if( !info.count ) {
+    ui_error( UI_ERROR_ERROR, "widget_menu_select_roms: unknown machine %u\n",
+	      machine );
+    fuse_abort();
+  }
+
+  info.initialised = 0;
+  return widget_do( WIDGET_TYPE_ROM, &info );
+}
+
 /* Options/Filter */
 int
 widget_menu_filter( void *data GCC_UNUSED )

@@ -1,5 +1,5 @@
 /* menu_data.c: Data for the widget menus
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -47,6 +47,7 @@ static widget_menu_entry file_aylogging[];
 static widget_menu_entry widget_menu_machine[];
 
 static widget_menu_entry widget_menu_options[];
+static widget_menu_entry widget_menu_roms[];
 
 static widget_menu_entry widget_menu_media[];
 static widget_menu_entry widget_menu_tape[];
@@ -140,7 +141,8 @@ static widget_menu_entry file_aylogging[] = {
 static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 static widget_menu_widget_t options_sound   = { WIDGET_TYPE_SOUND,   NULL };
 static widget_menu_widget_t options_rzx     = { WIDGET_TYPE_RZX,     NULL };
-static widget_menu_widget_t options_roms    = { WIDGET_TYPE_ROM,     NULL };
+static widget_menu_widget_t options_roms    = { WIDGET_TYPE_MENU,
+						&widget_menu_roms };
 
 static widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
@@ -158,6 +160,38 @@ static widget_menu_entry widget_menu_options[] = {
 #ifdef HAVE_LIB_XML2
   { "S(a)ve",	    KEYBOARD_a, widget_menu_save_options, NULL       },
 #endif				/* #ifdef HAVE_LIB_XML2 */
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Options/Select ROMs menu */
+
+static libspectrum_machine
+  spectrum_16 = LIBSPECTRUM_MACHINE_16,
+  spectrum_48 = LIBSPECTRUM_MACHINE_48,
+  spectrum_128 = LIBSPECTRUM_MACHINE_128,
+  spectrum_plus2 = LIBSPECTRUM_MACHINE_PLUS2,
+  spectrum_plus2a = LIBSPECTRUM_MACHINE_PLUS2A,
+  spectrum_plus3 = LIBSPECTRUM_MACHINE_PLUS3,
+  timex_tc2048 = LIBSPECTRUM_MACHINE_TC2048,
+  timex_tc2068 = LIBSPECTRUM_MACHINE_TC2068,
+  pentagon = LIBSPECTRUM_MACHINE_PENT,
+  scorpion = LIBSPECTRUM_MACHINE_SCORP;
+
+static widget_menu_entry widget_menu_roms[] = {
+  { "Select ROMs", 0, 0, NULL },	/* Menu title */
+
+  { "Spectrum 1(6)K...", KEYBOARD_6, widget_menu_select_roms, &spectrum_16 },
+  { "Spectrum (4)8K...", KEYBOARD_4, widget_menu_select_roms, &spectrum_48 },
+  { "Spectrum 12(8)K...", KEYBOARD_8, widget_menu_select_roms, &spectrum_128 },
+  { "Spectrum +(2)...", KEYBOARD_2, widget_menu_select_roms, &spectrum_plus2 },
+  { "Spectrum +2(A)...", KEYBOARD_a, widget_menu_select_roms,
+                                                            &spectrum_plus2a },
+  { "Spectrum +(3)...", KEYBOARD_3, widget_menu_select_roms, &spectrum_plus3 },
+  { "Timex (T)C2048...", KEYBOARD_t, widget_menu_select_roms, &timex_tc2048 },
+  { "Timex T(C)2068...", KEYBOARD_c, widget_menu_select_roms, &timex_tc2068 },
+  { "(P)entagon 128K...", KEYBOARD_p, widget_menu_select_roms, &pentagon },
+  { "(S)corpion ZS 256...", KEYBOARD_s, widget_menu_select_roms, &scorpion },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

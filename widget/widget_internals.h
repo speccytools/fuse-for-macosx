@@ -1,5 +1,5 @@
 /* widget_internals.h: Functions internal to the widget code
-   Copyright (c) 2001-2003 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -158,6 +158,7 @@ int widget_menu_save_scr( void *data );	     /* File/Save Scr */
 int widget_menu_exit( void *data );	     /* File/Exit */
 
 int widget_menu_save_options( void *data );  /* Options/Save */
+int widget_menu_select_roms( void *data );   /* Options/Select ROMs/<type> */
 
 int widget_menu_reset( void *data );	     /* Machine/Reset */
 int widget_menu_break( void *data );	     /* Machine/Break */
@@ -230,7 +231,17 @@ void widget_debugger_keyhandler( keyboard_key_name key,
 				 keyboard_key_name key2 );
 
 /* The ROM selector widget */
-int widget_roms_draw( void* data );
+
+typedef struct widget_roms_info {
+
+  int initialised;
+
+  libspectrum_machine machine;
+  size_t start, count;
+
+} widget_roms_info;
+
+int widget_roms_draw( void *data );
 void widget_roms_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
 int widget_roms_finish( widget_finish_state finished );
 
