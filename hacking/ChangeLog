@@ -412,3 +412,5 @@
 	 trigger when tstates is greater than a certain value.
 20031229 ui/gtk/debugger.c: double-clicking on an event causes emulation
 	 to run until that event occurs.
+20031230 fuse.c: another attempt to get tape_init() in the right place
+	 (patch #867906) (Fred).

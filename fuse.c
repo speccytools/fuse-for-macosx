@@ -248,10 +248,10 @@ static int fuse_init(int argc, char **argv)
   error = machine_init_machines();
   if( error ) return error;
 
-  error = tape_init(); if( error ) return error;
-
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
+
+  error = tape_init(); if( error ) return error;
 
   error = scaler_select_id( start_scaler ); free( start_scaler );
   if( error ) return error;
