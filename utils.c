@@ -87,6 +87,7 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_ID_TAPE_TAP:
   case LIBSPECTRUM_ID_TAPE_TZX:
+  case LIBSPECTRUM_ID_TAPE_WARAJEVO:
     error = tape_read_buffer( buffer, length, type, autoload );
     break;
 
