@@ -76,7 +76,7 @@ utils_open_file( const char *filename, int autoload,
   }
 
   error = libspectrum_identify_class( &class, type );
-  if( error ) return error;
+  if( error ) { utils_close_file( &file ); return error; }
 
   error = 0;
 

@@ -249,3 +249,5 @@
 20031008 ui/ggi/ggikeyboard.c: #include "fuse.h" (thanks, cmdzod)
 20031008 settings.pl: don't segfault if there are empty string entries
 	 in the config file.
+20031008 fuse.c, utils.c: partial cleanup of the startup code: there is
+	 now only one place at which each type of file is opened.

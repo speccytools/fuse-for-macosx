@@ -83,6 +83,19 @@ int fuse_sound_in_use;
 /* The creator information we'll store in file formats that support this */
 libspectrum_creator *fuse_creator;
 
+/* The various types of file we may want to run on startup */
+typedef struct start_files_t {
+
+  const char *disk_plus3;
+  const char *disk_trdos;
+  const char *dock;
+  const char *playback;
+  const char *recording;
+  const char *snapshot;
+  const char *tape;
+
+} start_files_t;
+
 static int fuse_init(int argc, char **argv);
 
 static int creator_init( void );
@@ -90,8 +103,10 @@ static void fuse_show_copyright(void);
 static void fuse_show_version( void );
 static void fuse_show_help( void );
 
+static int setup_start_files( start_files_t *start_files );
 static int parse_nonoption_args( int argc, char **argv, int first_arg,
-				 int autoload );
+				 start_files_t *start_files );
+static int do_start_files( start_files_t *start_files );
 
 static int fuse_end(void);
 
@@ -121,6 +136,7 @@ static int fuse_init(int argc, char **argv)
   int error, first_arg;
   int autoload;			/* Should we autoload tapes? */
   char *start_scaler;
+  start_files_t start_files;
 
   fuse_progname=argv[0];
   libspectrum_error_function = ui_libspectrum_error;
@@ -205,57 +221,9 @@ static int fuse_init(int argc, char **argv)
   error = scaler_select_id( start_scaler ); free( start_scaler );
   if( error ) return error;
 
-  if( settings_current.snapshot ) {
-    snapshot_read( settings_current.snapshot ); autoload = 0;
-  }
-
-  /* Insert any tape file; if no snapshot file already specified,
-     autoload the tape */
-  if( settings_current.tape_file )
-    tape_open( settings_current.tape_file, autoload );
-
-  if( settings_current.playback_file )
-    rzx_start_playback( settings_current.playback_file, NULL );
-
-#ifdef HAVE_765_H
-  if( settings_current.plus3disk_file ) {
-    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
-    if( error ) return error;
-
-    specplus3_disk_insert( SPECPLUS3_DRIVE_A, settings_current.plus3disk_file );
-  }
-#endif				/* #ifdef HAVE_765_H */
-
-  if( settings_current.trdosdisk_file ) {
-    error = machine_select( LIBSPECTRUM_MACHINE_PENT );
-    if( error ) return error;
-
-    trdos_disk_insert( TRDOS_DRIVE_A, settings_current.trdosdisk_file );
-  }
-
-  if( parse_nonoption_args( argc, argv, first_arg, autoload ) ) return 1;
-
-  /* Do this after we've parsed the non-option arguments or otherwise
-     something like `./fuse snapshot.z80 -r recording.rzx' ends up with
-     the startup snapshot stored in the RZX file, not snapshot.z80 */
-  if( settings_current.record_file )
-    rzx_start_recording( settings_current.record_file, 1 );
-
-#ifdef HAVE_765_H
-  if( settings_current.plus3disk_file ) {
-    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
-    if( error ) return error;
-
-    specplus3_disk_insert( SPECPLUS3_DRIVE_A, settings_current.plus3disk_file );
-  }
-#endif				/* #ifdef HAVE_765_H */
-
-  if( settings_current.trdosdisk_file ) {
-    error = machine_select( LIBSPECTRUM_MACHINE_PENT );
-    if( error ) return error;
-
-    trdos_disk_insert( TRDOS_DRIVE_A, settings_current.trdosdisk_file );
-  }
+  if( setup_start_files( &start_files ) ) return 1;
+  if( parse_nonoption_args( argc, argv, first_arg, &start_files ) ) return 1;
+  if( do_start_files( &start_files ) ) return 1;
 
   fuse_emulation_paused = 0;
 
@@ -413,27 +381,161 @@ int fuse_emulation_unpause(void)
   return 0;
 }
 
+static int
+setup_start_files( start_files_t *start_files )
+{
+  start_files->disk_plus3 = settings_current.plus3disk_file;
+  start_files->disk_trdos = settings_current.trdosdisk_file;
+  start_files->dock = settings_current.dck_file;
+  start_files->playback = settings_current.playback_file;
+  start_files->recording = settings_current.record_file;
+  start_files->snapshot = settings_current.snapshot;
+  start_files->tape = settings_current.tape_file;
+
+  return 0;
+}
+
 /* Make 'best guesses' as to what to do with non-option arguments */
 static int
-parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
+parse_nonoption_args( int argc, char **argv, int first_arg,
+		      start_files_t *start_files )
 {
+  size_t i;
+  const char *filename;
+  utils_file file;
   libspectrum_id_t type;
   libspectrum_class_t class;
   int error;
 
-  while( first_arg < argc ) {
+  for( i = first_arg; i < argc; i++ ) {
 
-    error = utils_open_file( argv[ first_arg ], autoload, &type );
+    filename = argv[i];
+
+    error = utils_read_file( filename, &file );
     if( error ) return error;
+
+    error = libspectrum_identify_file( &type, filename,
+				       file.buffer, file.length );
+    if( error ) return error;
+
+    error = utils_close_file( &file ); if( error ) return error;
 
     error = libspectrum_identify_class( &class, type );
     if( error ) return error;
 
-    /* If we had a snapshot on the command line, don't autoload any tapes
-       specified as well */
-    if( class == LIBSPECTRUM_CLASS_SNAPSHOT ) autoload = 0;
+    switch( class ) {
 
-    first_arg++;
+    case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
+      start_files->dock = filename; break;
+
+    case LIBSPECTRUM_CLASS_DISK_PLUS3:
+      start_files->disk_plus3 = filename; break;
+
+    case LIBSPECTRUM_CLASS_DISK_TRDOS:
+      start_files->disk_trdos = filename; break;
+
+    case LIBSPECTRUM_CLASS_RECORDING:
+      start_files->playback = filename; break;
+
+    case LIBSPECTRUM_CLASS_SNAPSHOT:
+      start_files->snapshot = filename; break;
+
+    case LIBSPECTRUM_CLASS_TAPE:
+      start_files->tape = filename; break;
+
+    case LIBSPECTRUM_CLASS_UNKNOWN:
+      ui_error( UI_ERROR_INFO, "couldn't identify '%s'; ignoring it",
+		filename );
+      break;
+
+    default:
+      ui_error( UI_ERROR_ERROR, "parse_nonoption_args: unknown file class %d",
+		class );
+      break;
+
+    }
+  }
+
+  return 0;
+}
+
+static int
+do_start_files( start_files_t *start_files )
+{
+  int autoload, error;
+
+  /* Can't do both input recording and playback */
+  if( start_files->playback && start_files->recording ) {
+    ui_error(
+      UI_ERROR_INFO,
+      "can't do both input playback and recording; recording disabled"
+    );
+    start_files->recording = NULL;
+  }
+
+  /* Can't use both +3 and TR-DOS disks simultaneously */
+  if( start_files->disk_plus3 && start_files->disk_trdos ) {
+    ui_error(
+      UI_ERROR_INFO,
+      "can't use +3 and TR-DOS disks simultaneously; +3 disk ignored"
+    );
+    start_files->disk_plus3 = NULL;
+  }
+
+  /* Can't use disks and the dock simultaneously */
+  if( ( start_files->disk_plus3 || start_files->disk_trdos ) &&
+      start_files->dock                                         ) {
+    ui_error(
+      UI_ERROR_INFO,
+      "can't use disks and the dock simultaneously; dock cartridge ignored"
+    );
+    start_files->dock = NULL;
+  }
+
+  /* If a snapshot has been specified, don't autoload tape, disks etc */
+  autoload = start_files->snapshot ? 0 : settings_current.auto_load;
+
+  /* Load in each of the files. Input recording must be done after
+     snapshot loading such that the right snapshot is embedded into
+     the file; input playback being done after snapshot loading means
+     any embedded snapshot in the input recording will override any
+     specified snapshot */
+
+  if( start_files->disk_plus3 ) {
+    error = utils_open_file( start_files->disk_plus3, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->disk_trdos ) {
+    error = utils_open_file( start_files->disk_trdos, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->dock ) {
+    error = utils_open_file( start_files->dock, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->snapshot ) {
+    error = utils_open_file( start_files->snapshot, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->tape ) {
+    error = utils_open_file( start_files->tape, autoload, NULL );
+    if( error ) return error;
+  }
+
+  /* Input recordings */
+
+  if( start_files->playback ) {
+    error = utils_open_file( start_files->playback, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->recording ) {
+    error = utils_open_file( start_files->recording, autoload, NULL );
+    if( error ) return error;
   }
 
   return 0;
