@@ -135,7 +135,8 @@ static int fuse_init(int argc, char **argv)
   if( error ) return error;
 
   fuse_sound_in_use = 0;
-  if( settings_current.sound ) sound_init( settings_current.sound_device );
+  if( settings_current.sound && settings_current.emulation_speed == 100 )
+    sound_init( settings_current.sound_device );
 
   if(sound_enabled) {
     fuse_sound_in_use = 1;
@@ -217,7 +218,7 @@ int fuse_emulation_unpause(void)
   if( --fuse_emulation_paused ) return 0;
 
   /* If we now want sound, enable it */
-  if( settings_current.sound ) {
+  if( settings_current.sound && settings_current.emulation_speed == 100 ) {
 
     /* If sound wasn't in use before, remove the old SIGALRM timer */
     if( !fuse_sound_in_use ) timer_end();
