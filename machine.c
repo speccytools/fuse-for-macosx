@@ -100,27 +100,29 @@ int machine_init_machines( void )
 
 static int machine_add_machine( int (*init_function)( fuse_machine_info *machine ) )
 {
+  fuse_machine_info *machine;
   int error;
 
   machine_count++;
 
-  machine_types = 
-    (fuse_machine_info**)realloc( machine_types, 
-			     machine_count * sizeof( fuse_machine_info* ) );
+  machine_types = realloc( machine_types,
+			   machine_count * sizeof( fuse_machine_info* ) );
   if( machine_types == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
-  machine_types[ machine_count - 1 ] =
-    (fuse_machine_info*)malloc( sizeof( fuse_machine_info ) );
-  if( machine_types[ machine_count - 1 ] == NULL ) {
+  machine_types[ machine_count - 1 ] = malloc( sizeof( fuse_machine_info ) );
+  if( !machine_types[ machine_count - 1 ] ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
-  error = init_function( machine_types[ machine_count - 1 ] );
-  if( error ) return error;
+  machine = machine_types[ machine_count - 1 ];
+
+  error = init_function( machine ); if( error ) return error;
+
+  machine->capabilities = libspectrum_machine_capabilities( machine->machine );
 
   return 0;
 }

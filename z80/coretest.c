@@ -355,6 +355,8 @@ event_add( libspectrum_dword event_time, int type )
 fuse_machine_info *machine_current;
 static fuse_machine_info dummy_machine;
 
+const int LIBSPECTRUM_MACHINE_CAPABILITY_EVEN_M1 = 1;
+
 settings_info settings_current;
 
 /* Initialise the dummy variables such that we're running on a clean a
@@ -367,6 +369,7 @@ init_dummies( void )
   for( i = 0; i < 8; i++ ) memory_map[i].page = &memory[ i * 0x2000 ];
 
   debugger_mode = DEBUGGER_MODE_INACTIVE;
+  dummy_machine.capabilities = 0;
   dummy_machine.ram.current_rom = 0;
   machine_current = &dummy_machine;
   rzx_playback = 0;

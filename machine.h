@@ -67,6 +67,7 @@ typedef struct fuse_machine_info {
 
   libspectrum_machine machine; /* which machine type is this? */
   const char *id;	/* Used to select from command line */
+  int capabilities;	/* Capabilities of this machine */
 
   int (*reset)(void);	/* Reset function */
 

@@ -88,16 +88,26 @@ static void z80_ddfdcbxx( libspectrum_byte opcode3,
 void
 z80_do_opcodes( void )
 {
+  int even_m1;
+  void *cgoto[4]; size_t next;
+
+  /* Avoid 'variable not used' warnings if we're not using gcc */
+  cgoto[0] = cgoto[0]; next = next;
+
+  even_m1 =
+    machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_EVEN_M1; 
 
 #ifdef __GNUC__
 
-  void *cgoto[3]; size_t next = 0;
-
+  next = 0;
   SETUP_CHECK( rzx, rzx_playback, 0 );
   SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 1 );
   SETUP_CHECK( trdos, trdos_available, 2 );
+  if( next != 3 ) { cgoto[ next ] = &&opcode_delay; }
 
-  if( next != 3 ) { cgoto[ next ] = &&run_opcode; }
+  next = 3;
+  SETUP_CHECK( evenm1, even_m1, 3 );
+  if( next != 4 ) { cgoto[ next ] = &&run_opcode; }
 
 #endif				/* #ifdef __GNUC__ */
 
@@ -142,12 +152,22 @@ z80_do_opcodes( void )
 
     END_CHECK
 
+  opcode_delay:
+
+    contend( PC, 4 );
+
+    /* Check to see if M1 cycles happen on even tstates */
+    CHECK( evenm1, even_m1, 3 )
+
+    if( tstates & 1 ) tstates++;
+
+    END_CHECK
+
   run_opcode:
 
     /* Do the instruction fetch; readbyte_internal used here to avoid
        triggering read breakpoints */
-    contend( PC, 4 ); R++;
-    opcode = readbyte_internal( PC ); PC++;
+    opcode = readbyte_internal( PC ); PC++; R++;
 
     switch(opcode) {
 #include "opcodes_base.c"
