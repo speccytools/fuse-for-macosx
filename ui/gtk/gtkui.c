@@ -165,9 +165,9 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
   { "/Options/S_elect ROMs...", NULL , gtkui_roms,          0, NULL          },
   { "/Options/_Filter...",	NULL , select_filter,	    0, NULL          },
-  { "/Options/separator",       NULL , NULL,                0, "<Separator>" },
 
 #ifdef HAVE_LIB_XML2
+  { "/Options/separator",       NULL , NULL,                0, "<Separator>" },
   { "/Options/S_ave",		NULL , save_options,	    0, NULL          },
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
