@@ -333,6 +333,9 @@ static int read_v1_block( uchar *buffer, int is_compressed,
 
   } else {	/* Snap isn't compressed */
 
+    /* Check we've got enough bytes to read */
+    if( end - (*next_block) < 0xc000 ) return LIBSPECTRUM_ERROR_CORRUPT;
+
     (*uncompressed) = (uchar*)malloc( 0xc000 * sizeof(uchar) );
     if( (*uncompressed) == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
 
