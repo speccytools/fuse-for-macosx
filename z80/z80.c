@@ -103,7 +103,7 @@ z80_reset( void )
 }
 
 /* Process a z80 maskable interrupt */
-void
+int
 z80_interrupt( void )
 {
   /* An interrupt will occur if IFF1 is set and the /INT line hasn't
@@ -115,7 +115,7 @@ z80_interrupt( void )
        but check after the next instruction has been executed */
     if( tstates == z80.interrupts_enabled_at ) {
       event_add( tstates + 1, EVENT_TYPE_INTERRUPT );
-      return;
+      return 0;
     }
 
     if( z80.halted ) { PC++; z80.halted = 0; }
@@ -140,6 +140,13 @@ z80_interrupt( void )
 	ui_error( UI_ERROR_ERROR, "Unknown interrupt mode %d", IM );
 	fuse_abort();
     }
+
+    return 1;			/* Accepted an interrupt */
+
+  } else {
+
+    return 0;			/* Did not accept an interrupt */
+
   }
 }
 

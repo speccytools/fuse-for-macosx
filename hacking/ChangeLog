@@ -346,3 +346,5 @@
 	 accepted after an EI/EI or EI/DI sequence.
 20031107 snapshot.c: use libspectrum's support for the 'last instruction
 	 EI' flag.
+20031111 event.c, z80/z80.[ch]: further changes to the interrupt code to
+	 allow old Fuse recordings to play back successfully.
