@@ -106,10 +106,6 @@ static int counter_reset( void );
 
 int rzx_init( void )
 {
-  libspectrum_error error;
-
-  error = libspectrum_rzx_alloc( &rzx ); if( error ) return error;
-
   rzx_recording = rzx_playback = 0;
 
   rzx_in_bytes = NULL;
@@ -124,6 +120,8 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   int error; libspectrum_error libspec_error;
 
   if( rzx_playback ) return 1;
+
+  error = libspectrum_rzx_alloc( &rzx ); if( error ) return error;
 
   /* Store the filename */
   rzx_filename = strdup( filename );
@@ -226,7 +224,9 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
   libspectrum_error libspec_error; int error;
   libspectrum_snap *snap;
 
-  if( rzx_recording) return 1;
+  if( rzx_recording ) return 1;
+
+  error = libspectrum_rzx_alloc( &rzx ); if( error ) return error;
 
   error = utils_read_file( filename, &file );
   if( error ) return error;
@@ -244,10 +244,7 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
     return 1;
   }
 
-  if( snap ) {
-    error = libspectrum_snap_free( snap );
-    if( error ) { libspectrum_rzx_free( rzx ); return error; }
-  } else if( load_snap ) {
+  if( !snap && load_snap ) {
     error = load_snap();
     if( error ) { libspectrum_rzx_free( rzx ); return 1; }
   }
@@ -257,6 +254,11 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
     if( snap ) libspectrum_snap_free( snap );
     libspectrum_rzx_free( rzx );
     return error;
+  }
+
+  if( snap ) {
+    error = libspectrum_snap_free( snap );
+    if( error ) { libspectrum_rzx_free( rzx ); return error; }
   }
 
   return 0;
@@ -269,6 +271,8 @@ rzx_start_playback_from_buffer( const unsigned char *buffer, size_t length )
   int error;
 
   if( rzx_recording ) return 0;
+
+  error = libspectrum_rzx_alloc( &rzx ); if( error ) return error;
 
   error = libspectrum_rzx_read( rzx, &snap, buffer, length, NULL );
   if( error ) return error;

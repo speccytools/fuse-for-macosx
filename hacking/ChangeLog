@@ -204,3 +204,5 @@
 20030919 ui/gtk/gtkdisplay.c, ui/sdl/sdldisplay.c: get greyscale values
 	 via 0.299r+0.587g+0.114b rather than 0.333r+0.333g+0.333b.
 20030919 rzx.c: prevent RZX recording being stopped twice under widget UIs.
+20030919 rzx.c: make sure an RZX file is allocated when we try and do
+	 anything with it.
