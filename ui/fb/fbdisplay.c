@@ -1,5 +1,6 @@
 /* fbdisplay.c: Routines for dealing with the linux fbdev display
-   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Darren Salt
+   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Darren Salt,
+			   Witold Filipczy
 
    $Id$
 
@@ -195,20 +196,6 @@ fb_set_mode( void )
   return 1;
 }
 
-void uidisplay_putpixel(int x,int y,int colour)
-{
-#ifdef USE_LIBPNG
-  screenshot_screen[y][x] = colour;
-#endif			/* #ifdef USE_LIBPNG */
-
-  if( IF_FB_WIDTH( 320 ) ) {
-    if( ( x & 1 ) == 0 )
-      *( image + 320 * y + (x >> 1) ) = colours[colour];
-  } else {
-    *( image + 640 * y + x ) = colours[colour];
-  }
-}
-
 void
 uidisplay_frame_end( void ) 
 {
@@ -216,51 +203,28 @@ uidisplay_frame_end( void )
 }
 
 void
-uidisplay_line( int y )
-{
-  switch( fb_resolution )
-  {
-  case FB_RES( 640, 480 ):
-    memcpy( gm +  2 * y      * display.xres_virtual, image + y * 640,
-	    640 * 2                                                   );
-    memcpy( gm + (2 * y + 1) * display.xres_virtual, image + y * 640,
-	    640 * 2                                                   );
-    break;
-  case FB_RES( 640, 240 ):
-    memcpy( gm +      y      * display.xres_virtual, image + y * 640,
-	    640 * 2                                                   );
-    break;
-  case FB_RES( 320, 240 ):
-    memcpy( gm +      y      * display.xres_virtual, image + y * 320,
-	    320 * 2                                                   );
-    break;
-  default:;		/* Shut gcc up */
-  }
-}
-
-void
-uidisplay_lines( int start, int end )
+uidisplay_area( int x, int start, int width, int height)
 {
   int y;
   switch( fb_resolution ) {
   case FB_RES( 640, 480 ):
-    for( y = start; y <= end; y++ )
+    for( y = start; y < start + height; y++ )
     {
-      memcpy( gm +   2 * y       * display.xres_virtual, image + y * 640,
-	      640 * 2                                                     );
-      memcpy( gm + ( 2 * y + 1 ) * display.xres_virtual, image + y * 640,
-	      640 * 2                                                     );
+      memcpy( gm +   2 * y       * display.xres_virtual + x * 2, image + y * 640 + x * 2,
+	      width * 4                                                     );
+      memcpy( gm + ( 2 * y + 1 ) * display.xres_virtual + x * 2, image + y * 640 + x * 2,
+	      width * 4                                                     );
     }
     break;
   case FB_RES( 640, 240 ):
-    for( y = start; y <= end; y++ )
-      memcpy( gm +       y       * display.xres_virtual, image + y * 640,
-	      640 * 2                                                     );
+    for( y = start; y < start + height; y++ )
+      memcpy( gm +       y       * display.xres_virtual + x * 2, image + y * 640 + x * 2,
+	      width * 4                                                     );
     break;
   case FB_RES( 320, 240 ):
-    for( y = start; y <= end; y++ )
-      memcpy( gm +       y       * display.xres_virtual, image + y * 320,
-	      320 * 2                                                     );
+    for( y = start; y < start + height; y++ )
+      memcpy( gm +       y       * display.xres_virtual + x, image + y * 320 + x,
+	     width * 2                                                    );
     break;
   default:;		/* Shut gcc up */
   }
