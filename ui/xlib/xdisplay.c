@@ -212,15 +212,16 @@ try_shm( const int width, const int height )
   shm_info.shmid = id;
   image->data = shm_info.shmaddr = shmat( id, 0, 0 );
 
-  /* Flag the chunk for removal; it won't actually be removed until
-     we detach (unless the above attach failed) */
-  shmctl( id, IPC_RMID, 0 );
-
-  if( !image->data ) return 0;
+  /* If we couldn't attach, remove the chunk and give up */
+  if( image->data == (void*)-1 ) {
+    shmctl( id, IPC_RMID, NULL );
+    image->data = NULL;
+    return 0;
+  }
 
   /* This may generate an X error */
   xerror_error = 0; xerror_expecting = 1;
-  error = XShmAttach( display, &shm_info );
+  error = !XShmAttach( display, &shm_info );
 
   /* Force any X errors to occur before we disable traps */
   XSync( display, False );
@@ -228,9 +229,14 @@ try_shm( const int width, const int height )
 
   /* If we caught an error, don't use SHM */
   if( error || xerror_error ) {
+    shmctl( id, IPC_RMID, NULL );
     shmdt( image->data ); image->data = NULL;
     return 0;
   }
+
+  /* Now flag the chunk for deletion; this will take effect when
+     everything has detached from it */
+  shmctl( id, IPC_RMID, NILL );
 
   return 1;
 }  
