@@ -185,3 +185,11 @@
 20030905 debugger/expression.c: get brackets right when deparsing
          expressions.
 20030908 dck.c: use Timex dock capability in dck_read
+20030912 ChangeLog, README, man/fuse.1: documentation updates for the
+         0.6.1 release (Release-0_6_1-branch)
+20030912 man/fuse.1: fix typo in BUGS section (for -> from). Mention 16K
+	 Spectrum as being available when changing machine.
+	 (Release-0_6_1-branch)
+20030913 Makefile.am: distribute compat.h (Release-0_6_1-branch)
+20030913 Merge all changes except the different DSA key from
+	 Release-0_6_1-branch onto HEAD.

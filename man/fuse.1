@@ -24,7 +24,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "1st September, 2003" "Version 0.6.1pre2" "Emulators"
+.TH fuse 1 "13th September, 2003" "Version 0.6.1" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -761,9 +761,9 @@ you're using the GTK+ UI.
 .I "Machine, Select..."
 .RS
 Choose a type of Spectrum to emulate. The machine initially emulated
-is the 48K Spectrum. The choices available are 48K, 128K, +2, +2A, +3,
-TC2048, TC2068 and Pentagon but most of the time you'll probably want
-to use the 48 or 128 machines.
+is the 48K Spectrum. The choices available are 16K, 48K, 128K, +2,
++2A, +3, TC2048, TC2068 and Pentagon but most of the time you'll
+probably want to use the 48 or 128 machines.
 .RE
 .PP
 .I "Machine, Debugger..."
@@ -1487,7 +1487,7 @@ Not many peripherals are supported.
 Selecting a startup filter doesn't work properly with user interfaces
 other than SDL.
 .br
-Attempting to replay an RZX file without an embedded snapshot for the
+Attempting to replay an RZX file without an embedded snapshot from the
 command-line doesn't work if you do `./fuse
 .IR "rzxfile snapshot" '.
 `./fuse

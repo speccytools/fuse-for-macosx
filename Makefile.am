@@ -81,6 +81,7 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\""
 
 noinst_HEADERS = ay.h \
+	compat.h \
 	dck.h \
 	display.h \
 	event.h \

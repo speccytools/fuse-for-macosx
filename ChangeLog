@@ -1,4 +1,6 @@
-2003-09-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+2003-09-13  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.6.1 released.
 
 	* A Z80 core rewrite such that it's now generated from the regular
 	  patterns in the instruction set. This shouldn't have any effect
