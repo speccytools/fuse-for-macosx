@@ -168,6 +168,12 @@ the same as the General Options dialog's
 option.
 .RE
 .PP
+.I "--dock file"
+.RS
+Insert the specified file into the emulated Timex TC2068 dock; also select
+the TC2068 on startup if available.
+.RE
+.PP
 .I "--embed-snapshot"
 .RS
 Specify whether a snapshot should be embedded in an RZX file when
@@ -221,6 +227,18 @@ section for more details.
 Give brief usage help, listing available options.
 .RE
 .PP
+.I "--if2cart file"
+.RS
+Insert the specified file into the emulated Interface II.
+.RE
+.PP
+.I --interface2
+.RS
+Emulate a Sinclair Interface II. Same as the Peripherals Options dialog's
+.I "Interface II"
+option.
+.RE
+.PP
 .I --issue2
 .RS
 Emulate an issue 2 keyboard. Same as the General Options dialog's
@@ -253,7 +271,7 @@ or
 .PP
 .I --kempston
 .RS
-Emulate a Kempston joystick. Same as the General Options dialog's
+Emulate a Kempston joystick. Same as the Peripherals Options dialog's
 .I "Kempston joystick"
 option.
 .RE
@@ -329,6 +347,27 @@ Give stereo separation of the 128's AY sound channels. Same as the
 General Options dialog's
 .I "AY stereo separation"
 option.
+.RE
+.PP
+.I --simpleide
+.RS
+Specify whether Fuse will emulate the simple 8-bit IDE interface
+as used by the Spectrum +3e. Same as the Perpherals
+Option dialog's
+.I "Simple 8-bit IDE"
+option.
+.RE
+.PP
+.I --simpleide-masterfile file
+.RS
+Specify a HDF file to connect to the emulated Simple 8-bit IDE
+interface's master channel.
+.RE
+.PP
+.I --simpleide-slavefile file
+.RS
+Specify a HDF file to connect to the emulated Simple 8-bit IDE
+interface's slave channel.
 .RE
 .PP
 .I --slt
@@ -446,6 +485,63 @@ Allow Spectrum programs to overwrite the ROM(s). The same as the
 General Options dialog's
 .I "Allow writes to ROM"
 option.
+.RE
+.PP
+.I --zxatasp
+.RS
+Specify whether Fuse emulate the ZXATASP interface. Same as the
+Perpherals Option dialog's
+.I "ZXATASP interface"
+option.
+.RE
+.PP
+.I --zxatasp-upload
+.RS
+Specify the state of the ZXATASP upload jumper. Same as the
+Perpherals Option dialog's
+.I "ZXATASP upload"
+option.
+.RE
+.PP
+.I --zxatasp-write-protect
+.RS
+Specify the state of the ZXATASP write protect jumper. Same as the
+Perpherals Option dialog's
+.I "ZXATASP write protect"
+option.
+.RE
+.PP
+.I --zxatasp-masterfile file
+.RS
+Specify a HDF file to connect to the emulated ZXATASP interface's
+master channel.
+.RE
+.PP
+.I --zxatasp-slavefile file
+.RS
+Specify a HDF file to connect to the emulated ZXATASP interface's
+slave channel.
+.RE
+.PP
+.I --zxcf
+.RS
+Specify whether Fuse emulate the ZXCF interface. Same as the
+Perpherals Option dialog's
+.I "ZXCF interface"
+option.
+.RE
+.PP
+.I --zxcf-upload
+.RS
+Specify the state of the ZXCF upload jumper. Same as the Perpherals
+Option dialog's
+.I "ZXCF upload"
+option.
+.RE
+.PP
+.I --zxcf-cffile file
+.RS
+Specify a HDF file to connect to the emulated ZXCF interface.
 .RE
 .PP
 All long options which control on/off settings can be disabled using

@@ -951,3 +951,4 @@
 20040621 configure.in: restore autoconf2.13 compatability.
 20040621 man/fuse.1: small man page update.
 20040621 ChangeLog: Darren did the initial Spectrum SE emulation.
+20040623 man/fuse.1: Updates for Interface II and IDE command line options.
