@@ -38,17 +38,19 @@
 int widget_tape_draw( void )
 {
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, 4 );
+  widget_dialog_with_border( 1, 2, 30, 7 );
 
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Tape Control" );
 
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND,
-		      "(C)lear tape" );
-  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND,
-		      "(R)ewind tape" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen tape" );
+  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(P)lay tape" );
+  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(C)lear tape" );
+  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(R)ewind tape" );
+  widget_printstring( 2, 8, WIDGET_COLOUR_FOREGROUND,
+		      "(W)rite tape to 'tape.tzx'" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 32 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 64 );
 
   return 0;
 }
@@ -65,8 +67,21 @@ void widget_tape_keyhandler( int key )
     tape_close();
     break;
 
+  case KEYBOARD_o:
+    widget_do( WIDGET_TYPE_FILESELECTOR );
+    if( widget_filesel_name ) tape_open( widget_filesel_name );
+    break;
+
+  case KEYBOARD_p:
+    tape_toggle_play();
+    break;
+
   case KEYBOARD_r:
     tape_rewind();
+    break;
+
+  case KEYBOARD_w:
+    tape_write( "tape.tzx" );
     break;
 
   case KEYBOARD_Enter:

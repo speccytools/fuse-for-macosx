@@ -388,12 +388,7 @@ static void gtkui_tape_open( GtkWidget *widget, gpointer data )
 /* Called by the menu when Tape/Play selected */
 static void gtkui_tape_play( GtkWidget *widget, gpointer data )
 {
-  if( tape_playing ) {
-    tape_stop();
-  } else {
-    tape_play();	/* Won't start the tape if traps are active
-			   and the next block is a ROM block */
-  }
+  tape_toggle_play();
 }
 
 /* Called by the menu when Tape/Rewind selected */

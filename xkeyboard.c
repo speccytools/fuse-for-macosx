@@ -101,18 +101,11 @@ int xkeyboard_keypress(XKeyEvent *event)
   case XK_F7:
     fuse_emulation_pause();
     widget_do( WIDGET_TYPE_FILESELECTOR );
-    if( widget_filesel_name ) {
-      tape_open( widget_filesel_name );
-      display_refresh_all();
-    }
+    if( widget_filesel_name ) tape_open( widget_filesel_name );
     fuse_emulation_unpause();
     break;
   case XK_F8:
-    if( tape_playing ) {
-      tape_stop();
-    } else {
-      tape_play();
-    }
+    tape_toggle_play();
     break;
   case XK_F9:
     machine_select_next();

@@ -470,6 +470,15 @@ int tape_play( void )
   return 0;
 }
 
+int tape_toggle_play( void )
+{
+  if( tape_playing ) {
+    return tape_stop();
+  } else {
+    return tape_play();
+  }
+}
+
 int tape_stop( void )
 {
   tape_playing = 0;

@@ -63,7 +63,7 @@ typedef struct widget_t {
 
 /* The information we need to store to recurse from a widget */
 typedef struct widget_recurse_t {
-  widget_type parent;		/* Which widget called us? */
+  widget_type type;		/* Which type of widget are we? */
   int finished;			/* Have we finished this widget yet? */
 } widget_recurse_t;
 

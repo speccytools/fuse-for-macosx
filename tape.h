@@ -38,7 +38,10 @@ int tape_load_trap( void );
 int tape_save_trap( void );
 
 int tape_play( void );
+int tape_toggle_play( void );
+
 int tape_next_edge( void );
+
 int tape_stop( void );
 
 extern int tape_playing;

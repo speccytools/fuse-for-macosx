@@ -176,17 +176,16 @@ int widget_do( widget_type which )
 {
   int error;
 
-  /* If we're recursing into widgets, set up what to return to. If this
-     is the first widget we've called, set the timer up.
-  */     
-  if( widget_level >= 0 ) {
-    widget_return[widget_level].parent = which;
-  } else {
+  /* We're now one widget level deeper */
+  widget_level++;
+
+  /* If we're the top-level widget, set up the timer */
+  if( ! widget_level ) {
     error = widget_timer_init(); if( error ) return error;
   }
 
-  /* We're now one widget level deeper */
-  widget_level++;
+  /* Store what type of widget we are */
+  widget_return[widget_level].type = which;
 
   /* Draw this widget */
   widget_data[ which ].draw();
@@ -218,8 +217,8 @@ int widget_do( widget_type which )
     /* If we're going back to another widget, set up its keyhandler and
        draw it again */
     widget_keyhandler =
-      widget_data[ widget_return[widget_level+1].parent ].keyhandler;
-    widget_data[ widget_return[widget_level+1].parent ] . draw();
+      widget_data[ widget_return[widget_level].type ].keyhandler;
+    widget_data[ widget_return[widget_level].type ] . draw();
 
   } else {
 
