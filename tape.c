@@ -65,6 +65,7 @@ typedef enum tape_edge_state_t {
   TAPE_EDGE_STATE_SYNC2,
   TAPE_EDGE_STATE_DATA1,
   TAPE_EDGE_STATE_DATA2,
+  TAPE_EDGE_STATE_END,
 } tape_edge_state_t;
 /* And the current state of the generator */
 static tape_edge_state_t tape_edge_state;
@@ -76,7 +77,7 @@ static int tape_edge_count;
 static int tape_bytes_through_block;
 static int tape_bits_through_byte;
 
-/* The current byte we're loading (gets shifted out rightwards) */
+/* The current byte we're loading (gets shifted out leftwards) */
 static int tape_current_byte;
 
 /* The length of the current data bit (in T-states) */
@@ -408,6 +409,18 @@ int tape_next_edge( void )
     if( error ) return error;
     error = tape_get_next_bit(); if( error ) return error;
     break;
+
+  case TAPE_EDGE_STATE_END:
+    if( tape_block_pointer == NULL ) {
+      tape_stop();
+      tape_block_pointer = tape_block_list;
+    } else {
+      error = event_add( tstates + tape_timings_pause, EVENT_TYPE_EDGE );
+      if( error ) return error;
+      error = tape_start_block(); if( error ) return error;
+    }
+    break;
+
   }
 
   return 0;
@@ -424,7 +437,7 @@ static int tape_start_block( void )
   if( ptr->data[0] & 0x80 ) {	/* program or data */
     tape_edge_count = 0x0c97;
   } else {			/* header */
-    tape_edge_count = 0x1f79;
+    tape_edge_count = 0x1f7f;
   }
 
   tape_bytes_through_block = -1; tape_bits_through_byte = 7;
@@ -438,29 +451,20 @@ static int tape_get_next_bit( void )
   tape_block_t *ptr;
   int next_bit;
 
-  int error;
-
   ptr = (tape_block_t*)(tape_block_pointer->data);
 
   if( ++tape_bits_through_byte == 8 ) {
     if( ++tape_bytes_through_block == ptr->length ) {
       tape_block_pointer = tape_block_pointer->next;
-      if( tape_block_pointer == NULL ) {
-	tape_stop();
-	tape_block_pointer = tape_block_list;
-	return 0;
-      }
-      error = event_add( tstates + tape_timings_pause, EVENT_TYPE_EDGE );
-      if( error ) return error;
-      error = tape_start_block(); if( error ) return error;
+      tape_edge_state = TAPE_EDGE_STATE_END;
       return 0;
     }
     tape_current_byte = ptr->data[ tape_bytes_through_block ];
     tape_bits_through_byte = 0;
   }
 
-  next_bit = tape_current_byte & 0x01;
-  tape_current_byte >>= 1;
+  next_bit = tape_current_byte & 0x80;
+  tape_current_byte <<= 1;
 
   tape_next_bit_timing = ( next_bit ? tape_timings_data1
 			            : tape_timings_data0 );
