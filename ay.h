@@ -32,6 +32,7 @@
 #endif			/* #ifndef FUSE_TYPES_H */
 
 typedef struct ayinfo {
+  int present;
   int current_register;
   BYTE registers[15];
 } ayinfo;

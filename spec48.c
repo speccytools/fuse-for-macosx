@@ -93,6 +93,7 @@ int spec48_init(void)
   machine.reset=spec48_reset;
 
   machine.peripherals=spec48_peripherals;
+  machine.ay.present=0;
 
   return 0;
 

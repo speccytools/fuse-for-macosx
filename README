@@ -1,18 +1,19 @@
-The Free Unix Spectrum Emulator (Fuse) 0.2.1
+The Free Unix Spectrum Emulator (Fuse) 0.3.0
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.2.1.
+is Fuse (the Free Unix Spectrum Emulator), version 0.3.0.
 
 What Fuse does have:
 
 * Working 48K/128K/+2/+2A Speccy emulation, running at true Speccy
   speed, at least on this PII-233.
+* Sound (at least under Linux).
 
 What Fuse doesn't have:
 
-* Any sound output
+* Any sound output under operating systems other than Linux.
 * A nice GUI. Or really any user interface at all!
 * The ability to save to tape files
 * Emulation of any peripherals (bar the tape deck)
@@ -26,6 +27,16 @@ What you'll need to run Fuse:
 To compile Fuse:
 
 $ ./configure
+
+There are now some options you can give to configure; `configure
+--help' will list them all, but the most important are:
+
+--with-svgalib		Use the SVGAlib interface, rather than GTK+.
+--without-gtk		Use the plain Xlib interface, rather than GTK+.
+--enable-issue2		Emulate an Issue 2 Spectrum, rather than an Issue 3.
+
+Then just:
+
 $ make
 
 To run fuse:
@@ -49,9 +60,9 @@ F10: Quit Fuse
 The snapshot loading is _very_ simple: it loads from a .sna snapshot
 (either 48K or 128K) called `snapshot.sna' in the current
 directory. (If you need to convert your snaps to .sna, try SnapConv:
-http://www.ast.cam.ac.uk/~pak/spectrum/snapconv.html). Saving is also
-to `snapshot.sna', and will happily overwrite any other file you may
-have with that name.
+http://www.srcf.ucam.org/~pak21/spectrum/snapconv.html). Saving is
+also to `snapshot.sna', and will happily overwrite any other file you
+may have with that name.
 
 The tape loading is also simple: it reads from a .tap file called
 `tape.tap' in the current directory. Press F7 to rewind the tape
@@ -80,9 +91,9 @@ or the latest version should be available from the World of Spectrum
 ftp://ftp.void.jump.org/pub/sinclair/emulators/unix/
 
 Finally, if you want to see how a Unix Speccy emulator should be done,
-check out Erik Kunze's `xzx': http://www.philosys.de/~kunze/xzx/.
+check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
 
 Philip Kendall <pak@ast.cam.ac.uk>
-17 December 2000
+30 January 2001
 
 $Id$

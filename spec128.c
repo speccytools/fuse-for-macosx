@@ -104,6 +104,7 @@ int spec128_init(void)
   machine.reset=spec128_reset;
 
   machine.peripherals=spec128_peripherals;
+  machine.ay.present=1;
 
   return 0;
 

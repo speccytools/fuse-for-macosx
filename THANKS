@@ -20,6 +20,8 @@ Some thanks (in alphabetical order):
   (ftp://ftp.void.jump.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
   got me started on this emulation lark all those years ago...
 
+* Russell Marks: for most of the Linux sound code.
+
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
 
@@ -31,6 +33,6 @@ Some thanks (in alphabetical order):
   -- simply the best Speccy Web site out there.
 
 * Matan Ziv-Av: for adding svgalib (http://www.svgalib.org/) support to
-  Fuse.
+  Fuse, and also work on the Linux sound code.
 
 $Id$

@@ -161,6 +161,7 @@ int specplus3_init(void)
   machine.reset=specplus3_reset;
 
   machine.peripherals=specplus3_peripherals;
+  machine.ay.present=1;
 
   return 0;
 

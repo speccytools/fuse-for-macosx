@@ -1,4 +1,4 @@
-/* sound.c: Sound support
+/* sound.h: Sound support
    Copyright (c) 2000-2001 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify

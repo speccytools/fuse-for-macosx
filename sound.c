@@ -100,8 +100,8 @@ void sound_ay_write(int reg,int val)
 /* full range of beeper volume */
 #define VOL_BEEPER		(AMPL_BEEPER*2)
 
-/* using 256 byte frags for 8kHz, scale up for higher */
-#define BASE_SOUND_FRAG_PWR	8
+/* using (8) 64 byte frags for 8kHz, scale up for higher */
+#define BASE_SOUND_FRAG_PWR	6
 
 /* max. number of sub-frame AY port writes allowed;
  * given the number of port writes theoretically possible in a
@@ -198,7 +198,7 @@ tmp=(sound_channels>1);
 if(ioctl(soundfd,SNDCTL_DSP_STEREO,&tmp)<0)
   sound_channels=1;	/* just use mono */
 
-frag=(0x20000|BASE_SOUND_FRAG_PWR);
+frag=(0x80000|BASE_SOUND_FRAG_PWR);
 
 if(ioctl(soundfd,SNDCTL_DSP_SPEED,&sound_freq)<0)
   {
@@ -273,9 +273,8 @@ struct ay_change_tag *change_ptr=ay_change;
 int changes_left=ay_change_count;
 int reg,r;
 
-/* If nothing has written to the AY registers, don't need to do anything
-   here */
-if(!ay_change_count) return;
+/* If no AY chip, don't produce any AY sound (!) */
+if(!machine.ay.present) return;
 
 /* convert change times to sample offsets */
 for(f=0;f<ay_change_count;f++)
