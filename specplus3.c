@@ -302,14 +302,14 @@ int specplus3_init( machine_info *machine )
   drive_a.fdd.fd_heads = 1;
   drive_a.fdd.fd_cylinders = 40;
   drive_a.fdd.fd_readonly = 0;
-  drive_a.fdd_filename[0] = NULL;
+  drive_a.fdd_filename[0] = '\0';
 
   fdd_init( &drive_b );
   drive_b.fdd.fd_type = FD_30;
   drive_b.fdd.fd_heads = 1;
   drive_b.fdd.fd_cylinders = 40;
   drive_b.fdd.fd_readonly = 0;
-  drive_b.fdd_filename[0] = NULL;
+  drive_b.fdd_filename[0] = '\0';
 
   /* And a null drive to use for the other two drives lib765 supports */
   fd_init( &drive_null );
