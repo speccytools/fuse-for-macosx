@@ -28,7 +28,12 @@ noinst_LIBRARIES = libuigtk.a
 
 INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
-libuigtk_a_SOURCES = browse.c debugger.c error.c gtkdisplay.c gtkkeyboard.c \
+libuigtk_a_SOURCES = binary.c \
+		     browse.c \
+	             debugger.c \
+                     error.c \
+		     gtkdisplay.c \
+		     gtkkeyboard.c \
                      gtkui.c \
 	             options.c keysyms.c picture.c \
 		     roms.c

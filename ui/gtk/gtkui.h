@@ -41,6 +41,8 @@ extern GtkWidget* gtkui_drawing_area;
 void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
 char* gtkui_fileselector_get_filename( const char *title );
 
+void gtkui_load_binary_data( GtkWidget *widget, gpointer data );
+void gtkui_save_binary_data( GtkWidget *widget, gpointer data );
 void gtk_tape_browse( GtkWidget *widget, gpointer data );
 void gtkui_roms( GtkWidget *widget, gpointer data );
 

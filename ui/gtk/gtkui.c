@@ -180,7 +180,12 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 #endif				/* #ifdef USE_LIBPNG */
 
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
+  { "/File/Loa_d binary data...",NULL, gtkui_load_binary_data, 0, NULL       },
+  { "/File/Save _binary data...",NULL, gtkui_save_binary_data, 0, NULL       },
+
+  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
+
   { "/Options",			NULL , NULL,                0, "<Branch>"    },
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
