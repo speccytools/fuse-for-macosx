@@ -240,19 +240,19 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
     return 1;
   }
 
-  error = start_playback( rzx, snap );
-  if( error ) {
-    if( snap ) libspectrum_snap_free( snap );
-    libspectrum_rzx_free( rzx );
-    return error;
-  }
-
   if( snap ) {
     error = libspectrum_snap_free( snap );
     if( error ) { libspectrum_rzx_free( rzx ); return error; }
   } else if( load_snap ) {
     error = load_snap();
     if( error ) { libspectrum_rzx_free( rzx ); return 1; }
+  }
+
+  error = start_playback( rzx, snap );
+  if( error ) {
+    if( snap ) libspectrum_snap_free( snap );
+    libspectrum_rzx_free( rzx );
+    return error;
   }
 
   return 0;
