@@ -32,7 +32,7 @@
 
 #include "widget_internals.h"
 
-char *widget_text_text;		/* What we return the text in */
+char *widget_text_text = NULL;	/* What we return the text in */
 
 static const char *title;	/* The window title */
 static char text[40];		/* The current entry text */
@@ -129,7 +129,7 @@ widget_text_finish( widget_finish_state finished )
 {
   if( finished == WIDGET_FINISHED_OK ) {
 
-    widget_text_text = malloc( strlen( text ) + 1 );
+    widget_text_text = realloc( widget_text_text, strlen( text ) + 1 );
     if( !widget_text_text ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;
@@ -137,6 +137,7 @@ widget_text_finish( widget_finish_state finished )
 
     strcpy( widget_text_text, text );
   } else {
+    free( widget_text_text );
     widget_text_text = NULL;
   }
 

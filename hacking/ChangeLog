@@ -1032,3 +1032,4 @@
 	 Should prevent the occasional errant 'No disk' messages.
 20040724 ui/sdl/sdldisplay.c: SDL_SetColors does not take a const array. Fix
          565/555 mode detection.
+20040724 widget/text.c: fix small memory leak (Darren).
