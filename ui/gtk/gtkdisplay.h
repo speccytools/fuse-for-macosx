@@ -1,5 +1,5 @@
 /* gtkdisplay.h: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2002 Philip Kendall
+   Copyright (c) 2000-2003 Philip Kendall
 
    $Id$
 
@@ -26,6 +26,9 @@
 
 #ifndef FUSE_GTKDISPLAY_H
 #define FUSE_GTKDISPLAY_H
+
+/* The colour palette in use */
+extern DWORD gtkdisplay_colours[16];
 
 int gtkdisplay_init( void );
 int gtkdisplay_end( void );
