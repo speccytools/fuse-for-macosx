@@ -740,3 +740,7 @@
 20040413 menu_data.pl: Perl 5.6 fixup.
 20040415 tape.c: when loading a block via the tape traps, we must have at
 	 least DE + 2 bytes due to the flag and parity bytes.
+20040415 tape.c: after successfully loading a block with tape traps, set
+	 DE equal to zero as this is what happens in the ROM code.
+	 Necessary for 'The Rats' to load with tape traps enabled; thanks
+	 to Simon Stuart for reporting this (fixes bug #890838).

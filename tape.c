@@ -396,8 +396,11 @@ trap_load_block( libspectrum_tape_block *block )
     return 0;
   }
 
-  /* Else return with carry set */
+  /* Else return with carry set, and DE (the byte counter) set equal
+     to zero. Setting DE is required by 'The Rats' as it explicitly
+     checks for this after loading the 40502 byte long block */
   F |= FLAG_C;
+  DE = 0;
 
   return 0;
 }
