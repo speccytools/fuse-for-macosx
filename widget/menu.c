@@ -140,7 +140,13 @@ void
 menu_file_savesnapshot( int action )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  snapshot_write( "snapshot.z80" );
+
+  if( settings_current.snaps_as_z80 ) {
+    snapshot_write( "snapshot.z80" );
+  } else {
+    snapshot_write( "snapshot.szx" );
+  }
+
 }
 
 void

@@ -5,6 +5,7 @@ Entry, F(r)ame rate (1:n), frame_rate, INPUT_KEY_r, 1, frames
 Checkbox, Issue (2) Keyboard, issue2, INPUT_KEY_2
 Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
 Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
+Checkbox, Save snaps as .(z)80, snaps_as_z80, INPUT_KEY_z
 Checkbox, Use .(s)lt traps, slt_traps, INPUT_KEY_s
 Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w
 Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u

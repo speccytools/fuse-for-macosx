@@ -383,8 +383,17 @@ option.
 .br
 .I "--snapshot file"
 .RS
-Specify a snapshot file to load. The file must be in Z80,
-SNA, or SLT format.
+Specify a snapshot file to load. The file can be in any snapshot
+format supported by
+.IR libspectrum "(3)."
+.RE
+.PP
+.I --snaps-as-z80
+.RS
+Specify whether the widget based user interfaces should save snapshots
+as .szx or .z80 files. The same as the General Options dialog's
+.I "Save snaps as .z80"
+option.
 .RE
 .PP
 .I --sound
@@ -630,9 +639,13 @@ option would open only snapshots.
 .RS
 Save a snapshot (machine state, memory contents, etc.) in Z80
 format. The GTK+ UI lets you select a filename, but the others just
-write the file as
-.IR snapshot.z80 ,
-and have a differently-named menu item to match.
+write the file as either
+.I snapshot.szx
+or
+.I snapshot.z80
+(depending on the state of the General Options dialog's
+.I "Save snaps as .z80"
+option).
 .RE
 .PP
 .I "File, Recording, Record..."
@@ -784,6 +797,21 @@ got a program in you want to load and run. If this option is selected,
 this will automatically happen for you when you open one of these
 files. To use tapes or disks for saving data to, or for loading data
 into an already running program, you'll want to turn this option off.
+.RE
+.PP
+.I "Save snaps as .z80"
+.RS
+Select the format used by the the widget based user interfaces for
+saving snapshots: they will be saved as .szx files if this option is
+disabled, or .z80 if this option is enabled. The .szx format is
+superior to .z80 both in terms of accuracy and hardware supported, and
+is therefore probably the better choice unless other concerns
+apply. Two situations you may wish to use .z80 are when giving
+snapshots to users of other emulators, as .szx is not well supported
+by other emulators, and when using .slt files, as these are not
+supported by the .szx format.
+.PP
+This option has no effect on the GTK+ user interfaces.
 .RE
 .PP
 .I "Use .slt traps"

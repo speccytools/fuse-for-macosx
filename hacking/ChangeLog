@@ -968,3 +968,6 @@
          #include <string.h> for memcpy and memset prototypes.
 20040702 configure.in,ui/Makefile.am: disable the broken and unmaintained
 	 GGI user interface.
+20040703 settings.dat,man/fuse.1,ui/options.dat,widget/menu.c: allow
+	 selection between .szx and .z80 for snaps saved by the widget
+	 UIs.
