@@ -434,3 +434,5 @@
 20040102 fuse.c: remove unused variable 'autoload' from fuse_init().
 20040102 ui/scaler, ui/sdl/sdldisplay.c: add Timex 1.5x scaler (part of
 	 patch #868418) (Fred).
+20040102 ui/scaler/scalers.c: merges to keep us close to ScummVM's code
+	 (rest of patch #868418) (Fred).
