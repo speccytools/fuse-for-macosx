@@ -30,6 +30,7 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
+#include "spectrum.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -224,3 +225,20 @@ show_breakpoint( gpointer data, gpointer user_data )
 
   (*index)++;
 }
+
+/* Exit from the last CALL etc by setting a oneshot breakpoint at
+   (SP) and then starting emulation */
+int
+debugger_breakpoint_exit( void )
+{
+  WORD target = readbyte( SP ) + 0x100 * readbyte( SP+1 );
+
+  if( debugger_breakpoint_add( target, DEBUGGER_BREAKPOINT_TYPE_ONESHOT ) )
+    return 1;
+
+  if( debugger_run() ) return 1;
+
+  return 0;
+}
+
+

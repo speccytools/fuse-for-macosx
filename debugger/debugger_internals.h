@@ -31,6 +31,7 @@ int debugger_breakpoint_add( WORD pc, enum debugger_breakpoint_type type );
 int debugger_breakpoint_remove( size_t n );
 int debugger_breakpoint_remove_all( void );
 int debugger_breakpoint_show( void );
+int debugger_breakpoint_exit( void );
 
 /* Utility functions called by the flex scanner */
 

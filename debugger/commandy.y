@@ -53,6 +53,7 @@ void yyerror( char *s );
 %token		 BREAK
 %token		 CLEAR
 %token		 CONTINUE
+%token		 EXIT
 %token		 NEXT
 %token		 SET
 %token		 SHOW
@@ -78,6 +79,7 @@ command:   BREAK    { debugger_breakpoint_add( PC,
 			    DEBUGGER_BREAKPOINT_TYPE_PERMANENT ); }
 	 | BREAK SHOW { debugger_breakpoint_show(); }
 	 | CONTINUE { debugger_run(); }
+         | EXIT     { debugger_breakpoint_exit(); }
 	 | NEXT	    { debugger_next(); }
          | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }

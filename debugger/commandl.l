@@ -52,6 +52,7 @@ HEX	[0-9a-f]
 br|bre|brea|break { return BREAK; }
 co|con|cont|contin|continu|continue { return CONTINUE; }
 cl|cle|clea|clear { return CLEAR; }
+ex|exi|exit { return EXIT; }
 n|ne|nex|next { return NEXT; }
 se|set { return SET; }
 sh|sho|show { return SHOW; }
