@@ -33,7 +33,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/mman.h>
+
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -46,6 +46,7 @@
 #include "options.h"
 #include "screenshot.h"
 #include "timer.h"
+#include "utils.h"
 #include "widget_internals.h"
 
 static void printchar(int x, int y, int col, int ch);
@@ -73,7 +74,9 @@ settings_info widget_options_settings;
 
 static int widget_read_font( const char *filename, size_t offset )
 {
-  int fd; struct stat file_info; unsigned char *buffer;
+  int fd;
+  utils_file file;
+  int error;
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
@@ -81,38 +84,15 @@ static int widget_read_font( const char *filename, size_t offset )
     return 1;
   }
 
-  if( fstat( fd, &file_info) ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't stat '%s': %s", filename,
-	      strerror( errno ) );
-    close(fd);
-    return errno;
-  }
+  error = utils_read_fd( fd, filename, &file );
+  if( error ) return error;
 
-  buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
-  if( buffer == (void*)-1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't mmap '%s': %s", filename,
-	      strerror( errno ) );
-    close(fd);
-    return errno;
-  }
+  memcpy( widget_font, file.buffer + offset - 1, 768 );
 
-  if( close(fd) ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
-	      strerror( errno ) );
-    munmap( buffer, file_info.st_size );
-    return errno;
-  }
-
-  memcpy( widget_font, buffer+offset-1, 768 );
-
-  if( munmap( buffer, file_info.st_size ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
-	      strerror( errno ) );
-    return errno;
-  }
+  error = utils_close_file( &file );
+  if( error ) return error;
 
   return 0;
-
 }
 
 static void printchar(int x, int y, int col, int ch) {
