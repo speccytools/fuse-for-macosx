@@ -32,6 +32,7 @@
 #include <gtk/gtk.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "gtkinternals.h"
 #include "pokefinder/pokefinder.h"
 
@@ -42,6 +43,8 @@ static void gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data );
 static gboolean delete_dialog( GtkWidget *widget, GdkEvent *event,
 			       gpointer user_data );
 static void update_pokefinder( void );
+static void possible_click( GtkCList *clist, gint row, gint column,
+			    GdkEventButton *event, gpointer user_data );
 
 static int dialog_created = 0;
 
@@ -49,6 +52,13 @@ static GtkWidget
   *dialog,			/* The dialog box itself */
   *count_label,			/* The number of possible locations */
   *location_list;		/* The list of possible locations */
+
+/* The possible locations */
+
+#define MAX_POSSIBLE 20
+
+int possible_page[ MAX_POSSIBLE ];
+libspectrum_word possible_offset[ MAX_POSSIBLE ];
 
 void
 gtkui_pokefinder( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
@@ -101,6 +111,9 @@ create_dialog( void )
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( location_list ), i, TRUE );
   gtk_box_pack_start( GTK_BOX( vbox ), location_list, TRUE, TRUE, 5 );
+
+  gtk_signal_connect( GTK_OBJECT( location_list ), "select-row",
+		      GTK_SIGNAL_FUNC( possible_click ), NULL );
 
   button = gtk_button_new_with_label( "Search" );
   gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
@@ -175,11 +188,19 @@ update_pokefinder( void )
   gtk_clist_freeze( GTK_CLIST( location_list ) );
   gtk_clist_clear( GTK_CLIST( location_list ) );
 
-  if( pokefinder_count && pokefinder_count < 20 ) {
+  if( pokefinder_count && pokefinder_count <= MAX_POSSIBLE ) {
+
+    size_t which;
+
+    which = 0;
 
     for( page = 0; page < 8; page++ )
       for( offset = 0; offset < 0x4000; offset++ )
 	if( pokefinder_possible[page][offset] ) {
+
+	  possible_page[ which ] = page;
+	  possible_offset[ which ] = offset;
+	  which++;
 	
 	  snprintf( possible_text[0], 128, "%lu", (unsigned long)page );
 	  snprintf( possible_text[1], 128, "0x%04lx", (unsigned long)offset );
@@ -199,3 +220,19 @@ update_pokefinder( void )
 	    (unsigned long)pokefinder_count );
   gtk_label_set_text( GTK_LABEL( count_label ), buffer );
 }  
+
+static void
+possible_click( GtkCList *clist, gint row, gint column,
+		GdkEventButton *event, gpointer user_data )
+{
+  int error;
+
+  /* Ignore events which aren't a double-click */
+  if( event->type != GDK_2BUTTON_PRESS ) return;
+
+  error =
+    debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_WRITE,
+			     possible_page[ row ], possible_offset[ row ],
+			     0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL );
+  if( error ) return;
+}

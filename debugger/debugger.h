@@ -106,6 +106,13 @@ int debugger_step( void );	/* Single step */
 int debugger_next( void );	/* Go to next instruction, ignoring CALL etc */
 int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
 
+/* Add a new breakpoint */
+int
+debugger_breakpoint_add( debugger_breakpoint_type type, int page,
+			 libspectrum_word value, size_t ignore,
+			 debugger_breakpoint_life life,
+			 debugger_expression *condition );
+
 /* Disassemble the instruction at 'address', returning its length in
    '*length' */
 void debugger_disassemble( char *buffer, size_t buflen, size_t *length,

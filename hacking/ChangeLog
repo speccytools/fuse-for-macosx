@@ -395,3 +395,5 @@
 20031227 display.c, memory.c: make writes to the screen work when the
 	 screen is paged in other than at 0x4000.
 20031227 ui/gtk/debugger.c, debugger/: add page-specific breakpoints.
+20031227 debugger/debugger{,_internals}.h, ui/gtk/pokefinder.c: add ability
+	 to set write breakpoints by clicking on the appropriate 'possible'.
