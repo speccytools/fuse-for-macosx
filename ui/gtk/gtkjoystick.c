@@ -40,36 +40,60 @@
 
 #include "../uijoystick.c"
 
-static void create_button_group( GtkWidget **radio, GtkBox *parent,
-				 const char *title, joystick_type_t current );
 static void joystick_done( GtkButton *button, gpointer user_data );
 
+struct joystick_info {
+
+  GtkWidget *radio[ JOYSTICK_TYPE_COUNT ];
+  int *setting;
+
+};
+
 void
-gtkjoystick_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+gtkjoystick_select( gpointer callback_data, guint callback_action,
+		    GtkWidget *widget )
 {
-  GtkWidget *dialog, *button, *radio[ 3 * JOYSTICK_TYPE_COUNT ];
-  GtkBox *box;
+  GtkWidget *dialog, *button;
+  GSList *button_group;
+  struct joystick_info info;
+  size_t i;
 
   fuse_emulation_pause();
 
   dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Select joysticks" );
+  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Configure joystick" );
 
-  box = GTK_BOX( GTK_DIALOG( dialog )->vbox );
+  switch( callback_action ) {
 
-  create_button_group( &radio[ 0 * JOYSTICK_TYPE_COUNT ], box,
-		       "Joystick 1", settings_current.joystick_1_output );
-  create_button_group( &radio[ 1 * JOYSTICK_TYPE_COUNT ], box,
-		       "Joystick 2", settings_current.joystick_2_output );
-  create_button_group( &radio[ 2 * JOYSTICK_TYPE_COUNT ], box,
-		       "Keyboard", settings_current.joystick_keyboard_output );
+  case 1: info.setting = &( settings_current.joystick_1_output ); break;
+  case 2: info.setting = &( settings_current.joystick_2_output ); break;
+  case 3: info.setting = &( settings_current.joystick_keyboard_output ); break;
+
+  }
+
+  button_group = NULL;
+
+  for( i = 0; i < JOYSTICK_TYPE_COUNT; i++ ) {
+
+    info.radio[ i ] =
+      gtk_radio_button_new_with_label( button_group, joystick_name[ i ] );
+    button_group =
+      gtk_radio_button_group( GTK_RADIO_BUTTON( info.radio[ i ] ) );
+    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+				 info.radio[ i ] );
+
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( info.radio[ i ] ),
+				  i == *( info.setting ) );
+
+  }
+  
 
   /* Create and add the action buttons to the dialog box */
   button = gtk_button_new_with_label( "OK" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     button );
   gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( joystick_done ), radio );
+		      GTK_SIGNAL_FUNC( joystick_done ), &info );
   gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( dialog ) );
@@ -90,58 +114,20 @@ gtkjoystick_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 }
 
 static void
-create_button_group( GtkWidget **radio, GtkBox *parent, const char *title,
-		     joystick_type_t current )
+joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
-  GtkWidget *frame, *box;
-  GSList *button_group;
-  size_t i;
+  struct joystick_info *info = user_data;
 
-  button_group = NULL;
-
-  frame = gtk_frame_new( title );
-  gtk_box_pack_start_defaults( parent, frame );
-
-  box = gtk_vbox_new( FALSE, FALSE );
-  gtk_container_add( GTK_CONTAINER( frame ), box );
+  int i;
+  GtkToggleButton *toggle;
 
   for( i = 0; i < JOYSTICK_TYPE_COUNT; i++ ) {
 
-    radio[ i ] =
-      gtk_radio_button_new_with_label( button_group, joystick_name[ i ] );
-    button_group = gtk_radio_button_group( GTK_RADIO_BUTTON( radio[ i ] ) );
-    gtk_box_pack_start_defaults( GTK_BOX( box ), radio[ i ] );
+    toggle = GTK_TOGGLE_BUTTON( info->radio[ i ] );
 
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radio[ i ] ),
-				  i == current );
-
-  }
-}
-
-static void
-joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
-{
-  GtkWidget **radio = user_data;
-
-  int joystick, i;
-  int *setting = NULL;
-  GtkWidget **group;
-
-  for( joystick = 0; joystick < 3; joystick++ ) {
-
-    group = &radio[ joystick * JOYSTICK_TYPE_COUNT ];
-
-    switch( joystick ) {
-    case 0: setting = &settings_current.joystick_1_output; break;
-    case 1: setting = &settings_current.joystick_2_output; break;
-    case 2: setting = &settings_current.joystick_keyboard_output; break;
-    }
-
-    for( i = 0; i < JOYSTICK_TYPE_COUNT; i++ ) {
-      if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( group[ i ] ) ) ) {
-	*setting = i;
-	break;
-      }
+    if( gtk_toggle_button_get_active( toggle ) ) {
+      *( info->setting ) = i;
+      return;
     }
 
   }

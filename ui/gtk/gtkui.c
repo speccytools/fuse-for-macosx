@@ -191,7 +191,11 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
   { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
-  { "/Options/_Joysticks...",   NULL , gtkjoystick_select,  0, NULL          },
+
+  { "/Options/_Joysticks",	NULL , NULL,		    0, "<Branch>"    },
+  { "/Options/Joysticks/Joystick _1...", NULL, gtkjoystick_select, 1, NULL   },
+  { "/Options/Joysticks/Joystick _2...", NULL, gtkjoystick_select, 2, NULL   },
+  { "/Options/Joysticks/_Keyboard...",   NULL, gtkjoystick_select, 3, NULL   },
 
   { "/Options/S_elect ROMs",    NULL , NULL,                0, "<Branch>"    },
   { "/Options/Select ROMs/Spectrum 1_6K...", NULL, gtkui_roms, 1, NULL       },

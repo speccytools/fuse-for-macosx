@@ -44,7 +44,8 @@ int gtkdisplay_end( void );
  * Joystick routines (gtkjoystick.c)
  */
 
-void gtkjoystick_select( GtkWidget *widget, gpointer data );
+void gtkjoystick_select( gpointer callback_data, guint callback_action,
+			 GtkWidget *widget );
 
 /*
  * Keyboard routines (gtkkeyboard.c)

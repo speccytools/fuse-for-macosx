@@ -681,3 +681,7 @@
 20040331 Move the machine-specific files into the machines/ directory.
 20040331 widget/{menu.c,menu_data.c}: fix up for the machines/ changes.
 20040331 ui/gtk/gtkjoystick.c: improve user interface.
+20040401 ui/gtk/{gtkinternals.h,gtkjoystick.c,gtkui.c},widget/{Makefile.am,
+	 joystick.c,menu_data.c,widget.c,widget.h,widget_internals.h}:
+	 add widget code to select joysticks and match up the GTK+
+	 interface.

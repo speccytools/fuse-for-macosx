@@ -246,6 +246,12 @@ int widget_roms_draw( void *data );
 void widget_roms_keyhandler( input_key key );
 int widget_roms_finish( widget_finish_state finished );
 
+/* Joystick selection widget */
+
+int widget_joystick_draw( void *data );
+void widget_joystick_keyhandler( input_key key );
+int widget_joystick_finish( widget_finish_state finished );
+
 /* The widgets actually available */
 
 extern widget_t widget_data[];

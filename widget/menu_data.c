@@ -30,6 +30,7 @@
 
 #include <stdlib.h>
 
+#include "joystick.h"
 #include "rzx.h"
 #include "screenshot.h"
 #include "snapshot.h"
@@ -46,6 +47,7 @@ static widget_menu_entry file_aylogging[];
 static widget_menu_entry widget_menu_machine[];
 
 static widget_menu_entry widget_menu_options[];
+static widget_menu_entry widget_menu_joysticks[];
 static widget_menu_entry widget_menu_roms[];
 
 static widget_menu_entry widget_menu_media[];
@@ -145,6 +147,8 @@ static widget_menu_entry file_aylogging[] = {
 static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 static widget_menu_widget_t options_sound   = { WIDGET_TYPE_SOUND,   NULL };
 static widget_menu_widget_t options_rzx     = { WIDGET_TYPE_RZX,     NULL };
+static widget_menu_widget_t options_joysticks = { WIDGET_TYPE_MENU,
+						  &widget_menu_joysticks };
 static widget_menu_widget_t options_roms    = { WIDGET_TYPE_MENU,
 						&widget_menu_roms };
 
@@ -154,6 +158,7 @@ static widget_menu_entry widget_menu_options[] = {
   { "(G)eneral...", INPUT_KEY_g, widget_menu_widget, &options_general },
   { "(S)ound...",   INPUT_KEY_s, widget_menu_widget, &options_sound   },
   { "(R)ZX...",	    INPUT_KEY_r, widget_menu_widget, &options_rzx     },
+  { "(J)oysticks...", INPUT_KEY_j, widget_menu_widget, &options_joysticks },
   { "S(e)lect ROMS...",
                     INPUT_KEY_e, widget_menu_widget, &options_roms    },
 
@@ -166,6 +171,30 @@ static widget_menu_entry widget_menu_options[] = {
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Options/Joysticks menu */
+
+static int
+  first_joystick = 0,
+  second_joystick = 1,
+  keyboard_joystick = JOYSTICK_KEYBOARD;
+
+static widget_menu_widget_t joystick_1 =
+  { WIDGET_TYPE_JOYSTICK, &first_joystick };
+static widget_menu_widget_t joystick_2 =
+  { WIDGET_TYPE_JOYSTICK, &second_joystick };
+static widget_menu_widget_t joystick_keyboard =
+  { WIDGET_TYPE_JOYSTICK, &keyboard_joystick };
+
+static widget_menu_entry widget_menu_joysticks[] = {
+  { "Configure joysticks", 0, 0, NULL },	/* Menu title */
+
+  { "Joystick (1)...", INPUT_KEY_1, widget_menu_widget, &joystick_1	   },
+  { "Joystick (2)...", INPUT_KEY_2, widget_menu_widget, &joystick_2	   },
+  { "(K)eyboard...",   INPUT_KEY_k, widget_menu_widget, &joystick_keyboard },
+
+  { NULL, 0, 0, NULL }			/* End marker */
 };
 
 /* Options/Select ROMs menu */
