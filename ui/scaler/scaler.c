@@ -552,21 +552,18 @@ static void
 _2xSaI(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
        BYTE *dstPtr, DWORD dstPitch, int width, int height)
 {
-  BYTE *dP;
-  WORD *bP;
-  DWORD inc_bP;
-
+  scaler_data_type *bP, *dP;
 
   {
-    DWORD Nextline = srcPitch >> 1;
-    inc_bP = 1;
+    DWORD Nextline = srcPitch / sizeof( scaler_data_type );
+    DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
 
     while (height--) {
       DWORD finish;
-      bP = (WORD *) srcPtr;
-      dP = dstPtr;
+      bP = (scaler_data_type*)srcPtr;
+      dP = (scaler_data_type*)dstPtr;
 
-      for (finish = width; finish; finish -= inc_bP) {
+      for( finish = width; finish; finish-- ) {
 
 	register DWORD colorA, colorB;
 	DWORD colorC, colorD, colorE, colorF, colorG, colorH, colorI, colorJ,
@@ -681,18 +678,10 @@ _2xSaI(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 	  }
 	}
 
-#ifdef WORDS_BIGENDIAN
-	product = (colorA << 16) | product;
-	product1 = (product1 << 16) | product2;
-#else				/* #ifdef WORDS_BIGENDIAN */
-	product = colorA | (product << 16);
-	product1 = product1 | (product2 << 16);
-#endif				/* #ifdef WORDS_BIGENDIAN */
-	*((SDWORD *) dP) = product;
-	*((DWORD *) (dP + dstPitch)) = product1;
+	*dP = colorA; *(dP+nextDstLine) = product1; dP++;
+	*dP = product; *(dP+nextDstLine) = product2; dP++;
 
-	bP += inc_bP;
-	dP += sizeof(DWORD);
+	bP++;
       }				/* end of for ( finish= width etc..) */
 
       srcPtr += srcPitch;

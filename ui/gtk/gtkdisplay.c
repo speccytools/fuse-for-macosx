@@ -223,6 +223,7 @@ register_scalers( void )
       scaler_register( SCALER_DOUBLESIZE );
       scaler_register( SCALER_TV2X );
       scaler_register( SCALER_ADVMAME2X );
+      scaler_register( SCALER_2XSAI );
       scaler_register( SCALER_SUPER2XSAI );
       scaler_register( SCALER_SUPEREAGLE );
       if( !scaler_is_supported( current_scaler ) )
