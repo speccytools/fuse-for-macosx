@@ -219,7 +219,7 @@ static int snapshot_copy_from( libspectrum_snap *snap )
   return 0;
 }
 
-int snapshot_write( char *filename )
+int snapshot_write( const char *filename )
 {
   libspectrum_snap snap;
   unsigned char *buffer; size_t length;

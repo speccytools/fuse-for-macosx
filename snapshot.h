@@ -26,8 +26,6 @@
 #define FUSE_SNAPSHOT_H
 
 int snapshot_read( const char *filename );
-int snapshot_write( char *filename );
+int snapshot_write( const char *filename );
 
 #endif
-
-
