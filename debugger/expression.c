@@ -118,16 +118,22 @@ binaryop_precedence( int operation )
 {
   switch( operation ) {
 
-  case 0x2228:		    return PRECEDENCE_LOGICAL_OR;
-  case 0x2227:		    return PRECEDENCE_LOGICAL_AND;
+  case DEBUGGER_TOKEN_LOGICAL_OR: return PRECEDENCE_LOGICAL_OR;
+  case DEBUGGER_TOKEN_LOGICAL_AND: return PRECEDENCE_LOGICAL_AND;
   case    '|':		    return PRECEDENCE_BITWISE_OR;
   case    '^':		    return PRECEDENCE_BITWISE_XOR;
   case    '&':		    return PRECEDENCE_BITWISE_AND;
   case    '+': case    '-': return PRECEDENCE_ADDITION;
   case    '*': case    '/': return PRECEDENCE_MULTIPLICATION;
-  case 0x225f: case 0x2260: return PRECEDENCE_EQUALITY;
+
+  case DEBUGGER_TOKEN_EQUAL_TO:
+  case DEBUGGER_TOKEN_NOT_EQUAL_TO:
+    return PRECEDENCE_EQUALITY;
+
   case    '<': case    '>':
-  case 0x2264: case 0x2265: return PRECEDENCE_COMPARISION;
+  case DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO:
+  case DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO:
+    return PRECEDENCE_COMPARISION;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown binary operator %d", operation );
@@ -293,11 +299,13 @@ evaluate_binaryop( struct binaryop_type *binary )
   case '/': return debugger_expression_evaluate( binary->op1 ) /
 		   debugger_expression_evaluate( binary->op2 );
 
-  case 0x225f: return debugger_expression_evaluate( binary->op1 ) ==
-		      debugger_expression_evaluate( binary->op2 );
+  case DEBUGGER_TOKEN_EQUAL_TO:
+            return debugger_expression_evaluate( binary->op1 ) ==
+                   debugger_expression_evaluate( binary->op2 );
 
-  case 0x2260: return debugger_expression_evaluate( binary->op1 ) !=
-		      debugger_expression_evaluate( binary->op2 );
+  case DEBUGGER_TOKEN_NOT_EQUAL_TO:
+	    return debugger_expression_evaluate( binary->op1 ) !=
+		   debugger_expression_evaluate( binary->op2 );
 
   case '>': return debugger_expression_evaluate( binary->op1 ) >
 		   debugger_expression_evaluate( binary->op2 );
@@ -305,11 +313,13 @@ evaluate_binaryop( struct binaryop_type *binary )
   case '<': return debugger_expression_evaluate( binary->op1 ) <
 	           debugger_expression_evaluate( binary->op2 );
 
-  case 0x2264: return debugger_expression_evaluate( binary->op1 ) <=
-		      debugger_expression_evaluate( binary->op2 );
+  case DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO:
+	    return debugger_expression_evaluate( binary->op1 ) <=
+		   debugger_expression_evaluate( binary->op2 );
 
-  case 0x2265: return debugger_expression_evaluate( binary->op1 ) >=
-		      debugger_expression_evaluate( binary->op2 );
+  case DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO:
+	    return debugger_expression_evaluate( binary->op1 ) >=
+		   debugger_expression_evaluate( binary->op2 );
 
   case '&': return debugger_expression_evaluate( binary->op1 ) &
 	           debugger_expression_evaluate( binary->op2 );
@@ -320,10 +330,12 @@ evaluate_binaryop( struct binaryop_type *binary )
   case '|': return debugger_expression_evaluate( binary->op1 ) |
 		   debugger_expression_evaluate( binary->op2 );
 
-  case 0x2227: return debugger_expression_evaluate( binary->op1 ) &&
+  case DEBUGGER_TOKEN_LOGICAL_AND:
+	    return debugger_expression_evaluate( binary->op1 ) &&
 		   debugger_expression_evaluate( binary->op2 );
 
-  case 0x2228: return debugger_expression_evaluate( binary->op1 ) ||
+  case DEBUGGER_TOKEN_LOGICAL_OR:
+	    return debugger_expression_evaluate( binary->op1 ) ||
 		   debugger_expression_evaluate( binary->op2 );
 
   }
@@ -432,17 +444,17 @@ deparse_binaryop( char *buffer, size_t length,
   case    '-': operation_string = "-";  break;
   case    '*': operation_string = "*";  break;
   case    '/': operation_string = "/";  break;
-  case 0x225f: operation_string = "=="; break;
-  case 0x2260: operation_string = "!="; break;
+  case DEBUGGER_TOKEN_EQUAL_TO: operation_string = "=="; break;
+  case DEBUGGER_TOKEN_NOT_EQUAL_TO: operation_string = "!="; break;
   case    '<': operation_string = "<";  break;
   case    '>': operation_string = ">";  break;
-  case 0x2264: operation_string = "<="; break;
-  case 0x2265: operation_string = ">="; break;
+  case DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO: operation_string = "<="; break;
+  case DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO: operation_string = ">="; break;
   case    '&': operation_string = "&";  break;
   case    '^': operation_string = "^";  break;
   case    '|': operation_string = "|";  break;
-  case 0x2227: operation_string = "&&"; break;
-  case 0x2228: operation_string = "||"; break;
+  case DEBUGGER_TOKEN_LOGICAL_AND: operation_string = "&&"; break;
+  case DEBUGGER_TOKEN_LOGICAL_OR: operation_string = "||"; break;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown binary operation %d",
@@ -525,12 +537,16 @@ is_non_associative( int operation )
 
   /* None of the comparision operators are associative due to them
      returning truth values */
-  case 0x225f: case 0x2260: case '<': case '>': case 0x2264: case 0x2265:
+  case DEBUGGER_TOKEN_EQUAL_TO:
+  case DEBUGGER_TOKEN_NOT_EQUAL_TO:
+  case '<': case '>':
+  case DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO:
+  case DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO:
     return 1;
 
   /* The logical operators are associative */
-  case 0x2227: return 0;
-  case 0x2228: return 0;
+  case DEBUGGER_TOKEN_LOGICAL_AND: return 0;
+  case DEBUGGER_TOKEN_LOGICAL_OR: return 0;
 
   /* The bitwise operators are also associative (consider them as
      vectorised logical operators) */

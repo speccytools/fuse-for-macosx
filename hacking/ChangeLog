@@ -928,3 +928,5 @@
 20040616 configure.in,menu_data.c,perl/cpp-perl.pl,ui/gtk/Makefile.am,
 	 widget/Makefile.am: use custom preprocessor to parse menu_data.c
 	 as OS X 10.1(?)'s preprocessor requires proper C syntax.
+20040616 debugger/{commandl.l,commandy.y,debugger_internals,h,expression.c}:
+	 remove duplicated literal constants.

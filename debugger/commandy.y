@@ -244,11 +244,15 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression LOGICAL_AND expression {
-	        $$ = debugger_expression_new_binaryop( 0x2227, $1, $3 );
+	        $$ = debugger_expression_new_binaryop(
+                  DEBUGGER_TOKEN_LOGICAL_AND, $1, $3
+                );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression LOGICAL_OR expression {
-	        $$ = debugger_expression_new_binaryop( 0x2228, $1, $3 );
+	        $$ = debugger_expression_new_binaryop(
+		  DEBUGGER_TOKEN_LOGICAL_OR, $1, $3
+		);
 		if( !$$ ) YYABORT;
 	      }
 ;

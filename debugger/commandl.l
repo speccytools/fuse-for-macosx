@@ -94,13 +94,16 @@ sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 
  /* The hex constants used here are the appropriate Unicode characters */
 
-"=="		{ yylval.token = 0x225f; return EQUALITY; }
-"!="		{ yylval.token = 0x2260; return EQUALITY; }
+"=="		{ yylval.token = DEBUGGER_TOKEN_EQUAL_TO; return EQUALITY; }
+"!="		{ yylval.token = DEBUGGER_TOKEN_NOT_EQUAL_TO;
+		  return EQUALITY; }
 
 "<"		{ yylval.token = '<'; return COMPARISION; }
 ">"		{ yylval.token = '>'; return COMPARISION; }
-"<="		{ yylval.token = 0x2264; return COMPARISION; }
-">="		{ yylval.token = 0x2265; return COMPARISION; }
+"<="		{ yylval.token = DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO;
+		  return COMPARISION; }
+">="		{ yylval.token = DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO;
+		  return COMPARISION; }
 
 "+"		{ return '+'; }
 "-"		{ return '-'; }

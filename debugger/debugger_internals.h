@@ -52,6 +52,22 @@ int debugger_command_input( char *buf, int *result, int max_size );
 int yylex( void );
 void yyerror( const char *s );
 
+/* The semantic values of some tokens */
+
+typedef enum debugger_token {
+
+  /* Chosen to match up with Unicode values */
+  DEBUGGER_TOKEN_LOGICAL_AND = 0x2227,
+  DEBUGGER_TOKEN_LOGICAL_OR = 0x2228,
+
+  DEBUGGER_TOKEN_EQUAL_TO = 0x225f,
+  DEBUGGER_TOKEN_NOT_EQUAL_TO = 0x2260,
+
+  DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO = 0x2264,
+  DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO = 0x2265,
+
+} debugger_token;
+
 /* Numeric expression stuff */
 
 debugger_expression*
