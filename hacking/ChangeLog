@@ -587,3 +587,5 @@
 20040225 z80/{harness.pl,z80.pl,tests/37.in,tests/37.out}: SCF should copy
 	 bits 3 and 5 from the A register, not OR them (thanks, Erik Kunze
 	 and Thomas Harte).
+20040225 z80/test/37*: split the SCF test into 4, rather than one overly
+	 complicated test.
