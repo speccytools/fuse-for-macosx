@@ -89,7 +89,7 @@ int tape_open( const char *filename )
   if( error ) return error;
 
   /* If we already have a tape file open, close it */
-  if( tape->blocks ) {
+  if( libspectrum_tape_present( tape ) ) {
     error = tape_close();
     if( error ) { munmap( buffer, length ); return error; }
   }
@@ -146,21 +146,7 @@ int tape_close( void )
 int
 tape_select_block( size_t n )
 {
-  if( !tape->blocks ) return 0;
-
-  tape->current_block = tape->blocks;
-  while( n-- ) {
-    tape->current_block = tape->current_block->next;
-    if( !tape->current_block ) {
-      tape->current_block = tape->blocks;
-    }
-  }
-
-  libspectrum_tape_init_block(
-    (libspectrum_tape_block*)tape->current_block->data
-  );
-
-  return 0;
+  return libspectrum_tape_nth_block( tape, n );
 }
 
 /* Which block is current? */
@@ -169,7 +155,7 @@ tape_get_current_block( void )
 {
   GSList *block; int n;
 
-  if( !tape->blocks ) return -1;
+  if( !libspectrum_tape_present( tape ) ) return -1;
 
   for( block = tape->blocks, n = 0; block; block = block->next, n++ ) {
     if( block == tape->current_block ) return n;
@@ -220,7 +206,7 @@ int tape_load_trap( void )
   if( ! trap_check_rom() ) return 3;
 
   /* Return with error if no tape file loaded */
-  if( !tape->blocks ) return 1;
+  if( !libspectrum_tape_present( tape ) ) return 1;
 
   current_block = (libspectrum_tape_block*)(tape->current_block->data);
 
@@ -427,7 +413,7 @@ int tape_play( void )
 
   int error;
 
-  if( !tape->blocks ) return 1;
+  if( !libspectrum_tape_present( tape ) ) return 1;
   
   block = (libspectrum_tape_block*)(tape->current_block->data);
 
