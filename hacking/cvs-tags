@@ -111,4 +111,9 @@ $Id$
 | Release-0_6_1pre1-merge-2		Merged from
 |					Release-0_5_1pre1-crypto-branch-2
 |
++-\					Branch for the 0.6.1 release
+| | Release-0_6_1
+| |
+| | Release-0_6_1-branch
+|
 HEAD
