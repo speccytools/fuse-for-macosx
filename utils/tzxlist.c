@@ -184,6 +184,10 @@ main( int argc, char **argv )
       printf("  Name: %s\n", block->types.group_start.name );
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+      /* Do nothing */
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       info_block = &(block->types.archive_info);
       for( i=0; i<info_block->count; i++ ) {

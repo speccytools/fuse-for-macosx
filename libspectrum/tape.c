@@ -120,6 +120,7 @@ block_free( gpointer data, gpointer user_data )
 
   /* Nothing needs doing for these blocks */
   case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
     break;
   }
 }
@@ -145,6 +146,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
 
   /* These blocks need no initialisation */
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     return LIBSPECTRUM_ERROR_NONE;
 
@@ -238,7 +240,8 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
   /* For blocks which contain no Spectrum-readable data, return zero
      tstates and set end of block set so we instantly get the next block */
-  case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_START: 
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     *tstates = 0; end_of_block = 1;
     break;
@@ -592,6 +595,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
 
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
     strncpy( buffer, "Group Start Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+    strncpy( buffer, "Group End Block", length );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:

@@ -53,6 +53,9 @@ static libspectrum_error
 tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		    const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		       const libspectrum_byte *end );
 
@@ -88,8 +91,6 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     /* Get the ID of the next block */
     libspectrum_tape_type id = *ptr++;
 
-    fprintf( stderr, "Block type 0x%02x\n", id );
-
     switch( id ) {
     case LIBSPECTRUM_TAPE_BLOCK_ROM:
       error = tzx_read_rom_block( tape, &ptr, end );
@@ -111,10 +112,16 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       error = tzx_read_pure_data( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
+
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
       error = tzx_read_group_start( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+      error = tzx_read_group_end( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       error = tzx_read_archive_info( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
@@ -421,6 +428,25 @@ tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   return LIBSPECTRUM_ERROR_NONE;
 }
+
+static libspectrum_error
+tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		    const libspectrum_byte *end )
+{
+  libspectrum_tape_block *block;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  /* This is an group end block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_GROUP_END;
+
+  /* Put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}  
 
 static libspectrum_error
 tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
