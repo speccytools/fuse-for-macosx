@@ -52,6 +52,9 @@ extern int rzx_playback;
 /* The .rzx frame we're currently playing */
 extern size_t rzx_current_frame;
 
+/* And the RZX frame we're getting IN data from */
+extern size_t rzx_data_frame;
+
 /* The actual RZX data */
 extern libspectrum_rzx rzx;
 

@@ -63,6 +63,9 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
 /* The signature used to identify .rzx files */
 const libspectrum_byte *signature = "RZX!";
 
+/* The IN count used to signify 'repeat last frame' */
+const libspectrum_word libspectrum_rzx_repeat_frame = 0xffff;
+
 libspectrum_error
 libspectrum_rzx_frame( libspectrum_rzx *rzx, size_t instructions,
 		       size_t count, libspectrum_byte *in_bytes )
@@ -106,6 +109,11 @@ libspectrum_rzx_frame( libspectrum_rzx *rzx, size_t instructions,
 libspectrum_error
 libspectrum_rzx_free( libspectrum_rzx *rzx )
 {
+  size_t i;
+
+  for( i=0; i<rzx->count; i++ )
+    if( !rzx->frames[i].repeat_last ) free( rzx->frames[i].in_bytes );
+  
   free( rzx->frames ); rzx->frames = NULL;
   rzx->count = rzx->allocated = 0;
   return LIBSPECTRUM_ERROR_NONE;
@@ -216,6 +224,12 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
 		   const libspectrum_byte *end, libspectrum_snap **snap )
 {
   size_t blocklength, snaplength; libspectrum_error error;
+  libspectrum_dword flags;
+  const libspectrum_byte *snap_ptr;
+
+  /* For deflated snapshot data: */
+  int compressed;
+  libspectrum_byte *gzsnap; size_t uncompressed_length = 0;
 
   if( end - (*ptr) < 16 ) {
     libspectrum_print_error("rzx_read_snapshot: not enough data in buffer\n");
@@ -233,47 +247,85 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  /* Skip the flags */
+  /* See if we want a compressed snap */
+  flags = (*ptr)[0]             +
+          (*ptr)[1] *     0x100 +
+	  (*ptr)[2] *   0x10000 +
+          (*ptr)[3] * 0x1000000 ;
   (*ptr) += 4;
+
+  compressed = flags & 0x02;
 
   snaplength = (*ptr)[4]             +
                (*ptr)[5] *     0x100 +
 	       (*ptr)[6] *   0x10000 +
                (*ptr)[7] * 0x1000000 ;
 
-  /* Check the snap length is consistent */
-  if( snaplength + 17 != blocklength ) return LIBSPECTRUM_ERROR_CORRUPT;
+  /* If compressed, uncompress the data */
+  if( compressed ) {
+    error = libspectrum_zlib_inflate( (*ptr) + 8, blocklength - 17,
+				      &gzsnap, &uncompressed_length );
+    if( error != LIBSPECTRUM_ERROR_NONE ) {
+      libspectrum_snap_destroy( *snap ); free( *snap );
+      return error;
+    }
+    if( uncompressed_length != snaplength ) {
+      libspectrum_print_error(
+        "rzx_read_snapshot: compressed snapshot has wrong length\n"
+      );
+      free( gzsnap );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }   
+    snap_ptr = gzsnap;
 
-  (*snap) = malloc( sizeof( libspectrum_snap ) );
-  if( *snap == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+  } else {
+
+    /* If not compressed, check things are consistent */
+    if( blocklength != snaplength + 17 ) {
+      libspectrum_print_error(
+        "rzx_read_snapshot: inconsistent snapshot lengths\n"
+      );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+    snap_ptr = (*ptr) + 8;
+    uncompressed_length = snaplength;
+
+  }
 
   /* Initialise the snap */
+  (*snap) = malloc( sizeof( libspectrum_snap ) );
+  if( *snap == NULL ) {
+    if( compressed ) free( gzsnap );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
   error = libspectrum_snap_initalise( *snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    free( *snap ); *snap = 0;
+    if( compressed ) free( gzsnap );
+    free( *snap ); (*snap) = 0;
     return error;
   }
 
-  if( !strcmp( *ptr, "Z80" ) ) {
-    error = libspectrum_z80_read( (*ptr) + 8, snaplength, (*snap) );
-  } else if( !strcmp( *ptr, "SNA" ) ) {
-    error = libspectrum_sna_read( (*ptr) + 8, snaplength, (*snap) );
+  if( !strcasecmp( *ptr, "Z80" ) ) {
+    error = libspectrum_z80_read( snap_ptr, uncompressed_length, (*snap) );
+  } else if( !strcasecmp( *ptr, "SNA" ) ) {
+    error = libspectrum_sna_read( snap_ptr, uncompressed_length, (*snap) );
   } else {
     libspectrum_print_error(
       "rzx_read_snapshot: unrecognised snapshot format\n"
     );
+    if( compressed ) free( gzsnap );
     free( *snap ); (*snap) = 0;
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
 
-  (*ptr) += 8 + snaplength;
+  /* Free the decompressed buffer */
+  free( gzsnap );
 
-  if( error != LIBSPECTRUM_ERROR_NONE ) {
-    libspectrum_snap_destroy( *snap );
-    free( *snap ); (*snap) = 0;
-  }
+  /* Skip over the data */
+  (*ptr) += blocklength - 9;
 
-  return error;
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 static libspectrum_error
@@ -405,7 +457,7 @@ rzx_read_frames( libspectrum_rzx *rzx,
 	"rzx_read_frames: not enough data in buffer\n"
       );
       for( j=0; j<i; j++ ) {
-	free( rzx->frames[j].in_bytes );
+	if( !rzx->frames[i].repeat_last ) free( rzx->frames[j].in_bytes );
       }
       libspectrum_rzx_free( rzx );
       return LIBSPECTRUM_ERROR_CORRUPT;
@@ -414,12 +466,21 @@ rzx_read_frames( libspectrum_rzx *rzx,
     rzx->frames[i].instructions = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
     rzx->frames[i].count        = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
 
-    if( (*ptr) - end < rzx->frames[i].count ) {
+    /* FIXME: is this is right thing to do? Or should we copy the data
+       across from the previous frame? */
+    if( rzx->frames[i].count == libspectrum_rzx_repeat_frame ) {
+      rzx->frames[i].repeat_last = 1;
+      continue;
+    }
+
+    rzx->frames[i].repeat_last = 0;
+
+    if( end - (*ptr) < rzx->frames[i].count ) {
       libspectrum_print_error(
 	"rzx_read_frames: not enough data in buffer\n"
       );
       for( j=0; j<i; j++ ) {
-	free( rzx->frames[j].in_bytes );
+	if( !rzx->frames[i].repeat_last ) free( rzx->frames[j].in_bytes );
       }
       libspectrum_rzx_free( rzx );
       return LIBSPECTRUM_ERROR_CORRUPT;
@@ -433,7 +494,7 @@ rzx_read_frames( libspectrum_rzx *rzx,
 	"rzx_read_input: out of memory\n"
       );
       for( j=0; j<i; j++ ) {
-	free( rzx->frames[j].in_bytes );
+	if( !rzx->frames[i].repeat_last ) free( rzx->frames[j].in_bytes );
       }
       libspectrum_rzx_free( rzx );
       return LIBSPECTRUM_ERROR_MEMORY;

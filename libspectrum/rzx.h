@@ -46,6 +46,9 @@ typedef struct libspectrum_rzx_frame_t {
   size_t count;
   libspectrum_byte* in_bytes;
 
+  int repeat_last;			/* Set if we should use the last
+					   frame's value */
+
 } libspectrum_rzx_frame_t;
 
 typedef struct libspectrum_rzx {

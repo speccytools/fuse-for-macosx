@@ -113,17 +113,17 @@ BYTE readport(WORD port)
   if( rzx_playback ) {
 
     /* Check we're not trying to read off the end of the array */
-    if( rzx_in_count >= rzx.frames[ rzx_current_frame ].count ) {
+    if( rzx_in_count >= rzx.frames[ rzx_data_frame ].count ) {
       ui_error( UI_ERROR_ERROR,
 		"More INs during frame %d than stored in RZX file (%d)",
-		rzx_current_frame, rzx.frames[ rzx_current_frame ].count );
+		rzx_current_frame, rzx.frames[ rzx_data_frame ].count );
       rzx_stop_playback( 1 );
       /* And get the byte normally */
       return readport( port );
     }
 
     /* Otherwise, just return the next RZX byte */
-    return rzx.frames[ rzx_current_frame ].in_bytes[ rzx_in_count++ ];
+    return rzx.frames[ rzx_data_frame ].in_bytes[ rzx_in_count++ ];
   }
 
   /* If we're not doing RZX playback, get the byte normally */

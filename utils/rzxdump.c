@@ -197,7 +197,7 @@ read_creator_block( unsigned char **ptr, unsigned char *end )
 static int
 read_snapshot_block( unsigned char **ptr, unsigned char *end )
 {
-  size_t snap_length;
+  size_t block_length;
 
   if( end - *ptr < 16 ) {
     fprintf( stderr,
@@ -206,19 +206,15 @@ read_snapshot_block( unsigned char **ptr, unsigned char *end )
   }
 
   printf( "Found a snapshot block\n" );
-  printf( "  Length: %d bytes\n", read_dword( ptr ) );
+
+  block_length = read_dword( ptr );
+  printf( "  Length: %d bytes\n", block_length );
+
   printf( "  Flags: %d\n", read_dword( ptr ) );
   printf( "  Snapshot extension: `%s'\n", *ptr ); (*ptr) += 4;
+  printf( "  Snap length: %d bytes\n", read_dword( ptr ) );
 
-  snap_length = read_dword( ptr );
-  printf( "  Snap length: %d bytes\n", snap_length );
-
-  if( end - *ptr < snap_length ) {
-    fprintf( stderr,
-	     "%s: Not enough bytes for snapshot\n", progname );
-    return 1;
-  }
-  (*ptr) += snap_length;
+  (*ptr) += block_length - 17;
 
   return 0;
 }

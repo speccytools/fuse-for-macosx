@@ -77,6 +77,9 @@ int rzx_playback;
 /* The .rzx frame we're currently playing */
 size_t rzx_current_frame;
 
+/* And the RZX frame we're getting IN data from */
+size_t rzx_data_frame;
+
 /* The current RZX data */
 libspectrum_rzx rzx;
 
@@ -261,7 +264,7 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
   /* We're now playing this RZX file */
   tstates = rzx.tstates;
   rzx_playback = 1;
-  rzx_current_frame = 0;
+  rzx_current_frame = rzx_data_frame = 0;
   counter_reset();
 
   return 0;
@@ -317,10 +320,10 @@ static int recording_frame( void )
 static int playback_frame( void )
 {
   /* Check we read the correct number of INs during this frame */
-  if( rzx_in_count != rzx.frames[ rzx_current_frame ].count ) {
+  if( rzx_in_count != rzx.frames[ rzx_data_frame ].count ) {
     ui_error( UI_ERROR_ERROR,
 	      "Not enough INs during frame %d: expected %d, got %d",
-	      rzx_current_frame, rzx.frames[ rzx_current_frame ].count,
+	      rzx_current_frame, rzx.frames[ rzx_data_frame ].count,
 	      rzx_in_count );
     abort();
     return rzx_stop_playback( 0 );
@@ -331,6 +334,11 @@ static int playback_frame( void )
     ui_error( UI_ERROR_INFO, "Finished RZX playback" );
     return rzx_stop_playback( 0 );
   }
+
+  /* Move the data frame pointer along, unless we're supposed to be
+     repeating the last frame */
+  if( !rzx.frames[ rzx_current_frame ].repeat_last )
+    rzx_data_frame = rzx_current_frame;
 
   /* If we've got more frame to do, just reset the count and continue */
   counter_reset();
