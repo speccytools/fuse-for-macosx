@@ -56,6 +56,9 @@ start_machine, string, strdup( "48" ), 'm', machine
 record_file, string, NULL, 'r', record, recordfile
 playback_file, string, NULL, 'p', playback, playbackfile
 
+printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
+printer_text_filename, string, strdup( "printout.txt" ),, textfile
+
 svga_mode, numeric, 320, 'v', svgamode
 
 rom_16, string, strdup( "48.rom" ),

@@ -38,14 +38,9 @@
 #include "fuse.h"
 #include "machine.h"
 #include "printer.h"
+#include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
-
-/* XXX presumably want these selectable eventually, but these
- * should be ok for now.
- */
-static const char *printer_graphics_filename="printout.pbm";
-static const char *printer_text_filename="printout.txt";
 
 static int printer_graphics_enabled=0;
 static int printer_text_enabled=0;
@@ -93,11 +88,11 @@ static const char *pbmstart="P4\n256 ";
 FILE *tmpf;
 int overwrite=1;
 
-if(!printer_graphics_enabled || !printer_graphics_filename)
+if(!printer_graphics_enabled || !settings_current.printer_graphics_filename)
   return(0);
 
 /* first, see if there's an existing file we can add to. */
-if((tmpf=fopen(printer_graphics_filename,"rb"))!=NULL)
+if((tmpf=fopen(settings_current.printer_graphics_filename,"rb"))!=NULL)
   {
   char buf[7+10+1];		/* 7 being length of pbmstart */
 
@@ -140,11 +135,11 @@ if((tmpf=fopen(printer_graphics_filename,"rb"))!=NULL)
   fclose(tmpf);
   }
 
-if((printer_graphics_file=fopen(printer_graphics_filename,
+if((printer_graphics_file=fopen(settings_current.printer_graphics_filename,
                                 overwrite?"wb":"r+b"))==NULL)
   {
   ui_error(UI_ERROR_ERROR,"Couldn't open '%s', graphics printout disabled",
-	   printer_graphics_filename);
+	   settings_current.printer_graphics_filename);
   printer_graphics_enabled=0;
   return(0);
   }
@@ -176,14 +171,14 @@ return(1);
 
 static int printer_text_open_file(void)
 {
-if(!printer_text_enabled || !printer_text_filename)
+if(!printer_text_enabled || !settings_current.printer_text_filename)
   return(0);
 
 /* append to any existing file... */
-if((printer_text_file=fopen(printer_text_filename,"a"))==NULL)
+if((printer_text_file=fopen(settings_current.printer_text_filename,"a"))==NULL)
   {
   ui_error(UI_ERROR_ERROR,"Couldn't open '%s', text printout disabled",
-	   printer_text_filename);
+	   settings_current.printer_text_filename);
   printer_text_enabled=0;
   return(0);
   }
