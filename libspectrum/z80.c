@@ -173,7 +173,11 @@ int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
        this code was part of SnapConv */
     snap->tstates= ( ( (extra_header[25]+1) % 4 ) + 1 ) * quarter_tstates -
       ( extra_header[23] + extra_header[24]*0x100 + 1 );
-
+    
+    /* Stop broken files from causing trouble... */
+    if(snap->tstates>=quarter_tstates*4)
+      snap->tstates = 0;
+    
     (*data) = buffer + LIBSPECTRUM_Z80_HEADER_LENGTH + 2 + extra_length;
 
   } else {	/* v1 .z80 file */
