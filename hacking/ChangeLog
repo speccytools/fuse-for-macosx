@@ -813,3 +813,6 @@
 	 non-RAM pages.
 20040514 memory.[ch],debugger/breakpoint.[ch]: allow breakpoints to be set
 	 on the ROMCS pages.
+20040516 spectrum.c: use Ramsoft's screen/attributes pattern for the
+	 floating bus, but stick to the 14335/14361 timings. Arkanoid and
+	 Sidewize now work.

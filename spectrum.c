@@ -210,22 +210,25 @@ spectrum_unattached_port( int offset )
 
   switch( tstates_through_line % 8 ) {
 
-    /* FIXME: 25% of these should be screen data, 25% attribute bytes
-       and 50% idle bus, but the actual distribution is unknown. Also,
-       in each 8 T-state block, 16 pixels are displayed; when each of
-       these is read is also unknown. Thanks to Ian Greenway for this
-       information */
+    /* The pattern of bytes returned here is the same as documented by
+       Ramsoft in their 'Floating bus technical guide' at
+       http://www.ramsoft.bbk.org/floatingbus.html
 
-    /* FIXME: Arkanoid doesn't work properly with the below */
+       However, the timings used are based on the first byte being
+       returned at 14335 (48K) and 14361 (128K) respectively, not
+       14347 and 14368 as used by Ramsoft.
+
+       In contrast to previous versions of this code, Arkanoid and
+       Sidewize now work. */
 
     /* Attribute bytes */
-    case 1: column++;
-    case 0:
+    case 3: column++;
+    case 1:
       return RAM[ memory_current_screen ][ display_attr_start[line] + column ];
 
     /* Screen data */
-    case 3: column++;
-    case 2:
+    case 2: column++;
+    case 0:
       return RAM[ memory_current_screen ][ display_line_start[line] + column ];
 
     /* Idle bus */
