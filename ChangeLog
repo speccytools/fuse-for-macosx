@@ -1,4 +1,34 @@
+2001-12-20  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Version 0.4.0 released.
+
+	* The big one: .tzx support. Fuse will now read in all the common
+	  block types from .tzx files (Philip Kendall).
+
+	* Ability to write out tape files (Philip Kendall).
+
+	* Various improvements to the widget dialog boxes: cursor keys,
+	  Page Up, Page Down, Home and End all do what you would expect,
+	  remove the use of `scandir' function to improve inter-Unix
+	  compatability, append `/' to directories to make them more
+	  obvious, stop the hangs if you tried to start a widget whilst
+	  one was active. (Philip Kendall).
+
+	* .z80 snapshots: deal with the case of the end marker being
+	  preceeded by 0x00 or 0x00 0xed (Philip Kendall).
+
+	* Lots of sound improvements (Russell Marks).
+
+	* Addition of tzxlist utility to list the blocks found in a .tzx
+	  file (Philip Kendall).
+
+	* Have a man page (Russell Marks).
+
+	* Emulation of the AY-3-8912's register 15 (Russell Marks).
+
 2001-10-07  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Versions 0.3.2 and 0.3.2.1 released.
 
 	* Added file selection dialog boxes for snapshot and tape loading,
 	  and (GTK+ only) snapshot saving (Philip Kendall, Matan Ziv-Av).
