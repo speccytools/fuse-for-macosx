@@ -1,5 +1,5 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -34,6 +34,7 @@
 
 #include "debugger/debugger.h"
 #include "display.h"
+#include "fuse.h"
 #include "machine.h"
 #include "pentagon.h"
 #include "scld.h"

@@ -1,5 +1,5 @@
 /* ay.c: AY-8-3912 routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#include "fuse.h"
+#include "compat.h"
 #include "machine.h"
 #include "printer.h"
 #include "psg.h"

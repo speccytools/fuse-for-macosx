@@ -28,9 +28,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "scld.h"
+#include "compat.h"
 #include "display.h"
-#include "fuse.h"
+#include "scld.h"
 
 scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 

@@ -1,5 +1,5 @@
 /* ui.h: General UI event handling routines
-   Copyright (c) 2000-2002 Philip Kendall
+   Copyright (c) 2000-2003 Philip Kendall
 
    $Id$
 
@@ -31,9 +31,9 @@
 
 #include <libspectrum.h>
 
-#ifndef FUSE_FUSE_H
-#include "fuse.h"
-#endif
+#ifndef FUSE_COMPAT_H
+#include "compat.h"
+#endif				/* #ifndef FUSE_COMPAT_H */
 
 #ifndef FUSE_KEYSYMS_H
 #include "keysyms.h"

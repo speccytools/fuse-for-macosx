@@ -1,5 +1,5 @@
 /* gtkkeyboard.c: GTK+ routines for dealing with the keyboard
-   Copyright (c) 2000-2002 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2003 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -32,7 +32,7 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
-#include "fuse.h"
+#include "compat.h"
 #include "gtkkeyboard.h"
 #include "gtkui.h"
 #include "keysyms.h"

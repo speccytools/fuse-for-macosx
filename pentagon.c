@@ -30,8 +30,8 @@
 #include <unistd.h>
 
 #include "ay.h"
+#include "compat.h"
 #include "display.h"
-#include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"

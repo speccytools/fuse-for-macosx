@@ -1,5 +1,5 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -31,8 +31,8 @@
 #include <libspectrum.h>
 
 #include "ay.h"
+#include "compat.h"
 #include "display.h"
-#include "fuse.h"
 #include "joystick.h"
 #include "machine.h"
 #include "settings.h"

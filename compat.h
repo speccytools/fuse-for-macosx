@@ -1,5 +1,5 @@
-/* fuse.h: Variables exported from the main file
-   Copyright (c) 2000-2003 Philip Kendall
+/* compat.h: various compatbility bits
+   Copyright (c) 2003 Philip Kendall
 
    $Id$
 
@@ -24,24 +24,16 @@
 
 */
 
-#ifndef FUSE_FUSE_H
-#define FUSE_FUSE_H
+#ifndef FUSE_COMPAT_H
+#define FUSE_COMPAT_H
 
-#include <libspectrum.h>
+/* Remove the gcc-specific incantations if we're not using gcc */
+#ifdef __GNUC__
+#define GCC_UNUSED __attribute__ ((unused))
+#define GCC_PRINTF( fmtstring, args ) __attribute__ ((format( printf, fmtstring, args )))
+#else				/* #ifdef __GNUC__ */
+#define GCC_UNUSED
+#define GCC_PRINTF( fmtstring, args )
+#endif				/* #ifdef __GNUC__ */
 
-extern char* fuse_progname;		/* argv[0] */
-
-extern int fuse_exiting;		/* Shall we exit now? */
-
-extern int fuse_emulation_paused;	/* Is Spectrum emulation paused? */
-int fuse_emulation_pause(void);		/* Stop and start emulation */
-int fuse_emulation_unpause(void);
-
-int fuse_abort( void );			/* Emergency shutdown */
-
-extern int fuse_sound_in_use;		/* Are we trying to produce sound? */
-
-extern libspectrum_creator *fuse_creator; /* Creator information for file
-					     formats which support this */
-
-#endif			/* #ifndef FUSE_FUSE_H */
+#endif				/* #ifndef FUSE_COMPAT_H */

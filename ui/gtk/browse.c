@@ -1,5 +1,5 @@
 /* browse.c: tape browser dialog box
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
@@ -33,6 +33,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "compat.h"
 #include "fuse.h"
 #include "gtkui.h"
 #include "tape.h"

@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "compat.h"
 #include "fuse.h"
 #include "spectrum.h"
 #include "timer.h"
