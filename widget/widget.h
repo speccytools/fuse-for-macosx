@@ -40,11 +40,13 @@ typedef enum widget_type {
 
   WIDGET_TYPE_MAINMENU,		/* Main menu */
   WIDGET_TYPE_FILESELECTOR,	/* File selector */
-  WIDGET_TYPE_OPTIONS,		/* General options */
-  WIDGET_TYPE_TAPE,		/* Tape options */
-  WIDGET_TYPE_SNAPSHOT,		/* Snapshot options */
-  WIDGET_TYPE_MACHINE,		/* Machine control */
+  WIDGET_TYPE_GENERAL,		/* General options */
+  WIDGET_TYPE_TAPE,		/* Tape menu */
+  WIDGET_TYPE_FILE,		/* File menu */
+  WIDGET_TYPE_MACHINE,		/* Machine menu */
   WIDGET_TYPE_PICTURE,		/* Keyboard picture */
+  WIDGET_TYPE_OPTIONS,		/* Options menu */
+  WIDGET_TYPE_HELP,		/* Help menu */
 
 } widget_type;
 
@@ -116,23 +118,23 @@ void widget_filesel_keyhandler( int key );
 
 extern char* widget_filesel_name;
 
-/* Options dialog */
+/* General options */
 
-int widget_options_draw( void );
-int widget_options_finish( widget_finish_state finished );
-void widget_options_keyhandler( int key );
+int widget_general_draw( void );
+int widget_general_finish( widget_finish_state finished );
+void widget_general_keyhandler( int key );
 
-/* Tape dialog */
+/* Tape menu */
 
 int widget_tape_draw( void );
 void widget_tape_keyhandler( int key );
 
-/* Snapshot dialog */
+/* File menu */
 
-int widget_snapshot_draw( void );
-void widget_snapshot_keyhandler( int key );
+int widget_file_draw( void );
+void widget_file_keyhandler( int key );
 
-/* Machine dialog */
+/* Machine menu */
 
 int widget_machine_draw( void );
 void widget_machine_keyhandler( int key );
@@ -145,6 +147,16 @@ void widget_picture_keyhandler( int key );
 /* The data for the keyboard picture */
 
 extern int widget_picture_data[DISPLAY_HEIGHT][DISPLAY_WIDTH];
+
+/* Options menu */
+
+int widget_options_draw( void );
+void widget_options_keyhandler( int key );
+
+/* Help menu */
+
+int widget_help_draw( void );
+void widget_help_keyhandler( int key );
 
 /* The widgets actually available */
 

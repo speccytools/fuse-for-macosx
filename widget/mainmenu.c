@@ -44,7 +44,7 @@ int widget_mainmenu_draw( void )
   widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(O)ptions" );
   widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(M)achine" );
   widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(T)ape" );
-  widget_printstring( 2, 8, WIDGET_COLOUR_FOREGROUND, "(K)eyboard picture" );
+  widget_printstring( 2, 8, WIDGET_COLOUR_FOREGROUND, "(H)elp" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 16 + 56 );
@@ -61,11 +61,11 @@ void widget_mainmenu_keyhandler( int key )
     break;
 
   case KEYBOARD_f:
-    widget_do( WIDGET_TYPE_SNAPSHOT );
+    widget_do( WIDGET_TYPE_FILE );
     break;
 
-  case KEYBOARD_k:
-    widget_do( WIDGET_TYPE_PICTURE );
+  case KEYBOARD_h:
+    widget_do( WIDGET_TYPE_HELP );
     break;
 
   case KEYBOARD_m:

@@ -39,7 +39,7 @@ int widget_tape_draw( void )
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, 7 );
 
-  widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Tape Control" );
+  widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Tape" );
 
   widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen tape" );
   widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(P)lay tape" ); 

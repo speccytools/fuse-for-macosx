@@ -27,7 +27,7 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libwidget.a
 
 libwidget_a_SOURCES = filesel.c machine_widget.c mainmenu.c options.c\
-picture.c picture_data.c snapshot_widget.c tape_widget.c widget.c
+picture.c picture_data.c file.c tape_widget.c widget.c general.c help.c
 
 BUILT_SOURCES = picture_data.c
 
@@ -35,3 +35,5 @@ picture_data.c: tap-extract.pl picture_data.tap
 	@PERL@ -w tap-extract.pl picture_data.tap > picture_data.c
 
 noinst_HEADERS = widget.h
+
+EXTRA_DIST = tap-extract.pl picture_data.tap
