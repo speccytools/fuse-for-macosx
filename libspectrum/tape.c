@@ -106,7 +106,7 @@ rom_init( libspectrum_tape_rom_block *block )
    last edge) */
 libspectrum_error
 libspectrum_tape_get_next_edge( libspectrum_tape *tape,
-				libspectrum_dword *tstates )
+				libspectrum_dword *tstates, int *end_of_tape )
 {
   int error;
 
@@ -115,6 +115,9 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
   /* Has this edge ended the block? */
   int end_of_block = 0;
+
+  /* By default, assume the tape hasn't ended */
+  *end_of_tape = 0;
 
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
@@ -126,13 +129,17 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
 
-  /* If that ended the block, move onto the next block
-     FIXME: End of tape! */
+  /* If that ended the block, move onto the next block */
   if( end_of_block ) {
     tape->current_block = tape->current_block->next;
-    block = (libspectrum_tape_block*)tape->current_block->data;
-    error = libspectrum_tape_init_block( block );
-    if( error ) return error;
+    if( tape->current_block == NULL ) {
+      *end_of_tape = 1;
+    } else {
+      /* Initialise the new block */
+      block = (libspectrum_tape_block*)tape->current_block->data;
+      error = libspectrum_tape_init_block( block );
+      if( error ) return error;
+    }
   }
 
   return LIBSPECTRUM_ERROR_NONE;

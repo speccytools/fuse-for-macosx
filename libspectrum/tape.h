@@ -126,7 +126,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block );
 
 libspectrum_error
 libspectrum_tape_get_next_edge( libspectrum_tape *tape,
-				libspectrum_dword *tstates );
+				libspectrum_dword *tstates, int *end_of_tape );
 
 /*** Routines for .tap format files ***/
 
