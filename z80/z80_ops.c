@@ -64,15 +64,13 @@ void z80_do_opcodes()
 			   the interrupt happen */
     }
 
-    R++;
+    /* Do the instruction fetch */
+    contend( PC, 4 ); R++;
 
-    /* If the z80 is HALTed, execute a NOP-equivalent and loop again */
-    if(z80.halted) {
-      tstates+=4;
-      continue;
-    }
+    /* If the z80 is HALTed, do nothing */
+    if( z80.halted ) continue;
 
-    contend( PC, 4 ); opcode=readbyte( PC++ );
+    opcode=readbyte( PC++ );
 
     switch(opcode) {
     case 0x00:		/* NOP */
