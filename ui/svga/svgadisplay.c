@@ -246,7 +246,7 @@ uidisplay_area( int x, int y, int w, int h )
   scaled_x = scale * x; scaled_y = scale * y;
 
   /* Create scaled image */
-  scaler_proc16( (BYTE*)&display_image[y][x], display_pitch, NULL, 
+  scaler_proc16( (BYTE*)&display_image[y][x], display_pitch,
 		 (BYTE*)&scaled_image[scaled_y][scaled_x], scaled_pitch,
 		 w, h );
 

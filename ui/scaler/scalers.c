@@ -241,7 +241,7 @@ Q_INTERPOLATE(DWORD A, DWORD B, DWORD C, DWORD D)
 
 void 
 FUNCTION( scaler_Super2xSaI )( BYTE *srcPtr, DWORD srcPitch,
-	BYTE *deltaPtr, BYTE *dstPtr, DWORD dstPitch, int width, int height)
+	BYTE *dstPtr, DWORD dstPitch, int width, int height)
 {
   scaler_data_type *bP, *dP;
 
@@ -345,13 +345,12 @@ FUNCTION( scaler_Super2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 
       srcPtr += srcPitch;
       dstPtr += dstPitch * 2;
-      deltaPtr += srcPitch;
     }				/* while (height--) */
   }
 }
 
 void 
-FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
+FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch,
 			       BYTE *dstPtr, DWORD dstPitch,
 			       int width, int height )
 {
@@ -456,13 +455,12 @@ FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 
       srcPtr += srcPitch;
       dstPtr += dstPitch * 2;
-      deltaPtr += srcPitch;
     }				/* endof: while (height--) */
   }
 }
 
 void 
-FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
+FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 			  BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   scaler_data_type *bP, *dP;
@@ -599,13 +597,12 @@ FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 
       srcPtr += srcPitch;
       dstPtr += dstPitch * 2;
-      deltaPtr += srcPitch;
     }				/* endof: while (height--) */
   }
 }
 
 void 
-FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch,
 			      BYTE *dstPtr, DWORD dstPitch,
 			      int width, int height )
 {
@@ -668,7 +665,7 @@ FUNCTION( scaler_Half )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 }
 
 void 
-FUNCTION( scaler_HalfSkip )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_HalfSkip )( BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch, int width,
 			     int height )
 {
@@ -690,7 +687,7 @@ FUNCTION( scaler_HalfSkip )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 }
 
 void 
-FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )
 {
@@ -702,7 +699,7 @@ FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 }
 
 void 
-FUNCTION( scaler_Normal2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_Normal2x )( BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )
 {
@@ -724,7 +721,7 @@ FUNCTION( scaler_Normal2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 }
 
 void 
-FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )
 {
@@ -754,7 +751,7 @@ FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 }
 
 void
-FUNCTION( scaler_TV2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_TV2x )( BYTE *srcPtr, DWORD srcPitch,
 			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   int i, j;
@@ -783,7 +780,7 @@ FUNCTION( scaler_TV2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 }
 
 void
-FUNCTION( scaler_TimexTV )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_TimexTV )( BYTE *srcPtr, DWORD srcPitch,
 			    BYTE *dstPtr, DWORD dstPitch,
 			    int width, int height )
 {
@@ -817,7 +814,7 @@ static inline scaler_data_type DOT_16(scaler_data_type c, int j, int i) {
 }
 
 void
-FUNCTION( scaler_DotMatrix )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_DotMatrix )( BYTE *srcPtr, DWORD srcPitch,
 			    BYTE *dstPtr, DWORD dstPitch,
 			    int width, int height )
 {

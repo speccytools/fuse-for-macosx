@@ -304,7 +304,7 @@ uidisplay_frame_end( void )
 
     scaler_proc16(
      (BYTE*)tmp_screen->pixels + (r->x*2+2) + (r->y+1)*tmp_screen_pitch,
-     tmp_screen_pitch, NULL,
+     tmp_screen_pitch,
      (BYTE*)sdldisplay_gc->pixels + r->x*(BYTE)(2*sdldisplay_current_size) +
      dst_y*dstPitch, dstPitch, r->w, dst_h );
 

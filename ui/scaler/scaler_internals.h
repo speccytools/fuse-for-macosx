@@ -31,62 +31,24 @@
 #ifndef FUSE_SCALER_INTERNALS_H
 #define FUSE_SCALER_INTERNALS_H
 
-void scaler_2xSaI_16( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-		      BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Super2xSaI_16( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-			   BYTE *dstPtr, DWORD dstPitch,
-			   int width, int height );
-void scaler_SuperEagle_16( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-			   BYTE *dstPtr, DWORD dstPitch,
-			   int width, int height);
-void scaler_AdvMame2x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			  BYTE *dstPtr, DWORD dstPitch,
-			  int width, int height );
-void scaler_Half_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-	             BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_HalfSkip_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Normal1x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Normal2x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Normal3x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_TV2x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-		     BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_TimexTV_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_DotMatrix_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			  BYTE *dstPtr, DWORD dstPitch,
-			  int width, int height );
+#define DECLARE_SCALER( name ) \
+         extern void scaler_##name##_16( BYTE *srcPtr, DWORD srcPitch, \
+                        BYTE *dstPtr, DWORD dstPitch, int width, int height); \
+         extern void scaler_##name##_32( BYTE *srcPtr, DWORD srcPitch, \
+                        BYTE *dstPtr, DWORD dstPitch, int width, int height)
 
-void scaler_2xSaI_32( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-		      BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Super2xSaI_32( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-			   BYTE *dstPtr, DWORD dstPitch,
-			   int width, int height );
-void scaler_SuperEagle_32( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
-			   BYTE *dstPtr, DWORD dstPitch,
-			   int width, int height);
-void scaler_AdvMame2x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			  BYTE *dstPtr, DWORD dstPitch,
-			  int width, int height );
-void scaler_Half_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-	             BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_HalfSkip_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Normal1x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Normal2x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_Normal3x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_TV2x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-		     BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_TimexTV_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			BYTE *dstPtr, DWORD dstPitch, int width, int height );
-void scaler_DotMatrix_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
-			  BYTE *dstPtr, DWORD dstPitch,
-			  int width, int height );
+DECLARE_SCALER(2xSaI);
+DECLARE_SCALER(Super2xSaI);
+DECLARE_SCALER(SuperEagle);
+DECLARE_SCALER(AdvMame2x);
+DECLARE_SCALER(AdvMame3x);
+DECLARE_SCALER(Half);
+DECLARE_SCALER(HalfSkip);
+DECLARE_SCALER(Normal1x);
+DECLARE_SCALER(Normal2x);
+DECLARE_SCALER(Normal3x);
+DECLARE_SCALER(TV2x);
+DECLARE_SCALER(TimexTV);
+DECLARE_SCALER(DotMatrix);
 
 #endif				/* #ifndef FUSE_SCALER_INTERNALS_H */

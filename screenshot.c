@@ -106,8 +106,7 @@ screenshot_write( const char *filename, scaler_type scaler )
   if( error ) return error;
 
   /* Actually scale the data here */
-  scaler_get_proc32( scaler )( rgb_data1, rgb_stride, NULL,
-			       rgb_data2, rgb_stride,
+  scaler_get_proc32( scaler )( rgb_data1, rgb_stride, rgb_data2, rgb_stride,
 			       base_width, base_height );
 
   height = base_height * scaler_get_scaling_factor( scaler );

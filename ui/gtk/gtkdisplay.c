@@ -263,7 +263,7 @@ uidisplay_area( int x, int y, int w, int h )
 
   /* Create scaled image */
   scaler_proc32( &rgb_image[ ( y + 2 ) * rgb_pitch + 4 * ( x + 1 ) ],
-		 rgb_pitch, NULL, 
+		 rgb_pitch,
 		 &scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
 		 scaled_pitch, w, h );
 
