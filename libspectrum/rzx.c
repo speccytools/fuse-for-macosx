@@ -423,8 +423,8 @@ rzx_write_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   }
 
   strcpy( *ptr, signature ); (*ptr) += strlen( signature );
-  *(*ptr)++ = 0x00;		/* Minor version number */
-  *(*ptr)++ = 0x01;		/* Major version number */
+  *(*ptr)++ = 0;		/* Minor version number */
+  *(*ptr)++ = 12;		/* Major version number */
 
   /* 'Reserved' flags */
   *(*ptr)++ = '\0'; *(*ptr)++ = '\0'; *(*ptr)++ = '\0'; *(*ptr)++ = '\0';
