@@ -73,7 +73,10 @@ int xkeyboard_keypress(XKeyEvent *event)
   case XK_F3:
     fuse_emulation_pause();
     filename = widget_selectfile();
-    if( filename ) snapshot_read( filename );
+    if( filename ) {
+      snapshot_read( filename );
+      display_refresh_all();
+    }
     fuse_emulation_unpause();
     break;
   case XK_F5:

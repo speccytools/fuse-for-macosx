@@ -51,7 +51,6 @@ void svgakeyboard_keyrelease(int keysym);
 int svgakeyboard_init(void)
 {
   keyboard_init();
-  widget_keymode=0;
   keyboard_seteventhandler(svgakeyboard_keystroke);
   return 0;
 }
@@ -67,6 +66,7 @@ void svgakeyboard_keystroke(int scancode, int press)  {
 int svgakeyboard_keypress(int keysym)
 {
   keysyms_key_info *ptr;
+  const char *filename;
 
   ptr=keysyms_get_data(keysym);
 
@@ -92,7 +92,10 @@ int svgakeyboard_keypress(int keysym)
   case SCANCODE_F3:
     fuse_emulation_pause();
     filename = widget_selectfile();
-    if( filename ) snapshot_read( filename );
+    if( filename ) {
+      snapshot_read( filename );
+      display_refresh_all();
+    }
     fuse_emulation_unpause();
     break;
   case SCANCODE_F5:
