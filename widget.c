@@ -1,5 +1,5 @@
 /* widget.c: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001 Matan Ziv-Av, Philip Kendall, Russell Marks
 
    $Id$
 
@@ -165,6 +165,7 @@ int scandir( const char *dir, struct dirent ***namelist,
   directory = opendir( dir );
   if( directory == NULL ) {
     free( *namelist );
+    *namelist = NULL;
     return -1;
   }
 
@@ -178,6 +179,8 @@ int scandir( const char *dir, struct dirent ***namelist,
       } else {
 	for( i=0; i<number; i++ ) free( (*namelist)[number] );
 	free( *namelist );
+	*namelist = NULL;
+	closedir( directory );
 	return -1;
       }
     }
@@ -185,12 +188,15 @@ int scandir( const char *dir, struct dirent ***namelist,
     if( select( dirent ) ) {
 
       if( ++number > allocated ) {
+	struct dirent **oldptr = *namelist;
+
 	(*namelist)=
 	  (struct dirent**)realloc( (*namelist),
 				    2 * allocated * sizeof(struct dirent*) );
 	if( *namelist == NULL ) {
 	  for( i=0; i<number-1; i++ ) free( (*namelist)[number] );
-	  free( *namelist );
+	  free( oldptr );
+	  closedir( directory );
 	  return -1;
 	}
 	allocated *= 2;
@@ -212,6 +218,7 @@ int scandir( const char *dir, struct dirent ***namelist,
   if( closedir( directory ) ) {
     for( i=0; i<number; i++ ) free( (*namelist)[number] );
     free( *namelist );
+    *namelist = NULL;
     return -1;
   }
 
