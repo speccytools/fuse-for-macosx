@@ -73,7 +73,7 @@ scaler_select_bitformat( libspectrum_dword BitFormat )
        and (*) xxxx|xyyy|yyzz|zzz0 for the 555 mode, where (*) is the
        least significant bit on LSB machines and the most significant
        bit on MSB machines. This is currently (April 2003) OK as the
-       other user interface to use this code is SDL, which hides all
+       only user interface to use this code is SDL, which hides all
        variation in SDL_MapRGB(3), but be very careful (especially
        about endianness) if we ever use the "interpolating" scalers
        from another user interface */

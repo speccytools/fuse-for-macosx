@@ -1080,3 +1080,4 @@
          transitive dependencies when gtk (and probably libspectrum) is
          installed in a non-default directory. Fixes build of UNIX version on
          Mac OS X.
+20041014 ui/scaler/scalers.c: Fix typo.
