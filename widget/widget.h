@@ -196,6 +196,8 @@ int widget_apply_to_file( void *data );
      
 /* More callbacks */
 int widget_menu_save_snapshot( void *data ); /* File/Save */
+int widget_menu_rzx_recording( void *data ); /* File/Recording/Record */
+int widget_menu_rzx_playback( void *data );  /* File/Recording/Play */
 int widget_menu_rzx_stop( void *data );	     /* File/Recording/Stop */
 int widget_menu_exit( void *data );	     /* File/Exit */
 

@@ -90,9 +90,9 @@ static widget_menu_entry widget_menu_file[] = {
 static widget_menu_entry widget_menu_file_recording[] = {
   { "Recording", 0, 0, NULL },		/* Menu title */
 
-  { "(R)ecord...", KEYBOARD_r, widget_apply_to_file, rzx_start_recording },
-  { "(P)lay...",   KEYBOARD_p, widget_apply_to_file, rzx_start_playback  },
-  { "(S)top",	   KEYBOARD_s, widget_menu_rzx_stop, NULL },
+  { "(R)ecord...", KEYBOARD_r, widget_menu_rzx_recording,  NULL },
+  { "(P)lay...",   KEYBOARD_p, widget_menu_rzx_playback,   NULL },
+  { "(S)top",	   KEYBOARD_s, widget_menu_rzx_stop,       NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

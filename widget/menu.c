@@ -130,6 +130,22 @@ int widget_menu_save_snapshot( void *data )
   return snapshot_write( "snapshot.z80" );
 }
 
+/* File/Recording/Record */
+int widget_menu_rzx_recording( void *data )
+{
+  if( rzx_playback || rzx_recording ) return 0;
+
+  return widget_apply_to_file( rzx_start_recording );
+}
+
+/* File/Recording/Play */
+int widget_menu_rzx_playback( void *data )
+{
+  if( rzx_playback || rzx_recording ) return 0;
+
+  return widget_apply_to_file( rzx_start_playback );
+}
+
 /* File/Recording/Stop */
 int widget_menu_rzx_stop( void *data )
 {

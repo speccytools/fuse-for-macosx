@@ -306,7 +306,7 @@ static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
 {
   char *filename;
 
-  if( rzx_playback ) return;
+  if( rzx_playback || rzx_recording ) return;
 
   fuse_emulation_pause();
   
@@ -332,7 +332,7 @@ static void gtkui_rzx_play( GtkWidget *widget, gpointer data )
 {
   char *filename;
 
-  if( rzx_recording ) return;
+  if( rzx_playback || rzx_recording ) return;
 
   fuse_emulation_pause();
   
