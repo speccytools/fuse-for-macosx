@@ -28,6 +28,9 @@
 
 #include <stdlib.h>
 
+#include "rzx.h"
+#include "snapshot.h"
+#include "tape.h"
 #include "widget.h"
 
 /* FIXME: there must be a better way of initialising all the menu data */
@@ -72,7 +75,8 @@ static widget_menu_widget_t file_recording = { WIDGET_TYPE_MENU,
 static widget_menu_entry widget_menu_file[] = {
   { "File", 0, 0, NULL },		/* Menu title */
 
-  { "(O)pen snapshot...",       KEYBOARD_o, widget_menu_open_snapshot, NULL },
+  { "(O)pen snapshot...",       KEYBOARD_o, widget_apply_to_file,
+                                            snapshot_read                   },
   { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
   { "(R)ecording",		KEYBOARD_r, widget_menu_widget,
 					    &file_recording                 },
@@ -86,8 +90,8 @@ static widget_menu_entry widget_menu_file[] = {
 static widget_menu_entry widget_menu_file_recording[] = {
   { "Recording", 0, 0, NULL },		/* Menu title */
 
-  { "(S)tart...", KEYBOARD_s, widget_menu_rzx_start, NULL },
-  { "(P)lay...",  KEYBOARD_p, widget_menu_rzx_play,  NULL },
+  { "(S)tart...", KEYBOARD_s, widget_apply_to_file, rzx_start_recording },
+  { "(P)lay...",  KEYBOARD_p, widget_apply_to_file, rzx_start_playback  },
   { "S(t)op",	  KEYBOARD_t, widget_menu_rzx_stop,  NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
@@ -123,7 +127,8 @@ static widget_menu_entry widget_menu_machine[] = {
 static widget_menu_entry widget_menu_tape[] = {
   { "Tape", 0, 0, NULL },		/* Menu title */
 
-  { "(O)pen tape...",           KEYBOARD_o, widget_menu_open_tape,   NULL },
+  { "(O)pen tape...",           KEYBOARD_o, widget_apply_to_file,    
+                                            tape_open                     },
   { "(P)lay tape",              KEYBOARD_p, widget_menu_play_tape,   NULL },
   { "(R)ewind tape",            KEYBOARD_r, widget_menu_rewind_tape, NULL },
   { "(C)lear tape",             KEYBOARD_c, widget_menu_clear_tape,  NULL },

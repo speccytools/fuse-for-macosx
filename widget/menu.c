@@ -98,6 +98,8 @@ void widget_menu_keyhandler( keyboard_key_name key )
   }
 }
 
+/* General callbacks */
+
 /* The callback used to call another widget */
 int widget_menu_widget( void *data )
 {
@@ -106,40 +108,26 @@ int widget_menu_widget( void *data )
   return widget_do( ptr->widget, ptr->data );
 }
 
-/* File menu callbacks */
-
-/* File/Open */
-int widget_menu_open_snapshot( void *data )
+/* The callback to get a file name and do something with it */
+int widget_apply_to_file( void *data )
 {
+  typedef int (*fn_ptr)(const char*);
+
+  fn_ptr ptr = (fn_ptr)data;
+
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( widget_filesel_name ) snapshot_read( widget_filesel_name );
+  if( widget_filesel_name ) ptr( widget_filesel_name );
 
   return 0;
 }
+
+/* File menu callbacks */
 
 /* File/Save */
 int widget_menu_save_snapshot( void *data )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return snapshot_write( "snapshot.z80" );
-}
-
-/* File/Recording/Start */
-int widget_menu_rzx_start( void *data )
-{
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( widget_filesel_name ) rzx_start_recording( widget_filesel_name );
-
-  return 0;
-}
-
-/* File/Recording/Play */
-int widget_menu_rzx_play( void *data )
-{
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( widget_filesel_name ) rzx_start_playback( widget_filesel_name );
-
-  return 0;
 }
 
 /* File/Recording/Stop */
@@ -163,15 +151,6 @@ int widget_menu_reset( void *data )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return machine_current->reset();
-}
-
-/* Tape/Open */
-int widget_menu_open_tape( void *data )
-{
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( widget_filesel_name ) tape_open( widget_filesel_name );
-
-  return 0;
 }
 
 /* Tape/Play */
