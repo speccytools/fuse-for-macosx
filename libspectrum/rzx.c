@@ -269,6 +269,9 @@ libspectrum_rzx_write( libspectrum_rzx *rzx,
   error = rzx_write_frames( rzx, buffer, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
   
+  /* *length is the allocated size; we want to return how much is used */
+  *length = ptr - *buffer;
+
   return LIBSPECTRUM_ERROR_NONE;
 }
 
