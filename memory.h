@@ -27,6 +27,8 @@
 #ifndef FUSE_MEMORY_H
 #define FUSE_MEMORY_H
 
+#include <libspectrum.h>
+
 extern libspectrum_byte *memory_map[8];
 extern int memory_writable[8];
 extern int memory_contended[8];

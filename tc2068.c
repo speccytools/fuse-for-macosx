@@ -40,6 +40,7 @@
 #include "fuse.h"
 #include "joystick.h"
 #include "machine.h"
+#include "memory.h"
 #include "printer.h"
 #include "scld.h"
 #include "settings.h"
@@ -265,6 +266,10 @@ tc2068_reset( void )
   scld_dec_write( 0x00ff, 0x80 );
   scld_dec_write( 0x00ff, 0x00 );
   scld_hsr_write( 0x00f4, 0x00 );
+
+  memory_screen_chunk1 = &RAM[5][0x0000];
+  memory_screen_chunk2 = &RAM[5][0x2000];
+  memory_screen_top = 0x1b00;
 
   return 0;
 }

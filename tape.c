@@ -430,7 +430,7 @@ int trap_check_rom( void )
 
   case LIBSPECTRUM_MACHINE_TC2068:
     /* OK if we're in the EXROM (location of the tape routines) */
-    return( timex_memory[0].page == timex_exrom[0].page );
+    return( memory_map[0] == timex_exrom[0].page );
 
   case LIBSPECTRUM_MACHINE_128:
   case LIBSPECTRUM_MACHINE_PLUS2:

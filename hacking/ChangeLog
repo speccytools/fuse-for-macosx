@@ -362,3 +362,5 @@
 	 widget/widget.c: add current emulation speed to GTK+ statusbar.
 20031116 fuse.c, timer.[ch]: better speed estimation just after emulation
 	 unpause (or startup).
+20031117 memory.h, scld.c, tape.c, tc2068.c: get TC2068 memory routines
+	 working again.

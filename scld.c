@@ -19,7 +19,10 @@
 
    Author contact information:
 
-   E-mail: fredm@spamcop.net
+   Philip: pak21-fuse@srcf.ucam.org
+   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+   Fred: fredm@spamcop.net
 
 */
 
@@ -30,6 +33,8 @@
 
 #include "compat.h"
 #include "display.h"
+#include "machine.h"
+#include "memory.h"
 #include "scld.h"
 #include "z80/z80.h"
 
@@ -43,7 +48,6 @@ timex_mem timex_exrom_dock[8];
 timex_mem timex_exrom[8];
 timex_mem timex_dock[8];
 timex_mem timex_home[8];
-timex_mem timex_memory[8];
 
 libspectrum_byte
 scld_dec_read( libspectrum_word port GCC_UNUSED )
@@ -104,11 +108,24 @@ scld_hsr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   
   scld_last_hsr = b;
 
-  for( i = 0; i < 8; i++ ) {
-    if( b & (1<<i) ) {
-      timex_memory[i] = timex_exrom_dock[i];
-    } else {
-      timex_memory[i] = timex_home[i];
+  if( libspectrum_machine_capabilities( machine_current->machine ) &
+      LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
+
+    for( i = 0; i < 8; i++ ) {
+
+      if( b & ( 1 << i ) ) {
+
+	memory_map[i] = timex_exrom_dock[i].page;
+	memory_writable[i] = timex_exrom_dock[i].writeable;
+	memory_contended[i] = 0;
+
+      } else {
+
+	memory_map[i] = timex_home[i].page;
+	memory_writable[i] = timex_home[i].writeable;
+	memory_contended[i] = ( i == 2 || i == 3 );
+
+      }
     }
   }
 }
