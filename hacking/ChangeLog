@@ -944,3 +944,5 @@
 	 and SDL joystick codes to pass more than one fire button through
 	 to the input layer.
 20040618 hacking/input.txt: add some documentation on the input layer.
+20040619 z80/z80.c: save/restore the high bit of R correctly (thanks, Jan
+         Samohýl).
