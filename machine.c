@@ -228,7 +228,7 @@ int machine_read_rom( machine_info *machine, size_t number,
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    fprintf( stderr, "%s: couldn't find ROM `%s'", fuse_progname, filename );
+    fprintf( stderr, "%s: couldn't find ROM `%s'\n", fuse_progname, filename );
     return 1;
   }
 
