@@ -314,12 +314,15 @@ static int recording_frame( void )
 
 static int playback_frame( void )
 {
+  printf( "Frame %d\n", rzx_current_frame );
+
   /* Check we read the correct number of INs during this frame */
   if( rzx_in_count != rzx.frames[ rzx_current_frame ].count ) {
     ui_error( UI_ERROR_ERROR,
 	      "Not enough INs during frame %d: expected %d, got %d",
 	      rzx_current_frame, rzx.frames[ rzx_current_frame ].count,
 	      rzx_in_count );
+    abort();
     return rzx_stop_playback( 0 );
   }
 
@@ -339,7 +342,7 @@ static int playback_frame( void )
    R register */
 static int counter_reset( void )
 {
-  R &= ~0x7f;		/* Clear all but the 7 lowest bits of the R register */
+  R &= 0x7f;		/* Clear all but the 7 lowest bits of the R register */
   rzx_instructions_offset = -R; /* Gives us a zero count */
 
   rzx_in_count = 0;
