@@ -155,7 +155,8 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
 
   /* Start the count of instruction fetches here */
   counter_reset();
-  rzx->tstates = tstates;
+
+  libspectrum_rzx_set_tstates( rzx, tstates );
 
   /* Store the filename */
   rzx_filename = strdup( filename );
@@ -264,7 +265,7 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
   if( error ) { libspectrum_rzx_free( rzx ); return error; }
 
   /* We're now playing this RZX file */
-  tstates = rzx->tstates;
+  tstates = libspectrum_rzx_tstates( rzx );
   rzx_playback = 1;
   rzx_current_frame = rzx_data_frame = 0;
   counter_reset();
