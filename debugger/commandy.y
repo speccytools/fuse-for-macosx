@@ -132,6 +132,7 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 	 | FINISH   { debugger_breakpoint_exit(); }
 	 | IGNORE NUMBER NUMBER { debugger_breakpoint_ignore( $2, $3 ); }
 	 | NEXT	    { debugger_next(); }
+	 | SET NUMBER NUMBER { debugger_poke( $2, $3 ); }
 	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;

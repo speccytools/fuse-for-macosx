@@ -354,3 +354,11 @@ debugger_breakpoint_ignore( size_t id, size_t ignore )
 
   return 0;
 }
+
+/* Poke a value into RAM */
+int
+debugger_poke( WORD address, BYTE value )
+{
+  writebyte_internal( address, value );
+  return 0;
+}

@@ -35,6 +35,7 @@ int debugger_breakpoint_clear( WORD address );
 int debugger_breakpoint_show( void );
 int debugger_breakpoint_exit( void );
 int debugger_breakpoint_ignore( size_t id, size_t ignore );
+int debugger_poke( WORD address, BYTE value );
 
 /* Utility functions called by the flex scanner */
 
