@@ -246,22 +246,31 @@ int machine_read_rom( machine_info *machine, size_t number,
 
 }
 
-/* Find a ROM called `filename'; look in the current directory, ./roms
-   and the defined roms directory; returns a fd for the ROM on success,
-   -1 if it couldn't find the ROM */
+/* Find a ROM called `filename' in some likely locations; returns a fd
+   for the ROM on success or -1 if it couldn't find the ROM */
 int machine_find_rom( const char *filename )
 {
   int fd;
 
   char path[ PATHNAME_MAX_LENGTH ];
 
+  /* First look off the current directory */
   snprintf( path, PATHNAME_MAX_LENGTH, "roms/%s", filename );
   fd = open( path, O_RDONLY );
   if( fd != -1 ) return fd;
 
+  /* Then look where Fuse may have installed the ROMs */
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", DATADIR, filename );
   fd = open( path, O_RDONLY );
   if( fd != -1 ) return fd;
+
+#ifdef ROMSDIR
+  /* Finally look in a system-wide directory for ROMs. Debian uses
+     /usr/share/spectrum-roms/ here */
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", ROMSDIR, filename );
+  fd = open( path, O_RDONLY );
+  if( fd != -1 ) return fd;
+#endif
 
   return -1;
 }
