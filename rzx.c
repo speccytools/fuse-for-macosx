@@ -159,18 +159,9 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   if( settings_current.competition_mode ) {
 
     expected_time = 0;
-
-    error = gettimeofday( &start_time, NULL );
-    if( error ) {
-      ui_error( UI_ERROR_INFO,
-		"Couldn't get start time: %s: competition mode disabled",
-		strerror( errno ) );
-      rzx_competition_mode = 0;
-    } else {
-      settings_current.emulation_speed = 100;
-      timer_count = 0;
-      rzx_competition_mode = 1;
-    }
+    settings_current.emulation_speed = 100;
+    timer_count = 0;
+    rzx_competition_mode = 1;
     
   }
     
@@ -370,9 +361,29 @@ static int recording_frame( void )
 
     expected_time++;
 
-    /* Small time measurements are highly inaccurate, so wait at least
-       one second before doing them */
-    if( expected_time > 50 ) {
+    /* We wait one second before starting time measurements at all.
+       This is to allow any initial speed fluctuations caused by the
+       menu system to settle down (notably, with a widget UI and OSS
+       sound, the first few frames run fast as the sound buffers fill
+       up) */
+    if( expected_time == 50 ) {
+      
+      error = gettimeofday( &start_time, NULL );
+      if( error ) {
+	ui_error(
+          UI_ERROR_INFO,
+	  "couldn't get start time: %s: stopping competition mode RZX recording",
+	  strerror( errno )
+	);
+	rzx_stop_recording();
+	return 1;
+      }
+
+
+    /* Measuring small time intervals will be inaccurate, so don't
+       start checking for speed violations until at least one second
+       of measured time has elapsed (ie two seconds into recording) */
+    } else if( expected_time > 100 ) {
 
       float seconds;
 
@@ -387,7 +398,8 @@ static int recording_frame( void )
 	return 1;
       }
 
-      seconds = expected_time * 0.02;
+      /* -1 to account for the fact we don't time the first second */
+      seconds = ( expected_time * 0.02 ) - 1;
 
       elapsed_time =   current_time.tv_sec  - start_time.tv_sec +
 	             ( current_time.tv_usec - start_time.tv_usec ) / 1000000.0;
