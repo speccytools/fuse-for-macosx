@@ -1,5 +1,5 @@
 /* sunsound.c: OpenBSD sound I/O
-   Copyright (c) 2002 Alexander Yurchenko
+   Copyright (c) 2002 Alexander Yurchenko, Russell Marks
 
    $Id$
 
