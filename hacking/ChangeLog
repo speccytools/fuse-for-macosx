@@ -1207,3 +1207,5 @@
 20050205 Makefile.am: Add kempmouse.h to headers list (Fred).
 20050205 sound/sdlsound.c: Remove unused socket header and replace setenv with
          putenv for Windows compatibility (Fred).
+20050212 ui/gtk/{gtkinternals.h,pixmaps.c,statusbar.c}: add mouse icon
+	 (Darren).

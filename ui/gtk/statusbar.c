@@ -41,9 +41,10 @@ static GdkPixmap
   *pixmap_tape_inactive, *pixmap_tape_active,
   *pixmap_mdr_inactive, *pixmap_mdr_active,
   *pixmap_disk_inactive, *pixmap_disk_active,
-  *pixmap_pause_inactive, *pixmap_pause_active;
+  *pixmap_pause_inactive, *pixmap_pause_active,
+  *pixmap_mouse_inactive, *pixmap_mouse_active;
 
-static GdkBitmap *pause_mask;
+static GdkBitmap *pause_mask, *mouse_mask;
 
 static GtkWidget
   *microdrive_status,	/* Is any microdrive motor running? */
@@ -90,6 +91,14 @@ gtkstatusbar_create( GtkBox *parent )
     gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
 					   NULL, gtkpixmap_pause_active );
 
+  pixmap_mouse_inactive = 
+    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(),
+					   &mouse_mask, NULL,
+					   gtkpixmap_mouse_inactive );
+  pixmap_mouse_active = 
+    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
+					   NULL, gtkpixmap_mouse_active );
+
   speed_status = gtk_label_new( "100%" );
   gtk_box_pack_end( GTK_BOX( status_bar ), speed_status, FALSE, FALSE, 0 );
 
@@ -109,7 +118,7 @@ gtkstatusbar_create( GtkBox *parent )
   pause_status = gtk_pixmap_new( pixmap_pause_inactive, pause_mask );
   gtk_box_pack_end( GTK_BOX( status_bar ), pause_status, FALSE, FALSE, 0 );
 
-  mouse_status = gtk_pixmap_new( pixmap_pause_inactive, pause_mask );
+  mouse_status = gtk_pixmap_new( pixmap_mouse_inactive, mouse_mask );
   gtk_box_pack_end( GTK_BOX( status_bar ), mouse_status, FALSE, FALSE, 0 );
 
   separator = gtk_vseparator_new();
@@ -154,8 +163,8 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 
   case UI_STATUSBAR_ITEM_MOUSE:
     which = ( state == UI_STATUSBAR_STATE_ACTIVE ?
-	      pixmap_pause_active : pixmap_pause_inactive );
-    gtk_pixmap_set( GTK_PIXMAP( mouse_status ), which, pause_mask  );
+	      pixmap_mouse_active : pixmap_mouse_inactive );
+    gtk_pixmap_set( GTK_PIXMAP( mouse_status ), which, mouse_mask  );
     return 0;
 
   case UI_STATUSBAR_ITEM_PAUSED:

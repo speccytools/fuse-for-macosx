@@ -166,6 +166,8 @@ extern char *gtkpixmap_disk_active[];
 extern char *gtkpixmap_pause_inactive[];
 extern char *gtkpixmap_pause_active[];
 extern char *gtkpixmap_tape_marker[];
+extern char *gtkpixmap_mouse_inactive[];
+extern char *gtkpixmap_mouse_active[];
 
 /*
  * Statusbar routines (statusbar.c)
