@@ -725,3 +725,5 @@
 	 ui/gtk/debugger.c,z80/z80_ops.c: add the beginnings of code to
 	 allow breakpoints to be set on pages other than RAM (eg ROM,
 	 DOCK, EXROM).
+20040409 ui/gtk/debugger.c: add indications of whether a chunk is writable
+	 and/or contended to the memory map pane.

@@ -106,7 +106,7 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *register_display,			/* The register display */
   *registers[18],			/* Individual registers */
   *memorymap,				/* The memory map display */
-  *page_label[8],			/* Individual page mappings */
+  *map_label[8][4],			/* Labels in the memory map */
   *breakpoints,				/* The breakpoint display */
   *disassembly_box,			/* A box to hold the disassembly */
   *disassembly,				/* The actual disassembly widget */
@@ -142,6 +142,18 @@ static GtkItemFactoryEntry menu_data[] = {
 
 static guint menu_data_count =
   sizeof( menu_data ) / sizeof( GtkItemFactoryEntry );
+
+static const char*
+format_8_bit( void )
+{
+  return debugger_output_base == 10 ? "%3d" : "0x%02X";
+}
+
+static const char*
+format_16_bit( void )
+{
+  return debugger_output_base == 10 ? "%5d" : "0x%04X";
+}
 
 int
 ui_debugger_activate( void )
@@ -379,27 +391,21 @@ create_register_display( GtkBox *parent, gtkui_font font )
 static int
 create_memory_map( GtkBox *parent )
 {
-  GtkWidget *table, *label;
-  size_t i;
-  char buffer[ 40 ];
+  GtkWidget *table;
+  size_t i, j;
 
   memorymap = gtk_frame_new( "Memory Map" );
   gtk_box_pack_start( parent, memorymap, FALSE, FALSE, 0 );
 
-  table = gtk_table_new( 8, 2, FALSE );
+  table = gtk_table_new( 8, 4, FALSE );
   gtk_container_add( GTK_CONTAINER( memorymap ), table );
 
   for( i = 0; i < 8; i++ ) {
-
-    snprintf( buffer, 40, "0x%04X", (unsigned)i * 0x2000 );
-    label = gtk_label_new( buffer );
-    gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 7 - i, 8 - i,
-		      0, 0, 2, 2 );
-
-    page_label[i] = gtk_label_new( "" );
-    gtk_table_attach( GTK_TABLE( table ), page_label[i], 1, 2, 7 - i, 8 - i,
-		      0, 0, 2, 2 );
-
+    for( j = 0; j < 4; j++ ) {
+      map_label[i][j] = gtk_label_new( "" );
+      gtk_table_attach( GTK_TABLE( table ), map_label[i][j],
+			j, j + 1, 7 - i, 8 - i, 0, 0, 2, 2 );
+    }
   }
 
   return 0;
@@ -629,7 +635,6 @@ ui_debugger_update( void )
 			        &buffer[120], &buffer[160], &buffer[200] },
     *disassembly_text[2] = { &buffer[0], &buffer[40] };
   libspectrum_word address;
-  const char *format_16_bit, *format_8_bit;
   GSList *ptr;
   int capabilities; size_t length;
   int error;
@@ -649,22 +654,16 @@ ui_debugger_update( void )
 
   if( !dialog_created ) return 0;
 
-  if( debugger_output_base == 10 ) {
-    format_16_bit = "%5d"; format_8_bit = "%3d";
-  } else {
-    format_16_bit = "0x%04X"; format_8_bit = "0x%02X";
-  }
-
   for( i = 0; i < 12; i++ ) {
     snprintf( buffer, 5, "%3s ", register_name[i] );
-    snprintf( &buffer[4], 76, format_16_bit, *value_ptr[i] );
+    snprintf( &buffer[4], 76, format_16_bit(), *value_ptr[i] );
     gtk_label_set_text( GTK_LABEL( registers[i] ), buffer );
   }
 
-  strcpy( buffer, "  I   " ); snprintf( &buffer[6], 76, format_8_bit, I );
+  strcpy( buffer, "  I   " ); snprintf( &buffer[6], 76, format_8_bit(), I );
   gtk_label_set_text( GTK_LABEL( registers[12] ), buffer );
   strcpy( buffer, "  R   " );
-  snprintf( &buffer[6], 80, format_8_bit, ( R & 0x7f ) | ( R7 & 0x80 ) );
+  snprintf( &buffer[6], 80, format_8_bit(), ( R & 0x7f ) | ( R7 & 0x80 ) );
   gtk_label_set_text( GTK_LABEL( registers[13] ), buffer );
 
   snprintf( buffer, 80, "T-states %5d", tstates );
@@ -679,39 +678,39 @@ ui_debugger_update( void )
 
   capabilities = libspectrum_machine_capabilities( machine_current->machine );
 
-  sprintf( format_string, "   ULA %s", format_8_bit );
+  sprintf( format_string, "   ULA %s", format_8_bit() );
   snprintf( buffer, 1024, format_string, spectrum_last_ula );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
-    sprintf( format_string, "\n    AY %s", format_8_bit );
+    sprintf( format_string, "\n    AY %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string,
 	      machine_current->ay.current_register );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) {
-    sprintf( format_string, "\n128Mem %s", format_8_bit );
+    sprintf( format_string, "\n128Mem %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string,
 	      machine_current->ram.last_byte );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) {
-    sprintf( format_string, "\n+3 Mem %s", format_8_bit );
+    sprintf( format_string, "\n+3 Mem %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string,
 	      machine_current->ram.last_byte2 );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) {
-    sprintf( format_string, "\nTmxDec %s", format_8_bit );
+    sprintf( format_string, "\nTmxDec %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string,
 	      scld_last_dec.byte );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO ) {
-    sprintf( format_string, "\nTmxHsr %s", format_8_bit );
+    sprintf( format_string, "\nTmxHsr %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string, scld_last_hsr );
   }
@@ -739,10 +738,10 @@ ui_debugger_update( void )
     case DEBUGGER_BREAKPOINT_TYPE_READ:
     case DEBUGGER_BREAKPOINT_TYPE_WRITE:
       if( bp->value.address.page == -1 ) {
-	snprintf( breakpoint_text[2], 40, format_16_bit,
+	snprintf( breakpoint_text[2], 40, format_16_bit(),
 		  bp->value.address.offset );
       } else {
-	sprintf( format_string, "%%d:%s", format_16_bit );
+	sprintf( format_string, "%%d:%s", format_16_bit() );
 	snprintf( breakpoint_text[2], 40, format_string,
 		  bp->value.address.page, bp->value.address.offset );
       }
@@ -750,7 +749,7 @@ ui_debugger_update( void )
 
     case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
     case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
-      sprintf( format_string, "%s:%s", format_16_bit, format_16_bit );
+      sprintf( format_string, "%s:%s", format_16_bit(), format_16_bit() );
       snprintf( breakpoint_text[2], 40, format_string,
 		bp->value.port.mask, bp->value.port.port );
       break;
@@ -787,8 +786,8 @@ ui_debugger_update( void )
     libspectrum_word contents = readbyte_internal( address ) +
 				0x100 * readbyte_internal( address + 1 );
 
-    snprintf( disassembly_text[0], 40, format_16_bit, address );
-    snprintf( disassembly_text[1], 40, format_16_bit, contents );
+    snprintf( disassembly_text[0], 40, format_16_bit(), address );
+    snprintf( disassembly_text[1], 40, format_16_bit(), contents );
     gtk_clist_append( GTK_CLIST( stack ), disassembly_text );
   }
 
@@ -809,6 +808,9 @@ update_memory_map( void )
 
   for( i = 0; i < 8; i++ ) {
 
+    snprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
+    gtk_label_set_text( GTK_LABEL( map_label[i][0] ), buffer );
+
     reverse = memory_map[i].reverse;
 
     if( reverse == -1 ) {
@@ -823,7 +825,13 @@ update_memory_map( void )
       snprintf( buffer, 40, "RAM %d", reverse );
     }
 
-    gtk_label_set_text( GTK_LABEL( page_label[i] ), buffer );
+    gtk_label_set_text( GTK_LABEL( map_label[i][1] ), buffer );
+
+    gtk_label_set_text( GTK_LABEL( map_label[i][2] ),
+			memory_map[i].writable ? "Y" : "N" );
+
+    gtk_label_set_text( GTK_LABEL( map_label[i][3] ),
+			memory_map[i].contended ? "Y" : "N" );
   }
 
   return 0;
@@ -836,15 +844,12 @@ update_disassembly( void )
   char buffer[80];
   char *disassembly_text[2] = { &buffer[0], &buffer[40] };
 
-  const char *format_16_bit =
-    ( debugger_output_base == 10 ? "%5d" : "0x%04X" );
-
   gtk_clist_freeze( GTK_CLIST( disassembly ) );
   gtk_clist_clear( GTK_CLIST( disassembly ) );
 
   for( i = 0, address = disassembly_top; i < 20; i++ ) {
 
-    snprintf( disassembly_text[0], 40, format_16_bit, address );
+    snprintf( disassembly_text[0], 40, format_16_bit(), address );
     debugger_disassemble( disassembly_text[1], 40, &length, address );
     address += length;
 
