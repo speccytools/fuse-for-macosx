@@ -460,5 +460,6 @@ widget_t widget_data[] = {
   { widget_sound_draw,	  widget_options_finish, widget_sound_keyhandler    },
   { widget_error_draw,	  NULL,			 widget_error_keyhandler    },
   { widget_rzx_draw,      widget_options_finish, widget_rzx_keyhandler      },
+  { widget_browse_draw,   widget_browse_finish,  widget_browse_keyhandler   },
 
 };

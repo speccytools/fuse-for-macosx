@@ -152,12 +152,15 @@ static widget_menu_entry widget_menu_machine[] = {
 
 /* Tape menu */
 
+static widget_menu_widget_t tape_browse = { WIDGET_TYPE_BROWSE, NULL };
+
 static widget_menu_entry widget_menu_tape[] = {
   { "Tape", 0, 0, NULL },		/* Menu title */
 
   { "(O)pen tape...",           KEYBOARD_o, widget_apply_to_file,    
                                             tape_open                     },
   { "(P)lay tape",              KEYBOARD_p, widget_menu_play_tape,   NULL },
+  { "(B)rowse tape...",		KEYBOARD_b, widget_menu_widget, &tape_browse },
   { "(R)ewind tape",            KEYBOARD_r, widget_menu_rewind_tape, NULL },
   { "(C)lear tape",             KEYBOARD_c, widget_menu_clear_tape,  NULL },
   { "Write tape to 'tape.tzx'", KEYBOARD_w, widget_menu_write_tape,  NULL },

@@ -40,7 +40,6 @@
 struct browse_data {
 
   GtkWidget *dialog;
-  GtkWidget *clist;
   gint row;		/* The selected row; -1 => none */
 
 };
@@ -105,7 +104,6 @@ gtk_tape_browse( GtkWidget *widget, gpointer data )
   
   /* Add the necessary callbacks */
   callback_data.dialog = dialog;
-  callback_data.clist = clist;
   callback_data.row = -1;
 
   gtk_signal_connect( GTK_OBJECT( clist ), "select_row",

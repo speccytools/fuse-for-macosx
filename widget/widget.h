@@ -63,6 +63,7 @@ typedef enum widget_type {
   WIDGET_TYPE_SOUND,		/* Sound options */
   WIDGET_TYPE_ERROR,		/* Error report */
   WIDGET_TYPE_RZX,		/* RZX options */
+  WIDGET_TYPE_BROWSE,		/* Browse tape */
 
 } widget_type;
 
@@ -232,6 +233,12 @@ extern widget_menu_entry widget_menu_main[];
 int widget_select_draw( void* data );
 void widget_select_keyhandler( keyboard_key_name key );
 int widget_select_finish( widget_finish_state finished );
+
+/* The tape browser widget */
+
+int widget_browse_draw( void* data );
+void widget_browse_keyhandler( keyboard_key_name key );
+int widget_browse_finish( widget_finish_state finished );
 
 /* General functions used by options dialogs */
 extern settings_info widget_options_settings;
