@@ -68,7 +68,7 @@ int tape_init( void )
   tape.blocks = NULL;
   tape_playing = 0;
   tape_microphone = 0;
-  sound_beeper( 1, tape_microphone );
+  if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
   return 0;
 }
 
@@ -409,7 +409,7 @@ int tape_play( void )
   /* Otherwise, start the tape going */
   tape_playing = 1;
   tape_microphone = 0;
-  sound_beeper( 1, tape_microphone );
+  if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
 
   error = tape_next_edge( tstates ); if( error ) return error;
 
@@ -449,7 +449,7 @@ int tape_next_edge( DWORD last_tstates )
   /* Invert the microphone state */
   if( edge_tstates || ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ) {
     tape_microphone = !tape_microphone;
-    sound_beeper( 1, tape_microphone );
+    if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
   }
 
   /* If we've been requested to stop the tape, do so and then

@@ -30,7 +30,7 @@ INCLUDES = @GTK_CFLAGS@
 
 libuigtk_a_SOURCES = gtkdisplay.c gtkkeyboard.c gtkui.c options.c
 
-BUILT_SOURCES = options.c
+BUILT_SOURCES = options.c options.h
 
 options.c: options.pl options.dat
 	@PERL@ options.pl options.dat > options.c

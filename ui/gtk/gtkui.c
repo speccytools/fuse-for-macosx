@@ -46,6 +46,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "timer.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "widget/widget.h"
@@ -104,6 +105,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
   { "/Options",		        NULL , NULL,                0, "<Branch>"    },
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
+  { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
   { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
@@ -599,6 +601,21 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data )
   gtk_widget_destroy( ptr->selector );
 
   gtk_main_quit();
+}
+
+/* Callback used by the Options/Sound dialog */
+void gtkui_sound_posthook( gtkoptions_sound_t *ptr )
+{
+  /* If we've changed the sound status, set fuse_sound_in_use to reflect
+     this and start or stop the SIGALARM timer as appropriate. */
+  if( fuse_sound_in_use != settings_current.sound ) {
+    fuse_sound_in_use = settings_current.sound;
+    if( !fuse_sound_in_use ) {
+      timer_init();
+    } else {
+      timer_end();
+    }
+  }
 }
 
 #endif			/* #ifdef UI_GTK */

@@ -66,9 +66,12 @@ int settings_defaults( settings_info *settings )
   settings->issue2 = 0;
   settings->joy_kempston = 0;
   settings->tape_traps = 1;
-  settings->stereo_ay = 0;
   settings->slt_traps = 1;
+
   settings->sound_device = NULL;
+  settings->sound = 1;
+  settings->sound_load = 1;
+  settings->stereo_ay = 0;
 
   settings->snapshot = NULL;
   settings->tape_file = NULL;

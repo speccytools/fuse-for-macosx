@@ -117,10 +117,10 @@ static int fuse_init(int argc, char **argv)
   if( printer_init() ) return 1;
   if( rzx_init() ) return 1;
 
-  fuse_sound_in_use = 0;
+  settings_current.sound = fuse_sound_in_use = 0;
   sound_init( settings_current.sound_device );
   if(sound_enabled) {
-    fuse_sound_in_use = 1;
+    settings_current.sound = fuse_sound_in_use = 1;
   } else {
     if(timer_init()) return 1;
   }
@@ -209,7 +209,7 @@ int fuse_emulation_unpause(void)
        signal based routines */
     if( !sound_enabled ) {
       fprintf( stderr, "%s: Couldn't reinitialise sound\n", fuse_progname );
-      fuse_sound_in_use = 0;
+      settings_current.sound = fuse_sound_in_use = 0;
       /* FIXME: How to deal with error return here? */
       timer_init();
     }

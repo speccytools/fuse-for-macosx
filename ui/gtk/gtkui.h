@@ -31,10 +31,15 @@
 #include <gtk/gtk.h>
 #endif
 
+#ifndef FUSE_GTKOPTIONS_H
+#include "options.h"
+#endif
+
 extern GtkWidget* gtkui_window;
 extern GtkWidget* gtkui_drawing_area;
 
 void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
+void gtkui_sound_posthook( gtkoptions_sound_t *ptr );
 
 extern void gtkui_popup_menu(void);
 

@@ -4,3 +4,10 @@ Checkbox, Issue 2 Keyboard, issue2
 Checkbox, Kempston joystick, joy_kempston
 Checkbox, Use tape traps, tape_traps
 Checkbox, Use .slt traps, slt_traps
+
+sound
+Fuse - Sound Options
+Checkbox, Sound enabled, sound
+Checkbox, Loading sound, sound_load
+Checkbox, AY stereo separation, stereo_ay
+Posthook, gtkui_sound_posthook

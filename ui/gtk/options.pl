@@ -57,20 +57,6 @@ while(<>) {
 
 static void gtkoptions_${type}_done( GtkWidget *widget, gpointer user_data );
 
-typedef struct gtkoptions_${type}_t {
-
-  GtkWidget *dialog;
-
-CODE
-
-    foreach( @widgets ) {
-	print "  GtkWidget *$_->{value};\n";
-    }
-
-    print << "CODE";
-
-} gtkoptions_${type}_t;
-
 void gtkoptions_${type}( GtkWidget *widget, gpointer data )
 {
   gtkoptions_${type}_t dialog;
@@ -102,6 +88,8 @@ CODE
 
 CODE
 
+	    } elsif( $type eq "Posthook" ) {
+		next;			# Do nothing
 	    } else {
 		warn "Unknown type `$type'\n";
 	    }
@@ -162,6 +150,8 @@ CODE
 
 CODE
 
+        } elsif( $widget->{type} eq "Posthook" ) {
+	    print "  $widget->{text}( ptr );\n\n";
         } else {
 	    warn "Unknown type `$widget->{type}'";
 	}
