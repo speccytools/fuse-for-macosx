@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef UI_GTK
+
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -101,3 +103,5 @@ set_confirmed( GtkButton *button, gpointer user_data )
 
   gtkui_destroy_widget_and_quit( data->dialog, NULL );
 }
+
+#endif				/* #ifdef UI_GTK */

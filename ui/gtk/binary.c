@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
+
 #include <stdio.h>
 
 #include <gtk/gtk.h>
@@ -36,8 +38,6 @@
 #include "types.h"
 #include "ui/ui.h"
 #include "utils.h"
-
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 struct binary_info {
 
