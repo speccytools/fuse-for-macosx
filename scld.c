@@ -36,7 +36,7 @@ scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
 BYTE scld_last_hsr   = 0;           /* The last byte sent to Timex HSR port */
 
-BYTE timex_fake_bank[8192];
+BYTE timex_fake_bank[0x2000];
 
 timex_mem timex_exrom_dock[8];
 timex_mem timex_exrom[8];

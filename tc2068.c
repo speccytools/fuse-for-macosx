@@ -42,14 +42,14 @@
 #include "machine.h"
 #include "printer.h"
 #include "settings.h"
-#include "scld.h"
 #include "spectrum.h"
 #include "tc2068.h"
+
+#define ADDR_TO_CHUNK(addr) 2 + (addr >> 13)
 
 static DWORD tc2068_contend_delay( void );
 
 spectrum_port_info tc2068_peripherals[] = {
-
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
   /* TS2040/Alphacom printer */
@@ -104,19 +104,18 @@ static
 BYTE tc2068_unattached_port( void )
 {
   /* TC2068 does not have floating ULA values on any port (despite
-     rumours to the contrary), it returns 255 on unattached ports */
-  return 255;
+     rumours to the contrary), it returns 0xff on unattached ports */
+  return 0xff;
 }
 
 BYTE
-tc2068_read_screen_memory(WORD offset)
+tc2068_read_screen_memory( WORD offset )
 {
   /* The SCLD always reads the real screen memory regardless of paging
      activity */
   WORD off = offset & 0x1fff;
-  int chunk = 2 + (offset >> 13);
 
-  return timex_home[chunk].page[off];
+  return timex_home[ADDR_TO_CHUNK(offset)].page[off];
 }
 
 DWORD
@@ -131,7 +130,7 @@ tc2068_contend_memory( WORD address )
 DWORD
 tc2068_contend_port( WORD port )
 {
-  /* Contention occurs for ports F4, FE and FF (HSR, ULA and DCE) */
+  /* Contention occurs for ports F4, FE and FF (HSR, ULA and DEC) */
   /* It's a guess that contention occurs for ports F5 and F6, too */
   if( ( port & 0xff ) == 0xf4 ||
       ( port & 0xff ) == 0xf5 ||
@@ -233,7 +232,7 @@ tc2068_dock_exrom_reset( void )
   scld_dock_free();
   scld_exrom_free();
 
-  memset(timex_fake_bank, 255, sizeof(timex_fake_bank));
+  memset( timex_fake_bank, 0xff, 0x2000);
 
   timex_home[0].page = ROM[0];
   timex_home[1].page = ROM[0] + 0x2000;

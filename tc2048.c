@@ -59,8 +59,8 @@ spectrum_port_info tc2048_peripherals[] = {
 static BYTE tc2048_unattached_port( void )
 {
   /* TC2048 does not have floating ULA values on any port (despite rumours to */
-  /* the contrary), it returns 255 on unattached ports */
-  return 255;
+  /* the contrary), it returns 0xff on unattached ports */
+  return 0xff;
 }
 BYTE tc2048_read_screen_memory(WORD offset)
 {
@@ -78,7 +78,7 @@ DWORD tc2048_contend_memory( WORD address )
 DWORD tc2048_contend_port( WORD port )
 {
   /* Contention occurs for ports FE and F4 (SCLD and HSR) */
-  /* Contention occurs for port FF (SCLD DCE) */
+  /* Contention occurs for port FF (SCLD DEC) */
   if( ( port & 0xff ) == 0xf4 ||
       ( port & 0xff ) == 0xfe ||
       ( port & 0xff ) == 0xff    ) return tc2048_contend_delay();
