@@ -265,6 +265,8 @@ widget_menu_nmi( void *data GCC_UNUSED )
 {
   int error;
 
+  widget_end_all( WIDGET_FINISHED_OK );
+
   error = event_add( 0, EVENT_TYPE_NMI );
   if( error ) return error;
 
