@@ -6,6 +6,8 @@
    	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
+   Modifications (c) 2003 Philip Kendall
+
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -21,6 +23,7 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+
 /* This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.
    Ditto for AIX 3.2 and <stdlib.h>.  */
 #ifndef _NO_PROTO
@@ -30,6 +33,8 @@
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
+
+#ifndef HAVE_GETOPT_LONG
 
 #if !defined __STDC__ || !__STDC__
 /* This is a separate conditional since some stdc systems
@@ -1275,3 +1280,5 @@ main (argc, argv)
 }
 
 #endif /* TEST */
+
+#endif				/* #ifndef HAVE_GETOPT_LONG */

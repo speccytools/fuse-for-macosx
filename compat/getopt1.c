@@ -3,6 +3,8 @@
      Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
+   Modifications copyright (c) 2003 Philip Kendall
+
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -21,6 +23,8 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+
+#ifndef HAVE_GETOPT_LONG
 
 #ifdef _LIBC
 # include <getopt.h>
@@ -194,3 +198,5 @@ main (argc, argv)
 }
 
 #endif /* TEST */
+
+#endif				/* #ifndef HAVE_GETOPT_LONG */
