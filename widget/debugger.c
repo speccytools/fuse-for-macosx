@@ -26,11 +26,15 @@
 
 #include <config.h>
 
+#include <stdio.h>
+
 #include "debugger/debugger.h"
 #include "display.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "widget_internals.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
 int
 ui_debugger_activate( void )
@@ -41,10 +45,34 @@ ui_debugger_activate( void )
 int
 widget_debugger_draw( void *data GCC_UNUSED )
 {
+  const char *register_names[] = { "PC", "SP",
+				   "AF", "AF'",
+				   "BC", "BC'",
+				   "DE", "DE'",
+				   "HL", "HL'",
+                                 };
+  WORD *register_values[] = { &PC, &SP,
+			      &AF, &AF_,
+			      &BC, &BC_,
+			      &DE, &DE_,
+			      &HL, &HL_,
+                            };
+
+  size_t i; char buffer[40];
+
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, 11 );
 
   widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Debugger" );
+
+  for( i = 0; i < 10; i++ ) {
+    snprintf( buffer, 9, "%-3s %04x", register_names[i], *register_values[i] );
+    widget_printstring( 3 + 10*(i%2), 4 + i/2, WIDGET_COLOUR_FOREGROUND,
+			buffer );
+  }
+
+  widget_printstring( 3, 10, WIDGET_COLOUR_FOREGROUND, "(S)tep" );
+  widget_printstring( 3, 11, WIDGET_COLOUR_FOREGROUND, "(C)ontinue" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 16 + 11*8 );
@@ -67,12 +95,17 @@ widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
       debugger_run();
       widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     }
-    return;
+    break;
 
-  case KEYBOARD_Enter:
+  case KEYBOARD_c:
     debugger_run();
     widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
-    return;
+    break;
+
+  case KEYBOARD_s:
+    debugger_mode = DEBUGGER_MODE_STEP;
+    widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
+    break;
 
   default:	/* Keep gcc happy */
     break;
