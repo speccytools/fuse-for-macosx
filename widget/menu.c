@@ -290,7 +290,7 @@ menu_options_joysticks_select( int action )
   error = widget_do( WIDGET_TYPE_SELECT, &info );
   if( error ) return;
 
-  *setting = info.result;
+  if( info.result != -1 ) *setting = info.result;
 }
 
 /* Options/Select ROMs/<type> */

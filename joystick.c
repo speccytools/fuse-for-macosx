@@ -159,8 +159,8 @@ joystick_press( int which, joystick_button button, int press )
   case JOYSTICK_TYPE_NONE: return 0;
   }
 
-  ui_error( UI_ERROR_ERROR, "Unknown joystick type %d",
-	    settings_current.joystick_1_output );
+  ui_error( UI_ERROR_ERROR, "%s:joystick_press:unknown joystick type %d",
+	    __FILE__, type );
   fuse_abort();
 }
 

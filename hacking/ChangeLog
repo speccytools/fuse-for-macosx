@@ -937,3 +937,5 @@
 20040617 man/fuse.1: man page update. More updates welcome :-)
 20040618 AUTHORS,ChangeLog,README,THANKS: doc updates working towards a
 	 0.7.0 release.
+20040618 joystick.c,widget/menu.c: don't set joystick type to an invalid
+	 value if the widget joystick selector cancelled.
