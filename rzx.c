@@ -455,7 +455,5 @@ int rzx_end( void )
   if( rzx_recording ) return rzx_stop_recording();
   if( rzx_playback  ) return rzx_stop_playback( 0 );
 
-  libspectrum_rzx_free( rzx );
-
   return 0;
 }
