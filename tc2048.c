@@ -67,18 +67,12 @@ static BYTE tc2048_unattached_port( void )
 
 BYTE tc2048_readbyte(WORD address)
 {
-  WORD bank;
-
-  if(address<0x4000) return ROM[0][address];
-  bank=address/0x4000; address-=(bank*0x4000);
-  switch(bank) {
-    case 1: return RAM[5][address]; break;
-    case 2: return RAM[2][address]; break;
-    case 3: return RAM[0][address]; break;
-    default:
-      ui_error( UI_ERROR_ERROR, "access to impossible bank %d at %s:%d\n",
-		bank, __FILE__, __LINE__ );
-      fuse_abort();
+  WORD offset = address & 0x3fff;
+  switch( address >> 14 ) {
+  case 0: return ROM[0][offset]; break;
+  case 1: return RAM[5][offset]; break;
+  case 2: return RAM[2][offset]; break;
+  case 3: return RAM[0][offset]; break;
   }
   return 0; /* Keep gcc happy */
 }
@@ -90,18 +84,15 @@ BYTE tc2048_read_screen_memory(WORD offset)
 
 void tc2048_writebyte(WORD address, BYTE b)
 {
-  if(address>=0x4000) {		/* 0x4000 = 1st byte of RAM */
-    WORD bank=address/0x4000,offset=address-(bank*0x4000);
-    switch(bank) {
-    case 1: RAM[5][offset]=b; break;
-    case 2: RAM[2][offset]=b; break;
-    case 3: RAM[0][offset]=b; break;
-    default:
-      ui_error( UI_ERROR_ERROR, "access to impossible bank %d at %s:%d\n",
-		bank, __FILE__, __LINE__ );
-      fuse_abort();
-    }
-    display_dirty( address );	/* Replot necessary pixels */
+  WORD offset = address & 0x3fff;
+
+  switch( address >> 14 ) {
+  case 0: break;
+  case 1: 
+    if( RAM[5][offset] != b ) { display_dirty( address ); RAM[5][offset] = b; }
+    break;
+  case 2: RAM[2][offset]=b; break;
+  case 3: RAM[0][offset]=b; break;
   }
 }
 
