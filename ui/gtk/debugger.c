@@ -37,6 +37,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "event.h"
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "machine.h"
@@ -61,6 +62,7 @@ typedef enum debugger_pane {
   DEBUGGER_PANE_BREAKPOINTS,
   DEBUGGER_PANE_DISASSEMBLY,
   DEBUGGER_PANE_STACK,
+  DEBUGGER_PANE_EVENTS,
 
   DEBUGGER_PANE_END		/* End marker */
 
@@ -77,12 +79,15 @@ static int create_register_display( GtkBox *parent, font_spec font );
 static int create_breakpoints( GtkBox *parent );
 static int create_disassembly( GtkBox *parent, font_spec font );
 static int create_stack_display( GtkBox *parent, font_spec font );
+static int create_events( GtkBox *parent );
 static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
 static void set_font( GtkWidget *widget, font_spec font );
 
 static int activate_debugger( void );
 static int update_disassembly( void );
+static int update_events( void );
+static void add_event( gpointer data, gpointer user_data );
 static int deactivate_debugger( void );
 
 static void move_disassembly( GtkAdjustment *adjustment, gpointer user_data );
@@ -103,7 +108,8 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *breakpoints,				/* The breakpoint display */
   *disassembly_box,			/* A box to hold the disassembly */
   *disassembly,				/* The actual disassembly widget */
-  *stack;				/* The stack display */
+  *stack,				/* The stack display */
+  *events;				/* The events display */
 
 static GtkObject *disassembly_scrollbar_adjustment;
 
@@ -127,6 +133,7 @@ static GtkItemFactoryEntry menu_data[] = {
   { "/View/_Breakpoints", NULL, toggle_display, DEBUGGER_PANE_BREAKPOINTS, "<ToggleItem>" },
   { "/View/_Disassembly", NULL, toggle_display, DEBUGGER_PANE_DISASSEMBLY, "<ToggleItem>" },
   { "/View/_Stack", NULL, toggle_display, DEBUGGER_PANE_STACK, "<ToggleItem>" },
+  { "/View/_Events", NULL, toggle_display, DEBUGGER_PANE_EVENTS, "<ToggleItem>" },
 
 };
 
@@ -186,6 +193,7 @@ get_pane_menu_item( debugger_pane pane )
   case DEBUGGER_PANE_BREAKPOINTS: path = "/View/Breakpoints"; break;
   case DEBUGGER_PANE_DISASSEMBLY: path = "/View/Disassembly"; break;
   case DEBUGGER_PANE_STACK: path = "/View/Stack"; break;
+  case DEBUGGER_PANE_EVENTS: path = "/View/Events"; break;
 
   case DEBUGGER_PANE_END: break;
   }
@@ -213,6 +221,7 @@ get_pane( debugger_pane pane )
   case DEBUGGER_PANE_BREAKPOINTS: return breakpoints;
   case DEBUGGER_PANE_DISASSEMBLY: return disassembly_box;
   case DEBUGGER_PANE_STACK: return stack;
+  case DEBUGGER_PANE_EVENTS: return events;
 
   case DEBUGGER_PANE_END: break;
   }
@@ -299,6 +308,8 @@ create_dialog( void )
 
   error = create_stack_display( GTK_BOX( hbox ), font );
   if( error ) return error;
+
+  error = create_events( GTK_BOX( hbox ) ); if( error ) return error;
 
   error = create_command_entry( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
 				accel_group );
@@ -439,6 +450,21 @@ create_stack_display( GtkBox *parent, font_spec font )
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
   gtk_box_pack_start( parent, stack, TRUE, TRUE, 5 );
+
+  return 0;
+}
+
+static int
+create_events( GtkBox *parent )
+{
+  size_t i;
+  gchar *titles[] = { "Time", "Type" };
+
+  events = gtk_clist_new_with_titles( 2, titles );
+  gtk_clist_column_titles_passive( GTK_CLIST( events ) );
+  for( i = 0; i < 2; i++ )
+    gtk_clist_set_column_auto_resize( GTK_CLIST( events ), i, TRUE );
+  gtk_box_pack_start( parent, events, TRUE, TRUE, 5 );
 
   return 0;
 }
@@ -672,6 +698,9 @@ ui_debugger_update( void )
 
   gtk_clist_thaw( GTK_CLIST( stack ) );
 
+  /* And the events display */
+  error = update_events(); if( error ) return error;
+
   return 0;
 }
 
@@ -699,6 +728,36 @@ update_disassembly( void )
   gtk_clist_thaw( GTK_CLIST( disassembly ) );
 
   return 0;
+}
+
+static int
+update_events( void )
+{
+  gtk_clist_freeze( GTK_CLIST( events ) );
+  gtk_clist_clear( GTK_CLIST( events ) );
+
+  event_foreach( add_event, NULL );
+
+  gtk_clist_thaw( GTK_CLIST( events ) );
+
+  return 0;
+}
+
+static void
+add_event( gpointer data, gpointer user_data )
+{
+  event_t *ptr = data;
+
+  char buffer[80];
+  char *event_text[2] = { &buffer[0], &buffer[40] };
+
+  /* Skip events which have been removed */
+  if( ptr->type == EVENT_TYPE_NULL ) return;
+
+  snprintf( event_text[0], 40, "%d", ptr->tstates );
+  strncpy( event_text[1], event_name( ptr->type ), 40 );
+
+  gtk_clist_append( GTK_CLIST( events ), event_text );
 }
 
 static int

@@ -27,6 +27,10 @@
 #ifndef FUSE_EVENT_H
 #define FUSE_EVENT_H
 
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#endif				/* #ifdef HAVE_LIB_GLIB */
+
 #include <libspectrum.h>
 
 /* Information about an event */
@@ -72,6 +76,13 @@ int event_remove_type( int type );
 
 /* Clear the event stack */
 int event_reset(void);
+
+/* Call a user-supplied function for every event in the current list */
+int event_foreach( void (*function)( gpointer data, gpointer user_data ),
+		   gpointer user_data );
+
+/* A textual representation of each event type */
+const char *event_name( int type );
 
 /* Called on exit to clean up */
 int event_end(void);

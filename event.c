@@ -29,10 +29,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef HAVE_LIB_GLIB
-#include <glib.h>
-#endif				/* #ifdef HAVE_LIB_GLIB */
-
 #include <libspectrum.h>
 
 #include "display.h"
@@ -247,6 +243,35 @@ static int event_force_events( void )
   tstates = machine_current->timings.tstates_per_frame;
 
   return 0;
+}
+
+/* Call a user-supplied function for every event in the current list */
+int
+event_foreach( void (*function)( gpointer data, gpointer user_data),
+	       gpointer user_data )
+{
+  g_slist_foreach( event_list, function, user_data );
+  return 0;
+}
+
+/* A textual representation of each event type */
+const char *
+event_name( int type )
+{
+  switch( type ) {
+
+  case EVENT_TYPE_EDGE: return "Tape edge";
+  case EVENT_TYPE_FRAME: return "End of frame";
+  case EVENT_TYPE_INTERRUPT: return "Retriggered interrupt";
+  case EVENT_TYPE_LINE: return "Display line";
+  case EVENT_TYPE_NMI: return "Non-maskable interrupt";
+  case EVENT_TYPE_NULL: return "[Deleted event]";
+  case EVENT_TYPE_TRDOS_CMD_DONE: return "End of TR-DOS command";
+  case EVENT_TYPE_TRDOS_INDEX: return "TR-DOS index";
+
+  default:
+    return "Unknown event";
+  }
 }
 
 /* Tidy-up function called at end of emulation */
