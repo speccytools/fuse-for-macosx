@@ -236,19 +236,19 @@ machine_select_machine( fuse_machine_info *machine )
 
   if( ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) ||
       ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )    ) {
-    ui_menu_activate_media_disk( 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
     ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
   } else {
-    ui_menu_activate_media_disk( 0 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 0 );
     ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
 			 UI_STATUSBAR_STATE_NOT_AVAILABLE );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
-    ui_menu_activate_media_cartridge( 1 );
-    ui_menu_activate_media_cartridge_eject( 0 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT, 0 );
   } else {
-    ui_menu_activate_media_cartridge( 0 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE, 0 );
   };
 
   return 0;

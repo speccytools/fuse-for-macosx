@@ -231,4 +231,6 @@
 	 status bar routines.
 20031005 machine.c, ui/ui.h, ui/gtk/statusbar.c: add a 'not available'
 	 state for the disk statusbar item.
-
+20031005 dck.c, machine.c, rzx.c, specplus3.c, trdos.c, ui/ui.h,
+	 ui/gtk/gtkui.c: better encapsulation of the menu activation
+	 routines.

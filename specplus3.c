@@ -296,10 +296,10 @@ int specplus3_reset(void)
 
 #ifdef HAVE_765_H
   /* We can eject disks only if they are currently present */
-  ui_menu_activate_media_disk_eject( SPECPLUS3_DRIVE_A,
-				     drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
-  ui_menu_activate_media_disk_eject( SPECPLUS3_DRIVE_B,
-				     drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
+		    drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
+		    drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
 #endif				/* #ifdef HAVE_765_H */
 
   return 0;
@@ -497,8 +497,12 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
   fdd_setfilename( drives[which].drive, filename );
 #endif				/* #ifdef HAVE_LIBDSK_H */
 
-  /* And set the `eject' item active */
-  ui_menu_activate_media_disk_eject( which, 1 );
+  /* And set the appropriate `eject' item active */
+  ui_menu_activate(
+    which == SPECPLUS3_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
+				 UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    1
+  );
 
   return 0;
 }
@@ -529,7 +533,12 @@ specplus3_disk_eject( specplus3_drive_number which )
   }
 
   /* Set the appropriate `eject' item inactive */
-  ui_menu_activate_media_disk_eject( which, 0 );
+  /* And set the appropriate `eject' item active */
+  ui_menu_activate(
+    which == SPECPLUS3_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
+				 UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    0
+  );
 
   return 0;
 }

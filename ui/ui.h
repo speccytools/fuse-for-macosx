@@ -75,13 +75,21 @@ libspectrum_error ui_libspectrum_error( libspectrum_error error,
 typedef int (*ui_scaler_available)( scaler_type scaler );
 scaler_type ui_get_scaler( ui_scaler_available available );
 
-/* Functions to (de)activate certain menu items */
-int ui_menu_activate_media_cartridge( int active );
-int ui_menu_activate_media_cartridge_eject( int active );
-int ui_menu_activate_media_disk( int active );
-int ui_menu_activate_media_disk_eject( int which, int active );
-int ui_menu_activate_recording( int recording );
-int ui_menu_activate_ay_logging( int recording );
+/* Routines to (de)activate certain menu items */
+
+typedef enum ui_menu_item {
+
+  UI_MENU_ITEM_MEDIA_CARTRIDGE,
+  UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK,
+  UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
+  UI_MENU_ITEM_RECORDING,
+  UI_MENU_ITEM_AY_LOGGING,
+
+} ui_menu_item;
+
+int ui_menu_activate( ui_menu_item item, int active );
 
 /* Functions to update the statusbar */
 

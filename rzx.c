@@ -154,7 +154,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   /* Note that we're recording */
   rzx_recording = 1;
 
-  ui_menu_activate_recording( 1 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
 
   if( settings_current.competition_mode ) {
 
@@ -178,7 +178,7 @@ int rzx_stop_recording( void )
   /* Stop recording data */
   rzx_recording = 0;
 
-  ui_menu_activate_recording( 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
 
   libspectrum_creator_set_competition_code(
     fuse_creator, settings_current.competition_code
@@ -305,7 +305,7 @@ start_playback( libspectrum_rzx *rzx, libspectrum_snap *snap )
   rzx_playback = 1;
   counter_reset();
 
-  ui_menu_activate_recording( 1 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
 
   return 0;
 }
@@ -316,7 +316,7 @@ int rzx_stop_playback( int add_interrupt )
 
   rzx_playback = 0;
 
-  ui_menu_activate_recording( 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
 
   /* We've now finished with the RZX file, so add an interrupt event
      back in if we've been requested to do so; we don't if we just run

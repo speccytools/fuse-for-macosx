@@ -342,10 +342,10 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
   gtkui_menu_popup = gtk_item_factory_get_widget( popup_factory, "<main>" );
 
   /* Start the recording menu off in the 'not playing' state */
-  ui_menu_activate_recording( 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
 
   /* Start the AY logging menu off in the 'not playing' state */
-  ui_menu_activate_ay_logging( 0 );
+  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
 
   return FALSE;
 }
@@ -516,7 +516,7 @@ gtkui_rzx_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   display_refresh_all();
 
-  ui_menu_activate_recording( 1 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
 
   fuse_emulation_unpause();
 }
@@ -540,7 +540,7 @@ gtkui_psg_start( GtkWidget *widget, gpointer data )
 
   display_refresh_all();
 
-  ui_menu_activate_ay_logging( 1 );
+  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 1 );
 
   fuse_emulation_unpause();
 }
@@ -552,7 +552,7 @@ gtkui_psg_stop( GtkWidget *widget, gpointer data )
   if ( !psg_recording ) return;
   psg_stop_recording();
 
-  ui_menu_activate_ay_logging( 0 );
+  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
 
   return;
 }
@@ -1159,6 +1159,8 @@ gtkui_fileselector_cancel( GtkButton *button GCC_UNUSED, gpointer user_data )
 
 /* Functions to activate and deactivate certain menu items */
 
+
+
 static int
 set_menu_item_active( const char *path, int active )
 {
@@ -1183,61 +1185,51 @@ set_menu_item_active( const char *path, int active )
   return 0;
 }
 
-int
-ui_menu_activate_media_cartridge( int active )
+int ui_menu_activate( ui_menu_item item, int active )
 {
-  return set_menu_item_active( "/Media/Cartridge", active );
-}
+  int error;
 
-int
-ui_menu_activate_media_cartridge_eject( int active )
-{
-  return set_menu_item_active( "/Media/Cartridge/Eject", active );
-}
+  switch( item ) {
 
-int
-ui_menu_activate_media_disk( int active )
-{
-  return set_menu_item_active( "/Media/Disk", active );
-}
+  case UI_MENU_ITEM_MEDIA_CARTRIDGE:
+    return set_menu_item_active( "/Media/Cartridge", active );
 
-int
-ui_menu_activate_media_disk_eject( int which, int active )
-{
-  if( which == 0 ) {
+  case UI_MENU_ITEM_MEDIA_CARTRIDGE_EJECT:
+    return set_menu_item_active( "/Media/Cartridge/Eject", active );
+
+  case UI_MENU_ITEM_MEDIA_DISK:
+    return set_menu_item_active( "/Media/Disk", active );
+
+  case UI_MENU_ITEM_MEDIA_DISK_A_EJECT:
     return set_menu_item_active( "/Media/Disk/Drive A:/Eject", active );
-  } else {
+
+  case UI_MENU_ITEM_MEDIA_DISK_B_EJECT:
     return set_menu_item_active( "/Media/Disk/Drive B:/Eject", active );
+
+  case UI_MENU_ITEM_RECORDING:
+    error = set_menu_item_active( "/File/Recording/Record...", !active );
+    if( error ) return error;
+
+    error = set_menu_item_active( "/File/Recording/Record from snapshot...",
+				  !active );
+    if( error ) return error;
+
+    error = set_menu_item_active( "/File/Recording/Play...", !active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/File/Recording/Stop", active );
+
+  case UI_MENU_ITEM_AY_LOGGING:
+    error = set_menu_item_active( "/File/AY Logging/Record...", !active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/File/AY Logging/Stop", active );
+
   }
-}
 
-int
-ui_menu_activate_recording( int active )
-{
-  int error;
-
-  error = set_menu_item_active( "/File/Recording/Record...", !active );
-  if( error ) return error;
-
-  error = set_menu_item_active( "/File/Recording/Record from snapshot...",
-				!active );
-  if( error ) return error;
-
-  error = set_menu_item_active( "/File/Recording/Play...", !active );
-  if( error ) return error;
-
-  return set_menu_item_active( "/File/Recording/Stop", active );
-}
-
-int
-ui_menu_activate_ay_logging( int active )
-{
-  int error;
-
-  error = set_menu_item_active( "/File/AY Logging/Record...", !active );
-  if( error ) return error;
-
-  return set_menu_item_active( "/File/AY Logging/Stop", active );
+  ui_error( UI_ERROR_ERROR, "Attempt to activate Unknown menu item %d",
+	    item );
+  return 1;
 }
 
 #endif			/* #ifdef UI_GTK */

@@ -188,10 +188,10 @@ trdos_reset( void )
   trdos_event_index( 0 );
 
   /* We can eject disks only if they are currently present */
-  ui_menu_activate_media_disk_eject( TRDOS_DRIVE_A,
-				     discs[ TRDOS_DRIVE_A ].disc_ready );
-  ui_menu_activate_media_disk_eject( TRDOS_DRIVE_B,
-				     discs[ TRDOS_DRIVE_B ].disc_ready );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
+		    discs[ TRDOS_DRIVE_A ].disc_ready );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
+		    discs[ TRDOS_DRIVE_B ].disc_ready );
 }
 
 void
@@ -495,7 +495,11 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
   if( error ) return error;
 
   /* Set the `eject' item active */
-  ui_menu_activate_media_disk_eject( which, 1 );
+  ui_menu_activate(
+    which == TRDOS_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
+			     UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    1
+  );
 
   return 0;
 }
@@ -512,7 +516,11 @@ trdos_disk_eject( trdos_drive_number which )
   discs[which].disc_ready = 0;
 
   /* Set the `eject' item inactive */
-  ui_menu_activate_media_disk_eject( which, 0 );
+  ui_menu_activate(
+    which == TRDOS_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
+			     UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    0
+  );
 
   return 0;
 }
