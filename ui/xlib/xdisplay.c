@@ -28,8 +28,6 @@
 
 #ifdef UI_X			/* Use this iff we're using Xlib */
 
-#define X_USE_SHM
-
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -43,11 +41,15 @@
 #include <siginfo.h>		/* Needed for psignal on Solaris */
 #endif				/* #ifdef HAVE_SIGINFO_H */
 
+#ifdef HAVE_X11_EXTENSIONS_XSHM_H
+#define X_USE_SHM
+#endif				/* #ifdef HAVE_X11_EXTENSIONS_XSHM_H */
+
 #ifdef X_USE_SHM
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
-#endif /* X_USE_SHM */
+#endif				/* #ifdef X_USE_SHM */
 
 #include "display.h"
 #include "fuse.h"
@@ -164,10 +166,6 @@ static int xdisplay_allocate_image(int width, int height)
 
 #ifdef X_USE_SHM
   shm_used = XShmQueryExtension( display );
-
-  /* Don't try to use SHM if the display isn't local */
-/*    if (shm_used && !ui_is_display_local ()) */
-/*      shm_used = 0; */
 
   if( shm_used ) {
     shm_eventtype = XShmGetEventBase( display ) + ShmCompletion;
@@ -321,17 +319,15 @@ void uidisplay_lines( int start, int end )
 
 void xdisplay_area(int x, int y, int width, int height)
 {
-#ifdef X_USE_SHM
   if( shm_used ) {
+#ifdef X_USE_SHM
     XShmPutImage( display, xui_mainWindow, gc, image,
 		  x, y, x, y, width, height, True );
     /* FIXME: should wait for an ShmCompletion event here */
+#endif				/* #ifdef X_USE_SHM */
   } else {
     XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
   }
-#else				/* #ifdef X_USE_SHM */
-  XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
-#endif				/* #ifdef X_USE_SHM */
 }
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)

@@ -134,6 +134,7 @@ if test -z "$ui"; then
   fi
 
   dnl Check for the MIT-SHM extension
+  AC_CHECK_HEADERS( X11/extensions/XShm.h )
   AC_CHECK_LIB( Xext, XShmAttach, LIBS="$LIBS -lXext" )
 
   AC_DEFINE(UI_X)
