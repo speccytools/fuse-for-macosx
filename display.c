@@ -626,3 +626,26 @@ void display_refresh_all(void)
     display_is_dirty[y] = display_all_dirty;	/* Marks all pixels as dirty */
   }
 }
+
+void
+display_refresh_border( void )
+{
+  int y;
+  int colour = scld_hires ? display_hires_border : display_lores_border;
+
+  /* Redraw the top and bottom borders */
+  for( y = 0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
+    uidisplay_set_border( y, 0, DISPLAY_SCREEN_WIDTH, colour );    
+    uidisplay_set_border( DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT + y, 0,
+                          DISPLAY_SCREEN_WIDTH, colour );
+  }
+
+  /* And the bits to the left and right of the main screen */
+  for( y = DISPLAY_BORDER_HEIGHT;
+       y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT;
+       y++ ) {
+    uidisplay_set_border( y, 0, DISPLAY_BORDER_WIDTH, colour );
+    uidisplay_set_border( y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
+                          DISPLAY_SCREEN_WIDTH, colour );
+  }
+}

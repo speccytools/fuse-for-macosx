@@ -149,7 +149,7 @@ static int gtkdisplay_allocate_colours( unsigned long *pixel_values )
   
 static int gtkdisplay_configure_notify( int width )
 {
-  int y,size,colour;
+  int size, colour;
 
   colour= scld_hires ? display_hires_border : display_lores_border;
   size = width / DISPLAY_ASPECT_WIDTH;
@@ -167,17 +167,7 @@ static int gtkdisplay_configure_notify( int width )
   display_refresh_all();
 
   /* And the entire border */
-  for(y=0;y<DISPLAY_BORDER_HEIGHT;y++) {
-    uidisplay_set_border(y,0,DISPLAY_SCREEN_WIDTH,colour);
-    uidisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y,0,
-			 DISPLAY_SCREEN_WIDTH,colour);
-  }
-
-  for(y=DISPLAY_BORDER_HEIGHT;y<DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT;y++) {
-    uidisplay_set_border(y,0,DISPLAY_BORDER_WIDTH,colour);
-    uidisplay_set_border(y,DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
-			 DISPLAY_SCREEN_WIDTH,colour);
-  }
+  display_refresh_border();
 
   /* Redraw widgets if they're active. Needed here as the keyboard help
      is implemented as a widget */

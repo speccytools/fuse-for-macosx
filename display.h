@@ -86,4 +86,6 @@ int display_dirty_border(void);
 int display_frame(void);
 void display_refresh_all(void);
 
+void display_refresh_border( void );
+
 #endif			/* #ifndef FUSE_DISPLAY_H */

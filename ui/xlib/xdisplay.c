@@ -311,17 +311,7 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
   display_refresh_all();
 
   /* And the entire border */
-  for(y=0;y<DISPLAY_BORDER_HEIGHT;y++) {
-    uidisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, colour);
-    uidisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y, 0,
-			 DISPLAY_SCREEN_WIDTH, colour);
-  }
-
-  for(y=DISPLAY_BORDER_HEIGHT;y<DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT;y++) {
-    uidisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, colour);
-    uidisplay_set_border(y, DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
-			 DISPLAY_SCREEN_WIDTH, colour);
-  }
+  display_refresh_border();
 
   /* If widgets are active, redraw the widget */
   if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
