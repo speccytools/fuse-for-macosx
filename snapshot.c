@@ -232,10 +232,9 @@ copy_ram_from( libspectrum_snap *snap )
 {
   size_t i;
 
-  for( i=0; i<8; i++ ) {
+  for( i = 0; i < 16; i++ )
     if( libspectrum_snap_pages( snap, i ) )
       memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
-  }
 
   return 0;
 }

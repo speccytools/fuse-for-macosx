@@ -894,3 +894,5 @@
 20040602 widget/{menu.c,widget.[ch]}: make Options/Peripherals work.
 20040603 snapshot.c: refactor snapshot_copy_to into multiple functions.
 20040603 snapshot.c: refactor snapshot_copy_from into multiple functions.
+20040604 snapshot.c: restore all RAM pages present in snap; Scorpion and
+	 SE snaps now more likely to work properly.
