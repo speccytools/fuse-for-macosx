@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall, Marek Januszewski
 
    $Id$
 
@@ -35,6 +35,8 @@
 #include "timer.h"
 
 volatile float timer_count;
+
+#ifndef WIN32
 
 #ifndef DEBUG_MODE
 /* Just places to store the old timer and signal handlers; restored
@@ -109,3 +111,74 @@ int timer_end(void)
   return 0;
 
 }
+
+#else				/* #ifndef WIN32 */
+
+/*
+ * Win32-specific timing routines below here
+ */
+
+#include <windows.h>
+
+#ifndef DEBUG_MODE
+
+static MMRESULT wTimerID;
+UINT wTimerRes;
+void CALLBACK timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1,
+			    DWORD dw2 );
+
+#define TARGET_RESOLUTION 1	/* 1-millisecond target resolution */
+
+#endif				/* #ifndef DEBUG_MODE */
+
+int
+timer_init( void )
+{
+#ifndef DEBUG_MODE
+
+  TIMECAPS tc;
+    
+  timer_count = 0.0;
+
+  if( timeGetDevCaps( &tc, sizeof( TIMECAPS ) ) != TIMERR_NOERROR ) return 1;
+    
+  wTimerRes = min( max( tc.wPeriodMin, TARGET_RESOLUTION ), tc.wPeriodMax );
+
+  timeBeginPeriod(wTimerRes);
+
+  wTimerID = timeSetEvent( 20, wTimerRes, timer_signal, (DWORD)NULL,
+			   TIME_PERIODIC );
+  if( !wTimerID ) return 1;
+
+#endif				/* #ifndef DEBUG_MODE */
+
+  return 0;
+}
+
+void
+timer_sleep( void )
+{
+#ifndef DEBUG_MODE
+  while( timer_count <= 0.0 ) Sleep(0);
+#endif				/* #ifndef DEBUG_MODE */
+}
+
+int
+timer_end( void )
+{
+#ifndef DEBUG_MODE
+  timeKillEvent(wTimerID);	/* cancel the event */
+  wTimerID = 0;
+#endif				/* #ifndef DEBUG_MODE */
+  return 0;
+}
+
+void CALLBACK
+timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 )
+{
+#ifndef DEBUG_MODE
+  if( !fuse_emulation_paused ) timer_count += 1.0;
+#endif				/* #ifndef DEBUG_MODE */
+}
+
+#endif   /* #ifndef WIN32 */
