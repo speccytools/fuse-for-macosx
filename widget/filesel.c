@@ -1,5 +1,6 @@
 /* filesel.c: File selection dialog box
-   Copyright (c) 2001-2003 Matan Ziv-Av, Philip Kendall, Russell Marks, Marek Januszewski
+   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall, Russell Marks,
+			   Marek Januszewski
 
    $Id$
 
@@ -42,7 +43,7 @@
 #endif				/* #ifdef WIN32 */
 
 #include "fuse.h"
-#include "keyboard.h"
+/*  #include "keyboard.h" */
 #include "widget_internals.h"
 
 struct widget_dirent **widget_filenames; /* Filenames in the current
@@ -361,65 +362,71 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 }
 
 void
-widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_filesel_keyhandler( input_key key )
 {
   char *fn, *ptr;
 
   new_current_file = current_file;
 
   switch(key) {
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_dialog_with_border( 1, 2, 30, 20 );
     widget_print_all_filenames( widget_filenames, widget_numfiles,
 				top_left_file, current_file        );
     break;
+#endif
     
-  case KEYBOARD_1:		/* 1 used as `Escape' generates `EDIT',
-				   which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
   
-  case KEYBOARD_5:		/* Left */
-  case KEYBOARD_h:
+  case INPUT_KEY_Left:
+  case INPUT_KEY_5:
+  case INPUT_KEY_h:
     if( current_file > 0                 ) new_current_file--;
     break;
 
-  case KEYBOARD_6:		/* Down */
-  case KEYBOARD_j:
+  case INPUT_KEY_Down:
+  case INPUT_KEY_6:
+  case INPUT_KEY_j:
     if( current_file < widget_numfiles-2 ) new_current_file += 2;
     break;
 
-  case KEYBOARD_7:		/* Up */
-  case KEYBOARD_k:
+  case INPUT_KEY_Up:
+  case INPUT_KEY_7:		/* Up */
+  case INPUT_KEY_k:
     if( current_file > 1                 ) new_current_file -= 2;
     break;
 
-  case KEYBOARD_8:		/* Right */
-  case KEYBOARD_l:
+  case INPUT_KEY_Right:
+  case INPUT_KEY_8:
+  case INPUT_KEY_l:
     if( current_file < widget_numfiles-1 ) new_current_file++;
     break;
 
-  case KEYBOARD_PageUp:
+  case INPUT_KEY_Page_Up:
     new_current_file = ( current_file > 36 ) ?
                        current_file - 36     :
                        0;
     break;
 
-  case KEYBOARD_PageDown:
+  case INPUT_KEY_Page_Down:
     new_current_file = current_file + 36;
     if( new_current_file >= widget_numfiles )
       new_current_file = widget_numfiles - 1;
     break;
 
-  case KEYBOARD_Home:
+  case INPUT_KEY_Home:
     new_current_file = 0;
     break;
 
-  case KEYBOARD_End:
+  case INPUT_KEY_End:
     new_current_file = widget_numfiles - 1;
     break;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     /* Get the new directory name */
     fn = widget_getcwd();
     if( fn == NULL ) {

@@ -629,3 +629,5 @@
 20040311 Makefile.am,input.[ch],keyboard.[ch],keysyms.{dat,pl},ui/ui.h,
 	 ui/gtk/gtkkeyboard.c: first changes to introduce a generalised
 	 input layer.
+20040311 input.[ch],keysyms.dat,ui/options.dat,ui/sdl/sdlkeyboard.c,widget/:
+	 widgets and SDL UI working with the new input layer code.

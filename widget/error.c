@@ -33,7 +33,6 @@
 #include <string.h>
 
 #include "fuse.h"
-#include "keyboard.h"
 #include "widget_internals.h"
 
 static int split_message( const char *message, char ***lines, size_t *count,
@@ -162,19 +161,21 @@ split_message( const char *message, char ***lines, size_t *count,
 }
 
 void
-widget_error_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_error_keyhandler( input_key key )
 {
   switch( key ) {
 
-  case KEYBOARD_Resize:	/* Fake keypress generated on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress generated on window resize */
     widget_error_draw( error_info );
     break;
+#endif
     
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 

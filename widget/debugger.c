@@ -1,5 +1,5 @@
 /* debugger.c: the debugger
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -87,27 +87,27 @@ widget_debugger_draw( void *data GCC_UNUSED )
 }
 
 void
-widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_debugger_keyhandler( input_key key )
 {
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_debugger_draw( NULL );
     break;
+#endif
 
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) {
-      debugger_run();
-      widget_end_widget( WIDGET_FINISHED_CANCEL );
-    }
+  case INPUT_KEY_Escape:
+    debugger_run();
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
 
-  case KEYBOARD_c:
+  case INPUT_KEY_c:
     debugger_run();
     widget_end_all( WIDGET_FINISHED_OK );
     break;
 
-  case KEYBOARD_s:
+  case INPUT_KEY_s:
     debugger_mode = DEBUGGER_MODE_HALTED;
     widget_end_all( WIDGET_FINISHED_OK );
     break;

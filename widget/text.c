@@ -1,5 +1,5 @@
 /* text.c: simple text entry widget
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -69,29 +69,25 @@ widget_text_draw( void *data )
 }
 
 void
-widget_text_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_text_keyhandler( input_key key )
 {
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_text_draw( NULL );
     return;
+#endif
       
-  case KEYBOARD_0:		/* Backspace generates DEL which is Caps + 0 */
-    if( key2 == KEYBOARD_Caps ) {
-      delete_character(); widget_text_draw( NULL );
-      return;
-    }
-    break;
+  case INPUT_KEY_BackSpace:	/* Backspace generates DEL which is Caps + 0 */
+    delete_character(); widget_text_draw( NULL );
+    return;
 
-  case KEYBOARD_1:		/* `Esc' generates EDIT which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) {
-      widget_end_widget( WIDGET_FINISHED_CANCEL );
-      return;
-    }
-    break;
+  case INPUT_KEY_Escape:	/* `Esc' generates EDIT which is Caps + 1 */
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
+    return;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 
@@ -100,9 +96,9 @@ widget_text_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   }
 
-  if( key >= KEYBOARD_0 && key <= KEYBOARD_9 ) {
+  if( key >= INPUT_KEY_0 && key <= INPUT_KEY_9 ) {
     append_character( key );
-  } else if( key >= KEYBOARD_a && key <= KEYBOARD_z ) {
+  } else if( key >= INPUT_KEY_a && key <= INPUT_KEY_z ) {
     append_character( key );
   }
 

@@ -1,5 +1,5 @@
 /* select.c: machine selection widget
-   Copyright (c) 2001-2003 Philip Kendall, Witold Filipczyk
+   Copyright (c) 2001-2004 Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -75,32 +75,36 @@ int widget_select_draw( void* data GCC_UNUSED )
 }
 
 void
-widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_select_keyhandler( input_key key )
 {
   int new_highlight_line = 0;
   int cursor_pressed = 0;
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_select_draw( NULL );
     break;
+#endif
 
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 
-  case KEYBOARD_7:
+  case INPUT_KEY_Up:
+  case INPUT_KEY_7:
     if ( highlight_line ) {
       new_highlight_line = highlight_line - 1;
       cursor_pressed = 1;
     }
     break;
 
-  case KEYBOARD_6:
+  case INPUT_KEY_Down:
+  case INPUT_KEY_6:
     if ( highlight_line + 1 < (ptrdiff_t)machine_count ) {
       new_highlight_line = highlight_line + 1;
       cursor_pressed = 1;
@@ -112,8 +116,8 @@ widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   }
 
-  if( cursor_pressed || ( key >= KEYBOARD_a && key <= KEYBOARD_z &&
-      key - KEYBOARD_a < (ptrdiff_t)machine_count )) {
+  if( cursor_pressed || ( key >= INPUT_KEY_a && key <= INPUT_KEY_z &&
+      key - INPUT_KEY_a < (ptrdiff_t)machine_count )) {
     
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
@@ -125,7 +129,7 @@ widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     if (cursor_pressed) {
       highlight_line = new_highlight_line;
     } else {
-      highlight_line = key - KEYBOARD_a;
+      highlight_line = key - INPUT_KEY_a;
     }
     
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,

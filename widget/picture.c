@@ -1,5 +1,5 @@
 /* picture.c: Keyboard picture
-   Copyright (c) 2001,2002 Philip Kendall
+   Copyright (c) 2001-2004 Philip Kendall
 
    $Id$
 
@@ -29,7 +29,6 @@
 #ifdef USE_WIDGET
 
 #include "display.h"
-#include "keyboard.h"
 #include "ui/uidisplay.h"
 #include "widget_internals.h"
 
@@ -46,19 +45,21 @@ int widget_picture_draw( void* data )
 }
 
 void
-widget_picture_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_picture_keyhandler( input_key key )
 {
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on widget resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on widget resize */
     widget_picture_draw( ptr );
     break;
+#endif
     
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_all( WIDGET_FINISHED_OK );
     break;
 

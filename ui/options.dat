@@ -1,30 +1,30 @@
 general
 General Options
-Entry, (E)mulation speed, emulation_speed, KEYBOARD_e, 3, %
-Entry, F(r)ame rate (1:n), frame_rate, KEYBOARD_r, 1, frames
-Checkbox, Issue (2) Keyboard, issue2, KEYBOARD_2
-Checkbox, (K)empston joystick, joy_kempston, KEYBOARD_k
-Checkbox, Use (t)ape traps, tape_traps, KEYBOARD_t
-Checkbox, (A)uto-load media, auto_load, KEYBOARD_a
-Checkbox, Use .(s)lt traps, slt_traps, KEYBOARD_s
-Checkbox, Allow (w)rites to ROM, writable_roms, KEYBOARD_w
-Checkbox, A(u)to-save settings, autosave_settings, KEYBOARD_u
-Checkbox, Black and white T(V), bw_tv, KEYBOARD_v
-Checkbox, (C)onfirm actions, confirm_actions, KEYBOARD_c
-Checkbox, Emulate (p)rinters, printer, KEYBOARD_p
-Checkbox, Show status(b)ar, statusbar, KEYBOARD_b
+Entry, (E)mulation speed, emulation_speed, INPUT_KEY_e, 3, %
+Entry, F(r)ame rate (1:n), frame_rate, INPUT_KEY_r, 1, frames
+Checkbox, Issue (2) Keyboard, issue2, INPUT_KEY_2
+Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
+Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
+Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
+Checkbox, Use .(s)lt traps, slt_traps, INPUT_KEY_s
+Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w
+Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
+Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
+Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
+Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
+Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Posthook, periph_update
 
 rzx
 RZX Options
-Checkbox, (C)ompress RZX data, rzx_compression, KEYBOARD_c
-Checkbox, C(o)mpetition mode, competition_mode, KEYBOARD_o
-Entry, Co(m)petition code, competition_code, KEYBOARD_m, 8,
-Checkbox, Always (e)mbed snapshot, embed_snapshot, KEYBOARD_e
+Checkbox, (C)ompress RZX data, rzx_compression, INPUT_KEY_c
+Checkbox, C(o)mpetition mode, competition_mode, INPUT_KEY_o
+Entry, Co(m)petition code, competition_code, INPUT_KEY_m, 8,
+Checkbox, Always (e)mbed snapshot, embed_snapshot, INPUT_KEY_e
 
 sound
 Sound Options
-Checkbox, (S)ound enabled, sound, KEYBOARD_s
-Checkbox, (L)oading sound, sound_load, KEYBOARD_l
-Checkbox, (A)Y stereo separation, stereo_ay, KEYBOARD_a
-Checkbox, (B)eeper pseudo-stereo, stereo_beeper, KEYBOARD_b
+Checkbox, (S)ound enabled, sound, INPUT_KEY_s
+Checkbox, (L)oading sound, sound_load, INPUT_KEY_l
+Checkbox, (A)Y stereo separation, stereo_ay, INPUT_KEY_a
+Checkbox, (B)eeper pseudo-stereo, stereo_beeper, INPUT_KEY_b

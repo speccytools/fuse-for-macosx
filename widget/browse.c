@@ -38,7 +38,6 @@
 #endif				/* #ifdef HAVE_LIB_GLIB */
 
 #include "fuse.h"
-#include "keyboard.h"
 #include "tape.h"
 #include "widget_internals.h"
 
@@ -124,20 +123,23 @@ show_blocks( void )
 }
 
 void
-widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_browse_keyhandler( input_key key )
 {
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_browse_draw( NULL );
     break;
+#endif
 
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
-  case KEYBOARD_6:
-  case KEYBOARD_j:
+  case INPUT_KEY_Down:
+  case INPUT_KEY_6:
+  case INPUT_KEY_j:
     if( highlight < block_count - 1 ) {
       highlight++;
       if( highlight >= top_line + 18 ) top_line += 18;
@@ -145,8 +147,9 @@ widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     }
     break;
     
-  case KEYBOARD_7:
-  case KEYBOARD_k:
+  case INPUT_KEY_Up:
+  case INPUT_KEY_7:
+  case INPUT_KEY_k:
     if( highlight > 0 ) { 
       highlight--;
       if( highlight < top_line )
@@ -158,13 +161,13 @@ widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     }
     break;
 
-  case KEYBOARD_PageUp:
+  case INPUT_KEY_Page_Up:
     highlight -= 18; if( highlight < 0 ) highlight = 0;
     top_line  -= 18; if( top_line  < 0 ) top_line = 0;
     show_blocks();
     break;
 
-  case KEYBOARD_PageDown:
+  case INPUT_KEY_Page_Down:
     highlight += 18;
     if( highlight >= block_count ) highlight = block_count - 1;
     top_line += 18;
@@ -175,18 +178,18 @@ widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     show_blocks();
     break;
 
-  case KEYBOARD_Home:
+  case INPUT_KEY_Home:
     highlight = top_line = 0;
     show_blocks();
     break;
 
-  case KEYBOARD_End:
+  case INPUT_KEY_End:
     highlight = block_count - 1;
     top_line = block_count - 18; if( top_line < 0 ) top_line = 0;
     show_blocks();
     break;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 

@@ -34,7 +34,6 @@
 #include <unistd.h>
 
 #include "fuse.h"
-#include "keyboard.h"
 #include "settings.h"
 #include "widget_internals.h"
 
@@ -110,19 +109,21 @@ print_rom( int which )
 }
 
 void
-widget_roms_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_roms_keyhandler( input_key key )
 {
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_roms_draw( NULL );
     break;
+#endif
 
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_all( WIDGET_FINISHED_OK );
     return;
 
@@ -131,14 +132,14 @@ widget_roms_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   }
 
-  if( key >= KEYBOARD_a && key <= KEYBOARD_z &&
-      key - KEYBOARD_a < (ptrdiff_t)rom_count ) {
+  if( key >= INPUT_KEY_a && key <= INPUT_KEY_z &&
+      key - INPUT_KEY_a < (ptrdiff_t)rom_count ) {
 
     char **setting;
     int error;
     int constant_zero = 0;
 
-    key -= KEYBOARD_a;
+    key -= INPUT_KEY_a;
 
     widget_do( WIDGET_TYPE_FILESELECTOR, &constant_zero );
     if( !widget_filesel_name ) return;

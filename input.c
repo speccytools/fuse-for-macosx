@@ -26,9 +26,17 @@
 
 #include <config.h>
 
+#include "fuse.h"
 #include "input.h"
 #include "keyboard.h"
+#include "settings.h"
+#include "snapshot.h"
+#include "tape.h"
 #include "ui/ui.h"
+#include "utils.h"
+#ifdef USE_WIDGET
+#include "widget/widget.h"
+#endif				/* #ifdef USE_WIDGET */
 
 static int keypress( const input_event_key_t *event );
 static int keyrelease( const input_event_key_t *event );
@@ -52,14 +60,81 @@ input_event( const input_event_t *event )
 static int
 keypress( const input_event_key_t *event )
 {
+  input_key key;
   const keysyms_key_info *ptr;
 
-  ptr = keysyms_get_data( event->key );
+  key = event->key;
+
+#ifdef USE_WIDGET
+  if( widget_level >= 0 ) {
+    widget_keyhandler( key );
+    return 0;
+  }
+#endif				/* #ifdef USE_WIDGET */
+
+  ptr = keysyms_get_data( key );
 
   if( ptr ) {
     keyboard_press( ptr->key1 );
     keyboard_press( ptr->key2 );
   }
+
+#ifdef USE_WIDGET
+  switch( key ) {
+  case INPUT_KEY_F1:
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_MENU, &widget_menu_main );
+    fuse_emulation_unpause();
+    break;
+  case INPUT_KEY_F2:
+    fuse_emulation_pause();
+    snapshot_write( "snapshot.z80" );
+    fuse_emulation_unpause();
+    break;
+  case INPUT_KEY_F3:
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+    if( widget_filesel_name ) {
+      utils_open_file( widget_filesel_name, settings_current.auto_load, NULL );
+      free( widget_filesel_name );
+      display_refresh_all();
+    }
+    fuse_emulation_unpause();
+    break;
+  case INPUT_KEY_F4:
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_GENERAL, NULL );
+    fuse_emulation_unpause();
+    break;
+  case INPUT_KEY_F5:
+    machine_reset();
+    break;
+  case INPUT_KEY_F6:
+    fuse_emulation_pause();
+    tape_write( "tape.tzx" );
+    fuse_emulation_unpause();
+    break;
+  case INPUT_KEY_F7:
+    fuse_emulation_pause();
+    widget_apply_to_file( tape_open_default_autoload );
+    fuse_emulation_unpause();
+    break;
+  case INPUT_KEY_F8:
+    tape_toggle_play();
+    break;
+  case INPUT_KEY_F9:
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_SELECT, NULL );
+    fuse_emulation_unpause();
+    break;
+  case INPUT_KEY_F10:
+    fuse_exiting = 1;
+    break;
+
+  default: break;		/* Remove gcc warning */
+
+  }
+#endif				/* #ifdef USE_WIDGET */
 
   return 0;
 }

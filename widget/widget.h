@@ -1,5 +1,5 @@
 /* widget.h: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001,2002 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -29,9 +29,9 @@
 
 #ifdef USE_WIDGET
 
-#ifndef FUSE_KEYBOARD_H
-#include "keyboard.h"
-#endif				/* #ifndef FUSE_KEYBOARD_H */
+#ifndef FUSE_INPUT_H
+#include "input.h"
+#endif				/* #ifndef FUSE_INPUT_H */
 
 #ifndef SCALER_H
 #include "ui/scaler/scaler.h"
@@ -71,8 +71,7 @@ typedef enum widget_type {
 int widget_do( widget_type which, void *data );
 
 /* A function to handle keypresses */
-typedef void (*widget_keyhandler_fn)( keyboard_key_name key,
-				      keyboard_key_name key2 );
+typedef void (*widget_keyhandler_fn)( input_key key );
 
 /* The current widget keyhandler */
 extern widget_keyhandler_fn widget_keyhandler;
@@ -87,7 +86,7 @@ typedef int (*widget_menu_callback_fn)( void *data );
 /* A general menu */
 typedef struct widget_menu_entry {
   const char *text;		/* Menu entry text */
-  keyboard_key_name key;	/* Which key to activate this widget */
+  input_key key;		/* Which key to activate this widget */
 
   widget_menu_callback_fn action; /* What to do */
   void *data;			/* And with which arguments */

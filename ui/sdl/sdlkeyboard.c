@@ -34,7 +34,6 @@
 
 #include "display.h"
 #include "fuse.h"
-#include "keysyms.h"
 #include "machine.h"
 #include "settings.h"
 #include "snapshot.h"
@@ -49,95 +48,33 @@
 void
 sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
 {
-  const keysyms_key_info *ptr;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
-  ptr=keysyms_get_data( keyevent->keysym.sym );
+  fuse_keysym = keysyms_remap( keyevent->keysym.sym );
 
-  if( ptr ) {
-    if( widget_level >= 0 ) {
-      widget_keyhandler( ptr->key1, ptr->key2 );
-    } else {
-      if( ptr->key1 != KEYBOARD_NONE ) keyboard_press( ptr->key1 );
-      if( ptr->key2 != KEYBOARD_NONE ) keyboard_press( ptr->key2 );
-    }
-    return;
-  }
+  if( fuse_keysym == INPUT_KEY_NONE ) return;
 
-  if( widget_level >= 0 ) return;
-  
-  /* Now deal with the non-Speccy keys */
-  switch(keyevent->keysym.sym) {
-  case SDLK_F1:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MENU, &widget_menu_main );
-    fuse_emulation_unpause();
-    break;
-  case SDLK_F2:
-    fuse_emulation_pause();
-    snapshot_write( "snapshot.z80" );
-    fuse_emulation_unpause();
-    break;
-  case SDLK_F3:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-    if( widget_filesel_name ) {
-      utils_open_file( widget_filesel_name, settings_current.auto_load, NULL );
-      free( widget_filesel_name );
-      display_refresh_all();
-    }
-    fuse_emulation_unpause();
-    break;
-  case SDLK_F4:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_GENERAL, NULL );
-    fuse_emulation_unpause();
-    break;
-  case SDLK_F5:
-    machine_reset();
-    break;
-  case SDLK_F6:
-    fuse_emulation_pause();
-    tape_write( "tape.tzx" );
-    fuse_emulation_unpause();
-    break;
-  case SDLK_F7:
-    fuse_emulation_pause();
-    widget_apply_to_file( tape_open_default_autoload );
-    fuse_emulation_unpause();
-    break;
-  case SDLK_F8:
-    tape_toggle_play();
-    break;
-  case SDLK_F9:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_SELECT, NULL );
-    fuse_emulation_unpause();
-    break;
-  case SDLK_F10:
-    fuse_exiting = 1;
-    break;
-  default:
-    break;
-  }
+  fuse_event.type = INPUT_EVENT_KEYPRESS;
+  fuse_event.types.key.key = fuse_keysym;
 
-  return;
-
+  input_event( &fuse_event );
 }
 
 void
 sdlkeyboard_keyrelease( SDL_KeyboardEvent *keyevent )
 {
-  const keysyms_key_info *ptr;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
-  ptr = keysyms_get_data( keyevent->keysym.sym );
+  fuse_keysym = keysyms_remap( keyevent->keysym.sym );
 
-  if(ptr) {
-    if( ptr->key1 != KEYBOARD_NONE ) keyboard_release( ptr->key1 );
-    if( ptr->key2 != KEYBOARD_NONE ) keyboard_release( ptr->key2 );
-  }
-  
-  return;
+  if( fuse_keysym == INPUT_KEY_NONE ) return;
 
+  fuse_event.type = INPUT_EVENT_KEYRELEASE;
+  fuse_event.types.key.key = fuse_keysym;
+
+  input_event( &fuse_event );
 }
 
 #endif			/* #ifdef UI_SDL */

@@ -88,18 +88,17 @@ extern size_t widget_numfiles;
 
 int widget_filesel_draw( void* data );
 int widget_filesel_finish( widget_finish_state finished );
-void widget_filesel_keyhandler( keyboard_key_name key,
-				keyboard_key_name key2 );
+void widget_filesel_keyhandler( input_key key );
 
 /* Tape menu */
 
 int widget_tape_draw( void* data );
-void widget_tape_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_tape_keyhandler( input_key key );
 
 /* File menu */
 
 int widget_file_draw( void* data );
-void widget_file_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_file_keyhandler( input_key key );
 
 /* Options menu */
 int widget_menu_filter( void *data );
@@ -107,8 +106,7 @@ int widget_menu_filter( void *data );
 /* Machine menu */
 
 int widget_machine_draw( void* data );
-void widget_machine_keyhandler( keyboard_key_name key,
-				keyboard_key_name key2 );
+void widget_machine_keyhandler( input_key key );
 
 /* Keyboard picture */
 
@@ -119,18 +117,17 @@ typedef struct widget_picture_data {
 } widget_picture_data;
 
 int widget_picture_draw( void* data );
-void widget_picture_keyhandler( keyboard_key_name key,
-				keyboard_key_name key2 );
+void widget_picture_keyhandler( input_key key );
 
 /* Help menu */
 
 int widget_help_draw( void* data );
-void widget_help_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_help_keyhandler( input_key key );
 
 /* General menu code */
 
 int widget_menu_draw( void* data );
-void widget_menu_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_menu_keyhandler( input_key key );
 
 /* General callbacks */
 
@@ -183,19 +180,19 @@ int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
 /* The select scaler widget */
 
 int widget_scaler_draw( void* data );
-void widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_scaler_keyhandler( input_key key );
 int widget_scaler_finish( widget_finish_state finished );
 
 /* The select machine widget */
 
 int widget_select_draw( void* data );
-void widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_select_keyhandler( input_key key );
 int widget_select_finish( widget_finish_state finished );
 
 /* The tape browser widget */
 
 int widget_browse_draw( void* data );
-void widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_browse_keyhandler( input_key key );
 int widget_browse_finish( widget_finish_state finished );
 
 /* The text entry widget */
@@ -206,7 +203,7 @@ typedef struct widget_text_t {
 } widget_text_t;
 
 int widget_text_draw( void* data );
-void widget_text_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_text_keyhandler( input_key key );
 int widget_text_finish( widget_finish_state finished );
 
 extern char *widget_text_text;	/* The returned text */
@@ -222,13 +219,12 @@ int widget_options_finish( widget_finish_state finished );
 /* The error widget */
 
 int widget_error_draw( void *data );
-void widget_error_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_error_keyhandler( input_key key );
 
 /* The debugger widget */
 
 int widget_debugger_draw( void *data );
-void widget_debugger_keyhandler( keyboard_key_name key,
-				 keyboard_key_name key2 );
+void widget_debugger_keyhandler( input_key key );
 
 /* The ROM selector widget */
 
@@ -242,7 +238,7 @@ typedef struct widget_roms_info {
 } widget_roms_info;
 
 int widget_roms_draw( void *data );
-void widget_roms_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+void widget_roms_keyhandler( input_key key );
 int widget_roms_finish( widget_finish_state finished );
 
 /* The widgets actually available */

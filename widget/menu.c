@@ -79,21 +79,23 @@ int widget_menu_draw( void *data )
 }
 
 void
-widget_menu_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_menu_keyhandler( input_key key )
 {
   widget_menu_entry *ptr;
 
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_menu_draw( menu );
     break;
+#endif
     
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 

@@ -104,7 +104,21 @@ typedef enum input_key {
   INPUT_KEY_Page_Down,
   INPUT_KEY_Home,
   INPUT_KEY_End,
+
   INPUT_KEY_Caps_Lock,
+
+  INPUT_KEY_F1,
+  INPUT_KEY_F2,
+  INPUT_KEY_F3,
+  INPUT_KEY_F4,
+  INPUT_KEY_F5,
+  INPUT_KEY_F6,
+  INPUT_KEY_F7,
+  INPUT_KEY_F8,
+  INPUT_KEY_F9,
+  INPUT_KEY_F10,
+  INPUT_KEY_F11,
+  INPUT_KEY_F12,
 
   INPUT_KEY_Shift_L = 0x1000,
   INPUT_KEY_Shift_R,

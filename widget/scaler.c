@@ -1,5 +1,5 @@
 /* scaler.c: scaler selection widget
-   Copyright (c) 2001,2002 Philip Kendall
+   Copyright (c) 2001-2004 Philip Kendall
 
    $Id$
 
@@ -37,7 +37,6 @@
 
 #include "display.h"
 #include "fuse.h"
-#include "keyboard.h"
 #include "settings.h"
 #include "ui/scaler/scaler.h"
 #include "ui/uidisplay.h"
@@ -105,19 +104,21 @@ widget_scaler_draw( void *data )
 }
 
 void
-widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
+widget_scaler_keyhandler( input_key key )
 {
   switch( key ) {
 
-  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
     widget_scaler_draw( NULL );
     break;
+#endif
 
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    if( key2 == KEYBOARD_Caps ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
-  case KEYBOARD_Enter:
+  case INPUT_KEY_Return:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 
@@ -126,8 +127,8 @@ widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   }
 
-  if( key >= KEYBOARD_a && key <= KEYBOARD_z &&
-      key - KEYBOARD_a < (ptrdiff_t)scaler_count ) {
+  if( key >= INPUT_KEY_a && key <= INPUT_KEY_z &&
+      key - INPUT_KEY_a < (ptrdiff_t)scaler_count ) {
     
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
@@ -136,7 +137,7 @@ widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 			descriptions[ highlight_line ] );
 
     /*  draw the new one */
-    highlight_line = key - KEYBOARD_a;
+    highlight_line = key - INPUT_KEY_a;
 
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
 		      WIDGET_COLOUR_FOREGROUND );
