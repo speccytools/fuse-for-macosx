@@ -44,6 +44,7 @@ static int create_dialog( void );
 static int activate_debugger( void );
 static int deactivate_debugger( void );
 
+static void evaluate_command( GtkWidget *widget, gpointer user_data );
 static void gtkui_debugger_done_step( GtkWidget *widget, gpointer user_data );
 static void gtkui_debugger_done_continue( GtkWidget *widget,
 					  gpointer user_data );
@@ -78,12 +79,24 @@ ui_debugger_activate( void )
   return 0;
 }
 
+int
+ui_debugger_deactivate( int interruptable )
+{
+  if( debugger_active ) deactivate_debugger();
+
+  gtk_widget_set_sensitive( continue_button, !interruptable );
+  gtk_widget_set_sensitive( break_button,     interruptable );
+
+  return 0;
+}
+
 static int
 create_dialog( void )
 {
   size_t i;
   GtkWidget *hbox;
   GtkWidget *table, *label;
+  GtkWidget *entry, *eval_button;
   GtkWidget *step_button, *close_button;
   GtkAccelGroup *accel_group;
 
@@ -99,9 +112,11 @@ create_dialog( void )
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
 
+  /* 'hbox' contains the register display and the disassembly */
   hbox = gtk_hbox_new( FALSE, 5 );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ), hbox );
+  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
 
+  /* 'table' contains the register display */
   table = gtk_table_new( 5, 4, FALSE );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), table );
 
@@ -122,42 +137,63 @@ create_dialog( void )
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
 
+  /* Another hbox to hold the command entry widget and the 'evaluate'
+     button */
+  hbox = gtk_hbox_new( FALSE, 5 );
+  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
+
+  /* The command entry widget */
+  entry = gtk_entry_new();
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), entry );
+
+  /* The 'command evaluate' button */
+  eval_button = gtk_button_new_with_label( "Evaluate" );
+  gtk_signal_connect_object( GTK_OBJECT( eval_button ), "clicked",
+			     GTK_SIGNAL_FUNC( evaluate_command ),
+			     GTK_OBJECT( entry ) );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), eval_button );
+
   /* The action buttons for the dialog box */
 
   step_button = gtk_button_new_with_label( "Single Step" );
+  gtk_signal_connect( GTK_OBJECT( step_button ), "clicked",
+		      GTK_SIGNAL_FUNC( gtkui_debugger_done_step ), NULL );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     step_button );
 
   continue_button = gtk_button_new_with_label( "Continue" );
+  gtk_signal_connect( GTK_OBJECT( continue_button ), "clicked",
+		      GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ), NULL );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     continue_button );
 
   break_button = gtk_button_new_with_label( "Break" );
+  gtk_signal_connect( GTK_OBJECT( break_button ), "clicked",
+		      GTK_SIGNAL_FUNC( gtkui_debugger_break ), NULL );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     break_button );
 
   close_button = gtk_button_new_with_label( "Close" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     close_button );
-
-  gtk_signal_connect( GTK_OBJECT( step_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_debugger_done_step ), NULL );
-  gtk_signal_connect( GTK_OBJECT( continue_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ), NULL );
-  gtk_signal_connect( GTK_OBJECT( break_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_debugger_break ), NULL );
   gtk_signal_connect_object( GTK_OBJECT( close_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_debugger_done_close ),
 			     GTK_OBJECT( dialog ) );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+		     close_button );
 
+  /* Deleting the window is the same as pressing 'Close' */
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
 		      GTK_SIGNAL_FUNC( gtkui_debugger_done_close ),
 		      (gpointer) NULL );
 
-  /* Esc `cancels' the selector by just continuing with emulation */
+  /* Keyboard shortcuts */
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
 
+  /* Return is equivalent to clicking on 'evaluate' */
+  gtk_widget_add_accelerator( eval_button, "clicked", accel_group,
+			      GDK_Return, 0, 0 );
+
+  /* Esc is equivalent to clicking on 'close' */
   gtk_widget_add_accelerator( close_button, "clicked", accel_group,
                               GDK_Escape, 0, 0 );
 
@@ -216,12 +252,18 @@ deactivate_debugger( void )
   return 0;
 }
 
+/* Evaluate the command currently in the entry box */
+static void
+evaluate_command( GtkWidget *widget, gpointer user_data GCC_UNUSED )
+{
+  debugger_command_parse( gtk_entry_get_text( GTK_ENTRY( widget ) ) );
+}
+
 static void
 gtkui_debugger_done_step( GtkWidget *widget GCC_UNUSED,
 			  gpointer user_data GCC_UNUSED )
 {
-  debugger_mode = DEBUGGER_MODE_STEP;
-  if( debugger_active ) deactivate_debugger();
+  debugger_step();
 }
 
 static void
@@ -229,9 +271,6 @@ gtkui_debugger_done_continue( GtkWidget *widget GCC_UNUSED,
 			      gpointer user_data GCC_UNUSED )
 {
   debugger_run();
-  gtk_widget_set_sensitive( continue_button, 0 );
-  gtk_widget_set_sensitive( break_button, 1 );
-  if( debugger_active ) deactivate_debugger();
 }
 
 static void

@@ -59,11 +59,16 @@ int debugger_end( void );
 int debugger_check( void );	/* See if the debugger should become active */
 int debugger_trap( void );	/* Activate the debugger */
 
+int debugger_step( void );	/* Single step */
+int debugger_next( void );	/* Go to next instruction, ignoring CALL etc */
 int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
 
 /* Disassemble the instruction at 'address', returning its length in
    '*length' */
 void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
 			   WORD address );
+
+/* Parse a debugger command */
+int debugger_command_parse( const char *command );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */

@@ -95,6 +95,23 @@ debugger_trap( void )
   return ui_debugger_activate();
 }
 
+/* Step one instruction */
+int
+debugger_step( void )
+{
+  debugger_mode = DEBUGGER_MODE_STEP;
+  ui_debugger_deactivate( 0 );
+  return 0;
+}
+
+/* Step to the next instruction, ignoring CALLs etc */
+int
+debugger_next( void )
+{
+  /* FIXME: make this work */
+  return debugger_step();
+}
+
 /* Set debugger_mode so that emulation will occur */
 int
 debugger_run( void )
@@ -103,6 +120,7 @@ debugger_run( void )
     debugger_breakpoint == DEBUGGER_BREAKPOINT_UNSET ?
     DEBUGGER_MODE_INACTIVE			     :
     DEBUGGER_MODE_ACTIVE;
+  ui_debugger_deactivate( 1 );
   return 0;
 }
 
