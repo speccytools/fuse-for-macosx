@@ -1,4 +1,4 @@
-/* select.c: machine selection widget
+/* select.c: generic selection widget
    Copyright (c) 2001-2004 Philip Kendall, Witold Filipczyk
 
    $Id$
@@ -128,7 +128,7 @@ widget_select_keyhandler( input_key key )
 
   case INPUT_KEY_Down:
   case INPUT_KEY_6:
-    if ( highlight_line + 1 < (ptrdiff_t)machine_count ) {
+    if ( highlight_line + 1 < (ptrdiff_t)count ) {
       new_highlight_line = highlight_line + 1;
       cursor_pressed = 1;
     }
