@@ -509,6 +509,10 @@ settings_get_rom_setting( settings_info *settings, size_t which )
 int
 settings_set_string( char **string_setting, const char *value )
 {
+  /* No need to do anything if the two strings are in fact the
+     same pointer */
+  if( *string_setting == value ) return 0;
+
   if( *string_setting) free( *string_setting );
   *string_setting = strdup( value );
   if( !( *string_setting ) ) {

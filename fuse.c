@@ -108,12 +108,15 @@ typedef struct start_files_t {
   const char *disk_plus3;
   const char *disk_trdos;
   const char *dock;
-  const char *harddisk;
   const char *if2;
   const char *playback;
   const char *recording;
   const char *snapshot;
   const char *tape;
+
+  const char *simpleide_master, *simpleide_slave;
+  const char *zxatasp_master, *zxatasp_slave;
+  const char *zxcf;
 
 } start_files_t;
 
@@ -511,15 +514,13 @@ setup_start_files( start_files_t *start_files )
   start_files->snapshot = settings_current.snapshot;
   start_files->tape = settings_current.tape_file;
 
-  if( settings_current.zxcf_active ) {
-    start_files->harddisk = settings_current.zxcf_pri_file;
-  } else if( settings_current.zxatasp_active ) {
-    start_files->harddisk = settings_current.zxatasp_master_file;
-  } else if( settings_current.simpleide_active ) {
-    start_files->harddisk = settings_current.simpleide_master_file;
-  } else {
-    start_files->harddisk = NULL;
-  }
+  start_files->simpleide_master = settings_current.simpleide_master_file;
+  start_files->simpleide_slave  = settings_current.simpleide_slave_file;
+
+  start_files->zxatasp_master = settings_current.zxatasp_master_file;
+  start_files->zxatasp_slave  = settings_current.zxatasp_slave_file;
+
+  start_files->zxcf = settings_current.zxcf_pri_file;
 
   return 0;
 }
@@ -556,7 +557,18 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       start_files->if2 = filename; break;
 
     case LIBSPECTRUM_CLASS_HARDDISK:
-      start_files->harddisk = filename; break;
+      if( settings_current.zxcf_active ) {
+	start_files->zxcf = filename;
+      } else if( settings_current.zxatasp_active ) {
+	start_files->zxatasp_master = filename;
+      } else if( settings_current.simpleide_active ) {
+	start_files->simpleide_master = filename;
+      } else {
+	/* No IDE interface active, so activate the ZXCF */
+	settings_current.zxcf_active = 1;
+	start_files->zxcf = filename;
+      }
+      break;
 
     case LIBSPECTRUM_CLASS_DISK_PLUS3:
       start_files->disk_plus3 = filename; break;
@@ -661,11 +673,6 @@ do_start_files( start_files_t *start_files )
     if( error ) return error;
   }
 
-  if( start_files->harddisk ) {
-    error = utils_open_file( start_files->harddisk, autoload, NULL );
-    if( error ) return error;
-  }
-
   if( start_files->snapshot ) {
     error = utils_open_file( start_files->snapshot, autoload, NULL );
     if( error ) return error;
@@ -674,6 +681,38 @@ do_start_files( start_files_t *start_files )
   if( start_files->tape ) {
     error = utils_open_file( start_files->tape, autoload, NULL );
     if( error ) return error;
+  }
+
+  /* IDE hard disk images */
+
+  if( start_files->simpleide_master ) {
+    error = simpleide_insert( start_files->simpleide_master,
+			      LIBSPECTRUM_IDE_MASTER );
+    simpleide_reset();
+    if( error ) return error;
+  }
+
+  if( start_files->simpleide_slave ) {
+    error = simpleide_insert( start_files->simpleide_slave,
+			      LIBSPECTRUM_IDE_SLAVE );
+    simpleide_reset();
+    if( error ) return error;
+  }
+
+  if( start_files->zxatasp_master ) {
+    error = zxatasp_insert( start_files->zxatasp_master,
+			    LIBSPECTRUM_IDE_MASTER );
+    if( error ) return error;
+  }
+
+  if( start_files->zxatasp_slave ) {
+    error = zxatasp_insert( start_files->zxatasp_slave,
+			    LIBSPECTRUM_IDE_SLAVE );
+    if( error ) return error;
+  }
+
+  if( start_files->zxcf ) {
+    error = zxcf_insert( start_files->zxcf ); if( error ) return error;
   }
 
   /* Input recordings */

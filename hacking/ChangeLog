@@ -883,6 +883,8 @@
 	 port if ZXCF active.
 20040531 fuse.c,utils.c: load .hdf images into the active IDE interface,
 	 or ZXCF if none active.
+20040531 fuse.c,settings.pl: further small changes to how .hdf images are
+	 handled.
 20040601 utils.c,fuse.c: Add handling of LIBSPECTRUM_CLASS_CARTRIDGE_IF2.
 20040601 machines/spec_se.c: Add include <string.h> for memset.
 20040601 utils.c: Fix bad merge of IF2 patch.
