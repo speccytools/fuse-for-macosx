@@ -83,6 +83,17 @@ typedef enum libspectrum_machine {
 
 } libspectrum_machine;
 
+typedef enum libspectrum_slt_type {
+
+  LIBSPECTRUM_SLT_TYPE_END = 0,
+  LIBSPECTRUM_SLT_TYPE_LEVEL,
+  LIBSPECTRUM_SLT_TYPE_INSTRUCTIONS,
+  LIBSPECTRUM_SLT_TYPE_SCREEN,
+  LIBSPECTRUM_SLT_TYPE_PICTURE,
+  LIBSPECTRUM_SLT_TYPE_POKE,
+
+} libspectrum_slt_type;
+
 typedef struct libspectrum_snap {
 
   /* Which machine are we using here? */
@@ -103,10 +114,15 @@ typedef struct libspectrum_snap {
 
   libspectrum_byte *pages[8];
 
-  /* Level data from .slt files */
+  /* Data from .slt files */
 
-  libspectrum_byte *slt[256];
-  size_t slt_length[256];
+  libspectrum_byte *slt[256];	/* Level data */
+  size_t slt_length[256];	/* Length of each level */
+
+  libspectrum_byte *slt_screen;	/* Loading screen */
+  int slt_screen_level;		/* The id of the loading screen. Not used
+				   for anything AFAIK, but I'll copy it
+				   around just in case */
 
   /* Peripheral status */
 

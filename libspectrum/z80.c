@@ -269,15 +269,19 @@ int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
 static int libspectrum_z80_read_slt( libspectrum_snap *snap,
 				     uchar **next_block, uchar *end )
 {
-  size_t slt_length[256];
-  int i;
+  size_t slt_length[256], offsets[256];
+  size_t whence = 0;
+
+  size_t screen_length = 0, screen_offset;
+
+  int i, error;
 
   /* Zero all lengths to imply `not present' */
   for( i=0; i<256; i++ ) slt_length[i]=0;
 
   while( 1 ) {
 
-    int type, level;
+    int type, level, length;
 
     /* Check we've got enough data left */
     if( *next_block + 8 > end ) {
@@ -287,42 +291,66 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    type = (*next_block)[0] + (*next_block)[1] * 0x100;
+    type =   (*next_block)[0] + (*next_block)[1] * 0x100;
+    level =  (*next_block)[2] + (*next_block)[3] * 0x100;
+    length = (*next_block)[4]             +
+             (*next_block)[5] *     0x100 +
+             (*next_block)[6] *   0x10000 +
+             (*next_block)[7] * 0x1000000;
 
-    /* Type of zero => end of table. But remember to skip this entry */
-    if( type == 0 ) { *next_block += 8; break; }
+    /* If this ends the table, exit. But remember to skip this entry */
+    if( type == LIBSPECTRUM_SLT_TYPE_END ) { *next_block += 8; break; }
 
-    /* We can handle only data type 1 (level data) */
-    if( type != 1 ) {
+    switch( type ) {
+
+    case LIBSPECTRUM_SLT_TYPE_LEVEL:	/* Level data */
+
+      if( level >= 0x100 ) {
+	libspectrum_print_error(
+	  "libspectrum_z80_read_slt: unexpected level number %d\n", level
+	);
+	return LIBSPECTRUM_ERROR_CORRUPT;
+      }
+
+      /* Each level should appear once only */
+      if( slt_length[ level ] ) {
+	libspectrum_print_error(
+          "libspectrum_z80_read_slt: level %d is duplicated\n", level
+        );
+        return LIBSPECTRUM_ERROR_CORRUPT;
+      }
+
+      offsets[ level ] = whence; slt_length[ level ] = length;
+
+      break;
+
+    case LIBSPECTRUM_SLT_TYPE_SCREEN:	/* Loading screen */
+
+      /* Allow only one loading screen per .slt file */
+      if( screen_length != 0 ) {
+	libspectrum_print_error(
+	  "libspectrum_z80_read_slt: duplicated loading screen\n"
+	);
+	return LIBSPECTRUM_ERROR_CORRUPT;
+      }
+
+      snap->slt_screen_level = level;
+      screen_length = length; screen_offset = whence;
+
+      break;
+
+    default:
+
       libspectrum_print_error(
         "libspectrum_z80_read_slt: unknown data type %d\n", type
       );
       return LIBSPECTRUM_ERROR_UNKNOWN;
+
     }
 
-    level = (*next_block)[2] + (*next_block)[3] * 0x100;
-    if( level >= 0x100 ) {
-      libspectrum_print_error(
-        "libspectrum_z80_read_slt: unexpected level number %d\n", level
-      );
-      return LIBSPECTRUM_ERROR_CORRUPT;
-    }
+    /* and move both pointers along to the next block */
+    *next_block += 8; whence += length;
 
-    /* Each level should appear once only */
-    if( slt_length[ level ] ) {
-      libspectrum_print_error(
-        "libspectrum_z80_read_slt: level %d is duplicated\n", level
-      );
-      return LIBSPECTRUM_ERROR_CORRUPT;
-    }
-
-    slt_length[ level ] = (*next_block)[4]             +
-                          (*next_block)[5] *     0x100 +
-                          (*next_block)[6] *   0x10000 +
-                          (*next_block)[7] * 0x1000000;
-
-    /* and move along to the next block */
-    *next_block += 8;
   }
 
   /* Read in the data for each level */
@@ -332,7 +360,7 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
       libspectrum_error error;
 
       /* Check this data actually exists */
-      if( *next_block + slt_length[i] > end ) {
+      if( *next_block + offsets[i] + slt_length[i] > end ) {
 	libspectrum_print_error(
           "libspectrum_z80_read_slt: out of data reading level %d\n", i
 	);
@@ -341,14 +369,48 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
 
       error = libspectrum_z80_uncompress_block(
 	        &(snap->slt[i]), &(snap->slt_length[i]),
-		*next_block, slt_length[i]
+		*next_block + offsets[i], slt_length[i]
 	      );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-      /* Move past this data */
-      *next_block += slt_length[i];
     }
   }
+
+  /* And the screen data */
+  if( screen_length ) {
+
+    /* Should expand to 6912 bytes, so give me a buffer that long */
+    snap->slt_screen =
+      (libspectrum_byte*)malloc( 6912 * sizeof( libspectrum_byte ) );
+    if( snap->slt_screen == NULL ) {
+      libspectrum_print_error(
+        "libspectrum_z80_read_slt: out of memory\n"
+      );
+      return LIBSPECTRUM_ERROR_MEMORY;
+    }
+
+    if( screen_length == 6912 ) {	/* Not compressed */
+      memcpy( snap->slt_screen, (*next_block) + screen_offset, 6912 );
+    } else {				/* Compressed */
+      
+      error = libspectrum_z80_uncompress_block(
+	        &(snap->slt_screen), &screen_length,
+		(*next_block) + screen_offset, screen_length
+	      );
+
+      /* A screen should be 6912 bytes long */
+      if( screen_length != 6912 ) {
+	libspectrum_print_error(
+	  "libspectrum_z80_read_slt: screen is not 6912 bytes long\n"
+	);
+	free( snap->slt_screen ); snap->slt_screen = NULL;
+	return LIBSPECTRUM_ERROR_CORRUPT;
+      }
+    }
+  }
+
+  /* Move past the data */
+  *next_block += whence;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
