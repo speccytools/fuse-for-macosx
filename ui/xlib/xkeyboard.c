@@ -46,38 +46,36 @@
 #endif				/* #ifdef USE_WIDGET */
 #include "xkeyboard.h"
 
+static void
+get_keysyms( XKeyEvent *event, input_event_t *fuse_event )
+{
+  int index;
+  KeySym native, spectrum;
+
+  index = event->state & ShiftMask ? 1 : 0;
+  native = XLookupKeysym( event, index );
+  fuse_event->types.key.native_key = keysyms_remap( native );
+
+  spectrum = XLookupKeysym( event, 0 );
+  fuse_event->types.key.spectrum_key = keysyms_remap( spectrum );
+}
+
 void xkeyboard_keypress(XKeyEvent *event)
 {
-  KeySym keysym;
-  input_key fuse_keysym;
   input_event_t fuse_event;
 
-  keysym=XLookupKeysym(event,0);
-
-  fuse_keysym = keysyms_remap( keysym );
-
-  if( fuse_keysym == INPUT_KEY_NONE ) return;
-
   fuse_event.type = INPUT_EVENT_KEYPRESS;
-  fuse_event.types.key.key = fuse_keysym;
+  get_keysyms( event, &fuse_event );
 
   input_event( &fuse_event );
 }
 
 void xkeyboard_keyrelease(XKeyEvent *event)
 {
-  KeySym keysym;
-  input_key fuse_keysym;
   input_event_t fuse_event;
 
-  keysym=XLookupKeysym(event,0);
-
-  fuse_keysym = keysyms_remap( keysym );
-
-  if( fuse_keysym == INPUT_KEY_NONE ) return;
-
   fuse_event.type = INPUT_EVENT_KEYRELEASE;
-  fuse_event.types.key.key = fuse_keysym;
+  get_keysyms( event, &fuse_event );
 
   input_event( &fuse_event );
 }

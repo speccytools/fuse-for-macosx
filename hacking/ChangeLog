@@ -1227,5 +1227,6 @@
 20050219 snapshot.c: ensure all menus etc are updated after snapshot load.
 20050219 trdos.c,ui/gtk/gtkui.c: add "Save, Don't Save, Cancel"
 	 functionality for TR-DOS disks.
-
-	
+20050223 input.[ch],keysyms.dat,ui/gtk/gtkkeyboard.c,ui/xlib/xkeyboard.c,
+	 widget/text.c: enable 'native' keysyms to be passed through to
+	 the widget controls, rather than the 'Spectrum' keysyms.

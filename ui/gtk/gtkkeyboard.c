@@ -40,12 +40,23 @@
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);
 
+static void
+get_keysyms( input_event_t *event, guint keysym )
+{
+  guint unshifted;
+
+  /* The GTK+ UI doesn't actually use the native keysym for anything,
+     but we may as well set it up anyway as we've got it */
+  event->types.key.native_key = keysyms_remap( keysym );
+
+  unshifted = gtkkeyboard_unshift_keysym( keysym );
+  event->types.key.spectrum_key = keysyms_remap( unshifted );
+}
+
 int
 gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 		      gpointer data GCC_UNUSED )
 {
-  guint gdk_keysym;
-  input_key fuse_keysym;
   input_event_t fuse_event;
 
 #ifdef UI_GTK2
@@ -53,14 +64,8 @@ gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
     ui_mouse_suspend();
 #endif
 
-  gdk_keysym = gtkkeyboard_unshift_keysym( event->key.keyval );
-
-  fuse_keysym = keysyms_remap( gdk_keysym );
-
-  if( fuse_keysym == INPUT_KEY_NONE ) return 0;
-
   fuse_event.type = INPUT_EVENT_KEYPRESS;
-  fuse_event.types.key.key = fuse_keysym;
+  get_keysyms( &fuse_event, event->key.keyval );
 
   return input_event( &fuse_event );
 
@@ -71,18 +76,10 @@ int
 gtkkeyboard_keyrelease( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 			gpointer data GCC_UNUSED )
 {
-  guint gdk_keysym;
-  input_key fuse_keysym;
   input_event_t fuse_event;
 
-  gdk_keysym = gtkkeyboard_unshift_keysym( event->key.keyval );
-
-  fuse_keysym = keysyms_remap( gdk_keysym );
-
-  if( fuse_keysym == INPUT_KEY_NONE ) return 0;
-
   fuse_event.type = INPUT_EVENT_KEYRELEASE;
-  fuse_event.types.key.key = fuse_keysym;
+  get_keysyms( &fuse_event, event->key.keyval );
 
   return input_event( &fuse_event );
 }

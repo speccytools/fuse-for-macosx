@@ -73,17 +73,11 @@ widget_text_keyhandler( input_key key )
 {
   switch( key ) {
 
-#if 0
-  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
-    widget_text_draw( NULL );
-    return;
-#endif
-      
   case INPUT_KEY_BackSpace:	/* Backspace generates DEL which is Caps + 0 */
     delete_character(); widget_text_draw( NULL );
     return;
 
-  case INPUT_KEY_Escape:	/* `Esc' generates EDIT which is Caps + 1 */
+  case INPUT_KEY_Escape:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
@@ -96,14 +90,9 @@ widget_text_keyhandler( input_key key )
 
   }
 
-  if( key >= INPUT_KEY_0 && key <= INPUT_KEY_9 ) {
-    append_character( key );
-  } else if( key >= INPUT_KEY_a && key <= INPUT_KEY_z ) {
-    append_character( key );
-  }
+  if( key >= 0x20 && key < 0x7f ) append_character( key );
 
   widget_text_draw( NULL );
-
 }
 
 static void 

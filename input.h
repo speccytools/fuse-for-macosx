@@ -72,6 +72,33 @@ typedef enum input_key {
   INPUT_KEY_semicolon = 0x3b,
   INPUT_KEY_equal = 0x3d,
 
+  INPUT_KEY_A = 0x41,
+  INPUT_KEY_B,
+  INPUT_KEY_C,
+  INPUT_KEY_D,
+  INPUT_KEY_E,
+  INPUT_KEY_F,
+  INPUT_KEY_G,
+  INPUT_KEY_H,
+  INPUT_KEY_I,
+  INPUT_KEY_J,
+  INPUT_KEY_K,
+  INPUT_KEY_L,
+  INPUT_KEY_M,
+  INPUT_KEY_N,
+  INPUT_KEY_O,
+  INPUT_KEY_P,
+  INPUT_KEY_Q,
+  INPUT_KEY_R,
+  INPUT_KEY_S,
+  INPUT_KEY_T,
+  INPUT_KEY_U,
+  INPUT_KEY_V,
+  INPUT_KEY_W,
+  INPUT_KEY_X,
+  INPUT_KEY_Y,
+  INPUT_KEY_Z,
+
   INPUT_KEY_a = 0x61,
   INPUT_KEY_b,
   INPUT_KEY_c,
@@ -146,7 +173,8 @@ typedef enum input_key {
 
 typedef struct input_event_key_t {
 
-  input_key key;
+  input_key native_key;
+  input_key spectrum_key;
 
 } input_event_key_t;
 

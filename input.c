@@ -69,28 +69,25 @@ input_event( const input_event_t *event )
 static int
 keypress( const input_event_key_t *event )
 {
-  input_key key;
   int swallow;
   const keyboard_spectrum_keys_t *ptr;
 
-  key = event->key;
-
 #ifdef USE_WIDGET
   if( widget_level >= 0 ) {
-    widget_keyhandler( key );
+    widget_keyhandler( event->native_key );
     return 0;
   }
 #endif				/* #ifdef USE_WIDGET */
 
   /* Escape => ask UI to end mouse grab, return if grab ended */
-  if( key == INPUT_KEY_Escape && ui_mouse_grabbed ) {
+  if( event->native_key == INPUT_KEY_Escape && ui_mouse_grabbed ) {
     ui_mouse_grabbed = ui_mouse_release( 0 );
     if( !ui_mouse_grabbed ) return 0;
   }
 
   swallow = 0;
   /* Joystick emulation via QAOP<space> */
-  switch( key ) {
+  switch( event->native_key ) {
 
   case INPUT_KEY_q:
     swallow = joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_UP   , 1 );
@@ -114,7 +111,7 @@ keypress( const input_event_key_t *event )
 
   if( swallow ) return 0;
 
-  ptr = keyboard_get_spectrum_keys( key );
+  ptr = keyboard_get_spectrum_keys( event->spectrum_key );
 
   if( ptr ) {
     keyboard_press( ptr->key1 );
@@ -122,7 +119,7 @@ keypress( const input_event_key_t *event )
   }
 
 #ifdef USE_WIDGET
-  switch( key ) {
+  switch( event->native_key ) {
   case INPUT_KEY_F1:
     fuse_emulation_pause();
     widget_do( WIDGET_TYPE_MENU, &widget_menu );
@@ -181,12 +178,9 @@ keypress( const input_event_key_t *event )
 static int
 keyrelease( const input_event_key_t *event )
 {
-  input_key key;
   const keyboard_spectrum_keys_t *ptr;
 
-  key = event->key;
-
-  ptr = keyboard_get_spectrum_keys( key );
+  ptr = keyboard_get_spectrum_keys( event->spectrum_key );
 
   if( ptr ) {
     keyboard_release( ptr->key1 );
@@ -194,7 +188,7 @@ keyrelease( const input_event_key_t *event )
   }
 
   /* Joystick emulation via QAOP<space> */
-  switch( key ) {
+  switch( event->native_key ) {
 
   case INPUT_KEY_q:
     joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_UP   , 0 ); break;
