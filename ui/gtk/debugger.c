@@ -29,6 +29,7 @@
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <stdio.h>
+#include <string.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -54,7 +55,7 @@ static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 
 static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
-  *registers[16],			/* The register display */
+  *registers[17],			/* The register display */
   *disassembly;				/* The disassembly */
 
 /* The top line of the current disassembly */
@@ -124,7 +125,7 @@ create_dialog( void )
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
 
   /* 'table' contains the register display */
-  table = gtk_table_new( 6, 4, FALSE );
+  table = gtk_table_new( 10, 4, FALSE );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), table );
 
   for( i = 0; i < 15; i++ ) {
@@ -141,6 +142,12 @@ create_dialog( void )
 
   registers[15] = gtk_label_new( "" );
   gtk_table_attach_defaults( GTK_TABLE( table ), registers[15], 2, 4, 7, 8 );
+
+  label = gtk_label_new( "SZ5H3PNC" );
+  gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 2, 8, 9 );
+
+  registers[16] = gtk_label_new( "" );
+  gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 2, 9, 10 );
 
   /* Create the disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, titles );
@@ -258,6 +265,10 @@ ui_debugger_update( void )
   gtk_label_set_text( GTK_LABEL( registers[14] ), buffer );
   snprintf( buffer, 80, "IM %d", IM );
   gtk_label_set_text( GTK_LABEL( registers[15] ), buffer );
+
+  for( i = 0; i < 8; i++ ) buffer[i] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
+  buffer[8] = '\0';
+  gtk_label_set_text( GTK_LABEL( registers[16] ), buffer );
 
   /* Put some disassembly in */
   gtk_clist_freeze( GTK_CLIST( disassembly ) );
