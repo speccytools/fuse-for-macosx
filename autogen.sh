@@ -28,6 +28,8 @@
 set -e
 
 aclocal
+# Mac OS X: Use glibtoolize instead
+libtoolize
 autoheader
 automake --add-missing --copy
 autoconf

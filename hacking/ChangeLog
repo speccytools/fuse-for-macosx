@@ -1075,3 +1075,8 @@
 	 ui/ui.h,ui/gtk/{Makefile.am,rollback.c}: allow RZX rollback to
 	 arbitrary points.
 20041002 keysyms.pl: SDL does not support caps lock as used in Fuse.
+20041014 .cvsignore, Makefile.am, autogen.sh, configure.in, ui/gtk/.cvsignore,
+         ui/gtk/Makefile.am: Use libtool to link Fuse and libuigtk, sorts out
+         transitive dependencies when gtk (and probably libspectrum) is
+         installed in a non-default directory. Fixes build of UNIX version on
+         Mac OS X.

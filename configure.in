@@ -22,6 +22,7 @@ dnl Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
+AC_CANONICAL_SYSTEM
 
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE(fuse, 0.7.0)
@@ -33,6 +34,7 @@ AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 AM_PROG_LEX
 AC_PROG_YACC
+AC_PROG_LIBTOOL
 
 dnl Generate commandy.h
 YFLAGS="$YFLAGS -d"
@@ -197,7 +199,7 @@ if test -z "$UI"; then
 		          [Defined if GTK+ UI (either 1.2 or 2.x) is in use])
 	        AC_DEFINE([UI_GTK2], 1, [Defined if GTK+ 2.0 is in use])
 		AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-	        UI=gtk; UI_LIBS="ui/gtk/libuigtk.a", 
+	        UI=gtk; UI_LIBS="ui/gtk/libuigtk.la",
 		AC_MSG_WARN([GTK+ 2.x not found. Reverting to GTK+ 1.2]))
   fi
 fi
@@ -215,9 +217,13 @@ if test -z "$UI"; then
 		AC_DEFINE([UI_GTK], 1,
 		          [Defined if GTK+ UI (either 1.2 or 2.x) is in use])
 		AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-		UI=gtk; UI_LIBS="ui/gtk/libuigtk.a",
+		UI=gtk; UI_LIBS="ui/gtk/libuigtk.la",
 		AC_MSG_WARN([GTK+ 1.2 not found. Reverting to Xlib UI]))
   fi
+fi
+
+if test "$UI" = gtk; then
+  AC_PATH_XTRA
 fi
 
 dnl Look for Xlib UI (default=yes)
@@ -225,7 +231,7 @@ if test -z "$UI"; then
   if test "$with_x" = no; then
     AC_MSG_ERROR([Please specify --with-svgalib or --with-fb, not --without-x.])
   fi
-  AC_PATH_XTRA	
+  AC_PATH_XTRA
   CFLAGS="$CFLAGS $X_CFLAGS";
   LDFLAGS="$LDFLAGS $X_LIBS";
   LIBS="$LIBS $X_PRE_LIBS -lX11 $X_EXTRA_LIBS";

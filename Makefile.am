@@ -100,7 +100,6 @@ z80/libz80.a \
 @DSKLIBS@ \
 @LIBSPEC_LIBS@ \
 @GLIB_LIBS@ \
-@GTK_LIBS@ \
 @PNG_LIBS@ \
 @XML_LIBS@ \
 compat/libcompat.a

@@ -24,11 +24,11 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-noinst_LIBRARIES = libuigtk.a
+noinst_LTLIBRARIES = libuigtk.la
 
 INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
-libuigtk_a_SOURCES = binary.c \
+libuigtk_la_SOURCES = binary.c \
 		     browse.c \
 		     confirm.c \
 	             debugger.c \
@@ -49,6 +49,8 @@ libuigtk_a_SOURCES = binary.c \
 		     roms.c \
 		     statusbar.c \
 		     stock.c
+
+libuigtk_la_LIBADD = @GTK_LIBS@ -lX11 
 
 BUILT_SOURCES = keysyms.c \
 		menu_data.c \
