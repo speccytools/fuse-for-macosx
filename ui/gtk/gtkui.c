@@ -145,7 +145,9 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 static void gtkui_disk_open_a( GtkWidget *widget, gpointer data );
 static void gtkui_disk_open_b( GtkWidget *widget, gpointer data );
 static void gtkui_disk_eject_a( GtkWidget *widget, gpointer data );
+static void gtkui_disk_eject_write_a( GtkWidget *widget, gpointer data );
 static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data );
+static void gtkui_disk_eject_write_b( GtkWidget *widget, gpointer data );
 
 static void gtkui_disk_open( specplus3_drive_number drive );
 
@@ -221,11 +223,15 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 				NULL , gtkui_disk_open_a,   0, NULL          },
   { "/Media/Disk/Drive A:/_Eject",
 				NULL , gtkui_disk_eject_a,  0, NULL          },
+  { "/Media/Disk/Drive A:/Eject and _write...",
+			        NULL , gtkui_disk_eject_write_a, 0, NULL     },
   { "/Media/Disk/Drive B:",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Disk/Drive B:/_Insert...",
 				NULL , gtkui_disk_open_b,   0, NULL          },
   { "/Media/Disk/Drive B:/_Eject",
 				NULL , gtkui_disk_eject_b,  0, NULL          },
+  { "/Media/Disk/Drive B:/Eject and _write...",
+			        NULL , gtkui_disk_eject_write_b, 0, NULL     },
 
   { "/Media/_Cartridge",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Cartridge/_Insert...",
@@ -1058,7 +1064,21 @@ gtkui_disk_eject_a( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
 #ifdef HAVE_765_H
   if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( SPECPLUS3_DRIVE_A );
+    specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
+    return;
+  }
+#endif				/* #ifdef HAVE_765_H */
+
+  trdos_disk_eject( TRDOS_DRIVE_A );
+}
+
+static void
+gtkui_disk_eject_write_a( GtkWidget *widget GCC_UNUSED,
+			  gpointer data GCC_UNUSED )
+{
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_disk_eject( SPECPLUS3_DRIVE_A, 1 );
     return;
   }
 #endif				/* #ifdef HAVE_765_H */
@@ -1071,13 +1091,55 @@ gtkui_disk_eject_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
 #ifdef HAVE_765_H
   if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_eject( SPECPLUS3_DRIVE_B );
+    specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
     return;
   }
 #endif				/* #ifdef HAVE_765_H */
 
   trdos_disk_eject( TRDOS_DRIVE_B );
 }
+
+static void
+gtkui_disk_eject_write_b( GtkWidget *widget GCC_UNUSED,
+			  gpointer data GCC_UNUSED )
+{
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_disk_eject( SPECPLUS3_DRIVE_B, 1 );
+    return;
+  }
+#endif				/* #ifdef HAVE_765_H */
+
+  trdos_disk_eject( TRDOS_DRIVE_B );
+}
+
+int
+ui_plus3_disk_write( specplus3_drive_number which )
+{
+  char drive, *filename, title[80];
+
+  drive = which == SPECPLUS3_DRIVE_A ? 'A' : 'B';
+
+  if( !specplus3_disk_present( which ) ) {
+    ui_error( UI_ERROR_INFO, "No disk present in drive %c:", drive );
+    return 0;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write +3 Disk %c:", drive );
+
+  filename = gtkui_fileselector_get_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  specplus3_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}  
 
 /* Cartridge/Insert */
 static void
@@ -1162,10 +1224,18 @@ int ui_menu_activate( ui_menu_item item, int active )
     return set_menu_item_active( "/Media/Disk", active );
 
   case UI_MENU_ITEM_MEDIA_DISK_A_EJECT:
-    return set_menu_item_active( "/Media/Disk/Drive A:/Eject", active );
+    error = set_menu_item_active( "/Media/Disk/Drive A:/Eject", active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/Media/Disk/Drive A:/Eject and write...",
+				 active );
 
   case UI_MENU_ITEM_MEDIA_DISK_B_EJECT:
-    return set_menu_item_active( "/Media/Disk/Drive B:/Eject", active );
+    error = set_menu_item_active( "/Media/Disk/Drive B:/Eject", active );
+    if( error ) return error;
+
+    return set_menu_item_active( "/Media/Disk/Drive B:/Eject and write...",
+				 active );
 
   case UI_MENU_ITEM_RECORDING:
     error = set_menu_item_active( "/File/Recording/Record...", !active );

@@ -451,3 +451,5 @@
 20040104 widget/{menu,widget}.c: fix up widget UIs for new confirm code.
 20040105 tape.c, ui/gtk/{confirm,gtkui}.c: check for tape modification
 	 on exit.
+20040105 specplus3.[ch], ui/ui.h, ui/gtk/gtkui.c: make writes to +3 disks
+	 only be committed when explicitly requested by the user.

@@ -30,12 +30,9 @@
 
 #ifdef HAVE_765_H
 #include <errno.h>
-#include <fcntl.h>
-#include <limits.h>		/* Needed to get PATH_MAX */
+#include <limits.h>
 #include <stdarg.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #ifdef HAVE_LIBDSK_H
@@ -58,6 +55,7 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 static int normal_memory_map( int rom, int page );
 static int special_memory_map( int which );
@@ -71,6 +69,11 @@ static void specplus3_fdc_write( libspectrum_word port,
 				 libspectrum_byte data );
 
 void specplus3_fdc_error( int debug, char *format, va_list ap );
+
+/* The template used for naming the temporary files used for making
+   a copy of the emulated disk */
+static const char *dsk_template = "fuse.dsk.XXXXXX";
+
 #endif			/* #ifdef HAVE_765_H */
 
 static int specplus3_shutdown( void );
@@ -488,109 +491,82 @@ specplus3_fdc_error( int debug, char *format, va_list ap )
   ui_verror( UI_ERROR_ERROR, format, ap );
 }
 
+/* How we handle +3 disk files: we would like to keep with Fuse's
+   model of having the current tape/disk as a 'virtual' tape/disk in
+   memory which is written to (the emulating machine's) disk only when
+   explicitly requested by the user. This doesn't mesh particularly
+   well with lib765/libdsk's model of having a direct one-to-one
+   mapping between the emulated disk and a disk file, so we copy the
+   emulated disk to a temporary file when it is opened and give that
+   to lib765/libdsk instead.
+
+   The use of the temporary file is further complicated by the fact
+   that lib765/libdsk doesn't immediately open the file so we can't
+   just do the standard mkstemp/unlink pair, but have to unlink when
+   the disk is ejected */
+
+int
+specplus3_disk_present( specplus3_drive_number which )
+{
+  return drives[ which ].fd != -1;
+}
+
 int
 specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 {
-  struct stat buf;
-  struct flock lock;
-  int readonly;
-  size_t i; int error;
+  char template[ PATH_MAX ];
+  utils_file file;
+  int fd, error;
+  ssize_t bytes_written;
 
   if( which > SPECPLUS3_DRIVE_B ) {
-    ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d\n",
+    ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d",
 	      which );
     fuse_abort();
   }
 
+  /* Make a copy of the disk */
+  snprintf( template, PATH_MAX, "%s/%s", utils_get_temp_path(), dsk_template );
+
+  fd = mkstemp( template );
+  if( fd == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't create .dsk temporary file: %s",
+	      strerror( errno ) );
+  }
+
+  error = utils_read_file( filename, &file );
+  if( error ) { close( fd ); unlink( template ); return error; }
+
+  bytes_written = write( fd, file.buffer, file.length );
+  if( bytes_written != file.length ) {
+    if( bytes_written == -1 ) {
+      ui_error( UI_ERROR_ERROR, "error writing to temporary file '%s': %s",
+		template, strerror( errno ) );
+    } else {
+      ui_error( UI_ERROR_ERROR,
+		"could write only %lu of %lu bytes to temporary file '%s'",
+		(unsigned long)bytes_written, (unsigned long)file.length,
+		template );
+    }
+    utils_close_file( &file ); close( fd ); unlink( template );
+    return 1;
+  }
+
+  error = utils_close_file( &file );
+  if( error ) { close( fd ); unlink( template ); return error; }
+
   /* Eject any disk already in the drive */
-  if( drives[which].fd != -1 ) specplus3_disk_eject( which );
-
-  readonly = 0;
-  /* Open the disk file */
-  drives[which].fd = open( filename, O_RDWR | O_BINARY );
-  if( drives[which].fd == -1 ) {
-
-    /* If we couldn't open read-write, try read-only */
-    if( errno == EACCES ) {
-      readonly = 1;
-      drives[which].fd = open( filename, O_RDONLY | O_BINARY );
-    }
-
-    /* If we got an error other than EACCES or the read-only open failed,
-       give up */
-    if( drives[which].fd == -1 ) {
-      ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
-		strerror( errno ) );
-      return 1;
-    }
-  }
-
-  /* We now have to do two sorts of locking:
-
-     1) stop the same disk being put into more than one drive on this
-     copy of Fuse. Do this by looking at the st_dev (device) and
-     st_ino (inode) results from fstat(2) and assuming that each file
-     returns a persistent unique pair. This assumption isn't quite
-     true (I can break it with smbfs, and nmm1@cam.ac.uk has pointed
-     out some other cases), but it's right most of the time, and it's
-     POSIX compliant.
-
-     2) stop the same disk being accessed by other programs. Without
-     mandatory locking (ugh), can't enforce this, so just lock the
-     entire file with fcntl. Therefore two copies of Fuse (or anything
-     else using fcntl) can't access the file whilst it's in a
-     drive. Again, this is POSIX compliant.
-  */
-
-  error = fstat( drives[which].fd, &buf );
-  if( error == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't fstat '%s': %s", filename,
-	      strerror( errno ) );
-    close( drives[which].fd ); drives[which].fd = -1;
-    return 1;
-  }
-
-  drives[which].device = buf.st_dev;
-  drives[which].inode  = buf.st_ino;
-
-  for( i = SPECPLUS3_DRIVE_A; i <= SPECPLUS3_DRIVE_B; i++ ) {
-
-    /* Don't compare this drive with itself */
-    if( i == which ) continue;
-
-    /* If there's no file in this drive, it can't clash */
-    if( drives[i].fd == -1 ) continue;
-
-    if( drives[i].device == drives[which].device &&
-	drives[i].inode  == drives[which].inode ) {
-      ui_error( UI_ERROR_ERROR, "'%s' is already in drive %c:", filename,
-		(char)( 'A' + i ) );
-      close( drives[which].fd ); drives[which].fd = -1;
-      return 1;
-    }
-  }
-
-  /* Lock the entire file: exclusively if we opened it read/write, or
-     read lock if we opened it readonly */
-  lock.l_type = readonly ? F_RDLCK : F_WRLCK;
-  lock.l_start = 0;
-  lock.l_whence = SEEK_SET;
-  lock.l_len = 0;		/* Entire file */
-
-  error = fcntl( drives[which].fd, F_SETLK, &lock );
-  if( error == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't lock '%s': %s", filename,
-	      strerror( errno ) );
-    close( drives[which].fd ); drives[which].fd = -1;
-    return 1;
-  }
+  if( drives[which].fd != -1 ) specplus3_disk_eject( which, 0 );
 
   /* And now insert the disk */
+  drives[ which ].fd = fd;
+  strcpy( drives[ which ].filename, template );
+
 #ifdef HAVE_LIBDSK_H
   fdl_settype( drives[which].drive, NULL ); /* Autodetect disk format */
-  fdl_setfilename( drives[which].drive, filename );
+  fdl_setfilename( drives[which].drive, template );
 #else				/* #ifdef HAVE_LIBDSK_H */
-  fdd_setfilename( drives[which].drive, filename );
+  fdd_setfilename( drives[which].drive, template );
 #endif				/* #ifdef HAVE_LIBDSK_H */
 
   /* And set the appropriate `eject' item active */
@@ -604,37 +580,73 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 }
 
 int
-specplus3_disk_eject( specplus3_drive_number which )
+specplus3_disk_eject( specplus3_drive_number which, int write )
 {
   int error;
 
   if( which > SPECPLUS3_DRIVE_B ) {
-    ui_error( UI_ERROR_ERROR, "specplus3_disk_eject: unknown drive %d\n",
+    ui_error( UI_ERROR_ERROR, "specplus3_disk_eject: unknown drive %d",
 	      which );
     fuse_abort();
   }
 
-  /* NB: the fclose() called here will cause the lock on the file to
-     be released */
+  if( drives[ which ].fd == -1 ) return 0;
+
   fd_eject( drives[which].drive );
 
-  if( drives[which].fd != -1 ) {
-    error = close( drives[which].fd );
-    if( error == -1 ) {
-      ui_error( UI_ERROR_ERROR, "Couldn't close the disk: %s\n",
-		strerror( errno ) );
-      return 1;
-    }
-    drives[which].fd = -1;
+  if( write ) ui_plus3_disk_write( which );
+
+  error = close( drives[which].fd );
+  if( error == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't close temporary file '%s': %s",
+	      drives[ which ].filename, strerror( errno ) );
+    return 1;
   }
+  drives[which].fd = -1;
+  unlink( drives[ which ].filename );
 
   /* Set the appropriate `eject' item inactive */
-  /* And set the appropriate `eject' item active */
   ui_menu_activate(
     which == SPECPLUS3_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
 				 UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
     0
   );
+
+  return 0;
+}
+
+int
+specplus3_disk_write( specplus3_drive_number which, const char *filename )
+{
+  utils_file file;
+  FILE *f;
+  int error;
+  size_t bytes_written;
+
+  f = fopen( filename, "wb" );
+  if( !f ) {
+    ui_error( UI_ERROR_ERROR, "couldn't open '%s' for writing: %s", filename,
+	      strerror( errno ) );
+  }
+
+  error = utils_read_file( drives[ which ].filename, &file );
+  if( error ) { fclose( f ); return error; }
+
+  bytes_written = fwrite( file.buffer, 1, file.length, f );
+  if( bytes_written != file.length ) {
+    ui_error( UI_ERROR_ERROR, "could write only %lu of %lu bytes to '%s'",
+	      (unsigned long)bytes_written, (unsigned long)file.length,
+	      filename );
+    utils_close_file( &file ); fclose( f );
+  }
+
+  error = utils_close_file( &file ); if( error ) { fclose( f ); return error; }
+
+  if( fclose( f ) ) {
+    ui_error( UI_ERROR_ERROR, "error closing '%s': %s", filename,
+	      strerror( errno ) );
+    return 1;
+  }
 
   return 0;
 }
@@ -645,6 +657,10 @@ static int
 specplus3_shutdown( void )
 {
 #ifdef HAVE_765_H
+  /* Eject any disks, thus causing the temporary files to be removed */
+  specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
+  specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
+
   fd_destroy( &drives[ SPECPLUS3_DRIVE_A ].drive );
   fd_destroy( &drives[ SPECPLUS3_DRIVE_B ].drive );
   fd_destroy( &drive_null );
