@@ -233,7 +233,8 @@ screenshot_available_scalers( scaler_type scaler )
 
     switch( scaler ) {
 
-    case SCALER_HALF: case SCALER_NORMAL: case SCALER_TIMEXTV:
+    case SCALER_HALF: case SCALER_HALFSKIP: case SCALER_NORMAL:
+    case SCALER_TIMEXTV:
       return 1;
     default:
       return 0;
