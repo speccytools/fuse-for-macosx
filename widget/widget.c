@@ -446,6 +446,7 @@ widget_options_print_entry( int number, const char *prefix, int value,
   widget_printstring( 2, number + 4, WIDGET_COLOUR_FOREGROUND, buffer );
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
 		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
+  uidisplay_frame_end();
 
   return 0;
 }

@@ -36,7 +36,6 @@
 #include "fuse.h"
 #include "keysyms.h"
 #include "machine.h"
-#include "settings.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
@@ -76,7 +75,12 @@ sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
     break;
   case SDLK_F3:
     fuse_emulation_pause();
-    widget_apply_to_file( snapshot_read );
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+    if( widget_filesel_name ) {
+      snapshot_read( widget_filesel_name );
+      free( widget_filesel_name );
+      display_refresh_all();
+    }
     fuse_emulation_unpause();
     break;
   case SDLK_F4:
@@ -94,7 +98,7 @@ sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
     break;
   case SDLK_F7:
     fuse_emulation_pause();
-    widget_apply_to_file( tape_open );
+    widget_apply_to_file( tape_open_default_autoload );
     fuse_emulation_unpause();
     break;
   case SDLK_F8:

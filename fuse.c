@@ -32,6 +32,10 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+#ifdef UI_SDL
+#include <SDL.h>		/* Needed on MacOS X and Windows */
+#endif				/* #ifdef UI_SDL */
+
 #include "display.h"
 #include "event.h"
 #include "fuse.h"

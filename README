@@ -24,8 +24,8 @@ What Fuse doesn't have:
 
 What you'll need to run Fuse:
 
-* A version of Unix with any of X, svgalib or framebuffer support installed.
-  If you have GTK+, you'll get a nicer user interface under X.
+* A version of Unix with any of X, svgalib, framebuffer or SDL support
+  installed.  If you have GTK+, you'll get a nicer user interface under X.
 * libspectrum: this is available from
   http://www.srcf.ucam.org/~pak21/spectrum/libspectrum.html
 * If you want +3 support, you'll need John Elliott's lib765 installed;

@@ -2,7 +2,7 @@
 
 # keysyms.pl: generate keysyms.c from keysyms.dat
 # Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Russell Marks,
-#			  Frederick Meunier
+#			  Fredrick Meunier
 
 # $Id$
 
@@ -106,7 +106,7 @@ my $declare = "const keysyms_key_info keysyms_data[] =\n{";
 
 my $preamble = Fuse::GPL(
     'keysyms.c: keysym to Spectrum key mappings for both Xlib and GDK',
-    '2000-2002 Philip Kendall, Matan Ziv-Av, Russell Marks, Frederick Meunier' ) .
+    '2000-2002 Philip Kendall, Matan Ziv-Av, Russell Marks, Fredrick Meunier' ) .
     "\n#include <config.h>\n";
 
 my $includes = << 'CODE';
