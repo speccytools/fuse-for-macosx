@@ -1156,3 +1156,4 @@
 20050102 fuse.c, if1.[ch], settings.dat, utils.c, ui/options.dat: variable
 	 length microdrive cartridge handling (rest of patch #1085429)
 	 (Gergely Szasz).
+20050102 fuse.c: update copyright date to 2005.

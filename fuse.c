@@ -49,6 +49,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "if1.h"
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
@@ -382,7 +383,7 @@ static void fuse_show_copyright(void)
   printf( "\n" );
   fuse_show_version();
   printf(
-   "Copyright (c) 1999-2004 Philip Kendall <pak21-fuse@srcf.ucam.org>\n"
+   "Copyright (c) 1999-2005 Philip Kendall <pak21-fuse@srcf.ucam.org>\n"
    "and others; see the file 'AUTHORS' for more details.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"
