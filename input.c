@@ -209,23 +209,73 @@ keyrelease( const input_event_key_t *event )
   return 0;
 }
 
+static keyboard_key_name
+get_fire_button_key( int which, input_joystick_button button )
+{
+  switch( which ) {
+
+  case 0:
+    switch( button ) {
+    case INPUT_JOYSTICK_FIRE: return settings_current.joystick_1_fire_1;
+    default:
+      fuse_abort();
+    }
+
+  case 1:
+    switch( button ) {
+    case INPUT_JOYSTICK_FIRE: return settings_current.joystick_2_fire_1;
+    default:
+      fuse_abort();
+    }
+
+  default:
+    fuse_abort();
+  }
+
+  return 0;
+}
+
 static int
 do_joystick( const input_event_joystick_t *joystick_event, int press )
 {
-  joystick_button button;
+  int which;
 
-  switch( joystick_event->button ) {
-  case INPUT_JOYSTICK_LEFT : button = JOYSTICK_BUTTON_LEFT;  break;
-  case INPUT_JOYSTICK_RIGHT: button = JOYSTICK_BUTTON_RIGHT; break;
-  case INPUT_JOYSTICK_UP   : button = JOYSTICK_BUTTON_UP;    break;
-  case INPUT_JOYSTICK_DOWN : button = JOYSTICK_BUTTON_DOWN;  break;
-  case INPUT_JOYSTICK_FIRE : button = JOYSTICK_BUTTON_FIRE;  break;
+  which = joystick_event->which;
 
-  default:
-    return 0;
+  if( joystick_event->button < INPUT_JOYSTICK_FIRE ) {
+
+    joystick_button button;
+
+    switch( joystick_event->button ) {
+    case INPUT_JOYSTICK_UP   : button = JOYSTICK_BUTTON_UP;    break;
+    case INPUT_JOYSTICK_DOWN : button = JOYSTICK_BUTTON_DOWN;  break;
+    case INPUT_JOYSTICK_LEFT : button = JOYSTICK_BUTTON_LEFT;  break;
+    case INPUT_JOYSTICK_RIGHT: button = JOYSTICK_BUTTON_RIGHT; break;
+
+    default:
+      fuse_abort();
+      return 0;			/* Keep gcc happy */
+    }
+
+    joystick_press( which, button, press );
+
+  } else {
+
+    keyboard_key_name key;
+
+    key = get_fire_button_key( which, joystick_event->button );
+
+    if( key == KEYBOARD_JOYSTICK_FIRE ) {
+      joystick_press( which, JOYSTICK_BUTTON_FIRE, press );
+    } else {
+      if( press ) {
+	keyboard_press( key );
+      } else {
+	keyboard_release( key );
+      }
+    }
+
   }
-
-  joystick_press( joystick_event->which, button, press );
 
   return 0;
 }

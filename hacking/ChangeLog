@@ -710,3 +710,6 @@
 20040404 ay.h,sound.h,machines/{pentagon.c,scorpion.c,spec128.c,spec16.c,
 	 spec48.c,specplus2.c,specplus2a.c,specplus3.c,specplus3e.c,
 	 tc2048.c,tc2068.c}: remove use of ayinfo.present.
+20040406 input.c,input.h,keyboard.h,settings.dat: make the 'real joystick
+	 fire' action configurable to be either 'emulated joystick fire'
+	 or 'press a key'.

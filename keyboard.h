@@ -86,18 +86,10 @@ typedef enum keyboard_key_name {
   KEYBOARD_Caps,
   KEYBOARD_Symbol,
 
-  /* Below here, keys don't actually correspond to Spectrum keys, but
-     are used by the widget code */
+  /* Used by the configuration code to signify that a real joystick fire
+     button should map to the emulated joystick fire button */
 
-  KEYBOARD_PageUp = 0x200,
-  KEYBOARD_PageDown,
-  KEYBOARD_Home,
-  KEYBOARD_End,
-
-  /* Fake keypress used on window resize to cause widgets to redraw
-     themselves */
-
-  KEYBOARD_Resize = 0x400,
+  KEYBOARD_JOYSTICK_FIRE = 0x1000,
 
 } keyboard_key_name;
 

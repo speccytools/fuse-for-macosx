@@ -56,9 +56,11 @@ stereo_beeper, boolean, 0,, beeper-stereo
 sound_force_8bit, boolean, 0
 
 joystick_1, string, NULL, 'j'
-joystick_2, string, NULL
 joystick_1_output, numeric, 0
+joystick_1_fire_1, numeric, 4096
+joystick_2, string, NULL
 joystick_2_output, numeric, 0
+joystick_2_fire_1, numeric, 4096
 joystick_keyboard_output, numeric, 0
 
 rzx_compression, boolean, 0,, compress-rzx
