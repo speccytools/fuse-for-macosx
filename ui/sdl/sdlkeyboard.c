@@ -89,7 +89,7 @@ sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
     fuse_emulation_unpause();
     break;
   case SDLK_F5:
-    machine_current->reset();
+    machine_reset();
     break;
   case SDLK_F6:
     fuse_emulation_pause();

@@ -92,7 +92,7 @@ void xkeyboard_keypress(XKeyEvent *event)
     fuse_emulation_unpause();
     break;
   case XK_F5:
-    machine_current->reset();
+    machine_reset();
     break;
   case XK_F6:
     fuse_emulation_pause();

@@ -119,6 +119,7 @@ int machine_read_rom( fuse_machine_info *machine, size_t number,
 		      const char* filename );
 int machine_find_rom( const char *filename );
 
+int machine_reset( void );
 int machine_end( void );
 
 #endif			/* #ifndef FUSE_MACHINE_H */

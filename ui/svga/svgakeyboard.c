@@ -104,7 +104,7 @@ static void svgakeyboard_keypress(int keysym)
     fuse_emulation_unpause();
     break;
   case SCANCODE_F5:
-    machine_current->reset();
+    machine_reset();
     break;
   case SCANCODE_F6:
     fuse_emulation_pause();

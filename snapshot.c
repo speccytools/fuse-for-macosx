@@ -155,7 +155,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
     }
   }
 
-  machine_current->reset();
+  machine_reset();
 
   capabilities = libspectrum_machine_capabilities( machine_current->machine );
 

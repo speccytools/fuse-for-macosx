@@ -274,7 +274,7 @@ ui_debugger_update( void )
 
   snprintf( buffer, 80, format_8_bit, I );
   gtk_label_set_text( GTK_LABEL( registers[12] ), buffer );
-  snprintf( buffer, 80, format_8_bit, R & 0xff );
+  snprintf( buffer, 80, format_8_bit, ( R & 0x7f ) | ( R7 | 0x80 ) );
   gtk_label_set_text( GTK_LABEL( registers[13] ), buffer );
   snprintf( buffer, 80, "%d", tstates );
   gtk_label_set_text( GTK_LABEL( registers[14] ), buffer );

@@ -194,6 +194,14 @@ static int machine_select_machine( fuse_machine_info *machine )
   
   ROM = machine->roms;
 
+  if( machine_reset() ) return 1;
+
+  return 0;
+}
+
+int
+machine_reset( void )
+{
   /* These things should happen on all resets */
   z80_reset();
   sound_ay_reset();
@@ -203,7 +211,7 @@ static int machine_select_machine( fuse_machine_info *machine )
   tape_stop();
 
   /* Do any machine-specific bits */
-  if( machine->reset ) machine->reset();
+  if( machine_current->reset ) machine_current->reset();
 
   return 0;
 }

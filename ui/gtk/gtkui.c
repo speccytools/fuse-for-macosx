@@ -494,7 +494,7 @@ save_options( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  machine_current->reset();
+  machine_reset();
 }
 
 typedef struct gtkui_select_info {

@@ -239,7 +239,7 @@ widget_menu_save_options( void *data GCC_UNUSED )
 int widget_menu_reset( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  return machine_current->reset();
+  return machine_reset();
 }
 
 /* Machine/Break */
