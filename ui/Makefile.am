@@ -27,7 +27,6 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = @UI@ scaler
 
 DIST_SUBDIRS = fb \
-	       ggi \
 	       gtk \
 	       scaler \
 	       sdl \

@@ -966,3 +966,5 @@
 	 (compiles, but untested).
 20040702 machines/tc2048.c,memory.c,scld.c,slt.c,zxatasp.c,zxcf.c:
          #include <string.h> for memcpy and memset prototypes.
+20040702 configure.in,ui/Makefile.am: disable the broken and unmaintained
+	 GGI user interface.

@@ -147,24 +147,25 @@ if test -z "$UI"; then
 fi
 
 dnl Look for GGI (default=no)
-if test -z "$UI"; then
-  AC_MSG_CHECKING(whether GGI UI requested)
-  AC_ARG_WITH(ggi,
-  [  --with-ggi              use GGI for user interface],
-  if test "$withval" = no; then sdl=no; else ggi=yes; fi,
-  ggi=no)
-  AC_MSG_RESULT($ggi)
-  if test "$ggi" = yes; then
-    AC_CHECK_HEADER(ggi/ggi.h,
-	            AC_DEFINE([UI_GGI], 1, [Defined if GGI UI in use])
-		    AC_DEFINE([USE_WIDGET], 1,
-		              [Defined if we're using a widget-based UI])
-		    UI=ggi; WIDGET=widget;
-	            UI_LIBS="ui/ggi/libuiggi.a widget/libwidget.a"
-		    LIBS="$LIBS -lggi",
-	            AC_MSG_ERROR([ggi/ggi.h not found]))
-  fi
-fi
+dnl Disabled -- doesn't work and unmaintained -- PAK 20040702
+dnl if test -z "$UI"; then
+dnl   AC_MSG_CHECKING(whether GGI UI requested)
+dnl   AC_ARG_WITH(ggi,
+dnl   [  --with-ggi              use GGI for user interface],
+dnl   if test "$withval" = no; then sdl=no; else ggi=yes; fi,
+dnl   ggi=no)
+dnl   AC_MSG_RESULT($ggi)
+dnl   if test "$ggi" = yes; then
+dnl     AC_CHECK_HEADER(ggi/ggi.h,
+dnl 	            AC_DEFINE([UI_GGI], 1, [Defined if GGI UI in use])
+dnl 		    AC_DEFINE([USE_WIDGET], 1,
+dnl 		              [Defined if we're using a widget-based UI])
+dnl 		    UI=ggi; WIDGET=widget;
+dnl 	            UI_LIBS="ui/ggi/libuiggi.a widget/libwidget.a"
+dnl 		    LIBS="$LIBS -lggi",
+dnl 	            AC_MSG_ERROR([ggi/ggi.h not found]))
+dnl   fi
+dnl fi
 
 dnl Look for GTK+ 2.0 (default=yes); fall back to GTK+ 1.2 if not found
 if test -z "$UI"; then
