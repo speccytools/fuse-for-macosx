@@ -98,35 +98,14 @@ int tape_open( const char *filename, int autoload )
   utils_file file;
   int error;
 
-  /* If we already have a tape file open, close it */
-  if( libspectrum_tape_present( tape ) ) {
-    error = tape_close();
-    if( error ) { utils_close_file( &file ); return error; }
-  }
-
-  /* Get the file's data */
   error = utils_read_file( filename, &file );
   if( error ) return error;
 
-  error = libspectrum_tape_read( tape, file.buffer, file.length,
-				 LIBSPECTRUM_ID_UNKNOWN, filename );
-  if( error != LIBSPECTRUM_ERROR_NONE ) {
-    utils_close_file( &file );
-    return error;
-  }
+  error = tape_read_buffer( file.buffer, file.length, LIBSPECTRUM_ID_UNKNOWN,
+			    filename, autoload );
+  if( error ) { utils_close_file( &file ); return error; }
 
-  if( utils_close_file( &file ) ) {
-    tape_close();
-    return 1;
-  }
-
-  tape_modified = 0;
-  ui_tape_browser_update();
-
-  if( autoload ) {
-    error = tape_autoload( machine_current->machine );
-    if( error ) return error;
-  }
+  utils_close_file( &file );
 
   return 0;
 }
@@ -134,7 +113,7 @@ int tape_open( const char *filename, int autoload )
 /* Use an already open tape file as the current tape */
 int
 tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
-		  int autoload )
+		  const char *filename, int autoload )
 {
   int error;
 
@@ -142,7 +121,7 @@ tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
     error = tape_close(); if( error ) return error;
   }
 
-  error = libspectrum_tape_read( tape, buffer, length, type, NULL );
+  error = libspectrum_tape_read( tape, buffer, length, type, filename );
   if( error ) return error;
 
   tape_modified = 0;
@@ -198,6 +177,23 @@ tape_autoload( libspectrum_machine hardware )
 int tape_close( void )
 {
   int error;
+  ui_confirm_save_t confirm;
+
+  /* If the tape has been modified, check if we want to do this */
+  if( settings_current.confirm_dangerous && tape_modified ) {
+
+    confirm = ui_confirm_save( "Tape has been modified" );
+    switch( confirm ) {
+
+    case UI_CONFIRM_SAVE_SAVE:
+      error = ui_tape_write(); if( error ) return error;
+      break;
+
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
+
+    }
+  }
 
   /* Stop the tape if it's currently playing */
   if( tape_playing ) {

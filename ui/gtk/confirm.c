@@ -35,23 +35,18 @@
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "settings.h"
-
-struct confirm_data {
-
-  GtkWidget *dialog;
-  int confirmed;
-
-};
+#include "ui/ui.h"
 
 static void set_confirmed( GtkButton *button, gpointer user_data );
+static void set_save( GtkButton *button, gpointer user_data );
+static void set_dont_save( GtkButton *button, gpointer user_data );
 
 int
 gtkui_confirm( const char *string )
 {
-  struct confirm_data data;
-
-  GtkWidget *label, *button;
+  GtkWidget *dialog, *label, *button;
   GtkAccelGroup *accelerators;
+  int confirm;
 
   /* Return value isn't an error code, but signifies whether to undertake
      the action */
@@ -59,55 +54,132 @@ gtkui_confirm( const char *string )
 
   fuse_emulation_pause();
 
-  data.confirmed = 0;
+  confirm = 0;
 
-  data.dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( data.dialog ), "Fuse - Confirm" );
-  gtk_signal_connect( GTK_OBJECT( data.dialog ), "delete-event",
+  dialog = gtk_dialog_new();
+  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Confirm" );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
   accelerators = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( data.dialog ), accelerators );
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accelerators );
 
   label = gtk_label_new( string );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( data.dialog )->vbox ),
-		      label, TRUE, TRUE, 5 );
+  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
+		      TRUE, TRUE, 5 );
 
   button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( data.dialog )->action_area ),
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     button );
   gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( set_confirmed ), &data );
+		      GTK_SIGNAL_FUNC( set_confirmed ), &confirm );
+  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog ) );
   gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Return, 0,
 			      0);
 
   button = gtk_button_new_with_label( "Cancel" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( data.dialog )->action_area ),
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     button );
   gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( data.dialog ) );
+			     GTK_OBJECT( dialog ) );
   gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Escape, 0,
 			      0);
 
-  gtk_window_set_modal( GTK_WINDOW( data.dialog ), TRUE );
-  gtk_widget_show_all( data.dialog );
+  gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
+  gtk_widget_show_all( dialog );
 
   gtk_main();
 
   fuse_emulation_unpause();
 
-  return data.confirmed;
+  return confirm;
 }
 
 static void
 set_confirmed( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
-  struct confirm_data *data = user_data;
+  int *ptr = user_data;
 
-  data->confirmed = 1;
+  *ptr = 1;
+}
 
-  gtkui_destroy_widget_and_quit( data->dialog, NULL );
+ui_confirm_save_t
+ui_confirm_save( const char *message )
+{
+  GtkWidget *dialog, *label, *button;
+  GtkAccelGroup *accelerators;
+  ui_confirm_save_t confirm;
+
+  fuse_emulation_pause();
+
+  confirm = UI_CONFIRM_SAVE_CANCEL;
+
+  dialog = gtk_dialog_new();
+  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Confirm" );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+
+  accelerators = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accelerators );
+
+  label = gtk_label_new( message );
+  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
+		      TRUE, TRUE, 5 );
+
+  button = gtk_button_new_with_label( "Save" );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+		     button );
+  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
+		      GTK_SIGNAL_FUNC( set_save ), &confirm );
+  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog ) );
+
+  button = gtk_button_new_with_label( "Don't Save" );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+		     button );
+  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
+		      GTK_SIGNAL_FUNC( set_dont_save ), &confirm );
+  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog ) );
+
+  button = gtk_button_new_with_label( "Cancel" );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+		     button );
+  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
+			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+			     GTK_OBJECT( dialog ) );
+  gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Escape, 0,
+			      0);
+
+  gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
+  gtk_widget_show_all( dialog );
+
+  gtk_main();
+
+  fuse_emulation_unpause();
+
+  return confirm;
+}
+
+static void
+set_save( GtkButton *button GCC_UNUSED, gpointer user_data )
+{
+  ui_confirm_save_t *ptr = user_data;
+
+  *ptr = UI_CONFIRM_SAVE_SAVE;
+}
+
+static void
+set_dont_save( GtkButton *button GCC_UNUSED, gpointer user_data )
+{
+  ui_confirm_save_t *ptr = user_data;
+
+  *ptr = UI_CONFIRM_SAVE_DONTSAVE;
 }
 
 #endif				/* #ifdef UI_GTK */

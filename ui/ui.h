@@ -71,6 +71,20 @@ int ui_error( ui_error_level severity, const char *format, ... )
 libspectrum_error ui_libspectrum_error( libspectrum_error error,
 					const char *format, va_list ap );
 
+/* Confirm whether we want to save some data before overwriting it */
+typedef enum ui_confirm_save_t {
+
+  UI_CONFIRM_SAVE_SAVE,		/* Save the data */
+  UI_CONFIRM_SAVE_DONTSAVE,	/* Don't save the data */
+  UI_CONFIRM_SAVE_CANCEL,	/* Cancel the action */
+
+} ui_confirm_save_t;
+
+ui_confirm_save_t ui_confirm_save( const char *message );
+
+/* Write the current tape out */
+int ui_tape_write( void );
+
 /* Select a scaler from those for which `available' returns true */
 typedef int (*ui_scaler_available)( scaler_type scaler );
 scaler_type ui_get_scaler( ui_scaler_available available );

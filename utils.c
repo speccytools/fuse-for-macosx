@@ -96,7 +96,8 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_TAPE:
-    error = tape_read_buffer( file.buffer, file.length, type, autoload );
+    error = tape_read_buffer( file.buffer, file.length, type, filename,
+			      autoload );
     break;
 
   case LIBSPECTRUM_CLASS_DISK_PLUS3:

@@ -446,3 +446,5 @@
 	 tape browser code.
 20040104 tape.[ch], ui/gtk/browse.c: add a 'tape modified' indicator to
 	 the GTK+ tape browser window.
+20040104 tape.[ch], utils.c, ui/ui.h, ui/gtk/{confirm,gtkui.c}: confirm
+	 before an attempt is made to close a modified tape.

@@ -990,18 +990,26 @@ gtkui_tape_clear( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_tape_write( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
+  ui_tape_write();
+}
+
+int
+ui_tape_write( void )
+{
   char *filename;
 
   fuse_emulation_pause();
 
   filename = gtkui_fileselector_get_filename( "Fuse - Write Tape" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   tape_write( filename );
 
   free( filename );
 
   fuse_emulation_unpause();
+
+  return 0;
 }
 
 /* Called by the mnu when Disk/Drive ?:/Open selected */

@@ -34,8 +34,9 @@ int tape_init( void );
 int tape_open( const char *filename, int autoload );
 int tape_open_default_autoload( const char *filename );
 
-int tape_read_buffer( unsigned char *buffer, size_t length,
-		      libspectrum_id_t type, int autoload );
+int
+tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
+		  const char *filename, int autoload );
 
 int tape_close( void );
 int tape_select_block( size_t n );
