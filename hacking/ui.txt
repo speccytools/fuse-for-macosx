@@ -39,7 +39,7 @@ current UIs, for example the GTK+ UI use this to do most of their
 processing such as reading the keyboard and the like, whilst others,
 for example the SVGAlib UI do much less here.
 
-* int ui_error( ui_error_level severity, const char *format, ... )
+* int ui_verror( ui_error_level severity, const char *format, va_list ap )
 
 This will be called whenever the emulator wishes to output an error
 message of some form to the user; `severity' specifies how severe the

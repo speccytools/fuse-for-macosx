@@ -443,17 +443,13 @@ void
 fdc_dprintf( int debug, char *format, ... )
 {
   va_list ap;
-  char error_message[1024];
 
   /* Report only serious errors */
   if( debug != 0 ) return;
 
-  /* FIXME: need a ui_verror function */
   va_start( ap, format );
-  vsnprintf( error_message, 1024, format, ap );
+  ui_verror( UI_ERROR_ERROR, format, ap );
   va_end( ap );
-
-  ui_error( UI_ERROR_ERROR, error_message );
 }
 
 int

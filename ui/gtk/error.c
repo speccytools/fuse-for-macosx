@@ -40,16 +40,14 @@
 
 #define MESSAGE_MAX_LENGTH 256
 
-int ui_error( ui_error_level severity, const char *format, ... )
+int
+ui_verror( ui_error_level severity, const char *format, va_list ap )
 {
-  va_list ap;
   GtkWidget *dialog, *ok_button, *label, *vbox;
   char message[ MESSAGE_MAX_LENGTH + 1 ];
 
-  /* Create the message from the given arguments */
-  va_start( ap, format );
+  /* Create the message to be displayed */
   vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
-  va_end( ap );
 
   /* If this is a 'severe' error, print it to stderr with a program
      identifier and a level indicator */
@@ -69,7 +67,7 @@ int ui_error( ui_error_level severity, const char *format, ... )
   }
 
   /* If we don't have a UI yet, we can't output widgets */
-  if( !display_ui_initialised ) return 1;
+  if( !display_ui_initialised ) return 0;
 
   /* Create the dialog box */
   dialog = gtk_dialog_new();

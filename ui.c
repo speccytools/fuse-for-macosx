@@ -1,5 +1,5 @@
-/* ui.h: General UI event handling routines
-   Copyright (c) 2000-2002 Philip Kendall
+/* ui.c: User interface routines, but those which are independent of any UI
+   Copyright (c) 2002 Philip Kendall
 
    $Id$
 
@@ -24,25 +24,22 @@
 
 */
 
-#ifndef FUSE_UI_H
-#define FUSE_UI_H
+#include <config.h>
 
 #include <stdarg.h>
+#include <stdio.h>
 
-/* The various severities of error level, increasing downwards */
-typedef enum ui_error_level {
+#include "ui/ui.h"
 
-  UI_ERROR_INFO,		/* Informational message */
-  UI_ERROR_ERROR,		/* An actual error */
+int
+ui_error( ui_error_level severity, const char *format, ... )
+{
+  int error;
+  va_list ap;
 
-} ui_error_level;
+  va_start( ap, format );
+  error = ui_verror( severity, format, ap );
+  va_end( ap );
 
-int ui_init(int *argc, char ***argv, int width, int height);
-int ui_event(void);
-
-int ui_error( ui_error_level severity, const char *format, ... );
-int ui_verror( ui_error_level severity, const char *format, va_list ap );
-
-int ui_end(void);
-
-#endif			/* #ifndef FUSE_UI_H */
+  return error;
+}

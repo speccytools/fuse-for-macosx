@@ -39,16 +39,13 @@
 #define MESSAGE_MAX_LENGTH 256
 
 int
-ui_error( ui_error_level severity, const char *format, ... )
+ui_verror( ui_error_level severity, const char *format, va_list ap )
 {
   char message[ MESSAGE_MAX_LENGTH + 1 ];
-  va_list ap;
   widget_error_t error_info;
   
   /* Create the message from the given arguments */
-  va_start( ap, format );
   vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
-  va_end( ap );
 
   /* If this is a 'severe' error, print it to stderr with a program
      identifier and a level indicator; however, don't if it's a terminal
