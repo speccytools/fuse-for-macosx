@@ -48,95 +48,38 @@
 
 void xkeyboard_keypress(XKeyEvent *event)
 {
-  KeySym keysym; const keysyms_key_info *ptr;
+  KeySym keysym;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
   keysym=XLookupKeysym(event,0);
 
-  ptr=keysyms_get_data(keysym);
+  fuse_keysym = keysyms_remap( keysym );
 
-  if( ptr ) {
+  if( fuse_keysym == INPUT_KEY_NONE ) return;
 
-    if( widget_level >= 0 ) {
-      widget_keyhandler( ptr->key1, ptr->key2 );
-    } else {
-      if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
-      if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
-    }
-    return;
-  }
+  fuse_event.type = INPUT_EVENT_KEYPRESS;
+  fuse_event.types.key.key = fuse_keysym;
 
-  if( widget_level >= 0 ) return;
-
-  /* Now deal with the non-Speccy keys */
-  switch(keysym) {
-  case XK_F1:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MENU, &widget_menu_main );
-    fuse_emulation_unpause();
-    break;
-  case XK_F2:
-    fuse_emulation_pause();
-    snapshot_write( "snapshot.z80" );
-    fuse_emulation_unpause();
-    break;
-  case XK_F3:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-    if( widget_filesel_name ) {
-      snapshot_read( widget_filesel_name );
-      display_refresh_all();
-    }
-    fuse_emulation_unpause();
-    break;
-  case XK_F4:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_GENERAL, NULL );
-    fuse_emulation_unpause();
-    break;
-  case XK_F5:
-    machine_reset();
-    break;
-  case XK_F6:
-    fuse_emulation_pause();
-    tape_write( "tape.tzx" );
-    fuse_emulation_unpause();
-    break;
-  case XK_F7:
-    fuse_emulation_pause();
-    widget_apply_to_file( tape_open_default_autoload );
-    fuse_emulation_unpause();
-    break;
-  case XK_F8:
-    tape_toggle_play();
-    break;
-  case XK_F9:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_SELECT, NULL );
-    fuse_emulation_unpause();
-    break;
-  case XK_F10:
-    fuse_exiting = 1;
-    break;
-  }
-
-  return;
+  input_event( &fuse_event );
 }
 
 void xkeyboard_keyrelease(XKeyEvent *event)
 {
-  KeySym keysym; const keysyms_key_info *ptr;
+  KeySym keysym;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
   keysym=XLookupKeysym(event,0);
 
-  ptr=keysyms_get_data(keysym);
+  fuse_keysym = keysyms_remap( keysym );
 
-  if(ptr) {
-    if(ptr->key1 != KEYBOARD_NONE) keyboard_release(ptr->key1);
-    if(ptr->key2 != KEYBOARD_NONE) keyboard_release(ptr->key2);
-  }
+  if( fuse_keysym == INPUT_KEY_NONE ) return;
 
-  return;
+  fuse_event.type = INPUT_EVENT_KEYRELEASE;
+  fuse_event.types.key.key = fuse_keysym;
 
+  input_event( &fuse_event );
 }
 
 #endif				/* #ifdef UI_X */
