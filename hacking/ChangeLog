@@ -669,3 +669,5 @@
 	 input layer.
 20040325 ui/uijoystick.c: fix up the 'no joystick' code for the new input
 	 layer.
+20040327 input.[ch], rzx.c, ui/uijoystick.c, ui/sdl/sdljoystick.c: make
+	 the 'real joystick' code actually use the input layer.

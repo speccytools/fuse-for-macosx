@@ -36,7 +36,6 @@
 
 #include "event.h"
 #include "fuse.h"
-#include "keyboard.h"
 #include "machine.h"
 #include "rzx.h"
 #include "settings.h"

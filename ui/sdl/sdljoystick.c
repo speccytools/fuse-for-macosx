@@ -38,7 +38,7 @@
 #include <SDL.h>
 
 #include "compat.h"
-#include "joystick.h"
+#include "input.h"
 #include "sdljoystick.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -46,6 +46,9 @@
 
 static SDL_Joystick *joystick1 = NULL;
 static SDL_Joystick *joystick2 = NULL;
+
+static void do_axis( int which, input_joystick_button negative,
+		     input_joystick_button positive );
 
 int
 ui_joystick_init( void )
@@ -93,50 +96,61 @@ ui_joystick_init( void )
 void
 sdljoystick_buttonpress( SDL_JoyButtonEvent *buttonevent )
 {
-  joystick_press( buttonevent->which, JOYSTICK_BUTTON_FIRE, 1 );
+  input_event_t event;
+
+  event.type = INPUT_EVENT_JOYSTICK_PRESS;
+  event.types.joystick.which = buttonevent->which;
+  event.types.joystick.button = INPUT_JOYSTICK_FIRE;
+
+  input_event( &event );
 }
 
 void
 sdljoystick_buttonrelease( SDL_JoyButtonEvent *buttonevent )
 {
-  joystick_press( buttonevent->which, JOYSTICK_BUTTON_FIRE, 0 );
+  input_event_t event;
+
+  event.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  event.types.joystick.which = buttonevent->which;
+  event.types.joystick.button = INPUT_JOYSTICK_FIRE;
+
+  input_event( &event );
 }
 
 void
 sdljoystick_axismove( SDL_JoyAxisEvent *axisevent )
 {
-  int which, axis;
-
-  which = axisevent->which;
-  axis = axisevent->axis;
-
-  if( axis == 0 ) {
-
-    if( axisevent->value > 16384 ) { /* right */
-      joystick_press( which, JOYSTICK_BUTTON_LEFT,  0 );
-      joystick_press( which, JOYSTICK_BUTTON_RIGHT, 1 );
-    } else if( axisevent->value < -16384 ) { /* left */
-      joystick_press( which, JOYSTICK_BUTTON_LEFT,  1 );
-      joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
-    } else { /* centered */
-      joystick_press( which, JOYSTICK_BUTTON_LEFT,  0 );
-      joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
-    }
-
-  } else if( axis == 1 ) {
-
-    if( axisevent->value > 16384 ) { /* down */
-      joystick_press( which, JOYSTICK_BUTTON_UP,   0 );
-      joystick_press( which, JOYSTICK_BUTTON_DOWN, 1 );
-    } else if( axisevent->value < -16384 ) { /* up */
-      joystick_press( which, JOYSTICK_BUTTON_UP,   1 );
-      joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
-    } else { /* centered */
-      joystick_press( which, JOYSTICK_BUTTON_UP,   0 );
-      joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
-    }
-
+  if( axisevent->axis == 0 ) {
+    do_axis( axisevent->which, INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
+  } else if( axisevent->axis == 1 ) {
+    do_axis( axisevent->which, INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
   }
+}
+
+static void
+do_axis( int which, input_joystick_button negative,
+	 input_joystick_button positive )
+{
+  input_event_t event1, event2;
+
+  event1.types.joystick.which = event2.types.joystick.which = which;
+
+  event1.types.joystick.button = negative;
+  event2.types.joystick.button = positive;
+
+  if( axisevent->value > 16384 ) {
+    event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+    event2.type = INPUT_EVENT_JOYSTICK_PRESS;
+  } else if( axisevent->value < -16384 ) {
+    event1.type = INPUT_EVENT_JOYSTICK_PRESS;
+    event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  } else {
+    event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+    event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  }
+
+  input_event( &event1 );
+  input_event( &event2 );
 }
 
 void

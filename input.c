@@ -41,6 +41,8 @@
 
 static int keypress( const input_event_key_t *event );
 static int keyrelease( const input_event_key_t *event );
+static int do_joystick( const input_event_joystick_t *joystick_event,
+			int press );
 
 int
 input_event( const input_event_t *event )
@@ -50,6 +52,11 @@ input_event( const input_event_t *event )
 
   case INPUT_EVENT_KEYPRESS: return keypress( &( event->types.key ) );
   case INPUT_EVENT_KEYRELEASE: return keyrelease( &( event->types.key ) );
+
+  case INPUT_EVENT_JOYSTICK_PRESS:
+    return do_joystick( &( event->types.joystick ), 1 );
+  case INPUT_EVENT_JOYSTICK_RELEASE:
+    return do_joystick( &( event->types.joystick ), 0 );
 
   }
 
@@ -188,6 +195,27 @@ keyrelease( const input_event_key_t *event )
 
   default: break;		/* Remove warning */
   }
+
+  return 0;
+}
+
+static int
+do_joystick( const input_event_joystick_t *joystick_event, int press )
+{
+  joystick_button button;
+
+  switch( joystick_event->button ) {
+  case INPUT_JOYSTICK_LEFT : button = JOYSTICK_BUTTON_LEFT;  break;
+  case INPUT_JOYSTICK_RIGHT: button = JOYSTICK_BUTTON_RIGHT; break;
+  case INPUT_JOYSTICK_UP   : button = JOYSTICK_BUTTON_UP;    break;
+  case INPUT_JOYSTICK_DOWN : button = JOYSTICK_BUTTON_DOWN;  break;
+  case INPUT_JOYSTICK_FIRE : button = JOYSTICK_BUTTON_FIRE;  break;
+
+  default:
+    return 0;
+  }
+
+  joystick_press( joystick_event->which, button, press );
 
   return 0;
 }

@@ -34,6 +34,9 @@ typedef enum input_event_type {
   INPUT_EVENT_KEYPRESS,
   INPUT_EVENT_KEYRELEASE,
 
+  INPUT_EVENT_JOYSTICK_PRESS,
+  INPUT_EVENT_JOYSTICK_RELEASE,
+
 } input_event_type;
 
 typedef enum input_key {
@@ -142,6 +145,25 @@ typedef struct input_event_key_t {
 
 } input_event_key_t;
 
+typedef enum input_joystick_button {
+
+  INPUT_JOYSTICK_LEFT,
+  INPUT_JOYSTICK_RIGHT,
+  INPUT_JOYSTICK_UP,
+  INPUT_JOYSTICK_DOWN,
+
+  INPUT_JOYSTICK_FIRE,
+  INPUT_JOYSTICK_FIRE_1 = INPUT_JOYSTICK_FIRE,
+
+} input_joystick_button;
+
+typedef struct input_event_joystick_t {
+
+  int which;
+  input_joystick_button button;
+
+} input_event_joystick_t;
+
 typedef struct input_event_t {
 
   input_event_type type;
@@ -149,6 +171,7 @@ typedef struct input_event_t {
   union {
 
     input_event_key_t key;
+    input_event_joystick_t joystick;
 
   } types;
 

@@ -38,8 +38,7 @@
 
 #include <config.h>
 
-#include "../joystick.h"
-#include "joystick.h"
+#include "input.h"
 #include "uijoystick.h"
 
 #if defined USE_JOYSTICK && defined HAVE_JSW_H
@@ -63,6 +62,9 @@
 static js_data_struct jsd[2];
 
 static void poll_joystick( int which );
+static void do_axis( int which, double position,
+		     input_joystick_button negative,
+		     input_joystick_button positive );
 
 static int
 init_stick( int which, const char *const device,
@@ -188,41 +190,52 @@ poll_joystick( int which )
   js_data_struct *joystick;
   double position;
   int fire;
+  input_event_t event;
 
   joystick = &jsd[which];
 
   if( JSUpdate( joystick ) != JSGotEvent ) return;
 
   position = JSGetAxisCoeffNZ( joystick, 0 );
-
-  if( position == 0.0 ) {
-    joystick_press( which, JOYSTICK_BUTTON_LEFT , 0 );
-    joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
-  } else if( position > 0.0 ) {
-    joystick_press( which, JOYSTICK_BUTTON_LEFT , 0 );
-    joystick_press( which, JOYSTICK_BUTTON_RIGHT, 1 );
-  } else {
-    joystick_press( which, JOYSTICK_BUTTON_LEFT , 1 );
-    joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
-  }
+  do_axis( which, position, INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
 
   position = JSGetAxisCoeffNZ( joystick, 1 );
-
-  if( position == 0.0 ) {
-    joystick_press( which, JOYSTICK_BUTTON_UP  , 0 );
-    joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
-  } else if( position > 0.0 ) {
-    joystick_press( which, JOYSTICK_BUTTON_UP  , 0 );
-    joystick_press( which, JOYSTICK_BUTTON_DOWN, 1 );
-  } else {
-    joystick_press( which, JOYSTICK_BUTTON_UP  , 1 );
-    joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
-  }
+  do_axis( which, position, INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
 
   fire = JSGetButtonState( joystick, 0 );
 
-  joystick_press( which, JOYSTICK_BUTTON_FIRE, fire == JSButtonStateOn );
+  event.type = fire == JSButtonStateOn ? INPUT_EVENT_JOYSTICK_PRESS :
+                                         INPUT_EVENT_JOYSTICK_RELEASE;
+  event.types.joystick.which = which;
+  event.types.joystick.button = INPUT_JOYSTICK_FIRE;
 
+  input_event( &event );
+}
+
+static void
+do_axis( int which, double position, input_joystick_button negative,
+	 input_joystick_button positive )
+{
+  input_event_t event1, event2;
+
+  event1.types.joystick.which = event2.types.joystick.which = which;
+
+  event1.types.joystick.button = positive;
+  event2.types.joystick.button = negative;
+
+  if( position == 0.0 ) {
+    event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+    event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  } else if( position > 0.0 ) {
+    event1.type = INPUT_EVENT_JOYSTICK_PRESS;
+    event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  } else {
+    event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+    event2.type = INPUT_EVENT_JOYSTICK_PRESS;
+  }
+
+  input_event( &event1 );
+  input_event( &event2 );
 }
 
 #else			/* #if defined USE_JOYSTICK && defined HAVE_JSW_H */
