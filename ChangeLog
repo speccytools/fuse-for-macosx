@@ -5,6 +5,9 @@
 	  be listed in this ChangeLog. For structural reasons, the glib
 	  replacement code is also in libspectrum (Philip Kendall).
 
+	* Also separate the Fuse utilities (tzxlist, etc) into their
+	  own package (Philip Kendall).
+
 	* Add tzxconv utility to do a best-guess conversion of .tzx files
 	  to .tap (Philip Kendall).
 
@@ -45,6 +48,16 @@
 
 	* Make keysyms.c be UI-specific, rather than containing
 	  information for all UIs (Darren Salt).
+
+	* Add support for loadable/savable configuration; you'll need
+	  libxml2 installed (Philip Kendall).
+
+	* Add a Tape Browser widget (Philip Kendall).
+
+	* Put the keyboard help in a separate window when using the GTK+
+	  UI (Philip Kendall).
+
+	* Changable emulation speed (Philip Kendall).
 	
 2002-08-22  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
