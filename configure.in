@@ -260,13 +260,13 @@ AC_SUBST(DSKLIBS)
 
 dnl Check if a version of libpng which supplies png_write_png is available
 AC_CHECK_LIB( png, png_write_png,
-  AC_CHECK_HEADER(
+  [AC_CHECK_HEADER(
     png.h,
-    AC_DEFINE(USE_LIBPNG) PNG_LIBS='-lpng -lm',
-    AC_MSG_WARN(png.h not found - saving screenshots disabled)
-  ),
-  AC_MSG_WARN(png_write_png not found - saving screenshots disabled),
-  -lm
+    [AC_DEFINE(USE_LIBPNG) PNG_LIBS='-lpng -lm'],
+    [AC_MSG_WARN(png.h not found - saving screenshots disabled)]
+  )],
+  [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)],
+  [-lm]
 )
 AC_SUBST(PNG_LIBS)
 
