@@ -1,5 +1,5 @@
 /* scld.h: Routines for handling the Timex SCLD
-   Copyright (c) 2002-2003 Fredrick Meunier, Witold Filipczyk
+   Copyright (c) 2002-2004 Fredrick Meunier, Witold Filipczyk
 
    $Id$
 
@@ -127,10 +127,10 @@ extern memory_page timex_memory[8];
 
 void scld_reset( void );
 void scld_dec_write( libspectrum_word port, libspectrum_byte b );
-libspectrum_byte scld_dec_read( libspectrum_word port );
+libspectrum_byte scld_dec_read( libspectrum_word port, int *attached );
 
 void scld_hsr_write( libspectrum_word port, libspectrum_byte b );
-libspectrum_byte scld_hsr_read( libspectrum_word port );
+libspectrum_byte scld_hsr_read( libspectrum_word port, int *attached );
 
 libspectrum_byte hires_get_attr( void );
 libspectrum_byte hires_convert_dec( libspectrum_byte attr );

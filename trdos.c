@@ -226,10 +226,11 @@ void trdos_update_index_impulse( void )
 }
 
 libspectrum_byte
-trdos_sr_read( libspectrum_word port GCC_UNUSED )
+trdos_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !trdos_active )
-    return machine_current->unattached_port();
+  if( !trdos_active ) return 0xff;
+
+  *attached = 1;
 
   trdos_update_index_impulse();
 
@@ -241,10 +242,11 @@ trdos_sr_read( libspectrum_word port GCC_UNUSED )
 }
 
 libspectrum_byte
-trdos_tr_read( libspectrum_word port GCC_UNUSED )
+trdos_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !trdos_active )
-    return machine_current->unattached_port();
+  if( !trdos_active ) return 0xff;
+
+  *attached = 1;
 
   trdos_update_index_impulse();
 
@@ -260,10 +262,11 @@ trdos_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 libspectrum_byte
-trdos_sec_read( libspectrum_word port GCC_UNUSED )
+trdos_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !trdos_active )
-    return machine_current->unattached_port();
+  if( !trdos_active ) return 0xff;
+
+  *attached = 1;
 
   trdos_update_index_impulse();
 
@@ -279,10 +282,11 @@ trdos_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 libspectrum_byte
-trdos_dr_read( libspectrum_word port GCC_UNUSED )
+trdos_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !trdos_active )
-    return machine_current->unattached_port();
+  if( !trdos_active ) return 0xff;
+
+  *attached = 1;
 
   trdos_update_index_impulse();
 
@@ -344,10 +348,11 @@ trdos_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 libspectrum_byte
-trdos_sp_read( libspectrum_word port GCC_UNUSED )
+trdos_sp_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !trdos_active )
-    return machine_current->unattached_port();
+  if( !trdos_active ) return 0xff;
+
+  *attached = 1;
 
   trdos_update_index_impulse();
 

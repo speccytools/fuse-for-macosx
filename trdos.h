@@ -1,5 +1,5 @@
 /* trdos.h: Routines for handling the Betadisk interface
-   Copyright (c) 2003 Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2004 Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -42,18 +42,18 @@ void trdos_end( void );
 
 void trdos_cr_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte trdos_sr_read( libspectrum_word port );
+libspectrum_byte trdos_sr_read( libspectrum_word port, int *attached );
 
-libspectrum_byte trdos_tr_read( libspectrum_word port );
+libspectrum_byte trdos_tr_read( libspectrum_word port, int *attached );
 void trdos_tr_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte trdos_sec_read( libspectrum_word port );
+libspectrum_byte trdos_sec_read( libspectrum_word port, int *attached );
 void trdos_sec_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte trdos_dr_read( libspectrum_word port );
+libspectrum_byte trdos_dr_read( libspectrum_word port, int *attached );
 void trdos_dr_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte trdos_sp_read( libspectrum_word port );
+libspectrum_byte trdos_sp_read( libspectrum_word port, int *attached );
 void trdos_sp_write( libspectrum_word port, libspectrum_byte b );
 
 typedef enum trdos_drive_number {

@@ -1,5 +1,5 @@
 /* ay.h: AY-8-3912 routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -35,7 +35,7 @@ typedef struct ayinfo {
   libspectrum_byte registers[16];
 } ayinfo;
 
-libspectrum_byte ay_registerport_read( libspectrum_word port );
+libspectrum_byte ay_registerport_read( libspectrum_word port, int *attached );
 void ay_registerport_write( libspectrum_word port, libspectrum_byte b );
 
 void ay_dataport_write( libspectrum_word port, libspectrum_byte b );

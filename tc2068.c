@@ -50,6 +50,10 @@
 
 #define ADDR_TO_CHUNK(addr) 2 + (addr >> 13)
 
+static libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
+						     int *attached );
+static libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
+						 int *attached );
 static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
 
@@ -71,20 +75,26 @@ const static periph_t peripherals[] = {
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-libspectrum_byte
-tc2068_ay_registerport_read( libspectrum_word port )
+static libspectrum_byte
+tc2068_ay_registerport_read( libspectrum_word port, int *attached )
 {
-  return   machine_current->ay.current_register != 14
-         ? ay_registerport_read( port )
-         : 0xff;
+  if( machine_current->ay.current_register == 14 ) return 0xff;
+
+  return ay_registerport_read( port, attached );
 }
 
-libspectrum_byte
-tc2068_ay_dataport_read( libspectrum_word port )
+static libspectrum_byte
+tc2068_ay_dataport_read( libspectrum_word port, int *attached )
 {
   if (machine_current->ay.current_register != 14) {
-    return ay_registerport_read( port );
+    return ay_registerport_read( port, attached );
   } else {
+
+    /* In theory, we may need to distinguish cases where some data
+       is returned here and were it isn't. In practice, this doesn't
+       matter for the TC2068 as it doesn't have a floating bus, so we'll
+       get 0xff in both cases anwyay */
+    *attached = 1;
 
     libspectrum_byte ret =   machine_current->ay.registers[7] & 0x40
 			   ? machine_current->ay.registers[14]
@@ -273,7 +283,7 @@ tc2068_reset( void )
 			    machine_current->rom_length[1] );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count, 0 );
+  error = periph_setup( peripherals, peripherals_count, PERIPH_PRESENT_NEVER );
   if( error ) return error;
 
   error = dock_exrom_reset(); if( error ) return error;

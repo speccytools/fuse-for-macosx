@@ -1,5 +1,5 @@
 /* printer.c: Printer support
-   Copyright (c) 2001-2003 Ian Collier, Russell Marks, Philip Kendall
+   Copyright (c) 2001-2004 Ian Collier, Russell Marks, Philip Kendall
 
    $Id$
 
@@ -373,12 +373,15 @@ frames++;
  * very little brain. :-) Or at least, I don't grok it that well.
  * It works wonderfully though.
  */
-libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED)
+libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED,
+				  int *attached)
 {
 if(!settings_current.printer)
   return(0xff);
 if(!printer_graphics_enabled)
   return(0xff);
+
+*attached=1;
 
 if(!zxpspeed)
   return 0x3e;
@@ -613,10 +616,14 @@ old_on=on;
 }
 
 
-libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED)
+libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED,
+				       int *attached)
 {
 if(!settings_current.printer)
   return(0xff);
+
+*attached = 1;
+
 /* bit 0 = busy. other bits high? */
 
 return(0xfe);	/* never busy */

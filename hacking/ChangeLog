@@ -611,3 +611,5 @@
 	 dialog into one dialog for each machine.
 20040302 ui/gtk/gtkui.c,widget/{menu.c,menu_data.c,roms.c,widget_internals.h}:
 	 split the ROMs selection dialog into one dialog for each machine.
+20040303 Another change to the peripheral handling code to let each 'read'
+	 function determine whether it had a peripheral attached.

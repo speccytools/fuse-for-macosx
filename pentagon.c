@@ -41,8 +41,10 @@
 #include "spec128.h"
 #include "trdos.h"
 
-static libspectrum_byte pentagon_select_1f_read( libspectrum_word port );
-static libspectrum_byte pentagon_select_ff_read( libspectrum_word port );
+static libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
+						 int *attached );
+static libspectrum_byte pentagon_select_ff_read( libspectrum_word port,
+						 int *attached );
 static libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
 static int pentagon_shutdown( void );
 
@@ -61,30 +63,25 @@ const static periph_t peripherals[] = {
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-libspectrum_byte
-pentagon_select_1f_read( libspectrum_word port )
+static libspectrum_byte
+pentagon_select_1f_read( libspectrum_word port, int *attached )
 {
-  if( trdos_active ) {
-    return trdos_sr_read( port );
-  } else if( settings_current.joy_kempston ) {
-    return joystick_kempston_read( port );
-  } else {
+  libspectrum_byte data;
 
-    /* FIXME: the peripheral code thinks that this port is attached to
-       something and won't return the floating bus value */
-    return 0xff;
+  data = trdos_sr_read( port, attached ); if( *attached ) return data;
+  data = joystick_kempston_read( port, attached ); if( *attached ) return data;
 
-  }
+  return 0xff;
 }
 
-libspectrum_byte
-pentagon_select_ff_read( libspectrum_word port )
+static libspectrum_byte
+pentagon_select_ff_read( libspectrum_word port, int *attached )
 {
-  if( trdos_active ) {
-    return trdos_sp_read( port );
-  } else {
-    return pentagon_unattached_port();
-  }
+  libspectrum_byte data;
+
+  data = trdos_sp_read( port, attached ); if( *attached ) return data;
+
+  return 0xff;
 }
 
 libspectrum_byte
@@ -165,7 +162,8 @@ pentagon_reset(void)
 
   trdos_available = 1;
 
-  error = periph_setup( peripherals, peripherals_count, 0 );
+  error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
   return spec128_common_reset( 0 );

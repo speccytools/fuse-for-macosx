@@ -1,5 +1,5 @@
 /* joystick.h: Joystick emulation support
-   Copyright (c) 2001-2003 Russell Marks, Philip Kendall
+   Copyright (c) 2001-2004 Russell Marks, Philip Kendall
    Copyright (c) 2003 Darren Salt
 
    $Id$
@@ -42,7 +42,8 @@ libspectrum_byte joystick_default_read( libspectrum_word port,
 					libspectrum_byte which );
 
 /* Interface-specific read functions */
-libspectrum_byte joystick_kempston_read ( libspectrum_word port );
+libspectrum_byte joystick_kempston_read ( libspectrum_word port,
+					  int *attached );
 libspectrum_byte joystick_timex_read ( libspectrum_word port,
 				       libspectrum_byte which );
 

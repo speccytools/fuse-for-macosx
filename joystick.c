@@ -32,6 +32,7 @@
 #include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
+#include "periph.h"
 #include "spectrum.h"
 #include "machine.h"
 #include "ui/ui.h"
@@ -81,8 +82,12 @@ joystick_default_read( libspectrum_word port, libspectrum_byte which )
 /* Read functions for specific interfaces */
 
 libspectrum_byte
-joystick_kempston_read( libspectrum_word port )
+joystick_kempston_read( libspectrum_word port, int *attached )
 {
+  if( !periph_kempston_active ) return 0xff;
+
+  *attached = 1;
+
   /* If we have no real joysticks, return the QAOP<space>-emulated value */
   if( joysticks_supported == 0 ) return joystick_default_read( port, 0 );
 

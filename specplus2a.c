@@ -43,6 +43,7 @@
 
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0xc002, 0x4000, NULL, specplus3_memoryport_write },
@@ -102,7 +103,8 @@ int specplus2a_reset(void)
 			    machine_current->rom_length[3] );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count, 1 );
+  error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
   return specplus3_plus2a_common_reset();

@@ -33,7 +33,8 @@
  * General peripheral list handling routines
  */
 
-typedef libspectrum_byte (*periph_port_read_function)( libspectrum_word port );
+typedef libspectrum_byte (*periph_port_read_function)( libspectrum_word port,
+						       int *attached );
 typedef void (*periph_port_write_function)( libspectrum_word port,
 					    libspectrum_byte data );
 
@@ -66,7 +67,21 @@ void writeport( libspectrum_word port, libspectrum_byte b );
  * The more Fuse-specific peripheral handling routines
  */
 
-int periph_setup( const periph_t *peripherals_list, size_t n, int kempston );
+/* For indicating the (optional) presence or absence of a peripheral */
+
+typedef enum periph_present {
+
+  PERIPH_PRESENT_NEVER,		/* Never present */
+  PERIPH_PRESENT_OPTIONAL,	/* Optionally present */
+  PERIPH_PRESENT_ALWAYS,	/* Always present */
+
+} periph_present;
+
+/* Is the Kempston interface active */
+extern int periph_kempston_active;
+
+int periph_setup( const periph_t *peripherals_list, size_t n,
+		  periph_present kempston );
 void periph_update( void );
 
 #endif				/* #ifndef FUSE_PERIPH_H */

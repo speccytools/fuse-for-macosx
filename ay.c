@@ -1,5 +1,5 @@
 /* ay.c: AY-8-3912 routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -35,9 +35,11 @@
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
 libspectrum_byte
-ay_registerport_read( libspectrum_word port GCC_UNUSED )
+ay_registerport_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   static libspectrum_byte port_input = 0xbf; /* always allow serial output */
+
+  *attached = 1;
 
   /* The AY I/O ports return input directly from the port when in
      input mode; but in output mode, they return an AND between the

@@ -42,6 +42,7 @@
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
 };
 
 const static size_t peripherals_count =
@@ -152,7 +153,8 @@ spec48_reset( void )
 			    machine_current->rom_length[0] );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count, 1 );
+  error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
   memory_map[0].page = &ROM[0][0x0000];

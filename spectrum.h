@@ -87,7 +87,7 @@ extern spectrum_port_contention_function contend_port;
 /* How much contention do we get at every tstate? */
 extern libspectrum_byte spectrum_contention[ 80000 ];
 
-libspectrum_byte spectrum_ula_read( libspectrum_word port );
+libspectrum_byte spectrum_ula_read( libspectrum_word port, int *attached );
 void spectrum_ula_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte spectrum_unattached_port( int offset );

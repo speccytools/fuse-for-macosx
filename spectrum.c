@@ -124,8 +124,10 @@ spectrum_frame( void )
 
 /* What do we get if we read from the ULA? */
 libspectrum_byte
-spectrum_ula_read( libspectrum_word port )
+spectrum_ula_read( libspectrum_word port, int *attached )
 {
+  *attached = 1;
+
   return ( keyboard_read( port >> 8 ) ^ ( tape_microphone ? 0x40 : 0x00 ) );
 }
 

@@ -170,7 +170,8 @@ tc2048_reset( void )
 			    machine_current->rom_length[0] );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count, 0 );
+  error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_ALWAYS );
   if( error ) return error;
 
   memory_map[0].page = &ROM[0][0x0000];

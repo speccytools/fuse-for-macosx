@@ -205,8 +205,8 @@ read_peripheral( gpointer data, gpointer user_data )
 
   if( private->active && peripheral->read &&
       ( ( callback_info->port & peripheral->mask ) == peripheral->value ) ) {
-    callback_info->value &= peripheral->read( callback_info->port );
-    callback_info->attached = 1;
+    callback_info->value &= peripheral->read( callback_info->port,
+					      &( callback_info->attached ) );
   }
 }
 
@@ -245,28 +245,22 @@ write_peripheral( gpointer data, gpointer user_data )
  * The more Fuse-specific peripheral handling routines
  */
 
-/* The ID for the (deactivable) Kempston interface; -1 if no interface
-   present _or_ if it is always active */
-static int kempston_id;
+/* What sort of Kempston interface does the current machine has */
+static periph_present kempston_present;
 
-/* The data for the Kempston interface */
-static const periph_t kempston_data =
-  { 0x00e0, 0x0000, joystick_kempston_read, NULL };
+/* Is the Kempston interface currently active */
+int periph_kempston_active;
 
 int
-periph_setup( const periph_t *peripherals_list, size_t n, int kempston )
+periph_setup( const periph_t *peripherals_list, size_t n,
+	      periph_present kempston )
 {
   int error;
 
   periph_clear();
-  kempston_id = -1;
 
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
-
-  if( kempston ) {
-    kempston_id = periph_register( &kempston_data );
-    if( kempston_id == -1 ) return -1;
-  }
+  kempston_present = kempston;
 
   periph_update();
 
@@ -276,7 +270,10 @@ periph_setup( const periph_t *peripherals_list, size_t n, int kempston )
 void
 periph_update( void )
 {
-  if( kempston_id != -1 ) {
-    periph_set_active( kempston_id, settings_current.joy_kempston );
+  switch( kempston_present ) {
+  case PERIPH_PRESENT_NEVER: periph_kempston_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_kempston_active = settings_current.joy_kempston; break;
+  case PERIPH_PRESENT_ALWAYS: periph_kempston_active = 1; break;
   }
 }

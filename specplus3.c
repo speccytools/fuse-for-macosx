@@ -64,8 +64,10 @@ static int select_special_map( int page1, int page2, int page3, int page4 );
 
 #ifdef HAVE_765_H
 static void specplus3_fdc_reset( void );
-static libspectrum_byte specplus3_fdc_status( libspectrum_word port );
-static libspectrum_byte specplus3_fdc_read( libspectrum_word port );
+static libspectrum_byte specplus3_fdc_status( libspectrum_word port,
+					      int *attached );
+static libspectrum_byte specplus3_fdc_read( libspectrum_word port,
+					    int *attached );
 static void specplus3_fdc_write( libspectrum_word port,
 				 libspectrum_byte data );
 
@@ -81,6 +83,7 @@ static int specplus3_shutdown( void );
 
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0xc002, 0x4000, NULL, specplus3_memoryport_write },
@@ -250,7 +253,8 @@ int specplus3_reset(void)
 			    machine_current->rom_length[3] );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count, 1 );
+  error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
 #ifdef HAVE_765_H
@@ -466,14 +470,18 @@ specplus3_fdc_reset( void )
 }
 
 static libspectrum_byte
-specplus3_fdc_status( libspectrum_word port GCC_UNUSED )
+specplus3_fdc_status( libspectrum_word port GCC_UNUSED, int *attached )
 {
+  *attached = 1;
+
   return fdc_read_ctrl( fdc );
 }
 
 static libspectrum_byte
-specplus3_fdc_read( libspectrum_word port GCC_UNUSED )
+specplus3_fdc_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
+  *attached = 1;
+
   return fdc_read_data( fdc );
 }
 

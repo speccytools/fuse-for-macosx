@@ -79,7 +79,8 @@ specplus2_reset( void )
 			    machine_current->rom_length[1] );
   if( error ) return error;
 
-  error = periph_setup( spec128_peripherals, spec128_peripherals_count, 1 );
+  error = periph_setup( spec128_peripherals, spec128_peripherals_count,
+			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
   return spec128_common_reset( 1 );

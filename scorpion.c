@@ -43,8 +43,10 @@
 #include "spectrum.h"
 #include "trdos.h"
 
-static libspectrum_byte scorpion_select_1f_read( libspectrum_word port );
-static libspectrum_byte scorpion_select_ff_read( libspectrum_word port );
+static libspectrum_byte scorpion_select_1f_read( libspectrum_word port,
+						 int *attached );
+static libspectrum_byte scorpion_select_ff_read( libspectrum_word port,
+						 int *attached );
 static libspectrum_byte scorpion_contend_delay( libspectrum_dword time );
 static int scorpion_shutdown( void );
 
@@ -64,24 +66,25 @@ const static periph_t peripherals[] = {
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-libspectrum_byte
-scorpion_select_1f_read( libspectrum_word port )
+static libspectrum_byte
+scorpion_select_1f_read( libspectrum_word port, int *attached )
 {
-  if( trdos_active ) {
-    return trdos_sr_read( port );
-  } else {
-    return joystick_kempston_read( port );
-  }
+  libspectrum_byte data;
+
+  data = trdos_sr_read( port, attached ); if( *attached ) return data;
+  data = joystick_kempston_read( port, attached ); if( *attached ) return data;
+
+  return 0xff;
 }
 
-libspectrum_byte
-scorpion_select_ff_read( libspectrum_word port )
+static libspectrum_byte
+scorpion_select_ff_read( libspectrum_word port, int *attached )
 {
-  if( trdos_active ) {
-    return trdos_sp_read( port ) | 0x08;
-  } else {
-    return scorpion_unattached_port();
-  }
+  libspectrum_byte data;
+
+  data = trdos_sp_read( port, attached ); if( *attached ) return data;
+
+  return 0xff;
 }
 
 libspectrum_byte
@@ -167,7 +170,8 @@ scorpion_reset(void)
   trdos_available = 1;
   trdos_active = 0;
 
-  error = periph_setup( peripherals, peripherals_count, 0 );
+  error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
   machine_current->ram.last_byte2 = 0;

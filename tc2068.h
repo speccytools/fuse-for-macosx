@@ -1,5 +1,5 @@
 /* tc2068.h: Timex TC2068 specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
    Copyright (c) 2002 Fredrick Meunier
    Copyright (c) 2003 Witold Filipczyk
 
@@ -42,8 +42,5 @@ libspectrum_dword tc2068_contend_port( libspectrum_word port );
 
 int tc2068_init( fuse_machine_info *machine );
 int tc2068_reset( void );
-
-libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port );
-libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port );
 
 #endif			/* #ifndef FUSE_TC2068_H */
