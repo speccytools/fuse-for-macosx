@@ -417,16 +417,14 @@ sub opcode_BIT (@) {
 
     my( $bit, $register ) = @_;
 
-    my $macro = ( $bit == 7 ? '7(' : "($bit," );
-
     if( length $register == 1 ) {
-	print "      BIT$macro$register);\n";
+	print "      BIT( $bit, $register );\n";
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "BIT";
       tstates += 2;
       {
 	libspectrum_byte bytetemp = readbyte( tempaddr );
-	BIT${macro}bytetemp);
+	BIT( $bit, bytetemp );
       }
 BIT
     } else {
@@ -434,7 +432,7 @@ BIT
       {
 	libspectrum_byte bytetemp = readbyte( HL );
 	tstates++;
-	BIT${macro}bytetemp);
+	BIT( $bit, bytetemp );
       }
 BIT
     }

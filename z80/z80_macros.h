@@ -174,17 +174,15 @@ void contend( libspectrum_word address, libspectrum_dword time );
     halfcarry_add_table[lookup];\
 }
 
-#define BIT(bit,value)\
-{\
-  F = ( F & FLAG_C ) | ( (value) & ( FLAG_3 | FLAG_5 ) ) |\
-    ( ( (value) & ( 0x01 << bit ) ) ? FLAG_H : ( FLAG_P | FLAG_H | FLAG_Z ) );\
-}
-
-#define BIT7(value)\
-{\
-  F = ( F & FLAG_C ) | ( (value) & ( FLAG_3 | FLAG_5 ) ) |\
-    ( ( (value) & 0x80 ) ? ( FLAG_H | FLAG_S ) :\
-      ( FLAG_P | FLAG_H | FLAG_Z ) );\
+/* This may look fairly inefficient, but the (gcc) optimiser does the
+   right thing assuming it's given a constant for 'bit' */
+#define BIT( bit, value ) \
+{ \
+  F = ( F & FLAG_C ) | FLAG_H; \
+  if( ! ( (value) & ( 0x01 << (bit) ) ) ) F |= FLAG_P | FLAG_Z; \
+  if( (bit) == 3 && (value) & 0x08 ) F |= FLAG_3; \
+  if( (bit) == 5 && (value) & 0x20 ) F |= FLAG_5; \
+  if( (bit) == 7 && (value) & 0x80 ) F |= FLAG_S; \
 }
 
 #define CALL()\

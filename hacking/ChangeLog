@@ -589,3 +589,6 @@
 	 and Thomas Harte).
 20040225 z80/test/37*: split the SCF test into 4, rather than one overly
 	 complicated test.
+20040225 z80/{z80.pl,z80_macros.h,tests/README,tests/*cb*}: BIT
+	 instructions should set bits 3 and 5 only for BIT 3,<arg> and BIT
+	 5,<arg> respectively.
