@@ -370,18 +370,6 @@ foreach my $name ( sort keys %options ) {
 
 print hashline( __LINE__ ), << 'CODE';
 
-    case 'o':
-      for( ptr = long_options; ptr->name; ptr++ ) {
-	
-	if( ptr->flag == NULL ) continue;
-
-	if( ! strcmp( optarg, ptr->name ) ) {
-	  *(ptr->flag) = ptr->val;
-	  break;
-	}
-      }
-      break;
-
     case 'h': settings->show_help = 1; break;
     case 'V': settings->show_version = 1; break;
 

@@ -104,16 +104,6 @@ and
 .IR 2048 .
 .RE
 .PP
-.I "-o long_option"
-.RS
-Equivalent to
-.RI ` --long_option '.
-If
-.I getopt_long
-was not present when Fuse was compiled, this will be the only way of
-using long options on the command line.
-.RE
-.PP
 .I "-p file"
 .br
 .I "--playback file"
@@ -212,12 +202,6 @@ using the General Options dialog - see the documentation for the
 menu item in the
 .B "MENUS AND KEYS"
 section for details.
-.PP
-Long options listed above will not be present if the
-.I getopt_long
-function was not available when Fuse was compiled, but the
-.RI ` -o '
-option should allow you to use them all the same.
 .\"
 .\"------------------------------------------------------------------
 .\"
