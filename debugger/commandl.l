@@ -78,6 +78,18 @@ af|bc|de|hl|sp|pc|ix|iy { yylval.integer = debugger_reg16_index( yytext );
 "("		{ return '('; }
 ")"		{ return ')'; }
 
+"!"		{ return '!'; }
+
+ /* The hex constants used here are the appropriate Unicode characters */
+
+"=="		{ yylval.token = 0x225f; return EQUALITY; }
+"!="		{ yylval.token = 0x2260; return EQUALITY; }
+
+"<"		{ yylval.token = '<'; return COMPARISION; }
+">"		{ yylval.token = '>'; return COMPARISION; }
+"<="		{ yylval.token = 0x2264; return COMPARISION; }
+">="		{ yylval.token = 0x2265; return COMPARISION; }
+
 "+"		{ return '+'; }
 "-"		{ return '-'; }
 "*"		{ yylval.token = '*'; return TIMES_DIVIDE; }

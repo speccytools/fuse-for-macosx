@@ -60,6 +60,8 @@ void yyerror( char *s );
 
 /* Tokens as returned from the Flex scanner (commandl.l) */
 
+%token <token>	 COMPARISION	/* < > <= >= */
+%token <token>   EQUALITY	/* == != */
 %token <token>	 TIMES_DIVIDE	/* '*' or '/' */
 
 %token		 BASE
@@ -101,9 +103,12 @@ void yyerror( char *s );
 
 /* Low precedence */
 
+%left EQUALITY
+%left COMPARISION
 %left '+' '-'
 %left TIMES_DIVIDE
 %left NEG		/* Unary minus (also unary plus) */
+%left '!'
 
 /* High precedence */
 
@@ -170,6 +175,10 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 	        $$ = debugger_expression_new_unaryop( '-', $2 );
 		if( !$$ ) YYABORT;
 	      }
+	    | '!' expression {
+	        $$ = debugger_expression_new_unaryop( '!', $2 );
+		if( !$$ ) YYABORT;
+	      }
 	    | expression '+' expression {
 	        $$ = debugger_expression_new_binaryop( '+', $1, $3 );
 		if( !$$ ) YYABORT;
@@ -179,6 +188,14 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression TIMES_DIVIDE expression {
+	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression EQUALITY expression {
+	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression COMPARISION expression {
 	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
 		if( !$$ ) YYABORT;
 	      }

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 
 #include "debugger_internals.h"
+#include "fuse.h"
 #include "ui/ui.h"
 
 typedef enum expression_type {
@@ -187,7 +188,9 @@ debugger_expression_evaluate( debugger_expression *exp )
   }
 
   ui_error( UI_ERROR_ERROR, "unknown expression type %d", exp->type );
-  return 0;
+  fuse_abort();
+
+  return 0;			/* Keep gcc happy */
 }
 
 static int
@@ -195,12 +198,15 @@ evaluate_unaryop( struct unaryop_type *unary )
 {
   switch( unary->operation ) {
 
+  case '!': return !debugger_expression_evaluate( unary->op );
   case '-': return -debugger_expression_evaluate( unary->op );
 
   }
 
   ui_error( UI_ERROR_ERROR, "unknown unary operator %d", unary->operation );
-  return 0;
+  fuse_abort();
+
+  return 0;			/* Keep gcc happy */
 }
 
 static int
@@ -219,8 +225,29 @@ evaluate_binaryop( struct binaryop_type *binary )
 
   case '/': return debugger_expression_evaluate( binary->op1 ) /
 		   debugger_expression_evaluate( binary->op2 );
+
+  case 0x225f: return debugger_expression_evaluate( binary->op1 ) ==
+		      debugger_expression_evaluate( binary->op2 );
+
+  case 0x2260: return debugger_expression_evaluate( binary->op1 ) !=
+		      debugger_expression_evaluate( binary->op2 );
+
+  case '>': return debugger_expression_evaluate( binary->op1 ) >
+		   debugger_expression_evaluate( binary->op2 );
+
+  case '<': return debugger_expression_evaluate( binary->op1 ) <
+	           debugger_expression_evaluate( binary->op2 );
+
+  case 0x2264: return debugger_expression_evaluate( binary->op1 ) <=
+		      debugger_expression_evaluate( binary->op2 );
+
+  case 0x2265: return debugger_expression_evaluate( binary->op1 ) >=
+		      debugger_expression_evaluate( binary->op2 );
+
   }
 
   ui_error( UI_ERROR_ERROR, "unknown binary operator %d", binary->operation );
-  return 0;
+  fuse_abort();
+
+  return 0;			/* Keep gcc happy */
 }
