@@ -499,12 +499,12 @@ trdos_event_index( DWORD last_tstates )
 
   if( num_calls == 0 ) {
     /* schedule next call in 20ms */
-    next_tstates = 20 * machine_current->timings.hz / 1000;
+    next_tstates = 20 * machine_current->timings.processor_speed / 1000;
     index_impulse = 1;
     num_calls = 1;
   } else {
     /* schedule next call in 180ms */
-    next_tstates = 180 * machine_current->timings.hz / 1000;
+    next_tstates = 180 * machine_current->timings.processor_speed / 1000;
     index_impulse = 0;
     num_calls = 0;
   }
@@ -535,7 +535,7 @@ vg_seek_delay(BYTE dst_track)
 
   /* schedule event */
   error = event_add( tstates +
-                     machine_current->timings.hz / 1000 * 20 *
+                     machine_current->timings.processor_speed / 1000 * 20 *
                      abs( dst_track - CurrentDisk.trk ),
                      EVENT_TYPE_TRDOS_CMD_DONE );
 }
@@ -692,7 +692,8 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
 
         /* schedule event */
         cmd_done = 1;
-        error = event_add( tstates + machine_current->timings.hz / 1000 * 30,
+        error = event_add( tstates + machine_current->timings.processor_speed
+                                     / 1000 * 30,
                            EVENT_TYPE_TRDOS_CMD_DONE );
       } else {
         close( trd_file );
@@ -726,7 +727,8 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
     cmd_done = 1;
     vg_spin = 0;
 
-    error = event_add( tstates + machine_current->timings.hz / 1000 * 30,
+    error = event_add( tstates + machine_current->timings.processor_speed
+                                 / 1000 * 30,
                        EVENT_TYPE_TRDOS_CMD_DONE );
 
     return;

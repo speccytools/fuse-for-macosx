@@ -1,5 +1,5 @@
 /* machine.h: Routines for handling the various machine types
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -51,6 +51,22 @@
 
 typedef BYTE (*spectrum_unattached_port_fn)( void );
 
+/* How long do things take to happen; fields are pulled from libspectrum
+   via the libspectrum_timings_* functions */
+typedef struct machine_timings {
+
+  /* Processor speed */
+  DWORD processor_speed;
+
+  /* Line timings in tstates */
+  WORD left_border, horizontal_screen, right_border;
+  WORD tstates_per_line;
+
+  /* Frame timing */
+  DWORD tstates_per_frame;
+
+} machine_timings;
+
 typedef struct fuse_machine_info {
 
   libspectrum_machine machine; /* which machine type is this? */
@@ -60,7 +76,7 @@ typedef struct fuse_machine_info {
 
   int timex;      /* Timex machine (keyboard emulation/loading sounds etc.) */
 
-  libspectrum_timings timings; /* How long do things take to happen? */
+  machine_timings timings; /* How long do things take to happen? */
   /* Redraw line y this many tstates after interrupt */
   DWORD	line_times[DISPLAY_SCREEN_HEIGHT+1];
 

@@ -303,18 +303,29 @@ machine_reset( void )
 int
 machine_set_timings( fuse_machine_info *machine )
 {
-  libspectrum_error error;
   size_t y;
 
-  error = libspectrum_machine_timings( &machine->timings, machine->machine );
-  if( error ) return error;
+  /* Pull timings we use repeatedly out of libspectrum and store them
+     for ourself */
+  machine->timings.processor_speed =
+    libspectrum_timings_processor_speed( machine->machine );
+  machine->timings.left_border =
+    libspectrum_timings_left_border( machine->machine );
+  machine->timings.horizontal_screen =
+    libspectrum_timings_horizontal_screen( machine->machine );
+  machine->timings.right_border =
+    libspectrum_timings_right_border( machine->machine );
+  machine->timings.tstates_per_line =
+    libspectrum_timings_tstates_per_line( machine->machine );
+  machine->timings.tstates_per_frame =
+    libspectrum_timings_tstates_per_frame( machine->machine );
 
   /* Magic number alert
 
-     libspectrum_machine_timings gives us the number of tstates after the
-     interrupt at which the top-left pixel of the screen is displayed.
-     However, what's more useful for Fuse is when the first pixel of the
-     top line of the border is displayed.
+     libspectrum_timings_top_left_pixel gives us the number of tstates
+     after the interrupt at which the top-left pixel of the screen is
+     displayed. However, what's more useful for Fuse is when the first
+     pixel of the top line of the border is displayed.
 
      Fuse is currently hard-wired to show 24 lines of top and bottom border,
      hence we subtract 24 times the line length. We also subtract the
@@ -323,9 +334,10 @@ machine_set_timings( fuse_machine_info *machine )
      display.c:display_border_column()
   */
 
-  machine->line_times[0]= machine->timings.top_left_pixel -
-                          24 * machine->timings.tstates_per_line -
-                          machine->timings.left_border;
+  machine->line_times[0]=
+    libspectrum_timings_top_left_pixel( machine->machine ) -
+    24 * machine->timings.tstates_per_line -
+    machine->timings.left_border;
 
   for( y=1; y<DISPLAY_SCREEN_HEIGHT+1; y++ ) {
     machine->line_times[y] = machine->line_times[y-1] + 

@@ -153,7 +153,7 @@ ay_tone_subcycles=ay_env_subcycles=0;
 for(f=0;f<3;f++)
   ay_tone_tick[f]=ay_tone_high[f]=0,ay_tone_period[f]=1;
 
-ay_tick_incr=(int)(65536.*machine_current->timings.ay_hz/sound_freq);
+ay_tick_incr=(int)(65536.*libspectrum_timings_ay_speed(machine_current->machine)/sound_freq);
 
 ay_change_count=0;
 }
@@ -400,7 +400,7 @@ if(!machine_current->ay.present) return;
 /* convert change times to sample offsets */
 for(f=0;f<ay_change_count;f++)
   ay_change[f].ofs=(ay_change[f].tstates*sound_freq)/
-                   machine_current->timings.hz;
+                   machine_current->timings.processor_speed;
 
 for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
   {
