@@ -158,12 +158,16 @@ create_dialog( void )
   /* The breakpoint CList */
   breakpoints = gtk_clist_new_with_titles( 5, breakpoint_titles );
   gtk_clist_column_titles_passive( GTK_CLIST( breakpoints ) );
+  for( i = 0; i < 5; i++ )
+    gtk_clist_set_column_auto_resize( GTK_CLIST( breakpoints ), i, TRUE );
   gtk_box_pack_start_defaults( GTK_BOX( vbox ), breakpoints );
 
   /* Create the disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
   gtk_widget_set_style( disassembly, style );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
+  for( i = 0; i < 2; i++ )
+    gtk_clist_set_column_auto_resize( GTK_CLIST( disassembly ), i, TRUE );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
 
   /* The disassembly scrollbar */
@@ -180,6 +184,8 @@ create_dialog( void )
   stack = gtk_clist_new_with_titles( 2, stack_titles );
   gtk_widget_set_style( stack, style );
   gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
+  for( i = 0; i < 2; i++ )
+    gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
   gtk_box_pack_start( GTK_BOX( hbox ), stack, TRUE, TRUE, 5 );
 
   /* Another hbox to hold the command entry widget and the 'evaluate'

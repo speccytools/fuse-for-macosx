@@ -79,19 +79,19 @@ gtk_tape_browse( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   /* And a scrolled window to pack the CList into */
   scrolled_window = gtk_scrolled_window_new( NULL, NULL );
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolled_window ),
-				  GTK_POLICY_AUTOMATIC,
-				  GTK_POLICY_AUTOMATIC );
+				  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
 		     scrolled_window );
 
   /* And the CList itself */
   clist = gtk_clist_new_with_titles( 2, titles );
   gtk_clist_column_titles_passive( GTK_CLIST( clist ) );
+  for( i = 0; i < 2; i++ )
+    gtk_clist_set_column_auto_resize( GTK_CLIST( clist ), i, TRUE );
+
   for( i=0; i<n; i++ ) {
     gtk_clist_append( GTK_CLIST( clist ), text[i] );
   }
-
-  gtk_clist_set_column_width( GTK_CLIST( clist ), 0, 250 );
 
   gtk_container_add( GTK_CONTAINER( scrolled_window ), clist );
 
@@ -130,7 +130,7 @@ gtk_tape_browse( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 			      accel_group, GDK_Escape, 0, 0);
 
   /* Make the window big enough to show at least some data */
-  gtk_window_set_default_size( GTK_WINDOW( dialog ), 400, 200 );
+  gtk_window_set_default_size( GTK_WINDOW( dialog ), -1, 200 );
 
   current_block = tape_get_current_block();
   if( current_block != -1 ) {
