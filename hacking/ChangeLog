@@ -622,3 +622,5 @@
 	 pokefinder to be able to find bytes which have increased or
 	 decreased since the last check.
 20040310 Move the low-level sound files into the new sound/ directory.
+20040310 fuse.c,sound.c,spectrum.c,timer.c,sound/: move the sound code
+	 detection logic into the new sound/lowlevel.h.

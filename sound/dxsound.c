@@ -1,5 +1,5 @@
 /* dxsound.c: DirectX sound I/O
-   Copyright (c) 2003 Marek Januszewski, Philip Kendall
+   Copyright (c) 2003-2004 Marek Januszewski, Philip Kendall
 
    $Id$
 
@@ -24,9 +24,11 @@
 
 */
 
-#include "config.h"
+#include <config.h>
 
-#if !defined(UI_SDL) && defined(HAVE_DSOUND_H)
+#include "lowlevel.h"
+
+#ifdef SOUND_DX
 
 #include <windows.h>
 #include <mmsystem.h>
@@ -164,4 +166,4 @@ sound_lowlevel_frame( unsigned char *data, int len )
 			     length2 );
 }
 
-#endif		/* #if !defined(UI_SDL) && defined(HAVE_DSOUND_H) */
+#endif		/* #ifdef SOUND_DX */

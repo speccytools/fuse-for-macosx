@@ -1,5 +1,5 @@
 /* sdlsound.c: SDL sound I/O
-   Copyright (c) 2002-2003 Alexander Yurchenko, Russell Marks, Philip Kendall,
+   Copyright (c) 2002-2004 Alexander Yurchenko, Russell Marks, Philip Kendall,
 			   Fredrick Meunier
 
    $Id$
@@ -20,9 +20,11 @@
 
 */
 
-#include "config.h"
+#include <config.h>
 
-#if defined(UI_SDL)		/* SDL sound */
+#include "lowlevel.h"
+
+#ifdef SOUND_SDL
 
 #include <string.h>
 
@@ -128,4 +130,4 @@ sdlwrite( void *userdata, Uint8 *stream, int len )
   }
 }
 
-#endif /* UI_SDL */
+#endif			/* #ifdef SOUND_SDL */

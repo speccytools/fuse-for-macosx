@@ -1,5 +1,5 @@
 /* osssound.c: OSS (e.g. Linux) sound I/O
-   Copyright (c) 2000-2003 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2004 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -21,7 +21,9 @@
 
 #include <config.h>
 
-#if !defined(UI_SDL) && defined(HAVE_SYS_SOUNDCARD_H)	/* OSS sound */
+#include "lowlevel.h"
+
+#ifdef SOUND_OSS
 
 #include <stdio.h>
 #include <string.h>
@@ -178,4 +180,4 @@ while(len)
   }
 }
 
-#endif	/* #if !defined(UI_SDL) && defined(HAVE_SYS_SOUNDCARD_H) */
+#endif	/* #ifdef SOUND_OSS */

@@ -37,6 +37,7 @@
 #include "rzx.h"
 #include "settings.h"
 #include "sound.h"
+#include "sound/lowlevel.h"
 #include "spec128.h"
 #include "spec48.h"
 #include "specplus2.h"

@@ -1,5 +1,5 @@
 /* sunsound.c: OpenBSD sound I/O
-   Copyright (c) 2002-2003 Alexander Yurchenko, Russell Marks, Philip Kendall
+   Copyright (c) 2002-2004 Alexander Yurchenko, Russell Marks, Philip Kendall
 
    $Id$
 
@@ -19,9 +19,11 @@
 
 */
 
-#include "config.h"
+#include <config.h>
 
-#if !defined(UI_SDL) && defined(HAVE_SYS_AUDIOIO_H)		/* SUN sound */
+#include "lowlevel.h"
+
+#ifdef SOUND_SUN
 
 #if defined(__SVR4) && defined(__sun)
 #define solaris
@@ -209,5 +211,4 @@ sound_lowlevel_frame(data, len)
 	}
 }
 
-#endif /* #if !defined(UI_SDL) && defined(HAVE_SYS_AUDIOIO_H) */
-
+#endif		/* #ifdef SOUND_SUN */

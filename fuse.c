@@ -59,6 +59,7 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
+#include "sound/lowlevel.h"
 #include "spectrum.h"
 #include "specplus3.h"
 #include "tape.h"
