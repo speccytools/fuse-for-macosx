@@ -182,3 +182,5 @@
 20030903 ui/gtk/binary.c: add padding around widgets
 20030905 ui/gtk/binary.c: call save_data not load_data when saving binary
          data. Add padding around the save binary data dialog widgets.
+20030905 debugger/expression.c: get brackets right when deparsing
+         expressions.

@@ -42,7 +42,7 @@ typedef enum expression_type {
 
 } expression_type;
 
-enum precedence {
+enum precedence_t {
 
   /* Lowest precedence */
   PRECEDENCE_LOGICAL_OR,
@@ -78,7 +78,7 @@ struct binaryop_type {
 struct debugger_expression {
 
   expression_type type;
-  enum precedence lowest_precedence;
+  enum precedence_t precedence;
 
   union {
     int integer;
@@ -96,8 +96,11 @@ static int deparse_unaryop( char *buffer, size_t length,
 			    const struct unaryop_type *unaryop );
 static int deparse_binaryop( char *buffer, size_t length,
 			     const struct binaryop_type *binaryop );
+static int
+brackets_necessary( int top_operation, debugger_expression *operand );
+static int is_non_associative( int operation );
 
-static enum precedence
+static enum precedence_t
 unaryop_precedence( int operation )
 {
   switch( operation ) {
@@ -112,7 +115,7 @@ unaryop_precedence( int operation )
   return 0;			/* Keep gcc happy */
 }
 
-static enum precedence
+static enum precedence_t
 binaryop_precedence( int operation )
 {
   switch( operation ) {
@@ -148,7 +151,7 @@ debugger_expression_new_number( libspectrum_word number )
   }
 
   exp->type = DEBUGGER_EXPRESSION_TYPE_INTEGER;
-  exp->lowest_precedence = PRECEDENCE_ATOMIC;
+  exp->precedence = PRECEDENCE_ATOMIC;
   exp->types.integer = number;
 
   return exp;
@@ -166,7 +169,7 @@ debugger_expression_new_register( int which )
   }
 
   exp->type = DEBUGGER_EXPRESSION_TYPE_REGISTER;
-  exp->lowest_precedence = PRECEDENCE_ATOMIC;
+  exp->precedence = PRECEDENCE_ATOMIC;
   exp->types.reg = which;
 
   return exp;
@@ -185,14 +188,7 @@ debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
   }
 
   exp->type = DEBUGGER_EXPRESSION_TYPE_BINARYOP;
-
-  exp->lowest_precedence = binaryop_precedence( operation );
-
-  if( operand1->lowest_precedence < exp->lowest_precedence )
-    exp->lowest_precedence = operand1->lowest_precedence;
-
-  if( operand2->lowest_precedence < exp->lowest_precedence )
-    exp->lowest_precedence = operand2->lowest_precedence;
+  exp->precedence = binaryop_precedence( operation );
 
   exp->types.binaryop.operation = operation;
   exp->types.binaryop.op1 = operand1;
@@ -214,11 +210,7 @@ debugger_expression_new_unaryop( int operation, debugger_expression *operand )
   }
 
   exp->type = DEBUGGER_EXPRESSION_TYPE_UNARYOP;
-
-  exp->lowest_precedence = unaryop_precedence( operation );
-
-  if( operand->lowest_precedence < exp->lowest_precedence )
-    exp->lowest_precedence = operand->lowest_precedence;
+  exp->precedence = unaryop_precedence( operation );
 
   exp->types.unaryop.operation = operation;
   exp->types.unaryop.op = operand;
@@ -411,7 +403,7 @@ deparse_unaryop( char *buffer, size_t length,
     fuse_abort();
   }
 
-  brackets_necessary = ( unaryop->op->lowest_precedence           <
+  brackets_necessary = ( unaryop->op->precedence                  < 
 			 unaryop_precedence( unaryop->operation )   );
     
   snprintf( buffer, length, "%s%s%s%s", operation_string,
@@ -470,12 +462,11 @@ deparse_binaryop( char *buffer, size_t length,
     fuse_abort();
   }
 
-  brackets_necessary1 = ( binaryop->op1->lowest_precedence          <
-			  binaryop_precedence( binaryop->operation )   );
-    
-  brackets_necessary2 = ( binaryop->op2->lowest_precedence           <
-			  binaryop_precedence( binaryop->operation )   );
-    
+  brackets_necessary1 = brackets_necessary( binaryop->operation,
+					    binaryop->op1 );
+  brackets_necessary2 = brackets_necessary( binaryop->operation,
+					    binaryop->op2 );
+
   snprintf( buffer, length, "%s%s%s %s %s%s%s",
 	    brackets_necessary1 ? "( " : "", operand1_buffer,
 	    brackets_necessary1 ? " )" : "",
@@ -487,3 +478,84 @@ deparse_binaryop( char *buffer, size_t length,
 
   return 0;
 }
+
+/* When deparsing, do we need to put brackets around `operand' when
+   being used as an operand of the binary operation `top_operation'? */
+static int
+brackets_necessary( int top_operation, debugger_expression *operand )
+{
+  enum precedence_t top_precedence, bottom_precedence;
+  
+  top_precedence = binaryop_precedence( top_operation );
+  bottom_precedence = operand->precedence;
+
+  /* If the top level operation has a higher precedence than the
+     bottom level operation, we always need brackets */
+  if( top_precedence > bottom_precedence ) return 1;
+
+  /* If the two operations are of equal precedence, we need brackets
+     i) if the top level operation is non-associative, or
+     ii) if the operand is a non-associative operation
+
+     Note the assumption here that all things with a precedence equal to
+     a binary operator are also binary operators
+
+     Strictly, we don't need brackets in either of these cases, but
+     otherwise the user is going to have to remember operator
+     left-right associativity; I think things are clearer with
+     brackets in.
+  */
+  if( top_precedence == bottom_precedence ) {
+
+    if( is_non_associative( top_operation ) ) return 1;
+
+    /* Sanity check */
+    if( operand->type != DEBUGGER_EXPRESSION_TYPE_BINARYOP ) {
+      ui_error( UI_ERROR_ERROR,
+		"binary operator has same precedence as non-binary operator" );
+      fuse_abort();
+    }
+
+    return is_non_associative( operand->types.binaryop.operation );
+  }
+
+  /* Otherwise (ie if the top level operation is of lower precedence
+     than the bottom, or both operators have equal precedence and
+     everything is associative) we don't need brackets */
+  return 0;
+}
+
+/* Is a binary operator non-associative? */
+static int
+is_non_associative( int operation )
+{
+  switch( operation ) {
+
+  /* Simple cases */
+  case '+': case '*': return 0;
+  case '-': case '/': return 1;
+
+  /* None of the comparision operators are associative due to them
+     returning truth values */
+  case 0x225f: case 0x2260: case '<': case '>': case 0x2264: case 0x2265:
+    return 1;
+
+  /* The logical operators are associative */
+  case 0x2227: return 0;
+  case 0x2228: return 0;
+
+  /* The bitwise operators are also associative (consider them as
+     vectorised logical operators) */
+  case    '&': return 0;
+  case    '^': return 0;
+  case    '|': return 0;
+
+  }
+
+  /* Should never get here */
+  ui_error( UI_ERROR_ERROR, "unknown binary operation %d", operation );
+  fuse_abort();
+
+  return 0;			/* Keep gcc happy */
+}
+
