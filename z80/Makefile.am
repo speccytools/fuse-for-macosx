@@ -69,7 +69,7 @@ SUBDIRS = tests
 noinst_PROGRAMS = coretest
 
 coretest_SOURCES = coretest.c z80.c
-coretest_LDADD = z80_coretest.o -lspectrum
+coretest_LDADD = z80_coretest.o @LIBSPEC_LIBS@
 
 coretest.o: coretest.c
 	$(COMPILE) -DCORETEST -c coretest.c -o coretest.o

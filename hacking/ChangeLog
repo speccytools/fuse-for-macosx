@@ -1047,3 +1047,4 @@
 20040807 ui.c: remove extraneous if in ui_mouse_suspend (Darren).
 20040808 ui/ui.h, ui/gtk/{gtkmouse.c,statusbar.c}: add 'mouse grabbed'
 	 icon.
+20040809 z80/Makefile.am: Link coretest against @LIBSPEC_LIBS@.
