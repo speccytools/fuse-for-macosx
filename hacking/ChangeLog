@@ -996,3 +996,4 @@
 20040709 ui/gtk/debugger.c: shorten 'Writable?' and 'Contended?' headings.
 20040709 configure.in: bump version number to 0.7.0pre1.
 20040709 TAG: Release-0_7_0pre1
+20040710 ui/fb/fbui.c: #include <errno.h> and <string.h>

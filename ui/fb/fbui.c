@@ -1,5 +1,5 @@
 /* fbui.c: Routines for dealing with the linux fbdev user interface
-   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Witold Filipczyk
+   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Witold Filipczyk
 
    $Id$
 
@@ -28,8 +28,10 @@
 
 #ifdef UI_FB			/* Use this iff we're using fbdev */
 
+#include <errno.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <string.h>
 
 #include "fbdisplay.h"
 #include "fbkeyboard.h"
