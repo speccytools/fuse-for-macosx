@@ -39,6 +39,10 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#ifdef HAVE_SIGINFO_H
+#include <siginfo.h>		/* Needed for psignal on Solaris */
+#endif				/* #ifdef HAVE_SIGINFO_H */
+
 #ifdef X_USE_SHM
 #include <sys/ipc.h>
 #include <sys/shm.h>
