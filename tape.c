@@ -152,6 +152,13 @@ int tape_close( void )
 {
   int error;
 
+  /* Stop the tape if it's currently playing */
+  if( tape_playing ) {
+    error = tape_stop();
+    if( error ) return error;
+  }
+
+  /* And then remove it from memory */
   error = libspectrum_tape_free( &tape );
   if( error ) return error;
 

@@ -49,7 +49,7 @@ int widget_tape( void )
   widget_keyhandler = widget_tape_keyhandler;
 
   /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 1 );
+  widget_dialog_with_border( 1, 2, 30, 2 );
   error = widget_tape_draw();
   if( error ) { widget_timer_end(); return error; }
 
@@ -82,13 +82,15 @@ int widget_tape( void )
 static int widget_tape_draw( void )
 {
   /* Blank the main display area */
-  widget_dialog( 1, 2, 30, 1 );
+  widget_dialog( 1, 2, 30, 2 );
 
   widget_printstring( 2, 2, WIDGET_COLOUR_FOREGROUND,
+		      "(C)lear tape" );
+  widget_printstring( 2, 3, WIDGET_COLOUR_FOREGROUND,
 		      "(R)ewind tape" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 8 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
 
   return 0;
 }
@@ -99,6 +101,10 @@ static void widget_tape_keyhandler( int key )
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_finished = WIDGET_FINISHED_CANCEL;
+    break;
+
+  case KEYBOARD_c:
+    tape_close();
     break;
 
   case KEYBOARD_r:

@@ -83,7 +83,7 @@ libspectrum_tape_free( libspectrum_tape *tape )
 {
   g_slist_foreach( tape->blocks, block_free, NULL );
   g_slist_free( tape->blocks );
-  tape->blocks = NULL;
+  tape->blocks = tape->current_block = NULL;
   
   return LIBSPECTRUM_ERROR_NONE;
 }
