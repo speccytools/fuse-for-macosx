@@ -133,9 +133,9 @@ int event_do_events(void)
 
     case EVENT_TYPE_INTERRUPT:
       if( rzx_playback ) event_force_events();
+      rzx_frame();
       spectrum_interrupt();
       ui_event();
-      rzx_frame();
       break;
 
     case EVENT_TYPE_LINE:
