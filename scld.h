@@ -50,15 +50,17 @@
 #define HIRESCOLMASK    0x38
 
 #define WHITEBLACK      0x00
-#define YELLOWBLUE      0x08
-#define CYANRED         0x10
-#define GREENMAGENTA    0x18
-#define MAGENTAGREEN    0x20
-#define REDCYAN         0x28
-#define BLUEYELLOW      0x30
-#define BLACKWHITE      0x38
+#define YELLOWBLUE      0x01
+#define CYANRED         0x02
+#define GREENMAGENTA    0x03
+#define MAGENTAGREEN    0x04
+#define REDCYAN         0x05
+#define BLUEYELLOW      0x06
+#define BLACKWHITE      0x07
 
 #define ALTDFILE_OFFSET 0x2000
+
+#ifdef WORDS_BIGENDIAN
 
 typedef struct
 {
@@ -79,6 +81,30 @@ typedef struct
   unsigned hirescol  : 3;  /* HIRESCOLMASK */
   unsigned scrnmode  : 3;  /* SCRNMODEMASK */
 } scld_masks;
+
+#else				/* #ifdef WORDS_BIGENDIAN */
+
+typedef struct
+{
+  unsigned altdfile : 1;  /* SCLD use ALTDFILE */
+  unsigned b1     : 1;  /* */
+  unsigned hires  : 1;  /* SCLD HIRES mode */
+  unsigned b3  : 1;  /* */
+  unsigned b4  : 1;  /* */
+  unsigned b5  : 1;  /* */
+  unsigned intdisable : 1;  /* INTDISABLE */
+  unsigned altmembank : 1;  /* ALTMEMBANK : 0 = cartridge, 1 = exrom */
+} scld_names;
+
+typedef struct
+{
+  unsigned scrnmode  : 3;  /* SCRNMODEMASK */
+  unsigned hirescol  : 3;  /* HIRESCOLMASK */
+  unsigned b6  : 1;  /* */
+  unsigned b7  : 1;  /* */
+} scld_masks;
+
+#endif				/* #ifdef WORDS_BIGENDIAN */
 
 typedef union
 {
