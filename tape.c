@@ -59,6 +59,7 @@ int tape_microphone;
 /* Function prototypes */
 
 static int trap_load_block( libspectrum_tape_rom_block *block );
+int trap_check_rom( void );
 
 /* Function defintions */
 
@@ -220,6 +221,9 @@ int tape_load_trap( void )
   /* Do nothing if tape traps aren't active */
   if( ! settings_current.tape_traps ) return 2;
 
+  /* Do nothing if we're not in the correct ROM */
+  if( ! trap_check_rom() ) return 3;
+
   /* Return with error if no tape file loaded */
   if( tape.blocks == NULL ) return 1;
 
@@ -339,6 +343,9 @@ int tape_save_trap( void )
   /* Do nothing if tape traps aren't active */
   if( ! settings_current.tape_traps ) return 2;
 
+  /* Check we're in the right ROM */
+  if( ! trap_check_rom() ) return 3;
+
   /* Get a new block to store this data in */
   block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
   if( block == NULL ) return 1;
@@ -380,6 +387,31 @@ int tape_save_trap( void )
   PC = 0x053e;
 
   return 0;
+
+}
+
+/* Check whether we're actually in the right ROM when a tape trap hit */
+int trap_check_rom( void )
+{
+  switch( machine_current->machine ) {
+  case SPECTRUM_MACHINE_48:
+    return 1;		/* Always OK here */
+
+  case SPECTRUM_MACHINE_128:
+  case SPECTRUM_MACHINE_PLUS2:
+    /* OK if we're in ROM 1 */
+    return( machine_current->ram.current_rom == 1 );
+
+  case SPECTRUM_MACHINE_PLUS3:
+    /* OK if we're not in a 64Kb RAM configuration and we're in
+       ROM 3 */
+    return( ! machine_current->ram.special &&
+	    machine_current->ram.current_rom == 3 );
+
+  }
+
+  fprintf( stderr, "Impossible machine type %d", machine_current->machine );
+  abort();
 
 }
 
