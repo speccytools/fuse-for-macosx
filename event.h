@@ -37,13 +37,16 @@ typedef struct event_t {
 
 /* The various types of event which can occur */
 enum event_types {
-  EVENT_TYPE_NULL,
+
+  EVENT_TYPE_EDGE,
+  EVENT_TYPE_ENABLE_INTERRUPTS,
   EVENT_TYPE_INTERRUPT,
   EVENT_TYPE_LINE,
-  EVENT_TYPE_EDGE,
   EVENT_TYPE_NMI,
+  EVENT_TYPE_NULL,
   EVENT_TYPE_TRDOS_CMD_DONE,
   EVENT_TYPE_TRDOS_INDEX,
+
 };
 
 /* A large value to mean `no events due' */

@@ -489,7 +489,14 @@ sub opcode_DJNZ (@) {
 DJNZ
 }
 
-sub opcode_EI (@) { print "      IFF1=IFF2=1;\n"; }
+sub opcode_EI (@) {
+    print << "EI"
+      /* Interrupts are not accepted immediately after an EI, but are
+	 accepted after the next instruction */
+      IFF1 = IFF2 = 0;
+      event_add( tstates + 1, EVENT_TYPE_ENABLE_INTERRUPTS );
+EI
+}
 
 sub opcode_EX (@) {
 

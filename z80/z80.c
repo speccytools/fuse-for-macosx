@@ -99,6 +99,13 @@ z80_reset( void )
   z80.halted=0;
 }
 
+/* Allow z80 interrupts to be accepted */
+void
+z80_enable_interrupts( void )
+{
+  IFF1 = IFF2 = 1;
+}
+
 /* Process a z80 maskable interrupt */
 void
 z80_interrupt( void )
@@ -146,3 +153,4 @@ z80_nmi( void )
   /* FIXME: how does contention apply here? */
   tstates += 11; PC = 0x0066;
 }
+

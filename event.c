@@ -124,9 +124,9 @@ int event_do_events(void)
 
     switch(ptr->type) {
 
-    case EVENT_TYPE_NULL:
-      /* Do nothing */
-      break;
+    case EVENT_TYPE_EDGE: tape_next_edge( ptr->tstates ); break;
+
+    case EVENT_TYPE_ENABLE_INTERRUPTS: z80_enable_interrupts(); break;
 
     case EVENT_TYPE_INTERRUPT:
       if( rzx_playback ) event_force_events();
@@ -136,25 +136,15 @@ int event_do_events(void)
       ui_event();
       break;
 
-    case EVENT_TYPE_LINE:
-      display_line();
-      break;
-
-    case EVENT_TYPE_EDGE:
-      tape_next_edge( ptr->tstates );
-      break;
-
-    case EVENT_TYPE_NMI:
-      z80_nmi();
-      break;
+    case EVENT_TYPE_LINE: display_line(); break;
+    case EVENT_TYPE_NMI: z80_nmi(); break;
+    case EVENT_TYPE_NULL: /* Do nothing */ break;
 
     case EVENT_TYPE_TRDOS_CMD_DONE:
       trdos_event_cmd_done( ptr->tstates );
       break;
 
-    case EVENT_TYPE_TRDOS_INDEX:
-      trdos_event_index( ptr->tstates );
-      break;
+    case EVENT_TYPE_TRDOS_INDEX: trdos_event_index( ptr->tstates ); break;
 
     default:
       ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );

@@ -59,6 +59,8 @@ void z80_nmi( void );
 
 void z80_do_opcodes(void);
 
+void z80_enable_interrupts( void );
+
 extern processor z80;
 extern libspectrum_byte halfcarry_add_table[];
 extern libspectrum_byte halfcarry_sub_table[];
