@@ -1,5 +1,5 @@
-/* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2002 Philip Kendall, Russell Marks
+/* picture.c: GTK+ routines to draw the keyboard picture
+   Copyright (c) 2002 Philip Kendall
 
    $Id$
 
@@ -54,7 +54,8 @@ struct picture_data {
 int
 gtkui_picture( const char *filename, int border )
 {
-  int fd, error, x, y;
+  int fd, error, i, x, y;
+  BYTE attr, ink, paper, data;
 
   BYTE *screen; size_t length;
 
@@ -85,6 +86,7 @@ gtkui_picture( const char *filename, int border )
 
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Keyboard" );
+  gtk_widget_set_colormap( dialog, gtk_widget_get_colormap( gtkui_window ) );
 
   callback_data.drawing_area = gtk_drawing_area_new();
   gtk_drawing_area_size( GTK_DRAWING_AREA( callback_data.drawing_area ),
@@ -110,6 +112,7 @@ gtkui_picture( const char *filename, int border )
   }
 
   for( y=0; y<DISPLAY_HEIGHT; y++ ) {
+
     for( x=0; x < DISPLAY_BORDER_WIDTH; x+=2 ) {
       gdk_image_put_pixel(
         callback_data.image, x >> 1, y + DISPLAY_BORDER_HEIGHT,
@@ -120,6 +123,26 @@ gtkui_picture( const char *filename, int border )
 	y + DISPLAY_BORDER_HEIGHT, gtkdisplay_colours[ border ]
       );
     }
+
+    for( x=0; x < DISPLAY_WIDTH_COLS; x++ ) {
+
+      attr = screen[ display_attr_start[y] + x ];
+
+      ink = ( attr & 0x07 ) + ( ( attr & 0x40 ) >> 3 );
+      paper = ( attr & ( 0x0f << 3 ) ) >> 3;
+
+      data = screen[ display_line_start[y]+x ];
+
+      for( i=0; i<8; i++ ) {
+	gdk_image_put_pixel( callback_data.image,
+			     ( DISPLAY_BORDER_WIDTH >> 1 ) + ( 8 * x ) + i,
+			     y + DISPLAY_BORDER_HEIGHT,
+			     ( data & 0x80 ) ? gtkdisplay_colours[ ink ]
+                                             : gtkdisplay_colours[ paper ] );
+	data <<= 1;
+      }
+    }
+
   }
 
   ok_button = gtk_button_new_with_label( "OK" );
