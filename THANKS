@@ -17,6 +17,8 @@ Some thanks (in alphabetical order):
   FDC, and libdsk which provides support for more disk image formats:
   see http://www.seasip.demon.co.uk/Unix/LibDsk/
 
+* Ivan Ruiz Etxabe: for helping test RZX competition mode recording.
+
 * Martin Garton: making the GTK+ user interface compatible with GTK+ 2.0,
   although I then went and broke it in other ways.
 
@@ -49,6 +51,8 @@ Some thanks (in alphabetical order):
 
 * Catalin Mihaila: for writing an SDL user interface for Fuse. Not in
   the code as this has already been done by Fred :-(
+
+* David Muriel: for helping test RZX competition mode recording.
 
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
