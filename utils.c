@@ -52,21 +52,23 @@
 /* Open `filename' and do something sensible with it; autoload tapes
    if `autoload' is true and return the type of file found in `type' */
 int
-utils_open_file( const char *filename, int autoload, libspectrum_id_t *type )
+utils_open_file( const char *filename, int autoload,
+		 libspectrum_id_t *type_ptr)
 {
   unsigned char *buffer; size_t length;
+  libspectrum_id_t type;
   int error = 0;
 
   /* Read the file into a buffer */
   if( utils_read_file( filename, &buffer, &length ) ) return 1;
 
   /* See if we can work out what it is */
-  if( libspectrum_identify_file( type, filename, buffer, length ) ) {
+  if( libspectrum_identify_file( &type, filename, buffer, length ) ) {
     munmap( buffer, length );
     return 1;
   }
 
-  switch( *type ) {
+  switch( type ) {
     
   case LIBSPECTRUM_ID_UNKNOWN:
     ui_error( UI_ERROR_ERROR, "utils_open_file: couldn't identify `%s'",
@@ -80,12 +82,12 @@ utils_open_file( const char *filename, int autoload, libspectrum_id_t *type )
 
   case LIBSPECTRUM_ID_SNAPSHOT_SNA:
   case LIBSPECTRUM_ID_SNAPSHOT_Z80:
-    error = snapshot_read_buffer( buffer, length, *type );
+    error = snapshot_read_buffer( buffer, length, type );
     break;
 
   case LIBSPECTRUM_ID_TAPE_TAP:
   case LIBSPECTRUM_ID_TAPE_TZX:
-    error = tape_read_buffer( buffer, length, *type, autoload );
+    error = tape_read_buffer( buffer, length, type, autoload );
     break;
 
 #ifdef HAVE_765_H
@@ -111,7 +113,7 @@ utils_open_file( const char *filename, int autoload, libspectrum_id_t *type )
     break;
 
   default:
-    ui_error( UI_ERROR_ERROR, "utils_open_file: unknown type %d", *type );
+    ui_error( UI_ERROR_ERROR, "utils_open_file: unknown type %d", type );
     fuse_abort();
   }
 
@@ -122,6 +124,8 @@ utils_open_file( const char *filename, int autoload, libspectrum_id_t *type )
 	      filename, strerror( errno ) );
     return 1;
   }
+
+  if( type_ptr ) *type_ptr = type;
 
   return 0;
 }

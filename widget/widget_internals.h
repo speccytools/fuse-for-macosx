@@ -147,7 +147,8 @@ typedef struct widget_menu_widget_t {
 } widget_menu_widget_t;
 
 /* More callbacks */
-int widget_menu_save_snapshot( void *data ); /* File/Save */
+int widget_menu_open( const char *filename ); /* File/Open */
+int widget_menu_save_snapshot( void *data ); /* File/Save Snapshot */
 int widget_menu_rzx_recording( void *data ); /* File/Recording/Record */
 int widget_menu_rzx_recording_snap( void *data ); /* File/Recording/Record
 						     from snap */

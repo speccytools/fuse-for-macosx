@@ -36,9 +36,11 @@
 #include "fuse.h"
 #include "keysyms.h"
 #include "machine.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "utils.h"
 #ifdef USE_WIDGET
 #include "widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
@@ -79,7 +81,7 @@ sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
     fuse_emulation_pause();
     widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     if( widget_filesel_name ) {
-      snapshot_read( widget_filesel_name );
+      utils_open_file( widget_filesel_name, settings_current.auto_load, NULL );
       free( widget_filesel_name );
       display_refresh_all();
     }

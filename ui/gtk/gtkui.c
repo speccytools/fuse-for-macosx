@@ -146,7 +146,7 @@ static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		        NULL , NULL,                0, "<Branch>"    },
+  { "/_File",		        NULL , NULL,                0, "<Branch>"    },
   { "/File/_Open...",		"F3" , gtkui_open,          0, NULL          },
   { "/File/_Save Snapshot..." , "F2" , gtkui_save,          0, NULL          },
   { "/File/_Recording",		NULL , NULL,		    0, "<Branch>"    },
@@ -165,7 +165,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
-  { "/Options",		        NULL , NULL,                0, "<Branch>"    },
+  { "/_Options",	        NULL , NULL,                0, "<Branch>"    },
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
   { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
@@ -177,15 +177,15 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/S_ave",		NULL , save_options,	    0, NULL          },
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
-  { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
+  { "/_Machine",	        NULL , NULL,                0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
   { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
   { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
 
-  { "/Media",			NULL , NULL,                0, "<Branch>"    },
+  { "/M_edia",			NULL , NULL,                0, "<Branch>"    },
 
-  { "/Media/Tape",		NULL , NULL,                0, "<Branch>"    },
+  { "/Media/_Tape",		NULL , NULL,                0, "<Branch>"    },
   { "/Media/Tape/_Open...",	"F7" , gtkui_tape_open,     0, NULL          },
   { "/Media/Tape/_Play",	"F8" , gtkui_tape_play,     0, NULL          },
   { "/Media/Tape/_Browse...",	NULL , gtk_tape_browse,     0, NULL          },
@@ -193,7 +193,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Media/Tape/_Clear",	NULL , gtkui_tape_clear,    0, NULL          },
   { "/Media/Tape/_Write...",	"F6" , gtkui_tape_write,    0, NULL          },
 
-  { "/Media/Disk",		NULL , NULL,		    0, "<Branch>"    },
+  { "/Media/_Disk",		NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Disk/Drive A:",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Disk/Drive A:/_Insert...",
 				NULL , gtkui_disk_open_a,   0, NULL          },
@@ -205,12 +205,12 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Media/Disk/Drive B:/_Eject",
 				NULL , gtkui_disk_eject_b,  0, NULL          },
 
-  { "/Media/Cartridge",		NULL , NULL,		    0, "<Branch>"    },
+  { "/Media/_Cartridge",	NULL , NULL,		    0, "<Branch>"    },
   { "/Media/Cartridge/_Insert...",
 				NULL , cartridge_insert,    0, NULL          },
   { "/Media/Cartridge/_Eject",	NULL , cartridge_eject,     0, NULL          },
 
-  { "/Help",			NULL , NULL,		    0, "<Branch>"    },
+  { "/_Help",			NULL , NULL,		    0, "<Branch>"    },
   { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
 };
 static guint gtkui_menu_data_size =
@@ -378,14 +378,14 @@ gtkui_delete( GtkWidget *widget GCC_UNUSED, GdkEvent *event GCC_UNUSED,
 static void
 gtkui_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  char *filename; libspectrum_id_t type;
+  char *filename;
 
   fuse_emulation_pause();
 
   filename = gtkui_fileselector_get_filename( "Fuse - Open Spectrum File" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  utils_open_file( filename, settings_current.auto_load, &type );
+  utils_open_file( filename, settings_current.auto_load, NULL );
 
   free( filename );
 

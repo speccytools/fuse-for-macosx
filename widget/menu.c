@@ -136,7 +136,14 @@ int widget_apply_to_file( void *data )
 
 /* File menu callbacks */
 
-/* File/Save */
+/* File/Open (called via widget_apply_to_file) */
+int
+widget_menu_open( const char *filename )
+{
+  return utils_open_file( filename, settings_current.auto_load, NULL );
+}
+
+/* File/Save Snapshot*/
 int
 widget_menu_save_snapshot( void *data GCC_UNUSED )
 {

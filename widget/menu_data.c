@@ -40,14 +40,16 @@
 
 static widget_menu_entry widget_menu_file[];
 static widget_menu_entry widget_menu_file_recording[];
-static widget_menu_entry widget_menu_machine[];
-static widget_menu_entry widget_menu_options[];
-static widget_menu_entry widget_menu_tape[];
 
+static widget_menu_entry widget_menu_machine[];
+
+static widget_menu_entry widget_menu_options[];
+
+static widget_menu_entry widget_menu_media[];
+static widget_menu_entry widget_menu_tape[];
 static widget_menu_entry widget_menu_disk[];
 static widget_menu_entry widget_menu_disk_a[];
 static widget_menu_entry widget_menu_disk_b[];
-
 static widget_menu_entry widget_menu_cart[];
 
 static widget_menu_entry widget_menu_help[];
@@ -60,15 +62,8 @@ static widget_menu_widget_t main_options = { WIDGET_TYPE_MENU,
 					     &widget_menu_options };
 static widget_menu_widget_t main_machine = { WIDGET_TYPE_MENU, 
 					     &widget_menu_machine };
-static widget_menu_widget_t main_tape =    { WIDGET_TYPE_MENU,
-					     &widget_menu_tape    };
-
-static widget_menu_widget_t main_disk =    { WIDGET_TYPE_MENU,
-					     &widget_menu_disk    };
-
-static widget_menu_widget_t main_cart =    { WIDGET_TYPE_MENU,
-					     &widget_menu_cart    };
-
+static widget_menu_widget_t main_media =   { WIDGET_TYPE_MENU, 
+					     &widget_menu_media };
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
 					     &widget_menu_help    };
 
@@ -78,9 +73,7 @@ widget_menu_entry widget_menu_main[] = {
   { "(F)ile",    KEYBOARD_f, widget_menu_widget, &main_file    },
   { "(O)ptions", KEYBOARD_o, widget_menu_widget, &main_options },
   { "(M)achine", KEYBOARD_m, widget_menu_widget, &main_machine },
-  { "(T)ape",	 KEYBOARD_t, widget_menu_widget, &main_tape    },
-  { "(D)isk",	 KEYBOARD_d, widget_menu_widget, &main_disk    },
-  { "(C)artridge", KEYBOARD_c, widget_menu_widget, &main_cart  },
+  { "M(e)dia",   KEYBOARD_e, widget_menu_widget, &main_media   },
 
   { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
 
@@ -95,8 +88,8 @@ static widget_menu_widget_t
 static widget_menu_entry widget_menu_file[] = {
   { "File", 0, 0, NULL },		/* Menu title */
 
-  { "(O)pen snapshot...",       KEYBOARD_o, widget_apply_to_file,
-                                            snapshot_read                   },
+  { "(O)pen...",	        KEYBOARD_o, widget_apply_to_file,
+					    widget_menu_open		    },
   { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
   { "(R)ecording",		KEYBOARD_r, widget_menu_widget,
 					    &file_recording                 },
@@ -169,7 +162,24 @@ static widget_menu_entry widget_menu_machine[] = {
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 
-/* Tape menu */
+static widget_menu_widget_t media_tape = { WIDGET_TYPE_MENU,
+					   &widget_menu_tape };
+static widget_menu_widget_t media_disk = { WIDGET_TYPE_MENU,
+					   &widget_menu_disk };
+static widget_menu_widget_t media_cart = { WIDGET_TYPE_MENU,
+					   &widget_menu_cart };
+
+static widget_menu_entry widget_menu_media[] = {
+  { "Media", 0, 0, NULL },		/* Menu title */
+
+  { "(T)ape",      KEYBOARD_t, widget_menu_widget, &media_tape },
+  { "(D)isk",      KEYBOARD_d, widget_menu_widget, &media_disk },
+  { "(C)artridge", KEYBOARD_c, widget_menu_widget, &media_cart },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Media/Tape menu */
 
 static widget_menu_widget_t tape_browse = { WIDGET_TYPE_BROWSE, NULL };
 
@@ -187,7 +197,7 @@ static widget_menu_entry widget_menu_tape[] = {
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 
-/* Disk menu */
+/* Media/Disk menu */
 
 static widget_menu_widget_t disk_a = { WIDGET_TYPE_MENU, &widget_menu_disk_a };
 static widget_menu_widget_t disk_b = { WIDGET_TYPE_MENU, &widget_menu_disk_b };
@@ -201,7 +211,7 @@ static widget_menu_entry widget_menu_disk[] = {
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 
-/* Disk/Drive A: menu */
+/* Media/Disk/Drive A: menu */
 
 static int disk_a_number = 0;
 
@@ -214,7 +224,7 @@ static widget_menu_entry widget_menu_disk_a[] = {
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 
-/* Disk/Drive B: menu */
+/* Media/Disk/Drive B: menu */
 
 static int disk_b_number = 1;
 
@@ -227,7 +237,7 @@ static widget_menu_entry widget_menu_disk_b[] = {
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 
-/* Cartridge/Timex Dock menu */
+/* Media/Cartridge menu */
 
 static widget_menu_entry widget_menu_cart[] = {
   { "Cartridge/Timex Dock", 0, 0, NULL },	/* Menu title */
@@ -237,7 +247,6 @@ static widget_menu_entry widget_menu_cart[] = {
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
-
 
 /* Help menu */
 
