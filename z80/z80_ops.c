@@ -883,8 +883,7 @@ void z80_do_opcodes()
       break;
     case 0xd3:		/* OUT (nn),A */
       contend( PC, 4 );
-      tstates += 3;	/* FIXME: IO port contention */
-      writeport( readbyte(PC++) + ( A << 8 ) , A);
+      OUT( readbyte(PC++) + ( A << 8 ) , A );
       break;
     case 0xd4:		/* CALL NC,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );

@@ -211,6 +211,7 @@ break
 
 #define IN(reg,port)\
 {\
+  tstates += 3;			/* FIXME: IO port contention */\
   (reg)=readport((port));\
   F = ( F & FLAG_C) | sz53p_table[(reg)];\
 }
@@ -271,6 +272,12 @@ break
   F = sz53p_table[A];\
 }
 
+#define OUT(port,reg)\
+{\
+  tstates += 3;			/* FIXME: IO port contention */\
+  writeport(port,reg);\
+}
+
 #define POP16(regl,regh)\
 {\
   contend( SP, 3 );\
@@ -281,9 +288,9 @@ break
 
 #define PUSH16(regl,regh)\
 {\
-  contend( --SP, 3 );\
+  SP--; contend( SP, 3 );\
   writebyte(SP,(regh));\
-  contend( --SP, 3 );\
+  SP--; contend( SP, 3 );\
   writebyte(SP,(regl));\
 }
 
