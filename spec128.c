@@ -97,10 +97,10 @@ void spec128_writebyte(WORD address, BYTE b)
 
 DWORD spec128_contend_memory( WORD address )
 {
-  /* Contention occurs in pages 4 to 7. 0x4000 to 0x7fff is always
-     page 5, whilst 0xc000 to 0xffff could have one of 4 to 7 paged in */
+  /* Contention occurs in pages 1,3, 5 and 7. 0x4000 to 0x7fff is always page
+     5, whilst 0xc000 to 0xffff could have one of the contended pages in */
   if( ( address >= 0x4000 && address < 0x8000 ) ||
-      ( address >= 0xc000 && machine_current->ram.current_page >= 4 )
+      ( address >= 0xc000 && ( machine_current->ram.current_page & 0x01 ) )
     )
     return spec128_contend_delay();
 
