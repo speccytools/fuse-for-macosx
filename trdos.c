@@ -237,7 +237,7 @@ trdos_memory_map( void )
 int
 trdos_from_snapshot( libspectrum_snap *snap, int capabilities )
 {
-  if( !capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) return 0;
+  if( !( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) ) return 0;
 
   trdos_active = libspectrum_snap_beta_paged( snap );
   

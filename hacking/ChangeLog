@@ -1028,3 +1028,5 @@
 20040721 ui/gtk/pixmaps.c: #include <config.h>
 20040721 ula.c: Add issue 2 keyboard snapshot support.
 20040722 ui/fb/fbdisplay.c: improve error messages slightly.
+20040723 trdos.c: get the capabilities check right in trdos_from_snapshot.
+	 Should prevent the occasional errant 'No disk' messages.
