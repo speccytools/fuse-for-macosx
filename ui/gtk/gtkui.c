@@ -847,8 +847,6 @@ gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data GCC_UNUSED )
 
 /* Functions to activate and deactivate certain menu items */
 
-
-
 static int
 set_menu_item_active( const char *path, int active )
 {
@@ -873,116 +871,101 @@ set_menu_item_active( const char *path, int active )
   return 0;
 }
 
-int ui_menu_activate( ui_menu_item item, int active )
+struct menu_item_entries {
+  ui_menu_item item;
+  const char *string1;
+  const char *string2; int string2_inverted;
+  const char *string3; int string3_inverted;
+  const char *string4; int string4_inverted;
+};
+
+struct menu_item_entries menu_item_lookup[] = {
+  
+  { UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, "/Media/Cartridge/Timex Dock" },
+
+  { UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT,
+    "/Media/Cartridge/Timex Dock/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, "/Media/Cartridge/Interface II" },
+
+  { UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT,
+    "/Media/Cartridge/Interface II/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_DISK, "/Media/Disk" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
+    "/Media/Disk/Drive A:/Eject",
+    "/Media/Disk/Drive A:/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
+    "/Media/Disk/Drive B:/Eject",
+    "/Media/Disk/Drive B:/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_IDE, "/Media/IDE" },
+
+  { UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT, "/Media/IDE/Simple 8-bit" },
+
+  { UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT,
+    "/Media/IDE/Simple 8-bit/Master/Commit",
+    "/Media/IDE/Simple 8-bit/Master/Eject", 0 },
+
+  { UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT,
+    "/Media/IDE/Simple 8-bit/Slave/Commit",
+    "/Media/IDE/Simple 8-bit/Slave/Eject", 0 },
+
+  { UI_MENU_ITEM_MEDIA_IDE_ZXATASP, "/Media/IDE/ZXATASP" },
+
+  { UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
+    "/Media/IDE/ZXATASP/Master/Commit",
+    "/Media/IDE/ZXATASP/Master/Eject", 0 },
+
+  { UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT,
+    "/Media/IDE/ZXATASP/Slave/Commit",
+    "/Media/IDE/ZXATASP/Slave/Eject", 0 },
+
+  { UI_MENU_ITEM_MEDIA_IDE_ZXCF, "/Media/IDE/ZXCF CompactFlash" },
+
+  { UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT,
+    "/Media/IDE/ZXCF CompactFlash/Commit",
+    "/Media/IDE/ZXCF CompactFlash/Eject", 0 },
+
+  { UI_MENU_ITEM_RECORDING,
+    "/File/Recording/Stop", 
+    "/File/Recording/Record...", 1,
+    "/File/Recording/Record from snapshot...", 1,
+    "/File/Recording/Play...", 1 },
+
+  { UI_MENU_ITEM_AY_LOGGING,
+    "/File/AY Logging/Stop",
+    "/File/AY Logging/Record...", 1, },
+
+  { UI_MENU_ITEM_AY_LOGGING, NULL },	/* End marker */
+};
+
+int
+ui_menu_activate( ui_menu_item item, int active )
 {
-  int error;
+  struct menu_item_entries *ptr;
 
-  switch( item ) {
+  for( ptr = menu_item_lookup; ptr->string1; ptr++ ) {
 
-  case UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK:
-    return set_menu_item_active( "/Media/Cartridge/Timex Dock", active );
-
-  case UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT:
-    return set_menu_item_active( "/Media/Cartridge/Timex Dock/Eject", active );
-
-  case UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2:
-    return set_menu_item_active( "/Media/Cartridge/Interface II", active );
-
-  case UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT:
-    return set_menu_item_active( "/Media/Cartridge/Interface II/Eject", active );
-
-  case UI_MENU_ITEM_MEDIA_DISK:
-    return set_menu_item_active( "/Media/Disk", active );
-
-  case UI_MENU_ITEM_MEDIA_DISK_A_EJECT:
-    error = set_menu_item_active( "/Media/Disk/Drive A:/Eject", active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/Media/Disk/Drive A:/Eject and write...",
-				 active );
-
-  case UI_MENU_ITEM_MEDIA_DISK_B_EJECT:
-    error = set_menu_item_active( "/Media/Disk/Drive B:/Eject", active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/Media/Disk/Drive B:/Eject and write...",
-				 active );
-
-  case UI_MENU_ITEM_MEDIA_IDE:
-    return set_menu_item_active( "/Media/IDE", active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT:
-    return set_menu_item_active( "/Media/IDE/Simple 8-bit", active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT:
-    error = set_menu_item_active( "/Media/IDE/Simple 8-bit/Master/Commit",
-				  active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/Media/IDE/Simple 8-bit/Master/Eject",
-				 active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT:
-    error = set_menu_item_active( "/Media/IDE/Simple 8-bit/Slave/Commit",
-				  active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/Media/IDE/Simple 8-bit/Slave/Eject",
-				 active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_ZXATASP:
-    return set_menu_item_active( "/Media/IDE/ZXATASP", active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT:
-    error = set_menu_item_active( "/Media/IDE/ZXATASP/Master/Commit",
-				  active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/Media/IDE/ZXATASP/Master/Eject",
-				 active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT:
-    error = set_menu_item_active( "/Media/IDE/ZXATASP/Slave/Commit",
-				  active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/Media/IDE/ZXATASP/Slave/Eject",
-				 active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_ZXCF:
-    return set_menu_item_active( "/Media/IDE/ZXCF CompactFlash", active );
-
-  case UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT:
-    error = set_menu_item_active( "/Media/IDE/ZXCF CompactFlash/Commit",
-				  active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/Media/IDE/ZXCF CompactFlash/Eject",
-				 active );
-
-  case UI_MENU_ITEM_RECORDING:
-    error = set_menu_item_active( "/File/Recording/Record...", !active );
-    if( error ) return error;
-
-    error = set_menu_item_active( "/File/Recording/Record from snapshot...",
-				  !active );
-    if( error ) return error;
-
-    error = set_menu_item_active( "/File/Recording/Play...", !active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/File/Recording/Stop", active );
-
-  case UI_MENU_ITEM_AY_LOGGING:
-    error = set_menu_item_active( "/File/AY Logging/Record...", !active );
-    if( error ) return error;
-
-    return set_menu_item_active( "/File/AY Logging/Stop", active );
+    if( item == ptr->item ) {
+      set_menu_item_active( ptr->string1, active );
+      if( ptr->string2 ) 
+	set_menu_item_active( ptr->string2,
+			      ptr->string2_inverted ? !active : active );
+      if( ptr->string3 ) 
+	set_menu_item_active( ptr->string3,
+			      ptr->string3_inverted ? !active : active );
+      if( ptr->string4 )
+	set_menu_item_active( ptr->string4,
+			      ptr->string4_inverted ? !active : active );
+      return 0;
+    }
 
   }
 
-  ui_error( UI_ERROR_ERROR, "Attempt to activate Unknown menu item %d",
-	    item );
+  ui_error( UI_ERROR_ERROR, "ui_menu_activate: unknown item %d\n", item );
   return 1;
 }
 

@@ -871,3 +871,4 @@
 20040527 zxatasp.c: ZXATASP write protect should protect only the odd pages.
 20040528 menu_data.c,periph.c,simpleide.c,zxatasp.c,zxcf.c,ui/ui.h,
 	 ui/gtk/gtkui.c: (De)activate IDE menu items as appropriate.
+20040528 ui/gtk/gtkui.c: refactor the menu item (de)activation code.
