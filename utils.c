@@ -95,3 +95,38 @@ int utils_read_fd( int fd, const char *filename,
 
   return 0;
 }
+
+int utils_write_file( const char *filename, const unsigned char *buffer,
+		      size_t length )
+{
+  FILE *f;
+
+  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  f=fopen( filename, "wb" );
+  if(!f) { 
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error opening `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
+	    
+  if( fwrite( buffer, 1, length, f ) != length ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error writing to `%s'", fuse_progname, filename );
+    perror( error_message );
+    fclose(f);
+    return 1;
+  }
+
+  if( fclose( f ) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error closing `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
+
+  return 0;
+}
+
+

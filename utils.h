@@ -32,4 +32,7 @@ int utils_read_file( const char *filename, unsigned char **buffer,
 int utils_read_fd( int fd, const char *filename,
 		   unsigned char **buffer, size_t *length );
 
+int utils_write_file( const char *filename, const unsigned char *buffer,
+		      size_t length );
+
 #endif			/* #ifndef FUSE_UTILS_H */

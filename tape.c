@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
 
@@ -149,9 +149,8 @@ int tape_rewind( void )
 int tape_write( const char* filename )
 {
   libspectrum_byte *buffer; size_t length;
-  FILE *f;
 
-  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+  int error;
 
   length = 0;
   error = libspectrum_tzx_write( &tape, &buffer, &length );
@@ -161,32 +160,8 @@ int tape_write( const char* filename )
     return error;
   }
 
-  f=fopen( filename, "wb" );
-  if(!f) { 
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: error opening `%s'", fuse_progname, filename );
-    perror( error_message );
-    free( buffer );
-    return 1;
-  }
-
-  if( fwrite( buffer, 1, length, f ) != length ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: error writing to `%s'", fuse_progname, filename );
-    perror( error_message );
-    fclose(f);
-    free( buffer );
-    return 1;
-  }
-
-  free( buffer );
-
-  if( fclose( f ) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: error closing `%s'", fuse_progname, filename );
-    perror( error_message );
-    return 1;
-  }
+  error = utils_write_file( filename, buffer, length );
+  if( error ) { free( buffer ); return error; }
 
   return 0;
 
