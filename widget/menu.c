@@ -373,35 +373,6 @@ ui_tape_write( void )
   return tape_write( "tape.tzx" );
 }
 
-void
-menu_media_disk_insert( int action )
-{
-  specplus3_drive_number which;
-
-  switch( action ) {
-  case 1: which = SPECPLUS3_DRIVE_A; break;
-  case 2: which = SPECPLUS3_DRIVE_B; break;
-
-  default:
-    ui_error( UI_ERROR_ERROR, "menu_media_disk_insert: unknown action %d",
-	      action );
-    fuse_abort();
-  }
-
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( !widget_filesel_name ) return;
-
-#ifdef HAVE_765_H
-  if( machine_current->capabilities &
-      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
-    specplus3_disk_insert( which, widget_filesel_name );
-    return;
-  }
-#endif			/* #ifdef HAVE_765_H */
-
-  trdos_disk_insert( which, widget_filesel_name );
-}
-
 #ifdef HAVE_765_H
 int
 ui_plus3_disk_write( specplus3_drive_number which )

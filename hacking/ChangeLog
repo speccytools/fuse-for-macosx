@@ -752,3 +752,5 @@
 20040415 widget/{menu.c,widget.h}: generalise more functions into menu.c
 	 (widget changes).
 20040415 menu.[ch]: add copyright and GPL notice.
+20040416 menu.[ch],ui/gtk/gtkui.c,widget/menu.c: generalise
+	 menu_media_disk_insert().

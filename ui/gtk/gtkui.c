@@ -92,8 +92,6 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 static gboolean gtkui_delete( GtkWidget *widget, GdkEvent *event,
 			      gpointer data );
 
-static void gtkui_disk_open( specplus3_drive_number drive );
-
 static void menu_options_filter_done( GtkWidget *widget, gpointer user_data );
 static void menu_machine_select_done( GtkWidget *widget, gpointer user_data );
 
@@ -778,41 +776,6 @@ ui_tape_write( void )
   fuse_emulation_unpause();
 
   return 0;
-}
-
-void
-menu_media_disk_insert( gpointer data GCC_UNUSED, guint action,
-			GtkWidget *widget GCC_UNUSED )
-{
-  guint which;
-
-  which = action - 1;
-
-  gtkui_disk_open( which );
-}
-
-void
-gtkui_disk_open( specplus3_drive_number drive )
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename = menu_get_filename(
-    ( drive == SPECPLUS3_DRIVE_A ? "Fuse - Insert disk into drive A:" :
-                                   "Fuse - Insert disk into drive B:" ) );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_insert( drive, filename );
-  } else
-#endif				/* #ifdef HAVE_765_H */
-    trdos_disk_insert( drive, filename );
-
-  free( filename );
-
-  fuse_emulation_unpause();
 }
 
 #ifdef HAVE_765_H

@@ -68,6 +68,7 @@ MENU_CALLBACK( menu_media_tape_rewind );
 MENU_CALLBACK( menu_media_tape_clear );
 MENU_CALLBACK( menu_media_tape_write );
 
+MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert );
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject );
 
 MENU_CALLBACK( menu_media_cartridge_insert );
@@ -109,8 +110,6 @@ MENU_CALLBACK( menu_machine_select );
 MENU_CALLBACK( menu_machine_debugger );
 MENU_CALLBACK( menu_machine_pokefinder );
 MENU_CALLBACK( menu_machine_memorybrowser );
-
-MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert );
 
 MENU_CALLBACK( menu_help_keyboard );
 

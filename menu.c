@@ -216,6 +216,30 @@ MENU_CALLBACK( menu_media_tape_write )
   ui_tape_write();
 }
 
+MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
+{
+  char *filename;
+  int which;
+
+  which = action - 1;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Insert disk" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+#ifdef HAVE_765_H
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+    specplus3_disk_insert( which, filename );
+  } else
+#endif				/* #ifdef HAVE_765_H */
+    trdos_disk_insert( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
 {
   int which, write;
