@@ -28,6 +28,8 @@
 
 #ifdef UI_X			/* Use this iff we're using Xlib */
 
+#include <stdio.h>
+
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 

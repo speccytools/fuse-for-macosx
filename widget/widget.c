@@ -339,5 +339,6 @@ widget_t widget_data[] = {
   { widget_filesel_draw,  widget_filesel_finish, widget_filesel_keyhandler  },
   { widget_options_draw,  widget_options_finish, widget_options_keyhandler  },
   { widget_tape_draw,     NULL,			 widget_tape_keyhandler     },
+  { widget_snapshot_draw, NULL,			 widget_snapshot_keyhandler },
 
 };

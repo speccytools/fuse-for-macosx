@@ -42,6 +42,7 @@ typedef enum widget_type {
   WIDGET_TYPE_FILESELECTOR,	/* File selector */
   WIDGET_TYPE_OPTIONS,		/* General options */
   WIDGET_TYPE_TAPE,		/* Tape options */
+  WIDGET_TYPE_SNAPSHOT,		/* Snapshot options */
 
 } widget_type;
 
@@ -123,6 +124,11 @@ void widget_options_keyhandler( int key );
 
 int widget_tape_draw( void );
 void widget_tape_keyhandler( int key );
+
+/* Snapshot dialog */
+
+int widget_snapshot_draw( void );
+void widget_snapshot_keyhandler( int key );
 
 /* The widgets actually available */
 
