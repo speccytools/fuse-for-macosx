@@ -60,11 +60,11 @@ int sound_enabled_ever=0;	/* if it's *ever* been in use; see
                                    sound_ay_write() and sound_ay_reset() */
 int sound_freq=32000;
 int sound_stereo=0;		/* true for stereo *output sample* (only) */
-int sound_stereo_beeper=0;	/* beeper pseudo-stereo */
 int sound_stereo_ay_abc=0;	/* (AY stereo) true for ABC stereo, else ACB */
 int sound_stereo_ay_narrow=0;	/* (AY stereo) true for narrow AY st. sep. */
 
 static int sound_stereo_ay=0;	/* local copy of settings_current.stereo_ay */
+static int sound_stereo_beeper=0;   /* and settings_current.stereo_beeper */
 
 
 #define AY_CLOCK		1773400
@@ -93,11 +93,6 @@ static unsigned char *sound_buf,*tape_buf;
 /* beeper stuff */
 static int sound_oldpos[2],sound_fillpos[2];
 static int sound_oldval[2],sound_oldval_orig[2];
-
-/* timer used for fadeout after beeper-toggle;
- * fixed-point with low 24 bits as fractional part.
- */
-static unsigned int beeper_tick[2],beeper_tick_incr;
 
 /* foo_subcycles are fixed-point with low 16 bits as fractional part.
  * The other bits count as the chip does.
@@ -184,6 +179,7 @@ if(sound_enabled)
   }
 
 sound_stereo_ay=settings_current.stereo_ay;
+sound_stereo_beeper=settings_current.stereo_beeper;
 
 /* only try for stereo if we need it */
 if(sound_stereo_ay || sound_stereo_beeper)
@@ -200,9 +196,9 @@ if(ret)
   return;
 
 /* important to override these settings if not using stereo
- * (it would probably be confusing to mess with the AY stereo
- * setting in settings_current though, which is why we make a copy
- * rather than using the real one).
+ * (it would probably be confusing to mess with the stereo
+ * settings in settings_current though, which is why we make copies
+ * rather than using the real ones).
  */
 if(!sound_stereo)
   {
@@ -243,12 +239,8 @@ if(first_init)
   {
   first_init=0;
 
-  beeper_tick_incr=(1<<24)/sound_freq;
   for(f=0;f<2;f++)
-    {
     sound_oldval[f]=sound_oldval_orig[f]=128;
-    beeper_tick[f]=0;
-    }
   
   sound_ay_init();
   }
@@ -664,34 +656,6 @@ ay_tone_subcycles=ay_env_subcycles=0;
 }
 
 
-/* it should go without saying that the beeper was hardly capable of
- * generating perfect square waves. :-) What seems to have happened is
- * that after the `click' in the intended direction away from the rest
- * (zero) position, it faded out gradually over about 1/50th of a second
- * back down to zero - the bulk of the fade being over after about
- * a 1/500th.
- *
- * The true behaviour is awkward to model accurately, but a compromise
- * emulation (doing a linear fadeout over 1/150th) seems to work quite
- * well and IMHO sounds a little more like a real speccy than most
- * emulations. It also has the considerable advantage of having a zero
- * rest position, which I'm a lot happier with. :-)
- */
-
-#define BEEPER_FADEOUT	(((1<<24)/150)/ampl)
-
-#define BEEPER_OLDVAL_ADJUST(is_tape) \
-  beeper_tick[is_tape]+=beeper_tick_incr;	\
-  if(beeper_tick[is_tape]>=BEEPER_FADEOUT)	\
-    {						\
-    beeper_tick[is_tape]-=BEEPER_FADEOUT;	\
-    if(sound_oldval[is_tape]>128)		\
-      sound_oldval[is_tape]--;			\
-    else					\
-      if(sound_oldval[is_tape]<128)		\
-        sound_oldval[is_tape]++;		\
-    }
-
 /* write stereo or mono beeper sample, and incr ptr */
 #define SOUND_WRITE_BUF_BEEPER(ptr,val) \
   do						\
@@ -733,10 +697,7 @@ ptr=sound_buf+(sound_stereo?sound_fillpos[0]*2:sound_fillpos[0]);
 for(bchan=0;bchan<2;bchan++)
   {
   for(f=sound_fillpos[bchan];f<sound_framesiz;f++)
-    {
-    BEEPER_OLDVAL_ADJUST(bchan);
     SOUND_WRITE_BUF(bchan,ptr,sound_oldval[bchan]);
-    }
 
   ptr=tape_buf+sound_fillpos[1];
   ampl=AMPL_TAPE;
@@ -816,8 +777,6 @@ subval=128+ampl-beeper_last_subpos[bchan];
 
 if(newpos>=0)
   {
-  int oldval=sound_oldval[bchan];
-  
   /* fill gap from previous position */
   if(is_tape)
     ptr=tape_buf+sound_fillpos[1];
@@ -825,10 +784,7 @@ if(newpos>=0)
     ptr=sound_buf+(sound_stereo?sound_fillpos[0]*2:sound_fillpos[0]);
   
   for(f=sound_fillpos[bchan];f<newpos && f<sound_framesiz;f++)
-    {
-    BEEPER_OLDVAL_ADJUST(bchan);
-    SOUND_WRITE_BUF(bchan,ptr,oldval);
-    }
+    SOUND_WRITE_BUF(bchan,ptr,sound_oldval[bchan]);
 
   if(newpos<sound_framesiz)
     {
@@ -837,13 +793,6 @@ if(newpos>=0)
       ptr=tape_buf+newpos;
     else
       ptr=sound_buf+(sound_stereo?newpos*2:newpos);
-
-    /* limit subval in case of faded beeper level,
-     * to avoid slight spikes on ordinary tones.
-     */
-    if((oldval<128 && subval<oldval) ||
-       (oldval>=128 && subval>oldval))
-      subval=oldval;
 
     /* write subsample value */
     SOUND_WRITE_BUF(bchan,ptr,subval);

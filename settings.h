@@ -44,6 +44,7 @@ typedef struct settings_info {
   int sound;		/* Is sound enabled */
   int sound_load;	/* Is loading noise enabled? */
   int stereo_ay;	/* Stereo separation for AY channels? */
+  int stereo_beeper;	/* Beeper pseudo-stereo? */
 
   /* Used on startup */
 

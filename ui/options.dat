@@ -10,3 +10,4 @@ Sound Options
 Checkbox, (S)ound enabled, sound, KEYBOARD_s
 Checkbox, (L)oading sound, sound_load, KEYBOARD_l
 Checkbox, (A)Y stereo separation, stereo_ay, KEYBOARD_a
+Checkbox, (B)eeper pseudo-stereo, stereo_beeper, KEYBOARD_b

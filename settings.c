@@ -72,6 +72,7 @@ int settings_defaults( settings_info *settings )
   settings->sound = 1;
   settings->sound_load = 1;
   settings->stereo_ay = 0;
+  settings->stereo_beeper = 0;
 
   settings->snapshot = NULL;
   settings->tape_file = NULL;
@@ -197,15 +198,16 @@ static int settings_command_line( int argc, char **argv,
 /* Copy one settings object to another */
 int settings_copy( settings_info *dest, settings_info *src )
 {
-  dest->issue2       = src->issue2;
-  dest->joy_kempston = src->joy_kempston;
-  dest->tape_traps   = src->tape_traps;
-  dest->slt_traps    = src->slt_traps;
+  dest->issue2        = src->issue2;
+  dest->joy_kempston  = src->joy_kempston;
+  dest->tape_traps    = src->tape_traps;
+  dest->slt_traps     = src->slt_traps;
 
-  dest->sound_device = src->sound_device;
-  dest->sound	     = src->sound;
-  dest->sound_load   = src->sound_load;
-  dest->stereo_ay    = src->stereo_ay;
+  dest->sound_device  = src->sound_device;
+  dest->sound	      = src->sound;
+  dest->sound_load    = src->sound_load;
+  dest->stereo_ay     = src->stereo_ay;
+  dest->stereo_beeper = src->stereo_beeper;
 
   return 0;
 }
