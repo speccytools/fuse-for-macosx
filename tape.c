@@ -226,8 +226,6 @@ int tape_trap( void )
 
   int i;
 
-  fprintf( stderr, "tape_trap()\n" );
-
   if( tape_block_list == NULL ) return 1;
 
   current_block = (tape_block_t*)(tape_block_pointer->data);
