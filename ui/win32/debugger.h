@@ -1,5 +1,5 @@
-/* win32display.h:  Routines for dealing with the Win32 DirectDraw display
-   Copyright (c) 2003 Marek Januszewski
+/* debugger.h: the Win32 debugger
+   Copyright (c) 2004 Marek Januszewski
 
    $Id$
 
@@ -24,12 +24,24 @@
 
 */
 
-#include "config.h"
+//#define IDG_DBG 1000
+#define IDC_LV_PC 1001
+#define IDC_LV_STACK 1002
+#define IDC_LV_EVENTS 1003
+#define IDC_LV_BPS 1004
+#define IDC_ED_EVAL 1005
+#define IDC_BTN_EVAL 1006
+#define IDC_GRP_MEMMAP 1007
+#define IDC_BTN_STEP 1008
+#define IDC_BTN_CONT 1009
+#define IDC_BTN_BREAK 1010
+#define IDC_BTN_CLOSE 1011
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
-#include "win32internals.h"
-
-void blit( void );
-
-#endif			/* #ifdef UI_WIN32 */
+#define IDM_MENU 400
+#define IDM_DB_VIEW 401
+#define IDM_DB_REG 402
+#define IDM_DB_MEMMAP 403
+#define IDM_DB_BPS 404
+#define IDM_DB_DIS 405
+#define IDM_DB_STACK 406
+#define IDM_DB_EVENTS 407

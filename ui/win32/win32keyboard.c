@@ -1,5 +1,5 @@
 /* win32keyboard.c: routines for dealing with the Win32 keyboard
-   Copyright (c) 2003 Marek Januszewski
+   Copyright (c) 2003 Marek Januszewski, Philip Kendall
 
    $Id$
 
@@ -34,7 +34,7 @@
 
 #include "display.h"
 #include "fuse.h"
-#include "keysyms.h"
+#include "keyboard.h"
 #include "machine.h"
 #include "settings.h"
 #include "snapshot.h"
@@ -49,103 +49,33 @@
 void
 win32keyboard_keypress( WPARAM wParam, LPARAM lParam )
 {
-  const keysyms_key_info *ptr;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
-  ptr=keysyms_get_data( wParam );
+  fuse_keysym = keysyms_remap( wParam );
 
-  if( ptr ) {
-#ifdef USE_WIDGET
-    if( widget_level >= 0 ) {
-      widget_keyhandler( ptr->key1, ptr->key2 );
-    } else {
-#endif
-      if( ptr->key1 != KEYBOARD_NONE ) keyboard_press( ptr->key1 );
-      if( ptr->key2 != KEYBOARD_NONE ) keyboard_press( ptr->key2 );
-#ifdef USE_WIDGET
-    }
-#endif
-    return;
-  }
+  if( fuse_keysym == INPUT_KEY_NONE ) return;
 
-#ifdef USE_WIDGET
+  fuse_event.type = INPUT_EVENT_KEYPRESS;
+  fuse_event.types.key.key = fuse_keysym;
 
- if( widget_level >= 0 ) return;
-  
-  /* Now deal with the non-Speccy keys */
-
-  switch( wParam ) {
-  case VK_F1:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MENU, &widget_menu_main );
-    fuse_emulation_unpause();
-    break;
-  case VK_F2:
-    fuse_emulation_pause();
-    snapshot_write( "snapshot.z80" );
-    fuse_emulation_unpause();
-    break;
-  case VK_F3:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-    if( widget_filesel_name ) {
-      utils_open_file( widget_filesel_name, settings_current.auto_load, NULL );
-      free( widget_filesel_name );
-      display_refresh_all();
-    }
-    fuse_emulation_unpause();
-    break;
-  case VK_F4:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_GENERAL, NULL );
-    fuse_emulation_unpause();
-    break;
-  case VK_F5:
-    machine_reset();
-    break;
-  case VK_F6:
-    fuse_emulation_pause();
-    tape_write( "tape.tzx" );
-    fuse_emulation_unpause();
-    break;
-  case VK_F7:
-    fuse_emulation_pause();
-    widget_apply_to_file( tape_open_default_autoload );
-    fuse_emulation_unpause();
-    break;
-  case VK_F8:
-    tape_toggle_play();
-    break;
-  case VK_F9:
-    fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_SELECT, NULL );
-    fuse_emulation_unpause();
-    break;
-  case VK_F10:
-    fuse_exiting = 1;
-    break;
-  default:
-    break;
-  }
-
-#endif
-
-  return;
+  input_event( &fuse_event );
 }
 
 void
 win32keyboard_keyrelease( WPARAM wParam, LPARAM lParam )
 {
-  const keysyms_key_info *ptr;
+  input_key fuse_keysym;
+  input_event_t fuse_event;
 
-  ptr = keysyms_get_data( wParam );
+  fuse_keysym = keysyms_remap( wParam );
 
-  if(ptr) {
-    if( ptr->key1 != KEYBOARD_NONE ) keyboard_release( ptr->key1 );
-    if( ptr->key2 != KEYBOARD_NONE ) keyboard_release( ptr->key2 );
-  }
-  
-  return;
+  if( fuse_keysym == INPUT_KEY_NONE ) return;
 
+  fuse_event.type = INPUT_EVENT_KEYRELEASE;
+  fuse_event.types.key.key = fuse_keysym;
+
+  input_event( &fuse_event );
 }
 
 #endif			/* #ifdef UI_WIN32 */

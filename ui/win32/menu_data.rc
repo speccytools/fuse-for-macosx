@@ -1,0 +1,196 @@
+/* menu_data.rc: menu structure for Fuse
+   Copyright (c) 2004 Marek Januszewski
+
+   $Id$
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+   Author contact information:
+
+   E-mail: pak21-fuse@srcf.ucam.org
+   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+*/
+
+#include <windows.h>
+#include "menu_data.h"
+
+win32_menu MENU
+{
+  POPUP "File"
+  {
+    MENUITEM "&Open\tF3", IDM_MENU_FILE_OPEN
+    MENUITEM "&Save Snapshot...\tF2", IDM_MENU_FILE_SAVE_SNAPSHOT
+    POPUP "&Recording"
+    {
+      MENUITEM "&Record...", IDM_MENU_FILE_RECORDING_RECORD
+      MENUITEM "Record &from snapshot...", IDM_MENU_FILE_RECORDING_RECORD_FROM_SNAPSHOT
+      MENUITEM "&Play", IDM_MENU_FILE_RECORDING_PLAY
+      MENUITEM "&Stop", IDM_MENU_FILE_RECORDING_STOP
+    }
+    POPUP "A&Y Logging"
+    {
+      MENUITEM "&Record...", IDM_MENU_FILE_AY_LOGGING_RECORD
+      MENUITEM "&Stop", IDM_MENU_FILE_AY_LOGGING_STOP
+    }
+    MENUITEM SEPARATOR
+    MENUITEM "O&pen SCR Screenshot...", IDM_MENU_FILE_OPEN_SCR_SCREENSHOT
+    MENUITEM "S&ave Screen as SCR...", IDM_MENU_FILE_SAVE_SCREEN_AS_SCR
+    MENUITEM "Save S&creen as PNG...", IDM_MENU_FILE_SAVE_SCREEN_AS_PNG
+    MENUITEM SEPARATOR
+    MENUITEM "Loa&d binary data...", IDM_MENU_FILE_LOAD_BINARY_DATA
+    MENUITEM "Save &binary data...", IDM_MENU_FILE_SAVE_BINARY_DATA
+    MENUITEM SEPARATOR
+    MENUITEM "E&xit...\tF10", IDM_MENU_FILE_EXIT
+  }  
+  POPUP "Options"
+  {
+    MENUITEM "&General...\tF4", IDM_MENU_OPTIONS_GENERAL
+    MENUITEM "&Sound...", IDM_MENU_OPTIONS_SOUND
+    MENUITEM "&Peripherals...", IDM_MENU_OPTIONS_PERIPHERIALS
+    MENUITEM "&RZX...", IDM_MENU_OPTIONS_RZX
+    POPUP "&Joysticks"
+    {
+      MENUITEM "Joystick &1...", IDM_MENU_OPTIONS_JOYSTICKS_JOYSTICK_1
+      MENUITEM "Joystick &2...", IDM_MENU_OPTIONS_JOYSTICKS_JOYSTICK_2
+      MENUITEM "&Keyboard...", IDM_MENU_OPTIONS_JOYSTICKS_KEYBOARD
+    }    
+    POPUP "S&elect ROMs"
+    {
+      MENUITEM "Spectrum 1&6K...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_16K
+      MENUITEM "Spectrum &48K...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_48K
+      MENUITEM "Spectrum &128K...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_128K
+      MENUITEM "Spectrum +&2...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_2
+      MENUITEM "Spectrum +2&A...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_2A
+      MENUITEM "Spectrum +&3...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_3
+      MENUITEM "Spectrum +3&e...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_3E
+      MENUITEM "Timex &TC2048...", IDM_MENU_OPTIONS_SELECT_ROMS_TIMEX_TC2048
+      MENUITEM "Timex TC206&8...", IDM_MENU_OPTIONS_SELECT_ROMS_TIMEX_TC2068
+      MENUITEM "&Pentagon 128K...", IDM_MENU_OPTIONS_SELECT_ROMS_PENTAGON_128K
+      MENUITEM "S&corpion ZS 256...", IDM_MENU_OPTIONS_SELECT_ROMS_SCORPION_ZS_256
+      MENUITEM "Spectrum &SE...", IDM_MENU_OPTIONS_SELECT_ROMS_SPECTRUM_SE
+    }    
+    MENUITEM "&Filter...", IDM_MENU_OPTIONS_FILTER
+    MENUITEM SEPARATOR
+    MENUITEM "S&ave", IDM_MENU_OPTIONS_SAVE
+  }    
+  POPUP "Machine"
+  {
+    MENUITEM "&Pause...\tPause", IDM_MENU_MACHINE_PAUSE
+    MENUITEM "&Reset...\tF5", IDM_MENU_MACHINE_RESET
+    MENUITEM "&Select...\tF9", IDM_MENU_MACHINE_SELECT
+    MENUITEM "&Debugger...", IDM_MENU_MACHINE_DEBUGGER
+    MENUITEM "P&oke Finder...", IDM_MENU_MACHINE_POKE_FINDER
+    MENUITEM "&Memory Browser...", IDM_MENU_MACHINE_MEMORY_BROWSER
+    MENUITEM "&NMI", IDM_MENU_MACHINE_NMI
+  }    
+  POPUP "Media"
+  {
+    POPUP "&Tape"
+    {
+      MENUITEM "&Open...\tF7", IDM_MENU_MEDIA_TAPE_OPEN
+      MENUITEM "&Play\tF8", IDM_MENU_MEDIA_TAPE_PLAY
+      MENUITEM "&Browse...", IDM_MENU_MEDIA_TAPE_BROWSE
+      MENUITEM "&Rewind", IDM_MENU_MEDIA_TAPE_REWIND
+      MENUITEM "&Clear", IDM_MENU_MEDIA_TAPE_CLEAR
+      MENUITEM "&Write...\tF6", IDM_MENU_MEDIA_TAPE_WRITE
+    }    
+    POPUP "&Disk"
+    {
+      POPUP "Drive &A:"
+      {
+        MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_DRIVE_A_INSERT
+        MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_DRIVE_A_EJECT
+        MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_DRIVE_A_EJECT_AND_WRITE
+      }    
+      POPUP "Drive &B:"
+      {
+        MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_DRIVE_B_INSERT
+        MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_DRIVE_B_EJECT
+        MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_DRIVE_B_EJECT_AND_WRITE
+      }    
+    }
+    POPUP "&Cartridge"
+    {
+      POPUP "&Timex Dock"
+      {
+        MENUITEM "&Insert...", IDM_MENU_MEDIA_CARTRIDGE_TIMEX_DOCK_INSERT
+        MENUITEM "&Eject", IDM_MENU_MEDIA_CARTRIDGE_TIMEX_DOCK_EJECT
+      }    
+      POPUP "&Interface II"
+      {
+        MENUITEM "&Insert...", IDM_MENU_MEDIA_CARTRIDGE_INTERFACE_II_INSERT
+        MENUITEM "&Eject", IDM_MENU_MEDIA_CARTRIDGE_INTERFACE_II_EJECT
+      }    
+    }    
+    POPUP "&IDE"
+    {
+      POPUP "Simple &8-bit"
+      {
+        POPUP "&Master"
+        {
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_IDE_SIMPLE_8_BIT_MASTER_INSERT
+          MENUITEM "&Commit", IDM_MENU_MEDIA_IDE_SIMPLE_8_BIT_MASTER_COMMIT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_IDE_SIMPLE_8_BIT_MASTER_EJECT
+        }    
+        POPUP "&Slave"
+        {
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_IDE_SIMPLE_8_BIT_SLAVE_INSERT
+          MENUITEM "&Commit", IDM_MENU_MEDIA_IDE_SIMPLE_8_BIT_SLAVE_COMMIT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_IDE_SIMPLE_8_BIT_SLAVE_EJECT
+        }    
+      }    
+      POPUP "ZX&ATASP"
+      {
+        POPUP "&Master"
+        {
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_IDE_ZXATASP_MASTER_INSERT
+          MENUITEM "&Commit", IDM_MENU_MEDIA_IDE_ZXATASP_MASTER_COMMIT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_IDE_ZXATASP_MASTER_EJECT
+        }    
+        POPUP "&Slave"
+        {
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_IDE_ZXATASP_SLAVE_INSERT
+          MENUITEM "&Commit", IDM_MENU_MEDIA_IDE_ZXATASP_SLAVE_COMMIT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_IDE_ZXATASP_SLAVE_EJECT
+        }    
+      }    
+      POPUP "ZX&CF CompactFlash"
+      {
+        MENUITEM "&Insert...", IDM_MENU_MEDIA_IDE_ZXCF_COMPACTFLASH_INSERT
+        MENUITEM "&Commit", IDM_MENU_MEDIA_IDE_ZXCF_COMPACTFLASH_COMMIT
+        MENUITEM "&Eject", IDM_MENU_MEDIA_IDE_ZXCF_COMPACTFLASH_EJECT
+      }    
+    }
+  }
+  POPUP "Help"
+  {
+    MENUITEM "&Keyboard...", IDM_MENU_HELP_KEYBOARD
+  }  
+}
+
+win32_accel ACCELERATORS
+{
+  VK_F3,    IDM_MENU_FILE_OPEN
+  VK_F2,    IDM_MENU_FILE_SAVE_SNAPSHOT
+  VK_F10,   IDM_MENU_FILE_EXIT
+  VK_F4,    IDM_MENU_OPTIONS_GENERAL
+  VK_PAUSE, IDM_MENU_MACHINE_PAUSE
+  VK_F5,    IDM_MENU_MACHINE_RESET
+  VK_F9,    IDM_MENU_MACHINE_SELECT
+  VK_F7,    IDM_MENU_MEDIA_TAPE_OPEN
+  VK_F8,    IDM_MENU_MEDIA_TAPE_PLAY
+  VK_F6,    IDM_MENU_MEDIA_TAPE_WRITE
+}

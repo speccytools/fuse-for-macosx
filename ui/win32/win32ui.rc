@@ -1,5 +1,5 @@
-/* win32display.h:  Routines for dealing with the Win32 DirectDraw display
-   Copyright (c) 2003 Marek Januszewski
+/* win32ui.rc: resource file for win32 interface
+   Copyright (c) 2004 Marek Januszewski
 
    $Id$
 
@@ -24,12 +24,11 @@
 
 */
 
-#include "config.h"
+win32bmp_disk_active    BITMAP "ui/win32/icons/disk_active.bmp"
+win32bmp_disk_inactive  BITMAP "ui/win32/icons/disk_inactive.bmp"
+win32bmp_pause_active   BITMAP "ui/win32/icons/pause_active.bmp"
+win32bmp_pause_inactive BITMAP "ui/win32/icons/pause_inactive.bmp"
+win32bmp_tape_active    BITMAP "ui/win32/icons/tape_active.bmp"
+win32bmp_tape_inactive  BITMAP "ui/win32/icons/tape_inactive.bmp"
+win32bmp_tape_marker    BITMAP "ui/win32/icons/tape_marker.bmp"
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
-#include "win32internals.h"
-
-void blit( void );
-
-#endif			/* #ifdef UI_WIN32 */

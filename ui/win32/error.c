@@ -1,5 +1,5 @@
 /* error.c: handle errors
-   Copyright (c) 2003 Marek Januszewski
+   Copyright (c) 2004 Marek Januszewski
 
    $Id$
 
@@ -37,11 +37,14 @@
 #include "fuse.h"
 #include "ui/ui.h"
 
+/*
+  TODO: (now conflicts with widget)
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
+/*
   /* finish - can ui be not initialized? */
-  char message[ MESSAGE_MAX_LENGTH + 1 ];
+/*
   UINT mtype;
   HWND hWnd;
 
@@ -67,5 +70,6 @@ ui_error_specific( ui_error_level severity, const char *message )
 
   return 0;
 }
+*/
 
 #endif			/* #ifdef UI_WIN32 */

@@ -1,5 +1,5 @@
-/* win32display.h:  Routines for dealing with the Win32 DirectDraw display
-   Copyright (c) 2003 Marek Januszewski
+/* pokefinder.h: Win32 interface to the poke finder
+   Copyright (c) 2004 Marek Januszwski
 
    $Id$
 
@@ -24,12 +24,13 @@
 
 */
 
-#include "config.h"
+#define IDC_PF_SEARCH_FOR 200
+#define IDC_PF_EDIT 201
+#define IDC_PF_LOCATIONS 202
+#define IDC_PF_LIST 203
+#define IDC_PF_INC 204
+#define IDC_PF_DEC 205
+#define IDC_PF_SEARCH 206
+#define IDC_PF_RESET 207
+#define IDC_PF_CLOSE 208
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
-#include "win32internals.h"
-
-void blit( void );
-
-#endif			/* #ifdef UI_WIN32 */

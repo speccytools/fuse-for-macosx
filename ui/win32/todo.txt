@@ -1,19 +1,6 @@
 http://msdn.microsoft.com/archive/default.asp?url=/archive/en-us/dnardirdraw/html/msdn_directd5.asp
 http://francis.dupont.free.fr/coindev/english/directdraw/clipping.htm
 http://www.fourcc.org/fccovrly.php
-
-- alldiplay.[ch]
-uidisplay_hotswap_gfx_mode - implement
-
-implement resizing
-
-finish special keys assignments
- find constants for them
-
-- error.c
-v check verror implementation - done
-v check opening bzip compressed files - done
-
 --
 change include "memory.h" to:
 
@@ -23,21 +10,9 @@ change include "memory.h" to:
 #include "../memory.h"
 37 11 C:\Dev-Cpp-projects\fuse-cvs\debugger\disassemble.c
 #include "../memory.h"
-
 -----------------
-ui/gtk/pokefinder.c
-add in line 29:
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-add in last line:
-#endif			/* #ifdef UI_GTK */
-
 in libspectrum:
 nothing to do - configure with --without-glib
-glib replacement functions are filled in by perl script.
-
-myglib.c misses only g_slist_prepend - done
-http://sourceforge.net/tracker/index.php?func=detail&aid=859594&group_id=91293&atid=596650
-
 --
 implement those 2 things I posted on mingw-devel
 
@@ -75,12 +50,6 @@ submitted:
 http://sourceforge.net/tracker/index.php?func=detail&aid=859674&group_id=91293&atid=596650
 
 --
-in machine.c
-remove libgen.h - unused? - done
---
-in utils.c
-remove libgen.h
---
 ssize_t replacement:
 compat.h
 #ifndef HAVE_SSIZE_T
@@ -95,45 +64,10 @@ change "main()" to "main1()"
 because program must start from WinMain
 (start with main() if found)
 
---
-modified things are:
-./fuse.dev
-./fuse.layaout
-./ui/win32
-./exe
-(./config.h)
-when compiled --with-sdl also
-./ui/gtk/keysyms.c
-./ui/gtk/options.[hc]
+is there a -D option?
 --
 strip fuse.exe and compress with http://upx.sf.net/
 ---
-joystick
-for full CURSOR/PROTEK joystick support add keysyms.c:
-  { VK_TAB,          KEYBOARD_0,        KEYBOARD_Caps   },
---
-sound and speed works fine when added:
-spectrum.c:101
-#if defined(UI_SDL) || defined(HAVE_DSOUND_H)
-fuse.c:227
-#if defined(UI_SDL) || defined(HAVE_DSOUND_H)
-fuse.c:404
-#if !defined(UI_SDL) && !defined(HAVE_DSOUND_H)
-fuse.c:421
-#if !defined(UI_SDL) && !defined(HAVE_DSOUND_H)
-fuse.c:426
-#if defined(UI_SDL) || defined(HAVE_DSOUND_H)
-fuse.c:431
-#if !defined(UI_SDL) && !defined(HAVE_DSOUND_H)
-fuse.c:612
-#if defined(UI_SDL) || defined(HAVE_DSOUND_H)
-
-added patch:
-http://sourceforge.net/tracker/index.php?func=detail&aid=859483&group_id=91293&atid=596650
-next patch:
-http://sourceforge.net/tracker/index.php?func=detail&aid=859997&group_id=91293&atid=596650
-
---
 write .def file for libspectrum.dll
 --
 used libraries to add in win32:
@@ -146,7 +80,7 @@ libdsk
 add some help to win32 - maybe there's man2help or man2pdf or sth like that
  man2html
 --
-add dirname() implementation
+fix dirname() implementation for win32
 --
 gtkkeyboard.c
 line 98:
