@@ -82,6 +82,7 @@ typedef struct machine_info {
 
   size_t rom_count;
   BYTE **roms;
+  size_t *rom_lengths;
 
   spectrum_port_info *peripherals; /* Which peripherals do we have? */
   spectrum_unattached_port_fn unattached_port; /* What to return if we read

@@ -212,13 +212,21 @@ int machine_allocate_roms( machine_info *machine, size_t count )
     return 1;
   }
 
+  machine->rom_lengths = (size_t*)malloc( count * sizeof(size_t) );
+  if( machine->rom_lengths == NULL ) {
+    fprintf(stderr, "%s: out of memory at %s:%d\n", fuse_progname,
+	    __FILE__, __LINE__ );
+    free( machine->roms );
+    return 1;
+  }
+
   return 0;
 }
 
 int machine_read_rom( machine_info *machine, size_t number,
 		      const char* filename )
 {
-  int fd; size_t length;
+  int fd;
 
   int error;
 
@@ -230,7 +238,8 @@ int machine_read_rom( machine_info *machine, size_t number,
     return 1;
   }
 
-  error = utils_read_fd( fd, filename, &(machine->roms[number]), &length );
+  error = utils_read_fd( fd, filename, &(machine->roms[number]),
+			 &(machine->rom_lengths[number]) );
   if( error ) return error;
 
   return 0;
@@ -281,8 +290,7 @@ static int machine_free_machine( machine_info *machine )
 
   for( i=0; i<machine->rom_count; i++ ) {
 
-    /* FIXME: should carry the length through properly */
-    if( munmap( machine->roms[i], 0x4000 ) == -1 ) {
+    if( munmap( machine->roms[i], machine->rom_lengths[i] ) == -1 ) {
       snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
 		"%s: couldn't munmap ROM %lu",
 		fuse_progname, (unsigned long)i );
