@@ -47,7 +47,7 @@
 static SDL_Joystick *joystick1 = NULL;
 static SDL_Joystick *joystick2 = NULL;
 
-static void do_axis( int which, input_joystick_button negative,
+static void do_axis( int which, Sint16 value, input_joystick_button negative,
 		     input_joystick_button positive );
 
 int
@@ -94,6 +94,13 @@ ui_joystick_init( void )
 }
 
 void
+ui_joystick_poll( void )
+{
+  /* No action needed; joysticks already handled by the SDL events
+     system */
+}
+
+void
 sdljoystick_buttonpress( SDL_JoyButtonEvent *buttonevent )
 {
   input_event_t event;
@@ -121,15 +128,17 @@ void
 sdljoystick_axismove( SDL_JoyAxisEvent *axisevent )
 {
   if( axisevent->axis == 0 ) {
-    do_axis( axisevent->which, INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
+    do_axis( axisevent->which, axisevent->value,
+	     INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
   } else if( axisevent->axis == 1 ) {
-    do_axis( axisevent->which, INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
+    do_axis( axisevent->which, axisevent->value,
+	     INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
   }
 }
 
 static void
-do_axis( int which, input_joystick_button negative,
-	 input_joystick_button positive )
+do_axis( int which, Sint16 value,
+	 input_joystick_button negative, input_joystick_button positive )
 {
   input_event_t event1, event2;
 
@@ -138,10 +147,10 @@ do_axis( int which, input_joystick_button negative,
   event1.types.joystick.button = negative;
   event2.types.joystick.button = positive;
 
-  if( axisevent->value > 16384 ) {
+  if( value > 16384 ) {
     event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
     event2.type = INPUT_EVENT_JOYSTICK_PRESS;
-  } else if( axisevent->value < -16384 ) {
+  } else if( value < -16384 ) {
     event1.type = INPUT_EVENT_JOYSTICK_PRESS;
     event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
   } else {
