@@ -257,6 +257,20 @@ int widget_timer_init( void )
   timer.it_value.tv_usec = 100000UL;
   setitimer( ITIMER_REAL, &timer, &widget_timer_old_timer );
 
+  /* FIXME: Is this really necessary? Without this on Solaris, we
+     often get called such taht widget_timer_old_timer.it_value is zero
+     which then means we die when we reactivate this timer as it is
+     disabled. Reread Stevens. */
+  if( widget_timer_old_timer.it_value.tv_sec == 0 &&
+      widget_timer_old_timer.it_value.tv_usec == 0 )
+    {
+      widget_timer_old_timer.it_value.tv_sec =
+	widget_timer_old_timer.it_interval.tv_sec;
+
+      widget_timer_old_timer.it_value.tv_usec = 
+	widget_timer_old_timer.it_interval.tv_usec;
+    }
+
   return 0;
 }
 
