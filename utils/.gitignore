@@ -3,4 +3,5 @@
 /Makefile.in
 /rzxdump
 /rzx-extract
+/rzx-uncompress
 /tzxlist
