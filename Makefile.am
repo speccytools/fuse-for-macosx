@@ -34,6 +34,7 @@ SUBDIRS = compat \
 	  perl \
 	  pokefinder \
 	  roms \
+	  sound \
 	  ui \
 	  @WIDGET@ \
 	  z80
@@ -46,6 +47,7 @@ DIST_SUBDIRS = compat \
 	       perl \
 	       pokefinder \
 	       roms \
+	       sound \
 	       ui \
 	       widget \
 	       z80
@@ -53,14 +55,12 @@ DIST_SUBDIRS = compat \
 fuse_SOURCES = ay.c \
 	dck.c \
 	display.c \
-	dxsound.c \
 	event.c \
 	fuse.c \
 	joystick.c \
 	keyboard.c \
 	machine.c \
 	memory.c \
-	osssound.c \
 	pentagon.c \
 	periph.c \
 	printer.c \
@@ -69,7 +69,6 @@ fuse_SOURCES = ay.c \
 	scld.c \
 	scorpion.c \
 	screenshot.c \
-	sdlsound.c \
 	settings.c \
 	snapshot.c \
 	sound.c \
@@ -80,7 +79,6 @@ fuse_SOURCES = ay.c \
 	specplus2a.c \
 	specplus3.c \
 	spectrum.c \
-	sunsound.c \
 	tape.c \
 	tc2048.c \
 	tc2068.c \
@@ -93,6 +91,7 @@ fuse_SOURCES = ay.c \
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
 pokefinder/libpokefinder.a \
+sound/libsound.a \
 ui/scaler/libscaler.a \
 debugger/libdebugger.a \
 z80/libz80.a \
@@ -106,6 +105,7 @@ compat/libcompat.a
 
 fuse_DEPENDENCIES = @UI_LIBS@ \
 		    debugger/libdebugger.a \
+		    sound/libsound.a \
 	            z80/libz80.a
 
 BUILT_SOURCES = settings.c settings.h

@@ -415,6 +415,7 @@ perl/Makefile \
 perl/Fuse/Makefile \
 pokefinder/Makefile \
 roms/Makefile \
+sound/Makefile \
 ui/Makefile \
 ui/fb/Makefile \
 ui/ggi/Makefile \

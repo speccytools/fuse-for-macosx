@@ -621,3 +621,4 @@
 20040309 pokefinder/pokefinder.[ch],ui/gtk/pokefinder.c: extend the
 	 pokefinder to be able to find bytes which have increased or
 	 decreased since the last check.
+20040310 Move the low-level sound files into the new sound/ directory.
