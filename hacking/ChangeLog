@@ -934,3 +934,4 @@
 	 make setting breakpoints in non-RAM pages slightly more user
 	 friendly.
 20040617 ui/gtk/roms.c: add ellipses to the 'Select' buttons.
+20040617 man/fuse.1: man page update. More updates welcome :-)
