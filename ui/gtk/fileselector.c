@@ -69,12 +69,11 @@ menu_get_filename( const char *title )
 
   gtk_signal_connect_object(
     GTK_OBJECT( GTK_FILE_SELECTION( selector.selector )->cancel_button ),
-    "clicked", GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-    GTK_OBJECT( selector.selector )
+    "clicked", DEFAULT_DESTROY, GTK_OBJECT( selector.selector )
   );
 
   gtk_signal_connect( GTK_OBJECT( selector.selector ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+		      DEFAULT_DESTROY, NULL );
 
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( selector.selector ), accel_group );

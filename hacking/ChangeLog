@@ -1053,3 +1053,5 @@
 20040813 ui/gtk/{binary.c,browse.c,confirm.c,debugger.c,gtkinternals.h,
 	 gtkjoystick.c,gtkui.c,memory.c,options.pl,picture.c,pokefinder.c,
 	 roms.c,stock.c}: add stock dialog creation function (Darren).
+20040816 ui/gtk/{fileselector.c,memory.c}: use DEFAULT_DESTROY wherever
+	 possible (Darren).

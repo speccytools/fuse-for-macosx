@@ -71,12 +71,6 @@ update_display( GtkCList *clist, libspectrum_word base )
 }
 
 static void
-memory_done( GtkWidget *widget, gpointer user_data )
-{
-  gtkui_destroy_widget_and_quit( widget, NULL );
-}
-
-static void
 scroller( GtkAdjustment *adjustment, gpointer user_data )
 {
   libspectrum_word base;
@@ -103,7 +97,7 @@ menu_machine_memorybrowser( void )
 
   dialog = gtkstock_dialog_new( "Fuse - Memory Browser", NULL );
 
-  gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( memory_done ), FALSE );
+  gtkstock_create_close( dialog, NULL, NULL, FALSE );
 
   box = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), box );
