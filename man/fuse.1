@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "29th January, 2002" "Version 0.4.1" "Emulators"
+.TH fuse 1 "17th March, 2002" "Version 0.4.2" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -134,6 +134,14 @@ Specify a snapshot file to load. The file must be in Z80,
 SNA, or SLT format.
 .RE
 .PP
+.I "-d device"
+.br
+.I "--sound-device device"
+.RS
+Specify the sound output device to use. Generally you shouldn't need
+to specify this, but it might be useful if you have more than one.
+.RE
+.PP
 .I "-t file"
 .br
 .I "--tape file"
@@ -205,16 +213,22 @@ Spectrum's keyboard, the primary way of controlling Fuse itself
 function key shortcuts for some menu options.
 .PP
 In the GTK+ version, the menu bar is always visible at the top of the
-Fuse window. You can click on a menu name to pop it up.
-.PP
-In the widget UI you have to press
+Fuse window. You can click on a menu name to pop it up. Alternatively,
+you can press
 .I F1
-to get the main menu, which is equivalent to the menu bar; and unlike
-the GTK+ version, the emulator pauses while the menus are being
-navigated. The menus show which key to press for each menu option in
-brackets. Pressing
+to display a pop-up version of the menu bar, which you can then
+navigate with the cursor keys or mouse.
+.PP
+In the widget UI pressing
+.I F1
+is the only way to get the main menu; and unlike the GTK+ version, the
+emulator pauses while the menus are being navigated. The menus show
+which key to press for each menu option in brackets. Pressing
 .I Esc
-exits a menu.
+exits a menu, and pressing
+.I Enter
+exits the menu system entirely (as well as `confirming' any current
+dialog).
 .PP
 Here's what the menu options do, along with the function key mappings
 for those items which have them:
@@ -240,6 +254,25 @@ Save a snapshot in Z80 format. The GTK+ UI lets you select a filename,
 but the others just write the file as
 .IR snapshot.z80 ,
 and have a differently-named menu item to match.
+.RE
+.PP
+.I "Recording, Record..."
+.RS
+Start recording input to an RZX file.
+.RE
+.PP
+.I "Recording, Play..."
+.RS
+Playback recorded input from an RZX file. This lets you replay
+keypresses recorded previously. Note that currently, it's up to you to
+make sure the emulated Spectrum is in the same state as it was when
+the input was originally recorded (which in practice may not be
+possible in some cases).
+.RE
+.PP
+.I "Recording, Stop"
+.RS
+Stop any currently-recording/playing RZX file.
 .RE
 .PP
 .I F10
@@ -306,17 +339,6 @@ or choosing the
 menu item.
 .RE
 .PP
-.I "AY stereo separation"
-.RS
-This option is only available when Fuse is able to play sound. By
-default, the sound output is mono, since this is all you got from an
-unmodified Spectrum. But enabling this option gives you so-called ACB
-stereo (for sound from the 128's AY-3-8912 sound chip). This actually
-works a little better than ACB stereo modifications for the machine
-itself, since it uses stereo positioning rather than simply playing on
-one channel only.
-.RE
-.PP
 .I "Use .slt traps"
 .RS
 The multi-load aspect of SLT files requires a trap instruction to be
@@ -324,6 +346,42 @@ supported. This instruction is not generally used except for this
 trap, but since it's not inconceivable that a program could be wanting
 to use the real instruction instead, you can choose whether to support
 the trap or not.
+.RE
+.RE
+.PP
+.I "Options, Sound..."
+.RS
+Display the Sound Options dialog, letting you configure Fuse's sound
+output. (With the widget UI, the keys shown in brackets toggle the
+options,
+.I Enter
+confirms any changes, and
+.I Esc
+aborts.) Note that any changed settings only apply to the
+currently-running Fuse.
+.PP
+.I "Sound enabled"
+.RS
+Specify whether sound output should be enabled at all. When this
+option is disabled, Fuse will not make any sound.
+.RE
+.PP
+.I "Loading sound"
+.RS
+Normally, Fuse emulates tape-loading noise when loading from TAPs or
+TZXs in real-time, albeit at a deliberately lower volume than on a
+real Spectrum. You can disable this option to eliminate the loading
+noise entirely.
+.RE
+.PP
+.I "AY stereo separation"
+.RS
+By default, the sound output is mono, since this is all you got from
+an unmodified Spectrum. But enabling this option gives you so-called
+ACB stereo (for sound from the 128's AY-3-8912 sound chip). This
+actually works a little better than ACB stereo modifications for the
+machine itself, since it uses stereo positioning rather than simply
+playing on one channel only.
 .RE
 .RE
 .PP
@@ -485,9 +543,9 @@ section below.
 .\"
 .SH "THE EMULATED SPECTRUM"
 The emulated Spectrum is, by default, an unmodified 48K Spectrum with
-no peripherals attached other than a tape player. Oh, and apparently
-some magical snapshot load/save machine which is probably best glossed
-over for the sake of the analogy. :-)
+a tape player and ZX Printer attached. Oh, and apparently some magical
+snapshot load/save machine which is probably best glossed over for the
+sake of the analogy. :-)
 .PP
 To emulate different kinds of Spectrum, select the
 .I "Machine, Select..."
@@ -497,6 +555,43 @@ menu option, or press
 The Spectrum emulation is paused when any dialogs appear. In the
 widget UI, it's also paused when menus or the keyboard picture are
 displayed.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "PRINTER EMULATION"
+The various models of Spectrum supported a range of ways to connect
+printers, three of which are supported by Fuse. Different printers are
+made available for the different models:
+.TP
+.I 48
+ZX Printer
+.TP
+.IR 128 / +2
+Serial printer (text-only)
+.TP
+.I +2A
+Parallel printer (text-only)
+.PP
+Any printout is appended to one (or both) of two files, depending on
+the printer -
+.I printout.txt
+for text output, and
+.I printout.pbm
+for graphics. (PBM images are supported by most image viewers and
+converters.) While the ZX Printer can
+.I only
+output graphically, simulated text output is generated at the same
+time using a crude sort of OCR based on the current character set (a
+bit like using SCREEN$). There is currently no support for graphics
+when using the serial/parallel output, though any escape codes used
+will be `printed' faithfully. (!)
+.PP
+By the way, it's not a good idea to modify the
+.I printout.pbm
+file outside of Fuse if you want to continue appending to it. The
+header needs to have a certain layout for Fuse to be able to continue
+appending to it correctly, and the file will be overwritten if it
+can't be appended to.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -566,8 +661,6 @@ files are shown, whether Fuse would be able to load them or not.
 .\"
 .SH BUGS
 Not many peripherals are supported.
-.PP
-The sound support is currently for OSS (e.g. Linux) only.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -597,4 +690,7 @@ the joystick emulation, some of the printer code, and this man page.
 .PP
 Ian Collier wrote the ZX Printer emulation (for xz80).
 .PP
-Darren Salt wrote the original SLT support code.
+Darren Salt wrote the original SLT support code, and the original
+MITSHM code (for the Xlib UI).
+.PP
+Alexander Yurchenko wrote the OpenBSD/Solaris-specific sound code.
