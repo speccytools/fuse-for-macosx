@@ -91,30 +91,40 @@ debugger_end( void )
 int
 debugger_check( debugger_breakpoint_type type, libspectrum_word value )
 {
-  GSList *ptr; debugger_breakpoint *bp, *active;
+  GSList *ptr; debugger_breakpoint *bp;
 
   switch( debugger_mode ) {
 
   case DEBUGGER_MODE_INACTIVE: return 0;
 
   case DEBUGGER_MODE_ACTIVE:
-    active = NULL;
     for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
+
       bp = ptr->data;
-      if( bp->type == type && bp->value == value ) {
-	if( bp->ignore ) {
-	  bp->ignore--;
-	} else if( !bp->condition ||
-		   debugger_expression_evaluate( bp->condition ) ) {
-	  active = bp; break;
-	}
+
+      if( bp->type != type ) continue;
+
+      if( bp->page == -1 ) {
+	/* If the breakpoint doesn't have a page specified, the value
+	   must match exactly */
+	if( bp->value != value ) continue;
+      } else {
+	/* If it has a page specified, the page and offset must both
+	   match */
+	if( bp->page != memory_map[ value >> 13 ].reverse ) continue;
+	if( bp->value != ( value & 0x3fff ) ) continue;
       }
-    }
-    if( active ) {
-      if( active->life == DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) {
-	debugger_breakpoints = g_slist_remove( debugger_breakpoints, active );
-	free( active );
+
+      if( bp->ignore ) { bp->ignore--; continue; }
+
+      if( bp->condition && !debugger_expression_evaluate( bp->condition ) )
+	continue;
+
+      if( bp->life == DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) {
+	debugger_breakpoints = g_slist_remove( debugger_breakpoints, bp );
+	free( bp );
       }
+
       debugger_mode = DEBUGGER_MODE_HALTED;
       return 1;
     }
@@ -152,7 +162,7 @@ debugger_next( void )
   debugger_disassemble( NULL, 0, &length, PC );
 
   /* And add a breakpoint after that */
-  debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
+  debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1,
 			   PC + length, 0, DEBUGGER_BREAKPOINT_LIFE_ONESHOT,
 			   NULL );
 
@@ -174,8 +184,9 @@ debugger_run( void )
 
 /* Add a breakpoint */
 int
-debugger_breakpoint_add( debugger_breakpoint_type type, libspectrum_word value,
-			 size_t ignore, debugger_breakpoint_life life,
+debugger_breakpoint_add( debugger_breakpoint_type type, int page,
+			 libspectrum_word value, size_t ignore,
+			 debugger_breakpoint_life life,
 			 debugger_expression *condition )
 {
   debugger_breakpoint *bp;
@@ -186,8 +197,9 @@ debugger_breakpoint_add( debugger_breakpoint_type type, libspectrum_word value,
     return 1;
   }
 
-  bp->id = next_breakpoint_id++;
-  bp->type = type; bp->value = value; bp->ignore = ignore; bp->life = life;
+  bp->id = next_breakpoint_id++; bp->type = type;
+  bp->page = page; bp->value = value;
+  bp->ignore = ignore; bp->life = life;
   bp->condition = condition;
 
   debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
@@ -280,13 +292,15 @@ find_breakpoint_by_address( gconstpointer data, gconstpointer user_data )
   const debugger_breakpoint *bp = data;
   libspectrum_word address = *(const libspectrum_word*)user_data;
 
-  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_EXECUTE ||
-      bp->type == DEBUGGER_BREAKPOINT_TYPE_READ ||
-      bp->type == DEBUGGER_BREAKPOINT_TYPE_WRITE ) {
-    return( bp->value - address );
-  }
+  /* Ignore all page-specific breakpoints */
+  if( bp->page != -1 ) return 1;
 
-  return 1;
+  if( bp->type != DEBUGGER_BREAKPOINT_TYPE_EXECUTE &&
+      bp->type != DEBUGGER_BREAKPOINT_TYPE_READ    &&
+      bp->type != DEBUGGER_BREAKPOINT_TYPE_WRITE      )
+    return 1;
+
+  return bp->value - address;
 }
 
 /* Remove all breakpoints */
@@ -324,7 +338,7 @@ debugger_breakpoint_exit( void )
 
   target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
 
-  if( debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, target, 0,
+  if( debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, target, 0,
 			       DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL ) )
     return 1;
 

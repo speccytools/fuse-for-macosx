@@ -51,6 +51,7 @@
   libspectrum_word integer;
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
+  debugger_breakpoint_value bpvalue;
 
   debugger_expression* exp;
 
@@ -95,6 +96,7 @@
 
 %type  <bplife>  breakpointlife
 %type  <bptype>  breakpointtype
+%type  <bpvalue> breakpointvalue
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
 %type  <integer> number
@@ -129,11 +131,11 @@ input:	 /* empty */
 ;
 
 command:   BASE number { debugger_output_base = $2; }
-	 | breakpointlife breakpointtype numberorpc optionalcondition {
-             debugger_breakpoint_add( $2, $3, 0, $1, $4 );
+	 | breakpointlife breakpointtype breakpointvalue optionalcondition {
+             debugger_breakpoint_add( $2, $3.page, $3.value, 0, $1, $4 );
 	   }
 	 | breakpointlife PORT portbreakpointtype number optionalcondition {
-	     debugger_breakpoint_add( $3, $4, 0, $1, $5 );
+	     debugger_breakpoint_add( $3, -1, $4, 0, $1, $5 );
            }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONDITION NUMBER expressionornull {
@@ -159,6 +161,10 @@ breakpointlife:   BREAK  { $$ = DEBUGGER_BREAKPOINT_LIFE_PERMANENT; }
 breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
 	        | READ        { $$ = DEBUGGER_BREAKPOINT_TYPE_READ; }
                 | WRITE       { $$ = DEBUGGER_BREAKPOINT_TYPE_WRITE; }
+;
+
+breakpointvalue:   numberorpc { $$.page = -1; $$.value = $1; }
+		 | number ':' number { $$.page = $1; $$.value = $3; }
 ;
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }

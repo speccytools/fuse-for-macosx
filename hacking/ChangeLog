@@ -394,3 +394,4 @@
 20031227 Add reverse page mappings to the memory_page structure.
 20031227 display.c, memory.c: make writes to the screen work when the
 	 screen is paged in other than at 0x4000.
+20031227 ui/gtk/debugger.c, debugger/: add page-specific breakpoints.

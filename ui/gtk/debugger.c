@@ -664,7 +664,14 @@ ui_debugger_update( void )
     snprintf( breakpoint_text[0], 40, "%lu", (unsigned long)bp->id );
     snprintf( breakpoint_text[1], 40, "%s",
 	      debugger_breakpoint_type_text[ bp->type ] );
-    snprintf( breakpoint_text[2], 40, format_16_bit, bp->value );
+
+    if( bp->page == -1 ) {
+      snprintf( breakpoint_text[2], 40, format_16_bit, bp->value );
+    } else {
+      sprintf( format_string, "%%d:%s", format_16_bit );
+      snprintf( breakpoint_text[2], 40, format_string, bp->page, bp->value );
+    }
+
     snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );
     snprintf( breakpoint_text[4], 40, "%s",
 	      debugger_breakpoint_life_text[ bp->life ] );
