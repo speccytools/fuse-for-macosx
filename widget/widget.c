@@ -39,7 +39,6 @@
 #include "fuse.h"
 #include "display.h"
 #include "machine.h"
-#include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "keyboard.h"
 #include "options.h"
@@ -156,6 +155,15 @@ void widget_rectangle( int x, int y, int w, int h, int col )
         uidisplay_putpixel( DISPLAY_BORDER_WIDTH  + ( (x+mx) << 1 ) + 1,
 			    DISPLAY_BORDER_HEIGHT +    y+my, col );
     }
+}
+
+/* Force screen lines y to (y+h) inclusive to be redrawn */
+void
+widget_display_lines( int y, int h )
+{
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 8 *  y,
+		   DISPLAY_BORDER_HEIGHT + 8 * (y+h) + 7 );
+  uidisplay_frame_end();
 }
 
 /* Global initialisation/end routines */
@@ -417,9 +425,7 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 			WIDGET_COLOUR_FOREGROUND );
   }
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT    + 8*(y       -1),
-		   DISPLAY_BORDER_HEIGHT -1 + 8*(y+height+1)  );
-  uidisplay_frame_end();
+  widget_display_lines( y-1, height+2 );
 
   return 0;
 }
@@ -433,9 +439,7 @@ int widget_options_print_option( int number, const char* string, int value )
   snprintf( buffer, 29, "%-22s : %s", string, value ? " On" : "Off" );
   widget_printstring( 2, number+4, WIDGET_COLOUR_FOREGROUND, buffer );
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
-		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
-  uidisplay_frame_end();
+  widget_display_lines( number + 4, 1 );
 
   return 0;
 }
@@ -445,9 +449,9 @@ int widget_options_print_value( int number, int value )
   widget_rectangle( 27*8, (number+4)*8, 24, 8, WIDGET_COLOUR_BACKGROUND );
   widget_printstring( 27, number+4, WIDGET_COLOUR_FOREGROUND,
 		      value ? " On" : "Off" );
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
-		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
-  uidisplay_frame_end();
+
+  widget_display_lines( number + 4, 1 );
+
   return 0;
 }
 
@@ -461,9 +465,8 @@ widget_options_print_entry( int number, const char *prefix, int value,
   
   snprintf( buffer, 29, "%s: %d %s", prefix, value, suffix );
   widget_printstring( 2, number + 4, WIDGET_COLOUR_FOREGROUND, buffer );
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
-		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
-  uidisplay_frame_end();
+
+  widget_display_lines( number + 4, 1 );
 
   return 0;
 }

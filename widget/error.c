@@ -30,9 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "display.h"
 #include "keyboard.h"
-#include "ui/uidisplay.h"
 #include "widget_internals.h"
 
 static int split_message( const char *message, char ***lines, size_t *count,
@@ -69,9 +67,7 @@ int widget_error_draw( void *data )
 
   free( lines );
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 31 + count*8 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, count + 4 );
 
   return 0;
 }

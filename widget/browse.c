@@ -29,11 +29,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
 #include "tape.h"
-#include "ui/uidisplay.h"
 #include "widget_internals.h"
 
 /* The descriptions of the blocks */
@@ -59,8 +57,7 @@ widget_browse_draw( void *data GCC_UNUSED )
   widget_dialog_with_border( 1, 2, 30, 20 );
 
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Browse Tape" );
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16, DISPLAY_BORDER_HEIGHT + 23 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, 1 );
 
   highlight = tape_get_current_block();
   top_line = highlight - 8; if( top_line < 0 ) top_line = 0;
@@ -88,9 +85,7 @@ show_blocks( void )
     }
   }
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 32,
-		   DISPLAY_BORDER_HEIGHT + 32 + 18 * 8 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, 18 );
 }
 
 void

@@ -31,13 +31,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <libspectrum.h>
-
-#include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
 #include "machine.h"
-#include "ui/uidisplay.h"
 #include "widget_internals.h"
 
 /* Data for drawing the cursor */
@@ -71,9 +67,7 @@ int widget_select_draw( void* data GCC_UNUSED )
     }
   }
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + (machine_count+2)*8 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, machine_count + 2 );
 
   return 0;
 }
@@ -116,10 +110,8 @@ widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 		      WIDGET_COLOUR_FOREGROUND );
     widget_printstring( 2, highlight_line+4, WIDGET_COLOUR_BACKGROUND,
 			descriptions[ highlight_line ] );
-
-    uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		     DISPLAY_BORDER_HEIGHT + 16 + (machine_count+2)*8 );
-    uidisplay_frame_end();
+    
+    widget_display_lines( 2, machine_count + 2 );
 
     /* And set this as the new machine type */
     new_machine = machine_types[highlight_line]->machine;

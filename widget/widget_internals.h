@@ -72,6 +72,7 @@ int widget_timer_end( void );
 
 void widget_rectangle( int x, int y, int w, int h, int col );
 void widget_printstring( int x, int y, int col, const char *s );
+void widget_display_lines( int y, int h );
 
 extern widget_finish_state widget_finished;
 

@@ -35,10 +35,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
-#include "ui/uidisplay.h"
 #include "widget_internals.h"
 
 struct widget_dirent **widget_filenames; /* Filenames in the current
@@ -308,9 +306,7 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   }
 
   /* Display that lot */
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT,
-		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
-  uidisplay_frame_end();
+  widget_display_lines( 2, 20 );
 
   return 0;
 }
@@ -472,10 +468,7 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
       widget_print_filename( widget_filenames[ new_current_file ],
 			     new_current_file - top_left_file, 1 );
         
-      uidisplay_lines(DISPLAY_BORDER_HEIGHT,
-		      DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
-      uidisplay_frame_end();
-	  
+      widget_display_lines( 2, 20 );
     }
 
     /* Reset the current file marker */

@@ -28,8 +28,6 @@
 
 #include <string.h>
 
-#include "display.h"
-#include "ui/uidisplay.h"
 #include "widget_internals.h"
 
 char *widget_text_text;		/* What we return the text in */
@@ -63,9 +61,7 @@ widget_text_draw( void *data )
   widget_printstring(  2, 4, WIDGET_COLOUR_FOREGROUND, buffer );
   widget_printstring( 29, 4, WIDGET_COLOUR_FOREGROUND, "]" );
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 3 * 8 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, 3 );
 
   return 0;
 }

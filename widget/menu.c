@@ -33,7 +33,6 @@
 #include <sys/mman.h>
 
 #include "debugger/debugger.h"
-#include "display.h"
 #include "fuse.h"
 #include "machine.h"
 #include "rzx.h"
@@ -43,8 +42,6 @@
 #include "tape.h"
 #include "utils.h"
 #include "widget_internals.h"
-#include "ui/ui.h"
-#include "ui/uidisplay.h"
 
 widget_menu_entry *menu;
 
@@ -70,9 +67,7 @@ int widget_menu_draw( void *data )
     widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND,
 			menu[i+1].text );
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + (menu_entries+2)*8 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, menu_entries + 2 );
 
   return 0;
 }

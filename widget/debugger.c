@@ -29,9 +29,6 @@
 #include <stdio.h>
 
 #include "debugger/debugger.h"
-#include "display.h"
-#include "ui/ui.h"
-#include "ui/uidisplay.h"
 #include "widget_internals.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -76,9 +73,7 @@ widget_debugger_draw( void *data GCC_UNUSED )
   widget_printstring( 3, 10, WIDGET_COLOUR_FOREGROUND, "(S)tep" );
   widget_printstring( 3, 11, WIDGET_COLOUR_FOREGROUND, "(C)ontinue" );
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 11*8 );
-  uidisplay_frame_end();
+  widget_display_lines( 2, 11 );
 
   return 0;
 }
