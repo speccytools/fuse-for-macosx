@@ -27,6 +27,8 @@
 
 #include <config.h>
 
+#include <string.h>
+
 #include <libspectrum.h>
 
 #include "joystick.h"
