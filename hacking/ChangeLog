@@ -884,3 +884,4 @@
 20040531 fuse.c,utils.c: load .hdf images into the active IDE interface,
 	 or ZXCF if none active.
 20040601 utils.c: Add handling of LIBSPECTRUM_CLASS_CARTRIDGE_IF2.
+20040601 machines/spec_se.c: Add include <string.h> for memset.
