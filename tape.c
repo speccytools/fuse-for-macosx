@@ -37,6 +37,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "libspectrum/tape.h"
+#include "machine.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
@@ -439,7 +440,10 @@ int tape_next_edge( void )
   }
 
   /* If we've been requested to stop the tape, do so! */
-  if( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) {
+  if( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ||
+      ( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP48 ) && 
+	machine_current->machine == SPECTRUM_MACHINE_48 )
+    ) {
     error = tape_stop();
     if( error ) return error;
   }
