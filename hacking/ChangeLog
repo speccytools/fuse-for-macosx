@@ -838,3 +838,5 @@
 	 snapshots with ZXCF support.
 20040521 trdos.c,machines/{pentagon.c,scorpion.c,spec128.c}: use /ROMCS
 	 to page in the TRDOS ROM.
+20040521 spec_se.c,specplus3.c: enable /ROMCS on the +2A/+3/+3e/SE to
+	 let ZXCF work there.

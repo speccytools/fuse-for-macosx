@@ -226,25 +226,26 @@ spec_se_memory_map( void )
   memory_page **exrom_dock, **bank;
 
   /* Spectrum SE memory paging is just a combination of the 128K
-     0x7ffd and TimexDOCK/EXROM paging schemes with some small
-     exceptions */
+     0x7ffd and TimexDOCK/EXROM paging schemes with one exception */
   spec128_memory_map();
   scld_memory_map();
 
-  /* Exceptions apply iff an odd bank is paged in via 0x7ffd */
-  if( !( machine_current->ram.current_page & 0x01 ) ) return 0;
+  /* Exceptions apply if an odd bank is paged in via 0x7ffd */
+  if( machine_current->ram.current_page & 0x01 ) {
 
-  /* If an odd page is paged in, bits 2 and 3 of 0xf4 also control
-     whether the DOCK/EXROM is paged in at 0xc000 and 0xe000
-     respectively */
-  exrom_dock = 
-    scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
+  /* If so, bits 2 and 3 of 0xf4 also control whether the DOCK/EXROM
+     is paged in at 0xc000 and 0xe000 respectively */
+    exrom_dock = 
+      scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
 
-  bank = scld_last_hsr & ( 1 << 2 ) ? exrom_dock : memory_map_home;
-  memory_map_read[6] = memory_map_write[6] = *bank[6];
+    bank = scld_last_hsr & ( 1 << 2 ) ? exrom_dock : memory_map_home;
+    memory_map_read[6] = memory_map_write[6] = *bank[6];
 
-  bank = scld_last_hsr & ( 1 << 3 ) ? exrom_dock : memory_map_home;
-  memory_map_read[7] = memory_map_write[7] = *bank[7];
+    bank = scld_last_hsr & ( 1 << 3 ) ? exrom_dock : memory_map_home;
+    memory_map_read[7] = memory_map_write[7] = *bank[7];
+  }
+
+  memory_romcs_map();
 
   return 0;
 }

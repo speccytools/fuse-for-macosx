@@ -303,8 +303,6 @@ normal_memory_map( int rom, int page )
   memory_map_home[6] = &memory_map_ram[ 2 * page     ];
   memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
 
-  memory_update_home( 0, 8 );
-
   return 0;
 }
 
@@ -337,8 +335,6 @@ select_special_map( int page1, int page2, int page3, int page4 )
 
   memory_map_home[6] = &memory_map_ram[ 2 * page4     ];
   memory_map_home[7] = &memory_map_ram[ 2 * page4 + 1 ];
-
-  memory_update_home( 0, 8 );
 
   return 0;
 }
@@ -377,6 +373,7 @@ int
 specplus3_memory_map( void )
 {
   int page, rom, screen;
+  size_t i;
 
   page = machine_current->ram.last_byte & 0x07;
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
@@ -408,6 +405,11 @@ specplus3_memory_map( void )
 
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom  = rom;
+
+  for( i = 0; i < 8; i++ )
+    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
+
+  memory_romcs_map();
 
   return 0;
 }
