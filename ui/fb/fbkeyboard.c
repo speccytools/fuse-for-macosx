@@ -60,7 +60,7 @@ static const enum input_key keymap[128] = {
   0, INPUT_KEY_Escape, INPUT_KEY_1, INPUT_KEY_2,
   INPUT_KEY_3, INPUT_KEY_4, INPUT_KEY_5, INPUT_KEY_6,
   INPUT_KEY_7, INPUT_KEY_8, INPUT_KEY_9, INPUT_KEY_0,
-  INPUT_KEY_minus, INPUT_KEY_equal, INPUT_KEY_BackSpace, 0,
+  INPUT_KEY_minus, INPUT_KEY_equal, INPUT_KEY_BackSpace, INPUT_KEY_Tab,
 /* 0x10 */
   INPUT_KEY_q, INPUT_KEY_w, INPUT_KEY_e, INPUT_KEY_r,
   INPUT_KEY_t, INPUT_KEY_y, INPUT_KEY_u, INPUT_KEY_i,
