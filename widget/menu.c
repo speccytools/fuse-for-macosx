@@ -213,8 +213,10 @@ widget_menu_rzx_stop( void *data GCC_UNUSED )
 int
 widget_menu_save_screen( void *data GCC_UNUSED )
 {
-  widget_end_all( WIDGET_FINISHED_OK );
-  return screenshot_write( "fuse.png", SCALER_NORMAL );
+  widget_do( WIDGET_TYPE_SCALER, screenshot_available_scalers );
+  if( widget_scaler == SCALER_NUM ) return 0;
+
+  return screenshot_write( "fuse.png", widget_scaler );
 }
 #endif			/* #ifdef USE_LIBPNG */
 
