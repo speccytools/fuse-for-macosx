@@ -279,9 +279,15 @@ int snapshot_copy_to( libspectrum_snap *snap )
   case SPECTRUM_MACHINE_128:
     snap->machine = LIBSPECTRUM_MACHINE_128;
     break;
+  case SPECTRUM_MACHINE_PLUS2A:
+    ui_error( UI_ERROR_INFO, "Saving as a +3 snapshot" );
+    /* Fall through */
+  case SPECTRUM_MACHINE_PLUS3:
+    snap->machine = LIBSPECTRUM_MACHINE_PLUS3;
+    break;
   default:
     ui_error( UI_ERROR_ERROR, "Can't handle machine type %d in snapshots",
-	      snap->machine );
+	      machine_current->machine );
     return 1;
   }
 
