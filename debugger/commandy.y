@@ -125,19 +125,24 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 
 breakpointlife:   BREAK  { $$ = DEBUGGER_BREAKPOINT_LIFE_PERMANENT; }
 		| TBREAK { $$ = DEBUGGER_BREAKPOINT_LIFE_ONESHOT; }
+;
 
 breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
 	        | READ        { $$ = DEBUGGER_BREAKPOINT_TYPE_READ; }
                 | WRITE       { $$ = DEBUGGER_BREAKPOINT_TYPE_WRITE; }
+;
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
 		    | WRITE { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE; }
+;
 
 numberorpc:   /* empty */ { $$ = PC; }
             | NUMBER	  { $$ = $1; }
+;
 
 expressionornull:   /* empty */ { $$ = NULL; }
 	          | expression  { $$ = $1; }
+;
 
 expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 		       if( !$$ ) YYABORT;
@@ -145,4 +150,6 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 	    | REGISTER { $$ = debugger_expression_new_register( $1 );
 			 if( !$$ ) YYABORT;
 		       }
+;
+
 %%
