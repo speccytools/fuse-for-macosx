@@ -1,5 +1,5 @@
 /* widget.c: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001-2003 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall, Russell Marks
 
    $Id$
 
@@ -414,5 +414,13 @@ ui_statusbar_update_speed( float speed )
   return 0;
 }
 #endif                          /* #ifndef UI_SDL */
+
+/* Tape browser update function. The dialog box is created every time it
+   is displayed, so no need to do anything here */
+int
+ui_tape_browser_update( void )
+{
+  return 0;
+}
 
 #endif				/* #ifdef USE_WIDGET */

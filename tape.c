@@ -688,18 +688,3 @@ tape_block_details( char *buffer, size_t length,
 
   return 0;
 }
-
-int
-tape_free_block_list( char ***list, size_t n )
-{
-  size_t i;
-
-  for( i=0; i<n; i++ ) {
-    free( list[i][0] ); free( list[i][1] );
-    free( list[i] );
-  }
-
-  free( list );
-
-  return 0;
-}

@@ -442,3 +442,5 @@
 	 optimisations.
 20040104 tape.[ch], ui/ui.h, ui/gtk/browse.c: make the GTK+ tape browser
 	 no longer modal.
+20040104 widget/{browse,widget}.c: fix up the widget UIs for the new
+	 tape browser code.

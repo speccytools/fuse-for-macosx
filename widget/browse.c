@@ -1,5 +1,5 @@
 /* browse.c: tape browser widget
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -31,14 +31,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#else				/* #ifdef HAVE_LIB_GLIB */
+#include <libspectrum.h>
+#endif				/* #ifdef HAVE_LIB_GLIB */
+
 #include "fuse.h"
 #include "keyboard.h"
 #include "tape.h"
 #include "widget_internals.h"
 
 /* The descriptions of the blocks */
-static char ***block_descriptions;
-static size_t blocks;
+static GSList *blocks;
+
+/* How many blocks we have in total */
+size_t block_count;
 
 /* Which block is shown on the top line of the widget */
 static int top_line;
@@ -47,14 +55,18 @@ static int top_line;
 static int highlight;
 
 static void show_blocks( void );
+static void add_block_description( libspectrum_tape_block *block,
+				   void *user_data );
+static void free_description( gpointer data, gpointer user_data );
 
 int
 widget_browse_draw( void *data GCC_UNUSED )
 {
   int error;
 
-  error = tape_get_block_list( &block_descriptions, &blocks );
-  if( error ) return 1;
+  blocks = NULL; block_count = 0;
+  error = tape_foreach( add_block_description, &blocks );
+  if( error ) return error;
 
   widget_dialog_with_border( 1, 2, 30, 20 );
 
@@ -70,21 +82,42 @@ widget_browse_draw( void *data GCC_UNUSED )
 }
 
 static void
+add_block_description( libspectrum_tape_block *block, void *user_data )
+{
+  GSList **ptr = user_data;
+
+  char *buffer;
+
+  buffer = malloc( 30 ); if( !buffer ) return;
+  libspectrum_tape_block_description( buffer, 30, block );
+
+  (*ptr) = g_slist_append( *ptr, buffer );
+
+  block_count++;
+}
+
+static void
 show_blocks( void )
 {
   size_t i; char buffer[30];
+  GSList *ptr;
 
   widget_rectangle( 2*8, 4*8, 28*8, 18*8, WIDGET_COLOUR_BACKGROUND );
 
-  for( i=0; i<18 && top_line+i<blocks; i++ ) {
-    snprintf( buffer, 29, "%2lu: %s", (unsigned long)(top_line+i+1),
-	      block_descriptions[top_line+i][0] );
+  for( i = 0, ptr = g_slist_nth( blocks, top_line );
+       i < 18 && ptr;
+       i++, ptr = ptr->next ) {
+
+    snprintf( buffer, 30, "%2lu: %s", (unsigned long)( top_line + i + 1 ),
+	      (char*)ptr->data );
+
     if( top_line+i == highlight ) {
       widget_rectangle( 2*8, (i+4)*8, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
       widget_printstring( 2, i+4, WIDGET_COLOUR_BACKGROUND, buffer );
     } else {
       widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND, buffer );
     }
+
   }
 
   widget_display_lines( 2, 18 );
@@ -105,7 +138,7 @@ widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   case KEYBOARD_6:
   case KEYBOARD_j:
-    if( highlight < blocks - 1 ) {
+    if( highlight < block_count - 1 ) {
       highlight++;
       if( highlight >= top_line + 18 ) top_line += 18;
       show_blocks();
@@ -132,10 +165,11 @@ widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     break;
 
   case KEYBOARD_PageDown:
-    highlight += 18; if( highlight >= blocks ) highlight = blocks - 1;
-    top_line  += 18;
-    if( top_line  >= blocks ) {
-      top_line = blocks - 18;
+    highlight += 18;
+    if( highlight >= block_count ) highlight = block_count - 1;
+    top_line += 18;
+    if( top_line >= block_count ) {
+      top_line = block_count - 18;
       if( top_line < 0 ) top_line = 0;
     }
     show_blocks();
@@ -147,8 +181,8 @@ widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     break;
 
   case KEYBOARD_End:
-    highlight = blocks - 1;
-    top_line = blocks - 18; if( top_line < 0 ) top_line = 0;
+    highlight = block_count - 1;
+    top_line = block_count - 18; if( top_line < 0 ) top_line = 0;
     show_blocks();
     break;
 
@@ -165,7 +199,8 @@ widget_browse_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 int
 widget_browse_finish( widget_finish_state finished )
 {
-  tape_free_block_list( block_descriptions, blocks );
+  g_slist_foreach( blocks, free_description, NULL );
+  g_slist_free( blocks );
 
   if( finished == WIDGET_FINISHED_OK ) {
     if( highlight != -1 ) tape_select_block( highlight );
@@ -173,6 +208,12 @@ widget_browse_finish( widget_finish_state finished )
   }
     
   return 0;
+}
+
+static void 
+free_description( gpointer data, gpointer user_data )
+{
+  free( data );
 }
 
 #endif				/* #ifdef USE_WIDGET */
