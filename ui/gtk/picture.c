@@ -43,6 +43,8 @@
 #include "ui/ui.h"
 #include "utils.h"
 
+static int read_screen( const char *filename, BYTE **screen, size_t *length );
+static void draw_screen( GdkImage *image, BYTE *screen, int border );
 static gint
 picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data );
 
@@ -54,9 +56,6 @@ struct picture_data {
 int
 gtkui_picture( const char *filename, int border )
 {
-  int fd, error, i, x, y;
-  BYTE attr, ink, paper, data;
-
   BYTE *screen; size_t length;
 
   GtkWidget *dialog;
@@ -65,21 +64,7 @@ gtkui_picture( const char *filename, int border )
 
   fuse_emulation_pause();
 
-  fd = utils_find_lib( filename );
-  if( fd == -1 ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
-	      filename );
-    fuse_emulation_unpause();
-    return 1;
-  }
-  
-  error = utils_read_fd( fd, filename, &screen, &length );
-  if( error ) return error;
-
-  if( length != 6912 ) {
-    munmap( screen, length );
-    ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
-	      filename );
+  if( read_screen( filename, &screen, &length ) ) {
     fuse_emulation_unpause();
     return 1;
   }
@@ -108,56 +93,11 @@ gtkui_picture( const char *filename, int border )
   callback_data->image =
     gdk_image_new( GDK_IMAGE_FASTEST, gdk_visual_get_system(),
 		   DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
-
-  for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
-    for( x=0; x < DISPLAY_ASPECT_WIDTH; x ++ ) {
-      gdk_image_put_pixel( callback_data->image, x, y, 
-			   gtkdisplay_colours[ border ] );
-      gdk_image_put_pixel( callback_data->image,
-			   x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
-			   gtkdisplay_colours[ border ] );
-    }
-  }
-
-  for( y=0; y<DISPLAY_HEIGHT; y++ ) {
-
-    for( x=0; x < DISPLAY_BORDER_WIDTH; x+=2 ) {
-      gdk_image_put_pixel(
-        callback_data->image, x >> 1, y + DISPLAY_BORDER_HEIGHT,
-	gtkdisplay_colours[ border ]
-      );
-      gdk_image_put_pixel(
-        callback_data->image,
-	( x + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH ) >> 1,
-	y + DISPLAY_BORDER_HEIGHT, gtkdisplay_colours[ border ]
-      );
-    }
-
-    for( x=0; x < DISPLAY_WIDTH_COLS; x++ ) {
-
-      attr = screen[ display_attr_start[y] + x ];
-
-      ink = ( attr & 0x07 ) + ( ( attr & 0x40 ) >> 3 );
-      paper = ( attr & ( 0x0f << 3 ) ) >> 3;
-
-      data = screen[ display_line_start[y]+x ];
-
-      for( i=0; i<8; i++ ) {
-	gdk_image_put_pixel( callback_data->image,
-			     ( DISPLAY_BORDER_WIDTH >> 1 ) + ( 8 * x ) + i,
-			     y + DISPLAY_BORDER_HEIGHT,
-			     ( data & 0x80 ) ? gtkdisplay_colours[ ink ]
-                                             : gtkdisplay_colours[ paper ] );
-	data <<= 1;
-      }
-    }
-
-  }
+  draw_screen( callback_data->image, screen, border );
 
   ok_button = gtk_button_new_with_label( "OK" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     ok_button );
-
   gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtk_widget_destroy ),
 			     GTK_OBJECT( dialog ) );
@@ -174,6 +114,79 @@ gtkui_picture( const char *filename, int border )
   fuse_emulation_unpause();
 
   return 0;
+}
+
+static int
+read_screen( const char *filename, BYTE **screen, size_t *length )
+{
+  int fd, error;
+
+  fd = utils_find_lib( filename );
+  if( fd == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
+	      filename );
+    return 1;
+  }
+  
+  error = utils_read_fd( fd, filename, screen, length );
+  if( error ) return error;
+
+  if( *length != 6912 ) {
+    munmap( *screen, *length );
+    ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
+	      filename );
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
+draw_screen( GdkImage *image, BYTE *screen, int border )
+{
+  int i, x, y, ink, paper;
+  BYTE attr, data; 
+
+  for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
+    for( x=0; x < DISPLAY_ASPECT_WIDTH; x ++ ) {
+      gdk_image_put_pixel( image, x, y, gtkdisplay_colours[ border ] );
+      gdk_image_put_pixel( image, 
+			   x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
+			   gtkdisplay_colours[ border ] );
+    }
+  }
+
+  for( y=0; y<DISPLAY_HEIGHT; y++ ) {
+
+    for( x=0; x < DISPLAY_BORDER_WIDTH; x+=2 ) {
+      gdk_image_put_pixel( image, x >> 1, y + DISPLAY_BORDER_HEIGHT,
+			   gtkdisplay_colours[ border ] );
+      gdk_image_put_pixel(
+        image, ( x + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH ) >> 1,
+	y + DISPLAY_BORDER_HEIGHT, gtkdisplay_colours[ border ]
+      );
+    }
+
+    for( x=0; x < DISPLAY_WIDTH_COLS; x++ ) {
+
+      attr = screen[ display_attr_start[y] + x ];
+
+      ink = ( attr & 0x07 ) + ( ( attr & 0x40 ) >> 3 );
+      paper = ( attr & ( 0x0f << 3 ) ) >> 3;
+
+      data = screen[ display_line_start[y]+x ];
+
+      for( i=0; i<8; i++ ) {
+	gdk_image_put_pixel( image,
+			     ( DISPLAY_BORDER_WIDTH >> 1 ) + ( 8 * x ) + i,
+			     y + DISPLAY_BORDER_HEIGHT,
+			     ( data & 0x80 ) ? gtkdisplay_colours[ ink ]
+                                             : gtkdisplay_colours[ paper ] );
+	data <<= 1;
+      }
+    }
+
+  }
 }
 
 static gint
