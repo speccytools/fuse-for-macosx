@@ -834,3 +834,8 @@
          autotools per patch #953734.
 20040518 roms/se-0.rom: Change 3 bytes at 0x240 to XOR A, OUT (FF), A instead
          of NOP, NOP, NOP. This resets the SCLD on real hardware.
+20040519 machine.c,snapshot.[ch],zxcf.[ch]: add support for saving
+	 snapshots with ZXCF support.
+
+
+	

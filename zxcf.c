@@ -34,7 +34,6 @@
 #include "zxcf.h"
 
 /*
-  TBD: Allow save/load of memory
   TBD: Allow memory size selection (128K/512K/1024K)
   TBD: Add secondary channel
 */
@@ -45,7 +44,6 @@
 static void set_zxcf_bank( int bank );
 static libspectrum_byte zxcf_memctl_read( libspectrum_word port,
 					  int *attached );
-static void zxcf_memctl_write( libspectrum_word port, libspectrum_byte data );
 static libspectrum_byte zxcf_ide_read( libspectrum_word port, int *attached );
 static void zxcf_ide_write( libspectrum_word port, libspectrum_byte data );
 
@@ -64,6 +62,8 @@ static int zxcf_writeenable;
 static libspectrum_ide_channel *zxcf_idechn;
 
 static libspectrum_byte ZXCFMEM[ 64 ][ 0x4000 ];
+
+static libspectrum_byte last_memctl;
 
 /* Housekeeping functions */
 
@@ -167,10 +167,12 @@ zxcf_memctl_read( libspectrum_word port GCC_UNUSED, int *attached )
   return 0xff;
 }
 
-static void
+void
 zxcf_memctl_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   if( !settings_current.zxcf_active ) return;
+
+  last_memctl = data;
 
   /* Bit 7 MEMOFF: 0=mem on, 1 =mem off */
   machine_current->ram.romcs = ( data & 0x80 ) ? 0 : 1;
@@ -184,6 +186,12 @@ zxcf_memctl_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
   machine_current->memory_map();
 }
 
+libspectrum_byte
+zxcf_last_memctl( void )
+{
+  return last_memctl;
+}
+
 static libspectrum_byte
 zxcf_ide_read( libspectrum_word port, int *attached )
 {
@@ -194,14 +202,21 @@ zxcf_ide_read( libspectrum_word port, int *attached )
   *attached = 1;
 
   return libspectrum_ide_read( zxcf_idechn, idereg ); 
-}  
+}
 
 static void
 zxcf_ide_write( libspectrum_word port, libspectrum_byte data )
 {
-  libspectrum_ide_register idereg = ( port >> 8 ) & 0x07;
+  libspectrum_ide_register idereg;
   
   if( !settings_current.zxcf_active ) return;
 
+  idereg = ( port >> 8 ) & 0x07;
   libspectrum_ide_write( zxcf_idechn, idereg, data ); 
+}
+
+libspectrum_byte*
+zxcf_ram( size_t page )
+{
+  return ZXCFMEM[ page ];
 }

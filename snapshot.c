@@ -1,5 +1,5 @@
 /* snapshot.c: snapshot handling routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -39,6 +39,7 @@
 #include "scld.h"
 #include "machines/scorpion.h"
 #include "machines/spec128.h"
+#include "settings.h"
 #include "sound.h"
 #include "snapshot.h"
 #include "spectrum.h"
@@ -46,6 +47,7 @@
 #include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+#include "zxcf.h"
 
 int snapshot_read( const char *filename )
 {
@@ -78,17 +80,6 @@ int snapshot_read( const char *filename )
   return 0;
 }
 
-void snapshot_flush_slt (void)
-{
-  int i;
-  for ( i=0; i<256; i++ ) {
-    if( slt[i] ) free( slt[i] );
-    slt[i] = NULL;
-    slt_length[i] = 0;
-  }
-  slt_screen = NULL;
-}
-
 int
 snapshot_read_buffer( const unsigned char *buffer, size_t length,
 		      libspectrum_id_t type )
@@ -111,7 +102,7 @@ snapshot_read_buffer( const unsigned char *buffer, size_t length,
 int
 snapshot_copy_from( libspectrum_snap *snap )
 {
-  int i,j; int error;
+  int i, error;
   int capabilities;
 
   libspectrum_machine machine = libspectrum_snap_machine( snap );
@@ -224,13 +215,12 @@ snapshot_copy_from( libspectrum_snap *snap )
 
     if( slt_length[i] ) {
 
-      slt[i] = malloc( slt_length[i] * sizeof( libspectrum_byte ) );
-      if( slt[i] == NULL ) {
-	for( j=0; j<i; j++ ) {
-	  if( slt_length[j] ) { free( slt[j] ); slt_length[j] = 0; }
-	  ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_from" );
-	  return 1;
-	}
+      slt[i] = memory_pool_allocate( slt_length[i] *
+				     sizeof( libspectrum_byte ) );
+      if( !slt[i] ) {
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+		  __LINE__ );
+	return 1;
       }
 
       memcpy( slt[i], libspectrum_snap_slt( snap, i ),
@@ -240,17 +230,24 @@ snapshot_copy_from( libspectrum_snap *snap )
 
   if( libspectrum_snap_slt_screen( snap ) ) {
 
-    slt_screen = malloc( 6912 * sizeof( libspectrum_byte ) );
-    if( slt_screen == NULL ) {
-      for( i=0; i<256; i++ ) {
-	if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }
-	ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_from" );
-	return 1;
-      }
+    slt_screen = memory_pool_allocate( 6912 * sizeof( libspectrum_byte ) );
+    if( !slt_screen ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
     }
 
     memcpy( slt_screen, libspectrum_snap_slt_screen( snap ), 6912 );
     slt_screen_level = libspectrum_snap_slt_screen_level( snap );
+  }
+
+  if( libspectrum_snap_zxcf_active( snap ) ) {
+
+    settings_current.zxcf_active = 1;
+    zxcf_memctl_write( 0x10bf, libspectrum_snap_zxcf_memctl( snap ) );
+
+    for( i = 0; i < libspectrum_snap_zxcf_pages( snap ); i++ )
+      if( libspectrum_snap_zxcf_ram( snap, i ) )
+	memcpy( zxcf_ram( i ), libspectrum_snap_zxcf_ram( snap, i ), 0x4000 );
   }
 	  
   return 0;
@@ -308,9 +305,11 @@ int snapshot_write( const char *filename )
 
 }
 
-int snapshot_copy_to( libspectrum_snap *snap )
+int
+snapshot_copy_to( libspectrum_snap *snap )
 {
-  int i,j;
+  size_t i;
+  libspectrum_byte *buffer;
 
   libspectrum_snap_set_machine( snap, machine_current->machine );
 
@@ -368,16 +367,10 @@ int snapshot_copy_to( libspectrum_snap *snap )
   for( i = 0; i < 16; i++ ) {
     if( RAM[i] != NULL ) {
 
-      libspectrum_byte *buffer;
-
       buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
       if( !buffer ) {
-	for( j=0; j<i; j++ )
-	  if( libspectrum_snap_pages( snap, j ) ) {
-	    free( libspectrum_snap_pages( snap, j ) );
-	    libspectrum_snap_set_pages( snap, j, NULL );
-	  }
-	ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_to" );
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+		  __LINE__ );
 	return 1;
       }
 
@@ -396,20 +389,9 @@ int snapshot_copy_to( libspectrum_snap *snap )
 
       buffer = malloc( slt_length[i] * sizeof(libspectrum_byte) );
       if( !buffer ) {
-
-	for( j=0; j<8; j++ )
-	  if( libspectrum_snap_pages( snap, j ) ) {
-	    free( libspectrum_snap_pages( snap, j ) );
-	    libspectrum_snap_set_pages( snap, j, NULL );
-	  }
-	for( j=0; j<i; j++ )
-	  if( libspectrum_snap_slt( snap, j ) ) {
-	    free( libspectrum_snap_slt( snap, j ) );
-	    libspectrum_snap_set_slt_length( snap, j, 0 );
-	  }
-	ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_to" );
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+		  __LINE__ );
 	return 1;
-
       }
 
       memcpy( buffer, slt[i], slt_length[i] );
@@ -424,25 +406,34 @@ int snapshot_copy_to( libspectrum_snap *snap )
     buffer = malloc( 6912 * sizeof( libspectrum_byte ) );
 
     if( !buffer ) {
-
-      for( i=0; i<8; i++ )
-	if( libspectrum_snap_pages( snap, i ) ) {
-	  free( libspectrum_snap_pages( snap, i ) );
-	  libspectrum_snap_set_pages( snap, i, NULL );
-	}
-      for( i=0; i<256; i++ )
-	if( libspectrum_snap_slt( snap, i ) ) {
-	  free( libspectrum_snap_slt( snap, i ) );
-	  libspectrum_snap_set_slt_length( snap, i, 0 );
-	}
-      ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_to" );
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;
-
     }
 
     memcpy( buffer, slt_screen, 6912 );
     libspectrum_snap_set_slt_screen( snap, buffer );
     libspectrum_snap_set_slt_screen_level( snap, slt_screen_level );
+  }
+
+  if( settings_current.zxcf_active ) {
+
+    libspectrum_snap_set_zxcf_active( snap, 1 );
+    libspectrum_snap_set_zxcf_memctl( snap, zxcf_last_memctl() );
+    libspectrum_snap_set_zxcf_pages( snap, 64 );
+
+    for( i = 0; i < 64; i++ ) {
+
+      buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+      if( !buffer ) {
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+		  __LINE__ );
+	return 1;
+      }
+
+      memcpy( buffer, zxcf_ram( i ), 0x4000 );
+      libspectrum_snap_set_zxcf_ram( snap, i, buffer );
+
+    }
   }
     
   return 0;

@@ -38,6 +38,4 @@ int snapshot_copy_from( libspectrum_snap *snap );
 int snapshot_write( const char *filename );
 int snapshot_copy_to( libspectrum_snap *snap );
 
-void snapshot_flush_slt( void );
-
 #endif

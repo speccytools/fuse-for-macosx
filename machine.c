@@ -322,7 +322,6 @@ machine_reset( void )
      sound_frame() or sound_ay_write() */
   sound_ay_reset();
 
-  snapshot_flush_slt();
   printer_zxp_reset();
   scld_reset();
   tape_stop();

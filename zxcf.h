@@ -38,7 +38,11 @@ void zxcf_reset( void );
 int zxcf_insert( const char *filename );
 int zxcf_commit();
 int zxcf_eject( void );
-void zxcf_mem_setcs( void );
+
+void zxcf_memctl_write( libspectrum_word port, libspectrum_byte data );
+libspectrum_byte zxcf_last_memctl( void );
+
+libspectrum_byte* zxcf_ram( size_t page );
 
 #endif			/* #ifndef FUSE_ZXCF_H */
 
