@@ -176,7 +176,7 @@ browse_done( GtkWidget *widget, gpointer data )
   struct browse_data *callback_data = (struct browse_data*)data;
 
   /* Set the tape to the appropriate block */
-  tape_select_block( callback_data->row );
+  if( callback_data->row != -1 ) tape_select_block( callback_data->row );
 
   gtkui_destroy_widget_and_quit( callback_data->dialog, NULL );
 }

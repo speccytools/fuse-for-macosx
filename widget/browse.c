@@ -170,7 +170,7 @@ widget_browse_finish( widget_finish_state finished )
   tape_free_block_list( block_descriptions, blocks );
 
   if( finished == WIDGET_FINISHED_OK ) {
-    tape_select_block( highlight );
+    if( highlight != -1 ) tape_select_block( highlight );
     widget_end_all( WIDGET_FINISHED_OK );
   }
     
