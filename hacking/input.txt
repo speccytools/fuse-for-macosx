@@ -5,7 +5,7 @@ interfaces.
 
 When some input is received from the user, the user interface code
 should set up an input_event_t structure and then simply call
-input.txt.
+input_event().
 
 input_event_t is defined as follows:
 
