@@ -1,5 +1,5 @@
 /* acconfig.h: Descriptions of macros produced by autoconf
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000,2002 Philip Kendall
 
    $Id$
 
@@ -23,6 +23,8 @@
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
+
+@TOP@
 
 /* Defined if we've got enough memory to compile z80_ops.c */
 #undef HAVE_ENOUGH_MEMORY
