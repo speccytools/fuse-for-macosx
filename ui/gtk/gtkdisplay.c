@@ -56,8 +56,8 @@ int image_width, image_height;
 
 /* An RGB image of the Spectrum screen; slightly bigger than the real
    screen to handle the smoothing filters which read around each pixel */
-static guchar rgb_image[ 4 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
-		             ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
+static guchar rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
+		                 ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
 static const gint rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
@@ -125,7 +125,7 @@ gtkdisplay_init( void )
 
   for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
     for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
-      rgb_image[ y + rgb_pitch + 4 * x ] = colours[0];
+      rgb_image[ y * rgb_pitch + 4 * x ] = colours[0];
 
   display_ui_initialised = 1;
 
@@ -278,12 +278,13 @@ uidisplay_area( int x, int y, int w, int h )
 
   /* Create the RGB image */
   for( xx = x; xx < x + w; xx++ )
-    for( yy = y; yy < y + h; yy++ )
-      *(DWORD*)(rgb_image + ( yy + 1 ) * rgb_pitch + 4 * ( xx + 1 ) ) =
+    for( yy = y; yy < y + h; yy++ ) {
+      *(DWORD*)(rgb_image + ( yy + 2 ) * rgb_pitch + 4 * ( xx + 1 ) ) =
 	colours[ display_image[yy][xx] ];
+    }
 
   /* Create scaled image */
-  scaler_proc( (BYTE*)&rgb_image[ ( y + 1 ) * rgb_pitch + 4 * ( x + 1 ) ],
+  scaler_proc( (BYTE*)&rgb_image[ ( y + 2 ) * rgb_pitch + 4 * ( x + 1 ) ],
 	       rgb_pitch, NULL, 
 	       (BYTE*)&scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
 	       scaled_pitch, w, h );
