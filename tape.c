@@ -90,30 +90,28 @@ tape_open_default_autoload( const char *filename )
 
 int tape_open( const char *filename, int autoload )
 {
-  unsigned char *buffer; size_t length;
+  utils_file file;
   int error;
 
   /* If we already have a tape file open, close it */
   if( libspectrum_tape_present( tape ) ) {
     error = tape_close();
-    if( error ) { munmap( buffer, length ); return error; }
+    if( error ) { utils_close_file( &file ); return error; }
   }
 
   /* Get the file's data */
-  error = utils_read_file( filename, &buffer, &length );
+  error = utils_read_file( filename, &file );
   if( error ) return error;
 
-  error = libspectrum_tape_read( tape, buffer, length, LIBSPECTRUM_ID_UNKNOWN,
-				 filename );
+  error = libspectrum_tape_read( tape, file.buffer, file.length,
+				 LIBSPECTRUM_ID_UNKNOWN, filename );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    munmap( buffer, length );
+    utils_close_file( &file );
     return error;
   }
 
-  if( length && munmap( buffer, length ) == -1 ) {
+  if( utils_close_file( &file ) ) {
     tape_close();
-    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
-	      strerror( errno ) );
     return 1;
   }
 
@@ -153,7 +151,7 @@ tape_autoload( libspectrum_machine hardware )
 {
   int error; const char *id; int fd;
   char filename[80];
-  unsigned char *snap; size_t length;
+  utils_file snap;
 
   id = machine_get_id( hardware );
   if( !id ) {
@@ -169,13 +167,14 @@ tape_autoload( libspectrum_machine hardware )
     return 1;
   }
 
-  error = utils_read_fd( fd, filename, &snap, &length );
+  error = utils_read_fd( fd, filename, &snap );
   if( error ) return error;
 
-  error = snapshot_read_buffer( snap, length, LIBSPECTRUM_ID_SNAPSHOT_Z80 );
-  if( error ) { munmap( snap, length ); return error; }
+  error = snapshot_read_buffer( snap.buffer, snap.length,
+				LIBSPECTRUM_ID_SNAPSHOT_Z80 );
+  if( error ) { utils_close_file( &snap ); return error; }
 
-  if( munmap( snap, length ) ) {
+  if( utils_close_file( &snap ) ) {
     ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
 	      strerror( errno ) );
     return 1;

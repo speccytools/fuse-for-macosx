@@ -52,7 +52,7 @@ static const gint picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
 
 static int screen_drawn = 0;
 
-static int read_screen( const char *filename, BYTE **screen, size_t *length );
+static int read_screen( const char *filename, utils_file *screen );
 static void draw_screen( BYTE *screen, int border );
 static gint
 picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data );
@@ -60,7 +60,7 @@ picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data );
 int
 gtkui_picture( const char *filename, int border )
 {
-  BYTE *screen; size_t length;
+  utils_file screen;
 
   GtkWidget *dialog;
   GtkWidget *ok_button;
@@ -72,16 +72,14 @@ gtkui_picture( const char *filename, int border )
 
   if( !screen_drawn ) {
 
-    if( read_screen( filename, &screen, &length ) ) {
+    if( read_screen( filename, &screen ) ) {
       fuse_emulation_unpause();
       return 1;
     }
 
-    draw_screen( screen, border );
+    draw_screen( screen.buffer, border );
 
-    if( munmap( screen, length ) == -1 ) {
-      ui_error( UI_ERROR_ERROR, "Couldn't munmap keyboard picture ('%s'): %s",
-		filename, strerror( errno ) );
+    if( utils_close_file( &screen ) ) {
       fuse_emulation_unpause();
       return 1;
     }
@@ -124,7 +122,7 @@ gtkui_picture( const char *filename, int border )
 }
 
 static int
-read_screen( const char *filename, BYTE **screen, size_t *length )
+read_screen( const char *filename, utils_file *screen )
 {
   int fd, error;
 
@@ -135,11 +133,11 @@ read_screen( const char *filename, BYTE **screen, size_t *length )
     return 1;
   }
   
-  error = utils_read_fd( fd, filename, screen, length );
+  error = utils_read_fd( fd, filename, screen );
   if( error ) return error;
 
-  if( *length != 6912 ) {
-    munmap( *screen, *length );
+  if( screen->length != 6912 ) {
+    utils_close_file( screen );
     ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
 	      filename );
     return 1;

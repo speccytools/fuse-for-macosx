@@ -392,7 +392,7 @@ int widget_menu_keyboard( void *data )
   widget_picture_data *ptr = (widget_picture_data*)data;
 
   int error, fd;
-  size_t length;
+  utils_file file;
 
   fd = utils_find_lib( ptr->filename );
   if( fd == -1 ) {
@@ -401,22 +401,21 @@ int widget_menu_keyboard( void *data )
     return 1;
   }
   
-  error = utils_read_fd( fd, ptr->filename, &(ptr->screen), &length );
+  error = utils_read_fd( fd, ptr->filename, &file );
   if( error ) return error;
 
-  if( length != 6912 ) {
+  if( file.length != 6912 ) {
     ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
 	      ptr->filename );
+    utils_close_file( &file );
     return 1;
   }
+
+  ptr->screen = file.buffer;
 
   widget_do( WIDGET_TYPE_PICTURE, ptr );
 
-  if( munmap( ptr->screen, length ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't munmap keyboard picture ('%s'): %s",
-	      ptr->filename, strerror( errno ) );
-    return 1;
-  }
+  if( utils_close_file( &file ) ) return 1;
 
   return 0;
 }

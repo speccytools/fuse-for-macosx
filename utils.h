@@ -1,5 +1,5 @@
 /* utils.h: some useful helper functions
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -29,13 +29,29 @@
 
 #include <libspectrum.h>
 
+/* The ways we may have allocated memory for a file */
+typedef enum utils_file_open_mode {
+
+  UTILS_FILE_OPEN_MMAP,
+  UTILS_FILE_OPEN_MALLOC,
+
+} utils_file_open_mode;
+
+typedef struct utils_file {
+
+  unsigned char *buffer;
+  size_t length;
+
+  utils_file_open_mode mode;
+
+} utils_file;
+
 int utils_open_file( const char *filename, int autoload,
 		     libspectrum_id_t *type );
 int utils_find_lib( const char *filename );
-int utils_read_file( const char *filename, unsigned char **buffer,
-		     size_t *length );
-int utils_read_fd( int fd, const char *filename,
-		   unsigned char **buffer, size_t *length );
+int utils_read_file( const char *filename, utils_file *file );
+int utils_read_fd( int fd, const char *filename, utils_file *file );
+int utils_close_file( utils_file *file );
 
 int utils_write_file( const char *filename, const unsigned char *buffer,
 		      size_t length );

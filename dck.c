@@ -80,8 +80,7 @@ dck_eject( void )
 int
 dck_read( const char *filename )
 {
-  unsigned char *buffer;
-  size_t length;
+  utils_file file;
   size_t num_block = 0;
   libspectrum_dck *dck;
   int error;
@@ -97,18 +96,16 @@ dck_read( const char *filename )
 
   error = libspectrum_dck_alloc( &dck ); if( error ) return error;
 
-  error = utils_read_file( filename, &buffer, &length );
+  error = utils_read_file( filename, &file );
   if( error ) { libspectrum_dck_free( dck, 0 ); return error; }
 
-  error = libspectrum_dck_read( dck, buffer, length );
+  error = libspectrum_dck_read( dck, file.buffer, file.length );
   if( error ) {
-    munmap( buffer, length ); libspectrum_dck_free (dck, 0); return error;
+    utils_close_file( &file ); libspectrum_dck_free( dck, 0 ); return error;
   }
 
-  if( munmap( buffer, length ) == -1 ) {
-    libspectrum_dck_free (dck, 0);
-    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
-	      strerror( errno ) );
+  if( utils_close_file( &file ) ) {
+    libspectrum_dck_free( dck, 0 );
     return 1;
   }
 

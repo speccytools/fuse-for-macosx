@@ -1,5 +1,5 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -55,16 +55,17 @@ int
 utils_open_file( const char *filename, int autoload,
 		 libspectrum_id_t *type_ptr)
 {
-  unsigned char *buffer; size_t length;
+  utils_file file;
   libspectrum_id_t type;
   int error = 0;
 
   /* Read the file into a buffer */
-  if( utils_read_file( filename, &buffer, &length ) ) return 1;
+  if( utils_read_file( filename, &file ) ) return 1;
 
   /* See if we can work out what it is */
-  if( libspectrum_identify_file( &type, filename, buffer, length ) ) {
-    munmap( buffer, length );
+  if( libspectrum_identify_file( &type, filename,
+				 file.buffer, file.length ) ) {
+    utils_close_file( &file );
     return 1;
   }
 
@@ -73,22 +74,22 @@ utils_open_file( const char *filename, int autoload,
   case LIBSPECTRUM_ID_UNKNOWN:
     ui_error( UI_ERROR_ERROR, "utils_open_file: couldn't identify `%s'",
 	      filename );
-    munmap( buffer, length );
+    utils_close_file( &file );
     return 1;
 
   case LIBSPECTRUM_ID_RECORDING_RZX:
-    error = rzx_start_playback_from_buffer( buffer, length );
+    error = rzx_start_playback_from_buffer( file.buffer, file.length );
     break;
 
   case LIBSPECTRUM_ID_SNAPSHOT_SNA:
   case LIBSPECTRUM_ID_SNAPSHOT_Z80:
-    error = snapshot_read_buffer( buffer, length, type );
+    error = snapshot_read_buffer( file.buffer, file.length, type );
     break;
 
   case LIBSPECTRUM_ID_TAPE_TAP:
   case LIBSPECTRUM_ID_TAPE_TZX:
   case LIBSPECTRUM_ID_TAPE_WARAJEVO:
-    error = tape_read_buffer( buffer, length, type, autoload );
+    error = tape_read_buffer( file.buffer, file.length, type, autoload );
     break;
 
   case LIBSPECTRUM_ID_DISK_DSK:
@@ -113,16 +114,12 @@ utils_open_file( const char *filename, int autoload,
 
   default:
     ui_error( UI_ERROR_ERROR, "utils_open_file: unknown type %d", type );
-    fuse_abort();
+    break;
   }
 
-  if( error ) { munmap( buffer, length ); return error; }
+  if( error ) { utils_close_file( &file ); return error; }
 
-  if( length && munmap( buffer, length ) ) {
-    ui_error( UI_ERROR_ERROR, "utils_open_file: couldn't munmap `%s': %s",
-	      filename, strerror( errno ) );
-    return 1;
-  }
+  if( utils_close_file( &file ) ) return 1;
 
   if( type_ptr ) *type_ptr = type;
 
@@ -149,8 +146,8 @@ int utils_find_lib( const char *filename )
   return -1;
 }
 
-int utils_read_file( const char *filename, unsigned char **buffer,
-		     size_t *length )
+int
+utils_read_file( const char *filename, utils_file *file )
 {
   int fd;
 
@@ -163,14 +160,14 @@ int utils_read_file( const char *filename, unsigned char **buffer,
     return 1;
   }
 
-  error = utils_read_fd( fd, filename, buffer, length );
+  error = utils_read_fd( fd, filename, file );
   if( error ) return error;
 
   return 0;
 }
 
-int utils_read_fd( int fd, const char *filename,
-		   unsigned char **buffer, size_t *length )
+int
+utils_read_fd( int fd, const char *filename, utils_file *file )
 {
   struct stat file_info;
 
@@ -181,21 +178,78 @@ int utils_read_fd( int fd, const char *filename,
     return 1;
   }
 
-  *length = file_info.st_size;
+  file->length = file_info.st_size;
 
-  (*buffer) = mmap( 0, *length, PROT_READ, MAP_SHARED, fd, 0 );
-  if( *buffer == (void*)-1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't mmap '%s': %s", filename,
+#ifdef HAVE_MMAP
+
+  file->buffer = mmap( 0, file->length, PROT_READ, MAP_SHARED, fd, 0 );
+
+  if( file->buffer != (void*)-1 ) {
+
+    file->mode = UTILS_FILE_OPEN_MMAP;
+
+    if( close(fd) ) {
+      ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
+		strerror( errno ) );
+      munmap( file->buffer, file->length );
+      return 1;
+    }
+
+    return 0;
+  }
+
+#endif			/* #ifdef HAVE_MMAP */
+
+  /* Either mmap() isn't available, or it failed for some reason so try
+     using normal IO */
+  file->mode = UTILS_FILE_OPEN_MALLOC;
+
+  file->buffer = malloc( file->length );
+  if( !file->buffer ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d\n", __FILE__, __LINE__ );
+    return 1;
+  }
+
+  if( read( fd, file->buffer, file->length ) != file->length ) {
+    ui_error( UI_ERROR_ERROR, "Error reading from '%s': %s", filename,
 	      strerror( errno ) );
-    close(fd);
+    free( file->buffer );
+    close( fd );
     return 1;
   }
 
   if( close(fd) ) {
     ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
 	      strerror( errno ) );
-    munmap( *buffer, *length );
+    free( file->buffer );
     return 1;
+  }
+
+  return 0;
+}
+
+int
+utils_close_file( utils_file *file )
+{
+  switch( file->mode ) {
+
+  case UTILS_FILE_OPEN_MMAP:
+    if( file->length ) {
+      if( munmap( file->buffer, file->length ) ) {
+	ui_error( UI_ERROR_ERROR, "Couldn't munmap: %s\n", strerror( errno ) );
+	return 1;
+      }
+    }
+    break;
+
+  case UTILS_FILE_OPEN_MALLOC:
+    free( file->buffer );
+    break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "Unknown file open mode %d\n", file->mode );
+    fuse_abort();
+
   }
 
   return 0;

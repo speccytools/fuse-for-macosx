@@ -1,5 +1,5 @@
 /* rzx.c: .rzx files
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
@@ -184,24 +184,22 @@ int rzx_stop_recording( void )
 
 int rzx_start_playback( const char *filename, int (*load_snap)(void) )
 {
-  libspectrum_byte *buffer; size_t length;
+  utils_file file;
   libspectrum_error libspec_error; int error;
   libspectrum_snap *snap = 0;
 
   if( rzx_recording) return 1;
 
-  error = utils_read_file( filename, &buffer, &length );
+  error = utils_read_file( filename, &file );
   if( error ) return error;
 
-  libspec_error = libspectrum_rzx_read( rzx, &snap, buffer, length );
+  libspec_error = libspectrum_rzx_read( rzx, &snap, file.buffer, file.length );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    munmap( buffer, length );
+    utils_close_file( &file );
     return libspec_error;
   }
 
-  if( munmap( buffer, length ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
-	      strerror( errno ) );
+  if( utils_close_file( &file ) ) {
     libspectrum_rzx_free( rzx );
     if( snap ) libspectrum_snap_free( snap );
     return 1;

@@ -364,16 +364,15 @@ screenshot_scr_read( const char *filename )
 {
   int error = 0;
   int i;
-  size_t length;
-  BYTE *screen;
+  utils_file screen;
 
-  error =  utils_read_file( filename, &screen, &length );
+  error =  utils_read_file( filename, &screen );
   if( error ) return error;
 
-  switch( length ) {
+  switch( screen.length ) {
   case STANDARD_SCR_SIZE:
     memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
-            screen, length );
+            screen.buffer, screen.length );
 
     /* If it is a Timex and it is in hi colour or hires mode, switch out of
        hires or hicolour mode */
@@ -389,13 +388,14 @@ screenshot_scr_read( const char *filename )
       if( !scld_last_dec.name.b1 )
         scld_dec_write( 0xff, ( scld_last_dec.byte & ~HIRESATTR ) | EXTCOLOUR );
       memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0) +
-              ALTDFILE_OFFSET], screen + MONO_BITMAP_SIZE, MONO_BITMAP_SIZE );
+              ALTDFILE_OFFSET], screen.buffer + MONO_BITMAP_SIZE,
+	      MONO_BITMAP_SIZE );
     } else
       ui_error( UI_ERROR_INFO,
             "The file contained a TC2048 high-colour screen, loaded as mono");
 
     memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
-              screen, MONO_BITMAP_SIZE );
+              screen.buffer, MONO_BITMAP_SIZE );
     break;
 
   case HIRES_SCR_SIZE:
@@ -404,24 +404,26 @@ screenshot_scr_read( const char *filename )
     /* If it is not a Timex scale the bitmap and raise an error */
     if( machine_current->timex ) {
       memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
-                screen, MONO_BITMAP_SIZE );
+                screen.buffer, MONO_BITMAP_SIZE );
 
       memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)] +
-              ALTDFILE_OFFSET, screen + MONO_BITMAP_SIZE, MONO_BITMAP_SIZE );
+              ALTDFILE_OFFSET, screen.buffer + MONO_BITMAP_SIZE,
+	      MONO_BITMAP_SIZE );
       if( !scld_last_dec.name.hires )
         scld_dec_write( 0xff,
             ( scld_last_dec.byte & ~( HIRESCOLMASK | HIRES ) ) |
-            ( *(screen + HIRES_ATTR) & ( HIRESCOLMASK | HIRES ) ) );
+            ( *(screen.buffer + HIRES_ATTR) & ( HIRESCOLMASK | HIRES ) ) );
     } else {
       for( i = 0; i < MONO_BITMAP_SIZE; i++ )
         RAM[machine_current->ram.current_screen][display_get_addr(0,0) + i] =
-          convert_hires_to_lores( *(screen + MONO_BITMAP_SIZE + i),
-                                  *(screen + i) );
+          convert_hires_to_lores( *(screen.buffer + MONO_BITMAP_SIZE + i),
+                                  *(screen.buffer + i) );
 
       /* set attributes based on hires attribute byte */
       for( i = 0; i < 768; i++ )
         RAM[machine_current->ram.current_screen][display_get_addr(0,0) +
-            MONO_BITMAP_SIZE + i] = hires_convert_dec( *(screen + HIRES_ATTR) );
+            MONO_BITMAP_SIZE + i] =
+	  hires_convert_dec( *(screen.buffer + HIRES_ATTR) );
 
       ui_error( UI_ERROR_INFO,
             "The file contained a TC2048 high-res screen, converted to lores");
@@ -432,6 +434,8 @@ screenshot_scr_read( const char *filename )
     ui_error( UI_ERROR_ERROR, "'%s' is not a valid scr file", filename );
     error = 1;
   }
+
+  utils_close_file( &screen );
 
   display_refresh_all();
 

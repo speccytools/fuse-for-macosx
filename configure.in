@@ -50,6 +50,7 @@ AC_C_CONST
 AC_INLINE
 
 dnl Checks for library functions.
+AC_FUNC_MMAP
 AC_CHECK_FUNCS(getopt_long,,GETOPT_LIBS=getopt/libgetopt.a)
 AC_SUBST(GETOPT_LIBS)
 

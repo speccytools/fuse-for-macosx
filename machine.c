@@ -224,7 +224,7 @@ int
 machine_load_rom( BYTE **data, char *filename, size_t expected_length )
 {
   int fd, error;
-  unsigned char *buffer; size_t length;
+  utils_file rom;
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
@@ -232,31 +232,27 @@ machine_load_rom( BYTE **data, char *filename, size_t expected_length )
     return 1;
   }
   
-  error = utils_read_fd( fd, filename, &buffer, &length );
+  error = utils_read_fd( fd, filename, &rom );
   if( error ) return error;
   
-  if( length != expected_length ) {
+  if( rom.length != expected_length ) {
     ui_error( UI_ERROR_ERROR,
 	      "ROM '%s' is %ld bytes long; expected %ld bytes",
-	      filename, (unsigned long)length,
+	      filename, (unsigned long)rom.length,
 	      (unsigned long)expected_length );
     return 1;
   }
 
   /* Take a copy of the ROM in case we want to write to it later */
-  *data = malloc( length * sizeof( BYTE ) );
+  *data = malloc( rom.length * sizeof( BYTE ) );
   if( !(*data) ) {
     ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
     return 1;
   }
 
-  memcpy( *data, buffer, length );
+  memcpy( *data, rom.buffer, rom.length );
 
-  if( munmap( buffer, length ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "couldn't munmap ROM '%s': %s", filename,
-	      strerror( errno ) );
-    return 1;
-  }
+  if( utils_close_file( &rom ) ) return 1;
 
   return 0;
 }

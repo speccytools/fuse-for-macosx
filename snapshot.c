@@ -1,5 +1,5 @@
 /* snapshot.c: snapshot handling routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -53,26 +53,24 @@
 
 int snapshot_read( const char *filename )
 {
-  unsigned char *buffer; size_t length;
+  utils_file file;
   libspectrum_snap *snap;
   int error;
 
   error = libspectrum_snap_alloc( &snap ); if( error ) return error;
 
-  error = utils_read_file( filename, &buffer, &length );
+  error = utils_read_file( filename, &file );
   if( error ) { libspectrum_snap_free( snap ); return error; }
 
-  error = libspectrum_snap_read( snap, buffer, length, LIBSPECTRUM_ID_UNKNOWN,
-				 filename );
+  error = libspectrum_snap_read( snap, file.buffer, file.length,
+				 LIBSPECTRUM_ID_UNKNOWN, filename );
   if( error ) {
-    munmap( buffer, length ); libspectrum_snap_free( snap );
+    utils_close_file( &file ); libspectrum_snap_free( snap );
     return error;
   }
 
-  if( munmap( buffer, length ) == -1 ) {
+  if( utils_close_file( &file ) ) {
     libspectrum_snap_free( snap );
-    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
-	      strerror( errno ) );
     return 1;
   }
 
