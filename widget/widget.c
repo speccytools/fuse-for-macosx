@@ -454,4 +454,12 @@ widget_t widget_data[] = {
 
 };
 
+/* The statusbar handling function */
+/* FIXME: how to handle this? */
+int
+ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
+{
+  return 0;
+}
+
 #endif				/* #ifdef USE_WIDGET */

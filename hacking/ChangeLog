@@ -234,3 +234,5 @@
 20031005 dck.c, machine.c, rzx.c, specplus3.c, trdos.c, ui/ui.h,
 	 ui/gtk/gtkui.c: better encapsulation of the menu activation
 	 routines.
+20031005 widget/menu.c, widget/widget.c: use the new statusbar and menu
+	 activation routines.
