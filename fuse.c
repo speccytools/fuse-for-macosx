@@ -134,11 +134,11 @@ static int fuse_init(int argc, char **argv)
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
 
-  settings_current.sound = fuse_sound_in_use = 0;
+  fuse_sound_in_use = 0;
   if( settings_current.sound ) sound_init( settings_current.sound_device );
 
   if(sound_enabled) {
-    settings_current.sound = fuse_sound_in_use = 1;
+    fuse_sound_in_use = 1;
   } else {
     if(timer_init()) return 1;
   }
