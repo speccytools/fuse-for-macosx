@@ -282,8 +282,9 @@ break
 
 #define Z80_OUT( port, reg )\
 {\
-  contend_io( port, 3 );\
+  contend_io( port, 0 );\
   writeport(port,reg);\
+  tstates += 3;\
 }
 
 #define POP16(regl,regh)\

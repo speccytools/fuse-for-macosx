@@ -784,3 +784,5 @@
 	 contended memory timings for EX (SP),HL, EX (SP),IX and EX
 	 (SP),IY (thanks, Mark Woodmass and Jonathan Needle).
 20040505 z80.c: fix times for interrupt acknowledgement.
+20040508 display.c,z80/z80_macros.h: improved display timings (thanks,
+	 Mark Woodmass and Jonathan Needle).

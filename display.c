@@ -836,7 +836,7 @@ static int display_border_column(int time_since_line)
   int column;
 
   /* 2 pixels per T-state */
-  column = ( time_since_line + 3 ) / 4;
+  column = time_since_line / 4;
 
   /* But now need to correct because our displayed border isn't necessarily
      the same size as the ULA's. */
