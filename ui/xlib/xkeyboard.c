@@ -46,7 +46,7 @@
 
 void xkeyboard_keypress(XKeyEvent *event)
 {
-  KeySym keysym; keysyms_key_info *ptr;
+  KeySym keysym; const keysyms_key_info *ptr;
 
   keysym=XLookupKeysym(event,0);
 
@@ -123,7 +123,7 @@ void xkeyboard_keypress(XKeyEvent *event)
 
 void xkeyboard_keyrelease(XKeyEvent *event)
 {
-  KeySym keysym; keysyms_key_info *ptr;
+  KeySym keysym; const keysyms_key_info *ptr;
 
   keysym=XLookupKeysym(event,0);
 
