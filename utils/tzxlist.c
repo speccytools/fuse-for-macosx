@@ -143,6 +143,7 @@ process_tzx( char *filename )
     libspectrum_tape_pure_tone_block *tone_block;
     libspectrum_tape_pulses_block *pulses_block;
     libspectrum_tape_pure_data_block *data_block;
+    libspectrum_tape_raw_data_block *raw_block;
     libspectrum_tape_select_block *select_block;
     libspectrum_tape_archive_info_block *info_block;
     libspectrum_tape_hardware_block *hardware_block;
@@ -193,6 +194,14 @@ process_tzx( char *filename )
       printf("  Data length: %d bytes (%d bits in last byte used)\n",
 	     data_block->length, data_block->bits_in_last_byte );
       printf("  Pause length: %d ms\n", data_block->pause );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+      raw_block = &(block->types.raw_data);
+      printf("  Length: %d bytes\n", raw_block->length );
+      printf("  Bits in last byte: %d\n", raw_block->bits_in_last_byte );
+      printf("  Each bit is %d tstates\n", raw_block->bit_length );
+      printf("  Pause length: %d ms\n", raw_block->pause );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
