@@ -177,6 +177,7 @@ int widget_insert_disk_a( const char *filename ); /* Disk/Drive A:/Insert */
 int widget_insert_disk_b( const char *filename ); /* Disk/Drive B:/Insert */
 int widget_menu_eject_disk( void *data );    /* Disk/Drive ?:/Eject */
 
+int widget_menu_toggle_full_screen( void *data ); /* Window/Toggle Full Screen */
 int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
 
 /* The select machine widget */

@@ -48,6 +48,10 @@ static widget_menu_entry widget_menu_disk_a[];
 static widget_menu_entry widget_menu_disk_b[];
 #endif					/* #ifdef HAVE_765_H */
 
+#ifdef UI_SDL
+static widget_menu_entry widget_menu_window[];
+#endif					/* #ifdef UI_SDL */
+
 static widget_menu_entry widget_menu_help[];
 
 /* Main menu */
@@ -66,6 +70,11 @@ static widget_menu_widget_t main_disk =    { WIDGET_TYPE_MENU,
 					     &widget_menu_disk    };
 #endif
 
+#ifdef UI_SDL
+static widget_menu_widget_t main_window =  { WIDGET_TYPE_MENU,
+					     &widget_menu_window  };
+#endif					/* #ifdef UI_SDL */
+
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
 					     &widget_menu_help    };
 
@@ -80,6 +89,10 @@ widget_menu_entry widget_menu_main[] = {
 #ifdef HAVE_765_H
   { "(D)isk",	 KEYBOARD_d, widget_menu_widget, &main_disk    },
 #endif					/* #ifdef HAVE_765_H */
+
+#ifdef UI_SDL
+  { "(W)indow",	 KEYBOARD_w, widget_menu_widget, &main_window  },
+#endif					/* #ifdef UI_SDL */
 
   { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
 
@@ -215,6 +228,21 @@ static widget_menu_entry widget_menu_disk_b[] = {
 };
 
 #endif					/* #ifdef HAVE_765_H */
+
+#ifdef UI_SDL
+
+/* Window menu */
+
+static widget_menu_entry widget_menu_window[] = {
+  { "Window", 0, 0, NULL },		/* Menu title */
+
+  { "(T)oggle full screen", KEYBOARD_t, widget_menu_toggle_full_screen, NULL },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+
+};
+
+#endif					/* #ifdef UI_SDL */
 
 /* Help menu */
 

@@ -39,6 +39,7 @@ tape_traps, boolean, 1,, traps, tapetraps
 auto_load, boolean, 1
 slt_traps, boolean, 1,, slt, slttraps
 double_screen, boolean, 0
+full_screen, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1

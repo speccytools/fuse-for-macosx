@@ -38,6 +38,7 @@
 #include "widget/widget.h"
 #include "scld.h"
 #include "screenshot.h"
+#include "settings.h"
 
 static SDL_Surface *gc=NULL;
 static SDL_Surface *image=NULL;
@@ -122,6 +123,55 @@ int sdldisplay_allocate_image(int width, int height)
     fprintf( stderr, "%s: couldn't create image\n", fuse_progname );
     return 1;
   }
+
+  return 0;
+}
+
+int
+uidisplay_toggle_fullscreen( void )
+{
+  int colour, vid_flags;
+
+  fuse_emulation_pause();
+
+  colour = scld_hires ? display_hires_border : display_lores_border;
+
+  settings_current.full_screen = !settings_current.full_screen;
+
+  vid_flags = SDL_SWSURFACE|SDL_ANYFORMAT|SDL_HWPALETTE;
+
+  if ( settings_current.full_screen ) {
+    sdldisplay_current_size = 2;
+    vid_flags |= SDL_FULLSCREEN;
+  } else {
+    sdldisplay_current_size = sdldisplay_last_window_size;
+    vid_flags |= SDL_RESIZABLE;
+  }
+
+  gc = SDL_SetVideoMode(
+      DISPLAY_ASPECT_WIDTH * sdldisplay_current_size,
+      DISPLAY_SCREEN_HEIGHT * sdldisplay_current_size,
+      vidinfo->vfmt->BitsPerPixel,
+      vid_flags
+    );
+
+/* Mac OS X resets the state of the cursor after a switch to full screen mode */
+  if ( settings_current.full_screen ) {
+    SDL_ShowCursor( SDL_DISABLE );
+  } else {
+    SDL_ShowCursor( SDL_ENABLE );
+  }
+
+  /* Redraw the entire screen... */
+  display_refresh_all();
+
+  /* And the entire border */
+  display_refresh_border();
+
+  /* If widgets are active, redraw the widget */
+  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
+
+  fuse_emulation_unpause();
 
   return 0;
 }

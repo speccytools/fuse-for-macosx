@@ -40,6 +40,7 @@ void uidisplay_lines( int start, int end );
 void uidisplay_frame_end( void );
 void uidisplay_set_border(int line, int pixel_from, int pixel_to,
 			  int colour);
+int uidisplay_toggle_fullscreen( void );
 
 int uidisplay_end(void);
 
