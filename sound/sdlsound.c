@@ -43,7 +43,7 @@ static void sdlwrite( void *userdata, Uint8 *stream, int len );
  * try and avoid any buffer overruns, ideally should be dynamically set  *
  * based on the obtained sample rate */
 #define MAX_AUDIO_RB 8192*5
-static unsigned char ringbuf[MAX_AUDIO_RB];
+static libspectrum_signed_word ringbuf[MAX_AUDIO_RB];
 
 volatile unsigned int ringbuffer_read = 0;
 volatile unsigned int ringbuffer_write = 0;
@@ -59,7 +59,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   memset( &requested, 0, sizeof( SDL_AudioSpec ) );
 
   requested.freq = *freqptr;
-  requested.format = AUDIO_U8;
+  requested.format = settings_current.sound_force_8bit ? AUDIO_U8 : AUDIO_U16;
   requested.channels = *stereoptr ? 2 : 1;
   requested.callback = sdlwrite;
 
@@ -96,7 +96,7 @@ sound_lowlevel_end( void )
 
 /* Copy data to ringbuffer */
 void
-sound_lowlevel_frame( unsigned char *data, int len )
+sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
   int i;
 
@@ -118,13 +118,16 @@ sdlwrite( void *userdata, Uint8 *stream, int len )
 {
   int f;
 
+  libspectrum_signed_word *ptr = (libspectrum_signed_word*)stream;
+  len /= sizeof( libspectrum_signed_word ) / sizeof( Uint8 );
+
   for( f=0; f<len; f++ )
   {
     if( ringbuffer_write == ringbuffer_read ) {
       /* buffer underrun - send last sample available */
-      *stream++ = ringbuf[ ringbuffer_read ];
+      *ptr++ = ringbuf[ ringbuffer_read ];
     } else {
-      *stream++ = ringbuf[ ringbuffer_read++ ];
+      *ptr++ = ringbuf[ ringbuffer_read++ ];
       if( ringbuffer_read == MAX_AUDIO_RB ) ringbuffer_read = 0;
     }
   }

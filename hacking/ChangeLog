@@ -675,3 +675,5 @@
 	 replacement.
 20040329 fuse.c,settings.dat,sound.[ch],man/fuse.1,sound/osssound.c,
 	 ui/options.dat: full 16-bit sound code (Rus).
+20040329 ui/sdl/sdljoystick.c: compilation fixes.
+20040329 sound/sdlsound.c: change to 16-bit sound.
