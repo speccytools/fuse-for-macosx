@@ -1,0 +1,106 @@
+1999-08-22  Philip Kendall  <pak21@cam.ac.uk>
+
+	* Added +2A emulation.
+
+	* spec128.c (spec128_writebyte): The screen wasn't being updated
+	  it was written to when not in the 0x4000-0x7fff position.
+
+1999-08-20  Philip Kendall  <pak21@cam.ac.uk>
+
+	* Make hardware emulation more modular
+
+1999-08-19  Philip Kendall  <pak21@cam.ac.uk>
+
+	* fuse.c (fuse_init): Console version now throws away
+	  suid root privileges after initialising Allegro
+
+	* snapshot.c: Can now save snapshots with the F2 key
+
+	* display.c (display_frame): Made flash happen every 16 frames,
+	  not 25
+
+	* Rainbowing effects now emulated (screen only, not border)
+
+	* timer.c: Made signal handling POSIX compliant (Thanks to
+	  Erik Kunze again)
+
+	* Made the console version run at the correct speed (almost. It
+	  runs at 50.00Hz, rather than the correct 50.01Hz (128K/+2) or
+	  50.08Hz (48K) ).
+
+1999-08-18  Philip Kendall  <pak21@cam.ac.uk>
+
+	* z80_macros.h (SBC16): Removed the optimisation as it was wrong.
+
+	* Added ROM trap to read from tape files
+
+1999-08-03  Philip Kendall  <pak21@cam.ac.uk>
+
+	* Version 0.1.2 released.
+
+	* Added support for running on the Linux console (Thanks here go
+	  to Thomas Harte). Console version does not eat up 100% of CPU
+	  time :-)
+
+	* Thanks to Erik Kunze for some helpful suggestions.
+
+1999-07-22  Philip Kendall  <pak21@cam.ac.uk>
+
+	* Added +2 emulation (Just 128K emulation with different ROMs!)
+	
+	* spec128.c (spec128_init): 
+	* spec48.c (spec48_init): 
+	* spectrum.h (machine_info): 
+	* spectrum.c (spectrum_set_timings): 
+	* timer.c (timer_delay): Add support for variable processor
+	  speeds. 128K machines now run at 3.54690 MHz
+
+	* fuse.c (main): z80 reset handled by machine.reset(),
+	  so no need to call it separately.
+
+	* z80.c (z80_reset): Z80 reset turns off halt state
+
+	* z80_macros.h (SBC16): Small optimisation
+
+	* display.c: Flashing characters implemented
+
+1999-07-21  Philip Kendall  <pak21@cam.ac.uk>
+
+	* display.c (display_get_attr):
+	  (display_plot8):
+	  (display_plot64_addr): ink and paper are now of type BYTE rather
+ 	  than int.
+
+	* z80_macros.h (CP): Set the S flag (and a small optimisation)
+
+	* fuse.c (fuse_init): 
+	* display.c (display_init): Made sure allegro_init() was called
+	  before install_timer(). (Thanks to Thomas Harte)
+
+	* keyboard.c (keyboard_data): Removed KEY_CONTROL entry as
+	  KEY_CONTROL and KEY_LCONTROL are the same thing.
+
+1999-07-19  Philip Kendall  <pak21@cam.ac.uk>
+
+	* Version 0.1.1 released.
+
+	* Makefile.am: Include spec128.h in the distribution so it compiles
+
+	* keyboard.c: Moved the keyboard initialisation from display.c (!)
+
+	* display.c, spec48.c, spec128.c: Added border emulation
+
+	* z80_ddfdcb.c: Documented rotates/shifts now write the changed
+	  byte back again.
+
+	* Changed file permissions on *.rom, COPYING.
+	
+	* ay.h: Added `extern' in front of the declarations.
+
+	* z80.h, z80_ed.c, z80_macros.h, z80_ops.c: Add R register emulation.
+
+	* README: Fix WoS download link.
+
+1999-07-18  Philip Kendall  <pak21@cam.ac.uk>
+
+	* Version 0.1.0 released.

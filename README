@@ -1,0 +1,146 @@
+The Free Unix Spectrum Emulator (Fuse) 0.1.3
+============================================
+
+Given the current proliferation of DOS/Windows Speccy emulators, I
+decided it was time to redress the Unix balance a bit. Therefore, here
+is Fuse (the Free Unix Spectrum Emulator), version 0.1.3.
+
+What Fuse does have:
+
+* Working 48K/128K/+2/+2A Speccy emulation, running at true Speccy
+  speed, at least on this PII-233.
+
+What Fuse doesn't have:
+
+* Any sound output
+* A nice GUI. Or really any user interface at all!
+* The ability to save to tape files
+* Emulation of any peripherals (bar the tape deck)
+* A keyboard picture, so you can find those keywords
+* ...
+
+What you'll need to run Fuse:
+
+* Either Unix, X and XWinAllegro
+  (http://www.canvaslink.com/allegro/xwinallegro/).
+* Or Linux and the latest Allegro WIP
+  (http://www.talula.demon.co.uk/allegro/)
+
+To compile Fuse:
+
+$ ./configure
+$ make
+
+The console version needs to be suid root to run.
+
+[ If you're like me, you might want to have both XWinAllegro and
+Allegro WIP installed on your machine. However, both libraries want to
+call themselves `alleg', which does present problems... here's my
+fudge fix:
+
+1) Install Allegro WIP as normal. (Note that `make install' didn't
+   install all the libraries for me -- I had to put the shared ones in
+   manually)
+2) Change into wherever you installed the libraries (/usr/local/lib, by
+   default), and rename `liballeg.*' to `liballegwip.*'.
+3) Change into wherever you installed the headers, and rename `allegro.h'
+   to `allegrowip.h'
+4) Install XWinAllegro.
+
+Now, the X version can be compiled by:
+
+$ ./configure
+$ make
+
+and the console version by:
+
+$ ./configure --without-x
+$ make
+
+There are some horrible hacks in configure.in getting all this to
+work. Hopefully XWinAllegro will be folded into the main Allegro
+libraries soon! ]
+
+To run fuse:
+
+$ fuse
+
+Not too difficult. You should then be presented with the familiar
+
+`(c) 1982 Sinclair Research Ltd'
+
+message. Numbers, letters, etc should now work as they do on the
+Speccy (plus a few others eg Backspace = CAPS + 0). Also:
+
+ F2: Save snapshot (see below)
+ F3: Load snapshot (see below)
+ F5: Reset Spectrum
+ F7: Rewind tape file to start
+ F9: Switch between 48K/128K/+2/+2A emulation
+F10: Quit Fuse
+F11: Switch to 320x200 display (console version only)
+F12: Switch to 320x240 display (console version only)
+
+The snapshot loading is _very_ simple: it loads from a .sna snapshot
+(either 48K or 128K) called `snapshot.sna' in the current
+directory. (If you need to convert your snaps to .sna, try SnapConv:
+http://www.kendalls.demon.co.uk/pak21/spectrum/snapconv.html). Saving
+is also to `snapshot.sna', and will happily overwrite any other file
+you may have with that name.
+
+The tape loading is also simple: it reads from a .tap file called
+`tape.tap' in the current directory. Press F7 to rewind the tape
+file to the start. Currently, only programs using the standard ROM
+loader will work.
+
+Currently, Fuse doesn't appear to work very well on 16bpp X
+displays. I blame this on XWinAllegro ;-(
+
+Fuse is copyrighted under the GNU General Public License (see the file
+`COPYING' for details). However, note the GPL does *not* apply to the
+Spectrum ROM files (`128-?.rom', `48.rom', `plus2-?.rom' and
+`plus3-?.rom'), which are still copyrighted to Amstrad, although their
+free distribution with emulators is permitted.
+
+If you have any bug reports, suggestions or (particularly
+appreciated!) patches for Fuse, mail them to me at
+pak21@cam.ac.uk. For more general Speccy related discussions, visit
+the Usenet group `comp.sys.sinclair', but do read the FAQ
+(http://www.kendalls.demon.co.uk/cssfaq/index.html) first!
+
+Fuse has its own home page, which you can find at:
+
+http://www.kendalls.demon.co.uk/pak21/spectrum/fuse.html,
+
+or the latest version should be available from the World of Spectrum
+(http://www.void.demon.nl/) FTP site:
+
+ftp://ftp.void.jump.org/pub/sinclair/emulators/unix/.
+
+Some thanks (in alphabetical order):
+
+* Michael Bukin: for XWinAllegro
+  (http://www.canvaslink.com/allegro/xwinallegro/)
+
+* Ian Collier: the source to his xz80
+  (http://www.comlab.ox.ac.uk/oucl/users/ian.collier/Spectrum/index.html)
+  was very helpful for getting the z80 opcodes right.
+
+* Shawn Hargreaves: for Allegro (http://www.talula.demon.co.uk/allegro/)
+
+* Thomas Harte: for the much faster console display routines.
+
+* Erik Kunze: for some helpful hints on how to program under Unix.
+
+* Gerton Lunter: his wonderful z80
+  (ftp://ftp.void.jump.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
+  got me started on this emulation lark all those years ago...
+
+* Martijn van der Heide: for World of Spectrum
+  (http://www.void.demon.nl/)
+
+Finally, if you want to see how a Unix Speccy emulator should be done,
+check out Erik's `xzx': http://www.philosys.de/~kunze/xzx/.
+
+Philip Kendall <pak21@cam.ac.uk>
+22 August 1999
