@@ -293,7 +293,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
   /* And we're pointing to the first block */
   tape->current_block = tape->blocks;
 
-  /* Which we should then initialise */
+  /* Return here if there wasn't any data in the file */
+  if( ! tape->blocks ) return LIBSPECTRUM_ERROR_NONE;
+
+  /* Otherwise, initialise the first block */
   error = libspectrum_tape_init_block(
             (libspectrum_tape_block*)tape->current_block->data
           );
