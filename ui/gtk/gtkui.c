@@ -184,7 +184,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/Save _binary data...",NULL, gtkui_save_binary_data, 0, NULL       },
 
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
-  { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
+  { "/File/E_xit...",	        "F10", gtkui_quit,          0, NULL          },
 
   { "/Options",			NULL , NULL,                0, "<Branch>"    },
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
@@ -199,7 +199,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
   { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
-  { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
+  { "/Machine/_Reset...",       "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
   { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
   { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
@@ -641,7 +641,7 @@ gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  fuse_exiting=1;
+  if( gtkui_confirm( "Exit Fuse?" ) ) fuse_exiting = 1;
 }
 
 /* Called by the menu when Options/Filter selected */
@@ -791,7 +791,7 @@ save_options( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  if( machine_reset() ) {
+  if( gtkui_confirm( "Reset?" ) && machine_reset() ) {
     ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 
     /* FIXME: abort() seems a bit extreme here, but it'll do for now */

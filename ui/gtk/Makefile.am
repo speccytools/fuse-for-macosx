@@ -30,6 +30,7 @@ INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuigtk_a_SOURCES = binary.c \
 		     browse.c \
+		     confirm.c \
 	             debugger.c \
                      error.c \
 		     gtkdisplay.c \
