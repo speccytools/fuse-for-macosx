@@ -303,8 +303,8 @@ ui_init( int *argc, char ***argv )
 
   geometry.min_width = DISPLAY_ASPECT_WIDTH;
   geometry.min_height = DISPLAY_SCREEN_HEIGHT;
-  geometry.max_width = 2 * DISPLAY_ASPECT_WIDTH;
-  geometry.max_height = 2 * DISPLAY_SCREEN_HEIGHT;
+  geometry.max_width = 3 * DISPLAY_ASPECT_WIDTH;
+  geometry.max_height = 3 * DISPLAY_SCREEN_HEIGHT;
   geometry.base_width = 0;
   geometry.base_height = 0;
   geometry.width_inc = DISPLAY_ASPECT_WIDTH;

@@ -436,3 +436,4 @@
 	 patch #868418) (Fred).
 20040102 ui/scaler/scalers.c: merges to keep us close to ScummVM's code
 	 (rest of patch #868418) (Fred).
+20040102 ui/gtk/{gtkdisplay,gtkui}.c: allow 3x3 scaled modes.

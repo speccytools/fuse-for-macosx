@@ -58,9 +58,9 @@ static guchar rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
 static const gint rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
-static guchar scaled_image[4 * 2 * DISPLAY_SCREEN_HEIGHT *
-			           DISPLAY_SCREEN_WIDTH    ];
-static const ptrdiff_t scaled_pitch = 4 * DISPLAY_SCREEN_WIDTH;
+static guchar scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
+			    (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
+static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 
 /* The colour palette */
 static guchar rgb_colours[16][3] = {
@@ -239,6 +239,22 @@ register_scalers( void )
       scaler_register( SCALER_TIMEXTV );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_NORMAL );
+      return 0;
+    }
+
+  case 3:
+
+    switch( image_scale ) {
+    case 1:
+      scaler_register( SCALER_TRIPLESIZE );
+      scaler_register( SCALER_ADVMAME3X );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_TRIPLESIZE );
+      return 0;
+    case 2:
+      scaler_register( SCALER_TIMEX1_5X );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_TIMEX1_5X );
       return 0;
     }
 
