@@ -423,3 +423,5 @@
 	 (patch #868415) (Fred).
 20031231 ui/win32: first (simple!) native Win32 user interface (Marek).
 20031231 ChangeLog: bring up-to-date.
+20040101 ui/sdl/sdlui.c, widget/widget.c: put speed in SDL title (patch
+	 #868412) (Fred).

@@ -119,4 +119,16 @@ ui_end( void )
   return 0;
 }
 
+int
+ui_statusbar_update_speed( float speed )
+{
+  char buffer[15];
+
+  snprintf( buffer, 15, "Fuse - %3.0f%%", speed );
+
+  SDL_WM_SetCaption( buffer, buffer );
+
+  return 0;
+}
+
 #endif				/* #ifdef UI_SDL */

@@ -407,10 +407,12 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
   return 0;
 }
 
+#ifndef UI_SDL
 int
 ui_statusbar_update_speed( float speed )
 {
   return 0;
 }
+#endif                          /* #ifndef UI_SDL */
 
 #endif				/* #ifdef USE_WIDGET */
