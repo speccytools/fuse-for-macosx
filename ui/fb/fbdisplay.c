@@ -167,13 +167,14 @@ int fbdisplay_init(void)
 
   fb_fd = open( dev, O_RDWR | O_EXCL );
   if( fb_fd == -1 ) {
-    fprintf( stderr, "%s: couldn't open framebuffer device\n", fuse_progname );
+    fprintf( stderr, "%s: couldn't open framebuffer device '%s'\n",
+	     fuse_progname, dev );
     return 1;
   }
   if( ioctl( fb_fd, FBIOGET_FSCREENINFO, &fixed )        ||
       ioctl( fb_fd, FBIOGET_VSCREENINFO, &orig_display )    ) {
-    fprintf( stderr, "%s: couldn't read framebuffer device info\n",
-	     fuse_progname );
+    fprintf( stderr, "%s: couldn't read info from framebuffer device '%s'\n",
+	     fuse_progname, dev );
     return 1;
   }
   got_orig_display = 1;
@@ -195,7 +196,8 @@ int fbdisplay_init(void)
   display.activate = FB_ACTIVATE_NOW;
   if( ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ||
       ioctl( fb_fd, FBIOPUTCMAP, &fb_cmap )            ) {
-    fprintf( stderr, "%s: couldn't set framebuffer mode\n", fuse_progname );
+    fprintf( stderr, "%s: couldn't set mode for framebuffer device '%s'\n",
+	     fuse_progname, dev );
     return 1;
   }
   ioctl( fb_fd, FBIOGET_VSCREENINFO, &display );
