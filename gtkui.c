@@ -69,6 +69,7 @@ static void gtkui_switch(GtkWidget *widget, gpointer data);
 static void gtkui_tape_open( GtkWidget *widget, gpointer data );
 static void gtkui_tape_play( GtkWidget *widget, gpointer data );
 static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
+static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
 static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
