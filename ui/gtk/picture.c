@@ -34,6 +34,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
 #include "display.h"
@@ -61,6 +62,8 @@ gtkui_picture( const char *filename, int border )
 
   GtkWidget *dialog;
   GtkWidget *ok_button;
+  GtkAccelGroup *accel_group;
+
   GtkWidget *drawing_area;
 
   fuse_emulation_pause();
@@ -102,6 +105,11 @@ gtkui_picture( const char *filename, int border )
   gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtk_widget_destroy ),
 			     GTK_OBJECT( dialog ) );
+
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
+  gtk_widget_add_accelerator( ok_button, "clicked",
+			      accel_group, GDK_Return, 0, 0);
 
   /* Stop users resizing this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
