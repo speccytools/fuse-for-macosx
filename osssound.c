@@ -51,13 +51,28 @@ static int sixteenbit=0;
  */
 int osssound_init(const char *device,int *freqptr,int *stereoptr)
 {
-int frag,tmp;
+int frag,tmp,flags;
 
 /* select a default device if we weren't explicitly given one */
 if(device==NULL) device = "/dev/dsp";
 
-if((soundfd=open(device,O_WRONLY))<0)
+/* Open the sound device non-blocking to avoid hangs if it is being
+ * used by something else, but then set it blocking again as that's what
+ * we actually want
+ */
+if((soundfd=open(device,O_WRONLY|O_NONBLOCK))==-1)
   return 1;
+if((flags=fcntl(soundfd,F_GETFL))==-1)
+  {
+  close(soundfd);
+  return 1;
+  }
+flags &= ~O_NONBLOCK;
+if(fcntl(soundfd,F_SETFL,flags)==-1)
+  {
+  close(soundfd);
+  return 1;
+  }
 
 tmp=AFMT_U8;
 if(ioctl(soundfd,SNDCTL_DSP_SETFMT,&tmp)==-1)

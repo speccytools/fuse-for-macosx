@@ -54,13 +54,26 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 #ifndef solaris
 	int frag;
 #endif
+	int flags;
 	struct audio_info ai;
 
 	if (device == NULL)
 		device = "/dev/audio";
 
-	if ((soundfd = open(device, O_WRONLY)) == -1)
+	/* Open the sound device non-blocking to avoid hangs if it is
+	   being used by something else, but then set it blocking
+	   again as that's what we actually want */
+	if ((soundfd = open(device, O_WRONLY | O_NONBLOCK )) == -1)
 		return 1;
+	if ((flags = fcntl(soundfd, F_GETFL)) == -1) {
+	        close(soundfd);
+	        return 1;
+	}
+	flags &= ~O_NONBLOCK;
+	if (fcntl(soundfd, F_SETFL, flags) == -1) {
+	        close(soundfd);
+		return 1;
+	}
 
 	AUDIO_INITINFO(&ai);
 
