@@ -98,12 +98,6 @@ typedef struct fuse_machine_info {
 
 } fuse_machine_info;
 
-/* The various capabilities of the different machines */
-extern const int MACHINE_CAPABILITY_AY;		/* AY-3-8192 */
-extern const int MACHINE_CAPABILITY_128_MEMORY; /* 128-style memory paging */
-extern const int MACHINE_CAPABILITY_PLUS3_MEMORY; /* +3-style memory paging */
-extern const int MACHINE_CAPABILITY_PLUS3_DISK; /* +3-style disk drive */
-
 extern fuse_machine_info **machine_types;	/* All available machines */
 extern int machine_count;		/* of which there are this many */
 
