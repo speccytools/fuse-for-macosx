@@ -1169,3 +1169,5 @@
 	 (all part of patch #1080531) (Fred).
 20050102 ui.c: don't try and set the 'Record movie as PNG' menu item as
 	 (in)active if libpng not present.
+20050103 if1.c: fdatasync is from the POSIX Realtime Extension, use fsync
+         instead.
