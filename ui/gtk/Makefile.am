@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2003 Philip Kendall
+## Copyright (c) 2001-2004 Philip Kendall
 
 ## $Id$
 
@@ -38,8 +38,9 @@ libuigtk_a_SOURCES = binary.c \
 		     gtkjoystick.c \
 		     gtkkeyboard.c \
                      gtkui.c \
-	             options.c \
 		     keysyms.c \
+		     memory.c \
+	             options.c \
 		     picture.c \
 		     pokefinder.c \
 		     roms.c \

@@ -64,6 +64,12 @@ int gtkstatusbar_create( GtkBox *parent );
 void gtkui_pokefinder( GtkWidget *widget, gpointer data );
 
 /*
+ * Memory browser routines (memory.c)
+ */
+
+void gtkui_memory_browser( void );
+
+/*
  * General user interface routines (gtkui.c)
  */
 
@@ -82,5 +88,15 @@ void gtkui_roms( GtkWidget *widget, gpointer data );
 int gtkui_picture( const char *filename, int border );
 
 extern void gtkui_popup_menu(void);
+
+#ifdef UI_GTK2
+typedef PangoFontDescription *gtkui_font;
+#else				/* #ifdef UI_GTK2 */
+typedef GtkStyle *gtkui_font;
+#endif				/* #ifdef UI_GTK2 */
+
+int gtkui_get_monospaced_font( gtkui_font *font );
+void gtkui_free_font( gtkui_font font );
+void gtkui_set_font( GtkWidget *widget, gtkui_font font );
 
 #endif				/* #ifndef FUSE_GTKINTERNALS_H */

@@ -200,6 +200,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
   { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
   { "/Machine/P_oke Finder...",	NULL , gtkui_pokefinder,    0, NULL	     },
+  { "/Machine/_Memory Browser...", NULL, gtkui_memory_browser, 0, NULL       },
   { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
 
   { "/Media",			NULL , NULL,                0, "<Branch>"    },
@@ -1241,5 +1242,56 @@ int ui_menu_activate( ui_menu_item item, int active )
 	    item );
   return 1;
 }
+
+/*
+ * Font code
+ */
+
+int
+gtkui_get_monospaced_font( gtkui_font *font )
+{
+#ifdef UI_GTK2
+
+  *font = pango_font_description_from_string( "Monospace 10" );
+  if( !(*font) ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
+    return 1;
+  }
+
+#else				/* #ifdef UI_GTK2 */
+
+  *font = gtk_style_new();
+  gdk_font_unref( (*font)->font );
+
+  (*font)->font = gdk_font_load( "-*-courier-medium-r-*-*-12-*-*-*-*-*-*-*" );
+  if( !(*font)->font ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
+    return 1;
+  }
+
+#endif				/* #ifdef UI_GTK2 */
+
+  return 0;
+}
+
+void
+gtkui_free_font( gtkui_font font )
+{
+#ifdef UI_GTK2
+  pango_font_description_free( font );
+#else				/* #ifdef UI_GTK2 */
+  gtk_style_detach( font );
+#endif				/* #ifdef UI_GTK2 */
+}
+
+void
+gtkui_set_font( GtkWidget *widget, gtkui_font font )
+{
+#ifdef UI_GTK2
+  gtk_widget_modify_font( widget, font );
+#else				/* #ifdef UI_GTK2 */
+  gtk_widget_set_style( widget, font );
+#endif				/* #ifdef UI_GTK2 */
+}  
 
 #endif			/* #ifdef UI_GTK */

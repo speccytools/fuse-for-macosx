@@ -47,12 +47,6 @@
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
-#ifdef UI_GTK2
-typedef PangoFontDescription *font_spec;
-#else				/* #ifdef UI_GTK2 */
-typedef GtkStyle *font_spec;
-#endif				/* #ifdef UI_GTK2 */
-
 /* The various debugger panes */
 typedef enum debugger_pane {
 
@@ -75,10 +69,10 @@ static GtkWidget* get_pane( debugger_pane pane );
 static int create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group );
 static void toggle_display( gpointer callback_data, guint callback_action,
 			    GtkWidget *widget );
-static int create_register_display( GtkBox *parent, font_spec font );
+static int create_register_display( GtkBox *parent, gtkui_font font );
 static int create_breakpoints( GtkBox *parent );
-static int create_disassembly( GtkBox *parent, font_spec font );
-static int create_stack_display( GtkBox *parent, font_spec font );
+static int create_disassembly( GtkBox *parent, gtkui_font font );
+static int create_stack_display( GtkBox *parent, gtkui_font font );
 static void stack_click( GtkCList *clist, gint row, gint column,
 			 GdkEventButton *event, gpointer user_data );
 static int create_events( GtkBox *parent );
@@ -86,7 +80,6 @@ static void events_click( GtkCList *clist, gint row, gint column,
 			  GdkEventButton *event, gpointer user_data );
 static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
-static void set_font( GtkWidget *widget, font_spec font );
 
 static int activate_debugger( void );
 static int update_disassembly( void );
@@ -253,29 +246,9 @@ create_dialog( void )
   GtkAccelGroup *accel_group;
   debugger_pane i;
 
-  font_spec font;
+  gtkui_font font;
 
-  /* Try and get a monospaced font */
-#ifdef UI_GTK2
-
-  font = pango_font_description_from_string( "Monospace 10" );
-  if( !font ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
-    return 1;
-  }
-
-#else				/* #ifdef UI_GTK2 */
-
-  font = gtk_style_new();
-  gdk_font_unref( font->font );
-
-  font->font = gdk_font_load( "-*-courier-medium-r-*-*-12-*-*-*-*-*-*-*" );
-  if( !font->font ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
-    return 1;
-  }
-
-#endif				/* #ifdef UI_GTK2 */
+  error = gtkui_get_monospaced_font( &font ); if( error ) return error;
 
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
@@ -334,9 +307,7 @@ create_dialog( void )
     gtk_check_menu_item_set_active( check_item, TRUE );
   }
 
-#ifdef UI_GTK2
-  pango_font_description_free( font );
-#endif				/* #ifdef UI_GTK2 */
+  gtkui_free_font( font );
 
   dialog_created = 1;
 
@@ -375,7 +346,7 @@ toggle_display( gpointer callback_data, guint callback_action,
 }
 
 static int
-create_register_display( GtkBox *parent, font_spec font )
+create_register_display( GtkBox *parent, gtkui_font font )
 {
   size_t i;
 
@@ -384,7 +355,7 @@ create_register_display( GtkBox *parent, font_spec font )
 
   for( i = 0; i < 18; i++ ) {
     registers[i] = gtk_label_new( "" );
-    set_font( registers[i], font );
+    gtkui_set_font( registers[i], font );
     gtk_table_attach( GTK_TABLE( register_display ), registers[i],
 		      i%2, i%2+1, i/2, i/2+1, 0, 0, 2, 2 );
   }
@@ -410,7 +381,7 @@ create_breakpoints( GtkBox *parent )
 }
 
 static int
-create_disassembly( GtkBox *parent, font_spec font )
+create_disassembly( GtkBox *parent, gtkui_font font )
 {
   size_t i;
 
@@ -423,7 +394,7 @@ create_disassembly( GtkBox *parent, font_spec font )
 
   /* The disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
-  set_font( disassembly, font );
+  gtkui_set_font( disassembly, font );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( disassembly ), i, TRUE );
@@ -443,13 +414,13 @@ create_disassembly( GtkBox *parent, font_spec font )
 }
 
 static int
-create_stack_display( GtkBox *parent, font_spec font )
+create_stack_display( GtkBox *parent, gtkui_font font )
 {
   size_t i;
   gchar *stack_titles[] = { "Address", "Value" };
 
   stack = gtk_clist_new_with_titles( 2, stack_titles );
-  set_font( stack, font );
+  gtkui_set_font( stack, font );
   gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
@@ -592,17 +563,6 @@ create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group )
 
   return 0;
 }
-
-static void
-set_font( GtkWidget *widget, font_spec font )
-{
-#ifdef UI_GTK2
-  gtk_widget_modify_font( widget, font );
-#else				/* #ifdef UI_GTK2 */
-  gtk_widget_set_style( widget, font );
-#endif				/* #ifdef UI_GTK2 */
-}
-
 
 static int
 activate_debugger( void )
