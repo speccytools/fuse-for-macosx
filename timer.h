@@ -33,4 +33,15 @@ int timer_init(void);
 void timer_sleep(void);
 int timer_end(void);
 
+typedef enum timer_function_type {
+
+  TIMER_FUNCTION_WAKE,
+  TIMER_FUNCTION_TICK,
+
+} timer_function_type;
+
+int timer_push( int msec, timer_function_type which );
+int timer_pop( void );
+void timer_pause( void );
+
 #endif			/* #ifndef FUSE_TIMER_H */

@@ -201,7 +201,8 @@ int widget_do( widget_type which, void *data )
     error = screenshot_save(); if( error ) { widget_level--; return error; }
 #endif				/* #ifdef USE_LIBPNG */
 
-    error = widget_timer_init(); if( error ) { widget_level--; return error; }
+    error = timer_push( 100, TIMER_FUNCTION_WAKE );
+    if( error ) { widget_level--; return error; }
   }
 
   /* Store what type of widget we are and what data we were given */
@@ -217,13 +218,9 @@ int widget_do( widget_type which, void *data )
   /* Process this widget until it returns */
   widget_return[widget_level].finished = 0;
   while( ! widget_return[widget_level].finished ) {
-
+    
     /* Go to sleep for a bit */
-#ifndef WIN32
-    pause();
-#else
-    Sleep(0);
-#endif
+    timer_pause();
 
     /* Process any events */
     ui_event();
@@ -252,8 +249,7 @@ int widget_do( widget_type which, void *data )
   } else {
 
     /* Restore the old keyboard handler */
-    error = widget_timer_end();
-    if( error ) return error;
+    error = timer_pop(); if( error ) return error;
 
     /* Refresh the Spectrum's display, including the border */
     display_refresh_all();
@@ -281,113 +277,6 @@ int widget_end_all( widget_finish_state state )
   return 0;
 }
     
-/* Widget timer routines */
-
-#ifndef WIN32
-static struct sigaction widget_timer_old_handler;
-static struct itimerval widget_timer_old_timer;
-
-static void widget_timer_signal( int signo );
-
-int widget_timer_init( void )
-{
-  struct sigaction handler;
-  struct itimerval timer;
-
-  handler.sa_handler = widget_timer_signal;
-  sigemptyset( &handler.sa_mask );
-  handler.sa_flags = 0;
-  sigaction( SIGALRM, &handler, &widget_timer_old_handler );
-
-  timer.it_interval.tv_sec = 0;
-  timer.it_interval.tv_usec = 100000UL;
-  timer.it_value.tv_sec = 0;
-  timer.it_value.tv_usec = 100000UL;
-  setitimer( ITIMER_REAL, &timer, &widget_timer_old_timer );
-
-  /* FIXME: Is this really necessary? Without this on Solaris, we
-     often get called such taht widget_timer_old_timer.it_value is zero
-     which then means we die when we reactivate this timer as it is
-     disabled. Reread Stevens. */
-  if( widget_timer_old_timer.it_value.tv_sec == 0 &&
-      widget_timer_old_timer.it_value.tv_usec == 0 )
-    {
-      widget_timer_old_timer.it_value.tv_sec =
-	widget_timer_old_timer.it_interval.tv_sec;
-
-      widget_timer_old_timer.it_value.tv_usec = 
-	widget_timer_old_timer.it_interval.tv_usec;
-    }
-
-  return 0;
-}
-
-/* The signal handler: just wake up */
-static void widget_timer_signal( int signo GCC_UNUSED )
-{
-  return;
-}
-
-int widget_timer_end( void )
-{
-  /* Restore the old timer */
-  setitimer( ITIMER_REAL, &widget_timer_old_timer, NULL);
-
-  /* And the old signal handler */
-  sigaction( SIGALRM, &widget_timer_old_handler, NULL);
-
-  return 0;
-}
-
-#else				/* #ifndef WIN32 */
-
-static MMRESULT widget_TimerID;
-UINT widget_TimerRes;
-static void CALLBACK widget_timer_signal( UINT wTimerID, UINT msg,
-					  DWORD dwUser, DWORD dw1, DWORD dw2 );
-
-#define TARGET_RESOLUTION 1	/* 1-millisecond target resolution */
-
-int
-widget_timer_init( void )
-{
-  TIMECAPS tc;
-    
-  if( timeGetDevCaps( &tc, sizeof( TIMECAPS ) ) != TIMERR_NOERROR ) return 1;
-    
-  widget_TimerRes = min( max( tc.wPeriodMin, TARGET_RESOLUTION ),
-			 tc.wPeriodMax );
-
-  timeBeginPeriod( widget_TimerRes );
-
-  widget_TimerID = timeSetEvent( 100, widget_TimerRes, widget_timer_signal,
-				 (DWORD)NULL, TIME_PERIODIC );
-  if( !widget_TimerID ) return 1;
-  
-  return 0;
-}
-
-/* The signal handler: just wake up */
-void CALLBACK
-widget_timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1,
-		     DWORD dw2 )
-{
-  return;
-}
-
-int
-widget_timer_end( void )
-{
-  timeKillEvent( widget_TimerID );
-  widget_TimerID = 0;
-
-  return 0;
-}
-
-#endif				/* #ifndef WIN32 */
-
-/* End of timer functions */
-
 int widget_dialog( int x, int y, int width, int height )
 {
   widget_rectangle( 8*x, 8*y, 8*width, 8*height, WIDGET_COLOUR_BACKGROUND );

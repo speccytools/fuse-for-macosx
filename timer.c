@@ -27,101 +27,193 @@
 #include <config.h>
 
 #include "fuse.h"
+#include "settings.h"
 #include "timer.h"
 
 volatile float timer_count;
 
-#ifndef WIN32
-
-#include <signal.h>
-#include <sys/time.h>
-#include <unistd.h>
-
-#include "compat.h"
-
-#ifdef DEBUG_MODE
 int
 timer_init( void )
 {
+  int error;
+
+  error = timer_push( 20, TIMER_FUNCTION_TICK ); if( error ) return error;
+
+  timer_count = 0.0;
+
+  return 0;
+}
+
+int
+timer_end( void )
+{
+  int error;
+
+  error = timer_pop(); return error;
+
   return 0;
 }
 
 void
 timer_sleep( void )
 {
-  return;
+  int speed;
+  /* Go to sleep iff we're emulating things fast enough */
+  while( timer_count <= 0.0 ) timer_pause();
+
+  /* And note that we've done a frame's worth of instructions */
+  speed = settings_current.emulation_speed < 1 ?
+          100                                  :
+          settings_current.emulation_speed;
+
+  timer_count -= 100.0 / speed;
 }
 
-int
-timer_end( void )
-{
-  return 0;
-}
-
-#else				/* #ifdef DEBUG_MODE */
-
-/* Just places to store the old timer and signal handlers; restored
-   on exit */
-static struct itimerval timer_old_timer;
-static struct sigaction timer_old_handler;
-
-static void timer_setup_timer(void);
-static void timer_setup_handler(void);
-void timer_signal( int signo );
-
-int timer_init(void)
-{
-  timer_count = 0.0;
-  timer_setup_handler();
-  timer_setup_timer();
-  return 0;
-}
-
-static void timer_setup_timer(void)
-{
-  struct itimerval timer;
-  timer.it_interval.tv_sec=0;
-  timer.it_interval.tv_usec=20000;
-  timer.it_value.tv_sec=0;
-  timer.it_value.tv_usec=20000;
-  setitimer(ITIMER_REAL,&timer,&timer_old_timer);
-}
-
-static void timer_setup_handler(void)
-{
-  struct sigaction handler; 
-  handler.sa_handler=timer_signal;
-  sigemptyset(&handler.sa_mask);
-  handler.sa_flags=0;
-  sigaction(SIGALRM,&handler,&timer_old_handler);
-}  
-
-void
-timer_signal( int signo GCC_UNUSED )
+static void
+timer_tick( void )
 {
   /* If the emulator is running, note that time has passed */
   if( !fuse_emulation_paused ) timer_count += 1.0;
 }
 
-void timer_sleep(void)
-{
-  /* Go to sleep iff we're emulating things fast enough */
-  while( timer_count <= 0.0 ) pause();
-}
+#ifdef DEBUG_MODE
 
-int timer_end(void)
-{
-  /* Restore the old timer */
-  setitimer(ITIMER_REAL,&timer_old_timer,NULL);
+int timer_push( long usec, timer_function_type which ) { return 0; }
+int timer_pop( void ) { return 0; }
+void timer_pause( void ) { }
 
-  /* And the old signal handler */
-  sigaction(SIGALRM,&timer_old_handler,NULL);
+#else				/* #ifdef DEBUG_MODE */
+
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#else				/* #ifdef HAVE_LIB_GLIB */
+#include <libspectrum.h>
+#endif				/* #ifdef HAVE_LIB_GLIB */
+
+#include "fuse.h"
+#include "timer.h"
+#include "ui/ui.h"
+
+#ifndef WIN32
+
+#include <errno.h>
+#include <signal.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+#include "compat.h"
+
+/* Stacks for the old timers and signal handlers */
+static GSList *old_timers = NULL, *old_handlers = NULL;
+
+static void signal_wake( int signo );
+static void signal_tick( int signo );
+
+int
+timer_push( int msec, timer_function_type which )
+{
+  void (*func)( int );
+  struct sigaction handler, *old_handler;
+  struct itimerval timer, *old_timer;
+  int error;
+
+  switch( which ) {
+
+  case TIMER_FUNCTION_WAKE: func = signal_wake; break;
+  case TIMER_FUNCTION_TICK: func = signal_tick; break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "attempt to install unknown timer function %d",
+	      which );
+    return 1;
+  }
+
+  old_handler = malloc( sizeof( struct sigaction ) );
+  if( !old_handler ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
+
+  old_timer = malloc( sizeof( struct itimerval ) );
+  if( !old_timer ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    free( old_handler );
+    return 1;
+  }
+
+  handler.sa_handler = func;
+  sigemptyset( &handler.sa_mask );
+  handler.sa_flags = 0;
+
+  error = sigaction( SIGALRM, &handler, old_handler );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "error setting signal handler: %s",
+	      strerror( errno ) );
+    free( old_handler ); free( old_timer );
+    return error;
+  }
+
+  timer.it_interval.tv_sec  = 0;
+  timer.it_interval.tv_usec = msec * 1000;
+  timer.it_value.tv_sec     = 0;
+  timer.it_value.tv_usec    = msec * 1000;
+
+  error = setitimer( ITIMER_REAL, &timer, old_timer );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "error setting interval timer: %s",
+	      strerror( errno ) );
+    sigaction( SIGALRM, old_handler, NULL );
+    free( old_handler ); free( old_timer );
+    return error;
+  }
+
+  old_handlers = g_slist_prepend( old_handlers, old_handler );
+  old_timers   = g_slist_prepend( old_timers,   old_timer   );
 
   return 0;
-
 }
 
-#endif				/* #ifdef DEBUG_MODE */
+int
+timer_pop( void )
+{
+  struct sigaction *old_handler;
+  struct itimerval *old_timer;
+  int error1, error2;
+
+  old_handler = old_handlers->data;
+  old_handlers = g_slist_remove( old_handlers, old_handler );
+
+  old_timer = old_timers->data;
+  old_timers = g_slist_remove( old_timers, old_timer );
+
+  error1 = sigaction( SIGALRM, old_handler, NULL );
+  if( error1 )
+    ui_error( UI_ERROR_ERROR, "error restoring old signal handler: %s",
+	      strerror( errno ) );
+
+  error2 = setitimer( ITIMER_REAL, old_timer, NULL );
+  if( error2 )
+    ui_error( UI_ERROR_ERROR, "error restoring old interval timer: %s",
+	      strerror( errno ) );
+
+  free( old_handler ); free( old_timer );
+
+  return error1 || error2;
+}
+
+void
+timer_pause( void )
+{
+  pause();
+}
+
+static void signal_wake( int signo GCC_UNUSED ) { }
+
+static void
+signal_tick( int signo GCC_UNUSED )
+{
+  timer_tick();
+}
 
 #else				/* #ifndef WIN32 */
 
@@ -131,65 +223,94 @@ int timer_end(void)
 
 #include <windows.h>
 
-#ifndef DEBUG_MODE
+static GSList *timer_ids;
 
-static MMRESULT wTimerID;
-UINT wTimerRes;
-void CALLBACK timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1,
-			    DWORD dw2 );
+static void CALLBACK timer_null( UINT wTimerID, UINT msg, DWORD dwUser,
+				 DWORD dw1, DWORD dw2 );
+static void CALLBACK timer_signal( UINT wTimerID, UINT msg, DWORD dwUser,
+				   DWORD dw1, DWORD dw2 );
 
 #define TARGET_RESOLUTION 1	/* 1-millisecond target resolution */
 
-#endif				/* #ifndef DEBUG_MODE */
-
 int
-timer_init( void )
+timer_push( int msec, timer_function_type which )
 {
-#ifndef DEBUG_MODE
-
+  void CALLBACK (*func)( UINT, UINT, DWORD, DWORD, DWORD );
+  MMRESULT *wTimerID;
   TIMECAPS tc;
-    
-  timer_count = 0.0;
+  UINT wTimerRes;
 
-  if( timeGetDevCaps( &tc, sizeof( TIMECAPS ) ) != TIMERR_NOERROR ) return 1;
+  switch( which ) {
+
+  case TIMER_FUNCTION_WAKE: func = signal_wake; break;
+  case TIMER_FUNCTION_TICK: func = signal_tick; break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "attempt to install unknown timer function %d",
+	      which );
+    return 1;
+  }
+
+  wTimerID = malloc( sizeof( MMRESULT ) );
+  if( !wTimerID ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
+    
+  if( timeGetDevCaps( &tc, sizeof( TIMECAPS ) ) != TIMERR_NOERROR ) {
+    ui_error( UI_ERROR_ERROR, "error getting timer capabilities" );
+    free( wTimerID );
+    return 1;
+  }
     
   wTimerRes = min( max( tc.wPeriodMin, TARGET_RESOLUTION ), tc.wPeriodMax );
 
-  timeBeginPeriod(wTimerRes);
+  timeBeginPeriod( wTimerRes );
 
-  wTimerID = timeSetEvent( 20, wTimerRes, timer_signal, (DWORD)NULL,
-			   TIME_PERIODIC );
-  if( !wTimerID ) return 1;
+  *wTimerID = timeSetEvent( msec, wTimerRes, func, (DWORD)NULL,
+			    TIME_PERIODIC );
+  if( !(*wTimerID) ) {
+    ui_error( UI_ERROR_ERROR, "error setting timer" );
+    free( wTimerID );
+    return 1;
+  }
 
-#endif				/* #ifndef DEBUG_MODE */
+  timer_ids = g_slist_prepend( timer_ids, wTimerID );
+
+  return 0;
+}
+
+int
+timer_pop( void )
+{
+  MMRESULT *wTimerID;
+
+  wTimerID = timer_ids->data;
+
+  timer_ids = g_slist_remove( timer_ids, wTimerID );
+
+  timeKillEvent( *wTimerID );	/* cancel the event */
+
+  free( wTimerID );
 
   return 0;
 }
 
 void
-timer_sleep( void )
+timer_pause( void )
 {
-#ifndef DEBUG_MODE
-  while( timer_count <= 0.0 ) Sleep(0);
-#endif				/* #ifndef DEBUG_MODE */
+  Sleep( 0 );
 }
 
-int
-timer_end( void )
-{
-#ifndef DEBUG_MODE
-  timeKillEvent(wTimerID);	/* cancel the event */
-  wTimerID = 0;
-#endif				/* #ifndef DEBUG_MODE */
-  return 0;
-}
+static void CALLBACK
+timer_null( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 ) { }
 
-void CALLBACK
+static void CALLBACK
 timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 )
 {
-#ifndef DEBUG_MODE
-  if( !fuse_emulation_paused ) timer_count += 1.0;
-#endif                         /* #ifndef DEBUG_MODE */
+  timer_tick();
 }
 
-#endif   /* #ifndef WIN32 */
+#endif				/* #ifndef WIN32 */
+
+#endif				/* #ifndef DEBUG_MODE */

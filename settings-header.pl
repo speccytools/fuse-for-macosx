@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # settings-header.pl: generate settings.h from settings.dat
-# Copyright (c) 2002 Philip Kendall
+# Copyright (c) 2002-2003 Philip Kendall
 
 # $Id$
 
@@ -58,11 +58,13 @@ while(<>) {
 }
 
 print Fuse::GPL( 'settings.h: Handling configuration settings',
-		 'Copyright (c) 2001-2002 Philip Kendall' );
+		 'Copyright (c) 2001-2003 Philip Kendall' );
 
 print << 'CODE';
 
 #include <config.h>
+
+#include <sys/types.h>
 
 #ifndef FUSE_SETTINGS_H
 #define FUSE_SETTINGS_H

@@ -86,11 +86,6 @@ int slt_screen_level;		/* The level of the screenshot.
 
 int spectrum_interrupt(void)
 {
-  /* FIXME: find some better way to deal with speed == 0 */
-  int speed =
-    settings_current.emulation_speed < 1 ? 1 :
-    settings_current.emulation_speed;
-
   /* Reduce the t-state count of both the processor and all the events
      scheduled to occur. Done slightly differently if RZX playback is
      occuring
@@ -106,13 +101,11 @@ int spectrum_interrupt(void)
 #ifdef UI_SDL		/* SDL sound routines do not provide speed control */
   if( sound_enabled ) sound_frame();
   timer_sleep();
-  timer_count -= 100.0 / speed;
 #else			/* #ifdef UI_SDL */
   if(sound_enabled) {
     sound_frame();
   } else {
     timer_sleep();
-    timer_count -= 100.0 / speed;
   }
 #endif			/* #ifdef UI_SDL */
 

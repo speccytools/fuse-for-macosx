@@ -301,3 +301,4 @@
 20031027 ui/gtk: "delete-event" is spelt "delete-event", not
 	 "delete_event".
 20031027 widget/widget.c: Win32 timing routines (Marek).
+20031028 Generalise the timer routines (see hacking/timer.txt).
