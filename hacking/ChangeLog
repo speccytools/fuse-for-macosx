@@ -388,3 +388,4 @@
 20031214 fuse.c, spectrum.c: DirectX sound routines do not provide timing
 	 control, so always use the timer_* routines.
 20031214 Generalise the low-level sound routines.
+20031215 machine.c: remove unused #includes.

@@ -26,14 +26,8 @@
 
 #include <config.h>
 
-#include <assert.h>
-#include <errno.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <libgen.h>
-#include <settings.h>
+#include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #include "event.h"
 #include "fuse.h"
@@ -41,6 +35,7 @@
 #include "pentagon.h"
 #include "printer.h"
 #include "scld.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "spec16.h"
@@ -54,7 +49,6 @@
 #include "tape.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
-#include "ui/scaler/scaler.h"
 #include "utils.h"
 #include "z80/z80.h"
 
