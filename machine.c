@@ -317,3 +317,18 @@ static int machine_free_machine( fuse_machine_info *machine )
 
   return 0;
 }
+
+/* Get the name from a SPECTRUM_MACHINE_* id */
+const char *
+machine_name( int type )
+{
+  switch( type ) {
+  case SPECTRUM_MACHINE_48:     return "Spectrum 48K";
+  case SPECTRUM_MACHINE_128:    return "Spectrum 128K";
+  case SPECTRUM_MACHINE_PLUS2:  return "Spectrum +2";
+  case SPECTRUM_MACHINE_PLUS2A: return "Spectrum +2A";
+  case SPECTRUM_MACHINE_PLUS3:  return "Spectrum +3";
+  case SPECTRUM_MACHINE_2048:   return "TC2048";
+  default:			return "unknown";
+  }
+}

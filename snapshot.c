@@ -193,7 +193,8 @@ int snapshot_copy_from( libspectrum_snap *snap )
     }
     break;
   default:
-    ui_error( UI_ERROR_ERROR, "Unknown machine type %d", snap->machine );
+    ui_error( UI_ERROR_ERROR, "Unknown machine type %d (%s)", snap->machine,
+	      libspectrum_machine_name( snap->machine ) );
     return 1;
   }
   machine_current->reset();
@@ -319,8 +320,9 @@ int snapshot_copy_to( libspectrum_snap *snap )
     snap->machine = LIBSPECTRUM_MACHINE_PLUS3;
     break;
   default:
-    ui_error( UI_ERROR_ERROR, "Can't handle machine type %d in snapshots",
-	      machine_current->machine );
+    ui_error( UI_ERROR_ERROR, "Can't handle machine type %d (%s) in snapshots",
+	      machine_current->machine,
+	      machine_name( machine_current->machine ) );
     return 1;
   }
 

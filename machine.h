@@ -119,4 +119,6 @@ int machine_find_rom( const char *filename );
 
 int machine_end( void );
 
+const char* machine_name( int type );
+
 #endif			/* #ifndef FUSE_MACHINE_H */
