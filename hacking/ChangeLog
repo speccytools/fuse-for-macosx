@@ -777,3 +777,9 @@
 	 contended memory timings for INC/DEC (HL), <shift/rotate> (HL),
 	 BIT/SET/RES b,(HL), RLD and RRD (thanks, Mark Woodmass and
 	 Jonathan Needle).
+20040428 z80/z80.pl,z80/tests/[df]d{3[456],[45689ab][6e],7[0123457e],cb??}.out:
+	 improved contended memory timings for (IX+nn) and (IY+nn)
+	 instructions (thanks, Mark Woodmass and Jonathan Needle).
+20040430 z80/z80.pl,z80/tests/{dde3.out,e3.out,fde3.out}; improved
+	 contended memory timings for EX (SP),HL, EX (SP),IX and EX
+	 (SP),IY (thanks, Mark Woodmass and Jonathan Needle).

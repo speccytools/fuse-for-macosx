@@ -552,8 +552,8 @@ EX
 	libspectrum_byte bytetempl, bytetemph;
 	bytetempl = readbyte( SP );
 	bytetemph = readbyte( SP + 1 ); tstates++;
-	writebyte( SP,    $low  );
-	writebyte( SP + 1,$high ); tstates += 2;
+	writebyte( SP,     $low  );
+	writebyte( SP + 1, $high ); contend( SP + 1, 1 ); contend( SP + 1, 1 );
 	$low=bytetempl; $high=bytetemph;
       }
 EX
