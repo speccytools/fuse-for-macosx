@@ -727,3 +727,4 @@
 	 DOCK, EXROM).
 20040409 ui/gtk/debugger.c: add indications of whether a chunk is writable
 	 and/or contended to the memory map pane.
+20040409 machines/tc2068.c: #include <string.h> for memset.

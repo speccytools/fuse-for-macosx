@@ -29,6 +29,8 @@
 
 #include <config.h>
 
+#include <string.h>
+
 #include <libspectrum.h>
 
 #include "dck.h"
