@@ -677,11 +677,6 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
       return error;
     }
 
-    fprintf( stderr, "Compressed data from %d to %d bytes\n",
-	     *ptr - data_ptr, gzlength );
-
-    fprintf( stderr, "%p %p\n", *buffer + length_offset, length_ptr );
-
     if( gzlength >= *ptr - data_ptr ) { /* Compression made it bigger :-( */
       *(*buffer + flags_offset) &= ~0x02; /* Clear `compressed' bit */
     } else {
