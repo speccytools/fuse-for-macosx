@@ -186,7 +186,19 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
   { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
-  { "/Options/S_elect ROMs...", NULL , gtkui_roms,          0, NULL          },
+
+  { "/Options/S_elect ROMs",    NULL , NULL,                0, "<Branch>"    },
+  { "/Options/Select ROMs/Spectrum 1_6K...", NULL, gtkui_roms, 1, NULL       },
+  { "/Options/Select ROMs/Spectrum _48K...", NULL, gtkui_roms, 2, NULL       },
+  { "/Options/Select ROMs/Spectrum _128K...", NULL, gtkui_roms, 3, NULL      },
+  { "/Options/Select ROMs/Spectrum +_2...", NULL, gtkui_roms, 4, NULL        },
+  { "/Options/Select ROMs/Spectrum +2_A...", NULL, gtkui_roms, 5, NULL       },
+  { "/Options/Select ROMs/Spectrum +_3...", NULL, gtkui_roms, 6, NULL        },
+  { "/Options/Select ROMs/Timex _TC2048...", NULL, gtkui_roms, 7, NULL       },
+  { "/Options/Select ROMs/Timex T_C2068...", NULL, gtkui_roms, 8, NULL       },
+  { "/Options/Select ROMs/_Pentagon 128K...", NULL, gtkui_roms, 9, NULL      },
+  { "/Options/Select ROMs/_Scorpion ZS 256...", NULL, gtkui_roms, 10, NULL   },
+
   { "/Options/_Filter...",	NULL , select_filter,	    0, NULL          },
 
 #ifdef HAVE_LIB_XML2

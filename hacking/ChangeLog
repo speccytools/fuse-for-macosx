@@ -607,3 +607,5 @@
 	 z80/z80_ops.c: Scorpion support (rest of patch #874504) (Stuart
 	 Brady).
 20040301 configure.in: make GTK+ 2.x the default user interface.
+20040301 ui/gtk/{gtkinternals.h,gtkui.c,roms.c}: split the ROMs selection
+	 dialog into one dialog for each machine.

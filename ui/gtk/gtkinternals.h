@@ -95,7 +95,8 @@ void gtkui_load_binary_data( GtkWidget *widget, gpointer data );
 void gtkui_save_binary_data( GtkWidget *widget, gpointer data );
 int gtkui_confirm( const char *string );
 void gtk_tape_browse( GtkWidget *widget, gpointer data );
-void gtkui_roms( GtkWidget *widget, gpointer data );
+void gtkui_roms( gpointer callback_data, guint callback_action,
+		 GtkWidget *widget );
 
 int gtkui_picture( const char *filename, int border );
 

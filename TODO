@@ -1,11 +1,5 @@
 TODO
 
-For the 0.6.2 release
----------------------
-
-For the 0.7 release
--------------------
-
-* Scorpion emulation (patch #874504).
+* Split the widget ROMs selection dialog into one dialog for each machine.
 
 $Id$

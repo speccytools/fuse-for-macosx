@@ -28,6 +28,7 @@
 
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <gdk/gdkkeysyms.h>
@@ -37,7 +38,9 @@
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "settings.h"
+#include "ui/ui.h"
 
+static int select_roms( libspectrum_machine machine, size_t start, size_t n );
 static void add_rom( GtkWidget *table, gint row, const char *name );
 static void select_new_rom( GtkWidget *widget, gpointer data );
 static void roms_done( GtkWidget *widget, gpointer data );
@@ -46,13 +49,36 @@ static void roms_done( GtkWidget *widget, gpointer data );
 GtkWidget *rom[ SETTINGS_ROM_COUNT ];
 
 void
-gtkui_roms( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+gtkui_roms( gpointer callback_data, guint callback_action, GtkWidget *widget )
+{
+  switch( callback_action ) {
+
+  case  1: select_roms( LIBSPECTRUM_MACHINE_16,      0, 1 ); return;
+  case  2: select_roms( LIBSPECTRUM_MACHINE_48,      1, 1 ); return;
+  case  3: select_roms( LIBSPECTRUM_MACHINE_128,     2, 2 ); return;
+  case  4: select_roms( LIBSPECTRUM_MACHINE_PLUS2,   4, 2 ); return;
+  case  5: select_roms( LIBSPECTRUM_MACHINE_PLUS2A,  6, 4 ); return;
+  case  6: select_roms( LIBSPECTRUM_MACHINE_PLUS3,  10, 4 ); return;
+  case  7: select_roms( LIBSPECTRUM_MACHINE_TC2048, 14, 1 ); return;
+  case  8: select_roms( LIBSPECTRUM_MACHINE_TC2068, 15, 2 ); return;
+  case  9: select_roms( LIBSPECTRUM_MACHINE_PENT,   17, 3 ); return;
+  case 10: select_roms( LIBSPECTRUM_MACHINE_SCORP,  20, 4 ); return;
+
+  }
+
+  ui_error( UI_ERROR_ERROR, "gtkui_roms: unknown action %u", callback_action );
+  fuse_abort();
+}
+
+static int
+select_roms( libspectrum_machine machine, size_t start, size_t n )
 {
   GtkWidget *dialog;
   GtkAccelGroup *accel_group;
   GtkWidget *table;
   GtkWidget *ok_button, *cancel_button;
 
+  char buffer[ 256 ];
   size_t i;
 
   /* Firstly, stop emulation */
@@ -60,7 +86,9 @@ gtkui_roms( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   /* Give me a new dialog box */
   dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Select ROMs" );
+  snprintf( buffer, 256, "Fuse - Select ROMs - %s",
+	    libspectrum_machine_name( machine ) );
+  gtk_window_set_title( GTK_WINDOW( dialog ), buffer );
 
   /* A table to put all the labels in */
   table = gtk_table_new( SETTINGS_ROM_COUNT, 3, FALSE );
@@ -68,7 +96,7 @@ gtkui_roms( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 		     table );
 
   /* And the current values of each of the ROMs */
-  for( i = 0; i < SETTINGS_ROM_COUNT; i++ )
+  for( i = start; n; i++, n-- )
     add_rom( table, i, settings_rom_name[i] );
 
   /* Create the OK and Cancel buttons */
@@ -109,7 +137,7 @@ gtkui_roms( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   /* And then carry on with emulation again */
   fuse_emulation_unpause();
 
-  return;
+  return 0;
 }
 
 static void
