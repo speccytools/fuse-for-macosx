@@ -56,6 +56,7 @@ static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
   *registers[17],			/* The register display */
+  *breakpoints,				/* The breakpoint display */
   *disassembly;				/* The disassembly */
 
 /* The top line of the current disassembly */
@@ -99,7 +100,7 @@ static int
 create_dialog( void )
 {
   size_t i;
-  GtkWidget *hbox;
+  GtkWidget *hbox, *vbox;
   GtkWidget *table, *label;
   GtkWidget *entry, *eval_button;
   GtkWidget *step_button, *close_button;
@@ -116,7 +117,8 @@ create_dialog( void )
 				  "T-states", 
                                 };
 
-  gchar *titles[] = { "Address", "Instruction" };
+  gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life" },
+    *disassembly_titles[] = { "Address", "Instruction" };
 
   /* Try and get a monospaced font */
   style = gtk_style_new();
@@ -131,13 +133,16 @@ create_dialog( void )
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
 
-  /* 'hbox' contains the register display and the disassembly */
+  /* A couple of boxes to contain the things we want to display */
   hbox = gtk_hbox_new( FALSE, 5 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
 
+  vbox = gtk_vbox_new( FALSE, 5 );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
+
   /* 'table' contains the register display */
   table = gtk_table_new( 10, 4, FALSE );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), table );
+  gtk_box_pack_start_defaults( GTK_BOX( vbox ), table );
 
   for( i = 0; i < 15; i++ ) {
 
@@ -163,8 +168,13 @@ create_dialog( void )
   gtk_widget_set_style( label, style );
   gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 2, 9, 10 );
 
+  /* The breakpoint CList */
+  breakpoints = gtk_clist_new_with_titles( 5, breakpoint_titles );
+  gtk_clist_column_titles_passive( GTK_CLIST( breakpoints ) );
+  gtk_box_pack_start_defaults( GTK_BOX( vbox ), breakpoints );
+
   /* Create the disassembly CList itself */
-  disassembly = gtk_clist_new_with_titles( 2, titles );
+  disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
   gtk_widget_set_style( disassembly, style );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
@@ -251,10 +261,13 @@ int
 ui_debugger_update( void )
 {
   size_t i;
-  char buffer[80];
-  gchar *text[] = { &buffer[0], &buffer[40] };
+  char buffer[1024];
+  gchar *breakpoint_text[5] = { &buffer[  0], &buffer[ 40], &buffer[80],
+			        &buffer[120], &buffer[160]               },
+    *disassembly_text[2] = { &buffer[0], &buffer[40] };
   WORD address;
   char *format_16_bit, *format_8_bit;
+  GSList *ptr;
 
   WORD *value_ptr[] = { &PC, &SP,  &AF, &AF_,
 			&BC, &BC_, &DE, &DE_,
@@ -285,6 +298,25 @@ ui_debugger_update( void )
   buffer[8] = '\0';
   gtk_label_set_text( GTK_LABEL( registers[16] ), buffer );
 
+  /* Create the breakpoint list */
+  gtk_clist_freeze( GTK_CLIST( breakpoints ) );
+  gtk_clist_clear( GTK_CLIST( breakpoints ) );
+
+  for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
+
+    debugger_breakpoint *bp = ptr->data;
+
+    snprintf( breakpoint_text[0], 40, "%lu", (unsigned long)bp->id );
+    snprintf( breakpoint_text[1], 40, "%d", bp->type );
+    snprintf( breakpoint_text[2], 40, format_16_bit, bp->value );
+    snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );
+    snprintf( breakpoint_text[4], 40, "%d", bp->life );
+
+    gtk_clist_append( GTK_CLIST( breakpoints ), breakpoint_text );
+  }
+
+  gtk_clist_thaw( GTK_CLIST( breakpoints ) );
+
   /* Put some disassembly in */
   gtk_clist_freeze( GTK_CLIST( disassembly ) );
   gtk_clist_clear( GTK_CLIST( disassembly ) );
@@ -293,11 +325,11 @@ ui_debugger_update( void )
 
     size_t length;
 
-    snprintf( text[0], 40, format_16_bit, address );
-    debugger_disassemble( text[1], 40, &length, address );
+    snprintf( disassembly_text[0], 40, format_16_bit, address );
+    debugger_disassemble( disassembly_text[1], 40, &length, address );
     address += length;
 
-    gtk_clist_append( GTK_CLIST( disassembly ), text );
+    gtk_clist_append( GTK_CLIST( disassembly ), disassembly_text );
   }
   gtk_clist_thaw( GTK_CLIST( disassembly ) );
 
