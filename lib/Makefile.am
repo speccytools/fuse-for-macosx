@@ -24,7 +24,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-FILES = keyboard.scr tape_128.z80 \
+FILES = disk_plus3.z80 \
+	keyboard.scr \
+	tape_128.z80 \
 	tape_16.z80 \
 	tape_2048.z80 \
 	tape_2068.z80 \
