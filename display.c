@@ -450,7 +450,7 @@ void display_refresh_all(void)
       for(z=0;z<8;z++) {
 	display_plot8(x,y+z,read_screen_memory(display_line_start[y+z]+x),
 		      ink,paper);
-	display_is_dirty[y+z]=1;
+	display_is_dirty[y+z] = ~0;	/* Marks all pixels as dirty */
       }
     }
   }
