@@ -29,6 +29,7 @@
 #include <stdlib.h>
 
 #include "rzx.h"
+#include "screenshot.h"
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
@@ -112,6 +113,10 @@ static widget_menu_entry widget_menu_file[] = {
   { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
   { "(R)ecording",		KEYBOARD_r, widget_menu_widget,
 					    &file_recording                 },
+  { "O(p)en SCR screenshot...", KEYBOARD_p, widget_apply_to_file,
+                                            screenshot_scr_read             },
+  { "S(a)ve Screen to 'fuse.scr'", KEYBOARD_a, widget_menu_save_scr,   NULL },
+
 #ifdef USE_LIBPNG
   { "Save S(c)reen to 'fuse.png'",KEYBOARD_c, widget_menu_save_screen, NULL },
 #endif				/* #ifdef USE_LIBPNG */

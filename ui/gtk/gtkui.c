@@ -81,6 +81,8 @@ static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
 static int gtkui_open_snap( void );
 
+static void gtkui_open_scr( GtkWidget *widget, gpointer data );
+static void gtkui_save_scr( GtkWidget *widget, gpointer data );
 #ifdef USE_LIBPNG
 static void gtkui_save_screen( GtkWidget *widget, gpointer data );
 #endif				/* #ifdef USE_LIBPNG */
@@ -131,8 +133,10 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
   { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
 
+  { "/File/O_pen SCR Screenshot...", NULL, gtkui_open_scr,  0, NULL          },
+  { "/File/S_ave Screen as SCR...", NULL, gtkui_save_scr,   0, NULL          },
 #ifdef USE_LIBPNG
-  { "/File/Save S_creen...",    NULL , gtkui_save_screen,   0, NULL          },
+  { "/File/Save S_creen as PNG...", NULL,gtkui_save_screen, 0, NULL          },
 #endif				/* #ifdef USE_LIBPNG */
 
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
@@ -453,8 +457,46 @@ gtkui_open_snap( void )
   return error;
 }
 
+/* File/Open SCR Screenshot */
+static void
+gtkui_open_scr( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename =
+    gtkui_fileselector_get_filename( "Fuse - Open SCR Screenshot" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_scr_read( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+/* File/Save Screenshot as SCR */
+static void
+gtkui_save_scr( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename =
+    gtkui_fileselector_get_filename( "Fuse - Save Screenshot as SCR" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_scr_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
 #ifdef USE_LIBPNG
-/* File/Save Screenshot */
+/* File/Save Screenshot as PNG */
 static void
 gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
@@ -462,7 +504,8 @@ gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename( "Fuse - Save Screenshot" );
+  filename =
+    gtkui_fileselector_get_filename( "Fuse - Save Screenshot as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_save();

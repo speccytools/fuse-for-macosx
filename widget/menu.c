@@ -217,6 +217,14 @@ widget_menu_save_screen( void *data GCC_UNUSED )
 }
 #endif			/* #ifdef USE_LIBPNG */
 
+/* File/Save Scr */
+int
+widget_menu_save_scr( void *data GCC_UNUSED )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+  return screenshot_scr_write( "fuse.scr" );
+}
+
 /* File/Exit */
 int widget_menu_exit( void *data GCC_UNUSED )
 {

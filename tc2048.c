@@ -148,6 +148,7 @@ int tc2048_init( fuse_machine_info *machine )
   machine->ram.write_memory_internal = tc2048_writebyte_internal;
   machine->ram.contend_memory	     = tc2048_contend_memory;
   machine->ram.contend_port	     = tc2048_contend_port;
+  machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;

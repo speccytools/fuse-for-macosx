@@ -29,11 +29,18 @@
 
 #ifdef USE_LIBPNG
 
+#ifndef FUSE_TYPES_H
+#include "types.h"
+#endif      /* #ifndef FUSE_TYPES_H */
+
 extern BYTE screenshot_screen[240][640];
 
 int screenshot_save( void );
 int screenshot_write( const char *filename );
 
 #endif				/* #ifdef USE_LIBPNG */
+
+int screenshot_scr_write( const char *filename );
+int screenshot_scr_read( const char *filename );
 
 #endif				/* #ifndef FUSE_SCREENSHOT_H */

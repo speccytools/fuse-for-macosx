@@ -108,9 +108,8 @@ static int display_border_line(void);
 static void display_dirty_flashing(void);
 static int display_border_column(int time_since_line);
 
-static WORD display_get_addr(int x, int y);
-
-static WORD display_get_addr(int x, int y)
+WORD
+display_get_addr( int x, int y )
 {
   if ( scld_last_dec.name.altdfile ) {
     return display_line_start[y]+x+ALTDFILE_OFFSET;

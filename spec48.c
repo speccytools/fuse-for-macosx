@@ -136,6 +136,7 @@ int spec48_init( fuse_machine_info *machine )
   machine->ram.write_memory_internal = spec48_writebyte_internal;
   machine->ram.contend_memory        = spec48_contend_memory;
   machine->ram.contend_port          = spec48_contend_port;
+  machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;

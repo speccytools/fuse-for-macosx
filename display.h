@@ -88,4 +88,6 @@ void display_refresh_all(void);
 
 void display_refresh_border( void );
 
+WORD display_get_addr( int x, int y );
+
 #endif			/* #ifndef FUSE_DISPLAY_H */
