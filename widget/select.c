@@ -1,5 +1,5 @@
 /* select.c: machine selection widget
-   Copyright (c) 2001,2002 Philip Kendall
+   Copyright (c) 2001-2003 Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -75,6 +75,8 @@ int widget_select_draw( void* data GCC_UNUSED )
 void
 widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 {
+  int new_highlight_line = 0;
+  int cursor_pressed = 0;
   switch( key ) {
 
   case KEYBOARD_Resize:		/* Fake keypress used on window resize */
@@ -89,13 +91,27 @@ widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 
+  case KEYBOARD_7:
+    if ( highlight_line ) {
+      new_highlight_line = highlight_line - 1;
+      cursor_pressed = 1;
+    }
+    break;
+
+  case KEYBOARD_6:
+    if ( highlight_line + 1 < (ptrdiff_t)machine_count ) {
+      new_highlight_line = highlight_line + 1;
+      cursor_pressed = 1;
+    }
+    break;
+
   default:	/* Keep gcc happy */
     break;
 
   }
 
-  if( key >= KEYBOARD_a && key <= KEYBOARD_z &&
-      key - KEYBOARD_a < (ptrdiff_t)machine_count ) {
+  if( cursor_pressed || ( key >= KEYBOARD_a && key <= KEYBOARD_z &&
+      key - KEYBOARD_a < (ptrdiff_t)machine_count )) {
     
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
@@ -104,8 +120,12 @@ widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 			descriptions[ highlight_line ] );
 
     /*  draw the new one */
-    highlight_line = key - KEYBOARD_a;
-
+    if (cursor_pressed) {
+      highlight_line = new_highlight_line;
+    } else {
+      highlight_line = key - KEYBOARD_a;
+    }
+    
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
 		      WIDGET_COLOUR_FOREGROUND );
     widget_printstring( 2, highlight_line+4, WIDGET_COLOUR_BACKGROUND,
