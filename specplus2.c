@@ -1,5 +1,5 @@
 /* specplus2.c: Spectrum +2 specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -30,6 +30,7 @@
 
 #include <libspectrum.h>
 
+#include "periph.h"
 #include "settings.h"
 #include "spec128.h"
 #include "specplus2.h"
@@ -56,7 +57,6 @@ int specplus2_init( fuse_machine_info *machine )
   if( error ) return error;
   machine->rom_length[0] = machine->rom_length[1] = 0x4000;
 
-  machine->peripherals = spec128_peripherals;
   machine->unattached_port = spec128_unattached_port;
 
   machine->ay.present = 1;
@@ -77,6 +77,10 @@ specplus2_reset( void )
   if( error ) return error;
   error = machine_load_rom( &ROM[1], settings_current.rom_plus2_1,
 			    machine_current->rom_length[1] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( spec128_peripherals, spec128_peripherals_count );
   if( error ) return error;
 
   return spec128_common_reset( 1 );

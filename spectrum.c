@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2003 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -120,80 +120,6 @@ spectrum_frame( void )
   }
 
   return 0;
-}
-
-libspectrum_byte
-readport( libspectrum_word port )
-{
-  spectrum_port_info *ptr;
-
-  libspectrum_byte return_value = 0xff;
-  int attached = 0;		/* Is this port attached to anything? */
-
-  /* Trigger the debugger if wanted */
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_READ, port ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
-
-  /* If we're doing RZX playback, get a byte from the RZX file */
-  if( rzx_playback ) {
-
-    libspectrum_error error;
-
-    error = libspectrum_rzx_playback( rzx, &return_value );
-    if( error ) { rzx_stop_playback( 1 ); return readport( port ); }
-
-    return return_value;
-  }
-
-  /* If we're not doing RZX playback, get the byte normally */
-  for( ptr = machine_current->peripherals; ptr->mask; ptr++ ) {
-    if( ( port & ptr->mask ) == ptr->data ) {
-      return_value &= ptr->read(port); attached = 1;
-    }
-  }
-
-  if( !attached ) return_value = machine_current->unattached_port();
-
-  /* If we're RZX recording, store this byte */
-  if( rzx_recording ) rzx_store_byte( return_value );
-
-  return return_value;
-
-}
-
-void
-writeport( libspectrum_word port, libspectrum_byte b )
-{
-  spectrum_port_info *ptr;
-
-  /* Trigger the debugger if wanted */
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, port ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
-
-  for( ptr = machine_current->peripherals; ptr->mask; ptr++ ) {
-    if( ( port & ptr->mask ) == ptr->data ) {
-      ptr->write(port, b);
-    }
-  }
-
-}
-
-/* A dummy function for non-readable ports */
-libspectrum_byte
-spectrum_port_noread( libspectrum_word port GCC_UNUSED )
-{
-  /* FIXME: should this return the floating bus value? */
-  return 0xff;
-}
-
-/* And one for non-writable ports */
-void
-spectrum_port_nowrite( libspectrum_word port GCC_UNUSED,
-		       libspectrum_byte value GCC_UNUSED )
-{
-  return;
 }
 
 /* What do we get if we read from the ULA? */

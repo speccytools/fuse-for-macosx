@@ -1,5 +1,5 @@
 /* z80_ops.c: Process the next opcode
-   Copyright (c) 1999-2003 Philip Kendall, Witold Filipczyk
+   Copyright (c) 1999-2004 Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -32,9 +32,9 @@
 #include "event.h"
 #include "machine.h"
 #include "memory.h"
+#include "periph.h"
 #include "rzx.h"
 #include "settings.h"
-#include "spectrum.h"
 #include "tape.h"
 #include "trdos.h"
 #include "z80.h"

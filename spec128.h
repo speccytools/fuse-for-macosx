@@ -1,5 +1,5 @@
 /* spec128.h: Spectrum 128K specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -33,7 +33,12 @@
 #include "machine.h"
 #endif			/* #ifndef FUSE_MACHINE_H */
 
-extern spectrum_port_info spec128_peripherals[];
+#ifndef FUSE_PERIPH_H
+#include "periph.h"
+#endif			/* #ifndef FUSE_PERIPH_H */
+
+extern const periph_t spec128_peripherals[];
+extern const size_t spec128_peripherals_count;
 
 libspectrum_byte spec128_unattached_port( void );
 

@@ -1,5 +1,5 @@
 /* machine.h: Routines for handling the various machine types
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -82,7 +82,6 @@ typedef struct fuse_machine_info {
   size_t rom_count;	/* How many ROMs does this machine use? */
   size_t *rom_length;	/* And how long is each ROM? */
 
-  spectrum_port_info *peripherals; /* Which peripherals do we have? */
   spectrum_unattached_port_fn unattached_port; /* What to return if we read
 						  from a port which isn't
 						  attached to anything */

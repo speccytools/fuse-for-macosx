@@ -1,5 +1,5 @@
 /* pentagon.h: Pentagon 128K specific routines
-   Copyright (c) 1999-2003 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2004 Philip Kendall and Fredrick Meunier
 
    $Id$
 
@@ -30,8 +30,6 @@
 #ifndef FUSE_MACHINE_H
 #include "machine.h"
 #endif			/* #ifndef FUSE_MACHINE_H */
-
-extern spectrum_port_info pentagon_peripherals[];
 
 libspectrum_byte pentagon_unattached_port( void );
 

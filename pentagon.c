@@ -1,5 +1,5 @@
 /* pentagon.c: Pentagon 128K specific routines
-   Copyright (c) 1999-2003 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2004 Philip Kendall and Fredrick Meunier
 
    $Id$
 
@@ -35,10 +35,10 @@
 #include "compat.h"
 #include "joystick.h"
 #include "memory.h"
+#include "periph.h"
 #include "settings.h"
 #include "pentagon.h"
 #include "spec128.h"
-#include "spectrum.h"
 #include "trdos.h"
 
 static libspectrum_byte pentagon_select_1f_read( libspectrum_word port );
@@ -46,7 +46,7 @@ static libspectrum_byte pentagon_select_ff_read( libspectrum_word port );
 static libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
 static int pentagon_shutdown( void );
 
-spectrum_port_info pentagon_peripherals[] = {
+const static periph_t peripherals[] = {
   { 0x00ff, 0x001f, pentagon_select_1f_read, trdos_cr_write },
   { 0x00ff, 0x003f, trdos_tr_read, trdos_tr_write },
   { 0x00ff, 0x005f, trdos_sec_read, trdos_sec_write },
@@ -54,10 +54,12 @@ spectrum_port_info pentagon_peripherals[] = {
   { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
   { 0x00ff, 0x00ff, pentagon_select_ff_read, trdos_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
-  { 0x8002, 0x0000, spectrum_port_noread, pentagon_memoryport_write },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
+  { 0xc002, 0x8000, NULL, ay_dataport_write },
+  { 0x8002, 0x0000, NULL, pentagon_memoryport_write },
 };
+
+const static size_t peripherals_count =
+  sizeof( peripherals ) / sizeof( periph_t );
 
 libspectrum_byte
 pentagon_select_1f_read( libspectrum_word port )
@@ -128,7 +130,6 @@ pentagon_init( fuse_machine_info *machine )
   machine->rom_length[0] = machine->rom_length[1] = 
     machine->rom_length[2] = 0x4000;
 
-  machine->peripherals = pentagon_peripherals;
   machine->unattached_port = pentagon_unattached_port;
 
   machine->ay.present = 1;
@@ -157,6 +158,10 @@ pentagon_reset(void)
   if( error ) return error;
 
   trdos_available = 1;
+
+  periph_clear();
+  error = periph_register_n( peripherals, peripherals_count );
+  if( error ) return error;
 
   return spec128_common_reset( 0 );
 }

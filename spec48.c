@@ -1,5 +1,5 @@
 /* spec48.c: Spectrum 48K specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -33,17 +33,20 @@
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
+#include "periph.h"
 #include "printer.h"
 #include "settings.h"
 #include "spec48.h"
 #include "spectrum.h"
 
-spectrum_port_info spec48_peripherals[] = {
+const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
 };
+
+const static size_t peripherals_count =
+  sizeof( peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte
 spec48_unattached_port( void )
@@ -130,7 +133,6 @@ int spec48_init( fuse_machine_info *machine )
   if( error ) return error;
   machine->rom_length[0] = 0x4000;
 
-  machine->peripherals = spec48_peripherals;
   machine->unattached_port = spec48_unattached_port;
 
   machine->ay.present = 0;
@@ -149,6 +151,10 @@ spec48_reset( void )
 
   error = machine_load_rom( &ROM[0], settings_current.rom_48,
 			    machine_current->rom_length[0] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( peripherals, peripherals_count );
   if( error ) return error;
 
   memory_map[0].page = &ROM[0][0x0000];

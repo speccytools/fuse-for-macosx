@@ -1,5 +1,5 @@
 /* tc2068.c: Timex TC2068 specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
    Copyright (c) 2002 Fredrick Meunier
    Copyright (c) 2003 Witold Filipczyk
    Copyright (c) 2003 Darren Salt
@@ -41,6 +41,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
+#include "periph.h"
 #include "printer.h"
 #include "scld.h"
 #include "settings.h"
@@ -52,7 +53,7 @@
 static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
 
-spectrum_port_info tc2068_peripherals[] = {
+const static periph_t peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
   /* TS2040/Alphacom printer */
@@ -65,8 +66,10 @@ spectrum_port_info tc2068_peripherals[] = {
   { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
 
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
+
+const static size_t peripherals_count =
+  sizeof( peripherals ) / sizeof( periph_t );
 
 libspectrum_byte
 tc2068_ay_registerport_read( libspectrum_word port )
@@ -201,7 +204,6 @@ tc2068_init( fuse_machine_info *machine )
   machine->rom_length[0] = 0x4000;
   machine->rom_length[1] = 0x2000;
 
-  machine->peripherals = tc2068_peripherals;
   machine->unattached_port = tc2068_unattached_port;
 
   machine->ay.present = 1;
@@ -278,6 +280,10 @@ tc2068_reset( void )
   if( error ) return error;
   error = machine_load_rom( &ROM[1], settings_current.rom_tc2068_1,
 			    machine_current->rom_length[1] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( peripherals, peripherals_count );
   if( error ) return error;
 
   error = dock_exrom_reset(); if( error ) return error;

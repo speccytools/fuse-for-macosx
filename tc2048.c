@@ -1,5 +1,5 @@
 /* tc2048.c: Timex TC2048 specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
    Copyright (c) 2002 Fredrick Meunier
 
    $Id$
@@ -35,6 +35,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
+#include "periph.h"
 #include "printer.h"
 #include "settings.h"
 #include "scld.h"
@@ -43,18 +44,21 @@
 
 static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );
 
-spectrum_port_info tc2048_peripherals[] = {
-  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
+const static periph_t peripherals[] = {
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
-  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write }, /* TS2040/Alphacom printer */
+
+  /* TS2040/Alphacom printer */
+  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
 
   /* Lower 8 bits of Timex ports are fully decoded */
   { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
 
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
+const static size_t peripherals_count =
+  sizeof( peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte
 tc2048_unattached_port( void )
@@ -146,7 +150,6 @@ int tc2048_init( fuse_machine_info *machine )
   if( error ) return error;
   machine->rom_length[0] = 0x4000;
 
-  machine->peripherals = tc2048_peripherals;
   machine->unattached_port = tc2048_unattached_port;
 
   machine->ay.present = 0;
@@ -165,6 +168,10 @@ tc2048_reset( void )
 
   error = machine_load_rom( &ROM[0], settings_current.rom_tc2048,
 			    machine_current->rom_length[0] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( peripherals, peripherals_count );
   if( error ) return error;
 
   memory_map[0].page = &ROM[0][0x0000];

@@ -1,5 +1,5 @@
 /* joystick.c: Joystick emulation support
-   Copyright (c) 2001-2003 Russell Marks, Philip Kendall
+   Copyright (c) 2001-2004 Russell Marks, Philip Kendall
    Copyright (c) 2003 Darren Salt
 
    $Id$
@@ -77,7 +77,7 @@ joystick_default_read( libspectrum_word port, libspectrum_byte which )
 	LIBSPECTRUM_MACHINE_CAPABILITY_KEMPSTON_JOYSTICK               )
       return 0;                         /* Kempston present; send no data */
   
-    return spectrum_port_noread( port );  /* Kempston absent */
+    return 0xff;		/* Kempston absent */
   }
 
 
@@ -95,7 +95,7 @@ libspectrum_byte
 joystick_kempston_read( libspectrum_word port )
 {
   /* If joysticks are disabled, return the floating bus value */
-  if( !settings_current.joy_kempston ) return spectrum_port_noread( port );
+  if( !settings_current.joy_kempston ) return 0xff;
 
   /* If we have no real joysticks, return the QAOP<space>-emulated value */
   if( joysticks_supported == 0 ) return joystick_default_read( port, 0 );

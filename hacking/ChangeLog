@@ -478,3 +478,5 @@
 20040207 Create and use a new UI_ERROR_WARNING error level.
 20040207 Remove duplicated ui_verror code.
 20040207 widget/error.c: #include "fuse.h".
+20040214 First pass at code to allow for a dynamically modifiable
+	 peripheral list.

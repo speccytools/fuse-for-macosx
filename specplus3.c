@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2003 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -50,6 +50,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
+#include "periph.h"
 #include "printer.h"
 #include "settings.h"
 #include "specplus3.h"
@@ -78,22 +79,24 @@ static const char *dsk_template = "fuse.dsk.XXXXXX";
 
 static int specplus3_shutdown( void );
 
-spectrum_port_info specplus3_peripherals[] = {
+const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
-  { 0xc002, 0x4000, spectrum_port_noread, specplus3_memoryport_write },
+  { 0xc002, 0x8000, NULL, ay_dataport_write },
+  { 0xc002, 0x4000, NULL, specplus3_memoryport_write },
 
 #ifdef HAVE_765_H
   { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
-  { 0xf002, 0x2000, specplus3_fdc_status, spectrum_port_nowrite },
+  { 0xf002, 0x2000, specplus3_fdc_status, NULL },
 #endif			/* #ifdef HAVE_765_H */
 
-  { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport2_write },
+  { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
+
+const static size_t peripherals_count =
+  sizeof( peripherals ) / sizeof( periph_t );
 
 #if HAVE_765_H
 static FDC_PTR fdc;		/* The FDC */
@@ -189,7 +192,6 @@ int specplus3_init( fuse_machine_info *machine )
   machine->rom_length[0] = machine->rom_length[1] = 
     machine->rom_length[2] = machine->rom_length[3] = 0x4000;
 
-  machine->peripherals=specplus3_peripherals;
   machine->unattached_port = specplus3_unattached_port;
 
   machine->ay.present=1;
@@ -247,6 +249,10 @@ int specplus3_reset(void)
   if( error ) return error;
   error = machine_load_rom( &ROM[3], settings_current.rom_plus3_3,
 			    machine_current->rom_length[3] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( peripherals, peripherals_count );
   if( error ) return error;
 
 #ifdef HAVE_765_H

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2002 Philip Kendall
+## Copyright (c) 1999-2004 Philip Kendall
 
 ## $Id$
 
@@ -55,30 +55,39 @@ fuse_SOURCES = ay.c \
 	display.c \
 	dxsound.c \
 	event.c \
-	fuse.c keyboard.c machine.c memory.c \
+	fuse.c \
+	joystick.c \
+	keyboard.c \
+	machine.c \
+	memory.c \
 	osssound.c \
 	pentagon.c \
+	periph.c \
+	printer.c \
 	psg.c \
 	rzx.c \
+	scld.c \
+	screenshot.c \
+	sdlsound.c \
 	settings.c \
-	snapshot.c sound.c spec128.c \
-	spec16.c spec48.c specplus2.c specplus2a.c\
+	snapshot.c \
+	sound.c \
+	spec128.c \
+	spec16.c \
+	spec48.c \
+	specplus2.c \
+	specplus2a.c \
 	specplus3.c \
 	spectrum.c \
 	sunsound.c \
 	tape.c \
+	tc2048.c \
+	tc2068.c \
 	timer.c \
 	trdos.c \
 	ui.c \
 	uidisplay.c \
-	utils.c	\
-	joystick.c \
-	printer.c \
-	tc2048.c \
-	tc2068.c \
-	scld.c \
-	screenshot.c \
-	sdlsound.c
+	utils.c
 
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
@@ -118,6 +127,7 @@ noinst_HEADERS = ay.h \
 	machine.h \
 	memory.h \
 	pentagon.h \
+	periph.h \
 	psg.h \
 	rzx.h \
 	screenshot.h \

@@ -1,5 +1,5 @@
 /* spec16.c: Spectrum 16K specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -35,6 +35,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "memory.h"
+#include "periph.h"
 #include "printer.h"
 #include "settings.h"
 #include "spec16.h"
@@ -43,12 +44,14 @@
 
 static libspectrum_byte empty_chunk[0x2000];
 
-spectrum_port_info spec16_peripherals[] = {
+const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
 };
+
+const static size_t peripherals_count =
+  sizeof( peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte
 spec16_unattached_port( void )
@@ -78,7 +81,6 @@ int spec16_init( fuse_machine_info *machine )
 
   memset( empty_chunk, 0xff, 0x2000 );
 
-  machine->peripherals = spec16_peripherals;
   machine->unattached_port = spec16_unattached_port;
 
   machine->ay.present = 0;
@@ -97,6 +99,10 @@ spec16_reset( void )
 
   error = machine_load_rom( &ROM[0], settings_current.rom_16,
 			    machine_current->rom_length[0] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( peripherals, peripherals_count );
   if( error ) return error;
 
   memory_map[0].page = &ROM[0][0x0000];

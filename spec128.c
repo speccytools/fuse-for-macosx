@@ -1,5 +1,5 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -35,18 +35,20 @@
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
+#include "periph.h"
 #include "settings.h"
 #include "spec128.h"
-#include "spectrum.h"
 
-spectrum_port_info spec128_peripherals[] = {
+const periph_t spec128_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
-  { 0x8002, 0x0000, spectrum_port_noread, spec128_memoryport_write },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
+  { 0xc002, 0x8000, NULL, ay_dataport_write },
+  { 0x8002, 0x0000, NULL, spec128_memoryport_write },
 };
+
+const size_t spec128_peripherals_count =
+  sizeof( spec128_peripherals ) / sizeof( periph_t );
 
 libspectrum_byte
 spec128_unattached_port( void )
@@ -134,7 +136,6 @@ int spec128_init( fuse_machine_info *machine )
   if( error ) return error;
   machine->rom_length[0] = machine->rom_length[1] = 0x4000;
 
-  machine->peripherals = spec128_peripherals;
   machine->unattached_port = spec128_unattached_port;
 
   machine->ay.present = 1;
@@ -154,6 +155,10 @@ int spec128_reset(void)
   if( error ) return error;
   error = machine_load_rom( &ROM[1], settings_current.rom_128_1,
 			    machine_current->rom_length[1] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( spec128_peripherals, spec128_peripherals_count );
   if( error ) return error;
 
   return spec128_common_reset( 1 );

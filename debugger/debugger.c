@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2004 Philip Kendall
 
    $Id$
 
@@ -30,7 +30,7 @@
 #include "debugger_internals.h"
 #include "event.h"
 #include "memory.h"
-#include "spectrum.h"
+#include "periph.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"

@@ -1,5 +1,5 @@
 /* specplus2a.c: Spectrum +2A specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -33,6 +33,7 @@
 #include "ay.h"
 #include "joystick.h"
 #include "machine.h"
+#include "periph.h"
 #include "printer.h"
 #include "settings.h"
 #include "spec128.h"
@@ -40,17 +41,18 @@
 #include "specplus3.h"
 #include "spectrum.h"
 
-spectrum_port_info
-specplus2a_peripherals[] = {
+const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
-  { 0xc002, 0x4000, spectrum_port_noread, specplus3_memoryport_write },
-  { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport2_write },
+  { 0xc002, 0x8000, NULL, ay_dataport_write },
+  { 0xc002, 0x4000, NULL, specplus3_memoryport_write },
+  { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
-  { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
+
+const static size_t peripherals_count =
+  sizeof( peripherals ) / sizeof( periph_t );
 
 int
 specplus2a_init( fuse_machine_info *machine )
@@ -74,7 +76,6 @@ specplus2a_init( fuse_machine_info *machine )
   machine->rom_length[0] = machine->rom_length[1] = 
     machine->rom_length[2] = machine->rom_length[3] = 0x4000;
 
-  machine->peripherals = specplus2a_peripherals;
   machine->unattached_port = specplus3_unattached_port;
 
   machine->ay.present=1;
@@ -100,6 +101,10 @@ int specplus2a_reset(void)
   if( error ) return error;
   error = machine_load_rom( &ROM[3], settings_current.rom_plus2a_3,
 			    machine_current->rom_length[3] );
+  if( error ) return error;
+
+  periph_clear();
+  error = periph_register_n( peripherals, peripherals_count );
   if( error ) return error;
 
   return specplus3_plus2a_common_reset();

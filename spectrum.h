@@ -1,5 +1,5 @@
 /* spectrum.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2003 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -86,26 +86,6 @@ extern spectrum_port_contention_function contend_port;
 
 /* How much contention do we get at every tstate? */
 extern libspectrum_byte spectrum_contention[ 80000 ];
-
-/* Things relating to peripherals */
-
-typedef libspectrum_byte
-  (*spectrum_port_read_function)( libspectrum_word port );
-typedef void (*spectrum_port_write_function)( libspectrum_word port,
-					      libspectrum_byte data );
-
-typedef struct spectrum_port_info {
-  libspectrum_word mask;	/* Mask port with these bits */
-  libspectrum_word data;	/* Then see if it's equal to these bits */
-  spectrum_port_read_function read; /* If so, call this function on read */
-  spectrum_port_write_function write; /* Or this one on write */
-} spectrum_port_info;
-
-libspectrum_byte readport( libspectrum_word port );
-void writeport( libspectrum_word port, libspectrum_byte b );
-
-libspectrum_byte spectrum_port_noread( libspectrum_word port );
-void spectrum_port_nowrite( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte spectrum_ula_read( libspectrum_word port );
 void spectrum_ula_write( libspectrum_word port, libspectrum_byte b );
