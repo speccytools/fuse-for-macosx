@@ -206,6 +206,44 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
   return 0;	/* Keep gcc happy */
 }
 
+static int
+encode_bank_and_page( libspectrum_word address )
+{
+  memory_page *page;
+  breakpoint_page_offset offset;
+
+  page = &memory_map[ address >> 13 ];
+
+  switch( page->bank ) {
+  case MEMORY_BANK_HOME:
+    offset = page->writable ? BREAKPOINT_PAGE_RAM : BREAKPOINT_PAGE_ROM;
+    break;
+  case MEMORY_BANK_DOCK: offset = BREAKPOINT_PAGE_DOCK; break;
+  case MEMORY_BANK_EXROM: offset = BREAKPOINT_PAGE_EXROM; break;
+  default: return -1;
+  }
+
+  return offset + page->page_num;
+}
+
+char*
+debugger_breakpoint_decode_page( char *buffer, size_t n, int page )
+{
+  if( page >= BREAKPOINT_PAGE_EXROM ) {
+    snprintf( buffer, n, "X%d", page - BREAKPOINT_PAGE_EXROM );
+  } else if( page >= BREAKPOINT_PAGE_DOCK ) {
+    snprintf( buffer, n, "D%d", page - BREAKPOINT_PAGE_DOCK );
+  } else if( page >= BREAKPOINT_PAGE_ROM ) {
+    snprintf( buffer, n, "R%d", page - BREAKPOINT_PAGE_ROM );
+  } else if( page >= BREAKPOINT_PAGE_RAM ) {
+    snprintf( buffer, n, "%d", page - BREAKPOINT_PAGE_RAM );
+  } else {
+    snprintf( buffer, n, "[Unknown page %d]", page );
+  }
+
+  return buffer;
+}
+
 /* Check whether 'bp' should trigger if we're looking for a breakpoint
    of 'type' with parameter 'value'. Returns non-zero if we should trigger */
 static int
@@ -229,10 +267,7 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
     if( page == -1 ) {
       if( bp->value.address.offset != value ) return 0;
     } else {
-
-      /* FIXME: handle different banks */
-      if( page != memory_map[ value >> 13 ].page_num ) return 0;
-
+      if( page != encode_bank_and_page( value ) ) return 0;
       if( bp->value.address.offset != ( value & 0x3fff ) ) return 0;
     }
     break;

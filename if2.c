@@ -91,7 +91,7 @@ if2_reset( void )
     return 0;
   }
 
-  error = machine_load_rom_bank( memory_map_romcs, 0,
+  error = machine_load_rom_bank( memory_map_romcs, 0, 0,
 				 settings_current.if2_file,
 				 2 * MEMORY_PAGE_SIZE );
   if( error ) return error;

@@ -251,7 +251,7 @@ machine_select_machine( fuse_machine_info *machine )
 }
 
 int
-machine_load_rom_bank( memory_page* bank_map, size_t which,
+machine_load_rom_bank( memory_page* bank_map, size_t which, int page_num,
 		       const char *filename, size_t expected_length )
 {
   int fd, error;
@@ -276,6 +276,8 @@ machine_load_rom_bank( memory_page* bank_map, size_t which,
     return 1;
   }
 
+  bank_map[ which ].offset = 0;
+  bank_map[ which ].page_num = page_num;
   bank_map[ which ].page = memory_pool_allocate( rom.length );
   if( !bank_map[ which ].page ) {
     utils_close_file( &rom );
@@ -288,6 +290,7 @@ machine_load_rom_bank( memory_page* bank_map, size_t which,
        offset < expected_length;
        i++, offset += MEMORY_PAGE_SIZE   ) {
     bank_map[ which + i ].offset = offset;
+    bank_map[ which + i ].page_num = page_num;
     bank_map[ which + i ].page = bank_map[ which ].page + offset;
   }
 
@@ -297,9 +300,10 @@ machine_load_rom_bank( memory_page* bank_map, size_t which,
 }
 
 int
-machine_load_rom( size_t which, const char *filename, size_t expected_length )
+machine_load_rom( size_t which, int page_num, const char *filename,
+		  size_t expected_length )
 {
-  return machine_load_rom_bank( memory_map_rom, which, filename,
+  return machine_load_rom_bank( memory_map_rom, which, page_num, filename,
 				expected_length );
 }
 

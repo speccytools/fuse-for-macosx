@@ -808,3 +808,8 @@
 20040514 spectrum.[ch]: Correct RAM array size comments.
 20040514 dck.c: Move i and mem variables to loop that uses them.
 20040514 roms/{Makefile.am,se-[01].rom}: add SE ROMs.
+20040514 if2.c,machine.[ch],memory.[ch],debugger/breakpoint.[ch],
+	 machines/,ui/gtk/debugger.c: allow breakpoints to be set for
+	 non-RAM pages.
+
+	 

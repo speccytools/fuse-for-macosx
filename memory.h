@@ -78,6 +78,8 @@ int memory_init( void );
 libspectrum_byte *memory_pool_allocate( size_t length );
 void memory_pool_free( void );
 
+const char *memory_bank_name( memory_page *page );
+
 /* Map in alternate bank if ROMCS is set */
 void memory_romcs_map( void );
 

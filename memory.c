@@ -142,6 +142,19 @@ memory_pool_free( void )
   pool = NULL;
 }
 
+const char*
+memory_bank_name( memory_page *page )
+{
+  switch( page->bank ) {
+  case MEMORY_BANK_NONE: return "Empty";
+  case MEMORY_BANK_HOME: return page->writable ? "RAM" : "ROM";
+  case MEMORY_BANK_DOCK: return "Dock";
+  case MEMORY_BANK_EXROM: return "Exrom";
+  }
+
+  return "[Undefined]";
+}
+
 libspectrum_byte
 readbyte( libspectrum_word address )
 {

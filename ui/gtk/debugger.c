@@ -85,6 +85,7 @@ static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
 
 static int activate_debugger( void );
 static int update_memory_map( void );
+static int update_breakpoints( void );
 static int update_disassembly( void );
 static int update_events( void );
 static void add_event( gpointer data, gpointer user_data );
@@ -631,11 +632,8 @@ ui_debugger_update( void )
 {
   size_t i;
   char buffer[1024], format_string[1024];
-  gchar *breakpoint_text[6] = { &buffer[  0], &buffer[ 40], &buffer[80],
-			        &buffer[120], &buffer[160], &buffer[200] },
-    *disassembly_text[2] = { &buffer[0], &buffer[40] };
+  gchar *disassembly_text[2] = { &buffer[0], &buffer[40] };
   libspectrum_word address;
-  GSList *ptr;
   int capabilities; size_t length;
   int error;
 
@@ -720,59 +718,7 @@ ui_debugger_update( void )
   /* Update the memory map display */
   error = update_memory_map(); if( error ) return error;
 
-  /* Create the breakpoint list */
-  gtk_clist_freeze( GTK_CLIST( breakpoints ) );
-  gtk_clist_clear( GTK_CLIST( breakpoints ) );
-
-  for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
-
-    debugger_breakpoint *bp = ptr->data;
-
-    snprintf( breakpoint_text[0], 40, "%lu", (unsigned long)bp->id );
-    snprintf( breakpoint_text[1], 40, "%s",
-	      debugger_breakpoint_type_text[ bp->type ] );
-
-    switch( bp->type ) {
-
-    case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
-    case DEBUGGER_BREAKPOINT_TYPE_READ:
-    case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-      if( bp->value.address.page == -1 ) {
-	snprintf( breakpoint_text[2], 40, format_16_bit(),
-		  bp->value.address.offset );
-      } else {
-	sprintf( format_string, "%%d:%s", format_16_bit() );
-	snprintf( breakpoint_text[2], 40, format_string,
-		  bp->value.address.page, bp->value.address.offset );
-      }
-      break;
-
-    case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
-    case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
-      sprintf( format_string, "%s:%s", format_16_bit(), format_16_bit() );
-      snprintf( breakpoint_text[2], 40, format_string,
-		bp->value.port.mask, bp->value.port.port );
-      break;
-
-    case DEBUGGER_BREAKPOINT_TYPE_TIME:
-      snprintf( breakpoint_text[2], 40, "%5d", bp->value.tstates );
-      break;
-
-    }
-
-    snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );
-    snprintf( breakpoint_text[4], 40, "%s",
-	      debugger_breakpoint_life_text[ bp->life ] );
-    if( bp->condition ) {
-      debugger_expression_deparse( breakpoint_text[5], 80, bp->condition );
-    } else {
-      strcpy( breakpoint_text[5], "" );
-    }
-
-    gtk_clist_append( GTK_CLIST( breakpoints ), breakpoint_text );
-  }
-
-  gtk_clist_thaw( GTK_CLIST( breakpoints ) );
+  error = update_breakpoints(); if( error ) return error;
 
   /* Update the disassembly */
   error = update_disassembly(); if( error ) return error;
@@ -810,7 +756,7 @@ update_memory_map( void )
     snprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
     gtk_label_set_text( GTK_LABEL( map_label[i][0] ), buffer );
 
-    snprintf( buffer, 40, "%d %d", memory_map[i].bank,
+    snprintf( buffer, 40, "%s %d", memory_bank_name( &memory_map[i] ),
 	      memory_map[i].page_num );
     gtk_label_set_text( GTK_LABEL( map_label[i][1] ), buffer );
 
@@ -820,6 +766,73 @@ update_memory_map( void )
     gtk_label_set_text( GTK_LABEL( map_label[i][3] ),
 			memory_map[i].contended ? "Y" : "N" );
   }
+
+  return 0;
+}
+
+static int
+update_breakpoints( void )
+{
+  gchar buffer[ 1024 ],
+    *breakpoint_text[6] = { &buffer[  0], &buffer[ 40], &buffer[80],
+			    &buffer[120], &buffer[160], &buffer[200] };
+  GSList *ptr;
+  char format_string[ 1024 ], page[ 1024 ];
+
+  /* Create the breakpoint list */
+  gtk_clist_freeze( GTK_CLIST( breakpoints ) );
+  gtk_clist_clear( GTK_CLIST( breakpoints ) );
+
+  for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
+
+    debugger_breakpoint *bp = ptr->data;
+
+    snprintf( breakpoint_text[0], 40, "%lu", (unsigned long)bp->id );
+    snprintf( breakpoint_text[1], 40, "%s",
+	      debugger_breakpoint_type_text[ bp->type ] );
+
+    switch( bp->type ) {
+
+    case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
+    case DEBUGGER_BREAKPOINT_TYPE_READ:
+    case DEBUGGER_BREAKPOINT_TYPE_WRITE:
+      if( bp->value.address.page == -1 ) {
+	snprintf( breakpoint_text[2], 40, format_16_bit(),
+		  bp->value.address.offset );
+      } else {
+	debugger_breakpoint_decode_page( page, 1024, bp->value.address.page );
+	snprintf( format_string, 1024, "%%s:%s", format_16_bit() );
+	snprintf( breakpoint_text[2], 40, format_string, page,
+		  bp->value.address.offset );
+      }
+      break;
+
+    case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
+    case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
+      sprintf( format_string, "%s:%s", format_16_bit(), format_16_bit() );
+      snprintf( breakpoint_text[2], 40, format_string,
+		bp->value.port.mask, bp->value.port.port );
+      break;
+
+    case DEBUGGER_BREAKPOINT_TYPE_TIME:
+      snprintf( breakpoint_text[2], 40, "%5d", bp->value.tstates );
+      break;
+
+    }
+
+    snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );
+    snprintf( breakpoint_text[4], 40, "%s",
+	      debugger_breakpoint_life_text[ bp->life ] );
+    if( bp->condition ) {
+      debugger_expression_deparse( breakpoint_text[5], 80, bp->condition );
+    } else {
+      strcpy( breakpoint_text[5], "" );
+    }
+
+    gtk_clist_append( GTK_CLIST( breakpoints ), breakpoint_text );
+  }
+
+  gtk_clist_thaw( GTK_CLIST( breakpoints ) );
 
   return 0;
 }

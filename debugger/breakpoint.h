@@ -54,6 +54,14 @@ typedef struct debugger_breakpoint_address {
 
 } debugger_breakpoint_address;
 
+/* Offsets used to encode various bank types in the above 'page' variable */
+typedef enum breakpoint_page_offset {
+  BREAKPOINT_PAGE_RAM = 0,
+  BREAKPOINT_PAGE_ROM = 32,
+  BREAKPOINT_PAGE_DOCK = 40,
+  BREAKPOINT_PAGE_EXROM = 48,
+} breakpoint_page_offset;
+
 typedef struct debugger_breakpoint_port {
 
   libspectrum_word port;
@@ -111,5 +119,8 @@ debugger_breakpoint_add_time(
 /* Add events corresponding to all the time breakpoints to happen
    during this frame */
 int debugger_add_time_events( void );
+
+char*
+debugger_breakpoint_decode_page( char *buffer, size_t n, int page );
 
 #endif				/* #ifndef FUSE_DEBUGGER_BREAKPOINT_H */
