@@ -121,13 +121,6 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   libspectrum_machine machine = snap->machine;
 
-  if( machine == LIBSPECTRUM_MACHINE_PENT ) {
-    ui_error( UI_ERROR_INFO, "%s not supported; trying %s instead",
-	      libspectrum_machine_name( snap->machine ),
-	      libspectrum_machine_name( LIBSPECTRUM_MACHINE_128 ) );
-    machine = LIBSPECTRUM_MACHINE_128;
-  }
-
   error = machine_select( machine );
   if( error ) {
 
