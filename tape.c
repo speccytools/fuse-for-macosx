@@ -199,7 +199,7 @@ tape_autoload( libspectrum_machine hardware )
   error = utils_read_fd( fd, filename, &snap, &length );
   if( error ) return error;
 
-  error = snapshot_open_z80_buffer( snap, length );
+  error = snapshot_read_buffer( snap, length, LIBSPECTRUM_ID_SNAPSHOT_Z80 );
   if( error ) { munmap( snap, length ); return error; }
 
   if( munmap( snap, length ) ) {

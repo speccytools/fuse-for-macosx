@@ -272,7 +272,7 @@ int fuse_emulation_unpause(void)
 static int
 parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
 {
-  unsigned char *buffer; size_t length; int type;
+  unsigned char *buffer; size_t length; libspectrum_id_t type;
   int error = 0;
 
   while( first_arg < argc ) {
@@ -298,12 +298,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
       break;
 
     case LIBSPECTRUM_ID_SNAPSHOT_SNA:
-      error = snapshot_open_sna_buffer( buffer, length );
-      if( !error ) autoload = 0;
-      break;
-
     case LIBSPECTRUM_ID_SNAPSHOT_Z80:
-      error = snapshot_open_z80_buffer( buffer, length );
+      error = snapshot_read_buffer( buffer, length, type );
       if( !error ) autoload = 0;
       break;
 

@@ -30,8 +30,8 @@
 #endif				/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
 int snapshot_read( const char *filename );
-int snapshot_open_sna_buffer( const unsigned char *buffer, size_t length );
-int snapshot_open_z80_buffer( const unsigned char *buffer, size_t length );
+int snapshot_read_buffer( const unsigned char *buffer, size_t length,
+			  libspectrum_id_t type );
 
 int snapshot_copy_from( libspectrum_snap *snap );
 

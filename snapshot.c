@@ -96,33 +96,16 @@ void snapshot_flush_slt (void)
 }
 
 int
-snapshot_open_sna_buffer( const unsigned char *buffer, size_t length )
+snapshot_read_buffer( const unsigned char *buffer, size_t length,
+		      libspectrum_id_t type )
 {
   libspectrum_snap *snap; int error;
 
   error = libspectrum_snap_alloc( &snap ); if( error ) return error;
 
-  error = libspectrum_sna_read( snap, buffer, length );
+  error = libspectrum_snap_read( snap, buffer, length, type, NULL );
   if( error ) { libspectrum_snap_free( snap ); return error; }
-
-  error = snapshot_copy_from( snap );
-  if( error ) { libspectrum_snap_free( snap ); return error; }
-
-  error = libspectrum_snap_free( snap ); if( error ) return error;
-
-  return 0;
-}
-
-int
-snapshot_open_z80_buffer( const unsigned char *buffer, size_t length )
-{
-  libspectrum_snap *snap; int error;
-
-  error = libspectrum_snap_alloc( &snap ); if( error ) return error;
-
-  error = libspectrum_z80_read( snap, buffer, length );
-  if( error ) { libspectrum_snap_free( snap ); return error; }
-
+    
   error = snapshot_copy_from( snap );
   if( error ) { libspectrum_snap_free( snap ); return error; }
 
