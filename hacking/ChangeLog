@@ -1030,3 +1030,5 @@
 20040722 ui/fb/fbdisplay.c: improve error messages slightly.
 20040723 trdos.c: get the capabilities check right in trdos_from_snapshot.
 	 Should prevent the occasional errant 'No disk' messages.
+20040724 ui/sdl/sdldisplay.c: SDL_SetColors does not take a const array. Fix
+         565/555 mode detection.

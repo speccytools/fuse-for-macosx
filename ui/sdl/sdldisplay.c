@@ -61,7 +61,7 @@ static int tmp_screen_width;
 
 static Uint32 colour_values[16];
 
-static const SDL_Color colour_palette[] = {
+static SDL_Color colour_palette[] = {
   {   0,   0,   0,   0 }, 
   {   0,   0, 192,   0 }, 
   { 192,   0,   0,   0 }, 
@@ -277,7 +277,7 @@ sdldisplay_load_gfx_mode( void )
   }
 
   /* Distinguish 555 and 565 mode */
-  if( sdldisplay_gc->format->Rmask == 0x7C00 )
+  if( sdldisplay_gc->format->Gmask >> sdldisplay_gc->format->Gshift == 0x1f )
     scaler_select_bitformat( 555 );
   else
     scaler_select_bitformat( 565 );
