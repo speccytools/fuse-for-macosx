@@ -753,6 +753,8 @@ void display_refresh_all(void)
 {
   size_t y;
 
-  for( y = 0; y < DISPLAY_SCREEN_HEIGHT ; y++ )
+  for( y = 0; y < DISPLAY_SCREEN_HEIGHT ; y++ ) {
     display_is_dirty[y] = display_all_dirty;
+    display_draw_line( y );
+  }
 }
