@@ -44,6 +44,7 @@ static const int LIBSPECTRUM_Z80_HEADER_LENGTH = 30;
 
 /* The signature used to designate the .slt extensions */
 static uchar slt_signature[] = "\0\0\0SLT";
+static size_t slt_signature_length = 6;
 
 static int read_v1_block( uchar *buffer, int is_compressed, 
 			  uchar **uncompressed, uchar **next_block,
@@ -277,7 +278,6 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
   while( 1 ) {
 
     int type, level;
-    long length;
 
     /* Check we've got enough data left */
     if( *next_block + 8 >= end ) {
@@ -329,6 +329,8 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
   for( i=0; i<256; i++ ) {
     if( slt_length[i] ) {
 
+      libspectrum_error error;
+
       /* Check this data actually exists */
       if( *next_block + slt_length[i] >= end ) {
 	libspectrum_print_error(
@@ -337,10 +339,10 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
 	return LIBSPECTRUM_ERROR_CORRUPT;
       }
 
-      int error = libspectrum_z80_uncompress_block(
-		    &(snap->slt[i]), &(snap->slt_length[i]),
-		    *next_block, slt_length[i]
-		  );
+      error = libspectrum_z80_uncompress_block(
+	        &(snap->slt[i]), &(snap->slt_length[i]),
+		*next_block, slt_length[i]
+	      );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
       /* Move past this data */
@@ -529,7 +531,7 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
 
   if (length2 == 0 && *page == 0) {
     if (buffer + 8 < end
-	&& !memcmp( buffer, slt_signature, strlen( slt_signature ) ) )
+	&& !memcmp( buffer, slt_signature, slt_signature_length ) )
     {
       /* Ah, we have what looks like SLT data... */
       *next_block = buffer + 6;
@@ -815,12 +817,12 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   libspectrum_error error;
 
   /* Make room for the .slt signature */
-  error = libspectrum_make_room( buffer, (*offset) + strlen( slt_signature ),
+  error = libspectrum_make_room( buffer, (*offset) + slt_signature_length,
 				 &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  memcpy( ptr, slt_signature, strlen( slt_signature ) );
-  (*offset) += 6;
+  memcpy( ptr, slt_signature, slt_signature_length );
+  (*offset) += slt_signature_length;
 
   /* Now write out the .slt directory */
   for( i=0; i<256; i++ ) {
