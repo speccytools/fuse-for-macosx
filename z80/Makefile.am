@@ -50,12 +50,17 @@ z80_ed.c: z80.pl opcodes_ed.dat
 noinst_HEADERS = z80.h \
 		 z80_macros.h 
 
-EXTRA_DIST = opcodes_base.dat \
+EXTRA_DIST = opcodes_base.c \
+	     opcodes_base.dat \
 	     opcodes_cb.dat \
 	     opcodes_ddfd.dat \
 	     opcodes_ddfdcb.dat \
-             opcodes_ed.dat \
-	     z80.pl
+	     opcodes_ed.dat \
+	     z80.pl \
+	     z80_cb.c \
+	     z80_ddfd.c \
+	     z80_ddfdcb.c \
+	     z80_ed.c
 
 ## The core tester
 
