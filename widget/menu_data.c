@@ -32,6 +32,13 @@
 
 /* FIXME: there must be a better way of initialising all the menu data */
 
+static widget_menu_entry widget_menu_file[];
+static widget_menu_entry widget_menu_file_recording[];
+static widget_menu_entry widget_menu_machine[];
+static widget_menu_entry widget_menu_options[];
+static widget_menu_entry widget_menu_tape[];
+static widget_menu_entry widget_menu_help[];
+
 /* Main menu */
 
 static widget_menu_widget_t main_file =    { WIDGET_TYPE_MENU,
@@ -59,12 +66,29 @@ widget_menu_entry widget_menu_main[] = {
 
 /* File menu */
 
-widget_menu_entry widget_menu_file[] = {
+static widget_menu_widget_t file_recording = { WIDGET_TYPE_MENU,
+					       &widget_menu_file_recording };
+
+static widget_menu_entry widget_menu_file[] = {
   { "File", 0, 0, NULL },		/* Menu title */
 
   { "(O)pen snapshot...",       KEYBOARD_o, widget_menu_open_snapshot, NULL },
   { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
+  { "(R)ecording",		KEYBOARD_r, widget_menu_widget,
+					    &file_recording                 },
   { "E(x)it",			KEYBOARD_x, widget_menu_exit,          NULL },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* File/Recording menu */
+
+static widget_menu_entry widget_menu_file_recording[] = {
+  { "Recording", 0, 0, NULL },		/* Menu title */
+
+  { "(S)tart...", KEYBOARD_s, widget_menu_rzx_start, NULL },
+  { "(P)lay...",  KEYBOARD_p, widget_menu_rzx_play,  NULL },
+  { "S(t)op",	  KEYBOARD_t, widget_menu_rzx_stop,  NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
@@ -73,7 +97,7 @@ widget_menu_entry widget_menu_file[] = {
 
 static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 
-widget_menu_entry widget_menu_options[] = {
+static widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
 
   { "(G)eneral...", KEYBOARD_g, widget_menu_widget, &options_general },
@@ -85,7 +109,7 @@ widget_menu_entry widget_menu_options[] = {
 
 static widget_menu_widget_t machine_select = { WIDGET_TYPE_SELECT, NULL };
 
-widget_menu_entry widget_menu_machine[] = {
+static widget_menu_entry widget_menu_machine[] = {
   { "Machine", 0, 0, NULL },		/* Menu title */
 
   { "(R)eset",     KEYBOARD_r, widget_menu_reset,  NULL            },
@@ -96,7 +120,7 @@ widget_menu_entry widget_menu_machine[] = {
 
 /* Tape menu */
 
-widget_menu_entry widget_menu_tape[] = {
+static widget_menu_entry widget_menu_tape[] = {
   { "Tape", 0, 0, NULL },		/* Menu title */
 
   { "(O)pen tape...",           KEYBOARD_o, widget_menu_open_tape,   NULL },
@@ -112,7 +136,7 @@ widget_menu_entry widget_menu_tape[] = {
 
 static widget_picture_data help_keyboard = { "keyboard.scr", NULL, 0 };
 
-widget_menu_entry widget_menu_help[] = {
+static widget_menu_entry widget_menu_help[] = {
   { "Help", 0, 0, NULL },		/* Menu title */
 
   { "(K)eyboard...", KEYBOARD_k, widget_menu_keyboard, &help_keyboard },

@@ -192,6 +192,11 @@ typedef struct widget_menu_widget_t {
 /* More callbacks */
 int widget_menu_open_snapshot( void *data ); /* File/Open */
 int widget_menu_save_snapshot( void *data ); /* File/Save */
+
+int widget_menu_rzx_start( void *data );     /* File/Recording/Start */
+int widget_menu_rzx_play( void *data );	     /* File/Recording/Play */
+int widget_menu_rzx_stop( void *data );	     /* File/Recording/Stop */
+
 int widget_menu_exit( void *data );	     /* File/Exit */
 
 int widget_menu_reset( void *data );	     /* Machine/Reset */
@@ -207,11 +212,11 @@ int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
 /* Available menus */
 
 extern widget_menu_entry widget_menu_main[];
-extern widget_menu_entry widget_menu_file[];
-extern widget_menu_entry widget_menu_machine[];
-extern widget_menu_entry widget_menu_options[];
-extern widget_menu_entry widget_menu_tape[];
-extern widget_menu_entry widget_menu_help[];
+/*  extern widget_menu_entry widget_menu_file[]; */
+/*  extern widget_menu_entry widget_menu_machine[]; */
+/*  extern widget_menu_entry widget_menu_options[]; */
+/*  extern widget_menu_entry widget_menu_tape[]; */
+/*  extern widget_menu_entry widget_menu_help[]; */
 
 /* The select machine widget */
 

@@ -34,6 +34,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "machine.h"
+#include "rzx.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "utils.h"
@@ -122,6 +123,32 @@ int widget_menu_save_snapshot( void *data )
   widget_end_all( WIDGET_FINISHED_OK );
   return snapshot_write( "snapshot.z80" );
 }
+
+/* File/Recording/Start */
+int widget_menu_rzx_start( void *data )
+{
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  if( widget_filesel_name ) rzx_start_recording( widget_filesel_name );
+
+  return 0;
+}
+
+/* File/Recording/Play */
+int widget_menu_rzx_play( void *data )
+{
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  if( widget_filesel_name ) rzx_start_playback( widget_filesel_name );
+
+  return 0;
+}
+
+/* File/Recording/Stop */
+int widget_menu_rzx_stop( void *data )
+{
+  if( rzx_recording ) rzx_stop_recording();
+  if( rzx_playback  ) rzx_stop_playback();
+  return 0;
+}  
 
 /* File/Exit */
 int widget_menu_exit( void *data )
