@@ -171,7 +171,6 @@ static int fuse_init(int argc, char **argv)
   fuse_joystick_init ();
   fuse_keyboard_init();
 
-  if( creator_init() ) return 1;
   if( tape_init() ) return 1;
 
 #ifdef USE_WIDGET
@@ -190,6 +189,10 @@ static int fuse_init(int argc, char **argv)
 	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
     return 1;
   }
+
+  /* Must be called after libspectrum_init() so we can get the gcrypt
+     version */
+  if( creator_init() ) return 1;
 
 #ifdef HAVE_GETEUID
   /* Drop root privs if we have them */
@@ -251,6 +254,8 @@ int creator_init( void )
   struct utsname buf;
   libspectrum_error error; int sys_error;
 
+  const char *gcrypt_version;
+
   sscanf( VERSION, "%u.%u.%u.%u",
 	  &version[0], &version[1], &version[2], &version[3] );
 
@@ -283,8 +288,11 @@ int creator_init( void )
     return 1;
   }
 
-  snprintf( custom, 256, "libspectrum: %s\nuname: %s %s %s",
-	    libspectrum_version(),
+  gcrypt_version = libspectrum_gcrypt_version();
+  if( !gcrypt_version ) gcrypt_version = "not available";
+
+  snprintf( custom, 256, "gcrypt: %s\nlibspectrum: %s\nuname: %s %s %s",
+	    gcrypt_version, libspectrum_version(),
 	    buf.sysname, buf.machine, buf.release );
 
   error = libspectrum_creator_set_custom( fuse_creator,

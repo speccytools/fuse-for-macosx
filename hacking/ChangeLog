@@ -274,3 +274,6 @@
 	 mode recording.
 20031013 fuse.c: check libspectrum's version at startup.
 20031013 fuse.c: add libspectrum version to the creator custom data.
+20031013 fuse.c, rzx.c: put gcrypt version into creator custom data. Give
+	 warning if a competition mode recording is started, but gcrypt is
+	 not available.
