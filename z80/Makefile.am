@@ -47,17 +47,12 @@ z80_ddfdcb.c: z80.pl opcodes_ddfd.dat
 z80_ed.c: z80.pl opcodes_ed.dat
 	@PERL@ z80.pl opcodes_ed.dat > z80_ed.c
 
-noinst_HEADERS = opcodes_base.c \
-		 z80.h \
-		 z80_cb.c \
-		 z80_ddfd.c \
-		 z80_ddfdcb.c \
-		 z80_ed.c \
+noinst_HEADERS = z80.h \
 		 z80_macros.h 
 
 EXTRA_DIST = opcodes_base.dat \
 	     opcodes_cb.dat \
 	     opcodes_ddfd.dat \
 	     opcodes_ddfdcb.dat \
-	     opcodes_ed.dat
-
+             opcodes_ed.dat \
+	     z80.pl
