@@ -196,3 +196,4 @@
 20030913 lib/Makefile.am: distribute disk_plus3.z80 (Release-0_6_1-branch)
 20030913 Merge the above change back onto HEAD.
 20030918 settings.dat, ui/options.dat, ui/sdl/sdldisplay.c: B&W TV mode (Fred).
+20030918 ui/gtk/gtkdisplay.c, ui/gtk/options.pl: B&W TV mode for the GTK+ UI.

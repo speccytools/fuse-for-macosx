@@ -43,6 +43,7 @@
 #include "ui/uidisplay.h"
 #include "ui/scaler/scaler.h"
 #include "scld.h"
+#include "settings.h"
 
 /* The size of a 1x1 image in units of
    DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */
@@ -84,8 +85,15 @@ static guchar rgb_colours[16][3] = {
 
 };
 
-/* And the colours 32-bit format */
+/* And the black and white palette */
+static guchar rgb_bw[16] = {
+  0, 64, 64, 128, 64, 128, 128, 192,
+  0, 85, 85, 170, 85, 170, 170, 255
+};
+
+/* And the colours (and black and white 'colours') in 32-bit format */
 libspectrum_dword gtkdisplay_colours[16];
+static libspectrum_dword bw_colours[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int gtkdisplay_current_size=1;
@@ -106,6 +114,7 @@ int
 gtkdisplay_init( void )
 {
   int x, y, error;
+  libspectrum_dword black;
 
   gtk_signal_connect( GTK_OBJECT(gtkui_drawing_area), "expose_event", 
 		      GTK_SIGNAL_FUNC(gtkdisplay_expose), NULL);
@@ -114,10 +123,11 @@ gtkdisplay_init( void )
 
   error = init_colours(); if( error ) return error;
 
+  black = settings_current.colour_tv ? gtkdisplay_colours[0] : bw_colours[0];
+
   for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
     for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
-      *(libspectrum_dword*)( rgb_image + y * rgb_pitch + 4 * x ) =
-	gtkdisplay_colours[0];
+      *(libspectrum_dword*)( rgb_image + y * rgb_pitch + 4 * x ) = black;
 
   display_ui_initialised = 1;
 
@@ -132,13 +142,19 @@ init_colours( void )
   for( i = 0; i < 16; i++ ) {
 
 #ifdef WORDS_BIGENDIAN
+
     gtkdisplay_colours[i] = rgb_colours[i][0] << 24 |
 			    rgb_colours[i][1] << 16 |
 			    rgb_colours[i][2] <<  8 ;
+    bw_colours[i] = rgb_bw[i] << 24 | rgb_bw[i] << 16 | rgb_bw[i] << 8;
+
 #else				/* #ifdef WORDS_BIGENDIAN */
+
     gtkdisplay_colours[i] = rgb_colours[i][0]       |
 			    rgb_colours[i][1] <<  8 |
 			    rgb_colours[i][2] << 16 ;
+    bw_colours[i] = rgb_bw[i] | rgb_bw[i] << 8 | rgb_bw[i] << 16;
+
 #endif				/* #ifdef WORDS_BIGENDIAN */
 
   }
@@ -247,6 +263,7 @@ uidisplay_area( int x, int y, int w, int h )
 {
   float scale = (float)gtkdisplay_current_size / image_scale;
   int scaled_x, scaled_y, xx, yy;
+  libspectrum_dword *palette;
 
   /* Extend the dirty region by 1 pixel for scalers
      that "smear" the screen, e.g. 2xSAI */
@@ -255,12 +272,14 @@ uidisplay_area( int x, int y, int w, int h )
 
   scaled_x = scale * x; scaled_y = scale * y;
 
+  palette = settings_current.colour_tv ? gtkdisplay_colours : bw_colours;
+
   /* Create the RGB image */
   for( xx = x; xx < x + w; xx++ )
     for( yy = y; yy < y + h; yy++ ) {
       *(libspectrum_dword*)
 	(rgb_image + ( yy + 2 ) * rgb_pitch + 4 * ( xx + 1 ) ) =
-	gtkdisplay_colours[ display_image[yy][xx] ];
+	  palette[ display_image[yy][xx] ];
     }
 
   /* Create scaled image */

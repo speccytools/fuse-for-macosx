@@ -52,6 +52,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include <gtk/gtk.h>
 
 #include "compat.h"
+#include "display.h"
 #include "fuse.h"
 #include "settings.h"
 #include "gtkui.h"
@@ -201,6 +202,8 @@ CODE
 
     print << "CODE";
   gtk_widget_destroy( ptr->dialog );
+
+  display_refresh_all();
 
   gtk_main_quit();
 }
