@@ -1,5 +1,5 @@
 /* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2001 Philip Kendall
+   Copyright (c) 2000-2001 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
@@ -76,19 +77,19 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		     NULL , NULL,            0, "<Branch>"    },
-  { "/File/_Open Snapshot" , "F3" , gtkui_open,      0, NULL          },
-  { "/File/_Save Snapshot" , "F2" , gtkui_save,      0, NULL          },
-  { "/File/separator",       NULL , NULL,            0, "<Separator>" },
-  { "/File/E_xit",	     "F10", gtkui_quit,      0, NULL          },
-  { "/Options",		     NULL , NULL,            0, "<Branch>"    },
-  { "/Options/_General",     "F4" , gtkui_options,   0, NULL          },
-  { "/Machine",		     NULL , NULL,            0, "<Branch>"    },
-  { "/Machine/_Reset",	     "F5" , gtkui_reset,     0, NULL          },
-  { "/Machine/_Switch",      "F9" , gtkui_switch,    0, NULL          },
-  { "/Tape",                 NULL , NULL,            0, "<Branch>"    },
-  { "/Tape/_Open",	     "F7" , gtkui_tape_open, 0, NULL          },
-  { "/Tape/_Play",	     "F8" , gtkui_tape_play, 0, NULL          },
+  { "/File",		        NULL , NULL,            0, "<Branch>"    },
+  { "/File/_Open Snapshot..." , "F3" , gtkui_open,      0, NULL          },
+  { "/File/_Save Snapshot..." , "F2" , gtkui_save,      0, NULL          },
+  { "/File/separator",          NULL , NULL,            0, "<Separator>" },
+  { "/File/E_xit",	        "F10", gtkui_quit,      0, NULL          },
+  { "/Options",		        NULL , NULL,            0, "<Branch>"    },
+  { "/Options/_General...",     "F4" , gtkui_options,   0, NULL          },
+  { "/Machine",		        NULL , NULL,            0, "<Branch>"    },
+  { "/Machine/_Reset",	        "F5" , gtkui_reset,     0, NULL          },
+  { "/Machine/_Switch",         "F9" , gtkui_switch,    0, NULL          },
+  { "/Tape",                    NULL , NULL,            0, "<Branch>"    },
+  { "/Tape/_Open...",	        "F7" , gtkui_tape_open, 0, NULL          },
+  { "/Tape/_Play",	        "F8" , gtkui_tape_play, 0, NULL          },
 };
 static guint gtkui_menu_data_size = 13;
   
@@ -313,6 +314,11 @@ static void gtkui_options( GtkWidget *widget, gpointer data )
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) NULL );
 
+  /* Allow Esc to cancel */
+  gtk_widget_add_accelerator( cancel_button, "clicked",
+                              gtk_accel_group_get_default(),
+                              GDK_Escape, 0, 0 );
+
   /* Set the window to be modal and display it */
   gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
   gtk_widget_show_all( dialog.dialog );
@@ -406,6 +412,13 @@ static char* gtkui_fileselector_get_filename( void )
   gtk_signal_connect( GTK_OBJECT( selector.selector ), "delete_event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) &selector );
+
+  /* Allow Esc to cancel */
+  gtk_widget_add_accelerator(
+       GTK_FILE_SELECTION( selector.selector )->cancel_button,
+       "clicked",
+       gtk_accel_group_get_default(),
+       GDK_Escape, 0, 0 );
 
   gtk_window_set_modal( GTK_WINDOW( selector.selector ), TRUE );
 
