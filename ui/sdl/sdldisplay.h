@@ -1,5 +1,5 @@
 /* sdldisplay.h: Routines for dealing with the SDL display
-   Copyright (c) 2000-2002 Philip Kendall, Fredrick Meunier
+   Copyright (c) 2000-2003 Philip Kendall, Fredrick Meunier
 
    $Id$
 
@@ -26,5 +26,7 @@
 
 #ifndef FUSE_SDLDISPLAY_H
 #define FUSE_SDLDISPLAY_H
+
+extern SDL_Surface *sdldisplay_gc;    /* Hardware screen */
 
 #endif			/* #ifndef FUSE_SDLDISPLAY_H */

@@ -44,7 +44,7 @@
 #include "ui/scaler/scaler.h"
 #include "machine.h"
 
-static SDL_Surface *gc=NULL;    /* Hardware screen */
+SDL_Surface *sdldisplay_gc = NULL;   /* Hardware screen */
 static SDL_Surface *tmp_screen=NULL; /* Temporary screen for scalers */
 
 static int tmp_screen_width;
@@ -165,18 +165,20 @@ sdldisplay_load_gfx_mode( void )
   sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
 
   /* Create the surface that contains the scaled graphics in 16 bit mode */
-  gc = SDL_SetVideoMode( image_width * sdldisplay_current_size,
-                         image_height * sdldisplay_current_size,
-                         16,
-                         settings_current.full_screen ? (SDL_FULLSCREEN|SDL_SWSURFACE) : SDL_SWSURFACE
-                       );
-  if( !gc ) {
+  sdldisplay_gc = SDL_SetVideoMode(
+    image_width * sdldisplay_current_size,
+    image_height * sdldisplay_current_size,
+    16,
+    settings_current.full_screen ? (SDL_FULLSCREEN|SDL_SWSURFACE)
+                                 : SDL_SWSURFACE
+  );
+  if( !sdldisplay_gc ) {
     fprintf( stderr, "%s: couldn't create gc\n", fuse_progname );
     return 1;
   }
 
   /* Distinguish 555 and 565 mode */
-  if (gc->format->Rmask == 0x7C00)
+  if( sdldisplay_gc->format->Rmask == 0x7C00 )
     scaler_select_bitformat( 555 );
   else
     scaler_select_bitformat( 565 );
@@ -189,10 +191,10 @@ sdldisplay_load_gfx_mode( void )
                                         tmp_screen_width,
                                         image_height + 3,
                                         16, tmp_screen_width*2,
-                                        gc->format->Rmask,
-                                        gc->format->Gmask,
-                                        gc->format->Bmask,
-                                        gc->format->Amask);
+                                        sdldisplay_gc->format->Rmask,
+                                        sdldisplay_gc->format->Gmask,
+                                        sdldisplay_gc->format->Bmask,
+                                        sdldisplay_gc->format->Amask );
 
   if( !tmp_screen ) {
     fprintf( stderr, "%s: couldn't create tmp_screen\n", fuse_progname );
@@ -222,7 +224,7 @@ uidisplay_hotswap_gfx_mode( void )
   sdldisplay_load_gfx_mode();
 
   /* reset palette */
-  SDL_SetColors( gc, colour_palette, 0, 16 );
+  SDL_SetColors( sdldisplay_gc, colour_palette, 0, 16 );
 
   /* Mac OS X resets the state of the cursor after a switch to full screen mode */
   if ( settings_current.full_screen )
@@ -292,9 +294,9 @@ uidisplay_frame_end( void )
 	  
   }
 
-  if( SDL_MUSTLOCK( gc ) ) SDL_LockSurface( gc );
+  if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_LockSurface( sdldisplay_gc );
 
-  dstPitch = gc->pitch;
+  dstPitch = sdldisplay_gc->pitch;
 
   for( r = updated_rects; r != last_rect; ++r ) {
     register int dst_y = r->y * sdldisplay_current_size;
@@ -303,7 +305,7 @@ uidisplay_frame_end( void )
     scaler_proc16(
      (BYTE*)tmp_screen->pixels + (r->x*2+2) + (r->y+1)*tmp_screen_pitch,
      tmp_screen_pitch, NULL,
-     (BYTE*)gc->pixels + r->x*(BYTE)(2*sdldisplay_current_size) +
+     (BYTE*)sdldisplay_gc->pixels + r->x*(BYTE)(2*sdldisplay_current_size) +
      dst_y*dstPitch, dstPitch, r->w, dst_h );
 
     /* Adjust rects for the destination rect size */
@@ -314,10 +316,10 @@ uidisplay_frame_end( void )
   }
 
   if( SDL_MUSTLOCK( tmp_screen ) ) SDL_UnlockSurface( tmp_screen );
-  if( SDL_MUSTLOCK( gc ) ) SDL_UnlockSurface( gc );
+  if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_UnlockSurface( sdldisplay_gc );
 
   /* Finally, blit all our changes to the screen */
-  SDL_UpdateRects( gc, num_rects, updated_rects );
+  SDL_UpdateRects( sdldisplay_gc, num_rects, updated_rects );
 
   num_rects = 0;
   sdldisplay_force_full_refresh = 0;
