@@ -410,3 +410,5 @@
 	 emulation to run to that address.
 20031229 event.[ch], debugger/, ui/gtk/debugger.c: new breakpoint type to
 	 trigger when tstates is greater than a certain value.
+20031229 ui/gtk/debugger.c: double-clicking on an event causes emulation
+	 to run until that event occurs.

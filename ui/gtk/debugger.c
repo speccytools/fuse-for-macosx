@@ -82,6 +82,8 @@ static int create_stack_display( GtkBox *parent, font_spec font );
 static void stack_click( GtkCList *clist, gint row, gint column,
 			 GdkEventButton *event, gpointer user_data );
 static int create_events( GtkBox *parent );
+static void events_click( GtkCList *clist, gint row, gint column,
+			  GdkEventButton *event, gpointer user_data );
 static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
 static void set_font( GtkWidget *widget, font_spec font );
@@ -494,7 +496,37 @@ create_events( GtkBox *parent )
     gtk_clist_set_column_auto_resize( GTK_CLIST( events ), i, TRUE );
   gtk_box_pack_start( parent, events, TRUE, TRUE, 5 );
 
+  gtk_signal_connect( GTK_OBJECT( events ), "select-row",
+		      GTK_SIGNAL_FUNC( events_click ), NULL );
+
   return 0;
+}
+
+static void
+events_click( GtkCList *clist, gint row, gint column,
+	      GdkEventButton *event, gpointer user_data )
+{
+  int got_text, error;
+  gchar *buffer;
+  libspectrum_dword tstates;
+
+  /* Ignore events which aren't a double-click */
+  if( event->type != GDK_2BUTTON_PRESS ) return;
+
+  got_text = gtk_clist_get_text( clist, row, 0, &buffer );
+  if( !got_text ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get text for row %d", row );
+    return;
+  }
+
+  tstates = atoi( buffer );
+
+  error = debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_TIME,
+				   -1, tstates, 0,
+				   DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL );
+  if( error ) return;
+
+  debugger_run();
 }
 
 static int
