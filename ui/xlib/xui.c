@@ -36,6 +36,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
+#include "settings.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "xdisplay.h"
