@@ -238,3 +238,4 @@
 	 activation routines.
 20031006 specplus3.c: if emulating a +2A, don't update the status of the
 	 disk motor when the +2A/+3 memory port is written to.
+20031006 machine.c: remove duplicated code from machine_select_machine()

@@ -193,7 +193,8 @@ static int
 machine_select_machine( fuse_machine_info *machine )
 {
   int width, height;
-  int capabilities = libspectrum_machine_capabilities( machine->machine );
+  int capabilities;
+
   machine_current = machine;
 
   settings_set_string( &settings_current.start_machine, machine->id );
@@ -206,8 +207,6 @@ machine_select_machine( fuse_machine_info *machine )
     return 1;
   if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
-  machine_current = machine;
-
   readbyte = machine->ram.read_memory;
   readbyte_internal = machine->ram.read_memory_internal;
   read_screen_memory = machine->ram.read_screen;
@@ -217,6 +216,8 @@ machine_select_machine( fuse_machine_info *machine )
   contend_port = machine->ram.contend_port;
   
   if( uidisplay_end() ) return 1;
+
+  capabilities = libspectrum_machine_capabilities( machine->machine );
 
   /* Set screen sizes here */
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO ) {
@@ -232,8 +233,6 @@ machine_select_machine( fuse_machine_info *machine )
   if( machine_reset() ) return 1;
 
   /* Activate appropriate menu items and update the status bar */
-  capabilities = libspectrum_machine_capabilities( machine_current->machine );
-
   if( ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) ||
       ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )    ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
