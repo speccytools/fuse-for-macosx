@@ -271,4 +271,8 @@ libspectrum_error
 libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 			const size_t length );
 
+libspectrum_error
+libspectrum_tzx_write( libspectrum_tape *tape,
+		       libspectrum_byte **buffer, size_t *length );
+
 #endif				/* #ifndef LIBSPECTRUM_TAPE_H */

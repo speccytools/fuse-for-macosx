@@ -62,9 +62,13 @@ static libspectrum_error
 tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		       const libspectrum_byte *end );
 
+static libspectrum_error
+tzx_write_rom( libspectrum_tape_rom_block *rom_block,
+	       libspectrum_byte **buffer, size_t *offset, size_t *length );
+
 /*** Function definitions ***/
 
-/* The main function */
+/* The main load function */
 
 libspectrum_error
 libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
@@ -569,6 +573,73 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* Finally, put the block into the block list */
   tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+/* The main write function */
+
+libspectrum_error
+libspectrum_tzx_write( libspectrum_tape *tape,
+		       libspectrum_byte **buffer, size_t *length )
+{
+  size_t offset; libspectrum_error error;
+
+  GSList *ptr;
+
+  /* First, write the .tzx signature and the version numbers */
+  error = libspectrum_make_room( buffer, strlen(signature)+2, buffer, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  memcpy( (*buffer), signature, strlen( signature ) );
+  offset = strlen( signature );
+  (*buffer)[ offset++ ] = 1;	/* Major version number */
+  (*buffer)[ offset++ ] = 13;	/* Minor version number */
+
+  for( ptr = tape->blocks; ptr; ptr = ptr->next ) {
+    libspectrum_tape_block *block = (libspectrum_tape_block*)ptr->data;
+
+    switch( block->type ) {
+
+    case LIBSPECTRUM_TAPE_BLOCK_ROM:
+      error = tzx_write_rom( &(block->types.rom), buffer, &offset, length );
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+
+    default:
+      free( *buffer );
+      return LIBSPECTRUM_ERROR_LOGIC;
+    }
+  }
+
+  (*length) = offset;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_rom( libspectrum_tape_rom_block *rom_block,
+	       libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte, the pause, the length and the actual data */
+  error = libspectrum_make_room( buffer, (*offset) + 5 + rom_block->length,
+				 &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  /* Write the ID byte, the pause and the length */
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_ROM;
+  libspectrum_write_word( ptr, rom_block->pause  ); ptr += 2;
+  libspectrum_write_word( ptr, rom_block->length ); ptr += 2;
+
+  /* Copy the data across */
+  memcpy( ptr, rom_block->data, rom_block->length );
+  ptr += rom_block->length;
+
+  /* And update our offset */
+  (*offset) += 5 + rom_block->length;
 
   return LIBSPECTRUM_ERROR_NONE;
 }

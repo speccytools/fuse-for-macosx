@@ -146,11 +146,58 @@ int tape_close( void )
   return 0;
 }
 
+/* Write the current in-memory tape file out to disk */
+int tape_write( const char* filename )
+{
+  libspectrum_byte *buffer; size_t length;
+  FILE *f;
+
+  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  length = 0;
+  error = libspectrum_tzx_write( &tape, &buffer, &length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf(stderr, "%s: error during libspectrum_tzx_write: %s\n",
+	    fuse_progname, libspectrum_error_message(error) );
+    return error;
+  }
+
+  f=fopen( filename, "wb" );
+  if(!f) { 
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error opening `%s'", fuse_progname, filename );
+    perror( error_message );
+    free( buffer );
+    return 1;
+  }
+	    
+  if( fwrite( buffer, 1, length, f ) != length ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error writing to `%s'", fuse_progname, filename );
+    perror( error_message );
+    fclose(f);
+    free( buffer );
+    return 1;
+  }
+
+  free( buffer );
+
+  if( fclose( f ) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error closing `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
+
+  return 0;
+
+}
+
 /* Load the next tape block into memory; returns 0 if a block was
    loaded (even if it had an tape loading error or equivalent) or
    non-zero if there was an error at the emulator level, or tape traps
    are not active */
-int tape_trap( void )
+int tape_load_trap( void )
 {
   libspectrum_tape_block *current_block;
   libspectrum_tape_rom_block *rom_block;
@@ -223,6 +270,68 @@ int tape_trap( void )
 
   /* Else return with carry set */
   F |= FLAG_C;
+
+  return 0;
+
+}
+
+/* Append to the current tape file in memory; returns 0 if a block was
+   saved or non-zero if there was an error at the emulator level, or tape
+   traps are not active */
+int tape_save_trap( void )
+{
+  libspectrum_tape_block *block;
+  libspectrum_tape_rom_block *rom_block;
+
+  libspectrum_byte parity;
+
+  int i;
+
+/*    fprintf( stderr, "Tape save trap active: saving %d bytes from 0x%04x\n", */
+/*  	   DE, IX ); */
+
+  /* Do nothing if tape traps aren't active */
+  if( ! settings_current.tape_traps ) return 2;
+
+  /* Get a new block to store this data in */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return 1;
+
+  /* This is a ROM block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_ROM;
+  rom_block = &(block->types.rom);
+
+  /* The +2 here is for the flag and parity bytes */
+  rom_block->length = DE + 2;
+
+  rom_block->data =
+    (libspectrum_byte*)malloc( rom_block->length * sizeof(libspectrum_byte) );
+  if( rom_block->data == NULL ) {
+    free( block );
+    return 1;
+  }
+
+  /* First, store the flag byte (and initialise the parity counter) */
+  rom_block->data[0] = parity = A;
+
+  /* then the main body of the data, counting parity along the way */
+  for( i=0; i<DE; i++) {
+    libspectrum_byte b = readbyte( IX+i );
+    parity ^= b;
+    rom_block->data[i+1] = b;
+  }
+
+  /* And finally the parity byte */
+  rom_block->data[ DE+1 ] = parity;
+
+  /* Give a 1 second pause after this block */
+  rom_block->pause = 1000;
+
+  /* Add the block to the current tape file */
+  tape.blocks = g_slist_append( tape.blocks, (gpointer)block );
+
+  /* And then return via the RET at #053E */
+  PC = 0x053e;
 
   return 0;
 

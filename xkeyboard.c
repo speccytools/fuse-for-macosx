@@ -90,6 +90,11 @@ int xkeyboard_keypress(XKeyEvent *event)
   case XK_F5:
     machine_current->reset();
     break;
+  case XK_F6:
+    fuse_emulation_pause();
+    tape_write( "tape.tzx" );
+    fuse_emulation_unpause();
+    break;
   case XK_F7:
     fuse_emulation_pause();
     filename = widget_selectfile();
