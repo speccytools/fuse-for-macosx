@@ -226,6 +226,16 @@ int widget_menu_exit( void *data GCC_UNUSED )
   return 0;
 }
 
+#ifdef HAVE_LIB_XML2
+/* Options/Save */
+int
+widget_menu_save_options( void *data GCC_UNUSED )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+  return settings_write_config( &settings_current );
+}
+#endif				/* #ifdef HAVE_LIB_XML2 */
+
 /* Machine/Reset */
 int widget_menu_reset( void *data GCC_UNUSED )
 {

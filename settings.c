@@ -174,7 +174,7 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
       settings->issue2 =
 	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"kempston" ) ) {
-      settings->tape_traps =
+      settings->joy_kempston =
 	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"machine" ) ) {
       settings->start_machine =
@@ -188,7 +188,7 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
     } else if( !strcmp( node->name, (const xmlChar*)"separation" ) ) {
       settings->stereo_ay =
 	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
-    } else if( !strcmp( node->name, (const xmlChar*)"slt_traps" ) ) {
+    } else if( !strcmp( node->name, (const xmlChar*)"slttraps" ) ) {
       settings->slt_traps =
 	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"snapshot" ) ) {
@@ -216,6 +216,53 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
 
     node = node->next;
   }
+
+  return 0;
+}
+
+int
+settings_write_config( settings_info *settings )
+{
+  const char *home; char path[256], buffer[80]; 
+
+  xmlDocPtr doc; xmlNodePtr root;
+
+  home = getenv( "HOME" );
+  if( !home ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get your home directory" );
+    return 1;
+  }
+
+  snprintf( path, 256, "%s/.fuserc", home );
+
+  /* Create the XML document */
+  doc = xmlNewDoc( "1.0" );
+
+  root = xmlNewNode( NULL, "settings" );
+  xmlDocSetRootElement( doc, root );
+
+  xmlNewTextChild( root, NULL, "issue2", settings->issue2 ? "1" : "0" );
+  xmlNewTextChild( root, NULL, "kempston",
+		   settings->joy_kempston ? "1" : "0" );
+  if( settings->playback_file )
+    xmlNewTextChild( root, NULL, "playbackfile", settings->playback_file );
+  if( settings->record_file )
+    xmlNewTextChild( root, NULL, "recordfile", settings->record_file );
+  xmlNewTextChild( root, NULL, "separation", settings->stereo_ay ? "1" : "0" );
+  xmlNewTextChild( root, NULL, "slttraps", settings->slt_traps ? "1" : "0" );
+  if( settings->snapshot )
+    xmlNewTextChild( root, NULL, "snapshot", settings->snapshot );
+  if( settings->sound_device )
+    xmlNewTextChild( root, NULL, "sounddevice", settings->sound_device );
+  if( settings->svga_mode ) {
+    snprintf( buffer, 80, "%d", settings->svga_mode );
+    xmlNewTextChild( root, NULL, "svgamode", buffer );
+  }
+  if( settings->tape_file )
+    xmlNewTextChild( root, NULL, "tapefile", settings->tape_file );
+  xmlNewTextChild( root, NULL, "tapetraps", settings->tape_traps ? "1" : "0" );
+
+  xmlSaveFormatFile( path, doc, 1 );
 
   return 0;
 }
@@ -350,24 +397,40 @@ int settings_copy( settings_info *dest, settings_info *src )
 
   dest->rzx_compression = src->rzx_compression;
 
-  dest->sound_device  = strdup( src->sound_device );
-  if( !dest->sound_device ) { settings_free( dest ); return 1; }
+  if( dest->sound_device ) {
+    dest->sound_device  = strdup( src->sound_device );
+    if( !dest->sound_device ) { settings_free( dest ); return 1; }
+  }
 
   dest->sound	      = src->sound;
   dest->sound_load    = src->sound_load;
   dest->stereo_ay     = src->stereo_ay;
   dest->stereo_beeper = src->stereo_beeper;
 
-  dest->snapshot      = src->snapshot;
-  if( !dest->snapshot ) { settings_free( dest ); return 1; }
-  dest->tape_file     = src->tape_file;
-  if( !dest->tape_file ) { settings_free( dest ); return 1; }
-  dest->start_machine = src->start_machine;
-  if( !dest->start_machine ) { settings_free( dest ); return 1; }
-  dest->record_file   = src->record_file;
-  if( !dest->record_file ) { settings_free( dest ); return 1; }
-  dest->playback_file = src->playback_file;
-  if( !dest->playback_file ) { settings_free( dest ); return 1; }
+  if( dest->snapshot ) {
+    dest->snapshot = src->snapshot;
+    if( !dest->snapshot ) { settings_free( dest ); return 1; }
+  }
+
+  if( dest->tape_file ) {
+    dest->tape_file = src->tape_file;
+    if( !dest->tape_file ) { settings_free( dest ); return 1; }
+  }
+
+  if( dest->start_machine ) {
+    dest->start_machine = src->start_machine;
+    if( !dest->start_machine ) { settings_free( dest ); return 1; }
+  }
+
+  if( dest->record_file ) {
+    dest->record_file = src->record_file;
+    if( !dest->record_file ) { settings_free( dest ); return 1; }
+  }
+
+  if( dest->playback_file ) {
+    dest->playback_file = src->playback_file;
+    if( !dest->playback_file ) { settings_free( dest ); return 1; }
+  }
 
   dest->svga_mode     = src->svga_mode;
 

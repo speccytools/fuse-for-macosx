@@ -134,6 +134,10 @@ static widget_menu_entry widget_menu_options[] = {
   { "(S)ound...",   KEYBOARD_s, widget_menu_widget, &options_sound   },
   { "(R)ZX...",	    KEYBOARD_r, widget_menu_widget, &options_rzx     },
 
+#ifdef HAVE_LIB_XML2
+  { "S(a)ve",	    KEYBOARD_a, widget_menu_save_options, NULL       },
+#endif				/* #ifdef HAVE_LIB_XML2 */
+
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 

@@ -211,6 +211,8 @@ int widget_menu_rzx_stop( void *data );	     /* File/Recording/Stop */
 int widget_menu_save_screen( void *data );   /* File/Save Screenshot */
 int widget_menu_exit( void *data );	     /* File/Exit */
 
+int widget_menu_save_options( void *data );  /* Options/Save */
+
 int widget_menu_reset( void *data );	     /* Machine/Reset */
 
 int widget_menu_play_tape( void *data );     /* Tape/Play */
