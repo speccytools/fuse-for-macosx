@@ -53,6 +53,7 @@ typedef enum debugger_pane {
   DEBUGGER_PANE_BEGIN = 1,	/* Start marker */
 
   DEBUGGER_PANE_REGISTERS = DEBUGGER_PANE_BEGIN,
+  DEBUGGER_PANE_MEMORYMAP,
   DEBUGGER_PANE_BREAKPOINTS,
   DEBUGGER_PANE_DISASSEMBLY,
   DEBUGGER_PANE_STACK,
@@ -70,6 +71,7 @@ static int create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group );
 static void toggle_display( gpointer callback_data, guint callback_action,
 			    GtkWidget *widget );
 static int create_register_display( GtkBox *parent, gtkui_font font );
+static int create_memory_map( GtkBox *parent );
 static int create_breakpoints( GtkBox *parent );
 static int create_disassembly( GtkBox *parent, gtkui_font font );
 static int create_stack_display( GtkBox *parent, gtkui_font font );
@@ -82,6 +84,7 @@ static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
 
 static int activate_debugger( void );
+static int update_memory_map( void );
 static int update_disassembly( void );
 static int update_events( void );
 static void add_event( gpointer data, gpointer user_data );
@@ -102,6 +105,8 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
   *register_display,			/* The register display */
   *registers[18],			/* Individual registers */
+  *memorymap,				/* The memory map display */
+  *page_label[8],			/* Individual page mappings */
   *breakpoints,				/* The breakpoint display */
   *disassembly_box,			/* A box to hold the disassembly */
   *disassembly,				/* The actual disassembly widget */
@@ -127,6 +132,7 @@ static GtkItemFactoryEntry menu_data[] = {
 
   { "/_View", NULL, NULL, 0, "<Branch>" },
   { "/View/_Registers", NULL, toggle_display, DEBUGGER_PANE_REGISTERS, "<ToggleItem>" },
+  { "/View/_Memory Map", NULL, toggle_display, DEBUGGER_PANE_MEMORYMAP, "<ToggleItem>" },
   { "/View/_Breakpoints", NULL, toggle_display, DEBUGGER_PANE_BREAKPOINTS, "<ToggleItem>" },
   { "/View/_Disassembly", NULL, toggle_display, DEBUGGER_PANE_DISASSEMBLY, "<ToggleItem>" },
   { "/View/_Stack", NULL, toggle_display, DEBUGGER_PANE_STACK, "<ToggleItem>" },
@@ -187,6 +193,7 @@ get_pane_menu_item( debugger_pane pane )
 
   switch( pane ) {
   case DEBUGGER_PANE_REGISTERS: path = "/View/Registers"; break;
+  case DEBUGGER_PANE_MEMORYMAP: path = "/View/Memory Map"; break;
   case DEBUGGER_PANE_BREAKPOINTS: path = "/View/Breakpoints"; break;
   case DEBUGGER_PANE_DISASSEMBLY: path = "/View/Disassembly"; break;
   case DEBUGGER_PANE_STACK: path = "/View/Stack"; break;
@@ -215,6 +222,7 @@ get_pane( debugger_pane pane )
 {
   switch( pane ) {
   case DEBUGGER_PANE_REGISTERS: return register_display;
+  case DEBUGGER_PANE_MEMORYMAP: return memorymap;
   case DEBUGGER_PANE_BREAKPOINTS: return breakpoints;
   case DEBUGGER_PANE_DISASSEMBLY: return disassembly_box;
   case DEBUGGER_PANE_STACK: return stack;
@@ -242,7 +250,7 @@ static int
 create_dialog( void )
 {
   int error;
-  GtkWidget *hbox, *vbox;
+  GtkWidget *hbox, *vbox, *hbox2;
   GtkAccelGroup *accel_group;
   debugger_pane i;
 
@@ -266,7 +274,7 @@ create_dialog( void )
 			   accel_group );
   if( error ) return error;
 
-  /* A couple of boxes to contain the things we want to display */
+  /* Some boxes to contain the things we want to display */
   hbox = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox,
 		      TRUE, TRUE, 5 );
@@ -274,9 +282,14 @@ create_dialog( void )
   vbox = gtk_vbox_new( FALSE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
 
+  hbox2 = gtk_hbox_new( FALSE, 5 );
+  gtk_box_pack_start_defaults( GTK_BOX( vbox ), hbox2 );
+
   /* The main display areas */
-  error = create_register_display( GTK_BOX( vbox ), font );
+  error = create_register_display( GTK_BOX( hbox2 ), font );
   if( error ) return error;
+
+  error = create_memory_map( GTK_BOX( hbox2 ) ); if( error ) return error;
 
   error = create_breakpoints( GTK_BOX( vbox ) ); if( error ) return error;
 
@@ -325,7 +338,7 @@ create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group )
 				 NULL);
   menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
 
-  gtk_box_pack_start_defaults( parent, menu_bar );
+  gtk_box_pack_start( parent, menu_bar, FALSE, FALSE, 0 );
   
   return 0;
 }
@@ -358,6 +371,32 @@ create_register_display( GtkBox *parent, gtkui_font font )
     gtkui_set_font( registers[i], font );
     gtk_table_attach( GTK_TABLE( register_display ), registers[i],
 		      i%2, i%2+1, i/2, i/2+1, 0, 0, 2, 2 );
+  }
+
+  return 0;
+}
+
+static int
+create_memory_map( GtkBox *parent )
+{
+  GtkWidget *label;
+  size_t i;
+  char buffer[ 40 ];
+
+  memorymap = gtk_table_new( 8, 2, FALSE );
+  gtk_box_pack_start( parent, memorymap, FALSE, FALSE, 0 );
+
+  for( i = 0; i < 8; i++ ) {
+
+    snprintf( buffer, 40, "0x%04x", (unsigned)i * 0x2000 );
+    label = gtk_label_new( buffer );
+    gtk_table_attach( GTK_TABLE( memorymap ), label, 0, 1, 7 - i, 8 - i,
+		      0, 0, 2, 2 );
+
+    page_label[i] = gtk_label_new( "" );
+    gtk_table_attach( GTK_TABLE( memorymap ), page_label[i],
+		      1, 2, 7 - i, 8 - i, 0, 0, 2, 2 );
+
   }
 
   return 0;
@@ -676,6 +715,9 @@ ui_debugger_update( void )
 
   gtk_label_set_text( GTK_LABEL( registers[17] ), buffer );
 
+  /* Update the memory map display */
+  error = update_memory_map(); if( error ) return error;
+
   /* Create the breakpoint list */
   gtk_clist_freeze( GTK_CLIST( breakpoints ) );
   gtk_clist_clear( GTK_CLIST( breakpoints ) );
@@ -753,6 +795,24 @@ ui_debugger_update( void )
   error = update_events(); if( error ) return error;
 
   return 0;
+}
+
+static int
+update_memory_map( void )
+{
+  size_t i;
+  char buffer[ 40 ];
+
+  for( i = 0; i < 8; i++ ) {
+
+    if( memory_map[i].reverse == -1 ) {
+      snprintf( buffer, 40, "[Undefined]" );
+    } else {
+      snprintf( buffer, 40, "RAM %d", memory_map[i].reverse );
+    }
+
+    gtk_label_set_text( GTK_LABEL( page_label[i] ), buffer );
+  }
 }
 
 static int
