@@ -204,7 +204,7 @@ update_pokefinder( void )
 	  which++;
 	
 	  snprintf( possible_text[0], 128, "%lu", (unsigned long)page );
-	  snprintf( possible_text[1], 128, "0x%04lx", (unsigned long)offset );
+	  snprintf( possible_text[1], 128, "0x%04X", (unsigned)offset );
 
 	  gtk_clist_append( GTK_CLIST( location_list ), possible_text );
 	}

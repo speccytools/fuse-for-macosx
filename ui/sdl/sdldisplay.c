@@ -1,5 +1,5 @@
 /* sdldisplay.c: Routines for dealing with the SDL display
-   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
 
    $Id$
 
@@ -28,26 +28,34 @@
 
 #ifdef UI_SDL			/* Use this iff we're using SDL */
 
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <SDL.h>
 
 #include <libspectrum.h>
 
-#include "fuse.h"
 #include "display.h"
-#include "ui/uidisplay.h"
-#ifdef USE_WIDGET
-#include "widget/widget.h"
-#endif				/* #ifdef USE_WIDGET */
+#include "fuse.h"
+#include "machine.h"
 #include "scld.h"
 #include "screenshot.h"
 #include "settings.h"
+#include "ui/ui.h"
 #include "ui/scaler/scaler.h"
-#include "machine.h"
+#include "ui/uidisplay.h"
+#include "utils.h"
+#ifdef USE_WIDGET
+#include "widget/widget.h"
+#endif				/* #ifdef USE_WIDGET */
 
 SDL_Surface *sdldisplay_gc = NULL;   /* Hardware screen */
 static SDL_Surface *tmp_screen=NULL; /* Temporary screen for scalers */
+
+static SDL_Surface *red_cassette, *green_cassette = NULL;
+static SDL_Surface *red_disk, *green_disk = NULL;
+
+static ui_statusbar_state sdl_disk_state, sdl_tape_state;
 
 static int tmp_screen_width;
 
@@ -127,6 +135,67 @@ init_scalers( void )
   }
 }
 
+static int
+sdl_load_status_icon( const char*filename, SDL_Surface **red, SDL_Surface **green )
+{
+  char path[ PATH_MAX ];
+  SDL_Surface *temp;    /* Copy of image as loaded */
+  SDL_Surface *temp2;   /* Copy with altered palette */
+  int i;
+
+  if( utils_find_file_path( filename, path, UTILS_AUXILIARY_LIB ) ) {
+    fprintf( stderr, "%s: Error getting path for icons\n", fuse_progname );
+    return -1;
+  }
+
+  if((temp = SDL_LoadBMP(path)) == NULL) {
+    fprintf( stderr, "%s: Error loading icon \"%s\" text:%s\n", fuse_progname,
+             path, SDL_GetError() );
+    return -1;
+  }
+
+  if(temp->format->palette == NULL) {
+    fprintf( stderr, "%s: Icon \"%s\" is not paletted\n", fuse_progname, path );
+    return -1;
+  }
+
+  {
+    SDL_Color colors[ temp->format->palette->ncolors ];
+    temp2 = SDL_ConvertSurface( temp, temp->format, SDL_SWSURFACE );
+    for( i = 0; i < temp2->format->palette->ncolors; i++ ) {
+      colors[i].r = temp2->format->palette->colors[i].r;
+      colors[i].g = 0;
+      colors[i].b = 0;
+    }
+
+    SDL_SetPalette( temp2, SDL_LOGPAL, colors, 0, i );
+
+    *red = SDL_ConvertSurface( temp2, tmp_screen->format, SDL_SWSURFACE );
+
+    SDL_FreeSurface( temp2 );
+  }
+
+  {
+    SDL_Color colors[ temp->format->palette->ncolors ];
+    temp2 = SDL_ConvertSurface( temp, temp->format, SDL_SWSURFACE );
+    for( i = 0; i < temp2->format->palette->ncolors; i++ ) {
+      colors[i].r = 0;
+      colors[i].g = temp2->format->palette->colors[i].g;
+      colors[i].b = 0;
+    }
+
+    SDL_SetPalette( temp2, SDL_LOGPAL, colors, 0, i );
+
+    *green = SDL_ConvertSurface( temp2, tmp_screen->format, SDL_SWSURFACE );
+
+    SDL_FreeSurface( temp2 );
+  }
+
+  SDL_FreeSurface( temp );
+
+  return 0;
+}
+
 int
 uidisplay_init( int width, int height )
 {
@@ -142,6 +211,9 @@ uidisplay_init( int width, int height )
 
   /* We can now output error messages to our output device */
   display_ui_initialised = 1;
+
+  sdl_load_status_icon( "cassette.bmp", &red_cassette, &green_cassette );
+  sdl_load_status_icon( "plus3disk.bmp", &red_disk, &green_disk );
 
   return 0;
 }
@@ -159,7 +231,8 @@ sdldisplay_allocate_colours( int numColours, Uint32 *colour_values,
     green = colour_palette[i].g;
      blue = colour_palette[i].b;
 
-     grey = 0.299 * red + 0.587 * green + 0.114 * blue;
+    /* Addition of 0.5 is to avoid rounding errors */
+    grey = ( 0.299 * red + 0.587 * green + 0.114 * blue ) + 0.5;
 
     colour_values[i] = SDL_MapRGB( tmp_screen->format,  red, green, blue );
     bw_values[i]     = SDL_MapRGB( tmp_screen->format, grey,  grey, grey );
@@ -252,14 +325,99 @@ uidisplay_hotswap_gfx_mode( void )
   fuse_emulation_unpause();
 }
 
+static void
+sdl_blit_icon( SDL_Surface *icon, SDL_Rect *r, Uint32 tmp_screen_pitch,
+               Uint32 dstPitch )
+{
+  int x = r->x;
+  int y = r->y;
+  int w = r->w;
+  int h = r->h;
+  int dst_y;
+  int dst_h;
+
+  r->x++;
+  r->y++;
+
+  if( SDL_BlitSurface( icon, NULL, tmp_screen, r ) ) return;
+
+  /* Extend the dirty region by 1 pixel for scalers
+     that "smear" the screen, e.g. 2xSAI */
+  if( scaler_flags & SCALER_FLAGS_EXPAND )
+    scaler_expander( &x, &y, &w, &h, image_width, image_height );
+
+  dst_y = y * sdldisplay_current_size;
+  dst_h = h;
+
+  scaler_proc16(
+	(libspectrum_byte*)tmp_screen->pixels +
+			(x+1) * tmp_screen->format->BytesPerPixel +
+	                (y+1) * tmp_screen_pitch,
+	tmp_screen_pitch,
+	(libspectrum_byte*)sdldisplay_gc->pixels +
+			x * (libspectrum_byte)
+				(sdldisplay_gc->format->BytesPerPixel *
+				sdldisplay_current_size) +
+			dst_y * dstPitch,
+	dstPitch, w, dst_h
+  );
+
+  /* Adjust rects for the destination rect size */
+
+  if( num_rects == MAX_UPDATE_RECT ) {
+    sdldisplay_force_full_refresh = 1;
+    return;
+  }
+
+  updated_rects[num_rects].x = x * sdldisplay_current_size;
+  updated_rects[num_rects].y = dst_y;
+  updated_rects[num_rects].w = w * sdldisplay_current_size;
+  updated_rects[num_rects].h = dst_h * sdldisplay_current_size;
+
+  num_rects++;
+}
+
+static void
+sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
+{
+  SDL_Rect r = { 264, 218, red_disk->w, red_disk->h };
+
+  switch( sdl_disk_state ) {
+  case UI_STATUSBAR_STATE_ACTIVE:
+    sdl_blit_icon( green_disk, &r, tmp_screen_pitch, dstPitch );
+    break;
+  case UI_STATUSBAR_STATE_INACTIVE:
+    sdl_blit_icon( red_disk, &r, tmp_screen_pitch, dstPitch );
+    break;
+  case UI_STATUSBAR_STATE_NOT_AVAILABLE:
+    break;
+  }
+
+  r.x = 285;
+  r.y = 220;
+  r.w = red_cassette->w;
+  r.h = red_cassette->h;
+
+  switch( sdl_tape_state ) {
+  case UI_STATUSBAR_STATE_ACTIVE:
+    sdl_blit_icon( green_cassette, &r, tmp_screen_pitch, dstPitch );
+    break;
+  case UI_STATUSBAR_STATE_INACTIVE:
+    sdl_blit_icon( red_cassette, &r, tmp_screen_pitch, dstPitch );
+    break;
+  case UI_STATUSBAR_STATE_NOT_AVAILABLE:
+    break;
+  }
+}
+
 void
 uidisplay_frame_end( void )
 {
   SDL_Rect *r;
   Uint32 tmp_screen_pitch, dstPitch;
   SDL_Rect *last_rect;
-  Uint32 *palette_values = settings_current.colour_tv ? colour_values :
-                           bw_values;
+  Uint32 *palette_values = settings_current.bw_tv ? bw_values :
+                           colour_values;
 
   /* We check for a switch to fullscreen here to give systems with a
      windowed-only UI a chance to free menu etc. resources before
@@ -309,10 +467,10 @@ uidisplay_frame_end( void )
     for( yy = r->y; yy < r->y + r->h; yy++ ) {
 
       for( xx = r->x, dest = dest_base; xx < r->x + r->w; xx++, dest++ )
-	*dest = palette_values[ display_image[yy][xx] ];
+        *dest = palette_values[ display_image[yy][xx] ];
 
       dest_base = (libspectrum_word*)
-	( (libspectrum_byte*)dest_base + tmp_screen_pitch );
+        ( (libspectrum_byte*)dest_base + tmp_screen_pitch );
     }
 	  
     scaler_proc16(
@@ -334,6 +492,9 @@ uidisplay_frame_end( void )
     r->w *= sdldisplay_current_size;
     r->h = dst_h * sdldisplay_current_size;
   }
+
+  if ( settings_current.statusbar )
+    sdl_icon_overlay( tmp_screen_pitch, dstPitch );
 
   if( SDL_MUSTLOCK( tmp_screen ) ) SDL_UnlockSurface( tmp_screen );
   if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_UnlockSurface( sdldisplay_gc );
@@ -377,7 +538,44 @@ uidisplay_end( void )
     free( tmp_screen->pixels );
     SDL_FreeSurface( tmp_screen ); tmp_screen = NULL;
   }
+  if ( red_cassette ) {
+    SDL_FreeSurface( red_cassette ); red_cassette = NULL;
+  }
+  if ( green_cassette ) {
+    SDL_FreeSurface( green_cassette ); green_cassette = NULL;
+  }
+  if ( red_disk ) {
+    SDL_FreeSurface( red_disk ); red_disk = NULL;
+  }
+  if ( green_disk ) {
+    SDL_FreeSurface( green_disk ); green_disk = NULL;
+  }
   return 0;
+}
+
+/* The statusbar handling function */
+int
+ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
+{
+  switch( item ) {
+
+  case UI_STATUSBAR_ITEM_DISK:
+    sdl_disk_state = state;
+    return 0;
+
+  case UI_STATUSBAR_ITEM_PAUSED:
+    // We don't support pausing this version of Fuse
+    return 0;
+
+  case UI_STATUSBAR_ITEM_TAPE:
+    sdl_tape_state = state;
+    return 0;
+
+  }
+
+  ui_error( UI_ERROR_ERROR, "Attempt to update unknown statusbar item %d",
+            item );
+  return 1;
 }
 
 #endif        /* #ifdef UI_SDL */

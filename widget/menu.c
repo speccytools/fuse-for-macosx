@@ -395,6 +395,7 @@ widget_menu_eject_write_disk( void *data )
   return trdos_disk_eject( which, 1 );
 }
 
+#ifdef HAVE_765_H
 int
 ui_plus3_disk_write( specplus3_drive_number which )
 {
@@ -404,6 +405,7 @@ ui_plus3_disk_write( specplus3_drive_number which )
 
   return specplus3_disk_write( which, filename );
 }
+#endif				/* #ifdef HAVE_765_H */
 
 int
 ui_trdos_disk_write( trdos_drive_number which )

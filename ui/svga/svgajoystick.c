@@ -82,11 +82,10 @@ ui_joystick_init( void )
   return 2;
 }
 
-int
+void
 ui_joystick_end( void )
 {
   joystick_close( -1 );
-  return 0;
 }
 
 libspectrum_byte

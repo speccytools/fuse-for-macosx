@@ -35,6 +35,8 @@
 #ifndef FUSE_UI_UIJOYSTICK_H
 #define FUSE_UI_UIJOYSTICK_H
 
+#include <libspectrum.h>
+
 #ifdef WORDS_BIGENDIAN
 
 typedef struct

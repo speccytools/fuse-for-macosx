@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2003 Philip Kendall, Marek Januszewski
+   Copyright (c) 1999-2004 Philip Kendall, Marek Januszewski
 
    $Id$
 
@@ -72,7 +72,9 @@ timer_estimate_speed( void )
 
   if( samples == 0 ) {
 
-    current_speed = 0;
+    /* If we don't have any data, assume we're running at the desired
+       speed :-) */
+    current_speed = settings_current.emulation_speed;
 
   } else if( samples < 10 ) {
 

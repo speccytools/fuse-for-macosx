@@ -53,8 +53,19 @@ extern libspectrum_word memory_screen_mask;
 
 libspectrum_byte readbyte( libspectrum_word address );
 
+/* Use a macro for performance in the main core, but a function for
+   flexibility in the core tester */
+
+#ifndef CORETEST
+
 #define readbyte_internal( address ) \
   memory_map[ (libspectrum_word)(address) >> 13 ].page[ (address) & 0x1fff ]
+
+#else				/* #ifndef CORETEST */
+
+libspectrum_byte readbyte_internal( libspectrum_word address );
+
+#endif				/* #ifndef CORETEST */
 
 void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );

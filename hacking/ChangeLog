@@ -475,12 +475,112 @@
 	 (Stuart Brady).
 20040110 TAG: Release-0_6_2-trunk
 	 BRANCH: Release-0_6_2-branch (from Release-0_6_2-trunk)
+20040111 ui/gtk/{memory,pokefinder}.c: use capital letters in hex
+	 constants (fixes bug #867286) (Release-0_6_2-branch).
+20040111 configure.in: bump version number to 0.6.2pre1
+	 (Release-0_6_2-branch).
+20040112 fuse.c: change copyright date in startup message to 2004, and
+	 reformat slightly (Release-0_6_2-branch).
+20040114 memory.h, z80/{Makefile.am,coretest.c,z80_macros.h}: get the
+	 core tester working again (Release-0_6_2-branch).
+20040114 ChangeLog: bring up to date (Release-0_6_2-branch).
+20040115 ui/uijoystick.c, ui/svga/svgajoystick.c: ui_joystick_end returns
+	 void (Release-0_6_2-branch) (Witold).
+20040115 screenshot.c: make .png screenshots save in black and white if
+	 colour TV mode disabled (Release-0_6_2-branch).
+20040115 pokefinder/Makefile.am: add @LIBSPEC_FLAGS@ to INCLUDES (more of
+	 patch #871182) (Release-0_6_2-branch) (Fred).
+20040115 ui/uijoystick.h: add #include <libspectrum.h> (more of patch
+	 #871182) (Release-0_6_2-branch) (Fred).
+20040115 Add optional tape and disk icons for the SDL UI (slightly
+	 modified version of the rest of patch #871182)
+	 (Release-0_6_2-branch) (Fred/Phil).
+20040117 TAG: Release-0_6_2pre1 (Release-0_6_2-branch).
+20040119 ui/Makefile.am: distribute uijoystick.[ch] (and move the
+	 Release-0_6_2pre1 tag to this version) (Release-0_6_2-branch).
+20040120 configure.in, ui/Makefile.am, ui/win32/Makefile.am: put the win32
+	 UI code in the distribution tarball (Release-0_6_2-branch).
+20040120 configure.in, z80/Makefile.am, z80/test/Makefile.am: put the z80
+	 core tests in the distribution tarball (Release-0_6_2-branch).
+20040120 ui/gtk: use Fred's tape and disk icons on the GTK+ statusbar
+	 (Release-0_6_2-branch).
+20040122 settings.dat, ui/gtk: make the 'view statusbar' option be
+	 effective under GTK+ (Release-0_6_2-branch).
+20040126 tc2068.c: return the correct value when both joystick ports are
+	 read from simultaneously (patch #883637) (Release-0_6_2-branch)
+         (Fred).
+20040126 dck.c: use libspectrum_dck_read2 instead of libspectrum_dck_read
+	 to aid with identifying compressed files (patch #884355)
+	 (Release-0_6_2-branch) (Fred).
+20040127 ui/gtk/statusbar.c, timer.c: visual improvements to the GTK+
+	 statusbar (Release-0_6_2-branch).
+20040129 ui/gtk/{gtkinternals.h,pixmaps.c,statusbar.c}: add pause icon
+	 (Release-0_6_2-branch).
+20040130 ui/gtk/{browse.c,gtkinternals.h,pixmaps.c}: add simple pixmap
+	 to mark the current tape location (Release-0_6_2-branch).
+20040131 ui/gtk/gtkui.c: stop RZX competition mode recording if the
+	 GTK+ pause function is used (Release-0_6_2-branch).
+20040202 debugger/debuggery.y: Update comment for <stdio.h> include
+	 (patch #883358) (Release-0_6_2-branch) (Fred).
+20040204 man/fuse.1: update (Release-0_6_2-branch).
+20040205 configure.in: bump version number to 0.6.2pre2
+	 (Release-0_6_2-branch).
+20040205 TAG: Release-0_6_2pre2 (Release-0_6_2-branch).
+20040205 man/fuse.1: fix typos (Release-0_6_2-branch).
+20040206 ChangeLog, README, man/fuse.1: final doc updates for the 0.6.2
+	 release (Release-0_6_2-branch).
+20040206 rzx.c: change over to using the 'release' key for signing
+	 competition mode files (Release-0_6_2-branch).
 20040207 Create and use a new UI_ERROR_WARNING error level.
 20040207 Remove duplicated ui_verror code.
 20040207 widget/error.c: #include "fuse.h".
+20040207 ui/svga/svgakeyboard.c: #include "utils.h"
+	 (Release-0_6_2-branch).
+20040208 settings.dat, man/fuse.1, ui/options.dat, ui/gtk/gtkdisplay.c,
+	 ui/sdl/sdldisplay.c: Rename Colour TV to Black and white TV for
+	 extra clarity (Release-0_6_2-branch).
+20040209 screenshot.c: final rename of the colour_tv member of settings
+	 to bw_tv (Release-0_6_2-branch).
+20040209 ui/gtk/pixmaps.c: change grayscale pixmaps to colour or they
+	 don't work under GTK+ 1.2 (Release-0_6_2-branch).
+20040209 screenshot.c, ui/gtk/gtkdisplay.c, ui/sdl/sdldisplay.c: avoid
+	 rounding errors when calculating greyscale colours
+	 (Release-0_6_2-branch).
+20040209 ui/options.dat: stop two options having 'b' as their hotkey
+	 (Release-0_6_2-branch).
+20040209 settings.dat, man/fuse.1, ui/options.dat, ui/gtk/confirm.c:
+	 rename options to fit properly in widgets
+20040211 configure.in: bump version number to 0.6.2
+	 (Release-0_6_2-branch).
+20040211 fuse.c, sound.h, man/fuse.1: fix the 'no sound on SVGAlib
+	 startup' bug (Release-0_6_2-branch) (Rus).
+20040212 TAG: Release-0_6_2 (Release-0_6_2-branch).
+20040213 widget/menu.c: don't use +3 functions when lib765 not available.
+	 (Release-0_6_2-branch).
+20040213 ui/sdl/Makefile.am: distribute sdljoystick.h (thanks, Owen Dunn)
+	 (Release-0_6_2-branch).
 20040214 First pass at code to allow for a dynamically modifiable
 	 peripheral list.
+20040214 specplus3.c: reverse map mapping for 0xc000 - 0xffff was
+	 incorrectly always set to 0 in normal_memory_map()
+	 (Release-0_6_2-branch).
 20040215 Use the new peripheral code to (de)activate the Kempston
 	 interface at run-time where appropriate.
 20040216 widget/{options.pl,widget.c}: update peripherals list when widget
 	 options dialog exited.
+20040216 ui/sdl/sdldisplay.c: don't overrun the rectangles array in
+	 sdl_blit_icon() (thanks, Simon Tatham) (Release-0_6_2-branch).
+20040216 configure.in: use glib 2.0 if available (Release-0_6_2-branch)
+	 (Darren).
+20040216 configure.in, utils.c: compilation fix if ROMSDIR defined (and
+	 configure.in option to define it) (Release-0_6_2-branch)
+	 (Darren).
+20040217 settings.dat, ui/uijoystick.c: allow selectable joystick devices
+	 (Release-0_6_2-branch) (Darren).
+20040218 ui/uijoystick.c: open_stick should be open_joystick
+	 (Release-0_6_2-branch).
+20040219 ChangeLog, README, configure.in, man/fuse.1: documenation etc
+	 updates for the 0.6.2.1 release (Release-0_6_2-branch).
+20040219 TAG: Release-0_6_2_1 (Release-0_6_2-branch).
+20040223 Merge changes from Release-0_6_2_1 to HEAD.
+20040223 TAG: Release-0_6_2-merge-1

@@ -50,14 +50,14 @@ update_display( GtkCList *clist, libspectrum_word base )
   gtk_clist_clear( clist );
 
   for( i = 0; i < 20; i++ ) {
-    snprintf( text[0], 8, "%04x", base );
+    snprintf( text[0], 8, "%04X", base );
 
     text[1][0] = '\0';
     for( j = 0; j < 0x10; j++, base++ ) {
 
       libspectrum_byte b = readbyte_internal( base );
 
-      snprintf( buffer2, 4, "%02x ", b );
+      snprintf( buffer2, 4, "%02X ", b );
       strncat( text[1], buffer2, 4 );
 
       text[2][j] = ( b >= 32 && b < 127 ) ? b : '.';

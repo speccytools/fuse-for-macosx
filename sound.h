@@ -1,5 +1,7 @@
 /* sound.h: Sound support
-   Copyright (c) 2000-2002 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2004 Russell Marks, Matan Ziv-Av, Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,6 +37,7 @@ void sound_frame( void );
 void sound_beeper( int is_tape, int on );
 
 extern int sound_enabled;
+extern int sound_enabled_ever;
 extern int sound_freq;
 extern int sound_stereo;
 extern int sound_stereo_beeper;

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2003 Philip Kendall
+## Copyright (c) 2001-2004 Philip Kendall
 
 ## $Id$
 
@@ -32,6 +32,12 @@ DIST_SUBDIRS = fb \
 	       scaler \
 	       sdl \
 	       svga \
+	       win32 \
 	       xlib
 
-noinst_HEADERS = ui.h uidisplay.h options.dat
+noinst_HEADERS = ui.h \
+		 uidisplay.h \
+		 uijoystick.h
+
+EXTRA_DIST = options.dat \
+	     uijoystick.c

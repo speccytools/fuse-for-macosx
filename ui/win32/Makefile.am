@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2004 Philip Kendall
+## Copyright (c) 2001-2004 Philip Kendall
 
 ## $Id$
 
@@ -24,20 +24,15 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-FILES = cassette.bmp \
-	disk_plus3.z80 \
-	keyboard.scr \
-	plus3disk.bmp \
-	tape_128.z80 \
-	tape_16.z80 \
-	tape_2048.z80 \
-	tape_2068.z80 \
-	tape_48.z80 \
-	tape_plus2.z80 \
-	tape_plus2a.z80 \
-	tape_plus3.z80 \
-	tape_pentagon.z80
+noinst_LIBRARIES = libuiwin32.a
 
-pkgdata_DATA = $(FILES)
+libuiwin32_a_SOURCES = error.c \
+		       keysyms.c \
+		       win32display.c \
+		       win32keyboard.c \
+		       win32ui.c
 
-EXTRA_DIST = $(FILES)
+noinst_HEADERS = win32display.h \
+		 win32keyboard.h
+
+EXTRA_DIST = todo.txt

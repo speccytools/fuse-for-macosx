@@ -99,7 +99,7 @@ dck_read( const char *filename )
   error = utils_read_file( filename, &file );
   if( error ) { libspectrum_dck_free( dck, 0 ); return error; }
 
-  error = libspectrum_dck_read( dck, file.buffer, file.length );
+  error = libspectrum_dck_read2( dck, file.buffer, file.length, filename );
   if( error ) {
     utils_close_file( &file ); libspectrum_dck_free( dck, 0 ); return error;
   }

@@ -1,9 +1,12 @@
-The Free Unix Spectrum Emulator (Fuse) 0.6.1.1
+The Free Unix Spectrum Emulator (Fuse) 0.6.2.1
 ==============================================
 
-Given the current proliferation of DOS/Windows Speccy emulators, I
-decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.6.1.1.
+Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
+unsurprisingly, an emulator of the ZX Spectrum (a popular 1980s home
+computer, especially in the UK) for Unix. However, it has now also
+been ported to Mac OS X, which may or may not count as a Unix variant
+depending on your advocacy position and emulates some of the
+better-known ZX Spectrum clones as well.
 
 What Fuse does have:
 
@@ -11,44 +14,52 @@ What Fuse does have:
   Pentagon 128 emulation, running at true Speccy speed on any computer
   you're likely to try it on.
 * Support for loading from .tzx files.
-* Sound (on systems supporting the Open Sound System, something
-  like OpenBSD or Solaris's /dev/audio, or SDL).
-* Kempston joystick emulation.
+* Sound (on systems supporting the Open Sound System, SDL, or OpenBSD/
+  Solaris's /dev/audio).
+* Kempston and Timex TC2068 joystick emulation.
 * Emulation of some of the printers you could attach to a Spectrum.
 * Support for the RZX input recording file format, including
-  `competition mode'.
+  'competition mode'.
 
-What Fuse doesn't have:
+What you'll need to run Fuse
+----------------------------
 
-* Emulation of any other peripherals (bar the tape deck)
-* ...
+Unix, Linux, BSD, etc.
 
-What you'll need to run Fuse:
+Required:
 
-* A version of Unix with any of X, svgalib, framebuffer or SDL support
-  installed.  If you have GTK+, you'll get a nicer user interface under X.
+* X, SDL, svgalib, framebuffer support. If you have GTK+, you'll get a
+  (much) nicer user interface under X.
 * libspectrum: this is available from
-  http://www.srcf.ucam.org/~pak21/spectrum/libspectrum.html
+  http://fuse-emulator.sourceforge.net/libspectrum.php
+
+Optional:
+
 * If you want +3 support, you'll need John Elliott's lib765 installed;
   this is available from http://www.seasip.demon.co.uk/Unix/LibDsk/
   If you also have libdsk (from the same location) installed, you'll also
   get support for extended .dsk files (see 'THE .DSK FORMAT' section in
   fuse(1) for more details on this).
 * Other libraries will give you some extended functionality:
-  * libgcrypt: the ability to digitally sign input recordings.
+  * libgcrypt: the ability to digitally sign input recordings (note that
+    Fuse requires version 1.1.42 or later).
   * libpng: the ability to save screenshots
   * libxml2: the ability to load and save Fuse's current configuration
   * zlib: support for compressed RZX files
 
-If you've used Fuse up to version 0.5.0, note that the external
+If you've used Fuse prior to version 0.5.0, note that the external
 utilities (tzxlist, etc) are now available separately from Fuse
-itself. See http://www.srcf.ucam.org/~pak21/spectrum/fuse.html for
-details.
+itself. See http://fuse-emulator.sourceforge.net/ for details.
+
+Mac OS X
+
+* Either the native port by Fredrick Meunier, or the original version
+  will compile on OS X 10.3 (Panther) or later.
 
 Building Fuse
 -------------
 
-To compile Fuse (see below for OS X instructions):
+To compile Fuse (see below for instructions for the OS X native port):
 
 $ ./configure
 
@@ -56,14 +67,13 @@ There are now some options you can give to configure; `configure
 --help' will list them all, but the most important are:
 
 --with-fb		Use the framebuffer interface, rather than GTK+.
+--with-sdl		Use the SDL interface, rather than GTK+.
 --with-svgalib		Use the SVGAlib interface.
 --without-gtk		Use the plain Xlib interface.
 
 If glib is installed on your system, Fuse will use this for a couple
-of things; however, it isn't necessary (unless you're using the GTK+
-interface, as GTK+ depends on glib). If you're having problem with
-your glib setup, you can use the `--without-glib' option to
-`configure', which will use some simple replacement routines.
+of things; however, it isn't necessary as libspectrum provides
+replacements for all the routines used by Fuse.
 
 Another useful option is `--with-local-prefix=DIRECTORY' which allows
 you to specify that you have some the the libraries needed by Fuse in
@@ -76,53 +86,51 @@ Then just:
 
 $ make
 
-(or `gmake' if that's what GNU Make is called on your system)
-
 and then
 
 $ make install
 
 if you want to place Fuse into the main directories on your system
 (under /usr/local by default, although you can change this with the
---prefix argument to `configure'). You'll probably need to be root to
+--prefix argument to 'configure'). You'll probably need to be root to
 do this bit.
 
 Once you've got Fuse configured and built, read the man page :-)
 
-Building Fuse on OS X
----------------------
+Building the OS X version of Fuse
+---------------------------------
 
-It is possible to build and run Fuse on OS X by using the native
-Cocoa port by fredm@spamcop.net. This comes as a set of
-ProjectBuilder projects for lib765, libdsk, libspectrum and fuse
-itself.
-
-Directly compiling the Unix version of Fuse on Mac OS X works on
-Mac OS X 10.3 (Panther) or newer.
+The native Cocoa port by Fredrick Meunier <fredm@spamcop.net> comes as
+a set of Xcode projects for libbz2, lib765, libdsk, libgcrypt,
+libspectrum and Fuse itself.
 
 Closing comments
 ----------------
 
-If you have any bug reports, suggestions or (particularly
-appreciated!) patches for Fuse, mail them to me at
-pak21-fuse@srcf.ucam.org. For more general Speccy related discussions,
-visit the Usenet group `comp.sys.sinclair', but do read the FAQ
-( http://www.sinclairfaq.com/cssfaq/index.html ) first!
-
 Fuse has its own home page, which you can find at:
 
-http://www.srcf.ucam.org/~pak21/spectrum/fuse.html
+http://fuse-emulator.sourceforge.net/
 
-or the latest version should be available from the World of Spectrum
-( http://www.worldofspectrum.org/ ) FTP site:
+and contains much of the information listed here. 
 
-ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/
+News of new versions of Fuse (and other important Fuse-related
+announcements) are distributed via the fuse-emulator-announce mailing
+list on SourceForge; see
+http://lists.sourceforge.net/lists/listinfo/fuse-emulator-announce
+for details on how to subscribe and the like.
 
-Finally, if you're interested in working on Fuse, some documents which
-may be useful (information on internals, etc) are in the hacking/
-directory.
+If you've got any bug reports, suggestions or the like for Fuse, or
+just want to get involved in the development, this is coordinated via
+the fuse-emulator-devel mailing list,
+http://lists.sourceforge.net/lists/listinfo/fuse-emulator-devel
+and the Fuse project page on SourceForge,
+http://sourceforge.net/projects/fuse-emulator/
+
+If you're interested in more general Speccy related discussions, visit
+the Usenet group 'comp.sys.sinclair', but do read the FAQ
+( http://www.worldofspectrum.org/faq/index.html ) first!
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-30 September 2003
+19 February 2004
 
 $Id$

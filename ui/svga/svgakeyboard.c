@@ -1,5 +1,5 @@
 /* svgakeyboard.c: svgalib routines for dealing with the keyboard
-   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av
+   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -41,6 +41,7 @@
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "utils.h"
 #ifdef USE_WIDGET
 #include "widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */

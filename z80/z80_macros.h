@@ -96,12 +96,22 @@
 #define FLAG_Z	0x40
 #define FLAG_S	0x80
 
-/* Get the appropriate contended memory delay. Use this macro later
-   to avoid a function call if memory contention is disabled */
+/* Get the appropriate contended memory delay. Use a macro for performance
+   reasons in the main core, but a function for flexibility when building
+   the core tester */
+
+#ifndef CORETEST
+
 #define contend(address,time) \
   if( memory_map[ (address) >> 13 ].contended ) \
     tstates += spectrum_contention[ tstates ]; \
   tstates += (time);
+
+#else				/* #ifndef CORETEST */
+
+void contend( libspectrum_word address, libspectrum_dword time );
+
+#endif				/* #ifndef CORETEST */
 
 #define contend_io(port,time) tstates += contend_port( (port) ) + (time);
 

@@ -28,7 +28,7 @@
 
 #include <config.h>
 
-#include <stdio.h>		/* Needed by the OS X build */
+#include <stdio.h>		/* Needed by NetBSD yacc */
 #include <stdlib.h>
 #include <string.h>
 

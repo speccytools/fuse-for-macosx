@@ -318,6 +318,7 @@ ui_init( int *argc, char ***argv )
   if( gtkdisplay_init() ) return 1;
 
   gtk_widget_show_all( gtkui_window );
+  gtkstatusbar_set_visibility( settings_current.statusbar );
 
   return 0;
 }
@@ -871,6 +872,8 @@ save_options( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
+  int error;
+
   if( paused ) {
     paused = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
@@ -879,6 +882,13 @@ gtkui_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
     timer_count = 0.0;
     gtk_main_quit();
   } else {
+
+    /* Stop recording any competition mode RZX file */
+    if( rzx_recording && rzx_competition_mode ) {
+      ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
+      error = rzx_stop_recording(); if( error ) return;
+    }
+      
     paused = 1;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
     gtk_main();

@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
 .\" fuse.1: Fuse man page
-.\" Copyright (c) 2001-2003 Russell Marks, Philip Kendall, Darren Salt,
+.\" Copyright (c) 2001-2004 Russell Marks, Philip Kendall, Darren Salt,
 .\"                         Fredrick Meunier
 .\"
 .\" This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "30th September, 2003" "Version 0.6.1.1" "Emulators"
+.TH fuse 1 "19th February, 2004" "Version 0.6.2.1" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -49,15 +49,25 @@ Fuse is a Sinclair ZX Spectrum emulator. It supports several models
 (including the 128), with quite faithful emulation of the display and
 sound.
 .PP
-The emulator can load Z80 and SNA snapshots, and TAP and TZX
+The emulator can load any of the formats supported by
+.IR libspectrum (3)
+- this includes Z80, SNA and SZX snapshots, and TAP and TZX
 virtual-tape files. Saving to both Z80 snapshots and TZX tape files is
 supported. The SLT extension to the Z80 format is partly supported
 (enough for multi-load games); however, loading of the old DAT-file
-variant is not. DSK disk images are supported when emulating a +3.
-TRD and SCL disk images are supported when emulating a Pentagon.
+variant is not. DSK disk images are supported when emulating a +3, TRD
+and SCL disk images are supported when emulating a Pentagon and DCK
+cartridge images are supported when emulating a TC2068.
 .PP
 There is also support for reading and writing the RZX input recording
 format.
+.PP
+See the
+.B COMPRESSED FILES
+section for details on reading files compressed with
+.IR bzip2 "(3)"
+or
+.IR gzip "(3)."
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -97,7 +107,7 @@ Specify whether tape and disk files should be automatically loaded
 when they are opened. (Enabled by default, but you can use
 .RI ` --no-auto-load '
 to disable). Same as the General Options dialog's
-.I "Auto-load tapes/disks"
+.I "Auto-load media"
 option.
 .RE
 .PP
@@ -106,6 +116,16 @@ option.
 Specify whether fake stereo should be added to the emulation of the
 Spectrum beeper. Same as the Sound Option dialog's
 .I "Beeper pseudo-stereo"
+option.
+.RE
+.PP
+.I --bw-tv
+.RS
+Specify whether the display should simulate a colour or black and
+white television. This option is effective only under the GTK+ and SDL
+user interfaces: the others will always simulate a colour TV. The same
+as the General Option dialog's
+.I "Black and white TV"
 option.
 .RE
 .PP
@@ -135,6 +155,29 @@ to disable). Same as the RZX Options dialog's
 option.
 .RE
 .PP
+.I "--confirm-actions"
+.RS
+Specify whether `dangerous' actions (those which could cause data
+loss, for example resetting the Spectrum) require confirmation before
+occuring. (Enabled by default, but you can use
+.RI ` --no-confirm-actions'
+to disable). This option is effective only under the GTK+ UI, and is
+the same as the General Options dialog's
+.I "Confirm actions"
+option.
+.RE
+.PP
+.I "--embed-snapshot"
+.RS
+Specify whether a snapshot should be embedded in an RZX file when
+recording is started from an existing snapshot. (Enabled by default,
+but you can use
+.RI ` --no-embed-snapshot '
+to disable). Same as the RZX Options dialog's
+.I "Always embed snapshot"
+option.
+.RE
+.PP
 .I "-g filter"
 .br
 .I "--graphics-filter mode"
@@ -142,19 +185,21 @@ option.
 Specify which graphics filter to use if available. The default is
 .IR normal ,
 which uses no filtering. The available options are
+.IR 2x ,
+.IR 2xsai ,
+.IR 3x ,
+.IR advmame2x ,
+.IR advmame3x ,
+.IR dotmatrix ,
 .IR half ,
 .IR halfskip ,
 .IR normal ,
-.IR 2x ,
-.IR 3x ,
-.IR 2xsai ,
 .IR super2xsai ,
 .IR supereagle ,
-.IR advmame2x ,
-.IR tv2x ,
+.IR timex15x ,
 .IR timextv ,
 and
-.IR dotmatrix .
+.IR tv2x .
 See the
 .B "GRAPHICS FILTERS"
 section for more details.
@@ -180,6 +225,29 @@ Give brief usage help, listing available options.
 Emulate an issue 2 keyboard. Same as the General Options dialog's
 .I "Issue 2 keyboard"
 option.
+.RE
+.PP
+.I -j
+.br
+.I "--joystick-1 device"
+.RS
+Read from
+.I device
+to emulate the first joystick. Fuse will use either
+.RI ` /dev/input/js0 '
+or
+.RI ` /dev/js0 '
+by default.
+.RE
+.PP
+.I "--joystick-2 device"
+.RS
+As for
+.I --joystick-1
+but for the second joystick; the default here is either
+.RI ` /dev/input/js1 '
+or
+.RI ` /dev/js1 "'."
 .RE
 .PP
 .I --kempston
@@ -229,6 +297,14 @@ Specify an RZX file to begin playback from.
 .RS
 Insert the specified file into the emulated +3's A: drive; also select
 the +3 on startup if available.
+.RE
+.PP
+.I "--printer"
+.RS
+Specify whether the emulation should include a printer. Same as the
+General Options dialog's
+.I "Emulate printers"
+option.
 .RE
 .PP
 .I "--rate frame"
@@ -295,6 +371,15 @@ Specify the speed (as a percentage of real Spectrum speed) at which
 emulation should attempt to proceed. Same as the General Options
 dialog's
 .I "Emulation speed"
+option.
+.RE
+.PP
+.I "--statusbar"
+.RS
+For the GTK+ UI, enables the statusbar beneath the display. For the
+SDL UI, enables the status icons showing whether the disk and tape are
+being accessed. Same as the General Options dialog's
+.I "Show statusbar"
 option.
 .RE
 .PP
@@ -421,12 +506,12 @@ for those items which have them:
 .RS
 Open a Spectrum file. Snapshots will be loaded into memory; tape
 images will be inserted into the emulated tape deck, and if the
-.I "Auto-load tapes/disks"
+.I "Auto-load media"
 option is set will being loading. Opening a disk image or a Timex dock
 image will cause the appropriate machine type (+3, Pentagon or TC2068)
 to be selected with the image inserted, and disks will automatically
 load if the
-.I "Auto-load tapes/disks"
+.I "Auto-load media"
 option is set. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file. Note that this
@@ -447,9 +532,19 @@ and have a differently-named menu item to match.
 .PP
 .I "File, Recording, Record..."
 .RS
-Start recording input to an RZX file. Again, the GTK+ UI lets you
-select a filename, while the others just write to
-.IR record.rzx
+Start recording input to an RZX file, initialised from the current
+emulation state. Again, the GTK+ UI lets you select a filename, while
+the others just write to
+.IR record.rzx .
+.RE
+.PP
+.I "File, Recording, Record from snapshot..."
+.RS
+Start recording input to an RZX file, initialised from a snapshot. You
+will first be asked for the snapshot to use and then (under the GTK+
+UI) for the file to save the recording to; the other UIs again write
+to
+.IR record.rzx .
 .RE
 .PP
 .I "File, Recording, Play..."
@@ -579,7 +674,7 @@ The use of
 as the fire button can cause problems with some games - since the keys
 still form part of the emulated Spectrum's keyboard, and
 .I Space
-was sometimes used as a second fire button when using the joystick -
+was sometimes used as a second fire button when using the joystick \-
 so it's probably best to only enable Kempston emulation when you
 really need it.
 .RE
@@ -598,7 +693,7 @@ or choosing the
 menu item.
 .RE
 .PP
-.I "Auto-load tapes/disks"
+.I "Auto-load media"
 .RS
 On many occasions when you open a tape or disk file, it's because it's
 got a program in you want to load and run. If this option is selected,
@@ -634,6 +729,35 @@ you'll have to manually use
 .I "Options, Save"
 afterwards to ensure that this setting gets written to Fuse's
 configuration file.
+.RE
+.PP
+.I "Black and white TV"
+.RS
+This option allows you to choose whether to simulate a colour or black
+and white television. This is effective only under the GTK+ and SDL
+user interfaces: the others will always simulate a colour TV.
+.RE
+.PP
+.I "Confirm actions"
+.RS
+Specify whether `dangerous' actions (those which could cause data
+loss, for example resetting the Spectrum) require confirmation before
+occuring. This option is effective only under the GTK+ UI.
+.RE
+.PP
+.I "Emulate printers"
+.RS
+Specify whether emulation should include a printer. See the
+.B "PRINTER EMULATION"
+section for more details.
+.RE
+.PP
+.I "Show statusbar"
+.RS
+For the GTK+ UI, enables the statusbar beneath the display. For the
+SDL UI, enables the status icons showing whether the disk and tape are
+being accessed. This option has no effect for the other user
+interfaces.
 .RE
 .RE
 .PP
@@ -729,9 +853,15 @@ requirements for Fuse to be used in an on-line tournament.
 .RS
 The numeric code entered here will be written into any RZX files made
 in competition mode. This is another feature for on-line tournaments
-which can be used to prove that the recording was made after a
+which can be used to `prove' that the recording was made after a
 specific code was released. If you're not playing in such a
 tournament, you can safely ignore this option.
+.RE
+.PP
+.I "Always embed snapshot"
+.RS
+Specify whether a snapshot should be embedded in an RZX file when
+recording is started from an existing snapshot.
 .RE
 .RE
 .PP
@@ -746,6 +876,15 @@ in your home directory, from which they will be picked up again when
 Fuse is restarted. The best way to update this file is by using this
 option, but it's a simple XML file and shouldn't be too hard to edit
 by hand if you really want to.
+.RE
+.PP
+.I Pause
+.br
+.I "Machine, Pause"
+.RS
+Pause or unpause emulation. This option is available only under the
+GTK+ UI; to pause the other user interfaces, simply press F1 to bring
+up the main menu.
 .RE
 .PP
 .I F5
@@ -773,6 +912,20 @@ Start the monitor/debugger. See the
 section for more information.
 .RE
 .PP
+.I "Machine, Poke Finder..."
+.RS
+Start the `poke finder' (available only under the GTK+ UI). See the
+.B "POKE FINDER"
+section for more information.
+.RE
+.PP
+.I "Machine, Memory Browser..."
+.RS
+Start the memory browser (again available only under the GTK+ UI). It
+should be fairly obvious what this does; perhaps the only thing worth
+noting is that emulation is paused until you close the window.
+.RE
+.PP
 .I "Machine, NMI"
 .RS
 Sends a non-maskable interrupt to the emulated Spectrum. Due to a typo
@@ -787,7 +940,7 @@ available which make use of this feature.
 Choose a TAP or TZX virtual-tape file to load from. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file. If
-.I "Auto-load tapes/disks"
+.I "Auto-load media"
 is set in the General Options dialog (as it is by default), the tape
 will begin loading. Otherwise, you have to start the load in the
 emulated machine (with LOAD "" or the 128's Tape Loader option, though
@@ -826,14 +979,12 @@ stop-the-tape request (which Fuse obeys).
 .RS
 Browse through the current tape. A brief display of each of the data
 blocks on the current tape will appear, from which you can select
-which block Fuse will play next. In the GTK+ UI, select the block with
-the mouse and use the
-.RI ` OK '
-button to exit; in the others, use the cursor keys and press
-.IR Enter .
-If you decide you don't want to change block, either use the
-.RI ` Cancel '
-button (in the GTK+ UI) or press
+which block Fuse will play next. With the GTK+ UI, emulation will
+continue while the browser is displayed; double-clicking on a block
+will select it. In the other UIs, emulation is paused and you can use
+the cursor keys and press
+.I Enter
+to select it. If you decide you don't want to change block, just press
 .IR Escape .
 .RE
 .PP
@@ -875,21 +1026,25 @@ written to any tape file until you choose this option!
 .RS
 Virtual disk images are only accessible when emulating a +3 or
 Pentagon. If any of the disk options are selected while emulating a
-+3, they refer to the +3's disk drives, which are both of the 3" type
++3, they refer to the +3's disk drives, which are both of the 3\" type
 (in effect, the internal drive plus an external FD-1). With the usual
 +3 format, these have a capacity of 173K. If any other machine is
 being emulated, these options refer to the Pentagon's disk drives,
 although these cannot be accessed unless the Pentagon is being
 emulated. (See
 .B "THE .DSK FORMAT"
-,
-.B "THE .TRD FORMAT"
 and
-.B "THE .SCL FORMAT"
+.B "PENTAGON DISK FORMATS"
 sections below for notes on the file formats supported).
+.PP
+Note that (since version 0.6.2), Fuse works with true virtual disk
+images: any changes made to a disk image will not affect the file
+which was `inserted' into the drive. If you do want to keep any
+changes, use the appropriate `eject and write' option before exiting
+Fuse.
 .RE
 .PP
-.I "Media, Disk, Drive A:, Insert"
+.I "Media, Disk, Drive A:, Insert..."
 .RS
 Select a disk-image file to read/write in the emulated drive
 A:.
@@ -898,10 +1053,21 @@ A:.
 .I "Media, Disk, Drive A:, Eject"
 .RS
 Deselect the disk image currently in drive A: - or from the emulated
-machine;s perspective, eject it.
+machine's perspective, eject it. Note that any changes made to the
+image will not be saved.
 .RE
 .PP
-.I "Media, Disk, Drive B:, Insert"
+.I "Media, Disk, Drive A:, Eject and write..."
+.RS
+Deselect the disk image currently in drive A: and write the current
+state of the disk to a file. The GTK+ UI lets you select a filename,
+while the others will write +3 disk images to
+.RI ` drivea.dsk '
+or Pentagon disk images to
+.RI ` drivea.trd '.
+.RE
+.PP
+.I "Media, Disk, Drive B:, Insert..."
 .RS
 As above, but for drive B:.
 .RE
@@ -909,6 +1075,29 @@ As above, but for drive B:.
 .I "Media, Disk, Drive B:, Eject"
 .RS
 As above, but for drive B:.
+.RE
+.PP
+.I "Media, Disk, Drive B:, Eject and write"
+.RS
+As above, but for drive B:. The filenames used by the widget-based UIs
+are
+.RI ` driveb.dsk '
+and
+.RI ` driveb.trd '
+respectively.
+.RE
+.PP
+.I "Media, Cartridge, Insert..."
+.RS
+Insert a cartridge into the TC2068's dock. This will cause the
+emulated machine to be changed to the TC2068 (if it wasn't already)
+and reset.
+.RE
+.PP
+.I "Media, Cartridge, Eject"
+.RS
+Remove the cartridge from the TC2068's dock. This will cause the
+emulated machine to be reset.
 .RE
 .PP
 .I "Help, Keyboard picture..."
@@ -1013,8 +1202,9 @@ have their high-resolution video mode with twice the horizontal
 resolution. To deal with this, Fuse treats these machines as having a
 `normal' display size which is twice the size of a normal Spectrum's
 screen, leading to a different set of filters being available for
-these machines. Note that any of the double-sizing filters are
-available for Timex machines only when using the SDL user interface.
+these machines. Note that any of the double or triple-sizing filters
+are available for Timex machines only when using the SDL user
+interface.
 .PP
 The available filters, along with their short name used to select them
 from the command line, are:
@@ -1046,7 +1236,8 @@ Scale the displayed screen up to double size.
 .IR "Triple size " ( 3x )
 .RS
 Scale the displayed screen up to triple size. Available only with the
-SDL user interface or when saving screenshots of non-Timex machines.
+GTK+ and SDL user interfaces or when saving screenshots of non-Timex
+machines.
 .RE
 .PP
 .IR "2xSaI " ( 2xsai )
@@ -1070,8 +1261,8 @@ diagonal lines.
 Very similar to
 .IR AdvMAME2x ,
 except that it triples the size of the displayed screen. Available
-only with the SDL user interface or when saving screenshots of
-non-Timex machines.
+only with the GTK+ and SDL user interfaces or when saving screenshots
+of non-Timex machines.
 .RE
 .PP
 .IR "TV 2x " ( tv2x )
@@ -1088,6 +1279,14 @@ machines (note that this means both produce the same size output).
 .RS
 A double-sizing filter which emulates the effect of a dot-matrix
 display.
+.RE
+.PP
+.IR "Timex 1.5x " ( timex15x )
+.RS
+An interpolating Timex-specific filter which scales the Timex screen
+up to 1.5x its usual size (which is therefore 3x the size of a
+`normal' Spectrum screen). Available only for the GTK+ and SDL user
+interfaces or when saving screenshots.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1225,14 +1424,18 @@ powerful, completely transparent monitor/debugger, which can be
 activated via the
 .I "Machine, Debugger ..."
 menu option. A debugger window will appear, showing the current state
-of the emulated machine: the top-left shows the current state of the
-Z80 and the last bytes written to any emulated peripherals. The
-bottom-left panel lists any active breakpoints. The centre panel gives
-a disassembly, which by default starts at the current program counter,
-although this can be modified either by the 'disassemble' command (see
-below) or by dragging the scrollbar next to it. Finally, the right
-panel shows the current stack. Below the displays are an entry box for
-debugger commands, and five buttons for controlling the debugger:
+of the emulated machine: the top-left `pane' shows the current state
+of the Z80 and the last bytes written to any emulated peripherals. The
+bottom-left pane lists any active breakpoints. Moving right, the next
+pane gives a disassembly, which by default starts at the current
+program counter, although this can be modified either by the
+`disassemble' command (see below) or by dragging the scrollbar next to
+it. The next pane shows the current stack, and the final pane any
+`events' which are due to occur and could affect emulation. Any of
+these panes can be removed by use of the
+.I View
+menu. Below the displays are an entry box for debugger commands, and
+five buttons for controlling the debugger:
 .PP
 .I Evaluate
 .RS
@@ -1259,6 +1462,11 @@ Stop emulation and return to the debugger.
 .RS
 Close the debugger window and restart emulation.
 .RE
+.PP
+Double-clicking on an entry in the stack pane will cause emulation to
+run until the program counter reaches the value stored at that
+address, while double-clicking on an entry in the `events' pane will
+cause emulation to run until that time is reached.
 .PP
 The main power of the debugger is via the commands entered into the
 entry box, which are similar in nature (but definitely not identical
@@ -1313,6 +1521,16 @@ is read from (other than via an opcode fetch) or written to and
 evaluates true.
 .I Address
 again defaults to the current value of PC if omitted.
+.RE
+.PP
+br{eakpoint} ti{me}
+.IR "time " [ condition ]
+.RS
+Set a breakpoint to occur
+.I time
+tstates after the start of the current frame, assuming
+.I condition
+evaluates true (if one is given).
 .RE
 .PP
 cl{ear}
@@ -1431,6 +1649,19 @@ except that that breakpoint is temporary: it will trigger once and
 once only, and then be removed.
 .RE
 .PP
+Addresses can be specified in one of two forms: either an absolute
+addresses, specifed by an integer in the range 0x0000 to 0xFFFF or as
+a
+.RI ` page : offset '
+combination, which refers to a location
+.I offset
+bytes into into memory bank
+.IR page ,
+independent of where that bank is currently paged into memory. The 48K
+machines are treated as having a permanent mapping of page 5 at
+0x4000, page 2 at 0x8000 and page 0 at 0xC000; the 16K Spectrum is
+treated as having page 5 at 0x4000 and no page at 0x8000 and 0xC000.
+.PP
 Anywhere the debugger is expecting a numeric value, except where it
 expects a breakpoint id, you can instead use a numeric expression,
 which uses a restricted version of C's syntax; exactly the same syntax
@@ -1442,6 +1673,70 @@ standard four numeric operations (`+', `-', `*' and `/'), the
 (non-)equality operators `==' and `!=', the comparision operators `>',
 `<', `>=' and `<=', bitwise and (`&'), or (`|') and exclusive or (`^')
 and logical and (`&&') and or (`||').
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH THE POKE FINDER
+.PP
+The `poke finder', available only under the GTK+ UI, is a tool which
+is designed to make the task of finding (infinite lives etc) pokes for
+games a bit easier: it is similar to the `Lifeguard' utility which was
+available for use with the Multiface. It works by maintaining a list
+of locations in which the current number of lives (etc) may be stored,
+and having the ability to remove from that list any locations which
+don't contain a specified value.
+.PP
+The poke finder dialog contains an entry box for specifying the value
+to be searched for, a count of the current number of possible
+locations and, if there are less than 20 possible locations, a list of
+the possible locations (in `page:offset' format). The three buttons
+act as follows:
+.PP
+.I Search
+.RS
+Remove from the list of possible locations any addresses which do not
+contain the value specified in the `Search for' field.
+.RE
+.PP
+.I Reset
+.RS
+Reset the poke finder so that all locations are considered possible.
+.RE
+.PP
+.I Close
+.RS
+Close the dialog. Note that this does not reset the current state of
+the poke finder.
+.RE
+.PP
+Double-clicking on an entry in the list of possible locations will
+cause a breakpoint to be set to trigger whenever that location is
+written to.
+.PP
+An example of how to use this may make things a bit clearer. We'll use
+the 128K version of Gryzor. Load the game, define keys to suit and
+start playing. Immediately pause the game and bring up the poke finder
+dialog. We note that we currently have 6 lives, so enter `6' into the
+`Search for' field and click `Search'. This reduces the number of
+possible locations to around 931 (you may get a slightly different
+number depending on exactly when you paused the game). Play along a
+bit and then (deliberately) lose a life. Pause the game again. As we
+now have 5 lives, replace the `6' in the 'Search for' field with a `5'
+and click `Search' again. This then reduces the list of possible
+locations to just one: page 2, offset 0x00BC. This is the only
+location in memory which stored `6' when we had 6 lives and `5' when
+we had 5 lives, so its pretty likely that this is where the lives
+count is stored. Double-clicking on the `2:0x00BC' entry in the dialog
+will set the appropriate breakpoint (you may wish to open the debugger
+at this point to confirm this). Play along a bit more. When you next
+lose a life, emulation is stopped with PC at 0x91CD. Scrolling up a
+few addresses in the debugger's disassembly pane shows a value was
+loaded from 0x80BC (our hypothetical lives counter), decremented and
+then stored again to 0x80BC, which looks very much like the code to
+reduce the number of lives. We can now use the debugger to replace the
+decrement with a NOP (`set 0x91c9 0'), and playing the game some more
+after this reveals that this has worked and we now have infinite
+lives.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1460,39 +1755,53 @@ one format will start `MV - CPCEMU' and the other will start
 The `lib765' library used by Fuse to emulate the +3's FDC supports the
 `CPCEMU' format, but not the extended format. If the `libdsk' library
 was also found while compiling Fuse, this is used to provide support
-for the extended format, as well as for other goodies such as gzip
+for the extended format, as well as for other goodies such as
 compressed disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH THE .TRD FORMAT
+.SH PENTAGON DISK FORMATS
 .PP
-Fuse supports .TRD images in its Pentagon emulation; truncated files
-need to be expanded with another utility before use.
+Fuse supports .SCL and .TRD images in its Pentagon emulation;
+truncated .TRD files need to be expanded with another utility before
+use.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH THE .SCL FORMAT
+.SH COMPRESSED FILES
 .PP
-Fuse has read-only support for .SCL images in its Pentagon emulation,
-you can create a read-write .TRD file using 
-.I scl2trd 
-from the associated Fuse utilities.
+Assuming the appropriate libraries were available when
+.IR libspectrum (3)
+was compiled, snapshots, tape images, dock cartridges and input
+recording files can be read from files compressed with
+.IR bzip2 (3)
+or
+.IR gzip (3)
+just as if they were uncompressed.
+.I libdsk
+provides an equivalent functionality for +3 disk images if available,
+but there is currently no support for reading compressed TR-DOS disk
+images.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
 Not many peripherals are supported.
-.br
+.PP
 Selecting a startup filter doesn't work properly with user interfaces
 other than SDL.
-.br
+.PP
 Attempting to replay an RZX file without an embedded snapshot from the
 command-line doesn't work if you do `./fuse
 .IR "rzxfile snapshot" '.
 `./fuse
 .IR "snapshot rzxfile" '
 does work though, so use that instead.
+.PP
+Changing virtual consoles when using SVGAlib for joystick support
+causes Fuse to exit. If this is a problem, compile Fuse with the
+.RI ` --disable-ui-joystick '
+option.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1502,18 +1811,16 @@ does work though, so use that instead.
 .\"------------------------------------------------------------------
 .\"
 .SH SEE ALSO
-.IR listbasic "(1),"
-.IR scl2trd "(1),"
-.IR tzxconv "(1),"
-.IR tzxlist "(1),"
-.IR rzxdump "(1),"
-.IR rzxtool "(1),"
+.IR bzip2 "(3),"
+.IR fuse-utils "(1),"
+.IR gzip "(3),"
+.IR libspectrum "(3),"
 .IR xspect "(1),"
 .IR xzx "(1)"
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br
-.IR "http://www.sinclairfaq.com/cssfaq/index.html" .
+.IR "http://www.worldofspectrum.org/faq/index.html" .
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -1543,13 +1850,17 @@ and RZX embedded snapshots and compression.
 .PP
 Alexander Yurchenko wrote the OpenBSD/Solaris-specific sound code.
 .PP
-Fredrick Meunier wrote the TC2048 support, the Pentagon support and
-did the original import of the graphics filter code.
+Fredrick Meunier wrote the TC2048 and Pentagon support as well as
+maintaining the OS X port and importing the graphics filter code.
 .PP
 Ludvig Strigeus and The ScummVM project wrote the original graphics
 filter code.
 .PP
-Dmitry Sanarin wrote the orignial TR-DOS emulation (for Glukalka).
+Dmitry Sanarin wrote the original TR-DOS emulation (for Glukalka).
 .PP
 Witold Filipczyk wrote the TC2068 support.
-
+.PP
+Matthew Westcott wrote the AY logging code.
+.PP
+Marek Januszewski wrote various bits of code to make Fuse work under
+Win32, including the DirectDraw user interface.

@@ -59,9 +59,18 @@ EXTRA_DIST = opcodes_base.dat \
 
 ## The core tester
 
+SUBDIRS = tests
+
 noinst_PROGRAMS = coretest
 
-coretest_SOURCES = coretest.c z80.c z80_ops.c
+coretest_SOURCES = coretest.c z80.c
+coretest_LDADD = z80_coretest.o
+
+coretest.o: coretest.c
+	$(COMPILE) -DCORETEST -c coretest.c -o coretest.o
+
+z80_coretest.o: z80_ops.c
+	$(COMPILE) -DCORETEST -c z80_ops.c -o z80_coretest.o
 
 test: coretest harness.pl
 	@PERL@ harness.pl tests/*.in

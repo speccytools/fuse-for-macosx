@@ -1,6 +1,6 @@
 /* tc2068.c: Timex TC2068 specific routines
    Copyright (c) 1999-2004 Philip Kendall
-   Copyright (c) 2002 Fredrick Meunier
+   Copyright (c) 2002-2004 Fredrick Meunier
    Copyright (c) 2003 Witold Filipczyk
    Copyright (c) 2003 Darren Salt
 
@@ -90,17 +90,8 @@ tc2068_ay_dataport_read( libspectrum_word port )
 			   ? machine_current->ay.registers[14]
 			   : 0xff;
 
-    switch( port & 0x0300 ) {
-    case 0x0100:
-      ret &= ~joystick_timex_read( port, 0 );
-      break;
-    case 0x0200:
-      ret &= ~joystick_timex_read( port, 1 );
-      break;
-    case 0x0300:
-      ret &= ~joystick_timex_read( port, 0 ) | ~joystick_timex_read( port, 1 );
-      break;
-    }
+    if( port & 0x0100 ) ret &= ~joystick_timex_read( port, 0 );
+    if( port & 0x0200 ) ret &= ~joystick_timex_read( port, 1 );
 
     return ret;
   }

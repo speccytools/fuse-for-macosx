@@ -29,3 +29,5 @@ noinst_LIBRARIES = libpokefinder.a
 libpokefinder_a_SOURCES = pokefinder.c
 
 noinst_HEADERS = pokefinder.h
+
+INCLUDES = @LIBSPEC_CFLAGS@

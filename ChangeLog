@@ -1,4 +1,26 @@
-200?-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+2004-02-19  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.6.2.1 released.
+
+	* Compilation fixes:
+	  + sdljoystick.h missing from tarball (thanks, Owen Dunn).
+	  + Link failure if a widget UI in use and lib765 not available
+	    (thanks, Jamie Glendinning).
+	  + Compilation failure if ROMSDIR defined (Darren Salt).
+
+	* Bugfixes:
+	  + Use of the SDL icons could cause screen corruption (Simon
+	    Tatham).
+	  + The reverse page mapping for 0xc000 - 0xffff would
+	    occasionally be wrong on the +2A/+3 (Philip Kendall).
+
+	* Miscellaneous:
+	  + Allow selectable devices to be used for the real joysticks
+	    (Darren Salt).
+	  + Use glib 2.0 if available (Darren Salt).
+	  + Allow ROMSDIR to be set when configuring (Darren Salt).
+
+2004-02-11  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.6.2 released.
 
@@ -7,7 +29,13 @@
 	  + The 'pokefinder' (Philip Kendall).
 	  + Black and white TV mode for the GTK+ and SDL user interfaces
 	    (Fredrick Meunier).
-	  + Status bar for the GTK+ UI (Philip Kendall).
+	  + The Timex 1.5x scaler and the reappearance of 3x3 mode for
+	    the GTK+ UI (Fredrick Meunier, Philip Kendall).
+	  + A simple memory browser (Philip Kendall).
+	  + Writes to disk will not affect the underlying file unless
+	    explicitly requested by the user (Philip Kendall).
+	  + Status bar for the GTK+ UI, and status icons for the
+	    SDL UI (Philip Kendall/Fredrick Meunier).
 	  + Options to disable the GTK+ confirmation dialogs and the
 	    printer emulation (Philip Kendall).
 
@@ -48,15 +76,20 @@
 	* Miscellaneous improvements:
 	  + The GTK+ file selector now remembers the last directory
 	    it was used for.
+	  + The GTK+ tape browser no longer stops emulation.
 	  + Look for ROMs and library files relative to the Fuse
 	    executable, not relative to the current directory. Helps when
 	    dealing with a non-installed copy of Fuse.
 	  + Use $TMPDIR for temporary files if it's specified.
+	  + Warn if the current tape has been modified before its contents
+	    are lost.
 	  (Philip Kendall).
 
 	* Minor bugfixes:
-	  + Make writes to the screen when it is paged in other than at
-	    0x4000 work (Philip Kendall).
+	  + Make writes to the screen work when it is paged in other than
+	    at 0x4000 (Philip Kendall).
+	  + Make reading from both Timex joysticks simultaneously work
+	    correctly (Fredrick Meunier).
 	  + Remove a possible segfault caused by the tape initialisation
             code trying to access the tape beeper before the beeper code
 	    has been fully initialised (Witold Filipczyk, Fredrick Meunier).

@@ -116,7 +116,7 @@ gtkdisplay_init( void )
 
   error = init_colours(); if( error ) return error;
 
-  black = settings_current.colour_tv ? gtkdisplay_colours[0] : bw_colours[0];
+  black = settings_current.bw_tv ? bw_colours[0] : gtkdisplay_colours[0];
 
   for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
     for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
@@ -140,7 +140,8 @@ init_colours( void )
     green = rgb_colours[i][1];
     blue  = rgb_colours[i][2];
 
-    grey = 0.299 * red + 0.587 * green + 0.114 * blue;
+    /* Addition of 0.5 is to avoid rounding errors */
+    grey = ( 0.299 * red + 0.587 * green + 0.114 * blue ) + 0.5;
 
 #ifdef WORDS_BIGENDIAN
 
@@ -285,7 +286,7 @@ uidisplay_area( int x, int y, int w, int h )
 
   scaled_x = scale * x; scaled_y = scale * y;
 
-  palette = settings_current.colour_tv ? gtkdisplay_colours : bw_colours;
+  palette = settings_current.bw_tv ? bw_colours : gtkdisplay_colours;
 
   /* Create the RGB image */
   for( yy = y; yy < y + h; yy++ ) {

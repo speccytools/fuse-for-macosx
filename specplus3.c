@@ -305,7 +305,7 @@ normal_memory_map( int rom, int page )
 
   memory_map[6].page = &RAM[ page ][0x0000];
   memory_map[7].page = &RAM[ page ][0x2000];
-  memory_map[6].reverse = memory_map[7].reverse = 0;
+  memory_map[6].reverse = memory_map[7].reverse = page;
 
   memory_map[0].writable = memory_map[1].writable = 0;
 

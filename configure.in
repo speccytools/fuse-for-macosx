@@ -24,7 +24,7 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.6.1.1)
+AM_INIT_AUTOMAKE(fuse, 0.6.2.1)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -230,8 +230,21 @@ if test "$UI" != gtk; then
   glib=yes)
   AC_MSG_RESULT($glib)
   if test "$glib" = yes; then
-    AM_PATH_GLIB(1.2.0,AC_DEFINE(HAVE_LIB_GLIB),
-	         AC_MSG_WARN(glib not found - using libspectrum's replacement))
+    glib2=no
+    AM_PATH_GLIB_2_0(
+      2.0.0,
+      glib2=yes
+      AC_DEFINE(HAVE_LIB_GLIB)
+      LIBS="$LIBS `pkg-config --libs glib-2.0`",
+    )
+    if test "$glib2" = no; then
+      AM_PATH_GLIB(
+        1.2.0,
+        AC_DEFINE(HAVE_LIB_GLIB)
+        LIBS="$LIBS `glib-config --libs`",
+        AC_MSG_WARN(glib not found - using libspectrum's replacement)
+      )
+    fi
   fi
 fi
 
@@ -283,6 +296,20 @@ AC_CHECK_LIB( png, png_write_png,
   [-lm -lz]
 )
 AC_SUBST(PNG_LIBS)
+
+dnl Are we supplying the ROMs or relying on another package?
+AC_MSG_CHECKING(where to find the Spectrum ROM images)
+AC_ARG_WITH(roms-dir,
+  [  --with-roms-dir=DIR     location of the Spectrum ROM images],
+  ,
+  unset withval
+)
+if test "$withval" = ""; then
+  echo 'we supply them'
+else
+  echo "$withval"
+  AC_DEFINE_UNQUOTED(ROMSDIR, "$withval", [Location of the ROM images])
+fi
 
 AC_MSG_CHECKING(whether hardware joystick support requested)
   AC_ARG_WITH(joystick,
@@ -393,6 +420,10 @@ ui/fb/Makefile \
 ui/ggi/Makefile \
 ui/gtk/Makefile \
 ui/svga/Makefile \
-ui/sdl/Makefile ui/scaler/Makefile \
-ui/xlib/Makefile widget/Makefile z80/Makefile)
-
+ui/sdl/Makefile \
+ui/scaler/Makefile \
+ui/win32/Makefile \
+ui/xlib/Makefile \
+widget/Makefile \
+z80/Makefile \
+z80/tests/Makefile)

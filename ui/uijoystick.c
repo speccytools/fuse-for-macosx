@@ -1,5 +1,5 @@
 /* uijoystick.c: Joystick emulation (using libjsw)
-   Copyright (c) 2003 Darren Salt
+   Copyright (c) 2003-2004 Darren Salt, Philip Kendall
 
    $Id$
 
@@ -116,12 +116,32 @@ init_stick( int which, const char *const device,
   return 1;
 }
 
+static
+int open_joystick( int which, const char *device, const char *calibration )
+{
+  char path[ PATH_MAX ];
+
+  /* If we were given an explicit device to use for this joystick, try
+     only that */
+  if( device && device[0] ) return init_stick( which, device, calibration );
+
+  /* Otherwise try /dev/input/js<n> and /dev/js<n> */
+  snprintf( path, PATH_MAX, "/dev/input/js%d", which );
+  if( !init_stick( which, path, calibration ) ) return 0;
+    
+  snprintf( path, PATH_MAX, "/dev/js%d", which );
+  if( !init_stick( which, path, calibration ) ) return 0;
+
+  /* Couldn't find this joystick */
+  return 1;
+}
 
 int
 ui_joystick_init( void )
 {
   const char *home;
   char *calibration;
+  int error;
 
   home = utils_get_home_path(); if( !home ) return 1;
 
@@ -131,24 +151,26 @@ ui_joystick_init( void )
   if( !calibration ) {
     ui_error( UI_ERROR_ERROR, "failed to initialise joystick: %s",
 	      "not enough memory" );
-    return 1;
+    return 0;
   }
 
   sprintf( calibration, "%s/%s", home, JSDefaultCalibration );
 
   /* If we can't init the first, don't try the second */
-  if( init_stick( 0, "/dev/js0", calibration ) ) return 0;
-  if( init_stick( 1, "/dev/js1", calibration ) ) return 1;
+  error = open_joystick( 0, settings_current.joystick_1, calibration );
+  if( error ) return 0;
+
+  error = open_joystick( 1, settings_current.joystick_2, calibration );
+  if( error ) return 1;
+
   return 2;
 }
 
-
-int
+void
 ui_joystick_end( void )
 {
   int i;
   for( i = 0; i < joysticks_supported; i++ ) JSClose( &jsd[i] );
-  return 0;
 }
 
 

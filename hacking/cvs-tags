@@ -120,6 +120,12 @@ $Id$
 | Release-0_6_2-trunk
 |
 +-\					Branch for the 0.6.2 release
+| | Release-0_6_2pre1
+| | Release-0_6_2
+| | Release-0_6_2_1			Merged to HEAD at Release-0_6_2-merge-1
+| |
 | | Release-0_6_2-branch
+|
+| Release-0_6_2-merge-1
 |
 HEAD

@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -365,8 +365,8 @@ static void fuse_show_copyright(void)
   printf( "\n" );
   fuse_show_version();
   printf(
-   "Copyright (c) 1999-2003 Philip Kendall <pak21-fuse@srcf.ucam.org> and others;\n"
-   "See the file `AUTHORS' for more details.\n"
+   "Copyright (c) 1999-2004 Philip Kendall <pak21-fuse@srcf.ucam.org>\n"
+   "and others; see the file 'AUTHORS' for more details.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"
    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
@@ -441,7 +441,8 @@ int fuse_emulation_unpause(void)
   if( --fuse_emulation_paused ) return 0;
 
   /* If we now want sound, enable it */
-  if( settings_current.sound && settings_current.emulation_speed == 100 ) {
+  if( sound_enabled_ever && settings_current.sound &&
+      settings_current.emulation_speed == 100 ) {
 
     /* If sound has just started providing the timing, remove the old
        SIGALRM timer */

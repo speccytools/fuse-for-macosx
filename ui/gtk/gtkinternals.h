@@ -1,5 +1,5 @@
 /* gtkinternals.h: stuff internal to the GTK+ UI
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2004 Philip Kendall
 
    $Id$
 
@@ -56,6 +56,18 @@ int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
  */
 
 int gtkstatusbar_create( GtkBox *parent );
+int gtkstatusbar_set_visibility( int visible );
+
+/*
+ * The icon pixmaps (pixmaps.c)
+ */
+extern char *gtkpixmap_tape_inactive[];
+extern char *gtkpixmap_tape_active[];
+extern char *gtkpixmap_disk_inactive[];
+extern char *gtkpixmap_disk_active[];
+extern char *gtkpixmap_pause_inactive[];
+extern char *gtkpixmap_pause_active[];
+extern char *gtkpixmap_tape_marker[];
 
 /*
  * Poke finder routines (pokefinder.c)

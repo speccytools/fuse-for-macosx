@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #ifdef HAVE_MMAP
 #include <sys/mman.h>
@@ -54,6 +56,18 @@
 #include "tape.h"
 #include "trdos.h"
 #include "utils.h"
+
+typedef struct path_context {
+
+  int state;
+
+  utils_aux_type type;
+  char path[ PATH_MAX ];
+
+} path_context;
+
+static void init_path_context( path_context *ctx, utils_aux_type type );
+static int get_next_path( path_context *ctx );
 
 /* Open `filename' and do something sensible with it; autoload tapes
    if `autoload' is true and return the type of file found in `type' */
@@ -175,61 +189,114 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 {
   int fd;
 
-  char fuse_path[ PATH_MAX ], path[ PATH_MAX ];
-  char *fuse_dir; const char *path_segment;
-
-  switch( type ) {
-
-  case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
-  case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
-  default:
-    ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", type );
-    return -1;
-  }
+  char path[ PATH_MAX ];
+  path_context ctx;
 
   /* If given an absolute path, just look there */
   if( filename[0] == '/' ) return open( filename, O_RDONLY | O_BINARY );
 
-  /* Otherwise look in some likely locations; first, relative to the
-     current directory */
-  fd = open( filename, O_RDONLY | O_BINARY ); if( fd != -1 ) return fd;
+  /* Otherwise look in some likely locations */
+  init_path_context( &ctx, type );
 
-  /* Otherwise look in some likely locations; first, in a directory
-     off where the Fuse executable is; (useful when Fuse hasn't been
-     installed into /usr/local or wherever) */
-  if( fuse_progname[0] == '/' ) {
-    strncpy( fuse_path, fuse_progname, PATH_MAX );
-  } else {
-    strncpy( fuse_path, fuse_directory, PATH_MAX );
-    strncat( fuse_path, fuse_progname, PATH_MAX );
-  }
-  fuse_dir = dirname( fuse_path );
+  while( get_next_path( &ctx ) ) {
 
-  snprintf( path, PATH_MAX, "%s/%s/%s", fuse_dir, path_segment,
-	    filename );
-  fd = open( path, O_RDONLY | O_BINARY );
-  if( fd != -1 ) return fd;
-
-  /* Then in the defined Fuse data directory */
-  snprintf( path, PATH_MAX, "%s/%s", FUSEDATADIR, filename );
-  fd = open( path, O_RDONLY | O_BINARY );
-  if( fd != -1 ) return fd;
-
-  /* If we were given a specific directory for ROMs, look there;
-     Debian uses /usr/share/spectrum-roms/ here */
-#ifdef ROMSDIR
-  if( type == UTILS_AUXILIARY_ROM ) {
-    snprintf( path, PATH_MAX, "%s/%s", ROMSDIR, filename );
+    snprintf( path, PATH_MAX, "%s/%s", ctx.path, filename );
     fd = open( path, O_RDONLY | O_BINARY );
     if( fd != -1 ) return fd;
-  }
-#endif
 
-  /* Finally, look relative to the current directory */
-  fd = open( filename, O_RDONLY | O_BINARY ); if( fd != -1 ) return fd;
+  }
 
   /* Give up. Couldn't find this file */
   return -1;
+}
+
+
+int
+utils_find_file_path( const char *filename, char *ret_path,
+		      utils_aux_type type )
+{
+  path_context ctx;
+  struct stat stat_info;
+
+  /* If given an absolute path, just look there */
+  if( filename[0] == '/' ) {
+    strncpy( ret_path, filename, PATH_MAX );
+    return 0;
+  }
+
+  /* Otherwise look in some likely locations */
+  init_path_context( &ctx, type );
+
+  while( get_next_path( &ctx ) ) {
+
+    snprintf( ret_path, PATH_MAX, "%s/%s", ctx.path, filename );
+    if( !stat( ret_path, &stat_info ) ) return 0;
+
+  }
+
+  return 1;
+}
+
+/* Something similar to that described at
+   http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html was
+   _very_ tempting here...
+*/
+static void
+init_path_context( path_context *ctx, utils_aux_type type )
+{
+  ctx->state = 0;
+  ctx->type = type;
+}
+
+static int
+get_next_path( path_context *ctx )
+{
+  char buffer[ PATH_MAX ], *path_segment, *path2;
+
+  switch( (ctx->state)++ ) {
+
+    /* First look relative to the current directory */
+  case 0: strncpy( ctx->path, ".", PATH_MAX ); return 1;
+
+    /* Then relative to the Fuse executable */
+  case 1:
+
+    switch( ctx->type ) {
+    
+    case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
+    case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
+    default:
+      ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", ctx->type );
+      return 0;
+    }
+
+    if( fuse_progname[0] == '/' ) {
+      strncpy( buffer, fuse_progname, PATH_MAX );
+      buffer[ PATH_MAX - 1 ] = '\0';
+    } else {
+      snprintf( buffer, PATH_MAX, "%s%s", fuse_directory, fuse_progname );
+    }
+    path2 = dirname( buffer );
+    snprintf( ctx->path, PATH_MAX, "%s/%s", path2, path_segment );
+    return 1;
+
+    /* Then where we may have installed the data files */
+  case 2:
+
+#ifndef ROMSDIR
+    path2 = FUSEDATADIR;
+#else				/* #ifndef ROMSDIR */
+    path2 = ctx->type == UTILS_AUXILIARY_ROM ? ROMSDIR : FUSEDATADIR;
+#endif				/* #ifndef ROMSDIR */
+    strncpy( ctx->path, path2, PATH_MAX ); buffer[ PATH_MAX - 1 ] = '\0';
+    return 1;
+
+  case 3: return 0;
+  }
+
+  ui_error( UI_ERROR_ERROR, "unknown path_context state %d", ctx->state );
+  fuse_abort();
+  return 1;			/* Keep gcc happy */
 }
 
 int

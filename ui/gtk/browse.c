@@ -48,6 +48,9 @@ static void browse_done( GtkWidget *widget, gpointer data );
 static gboolean delete_dialog( GtkWidget *widget, GdkEvent *event,
 			       gpointer user_data );
 
+static GdkPixmap *tape_marker_pixmap;
+static GdkBitmap *tape_marker_mask;
+
 static GtkWidget
   *dialog,			/* The dialog box itself */
   *blocks,			/* The list of blocks */
@@ -105,6 +108,12 @@ create_dialog( void )
 		      GTK_SIGNAL_FUNC( select_row ), NULL );
   gtk_container_add( GTK_CONTAINER( scrolled_window ), blocks );
 
+  /* The tape marker pixmap */
+  tape_marker_pixmap = 
+    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(),
+					   &tape_marker_mask, NULL,
+					   gtkpixmap_tape_marker );
+
   /* And the "tape modified" label */
   modified_label = gtk_label_new( "" );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), modified_label,
@@ -154,7 +163,8 @@ ui_tape_browser_update( void )
 
   current_block = tape_get_current_block();
   if( current_block != -1 )
-    gtk_clist_set_text( GTK_CLIST( blocks ), current_block, 0, "X" );
+    gtk_clist_set_pixmap( GTK_CLIST( blocks ), current_block, 0,
+			  tape_marker_pixmap, tape_marker_mask );
 
   gtk_clist_thaw( GTK_CLIST( blocks ) );
 
@@ -201,7 +211,7 @@ select_row( GtkCList *clist, gint row, gint column GCC_UNUSED,
   /* Otherwise, select the new block */
   tape_select_block_no_update( row );
 
-  gtk_clist_set_text( clist, row, 0, "X" );
+  gtk_clist_set_pixmap( clist, row, 0, tape_marker_pixmap, tape_marker_mask );
   if( current_block != -1 ) gtk_clist_set_text( clist, current_block, 0, "" );
 }
 

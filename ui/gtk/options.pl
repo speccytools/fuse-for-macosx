@@ -210,6 +210,7 @@ CODE
     print "  $_->{posthook}();\n\n" if $_->{posthook};
 
     print << "CODE";
+  gtkstatusbar_set_visibility( settings_current.statusbar );
   display_refresh_all();
 
   gtk_main_quit();

@@ -184,7 +184,7 @@ static int
 get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
 		size_t height, size_t width )
 {
-  size_t x, y, colour;
+  size_t i, x, y;
 
 				      /*  R    G    B */
   libspectrum_byte palette[16][3] = { {   0,   0,   0 },
@@ -204,15 +204,39 @@ get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
 				      { 255, 255,   0 },
 				      { 255, 255, 255 } };
 
+  libspectrum_byte grey_palette[16];
+
+  /* Addition of 0.5 is to avoid rounding errors */
+  for( i = 0; i < 16; i++ )
+    grey_palette[i] = ( 0.299 * palette[i][0] +
+			0.587 * palette[i][1] +
+			0.114 * palette[i][2]   ) + 0.5;
+
   for( y = 0; y < height; y++ ) {
     for( x = 0; x < width; x++ ) {
 
+      size_t colour;
+      libspectrum_byte red, green, blue;
+
       colour = saved_screen[y][x];
 
-      rgb32_data[ y * stride + 4 * x     ] = palette[colour][0];
-      rgb32_data[ y * stride + 4 * x + 1 ] = palette[colour][1];
-      rgb32_data[ y * stride + 4 * x + 2 ] = palette[colour][2];
-      rgb32_data[ y * stride + 4 * x + 3 ] = 0;			/* padding */
+      if( settings_current.bw_tv ) {
+
+	red = green = blue = grey_palette[colour];
+
+      } else {
+
+	red   = palette[colour][0];
+	green = palette[colour][1];
+	blue  = palette[colour][2];
+
+      }
+      
+      rgb32_data[ y * stride + 4 * x     ] = red;
+      rgb32_data[ y * stride + 4 * x + 1 ] = green;
+      rgb32_data[ y * stride + 4 * x + 2 ] = blue;
+      rgb32_data[ y * stride + 4 * x + 3 ] = 0;		 /* padding */
+
     }
   }
 

@@ -53,7 +53,6 @@ void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
 static libspectrum_dword trivial_contend_port( libspectrum_word port );
-static libspectrum_dword trivial_contend_delay( void );
 
 static int read_test_file( const char *filename,
 			   libspectrum_dword *end_tstates );
@@ -62,7 +61,6 @@ static void dump_z80_state( void );
 static void dump_memory_state( void );
 
 spectrum_port_contention_function contend_port = trivial_contend_port;
-spectrum_contention_delay_function contend_delay = trivial_contend_delay;
 
 int
 main( int argc, char **argv )
@@ -139,11 +137,11 @@ trivial_contend_port( libspectrum_word port )
   return 0;
 }
 
-static libspectrum_dword
-trivial_contend_delay( void )
+void
+contend( libspectrum_word address, libspectrum_dword time )
 {
-  printf( "%5d MC %04x\n", tstates, 0 );
-  return 0;
+  printf( "%5d MC %04x\n", tstates, address );
+  tstates += time;
 }
 
 libspectrum_byte
