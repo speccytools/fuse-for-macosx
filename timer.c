@@ -50,6 +50,10 @@ static int frames_until_update;
 /* The number of time samples we have for estimating speed */
 static int samples;
 
+/* Timer calibration */
+static float calibration_factor = 100.0;
+static int calibrated = 0;
+
 int
 timer_estimate_reset( void )
 {
@@ -148,10 +152,53 @@ timer_get_time_difference( timer_type *a, timer_type *b )
 
 volatile float timer_count;
 
+/* On some slower (Linux?) machines, the 20 ms tick set up by
+   setitimer runs around about 4% slow with respect to the time
+   returned by gettimeofday(). This routine guesses at the fudge
+   factor necessary to bring the two timers back into line.
+
+   We tweak the setitimer() results rather than the gettimeofday()
+   results as the SDL sound routines (which use setitimer() to get
+   their timing) appear to run off a timer much closer to that
+   returned by gettimeofday().
+*/
+
+static int
+calibrate( void )
+{
+  timer_type start, end;
+  int old_speed, error;
+  size_t i;
+
+  old_speed = settings_current.emulation_speed;
+
+  settings_current.emulation_speed = 100;
+  timer_count = 0.0;
+  error = timer_push( 20, TIMER_FUNCTION_TICK ); if( error ) return error;
+
+  timer_get_real_time( &start );
+  for( i = 0; i < 5; i++ ) timer_pause();
+  timer_get_real_time( &end );
+
+  timer_end();
+
+  calibration_factor = 10.0 / timer_get_time_difference( &end, &start );
+  calibrated = 1;
+
+  timer_count = 0.0;
+  settings_current.emulation_speed = old_speed;
+
+  return 0;
+}
+
 int
 timer_init( void )
 {
   int error;
+
+  if( !calibrated ) {
+    error = calibrate(); if( error ) return error;
+  }
 
   error = timer_push( 20, TIMER_FUNCTION_TICK ); if( error ) return error;
 
@@ -182,7 +229,7 @@ timer_sleep( void )
           100                                  :
           settings_current.emulation_speed;
 
-  timer_count -= 100.0 / speed;
+  timer_count -= calibration_factor / speed;
 }
 
 static void
@@ -273,9 +320,9 @@ timer_push( int msec, timer_function_type which )
   }
 
   timer.it_interval.tv_sec  = 0;
-  timer.it_interval.tv_usec = msec * 1000;
+  timer.it_interval.tv_usec = msec * 1000L;
   timer.it_value.tv_sec     = 0;
-  timer.it_value.tv_usec    = msec * 1000;
+  timer.it_value.tv_usec    = msec * 1000L;
 
   error = setitimer( ITIMER_REAL, &timer, old_timer );
   if( error ) {
