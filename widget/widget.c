@@ -28,6 +28,7 @@
 
 #ifdef USE_WIDGET
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -448,11 +449,35 @@ ui_get_rollback_point( GSList *points )
   return -1;
 }
 
-/* FIXME: make this do something useful */
+const char *joystick_connection[] = {
+  "None",
+  "Keyboard",
+  "Joystick 1",
+  "Joystick 2"
+};
+
 ui_confirm_joystick_t
 ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
-  return UI_CONFIRM_JOYSTICK_NONE;
+  widget_select_t info;
+  int *setting, error;
+  char title[80];
+  char* joystick_name = strdup( libspectrum_joystick_name( libspectrum_type ) );
+
+  joystick_name[0] = tolower( joystick_name[0] );
+  setting = NULL;
+
+  sprintf(title, "Configure %s joystick", joystick_name);
+
+  info.title = title;
+  info.options = joystick_connection;
+  info.count = sizeof( joystick_connection ) / sizeof (const char *);
+  info.current = UI_CONFIRM_JOYSTICK_NONE;
+
+  error = widget_do( WIDGET_TYPE_SELECT, &info );
+  if( error ) return UI_CONFIRM_JOYSTICK_NONE;
+
+  return (ui_confirm_joystick_t)info.result;
 }
 
 #endif				/* #ifdef USE_WIDGET */
