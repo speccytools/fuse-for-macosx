@@ -166,6 +166,9 @@ int fbdisplay_init(void)
     fprintf( stderr, "%s: couldn't set framebuffer mode\n", fuse_progname );
     return 1;
   }
+  sleep( 1 ); /* give the monitor time to sync before we start emulating */
+  fputs( "\x1B[?25l", stdout );		/* hide cursor */
+  fflush( stdout );
 
   return 0;
 }
@@ -358,6 +361,7 @@ fbdisplay_end( void )
     if( got_orig_display ) ioctl( fb_fd, FBIOPUT_VSCREENINFO, &orig_display );
     close( fb_fd );
     fb_fd = -1;
+    fputs( "\x1B[H\x1B[J\x1B[?25h", stdout );	/* clear screen, show cursor */
 
 #ifdef HAVE_GPM_H
     gpm_connected = 0;

@@ -1009,4 +1009,4 @@
 20040717 ui/fb/fbkeyboard.c: support Tab (Darren).
 20040719 ui/fb/fbdisplay.c: check FRAMEBUFFER environment variable for
 	 framebuffer device to use (Darren).
-
+20040719 ui/fb/fbdisplay.c: hide/restore cursor on startup/exit (Darren).
