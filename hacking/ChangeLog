@@ -391,3 +391,4 @@
 20031215 machine.c: remove unused #includes.
 20031216 ui/svga/svgajoystick.c: remove use of BYTE, WORD (Witold).
 20031226 ui/gtk/debugger.c: use a smaller monospaced font under GTK 2.
+20031227 Add reverse page mappings to the memory_page structure.

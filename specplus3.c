@@ -107,7 +107,7 @@ specplus3_unattached_port( void )
 
 libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset )
 {
-  return RAM[machine_current->ram.current_screen][offset];
+  return RAM[ memory_current_screen ][offset];
 }
 
 libspectrum_dword
@@ -268,16 +268,15 @@ specplus3_plus2a_common_reset( void )
   size_t i;
 
   machine_current->ram.current_page=0; machine_current->ram.current_rom=0;
-  machine_current->ram.current_screen=5;
   machine_current->ram.locked=0;
   machine_current->ram.special=0;
 
   error = normal_memory_map( 0, 0 ); if( error ) return error;
   for( i = 2; i < 8; i++ ) memory_map[i].writable = 1;
+  for( i = 0; i < 8; i++ ) memory_map[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
 
-  memory_screen_chunk1 = RAM[5];
-  memory_screen_chunk2 = NULL;
-  memory_screen_top = 0x1b00;
+  memory_current_screen = 5;
+  memory_screen_mask = 0xffff;
 
   return 0;
 }
@@ -287,12 +286,19 @@ normal_memory_map( int rom, int page )
 {
   memory_map[0].page = &ROM[  rom ][0x0000];
   memory_map[1].page = &ROM[  rom ][0x2000];
+  memory_map[0].reverse = memory_map[1].reverse = -1;
+
   memory_map[2].page = &RAM[    5 ][0x0000];
   memory_map[3].page = &RAM[    5 ][0x2000];
+  memory_map[2].reverse = memory_map[3].reverse = 5;
+
   memory_map[4].page = &RAM[    2 ][0x0000];
   memory_map[5].page = &RAM[    2 ][0x2000];
+  memory_map[4].reverse = memory_map[5].reverse = 2;
+
   memory_map[6].page = &RAM[ page ][0x0000];
   memory_map[7].page = &RAM[ page ][0x2000];
+  memory_map[6].reverse = memory_map[7].reverse = 0;
 
   memory_map[0].writable = memory_map[1].writable = 0;
 
@@ -325,12 +331,19 @@ select_special_map( int page1, int page2, int page3, int page4 )
 {
   memory_map[0].page = &RAM[ page1 ][0x0000];
   memory_map[1].page = &RAM[ page1 ][0x2000];
+  memory_map[0].reverse = memory_map[1].reverse = page1;
+
   memory_map[2].page = &RAM[ page2 ][0x0000];
   memory_map[3].page = &RAM[ page2 ][0x2000];
+  memory_map[2].reverse = memory_map[3].reverse = page2;
+
   memory_map[4].page = &RAM[ page3 ][0x0000];
   memory_map[5].page = &RAM[ page3 ][0x2000];
+  memory_map[4].reverse = memory_map[5].reverse = page3;
+
   memory_map[6].page = &RAM[ page4 ][0x0000];
   memory_map[7].page = &RAM[ page4 ][0x2000];
+  memory_map[6].reverse = memory_map[7].reverse = page4;
 
   memory_map[0].writable = memory_map[1].writable = 1;
 
@@ -361,23 +374,24 @@ specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
 
     memory_map[0].page = &ROM[ rom ][0x0000];
     memory_map[1].page = &ROM[ rom ][0x2000];
+    memory_map[0].reverse = memory_map[1].reverse = -1;
 
     memory_map[6].page = &RAM[ page ][0x0000];
     memory_map[7].page = &RAM[ page ][0x2000];
+    memory_map[6].reverse = memory_map[7].reverse = page;
 
     /* Pages 4, 5, 6 and 7 are contended */
     memory_map[6].contended = memory_map[7].contended = page & 0x04;
   }
 
-  memory_screen_chunk1 = RAM[ screen ];
-
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
-  if( screen != machine_current->ram.current_screen )
+  if( memory_current_screen != screen ) {
     display_refresh_all();
+    memory_current_screen = screen;
+  }
 
   machine_current->ram.current_page = page;
-  machine_current->ram.current_screen = screen;
   machine_current->ram.current_rom = rom;
   machine_current->ram.locked = ( b & 0x20 );
 

@@ -70,7 +70,7 @@ typedef struct spectrum_raminfo {
   spectrum_contention_delay_function contend_delay;
 
   int locked;			/* Is the memory configuration locked? */
-  int current_page,current_rom,current_screen; /* Current paged memory */
+  int current_page, current_rom; /* Current paged memory */
 
   libspectrum_byte last_byte;	/* The last byte sent to the 128K port */
   libspectrum_byte last_byte2;	/* The last byte sent to +3 port */

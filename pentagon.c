@@ -88,7 +88,7 @@ pentagon_unattached_port( void )
 libspectrum_byte
 pentagon_read_screen_memory( libspectrum_word offset )
 {
-  return RAM[machine_current->ram.current_screen][offset];
+  return RAM[ memory_current_screen ][offset];
 }
 
 libspectrum_dword
@@ -178,17 +178,17 @@ pentagon_memoryport_write( libspectrum_word port GCC_UNUSED,
 
   memory_map[6].page = &RAM[ page ][0x0000];
   memory_map[7].page = &RAM[ page ][0x2000];
-
-  memory_screen_chunk1 = RAM[ screen ];
+  memory_map[6].reverse = memory_map[7].reverse = page;
 
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
-  if( screen != machine_current->ram.current_screen )
+  if( memory_current_screen != screen ) {
     display_refresh_all();
+    memory_current_screen = screen;
+  }
 
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom = rom;
-  machine_current->ram.current_screen = screen;
   machine_current->ram.locked = ( b & 0x20 );
 
   machine_current->ram.last_byte = b;

@@ -195,7 +195,6 @@ tc2068_init( fuse_machine_info *machine )
   machine->ram.read_screen	     = tc2068_read_screen_memory;
   machine->ram.contend_port	     = tc2068_contend_port;
   machine->ram.contend_delay	     = tc2068_contend_delay;
-  machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;
@@ -226,12 +225,21 @@ dock_exrom_reset( void )
 
   timex_home[0].page = ROM[0];
   timex_home[1].page = ROM[0] + 0x2000;
+  timex_home[0].reverse = timex_home[1].reverse = -1;
+
   timex_home[2].page = RAM[5];
   timex_home[3].page = RAM[5] + 0x2000;
+  timex_home[2].reverse = timex_home[3].reverse = 5;
+
   timex_home[4].page = RAM[2];
   timex_home[5].page = RAM[2] + 0x2000;
+  timex_home[4].reverse = timex_home[5].reverse = 2;
+
   timex_home[6].page = RAM[0];
   timex_home[7].page = RAM[0] + 0x2000;
+  timex_home[6].reverse = timex_home[7].reverse = 0;
+
+  for( i = 0 ; i < 8; i++ ) timex_home[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
 
   timex_home[0].writable = timex_home[1].writable = 0;
   for( i = 2; i < 8; i++ ) timex_home[i].writable = 1;
@@ -278,9 +286,8 @@ tc2068_reset( void )
   scld_dec_write( 0x00ff, 0x00 );
   scld_hsr_write( 0x00f4, 0x00 );
 
-  memory_screen_chunk1 = &RAM[5][0x0000];
-  memory_screen_chunk2 = &RAM[5][0x2000];
-  memory_screen_top = 0x1b00;
+  memory_current_screen = 5;
+  memory_screen_mask = 0xdfff;
 
   return 0;
 }

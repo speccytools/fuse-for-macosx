@@ -137,6 +137,7 @@ dck_read( const char *filename )
         mem[i].page = dck->dck[num_block]->pages[i];
         mem[i].allocated = 1;
         mem[i].writable = 0;
+	mem[i].reverse = -1;
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
@@ -151,6 +152,7 @@ dck_read( const char *filename )
           mem[i].page = dck->dck[num_block]->pages[i];
           mem[i].allocated = 1;
           mem[i].writable = 1;
+	  mem[i].reverse = -1;
         }
 
         break;

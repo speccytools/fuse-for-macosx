@@ -280,10 +280,10 @@ screenshot_scr_write( const char *filename )
 
   if( scld_last_dec.name.hires ) {
     memcpy( scr_data,
-            &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
+            &RAM[ memory_current_screen ][display_get_addr(0,0)],
             MONO_BITMAP_SIZE );
     memcpy( scr_data + MONO_BITMAP_SIZE,
-            &RAM[machine_current->ram.current_screen][display_get_addr(0,0) +
+            &RAM[ memory_current_screen ][display_get_addr(0,0) +
             ALTDFILE_OFFSET], MONO_BITMAP_SIZE );
     scr_data[HIRES_ATTR] = scld_last_dec.mask.hirescol |
                            scld_last_dec.mask.scrnmode;
@@ -291,16 +291,16 @@ screenshot_scr_write( const char *filename )
   }
   else if( scld_last_dec.name.b1 ) {
     memcpy( scr_data,
-            &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
+            &RAM[ memory_current_screen ][display_get_addr(0,0)],
             MONO_BITMAP_SIZE );
     memcpy( scr_data + MONO_BITMAP_SIZE,
-            &RAM[machine_current->ram.current_screen][display_get_addr(0,0) +
+            &RAM[ memory_current_screen ][display_get_addr(0,0) +
             ALTDFILE_OFFSET], MONO_BITMAP_SIZE );
     scr_length = HICOLOUR_SCR_SIZE;
   }
   else { /* ALTDFILE and default */
     memcpy( scr_data, 
-            &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
+            &RAM[ memory_current_screen ][display_get_addr(0,0)],
             STANDARD_SCR_SIZE );
     scr_length = STANDARD_SCR_SIZE;
   }
@@ -373,8 +373,8 @@ screenshot_scr_read( const char *filename )
 
   switch( screen.length ) {
   case STANDARD_SCR_SIZE:
-    memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
-            screen.buffer, screen.length );
+    memcpy( &RAM[ memory_current_screen ][display_get_addr(0,0)],
+	    screen.buffer, screen.length );
 
     /* If it is a Timex and it is in hi colour or hires mode, switch out of
        hires or hicolour mode */
@@ -389,14 +389,14 @@ screenshot_scr_read( const char *filename )
     if( machine_current->timex ) {
       if( !scld_last_dec.name.b1 )
         scld_dec_write( 0xff, ( scld_last_dec.byte & ~HIRESATTR ) | EXTCOLOUR );
-      memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0) +
+      memcpy( &RAM[ memory_current_screen ][display_get_addr(0,0) +
               ALTDFILE_OFFSET], screen.buffer + MONO_BITMAP_SIZE,
 	      MONO_BITMAP_SIZE );
     } else
       ui_error( UI_ERROR_INFO,
             "The file contained a TC2048 high-colour screen, loaded as mono");
 
-    memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
+    memcpy( &RAM[ memory_current_screen ][display_get_addr(0,0)],
               screen.buffer, MONO_BITMAP_SIZE );
     break;
 
@@ -405,10 +405,10 @@ screenshot_scr_read( const char *filename )
         mode if neccesary */
     /* If it is not a Timex scale the bitmap and raise an error */
     if( machine_current->timex ) {
-      memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)],
+      memcpy( &RAM[ memory_current_screen ][display_get_addr(0,0)],
                 screen.buffer, MONO_BITMAP_SIZE );
 
-      memcpy( &RAM[machine_current->ram.current_screen][display_get_addr(0,0)] +
+      memcpy( &RAM[ memory_current_screen ][display_get_addr(0,0)] +
               ALTDFILE_OFFSET, screen.buffer + MONO_BITMAP_SIZE,
 	      MONO_BITMAP_SIZE );
       if( !scld_last_dec.name.hires )
@@ -417,13 +417,13 @@ screenshot_scr_read( const char *filename )
             ( *(screen.buffer + HIRES_ATTR) & ( HIRESCOLMASK | HIRES ) ) );
     } else {
       for( i = 0; i < MONO_BITMAP_SIZE; i++ )
-        RAM[machine_current->ram.current_screen][display_get_addr(0,0) + i] =
+        RAM[ memory_current_screen ][display_get_addr(0,0) + i] =
           convert_hires_to_lores( *(screen.buffer + MONO_BITMAP_SIZE + i),
                                   *(screen.buffer + i) );
 
       /* set attributes based on hires attribute byte */
       for( i = 0; i < 768; i++ )
-        RAM[machine_current->ram.current_screen][display_get_addr(0,0) +
+        RAM[ memory_current_screen ][display_get_addr(0,0) +
             MONO_BITMAP_SIZE + i] =
 	  hires_convert_dec( *(screen.buffer + HIRES_ATTR) );
 

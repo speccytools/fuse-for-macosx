@@ -71,7 +71,6 @@ int spec16_init( fuse_machine_info *machine )
   machine->ram.read_screen    = spec48_read_screen_memory;
   machine->ram.contend_port   = spec48_contend_port;
   machine->ram.contend_delay  = spec48_contend_delay;
-  machine->ram.current_screen = 5;
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
@@ -102,12 +101,20 @@ spec16_reset( void )
 
   memory_map[0].page = &ROM[0][0x0000];
   memory_map[1].page = &ROM[0][0x2000];
+  memory_map[0].reverse = memory_map[1].reverse = -1;
+
   memory_map[2].page = &RAM[5][0x0000];
   memory_map[3].page = &RAM[5][0x2000];
+  memory_map[2].reverse = memory_map[3].reverse = 5;
+
   memory_map[4].page = empty_chunk;
   memory_map[5].page = empty_chunk;
   memory_map[6].page = empty_chunk;
   memory_map[7].page = empty_chunk;
+  memory_map[4].reverse = memory_map[5].reverse =
+    memory_map[6].reverse = memory_map[7].reverse = -1;
+
+  for( i = 0; i < 8; i++ ) memory_map[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
 
   for( i = 0; i < 8; i++ ) memory_map[i].writable = 0;
   memory_map[2].writable = memory_map[3].writable = 1;
@@ -115,9 +122,8 @@ spec16_reset( void )
   for( i = 0; i < 8; i++ ) memory_map[i].contended = 0;
   memory_map[2].contended = memory_map[3].contended = 1;
 
-  memory_screen_chunk1 = RAM[5];
-  memory_screen_chunk2 = NULL;
-  memory_screen_top = 0x1b00;
+  memory_current_screen = 5;
+  memory_screen_mask = 0xffff;
 
   return 0;
 }

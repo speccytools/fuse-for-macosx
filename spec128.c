@@ -57,7 +57,7 @@ spec128_unattached_port( void )
 libspectrum_byte
 spec128_read_screen_memory( libspectrum_word offset )
 {
-  return RAM[machine_current->ram.current_screen][offset];
+  return RAM[ memory_current_screen ][offset];
 }
 
 libspectrum_dword
@@ -167,16 +167,24 @@ spec128_common_reset( int contention )
   machine_current->ram.locked=0;
   machine_current->ram.current_page=0;
   machine_current->ram.current_rom=0;
-  machine_current->ram.current_screen=5;
 
   memory_map[0].page = &ROM[0][0x0000];
   memory_map[1].page = &ROM[0][0x2000];
+  memory_map[0].reverse = memory_map[1].reverse = -1;
+
   memory_map[2].page = &RAM[5][0x0000];
   memory_map[3].page = &RAM[5][0x2000];
+  memory_map[2].reverse = memory_map[3].reverse = 5;
+
   memory_map[4].page = &RAM[2][0x0000];
   memory_map[5].page = &RAM[2][0x2000];
+  memory_map[4].reverse = memory_map[5].reverse = 2;
+
   memory_map[6].page = &RAM[0][0x0000];
   memory_map[7].page = &RAM[0][0x2000];
+  memory_map[6].reverse = memory_map[7].reverse = 0;
+
+  for( i = 0; i < 8; i++ ) memory_map[i].offset = ( i & 1 ? 0x2000 : 0x0000 );
 
   memory_map[0].writable = memory_map[1].writable = 0;
   for( i = 2; i < 8; i++ ) memory_map[i].writable = 1;
@@ -187,9 +195,8 @@ spec128_common_reset( int contention )
     memory_map[2].contended = memory_map[3].contended = 1;
   }
 
-  memory_screen_chunk1 = RAM[5];
-  memory_screen_chunk2 = NULL;
-  memory_screen_top = 0x1b00;
+  memory_current_screen = 5;
+  memory_screen_mask = 0xffff;
 
   return 0;
 }
@@ -211,20 +218,20 @@ spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
 
   memory_map[6].page = &RAM[ page ][0x0000];
   memory_map[7].page = &RAM[ page ][0x2000];
+  memory_map[6].reverse = memory_map[7].reverse = page;
 
   /* Pages 1, 3, 5 and 7 are contended */
   memory_map[6].contended = memory_map[7].contended = page & 0x01;
 
-  memory_screen_chunk1 = RAM[ screen ];
-
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
-  if( screen != machine_current->ram.current_screen )
+  if( memory_current_screen != screen ) {
     display_refresh_all();
+    memory_current_screen = screen;
+  }
 
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom = rom;
-  machine_current->ram.current_screen = screen;
   machine_current->ram.locked = ( b & 0x20 );
 
   machine_current->ram.last_byte = b;

@@ -36,12 +36,20 @@ typedef struct memory_page {
   int contended;		/* Are reads/writes to this page contended? */
   int allocated;		/* Do we own the memory for this page? */
 
+  /* For reverse mapping */
+
+  int reverse;			/* Which page is mapped in here; -1 => ROM */
+  libspectrum_word offset;	/* How far into the page this chunk starts */
+
 } memory_page;
 
 extern memory_page memory_map[8];
 
-extern libspectrum_byte *memory_screen_chunk1, *memory_screen_chunk2;
-extern libspectrum_word memory_screen_top;
+/* Which RAM page contains the current screen */
+extern int memory_current_screen;
+
+/* Which bits to look at when working out where the screen is */
+extern libspectrum_word memory_screen_mask;
 
 libspectrum_byte readbyte( libspectrum_word address );
 

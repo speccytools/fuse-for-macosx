@@ -38,12 +38,11 @@
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map[8];
 
-/* The base address of the chunks containing the screen */
-libspectrum_byte *memory_screen_chunk1, *memory_screen_chunk2;
+/* Which RAM page contains the current screen */
+int memory_current_screen;
 
-/* The highest offset within 'memory_screen_chunk' which is part of the
-   screen */
-libspectrum_word memory_screen_top;
+/* Which bits to look at when working out where the screen is */
+libspectrum_word memory_screen_mask;
 
 libspectrum_byte
 readbyte( libspectrum_word address )
@@ -66,22 +65,29 @@ void
 writebyte( libspectrum_word address, libspectrum_byte b )
 {
   libspectrum_word bank, offset;
+  memory_page *mapping;
   libspectrum_byte *memory;
 
   bank = address >> 13; offset = address & 0x1fff;
-  memory = memory_map[ bank ].page;
+  mapping = &memory_map[ bank ];
+  memory = mapping->page;
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
-  if( memory_map[ bank ].contended ) tstates += spectrum_contention[ tstates ];
+  if( mapping->contended ) tstates += spectrum_contention[ tstates ];
   tstates += 3;
 
-  if( memory_map[ bank ].writable || settings_current.writable_roms ) {
+  if( mapping->writable || settings_current.writable_roms ) {
 
-    if( ( memory == memory_screen_chunk1 || memory == memory_screen_chunk2 ) &&
-	offset < memory_screen_top &&
+    /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
+    libspectrum_word offset2 = offset + mapping->offset;
+
+    /* If this is a write to the current screen (and it actually changes
+       the destination), redraw that bit */
+    if( mapping->reverse == memory_current_screen &&
+	( offset2 & memory_screen_mask ) < 0x1b00 &&
 	memory[ offset ] != b )
       display_dirty( address );
 
@@ -93,68 +99,25 @@ void
 writebyte_internal( libspectrum_word address, libspectrum_byte b )
 {
   libspectrum_word bank, offset;
+  memory_page *mapping;
   libspectrum_byte *memory;
 
   bank = address >> 13; offset = address & 0x1fff;
-  memory = memory_map[ bank ].page;
+  mapping = &memory_map[ bank ];
+  memory = mapping->page;
 
   if( memory_map[ bank ].writable || settings_current.writable_roms ) {
 
-    if( ( memory == memory_screen_chunk1 || memory == memory_screen_chunk2 ) &&
-	offset < memory_screen_top &&
+    /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
+    libspectrum_word offset2 = offset + mapping->offset;
+
+    /* If this is a write to the current screen (and it actually changes
+       the destination), redraw that bit */
+    if( mapping->reverse == memory_current_screen &&
+	( offset2 & memory_screen_mask ) < 0x1b00 &&
 	memory[ offset ] != b )
       display_dirty( address );
 
     memory[ offset ] = b;
   }
 }
-
-#if 0
-  
-libspectrum_byte
-FUNCTION( tc2068_readbyte )( libspectrum_word address )
-{
-  libspectrum_word offset = address & 0x1fff;
-  int chunk = address >> 13;
-
-#ifndef INTERNAL
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
-
-  if( chunk == 2 || chunk == 3 ) tstates += contend_memory( address );
-  tstates += 3;
-#endif				/* #ifndef INTERNAL */
-
-  return timex_memory[chunk].page[offset];
-}
-
-void
-FUNCTION( tc2068_writebyte )( libspectrum_word address, libspectrum_byte b )
-{
-  libspectrum_word offset = address & 0x1fff;
-  int chunk = address >> 13;
-
-#ifndef INTERNAL
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
-
-  if( chunk == 2 || chunk == 3 ) tstates += contend_memory( address );
-  tstates += 3;
-#endif				/* #ifndef INTERNAL */
-
-/* Need to take check if write is to home bank screen area for display
-   dirty checking */
-  switch( chunk ) {
-  case 2:
-  case 3:
-    if( timex_memory[chunk].page == timex_home[chunk].page &&
-        timex_memory[chunk].page[offset] != b ) display_dirty( address );
-    /* Fall through */
-  default:
-    if( timex_memory[chunk].writeable == 1 ) timex_memory[chunk].page[offset] = b;
-  }
-}
-
-#endif				/* #if 0 */
