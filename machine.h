@@ -100,6 +100,7 @@ void machine_set_timings( machine_info *machine, DWORD hz,
 int machine_allocate_roms( machine_info *machine, size_t count );
 int machine_read_rom( machine_info *machine, size_t number,
 		      const char* filename );
+int machine_find_rom( const char *filename );
 
 int machine_end( void );
 

@@ -212,28 +212,13 @@ int machine_read_rom( machine_info *machine, size_t number,
   struct stat file_info;
 
   char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
-  char path_and_filename[ PATHNAME_MAX_LENGTH ];
 
   assert( number < machine->rom_count );
 
-  strncpy( path_and_filename, filename, PATHNAME_MAX_LENGTH );
-
-  fd = open( path_and_filename, O_RDONLY );
+  fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    snprintf( path_and_filename, PATHNAME_MAX_LENGTH,
-	      "roms/%s", filename );
-    fd = open( path_and_filename, O_RDONLY );
-    if( fd == -1 ) {
-      snprintf( path_and_filename, PATHNAME_MAX_LENGTH,
-		"%s/%s", ROMSDIR, filename );
-      fd = open( path_and_filename, O_RDONLY );
-      if( fd == -1 ) { 
-	snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-		  "%s: couldn't open `%s'", fuse_progname, filename );
-	perror( error_message );
-	return 1;
-      }
-    }
+    fprintf( stderr, "%s: couldn't find ROM `%s'", fuse_progname, filename );
+    return 1;
   }
 
   if( fstat( fd, &file_info) ) {
@@ -263,6 +248,31 @@ int machine_read_rom( machine_info *machine, size_t number,
 
   return 0;
 
+}
+
+/* Find a ROM called `filename'; look in the current directory, ./roms
+   and the defined roms directory; returns a fd for the ROM on success,
+   -1 if it couldn't find the ROM */
+int machine_find_rom( const char *filename )
+{
+  int fd;
+
+  char path_and_filename[ PATHNAME_MAX_LENGTH ];
+
+  strncpy( path_and_filename, filename, PATHNAME_MAX_LENGTH );
+  fd = open( path_and_filename, O_RDONLY );
+  if( fd != -1 ) return fd;
+
+  snprintf( path_and_filename, PATHNAME_MAX_LENGTH, "roms/%s", filename );
+  fd = open( path_and_filename, O_RDONLY );
+  if( fd != -1 ) return fd;
+
+  snprintf( path_and_filename, PATHNAME_MAX_LENGTH, "%s/%s",
+	    ROMSDIR, filename );
+  fd = open( path_and_filename, O_RDONLY );
+  if( fd != -1 ) return fd;
+
+  return -1;
 }
 
 int machine_end( void )
