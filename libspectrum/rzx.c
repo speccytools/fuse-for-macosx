@@ -34,6 +34,9 @@ rzx_write_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 static libspectrum_error
 rzx_write_input( size_t frames, libspectrum_byte **buffer,
 		 libspectrum_byte **ptr, size_t *length );
+static libspectrum_error
+rzx_write_frames( libspectrum_rzx *rzx, libspectrum_byte **buffer,
+		  libspectrum_byte **ptr, size_t *length );
 
 /* The signature used to identify .rzx files */
 const libspectrum_byte *signature = "RZX!";
@@ -42,19 +45,17 @@ libspectrum_error
 libspectrum_rzx_frame( libspectrum_rzx *rzx, size_t instructions,
 		       libspectrum_byte *keyboard )
 {
-  int i;
-
   /* Get more space if we need it; allocate twice as much as we currently
      have, with a minimum of 50 */
   if( rzx->count == rzx->allocated ) {
 
     libspectrum_rzx_frame_t *ptr; size_t new_allocated;
 
-    new_allocated = rzx_frame_allocated >= 50 ? 2 * rzx_frame_allocated : 50;
+    new_allocated = rzx->allocated >= 25 ? 2 * rzx->allocated : 50;
     ptr =
-      (libspectrum_rzx_frame_t*)realloc( rzx_frames,
-					 new_allocated * sizeof(rzx_frame_t)
-				       );
+      (libspectrum_rzx_frame_t*)realloc(
+        rzx->frames, new_allocated * sizeof(libspectrum_rzx_frame_t)
+      );
     if( ptr == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
 
     rzx->frames = ptr;
@@ -89,7 +90,10 @@ libspectrum_rzx_write( libspectrum_rzx *rzx,
   error = rzx_write_header( buffer, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  error = rzx_write_input( rzx->frames, buffer, &ptr, length );
+  error = rzx_write_input( rzx->count, buffer, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  
+  error = rzx_write_frames( rzx, buffer, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
   
   return LIBSPECTRUM_ERROR_NONE;
@@ -104,7 +108,7 @@ rzx_write_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
   error = libspectrum_make_room( buffer, strlen(signature) + 6, ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  strcpy( buffer, signature ); ptr += strlen( signature );
+  strcpy( *ptr, signature ); (*ptr) += strlen( signature );
   *(*ptr)++ = 0x00;		/* Minor version number */
   *(*ptr)++ = 0x01;		/* Major version number */
 
@@ -123,6 +127,9 @@ rzx_write_input( size_t frames, libspectrum_byte **buffer,
   error = libspectrum_make_room( buffer, 18, ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
+  /* Block ID */
+  *(*ptr)++ = 0x80;
+
   /* The length bytes: 18 for this block, plus 11 per frame */
   libspectrum_write_dword( ptr, 18 + 11 * frames );
 
@@ -140,3 +147,25 @@ rzx_write_input( size_t frames, libspectrum_byte **buffer,
 
   return LIBSPECTRUM_ERROR_NONE;
 }
+
+static libspectrum_error
+rzx_write_frames( libspectrum_rzx *rzx, libspectrum_byte **buffer,
+		  libspectrum_byte **ptr, size_t *length )
+{
+  libspectrum_error error; int i,j;
+
+  error = libspectrum_make_room( buffer, 11 * rzx->count, ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  for( i=0; i<rzx->count; i++ ) {
+    libspectrum_write_word(
+      ptr, i == rzx->count ? 0 : rzx->frames[i+1].instructions
+    );
+    for( j=0; j<8; j++ ) *(*ptr)++ = rzx->frames[i].keyboard[j];
+    *(*ptr)++ = 0;		/* Kempston joystick input */
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+     

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2002 Philip Kendall
 
 ## $Id$
 
@@ -26,7 +26,8 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libspectrum.a
 
-libspectrum_a_SOURCES = libspectrum.c sna.c tap.c tape.c tzx_read.c tzx_write.c z80.c
+libspectrum_a_SOURCES = libspectrum.c rzx.c sna.c tap.c tape.c\
+tzx_read.c tzx_write.c z80.c
 
 noinst_HEADERS = libspectrum.h tape.h
 

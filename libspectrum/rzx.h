@@ -52,4 +52,8 @@ libspectrum_error libspectrum_rzx_frame( libspectrum_rzx *rzx,
 
 libspectrum_error libspectrum_rzx_free( libspectrum_rzx *rzx );
 
+libspectrum_error
+libspectrum_rzx_write( libspectrum_rzx *rzx,
+		       libspectrum_byte **buffer, size_t *length );
+
 #endif			/* #ifndef LIBSPECTRUM_RZX_H */

@@ -160,6 +160,7 @@ int libspectrum_make_room( uchar **dest, size_t requested, uchar **ptr,
 			   size_t *allocated );
 
 int libspectrum_write_word( uchar **buffer, libspectrum_word w );
+int libspectrum_write_dword( libspectrum_byte **buffer, libspectrum_dword d );
 
 /* .sna specific routines */
 

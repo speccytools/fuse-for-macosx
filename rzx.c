@@ -29,10 +29,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "fuse.h"
 #include "keyboard.h"
 #include "libspectrum/rzx.h"
 #include "rzx.h"
 #include "types.h"
+#include "utils.h"
 #include "z80/z80_macros.h"
 
 /* The count of instruction fetches needed for .rzx files */
@@ -62,7 +64,7 @@ int rzx_start_recording( void )
   for( i=0; i<8; i++ )
     keyboard[i] = keyboard_default_value & keyboard_return_values[i];
 
-  error = libspectrum_rzx_frame( rzx, 0, keyboard );
+  error = libspectrum_rzx_frame( &rzx, 0, keyboard );
   if( error ) return error;
 
   /* Start the count of instruction fetches here */
@@ -73,9 +75,32 @@ int rzx_start_recording( void )
 
 int rzx_stop_recording( void )
 {
+  libspectrum_byte *buffer; size_t length;
+  libspectrum_error libspec_error; int error;
+
+  /* Stop recording data */
   rzx_recording = 0;
 
-  /* Save .rzx file */
+  length = 0;
+  libspec_error = libspectrum_rzx_write( &rzx, &buffer, &length );
+  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf(stderr, "%s: error during libspectrum_rzx_write: %s\n",
+	    fuse_progname, libspectrum_error_message( libspec_error ) );
+    libspectrum_rzx_free( &rzx );
+    return libspec_error;
+  }
+
+  error = utils_write_file( "test.rzx", buffer, length );
+  if( error ) { free( buffer ); libspectrum_rzx_free( &rzx ); return error; }
+
+  free( buffer );
+
+  libspec_error = libspectrum_rzx_free( &rzx );
+  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf(stderr, "%s: error during libspectrum_rzx_free: %s\n",
+	    fuse_progname, libspectrum_error_message( libspec_error ) );
+    return libspec_error;
+  }
 
   return 0;
 }
@@ -91,11 +116,11 @@ int rzx_frame( void )
   for( i=0; i<8; i++ )
     keyboard[i] = keyboard_default_value & keyboard_return_values[i];
 
-  error = libspectrum_rzx_frame( rzx, instructions, keyboard );
+  error = libspectrum_rzx_frame( &rzx, rzx_instructions, keyboard );
   if( error ) return error;
 
   /* Reset the instruction counter */
-  instructions = 0;
+  rzx_instructions = 0;
 
   return 0;
 }

@@ -39,6 +39,5 @@ int rzx_start_recording( void );
 int rzx_stop_recording( void );
 
 int rzx_frame( void );
-int rzx_dump( void );
 
 #endif			/* #ifndef FUSE_RZX_H */
