@@ -143,6 +143,7 @@ tape_autoload( libspectrum_machine hardware )
   int error; const char *id; int fd;
   char filename[80];
   utils_file snap;
+  libspectrum_id_t type;
 
   id = machine_get_id( hardware );
   if( !id ) {
@@ -150,8 +151,17 @@ tape_autoload( libspectrum_machine hardware )
     return 1;
   }
 
-  snprintf( filename, 80, "tape_%s.z80", id );
+  /* Look for an autoload snap. Try .szx first, then .z80 */
+  type = LIBSPECTRUM_ID_SNAPSHOT_SZX;
+  snprintf( filename, 80, "tape_%s.szx", id );
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
+  if( fd == -1 ) {
+  type = LIBSPECTRUM_ID_SNAPSHOT_Z80;
+    snprintf( filename, 80, "tape_%s.z80", id );
+    fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
+  }
+    
+  /* If we couldn't find either, give up */
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR,
 	      "Couldn't find autoload snap for machine type '%s'", id );
@@ -161,8 +171,7 @@ tape_autoload( libspectrum_machine hardware )
   error = utils_read_fd( fd, filename, &snap );
   if( error ) return error;
 
-  error = snapshot_read_buffer( snap.buffer, snap.length,
-				LIBSPECTRUM_ID_SNAPSHOT_Z80 );
+  error = snapshot_read_buffer( snap.buffer, snap.length, type );
   if( error ) { utils_close_file( &snap ); return error; }
 
   if( utils_close_file( &snap ) ) {
