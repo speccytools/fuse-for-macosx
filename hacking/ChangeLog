@@ -329,3 +329,4 @@
 20031102 Makefile.am: revert unintended commit of DIST_SUBDIRS change.
 20031103 Makefile.am, ui/Makefile.am: add DIST_SUBDIRS so all user
 	 interfaces etc get into the dist tarball (thanks, Erik Kunze).
+20031103 rzx.c: add Win32 timing routines (Marek).

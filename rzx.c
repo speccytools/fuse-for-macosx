@@ -33,6 +33,10 @@
 #include <string.h>
 #include <sys/time.h>
 
+#ifdef WIN32
+#include <windows.h>
+#endif				/* #ifdef WIN32 */
+
 #include "event.h"
 #include "fuse.h"
 #include "keyboard.h"
@@ -90,7 +94,11 @@ libspectrum_rzx_dsa_key rzx_key = {
 };
 
 /* The time we started recording this RZX file */
+#ifndef WIN32
 static struct timeval start_time;
+#else				/* #ifndef WIN32 */
+static DWORD start_time;
+#endif				/* #ifndef WIN32 */
 
 /* How many 1/50ths of a second do we expect to have elapsed since we
    started recording? */
@@ -364,7 +372,12 @@ static int recording_frame( void )
      speed */
   if( rzx_competition_mode ) {
 
+#ifndef WIN32
     struct timeval current_time;
+#else				/* #ifndef WIN32 */
+    DWORD current_time;
+#endif				/* #ifndef WIN32 */
+
     float elapsed_time;
 
     expected_time++;
@@ -376,6 +389,7 @@ static int recording_frame( void )
        up) */
     if( expected_time == 50 ) {
       
+#ifndef WIN32
       error = gettimeofday( &start_time, NULL );
       if( error ) {
 	ui_error(
@@ -386,7 +400,9 @@ static int recording_frame( void )
 	rzx_stop_recording();
 	return 1;
       }
-
+#else				/* #ifndef WIN32 */
+      start_time = GetTickCount();
+#endif				/* #ifndef WIN32 */
 
     /* Measuring small time intervals will be inaccurate, so don't
        start checking for speed violations until at least one second
@@ -395,6 +411,7 @@ static int recording_frame( void )
 
       float seconds;
 
+#ifndef WIN32
       error = gettimeofday( &current_time, NULL );
       if( error ) {
 	ui_error(
@@ -405,12 +422,20 @@ static int recording_frame( void )
 	rzx_stop_recording();
 	return 1;
       }
+#else				/* #ifndef WIN32 */
+    current_time = GetTickCount();
+#endif				/* #ifndef WIN32 */
 
       /* -1 to account for the fact we don't time the first second */
       seconds = ( expected_time * 0.02 ) - 1;
 
+#ifndef WIN32
       elapsed_time =   current_time.tv_sec  - start_time.tv_sec +
 	             ( current_time.tv_usec - start_time.tv_usec ) / 1000000.0;
+#else				/* #ifndef WIN32 */
+      elapsed_time =   current_time - start_time / 1000000.0;
+#endif				/* #ifndef WIN32 */
+
       if( fabs( seconds / elapsed_time - 1 ) > SPEED_TOLERANCE ) {
 
 	rzx_stop_recording();
