@@ -138,7 +138,7 @@ if((tmpf=fopen(printer_graphics_filename,"rb"))!=NULL)
 if((printer_graphics_file=fopen(printer_graphics_filename,
                                 overwrite?"wb":"r+b"))==NULL)
   {
-  ui_error("Couldn't open `%s', graphics printout disabled\n",
+  ui_error("Couldn't open '%s', graphics printout disabled\n",
 	   printer_graphics_filename);
   printer_graphics_enabled=0;
   return(0);
@@ -176,7 +176,7 @@ if(!printer_text_enabled || !printer_text_filename)
 /* append to any existing file... */
 if((printer_text_file=fopen(printer_text_filename,"a"))==NULL)
   {
-  ui_error("Couldn't open `%s', text printout disabled\n",
+  ui_error("Couldn't open '%s', text printout disabled\n",
 	   printer_text_filename);
   printer_text_enabled=0;
   return(0);

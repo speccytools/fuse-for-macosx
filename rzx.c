@@ -155,7 +155,7 @@ int rzx_start_playback( const char *filename )
   }
 
   if( munmap( buffer, length ) == -1 ) {
-    ui_error( "Couldn't munmap `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "Couldn't munmap '%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 

@@ -77,7 +77,7 @@ int snapshot_read( const char *filename )
     snapshot_flush_slt();
     error = libspectrum_sna_read( buffer, length, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
-      ui_error( "Error reading `%s': %s\n", filename,
+      ui_error( "Error reading '%s': %s\n", filename,
 		libspectrum_error_message(error) );
       munmap( buffer, length );
       return 1;
@@ -89,7 +89,7 @@ int snapshot_read( const char *filename )
     snapshot_flush_slt();
     error = libspectrum_z80_read( buffer, length, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
-      ui_error( "Error reading `%s': %s\n", filename, 
+      ui_error( "Error reading '%s': %s\n", filename, 
 		libspectrum_error_message(error) );
       munmap( buffer, length );
       return 1;
@@ -98,14 +98,14 @@ int snapshot_read( const char *filename )
 
   default:
 
-    ui_error( "Unknown snapshot type for `%s'\n" );
+    ui_error( "Unknown snapshot type for '%s'\n" );
     munmap( buffer, length );
     return 1;
 
   }
 
   if( munmap( buffer, length ) == -1 ) {
-    ui_error( "Couldn't munmap `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "Couldn't munmap '%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 
@@ -249,7 +249,7 @@ int snapshot_write( const char *filename )
   length = 0;
   error = libspectrum_z80_write( &buffer, &length, &snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    ui_error( "Error writing `%s': %s\n", filename,
+    ui_error( "Error writing '%s': %s\n", filename,
 	      libspectrum_error_message(error) );
     return error;
   }

@@ -118,7 +118,7 @@ int machine_select( int type )
     }
   }
 
-  ui_error( "Machine type `%d' unavailable\n", type );
+  ui_error( "Machine type '%d' unavailable\n", type );
   return 1;
 }
 
@@ -134,7 +134,7 @@ int machine_select_id( const char *id )
     }
   }
 
-  ui_error( "Machine id `%s' unknown\n", id );
+  ui_error( "Machine id '%s' unknown\n", id );
   return 1;
 }
 
@@ -230,7 +230,7 @@ int machine_read_rom( machine_info *machine, size_t number,
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    ui_error( "couldn't find ROM `%s'\n", filename );
+    ui_error( "couldn't find ROM '%s'\n", filename );
     return 1;
   }
 

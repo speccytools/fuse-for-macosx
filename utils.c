@@ -70,7 +70,7 @@ int utils_read_file( const char *filename, unsigned char **buffer,
 
   fd = open( filename, O_RDONLY );
   if( fd == -1 ) {
-    ui_error( "couldn't open `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "couldn't open '%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 
@@ -86,7 +86,7 @@ int utils_read_fd( int fd, const char *filename,
   struct stat file_info;
 
   if( fstat( fd, &file_info) ) {
-    ui_error( "Couldn't stat `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "Couldn't stat '%s': %s\n", filename, strerror( errno ) );
     close(fd);
     return 1;
   }
@@ -95,13 +95,13 @@ int utils_read_fd( int fd, const char *filename,
 
   (*buffer) = mmap( 0, *length, PROT_READ, MAP_SHARED, fd, 0 );
   if( *buffer == (void*)-1 ) {
-    ui_error( "Couldn't mmap `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "Couldn't mmap '%s': %s\n", filename, strerror( errno ) );
     close(fd);
     return 1;
   }
 
   if( close(fd) ) {
-    ui_error( "Couldn't close `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "Couldn't close '%s': %s\n", filename, strerror( errno ) );
     munmap( *buffer, *length );
     return 1;
   }
@@ -116,18 +116,18 @@ int utils_write_file( const char *filename, const unsigned char *buffer,
 
   f=fopen( filename, "wb" );
   if(!f) { 
-    ui_error( "error opening `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "error opening '%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 	    
   if( fwrite( buffer, 1, length, f ) != length ) {
-    ui_error( "error writing to `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "error writing to '%s': %s\n", filename, strerror( errno ) );
     fclose(f);
     return 1;
   }
 
   if( fclose( f ) ) {
-    ui_error( "error closing `%s': %s\n", filename, strerror( errno ) );
+    ui_error( "error closing '%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 
