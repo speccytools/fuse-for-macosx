@@ -149,7 +149,6 @@ int main(int argc, char **argv)
 static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
-  int autoload;			/* Should we autoload tapes? */
   char *start_scaler;
   start_files_t start_files;
 
@@ -164,7 +163,6 @@ static int fuse_init(int argc, char **argv)
   strcat( fuse_directory, "/" );
 
   if( settings_init( &first_arg, argc, argv ) ) return 1;
-  autoload = settings_current.auto_load;
 
   if( settings_current.show_version ) {
     fuse_show_version();
