@@ -90,14 +90,16 @@ utils_open_file( const char *filename, int autoload,
     error = tape_read_buffer( buffer, length, type, autoload );
     break;
 
-#ifdef HAVE_765_H
   case LIBSPECTRUM_ID_DISK_DSK:
+#ifdef HAVE_765_H
     error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
     if( error ) return error;
 
     error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
-    break;
+#else				/* #ifdef HAVE_765_H */
+    ui_error( UI_ERROR_INFO, "lib765 not present so can't handle .dsk files" );
 #endif				/* #ifdef HAVE_765_H */
+    break;
 
   case LIBSPECTRUM_ID_DISK_SCL:
   case LIBSPECTRUM_ID_DISK_TRD:
