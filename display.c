@@ -1,5 +1,5 @@
 /* display.c: Routines for printing the Spectrum screen
-   Copyright (c) 1999-2003 Philip Kendall, Thomas Harte, Witold Filipczyk
+   Copyright (c) 1999-2004 Philip Kendall, Thomas Harte, Witold Filipczyk
                            and Fredrick Meunier
 
    $Id$
@@ -123,6 +123,9 @@ size_t active_rectangle_count = 0, active_rectangle_allocated = 0;
 struct rectangle *inactive_rectangle = NULL;
 size_t inactive_rectangle_count = 0, inactive_rectangle_allocated = 0;
 
+/* The last point at which we updated the screen display */
+int critical_region_x = 0, critical_region_y = 0;
+
 static void display_draw_line(int y);
 static void display_dirty8( libspectrum_word address );
 static void display_dirty64( libspectrum_word address );
@@ -198,57 +201,6 @@ int display_init(int *argc, char ***argv)
 
   return 0;
 }
-
-/* Draw the current screen line, and increment the line count. Called
-   one more time after the entire screen has been displayed so we know
-   this fact */
-void display_line(void)
-{
-  static int frame_count = 0;
-  size_t i; struct rectangle *ptr;
-  int error;
-
-  if( display_next_line < DISPLAY_SCREEN_HEIGHT ) {
-    display_draw_line(display_next_line);
-    event_add( machine_current->line_times[display_next_line+1],
-	       EVENT_TYPE_LINE );
-  } 
-
-  /* If we're at the end of the frame, and we've got some data to
-     send to the screen, send it now */
-  else {
-
-    int scale = machine_current->timex ? 2 : 1;
-
-    /* Force all rectangles into the inactive list */
-    error = end_line( display_next_line ); if( error ) return;
-
-    if( settings_current.frame_rate <= ++frame_count ) {
-      frame_count = 0;
-
-      if( display_redraw_all ) {
-	uidisplay_area( 0, 0,
-			scale * DISPLAY_ASPECT_WIDTH,
-			scale * DISPLAY_SCREEN_HEIGHT );
-	display_redraw_all = 0;
-      } else {
-	for( i = 0, ptr = inactive_rectangle;
-	     i < inactive_rectangle_count;
-	     i++, ptr++ ) {
-	  uidisplay_area( 8 * scale * ptr->x, scale * ptr->y,
-			  8 * scale * ptr->w, scale * ptr->h );
-	}
-      }
-
-      inactive_rectangle_count = 0;
-
-      uidisplay_frame_end();
-    }
-  }
-
-  display_next_line++;
-
-}   
 
 /* Redraw pixel line y if it is flagged as `dirty' */
 static void
@@ -578,6 +530,187 @@ display_dirty( libspectrum_word offset )
   }
 }
 
+/* Copy any dirty data from ( x, y ) to ( end, y ) of the critical
+   region to display_image[] */
+static void
+copy_critical_region_line( int y, int x, int end )
+{
+  int start, border_colour, error;
+  libspectrum_byte data, data2, ink, paper;
+  libspectrum_word hires_data;
+  libspectrum_qword bit_mask, dirty;
+
+  /* Build a mask for the bits we're interested in */
+  bit_mask = -1;
+
+  bit_mask >>= x;
+  bit_mask <<= x + ( 64 - end );
+  bit_mask >>= ( 64 - end );
+
+  /* Get the bits we're interested in */
+  dirty = ( display_is_dirty[y] & bit_mask ) >> x;
+
+  /* And remove those bits from the dirty mask */
+  display_is_dirty[y] &= ~bit_mask;
+
+  while( dirty ) {
+
+    /* Find the first dirty chunk on this row */
+    while( !( dirty & 0x01 ) ) {
+      dirty >>= 1;
+      x++;
+    }
+
+    start = x;
+
+    /* Walk to the end of the dirty region, writing the bytes to the
+       drawing area along the way */
+    do {
+
+      if( y >= DISPLAY_BORDER_HEIGHT &&
+	  y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
+
+	if( x >= DISPLAY_BORDER_WIDTH_COLS &&
+	    x < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
+
+	  int screen_x, screen_y;
+	  libspectrum_word offset;
+	  libspectrum_byte *screen;
+
+	  screen_x = x - DISPLAY_BORDER_WIDTH_COLS;
+	  screen_y = y - DISPLAY_BORDER_HEIGHT;
+
+	  screen = RAM[ memory_current_screen ];
+      
+	  display_get_attr( screen_x, screen_y, &ink, &paper );
+
+	  offset = display_get_addr( screen_x, screen_y );
+	  data = screen[ offset ];
+
+	  if( scld_last_dec.name.hires ) {
+	    switch( scld_last_dec.mask.scrnmode ) {
+
+            case HIRESATTRALTD:
+	      offset =
+		display_attr_start[ screen_y ] + screen_x + ALTDFILE_OFFSET;
+              data2 = screen[ offset ];
+              break;
+
+            case HIRES:
+              data2 = screen[ offset + ALTDFILE_OFFSET ];
+              break;
+
+            case HIRESDOUBLECOL:
+              data2 = data;
+              break;
+
+            default: /* case HIRESATTR: */
+	      offset = display_attr_start[ screen_y ] + screen_x;
+	      data2 = screen[ offset ];
+              break;
+
+	    }
+	    hires_data = (data << 8) + data2;
+	    display_plot16( screen_x, screen_y, hires_data, ink, paper );
+	  } else {
+	    display_plot8( screen_x, screen_y, data, ink, paper );
+	  }    
+
+	} else if( x < DISPLAY_BORDER_WIDTH_COLS ) {
+
+	  border_colour = left_border[ y - DISPLAY_BORDER_HEIGHT ][x];
+	  set_border( x, y, border_colour );
+
+	} else {
+
+	  border_colour =
+	    right_border[ y - DISPLAY_BORDER_HEIGHT ]
+                        [ x - DISPLAY_BORDER_WIDTH_COLS - DISPLAY_WIDTH_COLS ];
+	  set_border( x, y, border_colour );
+	}
+
+      } else if( y < DISPLAY_BORDER_HEIGHT ) {
+
+	border_colour = top_border[y][x];
+	set_border( x, y, border_colour );
+
+      } else {
+
+	border_colour =
+	  bottom_border[y - DISPLAY_BORDER_HEIGHT - DISPLAY_HEIGHT ][x];
+	set_border( x, y, border_colour );
+      }
+
+      dirty >>= 1;
+      x++;
+
+    } while( dirty & 0x01 );
+
+    error = add_rectangle( y, start, x - start ); if( error ) return;
+  }
+  
+  error = end_line( y ); if( error ) return;
+}
+
+/* Copy any dirty data from the critical region to display_image[] */
+static void
+copy_critical_region( int beam_x, int beam_y )
+{
+  copy_critical_region_line( critical_region_y++, critical_region_x,
+			     DISPLAY_SCREEN_WIDTH_COLS );
+  
+  for( ; critical_region_y < beam_y; critical_region_y++ )
+    copy_critical_region_line( critical_region_y, 0,
+			       DISPLAY_SCREEN_WIDTH_COLS );
+
+  if( critical_region_y < DISPLAY_SCREEN_HEIGHT )
+    copy_critical_region_line( critical_region_y, 0, beam_x );
+
+  critical_region_x = beam_x;
+}
+
+static void
+get_beam_position( int *x, int *y )
+{
+  if( tstates < machine_current->line_times[ 0 ] ) {
+    *x = *y = -1;
+    return;
+  }
+
+  *y = ( tstates - machine_current->line_times[ 0 ] ) /
+    machine_current->timings.tstates_per_line;
+
+  if( *y >= DISPLAY_SCREEN_HEIGHT ) {
+    *x = DISPLAY_SCREEN_WIDTH_COLS;
+    *y = DISPLAY_SCREEN_HEIGHT - 1;
+    return;
+  }
+
+  *x = ( tstates - machine_current->line_times[ *y ] ) / 4;
+}
+
+/* Mark the 8-pixel chunk at (x,y) as dirty and update the critical
+   region as appropriate */
+static void
+display_dirty_chunk( int x, int y )
+{
+  /* If the write is between the start of the critical region and the
+     current beam position, then we must copy the critical region now */
+  if(   y >  critical_region_y                             ||
+      ( y == critical_region_y && x >= critical_region_x )    ) {
+
+    int beam_x, beam_y;
+
+    get_beam_position( &beam_x, &beam_y );
+
+    if(   y <  beam_y                 ||
+	( y == beam_y && x < beam_x )    )
+      copy_critical_region( beam_x, beam_y );
+  }
+
+  display_is_dirty[y] |= ( (libspectrum_qword)1 << x );
+}
+
 static void
 display_dirty8( libspectrum_word offset )
 {
@@ -586,8 +719,7 @@ display_dirty8( libspectrum_word offset )
   x=display_dirty_xtable[ offset ];
   y=display_dirty_ytable[ offset ];
 
-  display_is_dirty[y] |= ( (libspectrum_qword)1 << x );
-  
+  display_dirty_chunk( x, y );
 }
 
 static void
@@ -598,7 +730,7 @@ display_dirty64( libspectrum_word offset )
   x=display_dirty_xtable2[ offset - 0x1800 ];
   y=display_dirty_ytable2[ offset - 0x1800 ];
 
-  for( i=0; i<8; i++ ) display_is_dirty[y+i] |= ( (libspectrum_qword)1 << x );
+  for( i = 0; i < 8; i++ ) display_dirty_chunk( x, y + i );
 }
 
 /* Set one pixel in the display */
@@ -900,10 +1032,49 @@ set_border_pixels( int line, int column, int colour )
   }
 }  
 
-int display_frame(void)
+/* Send the updated screen to the UI-specific code */
+static void
+update_ui_screen( void )
 {
-  display_next_line=0;
-  if( event_add( machine_current->line_times[0], EVENT_TYPE_LINE) ) return 1;
+  static int frame_count = 0;
+  int error, scale = machine_current->timex ? 2 : 1;
+  size_t i;
+  struct rectangle *ptr;
+
+  /* Copy all the critical region to display_image[] */
+  copy_critical_region( DISPLAY_SCREEN_WIDTH_COLS, DISPLAY_SCREEN_HEIGHT - 1 );
+  critical_region_x = critical_region_y = 0;
+
+  /* Force all rectangles into the inactive list */
+  error = end_line( display_next_line ); if( error ) return;
+
+  if( settings_current.frame_rate <= ++frame_count ) {
+    frame_count = 0;
+
+    if( display_redraw_all ) {
+      uidisplay_area( 0, 0,
+		      scale * DISPLAY_ASPECT_WIDTH,
+		      scale * DISPLAY_SCREEN_HEIGHT );
+      display_redraw_all = 0;
+    } else {
+      for( i = 0, ptr = inactive_rectangle;
+	   i < inactive_rectangle_count;
+	   i++, ptr++ ) {
+	uidisplay_area( 8 * scale * ptr->x, scale * ptr->y,
+			8 * scale * ptr->w, scale * ptr->h );
+      }
+    }
+
+    inactive_rectangle_count = 0;
+    
+    uidisplay_frame_end();
+  }
+}
+
+int
+display_frame( void )
+{
+  update_ui_screen();
 
   if( screenshot_movie_record == 1 ) {
 

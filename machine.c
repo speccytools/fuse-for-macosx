@@ -215,7 +215,6 @@ machine_select_machine( fuse_machine_info *machine )
   event_reset();
   if( event_add( machine->timings.tstates_per_frame, EVENT_TYPE_FRAME ) )
     return 1;
-  if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
   if( uidisplay_end() ) return 1;
 

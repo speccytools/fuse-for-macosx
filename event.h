@@ -1,5 +1,5 @@
 /* event.h: Routines needed for dealing with the event list
-   Copyright (c) 2000-2003 Philip Kendall
+   Copyright (c) 2000-2004 Philip Kendall
 
    $Id$
 
@@ -46,7 +46,6 @@ typedef enum event_type {
   EVENT_TYPE_EDGE,
   EVENT_TYPE_FRAME,
   EVENT_TYPE_INTERRUPT,
-  EVENT_TYPE_LINE,
   EVENT_TYPE_NMI,
   EVENT_TYPE_NULL,
   EVENT_TYPE_TRDOS_CMD_DONE,

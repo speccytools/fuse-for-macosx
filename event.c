@@ -1,5 +1,5 @@
 /* event.c: Routines needed for dealing with the event list
-   Copyright (c) 2000-2003 Philip Kendall
+   Copyright (c) 2000-2004 Philip Kendall
 
    $Id$
 
@@ -150,7 +150,6 @@ int event_do_events(void)
       if( z80_interrupt() ) rzx_frame();
       break;
 
-    case EVENT_TYPE_LINE: display_line(); break;
     case EVENT_TYPE_NMI: z80_nmi(); break;
     case EVENT_TYPE_NULL: /* Do nothing */ break;
 
@@ -273,7 +272,6 @@ event_name( event_type type )
   case EVENT_TYPE_EDGE: return "Tape edge";
   case EVENT_TYPE_FRAME: return "End of frame";
   case EVENT_TYPE_INTERRUPT: return "Retriggered interrupt";
-  case EVENT_TYPE_LINE: return "Display line";
   case EVENT_TYPE_NMI: return "Non-maskable interrupt";
   case EVENT_TYPE_NULL: return "[Deleted event]";
   case EVENT_TYPE_TRDOS_CMD_DONE: return "End of TR-DOS command";

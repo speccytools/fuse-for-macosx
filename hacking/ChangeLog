@@ -1140,3 +1140,5 @@
          Fuse attempting to change joystick settings when auto-loading tapes or
          disks.
 20041222 display.c,screenshot.c: Fix compilation without libpng.
+20041225 display.c,event.[ch],machine.c: first pass at character-accurate
+	 rendering.
