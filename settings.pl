@@ -30,7 +30,7 @@ use lib 'perl';
 
 use Fuse;
 
-sub hashline ($) { "#line $_[0] \"", __FILE__, "\"\n" }
+sub hashline ($) { '#line ', $_[0] + 1, '"', __FILE__, "\"\n" }
 
 my %options;
 
@@ -126,7 +126,10 @@ settings_init( int *first_arg, int argc, char **argv )
   int error;
 
   error = settings_defaults( &settings_current );
-  if( error ) return error;
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return error;
+  }
 
 #ifdef HAVE_LIB_XML2
   error = read_config_file( &settings_current );
@@ -147,6 +150,10 @@ CODE
     foreach my $name ( sort keys %options ) {
 	next if $options{$name}->{type} eq 'null';
 	print "  settings->$name = $options{$name}->{default};\n";
+	if( $options{$name}->{type} eq 'string' and
+	    $options{$name}->{default} ne 'NULL'    ) {
+	    print "  if( !settings->$name ) return 1;\n";
+	}
     }
 
     print hashline( __LINE__ ), << 'CODE';
