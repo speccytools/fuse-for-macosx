@@ -38,6 +38,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "tape.h"
 #include "ui.h"
 #include "spectrum.h"
 

@@ -78,7 +78,7 @@ int xkeyboard_keypress(XKeyEvent *event)
     break;
   case XK_F8:
     /* If tape traps active, do nothing */
-    if( settings_current.tape_traps ) return;
+    if( settings_current.tape_traps ) return 0;
 
     /* Otherwise, toggle whether the tape is playing or not */
     if( tape_playing ) {
