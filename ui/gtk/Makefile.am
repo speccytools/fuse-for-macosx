@@ -30,7 +30,8 @@ INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuigtk_a_SOURCES = browse.c debugger.c error.c gtkdisplay.c gtkkeyboard.c \
                      gtkui.c \
-options.c keysyms.c picture.c
+	             options.c keysyms.c picture.c \
+		     roms.c
 
 BUILT_SOURCES = keysyms.c options.c options.h
 

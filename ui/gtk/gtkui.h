@@ -42,7 +42,10 @@ extern GdkGC *gtkdisplay_gc;
 extern unsigned long gtkdisplay_colours[];
 
 void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
+char* gtkui_fileselector_get_filename( const char *title );
+
 void gtk_tape_browse( GtkWidget *widget, gpointer data );
+void gtkui_roms( GtkWidget *widget, gpointer data );
 
 int gtkui_picture( const char *filename, int border );
 

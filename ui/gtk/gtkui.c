@@ -117,7 +117,6 @@ static void gtkui_disk_open( specplus3_drive_number drive );
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
-static char* gtkui_fileselector_get_filename( const char *title );
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
@@ -143,6 +142,8 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Options/_Sound...",	NULL , gtkoptions_sound,    0, NULL          },
   { "/Options/_RZX...",		NULL , gtkoptions_rzx,      0, NULL          },
+  { "/Options/S_elect ROMs...", NULL , gtkui_roms,          0, NULL          },
+  { "/Options/separator",       NULL , NULL,                0, "<Separator>" },
 
 #ifdef HAVE_LIB_XML2
   { "/Options/S_ave",		NULL , save_options,	    0, NULL          },
@@ -752,7 +753,8 @@ typedef struct gktui_fileselector_info {
 
 } gtkui_fileselector_info;
 
-static char* gtkui_fileselector_get_filename( const char *title )
+char*
+gtkui_fileselector_get_filename( const char *title )
 {
   gtkui_fileselector_info selector;
   GtkAccelGroup *accel_group;
