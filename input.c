@@ -79,15 +79,15 @@ keypress( const input_event_key_t *event )
   switch( key ) {
 
   case INPUT_KEY_q:
-    swallow = joystick_press( JOYSTICK_BUTTON_UP   , 1 ); break;
+    swallow = joystick_press( 0, JOYSTICK_BUTTON_UP   , 1 ); break;
   case INPUT_KEY_a:
-    swallow = joystick_press( JOYSTICK_BUTTON_DOWN , 1 ); break;
+    swallow = joystick_press( 0, JOYSTICK_BUTTON_DOWN , 1 ); break;
   case INPUT_KEY_o:
-    swallow = joystick_press( JOYSTICK_BUTTON_LEFT , 1 ); break;
+    swallow = joystick_press( 0, JOYSTICK_BUTTON_LEFT , 1 ); break;
   case INPUT_KEY_p:
-    swallow = joystick_press( JOYSTICK_BUTTON_RIGHT, 1 ); break;
+    swallow = joystick_press( 0, JOYSTICK_BUTTON_RIGHT, 1 ); break;
   case INPUT_KEY_space:
-    swallow = joystick_press( JOYSTICK_BUTTON_FIRE , 1 ); break;
+    swallow = joystick_press( 0, JOYSTICK_BUTTON_FIRE , 1 ); break;
 
   default: break;		/* Remove warning */
 
@@ -180,11 +180,11 @@ keyrelease( const input_event_key_t *event )
   /* Joystick emulation via QAOP<space> */
   switch( key ) {
 
-  case INPUT_KEY_q:     joystick_press( JOYSTICK_BUTTON_UP   , 0 ); break;
-  case INPUT_KEY_a:     joystick_press( JOYSTICK_BUTTON_DOWN , 0 ); break;
-  case INPUT_KEY_o:     joystick_press( JOYSTICK_BUTTON_LEFT , 0 ); break;
-  case INPUT_KEY_p:     joystick_press( JOYSTICK_BUTTON_RIGHT, 0 ); break;
-  case INPUT_KEY_space: joystick_press( JOYSTICK_BUTTON_FIRE , 0 ); break;
+  case INPUT_KEY_q:     joystick_press( 0, JOYSTICK_BUTTON_UP   , 0 ); break;
+  case INPUT_KEY_a:     joystick_press( 0, JOYSTICK_BUTTON_DOWN , 0 ); break;
+  case INPUT_KEY_o:     joystick_press( 0, JOYSTICK_BUTTON_LEFT , 0 ); break;
+  case INPUT_KEY_p:     joystick_press( 0, JOYSTICK_BUTTON_RIGHT, 0 ); break;
+  case INPUT_KEY_space: joystick_press( 0, JOYSTICK_BUTTON_FIRE , 0 ); break;
 
   default: break;		/* Remove warning */
   }

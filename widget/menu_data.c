@@ -225,7 +225,7 @@ static widget_menu_widget_t media_disk = { WIDGET_TYPE_MENU,
 					   &widget_menu_disk };
 static widget_menu_widget_t media_cart = { WIDGET_TYPE_MENU,
 					   &widget_menu_cart };
-static widget_menu_widget_t media_cart = { WIDGET_TYPE_MENU,
+static widget_menu_widget_t media_ide  = { WIDGET_TYPE_MENU,
 					   &widget_menu_ide  };
 
 static widget_menu_entry widget_menu_media[] = {

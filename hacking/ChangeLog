@@ -660,3 +660,6 @@
 	 selection code.
 20040324 joystick.[ch]: start merging the Timex joystick emulation into
 	 the new scheme of things.
+20040325 input.c,joystick.[ch],ui/sdl/{sdljoystick.c,sdlkeyboard.c},
+	 widget/menu_data.c: make the SDL joystick code use the new input
+	 layer; also a couple of SDL compilation fixes.

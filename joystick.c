@@ -39,6 +39,8 @@
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 
+/* FIXME: make two joysticks work */
+
 /* Number of joysticks known about & initialised */
 int joysticks_supported = 0;
 
@@ -82,10 +84,12 @@ fuse_joystick_end (void)
 }
 
 int
-joystick_press( joystick_button button, int press )
+joystick_press( int which, joystick_button button, int press )
 {
   keyboard_key_name key;
   libspectrum_byte mask;
+
+  if( which ) return 0;
 
   switch( settings_current.joystick_1_output ) {
 
@@ -165,24 +169,11 @@ joystick_kempston_read( libspectrum_word port, int *attached )
 
   *attached = 1;
 
-  /* If we have no real joysticks, return the QAOP<space>-emulated value */
-  if( joysticks_supported == 0 ) return kempston_value;
-
-  /* Return the value from the actual joystick */
-  return ui_joystick_read( port, 0 );
+  return kempston_value;
 }
 
 libspectrum_byte
 joystick_timex_read( libspectrum_word port, libspectrum_byte which )
 {
-  static const libspectrum_byte translate[] = {
-    0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
-    0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F,
-    0x80, 0x88, 0x84, 0x8C, 0x82, 0x8A, 0x86, 0x8E,
-    0x81, 0x89, 0x85, 0x8D, 0x83, 0x8B, 0x87, 0x8F,
-  };
-
-  if( joysticks_supported == 0 ) return which ? 0x00 : timex_value;
-
-  return translate[ ui_joystick_read( port, which ) ];
+  return which ? 0x00 : timex_value;
 }

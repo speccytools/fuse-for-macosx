@@ -1,5 +1,5 @@
 /* sdlkeyboard.c: routines for dealing with the SDL keyboard
-   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
 
    $Id$
 
@@ -34,6 +34,7 @@
 
 #include "display.h"
 #include "fuse.h"
+#include "keyboard.h"
 #include "machine.h"
 #include "settings.h"
 #include "snapshot.h"

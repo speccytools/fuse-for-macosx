@@ -1,5 +1,5 @@
 /* sdljoystick.c: routines for dealing with the SDL joystick
-   Copyright (c) 2003 Darren Salt, Fredrick Meunier
+   Copyright (c) 2003-2004 Darren Salt, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -38,6 +38,7 @@
 #include <SDL.h>
 
 #include "compat.h"
+#include "joystick.h"
 #include "sdljoystick.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -45,9 +46,6 @@
 
 static SDL_Joystick *joystick1 = NULL;
 static SDL_Joystick *joystick2 = NULL;
-
-kempston_type joystick1_return_value;
-kempston_type joystick2_return_value;
 
 int
 ui_joystick_init( void )
@@ -92,81 +90,50 @@ ui_joystick_init( void )
   return retval;
 }
 
-libspectrum_byte
-ui_joystick_read( libspectrum_word port GCC_UNUSED, libspectrum_byte which )
-{
-  if( which ) return joystick2_return_value.byte;
-
-  return joystick1_return_value.byte;
-}
-
 void
 sdljoystick_buttonpress( SDL_JoyButtonEvent *buttonevent )
 {
-  switch ( buttonevent->which ) {
-
-  case 0: joystick1_return_value.bits.fire = 1; break;
-  case 1: joystick2_return_value.bits.fire = 1; break;
-
-  default:
-    /* Unknown joystick */
-    return;
-  }
+  joystick_press( buttonevent->which, JOYSTICK_BUTTON_FIRE, 1 );
 }
 
 void
 sdljoystick_buttonrelease( SDL_JoyButtonEvent *buttonevent )
 {
-  switch ( buttonevent->which ) {
-
-  case 0: joystick1_return_value.bits.fire = 0; break;
-  case 1: joystick2_return_value.bits.fire = 0; break;
-
-  default:
-    /* Unknown joystick */
-    return;
-  }
+  joystick_press( buttonevent->which, JOYSTICK_BUTTON_FIRE, 0 );
 }
 
 void
 sdljoystick_axismove( SDL_JoyAxisEvent *axisevent )
 {
-  kempston_type *joystick_return_value = NULL;
-  
-  switch ( axisevent->which ) {
+  int which, axis;
 
-  case 0: joystick_return_value = &joystick1_return_value; break;
-  case 1: joystick_return_value = &joystick2_return_value; break;
+  which = axisevent->which;
+  axis = axisevent->axis;
 
-  default:
-    /* Unknown joystick */
-    return;
-  }
-
-  if( axisevent->axis == 0 ) {
+  if( axis == 0 ) {
 
     if( axisevent->value > 16384 ) { /* right */
-      (*joystick_return_value).bits.right = 1;
-      (*joystick_return_value).bits.left = 0;
+      joystick_press( which, JOYSTICK_BUTTON_LEFT,  0 );
+      joystick_press( which, JOYSTICK_BUTTON_RIGHT, 1 );
     } else if( axisevent->value < -16384 ) { /* left */
-      (*joystick_return_value).bits.left = 1;
-      (*joystick_return_value).bits.right = 0;
+      joystick_press( which, JOYSTICK_BUTTON_LEFT,  1 );
+      joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
     } else { /* centered */
-      (*joystick_return_value).bits.left = 0;
-      (*joystick_return_value).bits.right = 0;
+      joystick_press( which, JOYSTICK_BUTTON_LEFT,  0 );
+      joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
     }
 
-  } else if( axisevent->axis == 1 ) {
+  } else if( axis == 1 ) {
 
     if( axisevent->value > 16384 ) { /* down */
-      (*joystick_return_value).bits.down = 1;
-      (*joystick_return_value).bits.up = 0;
+      joystick_press( which, JOYSTICK_BUTTON_UP,   0 );
+      joystick_press( which, JOYSTICK_BUTTON_DOWN, 1 );
     } else if( axisevent->value < -16384 ) { /* up */
-      (*joystick_return_value).bits.up = 1;
-      (*joystick_return_value).bits.down = 0;
+      joystick_press( which, JOYSTICK_BUTTON_UP,   1 );
+      joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
     } else { /* centered */
-      (*joystick_return_value).bits.up = 0;
-      (*joystick_return_value).bits.down = 0;
+      joystick_press( which, JOYSTICK_BUTTON_UP,   0 );
+      joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
     }
 
   }
