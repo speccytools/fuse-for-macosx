@@ -26,17 +26,18 @@
 
 #include <config.h>
 
-#include <signal.h>
-#include <sys/time.h>
-#include <unistd.h>
-
-#include "compat.h"
 #include "fuse.h"
 #include "timer.h"
 
 volatile float timer_count;
 
 #ifndef WIN32
+
+#include <signal.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+#include "compat.h"
 
 #ifndef DEBUG_MODE
 /* Just places to store the old timer and signal handlers; restored
