@@ -38,6 +38,9 @@
 #include "ui/uidisplay.h"
 #include "scld.h"
 
+/* Set once we have initialised the UI */
+int display_ui_initialised = 0;
+
 /* The current border colour */
 BYTE display_lores_border;
 BYTE display_hires_border;
@@ -132,6 +135,9 @@ int display_init(int *argc, char ***argv)
 
   if(ui_init(argc, argv, DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT))
     return 1;
+
+  /* We can now output error messages to our output device */
+  display_ui_initialised = 1;
 
   for(i=0;i<3;i++)
     for(j=0;j<8;j++)

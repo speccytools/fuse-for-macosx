@@ -60,6 +60,8 @@
 /* The aspect ratio corrected display width */
 #define DISPLAY_ASPECT_WIDTH  ( DISPLAY_SCREEN_WIDTH / 2 )
 
+extern int display_ui_initialised;
+
 extern BYTE display_lores_border;
 extern BYTE display_hires_border;
 

@@ -187,6 +187,9 @@ int widget_do( widget_type which, void *data )
 {
   int error;
 
+  /* If we don't have a UI yet, we can't output widgets */
+  if( !display_ui_initialised ) return 1;
+
   /* We're now one widget level deeper */
   widget_level++;
 
@@ -200,7 +203,7 @@ int widget_do( widget_type which, void *data )
   widget_return[widget_level].data = data;
 
   /* Draw this widget */
-  widget_data[ which ].draw( data );
+  error = widget_data[ which ].draw( data );
 
   /* Set up the keyhandler for this widget */
   widget_keyhandler = widget_data[which].keyhandler;

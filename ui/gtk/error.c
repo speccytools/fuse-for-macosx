@@ -34,6 +34,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "display.h"
 #include "fuse.h"
 #include "ui/ui.h"
 
@@ -66,6 +67,9 @@ int ui_error( ui_error_level severity, const char *format, ... )
     fprintf( stderr, "%s\n", message );
 
   }
+
+  /* If we don't have a UI yet, we can't output widgets */
+  if( !display_ui_initialised ) return 1;
 
   /* Create the dialog box */
   dialog = gtk_dialog_new();
