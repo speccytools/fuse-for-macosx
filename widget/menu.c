@@ -39,6 +39,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "machines/specplus3.h"
+#include "menu.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"

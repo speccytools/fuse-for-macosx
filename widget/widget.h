@@ -90,7 +90,7 @@ typedef struct widget_menu_entry {
   const char *text;		/* Menu entry text */
   input_key key;		/* Which key to activate this widget */
 
-  const struct widget_menu_entry *submenu;
+  struct widget_menu_entry *submenu;
   widget_menu_callback_fn callback;
 
   int action;
@@ -98,7 +98,7 @@ typedef struct widget_menu_entry {
 } widget_menu_entry;
 
 /* The main menu as activated with F1 */
-extern const widget_menu_entry widget_menu[];
+extern widget_menu_entry widget_menu[];
 
 /* The name returned from the file selector */
 extern char* widget_filesel_name;

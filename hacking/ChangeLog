@@ -744,3 +744,5 @@
 	 DE equal to zero as this is what happens in the ROM code.
 	 Necessary for 'The Rats' to load with tape traps enabled; thanks
 	 to Simon Stuart for reporting this (fixes bug #890838).
+20040415 menu_data.pl,widget/{menu.c,widget.h}: fix up widget compilation
+	 of the new menu code.
