@@ -1,5 +1,5 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
 
@@ -34,6 +34,7 @@
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "snapshot.h"
 #include "sound.h"
 #include "spec128.h"
 #include "spectrum.h"
@@ -125,6 +126,7 @@ int spec128_reset(void)
 
   z80_reset();
   sound_ay_reset();
+  snapshot_flush_slt();
 
   return 0;
 }

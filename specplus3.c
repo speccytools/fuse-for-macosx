@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
 
@@ -35,6 +35,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
+#include "snapshot.h"
 #include "sound.h"
 #include "spec128.h"
 #include "specplus3.h"
@@ -180,6 +181,7 @@ int specplus3_reset(void)
 
   z80_reset();
   sound_ay_reset();
+  snapshot_flush_slt();
 
   return 0;
 }

@@ -1,5 +1,5 @@
 /* libspectrum.c: Some general routines
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001-2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -40,6 +40,7 @@ int libspectrum_snap_initalise( libspectrum_snap *snap )
   int i;
 
   for( i=0; i<8; i++ ) snap->pages[i]=NULL;
+  for( i=0; i<256; i++ ) { snap->slt[i]=NULL; snap->slt_length[i]=0; }
 
   return LIBSPECTRUM_ERROR_NONE;
 }

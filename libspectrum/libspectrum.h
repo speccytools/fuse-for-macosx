@@ -1,5 +1,5 @@
 /* libspectrum.h
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001,2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -67,6 +67,7 @@ typedef enum libspectrum_error {
   LIBSPECTRUM_ERROR_UNKNOWN,
   LIBSPECTRUM_ERROR_CORRUPT,
   LIBSPECTRUM_ERROR_SIGNATURE,
+  LIBSPECTRUM_ERROR_SLT,	/* .slt data found at end of a .z80 file */
 
   LIBSPECTRUM_ERROR_LOGIC = -1,
 
@@ -101,6 +102,11 @@ typedef struct libspectrum_snap {
   /* RAM */
 
   libspectrum_byte *pages[8];
+
+  /* Level data from .slt files */
+
+  libspectrum_byte *slt[256];
+  size_t slt_length[256];
 
   /* Peripheral status */
 

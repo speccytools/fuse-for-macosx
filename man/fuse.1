@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
 .\" fuse.1: Fuse man page
-.\" Copyright (c) 2001,2002 Russell Marks, Philip Kendall
+.\" Copyright (c) 2001,2002 Russell Marks, Philip Kendall, Darren Salt
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -46,6 +46,8 @@ Fuse is a Sinclair ZX Spectrum emulator. It supports several models
 (including the 128), with quite faithful emulation of the display and
 sound. It can load Z80 and SNA snapshots, and TAP and TZX virtual-tape
 files. Saving to both Z80 snapshots and TZX tape files is supported.
+The SLT extension to the Z80 format is partly supported (enough for
+multi-load games); however, loading of DAT files is not.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -367,3 +369,5 @@ the original widget UI code.
 .PP
 Russell Marks wrote the sound emulation and OSS-specific sound code,
 the joystick emulation, and this man page.
+.PP
+Darren Salt wrote the original SLT support code.

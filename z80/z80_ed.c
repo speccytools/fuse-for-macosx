@@ -1,5 +1,5 @@
 /* z80_ed.c: z80 EDxx opcodes
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999,2002 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -480,6 +480,19 @@ tstates+=16;
   F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
   /* C,H and P/V flags not implemented */
   if(B) { tstates+=5; PC-=2; }
+}
+break;
+
+case 0xfb:	/* Emulator trap to load .slt data */
+/* Takes no t-states */
+{
+  if( slt_length[A] ) {
+    WORD base = HL;
+    BYTE *data = slt[A];
+    size_t length = slt_length[A];
+
+    while( length-- ) writebyte( base++, *data++ );
+  }
 }
 break;
 

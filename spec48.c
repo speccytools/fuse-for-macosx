@@ -34,6 +34,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
+#include "snapshot.h"
 #include "sound.h"
 #include "spec48.h"
 #include "spectrum.h"
@@ -120,6 +121,7 @@ int spec48_reset(void)
 {
   z80_reset();
   sound_ay_reset();	/* should happen for *all* resets */
+  snapshot_flush_slt();
   printer_zxp_reset();
 
   return 0;

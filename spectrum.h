@@ -1,5 +1,5 @@
 /* spectrum.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -26,6 +26,8 @@
 
 #ifndef FUSE_SPECTRUM_H
 #define FUSE_SPECTRUM_H
+
+#include <stdio.h>
 
 #ifndef FUSE_TYPES_H
 #include "types.h"
@@ -90,6 +92,12 @@ void spectrum_ula_write(WORD port, BYTE b);
 /* Miscellaneous stuff */
 
 int spectrum_interrupt(void);
+
+/* Level data from .slt files */
+
+size_t slt_length[256];		/* Length of data for this value of A
+				   0 => no data */
+BYTE *slt[256];			/* Actual data for each value of A */
 
 /* The machines available */
 enum { SPECTRUM_MACHINE_48, SPECTRUM_MACHINE_128, SPECTRUM_MACHINE_PLUS2,

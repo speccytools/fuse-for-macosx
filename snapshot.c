@@ -105,6 +105,7 @@ int snapshot_read( const char *filename )
 
   case SNAPSHOT_TYPE_SNA:
 
+    snapshot_flush_slt();
     error = libspectrum_sna_read( buffer, file_info.st_size, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       fprintf(stderr, "%s: Error from libspectrum_sna_read: %s\n",
@@ -116,6 +117,7 @@ int snapshot_read( const char *filename )
 
   case SNAPSHOT_TYPE_Z80:
 
+    snapshot_flush_slt();
     error = libspectrum_z80_read( buffer, file_info.st_size, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       fprintf(stderr, "%s: Error from libspectrum_z80_read: %s\n",
@@ -160,6 +162,16 @@ static snapshot_type snapshot_identify( const char *filename )
     return SNAPSHOT_TYPE_Z80;
   } else {
     return SNAPSHOT_TYPE_SNA;
+  }
+}
+
+void snapshot_flush_slt (void)
+{
+  int i;
+  for ( i=0; i<256; i++ ) {
+    if( slt[i] ) free( slt[i] );
+    slt[i] = NULL;
+    slt_length[i] = 0;
   }
 }
 
@@ -218,6 +230,9 @@ static int snapshot_copy_from( libspectrum_snap *snap )
   for( i=0; i<8; i++ ) {
     if( snap->pages[i] != NULL ) memcpy( RAM[i], snap->pages[i], 0x4000 );
   }
+
+  memcpy( slt,        snap->slt,        sizeof(slt)        );
+  memcpy( slt_length, snap->slt_length, sizeof(slt_length) );
 
   return 0;
 }

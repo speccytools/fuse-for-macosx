@@ -1,5 +1,5 @@
 /* z80.c: Routines for handling .z80 snapshots
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001-2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -42,11 +42,23 @@ static const int LIBSPECTRUM_Z80_HEADER_LENGTH = 30;
 /* Length of xzx's extensions */
 #define LIBSPECTRUM_Z80_V3X_LENGTH 55
 
+/* The signature used to designate the .slt extensions */
+static uchar slt_signature[] = "\0\0\0SLT";
+
 static int read_v1_block( uchar *buffer, int is_compressed, 
 			  uchar **uncompressed, uchar **next_block,
 			  uchar *end );
 static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
 			  int *page, uchar **next_block, uchar *end );
+static int libspectrum_z80_read_slt( libspectrum_snap *snap,
+				     uchar **next_block, uchar *end );
+static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
+				      size_t *length, libspectrum_snap *snap );
+static int libspectrum_z80_write_slt_entry( uchar **buffer, size_t *offset,
+					    size_t *length,
+					    libspectrum_word type,
+					    libspectrum_word id,
+					    libspectrum_dword slt_length );
 
 int libspectrum_z80_read( uchar *buffer, size_t buffer_length,
 			  libspectrum_snap *snap )
@@ -226,12 +238,117 @@ int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
     int error;
 
     error = libspectrum_z80_read_block( next_block, snap, &next_block, end );
+
+    /* If it looks like some .slt data, try and parse that. That should
+       then be the end of the file */
+    if( error == LIBSPECTRUM_ERROR_SLT ) {
+      error = libspectrum_z80_read_slt( snap, &next_block, end );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+      
+      /* If we haven't reached the end, return with error */
+      if( next_block != end ) {
+	libspectrum_print_error(
+	  "libspectrum_z80_read_blocks: .slt data does not end file\n"
+        );
+	return LIBSPECTRUM_ERROR_CORRUPT;
+      }
+
+      /* If we have reached the end, that's OK */
+      return LIBSPECTRUM_ERROR_NONE;
+    }
+
+    /* Return immediately with any other errors */
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   }
 
   return LIBSPECTRUM_ERROR_NONE;
+}
 
+static int libspectrum_z80_read_slt( libspectrum_snap *snap,
+				     uchar **next_block, uchar *end )
+{
+  size_t slt_length[256];
+  int i;
+
+  /* Zero all lengths to imply `not present' */
+  for( i=0; i<256; i++ ) slt_length[i]=0;
+
+  while( 1 ) {
+
+    int type, level;
+    long length;
+
+    /* Check we've got enough data left */
+    if( *next_block + 8 >= end ) {
+      libspectrum_print_error(
+	"libspectrum_z80_read_slt: out of data in directory\n"
+      );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+
+    type = *next_block[0] + *next_block[1] * 0x100;
+
+    /* Type of zero => end of table. But remember to skip this entry */
+    if( type == 0 ) { *next_block += 8; break; }
+
+    /* We can handle only data type 1 (level data) */
+    if( type != 1 ) {
+      libspectrum_print_error(
+        "libspectrum_z80_read_slt: unknown data type %d\n", type
+      );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+
+    level = *next_block[2] + *next_block[3] * 0x100;
+    if( level >= 0x100 ) {
+      libspectrum_print_error(
+        "libspectrum_z80_read_slt: unexpected level number %d\n", level
+      );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+
+    /* Each level should appear once only */
+    if( slt_length[ level ] ) {
+      libspectrum_print_error(
+        "libspectrum_z80_read_slt: level %d is duplicated\n", level
+      );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+
+    slt_length[ level ] = *next_block[4]             +
+                          *next_block[5] *     0x100 +
+                          *next_block[6] *   0x10000 +
+                          *next_block[7] * 0x1000000;
+
+    /* and move along to the next block */
+    *next_block += 8;
+  }
+
+  /* Read in the data for each level */
+  for( i=0; i<256; i++ ) {
+    if( slt_length[i] ) {
+
+      /* Check this data actually exists */
+      if( *next_block + slt_length[i] >= end ) {
+	libspectrum_print_error(
+          "libspectrum_z80_read_slt: out of data reading level %d\n", i
+	);
+	return LIBSPECTRUM_ERROR_CORRUPT;
+      }
+
+      int error = libspectrum_z80_uncompress_block(
+		    &(snap->slt[i]), &(snap->slt_length[i]),
+		    *next_block, slt_length[i]
+		  );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+      /* Move past this data */
+      *next_block += slt_length[i];
+    }
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
@@ -409,6 +526,16 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
 
   length2 = buffer[0] + buffer[1] * 0x100;
   (*page) = buffer[2];
+
+  if (length2 == 0 && *page == 0) {
+    if (buffer + 8 < end
+	&& !memcmp( buffer, slt_signature, strlen( slt_signature ) ) )
+    {
+      /* Ah, we have what looks like SLT data... */
+      *next_block = buffer + 6;
+      return LIBSPECTRUM_ERROR_SLT;
+    }
+  }
 
   /* A length of 0xffff => 16384 bytes of uncompressed data */ 
   if( length2 != 0xffff ) {
@@ -619,6 +746,14 @@ int libspectrum_z80_write_pages( uchar **buffer, size_t *offset,
 
   }
 
+  /* If we've got any .slt data, add that to the end of the buffer */
+  for( i=0; i<256; i++ ) {
+    if( snap->slt_length[i] ) {
+      libspectrum_z80_write_slt( buffer, offset, length, snap );
+      break;
+    }
+  }
+
   return LIBSPECTRUM_ERROR_NONE;
 
 }
@@ -669,6 +804,79 @@ int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
 
   return LIBSPECTRUM_ERROR_NONE;
 
+}
+
+static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
+				      size_t *length, libspectrum_snap *snap )
+{
+  int i;
+  uchar *ptr = *buffer + *offset;
+
+  libspectrum_error error;
+
+  /* Make room for the .slt signature */
+  error = libspectrum_make_room( buffer, (*offset) + strlen( slt_signature ),
+				 &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  memcpy( ptr, slt_signature, strlen( slt_signature ) );
+  (*offset) += 6;
+
+  /* Now write out the .slt directory */
+  for( i=0; i<256; i++ ) {
+    if( snap->slt_length[i] ) {
+      error = libspectrum_z80_write_slt_entry( buffer, offset, length,
+					       1, i, snap->slt_length[i] );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+    }
+  }
+
+  /* and the directory end marker */
+  error = libspectrum_z80_write_slt_entry( buffer, offset, length, 0, 0, 0);
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  /* Reset the current data pointer */
+  ptr = *buffer + *offset;
+
+  /* Then write the actual data */
+  for( i=0; i<256; i++ ) {
+    if( snap->slt_length[i] ) {
+      
+      /* Make room for the data */
+      error = libspectrum_make_room( buffer, (*offset) + snap->slt_length[i],
+				     &ptr, length 
+				   );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+      /* And copy it across */
+      memcpy( ptr, snap->slt[i], snap->slt_length[i] );
+    }
+  }
+
+  /* That's your lot */
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static int libspectrum_z80_write_slt_entry( uchar **buffer, size_t *offset,
+					    size_t *length,
+					    libspectrum_word type,
+					    libspectrum_word id,
+					    libspectrum_dword slt_length )
+{
+  uchar *ptr = *buffer + *offset;
+
+  libspectrum_error error;
+
+  /* We need 8 bytes of space */
+  error = libspectrum_make_room( buffer, (*offset) + 8, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  libspectrum_write_word( &ptr[0], type );
+  libspectrum_write_word( &ptr[2], id );
+  libspectrum_write_word( &ptr[4], slt_length & 0xffff );
+  libspectrum_write_word( &ptr[6], slt_length >> 16 );
+
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 int libspectrum_z80_compress_block( uchar **dest, size_t *dest_length,

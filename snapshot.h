@@ -1,5 +1,5 @@
 /* snapshot.h: snapshot handling routines
-   Copyright (c) 1999,2001 Philip Kendall
+   Copyright (c) 1999,2001-2002 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,5 +27,6 @@
 
 int snapshot_read( const char *filename );
 int snapshot_write( const char *filename );
+void snapshot_flush_slt( void );
 
 #endif

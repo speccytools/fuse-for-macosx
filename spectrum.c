@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -47,6 +47,11 @@
 BYTE **ROM;
 BYTE RAM[8][0x4000];
 DWORD tstates;
+
+/* Level data from .slt files */
+
+BYTE *slt[256];
+size_t slt_length[256];
 
 int spectrum_interrupt(void)
 {

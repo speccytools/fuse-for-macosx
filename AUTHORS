@@ -7,6 +7,8 @@ Fuse has been brought to you by:
 * Russell Marks: the generic and OSS-specific sound code, the man page
   and the Kempston joystick emulation.
 
+* Darren Salt: the original version of the SLT support code.
+
 * Philip Kendall: everything else.
 
 $Id$
