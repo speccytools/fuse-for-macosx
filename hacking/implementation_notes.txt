@@ -31,8 +31,10 @@ Z80 opcodes is also stopped to draw the lines of the Spectrum's
 screen; this produces an event of type EVENT_TYPE_LINE at the start of
 each of the 240 lines which are drawn by Fuse (the main screen and the
 24 lines in each of the top and bottom borders), starting 8936 tstates
-after the interrupt (on the 48K machine. FWIW, 8936 is 70 lines at 128
-tstates each, minus 24 for the left border).
+after the interrupt (on the 48K machine. FWIW, 8936 is 40 lines at 224
+tstates each, minus 24 for the left border; there are 64 lines of
+overscan/border after the interrupt but before the screen is
+displayed; Fuse shows the last 24 of these as the top border).
 
 TZX playback is handled in much the same way: an event (of type
 EVENT_TYPE_EDGE) is scheduled to occur whenever the signal from the
