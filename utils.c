@@ -151,7 +151,7 @@ int utils_find_lib( const char *filename )
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", DATADIR, filename );
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", FUSEDATADIR, filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 

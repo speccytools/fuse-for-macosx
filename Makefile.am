@@ -78,7 +78,7 @@ settings.h: settings-header.pl settings.dat
 	@PERL@ settings-header.pl settings.dat > settings.h
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
-@XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
+@XML_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\""
 
 noinst_HEADERS = ay.h \
 	dck.h \

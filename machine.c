@@ -413,7 +413,7 @@ int machine_find_rom( const char *filename )
   if( fd != -1 ) return fd;
 
   /* Then look where Fuse may have installed the ROMs */
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", DATADIR, filename );
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", FUSEDATADIR, filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
