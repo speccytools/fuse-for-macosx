@@ -121,6 +121,10 @@ block_free( gpointer data, gpointer user_data )
     break;
   case LIBSPECTRUM_TAPE_BLOCK_JUMP:
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
+    break;
 
   case LIBSPECTRUM_TAPE_BLOCK_SELECT:
     for( i=0; i<block->types.select.count; i++ ) {
@@ -186,6 +190,8 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_JUMP:
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
   case LIBSPECTRUM_TAPE_BLOCK_SELECT:
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
@@ -306,6 +312,20 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     error = jump_blocks( tape, block->types.jump.offset );
     if( error ) return error;
     *tstates = 0; end_of_block = 1; no_advance = 1;
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
+    tape->loop_block = tape->current_block->next;
+    tape->loop_count = block->types.loop_start.count;
+    *tstates = 0; end_of_block = 1;
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
+    if( --tape->loop_count ) {
+      tape->current_block = tape->loop_block;
+      no_advance = 1;
+    }
+    *tstates = 0; end_of_block = 1;
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
@@ -719,6 +739,12 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_JUMP:
     strncpy( buffer, "Jump Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
+    strncpy( buffer, "Loop Start Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
+    strncpy( buffer, "Loop End Block", length );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_SELECT:

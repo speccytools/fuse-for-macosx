@@ -225,6 +225,14 @@ main( int argc, char **argv )
       printf("  Offset: %d\n", block->types.jump.offset );
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_LOOP_START:
+      printf("  Count: %d\n", block->types.loop_start.count );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
+      /* Do nothing */
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_SELECT:
       select_block = &(block->types.select);
       for( i=0; i<select_block->count; i++ ) {

@@ -54,6 +54,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_END,
   LIBSPECTRUM_TAPE_BLOCK_JUMP,
+  LIBSPECTRUM_TAPE_BLOCK_LOOP_START,
+  LIBSPECTRUM_TAPE_BLOCK_LOOP_END,
 
   LIBSPECTRUM_TAPE_BLOCK_SELECT = 0x28,
 
@@ -218,6 +220,15 @@ typedef struct libspectrum_tape_jump_block {
 
 } libspectrum_tape_jump_block;
 
+/* A loop start block */
+typedef struct libspectrum_tape_loop_start_block {
+
+  int count;
+
+} libspectrum_tape_loop_start_block;
+
+/* No loop end block needed as it contains no data */
+
 /* A select block */
 typedef struct libspectrum_tape_select_block {
 
@@ -302,6 +313,8 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_group_start_block group_start;
     /* No group end block needed as it contains no data */
     libspectrum_tape_jump_block jump;
+    libspectrum_tape_loop_start_block loop_start;
+    /* No loop end block needed as it contains no data */
 
     libspectrum_tape_select_block select;
 
@@ -325,6 +338,13 @@ typedef struct libspectrum_tape {
 
   /* The current block */
   GSList* current_block;
+
+  /* Private data */
+
+  /* Where to return to after a loop, and how many iterations of the loop
+     to do */
+  GSList* loop_block;
+  size_t loop_count;
 
 } libspectrum_tape;
 
