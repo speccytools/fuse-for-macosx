@@ -373,6 +373,7 @@ int trap_check_rom( void )
     /* OK if we're in ROM 1 */
     return( machine_current->ram.current_rom == 1 );
 
+  case SPECTRUM_MACHINE_PLUS2A:
   case SPECTRUM_MACHINE_PLUS3:
     /* OK if we're not in a 64Kb RAM configuration and we're in
        ROM 3 */
