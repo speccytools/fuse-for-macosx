@@ -40,6 +40,7 @@
 
 #include <libspectrum.h>
 
+#include "compat.h"
 #include "event.h"
 #include "machine.h"
 #include "spectrum.h"
