@@ -6,12 +6,15 @@ Version: $Id$
 In order to add a new user interface (UI) to Fuse, you need to
 implement:
 
-* the functions listed in ui.h
-* the functions listed in uidisplay.h
+* the functions listed in ui/ui.h
+* the functions listed in ui/uidisplay.h
 * some form of keyboard handling.
 
 In general, all functions returning `int' should return zero on
-success and non-zero on error unless other specified.
+success and non-zero on error unless otherwise specified.
+
+As of Fuse 0.4.1, the specific code for each user interface sits in
+its own directory under the ui/ directory.
 
 ui.h
 ----

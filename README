@@ -94,6 +94,10 @@ or the latest version should be available from the World of Spectrum
 
 ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/
 
+Finally, if you're interested in working on Fuse, some documents which
+may be useful (information on internals, etc) are in the hacking/
+directory.
+
 Philip Kendall <pak21-fuse@srcf.ucam.org>
 20 December 2001
 
