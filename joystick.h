@@ -37,6 +37,15 @@ extern int joysticks_supported;
 void fuse_joystick_init( void );
 void fuse_joystick_end( void );
 
+typedef enum joystick_type_t {
+
+  JOYSTICK_TYPE_NONE = 0,
+  
+  JOYSTICK_TYPE_CURSOR,
+  JOYSTICK_TYPE_KEMPSTON,
+
+} joystick_type_t;
+
 typedef enum joystick_button {
 
   JOYSTICK_BUTTON_RIGHT,
@@ -49,7 +58,7 @@ typedef enum joystick_button {
 
 /* Called whenever the (Spectrum) joystick is moved or the fire button
    pressed */
-void joystick_press( joystick_button button, int press );
+int joystick_press( joystick_button button, int press );
 
 /* Default read function (returns data in Kempston format) */
 libspectrum_byte joystick_default_read( libspectrum_word port,

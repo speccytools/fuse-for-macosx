@@ -62,6 +62,7 @@ static int
 keypress( const input_event_key_t *event )
 {
   input_key key;
+  int swallow;
   const keysyms_key_info *ptr;
 
   key = event->key;
@@ -73,23 +74,32 @@ keypress( const input_event_key_t *event )
   }
 #endif				/* #ifdef USE_WIDGET */
 
+  swallow = 0;
+  /* Joystick emulation via QAOP<space> */
+  switch( key ) {
+
+  case INPUT_KEY_q:
+    swallow = joystick_press( JOYSTICK_BUTTON_UP   , 1 ); break;
+  case INPUT_KEY_a:
+    swallow = joystick_press( JOYSTICK_BUTTON_DOWN , 1 ); break;
+  case INPUT_KEY_o:
+    swallow = joystick_press( JOYSTICK_BUTTON_LEFT , 1 ); break;
+  case INPUT_KEY_p:
+    swallow = joystick_press( JOYSTICK_BUTTON_RIGHT, 1 ); break;
+  case INPUT_KEY_space:
+    swallow = joystick_press( JOYSTICK_BUTTON_FIRE , 1 ); break;
+
+  default: break;		/* Remove warning */
+
+  }
+
+  if( swallow ) return 0;
+
   ptr = keysyms_get_data( key );
 
   if( ptr ) {
     keyboard_press( ptr->key1 );
     keyboard_press( ptr->key2 );
-  }
-
-  /* Joystick emulation via QAOP<space> */
-  switch( key ) {
-
-  case INPUT_KEY_q:     joystick_press( JOYSTICK_BUTTON_UP   , 1 ); break;
-  case INPUT_KEY_a:     joystick_press( JOYSTICK_BUTTON_DOWN , 1 ); break;
-  case INPUT_KEY_o:     joystick_press( JOYSTICK_BUTTON_LEFT , 1 ); break;
-  case INPUT_KEY_p:     joystick_press( JOYSTICK_BUTTON_RIGHT, 1 ); break;
-  case INPUT_KEY_space: joystick_press( JOYSTICK_BUTTON_FIRE , 1 ); break;
-
-  default: break;		/* Remove warning */
   }
 
 #ifdef USE_WIDGET

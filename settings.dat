@@ -55,6 +55,7 @@ stereo_ay, boolean, 0,, separation
 stereo_beeper, boolean, 0,, beeper-stereo
 
 joystick_1, string, NULL, 'j'
+joystick_1_output, numeric, 0
 joystick_2, string, NULL
 
 rzx_compression, boolean, 0,, compress-rzx

@@ -33,6 +33,7 @@
 #include "joystick.h"
 #include "keyboard.h"
 #include "periph.h"
+#include "settings.h"
 #include "spectrum.h"
 #include "machine.h"
 #include "ui/ui.h"
@@ -43,6 +44,13 @@ int joysticks_supported = 0;
 
 /* The current state of the emulated Kempston joystick */
 static libspectrum_byte joystick_value;
+
+/* Bits used by the Kempston joystick */
+static const libspectrum_byte KEMPSTON_MASK_RIGHT = 0x01;
+static const libspectrum_byte KEMPSTON_MASK_LEFT  = 0x02;
+static const libspectrum_byte KEMPSTON_MASK_DOWN  = 0x04;
+static const libspectrum_byte KEMPSTON_MASK_UP    = 0x08;
+static const libspectrum_byte KEMPSTON_MASK_FIRE  = 0x10;
 
 /* Init/shutdown functions. Errors aren't important here */
 
@@ -59,30 +67,60 @@ fuse_joystick_end (void)
   ui_joystick_end();
 }
 
-void
+int
 joystick_press( joystick_button button, int press )
 {
+  keyboard_key_name key;
   libspectrum_byte mask;
 
-  mask = 0x00;			/* Avoid warning */
+  switch( settings_current.joystick_1_output ) {
 
-  switch( button ) {
-  case JOYSTICK_BUTTON_RIGHT: mask = 0x01; break;
-  case JOYSTICK_BUTTON_LEFT:  mask = 0x02; break;
-  case JOYSTICK_BUTTON_DOWN:  mask = 0x04; break;
-  case JOYSTICK_BUTTON_UP:    mask = 0x08; break;
-  case JOYSTICK_BUTTON_FIRE:  mask = 0x10; break;
+  case JOYSTICK_TYPE_CURSOR:
+    key = KEYBOARD_NONE;	/* Avoid warning */
 
-  default:
-    ui_error( UI_ERROR_ERROR, "Unknown joystick button %d", button );
-    fuse_abort();
+    switch( button ) {
+    case JOYSTICK_BUTTON_UP:    key = KEYBOARD_7; break;
+    case JOYSTICK_BUTTON_DOWN:  key = KEYBOARD_6; break;
+    case JOYSTICK_BUTTON_LEFT:  key = KEYBOARD_5; break;
+    case JOYSTICK_BUTTON_RIGHT: key = KEYBOARD_8; break;
+    case JOYSTICK_BUTTON_FIRE:  key = KEYBOARD_0; break;
+    }
+
+    if( press ) {
+      keyboard_press( key );
+    } else {
+      keyboard_release( key );
+    }
+
+    return 1;
+
+  case JOYSTICK_TYPE_KEMPSTON:
+    mask = 0x00;		/* Avoid warning */
+
+    switch( button ) {
+    case JOYSTICK_BUTTON_UP:    mask = KEMPSTON_MASK_UP; break;
+    case JOYSTICK_BUTTON_DOWN:  mask = KEMPSTON_MASK_DOWN; break;
+    case JOYSTICK_BUTTON_LEFT:  mask = KEMPSTON_MASK_LEFT; break;
+    case JOYSTICK_BUTTON_RIGHT: mask = KEMPSTON_MASK_RIGHT; break;
+    case JOYSTICK_BUTTON_FIRE:  mask = KEMPSTON_MASK_FIRE; break;
+    }
+
+    if( press ) {
+      joystick_value |=  mask;
+    } else {
+      joystick_value &= ~mask;
+    }
+
+    return 1;
+
+  case JOYSTICK_TYPE_NONE: return 0;
   }
 
-  if( press ) {
-    joystick_value |=  mask;
-  } else {
-    joystick_value &= ~mask;
-  }
+  ui_error( UI_ERROR_ERROR, "Unknown joystick type %d",
+	    settings_current.joystick_1_output );
+  fuse_abort();
+
+  return 0;			/* Avoid warning */
 }
 
 libspectrum_byte

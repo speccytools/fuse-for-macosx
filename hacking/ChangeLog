@@ -653,3 +653,6 @@
 	 'Even M1' capability.
 20040322 input.c,joystick.[ch]: convert the QAOP<space> joystick emulation
 	 over to using the new input layer.
+20040323 input.c,joystick.[ch],settings.dat,ui/gtk/{gtkinternal.h,
+	 gtkjoystick.c,gtkui.c}: first bits of code allowing emulation of
+	 multiple joystick types.
