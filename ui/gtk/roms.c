@@ -95,6 +95,9 @@ gtkui_roms( GtkWidget *widget, gpointer data )
   gtk_widget_add_accelerator( cancel_button, "clicked",
 			      accel_group, GDK_Escape, 0, 0);
 
+  /* Users shouldn't be able to resize this window */
+  gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
+
   /* Set the window to be modal and display it */
   gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
   gtk_widget_show_all( dialog );
