@@ -297,8 +297,7 @@ if test "$stick" = yes; then
   dnl We prefer to use UI-specific joystick code. (Default.)
   dnl If there is none, or you override this here, we use libjsw.
   dnl (svgalib appears to dislike switched joysticks on the parallel port...)
-  AC_DEFINE(USE_JOYSTICK)
-  case "$ui" in
+  case "$UI" in
     svga)
       dnl Libraries such as svgalib provide their own joystick code.
       AC_MSG_CHECKING([whether to use $UI's joystick support])
@@ -310,6 +309,7 @@ if test "$stick" = yes; then
 	AC_MSG_RESULT([no, use libjsw])
       else
 	AC_MSG_RESULT(yes)
+	AC_DEFINE(USE_JOYSTICK)
       fi
       ;;
     *)
@@ -320,7 +320,7 @@ if test "$stick" = yes; then
   if test "$libjsw" = yes; then
     dnl Look for libjsw. If missing, use QAOP<space>.
     AC_CHECK_HEADERS(jsw.h,
-                     LIBS="$LIBS -ljsw",
+                     LIBS="$LIBS -ljsw" AC_DEFINE(USE_JOYSTICK),
                      AC_MSG_WARN(jsw.h not found - joystick support disabled))
   fi
 fi

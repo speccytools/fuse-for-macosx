@@ -251,3 +251,5 @@
 	 in the config file.
 20031008 fuse.c, utils.c: partial cleanup of the startup code: there is
 	 now only one place at which each type of file is opened.
+20031008 configure.in: correct joystick code detection if libjsw not
+	 present.
