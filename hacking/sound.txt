@@ -15,8 +15,8 @@ void sound_lowlevel_end( void );
 
 Close down the sound card etc.
 
-void sound_lowlevel_frame( unsigned char *data, int len );
+void sound_lowlevel_frame( libspectrum_signed_word *data, int len );
 
-Write the 'len' bytes of sound data in 'data' to the sound hardware.
+Write the 'len' 16-bit items of sound data in 'data' to the sound hardware.
 
 $Id$

@@ -91,13 +91,16 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 	}
 
 	AUDIO_INITINFO(&ai);
-
-	ai.play.encoding = AUDIO_ENCODING_LINEAR8;
-	ai.play.precision = 8;
-	if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
-		/* try 16-bit, may be a 16-bit only device */
-		ai.play.encoding = AUDIO_ENCODING_LINEAR;
-		ai.play.precision = 16;
+	
+	ai.play.encoding = AUDIO_ENCODING_LINEAR;	
+	ai.play.precision = 16;
+	sixteenbit = 1;
+	if (settings_current.sound_force_8bit ||
+	    ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+		/* try 8-bit */
+		ai.play.encoding = AUDIO_ENCODING_LINEAR8;
+		ai.play.precision = 8;
+		sixteenbit = 0;
 		if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
 			settings_current.sound = 0;
 		        ui_error( UI_ERROR_ERROR,
@@ -106,7 +109,6 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 			close(soundfd);
 			return 1;
 		}
-		sixteenbit = 1;
 	}
 
 	ai.play.channels = *stereoptr ? 2 : 1;
@@ -176,38 +178,33 @@ sound_lowlevel_end( void )
 }
 
 void
-sound_lowlevel_frame(data, len)
-	unsigned char *data;
-	int len;
+sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
-	unsigned char buf16[8192];
+	static unsigned char buf8[4096];
+	unsigned char *data8=(unsigned char *)data;
 	int ret=0, ofs=0;
 
-	if (sixteenbit) {
-		unsigned char *src, *dst;
+	len <<= 1;		/* now in bytes */
+
+	if (!sixteenbit) {
+		libspectrum_signed_word *src;
+		unsigned char *dst;
 		int f;
 
-		src = data;
-		dst = buf16;
-		for (f = 0; f < len; f++) {
-#ifdef WORDS_BIGENDIAN
-		        *dst++ = *src++ - 128;
-		        *dst++ = 128;
-#else			/* #ifdef WORDS_BIGENDIAN */
-			*dst++ = 128;
-			*dst++ = *src++ - 128;
-#endif			/* #ifdef WORDS_BIGENDIAN */
-		}
+		src = data; dst = buf8;
+		len >>= 1;
+		for (f=0; f < len; f++)
+			*dst++ = 128 + (int)((*src++)/256);
 
-		data = buf16;
-		len <<= 1;
-	}
+		data8 = buf8;
+	}	
 
 	while (len) {
-		if ((ret = write(soundfd, data + ofs, len)) == -1)
-			break;
-		ofs += ret;
-		len -= ret;
+		ret = write (soundfd, data8 + ofs, len);
+		if (ret > 0) {
+			ofs += ret;
+			len -= ret;
+		}
 	}
 }
 

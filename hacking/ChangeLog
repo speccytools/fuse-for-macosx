@@ -962,3 +962,5 @@
 	 <libgen.h> before #including it (thanks, Marek).
 20040702 ui/gtk/debugger.c: add column headings to the memory map pane.
 20040702 man/fuse.1: debugger docs update.
+20040702 hacking/sound.txt,sound/sunsound.c: fix up for 16 bit sound
+	 (compiles, but untested).
