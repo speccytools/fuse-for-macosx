@@ -147,6 +147,7 @@ create_dialog( void )
   for( i = 0; i < 15; i++ ) {
 
     label = gtk_label_new( register_name[i] );
+    gtk_widget_set_style( label, style );
     gtk_table_attach_defaults( GTK_TABLE( table ), label,
 			       2*(i%2),   2*(i%2)+1, i/2, i/2+1 );
 
@@ -157,16 +158,15 @@ create_dialog( void )
 
   }
 
+  /* Interrupt mode */
   registers[15] = gtk_label_new( "" );
+  gtk_widget_set_style( registers[15], style );
   gtk_table_attach_defaults( GTK_TABLE( table ), registers[15], 2, 4, 7, 8 );
 
-  label = gtk_label_new( "SZ5H3PNC" );
-  gtk_widget_set_style( label, style );
-  gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 2, 8, 9 );
-
+  /* Flags */
   registers[16] = gtk_label_new( "" );
-  gtk_widget_set_style( label, style );
-  gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 2, 9, 10 );
+  gtk_widget_set_style( registers[16], style );
+  gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 2, 8, 9 );
 
   /* The breakpoint CList */
   breakpoints = gtk_clist_new_with_titles( 5, breakpoint_titles );
@@ -294,8 +294,9 @@ ui_debugger_update( void )
   snprintf( buffer, 80, "IM %d", IM );
   gtk_label_set_text( GTK_LABEL( registers[15] ), buffer );
 
-  for( i = 0; i < 8; i++ ) buffer[i] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
-  buffer[8] = '\0';
+  strcpy( buffer, "SZ5H3PNC\n" );
+  for( i = 0; i < 8; i++ ) buffer[i+9] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
+  buffer[17] = '\0';
   gtk_label_set_text( GTK_LABEL( registers[16] ), buffer );
 
   /* Create the breakpoint list */
