@@ -135,6 +135,9 @@ static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data );
 static void gtkui_disk_open( specplus3_drive_number drive );
 #endif				/* #ifdef HAVE_765_H */
 
+static void cartridge_insert( GtkWidget *widget, gpointer data );
+static void cartridge_eject( GtkWidget *widget, gpointer data );
+
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
@@ -194,6 +197,10 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Disk/Drive B:/_Insert...",NULL , gtkui_disk_open_b,   0, NULL          },
   { "/Disk/Drive B:/_Eject",    NULL , gtkui_disk_eject_b,  0, NULL          },
 #endif				/* #ifdef HAVE_765_H */
+
+  { "/Cartridge",		NULL , NULL,		    0, "<Branch>"    },
+  { "/Cartridge/_Insert...",	NULL , cartridge_insert,    0, NULL          },
+  { "/Cartridge/_Eject...",	NULL , cartridge_eject,     0, NULL          },
 
   { "/Help",			NULL , NULL,		    0, "<Branch>"    },
   { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },
@@ -946,6 +953,31 @@ gtkui_disk_eject_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 }
 
 #endif			/* #ifdef HAVE_765_H */
+
+/* Cartridge/Insert */
+static void
+cartridge_insert( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = gtkui_fileselector_get_filename( "Fuse - Insert Cartridge" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  dck_insert( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+/* Cartridge/Eject */
+static void
+cartridge_eject( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  dck_eject();
+}
 
 static void
 gtkui_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
