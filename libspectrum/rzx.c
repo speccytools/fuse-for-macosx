@@ -587,6 +587,7 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
   libspectrum_error error;
   size_t i, size;
   size_t length_offset, data_offset, flags_offset;
+  libspectrum_byte *length_ptr; 
 
   error = libspectrum_make_room( buffer, 18, ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
@@ -599,13 +600,14 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
   /* Block ID */
   *(*ptr)++ = 0x80;
 
-  /* The length bytes: for uncompressed data, 18 for the block introduction,
-     4 per frame, plus the number bytes in every frame. If compression is
-     requested (and makes the data shorter), this will be overwritten below */
+  /* The length bytes: for uncompressed data, 18 for the block introduction
+     and 4 per frame; the number of bytes in every frame is added in below.
+     If compression is requested (and makes the data shorter), this will be
+     overwritten with the compressed length */
   size = 18 + 4 * rzx->count;
-  for( i=0; i<rzx->count; i++ ) size += rzx->frames[i].count;
-  length_offset = *ptr - *buffer;
-  libspectrum_write_dword( ptr, size );
+
+  /* Store where the length will be written, and skip over those byes */
+  length_offset = *ptr - *buffer; (*ptr) += 4;
 
   /* How many frames? */
   libspectrum_write_dword( ptr, rzx->count );
@@ -633,9 +635,19 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
     }
 
     libspectrum_write_word( ptr, frame->instructions );
-    libspectrum_write_word( ptr, frame->count );
-    memcpy( *ptr, frame->in_bytes, frame->count ); (*ptr) += frame->count;
+
+    if( frame->repeat_last ) {
+      libspectrum_write_word( ptr, libspectrum_rzx_repeat_frame );
+    } else {
+      libspectrum_write_word( ptr, frame->count );
+      memcpy( *ptr, frame->in_bytes, frame->count ); (*ptr) += frame->count;
+      size += frame->count;			/* Keep track of the size */
+    }
   }
+
+  /* Write the length in */
+  length_ptr = *buffer + length_offset;
+  libspectrum_write_dword( &length_ptr, size );
 
   if( compress ) {
 
@@ -643,8 +655,7 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
 
     /* Compress the data the simple way. Really, we should stream the data */
     libspectrum_byte *gzsnap = NULL; size_t gzlength;
-    libspectrum_byte *length_ptr = *buffer + length_offset;
-    libspectrum_byte *data_ptr   = *buffer + data_offset;
+    libspectrum_byte *data_ptr = *buffer + data_offset;
 
     error = libspectrum_zlib_compress( data_ptr, *ptr - data_ptr,
 				       &gzsnap, &gzlength );

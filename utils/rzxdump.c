@@ -270,6 +270,11 @@ read_input_block( unsigned char **ptr, unsigned char *end )
       printf( "  Instruction count: %d\n", read_word( ptr ) );
 
       count = read_word( ptr );
+      if( count == 0xffff ) {
+	printf( "  (Repeat last frame's INs)\n" );
+	continue;
+      }
+
       printf( "  IN count: %d\n", count );
 
       if( end - *ptr < count ) {
