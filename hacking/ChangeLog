@@ -320,3 +320,5 @@
 	 if argv[0] is a full path.
 20031030 Merge machine_find_rom and utils_find_lib into one
 	 utils_find_auxiliary_file routine.
+20031030 ui/ui.h, ui/gtk/gtkui.c, ui/gtk/statusbar.c: add 'pause'
+	 functionality.

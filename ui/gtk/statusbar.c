@@ -33,11 +33,9 @@
 #include "gtkinternals.h"
 #include "ui/ui.h"
 
-/* Is the disk motor running? */
-GtkWidget *disk_status;
-
-/* Is the tape running? */
-GtkWidget *tape_status;
+GtkWidget *disk_status,	/* Is the disk motor running? */
+  *pause_status,	/* Is emulation paused (via the menu option)? */
+  *tape_status;		/* Is the tape running? */
 
 int
 gtkstatusbar_create( GtkBox *parent )
@@ -49,6 +47,9 @@ gtkstatusbar_create( GtkBox *parent )
 
   disk_status = gtk_label_new( "Disk: N/A" );
   gtk_box_pack_start_defaults( GTK_BOX( status_bar ), disk_status );
+
+  pause_status = gtk_label_new( "Paused: 0" );
+  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), pause_status );
 
   tape_status = gtk_label_new( "Tape: 0" );
   gtk_box_pack_start_defaults( GTK_BOX( status_bar ), tape_status );
@@ -70,6 +71,13 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
     default:
       gtk_label_set( GTK_LABEL( disk_status ), "Disk: 0" ); break;
     }      
+    return 0;
+
+  case UI_STATUSBAR_ITEM_PAUSED:
+    gtk_label_set(
+      GTK_LABEL( pause_status ),
+      state == UI_STATUSBAR_STATE_ACTIVE ? "Paused: 1" : "Paused: 0"
+    );
     return 0;
 
   case UI_STATUSBAR_ITEM_TAPE:

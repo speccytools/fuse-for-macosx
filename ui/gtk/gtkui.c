@@ -78,6 +78,9 @@ GtkItemFactory *menu_factory;
 /* And that used to create the popup menus */
 GtkItemFactory *popup_factory;
 
+/* True if we were paused via the Machine/Pause menu item */
+static int paused = 0;
+
 /* Structure used by the radio button selection widgets (the graphics
    filter selectors and Machine/Select) */
 typedef struct gtkui_select_info {
@@ -125,6 +128,7 @@ static void select_filter_done( GtkWidget *widget, gpointer user_data );
 static void save_options( GtkWidget *widget, gpointer data );
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
+static void gtkui_pause( GtkWidget *widget, gpointer data );
 static void gtkui_reset(GtkWidget *widget, gpointer data);
 
 static void gtkui_select(GtkWidget *widget, gpointer data);
@@ -198,10 +202,11 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
   { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
+  { "/Machine/_Pause...",       "Pause", gtkui_pause,	    0, NULL          },
   { "/Machine/_Reset...",       "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
   { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
-  { "/Machine/_Poke Finder...",	NULL , gtkui_pokefinder,    0, NULL	     },
+  { "/Machine/P_oke Finder...",	NULL , gtkui_pokefinder,    0, NULL	     },
   { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
 
   { "/Media",			NULL , NULL,                0, "<Branch>"    },
@@ -643,7 +648,13 @@ gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  if( gtkui_confirm( "Exit Fuse?" ) ) fuse_exiting = 1;
+  if( gtkui_confirm( "Exit Fuse?" ) ) {
+    fuse_exiting = 1;
+
+    /* Stop the paused state to allow us to exit (occurs from main
+       emulation loop) */
+    if( paused ) gtkui_pause( NULL, NULL );
+  }
 }
 
 /* Called by the menu when Options/Filter selected */
@@ -789,6 +800,23 @@ save_options( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 }
 #endif				/* #ifdef HAVE_LIB_XML2 */
 
+/* Machine/Pause */
+static void
+gtkui_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  if( paused ) {
+    paused = 0;
+    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
+			 UI_STATUSBAR_STATE_INACTIVE );
+    gtk_main_quit();
+  } else {
+    paused = 1;
+    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
+    gtk_main();
+  }
+
+}
+
 /* Called by the menu when Machine/Reset selected */
 static void
 gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
@@ -910,6 +938,7 @@ static void
 gtkui_break( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
+  if( paused ) ui_debugger_activate();
 }
 
 /* Machine/NMI */
