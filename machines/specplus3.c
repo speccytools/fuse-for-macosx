@@ -80,6 +80,9 @@ void specplus3_fdc_error( int debug, char *format, va_list ap );
    a copy of the emulated disk */
 static const char *dsk_template = "fuse.dsk.XXXXXX";
 
+/* The filename used for the +3 disk autoload snap */
+static const char *disk_autoload_snap = "disk_plus3.szx";
+
 #endif			/* #ifdef HAVE_765_H */
 
 static int specplus3_reset( void );
@@ -550,21 +553,21 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
   if( autoload ) {
     int fd; utils_file snap;
 
-    fd = utils_find_auxiliary_file( "disk_plus3.z80", UTILS_AUXILIARY_LIB );
+    fd = utils_find_auxiliary_file( disk_autoload_snap, UTILS_AUXILIARY_LIB );
     if( fd == -1 ) {
       ui_error( UI_ERROR_ERROR, "Couldn't find +3 disk autoload snap" );
       return 1;
     }
 
-    error = utils_read_fd( fd, "disk_plus3.z80", &snap );
+    error = utils_read_fd( fd, disk_autoload_snap, &snap );
     if( error ) { utils_close_file( &snap ); return error; }
 
     error = snapshot_read_buffer( snap.buffer, snap.length,
-                                  LIBSPECTRUM_ID_SNAPSHOT_Z80 );
+                                  LIBSPECTRUM_ID_SNAPSHOT_SZX );
     if( error ) { utils_close_file( &snap ); return error; }
 
     if( utils_close_file( &snap ) ) {
-      ui_error( UI_ERROR_ERROR, "Couldn't munmap 'disk_plus3.z80': %s",
+      ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", disk_autoload_snap,
                 strerror( errno ) );
       return 1;
     }
