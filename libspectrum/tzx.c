@@ -65,6 +65,33 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 static libspectrum_error
 tzx_write_rom( libspectrum_tape_rom_block *rom_block,
 	       libspectrum_byte **buffer, size_t *offset, size_t *length );
+static libspectrum_error
+tzx_write_turbo( libspectrum_tape_turbo_block *rom_block,
+		 libspectrum_byte **buffer, size_t *offset, size_t *length );
+static libspectrum_error
+tzx_write_pure_tone( libspectrum_tape_pure_tone_block *tone_block,
+		     libspectrum_byte **buffer, size_t *offset,
+		     size_t *length );
+static libspectrum_error
+tzx_write_data( libspectrum_tape_pure_data_block *data_block,
+		libspectrum_byte **buffer, size_t *offset, size_t *length );
+static libspectrum_error
+tzx_write_pulses( libspectrum_tape_pulses_block *pulses_block,
+		  libspectrum_byte **buffer, size_t *offset, size_t *length );
+static libspectrum_error
+tzx_write_pause( libspectrum_tape_pause_block *pause_block,
+		 libspectrum_byte **buffer, size_t *offset, size_t *length );
+static libspectrum_error
+tzx_write_group_start( libspectrum_tape_group_start_block *start_block,
+		       libspectrum_byte **buffer, size_t *offset,
+		       size_t *length );
+static libspectrum_error
+tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
+		     size_t *length );
+static libspectrum_error
+tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
+			libspectrum_byte **buffer, size_t *offset,
+			size_t *length );
 
 /*** Function definitions ***/
 
@@ -605,6 +632,45 @@ libspectrum_tzx_write( libspectrum_tape *tape,
       error = tzx_write_rom( &(block->types.rom), buffer, &offset, length );
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
       break;
+    case LIBSPECTRUM_TAPE_BLOCK_TURBO:
+      error = tzx_write_turbo( &(block->types.turbo), buffer, &offset, length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+      error = tzx_write_pure_tone( &(block->types.pure_tone), buffer, &offset,
+				   length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+      error = tzx_write_pulses( &(block->types.pulses), buffer, &offset,
+				length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+      error = tzx_write_data( &(block->types.pure_data), buffer, &offset,
+			      length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+      error = tzx_write_pause( &(block->types.pause), buffer, &offset, length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+      error = tzx_write_group_start( &(block->types.group_start), buffer,
+				     &offset, length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+      error = tzx_write_group_end( buffer, &offset, length );
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+      error = tzx_write_archive_info( &(block->types.archive_info),
+				      buffer, &offset, length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
 
     default:
       free( *buffer );
@@ -640,6 +706,226 @@ tzx_write_rom( libspectrum_tape_rom_block *rom_block,
 
   /* And update our offset */
   (*offset) += 5 + rom_block->length;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_turbo( libspectrum_tape_turbo_block *turbo_block,
+		 libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte, the metadata and the actual data */
+  error = libspectrum_make_room( buffer, (*offset) + 19 + turbo_block->length,
+				 &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  /* Write the ID byte and the metadata */
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_TURBO;
+  libspectrum_write_word( ptr, turbo_block->pilot_length ); ptr += 2;
+  libspectrum_write_word( ptr, turbo_block->sync1_length ); ptr += 2;
+  libspectrum_write_word( ptr, turbo_block->sync2_length ); ptr += 2;
+  libspectrum_write_word( ptr, turbo_block->bit0_length  ); ptr += 2;
+  libspectrum_write_word( ptr, turbo_block->bit1_length  ); ptr += 2;
+  libspectrum_write_word( ptr, turbo_block->pilot_pulses ); ptr += 2;
+  *ptr++ = turbo_block->bits_in_last_byte;
+  libspectrum_write_word( ptr, turbo_block->pause        ); ptr += 2;
+  *ptr++ =   turbo_block->length & 0x0000ff;
+  *ptr++ = ( turbo_block->length & 0x00ff00 ) >> 8;
+  *ptr++ = ( turbo_block->length & 0xff0000 ) >> 16;
+
+  /* Copy the data across */
+  memcpy( ptr, turbo_block->data, turbo_block->length );
+  ptr += turbo_block->length;
+
+  /* And update our offset */
+  (*offset) += 19 + turbo_block->length;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_pure_tone( libspectrum_tape_pure_tone_block *tone_block,
+		     libspectrum_byte **buffer, size_t *offset,
+		     size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte and the data */
+  error = libspectrum_make_room( buffer, (*offset) + 5, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_PURE_TONE;
+  libspectrum_write_word( ptr, tone_block->length ); ptr += 2;
+  libspectrum_write_word( ptr, tone_block->pulses ); ptr += 2;
+  
+  (*offset) += 5;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_pulses( libspectrum_tape_pulses_block *pulses_block,
+		  libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  size_t i;
+
+  /* ID byte, count and 2 bytes for length of each pulse */
+  size_t block_length = 2 + 2 * pulses_block->count;
+
+  /* Make room for the ID byte, the count and the data */
+  error = libspectrum_make_room( buffer, (*offset) + block_length, &ptr,
+				 length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_PULSES;
+  *ptr++ = pulses_block->count;
+  for( i=0; i<pulses_block->count; i++ ) {
+    libspectrum_write_word( ptr, pulses_block->lengths[i] ); ptr += 2;
+  }
+  
+  (*offset) += block_length;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_data( libspectrum_tape_pure_data_block *data_block,
+		libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte, the metadata and the actual data */
+  error = libspectrum_make_room( buffer, (*offset) + 11 + data_block->length,
+				 &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  /* Write the ID byte and the metadata */
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_PURE_DATA;
+  libspectrum_write_word( ptr, data_block->bit0_length  ); ptr += 2;
+  libspectrum_write_word( ptr, data_block->bit1_length  ); ptr += 2;
+  *ptr++ = data_block->bits_in_last_byte;
+  libspectrum_write_word( ptr, data_block->pause        ); ptr += 2;
+  *ptr++ =   data_block->length & 0x0000ff;
+  *ptr++ = ( data_block->length & 0x00ff00 ) >> 8;
+  *ptr++ = ( data_block->length & 0xff0000 ) >> 16;
+
+  /* Copy the data across */
+  memcpy( ptr, data_block->data, data_block->length );
+  ptr += data_block->length;
+
+  /* And update our offset */
+  (*offset) += 11 + data_block->length;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_pause( libspectrum_tape_pause_block *pause_block,
+		 libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte and the data */
+  error = libspectrum_make_room( buffer, (*offset) + 3, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_PAUSE;
+  libspectrum_write_word( ptr, pause_block->length ); ptr += 2;
+  
+  (*offset) += 3;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_group_start( libspectrum_tape_group_start_block *start_block,
+		       libspectrum_byte **buffer, size_t *offset,
+		       size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  size_t name_length = strlen( start_block->name );
+
+  /* Make room for the ID byte, the length byte and the name */
+  error = libspectrum_make_room( buffer, (*offset) + 2 + name_length, &ptr,
+				 length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_GROUP_START;
+  *ptr++ = name_length;
+  memcpy( ptr, start_block->name, name_length ); ptr += name_length;
+
+  (*offset) += 2 + name_length;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
+		     size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  /* Make room for the ID byte */
+  error = libspectrum_make_room( buffer, (*offset) + 1, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_GROUP_END;
+
+  (*offset)++;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
+			libspectrum_byte **buffer, size_t *offset,
+			size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  size_t i, total_length;
+
+  /* ID byte, 1 count byte, 2 bytes (ID and length) for
+     every string */
+  total_length = 2 + 2 * info_block->count;
+  /* And then the length of all the strings */
+  for( i=0; i<info_block->count; i++ )
+    total_length += strlen( info_block->strings[i] );
+
+  /* Make room for all that, and two bytes storing the length */
+  error = libspectrum_make_room( buffer, (*offset) + total_length + 2,
+				 &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  /* Write out the metadata */
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO;
+  libspectrum_write_word( ptr, total_length ); ptr += 2;
+  *ptr++ = info_block->count;
+
+  /* And the strings */
+  for( i=0; i<info_block->count; i++ ) {
+    size_t string_length = strlen( info_block->strings[i] );
+
+    *ptr++ = info_block->ids[i];
+    *ptr++ = string_length;
+    memcpy( ptr, info_block->strings[i], string_length ); ptr += string_length;
+  }
+
+  /* Update offset and return */
+  (*offset) += total_length + 2;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
