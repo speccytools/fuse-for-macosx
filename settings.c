@@ -200,7 +200,7 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
 	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"svgamode" ) ) {
       settings->svga_mode =
-	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"tapefile" ) ) {
       settings->tape_file =
 	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
