@@ -1010,9 +1010,9 @@ sub opcode_shift (@) {
 	libspectrum_word tempaddr; libspectrum_byte opcode3;
 	contend( PC, 3 );
 	tempaddr =
-	    REGISTER + (libspectrum_signed_byte)readbyte_internal( PC++ );
-	contend( PC, 4 );
-	opcode3 = readbyte_internal( PC++ );
+	    REGISTER + (libspectrum_signed_byte)readbyte_internal( PC );
+	PC++; contend( PC, 4 );
+	opcode3 = readbyte_internal( PC ); PC++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode3) {
 #include "z80_ddfdcb.c"
@@ -1027,7 +1027,7 @@ shift
       {
 	libspectrum_byte opcode2;
 	contend( PC, 4 );
-	opcode2 = readbyte_internal( PC++ );
+	opcode2 = readbyte_internal( PC ); PC++;
 	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {

@@ -67,12 +67,6 @@ readbyte( libspectrum_word address )
   return memory_map[ bank ][ address & 0x1fff ];
 }
 
-libspectrum_byte
-readbyte_internal( libspectrum_word address )
-{
-  return memory_map[ address >> 13 ][ address & 0x1fff ];
-}
-
 void
 writebyte( libspectrum_word address, libspectrum_byte b )
 {

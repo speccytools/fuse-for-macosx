@@ -34,7 +34,9 @@ extern libspectrum_byte *memory_screen_chunk1, *memory_screen_chunk2;
 extern libspectrum_word memory_screen_top;
 
 libspectrum_byte readbyte( libspectrum_word address );
-libspectrum_byte readbyte_internal( libspectrum_word address );
+
+#define readbyte_internal( address ) \
+  memory_map[ (address) >> 13 ][ (address) & 0x1fff ]
 
 void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );

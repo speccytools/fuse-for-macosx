@@ -92,7 +92,7 @@ void z80_do_opcodes()
     /* Do the instruction fetch; readbyte_internal used here to avoid
        triggering read breakpoints */
     contend( PC, 4 ); R++;
-    opcode = readbyte_internal( PC++ );
+    opcode = readbyte_internal( PC ); PC++;
 
     switch(opcode) {
 #include "opcodes_base.c"

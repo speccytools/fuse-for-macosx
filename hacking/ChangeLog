@@ -354,3 +354,5 @@
 20031113 printer.c: readbyte() should be readbyte_internal().
 20031114 Make the memory access routines both simpler and more flexible.
 	 TODO: TC2068 routines.
+20031114 memory.[ch], z80/z80.pl, z80/z80_ops.c: macroise
+         readbyte_internal().
