@@ -188,8 +188,6 @@ static int fuse_init(int argc, char **argv)
   fuse_joystick_init ();
   fuse_keyboard_init();
 
-  if( tape_init() ) return 1;
-
 #ifdef USE_WIDGET
   if( widget_init() ) return 1;
 #endif				/* #ifdef USE_WIDGET */
@@ -249,6 +247,8 @@ static int fuse_init(int argc, char **argv)
 
   error = machine_init_machines();
   if( error ) return error;
+
+  error = tape_init(); if( error ) return error;
 
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
