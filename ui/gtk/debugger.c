@@ -78,6 +78,7 @@ create_dialog( void )
 {
   size_t i;
   GtkWidget *step_button, *close_button, *table, *label;
+  GtkAccelGroup *accel_group;
 
   const char *register_name[] = { "PC", "SP",
 				  "AF", "AF'",
@@ -135,8 +136,10 @@ create_dialog( void )
 		      (gpointer) NULL );
 
   /* Esc `cancels' the selector by just continuing with emulation */
-  gtk_widget_add_accelerator( close_button, "clicked",
-                              gtk_accel_group_get_default(),
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
+
+  gtk_widget_add_accelerator( close_button, "clicked", accel_group,
                               GDK_Escape, 0, 0 );
 
   dialog_created = 1;

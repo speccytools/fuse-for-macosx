@@ -788,7 +788,7 @@ static void
 gtkui_fileselector_done( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
-  char *filename;
+  const char *filename;
 
   filename =
     gtk_file_selection_get_filename( GTK_FILE_SELECTION( ptr->selector ) );
