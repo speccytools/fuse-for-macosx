@@ -31,6 +31,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <libspectrum.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
