@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
@@ -82,7 +83,7 @@ static int settings_command_line( int argc, char **argv,
       int has_arg;
       int *flag;
       int val;
-    }
+    };
 
 #endif				/* #ifndef HAVE_GETOPT_LONG */
 
