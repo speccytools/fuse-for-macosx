@@ -174,7 +174,7 @@ roms_done( GtkButton *button GCC_UNUSED, gpointer data )
   size_t i;
   int error;
   
-  char *string, **setting;
+  char **setting; const char *string;
 
   struct callback_info *info = data;
 

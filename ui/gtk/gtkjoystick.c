@@ -152,7 +152,7 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
 
   for( i = 0; i < 10; i++ )
     if( info.button[i].setting ) {
-      snprintf( buffer, 80, "Button %d", i + 1 );
+      snprintf( buffer, 80, "Button %lu", (unsigned long)i + 1 );
       create_fire_button_selector( buffer, &( info.button[i] ),
 				   GTK_BOX( vbox ) );
     }

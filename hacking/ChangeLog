@@ -921,3 +921,4 @@
 20040610 ui/gtk/gtkjoystick.c: improve user interface a bit.
 20040611 settings.dat,ui/gtk/gtkjoystick.c: allow up to 10 buttons per
 	 joystick, and improve user interface for changing these.
+20040611 ui/gtk/{gtkjoystick.c,roms.c}: remove a couple of warnings.
