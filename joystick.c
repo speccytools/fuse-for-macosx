@@ -52,6 +52,8 @@ static const libspectrum_byte KEMPSTON_MASK_DOWN  = 0x04;
 static const libspectrum_byte KEMPSTON_MASK_UP    = 0x08;
 static const libspectrum_byte KEMPSTON_MASK_FIRE  = 0x10;
 
+char *joystick_name[ JOYSTICK_TYPE_COUNT ] = { "None", "Cursor", "Kempston" };
+
 /* Init/shutdown functions. Errors aren't important here */
 
 void

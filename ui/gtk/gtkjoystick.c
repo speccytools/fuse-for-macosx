@@ -40,24 +40,14 @@
 
 #include "../uijoystick.c"
 
-/* FIXME: quick and ugly hack. Needs to be generalised to support an
-   arbitrary number of arbitrarly named joystick type */
-
-struct callback_info {
-
-  GtkWidget *none, *cursor, *kempston;
-
-};
-
 static void joystick_done( GtkButton *button, gpointer user_data );
 
 void
 gtkjoystick_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  GtkWidget *dialog, *button;
+  GtkWidget *dialog, *button, *radio[ JOYSTICK_TYPE_COUNT ];
   GSList *button_group;
-
-  struct callback_info info;
+  int i;
 
   fuse_emulation_pause();
 
@@ -67,27 +57,25 @@ gtkjoystick_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   /* The available joysticks */
   button_group = NULL;
 
-  info.none = gtk_radio_button_new_with_label( button_group, "None" );
-  button_group = gtk_radio_button_group( GTK_RADIO_BUTTON( info.none ) );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-			       info.none );
+  for( i = 0; i < JOYSTICK_TYPE_COUNT; i++ ) {
 
-  info.cursor = gtk_radio_button_new_with_label( button_group, "Cursor" );
-  button_group = gtk_radio_button_group( GTK_RADIO_BUTTON( info.cursor ) );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-			       info.cursor );
+    radio[ i ] =
+      gtk_radio_button_new_with_label( button_group, joystick_name[ i ] );
+    button_group = gtk_radio_button_group( GTK_RADIO_BUTTON( radio[ i ] ) );
+    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+			         radio[ i ] );
 
-  info.kempston = gtk_radio_button_new_with_label( button_group, "Kempston" );
-  button_group = gtk_radio_button_group( GTK_RADIO_BUTTON( info.kempston ) );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
-			       info.kempston );
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radio[ i ] ),
+				  settings_current.joystick_1_output == i );
+
+  }
 
   /* Create and add the action buttons to the dialog box */
   button = gtk_button_new_with_label( "OK" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     button );
   gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( joystick_done ), &info );
+		      GTK_SIGNAL_FUNC( joystick_done ), radio );
   gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( dialog ) );
@@ -110,22 +98,17 @@ gtkjoystick_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
-  struct callback_info *info = user_data;
+  GtkWidget **radio = user_data;
 
-  if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( info->none ) ) ) {
-    settings_current.joystick_1_output = JOYSTICK_TYPE_NONE;
-    return;
+  int i;
+
+  for( i = 0; i < JOYSTICK_TYPE_COUNT; i++ ) {
+    if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( radio[ i ] ) ) ) {
+      settings_current.joystick_1_output = i;
+      return;
+    }
   }
 
-  if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( info->cursor ) ) ) {
-    settings_current.joystick_1_output = JOYSTICK_TYPE_CURSOR;
-    return;
-  }
-
-  if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( info->kempston ) ) ) {
-    settings_current.joystick_1_output = JOYSTICK_TYPE_KEMPSTON;
-    return;
-  }
 }
 
 #endif				/* #ifdef UI_GTK */

@@ -656,3 +656,5 @@
 20040323 input.c,joystick.[ch],settings.dat,ui/gtk/{gtkinternal.h,
 	 gtkjoystick.c,gtkui.c}: first bits of code allowing emulation of
 	 multiple joystick types.
+20040324 joystick.[ch],ui/gtk/gtkjoystick.c: generalise the joystick
+	 selection code.
