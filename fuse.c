@@ -283,8 +283,9 @@ int creator_init( void )
     return 1;
   }
 
-  snprintf( custom, 256, "uname: %s %s %s\n", buf.sysname, buf.machine,
-	    buf.release );
+  snprintf( custom, 256, "libspectrum: %s\nuname: %s %s %s",
+	    libspectrum_version(),
+	    buf.sysname, buf.machine, buf.release );
 
   error = libspectrum_creator_set_custom( fuse_creator,
 					  custom, strlen( custom ) );
