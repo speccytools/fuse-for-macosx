@@ -66,10 +66,8 @@ void z80_do_opcodes()
     /* Check if the debugger should become active at this point;
        special case DEBUGGER_MODE_INACTIVE for alleged performance
        reasons */
-    if( debugger_mode != DEBUGGER_MODE_INACTIVE && debugger_check() ) {
+    if( debugger_mode != DEBUGGER_MODE_INACTIVE && debugger_check() )
       debugger_trap();
-      continue;
-    }
 
     /* If the z80 is HALTed, repeat the HALT instruction */
     if( z80.halted ) PC--;

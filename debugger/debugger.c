@@ -104,10 +104,6 @@ debugger_check( void )
     }
     return 0;
 
-  case DEBUGGER_MODE_STEP:	/* Stop after this instruction */
-    debugger_mode = DEBUGGER_MODE_HALTED;
-    return 0;
-
   case DEBUGGER_MODE_HALTED: return 1;
 
   }
@@ -125,7 +121,7 @@ debugger_trap( void )
 int
 debugger_step( void )
 {
-  debugger_mode = DEBUGGER_MODE_STEP;
+  debugger_mode = DEBUGGER_MODE_HALTED;
   ui_debugger_deactivate( 0 );
   return 0;
 }

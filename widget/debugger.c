@@ -100,7 +100,7 @@ widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     break;
 
   case KEYBOARD_s:
-    debugger_mode = DEBUGGER_MODE_STEP;
+    debugger_mode = DEBUGGER_MODE_HALTED;
     widget_end_all( WIDGET_FINISHED_OK );
     break;
 
