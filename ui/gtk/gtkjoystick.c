@@ -41,36 +41,28 @@
 #include "../uijoystick.c"
 
 static void create_button_group( GtkWidget **radio, GtkBox *parent,
-				 joystick_type_t current );
+				 const char *title, joystick_type_t current );
 static void joystick_done( GtkButton *button, gpointer user_data );
 
 void
 gtkjoystick_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   GtkWidget *dialog, *button, *radio[ 3 * JOYSTICK_TYPE_COUNT ];
-  joystick_type_t current;
-  int i;
+  GtkBox *box;
 
   fuse_emulation_pause();
 
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Select joysticks" );
 
-  for( i = 0; i < 3; i++ ) {
-    
-    switch( i ) {
-    case 0: current = settings_current.joystick_1_output; break;
-    case 1: current = settings_current.joystick_2_output; break;
+  box = GTK_BOX( GTK_DIALOG( dialog )->vbox );
 
-    case JOYSTICK_KEYBOARD:
-      current = settings_current.joystick_keyboard_output; break;
-
-    default: current = JOYSTICK_TYPE_NONE; break;
-    }
-
-    create_button_group( &radio[ i * JOYSTICK_TYPE_COUNT ],
-			 GTK_BOX( GTK_DIALOG( dialog )->vbox ), current );
-  }
+  create_button_group( &radio[ 0 * JOYSTICK_TYPE_COUNT ], box,
+		       "Joystick 1", settings_current.joystick_1_output );
+  create_button_group( &radio[ 1 * JOYSTICK_TYPE_COUNT ], box,
+		       "Joystick 2", settings_current.joystick_2_output );
+  create_button_group( &radio[ 2 * JOYSTICK_TYPE_COUNT ], box,
+		       "Keyboard", settings_current.joystick_keyboard_output );
 
   /* Create and add the action buttons to the dialog box */
   button = gtk_button_new_with_label( "OK" );
@@ -98,20 +90,27 @@ gtkjoystick_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 }
 
 static void
-create_button_group( GtkWidget **radio, GtkBox *parent,
+create_button_group( GtkWidget **radio, GtkBox *parent, const char *title,
 		     joystick_type_t current )
 {
+  GtkWidget *frame, *box;
   GSList *button_group;
   size_t i;
 
   button_group = NULL;
+
+  frame = gtk_frame_new( title );
+  gtk_box_pack_start_defaults( parent, frame );
+
+  box = gtk_vbox_new( FALSE, FALSE );
+  gtk_container_add( GTK_CONTAINER( frame ), box );
 
   for( i = 0; i < JOYSTICK_TYPE_COUNT; i++ ) {
 
     radio[ i ] =
       gtk_radio_button_new_with_label( button_group, joystick_name[ i ] );
     button_group = gtk_radio_button_group( GTK_RADIO_BUTTON( radio[ i ] ) );
-    gtk_box_pack_start_defaults( parent, radio[ i ] );
+    gtk_box_pack_start_defaults( GTK_BOX( box ), radio[ i ] );
 
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( radio[ i ] ),
 				  i == current );
