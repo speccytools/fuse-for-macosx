@@ -326,3 +326,4 @@
 	 (Marek).
 20031102 debugger/commandy.y, z80/z80.pl, z80/z80_macros.h: rename the
 	 IN and OUT macros to avoid clashing with Win32's windows.h.
+20031102 Makefile.am: revert unintended commit of DIST_SUBDIRS change.

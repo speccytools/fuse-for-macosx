@@ -38,18 +38,6 @@ SUBDIRS = compat \
 	  @WIDGET@ \
 	  z80
 
-DIST_SUBDIRS = compat \
-	       debugger \
-	       hacking \
-	       lib \
-	       man \
-	       perl \
-	       pokefinder \
-	       roms \
-	       ui \
-	       widget \
-	       z80
-
 fuse_SOURCES = ay.c \
 	dck.c \
 	display.c \
