@@ -48,6 +48,8 @@ static widget_menu_entry widget_menu_disk[];
 static widget_menu_entry widget_menu_disk_a[];
 static widget_menu_entry widget_menu_disk_b[];
 
+static widget_menu_entry widget_menu_cart[];
+
 static widget_menu_entry widget_menu_help[];
 
 /* Main menu */
@@ -64,6 +66,9 @@ static widget_menu_widget_t main_tape =    { WIDGET_TYPE_MENU,
 static widget_menu_widget_t main_disk =    { WIDGET_TYPE_MENU,
 					     &widget_menu_disk    };
 
+static widget_menu_widget_t main_cart =    { WIDGET_TYPE_MENU,
+					     &widget_menu_cart    };
+
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
 					     &widget_menu_help    };
 
@@ -74,8 +79,8 @@ widget_menu_entry widget_menu_main[] = {
   { "(O)ptions", KEYBOARD_o, widget_menu_widget, &main_options },
   { "(M)achine", KEYBOARD_m, widget_menu_widget, &main_machine },
   { "(T)ape",	 KEYBOARD_t, widget_menu_widget, &main_tape    },
-
   { "(D)isk",	 KEYBOARD_d, widget_menu_widget, &main_disk    },
+  { "(C)artridge", KEYBOARD_c, widget_menu_widget, &main_cart  },
 
   { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
 
@@ -221,6 +226,18 @@ static widget_menu_entry widget_menu_disk_b[] = {
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
+
+/* Cartridge/Timex Dock menu */
+
+static widget_menu_entry widget_menu_cart[] = {
+  { "Cartridge/Timex Dock", 0, 0, NULL },	/* Menu title */
+
+  { "(I)nsert...", KEYBOARD_i, widget_apply_to_file,   widget_insert_dock },
+  { "(E)ject",	   KEYBOARD_e, widget_menu_eject_dock, NULL       },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
 
 /* Help menu */
 

@@ -172,6 +172,9 @@ int widget_insert_disk_a( const char *filename ); /* Disk/Drive A:/Insert */
 int widget_insert_disk_b( const char *filename ); /* Disk/Drive B:/Insert */
 int widget_menu_eject_disk( void *data );    /* Disk/Drive ?:/Eject */
 
+int widget_insert_dock( const char *filename ); /* Cart/Timex Dock/Insert */
+int widget_menu_eject_dock( void *data );    /* Cart/Timex Dock/Eject */
+
 int widget_menu_keyboard( void *data );	     /* Help/Keyboard Picture */
 
 /* The select scaler widget */

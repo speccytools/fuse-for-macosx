@@ -2,6 +2,7 @@
    Copyright (c) 1999-2003 Philip Kendall
    Copyright (c) 2002 Fredrick Meunier
    Copyright (c) 2003 Witold Filipczyk
+   Copyright (c) 2003 Darren Salt
 
    $Id$
 
@@ -34,6 +35,7 @@
 #include <libspectrum.h>
 
 #include "ay.h"
+#include "dck.h"
 #include "display.h"
 #include "fuse.h"
 #include "joystick.h"
@@ -74,8 +76,12 @@ BYTE tc2068_unattached_port( void )
 BYTE
 tc2068_read_screen_memory(WORD offset)
 {
-  if (offset >= 0x2000) return timex_memory[3][offset - 0x2000];
-  return timex_memory[2][offset];
+  /* The SCLD always reads the real screen memory regardless of paging
+     activity */
+  WORD off = offset & 0x1fff;
+  int chunk = 2 + (offset >> 13);
+
+  return timex_home[chunk].page[off];
 }
 
 DWORD
@@ -178,15 +184,52 @@ tc2068_init( fuse_machine_info *machine )
   machine->ay.present = 1;
 
   machine->shutdown = NULL;
-  return 0;
 
+  return 0;
+}
+
+int
+tc2068_dock_exrom_reset( void )
+{
+  int i;
+  int error;
+
+  scld_home_free();
+  scld_dock_free();
+  scld_exrom_free();
+
+  memset(timex_fake_bank, 255, sizeof(timex_fake_bank));
+
+  timex_home[0].page = ROM[0];
+  timex_home[1].page = ROM[0] + 0x2000;
+  timex_home[2].page = RAM[5];
+  timex_home[3].page = RAM[5] + 0x2000;
+  timex_home[4].page = RAM[2];
+  timex_home[5].page = RAM[2] + 0x2000;
+  timex_home[6].page = RAM[0];
+  timex_home[7].page = RAM[0] + 0x2000;
+
+  timex_home[0].writeable = timex_home[1].writeable = 0;
+  for( i = 2; i < 8; i++ ) timex_home[i].writeable = 1;
+  for( i = 0; i < 8; i++ ) timex_home[i].allocated = 0;
+  for( i = 0; i < 8; i++ ) timex_dock[i].writeable = 0;
+  for( i = 0; i < 8; i++ ) timex_dock[i].page = timex_fake_bank;
+  for( i = 0; i < 8; i++ ) timex_dock[i].allocated = 0;
+  for( i = 0; i < 8; i++ ) timex_exrom[i].page = ROM[1];
+  for( i = 0; i < 8; i++ ) timex_exrom[i].writeable = 0;
+  for( i = 0; i < 8; i++ ) timex_exrom[i].allocated = 0;
+
+  if( settings_current.dck_file ) {
+    error = dck_read( settings_current.dck_file ); if( error ) return error;
+  }
+
+  return 0;
 }
 
 int
 tc2068_reset( void )
 {
   int error;
-  int i;
 
   error = machine_load_rom( &ROM[0], settings_current.rom_tc2068_0,
 			    machine_current->rom_length[0] );
@@ -195,23 +238,7 @@ tc2068_reset( void )
 			    machine_current->rom_length[1] );
   if( error ) return error;
 
-  memset(timex_fake_bank, 255, sizeof(timex_fake_bank));
-
-  timex_home[0] = ROM[0];
-  timex_home[1] = ROM[0] + 0x2000;
-  timex_home[2] = RAM[5];
-  timex_home[3] = RAM[5] + 0x2000;
-  timex_home[4] = RAM[2];
-  timex_home[5] = RAM[2] + 0x2000;
-  timex_home[6] = RAM[0];
-  timex_home[7] = RAM[0] + 0x2000;
-  timex_exrom = ROM[1];
-
-  timex_exrom_writeable = 0;
-  timex_home_writeable[0] = timex_home_writeable[1] = 0;
-  for( i = 2; i < 8; i++ ) timex_home_writeable[i] = 1;
-  for( i = 0; i < 8; i++ ) timex_dock_writeable[i] = 0;
-  for( i = 0; i < 8; i++ ) timex_dock[i] = timex_fake_bank;
+  error = tc2068_dock_exrom_reset(); if( error ) return error;
 
   scld_dec_write(255, 128);
   scld_dec_write(255, 0);

@@ -45,4 +45,7 @@ DWORD tc2068_contend_port( WORD port );
 int tc2068_init( fuse_machine_info *machine );
 int tc2068_reset( void );
 
+BYTE tc2068_ay_registerport_read (WORD port);
+BYTE tc2068_ay_dataport_read (WORD port);
+
 #endif			/* #ifndef FUSE_TC2068_H */

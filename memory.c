@@ -392,7 +392,7 @@ FUNCTION( tc2068_readbyte )( WORD address )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
-  return timex_memory[chunk][offset];
+  return timex_memory[chunk].page[offset];
 }
 
 void
@@ -407,12 +407,15 @@ FUNCTION( tc2068_writebyte )( WORD address, BYTE b )
     debugger_mode = DEBUGGER_MODE_HALTED;
 #endif				/* #ifndef INTERNAL */
 
+/* Need to take check if write is to home bank screen area for display
+   dirty checking */
   switch( chunk ) {
   case 2:
   case 3:
-    if( timex_memory[chunk][offset] != b ) display_dirty( address );
+    if( timex_memory[chunk].page == timex_home[chunk].page &&
+        timex_memory[chunk].page[offset] != b ) display_dirty( address );
     /* Fall through */
   default:
-    if( timex_chunk_writeable[chunk] == 1 ) timex_memory[chunk][offset] = b;
+    if( timex_memory[chunk].writeable == 1 ) timex_memory[chunk].page[offset] = b;
   }
 }

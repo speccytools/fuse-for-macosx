@@ -148,8 +148,6 @@ int snapshot_copy_from( libspectrum_snap *snap )
     }
   }
 
-  machine_reset();
-
   capabilities = libspectrum_machine_capabilities( machine_current->machine );
 
   z80.halted = 0;

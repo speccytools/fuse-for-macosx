@@ -118,17 +118,18 @@ extern scld scld_last_dec;           /* The last byte sent to Timex DEC port */
 extern BYTE scld_last_hsr;           /* The last byte sent to Timex HSR port */
 
 extern BYTE timex_fake_bank[8192];
-extern BYTE timex_exrom_dock_writeable[8]; /* 1 - chunk writeable,
-					      0 - chunk read only */
-extern BYTE timex_dock_writeable[8];
-extern BYTE timex_home_writeable[8];    
-extern BYTE timex_exrom_writeable;
-extern BYTE timex_chunk_writeable[8];
-extern BYTE *timex_exrom;                  /* address of memory chunk */
-extern BYTE *timex_exrom_dock[8];
-extern BYTE *timex_dock[8];
-extern BYTE *timex_home[8];
-extern BYTE *timex_memory[8];
+
+typedef struct timex_mem {
+  BYTE *page;
+  BYTE writeable;               /* 1 - chunk writeable, 0 - chunk read only */
+  BYTE allocated;               /* Did we malloc this block? */
+} timex_mem;
+
+extern timex_mem timex_exrom_dock[8];
+extern timex_mem timex_exrom[8];
+extern timex_mem timex_dock[8];
+extern timex_mem timex_home[8];
+extern timex_mem timex_memory[8];
 
 void scld_reset( void );
 void scld_dec_write( WORD port, BYTE b );
@@ -139,5 +140,9 @@ BYTE scld_hsr_read( WORD port );
 
 BYTE hires_get_attr( void );
 BYTE hires_convert_dec( BYTE attr );
+
+void scld_dock_free( void );
+void scld_exrom_free( void );
+void scld_home_free( void );
 
 #endif                  /* #ifndef FUSE_SCLD_H */

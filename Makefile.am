@@ -28,7 +28,10 @@ bin_PROGRAMS = fuse
 
 SUBDIRS = debugger getopt hacking lib man perl roms ui widget z80
 
-fuse_SOURCES = ay.c display.c event.c\
+fuse_SOURCES = ay.c \
+	dck.c \
+	display.c \
+	event.c \
 	fuse.c keyboard.c machine.c memory.c \
 	osssound.c \
 	pentagon.c \
@@ -76,7 +79,10 @@ settings.h: settings-header.pl settings.dat
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 
-noinst_HEADERS = ay.h display.h event.h\
+noinst_HEADERS = ay.h \
+	dck.h \
+	display.h \
+	event.h \
 	fuse.h keyboard.h keysyms.h\
 	machine.h \
 	osssound.h \

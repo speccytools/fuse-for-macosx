@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "scld.h"
 #include "display.h"
@@ -36,17 +37,12 @@ scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 BYTE scld_last_hsr   = 0;           /* The last byte sent to Timex HSR port */
 
 BYTE timex_fake_bank[8192];
-BYTE timex_exrom_dock_writeable[8]; /* 1 - chunk writeable,
-				       0 - chunk read only */
-BYTE timex_dock_writeable[8];
-BYTE timex_home_writeable[8];    
-BYTE timex_exrom_writeable;
-BYTE timex_chunk_writeable[8];
-BYTE *timex_exrom;                  /* address of memory chunk */
-BYTE *timex_exrom_dock[8];
-BYTE *timex_dock[8];
-BYTE *timex_home[8];
-BYTE *timex_memory[8];
+
+timex_mem timex_exrom_dock[8];
+timex_mem timex_exrom[8];
+timex_mem timex_dock[8];
+timex_mem timex_home[8];
+timex_mem timex_memory[8];
 
 BYTE
 scld_dec_read( WORD port GCC_UNUSED )
@@ -76,13 +72,11 @@ scld_dec_write( WORD port GCC_UNUSED, BYTE b )
     
     if( scld_last_dec.name.altmembank ) {
       for( i = 0; i < 8; i++ ) {
-        timex_exrom_dock[i] = timex_exrom;
-        timex_exrom_dock_writeable[i] = timex_exrom_writeable;
+        timex_exrom_dock[i] = timex_exrom[i];
       }
     } else {
       for( i = 0; i < 8; i++ ) {
         timex_exrom_dock[i] = timex_dock[i];
-        timex_exrom_dock_writeable[i] = timex_dock_writeable[i];
       }
     }
     scld_hsr_write( 0xf4, scld_last_hsr );
@@ -108,10 +102,8 @@ scld_hsr_write( WORD port GCC_UNUSED, BYTE b )
   for( i = 0; i < 8; i++ ) {
     if( b & (1<<i) ) {
       timex_memory[i] = timex_exrom_dock[i];
-      timex_chunk_writeable[i] = timex_exrom_dock_writeable[i];
     } else {
       timex_memory[i] = timex_home[i];
-      timex_chunk_writeable[i] = timex_home_writeable[i];
     }
   }
 }
@@ -160,5 +152,47 @@ hires_convert_dec( BYTE attr )
       break;
     default:  /* WHITEBLACK */
       return (BYTE) 0x78;
+  }
+}
+
+void
+scld_dock_free( void )
+{
+  size_t i;
+
+  for( i = 0; i < 8; i++ ) {
+    if( timex_dock[i].allocated ) {
+      free( timex_dock[i].page );
+      timex_dock[i].page = 0;
+      timex_dock[i].allocated = 0;
+    }
+  }
+}
+
+void
+scld_exrom_free( void )
+{
+  size_t i;
+
+  for( i = 0; i < 8; i++ ) {
+    if( timex_exrom[i].allocated ) {
+      free( timex_exrom[i].page );
+      timex_exrom[i].page = 0;
+      timex_exrom[i].allocated = 0;
+    }
+  }
+}
+
+void
+scld_home_free( void )
+{
+  size_t i;
+
+  for( i = 0; i < 8; i++ ) {
+    if( timex_home[i].allocated ) {
+      free( timex_home[i].page );
+      timex_home[i].page = 0;
+      timex_home[i].allocated = 0;
+    }
   }
 }

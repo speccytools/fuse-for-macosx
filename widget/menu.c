@@ -345,6 +345,22 @@ widget_menu_eject_disk( void *data )
   return trdos_disk_eject( which );
 }
 
+/* Cartridge/Timex Dock/Insert (called via widget_apply_to_file) */
+int
+widget_insert_dock( const char *filename )
+{
+  return dck_insert( filename );
+}
+
+/* Cartridge/Timex Dock/Eject */
+int
+widget_menu_eject_dock( void *data )
+{
+  dck_eject();
+
+  return 0;
+}
+
 /* Tape/Clear */
 int widget_menu_clear_tape( void *data GCC_UNUSED )
 {

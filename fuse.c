@@ -36,6 +36,7 @@
 #include <SDL.h>		/* Needed on MacOS X and Windows */
 #endif				/* #ifdef UI_SDL */
 
+#include "dck.h"
 #include "debugger/debugger.h"
 #include "display.h"
 #include "event.h"
@@ -398,6 +399,13 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
       if( error ) return error;
 
       error = trdos_disk_insert( TRDOS_DRIVE_A, argv[ first_arg ] );
+      break;
+
+    case LIBSPECTRUM_ID_CARTRIDGE_DCK:
+      error = dck_read( argv[ first_arg ] );
+
+      if( !error )
+        error = machine_select( LIBSPECTRUM_MACHINE_TC2068 );
       break;
 
     default:
