@@ -52,6 +52,9 @@
 /* The current tape */
 static libspectrum_tape *tape;
 
+/* Has the current tape been modified since it was last loaded/saved? */
+int tape_modified;
+
 /* Is the emulated tape deck playing? */
 static int tape_playing;
 
@@ -72,6 +75,8 @@ int tape_init( void )
 
   error = libspectrum_tape_alloc( &tape );
   if( !tape ) return error;
+
+  tape_modified = 0;
 
   /* Don't call tape_stop() here as the UI hasn't been initialised yet,
      so we can't update the statusbar */
@@ -115,6 +120,7 @@ int tape_open( const char *filename, int autoload )
     return 1;
   }
 
+  tape_modified = 0;
   ui_tape_browser_update();
 
   if( autoload ) {
@@ -139,6 +145,7 @@ tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
   error = libspectrum_tape_read( tape, buffer, length, type, NULL );
   if( error ) return error;
 
+  tape_modified = 0;
   ui_tape_browser_update();
 
   if( autoload ) {
@@ -202,6 +209,7 @@ int tape_close( void )
   error = libspectrum_tape_clear( tape );
   if( error ) return error;
 
+  tape_modified = 0;
   ui_tape_browser_update();
 
   return 0;
@@ -255,6 +263,9 @@ int tape_write( const char* filename )
 
   error = utils_write_file( filename, buffer, length );
   if( error ) { free( buffer ); return error; }
+
+  tape_modified = 0;
+  ui_tape_browser_update();
 
   return 0;
 
@@ -430,6 +441,7 @@ int tape_save_trap( void )
   error = libspectrum_tape_append_block( tape, block );
   if( error ) return error;
 
+  tape_modified = 1;
   ui_tape_browser_update();
 
   /* And then return via the RET at #053E, except on Timex 2068 at #00E4 */

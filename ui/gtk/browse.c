@@ -50,7 +50,9 @@ static gboolean delete_dialog( GtkWidget *widget, GdkEvent *event,
 
 static GtkWidget
   *dialog,			/* The dialog box itself */
-  *blocks;			/* The list of blocks */
+  *blocks,			/* The list of blocks */
+  *modified_label;		/* The label saying if the tape has been
+				   modified */
 
 static int dialog_created;	/* Have we created the dialog box yet? */
 
@@ -91,8 +93,8 @@ create_dialog( void )
   scrolled_window = gtk_scrolled_window_new( NULL, NULL );
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolled_window ),
 				  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
-		     scrolled_window );
+  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+			       scrolled_window );
 
   /* And the CList itself */
   blocks = gtk_clist_new_with_titles( 3, titles );
@@ -103,6 +105,11 @@ create_dialog( void )
 		      GTK_SIGNAL_FUNC( select_row ), NULL );
   gtk_container_add( GTK_CONTAINER( scrolled_window ), blocks );
 
+  /* And the "tape modified" label */
+  modified_label = gtk_label_new( "" );
+  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), modified_label,
+		      FALSE, FALSE, 0 );
+
   /* Create the OK button */
   ok_button = gtk_button_new_with_label( "OK" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
@@ -110,9 +117,11 @@ create_dialog( void )
   gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
 		      GTK_SIGNAL_FUNC( browse_done ), NULL );
 
-  /* Esc will close the dialog box */
+  /* Return or Esc will close the dialog box */
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
+  gtk_widget_add_accelerator( ok_button, "clicked",
+			      accel_group, GDK_Return, 0, 0);
   gtk_widget_add_accelerator( ok_button, "clicked",
 			      accel_group, GDK_Escape, 0, 0);
 
@@ -148,6 +157,13 @@ ui_tape_browser_update( void )
     gtk_clist_set_text( GTK_CLIST( blocks ), current_block, 0, "X" );
 
   gtk_clist_thaw( GTK_CLIST( blocks ) );
+
+  if( tape_modified ) {
+    gtk_label_set_text( GTK_LABEL( modified_label ), "Tape modified" );
+  } else {
+    gtk_label_set_text( GTK_LABEL( modified_label ), "Tape not modified" );
+  }
+
   fuse_emulation_unpause();
 
   return 0;

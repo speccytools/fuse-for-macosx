@@ -65,5 +65,6 @@ int tape_block_details( char *buffer, size_t length,
 			libspectrum_tape_block *block );
 
 extern int tape_microphone;
+extern int tape_modified;
 
 #endif

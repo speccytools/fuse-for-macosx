@@ -444,3 +444,5 @@
 	 no longer modal.
 20040104 widget/{browse,widget}.c: fix up the widget UIs for the new
 	 tape browser code.
+20040104 tape.[ch], ui/gtk/browse.c: add a 'tape modified' indicator to
+	 the GTK+ tape browser window.
