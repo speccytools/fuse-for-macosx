@@ -72,11 +72,11 @@ menu_options_$_->{name}( GtkWidget *widget GCC_UNUSED,
 			 gpointer data GCC_UNUSED )
 {
   menu_options_$_->{name}_t dialog;
-  GtkWidget *ok_button, *cancel_button, *hbox, *text, *text2;
+  GtkWidget *ok_button, *cancel_button, *frame, *hbox, *text;
   GtkAccelGroup *accel_group;
   gchar buffer[80];
 
-  hbox = text = text2 = NULL;
+  frame = hbox = text = NULL;
   buffer[0] = '\\0';		/* Shut gcc up */
   
   /* Firstly, stop emulation */
@@ -111,23 +111,24 @@ CODE
                 # FIXME: Make the entry widget resize sensibly
 
 		print << "CODE";
+  frame = gtk_frame_new( "$text" );
+  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog.dialog )->vbox ),
+			       frame );
+				    
+  hbox = gtk_hbox_new( FALSE, 0 );
+  gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
+  gtk_container_add( GTK_CONTAINER( frame ), hbox );
+
   dialog.$widget->{value} = gtk_entry_new();
   gtk_entry_set_max_length( GTK_ENTRY( dialog.$widget->{value} ),
 	   		    $widget->{data1} );
-  snprintf( buffer, $widget->{data1} + 1, "%d",
-	    settings_current.$widget->{value} );
+  snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
   gtk_entry_set_text( GTK_ENTRY( dialog.$widget->{value} ), buffer );
-
-  text = gtk_label_new( "$text" );
-  text2 = gtk_label_new( "$widget->{data2}" );
-
-  hbox = gtk_hbox_new( FALSE, 0 );
-  gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), dialog.$widget->{value} );
-  gtk_box_pack_start( GTK_BOX( hbox ), text2, FALSE, FALSE, 5 );
 
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		     hbox );
+  text = gtk_label_new( "$widget->{data2}" );
+  gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
+
 CODE
 	    } else {
 		die "Unknown type `$type'";

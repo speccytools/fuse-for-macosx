@@ -956,3 +956,5 @@
          ALWAYS_USE_TIMER defined for SDL
 20040627 sound/sdlsound.c: Fuse generates 16 bit sound in signed host byte
          order.
+20040628 ui/gtk/options.pl: improve user interface for text entry boxes
+	 slightly.
