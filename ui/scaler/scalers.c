@@ -49,6 +49,14 @@ scaler_select_bitformat( DWORD BitFormat )
 {
   switch( BitFormat ) {
 
+    /* FIXME(?): there is an assumption here that our colour fields
+       are (LSb) xxxx|xyyy|yyyz|zzzz (MSb) for the 565 mode
+       and (LSb) xxxx|xyyy|yyzz|zzz0 (MSb) for the 555 mode. This is
+       currently (April 2003) OK as the other user interface to use
+       this code is SDL, which hides all variation in SDL_MapRGB(3),
+       but be very careful (especially about endianness) if we ever
+       use the "interpolating" scalers from another user interface */
+
   case 565:
     colorMask = 0x0000F7DE;
     lowPixelMask = 0x00000821;
@@ -77,10 +85,26 @@ scaler_select_bitformat( DWORD BitFormat )
 typedef DWORD scaler_data_type;
 #define FUNCTION( name ) name##_32
 
+/* The assumption here is that the colour fields are laid out in
+   memory as (LSB) red|green|blue|padding (MSB). We wish to access
+   these as 32-bit entities, so make sure we get our masks the right
+   way round. */
+
+#ifdef WORDS_BIGENDIAN
+
 const static DWORD colorMask = 0xFEFEFE00;
 const static DWORD lowPixelMask = 0x01010100;
 const static DWORD qcolorMask = 0xFCFCFC00;
 const static DWORD qlowpixelMask = 0x03030300;
+
+#else				/* #ifdef WORDS_BIGENDIAN */
+
+const static DWORD colorMask = 0x00FEFEFE;
+const static DWORD lowPixelMask = 0x00010101;
+const static DWORD qcolorMask = 0x00FCFCFC;
+const static DWORD qlowpixelMask = 0x00030303;
+
+#endif				/* #ifdef WORDS_BIGENDIAN */
 
 #else				/* #if SCALER_DATA_SIZE == 2 or 4 */
 #error Unknown SCALER_DATA_SIZE
