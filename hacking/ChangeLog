@@ -292,3 +292,4 @@
 20031023 fuse.c, osssound.c: more useful error messages if we couldn't
 	 initialise the OSS sound code.
 20031025 pokefinder.c: UI improvements.
+20031025 pokefinder.c: keyboard shortcuts

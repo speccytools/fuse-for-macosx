@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
 #include "pokefinder/pokefinder.h"
@@ -62,6 +63,7 @@ static int
 create_dialog( void )
 {
   GtkWidget *hbox, *vbox, *label, *entry, *button;
+  GtkAccelGroup *accel_group;
   int error;
   size_t i;
 
@@ -72,6 +74,10 @@ create_dialog( void )
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Poke Finder" );
 
+  /* Keyboard shortcuts */
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
+
   hbox = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
 
@@ -79,6 +85,8 @@ create_dialog( void )
   gtk_box_pack_start( GTK_BOX( hbox ), label, TRUE, TRUE, 5 );
 
   entry = gtk_entry_new();
+  gtk_signal_connect( GTK_OBJECT( entry ), "activate",
+		      GTK_SIGNAL_FUNC( gtkui_pokefinder_search ), NULL );
   gtk_box_pack_start( GTK_BOX( hbox ), entry, TRUE, TRUE, 5 );
 
   vbox = gtk_vbox_new( FALSE, 0 );
@@ -99,6 +107,8 @@ create_dialog( void )
 		      GTK_OBJECT( entry ) );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     button );
+  gtk_widget_add_accelerator( button, "clicked", accel_group, GDK_Return,
+			      0, 0 );
 
   button = gtk_button_new_with_label( "Reset" );
   gtk_signal_connect( GTK_OBJECT( button ), "clicked",
@@ -112,6 +122,8 @@ create_dialog( void )
 			     GTK_OBJECT( dialog ) );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
 		     button );
+  gtk_widget_add_accelerator( button, "clicked", accel_group, GDK_Escape,
+			      0, 0 );
 
   /* Users shouldn't be able to resize this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
