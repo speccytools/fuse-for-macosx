@@ -47,6 +47,9 @@ static libspectrum_error
 tzx_read_pulses_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		       const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_pure_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		    const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
 static libspectrum_error
@@ -102,6 +105,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_PULSES:
       error = tzx_read_pulses_block( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+      error = tzx_read_pure_data( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -312,6 +319,59 @@ tzx_read_pulses_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* And return with no error */
   return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_read_pure_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		    const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_pure_data_block *data_block;
+
+  /* Check there's enough left in the buffer for all the metadata */
+  if( end - (*ptr) < 10 ) return LIBSPECTRUM_ERROR_CORRUPT;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  /* This is a pure data block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_PURE_DATA;
+  data_block = &(block->types.pure_data);
+
+  /* Get the metadata */
+  data_block->bit0_length  = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  data_block->bit1_length  = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  data_block->bits_in_last_byte = **ptr; (*ptr)++;
+  data_block->pause        = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+
+  data_block->length = (*ptr)[0] + (*ptr)[1] * 0x100 + (*ptr)[2] * 0x10000;
+  (*ptr) += 3;
+
+  /* Have we got enough bytes left in buffer? */
+  if( ( end - (*ptr) ) < data_block->length ) {
+    free( block );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Allocate memory for the data */
+  data_block->data = (libspectrum_byte*)malloc( data_block->length *
+						sizeof( libspectrum_byte ) );
+  if( data_block->data == NULL ) {
+    free( block );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* Copy the block data across, and move along */
+  memcpy( data_block->data, (*ptr), data_block->length );
+  (*ptr) += data_block->length;
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  /* And return with no error */
+  return LIBSPECTRUM_ERROR_NONE;
+
 }
 
 static libspectrum_error

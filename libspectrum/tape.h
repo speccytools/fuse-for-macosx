@@ -48,6 +48,7 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_TURBO,
   LIBSPECTRUM_TAPE_BLOCK_PURE_TONE,
   LIBSPECTRUM_TAPE_BLOCK_PULSES,
+  LIBSPECTRUM_TAPE_BLOCK_PURE_DATA,
 
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START = 0x21,
 
@@ -155,6 +156,29 @@ typedef struct libspectrum_tape_pulses_block {
 
 } libspectrum_tape_pulses_block;
 
+/* A block of just of data */
+typedef struct libspectrum_tape_pure_data_block {
+
+  size_t length;		/* Length of data */
+  size_t bits_in_last_byte;	/* How many bits are in the last byte? */
+  libspectrum_byte *data;	/* The actual data */
+  libspectrum_dword pause;	/* Pause after data (in ms) */
+
+  libspectrum_dword bit0_length, bit1_length; /* Length of (re)set bits */
+
+  /* Private data */
+
+  libspectrum_tape_state_type state;
+
+  size_t bytes_through_block;
+  size_t bits_through_byte;	/* How far through the data are we? */
+
+  libspectrum_byte current_byte; /* The current data byte; gets shifted out
+				    as we read bits from it */
+  libspectrum_dword bit_tstates; /* How long is an edge for the current bit */
+
+} libspectrum_tape_pure_data_block;
+
 /* A group start block */
 typedef struct libspectrum_tape_group_start_block {
 
@@ -186,6 +210,7 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_turbo_block turbo;
     libspectrum_tape_pure_tone_block pure_tone;
     libspectrum_tape_pulses_block pulses;
+    libspectrum_tape_pure_data_block pure_data;
 
     libspectrum_tape_group_start_block group_start;
 

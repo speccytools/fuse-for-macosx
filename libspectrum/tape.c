@@ -40,6 +40,8 @@ static libspectrum_error
 rom_init( libspectrum_tape_rom_block *block );
 static libspectrum_error
 turbo_init( libspectrum_tape_turbo_block *block );
+static libspectrum_error
+pure_data_init( libspectrum_tape_pure_data_block *block );
 
 /* Functions to get the next edge */
 
@@ -62,6 +64,12 @@ tone_edge( libspectrum_tape_pure_tone_block *block, libspectrum_dword *tstates,
 static libspectrum_error
 pulses_edge( libspectrum_tape_pulses_block *block, libspectrum_dword *tstates,
 	     int *end_of_block );
+
+static libspectrum_error
+pure_data_edge( libspectrum_tape_pure_data_block *block,
+		libspectrum_dword *tstates, int *end_of_block );
+static libspectrum_error
+pure_data_next_bit( libspectrum_tape_pure_data_block *block );
 
 /*** Function definitions ****/
 
@@ -93,6 +101,9 @@ block_free( gpointer data, gpointer user_data )
     break;
   case LIBSPECTRUM_TAPE_BLOCK_PULSES:
     free( block->types.pulses.lengths );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+    free( block->types.pure_data.data );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -129,6 +140,8 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_PULSES:
     block->types.pulses.edge_count = 0;
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+    return pure_data_init( &(block->types.pure_data) );
 
   /* These blocks need no initialisation */
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -170,6 +183,19 @@ turbo_init( libspectrum_tape_turbo_block *block )
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+pure_data_init( libspectrum_tape_pure_data_block *block )
+{
+  libspectrum_error error;
+
+  /* We're just before the start of the data */
+  block->bytes_through_block = -1; block->bits_through_byte = 7;
+  /* Set up the next bit */
+  error = pure_data_next_bit( block ); if( error ) return error;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 /* The main function: called with a tape object and returns the number of
    t-states until the next edge, and a marker if this was the last edge
    on the tape */
@@ -203,6 +229,10 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_PULSES:
     error = pulses_edge( &(block->types.pulses), tstates, &end_of_block );
+    if( error ) return error;
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+    error = pure_data_edge( &(block->types.pure_data), tstates, &end_of_block);
     if( error ) return error;
     break;
 
@@ -463,6 +493,82 @@ pulses_edge( libspectrum_tape_pulses_block *block, libspectrum_dword *tstates,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+pure_data_edge( libspectrum_tape_pure_data_block *block,
+		libspectrum_dword *tstates, int *end_of_block )
+{
+  int error;
+
+  switch( block->state ) {
+
+  case LIBSPECTRUM_TAPE_STATE_DATA1:
+    /* The first edge for a bit of data */
+    *tstates = block->bit_tstates;
+    /* Followed by the second edge */
+    block->state = LIBSPECTRUM_TAPE_STATE_DATA2;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_DATA2:
+    /* The second edge for a bit of data */
+    *tstates = block->bit_tstates;
+    /* Followed by the next bit of data (or the end of data) */
+    error = pure_data_next_bit( block ); if( error ) return error;
+    break;
+
+  case LIBSPECTRUM_TAPE_STATE_PAUSE:
+    /* The pause at the end of the block */
+    *tstates = (block->pause * 69888)/50; /* FIXME: should vary with tstates
+					     per frame */
+    *end_of_block = 1;
+    break;
+
+  default:
+    return LIBSPECTRUM_ERROR_LOGIC;
+
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+pure_data_next_bit( libspectrum_tape_pure_data_block *block )
+{
+  int next_bit;
+
+  /* Have we finished the current byte? */
+  if( ++(block->bits_through_byte) == 8 ) {
+
+    /* If so, have we finished the entire block? If so, all we've got
+       left after this is the pause at the end */
+    if( ++(block->bytes_through_block) == block->length ) {
+      block->state = LIBSPECTRUM_TAPE_STATE_PAUSE;
+      return LIBSPECTRUM_ERROR_NONE;
+    }
+    
+    /* If we've finished the current byte, but not the entire block,
+       get the next byte */
+    block->current_byte = block->data[ block->bytes_through_block ];
+
+    /* If we're looking at the last byte, take account of the fact it
+       may have less than 8 bits in it */
+    if( block->bytes_through_block == block->length-1 ) {
+      block->bits_through_byte = 8 - block->bits_in_last_byte;
+    } else {
+      block->bits_through_byte = 0;
+    }
+  }
+
+  /* Get the high bit, and shift the byte out leftwards */
+  next_bit = block->current_byte & 0x80;
+  block->current_byte <<= 1;
+
+  /* And set the timing and state for another data bit */
+  block->bit_tstates = ( next_bit ? block->bit1_length : block->bit0_length );
+  block->state = LIBSPECTRUM_TAPE_STATE_DATA1;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 libspectrum_error
 libspectrum_tape_block_description( libspectrum_tape_block *block,
 				    char *buffer, size_t length )
@@ -480,9 +586,14 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
   case LIBSPECTRUM_TAPE_BLOCK_PULSES:
     strncpy( buffer, "List of Pulses", length );
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
+    strncpy( buffer, "Pure Data Block", length );
+    break;
+
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
     strncpy( buffer, "Group Start Block", length );
     break;
+
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     strncpy( buffer, "Archive Info Block", length );
     break;
@@ -493,4 +604,3 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
   buffer[ length-1 ] = '\0';
   return LIBSPECTRUM_ERROR_NONE;
 }
-
