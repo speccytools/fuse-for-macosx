@@ -1,5 +1,5 @@
 /* ggiui.c: Routines for dealing with the GGI user interface
-   Copyright (c) 2003 Catalin Mihaila <catalin@idgrup.ro>
+   Copyright (c) 2003 Catalin Mihaila, Philip Kendall
 
    $Id$
 
@@ -103,17 +103,27 @@ uidisplay_frame_end( void )
 int
 uidisplay_init( int width, int height )
 {
-  ggiInit();
+  int error;
+
+  error = ggiInit();
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "uidisplay_init: ggiInit failed" );
+    return error;
+  }
 
   vis = ggiOpen( NULL );
 
-  if(vis == NULL) {
+  if( vis == NULL ) {
     ui_error( UI_ERROR_ERROR,
 	      "uidisplay_init: unable to open default visual" );
     return 1;
   }
 
-  ggiSetFlags( vis, GGIFLAG_ASYNC );
+  error = ggiSetFlags( vis, GGIFLAG_ASYNC );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "uidisplay_init: ggiSetFlags failed" );
+    return error;
+  }
 
   mo.virt.x = width;
   mo.virt.y = height;
@@ -127,8 +137,17 @@ uidisplay_init( int width, int height )
   mo.dpp.x = 1;
   mo.dpp.y = 1;
 
-  ggiCheckMode( vis, &mo );
-  ggiSetMode( vis, &mo );
+  error = ggiCheckMode( vis, &mo );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "uidisplay_init: ggiCheckMode failed" );
+    return error;
+  }
+
+  error = ggiSetMode( vis, &mo );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "uidisplay_init: ggiSetMode failed" );
+    return error;
+  }
 
   display_ui_initialised = 1;
 
