@@ -380,8 +380,12 @@ specplus3_memoryport_write( WORD port GCC_UNUSED, BYTE b )
   machine_current->ram.last_byte2=b;
 
 #ifdef HAVE_765_H
-  /* Set the state of both ( 3 = (1<<0) + (1<<1) ) floppy drive motors */
-  fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
+  /* If this was called by a machine which has a +3-style disk (ie the +3
+     as opposed to the +2A), set the state of both ( 3 = ( 1<<0 ) + ( 1<<1 ) )
+     floppy drive motors */
+  if( machine_capabilities( machine_current->machine ) &&
+      MACHINE_CAPABILITY_PLUS3_DISK )
+    fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
 #endif			/* #ifdef HAVE_765_H */
 
   if( b & 0x01) {	/* Check whether we want a special RAM configuration */

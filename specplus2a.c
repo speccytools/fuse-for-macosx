@@ -50,7 +50,7 @@ specplus2a_peripherals[] = {
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
   { 0xc002, 0x4000, spectrum_port_noread, spec128_memoryport_write },
-  { 0xf002, 0x1000, spectrum_port_noread, specplus2a_memoryport_write },
+  { 0xf002, 0x1000, spectrum_port_noread, specplus3_memoryport_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
@@ -111,33 +111,4 @@ int specplus2a_reset(void)
   snapshot_flush_slt();
 
   return 0;
-}
-
-void
-specplus2a_memoryport_write( WORD port GCC_UNUSED, BYTE b )
-{
-  /* Let the parallel printer code know about the strobe bit */
-  printer_parallel_strobe_write( b & 0x10 );
-
-  /* Do nothing else if we've locked the RAM configuration */
-  if( machine_current->ram.locked ) return;
-
-  /* Store the last byte written in case we need it */
-  machine_current->ram.last_byte2 = b;
-
-  if( b & 0x01) {	/* Check whether we want a special RAM configuration */
-
-    /* If so, select it */
-    machine_current->ram.special = 1;
-    machine_current->ram.specialcfg = ( b & 0x06 ) >> 1;
-
-  } else {
-
-    /* If not, we're selecting the high bit of the current ROM */
-    machine_current->ram.special = 0;
-    machine_current->ram.current_rom = 
-      ( machine_current->ram.current_rom & 0x01 ) | ( (b & 0x04) >> 1 );
-
-  }
-
 }

@@ -148,6 +148,7 @@ void snapshot_flush_slt (void)
 int snapshot_copy_from( libspectrum_snap *snap )
 {
   int i,j; int error;
+  int capabilities;
 
   switch( snap->machine ) {
   case LIBSPECTRUM_MACHINE_48:
@@ -201,6 +202,8 @@ int snapshot_copy_from( libspectrum_snap *snap )
   }
   machine_current->reset();
 
+  capabilities = machine_capabilities( machine_current->machine );
+
   z80.halted = 0;
 
   A  = snap->a ; F  = snap->f ;
@@ -216,9 +219,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   spectrum_ula_write( 0x00fe, snap->out_ula );
 
-  if( machine_current->machine >= SPECTRUM_MACHINE_128   &&
-      machine_current->machine <= SPECTRUM_MACHINE_PLUS3    ) {
-    spec128_memoryport_write( 0x7ffd, snap->out_128_memoryport );
+  if( capabilities & MACHINE_CAPABILITY_AY ) {
     ay_registerport_write( 0xfffd, snap->out_ay_registerport );
     for( i=0; i<16; i++ ) {
       machine_current->ay.registers[i] = snap->ay_registers[i];
@@ -226,11 +227,11 @@ int snapshot_copy_from( libspectrum_snap *snap )
     }
   }
 
-  if( machine_current->machine == SPECTRUM_MACHINE_PLUS2A ) {
-    specplus2a_memoryport_write( 0x1ffd, snap->out_plus3_memoryport );
-  } else if( machine_current->machine == SPECTRUM_MACHINE_PLUS3 ) {
+  if( capabilities & MACHINE_CAPABILITY_128_MEMORY )
+    spec128_memoryport_write( 0x7ffd, snap->out_128_memoryport );
+
+  if( capabilities & MACHINE_CAPABILITY_PLUS3_MEMORY )
     specplus3_memoryport_write( 0x1ffd, snap->out_plus3_memoryport );
-  }
 
   tstates = snap->tstates;
 
