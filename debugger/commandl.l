@@ -54,9 +54,11 @@ co|con|cont|contin|continu|continue { return CONTINUE; }
 cl|cle|clea|clear { return CLEAR; }
 ex|exi|exit { return EXIT; }
 n|ne|nex|next { return NEXT; }
+r|re|rea|read { return READ; }
 se|set { return SET; }
 sh|sho|show { return SHOW; }
 s|st|ste|step { return STEP; }
+w|wr|wri|writ|write { return WRITE; }
 
 a|b|c|d|e|f|h|l { yylval.integer = tolower( *yytext ); return REGISTER; }
 af|bc|de|hl|sp|pc|ix|iy { yylval.integer = debugger_reg16_index( yytext );

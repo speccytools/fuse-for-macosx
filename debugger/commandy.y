@@ -55,9 +55,11 @@ void yyerror( char *s );
 %token		 CONTINUE
 %token		 EXIT
 %token		 NEXT
+%token		 READ
 %token		 SET
 %token		 SHOW
 %token		 STEP
+%token		 WRITE
 
 %token <integer> REGISTER
 
@@ -83,7 +85,27 @@ command:   BREAK    { debugger_breakpoint_add(
 			    DEBUGGER_BREAKPOINT_LIFE_PERMANENT
                           );
                         }
+	 | BREAK READ { debugger_breakpoint_add(
+			  DEBUGGER_BREAKPOINT_TYPE_READ, PC,
+			  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+			);
+	              }
+	 | BREAK READ NUMBER { debugger_breakpoint_add(
+				 DEBUGGER_BREAKPOINT_TYPE_READ, $3,
+				 DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+                               );
+			     }
 	 | BREAK SHOW { debugger_breakpoint_show(); }
+	 | BREAK WRITE { debugger_breakpoint_add(
+			   DEBUGGER_BREAKPOINT_TYPE_WRITE, PC,
+			   DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+			 );
+	               }
+	 | BREAK WRITE NUMBER { debugger_breakpoint_add(
+				  DEBUGGER_BREAKPOINT_TYPE_WRITE, $3,
+				  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+                                );
+			      }
 	 | CONTINUE { debugger_run(); }
          | EXIT     { debugger_breakpoint_exit(); }
 	 | NEXT	    { debugger_next(); }

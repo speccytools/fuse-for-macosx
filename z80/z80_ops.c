@@ -73,9 +73,10 @@ void z80_do_opcodes()
     /* If the z80 is HALTed, repeat the HALT instruction */
     if( z80.halted ) PC--;
 
-    /* Do the instruction fetch */
+    /* Do the instruction fetch; readbyte_internal used here to avoid
+       triggering read breakpoints */
     contend( PC, 4 ); R++;
-    opcode=readbyte( PC++ );
+    opcode = readbyte_internal( PC++ );
 
     switch(opcode) {
     case 0x00:		/* NOP */
@@ -857,7 +858,7 @@ void z80_do_opcodes()
       {
 	BYTE opcode2;
 	contend( PC, 4 );
-	opcode2 = readbyte(PC++);
+	opcode2 = readbyte_internal( PC++ );
 	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
@@ -962,7 +963,7 @@ void z80_do_opcodes()
       {
 	BYTE opcode2;
 	contend( PC, 4 );
-	opcode2 = readbyte(PC++);
+	opcode2 = readbyte_internal( PC++ );
 	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
@@ -1056,7 +1057,7 @@ void z80_do_opcodes()
       {
 	BYTE opcode2;
 	contend( PC, 4 );
-	opcode2 = readbyte(PC++);
+	opcode2 = readbyte_internal( PC++ );
 	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
@@ -1138,7 +1139,7 @@ void z80_do_opcodes()
       {
 	BYTE opcode2;
 	contend( PC, 4 ); 
-	opcode2 = readbyte(PC++);
+	opcode2 = readbyte_internal( PC++ );
 	R++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {

@@ -424,9 +424,9 @@ case 0xcb:		/* {DD,FD}CBxx opcodes */
 {
   WORD tempaddr; BYTE opcode3;
   contend( PC, 3 );
-  tempaddr = REGISTER + (SBYTE)readbyte(PC++);
+  tempaddr = REGISTER + (SBYTE)readbyte_internal( PC++ );
   contend( PC, 4 );
-  opcode3 = readbyte( PC++ );
+  opcode3 = readbyte_internal( PC++ );
 #ifdef HAVE_ENOUGH_MEMORY
   switch(opcode3) {
 #include "z80_ddfdcb.c"
