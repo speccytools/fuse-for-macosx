@@ -177,6 +177,7 @@ tc2068_init( fuse_machine_info *machine )
   fake_mapping.writable = 0;
   fake_mapping.contended = 0;
   fake_mapping.bank = MEMORY_BANK_DOCK;
+  fake_mapping.source = MEMORY_SOURCE_SYSTEM;
   fake_mapping.offset = 0x0000;
 
   machine->unattached_port = tc2068_unattached_port;
@@ -217,12 +218,10 @@ tc2068_reset( void )
 
   }
 
-  if( settings_current.dck_file ) {
-    error = dck_read( settings_current.dck_file );
-    if( error ) {
-      ui_error( UI_ERROR_INFO, "Ignoring Timex dock file '%s'",
-		settings_current.dck_file );
-    }
+  error = dck_reset();
+  if( error ) {
+    ui_error( UI_ERROR_INFO, "Ignoring Timex dock file '%s'",
+            settings_current.dck_file );
   }
 
   return tc2068_tc2048_common_reset();

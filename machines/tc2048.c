@@ -169,11 +169,13 @@ tc2048_reset( void )
     timex_dock[i] = fake_mapping;
     timex_dock[i].bank= MEMORY_BANK_DOCK;
     timex_dock[i].page_num = i;
+    timex_dock[i].source= MEMORY_SOURCE_SYSTEM;
     memory_map_dock[i] = &timex_dock[i];
 
     timex_exrom[i] = fake_mapping;
     timex_exrom[i].bank = MEMORY_BANK_EXROM;
     timex_exrom[i].page_num = i;
+    timex_exrom[i].source= MEMORY_SOURCE_SYSTEM;
     memory_map_exrom[i] = &timex_exrom[i];
 
   }

@@ -86,6 +86,7 @@ memory_init( void )
     mapping1->writable = 0;
     mapping1->bank = MEMORY_BANK_HOME;
     mapping1->page_num = i;
+    mapping1->source = MEMORY_SOURCE_SYSTEM;
 
   }
 
@@ -104,6 +105,7 @@ memory_init( void )
     mapping1->offset = 0x0000;
     mapping2->offset = MEMORY_PAGE_SIZE;
 
+    mapping1->source = mapping2->source = MEMORY_SOURCE_SYSTEM;
   }
 
   /* Just initialise these with something */

@@ -45,6 +45,9 @@
 #include "debugger/debugger.h"
 #include "widget/widget.h"
 
+/* Dock cart inserted? */
+int dck_active = 0;
+
 int
 dck_insert( const char *filename )
 {
@@ -76,25 +79,35 @@ dck_eject( void )
   if( settings_current.dck_file ) free( settings_current.dck_file );
   settings_current.dck_file = NULL;
 
+  dck_active = 0;
+
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
 
   machine_reset();
 }
 
 int
-dck_read( const char *filename )
+dck_reset( void )
 {
   utils_file file;
   size_t num_block = 0;
   libspectrum_dck *dck;
   int error;
 
+  dck_active = 0;
+
+  if( !settings_current.dck_file ) {
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
+    return 0;
+  }
+
   error = libspectrum_dck_alloc( &dck ); if( error ) return error;
 
-  error = utils_read_file( filename, &file );
+  error = utils_read_file( settings_current.dck_file, &file );
   if( error ) { libspectrum_dck_free( dck, 0 ); return error; }
 
-  error = libspectrum_dck_read2( dck, file.buffer, file.length, filename );
+  error = libspectrum_dck_read2( dck, file.buffer, file.length,
+                                 settings_current.dck_file );
   if( error ) {
     utils_close_file( &file ); libspectrum_dck_free( dck, 0 ); return error;
   }
@@ -138,6 +151,7 @@ dck_read( const char *filename )
 	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
 		MEMORY_PAGE_SIZE );
         mem[i]->writable = 0;
+        mem[i]->source = MEMORY_SOURCE_CARTRIDGE;
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
@@ -147,12 +161,13 @@ dck_read( const char *filename )
 	   blocks from the HOME bank into the appropriate page; in
 	   other cases, we allocate ourselves a new page to store the
 	   contents in */
-        if( dck->dck[num_block]->bank != LIBSPECTRUM_DCK_BANK_HOME || i < 2 ) {
+        if( !(dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME && i>1) ) {
           mem[i]->page = memory_pool_allocate( MEMORY_PAGE_SIZE );
 	  if( !mem[i]->page ) return 1;
           mem[i]->writable = 1;
         }
 	
+        mem[i]->source = MEMORY_SOURCE_CARTRIDGE;
 	memcpy( mem[i]->page, dck->dck[num_block]->pages[i],
 		MEMORY_PAGE_SIZE );
         break;
@@ -161,6 +176,8 @@ dck_read( const char *filename )
     }
     num_block++;
   }
+
+  dck_active = 1;
 
   /* Make the menu item to eject the cartridge active */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 1 );

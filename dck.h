@@ -30,8 +30,11 @@
 #ifndef FUSE_DCK_H
 #define FUSE_DCK_H
 
+/* Dock cart inserted? */
+extern int dck_active;
+
 int dck_insert( const char *filename );
 void dck_eject( void );
-int dck_read( const char *filename );
+int dck_reset( void );
 
 #endif

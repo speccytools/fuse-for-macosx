@@ -101,6 +101,9 @@ if2_reset( void )
 				 2 * MEMORY_PAGE_SIZE );
   if( error ) return error;
 
+  memory_map_romcs[0].source =
+    memory_map_romcs[1].source = MEMORY_SOURCE_CARTRIDGE;
+
   machine_current->ram.romcs = 1;
 
   memory_romcs_map();

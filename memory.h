@@ -42,6 +42,13 @@ typedef enum memory_bank {
   
 } memory_bank;
 
+typedef enum memory_page_source {
+
+  MEMORY_SOURCE_SYSTEM,
+  MEMORY_SOURCE_CARTRIDGE,
+  
+} memory_page_source;
+
 typedef struct memory_page {
 
   libspectrum_byte *page;	/* The data for this page */
@@ -51,6 +58,8 @@ typedef struct memory_page {
   memory_bank bank;		/* Which bank is mapped in here */
   int page_num;			/* Which page from the bank */
   libspectrum_word offset;	/* How far into the page this chunk starts */
+
+  memory_page_source source;	/* Where did this page come from? */
 
 } memory_page;
 
