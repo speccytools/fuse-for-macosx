@@ -62,7 +62,8 @@ typedef enum trdos_drive_number {
 } trdos_drive_number;
 
 int trdos_disk_insert( trdos_drive_number which, const char *filename );
-int trdos_disk_eject( trdos_drive_number which );
+int trdos_disk_eject( trdos_drive_number which, int write );
+int trdos_disk_write( trdos_drive_number which, const char *filename );
 int trdos_event_cmd_done( libspectrum_dword last_tstates );
 int trdos_event_index( libspectrum_dword last_tstates );
 

@@ -373,6 +373,47 @@ int utils_write_file( const char *filename, const unsigned char *buffer,
   return 0;
 }
 
+/* Make a copy of a file in a temporary file */
+int
+utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
+		      const char *template )
+{
+  int error;
+  utils_file file;
+  ssize_t bytes_written;
+
+  snprintf( tempfilename, PATH_MAX, "%s/%s", utils_get_temp_path(), template );
+
+  *fd = mkstemp( tempfilename );
+  if( *fd == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't create temporary file: %s",
+	      strerror( errno ) );
+  }
+
+  error = utils_read_file( filename, &file );
+  if( error ) { close( *fd ); unlink( tempfilename ); return error; }
+
+  bytes_written = write( *fd, file.buffer, file.length );
+  if( bytes_written != file.length ) {
+    if( bytes_written == -1 ) {
+      ui_error( UI_ERROR_ERROR, "error writing to temporary file '%s': %s",
+		tempfilename, strerror( errno ) );
+    } else {
+      ui_error( UI_ERROR_ERROR,
+		"could write only %lu of %lu bytes to temporary file '%s'",
+		(unsigned long)bytes_written, (unsigned long)file.length,
+		tempfilename );
+    }
+    utils_close_file( &file ); close( *fd ); unlink( tempfilename );
+    return 1;
+  }
+
+  error = utils_close_file( &file );
+  if( error ) { close( *fd ); unlink( tempfilename ); return error; }
+
+  return 0;
+}
+
 /* Get a path where we can reasonably create temporary files */
 const char*
 utils_get_temp_path( void )

@@ -31,21 +31,11 @@
 
 #include <libspectrum.h>
 
-#ifndef FUSE_COMPAT_H
 #include "compat.h"
-#endif				/* #ifndef FUSE_COMPAT_H */
-
-#ifndef FUSE_KEYSYMS_H
 #include "keysyms.h"
-#endif			        /* #ifndef FUSE_KEYSYMS_H */
-
-#ifndef FUSE_SPECPLUS3_H
 #include "specplus3.h"
-#endif				/* #ifndef SPECPLUS3_H */
-
-#ifndef SCALER_H
+#include "trdos.h"
 #include "ui/scaler/scaler.h"
-#endif				/* #ifndef SCALER_H */
 
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {
@@ -89,8 +79,9 @@ ui_confirm_save_t ui_confirm_save( const char *message );
 /* Write the current tape out */
 int ui_tape_write( void );
 
-/* Write a +3 disk out */
+/* Write a +3 or TRDOS disk out */
 int ui_plus3_disk_write( specplus3_drive_number which );
+int ui_trdos_disk_write( trdos_drive_number which );
 
 /* Select a scaler from those for which `available' returns true */
 typedef int (*ui_scaler_available)( scaler_type scaler );

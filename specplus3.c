@@ -515,9 +515,7 @@ int
 specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 {
   char template[ PATH_MAX ];
-  utils_file file;
   int fd, error;
-  ssize_t bytes_written;
 
   if( which > SPECPLUS3_DRIVE_B ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d",
@@ -525,35 +523,9 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
     fuse_abort();
   }
 
-  /* Make a copy of the disk */
-  snprintf( template, PATH_MAX, "%s/%s", utils_get_temp_path(), dsk_template );
-
-  fd = mkstemp( template );
-  if( fd == -1 ) {
-    ui_error( UI_ERROR_ERROR, "couldn't create .dsk temporary file: %s",
-	      strerror( errno ) );
-  }
-
-  error = utils_read_file( filename, &file );
-  if( error ) { close( fd ); unlink( template ); return error; }
-
-  bytes_written = write( fd, file.buffer, file.length );
-  if( bytes_written != file.length ) {
-    if( bytes_written == -1 ) {
-      ui_error( UI_ERROR_ERROR, "error writing to temporary file '%s': %s",
-		template, strerror( errno ) );
-    } else {
-      ui_error( UI_ERROR_ERROR,
-		"could write only %lu of %lu bytes to temporary file '%s'",
-		(unsigned long)bytes_written, (unsigned long)file.length,
-		template );
-    }
-    utils_close_file( &file ); close( fd ); unlink( template );
-    return 1;
-  }
-
-  error = utils_close_file( &file );
-  if( error ) { close( fd ); unlink( template ); return error; }
+  /* Make a temporary copy of the disk file */
+  error = utils_make_temp_file( &fd, template, filename, dsk_template );
+  if( error ) return error;
 
   /* Eject any disk already in the drive */
   if( drives[which].fd != -1 ) specplus3_disk_eject( which, 0 );

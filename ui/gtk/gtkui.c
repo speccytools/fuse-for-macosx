@@ -1064,7 +1064,7 @@ disk_eject( gpointer data GCC_UNUSED, guint action,
   }
 #endif				/* #ifdef HAVE_765_H */
 
-  trdos_disk_eject( which );
+  trdos_disk_eject( which, write );
 }
 
 #ifdef HAVE_765_H
@@ -1096,6 +1096,29 @@ ui_plus3_disk_write( specplus3_drive_number which )
   return 0;
 }
 #endif				/* #ifdef HAVE_765_H */  
+
+int
+ui_trdos_disk_write( trdos_drive_number which )
+{
+  char drive, *filename, title[80];
+
+  drive = which == TRDOS_DRIVE_A ? 'A' : 'B';
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write TR-DOS Disk %c:", drive );
+
+  filename = gtkui_fileselector_get_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  trdos_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
 
 /* Cartridge/Insert */
 static void

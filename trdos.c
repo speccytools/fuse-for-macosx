@@ -167,6 +167,9 @@ int trdos_active=0;
 /* The template used for naming the results of the SCL->TRD conversion */
 #define SCL_TMP_FILE_TEMPLATE "fuse.scl.XXXXXX"
 
+/* The template used for the temporary copy of a .trd file */
+static const char *trd_template = "fuse.trd.XXXXXX";
+
 static int Scl2Trd( const char *oldname, int TRD );
 static int insert_scl( trdos_drive_number which, const char *filename );
 static int insert_trd( trdos_drive_number which, const char *filename );
@@ -343,70 +346,17 @@ trdos_sp_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 static int
 insert_trd( trdos_drive_number which, const char *filename )
 {
-  int fil;
-  libspectrum_byte *temp;
+  int fd, error;
+  char tempfilename[ PATH_MAX ];
+
+  /* Make a temporary copy of the disk */
+  error = utils_make_temp_file( &fd, tempfilename, filename, trd_template );
+  if( error ) return error;
+
+  unlink( tempfilename );
 
   discs[which].ro = 0;
-
-  fil = open( filename, O_RDWR | O_BINARY );
-  if( fil == -1 ) {
-
-    /* If we couldn't open the file read-write, try opening it read-only */
-    if( errno == EACCES ) {
-      discs[which].ro = 1;
-      fil = open( filename, O_RDONLY | O_BINARY );
-    }
-  }
-
-  if( fil == -1 ) {
-
-    ssize_t written;
-
-    /* If we got an error other than 'file doesn't exist', don't try
-       anything else */
-    if( errno != ENOENT ) {
-      ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
-		strerror( errno ) );
-      return 1;
-    }
-
-    ui_error( UI_ERROR_INFO, "No such file '%s'; creating it", filename );
-    discs[which].ro = 0;
-
-    /* FIXME: NFS locking problems */
-    fil = open( filename, O_CREAT | O_EXCL | O_RDWR | O_BINARY );
-    if( fil == -1 ) {
-      ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
-		strerror( errno ) );
-      return 1;
-    }
-
-    temp = malloc( TRDOS_DISC_SIZE );
-    if( !temp ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      close( fil );
-      return 1;
-    }
-
-    memset( temp, TRDOS_DISC_SIZE, 0 );
-
-    written = write( fil, temp, TRDOS_DISC_SIZE );
-    if( written != TRDOS_DISC_SIZE ) {
-      if( written == -1 ) {
-	ui_error( UI_ERROR_ERROR, "Error writing to '%s': %s", filename,
-		  strerror( errno ) );
-      } else {
-	ui_error( UI_ERROR_ERROR,
-		  "Only wrote %lu bytes out of %d to '%s'",
-		  (unsigned long)written, TRDOS_DISC_SIZE, filename );
-      }
-      close( fil );
-      return 1;
-    }
-
-  }
-
-  discs[which].fd = fil;
+  discs[which].fd = fd;
   strcpy( discs[which].filename, filename );
   discs[which].disc_ready = 1;
 
@@ -471,7 +421,7 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
   libspectrum_class_t class;
 
   if( discs[ which ].disc_ready ) {
-    if( trdos_disk_eject( which ) ) return 1;
+    if( trdos_disk_eject( which, 0 ) ) return 1;
   }
 
   if( utils_read_file( filename, &file ) ) return 1;
@@ -516,11 +466,18 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
 }
 
 int
-trdos_disk_eject( trdos_drive_number which )
+trdos_disk_eject( trdos_drive_number which, int write )
 {
-  if( close( discs[which].fd ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Error closing '%s': %s", discs[which].filename,
-	      strerror( errno ) );
+  int error;
+
+  if( write ) {
+    ui_trdos_disk_write( which );
+  } else {
+    error = close( discs[ which ].fd );
+    if( error ) {
+      ui_error( UI_ERROR_ERROR, "Error closing '%s': %s",
+		discs[which].filename, strerror( errno ) );
+    }
     return 1;
   }
 
@@ -532,6 +489,42 @@ trdos_disk_eject( trdos_drive_number which )
 			     UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
     0
   );
+
+  return 0;
+}
+
+int
+trdos_disk_write( trdos_drive_number which, const char *filename )
+{
+  FILE *f;
+  utils_file file;
+  int error;
+  ssize_t bytes_written;
+
+  f = fopen( filename, "wb" );
+  if( !f ) {
+    ui_error( UI_ERROR_ERROR, "couldn't open '%s' for writing: %s", filename,
+	      strerror( errno ) );
+  }
+
+  error = utils_read_fd( discs[ which ].fd, discs[ which ].filename, &file );
+  if( error ) { fclose( f ); return error; }
+
+  bytes_written = fwrite( file.buffer, 1, file.length, f );
+  if( bytes_written != file.length ) {
+    ui_error( UI_ERROR_ERROR, "could write only %lu of %lu bytes to '%s'",
+	      (unsigned long)bytes_written, (unsigned long)file.length,
+	      filename );
+    utils_close_file( &file ); fclose( f );
+  }
+
+  error = utils_close_file( &file ); if( error ) { fclose( f ); return error; }
+
+  if( fclose( f ) ) {
+    ui_error( UI_ERROR_ERROR, "error closing '%s': %s", filename,
+	      strerror( errno ) );
+    return 1;
+  }
 
   return 0;
 }

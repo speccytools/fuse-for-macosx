@@ -63,6 +63,8 @@ int utils_close_file( utils_file *file );
 
 int utils_write_file( const char *filename, const unsigned char *buffer,
 		      size_t length );
+int utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
+			  const char *template );
 const char* utils_get_temp_path( void );
 const char* utils_get_home_path( void );
 
