@@ -30,6 +30,8 @@
 
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "debugger/debugger.h"
 #include "widget_internals.h"
 #include "z80/z80.h"
@@ -56,12 +58,12 @@ widget_debugger_draw( void *data GCC_UNUSED )
 				   "DE", "DE'",
 				   "HL", "HL'",
                                  };
-  WORD *register_values[] = { &PC, &SP,
-			      &AF, &AF_,
-			      &BC, &BC_,
-			      &DE, &DE_,
-			      &HL, &HL_,
-                            };
+  libspectrum_word *register_values[] = { &PC, &SP,
+					  &AF, &AF_,
+					  &BC, &BC_,
+					  &DE, &DE_,
+					  &HL, &HL_,
+					};
 
   size_t i; char buffer[40];
 
@@ -116,7 +118,7 @@ widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
   }
 }
 
-int ui_debugger_disassemble( WORD address GCC_UNUSED )
+int ui_debugger_disassemble( libspectrum_word address GCC_UNUSED )
 {
   return 0;
 }

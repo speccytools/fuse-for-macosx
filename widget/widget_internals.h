@@ -1,5 +1,5 @@
 /* widget_internals.h: Functions internal to the widget code
-   Copyright (c) 2001,2002 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001-2003 Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -27,14 +27,11 @@
 #ifndef FUSE_WIDGET_INTERNALS_H
 #define FUSE_WIDGET_INTERNALS_H
 
-#ifndef _DIRENT_H
 #include <sys/types.h>
 #include <dirent.h>
-#endif				/* #ifndef _DIRENT_H */
-
-#ifndef _STDLIB_H
 #include <stdlib.h>
-#endif				/* #ifndef _STDLIB_H */
+
+#include <libspectrum.h>
 
 #ifndef FUSE_SETTINGS_H
 #include "settings.h"
@@ -117,7 +114,7 @@ void widget_machine_keyhandler( keyboard_key_name key,
 
 typedef struct widget_picture_data {
   const char *filename;
-  BYTE *screen;
+  libspectrum_byte *screen;
   int border;
 } widget_picture_data;
 

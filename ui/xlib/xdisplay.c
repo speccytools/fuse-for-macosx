@@ -51,6 +51,8 @@
 #include <X11/extensions/XShm.h>
 #endif				/* #ifdef X_USE_SHM */
 
+#include <libspectrum.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
@@ -77,9 +79,10 @@ int image_scale;
 int image_width, image_height;
 
 /* A scaled copy of the image displayed on the Spectrum's screen */
-static WORD scaled_image[2*DISPLAY_SCREEN_HEIGHT][2*DISPLAY_SCREEN_WIDTH];
+static libspectrum_word
+  scaled_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ 2 * DISPLAY_SCREEN_WIDTH ];
 static const ptrdiff_t scaled_pitch =
-                                     2 * DISPLAY_SCREEN_WIDTH * sizeof( WORD );
+  2 * DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 
 static unsigned long colours[16];
 
@@ -417,9 +420,9 @@ uidisplay_area( int x, int y, int w, int h )
   scaled_x = scale * x; scaled_y = scale * y;
 
   /* Create scaled image */
-  scaler_proc16( (BYTE*)&display_image[y][x], display_pitch,
-		 (BYTE*)&scaled_image[scaled_y][scaled_x], scaled_pitch,
-		 w, h );
+  scaler_proc16( (libspectrum_byte*)&display_image[y][x], display_pitch,
+		 (libspectrum_byte*)&scaled_image[scaled_y][scaled_x],
+		 scaled_pitch, w, h );
 
   w *= scale; h *= scale;
 
