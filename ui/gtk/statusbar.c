@@ -28,6 +28,8 @@
 
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
+#include <stdio.h>
+
 #include <gtk/gtk.h>
 
 #include "gtkinternals.h"
@@ -35,7 +37,8 @@
 
 GtkWidget *disk_status,	/* Is the disk motor running? */
   *pause_status,	/* Is emulation paused (via the menu option)? */
-  *tape_status;		/* Is the tape running? */
+  *tape_status,		/* Is the tape running? */
+  *speed_status;	/* How fast are we running? */
 
 int
 gtkstatusbar_create( GtkBox *parent )
@@ -53,6 +56,9 @@ gtkstatusbar_create( GtkBox *parent )
 
   tape_status = gtk_label_new( "Tape: 0" );
   gtk_box_pack_start_defaults( GTK_BOX( status_bar ), tape_status );
+
+  speed_status = gtk_label_new( "100%" );
+  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), speed_status );
 
   return 0;
 }
@@ -91,6 +97,17 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
   ui_error( UI_ERROR_ERROR, "Attempt to update unknown statusbar item %d",
 	    item );
   return 1;
+}
+
+int
+ui_statusbar_update_speed( float speed )
+{
+  char buffer[8];
+
+  snprintf( buffer, 8, "%3.0f%%", speed );
+  gtk_label_set( GTK_LABEL( speed_status ), buffer );
+
+  return 0;
 }
 
 #endif			/* #ifdef UI_GTK */

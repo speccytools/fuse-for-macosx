@@ -26,9 +26,98 @@
 
 #include <config.h>
 
+#include <errno.h>
+
 #include "fuse.h"
 #include "settings.h"
 #include "timer.h"
+#include "ui/ui.h"
+
+/*
+ * Routines for estimating emulation speed
+ */
+
+/* The actual time at the end of each of the last 10 emulated seconds */
+static timer_type stored_times[10];
+
+/* Which is the next entry in 'stored_times' that we will update */
+static size_t next_stored_time = 0;
+
+/* The number of frames until we next update 'stored_times' */
+static int frames_until_update = 0;
+
+/* The current running speed */
+float timer_current_speed;
+
+int
+timer_estimate_speed( void )
+{
+  timer_type current_time;
+  float difference;
+  int error;
+
+  if( frames_until_update-- ) return 0;
+
+  error = timer_get_real_time( &current_time ); if( error ) return error;
+
+  difference = timer_get_time_difference( &current_time, 
+					  &stored_times[ next_stored_time ] );
+
+  timer_current_speed = 100 * ( 10.0 / difference );
+
+  ui_statusbar_update_speed( timer_current_speed );
+
+  stored_times[ next_stored_time ] = current_time;
+
+  next_stored_time = ( next_stored_time + 1 ) % 10;
+  frames_until_update = 49;
+
+  return 0;
+}
+
+#ifndef WIN32
+
+int
+timer_get_real_time( timer_type *time )
+{
+  int error;
+
+  error = gettimeofday( time, NULL );
+  if( error ) {
+    ui_error( UI_ERROR_INFO, "error getting time: %s", strerror( errno ) );
+    return 1;
+  }
+
+  return 0;
+}
+
+float
+timer_get_time_difference( timer_type *a, timer_type *b )
+{
+  return ( a->tv_sec - b->tv_sec ) + ( a->tv_usec - b->tv_usec ) / 1000000.0;
+}
+
+#else				/* #ifndef WIN32 */
+
+int
+timer_get_real_time( timer_type *time )
+{
+  *time = GetTickCount();
+  return 0;
+}
+
+float
+timer_get_time_difference( timer_type *a, timer_type *b )
+{
+  return ( *a - *b ) / 1000000.0;
+}
+
+#endif				/* #ifndef WIN32 */
+
+/*
+ * Routines for speed control; used either when sound is not in use, or
+ * when the SDL sound routines are being used
+ */
 
 volatile float timer_count;
 

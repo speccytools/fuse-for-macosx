@@ -110,5 +110,6 @@ typedef enum ui_statusbar_state {
 } ui_statusbar_state;
 
 int ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state );
+int ui_statusbar_update_speed( float speed );
 
 #endif			/* #ifndef FUSE_UI_H */

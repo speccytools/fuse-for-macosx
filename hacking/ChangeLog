@@ -358,3 +358,5 @@
          readbyte_internal().
 20031114 Remove use of *_contend_memory().
 20031114 Precalculate the contention at every tstate.
+20031115 event.c, rzx.c, timer.[ch], ui/ui.h, ui/gtk/statusbar.c,
+	 widget/widget.c: add current emulation speed to GTK+ statusbar.

@@ -1,5 +1,5 @@
 /* timer.h: Speed routines for Fuse
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -26,6 +26,25 @@
 
 #ifndef FUSE_TIMER_H
 #define FUSE_TIMER_H
+
+#ifndef WIN32
+
+#include <sys/time.h>
+#include <time.h>
+
+typedef struct timeval timer_type;
+
+#else				/* #ifndef WIN32 */
+
+#include <windows.h>
+
+typedef DWORD timer_type;
+
+#endif				/* #ifndef WIN32 */
+
+int timer_estimate_speed( void );
+int timer_get_real_time( timer_type *time );
+float timer_get_time_difference( timer_type *a, timer_type *b );
 
 extern volatile float timer_count;
 

@@ -45,6 +45,7 @@
 #include "trdos.h"
 #include "ui/ui.h"
 #include "spectrum.h"
+#include "timer.h"
 #include "z80/z80.h"
 
 /* A large value to mean `no events due' */
@@ -135,6 +136,7 @@ int event_do_events(void)
       psg_frame();
       spectrum_frame();
       z80_interrupt();
+      timer_estimate_speed();
       ui_event();
       break;
 

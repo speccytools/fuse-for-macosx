@@ -26,12 +26,9 @@
 
 #include <config.h>
 
-#include <errno.h>
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -94,11 +91,7 @@ libspectrum_rzx_dsa_key rzx_key = {
 };
 
 /* The time we started recording this RZX file */
-#ifndef WIN32
-static struct timeval start_time;
-#else				/* #ifndef WIN32 */
-static DWORD start_time;
-#endif				/* #ifndef WIN32 */
+static timer_type start_time;
 
 /* How many 1/50ths of a second do we expect to have elapsed since we
    started recording? */
@@ -372,14 +365,6 @@ static int recording_frame( void )
      speed */
   if( rzx_competition_mode ) {
 
-#ifndef WIN32
-    struct timeval current_time;
-#else				/* #ifndef WIN32 */
-    DWORD current_time;
-#endif				/* #ifndef WIN32 */
-
-    float elapsed_time;
-
     expected_time++;
 
     /* We wait one second before starting time measurements at all.
@@ -388,62 +373,43 @@ static int recording_frame( void )
        sound, the first few frames run fast as the sound buffers fill
        up) */
     if( expected_time == 50 ) {
-      
-#ifndef WIN32
-      error = gettimeofday( &start_time, NULL );
-      if( error ) {
-	ui_error(
-          UI_ERROR_INFO,
-	  "couldn't get start time: %s: stopping competition mode RZX recording",
-	  strerror( errno )
-	);
-	rzx_stop_recording();
-	return 1;
-      }
-#else				/* #ifndef WIN32 */
-      start_time = GetTickCount();
-#endif				/* #ifndef WIN32 */
 
+      error = timer_get_real_time( &start_time );
+      if( error ) {
+	ui_error( UI_ERROR_ERROR, "stopping competition mode recording" );
+	rzx_stop_recording();
+	return error;
+      }
+      
     /* Measuring small time intervals will be inaccurate, so don't
        start checking for speed violations until at least one second
        of measured time has elapsed (ie two seconds into recording) */
     } else if( expected_time > 100 ) {
 
-      float seconds;
+      timer_type current_time;
+      float elapsed_seconds, expected_seconds;
 
-#ifndef WIN32
-      error = gettimeofday( &current_time, NULL );
+      error = timer_get_real_time( &current_time );
       if( error ) {
-	ui_error(
-          UI_ERROR_INFO,
-	  "couldn't get time: %s: stopping competition mode RZX recording",
-	  strerror( errno )
-	);
+	ui_error( UI_ERROR_ERROR, "stopping competition mode recording" );
 	rzx_stop_recording();
-	return 1;
+	return error;
       }
-#else				/* #ifndef WIN32 */
-    current_time = GetTickCount();
-#endif				/* #ifndef WIN32 */
 
       /* -1 to account for the fact we don't time the first second */
-      seconds = ( expected_time * 0.02 ) - 1;
+      expected_seconds = ( expected_time * 0.02 ) - 1;
 
-#ifndef WIN32
-      elapsed_time =   current_time.tv_sec  - start_time.tv_sec +
-	             ( current_time.tv_usec - start_time.tv_usec ) / 1000000.0;
-#else				/* #ifndef WIN32 */
-      elapsed_time =   current_time - start_time / 1000000.0;
-#endif				/* #ifndef WIN32 */
+      elapsed_seconds =
+	timer_get_time_difference( &current_time, &start_time );
 
-      if( fabs( seconds / elapsed_time - 1 ) > SPEED_TOLERANCE ) {
+      if( fabs( expected_seconds / elapsed_seconds - 1 ) > SPEED_TOLERANCE ) {
 
 	rzx_stop_recording();
 
 	ui_error(
 	  UI_ERROR_INFO,
 	  "emulator speed is %d%%: stopping competition mode RZX recording",
-	  (int)( 100 * ( seconds / elapsed_time ) )
+	  (int)( 100 * ( expected_seconds / elapsed_seconds ) )
 	);
 
       }
