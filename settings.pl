@@ -77,8 +77,10 @@ print hashline( __LINE__ ), << 'CODE';
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifdef HAVE_GETOPT_LONG
+#ifdef HAVE_GETOPT_LONG		/* Did our libc include getopt_long? */
 #include <getopt.h>
+#else				/* #ifdef HAVE_GETOPT_LONG */
+#include "getopt/getopt.h"	/* If not, use ours */
 #endif				/* #ifdef HAVE_GETOPT_LONG */
 
 #ifdef HAVE_LIB_XML2
@@ -304,17 +306,6 @@ settings_command_line( settings_info *settings, int *first_arg,
                        int argc, char **argv )
 {
 
-#ifndef HAVE_GETOPT_LONG
-
-    struct option {
-      const char *name;
-      int has_arg;
-      int *flag;
-      int val;
-    };
-
-#endif				/* #ifndef HAVE_GETOPT_LONG */
-
   struct option long_options[] = {
 
 CODE
@@ -351,11 +342,7 @@ print hashline( __LINE__ ), << 'CODE';
     struct option *ptr;
     int c;
 
-#ifdef HAVE_GETOPT_LONG
     c = getopt_long( argc, argv, "d:hm:o:p:r:s:t:v:V", long_options, NULL );
-#else				/* #ifdef HAVE_GETOPT_LONG */
-    c = getopt( argc, argv, "d:hm:o:p:r:s:t:v:V" );
-#endif				/* #ifdef HAVE_GETOPT_LONG */
 
     if( c == -1 ) break;	/* End of option list */
 

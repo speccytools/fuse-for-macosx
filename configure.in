@@ -43,7 +43,8 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(getopt_long)
+AC_CHECK_FUNCS(getopt_long,,GETOPT_LIBS=getopt/libgetopt.a)
+AC_SUBST(GETOPT_LIBS)
 
 dnl Check sizes of various types; second parameter is a `default' for
 dnl cross-compiling. Will obviously break everything if this is wrong...
@@ -249,7 +250,7 @@ if test "$ac_cv_prog_gcc" = yes; then
     fi
 fi
 
-AC_OUTPUT(Makefile hacking/Makefile lib/Makefile \
+AC_OUTPUT(Makefile getopt/Makefile hacking/Makefile lib/Makefile \
 man/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \
 ui/Makefile ui/aalib/Makefile ui/fb/Makefile ui/gtk/Makefile ui/svga/Makefile \
 ui/xlib/Makefile widget/Makefile z80/Makefile)
