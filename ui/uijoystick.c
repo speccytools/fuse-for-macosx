@@ -57,6 +57,7 @@
 #include "spectrum.h"
 #include "machine.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 static js_data_struct jsd[2];
 
@@ -168,7 +169,7 @@ ui_joystick_read( libspectrum_word port, libspectrum_byte which )
        if( jsd[which].axis[1]->cur >
 	   jsd[which].axis[1]->cen + jsd[which].axis[1]->nz ) {
     ret |= 4; /* down */
-  else if( jsd[which].axis[1]->cur <
+  } else if( jsd[which].axis[1]->cur <
 	   jsd[which].axis[1]->cen - jsd[which].axis[1]->nz ) {
     ret |= 8; /* up */
   }

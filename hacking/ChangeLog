@@ -340,3 +340,4 @@
 	 z80/z80_ops.c: add support for retriggered interrupts.
 20031106 debugger/command.c, debugger/commandl.l: remove use of %option
 	 noyywrap.
+20031107 ui/uijoystick.c: fix typos (thanks, Erik Kunze).
