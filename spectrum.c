@@ -80,11 +80,16 @@ BYTE readport(WORD port)
   spectrum_port_info *ptr;
 
   BYTE return_value = 0xff;
+  int attached = 0;		/* Is this port attached to anything? */
 
   for( ptr = machine_current->peripherals; ptr->mask; ptr++ ) {
     if( ( port & ptr->mask ) == ptr->data ) {
-      return_value &= ptr->read(port);
+      return_value &= ptr->read(port); attached = 1;
     }
+  }
+
+  if( !attached ) {
+    return machine_current->unattached_port();
   }
 
   return return_value;

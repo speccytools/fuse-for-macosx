@@ -8,6 +8,10 @@ Some thanks (in alphabetical order):
   (http://www.comlab.ox.ac.uk/oucl/users/ian.collier/Spectrum/index.html)
   was very helpful for getting the z80 opcodes right.
 
+* Ian Greenway: for information about reading from unattached ports. If
+  you've got an Amiga, you may well like to check out Ian's Spectrum
+  Emulator, ASp: http://www.greew.freeserve.co.uk/ASp.html
+
 * Shawn Hargreaves: for Allegro (http://www.talula.demon.co.uk/allegro/)
   (again, used by previous versions of Fuse for the graphical display)
 

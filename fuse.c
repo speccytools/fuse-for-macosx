@@ -67,6 +67,8 @@ static void fuse_show_help( void );
 
 static int fuse_end(void);
 
+BYTE spec48_unattached_port(void);
+
 int main(int argc,char **argv)
 {
   if(fuse_init(argc,argv)) {

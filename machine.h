@@ -63,6 +63,8 @@ typedef struct machine_timings {
 
 } machine_timings;  
 
+typedef BYTE (*spectrum_unattached_port_fn)( void );
+
 typedef struct machine_info {
 
   int machine;		/* which machine type is this? */
@@ -81,6 +83,10 @@ typedef struct machine_info {
   BYTE **roms;
 
   spectrum_port_info *peripherals; /* Which peripherals do we have? */
+  spectrum_unattached_port_fn unattached_port; /* What to return if we read
+						  from a port which isn't
+						  attached to anything */
+
   ayinfo ay;		/* The AY-8-3912 chip */
 
 } machine_info;

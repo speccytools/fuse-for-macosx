@@ -1,5 +1,5 @@
 /* spec48.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
 
@@ -30,6 +30,8 @@
 #ifndef FUSE_TYPES_H
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
+
+BYTE spec48_unattached_port( void );
 
 BYTE spec48_readbyte(WORD address);
 BYTE spec48_read_screen_memory(WORD offset);
