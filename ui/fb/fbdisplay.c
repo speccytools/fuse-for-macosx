@@ -66,7 +66,7 @@ static int hires;
 static int register_scalers( void );
 
 /* probably 0rrrrrgggggbbbbb */
-static short colours[16];
+static short rgbs[16], greys[16];
 
 static int fb_fd = -1;		/* The framebuffer's file descriptor */
 static libspectrum_word *gm = 0;
@@ -157,9 +157,9 @@ int fbdisplay_init(void)
   int i;
   char *dev;
 
-  static libspectrum_word paldata[4] = { 0, 0xBBBB, 0xFFFF };
+  static libspectrum_word paldata[20] = { 0, 0xbbbb, 0xffff };
   static const struct fb_cmap fb_cmap = {
-    0, 4, paldata, paldata, paldata, NULL
+    0, 20, paldata, paldata, paldata, NULL
   };
 
   dev = getenv( DEVICE_VARIABLE );
@@ -186,11 +186,18 @@ int fbdisplay_init(void)
 
   for( i = 0; i < 16; i++ ) {
     int v = ( i & 8 ) ? 2 : 1;
+     rgbs[i] = ( ( i & 1 ) ? v << display.blue.offset  : 0 )
+           | ( ( i & 2 ) ? v << display.red.offset   : 0 )
+           | ( ( i & 4 ) ? v << display.green.offset : 0 );
 
-    colours[i] = 0;
-    if( i & 1 ) colours[i] |= v << display.blue.offset;
-    if( i & 2 ) colours[i] |= v << display.red.offset;
-    if( i & 4 ) colours[i] |= v << display.green.offset;
+     v = ( i & 8 ) ? 15 : 11;
+     paldata[i+4] = (   ( (i & 1) ? v *  7471 : 0)  /* 0.114 */
+		      + ( (i & 2) ? v * 19595 : 0)  /* 0.299 */
+		      + ( (i & 4) ? v * 38469 : 0)  /* 0.587 */
+		    ) / 15;
+     greys[i] = (i + 4) << display.blue.offset
+              | (i + 4) << display.red.offset
+              | (i + 4) << display.green.offset;
   }
 
   display.activate = FB_ACTIVATE_NOW;
@@ -298,7 +305,8 @@ void
 uidisplay_area( int x, int start, int width, int height)
 {
   int y;
-  
+  const short *colours = settings_current.bw_tv ? greys : rgbs;
+
   switch( fb_resolution ) {
   case FB_RES( 640, 480 ):
     for( y = start; y < start + height; y++ )

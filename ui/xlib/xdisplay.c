@@ -58,6 +58,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "screenshot.h"
+#include "settings.h"
 #include "xdisplay.h"
 #include "xui.h"
 #include "ui/scaler/scaler.h"
@@ -84,7 +85,7 @@ static libspectrum_word
 static const ptrdiff_t scaled_pitch =
   2 * DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 
-static unsigned long colours[16];
+static unsigned long colours[16], greys[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int xdisplay_current_size=1;
@@ -100,8 +101,7 @@ static int get_shm_id( const int size );
 
 static int shm_used = 0;
 
-static int xdisplay_allocate_colours( int numColours,
-				      unsigned long *colour_values );
+static int xdisplay_allocate_colours( void );
 static int xdisplay_allocate_gc( Window window, GC *new_gc );
 
 static int xdisplay_allocate_image(int width, int height);
@@ -112,7 +112,7 @@ static void xdisplay_catch_signal( int sig );
 int
 xdisplay_init( void )
 {
-  if(xdisplay_allocate_colours(16,colours)) return 1;
+  if(xdisplay_allocate_colours()) return 1;
   if(xdisplay_allocate_gc(xui_mainWindow,&gc)) return 1;
   if( xdisplay_allocate_image( DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT ) )
      return 1;
@@ -121,9 +121,31 @@ xdisplay_init( void )
 }
 
 static int
-xdisplay_allocate_colours( int numColours, unsigned long *colour_values )
+xdisplay_alloc_colour( Colormap *map, XColor *colour, int grey,
+                       const char *cname )
 {
-  XColor colour;
+  for(;;) {
+    if( XAllocColor(display, *map, colour) )
+      return 0;
+
+    fprintf(stderr,"%s: couldn't allocate %s `%s'\n", fuse_progname,
+            grey ? "grey for colour" : "colour", cname);
+    if(*map == DefaultColormap(display, xui_screenNum)) {
+      fprintf(stderr,"%s: switching to private colour map\n", fuse_progname);
+      *map=XCopyColormapAndFree(display, *map);
+      XSetWindowColormap(display, xui_mainWindow, *map);
+      /* Need to repeat the failed allocation */
+    } else {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int
+xdisplay_allocate_colours( void )
+{
+  XColor colour, grey;
   Colormap currentMap;
 
   static const char *colour_names[] = {
@@ -149,25 +171,24 @@ xdisplay_allocate_colours( int numColours, unsigned long *colour_values )
 
   currentMap=DefaultColormap(display,xui_screenNum);
 
-  for(i=0;i<numColours;i++) {
+  for(i=0;i<16;i++) {
     if( XParseColor(display, currentMap, colour_names[i], &colour) == 0 ) {
       fprintf(stderr,"%s: couldn't parse colour `%s'\n", fuse_progname,
 	      colour_names[i]);
       return 1;
     }
-    if( XAllocColor(display, currentMap, &colour) == 0 ) {
-      fprintf(stderr,"%s: couldn't allocate colour `%s'\n", fuse_progname,
-	      colour_names[i]);
-      if(currentMap == DefaultColormap(display, xui_screenNum)) {
-	fprintf(stderr,"%s: switching to private colour map\n", fuse_progname);
-	currentMap=XCopyColormapAndFree(display, currentMap);
-	XSetWindowColormap(display, xui_mainWindow, currentMap);
-	i--;		/* Need to repeat the failed allocation */
-      } else {
-	return 1;
-      }
-    }
-    colour_values[i] = colour.pixel;
+
+    grey.red = grey.green = grey.blue =
+      0.299 * colour.red + 0.587 * colour.green + 0.114 * colour.blue;
+
+    if( xdisplay_alloc_colour( &currentMap, &colour, 0, colour_names[i] ) )
+      return 1;
+    colours[i] = colour.pixel;
+
+    if( xdisplay_alloc_colour( &currentMap, &grey, 1, colour_names[i] ) )
+      return 1;
+    greys[i] = grey.pixel;
+
   }
 
   return 0;
@@ -413,6 +434,7 @@ uidisplay_area( int x, int y, int w, int h )
 {
   float scale = (float)xdisplay_current_size / image_scale;
   int scaled_x, scaled_y, xx, yy;
+  const unsigned long *palette = settings_current.bw_tv ? greys : colours;
 
   /* Extend the dirty region by 1 pixel for scalers
        that "smear" the screen, e.g. 2xSAI */
@@ -432,7 +454,7 @@ uidisplay_area( int x, int y, int w, int h )
   for( yy = scaled_y; yy < scaled_y + h; yy++ )
     for( xx = scaled_x; xx < scaled_x + w; xx++ ) {
       int colour = scaled_image[yy][xx];
-      XPutPixel( image, xx, yy, colours[ colour ] );
+      XPutPixel( image, xx, yy, palette[ colour ] );
     }
 
   /* Blit to the real screen */

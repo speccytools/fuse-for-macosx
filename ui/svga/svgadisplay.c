@@ -179,7 +179,7 @@ register_scalers( void )
 static int
 svgadisplay_allocate_colours( int numColours )
 {
-  static const int colour_palette[] = {
+  static const libspectrum_byte colour_palette[] = {
   0,0,0,
   0,0,192,
   192,0,0,
@@ -197,12 +197,17 @@ svgadisplay_allocate_colours( int numColours )
   255,255,0,
   255,255,255
   };
-  
+
   int i;
 
-  for(i=0;i<numColours;i++)
+  for(i=0;i<numColours;i++) {
+    float grey = 0.299 * colour_palette[i*3]
+               + 0.587 * colour_palette[i*3+1]
+               + 0.114 * colour_palette[i*3+2] + 0.5;
+    vga_setpalette(i+16, grey / 4, grey / 4, grey / 4);
     vga_setpalette(i,colour_palette[i*3]>>2,colour_palette[i*3+1]>>2,
 		   colour_palette[i*3+2]>>2);
+  }
 
   return 0;
 }
@@ -226,12 +231,13 @@ uidisplay_area( int x, int y, int w, int h )
   unsigned char *ptr;
   float scale;
   int scaled_x, scaled_y, xx, yy;
-  
+  unsigned char grey = settings_current.bw_tv ? 16 : 0;
+
   /* a simplified shortcut, for normal usage */
   if ( !hires && image_scale == 1 ) {
     for( yy = y; yy < y + h; yy++ ) {
       for( xx = x, ptr = linebuf; xx < x + w; xx++ )
-        *ptr++ = display_image[yy][xx];
+        *ptr++ = display_image[yy][xx] | grey;
       vga_drawscansegment( linebuf, x, yy, w );
     }
 
@@ -256,7 +262,7 @@ uidisplay_area( int x, int y, int w, int h )
 
   for( yy = scaled_y; yy < scaled_y + h; yy++ ) {
     for( xx = scaled_x, ptr = linebuf; xx < scaled_x + w; xx++ )
-      *ptr++ = scaled_image[yy][xx];
+      *ptr++ = scaled_image[yy][xx] | grey;
     vga_drawscansegment( linebuf, scaled_x, yy, w );
   }
 }

@@ -1048,3 +1048,5 @@
 20040808 ui/ui.h, ui/gtk/{gtkmouse.c,statusbar.c}: add 'mouse grabbed'
 	 icon.
 20040809 z80/Makefile.am: Link coretest against @LIBSPEC_LIBS@.
+20040813 ui/fb/fbdisplay.c, ui/svga/svgadisplay.c, ui/xlib/xdisplay.c:
+	 add support for black and white TV option (Darren).
