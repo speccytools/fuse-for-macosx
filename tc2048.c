@@ -140,7 +140,7 @@ int tc2048_init( fuse_machine_info *machine )
 
   machine->reset = tc2048_reset;
 
-  machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
+  machine_set_timings( machine, 3.528e6, 24, 128, 24, 48, 312, 8936 );
 
   machine->timex = 1;
   machine->ram.read_memory	     = tc2048_readbyte;
