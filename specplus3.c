@@ -393,6 +393,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 {
   struct stat buf;
   struct flock lock;
+  int readonly;
   size_t i; int error;
 
   if( which > SPECPLUS3_DRIVE_B ) {
@@ -404,12 +405,24 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
   /* Eject any disk already in the drive */
   if( drives[which].fd != -1 ) specplus3_disk_eject( which );
 
+  readonly = 0;
   /* Open the disk file */
   drives[which].fd = open( filename, O_RDWR | O_BINARY );
   if( drives[which].fd == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
-	      strerror( errno ) );
-    return 1;
+
+    /* If we couldn't open read-write, try read-only */
+    if( errno == EACCES ) {
+      readonly = 1;
+      drives[which].fd = open( filename, O_RDONLY | O_BINARY );
+    }
+
+    /* If we got an error other than EACCES or the read-only open failed,
+       give up */
+    if( drives[which].fd == -1 ) {
+      ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
+		strerror( errno ) );
+      return 1;
+    }
   }
 
   /* We now have to do two sorts of locking:
@@ -457,8 +470,9 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
     }
   }
 
-  /* Exclusively lock the entire file */
-  lock.l_type = F_WRLCK;
+  /* Lock the entire file: exclusively if we opened it read/write, or
+     read lock if we opened it readonly */
+  lock.l_type = readonly ? F_RDLCK : F_WRLCK;
   lock.l_start = 0;
   lock.l_whence = SEEK_SET;
   lock.l_len = 0;		/* Entire file */
