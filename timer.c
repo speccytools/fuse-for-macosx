@@ -184,28 +184,6 @@ timer_end( void )
   return 0;
 }
 
-
-  return 0;
-}
-
-void
-timer_sleep( void )
-{
-#ifndef DEBUG_MODE
-  while( timer_count <= 0.0 ) Sleep(0);
-#endif				/* #ifndef DEBUG_MODE */
-}
-
-int
-timer_end( void )
-{
-#ifndef DEBUG_MODE
-  timeKillEvent(wTimerID);	/* cancel the event */
-  wTimerID = 0;
-#endif				/* #ifndef DEBUG_MODE */
-  return 0;
-}
-
 void CALLBACK
 timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 )
 {
