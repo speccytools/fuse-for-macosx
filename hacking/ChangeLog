@@ -766,3 +766,5 @@
 	 machines/{spec16.c,tc2068.c}: simplify memory handling by
 	 allocating all memory from a pool and then just throwing the pool
 	 away on reset.
+20040420 dck.c: when inserting a cartridge, change the setting only after
+	 we have verified that the file loads successfully.

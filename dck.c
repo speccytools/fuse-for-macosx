@@ -50,10 +50,10 @@ dck_insert( const char *filename )
 {
   int error;
 
+  error = dck_read( filename ); if( error ) return error;
+
   error = settings_set_string( &settings_current.dck_file, filename );
   if( error ) return error;
-
-  error = dck_read( filename ); if( error ) return error;
 
   machine_reset();
 
