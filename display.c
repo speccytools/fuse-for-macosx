@@ -1081,4 +1081,7 @@ void display_refresh_all(void)
 
   for( i = 0; i < DISPLAY_HEIGHT; i++ )
     display_is_dirty[i] = display_all_dirty;
+
+  for( i = 0; i < DISPLAY_SCREEN_HEIGHT; i++ )
+    display_current_border[i] = display_border_mixed;
 }

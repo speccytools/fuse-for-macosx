@@ -1230,3 +1230,6 @@
 20050223 input.[ch],keysyms.dat,ui/gtk/gtkkeyboard.c,ui/xlib/xkeyboard.c,
 	 widget/text.c: enable 'native' keysyms to be passed through to
 	 the widget controls, rather than the 'Spectrum' keysyms.
+20050223 display.c: force border to be redrawn in display_refresh_all();
+	 means the border gets correctly restored after Help/Keyboard
+	 widget.
