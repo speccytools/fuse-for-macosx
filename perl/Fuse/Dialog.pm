@@ -41,21 +41,32 @@ sub read ($) {
 
 	my( $name, $title, @widgets ) = split /\n/;
 
+	my @widget_data;
+	my $posthook;
+
 	foreach( @widgets ) {
+
 	    my( $widget_type, $text, $value, $key, $data1, $data2 ) =
 		split /\s*,\s*/;
-	    $_ = { type => $widget_type,
-		   text => $text,
-		   value => $value,
-		   key => $key,
-		   data1 => $data1,
-		   data2 => $data2,
-	         };
+
+	    if( lc $widget_type eq 'posthook' ) {
+		$posthook = $text;
+		next;
+	    }
+
+	    push @widget_data, { type => $widget_type,
+				 text => $text,
+				 value => $value,
+				 key => $key,
+				 data1 => $data1,
+				 data2 => $data2,
+			       };
 	}
 
 	push @dialogs, { name => $name,
 			 title => $title,
-			 widgets => \@widgets };
+			 posthook => $posthook,
+			 widgets => \@widget_data };
     }
 
     return @dialogs;

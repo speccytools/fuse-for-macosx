@@ -66,8 +66,14 @@ pentagon_select_1f_read( libspectrum_word port )
 {
   if( trdos_active ) {
     return trdos_sr_read( port );
-  } else {
+  } else if( settings_current.joy_kempston ) {
     return joystick_kempston_read( port );
+  } else {
+
+    /* FIXME: the peripheral code thinks that this port is attached to
+       something and won't return the floating bus value */
+    return 0xff;
+
   }
 }
 
@@ -159,8 +165,7 @@ pentagon_reset(void)
 
   trdos_available = 1;
 
-  periph_clear();
-  error = periph_register_n( peripherals, peripherals_count );
+  error = periph_setup( peripherals, peripherals_count, 0 );
   if( error ) return error;
 
   return spec128_common_reset( 0 );

@@ -480,3 +480,7 @@
 20040207 widget/error.c: #include "fuse.h".
 20040214 First pass at code to allow for a dynamically modifiable
 	 peripheral list.
+20040215 Use the new peripheral code to (de)activate the Kempston
+	 interface at run-time where appropriate.
+
+	

@@ -29,32 +29,31 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "joystick.h"
 #include "periph.h"
 #include "rzx.h"
+#include "settings.h"
 #include "ui/ui.h"
 
-/* Full information about a peripheral; the same as periph_t but
-   with the addition of the id parameter */
+/*
+ * General peripheral list handling routines
+ */
+
+/* Full information about a peripheral */
 typedef struct periph_private_t {
+
   int id;
+  int active;
+
   periph_t peripheral;
+
 } periph_private_t;
 
 static GSList *peripherals = NULL;
 static int last_id = 0;
 
-/* Internal type used for passing to read_peripheral and write_peripheral */
-struct peripheral_data_t {
-
-  libspectrum_word port;
-
-  int attached;
-  libspectrum_byte value;
-};
-
+static gint find_by_id( gconstpointer data, gconstpointer id );
 static void free_peripheral( gpointer data, gpointer user_data );
-static void read_peripheral( gpointer data, gpointer user_data );
-static void write_peripheral( gpointer data, gpointer user_data );
 
 /* Register a peripheral. Returns -1 on error or a peripheral ID if
    successful */
@@ -70,6 +69,7 @@ periph_register( const periph_t *peripheral )
   }
 
   private->id = last_id++;
+  private->active = 1;
   private->peripheral = *peripheral;
 
   peripherals = g_slist_append( peripherals, private );
@@ -91,6 +91,35 @@ periph_register_n( const periph_t *peripherals_list, size_t n )
   return 0;
 }
 
+/* (De)activate a specific peripheral */
+int
+periph_set_active( int id, int active )
+{
+  GSList *ptr;
+  periph_private_t *private;
+
+  ptr = g_slist_find_custom( peripherals, &id, find_by_id );
+  if( !ptr ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find peripheral ID %d", id );
+    return 1;
+  }
+
+  private = ptr->data;
+
+  private->active = active;
+
+  return 0;
+}
+
+static gint
+find_by_id( gconstpointer data, gconstpointer user_data )
+{
+  const periph_private_t *private = data;
+  int id = *(const int*)user_data;
+
+  return private->id - id;
+}
+
 /* Clear all peripherals */
 void
 periph_clear( void )
@@ -109,6 +138,22 @@ free_peripheral( gpointer data, gpointer user_data )
 
   free( private );
 }
+
+/*
+ * The actual routines to read and write a port
+ */
+
+static void read_peripheral( gpointer data, gpointer user_data );
+static void write_peripheral( gpointer data, gpointer user_data );
+
+/* Internal type used for passing to read_peripheral and write_peripheral */
+struct peripheral_data_t {
+
+  libspectrum_word port;
+
+  int attached;
+  libspectrum_byte value;
+};
 
 libspectrum_byte
 readport( libspectrum_word port )
@@ -158,7 +203,7 @@ read_peripheral( gpointer data, gpointer user_data )
 
   peripheral = &( private->peripheral );
 
-  if( peripheral->read &&
+  if( private->active && peripheral->read &&
       ( ( callback_info->port & peripheral->mask ) == peripheral->value ) ) {
     callback_info->value &= peripheral->read( callback_info->port );
     callback_info->attached = 1;
@@ -191,7 +236,47 @@ write_peripheral( gpointer data, gpointer user_data )
 
   peripheral = &( private->peripheral );
   
-  if( peripheral->write &&
+  if( private->active && peripheral->write &&
       ( ( callback_info->port & peripheral->mask ) == peripheral->value ) )
     peripheral->write( callback_info->port, callback_info->value );
+}
+
+/*
+ * The more Fuse-specific peripheral handling routines
+ */
+
+/* The ID for the (deactivable) Kempston interface; -1 if no interface
+   present _or_ if it is always active */
+static int kempston_id;
+
+/* The data for the Kempston interface */
+static const periph_t kempston_data =
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL };
+
+int
+periph_setup( const periph_t *peripherals_list, size_t n, int kempston )
+{
+  int error;
+
+  periph_clear();
+  kempston_id = -1;
+
+  error = periph_register_n( peripherals_list, n ); if( error ) return error;
+
+  if( kempston ) {
+    kempston_id = periph_register( &kempston_data );
+    if( kempston_id == -1 ) return -1;
+  }
+
+  periph_update();
+
+  return 0;
+}
+
+void
+periph_update( void )
+{
+  if( kempston_id != -1 ) {
+    periph_set_active( kempston_id, settings_current.joy_kempston );
+  }
 }

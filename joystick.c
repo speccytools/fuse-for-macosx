@@ -32,7 +32,6 @@
 #include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
-#include "settings.h"
 #include "spectrum.h"
 #include "machine.h"
 #include "ui/ui.h"
@@ -71,16 +70,6 @@ joystick_default_read( libspectrum_word port, libspectrum_byte which )
   /* We only support one "joystick" */
   if( which ) return 0;
 
-  if( !settings_current.joy_kempston ) {
-    /* Some machines have a built-in Kempston interface */
-    if( libspectrum_machine_capabilities( machine_current->machine ) &
-	LIBSPECTRUM_MACHINE_CAPABILITY_KEMPSTON_JOYSTICK               )
-      return 0;                         /* Kempston present; send no data */
-  
-    return 0xff;		/* Kempston absent */
-  }
-
-
   for( i=0; i<5; i++, jmask<<=1 ) {
     if( !(keyboard_return_values[offset[i]] & mask[i]) )
       return_value|=jmask;
@@ -94,9 +83,6 @@ joystick_default_read( libspectrum_word port, libspectrum_byte which )
 libspectrum_byte
 joystick_kempston_read( libspectrum_word port )
 {
-  /* If joysticks are disabled, return the floating bus value */
-  if( !settings_current.joy_kempston ) return 0xff;
-
   /* If we have no real joysticks, return the QAOP<space>-emulated value */
   if( joysticks_supported == 0 ) return joystick_default_read( port, 0 );
 

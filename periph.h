@@ -29,6 +29,10 @@
 
 #include <libspectrum.h>
 
+/*
+ * General peripheral list handling routines
+ */
+
 typedef libspectrum_byte (*periph_port_read_function)( libspectrum_word port );
 typedef void (*periph_port_write_function)( libspectrum_word port,
 					    libspectrum_byte data );
@@ -48,9 +52,21 @@ typedef struct periph_t {
 
 int periph_register( const periph_t *peripheral );
 int periph_register_n( const periph_t *peripherals_list, size_t n );
+int periph_set_active( int id, int active );
 void periph_clear( void );
+
+/*
+ * The actual routines to read and write a port
+ */
 
 libspectrum_byte readport( libspectrum_word port );
 void writeport( libspectrum_word port, libspectrum_byte b );
+
+/*
+ * The more Fuse-specific peripheral handling routines
+ */
+
+int periph_setup( const periph_t *peripherals_list, size_t n, int kempston );
+void periph_update( void );
 
 #endif				/* #ifndef FUSE_PERIPH_H */

@@ -282,8 +282,7 @@ tc2068_reset( void )
 			    machine_current->rom_length[1] );
   if( error ) return error;
 
-  periph_clear();
-  error = periph_register_n( peripherals, peripherals_count );
+  error = periph_setup( peripherals, peripherals_count, 0 );
   if( error ) return error;
 
   error = dock_exrom_reset(); if( error ) return error;

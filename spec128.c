@@ -41,7 +41,6 @@
 
 const periph_t spec128_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },
@@ -157,8 +156,7 @@ int spec128_reset(void)
 			    machine_current->rom_length[1] );
   if( error ) return error;
 
-  periph_clear();
-  error = periph_register_n( spec128_peripherals, spec128_peripherals_count );
+  error = periph_setup( spec128_peripherals, spec128_peripherals_count, 1 );
   if( error ) return error;
 
   return spec128_common_reset( 1 );
