@@ -1,5 +1,5 @@
 /* menu.c: general menu widget
-   Copyright (c) 2001-2003 Philip Kendall
+   Copyright (c) 2001-2004 Philip Kendall
 
    $Id$
 
@@ -378,7 +378,7 @@ widget_menu_eject_disk( void *data )
     return specplus3_disk_eject( which, 0 );
 #endif				/* #ifdef HAVE_765_H */
 
-  return trdos_disk_eject( which );
+  return trdos_disk_eject( which, 0 );
 }
 
 /* Disk/Drive ?:/Eject and write */
@@ -392,7 +392,7 @@ widget_menu_eject_write_disk( void *data )
     return specplus3_disk_eject( which, 1 );
 #endif				/* #ifdef HAVE_765_H */
 
-  return trdos_disk_eject( which );
+  return trdos_disk_eject( which, 1 );
 }
 
 int
@@ -403,6 +403,16 @@ ui_plus3_disk_write( specplus3_drive_number which )
   snprintf( filename, 20, "drive%c.dsk", (char)( 'a' + which ) );
 
   return specplus3_disk_write( which, filename );
+}
+
+int
+ui_trdos_disk_write( trdos_drive_number which )
+{
+  char filename[ 20 ];
+
+  snprintf( filename, 20, "drive%c.trd", (char)( 'a' + which ) );
+
+  return trdos_disk_write( which, filename );
 }
 
 /* Cartridge/Timex Dock/Insert (called via widget_apply_to_file) */

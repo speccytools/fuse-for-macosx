@@ -468,3 +468,4 @@
 	 patch #871182) (Fred).
 20040108 specplus3.c, trdos.[ch], utils.[ch], ui/ui.h, ui/gtk/gtkui.c:
 	 make writes to TR-DOS disks need explicit commits.
+20040108 widget/menu.c: fix up widget UIs for the TR-DOS write scheme.
