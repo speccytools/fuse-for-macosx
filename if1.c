@@ -114,6 +114,10 @@ if1_ula_t if1_ula = { .fd_r = -1, .fd_t = -1, .rs232_mode = RS232_INT,
 		   .dtr = 0, .comms_clk = 0, .comms_data = 0, /* realy? */
 		  .fd_net = -1, .s_net_mode = S_NET_INT, };
 
+static void microdrives_reset( void );
+static void microdrives_restart( void );
+static void increment_head( int m );
+
 #define IN(m) microdrv[m - 1].inserted
 #define WP(m) microdrv[m - 1].wp
 
@@ -133,7 +137,7 @@ enum if1_menu_item {
 };
 
 static void
-if1_update_menu( enum if1_menu_item what )
+update_menu( enum if1_menu_item what )
 {
   if( what == UMENU_ALL || what == UMENU_MDRV1 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_EJECT, IN( 1 ) );
@@ -185,6 +189,12 @@ if1_update_menu( enum if1_menu_item what )
   }
 }
 
+void
+if1_update_menu( void )
+{
+  update_menu( UMENU_ALL );
+}
+
 int
 if1_reset( void )
 {
@@ -210,7 +220,7 @@ if1_reset( void )
 
 
 /*  ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1, 1 ); */
-  if1_update_menu( UMENU_ALL );
+  update_menu( UMENU_ALL );
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV, UI_STATUSBAR_STATE_INACTIVE );
   if1_mdr_status = 0;
   
@@ -576,7 +586,7 @@ if1_mdr_writep( int w, int drive )
   microdrv[drive].wp = ( w ) ? 1 : 0;
   microdrv[drive].modified = 1;
 
-  if1_update_menu( UMENU_MDRV1 + drive );
+  update_menu( UMENU_MDRV1 + drive );
 }
 
 void
@@ -597,7 +607,7 @@ if1_mdr_new( int drive )
   microdrv[drive].inserted = 1;
   microdrv[drive].modified = 1;
 
-  if1_update_menu( UMENU_MDRV1 + drive );
+  update_menu( UMENU_MDRV1 + drive );
 }
 
 void
@@ -639,7 +649,7 @@ if1_mdr_insert( char *filename, int drive )
   if( microdrv[drive].filename )
     strcpy( microdrv[drive].filename, filename );
   
-  if1_update_menu( UMENU_MDRV1 + drive );
+  update_menu( UMENU_MDRV1 + drive );
 }
 
 int
@@ -700,7 +710,7 @@ if1_mdr_eject( char *filename, int drive )
     free( microdrv[drive].filename );
   microdrv[drive].filename = NULL;
   
-  if1_update_menu( UMENU_MDRV1 + drive );
+  update_menu( UMENU_MDRV1 + drive );
   return 0;
 }
 
@@ -735,7 +745,7 @@ if1_plug( char *filename, int what )
   }
   if1_ula.rs232_mode = settings_current.raw_rs232 ? RS232_RAW : RS232_INT;
   if1_ula.s_net_mode = settings_current.raw_s_net ? S_NET_RAW : S_NET_INT;
-  if1_update_menu( UMENU_RS232 );
+  update_menu( UMENU_RS232 );
 }
 
 void
@@ -759,5 +769,5 @@ if1_unplug( int what )
     if1_ula.fd_net = -1;
     break;
   }
-  if1_update_menu( UMENU_RS232 );
+  update_menu( UMENU_RS232 );
 }

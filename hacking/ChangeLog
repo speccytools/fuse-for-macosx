@@ -1122,3 +1122,4 @@
 20041128 if1.c: add void to prototypes where appropriate.
 20041128 if1.[ch]: declare local functions as static.
 20041128 if1.h: name parameters in if1.h prototypes.
+20041128 if1.[ch],periph.c: update If1 menu in periph_update().

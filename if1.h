@@ -48,4 +48,6 @@ void if1_mdr_writep( int w, int drive );
 void if1_plug( char *filename, int what );
 void if1_unplug( int what );
 
+void if1_update_menu( void );
+
 #endif				/* #ifndef FUSE_IF1_H */
