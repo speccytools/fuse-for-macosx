@@ -1033,3 +1033,4 @@
 20040724 ui/sdl/sdldisplay.c: SDL_SetColors does not take a const array. Fix
          565/555 mode detection.
 20040724 widget/text.c: fix small memory leak (Darren).
+20040724 ui/gtk/pokefinder.c: remove unnecessary accelerator code (Darren).

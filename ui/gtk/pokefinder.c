@@ -91,10 +91,6 @@ create_dialog( void )
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Poke Finder" );
 
-  /* Keyboard shortcuts */
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-
   hbox = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
 
