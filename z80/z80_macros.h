@@ -221,8 +221,7 @@ break
 {\
   (value)++;\
   F = ( F & FLAG_C ) | ( (value)==0x80 ? FLAG_V : 0 ) |\
-  ( (value)&0x0f ? 0 : FLAG_H ) | ( (value) ? 0 : FLAG_Z ) |\
-  sz53_table[(value)];\
+  ( (value)&0x0f ? 0 : FLAG_H ) | sz53_table[(value)];\
 }
 
 #define LD16_NNRR(regl,regh)\
