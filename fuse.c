@@ -150,6 +150,7 @@ static int fuse_init(int argc, char **argv)
   if(sound_enabled) {
     fuse_sound_in_use = 1;
   } else {
+    settings_current.sound = 0;
     if(timer_init()) return 1;
   }
 
