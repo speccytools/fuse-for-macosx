@@ -39,7 +39,7 @@ int widget_options_draw( void* data )
   widget_dialog_with_border( 1, 2, 30, 3 );
 
   widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Options" );
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(G)eneral" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(G)eneral..." );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 16 + 24 );

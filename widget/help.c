@@ -47,7 +47,8 @@ int widget_help_draw( void* data )
   widget_dialog_with_border( 1, 2, 30, 3 );
 
   widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Help" );
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(K)eyboard picture" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND,
+		      "(K)eyboard picture..." );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 16 + 24 );

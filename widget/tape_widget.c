@@ -41,7 +41,7 @@ int widget_tape_draw( void* data )
 
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Tape" );
 
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen tape" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen tape..." );
   widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(P)lay tape" ); 
   widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(R)ewind tape" );
   widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(C)lear tape" );

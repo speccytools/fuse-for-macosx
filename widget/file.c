@@ -41,7 +41,7 @@ int widget_file_draw( void* data )
 
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "File" );
 
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen snapshot" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen snapshot..." );
   widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND,
 		      "(S)ave to 'snapshot.z80'" );
 
