@@ -61,7 +61,7 @@ fuse_LDADD = memory_internal.o \
 debugger/libdebugger.a \
 @UI_LIBS@ ui/scaler/libscaler.a debugger/libdebugger.a z80/libz80.a @DSKLIBS@ \
 @LIBSPEC_LIBS@ \
-@GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@
+@GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ compat/libcompat.a
 
 fuse_DEPENDENCIES = memory_internal.o @UI_LIBS@ debugger/libdebugger.a \
 	            z80/libz80.a
