@@ -411,7 +411,7 @@ int tape_play( void )
   tape_microphone = 0;
   sound_beeper( 1, tape_microphone );
 
-  error = tape_next_edge(); if( error ) return error;
+  error = tape_next_edge( tstates ); if( error ) return error;
 
   return 0;
 }
@@ -431,7 +431,7 @@ int tape_stop( void )
   return 0;
 }
 
-int tape_next_edge( void )
+int tape_next_edge( DWORD last_tstates )
 {
   int error; libspectrum_error libspec_error;
 
@@ -474,9 +474,11 @@ int tape_next_edge( void )
     return 0;
   }
 
-  /* Otherwise, put this into the event queue which will cause the
-     next block to become active when it occurs */
-  error = event_add( tstates + edge_tstates, EVENT_TYPE_EDGE );
+  /* Otherwise, put this into the event queue; remember that this edge
+     should occur 'edge_tstates' after the last edge, not after the
+     current time (these will be slightly different as we only process
+     events between instructions). */
+  error = event_add( last_tstates + edge_tstates, EVENT_TYPE_EDGE );
   if( error ) return error;
 
   return 0;

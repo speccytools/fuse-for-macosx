@@ -141,7 +141,7 @@ int event_do_events(void)
       break;
 
     case EVENT_TYPE_EDGE:
-      tape_next_edge();
+      tape_next_edge( ptr->tstates );
       break;
 
     default:
