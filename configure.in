@@ -139,7 +139,8 @@ if test -z "$ui"; then
   AC_MSG_RESULT($gtk2)
   if test "$gtk2" = yes; then
     AM_PATH_GTK_2_0(2.0.0,
-		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB) ui=gtk, 
+		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB)
+	        ui=gtk; UI_LIBS="ui/gtk/libuigtk.a", 
 		AC_MSG_WARN([GTK+ 2.0 not found. Reverting to GTK+ 1.2]))
   fi
 fi
