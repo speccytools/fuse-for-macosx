@@ -2,6 +2,5 @@
 /Makefile
 /Makefile.in
 /rzxdump
-/rzx-extract
-/rzx-uncompress
+/rzxtool
 /tzxlist

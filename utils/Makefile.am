@@ -24,17 +24,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-bin_PROGRAMS = rzxdump rzx-extract rzx-uncompress tzxlist
-
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
+bin_PROGRAMS = rzxdump rzxtool tzxlist
 
 rzxdump_SOURCES = rzxdump.c
 
-rzx_extract_SOURCES = rzx-extract.c
-rzx_extract_LDADD = ../libspectrum/libspectrum.a @ZLIB_LIBS@
-
-rzx_uncompress_SOURCES = rzx-uncompress.c
-rzx_uncompress_LDADD = ../libspectrum/libspectrum.a @ZLIB_LIBS@
+rzxtool_SOURCES = rzxtool.c
+rzxtool_LDADD = ../libspectrum/libspectrum.a @ZLIB_LIBS@
 
 tzxlist_SOURCES = tzxlist.c
+tzxlist_INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
 tzxlist_LDADD = @GLIB_LIBS@ @GTK_LIBS@ ../libspectrum/libspectrum.a ../myglib/libmyglib.a
