@@ -150,7 +150,7 @@ DWORD specplus3_contend_memory( WORD address )
   int bank;
 
   /* Contention occurs in pages 4 to 7. If we're not in a special
-     RAM ocnfiguration, the logic is the same as for the 128K machine.
+     RAM configuration, the logic is the same as for the 128K machine.
      If we are, just enumerate the cases */
   if( machine_current->ram.special ) {
 
