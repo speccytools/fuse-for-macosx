@@ -389,6 +389,63 @@ add_rectangle( int y, int x, int w )
   return 0;
 }
 
+#ifndef MAX
+#define MAX(a,b)    (((a) > (b)) ? (a) : (b))
+#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
+#endif
+
+inline static int
+compare_and_merge_rectangles( struct rectangle *source )
+{
+  size_t z;
+
+  /* Now look to see if there is an overlapping rectangle in the inactive
+     list.  These occur when frame skip is on and the same lines are
+     covered more than once... */
+  for( z = 0; z < inactive_rectangle_count; z++ ) {
+    if( inactive_rectangle[z].x == source->x &&
+          inactive_rectangle[z].w == source->w ) {
+      if( inactive_rectangle[z].y == source->y &&
+            inactive_rectangle[z].h == source->h )
+        return 1;
+
+      if( ( inactive_rectangle[z].y < source->y && 
+          ( source->y < ( inactive_rectangle[z].y +
+            inactive_rectangle[z].h + 1 ) ) ) ||
+          ( source->y < inactive_rectangle[z].y && 
+          ( inactive_rectangle[z].y < ( source->y + source->h + 1 ) ) ) ) {
+        /* rects overlap or touch in the y dimension, merge */
+        inactive_rectangle[z].h = MAX( inactive_rectangle[z].y +
+                                    inactive_rectangle[z].h,
+                                    source->y + source->h ) -
+                                  MIN( inactive_rectangle[z].y, source->y );
+        inactive_rectangle[z].y = MIN( inactive_rectangle[z].y, source->y );
+
+        return 1;
+      }
+    }
+    if( inactive_rectangle[z].y == source->y &&
+          inactive_rectangle[z].h == source->h ) {
+
+      if( (inactive_rectangle[z].x < source->x && 
+          ( source->x < ( inactive_rectangle[z].x +
+            inactive_rectangle[z].w + 1 ) ) ) ||
+          ( source->x < inactive_rectangle[z].x && 
+          ( inactive_rectangle[z].x < ( source->x + source->w + 1 ) ) ) ) {
+        /* rects overlap or touch in the x dimension, merge */
+        inactive_rectangle[z].w = MAX( inactive_rectangle[z].x +
+          inactive_rectangle[z].w, source->x +
+          source->w ) - MIN( inactive_rectangle[z].x, source->x );
+        inactive_rectangle[z].x = MIN( inactive_rectangle[z].x, source->x );
+        return 1;
+      }
+    }
+     /* Handle overlaps offset by both x and y? how much overlap and hence 
+        overdraw can be tolerated? */
+  }
+  return 0;
+}
+
 /* Move all rectangles not updated on this line to the inactive list */
 static int
 end_line( int y )
@@ -400,6 +457,14 @@ end_line( int y )
 
     /* Skip if this rectangle was updated this line */
     if( active_rectangle[i].y + active_rectangle[i].h == y + 1 ) continue;
+
+    if ( settings_current.frame_rate > 1 &&
+	 compare_and_merge_rectangles( &active_rectangle[i] ) ) {
+
+      /* Mark the active rectangle as done */
+      active_rectangle[i].h = 0;
+      continue;
+    }
 
     /* We couldn't find a rectangle to extend, so create a new one */
     if( ++inactive_rectangle_count > inactive_rectangle_allocated ) {
