@@ -99,16 +99,16 @@ spectrum_frame( void )
   if( z80.interrupts_enabled_at >= 0 )
     z80.interrupts_enabled_at -= frame_length;
 
-#ifdef UI_SDL		/* SDL sound routines do not provide speed control */
+#ifdef ALWAYS_USE_TIMER /* Some sound routines do not provide speed control */
   if( sound_enabled ) sound_frame();
   timer_sleep();
-#else			/* #ifdef UI_SDL */
+#else			/* #ifdef ALWAYS_USE_TIMER */
   if(sound_enabled) {
     sound_frame();
   } else {
     timer_sleep();
   }
-#endif			/* #ifdef UI_SDL */
+#endif			/* #ifdef ALWAYS_USE_TIMER */
 
   if(display_frame()) return 1;
   printer_frame();

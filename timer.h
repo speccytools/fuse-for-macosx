@@ -47,6 +47,12 @@ int timer_estimate_speed( void );
 int timer_get_real_time( timer_type *real_time );
 float timer_get_time_difference( timer_type *a, timer_type *b );
 
+/* Define ALWAYS_USE_TIMER if we're using sound routines which don't
+   do timing control for us (namely, SDL and DirectX) */
+#if defined( UI_SDL ) || defined( HAVE_DSOUND_H )
+#define ALWAYS_USE_TIMER
+#endif			/* #if defined( UI_SDL ) || defined( HAVE_DSOUND_H ) */
+
 extern volatile float timer_count;
 
 int timer_init(void);

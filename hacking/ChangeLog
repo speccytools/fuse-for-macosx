@@ -385,3 +385,5 @@
 20031209 ChangeLog: bring up-to-date.
 20031214 widget/filesel.c: on Win32, chdir does not return ENOTDIR for not
 	 a directory, so check explicitly (Marek).
+20031214 fuse.c, spectrum.c: DirectX sound routines do not provide timing
+	 control, so always use the timer_* routines.
