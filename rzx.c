@@ -93,12 +93,11 @@ int rzx_start_recording( const char *filename )
   rzx_instructions = 0;
 
   /* Store the filename */
-  rzx_filename = (char*)malloc( strlen(filename) + 1 );
+  rzx_filename = strdup( filename );
   if( rzx_filename == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory in rzx_start_recording" );
     return 1;
   }
-  strcpy( rzx_filename, filename );
 
   return 0;
 }
