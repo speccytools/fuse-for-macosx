@@ -66,6 +66,7 @@ int tape_microphone;
 static int tape_autoload( libspectrum_machine hardware );
 static int trap_load_block( libspectrum_tape_block *block );
 int trap_check_rom( void );
+static void make_name( char *name, const char *data );
 
 /* Function defintions */
 
@@ -630,11 +631,41 @@ int
 tape_block_details( char *buffer, size_t length,
 		    libspectrum_tape_block *block )
 {
+  libspectrum_byte *data;
+  const char *type; char name[11];
   int offset;
 
   switch( libspectrum_tape_block_type( block ) ) {
 
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
+    /* See if this looks like a standard Spectrum header and if so
+       display some extra data */
+    if( libspectrum_tape_block_data_length( block ) != 19 ) goto normal;
+
+    data = libspectrum_tape_block_data( block );
+
+    /* Flag byte is 0x00 for headers */
+    if( data[0] != 0x00 ) goto normal;
+
+    switch( data[1] ) {
+    case 0x00: type = "Program"; break;
+    case 0x01: type = "Number array"; break;
+    case 0x02: type = "Character array"; break;
+    case 0x03: type = "Bytes"; break;
+    default: goto normal;
+    }
+    
+    make_name( name, &data[2] );
+
+    snprintf( buffer, length, "%s: \"%s\"", type, name );
+
+    break;
+
+  normal:
+    snprintf( buffer, length, "%lu bytes",
+	      (unsigned long)libspectrum_tape_block_data_length( block ) );
+    break;
+
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
   case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
@@ -696,3 +727,20 @@ tape_block_details( char *buffer, size_t length,
 
   return 0;
 }
+
+static void
+make_name( char *name, const char *data )
+{
+  size_t i;
+
+  for( i = 0; i < 10; i++, name++, data++ ) {
+    if( *data >= 32 && *data < 127 ) {
+      *name = *data;
+    } else {
+      *name = '?';
+    }
+  }
+
+  *name = '\0';
+}
+

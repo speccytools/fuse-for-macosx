@@ -458,5 +458,5 @@
 	 changes.
 20040106 ui/gtk/gtkui.c: merge the gtkui_disk_open_[ab] and
 	 gtkui_disk_eject(_write)_[ab] functions.
-
-	 
+20040106 tape.c: put the header type/name in the tape browser 'details'
+	 field.
