@@ -63,7 +63,7 @@ void svgakeyboard_keystroke(int scancode, int press)  {
   }
 }
 
-int svgakeyboard_keypress(int keysym)
+void svgakeyboard_keypress(int keysym)
 {
   keysyms_key_info *ptr;
   const char *filename;
@@ -78,11 +78,10 @@ int svgakeyboard_keypress(int keysym)
       if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
       if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
     }
-
-    return 0;
+    return;
   }
 
-  if( widget_level >= 0 ) return 0;
+  if( widget_level >= 0 ) return;
 
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
@@ -134,10 +133,10 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F10:
     fuse_exiting=1;
-    return 1;
+    break;
   }
 
-  return 0;
+  return;
 }
 
 void svgakeyboard_keyrelease(int keysym)

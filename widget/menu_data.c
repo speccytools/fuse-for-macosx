@@ -64,6 +64,7 @@ widget_menu_entry widget_menu_file[] = {
 
   { "(O)pen snapshot...",       KEYBOARD_o, widget_menu_open_snapshot, NULL },
   { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
+  { "E(x)it",			KEYBOARD_x, widget_menu_exit,          NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

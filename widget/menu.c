@@ -118,6 +118,13 @@ int widget_menu_save_snapshot( void *data )
   return snapshot_write( "snapshot.z80" );
 }
 
+/* File/Exit */
+int widget_menu_exit( void *data )
+{
+  fuse_exiting = 1;
+  return 0;
+}
+
 /* Machine/Reset */
 int widget_menu_reset( void *data )
 {

@@ -164,7 +164,7 @@ int ui_event(void)
 		    event.xexpose.width,event.xexpose.height);
       break;
     case KeyPress:
-      fuse_exiting=xkeyboard_keypress(&(event.xkey));
+      xkeyboard_keypress(&(event.xkey));
       break;
     case KeyRelease:
       xkeyboard_keyrelease(&(event.xkey));

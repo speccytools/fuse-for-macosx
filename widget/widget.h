@@ -185,6 +185,7 @@ typedef struct widget_menu_widget_t {
 /* More callbacks */
 int widget_menu_open_snapshot( void *data ); /* File/Open */
 int widget_menu_save_snapshot( void *data ); /* File/Save */
+int widget_menu_exit( void *data );	     /* File/Exit */
 
 int widget_menu_reset( void *data );	     /* Machine/Reset */
 

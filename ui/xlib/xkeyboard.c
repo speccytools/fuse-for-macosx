@@ -44,7 +44,7 @@
 #include "tape.h"
 #include "widget/widget.h"
 
-int xkeyboard_keypress(XKeyEvent *event)
+void xkeyboard_keypress(XKeyEvent *event)
 {
   KeySym keysym; keysyms_key_info *ptr;
 
@@ -60,11 +60,10 @@ int xkeyboard_keypress(XKeyEvent *event)
       if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
       if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
     }
-
-    return 0;
+    return;
   }
 
-  if( widget_level >= 0 ) return 0;
+  if( widget_level >= 0 ) return;
 
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
@@ -115,11 +114,11 @@ int xkeyboard_keypress(XKeyEvent *event)
     fuse_emulation_unpause();
     break;
   case XK_F10:
-    return 1;
+    fuse_exiting = 1;
+    break;
   }
 
-  return 0;
-
+  return;
 }
 
 void xkeyboard_keyrelease(XKeyEvent *event)
