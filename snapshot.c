@@ -99,9 +99,10 @@ try_fallback_machine( libspectrum_machine machine )
 {
   int error;
 
-  /* If we failed on a +3 snapshot, try falling back to +2A (in case
-     we were compiled without lib765) */
-  if( machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+  /* If we failed on a +3 or +3e snapshot, try falling back to +2A (in
+     case we were compiled without lib765) */
+  if( machine == LIBSPECTRUM_MACHINE_PLUS3  ||
+      machine == LIBSPECTRUM_MACHINE_PLUS3E    ) {
 
     error = machine_select( LIBSPECTRUM_MACHINE_PLUS2A );
     if( error ) {
@@ -118,7 +119,7 @@ try_fallback_machine( libspectrum_machine machine )
 		libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )  );
     }
 
-  } else {			/* Not trying a +3 snapshot */
+  } else {			/* Not trying a +3 or +3e snapshot */
     ui_error( UI_ERROR_ERROR,
 	      "Loading a %s snapshot, but that's not available",
 	      libspectrum_machine_name( machine ) );
