@@ -45,6 +45,10 @@ Some thanks (in alphabetical order):
 
 * Darren Salt: quite a few bits of code (see `AUTHORS')
 
+* Steve Snake (via Mark Woodmass): for pointing out which memory pages
+  on the 128K machine are actually contended. Grab Steve's emulator, Klive,
+  from http://www.worldofspectrum.org/emulators.html#pcwin
+
 * Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)
   gave the inspiration for an important rewrite of the Z80 core, and was
   also _very_ useful whilst trying to track down some bugs.
