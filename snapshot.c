@@ -42,6 +42,8 @@
 #include "sound.h"
 #include "snapshot.h"
 #include "spec128.h"
+#include "specplus2a.h"
+#include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "utils.h"
