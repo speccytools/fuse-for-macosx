@@ -61,7 +61,7 @@ static int tmp_screen_width;
 
 static Uint32 colour_values[16];
 
-static SDL_Color colour_palette[] = {
+static const SDL_Color colour_palette[] = {
   {   0,   0,   0,   0 }, 
   {   0,   0, 192,   0 }, 
   { 192,   0,   0,   0 }, 

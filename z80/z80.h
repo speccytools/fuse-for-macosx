@@ -70,10 +70,10 @@ int z80_from_snapshot( libspectrum_snap *snap );
 int z80_to_snapshot( libspectrum_snap *snap );
 
 extern processor z80;
-extern libspectrum_byte halfcarry_add_table[];
-extern libspectrum_byte halfcarry_sub_table[];
-extern libspectrum_byte overflow_add_table[];
-extern libspectrum_byte overflow_sub_table[];
+extern const libspectrum_byte halfcarry_add_table[];
+extern const libspectrum_byte halfcarry_sub_table[];
+extern const libspectrum_byte overflow_add_table[];
+extern const libspectrum_byte overflow_sub_table[];
 extern libspectrum_byte sz53_table[];
 extern libspectrum_byte sz53p_table[];
 extern libspectrum_byte parity_table[];

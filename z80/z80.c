@@ -42,15 +42,15 @@
    result, 1 is the 3rd bit of the 1st argument and 2 is the
    third bit of the 2nd argument; the tables differ for add and subtract
    operations */
-libspectrum_byte halfcarry_add_table[] =
+const libspectrum_byte halfcarry_add_table[] =
   { 0, FLAG_H, FLAG_H, FLAG_H, 0, 0, 0, FLAG_H };
-libspectrum_byte halfcarry_sub_table[] =
+const libspectrum_byte halfcarry_sub_table[] =
   { 0, 0, FLAG_H, 0, FLAG_H, 0, FLAG_H, FLAG_H };
 
 /* Similarly, overflow can be determined by looking at the 7th bits; again
    the hash into this table is r12 */
-libspectrum_byte overflow_add_table[] = { 0, 0, 0, FLAG_V, FLAG_V, 0, 0, 0 };
-libspectrum_byte overflow_sub_table[] = { 0, FLAG_V, 0, 0, 0, 0, FLAG_V, 0 };
+const libspectrum_byte overflow_add_table[] = { 0, 0, 0, FLAG_V, FLAG_V, 0, 0, 0 };
+const libspectrum_byte overflow_sub_table[] = { 0, FLAG_V, 0, 0, 0, 0, FLAG_V, 0 };
 
 /* Some more tables; initialised in z80_init_tables() */
 

@@ -126,7 +126,7 @@ xdisplay_allocate_colours( int numColours, unsigned long *colour_values )
   XColor colour;
   Colormap currentMap;
 
-  const char *colour_names[] = {
+  static const char *colour_names[] = {
     "black",
     "blue3",
     "red3",

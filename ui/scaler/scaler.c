@@ -65,7 +65,7 @@ static void expand_dotmatrix( int *x, int *y, int *w, int *h,
 
 /* Information on each of the available scalers. Make sure this array stays
    in the same order as scaler.h:scaler_type */
-static struct scaler_info available_scalers[] = {
+static const struct scaler_info available_scalers[] = {
 
   { "Timex Half (smoothed)", "half", SCALER_FLAGS_NONE,	       0.5,
     scaler_Half_16,       scaler_Half_32,       NULL                },

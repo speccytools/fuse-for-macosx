@@ -63,7 +63,7 @@ static guchar scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
 static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 
 /* The colour palette */
-static guchar rgb_colours[16][3] = {
+static const guchar rgb_colours[16][3] = {
 
   {   0,   0,   0 },
   {   0,   0, 192 },

@@ -36,7 +36,7 @@
 #include "ggi_internals.h"
 #include "ui/ui.h"
 
-static unsigned int colour_pal[] = {
+static const unsigned int colour_pal[] = {
 
     0x0000, 0x0000, 0x0000,
     0x0000, 0x0000, 0xC000,

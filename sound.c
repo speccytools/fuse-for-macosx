@@ -129,7 +129,7 @@ static void sound_ay_init(void)
  * Matthew Westcott, adjusted as I described in a followup to his post,
  * then scaled to 0..0xffff.
  */
-static int levels[16]=
+static const int levels[16]=
   {
   0x0000, 0x0385, 0x053D, 0x0770,
   0x0AD7, 0x0FD5, 0x15B0, 0x230C,

@@ -186,7 +186,7 @@ get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
 {
   size_t i, x, y;
 
-				      /*  R    G    B */
+  static const			      /*  R    G    B */
   libspectrum_byte palette[16][3] = { {   0,   0,   0 },
 				      {   0,   0, 192 },
 				      { 192,   0,   0 },

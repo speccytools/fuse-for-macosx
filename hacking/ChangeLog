@@ -977,3 +977,7 @@
 	 types.
 20040704 configure.in: --without-gtk disables GTK+ 2.0 user interface
 	 (Darren).
+20040704 screenshot.c,sound.c,ui/ggi/ggidisplay.c,ui/gtk/gtkdisplay.c,
+	 ui/scaler/scaler.c,ui/sdl/sdldisplay.c,ui/xlib/xdisplay.c,
+	 z80/z80.[ch]: make some variables static and/or const where
+	 appropriate (Darren).
