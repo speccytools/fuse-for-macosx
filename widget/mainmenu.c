@@ -37,13 +37,16 @@
 int widget_mainmenu_draw( void )
 {
   /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 1 );
+  widget_dialog_with_border( 1, 2, 30, 2 );
 
   widget_printstring( 2, 2, WIDGET_COLOUR_FOREGROUND,
+		      "General (o)ptions" );
+
+  widget_printstring( 2, 3, WIDGET_COLOUR_FOREGROUND,
 		      "(T)ape control" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 8 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
 
   return 0;
 }
@@ -54,6 +57,10 @@ void widget_mainmenu_keyhandler( int key )
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+    break;
+
+  case KEYBOARD_o:
+    widget_do( WIDGET_TYPE_OPTIONS );
     break;
 
   case KEYBOARD_t:
