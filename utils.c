@@ -52,12 +52,16 @@
 #include "machines/specplus3.h"
 #include "memory.h"
 #include "rzx.h"
+#include "settings.h"
+#include "simpleide.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "trdos.h"
 #include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+#include "zxatasp.h"
+#include "zxcf.h"
 
 typedef struct path_context {
 
@@ -177,6 +181,25 @@ utils_open_file( const char *filename, int autoload,
   case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
     error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
     error = dck_insert( filename );
+    break;
+
+  case LIBSPECTRUM_CLASS_HARDDISK:
+    if( !settings_current.simpleide_active &&
+	!settings_current.zxatasp_active   &&
+	!settings_current.zxcf_active         ) {
+      settings_current.zxcf_active = 1;
+      periph_update();
+    }
+
+    if( settings_current.zxcf_active ) {
+      error = zxcf_insert( filename );
+    } else if( settings_current.zxatasp_active ) {
+      error = zxatasp_insert( filename, LIBSPECTRUM_IDE_MASTER );
+    } else {
+      error = simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER );
+    }
+    if( error ) return error;
+    
     break;
 
   default:

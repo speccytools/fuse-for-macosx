@@ -108,6 +108,7 @@ typedef struct start_files_t {
   const char *disk_plus3;
   const char *disk_trdos;
   const char *dock;
+  const char *harddisk;
   const char *playback;
   const char *recording;
   const char *snapshot;
@@ -539,6 +540,9 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
       start_files->dock = filename; break;
 
+    case LIBSPECTRUM_CLASS_HARDDISK:
+      start_files->harddisk = filename; break;
+
     case LIBSPECTRUM_CLASS_DISK_PLUS3:
       start_files->disk_plus3 = filename; break;
 
@@ -624,6 +628,11 @@ do_start_files( start_files_t *start_files )
 
   if( start_files->dock ) {
     error = utils_open_file( start_files->dock, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->harddisk ) {
+    error = utils_open_file( start_files->harddisk, autoload, NULL );
     if( error ) return error;
   }
 

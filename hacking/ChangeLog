@@ -881,3 +881,5 @@
 	 is set (as it controls dock/exrom selection). Display both DEC
 	 and HSR if SE memory capability set. Display ZXCF memory control
 	 port if ZXCF active.
+20040531 fuse.c,utils.c: load .hdf images into the active IDE interface,
+	 or ZXCF if none active.
