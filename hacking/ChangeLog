@@ -1202,3 +1202,4 @@
 20050114 ui/scaler/scalers.c: Undo accidental commit again (Fred).
 20050115 settings.pl: Add short option for sound frequency (Fred).
 20050115 hacking/implementation_notes.txt: update with new display algorithm.
+20050115 sound/aosound.c: small fixes (Gergely).

@@ -43,6 +43,7 @@
 static ao_device *dev_for_ao;
 static int sixteenbit = 1;
 static char *filename = NULL;
+static const char *default_filename = "fuse-sound.ao";
 
 static void
 driver_error( void )
@@ -108,7 +109,7 @@ parse_driver_options( const char *device, int *driver_id, ao_option **options )
     if( option ) *option++ = '\0';
 
     value = strchr( key, '=' );
-    if( value ) *value = '\0';
+    if( value ) *value++ = '\0';
 
     if( strcmp( key, "file" ) == 0 ) {
       filename = strdup( value );
@@ -175,7 +176,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   
   if( driver_info->type == AO_TYPE_FILE &&
       format.bits != 0 ) {	/* OK. We not want to trunc the file :-) */
-    ui_error( UI_ERROR_WARNING, "ao: must truncate audio fule '%s'\n",
+    ui_error( UI_ERROR_WARNING, "ao: must truncate audio file '%s'\n",
 	      filename );
   }
 
@@ -191,7 +192,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 
   } else {
 
-    if( !filename ) filename = "fuse-sound.ao";
+    if( !filename ) filename = default_filename;
     dev_for_ao = ao_open_file( driver_id, filename, 1, &format, options);
 
   }
@@ -213,7 +214,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 void
 sound_lowlevel_end( void )
 {
-  free( filename );
+  if( filename != default_filename ) free( filename );
   ao_close(dev_for_ao);
   ao_shutdown();
 }
