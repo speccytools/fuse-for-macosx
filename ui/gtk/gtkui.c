@@ -38,7 +38,9 @@
 #include "display.h"
 #include "fuse.h"
 #include "gtkkeyboard.h"
+#include "gtkui.h"
 #include "machine.h"
+#include "options.h"
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
@@ -72,7 +74,6 @@ static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
 
 static void gtkui_quit(GtkWidget *widget, gpointer data);
-static void gtkui_options( GtkWidget *widget, gpointer data );
 static void gtkui_reset(GtkWidget *widget, gpointer data);
 
 static void gtkui_select(GtkWidget *widget, gpointer data);
@@ -86,13 +87,9 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
-static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
-
 static char* gtkui_fileselector_get_filename( void );
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
-
-static void gtkui_options_done( GtkWidget *widget, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File",		        NULL , NULL,                0, "<Branch>"    },
@@ -106,7 +103,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
   { "/Options",		        NULL , NULL,                0, "<Branch>"    },
-  { "/Options/_General...",     "F4" , gtkui_options,       0, NULL          },
+  { "/Options/_General...",     "F4" , gtkoptions_general,  0, NULL          },
   { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
@@ -352,107 +349,6 @@ static void gtkui_quit(GtkWidget *widget, gpointer data)
   fuse_exiting=1;
 }
 
-typedef struct gtkui_options_info {
-
-  GtkWidget *dialog;
-
-  GtkWidget *issue2;
-  GtkWidget *joy_kempston;
-  GtkWidget *tape_traps;
-  GtkWidget *stereo_ay;
-  GtkWidget *slt_traps;
-
-} gtkui_options_info;
-
-/* Called by the menu when Options/General selected */
-static void gtkui_options( GtkWidget *widget, gpointer data )
-{
-  gtkui_options_info dialog;
-  GtkWidget *ok_button, *cancel_button;
-  
-  /* Firstly, stop emulation */
-  fuse_emulation_pause();
-
-  /* Create the necessary widgets */
-  dialog.dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog.dialog ),
-			"Fuse - General Options" );
-
-  dialog.issue2 =
-    gtk_check_button_new_with_label( "Issue 2 keyboard" );
-  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.issue2 ),
-				settings_current.issue2 );
-
-  dialog.joy_kempston =
-    gtk_check_button_new_with_label( "Kempston joystick" );
-  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.joy_kempston ),
-				settings_current.joy_kempston );
-
-  dialog.tape_traps =
-    gtk_check_button_new_with_label( "Use tape traps" );
-  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.tape_traps ),
-				settings_current.tape_traps );
-
-  dialog.stereo_ay =
-    gtk_check_button_new_with_label( "AY stereo separation" );
-  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.stereo_ay ),
-				settings_current.stereo_ay );
-
-  dialog.slt_traps =
-    gtk_check_button_new_with_label( "Use .slt traps" );
-  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.slt_traps ),
-				settings_current.slt_traps );
-
-  if( !fuse_sound_in_use )
-    gtk_widget_set_sensitive( dialog.stereo_ay, FALSE );
-
-  ok_button = gtk_button_new_with_label( "OK" );
-  cancel_button = gtk_button_new_with_label( "Cancel" );
-
-  /* Put everything into the dialog box */
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		     dialog.issue2 );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		     dialog.joy_kempston );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		     dialog.tape_traps );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		     dialog.stereo_ay );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
-		     dialog.slt_traps );
-
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
-		     ok_button );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
-		     cancel_button );
-
-  /* Add the necessary callbacks */
-  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_options_done ),
-		      (gpointer) &dialog );
-  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog.dialog ) );
-  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete_event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-		      (gpointer) NULL );
-
-  /* Allow Esc to cancel */
-  gtk_widget_add_accelerator( cancel_button, "clicked",
-                              gtk_accel_group_get_default(),
-                              GDK_Escape, 0, 0 );
-
-  /* Set the window to be modal and display it */
-  gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
-  gtk_widget_show_all( dialog.dialog );
-
-  /* Process events until the window is done with */
-  gtk_main();
-
-  /* And then carry on with emulation again */
-  fuse_emulation_unpause();
-}
-
 /* Called by the menu when Machine/Reset selected */
 static void gtkui_reset(GtkWidget *widget, gpointer data)
 {
@@ -626,7 +522,7 @@ static void gtkui_help_keyboard( GtkWidget *widget, gpointer data )
 }
 
 /* Generic `tidy-up' callback */
-static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data )
+void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data )
 {
   gtk_widget_destroy( widget );
   gtk_main_quit();
@@ -701,31 +597,6 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data )
   gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
 
   gtk_widget_destroy( ptr->selector );
-
-  gtk_main_quit();
-}
-
-/* Callbacks used by the Options dialog */
-static void gtkui_options_done( GtkWidget *widget, gpointer user_data )
-{
-  gtkui_options_info *ptr = (gtkui_options_info*) user_data;
-
-  settings_current.issue2 =
-    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->issue2 ) );
-
-  settings_current.joy_kempston =
-    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->joy_kempston ) );
-
-  settings_current.tape_traps =
-    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->tape_traps ) );
-
-  settings_current.stereo_ay =
-    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->stereo_ay ) );
-
-  settings_current.slt_traps =
-    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->slt_traps ) );
-
-  gtk_widget_destroy( ptr->dialog );
 
   gtk_main_quit();
 }

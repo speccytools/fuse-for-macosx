@@ -31,13 +31,19 @@
 
 typedef struct settings_info {
 
+  /* General options */
+
   int issue2;		/* Issue 2 keyboard emulation? */
   int joy_kempston;	/* Kempston joystick emulation? */
   int tape_traps;	/* Use tape loading traps? */
-  int stereo_ay;	/* Stereo separation for AY channels? */
   int slt_traps;	/* Use .slt loading traps/ */
 
+  /* Sound options */
+
   const char *sound_device; /* Where to output sound */
+  int sound;		/* Is sound enabled */
+  int sound_load;	/* Is loading noise enabled? */
+  int stereo_ay;	/* Stereo separation for AY channels? */
 
   /* Used on startup */
 

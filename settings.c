@@ -197,9 +197,12 @@ int settings_copy( settings_info *dest, settings_info *src )
   dest->issue2       = src->issue2;
   dest->joy_kempston = src->joy_kempston;
   dest->tape_traps   = src->tape_traps;
-  dest->stereo_ay    = src->stereo_ay;
   dest->slt_traps    = src->slt_traps;
+
   dest->sound_device = src->sound_device;
+  dest->sound	     = src->sound;
+  dest->sound_load   = src->sound_load;
+  dest->stereo_ay    = src->stereo_ay;
 
   return 0;
 }
