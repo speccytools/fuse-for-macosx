@@ -85,7 +85,7 @@ joystick_2_fire_9, numeric, 4096
 joystick_2_fire_10, numeric, 4096
 joystick_keyboard_output, numeric, 0
 
-rzx_compression, boolean, 0,, compress-rzx
+rzx_compression, boolean, 1,, compress-rzx
 competition_mode, boolean, 0
 competition_code, numeric, 0
 embed_snapshot, boolean, 1

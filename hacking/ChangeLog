@@ -1098,3 +1098,4 @@
 20041029 rzx.c,ui.c,ui/ui.h,ui/gtk/gtkui.c,widget/widget.c: (de)activate
 	 rollback menu items appropriately.
 20041031 .cvsignore,z80/.cvsignore: ignore .libs directories.
+20041006 settings.dat: make RZX files be compressed by default.
