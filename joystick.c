@@ -46,10 +46,15 @@ joystick_kempston_read( libspectrum_word port )
   libspectrum_byte return_value = 0, jmask = 1;
   int i;
 
-  /* The TC2048 has a unremoveable Kempston interface */
-  if( ( machine_current->machine != LIBSPECTRUM_MACHINE_TC2048 )
-	  && !settings_current.joy_kempston )
-    return spectrum_port_noread(port);
+  if( !settings_current.joy_kempston ) {
+    /* Some machines have a built-in Kempston interface */
+    if( libspectrum_machine_capabilities( machine_current->machine ) &
+	LIBSPECTRUM_MACHINE_CAPABILITY_KEMPSTON_JOYSTICK               )
+      return 0;                         /* Kempston present; send no data */
+  
+    return spectrum_port_noread( port );  /* Kempston absent */
+  }
+
 
   for( i=0; i<5; i++, jmask<<=1 ) {
     if( !(keyboard_return_values[offset[i]] & mask[i]) )
