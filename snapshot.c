@@ -293,17 +293,19 @@ snapshot_copy_from( libspectrum_snap *snap )
     for( i = 0; i < 8; i++ ) {
 
       if( libspectrum_snap_dock_cart( snap, i ) ) {
-        memory_map_dock[i]->offset = 0;
-        memory_map_dock[i]->page_num = 0;
-        memory_map_dock[i]->writable = libspectrum_snap_dock_ram( snap, i );
-        memory_map_dock[i]->source = MEMORY_SOURCE_CARTRIDGE;
-        memory_map_dock[i]->page = memory_pool_allocate(
-                                    MEMORY_PAGE_SIZE *
-                                    sizeof( libspectrum_byte ) );
         if( !memory_map_dock[i]->page ) {
-          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-                    __LINE__ );
-          return 1;
+          memory_map_dock[i]->offset = 0;
+          memory_map_dock[i]->page_num = 0;
+          memory_map_dock[i]->writable = libspectrum_snap_dock_ram( snap, i );
+          memory_map_dock[i]->source = MEMORY_SOURCE_CARTRIDGE;
+          memory_map_dock[i]->page = memory_pool_allocate(
+                                      MEMORY_PAGE_SIZE *
+                                      sizeof( libspectrum_byte ) );
+          if( !memory_map_dock[i]->page ) {
+            ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                      __LINE__ );
+            return 1;
+          }
         }
 
         memcpy( memory_map_dock[i]->page, libspectrum_snap_dock_cart( snap, i ),
@@ -311,17 +313,19 @@ snapshot_copy_from( libspectrum_snap *snap )
       }
 
       if( libspectrum_snap_exrom_cart( snap, i ) ) {
-        memory_map_exrom[i]->offset = 0;
-        memory_map_exrom[i]->page_num = 0;
-        memory_map_exrom[i]->writable = libspectrum_snap_exrom_ram( snap, i );
-        memory_map_exrom[i]->source = MEMORY_SOURCE_CARTRIDGE;
-        memory_map_exrom[i]->page = memory_pool_allocate(
-                                    MEMORY_PAGE_SIZE *
-                                    sizeof( libspectrum_byte ) );
-        if( !memory_map_exrom[i]->page ) {
-          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
-                    __LINE__ );
-          return 1;
+        if( !memory_map_dock[i]->page ) {
+          memory_map_exrom[i]->offset = 0;
+          memory_map_exrom[i]->page_num = 0;
+          memory_map_exrom[i]->writable = libspectrum_snap_exrom_ram( snap, i );
+          memory_map_exrom[i]->source = MEMORY_SOURCE_CARTRIDGE;
+          memory_map_exrom[i]->page = memory_pool_allocate(
+                                      MEMORY_PAGE_SIZE *
+                                      sizeof( libspectrum_byte ) );
+          if( !memory_map_exrom[i]->page ) {
+            ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                      __LINE__ );
+            return 1;
+          }
         }
 
         memcpy( memory_map_exrom[i]->page,
