@@ -170,6 +170,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
 	ui_error( UI_ERROR_ERROR,
           "Loading +3 snapshot, but neither +3 nor +2A available."
 	);
+	return 1;
       } else {
 	ui_error( UI_ERROR_INFO,
 	  "Loading +3 snapshot, but +3 not available. Using +2A instead."
