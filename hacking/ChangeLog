@@ -1221,3 +1221,4 @@
 20050219 machines/specplus3.c: the +3 disk autoload snap is now an SZX file.
 20050219 ide.[ch],simpleide.c,zxatasp.c,zxcf.c: make ide_insert check whether
 	 the currently inserted disk is dirty before doing the insert.
+20050219 ui/gtk/gtkui.c: check for modified IDE disks before exit.

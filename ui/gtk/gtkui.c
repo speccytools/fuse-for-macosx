@@ -48,11 +48,14 @@
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
+#include "simpleide.h"
 #include "snapshot.h"
 #include "machines/specplus3.h"
 #include "tape.h"
 #include "timer.h"
 #include "ui/ui.h"
+#include "zxatasp.h"
+#include "zxcf.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -540,11 +543,35 @@ menu_file_movies_recordmovieaspng( GtkWidget *widget GCC_UNUSED,
 void
 menu_file_exit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  int error;
+  int confirm;
 
   if( gtkui_confirm( "Exit Fuse?" ) ) {
 
-    error = tape_close(); if( error ) return;
+    confirm = tape_close(); if( confirm ) return;
+
+    if( settings_current.simpleide_master_file ) {
+      confirm = simpleide_eject( LIBSPECTRUM_IDE_MASTER );
+      if( confirm ) return;
+    }
+
+    if( settings_current.simpleide_slave_file ) {
+      confirm = simpleide_eject( LIBSPECTRUM_IDE_SLAVE );
+      if( confirm ) return;
+    }
+
+    if( settings_current.zxatasp_master_file ) {
+      confirm = zxatasp_eject( LIBSPECTRUM_IDE_MASTER );
+      if( confirm ) return;
+    }
+
+    if( settings_current.zxatasp_slave_file ) {
+      confirm = zxatasp_eject( LIBSPECTRUM_IDE_SLAVE );
+      if( confirm ) return;
+    }
+
+    if( settings_current.zxcf_pri_file ) {
+      confirm = zxcf_eject(); if( confirm ) return;
+    }
 
     fuse_exiting = 1;
 
