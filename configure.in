@@ -28,7 +28,6 @@ AM_INIT_AUTOMAKE(fuse, 0.6.2.1)
 
 dnl Checks for programs.
 AC_PROG_CC
-AC_PROG_CPP
 AC_PROG_RANLIB
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)

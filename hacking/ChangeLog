@@ -925,3 +925,6 @@
 20040615 snapshot.c: fall back to +2A if +3e not available.
 20040615 ay.[ch],psg.c: remove duplicated literal constant for number
 	 of AY registers.
+20040616 configure.in,menu_data.c,perl/cpp-perl.pl,ui/gtk/Makefile.am,
+	 widget/Makefile.am: use custom preprocessor to parse menu_data.c
+	 as OS X 10.1(?)'s preprocessor requires proper C syntax.
