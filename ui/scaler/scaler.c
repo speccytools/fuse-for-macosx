@@ -51,6 +51,7 @@ struct scaler_info {
 /* The expander functions */
 static void expand_1( int *x, int *y, int *w, int *h );
 static void expand_sai( int *x, int *y, int *w, int *h );
+static void expand_dotmatrix( int *x, int *y, int *w, int *h );
 
 /* Information on each of the available scalers. Make sure this array stays
    in the same order as scaler.h:scaler_type */
@@ -78,6 +79,8 @@ static struct scaler_info available_scalers[] = {
     scaler_TV2x_16,       scaler_TV2x_32,       NULL                },
   { "Timex TV",	       "timextv",    SCALER_FLAGS_NONE,        1.0, 
     scaler_TimexTV_16,    scaler_TimexTV_32,    NULL                },
+  { "Dot Matrix",      "dotmatrix",  SCALER_FLAGS_EXPAND,      2.0,
+    scaler_DotMatrix_16,  scaler_DotMatrix_32,  expand_dotmatrix    },
 };
 
 scaler_type current_scaler = SCALER_NUM;
@@ -199,4 +202,14 @@ static void
 expand_sai( int *x, int *y, int *w, int *h )
 {
   (*x)-=2; (*y)-=2; (*w)+=3; (*h)+=3;
+}
+
+/* Expand to a even y co-ord */
+static void
+expand_dotmatrix( int *x, int *y, int *w, int *h )
+{
+  int y_mod = (*y) % 2;
+
+  (*y)-=y_mod;
+  (*h)+=y_mod;
 }

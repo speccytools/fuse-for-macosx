@@ -46,6 +46,20 @@ static DWORD qlowpixelMask;
 static DWORD redblueMask;
 static DWORD greenMask;
 
+static const WORD dotmatrix_565[16] = {
+  0x01E0, 0x0007, 0x3800, 0x0000,
+  0x39E7, 0x0000, 0x39E7, 0x0000,
+  0x3800, 0x0000, 0x01E0, 0x0007,
+  0x39E7, 0x0000, 0x39E7, 0x0000
+};
+static const WORD dotmatrix_555[16] = {
+  0x00E0, 0x0007, 0x1C00, 0x0000,
+  0x1CE7, 0x0000, 0x1CE7, 0x0000,
+  0x1C00, 0x0000, 0x00E0, 0x0007,
+  0x1CE7, 0x0000, 0x1CE7, 0x0000
+};
+static const WORD *dotmatrix;
+
 int 
 scaler_select_bitformat( DWORD BitFormat )
 {
@@ -68,6 +82,7 @@ scaler_select_bitformat( DWORD BitFormat )
     qlowpixelMask = 0x00001863;
     redblueMask = 0x0000F81F;
     greenMask = 0x000007E0;
+    dotmatrix = dotmatrix_565;
     break;
 
   case 555:
@@ -77,6 +92,7 @@ scaler_select_bitformat( DWORD BitFormat )
     qlowpixelMask = 0x00000C63;
     redblueMask = 0x00007C1F;
     greenMask = 0x000003E0;
+    dotmatrix = dotmatrix_555;
     break;
 
   default:
@@ -107,6 +123,13 @@ const static DWORD qlowpixelMask = 0x03030300;
 const static QWORD redblueMask = 0xFF00FF00;
 const static QWORD greenMask = 0x00FF0000;
 
+static const DWORD dotmatrix[16] = {
+  0x003F0000, 0x00003F00, 0x3F000000, 0x00000000,
+  0x3F3F3F00, 0x00000000, 0x3F3F3F00, 0x00000000,
+  0x3F000000, 0x00000000, 0x003F0000, 0x00003F00,
+  0x3F3F3F00, 0x00000000, 0x3F3F3F00, 0x00000000
+};
+
 #else				/* #ifdef WORDS_BIGENDIAN */
 
 const static DWORD colorMask = 0x00FEFEFE;
@@ -115,6 +138,13 @@ const static DWORD qcolorMask = 0x00FCFCFC;
 const static DWORD qlowpixelMask = 0x00030303;
 const static QWORD redblueMask = 0x00FF00FF;
 const static QWORD greenMask = 0x0000FF00;
+
+static const DWORD dotmatrix[16] = {
+  0x00003F00, 0x003F0000, 0x0000003F, 0x00000000,
+  0x003F3F3F, 0x00000000, 0x003F3F3F, 0x00000000,
+  0x0000003F, 0x00000000, 0x00003F00, 0x003F0000,
+  0x003F3F3F, 0x00000000, 0x003F3F3F, 0x00000000
+};
 
 #endif				/* #ifdef WORDS_BIGENDIAN */
 
@@ -774,5 +804,34 @@ FUNCTION( scaler_TimexTV )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
       q += nextlineDst << 1;
     }
     p += nextlineSrc;
+  }
+}
+
+static inline scaler_data_type DOT(scaler_data_type c, int j, int i) {
+  return c - ((c >> 2) & *(dotmatrix + ((j & 3) << 2) + (i & 3)));
+}
+
+void
+FUNCTION( scaler_DotMatrix )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			    BYTE *dstPtr, DWORD dstPitch,
+			    int width, int height )
+{
+  int i, j, ii, jj;
+  unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
+  scaler_data_type *p = (scaler_data_type *)srcPtr;
+
+  unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
+  scaler_data_type *q = (scaler_data_type *)dstPtr;
+
+  for (j = 0, jj = 0; j < height; ++j, jj += 2) {
+    for (i = 0, ii = 0; i < width; ++i, ii += 2) {
+      scaler_data_type c = *(p + i);
+      *(q + ii) = DOT(c, jj, ii);
+      *(q + ii + 1) = DOT(c, jj, ii + 1);
+      *(q + ii + nextlineDst) = DOT(c, jj + 1, ii);
+      *(q + ii + nextlineDst + 1) = DOT(c, jj + 1, ii + 1);
+    }
+    p += nextlineSrc;
+    q += nextlineDst << 1;
   }
 }

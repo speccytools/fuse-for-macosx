@@ -104,6 +104,7 @@ init_scalers( void )
   scaler_register( SCALER_SUPER2XSAI );
   scaler_register( SCALER_SUPEREAGLE );
   scaler_register( SCALER_ADVMAME2X );
+  scaler_register( SCALER_DOTMATRIX );
   if( machine_current->timex ) {
     scaler_register( SCALER_HALF ); 
     scaler_register( SCALER_HALFSKIP );

@@ -215,6 +215,7 @@ register_scalers( void )
       scaler_register( SCALER_2XSAI );
       scaler_register( SCALER_SUPER2XSAI );
       scaler_register( SCALER_SUPEREAGLE );
+      scaler_register( SCALER_DOTMATRIX );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_DOUBLESIZE );
       return 0;

@@ -56,6 +56,9 @@ void scaler_TV2x_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 		     BYTE *dstPtr, DWORD dstPitch, int width, int height );
 void scaler_TimexTV_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			BYTE *dstPtr, DWORD dstPitch, int width, int height );
+void scaler_DotMatrix_16( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			  BYTE *dstPtr, DWORD dstPitch,
+			  int width, int height );
 
 void scaler_2xSaI_32( BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 		      BYTE *dstPtr, DWORD dstPitch, int width, int height );
@@ -82,5 +85,8 @@ void scaler_TV2x_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 		     BYTE *dstPtr, DWORD dstPitch, int width, int height );
 void scaler_TimexTV_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
 			BYTE *dstPtr, DWORD dstPitch, int width, int height );
+void scaler_DotMatrix_32( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+			  BYTE *dstPtr, DWORD dstPitch,
+			  int width, int height );
 
 #endif				/* #ifndef FUSE_SCALER_INTERNALS_H */
