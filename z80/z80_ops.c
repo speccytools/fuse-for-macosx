@@ -317,7 +317,7 @@ void z80_do_opcodes()
       }
       break;
     case 0x36:		/* LD (HL),nn */
-      contend( PC, 4 ); contend( HL, 3 );
+      contend( PC, 3 ); contend( HL, 3 );
       writebyte(HL,readbyte(PC++));
       break;
     case 0x37:		/* SCF */

@@ -33,12 +33,10 @@
 #endif
 
 case 0x09:		/* ADD REGISTER,BC */
-tstates += 11;
 ADD16(REGISTER,BC);
 break;
 
 case 0x19:		/* ADD REGISTER,DE */
-tstates += 11;
 ADD16(REGISTER,DE);
 break;
 
@@ -169,12 +167,10 @@ D=readbyte( REGISTER + (SBYTE)readbyte(PC++) );
 break;
 
 case 0x5c:		/* LD E,REGISTERH */
-tstates += 8;
 E=REGISTERH;
 break;
 
 case 0x5d:		/* LD E,REGISTERL */
-tstates += 8;
 E=REGISTERL;
 break;
 
