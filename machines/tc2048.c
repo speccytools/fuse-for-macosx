@@ -41,12 +41,16 @@
 #include "scld.h"
 #include "spec48.h"
 #include "ula.h"
+#include "if1.h"
 
 static int tc2048_reset( void );
 static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );
 
 const static periph_t peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
+  { 0x0018, 0x0010, if1_port_in, if1_port_out },
+  { 0x0018, 0x0008, if1_port_in, if1_port_out },
+  { 0x0018, 0x0000, if1_port_in, if1_port_out },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
   /* TS2040/Alphacom printer */
@@ -164,6 +168,7 @@ tc2048_reset( void )
 
   error = periph_setup( peripherals, peripherals_count,
 			PERIPH_PRESENT_ALWAYS,
+			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 

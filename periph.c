@@ -29,6 +29,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "if1.h"
 #include "if2.h"
 #include "joystick.h"
 #include "kempmouse.h"
@@ -256,6 +257,12 @@ static periph_present kempston_present;
 /* Is the Kempston interface currently active */
 int periph_kempston_active;
 
+/* What sort of Interface I does the current machine have */
+periph_present interface1_present;
+
+/* Is the Interface I currently active */
+int periph_interface1_active;
+
 /* What sort of Interface II does the current machine have */
 periph_present interface2_present;
 
@@ -265,6 +272,7 @@ int periph_interface2_active;
 int
 periph_setup( const periph_t *peripherals_list, size_t n,
 	      periph_present kempston,
+	      periph_present interface1,
 	      periph_present interface2 )
 {
   int error;
@@ -283,6 +291,7 @@ periph_setup( const periph_t *peripherals_list, size_t n,
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
 
   kempston_present = kempston;
+  interface1_present = interface1;
   interface2_present = interface2;
 
   periph_update();
@@ -333,6 +342,13 @@ periph_update( void )
   case PERIPH_PRESENT_ALWAYS: periph_kempston_active = 1; break;
   }
 
+  switch( interface1_present ) {
+  case PERIPH_PRESENT_NEVER: periph_interface1_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_interface1_active = settings_current.interface1; break;
+  case PERIPH_PRESENT_ALWAYS: periph_interface1_active = 1; break;
+  }
+
   switch( interface2_present ) {
 
   case PERIPH_PRESENT_NEVER:
@@ -346,6 +362,9 @@ periph_update( void )
     break;
 
   }
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1,
+		    periph_interface1_active );
+
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
 		    periph_interface2_active );
 

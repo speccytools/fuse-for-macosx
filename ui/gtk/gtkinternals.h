@@ -159,6 +159,8 @@ extern guint gtkui_menu_data_size;
  */
 extern char *gtkpixmap_tape_inactive[];
 extern char *gtkpixmap_tape_active[];
+extern char *gtkpixmap_mdr_inactive[];
+extern char *gtkpixmap_mdr_active[];
 extern char *gtkpixmap_disk_inactive[];
 extern char *gtkpixmap_disk_active[];
 extern char *gtkpixmap_pause_inactive[];

@@ -33,6 +33,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "if1.h"
 #include "if2.h"
 #include "machines/spec128.h"
 #include "memory.h"
@@ -241,11 +242,26 @@ memory_romcs_map( void )
   if( !machine_current->ram.romcs ) return;
 
   /* FIXME: what should we do if more than one of these devices is
-     active? */
+     active? What happen in the real situation? e.g. if1+if2 with cartridge?
+     
+     OK. in the Interface 1 service manual: p.: 1.2 par.: 1.3.1
+       All the additional software needed in IC2 (the if1 ROM). IC2 enable
+       is discussed in paragraph 1.2.2 above. In addition to control from
+       IC1 (the if1 ULA), the ROM maybe disabled by a device connected to
+       the (if1's) expansion connector J1. ROMCS2 from (B25), for example,
+       Interface 2 connected to J1 would disable both ROM IC2 (if1 ROM) and
+       the Spectrum ROM, via isolating diodes D10 and D9 respectively.
+     
+     All comment in paranthesis added by me (Gergely Szasz).
+     The ROMCS2 (B25 conn) in Interface 1 J1 edge connector is in the
+     same position than ROMCS (B25 conn) in the Spectrum edge connector.
+     
+   */
   if( machine_current->capabilities &
       LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )
     trdos_memory_map();
 
+  if( if1_active ) if1_memory_map();	/* if2 is superior */
   if( if2_active ) if2_memory_map();
   if( settings_current.zxatasp_active ) zxatasp_memory_map();
   if( settings_current.zxcf_active ) zxcf_memory_map();

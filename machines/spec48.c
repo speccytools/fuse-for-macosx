@@ -39,11 +39,15 @@
 #include "spec48.h"
 #include "spectrum.h"
 #include "ula.h"
+#include "if1.h"
 
 static int spec48_reset( void );
 
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, ula_read, ula_write },
+  { 0x0018, 0x0010, if1_port_in, if1_port_out },
+  { 0x0018, 0x0008, if1_port_in, if1_port_out },
+  { 0x0018, 0x0000, if1_port_in, if1_port_out },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
 };
@@ -138,6 +142,7 @@ spec48_reset( void )
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;

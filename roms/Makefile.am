@@ -33,7 +33,8 @@ ROMS =  128-0.rom 128-1.rom \
 	tc2068-0.rom tc2068-1.rom \
 	128p-0.rom 128p-1.rom trdos.rom \
 	256s-0.rom 256s-1.rom 256s-2.rom 256s-3.rom \
-	se-0.rom se-1.rom
+	se-0.rom se-1.rom \
+	if1-1.rom if1-2.rom
 
 pkgdata_DATA = $(ROMS)
 

@@ -198,6 +198,94 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT,
     "/Media/Cartridge/Timex Dock/Eject" },
 
+  { UI_MENU_ITEM_MEDIA_IF1, "/Media/Interface I" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M1_SYNC, "/Media/Interface I/Microdrive 1/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M1_EJECT, "/Media/Interface I/Microdrive 1/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M1_WP, "/Media/Interface I/Microdrive 1/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET, "/Media/Interface I/Microdrive 1/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M1_WP_REMOVE, "/Media/Interface I/Microdrive 1/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M2_SYNC, "/Media/Interface I/Microdrive 2/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M2_EJECT, "/Media/Interface I/Microdrive 2/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M2_WP, "/Media/Interface I/Microdrive 2/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET, "/Media/Interface I/Microdrive 2/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M2_WP_REMOVE, "/Media/Interface I/Microdrive 2/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M3_SYNC, "/Media/Interface I/Microdrive 3/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M3_EJECT, "/Media/Interface I/Microdrive 3/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M3_WP, "/Media/Interface I/Microdrive 3/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET, "/Media/Interface I/Microdrive 3/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M3_WP_REMOVE, "/Media/Interface I/Microdrive 3/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M4_SYNC, "/Media/Interface I/Microdrive 4/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M4_EJECT, "/Media/Interface I/Microdrive 4/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M4_WP, "/Media/Interface I/Microdrive 4/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET, "/Media/Interface I/Microdrive 4/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M4_WP_REMOVE, "/Media/Interface I/Microdrive 4/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M5_SYNC, "/Media/Interface I/Microdrive 5/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M5_EJECT, "/Media/Interface I/Microdrive 5/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M5_WP, "/Media/Interface I/Microdrive 5/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET, "/Media/Interface I/Microdrive 5/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M5_WP_REMOVE, "/Media/Interface I/Microdrive 5/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M6_SYNC, "/Media/Interface I/Microdrive 6/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M6_EJECT, "/Media/Interface I/Microdrive 6/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M6_WP, "/Media/Interface I/Microdrive 6/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET, "/Media/Interface I/Microdrive 6/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M6_WP_REMOVE, "/Media/Interface I/Microdrive 6/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M7_SYNC, "/Media/Interface I/Microdrive 7/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M7_EJECT, "/Media/Interface I/Microdrive 7/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M7_WP, "/Media/Interface I/Microdrive 7/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET, "/Media/Interface I/Microdrive 7/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M7_WP_REMOVE, "/Media/Interface I/Microdrive 7/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M8_SYNC, "/Media/Interface I/Microdrive 8/Sync" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M8_EJECT, "/Media/Interface I/Microdrive 8/Eject" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M8_WP, "/Media/Interface I/Microdrive 8/Write protect" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET, "/Media/Interface I/Microdrive 8/Write protect/Set" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_M8_WP_REMOVE, "/Media/Interface I/Microdrive 8/Write protect/Remove" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_RS232_UNPLUG_R, "/Media/Interface I/RS232/Unplug RxD" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_RS232_UNPLUG_T, "/Media/Interface I/RS232/Unplug TxD" },
+
+  { UI_MENU_ITEM_MEDIA_IF1_SNET_UNPLUG, "/Media/Interface I/Sinclair NET/Unplug" },
+
   { UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, "/Media/Cartridge/Interface II" },
 
   { UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT,

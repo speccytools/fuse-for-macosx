@@ -203,6 +203,7 @@ tc2068_reset( void )
 
   error = periph_setup( peripherals, peripherals_count,
                         PERIPH_PRESENT_OPTIONAL,
+			PERIPH_PRESENT_NEVER,
                         PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 

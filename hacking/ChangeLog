@@ -1109,3 +1109,12 @@
 	 aosound.c,lowlevel.h}: add ao sound driver (Gergely Szasz).
 20041122 THANKS,sound/lowlevel.h: do <sys/audio.h> check before
 	 <sys/soundcard.h> (thanks, Mark Round) (fixes bug #1068670).
+20041128 Makefile.am, if1.[ch], machine.c, memory.[ch], menu.[ch],
+	 menu_data.c, periph.[ch], settings.{dat,pl}, ui.c,
+	 lib/Makefile.am, machines/{pentagon.c,spec128.c,spec16.c,spec48.c,
+	 spec_se.c,specplus2.c,specplus2a.c,specplus3.c,specplus3e.c,
+	 tc2048.c,tc2068.c}, roms/{Makefile.am,if1-[12].rom},
+	 ui/{options.dat,ui.h}, ui/gtk/{gtkinternals.h,pixmaps.c,
+	 statusbar.c}, ui/sdl/sdldisplay.c, z80/{coretest.c,z80_ops.c}:
+	 Interface I and microdrive emulation (patch #1060831)
+	 (Gergely Szasz)

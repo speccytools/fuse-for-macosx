@@ -355,6 +355,7 @@ slt_trap( libspectrum_word address, libspectrum_byte level )
 
 int trdos_available = 0;
 int trdos_active = 0;
+int if1_available = 0;
 
 void
 trdos_page( void )
@@ -364,6 +365,18 @@ trdos_page( void )
 
 void
 trdos_unpage( void )
+{
+  abort();
+}
+
+void
+if1_page( void )
+{
+  abort();
+}
+
+void
+if1_unpage( void )
 {
   abort();
 }

@@ -34,6 +34,7 @@
 #include "memory.h"
 #include "periph.h"
 #include "rzx.h"
+#include "if1.h"
 #include "settings.h"
 #include "slt.h"
 #include "tape.h"
@@ -91,7 +92,7 @@ void
 z80_do_opcodes( void )
 {
   int even_m1;
-  void *cgoto[4]; size_t next;
+  void *cgoto[6]; size_t next;
 
   /* Avoid 'variable not used' warnings if we're not using gcc */
   cgoto[0] = cgoto[0]; next = next;
@@ -105,11 +106,15 @@ z80_do_opcodes( void )
   SETUP_CHECK( rzx, rzx_playback, 0 );
   SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 1 );
   SETUP_CHECK( trdos, trdos_available, 2 );
-  if( next != 3 ) { cgoto[ next ] = &&opcode_delay; }
+  SETUP_CHECK( if1p, if1_available, 3 );
+  if( next != 4 ) { cgoto[ next ] = &&opcode_delay; }
 
-  next = 3;
-  SETUP_CHECK( evenm1, even_m1, 3 );
-  if( next != 4 ) { cgoto[ next ] = &&run_opcode; }
+  next = 4;
+  SETUP_CHECK( evenm1, even_m1, 4 );
+  if( next != 5 ) { cgoto[ next ] = &&run_opcode; }
+  next = 5;
+  SETUP_CHECK( if1u, if1_available, 5 );
+  if( next != 6 ) { cgoto[ next ] = &&end_opcode; }
 
 #endif				/* #ifdef __GNUC__ */
 
@@ -150,23 +155,40 @@ z80_do_opcodes( void )
 
     END_CHECK
 
+    CHECK( if1p, if1_available, 3 )
+
+    if( PC == 0x0008 || PC == 0x1708 ) {
+      if1_page();
+    }
+
+    END_CHECK
+
   opcode_delay:
 
     contend_read( PC, 4 );
 
     /* Check to see if M1 cycles happen on even tstates */
-    CHECK( evenm1, even_m1, 3 )
+    CHECK( evenm1, even_m1, 4 )
 
     if( tstates & 1 ) tstates++;
 
     END_CHECK
 
   run_opcode:
-
     /* Do the instruction fetch; readbyte_internal used here to avoid
        triggering read breakpoints */
-    opcode = readbyte_internal( PC ); PC++; R++;
+    opcode = readbyte_internal( PC );
 
+    CHECK( if1u, if1_available, 5 )
+
+    if( PC == 0x0700 ) {
+      if1_unpage();
+    }
+
+    END_CHECK
+
+  end_opcode:
+    PC++; R++;
     switch(opcode) {
 #include "opcodes_base.c"
     }

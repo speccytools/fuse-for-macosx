@@ -485,6 +485,7 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 27: return &( settings->rom_plus3e_3 );
   case 28: return &( settings->rom_spec_se_0 );
   case 29: return &( settings->rom_spec_se_1 );
+  case 30: return &( settings->rom_interface_i );
   default: return NULL;
   }
 }

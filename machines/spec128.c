@@ -41,11 +41,15 @@
 #include "spec48.h"
 #include "trdos.h"
 #include "ula.h"
+#include "if1.h"
 
 static int spec128_reset( void );
 
 const periph_t spec128_peripherals[] = {
   { 0x0001, 0x0000, ula_read, ula_write },
+  { 0x0018, 0x0010, if1_port_in, if1_port_out },
+  { 0x0018, 0x0008, if1_port_in, if1_port_out },
+  { 0x0018, 0x0000, if1_port_in, if1_port_out },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
@@ -137,6 +141,7 @@ spec128_reset( void )
   if( error ) return error;
 
   error = periph_setup( spec128_peripherals, spec128_peripherals_count,
+			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;

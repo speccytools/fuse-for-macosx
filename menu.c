@@ -31,6 +31,7 @@
 #include "dck.h"
 #include "event.h"
 #include "fuse.h"
+#include "if1.h"
 #include "if2.h"
 #include "menu.h"
 #include "psg.h"
@@ -228,6 +229,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case 10: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,  20, 4 ); return;
   case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3E, 24, 4 ); return;
   case 12: menu_select_roms( LIBSPECTRUM_MACHINE_SE,     28, 2 ); return;
+  case 13: menu_select_roms( LIBSPECTRUM_MACHINE_48,     30, 1 ); return;
 
   }
 
@@ -302,6 +304,101 @@ MENU_CALLBACK( menu_media_tape_clear )
 MENU_CALLBACK( menu_media_tape_write )
 {
   ui_tape_write();
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_mdr_new )
+{
+  WIDGET_END;
+
+  if1_mdr_new( action - 1 );
+
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_mdr_insert )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_filename( "Fuse - Insert microdrive disk file" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  if1_mdr_insert( filename, action - 1 );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_mdr_sync )
+{
+
+  if( if1_mdr_sync( NULL, action - 1 ) ) {
+    char *filename;
+
+    fuse_emulation_pause();
+
+    filename = menu_get_filename( "Fuse - Write microdrive disk to file" );
+    if( !filename ) { fuse_emulation_unpause(); return; }
+
+    if1_mdr_sync( filename, action - 1 );
+
+    free( filename );
+
+    fuse_emulation_unpause();
+  } else {
+    WIDGET_END;
+  }
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_mdr_eject )
+{
+
+  if( if1_mdr_eject( NULL, action - 1 ) ) {
+    char *filename;
+
+    fuse_emulation_pause();
+
+    filename = menu_get_filename( "Fuse - Write microdrive disk to file" );
+    if( !filename ) { fuse_emulation_unpause(); return; }
+
+    if1_mdr_eject( filename, action - 1 );
+
+    free( filename );
+
+    fuse_emulation_unpause();
+  } else {
+    WIDGET_END;
+  }
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_mdr_writep )
+{
+  WIDGET_END;
+
+  if1_mdr_writep( action & 0xf0, ( action & 0x0f ) - 1 );
+
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  if( action & 0xf0 ) {
+    WIDGET_END;
+    if1_unplug( action & 0x0f );
+  } else {
+    filename = menu_get_filename( "Fuse - Select file for communication" );
+    if( !filename ) { fuse_emulation_unpause(); return; }
+
+    if1_plug( filename, action );
+
+    free( filename );
+  }
+  fuse_emulation_unpause();
+
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )

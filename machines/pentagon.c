@@ -37,6 +37,7 @@
 #include "spec128.h"
 #include "trdos.h"
 #include "ula.h"
+#include "if1.h"
 
 static libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
 						 int *attached );
@@ -47,6 +48,9 @@ static int pentagon_reset( void );
 static int pentagon_shutdown( void );
 
 const static periph_t peripherals[] = {
+  { 0x0018, 0x0010, if1_port_in, if1_port_out },
+  { 0x0018, 0x0008, if1_port_in, if1_port_out },
+  { 0x0018, 0x0000, if1_port_in, if1_port_out },
   { 0x00ff, 0x001f, pentagon_select_1f_read, trdos_cr_write },
   { 0x00ff, 0x003f, trdos_tr_read, trdos_tr_write },
   { 0x00ff, 0x005f, trdos_sec_read, trdos_sec_write },
@@ -142,6 +146,7 @@ pentagon_reset(void)
   trdos_available = 1;
 
   error = periph_setup( peripherals, peripherals_count,
+			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_NEVER );
   if( error ) return error;

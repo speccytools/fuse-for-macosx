@@ -39,12 +39,14 @@ static GtkWidget *status_bar;
 
 static GdkPixmap
   *pixmap_tape_inactive, *pixmap_tape_active,
+  *pixmap_mdr_inactive, *pixmap_mdr_active,
   *pixmap_disk_inactive, *pixmap_disk_active,
   *pixmap_pause_inactive, *pixmap_pause_active;
 
 static GdkBitmap *pause_mask;
 
 static GtkWidget
+  *microdrv_status,	/* Is any microdrive motor running? */
   *disk_status,		/* Is the disk motor running? */
   *mouse_status,	/* Have we grabbed the mouse? */
   *pause_status,	/* Is emulation paused (via the menu option)? */
@@ -65,6 +67,13 @@ gtkstatusbar_create( GtkBox *parent )
   pixmap_tape_active = 
     gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
 					   NULL, gtkpixmap_tape_active );
+
+  pixmap_mdr_inactive = 
+    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
+					   NULL, gtkpixmap_mdr_inactive );
+  pixmap_mdr_active = 
+    gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
+					   NULL, gtkpixmap_mdr_active );
 
   pixmap_disk_inactive = 
     gdk_pixmap_colormap_create_from_xpm_d( NULL, gdk_rgb_get_cmap(), NULL,
@@ -89,6 +98,9 @@ gtkstatusbar_create( GtkBox *parent )
 
   tape_status = gtk_pixmap_new( pixmap_tape_inactive, NULL );
   gtk_box_pack_end( GTK_BOX( status_bar ), tape_status, FALSE, FALSE, 0 );
+
+  microdrv_status = gtk_pixmap_new( pixmap_mdr_inactive, NULL );
+  gtk_box_pack_end( GTK_BOX( status_bar ), microdrv_status, FALSE, FALSE, 0 );
 
   disk_status = gtk_pixmap_new( pixmap_disk_inactive, NULL );
   gtk_box_pack_end( GTK_BOX( status_bar ), disk_status, FALSE, FALSE, 0 );
@@ -149,6 +161,21 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
     which = ( state == UI_STATUSBAR_STATE_ACTIVE ?
 	      pixmap_pause_active : pixmap_pause_inactive );
     gtk_pixmap_set( GTK_PIXMAP( pause_status ), which, pause_mask  );
+    return 0;
+
+  case UI_STATUSBAR_ITEM_MICRODRV:
+    switch( state ) {
+    case UI_STATUSBAR_STATE_NOT_AVAILABLE:
+      gtk_widget_hide( microdrv_status ); break;
+    case UI_STATUSBAR_STATE_ACTIVE:
+      gtk_widget_show( microdrv_status );
+      gtk_pixmap_set( GTK_PIXMAP( microdrv_status ), pixmap_mdr_active, NULL );
+      break;
+    default:
+      gtk_widget_show( microdrv_status );
+      gtk_pixmap_set( GTK_PIXMAP( microdrv_status ), pixmap_mdr_inactive, NULL );
+      break;
+    }      
     return 0;
 
   case UI_STATUSBAR_ITEM_TAPE:

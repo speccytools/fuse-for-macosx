@@ -46,9 +46,12 @@ full_screen, boolean, 0
 writable_roms, boolean, 0
 autosave_settings, boolean, 0
 bw_tv, boolean, 0
+raw_rs232, boolean, 0
+raw_s_net, boolean, 0
 confirm_actions, boolean, 1
 printer, boolean, 0
 statusbar, boolean, 1
+interface1, boolean, 0
 interface2, boolean, 1
 snaps_as_z80, boolean, 0
 
@@ -151,3 +154,4 @@ rom_scorpion_2, string, strdup( "256s-2.rom" ),
 rom_scorpion_3, string, strdup( "256s-3.rom" ),
 rom_spec_se_0, string, strdup( "se-0.rom" ),
 rom_spec_se_1, string, strdup( "se-1.rom" ),
+rom_interface_i, string, strdup( "if1-2.rom" ),

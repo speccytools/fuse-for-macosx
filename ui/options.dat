@@ -9,6 +9,8 @@ Checkbox, Save snaps as .(z)80, snaps_as_z80, INPUT_KEY_z
 Checkbox, Use .(s)lt traps, slt_traps, INPUT_KEY_s
 Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w
 Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
+Checkbox, Raw RS-2(3)2, raw_rs232, INPUT_KEY_3
+Checkbox, Raw Sinclair(N)ET, raw_s_net, INPUT_KEY_n
 Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
@@ -18,6 +20,7 @@ peripherals
 Peripheral Options
 Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
 Checkbox, Kempston (m)ouse, kempston_mouse, INPUT_KEY_m
+Checkbox, Inter(f)ace I, interface1, INPUT_KEY_f
 Checkbox, (I)nterface II, interface2, INPUT_KEY_i
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, Simple (8)-bit IDE, simpleide_active, INPUT_KEY_8

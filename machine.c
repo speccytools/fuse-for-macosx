@@ -31,6 +31,7 @@
 
 #include "event.h"
 #include "fuse.h"
+#include "if1.h"
 #include "if2.h"
 #include "machine.h"
 #include "machines/machines.h"
@@ -347,9 +348,14 @@ machine_reset( void )
   for( i = 0; i < machine_current->timings.tstates_per_frame; i++ )
     ula_contention[ i ] = machine_current->ram.contend_delay( i );
 
+  /* Check for an Interface I ROM */
+  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
+    UI_STATUSBAR_STATE_NOT_AVAILABLE );
+  
+  error = if1_reset(); if( error ) return error;
+
   /* Check for an Interface II ROM */
   error = if2_reset(); if( error ) return error;
-
   return 0;
 }
 

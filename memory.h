@@ -46,6 +46,7 @@ typedef enum memory_page_source {
 
   MEMORY_SOURCE_SYSTEM,
   MEMORY_SOURCE_CARTRIDGE,
+  MEMORY_SOURCE_PERIPHERAL,
   
 } memory_page_source;
 

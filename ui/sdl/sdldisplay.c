@@ -53,9 +53,10 @@ SDL_Surface *sdldisplay_gc = NULL;   /* Hardware screen */
 static SDL_Surface *tmp_screen=NULL; /* Temporary screen for scalers */
 
 static SDL_Surface *red_cassette[2], *green_cassette[2];
+static SDL_Surface *red_mdr[2], *green_mdr[2];
 static SDL_Surface *red_disk[2], *green_disk[2];
 
-static ui_statusbar_state sdl_disk_state, sdl_tape_state;
+static ui_statusbar_state sdl_disk_state, sdl_mdr_state, sdl_tape_state;
 
 static int tmp_screen_width;
 
@@ -227,6 +228,7 @@ uidisplay_init( int width, int height )
   display_ui_initialised = 1;
 
   sdl_load_status_icon( "cassette.bmp", red_cassette, green_cassette );
+  sdl_load_status_icon( "microdrv.bmp", red_mdr, green_mdr );
   sdl_load_status_icon( "plus3disk.bmp", red_disk, green_disk );
 
   return 0;
@@ -405,7 +407,7 @@ sdl_blit_icon( SDL_Surface **icon,
 static void
 sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
 {
-  SDL_Rect r = { 264, 218, red_disk[0]->w, red_disk[0]->h };
+  SDL_Rect r = { 243, 218, red_disk[0]->w, red_disk[0]->h };
 
   switch( sdl_disk_state ) {
   case UI_STATUSBAR_STATE_ACTIVE:
@@ -413,6 +415,22 @@ sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
     break;
   case UI_STATUSBAR_STATE_INACTIVE:
     sdl_blit_icon( red_disk, &r, tmp_screen_pitch, dstPitch );
+    break;
+  case UI_STATUSBAR_STATE_NOT_AVAILABLE:
+    break;
+  }
+
+  r.x = 264;
+  r.y = 218;
+  r.w = red_mdr[0]->w;
+  r.h = red_mdr[0]->h;
+
+  switch( sdl_mdr_state ) {
+  case UI_STATUSBAR_STATE_ACTIVE:
+    sdl_blit_icon( green_mdr, &r, tmp_screen_pitch, dstPitch );
+    break;
+  case UI_STATUSBAR_STATE_INACTIVE:
+    sdl_blit_icon( red_mdr, &r, tmp_screen_pitch, dstPitch );
     break;
   case UI_STATUSBAR_STATE_NOT_AVAILABLE:
     break;
@@ -570,6 +588,12 @@ uidisplay_end( void )
     if ( green_cassette[i] ) {
       SDL_FreeSurface( green_cassette[i] ); green_cassette[i] = NULL;
     }
+    if ( red_mdr[i] ) {
+      SDL_FreeSurface( red_mdr[i] ); red_mdr[i] = NULL;
+    }
+    if ( green_mdr[i] ) {
+      SDL_FreeSurface( green_mdr[i] ); green_mdr[i] = NULL;
+    }
     if ( red_disk[i] ) {
       SDL_FreeSurface( red_disk[i] ); red_disk[i] = NULL;
     }
@@ -596,6 +620,10 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 
   case UI_STATUSBAR_ITEM_TAPE:
     sdl_tape_state = state;
+    return 0;
+
+  case UI_STATUSBAR_ITEM_MICRODRV:
+    sdl_mdr_state = state;
     return 0;
 
   case UI_STATUSBAR_ITEM_MOUSE:
