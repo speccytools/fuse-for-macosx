@@ -267,23 +267,7 @@ int tape_write( const char* filename )
 
   length = 0;
 
-  switch( type ) {
-
-  case LIBSPECTRUM_ID_TAPE_TAP:
-    error = libspectrum_tap_write( &buffer, &length, tape );
-    break;
-
-  case LIBSPECTRUM_ID_TAPE_TZX:
-    error = libspectrum_tzx_write( &buffer, &length, tape );
-    break;
-
-  default:
-    ui_error( UI_ERROR_INFO,
-	      "Sorry: no support for writing that tape format" );
-    return 0;
-
-  }
-
+  error = libspectrum_tape_write( &buffer, &length, tape, type );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   error = utils_write_file( filename, buffer, length );

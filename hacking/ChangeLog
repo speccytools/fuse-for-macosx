@@ -693,6 +693,7 @@
 20040401 machine.c,settings.dat,machines/{Makefile.am,machines.h,
 	 specplus3.[ch],specplus3e.c}: Spectrum +3e support.
 20040402 machines/specplus3e.c: make the +3e be a +3e not a +3.
+20040402 tape.c: use libspectrum_tape_write().
 20040403 widget/roms.c: Fix ROM name lookup for labels
 20040403 widget/select.c: Add <string.h> for strlen
 20040403 ui/sdl/sdldisplay.c: Fix icon overlays for timex machines
