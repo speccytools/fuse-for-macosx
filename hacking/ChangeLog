@@ -950,3 +950,4 @@
 20040620 README,autogen.sh: add script to do the autotools invocation.
 20040621 configure.in: restore autoconf2.13 compatability.
 20040621 man/fuse.1: small man page update.
+20040621 ChangeLog: Darren did the initial Spectrum SE emulation.

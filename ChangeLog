@@ -4,7 +4,7 @@
 
 	* New features:
 	  + Scorpion ZS 256 support (Stuart Brady).
-	  + Spectrum SE support (Fredrick Meunier).
+	  + Spectrum SE support (Fredrick Meunier, Darren Salt).
 	  + Support for the simple 8-bit IDE interface (as used by the
 	    +3e) and the ZXATASP and ZXCF interfaces (Garry Lancaster).
 	  + Spectrum +3e support: just a +3 with different ROMs (Philip
