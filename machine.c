@@ -282,7 +282,11 @@ machine_reset( void )
 
   /* These things should happen on all resets */
   z80_reset();
+
+  /* sound_ay_reset() *absolutely must* be called before either
+     sound_frame() or sound_ay_write() */
   sound_ay_reset();
+
   snapshot_flush_slt();
   printer_zxp_reset();
   scld_reset();
