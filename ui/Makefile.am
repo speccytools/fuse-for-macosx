@@ -26,4 +26,4 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = aalib fb gtk svga xlib
 
-noinst_HEADERS = ui.h uidisplay.h
+noinst_HEADERS = ui.h uidisplay.h options.dat

@@ -38,4 +38,4 @@ options.c: options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.p
 options.h: options-header.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
 	@PERL@ options-header.pl ../options.dat > options.h
 
-noinst_HEADERS = gtkkeyboard.h gtkui.h options.h
+noinst_HEADERS = gtkkeyboard.h gtkui.h options.h options.pl options-header.pl

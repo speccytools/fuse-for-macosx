@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = lib libspectrum man myglib roms ui utils widget z80
+SUBDIRS = lib libspectrum man myglib perl roms ui utils widget z80
 
 fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c rzx.c settings.c\
