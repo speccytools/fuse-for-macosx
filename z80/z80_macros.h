@@ -284,7 +284,7 @@ break
   contend( --SP, 3 );\
   writebyte(SP,(regh));\
   contend( --SP, 3 );\
-  writebyte(--SP,(regl));\
+  writebyte(SP,(regl));\
 }
 
 #define RET()\
