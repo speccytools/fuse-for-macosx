@@ -169,7 +169,7 @@ utils_open_file( const char *filename, int autoload,
     if( autoload ) {
 
       PC = 0;
-      machine_current->ram.current_rom = 1;
+      machine_current->ram.last_byte |= 0x10;	/* Select ROM 1 */
       trdos_page();
     }
     break;

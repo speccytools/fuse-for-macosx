@@ -867,3 +867,4 @@
          snapshots with Dock cartridges installed.
 20040527 if2.[ch],memory.c,periph.c,trdos.[ch],zxatasp.[ch],zxcf.[ch]:
 	 simplify the handling of /ROMCS memory mapping.
+20040527 utils.c: make TRDOS autoloading work again.
