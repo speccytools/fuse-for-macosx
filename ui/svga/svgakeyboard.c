@@ -88,7 +88,7 @@ int svgakeyboard_keypress(int keysym)
   switch(keysym) {
   case SCANCODE_F1:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MAINMENU );
+    widget_do( WIDGET_TYPE_MAINMENU, NULL );
     fuse_emulation_unpause();
     break;
   case SCANCODE_F2:
@@ -98,7 +98,7 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F3:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR );
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     if( widget_filesel_name ) {
       snapshot_read( widget_filesel_name );
       display_refresh_all();
@@ -107,7 +107,7 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F4:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_GENERAL );
+    widget_do( WIDGET_TYPE_GENERAL, NULL );
     fuse_emulation_unpause();
     break;
   case SCANCODE_F5:
@@ -120,7 +120,7 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F7:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR );
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     if( widget_filesel_name ) tape_open( widget_filesel_name );
     fuse_emulation_unpause();
     break;

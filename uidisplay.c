@@ -1,5 +1,5 @@
-/* help.c: Help menu
-   Copyright (c) 2001,2002 Philip Kendall
+/* uidisplay.c: UI display functions
+   Copyright (c) 2002 Philip Kendall
 
    $Id$
 
@@ -26,42 +26,33 @@
 
 #include <config.h>
 
-#include <unistd.h>
+#include <stdio.h>
 
 #include "display.h"
-#include "keyboard.h"
 #include "ui/uidisplay.h"
-#include "widget.h"
 
-int widget_help_draw( void* data )
+void uidisplay_spectrum_screen( BYTE *screen )
 {
-  /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 3 );
+  int x,y;
+  BYTE attr,data; int ink, paper;
 
-  widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Help" );
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(K)eyboard picture" );
+  for( y=0; y<DISPLAY_HEIGHT; y++ ) {
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 24 );
+    for( x=0; x < DISPLAY_WIDTH/8; x++ ) {
 
-  return 0;
-}
+      /* Get the attribute byte */
+      attr = screen[ display_attr_start[y] + x ];
+      
+      /* Split it into (possibly bright) INK and PAPER */
+      ink = (attr & 0x07) + ( (attr & 0x40) >> 3 );
+      paper = (attr & ( 0x0f << 3 ) ) >> 3;
 
-void widget_help_keyhandler( int key )
-{
-  switch( key ) {
-    
-  case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
-    break;
+      data = screen[ display_line_start[y]+x ];
 
-  case KEYBOARD_k:
-    widget_do( WIDGET_TYPE_PICTURE, widget_keyboard_picture );
-    break;
-
-  case KEYBOARD_Enter:
-    widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
-    break;
-
+      display_plot8( x, y, data, ink, paper );
+    }
   }
+
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT,
+		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
 }

@@ -33,7 +33,7 @@
 #include "ui/uidisplay.h"
 #include "widget.h"
 
-int widget_mainmenu_draw( void )
+int widget_mainmenu_draw( void* data )
 {
   /* Draw the dialog box */
   widget_dialog_with_border( 1, 2, 30, 7 );
@@ -61,23 +61,23 @@ void widget_mainmenu_keyhandler( int key )
     break;
 
   case KEYBOARD_f:
-    widget_do( WIDGET_TYPE_FILE );
+    widget_do( WIDGET_TYPE_FILE, NULL );
     break;
 
   case KEYBOARD_h:
-    widget_do( WIDGET_TYPE_HELP );
+    widget_do( WIDGET_TYPE_HELP, NULL );
     break;
 
   case KEYBOARD_m:
-    widget_do( WIDGET_TYPE_MACHINE );
+    widget_do( WIDGET_TYPE_MACHINE, NULL );
     break;
 
   case KEYBOARD_o:
-    widget_do( WIDGET_TYPE_OPTIONS );
+    widget_do( WIDGET_TYPE_OPTIONS, NULL );
     break;
 
   case KEYBOARD_t:
-    widget_do( WIDGET_TYPE_TAPE );
+    widget_do( WIDGET_TYPE_TAPE, NULL );
     break;
 
   case KEYBOARD_Enter:

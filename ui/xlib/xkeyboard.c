@@ -70,7 +70,7 @@ int xkeyboard_keypress(XKeyEvent *event)
   switch(keysym) {
   case XK_F1:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_MAINMENU );
+    widget_do( WIDGET_TYPE_MAINMENU, NULL );
     fuse_emulation_unpause();
     break;
   case XK_F2:
@@ -80,7 +80,7 @@ int xkeyboard_keypress(XKeyEvent *event)
     break;
   case XK_F3:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR );
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     if( widget_filesel_name ) {
       snapshot_read( widget_filesel_name );
       display_refresh_all();
@@ -89,7 +89,7 @@ int xkeyboard_keypress(XKeyEvent *event)
     break;
   case XK_F4:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_GENERAL );
+    widget_do( WIDGET_TYPE_GENERAL, NULL );
     fuse_emulation_unpause();
     break;
   case XK_F5:
@@ -102,7 +102,7 @@ int xkeyboard_keypress(XKeyEvent *event)
     break;
   case XK_F7:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR );
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     if( widget_filesel_name ) tape_open( widget_filesel_name );
     fuse_emulation_unpause();
     break;

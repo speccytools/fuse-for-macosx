@@ -34,7 +34,7 @@
 #include "ui/uidisplay.h"
 #include "widget.h"
 
-int widget_file_draw( void )
+int widget_file_draw( void* data )
 {
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, 4 );
@@ -60,7 +60,7 @@ void widget_file_keyhandler( int key )
     break;
 
   case KEYBOARD_o:
-    widget_do( WIDGET_TYPE_FILESELECTOR );
+    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     if( widget_filesel_name ) snapshot_read( widget_filesel_name );
     break;
 

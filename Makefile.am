@@ -31,7 +31,7 @@ SUBDIRS = libspectrum man myglib roms ui utils widget z80
 fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c settings.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus3.c\
-	spectrum.c tape.c timer.c utils.c\
+	spectrum.c tape.c timer.c uidisplay.c utils.c\
 	joystick.c printer.c
 
 BUILT_SOURCES = keysyms.c

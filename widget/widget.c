@@ -50,6 +50,9 @@ static char widget_font[768];
 
 #define ERROR_MESSAGE_MAX_LENGTH 1024
 
+/* The data used for recursive widgets */
+widget_recurse_t widget_return[10];
+
 static int widget_read_font( const char *filename, size_t offset )
 {
   int fd; struct stat file_info; unsigned char *buffer;
@@ -172,7 +175,7 @@ int widget_end( void )
 /* We don't start in a widget */
 int widget_level = -1;
 
-int widget_do( widget_type which )
+int widget_do( widget_type which, void *data )
 {
   int error;
 
@@ -184,11 +187,12 @@ int widget_do( widget_type which )
     error = widget_timer_init(); if( error ) return error;
   }
 
-  /* Store what type of widget we are */
+  /* Store what type of widget we are and what data we were given */
   widget_return[widget_level].type = which;
+  widget_return[widget_level].data = data;
 
   /* Draw this widget */
-  widget_data[ which ].draw();
+  widget_data[ which ].draw( data );
 
   /* Set up the keyhandler for this widget */
   widget_keyhandler = widget_data[which].keyhandler;
@@ -218,7 +222,9 @@ int widget_do( widget_type which )
        draw it again */
     widget_keyhandler =
       widget_data[ widget_return[widget_level].type ].keyhandler;
-    widget_data[ widget_return[widget_level].type ] . draw();
+    widget_data[ widget_return[widget_level].type ].draw(
+      widget_return[widget_level].data
+    );
 
   } else {
 

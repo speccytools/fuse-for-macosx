@@ -45,9 +45,17 @@
 
 extern BYTE display_border;
 
+/* Offsets as to where the data and the attributes for each pixel
+   line start */
+extern WORD display_line_start[DISPLAY_HEIGHT];
+extern WORD display_attr_start[DISPLAY_HEIGHT];
+
 int display_init(int *argc, char ***argv);
 void display_line(void);
+
 void display_dirty( WORD address );
+void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper);
+
 void display_set_border(int colour);
 int display_frame(void);
 void display_refresh_all(void);

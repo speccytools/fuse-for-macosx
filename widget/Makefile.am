@@ -27,13 +27,13 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libwidget.a
 
 libwidget_a_SOURCES = filesel.c machine_widget.c mainmenu.c options.c\
-picture.c picture_data.c file.c tape_widget.c widget.c general.c help.c
+picture.c file.c tape_widget.c widget.c widget_keyboard.c general.c help.c
 
-BUILT_SOURCES = picture_data.c
+BUILT_SOURCES = widget_keyboard.c
 
-picture_data.c: tap-extract.pl picture_data.tap
-	@PERL@ -w tap-extract.pl picture_data.tap > picture_data.c
+widget_keyboard.c: tap-extract.pl widget_keyboard.tap
+	@PERL@ -w tap-extract.pl widget_keyboard.tap > widget_keyboard.c
 
 noinst_HEADERS = widget.h
 
-EXTRA_DIST = tap-extract.pl picture_data.tap
+EXTRA_DIST = tap-extract.pl widget_keyboard.tap

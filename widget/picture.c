@@ -31,17 +31,9 @@
 #include "ui/uidisplay.h"
 #include "widget.h"
 
-int widget_picture_draw( void )
+int widget_picture_draw( void* data )
 {
-  int x; int y;
-
-  for( y=0; y<DISPLAY_HEIGHT; y++ )
-    for( x=0; x<DISPLAY_WIDTH; x++ )
-      uidisplay_putpixel( DISPLAY_BORDER_WIDTH + x, DISPLAY_BORDER_HEIGHT + y,
-			  widget_picture_data[y][x] );
-  
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT,
-		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
+  uidisplay_spectrum_screen( (BYTE*)data );
 
   return 0;
 }

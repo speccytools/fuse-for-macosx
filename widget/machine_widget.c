@@ -38,7 +38,7 @@
 
 static int widget_machine_show_machine( void );
 
-int widget_machine_draw( void )
+int widget_machine_draw( void* data )
 {
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, 6 );

@@ -43,8 +43,8 @@ static BYTE display_current_border[DISPLAY_SCREEN_HEIGHT];
 
 /* Offsets as to where the data and the attributes for each pixel
    line start */
-static WORD display_line_start[DISPLAY_HEIGHT];
-static WORD display_attr_start[DISPLAY_HEIGHT];
+WORD display_line_start[DISPLAY_HEIGHT];
+WORD display_attr_start[DISPLAY_HEIGHT];
 
 /* If you write to the byte at display_dirty_?table[n+0x4000], then
    the eight pixels starting at (8*xtable[n],ytable[n]) must be
@@ -93,7 +93,6 @@ static void display_draw_line(int y);
 static void display_dirty8(WORD address);
 static void display_dirty64(WORD address);
 
-static void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper);
 static void display_get_attr(int x, int y, BYTE *ink, BYTE *paper);
 static void display_parse_attr(BYTE attr, BYTE *ink, BYTE *paper);
 
@@ -290,7 +289,8 @@ static void display_dirty64(WORD address)
 
 /* Print the 8 pixels in `data' using ink colour `ink' and paper
    colour `paper' to the screen at ( (8*x) , y ) */
-static void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper)
+
+void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper)
 {
 
   x = (x << 3) + DISPLAY_BORDER_WIDTH;

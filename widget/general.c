@@ -43,7 +43,7 @@ static int widget_general_print_option( int number, const char* string,
 					int value );
 static int widget_general_print_value( int number, int value );
 
-int widget_general_draw( void )
+int widget_general_draw( void* data )
 {
   int error;
 

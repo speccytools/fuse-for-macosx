@@ -56,24 +56,31 @@ typedef enum widget_finish_state {
   WIDGET_FINISHED_CANCEL,
 } widget_finish_state;
 
+/* A function to draw a widget */
+typedef int (*widget_draw_fn)( void *data );
+
 /* A function to handle keypresses */
 typedef void (*widget_keyhandler_fn)( int key );
 
 /* The information we need to store for each widget */
 typedef struct widget_t {
-  int (*draw)(void);			/* Draw this widget */
+  widget_draw_fn draw;			/* Draw this widget */
   int (*finish)( widget_finish_state finished ); /* Post-widget processing */
   widget_keyhandler_fn keyhandler;	/* Keyhandler */
 } widget_t;
 
 /* The information we need to store to recurse from a widget */
 typedef struct widget_recurse_t {
+
   widget_type type;		/* Which type of widget are we? */
+  void *data;			/* What data were we passed? */
+
   int finished;			/* Have we finished this widget yet? */
+
 } widget_recurse_t;
 
 /* A `stack' so we can recurse through widgets */
-widget_recurse_t widget_return[10];
+extern widget_recurse_t widget_return[];
 
 /* How many levels deep have we recursed through widgets; -1 => none */
 extern int widget_level;
@@ -84,7 +91,7 @@ widget_keyhandler_fn widget_keyhandler;
 int widget_init( void );
 int widget_end( void );
 
-int widget_do( widget_type which );
+int widget_do( widget_type which, void *data );
 
 int widget_timer_init( void );
 int widget_timer_end( void );
@@ -99,7 +106,7 @@ int widget_dialog_with_border( int x, int y, int width, int height );
 
 /* Main menu dialog */
 
-int widget_mainmenu_draw( void );
+int widget_mainmenu_draw( void* data );
 void widget_mainmenu_keyhandler( int key );
 
 /* File selector */
@@ -112,7 +119,7 @@ typedef struct widget_dirent {
 struct widget_dirent **widget_filenames;
 size_t widget_numfiles;
 
-int widget_filesel_draw( void );
+int widget_filesel_draw( void* data );
 int widget_filesel_finish( widget_finish_state finished );
 void widget_filesel_keyhandler( int key );
 
@@ -120,42 +127,42 @@ extern char* widget_filesel_name;
 
 /* General options */
 
-int widget_general_draw( void );
+int widget_general_draw( void* data );
 int widget_general_finish( widget_finish_state finished );
 void widget_general_keyhandler( int key );
 
 /* Tape menu */
 
-int widget_tape_draw( void );
+int widget_tape_draw( void* data );
 void widget_tape_keyhandler( int key );
 
 /* File menu */
 
-int widget_file_draw( void );
+int widget_file_draw( void* data );
 void widget_file_keyhandler( int key );
 
 /* Machine menu */
 
-int widget_machine_draw( void );
+int widget_machine_draw( void* data );
 void widget_machine_keyhandler( int key );
 
 /* Keyboard picture */
 
-int widget_picture_draw( void );
+int widget_picture_draw( void* data );
 void widget_picture_keyhandler( int key );
 
 /* The data for the keyboard picture */
 
-extern int widget_picture_data[DISPLAY_HEIGHT][DISPLAY_WIDTH];
+extern BYTE widget_keyboard_picture[6912];
 
 /* Options menu */
 
-int widget_options_draw( void );
+int widget_options_draw( void* data );
 void widget_options_keyhandler( int key );
 
 /* Help menu */
 
-int widget_help_draw( void );
+int widget_help_draw( void* data );
 void widget_help_keyhandler( int key );
 
 /* The widgets actually available */

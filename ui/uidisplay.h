@@ -1,5 +1,5 @@
 /* uidisplay.h: Low-level display routines
-   Copyright (c) 2000-2001 Philip Kendall
+   Copyright (c) 2000-2002 Philip Kendall
 
    $Id$
 
@@ -27,6 +27,12 @@
 #ifndef FUSE_UIDISPLAY_H
 #define FUSE_UIDISPLAY_H
 
+#ifndef FUSE_TYPES_H
+#include "types.h"
+#endif			/* #ifndef FUSE_TYPES_H */
+
+/* User interface specific functions */
+
 int uidisplay_init(int width, int height);
 
 void uidisplay_putpixel(int x,int y,int colour);
@@ -36,5 +42,9 @@ void uidisplay_set_border(int line, int pixel_from, int pixel_to,
 			  int colour);
 
 int uidisplay_end(void);
+
+/* General functions */
+
+void uidisplay_spectrum_screen( BYTE *screen );
 
 #endif			/* #ifndef FUSE_UIDISPLAY_H */

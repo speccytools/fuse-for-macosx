@@ -217,7 +217,7 @@ static int widget_scan_compare( const struct widget_dirent **a,
 
 /* File selection widget */
 
-int widget_filesel_draw( void )
+int widget_filesel_draw( void* data )
 {
   char *directory;
 
