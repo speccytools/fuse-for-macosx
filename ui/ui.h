@@ -80,5 +80,6 @@ int ui_menu_activate_media_cartridge( int active );
 int ui_menu_activate_media_cartridge_eject( int active );
 int ui_menu_activate_media_disk( int active );
 int ui_menu_activate_media_disk_eject( int which, int active );
+int ui_menu_activate_recording( int recording );
 
 #endif			/* #ifndef FUSE_UI_H */

@@ -328,6 +328,9 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				 NULL);
   gtkui_menu_popup = gtk_item_factory_get_widget( popup_factory, "<main>" );
 
+  /* Start the recording menu off in the 'not playing' state */
+  ui_menu_activate_recording( 0 );
+
   return FALSE;
 }
 
@@ -438,6 +441,8 @@ gtkui_rzx_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   free( recording );
 
+  ui_menu_activate_recording( 1 );
+
   fuse_emulation_unpause();
 }
 
@@ -467,6 +472,8 @@ gtkui_rzx_start_snap( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   display_refresh_all();
 
+  ui_menu_activate_recording( 1 );
+
   fuse_emulation_unpause();
 }
 
@@ -476,6 +483,8 @@ gtkui_rzx_stop( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback( 1 );
+
+  ui_menu_activate_recording( 0 );
 }
 
 /* Called when File/Recording/Play selected */
@@ -496,6 +505,8 @@ gtkui_rzx_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   free( recording );
 
   display_refresh_all();
+
+  ui_menu_activate_recording( 1 );
 
   fuse_emulation_unpause();
 }
@@ -1152,6 +1163,24 @@ ui_menu_activate_media_disk_eject( int which, int active )
   } else {
     return set_menu_item_active( "/Media/Disk/Drive B:/Eject", active );
   }
+}
+
+int
+ui_menu_activate_recording( int active )
+{
+  int error;
+
+  error = set_menu_item_active( "/File/Recording/Record...", !active );
+  if( error ) return error;
+
+  error = set_menu_item_active( "/File/Recording/Record from snapshot...",
+				!active );
+  if( error ) return error;
+
+  error = set_menu_item_active( "/File/Recording/Play...", !active );
+  if( error ) return error;
+
+  return set_menu_item_active( "/File/Recording/Stop", active );
 }
 
 #endif			/* #ifdef UI_GTK */

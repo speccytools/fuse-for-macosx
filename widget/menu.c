@@ -426,5 +426,6 @@ int ui_menu_activate_media_cartridge( int active ) { return 0; }
 int ui_menu_activate_media_cartridge_eject( int active ) { return 0; }
 int ui_menu_activate_media_disk( int active ) { return 0; }
 int ui_menu_activate_media_disk_eject( int which, int active ) { return 0; }
+int ui_menu_activate_recording( int active ) { return 0; }
 
 #endif				/* #ifdef USE_WIDGET */
