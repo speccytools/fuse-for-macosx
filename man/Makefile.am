@@ -24,6 +24,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-man_MANS = fuse.1 rzxdump.1 rzxtool.1 tzxlist.1
+man_MANS = fuse.1
 
 EXTRA_DIST = $(man_MANS)
