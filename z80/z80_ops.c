@@ -882,8 +882,12 @@ void z80_do_opcodes()
       else PC+=2;
       break;
     case 0xd3:		/* OUT (nn),A */
-      contend( PC, 4 );
-      OUT( readbyte(PC++) + ( A << 8 ) , A );
+      { 
+	WORD outtemp;
+	contend( PC, 4 );
+	outtemp = readbyte( PC++ ) + ( A << 8 );
+	OUT( outtemp , A );
+      }
       break;
     case 0xd4:		/* CALL NC,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
@@ -922,9 +926,13 @@ void z80_do_opcodes()
       else PC+=2;
       break;
     case 0xdb:		/* IN A,(nn) */
-      contend( PC, 4 );
-      tstates += 3;	/* FIXME: IO port contention */
-      A=readport( readbyte(PC++) + ( A << 8 ) );
+      { 
+	WORD intemp;
+	contend( PC, 4 );
+	intemp = readbyte( PC++ ) + ( A << 8 );
+	contend_io( intemp, 3 );
+        A=readport( intemp );
+      }
       break;
     case 0xdc:		/* CALL C,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );

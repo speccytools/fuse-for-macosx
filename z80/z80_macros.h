@@ -212,7 +212,7 @@ break
 
 #define IN(reg,port)\
 {\
-  tstates += 3;			/* FIXME: IO port contention */\
+  contend_io( port, 3 );\
   (reg)=readport((port));\
   F = ( F & FLAG_C) | sz53p_table[(reg)];\
 }
@@ -275,7 +275,7 @@ break
 
 #define OUT(port,reg)\
 {\
-  tstates += 3;			/* FIXME: IO port contention */\
+  contend_io( port, 3 );\
   writeport(port,reg);\
 }
 

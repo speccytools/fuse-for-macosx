@@ -297,9 +297,7 @@ break;
 case 0xa2:	/* INI */
 {
   WORD initemp=readport(BC);
-  tstates += 2;
-  tstates += 3;		/* FIXME: IO port contention */
-  contend( HL, 3 );
+  tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
   writebyte(HL,initemp);
   B--; HL++;
   F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -310,9 +308,9 @@ break;
 case 0xa3:	/* OUTI */
 {
   WORD outitemp=readbyte(HL);
-  tstates++; contend( HL, 4 );
-  B--;	HL++;	/* This does happen first, despite what the specs say */
-  tstates += 3;		/* FIXME: IO port contention */
+  B--;		/* This does happen first, despite what the specs say */
+  tstates++; contend( HL, 4 ); contend_io( BC, 3 );
+  HL++;
   writeport(BC,outitemp);
   F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
   /* C,H and P/V flags not implemented */
@@ -351,9 +349,7 @@ break;
 case 0xaa:	/* IND */
 {
   WORD initemp=readport(BC);
-  tstates += 2;
-  tstates += 3;		/* FIXME: IO port contention */
-  contend( HL, 3 );
+  tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
   writebyte(HL,initemp);
   B--; HL--;
   F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -364,9 +360,9 @@ break;
 case 0xab:	/* OUTD */
 {
   WORD outitemp=readbyte(HL);
-  tstates++; contend( HL, 4 );
-  B--; HL--;	/* This does happen first, despite what the specs say */
-  tstates += 3;		/* FIXME: IO port contention */
+  B--;		/* This does happen first, despite what the specs say */
+  tstates++; contend( HL, 4 ); contend_io( BC, 3 );
+  HL--;
   writeport(BC,outitemp);
   F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
   /* C,H and P/V flags not implemented */
@@ -414,9 +410,7 @@ break;
 case 0xb2:	/* INIR */
 {
   WORD initemp=readport(BC);
-  tstates += 2;
-  tstates += 3;			/* FIXME: IO port contention */
-  contend( HL, 3 );
+  tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
   writebyte(HL,initemp);
   B--; HL++;
   F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -438,12 +432,12 @@ case 0xb3:	/* OTIR */
   F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
   /* C,H and P/V flags not implemented */
   if(B) {
-    tstates++;			/* FIXME: IO port contention */
+    contend_io( BC, 1 );
     contend( PC, 1 ); contend( PC, 1 ); contend( PC  , 1 ); contend( PC, 1 ); 
     contend( PC, 1 ); contend( PC, 1 ); contend( PC-1, 1 );
     PC-=2;
   } else {
-    tstates += 3;		/* FIXME: IO port contention */
+    contend_io( BC, 3 );
   }
 }
 break;
@@ -489,9 +483,7 @@ break;
 case 0xba:	/* INDR */
 {
   WORD initemp=readport(BC);
-  tstates += 2;
-  tstates += 3;			/* FIXME: IO port contention */
-  contend( HL, 3 );
+  tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
   writebyte(HL,initemp);
   B--; HL--;
   F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -514,12 +506,12 @@ tstates+=16;
   F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
   /* C,H and P/V flags not implemented */
   if(B) {
-    tstates++;			/* FIXME: IO port contention */
+    contend_io( BC, 1 );
     contend( PC, 1 ); contend( PC, 1 ); contend( PC  , 1 ); contend( PC, 1 ); 
     contend( PC, 1 ); contend( PC, 1 ); contend( PC-1, 1 );
     PC-=2;
   } else {
-    tstates += 3;		/* FIXME: IO port contention */
+    contend_io( BC, 3 );
   }
 }
 break;
