@@ -1044,3 +1044,4 @@
 	 ui/gtk/{Makefile.am,gtkinternals.h,gtkkeyboard.c,gtkmouse.c,gtkui.c},
 	 ui/sdl/{sdldisplay.c,sdlui.c}, ui/svga/svgaui.c, ui/win32/win32ui.c,
 	 ui/xlib/xui.c: Kempston mouse support (Darren).
+20040807 ui.c: remove extraneous if in ui_mouse_suspend (Darren).
