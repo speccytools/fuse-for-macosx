@@ -381,7 +381,6 @@ int machine_allocate_roms( fuse_machine_info *machine, size_t count )
   machine->rom_length = malloc( count * sizeof(size_t) );
   if( machine->rom_length == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    free( machine->rom_length );
     return 1;
   }
 

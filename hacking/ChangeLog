@@ -471,3 +471,5 @@
 20040108 widget/menu.c: fix up widget UIs for the TR-DOS write scheme.
 20040108 ui/gtk/{Makefile.am,debugger.c,gtkinternals.h,gtkui.c}: add
 	 a simple memory browser.
+20040110 machine.c: remove pointless free( NULL ) (patch #874507)
+	 (Stuart Brady).
