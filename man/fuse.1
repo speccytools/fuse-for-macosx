@@ -1,0 +1,264 @@
+.\" -*- nroff -*-
+.\"
+.\" fuse.1: Fuse man page
+.\" Copyright (c) 2001 Russell Marks, Philip Kendall
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+.\"
+.\" Author contact information:
+.\"
+.\" E-mail: pak21-fuse@srcf.ucam.org
+.\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+.\"
+.\"
+.TH fuse 1 "6th November, 2001" "Version 0.3.3" "Emulators"
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH NAME
+fuse \- Sinclair ZX Spectrum emulator
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH SYNOPSIS
+.PD 0
+.B fuse
+.RI [ snapshot ]
+.P
+.PD 1
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH DESCRIPTION
+Fuse is a Sinclair ZX Spectrum emulator. It supports several models
+(including the 128), with quite faithful emulation of the display and
+sound. It can load Z80 and SNA snapshots, and TAP virtual-tape files.
+But currently, it can only save Z80 snapshots.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH OPTIONS
+.TP
+.I snapshot
+specifies a snapshot file to load. The file may be in Z80 or SNA
+format.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "THE VARIOUS FRONT-ENDS"
+Fuse supports various front-ends, or UIs (user interfaces). The usual
+one is GTK+-based, but there are also Xlib and svgalib ones, as well
+as some more experimental options for the adventurous. :-)
+.PP
+The important difference to note is that the GTK+ version uses
+`native' dialog boxes etc. (behaving like a fairly normal GUI-based
+program) while the others use an alternative, Fuse-specific `widget
+UI'. This latter front-end is easily spotted by the way it uses the
+main Fuse window/screen for dialogs, and uses the Spectrum's own font.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "KEYS AND KEY MAPPING"
+When the Spectrum is being emulated, the following keys are available:
+.TP
+.I F2
+Save a snapshot (the current machine state, memory contents etc.). The
+GTK+ UI lets you select a filename, but the others just write the file
+as
+.IR snapshot.z80 .
+.TP
+.I F3
+Load a snapshot. See the
+.B "FILE SELECTION"
+section below for details on how to choose the file.
+.TP
+.I F4
+Display the General Options dialog, letting you configure Fuse. (With
+the widget UI, the keys shown in (brackets) toggle the option - after
+doing so, press
+.I Enter
+to confirm the new options or
+.I Esc
+to abort.) Note that any changed settings only apply to the
+currently-running Fuse.
+.TP
+.I F5
+Reset the emulated Spectrum.
+.TP
+.I F7
+Choose a TAP file to load from. Again, see
+.B "FILE SELECTION"
+below. The loading does not start automatically - you have to start
+the load in the emulated machine (with LOAD "" or the 128's Tape
+Loader option, though you may need to reset first).
+.TP
+.I F8
+Start playing the TAP file, if required. To explain - if tape-loading
+traps have been disabled (in the General Options dialog), starting the
+loading process in the emulated machine isn't enough. You also have to
+`press play', so to speak :-), and this is how you do that.
+.TP
+.I F9
+Choose the next machine type in sequence. The machine initially
+emulated is the 48k Spectrum. Pressing
+.I F9
+gives (in turn) the 128, +2, and +2A before returning to the 48.
+.TP
+.I F10
+Exit the emulator.
+.PP
+The GTK+ UI also has a menu bar, giving you an alternative way to do
+the same things. For example, File/Exit exits the emulator.
+.PP
+Returning to the keys, the alphanumeric ones (along with
+.I Enter
+and
+.IR Space )
+are mapped as-is to the Spectrum keys, with other mapped keys being:
+.TP
+.I Shift
+emulated as Caps Shift
+.TP
+.IR Control ", " Alt ", and " Meta
+emulated as Symbol Shift (most other modifiers are also mapped to
+this)
+.TP
+.I Backspace
+emulated as Caps-0 (Delete)
+.TP
+.I Esc
+emulated as Caps-1 (Edit)
+.TP
+.I Caps Lock
+emulated as Caps-2
+.TP
+.I Cursor keys
+emulated as Caps-5/6/7/8 (as appropriate)
+.PP
+Some further punctuation keys are supported, if they exist on your
+keyboard -
+.RI ` , ',
+.RI ` . ',
+.RI ` / ',
+.RI ` ; ',
+.RI ` ' ',
+.RI ` # ',
+.RI ` - ',
+and
+.RI ` = '.
+These are mapped to the appropriate symbol-shifted keys on the
+Spectrum.
+.PP
+A list of keys applicable when using the file selection dialogs is
+given in the
+.B "FILE SELECTION"
+section below.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "THE EMULATED SPECTRUM"
+The emulated Spectrum is, by default, an unmodified 48k Spectrum with
+no peripherals attached other than a tape player. Oh, and apparently
+some magical snapshot load/save machine which is probably best glossed
+over for the sake of the analogy. :-)
+.PP
+To emulate different kinds of Spectrum, press
+.I F9
+(or the Machine/Switch menu option, in the GTK+ UI). This cycles
+through the different types. Pressing it once gets you a 128, for
+example.
+.PP
+The Spectrum emulation is paused when any dialogs appear.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "FILE SELECTION"
+The way you select a file (either snapshot or TAP file) depends on
+which UI you're using. So firstly, here's how to use the GTK+ file
+selector.
+.PP
+The selector shows the directories and files in the current directory
+in two separate subwindows. If either list is too big to fit in the
+window, you can use the scrollbar to see the rest (by dragging the
+slider, for example), or you can use Shift-Tab (to move the keyboard
+focus to a subwindow) and use the cursor keys. To change directory,
+double-click it.
+.PP
+To choose a file to load you can either double-click it, or click it
+then click `Ok'. Or click `Cancel' to abort.
+.PP
+If you're using the keyboard, probably the easiest way to use the
+selector is to just ignore it and type in the name. This isn't as
+irksome as it sounds, since the filename input box has filename
+completion - type part of a directory or file name, then press Tab. It
+should complete it. If it was a directory, it moves to that directory;
+if the completion was ambiguous, it completes as much as possible, and
+narrows the filenames shown to those which match. You should press
+Enter when you've finished typing the filename, or Esc to abort.
+.PP
+Now, if you're using the widget UI - the one using the Spectrum font -
+the selector works a bit differently. The files and directories are
+all listed in a single two-column-wide window (the directories are
+shown at the top, ending in `/') - the names may be truncated onscreen
+if they're too long to fit.
+.PP
+To move the cursor, you can either use the cursor keys or the
+Spectrum equivalent (5/6/7/8). To select a file or directory, press
+Enter. To abort, press Esc (or 1).
+.PP
+With both selectors, do bear in mind that
+.I all
+files are shown, whether Fuse would be able to load them or not.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH BUGS
+TZX files aren't yet supported.
+.PP
+It can't currently save to TAP files.
+.PP
+It doesn't emulate memory contention, so some `rainbow' and border
+effects don't look right.
+.PP
+No peripherals (except the tape player) are supported.
+.PP
+The sound support is currently for OSS (e.g. Linux) only.
+.PP
+There's no way to page up or down in the widget-UI selector.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH SEE ALSO
+.IR xspect "(1),"
+.IR xzx "(1)"
+.PP
+The comp.sys.sinclair Spectrum FAQ, at
+.br
+.IR "http://www.srcf.ucam.org/~pak21/cssfaq/index.html" .
+.\"
+.\"------------------------------------------------------------------
+.\"
+.\" `AUTHOR' here is deliberate; avoiding the plural IMHO makes it
+.\" clear that Phil is the main author.
+.\"
+.SH AUTHOR
+Philip Kendall (pak21-fuse@srcf.ucam.org).
+.PP
+Matan Ziv-Av wrote the svgalib and framebuffer UIs, the glib
+replacement code, and did some work on the OSS-specific sound code and
+the original widget UI code.
+.PP
+Russell Marks wrote the sound emulation and OSS-specific sound code,
+and this man page.
