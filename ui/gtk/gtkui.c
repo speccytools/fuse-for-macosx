@@ -88,7 +88,7 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
-static char* gtkui_fileselector_get_filename( void );
+static char* gtkui_fileselector_get_filename( const char *title );
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
@@ -271,7 +271,7 @@ static void gtkui_open(GtkWidget *widget, gpointer data)
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename();
+  filename = gtkui_fileselector_get_filename( "Fuse - Load Snapshot" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snapshot_read( filename );
@@ -290,7 +290,7 @@ static void gtkui_save(GtkWidget *widget, gpointer data)
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename();
+  filename = gtkui_fileselector_get_filename( "Fuse - Save Snapshot" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snapshot_write( filename );
@@ -309,7 +309,7 @@ static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
 
   fuse_emulation_pause();
   
-  filename = gtkui_fileselector_get_filename();
+  filename = gtkui_fileselector_get_filename( "Fuse - Start Recording" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   rzx_start_recording( filename );
@@ -335,7 +335,7 @@ static void gtkui_rzx_play( GtkWidget *widget, gpointer data )
 
   fuse_emulation_pause();
   
-  filename = gtkui_fileselector_get_filename();
+  filename = gtkui_fileselector_get_filename( "Fuse - Play Recording" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   rzx_start_playback( filename );
@@ -471,7 +471,7 @@ static void gtkui_tape_open( GtkWidget *widget, gpointer data )
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename();
+  filename = gtkui_fileselector_get_filename( "Fuse - Open Tape" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   tape_open( filename );
@@ -506,7 +506,7 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data )
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename();
+  filename = gtkui_fileselector_get_filename( "Fuse - Write Tape" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   tape_write( filename );
@@ -539,11 +539,11 @@ typedef struct gktui_fileselector_info {
 
 } gtkui_fileselector_info;
 
-static char* gtkui_fileselector_get_filename( void )
+static char* gtkui_fileselector_get_filename( const char *title )
 {
   gtkui_fileselector_info selector;
 
-  selector.selector = gtk_file_selection_new( "Select File" );
+  selector.selector = gtk_file_selection_new( title );
   selector.filename = NULL;
 
   gtk_signal_connect(
