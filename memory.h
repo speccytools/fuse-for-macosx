@@ -29,6 +29,8 @@
 
 #include <libspectrum.h>
 
+#include "spectrum.h"
+
 typedef enum memory_bank {
 
   MEMORY_BANK_NONE,
@@ -63,7 +65,7 @@ extern memory_page *memory_map_home[8];
 extern memory_page *memory_map_dock[8];
 extern memory_page *memory_map_exrom[8];
 
-extern memory_page memory_map_ram[32];
+extern memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
 extern memory_page memory_map_rom[ 8];
 
 /* Which RAM page contains the current screen */

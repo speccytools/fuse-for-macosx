@@ -95,6 +95,8 @@ int machine_init_machines( void )
   if (error ) return error;
   error = machine_add_machine( scorpion_init );
   if ( error ) return error;
+  error = machine_add_machine( spec_se_init );
+  if ( error ) return error;
 
   return 0;
 }

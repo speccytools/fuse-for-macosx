@@ -34,6 +34,7 @@ libmachines_a_SOURCES = pentagon.c \
 			spec16.c \
 			spec48.c \
 			specplus2.c \
+			spec_se.c \
 			specplus2a.c \
 			specplus3.c \
 			specplus3e.c \

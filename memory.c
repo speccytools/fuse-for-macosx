@@ -49,7 +49,7 @@ memory_page *memory_map_dock[8];
 memory_page *memory_map_exrom[8];
 
 /* Standard mappings for the 'normal' RAM */
-memory_page memory_map_ram[32];
+memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
 
 /* Standard mappings for the ROMs */
 memory_page memory_map_rom[8];
@@ -86,7 +86,7 @@ memory_init( void )
 
   }
 
-  for( i = 0; i < 16; i++ ) {
+  for( i = 0; i < SPECTRUM_RAM_PAGES; i++ ) {
 
     mapping1 = &memory_map_ram[ 2 * i     ];
     mapping2 = &memory_map_ram[ 2 * i + 1 ];

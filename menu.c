@@ -141,6 +141,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case  9: menu_select_roms( LIBSPECTRUM_MACHINE_PENT,   17, 3 ); return;
   case 10: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,  20, 4 ); return;
   case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3E, 24, 4 ); return;
+  case 12: menu_select_roms( LIBSPECTRUM_MACHINE_SE,     28, 2 ); return;
 
   }
 

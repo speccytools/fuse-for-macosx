@@ -1,8 +1,9 @@
-/* tc2068.c: Timex TC2068 specific routines
-   Copyright (c) 1999-2004 Philip Kendall
-   Copyright (c) 2002-2004 Fredrick Meunier
-   Copyright (c) 2003 Witold Filipczyk
+/* spec_se.c: ZX Spectrum SE specific routines
    Copyright (c) 2003 Darren Salt
+   Copyright (c) 2004 Fredrick Meunier, Philip Kendall
+   Based on tc2048.c
+   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 2002-2003 Fredrick Meunier
 
    $Id$
 
@@ -29,41 +30,49 @@
 
 #include <config.h>
 
-#include <string.h>
+#include <stdio.h>
 
 #include <libspectrum.h>
 
-#include "dck.h"
+#include "fuse.h"
 #include "joystick.h"
+#include "keyboard.h"
 #include "machine.h"
 #include "machines.h"
-#include "periph.h"
+#include "memory.h"
 #include "printer.h"
-#include "scld.h"
+#include "snapshot.h"
+#include "sound.h"
+#include "spec128.h"
 #include "settings.h"
+#include "spectrum.h"
+#include "scld.h"
 #include "ui/ui.h"
 
-static libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
-						     int *attached );
-static libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
-						 int *attached );
-static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
+static libspectrum_byte spec_se_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
-
-static int tc2068_reset( void );
-static int tc2068_memory_map( void );
+static int spec_se_reset( void );
+static int spec_se_memory_map( void );
 
 const static periph_t peripherals[] = {
+  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
   /* TS2040/Alphacom printer */
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
 
+  /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
+  { 0xffff, 0xfffd, ay_registerport_read, ay_registerport_write },
+  { 0xffff, 0xbffd, NULL, ay_dataport_write },
+
+  { 0xffff, 0x7ffd, NULL, spec128_memoryport_write },
+
   /* Lower 8 bits of Timex ports are fully decoded */
   { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
 
-  { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
-  { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
+  /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
+  { 0x00ff, 0x00f5, ay_registerport_read, ay_registerport_write },
+  { 0x00ff, 0x00f6, NULL, ay_dataport_write },
 
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };
@@ -71,54 +80,12 @@ const static periph_t peripherals[] = {
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-static libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
-static memory_page fake_mapping;
-
 static libspectrum_byte
-tc2068_ay_registerport_read( libspectrum_word port, int *attached )
+spec_se_contend_delay ( libspectrum_dword time )
 {
-  if( machine_current->ay.current_register == 14 ) return 0xff;
-
-  return ay_registerport_read( port, attached );
-}
-
-static libspectrum_byte
-tc2068_ay_dataport_read( libspectrum_word port, int *attached )
-{
-  if (machine_current->ay.current_register != 14) {
-    return ay_registerport_read( port, attached );
-  } else {
-
-    libspectrum_byte ret;
-
-    /* In theory, we may need to distinguish cases where some data
-       is returned here and were it isn't. In practice, this doesn't
-       matter for the TC2068 as it doesn't have a floating bus, so we'll
-       get 0xff in both cases anwyay */
-    *attached = 1;
-
-    ret =   machine_current->ay.registers[7] & 0x40
-	  ? machine_current->ay.registers[14]
-	  : 0xff;
-
-    if( port & 0x0100 ) ret &= ~joystick_timex_read( port, 0 );
-    if( port & 0x0200 ) ret &= ~joystick_timex_read( port, 1 );
-
-    return ret;
-  }
-}
-
-libspectrum_byte
-tc2068_unattached_port( void )
-{
-  /* TC2068 does not have floating ULA values on any port (despite
-     rumours to the contrary), it returns 0xff on unattached ports */
-  return 0xff;
-}
-
-static libspectrum_byte
-tc2068_contend_delay( libspectrum_dword time )
-{
+  /* Contention is as for a 128 in odd-numbered HOME banks.
+   * Else it is as a TC2048 or TC2068.
+   */
   libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
@@ -161,30 +128,22 @@ tc2068_contend_delay( libspectrum_dword time )
 }
 
 int
-tc2068_init( fuse_machine_info *machine )
+spec_se_init( fuse_machine_info *machine )
 {
-  machine->machine = LIBSPECTRUM_MACHINE_TC2068;
-  machine->id = "2068";
+  machine->machine = LIBSPECTRUM_MACHINE_SE;
+  machine->id = "se";
 
-  machine->reset = tc2068_reset;
+  machine->reset = spec_se_reset;
 
   machine->timex = 1;
-  machine->ram.port_contended	     = tc2048_port_contended;
-  machine->ram.contend_delay	     = tc2068_contend_delay;
-
-  memset( fake_bank, 0xff, MEMORY_PAGE_SIZE );
-
-  fake_mapping.page = fake_bank;
-  fake_mapping.writable = 0;
-  fake_mapping.contended = 0;
-  fake_mapping.bank = MEMORY_BANK_DOCK;
-  fake_mapping.offset = 0x0000;
+  machine->ram.port_contended = tc2048_port_contended;
+  machine->ram.contend_delay = spec_se_contend_delay;
 
   machine->unattached_port = tc2068_unattached_port;
 
   machine->shutdown = NULL;
 
-  machine->memory_map = tc2068_memory_map;
+  machine->memory_map = spec_se_memory_map;
 
   return 0;
 }
@@ -198,8 +157,8 @@ dock_exrom_reset( void )
   memory_map_home[2] = &memory_map_ram[10];
   memory_map_home[3] = &memory_map_ram[11];
 
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
+  memory_map_home[4] = &memory_map_ram[16];
+  memory_map_home[5] = &memory_map_ram[17];
 
   memory_map_home[6] = &memory_map_ram[ 0];
   memory_map_home[7] = &memory_map_ram[ 1];
@@ -207,17 +166,17 @@ dock_exrom_reset( void )
   return 0;
 }
 
-static int
-tc2068_reset( void )
+int
+spec_se_reset( void )
 {
-  size_t i;
   int error;
+  size_t i;
 
   error = dock_exrom_reset(); if( error ) return error;
 
-  error = machine_load_rom( 0, settings_current.rom_tc2068_0, 0x4000 );
+  error = machine_load_rom( 0, settings_current.rom_spec_se_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, settings_current.rom_tc2068_1, 0x2000 );
+  error = machine_load_rom( 2, settings_current.rom_spec_se_1, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count,
@@ -227,23 +186,29 @@ tc2068_reset( void )
 
   for( i = 0; i < 8; i++ ) {
 
-    timex_dock[i] = fake_mapping;
+    timex_dock[i] = memory_map_ram[ i + 18 ];
+    timex_dock[i].bank = MEMORY_BANK_DOCK;
     timex_dock[i].page_num = i;
+    timex_dock[i].contended = 0;
     memory_map_dock[i] = &timex_dock[i];
 
-    timex_exrom[i] = memory_map_rom[2];
+    timex_exrom[i] = memory_map_ram[ i + 26 ];
+    timex_exrom[i].bank = MEMORY_BANK_EXROM;
     timex_exrom[i].page_num = i;
+    timex_exrom[i].contended = 0;
     memory_map_exrom[i] = &timex_exrom[i];
-
   }
 
-  if( settings_current.dck_file ) {
-    error = dck_read( settings_current.dck_file );
-    if( error ) {
-      ui_error( UI_ERROR_INFO, "Ignoring Timex dock file '%s'",
-		settings_current.dck_file );
-    }
-  }
+  /* RAM pages 1, 3, 5 and 7 contended */
+  for( i = 0; i < 8; i++ ) 
+    memory_map_ram[ 2 * i ].contended =
+      memory_map_ram[ 2 * i + 1 ].contended = i & 1;
+
+  machine_current->ram.locked=0;
+  machine_current->ram.last_byte = 0;
+
+  machine_current->ram.current_page=0;
+  machine_current->ram.current_rom=0;
 
   memory_current_screen = 5;
   memory_screen_mask = 0xdfff;
@@ -256,11 +221,29 @@ tc2068_reset( void )
 }
 
 static int
-tc2068_memory_map( void )
+spec_se_memory_map( void )
 {
+  memory_page **exrom_dock;
+
+  /* Spectrum SE memory paging is just a combination of the 128K
+     0x7ffd and TimexDOCK/EXROM paging schemes with some small
+     exceptions */
+  spec128_memory_map();
   scld_memory_map();
 
-  memory_romcs_map();
+  /* Exceptions apply iff an odd bank is paged in via 0x7ffd */
+  if( !( machine_current->ram.current_page & 0x01 ) ) return 0;
+
+  /* If an odd page is paged in, bits 2 and 3 of 0xf4 also control
+     whether the DOCK/EXROM is paged in at 0xc000 and 0xe000
+     respectively */
+  exrom_dock = 
+    scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
+
+  memory_map[6] =
+    scld_last_hsr & ( 1 << 2 ) ? *exrom_dock[6] : *memory_map_home[6];
+  memory_map[7] =
+    scld_last_hsr & ( 1 << 3 ) ? *exrom_dock[7] : *memory_map_home[7];
 
   return 0;
 }

@@ -800,3 +800,7 @@
 	 (Fred).
 20040513 machines/machines.h: use correct #include guard name (part of
 	 patch #929112) (Fred).
+20040513 machine.c,memory.[ch],menu.c,menu_data.c,settings-header.pl,
+	 settings.pl,spectrum.[ch],tape.c,machines/{Makefile.am,
+	 machines.h,spec_se.c,tc2068.c}: Spectrum SE support (hacked
+	 version of the rest of patch #929112) (Fred/Phil).

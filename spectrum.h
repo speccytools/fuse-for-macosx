@@ -41,7 +41,9 @@ extern libspectrum_byte spectrum_last_ula;
 /* Things relating to memory */
 
 /* 256 Kb of RAM */
-extern libspectrum_byte RAM[16][0x4000];
+#define SPECTRUM_RAM_PAGES 17
+
+extern libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 
 typedef int
   (*spectrum_port_contented_function)( libspectrum_word port );

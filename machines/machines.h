@@ -35,6 +35,7 @@ int pentagon_init( fuse_machine_info *machine );
 int pentagon_port_contended( libspectrum_word port );
 
 int spec16_init( fuse_machine_info *machine );
+int spec_se_init( fuse_machine_info *machine );
 int specplus2_init( fuse_machine_info *machine );
 int specplus2a_init( fuse_machine_info *machine );
 int specplus3e_init( fuse_machine_info *machine );
@@ -43,5 +44,6 @@ int tc2048_init( fuse_machine_info *machine );
 int tc2048_port_contended( libspectrum_word port );
 
 int tc2068_init( fuse_machine_info *machine );
+libspectrum_byte tc2068_unattached_port( void );
 
 #endif			/* #ifndef FUSE_MACHINES_H */

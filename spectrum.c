@@ -43,8 +43,8 @@
 #include "timer.h"
 #include "z80/z80.h"
 
-/* 256Kb of RAM */
-libspectrum_byte RAM[16][0x4000];
+/* 280Kb of RAM */
+libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 
 /* How many tstates have elapsed since the last interrupt? (or more
    precisely, since the ULA last pulled the /INT line to the Z80 low) */
