@@ -414,3 +414,5 @@
 	 to run until that event occurs.
 20031230 fuse.c: another attempt to get tape_init() in the right place
 	 (patch #867906) (Fred).
+20031231 z80/z80_ops.c: use gcc's computed goto feature to give a small
+	 performance boost.

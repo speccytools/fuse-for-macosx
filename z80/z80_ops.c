@@ -50,29 +50,81 @@ static void z80_ddfdcbxx( libspectrum_byte opcode3,
 			  libspectrum_word tempaddr );
 #endif				/* #ifndef HAVE_ENOUGH_MEMORY */
 
+/* Certain features (eg RZX playback trigged interrupts, the debugger,
+   TR-DOS ROM paging) can't be handled within the normal 'events'
+   framework as they don't happen at a specified tstate. In order to
+   support these, we basically need to check every opcode as to
+   whether they have occured or not.
+
+   There are (fairly common) circumstances under which we know that
+   the features will never occur (eg we will never get an interrupt
+   from RZX playback unless we're doing RZX playback), and we would
+   quite like to skip the check in this state. We can do this if we
+   use gcc's computed goto feature[1]. What follows is some
+   preprocessor hackery to moderately transparently do this while
+   still retaining the "normal" behaviour for non-gcc compilers.
+
+   Ensure that the same arguments are given to respective
+   SETUP_CHECK() and CHECK() macros or everything will break.
+
+   [1] see 'C Extensions', 'Labels as Values' in the gcc info page.
+*/
+
+#ifdef __GNUC__
+
+#define SETUP_CHECK( label, condition, dest ) \
+  if( condition ) { cgoto[ next ] = &&label; next = dest + 1; }
+#define CHECK( label, condition, dest ) goto *cgoto[ dest ]; label:
+#define END_CHECK
+
+#else				/* #ifdef __GNUC__ */
+
+#define CHECK( label, condition, dest ) if( condition ) {
+#define END_CHECK }
+
+#endif				/* #ifdef __GNUC__ */
+
 /* Execute Z80 opcodes until the next event */
-void z80_do_opcodes()
+void
+z80_do_opcodes( void )
 {
 
-  while(tstates < event_next_event ) {
+#ifdef __GNUC__
+
+  void *cgoto[3]; size_t next = 0;
+
+  SETUP_CHECK( rzx, rzx_playback, 0 );
+  SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 1 );
+  SETUP_CHECK( trdos, trdos_available, 2 );
+
+  if( next != 3 ) { cgoto[ next ] = &&run_opcode; }
+
+#endif				/* #ifdef __GNUC__ */
+
+  while( tstates < event_next_event ) {
 
     libspectrum_byte opcode;
 
     /* If we're due an end of frame from RZX playback, generate one */
-    if( rzx_playback &&
-	R + rzx_instructions_offset >= rzx_instruction_count
-      ) {
+    CHECK( rzx, rzx_playback, 0 )
+
+    if( R + rzx_instructions_offset >= rzx_instruction_count ) {
       event_add( tstates, EVENT_TYPE_FRAME );
       break;		/* And break out of the execution loop to let
 			   the interrupt happen */
     }
 
-    /* Check if the debugger should become active at this point;
-       special case DEBUGGER_MODE_INACTIVE for alleged performance
-       reasons */
-    if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-	debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
+    END_CHECK
+
+    /* Check if the debugger should become active at this point */
+    CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 1 )
+
+    if( debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
       debugger_trap();
+
+    END_CHECK
+
+    CHECK( trdos, trdos_available, 2 )
 
     if( trdos_active ) {
       if( machine_current->ram.current_rom == 1 &&
@@ -81,13 +133,16 @@ void z80_do_opcodes()
 	memory_map[0].page = &ROM[ machine_current->ram.current_rom ][0x0000];
 	memory_map[1].page = &ROM[ machine_current->ram.current_rom ][0x2000];
       }
-    } else if( trdos_available && 
-	       ( PC & 0xff00 ) == 0x3d00 &&
+    } else if( ( PC & 0xff00 ) == 0x3d00 &&
 	       machine_current->ram.current_rom == 1 ) {
       trdos_active = 1;
       memory_map[0].page = &ROM[2][0x0000];
       memory_map[1].page = &ROM[2][0x2000];
     }
+
+    END_CHECK
+
+  run_opcode:
 
     /* Do the instruction fetch; readbyte_internal used here to avoid
        triggering read breakpoints */
