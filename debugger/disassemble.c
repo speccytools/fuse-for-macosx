@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 
+#include "debugger.h"
 #include "fuse.h"
 #include "spectrum.h"
 #include "types.h"
@@ -596,7 +597,7 @@ disassemble_ddfd_cb( WORD address, char offset, enum hl_type use_hl,
 static void
 get_byte( char *buffer, size_t buflen, BYTE b )
 {
-  snprintf( buffer, buflen, "%02X", b );
+  snprintf( buffer, buflen, debugger_output_base == 10 ? "%d" : "%02X", b );
 }
 
 /* Get a text representation of an (LSB) two-byte number */
@@ -608,7 +609,7 @@ get_word( char *buffer, size_t buflen, WORD address )
   w  = readbyte_internal( address + 1 ); w <<= 8;
   w += readbyte_internal( address     );
 
-  snprintf( buffer, buflen, "%04X", w );
+  snprintf( buffer, buflen, debugger_output_base == 10 ? "%d" : "%04X", w );
 }
 
 /* Get a text representation of ( 'address' + 'offset' ) */
@@ -616,7 +617,8 @@ static void
 get_offset( char *buffer, size_t buflen, WORD address, BYTE offset )
 {
   address += ( offset >= 0x80 ? offset-0x100 : offset );
-  snprintf( buffer, buflen, "%04X", address );
+  snprintf( buffer, buflen, debugger_output_base == 10 ? "%d" : "%04X",
+	    address );
 }
 
 /* Select the appropriate register pair from BC, DE, HL (or IX, IY) or
@@ -650,10 +652,13 @@ static void
 ix_iy_offset( char *buffer, size_t buflen, enum hl_type use_hl, BYTE offset )
 {
   if( offset < 0x80 ) {
-    snprintf( buffer, buflen, "(%s+%02X)", hl_ix_iy( use_hl ), offset );
+    snprintf( buffer, buflen,
+	      debugger_output_base == 10 ? "(%s+%d)" : "(%s+%02X)",
+	      hl_ix_iy( use_hl ), offset );
   } else {
-    snprintf( buffer, buflen, "(%s-%02X)", hl_ix_iy( use_hl ),
-	      0x100 - offset );
+    snprintf( buffer, buflen,
+	      debugger_output_base == 10 ? "(%s-%d)" : "(%s-%02X)",
+	      hl_ix_iy( use_hl ), 0x100 - offset );
   }
 }
 

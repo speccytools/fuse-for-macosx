@@ -41,6 +41,9 @@ enum debugger_mode_t debugger_mode;
 /* The current breakpoints */
 GSList *debugger_breakpoints;
 
+/* Which base should we display things in */
+int debugger_output_base;
+
 static void free_breakpoint( gpointer data, gpointer user_data );
 static void show_breakpoint( gpointer data, gpointer user_data );
 
@@ -48,6 +51,7 @@ int
 debugger_init( void )
 {
   debugger_breakpoints = NULL;
+  debugger_output_base = 16;
   return debugger_reset();
 }
 

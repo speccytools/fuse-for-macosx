@@ -75,6 +75,9 @@ typedef struct debugger_breakpoint {
 /* The current breakpoints */
 extern GSList *debugger_breakpoints;
 
+/* Which base should we display things in */
+extern int debugger_output_base;
+
 int debugger_init( void );
 int debugger_reset( void );
 

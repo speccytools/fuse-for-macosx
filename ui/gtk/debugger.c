@@ -232,20 +232,27 @@ ui_debugger_update( void )
   char buffer[80];
   gchar *text[] = { &buffer[0], &buffer[40] };
   WORD address;
+  char *format_16_bit, *format_8_bit;
 
   WORD *value_ptr[] = { &PC, &SP,  &AF, &AF_,
 			&BC, &BC_, &DE, &DE_,
 			&HL, &HL_, &IX, &IY,
                       };
 
+  if( debugger_output_base == 10 ) {
+    format_16_bit = format_8_bit = "%d";
+  } else {
+    format_16_bit = "0x%04X"; format_8_bit = "0x%02X";
+  }
+
   for( i = 0; i < 12; i++ ) {
-    snprintf( buffer, 80, "0x%04x", *value_ptr[i] );
+    snprintf( buffer, 80, format_16_bit, *value_ptr[i] );
     gtk_label_set_text( GTK_LABEL( registers[i] ), buffer );
   }
 
-  snprintf( buffer, 80, "0x%02x", I );
+  snprintf( buffer, 80, format_8_bit, I );
   gtk_label_set_text( GTK_LABEL( registers[12] ), buffer );
-  snprintf( buffer, 80, "0x%02x", R & 0xff );
+  snprintf( buffer, 80, format_8_bit, R & 0xff );
   gtk_label_set_text( GTK_LABEL( registers[13] ), buffer );
   snprintf( buffer, 80, "%d", tstates );
   gtk_label_set_text( GTK_LABEL( registers[14] ), buffer );
@@ -260,7 +267,7 @@ ui_debugger_update( void )
 
     size_t length;
 
-    snprintf( text[0], 40, "%04X", address );
+    snprintf( text[0], 40, format_16_bit, address );
     debugger_disassemble( text[1], 40, &length, address );
     address += length;
 
@@ -285,6 +292,7 @@ int
 ui_debugger_disassemble( WORD address )
 {
   disassembly_top = address;
+  return 0;
 }
 
 /* Evaluate the command currently in the entry box */
