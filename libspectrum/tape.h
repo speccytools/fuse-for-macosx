@@ -40,13 +40,49 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_ROM,
 } libspectrum_tape_type;
 
+/* A huge number of states available; encompasses all possible block types */
+typedef enum libspectrum_tape_state_type {
+
+  /* Normal/turbo loaders */
+  LIBSPECTRUM_TAPE_STATE_PILOT,		/* Pilot pulses */
+  LIBSPECTRUM_TAPE_STATE_SYNC1,		/* First sync pulse */
+  LIBSPECTRUM_TAPE_STATE_SYNC2,		/* Second sync pulse */
+  LIBSPECTRUM_TAPE_STATE_DATA1,		/* First edge of a data bit */
+  LIBSPECTRUM_TAPE_STATE_DATA2,		/* Second edge of a data bit */
+
+  /* Generic */
+  LIBSPECTRUM_TAPE_STATE_PAUSE,		/* The pause at the end of a block */
+
+} libspectrum_tape_state_type;
+
 /* A standard ROM loading block */
 typedef struct libspectrum_tape_rom_block {
   
-  size_t length;
-  libspectrum_byte *data;
+  size_t length;		/* How long is this block */
+  libspectrum_byte *data;	/* The actual data */
+  libspectrum_dword pause;	/* Pause after block (milliseconds) */
+
+  /* Private data */
+
+  libspectrum_tape_state_type state;
+
+  size_t edge_count;		/* Number of pilot pulses to go */
+
+  size_t bytes_through_block;
+  size_t bits_through_byte;	/* How far through the data are we? */
+
+  libspectrum_byte current_byte; /* The current data byte; gets shifted out
+				    as we read bits from it */
+  libspectrum_dword bit_tstates; /* How long is an edge for the current bit */
 
 } libspectrum_tape_rom_block;
+
+/* The timings for the standard ROM loader */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_PILOT = 2168; /* Pilot */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC1 =  667; /* Sync 1 */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC2 =  735; /* Sync 2 */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA0 =  855; /* Reset */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA1 = 1710; /* Set */
 
 /* A generic tape block */
 typedef struct libspectrum_tape_block {
