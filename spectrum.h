@@ -40,7 +40,7 @@ extern libspectrum_byte spectrum_last_ula;
 
 /* Things relating to memory */
 
-/* 256 Kb of RAM */
+/* 272 Kb of RAM */
 #define SPECTRUM_RAM_PAGES 17
 
 extern libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
