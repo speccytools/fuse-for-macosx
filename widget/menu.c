@@ -248,6 +248,12 @@ menu_options_general( int action )
 }
 
 void
+menu_options_peripherals( int action )
+{
+  widget_do( WIDGET_TYPE_PERIPHERALS, NULL );
+}
+
+void
 menu_options_sound( int action )
 {
   widget_do( WIDGET_TYPE_SOUND, NULL );

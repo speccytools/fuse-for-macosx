@@ -891,3 +891,4 @@
 20040602 snapshot.c: save/restore ZXCF upload state.
 20040602 snapshot.c,zxatasp.[ch]: save/restore ZXATASP state.
 20040602 menu_data.c: use proper C comment rather than #if 0/#endif.
+20040602 widget/{menu.c,widget.[ch]}: make Options/Peripherals work.
