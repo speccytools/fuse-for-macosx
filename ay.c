@@ -33,6 +33,18 @@
    machines) is read from */
 BYTE ay_registerport_read(WORD port)
 {
+  /* For R14, return input val if relevant I/O bit is zero */
+  if(machine_current->ay.current_register == 14 &&
+     !(machine_current->ay.registers[7] & 0x40))
+    return 0xff;
+
+  /* Similarly for R15, but since the 8912 lacks the second I/O port,
+     input-mode input is always 0xff */
+  if(machine_current->ay.current_register == 15 &&
+     !(machine_current->ay.registers[7] & 0x80))
+    return 0xff;
+
+  /* Otherwise return register value */
   return machine_current->ay.registers[ machine_current->ay.current_register ];
 }
 
