@@ -98,7 +98,7 @@ void z80_do_opcodes()
     case 0x05:		/* DEC B */
       DEC(B);
       break;
-    case 0x06:		/* LB B,nn */
+    case 0x06:		/* LD B,nn */
       contend( PC, 3 );
       B=readbyte(PC++);
       break;
