@@ -43,10 +43,6 @@
 					 libspectrum_dword dstPitch, \
 					 int width, int height );
 
-#ifdef __cplusplus
-extern "C" {
-#endif        /* #ifdef __cplusplus */
-
 DECLARE_SCALER(2xSaI);
 DECLARE_SCALER(Super2xSaI);
 DECLARE_SCALER(SuperEagle);
@@ -61,17 +57,5 @@ DECLARE_SCALER(Timex1_5x);
 DECLARE_SCALER(TV2x);
 DECLARE_SCALER(TimexTV);
 DECLARE_SCALER(DotMatrix);
-
-#define kVeryFastAndUglyAspectMode  0 // No interpolation at all, but super-fast
-#define kFastAndNiceAspectMode      1 // Quite good quality with good speed
-#define kSlowAndPerfectAspectMode   2 // Accurate but slow code
-
-#define ASPECT_MODE kFastAndNiceAspectMode
-//#define ASPECT_MODE kVeryFastAndUglyAspectMode
-//#define ASPECT_MODE kSlowAndPerfectAspectMode
-
-#ifdef __cplusplus
-};
-#endif        /* #ifdef __cplusplus */
 
 #endif				/* #ifndef FUSE_SCALER_INTERNALS_H */

@@ -24,10 +24,6 @@
 
 #include <libspectrum.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif        /* #ifdef __cplusplus */
-
 typedef enum scaler_type {
   SCALER_HALF = 0,
   SCALER_HALFSKIP,
@@ -51,14 +47,6 @@ typedef enum scaler_flags_t {
   SCALER_FLAGS_NONE        = 0,
   SCALER_FLAGS_EXPAND      = 1 << 0,
 } scaler_flags_t;
-
-typedef enum scale_factor_t {
-  SCALE_FACTOR_HALF        = 1 << 0,
-  SCALE_FACTOR_ONE         = 1 << 1,
-  SCALE_FACTOR_ONE_HALF    = 1 << 2,
-  SCALE_FACTOR_TWO         = 1 << 3,
-  SCALE_FACTOR_THREE       = 1 << 4,
-} scale_factor_t;
 
 typedef void ScalerProc( const libspectrum_byte *srcPtr,
 			 libspectrum_dword srcPitch,
@@ -87,27 +75,8 @@ ScalerProc *scaler_get_proc16( scaler_type scaler );
 ScalerProc *scaler_get_proc32( scaler_type scaler );
 scaler_flags_t scaler_get_flags( scaler_type scaler );
 float scaler_get_scaling_factor( scaler_type scaler );
-int scaler_scale_number( scaler_type scaler, int num );
 scaler_expand_fn* scaler_get_expander( scaler_type scaler );
 
 int scaler_select_bitformat( libspectrum_dword BitFormat );
-
-int real2Aspect(int y);
-int aspect2Real(int y);
-
-void makeRectStretchable( int *x, int *y, int *w, int *h, int image_width,
-                          int image_height );
-
-int scaler_rect_to_ntsc( int *y, int *h, int image_width );
-
-int stretch200To240_16( libspectrum_byte *buf, libspectrum_dword pitch,
-                    int width, int height, int srcX, int srcY, int origSrcY );
-
-int stretch200To240_32( libspectrum_byte *buf, libspectrum_dword pitch,
-                    int width, int height, int srcX, int srcY, int origSrcY );
-
-#ifdef __cplusplus
-};
-#endif        /* #ifdef __cplusplus */
 
 #endif

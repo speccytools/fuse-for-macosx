@@ -1196,3 +1196,6 @@
          driver pass back the obtained frequency if it is not able to get that
          originally requested as long as it gets a native endian 16 bit format
          (Fred).
+20050113 ui/scaler/{scaler.[ch],scaler_internals.h,scalers.c},
+         ui/sdl/sdldisplay.c: Undo accidental commit (Fred).
+

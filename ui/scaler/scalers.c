@@ -47,9 +47,7 @@ static libspectrum_dword lowPixelMask;
 static libspectrum_dword qcolorMask;
 static libspectrum_dword qlowpixelMask;
 static libspectrum_dword redblueMask;
-static libspectrum_dword redMask;
 static libspectrum_dword greenMask;
-static libspectrum_dword blueMask;
 
 static const libspectrum_word dotmatrix_565[16] = {
   0x01E0, 0x0007, 0x3800, 0x0000,
@@ -86,9 +84,7 @@ scaler_select_bitformat( libspectrum_dword BitFormat )
     qcolorMask = 0x0000E79C;
     qlowpixelMask = 0x00001863;
     redblueMask = 0x0000F81F;
-    redMask = 0x0000F800;
     greenMask = 0x000007E0;
-    blueMask = 0x0000001F;
     dotmatrix = dotmatrix_565;
     break;
 
@@ -98,9 +94,7 @@ scaler_select_bitformat( libspectrum_dword BitFormat )
     qcolorMask = 0x0000739C;
     qlowpixelMask = 0x00000C63;
     redblueMask = 0x00007C1F;
-    redMask = 0x00007C00;
     greenMask = 0x000003E0;
-    blueMask = 0x0000001F;
     dotmatrix = dotmatrix_555;
     break;
 
@@ -130,9 +124,7 @@ const static libspectrum_dword lowPixelMask = 0x01010100;
 const static libspectrum_dword qcolorMask = 0xFCFCFC00;
 const static libspectrum_dword qlowpixelMask = 0x03030300;
 const static libspectrum_qword redblueMask = 0xFF00FF00;
-const static libspectrum_qword redMask = 0x0000FF00;
 const static libspectrum_qword greenMask = 0x00FF0000;
-const static libspectrum_qword blueMask = 0xFF000000;
 
 static const libspectrum_dword dotmatrix[16] = {
   0x003F0000, 0x00003F00, 0x3F000000, 0x00000000,
@@ -148,11 +140,53 @@ static const libspectrum_dword lowPixelMask = 0x00010101;
 static const libspectrum_dword qcolorMask = 0x00FCFCFC;
 static const libspectrum_dword qlowpixelMask = 0x00030303;
 static const libspectrum_qword redblueMask = 0x00FF00FF;
-static const libspectrum_qword redMask = 0x00FF0000;
 static const libspectrum_qword greenMask = 0x0000FF00;
-static const libspectrum_qword blueMask = 0x000000FF;
 
 static const libspectrum_dword dotmatrix[16] = {
+GetResult1(DWORD A, DWORD B, DWORD C, DWORD D, DWORD E)
+{
+  int x = 0;
+  int y = 0;
+  int r = 0;
+
+  if (A == C)
+    x += 1;
+  else if (B == C)
+    y += 1;
+  if (A == D)
+    x += 1;
+  else if (B == D)
+    y += 1;
+  if (x <= 1)
+    r += 1;
+  if (y <= 1)
+    r -= 1;
+  return r;
+}
+
+static inline int 
+GetResult2(DWORD A, DWORD B, DWORD C, DWORD D, DWORD E)
+{
+  int x = 0;
+  int y = 0;
+  int r = 0;
+
+  if (A == C)
+    x += 1;
+  else if (B == C)
+    y += 1;
+  if (A == D)
+    x += 1;
+  else if (B == D)
+    y += 1;
+  if (x <= 1)
+    r -= 1;
+  if (y <= 1)
+    r += 1;
+  return r;
+}
+
+static inline int 
   0x00003F00, 0x003F0000, 0x0000003F, 0x00000000,
   0x003F3F3F, 0x00000000, 0x003F3F3F, 0x00000000,
   0x0000003F, 0x00000000, 0x00003F00, 0x003F0000,
@@ -169,22 +203,23 @@ static inline int
 GetResult( libspectrum_dword A, libspectrum_dword B, libspectrum_dword C,
 	   libspectrum_dword D )
 {
-  const int ac = (A==C);
-  const int bc = (B==C);
-  const int x1 = ac;
-  const int y1 = (bc & !ac);
-  const int ad = (A==D);
-  const int bd = (B==D);
-  const int x2 = ad;
-  const int y2 = (bd & !ad);
-  const int x = x1+x2;
-  const int y = y1+y2;
-  static const int rmap[3][3] = {
-      {0, 0, -1},
-      {0, 0, -1},
-      {1, 1,  0}
-    };
-  return rmap[y][x];
+  int x = 0;
+  int y = 0;
+  int r = 0;
+
+  if (A == C)
+    x += 1;
+  else if (B == C)
+    y += 1;
+  if (A == D)
+    x += 1;
+  else if (B == D)
+    y += 1;
+  if (x <= 1)
+    r += 1;
+  if (y <= 1)
+    r -= 1;
+  return r;
 }
 
 static inline libspectrum_dword 
@@ -216,8 +251,7 @@ FUNCTION( scaler_Super2xSaI )( const libspectrum_byte *srcPtr,
 			       libspectrum_dword dstPitch,
 			       int width, int height )
 {
-  const scaler_data_type *bP;
-  scaler_data_type *dP;
+  scaler_data_type *bP, *dP;
 
   {
     const libspectrum_dword nextlineSrc = srcPitch / sizeof( scaler_data_type );
@@ -225,7 +259,7 @@ FUNCTION( scaler_Super2xSaI )( const libspectrum_byte *srcPtr,
     size_t i;
 
     while (height--) {
-      bP = (const scaler_data_type*)srcPtr;
+      bP = (scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
 
       for( i = 0; i < width; ++i ) {
@@ -334,8 +368,7 @@ FUNCTION( scaler_SuperEagle )( const libspectrum_byte *srcPtr,
 			       libspectrum_dword dstPitch,
 			       int width, int height )
 {
-  const scaler_data_type *bP;
-  scaler_data_type *dP;
+  scaler_data_type *bP, *dP;
 
   {
     size_t i;
@@ -343,7 +376,7 @@ FUNCTION( scaler_SuperEagle )( const libspectrum_byte *srcPtr,
     libspectrum_dword nextDstLine = dstPitch / sizeof( scaler_data_type );
 
     while (height--) {
-      bP = (const scaler_data_type*)srcPtr;
+      bP = (scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
       for( i = 0; i < width; ++i ) {
 	libspectrum_dword color4, color5, color6;
@@ -463,8 +496,7 @@ FUNCTION( scaler_2xSaI )( const libspectrum_byte *srcPtr,
 			  libspectrum_dword dstPitch,
 			  int width, int height )
 {
-  const scaler_data_type *bP;
-  scaler_data_type *dP;
+  scaler_data_type *bP, *dP;
 
   {
     libspectrum_dword nextlineSrc = srcPitch / sizeof( scaler_data_type );
@@ -472,7 +504,7 @@ FUNCTION( scaler_2xSaI )( const libspectrum_byte *srcPtr,
 
     while (height--) {
       size_t i;
-      bP = (const scaler_data_type*)srcPtr;
+      bP = (scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
 
       for( i = 0; i < width; ++i ) {
@@ -610,7 +642,7 @@ FUNCTION( scaler_AdvMame2x )( const libspectrum_byte *srcPtr,
 			      int width, int height )
 {
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  const scaler_data_type *p = (const scaler_data_type*) srcPtr;
+  scaler_data_type *p = (scaler_data_type*) srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*) dstPtr;
@@ -654,7 +686,7 @@ FUNCTION( scaler_AdvMame3x )( const libspectrum_byte *srcPtr,
 			      int width, int height )
 {
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  const scaler_data_type *p = (const scaler_data_type*) srcPtr;
+  scaler_data_type *p = (scaler_data_type*) srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*) dstPtr;
@@ -766,12 +798,11 @@ FUNCTION( scaler_Normal2x )( const libspectrum_byte *srcPtr,
 			     libspectrum_dword dstPitch,
 			     int width, int height )
 {
-  const scaler_data_type *s;
-  scaler_data_type i, *d, *d2;
+  scaler_data_type i, *s, *d, *d2;
 
   while( height-- ) {
 
-    for( i = 0, s = (const scaler_data_type*)srcPtr,
+    for( i = 0, s = (scaler_data_type*)srcPtr,
 	   d = (scaler_data_type*)dstPtr,
 	   d2 = (scaler_data_type*)(dstPtr + dstPitch);
 	 i < width;
@@ -799,7 +830,7 @@ FUNCTION( scaler_Normal3x )( const libspectrum_byte *srcPtr,
     int i;
     r = dstPtr;
     for (i = 0; i < width; ++i, r += 3 * SCALER_DATA_SIZE ) {
-      scaler_data_type color = *(((const scaler_data_type*) srcPtr) + i);
+      scaler_data_type color = *(((scaler_data_type*) srcPtr) + i);
 
       *(scaler_data_type*)( r +                    0             ) = color;
       *(scaler_data_type*)( r +     SCALER_DATA_SIZE             ) = color;
@@ -861,7 +892,7 @@ FUNCTION( scaler_TV2x )( const libspectrum_byte *srcPtr,
 {
   int i, j;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  const scaler_data_type *p = (const scaler_data_type*)srcPtr;
+  scaler_data_type *p = (scaler_data_type*)srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*)dstPtr;
@@ -893,7 +924,7 @@ FUNCTION( scaler_TimexTV )( const libspectrum_byte *srcPtr,
 {
   int i, j;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  const scaler_data_type *p = (const scaler_data_type *)srcPtr;
+  scaler_data_type *p = (scaler_data_type *)srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type *)dstPtr;
@@ -929,7 +960,7 @@ FUNCTION( scaler_DotMatrix )( const libspectrum_byte *srcPtr,
 {
   int i, j, ii, jj;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  const scaler_data_type *p = (const scaler_data_type *)srcPtr;
+  scaler_data_type *p = (scaler_data_type *)srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type *)dstPtr;
@@ -945,119 +976,4 @@ FUNCTION( scaler_DotMatrix )( const libspectrum_byte *srcPtr,
     p += nextlineSrc;
     q += nextlineDst << 1;
   }
-}
-
-static inline scaler_data_type
-interpolate5_2( scaler_data_type A,
-                scaler_data_type B )
-{
-  scaler_data_type r = (scaler_data_type)(((A & redMask) * 2 +
-                       (B & redMask) * (5 - 2)) / 5);
-  scaler_data_type g = (scaler_data_type)(((A & greenMask) * 2 +
-                       (B & greenMask) * (5 - 2)) / 5);
-  scaler_data_type b = (scaler_data_type)(((A & blueMask) * 2 +
-                       (B & blueMask) * (5 - 2)) / 5);
-
-  return (scaler_data_type)((r & redMask) | (g & greenMask) | (b & blueMask));
-}
-
-static inline scaler_data_type
-interpolate5_1( scaler_data_type A,
-                scaler_data_type B )
-{
-  scaler_data_type r = (scaler_data_type)(((A & redMask) * 1 +
-                       (B & redMask) * (5 - 1)) / 5);
-  scaler_data_type g = (scaler_data_type)(((A & greenMask) * 1 +
-                       (B & greenMask) * (5 - 1)) / 5);
-  scaler_data_type b = (scaler_data_type)(((A & blueMask) * 1 +
-                       (B & blueMask) * (5 - 1)) / 5);
-
-  return (scaler_data_type)((r & redMask) | (g & greenMask) | (b & blueMask));
-}
-
-static inline void
-interpolate5Line2( scaler_data_type *dst,
-                   const scaler_data_type *srcA,
-                   const scaler_data_type *srcB,
-                   int width )
-{
-  while (width--) {
-    *dst++ = interpolate5_2(*srcA++, *srcB++);
-  }
-}
-
-static inline void
-interpolate5Line1( scaler_data_type *dst,
-                   const scaler_data_type *srcA,
-                   const scaler_data_type *srcB,
-                   int width )
-{
-  while (width--) {
-    *dst++ = interpolate5_1(*srcA++, *srcB++);
-  }
-}
-
-/**
- * Stretch an image vertically by factor 1.2. Used to correct the
- * aspect-ratio in games using 320x200 pixel graphics with non-quadratic
- * pixels. Applying this method effectively turns that into 320x240, which
- * provides the correct aspect-ratio on modern displays.
- *
- * The image would normally have occupied y coordinates origSrcY through
- * origSrcY + height - 1.
- *
- * However, we have already placed it at srcY - the aspect-corrected y
- * coordinate - to allow in-place stretching.
- *
- * Therefore, the source image now occupies Y coordinates srcY through
- * srcY + height - 1, and it should be stretched to Y coordinates srcY
- * through real2Aspect(srcY + height - 1).
- */
-
-int
-FUNCTION( stretch200To240 )( libspectrum_byte *buf,
-            libspectrum_dword pitch,
-            int width, int height,
-            int srcX, int srcY, int origSrcY )
-{
-  int maxDstY = real2Aspect(origSrcY + height - 1);
-  int y;
-  const libspectrum_byte *startSrcPtr =
-                                  buf + srcX * sizeof( scaler_data_type ) +
-                                  (srcY - origSrcY) * pitch;
-  libspectrum_byte *dstPtr = buf + srcX * sizeof( scaler_data_type ) +
-                                  maxDstY * pitch;
-
-  for (y = maxDstY; y >= srcY; y--) {
-    const libspectrum_byte *srcPtr = startSrcPtr + aspect2Real(y) * pitch;
-
-  // Bilinear filter
-  switch (y % 6) {
-    case 0:
-    case 5:
-      if (srcPtr != dstPtr)
-        memcpy(dstPtr, srcPtr, width * sizeof( scaler_data_type ));
-      break;
-    case 1:
-      interpolate5Line1((scaler_data_type *)dstPtr, (const scaler_data_type *)
-      (srcPtr - pitch), (const scaler_data_type *)srcPtr, width);
-      break;
-    case 2:
-      interpolate5Line2((scaler_data_type *)dstPtr, (const scaler_data_type *)
-      (srcPtr - pitch), (const scaler_data_type *)srcPtr, width);
-      break;
-    case 3:
-      interpolate5Line2((scaler_data_type *)dstPtr, (const scaler_data_type *)
-      srcPtr, (const scaler_data_type *)(srcPtr - pitch), width);
-      break;
-    case 4:
-      interpolate5Line1((scaler_data_type *)dstPtr, (const scaler_data_type *)
-      srcPtr, (const scaler_data_type *)(srcPtr - pitch), width);
-      break;
-
-    }
-    dstPtr -= pitch;
-  }
-
-  return 1 + maxDstY - srcY;
 }

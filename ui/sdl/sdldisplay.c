@@ -90,13 +90,15 @@ static SDL_Rect updated_rects[MAX_UPDATE_RECT];
 static int num_rects = 0;
 static libspectrum_byte sdldisplay_force_full_refresh = 1;
 
+/* The current size of the display (in units of DISPLAY_SCREEN_*) */
+static float sdldisplay_current_size = 1;
+
 static libspectrum_byte sdldisplay_is_full_screen = 0;
 
 static int image_width;
 static int image_height;
 
 static int timex;
-static int ntsc;
 
 static void init_scalers( void );
 static int sdldisplay_allocate_colours( int numColours, Uint32 *colour_values,
@@ -212,8 +214,6 @@ uidisplay_init( int width, int height )
   image_height = height;
 
   timex = machine_current->timex;
-  ntsc = libspectrum_machine_capabilities( machine_current->machine ) &
-          LIBSPECTRUM_MACHINE_CAPABILITY_NTSC;
 
   init_scalers();
 
@@ -267,10 +267,12 @@ sdldisplay_load_gfx_mode( void )
   tmp_screen = NULL;
   tmp_screen_width = (image_width + 3);
 
+  sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
+
   /* Create the surface that contains the scaled graphics in 16 bit mode */
   sdldisplay_gc = SDL_SetVideoMode(
-    scaler_scale_number( current_scaler, image_width ),
-    scaler_scale_number( current_scaler, image_height ),
+    image_width * sdldisplay_current_size,
+    image_height * sdldisplay_current_size,
     16,
     settings_current.full_screen ? (SDL_FULLSCREEN|SDL_SWSURFACE)
                                  : SDL_SWSURFACE
@@ -292,8 +294,7 @@ sdldisplay_load_gfx_mode( void )
   /* Create the surface used for the graphics in 16 bit before scaling */
 
   /* Need some extra bytes around when using 2xSaI */
-  tmp_screen_pixels = (Uint16*)calloc(tmp_screen_width*(image_height+3),
-                        sizeof(Uint16));
+  tmp_screen_pixels = (Uint16*)calloc(tmp_screen_width*(image_height+3), sizeof(Uint16));
   tmp_screen = SDL_CreateRGBSurfaceFrom(tmp_screen_pixels,
                                         tmp_screen_width,
                                         image_height + 3,
@@ -373,7 +374,7 @@ sdl_blit_icon( SDL_Surface **icon,
   if( scaler_flags & SCALER_FLAGS_EXPAND )
     scaler_expander( &x, &y, &w, &h, image_width, image_height );
 
-  dst_y = scaler_scale_number( current_scaler, y );
+  dst_y = y * sdldisplay_current_size;
   dst_h = h;
 
   scaler_proc16(
@@ -382,9 +383,9 @@ sdl_blit_icon( SDL_Surface **icon,
 	                (y+1) * tmp_screen_pitch,
 	tmp_screen_pitch,
 	(libspectrum_byte*)sdldisplay_gc->pixels +
-			x *
-                        (libspectrum_byte)scaler_scale_number( current_scaler,
-                                       sdldisplay_gc->format->BytesPerPixel ) +
+			x * (libspectrum_byte)
+				(sdldisplay_gc->format->BytesPerPixel *
+				sdldisplay_current_size) +
 			dst_y * dstPitch,
 	dstPitch, w, dst_h
   );
@@ -395,10 +396,10 @@ sdl_blit_icon( SDL_Surface **icon,
   }
 
   /* Adjust rects for the destination rect size */
-  updated_rects[num_rects].x = scaler_scale_number( current_scaler, x );
+  updated_rects[num_rects].x = x * sdldisplay_current_size;
   updated_rects[num_rects].y = dst_y;
-  updated_rects[num_rects].w = scaler_scale_number( current_scaler, w );
-  updated_rects[num_rects].h = scaler_scale_number( current_scaler, dst_h );
+  updated_rects[num_rects].w = w * sdldisplay_current_size;
+  updated_rects[num_rects].h = dst_h * sdldisplay_current_size;
 
   num_rects++;
 }
@@ -497,28 +498,15 @@ uidisplay_frame_end( void )
 
     libspectrum_word *dest_base, *dest;
     size_t xx,yy;
-    int dst_y = scaler_scale_number( current_scaler, r->y );
-    int orig_dst_y = dst_y;
-    int disp_y = r->y;
+    int dst_y = r->y * sdldisplay_current_size;
     int dst_h = r->h;
-    int y = r->y;
-    int h = r->h;
-
-    if ( ntsc ) {
-      scaler_rect_to_ntsc( &y, &h, image_width );
-      dst_h = h;
-      dst_y = scaler_scale_number( current_scaler, y );
-      orig_dst_y = dst_y;
-      disp_y = y + (20 << machine_current->timex);
-      dst_y = real2Aspect(orig_dst_y);
-    }
 
     dest_base =
       (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
                            (r->x+1) * tmp_screen->format->BytesPerPixel +
-			   (y+1) * tmp_screen_pitch );
+			   (r->y+1)*tmp_screen_pitch );
 
-    for( yy = disp_y; yy < disp_y + h; yy++ ) {
+    for( yy = r->y; yy < r->y + r->h; yy++ ) {
 
       for( xx = r->x, dest = dest_base; xx < r->x + r->w; xx++, dest++ )
         *dest = palette_values[ display_image[yy][xx] ];
@@ -526,31 +514,25 @@ uidisplay_frame_end( void )
       dest_base = (libspectrum_word*)
         ( (libspectrum_byte*)dest_base + tmp_screen_pitch );
     }
-  
+	  
     scaler_proc16(
       (libspectrum_byte*)tmp_screen->pixels +
-                  (r->x+1) * tmp_screen->format->BytesPerPixel +
-                  (y+1) * tmp_screen_pitch,
+                        (r->x+1) * tmp_screen->format->BytesPerPixel +
+	                (r->y+1)*tmp_screen_pitch,
       tmp_screen_pitch,
       (libspectrum_byte*)sdldisplay_gc->pixels +
-                  r->x*(libspectrum_byte)
-                  scaler_scale_number( current_scaler,
-                                       sdldisplay_gc->format->BytesPerPixel ) +
-                  dst_y*dstPitch,
+	                 r->x*(libspectrum_byte)
+                               (sdldisplay_gc->format->BytesPerPixel *
+                                sdldisplay_current_size) +
+			 dst_y*dstPitch,
       dstPitch, r->w, dst_h
     );
 
     /* Adjust rects for the destination rect size */
-    r->x = scaler_scale_number( current_scaler, r->x );
+    r->x *= sdldisplay_current_size;
     r->y = dst_y;
-    r->w = scaler_scale_number( current_scaler, r->w );
-    r->h = scaler_scale_number( current_scaler, dst_h );
-
-    if ( ntsc ) {
-      r->h = stretch200To240_16(
-        (libspectrum_byte*)sdldisplay_gc->pixels,
-        (libspectrum_dword)dstPitch, r->w, r->h, r->x, r->y, orig_dst_y);
-    }
+    r->w *= sdldisplay_current_size;
+    r->h = dst_h * sdldisplay_current_size;
   }
 
   if ( settings_current.statusbar )
@@ -569,25 +551,18 @@ uidisplay_frame_end( void )
 void
 uidisplay_area( int x, int y, int width, int height )
 {
+  if ( sdldisplay_force_full_refresh )
+    return;
+
   if( num_rects == MAX_UPDATE_RECT ) {
     sdldisplay_force_full_refresh = 1;
     return;
-  }
-
-  if ( ntsc ) {
-    if( scaler_rect_to_ntsc( &y, &height, image_width ) ) return;
-    y += 20 << machine_current->timex;
   }
 
   /* Extend the dirty region by 1 pixel for scalers
      that "smear" the screen, e.g. 2xSAI */
   if( scaler_flags & SCALER_FLAGS_EXPAND )
     scaler_expander( &x, &y, &width, &height, image_width, image_height );
-
-  /* Extend the dirty region in the y axis for the stretch scaler */
-  if ( ntsc ) {
-    makeRectStretchable( &x, &y, &width, &height, image_width, image_height );
-  }
 
   updated_rects[num_rects].x = x;
   updated_rects[num_rects].y = y;

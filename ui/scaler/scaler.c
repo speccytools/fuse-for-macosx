@@ -29,7 +29,6 @@
 
 #include <libspectrum.h>
 
-#include "machine.h"
 #include "scaler.h"
 #include "scaler_internals.h"
 #include "settings.h"
@@ -45,7 +44,7 @@ struct scaler_info {
   const char *name;
   const char *id;
   enum scaler_flags_t flags;
-  scale_factor_t scaling_factor;
+  float scaling_factor;
   ScalerProc *scaler16, *scaler32;
   scaler_expand_fn *expander;
 
@@ -68,33 +67,33 @@ static void expand_dotmatrix( int *x, int *y, int *w, int *h,
    in the same order as scaler.h:scaler_type */
 static const struct scaler_info available_scalers[] = {
 
-  { "Timex Half (smoothed)", "half", SCALER_FLAGS_NONE,	  SCALE_FACTOR_HALF,
+  { "Timex Half (smoothed)", "half", SCALER_FLAGS_NONE,	       0.5,
     scaler_Half_16,       scaler_Half_32,       NULL                },
-  { "Timex Half (skipping)", "halfskip", SCALER_FLAGS_NONE, SCALE_FACTOR_HALF,
+  { "Timex Half (skipping)", "halfskip", SCALER_FLAGS_NONE,    0.5,
     scaler_HalfSkip_16,   scaler_HalfSkip_32,   NULL                },
-  { "Normal",	       "normal",     SCALER_FLAGS_NONE,	  SCALE_FACTOR_ONE,
+  { "Normal",	       "normal",     SCALER_FLAGS_NONE,	       1.0, 
     scaler_Normal1x_16,   scaler_Normal1x_32,   NULL                },
-  { "Double size",     "2x",	     SCALER_FLAGS_NONE,	  SCALE_FACTOR_TWO,
+  { "Double size",     "2x",	     SCALER_FLAGS_NONE,	       2.0, 
     scaler_Normal2x_16,   scaler_Normal2x_32,   NULL                },
-  { "Triple size",     "3x",	     SCALER_FLAGS_NONE,	  SCALE_FACTOR_THREE,
+  { "Triple size",     "3x",	     SCALER_FLAGS_NONE,	       3.0, 
     scaler_Normal3x_16,   scaler_Normal3x_32,   NULL		    },
-  { "2xSaI",	       "2xsai",	     SCALER_FLAGS_EXPAND, SCALE_FACTOR_TWO,
+  { "2xSaI",	       "2xsai",	     SCALER_FLAGS_EXPAND,      2.0, 
     scaler_2xSaI_16,      scaler_2xSaI_32,      expand_sai          },
-  { "Super 2xSaI",     "super2xsai", SCALER_FLAGS_EXPAND, SCALE_FACTOR_TWO,
+  { "Super 2xSaI",     "super2xsai", SCALER_FLAGS_EXPAND,      2.0, 
     scaler_Super2xSaI_16, scaler_Super2xSaI_32, expand_sai          },
-  { "SuperEagle",      "supereagle", SCALER_FLAGS_EXPAND, SCALE_FACTOR_TWO,
+  { "SuperEagle",      "supereagle", SCALER_FLAGS_EXPAND,      2.0, 
     scaler_SuperEagle_16, scaler_SuperEagle_32, expand_sai          },
-  { "AdvMAME 2x",      "advmame2x",  SCALER_FLAGS_EXPAND, SCALE_FACTOR_TWO,
+  { "AdvMAME 2x",      "advmame2x",  SCALER_FLAGS_EXPAND,      2.0, 
     scaler_AdvMame2x_16,  scaler_AdvMame2x_32,  expand_1            },
-  { "AdvMAME 3x",      "advmame3x",  SCALER_FLAGS_EXPAND, SCALE_FACTOR_THREE,
+  { "AdvMAME 3x",      "advmame3x",  SCALER_FLAGS_EXPAND,      3.0, 
     scaler_AdvMame3x_16,  scaler_AdvMame3x_32,  expand_1            },
-  { "TV 2x",	       "tv2x",	     SCALER_FLAGS_NONE,   SCALE_FACTOR_TWO,
+  { "TV 2x",	       "tv2x",	     SCALER_FLAGS_NONE,        2.0, 
     scaler_TV2x_16,       scaler_TV2x_32,       NULL                },
-  { "Timex TV",	       "timextv",    SCALER_FLAGS_NONE,   SCALE_FACTOR_ONE,
+  { "Timex TV",	       "timextv",    SCALER_FLAGS_NONE,        1.0, 
     scaler_TimexTV_16,    scaler_TimexTV_32,    NULL                },
-  { "Dot Matrix",      "dotmatrix",  SCALER_FLAGS_EXPAND, SCALE_FACTOR_TWO,
+  { "Dot Matrix",      "dotmatrix",  SCALER_FLAGS_EXPAND,      2.0,
     scaler_DotMatrix_16,  scaler_DotMatrix_32,  expand_dotmatrix    },
-  { "Timex 1.5x",      "timex15x",   SCALER_FLAGS_NONE,   SCALE_FACTOR_ONE_HALF,
+  { "Timex 1.5x",      "timex15x",   SCALER_FLAGS_NONE,        1.5,
     scaler_Timex1_5x_16,  scaler_Timex1_5x_32,  NULL                },
 };
 
@@ -194,29 +193,7 @@ scaler_get_flags( scaler_type scaler )
 float
 scaler_get_scaling_factor( scaler_type scaler )
 {
-  switch ( available_scalers[scaler].scaling_factor ) {
-  case SCALE_FACTOR_HALF: return 0.5f;
-  case SCALE_FACTOR_ONE: return 1.0f;
-  case SCALE_FACTOR_ONE_HALF: return 1.5f;
-  case SCALE_FACTOR_TWO: return 2.0f;
-  case SCALE_FACTOR_THREE: return 3.0f;
-  }
-  /* Silence warning */
-  return 1.0f;
-}
-
-int
-scaler_scale_number( scaler_type scaler, int num )
-{
-  switch ( available_scalers[scaler].scaling_factor ) {
-  case SCALE_FACTOR_HALF: return num>>1;
-  case SCALE_FACTOR_ONE: return num;
-  case SCALE_FACTOR_ONE_HALF: return num+(num>>1);
-  case SCALE_FACTOR_TWO: return num<<1;
-  case SCALE_FACTOR_THREE: return num+(num<<1);
-  }
-  /* Silence warning */
-  return num;
+  return available_scalers[scaler].scaling_factor;
 }
 
 scaler_expand_fn*
@@ -263,57 +240,4 @@ expand_dotmatrix( int *x GCC_UNUSED, int *y GCC_UNUSED, int *w GCC_UNUSED,
 
   (*y)-=y_mod;
   (*h)+=y_mod;
-}
-
-int
-scaler_rect_to_ntsc( int *y, int *h, int image_width )
-{
-  int screen_height = 200 << machine_current->timex;
-  int t1 = 0;
-  int t2 = 1;
-
-  *y -= 20 << machine_current->timex;
-
-  if( *y >= screen_height ) return 1;
-
-  clip( &t1, y, &t2, h, image_width, screen_height);
-
-  if( *h < 1 ) return 1;
-
-  return 0;
-}
-
-int real2Aspect(int y) {
-  return y + (y + 1) / 5;
-}
-
-int aspect2Real(int y) {
-  return (y * 5 + 4) / 6;
-}
-
-void
-makeRectStretchable( int *x, int *y, int *w, int *h, int image_width,
-                     int image_height )
-{
-#if ASPECT_MODE != kVeryFastAndUglyAspectMode
-/* Fuse seems to need the following simple adjustment for reasons I am not
-   entirely clear on in addition to the start adjustment */
-  (*y) -= 2;
-  (*h) += 6;
-
-  int m = real2Aspect(*y) % 6;
-
-  /* Ensure that the rect will start on a line that won't have its
-     colours changed by the stretching function. */
-  if (m != 0 && m != 5) {
-    (*y) -= m;
-    (*h) += m;
-  }
-
-  //clip( x, y, w, h, image_width, image_height );
-
-#if ASPECT_MODE == kFastAndNiceAspectMode
-  /* Data may be 32-bit so no two pixel at a time optimisations */
-#endif         /* #if ASPECT_MODE == kFastAndNiceAspectMode */
-#endif         /* #if ASPECT_MODE != kVeryFastAndUglyAspectMode */
 }
