@@ -52,12 +52,12 @@ int widget_general_draw( void )
   if( error ) return error;
 
   /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 6 );
+  widget_dialog_with_border( 1, 2, 30, 7 );
   error = widget_general_show_all( &settings );
   if( error ) return error;
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 48 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 56 );
 
   return 0;
 
@@ -82,7 +82,7 @@ static int widget_general_show_all( settings_info *show )
 
   widget_printstring( 9, 2, WIDGET_COLOUR_FOREGROUND, "General Options" );
 
-  error = widget_general_print_option( 0, "Issue (2) emulation",
+  error = widget_general_print_option( 0, "Issue (2) keyboard",
 				       show->issue2 );
   if( error ) return error;
 
@@ -90,12 +90,16 @@ static int widget_general_show_all( settings_info *show )
 				       show->joy_kempston );
   if( error ) return error;
 
-  error = widget_general_print_option( 2, "(F)ast tape loading",
+  error = widget_general_print_option( 2, "Use (t)ape traps",
 				       show->tape_traps );
   if( error ) return error;
 
   error = widget_general_print_option( 3, "(A)Y stereo separation",
 				       show->stereo_ay );
+  if( error ) return error;
+
+  error = widget_general_print_option( 4, "Use .(s)lt traps",
+				       show->slt_traps );
   if( error ) return error;
 
   return 0;
@@ -145,21 +149,27 @@ void widget_general_keyhandler( int key )
     if( error ) return;
     break;
 
+  case KEYBOARD_a:
+    settings.stereo_ay = ! settings.stereo_ay;
+    error = widget_general_print_value( 3, settings.stereo_ay );
+    if( error ) return;
+    break;
+
   case KEYBOARD_k:
     settings.joy_kempston = ! settings.joy_kempston;
     error = widget_general_print_value( 1, settings.joy_kempston );
     if( error ) return;
     break;
 
-  case KEYBOARD_f:
-    settings.tape_traps = ! settings.tape_traps;
-    error = widget_general_print_value( 2, settings.tape_traps );
+  case KEYBOARD_s:
+    settings.slt_traps = ! settings.slt_traps;
+    error = widget_general_print_value( 4, settings.slt_traps );
     if( error ) return;
     break;
 
-  case KEYBOARD_a:
-    settings.stereo_ay = ! settings.stereo_ay;
-    error = widget_general_print_value( 3, settings.stereo_ay );
+  case KEYBOARD_t:
+    settings.tape_traps = ! settings.tape_traps;
+    error = widget_general_print_value( 2, settings.tape_traps );
     if( error ) return;
     break;
 

@@ -292,27 +292,27 @@ static void gtkui_options( GtkWidget *widget, gpointer data )
 			"Fuse - General Options" );
 
   dialog.issue2 =
-    gtk_check_button_new_with_label( "Issue 2 keyboard emulation" );
+    gtk_check_button_new_with_label( "Issue 2 keyboard" );
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.issue2 ),
 				settings_current.issue2 );
 
   dialog.joy_kempston =
-    gtk_check_button_new_with_label( "Kempston joystick emulation" );
+    gtk_check_button_new_with_label( "Kempston joystick" );
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.joy_kempston ),
 				settings_current.joy_kempston );
 
   dialog.tape_traps =
-    gtk_check_button_new_with_label( "Use tape loading traps" );
+    gtk_check_button_new_with_label( "Use tape traps" );
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.tape_traps ),
 				settings_current.tape_traps );
 
   dialog.stereo_ay =
-    gtk_check_button_new_with_label( "Stereo separation for AY sound" );
+    gtk_check_button_new_with_label( "AY stereo separation" );
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.stereo_ay ),
 				settings_current.stereo_ay );
 
   dialog.slt_traps =
-    gtk_check_button_new_with_label( "Use .slt loading traps" );
+    gtk_check_button_new_with_label( "Use .slt traps" );
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.slt_traps ),
 				settings_current.slt_traps );
 

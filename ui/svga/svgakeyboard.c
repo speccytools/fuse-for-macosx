@@ -107,7 +107,7 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F4:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_OPTIONS );
+    widget_do( WIDGET_TYPE_GENERAL );
     fuse_emulation_unpause();
     break;
   case SCANCODE_F5:

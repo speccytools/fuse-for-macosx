@@ -89,7 +89,7 @@ int xkeyboard_keypress(XKeyEvent *event)
     break;
   case XK_F4:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_OPTIONS );
+    widget_do( WIDGET_TYPE_GENERAL );
     fuse_emulation_unpause();
     break;
   case XK_F5:
