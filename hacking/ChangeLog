@@ -287,3 +287,4 @@
 	 it is no longer pulled in by libspectrum.
 20031020 fuse.c, trdos.c, utils.c: use libspectrum_identify_file_with_class
 	 where appropriate.
+20031020 utils.c: use TMPDIR before /tmp for temporary files.

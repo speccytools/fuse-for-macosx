@@ -335,9 +335,9 @@ int utils_write_file( const char *filename, const unsigned char *buffer,
 const char*
 utils_get_temp_path( void )
 {
-#ifdef WIN32
-
   const char *dir;
+
+#ifdef WIN32
 
   /* Something close to this algorithm specified at
      http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/gettemppath.asp
@@ -348,7 +348,8 @@ utils_get_temp_path( void )
 
 #else				/* #ifdef WIN32 */
 
-  /* Unix-ish. Just use /tmp */
+  /* Unix-ish. Use TMPDIR if specified, if not /tmp */
+  dir = getenv( "TMPDIR" ); if( dir ) return dir;
   return "/tmp/";
 
 #endif				/* #ifdef WIN32 */
