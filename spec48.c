@@ -168,6 +168,7 @@ int spec48_init( machine_info *machine )
 
   machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
 
+  machine->timex = 0;
   machine->ram.read_memory    = spec48_readbyte;
   machine->ram.read_screen    = spec48_read_screen_memory;
   machine->ram.write_memory   = spec48_writebyte;

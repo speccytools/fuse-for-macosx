@@ -73,6 +73,8 @@ typedef struct machine_info {
 
   int (*reset)(void);	/* Reset function */
 
+  int timex;            /* Timex machine (keyboard emulation/loading sounds etc.) */
+
   machine_timings timings; /* How long do things take to happen? */
   /* Redraw line y this many tstates after interrupt */
   DWORD	line_times[DISPLAY_SCREEN_HEIGHT+1];

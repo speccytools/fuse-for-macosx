@@ -1,0 +1,8 @@
+Timex ports are fully decoded
+Timings appear close to 48K spectrum
+Keyboard reads (port FE) are different to other spectrum models,  bits 5 & 7 are always reset
+Reading unattached ports gives 255. There are no floating ULA values.
+Joystick ports are all over the shop!
+Machine is silent during loading (eerie!)
+Colours are always bright in hires mode
+Border always matches hires colour in hires mode

@@ -41,6 +41,7 @@
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
+#include "settings.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -410,7 +411,10 @@ int tape_play( void )
   /* Otherwise, start the tape going */
   tape_playing = 1;
   tape_microphone = 0;
-  if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
+
+  /* Timex machines have no loading noise */
+  if( ( !( machine_current->timex ) ) && settings_current.sound_load )
+    sound_beeper( 1, tape_microphone );
 
   error = tape_next_edge( tstates ); if( error ) return error;
 

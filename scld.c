@@ -105,27 +105,27 @@ BYTE hires_get_attr(void)
   switch (scld_last_dec & HIRESCOLMASK)
   {
     case YELLOWBLUE:
-      return (BYTE) 0x31;
+      return (BYTE) 0x71;
       break;
     case CYANRED:
-      return (BYTE) 0x2A;
+      return (BYTE) 0x6A;
       break;
     case GREENMAGENTA:
-      return (BYTE) 0x23;
+      return (BYTE) 0x63;
       break;
     case MAGENTAGREEN:
-      return (BYTE) 0x1C;
+      return (BYTE) 0x5C;
       break;
     case REDCYAN:
-      return (BYTE) 0x15;
+      return (BYTE) 0x55;
       break;
     case BLUEYELLOW:
-      return (BYTE) 0x0E;
+      return (BYTE) 0x4E;
       break;
     case BLACKWHITE:
-      return (BYTE) 0x07;
+      return (BYTE) 0x47;
       break;
     default:  /* WHITEBLACK */
-      return (BYTE) 0x38;
+      return (BYTE) 0x78;
   }
 }

@@ -46,11 +46,11 @@
 static DWORD tc2048_contend_delay( void );
 
 spectrum_port_info tc2048_peripherals[] = {
-  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
   { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
+  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write }, /* TS2040/Alphacom printer */
 
-  /* Timex ports are fully decoded (at least in the lower 8 bits) */
+  /* Lower 8 bits of Timex ports are fully decoded */
   { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
 
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
@@ -60,7 +60,9 @@ spectrum_port_info tc2048_peripherals[] = {
 
 static BYTE tc2048_unattached_port( void )
 {
-  return spectrum_unattached_port( 1 );
+  /* TC2048 does not have floating ULA values on any port (despite rumours to */
+  /* the contrary), it returns 255 on unattached ports */
+  return 255;
 }
 
 BYTE tc2048_readbyte(WORD address)
@@ -113,9 +115,10 @@ DWORD tc2048_contend_memory( WORD address )
 
 DWORD tc2048_contend_port( WORD port )
 {
-  /* Contention occurs for even-numbered ports (SCLD and HSR) */
+  /* Contention occurs for ports FE and F4 (SCLD and HSR) */
   /* Contention occurs for port FF (SCLD DCE) */
-  if( ( port & 0x01 ) == 0x00 ||
+  if( ( port & 0xff ) == 0xf4 ||
+      ( port & 0xff ) == 0xfe ||
       ( port & 0xff ) == 0xff    ) return tc2048_contend_delay();
 
   return 0;
@@ -174,8 +177,9 @@ int tc2048_init( machine_info *machine )
 
   machine->reset = tc2048_reset;
 
-  machine_set_timings( machine, 3.528e6, 24, 128, 24, 50, 312, 9016 );
+  machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
 
+  machine->timex = 1;
   machine->ram.read_memory    = tc2048_readbyte;
   machine->ram.read_screen    = tc2048_read_screen_memory;
   machine->ram.write_memory   = tc2048_writebyte;

@@ -31,6 +31,7 @@
 #include "keyboard.h"
 #include "settings.h"
 #include "spectrum.h"
+#include "machine.h"
 
 BYTE joystick_kempston_read(WORD port)
 {
@@ -41,7 +42,9 @@ BYTE joystick_kempston_read(WORD port)
   BYTE return_value = 0, jmask = 1;
   int i;
 
-  if( !settings_current.joy_kempston )
+  /* The TC2048 has a unremoveable Kempston interface */
+  if( ( machine_current->machine != SPECTRUM_MACHINE_2048 )
+	  && !settings_current.joy_kempston )
     return spectrum_port_noread(port);
 
   for( i=0; i<5; i++, jmask<<=1 ) {

@@ -140,6 +140,11 @@ void spectrum_ula_write(WORD port, BYTE b)
   display_set_lores_border( b & 0x07 );
   sound_beeper( 0, b & 0x10 );
 
+  if( machine_current->timex ) {
+      keyboard_default_value=0x5f;
+      return;
+  }
+
   if( settings_current.issue2 ) {
     if( b & 0x18 ) {
       keyboard_default_value=0xff;
