@@ -49,7 +49,7 @@ noinst_HEADERS = ay.h display.h event.h\
 	machine.h osssound.h rzx.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h sunsound.h\
 	tape.h timer.h types.h utils.h\
-	joystick.h printer.h
+	joystick.h printer.h tc2048.h scld.h
 
 EXTRA_DIST = AUTHORS README THANKS hacking/coding_style.txt hacking/ui.txt\
 	hacking/tc2048_tech_notes.txt keysyms.dat keysyms.pl
