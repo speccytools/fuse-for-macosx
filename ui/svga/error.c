@@ -32,18 +32,27 @@
 #include <stdio.h>
 
 #include "fuse.h"
+#include "widget.h"
+
+#define MESSAGE_MAX_LENGTH 256
 
 int
 ui_error( const char *format, ... )
 {
+  char message[ MESSAGE_MAX_LENGTH + 1 ];
   va_list ap;
   
+  /* Create the message from the given arguments */
   va_start( ap, format );
-
-   fprintf( stderr, "%s: error: ", fuse_progname );
-  vfprintf( stderr, format, ap );
-
+  vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
   va_end( ap );
+
+  /* Print the message to stderr, along with a program identifier */
+  fprintf( stderr, "%s: error: %s\n", fuse_progname, message );
+
+  fuse_emulation_pause();
+  widget_do( WIDGET_TYPE_ERROR, message );
+  fuse_emulation_unpause();
 
   return 0;
 }
