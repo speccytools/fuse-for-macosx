@@ -48,7 +48,7 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ @GETOPT_LIBS@\
 debugger/libdebugger.a \
-@UI_LIBS@ z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
+@UI_LIBS@ debugger/libdebugger.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\

@@ -36,6 +36,7 @@
 #include "debugger/debugger.h"
 #include "fuse.h"
 #include "gtkui.h"
+#include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
@@ -49,8 +50,10 @@ static void gtkui_debugger_done_continue( GtkWidget *widget,
 static void gtkui_debugger_break( GtkWidget *widget, gpointer user_data );
 static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 
-/* The debugger dialog box and the PC printout */
-static GtkWidget *dialog, *continue_button, *break_button, *registers[10];
+static GtkWidget *dialog,		/* The debugger dialog box */
+  *continue_button, *break_button,	/* Two of its buttons */
+  *registers[10],			/* The register display */
+  *disassembly;				/* The disassembly */
 
 /* Have we created the above yet? */
 static int dialog_created = 0;
@@ -79,7 +82,10 @@ static int
 create_dialog( void )
 {
   size_t i;
-  GtkWidget *step_button, *close_button, *table, *label;
+  GtkWidget *hbox;
+  GtkWidget *table, *label;
+  GtkWidget *scrolled_window;
+  GtkWidget *step_button, *close_button;
   GtkAccelGroup *accel_group;
 
   const char *register_name[] = { "PC", "SP",
@@ -89,11 +95,16 @@ create_dialog( void )
 				  "HL", "HL'",
                                 };
 
+  gchar *titles[] = { "Address", "Instruction" };
+
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
 
+  hbox = gtk_hbox_new( FALSE, 5 );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ), hbox );
+
   table = gtk_table_new( 5, 4, FALSE );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), table );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), table );
 
   for( i = 0; i < 10; i++ ) {
 
@@ -106,6 +117,20 @@ create_dialog( void )
 			       2*(i%2)+1, 2*(i%2)+2, i/2, i/2+1 );
 
   }
+
+  /* A scrolled window to pack the disassembly CList into */
+  scrolled_window = gtk_scrolled_window_new( NULL, NULL );
+  gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scrolled_window ),
+				  GTK_POLICY_AUTOMATIC,
+				  GTK_POLICY_AUTOMATIC );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), scrolled_window );
+
+  /* And the CList itself */
+  disassembly = gtk_clist_new_with_titles( 2, titles );
+  gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
+  gtk_container_add( GTK_CONTAINER( scrolled_window ), disassembly );
+
+  /* The action buttons for the dialog box */
 
   step_button = gtk_button_new_with_label( "Single Step" );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
@@ -154,6 +179,8 @@ activate_debugger( void )
 {
   size_t i;
   char buffer[80];
+  gchar *text[] = { &buffer[0], &buffer[40] };
+  WORD address;
 
   WORD *value_ptr[] = { &PC, &SP,
 			&AF, &AF_,
@@ -171,6 +198,18 @@ activate_debugger( void )
 
   }
 
+  /* Put some disassembly in */
+  for( i = 0, address = PC; i < 10; i++ ) {
+
+    size_t length;
+
+    snprintf( text[0], 40, "%04X", address );
+    debugger_disassemble( text[1], 40, &length, address );
+    address += length;
+
+    gtk_clist_append( GTK_CLIST( disassembly ), text );
+  }
+
   gtk_main();
   return 0;
 }
@@ -179,6 +218,7 @@ static int
 deactivate_debugger( void )
 {
   gtk_main_quit();
+  gtk_clist_clear( GTK_CLIST( disassembly ) );
   debugger_active = 0;
   fuse_emulation_unpause();
   return 0;

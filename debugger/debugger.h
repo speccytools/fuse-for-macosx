@@ -31,6 +31,10 @@
 
 #include <stdlib.h>
 
+#ifndef FUSE_TYPES_H
+#include "types.h"
+#endif
+
 /* The current state of the debugger */
 enum debugger_mode_t
 {
@@ -56,5 +60,10 @@ int debugger_check( void );	/* See if the debugger should become active */
 int debugger_trap( void );	/* Activate the debugger */
 
 int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
+
+/* Disassemble the instruction at 'address', returning its length in
+   '*length' */
+void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
+			   WORD address );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */
