@@ -434,6 +434,12 @@ menu_machine_debugger( int action )
 }
 
 void
+menu_machine_pokefinder( int action )
+{
+  widget_do( WIDGET_TYPE_POKEFINDER, NULL );
+}
+
+void
 menu_media_tape_browse( int action )
 {
   widget_do( WIDGET_TYPE_BROWSE, NULL );

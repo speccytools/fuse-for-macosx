@@ -1285,3 +1285,6 @@
 	 various pokefinder improvements (patch #1150701) (Darren).
 20050325 menu.[ch],menu_data.c,profile.c,ui.c,ui/ui.h,ui/gtk/gtkui.c,
 	 widget/widget.c: improve profiler UI.
+20050325 menu_data.c,widget/{Makefile.am,menu.c,pokefinder.c,widget.[ch],
+	 widget_internals.h}: add widget pokefinder (patch #1150703)
+	 (Darren).

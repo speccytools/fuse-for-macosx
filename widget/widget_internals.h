@@ -204,6 +204,11 @@ void widget_error_keyhandler( input_key key );
 int widget_debugger_draw( void *data );
 void widget_debugger_keyhandler( input_key key );
 
+/* The poke finder widget */
+
+int widget_pokefinder_draw( void *data );
+void widget_pokefinder_keyhandler( input_key key, long rawkey );
+
 /* The ROM selector widget */
 
 typedef struct widget_roms_info {

@@ -107,9 +107,9 @@ Machine/_Pause..., Item, Pause
 Machine/_Reset..., Item, F5
 Machine/_Select..., Item, F9
 Machine/_Debugger..., Item
+Machine/P_oke Finder..., Item
 
 #ifndef USE_WIDGET
-Machine/P_oke Finder..., Item
 Machine/_Memory Browser..., Item
 #endif
 
