@@ -43,6 +43,12 @@
 #include "sound.h"
 #include "ui/ui.h"
 
+/* Do we have any of our sound devices available? */
+
+#if defined(HAVE_SYS_SOUNDCARD_H) || defined(HAVE_SYS_AUDIOIO_H) || defined(UI_SDL) || defined(HAVE_DSOUND_H)
+#define HAVE_SOUND
+#endif
+
 /* configuration */
 int sound_enabled=0;		/* Are we currently using the sound card;
 				   cf fuse.c:fuse_sound_in_use */
@@ -154,7 +160,7 @@ static int first_init=1;
 int f,ret;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
-#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SYS_AUDIOIO_H) && !defined(UI_SDL) && !defined(HAVE_DSOUND_H)
+#ifndef HAVE_SOUND
 return;
 #endif
 
@@ -776,3 +782,25 @@ sound_oldpos[bchan]=newpos;
 sound_fillpos[bchan]=newpos+1;
 sound_oldval[bchan]=sound_oldval_orig[bchan]=val;
 }
+
+#ifndef HAVE_SOUND
+
+/* Dummy functions for when we don't have a sound device; should never be
+   called, so just abort if they are */
+int sound_lowlevel_init(const char *device,int *freqptr,int *stereoptr)
+{
+fuse_abort();
+return 0;
+}
+
+void sound_lowlevel_end( void )
+{
+fuse_abort();
+}
+
+void sound_lowlevel_frame(unsigned char *data,int len)
+{
+fuse_abort();
+}
+
+#endif

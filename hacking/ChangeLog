@@ -399,3 +399,5 @@
 	 to set write breakpoints by clicking on the appropriate 'possible'.
 20031228 ui/gtk/debugger.c, ui/gtk/pokefinder.c: update the debugger display
 	 after adding a breakpoint with the pokefinder.
+20031228 sound.c: add dummy functions for when we don't have a sound device
+	 (fixes bug #866403).
