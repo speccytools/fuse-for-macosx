@@ -70,6 +70,51 @@ MENU_CALLBACK( menu_file_open )
   fuse_emulation_unpause();
 }
 
+MENU_CALLBACK( menu_file_recording_insertsnapshot )
+{
+  libspectrum_snap *snap;
+  libspectrum_error error;
+
+  if( !rzx_recording ) return;
+
+  WIDGET_END;
+
+  libspectrum_rzx_stop_input( rzx );
+
+  error = libspectrum_snap_alloc( &snap );
+  if( error ) return;
+
+  error = snapshot_copy_to( snap );
+  if( error ) { libspectrum_snap_free( snap ); return; }
+
+  libspectrum_rzx_add_snap( rzx, snap );
+
+  libspectrum_rzx_start_input( rzx, tstates );
+}
+
+MENU_CALLBACK( menu_file_recording_rollback )
+{
+  libspectrum_snap *snap;
+  libspectrum_error error;
+  
+  if( !rzx_recording ) return;
+
+  WIDGET_END;
+
+  fuse_emulation_pause();
+
+  error = libspectrum_rzx_rollback( rzx, &snap );
+  if( error ) { fuse_emulation_unpause(); return; }
+
+  error = snapshot_copy_from( snap );
+  if( error ) { fuse_emulation_unpause(); return; }
+
+  error = libspectrum_rzx_start_input( rzx, tstates );
+  if( error ) { fuse_emulation_unpause(); return; }
+
+  fuse_emulation_unpause();
+}
+
 MENU_CALLBACK( menu_file_recording_play )
 {
   char *recording;
@@ -101,28 +146,6 @@ MENU_CALLBACK( menu_file_recording_stop )
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback( 1 );
 }  
-
-MENU_CALLBACK( menu_file_recording_rzxbreak )
-{
-  libspectrum_snap *snap;
-  libspectrum_error error;
-
-  if( !rzx_recording ) return;
-
-  WIDGET_END;
-
-  libspectrum_rzx_stop_input( rzx );
-
-  error = libspectrum_snap_alloc( &snap );
-  if( error ) return;
-
-  error = snapshot_copy_to( snap );
-  if( error ) { libspectrum_snap_free( snap ); return; }
-
-  libspectrum_rzx_add_snap( rzx, snap );
-
-  libspectrum_rzx_start_input( rzx, tstates );
-}
 
 MENU_CALLBACK( menu_file_aylogging_stop )
 {

@@ -105,10 +105,13 @@ typedef enum input_key {
   INPUT_KEY_Down,
   INPUT_KEY_Left,
   INPUT_KEY_Right,
-  INPUT_KEY_Page_Up,
-  INPUT_KEY_Page_Down,
+
+  INPUT_KEY_Insert,
+  INPUT_KEY_Delete,
   INPUT_KEY_Home,
   INPUT_KEY_End,
+  INPUT_KEY_Page_Up,
+  INPUT_KEY_Page_Down,
 
   INPUT_KEY_Caps_Lock,
 

@@ -30,9 +30,10 @@ File/_Save Snapshot..., Item, F2
 File/_Recording, Branch
 File/Recording/_Record..., Item
 File/Recording/Record _from snapshot..., Item
+File/Recording/Insert Snapshot, Item, Insert
+File/Recording/Rollback, Item, Delete
 File/Recording/_Play..., Item
 File/Recording/_Stop, Item
-File/Recording/RZX Break..., Item
 
 File/A_Y Logging, Branch
 File/AY Logging/_Record..., Item

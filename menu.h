@@ -51,9 +51,10 @@
  */
 
 MENU_CALLBACK( menu_file_open );
+MENU_CALLBACK( menu_file_recording_insertsnapshot );
+MENU_CALLBACK( menu_file_recording_rollback );
 MENU_CALLBACK( menu_file_recording_play );
 MENU_CALLBACK( menu_file_recording_stop );
-MENU_CALLBACK( menu_file_recording_rzxbreak );
 MENU_CALLBACK( menu_file_aylogging_stop );
 MENU_CALLBACK( menu_file_openscrscreenshot );
 
