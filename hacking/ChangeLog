@@ -1151,3 +1151,4 @@
 	 no longer needed for the border. Various other bug fixes, leading
 	 to the Overscan demo now looking pretty much perfect :-)
 20041229 display.c: get Timex borders working properly again.
+20041230 configure.in: improved libao checking (Gergely Szasz).
