@@ -176,7 +176,6 @@ gtkui_debugger_break( GtkWidget *widget GCC_UNUSED,
   debugger_mode = DEBUGGER_MODE_HALTED;
   gtk_widget_set_sensitive( continue_button, 1 );
   gtk_widget_set_sensitive( break_button, 0 );
-  if( !debugger_active ) activate_debugger();
 }
 
 static void
