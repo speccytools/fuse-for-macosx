@@ -954,3 +954,5 @@
 20040623 man/fuse.1: Updates for Interface II and IDE command line options.
 20040626 spectrum.c: Now need to include "sound/lowlevel.h" to get
          ALWAYS_USE_TIMER defined for SDL
+20040627 sound/sdlsound.c: Fuse generates 16 bit sound in signed host byte
+         order.

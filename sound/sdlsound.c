@@ -66,7 +66,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     requested.format = AUDIO_U8;
     requested.callback = sdlwrite8;
   } else {
-    requested.format = AUDIO_U16;
+    requested.format = AUDIO_S16SYS;
     requested.callback = sdlwrite16;
   }
 
