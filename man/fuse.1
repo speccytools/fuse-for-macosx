@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "29th November, 2001" "Version 0.4.0" "Emulators"
+.TH fuse 1 "15th December, 2001" "Version 0.4.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -100,6 +100,27 @@ Early versions of the Spectrum used a different value for unused bits
 on the keyboard input ports, and a few games depended on the old value
 of these bits. Enabling this option switches to the old value, to let
 you run them.
+.RE
+.PP
+.I "Kempston joystick emulation"
+.RS
+There were several types of joystick interface for the Spectrum;
+enabling this option lets you use what was probably the most
+widely-supported one. When enabled, the joystick uses the keys
+.IR q ,
+.IR a ,
+.IR o ,
+.IR p ,
+and
+.IR Space .
+The use of
+.I Space
+as the fire button can cause problems with some games - since the keys
+still form part of the emulated Spectrum's keyboard, and
+.I Space
+was sometimes used as a second fire button when using the joystick -
+so it's probably best to only enable Kempston emulation when you
+really need it.
 .RE
 .PP
 .I "Use tape loading traps"
@@ -317,7 +338,7 @@ files are shown, whether Fuse would be able to load them or not.
 It doesn't emulate memory contention, so some `rainbow' and border
 effects don't look right.
 .PP
-No peripherals (except the tape player) are supported.
+Not many peripherals are supported.
 .PP
 The sound support is currently for OSS (e.g. Linux) only.
 .\"
@@ -344,4 +365,4 @@ replacement code, and did some work on the OSS-specific sound code and
 the original widget UI code.
 .PP
 Russell Marks wrote the sound emulation and OSS-specific sound code,
-and this man page.
+the joystick emulation, and this man page.
