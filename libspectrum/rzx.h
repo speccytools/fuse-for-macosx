@@ -62,7 +62,8 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
 		      const size_t length );
 
 libspectrum_error
-libspectrum_rzx_write( libspectrum_rzx *rzx,
-		       libspectrum_byte **buffer, size_t *length );
+libspectrum_rzx_write( libspectrum_rzx *rzx, libspectrum_byte **buffer,
+		       size_t *length, const char *program,
+		       libspectrum_word major, libspectrum_word minor );
 
 #endif			/* #ifndef LIBSPECTRUM_RZX_H */

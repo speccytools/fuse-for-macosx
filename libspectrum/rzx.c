@@ -44,6 +44,10 @@ static libspectrum_error
 rzx_write_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		  size_t *length );
 static libspectrum_error
+rzx_write_creator( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		   size_t *length, const char *program, libspectrum_word major,
+		   libspectrum_word minor );
+static libspectrum_error
 rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
 		 libspectrum_byte **ptr, size_t *length );
 static libspectrum_error
@@ -51,7 +55,7 @@ rzx_write_frames( libspectrum_rzx *rzx, libspectrum_byte **buffer,
 		  libspectrum_byte **ptr, size_t *length );
 
 /* The signature used to identify .rzx files */
-const libspectrum_byte *signature = "RZX2";
+const libspectrum_byte *signature = "RZX!";
 
 libspectrum_error
 libspectrum_rzx_frame( libspectrum_rzx *rzx, size_t instructions,
@@ -261,13 +265,17 @@ rzx_read_frames( libspectrum_rzx *rzx,
 }
 
 libspectrum_error
-libspectrum_rzx_write( libspectrum_rzx *rzx,
-		       libspectrum_byte **buffer, size_t *length )
+libspectrum_rzx_write( libspectrum_rzx *rzx, libspectrum_byte **buffer,
+		       size_t *length, const char *program,
+		       libspectrum_word major, libspectrum_word minor )
 {
   libspectrum_error error;
   libspectrum_byte *ptr = *buffer;
 
   error = rzx_write_header( buffer, &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  error = rzx_write_creator( buffer, &ptr, length, program, major, minor );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   error = rzx_write_input( rzx, buffer, &ptr, length );
@@ -302,6 +310,31 @@ rzx_write_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   /* 'Reserved' flags */
   *(*ptr)++ = '\0'; *(*ptr)++ = '\0'; *(*ptr)++ = '\0'; *(*ptr)++ = '\0';
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+rzx_write_creator( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		   size_t *length, const char *program, libspectrum_word major,
+		   libspectrum_word minor )
+{
+  libspectrum_error error;
+
+  error = libspectrum_make_room( buffer, 29, ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    libspectrum_print_error( "rzx_write_creator: out of memory\n" );
+    return error;
+  }
+
+  *(*ptr)++ = 0x10;			/* Block identifier */
+  libspectrum_write_dword( ptr, 29 );	/* Block length */
+
+  strncpy( *ptr, program, 19 ); (*ptr) += 19;
+  *(*ptr)++ = '\0';
+
+  libspectrum_write_word( ptr, major );
+  libspectrum_write_word( ptr, minor );
 
   return LIBSPECTRUM_ERROR_NONE;
 }

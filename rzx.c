@@ -73,16 +73,31 @@ size_t rzx_current_frame;
 /* The current RZX data */
 libspectrum_rzx rzx;
 
+/* The information to be used as the creator in the RZX file */
+static const char *rzx_creator = "Fuse";
+static libspectrum_word rzx_major_version, rzx_minor_version;
+
 static int recording_frame( void );
 static int playback_frame( void );
 static int counter_reset( void );
 
 int rzx_init( void )
 {
+  unsigned version[4] = { 0, 0, 0, 0 };
+  int i;
+
   rzx_recording = rzx_playback = 0;
 
   rzx_in_bytes = NULL;
   rzx_in_allocated = 0;
+
+  sscanf( VERSION, "%u.%u.%u.%u",
+	  &version[0], &version[1], &version[2], &version[3] );
+
+  for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
+
+  rzx_major_version = version[0] * 0x100 + version[1];
+  rzx_minor_version = version[2] * 0x100 + version[3];
 
   return 0;
 }
@@ -117,7 +132,9 @@ int rzx_stop_recording( void )
   rzx_recording = 0;
 
   length = 0;
-  libspec_error = libspectrum_rzx_write( &rzx, &buffer, &length );
+  libspec_error = libspectrum_rzx_write( &rzx, &buffer, &length,
+					 rzx_creator, rzx_major_version,
+					 rzx_minor_version );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     ui_error( UI_ERROR_ERROR, "error during libspectrum_rzx_write: %s",
 	      libspectrum_error_message( libspec_error ) );
