@@ -49,6 +49,15 @@
    (instruction count) = R + rzx_instructions_offset */
 size_t rzx_instructions_offset;
 
+/* The number of bytes read via IN during the current frame */
+size_t rzx_in_count;
+
+/* And the values of those bytes */
+libspectrum_byte *rzx_in_bytes;
+
+/* How big is the above array? */
+size_t rzx_in_allocated;
+
 /* Are we currently recording a .rzx file? */
 int rzx_recording;
 
@@ -72,25 +81,18 @@ int rzx_init( void )
 {
   rzx_recording = rzx_playback = 0;
 
+  rzx_in_bytes = NULL;
+  rzx_in_allocated = 0;
+
   return 0;
 }
 
 int rzx_start_recording( const char *filename )
 {
-  libspectrum_error error;
-
-  size_t i; libspectrum_byte keyboard[8];
-
   if( rzx_playback ) return 1;
 
   /* Note that we're recording */
   rzx_recording = 1;
-
-  for( i=0; i<8; i++ )
-    keyboard[i] = keyboard_default_value & keyboard_return_values[i];
-
-  error = libspectrum_rzx_frame( &rzx, 0, keyboard );
-  if( error ) return error;
 
   /* Start the count of instruction fetches here */
   counter_reset();
@@ -207,13 +209,8 @@ static int recording_frame( void )
 {
   libspectrum_error error;
 
-  size_t i; libspectrum_byte keyboard[8];
-
-  for( i=0; i<8; i++ )
-    keyboard[i] = keyboard_default_value & keyboard_return_values[i];
-
   error = libspectrum_rzx_frame( &rzx, R + rzx_instructions_offset,
-				 keyboard );
+				 rzx_in_count, rzx_in_bytes );
   if( error ) return error;
 
   /* Reset the instruction counter */
@@ -224,6 +221,15 @@ static int recording_frame( void )
 
 static int playback_frame( void )
 {
+  /* Check we read the correct number of INs during this frame */
+  if( rzx_in_count != rzx.frames[ rzx_current_frame ].count ) {
+    ui_error( UI_ERROR_ERROR,
+	      "Not enough INs during frame %d: expected %d, got %d",
+	      rzx_current_frame, rzx.frames[ rzx_current_frame ].count,
+	      rzx_in_count );
+    return rzx_end();
+  }
+
   /* Increment the frame count and see if we've finished with this file */
   if( ++rzx_current_frame >= rzx.count ) {
     ui_error( UI_ERROR_INFO, "Finished RZX playback" );
@@ -236,12 +242,42 @@ static int playback_frame( void )
   return 0;
 }
 
-/* Reset the RZX instruction counter; also, take this opportunity to
-   normalise the R register */
+/* Reset the RZX counters; also, take this opportunity to normalise the
+   R register */
 static int counter_reset( void )
 {
   R &= ~0x7f;		/* Clear all but the 7 lowest bits of the R register */
   rzx_instructions_offset = -R; /* Gives us a zero count */
+
+  rzx_in_count = 0;
+
+  return 0;
+}
+
+int rzx_store_byte( libspectrum_byte value )
+{
+  /* Get more space if we need it; allocate twice as much as we currently
+     have, with a minimum of 50 */
+  if( rzx_in_count == rzx_in_allocated ) {
+
+    libspectrum_byte *ptr; size_t new_allocated;
+
+    new_allocated = rzx_in_allocated >= 25 ? 2 * rzx_in_allocated : 50;
+    ptr =
+      (libspectrum_byte*)realloc(
+        rzx_in_bytes, new_allocated * sizeof(libspectrum_byte)
+      );
+    if( ptr == NULL ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory in rzx_store_byte\n" );
+      return 1;
+    }
+
+    rzx_in_bytes = ptr;
+    rzx_in_allocated = new_allocated;
+  }
+
+  rzx_in_bytes[ rzx_in_count++ ] = value;
+
   return 0;
 }
 

@@ -43,6 +43,7 @@
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
+#include "ui/ui.h"
 #include "z80/z80.h"
 
 BYTE **ROM;
@@ -95,15 +96,34 @@ BYTE readport(WORD port)
   BYTE return_value = 0xff;
   int attached = 0;		/* Is this port attached to anything? */
 
+  /* If we're doing RZX playback, get a byte from the RZX file */
+  if( rzx_playback ) {
+
+    /* Check we're not trying to read off the end of the array */
+    if( rzx_in_count >= rzx.frames[ rzx_current_frame ].count ) {
+      ui_error( UI_ERROR_ERROR,
+		"More INs during frame %d than stored in RZX file (%d)",
+		rzx_current_frame, rzx.frames[ rzx_current_frame ].count );
+      rzx_end();
+      /* And get the byte normally */
+      return readport( port );
+    }
+
+    /* Otherwise, just return the next RZX byte */
+    return rzx.frames[ rzx_current_frame ].in_bytes[ rzx_in_count++ ];
+  }
+
+  /* If we're not doing RZX playback, get the byte normally */
   for( ptr = machine_current->peripherals; ptr->mask; ptr++ ) {
     if( ( port & ptr->mask ) == ptr->data ) {
       return_value &= ptr->read(port); attached = 1;
     }
   }
 
-  if( !attached ) {
-    return machine_current->unattached_port();
-  }
+  if( !attached ) return_value = machine_current->unattached_port();
+
+  /* If we're RZX recording, store this byte */
+  if( rzx_recording ) rzx_store_byte( return_value );
 
   return return_value;
 
@@ -172,14 +192,17 @@ BYTE spectrum_unattached_port( int offset )
 {
   int line, tstates_through_line, column;
 
+  /* Return 0xff (idle bus) if we're in the top border */
+  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+    return 0xff;
+
   /* Work out which line we're on, relative to the top of the screen */
   line = ( (SDWORD)tstates -
 	   (SDWORD)machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] ) /
     machine_current->timings.cycles_per_line;
 
-  /* Return 0xff (idle bus) if we're in the lower or upper borders */
-  if( line < 0 || line >= DISPLAY_HEIGHT )
-    return 0xff;
+  /* Idle bus if we're in the lower or upper borders */
+  if( line >= DISPLAY_HEIGHT ) return 0xff;
 
   /* Work out where we are in this line */
   tstates_through_line = tstates -
@@ -205,6 +228,8 @@ BYTE spectrum_unattached_port( int offset )
        in each 8 T-state block, 16 pixels are displayed; when each of
        these is read is also unknown. Thanks to Ian Greenway for this
        information */
+
+    /* FIXME: Arkanoid doesn't work properly with the below */
 
     /* Attribute bytes */
     case 1: column++;

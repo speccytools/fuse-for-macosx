@@ -27,7 +27,6 @@
 #include <config.h>
 
 #include "keyboard.h"
-#include "rzx.h"
 #include "types.h"
 #include "scld.h"
 
@@ -113,22 +112,8 @@ BYTE keyboard_read(BYTE porth)
 
   if ( scld_intdisable ) return data;
 
-  /* If we're playing back a .rzx file, start with all bits one. If we're
-     not, start with bit 6 possibly unset */
-  data = rzx_playback ? 0xff : keyboard_default_value;
-
   for( i=0; i<8; i++,porth>>=1 ) {
-    if(! (porth&0x01) ) {
-
-      /* If we're playing back a .rzx file, use the data from that;
-	 otherwise return what keys are actually pressed */
-      if( rzx_playback ) {
-	data &= rzx.frames[ rzx_current_frame ].keyboard[i];
-      } else {
-	data &= keyboard_return_values[i];
-      }
-
-    }
+    if(! (porth&0x01) ) data &= keyboard_return_values[i];
   }
 
   return data;

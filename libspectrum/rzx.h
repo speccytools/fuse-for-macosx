@@ -34,7 +34,9 @@
 typedef struct libspectrum_rzx_frame_t {
 
   size_t instructions;
-  libspectrum_byte keyboard[8];
+
+  size_t count;
+  libspectrum_byte* in_bytes;
 
 } libspectrum_rzx_frame_t;
 
@@ -48,7 +50,8 @@ typedef struct libspectrum_rzx {
 
 libspectrum_error libspectrum_rzx_frame( libspectrum_rzx *rzx,
 					 size_t instructions, 
-					 libspectrum_byte *keyboard );
+					 size_t count,
+					 libspectrum_byte *in_bytes );
 
 libspectrum_error libspectrum_rzx_free( libspectrum_rzx *rzx );
 

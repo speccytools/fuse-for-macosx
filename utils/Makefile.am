@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2001 Philip Kendall
+## Copyright (c) 1999-2002 Philip Kendall
 
 ## $Id$
 
@@ -24,9 +24,11 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-bin_PROGRAMS = tzxlist
-
-tzxlist_SOURCES = tzxlist.c
+bin_PROGRAMS = rzx2dump tzxlist
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ ../libspectrum/libspectrum.a ../myglib/libmyglib.a
+
+rzx2dump_SOURCES = rzx2dump.c
+
+tzxlist_SOURCES = tzxlist.c
+tzxlist_LDADD = @GLIB_LIBS@ @GTK_LIBS@ ../libspectrum/libspectrum.a ../myglib/libmyglib.a

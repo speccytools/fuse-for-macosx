@@ -34,6 +34,15 @@
 /* The offset used to get the count of instructions from the R register */
 extern size_t rzx_instructions_offset;
 
+/* The number of bytes read via IN during the current frame */
+extern size_t rzx_in_count;
+
+/* And the values of those bytes */
+extern libspectrum_byte *rzx_in_bytes;
+
+/* How big is the above array? */
+extern size_t rzx_in_allocated;
+
 /* Are we currently recording a .rzx file? */
 extern int rzx_recording;
 
@@ -55,6 +64,8 @@ int rzx_start_playback( const char *filename );
 int rzx_stop_playback( void );
 
 int rzx_frame( void );
+
+int rzx_store_byte( libspectrum_byte value );
 
 int rzx_end( void );
 
