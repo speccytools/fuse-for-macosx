@@ -38,6 +38,10 @@
 #include "ui/ui.h"
 
 static int create_dialog( void );
+static void gtkui_pokefinder_incremented( GtkWidget *widget,
+					  gpointer user_data GCC_UNUSED );
+static void gtkui_pokefinder_decremented( GtkWidget *widget,
+					  gpointer user_data GCC_UNUSED );
 static void gtkui_pokefinder_search( GtkWidget *widget, gpointer user_data );
 static void gtkui_pokefinder_reset( GtkWidget *widget, gpointer user_data );
 static void gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data );
@@ -116,6 +120,18 @@ create_dialog( void )
   gtk_signal_connect( GTK_OBJECT( location_list ), "select-row",
 		      GTK_SIGNAL_FUNC( possible_click ), NULL );
 
+  button = gtk_button_new_with_label( "Incremented" );
+  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
+		      GTK_SIGNAL_FUNC( gtkui_pokefinder_incremented ), NULL );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+		     button );
+
+  button = gtk_button_new_with_label( "Decremented" );
+  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
+		      GTK_SIGNAL_FUNC( gtkui_pokefinder_decremented ), NULL );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+		     button );
+
   button = gtk_button_new_with_label( "Search" );
   gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
 		      GTK_SIGNAL_FUNC( gtkui_pokefinder_search ),
@@ -149,6 +165,22 @@ create_dialog( void )
   dialog_created = 1;
 
   return 0;
+}
+
+static void
+gtkui_pokefinder_incremented( GtkWidget *widget,
+			      gpointer user_data GCC_UNUSED )
+{
+  pokefinder_incremented();
+  update_pokefinder();
+}
+
+static void
+gtkui_pokefinder_decremented( GtkWidget *widget,
+			      gpointer user_data GCC_UNUSED )
+{
+  pokefinder_decremented();
+  update_pokefinder();
 }
 
 static void
@@ -197,7 +229,7 @@ update_pokefinder( void )
 
     for( page = 0; page < 8; page++ )
       for( offset = 0; offset < 0x4000; offset++ )
-	if( pokefinder_possible[page][offset] ) {
+	if( pokefinder_possible[page][offset] != -1 ) {
 
 	  possible_page[ which ] = page;
 	  possible_offset[ which ] = offset;

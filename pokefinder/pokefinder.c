@@ -1,5 +1,5 @@
 /* pokefinder.c: help with finding pokes
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2004 Philip Kendall
 
    $Id$
 
@@ -32,16 +32,17 @@
 
 #include "spectrum.h"
 
-libspectrum_byte pokefinder_possible[8][0x4000];
+int pokefinder_possible[8][0x4000];
 size_t pokefinder_count;
 
 int
 pokefinder_clear( void )
 {
-  size_t page;
+  size_t page, offset;
 
   for( page = 0; page < 8; page++ )
-    memset( pokefinder_possible[page], 1, 0x4000 );
+    for( offset = 0; offset < 0x4000; offset++ ) 
+      pokefinder_possible[page][offset] = RAM[page][offset];
 
   pokefinder_count = 8 * 0x4000;
 
@@ -54,11 +55,61 @@ pokefinder_search( libspectrum_byte value )
   size_t page, offset;
 
   for( page = 0; page < 8; page++ )
-    for( offset = 0; offset < 0x4000; offset++ )
-      if( pokefinder_possible[page][offset] && RAM[page][offset] != value ) {
-	pokefinder_possible[page][offset] = 0;
+    for( offset = 0; offset < 0x4000; offset++ ) {
+
+      if( pokefinder_possible[page][offset] == -1 ) continue;
+
+      if( RAM[page][offset] != value ) {
+	pokefinder_possible[page][offset] = -1;
 	pokefinder_count--;
       }
+    }
+
+  return 0;
+}
+
+int
+pokefinder_incremented( void )
+{
+  size_t page, offset;
+
+  for( page = 0; page < 8; page++ ) {
+    for( offset = 0; offset < 0x4000; offset++ ) {
+
+      if( pokefinder_possible[page][offset] == -1 ) continue;
+
+      if( RAM[page][offset] > pokefinder_possible[page][offset] ) {
+	pokefinder_possible[page][offset] = RAM[page][offset];
+      } else {
+	pokefinder_possible[page][offset] = -1;
+	pokefinder_count--;
+      }
+
+    }
+  }
+
+  return 0;
+}
+
+int
+pokefinder_decremented( void )
+{
+  size_t page, offset;
+
+  for( page = 0; page < 8; page++ ) {
+    for( offset = 0; offset < 0x4000; offset++ ) {
+
+      if( pokefinder_possible[page][offset] == -1 ) continue;
+
+      if( RAM[page][offset] < pokefinder_possible[page][offset] ) {
+	pokefinder_possible[page][offset] = RAM[page][offset];
+      } else {
+	pokefinder_possible[page][offset] = -1;
+	pokefinder_count--;
+      }
+
+    }
+  }
 
   return 0;
 }

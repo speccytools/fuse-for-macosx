@@ -1,5 +1,5 @@
 /* pokefinder.h: help with finding pokes
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2004 Philip Kendall
 
    $Id$
 
@@ -29,10 +29,12 @@
 
 #include <libspectrum.h>
 
-extern libspectrum_byte pokefinder_possible[8][0x4000];
+extern int pokefinder_possible[8][0x4000];
 extern size_t pokefinder_count;
 
 int pokefinder_clear( void );
 int pokefinder_search( libspectrum_byte value );
+int pokefinder_incremented( void );
+int pokefinder_decremented( void );
 
 #endif				/* #ifndef FUSE_POKEFINDER_H */
