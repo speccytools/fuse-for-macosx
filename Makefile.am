@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = hacking lib man perl roms ui utils widget z80
+SUBDIRS = hacking lib man perl roms ui widget z80
 
 fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c machine.c osssound.c rzx.c settings.c\

@@ -252,4 +252,4 @@ fi
 AC_OUTPUT(Makefile hacking/Makefile lib/Makefile \
 man/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \
 ui/Makefile ui/aalib/Makefile ui/fb/Makefile ui/gtk/Makefile ui/svga/Makefile \
-ui/xlib/Makefile utils/Makefile widget/Makefile z80/Makefile)
+ui/xlib/Makefile widget/Makefile z80/Makefile)
