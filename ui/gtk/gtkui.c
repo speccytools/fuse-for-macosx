@@ -345,7 +345,7 @@ static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
 static void gtkui_rzx_stop( GtkWidget *widget, gpointer data )
 {
   if( rzx_recording ) rzx_stop_recording();
-  if( rzx_playback  ) rzx_stop_playback();
+  if( rzx_playback  ) rzx_stop_playback( 1 );
 }
 
 /* Called when File/Recording/Play selected */

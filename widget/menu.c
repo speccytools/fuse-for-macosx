@@ -162,7 +162,7 @@ static int widget_load_snapshot( void )
 int widget_menu_rzx_stop( void *data )
 {
   if( rzx_recording ) rzx_stop_recording();
-  if( rzx_playback  ) rzx_stop_playback();
+  if( rzx_playback  ) rzx_stop_playback( 1 );
 
   widget_end_all( WIDGET_FINISHED_OK );
   return 0;

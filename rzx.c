@@ -265,17 +265,21 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
   return 0;
 }
 
-int rzx_stop_playback( void )
+int rzx_stop_playback( int add_interrupt )
 {
   libspectrum_error libspec_error; int error;
 
   rzx_playback = 0;
 
   /* We've now finished with the RZX file, so add an interrupt event
-     back in */
-  error = event_add( machine_current->timings.cycles_per_frame,
-		     EVENT_TYPE_INTERRUPT );
-  if( error ) return error;
+     back in if we've been requested to do so; we don't if we just run
+     out of frames, as this occurs just before a normal interrupt will
+     do this for us */
+  if( add_interrupt ) {
+    error = event_add( machine_current->timings.cycles_per_frame,
+		       EVENT_TYPE_INTERRUPT );
+    if( error ) return error;
+  }
 
   libspec_error = libspectrum_rzx_free( &rzx );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
@@ -316,13 +320,13 @@ static int playback_frame( void )
 	      "Not enough INs during frame %d: expected %d, got %d",
 	      rzx_current_frame, rzx.frames[ rzx_current_frame ].count,
 	      rzx_in_count );
-    return rzx_end();
+    return rzx_stop_playback( 0 );
   }
 
   /* Increment the frame count and see if we've finished with this file */
   if( ++rzx_current_frame >= rzx.count ) {
     ui_error( UI_ERROR_INFO, "Finished RZX playback" );
-    return rzx_stop_playback();
+    return rzx_stop_playback( 0 );
   }
 
   /* If we've got more frame to do, just reset the count and continue */
@@ -373,6 +377,6 @@ int rzx_store_byte( libspectrum_byte value )
 int rzx_end( void )
 {
   if( rzx_recording ) return rzx_stop_recording();
-  if( rzx_playback  ) return rzx_stop_playback();
+  if( rzx_playback  ) return rzx_stop_playback( 0 );
   return 0;
 }

@@ -117,7 +117,7 @@ BYTE readport(WORD port)
       ui_error( UI_ERROR_ERROR,
 		"More INs during frame %d than stored in RZX file (%d)",
 		rzx_current_frame, rzx.frames[ rzx_current_frame ].count );
-      rzx_end();
+      rzx_stop_playback( 1 );
       /* And get the byte normally */
       return readport( port );
     }
