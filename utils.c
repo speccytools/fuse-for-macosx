@@ -311,7 +311,6 @@ get_next_path( path_context *ctx )
 
   ui_error( UI_ERROR_ERROR, "unknown path_context state %d", ctx->state );
   fuse_abort();
-  return 1;			/* Keep gcc happy */
 }
 
 int
@@ -409,11 +408,11 @@ utils_close_file( utils_file *file )
 	return 1;
       }
     }
+    break;
 #else				/* #ifdef HAVE_MMAP */
     ui_error( UI_ERROR_ERROR, "utils_close_file: file->mode == UTILS_FILE_OPEN_MMAP, but mmap not available?!" );
     fuse_abort();
 #endif
-    break;
 
   case UTILS_FILE_OPEN_MALLOC:
     free( file->buffer );

@@ -29,11 +29,17 @@
 
 /* Remove the gcc-specific incantations if we're not using gcc */
 #ifdef __GNUC__
+
 #define GCC_UNUSED __attribute__ ((unused))
 #define GCC_PRINTF( fmtstring, args ) __attribute__ ((format( printf, fmtstring, args )))
+#define GCC_NORETURN __attribute__ ((noreturn))
+
 #else				/* #ifdef __GNUC__ */
+
 #define GCC_UNUSED
 #define GCC_PRINTF( fmtstring, args )
+#define GCC_NORETURN
+
 #endif				/* #ifdef __GNUC__ */
 
 /* Certain brain damaged operating systems (DOS/Windows) treat text

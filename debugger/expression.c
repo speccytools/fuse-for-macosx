@@ -111,8 +111,6 @@ unaryop_precedence( int operation )
     ui_error( UI_ERROR_ERROR, "unknown unary operator %d", operation );
     fuse_abort();
   }
-
-  return 0;			/* Keep gcc happy */
 }
 
 static enum precedence_t
@@ -135,8 +133,6 @@ binaryop_precedence( int operation )
     ui_error( UI_ERROR_ERROR, "unknown binary operator %d", operation );
     fuse_abort();
   }
-
-  return 0;			/* Keep gcc happy */
 }
 
 debugger_expression*
@@ -263,8 +259,6 @@ debugger_expression_evaluate( debugger_expression *exp )
 
   ui_error( UI_ERROR_ERROR, "unknown expression type %d", exp->type );
   fuse_abort();
-
-  return 0;			/* Keep gcc happy */
 }
 
 static libspectrum_dword
@@ -280,8 +274,6 @@ evaluate_unaryop( struct unaryop_type *unary )
 
   ui_error( UI_ERROR_ERROR, "unknown unary operator %d", unary->operation );
   fuse_abort();
-
-  return 0;			/* Keep gcc happy */
 }
 
 static libspectrum_dword
@@ -338,8 +330,6 @@ evaluate_binaryop( struct binaryop_type *binary )
 
   ui_error( UI_ERROR_ERROR, "unknown binary operator %d", binary->operation );
   fuse_abort();
-
-  return 0;			/* Keep gcc happy */
 }
 
 int
@@ -370,8 +360,6 @@ debugger_expression_deparse( char *buffer, size_t length,
 
   ui_error( UI_ERROR_ERROR, "unknown expression type %d", exp->type );
   fuse_abort();
-
-  return 0;			/* Keep gcc happy */
 }
   
 static int
@@ -555,7 +543,5 @@ is_non_associative( int operation )
   /* Should never get here */
   ui_error( UI_ERROR_ERROR, "unknown binary operation %d", operation );
   fuse_abort();
-
-  return 0;			/* Keep gcc happy */
 }
 

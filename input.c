@@ -215,22 +215,22 @@ get_fire_button_key( int which, input_joystick_button button )
   case 0:
     switch( button ) {
     case INPUT_JOYSTICK_FIRE: return settings_current.joystick_1_fire_1;
-    default:
-      fuse_abort();
+    default: break;
     }
+    break;
 
   case 1:
     switch( button ) {
     case INPUT_JOYSTICK_FIRE: return settings_current.joystick_2_fire_1;
-    default:
-      fuse_abort();
+    default: break;
     }
+    break;
 
-  default:
-    fuse_abort();
   }
 
-  return 0;
+  ui_error( UI_ERROR_ERROR, "get_fire_button_key: which = %d, button = %d",
+	    which, button );
+  fuse_abort();
 }
 
 static int
@@ -251,8 +251,9 @@ do_joystick( const input_event_joystick_t *joystick_event, int press )
     case INPUT_JOYSTICK_RIGHT: button = JOYSTICK_BUTTON_RIGHT; break;
 
     default:
+      ui_error( UI_ERROR_ERROR, "do_joystick: unknown button %d",
+		joystick_event->button );
       fuse_abort();
-      return 0;			/* Keep gcc happy */
     }
 
     joystick_press( which, button, press );

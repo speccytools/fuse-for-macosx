@@ -28,12 +28,13 @@
 #define FUSE_FUSE_H
 
 #include <limits.h>
+
 #include <libspectrum.h>
+
+#include "compat.h"
 
 extern char *fuse_progname;		/* argv[0] */
 extern char fuse_directory[ PATH_MAX ];	/* The directory we started in */
-
-extern char* fuse_progname;		/* argv[0] */
 
 extern int fuse_exiting;		/* Shall we exit now? */
 
@@ -41,7 +42,7 @@ extern int fuse_emulation_paused;	/* Is Spectrum emulation paused? */
 int fuse_emulation_pause(void);		/* Stop and start emulation */
 int fuse_emulation_unpause(void);
 
-int fuse_abort( void );			/* Emergency shutdown */
+void fuse_abort( void ) GCC_NORETURN;	/* Emergency shutdown */
 
 extern int fuse_sound_in_use;		/* Are we trying to produce sound? */
 

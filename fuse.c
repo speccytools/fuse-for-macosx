@@ -683,7 +683,8 @@ static int fuse_end(void)
 }
 
 /* Emergency shutdown */
-int fuse_abort( void )
+void
+fuse_abort( void )
 {
   fuse_end();
   abort();

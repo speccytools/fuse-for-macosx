@@ -505,7 +505,6 @@ int trap_check_rom( void )
   ui_error( UI_ERROR_ERROR, "trap_check_rom: unknown machine type %d",
 	    machine_current->machine );
   fuse_abort();
-  return 0; /* Keep gcc happy */
 }
 
 int tape_play( void )
