@@ -280,7 +280,7 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
   size_t slt_length[256], offsets[256];
   size_t whence = 0;
 
-  size_t screen_length = 0, screen_offset;
+  size_t screen_length = 0, screen_offset = 0;
 
   int i, error;
 
