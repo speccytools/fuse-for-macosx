@@ -150,7 +150,12 @@ widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
 int widget_scaler_finish( widget_finish_state finished )
 {
-  if( finished == WIDGET_FINISHED_OK ) widget_end_all( WIDGET_FINISHED_OK );
+  if( finished == WIDGET_FINISHED_OK ) {
+    widget_end_all( WIDGET_FINISHED_OK );
+  } else {
+    widget_scaler = SCALER_NUM;
+  }
+
   return 0;
 }
 
