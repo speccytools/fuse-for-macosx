@@ -754,3 +754,5 @@
 20040415 menu.[ch]: add copyright and GPL notice.
 20040416 menu.[ch],ui/gtk/gtkui.c,widget/menu.c: generalise
 	 menu_media_disk_insert().
+20040416 keyboard.[ch],ui/gtk/gtkjoystick.c: add kludgey UI to allow
+	 the joystick fire button actions to be changed.

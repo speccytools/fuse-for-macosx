@@ -125,4 +125,6 @@ extern keysyms_map_t keysyms_map[];
 
 input_key keysyms_remap( libspectrum_dword ui_keysym );
 
+const char* keyboard_key_text( keyboard_key_name key );
+
 #endif			/* #ifndef FUSE_KEYBOARD_H */

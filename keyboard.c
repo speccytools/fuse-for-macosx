@@ -202,6 +202,68 @@ static struct key_info keyboard_data_table[] = {
 /* The hash used for storing keyboard_data_table */
 static GHashTable *keyboard_data;
 
+/* A textual name for each key */
+struct key_text_t {
+  keyboard_key_name key;
+  const char *text;
+};
+
+struct key_text_t key_text_table[] = {
+
+  { KEYBOARD_NONE, "Nothing" },
+
+  { KEYBOARD_space, "Space" },
+
+  { KEYBOARD_0, "0" },
+  { KEYBOARD_1, "1" },
+  { KEYBOARD_2, "2" },
+  { KEYBOARD_3, "3" },
+  { KEYBOARD_4, "4" },
+  { KEYBOARD_5, "5" },
+  { KEYBOARD_6, "6" },
+  { KEYBOARD_7, "7" },
+  { KEYBOARD_8, "8" },
+  { KEYBOARD_9, "9" },
+
+  { KEYBOARD_a, "A" },
+  { KEYBOARD_b, "B" },
+  { KEYBOARD_c, "C" },
+  { KEYBOARD_d, "D" },
+  { KEYBOARD_e, "E" },
+  { KEYBOARD_f, "F" },
+  { KEYBOARD_g, "G" },
+  { KEYBOARD_h, "H" },
+  { KEYBOARD_i, "I" },
+  { KEYBOARD_j, "J" },
+  { KEYBOARD_k, "K" },
+  { KEYBOARD_l, "L" },
+  { KEYBOARD_m, "M" },
+  { KEYBOARD_n, "N" },
+  { KEYBOARD_o, "O" },
+  { KEYBOARD_p, "P" },
+  { KEYBOARD_q, "Q" },
+  { KEYBOARD_r, "R" },
+  { KEYBOARD_s, "S" },
+  { KEYBOARD_t, "T" },
+  { KEYBOARD_u, "U" },
+  { KEYBOARD_v, "V" },
+  { KEYBOARD_w, "W" },
+  { KEYBOARD_x, "X" },
+  { KEYBOARD_y, "Y" },
+  { KEYBOARD_z, "Z" },
+
+  { KEYBOARD_Enter, "Enter" },
+  { KEYBOARD_Caps, "Caps Shift" },
+  { KEYBOARD_Symbol, "Symbol Shift" },
+
+  { KEYBOARD_JOYSTICK_FIRE, "Joystick Fire" },
+
+  { -1 },		/* End marker */
+
+};
+
+static GHashTable *key_text;
+
 /* Called `fuse_keyboard_init' as svgalib pollutes the global namespace
    with keyboard_init... */
 void fuse_keyboard_init(void)
@@ -209,6 +271,7 @@ void fuse_keyboard_init(void)
   struct key_info *ptr;
   struct spectrum_keys_wrapper *ptr2;
   keysyms_map_t *ptr3;
+  struct key_text_t *ptr4;
 
   keyboard_default_value=0xff;
   keyboard_release_all();
@@ -228,6 +291,11 @@ void fuse_keyboard_init(void)
 
   for( ptr3 = keysyms_map; ptr3->ui; ptr3++ )
     g_hash_table_insert( keysyms_hash, &( ptr3->ui ), &( ptr3->fuse ) );
+
+  key_text = g_hash_table_new( g_int_hash, g_int_equal );
+
+  for( ptr4 = key_text_table; ptr4->key != -1; ptr4++ )
+    g_hash_table_insert( key_text, &( ptr4->key ), &( ptr4->text ) );
 
 }
 
@@ -287,4 +355,14 @@ keysyms_remap( libspectrum_dword ui_keysym )
   ptr = g_hash_table_lookup( keysyms_hash, &ui_keysym );
 
   return ptr ? *ptr : INPUT_KEY_NONE;
+}
+
+const char*
+keyboard_key_text( keyboard_key_name key )
+{
+  const char **ptr;
+
+  ptr = g_hash_table_lookup( key_text, &key );
+
+  return ptr ? *ptr : "[Unknown key]";
 }
