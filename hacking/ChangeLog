@@ -665,3 +665,5 @@
 	 layer; also a couple of SDL compilation fixes.
 20040325 sound.c: use 16 bits when mixing sound samples (patch #911525)
 	 (Stuart Brady).
+20040325 event.c,ui/uijoystick.[ch]: make the libjsw code use the new
+	 input layer.

@@ -62,6 +62,7 @@
 
 static js_data_struct jsd[2];
 
+static void poll_joystick( int which );
 
 static int
 init_stick( int which, const char *const device,
@@ -173,33 +174,54 @@ ui_joystick_end( void )
   for( i = 0; i < joysticks_supported; i++ ) JSClose( &jsd[i] );
 }
 
-
-libspectrum_byte
-ui_joystick_read( libspectrum_word port, libspectrum_byte which )
+void
+ui_joystick_poll( void )
 {
-  libspectrum_byte ret = 0;
+  poll_joystick( 0 );
+  poll_joystick( 1 );
+}
 
-  JSUpdate( &jsd[which] );
+static void
+poll_joystick( int which )
+{
+  js_data_struct *joystick;
+  double position;
+  int fire;
 
-         if( jsd[which].axis[0]->cur >
-	     jsd[which].axis[0]->cen + jsd[which].axis[0]->nz ) {
-    ret = 1; /* right */
-  } else if( jsd[which].axis[0]->cur <
-	     jsd[which].axis[0]->cen - jsd[which].axis[0]->nz ) {
-    ret = 2; /* left */
+  joystick = &jsd[which];
+
+  if( JSUpdate( joystick ) != JSGotEvent ) return;
+
+  position = JSGetAxisCoeffNZ( joystick, 0 );
+
+  if( position == 0.0 ) {
+    joystick_press( which, JOYSTICK_BUTTON_LEFT , 0 );
+    joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
+  } else if( position > 0.0 ) {
+    joystick_press( which, JOYSTICK_BUTTON_LEFT , 0 );
+    joystick_press( which, JOYSTICK_BUTTON_RIGHT, 1 );
+  } else {
+    joystick_press( which, JOYSTICK_BUTTON_LEFT , 1 );
+    joystick_press( which, JOYSTICK_BUTTON_RIGHT, 0 );
   }
 
-       if( jsd[which].axis[1]->cur >
-	   jsd[which].axis[1]->cen + jsd[which].axis[1]->nz ) {
-    ret |= 4; /* down */
-  } else if( jsd[which].axis[1]->cur <
-	   jsd[which].axis[1]->cen - jsd[which].axis[1]->nz ) {
-    ret |= 8; /* up */
+  position = JSGetAxisCoeffNZ( joystick, 1 );
+
+  if( position == 0.0 ) {
+    joystick_press( which, JOYSTICK_BUTTON_UP  , 0 );
+    joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
+  } else if( position > 0.0 ) {
+    joystick_press( which, JOYSTICK_BUTTON_UP  , 0 );
+    joystick_press( which, JOYSTICK_BUTTON_DOWN, 1 );
+  } else {
+    joystick_press( which, JOYSTICK_BUTTON_UP  , 1 );
+    joystick_press( which, JOYSTICK_BUTTON_DOWN, 0 );
   }
 
-  if( jsd[which].button[0]->state == JSButtonStateOn ) ret |= 16; /* fire */
+  fire = JSGetButtonState( joystick, 0 );
 
-  return ret;
+  joystick_press( which, JOYSTICK_BUTTON_FIRE, fire == JSButtonStateOn );
+
 }
 
 #else			/* #if defined USE_JOYSTICK && defined HAVE_JSW_H */

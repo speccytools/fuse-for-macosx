@@ -41,6 +41,7 @@
 #include "tape.h"
 #include "trdos.h"
 #include "ui/ui.h"
+#include "ui/uijoystick.h"
 #include "spectrum.h"
 #include "timer.h"
 #include "z80/z80.h"
@@ -133,6 +134,7 @@ int event_do_events(void)
       psg_frame();
       spectrum_frame();
       z80_interrupt();
+      ui_joystick_poll();
       timer_estimate_speed();
       debugger_add_time_events();
       ui_event();

@@ -72,8 +72,7 @@ typedef union
 int ui_joystick_init( void ); /* returns no. of joysticks initialised */
 void ui_joystick_end( void );
 
-/* Read function (returns data in Kempston format) */
-libspectrum_byte ui_joystick_read( libspectrum_word port,
-				   libspectrum_byte which );
+/* Poll the joysticks for any changes */
+void ui_joystick_poll( void );
 
 #endif			/* #ifndef FUSE_UI_UIJOYSTICK_H */
