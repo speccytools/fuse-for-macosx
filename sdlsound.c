@@ -32,9 +32,6 @@
 /* using (7) 32 byte frags for 8kHz, scale up for higher */
 #define BASE_SOUND_FRAG_PWR	7
 
-static int sixteenbit = 0;
-static int soundmsb = 0;
-
 static void sdlwrite( void *userdata, Uint8 *stream, int len );
 
 /* ring buffer for SDL audio thread, make larger than standard buffer to *
@@ -72,6 +69,8 @@ sdlsound_init( const char *device, int *freqptr, int *stereoptr )
   requested.samples = 1 << frag;
 
   if ( SDL_OpenAudio( &requested, NULL ) < 0 ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't open sound device:%s",
+              SDL_GetError() );
     return 1;
   }
 
@@ -93,29 +92,7 @@ sdlsound_end( void )
 void
 sdlsound_frame( unsigned char *data, int len )
 {
-  unsigned char buf16[len<<1];
   int i;
-
-  if( sixteenbit )
-  {
-    unsigned char *src, *dst;
-    int f;
-
-    src=data; dst=buf16;
-    for( f=0; f<len; f++)
-    {
-      if( soundmsb == 1 ) {
-        *dst++ = *src++ - 128;
-        *dst++ = 128;
-      } else {
-        *dst++ = 128;
-        *dst++ = *src++ - 128;
-      }
-    }
-
-    data=buf16;
-    len<<=1;
-  }
 
   SDL_LockAudio();
 
