@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2002 Philip Kendall
 
 ## $Id$
 
@@ -25,6 +25,8 @@
 AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuisvga.a
+
+INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuisvga_a_SOURCES = error.c svgadisplay.c svgakeyboard.c svgaui.c keysyms.c
 
