@@ -29,8 +29,6 @@ noinst_LIBRARIES = libspectrum.a
 libspectrum_a_SOURCES = libspectrum.c rzx.c sna.c tap.c tape.c\
 tzx_read.c tzx_write.c z80.c
 
-noinst_HEADERS = libspectrum.h tape.h
+noinst_HEADERS = libspectrum.h rzx.h tape.h
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
-
-
