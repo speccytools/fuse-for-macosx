@@ -30,22 +30,37 @@
 
 #include "widget.h"
 
+/* FIXME: there must be a better way of initialising all the menu data */
+
+/* Main menu */
+
+static widget_menu_widget_t main_file =    { WIDGET_TYPE_FILE,    NULL };
+static widget_menu_widget_t main_options = { WIDGET_TYPE_MENU,
+					     &widget_menu_options };
+static widget_menu_widget_t main_machine = { WIDGET_TYPE_MACHINE, NULL };
+static widget_menu_widget_t main_tape =    { WIDGET_TYPE_TAPE,    NULL };
+static widget_menu_widget_t main_help =    { WIDGET_TYPE_HELP,    NULL };
+
 widget_menu_entry widget_menu_main[] = {
   { "Main menu", 0, 0, NULL },		/* Menu title */
 
-  { "(F)ile",    KEYBOARD_f, WIDGET_TYPE_FILE,     NULL                 },
-  { "(O)ptions", KEYBOARD_o, WIDGET_TYPE_MENU,     &widget_menu_options },
-  { "(M)achine", KEYBOARD_m, WIDGET_TYPE_MACHINE,  NULL                 },
-  { "(T)ape",	 KEYBOARD_t, WIDGET_TYPE_TAPE,     NULL                 },
-  { "(H)elp",    KEYBOARD_h, WIDGET_TYPE_HELP,     NULL                 },
+  { "(F)ile",    KEYBOARD_f, widget_menu_widget, &main_file    },
+  { "(O)ptions", KEYBOARD_o, widget_menu_widget, &main_options },
+  { "(M)achine", KEYBOARD_m, widget_menu_widget, &main_machine },
+  { "(T)ape",	 KEYBOARD_t, widget_menu_widget, &main_tape    },
+  { "(H)elp",    KEYBOARD_h, widget_menu_widget, &main_help    },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
 
+/* Options menu */
+
+static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
+
 widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
 
-  { "(G)eneral...", KEYBOARD_g, WIDGET_TYPE_GENERAL, NULL                  },
+  { "(G)eneral...", KEYBOARD_g, widget_menu_widget, &options_general },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

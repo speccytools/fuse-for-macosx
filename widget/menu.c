@@ -78,9 +78,17 @@ void widget_menu_keyhandler( int key )
 
   for( ptr=&menu[1]; ptr->text; ptr++ ) {
     if( key == ptr->key ) {
-      widget_do( ptr->widget, ptr->widget_args );
+      (ptr->action)( ptr->data );	/* function pointer call */
       break;
     }
   }
+}
+
+/* The callback used to call another widget */
+int widget_menu_widget( void *data )
+{
+  widget_menu_widget_t *ptr = (widget_menu_widget_t*)data;
+
+  return widget_do( ptr->widget, ptr->data );
 }
 

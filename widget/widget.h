@@ -59,12 +59,17 @@ typedef enum widget_finish_state {
   WIDGET_FINISHED_CANCEL,
 } widget_finish_state;
 
+/* A generic callback function */
+typedef int (*widget_menu_callback_fn)( void *data );
+
 /* A general menu */
 typedef struct widget_menu_entry {
   const char *text;		/* Menu entry text */
   keyboard_key_name key;	/* Which key to activate this widget */
-  widget_type widget;		/* Which widget to call */
-  void *widget_args;		/* And with which arguments */
+
+  widget_menu_callback_fn action; /* What to do */
+  void *data;			/* And with which arguments */
+
 } widget_menu_entry;
 
 /* A function to draw a widget */
@@ -170,6 +175,15 @@ void widget_help_keyhandler( int key );
 
 int widget_menu_draw( void* data );
 void widget_menu_keyhandler( int key );
+
+/* The callback function to call another widget */
+int widget_menu_widget( void *data );
+
+/* The data type passed to widget_menu_widget */
+typedef struct widget_menu_widget_t {
+  widget_type widget;	/* The widget to call */
+  void *data;		/* with this data parameter */
+} widget_menu_widget_t;
 
 /* Available menus */
 
