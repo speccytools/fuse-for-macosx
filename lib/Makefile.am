@@ -36,7 +36,8 @@ FILES = cassette.bmp \
 	tape_plus2.z80 \
 	tape_plus2a.z80 \
 	tape_plus3.z80 \
-	tape_pentagon.z80
+	tape_pentagon.z80 \
+	tape_scorpion.z80
 
 pkgdata_DATA = $(FILES)
 

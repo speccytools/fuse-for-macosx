@@ -615,3 +615,5 @@
 	 function determine whether it had a peripheral attached.
 20040303 scorpion.c: no need to zero memory in reset function (Stuart
 	 Brady).
+20040303 lib/tape_scorpion.z80: add Scorpion tape auto-load snapshot
+	 (Stuart Brady).
