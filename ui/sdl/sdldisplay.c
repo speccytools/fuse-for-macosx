@@ -63,7 +63,6 @@ static int sdldisplay_last_window_size = 1;
 
 static int sdldisplay_allocate_colours( int numColours, Uint32 *colour_values );
 static int sdldisplay_allocate_image( int width, int height );
-static void sdldisplay_area( int x, int y, int width, int height );
 
 int
 uidisplay_init( int width, int height )
@@ -136,7 +135,8 @@ uidisplay_toggle_fullscreen( void )
 
   fuse_emulation_pause();
 
-  colour = scld_hires ? display_hires_border : display_lores_border;
+  colour = scld_last_dec.name.hires ? display_hires_border :
+                                      display_lores_border;
 
   settings_current.full_screen = !settings_current.full_screen;
 
@@ -167,9 +167,6 @@ uidisplay_toggle_fullscreen( void )
   /* Redraw the entire screen... */
   display_refresh_all();
 
-  /* And the entire border */
-  display_refresh_border();
-
   /* If widgets are active, redraw the widget */
   if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
 
@@ -185,7 +182,8 @@ sdldisplay_resize_event( SDL_ResizeEvent *resize )
 
   fuse_emulation_pause();
 
-  colour = scld_hires ? display_hires_border : display_lores_border;
+  colour = scld_last_dec.name.hires ? display_hires_border :
+                                      display_lores_border;
   size = resize->w / DISPLAY_ASPECT_WIDTH;
 
   if( size < 1 ) {
@@ -210,9 +208,6 @@ sdldisplay_resize_event( SDL_ResizeEvent *resize )
 
   /* Redraw the entire screen... */
   display_refresh_all();
-
-  /* And the entire border */
-  display_refresh_border();
 
   /* If widgets are active, redraw the widget */
   if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
@@ -282,52 +277,6 @@ uidisplay_putpixel( int x, int y, int colour )
 }
 
 void
-uidisplay_lines( int start, int end )
-{
-  int row, col;
-  int x1 = DISPLAY_SCREEN_WIDTH - 1;
-  int x2 = 0;
-  
-/* Process lines from start to end in reference to the sdldisplay_dirty_table */
-  for( row = start; row <= end; row++) {
-  
-/* Find and record first change in this row */
-    for( col = 0; ( col < x1 ) && ( col < DISPLAY_SCREEN_WIDTH ); col++ ) {
-      if( sdldisplay_dirty_table[ row ][ col ] == 1 ) {
-        x1 = col;
-        break;
-      }
-    }
-    
-/* Find and record last change in this row */
-    for( col = DISPLAY_SCREEN_WIDTH - 1; ( col > x2 ) && ( col >= 0 ); col-- ) {
-      if( sdldisplay_dirty_table[ row ][ col ] == 1 ) {
-        x2 = col;
-        break;
-      }
-    }
-    
-    if ( ( x1 == 0 ) && ( x2 == DISPLAY_SCREEN_WIDTH - 1 ) ) break;
-  }
-
-  switch( sdldisplay_current_size ) {
-  case 1:
-    x1 >>= 1;
-    x2 >>= 1;
-    break;
-  case 2:
-    break;
-  }
-
-  memset( sdldisplay_dirty_table[start], 0, (end - start + 1) * DISPLAY_SCREEN_WIDTH );
-
-  sdldisplay_area( x1, sdldisplay_current_size * start,
-                   x2 - x1 + 1,
-                   sdldisplay_current_size * ( end - start + 1 ) );
-
-}
-
-void
 uidisplay_frame_end( void )
 {
   int i;
@@ -341,12 +290,12 @@ uidisplay_frame_end( void )
 }
 
 void
-sdldisplay_area( int x, int y, int width, int height )
+uidisplay_area( int x, int y, int width, int height )
 {
-  updated_rects[num_rects].x = x;
-  updated_rects[num_rects].y = y;
-  updated_rects[num_rects].w = width;
-  updated_rects[num_rects].h = height;
+  updated_rects[num_rects].x = sdldisplay_current_size * x;
+  updated_rects[num_rects].y = sdldisplay_current_size * y;
+  updated_rects[num_rects].w = sdldisplay_current_size * width;
+  updated_rects[num_rects].h = sdldisplay_current_size * height;
 
   num_rects++;
 }

@@ -1,5 +1,5 @@
 /* menu.c: general menu widget
-   Copyright (c) 2001,2002 Philip Kendall
+   Copyright (c) 2001-2003 Philip Kendall
 
    $Id$
 
@@ -41,6 +41,7 @@
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
+#include "ui/uidisplay.h"
 #include "utils.h"
 #include "widget_internals.h"
 
