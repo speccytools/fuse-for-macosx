@@ -206,3 +206,5 @@
 20030919 rzx.c: prevent RZX recording being stopped twice under widget UIs.
 20030919 rzx.c: make sure an RZX file is allocated when we try and do
 	 anything with it.
+20030919 rzx.c: count the 'expected time' in 1/50ths of a second, rather
+	 than repeated adds of 0.02; avoids rounding errors.

@@ -92,8 +92,9 @@ libspectrum_rzx_dsa_key rzx_key = {
 /* The time we started recording this RZX file */
 static struct timeval start_time;
 
-/* How many seconds do we expect to have elapsed since we started recording? */
-static float expected_time;
+/* How many 1/50ths of a second do we expect to have elapsed since we
+   started recording? */
+static int expected_time;
 
 /* By how much is the speed allowed to deviate from 100% whilst recording
    a competition mode RZX file */
@@ -367,12 +368,14 @@ static int recording_frame( void )
     struct timeval current_time;
     float elapsed_time;
 
-    expected_time += 0.02;
+    expected_time++;
 
     /* Small time measurements are highly inaccurate, so wait at least
        one second before doing them */
-    if( expected_time > 1.0 ) {
-    
+    if( expected_time > 50 ) {
+
+      float seconds;
+
       error = gettimeofday( &current_time, NULL );
       if( error ) {
 	ui_error(
@@ -384,16 +387,18 @@ static int recording_frame( void )
 	return 1;
       }
 
+      seconds = expected_time * 0.02;
+
       elapsed_time =   current_time.tv_sec  - start_time.tv_sec +
 	             ( current_time.tv_usec - start_time.tv_usec ) / 1000000.0;
-      if( fabs( expected_time / elapsed_time - 1 ) > SPEED_TOLERANCE ) {
+      if( fabs( seconds / elapsed_time - 1 ) > SPEED_TOLERANCE ) {
 
 	rzx_stop_recording();
 
 	ui_error(
 	  UI_ERROR_INFO,
 	  "emulator speed is %d%%: stopping competition mode RZX recording",
-	  (int)( 100 * ( expected_time / elapsed_time ) )
+	  (int)( 100 * ( seconds / elapsed_time ) )
 	);
 
       }
