@@ -87,12 +87,13 @@ static int image_height;
 
 static int timex;
 
+static void init_scalers( void );
 static int sdldisplay_allocate_colours( int numColours, Uint32 *colour_values );
 
 static int sdldisplay_load_gfx_mode( void );
 
-void
-uidisplay_init_scalers( void )
+static void
+init_scalers( void )
 {
   scaler_register_clear();
 
