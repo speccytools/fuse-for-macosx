@@ -29,16 +29,26 @@ bin_PROGRAMS = fuse
 SUBDIRS = debugger getopt hacking lib man perl roms ui widget z80
 
 fuse_SOURCES = ay.c display.c event.c\
-	fuse.c keyboard.c machine.c memory.c memory_internal.c \
+	fuse.c keyboard.c machine.c memory.c \
         osssound.c rzx.c settings.c\
 	snapshot.c sound.c spec128.c \
 	spec16.c spec48.c specplus2.c specplus2a.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c
 
-fuse_DEPENDENCIES = @UI_LIBS@ debugger/libdebugger.a z80/libz80.a
+fuse_LDADD = memory_internal.o @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ \
+@GETOPT_LIBS@ \
+debugger/libdebugger.a \
+@UI_LIBS@ debugger/libdebugger.a z80/libz80.a @DSKLIBS@ \
+@LIBSPEC_LIBS@
+
+fuse_DEPENDENCIES = memory_internal.o @UI_LIBS@ debugger/libdebugger.a \
+	            z80/libz80.a
 
 BUILT_SOURCES = settings.c settings.h
+
+memory_internal.o: memory.c
+	$(COMPILE) -DINTERNAL -c memory.c -o memory_internal.o
 
 settings.c: settings.pl settings.dat
 	@PERL@ settings.pl settings.dat > settings.c
@@ -48,9 +58,6 @@ settings.h: settings-header.pl settings.dat
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ @GETOPT_LIBS@\
-debugger/libdebugger.a \
-@UI_LIBS@ debugger/libdebugger.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
