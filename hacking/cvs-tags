@@ -89,10 +89,14 @@ $Id$
 | Release-0_6_0pre1
 | Release-0_6_0pre2
 | Release-0_6_0
-| Release-0_6_1pre1
 |
 +-\					Bugfix branch for 0.6.0
-| | Release-0_6_0_1
+| | Release-0_6_0_1			Merged to trunk at
+| |					Release-0_6_1pre1-merge-1
 | | Release-0_6_0-bugfix-branch
+|
+| Release-0_6_1pre1
+| Release-0_6_1pre1-merge-1		Merged from
+|					Release-0_6_0_1
 |
 HEAD
