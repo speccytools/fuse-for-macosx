@@ -1,0 +1,16 @@
+/.deps
+/Makefile
+/Makefile.in
+/aclocal.m4
+/config.cache
+/config.h
+/config.h.in
+/config.log
+/config.status
+/fuse
+/install-sh
+/keysyms.c
+/missing
+/mkinstalldirs
+/stamp-h
+/stamp-h.in
