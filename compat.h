@@ -43,4 +43,9 @@
 #define O_BINARY 0
 #endif				/* #ifndef O_BINARY */
 
+/* Replacement functions */
+#ifndef HAVE_MKSTEMP
+int mkstemp( char *template );
+#endif				/* #ifndef HAVE_MKSTEMP */
+
 #endif				/* #ifndef FUSE_COMPAT_H */
