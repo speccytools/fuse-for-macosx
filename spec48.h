@@ -1,5 +1,5 @@
 /* spec48.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -34,7 +34,7 @@
 BYTE spec48_readbyte(WORD address);
 BYTE spec48_read_screen_memory(WORD offset);
 void spec48_writebyte(WORD address, BYTE b);
-int spec48_init(void);
+int spec48_init( machine_info *machine );
 int spec48_reset(void);
 
 #endif			/* #ifndef FUSE_SPEC48_H */

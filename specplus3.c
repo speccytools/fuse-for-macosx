@@ -32,10 +32,11 @@
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"
+#include "machine.h"
 #include "spec128.h"
 #include "specplus3.h"
 #include "spectrum.h"
-#include "z80.h"
+#include "z80/z80.h"
 
 spectrum_port_info specplus3_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -50,9 +51,9 @@ BYTE specplus3_readbyte(WORD address)
 {
   int bank;
 
-  if(machine.ram.special) {
+  if(machine_current->ram.special) {
     bank=address/0x4000; address-=(bank*0x4000);
-    switch(machine.ram.specialcfg) {
+    switch(machine_current->ram.specialcfg) {
       case 0: return RAM[bank  ][address];
       case 1: return RAM[bank+4][address];
       case 2: switch(bank) {
@@ -69,16 +70,16 @@ BYTE specplus3_readbyte(WORD address)
       }
       default:
 	fprintf(stderr,"Unknown +3 special configuration %d\n",
-		machine.ram.specialcfg);
+		machine_current->ram.specialcfg);
 	abort();
     }
   } else {
-    if(address<0x4000) return ROM[machine.ram.current_rom][address];
+    if(address<0x4000) return ROM[machine_current->ram.current_rom][address];
     bank=address/0x4000; address-=(bank*0x4000);
     switch(bank) {
-      case 1: return RAM[                       5][address]; break;
-      case 2: return RAM[                       2][address]; break;
-      case 3: return RAM[machine.ram.current_page][address]; break;
+      case 1: return RAM[				 5][address]; break;
+      case 2: return RAM[				 2][address]; break;
+      case 3: return RAM[machine_current->ram.current_page][address]; break;
       default: abort();
     }
   }
@@ -86,16 +87,16 @@ BYTE specplus3_readbyte(WORD address)
 
 BYTE specplus3_read_screen_memory(WORD offset)
 {
-  return RAM[machine.ram.current_screen][offset];
+  return RAM[machine_current->ram.current_screen][offset];
 }
 
 void specplus3_writebyte(WORD address, BYTE b)
 {
   int bank;
 
-  if(machine.ram.special) {
+  if(machine_current->ram.special) {
     bank=address/0x4000; address-=(bank*0x4000);
-    switch(machine.ram.specialcfg) {
+    switch(machine_current->ram.specialcfg) {
       case 0: break;
       case 1: bank+=4; break;
       case 2:
@@ -118,50 +119,45 @@ void specplus3_writebyte(WORD address, BYTE b)
     if(address<0x4000) return;
     bank=address/0x4000; address-=(bank*0x4000);
     switch(bank) {
-      case 1: bank=5;                        break;
-      case 2: bank=2;                        break;
-      case 3: bank=machine.ram.current_page; break;
+      case 1: bank=5;				      break;
+      case 2: bank=2;				      break;
+      case 3: bank=machine_current->ram.current_page; break;
     }
   }
   RAM[bank][address]=b;
-  if(bank==machine.ram.current_screen && address < 0x1b00) {
+  if(bank==machine_current->ram.current_screen && address < 0x1b00) {
     display_dirty(address+0x4000,b); /* Replot necessary pixels */
   }
 }
 
-int specplus3_init(void)
+int specplus3_init( machine_info *machine )
 {
-  FILE *f;
+  int error;
 
-  f=fopen("plus3-0.rom","rb");
-  if(!f) return 1;
-  fread(ROM[0],0x4000,1,f);
+  machine->machine = SPECTRUM_MACHINE_PLUS3;
 
-  f=freopen("plus3-1.rom","rb",f);
-  if(!f) return 2;
-  fread(ROM[1],0x4000,1,f);
+  machine->reset = specplus3_reset;
 
-  f=freopen("plus3-2.rom","rb",f);
-  if(!f) return 3;
-  fread(ROM[2],0x4000,1,f);
+  machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865 );
 
-  f=freopen("plus3-3.rom","rb",f);
-  if(!f) return 4;
-  fread(ROM[3],0x4000,1,f);
+  machine->ram.read_memory = specplus3_readbyte;
+  machine->ram.read_screen = specplus3_read_screen_memory;
+  machine->ram.write_memory = specplus3_writebyte;
 
-  fclose(f);
+  error = machine_allocate_roms( machine, 4 );
+  if( error ) return error;
+  error = machine_read_rom( machine, 0, "plus3-0.rom" );
+  if( error ) return error;
+  error = machine_read_rom( machine, 1, "plus3-1.rom" );
+  if( error ) return error;
+  error = machine_read_rom( machine, 2, "plus3-2.rom" );
+  if( error ) return error;
+  error = machine_read_rom( machine, 3, "plus3-3.rom" );
+  if( error ) return error;
 
-  readbyte=specplus3_readbyte;
-  read_screen_memory=specplus3_read_screen_memory;
-  writebyte=specplus3_writebyte;
+  machine->peripherals=specplus3_peripherals;
 
-  tstates=0;
-
-  spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
-  machine.reset=specplus3_reset;
-
-  machine.peripherals=specplus3_peripherals;
-  machine.ay.present=1;
+  machine->ay.present=1;
 
   return 0;
 
@@ -169,14 +165,19 @@ int specplus3_init(void)
 
 int specplus3_reset(void)
 {
-  machine.ram.current_page=0; machine.ram.current_rom=0;
-  machine.ram.current_screen=5;
-  machine.ram.locked=0;
-  machine.ram.special=0; machine.ram.specialcfg=0;
+  machine_current->ram.current_page=0; machine_current->ram.current_rom=0;
+  machine_current->ram.current_screen=5;
+  machine_current->ram.locked=0;
+  machine_current->ram.special=0; machine_current->ram.specialcfg=0;
+
   event_reset();
-  if(event_add(machine.cycles_per_frame,EVENT_TYPE_INTERRUPT)) return 1;
-  if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
+  if( event_add( machine_current->timings.cycles_per_frame,
+		 EVENT_TYPE_INTERRUPT) ) return 1;
+  if( event_add( machine_current->line_times[0],
+		 EVENT_TYPE_LINE) ) return 1;
+
   z80_reset();
+
   return 0;
 }
 
@@ -184,22 +185,22 @@ void specplus3_memoryport_write(WORD port, BYTE b)
 {
 
   /* Do nothing if we've locked the RAM configuration */
-  if( machine.ram.locked ) return;
+  if( machine_current->ram.locked ) return;
 
   /* Store the last byte written in case we need it */
-  machine.ram.last_byte2=b;
+  machine_current->ram.last_byte2=b;
 
   if( b & 0x01) {	/* Check whether we want a special RAM configuration */
 
     /* If so, select it */
-    machine.ram.special=1;
-    machine.ram.specialcfg= ( b & 0x06 ) >> 1;
+    machine_current->ram.special=1;
+    machine_current->ram.specialcfg= ( b & 0x06 ) >> 1;
 
   } else {
 
     /* If not, we're selecting the high bit of the current ROM */
-    machine.ram.special=0;
-    machine.ram.current_rom=(machine.ram.current_rom & 0x01) |
+    machine_current->ram.special=0;
+    machine_current->ram.current_rom=(machine_current->ram.current_rom & 0x01) |
       ( (b & 0x04) >> 1 );
 
   }

@@ -44,5 +44,3 @@
 
 /* Defined if Xlib UI in use */
 #undef UI_X
-
-

@@ -1,5 +1,5 @@
 /* z80_ddfdcb.c: z80 DDCBxx and FDCBxx opcodes
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */

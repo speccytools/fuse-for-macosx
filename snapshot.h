@@ -25,8 +25,8 @@
 #ifndef FUSE_SNAPSHOT_H
 #define FUSE_SNAPSHOT_H
 
-int snapshot_read(void);
-int snapshot_write(void);
+int snapshot_read( char *filename );
+int snapshot_write( char *filename );
 
 #endif
 

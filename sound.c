@@ -51,6 +51,7 @@
 #include "osssound.h"
 #endif
 
+#include "machine.h"
 #include "sound.h"
 #include "spectrum.h"
 
@@ -248,11 +249,12 @@ int reg,r;
 int was_high;
 
 /* If no AY chip, don't produce any AY sound (!) */
-if(!machine.ay.present) return;
+if(!machine_current->ay.present) return;
 
 /* convert change times to sample offsets */
 for(f=0;f<ay_change_count;f++)
-  ay_change[f].ofs=(ay_change[f].tstates*sound_freq)/machine.hz;
+  ay_change[f].ofs=(ay_change[f].tstates*sound_freq)/
+                   machine_current->timings.hz;
 
 for(f=0,ptr=sound_buf;f<sound_framesiz;f++,ptr+=sound_channels)
   {
@@ -474,9 +476,9 @@ if(val==sound_oldval_orig) return;
 /* XXX a lookup table might help here, but would need to regenerate it
  * whenever cycles_per_frame were changed (i.e. when machine type changed).
  */
-newpos=(tstates*sound_framesiz)/machine.cycles_per_frame;
-subpos=(tstates*sound_framesiz*VOL_BEEPER)/machine.cycles_per_frame-
-  VOL_BEEPER*newpos;
+newpos=(tstates*sound_framesiz)/machine_current->timings.cycles_per_frame;
+subpos=(tstates*sound_framesiz*VOL_BEEPER)/
+        machine_current->timings.cycles_per_frame-VOL_BEEPER*newpos;
 
 /* if we already wrote here, adjust the level.
  */

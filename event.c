@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #ifdef HAVE_LIB_GLIB		/* If we're using glib */

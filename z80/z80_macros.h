@@ -1,5 +1,5 @@
 /* z80_macros.h: Some commonly used z80 things as macros
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -183,6 +183,16 @@
     ( value & ( FLAG_3 | FLAG_5 ) ) |\
     ( cptemp & FLAG_S );\
 }
+
+/* Macro for the {DD,FD} CB dd xx rotate/shift instructions */
+#define DDFDCB_ROTATESHIFT(time, target, instruction)\
+tstates+=(time);\
+{\
+  (target) = readbyte( tempaddr );\
+  instruction( (target) );\
+  writebyte( tempaddr, (target) );\
+}\
+break
 
 #define DEC(value)\
 {\

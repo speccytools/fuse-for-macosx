@@ -33,31 +33,30 @@
 
 /* The +2 emulation just uses the 128K routines */
 
-int specplus2_init(void)
+int specplus2_init( machine_info *machine )
 {
-  FILE *f;
+  int error;
 
-  f=fopen("plus2-0.rom","rb");
-  if(!f) return 1;
-  fread(ROM[0],0x4000,1,f);
+  machine->machine = SPECTRUM_MACHINE_128;
 
-  f=freopen("plus2-1.rom","rb",f);
-  if(!f) return 2;
-  fread(ROM[1],0x4000,1,f);
+  machine->reset = spec128_reset;
 
-  fclose(f);
+  machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865);
 
-  readbyte=spec128_readbyte;
-  read_screen_memory=spec128_read_screen_memory;
-  writebyte=spec128_writebyte;
+  machine->ram.read_memory = spec128_readbyte;
+  machine->ram.read_screen = spec128_read_screen_memory;
+  machine->ram.write_memory = spec128_writebyte;
 
-  tstates=0;
+  error = machine_allocate_roms( machine, 2 );
+  if( error ) return error;
+  error = machine_read_rom( machine, 0, "plus2-0.rom" );
+  if( error ) return error;
+  error = machine_read_rom( machine, 1, "plus2-1.rom" );
+  if( error ) return error;
 
-  spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
-  machine.reset=spec128_reset;
+  machine->peripherals = spec128_peripherals;
 
-  machine.peripherals=spec128_peripherals;
-  machine.ay.present=1;
+  machine->ay.present = 1;
 
   return 0;
 

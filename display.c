@@ -31,9 +31,14 @@
 
 #include "display.h"
 #include "event.h"
+#include "machine.h"
 #include "spectrum.h"
 #include "ui.h"
 #include "uidisplay.h"
+
+/* Testing: define this to send blocks to lines to the screen, rather than
+   a line at a time */
+#define BLOCKED_WRITES
 
 /* The current border colour */
 BYTE display_border;
@@ -67,6 +72,8 @@ static int display_flash_reversed;
 /* Which eight-pixel chunks on each line need to be redisplayed. Bit 0
    corresponds to pixels 0-7, bit 31 to pixels 248-255. */
 static DWORD display_is_dirty[DISPLAY_HEIGHT];
+/* This value signifies that the entire line must be redisplayed */
+const static DWORD display_all_dirty = 0xffffffffUL;
 
 /* Which border lines need to be redrawn */
 static int display_border_dirty[DISPLAY_SCREEN_HEIGHT];
@@ -79,6 +86,16 @@ const static int display_border_retrace=-1;
 
 /* Value used to signify a border line has more than one colour on it. */
 const static int display_border_mixed = 0xff;
+
+#ifdef BLOCKED_WRITES
+
+/* Where the current block of lines to send to the screen starts */
+static int display_blocked_write_start;
+
+/* Value to signify `no block to send to screen' */
+const static int display_blocked_write_none = -1;
+
+#endif			/* #ifdef BLOCKED_WRITES */
 
 static void display_draw_line(int y);
 static void display_dirty8(WORD address);
@@ -108,7 +125,10 @@ int display_init(int *argc, char ***argv)
 
   for(y=0;y<DISPLAY_HEIGHT;y++) {
     display_attr_start[y]=6144 + (32*(y/8));
-    display_is_dirty[y]=0xffffffff;
+    display_is_dirty[y]=display_all_dirty;
+
+    display_current_border[y]=display_border_mixed;
+    display_border_dirty[y]=1;
   }
 
   for(y=0;y<DISPLAY_HEIGHT;y++)
@@ -130,6 +150,10 @@ int display_init(int *argc, char ***argv)
     display_border_dirty[y]=1;
   }
 
+#ifdef BLOCKED_WRITES
+  display_blocked_write_start = display_blocked_write_none;
+#endif			/* #ifdef BLOCKED_WRITES */
+
   return 0;
 
 }
@@ -141,24 +165,41 @@ void display_line(void)
 {
   if( display_next_line < DISPLAY_SCREEN_HEIGHT ) {
     display_draw_line(display_next_line);
-    event_add(machine.line_times[display_next_line+1],EVENT_TYPE_LINE);
+    event_add( machine_current->line_times[display_next_line+1],
+	       EVENT_TYPE_LINE );
+  } 
+
+#ifdef BLOCKED_WRITES
+  /* If we're at the end of the frame, and we've got some data to
+     send to the screen, send it now */
+  else if( display_blocked_write_start != display_blocked_write_none ) {
+    uidisplay_lines( display_blocked_write_start, display_next_line-1 );
+    display_blocked_write_start = display_blocked_write_none;
   }
+#endif			/* #ifdef BLOCKED_WRITES */
+
   display_next_line++;
+
 }   
 
 /* Redraw pixel line y if it is flagged as `dirty' */
+
 static void display_draw_line(int y)
 {
 
-  int x, screen_y;
+  int x, screen_y, redraw;
   BYTE data, ink, paper;
+
+  redraw = 0;
   
-  /* If we're in the main screen, see what needs redrawing */
+  /* If we're in the main screen, see if anything redrawing; if so,
+     copy the data to the image buffer, and flag that we need to copy
+     this line to the screen */
   if( y >= DISPLAY_BORDER_HEIGHT &&
       y < DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
 
     screen_y = y - DISPLAY_BORDER_HEIGHT;
-
+      
     if( display_is_dirty[screen_y] ) {
 
       for( x=0;
@@ -175,12 +216,47 @@ static void display_draw_line(int y)
 
       }
 
-      uidisplay_line( y );
+      /* Need to redraw this line */
+      redraw = 1;
 
     }
 
   }
 
+  /* We need to redraw this line if the main screen or border has
+     been changed since we were last here... */
+  if( redraw || display_border_dirty[y] ) {
+
+#ifdef BLOCKED_WRITES
+    /* If we're doing blocked writes, and we haven't currently got a 
+       block, note this line as the start; if we have currently
+       got a block, just carry on until we find a line we don't
+       want to copy to the screen. */
+    if( display_blocked_write_start == display_blocked_write_none ) {
+      display_blocked_write_start = y;
+    }
+#else
+    /* If we're not doing blocked writes, copy this line to the
+       screen immediately */
+    uidisplay_line( y );
+#endif
+
+    display_border_dirty[y]=0;
+
+  }
+
+#ifdef BLOCKED_WRITES
+
+  /* This else matches `if( redraw || display_border_dirty[y] ) {' above */
+
+  /* If we're doing blocked writes and _don't_ need to redraw this line,
+     copy any block with exists to the screen */
+  else if( display_blocked_write_start != display_blocked_write_none ) {
+    uidisplay_lines( display_blocked_write_start, y-1 );
+    display_blocked_write_start = display_blocked_write_none;
+  }
+#endif
+  
   if(display_current_border[y] != display_border) {
 
     /* See if we're in the top/bottom border */
@@ -202,8 +278,6 @@ static void display_draw_line(int y)
     display_border_dirty[y]=1;	/* Need to redisplay this line next time */
 
   }
-
-
 
 }
 
@@ -290,12 +364,13 @@ void display_set_border(int colour)
   /* If the current line is already this colour, don't need to do anything */
   if(display_current_border[current_line] == colour) return;
 
-  time_since_line = tstates - machine.line_times[current_line];
+  time_since_line = tstates - machine_current->line_times[current_line];
 
   /* Now check we're not in horizonal retrace. Again, do nothing
      if we are */
-  if(time_since_line >= machine.left_border_cycles + machine.screen_cycles +
-     machine.right_border_cycles ) return;
+  if(time_since_line >= machine_current->timings.left_border_cycles +
+                        machine_current->timings.screen_cycles +
+                        machine_current->timings.right_border_cycles ) return;
       
   current_pixel=display_border_column(time_since_line);
 
@@ -324,8 +399,11 @@ void display_set_border(int colour)
 
   }
 
-  /* And note this line has more than one colour on it */
+  /* Note this line has more than one colour on it */
   display_current_border[current_line]=display_border_mixed;
+
+  /* And that it needs to be copied to the display */
+  display_border_dirty[current_line] = 1;
 
 }
 
@@ -347,7 +425,8 @@ static int display_border_column(int time_since_line)
 
   /* But now need to correct because our displayed border isn't necessarily
      the same size as the ULA's. */
-  column -= ( 2*machine.left_border_cycles - DISPLAY_BORDER_WIDTH );
+  column -= ( 2*machine_current->timings.left_border_cycles -
+	      DISPLAY_BORDER_WIDTH );
   if(column < 0) {
     column=0;
   } else if(column > DISPLAY_SCREEN_WIDTH) {
@@ -360,7 +439,8 @@ static int display_border_column(int time_since_line)
 int display_frame(void)
 {
   display_next_line=0;
-  if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
+  if( event_add( machine_current->line_times[0], EVENT_TYPE_LINE) ) return 1;
+
   display_frame_count++;
   if(display_frame_count==16) {
     display_flash_reversed=1;

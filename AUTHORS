@@ -1,0 +1,10 @@
+Fuse has been brought to you by:
+
+* Matan Ziv-Av: SVGAlib and framebuffer user interfaces, the glib
+  replacement code and some work on the sound code.
+
+* Russell Marks: the generic and OSS-specific sound code.
+
+* Philip Kendall: everything else.
+
+$Id$

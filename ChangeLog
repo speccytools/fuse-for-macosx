@@ -2,18 +2,40 @@
 
 	* Version 0.3.1 released.
 
-	* Major tidy-up of display.c and event.c (Philip Kendall).
+	* Removed need for glib (but it's still used if present)
+	  (Matan Ziv-Av).
 
-	* Fuse now runs on a StrongARM 1110, using the new framebuffer
-	  UI (Matan Ziv-Av).
-	
 	* Separated OSS (Linux) specific sound code out into separate
 	  files, removed most floating-point calculations from the AY
 	  code, added support for 16-bit only devices, and added some
 	  AY subsampling (Russell Marks).
 
-	* Removed need for glib (but it's still used if present)
-	  (Matan Ziv-Av).
+	* Fuse now runs on a StrongARM 1110, using the new framebuffer
+	  UI (Matan Ziv-Av).
+	
+	* Major tidy-up of display.c and event.c (Philip Kendall).
+
+	* Implemented a `lazy write' scheme for the screen. Makes
+	  rainbowing effects _much_ faster (and helps elsewhere as
+	  well) (Philip Kendall).
+
+	* Further improvements to the lazy write scheme - consecutive
+	  lines which have changed are copied to the screen in one
+	  block, rather than as separate lines (Philip Kendall).
+
+	* Complete rewrite of the snapshot code - now handles .z80
+	  snapshots (but not .sna at the moment) (Philip Kendall).
+
+	* Started separating some bits of code into subdirectories;
+	  currently `libspectrum' for the snapshot code, and `z80'
+	  for the Z80 core (Philip Kendall).
+
+	* Added `AUTHORS' file (Philip Kendall).
+
+	* Large rewrite of the code for changing machine type
+	  (Philip Kendall).
+
+	* Made `make install' work (Philip Kendall).
 
 2001-01-31  Philip Kendall  <pak@ast.cam.ac.uk>
 

@@ -44,15 +44,18 @@ static int colours[16];
 static int svgadisplay_allocate_colours(int numColours, int *colours);
 static int svgadisplay_allocate_image(int width, int height);
 
-/* Never used, so commented out to avoid warning */
-/*  static void svgadisplay_area(int x, int y, int width, int height); */
+static void svgadisplay_area(int x, int y, int width, int height);
 
 int uidisplay_init(int width, int height)
 {
 
   vga_init();
 #ifdef G320x240x256V
-  vga_setmode(G320x240x256V);
+  if( vga_hasmode( G320x240x256V ) ) {
+    vga_setmode( G320x240x256V );
+  } else {
+    vga_setmode( G320x240x256  );
+  }
 #else				/* #ifdef G320x240x256V */
   vga_setmode(G320x240x256);
 #endif				/* #ifdef G320x240x256V */
@@ -117,13 +120,17 @@ void uidisplay_line(int y)
     vga_drawscansegment(image+y*DISPLAY_SCREEN_WIDTH,0,y,DISPLAY_SCREEN_WIDTH);
 }
 
-/* Never used, so commented out to avoid warning */
-/*  static void svgadisplay_area(int x, int y, int width, int height) */
-/*  { */
-/*      int yy; */
-/*      for(yy=y; yy<y+height; yy++) */
-/*          vga_drawscansegment(image+yy*DISPLAY_SCREEN_WIDTH+x,x,yy,width); */
-/*  } */
+void uidisplay_lines( int start, int end )
+{
+  svgadisplay_area( 0, start, DISPLAY_SCREEN_WIDTH, ( end - start + 1 ) );
+}
+
+static void svgadisplay_area(int x, int y, int width, int height)
+{
+  int yy;
+  for(yy=y; yy<y+height; yy++)
+    vga_drawscansegment(image+yy*DISPLAY_SCREEN_WIDTH+x,x,yy,width);
+}
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {

@@ -26,20 +26,20 @@
 
 #include <config.h>
 
+#include "machine.h"
 #include "sound.h"
-#include "spectrum.h"
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
 BYTE ay_registerport_read(WORD port)
 {
-  return machine.ay.registers[machine.ay.current_register];
+  return machine_current->ay.registers[ machine_current->ay.current_register ];
 }
 
 /* And when it's written to */
 void ay_registerport_write(WORD port, BYTE b)
 {
-  if(b < 15) machine.ay.current_register=b;
+  if(b < 15) machine_current->ay.current_register = b;
 }
 
 /* What happens when the AY data port (traditionally 0xbffd on the 128K
@@ -47,6 +47,6 @@ void ay_registerport_write(WORD port, BYTE b)
    always returns 0xff */
 void ay_dataport_write(WORD port, BYTE b)
 {
-  machine.ay.registers[machine.ay.current_register]=b;
-  sound_ay_write(machine.ay.current_register,b);
+  machine_current->ay.registers[ machine_current->ay.current_register ] = b;
+  sound_ay_write( machine_current->ay.current_register, b );
 }

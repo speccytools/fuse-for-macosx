@@ -24,10 +24,13 @@
 
 */
 
-#include "config.h"
-#include "event.h"
-#include "spectrum.h"
-#include "tape.h"
+#include <config.h>
+
+#include <stdio.h>
+
+#include "../event.h"
+#include "../spectrum.h"
+#include "../tape.h"
 #include "z80.h"
 
 #include "z80_macros.h"

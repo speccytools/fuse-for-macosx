@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2001 Philip Kendall
+## Copyright (c) 2001 Philip Kendall
 
 ## $Id$
 
@@ -24,24 +24,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-bin_PROGRAMS = fuse
+noinst_LIBRARIES = libspectrum.a
 
-SUBDIRS = libspectrum roms z80
+libspectrum_a_SOURCES = libspectrum.c z80.c
 
-fuse_SOURCES = ay.c display.c event.c fbdisplay.c fbkeyboard.c fbui.c\
-	fuse.c gtkdisplay.c gtkkeyboard.c gtkui.c keyboard.c keysyms.c\
-	machine.c myglib.c osssound.c snapshot.c sound.c spec128.c spec48.c\
-	specplus2.c specplus3.c spectrum.c svgadisplay.c svgakeyboard.c\
-	svgaui.c tape.c timer.c xdisplay.c xkeyboard.c xui.c
+noinst_HEADERS = libspectrum.h
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DROMSDIR="\"${pkgdatadir}\""
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a z80/libz80.a
-
-noinst_HEADERS = ay.h display.h event.h fbkeyboard.h\
-	fuse.h gtkkeyboard.h gtkui.h keyboard.h keysyms.h\
-	machine.h myglib.h osssound.h snapshot.h sound.h spec128.h spec48.h\
-	specplus2.h specplus3.h	spectrum.h svgakeyboard.h\
-	tape.h timer.h types.h ui.h uidisplay.h xdisplay.h\
-	xkeyboard.h xui.h
-
-EXTRA_DIST = AUTHORS README THANKS

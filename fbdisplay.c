@@ -50,8 +50,7 @@ static int fd;
 static int fbdisplay_allocate_colours(int numColours, int *colours);
 static int fbdisplay_allocate_image(int width, int height);
 
-/* Never used, so commented out to avoid warning */
-/*  static void fbdisplay_area(int x, int y, int width, int height); */
+static void fbdisplay_area(int x, int y, int width, int height);
 
 int uidisplay_init(int width, int height)
 {
@@ -118,13 +117,17 @@ void uidisplay_line(int y)
     memcpy(gm+y*320, image+y*DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_WIDTH*2);
 }
 
-/* Never used, so commented out to avoid warning */
-/*  static void fbdisplay_area(int x, int y, int width, int height) */
-/*  { */
-/*      int yy; */
-/*      for(yy=y; yy<y+height; yy++) */
-/*          memcpy(gm+yy*320+x, image+yy*DISPLAY_SCREEN_WIDTH+x, width*2); */
-/*  } */
+void uidisplay_lines( int start, int end )
+{
+  fbdisplay_area( 0, start, DISPLAY_SCREEN_WIDTH, ( end - start + 1 ) );
+}
+
+static void fbdisplay_area(int x, int y, int width, int height)
+{
+    int yy;
+    for(yy=y; yy<y+height; yy++)
+        memcpy(gm+yy*320+x, image+yy*DISPLAY_SCREEN_WIDTH+x, width*2);
+}
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {

@@ -27,73 +27,57 @@
 #ifndef FUSE_SPECTRUM_H
 #define FUSE_SPECTRUM_H
 
-#ifndef FUSE_AY_H
-#include "ay.h"
-#endif			/* #ifndef FUSE_AY_H */
-
-#ifndef FUSE_DISPLAY_H
-#include "display.h"
-#endif			/* #ifndef FUSE_DISPLAY_H */
-
 #ifndef FUSE_TYPES_H
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
-typedef struct raminfo {
-  int locked;
-  int current_page,current_rom,current_screen;
+extern DWORD tstates;
+
+/* Things relating to memory */
+
+extern BYTE **ROM;
+extern BYTE RAM[8][0x4000];
+
+typedef BYTE (*spectrum_memory_read_function) ( WORD address );
+typedef BYTE (*spectrum_screen_read_function) ( WORD offset );
+typedef void (*spectrum_memory_write_function)( WORD address, BYTE data );
+
+typedef struct spectrum_raminfo {
+
+  spectrum_memory_read_function read_memory; /* Read a byte from anywhere in 
+						paged in memory */
+  spectrum_screen_read_function read_screen; /* Read a byte from the
+						current screen */
+  spectrum_memory_write_function write_memory; /* Write to paged-in memory */
+
+  int locked;			/* Is the memory configuration locked? */
+  int current_page,current_rom,current_screen; /* Current paged memory */
+
   BYTE last_byte;		/* The last byte sent to the 128K port */
   BYTE last_byte2;		/* The last byte sent to +3 port */
+
   int special;			/* Is a +3 special config in use? */
   int specialcfg;		/* If so, which one? */
-} raminfo;
+
+} spectrum_raminfo;
+
+/* Set these every time we change machine to avoid having to do a
+   structure lookup on every memory access */
+spectrum_memory_read_function readbyte;
+spectrum_screen_read_function read_screen_memory;
+spectrum_memory_write_function writebyte;
+
+/* Things relating to peripherals */
 
 typedef BYTE (*spectrum_port_read_function)(WORD port);
 typedef void (*spectrum_port_write_function)(WORD port, BYTE data);
 
-/* The peripherals that may be available */
 typedef struct spectrum_port_info {
   WORD mask;			/* Mask port with these bits */
   WORD data;			/* Then see if it's equal to these bits */
   spectrum_port_read_function read; /* If so, call this function on read */
   spectrum_port_write_function write; /* Or this one on write */
 } spectrum_port_info;
-
-typedef struct machine_info {
-  int machine;
-
-  WORD left_border_cycles;  /* T-states spent drawing left border */
-  WORD screen_cycles;	    /* T-states spent drawing screen */
-  WORD right_border_cycles; /* T-states spent drawing right border */
-  WORD retrace_cycles;	    /* T-states spent in horizontal retrace */
-
-  WORD cycles_per_line;	/* = sum of above four values */
-  WORD lines_per_frame;
-  DWORD cycles_per_frame; /* = cycles_per_line*lines_per_frame */
-
-  DWORD hz;		/* Processor speed in Hz */
-
-  /* Redraw line y this many tstates after interrupt */
-  DWORD	line_times[DISPLAY_SCREEN_HEIGHT+1];
-
-  int (*reset)(void);	/* Reset function */
-
-  spectrum_port_info *peripherals; /* Which peripherals do we have? */
-
-  raminfo ram;          /* RAM paging information */
-  ayinfo ay;		/* The AY-8-3912 chip */
-
-} machine_info;
-
-int spectrum_init();
-void spectrum_set_timings(WORD left_border_cycles,  WORD screen_cycles,
-			  WORD right_border_cycles, WORD retrace_cycles,
-			  WORD lines_per_frame, DWORD hz, DWORD first_line);
-int spectrum_interrupt(void);
-
-BYTE (*readbyte)(WORD address);
-BYTE (*read_screen_memory)(WORD offset);
-void (*writebyte)(WORD address,BYTE b);
 
 BYTE readport(WORD port);
 void writeport(WORD port, BYTE b);
@@ -103,10 +87,9 @@ BYTE spectrum_port_noread(WORD port);
 BYTE spectrum_ula_read(WORD port);
 void spectrum_ula_write(WORD port, BYTE b);
 
-extern BYTE ROM[4][0x4000];
-extern BYTE RAM[8][0x4000];
-extern DWORD tstates;
-extern machine_info machine;
+/* Miscellaneous stuff */
+
+int spectrum_interrupt(void);
 
 /* The machines available */
 enum { SPECTRUM_MACHINE_48, SPECTRUM_MACHINE_128, SPECTRUM_MACHINE_PLUS2,

@@ -32,9 +32,10 @@
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"
+#include "machine.h"
 #include "spec128.h"
 #include "spectrum.h"
-#include "z80.h"
+#include "z80/z80.h"
 
 spectrum_port_info spec128_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -47,19 +48,20 @@ spectrum_port_info spec128_peripherals[] = {
 BYTE spec128_readbyte(WORD address)
 {
   WORD bank;
-  if(address<0x4000) return ROM[machine.ram.current_rom][address];
+
+  if(address<0x4000) return ROM[machine_current->ram.current_rom][address];
   bank=address/0x4000; address-=(bank*0x4000);
   switch(bank) {
-    case 1: return RAM[                       5][address]; break;
-    case 2: return RAM[                       2][address]; break;
-    case 3: return RAM[machine.ram.current_page][address]; break;
-    default: abort();
+  case 1: return RAM[                                5][address]; break;
+  case 2: return RAM[                                2][address]; break;
+  case 3: return RAM[machine_current->ram.current_page][address]; break;
+  default: abort();
   }
 }
 
 BYTE spec128_read_screen_memory(WORD offset)
 {
-  return RAM[machine.ram.current_screen][offset];
+  return RAM[machine_current->ram.current_screen][offset];
 }
 
 void spec128_writebyte(WORD address, BYTE b)
@@ -69,42 +71,41 @@ void spec128_writebyte(WORD address, BYTE b)
   if(address>=0x4000) {		/* 0x4000 = 1st byte of RAM */
     bank=address/0x4000; address-=(bank*0x4000);
     switch(bank) {
-      case 1: bank=5;                        break;
-      case 2: bank=2;                        break;
-      case 3: bank=machine.ram.current_page; break;
+    case 1: bank=5;                                 break;
+    case 2: bank=2;                                 break;
+    case 3: bank=machine_current->ram.current_page; break;
     }
     RAM[bank][address]=b;
-    if(bank==machine.ram.current_screen && address < 0x1b00) {
+    if(bank==machine_current->ram.current_screen && address < 0x1b00) {
       display_dirty(address+0x4000,b); /* Replot necessary pixels */
     }
   }
 }
 
-int spec128_init(void)
+int spec128_init( machine_info *machine )
 {
-  FILE *f;
+  int error;
 
-  f=fopen("128-0.rom","rb");
-  if(!f) return 1;
-  fread(ROM[0],0x4000,1,f);
+  machine->machine = SPECTRUM_MACHINE_128;
 
-  f=freopen("128-1.rom","rb",f);
-  if(!f) return 2;
-  fread(ROM[1],0x4000,1,f);
+  machine->reset = spec128_reset;
 
-  fclose(f);
+  machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865);
 
-  readbyte=spec128_readbyte;
-  read_screen_memory=spec128_read_screen_memory;
-  writebyte=spec128_writebyte;
+  machine->ram.read_memory = spec128_readbyte;
+  machine->ram.read_screen = spec128_read_screen_memory;
+  machine->ram.write_memory = spec128_writebyte;
 
-  tstates=0;
+  error = machine_allocate_roms( machine, 2 );
+  if( error ) return error;
+  error = machine_read_rom( machine, 0, "128-0.rom" );
+  if( error ) return error;
+  error = machine_read_rom( machine, 1, "128-1.rom" );
+  if( error ) return error;
 
-  spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
-  machine.reset=spec128_reset;
+  machine->peripherals = spec128_peripherals;
 
-  machine.peripherals=spec128_peripherals;
-  machine.ay.present=1;
+  machine->ay.present = 1;
 
   return 0;
 
@@ -112,13 +113,19 @@ int spec128_init(void)
 
 int spec128_reset(void)
 {
-  machine.ram.current_page=0; machine.ram.current_rom=0;
-  machine.ram.current_screen=5;
-  machine.ram.locked=0;
+  machine_current->ram.locked=0;
+  machine_current->ram.current_page=0;
+  machine_current->ram.current_rom=0;
+  machine_current->ram.current_screen=5;
+
   event_reset();
-  if(event_add(machine.cycles_per_frame,EVENT_TYPE_INTERRUPT)) return 1;
-  if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
+  if( event_add( machine_current->timings.cycles_per_frame,
+		 EVENT_TYPE_INTERRUPT) ) return 1;
+  if( event_add( machine_current->line_times[0],
+		 EVENT_TYPE_LINE) ) return 1;
+
   z80_reset();
+
   return 0;
 }
 
@@ -127,23 +134,23 @@ void spec128_memoryport_write(WORD port, BYTE b)
   int old_screen;
 
   /* Do nothing if we've locked the RAM configuration */
-  if(machine.ram.locked) return;
+  if(machine_current->ram.locked) return;
     
-  old_screen=machine.ram.current_screen;
+  old_screen=machine_current->ram.current_screen;
 
   /* Store the last byte written in case we need it */
-  machine.ram.last_byte=b;
+  machine_current->ram.last_byte=b;
 
   /* Work out which page, screen and ROM are selected */
-  machine.ram.current_page= b & 0x07;
-  machine.ram.current_screen=( b & 0x08) ? 7 : 5;
-  machine.ram.current_rom=(machine.ram.current_rom & 0x02) |
+  machine_current->ram.current_page= b & 0x07;
+  machine_current->ram.current_screen=( b & 0x08 ) ? 7 : 5;
+  machine_current->ram.current_rom=(machine_current->ram.current_rom & 0x02) |
     ( (b & 0x10) >> 4 );
 
   /* Are we locking the RAM configuration? */
-  machine.ram.locked=( b & 0x20 );
+  machine_current->ram.locked=( b & 0x20 );
 
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
-  if(machine.ram.current_screen!=old_screen) display_refresh_all();
+  if(machine_current->ram.current_screen!=old_screen) display_refresh_all();
 }

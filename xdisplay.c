@@ -207,6 +207,13 @@ void uidisplay_line(int y)
 	    xdisplay_current_size*DISPLAY_SCREEN_WIDTH, xdisplay_current_size);
 }
 
+void uidisplay_lines( int start, int end )
+{
+  xdisplay_area( 0, xdisplay_current_size * start,
+		 xdisplay_current_size * DISPLAY_SCREEN_WIDTH,
+		 xdisplay_current_size * ( end - start + 1 ) );
+}
+
 void xdisplay_area(int x, int y, int width, int height)
 {
   XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);

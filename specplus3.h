@@ -34,7 +34,7 @@
 BYTE specplus3_readbyte(WORD address);
 BYTE specplus3_read_screen_memory(WORD offset);
 void specplus3_writebyte(WORD address, BYTE b);
-int specplus3_init(void);
+int specplus3_init( machine_info *machine );
 int specplus3_reset(void);
 
 void specplus3_memoryport_write(WORD port, BYTE b);

@@ -121,7 +121,7 @@ static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
   for(i=0,ok=1;i<16;i++) if(!success[i]) ok=0;
 
   if(!ok) {
-    fprintf(stderr,"%s: Couldn't allocate all colours in default colourmap\n"
+    fprintf(stderr,"%s: couldn't allocate all colours in default colourmap\n"
 	    "%s: switching to private colourmap\n",
 	    fuse_progname,fuse_progname);
     /* FIXME: should free colours in default map here */
@@ -130,7 +130,7 @@ static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
 			       success );
     for(i=0,ok=1;i<16;i++) if(!success[i]) ok=0;
     if( !ok ) {
-      fprintf(stderr,"%s: Still couldn't allocate all colours\n",
+      fprintf(stderr,"%s: still couldn't allocate all colours\n",
 	      fuse_progname);
       return 1;
     }
@@ -210,6 +210,13 @@ void uidisplay_line(int y)
 		 0,gtkdisplay_current_size*y,
 		 gtkdisplay_current_size*DISPLAY_SCREEN_WIDTH,
 		 gtkdisplay_current_size);
+}
+
+void uidisplay_lines( int start, int end )
+{
+  gtkdisplay_area( 0, gtkdisplay_current_size*start,
+		   gtkdisplay_current_size*DISPLAY_SCREEN_WIDTH,
+		   gtkdisplay_current_size * ( end - start + 1 ) );
 }
 
 static void gtkdisplay_area(int x, int y, int width, int height)

@@ -31,13 +31,14 @@
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"
+#include "machine.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
 #include "ui.h"
-#include "z80.h"
+#include "z80/z80.h"
 
 /* What name were we called under? */
 char* fuse_progname;
@@ -52,7 +53,7 @@ static int fuse_end(void);
 int main(int argc,char **argv)
 {
   if(fuse_init(argc,argv)) {
-    fprintf(stderr,"Error initalising -- giving up!\n");
+    fprintf(stderr,"%s: error initalising -- giving up!\n", fuse_progname);
     return 1;
   }
 
@@ -69,6 +70,8 @@ int main(int argc,char **argv)
 
 static int fuse_init(int argc, char **argv)
 {
+  int error;
+
   fuse_show_copyright();
 
   fuse_progname=argv[0];
@@ -77,10 +80,16 @@ static int fuse_init(int argc, char **argv)
   if(event_init()) return 1;
   sound_init();		/* sound-init failure non-fatal? */
   if(!sound_enabled) if(timer_init()) return 1;
-
-  machine.machine=SPECTRUM_MACHINE_48; spectrum_init(); machine.reset();
   fuse_keyboard_init();
+
   z80_init();
+
+  error = machine_init_machines();
+  if( error ) return error;
+  error = machine_select_first();
+  if( error ) return error;
+
+  if( argc >= 2 ) snapshot_read( argv[1] );
 
   return 0;
 
@@ -89,8 +98,9 @@ static int fuse_init(int argc, char **argv)
 static void fuse_show_copyright(void)
 {
   printf(
-   "The Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n"
-   "Copyright (c) 1999-2001 Philip Kendall <pak@ast.cam.ac.uk> and others.\n"
+   "\nThe Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n"
+   "Copyright (c) 1999-2001 Philip Kendall <pak@ast.cam.ac.uk> and others;\n"
+   "See the file `AUTHORS' for more details.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"
    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
@@ -102,6 +112,11 @@ static void fuse_show_copyright(void)
 /* Tidy-up function called at end of emulation */
 static int fuse_end(void)
 {
+  int error;
+
+  error = machine_end();
+  if( error ) return error;
+
   if(!sound_enabled) timer_end();
   sound_end();
   event_end();

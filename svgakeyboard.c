@@ -37,6 +37,7 @@
 #include "fuse.h"
 #include "keyboard.h"
 #include "keysyms.h"
+#include "machine.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
@@ -76,34 +77,20 @@ int svgakeyboard_keypress(int keysym)
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
   case SCANCODE_F2:
-    snapshot_write();
+    snapshot_write( "snapshot.z80" );
     break;
   case SCANCODE_F3:
-    snapshot_read();
+    snapshot_read( "snapshot.z80" );
     display_refresh_all();
     break;
   case SCANCODE_F5:
-    machine.reset();
+    machine_current->reset();
     break;
   case SCANCODE_F7:
     tape_open();
     break;
   case SCANCODE_F9:
-    switch(machine.machine) {
-    case SPECTRUM_MACHINE_48:
-      machine.machine=SPECTRUM_MACHINE_128;
-      break;
-    case SPECTRUM_MACHINE_128:
-      machine.machine=SPECTRUM_MACHINE_PLUS2;
-      break;
-    case SPECTRUM_MACHINE_PLUS2:
-      machine.machine=SPECTRUM_MACHINE_PLUS3;
-      break;
-    case SPECTRUM_MACHINE_PLUS3:
-      machine.machine=SPECTRUM_MACHINE_48;
-      break;
-    }
-    spectrum_init(); machine.reset();
+    machine_select_next();
     break;
   case SCANCODE_F10:
     fuse_exiting=1;

@@ -20,8 +20,7 @@ Some thanks (in alphabetical order):
   (ftp://ftp.void.jump.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
   got me started on this emulation lark all those years ago...
 
-* Russell Marks: for the beeper/AY emulation, and the Linux specific sound
-  code.
+* Russell Marks: for various bits of code (see `AUTHORS')
 
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
@@ -33,8 +32,6 @@ Some thanks (in alphabetical order):
 * Martijn van der Heide: for World of Spectrum (http://www.void.jump.org/)
   -- simply the best Speccy Web site out there.
 
-* Matan Ziv-Av: for adding svgalib (http://www.svgalib.org/) support to
-  Fuse, some work on the sound code and the replacement functions used
-  if glib isn't available.
+* Matan Ziv-Av: for various bits of code (see `AUTHORS')
 
 $Id$

@@ -1,5 +1,5 @@
 /* specplus2.h: Spectrum +2 specific routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -25,6 +25,10 @@
 #ifndef FUSE_SPECPLUS2_H
 #define FUSE_SPECPLUS2_H
 
-int specplus2_init(void);
+#ifndef FUSE_MACHINE_H
+#include "machine.h"
+#endif			/* #ifndef FUSE_MACHINE_H */
+
+int specplus2_init( machine_info *machine );
 
 #endif			/* #ifndef FUSE_SPECPLUS2_H */

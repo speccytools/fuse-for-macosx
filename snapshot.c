@@ -26,136 +26,253 @@
 
 #include <config.h>
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "display.h"
+#include "fuse.h"
+#include "libspectrum/libspectrum.h"
+#include "machine.h"
+#include "snapshot.h"
 #include "spec128.h"
 #include "spectrum.h"
-#include "z80.h"
-#include "z80_macros.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
-int snapshot_read(void)
+static int snapshot_copy_from( libspectrum_snap *snap );
+static int snapshot_copy_to( libspectrum_snap *snap );
+
+#define ERROR_MESSAGE_MAX_LENGTH 1024
+
+int snapshot_read( char *filename )
 {
-  FILE *f; BYTE buffer[27],buffer2[0x4000]; struct stat file_info;
+  struct stat file_info; int fd; uchar *buffer;
 
-  if(stat("snapshot.sna",&file_info)) return 1;
+  libspectrum_snap snap;
 
-  switch(file_info.st_size) {
-    case 49179:
-      machine.machine=SPECTRUM_MACHINE_48;
-      break;
-    case 131103:
-    case 147487:
-      machine.machine=SPECTRUM_MACHINE_128;
-      break;
-    default: return 3;
+  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  libspectrum_snap_initalise( &snap );
+
+  fd = open( filename, O_RDONLY );
+  if( fd == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: couldn't open `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
   }
-  spectrum_init(); machine.reset();
 
-  f=fopen("snapshot.sna","rb");
-  if(!f) return 2;
+  if( fstat( fd, &file_info) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't stat `%s'", fuse_progname, filename );
+    perror( error_message );
+    close(fd);
+    return 1;
+  }
 
-  fread(buffer,27,1,f);
+  buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
+  if( buffer == (void*)-1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
+    perror( error_message );
+    close(fd);
+    return 1;
+  }
 
-  z80.halted=0;
-  I   =buffer[ 0];
-  L_  =buffer[ 1];      H_ =buffer[ 2];
-  E_  =buffer[ 3];      D_ =buffer[ 4];
-  C_  =buffer[ 5];      B_ =buffer[ 6];
-  F_  =buffer[ 7];      A_ =buffer[ 8];
-  L   =buffer[ 9];      H  =buffer[10];
-  E   =buffer[11];      D  =buffer[12];
-  C   =buffer[13];      B  =buffer[14];
-  IYL =buffer[15];      IYH=buffer[16];
-  IXL =buffer[17];      IXH=buffer[18];
-  IFF1=IFF2=(buffer[19]&0x04)>>2;
-  R  =buffer[20];
-  F  =buffer[21];        A  =buffer[22];
-  SPL=buffer[23];        SPH=buffer[24];
-  IM =buffer[25];
+  if( close(fd) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't close `%s'", fuse_progname, filename );
+    perror( error_message );
+    munmap( buffer, file_info.st_size );
+    return 1;
+  }
 
-  display_set_border(buffer[26]);
+  error = libspectrum_z80_read( buffer, file_info.st_size, &snap );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf(stderr, "%s: Error from libspectrum_z80_read: %s\n",
+	    fuse_progname, libspectrum_error_message(error) );
+    munmap( buffer, file_info.st_size );
+    return 1;
+  }
 
-  fread(RAM[5],0x4000,1,f);
-  fread(RAM[2],0x4000,1,f);
-  if(machine.machine==SPECTRUM_MACHINE_48) {
-    fread(RAM[0],0x4000,1,f);
-    PCL=readbyte(SP++); PCH=readbyte(SP++);
-  } else {
-    int i,page;
-    fread(buffer2,0x4000,1,f);
-    fread(buffer,4,1,f); PCL=buffer[0]; PCH=buffer[1];
+  if( munmap( buffer, file_info.st_size ) == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
 
-    /* Write to the 128K's memory; the port number here is ignored */
-    spec128_memoryport_write( 0x7ffd, buffer[2]);
+  error = snapshot_copy_from( &snap );
+  if( error ) return error;
 
-    page=buffer[2]&0x07;
-    memcpy(RAM[page],buffer2,0x4000);
-    for(i=0;i<8;i++) {
-      if( i==2 || i==5 || i==page ) continue;
-      fread(RAM[i],0x4000,1,f);
-    }
-  }    
-
-  fclose(f);
+  error = libspectrum_snap_destroy( &snap );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf(stderr, "%s: Error from libspectrum_snap_destroy: %s\n",
+	    fuse_progname, libspectrum_error_message(error) );
+    return 1;
+  }
 
   return 0;
 
 }
 
-int snapshot_write(void)
+static int snapshot_copy_from( libspectrum_snap *snap )
 {
-  FILE *f; BYTE buffer[0xc000]; int i;
-  WORD stackpointer;
+  int i; int error;
 
-  f=fopen("snapshot.sna","wb");
-  if(!f) return 1;
-
-  if(machine.machine==SPECTRUM_MACHINE_48) {
-    stackpointer = SP-2;
-  } else {
-    stackpointer = SP;
-  }
-
-  fputc(I  ,f);
-  fputc(L_ ,f); fputc(H_ ,f);
-  fputc(E_ ,f); fputc(D_ ,f);
-  fputc(C_ ,f); fputc(B_ ,f);
-  fputc(F_ ,f); fputc(A_ ,f);
-  fputc(L  ,f); fputc(H  ,f);
-  fputc(E  ,f); fputc(D  ,f);
-  fputc(C  ,f); fputc(B  ,f);
-  fputc(IYL,f); fputc(IYH,f);
-  fputc(IXL,f); fputc(IXH,f);
-  fputc( IFF1 << 2 ,f);
-  fputc(R  ,f);
-  fputc(F  ,f); fputc(A  ,f);
-  fputc( (stackpointer & 0xff ),f); fputc( (stackpointer >> 8 ),f);
-  fputc(IM ,f);
-  fputc(display_border,f);
-
-  memcpy(&buffer[     0],RAM[5],0x4000);
-  memcpy(&buffer[0x4000],RAM[2],0x4000);
-
-  if(machine.machine==SPECTRUM_MACHINE_48) {
-    memcpy(&buffer[0x8000],RAM[0],0x4000);
-    buffer[((stackpointer+1)-0x4000)]=PCH;
-    buffer[((stackpointer  )-0x4000)]=PCL;
-    fwrite(buffer,0xc000,1,f);
-  } else {
-    memcpy(&buffer[0x8000],RAM[machine.ram.current_page],0x4000);
-    fwrite(buffer,0xc000,1,f);
-    fputc(PCL,f); fputc(PCH,f);
-    fputc(machine.ram.last_byte,f); fputc(0,f);
-    for(i=0;i<8;i++) {
-      if( i==2 || i==5 || i==machine.ram.current_page ) continue;
-      fwrite(RAM[i],0x4000,1,f);
+  switch( snap->machine ) {
+  case LIBSPECTRUM_MACHINE_48:
+    error = machine_select( SPECTRUM_MACHINE_48 );
+    if( error ) {
+      fprintf(stderr,"%s: 48K Spectrum unavailable\n", fuse_progname );
+      return 1;
     }
+    break;
+  case LIBSPECTRUM_MACHINE_128:
+    error = machine_select( SPECTRUM_MACHINE_128 );
+    if( error ) {
+      fprintf(stderr,"%s: 128K Spectrum unavailable\n", fuse_progname );
+      return 1;
+    }
+    break;
+  default:
+    fprintf(stderr,"%s: Unknown machine type %d\n", fuse_progname,
+	    snap->machine);
+    return 1;
+  }
+  machine_current->reset();
+
+  z80.halted = 0;
+
+  A  = snap->a ; F  = snap->f ;
+  A_ = snap->a_; F_ = snap->f_;
+
+  BC  = snap->bc ; DE  = snap->de ; HL  = snap->hl ;
+  BC_ = snap->bc_; DE_ = snap->de_; HL_ = snap->hl_;
+
+  IX = snap->ix; IY = snap->iy; I = snap->i; R = snap->r;
+  SP = snap->sp; PC = snap->pc;
+
+  IFF1 = snap->iff1; IFF2 = snap->iff2; IM = snap->im;
+
+  spectrum_ula_write( 0x00fe, snap->out_ula );
+
+  if( machine_current->machine == SPECTRUM_MACHINE_128 ) {
+    spec128_memoryport_write( 0x7ffd, snap->out_128_memoryport );
+    ay_registerport_write( 0xfffd, snap->out_ay_registerport );
+    for( i=0; i<15; i++ )
+      machine_current->ay.registers[i] = snap->ay_registers[i];
   }
 
-  fclose(f);
+  tstates = snap->tstates;
+
+  for( i=0; i<8; i++ ) {
+    if( snap->pages[i] != NULL ) memcpy( RAM[i], snap->pages[i], 0x4000 );
+  }
+
+  return 0;
+}
+
+int snapshot_write( char *filename )
+{
+  libspectrum_snap snap;
+  unsigned char *buffer; size_t length;
+  FILE *f;
+
+  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  libspectrum_snap_initalise( &snap );
+
+  error = snapshot_copy_to( &snap );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  length = 0;
+  error = libspectrum_z80_write( &buffer, &length, &snap );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf(stderr, "%s: error libspectrum_z80_write: %s\n", fuse_progname,
+	    libspectrum_error_message(error) );
+    return error;
+  }
+
+  f=fopen( filename, "wb" );
+  if(!f) { 
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error opening `%s'", fuse_progname, filename );
+    perror( error_message );
+    free( buffer );
+    return 1;
+  }
+	    
+  if( fwrite( buffer, 1, length, f ) != length ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error writing to `%s'", fuse_progname, filename );
+    perror( error_message );
+    fclose(f);
+    free( buffer );
+    return 1;
+  }
+
+  free( buffer );
+
+  if( fclose( f ) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: error closing `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
+
+  return 0;
+
+}
+
+static int snapshot_copy_to( libspectrum_snap *snap )
+{
+  int i;
+
+  switch( machine_current->machine ) {
+  case SPECTRUM_MACHINE_48:
+    snap->machine = LIBSPECTRUM_MACHINE_48;
+    break;
+  case SPECTRUM_MACHINE_128:
+    snap->machine = LIBSPECTRUM_MACHINE_128;
+    break;
+  default:
+    fprintf(stderr,"%s: Can't handle machine type %d in snapshots\n",
+	    fuse_progname, snap->machine);
+    return 1;
+  }
+
+  snap->a  = A ; snap->f  = F ;
+  snap->a_ = A_; snap->f_ = F_;
+
+  snap->bc  = BC ; snap->de  = DE ; snap->hl  = HL ;
+  snap->bc_ = BC_; snap->de_ = DE_; snap->hl_ = HL_;
+
+  snap->ix = IX; snap->iy = IY; snap->i = I; snap->r = R;
+  snap->sp = SP; snap->pc = PC;
+
+  snap->iff1 = IFF1; snap->iff2 = IFF2; snap->im = IM;
+
+  snap->out_ula = display_border; /* FIXME: need to do this properly */
+  
+  if( machine_current->machine == SPECTRUM_MACHINE_128 ) {
+    snap->out_128_memoryport = machine_current->ram.last_byte;
+    snap->out_ay_registerport = machine_current->ay.current_register;
+    for( i=0; i<15; i++ )
+      snap->ay_registers[i] = machine_current->ay.registers[i];
+  }
+
+  snap->tstates = tstates;
+
+  /* FIXME: should copy to new memory */
+  for( i=0; i<8; i++ ) snap->pages[i] = RAM[i];
 
   return 0;
 }

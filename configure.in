@@ -26,8 +26,12 @@ AM_CONFIG_HEADER(config.h)
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE(fuse, 0.3.1-pre1)
 
+dnl Use '/usr' as the default prefix, rather than '/usr/local'
+AC_PREFIX_DEFAULT(/usr)
+
 dnl Checks for programs.
 AC_PROG_CC
+AC_PROG_RANLIB
 
 dnl Check for big endianness
 AC_C_BIGENDIAN
@@ -167,4 +171,4 @@ if test "$ac_cv_prog_CC" = gcc; then
     CFLAGS="$CFLAGS -Wall"
 fi
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile libspectrum/Makefile roms/Makefile z80/Makefile)

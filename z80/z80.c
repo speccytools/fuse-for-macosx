@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 
-#include "spectrum.h"
+#include "../spectrum.h"
 #include "z80.h"
 
 #include "z80_macros.h"
