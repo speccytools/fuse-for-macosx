@@ -832,3 +832,5 @@
 	 now boots, although ZXATASP doesn't.
 20040518 configure.in,acconfig,h: Remove need for acconfig.h for newer
          autotools per patch #953734.
+20040518 roms/se-0.rom: Change 3 bytes at 0x240 to XOR A, OUT (FF), A instead
+         of NOP, NOP, NOP. This resets the SCLD on real hardware.
