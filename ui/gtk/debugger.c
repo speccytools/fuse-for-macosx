@@ -61,7 +61,8 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
   *registers[18],			/* The register display */
   *breakpoints,				/* The breakpoint display */
-  *disassembly;				/* The disassembly */
+  *disassembly,				/* The disassembly */
+  *stack;				/* The stack display */
 
 /* The top line of the current disassembly */
 static WORD disassembly_top;
@@ -112,7 +113,8 @@ create_dialog( void )
   GtkStyle *style;
 
   gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life" },
-    *disassembly_titles[] = { "Address", "Instruction" };
+    *disassembly_titles[] = { "Address", "Instruction" },
+    *stack_titles[] = { "Address", "Value" };
 
   /* Try and get a monospaced font */
   style = gtk_style_new();
@@ -155,6 +157,12 @@ create_dialog( void )
   gtk_widget_set_style( disassembly, style );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
+
+  /* And the stack CList */
+  stack = gtk_clist_new_with_titles( 2, stack_titles );
+  gtk_widget_set_style( stack, style );
+  gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
+  gtk_box_pack_start_defaults( GTK_BOX( hbox ), stack );
 
   /* Another hbox to hold the command entry widget and the 'evaluate'
      button */
@@ -364,6 +372,22 @@ ui_debugger_update( void )
     gtk_clist_append( GTK_CLIST( disassembly ), disassembly_text );
   }
   gtk_clist_thaw( GTK_CLIST( disassembly ) );
+
+  /* And the stack display */
+  gtk_clist_freeze( GTK_CLIST( stack ) );
+  gtk_clist_clear( GTK_CLIST( stack ) );
+
+  for( address = SP + 38; address >= SP; address -= 2 ) {
+    
+    WORD contents = readbyte_internal( address ) +
+                    0x100 * readbyte_internal( address + 1 );
+
+    snprintf( disassembly_text[0], 40, format_16_bit, address );
+    snprintf( disassembly_text[1], 40, format_16_bit, contents );
+    gtk_clist_append( GTK_CLIST( stack ), disassembly_text );
+  }
+
+  gtk_clist_thaw( GTK_CLIST( stack ) );
 
   return 0;
 }
