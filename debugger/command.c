@@ -70,6 +70,12 @@ debugger_command_evaluate( const char *command )
 
 /* Utility functions called from the flex scanner */
 
+int
+yywrap( void )
+{
+  return 1;
+}
+
 /* Called to get up to 'max_size' bytes of the command to be parsed */
 int
 debugger_command_input( char *buf, int *result, int max_size )

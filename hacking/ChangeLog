@@ -338,3 +338,5 @@
 	 events occur at the same tstate.
 20031106 event.[ch], machine.c, rzx.c, scld.c, spectrum.[ch], z80/z80.c,
 	 z80/z80_ops.c: add support for retriggered interrupts.
+20031106 debugger/command.c, debugger/commandl.l: remove use of %option
+	 noyywrap.
