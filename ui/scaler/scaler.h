@@ -52,7 +52,8 @@ typedef void ScalerProc(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 	                BYTE *dstPtr, DWORD dstPitch, int width, int height);
 
 /* The type of function used to expand the area dirtied by a scaler */
-typedef void scaler_expand_fn( int *x, int *y, int *w, int *h );
+typedef void scaler_expand_fn( int *x, int *y, int *w, int *h,
+			       int image_width, int image_height );
 
 extern scaler_type current_scaler;
 extern ScalerProc *scaler_proc16, *scaler_proc32;

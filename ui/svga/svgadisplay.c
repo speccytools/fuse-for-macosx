@@ -240,16 +240,8 @@ uidisplay_area( int x, int y, int w, int h )
   
   /* Extend the dirty region by 1 pixel for scalers
      that "smear" the screen, e.g. AdvMAME2x */
-  if( scaler_flags & SCALER_FLAGS_EXPAND ) {
-
-    scaler_expander( &x, &y, &w, &h );
-    
-    /* clip */
-    if ( x < 0 ) { w += x; x=0; }
-    if ( y < 0 ) { h += y; y=0; }
-    if ( w > image_width - x ) w = image_width - x;
-    if ( h > image_height - y ) h = image_height - y;
-  }
+  if( scaler_flags & SCALER_FLAGS_EXPAND )
+    scaler_expander( &x, &y, &w, &h, image_width, image_height );
 
   scaled_x = scale * x; scaled_y = scale * y;
 

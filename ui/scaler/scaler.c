@@ -49,9 +49,17 @@ struct scaler_info {
 };
 
 /* The expander functions */
-static void expand_1( int *x, int *y, int *w, int *h );
-static void expand_sai( int *x, int *y, int *w, int *h );
-static void expand_dotmatrix( int *x, int *y, int *w, int *h );
+
+/* Clip back to screen size after expansion */
+static void clip( int *x, int *y, int *w, int *h,
+		  int image_width, int image_height );
+
+static void expand_1( int *x, int *y, int *w, int *h,
+		      int image_width, int image_height );
+static void expand_sai( int *x, int *y, int *w, int *h,
+			int image_width, int image_height );
+static void expand_dotmatrix( int *x, int *y, int *w, int *h,
+			      int image_width, int image_height );
 
 /* Information on each of the available scalers. Make sure this array stays
    in the same order as scaler.h:scaler_type */
@@ -190,23 +198,36 @@ scaler_get_expander( scaler_type scaler )
 
 /* The expansion functions */
 
+/* Clip after expansion */
+static inline void
+clip( int *x, int *y, int *w, int *h, int image_width, int image_height )
+{
+  if ( *x < 0 ) { *w += *x; *x=0; }
+  if ( *y < 0 ) { *h += *y; *y=0; }
+  if ( *w > image_width - *x ) *w = image_width - *x;
+  if ( *h > image_height - *y ) *h = image_height - *y;
+}
+
 /* Expand one pixel in all directions */
 static void
-expand_1( int *x, int *y, int *w, int *h )
+expand_1( int *x, int *y, int *w, int *h, int image_width, int image_height )
 {
   (*x)--; (*y)--; (*w)+=2; (*h)+=2;
+  clip( x, y, w, h, image_width, image_height );
 }
 
 /* Expand two pixels up and left and one pixel down and right */
 static void
-expand_sai( int *x, int *y, int *w, int *h )
+expand_sai( int *x, int *y, int *w, int *h, int image_width, int image_height )
 {
   (*x)-=2; (*y)-=2; (*w)+=3; (*h)+=3;
+  clip( x, y, w, h, image_width, image_height );
 }
 
 /* Expand to a even y co-ord */
 static void
-expand_dotmatrix( int *x GCC_UNUSED, int *y, int *w GCC_UNUSED, int *h )
+expand_dotmatrix( int *x, int *y, int *w, int *h,
+		  int image_width, int image_height )
 {
   int y_mod = (*y) % 2;
 
