@@ -255,3 +255,4 @@
 	 present.
 20031008 ui/svga/svgakeyboard.c: F3 should open all files, not just
 	 snapshots.
+20031009 fuse.c: make the --record option record rather than playback.

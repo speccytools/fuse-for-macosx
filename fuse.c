@@ -534,7 +534,7 @@ do_start_files( start_files_t *start_files )
   }
 
   if( start_files->recording ) {
-    error = utils_open_file( start_files->recording, autoload, NULL );
+    error = rzx_start_recording( start_files->recording, 1 );
     if( error ) return error;
   }
 
