@@ -68,6 +68,8 @@
 	* Reset the Timex's SCLD when loading snapshot (Philip Kendall,
 	  Frederick Meunier).
 
+	* Timex machines have no loading noise (Frederick Meunier).
+
 	* Distribute glibc's getopt so that long options are available
 	  even if the native libc doesn't provide them (Philip Kendall).
 	
