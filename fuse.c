@@ -246,12 +246,15 @@ static int fuse_end(void)
 {
   int error;
 
+  /* Must happen before memory is deallocated as we read the character
+     set from memory for the text output */
+  printer_end();
+
   error = machine_end();
   if( error ) return error;
 
   if(!sound_enabled) timer_end();
   sound_end();
-  printer_end();
   rzx_end();
   event_end();
   ui_end();
