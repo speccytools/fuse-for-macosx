@@ -1,4 +1,5 @@
 /*.tap
+/*.tzx
 /*.z80
 /.deps
 /Makefile
