@@ -42,6 +42,8 @@
 #include "spectrum.h"
 #include "z80/z80.h"
 
+static DWORD specplus3_contend_delay( void );
+
 spectrum_port_info specplus3_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
@@ -143,8 +145,92 @@ void specplus3_writebyte(WORD address, BYTE b)
   }
 }
 
-/* Temporary hack */ DWORD spec48_contend_memory( WORD address );
-/* Temporary hack */ DWORD spec48_contend_port( WORD port );
+DWORD specplus3_contend_memory( WORD address )
+{
+  int bank;
+
+  /* Contention occurs in pages 4 to 7. If we're not in a special
+     RAM ocnfiguration, the logic is the same as for the 128K machine.
+     If we are, just enumerate the cases */
+  if( machine_current->ram.special ) {
+
+    switch( machine_current->ram.specialcfg ) {
+
+    case 0: /* Pages 0, 1, 2, 3 */
+      return 0;
+    case 1: /* Pages 4, 5, 6, 7 */
+      return specplus3_contend_delay();
+    case 2: /* Pages 4, 5, 6, 3 */
+    case 3: /* Pages 4, 7, 6, 3 */
+      bank = address / 0x4000;
+      switch( bank ) {
+      case 0: case 1: case 2:
+	return specplus3_contend_delay();
+      case 3:
+	return 0;
+      }
+    }
+
+  } else {
+
+    if( ( address >= 0x4000 && address < 0x8000 ) ||
+	( address >= 0xc000 && machine_current->ram.current_page >= 4 )
+	)
+      return specplus3_contend_delay();
+  }
+
+  return 0;
+}
+
+DWORD specplus3_contend_port( WORD port )
+{
+  /* Contention does not occur for the ULA.
+     FIXME: Unknown for other ports, so let's assume it doesn't for now */
+  return 0;
+}
+
+static DWORD specplus3_contend_delay( void )
+{
+  DWORD tstates_through_line;
+  
+  /* No contention in the upper border */
+  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+    return 0;
+
+  /* Or the lower border */
+  if( tstates >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
+                                              DISPLAY_HEIGHT          ] )
+    return 0;
+
+  /* Work out where we are in this line */
+  tstates_through_line =
+    ( tstates + machine_current->timings.left_border_cycles ) %
+    machine_current->timings.cycles_per_line;
+
+  /* No contention if we're in the left border */
+  if( tstates_through_line < machine_current->timings.left_border_cycles - 3 ) 
+    return 0;
+
+  /* Or the right border or retrace */
+  if( tstates_through_line >= machine_current->timings.left_border_cycles +
+                              machine_current->timings.screen_cycles - 3 )
+    return 0;
+
+  /* We now know the ULA is reading the screen, so put in the appropriate
+     delay */
+  switch( tstates_through_line % 8 ) {
+    case 5: return 1; break;
+    case 6: return 0; break;
+    case 7: return 7; break;
+    case 0: return 6; break;
+    case 1: return 5; break;
+    case 2: return 4; break;
+    case 3: return 3; break;
+    case 4: return 2; break;
+  }
+
+  return 0;	/* Shut gcc up */
+}
 
 int specplus3_init( machine_info *machine )
 {
@@ -160,8 +246,8 @@ int specplus3_init( machine_info *machine )
   machine->ram.read_memory    = specplus3_readbyte;
   machine->ram.read_screen    = specplus3_read_screen_memory;
   machine->ram.write_memory   = specplus3_writebyte;
-  machine->ram.contend_memory = spec48_contend_memory;
-  machine->ram.contend_port   = spec48_contend_port;
+  machine->ram.contend_memory = specplus3_contend_memory;
+  machine->ram.contend_port   = specplus3_contend_port;
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;
@@ -224,5 +310,3 @@ void specplus3_memoryport_write(WORD port, BYTE b)
   }
 
 }
-
-

@@ -38,6 +38,10 @@ BYTE spec128_unattached_port( void );
 BYTE spec128_readbyte(WORD address);
 BYTE spec128_read_screen_memory(WORD offset);
 void spec128_writebyte(WORD address, BYTE b);
+
+DWORD spec128_contend_memory( WORD address );
+DWORD spec128_contend_port( WORD port );
+
 int spec128_init( machine_info *machine );
 int spec128_reset(void);
 

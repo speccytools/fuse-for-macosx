@@ -40,6 +40,8 @@
 #include "spectrum.h"
 #include "z80/z80.h"
 
+static DWORD spec128_contend_delay( void );
+
 spectrum_port_info spec128_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
@@ -92,8 +94,69 @@ void spec128_writebyte(WORD address, BYTE b)
   }
 }
 
-/* Temporary hack */ DWORD spec48_contend_memory( WORD address );
-/* Temporary hack */ DWORD spec48_contend_port( WORD port );
+DWORD spec128_contend_memory( WORD address )
+{
+  /* Contention occurs in pages 4 to 7. 0x4000 to 0x7fff is always
+     page 5, whilst 0xc000 to 0xffff could have one of 4 to 7 paged in */
+  if( ( address >= 0x4000 && address < 0x8000 ) ||
+      ( address >= 0xc000 && machine_current->ram.current_page >= 4 )
+    )
+    return spec128_contend_delay();
+
+  return 0;
+}
+
+DWORD spec128_contend_port( WORD port )
+{
+  /* Contention occurs for the ULA, or for the memory paging port */
+  if( ( port & 0x0001 ) == 0x0000 ||
+      ( port & 0xc002 ) == 0x4000    ) return spec128_contend_delay();
+
+  return 0;
+}
+
+static DWORD spec128_contend_delay( void )
+{
+  DWORD tstates_through_line;
+  
+  /* No contention in the upper border */
+  if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
+    return 0;
+
+  /* Or the lower border */
+  if( tstates >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
+                                              DISPLAY_HEIGHT          ] )
+    return 0;
+
+  /* Work out where we are in this line */
+  tstates_through_line =
+    ( tstates + machine_current->timings.left_border_cycles ) %
+    machine_current->timings.cycles_per_line;
+
+  /* No contention if we're in the left border */
+  if( tstates_through_line < machine_current->timings.left_border_cycles - 3 ) 
+    return 0;
+
+  /* Or the right border or retrace */
+  if( tstates_through_line >= machine_current->timings.left_border_cycles +
+                              machine_current->timings.screen_cycles - 3 )
+    return 0;
+
+  /* We now know the ULA is reading the screen, so put in the appropriate
+     delay */
+  switch( tstates_through_line % 8 ) {
+    case 5: return 6; break;
+    case 6: return 5; break;
+    case 7: return 4; break;
+    case 0: return 3; break;
+    case 1: return 2; break;
+    case 2: return 1; break;
+    case 3: return 0; break;
+    case 4: return 0; break;
+  }
+
+  return 0;	/* Shut gcc up */
+}
 
 int spec128_init( machine_info *machine )
 {
@@ -109,8 +172,8 @@ int spec128_init( machine_info *machine )
   machine->ram.read_memory    = spec128_readbyte;
   machine->ram.read_screen    = spec128_read_screen_memory;
   machine->ram.write_memory   = spec128_writebyte;
-  machine->ram.contend_memory = spec48_contend_memory;
-  machine->ram.contend_port   = spec48_contend_port;
+  machine->ram.contend_memory = spec128_contend_memory;
+  machine->ram.contend_port   = spec128_contend_port;
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;
