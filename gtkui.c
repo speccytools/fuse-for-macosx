@@ -387,7 +387,7 @@ static void gtkui_tape_play( GtkWidget *widget, gpointer data )
 }
 
 /* Called by the menu when Tape/Write selected */
-static void gtkui_tape_play( GtkWidget *widget, gpointer data )
+static void gtkui_tape_write( GtkWidget *widget, gpointer data )
 {
   char *filename;
 
