@@ -856,9 +856,15 @@ update_disassembly( void )
   gtk_clist_clear( GTK_CLIST( disassembly ) );
 
   for( i = 0, address = disassembly_top; i < 20; i++ ) {
-
+    int l;
     snprintf( disassembly_text[0], 40, format_16_bit(), address );
     debugger_disassemble( disassembly_text[1], 40, &length, address );
+
+    /* pad to 16 characters (long instruction) to avoid varying width */
+    l = strlen( disassembly_text[1] );
+    while( l < 16 ) disassembly_text[1][l++] = ' ';
+    disassembly_text[1][l] = 0;
+
     address += length;
 
     gtk_clist_append( GTK_CLIST( disassembly ), disassembly_text );

@@ -1248,3 +1248,6 @@
 20050226 tape.[ch]: Media/Tape/Play always starts the tape playing, even
 	 if tape traps are active. Makes working with normal speed custom
 	 loader blocks less painful (patch #1150682) (Darren).
+20050226 ui/gtk/debugger.c: pad disassembled instructions to fixed width
+	 so debugger pane stays a constant width (patch #1150686)
+	 (Darren).
