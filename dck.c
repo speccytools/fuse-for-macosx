@@ -30,6 +30,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -141,12 +142,18 @@ dck_read( const char *filename )
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
       case LIBSPECTRUM_DCK_PAGE_RAM:
-        /* If there is initialised memory in the home bank we probably want to
-           copy it to the appropriate RAM[] page, ignore for now */
-        if( dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME ) break;
-        mem[i].page = dck->dck[num_block]->pages[i];
-        mem[i].allocated = 1;
-        mem[i].writeable = 1;
+        if( dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME && i > 1 ) {
+          /* Because the scr and snapshot code depends on the standard memory
+             map being in the RAM[] array, we copy blocks from the HOME bank
+             into the appropriate page via the timex_home structure */
+          memcpy( mem[i].page, dck->dck[num_block]->pages[i], 0x2000 );
+          free( dck->dck[num_block]->pages[i] );
+        } else {
+          mem[i].page = dck->dck[num_block]->pages[i];
+          mem[i].allocated = 1;
+          mem[i].writeable = 1;
+        }
+
         break;
 
       }
