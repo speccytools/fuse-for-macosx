@@ -153,7 +153,6 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   rzx_recording = 1;
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
-  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 1 );
 
   if( settings_current.competition_mode ) {
 
@@ -166,6 +165,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
     
   } else {
 
+    ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 1 );
     rzx_competition_mode = 0;
 
   }
@@ -289,6 +289,7 @@ start_playback( libspectrum_rzx *rzx )
   counter_reset();
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 1 );
 
   return 0;
 }
@@ -300,6 +301,7 @@ int rzx_stop_playback( int add_interrupt )
   rzx_playback = 0;
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
 
   /* We've now finished with the RZX file, so add an end of frame
      event if we've been requested to do so; we don't if we just run
