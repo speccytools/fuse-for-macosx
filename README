@@ -1,9 +1,9 @@
-The Free Unix Spectrum Emulator (Fuse) 0.2.0
+The Free Unix Spectrum Emulator (Fuse) 0.2.1
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.2.0.
+is Fuse (the Free Unix Spectrum Emulator), version 0.2.1.
 
 What Fuse does have:
 
@@ -21,7 +21,7 @@ What Fuse doesn't have:
 
 What you'll need to run Fuse:
 
-* A version of Un*x and X
+* A version of Un*x, with X and glib.
 
 To compile Fuse:
 
@@ -68,46 +68,21 @@ If you have any bug reports, suggestions or (particularly
 appreciated!) patches for Fuse, mail them to me at
 pak@ast.cam.ac.uk. For more general Speccy related discussions, visit
 the Usenet group `comp.sys.sinclair', but do read the FAQ
-(http://www.ast.cam.ac.uk/~pak/cssfaq/index.html) first!
+(http://www.srcf.ucam.org/~pak21/cssfaq/index.html) first!
 
 Fuse has its own home page, which you can find at:
 
-http://www.ast.cam.ac.uk/~pak/spectrum/fuse.html
+http://www.srcf.ucam.org/~pak21/spectrum/fuse.html
 
 or the latest version should be available from the World of Spectrum
 (http://www.void.jump.org/) FTP site:
 
 ftp://ftp.void.jump.org/pub/sinclair/emulators/unix/
 
-Some thanks (in alphabetical order):
-
-* Michael Bukin: for XWinAllegro (used by previous versions of Fuse
-  for the graphical display)
-  (http://www.canvaslink.com/allegro/xwinallegro/)
-
-* Ian Collier: the source to his xz80
-  (http://www.comlab.ox.ac.uk/oucl/users/ian.collier/Spectrum/index.html)
-  was very helpful for getting the z80 opcodes right.
-
-* Shawn Hargreaves: for Allegro (http://www.talula.demon.co.uk/allegro/)
-  (again, used by previous versions of Fuse for the graphical display)
-
-* Thomas Harte: for the much faster console display routines (Not present
-  in the current version).
-
-* Erik Kunze: for some helpful hints on how to program under Unix.
-
-* Gerton Lunter: his wonderful z80
-  (ftp://ftp.void.jump.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
-  got me started on this emulation lark all those years ago...
-
-* Martijn van der Heide: for World of Spectrum
-  (http://www.void.jump.org/)
-
 Finally, if you want to see how a Unix Speccy emulator should be done,
-check out Erik's `xzx': http://www.philosys.de/~kunze/xzx/.
+check out Erik Kunze's `xzx': http://www.philosys.de/~kunze/xzx/.
 
 Philip Kendall <pak@ast.cam.ac.uk>
-27 September 1999
+17 December 2000
 
 $Id$

@@ -1,0 +1,33 @@
+Some thanks (in alphabetical order):
+
+* Michael Bukin: for XWinAllegro (used by previous versions of Fuse
+  for the graphical display)
+  (http://www.canvaslink.com/allegro/xwinallegro/)
+
+* Ian Collier: the source to his xz80
+  (http://www.comlab.ox.ac.uk/oucl/users/ian.collier/Spectrum/index.html)
+  was very helpful for getting the z80 opcodes right.
+
+* Shawn Hargreaves: for Allegro (http://www.talula.demon.co.uk/allegro/)
+  (again, used by previous versions of Fuse for the graphical display)
+
+* Thomas Harte: for the much faster console display routines (Not present
+  in the current version).
+
+* Erik Kunze: for lots of helpful hints on how to program under Unix.
+
+* Gerton Lunter: his wonderful z80
+  (ftp://ftp.void.jump.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
+  got me started on this emulation lark all those years ago...
+
+* Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
+  emulation.
+
+* Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)
+  gave the inspiration for an important rewrite of the Z80 core, and was
+  also _very_ useful whilst trying to track down some bugs.
+
+* Martijn van der Heide: for World of Spectrum (http://www.void.jump.org/)
+  -- simply the best Speccy Web site out there.
+
+$Id$
