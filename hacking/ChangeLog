@@ -872,3 +872,4 @@
 20040528 menu_data.c,periph.c,simpleide.c,zxatasp.c,zxcf.c,ui/ui.h,
 	 ui/gtk/gtkui.c: (De)activate IDE menu items as appropriate.
 20040528 ui/gtk/gtkui.c: refactor the menu item (de)activation code.
+20040528 settings.pl: Make 2048 ROM label consistent with the others.
