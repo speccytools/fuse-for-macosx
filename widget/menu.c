@@ -121,29 +121,19 @@ widget_menu_keyhandler( input_key key )
 
 /* General callbacks */
 
-/* The callback to get a file name and do something with it */
-int
-widget_apply_to_file( int (*func)( const char *, void * ), void *data )
+char *
+menu_get_filename( const char *title )
 {
+  char *filename = NULL;
+
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
   if( widget_filesel_name ) {
-    func( widget_filesel_name, data );
-    free( widget_filesel_name );
+    filename = strdup( widget_filesel_name );
+    if( !filename )
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
   }
 
-  return 0;
-}
-
-static int
-open_file( const char *filename, void *data )
-{
-  return utils_open_file( filename, settings_current.auto_load, NULL );
-}
-
-void
-menu_file_open( int action )
-{
-  widget_apply_to_file( open_file, NULL );
+  return filename;
 }
 
 void
@@ -183,34 +173,6 @@ menu_file_recording_recordfromsnapshot( int action )
   rzx_start_recording( "record.rzx", settings_current.embed_snapshot );
 }
 
-static int
-load_snapshot( const char *filename, void *data )
-{
-  return snapshot_read( filename );
-}
-
-static int
-get_snapshot( void )
-{
-  return widget_apply_to_file( load_snapshot, NULL );
-}
-
-void
-menu_file_recording_play( int action )
-{
-  int error;
-
-  if( rzx_playback || rzx_recording ) return;
-
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-
-  if( widget_filesel_name ) {
-    error = rzx_start_playback( widget_filesel_name, get_snapshot );
-    free( widget_filesel_name );
-  }
-
-}
-
 void
 menu_file_aylogging_record( int action )
 {
@@ -218,18 +180,6 @@ menu_file_aylogging_record( int action )
 
   widget_end_all( WIDGET_FINISHED_OK );
   psg_start_recording( "ay.psg" );
-}
-
-static int
-open_screenshot( const char *filename, void *data )
-{
-  return screenshot_scr_read( filename );
-}
-
-void
-menu_file_openscrscreenshot( int action )
-{
-  widget_apply_to_file( open_screenshot, NULL );
 }
 
 void
@@ -411,12 +361,6 @@ menu_machine_debugger( int action )
 }
 
 void
-menu_media_tape_open( int action )
-{
-  widget_apply_to_file( tape_open_default_autoload, NULL );
-}
-
-void
 menu_media_tape_browse( int action )
 {
   widget_do( WIDGET_TYPE_BROWSE, NULL );
@@ -427,20 +371,6 @@ ui_tape_write( void )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_write( "tape.tzx" );
-}
-
-static int
-insert_disk( const char *filename, void *data )
-{
-  specplus3_drive_number which = *(specplus3_drive_number*)data;
-
-#ifdef HAVE_765_H
-  if( machine_current->capabilities &
-      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
-    return specplus3_disk_insert( which, filename );
-#endif			/* #ifdef HAVE_765_H */
-
-  return trdos_disk_insert( which, filename );
 }
 
 void
@@ -458,7 +388,16 @@ menu_media_disk_insert( int action )
     fuse_abort();
   }
 
-  widget_apply_to_file( insert_disk, &which );
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  if( !widget_filesel_name ) return;
+
+#ifdef HAVE_765_H
+  if( machine_current->capabilities &
+      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
+    return specplus3_disk_insert( which, widget_filesel_name );
+#endif			/* #ifdef HAVE_765_H */
+
+  return trdos_disk_insert( which, widget_filesel_name );
 }
 
 #ifdef HAVE_765_H
@@ -481,47 +420,6 @@ ui_trdos_disk_write( trdos_drive_number which )
   snprintf( filename, 20, "drive%c.trd", (char)( 'a' + which ) );
 
   return trdos_disk_write( which, filename );
-}
-
-static int
-insert_cartridge( const char *filename, void *data )
-{
-  return dck_insert( filename );
-}
-
-void
-menu_media_cartridge_insert( int action )
-{
-  widget_apply_to_file( insert_cartridge, NULL );
-}
-
-static libspectrum_ide_unit
-action_to_ideunit( int action )
-{
-  switch( action ) {
-  case 1: return LIBSPECTRUM_IDE_MASTER;
-  case 2: return LIBSPECTRUM_IDE_SLAVE;
-  }
-
-  ui_error( UI_ERROR_ERROR, "action_to_ideunit: unknown action %d", action );
-  fuse_abort();
-}
-
-static int
-insert_simpleide( const char *filename, void *data )
-{
-  libspectrum_ide_unit unit = *(libspectrum_ide_unit*)data;
-
-  return simpleide_insert( filename, unit );
-}
-
-void
-menu_media_ide_simple8bit_insert( int action )
-{
-  libspectrum_ide_unit unit;
-
-  unit = action_to_ideunit( action );
-  widget_apply_to_file( insert_simpleide, &unit );
 }
 
 void

@@ -749,3 +749,5 @@
 20040415 menu.[ch],rzx.[ch],ui/gtk/{binary.c,fileselector.c,gtkinternals.h,
 	 gtkui.c,roms.c},widget/menu.c: generalise more functions into
 	 menu.c (GTK+ changes).
+20040415 widget/{menu.c,widget.h}: generalise more functions into menu.c
+	 (widget changes).

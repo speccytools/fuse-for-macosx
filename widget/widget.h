@@ -103,9 +103,6 @@ extern widget_menu_entry widget_menu[];
 /* The name returned from the file selector */
 extern char* widget_filesel_name;
 
-/* Get a filename and do something with it */
-int widget_apply_to_file( int (*func)( const char *, void * ), void *data );
-
 /* Select a machine */
 int widget_select_machine( void *data );
      
