@@ -197,8 +197,8 @@ int ui_init(int *argc, char ***argv, int width, int height)
 
   geometry.min_width = width;
   geometry.min_height = height;
-  geometry.max_width = 3*width;
-  geometry.max_height = 3*height;
+  geometry.max_width = 2 * width;
+  geometry.max_height = 2 * height;
   geometry.base_width = 0;
   geometry.base_height = 0;
   geometry.width_inc = width;
