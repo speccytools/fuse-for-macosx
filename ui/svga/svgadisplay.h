@@ -1,7 +1,5 @@
-/* svgaui.c: Routines for dealing with the svgalib user interface
-   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Russell Marks
-
-   $Id$
+/* svgadisplay.h: Routines for dealing with the svgalib display
+   Copyright (c) 2003 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,52 +22,10 @@
 
 */
 
-#include <config.h>
+#ifndef FUSE_SVGADISPLAY_H
+#define FUSE_SVGADISPLAY_H
 
-#ifdef UI_SVGA			/* Use this iff we're using svgalib */
+int svgadisplay_init( void );
+int svgadisplay_end( void );
 
-#include <stdio.h>
-
-#include <vgakeyboard.h>
-
-#include "display.h"
-#include "fuse.h"
-#include "svgadisplay.h"
-#include "svgakeyboard.h"
-#include "ui/ui.h"
-#include "ui/uidisplay.h"
-
-int ui_init(int *argc, char ***argv)
-{
-  int error;
-
-  error = svgadisplay_init();
-  if(error) return error;
-
-  error = svgakeyboard_init();
-  if(error) return error;
-
-  return 0;
-}
-
-int
-ui_event( void )
-{
-  keyboard_update();
-  return 0;
-}
-
-int ui_end(void)
-{
-  int error;
-
-  error = svgakeyboard_end();
-  if(error) return error;
-
-  error = svgadisplay_end();
-  if(error) return error;
-
-  return 0;
-}
-
-#endif				/* #ifdef UI_SVGA */
+#endif			/* #ifndef FUSE_SVGADISPLAY_H */

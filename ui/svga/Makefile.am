@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2002 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -35,4 +35,4 @@ BUILT_SOURCES = keysyms.c
 keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl svga ../../keysyms.dat > $@
 
-noinst_HEADERS = svgakeyboard.h
+noinst_HEADERS = svgadisplay.h svgakeyboard.h
