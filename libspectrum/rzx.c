@@ -92,13 +92,25 @@ libspectrum_rzx_frame( libspectrum_rzx *rzx, size_t instructions,
   frame = &rzx->frames[ rzx->count ];
 
   frame->instructions = instructions;
-  frame->count        = count;
 
-  frame->in_bytes = (libspectrum_byte*)
-    malloc( count * sizeof( libspectrum_byte ) );
-  if( frame->in_bytes == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+  /* Check for repeated frames */
+  if( rzx->count != 0 && count != 0 &&
+      count == rzx->frames[ rzx->count - 1].count &&
+      !memcmp( in_bytes, rzx->frames[ rzx->count - 1].in_bytes, count ) ) {
+	
+    frame->repeat_last = 1;
 
-  memcpy( frame->in_bytes, in_bytes, count * sizeof( libspectrum_byte ) );
+  } else {
+
+    frame->repeat_last = 0;
+    frame->count = count;
+
+    frame->in_bytes = (libspectrum_byte*)
+      malloc( count * sizeof( libspectrum_byte ) );
+    if( frame->in_bytes == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+    memcpy( frame->in_bytes, in_bytes, count * sizeof( libspectrum_byte ) );
+  }
 
   /* Move along to the next frame */
   rzx->count++;
@@ -647,7 +659,7 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
 
   /* Write the length in */
   length_ptr = *buffer + length_offset;
-  libspectrum_write_dword( &length_ptr, size );
+  libspectrum_write_dword( &length_ptr, size ); length_ptr -= 4;
 
   if( compress ) {
 
@@ -664,6 +676,11 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
 			       libspectrum_error_message( error ) );
       return error;
     }
+
+    fprintf( stderr, "Compressed data from %d to %d bytes\n",
+	     *ptr - data_ptr, gzlength );
+
+    fprintf( stderr, "%p %p\n", *buffer + length_offset, length_ptr );
 
     if( gzlength >= *ptr - data_ptr ) { /* Compression made it bigger :-( */
       *(*buffer + flags_offset) &= ~0x02; /* Clear `compressed' bit */
