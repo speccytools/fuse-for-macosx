@@ -757,3 +757,5 @@
 20040416 keyboard.[ch],ui/gtk/gtkjoystick.c: add kludgey UI to allow
 	 the joystick fire button actions to be changed.
 20040419 Major memory mapping revamp (patch #932893).
+20040419 printer.c: stop output to the serial printer when printer
+	 emulation is disabled.

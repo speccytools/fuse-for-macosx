@@ -529,7 +529,8 @@ void printer_serial_write(libspectrum_byte b)
 {
 static int reading=0,bits_to_get=0,ser_byte=0;
 int high=(b&8);
-
+if(!settings_current.printer)
+  return;
 if(!reading)
   {
   if(!high)
@@ -577,6 +578,8 @@ static libspectrum_dword last_tstates=0;
 static unsigned char last_data=0;
 libspectrum_dword diff;
 
+if(!settings_current.printer)
+  return;
 if((old_on && !on) || (!old_on && on))
   {
   /* got an edge */
