@@ -22,11 +22,8 @@
 
 */
 
-/* 48/128 sound support by Russell Marks */
-
-/* some AY details (volume levels, white noise RNG algorithm) based on
- * info from MAME's ay8910.c - MAME's licence explicitly permits free
- * use of info (even encourages it).
+/* The AY white noise RNG algorithm is based on info from MAME's ay8910.c -
+ * MAME's licence explicitly permits free use of info (even encourages it).
  */
 
 /* NB: I know some of this stuff looks fairly CPU-hogging.
