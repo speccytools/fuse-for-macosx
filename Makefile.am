@@ -127,6 +127,7 @@ noinst_HEADERS = ay.h \
 	display.h \
 	event.h \
 	fuse.h \
+	input.h \
 	keyboard.h \
 	machine.h \
 	memory.h \
