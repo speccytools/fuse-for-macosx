@@ -947,3 +947,4 @@
 20040619 z80/z80.c: save/restore the high bit of R correctly (thanks, Jan
          Samohýl).
 20040620 zxatasp.c,zxcf.c: more literal constant removal.
+20040620 README,autogen.sh: add script to do the autotools invocation.
