@@ -32,21 +32,33 @@
 #include "psg.h"
 #include "sound.h"
 
+/* Unused bits in the AY registers are silently zeroed out; these masks
+   accomplish this */
+static const libspectrum_byte mask[16] = {
+
+  0xff, 0x0f, 0xff, 0x0f, 0xff, 0x0f, 0x1f, 0xff,
+  0x1f, 0x1f, 0x1f, 0xff, 0xff, 0x0f, 0xff, 0xff,
+
+};
+
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
 libspectrum_byte
 ay_registerport_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  static libspectrum_byte port_input = 0xbf; /* always allow serial output */
+  int current;
+  const libspectrum_byte port_input = 0xbf; /* always allow serial output */
 
   *attached = 1;
+
+  current = machine_current->ay.current_register;
 
   /* The AY I/O ports return input directly from the port when in
      input mode; but in output mode, they return an AND between the
      register value and the port input. So, allow for this when
      reading R14... */
 
-  if(machine_current->ay.current_register == 14) {
+  if( current == 14 ) {
     if(machine_current->ay.registers[7] & 0x40)
       return (port_input & machine_current->ay.registers[14]);
     else
@@ -55,12 +67,11 @@ ay_registerport_read( libspectrum_word port GCC_UNUSED, int *attached )
 
   /* R15 is simpler to do, as the 8912 lacks the second I/O port, and
      the input-mode input is always 0xff */
-  if(machine_current->ay.current_register == 15 &&
-     !(machine_current->ay.registers[7] & 0x80))
+  if( current == 15 && !( machine_current->ay.registers[7] & 0x80 ) )
     return 0xff;
 
-  /* Otherwise return register value */
-  return machine_current->ay.registers[ machine_current->ay.current_register ];
+  /* Otherwise return register value, appropriately masked */
+  return machine_current->ay.registers[ current ] & mask[ current ];
 }
 
 /* And when it's written to */
@@ -76,11 +87,13 @@ ay_registerport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 void
 ay_dataport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  machine_current->ay.registers[ machine_current->ay.current_register ] = b;
-  sound_ay_write( machine_current->ay.current_register, b, tstates );
-  if( psg_recording )
-    psg_write_register( machine_current->ay.current_register, b );
+  int current;
 
-  if(machine_current->ay.current_register==14)
-    printer_serial_write( b );
+  current = machine_current->ay.current_register;
+
+  machine_current->ay.registers[ current ] = b & mask[ current ];
+  sound_ay_write( current, b, tstates );
+  if( psg_recording ) psg_write_register( current, b );
+
+  if( current == 14 ) printer_serial_write( b );
 }
