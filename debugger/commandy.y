@@ -61,6 +61,8 @@ void yyerror( char *s );
 
 /* Tokens as returned from the Flex scanner (commandl.l) */
 
+%token		 LOGICAL_OR	/* || */
+%token		 LOGICAL_AND	/* && */
 %token <token>	 COMPARISION	/* < > <= >= */
 %token <token>   EQUALITY	/* == != */
 %token <token>   NEGATE		/* ! ~ */
@@ -109,6 +111,8 @@ void yyerror( char *s );
 
 /* Low precedence */
 
+%left LOGICAL_OR
+%left LOGICAL_AND
 %left '|'
 %left '^'
 %left '&'
@@ -223,6 +227,14 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 	      }
 	    | expression '|' expression {
 	        $$ = debugger_expression_new_binaryop( '|', $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression LOGICAL_AND expression {
+	        $$ = debugger_expression_new_binaryop( 0x2227, $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression LOGICAL_OR expression {
+	        $$ = debugger_expression_new_binaryop( 0x2228, $1, $3 );
 		if( !$$ ) YYABORT;
 	      }
 ;

@@ -111,6 +111,9 @@ sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 "^"		{ return '^'; }
 "|"		{ return '|'; }
 
+"&&"		{ return LOGICAL_AND; }
+"||"		{ return LOGICAL_OR; }
+
 ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  return NUMBER; }
 0x{HEX}+	{ yylval.integer = strtol( yytext+2, NULL, 16 );

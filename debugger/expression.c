@@ -45,6 +45,8 @@ typedef enum expression_type {
 enum precedence {
 
   /* Lowest precedence */
+  PRECEDENCE_LOGICAL_OR,
+  PRECEDENCE_LOGICAL_AND,
   PRECEDENCE_BITWISE_OR,
   PRECEDENCE_BITWISE_XOR,
   PRECEDENCE_BITWISE_AND,
@@ -115,6 +117,8 @@ binaryop_precedence( int operation )
 {
   switch( operation ) {
 
+  case 0x2228:		    return PRECEDENCE_LOGICAL_OR;
+  case 0x2227:		    return PRECEDENCE_LOGICAL_AND;
   case    '|':		    return PRECEDENCE_BITWISE_OR;
   case    '^':		    return PRECEDENCE_BITWISE_XOR;
   case    '&':		    return PRECEDENCE_BITWISE_AND;
@@ -332,6 +336,12 @@ evaluate_binaryop( struct binaryop_type *binary )
   case '|': return debugger_expression_evaluate( binary->op1 ) |
 		   debugger_expression_evaluate( binary->op2 );
 
+  case 0x2227: return debugger_expression_evaluate( binary->op1 ) &&
+		   debugger_expression_evaluate( binary->op2 );
+
+  case 0x2228: return debugger_expression_evaluate( binary->op1 ) ||
+		   debugger_expression_evaluate( binary->op2 );
+
   }
 
   ui_error( UI_ERROR_ERROR, "unknown binary operator %d", binary->operation );
@@ -451,6 +461,8 @@ deparse_binaryop( char *buffer, size_t length,
   case    '&': operation_string = "&";  break;
   case    '^': operation_string = "^";  break;
   case    '|': operation_string = "|";  break;
+  case 0x2227: operation_string = "&&"; break;
+  case 0x2228: operation_string = "||"; break;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown binary operation %d",
