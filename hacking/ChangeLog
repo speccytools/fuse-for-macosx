@@ -1167,3 +1167,5 @@
 	 sound/osssound.c: add comment about writing frame sized chunks
 	 ui/options.dat: shorten "joystick snap prompt" entry
 	 (all part of patch #1080531) (Fred).
+20050102 ui.c: don't try and set the 'Record movie as PNG' menu item as
+	 (in)active if libpng not present.
