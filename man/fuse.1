@@ -52,8 +52,10 @@ The emulator can load Z80 and SNA snapshots, and TAP and TZX
 virtual-tape files. Saving to both Z80 snapshots and TZX tape files is
 supported. The SLT extension to the Z80 format is partly supported
 (enough for multi-load games); however, loading of the old DAT-file
-variant is not. There is also very basic support for the RZX input
-recording format.
+variant is not. DSK disk images are supported when emulating a +3.
+.PP
+There is also support for reading and writing the RZX input recording
+format.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -402,6 +404,13 @@ actually works a little better than ACB stereo modifications for the
 machine itself, since it uses stereo positioning rather than simply
 playing on one channel only.
 .RE
+.PP
+.I "Beeper pseudo-stereo"
+.RS
+The Spectrum beeper is inherently mono, but enabling this option adds
+a simple fake-stereo effect. While the slight echo involved can
+sometimes make beeper noise sound worse, in many cases it gives an
+acceptable result.
 .RE
 .PP
 .I F5
@@ -416,9 +425,9 @@ Reset the emulated Spectrum.
 .I "Machine, Select..."
 .RS
 Choose a type of Spectrum to emulate. The machine initially emulated
-is the 48K Spectrum. The choices available are 48K, 128K, +2, +2A, and
-TC2048 but most of the time you'll probably want to use the 48 or 128
-machines.
+is the 48K Spectrum. The choices available are 48K, 128K, +2, +2A, +3,
+and TC2048 but most of the time you'll probably want to use the 48 or
+128 machines.
 .RE
 .PP
 .I F7
@@ -495,6 +504,41 @@ These newly-saved files are
 written to any tape file until you choose this option!
 .RE
 .PP
+.I "Disk"
+.RS
+Note that the Disk menu and associated submenus are available only if
+Fuse was compiled with +3 support. (This won't have happened if the
+`lib765' library couldn't be found at compile time.) Even then, the
+virtual disk images are only accessible when emulating a +3.
+.RE
+.PP
+.I "Disk, Drive A:, Insert"
+.RS
+Select a disk-image file (in DSK format) to read/write in the emulated
++3's drive A:. Currently Fuse provides no way to create these files,
+though it's possible to format an existing one from the emulated +3.
+.PP
+Both emulated drives are the 3" type (in effect, the internal drive
+plus an external FD-1). With the usual +3 format, these have a
+capacity of 173K.
+.RE
+.PP
+.I "Disk, Drive A:, Eject"
+.RS
+Deselect the disk image currently in drive A: - or from the +3's
+perspective, eject it.
+.RE
+.PP
+.I "Disk, Drive B:, Insert"
+.RS
+As above, but for drive B:.
+.RE
+.PP
+.I "Disk, Drive B:, Eject"
+.RS
+As above, but for drive B:.
+.RE
+.PP
 .I "Help, Keyboard picture..."
 .RS
 Display a diagram showing the Spectrum keyboard, and the various
@@ -560,6 +604,16 @@ section below.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH "DISPLAY SIZE"
+Some of Fuse's UIs allow resizing of the emulated Spectrum's display.
+Since these are the window-based ones (GTK+ and Xlib), you can resize
+the window by, well, resizing it. :-) You do have to make the window
+twice the width before the Fuse window actually scales up; you don't
+.I have
+to make it twice the height as well, but generally you'd want to.
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH "THE EMULATED SPECTRUM"
 The emulated Spectrum is, by default, an unmodified 48K Spectrum with
 a tape player and ZX Printer attached. Oh, and apparently some magical
@@ -582,13 +636,13 @@ The various models of Spectrum supported a range of ways to connect
 printers, three of which are supported by Fuse. Different printers are
 made available for the different models:
 .TP
-.I 48
+.IR 48 ", " TC2048
 ZX Printer
 .TP
 .IR 128 / +2
 Serial printer (text-only)
 .TP
-.I +2A
+.IR +2A ", " +3
 Parallel printer (text-only)
 .PP
 Any printout is appended to one (or both) of two files, depending on
@@ -708,6 +762,9 @@ the original widget UI code.
 .PP
 Russell Marks wrote the sound emulation and OSS-specific sound code,
 the joystick emulation, some of the printer code, and this man page.
+.PP
+John Elliott's lib765 library emulates the +3's disk controller chip,
+providing Fuse's +3 disk support.
 .PP
 Ian Collier wrote the ZX Printer emulation (for xz80).
 .PP
