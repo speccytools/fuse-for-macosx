@@ -47,7 +47,7 @@ gtkstatusbar_create( GtkBox *parent )
   status_bar = gtk_hbox_new( FALSE, 3 );
   gtk_box_pack_start_defaults( parent, status_bar );
 
-  disk_status = gtk_label_new( "Disk: 0" );
+  disk_status = gtk_label_new( "Disk: N/A" );
   gtk_box_pack_start_defaults( GTK_BOX( status_bar ), disk_status );
 
   tape_status = gtk_label_new( "Tape: 0" );
@@ -62,9 +62,14 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
   switch( item ) {
 
   case UI_STATUSBAR_ITEM_DISK:
-    gtk_label_set( GTK_LABEL( disk_status ),
-		   state == UI_STATUSBAR_STATE_ACTIVE ? "Disk: 1" : "Disk: 0"
-		 );
+    switch( state ) {
+    case UI_STATUSBAR_STATE_NOT_AVAILABLE:
+      gtk_label_set( GTK_LABEL( disk_status ), "Disk: N/A" ); break;
+    case UI_STATUSBAR_STATE_ACTIVE:
+      gtk_label_set( GTK_LABEL( disk_status ), "Disk: 1" ); break;
+    default:
+      gtk_label_set( GTK_LABEL( disk_status ), "Disk: 0" ); break;
+    }      
     return 0;
 
   case UI_STATUSBAR_ITEM_TAPE:

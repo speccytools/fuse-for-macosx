@@ -94,6 +94,7 @@ typedef enum ui_statusbar_item {
 
 typedef enum ui_statusbar_state {
 
+  UI_STATUSBAR_STATE_NOT_AVAILABLE,
   UI_STATUSBAR_STATE_INACTIVE,
   UI_STATUSBAR_STATE_ACTIVE,
 

@@ -229,3 +229,6 @@
 	 status bar.
 20031005 specplus3.c, tape.c, ui/ui.h, ui/gtk: better encapsulation of the
 	 status bar routines.
+20031005 machine.c, ui/ui.h, ui/gtk/statusbar.c: add a 'not available'
+	 state for the disk statusbar item.
+
