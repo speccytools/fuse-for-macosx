@@ -102,6 +102,10 @@ int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
 
   snap->out_ula = buffer[26] & 0x07;
 
+  /* A bit before an interrupt. Why this value? Because it's what
+     z80's `convert' uses :-) */
+  snap->tstates = 69664;
+
   return LIBSPECTRUM_ERROR_NONE;
 }
 
