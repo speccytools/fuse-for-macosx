@@ -359,7 +359,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
 
     if( error ) { munmap( buffer, length ); return 1; }
 
-    if( munmap( buffer, length ) ) {
+    if( length && munmap( buffer, length ) ) {
       fprintf( stderr, "%s: parse_nonoption_args: couldn't munmap `%s': %s\n",
 	       fuse_progname, argv[ first_arg ], strerror( errno ) );
       return 1;

@@ -109,7 +109,7 @@ int tape_open( const char *filename, int autoload )
     return error;
   }
 
-  if( munmap( buffer, length ) == -1 ) {
+  if( length && munmap( buffer, length ) == -1 ) {
     tape_close();
     ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
 	      strerror( errno ) );
