@@ -1297,3 +1297,5 @@
 20050326 ChangeLog,widget/{Makefile.am,error.c,menu.c,query.c,widget.[ch],
 	 widget_internals.h}: add widget query confirmation dialog (patch
 	 #1150708) (Darren).
+20050327 z80/z80.c: page in TR-DOS ROM on NMI (enables Pentagon snapshot
+	 function to work).

@@ -163,6 +163,10 @@ z80_nmi( void )
 
   writebyte( --SP, PCH ); writebyte( --SP, PCL );
 
+  if( machine_current->capabilities &
+      LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )
+    trdos_page();
+
   /* FIXME: how is R affected? */
 
   /* FIXME: how does contention apply here? */
