@@ -1062,3 +1062,5 @@
 	 if neither Dock nor If2 available.
 20040817 ui/sdl/{sdldisplay.c,sdlui.c}: SDL mouse support updates.
 20040818 ui/sdl/sdldisplay.c: Wrap long lines.
+20040905 fuse.c,menu.[ch],menu_data.c,rzx.c: support multiple input
+	 recording blocks in an RZX file.

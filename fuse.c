@@ -137,7 +137,7 @@ static int fuse_end(void);
 int main(int argc, char **argv)
 {
   if(fuse_init(argc,argv)) {
-    fprintf(stderr,"%s: error initalising -- giving up!\n", fuse_progname);
+    fprintf(stderr,"%s: error initialising -- giving up!\n", fuse_progname);
     return 1;
   }
 

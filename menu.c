@@ -102,6 +102,28 @@ MENU_CALLBACK( menu_file_recording_stop )
   if( rzx_playback  ) rzx_stop_playback( 1 );
 }  
 
+MENU_CALLBACK( menu_file_recording_rzxbreak )
+{
+  libspectrum_snap *snap;
+  libspectrum_error error;
+
+  if( !rzx_recording ) return;
+
+  WIDGET_END;
+
+  libspectrum_rzx_stop_input( rzx );
+
+  error = libspectrum_snap_alloc( &snap );
+  if( error ) return;
+
+  error = snapshot_copy_to( snap );
+  if( error ) { libspectrum_snap_free( snap ); return; }
+
+  libspectrum_rzx_add_snap( rzx, snap );
+
+  libspectrum_rzx_start_input( rzx, tstates );
+}
+
 MENU_CALLBACK( menu_file_aylogging_stop )
 {
   if ( !psg_recording ) return;

@@ -32,6 +32,7 @@ File/Recording/_Record..., Item
 File/Recording/Record _from snapshot..., Item
 File/Recording/_Play..., Item
 File/Recording/_Stop, Item
+File/Recording/RZX Break..., Item
 
 File/A_Y Logging, Branch
 File/AY Logging/_Record..., Item

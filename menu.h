@@ -52,6 +52,8 @@
 
 MENU_CALLBACK( menu_file_open );
 MENU_CALLBACK( menu_file_recording_play );
+MENU_CALLBACK( menu_file_recording_stop );
+MENU_CALLBACK( menu_file_recording_rzxbreak );
 MENU_CALLBACK( menu_file_aylogging_stop );
 MENU_CALLBACK( menu_file_openscrscreenshot );
 
@@ -95,7 +97,6 @@ int menu_open_snap( void );
 MENU_CALLBACK( menu_file_savesnapshot );
 MENU_CALLBACK( menu_file_recording_record );
 MENU_CALLBACK( menu_file_recording_recordfromsnapshot );
-MENU_CALLBACK( menu_file_recording_stop );
 MENU_CALLBACK( menu_file_loadbinarydata );
 MENU_CALLBACK( menu_file_savebinarydata );
 MENU_CALLBACK( menu_file_exit );
