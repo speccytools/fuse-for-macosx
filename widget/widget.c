@@ -234,8 +234,9 @@ int widget_do( widget_type which, void *data )
     error = widget_timer_end();
     if( error ) return error;
 
-    /* Refresh the Spectrum's display */
+    /* Refresh the Spectrum's display, including the border */
     display_refresh_all();
+    display_dirty_border();
 
   }
 

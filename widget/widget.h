@@ -161,12 +161,14 @@ void widget_machine_keyhandler( keyboard_key_name key );
 
 /* Keyboard picture */
 
+typedef struct widget_picture_data {
+  const char *filename;
+  BYTE *screen;
+  int border;
+} widget_picture_data;
+
 int widget_picture_draw( void* data );
 void widget_picture_keyhandler( keyboard_key_name key );
-
-/* The data for the keyboard picture */
-
-extern BYTE widget_keyboard_picture[6912];
 
 /* Help menu */
 

@@ -542,7 +542,9 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data )
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data )
 {
-  widget_menu_keyboard( "keyboard.scr" );
+  widget_picture_data picture_data = { "keyboard.scr", NULL, 0 };
+
+  widget_menu_keyboard( &picture_data );
 }
 
 /* Generic `tidy-up' callback */

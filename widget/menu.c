@@ -178,35 +178,35 @@ int widget_menu_write_tape( void *data )
 /* Help/Keyboard Picture */
 int widget_menu_keyboard( void *data )
 {
-  const char *filename = (const char*)data;
+  widget_picture_data *ptr = (widget_picture_data*)data;
 
   int error, fd;
-  BYTE *screen; size_t length;
+  size_t length;
 
   char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
 
-  fd = utils_find_lib( filename );
+  fd = utils_find_lib( ptr->filename );
   if( fd == -1 ) {
     fprintf( stderr, "%s: couldn't find keyboard picture (`%s')\n",
-	     fuse_progname, filename );
+	     fuse_progname, ptr->filename );
     return 1;
   }
   
-  error = utils_read_fd( fd, filename, &screen, &length );
+  error = utils_read_fd( fd, ptr->filename, &(ptr->screen), &length );
   if( error ) return error;
 
   if( length != 6912 ) {
     fprintf( stderr, "%s: keyboard picture (`%s') is not 6912 bytes long\n",
-	     fuse_progname, filename );
+	     fuse_progname, ptr->filename );
     return 1;
   }
 
-  widget_do( WIDGET_TYPE_PICTURE, screen );
+  widget_do( WIDGET_TYPE_PICTURE, ptr );
 
-  if( munmap( screen, length ) == -1 ) {
+  if( munmap( ptr->screen, length ) == -1 ) {
     snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
 	      "%s: Couldn't munmap keyboard picture (`%s')",
-	      fuse_progname, filename );
+	      fuse_progname, ptr->filename );
     perror( error_message );
     return 1;
   }

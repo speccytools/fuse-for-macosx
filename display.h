@@ -57,6 +57,8 @@ void display_dirty( WORD address );
 void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper);
 
 void display_set_border(int colour);
+int display_dirty_border( void );
+
 int display_frame(void);
 void display_refresh_all(void);
 

@@ -31,12 +31,27 @@
 #include "display.h"
 #include "ui/uidisplay.h"
 
-void uidisplay_spectrum_screen( BYTE *screen )
+void uidisplay_spectrum_screen( const BYTE *screen, int border )
 {
   int x,y;
   BYTE attr,data; int ink, paper;
 
+  for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
+    for( x=0; x < DISPLAY_SCREEN_WIDTH; x++ ) {
+      uidisplay_putpixel( x, y, border );
+      uidisplay_putpixel( x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
+			  border );
+    }
+  }
+
   for( y=0; y<DISPLAY_HEIGHT; y++ ) {
+
+    for( x=0; x < DISPLAY_BORDER_WIDTH; x++ ) {
+      uidisplay_putpixel( x,
+			  y + DISPLAY_BORDER_HEIGHT, border );
+      uidisplay_putpixel( x + DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
+			  y + DISPLAY_BORDER_HEIGHT, border );
+    }
 
     for( x=0; x < DISPLAY_WIDTH/8; x++ ) {
 
@@ -53,6 +68,5 @@ void uidisplay_spectrum_screen( BYTE *screen )
     }
   }
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT,
-		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
+  uidisplay_lines( 0, DISPLAY_SCREEN_HEIGHT - 1 );
 }

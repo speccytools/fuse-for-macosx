@@ -33,7 +33,9 @@
 
 int widget_picture_draw( void* data )
 {
-  uidisplay_spectrum_screen( (BYTE*)data );
+  widget_picture_data *ptr = (widget_picture_data*)data;
+
+  uidisplay_spectrum_screen( ptr->screen, ptr->border );
 
   return 0;
 }

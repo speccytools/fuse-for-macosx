@@ -110,10 +110,12 @@ widget_menu_entry widget_menu_tape[] = {
 
 /* Help menu */
 
+static widget_picture_data help_keyboard = { "keyboard.scr", NULL, 0 };
+
 widget_menu_entry widget_menu_help[] = {
   { "Help", 0, 0, NULL },		/* Menu title */
 
-  { "(K)eyboard...", KEYBOARD_k, widget_menu_keyboard, "keyboard.scr" },
+  { "(K)eyboard...", KEYBOARD_k, widget_menu_keyboard, &help_keyboard },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

@@ -411,6 +411,18 @@ static int display_border_column(int time_since_line)
   return column;
 }
 
+int display_dirty_border( void )
+{
+  int y;
+
+  for( y=0; y<DISPLAY_SCREEN_HEIGHT; y++ ) {
+    display_current_border[y] = display_border_mixed;
+    display_border_dirty[y] = 1;
+  }
+
+  return 0;
+}
+
 int display_frame(void)
 {
   display_next_line=0;
