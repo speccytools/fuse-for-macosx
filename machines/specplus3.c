@@ -63,7 +63,6 @@ static int special_memory_map( int which );
 static int select_special_map( int page1, int page2, int page3, int page4 );
 
 #ifdef HAVE_765_H
-static void specplus3_fdc_reset( void );
 static libspectrum_byte specplus3_fdc_status( libspectrum_word port,
 					      int *attached );
 static libspectrum_byte specplus3_fdc_read( libspectrum_word port,
@@ -80,9 +79,8 @@ static const char *dsk_template = "fuse.dsk.XXXXXX";
 #endif			/* #ifdef HAVE_765_H */
 
 static int specplus3_reset( void );
-static int specplus3_shutdown( void );
 
-const static periph_t peripherals[] = {
+const periph_t specplus3_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
@@ -98,8 +96,8 @@ const static periph_t peripherals[] = {
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
 };
 
-const static size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
+const size_t specplus3_peripherals_count =
+  sizeof( specplus3_peripherals ) / sizeof( periph_t );
 
 #if HAVE_765_H
 static FDC_PTR fdc;		/* The FDC */
@@ -174,9 +172,6 @@ specplus3_contend_delay( libspectrum_dword time )
 int specplus3_init( fuse_machine_info *machine )
 {
   int error;
-#ifdef HAVE_765_H
-  int i;
-#endif			/* #ifdef HAVE_765_H */
 
   machine->machine = LIBSPECTRUM_MACHINE_PLUS3;
   machine->id = "plus3";
@@ -199,7 +194,19 @@ int specplus3_init( fuse_machine_info *machine )
 
   machine->ay.present=1;
 
+  specplus3_765_init();
+
+  machine->shutdown = specplus3_shutdown;
+
+  return 0;
+
+}
+
+void
+specplus3_765_init( void )
+{
 #ifdef HAVE_765_H
+  int i;
 
   /* Register lib765 error callback */
   lib765_register_error_function( specplus3_fdc_error );
@@ -229,11 +236,8 @@ int specplus3_init( fuse_machine_info *machine )
   
   /* And reset the FDC */
   specplus3_fdc_reset();
+
 #endif				/* #ifdef HAVE_765_H */
-
-  machine->shutdown = specplus3_shutdown;
-
-  return 0;
 
 }
 
@@ -255,19 +259,14 @@ specplus3_reset( void )
 			    machine_current->rom_length[3] );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count,
+  error = periph_setup( specplus3_peripherals, specplus3_peripherals_count,
 			PERIPH_PRESENT_OPTIONAL );
   if( error ) return error;
 
 #ifdef HAVE_765_H
 
   specplus3_fdc_reset();
-
-  /* We can eject disks only if they are currently present */
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
-		    drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
-		    drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
+  specplus3_menu_items();
 
 #endif				/* #ifdef HAVE_765_H */
 
@@ -459,7 +458,7 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
 
 #if HAVE_765_H
 
-static void
+void
 specplus3_fdc_reset( void )
 {
   /* Reset the FDC and set up the four drives (of which only drives 0 and
@@ -469,6 +468,16 @@ specplus3_fdc_reset( void )
   fdc_setdrive( fdc, 1, drives[ SPECPLUS3_DRIVE_B ].drive );
   fdc_setdrive( fdc, 2, drive_null );
   fdc_setdrive( fdc, 3, drive_null );
+}
+
+void
+specplus3_menu_items( void )
+{
+  /* We can eject disks only if they are currently present */
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
+		    drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
+		    drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
 }
 
 static libspectrum_byte
@@ -639,7 +648,7 @@ specplus3_disk_write( specplus3_drive_number which, const char *filename )
 
 #endif			/* #ifdef HAVE_765_H */
 
-static int
+int
 specplus3_shutdown( void )
 {
 #ifdef HAVE_765_H

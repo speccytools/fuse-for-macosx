@@ -690,3 +690,5 @@
 	 replace the three 'select' widgets (machine, scaler, joystick)
 	 with one generalised one.
 20040401 machine.c,machines/: general tidy-up of the machines/ directory.
+20040401 machine.c,settings.dat,machines/{Makefile.am,machines.h,
+	 specplus3.[ch],specplus3e.c}: Spectrum +3e support.

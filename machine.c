@@ -79,6 +79,11 @@ int machine_init_machines( void )
      emulations are identical */
   error = machine_add_machine( specplus3_init );
   if (error ) return error;
+
+  /* FIXME: what should we do about the +3e if we don't have lib765? */
+  error = machine_add_machine( specplus3e_init );
+  if( error ) return error;
+
 #endif				/* #ifdef HAVE_765_H */
 
   error = machine_add_machine( tc2048_init );

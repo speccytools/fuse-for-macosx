@@ -29,9 +29,8 @@
 
 #include <libspectrum.h>
 
-#ifndef FUSE_MACHINE_H
 #include "machine.h"
-#endif			/* #ifndef FUSE_MACHINE_H */
+#include "periph.h"
 
 #ifdef HAVE_765_H
 #include <limits.h>	/* Needed to get PATH_MAX */
@@ -40,14 +39,21 @@
 #include <765.h>
 #endif			/* #ifdef HAVE_765_H */
 
+extern const periph_t specplus3_peripherals[];
+extern const size_t specplus3_peripherals_count;
+
 libspectrum_byte specplus3_unattached_port( void );
 libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset );
 libspectrum_dword specplus3_contend_port( libspectrum_word address );
 libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
 
 int specplus3_init( fuse_machine_info *machine );
+void specplus3_765_init( void );
 
 int specplus3_plus2a_common_reset( void );
+void specplus3_fdc_reset( void );
+void specplus3_menu_items( void );
+int specplus3_shutdown( void );
 
 void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );

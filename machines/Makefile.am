@@ -36,6 +36,7 @@ libmachines_a_SOURCES = pentagon.c \
 			specplus2.c \
 			specplus2a.c \
 			specplus3.c \
+			specplus3e.c \
 			tc2048.c \
 			tc2068.c
 
