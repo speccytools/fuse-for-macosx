@@ -12,7 +12,7 @@
 	  remove the use of `scandir' function to improve inter-Unix
 	  compatability, append `/' to directories to make them more
 	  obvious, stop the hangs if you tried to start a widget whilst
-	  one was active. (Philip Kendall).
+	  one was active. (Philip Kendall, Russell Marks).
 
 	* .z80 snapshots: deal with the case of the end marker being
 	  preceeded by 0x00 or 0x00 0xed (Philip Kendall).
@@ -25,6 +25,8 @@
 	* Have a man page (Russell Marks).
 
 	* Emulation of the AY-3-8912's register 15 (Russell Marks).
+
+	* Kempston joystick emulation (Russell Marks).
 
 2001-10-07  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
