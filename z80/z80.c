@@ -86,7 +86,8 @@ static void z80_init_tables(void)
 }
 
 /* Reset the z80 */
-void z80_reset()
+void
+z80_reset( void )
 {
   AF =BC =DE =HL =0;
   AF_=BC_=DE_=HL_=0;
@@ -98,7 +99,8 @@ void z80_reset()
 }
 
 /* Process a z80 maskable interrupt */
-void z80_interrupt()
+void
+z80_interrupt( void )
 {
   if(IFF1) {
     
