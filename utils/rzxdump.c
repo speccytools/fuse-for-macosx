@@ -245,7 +245,7 @@ read_input_block( unsigned char **ptr, unsigned char *end )
   printf( "  Flags: %d\n", flags );
 
   /* Check there's enough data */
-  if( end - *ptr < length - 18 ) {
+  if( end - *ptr < (off_t)length - 18 ) {
     fprintf( stderr, "%s: not enough frame data\n", progname );
     return 1;
   }
