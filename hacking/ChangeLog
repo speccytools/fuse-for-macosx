@@ -210,3 +210,10 @@
 	 than repeated adds of 0.02; avoids rounding errors.
 20030922 rzx.c: start timing measurements after a 1s delay to avoid
          transients.
+20030923 fuse.c, rzx.c, widget/menu.c: port RZX bugfixes from HEAD
+	 (Release-0_6_1-branch)
+20030923 ChangeLog, README, configure.in, man/fuse.1: updates for 0.6.1.1
+	 release (Release-0_6_1-branch)
+20030930 ChangeLog, README, man/fuse.1: put in release date for 0.6.1.1
+	 (Release-0_6_1-branch).
+20031001 ChangeLog, README, man/fuse.1: port 0.6.1.1 changes to HEAD.

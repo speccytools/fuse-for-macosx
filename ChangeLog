@@ -1,3 +1,12 @@
+2003-09-30  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.6.1.1 released.
+
+	* Make the SVGAlib UI compile (Philip Kendall/Russell Marks, with
+	  thanks to Josetxu Malanda).
+
+	* Various RZX-related bugfixes (Philip Kendall/Russell Marks)
+
 2003-09-13  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.6.1 released.
