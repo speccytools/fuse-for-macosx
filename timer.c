@@ -75,7 +75,7 @@ static void timer_setup_handler(void)
 void timer_signal( int signo )
 {
   /* If the emulator is running, note that time has passed */
-  if( fuse_emulation_paused ) timer_count++;
+  if( !fuse_emulation_paused ) timer_count++;
 }
 
 void timer_sleep(void)
