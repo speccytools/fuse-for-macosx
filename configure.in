@@ -74,6 +74,14 @@ dnl Select a user interface
 dnl Try various UI options; set the `ui' variable when we've got one
 dnl we like, and then don't look at the other options
 
+AH_TEMPLATE([HAVE_LIB_GLIB], [Defined if we've got glib])
+
+AH_TEMPLATE([UI_GTK], [Defined if GTK+ UI (either 1.2 or 2.x) is in use])
+
+AH_TEMPLATE([UI_GTK2], [Defined if GTK+ 2.0 is in use])
+
+AH_TEMPLATE([USE_WIDGET], [Defined if we're using a widget-based UI])
+
 dnl Look for svgalib (default=no)
 AC_MSG_CHECKING(whether svgalib UI requested)
 AC_ARG_WITH(svgalib,
@@ -83,7 +91,9 @@ svgalib=no)
 AC_MSG_RESULT($svgalib)
 if test "$svgalib" = yes; then
   AC_CHECK_HEADER(vga.h,
-                  LIBS="$LIBS -lvga"; AC_DEFINE(UI_SVGA) AC_DEFINE(USE_WIDGET)
+                  LIBS="$LIBS -lvga";
+                  AC_DEFINE([UI_SVGA], 1, [Defined if svgalib UI in use])
+                  AC_DEFINE(USE_WIDGET)
                   UI=svga; WIDGET=widget;
                   UI_LIBS="ui/svga/libuisvga.a widget/libwidget.a",
                   AC_MSG_ERROR([svgalib not found]))
@@ -99,7 +109,7 @@ dnl aalib=no)
 dnl AC_MSG_RESULT($aalib)
 dnl if test "$aalib" = yes; then
 dnl   AC_CHECK_HEADER(aalib.h,
-dnl                   LIBS="$LIBS -laa"; AC_DEFINE(UI_AALIB) AC_DEFINE(USE_WIDGET)
+dnl                   LIBS="$LIBS -laa"; AC_DEFINE([UI_AALIB], 1, [Defined if aalib UI in use]) AC_DEFINE(USE_WIDGET)
 dnl 		  ui=aalib; UI_LIBS="ui/aalib/libuiaalib.a widget/libwidget.a",
 dnl                   AC_MSG_ERROR([aalib not found]))
 dnl fi
@@ -113,7 +123,7 @@ if test -z "$UI"; then
   fb=no)
   AC_MSG_RESULT($fb)
   if test "$fb" = yes; then
-    AC_DEFINE(UI_FB)
+    AC_DEFINE([UI_FB], 1, [Defined if framebuffer UI in use])
     AC_DEFINE(USE_WIDGET)
     UI=fb; WIDGET=widget;
     UI_LIBS="ui/fb/libuifb.a widget/libwidget.a"
@@ -131,7 +141,8 @@ if test -z "$UI"; then
   if test "$sdl" = yes; then
     SDL_VERSION=1.2.4
     AM_PATH_SDL($SDL_VERSION,
-		AC_DEFINE(UI_SDL) AC_DEFINE(USE_WIDGET) UI=sdl; WIDGET=widget;
+		AC_DEFINE([UI_SDL], 1, [Defined if the SDL UI in use])
+		AC_DEFINE(USE_WIDGET) UI=sdl; WIDGET=widget;
 	        UI_LIBS="ui/sdl/libuisdl.a widget/libwidget.a", 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
     CFLAGS="$CFLAGS $SDL_CFLAGS"
@@ -150,7 +161,8 @@ if test -z "$UI"; then
   AC_MSG_RESULT($ggi)
   if test "$ggi" = yes; then
     AC_CHECK_HEADER(ggi/ggi.h,
-	            AC_DEFINE(UI_GGI) AC_DEFINE(USE_WIDGET)
+	            AC_DEFINE([UI_GGI], 1, [Defined if GGI UI in use])
+	            AC_DEFINE(USE_WIDGET)
 		    UI=ggi; WIDGET=widget;
 	            UI_LIBS="ui/ggi/libuiggi.a widget/libwidget.a"
 		    LIBS="$LIBS -lggi",
@@ -218,7 +230,7 @@ if test -z "$UI"; then
   AC_CHECK_HEADERS( X11/extensions/XShm.h )
   AC_CHECK_LIB( Xext, XShmAttach, LIBS="$LIBS -lXext" )
 
-  AC_DEFINE(UI_X)
+  AC_DEFINE([UI_X], 1, [Defined if Xlib UI in use])
   UI=xlib; WIDGET=widget;
   AC_DEFINE(USE_WIDGET)
   UI_LIBS="ui/xlib/libuixlib.a widget/libwidget.a"
@@ -297,7 +309,7 @@ dnl Check if a version of libpng which supplies png_write_png is available
 AC_CHECK_LIB( png, png_write_png,
   [AC_CHECK_HEADER(
     png.h,
-    [AC_DEFINE(USE_LIBPNG) PNG_LIBS='-lpng -lm -lz'],
+    [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
     [AC_MSG_WARN(png.h not found - saving screenshots disabled)]
   )],
   [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)],
@@ -341,7 +353,7 @@ if test "$stick" = yes; then
 	AC_MSG_RESULT([no, use libjsw])
       else
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(USE_JOYSTICK)
+	AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
       fi
       ;;
     *)
@@ -358,8 +370,9 @@ if test "$stick" = yes; then
 fi
 
 dnl See if libxml2 is available (for the config file handling)
-AM_PATH_XML2(2.0.0,AC_DEFINE(HAVE_LIB_XML2),
-  AC_WARN(libxml2 not found - config file use disabled))
+AM_PATH_XML2(2.0.0,AC_DEFINE([HAVE_LIB_XML2], 1,
+             [Defined if we've got libxml2]),
+             AC_WARN(libxml2 not found - config file use disabled))
 
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
@@ -372,7 +385,7 @@ else
 fi,
 smallmem=no)
 if test "$smallmem" = no; then
-    AC_DEFINE(HAVE_ENOUGH_MEMORY)
+    AC_DEFINE([HAVE_ENOUGH_MEMORY], 1, [Defined if we've got enough memory to compile z80_ops.c])
 fi
 AC_MSG_RESULT($smallmem)
 
@@ -410,7 +423,7 @@ fi,
 debugging=no)
 AC_MSG_RESULT($debugging)
 if test "$debugging" = yes; then
-  AC_DEFINE(DEBUG_MODE)
+  AC_DEFINE([DEBUG_MODE], 1, [Defined if we're in debugging mode])
 fi
 
 AC_OUTPUT(Makefile \
