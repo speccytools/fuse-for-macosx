@@ -109,6 +109,7 @@ typedef struct start_files_t {
   const char *disk_trdos;
   const char *dock;
   const char *harddisk;
+  const char *if2;
   const char *playback;
   const char *recording;
   const char *snapshot;
@@ -504,6 +505,7 @@ setup_start_files( start_files_t *start_files )
   start_files->disk_plus3 = settings_current.plus3disk_file;
   start_files->disk_trdos = settings_current.trdosdisk_file;
   start_files->dock = settings_current.dck_file;
+  start_files->if2 = settings_current.if2_file;
   start_files->playback = settings_current.playback_file;
   start_files->recording = settings_current.record_file;
   start_files->snapshot = settings_current.snapshot;
@@ -549,6 +551,9 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 
     case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
       start_files->dock = filename; break;
+
+    case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:
+      start_files->if2 = filename; break;
 
     case LIBSPECTRUM_CLASS_HARDDISK:
       start_files->harddisk = filename; break;
@@ -617,6 +622,16 @@ do_start_files( start_files_t *start_files )
     start_files->dock = NULL;
   }
 
+  /* Can't use disks and the Interface II simultaneously */
+  if( ( start_files->disk_plus3 || start_files->disk_trdos ) &&
+      start_files->if2                                          ) {
+    ui_error(
+      UI_ERROR_WARNING,
+      "can't use disks and the Interface II simultaneously; cartridge ignored"
+    );
+    start_files->if2 = NULL;
+  }
+
   /* If a snapshot has been specified, don't autoload tape, disks etc */
   autoload = start_files->snapshot ? 0 : settings_current.auto_load;
 
@@ -638,6 +653,11 @@ do_start_files( start_files_t *start_files )
 
   if( start_files->dock ) {
     error = utils_open_file( start_files->dock, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->if2 ) {
+    error = utils_open_file( start_files->if2, autoload, NULL );
     if( error ) return error;
   }
 
