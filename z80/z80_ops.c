@@ -557,7 +557,7 @@ void z80_do_opcodes()
       break;
     case 0x76:		/* HALT */
       z80.halted=1;
-      PC--;		
+      PC--;
       break;
     case 0x77:		/* LD (HL),A */
       contend( HL, 3 );
@@ -823,7 +823,7 @@ void z80_do_opcodes()
       break;
     case 0xc2:		/* JP NZ,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! ( F & FLAG_Z ) ) { JP(); }
+      if( ! ( F & FLAG_Z ) ) { JP(); }
       else PC+=2;
       break;
     case 0xc3:		/* JP nnnn */
@@ -832,7 +832,7 @@ void z80_do_opcodes()
       break;
     case 0xc4:		/* CALL NZ,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! (F & FLAG_Z ) ) { CALL(); }
+      if( ! ( F & FLAG_Z ) ) { CALL(); }
       else PC+=2;
       break;
     case 0xc5:		/* PUSH BC */
@@ -859,10 +859,10 @@ void z80_do_opcodes()
       break;
     case 0xca:		/* JP Z,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_Z ) { JP(); }
+      if( F & FLAG_Z ) { JP(); }
       else PC+=2;
       break;
-    case 0xcb:		/* CBxx opcodes */
+    case 0xcb:		/* shift CB */
       {
 	BYTE opcode2;
 	contend( PC, 4 );
@@ -879,7 +879,7 @@ void z80_do_opcodes()
       break;
     case 0xcc:		/* CALL Z,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_Z ) { CALL(); }
+      if( F & FLAG_Z ) { CALL(); }
       else PC+=2;
       break;
     case 0xcd:		/* CALL nnnn */
@@ -906,7 +906,7 @@ void z80_do_opcodes()
       break;
     case 0xd2:		/* JP NC,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! ( F & FLAG_C ) ) { JP(); }
+      if( ! ( F & FLAG_C ) ) { JP(); }
       else PC+=2;
       break;
     case 0xd3:		/* OUT (nn),A */
@@ -919,7 +919,7 @@ void z80_do_opcodes()
       break;
     case 0xd4:		/* CALL NC,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! (F & FLAG_C ) ) { CALL(); }
+      if( ! ( F & FLAG_C ) ) { CALL(); }
       else PC+=2;
       break;
     case 0xd5:		/* PUSH DE */
@@ -950,7 +950,7 @@ void z80_do_opcodes()
       break;
     case 0xda:		/* JP C,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_C ) { JP(); }
+      if( F & FLAG_C ) { JP(); }
       else PC+=2;
       break;
     case 0xdb:		/* IN A,(nn) */
@@ -964,10 +964,10 @@ void z80_do_opcodes()
       break;
     case 0xdc:		/* CALL C,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_C ) { CALL(); }
+      if( F & FLAG_C ) { CALL(); }
       else PC+=2;
       break;
-    case 0xdd:		/* DDxx opcodes */
+    case 0xdd:		/* shift DD */
       {
 	BYTE opcode2;
 	contend( PC, 4 );
@@ -1007,7 +1007,7 @@ void z80_do_opcodes()
       break;
     case 0xe2:		/* JP PO,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! ( F & FLAG_P ) ) { JP(); }
+      if( ! ( F & FLAG_P ) ) { JP(); }
       else PC+=2;
       break;
     case 0xe3:		/* EX (SP),HL */
@@ -1021,7 +1021,7 @@ void z80_do_opcodes()
       break;
     case 0xe4:		/* CALL PO,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! (F & FLAG_P ) ) { CALL(); }
+      if( ! ( F & FLAG_P ) ) { CALL(); }
       else PC+=2;
       break;
     case 0xe5:		/* PUSH HL */
@@ -1048,7 +1048,7 @@ void z80_do_opcodes()
       break;
     case 0xea:		/* JP PE,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_P ) { JP(); }
+      if( F & FLAG_P ) { JP(); }
       else PC+=2;
       break;
     case 0xeb:		/* EX DE,HL */
@@ -1058,10 +1058,10 @@ void z80_do_opcodes()
       break;
     case 0xec:		/* CALL PE,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_P ) { CALL(); }
+      if( F & FLAG_P ) { CALL(); }
       else PC+=2;
       break;
-    case 0xed:		/* EDxx opcodes */
+    case 0xed:		/* shift ED */
       {
 	BYTE opcode2;
 	contend( PC, 4 );
@@ -1096,7 +1096,7 @@ void z80_do_opcodes()
       break;
     case 0xf2:		/* JP P,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! ( F & FLAG_S ) ) { JP(); }
+      if( ! ( F & FLAG_S ) ) { JP(); }
       else PC+=2;
       break;
     case 0xf3:		/* DI */
@@ -1104,7 +1104,7 @@ void z80_do_opcodes()
       break;
     case 0xf4:		/* CALL P,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( ! (F & FLAG_S ) ) { CALL(); }
+      if( ! ( F & FLAG_S ) ) { CALL(); }
       else PC+=2;
       break;
     case 0xf5:		/* PUSH AF */
@@ -1132,7 +1132,7 @@ void z80_do_opcodes()
       break;
     case 0xfa:		/* JP M,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_S ) { JP(); }
+      if( F & FLAG_S ) { JP(); }
       else PC+=2;
       break;
     case 0xfb:		/* EI */
@@ -1140,13 +1140,13 @@ void z80_do_opcodes()
       break;
     case 0xfc:		/* CALL M,nnnn */
       contend( PC, 3 ); contend( PC+1, 3 );
-      if ( F & FLAG_S ) { CALL(); }
+      if( F & FLAG_S ) { CALL(); }
       else PC+=2;
       break;
-    case 0xfd:		/* FDxx opcodes */
+    case 0xfd:		/* shift FD */
       {
 	BYTE opcode2;
-	contend( PC, 4 ); 
+	contend( PC, 4 );
 	opcode2 = readbyte_internal( PC++ );
 	R++;
 #ifdef HAVE_ENOUGH_MEMORY
