@@ -30,6 +30,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "fuse.h"
 #include "ui/ui.h"
@@ -50,8 +51,10 @@ ui_error( ui_error_level severity, const char *format, ... )
   va_end( ap );
 
   /* If this is a 'severe' error, print it to stderr with a program
-     identifier and a level indicator */
-  if( severity >= UI_ERROR_ERROR ) {
+     identifier and a level indicator; however, don't if it's a terminal
+     (and therefore the display which Fuse is using) unless we're exiting */
+  if( severity >= UI_ERROR_ERROR                   && 
+      ( !isatty( STDERR_FILENO ) || fuse_exiting )    ) {
 
     fprintf( stderr, "%s: ", fuse_progname );
 

@@ -47,10 +47,13 @@ int ui_init(int *argc, char ***argv, int width, int height)
   error = svgakeyboard_init();
   if(error) return error;
 
+  vga_lockvc();
+
   return 0;
 }
 
-int ui_event()
+int
+ui_event( void )
 {
   keyboard_update();
   return 0;

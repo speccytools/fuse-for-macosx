@@ -96,11 +96,7 @@ static void svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F3:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-    if( widget_filesel_name ) {
-      snapshot_read( widget_filesel_name );
-      display_refresh_all();
-    }
+    widget_apply_to_file( snapshot_read );
     fuse_emulation_unpause();
     break;
   case SCANCODE_F4:
@@ -118,8 +114,7 @@ static void svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F7:
     fuse_emulation_pause();
-    widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-    if( widget_filesel_name ) tape_open( widget_filesel_name );
+    widget_apply_to_file( tape_open );
     fuse_emulation_unpause();
     break;
   case SCANCODE_F8:
