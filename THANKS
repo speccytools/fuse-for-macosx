@@ -63,6 +63,8 @@ Some thanks (in alphabetical order):
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
 
+* Mark Round: for reporting a bug with respect to Solaris sound detection.
+
 * Darren Salt: quite a few bits of code (see `AUTHORS')
 
 * Dmitry Sanarin: the author of Glukalka (http://glukalka.sf.net/),
