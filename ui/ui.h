@@ -39,6 +39,10 @@
 #include "keysyms.h"
 #endif			        /* #ifndef FUSE_KEYSYMS_H */
 
+#ifndef SCALER_H
+#include "ui/scaler/scaler.h"
+#endif				/* #ifndef SCALER_H */
+
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {
 
@@ -66,5 +70,9 @@ int ui_error( ui_error_level severity, const char *format, ... )
      GCC_PRINTF( 2, 3 );
 libspectrum_error ui_libspectrum_error( libspectrum_error error,
 					const char *format, va_list ap );
+
+/* Select a scaler from those for which `available' returns true */
+typedef int (*ui_scaler_available)( scaler_type scaler );
+scaler_type ui_get_scaler( ui_scaler_available available );
 
 #endif			/* #ifndef FUSE_UI_H */

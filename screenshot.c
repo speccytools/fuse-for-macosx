@@ -67,7 +67,7 @@ screenshot_save( void )
 }
 
 int
-screenshot_write( const char *filename )
+screenshot_write( const char *filename, scaler_type scaler )
 {
   FILE *f;
 
@@ -83,8 +83,6 @@ screenshot_write( const char *filename )
   size_t y, base_height, base_width, height, width;
   int error;
 
-  scaler_type scaler;
-
   if( machine_current->timex ) {
     base_height = 2 * DISPLAY_SCREEN_HEIGHT;
     base_width = DISPLAY_SCREEN_WIDTH; 
@@ -96,8 +94,6 @@ screenshot_write( const char *filename )
   /* Change from paletted data to RGB data */
   error = get_rgb32_data( rgb_data1, rgb_stride, base_height, base_width );
   if( error ) return error;
-
-  scaler = SCALER_DOUBLESIZE;
 
   /* Actually scale the data here */
   scaler_get_proc32( scaler )( rgb_data1, rgb_stride, NULL,
@@ -228,6 +224,35 @@ rgb32_to_rgb24( BYTE *rgb24_data, size_t rgb24_stride,
   }
 
   return 0;
+}
+
+int
+screenshot_available_scalers( scaler_type scaler )
+{
+  if( machine_current->timex ) {
+
+    switch( scaler ) {
+
+    case SCALER_HALF: case SCALER_NORMAL: case SCALER_TIMEXTV:
+      return 1;
+    default:
+      return 0;
+
+    }
+
+  } else {
+    
+    switch( scaler ) {
+
+    case SCALER_NORMAL: case SCALER_DOUBLESIZE: case SCALER_TRIPLESIZE:
+    case SCALER_2XSAI: case SCALER_SUPER2XSAI: case SCALER_SUPEREAGLE:
+    case SCALER_ADVMAME2X: case SCALER_TV2X:
+      return 1;
+    default:
+      return 0;
+
+    }
+  }
 }
 
 #endif				/* #ifdef USE_LIBPNG */

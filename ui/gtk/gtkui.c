@@ -67,12 +67,16 @@ GtkWidget *gtkui_drawing_area;
 /* Popup menu widget(s), as invoked by F1 */
 GtkWidget *gtkui_menu_popup;
 
-/* Structure used by the radio button selection widgets (Options/Filter
-   and Machine/Select) */
+/* Structure used by the radio button selection widgets (the graphics
+   filter selectors and Machine/Select) */
 typedef struct gtkui_select_info {
 
   GtkWidget *dialog;
   GtkWidget **buttons;
+
+  /* Used by the graphics filter selectors */
+  ui_scaler_available available;
+  scaler_type selected;
 
 } gtkui_select_info;
 
@@ -524,16 +528,23 @@ gtkui_save_scr( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
+  scaler_type scaler;
   char *filename;
 
   fuse_emulation_pause();
+
+  scaler = ui_get_scaler( screenshot_available_scalers );
+  if( scaler == SCALER_NUM ) {
+    fuse_emulation_unpause();
+    return;
+  }
 
   filename =
     gtkui_fileselector_get_filename( "Fuse - Save Screenshot as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_save();
-  screenshot_write( filename );
+  screenshot_write( filename, scaler );
 
   free( filename );
 
@@ -552,6 +563,24 @@ gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 static void
 select_filter( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
+  scaler_type scaler;
+
+  /* Stop emulation */
+  fuse_emulation_pause();
+
+  scaler = ui_get_scaler( scaler_is_supported );
+  if( scaler != SCALER_NUM && scaler != current_scaler )
+    scaler_select_scaler( scaler );
+
+  /* Carry on with emulation again */
+  fuse_emulation_unpause();
+}
+
+/* Select a graphics filter from those for which `available' returns
+   true */
+scaler_type
+ui_get_scaler( ui_scaler_available available )
+{
   gtkui_select_info dialog;
   GtkAccelGroup *accel_group;
   GSList *button_group = NULL;
@@ -559,16 +588,20 @@ select_filter( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   GtkWidget *ok_button, *cancel_button;
 
   int i, count;
+
+  /* Store the function which tells us which scalers are currently
+     available */
+  dialog.available = available;
+
+  /* No scaler currently selected */
+  dialog.selected = SCALER_NUM;
   
   /* Some space to store the radio buttons in */
   dialog.buttons = (GtkWidget**)malloc( SCALER_NUM * sizeof(GtkWidget* ) );
   if( dialog.buttons == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return;
+    return SCALER_NUM;
   }
-
-  /* Stop emulation */
-  fuse_emulation_pause();
 
   count = 0;
 
@@ -578,7 +611,7 @@ select_filter( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   for( i = 0; i < SCALER_NUM; i++ ) {
 
-    if( !scaler_is_supported( i ) ) continue;
+    if( !available( i ) ) continue;
 
     dialog.buttons[ count ] =
       gtk_radio_button_new_with_label( button_group, scaler_name( i ) );
@@ -629,8 +662,7 @@ select_filter( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   /* Process events until the window is done with */
   gtk_main();
 
-  /* And then carry on with emulation again */
-  fuse_emulation_unpause();
+  return dialog.selected;
 }
 
 /* Callback used by the filter selection dialog */
@@ -644,12 +676,14 @@ select_filter_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 
   for( i = 0; i < SCALER_NUM; i++ ) {
 
-    if( !scaler_is_supported( i ) ) continue;
+    if( !ptr->available( i ) ) continue;
 
     if( gtk_toggle_button_get_active(
 	  GTK_TOGGLE_BUTTON( ptr->buttons[ count ] )
-        ) && current_scaler != i                     )
-      scaler_select_scaler( i );
+	)
+      ) {
+      ptr->selected = i;
+    }
 
     count++;
   }

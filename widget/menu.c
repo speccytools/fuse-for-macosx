@@ -214,7 +214,7 @@ int
 widget_menu_save_screen( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  return screenshot_write( "fuse.png" );
+  return screenshot_write( "fuse.png", SCALER_NORMAL );
 }
 #endif			/* #ifdef USE_LIBPNG */
 

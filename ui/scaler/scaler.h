@@ -22,6 +22,10 @@
 #ifndef SCALER_H
 #define SCALER_H
 
+#ifndef FUSE_TYPES_H
+#include "types.h"
+#endif			/* #ifndef FUSE_TYPES_H */
+
 typedef enum scaler_type {
   SCALER_HALF = 0,
   SCALER_NORMAL,
