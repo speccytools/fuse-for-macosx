@@ -30,12 +30,24 @@
 #include "types.h"
 #endif                  /* #ifndef FUSE_TYPES_H */
 
-#define ALTDFILE        0x01
-#define EXTCOLOUR       0x02
-#define HIRES           0x04
+#define STANDARD        0x00 /* standard Spectrum */
+#define ALTDFILE        0x01 /* the same in nature as above, but using second
+                                display file */
+#define EXTCOLOUR       0x02 /* extended colours (data taken from first screen,
+                                attributes 1x8 taken from second display. */
+#define EXTCOLALTD      0x03 /* similar to above, but data is taken from second
+                                screen */
+#define HIRESATTR       0x04 /* hires mode, data in odd columns is taken from
+                                first screen in standard way, data in even
+                                columns is made from attributes data (8x8) */
+#define HIRESATTRALTD   0x05 /* similar to above, but data taken from second
+                                display */
+#define HIRES           0x06 /* true hires mode, odd columns from first screen,
+                                even columns from second screen.  columns
+                                numbered from 1. */
+#define HIRESDOUBLECOL  0x07 /* data taken only from second screen, columns are
+                                doubled */
 #define HIRESCOLMASK    0x38
-#define INTDISABLE      0x40
-#define ALTMEMBANK      0x80
 
 #define WHITEBLACK      0x00
 #define YELLOWBLUE      0x08
@@ -48,25 +60,45 @@
 
 #define ALTDFILE_OFFSET 0x2000
 
-extern BYTE scld_altdfile;
-extern BYTE scld_extcolour;
-extern BYTE scld_hires;
-extern BYTE scld_intdisable;
-extern BYTE scld_altmembank;	     /* 0 = cartridge, 1 = exrom */
+typedef struct
+{
+  unsigned altmembank : 1;  /* ALTMEMBANK : 0 = cartridge, 1 = exrom */
+  unsigned intdisable : 1;  /* INTDISABLE */
+  unsigned b5  : 1;  /* */
+  unsigned b4  : 1;  /* */
+  unsigned b3  : 1;  /* */
+  unsigned hires  : 1;  /* SCLD HIRES mode */
+  unsigned b1     : 1;  /* */
+  unsigned altdfile : 1;  /* SCLD use ALTDFILE */
+} scld_names;
 
-extern BYTE scld_screenmode;
+typedef struct
+{
+  unsigned b7  : 1;  /* */
+  unsigned b6  : 1;  /* */
+  unsigned hirescol  : 3;  /* HIRESCOLMASK */
+  unsigned scrnmode  : 3;  /* SCRNMODEMASK */
+} scld_masks;
 
-extern BYTE scld_last_dec;           /* The last byte sent to Timex DEC port */
+typedef union
+{
+  BYTE byte;
+  scld_masks mask;
+  scld_names name;
+} scld; 
+
+extern scld scld_last_dec;           /* The last byte sent to Timex DEC port */
 
 extern BYTE scld_last_hsr;           /* The last byte sent to Timex HSR port */
 
-void scld_reset(void);
-void scld_dec_write(WORD port, BYTE b);
-BYTE scld_dec_read(WORD port);
+void scld_reset( void );
+void scld_dec_write( WORD port, BYTE b );
+BYTE scld_dec_read( WORD port );
 
-void scld_hsr_write (WORD port, BYTE b);
-BYTE scld_hsr_read (WORD port);
+void scld_hsr_write( WORD port, BYTE b );
+BYTE scld_hsr_read( WORD port );
 
-BYTE hires_get_attr(void);
+BYTE hires_get_attr( void );
+BYTE hires_convert_dec( BYTE attr );
 
 #endif                  /* #ifndef FUSE_SCLD_H */

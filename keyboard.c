@@ -111,7 +111,7 @@ BYTE keyboard_read(BYTE porth)
 {
   BYTE data=keyboard_default_value; int i;
 
-  if ( scld_intdisable ) return data;
+  if ( scld_last_dec.name.intdisable ) return data;
 
   for( i=0; i<8; i++,porth>>=1 ) {
     if(! (porth&0x01) ) data &= keyboard_return_values[i];

@@ -287,7 +287,7 @@ int snapshot_copy_to( libspectrum_snap *snap )
   for( i=0; i<16; i++ )
     snap->ay_registers[i] = machine_current->ay.registers[i];
   snap->out_plus3_memoryport = machine_current->ram.last_byte2;
-  snap->out_scld_hsr = scld_last_hsr; snap->out_scld_dec = scld_last_dec;
+  snap->out_scld_hsr = scld_last_hsr; snap->out_scld_dec = scld_last_dec.byte;
 
   snap->tstates = tstates;
 

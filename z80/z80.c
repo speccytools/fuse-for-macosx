@@ -102,7 +102,8 @@ z80_reset( void )
 void
 z80_interrupt( void )
 {
-  if(IFF1) {
+  /* Process if IFF1 set && (if a Timex machine, SCLD INTDISABLE is clear) */
+  if( IFF1 && !scld_last_dec.name.intdisable ) {
     
     if( z80.halted ) { PC++; z80.halted = 0; }
     
@@ -113,7 +114,7 @@ z80_interrupt( void )
     R++; rzx_instructions_offset--;
 
     switch(IM) {
-      case 0: if( scld_intdisable ) break; PC = 0x0038; tstates+=12; break;
+      case 0: PC = 0x0038; tstates+=12; break;
       case 1: PC = 0x0038; tstates+=13; break;
       case 2: 
 	{

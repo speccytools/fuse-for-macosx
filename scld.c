@@ -31,66 +31,41 @@
 #include "display.h"
 #include "fuse.h"
 
-BYTE scld_altdfile   = 0;
-BYTE scld_extcolour  = 0;
-BYTE scld_hires      = 0;
-BYTE scld_intdisable = 0;
-BYTE scld_altmembank = 0;
-
-BYTE scld_screenmode = 0;
-
-BYTE scld_last_dec   = 0;           /* The last byte sent to Timex DEC port */
+scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
 BYTE scld_last_hsr   = 0;           /* The last byte sent to Timex HSR port */
 
 BYTE
 scld_dec_read( WORD port GCC_UNUSED )
 {
-  return scld_last_dec;
+  return scld_last_dec.byte;
 }
 
 void
 scld_dec_write( WORD port GCC_UNUSED, BYTE b )
 {
-  int old_dec       = scld_last_dec;
-  BYTE old_hirescol = hires_get_attr();
+  scld old_dec = scld_last_dec;
   BYTE ink,paper;
 
-  old_dec        &= (ALTDFILE|EXTCOLOUR|HIRES);
-
-  scld_last_dec   = b;
-
-  scld_altdfile   = scld_last_dec & ALTDFILE;
-  scld_extcolour  = scld_last_dec & EXTCOLOUR;
-  scld_hires      = scld_last_dec & HIRES;
-  scld_intdisable = scld_last_dec & INTDISABLE;
-  scld_altmembank = scld_last_dec & ALTMEMBANK;
-
-  scld_screenmode = scld_last_dec & (ALTDFILE|EXTCOLOUR|HIRES);
+  scld_last_dec.byte = b;
 
   /* If we changed the active screen, or change the colour in hires
    * mode mark the entire display file as dirty so we redraw it on
    * the next pass */
-  if((scld_screenmode != old_dec)
-       || (scld_hires && (old_hirescol != hires_get_attr()))) {
+  if((scld_last_dec.mask.scrnmode != old_dec.mask.scrnmode)
+       || (scld_last_dec.name.hires &&
+           (scld_last_dec.mask.hirescol != old_dec.mask.hirescol))) {
     display_refresh_all();
   }
 
-  display_parse_attr(hires_get_attr(),&ink,&paper);
-  display_set_hires_border(paper);
+  display_parse_attr( hires_get_attr(), &ink, &paper );
+  display_set_hires_border( paper );
 }
 
-void scld_reset(void)
+void
+scld_reset(void)
 {
-  scld_altdfile   = 0;
-  scld_extcolour  = 0;
-  scld_hires      = 0;
-  scld_intdisable = 0;
-  scld_altmembank = 0;
-
-  scld_screenmode = 0;
-
-  scld_last_dec   = 0;
+  scld_last_dec.byte = 0;
 }
 
 void
@@ -105,9 +80,20 @@ scld_hsr_read( WORD port GCC_UNUSED )
   return scld_last_hsr;
 }
 
-BYTE hires_get_attr(void)
+BYTE
+hires_get_attr( void )
 {
-  switch (scld_last_dec & HIRESCOLMASK)
+  return( hires_convert_dec( scld_last_dec.byte ) );
+}
+
+BYTE
+hires_convert_dec( BYTE attr )
+{
+  scld colour;
+
+  colour.byte = attr;
+
+  switch ( colour.mask.hirescol )
   {
     case YELLOWBLUE:
       return (BYTE) 0x71;

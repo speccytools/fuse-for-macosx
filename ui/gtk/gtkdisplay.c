@@ -150,7 +150,8 @@ static int gtkdisplay_configure_notify( int width )
 {
   int size, colour;
 
-  colour= scld_hires ? display_hires_border : display_lores_border;
+  colour = scld_last_dec.name.hires ? display_hires_border :
+                                      display_lores_border;
   size = width / DISPLAY_ASPECT_WIDTH;
 
   /* If we're the same size as before, nothing special needed */

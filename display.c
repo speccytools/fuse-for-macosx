@@ -1,5 +1,6 @@
 /* display.c: Routines for printing the Spectrum screen
-   Copyright (c) 1999-2001 Philip Kendall and Thomas Harte
+   Copyright (c) 1999-2003 Philip Kendall, Thomas Harte, Witold Filipczyk
+                           and Fredrick Meunier
 
    $Id$
 
@@ -111,22 +112,11 @@ static WORD display_get_addr(int x, int y);
 
 static WORD display_get_addr(int x, int y)
 {
-  switch( scld_screenmode )
-  {
-    case HIRES:
-      return display_line_start[y]+x;
-      break;
-    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
-      return display_line_start[y]+x+ALTDFILE_OFFSET;
-      break;
-    case EXTCOLOUR:
-    default:  /* Standard Speccy screen */
-      return display_line_start[y]+x;
-      break;
+  if ( scld_last_dec.name.altdfile ) {
+    return display_line_start[y]+x+ALTDFILE_OFFSET;
+  } else {
+    return display_line_start[y]+x;
   }
-
-  ui_error( UI_ERROR_ERROR, "Impossible screenmode `%d'", scld_screenmode );
-  fuse_abort();
 }
 
 int display_init(int *argc, char ***argv)
@@ -209,11 +199,12 @@ static void display_draw_line(int y)
 {
 
   int x, screen_y, redraw, colour;
-  BYTE data, ink, paper;
+  BYTE data, data2, ink, paper;
   WORD hires_data;
 
   redraw = 0;
-  colour = scld_hires ? display_hires_border : display_lores_border;
+  colour = scld_last_dec.name.hires ? display_hires_border :
+                                      display_lores_border;
   
   /* If we're in the main screen, see if anything redrawing; if so,
      copy the data to the image buffer, and flag that we need to copy
@@ -230,20 +221,30 @@ static void display_draw_line(int y)
 	   display_is_dirty[screen_y] >>= 1, x++ ) {
 
 	/* Skip to next 8 pixel chunk if this chunk is clean */
-	if( ! ( display_is_dirty[screen_y] & 0x01 ) ) continue;
+        if( ! ( display_is_dirty[screen_y] & 0x01 ) ) continue;
 
-	data = read_screen_memory( display_get_addr( x, screen_y ) );
-	display_get_attr( x, screen_y, &ink, &paper );
-
-	if( scld_hires ) {
-	  hires_data = (data<<8) +
-	    read_screen_memory( display_get_addr( x, screen_y ) +
-				ALTDFILE_OFFSET
-			      );
-
-	  display_plot16( x<<1, screen_y, hires_data, ink, paper );
-	} else
-	  display_plot8( x<<1, screen_y, data, ink, paper );
+        display_get_attr( x, screen_y, &ink, &paper );
+        data = read_screen_memory( display_get_addr( x, screen_y ) );
+        if ( scld_last_dec.name.hires ) {
+          switch ( scld_last_dec.mask.scrnmode ) {
+            case HIRESATTRALTD:
+              data2 = read_screen_memory( display_attr_start[screen_y] + x + ALTDFILE_OFFSET );
+              break;
+            case HIRES:
+              data2 = read_screen_memory( display_get_addr( x, screen_y ) + ALTDFILE_OFFSET );
+              break;
+            case HIRESDOUBLECOL:
+              data2 = data;
+              break;
+            default: /* case HIRESATTR: */
+              data2 = read_screen_memory( display_attr_start[screen_y] + x );
+              break;
+          }
+          hires_data = (data << 8) + data2;
+          display_plot16( x<<1, screen_y, hires_data, ink, paper );    
+        } else {
+          display_plot8( x<<1, screen_y, data, ink, paper );
+        }    
       }
 
       /* Need to redraw this line */
@@ -302,33 +303,42 @@ static void display_draw_line(int y)
    `address'; 0x4000 <= address < 0x5b00 */
 void display_dirty( WORD address )
 {
-  switch( scld_screenmode )
-  {
-    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
-      if( address >= 0x7b00 )
-        return;
-      if( address < 0x7800 ) {		/* 0x7800 = first attributes byte */
-        display_dirty8(address-ALTDFILE_OFFSET);
-      } else {
-        display_dirty64(address-ALTDFILE_OFFSET);
-      }
-      break;
-
-    case HIRES:
-    case EXTCOLOUR:
-      if((address>=0x7800) || ((address>=0x5800) && (address<0x6000)))
-        return;
-      if(address>=0x6000) address-=ALTDFILE_OFFSET;
-      display_dirty8(address);
-      break;
-    
-    default:  /* Standard Speccy screen */
+  switch ( scld_last_dec.mask.scrnmode ) {
+    case STANDARD: /* standard Speccy screen */
+    case HIRESATTR: /* strange mode */
       if(address>=0x5b00)
         return;
       if(address<0x5800) {		/* 0x5800 = first attributes byte */
         display_dirty8(address);
       } else {
         display_dirty64(address);
+      }
+      break;
+
+    case ALTDFILE: /* second screen */
+    case HIRESATTRALTD: /* strange mode using second screen */      
+      if( address >= 0x7b00 )
+        return;
+      if( address >= 0x6000 && address < 0x7800 ) {		/* 0x7800 = first attributes byte */
+        display_dirty8(address-ALTDFILE_OFFSET);
+      } else {
+        display_dirty64(address-ALTDFILE_OFFSET);
+      }
+      break;
+
+    case EXTCOLOUR: /* extended colours */
+    case HIRES: /* hires mode */     
+      if((address>=0x7800) || ((address>=0x5800) && (address<0x6000)))
+        return;
+      if(address>=0x6000) address-=ALTDFILE_OFFSET;
+      display_dirty8(address);
+      break;
+
+    default:
+    /* case EXTCOLALTD: extended colours, but attributes and data taken from second screen */
+    /* case HIRESDOUBLECOL: hires mode, but data taken only from second screen */
+      if( address >= 0x6000 && address < 0x7800 ) {		/* 0x7800 = first attributes byte */
+        display_dirty8(address-ALTDFILE_OFFSET);
       }
       break;
   }
@@ -411,27 +421,20 @@ static void display_get_attr(int x,int y,BYTE *ink,BYTE *paper)
 {
   BYTE attr;
 
-  switch( scld_screenmode )
-  {
-    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
-      attr=read_screen_memory(display_attr_start[y]+x+ALTDFILE_OFFSET);
-      break;
-    case EXTCOLOUR:
-      attr=read_screen_memory(display_line_start[y]+x+ALTDFILE_OFFSET);
-      break;
-    case HIRES:
-    case (HIRES|EXTCOLOUR):
-      attr=hires_get_attr();
-      break;
-    default: /* Standard Speccy screen */
-      attr=read_screen_memory(display_attr_start[y]+x);
-      break;
+  if ( scld_last_dec.name.hires ) {
+    attr = hires_get_attr();
+  } else {
+    if ( scld_last_dec.name.b1 ) {
+      attr = read_screen_memory(display_line_start[y]+x+ALTDFILE_OFFSET);
+    } else if ( scld_last_dec.name.altdfile ) {
+      attr = read_screen_memory(display_attr_start[y]+x+ALTDFILE_OFFSET);
+    } else attr = read_screen_memory(display_attr_start[y]+x);
   }
 
   display_parse_attr(attr,ink,paper);
 }
 
-void display_parse_attr(BYTE attr,BYTE *ink,BYTE *paper)
+void display_parse_attr(BYTE attr, BYTE *ink, BYTE *paper)
 {
   if( (attr & 0x80) && display_flash_reversed ) {
     *ink  = (attr & ( 0x0f << 3 ) ) >> 3;
@@ -460,7 +463,7 @@ static void display_set_border(void)
 {
   int current_line,time_since_line,current_pixel,colour;
 
-  colour = scld_hires ? display_hires_border : display_lores_border;
+  colour = scld_last_dec.name.hires ? display_hires_border : display_lores_border;
   current_line=display_border_line();
 
   /* Check if we're in vertical retrace; if we are, don't need to do
@@ -575,32 +578,27 @@ int display_frame(void)
 static void display_dirty_flashing(void)
 {
   int offset; BYTE attr;
-
-  switch (scld_screenmode)
-  {
-    case ALTDFILE:  /* Same as standard, but base at 0x6000 */
+  
+  if ( !scld_last_dec.name.hires ) {
+    if ( scld_last_dec.name.b1 ) {
+      for(offset=ALTDFILE_OFFSET;offset<0x3800;offset++) {
+        attr=read_screen_memory(offset);
+        if( attr & 0x80 )
+          display_dirty8(offset+ALTDFILE_OFFSET);
+      }
+    } else if ( scld_last_dec.name.altdfile ) {
       for(offset=0x3800;offset<0x3b00;offset++) {
         attr=read_screen_memory(offset);
         if( attr & 0x80 )
           display_dirty64(offset+ALTDFILE_OFFSET);
       }
-      break;
-    case EXTCOLOUR:
-      for(offset=ALTDFILE_OFFSET;offset<0x3800;offset++) {
-        attr=read_screen_memory(offset);
-        if( attr & 0x80 )
-          display_dirty8(offset-ALTDFILE_OFFSET);
-      }
-      break;
-    case HIRES:
-      break;
-    default:  /* Standard Speccy screen */
+    } else { /* Standard Speccy screen */
       for(offset=0x1800;offset<0x1b00;offset++) {
         attr=read_screen_memory(offset);
         if( attr & 0x80 )
           display_dirty64(offset+0x4000);
       }
-      break;
+    }
   }
 }
 
@@ -616,7 +614,7 @@ void display_refresh_all(void)
   for(y=0;y<DISPLAY_HEIGHT;y++) {
     for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
       display_get_attr(x,y,&ink,&paper);
-	if( scld_hires ) {
+	if( scld_last_dec.name.hires ) {
 	  hires_data = (read_screen_memory( display_get_addr(x,y) ) << 8 ) +
 	    read_screen_memory( display_get_addr( x, y ) + ALTDFILE_OFFSET );
 	  display_plot16( x<<1, y, hires_data, ink, paper );
@@ -632,7 +630,7 @@ void
 display_refresh_border( void )
 {
   int y;
-  int colour = scld_hires ? display_hires_border : display_lores_border;
+  int colour = scld_last_dec.name.hires ? display_hires_border : display_lores_border;
 
   /* Redraw the top and bottom borders */
   for( y = 0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
