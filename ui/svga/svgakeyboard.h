@@ -1,5 +1,5 @@
 /* svgakeyboard.h: svgalib routines for dealing with the keyboard
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -28,10 +28,6 @@
 #define FUSE_SVGAKEYBOARD_H
 
 int svgakeyboard_init(void);
-
-int svgakeyboard_keypress(int keysym);
-void svgakeyboard_keyrelease(int keysym);
-
 int svgakeyboard_end(void);
 
 #endif			/* #ifndef FUSE_SVGAKEYBOARD_H */

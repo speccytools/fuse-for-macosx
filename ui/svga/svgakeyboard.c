@@ -44,9 +44,9 @@
 #include "tape.h"
 #include "widget/widget.h"
 
-void svgakeyboard_keystroke(int scancode, int press);
-int svgakeyboard_keypress(int keysym);
-void svgakeyboard_keyrelease(int keysym);
+static void svgakeyboard_keystroke(int scancode, int press);
+static void svgakeyboard_keypress(int keysym);
+static void svgakeyboard_keyrelease(int keysym);
 
 int svgakeyboard_init(void)
 {
@@ -55,7 +55,7 @@ int svgakeyboard_init(void)
   return 0;
 }
 
-void svgakeyboard_keystroke(int scancode, int press)  {
+static void svgakeyboard_keystroke(int scancode, int press)  {
   if(press) {
     svgakeyboard_keypress(scancode);
   } else {
@@ -63,10 +63,9 @@ void svgakeyboard_keystroke(int scancode, int press)  {
   }
 }
 
-void svgakeyboard_keypress(int keysym)
+static void svgakeyboard_keypress(int keysym)
 {
   keysyms_key_info *ptr;
-  const char *filename;
 
   ptr=keysyms_get_data(keysym);
 
@@ -139,7 +138,7 @@ void svgakeyboard_keypress(int keysym)
   return;
 }
 
-void svgakeyboard_keyrelease(int keysym)
+static void svgakeyboard_keyrelease(int keysym)
 {
   keysyms_key_info *ptr;
 
