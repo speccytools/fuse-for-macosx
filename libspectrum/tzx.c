@@ -799,7 +799,7 @@ tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
   /* Get memory for a new block */
   block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
   if( block == NULL ) {
-    libspectrum_print_error( "tzx_read_group_end: out of memory\n" );
+    libspectrum_print_error( "tzx_read_stop: out of memory\n" );
     return LIBSPECTRUM_ERROR_MEMORY;
   }
 
