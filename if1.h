@@ -37,15 +37,15 @@ void if1_page( void );
 void if1_unpage( void );
 void if1_memory_map( void );
 
-void if1_port_out( libspectrum_word, libspectrum_byte );
-libspectrum_byte if1_port_in( libspectrum_word, int * );
+void if1_port_out( libspectrum_word port, libspectrum_byte val );
+libspectrum_byte if1_port_in( libspectrum_word port, int *attached );
 
-void if1_mdr_new( int );
-void if1_mdr_insert( char *, int );
-int if1_mdr_sync( char *, int );
-int if1_mdr_eject( char *, int );
-void if1_mdr_writep( int, int );
-void if1_plug( char *, int );
-void if1_unplug( int );
+void if1_mdr_new( int drive );
+void if1_mdr_insert( char *filename, int drive );
+int if1_mdr_sync( char *filename, int drive );
+int if1_mdr_eject( char *filename, int drive );
+void if1_mdr_writep( int w, int drive );
+void if1_plug( char *filename, int what );
+void if1_unplug( int what );
 
 #endif				/* #ifndef FUSE_IF1_H */
