@@ -71,9 +71,19 @@ t|tb|tbr|tbre|tbrea|tbreak|tbreakp|tbreakpo|tbreakpoi|tbreakpoin|tbreakpoint {
 							       return TBREAK; }
 w|wr|wri|writ|write { return WRITE; }
 
-a|b|c|d|e|f|h|l { yylval.integer = tolower( *yytext ); return REGISTER; }
-af|bc|de|hl|sp|pc|ix|iy { yylval.integer = debugger_reg16_index( yytext );
-	                  return REGISTER; }
+a|b|c|d|e|f|h|l { yylval.integer = debugger_register_hash( yytext );
+		  return REGISTER; }
+
+"a'"|"b'"|"c'"|"d'"|"e'"|"f'"|"h'"|"l'" {
+                             yylval.integer = debugger_register_hash( yytext );
+			     return REGISTER; }
+
+af|bc|de|hl|"af\'"|"bc\'"|"de\'"|"hl\'" {
+                             yylval.integer = debugger_register_hash( yytext );
+			     return REGISTER; }
+
+sp|pc|ix|iy { yylval.integer = debugger_register_hash( yytext );
+	      return REGISTER; }
 
 "("		{ return '('; }
 ")"		{ return ')'; }

@@ -89,21 +89,41 @@ debugger_command_input( char *buf, int *result, int max_size )
   }
 }
 
-/* Convert a 16-bit register name to a useful index value */
+/* Convert a register name to a useful index value */
 int
-debugger_reg16_index( char *name )
+debugger_register_hash( const char *name )
 {
-  int hash = 0x100 * tolower( name[0] ) + tolower( name[1] );
+  int hash = 0x0000, primed = 0;
+  size_t length;
+  const char *ptr;
+
+  length = strlen( name );
+
+  if( name[ length - 1 ] == '\'' ) { primed = 1; length--; }
+
+  for( ptr = name; ptr < name + length; ptr++ ) {
+    hash <<= 8; hash |= tolower( *ptr );
+  }
+
+  if( primed ) hash |= 0x8000;
 
   switch( hash ) {
-    case 0x6166:	/* AF */
-    case 0x6263:	/* BC */
-    case 0x6465:	/* DE */
-    case 0x686c:	/* HL */
-    case 0x7370:	/* SP */
-    case 0x7063:	/* PC */
-    case 0x6978:	/* IX */
-    case 0x6979:	/* IY */
+    case 0x0061: case 0x8061:	/* A, A' */
+    case 0x0066: case 0x8066:	/* F, F' */
+    case 0x0062: case 0x8062:	/* B, B' */
+    case 0x0063: case 0x8063:	/* C, C' */
+    case 0x0064: case 0x8064:	/* D, D' */
+    case 0x0065: case 0x8065:	/* E, E' */
+    case 0x0068: case 0x8068:	/* H, H' */
+    case 0x006c: case 0x806c:	/* L, L' */
+    case 0x6166: case 0xd166:	/* AF, AF' */
+    case 0x6263: case 0xd263:	/* BC, BC' */
+    case 0x6465: case 0xd465:	/* DE, DE' */
+    case 0x686c: case 0xd86c:	/* HL, HL' */
+    case 0x7370:		/* SP */
+    case 0x7063:		/* PC */
+    case 0x6978:		/* IX */
+    case 0x6979:		/* IY */
       return hash;
 
     default: return -1;
@@ -126,20 +146,33 @@ debugger_register_get( int which )
   switch( which ) {
 
     /* 8-bit registers */
-  case 'a': return A;
-  case 'b': return B;
-  case 'c': return C;
-  case 'd': return D;
-  case 'e': return E;
-  case 'f': return F;
-  case 'h': return H;
-  case 'l': return L;
+  case 0x0061: return A;
+  case 0x8061: return A_;
+  case 0x0066: return F;
+  case 0x8066: return F_;
+  case 0x0062: return B;
+  case 0x8062: return B_;
+  case 0x0063: return C;
+  case 0x8063: return C_;
+  case 0x0064: return D;
+  case 0x8064: return D_;
+  case 0x0065: return E;
+  case 0x8065: return E_;
+  case 0x0068: return H;
+  case 0x8068: return H_;
+  case 0x006c: return L;
+  case 0x806c: return L_;
     
     /* 16-bit registers */
   case 0x6166: return AF;
+  case 0xd166: return AF_;
   case 0x6263: return BC;
+  case 0xd263: return BC_;
   case 0x6465: return DE;
+  case 0xd465: return DE_;
   case 0x686c: return HL;
+  case 0xd86c: return HL_;
+
   case 0x7370: return SP;
   case 0x7063: return PC;
   case 0x6978: return IX;
@@ -158,20 +191,33 @@ debugger_register_set( int which, int value )
   switch( which ) {
 
     /* 8-bit registers */
-    case 'a': A = value; break;
-    case 'b': B = value; break;
-    case 'c': C = value; break;
-    case 'd': D = value; break;
-    case 'e': E = value; break;
-    case 'f': F = value; break;
-    case 'h': H = value; break;
-    case 'l': L = value; break;
+    case 0x0061: A = value; break;
+    case 0x8061: A_ = value; break;
+    case 0x0066: F = value; break;
+    case 0x8066: F_ = value; break;
+    case 0x0062: B = value; break;
+    case 0x8062: B_ = value; break;
+    case 0x0063: C = value; break;
+    case 0x8063: C_ = value; break;
+    case 0x0064: D = value; break;
+    case 0x8064: D_ = value; break;
+    case 0x0065: E = value; break;
+    case 0x8065: E_ = value; break;
+    case 0x0068: H = value; break;
+    case 0x8068: H_ = value; break;
+    case 0x006c: L = value; break;
+    case 0x806c: L_ = value; break;
 
     /* 16-bit registers */
     case 0x6166: AF = value; break;
+    case 0xd166: AF_ = value; break;
     case 0x6263: BC = value; break;
+    case 0xd263: BC_ = value; break;
     case 0x6465: DE = value; break;
+    case 0xd465: DE_ = value; break;
     case 0x686c: HL = value; break;
+    case 0xd86c: HL_ = value; break;
+
     case 0x7370: SP = value; break;
     case 0x7063: PC = value; break;
     case 0x6978: IX = value; break;

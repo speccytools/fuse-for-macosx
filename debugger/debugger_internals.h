@@ -49,7 +49,7 @@ void debugger_register_set( int which, int value );
 /* Utility functions called by the flex scanner */
 
 int debugger_command_input( char *buf, int *result, int max_size );
-int debugger_reg16_index( char *reg );
+int debugger_register_hash( const char *reg );
 
 /* Numeric expression stuff */
 
@@ -64,5 +64,8 @@ debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 void debugger_expression_delete( debugger_expression* expression );
 
 int debugger_expression_evaluate( debugger_expression* expression );
+
+int debugger_expression_deparse( char *buffer, size_t length,
+				 const debugger_expression *exp );
 
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */
