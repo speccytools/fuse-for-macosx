@@ -46,6 +46,7 @@ static GdkBitmap *pause_mask;
 
 static GtkWidget
   *disk_status,		/* Is the disk motor running? */
+  *mouse_status,	/* Have we grabbed the mouse? */
   *pause_status,	/* Is emulation paused (via the menu option)? */
   *tape_status,		/* Is the tape running? */
   *speed_status;	/* How fast are we running? */
@@ -95,6 +96,9 @@ gtkstatusbar_create( GtkBox *parent )
   pause_status = gtk_pixmap_new( pixmap_pause_inactive, pause_mask );
   gtk_box_pack_end( GTK_BOX( status_bar ), pause_status, FALSE, FALSE, 0 );
 
+  mouse_status = gtk_pixmap_new( pixmap_pause_inactive, pause_mask );
+  gtk_box_pack_end( GTK_BOX( status_bar ), mouse_status, FALSE, FALSE, 0 );
+
   separator = gtk_vseparator_new();
   gtk_box_pack_end( GTK_BOX( status_bar ), separator, FALSE, FALSE, 0 );
 
@@ -133,6 +137,12 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
       gtk_pixmap_set( GTK_PIXMAP( disk_status ), pixmap_disk_inactive, NULL );
       break;
     }      
+    return 0;
+
+  case UI_STATUSBAR_ITEM_MOUSE:
+    which = ( state == UI_STATUSBAR_STATE_ACTIVE ?
+	      pixmap_pause_active : pixmap_pause_inactive );
+    gtk_pixmap_set( GTK_PIXMAP( mouse_status ), which, pause_mask  );
     return 0;
 
   case UI_STATUSBAR_ITEM_PAUSED:

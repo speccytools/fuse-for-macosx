@@ -1045,3 +1045,5 @@
 	 ui/sdl/{sdldisplay.c,sdlui.c}, ui/svga/svgaui.c, ui/win32/win32ui.c,
 	 ui/xlib/xui.c: Kempston mouse support (Darren).
 20040807 ui.c: remove extraneous if in ui_mouse_suspend (Darren).
+20040808 ui/ui.h, ui/gtk/{gtkmouse.c,statusbar.c}: add 'mouse grabbed'
+	 icon.

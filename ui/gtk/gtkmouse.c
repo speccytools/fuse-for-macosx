@@ -97,6 +97,7 @@ ui_mouse_grab( int startup )
 			| GDK_BUTTON_RELEASE_MASK, gtkui_drawing_area->window,
 			nullpointer, GDK_CURRENT_TIME ) == GDK_GRAB_SUCCESS ) {
     gtkmouse_reset_pointer();
+    ui_statusbar_update( UI_STATUSBAR_ITEM_MOUSE, UI_STATUSBAR_STATE_ACTIVE );
     return 1;
   }
 
@@ -108,6 +109,7 @@ int
 ui_mouse_release( int suspend GCC_UNUSED )
 {
   gdk_pointer_ungrab( GDK_CURRENT_TIME );
+  ui_statusbar_update( UI_STATUSBAR_ITEM_MOUSE, UI_STATUSBAR_STATE_INACTIVE );
   return 0;
 }
 

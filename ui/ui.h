@@ -127,6 +127,7 @@ int ui_menu_activate( ui_menu_item item, int active );
 typedef enum ui_statusbar_item {
 
   UI_STATUSBAR_ITEM_DISK,
+  UI_STATUSBAR_ITEM_MOUSE,
   UI_STATUSBAR_ITEM_PAUSED,
   UI_STATUSBAR_ITEM_TAPE,
 
