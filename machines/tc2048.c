@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "scld.h"
 #include "spec48.h"
+#include "tc2068.h"
 #include "ula.h"
 #include "if1.h"
 

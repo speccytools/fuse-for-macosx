@@ -1,5 +1,5 @@
-/* machines.h: machine specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+/* tc2068.h: Timex TC2068 specific routines
+   Copyright (c) 2004 Fredrick Meunier
 
    $Id$
 
@@ -24,24 +24,29 @@
 
 */
 
-#ifndef FUSE_MACHINES_H
-#define FUSE_MACHINES_H
+#ifndef FUSE_TS2068_H
+#define FUSE_TS2068_H
 
 #include <libspectrum.h>
 
 #include "machine.h"
 
-int pentagon_init( fuse_machine_info *machine );
-int pentagon_port_contended( libspectrum_word port );
+int tc2068_init( fuse_machine_info *machine );
+int tc2068_tc2048_common_reset( void );
+libspectrum_byte tc2068_unattached_port( void );
 
-int spec16_init( fuse_machine_info *machine );
-int spec_se_init( fuse_machine_info *machine );
-int specplus2_init( fuse_machine_info *machine );
-int specplus2a_init( fuse_machine_info *machine );
-int specplus3e_init( fuse_machine_info *machine );
+libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
+                                              int *attached );
+libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
+                                          int *attached );
+libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 
-int tc2048_init( fuse_machine_info *machine );
-int tc2048_port_contended( libspectrum_word port );
-int ts2068_init( fuse_machine_info *machine );
+int tc2068_memory_map( void );
 
-#endif			/* #ifndef FUSE_MACHINES_H */
+extern libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
+extern memory_page fake_mapping;
+
+extern const periph_t tc2068_peripherals[];
+extern const size_t tc2068_peripherals_count;
+
+#endif			/* #ifndef FUSE_TS2068_H */

@@ -526,6 +526,7 @@ int trap_check_rom( void )
     return 1;		/* Always OK here */
 
   case LIBSPECTRUM_MACHINE_TC2068:
+  case LIBSPECTRUM_MACHINE_TS2068:
     /* OK if we're in the EXROM (location of the tape routines) */
     return( memory_map_read[0].bank == MEMORY_BANK_EXROM );
 

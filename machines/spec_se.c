@@ -49,6 +49,7 @@
 #include "settings.h"
 #include "spectrum.h"
 #include "scld.h"
+#include "tc2068.h"
 #include "ui/ui.h"
 #include "ula.h"
 #include "if1.h"

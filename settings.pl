@@ -486,6 +486,8 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 28: return &( settings->rom_spec_se_0 );
   case 29: return &( settings->rom_spec_se_1 );
   case 30: return &( settings->rom_interface_i );
+  case 31: return &( settings->rom_ts2068_0 );
+  case 32: return &( settings->rom_ts2068_1 );
   default: return NULL;
   }
 }

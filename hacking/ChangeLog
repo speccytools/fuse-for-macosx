@@ -1159,3 +1159,6 @@
 20050102 fuse.c: update copyright date to 2005.
 20050102 machine.c,periph.c,zxatasp.c,zxcf.c: fix ZXATASP/ZXCF upload/reset
 	 behaviour (patch #1094632) (Garry Lancaster).
+20050102 machine.c,menu.c,settings.{dat,pl},tape.c,machines/{Makefile.am,
+	 machines.h,spec_se.c,tc2048.[ch],tc2068.c,ts2068,c}: add TS2068
+	 support (part of patch #1080531) (Fred).

@@ -39,10 +39,12 @@ libmachines_a_SOURCES = pentagon.c \
 			specplus3.c \
 			specplus3e.c \
 			tc2048.c \
-			tc2068.c
+			tc2068.c \
+			ts2068.c
 
 noinst_HEADERS = machines.h \
 		 scorpion.h \
 		 spec128.h \
 		 spec48.h \
-		 specplus3.h
+		 specplus3.h \
+		 tc2068.h

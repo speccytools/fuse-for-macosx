@@ -230,6 +230,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3E, 24, 4 ); return;
   case 12: menu_select_roms( LIBSPECTRUM_MACHINE_SE,     28, 2 ); return;
   case 13: menu_select_roms( LIBSPECTRUM_MACHINE_48,     30, 1 ); return;
+  case 14: menu_select_roms( LIBSPECTRUM_MACHINE_TS2068, 31, 2 ); return;
 
   }
 

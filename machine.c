@@ -39,6 +39,7 @@
 #include "machines/spec128.h"
 #include "machines/spec48.h"
 #include "machines/specplus3.h"
+#include "machines/tc2068.h"
 #include "printer.h"
 #include "scld.h"
 #include "settings.h"
@@ -94,6 +95,8 @@ int machine_init_machines( void )
   error = machine_add_machine( tc2048_init );
   if (error ) return error;
   error = machine_add_machine( tc2068_init );
+  if( error ) return error;
+  error = machine_add_machine( ts2068_init );
   if( error ) return error;
   error = machine_add_machine( pentagon_init );
   if (error ) return error;

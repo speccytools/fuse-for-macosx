@@ -42,18 +42,13 @@
 #include "scld.h"
 #include "spec48.h"
 #include "settings.h"
+#include "tc2068.h"
 #include "ui/ui.h"
 #include "ula.h"
 
-static libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
-						     int *attached );
-static libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
-						 int *attached );
-static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
-
 static int tc2068_reset( void );
 
-const static periph_t peripherals[] = {
+const periph_t tc2068_peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
   /* TS2040/Alphacom printer */
@@ -68,13 +63,13 @@ const static periph_t peripherals[] = {
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };
 
-const static size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
+const size_t tc2068_peripherals_count =
+  sizeof( tc2068_peripherals ) / sizeof( periph_t );
 
-static libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
-static memory_page fake_mapping;
+libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
+memory_page fake_mapping;
 
-static libspectrum_byte
+libspectrum_byte
 tc2068_ay_registerport_read( libspectrum_word port, int *attached )
 {
   if( machine_current->ay.current_register == 14 ) return 0xff;
@@ -82,7 +77,7 @@ tc2068_ay_registerport_read( libspectrum_word port, int *attached )
   return ay_registerport_read( port, attached );
 }
 
-static libspectrum_byte
+libspectrum_byte
 tc2068_ay_dataport_read( libspectrum_word port, int *attached )
 {
   if (machine_current->ay.current_register != 14) {
@@ -116,7 +111,7 @@ tc2068_unattached_port( void )
   return 0xff;
 }
 
-static libspectrum_byte
+libspectrum_byte
 tc2068_contend_delay( libspectrum_dword time )
 {
   libspectrum_word tstates_through_line;
@@ -201,7 +196,7 @@ tc2068_reset( void )
   error = machine_load_rom( 2, -1, settings_current.rom_tc2068_1, 0x2000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count,
+  error = periph_setup( tc2068_peripherals, tc2068_peripherals_count,
                         PERIPH_PRESENT_OPTIONAL,
 			PERIPH_PRESENT_NEVER,
                         PERIPH_PRESENT_OPTIONAL );
