@@ -45,7 +45,7 @@ widget_menu_entry widget_menu_main[] = {
 widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
 
-  { "(G)eneral", KEYBOARD_g, WIDGET_TYPE_GENERAL, NULL                  },
+  { "(G)eneral...", KEYBOARD_g, WIDGET_TYPE_GENERAL, NULL                  },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
