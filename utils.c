@@ -175,7 +175,8 @@ int utils_find_lib( const char *filename )
   char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
   char *fuse_dir;
 
-  strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
+  strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
   fuse_dir = dirname( fuse_path );
 
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/lib/%s", fuse_dir, filename );

@@ -401,7 +401,7 @@ int machine_allocate_roms( fuse_machine_info *machine, size_t count )
 int machine_find_rom( const char *filename )
 {
   int fd;
-  char fuse_path[ PATHNAME_MAX_LENGTH], path[ PATHNAME_MAX_LENGTH ];
+  char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
   char *fuse_dir;
 
   /* If this is an absolute path, just look there */
@@ -414,7 +414,8 @@ int machine_find_rom( const char *filename )
   /* Then in a 'roms' subdirectory off where the Fuse executable is
      (useful when Fuse hasn't been installed into /usr/local or
      wherever) */
-  strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
+  strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
   fuse_dir = dirname( fuse_path );
 
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/roms/%s", fuse_dir, filename );

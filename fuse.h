@@ -29,7 +29,8 @@
 
 #include <libspectrum.h>
 
-extern char* fuse_progname;		/* argv[0] */
+extern char *fuse_progname;		/* argv[0] */
+extern char fuse_directory[ 1024 ];	/* The directory we started in */
 
 extern int fuse_exiting;		/* Shall we exit now? */
 

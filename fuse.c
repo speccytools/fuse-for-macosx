@@ -67,7 +67,10 @@
 #include "z80/z80.h"
 
 /* What name were we called under? */
-char* fuse_progname;
+char *fuse_progname;
+
+/* Which directory were we started in? */
+char fuse_directory[ 1024 ];
 
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;
@@ -144,7 +147,14 @@ static int fuse_init(int argc, char **argv)
 
   fuse_progname=argv[0];
   libspectrum_error_function = ui_libspectrum_error;
-  
+
+  if( !getcwd( fuse_directory, 1024 ) ) {
+    ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
+	      strerror( errno ) );
+    return 1;
+  }
+  strncat( fuse_directory, "/", 1024 );
+
   if( settings_init( &first_arg, argc, argv ) ) return 1;
   autoload = settings_current.auto_load;
 
