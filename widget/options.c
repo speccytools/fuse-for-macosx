@@ -52,11 +52,7 @@ int widget_options( void )
   error = widget_timer_init();
   if( error ) return error;
 
-  /* A bright blue border */
-  /* FIXME: Do this more efficiently! */
-  widget_rectangle( 6, 6, 244, 36, 9 );
-
-  /* And set up the key handler */
+  /* Set up the key handler */
   widget_keyhandler = widget_options_keyhandler;
 
   /* Get a copy of the current settings */
@@ -64,6 +60,7 @@ int widget_options( void )
   if( error ) return error;
 
   /* Draw the dialog box */
+  widget_dialog_with_border( 1, 2, 30, 2 );
   error = widget_options_show_all( &settings );
   if( error ) return error;
 
@@ -103,8 +100,8 @@ static int widget_options_show_all( settings_info *settings )
 {
   int error;
 
-  /* A nice black rectangle to start with */
-  widget_rectangle( 8, 8, 240, 32, 0 );
+  /* Blank the main display area */
+  widget_dialog( 1, 2, 30, 2 );
 
   error = widget_options_print_option( 0, "Issue (2) emulation",
 				       settings->issue2 );
@@ -114,8 +111,8 @@ static int widget_options_show_all( settings_info *settings )
 				       settings->tape_traps );
   if( error ) return error;
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 6,
-		   DISPLAY_BORDER_HEIGHT + 6 + 36 );
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
+		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
 
   return 0;
 }
@@ -129,7 +126,7 @@ static int widget_options_print_option( int number, const char* string,
   strcat( buffer, " : " );
   strcat( buffer, value ? " On" : "Off" );
 
-  widget_printstring( 2, number+2, 2, buffer );
+  widget_printstring( 2, number+2, WIDGET_COLOUR_FOREGROUND, buffer );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+2)*8,
 		   DISPLAY_BORDER_HEIGHT + (number+3)*8  );
@@ -139,8 +136,9 @@ static int widget_options_print_option( int number, const char* string,
 
 static int widget_options_print_value( int number, int value )
 {
-  widget_rectangle( 27*8, (number+2)*8, 24, 8, 0 );
-  widget_printstring( 27, number+2, 2, value ? " On" : "Off" );
+  widget_rectangle( 27*8, (number+2)*8, 24, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 27, number+2, WIDGET_COLOUR_FOREGROUND,
+		      value ? " On" : "Off" );
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+2)*8,
 		   DISPLAY_BORDER_HEIGHT + (number+3)*8  );
   return 0;

@@ -221,3 +221,56 @@ int widget_timer_end( void )
 
   return 0;
 }
+
+/* End of timer functions */
+
+int widget_dialog( int x, int y, int width, int height )
+{
+  widget_rectangle( 8*x, 8*y, 8*width, 8*height, WIDGET_COLOUR_BACKGROUND );
+  return 0;
+}
+
+int widget_dialog_with_border( int x, int y, int width, int height )
+{
+  int i;
+
+  widget_rectangle( 8*(x-1), 8*(y-1), 8*(width+2), 8*(height+2),
+		    WIDGET_COLOUR_BACKGROUND );
+  
+  for( i=(8*x)-2; i<(8*(x+width))+2; i++ ) {
+    uidisplay_putpixel( i                + DISPLAY_BORDER_WIDTH,
+			(8* y        )-4 + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( i                + DISPLAY_BORDER_WIDTH,
+			(8*(y+height))+3 + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+  }
+
+  for( i=(8*y)-2; i<(8*(y+height))+2; i++ ) {
+    uidisplay_putpixel( (8* x        )-4 + DISPLAY_BORDER_WIDTH,
+			i                + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+    uidisplay_putpixel( (8*(x+width ))+3 + DISPLAY_BORDER_WIDTH,
+			i                + DISPLAY_BORDER_HEIGHT,
+			WIDGET_COLOUR_FOREGROUND );
+  }
+
+  uidisplay_putpixel( (8* x        )-3 + DISPLAY_BORDER_WIDTH,
+		      (8* y        )-3 + DISPLAY_BORDER_HEIGHT,
+		      WIDGET_COLOUR_FOREGROUND );
+  uidisplay_putpixel( (8*(x+width ))+2 + DISPLAY_BORDER_WIDTH,
+		      (8* y        )-3 + DISPLAY_BORDER_HEIGHT,
+		      WIDGET_COLOUR_FOREGROUND );
+  uidisplay_putpixel( (8* x        )-3 + DISPLAY_BORDER_WIDTH,
+		      (8*(y+height))+2 + DISPLAY_BORDER_HEIGHT,
+		      WIDGET_COLOUR_FOREGROUND );
+  uidisplay_putpixel( (8*(x+width ))+2 + DISPLAY_BORDER_WIDTH,
+		      (8*(y+height))+2 + DISPLAY_BORDER_HEIGHT,
+		      WIDGET_COLOUR_FOREGROUND );
+
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 8*(y       -1),
+		   DISPLAY_BORDER_HEIGHT + 8*(y+height+1)  );
+
+  return 0;
+}
+

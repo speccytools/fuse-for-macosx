@@ -57,7 +57,7 @@ static char* widget_getcwd( void );
 static int widget_print_all_filenames( struct dirent **filenames, int n,
 				       int top_left, int current );
 static int widget_print_filename( struct dirent *filename, int position,
-				  int colour );
+				  int inverted );
 static void widget_selectfile_keyhandler( int key );
 
 #ifndef HAVE_SCANDIR
@@ -202,13 +202,16 @@ const char* widget_selectfile( void )
   if( directory == NULL ) return NULL;
 
   widget_scan( directory );
-  current_file = 0;
+  new_current_file = current_file = 0;
   top_left_file = 0;
-    
-  /* A bright blue border */
-  /* FIXME: Do this more efficiently! */
-  widget_rectangle( 6, 6, 244, 180, 9 );
 
+  /* Create the dialog box */
+  error = widget_dialog_with_border( 1, 2, 30, 20 );
+  if( error ) {
+    free( directory );
+    return NULL;
+  }
+    
   /* And set up the key handler */
   widget_keyhandler = widget_selectfile_keyhandler;
 
@@ -256,17 +259,18 @@ const char* widget_selectfile( void )
 
       } else {
 
-	/* Otherwise, just reprint the new current file, display the
-	   screen, and then print the current file back in red so
+	/* Otherwise, print the new current file inverted, display the
+	   screen, and then print the current file back uninverted so
 	   we don't have to do so later */
 
 	widget_print_filename( widget_filenames[ current_file ],
 			       current_file - top_left_file, 1 );
         
-	uidisplay_lines(DISPLAY_BORDER_HEIGHT, DISPLAY_BORDER_HEIGHT+192);
+	uidisplay_lines(DISPLAY_BORDER_HEIGHT,
+			DISPLAY_BORDER_HEIGHT + DISPLAY_SCREEN_HEIGHT );
 	  
 	widget_print_filename( widget_filenames[ current_file ],
-			       current_file - top_left_file, 2 );
+			       current_file - top_left_file, 0 );
 	  
       }
     }
@@ -326,17 +330,19 @@ static int widget_print_all_filenames( struct dirent **filenames, int n,
 				       int top_left, int current )
 {
   int i;
+  int error;
 
-  /* Give us a nice black box to start with */
-  widget_rectangle( 8, 8, 240, 176, 8 );
+  /* Give us a clean box to start with */
+  error = widget_dialog( 1, 2, 30, 20 );
+  if( error ) return error;
 
-  /* Print the filenames, mostly in red, but with the currently selected
-     file in blue */
+  /* Print the filenames, mostly normally, but with the currently
+     selected file inverted */
   for( i=top_left; i<n && i<top_left+36; i++ ) {
     if( i == current ) {
       widget_print_filename( filenames[i], i-top_left, 1 );
     } else {
-      widget_print_filename( filenames[i], i-top_left, 2 );
+      widget_print_filename( filenames[i], i-top_left, 0 );
     }
   }
 
@@ -344,22 +350,32 @@ static int widget_print_all_filenames( struct dirent **filenames, int n,
   uidisplay_lines( DISPLAY_BORDER_HEIGHT,
 		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
 
-  /* Now print the currently selected file in red, so we don't have
+  /* Now print the currently selected file uninverted so we don't have
      to worry about doing it later */
-  widget_print_filename( filenames[ current_file ], current_file-top_left, 2 );
+  widget_print_filename( filenames[ current_file ], current_file-top_left, 0 );
 
   return 0;
 }
 
 /* Print a filename onto the dialog box */
 static int widget_print_filename( struct dirent *filename, int position,
-				  int colour )
+				  int inverted )
 {
   char buffer[14];
 
+  int x = (position & 1) ? 17 : 2,
+      y = 3 + position/2;
+
+  int foreground = inverted ? WIDGET_COLOUR_BACKGROUND
+                            : WIDGET_COLOUR_FOREGROUND,
+
+      background = inverted ? WIDGET_COLOUR_FOREGROUND
+                            : WIDGET_COLOUR_BACKGROUND;
+
+  widget_rectangle( 8 * x, 8 * y, 8 * 13, 8, background );
+
   strncpy( buffer, filename->d_name, 13 ); buffer[13] = '\0';
-  widget_printstring( 2 + ( position & 1 ) * 15, 3 + position/2,
-		      colour, buffer );
+  widget_printstring( x, y, foreground, buffer );
 
   return 0;
 }

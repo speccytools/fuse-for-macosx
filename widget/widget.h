@@ -31,6 +31,10 @@
 #include <dirent.h>
 #endif				/* #ifndef _DIRENT_H */
 
+/* The default colours used in the widget */
+#define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
+#define WIDGET_COLOUR_FOREGROUND 7	/* White */
+
 extern int widget_active;
 
 typedef void (*widget_keyhandler_fn)( int key );
@@ -53,6 +57,9 @@ typedef enum widget_finish_state {
 } widget_finish_state;
 
 extern widget_finish_state widget_finished;;
+
+int widget_dialog( int x, int y, int width, int height );
+int widget_dialog_with_border( int x, int y, int width, int height );
 
 /* File selector */
 
