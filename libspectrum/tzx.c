@@ -972,6 +972,7 @@ tzx_read_custom( libspectrum_tape *tape, const libspectrum_byte **ptr,
 {
   libspectrum_tape_block* block;
   libspectrum_tape_custom_block *custom_block;
+  libspectrum_error error;
 
   /* Check the description (16) and length bytes (4) exist */
   if( end - (*ptr) < 20 ) {
@@ -996,36 +997,10 @@ tzx_read_custom( libspectrum_tape *tape, const libspectrum_byte **ptr,
   memcpy( custom_block->description, *ptr, 16 ); (*ptr) += 16;
   custom_block->description[16] = '\0';
 
-  /* Get the length */
-  custom_block->length = (*ptr)[0]              +
-                         (*ptr)[1] * 0x100      +
-                         (*ptr)[2] * 0x10000    +
-                         (*ptr)[3] * 0x1000000;
-  (*ptr) += 4;
-
-  /* Check we've got enough bytes left for the data */
-  if( end - (*ptr) < custom_block->length ) {
-    free( block );
-    libspectrum_print_error(
-      "tzx_read_custom: not enough data in buffer\n"
-    );
-    return LIBSPECTRUM_ERROR_CORRUPT;
-  }
-
-  /* Allocate memory */
-  custom_block->data =
-    (libspectrum_byte*)malloc( (custom_block->length) *
-			       sizeof( libspectrum_byte )
-			     );
-  if( custom_block->data == NULL ) {
-    free( block );
-    libspectrum_print_error( "tzx_read_custom: out of memory\n" );
-    return LIBSPECTRUM_ERROR_MEMORY;
-  }
-
-  /* Copy the data across, and move along */
-  memcpy( custom_block->data, (*ptr), custom_block->length );
-  (*ptr) += custom_block->length;
+  /* Read in the data */
+  error = tzx_read_data( ptr, end,
+			 &(custom_block->length), 4, &(custom_block->data) );
+  if( error ) { free( block ); return error; }
 
   /* Finally, put the block into the block list */
   tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
