@@ -139,6 +139,7 @@ int widget_menu_rzx_recording( void *data )
     return 1;
   }
 
+  widget_end_all( WIDGET_FINISHED_OK );
   return rzx_start_recording( "recording.rzx" );
 }
 
@@ -167,6 +168,8 @@ int widget_menu_rzx_playback( void *data )
       return 1;
     }
     free( snapshot );
+
+    widget_end_all( WIDGET_FINISHED_OK );
     return rzx_start_playback( widget_filesel_name );
   }
 
@@ -179,6 +182,8 @@ int widget_menu_rzx_stop( void *data )
 {
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback();
+
+  widget_end_all( WIDGET_FINISHED_OK );
   return 0;
 }  
 
