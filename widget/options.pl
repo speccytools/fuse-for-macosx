@@ -45,6 +45,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include <stdio.h>
 
+#include "display.h"
 #include "fuse.h"
 #include "options.h"
 #include "widget_internals.h"
@@ -181,6 +182,7 @@ CODE
 
     print << "CODE";
   case KEYBOARD_Enter:
+    display_refresh_all();
     widget_end_all( WIDGET_FINISHED_OK );
     break;
 
