@@ -26,13 +26,17 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-fuse_SOURCES = ay.c display.c event.c fuse.c keyboard.c snapshot.c spec128.c\
-	spec48.c specplus2.c specplus3.c spectrum.c tape.c timer.c x.c\
-	xdisplay.c xkeyboard.c z80.c z80_ops.c
+fuse_SOURCES = ay.c display.c event.c fuse.c gtk.c gtkdisplay.c gtkkeyboard.c\
+	gtkui.c keyboard.c keysyms.c snapshot.c spec128.c spec48.c specplus2.c\
+	specplus3.c spectrum.c tape.c timer.c x.c xdisplay.c xkeyboard.c xui.c\
+	z80.c z80_ops.c
+INCLUDES = @GTK_CFLAGS@
+LDADD = @GTK_LIBS@
 
-noinst_HEADERS = ay.h display.h event.h fuse.h keyboard.h snapshot.h spec128.h\
-	spec48.h specplus2.h specplus3.h spectrum.h tape.h timer.h types.h\
-	x.h xdisplay.h xkeyboard.h z80.h z80_cb.c z80_ddfd.c z80_ddfdcb.c\
+noinst_HEADERS = ay.h display.h event.h fuse.h gtk.h gtkdisplay.h\
+	gtkkeyboard.h gtkui.h keyboard.h keysyms.h snapshot.h spec128.h\
+	spec48.h specplus2.h specplus3.h spectrum.h tape.h timer.h types.h x.h\
+	xdisplay.h xkeyboard.h xui.h z80.h z80_cb.c z80_ddfd.c z80_ddfdcb.c\
 	z80_ed.c z80_macros.h 
 
 EXTRA_DIST = 128-0.rom 128-1.rom 48.rom	plus2-0.rom plus2-1.rom plus3-0.rom\

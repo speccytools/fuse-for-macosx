@@ -1,4 +1,4 @@
-/* fuse.h: Variables exported from the main file
+/* xui.h: Routines for dealing with the Xlib user interface
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -24,10 +24,18 @@
 
 */
 
-#ifndef FUSE_FUSE_H
-#define FUSE_FUSE_H
+#ifndef FUSE_XUI_H
+#define FUSE_XUI_H
 
-extern int fuse_exiting;
-extern char* fuse_progname;
+#ifndef _XLIB_H_
+#include <X11/Xlib.h>
+#endif
 
-#endif			/* #ifndef FUSE_FUSE_H */
+int xui_init(int argc, char **argv, int width, int height);
+int xui_end(void);
+
+extern int xui_screenNum;	/* Which screen are we using on our
+				   X server? */
+extern Window xui_mainWindow;	/* Window ID for the main Fuse window */
+
+#endif			/* #ifndef FUSE_XUI_H */

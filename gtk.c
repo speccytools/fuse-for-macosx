@@ -1,4 +1,4 @@
-/* fuse.h: Variables exported from the main file
+/* gtk.c: General GTK+ routines
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -24,10 +24,15 @@
 
 */
 
-#ifndef FUSE_FUSE_H
-#define FUSE_FUSE_H
+#include <config.h>
 
-extern int fuse_exiting;
-extern char* fuse_progname;
+#ifdef HAVE_LIBGTK	/* Use this file iff we're using GTK+ */
 
-#endif			/* #ifndef FUSE_FUSE_H */
+#include <gtk/gtk.h>
+
+int gtk_event(void)
+{
+  return gtk_main_iteration_do( FALSE );
+}
+
+#endif			/* #ifdef HAVE_LIBGTK */

@@ -24,5 +24,8 @@
 
 */
 
+/* Defined if GTK requested and found */
+#undef HAVE_LIBGTK
+
 /* Defined if Issue 2 emulation requested */
 #undef ISSUE2

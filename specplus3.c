@@ -24,11 +24,11 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
-#include <string.h>
 
 #include "ay.h"
-#include "config.h"
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"

@@ -1,0 +1,92 @@
+/* gtkkeyboard.c: GTK+ routines for dealing with the keyboard
+   Copyright (c) 2000-2001 Philip Kendall
+
+   $Id$
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+   Author contact information:
+
+   E-mail: pak@ast.cam.ac.uk
+   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+*/
+
+#include <config.h>
+
+#ifdef HAVE_LIBGTK	/* Use this file iff we're using GTK+ */
+
+#include <gdk/gdkkeysyms.h>
+#include <gdk/gdkx.h>
+#include <gtk/gtk.h>
+
+#include "gtkkeyboard.h"
+#include "keyboard.h"
+#include "keysyms.h"
+
+static guint gtkkeyboard_unshift_keysym(guint keysym);
+
+int gtkkeyboard_keypress(GtkWidget *widget, GdkEvent *event,
+			 gpointer data)
+{
+  guint keysym; keysyms_key_info *ptr;
+
+  keysym=gtkkeyboard_unshift_keysym(event->key.keyval);
+
+  ptr=keysyms_get_data(keysym);
+
+  if(ptr) {
+    if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
+    if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+
+}
+
+int gtkkeyboard_keyrelease(GtkWidget *widget, GdkEvent *event,
+			   gpointer data)
+{
+  guint keysym; keysyms_key_info *ptr;
+
+  keysym=gtkkeyboard_unshift_keysym(event->key.keyval);
+
+  ptr=keysyms_get_data(keysym);
+
+  if(ptr) {
+    if(ptr->key1 != KEYBOARD_NONE) keyboard_release(ptr->key1);
+    if(ptr->key2 != KEYBOARD_NONE) keyboard_release(ptr->key2);
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+
+}
+
+/* Given a keysym, return the keysym which would have been returned if
+   the key where unshifted */
+static guint gtkkeyboard_unshift_keysym(guint keysym)
+{
+  /* Oh boy is this ugly! There are better ways of doing this (see
+     http://mail.gnome.org/archives/gtk-app-devel-list/2000-December/msg00261.html
+     and followups). However, this will do until that functionality is
+     incorporated into GTK 2.0 */
+  return XKeycodeToKeysym(gdk_display,
+			  XKeysymToKeycode(gdk_display,keysym),
+			  0);
+}
+			  
+#endif			/* #ifdef HAVE_LIBGTK */

@@ -24,8 +24,8 @@
 
 */
 
-#ifndef Z80_TYPES_H
-#define Z80_TYPES_H
+#ifndef FUSE_TYPES_H
+#define FUSE_TYPES_H
 
 typedef   signed char SBYTE;
 typedef unsigned char  BYTE;
@@ -36,4 +36,4 @@ typedef unsigned short  WORD;
 typedef   signed int SDWORD;
 typedef unsigned int  DWORD;
 
-#endif			/* #ifndef Z80_TYPES_H */
+#endif			/* #ifndef FUSE_TYPES_H */

@@ -1,3 +1,11 @@
+2001-xx-yy  Philip Kendall  <pak@ast.cam.ac.uk>
+
+	* Version 0.2.2 released.
+
+	* Fixed a large bug in the 48K snapshot saving routine.
+
+	* Added rudimentary GTK+ interface.
+
 2000-12-17  Philip Kendall  <pak@ast.cam.ac.uk>
 
 	* Version 0.2.1 released.
@@ -66,3 +74,5 @@
 1999-07-18  Philip Kendall  <pak@ast.cam.ac.uk>
 
 	* Version 0.1.0 released.
+
+$Id$

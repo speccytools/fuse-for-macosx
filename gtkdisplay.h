@@ -1,4 +1,4 @@
-/* fuse.h: Variables exported from the main file
+/* gtkdisplay.h: GTK+ routines for dealing with the Speccy screen
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -24,10 +24,17 @@
 
 */
 
-#ifndef FUSE_FUSE_H
-#define FUSE_FUSE_H
+#ifndef FUSE_GTKDISPLAY_H
+#define FUSE_GTKDISPLAY_H
 
-extern int fuse_exiting;
-extern char* fuse_progname;
+int gtkdisplay_init(int width, int height);
 
-#endif			/* #ifndef FUSE_FUSE_H */
+int gtkdisplay_configure_notify(int width, int height);
+void gtkdisplay_putpixel(int x,int y,int colour);
+void gtkdisplay_line(int y);
+void gtkdisplay_area(int x, int y, int width, int height);
+void gtkdisplay_set_border(int line, int pixel_from, int pixel_to, int colour);
+
+int gtkdisplay_end(void);
+
+#endif			/* #ifndef FUSE_GTKDISPLAY_H */

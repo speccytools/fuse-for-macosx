@@ -45,7 +45,7 @@
 
 extern BYTE display_border;
 
-int display_init(int argc, char **argv);
+int display_init(int *argc, char ***argv);
 void display_line(void);
 void display_dirty(WORD address, BYTE data);
 void display_set_border(int colour);

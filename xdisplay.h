@@ -27,7 +27,7 @@
 #ifndef FUSE_XDISPLAY_H
 #define FUSE_XDISPLAY_H
 
-int xdisplay_init(int argc, char **argv, int width, int height);
+int xdisplay_init(int width, int height);
 
 int xdisplay_configure_notify(int width, int height);
 

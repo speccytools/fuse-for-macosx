@@ -1,4 +1,4 @@
-/* fuse.h: Variables exported from the main file
+/* keysyms.h: keysym to Spectrum key mappings for both Xlib and GDK
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -24,10 +24,18 @@
 
 */
 
-#ifndef FUSE_FUSE_H
-#define FUSE_FUSE_H
+#ifndef FUSE_KEYSYMS_H
+#define FUSE_KEYSYMS_H
 
-extern int fuse_exiting;
-extern char* fuse_progname;
+#ifndef FUSE_KEYBOARD_H
+#include "keyboard.h"
+#endif			/* #ifndef FUSE_KEYBOARD_H */
 
-#endif			/* #ifndef FUSE_FUSE_H */
+typedef struct keysyms_key_info {
+  unsigned long keysym;
+  keyboard_key_name key1,key2;
+} keysyms_key_info;
+
+keysyms_key_info* keysyms_get_data(unsigned keysym);
+
+#endif			/* #ifndef FUSE_KEYSYMS_H */

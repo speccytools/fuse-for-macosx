@@ -26,11 +26,10 @@
 
 #include <config.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef HAVE_LIBGTK		/* Use this iff we're not using GTK+ */
+
 #include <X11/Xlib.h>
 
-#include "display.h"
 #include "xdisplay.h"
 #include "xkeyboard.h"
 
@@ -41,7 +40,6 @@ Bool x_trueFunction();
 int x_event(void)
 {
   XEvent event;
-  int x,y,width,height;
 
   while(XCheckIfEvent(display,&event,x_trueFunction,NULL)) {
     switch(event.type) {
@@ -66,3 +64,5 @@ Bool x_trueFunction()
 {
   return True;
 }
+
+#endif				/* #ifndef HAVE_LIBGTK */

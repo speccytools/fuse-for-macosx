@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#include <stdio.h>
+#include <stdlib.h>
 
 #include <glib.h>
 
@@ -34,7 +34,12 @@
 #include "event.h"
 #include "fuse.h"
 #include "spectrum.h"
+
+#ifdef HAVE_LIBGTK
+#include "gtk.h"
+#else			/* #ifdef HAVE_LIBGTK */
 #include "x.h"
+#endif			/* #ifdef HAVE_LIBGTK */
 
 /* A large value to mean `no events due' */
 const DWORD event_no_events = 0xffffffff;
@@ -62,7 +67,7 @@ int event_init(void)
 /* Add an event at the correct place in the event list */
 int event_add(DWORD tstates, int type)
 {
-  event_t *ptr; GSList *ptr2;
+  event_t *ptr;
 
   ptr=(event_t*)malloc(sizeof(event_t));
   if(!ptr) return 1;
@@ -95,7 +100,7 @@ gint event_add_cmp(gconstpointer a, gconstpointer b)
 /* Do all events which have passed */
 int event_do_events(void)
 {
-  event_t *ptr; GSList *ptr2;
+  event_t *ptr;
 
   while(event_next_event <= tstates) {
     ptr= ( (event_t*) (event_list->data) );
@@ -106,7 +111,11 @@ int event_do_events(void)
     switch(ptr->type) {
     case EVENT_TYPE_INTERRUPT:
       spectrum_interrupt();
+#ifdef HAVE_LIBGTK
+      gtk_event();
+#else			/* #ifdef HAVE_LIBGTK */
       fuse_exiting=x_event();
+#endif			/* #ifdef HAVE_LIBGTK */
       break;
     case EVENT_TYPE_LINE:
       display_line();

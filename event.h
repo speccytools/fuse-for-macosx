@@ -61,4 +61,7 @@ int event_interrupt(DWORD tstates);
 /* Clear the event stack */
 int event_reset(void);
 
+/* Called on exit to clean up */
+int event_end(void);
+
 #endif				/* #ifndef FUSE_EVENT_H */

@@ -39,16 +39,16 @@ volatile int timer_count;
 static struct itimerval timer_old_timer;
 static struct sigaction timer_old_handler;
 
-void timer_init(void);
 static void timer_setup_timer(void);
 static void timer_setup_handler(void);
 void timer_signal(int signal);
 
-void timer_init(void)
+int timer_init(void)
 {
   timer_count=0;
   timer_setup_handler();
   timer_setup_timer();
+  return 0;
 }
 
 static void timer_setup_timer(void)

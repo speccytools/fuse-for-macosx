@@ -29,7 +29,8 @@
 
 extern volatile int timer_count;
 
-void timer_init(void);
+int timer_init(void);
 void timer_sleep(void);
+int timer_end(void);
 
 #endif			/* #ifndef FUSE_TIMER_H */

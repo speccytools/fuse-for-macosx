@@ -1,4 +1,4 @@
-/* fuse.h: Variables exported from the main file
+/* gtkui.h: GTK+ routines for dealing with the user interface
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -24,10 +24,16 @@
 
 */
 
-#ifndef FUSE_FUSE_H
-#define FUSE_FUSE_H
+#ifndef FUSE_GTKUI_H
+#define FUSE_GTKUI_H
 
-extern int fuse_exiting;
-extern char* fuse_progname;
+#ifndef __GTK_H__
+#include <gtk/gtk.h>
+#endif
 
-#endif			/* #ifndef FUSE_FUSE_H */
+extern GtkWidget* gtkui_drawing_area;
+
+int gtkui_init(int *argc, char ***argv, int width, int height);
+int gtkui_end(void);
+
+#endif			/* #ifndef FUSE_GTKUI_H */

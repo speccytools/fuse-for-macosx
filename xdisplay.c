@@ -1,4 +1,4 @@
-/* xdisplay.c: Routines for dealing with the X display
+/* xdisplay.c: Routines for dealing with drawing the Speccy's screen via Xlib
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -26,23 +26,22 @@
 
 #include <config.h>
 
+#ifndef HAVE_LIBGTK		/* Use this iff we're not using GTK+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "x.h"
 #include "xdisplay.h"
+#include "xui.h"
 
-static int screenNum;		/* And which screen on that display? */
-
-static Window mainWindow;	/* Window ID for the main Fuse window */
 static XImage *image;		/* The image structure to draw the
 				   Speccy's screen on */
 static GC gc;			/* A graphics context to draw with */
-
-static char* progname;
 
 static unsigned long colours[16];
 
@@ -53,107 +52,11 @@ static int xdisplay_allocate_colours(int numColours, unsigned long *colours);
 static int xdisplay_allocate_gc(Window window, GC *gc);
 static int xdisplay_allocate_image(int width, int height);
 
-int xdisplay_init(int argc, char **argv, int width, int height)
+int xdisplay_init(int width, int height)
 {
-  char *displayName=NULL;	/* Use default display */
-  XWMHints *wmHints;
-  XSizeHints *sizeHints;
-  XClassHint *classHint;
-  char *windowNameList="Fuse",*iconNameList="Fuse";
-  XTextProperty windowName, iconName;
-  unsigned long windowFlags;
-  XSetWindowAttributes windowAttributes;
-
-  progname=argv[0];
-
-  /* Allocate memory for various things */
-
-  if(!(wmHints = XAllocWMHints())) {
-    fprintf(stderr,"%s: failure allocating memory\n",progname);
-    return 1;
-  }
-
-  if(!(sizeHints = XAllocSizeHints())) {
-    fprintf(stderr,"%s: failure allocating memory\n",progname);
-    return 1;
-  }
-
-  if(!(classHint = XAllocClassHint())) {
-    fprintf(stderr,"%s: failure allocating memory\n",progname);
-    return 1;
-  }
-
-  if(XStringListToTextProperty(&windowNameList,1,&windowName) == 0 ) {
-    fprintf(stderr,"%s: structure allocation for windowName failed\n",
-	    progname);
-    return 1;
-  }
-
-  if(XStringListToTextProperty(&iconNameList,1,&iconName) == 0 ) {
-    fprintf(stderr,"%s: structure allocation for iconName failed\n",
-	    progname);
-    return 1;
-  }
-
-  /* Open a connection to the X server */
-
-  if ( ( display=XOpenDisplay(displayName)) == NULL ) {
-    fprintf(stderr,"%s: cannot connect to X server %s\n",progname,
-	    XDisplayName(displayName));
-    return 1;
-  }
-
-  screenNum=DefaultScreen(display);
-
-  /* Create the main window */
-
-  mainWindow = XCreateSimpleWindow(
-    display, RootWindow(display,screenNum), 0, 0, width, height, 0,
-    BlackPixel(display,screenNum), WhitePixel(display,screenNum));
-
-  /* Set standard window properties */
-
-  sizeHints->flags = PBaseSize | PResizeInc | PAspect | PMaxSize;
-  sizeHints->base_width=0;
-  sizeHints->base_height=0;
-  sizeHints->width_inc=width;
-  sizeHints->height_inc=height;
-  sizeHints->min_aspect.x=width;
-  sizeHints->min_aspect.y=height;
-  sizeHints->max_aspect.x=width;
-  sizeHints->max_aspect.y=height;
-  sizeHints->max_width=3*width;
-  sizeHints->max_height=3*height;
-
-  wmHints->flags=StateHint | InputHint;
-  wmHints->initial_state=NormalState;
-  wmHints->input=True;
-
-  classHint->res_name=progname;
-  classHint->res_class="Fuse";
-
-  XSetWMProperties(display, mainWindow, &windowName, &iconName, argv, argc,
-		   sizeHints,wmHints,classHint);
-
-  /* Ask the server to use its backing store for this window */
-
-  windowFlags=CWBackingStore;
-  windowAttributes.backing_store=WhenMapped;
-
-  XChangeWindowAttributes(display,mainWindow,windowFlags,&windowAttributes);
-
-  /* Select which types of event we want to receive */
-
-  XSelectInput(display,mainWindow,ExposureMask | KeyPressMask |
-	       KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
-	       StructureNotifyMask);
-
   if(xdisplay_allocate_colours(16,colours)) return 1;
-  if(xdisplay_allocate_gc(mainWindow,&gc)) return 1;
+  if(xdisplay_allocate_gc(xui_mainWindow,&gc)) return 1;
   if(xdisplay_allocate_image(width,height)) return 1;
-
-  /* And finally display the window */
-  XMapWindow(display,mainWindow);
 
   return 0;
 }
@@ -184,21 +87,21 @@ static int xdisplay_allocate_colours(int numColours, unsigned long *colours)
 
   int i;
 
-  currentMap=DefaultColormap(display,screenNum);
+  currentMap=DefaultColormap(display,xui_screenNum);
 
   for(i=0;i<numColours;i++) {
     if( XParseColor(display, currentMap, colour_names[i], &colour) == 0 ) {
-      fprintf(stderr,"%s: couldn't parse colour `%s'\n",progname,
+      fprintf(stderr,"%s: couldn't parse colour `%s'\n", fuse_progname,
 	      colour_names[i]);
       return 1;
     }
     if( XAllocColor(display, currentMap, &colour) == 0 ) {
-      fprintf(stderr,"%s: couldn't allocate colour `%s'\n",progname,
+      fprintf(stderr,"%s: couldn't allocate colour `%s'\n", fuse_progname,
 	      colour_names[i]);
-      if(currentMap == DefaultColormap(display,screenNum)) {
-	fprintf(stderr,"%s: switching to private colour map\n",progname);
-	currentMap=XCopyColormapAndFree(display,currentMap);
-	XSetWindowColormap(display,mainWindow,currentMap);
+      if(currentMap == DefaultColormap(display, xui_screenNum)) {
+	fprintf(stderr,"%s: switching to private colour map\n", fuse_progname);
+	currentMap=XCopyColormapAndFree(display, currentMap);
+	XSetWindowColormap(display, xui_mainWindow, currentMap);
 	i--;		/* Need to repeat the failed allocation */
       } else {
 	return 1;
@@ -222,17 +125,17 @@ static int xdisplay_allocate_gc(Window window,GC *gc)
 
 static int xdisplay_allocate_image(int width, int height)
 {
-  image=XCreateImage(display, DefaultVisual(display,screenNum),
-		     DefaultDepth(display,screenNum),ZPixmap,0,NULL,
+  image=XCreateImage(display, DefaultVisual(display, xui_screenNum),
+		     DefaultDepth(display, xui_screenNum), ZPixmap, 0, NULL,
 		     3*width,3*height,8,0);
 
   if(!image) {
-    fprintf(stderr,"%s: couldn't create image\n",progname);
+    fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
     return 1;
   }
 
   if( (image->data=(char*)malloc(image->bytes_per_line*3*height)) == NULL ) {
-    fprintf(stderr,"%s: out of memory for image data\n",progname);
+    fprintf(stderr, "%s: out of memory for image data\n", fuse_progname);
     return 1;
   }
 
@@ -298,15 +201,15 @@ void xdisplay_putpixel(int x,int y,int colour)
 
 void xdisplay_line(int y)
 {
-  XPutImage(display,mainWindow,gc,image,
-	    0,xdisplay_current_size*y,
-	    0,xdisplay_current_size*y,
-	    xdisplay_current_size*DISPLAY_SCREEN_WIDTH,xdisplay_current_size);
+  XPutImage(display, xui_mainWindow, gc, image,
+	    0, xdisplay_current_size*y,
+	    0, xdisplay_current_size*y,
+	    xdisplay_current_size*DISPLAY_SCREEN_WIDTH, xdisplay_current_size);
 }
 
 void xdisplay_area(int x, int y, int width, int height)
 {
-  XPutImage(display,mainWindow,gc,image,x,y,x,y,width,height);
+  XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
 }
 
 void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
@@ -345,9 +248,6 @@ void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 
 int xdisplay_end(void)
 {
-  /* Don't display the window whilst doing all this! */
-  XUnmapWindow(display,mainWindow);
-
   /* Free the XImage used to store screen data; also frees the malloc'd
      data */
   XDestroyImage(image);
@@ -355,11 +255,7 @@ int xdisplay_end(void)
   /* Free the allocated GC */
   XFreeGC(display,gc);
 
-  /* Now free up the window itself */
-  XDestroyWindow(display,mainWindow);
-
-  /* And disconnect from the X server */
-  XCloseDisplay(display);
-
   return 0;
 }
+
+#endif				/* #ifndef HAVE_LIBGTK */

@@ -27,7 +27,6 @@
 #include <config.h>
 
 #include <stdio.h>
-#include <unistd.h>
 
 #include "display.h"
 #include "event.h"

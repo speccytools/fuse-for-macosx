@@ -1,4 +1,4 @@
-/* fuse.h: Variables exported from the main file
+/* xkeyboard.h: GTK+ routines for dealing with the keyboard
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
    Author contact information:
 
@@ -24,10 +24,12 @@
 
 */
 
-#ifndef FUSE_FUSE_H
-#define FUSE_FUSE_H
+#ifndef FUSE_GTKKEYBOARD_H
+#define FUSE_GTKKEYBOARD_H
 
-extern int fuse_exiting;
-extern char* fuse_progname;
+int gtkkeyboard_keypress(GtkWidget *widget, GdkEvent *event,
+			 gpointer data);
+int gtkkeyboard_keyrelease(GtkWidget *widget, GdkEvent *event,
+			   gpointer data);
 
-#endif			/* #ifndef FUSE_FUSE_H */
+#endif			/* #ifndef FUSE_GTKKEYBOARD_H */

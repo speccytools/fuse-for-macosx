@@ -38,6 +38,9 @@
 #include "x.h"
 #include "z80.h"
 
+/* What name were we called under? */
+char* fuse_progname;
+
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;
 
@@ -67,9 +70,11 @@ static int fuse_init(int argc, char **argv)
 {
   fuse_show_copyright();
 
-  if(display_init(argc,argv)) return 1;
+  fuse_progname=argv[0];
+
+  if(display_init(&argc,&argv)) return 1;
   if(event_init()) return 1;
-  timer_init();
+  if(timer_init()) return 1;
 
   machine.machine=SPECTRUM_MACHINE_48; spectrum_init(); machine.reset();
   keyboard_init();
@@ -83,7 +88,7 @@ static void fuse_show_copyright(void)
 {
   printf(
    "The Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n"
-   "Copyright (c) 1999-2000 Philip Kendall <pak@ast.cam.ac.uk> and others;\n"
+   "Copyright (c) 1999-2000 Philip Kendall <pak@ast.cam.ac.uk> and others.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"
    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"

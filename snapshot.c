@@ -24,11 +24,11 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
-#include "config.h"
 #include "display.h"
 #include "spec128.h"
 #include "spectrum.h"
@@ -104,11 +104,16 @@ int snapshot_read(void)
 int snapshot_write(void)
 {
   FILE *f; BYTE buffer[0xc000]; int i;
+  WORD stackpointer;
 
   f=fopen("snapshot.sna","wb");
   if(!f) return 1;
 
-  if(machine.machine==SPECTRUM_MACHINE_48) SP-=2;
+  if(machine.machine==SPECTRUM_MACHINE_48) {
+    stackpointer = SP-2;
+  } else {
+    stackpointer = SP;
+  }
 
   fputc(I  ,f);
   fputc(L_ ,f); fputc(H_ ,f);
@@ -123,7 +128,7 @@ int snapshot_write(void)
   fputc( IFF1 << 2 ,f);
   fputc(R  ,f);
   fputc(F  ,f); fputc(A  ,f);
-  fputc(SPL,f); fputc(SPH,f);
+  fputc( (stackpointer & 0xff ),f); fputc( (stackpointer >> 8 ),f);
   fputc(IM ,f);
   fputc(display_border,f);
 
@@ -132,8 +137,8 @@ int snapshot_write(void)
 
   if(machine.machine==SPECTRUM_MACHINE_48) {
     memcpy(&buffer[0x8000],RAM[0],0x4000);
-    buffer[((SP+1)-0x4000)]=PCH;
-    buffer[((SP  )-0x4000)]=PCL;
+    buffer[((stackpointer+1)-0x4000)]=PCH;
+    buffer[((stackpointer  )-0x4000)]=PCL;
     fwrite(buffer,0xc000,1,f);
   } else {
     memcpy(&buffer[0x8000],RAM[machine.ram.current_page],0x4000);
@@ -145,5 +150,8 @@ int snapshot_write(void)
       fwrite(RAM[i],0x4000,1,f);
     }
   }
+
+  fclose(f);
+
   return 0;
 }

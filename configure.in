@@ -24,33 +24,13 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.2.1)
+AM_INIT_AUTOMAKE(fuse, 0.2.2-pre1)
 
 dnl Checks for programs.
 AC_PROG_CC
 
 dnl Check for big endianness
 AC_C_BIGENDIAN
-
-dnl Find the X libraries
-AC_PATH_XTRA
-CFLAGS="$CFLAGS $X_CFLAGS";
-LDFLAGS="$LDFLAGS $X_LIBS";
-LIBS="$LIBS $X_PRE_LIBS -lX11 $X_EXTRA_LIBS";
-
-dnl This apparently needed for SVR4 systems to link correctly
-dnl Basically the same as a part of AC_PATH_XTRA, but using `gethostname'
-dnl instead of `gethostbyname'.
-dnl Thanks to Erik Kunze for pointing out this problem
-AC_CHECK_FUNC(gethostname)
-if test $ac_cv_func_gethostname = no; then
-  AC_CHECK_LIB(nsl, gethostname, X_EXTRA_LIBS="$X_EXTRA_LIBS -lnsl")
-fi
-AC_CHECK_FUNC(connect)
-if test $ac_cv_func_connect = no; then
-  AC_CHECK_LIB(socket, connect, X_EXTRA_LIBS="-lsocket $X_EXTRA_LIBS", ,
-	$X_EXTRA_LIBS)
-fi
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -63,9 +43,59 @@ dnl Checks for library functions.
 AC_CHECK_FUNCS(setitimer)
 
 dnl Check for libraries
-AC_CHECK_LIB(glib, g_slist_append)
-if test $ac_cv_lib_glib_g_slist_append = yes; then
-    CFLAGS="$CFLAGS `glib-config --cflags`"
+AC_MSG_CHECKING(whether GTK UI requested)
+AC_ARG_WITH(gtk,
+[  --with-gtk              use GTK+ library for user interface],
+if test "$withval" = no; then
+    gtk=no
+else
+    gtk=yes
+fi,
+gtk=yes)
+AC_MSG_RESULT($gtk)
+if test "$gtk" = yes; then
+    AM_PATH_GTK(1.2.0,
+		AC_DEFINE(HAVE_LIBGTK),
+		gtk=no;
+		AC_MSG_WARN([GTK+ not found. Reverting to Xlib UI]))
+fi
+
+dnl If we're not using GTK+, go and look for X ourselves
+if test "$gtk" = no; then
+    if test "$with_x" = no; then
+	AC_MSG_ERROR([Fuse cannot run without X. Sorry.])
+    fi
+    AC_PATH_XTRA	
+    CFLAGS="$CFLAGS $X_CFLAGS";
+    LDFLAGS="$LDFLAGS $X_LIBS";
+    LIBS="$LIBS $X_PRE_LIBS -lX11 $X_EXTRA_LIBS";
+
+    dnl This apparently needed for SVR4 systems to link correctly
+    dnl Basically the same as a part of AC_PATH_XTRA, but using `gethostname'
+    dnl instead of `gethostbyname'.
+    dnl Thanks to Erik Kunze for pointing out this problem
+    AC_CHECK_FUNC(gethostname)
+    if test $ac_cv_func_gethostname = no; then
+    AC_CHECK_LIB(nsl, gethostname, X_EXTRA_LIBS="$X_EXTRA_LIBS -lnsl")
+    fi
+    AC_CHECK_FUNC(connect)
+    if test $ac_cv_func_connect = no; then
+    AC_CHECK_LIB(socket, connect, X_EXTRA_LIBS="-lsocket $X_EXTRA_LIBS", ,
+	    $X_EXTRA_LIBS)
+    fi
+
+    dnl Also need to find glib ourselves
+    AC_CHECK_PROG(glibconfig, glib-config, "yes")
+    if test "$glibconfig" = yes; then
+	AC_CHECK_LIB(glib, g_slist_alloc,
+		     CFLAGS="$CFLAGS `glib-config --cflags`";
+		     LIBS="$LIBS `glib-config --libs`"
+		     ,
+		     ,[`glib-config --libs`])
+    fi
+    if test "$ac_cv_lib_glib_g_slist_alloc" != yes; then
+	AC_MSG_ERROR([Necessary library glib not found])
+    fi
 fi
 
 dnl Do we want issue 2 keyboard emulation?
@@ -81,9 +111,9 @@ fi,
 issue2=no)
 AC_MSG_RESULT($issue2)
 
-AC_SUBST(X_CFLAGS)
-AC_SUBST(X_LIBS)
-AC_SUBST(X_EXTRA_LIBS)
-AC_SUBST(X_PRE_LIBS)
+dnl If it appears we're using gcc as our compiler, turn on warnings
+if test "$ac_cv_prog_CC" = gcc; then
+    CFLAGS="$CFLAGS -Wall"
+fi
 
 AC_OUTPUT(Makefile)
