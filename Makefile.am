@@ -38,7 +38,7 @@ fuse_SOURCES = ay.c display.c event.c fbdisplay.c fbkeyboard.c fbui.c\
 BUILT_SOURCES = keysyms.c
 
 keysyms.c: keysyms.pl keysyms.dat
-	./keysyms.pl keysyms.dat > keysyms.c
+	@PERL@ keysyms.pl keysyms.dat > keysyms.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DROMSDIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a widget/libwidget.a z80/libz80.a
