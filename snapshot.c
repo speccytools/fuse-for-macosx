@@ -143,6 +143,7 @@ void snapshot_flush_slt (void)
     slt[i] = NULL;
     slt_length[i] = 0;
   }
+  slt_screen = NULL;
 }
 
 static int snapshot_copy_from( libspectrum_snap *snap )
@@ -208,7 +209,9 @@ static int snapshot_copy_from( libspectrum_snap *snap )
       slt[i] = (BYTE*)malloc( slt_length[i] * sizeof( BYTE ) );
       if( slt[i] == NULL ) {
 	for( j=0; j<i; j++ ) {
-	  if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }
+	  if( slt_length[j] ) { free( slt[j] ); slt_length[j] = 0; }
+	  fprintf( stderr, "%s: out of memory in snapshot_copy_from\n",
+		   fuse_progname );
 	  return 1;
 	}
       }
@@ -223,6 +226,8 @@ static int snapshot_copy_from( libspectrum_snap *snap )
     if( slt_screen == NULL ) {
       for( i=0; i<256; i++ ) {
 	if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }
+	fprintf( stderr, "%s: out of memory in snapshot_copy_from\n",
+		 fuse_progname );
 	return 1;
       }
     }
@@ -254,6 +259,14 @@ int snapshot_write( const char *filename )
     return error;
   }
 
+  error = libspectrum_snap_destroy( &snap );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    fprintf(stderr, "%s: Error from libspectrum_snap_destroy: %s\n",
+	    fuse_progname, libspectrum_error_message(error) );
+    free( buffer );
+    return 1;
+  }
+
   error = utils_write_file( filename, buffer, length );
   if( error ) { free( buffer ); return error; }
 
@@ -263,7 +276,7 @@ int snapshot_write( const char *filename )
 
 static int snapshot_copy_to( libspectrum_snap *snap )
 {
-  int i;
+  int i,j;
 
   switch( machine_current->machine ) {
   case SPECTRUM_MACHINE_48:
@@ -300,11 +313,59 @@ static int snapshot_copy_to( libspectrum_snap *snap )
 
   snap->tstates = tstates;
 
-  /* FIXME: should copy to new memory */
-  for( i=0; i<8; i++ ) snap->pages[i] = RAM[i];
+  for( i=0; i<8; i++ ) {
+    if( RAM[i] != NULL ) {
 
-  memcpy( snap->slt,        slt,        sizeof(snap->slt)        );
+      snap->pages[i] =
+	(libspectrum_byte*)malloc( 0x4000 * sizeof( libspectrum_byte ) );
+      if( snap->pages[i] == NULL ) {
+	for( j=0; j<i; j++ )
+	  if( snap->pages[j] ) { free(snap->pages[j]); snap->pages[j] = NULL; }
+	fprintf( stderr, "%s: out of memory in snapshot_copy_to\n",
+		 fuse_progname );
+	return 1;
+      }
+
+      memcpy( snap->pages[i], RAM[i], 0x4000 );
+    }
+  }
+
   memcpy( snap->slt_length, slt_length, sizeof(snap->slt_length) );
+  for( i=0; i<256; i++ ) {
+    if( slt_length[i] ) {
 
+      snap->slt[i] =
+	(libspectrum_byte*)malloc( slt_length[i] * sizeof(libspectrum_byte) );
+      if( snap->slt[i] == NULL ) {
+	for( j=0; j<8; j++ )
+	  if( snap->pages[j] ) { free(snap->pages[j]); snap->pages[j] = NULL; }
+	for( j=0; j<i; j++ )
+	  if( snap->slt[j] ) { free( snap->slt[j] ); snap->slt_length[j] = 0; }
+	fprintf( stderr, "%s: out of memory in snapshot_copy_to\n",
+		 fuse_progname );
+	return 1;
+      }
+
+      memcpy( snap->slt[i], slt[i], slt_length[i] );
+    }
+  }
+
+  if( slt_screen ) {
+    snap->slt_screen =
+      (libspectrum_byte*)malloc( 6192 * sizeof( libspectrum_byte ) );
+    if( snap->slt_screen == NULL ) {
+      for( i=0; i<8; i++ )
+	if( snap->pages[i] ) { free( snap->pages[i] ); snap->pages[i] = NULL; }
+      for( i=0; i<256; i++ )
+	if( snap->slt[i] ) { free( snap->slt[i] ); snap->slt_length[i] = 0; }
+      fprintf( stderr, "%s: out of memory in snapshot_copy_to\n",
+	       fuse_progname );
+      return 1;
+    }
+
+    memcpy( snap->slt_screen, slt_screen, 6192 );
+    snap->slt_screen_level = slt_screen_level;
+  }
+    
   return 0;
 }
