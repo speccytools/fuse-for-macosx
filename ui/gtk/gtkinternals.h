@@ -58,6 +58,12 @@ int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
 int gtkstatusbar_create( GtkBox *parent );
 
 /*
+ * Poke finder routines (pokefinder.c)
+ */
+
+void gtkui_pokefinder( GtkWidget *widget, gpointer data );
+
+/*
  * General user interface routines (gtkui.c)
  */
 

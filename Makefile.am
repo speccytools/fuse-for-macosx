@@ -26,7 +26,17 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = compat debugger hacking lib man perl roms ui @WIDGET@ z80
+SUBDIRS = compat \
+	  debugger \
+	  hacking \
+	  lib \
+	  man \
+	  perl \
+	  pokefinder \
+	  roms \
+	  ui \
+	  @WIDGET@ \
+	  z80
 
 fuse_SOURCES = ay.c \
 	dck.c \
@@ -59,9 +69,18 @@ fuse_SOURCES = ay.c \
 
 fuse_LDADD = memory_internal.o \
 debugger/libdebugger.a \
-@UI_LIBS@ ui/scaler/libscaler.a debugger/libdebugger.a z80/libz80.a @DSKLIBS@ \
+pokefinder/libpokefinder.a \
+@UI_LIBS@ \
+ui/scaler/libscaler.a \
+debugger/libdebugger.a \
+z80/libz80.a \
+@DSKLIBS@ \
 @LIBSPEC_LIBS@ \
-@GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ compat/libcompat.a
+@GLIB_LIBS@ \
+@GTK_LIBS@ \
+@PNG_LIBS@ \
+@XML_LIBS@ \
+compat/libcompat.a
 
 fuse_DEPENDENCIES = memory_internal.o @UI_LIBS@ debugger/libdebugger.a \
 	            z80/libz80.a

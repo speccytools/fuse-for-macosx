@@ -37,7 +37,10 @@ libuigtk_a_SOURCES = binary.c \
 		     gtkjoystick.c \
 		     gtkkeyboard.c \
                      gtkui.c \
-	             options.c keysyms.c picture.c \
+	             options.c \
+		     keysyms.c \
+		     picture.c \
+		     pokefinder.c \
 		     roms.c \
 		     statusbar.c
 

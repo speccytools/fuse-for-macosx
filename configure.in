@@ -383,7 +383,11 @@ compat/Makefile \
 debugger/Makefile \
 hacking/Makefile \
 lib/Makefile \
-man/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \
+man/Makefile \
+perl/Makefile \
+perl/Fuse/Makefile \
+pokefinder/Makefile \
+roms/Makefile \
 ui/Makefile \
 ui/fb/Makefile \
 ui/ggi/Makefile \

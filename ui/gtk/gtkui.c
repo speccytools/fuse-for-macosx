@@ -47,6 +47,7 @@
 #include "gtkinternals.h"
 #include "machine.h"
 #include "options.h"
+#include "pokefinder/pokefinder.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
@@ -200,6 +201,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Machine/_Reset...",       "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
   { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
+  { "/Machine/_Poke Finder...",	NULL , gtkui_pokefinder,    0, NULL	     },
   { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
 
   { "/Media",			NULL , NULL,                0, "<Branch>"    },
