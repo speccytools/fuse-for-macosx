@@ -50,10 +50,23 @@ BYTE **ROM;
 BYTE RAM[8][0x4000];
 DWORD tstates;
 
+/* Set these every time we change machine to avoid having to do a
+   structure lookup too often */
+spectrum_memory_read_function readbyte;
+spectrum_screen_read_function read_screen_memory;
+spectrum_memory_write_function writebyte;
+
+spectrum_memory_contention_function contend_memory;
+spectrum_port_contention_function contend_port;
+
 /* Level data from .slt files */
 
 BYTE *slt[256];
 size_t slt_length[256];
+
+BYTE *slt_screen;		/* The screenshot from the .slt file */
+int slt_screen_level;		/* The level of the screenshot.
+				   Not used for anything AFAIK */
 
 int spectrum_interrupt(void)
 {

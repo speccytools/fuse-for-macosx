@@ -1,4 +1,4 @@
-/* utils.c: some useful helper functions
+/* utils.h: some useful helper functions
    Copyright (c) 1999-2002 Philip Kendall
 
    $Id$

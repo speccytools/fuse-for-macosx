@@ -113,7 +113,7 @@ extern widget_recurse_t widget_return[];
 extern int widget_level;
 
 /* The current widget keyhandler */
-widget_keyhandler_fn widget_keyhandler;
+extern widget_keyhandler_fn widget_keyhandler;
 
 int widget_init( void );
 int widget_end( void );
@@ -139,8 +139,8 @@ typedef struct widget_dirent {
   char *name;
 } widget_dirent;
 
-struct widget_dirent **widget_filenames;
-size_t widget_numfiles;
+extern struct widget_dirent **widget_filenames;
+extern size_t widget_numfiles;
 
 int widget_filesel_draw( void* data );
 int widget_filesel_finish( widget_finish_state finished );

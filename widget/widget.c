@@ -50,6 +50,9 @@ static void printchar(int x, int y, int col, int ch);
 
 static char widget_font[768];
 
+/* The current widget keyhandler */
+widget_keyhandler_fn widget_keyhandler;
+
 /* The data used for recursive widgets */
 widget_recurse_t widget_return[10];
 

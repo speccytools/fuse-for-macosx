@@ -1,4 +1,4 @@
-/* event.c: Routines needed for dealing with the event list
+/* event.h: Routines needed for dealing with the event list
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -49,7 +49,7 @@ enum event_types {
 extern const DWORD event_no_events;
 
 /* When will the next event happen? */
-DWORD event_next_event;
+extern DWORD event_next_event;
 
 /* Set up the event list */
 int event_init(void);

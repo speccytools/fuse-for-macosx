@@ -46,6 +46,9 @@
 /* A large value to mean `no events due' */
 const DWORD event_no_events = 0xffffffff;
 
+/* When will the next event happen? */
+DWORD event_next_event;
+
 /* The actual list of events */
 static GSList* event_list;
 

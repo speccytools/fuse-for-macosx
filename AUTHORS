@@ -14,6 +14,9 @@ Fuse has been brought to you by:
 
 * Alexander Yurchenko: the OpenBSD/Solaris-specific sound code.
 
+* Fredrick Meunier: for TC2048 support and well as other bug fixes and the
+  like.
+
 * Philip Kendall: everything else.
 
 $Id$

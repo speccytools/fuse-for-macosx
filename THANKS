@@ -34,6 +34,8 @@ Some thanks (in alphabetical order):
 
 * Russell Marks: for various bits of code (see `AUTHORS')
 
+* Fredrick Meunier: for TC2048 support and more (see `AUTHORS')
+
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
 

@@ -71,12 +71,12 @@ typedef struct spectrum_raminfo {
 
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
-spectrum_memory_read_function readbyte;
-spectrum_screen_read_function read_screen_memory;
-spectrum_memory_write_function writebyte;
+extern spectrum_memory_read_function readbyte;
+extern spectrum_screen_read_function read_screen_memory;
+extern spectrum_memory_write_function writebyte;
 
-spectrum_memory_contention_function contend_memory;
-spectrum_port_contention_function contend_port;
+extern spectrum_memory_contention_function contend_memory;
+extern spectrum_port_contention_function contend_port;
 
 /* Things relating to peripherals */
 
@@ -107,12 +107,12 @@ int spectrum_interrupt(void);
 
 /* Data from .slt files */
 
-size_t slt_length[256];		/* Length of data for this value of A
+extern size_t slt_length[256];		/* Length of data for this value of A
 				   0 => no data */
-BYTE *slt[256];			/* Actual data for each value of A */
+extern BYTE *slt[256];			/* Actual data for each value of A */
 
-BYTE *slt_screen;		/* The screenshot from the .slt file */
-int slt_screen_level;		/* The level of the screenshot.
+extern BYTE *slt_screen;		/* The screenshot from the .slt file */
+extern int slt_screen_level;		/* The level of the screenshot.
 				   Not used for anything AFAIK */
 
 /* The machines available */
