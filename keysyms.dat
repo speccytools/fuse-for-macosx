@@ -28,7 +28,10 @@
 # differ for svgalib
 
 # <key1> and <key2> are two Spectrum keys as defined in keyboard.h (or
-# NONE for no key)
+# NONE for no key). The widget handlers consider only the first key
+# specified, so put the `main' key in as <key1> and the modifier as <key2>
+
+Escape      , 1,     Caps
 
 1           , 1,     NONE
 2           , 2,     NONE
