@@ -135,9 +135,10 @@ static void
 add_rom( GtkWidget *table, size_t start, gint row )
 {
   GtkWidget *label, *change_button;
-  char **setting;
+  char buffer[ 80 ], **setting;
 
-  label = gtk_label_new( settings_rom_name[ start + row ] );
+  snprintf( buffer, 80, "ROM %d", row );
+  label = gtk_label_new( buffer );
   gtk_table_attach( GTK_TABLE( table ), label, 0, 1, row, row + 1,
 		    0, 0, 2, 2 );
 

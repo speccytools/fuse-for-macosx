@@ -913,3 +913,6 @@
 	 z80_ops.c}: place ULA routines in their own source file.
 20040610 settings.dat: make ZXATASP upload and write protect, and ZXCF
 	 upload default to off.
+20040610 settings-header.pl,settings.pl,ui/gtk/roms.c,widget/roms.c:
+	 no need to put machine name in ROM titles any more as they're
+	 now on their own menus.

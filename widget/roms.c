@@ -82,8 +82,7 @@ widget_roms_draw( void *data )
 
   for( i = 0; i < info->count; i++ ) {
 
-    snprintf( buffer, 32, "(%c) %10s:", ((char)i) + 'A',
-	      settings_rom_name[ first_rom + i ] );
+    snprintf( buffer, 32, "(%c) ROM %d:", ((char)i) + 'A', i );
     widget_printstring( 2, i + 4, WIDGET_COLOUR_FOREGROUND, buffer );
 
     print_rom( i );
@@ -100,11 +99,11 @@ print_rom( int which )
 
   setting = *( settings_get_rom_setting( widget_settings,
 					 which + first_rom ) );
-  length = strlen( setting ); if( length > 12 ) setting += length - 12;
+  length = strlen( setting ); if( length > 17 ) setting += length - 17;
 
-  widget_rectangle( 18 * 8, ( which + 4 ) * 8, 12 * 8, 1 * 8,
+  widget_rectangle( 13 * 8, ( which + 4 ) * 8, 17 * 8, 1 * 8,
 		    WIDGET_COLOUR_BACKGROUND );
-  widget_printstring( 18, which + 4, WIDGET_COLOUR_FOREGROUND, setting );
+  widget_printstring( 13, which + 4, WIDGET_COLOUR_FOREGROUND, setting );
   widget_display_lines( which + 4, 1 );
 }
 
