@@ -56,6 +56,7 @@ void yyerror( char *s );
 %token		 CONTINUE
 %token		 DISASSEMBLE
 %token		 EXIT
+%token		 IGNORE
 %token		 NEXT
 %token		 PORT
 %token		 READ
@@ -77,45 +78,48 @@ input:	 /* empty */
 ;
 
 command:   BREAK    { debugger_breakpoint_add(
-			DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC,
+			DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC, 0,
 			DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 		      );
 		    }
 	 | BREAK CLEAR { debugger_breakpoint_remove_all(); }
 	 | BREAK CLEAR NUMBER { debugger_breakpoint_remove( $3 ); }
 	 | BREAK NUMBER { debugger_breakpoint_add( 
-			    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, $2,
+			    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, $2, 0,
 			    DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 			  );
 			}
-	 | BREAK PORT READ NUMBER { debugger_breakpoint_add(
-				      DEBUGGER_BREAKPOINT_TYPE_PORT_READ, $4,
-				      DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-				    );
-				  }
-	 | BREAK PORT WRITE NUMBER { debugger_breakpoint_add(
-				       DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, $4,
-				       DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-				     );
-				   }
+	 | BREAK IGNORE NUMBER NUMBER { debugger_breakpoint_ignore( $3, $4 ); }
+	 | BREAK PORT READ NUMBER {
+             debugger_breakpoint_add(
+               DEBUGGER_BREAKPOINT_TYPE_PORT_READ, $4, 0,
+               DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+	     );
+           }
+	 | BREAK PORT WRITE NUMBER {
+             debugger_breakpoint_add(
+	       DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, $4, 0,
+	       DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+	     );
+	   }
 	 | BREAK READ { debugger_breakpoint_add(
-			  DEBUGGER_BREAKPOINT_TYPE_READ, PC,
+			  DEBUGGER_BREAKPOINT_TYPE_READ, PC, 0,
 			  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 			);
 		      }
 	 | BREAK READ NUMBER { debugger_breakpoint_add(
-				 DEBUGGER_BREAKPOINT_TYPE_READ, $3,
+				 DEBUGGER_BREAKPOINT_TYPE_READ, $3, 0,
 				 DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 			       );
 			     }
 	 | BREAK SHOW { debugger_breakpoint_show(); }
 	 | BREAK WRITE { debugger_breakpoint_add(
-			   DEBUGGER_BREAKPOINT_TYPE_WRITE, PC,
+			   DEBUGGER_BREAKPOINT_TYPE_WRITE, PC, 0,
 			   DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 			 );
 		       }
 	 | BREAK WRITE NUMBER { debugger_breakpoint_add(
-				  DEBUGGER_BREAKPOINT_TYPE_WRITE, $3,
+				  DEBUGGER_BREAKPOINT_TYPE_WRITE, $3, 0,
 				  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 				);
 			      }

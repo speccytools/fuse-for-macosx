@@ -55,6 +55,7 @@ cl|cle|clea|clear { return CLEAR; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
 	                                                  return DISASSEMBLE; }
 ex|exi|exit { return EXIT; }
+i|ig|ign|igno|ignor|ignore { return IGNORE; }
 n|ne|nex|next { return NEXT; }
 p|po|por|port { return PORT; }
 r|re|rea|read { return READ; }

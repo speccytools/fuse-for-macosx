@@ -82,7 +82,11 @@ debugger_check( debugger_breakpoint_type type, WORD value )
     for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
       bp = ptr->data;
       if( bp->type == type && bp->value == value ) {
-	active = bp; break;
+	if( bp->ignore ) {
+	  bp->ignore--;
+	} else {
+	  active = bp; break;
+	}
       }
     }
     if( active ) {
@@ -128,7 +132,7 @@ debugger_next( void )
 
   /* And add a breakpoint after that */
   debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-			   PC + length, DEBUGGER_BREAKPOINT_LIFE_ONESHOT );
+			   PC + length, 0, DEBUGGER_BREAKPOINT_LIFE_ONESHOT );
 
   debugger_run();
 
@@ -149,7 +153,7 @@ debugger_run( void )
 /* Add a breakpoint */
 int
 debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
-			 debugger_breakpoint_life life )
+			 size_t ignore, debugger_breakpoint_life life )
 {
   debugger_breakpoint *bp;
 
@@ -159,7 +163,7 @@ debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
     return 1;
   }
 
-  bp->type = type; bp->value = value; bp->life = life;
+  bp->type = type; bp->value = value; bp->ignore = ignore; bp->life = life;
 
   debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
 
@@ -176,7 +180,11 @@ debugger_breakpoint_remove( size_t n )
   GSList *ptr;
 
   ptr = g_slist_nth( debugger_breakpoints, n );
-  if( !ptr ) return 1;
+  if( !ptr ) {
+    ui_error( UI_ERROR_ERROR, "Breakpoint %ld does not exist",
+	      (unsigned long)n );
+    return 1;
+  }
 
   debugger_breakpoints = g_slist_remove( debugger_breakpoints, ptr->data );
   if( debugger_mode == DEBUGGER_MODE_ACTIVE && !debugger_breakpoints )
@@ -225,7 +233,8 @@ show_breakpoint( gpointer data, gpointer user_data )
   debugger_breakpoint *bp = data;
   size_t *index = user_data;
 
-  printf( "%d: %d 0x%04x %d\n", *index, bp->type, bp->value, bp->life );
+  printf( "%d: %d 0x%04x %ld %d\n", *index, bp->type, bp->value,
+	  (unsigned long)bp->ignore, bp->life );
 
   (*index)++;
 }
@@ -237,8 +246,8 @@ debugger_breakpoint_exit( void )
 {
   WORD target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
 
-  if( debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
-			       target, DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) )
+  if( debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, target, 0,
+			       DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) )
     return 1;
 
   if( debugger_run() ) return 1;
@@ -246,4 +255,22 @@ debugger_breakpoint_exit( void )
   return 0;
 }
 
+/* Ignore breakpoint 'which' the next 'ignore' times it hits */
+int
+debugger_breakpoint_ignore( size_t which, size_t ignore )
+{
+  GSList *ptr; debugger_breakpoint *bp;
 
+  ptr = g_slist_nth( debugger_breakpoints, which );
+  if( !ptr ) {
+    ui_error( UI_ERROR_ERROR, "Breakpoint %ld does not exist",
+	      (unsigned long)which );
+    return 1;
+  }
+
+  bp = ptr->data;
+
+  bp->ignore = ignore;
+
+  return 0;
+}

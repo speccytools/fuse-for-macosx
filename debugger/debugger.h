@@ -68,6 +68,7 @@ typedef enum debugger_breakpoint_life {
 typedef struct debugger_breakpoint {
   enum debugger_breakpoint_type type;
   WORD value;
+  size_t ignore;		/* Ignore this breakpoint this many times */
   enum debugger_breakpoint_life life;
 } debugger_breakpoint;
 
