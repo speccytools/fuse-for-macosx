@@ -26,14 +26,17 @@
 
 #include <config.h>
 
-#include <stdlib.h>
-#include <unistd.h>
 #include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/time.h>
-#include <errno.h>
+#include <unistd.h>
 
 #include "fuse.h"
 #include "display.h"
@@ -42,14 +45,67 @@
 #include "keyboard.h"
 #include "widget.h"
 
-/* Get the Spectrum font from its file */
-#include "font.c"
-
 int widget_keymode;
 
 static void printchar(int x, int y, int col, int ch);
 static void printstring(int x, int y, int col, char *s);
 static void rect(int x, int y, int w, int h, int col);
+
+static char widget_font[768];
+
+#define ERROR_MESSAGE_MAX_LENGTH 1024
+
+static int widget_read_font( const char *filename, size_t offset )
+{
+  int fd; struct stat file_info; unsigned char *buffer;
+
+  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  fd = open( filename, O_RDONLY );
+  if( fd == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: couldn't open `%s'", fuse_progname, filename );
+    perror( error_message );
+    return errno;
+  }
+
+  if( fstat( fd, &file_info) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't stat `%s'", fuse_progname, filename );
+    perror( error_message );
+    close(fd);
+    return errno;
+  }
+
+  buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
+  if( buffer == (void*)-1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
+    perror( error_message );
+    close(fd);
+    return errno;
+  }
+
+  if( close(fd) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't close `%s'", fuse_progname, filename );
+    perror( error_message );
+    munmap( buffer, file_info.st_size );
+    return errno;
+  }
+
+  memcpy( widget_font, buffer+offset-1, 768 );
+
+  if( munmap( buffer, file_info.st_size ) == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
+    perror( error_message );
+    return errno;
+  }
+
+  return 0;
+
+}
 
 static void printchar(int x, int y, int col, int ch) {
     
@@ -195,14 +251,17 @@ static widget_finish_state widget_finished;
 
 int widget_init( void )
 {
-  int i;
+  int i, error;
+
+  error = widget_read_font( "roms/48.rom", 15617 );
+  if( error ) return error;
 
   filenames = (char**)malloc( 8192 * sizeof( char* ) );
-  if( filenames == NULL ) return 1;
+  if( filenames == NULL ) return ENOMEM;
 
   for( i=0; i<8192; i++ ) {
     filenames[i] = (char*)malloc( 64 * sizeof( char ) );
-    if( filenames[i] == NULL ) return 1;
+    if( filenames[i] == NULL ) return ENOMEM;
   }
 
   return 0;
