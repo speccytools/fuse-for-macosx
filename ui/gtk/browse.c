@@ -58,6 +58,7 @@ gtk_tape_browse( GtkWidget *widget, gpointer data )
   GtkWidget *ok_button, *cancel_button;
 
   struct browse_data callback_data;
+  int current_block;
 
   gchar *titles[2] = { "Block type", "Data" };
 
@@ -126,6 +127,15 @@ gtk_tape_browse( GtkWidget *widget, gpointer data )
 
   /* Make the window big enough to show at least some data */
   gtk_window_set_default_size( GTK_WINDOW( dialog ), 400, 200 );
+
+  current_block = tape_get_current_block();
+  if( current_block != -1 ) {
+    /* FIXME: Why doesn't this work? */
+    gtk_clist_moveto( GTK_CLIST( clist ), current_block, -1,
+		      0.5, 0.0 );
+
+    gtk_clist_select_row( GTK_CLIST( clist ), current_block, 0 );
+  }
 
   /* Set the window to be modal and display it */
   gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
