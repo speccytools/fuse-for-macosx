@@ -54,6 +54,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_END,
 
+  LIBSPECTRUM_TAPE_BLOCK_STOP48 = 0x2a,
+
   LIBSPECTRUM_TAPE_BLOCK_COMMENT = 0x30,
   LIBSPECTRUM_TAPE_BLOCK_MESSAGE,
   LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO,
@@ -75,6 +77,7 @@ typedef enum libspectrum_tape_state_type {
 /* Some flags */
 extern const int LIBSPECTRUM_TAPE_FLAGS_BLOCK;	/* End of block */
 extern const int LIBSPECTRUM_TAPE_FLAGS_STOP;	/* Stop tape */
+extern const int LIBSPECTRUM_TAPE_FLAGS_STOP48;	/* Stop tape if in 48K mode */
 
 /* A standard ROM loading block */
 typedef struct libspectrum_tape_rom_block {
@@ -200,6 +203,7 @@ typedef struct libspectrum_tape_group_start_block {
 } libspectrum_tape_group_start_block;
 
 /* No group end block needed as it contains no data */
+/* No `stop tape if in 48K mode' block either */
 
 /* A comment block */
 typedef struct libspectrum_tape_comment_block {
@@ -256,6 +260,8 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_pause_block pause;
     libspectrum_tape_group_start_block group_start;
     /* No group end block needed as it contains no data */
+
+    /* No `stop tape if in 48K mode' block needed either */
 
     libspectrum_tape_comment_block comment;
     libspectrum_tape_message_block message;

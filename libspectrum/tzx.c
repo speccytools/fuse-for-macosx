@@ -59,6 +59,9 @@ static libspectrum_error
 tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		    const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
+	       const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_comment( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		  const libspectrum_byte *end );
 static libspectrum_error
@@ -182,6 +185,11 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
       error = tzx_read_group_end( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+      error = tzx_read_stop( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -627,6 +635,39 @@ tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* This is an group end block */
   block->type = LIBSPECTRUM_TAPE_BLOCK_GROUP_END;
+
+  /* Put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}  
+
+static libspectrum_error
+tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
+	       const libspectrum_byte *end )
+{
+  libspectrum_tape_block *block;
+
+  /* Check the length field exists */
+  if( end - (*ptr) < 2 ) {
+    libspectrum_print_error(
+      "tzx_read_stop: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* But then just skip over it, as I don't care what it is */
+  (*ptr) += 2;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) {
+    libspectrum_print_error( "tzx_read_group_end: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* This is an `stop tape if in 48K mode' block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_STOP48;
 
   /* Put the block into the block list */
   tape->blocks = g_slist_append( tape->blocks, (gpointer)block );

@@ -220,6 +220,10 @@ main( int argc, char **argv )
       /* Do nothing */
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+      /* Do nothing */
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
       printf("  Comment: %s\n", block->types.comment.text );
       break;

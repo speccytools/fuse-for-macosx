@@ -116,6 +116,9 @@ block_free( gpointer data, gpointer user_data )
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
     break;
 
+  case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+    break;
+
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
     free( block->types.comment.text );
     break;
@@ -160,6 +163,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+  case LIBSPECTRUM_TAPE_BLOCK_STOP48:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
   case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
@@ -219,8 +223,10 @@ pure_data_init( libspectrum_tape_pure_data_block *block )
 }
 
 /* Some flags which may be set after calling libspectrum_tape_get_next_edge */
-const int LIBSPECTRUM_TAPE_FLAGS_BLOCK = 1 << 0; /* End of block */
-const int LIBSPECTRUM_TAPE_FLAGS_STOP  = 1 << 1; /* Stop tape */
+const int LIBSPECTRUM_TAPE_FLAGS_BLOCK  = 1 << 0; /* End of block */
+const int LIBSPECTRUM_TAPE_FLAGS_STOP   = 1 << 1; /* Stop tape */
+const int LIBSPECTRUM_TAPE_FLAGS_STOP48 = 1 << 2; /* Stop tape if in
+						     48K mode */
 
 /* The main function: called with a tape object and returns the number of
    t-states until the next edge, and a marker if this was the last edge
@@ -266,6 +272,10 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     *tstates = block->types.pause.length; end_of_block = 1;
     /* 0 ms pause => stop tape */
     if( *tstates == 0 ) { *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP; }
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+    *tstates = 0; *flags |= LIBSPECTRUM_TAPE_FLAGS_STOP48; end_of_block = 1;
     break;
 
   /* For blocks which contain no Spectrum-readable data, return zero
@@ -647,6 +657,10 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
     strncpy( buffer, "Group End Block", length );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+    strncpy( buffer, "Stop Tape If In 48K Mode Block", length );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
