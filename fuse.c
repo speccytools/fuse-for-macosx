@@ -345,16 +345,16 @@ int fuse_emulation_pause(void)
 {
   int error;
 
+  /* If we were already paused, just return. In any case, increment
+     the pause count */
+  if( fuse_emulation_paused++ ) return 0;
+
   /* Stop recording any competition mode RZX file */
   if( rzx_recording && rzx_competition_mode ) {
     ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
     error = rzx_stop_recording(); if( error ) return error;
   }
       
-  /* If we were already paused, just return. In any case, increment
-     the pause count */
-  if( fuse_emulation_paused++ ) return 0;
-
   /* If we had sound enabled (and hence doing the speed regulation),
      turn it off */
   if( sound_enabled ) sound_end();
