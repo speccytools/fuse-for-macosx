@@ -1017,3 +1017,5 @@
 20040720 widget/select.c: stop cursor at correct bottom limit (Darren).
 20040720 rzx.c: change back to the RZX test key.
 20040720 ui/fb/fbdisplay.c: Timex rendering fixes (Darren).
+20040720 settings.dat,man/fuse.1,ui/fb/fbdisplay.c,ui/svga/svgadisplay.c:
+	 optionally use doublescan modes for SVGAlib and fb (Darren).

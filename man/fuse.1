@@ -444,10 +444,27 @@ option.
 .br
 .I "--svgamode mode"
 .RS
-Specify which mode to use for the SVGAlib UI. Available values for
+Specify which mode to use for the SVGAlib and FB UIs. Available values for
 .I mode
 are `320' (which corresponds to a 320x240x256 mode), the default and
 `640' (a 640x480x256 mode).
+.RE
+.PP
+.I "-D mode"
+.br
+.I "--doublescan-mode mode"
+.RS
+Specify whether to use doublescan modes in the SVGALib and FB UIs.
+Available values for
+.I mode
+are 0, 1 and 2. 0 means "never doublescan" (use 640x480 at either 72Hz or
+60Hz), whereas 1 and 2 both mean "try to use doublescan" and will fall back
+on the 640x480 modes. These latter two are treated identically for SVGA, but
+for FB, they differ: 1 selects 72Hz modes (the same size and shape as your
+typical 640x480), and 2 selects 60Hz modes (overscan).
+.br
+If your monitor displays a blank screen when using 1 or 2, press F10 then
+try a different option or say "--svgamode 640".
 .RE
 .PP
 .I "-t file"

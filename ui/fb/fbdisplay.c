@@ -82,18 +82,48 @@ unsigned long fb_resolution; /* == xres << 16 | yres */
 #define IF_FB_HEIGHT(Y) ((fb_resolution & 0xFFFF) == (Y))
 #define IF_FB_RES(X, Y) (fb_resolution == FB_RES ((X), (Y)))
 
-static const struct {
+typedef struct {
   int xres, yres, pixclock;
   int left_margin, right_margin, upper_margin, lower_margin;
   int hsync_len, vsync_len;
   int sync, doublescan;
-} fb_modes[] = {
-  { 640, 240, 32052,  128, 24, 28, 9,  40, 3,  0, 1 }, /* 640x240, 72Hz */
-  { 640, 480, 32052,  128, 24, 28, 9,  40, 3,  0, 0 }, /* 640x480, 72Hz */
-  { 320, 240, 64104,   64, 12, 14, 4,  20, 3,  0, 1 }, /* 320x240, 72Hz */
-  { 0 }
-};
+} fuse_fb_mode_t;
 
+/* Test monitor is a Compaq V50, default settings
+ * A = working on ATI RV100 (Radeon 7000) (2.6.x, old radeonfb)
+ * M = working on Matrox MGA2064W (Millennium I) (2.6.x, matroxfb)
+ * Large/tall/wide = size indication (overscan)
+ * The 640x480 modes are from /etc/fb.modes and should work anywhere.
+ *
+ *    x    y  clock   lm  rm  tm  bm   hl  vl  s  d
+ */
+static const fuse_fb_mode_t fb_modes_singlescan[] = {
+  { 640, 480, 32052,  96, 56, 28,  9,  40,  3, 0, 0 }, /* 640x480-72  72.114 */
+  { 640, 480, 39722,  48, 16, 33, 10,  96,  2, 0, 0 }, /* 640x480-60  59.940 std */
+  { 0 } /* end of list */
+};
+static const fuse_fb_mode_t fb_modes_doublescan[] = {
+  { 640, 240, 32052,  92, 56, 14,  4,  40,  3, 0, 1 }, /* 640x240-72  72.185 */
+  { 640, 480, 32052,  96, 56, 28,  9,  40,  3, 0, 0 }, /* 640x480-72  72.114 */
+  { 640, 480, 39722,  48, 16, 33, 10,  96,  2, 0, 0 }, /* 640x480-60  59.940 std */
+  { 320, 240, 64104,  46, 28, 14,  4,  20,  3, 3, 1 }, /* 320x240-72  72.185 M wide */
+  { 0 } /* end of list */
+};
+static const fuse_fb_mode_t fb_modes_doublescan_alt[] = {
+  { 640, 240, 39722,  36, 12, 18,  7,  96,  2, 1, 1 }, /* 640x240-60  60.133 AM large */
+  { 640, 480, 32052,  96, 56, 28,  9,  40,  3, 0, 0 }, /* 640x480-72  72.114 */
+  { 640, 480, 39722,  48, 16, 33, 10,  96,  2, 0, 0 }, /* 640x480-60  59.940 std */
+  { 320, 240, 79444,  18,  6, 18,  7,  48,  2, 1, 1 }, /* 320x240-60  60.133 AM large */
+  { 0 } /* end of list */
+};
+/* Modes not used but which may work are listed here.
+ *    x    y  clock   lm  rm  tm  bm   hl  vl  s  d
+  { 640, 480, 22272,  48, 32, 17, 22, 128, 12, 0, 0 }, ** 640x480-100 99.713
+  { 640, 480, 25057, 120, 32, 14, 25,  40, 14, 0, 0 }, ** 640x480-90  89.995
+  { 640, 480, 31747, 120, 16, 16,  1,  64,  3, 0, 0 }, ** 640x480-75  74.998
+  { 320, 240, 80000,  40, 28,  9,  2,  20,  3, 0, 1 }, ** 320x240-60  60.310 M tall
+  { 320, 240, 55555,  52, 16, 12,  0,  28,  2, 0, 1 }, ** 320x240-85  85.177 M
+ */
 static int fb_set_mode( void );
 
 int uidisplay_init( int width, int height )
@@ -178,23 +208,27 @@ int fbdisplay_init(void)
 }
 
 static int
-fb_select_mode( size_t index )
+fb_select_mode( const fuse_fb_mode_t *fb_mode )
 {
-  display = orig_display;
-  display.xres_virtual = display.xres = fb_modes[index].xres;
-  display.yres_virtual = display.yres = fb_modes[index].yres;
-  display.pixclock = fb_modes[index].pixclock;
-  display.left_margin = fb_modes[index].left_margin;
-  display.right_margin = fb_modes[index].right_margin;
-  display.upper_margin = fb_modes[index].upper_margin; 
-  display.lower_margin = fb_modes[index].lower_margin;
-  display.hsync_len = fb_modes[index].hsync_len;
-  display.vsync_len = fb_modes[index].vsync_len;     
-  display.sync = fb_modes[index].sync;
-  display.vmode &= ~FB_VMODE_MASK;
-  if( fb_modes[index].doublescan ) display.vmode |= FB_VMODE_DOUBLE;
-  
+  memset (&display, 0, sizeof (struct fb_var_screeninfo));
+  display.xres_virtual = display.xres = fb_mode->xres;
+  display.yres_virtual = display.yres = fb_mode->yres;
   display.xoffset = display.yoffset = 0;
+  display.grayscale = 0;
+  display.nonstd = 0;
+  display.accel_flags = 0;
+  display.pixclock = fb_mode->pixclock;
+  display.left_margin = fb_mode->left_margin;
+  display.right_margin = fb_mode->right_margin;
+  display.upper_margin = fb_mode->upper_margin;
+  display.lower_margin = fb_mode->lower_margin;
+  display.hsync_len = fb_mode->hsync_len;
+  display.vsync_len = fb_mode->vsync_len;
+  display.sync = fb_mode->sync;
+  display.vmode &= ~FB_VMODE_MASK;
+  if( fb_mode->doublescan ) display.vmode |= FB_VMODE_DOUBLE;
+  display.vmode |= FB_VMODE_CONUPDATE;
+
   display.bits_per_pixel = 16;
   display.red.length = display.green.length = display.blue.length = 5;
 
@@ -232,18 +266,23 @@ fb_set_mode( void )
 {
   size_t i;
 
-  /* First, try to use out preferred mode */
+  const fuse_fb_mode_t *fb_modes =
+    (settings_current.doublescan_mode == 0) ? fb_modes_singlescan :
+    (settings_current.doublescan_mode == 1) ? fb_modes_doublescan :
+					      fb_modes_doublescan_alt;
+
+  /* First, try to use our preferred mode */
   for( i=0; fb_modes[i].xres; i++ )
     if( fb_modes[i].xres == settings_current.svga_mode )
-      if( !fb_select_mode( i ) )
+      if( !fb_select_mode( fb_modes + i ) )
 	return 0;
 
   /* If that failed, try to use the first available mode */
   for( i=0; fb_modes[i].xres; i++ )
-    if( !fb_select_mode( i ) )
+    if( !fb_select_mode( fb_modes + i ) )
       return 0;
 
-  /* If that filed, we can't continue :-( */
+  /* If that failed, we can't continue :-( */
   fprintf( stderr, "%s: couldn't find a framebuffer mode to start in\n",
 	   fuse_progname );
   return 1;

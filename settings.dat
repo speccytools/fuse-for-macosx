@@ -115,6 +115,7 @@ printer_text_filename, string, strdup( "printout.txt" ),, textfile
 
 aspect_hint, boolean, 1
 svga_mode, numeric, 320, 'v', svgamode
+doublescan_mode, numeric, 1, 'D', doublescan-mode
 
 start_scaler_mode, string, strdup( "normal" ), 'g', graphics-filter
 

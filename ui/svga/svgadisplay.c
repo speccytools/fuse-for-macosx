@@ -87,7 +87,8 @@ int svgadisplay_init( void )
 
   /* First, see if our preferred mode exists */
   for( i=0; i<mode_count && !found_mode; i++ ) {
-    if( available_modes[i].fuse_id == settings_current.svga_mode ) {
+    if( available_modes[i].fuse_id == settings_current.svga_mode ||
+	settings_current.doublescan_mode == 0 ) {
       if( vga_hasmode( available_modes[i].svgalib_id ) ) {
 	vga_setmode( available_modes[i].svgalib_id );
 	hires = available_modes[i].hires;
