@@ -106,4 +106,21 @@ At the end of the frame, each of these rectangles is passed off to the
 user-interface specific rendering code to be drawn onto the emulating
 machine's screen.
 
+2.2. From display_image to the emulating machine's screen
+---------------------------------------------------------
+
+At the end of every frame, Fuse calls uidisplay_area repeatedly to get
+the user interface to update the emulating machine's screen.
+
+If a user interface is outputting the same number of pixels as in
+display_image (320x240 for non-Timex, 640x480 for Timex), this can be
+very simple, but user interfaces which implement scaling (either
+upwards, or downwards as is necessary for displaying the Timex modes
+in a 320x240 mode) may wish to make use of the 'scalers' defined in
+ui/scaler: a generalised set of routines for accomplishing this, as
+well as various smoothing options and the like (for example,
+scanlines). See `scalers.txt' for more information on these.
+
+(FIXME: write scalers.txt)
+
 $Id$
