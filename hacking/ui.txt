@@ -1,0 +1,105 @@
+Some brief instructions on adding another user interface to Fuse
+================================================================
+
+Version: $Id$
+
+In order to add a new user interface (UI) to Fuse, you need to
+implement:
+
+* the functions listed in ui.h
+* the functions listed in uidisplay.h
+* some form of keyboard handling.
+
+In general, all functions returning `int' should return zero on
+success and non-zero on error unless other specified.
+
+ui.h
+----
+
+* int ui_init( int *argc, char ***argv, int width, int height )
+
+Initalise all of the UI-specific bits (display, keyboard, etc) for a
+display of (preferred) size `width' x `height' pixels; note that
+`width' and `height' refer to the entire canvas on which the screen
+and emulated border is to be drawn, not just the Spectrum's
+screen. `argc' and `argv' are pointers to `argc' and `argv' as
+supplied to `main()'. The current UIs delegate the actual setting up
+of the emulated Spectrum's screen to `uidisplay_init()', but there's
+no fundamental need for this to happen as the only place
+`uidisplay_init()' is called is from `ui_init()'.
+
+* int ui_event( void )
+
+`ui_event()' is called at the start of every emulated Spectrum frame,
+and is the opportunity for the UI actions to happen. Some of the
+current UIs, for example the GTK+ UI use this to do most of their
+processing such as reading the keyboard and the like, whilst others,
+for example the SVGAlib UI do much less here.
+
+* int ui_end( void )
+
+`ui_end()' is called on emulator shutdown and should undo all the
+setup done in `ui_init()'.
+
+uidisplay.h
+-----------
+
+* int uidisplay_init( int width, int height )
+
+As mentioned in the `ui_init()' description above, this can be used to
+setup the emulated Spectrum's screen.
+
+* void uidisplay_putpixel( int x, int y, int colour )
+
+This should set pixel ( `x', `y' ) of the (buffered copy of) the
+emulated Spectrum's screen to colour `colour'. Colours 0-7 correspond
+to the Spectrum's colours 0-7, whilst 8-15 are the bright
+versions. Note that `x' and `y' are offsets from the top-level pixel
+of the border, not of the screen.
+
+* void uidisplay_line( int y )
+
+This should copy line `y' of the buffered copy of the Spectrum's
+screen to the emulating machine's screen.
+
+* void uidisplay_lines( int start, int end )
+
+This should copy lines `start' to `end' (inclusive) of the Spectrum's
+screen to the emulating machine's screen.
+
+* void uidisplay_set_border( int line, int pixel_from, int pixel_to,
+			     int colour )
+
+This should set the pixels from `pixel_from' to `pixel_to' of
+line `line' of the Spectrum's screen to colour `colour'.
+
+* void uidisplay_end( void )
+
+Just undo whatever was done by `uidisplay_init()'.
+
+Keyboard handling
+-----------------
+
+There are two different sorts of keys which the UI has to handle:
+those which correspond to Spectrum keys, and those which control Fuse
+in some way.
+
+There are two functions to handle Spectrum-related keys (from `keyboard.h'):
+
+* void keyboard_press  ( keyboard_key_name key )
+* void keyboard_release( keyboard_key_name key )
+
+`keyboard_key_name' is an enum defined in `keyboard.h' which lists all
+the Spectrum keys; calling these functions will cause the emulated
+machine to believe that the corresponding Spectrum key has been
+pressed or released.
+
+If you're using widget code in your user interface, note that this
+contains its own keyboard handling code, so you should ignore any
+non-Spectrum keys if `widget_active' is true.
+
+There is a general keyboard to Spectrum keys mapping listed in
+`keysyms.dat', which is used to generate `keysyms.c' by
+`keysyms.pl'. If you can generate a mapping from whatever your UI's
+keyboard routines return to the Xlib keysyms used in `keysyms.dat',
+this is probably the easiest way to deal with the Spectrum-related keys.
