@@ -50,6 +50,10 @@ Some thanks (in alphabetical order):
   on the 128K machine are actually contended. Grab Steve's emulator, Klive,
   from http://www.worldofspectrum.org/emulators.html#pcwin
 
+* Ludvig Strigeus and The ScummVM project wrote the original version of
+  the code which is used as the graphics scalers. For ScummVM, check out
+  http://www.scummvm.org/
+
 * Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)
   gave the inspiration for an important rewrite of the Z80 core, and was
   also _very_ useful whilst trying to track down some bugs.
