@@ -59,6 +59,8 @@ di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
 fi|fin|fini|finis|finish { return FINISH; }
 i|ig|ign|igno|ignor|ignore { return IGNORE; }
 n|ne|nex|next { return NEXT; }
+o|ou|out { return DEBUGGER_OUT; }	/* Different name to avoid clashing
+					   with OUT from z80/z80_macros.h */
 p|po|por|port { return PORT; }
 r|re|rea|read { return READ; }
 se|set { return SET; }

@@ -61,6 +61,8 @@ void yyerror( char *s );
 %token		 FINISH
 %token		 IGNORE
 %token		 NEXT
+%token		 DEBUGGER_OUT	/* Different name to avoid clashing with
+				   OUT from z80/z80_macros.h */
 %token		 PORT
 %token		 READ
 %token		 SET
@@ -133,6 +135,7 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 	 | FINISH   { debugger_breakpoint_exit(); }
 	 | IGNORE NUMBER NUMBER { debugger_breakpoint_ignore( $2, $3 ); }
 	 | NEXT	    { debugger_next(); }
+	 | DEBUGGER_OUT NUMBER NUMBER { debugger_port_write( $2, $3 ); }
 	 | SET NUMBER NUMBER { debugger_poke( $2, $3 ); }
 	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }

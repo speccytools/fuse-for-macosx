@@ -362,3 +362,11 @@ debugger_poke( WORD address, BYTE value )
   writebyte_internal( address, value );
   return 0;
 }
+
+/* Write a value to a port */
+int
+debugger_port_write( WORD port, BYTE value )
+{
+  writeport( port, value );
+  return 0;
+}
