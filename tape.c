@@ -39,6 +39,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "scld.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
@@ -441,8 +442,11 @@ int trap_check_rom( void )
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:
   case LIBSPECTRUM_MACHINE_TC2048:
-  case LIBSPECTRUM_MACHINE_TC2068: /* FIXME: not always OK? */
     return 1;		/* Always OK here */
+
+  case LIBSPECTRUM_MACHINE_TC2068:
+    /* OK if we're in the EXROM (location of the tape routines) */
+    return( timex_memory[0].page == timex_exrom[0].page );
 
   case LIBSPECTRUM_MACHINE_128:
   case LIBSPECTRUM_MACHINE_PLUS2:
