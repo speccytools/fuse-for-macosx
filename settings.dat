@@ -56,8 +56,8 @@ tape_file, string, NULL, 't', tape, tapefile
 start_machine, string, strdup( "48" ), 'm', machine
 record_file, string, NULL, 'r', record, recordfile
 playback_file, string, NULL, 'p', playback, playbackfile
-plus3disk_file, string, NULL,, plus3disk, plus3diskfile
-trdosdisk_file, string, NULL,, trdosdisk, trdosdiskfile
+plus3disk_file, string, NULL,, plus3disk
+trdosdisk_file, string, NULL,, trdosdisk
 
 printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
 printer_text_filename, string, strdup( "printout.txt" ),, textfile

@@ -80,7 +80,7 @@ example
 this prevents the window from being resized at all. (Enabled by
 default, but you can use
 .RI ` --no-aspect-hint '
-to disable.)
+to disable).
 .RE
 .PP
 .I --auto-load
@@ -88,7 +88,7 @@ to disable.)
 Specify whether tape files should be automatically loaded when they
 are opened. (Enabled by default, but you can use
 .RI ` --no-auto-load '
-to disable.) Same as the General Option dialog's
+to disable). Same as the General Option dialog's
 .I "Auto-load tapes"
 option.
 .RE
@@ -106,7 +106,7 @@ option.
 Specify whether RZX files should be written out compressed. (Enabled
 by default, but you can use
 .RI ` --no-compress-rzx '
-to disable.) Same as the RZX Options dialog's
+to disable). Same as the RZX Options dialog's
 .I "Compress RZX data"
 option.
 .RE
@@ -136,6 +136,14 @@ See the
 section for more details.
 .RE
 .PP
+.I "--graphicsfile file"
+.RS
+Set the filename used for graphical output from the emulated ZX
+printer. See the
+.B "PRINTER EMULATION"
+section for more details.
+.RE
+.PP
 .I -h
 .br
 .I --help
@@ -162,7 +170,7 @@ option.
 Specify whether the sound made whilst tapes are loading should be
 emulated. (Enabled by default, but you can use
 .RI ` --no-loading-sound '
-to disable.) Same as the Sound Option dialog's
+to disable). Same as the Sound Option dialog's
 .I "Loading sound"
 option.
 .RE
@@ -181,6 +189,7 @@ a 48K Spectrum. The available options are
 .IR plus2a ,
 .IR plus3 ,
 .IR 2048 ,
+.IR 2068 ,
 and
 .IR pentagon .
 .RE
@@ -190,6 +199,20 @@ and
 .I "--playback file"
 .RS
 Specify an RZX file to begin playback from.
+.RE
+.PP
+.I "--plus3disk file"
+.RS
+Insert the specified file into the emulated +3's A: drive; also select
+the +3 on startup if available.
+.RE
+.PP
+.I "--rate frame"
+.RS
+Specify the frame rate, the ratio of spectrum frame updates to real
+frame updates. Same as the General Options dialog's
+.I "Frame rate"
+option.
 .RE
 .PP
 .I "-r file"
@@ -211,7 +234,7 @@ option.
 .RS
 Support the SLT trap instruction. (Enabled by default, but you can use
 .RI ` --no-slt '
-to disable.) Same as the General Options dialog's
+to disable). Same as the General Options dialog's
 .I "Use .slt traps"
 option.
 .RE
@@ -229,7 +252,7 @@ SNA, or SLT format.
 Specify whether Fuse should produce sound. (Enabled by default, but
 you can use
 .RI ` --no-sound '
-to disable.) Same as the Sound Option dialog's
+to disable). Same as the Sound Option dialog's
 .I "Sound enabled"
 option.
 .RE
@@ -240,14 +263,6 @@ option.
 .RS
 Specify the sound output device to use. Generally you shouldn't need
 to specify this, but it might be useful if you have more than one.
-.RE
-.PP
-.I "--rate frame"
-.RS
-Specify the frame rate, the ratio of spectrum frame updates to real
-frame updates. Same as the General Options dialog's
-.I "Frame rate"
-option.
 .RE
 .PP
 .I "--speed percentage"
@@ -276,14 +291,28 @@ are `320' (which corresponds to a 320x240x256 mode), the default and
 Specify a virtual tape file to use. It must be in TAP or TZX format.
 .RE
 .PP
+.I "--textfile file"
+.RS
+Set the filename used for text output from the emulated printers. See
+the
+.B "PRINTER EMULATION"
+section below for more details.
+.RE
+.PP
 .I --traps
 .RS
 Support traps for ROM tape loading/saving. (Enabled by default, but
 you can use
 .RI ` --no-traps '
-to disable.) Same as the General Options dialog's
+to disable). Same as the General Options dialog's
 .I "Use tape traps"
 option.
+.RE
+.PP
+.I "--trdosdisk file"
+.RS
+Insert the specified file into the emulated TR-DOS drive A: and select
+Pentagon mode on startup.
 .RE
 .PP
 .I -V
@@ -312,8 +341,8 @@ section for details.
 .\"
 .SH "THE VARIOUS FRONT-ENDS"
 Fuse supports various front-ends, or UIs (user interfaces). The usual
-one is GTK+-based, but there are also Xlib and svgalib ones, as well
-as some more experimental options for the adventurous. :-)
+one is GTK+-based, but there are also SDL, Xlib, svgalib and
+framebuffer ones.
 .PP
 The important difference to note is that the GTK+ version uses
 `native' dialog boxes etc. (behaving like a fairly normal GUI-based
@@ -419,7 +448,7 @@ the widget UI, the keys shown in brackets toggle the options,
 .I Enter
 confirms any changes, and
 .I Esc
-aborts.) Note that any changed settings only apply to the
+aborts). Note that any changed settings only apply to the
 currently-running Fuse.
 .PP
 The options available are:
@@ -510,7 +539,7 @@ options,
 .I Enter
 confirms any changes, and
 .I Esc
-aborts.) Note that any changed settings only apply to the
+aborts). Note that any changed settings only apply to the
 currently-running Fuse.
 .PP
 .I "Sound enabled"
@@ -554,7 +583,7 @@ brackets toggle the options,
 .I Enter
 confirms any changes, and
 .I Esc
-aborts.) Note that any changed settings only apply to the
+aborts). Note that any changed settings only apply to the
 currently-running Fuse.
 .PP
 .I "Compress RZX data"
@@ -595,14 +624,13 @@ Reset the emulated Spectrum.
 .RS
 Choose a type of Spectrum to emulate. The machine initially emulated
 is the 48K Spectrum. The choices available are 48K, 128K, +2, +2A, +3,
-and TC2048 but most of the time you'll probably want to use the 48 or
-128 machines.
+TC2048, TC2068 and Pentagon but most of the time you'll probably want
+to use the 48 or 128 machines.
 .RE
 .PP
 .I "Machine, Break..."
 .RS
-(Available only under the GTK+ or Mac OS X user interfaces). Start the
-emulated debugger/monitor. See the
+Start the monitor/debugger. See the
 .B "MONITOR/DEBUGGER"
 section for more information.
 .RE
@@ -645,7 +673,7 @@ might want to try it that way first.
 Start playing the TAP or TZX file, if required. (Choosing the option
 (or pressing
 .IR F8 )
-again pauses playback, and a further press resumes.) To explain - if
+again pauses playback, and a further press resumes). To explain - if
 tape-loading traps have been disabled (in the General Options dialog),
 starting the loading process in the emulated machine isn't enough. You
 also have to `press play', so to speak :-), and this is how you do
@@ -933,7 +961,7 @@ The various models of Spectrum supported a range of ways to connect
 printers, three of which are supported by Fuse. Different printers are
 made available for the different models:
 .TP
-.IR 16 ", " 48 ", " TC2048
+.IR 16 ", " 48 ", " TC2048 ", " TC2068
 ZX Printer
 .TP
 .IR 128 / +2 / Pentagon
@@ -943,12 +971,17 @@ Serial printer (text-only)
 Parallel printer (text-only)
 .PP
 Any printout is appended to one (or both) of two files, depending on
-the printer -
+the printer - these default to
 .I printout.txt
 for text output, and
 .I printout.pbm
-for graphics. (PBM images are supported by most image viewers and
-converters.) While the ZX Printer can
+for graphics (PBM images are supported by most image viewers and
+converters). These names can be changed with the
+.I --textfile
+and
+.I --graphicsfile
+options from the command line or configuration file. While the ZX
+Printer can
 .I only
 output graphically, simulated text output is generated at the same
 time using a crude sort of OCR based on the current character set (a
@@ -1029,9 +1062,15 @@ files are shown, whether Fuse would be able to load them or not.
 .\"
 .SH MONITOR/DEBUGGER
 .PP
-If you're using the GTK+ or Mac OS X user interfaces, Fuse features a
-moderately powerful, completely transparent monitor/debugger, which
-can be activated via the
+Firstly, note that the vast majority of this section applies only if
+you're using the GTK+ user interface; if you're using one of the
+widget user interfaces, you'll get a very basic monitor which shows
+the current values of the registers and allows you to single step
+through execution or continue.
+.PP
+If you are using the GTK+ user interface, Fuse features a moderately
+powerful, completely transparent monitor/debugger, which can be
+activated via the
 .I "Machine, Break ..."
 menu option. A debugger window will appear, showing the current state
 of the emulated machine: the top-left shows the current state of the
@@ -1214,7 +1253,7 @@ similar, but not identical, DSK formats. (The difference can be seen
 by doing `head -1
 .IR dskfile ':
 one format will start `MV - CPCEMU' and the other will start
-`EXTENDED'.)
+`EXTENDED').
 .PP
 The `lib765' library used by Fuse to emulate the +3's FDC supports the
 `CPCEMU' format, but not the extended format. If the `libdsk' library
@@ -1293,7 +1332,8 @@ and RZX embedded snapshots and compression.
 .PP
 Alexander Yurchenko wrote the OpenBSD/Solaris-specific sound code.
 .PP
-Frederick Meunier wrote the TC2048 support.
+Frederick Meunier wrote the TC2048 support, the original version of
+the graphics filter code and the Pentagon support.
 .PP
 Ludvig Strigeus and The ScummVM project wrote the original graphics
 filter code.
