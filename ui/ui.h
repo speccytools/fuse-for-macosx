@@ -60,6 +60,7 @@ libspectrum_error ui_libspectrum_error( libspectrum_error error,
 					const char *format, va_list ap );
 int ui_verror( ui_error_level severity, const char *format, va_list ap );
 int ui_error_specific( ui_error_level severity, const char *message );
+int ui_error_frame( void );
 
 /* Callbacks used by the debugger */
 int ui_debugger_activate( void );

@@ -37,6 +37,9 @@
 
 #define MESSAGE_MAX_LENGTH 256
 
+static char last_message[ MESSAGE_MAX_LENGTH ] = "";
+static size_t frames_since_last_message = 0;
+
 static int
 print_error_to_stderr( ui_error_level severity, const char *message );
 
@@ -59,6 +62,15 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
   char message[ MESSAGE_MAX_LENGTH ];
 
   vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
+
+  /* Skip the message if the same message was displayed recently */
+  if( frames_since_last_message < 50 && !strcmp( message, last_message ) ) {
+    frames_since_last_message = 0;
+    return 0;
+  }
+
+  /* And store the 'last message' */
+  strncpy( last_message, message, MESSAGE_MAX_LENGTH );
 
 #ifndef UI_WIN32
   print_error_to_stderr( severity, message );
@@ -111,4 +123,10 @@ ui_libspectrum_error( libspectrum_error error GCC_UNUSED, const char *format,
   ui_verror( UI_ERROR_ERROR, new_format, ap );
 
   return LIBSPECTRUM_ERROR_NONE;
+}
+
+int
+ui_error_frame( void )
+{
+  frames_since_last_message++;
 }

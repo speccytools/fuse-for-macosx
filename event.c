@@ -136,6 +136,7 @@ int event_do_events(void)
       timer_estimate_speed();
       debugger_add_time_events();
       ui_event();
+      ui_error_frame();
       break;
 
     case EVENT_TYPE_INTERRUPT:
