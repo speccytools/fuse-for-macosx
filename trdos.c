@@ -1,5 +1,5 @@
 /* trdos.c: Routines for handling the Betadisk interface
-   Copyright (c) 2002-2003 Dmitry Sanarin, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2002-2004 Dmitry Sanarin, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -188,6 +188,7 @@ void
 trdos_reset( void )
 {
   trdos_active = 0;
+  busy = 0;
 
   trdos_event_index( 0 );
 
