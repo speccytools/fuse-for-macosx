@@ -81,17 +81,23 @@ int fbkeyboard_keypress(int keysym)
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
   case -1:
+    fuse_emulation_pause();
     snapshot_write( "snapshot.z80" );
+    fuse_emulation_unpause();
     break;
   case 1<<13:
+    fuse_emulation_pause();
     snapshot_read( "snapshot.z80" );
     display_refresh_all();
+    fuse_emulation_unpause();
     break;
   case -3:
     machine_current->reset();
     break;
   case -4:
+    fuse_emulation_pause();
     tape_open( "tape.tap" );
+    fuse_emulation_unpause();
     break;
   case 1<<14:
     machine_select_next();

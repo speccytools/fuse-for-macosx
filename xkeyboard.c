@@ -32,6 +32,7 @@
 #include <X11/keysym.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "keyboard.h"
 #include "keysyms.h"
 #include "machine.h"
@@ -56,17 +57,23 @@ int xkeyboard_keypress(XKeyEvent *event)
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
   case XK_F2:
+    fuse_emulation_pause();
     snapshot_write( "snapshot.z80" );
+    fuse_emulation_unpause();
     break;
   case XK_F3:
+    fuse_emulation_pause();
     snapshot_read( "snapshot.z80" );
     display_refresh_all();
+    fuse_emulation_unpause();
     break;
   case XK_F5:
     machine_current->reset();
     break;
   case XK_F7:
-    tape_open();
+    fuse_emulation_pause();
+    tape_open( "tape.tap" );
+    fuse_emulation_unpause();
     break;
   case XK_F9:
     machine_select_next();

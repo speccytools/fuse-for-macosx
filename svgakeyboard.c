@@ -77,17 +77,23 @@ int svgakeyboard_keypress(int keysym)
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
   case SCANCODE_F2:
+    fuse_emulation_pause();
     snapshot_write( "snapshot.z80" );
+    fuse_emulation_unpause();
     break;
   case SCANCODE_F3:
+    fuse_emulation_pause();
     snapshot_read( "snapshot.z80" );
     display_refresh_all();
+    fuse_emulation_unpause();
     break;
   case SCANCODE_F5:
     machine_current->reset();
     break;
   case SCANCODE_F7:
+    fuse_emulation_pause();
     tape_open( "tape.tap" );
+    fuse_emulation_unpause();
     break;
   case SCANCODE_F9:
     machine_select_next();
