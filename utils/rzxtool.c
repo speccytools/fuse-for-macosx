@@ -82,9 +82,6 @@ main( int argc, char **argv )
     return 1;
   }
 
-  /* Show errors from libspectrum */
-  libspectrum_show_errors = 1;
-
   if( mmap_file( options.rzxfile, &buffer, &length ) ) return 1;
 
   if( libspectrum_rzx_read( &rzx, buffer, length, &snap ) ) {

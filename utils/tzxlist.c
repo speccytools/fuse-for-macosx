@@ -325,9 +325,6 @@ main( int argc, char **argv )
 
   progname = argv[0];
 
-  /* Show libspectrum error messages */
-  libspectrum_show_errors = 1;
-
   if( argc < 2 ) {
     fprintf( stderr, "%s: usage: %s <tzx files>...\n", progname, progname );
     return 1;

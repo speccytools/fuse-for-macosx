@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "ui/ui.h"
 
 int
@@ -42,4 +44,15 @@ ui_error( ui_error_level severity, const char *format, ... )
   va_end( ap );
 
   return error;
+}
+
+libspectrum_error
+ui_libspectrum_error( const char *format, va_list ap )
+{
+  char new_format[ 257 ];
+  snprintf( new_format, 256, "libspectrum: %s", format );
+
+  ui_error( UI_ERROR_ERROR, new_format, ap );
+
+  return LIBSPECTRUM_ERROR_NONE;
 }

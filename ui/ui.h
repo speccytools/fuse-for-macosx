@@ -29,6 +29,8 @@
 
 #include <stdarg.h>
 
+#include <libspectrum.h>
+
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {
 
@@ -39,10 +41,11 @@ typedef enum ui_error_level {
 
 int ui_init(int *argc, char ***argv, int width, int height);
 int ui_event(void);
-
-int ui_error( ui_error_level severity, const char *format, ... );
 int ui_verror( ui_error_level severity, const char *format, va_list ap );
-
 int ui_end(void);
+
+/* Functions defined in ../ui.c */
+int ui_error( ui_error_level severity, const char *format, ... );
+libspectrum_error ui_libspectrum_error( const char *format, va_list ap );
 
 #endif			/* #ifndef FUSE_UI_H */

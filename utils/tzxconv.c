@@ -61,9 +61,6 @@ main( int argc, char **argv )
     return 1;
   }
 
-  /* Show errors from libspectrum */
-  libspectrum_show_errors = 1;
-
   if( ( fd = open( argv[1], O_RDONLY ) ) == -1 ) {
     fprintf( stderr, "%s: couldn't open `%s': %s\n", progname, argv[1],
 	     strerror( errno ) );
