@@ -164,8 +164,17 @@ z80_nmi( void )
   writebyte( --SP, PCH ); writebyte( --SP, PCL );
 
   if( machine_current->capabilities &
-      LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )
+      LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY ) {
+
+    /* Page in ROM 2 */
+    writeport_internal( 0x1ffd, machine_current->ram.last_byte2 | 0x02 );
+
+  } else if( machine_current->capabilities &
+	     LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) {
+
+    /* Page in TR-DOS ROM */
     trdos_page();
+  }
 
   /* FIXME: how is R affected? */
 

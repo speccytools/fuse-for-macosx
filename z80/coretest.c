@@ -389,6 +389,12 @@ if1_unpage( void )
   abort();
 }
 
+void
+writeport_internal( libspectrum_word port, libspectrum_byte b )
+{
+  abort();
+}
+
 int
 event_add( libspectrum_dword event_time, int type )
 {
