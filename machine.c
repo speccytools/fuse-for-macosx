@@ -261,7 +261,7 @@ machine_load_rom( libspectrum_byte **data, char *filename,
   int fd, error;
   utils_file rom;
 
-  fd = machine_find_rom( filename );
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_ROM );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
     return 1;
@@ -281,7 +281,7 @@ machine_load_rom( libspectrum_byte **data, char *filename,
   /* Take a copy of the ROM in case we want to write to it later */
   *data = malloc( rom.length * sizeof( libspectrum_byte ) );
   if( !(*data) ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
@@ -394,52 +394,6 @@ int machine_allocate_roms( fuse_machine_info *machine, size_t count )
   }
 
   return 0;
-}
-
-/* Find a ROM called `filename' in some likely locations; returns a fd
-   for the ROM on success or -1 if it couldn't find the ROM */
-int machine_find_rom( const char *filename )
-{
-  int fd;
-  char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
-  char *fuse_dir;
-
-  /* If this is an absolute path, just look there */
-  if( filename[0] == '/' ) return open( filename, O_RDONLY | O_BINARY );
-
-  /* If not, look in some likely places. Firstly, relative to the current
-     directory */
-  fd = open( filename, O_RDONLY | O_BINARY ); if( fd != -1 ) return fd;
-
-  /* Then in a 'roms' subdirectory off where the Fuse executable is
-     (useful when Fuse hasn't been installed into /usr/local or
-     wherever) */
-  if( fuse_progname[0] == '/' ) {
-    strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
-  } else {
-    strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
-    strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
-  }
-  fuse_dir = dirname( fuse_path );
-
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/roms/%s", fuse_dir, filename );
-  fd = open( path, O_RDONLY | O_BINARY );
-  if( fd != -1 ) return fd;
-
-  /* Then look where Fuse may have installed the ROMs */
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", FUSEDATADIR, filename );
-  fd = open( path, O_RDONLY | O_BINARY );
-  if( fd != -1 ) return fd;
-
-#ifdef ROMSDIR
-  /* Finally look in a system-wide directory for ROMs. Debian uses
-     /usr/share/spectrum-roms/ here */
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", ROMSDIR, filename );
-  fd = open( path, O_RDONLY | O_BINARY );
-  if( fd != -1 ) return fd;
-#endif
-
-  return -1;
 }
 
 int machine_end( void )

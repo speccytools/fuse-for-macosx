@@ -419,7 +419,7 @@ int widget_menu_keyboard( void *data )
   int error, fd;
   utils_file file;
 
-  fd = utils_find_lib( ptr->filename );
+  fd = utils_find_auxiliary_file( ptr->filename, UTILS_AUXILIARY_LIB );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
 	      ptr->filename );

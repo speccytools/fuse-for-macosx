@@ -109,7 +109,6 @@ int machine_set_timings( fuse_machine_info *machine );
 int machine_allocate_roms( fuse_machine_info *machine, size_t count );
 int machine_load_rom( libspectrum_byte **data, char *filename,
 		      size_t expected_length );
-int machine_find_rom( const char *filename );
 
 int machine_reset( void );
 int machine_end( void );

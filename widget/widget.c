@@ -82,7 +82,7 @@ static int widget_read_font( const char *filename, size_t offset )
   utils_file file;
   int error;
 
-  fd = machine_find_rom( filename );
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_ROM );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
     return 1;

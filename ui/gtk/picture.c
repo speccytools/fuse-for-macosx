@@ -123,7 +123,7 @@ read_screen( const char *filename, utils_file *screen )
 {
   int fd, error;
 
-  fd = utils_find_lib( filename );
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
 	      filename );

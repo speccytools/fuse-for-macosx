@@ -106,7 +106,7 @@ utils_open_file( const char *filename, int autoload,
 
       int fd; utils_file snap;
 
-      fd = utils_find_lib( "disk_plus3.z80" );
+      fd = utils_find_auxiliary_file( "disk_plus3.z80", UTILS_AUXILIARY_LIB );
       if( fd == -1 ) {
 	ui_error( UI_ERROR_ERROR, "Couldn't find +3 disk autoload snap" );
 	error = 1;
@@ -164,17 +164,35 @@ utils_open_file( const char *filename, int autoload,
   return 0;
 }
 
-/* Find the auxillary file called `filename'; look in the lib
-   directory below where the Fuse executable is and the defined
-   package data directory; returns a fd for the file on success, -1 if
-   it couldn't find the file */
-int utils_find_lib( const char *filename )
+/* Find the auxillary file called `filename'; returns a fd for the
+   file on success, -1 if it couldn't find the file */
+int
+utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 {
   int fd;
 
   char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
-  char *fuse_dir;
+  char *fuse_dir, *path_segment;
 
+  switch( type ) {
+
+  case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
+  case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
+  default:
+    ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", type );
+    return -1;
+  }
+
+  /* If given an absolute path, just look there */
+  if( filename[0] == '/' ) return open( filename, O_RDONLY | O_BINARY );
+
+  /* Otherwise look in some likely locations; first, relative to the
+     current directory */
+  fd = open( filename, O_RDONLY | O_BINARY ); if( fd != -1 ) return fd;
+
+  /* Otherwise look in some likely locations; first, in a directory
+     off where the Fuse executable is; (useful when Fuse hasn't been
+     installed into /usr/local or wherever) */
   if( fuse_progname[0] == '/' ) {
     strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
   } else {
@@ -183,14 +201,30 @@ int utils_find_lib( const char *filename )
   }
   fuse_dir = dirname( fuse_path );
 
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/lib/%s", fuse_dir, filename );
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s/%s", fuse_dir, path_segment,
+	    filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
+  /* Then in the defined Fuse data directory */
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", FUSEDATADIR, filename );
   fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
+  /* If we were given a specific directory for ROMs, look there;
+     Debian uses /usr/share/spectrum-roms/ here */
+#ifdef ROMSDIR
+  if( type == UTILS_AUXILIARY_ROM ) {
+    snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", ROMSDIR, filename );
+    fd = open( path, O_RDONLY | O_BINARY );
+    if( fd != -1 ) return fd;
+  }
+#endif
+
+  /* Finally, look relative to the current directory */
+  fd = open( filename, O_RDONLY | O_BINARY ); if( fd != -1 ) return fd;
+
+  /* Give up. Couldn't find this file */
   return -1;
 }
 

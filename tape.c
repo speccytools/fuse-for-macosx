@@ -160,7 +160,7 @@ tape_autoload( libspectrum_machine hardware )
   }
 
   snprintf( filename, 80, "tape_%s.z80", id );
-  fd = utils_find_lib( filename );
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR,
 	      "Couldn't find autoload snap for machine type '%s'", id );
