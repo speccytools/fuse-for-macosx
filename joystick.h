@@ -37,26 +37,30 @@ extern int joysticks_supported;
 void fuse_joystick_init( void );
 void fuse_joystick_end( void );
 
+/* A constant to identify the joystick emulated via the keyboard */
+#define JOYSTICK_KEYBOARD 2
+
 typedef enum joystick_type_t {
 
   JOYSTICK_TYPE_NONE = 0,
   
   JOYSTICK_TYPE_CURSOR,
   JOYSTICK_TYPE_KEMPSTON,
-  JOYSTICK_TYPE_TIMEX,
+  JOYSTICK_TYPE_TIMEX_1,
+  JOYSTICK_TYPE_TIMEX_2,
 
 } joystick_type_t;
 
-#define JOYSTICK_TYPE_COUNT 4
+#define JOYSTICK_TYPE_COUNT 5
 
 extern char *joystick_name[];
 
 typedef enum joystick_button {
 
+  JOYSTICK_BUTTON_LEFT = 0,
   JOYSTICK_BUTTON_RIGHT,
-  JOYSTICK_BUTTON_LEFT,
-  JOYSTICK_BUTTON_DOWN,
   JOYSTICK_BUTTON_UP,
+  JOYSTICK_BUTTON_DOWN,
   JOYSTICK_BUTTON_FIRE,
 
 } joystick_button;

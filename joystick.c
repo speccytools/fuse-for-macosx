@@ -39,33 +39,30 @@
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 
-/* FIXME: make two joysticks work */
-
 /* Number of joysticks known about & initialised */
 int joysticks_supported = 0;
 
-/* The current state of the emulated Kempston joystick */
+/* The bit masks used by the various joysticks. The order is the same
+   as the ordering of buttons in joystick.h:joystick_button (left,
+   right, up, down, fire ) */
+static const libspectrum_byte kempston_mask[5] =
+  { 0x02, 0x01, 0x08, 0x04, 0x10 };
+static const libspectrum_byte timex_mask[5] =
+  { 0x04, 0x08, 0x01, 0x02, 0x80 };
+
+/* The keys used by the Cursor joystick */
+static const keyboard_key_name cursor_key[5] =
+  { KEYBOARD_5, KEYBOARD_8, KEYBOARD_7, KEYBOARD_6, KEYBOARD_0 };
+
+/* The current values for the joysticks we can emulate */
 static libspectrum_byte kempston_value;
+static libspectrum_byte timex1_value;
+static libspectrum_byte timex2_value;
 
-/* Bits used by the Kempston joystick */
-static const libspectrum_byte KEMPSTON_MASK_RIGHT = 0x01;
-static const libspectrum_byte KEMPSTON_MASK_LEFT  = 0x02;
-static const libspectrum_byte KEMPSTON_MASK_DOWN  = 0x04;
-static const libspectrum_byte KEMPSTON_MASK_UP    = 0x08;
-static const libspectrum_byte KEMPSTON_MASK_FIRE  = 0x10;
-
-/* The current state of the emulated Timex joystick */
-static libspectrum_byte timex_value;
-
-/* Bits used by the Kempston joystick */
-static const libspectrum_byte TIMEX_MASK_RIGHT = 0x08;
-static const libspectrum_byte TIMEX_MASK_LEFT  = 0x04;
-static const libspectrum_byte TIMEX_MASK_DOWN  = 0x02;
-static const libspectrum_byte TIMEX_MASK_UP    = 0x01;
-static const libspectrum_byte TIMEX_MASK_FIRE  = 0x80;
-
+/* The names of the joysticks we can emulate. Order must correspond to
+   that of joystick.h:joystick_type_t */
 char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
-  "None", "Cursor", "Kempston", "Timex"
+  "None", "Cursor", "Kempston", "Timex 1", "Timex 2"
 };
 
 /* Init/shutdown functions. Errors aren't important here */
@@ -74,7 +71,7 @@ void
 fuse_joystick_init (void)
 {
   joysticks_supported = ui_joystick_init();
-  kempston_value = timex_value = 0x00;
+  kempston_value = timex1_value = timex2_value = 0x00;
 }
 
 void
@@ -86,68 +83,51 @@ fuse_joystick_end (void)
 int
 joystick_press( int which, joystick_button button, int press )
 {
-  keyboard_key_name key;
-  libspectrum_byte mask;
+  joystick_type_t type;
 
-  if( which ) return 0;
+  switch( which ) {
+  case 0: type = settings_current.joystick_1_output; break;
+  case 1: type = settings_current.joystick_2_output; break;
 
-  switch( settings_current.joystick_1_output ) {
+  case JOYSTICK_KEYBOARD:
+    type = settings_current.joystick_keyboard_output; break;
+
+  default:
+    return 0;
+  }
+
+  switch( type ) {
 
   case JOYSTICK_TYPE_CURSOR:
-    key = KEYBOARD_NONE;	/* Avoid warning */
-
-    switch( button ) {
-    case JOYSTICK_BUTTON_UP:    key = KEYBOARD_7; break;
-    case JOYSTICK_BUTTON_DOWN:  key = KEYBOARD_6; break;
-    case JOYSTICK_BUTTON_LEFT:  key = KEYBOARD_5; break;
-    case JOYSTICK_BUTTON_RIGHT: key = KEYBOARD_8; break;
-    case JOYSTICK_BUTTON_FIRE:  key = KEYBOARD_0; break;
-    }
-
     if( press ) {
-      keyboard_press( key );
+      keyboard_press( cursor_key[ button ] );
     } else {
-      keyboard_release( key );
+      keyboard_release( cursor_key[ button ] );
     }
-
     return 1;
 
   case JOYSTICK_TYPE_KEMPSTON:
-    mask = 0x00;		/* Avoid warning */
-
-    switch( button ) {
-    case JOYSTICK_BUTTON_UP:    mask = KEMPSTON_MASK_UP; break;
-    case JOYSTICK_BUTTON_DOWN:  mask = KEMPSTON_MASK_DOWN; break;
-    case JOYSTICK_BUTTON_LEFT:  mask = KEMPSTON_MASK_LEFT; break;
-    case JOYSTICK_BUTTON_RIGHT: mask = KEMPSTON_MASK_RIGHT; break;
-    case JOYSTICK_BUTTON_FIRE:  mask = KEMPSTON_MASK_FIRE; break;
-    }
-
     if( press ) {
-      kempston_value |=  mask;
+      kempston_value |=  kempston_mask[ button ];
     } else {
-      kempston_value &= ~mask;
+      kempston_value &= ~kempston_mask[ button ];
     }
-
     return 1;
 
-  case JOYSTICK_TYPE_TIMEX:
-    mask = 0x00;		/* Avoid warning */
-
-    switch( button ) {
-    case JOYSTICK_BUTTON_UP:    mask = TIMEX_MASK_UP; break;
-    case JOYSTICK_BUTTON_DOWN:  mask = TIMEX_MASK_DOWN; break;
-    case JOYSTICK_BUTTON_LEFT:  mask = TIMEX_MASK_LEFT; break;
-    case JOYSTICK_BUTTON_RIGHT: mask = TIMEX_MASK_RIGHT; break;
-    case JOYSTICK_BUTTON_FIRE:  mask = TIMEX_MASK_FIRE; break;
-    }
-
+  case JOYSTICK_TYPE_TIMEX_1:
     if( press ) {
-      timex_value |=  mask;
+      timex1_value |=  timex_mask[ button ];
     } else {
-      timex_value &= ~mask;
+      timex1_value &= ~timex_mask[ button ];
     }
+    return 1;
 
+  case JOYSTICK_TYPE_TIMEX_2:
+    if( press ) {
+      timex2_value |=  timex_mask[ button ];
+    } else {
+      timex2_value &= ~timex_mask[ button ];
+    }
     return 1;
 
   case JOYSTICK_TYPE_NONE: return 0;
@@ -175,5 +155,5 @@ joystick_kempston_read( libspectrum_word port, int *attached )
 libspectrum_byte
 joystick_timex_read( libspectrum_word port, libspectrum_byte which )
 {
-  return which ? 0x00 : timex_value;
+  return which ? timex2_value : timex1_value;
 }
