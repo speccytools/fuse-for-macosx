@@ -161,7 +161,8 @@ static int machine_select_machine( machine_info *machine )
   readbyte = machine->ram.read_memory;
   read_screen_memory = machine->ram.read_screen;
   writebyte = machine->ram.write_memory;
-  contention = machine->ram.contention;
+  contend_memory = machine->ram.contend_memory;
+  contend_port = machine->ram.contend_port;
   
   ROM = machine->roms;
 

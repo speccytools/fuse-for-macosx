@@ -40,6 +40,8 @@
 #include "spectrum.h"
 #include "z80/z80.h"
 
+static DWORD spec48_contend_delay( void );
+
 spectrum_port_info spec48_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
@@ -89,13 +91,26 @@ void spec48_writebyte(WORD address, BYTE b)
   }
 }
 
-DWORD spec48_contention( WORD address )
+DWORD spec48_contend_memory( WORD address )
 {
-  DWORD tstates_through_line;
-  
   /* Contention occurs only in the lowest 16Kb of RAM */
   if( address < 0x4000 || address > 0x7fff ) return 0;
 
+  return spec48_contend_delay();
+}
+
+DWORD spec48_contend_port( WORD port )
+{
+  /* Contention occurs only for even-numbered ports */
+  if( ( port & 0x01 ) == 0 ) return spec48_contend_delay();
+
+  return 0;
+}
+
+static DWORD spec48_contend_delay( void )
+{
+  DWORD tstates_through_line;
+  
   /* No contention in the upper border */
   if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
     return 0;
@@ -146,10 +161,11 @@ int spec48_init( machine_info *machine )
 
   machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
 
-  machine->ram.read_memory  = spec48_readbyte;
-  machine->ram.read_screen  = spec48_read_screen_memory;
-  machine->ram.write_memory = spec48_writebyte;
-  machine->ram.contention   = spec48_contention;
+  machine->ram.read_memory    = spec48_readbyte;
+  machine->ram.read_screen    = spec48_read_screen_memory;
+  machine->ram.write_memory   = spec48_writebyte;
+  machine->ram.contend_memory = spec48_contend_memory;
+  machine->ram.contend_port   = spec48_contend_port;
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
