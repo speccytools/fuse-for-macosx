@@ -177,8 +177,6 @@ tc2068_init( fuse_machine_info *machine )
 
   machine->reset = tc2068_reset;
 
-  error = machine_set_timings( machine ); if( error ) return error;
-
   machine->timex = 1;
   machine->ram.contend_port	     = tc2068_contend_port;
   machine->ram.contend_delay	     = tc2068_contend_delay;

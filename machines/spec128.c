@@ -121,8 +121,6 @@ int spec128_init( fuse_machine_info *machine )
 
   machine->reset = spec128_reset;
 
-  error = machine_set_timings( machine ); if( error ) return error;
-
   machine->timex = 0;
   machine->ram.contend_port	     = spec128_contend_port;
   machine->ram.contend_delay	     = spec128_contend_delay;

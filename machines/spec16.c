@@ -68,8 +68,6 @@ int spec16_init( fuse_machine_info *machine )
 
   machine->reset = spec16_reset;
 
-  error = machine_set_timings( machine ); if( error ) return error;
-
   machine->timex = 0;
   machine->ram.contend_port   = spec48_contend_port;
   machine->ram.contend_delay  = spec48_contend_delay;

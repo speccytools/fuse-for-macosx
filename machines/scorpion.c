@@ -121,8 +121,6 @@ scorpion_init( fuse_machine_info *machine )
 
   machine->reset = scorpion_reset;
 
-  error = machine_set_timings( machine ); if( error ) return error;
-
   machine->timex = 0;
   machine->ram.contend_port   = scorpion_contend_port;
   machine->ram.contend_delay  = scorpion_contend_delay;

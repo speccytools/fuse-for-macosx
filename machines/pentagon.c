@@ -114,8 +114,6 @@ pentagon_init( fuse_machine_info *machine )
 
   machine->reset = pentagon_reset;
 
-  error = machine_set_timings( machine ); if( error ) return error;
-
   machine->timex = 0;
   machine->ram.contend_port   = pentagon_contend_port;
   machine->ram.contend_delay  = pentagon_contend_delay;

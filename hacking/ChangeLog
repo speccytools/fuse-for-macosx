@@ -696,6 +696,10 @@
 20040402 tape.c: use libspectrum_tape_write().
 20040402 display,c,machine.c,machines/,memory.h,spectrum.c: remove use of
 	 the read_screen_memory function.
+20040402 machine.c,machines/{pentagon.c,scorpion.c,spec128.c,spec16.c,
+	 spec48.c,specplus2.c,specplus2a.c,specplus3.c,specplus3e.c,
+	 tc2048.c,tc2068.c}: move call to machine_set_timings() from
+	 individual init functions to machine_add_machine.
 20040403 widget/roms.c: Fix ROM name lookup for labels
 20040403 widget/select.c: Add <string.h> for strlen
 20040403 ui/sdl/sdldisplay.c: Fix icon overlays for timex machines

@@ -122,6 +122,8 @@ static int machine_add_machine( int (*init_function)( fuse_machine_info *machine
 
   error = init_function( machine ); if( error ) return error;
 
+  error = machine_set_timings( machine ); if( error ) return error;
+
   machine->capabilities = libspectrum_machine_capabilities( machine->machine );
 
   return 0;
