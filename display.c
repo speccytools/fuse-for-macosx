@@ -490,7 +490,7 @@ static void display_dirty8(WORD address)
   x=display_dirty_xtable[address-0x4000];
   y=display_dirty_ytable[address-0x4000];
 
-  display_is_dirty[y] |= ( 1UL << x );
+  display_is_dirty[y] |= ( (QWORD)1 << x );
   
 }
 
@@ -501,7 +501,7 @@ static void display_dirty64(WORD address)
   x=display_dirty_xtable2[address-0x5800];
   y=display_dirty_ytable2[address-0x5800];
 
-  for( i=0; i<8; i++ ) display_is_dirty[y+i] |= ( 1UL << x );
+  for( i=0; i<8; i++ ) display_is_dirty[y+i] |= ( (QWORD)1 << x );
 }
 
 /* Print the 8 pixels in `data' using ink colour `ink' and paper
