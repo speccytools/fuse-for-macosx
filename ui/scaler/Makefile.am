@@ -37,4 +37,6 @@ scalers16.o: scalers.c
 scalers32.o: scalers.c
 	$(COMPILE) -DSCALER_DATA_SIZE=4 -c scalers.c -o scalers32.o
 
-noinst_HEADERS = scaler.h
+noinst_HEADERS = scaler.h scaler_internals.h
+
+EXTRA_DIST = scalers.c
