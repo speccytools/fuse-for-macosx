@@ -26,12 +26,20 @@
 
 #include <config.h>
 
+#include <stdio.h>
+#include <sys/mman.h>
 #include <unistd.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
+#include "utils.h"
 #include "widget.h"
+
+#define ERROR_MESSAGE_MAX_LENGTH 1024
+
+static int widget_help_keyboard( const char *filename );
 
 int widget_help_draw( void* data )
 {
@@ -56,7 +64,7 @@ void widget_help_keyhandler( int key )
     break;
 
   case KEYBOARD_k:
-    widget_do( WIDGET_TYPE_PICTURE, widget_keyboard_picture );
+    widget_help_keyboard( "keyboard.scr" );
     break;
 
   case KEYBOARD_Enter:
@@ -64,4 +72,40 @@ void widget_help_keyhandler( int key )
     break;
 
   }
+}
+
+static int widget_help_keyboard( const char *filename )
+{
+  int error, fd;
+  BYTE *screen; size_t length;
+
+  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  fd = utils_find_lib( filename );
+  if( fd == -1 ) {
+    fprintf( stderr, "%s: couldn't find keyboard picture (`%s')\n",
+	     fuse_progname, filename );
+    return 1;
+  }
+  
+  error = utils_read_fd( fd, filename, &screen, &length );
+  if( error ) return error;
+
+  if( length != 6912 ) {
+    fprintf( stderr, "%s: keyboard picture (`%s') is not 6912 bytes long\n",
+	     fuse_progname, filename );
+    return 1;
+  }
+
+  widget_do( WIDGET_TYPE_PICTURE, screen );
+
+  if( munmap( screen, length ) == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't munmap keyboard picture (`%s')",
+	      fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
+
+  return 0;
 }

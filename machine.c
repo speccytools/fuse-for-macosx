@@ -247,19 +247,14 @@ int machine_find_rom( const char *filename )
 {
   int fd;
 
-  char path_and_filename[ PATHNAME_MAX_LENGTH ];
+  char path[ PATHNAME_MAX_LENGTH ];
 
-  strncpy( path_and_filename, filename, PATHNAME_MAX_LENGTH );
-  fd = open( path_and_filename, O_RDONLY );
+  snprintf( path, PATHNAME_MAX_LENGTH, "roms/%s", filename );
+  fd = open( path, O_RDONLY );
   if( fd != -1 ) return fd;
 
-  snprintf( path_and_filename, PATHNAME_MAX_LENGTH, "roms/%s", filename );
-  fd = open( path_and_filename, O_RDONLY );
-  if( fd != -1 ) return fd;
-
-  snprintf( path_and_filename, PATHNAME_MAX_LENGTH, "%s/%s",
-	    ROMSDIR, filename );
-  fd = open( path_and_filename, O_RDONLY );
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", DATADIR, filename );
+  fd = open( path, O_RDONLY );
   if( fd != -1 ) return fd;
 
   return -1;

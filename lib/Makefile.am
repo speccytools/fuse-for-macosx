@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001,2002 Philip Kendall
+## Copyright (c) 1999-2002 Philip Kendall
 
 ## $Id$
 
@@ -24,9 +24,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-noinst_LIBRARIES = libwidget.a
+FILES = keyboard.scr
 
-libwidget_a_SOURCES = filesel.c machine_widget.c mainmenu.c options.c\
-picture.c file.c tape_widget.c widget.c general.c help.c
+pkgdata_DATA = $(FILES)
 
-noinst_HEADERS = widget.h
+EXTRA_DIST = $(FILES)

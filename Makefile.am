@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = libspectrum man myglib roms ui utils widget z80
+SUBDIRS = lib libspectrum man myglib roms ui utils widget z80
 
 fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c settings.c\
@@ -39,7 +39,7 @@ BUILT_SOURCES = keysyms.c
 keysyms.c: keysyms.pl keysyms.dat
 	@PERL@ keysyms.pl keysyms.dat > keysyms.c
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DROMSDIR="\"${pkgdatadir}\""
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a myglib/libmyglib.a\
 ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/svga/libuisvga.a\
 ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a

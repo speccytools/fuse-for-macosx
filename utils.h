@@ -27,6 +27,7 @@
 #ifndef FUSE_UTILS_H
 #define FUSE_UTILS_H
 
+int utils_find_lib( const char *filename );
 int utils_read_file( const char *filename, unsigned char **buffer,
 		     size_t *length );
 int utils_read_fd( int fd, const char *filename,

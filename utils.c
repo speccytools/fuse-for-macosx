@@ -37,6 +37,27 @@
 #include "utils.h"
 
 #define ERROR_MESSAGE_MAX_LENGTH 1024
+#define PATHNAME_MAX_LENGTH 1024
+
+/* Find a ROM called `filename'; look in the current directory, ./roms
+   and the defined roms directory; returns a fd for the ROM on success,
+   -1 if it couldn't find the ROM */
+int utils_find_lib( const char *filename )
+{
+  int fd;
+
+  char path[ PATHNAME_MAX_LENGTH ];
+
+  snprintf( path, PATHNAME_MAX_LENGTH, "lib/%s", filename );
+  fd = open( path, O_RDONLY );
+  if( fd != -1 ) return fd;
+
+  snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", DATADIR, filename );
+  fd = open( path, O_RDONLY );
+  if( fd != -1 ) return fd;
+
+  return -1;
+}
 
 int utils_read_file( const char *filename, unsigned char **buffer,
 		     size_t *length )

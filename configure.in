@@ -186,6 +186,7 @@ if test "$ac_cv_prog_cc_g" = yes; then
     fi
 fi
 
-AC_OUTPUT(Makefile libspectrum/Makefile man/Makefile myglib/Makefile \
-roms/Makefile ui/Makefile ui/aalib/Makefile ui/fb/Makefile ui/gtk/Makefile \
-ui/svga/Makefile ui/xlib/Makefile utils/Makefile widget/Makefile z80/Makefile)
+AC_OUTPUT(Makefile lib/Makefile libspectrum/Makefile man/Makefile \
+myglib/Makefile roms/Makefile ui/Makefile ui/aalib/Makefile ui/fb/Makefile \
+ui/gtk/Makefile ui/svga/Makefile ui/xlib/Makefile utils/Makefile \
+widget/Makefile z80/Makefile)
