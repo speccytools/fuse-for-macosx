@@ -299,21 +299,24 @@ MENU_CALLBACK( menu_media_tape_write )
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
 {
   char *filename;
-  int which;
-
-  which = action - 1;
+  int which, type;
+  
+  action--;
+  which = action & 0x01;
+  type  = action & 0x02;
 
   fuse_emulation_pause();
 
   filename = menu_get_filename( "Fuse - Insert disk" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-#ifdef HAVE_765_H
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
-    specplus3_disk_insert_default_autoload( which, filename );
-  } else
-#endif				/* #ifdef HAVE_765_H */
+  if( type ) {
     trdos_disk_insert_default_autoload( which, filename );
+  } else {
+#ifdef HAVE_765_H
+    specplus3_disk_insert_default_autoload( which, filename );
+#endif				/* #ifdef HAVE_765_H */
+  }
 
   free( filename );
 
@@ -322,23 +325,23 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
 
 MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
 {
-  int which, write;
+  int which, write, type;
 
   WIDGET_END;
 
   action--;
   which = action & 0x01;
   write = action & 0x02;
+  type  = action & 0x04;
 
+  if( type ) {
+    trdos_disk_eject( which, write );
+  } else {
 #ifdef HAVE_765_H
-  if( machine_current->capabilities &
-      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
     specplus3_disk_eject( which, write );
-    return;
-  }
 #endif			/* #ifdef HAVE_765_H */
+  }
 
-  trdos_disk_eject( which, write );
 }
 
 MENU_CALLBACK( menu_media_cartridge_timexdock_insert )

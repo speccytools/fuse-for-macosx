@@ -1099,3 +1099,6 @@
 	 rollback menu items appropriately.
 20041031 .cvsignore,z80/.cvsignore: ignore .libs directories.
 20041006 settings.dat: make RZX files be compressed by default.
+20041006 machine.c,menu.c,menu_data.c,trdos.c,ui.c,machines/specplus3.c,
+	 man/fuse.1,ui/ui.h: split the Media/Disk menu into separate +3 and
+	 TR-DOS entries.

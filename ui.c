@@ -200,13 +200,25 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK, "/Media/Disk" },
 
-  { UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
-    "/Media/Disk/Drive A:/Eject",
-    "/Media/Disk/Drive A:/Eject and write...", 0 },
+  { UI_MENU_ITEM_MEDIA_DISK_PLUS3, "/Media/Disk/+3" },
 
-  { UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
-    "/Media/Disk/Drive B:/Eject",
-    "/Media/Disk/Drive B:/Eject and write...", 0 },
+  { UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
+    "/Media/Disk/+3/Drive A:/Eject",
+    "/Media/Disk/+3/Drive A:/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
+    "/Media/Disk/+3/Drive B:/Eject",
+    "/Media/Disk/+3/Drive B:/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_TRDOS, "/Media/Disk/TR-DOS" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT,
+    "/Media/Disk/TR-DOS/Drive A:/Eject",
+    "/Media/Disk/TR-DOS/Drive A:/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT,
+    "/Media/Disk/TR-DOS/Drive B:/Eject",
+    "/Media/Disk/TR-DOS/Drive B:/Eject and write...", 0 },
 
   { UI_MENU_ITEM_MEDIA_IDE, "/Media/IDE" },
 

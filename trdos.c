@@ -200,9 +200,9 @@ trdos_reset( void )
   trdos_event_index( 0 );
 
   /* We can eject disks only if they are currently present */
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT,
 		    discs[ TRDOS_DRIVE_A ].disc_ready );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT,
 		    discs[ TRDOS_DRIVE_B ].disc_ready );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
@@ -557,8 +557,8 @@ trdos_disk_insert( trdos_drive_number which, const char *filename,
 
   /* Set the `eject' item active */
   ui_menu_activate(
-    which == TRDOS_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
-			     UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    which == TRDOS_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT :
+			     UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT  ,
     1
   );
 
@@ -591,8 +591,8 @@ trdos_disk_eject( trdos_drive_number which, int write )
 
   /* Set the `eject' item inactive */
   ui_menu_activate(
-    which == TRDOS_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
-			     UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    which == TRDOS_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT :
+			     UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT  ,
     0
   );
 

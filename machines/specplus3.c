@@ -434,9 +434,9 @@ void
 specplus3_menu_items( void )
 {
   /* We can eject disks only if they are currently present */
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_A_EJECT,
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
 		    drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_B_EJECT,
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
 		    drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
 }
 
@@ -534,8 +534,8 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
 
   /* And set the appropriate `eject' item active */
   ui_menu_activate(
-    which == SPECPLUS3_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
-				 UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    which == SPECPLUS3_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT :
+				 UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT  ,
     1
   );
 
@@ -593,8 +593,8 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
 
   /* Set the appropriate `eject' item inactive */
   ui_menu_activate(
-    which == SPECPLUS3_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_A_EJECT :
-				 UI_MENU_ITEM_MEDIA_DISK_B_EJECT  ,
+    which == SPECPLUS3_DRIVE_A ? UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT :
+				 UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT  ,
     0
   );
 

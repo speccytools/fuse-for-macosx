@@ -1460,14 +1460,8 @@ written to any tape file until you choose this option!
 .PP
 .I "Media, Disk"
 .RS
-Virtual disk images are only accessible when emulating a +3,
-Pentagon or Scorpion. If any of the disk options are selected while
-emulating a +3, they refer to the +3's disk drives, which are both
-of the 3\" type (in effect, the internal drive plus an external FD-1).
-With the usual +3 format, these have a capacity of 173K. If the
-Pentagon or Scorpion is being emulated, these options refer to the
-TR-DOS disk drives.  If any other machine is being emulated, this
-menu cannot be selected. (See
+Virtual disk images are accessible only when emulating a +3, +3e,
+Pentagon or Scorpion. (See
 .B "THE .DSK FORMAT"
 and
 .B "TR-DOS DISK FORMATS"
@@ -1480,44 +1474,60 @@ changes, use the appropriate `eject and write' option before exiting
 Fuse.
 .RE
 .PP
-.I "Media, Disk, Drive A:, Insert..."
+.I "Media, Disk, +3, Drive A:, Insert..."
 .RS
-Select a disk-image file to read/write in the emulated drive
+Select a disk-image file to read/write in the +3's emulated drive
 A:.
 .RE
 .PP
-.I "Media, Disk, Drive A:, Eject"
+.I "Media, Disk, +3, Drive A:, Eject"
 .RS
-Deselect the disk image currently in drive A: - or from the emulated
-machine's perspective, eject it. Note that any changes made to the
-image will not be saved.
+Deselect the disk image currently in the +3's emulated drive A: - or
+from the emulated machine's perspective, eject it. Note that any
+changes made to the image will not be saved.
 .RE
 .PP
-.I "Media, Disk, Drive A:, Eject and write..."
+.I "Media, Disk, +3, Drive A:, Eject and write..."
 .RS
-Deselect the disk image currently in drive A: and write the current
-state of the disk to a file. The GTK+ UI lets you select a filename,
-while the others will write +3 disk images to
-.RI ` drivea.dsk '
-or Pentagon disk images to
-.RI ` drivea.trd '.
+Deselect the disk image currently in the +3's drive A: and write the
+current state of the disk to a file. The GTK+ UI lets you select a
+filename, while the others will write the image to
+.RI ` drivea.dsk '.
 .RE
 .PP
-.I "Media, Disk, Drive B:, Insert..."
+.I "Media, Disk, +3, Drive B:, Insert..."
+.RS
+As above, but for the +3's drive B:. Fuse emulates drive B: as a
+second 3\" drive.
+.RE
+.PP
+.I "Media, Disk, +3, Drive B:, Eject"
 .RS
 As above, but for drive B:.
 .RE
 .PP
-.I "Media, Disk, Drive B:, Eject"
+.I "Media, Disk, +3, Drive B:, Eject and write"
 .RS
-As above, but for drive B:.
+As above, but for drive B:. The widget-based UIs will save to
+.RI ` driveb.dsk '.
 .RE
 .PP
-.I "Media, Disk, Drive B:, Eject and write"
+.I "Media, Disk, TR-DOS, Drive A:, Insert..."
+.br
+.I "Media, Disk, TR-DOS, Drive A:, Eject"
+.br
+.I "Media, Disk, TR-DOS, Drive A:, Eject and write..."
+.br
+.I "Media, Disk, TR-DOS, Drive B:, Insert..."
+.br
+.I "Media, Disk, TR-DOS, Drive B:, Eject"
+.br
+.I "Media, Disk, TR-DOS, Drive B:, Eject and write..."
+.br
 .RS
-As above, but for drive B:. The filenames used by the widget-based UIs
-are
-.RI ` driveb.dsk '
+As above, but for the emulated TR-DOS drives. The widget-based UIs
+will save to
+.RI ` drivea.trd '
 and
 .RI ` driveb.trd '
 respectively.
