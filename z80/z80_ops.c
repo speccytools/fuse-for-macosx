@@ -70,9 +70,6 @@ void z80_do_opcodes()
 	debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
       debugger_trap();
 
-    /* If the z80 is HALTed, repeat the HALT instruction */
-    if( z80.halted ) PC--;
-
     /* Do the instruction fetch; readbyte_internal used here to avoid
        triggering read breakpoints */
     contend( PC, 4 ); R++;
@@ -550,6 +547,7 @@ void z80_do_opcodes()
       break;
     case 0x76:		/* HALT */
       z80.halted=1;
+      PC--;		
       break;
     case 0x77:		/* LD (HL),A */
       contend( HL, 3 );

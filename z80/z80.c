@@ -104,7 +104,7 @@ z80_interrupt( void )
 {
   if(IFF1) {
     
-    z80.halted=0;
+    if( z80.halted ) { PC++; z80.halted = 0; }
     
     IFF1=IFF2=0;
 
