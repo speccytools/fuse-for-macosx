@@ -176,11 +176,6 @@ int widget_end( void )
 
 /* Widget timer routines */
 
-/* FIXME: * race conditions.
-          * Do I really need a signal function here, or can I just ignore it?
-	    Re-read Stevens.
-*/
-
 static struct sigaction widget_timer_old_handler;
 static struct itimerval widget_timer_old_timer;
 
@@ -275,4 +270,3 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 
   return 0;
 }
-

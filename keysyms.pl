@@ -81,7 +81,6 @@ print << "CODE";
    However, the svgalib keysyms are different enough that I need a separate
    table.
 
-   FIXME: Need some way to keep the two tables consistent
 */
 #if defined( UI_GTK )
 #include <gdk/gdkkeysyms.h>

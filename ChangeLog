@@ -1,4 +1,4 @@
-2001-10-06  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+2001-10-07  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Added file selection dialog boxes for snapshot and tape loading,
 	  and (GTK+ only) snapshot saving (Philip Kendall, Matan Ziv-Av).

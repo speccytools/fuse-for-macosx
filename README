@@ -3,17 +3,18 @@ The Free Unix Spectrum Emulator (Fuse) 0.3.2
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.3.1.
+is Fuse (the Free Unix Spectrum Emulator), version 0.3.2.
 
 What Fuse does have:
 
 * Working 48K/128K/+2/+2A Speccy emulation, running at true Speccy
-  speed, at least on this PII-233.
-* Sound (at least under Linux).
+  speed on any computer you're likely to try it on (it runs at full
+  speed on a SparcStation 4 unless you do too much graphics intensive
+  stuff).
+* Sound (on systems supporting the Open Sound System).
 
 What Fuse doesn't have:
 
-* Any sound output under operating systems other than Linux.
 * The ability to save to tape files
 * Emulation of any peripherals (bar the tape deck)
 * A keyboard picture, so you can find those keywords
@@ -21,7 +22,7 @@ What Fuse doesn't have:
 
 What you'll need to run Fuse:
 
-* A version of Un*x with either X or svgalib. If you have GTK+
+* A version of Unix with either X or svgalib. If you have GTK+
   installed, you'll get a nicer user interface under X.
 
 To compile Fuse:
@@ -104,6 +105,6 @@ Finally, if you want to see how a Unix Speccy emulator should be done,
 check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-6 October 2001
+7 October 2001
 
 $Id$
