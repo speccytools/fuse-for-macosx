@@ -342,7 +342,7 @@ uidisplay_area( int x, int y, int width, int height )
      that "smear" the screen, e.g. 2xSAI */
   if( scaler_flags & SCALER_FLAGS_EXPAND ) {
     
-    scaler_expander( &x, &y, &w, &h );
+    scaler_expander( &x, &y, &width, &height );
 
     if ( x < 0 ) { width+=x; x=0; }
     if ( y < 0 ) { height+=y; y=0; }
