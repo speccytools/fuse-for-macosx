@@ -39,11 +39,11 @@
 #include "ui/ui.h"
 
 static int soundfd = -1;
-static int sixteenbit = 0;
+static int sixteenbit = 1;
 
 int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
-  int flags, tmp;
+  int flags, tmp, frag;
 
   /* select a default device if we weren't explicitly given one */
   if( device == NULL ) device = "/dev/audio";
@@ -74,23 +74,24 @@ int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     return 1;
   }
 
-  tmp = AUDIO_FORMAT_LINEAR8BIT;
+  tmp = AUDIO_FORMAT_LINEAR16BIT;
   if( ioctl( soundfd, AUDIO_SET_DATA_FORMAT, tmp ) < 0 ) {
 
-    /* try 16-bit - may be a 16-bit only device */
-    tmp = AUDIO_FORMAT_LINEAR16BIT;
-    if( ioctl( soundfd, AUDIO_SET_DATA_FORMAT, tmp ) < 0 ) {
+    /* try 8-bit - may be an 8-bit only device */
+    tmp = AUDIO_FORMAT_LINEAR8BIT;
+    if( settings_current.sound_force_8bit                ||
+	ioctl( soundfd, AUDIO_SET_DATA_FORMAT, tmp ) < 0    ) {
       settings_current.sound = 0;
       ui_error(
         UI_ERROR_ERROR,
-	"Couldn't set sound device '%s' into either 8-bit or 16-bit mode",
+	"Couldn't set sound device '%s' into either 16-bit or 8-bit mode",
 	device
       );
       close( soundfd );
       return 1;
     }
 
-    sixteenbit = 1;
+    sixteenbit = 0;
   }
 
   tmp = ( *stereoptr ) ? 2 : 1;
@@ -117,6 +118,9 @@ int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     return 1;
   }
 
+  frag = 16384;
+  ioctl( soundfd, AUDIO_SET_FRAGMENT, frag );
+
   return 0;
 }
 
@@ -127,29 +131,29 @@ sound_lowlevel_end( void )
 }
 
 void
-sound_lowlevel_frame( unsigned char *data, int len )
+sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
-  unsigned char buf16[8192];
+  static unsigned char buf8[4096];
+  unsigned char *data8=(unsigned char *)data;
   int ret=0, ofs=0;
 
-  if( sixteenbit ) {
-    unsigned char *src, *dst;
+  len <<= 1;	/* now in bytes */
+  if( !sixteenbit ) {
+    libspectrum_signed_word *src;
+    unsigned char *dst;
     int f;
 
-    src = data;
-    dst = buf16;
-    for( f = 0; f < len; f++ ) {
-      /* TODO: confirm byteorder on IA64 */
-      *dst++ = *src++ - 128;
-      *dst++ = 128;
-    }
+    src = data; dst = buf8;
+    len >>= 1;
+    /* TODO: confirm byteorder on IA64 */
+    for( f = 0; f < len; f++ )
+      *dst++ = 128 + (int)( (*src++) / 256 );
 
-    data = buf16;
-    len <<= 1;
+    data8 = buf8;
   }
 
   while( len ) {
-    ret = write( soundfd, data + ofs, len );
+    ret = write( soundfd, data8 + ofs, len );
     if( ret > 0 ) {
       ofs += ret;
       len -= ret;

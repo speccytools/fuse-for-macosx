@@ -858,3 +858,4 @@
 20040525 tape.c,lib/{tape_plus3e.szx,tape_se.szx}: add autoload snaps for
 	 the +3e and SE, and allow autoload snaps to be .szx as well as
 	 .z80.
+20040525 sound/hpsound.c: update for 16-bit sound (Stuart Brady).
