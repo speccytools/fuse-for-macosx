@@ -106,7 +106,7 @@ int tape_open( const char *filename )
   }
 
   if(    strlen( filename ) < 4
-      || strncmp( &filename[ strlen(filename)-4 ], ".tap", 4 ) ) {
+      || strncasecmp( &filename[ strlen(filename)-4 ], ".tap", 4 ) ) {
     
     error = libspectrum_tzx_create( &tape, buffer, file_info.st_size );
     if( error != LIBSPECTRUM_ERROR_NONE ) {

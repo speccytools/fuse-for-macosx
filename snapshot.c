@@ -156,7 +156,7 @@ int snapshot_read( const char *filename )
 static snapshot_type snapshot_identify( const char *filename )
 {
   if(    strlen( filename ) < 4
-      || strncmp( &filename[ strlen(filename) - 4 ], ".sna", 4 ) ) {
+      || strncasecmp( &filename[ strlen(filename) - 4 ], ".sna", 4 ) ) {
     return SNAPSHOT_TYPE_Z80;
   } else {
     return SNAPSHOT_TYPE_SNA;
