@@ -37,12 +37,12 @@ void uidisplay_spectrum_screen( const BYTE *screen, int border )
   BYTE attr,data; int ink, paper;
 
   for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
-    for( x=0; x < DISPLAY_SCREEN_WIDTH; x++ ) {
-      uidisplay_putpixel( x<<1, y, border );
-      uidisplay_putpixel( (x<<1)+1, y, border );
-      uidisplay_putpixel( x<<1, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
+    for( x=0; x < DISPLAY_SCREEN_WIDTH; x+=2 ) {
+      uidisplay_putpixel( x, y, border );
+      uidisplay_putpixel( x+1, y, border );
+      uidisplay_putpixel( x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
 			  border );
-      uidisplay_putpixel( (x<<1)+1, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
+      uidisplay_putpixel( x+1, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
 			  border );
     }
   }
