@@ -30,6 +30,7 @@
 
 #include "display.h"
 #include "fuse.h"
+#include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "sound.h"
@@ -39,6 +40,7 @@
 
 spectrum_port_info spec48_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 

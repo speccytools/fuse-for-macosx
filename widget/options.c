@@ -63,7 +63,7 @@ int widget_options( void )
   }
 
   /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 3 );
+  widget_dialog_with_border( 1, 2, 30, 4 );
   error = widget_options_show_all( &settings );
   if( error ) {
     widget_timer_end();
@@ -107,17 +107,21 @@ static int widget_options_show_all( settings_info *settings )
   int error;
 
   /* Blank the main display area */
-  widget_dialog( 1, 2, 30, 3 );
+  widget_dialog( 1, 2, 30, 4 );
 
   error = widget_options_print_option( 0, "Issue (2) emulation",
 				       settings->issue2 );
   if( error ) return error;
 
-  error = widget_options_print_option( 1, "(F)ast tape loading",
+  error = widget_options_print_option( 1, "(K)empston joystick",
+				       settings->joy_kempston );
+  if( error ) return error;
+
+  error = widget_options_print_option( 2, "(F)ast tape loading",
 				       settings->tape_traps );
   if( error ) return error;
 
-  error = widget_options_print_option( 2, "(A)Y stereo separation",
+  error = widget_options_print_option( 3, "(A)Y stereo separation",
 				       settings->stereo_ay );
   if( error ) return error;
 
@@ -171,15 +175,21 @@ static void widget_options_keyhandler( int key )
     if( error ) return;
     break;
 
+  case KEYBOARD_k:
+    settings.joy_kempston = ! settings.joy_kempston;
+    error = widget_options_print_value( 1, settings.joy_kempston );
+    if( error ) return;
+    break;
+
   case KEYBOARD_f:
     settings.tape_traps = ! settings.tape_traps;
-    error = widget_options_print_value( 1, settings.tape_traps );
+    error = widget_options_print_value( 2, settings.tape_traps );
     if( error ) return;
     break;
 
   case KEYBOARD_a:
     settings.stereo_ay = ! settings.stereo_ay;
-    error = widget_options_print_value( 2, settings.stereo_ay );
+    error = widget_options_print_value( 3, settings.stereo_ay );
     if( error ) return;
     break;
 

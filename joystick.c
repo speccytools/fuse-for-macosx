@@ -1,5 +1,5 @@
-/* settings.c: Handling configuration settings
-   Copyright (c) 2001 Philip Kendall
+/* joystick.c: Joystick emulation support
+   Copyright (c) 2001 Russell Marks, Philip Kendall
 
    $Id$
 
@@ -26,42 +26,34 @@
 
 #include <config.h>
 
+#include "fuse.h"
+#include "joystick.h"
+#include "keyboard.h"
 #include "settings.h"
+#include "spectrum.h"
 
-/* The current settings of options, etc */
-settings_info settings_current;
-
-/* Called on emulator startup */
-int settings_init( void )
+BYTE joystick_kempston_read(WORD port)
 {
-  int error;
+  /* Offset/mask in keyboard_return_values[] for joystick keys,
+     in order right, left, down, up, fire. These are p/o/a/q/Space */
+  static int offset[5] = {    5,    5,    1,    2,    7 };
+  static int mask[5]   = { 0x01, 0x02, 0x01, 0x01, 0x01 };
+  BYTE return_value = 0, jmask = 1;
+  int i;
 
-  error = settings_defaults( &settings_current );
-  if( error ) return error;
+  if( !settings_current.joy_kempston )
+    return spectrum_port_noread(port);
 
-  return 0;
+  for( i=0; i<5; i++, jmask<<=1 ) {
+    if( !(keyboard_return_values[offset[i]] & mask[i]) )
+      return_value|=jmask;
+  }
+
+  return return_value;
 }
 
-/* Fill the settings structure with sensible defaults */
-int settings_defaults( settings_info *settings )
+
+void joystick_kempston_write(WORD port, BYTE b)
 {
-  settings->issue2 = 0;
-  settings->joy_kempston = 0;
-  settings->tape_traps = 1;
-  settings->stereo_ay = 0;
-
-  return 0;
+  /* nothing, presumably... */
 }
-
-/* Copy one settings object to another */
-int settings_copy( settings_info *dest, settings_info *src )
-{
-  dest->issue2       = src->issue2;
-  dest->joy_kempston = src->joy_kempston;
-  dest->tape_traps   = src->tape_traps;
-  dest->stereo_ay    = src->stereo_ay;
-
-  return 0;
-}
-
-    

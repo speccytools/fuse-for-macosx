@@ -1,5 +1,5 @@
-/* settings.h: Handling configuration settings
-   Copyright (c) 2001 Philip Kendall
+/* joystick.h: Joystick emulation support
+   Copyright (c) 2001 Russell Marks, Philip Kendall
 
    $Id$
 
@@ -24,24 +24,14 @@
 
 */
 
-#include <config.h>
+#ifndef FUSE_JOYSTICK_H
+#define FUSE_JOYSTICK_H
 
-#ifndef FUSE_SETTINGS_H
-#define FUSE_SETTINGS_H
+#ifndef FUSE_TYPES_H
+#include "types.h"
+#endif			/* #ifndef FUSE_TYPES_H */
 
-typedef struct settings_info {
+BYTE joystick_kempston_read(WORD port);
+void joystick_kempston_write(WORD port, BYTE b);
 
-  int issue2;		/* Issue 2 keyboard emulation? */
-  int joy_kempston;	/* Kempston joystick emulation? */
-  int tape_traps;	/* Use tape loading traps? */
-  int stereo_ay;	/* Stereo separation for AY channels? */
-
-} settings_info;
-
-extern settings_info settings_current;
-
-int settings_init( void );
-int settings_defaults( settings_info *settings );
-int settings_copy( settings_info *dest, settings_info *src );
-
-#endif				/* #ifndef FUSE_SETTINGS_H */
+#endif			/* #ifndef FUSE_JOYSTICK_H */

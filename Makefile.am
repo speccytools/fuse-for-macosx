@@ -33,7 +33,7 @@ fuse_SOURCES = ay.c display.c event.c fbdisplay.c fbkeyboard.c fbui.c\
 	machine.c osssound.c settings.c snapshot.c sound.c spec128.c\
 	spec48.c specplus2.c specplus3.c spectrum.c svgadisplay.c\
 	svgakeyboard.c svgaui.c tape.c timer.c xdisplay.c xkeyboard.c xui.c\
-	aalibui.c aalibdisplay.c aalibkeyboard.c
+	aalibui.c aalibdisplay.c aalibkeyboard.c joystick.c
 
 BUILT_SOURCES = keysyms.c
 
@@ -48,6 +48,6 @@ noinst_HEADERS = ay.h display.h event.h fbkeyboard.h\
 	machine.h osssound.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h svgakeyboard.h\
 	tape.h timer.h types.h ui.h uidisplay.h xdisplay.h\
-	xkeyboard.h xui.h aalibui.h aalibkeyboard.h
+	xkeyboard.h xui.h aalibui.h aalibkeyboard.h joystick.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl

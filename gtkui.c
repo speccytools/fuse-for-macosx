@@ -263,6 +263,7 @@ typedef struct gtkui_options_info {
   GtkWidget *dialog;
 
   GtkWidget *issue2;
+  GtkWidget *joy_kempston;
   GtkWidget *tape_traps;
   GtkWidget *stereo_ay;
 
@@ -287,6 +288,11 @@ static void gtkui_options( GtkWidget *widget, gpointer data )
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.issue2 ),
 				settings_current.issue2 );
 
+  dialog.joy_kempston =
+    gtk_check_button_new_with_label( "Kempston joystick emulation" );
+  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.joy_kempston ),
+				settings_current.joy_kempston );
+
   dialog.tape_traps =
     gtk_check_button_new_with_label( "Use tape loading traps" );
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.tape_traps ),
@@ -306,6 +312,8 @@ static void gtkui_options( GtkWidget *widget, gpointer data )
   /* Put everything into the dialog box */
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
 		     dialog.issue2 );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		     dialog.joy_kempston );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
 		     dialog.tape_traps );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
@@ -487,6 +495,9 @@ static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data )
 
   settings_current.issue2 =
     gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->issue2 ) );
+
+  settings_current.joy_kempston =
+    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->joy_kempston ) );
 
   settings_current.tape_traps =
     gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->tape_traps ) );
