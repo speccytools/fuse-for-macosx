@@ -276,6 +276,8 @@ snapshot_copy_from( libspectrum_snap *snap )
       memory_map_romcs[1].page = memory_map_romcs[0].page + MEMORY_PAGE_SIZE;
     }
 
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 1 );
+
     machine_current->memory_map();
   }
   

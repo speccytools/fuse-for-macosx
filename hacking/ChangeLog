@@ -844,3 +844,5 @@
 	 working properly again.
 20040521 if2.[ch],snapshot.c: Add support for saving interface 2 cart in
          snapshots.
+20040524 if2.c,snapshot.c: Fix Interface II eject menu state after snapshot
+         loading.

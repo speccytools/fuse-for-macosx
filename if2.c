@@ -85,8 +85,9 @@ if2_reset( void )
 {
   int error;
 
+  if2_active = 0;
+
   if( !settings_current.if2_file ) {
-    if2_active = 0;
     ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 0 );
     return 0;
   }
@@ -94,8 +95,6 @@ if2_reset( void )
   if ( !periph_interface2_active ) {
     return 0;
   }
-
-  if2_active = 1;
 
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
 				 settings_current.if2_file,
@@ -105,6 +104,8 @@ if2_reset( void )
   machine_current->ram.romcs = 1;
 
   memory_romcs_map();
+
+  if2_active = 1;
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 1 );
 
