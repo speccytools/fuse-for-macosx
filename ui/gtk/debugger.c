@@ -123,7 +123,9 @@ create_dialog( void )
 
   GtkWidget *scrollbar;
 
-  gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life" },
+  gchar
+    *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life",
+			     "Condition" },
     *disassembly_titles[] = { "Address", "Instruction" },
     *stack_titles[] = { "Address", "Value" };
 
@@ -169,9 +171,9 @@ create_dialog( void )
   }
 
   /* The breakpoint CList */
-  breakpoints = gtk_clist_new_with_titles( 5, breakpoint_titles );
+  breakpoints = gtk_clist_new_with_titles( 6, breakpoint_titles );
   gtk_clist_column_titles_passive( GTK_CLIST( breakpoints ) );
-  for( i = 0; i < 5; i++ )
+  for( i = 0; i < 6; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( breakpoints ), i, TRUE );
   gtk_box_pack_start_defaults( GTK_BOX( vbox ), breakpoints );
 
@@ -299,8 +301,8 @@ ui_debugger_update( void )
 {
   size_t i;
   char buffer[1024], format_string[1024];
-  gchar *breakpoint_text[5] = { &buffer[  0], &buffer[ 40], &buffer[80],
-			        &buffer[120], &buffer[160]               },
+  gchar *breakpoint_text[6] = { &buffer[  0], &buffer[ 40], &buffer[80],
+			        &buffer[120], &buffer[160], &buffer[200] },
     *disassembly_text[2] = { &buffer[0], &buffer[40] };
   libspectrum_word address;
   const char *format_16_bit, *format_8_bit;
@@ -404,6 +406,11 @@ ui_debugger_update( void )
     snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );
     snprintf( breakpoint_text[4], 40, "%s",
 	      debugger_breakpoint_life_text[ bp->life ] );
+    if( bp->condition ) {
+      debugger_expression_deparse( breakpoint_text[5], 80, bp->condition );
+    } else {
+      breakpoint_text[5] = "";
+    }
 
     gtk_clist_append( GTK_CLIST( breakpoints ), breakpoint_text );
   }

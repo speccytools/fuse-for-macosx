@@ -333,13 +333,15 @@ debugger_expression_deparse( char *buffer, size_t length,
   switch( exp->type ) {
 
   case DEBUGGER_EXPRESSION_TYPE_INTEGER:
-    /* FIXME: deal with debugger_base */
-    snprintf( buffer, length, "0x%04x", exp->types.integer );
+    if( debugger_output_base == 10 ) {
+      snprintf( buffer, length, "%d", exp->types.integer );
+    } else {
+      snprintf( buffer, length, "0x%x", exp->types.integer );
+    }
     return 0;
 
   case DEBUGGER_EXPRESSION_TYPE_REGISTER:
-    /* FIXME: do something more user-friendly */
-    snprintf( buffer, length, "reg:%04x", exp->types.reg );
+    snprintf( buffer, length, "%s", debugger_register_text( exp->types.reg ) );
     return 0;
 
   case DEBUGGER_EXPRESSION_TYPE_UNARYOP:

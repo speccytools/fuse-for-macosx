@@ -228,3 +228,48 @@ debugger_register_set( int which, int value )
     break;
   }
 }
+
+/* Get the textual representation of a register */
+const char *
+debugger_register_text( int which )
+{
+  switch( which ) {
+
+    /* 8-bit registers */
+  case 0x0061: return "A";
+  case 0x8061: return "A'";
+  case 0x0066: return "F";
+  case 0x8066: return "F'";
+  case 0x0062: return "B";
+  case 0x8062: return "B'";
+  case 0x0063: return "C";
+  case 0x8063: return "C'";
+  case 0x0064: return "D";
+  case 0x8064: return "D'";
+  case 0x0065: return "E";
+  case 0x8065: return "E'";
+  case 0x0068: return "H";
+  case 0x8068: return "H'";
+  case 0x006c: return "L";
+  case 0x806c: return "L'";
+    
+    /* 16-bit registers */
+  case 0x6166: return "AF";
+  case 0xd166: return "AF'";
+  case 0x6263: return "BC";
+  case 0xd263: return "BC'";
+  case 0x6465: return "DE";
+  case 0xd465: return "DE'";
+  case 0x686c: return "HL";
+  case 0xd86c: return "HL'";
+
+  case 0x7370: return "SP";
+  case 0x7063: return "PC";
+  case 0x6978: return "IX";
+  case 0x6979: return "IY";
+
+  default:
+    ui_error( UI_ERROR_ERROR, "attempt to get unknown register '%d'", which );
+    return "(invalid)";
+  }
+}
