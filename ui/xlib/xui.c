@@ -51,6 +51,8 @@ Window xui_mainWindow;		/* Window ID for the main Fuse window */
 /* FIXME: not a prototype. What should it be? */
 Bool xui_trueFunction();
 
+static Atom delete_window_atom;
+
 int
 ui_init( int *argc, char ***argv )
 {
@@ -157,6 +159,11 @@ ui_init( int *argc, char ***argv )
 	       KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
 	       StructureNotifyMask | FocusChangeMask );
 
+  /* Ask to be notified of window close requests */
+
+  delete_window_atom = XInternAtom( display, "WM_DELETE_WINDOW", 0 );
+  XSetWMProtocols( display, xui_mainWindow, &delete_window_atom, 1 );
+
   if( xdisplay_init() ) return 1;
 
   /* And finally display the window */
@@ -187,6 +194,9 @@ int ui_event(void)
       break;
     case KeyRelease:
       xkeyboard_keyrelease(&(event.xkey));
+      break;
+    case ClientMessage:
+      if( event.xclient.data.l[0] == delete_window_atom ) fuse_exiting = 1;
       break;
     }
   }
