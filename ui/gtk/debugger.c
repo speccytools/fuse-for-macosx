@@ -48,6 +48,7 @@
 
 static int create_dialog( void );
 static int activate_debugger( void );
+static int update_disassembly( void );
 static int deactivate_debugger( void );
 
 static void move_disassembly( GtkAdjustment *adjustment, gpointer user_data );
@@ -65,6 +66,8 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *breakpoints,				/* The breakpoint display */
   *disassembly,				/* The disassembly */
   *stack;				/* The stack display */
+
+static GtkObject *disassembly_scrollbar_adjustment;
 
 /* The top line of the current disassembly */
 static WORD disassembly_top;
@@ -114,7 +117,7 @@ create_dialog( void )
   GtkAccelGroup *accel_group;
   GtkStyle *style;
 
-  GtkObject *adjustment; GtkWidget *scrollbar;
+  GtkWidget *scrollbar;
 
   gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life" },
     *disassembly_titles[] = { "Address", "Instruction" },
@@ -163,10 +166,13 @@ create_dialog( void )
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
 
   /* The disassembly scrollbar */
-  adjustment = gtk_adjustment_new( PC, 0x0000, 0xffff, 0.5, 20, 20 );
-  gtk_signal_connect( GTK_OBJECT( adjustment ), "value-changed",
-		      GTK_SIGNAL_FUNC( move_disassembly ), NULL );
-  scrollbar = gtk_vscrollbar_new( GTK_ADJUSTMENT( adjustment ) );
+  disassembly_scrollbar_adjustment =
+    gtk_adjustment_new( 0, 0x0000, 0xffff, 0.5, 20, 20 );
+  gtk_signal_connect( GTK_OBJECT( disassembly_scrollbar_adjustment ),
+		      "value-changed", GTK_SIGNAL_FUNC( move_disassembly ),
+		      NULL );
+  scrollbar =
+    gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), scrollbar );
 
   /* And the stack CList */
@@ -246,7 +252,7 @@ activate_debugger( void )
 {
   debugger_active = 1;
 
-  disassembly_top = PC;
+  ui_debugger_disassemble( PC );
   ui_debugger_update();
 
   gtk_main();
@@ -266,6 +272,7 @@ ui_debugger_update( void )
   const char *format_16_bit, *format_8_bit;
   GSList *ptr;
   int capabilities; size_t length;
+  int error;
 
   const char *register_name[] = { "PC", "SP",
 				  "AF", "AF'",
@@ -369,19 +376,8 @@ ui_debugger_update( void )
 
   gtk_clist_thaw( GTK_CLIST( breakpoints ) );
 
-  /* Put some disassembly in */
-  gtk_clist_freeze( GTK_CLIST( disassembly ) );
-  gtk_clist_clear( GTK_CLIST( disassembly ) );
-
-  for( i = 0, address = disassembly_top; i < 20; i++ ) {
-
-    snprintf( disassembly_text[0], 40, format_16_bit, address );
-    debugger_disassemble( disassembly_text[1], 40, &length, address );
-    address += length;
-
-    gtk_clist_append( GTK_CLIST( disassembly ), disassembly_text );
-  }
-  gtk_clist_thaw( GTK_CLIST( disassembly ) );
+  /* Update the disassembly */
+  error = update_disassembly(); if( error ) return error;
 
   /* And the stack display */
   gtk_clist_freeze( GTK_CLIST( stack ) );
@@ -403,6 +399,32 @@ ui_debugger_update( void )
 }
 
 static int
+update_disassembly( void )
+{
+  size_t i, length; WORD address;
+  char buffer[80];
+  char *disassembly_text[2] = { &buffer[0], &buffer[40] };
+
+  const char *format_16_bit =
+    ( debugger_output_base == 10 ? "%5d" : "0x%04X" );
+
+  gtk_clist_freeze( GTK_CLIST( disassembly ) );
+  gtk_clist_clear( GTK_CLIST( disassembly ) );
+
+  for( i = 0, address = disassembly_top; i < 20; i++ ) {
+
+    snprintf( disassembly_text[0], 40, format_16_bit, address );
+    debugger_disassemble( disassembly_text[1], 40, &length, address );
+    address += length;
+
+    gtk_clist_append( GTK_CLIST( disassembly ), disassembly_text );
+  }
+  gtk_clist_thaw( GTK_CLIST( disassembly ) );
+
+  return 0;
+}
+
+static int
 deactivate_debugger( void )
 {
   gtk_main_quit();
@@ -415,7 +437,8 @@ deactivate_debugger( void )
 int
 ui_debugger_disassemble( WORD address )
 {
-  disassembly_top = address;
+  GTK_ADJUSTMENT( disassembly_scrollbar_adjustment )->value =
+    disassembly_top = address;
   return 0;
 }
 
@@ -431,7 +454,7 @@ move_disassembly( GtkAdjustment *adjustment, gpointer user_data GCC_UNUSED )
   if( value > disassembly_top && value - disassembly_top < 1 ) {
 
     debugger_disassemble( NULL, 0, &length, disassembly_top );
-    disassembly_top += length;
+    ui_debugger_disassemble( disassembly_top + length );
 
   /* disassembly_top - 1 < value < disassembly_top => 'up' button pressed
      
@@ -465,20 +488,17 @@ move_disassembly( GtkAdjustment *adjustment, gpointer user_data GCC_UNUSED )
 
     }
 
-    disassembly_top -= longest;
+    ui_debugger_disassemble( disassembly_top - longest );
 
   /* Anything else, just set disassembly_top to that value */
   } else {
 
-    disassembly_top = value;
+    ui_debugger_disassemble( value );
 
   }
 
-  /* Reset the adjustment value to what we're now actually using */
-  adjustment->value = disassembly_top;
-
-  /* And update the disassembly */
-  ui_debugger_update();
+  /* And update the disassembly if the debugger is active */
+  if( debugger_active ) update_disassembly();
 }
 
 /* Evaluate the command currently in the entry box */
