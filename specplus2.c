@@ -48,11 +48,13 @@ int specplus2_init( fuse_machine_info *machine )
   machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865);
 
   machine->timex = 0;
-  machine->ram.read_memory    = spec128_readbyte;
-  machine->ram.read_screen    = spec128_read_screen_memory;
-  machine->ram.write_memory   = spec128_writebyte;
-  machine->ram.contend_memory = spec128_contend_memory;
-  machine->ram.contend_port   = spec128_contend_port;
+  machine->ram.read_memory	     = spec128_readbyte;
+  machine->ram.read_memory_internal  = spec128_readbyte_internal;
+  machine->ram.read_screen	     = spec128_read_screen_memory;
+  machine->ram.write_memory          = spec128_writebyte;
+  machine->ram.write_memory_internal = spec128_writebyte_internal;
+  machine->ram.contend_memory	     = spec128_contend_memory;
+  machine->ram.contend_port	     = spec128_contend_port;
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;

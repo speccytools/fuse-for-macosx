@@ -100,7 +100,7 @@ disassemble_main( WORD address, char *buffer, size_t buflen, size_t *length,
   BYTE b;
   char buffer2[40], buffer3[40];
 
-  b = readbyte( address );
+  b = readbyte_internal( address );
 
   if( b < 0x40 ) {
     disassemble_00xxxxxx( address, buffer, buflen, length, use_hl );
@@ -146,7 +146,7 @@ disassemble_00xxxxxx( WORD address, char *buffer, size_t buflen,
   };
   char buffer2[40], buffer3[40];
 
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
 
   switch( b & 0x0f ) {
 
@@ -154,7 +154,7 @@ disassemble_00xxxxxx( WORD address, char *buffer, size_t buflen,
     if( b <= 0x08 ) {
       snprintf( buffer, buflen, opcode_00xxx000[ b >> 3 ] ); *length = 1;
     } else {
-      get_offset( buffer2, 40, address + 2, readbyte( address + 1 ) );
+      get_offset( buffer2, 40, address + 2, readbyte_internal( address + 1 ) );
       snprintf( buffer, buflen, "%s%s", opcode_00xxx000[ b >> 3 ], buffer2 );
       *length = 2;
     }
@@ -186,7 +186,7 @@ disassemble_00xxxxxx( WORD address, char *buffer, size_t buflen,
 
   case 0x06: case 0x0e:
     *length = 2 + dest_reg( address, use_hl, buffer2, 40 );
-    get_byte( buffer3, 40, readbyte( address + *length - 1 ) );
+    get_byte( buffer3, 40, readbyte_internal( address + *length - 1 ) );
     snprintf( buffer, buflen, "LD %s,%s", buffer2, buffer3 );
     break;
 
@@ -218,7 +218,7 @@ disassemble_00xxx010( WORD address, char *buffer, size_t buflen,
 		      size_t *length, enum hl_type use_hl )
 {
   char buffer2[40];
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
 
   switch( b >> 4 ) {
 
@@ -246,7 +246,7 @@ disassemble_00xxx110( WORD address, char *buffer, size_t buflen,
 		      size_t *length, enum hl_type use_hl )
 {
   char buffer2[40];
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
 
   switch( b >> 4 ) {
 
@@ -274,7 +274,7 @@ disassemble_11xxxxxx( WORD address, char *buffer, size_t buflen,
 		      size_t *length, enum hl_type use_hl )
 {
   char buffer2[40];
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
 
   switch( b & 0x07 ) {
 
@@ -307,7 +307,7 @@ disassemble_11xxxxxx( WORD address, char *buffer, size_t buflen,
     break;
 
   case 0x06:
-    get_byte( buffer2, 40, readbyte( address + 1 ) );
+    get_byte( buffer2, 40, readbyte_internal( address + 1 ) );
     snprintf( buffer, buflen, addition_op( b ), buffer2 );
     *length = 2;
     break;
@@ -351,7 +351,7 @@ disassemble_11xxx011( WORD address, char *buffer, size_t buflen,
 		      size_t *length, enum hl_type use_hl )
 {
   char buffer2[40];
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
 
   switch( ( b >> 3 ) - 0x18 ) {
 
@@ -362,7 +362,7 @@ disassemble_11xxx011( WORD address, char *buffer, size_t buflen,
 
   case 0x01:
     if( use_hl != USE_HL ) {
-      char offset = readbyte( address + 1 );
+      char offset = readbyte_internal( address + 1 );
       disassemble_ddfd_cb( address+2, offset, use_hl, buffer, buflen,
 			   length );
       (*length) += 2;
@@ -372,12 +372,12 @@ disassemble_11xxx011( WORD address, char *buffer, size_t buflen,
     break;
 
   case 0x02:
-    get_byte( buffer2, 40, readbyte( address + 1 ) );
+    get_byte( buffer2, 40, readbyte_internal( address + 1 ) );
     snprintf( buffer, buflen, "OUT (%s),A", buffer2 ); *length = 2;
     break;
 
   case 0x03:
-    get_byte( buffer2, 40, readbyte( address + 1 ) );
+    get_byte( buffer2, 40, readbyte_internal( address + 1 ) );
     snprintf( buffer, buflen, "IN A,(%s)", buffer2 ); *length = 2;
     break;
 
@@ -406,7 +406,7 @@ disassemble_11xxx101( WORD address, char *buffer, size_t buflen,
 		      size_t *length, enum hl_type use_hl )
 {
   char buffer2[40];
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
 
   switch( ( b >> 3 ) - 0x18 ) {
 	
@@ -442,7 +442,7 @@ static void
 disassemble_cb( WORD address, char *buffer, size_t buflen, size_t *length )
 {
   char buffer2[40];
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
 
   source_reg( address, USE_HL, buffer2, 40 );
 
@@ -478,7 +478,7 @@ disassemble_ed( WORD address, char *buffer, size_t buflen, size_t *length )
   /* The order in which the IM x instructions appear */
   const int im_modes[] = { 0, 0, 1, 2 };
 
-  b = readbyte( address );
+  b = readbyte_internal( address );
 
   if( b < 0x40 || b > 0xbb ) {
     snprintf( buffer, buflen, "NOPD" ); *length = 1;
@@ -558,7 +558,7 @@ static void
 disassemble_ddfd_cb( WORD address, char offset, enum hl_type use_hl,
 		     char *buffer, size_t buflen, size_t *length )
 {
-  BYTE b = readbyte( address );
+  BYTE b = readbyte_internal( address );
   char buffer2[40], buffer3[40];
 
   if( b < 0x40 ) {
@@ -605,7 +605,8 @@ get_word( char *buffer, size_t buflen, WORD address )
 {
   WORD w;
 
-  w = readbyte( address + 1 ); w <<= 8; w += readbyte( address );
+  w  = readbyte_internal( address + 1 ); w <<= 8;
+  w += readbyte_internal( address     );
 
   snprintf( buffer, buflen, "%04X", w );
 }
@@ -660,16 +661,16 @@ ix_iy_offset( char *buffer, size_t buflen, enum hl_type use_hl, BYTE offset )
 static int
 source_reg( WORD address, enum hl_type use_hl, char *buffer, size_t buflen )
 {
-  return single_reg( readbyte( address ) & 0x07, use_hl,
-		     readbyte( address + 1 ), buffer, buflen );
+  return single_reg( readbyte_internal( address ) & 0x07, use_hl,
+		     readbyte_internal( address + 1 ), buffer, buflen );
 }
 
 /* Get an 8-bit register, based on bits 3-5 of the opcode at 'address' */
 static int
 dest_reg( WORD address, enum hl_type use_hl, char *buffer, size_t buflen )
 {
-  return single_reg( ( readbyte( address ) >> 3 ) & 0x07, use_hl,
-		     readbyte( address + 1 ), buffer, buflen );
+  return single_reg( ( readbyte_internal( address ) >> 3 ) & 0x07, use_hl,
+		     readbyte_internal( address + 1 ), buffer, buflen );
 }
 
 /* Get an 8-bit register name, including (HL). Also substitutes

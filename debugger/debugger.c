@@ -99,6 +99,22 @@ debugger_check( void )
   return 0;	/* Keep gcc happy */
 }
 
+/* Check for a read breakpoint */
+int
+debugger_check_read( WORD address )
+{
+  /* TODO */
+  return 0;
+}
+
+/* Check for a write breakpoint */
+int
+debugger_check_write( WORD address )
+{
+  /* TODO */
+  return 0;
+}
+
 /* Activate the debugger */
 int
 debugger_trap( void )
@@ -231,7 +247,7 @@ show_breakpoint( gpointer data, gpointer user_data )
 int
 debugger_breakpoint_exit( void )
 {
-  WORD target = readbyte( SP ) + 0x100 * readbyte( SP+1 );
+  WORD target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
 
   if( debugger_breakpoint_add( target, DEBUGGER_BREAKPOINT_TYPE_ONESHOT ) )
     return 1;

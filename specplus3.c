@@ -103,85 +103,9 @@ specplus3_unattached_port( void )
   return 0xff;
 }
 
-BYTE specplus3_readbyte(WORD address)
-{
-  if(machine_current->ram.special) {
-    switch(machine_current->ram.specialcfg) {
-      case 0: return RAM[   address >> 14       ][ address & 0x3fff ];
-      case 1: return RAM[ ( address >> 14 ) + 4 ][ address & 0x3fff ];
-      case 2: switch( address >> 14 ) {
-	case 0: return RAM[4][ address & 0x3fff ];
-	case 1: return RAM[5][ address & 0x3fff ];
-	case 2: return RAM[6][ address & 0x3fff ];
-	case 3: return RAM[3][ address & 0x3fff ];
-      }
-      case 3: switch( address >> 14 ) {
-	case 0: return RAM[4][ address & 0x3fff ];
-	case 1: return RAM[7][ address & 0x3fff ];
-	case 2: return RAM[6][ address & 0x3fff ];
-	case 3: return RAM[3][ address & 0x3fff ];
-      }
-      default:
-	ui_error( UI_ERROR_ERROR, "Unknown +3 special configuration %d",
-		  machine_current->ram.specialcfg );
-	fuse_abort();
-    }
-  } else {
-    switch( address >> 14 ) {
-    case 0: return ROM[ machine_current->ram.current_rom][ address & 0x3fff ];
-    case 1: return RAM[				       5][ address & 0x3fff ];
-    case 2: return RAM[				       2][ address & 0x3fff ];
-    case 3: return RAM[machine_current->ram.current_page][ address & 0x3fff ];
-    }
-  }
-
-  return 0; /* Keep gcc happy */
-}
-
 BYTE specplus3_read_screen_memory(WORD offset)
 {
   return RAM[machine_current->ram.current_screen][offset];
-}
-
-void specplus3_writebyte(WORD address, BYTE b)
-{
-  int bank = address >> 14;
-
-  if(machine_current->ram.special) {
-    switch(machine_current->ram.specialcfg) {
-      case 0: break;
-      case 1: bank+=4; break;
-      case 2:
-	switch(bank) {
-	  case 0: bank=4; break;
-	  case 1: bank=5; break;
-	  case 2: bank=6; break;
-	  case 3: bank=3; break;
-	}
-	break;
-      case 3: switch(bank) {
-	case 0: bank=4; break;
-	case 1: bank=7; break;
-	case 2: bank=6; break;
-	case 3: bank=3; break;
-      }
-      break;
-    }
-  } else {
-    switch(bank) {
-      case 0: return;
-      case 1: bank=5;				      break;
-      case 2: bank=2;				      break;
-      case 3: bank=machine_current->ram.current_page; break;
-    }
-  }
-
-  if( bank == machine_current->ram.current_screen &&
-      ( address & 0x3fff ) < 0x1b00 &&
-      RAM[ bank ][ address & 0x3fff ] != b )
-    display_dirty( ( address & 0x3fff ) | 0x4000 );
-    
-  RAM[ bank ][ address & 0x3fff ] = b;
 }
 
 DWORD specplus3_contend_memory( WORD address )
@@ -287,11 +211,13 @@ int specplus3_init( fuse_machine_info *machine )
   machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865 );
 
   machine->timex = 0;
-  machine->ram.read_memory    = specplus3_readbyte;
-  machine->ram.read_screen    = specplus3_read_screen_memory;
-  machine->ram.write_memory   = specplus3_writebyte;
-  machine->ram.contend_memory = specplus3_contend_memory;
-  machine->ram.contend_port   = specplus3_contend_port;
+  machine->ram.read_memory	     = specplus3_readbyte;
+  machine->ram.read_memory_internal  = specplus3_readbyte_internal;
+  machine->ram.read_screen	     = specplus3_read_screen_memory;
+  machine->ram.write_memory          = specplus3_writebyte;
+  machine->ram.write_memory_internal = specplus3_writebyte_internal;
+  machine->ram.contend_memory	     = specplus3_contend_memory;
+  machine->ram.contend_port	     = specplus3_contend_port;
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;

@@ -64,36 +64,9 @@ static BYTE tc2048_unattached_port( void )
   /* the contrary), it returns 255 on unattached ports */
   return 255;
 }
-
-BYTE tc2048_readbyte(WORD address)
-{
-  WORD offset = address & 0x3fff;
-  switch( address >> 14 ) {
-  case 0: return ROM[0][offset]; break;
-  case 1: return RAM[5][offset]; break;
-  case 2: return RAM[2][offset]; break;
-  case 3: return RAM[0][offset]; break;
-  }
-  return 0; /* Keep gcc happy */
-}
-
 BYTE tc2048_read_screen_memory(WORD offset)
 {
   return RAM[5][offset];
-}
-
-void tc2048_writebyte(WORD address, BYTE b)
-{
-  WORD offset = address & 0x3fff;
-
-  switch( address >> 14 ) {
-  case 0: break;
-  case 1: 
-    if( RAM[5][offset] != b ) { display_dirty( address ); RAM[5][offset] = b; }
-    break;
-  case 2: RAM[2][offset]=b; break;
-  case 3: RAM[0][offset]=b; break;
-  }
 }
 
 DWORD tc2048_contend_memory( WORD address )
@@ -170,11 +143,13 @@ int tc2048_init( fuse_machine_info *machine )
   machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
 
   machine->timex = 1;
-  machine->ram.read_memory    = tc2048_readbyte;
-  machine->ram.read_screen    = tc2048_read_screen_memory;
-  machine->ram.write_memory   = tc2048_writebyte;
-  machine->ram.contend_memory = tc2048_contend_memory;
-  machine->ram.contend_port   = tc2048_contend_port;
+  machine->ram.read_memory	     = tc2048_readbyte;
+  machine->ram.read_memory_internal  = tc2048_readbyte_internal;
+  machine->ram.read_screen	     = tc2048_read_screen_memory;
+  machine->ram.write_memory          = tc2048_writebyte;
+  machine->ram.write_memory_internal = tc2048_writebyte_internal;
+  machine->ram.contend_memory	     = tc2048_contend_memory;
+  machine->ram.contend_port	     = tc2048_contend_port;
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;

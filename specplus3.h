@@ -45,8 +45,10 @@
 BYTE specplus3_unattached_port( void );
 
 BYTE specplus3_readbyte(WORD address);
+BYTE specplus3_readbyte_internal( WORD address );
 BYTE specplus3_read_screen_memory(WORD offset);
 void specplus3_writebyte(WORD address, BYTE b);
+void specplus3_writebyte_internal( WORD address, BYTE b );
 
 DWORD specplus3_contend_memory( WORD address );
 DWORD specplus3_contend_port( WORD address );

@@ -36,8 +36,10 @@ extern spectrum_port_info spec128_peripherals[];
 BYTE spec128_unattached_port( void );
 
 BYTE spec128_readbyte(WORD address);
+BYTE spec128_readbyte_internal( WORD address );
 BYTE spec128_read_screen_memory(WORD offset);
 void spec128_writebyte(WORD address, BYTE b);
+void spec128_writebyte_internal( WORD address, BYTE b );
 
 DWORD spec128_contend_memory( WORD address );
 DWORD spec128_contend_port( WORD port );

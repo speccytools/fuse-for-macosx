@@ -53,9 +53,14 @@ typedef struct spectrum_raminfo {
 
   spectrum_memory_read_function read_memory; /* Read a byte from anywhere in 
 						paged in memory */
+  spectrum_memory_read_function read_memory_internal;
+
   spectrum_screen_read_function read_screen; /* Read a byte from the
 						current screen */
+
   spectrum_memory_write_function write_memory; /* Write to paged-in memory */
+  spectrum_memory_write_function write_memory_internal;
+
   spectrum_memory_contention_function contend_memory; /* How long must we wait
 							 to access memory? */
   spectrum_port_contention_function contend_port; /* And how long to access
@@ -75,8 +80,10 @@ typedef struct spectrum_raminfo {
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
 extern spectrum_memory_read_function readbyte;
+extern spectrum_memory_read_function readbyte_internal;
 extern spectrum_screen_read_function read_screen_memory;
 extern spectrum_memory_write_function writebyte;
+extern spectrum_memory_write_function writebyte_internal;
 
 extern spectrum_memory_contention_function contend_memory;
 extern spectrum_port_contention_function contend_port;

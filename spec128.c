@@ -56,39 +56,9 @@ BYTE spec128_unattached_port( void )
   return spectrum_unattached_port( 3 );
 }
 
-BYTE spec128_readbyte(WORD address)
-{
-  switch( address >> 14 ) {
-  case 0: return ROM[ machine_current->ram.current_rom][ address & 0x3fff ];
-  case 1: return RAM[                                5][ address & 0x3fff ];
-  case 2: return RAM[                                2][ address & 0x3fff ];
-  case 3: return RAM[machine_current->ram.current_page][ address & 0x3fff ];
-  }
-  return 0; /* Keep gcc happy */
-}
-
 BYTE spec128_read_screen_memory(WORD offset)
 {
   return RAM[machine_current->ram.current_screen][offset];
-}
-
-void spec128_writebyte(WORD address, BYTE b)
-{
-  int bank = address >> 14;
-
-  switch( bank ) {
-  case 0: return;
-  case 1: bank = 5;				    break;
-  case 2: bank = 2;				    break;
-  case 3: bank = machine_current->ram.current_page; break;
-  }
-
-  if( bank == machine_current->ram.current_screen &&
-      ( address & 0x3fff ) < 0x1b00 &&
-      RAM[ bank ][ address & 0x3fff ] != b )
-    display_dirty( ( address & 0x3fff ) | 0x4000 );
-    
-  RAM[ bank ][ address & 0x3fff ] = b;
 }
 
 DWORD spec128_contend_memory( WORD address )
@@ -167,11 +137,13 @@ int spec128_init( fuse_machine_info *machine )
   machine_set_timings( machine, 3.54690e6, 24, 128, 24, 52, 311, 8865);
 
   machine->timex = 0;
-  machine->ram.read_memory    = spec128_readbyte;
-  machine->ram.read_screen    = spec128_read_screen_memory;
-  machine->ram.write_memory   = spec128_writebyte;
-  machine->ram.contend_memory = spec128_contend_memory;
-  machine->ram.contend_port   = spec128_contend_port;
+  machine->ram.read_memory	     = spec128_readbyte;
+  machine->ram.read_memory_internal  = spec128_readbyte_internal;
+  machine->ram.read_screen	     = spec128_read_screen_memory;
+  machine->ram.write_memory          = spec128_writebyte;
+  machine->ram.write_memory_internal = spec128_writebyte_internal;
+  machine->ram.contend_memory	     = spec128_contend_memory;
+  machine->ram.contend_port	     = spec128_contend_port;
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;

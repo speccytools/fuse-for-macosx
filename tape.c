@@ -338,13 +338,13 @@ static int trap_load_block( libspectrum_tape_rom_block *block )
 
   if( loading ) {
     for( i=0; i<DE; i++ ) {
-      writebyte( IX+i, *data );
+      writebyte_internal( IX+i, *data );
       parity ^= *data++;
     }
   } else {		/* verifying */
     for( i=0; i<DE; i++) {
       parity ^= *data;
-      if( *data++ != readbyte(IX+i) ) {
+      if( *data++ != readbyte_internal(IX+i) ) {
 	F = ( F & ~FLAG_C );
 	return 0;
       }
@@ -404,7 +404,7 @@ int tape_save_trap( void )
 
   /* then the main body of the data, counting parity along the way */
   for( i=0; i<DE; i++) {
-    libspectrum_byte b = readbyte( IX+i );
+    libspectrum_byte b = readbyte_internal( IX+i );
     parity ^= b;
     rom_block->data[i+1] = b;
   }

@@ -55,33 +55,9 @@ static BYTE spec48_unattached_port( void )
   return spectrum_unattached_port( 1 );
 }
 
-BYTE spec48_readbyte(WORD address)
-{
-  switch( address >> 14 ) {
-  case 0: return ROM[0][ address & 0x3fff ];
-  case 1: return RAM[5][ address & 0x3fff ];
-  case 2: return RAM[2][ address & 0x3fff ];
-  case 3: return RAM[0][ address & 0x3fff ];
-  }
-  return 0; /* Keep gcc happy */
-}
-
 BYTE spec48_read_screen_memory(WORD offset)
 {
   return RAM[5][offset];
-}
-
-void spec48_writebyte(WORD address, BYTE b)
-{
-  switch( address >> 14 ) {
-  case 0: break;
-  case 1:
-    if( ( address & 0x3fff ) < 0x1b00 && RAM[5][ address & 0x3fff ] != b )
-      display_dirty( address );
-    RAM[5][ address & 0x3fff ] = b; break;
-  case 2: RAM[2][ address & 0x3fff ] = b; break;
-  case 3: RAM[0][ address & 0x3fff ] = b; break;
-  }
 }
 
 DWORD spec48_contend_memory( WORD address )
@@ -155,11 +131,13 @@ int spec48_init( fuse_machine_info *machine )
   machine_set_timings( machine, 3.5e6, 24, 128, 24, 48, 312, 8936 );
 
   machine->timex = 0;
-  machine->ram.read_memory    = spec48_readbyte;
-  machine->ram.read_screen    = spec48_read_screen_memory;
-  machine->ram.write_memory   = spec48_writebyte;
-  machine->ram.contend_memory = spec48_contend_memory;
-  machine->ram.contend_port   = spec48_contend_port;
+  machine->ram.read_memory           = spec48_readbyte;
+  machine->ram.read_memory_internal  = spec48_readbyte_internal;
+  machine->ram.read_screen           = spec48_read_screen_memory;
+  machine->ram.write_memory	     = spec48_writebyte;
+  machine->ram.write_memory_internal = spec48_writebyte_internal;
+  machine->ram.contend_memory        = spec48_contend_memory;
+  machine->ram.contend_port          = spec48_contend_port;
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;

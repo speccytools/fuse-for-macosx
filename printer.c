@@ -284,8 +284,8 @@ int x,y,f,c,chars;
 
 #define SYSV_CHARS	0x5c36
 
-chars=readbyte(SYSV_CHARS);
-chars+=256*readbyte(SYSV_CHARS+1);
+chars=readbyte_internal(SYSV_CHARS);
+chars+=256*readbyte_internal(SYSV_CHARS+1);
 
 memset(charset,0,sizeof(charset));
 ptr=charset+32*8;

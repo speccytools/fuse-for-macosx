@@ -33,8 +33,10 @@
 #endif			/* #ifndef FUSE_TYPES_H */
 
 BYTE tc2048_readbyte(WORD address);
+BYTE tc2048_readbyte_internal( WORD address );
 BYTE tc2048_read_screen_memory(WORD offset);
 void tc2048_writebyte(WORD address, BYTE b);
+void tc2048_writebyte_internal( WORD address, BYTE b );
 
 DWORD tc2048_contend_memory( WORD address );
 DWORD tc2048_contend_port( WORD port );

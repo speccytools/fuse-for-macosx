@@ -29,7 +29,8 @@ bin_PROGRAMS = fuse
 SUBDIRS = debugger getopt hacking lib man perl roms ui widget z80
 
 fuse_SOURCES = ay.c display.c event.c\
-	fuse.c keyboard.c machine.c osssound.c rzx.c settings.c\
+	fuse.c keyboard.c machine.c memory.c memory_internal.c \
+        osssound.c rzx.c settings.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus2a.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c

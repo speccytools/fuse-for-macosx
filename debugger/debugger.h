@@ -70,6 +70,9 @@ int debugger_reset( void );
 int debugger_end( void );
 
 int debugger_check( void );	/* See if the debugger should become active */
+int debugger_check_read( WORD address );
+int debugger_check_write( WORD address );
+
 int debugger_trap( void );	/* Activate the debugger */
 
 int debugger_step( void );	/* Single step */

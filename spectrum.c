@@ -56,8 +56,10 @@ BYTE spectrum_last_ula;
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
 spectrum_memory_read_function readbyte;
+spectrum_memory_read_function readbyte_internal;
 spectrum_screen_read_function read_screen_memory;
 spectrum_memory_write_function writebyte;
+spectrum_memory_write_function writebyte_internal;
 
 spectrum_memory_contention_function contend_memory;
 spectrum_port_contention_function contend_port;
