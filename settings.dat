@@ -1,5 +1,5 @@
 # settings.dat: configuration options for Fuse
-# Copyright (c) 2002 Philip Kendall
+# Copyright (c) 2002-2003 Philip Kendall
 
 # $Id$
 
@@ -50,6 +50,8 @@ stereo_ay, boolean, 0,, separation
 stereo_beeper, boolean, 0,, beeper-stereo
 
 rzx_compression, boolean, 0,, compress-rzx
+competition_mode, boolean, 0
+competition_code, numeric, 0
 
 snapshot, string, NULL, 's'
 tape_file, string, NULL, 't', tape, tapefile

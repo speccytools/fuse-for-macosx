@@ -27,9 +27,11 @@
 #include <config.h>
 
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "event.h"
 #include "fuse.h"
@@ -38,6 +40,7 @@
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
+#include "timer.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80.h"
@@ -59,6 +62,9 @@ size_t rzx_in_allocated;
 /* Are we currently recording a .rzx file? */
 int rzx_recording;
 
+/* Is the .rzx file being recorded in competition mode? */
+int rzx_competition_mode;
+
 /* The filename we'll save this recording into */
 static char *rzx_filename;
 
@@ -73,6 +79,25 @@ size_t rzx_instruction_count;
 
 /* The current RZX data */
 libspectrum_rzx *rzx;
+
+/* Fuse's DSA key */
+libspectrum_rzx_dsa_key rzx_key = {
+  "9E140C4CEA9CA011AA8AD17443CB5DC18DC634908474992D38AB7D4A27038CBB209420BA2CAB8508CED35ADF8CBD31A0A034FC082A168A0E190FFC4CCD21706F", /* p */
+  "C52E9CA1804BD021FFAD30E8FB89A94437C2E4CB",	       /* q */
+  "90E56D9493DE80E1A35F922007357888A1A47805FD365AD27BC5F184601EBC74E44F576AA4BF8C5244D202BBAE697C4F9132DFB7AD0A56892A414C96756BD21A", /* g */
+  "7810A35AC94EA5750934FB9C922351EE597C71E2B83913C121C6655EA25CE7CBE2C259FA3168F8475B2510AA29C5FEB50ACAB25F34366C2FFC93B3870A522232", /* y */
+  "9A4E53CC249750C3194A38A3BE3EDEED28B171A9"	       /* x */
+};
+
+/* The time we started recording this RZX file */
+static struct timeval start_time;
+
+/* How many seconds do we expect to have elapsed since we started recording? */
+static float expected_time;
+
+/* By how much is the speed allowed to deviate from 100% whilst recording
+   a competition mode RZX file */
+static const float SPEED_TOLERANCE = 0.05;
 
 static int start_playback( libspectrum_rzx *rzx, libspectrum_snap *snap );
 static int recording_frame( void );
@@ -127,6 +152,25 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
 
   /* Note that we're recording */
   rzx_recording = 1;
+
+  if( settings_current.competition_mode ) {
+
+    expected_time = 0;
+
+    error = gettimeofday( &start_time, NULL );
+    if( error ) {
+      ui_error( UI_ERROR_INFO,
+		"Couldn't get start time: %s: competition mode disabled",
+		strerror( errno ) );
+      rzx_competition_mode = 0;
+    } else {
+      settings_current.emulation_speed = 100;
+      timer_count = 0;
+      rzx_competition_mode = 1;
+    }
+    
+  }
+    
   ui_menu_activate_recording( 1 );
 
   return 0;
@@ -142,10 +186,16 @@ int rzx_stop_recording( void )
 
   ui_menu_activate_recording( 0 );
 
+  libspectrum_creator_set_competition_code(
+    fuse_creator, settings_current.competition_code
+  );
+
   length = 0;
-  libspec_error = libspectrum_rzx_write( &buffer, &length,
-					 rzx, rzx_snap, fuse_creator,
-					 settings_current.rzx_compression );
+  libspec_error =
+    libspectrum_rzx_write( &buffer, &length, rzx, rzx_snap, fuse_creator,
+			   settings_current.rzx_compression,
+			   rzx_competition_mode ? &rzx_key : NULL
+			 );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     libspectrum_rzx_free( rzx );
     if( rzx_snap ) libspectrum_snap_free( rzx_snap );
@@ -170,14 +220,15 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
 {
   utils_file file;
   libspectrum_error libspec_error; int error;
-  libspectrum_snap *snap = 0;
+  libspectrum_snap *snap;
 
   if( rzx_recording) return 1;
 
   error = utils_read_file( filename, &file );
   if( error ) return error;
 
-  libspec_error = libspectrum_rzx_read( rzx, &snap, file.buffer, file.length );
+  libspec_error = libspectrum_rzx_read( rzx, &snap, file.buffer, file.length,
+					NULL );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
     utils_close_file( &file );
     return libspec_error;
@@ -215,7 +266,7 @@ rzx_start_playback_from_buffer( const unsigned char *buffer, size_t length )
 
   if( rzx_recording ) return 0;
 
-  error = libspectrum_rzx_read( rzx, &snap, buffer, length );
+  error = libspectrum_rzx_read( rzx, &snap, buffer, length, NULL );
   if( error ) return error;
 
   error = start_playback( rzx, snap );
@@ -300,6 +351,44 @@ static int recording_frame( void )
 
   /* Reset the instruction counter */
   rzx_in_count = 0; counter_reset();
+
+  /* If we're in competition mode, check we're running at close to 100%
+     speed */
+  if( rzx_competition_mode ) {
+
+    struct timeval current_time;
+    float elapsed_time;
+
+    expected_time += 0.02;
+
+    /* Small time measurements are highly inaccurate, so wait at least
+       one second before doing them */
+    if( expected_time > 1.0 ) {
+    
+      error = gettimeofday( &current_time, NULL );
+      if( error ) {
+	ui_error(
+          UI_ERROR_INFO,
+	  "couldn't get time: %s: stopping competition mode RZX recording",
+	  strerror( errno )
+	);
+	rzx_stop_recording();
+	return 1;
+      }
+
+      elapsed_time =   current_time.tv_sec  - start_time.tv_sec +
+	             ( current_time.tv_usec - start_time.tv_usec ) / 1000000.0;
+      if( fabs( expected_time / elapsed_time - 1 ) > SPEED_TOLERANCE ) {
+	ui_error(
+	  UI_ERROR_INFO,
+	  "emulator speed is %d%%: stopping competition mode RZX recording",
+	  (int)( 100 * ( expected_time / elapsed_time ) )
+	);
+	rzx_stop_recording();
+      }
+    }
+
+  }
 
   return 0;
 }

@@ -39,7 +39,27 @@ volatile float timer_count;
 
 #include "compat.h"
 
-#ifndef DEBUG_MODE
+#ifdef DEBUG_MODE
+int
+timer_init( void )
+{
+  return 0;
+}
+
+void
+timer_sleep( void )
+{
+  return;
+}
+
+int
+timer_end( void )
+{
+  return 0;
+}
+
+#else				/* #ifdef DEBUG_MODE */
+
 /* Just places to store the old timer and signal handlers; restored
    on exit */
 static struct itimerval timer_old_timer;
@@ -47,20 +67,16 @@ static struct sigaction timer_old_handler;
 
 static void timer_setup_timer(void);
 static void timer_setup_handler(void);
-#endif				/* #ifndef DEBUG_MODE */
 void timer_signal( int signo );
 
 int timer_init(void)
 {
-#ifndef DEBUG_MODE
   timer_count = 0.0;
   timer_setup_handler();
   timer_setup_timer();
-#endif				/* #ifndef DEBUG_MODE */
   return 0;
 }
 
-#ifndef DEBUG_MODE
 static void timer_setup_timer(void)
 {
   struct itimerval timer;
@@ -79,39 +95,33 @@ static void timer_setup_handler(void)
   handler.sa_flags=0;
   sigaction(SIGALRM,&handler,&timer_old_handler);
 }  
-#endif				/* #ifndef DEBUG_MODE */
 
 void
 timer_signal( int signo GCC_UNUSED )
 {
-#ifndef DEBUG_MODE
   /* If the emulator is running, note that time has passed */
   if( !fuse_emulation_paused ) timer_count += 1.0;
-#endif				/* #ifndef DEBUG_MODE */
 }
 
 void timer_sleep(void)
 {
-#ifndef DEBUG_MODE
   /* Go to sleep iff we're emulating things fast enough */
   while( timer_count <= 0.0 ) pause();
-#endif				/* #ifndef DEBUG_MODE */
 }
 
 int timer_end(void)
 {
-#ifndef DEBUG_MODE
   /* Restore the old timer */
   setitimer(ITIMER_REAL,&timer_old_timer,NULL);
 
   /* And the old signal handler */
   sigaction(SIGALRM,&timer_old_handler,NULL);
 
-#endif				/* #ifndef DEBUG_MODE */
-
   return 0;
 
 }
+
+#endif				/* #ifdef DEBUG_MODE */
 
 #else				/* #ifndef WIN32 */
 
@@ -174,12 +184,34 @@ timer_end( void )
   return 0;
 }
 
+
+  return 0;
+}
+
+void
+timer_sleep( void )
+{
+#ifndef DEBUG_MODE
+  while( timer_count <= 0.0 ) Sleep(0);
+#endif				/* #ifndef DEBUG_MODE */
+}
+
+int
+timer_end( void )
+{
+#ifndef DEBUG_MODE
+  timeKillEvent(wTimerID);	/* cancel the event */
+  wTimerID = 0;
+#endif				/* #ifndef DEBUG_MODE */
+  return 0;
+}
+
 void CALLBACK
 timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 )
 {
 #ifndef DEBUG_MODE
   if( !fuse_emulation_paused ) timer_count += 1.0;
-#endif				/* #ifndef DEBUG_MODE */
+#endif                         /* #ifndef DEBUG_MODE */
 }
 
 #endif   /* #ifndef WIN32 */

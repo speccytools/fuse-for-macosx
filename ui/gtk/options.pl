@@ -116,10 +116,10 @@ CODE
   text = gtk_label_new( "$text" );
   text2 = gtk_label_new( "$widget->{data2}" );
 
-  hbox = gtk_hbox_new( FALSE, 5 );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), text );
+  hbox = gtk_hbox_new( FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX( hbox ), text, FALSE, FALSE, 5 );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), dialog.$widget->{value} );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), text2 );
+  gtk_box_pack_start( GTK_BOX( hbox ), text2, FALSE, FALSE, 5 );
 
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
 		     hbox );
@@ -151,12 +151,14 @@ CODE
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) NULL );
 
-  /* Allow Esc to cancel */
+  /* Return = 'OK', Esc = 'Cancel' */
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( dialog.dialog ), accel_group );
 
-  gtk_widget_add_accelerator( cancel_button, "clicked",
-			      accel_group, GDK_Escape, 0, 0);
+  gtk_widget_add_accelerator( ok_button, "clicked", accel_group,
+			      GDK_Return, 0, 0 );
+  gtk_widget_add_accelerator( cancel_button, "clicked", accel_group,
+			      GDK_Escape, 0, 0 );
 
   /* Set the window to be modal and display it */
   gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );

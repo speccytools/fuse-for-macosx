@@ -12,6 +12,8 @@ Checkbox, Allow (w)rites to ROM, writable_roms, KEYBOARD_w
 rzx
 RZX Options
 Checkbox, (C)ompress RZX data, rzx_compression, KEYBOARD_c
+Checkbox, C(o)mpetition mode, competition_mode, KEYBOARD_o
+Entry, Co(m)petition code, competition_code, KEYBOARD_m, 8,
 
 sound
 Sound Options

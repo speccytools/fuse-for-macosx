@@ -160,6 +160,8 @@ static int fuse_init(int argc, char **argv)
   
   if( display_init(&argc,&argv) ) return 1;
 
+  if( libspectrum_init() ) return 1;
+
 #ifdef HAVE_GETEUID
   /* Drop root privs if we have them */
   if( !geteuid() ) { setuid( getuid() ); }
@@ -210,11 +212,32 @@ static int fuse_init(int argc, char **argv)
   if( settings_current.tape_file )
     tape_open( settings_current.tape_file, autoload );
 
-  if( settings_current.playback_file ) {
+  if( settings_current.playback_file )
     rzx_start_playback( settings_current.playback_file, NULL );
-  } else if( settings_current.record_file ) {
-    rzx_start_recording( settings_current.record_file, 1 );
+
+#ifdef HAVE_765_H
+  if( settings_current.plus3disk_file ) {
+    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
+    if( error ) return error;
+
+    specplus3_disk_insert( SPECPLUS3_DRIVE_A, settings_current.plus3disk_file );
   }
+#endif				/* #ifdef HAVE_765_H */
+
+  if( settings_current.trdosdisk_file ) {
+    error = machine_select( LIBSPECTRUM_MACHINE_PENT );
+    if( error ) return error;
+
+    trdos_disk_insert( TRDOS_DRIVE_A, settings_current.trdosdisk_file );
+  }
+
+  if( parse_nonoption_args( argc, argv, first_arg, autoload ) ) return 1;
+
+  /* Do this after we've parsed the non-option arguments or otherwise
+     something like `./fuse snapshot.z80 -r recording.rzx' ends up with
+     the startup snapshot stored in the RZX file, not snapshot.z80 */
+  if( settings_current.record_file )
+    rzx_start_recording( settings_current.record_file, 1 );
 
 #ifdef HAVE_765_H
   if( settings_current.plus3disk_file ) {
@@ -320,6 +343,14 @@ static void fuse_show_help( void )
 /* Stop all activities associated with actual Spectrum emulation */
 int fuse_emulation_pause(void)
 {
+  int error;
+
+  /* Stop recording any competition mode RZX file */
+  if( rzx_recording && rzx_competition_mode ) {
+    ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
+    error = rzx_stop_recording(); if( error ) return error;
+  }
+      
   /* If we were already paused, just return. In any case, increment
      the pause count */
   if( fuse_emulation_paused++ ) return 0;

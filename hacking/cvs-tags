@@ -64,6 +64,16 @@ $Id$
 | Release-0_5_0-merge-1			Merged from
 |                                       Release-0_5_0-branch-1
 | Release-0_5_1pre1
+|
++-\					Branch for digitial signatures
+| |
+| | Release-0_5_1pre1-crypto-branch-1	Sync with HEAD as of 2003/07/22
+| |					(post Release-0_6_1pre1-merge-1)
+| | Release-0_5_1pre1-crypto-branch-2	Merge to head at
+| |					Release-0_6_1pre1-merge-2
+| |
+| | Release-0_5_1pre1-crypto-branch
+|
 | Release-0_5_1pre2
 |
 +-\					First bits of debugger
@@ -98,5 +108,7 @@ $Id$
 | Release-0_6_1pre1
 | Release-0_6_1pre1-merge-1		Merged from
 |					Release-0_6_0_1
+| Release-0_6_1pre1-merge-2		Merged from
+|					Release-0_5_1pre1-crypto-branch-2
 |
 HEAD

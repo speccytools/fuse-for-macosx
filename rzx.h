@@ -1,5 +1,5 @@
 /* rzx.h: .rzx files
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
@@ -48,6 +48,9 @@ extern int rzx_recording;
 
 /* Are we currently playing back a .rzx file? */
 extern int rzx_playback;
+
+/* Is the .rzx file being recorded in competition mode? */
+int rzx_competition_mode;
 
 /* The number of instructions in the current .rzx playback frame */
 extern size_t rzx_instruction_count;
