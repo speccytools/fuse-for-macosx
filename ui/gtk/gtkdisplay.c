@@ -275,7 +275,7 @@ void
 uidisplay_area( int x, int y, int w, int h )
 {
   float scale = (float)gtkdisplay_current_size / image_scale;
-  int scaled_x, scaled_y, xx, yy;
+  int scaled_x, scaled_y, i, yy;
   libspectrum_dword *palette;
 
   /* Extend the dirty region by 1 pixel for scalers
@@ -288,12 +288,17 @@ uidisplay_area( int x, int y, int w, int h )
   palette = settings_current.colour_tv ? gtkdisplay_colours : bw_colours;
 
   /* Create the RGB image */
-  for( xx = x; xx < x + w; xx++ )
-    for( yy = y; yy < y + h; yy++ ) {
-      *(libspectrum_dword*)
-	(rgb_image + ( yy + 2 ) * rgb_pitch + 4 * ( xx + 1 ) ) =
-	  palette[ display_image[yy][xx] ];
-    }
+  for( yy = y; yy < y + h; yy++ ) {
+
+    libspectrum_dword *rgb; libspectrum_word *display;
+
+    rgb = (libspectrum_dword*)( rgb_image + ( yy + 2 ) * rgb_pitch );
+    rgb += x + 1;
+
+    display = &display_image[yy][x];
+
+    for( i = 0; i < w; i++, rgb++, display++ ) *rgb = palette[ *display ];
+  }
 
   /* Create scaled image */
   scaler_proc32( &rgb_image[ ( y + 2 ) * rgb_pitch + 4 * ( x + 1 ) ],
