@@ -48,18 +48,14 @@
 
 #include <png.h>
 
-BYTE screenshot_screen[240][640];
-
-static BYTE saved_screen[240][640];
+/* A copy of display.c:display_image, taken so we can draw widgets on
+   display_image */
+static WORD saved_screen[2*DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH];
 
 int
 screenshot_save( void )
 {
-  size_t y;
-
-  for( y=0; y<240; y++ )
-    memcpy( saved_screen[y], screenshot_screen[y], 640 * sizeof( BYTE ) );
-
+  memcpy( saved_screen, display_image, sizeof( display_image ) );
   return 0;
 }
 
@@ -71,7 +67,7 @@ screenshot_write( const char *filename )
   png_structp png_ptr;
   png_infop info_ptr;
 
-  BYTE png_data[240][320], *row_pointers[480];
+  BYTE png_data[240][320*3], *row_pointers[240];
   size_t x, y;
 
   png_color palette[] = { {   0,   0,   0 },
@@ -129,30 +125,21 @@ screenshot_write( const char *filename )
   png_set_compression_level( png_ptr, Z_BEST_COMPRESSION );
 
   png_set_IHDR( png_ptr, info_ptr,
-		settings_current.double_screen ? 640 : 320, /* height */
-		settings_current.double_screen ? 480 : 240, /* width */
-		4,			/* 2^4 colours */
-		PNG_COLOR_TYPE_PALETTE,
+		320, 240, 8, 
+		PNG_COLOR_TYPE_RGB,
 		PNG_INTERLACE_NONE,
 		PNG_COMPRESSION_TYPE_DEFAULT,
 		PNG_FILTER_TYPE_DEFAULT );
 
-  png_set_PLTE( png_ptr, info_ptr, palette, 16 );
- 
   for( y=0; y<240; y++ ) {
+    row_pointers[y] = png_data[y];
+    for( x=0; x<320; x++ ) {
+      int colour = saved_screen[y][x];
 
-    if( settings_current.double_screen ) {
-      row_pointers[2*y] = row_pointers[2*y+1] = png_data[y];
-      for( x=0; x<320; x++ )
-	png_data[y][x] = (   saved_screen[y][2*x  ] & 0x1f )        |
-	                 ( ( saved_screen[y][2*x+1] & 0x1f ) << 4 );
-    } else {
-      row_pointers[y] = png_data[y];
-      for( x=0; x<160; x++ )
-	png_data[y][x] = (   saved_screen[y][4*x+2] & 0x1f )        |
-	                 ( ( saved_screen[y][4*x  ] & 0x1f ) << 4 );
+      png_data[y][3*x  ] = palette[colour].red;
+      png_data[y][3*x+1] = palette[colour].green;
+      png_data[y][3*x+2] = palette[colour].blue;
     }
-
   }
   
   png_set_rows( png_ptr, info_ptr, row_pointers );
