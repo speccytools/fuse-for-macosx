@@ -509,6 +509,16 @@ setup_start_files( start_files_t *start_files )
   start_files->snapshot = settings_current.snapshot;
   start_files->tape = settings_current.tape_file;
 
+  if( settings_current.zxcf_active ) {
+    start_files->harddisk = settings_current.zxcf_pri_file;
+  } else if( settings_current.zxatasp_active ) {
+    start_files->harddisk = settings_current.zxatasp_master_file;
+  } else if( settings_current.simpleide_active ) {
+    start_files->harddisk = settings_current.simpleide_master_file;
+  } else {
+    start_files->harddisk = NULL;
+  }
+
   return 0;
 }
 
