@@ -67,6 +67,7 @@ static void gtkui_reset(GtkWidget *widget, gpointer data);
 static void gtkui_switch(GtkWidget *widget, gpointer data);
 static void gtkui_tape_open( GtkWidget *widget, gpointer data );
 static void gtkui_tape_play( GtkWidget *widget, gpointer data );
+static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
 static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
 
@@ -90,7 +91,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Tape",                    NULL , NULL,             0, "<Branch>"    },
   { "/Tape/_Open...",	        "F7" , gtkui_tape_open,  0, NULL          },
   { "/Tape/_Play",	        "F8" , gtkui_tape_play,  0, NULL          },
-  { "/Tape/_Write",		"F6" , gtkui_tape_write, 0, NULL          },
+  { "/Tape/_Write...",		"F6" , gtkui_tape_write, 0, NULL          },
 };
 static guint gtkui_menu_data_size = 14;
   
