@@ -38,6 +38,8 @@ Fuse has been brought to you by:
 
 * Garry Lancaster: the simple 8-bit IDE, ZXATASP and ZXCF support.
 
+* Gergely Szasz: the 'movie' code and the ao sound driver.
+
 * Philip Kendall: everything else.
 
 $Id$

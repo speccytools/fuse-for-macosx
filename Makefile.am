@@ -101,6 +101,7 @@ z80/libz80.a \
 @LIBSPEC_LIBS@ \
 @GLIB_LIBS@ \
 @PNG_LIBS@ \
+@AO_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
 compat/libcompat.a

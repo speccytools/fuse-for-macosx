@@ -76,6 +76,8 @@ Some thanks (in alphabetical order):
   the code which is used as the graphics scalers. For ScummVM, check out
   http://www.scummvm.org/
 
+* Gergely Szasz: the 'movie' code and the ao sound driver (see `AUTHORS')
+
 * Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)
   gave the inspiration for an important rewrite of the Z80 core, and was
   also _very_ useful whilst trying to track down some bugs.

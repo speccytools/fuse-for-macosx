@@ -29,6 +29,7 @@ INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 noinst_LIBRARIES = libsound.a
 
 libsound_a_SOURCES = dxsound.c \
+		     aosound.c \
 		     hpsound.c \
 		     nullsound.c \
 		     osssound.c \

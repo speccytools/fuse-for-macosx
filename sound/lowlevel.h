@@ -33,6 +33,12 @@
 #define SOUND_SDL
 #define ALWAYS_USE_TIMER
 
+#elif defined USE_LIBAO	/* #if defined UI_SDL */
+
+#define HAVE_SOUND
+#define SOUND_AO
+#define ALWAYS_USE_TIMER
+
 #elif defined HAVE_SYS_SOUNDCARD_H	/* #if defined UI_SDL */
 
 #define HAVE_SOUND
