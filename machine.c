@@ -244,8 +244,7 @@ machine_select_machine( fuse_machine_info *machine )
     ui_menu_activate_media_disk( 0 );
   }
 
-  /* FIXME: put a capability in libspectrum for this */
-  if( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) {
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
     ui_menu_activate_media_cartridge( 1 );
     ui_menu_activate_media_cartridge_eject( 0 );
   } else {
