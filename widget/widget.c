@@ -441,6 +441,7 @@ int widget_options_finish( widget_finish_state finished )
   /* If we exited normally, actually set the options */
   if( finished == WIDGET_FINISHED_OK ) {
     error = settings_copy( &settings_current, &widget_options_settings );
+    settings_free( &widget_options_settings );
     if( error ) return error;
   }
 

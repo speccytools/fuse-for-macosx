@@ -44,7 +44,7 @@ typedef struct settings_info {
 
   /* Sound options */
 
-  const char *sound_device; /* Where to output sound */
+  char *sound_device;   /* Where to output sound */
   int sound;		/* Is sound enabled */
   int sound_load;	/* Is loading noise enabled? */
   int stereo_ay;	/* Stereo separation for AY channels? */
@@ -54,7 +54,7 @@ typedef struct settings_info {
 
   char *snapshot;
   char *tape_file;
-  const char *start_machine;
+  char *start_machine;
 
   char *record_file;
   char *playback_file;
@@ -71,5 +71,6 @@ extern settings_info settings_current;
 int settings_init( int argc, char **argv );
 int settings_defaults( settings_info *settings );
 int settings_copy( settings_info *dest, settings_info *src );
+int settings_free( settings_info *settings );
 
 #endif				/* #ifndef FUSE_SETTINGS_H */

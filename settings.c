@@ -104,7 +104,8 @@ int settings_defaults( settings_info *settings )
 
   settings->record_file = settings->playback_file = NULL;
 
-  settings->start_machine = "48";
+  settings->start_machine = strdup( "48" );
+  if( !settings->start_machine ) return 1;
 
   settings->svga_mode = 320;
 
@@ -168,8 +169,6 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
 
   node = node->xmlChildrenNode;
   while( node ) {
-
-    /* FIXME: memory leak on string settings */
 
     if( !strcmp( node->name, (const xmlChar*)"issue2" ) ) {
       settings->issue2 =
@@ -341,6 +340,9 @@ static int settings_command_line( int argc, char **argv,
 /* Copy one settings object to another */
 int settings_copy( settings_info *dest, settings_info *src )
 {
+  if( settings_defaults( dest ) ) return 1;
+  free( dest->start_machine ); dest->start_machine = NULL;
+
   dest->issue2        = src->issue2;
   dest->joy_kempston  = src->joy_kempston;
   dest->tape_traps    = src->tape_traps;
@@ -348,11 +350,39 @@ int settings_copy( settings_info *dest, settings_info *src )
 
   dest->rzx_compression = src->rzx_compression;
 
-  dest->sound_device  = src->sound_device;
+  dest->sound_device  = strdup( src->sound_device );
+  if( !dest->sound_device ) { settings_free( dest ); return 1; }
+
   dest->sound	      = src->sound;
   dest->sound_load    = src->sound_load;
   dest->stereo_ay     = src->stereo_ay;
   dest->stereo_beeper = src->stereo_beeper;
+
+  dest->snapshot      = src->snapshot;
+  if( !dest->snapshot ) { settings_free( dest ); return 1; }
+  dest->tape_file     = src->tape_file;
+  if( !dest->tape_file ) { settings_free( dest ); return 1; }
+  dest->start_machine = src->start_machine;
+  if( !dest->start_machine ) { settings_free( dest ); return 1; }
+  dest->record_file   = src->record_file;
+  if( !dest->record_file ) { settings_free( dest ); return 1; }
+  dest->playback_file = src->playback_file;
+  if( !dest->playback_file ) { settings_free( dest ); return 1; }
+
+  dest->svga_mode     = src->svga_mode;
+
+  return 0;
+}
+
+int
+settings_free( settings_info *settings )
+{
+  if( settings->sound_device ) free( settings->sound_device );
+  if( settings->snapshot ) free( settings->snapshot );
+  if( settings->tape_file ) free( settings->tape_file );
+  if( settings->start_machine ) free( settings->start_machine );
+  if( settings->record_file ) free( settings->record_file );
+  if( settings->playback_file ) free( settings->playback_file );
 
   return 0;
 }

@@ -60,12 +60,12 @@ int widget_$_->{name}_draw( void *data GCC_UNUSED )
   
   /* Get a copy of the current settings */
   error = settings_copy( &widget_options_settings, &settings_current );
-  if( error ) return error;
+  if( error ) { settings_free( &widget_options_settings ); return error; }
 
   /* Draw the dialog box */
   widget_dialog_with_border( 1, 2, 30, 2 + $count );
   error = widget_$_->{name}_show_all( &widget_options_settings );
-  if( error ) return error;
+  if( error ) { settings_free( &widget_options_settings ); return error; }
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 32 + $count * 8 );
