@@ -99,20 +99,20 @@ spec16_reset( void )
 			    machine_current->rom_length[0] );
   if( error ) return error;
 
-  memory_map[0] = &ROM[0][0x0000];
-  memory_map[1] = &ROM[0][0x2000];
-  memory_map[2] = &RAM[5][0x0000];
-  memory_map[3] = &RAM[5][0x2000];
-  memory_map[4] = empty_chunk;
-  memory_map[5] = empty_chunk;
-  memory_map[6] = empty_chunk;
-  memory_map[7] = empty_chunk;
+  memory_map[0].page = &ROM[0][0x0000];
+  memory_map[1].page = &ROM[0][0x2000];
+  memory_map[2].page = &RAM[5][0x0000];
+  memory_map[3].page = &RAM[5][0x2000];
+  memory_map[4].page = empty_chunk;
+  memory_map[5].page = empty_chunk;
+  memory_map[6].page = empty_chunk;
+  memory_map[7].page = empty_chunk;
 
-  for( i = 0; i < 8; i++ ) memory_writable[i] = 0;
-  memory_writable[2] = memory_writable[3] = 1;
+  for( i = 0; i < 8; i++ ) memory_map[i].writable = 0;
+  memory_map[2].writable = memory_map[3].writable = 1;
 
-  for( i = 0; i < 8; i++ ) memory_contended[i] = 0;
-  memory_contended[2] = memory_contended[3] = 1;
+  for( i = 0; i < 8; i++ ) memory_map[i].contended = 0;
+  memory_map[2].contended = memory_map[3].contended = 1;
 
   memory_screen_chunk1 = RAM[5];
   memory_screen_chunk2 = NULL;

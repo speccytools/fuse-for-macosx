@@ -78,15 +78,15 @@ void z80_do_opcodes()
       if( machine_current->ram.current_rom == 1 &&
 	  PC >= 16384 ) {
 	trdos_active = 0;
-	memory_map[0] = &ROM[ machine_current->ram.current_rom ][0x0000];
-	memory_map[1] = &ROM[ machine_current->ram.current_rom ][0x2000];
+	memory_map[0].page = &ROM[ machine_current->ram.current_rom ][0x0000];
+	memory_map[1].page = &ROM[ machine_current->ram.current_rom ][0x2000];
       }
     } else if( trdos_available && 
 	       ( PC & 0xff00 ) == 0x3d00 &&
 	       machine_current->ram.current_rom == 1 ) {
       trdos_active = 1;
-      memory_map[0] = &ROM[2][0x0000];
-      memory_map[1] = &ROM[2][0x2000];
+      memory_map[0].page = &ROM[2][0x0000];
+      memory_map[1].page = &ROM[2][0x2000];
     }
 
     /* Do the instruction fetch; readbyte_internal used here to avoid

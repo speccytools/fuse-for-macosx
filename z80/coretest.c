@@ -326,7 +326,7 @@ int rzx_instructions_offset;
 enum debugger_mode_t debugger_mode;
 
 libspectrum_byte **ROM = NULL;
-libspectrum_byte *memory_map[8];
+memory_page memory_map[8];
 int memory_contended[8] = { 1 };
 libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 
@@ -366,7 +366,7 @@ init_dummies( void )
 {
   size_t i;
 
-  for( i = 0; i < 8; i++ ) memory_map[i] = &memory[ i * 0x2000 ];
+  for( i = 0; i < 8; i++ ) memory_map[i].page = &memory[ i * 0x2000 ];
 
   debugger_mode = DEBUGGER_MODE_INACTIVE;
   dummy_machine.ram.current_rom = 0;

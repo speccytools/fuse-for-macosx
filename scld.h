@@ -26,6 +26,10 @@
 #ifndef FUSE_SCLD_H
 #define FUSE_SCLD_H
 
+#ifndef FUSE_MEMORY_H
+#include "memory.h"
+#endif				/* #ifndef FUSE_MEMORY_H */
+
 #define STANDARD        0x00 /* standard Spectrum */
 #define ALTDFILE        0x01 /* the same in nature as above, but using second
                                 display file */
@@ -115,17 +119,11 @@ extern libspectrum_byte scld_last_hsr; /* Last byte sent to Timex HSR port */
 
 extern libspectrum_byte timex_fake_bank[ 8192 ];
 
-typedef struct timex_mem {
-  libspectrum_byte *page;
-  libspectrum_byte writeable;	/* 1 - chunk writeable, 0 - chunk read only */
-  libspectrum_byte allocated;	/* Did we malloc this block? */
-} timex_mem;
-
-extern timex_mem timex_exrom_dock[8];
-extern timex_mem timex_exrom[8];
-extern timex_mem timex_dock[8];
-extern timex_mem timex_home[8];
-extern timex_mem timex_memory[8];
+extern memory_page timex_exrom_dock[8];
+extern memory_page timex_exrom[8];
+extern memory_page timex_dock[8];
+extern memory_page timex_home[8];
+extern memory_page timex_memory[8];
 
 void scld_reset( void );
 void scld_dec_write( libspectrum_word port, libspectrum_byte b );

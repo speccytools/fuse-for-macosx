@@ -273,7 +273,7 @@ specplus3_plus2a_common_reset()
   machine_current->ram.special=0;
 
   error = normal_memory_map( 0, 0 ); if( error ) return error;
-  for( i = 2; i < 8; i++ ) memory_writable[i] = 1;
+  for( i = 2; i < 8; i++ ) memory_map[i].writable = 1;
 
   memory_screen_chunk1 = RAM[5];
   memory_screen_chunk2 = NULL;
@@ -285,22 +285,22 @@ specplus3_plus2a_common_reset()
 static int
 normal_memory_map( int rom, int page )
 {
-  memory_map[0] = &ROM[  rom ][0x0000];
-  memory_map[1] = &ROM[  rom ][0x2000];
-  memory_map[2] = &RAM[    5 ][0x0000];
-  memory_map[3] = &RAM[    5 ][0x2000];
-  memory_map[4] = &RAM[    2 ][0x0000];
-  memory_map[5] = &RAM[    2 ][0x2000];
-  memory_map[6] = &RAM[ page ][0x0000];
-  memory_map[7] = &RAM[ page ][0x2000];
+  memory_map[0].page = &ROM[  rom ][0x0000];
+  memory_map[1].page = &ROM[  rom ][0x2000];
+  memory_map[2].page = &RAM[    5 ][0x0000];
+  memory_map[3].page = &RAM[    5 ][0x2000];
+  memory_map[4].page = &RAM[    2 ][0x0000];
+  memory_map[5].page = &RAM[    2 ][0x2000];
+  memory_map[6].page = &RAM[ page ][0x0000];
+  memory_map[7].page = &RAM[ page ][0x2000];
 
-  memory_writable[0] = memory_writable[1] = 0;
+  memory_map[0].writable = memory_map[1].writable = 0;
 
-  memory_contended[0] = memory_contended[1] = 0;
-  memory_contended[2] = memory_contended[3] = 1;
-  memory_contended[4] = memory_contended[5] = 0;
+  memory_map[0].contended = memory_map[1].contended = 0;
+  memory_map[2].contended = memory_map[3].contended = 1;
+  memory_map[4].contended = memory_map[5].contended = 0;
   /* Pages 4, 5, 6 and 7 contended */
-  memory_contended[6] = memory_contended[7] = page & 0x04;
+  memory_map[6].contended = memory_map[7].contended = page & 0x04;
 
   return 0;
 }
@@ -323,22 +323,22 @@ special_memory_map( int which )
 static int
 select_special_map( int page1, int page2, int page3, int page4 )
 {
-  memory_map[0] = &RAM[ page1 ][0x0000];
-  memory_map[1] = &RAM[ page1 ][0x0000];
-  memory_map[2] = &RAM[ page2 ][0x0000];
-  memory_map[3] = &RAM[ page2 ][0x0000];
-  memory_map[4] = &RAM[ page3 ][0x0000];
-  memory_map[5] = &RAM[ page3 ][0x0000];
-  memory_map[6] = &RAM[ page4 ][0x0000];
-  memory_map[7] = &RAM[ page4 ][0x0000];
+  memory_map[0].page = &RAM[ page1 ][0x0000];
+  memory_map[1].page = &RAM[ page1 ][0x0000];
+  memory_map[2].page = &RAM[ page2 ][0x0000];
+  memory_map[3].page = &RAM[ page2 ][0x0000];
+  memory_map[4].page = &RAM[ page3 ][0x0000];
+  memory_map[5].page = &RAM[ page3 ][0x0000];
+  memory_map[6].page = &RAM[ page4 ][0x0000];
+  memory_map[7].page = &RAM[ page4 ][0x0000];
 
-  memory_writable[0] = memory_writable[1] = 1;
+  memory_map[0].writable = memory_map[1].writable = 1;
 
   /* Pages 4, 5, 6 and 7 contended */
-  memory_contended[0] = memory_contended[1] = page1 & 0x04;
-  memory_contended[2] = memory_contended[3] = page2 & 0x04;
-  memory_contended[4] = memory_contended[5] = page3 & 0x04;
-  memory_contended[5] = memory_contended[7] = page4 & 0x04;
+  memory_map[0].contended = memory_map[1].contended = page1 & 0x04;
+  memory_map[2].contended = memory_map[3].contended = page2 & 0x04;
+  memory_map[4].contended = memory_map[5].contended = page3 & 0x04;
+  memory_map[6].contended = memory_map[7].contended = page4 & 0x04;
 
   return 0;
 }
@@ -359,14 +359,14 @@ specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
 
   if( !machine_current->ram.special ) {
 
-    memory_map[0] = &ROM[ rom ][0x0000];
-    memory_map[1] = &ROM[ rom ][0x2000];
+    memory_map[0].page = &ROM[ rom ][0x0000];
+    memory_map[1].page = &ROM[ rom ][0x2000];
 
-    memory_map[6] = &RAM[ page ][0x0000];
-    memory_map[7] = &RAM[ page ][0x2000];
+    memory_map[6].page = &RAM[ page ][0x0000];
+    memory_map[7].page = &RAM[ page ][0x2000];
 
     /* Pages 4, 5, 6 and 7 are contended */
-    memory_contended[6] = memory_contended[7] = page & 0x04;
+    memory_map[6].contended = memory_map[7].contended = page & 0x04;
   }
 
   memory_screen_chunk1 = RAM[ screen ];

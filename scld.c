@@ -44,10 +44,10 @@ libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 
 libspectrum_byte timex_fake_bank[0x2000];
 
-timex_mem timex_exrom_dock[8];
-timex_mem timex_exrom[8];
-timex_mem timex_dock[8];
-timex_mem timex_home[8];
+memory_page timex_exrom_dock[8];
+memory_page timex_exrom[8];
+memory_page timex_dock[8];
+memory_page timex_home[8];
 
 libspectrum_byte
 scld_dec_read( libspectrum_word port GCC_UNUSED )
@@ -109,25 +109,10 @@ scld_hsr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   scld_last_hsr = b;
 
   if( libspectrum_machine_capabilities( machine_current->machine ) &
-      LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
+      LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK )
+    for( i = 0; i < 8; i++ )
+      memory_map[i] = ( b & ( 1 << i ) ) ? timex_exrom_dock[i] : timex_home[i];
 
-    for( i = 0; i < 8; i++ ) {
-
-      if( b & ( 1 << i ) ) {
-
-	memory_map[i] = timex_exrom_dock[i].page;
-	memory_writable[i] = timex_exrom_dock[i].writeable;
-	memory_contended[i] = 0;
-
-      } else {
-
-	memory_map[i] = timex_home[i].page;
-	memory_writable[i] = timex_home[i].writeable;
-	memory_contended[i] = ( i == 2 || i == 3 );
-
-      }
-    }
-  }
 }
 
 libspectrum_byte

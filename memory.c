@@ -31,17 +31,12 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "memory.h"
 #include "settings.h"
 #include "spectrum.h"
 
-/* A pointer to each 8Kb chunk accessible by the Z80 */
-libspectrum_byte *memory_map[8];
-
-/* Is each 8Kb chunk writable? */
-int memory_writable[8];
-
-/* Is each 8Kb subject to memory contention? */
-int memory_contended[8];
+/* Each 8Kb RAM chunk accessible by the Z80 */
+memory_page memory_map[8];
 
 /* The base address of the chunks containing the screen */
 libspectrum_byte *memory_screen_chunk1, *memory_screen_chunk2;
@@ -61,10 +56,10 @@ readbyte( libspectrum_word address )
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
-  if( memory_contended[ bank ] ) tstates += spectrum_contention[ tstates ];
+  if( memory_map[ bank ].contended ) tstates += spectrum_contention[ tstates ];
   tstates += 3;
 
-  return memory_map[ bank ][ address & 0x1fff ];
+  return memory_map[ bank ].page[ address & 0x1fff ];
 }
 
 void
@@ -74,16 +69,16 @@ writebyte( libspectrum_word address, libspectrum_byte b )
   libspectrum_byte *memory;
 
   bank = address >> 13; offset = address & 0x1fff;
-  memory = memory_map[ bank ];
+  memory = memory_map[ bank ].page;
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
-  if( memory_contended[ bank ] ) tstates += spectrum_contention[ tstates ];
+  if( memory_map[ bank ].contended ) tstates += spectrum_contention[ tstates ];
   tstates += 3;
 
-  if( memory_writable[ bank ] || settings_current.writable_roms ) {
+  if( memory_map[ bank ].writable || settings_current.writable_roms ) {
 
     if( ( memory == memory_screen_chunk1 || memory == memory_screen_chunk2 ) &&
 	offset < memory_screen_top &&
@@ -101,9 +96,9 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   libspectrum_byte *memory;
 
   bank = address >> 13; offset = address & 0x1fff;
-  memory = memory_map[ bank ];
+  memory = memory_map[ bank ].page;
 
-  if( memory_writable[ bank ] || settings_current.writable_roms ) {
+  if( memory_map[ bank ].writable || settings_current.writable_roms ) {
 
     if( ( memory == memory_screen_chunk1 || memory == memory_screen_chunk2 ) &&
 	offset < memory_screen_top &&

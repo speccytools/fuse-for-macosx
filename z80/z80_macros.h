@@ -99,7 +99,7 @@
 /* Get the appropriate contended memory delay. Use this macro later
    to avoid a function call if memory contention is disabled */
 #define contend(address,time) \
-  if( memory_contended[ (address) >> 13 ] ) \
+  if( memory_map[ (address) >> 13 ].contended ) \
     tstates += spectrum_contention[ tstates ]; \
   tstates += (time);
 

@@ -173,11 +173,11 @@ pentagon_memoryport_write( libspectrum_word port GCC_UNUSED,
   screen = ( b & 0x08 ) ? 7 : 5;
   rom = ( b & 0x10 ) >> 4;
 
-  memory_map[0] = &ROM[ rom ][0x0000];
-  memory_map[1] = &ROM[ rom ][0x2000];
+  memory_map[0].page = &ROM[ rom ][0x0000];
+  memory_map[1].page = &ROM[ rom ][0x2000];
 
-  memory_map[6] = &RAM[ page ][0x0000];
-  memory_map[7] = &RAM[ page ][0x2000];
+  memory_map[6].page = &RAM[ page ][0x0000];
+  memory_map[7].page = &RAM[ page ][0x2000];
 
   memory_screen_chunk1 = RAM[ screen ];
 

@@ -86,7 +86,7 @@ dck_read( const char *filename )
   int error;
 
   int i;
-  timex_mem *mem;
+  memory_page *mem;
 
   if ( !( libspectrum_machine_capabilities( machine_current->machine ) &
 	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
@@ -136,7 +136,7 @@ dck_read( const char *filename )
       case LIBSPECTRUM_DCK_PAGE_ROM:
         mem[i].page = dck->dck[num_block]->pages[i];
         mem[i].allocated = 1;
-        mem[i].writeable = 0;
+        mem[i].writable = 0;
         break;
 
       case LIBSPECTRUM_DCK_PAGE_RAM_EMPTY:
@@ -150,7 +150,7 @@ dck_read( const char *filename )
         } else {
           mem[i].page = dck->dck[num_block]->pages[i];
           mem[i].allocated = 1;
-          mem[i].writeable = 1;
+          mem[i].writable = 1;
         }
 
         break;

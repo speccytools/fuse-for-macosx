@@ -232,15 +232,25 @@ tc2068_dock_exrom_reset( void )
   timex_home[6].page = RAM[0];
   timex_home[7].page = RAM[0] + 0x2000;
 
-  timex_home[0].writeable = timex_home[1].writeable = 0;
-  for( i = 2; i < 8; i++ ) timex_home[i].writeable = 1;
+  timex_home[0].writable = timex_home[1].writable = 0;
+  for( i = 2; i < 8; i++ ) timex_home[i].writable = 1;
   for( i = 0; i < 8; i++ ) timex_home[i].allocated = 0;
-  for( i = 0; i < 8; i++ ) timex_dock[i].writeable = 0;
-  for( i = 0; i < 8; i++ ) timex_dock[i].page = timex_fake_bank;
-  for( i = 0; i < 8; i++ ) timex_dock[i].allocated = 0;
-  for( i = 0; i < 8; i++ ) timex_exrom[i].page = ROM[1];
-  for( i = 0; i < 8; i++ ) timex_exrom[i].writeable = 0;
-  for( i = 0; i < 8; i++ ) timex_exrom[i].allocated = 0;
+  for( i = 0; i < 8; i++ ) timex_home[i].contended = 0;
+  timex_home[2].contended = timex_home[3].contended = 1;
+
+  for( i = 0; i < 8; i++ ) {
+
+    timex_dock[i].page = timex_fake_bank;
+    timex_dock[i].writable = 0;
+    timex_dock[i].allocated = 0;
+    timex_dock[i].contended = 0;
+
+    timex_exrom[i].page = ROM[1];
+    timex_exrom[i].writable = 0;
+    timex_exrom[i].allocated = 0;
+    timex_exrom[i].contended = 0;
+
+  }
 
   if( settings_current.dck_file ) {
     error = dck_read( settings_current.dck_file ); if( error ) return error;

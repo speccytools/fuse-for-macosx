@@ -29,16 +29,24 @@
 
 #include <libspectrum.h>
 
-extern libspectrum_byte *memory_map[8];
-extern int memory_writable[8];
-extern int memory_contended[8];
+typedef struct memory_page {
+
+  libspectrum_byte *page;	/* The data for this page */
+  int writable;			/* Can we write to this data? */
+  int contended;		/* Are reads/writes to this page contended? */
+  int allocated;		/* Do we own the memory for this page? */
+
+} memory_page;
+
+extern memory_page memory_map[8];
+
 extern libspectrum_byte *memory_screen_chunk1, *memory_screen_chunk2;
 extern libspectrum_word memory_screen_top;
 
 libspectrum_byte readbyte( libspectrum_word address );
 
 #define readbyte_internal( address ) \
-  memory_map[ (address) >> 13 ][ (address) & 0x1fff ]
+  memory_map[ (address) >> 13 ].page[ (address) & 0x1fff ]
 
 void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );
