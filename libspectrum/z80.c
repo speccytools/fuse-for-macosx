@@ -300,16 +300,30 @@ static int read_v1_block( uchar *buffer, int is_compressed,
 
       switch( state ) {
       case 0:
-	if( *ptr++ == 0x00 ) state=1;
+	switch( *ptr++ ) {
+	case 0x00: state = 1; break;
+	  default: state = 0; break;
+	}
 	break;
       case 1:
-	if( *ptr++ == 0xed ) state=2; else state=0;
+	switch( *ptr++ ) {
+	case 0x00: state = 1; break;
+	case 0xed: state = 2; break;
+	  default: state = 0; break;
+	}
 	break;
       case 2:
-	if( *ptr++ == 0xed ) state=3; else state=0;
+	switch( *ptr++ ) {
+	case 0x00: state = 1; break;
+	case 0xed: state = 3; break;
+	  default: state = 0; break;
+	}
 	break;
       case 3:
-	if( *ptr++ == 0x00 ) state=4; else state=0;
+	switch( *ptr++ ) {
+	case 0x00: state = 4; break;
+	  default: state = 0; break;
+	}
 	break;
       default:
 	return LIBSPECTRUM_ERROR_LOGIC;
