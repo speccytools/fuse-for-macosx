@@ -46,7 +46,7 @@ ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
-	machine.h osssound.h settings.h snapshot.h sound.h spec128.h\
+	machine.h osssound.h rzx.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h\
 	tape.h timer.h types.h utils.h\
 	joystick.h printer.h
