@@ -234,12 +234,14 @@ ui_joystick_init( void )
   return 0;
 }
 
-void ui_joystick_end( void ) { }
-
-libspectrum_byte
-ui_joystick_read(libspectrum_word port, libspectrum_byte which)
+void
+ui_joystick_end( void )
 {
-  return joystick_default_read( port, which );
+}
+
+void
+ui_joystick_poll( void )
+{
 }
 
 #endif			/* #if defined USE_JOYSTICK && defined HAVE_JSW_H */

@@ -667,3 +667,5 @@
 	 (Stuart Brady).
 20040325 event.c,ui/uijoystick.[ch]: make the libjsw code use the new
 	 input layer.
+20040325 ui/uijoystick.c: fix up the 'no joystick' code for the new input
+	 layer.
