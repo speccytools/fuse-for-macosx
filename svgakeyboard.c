@@ -72,7 +72,7 @@ int svgakeyboard_keypress(int keysym)
 
   if( ptr ) {
 
-    if( widget_active ) {
+    if( widget_level >= 0 ) {
       widget_keyhandler( ptr->key1 );
     } else {
       if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
@@ -82,11 +82,15 @@ int svgakeyboard_keypress(int keysym)
     return 0;
   }
 
-  if(widget_active)
-    return 0;
+  if( widget_level >= 0 ) return 0;
 
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
+  case SCANCODE_F1:
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_MAINMENU );
+    fuse_emulation_unpause();
+    break;
   case SCANCODE_F2:
     fuse_emulation_pause();
     snapshot_write( "snapshot.z80" );
@@ -94,16 +98,16 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F3:
     fuse_emulation_pause();
-    filename = widget_selectfile();
-    if( filename ) {
-      snapshot_read( filename );
+    widget_do( WIDGET_TYPE_FILESELECTOR );
+    if( widget_filesel_name ) {
+      snapshot_read( widget_filesel_name );
       display_refresh_all();
     }
     fuse_emulation_unpause();
     break;
   case SCANCODE_F4:
     fuse_emulation_pause();
-    widget_options();
+    widget_do( WIDGET_TYPE_OPTIONS );
     fuse_emulation_unpause();
     break;
   case SCANCODE_F5:
@@ -116,9 +120,9 @@ int svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F7:
     fuse_emulation_pause();
-    filename = widget_selectfile();
-    if( filename ) {
-      tape_open( filename );
+    widget_do( WIDGET_TYPE_FILESELECTOR );
+    if( widget_filesel_name ) {
+      tape_open( widget_filesel_name );
       display_refresh_all();
     }
     fuse_emulation_unpause();
