@@ -26,10 +26,10 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libspectrum.a
 
-libspectrum_a_SOURCES = libspectrum.c sna.c tape.c z80.c
+libspectrum_a_SOURCES = libspectrum.c sna.c tap.c tape.c z80.c
 
 noinst_HEADERS = libspectrum.h tape.h
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
-LDADD = @GLIB_LIBS@ @GTK_LIBS@
+
 

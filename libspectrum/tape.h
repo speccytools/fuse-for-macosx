@@ -35,6 +35,8 @@
 #include "libspectrum.h"
 #endif			/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
+/*** Generic tape routines ***/
+
 /* The various types of block available */
 typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_ROM,
@@ -84,6 +86,14 @@ const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC2 =  735; /* Sync 2 */
 const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA0 =  855; /* Reset */
 const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA1 = 1710; /* Set */
 
+/* The number of pilot pulses for the standard ROM loader
+   NB: These disagree with the .tzx specification (they're one less), but
+       are correct. Entering the loop at #04D8 in the 48K ROM with HL == #0001
+       will produce the first sync pulse, not a pilot pulse.
+*/
+const size_t LIBSPECTRUM_TAPE_PILOTS_HEADER = 0x1f7f;
+const size_t LIBSPECTRUM_TAPE_PILOTS_DATA   = 0x0c97;
+
 /* A generic tape block */
 typedef struct libspectrum_tape_block {
 
@@ -95,6 +105,7 @@ typedef struct libspectrum_tape_block {
 
 } libspectrum_tape_block;
 
+/* A linked list of tape blocks */
 typedef struct libspectrum_tape {
 
   /* All the blocks */
@@ -104,5 +115,23 @@ typedef struct libspectrum_tape {
   GSList* current_block;
 
 } libspectrum_tape;
+
+/* Routines to manipulate tape blocks */
+
+libspectrum_error
+libspectrum_tape_free( libspectrum_tape *tape );
+
+libspectrum_error
+libspectrum_tape_init_block( libspectrum_tape_block *block );
+
+libspectrum_error
+libspectrum_tape_get_next_edge( libspectrum_tape *tape,
+				libspectrum_dword *tstates );
+
+/*** Routines for .tap format files ***/
+
+libspectrum_error
+libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
+			const size_t length );
 
 #endif				/* #ifndef LIBSPECTRUM_TAPE_H */

@@ -26,12 +26,79 @@
 
 #include "tape.h"
 
-/* Local function prototypes */
+/*** Local function prototypes ***/
+
+/* Free the memory used by a block */
+static void
+block_free( gpointer data, gpointer user_data );
+
+/* Functions to initialise block types */
+
+/* Standard ROM loader */
+static libspectrum_error
+rom_init( libspectrum_tape_rom_block *block );
+
+/* Functions to get the next edge */
+
+/* Standard ROM loader */
 static libspectrum_error
 rom_edge( libspectrum_tape_rom_block *block, libspectrum_dword *tstates,
 	  int *end_of_block );
 static libspectrum_error
 rom_next_bit( libspectrum_tape_rom_block *block );
+
+/*** Function definitions ****/
+
+/* Free up a list of blocks */
+libspectrum_error
+libspectrum_tape_free( libspectrum_tape *tape )
+{
+  g_slist_foreach( tape->blocks, block_free, NULL );
+  g_slist_free( tape->blocks );
+  tape->blocks = NULL;
+  
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+/* Free the memory used by one block */
+static void
+block_free( gpointer data, gpointer user_data )
+{
+  libspectrum_tape_block *block = (libspectrum_tape_block*)data;
+
+  switch( block->type ) {
+  case LIBSPECTRUM_TAPE_BLOCK_ROM:
+    free( block->types.rom.data );
+    break;
+  }
+}
+
+/* Called when a new block is started to initialise its internal state */
+libspectrum_error
+libspectrum_tape_init_block( libspectrum_tape_block *block )
+{
+  switch( block->type ) {
+  case LIBSPECTRUM_TAPE_BLOCK_ROM:
+    return rom_init( &(block->types.rom) );
+  default:
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+}
+
+static libspectrum_error
+rom_init( libspectrum_tape_rom_block *block )
+{
+  /* Initialise the number of pilot pulses */
+  block->edge_count = block->data[0] & 0x80         ?
+                      LIBSPECTRUM_TAPE_PILOTS_DATA  :
+                      LIBSPECTRUM_TAPE_PILOTS_HEADER;
+
+  /* And that we're just before the start of the data */
+  block->bytes_through_block = -1; block->bits_through_byte = 7;
+  block->state = LIBSPECTRUM_TAPE_STATE_PILOT;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
 
 /* The main function: called with a tape object and returns the number of
    t-states until the next edge (or LIBSPECTRUM_TAPE_END if that was the
@@ -40,6 +107,8 @@ libspectrum_error
 libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 				libspectrum_dword *tstates )
 {
+  int error;
+
   libspectrum_tape_block *block =
     (libspectrum_tape_block*)tape->current_block->data;
 
@@ -48,9 +117,10 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
-    return rom_edge( &(block->types.rom), tstates, &end_of_block );
+    error = rom_edge( &(block->types.rom), tstates, &end_of_block );
+    if( error ) return error;
   default:
-    tstates = 0;
+    *tstates = 0;
     return LIBSPECTRUM_ERROR_UNKNOWN;
   }
 
@@ -58,7 +128,12 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
      FIXME: End of tape! */
   if( end_of_block ) {
     tape->current_block = tape->current_block->next;
+    block = (libspectrum_tape_block*)tape->current_block->data;
+    error = libspectrum_tape_init_block( block );
+    if( error ) return error;
   }
+
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 static libspectrum_error
