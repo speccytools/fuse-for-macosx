@@ -4,13 +4,13 @@ Fuse has been brought to you by:
   replacement code, some work on the sound code and the original
   `widget' code.
 
-* Russell Marks: the generic and OSS-specific sound code, the man page
-  and the Kempston joystick emulation.
+* Russell Marks: the generic and OSS-specific sound code, the man page,
+  the Kempston joystick emulation and lots of bug reports and fixes.
 
 * Ian Collier: the original ZX Printer emulation (for xz80).
 
-* Darren Salt: the original version of the SLT support code, and the
-  original MITSHM code (for the Xlib UI).
+* Darren Salt: the original versions of the +3 emulation, the SLT and
+  the MITSHM code (for the Xlib UI).
 
 * Alexander Yurchenko: the OpenBSD/Solaris-specific sound code.
 

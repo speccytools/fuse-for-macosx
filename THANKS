@@ -9,6 +9,9 @@ Some thanks (in alphabetical order):
   was very helpful for getting the z80 opcodes right; also the ZX Printer
   emulation is based on xz80's.
 
+* John Elliott: for lib765, which provides Fuse's emulation of the +3's
+  FDC: see http://www.seasip.demon.co.uk/Unix/LibDsk/
+
 * Ian Greenway: for information about reading from unattached ports. If
   you've got an Amiga, you may well like to check out Ian's Spectrum
   Emulator, ASp: http://www.greew.freeserve.co.uk/ASp.html
