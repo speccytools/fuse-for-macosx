@@ -96,6 +96,10 @@ int ui_init(int *argc, char ***argv, int width, int height)
     return 1;
   }
 
+  /* Set up our error handler */
+  xerror_expecting = xerror_error = 0;
+  XSetErrorHandler( xerror_handler );
+
   xui_screenNum=DefaultScreen(display);
 
   /* Create the main window */

@@ -26,6 +26,6 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuixlib.a
 
-libuixlib_a_SOURCES = xdisplay.c xkeyboard.c xui.c
+libuixlib_a_SOURCES = xdisplay.c xerror.c xkeyboard.c xui.c
 
 noinst_HEADERS = xdisplay.h xkeyboard.h xui.h

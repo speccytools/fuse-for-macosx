@@ -30,4 +30,13 @@
 int xdisplay_configure_notify(int width, int height);
 void xdisplay_area(int x, int y, int width, int height);
 
+/* Are we expecting an X error to occur? */
+extern int xerror_expecting;
+
+/* Which error occured? */
+extern int xerror_error;
+
+/* The X error handler */
+int xerror_handler( Display *display, XErrorEvent *error );
+
 #endif			/* #ifndef FUSE_XDISPLAY_H */
