@@ -36,6 +36,25 @@ extern widget_keyhandler_fn widget_keyhandler;
 int widget_init( void );
 int widget_end( void );
 
+int widget_timer_init( void );
+int widget_timer_end( void );
+
+void widget_rectangle( int x, int y, int w, int h, int col );
+void widget_printstring( int x, int y, int col, char *s );
+
+/* Two ways of finishing a widget */
+typedef enum widget_finish_state {
+  WIDGET_FINISHED_OK = 1,
+  WIDGET_FINISHED_CANCEL,
+} widget_finish_state;
+
+extern widget_finish_state widget_finished;;
+
+/* File selector */
+
 const char* widget_selectfile(void);
+
+struct dirent **widget_filenames;
+size_t widget_numfiles;
 
 #endif				/* #ifndef FUSE_WIDGET_H */
