@@ -49,8 +49,11 @@ void yyerror( char *s );
 %union {
 
   int integer;
+  debugger_breakpoint_type bptype;
 
 }
+
+/* Tokens as returned from the Flex scanner (commandl.l) */
 
 %token		 BASE
 %token		 BREAK
@@ -76,6 +79,12 @@ void yyerror( char *s );
 
 %token		 ERROR
 
+/* Derived types */
+
+%type  <bptype>  breakpointtype
+%type  <bptype>  portbreakpointtype
+%type  <integer> numberorpc
+
 %%
 
 input:	 /* empty */
@@ -83,51 +92,18 @@ input:	 /* empty */
 ;
 
 command:   BASE NUMBER { debugger_output_base = $2; }
-	 | BREAK    { debugger_breakpoint_add(
-			DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC, 0,
-			DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-		      );
-		    }
-	 | BREAK NUMBER { debugger_breakpoint_add( 
-			    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, $2, 0,
-			    DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-			  );
-			}
-	 | BREAK PORT READ NUMBER {
+	 | BREAK breakpointtype numberorpc {
              debugger_breakpoint_add(
-               DEBUGGER_BREAKPOINT_TYPE_PORT_READ, $4, 0,
-               DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-	     );
-           }
-	 | BREAK PORT WRITE NUMBER {
-             debugger_breakpoint_add(
-	       DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, $4, 0,
-	       DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+	       $2, $3, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT
 	     );
 	   }
-	 | BREAK READ { debugger_breakpoint_add(
-			  DEBUGGER_BREAKPOINT_TYPE_READ, PC, 0,
-			  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-			);
-		      }
-	 | BREAK READ NUMBER { debugger_breakpoint_add(
-				 DEBUGGER_BREAKPOINT_TYPE_READ, $3, 0,
-				 DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-			       );
-			     }
+	 | BREAK PORT portbreakpointtype NUMBER {
+             debugger_breakpoint_add(
+               $3, $4, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT
+	     );
+           }
 	 | BREAK SHOW { debugger_breakpoint_show(); }
-	 | BREAK WRITE { debugger_breakpoint_add(
-			   DEBUGGER_BREAKPOINT_TYPE_WRITE, PC, 0,
-			   DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-			 );
-		       }
-	 | BREAK WRITE NUMBER { debugger_breakpoint_add(
-				  DEBUGGER_BREAKPOINT_TYPE_WRITE, $3, 0,
-				  DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-				);
-			      }
-	 | CLEAR { debugger_breakpoint_clear( PC ); }
-	 | CLEAR NUMBER { debugger_breakpoint_clear( $2 ); }
+	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONTINUE { debugger_run(); }
 	 | DELETE { debugger_breakpoint_remove_all(); }
 	 | DELETE NUMBER { debugger_breakpoint_remove( $2 ); }
@@ -140,5 +116,15 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;
+
+breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
+	        | READ        { $$ = DEBUGGER_BREAKPOINT_TYPE_READ; }
+                | WRITE       { $$ = DEBUGGER_BREAKPOINT_TYPE_WRITE; }
+
+portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
+		    | WRITE { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE; }
+
+numberorpc:   /* empty */ { $$ = PC; }
+            | NUMBER	  { $$ = $1; }
 
 %%

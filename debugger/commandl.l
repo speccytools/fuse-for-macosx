@@ -30,9 +30,10 @@
 
 #include <ctype.h>
 
-#include "commandy.h"
 #include "debugger.h"
 #include "debugger_internals.h"
+
+#include "commandy.h"
 
 #define YY_INPUT(buf,result,max_size) \
 { \
