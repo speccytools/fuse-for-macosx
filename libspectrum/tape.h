@@ -64,6 +64,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_HARDWARE,
 
   LIBSPECTRUM_TAPE_BLOCK_CUSTOM = 0x35,
+
+  LIBSPECTRUM_TAPE_BLOCK_CONCAT = 0x5a,
 } libspectrum_tape_type;
 
 /* The states which a block can be in */
@@ -273,6 +275,8 @@ typedef struct libspectrum_tape_custom_block {
   size_t length; libspectrum_byte *data;
 
 } libspectrum_tape_custom_block;
+
+/* No block needed for concatenation block, as it isn't stored */
 
 /* A generic tape block */
 typedef struct libspectrum_tape_block {

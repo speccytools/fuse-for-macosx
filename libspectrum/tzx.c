@@ -79,6 +79,8 @@ tzx_read_hardware( libspectrum_tape *tape, const libspectrum_byte **ptr,
 static libspectrum_error
 tzx_read_custom( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		 const libspectrum_byte *end );
+static libspectrum_error
+tzx_read_concat( const libspectrum_byte **ptr, const libspectrum_byte *end );
 
 static libspectrum_error
 tzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
@@ -244,6 +246,11 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 
     case LIBSPECTRUM_TAPE_BLOCK_CUSTOM:
       error = tzx_read_custom( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_CONCAT:
+      error = tzx_read_concat( &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -1008,6 +1015,26 @@ tzx_read_custom( libspectrum_tape *tape, const libspectrum_byte **ptr,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+/* Concatenation block: just skip it entirely as it serves no useful
+   purpose */
+static libspectrum_error
+tzx_read_concat( const libspectrum_byte **ptr, const libspectrum_byte *end )
+{
+  /* Check there's enough data left; the -1 here is because we've already
+     read the first byte of the signature as the block ID */
+  if( end - (*ptr) < strlen( signature ) + 2 - 1 ) {
+    libspectrum_print_error(
+      "tzx_read_concat: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Skip the data */
+  (*ptr) += strlen( signature ) + 2 - 1;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+  
 static libspectrum_error
 tzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
 	       size_t *length, int bytes, libspectrum_byte **data )
