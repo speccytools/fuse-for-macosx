@@ -214,8 +214,6 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   IFF1 = snap->iff1; IFF2 = snap->iff2; IM = snap->im;
 
-  fprintf( stderr, "%u\n", (unsigned)snap->im );
-
   spectrum_ula_write( 0x00fe, snap->out_ula );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
