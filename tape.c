@@ -82,7 +82,7 @@ int tape_open( const char *filename )
 {
   unsigned char *buffer; size_t length;
 
-  int error;
+  int error; libspectrum_error_function_t old_error_fn;
 
   /* Get the file's data */
   error = utils_read_file( filename, &buffer, &length );
@@ -97,10 +97,17 @@ int tape_open( const char *filename )
   /* First, try opening the file as a .tzx file; if we get back an
      error saying it didn't have the .tzx signature, then try opening
      it as a .tap file */
+
+  /* Temporarily ignore signature errors */
+  old_error_fn = libspectrum_error_function;
+  libspectrum_error_function = ui_libspectrum_error_ignore_sig;
+
   error = libspectrum_tzx_read( tape, buffer, length );
   if( error == LIBSPECTRUM_ERROR_SIGNATURE ) {
     error = libspectrum_tap_read( tape, buffer, length );
   }
+
+  libspectrum_error_function = old_error_fn;
 
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     tape_close();

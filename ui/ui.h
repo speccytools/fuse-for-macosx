@@ -52,6 +52,10 @@ int ui_end(void);
 
 /* Functions defined in ../ui.c */
 int ui_error( ui_error_level severity, const char *format, ... );
-libspectrum_error ui_libspectrum_error( const char *format, va_list ap );
+libspectrum_error ui_libspectrum_error( libspectrum_error error,
+					const char *format, va_list ap );
+libspectrum_error
+ui_libspectrum_error_ignore_sig( libspectrum_error error,
+				 const char *format, va_list ap );
 
 #endif			/* #ifndef FUSE_UI_H */
