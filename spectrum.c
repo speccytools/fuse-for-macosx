@@ -89,7 +89,14 @@ int spectrum_interrupt(void)
     sound_frame();
   } else {
     timer_sleep();
-    timer_count -= 100.0 / settings_current.emulation_speed;
+
+    /* FIXME: find some better way to deal with speed == 0 */
+    if( settings_current.emulation_speed < 1 ) {
+      /* Assume 1% speed */
+      timer_count -= 100.0;
+    } else {
+      timer_count -= 100.0 / settings_current.emulation_speed;
+    }
   }
 
   if(display_frame()) return 1;
