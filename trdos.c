@@ -215,22 +215,16 @@ void
 trdos_page( void )
 {
   trdos_active = 1;
-  memory_map_home[0] = &memory_map_rom[4];
-  memory_map_home[1] = &memory_map_rom[5];
-
-  memory_update_home( 0, 2 );
+  machine_current->ram.romcs = 1;
+  machine_current->memory_map();
 }
 
 void
 trdos_unpage( void )
 {
   trdos_active = 0;
-  memory_map_home[0] = 
-    &memory_map_rom[ 2 * machine_current->ram.current_rom     ];
-  memory_map_home[1] =
-    &memory_map_rom[ 2 * machine_current->ram.current_rom + 1 ];
-
-  memory_update_home( 0, 2 );
+  machine_current->ram.romcs = 0;
+  machine_current->memory_map();
 }
 
 static

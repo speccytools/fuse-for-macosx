@@ -836,6 +836,5 @@
          of NOP, NOP, NOP. This resets the SCLD on real hardware.
 20040519 machine.c,snapshot.[ch],zxcf.[ch]: add support for saving
 	 snapshots with ZXCF support.
-
-
-	
+20040521 trdos.c,machines/{pentagon.c,scorpion.c,spec128.c}: use /ROMCS
+	 to page in the TRDOS ROM.

@@ -136,9 +136,10 @@ scorpion_reset(void)
   if( error ) return error;
   error = machine_load_rom( 2, 1, settings_current.rom_scorpion_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 3, settings_current.rom_scorpion_3, 0x4000 );
+  error = machine_load_rom( 4, 2, settings_current.rom_scorpion_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 6, 2, settings_current.rom_scorpion_2, 0x4000 );
+  error = machine_load_rom_bank( memory_map_romcs, 0, 0,
+				 settings_current.rom_scorpion_3, 0x4000 );
   if( error ) return error;
 
   trdos_available = 1;
@@ -158,62 +159,41 @@ scorpion_reset(void)
 static int
 scorpion_memory_map( void )
 {
-  int rom;
+  int rom, page, screen;
+  size_t i;
 
-  int page = ( machine_current->ram.last_byte & 0x07 ) |
-          ( ( machine_current->ram.last_byte2 & 0x10 ) >> 1 );
-  int screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
-  
-  /* ROM 2 is TR-DOS because that's hardcoded elsewhere
-   * ROM 3 is the extended ROM
-   * 64k RAM mode takes priority over ROM 3 */
-  if( ! ( machine_current->ram.last_byte2 & 0x02 ) ) {
-    rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
-    machine_current->ram.current_rom = rom;
-    if( !( machine_current->ram.last_byte2 & 0x01 ) &&
-	!trdos_active                                   )
-      spec128_select_rom( rom );
-  }
-
-  spec128_select_page( page );
-  
-  /* If we changed the active screen, mark the entire display file as
-     dirty so we redraw it on the next pass */
+  screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   if( memory_current_screen != screen ) {
     display_refresh_all();
     memory_current_screen = screen;
   }
 
-  machine_current->ram.current_page = page;
-
-  page = ( ( machine_current->ram.last_byte2 & 0x10 ) >> 1 ) |
-          ( machine_current->ram.last_byte & 0x07 );
-  
-  if ( machine_current->ram.last_byte2 & 0x02 )
-    rom = 3;
-  else
+  if( machine_current->ram.last_byte2 & 0x02 ) {
+    rom = 2;
+  } else {
     rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
-  
-  if( machine_current->ram.last_byte2 & 0x01 ) {
-    /* map 0x0000-0x3fff to RAM 0 */
+  }
+  machine_current->ram.current_rom = rom;
 
+  if( machine_current->ram.last_byte2 & 0x01 ) {
     memory_map_home[0] = &memory_map_ram[ 0 ];
     memory_map_home[1] = &memory_map_ram[ 1 ];
     machine_current->ram.special = 1;
-    memory_update_home( 0, 2 );
-
   } else {
     spec128_select_rom( rom );
   }
+
+  page = ( ( machine_current->ram.last_byte2 & 0x10 ) >> 1 ) |
+           ( machine_current->ram.last_byte  & 0x07 );
   
-  /* I don't think the screen can change here. Rusfaq talks about
-   * 0x4000-0x7fff and 0xc000-0xffff, rather than banks 3 and 5,
-   * I'm sticking with the traditional behaviour for now. */
   spec128_select_page( page );
- 
   machine_current->ram.current_page = page;
-  machine_current->ram.current_rom = rom;
- 
+
+  for( i = 0; i < 8; i++ )
+    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
+
+  memory_romcs_map();
+
   return 0;
 }
 

@@ -201,8 +201,6 @@ spec128_select_rom( int rom )
   memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
   memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
   machine_current->ram.current_rom = rom;
-
-  memory_update_home( 0, 2 );
 }
 
 void
@@ -211,21 +209,17 @@ spec128_select_page( int page )
   memory_map_home[6] = &memory_map_ram[ 2 * page     ];
   memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
   machine_current->ram.current_page = page;
-
-  memory_update_home( 6, 2 );
 }
 
 int
 spec128_memory_map( void )
 {
-  int page = machine_current->ram.last_byte & 0x07;
-  int screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
-  int rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
+  int page, screen, rom;
+  size_t i;
 
-  if( ( machine_current->capabilities &
-      LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) &&
-      trdos_active )
-    rom = 2;
+  page = machine_current->ram.last_byte & 0x07;
+  screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
+  rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
 
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
@@ -237,6 +231,9 @@ spec128_memory_map( void )
 
   spec128_select_rom( rom );
   spec128_select_page( page );
+
+  for( i = 0; i < 8; i++ )
+    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 
