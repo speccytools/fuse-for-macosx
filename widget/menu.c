@@ -135,15 +135,43 @@ int widget_menu_rzx_recording( void *data )
 {
   if( rzx_playback || rzx_recording ) return 0;
 
-  return widget_apply_to_file( rzx_start_recording );
+  if( snapshot_write( "snapshot.z80" ) ) {
+    return 1;
+  }
+
+  return rzx_start_recording( "recording.rzx" );
 }
 
 /* File/Recording/Play */
 int widget_menu_rzx_playback( void *data )
 {
+  char *snapshot;
+
   if( rzx_playback || rzx_recording ) return 0;
 
-  return widget_apply_to_file( rzx_start_playback );
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  if( widget_filesel_name ) {
+    snapshot = strdup( widget_filesel_name );
+    if( !snapshot ) {
+      ui_error( "Out of memory at %s:%d\n", __FILE__, __LINE__ );
+      return 1;
+    }
+  } else {
+    return 0;	/* Fileselector cancelled, therefore non-error return */
+  }
+
+  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  if( widget_filesel_name ) {
+    if( snapshot_read( snapshot ) ) {
+      free( snapshot );
+      return 1;
+    }
+    free( snapshot );
+    return rzx_start_playback( widget_filesel_name );
+  }
+
+  /* Recording file selector cancelled */
+  return 0;
 }
 
 /* File/Recording/Stop */

@@ -300,21 +300,29 @@ static void gtkui_save(GtkWidget *widget, gpointer data)
   fuse_emulation_unpause();
 }
 
-/* Called when File/Recording/Start selected */
+/* Called when File/Recording/Record selected */
 static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
 {
-  char *filename;
+  char *snapshot, *recording;
 
   if( rzx_playback || rzx_recording ) return;
 
   fuse_emulation_pause();
+
+  snapshot = gtkui_fileselector_get_filename( "Fuse - Recording Snapshot" );
+  if( !snapshot ) { fuse_emulation_unpause(); return; }
   
-  filename = gtkui_fileselector_get_filename( "Fuse - Start Recording" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
+  recording = gtkui_fileselector_get_filename( "Fuse - Start Recording" );
+  if( !recording ) { free( snapshot ); fuse_emulation_unpause(); return; }
 
-  rzx_start_recording( filename );
+  if( snapshot_write( snapshot ) ) {
+    free( snapshot ); free( recording );
+    return;
+  }
 
-  free( filename );
+  rzx_start_recording( recording );
+
+  free( snapshot ); free( recording );
 
   fuse_emulation_unpause();
 }
@@ -329,18 +337,28 @@ static void gtkui_rzx_stop( GtkWidget *widget, gpointer data )
 /* Called when File/Recording/Play selected */
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data )
 {
-  char *filename;
+  char *snapshot, *recording;
 
   if( rzx_playback || rzx_recording ) return;
 
   fuse_emulation_pause();
+
+  snapshot = gtkui_fileselector_get_filename( "Fuse - Replay Snapshot" );
+  if( !snapshot ) { fuse_emulation_unpause(); return; }
   
-  filename = gtkui_fileselector_get_filename( "Fuse - Play Recording" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
+  recording = gtkui_fileselector_get_filename( "Fuse - Start Replay" );
+  if( !recording ) { free( snapshot ); fuse_emulation_unpause(); return; }
 
-  rzx_start_playback( filename );
+  if( snapshot_read( snapshot ) ) {
+    free( snapshot ); free( recording );
+    return;
+  }
 
-  free( filename );
+  rzx_start_playback( recording );
+
+  free( snapshot ); free( recording );
+
+  display_refresh_all();
 
   fuse_emulation_unpause();
 }
