@@ -3,6 +3,8 @@
 # z80.pl: generate C code for Z80 opcodes
 # $Id$
 
+# Copyright (c) 1999-2003 Philip Kendall
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -58,7 +60,8 @@ sub arithmetic_logical ($$$) {
 	    print << "CODE";
       tstates += 11;		/* FIXME: how is this contended? */
       {
-	BYTE bytetemp=readbyte( REGISTER + (SBYTE)readbyte(PC++) );
+	libspectrum_byte bytetemp = 
+	    readbyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ) );
 	$opcode(bytetemp);
       }
 CODE
@@ -68,7 +71,7 @@ CODE
 	    print << "CODE";
       contend( $register, 3 );
       {
-	BYTE bytetemp=readbyte($register$increment);
+	libspectrum_byte bytetemp = readbyte( $register$increment );
 	$opcode(bytetemp);
       }
 CODE
@@ -106,9 +109,10 @@ sub cpi_cpd ($) {
 
     print << "CODE";
       {
-	BYTE value=readbyte(HL),bytetemp=A-value,
-	  lookup = ( (A & 0x08) >> 3 ) | ( ( (value) & 0x08 ) >> 2 ) |
-	  ( (bytetemp & 0x08) >> 1 );
+	libspectrum_byte value = readbyte( HL ), bytetemp = A - value,
+	  lookup = ( (        A & 0x08 ) >> 3 ) |
+	           ( (  (value) & 0x08 ) >> 2 ) |
+	           ( ( bytetemp & 0x08 ) >> 1 );
 	contend( HL, 3 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
 	contend( HL, 1 ); contend( HL, 1 );
 	HL$modifier; BC--;
@@ -129,9 +133,10 @@ sub cpir_cpdr ($) {
 
     print << "CODE";
       {
-	BYTE value=readbyte(HL),bytetemp=A-value,
-	  lookup = ( (A & 0x08) >> 3 ) | ( ( (value) & 0x08 ) >> 2 ) |
-	  ( (bytetemp & 0x08) >> 1 );
+	libspectrum_byte value = readbyte( HL ), bytetemp = A - value,
+	  lookup = ( (        A & 0x08 ) >> 3 ) |
+		   ( (  (value) & 0x08 ) >> 2 ) |
+		   ( ( bytetemp & 0x08 ) >> 1 );
 	contend( HL, 3 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
 	contend( HL, 1 ); contend( HL, 1 );
 	HL$modifier; BC--;
@@ -163,7 +168,7 @@ sub inc_dec ($$) {
 	print << "CODE";
       contend( HL, 4 );
       {
-	BYTE bytetemp=readbyte(HL);
+	libspectrum_byte bytetemp = readbyte( HL );
 	$opcode(bytetemp);
 	contend( HL, 3 );
 	writebyte(HL,bytetemp);
@@ -173,8 +178,9 @@ CODE
 	print << "CODE";
       tstates += 15;		/* FIXME: how is this contended? */
       {
-	WORD wordtemp=REGISTER+(SBYTE)readbyte(PC++);
-	BYTE bytetemp=readbyte(wordtemp);
+	libspectrum_word wordtemp =
+	    REGISTER + (libspectrum_signed_byte)readbyte( PC++ );
+	libspectrum_byte bytetemp = readbyte( wordtemp );
 	$opcode(bytetemp);
 	writebyte(wordtemp,bytetemp);
       }
@@ -191,7 +197,7 @@ sub ini_ind ($) {
 
     print << "CODE";
       {
-	WORD initemp=readport(BC);
+	libspectrum_word initemp = readport( BC );
 	tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
@@ -209,7 +215,7 @@ sub inir_indr ($) {
 
     print << "CODE";
       {
-	WORD initemp=readport(BC);
+	libspectrum_word initemp=readport( BC );
 	tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
@@ -233,7 +239,7 @@ sub ldi_ldd ($) {
 
     print << "CODE";
       {
-	BYTE bytetemp=readbyte(HL);
+	libspectrum_byte bytetemp=readbyte( HL );
 	contend( HL, 3 ); contend( DE, 3 ); contend( DE, 1 ); contend( DE, 1 );
 	BC--;
 	writebyte(DE,bytetemp);
@@ -253,7 +259,7 @@ sub ldir_lddr ($) {
 
     print << "CODE";
       {
-	BYTE bytetemp=readbyte(HL);
+	libspectrum_byte bytetemp=readbyte( HL );
 	contend( HL, 3 ); contend( DE, 3 ); contend( DE, 1 ); contend( DE, 1 );
 	writebyte(DE,bytetemp);
 	HL$modifier; DE$modifier; BC--;
@@ -277,7 +283,7 @@ sub otir_otdr ($) {
 
     print << "CODE";
       {
-	WORD outitemp=readbyte(HL);
+	libspectrum_word outitemp=readbyte( HL );
 	tstates++; contend( HL, 4 );
 	B--; HL$modifier; /* This does happen first, despite what the specs say */
 	writeport(BC,outitemp);
@@ -304,7 +310,7 @@ sub outi_outd ($) {
 
     print << "CODE";
       {
-	WORD outitemp=readbyte(HL);
+	libspectrum_word outitemp=readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
 	tstates++; contend( HL, 4 ); contend_io( BC, 3 );
 	HL$modifier;
@@ -372,7 +378,7 @@ sub rotate_shift ($$) {
     } elsif( $register eq '(HL)' ) {
 	print << "CODE";
       {
-	BYTE bytetemp = readbyte(HL);
+	libspectrum_byte bytetemp = readbyte(HL);
 	contend( HL, 4 ); contend( HL, 3 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
@@ -382,7 +388,7 @@ CODE
 	print << "CODE";
       tstates += 8;
       {
-	BYTE bytetemp = readbyte(tempaddr);
+	libspectrum_byte bytetemp = readbyte(tempaddr);
 	$opcode(bytetemp);
 	writebyte(tempaddr,bytetemp);
       }
@@ -410,14 +416,14 @@ sub opcode_BIT (@) {
 	print << "BIT";
       tstates += 5;
       {
-	BYTE bytetemp=readbyte(tempaddr);
+	libspectrum_byte bytetemp = readbyte( tempaddr );
 	BIT${macro}bytetemp);
       }
 BIT
     } else {
 	print << "BIT";
       {
-	BYTE bytetemp = readbyte(HL);
+	libspectrum_byte bytetemp = readbyte( HL );
 	contend( HL, 4 );
 	BIT${macro}bytetemp);
       }
@@ -455,7 +461,7 @@ CPL
 sub opcode_DAA (@) {
     print << "DAA";
       {
-	BYTE add = 0,carry= ( F & FLAG_C );
+	libspectrum_byte add = 0, carry = ( F & FLAG_C );
 	if( ( F & FLAG_H ) || ( (A & 0x0f)>9 ) ) add=6;
 	if( carry || (A > 0x9f ) ) add|=0x60;
 	if( A > 0x99 ) carry=1;
@@ -499,7 +505,7 @@ sub opcode_EX (@) {
       }
 
       {
-	WORD wordtemp=AF; AF=AF_; AF_=wordtemp;
+	libspectrum_word wordtemp = AF; AF = AF_; AF_ = wordtemp;
       }
 EX
     } elsif( $arg1 eq '(SP)' and ( $arg2 eq 'HL' or $arg2 eq 'REGISTER' ) ) {
@@ -514,7 +520,8 @@ EX
 
 	print << "EX";
       {
-	BYTE bytetempl=readbyte(SP), bytetemph=readbyte(SP+1);
+	libspectrum_byte bytetempl = readbyte( SP     ),
+	                 bytetemph = readbyte( SP + 1 );
 	contend( SP, 3 ); contend( SP+1, 4 );
 	contend( SP, 3 ); contend( SP+1, 5 );
 	writebyte(SP,$low); writebyte(SP+1,$high);
@@ -524,7 +531,7 @@ EX
     } elsif( $arg1 eq 'DE' and $arg2 eq 'HL' ) {
 	print << "EX";
       {
-	WORD wordtemp=DE; DE=HL; HL=wordtemp;
+	libspectrum_word wordtemp=DE; DE=HL; HL=wordtemp;
       }
 EX
     }
@@ -533,9 +540,10 @@ EX
 sub opcode_EXX (@) {
     print << "EXX";
       {
-	WORD wordtemp=BC; BC=BC_; BC_=wordtemp;
-	wordtemp=DE; DE=DE_; DE_=wordtemp;
-	wordtemp=HL; HL=HL_; HL_=wordtemp;
+	libspectrum_word wordtemp;
+	wordtemp = BC; BC = BC_; BC_ = wordtemp;
+	wordtemp = DE; DE = DE_; DE_ = wordtemp;
+	wordtemp = HL; HL = HL_; HL_ = wordtemp;
       }
 EXX
 }
@@ -556,7 +564,7 @@ sub opcode_IN (@) {
     if( $register eq 'A' and $port eq '(nn)' ) {
 	print << "IN";
       { 
-	WORD intemp;
+	libspectrum_word intemp;
 	contend( PC, 4 );
 	intemp = readbyte( PC++ ) + ( A << 8 );
 	contend_io( intemp, 3 );
@@ -567,7 +575,7 @@ IN
 	print << "IN";
       tstates += 1;
       {
-	BYTE bytetemp;
+	libspectrum_byte bytetemp;
 	IN(bytetemp,BC);
       }
 IN
@@ -659,7 +667,7 @@ LD
         } elsif( $src eq '(nnnn)' ) {
 	    print << "LD";
       {
-	WORD wordtemp;
+	libspectrum_word wordtemp;
 	contend( PC, 3 );
 	wordtemp = readbyte(PC++);
 	contend( PC, 3 );
@@ -671,7 +679,7 @@ LD
         } elsif( $src eq '(REGISTER+dd)' ) {
 	    print << "LD";
       tstates += 11;		/* FIXME: how is this contended? */
-      $dest=readbyte( REGISTER + (SBYTE)readbyte(PC++) );
+      $dest = readbyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ) );
 LD
         }
 
@@ -721,7 +729,7 @@ LD
 	    print << "LD";
       contend( PC, 3 );
       {
-	WORD wordtemp=readbyte(PC++);
+	libspectrum_word wordtemp = readbyte( PC++ );
 	contend( PC, 3 );
 	wordtemp|=readbyte(PC++) << 8;
 	contend( wordtemp, 3 );
@@ -745,13 +753,14 @@ LD
 	if( length $src == 1 ) {
 	print << "LD";
       tstates += 11;		/* FIXME: how is this contended? */
-      writebyte( REGISTER + (SBYTE)readbyte(PC++), $src);
+      writebyte( REGISTER + (libspectrum_signed_byte)readbyte( PC++ ), $src );
 LD
         } elsif( $src eq 'nn' ) {
 	    print << "LD";
       tstates += 11;		/* FIXME: how is this contended? */
       {
-	WORD wordtemp=REGISTER+(SBYTE)readbyte(PC++);
+	libspectrum_word wordtemp =
+	    REGISTER + (libspectrum_signed_byte)readbyte( PC++ );
 	writebyte(wordtemp,readbyte(PC++));
       }
 LD
@@ -771,7 +780,7 @@ sub opcode_LDIR (@) { ldir_lddr( 'LDIR' ); }
 sub opcode_NEG (@) {
     print << "NEG";
       {
-	BYTE bytetemp=A;
+	libspectrum_byte bytetemp=A;
 	A=0;
 	SUB(bytetemp);
       }
@@ -793,7 +802,7 @@ sub opcode_OUT (@) {
     if( $port eq '(nn)' and $register eq 'A' ) {
 	print << "OUT";
       { 
-	WORD outtemp;
+	libspectrum_word outtemp;
 	contend( PC, 4 );
 	outtemp = readbyte( PC++ ) + ( A << 8 );
 	OUT( outtemp , A );
@@ -872,7 +881,7 @@ RLCA
 sub opcode_RLA (@) {
     print << "RLA";
       {
-	BYTE bytetemp = A;
+	libspectrum_byte bytetemp = A;
 	A = ( A << 1 ) | ( F & FLAG_C );
 	F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
 	  ( A & ( FLAG_3 | FLAG_5 ) ) | ( bytetemp >> 7 );
@@ -883,7 +892,7 @@ RLA
 sub opcode_RLD (@) {
     print << "RLD";
       {
-	BYTE bytetemp=readbyte(HL);
+	libspectrum_byte bytetemp = readbyte( HL );
 	contend( HL, 7 ); contend( HL, 3 );
 	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
 	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
@@ -897,7 +906,7 @@ sub opcode_RR (@) { rotate_shift( 'RR', $_[0] ); }
 sub opcode_RRA (@) {
     print << "RRA";
       {
-	BYTE bytetemp = A;
+	libspectrum_byte bytetemp = A;
 	A = ( A >> 1 ) | ( F << 7 );
 	F = ( F & ( FLAG_P | FLAG_Z | FLAG_S ) ) |
 	  ( A & ( FLAG_3 | FLAG_5 ) ) | ( bytetemp & FLAG_C ) ;
@@ -918,7 +927,7 @@ RRCA
 sub opcode_RRD (@) {
     print << "RRD";
       {
-	BYTE bytetemp=readbyte(HL);
+	libspectrum_byte bytetemp = readbyte( HL );
 	contend( HL, 7 ); contend( HL, 3 );
 	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
 	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
@@ -961,8 +970,8 @@ sub opcode_slttrap ($) {
     print << "slttrap";
       if( settings_current.slt_traps ) {
 	if( slt_length[A] ) {
-	  WORD base = HL;
-	  BYTE *data = slt[A];
+	  libspectrum_word base = HL;
+	  libspectrum_byte *data = slt[A];
 	  size_t length = slt_length[A];
 	  while( length-- ) writebyte( base++, *data++ );
 	}
@@ -981,9 +990,10 @@ sub opcode_shift (@) {
 	print << "shift";
       /* FIXME: contention here is just a guess */
       {
-	WORD tempaddr; BYTE opcode3;
+	libspectrum_word tempaddr; libspectrum_byte opcode3;
 	contend( PC, 3 );
-	tempaddr = REGISTER + (SBYTE)readbyte_internal( PC++ );
+	tempaddr =
+	    REGISTER + (libspectrum_signed_byte)readbyte_internal( PC++ );
 	contend( PC, 4 );
 	opcode3 = readbyte_internal( PC++ );
 #ifdef HAVE_ENOUGH_MEMORY
@@ -998,7 +1008,7 @@ shift
     } else {
 	print << "shift";
       {
-	BYTE opcode2;
+	libspectrum_byte opcode2;
 	contend( PC, 4 );
 	opcode2 = readbyte_internal( PC++ );
 	R++;

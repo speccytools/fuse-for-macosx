@@ -1,5 +1,5 @@
 /* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -27,9 +27,7 @@
 #ifndef FUSE_SPECPLUS3_H
 #define FUSE_SPECPLUS3_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
 #ifndef FUSE_MACHINE_H
 #include "machine.h"
@@ -42,21 +40,22 @@
 #include <765.h>
 #endif			/* #ifdef HAVE_765_H */
 
-BYTE specplus3_unattached_port( void );
+libspectrum_byte specplus3_unattached_port( void );
 
-BYTE specplus3_readbyte(WORD address);
-BYTE specplus3_readbyte_internal( WORD address );
-BYTE specplus3_read_screen_memory(WORD offset);
-void specplus3_writebyte(WORD address, BYTE b);
-void specplus3_writebyte_internal( WORD address, BYTE b );
+libspectrum_byte specplus3_readbyte( libspectrum_word address );
+libspectrum_byte specplus3_readbyte_internal( libspectrum_word address );
+libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset );
+void specplus3_writebyte( libspectrum_word address, libspectrum_byte b );
+void specplus3_writebyte_internal( libspectrum_word address,
+				   libspectrum_byte b );
 
-DWORD specplus3_contend_memory( WORD address );
-DWORD specplus3_contend_port( WORD address );
+libspectrum_dword specplus3_contend_memory( libspectrum_word address );
+libspectrum_dword specplus3_contend_port( libspectrum_word address );
 
 int specplus3_init( fuse_machine_info *machine );
 int specplus3_reset(void);
 
-void specplus3_memoryport_write(WORD port, BYTE b);
+void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
 
 /* We need these outside the HAVE_765_H guards as they're also used
    for identifying the TRDOS drives */

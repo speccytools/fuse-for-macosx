@@ -1,5 +1,5 @@
 /* spec48.c: Spectrum 48K specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -39,7 +39,7 @@
 #include "spec48.h"
 #include "spectrum.h"
 
-static DWORD spec48_contend_delay( void );
+static libspectrum_dword spec48_contend_delay( void );
 
 spectrum_port_info spec48_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -48,17 +48,20 @@ spectrum_port_info spec48_peripherals[] = {
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
-static BYTE spec48_unattached_port( void )
+static libspectrum_byte
+spec48_unattached_port( void )
 {
   return spectrum_unattached_port( 1 );
 }
 
-BYTE spec48_read_screen_memory(WORD offset)
+libspectrum_byte
+spec48_read_screen_memory( libspectrum_word offset )
 {
   return RAM[5][offset];
 }
 
-DWORD spec48_contend_memory( WORD address )
+libspectrum_dword
+spec48_contend_memory( libspectrum_word address )
 {
   /* Contention occurs only in the lowest 16Kb of RAM */
   if( address < 0x4000 || address > 0x7fff ) return 0;
@@ -66,7 +69,8 @@ DWORD spec48_contend_memory( WORD address )
   return spec48_contend_delay();
 }
 
-DWORD spec48_contend_port( WORD port )
+libspectrum_dword
+spec48_contend_port( libspectrum_word port )
 {
   /* Contention occurs only for even-numbered ports */
   if( ( port & 0x01 ) == 0 ) return spec48_contend_delay();
@@ -74,9 +78,10 @@ DWORD spec48_contend_port( WORD port )
   return 0;
 }
 
-static DWORD spec48_contend_delay( void )
+static libspectrum_dword
+spec48_contend_delay( void )
 {
-  WORD tstates_through_line;
+  libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
   if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )

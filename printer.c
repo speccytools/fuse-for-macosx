@@ -1,5 +1,5 @@
 /* printer.c: Printer support
-   Copyright (c) 2001,2002 Ian Collier, Russell Marks, Philip Kendall
+   Copyright (c) 2001-2003 Ian Collier, Russell Marks, Philip Kendall
 
    $Id$
 
@@ -49,7 +49,7 @@ static FILE *printer_text_file=NULL;
 
 /* for the ZX Printer */
 static int zxpframes,zxpspeed,zxpnewspeed;
-static DWORD zxpcycles;
+static libspectrum_dword zxpcycles;
 static int zxpheight,zxppixel,zxpstylus;
 static unsigned char zxpline[256];
 static unsigned int frames=0;
@@ -373,7 +373,7 @@ frames++;
  * very little brain. :-) Or at least, I don't grok it that well.
  * It works wonderfully though.
  */
-BYTE printer_zxp_read(WORD port GCC_UNUSED)
+libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED)
 {
 if(!printer_graphics_enabled)
   return(0xff);
@@ -417,7 +417,7 @@ else
 }
 
 
-void printer_zxp_write(WORD port GCC_UNUSED,BYTE b)
+void printer_zxp_write(libspectrum_word port GCC_UNUSED,libspectrum_byte b)
 {
 if(!zxpspeed)
   {
@@ -518,7 +518,7 @@ zxplineofchar=0;
  * likely; certainly the ROMs do it) means we can use a
  * bps-independent approach.
  */
-void printer_serial_write(BYTE b)
+void printer_serial_write(libspectrum_byte b)
 {
 static int reading=0,bits_to_get=0,ser_byte=0;
 int high=(b&8);
@@ -566,9 +566,9 @@ void printer_parallel_strobe_write(int on)
 static int old_on=0;
 static int second_edge=0;
 static unsigned int last_frames=0;
-static DWORD last_tstates=0;
+static libspectrum_dword last_tstates=0;
 static unsigned char last_data=0;
-DWORD diff;
+libspectrum_dword diff;
 
 if((old_on && !on) || (!old_on && on))
   {
@@ -609,7 +609,7 @@ old_on=on;
 }
 
 
-BYTE printer_parallel_read(WORD port GCC_UNUSED)
+libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED)
 {
 /* bit 0 = busy. other bits high? */
 
@@ -617,7 +617,8 @@ return(0xfe);	/* never busy */
 }
 
 
-void printer_parallel_write(WORD port GCC_UNUSED,BYTE b)
+void printer_parallel_write(libspectrum_word port GCC_UNUSED,
+			    libspectrum_byte b)
 {
 parallel_data=b;
 }

@@ -33,20 +33,21 @@
 
 extern spectrum_port_info pentagon_peripherals[];
 
-BYTE pentagon_unattached_port( void );
+libspectrum_byte pentagon_unattached_port( void );
 
-BYTE pentagon_readbyte(WORD address);
-BYTE pentagon_readbyte_internal(WORD address);
-BYTE pentagon_read_screen_memory(WORD offset);
-void pentagon_writebyte(WORD address, BYTE b);
-void pentagon_writebyte_internal(WORD address, BYTE b);
+libspectrum_byte pentagon_readbyte( libspectrum_word address );
+libspectrum_byte pentagon_readbyte_internal( libspectrum_word address );
+libspectrum_byte pentagon_read_screen_memory( libspectrum_word offset );
+void pentagon_writebyte( libspectrum_word address, libspectrum_byte b );
+void pentagon_writebyte_internal( libspectrum_word address,
+				  libspectrum_byte b);
 
-DWORD pentagon_contend_memory( WORD address );
-DWORD pentagon_contend_port( WORD port );
+libspectrum_dword pentagon_contend_memory( libspectrum_word address );
+libspectrum_dword pentagon_contend_port( libspectrum_word port );
 
 int pentagon_init( fuse_machine_info *machine );
 int pentagon_reset(void);
 
-void pentagon_memoryport_write(WORD port, BYTE b);
+void pentagon_memoryport_write( libspectrum_word port, libspectrum_byte b );
 
 #endif			/* #ifndef FUSE_PENTAGON_H */

@@ -63,7 +63,7 @@ int ui_end(void);
 int ui_debugger_activate( void );
 int ui_debugger_deactivate( int interruptable );
 int ui_debugger_update( void );
-int ui_debugger_disassemble( WORD address );
+int ui_debugger_disassemble( libspectrum_word address );
 
 /* Functions defined in ../ui.c */
 int ui_error( ui_error_level severity, const char *format, ... )

@@ -1,5 +1,5 @@
 /* psg.c: recording AY chip output to .psg files
-   Copyright (c) 2003 Matthew Westcott
+   Copyright (c) 2003 Matthew Westcott, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 /* Are we currently recording a .psg file? */
 int psg_recording;
 
-static BYTE psg_register_values[16];
+static libspectrum_byte psg_register_values[16];
 
 /* booleans to indicate the registers written to in this frame */
 static int psg_registers_written[16];
@@ -152,7 +152,7 @@ psg_frame( void )
 }
 
 int
-psg_write_register( BYTE reg, BYTE value )
+psg_write_register( libspectrum_byte reg, libspectrum_byte value )
 {
   if( psg_registers_written[reg] ) return 0;
   psg_register_values[reg] = value;

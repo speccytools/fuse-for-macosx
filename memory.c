@@ -32,6 +32,8 @@
 
 #include <config.h>
 
+#include <libspectrum.h>
+
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
@@ -46,7 +48,6 @@
 #include "spectrum.h"
 #include "tc2048.h"
 #include "trdos.h"
-#include "types.h"
 #include "ui/ui.h"
 
 #ifdef INTERNAL
@@ -55,8 +56,8 @@
 #define FUNCTION( name ) name
 #endif				/* #ifdef INTERNAL */
 
-BYTE
-FUNCTION( spec16_readbyte )( WORD address )
+libspectrum_byte
+FUNCTION( spec16_readbyte )( libspectrum_word address )
 {
 
 #ifndef INTERNAL
@@ -75,7 +76,7 @@ FUNCTION( spec16_readbyte )( WORD address )
 }
 
 void
-FUNCTION( spec16_writebyte )( WORD address, BYTE b )
+FUNCTION( spec16_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
 
 #ifndef INTERNAL
@@ -97,8 +98,8 @@ FUNCTION( spec16_writebyte )( WORD address, BYTE b )
   }
 }
 
-BYTE
-FUNCTION( spec48_readbyte )( WORD address )
+libspectrum_byte
+FUNCTION( spec48_readbyte )( libspectrum_word address )
 {
 
 #ifndef INTERNAL
@@ -117,7 +118,7 @@ FUNCTION( spec48_readbyte )( WORD address )
 }
 
 void
-FUNCTION( spec48_writebyte )( WORD address, BYTE b )
+FUNCTION( spec48_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
 
 #ifndef INTERNAL
@@ -139,8 +140,8 @@ FUNCTION( spec48_writebyte )( WORD address, BYTE b )
   }
 }
 
-BYTE
-FUNCTION( spec128_readbyte )( WORD address )
+libspectrum_byte
+FUNCTION( spec128_readbyte )( libspectrum_word address )
 {
 
 #ifndef INTERNAL
@@ -159,7 +160,7 @@ FUNCTION( spec128_readbyte )( WORD address )
 }
 
 void
-FUNCTION( spec128_writebyte )( WORD address, BYTE b )
+FUNCTION( spec128_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
   int bank = address >> 14;
 
@@ -189,8 +190,8 @@ FUNCTION( spec128_writebyte )( WORD address, BYTE b )
   RAM[ bank ][ address & 0x3fff ] = b;
 }
 
-BYTE
-FUNCTION( specplus3_readbyte )( WORD address )
+libspectrum_byte
+FUNCTION( specplus3_readbyte )( libspectrum_word address )
 {
 
 #ifndef INTERNAL
@@ -233,7 +234,7 @@ FUNCTION( specplus3_readbyte )( WORD address )
 }
 
 void
-FUNCTION( specplus3_writebyte )( WORD address, BYTE b )
+FUNCTION( specplus3_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
   int bank = address >> 14;
 
@@ -286,10 +287,10 @@ FUNCTION( specplus3_writebyte )( WORD address, BYTE b )
 }
 
 
-BYTE
-FUNCTION( tc2048_readbyte )( WORD address )
+libspectrum_byte
+FUNCTION( tc2048_readbyte )( libspectrum_word address )
 {
-  WORD offset = address & 0x3fff;
+  libspectrum_word offset = address & 0x3fff;
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
@@ -307,9 +308,9 @@ FUNCTION( tc2048_readbyte )( WORD address )
 }
 
 void
-FUNCTION( tc2048_writebyte )( WORD address, BYTE b )
+FUNCTION( tc2048_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
-  WORD offset = address & 0x3fff;
+  libspectrum_word offset = address & 0x3fff;
 
 #ifndef INTERNAL
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
@@ -329,8 +330,8 @@ FUNCTION( tc2048_writebyte )( WORD address, BYTE b )
   }
 }
 
-BYTE
-FUNCTION( pentagon_readbyte )( WORD address )
+libspectrum_byte
+FUNCTION( pentagon_readbyte )( libspectrum_word address )
 {
 
 #ifndef INTERNAL
@@ -352,7 +353,7 @@ FUNCTION( pentagon_readbyte )( WORD address )
 }
 
 void
-FUNCTION( pentagon_writebyte )( WORD address, BYTE b )
+FUNCTION( pentagon_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
   int bank = address >> 14;
 
@@ -381,10 +382,10 @@ FUNCTION( pentagon_writebyte )( WORD address, BYTE b )
   RAM[ bank ][ address & 0x3fff ] = b;
 }
 
-BYTE
-FUNCTION( tc2068_readbyte )( WORD address )
+libspectrum_byte
+FUNCTION( tc2068_readbyte )( libspectrum_word address )
 {
-  WORD offset = address & 0x1fff;
+  libspectrum_word offset = address & 0x1fff;
   int chunk = address >> 13;
 
 #ifndef INTERNAL
@@ -397,9 +398,9 @@ FUNCTION( tc2068_readbyte )( WORD address )
 }
 
 void
-FUNCTION( tc2068_writebyte )( WORD address, BYTE b )
+FUNCTION( tc2068_writebyte )( libspectrum_word address, libspectrum_byte b )
 {
-  WORD offset = address & 0x1fff;
+  libspectrum_word offset = address & 0x1fff;
   int chunk = address >> 13;
 
 #ifndef INTERNAL

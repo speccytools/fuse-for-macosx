@@ -48,7 +48,7 @@
 
 #define ADDR_TO_CHUNK(addr) 2 + (addr >> 13)
 
-static DWORD tc2068_contend_delay( void );
+static libspectrum_dword tc2068_contend_delay( void );
 
 spectrum_port_info tc2068_peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
@@ -66,24 +66,24 @@ spectrum_port_info tc2068_peripherals[] = {
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
-BYTE
-tc2068_ay_registerport_read( WORD port )
+libspectrum_byte
+tc2068_ay_registerport_read( libspectrum_word port )
 {
   return   machine_current->ay.current_register != 14
          ? ay_registerport_read( port )
          : 0xff;
 }
 
-BYTE
-tc2068_ay_dataport_read( WORD port )
+libspectrum_byte
+tc2068_ay_dataport_read( libspectrum_word port )
 {
   if (machine_current->ay.current_register != 14) {
     return ay_registerport_read( port );
   } else {
 
-    BYTE ret =   machine_current->ay.registers[7] & 0x40
-               ? machine_current->ay.registers[14]
-               : 0xff;
+    libspectrum_byte ret =   machine_current->ay.registers[7] & 0x40
+			   ? machine_current->ay.registers[14]
+			   : 0xff;
 
     switch( port & 0x0300 ) {
     case 0x0100:
@@ -101,26 +101,26 @@ tc2068_ay_dataport_read( WORD port )
   }
 }
 
-static
-BYTE tc2068_unattached_port( void )
+static libspectrum_byte
+tc2068_unattached_port( void )
 {
   /* TC2068 does not have floating ULA values on any port (despite
      rumours to the contrary), it returns 0xff on unattached ports */
   return 0xff;
 }
 
-BYTE
-tc2068_read_screen_memory( WORD offset )
+libspectrum_byte
+tc2068_read_screen_memory( libspectrum_word offset )
 {
   /* The SCLD always reads the real screen memory regardless of paging
      activity */
-  WORD off = offset & 0x1fff;
+  libspectrum_word off = offset & 0x1fff;
 
   return timex_home[ADDR_TO_CHUNK(offset)].page[off];
 }
 
-DWORD
-tc2068_contend_memory( WORD address )
+libspectrum_dword
+tc2068_contend_memory( libspectrum_word address )
 {
   int chunk = ADDR_TO_CHUNK(address);
 
@@ -132,8 +132,8 @@ tc2068_contend_memory( WORD address )
   return tc2068_contend_delay();
 }
 
-DWORD
-tc2068_contend_port( WORD port )
+libspectrum_dword
+tc2068_contend_port( libspectrum_word port )
 {
   /* Contention occurs for ports F4, FE and FF (HSR, ULA and DEC) */
   /* It's a guess that contention occurs for ports F5 and F6, too */
@@ -146,10 +146,10 @@ tc2068_contend_port( WORD port )
   return 0;
 }
 
-static DWORD
+static libspectrum_dword
 tc2068_contend_delay( void )
 {
-  WORD tstates_through_line;
+  libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
   if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )

@@ -1,5 +1,5 @@
 /* debugger_internals.h: The internals of Fuse's monitor/debugger
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
@@ -31,17 +31,18 @@
 #include "debugger.h"
 #endif				/* #ifndef FUSE_DEBUGGER_H */
 
-int debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
-			     size_t ignore, debugger_breakpoint_life life );
+int debugger_breakpoint_add( debugger_breakpoint_type type,
+			     libspectrum_word value, size_t ignore,
+			     debugger_breakpoint_life life );
 int debugger_breakpoint_remove( size_t id );
 int debugger_breakpoint_remove_all( void );
-int debugger_breakpoint_clear( WORD address );
+int debugger_breakpoint_clear( libspectrum_word address );
 int debugger_breakpoint_exit( void );
 int debugger_breakpoint_ignore( size_t id, size_t ignore );
 int debugger_breakpoint_set_condition( size_t id,
 				       debugger_expression *condition );
-int debugger_poke( WORD address, BYTE value );
-int debugger_port_write( WORD address, BYTE value );
+int debugger_poke( libspectrum_word address, libspectrum_byte value );
+int debugger_port_write( libspectrum_word address, libspectrum_byte value );
 int debugger_register_get( int which );
 void debugger_register_set( int which, int value );
 

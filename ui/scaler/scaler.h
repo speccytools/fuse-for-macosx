@@ -22,9 +22,7 @@
 #ifndef SCALER_H
 #define SCALER_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
 typedef enum scaler_type {
   SCALER_HALF = 0,
@@ -49,8 +47,10 @@ typedef enum scaler_flags_t {
   SCALER_FLAGS_EXPAND      = 1 << 0,
 } scaler_flags_t;
 
-typedef void ScalerProc(const BYTE *srcPtr, DWORD srcPitch,
-	                BYTE *dstPtr, DWORD dstPitch, int width, int height);
+typedef void ScalerProc( const libspectrum_byte *srcPtr,
+			 libspectrum_dword srcPitch,
+			 libspectrum_byte *dstPtr, libspectrum_dword dstPitch,
+			 int width, int height );
 
 /* The type of function used to expand the area dirtied by a scaler */
 typedef void scaler_expand_fn( int *x, int *y, int *w, int *h,
@@ -74,6 +74,6 @@ scaler_flags_t scaler_get_flags( scaler_type scaler );
 float scaler_get_scaling_factor( scaler_type scaler );
 scaler_expand_fn* scaler_get_expander( scaler_type scaler );
 
-int scaler_select_bitformat( DWORD BitFormat );
+int scaler_select_bitformat( libspectrum_dword BitFormat );
 
 #endif

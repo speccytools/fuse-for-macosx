@@ -27,15 +27,15 @@
 #include <config.h>
 
 #include <errno.h>
-#include <stdio.h>
 #include <string.h>
+
+#include <libspectrum.h>
 
 #include "display.h"
 #include "machine.h"
 #include "screenshot.h"
 #include "scld.h"
 #include "settings.h"
-#include "types.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -50,10 +50,10 @@
 
 #include <png.h>
 
-static int get_rgb32_data( BYTE *rgb32_data, size_t stride,
+static int get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
 			   size_t height, size_t width );
-static int rgb32_to_rgb24( BYTE *rgb24_data, size_t rgb24_stride,
-			   BYTE *rgb32_data, size_t rgb32_stride,
+static int rgb32_to_rgb24( libspectrum_byte *rgb24_data, size_t rgb24_stride,
+			   libspectrum_byte *rgb32_data, size_t rgb32_stride,
 			   size_t height, size_t width );
 
 /* The biggest size screen (in units of DISPLAY_ASPECT_WIDTH x
@@ -63,11 +63,12 @@ static int rgb32_to_rgb24( BYTE *rgb24_data, size_t rgb24_stride,
 
 /* A copy of display.c:display_image, taken so we can draw widgets on
    display_image */
-static WORD saved_screen[2*DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH];
+static libspectrum_word
+  saved_screen[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
 
 /* The space used for drawing the screen image on. Out here to avoid placing
    these large objects on the stack */
-static BYTE
+static libspectrum_byte
   rgb_data1[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
   rgb_data2[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 4 ],
    png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 3 ];
@@ -87,7 +88,7 @@ screenshot_write( const char *filename, scaler_type scaler )
   png_structp png_ptr;
   png_infop info_ptr;
 
-  BYTE *row_pointers[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT ];
+  libspectrum_byte *row_pointers[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT ];
   size_t rgb_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 4,
          png_stride = MAX_SIZE * DISPLAY_ASPECT_WIDTH * 3;
   size_t y, base_height, base_width, height, width;
@@ -180,27 +181,28 @@ screenshot_write( const char *filename, scaler_type scaler )
 }
 
 static int
-get_rgb32_data( BYTE *rgb32_data, size_t stride, size_t height, size_t width )
+get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
+		size_t height, size_t width )
 {
   size_t x, y, colour;
 
-                          /*  R    G    B */
-  BYTE palette[16][3] = { {   0,   0,   0 },
-			  {   0,   0, 192 },
-			  { 192,   0,   0 },
-			  { 192,   0, 192 },
-			  {   0, 192,   0 },
-			  {   0, 192, 192 },
-			  { 192, 192,   0 },
-			  { 192, 192, 192 },
-			  {   0,   0,   0 },
-			  {   0,   0, 255 },
-			  { 255,   0,   0 },
-			  { 255,   0, 255 },
-			  {   0, 255,   0 },
-			  {   0, 255, 255 },
-			  { 255, 255,   0 },
-			  { 255, 255, 255 } };
+				      /*  R    G    B */
+  libspectrum_byte palette[16][3] = { {   0,   0,   0 },
+				      {   0,   0, 192 },
+				      { 192,   0,   0 },
+				      { 192,   0, 192 },
+				      {   0, 192,   0 },
+				      {   0, 192, 192 },
+				      { 192, 192,   0 },
+				      { 192, 192, 192 },
+				      {   0,   0,   0 },
+				      {   0,   0, 255 },
+				      { 255,   0,   0 },
+				      { 255,   0, 255 },
+				      {   0, 255,   0 },
+				      {   0, 255, 255 },
+				      { 255, 255,   0 },
+				      { 255, 255, 255 } };
 
   for( y = 0; y < height; y++ ) {
     for( x = 0; x < width; x++ ) {
@@ -218,8 +220,8 @@ get_rgb32_data( BYTE *rgb32_data, size_t stride, size_t height, size_t width )
 }
 
 static int
-rgb32_to_rgb24( BYTE *rgb24_data, size_t rgb24_stride,
-		BYTE *rgb32_data, size_t rgb32_stride,
+rgb32_to_rgb24( libspectrum_byte *rgb24_data, size_t rgb24_stride,
+		libspectrum_byte *rgb32_data, size_t rgb32_stride,
 		size_t height, size_t width )
 {
   size_t x, y;
@@ -271,7 +273,7 @@ screenshot_available_scalers( scaler_type scaler )
 int
 screenshot_scr_write( const char *filename )
 {
-  BYTE scr_data[HIRES_SCR_SIZE];
+  libspectrum_byte scr_data[HIRES_SCR_SIZE];
   int scr_length;
 
   memset( scr_data, 0, HIRES_SCR_SIZE );
@@ -335,12 +337,12 @@ typedef struct {
 #endif			/* #ifdef WORDS_BIGENDIAN */
 
 typedef union {
-  BYTE byte;
+  libspectrum_byte byte;
   byte_field_type bit;
 } bft_union;
 
-BYTE
-convert_hires_to_lores( BYTE high, BYTE low )
+libspectrum_byte
+convert_hires_to_lores( libspectrum_byte high, libspectrum_byte low )
 {
   bft_union ret, h, l;
 

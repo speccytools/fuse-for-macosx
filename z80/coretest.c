@@ -40,11 +40,11 @@ static const char *progname;		/* argv[0] */
 
 static int init_dummies( void );
 
-DWORD tstates;
-DWORD event_next_event;
+libspectrum_dword tstates;
+libspectrum_dword event_next_event;
 
 /* 64Kb of RAM */
-static BYTE initial_memory[ 0x10000 ], memory[ 0x10000 ];
+static libspectrum_byte initial_memory[ 0x10000 ], memory[ 0x10000 ];
 
 spectrum_memory_read_function readbyte, readbyte_internal;
 spectrum_memory_write_function writebyte;
@@ -52,12 +52,13 @@ spectrum_memory_write_function writebyte;
 spectrum_memory_contention_function contend_memory;
 spectrum_port_contention_function contend_port;
 
-static BYTE trivial_readbyte( WORD address );
-static void trivial_writebyte( WORD address, BYTE b );
-static DWORD trivial_contend_memory( WORD address );
-static DWORD trivial_contend_port( WORD port );
+static libspectrum_byte trivial_readbyte( libspectrum_word address );
+static void trivial_writebyte( libspectrum_word address, libspectrum_byte b );
+static libspectrum_dword trivial_contend_memory( libspectrum_word address );
+static libspectrum_dword trivial_contend_port( libspectrum_word port );
 
-static int read_test_file( const char *filename, DWORD *end_tstates );
+static int read_test_file( const char *filename,
+			   libspectrum_dword *end_tstates );
 
 static void dump_z80_state( void );
 static void dump_memory_state( void );
@@ -106,36 +107,36 @@ main( int argc, char **argv )
   return 0;
 }
 
-static BYTE
-trivial_readbyte( WORD address )
+static libspectrum_byte
+trivial_readbyte( libspectrum_word address )
 {
   printf( "%5d MR %04x %02x\n", tstates, address, memory[ address ] );
   return memory[ address ];
 }
 
 static void
-trivial_writebyte( WORD address, BYTE b )
+trivial_writebyte( libspectrum_word address, libspectrum_byte b )
 {
   printf( "%5d MW %04x %02x\n", tstates, address, b );
   memory[ address ] = b;
 }
 
-static DWORD
-trivial_contend_memory( WORD address )
+static libspectrum_dword
+trivial_contend_memory( libspectrum_word address )
 {
   printf( "%5d MC %04x\n", tstates, address );
   return 0;
 }
 
-static DWORD
-trivial_contend_port( WORD port )
+static libspectrum_dword
+trivial_contend_port( libspectrum_word port )
 {
   printf( "%5d PC %04x\n", tstates, port );
   return 0;
 }
 
-BYTE
-readport( WORD port )
+libspectrum_byte
+readport( libspectrum_word port )
 {
   /* For now, just return 0xff. May need to make this more complicated later */
   printf( "%5d PR %04x %02x\n", tstates, port, 0xff );
@@ -143,14 +144,14 @@ readport( WORD port )
 }
 
 void
-writeport( WORD port, BYTE b )
+writeport( libspectrum_word port, libspectrum_byte b )
 {
   /* Don't need to do anything here */
   printf( "%5d PW %04x %02x\n", tstates, port, b );
 }
 
 static int
-read_test_file( const char *filename, DWORD *end_tstates )
+read_test_file( const char *filename, libspectrum_dword *end_tstates )
 {
   FILE *f;
 
@@ -288,7 +289,7 @@ ui_error( ui_error_level severity, const char *format, ... )
 #include "scld.h"
 #include "settings.h"
 
-BYTE *slt[256];
+libspectrum_byte *slt[256];
 size_t slt_length[256];
 
 int
@@ -314,7 +315,7 @@ int rzx_instructions_offset;
 enum debugger_mode_t debugger_mode;
 
 int
-debugger_check( debugger_breakpoint_type type, WORD value )
+debugger_check( debugger_breakpoint_type type, libspectrum_word value )
 {
   /* Should never be called */
   abort();
@@ -330,7 +331,7 @@ debugger_trap( void )
 int trdos_active;
 
 int
-event_add( DWORD event_time, int type )
+event_add( libspectrum_dword event_time, int type )
 {
   /* Should never be called */
   abort();

@@ -24,8 +24,10 @@
  */
 
 #include <config.h>
+
 #include <string.h>
-#include "types.h"
+
+#include <libspectrum.h>
 
 #include "scaler.h"
 #include "scaler_internals.h"

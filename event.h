@@ -1,5 +1,5 @@
 /* event.h: Routines needed for dealing with the event list
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000-2003 Philip Kendall
 
    $Id$
 
@@ -27,13 +27,11 @@
 #ifndef FUSE_EVENT_H
 #define FUSE_EVENT_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
 /* Information about an event */
 typedef struct event_t {
-  DWORD tstates;
+  libspectrum_dword tstates;
   int type;
 } event_t;
 
@@ -49,22 +47,22 @@ enum event_types {
 };
 
 /* A large value to mean `no events due' */
-extern const DWORD event_no_events;
+extern const libspectrum_dword event_no_events;
 
 /* When will the next event happen? */
-extern DWORD event_next_event;
+extern libspectrum_dword event_next_event;
 
 /* Set up the event list */
 int event_init(void);
 
 /* Add an event at the correct place in the event list */
-int event_add(DWORD event_time, int type);
+int event_add( libspectrum_dword event_time, int type );
 
 /* Do all events which have passed */
 int event_do_events(void);
 
 /* Called on interrupt to reduce T-state count of all entries */
-int event_interrupt( DWORD tstates_per_frame );
+int event_interrupt( libspectrum_dword tstates_per_frame );
 
 /* Remove all events of a specific type from the stack */
 int event_remove_type( int type );

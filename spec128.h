@@ -27,26 +27,29 @@
 #ifndef FUSE_SPEC128_H
 #define FUSE_SPEC128_H
 
+#include <libspectrum.h>
+
 #ifndef FUSE_MACHINE_H
 #include "machine.h"
 #endif			/* #ifndef FUSE_MACHINE_H */
 
 extern spectrum_port_info spec128_peripherals[];
 
-BYTE spec128_unattached_port( void );
+libspectrum_byte spec128_unattached_port( void );
 
-BYTE spec128_readbyte(WORD address);
-BYTE spec128_readbyte_internal( WORD address );
-BYTE spec128_read_screen_memory(WORD offset);
-void spec128_writebyte(WORD address, BYTE b);
-void spec128_writebyte_internal( WORD address, BYTE b );
+libspectrum_byte spec128_readbyte( libspectrum_word address );
+libspectrum_byte spec128_readbyte_internal( libspectrum_word address );
+libspectrum_byte spec128_read_screen_memory( libspectrum_word offset );
+void spec128_writebyte( libspectrum_word address, libspectrum_byte b );
+void spec128_writebyte_internal( libspectrum_word address,
+				 libspectrum_byte b );
 
-DWORD spec128_contend_memory( WORD address );
-DWORD spec128_contend_port( WORD port );
+libspectrum_dword spec128_contend_memory( libspectrum_word address );
+libspectrum_dword spec128_contend_port( libspectrum_word port );
 
 int spec128_init( fuse_machine_info *machine );
 int spec128_reset(void);
 
-void spec128_memoryport_write(WORD port, BYTE b);
+void spec128_memoryport_write( libspectrum_word port, libspectrum_byte b );
 
 #endif			/* #ifndef FUSE_SPEC128_H */

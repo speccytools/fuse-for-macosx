@@ -41,29 +41,25 @@
 #include "display.h"
 #endif			/* #ifndef FUSE_DISPLAY_H */
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
-
 #ifndef FUSE_SPECTRUM_H
 #include "spectrum.h"
 #endif			/* #ifndef FUSE_SPECTRUM_H */
 
-typedef BYTE (*spectrum_unattached_port_fn)( void );
+typedef libspectrum_byte (*spectrum_unattached_port_fn)( void );
 
 /* How long do things take to happen; fields are pulled from libspectrum
    via the libspectrum_timings_* functions */
 typedef struct machine_timings {
 
   /* Processor speed */
-  DWORD processor_speed;
+  libspectrum_dword processor_speed;
 
   /* Line timings in tstates */
-  WORD left_border, horizontal_screen, right_border;
-  WORD tstates_per_line;
+  libspectrum_word left_border, horizontal_screen, right_border;
+  libspectrum_word tstates_per_line;
 
   /* Frame timing */
-  DWORD tstates_per_frame;
+  libspectrum_dword tstates_per_frame;
 
 } machine_timings;
 
@@ -78,7 +74,7 @@ typedef struct fuse_machine_info {
 
   machine_timings timings; /* How long do things take to happen? */
   /* Redraw line y this many tstates after interrupt */
-  DWORD	line_times[DISPLAY_SCREEN_HEIGHT+1];
+  libspectrum_dword line_times[DISPLAY_SCREEN_HEIGHT+1];
 
   spectrum_raminfo ram; /* How do we access memory, and what's currently
 			   paged in */
@@ -111,7 +107,8 @@ const char* machine_get_id( libspectrum_machine type );
 int machine_set_timings( fuse_machine_info *machine );
 
 int machine_allocate_roms( fuse_machine_info *machine, size_t count );
-int machine_load_rom( BYTE **data, char *filename, size_t expected_length );
+int machine_load_rom( libspectrum_byte **data, char *filename,
+		      size_t expected_length );
 int machine_find_rom( const char *filename );
 
 int machine_reset( void );

@@ -1,5 +1,5 @@
 /* tc2068.h: Timex TC2068 specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
    Copyright (c) 2002 Fredrick Meunier
    Copyright (c) 2003 Witold Filipczyk
 
@@ -29,23 +29,21 @@
 #ifndef FUSE_TC2068_H
 #define FUSE_TC2068_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
-BYTE tc2068_readbyte(WORD address);
-BYTE tc2068_readbyte_internal( WORD address );
-BYTE tc2068_read_screen_memory(WORD offset);
-void tc2068_writebyte(WORD address, BYTE b);
-void tc2068_writebyte_internal( WORD address, BYTE b );
+libspectrum_byte tc2068_readbyte( libspectrum_word address );
+libspectrum_byte tc2068_readbyte_internal( libspectrum_word address );
+libspectrum_byte tc2068_read_screen_memory( libspectrum_word offset );
+void tc2068_writebyte( libspectrum_word address, libspectrum_byte b );
+void tc2068_writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
-DWORD tc2068_contend_memory( WORD address );
-DWORD tc2068_contend_port( WORD port );
+libspectrum_dword tc2068_contend_memory( libspectrum_word address );
+libspectrum_dword tc2068_contend_port( libspectrum_word port );
 
 int tc2068_init( fuse_machine_info *machine );
 int tc2068_reset( void );
 
-BYTE tc2068_ay_registerport_read( WORD port );
-BYTE tc2068_ay_dataport_read( WORD port );
+libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port );
+libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port );
 
 #endif			/* #ifndef FUSE_TC2068_H */

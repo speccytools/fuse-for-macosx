@@ -35,7 +35,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <limits.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 
 #include <libspectrum.h>
@@ -44,7 +43,6 @@
 #include "event.h"
 #include "machine.h"
 #include "spectrum.h"
-#include "types.h"
 #include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -61,7 +59,7 @@ typedef struct
   int ro;			/* True if we have read-only access to this
 				   disk */
 
-  BYTE trk;
+  libspectrum_byte trk;
 
 } discs_type;
 
@@ -137,23 +135,24 @@ static int towriteaddr;
 static int pointer;
 static int side;
 
-static BYTE track[TRDOS_DISC_SIZE];
-static BYTE * toread;
+static libspectrum_byte track[ TRDOS_DISC_SIZE ];
+static libspectrum_byte *toread;
 static unsigned int toread_num = 0;
 static unsigned int toread_position = 0;
-static BYTE six_bytes[6];
+static libspectrum_byte six_bytes[6];
 
 static int vg_spin;
 static int vg_direction; /* 0 - spindlewards 1 - rimwards */
-static BYTE vg_reg_trk; /* The last byte sent to the VG93 track register  */
-static BYTE vg_reg_sec; /* The last byte sent to the VG93 sector register */
-static BYTE vg_reg_dat; /* The last byte sent to the VG93 data register   */
-static BYTE vg_portFF_in;
-static BYTE last_vg93_system = 0; /* The last byte sent to the VG93 system port */
+static libspectrum_byte vg_reg_trk; /* The last byte sent to VG93 track reg */
+static libspectrum_byte vg_reg_sec; /* The last byte sent to VG93 sector reg */
+static libspectrum_byte vg_reg_dat; /* The last byte sent to VG93 data reg */
+static libspectrum_byte vg_portFF_in;
+static libspectrum_byte last_vg93_system = 0; /* Last byte sent to VG93 system
+						 port */
 
 union
 {
-  BYTE byte;
+  libspectrum_byte byte;
   rs_type bit;
 } vg_rs; 
 
@@ -167,8 +166,8 @@ int trdos_active=0;
 static int Scl2Trd( const char *oldname, int TRD );
 static int insert_scl( trdos_drive_number which, const char *filename );
 static int insert_trd( trdos_drive_number which, const char *filename );
-static DWORD lsb2dw( BYTE *mem );
-static void dw2lsb( BYTE *mem, DWORD value );
+static libspectrum_dword lsb2dw( libspectrum_byte *mem );
+static void dw2lsb( libspectrum_byte *mem, libspectrum_dword value );
 
 int
 trdos_init( void )
@@ -212,8 +211,8 @@ void trdos_update_index_impulse( void )
   }
 }
 
-BYTE
-trdos_sr_read( WORD port GCC_UNUSED )
+libspectrum_byte
+trdos_sr_read( libspectrum_word port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -224,8 +223,8 @@ trdos_sr_read( WORD port GCC_UNUSED )
   return( vg_rs.byte );
 }
 
-BYTE
-trdos_tr_read( WORD port GCC_UNUSED )
+libspectrum_byte
+trdos_tr_read( libspectrum_word port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -233,13 +232,13 @@ trdos_tr_read( WORD port GCC_UNUSED )
 }
 
 void
-trdos_tr_write( WORD port GCC_UNUSED, BYTE b )
+trdos_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   vg_reg_trk = b;
 }
 
-BYTE
-trdos_sec_read( WORD port GCC_UNUSED )
+libspectrum_byte
+trdos_sec_read( libspectrum_word port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -247,13 +246,13 @@ trdos_sec_read( WORD port GCC_UNUSED )
 }
 
 void
-trdos_sec_write( WORD port GCC_UNUSED, BYTE b )
+trdos_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   vg_reg_sec = b;
 }
 
-BYTE
-trdos_dr_read( WORD port GCC_UNUSED )
+libspectrum_byte
+trdos_dr_read( libspectrum_word port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -284,7 +283,7 @@ trdos_dr_read( WORD port GCC_UNUSED )
 }
 
 void
-trdos_dr_write( WORD port GCC_UNUSED, BYTE b )
+trdos_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   vg_reg_dat = b;
 
@@ -312,8 +311,8 @@ trdos_dr_write( WORD port GCC_UNUSED, BYTE b )
   }
 }
 
-BYTE
-trdos_sp_read( WORD port GCC_UNUSED )
+libspectrum_byte
+trdos_sp_read( libspectrum_word port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -325,7 +324,7 @@ trdos_sp_read( WORD port GCC_UNUSED )
 }
 
 void
-trdos_sp_write( WORD port GCC_UNUSED, BYTE b )
+trdos_sp_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   last_vg93_system = b;
 }
@@ -334,7 +333,7 @@ static int
 insert_trd( trdos_drive_number which, const char *filename )
 {
   int fil;
-  BYTE *temp;
+  libspectrum_byte *temp;
 
   discs[which].ro = 0;
 
@@ -519,7 +518,7 @@ trdos_disk_eject( trdos_drive_number which )
 }
 
 int
-trdos_event_cmd_done( DWORD last_tstates GCC_UNUSED )
+trdos_event_cmd_done( libspectrum_dword last_tstates GCC_UNUSED )
 {
   busy = 0;
 
@@ -527,7 +526,7 @@ trdos_event_cmd_done( DWORD last_tstates GCC_UNUSED )
 }
 
 int
-trdos_event_index( DWORD last_tstates )
+trdos_event_index( libspectrum_dword last_tstates )
 {
   int error;
   int next_tstates;
@@ -552,7 +551,7 @@ trdos_event_index( DWORD last_tstates )
 }
 
 static void
-vg_seek_delay(BYTE dst_track) 
+vg_seek_delay( libspectrum_byte dst_track ) 
 {
   int error;
 
@@ -593,7 +592,7 @@ vg_setFlagsSeeks( void )
 }
 
 void
-trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
+trdos_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int error;
 
@@ -803,22 +802,22 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
 
 typedef union {
 #ifdef WORDS_BIGENDIAN
-  struct { BYTE b3, b2, b1, b0; } b;
+  struct { libspectrum_byte b3, b2, b1, b0; } b;
 #else
-  struct { BYTE b0, b1, b2, b3; } b;
+  struct { libspectrum_byte b0, b1, b2, b3; } b;
 #endif
-  DWORD dword;
+  libspectrum_dword dword;
 } lsb_dword;
 
-static DWORD 
-lsb2dw( BYTE *mem )
+static libspectrum_dword 
+lsb2dw( libspectrum_byte *mem )
 {
   return ( mem[0] + ( mem[1] * 256 ) + ( mem[2] * 256 * 256 )
           + ( mem[3] * 256 * 256 * 256 ) );
 }
 
 static void
-dw2lsb( BYTE *mem, DWORD value )
+dw2lsb( libspectrum_byte *mem, libspectrum_dword value )
 {
   lsb_dword ret;
 
@@ -835,26 +834,26 @@ Scl2Trd( const char *oldname, int TRD )
 {
   int SCL, i;
 
-  BYTE *TRDh;
+  libspectrum_byte *TRDh;
 
-  BYTE *trd_free;
-  BYTE *trd_fsec;
-  BYTE *trd_ftrk;
-  BYTE *trd_files;
-  BYTE size;
+  libspectrum_byte *trd_free;
+  libspectrum_byte *trd_fsec;
+  libspectrum_byte *trd_ftrk;
+  libspectrum_byte *trd_files;
+  libspectrum_byte size;
 
   char signature[8];
-  BYTE blocks;
-  BYTE headers[256][14];
+  libspectrum_byte blocks;
+  libspectrum_byte headers[256][14];
   void *tmpscl;
-  DWORD left;
-  DWORD fptr;
+  libspectrum_dword left;
+  libspectrum_dword fptr;
   size_t x;
 
   ssize_t written;
 
-  BYTE template[34] =
-  { 0x01, 0x16, 0x00, 0xF0,
+  libspectrum_byte template[34] = { 
+    0x01, 0x16, 0x00, 0xF0,
     0x09, 0x10, 0x00, 0x00,
     0x20, 0x20, 0x20, 0x20,
     0x20, 0x20, 0x20, 0x20,
@@ -864,7 +863,7 @@ Scl2Trd( const char *oldname, int TRD )
     0x00, 0x00, 0x46, 0x55
   };
 
-  BYTE *mem;
+  libspectrum_byte *mem;
 
   mem = malloc( BLOCKSIZE );
   if( !mem ) {
@@ -978,8 +977,9 @@ Scl2Trd( const char *oldname, int TRD )
       goto Finish;
     }
 
-    left = ( headers[x][13] ) * (DWORD)256;
-    fptr = (*trd_ftrk) * (DWORD)4096 + (*trd_fsec) * (DWORD)256;
+    left = ( headers[x][13] ) * (libspectrum_dword)256;
+    fptr = (*trd_ftrk) * (libspectrum_dword)4096 +
+           (*trd_fsec) * (libspectrum_dword)256;
     
     if( lseek( TRD, fptr, SEEK_SET ) == -1 ) {
       ui_error( UI_ERROR_ERROR, "Error seeking in temporary TRD file: %s",

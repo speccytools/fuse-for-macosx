@@ -1,5 +1,5 @@
 /* printer.h: Printer support
-   Copyright (c) 2001,2002 Ian Collier, Russell Marks, Philip Kendall
+   Copyright (c) 2001-2003 Ian Collier, Russell Marks, Philip Kendall
 
    $Id$
 
@@ -27,19 +27,17 @@
 #ifndef FUSE_PRINTER_H
 #define FUSE_PRINTER_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
-BYTE printer_zxp_read(WORD port);
-void printer_zxp_write(WORD port,BYTE b);
-void printer_zxp_reset(void);
-void printer_frame(void);
-void printer_serial_write(BYTE b);
-void printer_parallel_strobe_write(int on);
-BYTE printer_parallel_read(WORD port);
-void printer_parallel_write(WORD port,BYTE b);
-int printer_init(void);
-void printer_end(void);
+libspectrum_byte printer_zxp_read( libspectrum_word port );
+void printer_zxp_write( libspectrum_word port, libspectrum_byte b );
+void printer_zxp_reset( void );
+void printer_frame( void );
+void printer_serial_write( libspectrum_byte b );
+void printer_parallel_strobe_write( int on );
+libspectrum_byte printer_parallel_read( libspectrum_word port );
+void printer_parallel_write( libspectrum_word port, libspectrum_byte b );
+int printer_init( void );
+void printer_end( void );
 
 #endif				/* #ifndef FUSE_PRINTER_H */

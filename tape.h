@@ -1,5 +1,5 @@
 /* tape.h: tape handling routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -29,10 +29,6 @@
 
 #include <libspectrum.h>
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif
-
 int tape_init( void );
 
 int tape_open( const char *filename, int autoload );
@@ -52,7 +48,7 @@ int tape_save_trap( void );
 int tape_play( void );
 int tape_toggle_play( void );
 
-int tape_next_edge( DWORD last_tstates );
+int tape_next_edge( libspectrum_dword last_tstates );
 
 int tape_stop( void );
 

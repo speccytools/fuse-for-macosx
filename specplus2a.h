@@ -1,5 +1,5 @@
 /* specplus2a.h: Spectrum +2A specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -27,9 +27,9 @@
 #ifndef FUSE_SPECPLUS2A_H
 #define FUSE_SPECPLUS2A_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#ifndef FUSE_MACHINE_H
+#include "machine.h"
+#endif			/* #ifndef FUSE_MACHINE_H */
 
 int specplus2a_init( fuse_machine_info *machine );
 int specplus2a_reset(void);

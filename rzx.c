@@ -38,7 +38,6 @@
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
-#include "types.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80.h"

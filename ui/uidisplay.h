@@ -27,9 +27,7 @@
 #ifndef FUSE_UIDISPLAY_H
 #define FUSE_UIDISPLAY_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
 /* User interface specific functions */
 
@@ -43,6 +41,6 @@ int uidisplay_end(void);
 
 /* General functions */
 
-void uidisplay_spectrum_screen( const BYTE *screen, int border );
+void uidisplay_spectrum_screen( const libspectrum_byte *screen, int border );
 
 #endif			/* #ifndef FUSE_UIDISPLAY_H */

@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2002 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2003 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -26,7 +26,7 @@
 
 #include <config.h>
 
-#include <stdio.h>
+#include <libspectrum.h>
 
 #include "debugger/debugger.h"
 #include "display.h"
@@ -52,17 +52,17 @@
 size_t spectrum_rom_count = 0;
 
 /* The ROMs themselves */
-BYTE **ROM = NULL;
+libspectrum_byte **ROM = NULL;
 
 /* And the RAM */
-BYTE RAM[8][0x4000];
+libspectrum_byte RAM[8][0x4000];
 
 /* How many tstates have elapsed since the last interrupt? (or more
    precisely, since the ULA last pulled the /INT line to the Z80 low) */
-DWORD tstates;
+libspectrum_dword tstates;
 
 /* The last byte written to the ULA */
-BYTE spectrum_last_ula;
+libspectrum_byte spectrum_last_ula;
 
 /* Set these every time we change machine to avoid having to do a
    structure lookup too often */
@@ -77,10 +77,10 @@ spectrum_port_contention_function contend_port;
 
 /* Level data from .slt files */
 
-BYTE *slt[256];
+libspectrum_byte *slt[256];
 size_t slt_length[256];
 
-BYTE *slt_screen;		/* The screenshot from the .slt file */
+libspectrum_byte *slt_screen;	/* The screenshot from the .slt file */
 int slt_screen_level;		/* The level of the screenshot.
 				   Not used for anything AFAIK */
 
@@ -129,11 +129,12 @@ int spectrum_interrupt(void)
   return 0;
 }
 
-BYTE readport(WORD port)
+libspectrum_byte
+readport( libspectrum_word port )
 {
   spectrum_port_info *ptr;
 
-  BYTE return_value = 0xff;
+  libspectrum_byte return_value = 0xff;
   int attached = 0;		/* Is this port attached to anything? */
 
   /* Trigger the debugger if wanted */
@@ -168,7 +169,8 @@ BYTE readport(WORD port)
 
 }
 
-void writeport(WORD port, BYTE b)
+void
+writeport( libspectrum_word port, libspectrum_byte b )
 {
   spectrum_port_info *ptr;
 
@@ -186,8 +188,8 @@ void writeport(WORD port, BYTE b)
 }
 
 /* A dummy function for non-readable ports */
-BYTE
-spectrum_port_noread( WORD port GCC_UNUSED )
+libspectrum_byte
+spectrum_port_noread( libspectrum_word port GCC_UNUSED )
 {
   /* FIXME: should this return the floating bus value? */
   return 0xff;
@@ -195,20 +197,22 @@ spectrum_port_noread( WORD port GCC_UNUSED )
 
 /* And one for non-writable ports */
 void
-spectrum_port_nowrite( WORD port GCC_UNUSED, BYTE value GCC_UNUSED )
+spectrum_port_nowrite( libspectrum_word port GCC_UNUSED,
+		       libspectrum_byte value GCC_UNUSED )
 {
   return;
 }
 
 /* What do we get if we read from the ULA? */
-BYTE spectrum_ula_read(WORD port)
+libspectrum_byte
+spectrum_ula_read( libspectrum_word port )
 {
   return ( keyboard_read( port >> 8 ) ^ ( tape_microphone ? 0x40 : 0x00 ) );
 }
 
 /* What happens when we write to the ULA? */
 void
-spectrum_ula_write( WORD port GCC_UNUSED, BYTE b )
+spectrum_ula_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   spectrum_last_ula = b;
 
@@ -236,7 +240,8 @@ spectrum_ula_write( WORD port GCC_UNUSED, BYTE b )
 }
 
 /* What happens if we read from an unattached port? */
-BYTE spectrum_unattached_port( int offset )
+libspectrum_byte
+spectrum_unattached_port( int offset )
 {
   int line, tstates_through_line, column;
 
@@ -245,8 +250,8 @@ BYTE spectrum_unattached_port( int offset )
     return 0xff;
 
   /* Work out which line we're on, relative to the top of the screen */
-  line = ( (SDWORD)tstates -
-	   (SDWORD)machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] ) /
+  line = ( (libspectrum_signed_dword)tstates -
+	   machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] ) /
     machine_current->timings.tstates_per_line;
 
   /* Idle bus if we're in the lower or upper borders */

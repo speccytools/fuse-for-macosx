@@ -1,5 +1,5 @@
 /* keyboard.h: Routines for dealing with the Spectrum's keyboard
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -27,12 +27,10 @@
 #ifndef FUSE_KEYBOARD_H
 #define FUSE_KEYBOARD_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
-extern BYTE keyboard_default_value;
-extern BYTE keyboard_return_values[8];
+extern libspectrum_byte keyboard_default_value;
+extern libspectrum_byte keyboard_return_values[8];
 
 /* A numeric identifier for each Spectrum key. Chosen to map to ASCII in
    most cases */
@@ -100,7 +98,7 @@ typedef enum keyboard_key_name {
 } keyboard_key_name;
 
 void fuse_keyboard_init(void);
-BYTE keyboard_read(BYTE porth);
+libspectrum_byte keyboard_read( libspectrum_byte porth );
 void keyboard_press(keyboard_key_name key);
 void keyboard_release(keyboard_key_name key);
 int keyboard_release_all( void );

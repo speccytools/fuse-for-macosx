@@ -26,10 +26,6 @@
 #ifndef FUSE_SCLD_H
 #define FUSE_SCLD_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif                  /* #ifndef FUSE_TYPES_H */
-
 #define STANDARD        0x00 /* standard Spectrum */
 #define ALTDFILE        0x01 /* the same in nature as above, but using second
                                 display file */
@@ -108,21 +104,21 @@ typedef struct
 
 typedef union
 {
-  BYTE byte;
+  libspectrum_byte byte;
   scld_masks mask;
   scld_names name;
 } scld; 
 
 extern scld scld_last_dec;           /* The last byte sent to Timex DEC port */
 
-extern BYTE scld_last_hsr;           /* The last byte sent to Timex HSR port */
+extern libspectrum_byte scld_last_hsr; /* Last byte sent to Timex HSR port */
 
-extern BYTE timex_fake_bank[8192];
+extern libspectrum_byte timex_fake_bank[ 8192 ];
 
 typedef struct timex_mem {
-  BYTE *page;
-  BYTE writeable;               /* 1 - chunk writeable, 0 - chunk read only */
-  BYTE allocated;               /* Did we malloc this block? */
+  libspectrum_byte *page;
+  libspectrum_byte writeable;	/* 1 - chunk writeable, 0 - chunk read only */
+  libspectrum_byte allocated;	/* Did we malloc this block? */
 } timex_mem;
 
 extern timex_mem timex_exrom_dock[8];
@@ -132,14 +128,14 @@ extern timex_mem timex_home[8];
 extern timex_mem timex_memory[8];
 
 void scld_reset( void );
-void scld_dec_write( WORD port, BYTE b );
-BYTE scld_dec_read( WORD port );
+void scld_dec_write( libspectrum_word port, libspectrum_byte b );
+libspectrum_byte scld_dec_read( libspectrum_word port );
 
-void scld_hsr_write( WORD port, BYTE b );
-BYTE scld_hsr_read( WORD port );
+void scld_hsr_write( libspectrum_word port, libspectrum_byte b );
+libspectrum_byte scld_hsr_read( libspectrum_word port );
 
-BYTE hires_get_attr( void );
-BYTE hires_convert_dec( BYTE attr );
+libspectrum_byte hires_get_attr( void );
+libspectrum_byte hires_convert_dec( libspectrum_byte attr );
 
 void scld_dock_free( void );
 void scld_exrom_free( void );

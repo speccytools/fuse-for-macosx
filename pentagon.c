@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <libspectrum.h>
+
 #include "ay.h"
 #include "compat.h"
 #include "display.h"
@@ -43,8 +45,8 @@
 #include "trdos.h"
 #include "z80/z80.h"
 
-static BYTE pentagon_select_1f_read( WORD port );
-static BYTE pentagon_select_ff_read( WORD port );
+static libspectrum_byte pentagon_select_1f_read( libspectrum_word port );
+static libspectrum_byte pentagon_select_ff_read( libspectrum_word port );
 static int pentagon_shutdown( void );
 
 spectrum_port_info pentagon_peripherals[] = {
@@ -60,8 +62,8 @@ spectrum_port_info pentagon_peripherals[] = {
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
-BYTE
-pentagon_select_1f_read( WORD port )
+libspectrum_byte
+pentagon_select_1f_read( libspectrum_word port )
 {
   if( trdos_active ) {
     return trdos_sr_read( port );
@@ -70,8 +72,8 @@ pentagon_select_1f_read( WORD port )
   }
 }
 
-BYTE
-pentagon_select_ff_read( WORD port )
+libspectrum_byte
+pentagon_select_ff_read( libspectrum_word port )
 {
   if( trdos_active ) {
     return trdos_sp_read( port );
@@ -80,28 +82,28 @@ pentagon_select_ff_read( WORD port )
   }
 }
 
-BYTE
+libspectrum_byte
 pentagon_unattached_port( void )
 {
   return spectrum_unattached_port( 3 );
 }
 
-BYTE
-pentagon_read_screen_memory(WORD offset)
+libspectrum_byte
+pentagon_read_screen_memory( libspectrum_word offset )
 {
   return RAM[machine_current->ram.current_screen][offset];
 }
 
-DWORD
-pentagon_contend_memory( WORD address GCC_UNUSED )
+libspectrum_dword
+pentagon_contend_memory( libspectrum_word address GCC_UNUSED )
 {
   /* No contended memory */
 
   return 0;
 }
 
-DWORD
-pentagon_contend_port( WORD port GCC_UNUSED )
+libspectrum_dword
+pentagon_contend_port( libspectrum_word port GCC_UNUSED )
 {
   /* No contention on ports AFAIK */
 
@@ -171,7 +173,8 @@ pentagon_reset(void)
 }
 
 void
-pentagon_memoryport_write( WORD port GCC_UNUSED, BYTE b )
+pentagon_memoryport_write( libspectrum_word port GCC_UNUSED,
+			   libspectrum_byte b )
 {
   int old_screen;
 

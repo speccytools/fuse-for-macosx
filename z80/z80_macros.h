@@ -110,9 +110,10 @@
 
 #define ADC(value)\
 {\
-  WORD adctemp = A + (value) + ( F & FLAG_C );\
-  BYTE lookup = ( (A & 0x88) >> 3 ) | ( ( (value) & 0x88 ) >> 2 ) |\
-    ( (adctemp & 0x88) >> 1 );\
+  libspectrum_word adctemp = A + (value) + ( F & FLAG_C ); \
+  libspectrum_byte lookup = ( (       A & 0x88 ) >> 3 ) | \
+			    ( ( (value) & 0x88 ) >> 2 ) | \
+			    ( ( adctemp & 0x88 ) >> 1 );  \
   A=adctemp;\
   F = ( adctemp & 0x100 ? FLAG_C : 0 ) |\
     halfcarry_add_table[lookup & 0x07] | overflow_add_table[lookup >> 4] |\
@@ -121,10 +122,10 @@
 
 #define ADC16(value)\
 {\
-  DWORD add16temp= HL + (value) + ( F & FLAG_C );\
-  BYTE lookup = ( ( HL & 0x8800 ) >> 11 ) |\
-    ( ( (value) & 0x8800 ) >> 10 ) |\
-    ( ( add16temp & 0x8800 ) >> 9 );\
+  libspectrum_dword add16temp= HL + (value) + ( F & FLAG_C ); \
+  libspectrum_byte lookup = ( (        HL & 0x8800 ) >> 11 ) | \
+			    ( (   (value) & 0x8800 ) >> 10 ) | \
+			    ( ( add16temp & 0x8800 ) >>  9 );  \
   HL = add16temp;\
   F = ( add16temp & 0x10000 ? FLAG_C : 0 )|\
     overflow_add_table[lookup >> 4] |\
@@ -135,9 +136,10 @@
 
 #define ADD(value)\
 {\
-  WORD addtemp = A + (value);\
-  BYTE lookup = ( (A & 0x88) >> 3 ) | ( ( (value) & 0x88 ) >> 2 ) |\
-    ( (addtemp & 0x88) >> 1 );\
+  libspectrum_word addtemp = A + (value); \
+  libspectrum_byte lookup = ( (       A & 0x88 ) >> 3 ) | \
+			    ( ( (value) & 0x88 ) >> 2 ) | \
+			    ( ( addtemp & 0x88 ) >> 1 );  \
   A=addtemp;\
   F = ( addtemp & 0x100 ? FLAG_C : 0 ) |\
     halfcarry_add_table[lookup & 0x07] | overflow_add_table[lookup >> 4] |\
@@ -146,10 +148,10 @@
 
 #define ADD16(value1,value2)\
 {\
-  DWORD add16temp= (value1) + (value2);\
-  BYTE lookup = ( ( (value1) & 0x0800 ) >> 11 ) |\
-    ( ( (value2) & 0x0800 ) >> 10 ) |\
-    ( ( add16temp & 0x0800 ) >> 9 );\
+  libspectrum_dword add16temp = (value1) + (value2); \
+  libspectrum_byte lookup = ( (  (value1) & 0x0800 ) >> 11 ) | \
+			    ( (  (value2) & 0x0800 ) >> 10 ) | \
+			    ( ( add16temp & 0x0800 ) >>  9 );  \
   tstates += 7;\
   (value1) = add16temp;\
   F = ( F & ( FLAG_V | FLAG_Z | FLAG_S ) ) |\
@@ -173,7 +175,7 @@
 
 #define CALL()\
 {\
-  BYTE calltempl, calltemph;\
+  libspectrum_byte calltempl, calltemph; \
   calltempl=readbyte(PC++);\
   contend( PC, 1 );\
   calltemph=readbyte(PC++);\
@@ -183,9 +185,10 @@
 
 #define CP(value)\
 {\
-  WORD cptemp = A - value;\
-  BYTE lookup = ( (A & 0x88) >> 3 ) | ( ( (value) & 0x88 ) >> 2 ) |\
-    ( (cptemp & 0x88) >> 1 );\
+  libspectrum_word cptemp = A - value; \
+  libspectrum_byte lookup = ( (       A & 0x88 ) >> 3 ) | \
+			    ( ( (value) & 0x88 ) >> 2 ) | \
+			    ( (  cptemp & 0x88 ) >> 1 );  \
   F = ( cptemp & 0x100 ? FLAG_C : ( cptemp ? 0 : FLAG_Z ) ) | FLAG_N |\
     halfcarry_sub_table[lookup & 0x07] |\
     overflow_sub_table[lookup >> 4] |\
@@ -226,7 +229,7 @@ break
 
 #define LD16_NNRR(regl,regh)\
 {\
-  WORD ldtemp;\
+  libspectrum_word ldtemp; \
   contend( PC, 3 );\
   ldtemp=readbyte(PC++);\
   contend( PC, 3 );\
@@ -240,7 +243,7 @@ break
 
 #define LD16_RRNN(regl,regh)\
 {\
-  WORD ldtemp;\
+  libspectrum_word ldtemp; \
   contend( PC, 3 );\
   ldtemp=readbyte(PC++);\
   contend( PC, 3 );\
@@ -254,7 +257,7 @@ break
 
 #define JP()\
 {\
-  WORD jptemp=PC;\
+  libspectrum_word jptemp=PC; \
   PCL=readbyte(jptemp++);\
   PCH=readbyte(jptemp);\
 }
@@ -263,7 +266,7 @@ break
 {\
   contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );\
   contend( PC, 1 );\
-  PC+=(SBYTE)readbyte(PC);\
+  PC += (libspectrum_signed_byte)readbyte( PC ); \
 }
 
 #define OR(value)\
@@ -301,7 +304,7 @@ break
 
 #define RL(value)\
 {\
-  BYTE rltemp = (value);\
+  libspectrum_byte rltemp = (value); \
   (value) = ( (value)<<1 ) | ( F & FLAG_C );\
   F = ( rltemp >> 7 ) | sz53p_table[(value)];\
 }
@@ -314,7 +317,7 @@ break
 
 #define RR(value)\
 {\
-  BYTE rrtemp = (value);\
+  libspectrum_byte rrtemp = (value); \
   (value) = ( (value)>>1 ) | ( F << 7 );\
   F = ( rrtemp & FLAG_C ) | sz53p_table[(value)];\
 }
@@ -334,9 +337,10 @@ break
 
 #define SBC(value)\
 {\
-  WORD sbctemp = A - (value) - ( F & FLAG_C );\
-  BYTE lookup = ( (A & 0x88) >> 3 ) | ( ( (value) & 0x88 ) >> 2 ) |\
-    ( (sbctemp & 0x88) >> 1 );\
+  libspectrum_word sbctemp = A - (value) - ( F & FLAG_C ); \
+  libspectrum_byte lookup = ( (       A & 0x88 ) >> 3 ) | \
+			    ( ( (value) & 0x88 ) >> 2 ) | \
+			    ( ( sbctemp & 0x88 ) >> 1 );  \
   A=sbctemp;\
   F = ( sbctemp & 0x100 ? FLAG_C : 0 ) | FLAG_N |\
     halfcarry_sub_table[lookup & 0x07] | overflow_sub_table[lookup >> 4] |\
@@ -345,10 +349,10 @@ break
 
 #define SBC16(value)\
 {\
-  DWORD sub16temp = HL - (value) - (F & FLAG_C);\
-  BYTE lookup = ( ( HL & 0x8800 ) >> 11 ) |\
-    ( ( (value) & 0x8800 ) >> 10 ) |\
-    ( ( sub16temp & 0x8800 ) >> 9 );\
+  libspectrum_dword sub16temp = HL - (value) - (F & FLAG_C); \
+  libspectrum_byte lookup = ( (        HL & 0x8800 ) >> 11 ) | \
+			    ( (   (value) & 0x8800 ) >> 10 ) | \
+			    ( ( sub16temp & 0x8800 ) >>  9 );  \
   HL = sub16temp;\
   F = ( sub16temp & 0x10000 ? FLAG_C : 0 ) |\
     FLAG_N | overflow_sub_table[lookup >> 4] |\
@@ -387,9 +391,10 @@ break
 
 #define SUB(value)\
 {\
-  WORD subtemp = A - (value);\
-  BYTE lookup = ( (A & 0x88) >> 3 ) | ( ( (value) & 0x88 ) >> 2 ) |\
-    ( (subtemp & 0x88) >> 1 );\
+  libspectrum_word subtemp = A - (value); \
+  libspectrum_byte lookup = ( (       A & 0x88 ) >> 3 ) | \
+			    ( ( (value) & 0x88 ) >> 2 ) | \
+			    (  (subtemp & 0x88 ) >> 1 );  \
   A=subtemp;\
   F = ( subtemp & 0x100 ? FLAG_C : 0 ) | FLAG_N |\
     halfcarry_sub_table[lookup & 0x07] | overflow_sub_table[lookup >> 4] |\

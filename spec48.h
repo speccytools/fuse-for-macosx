@@ -1,5 +1,5 @@
 /* spec48.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -27,18 +27,16 @@
 #ifndef FUSE_SPEC48_H
 #define FUSE_SPEC48_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
-BYTE spec48_readbyte(WORD address);
-BYTE spec48_readbyte_internal( WORD address );
-BYTE spec48_read_screen_memory(WORD offset);
-void spec48_writebyte(WORD address, BYTE b);
-void spec48_writebyte_internal( WORD address, BYTE b );
+libspectrum_byte spec48_readbyte( libspectrum_word address );
+libspectrum_byte spec48_readbyte_internal( libspectrum_word address );
+libspectrum_byte spec48_read_screen_memory( libspectrum_word offset );
+void spec48_writebyte( libspectrum_word address, libspectrum_byte b );
+void spec48_writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
-DWORD spec48_contend_memory( WORD address );
-DWORD spec48_contend_port( WORD port );
+libspectrum_dword spec48_contend_memory( libspectrum_word address );
+libspectrum_dword spec48_contend_port( libspectrum_word port );
 
 int spec48_init( fuse_machine_info *machine );
 int spec48_reset( void );

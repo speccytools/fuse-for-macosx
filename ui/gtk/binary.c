@@ -31,11 +31,11 @@
 #include <stdio.h>
 
 #include <gtk/gtk.h>
+#include <libspectrum.h>
 
 #include "fuse.h"
 #include "gtkui.h"
 #include "spectrum.h"
-#include "types.h"
 #include "ui/ui.h"
 #include "utils.h"
 
@@ -182,7 +182,7 @@ load_data( GtkButton *button, gpointer user_data )
 {
   struct binary_info *info = user_data;
 
-  WORD start, length; size_t i;
+  libspectrum_word start, length; size_t i;
 
   length = atoi( gtk_entry_get_text( GTK_ENTRY( info->length_widget ) ) );
 
@@ -303,7 +303,7 @@ save_data( GtkButton *button, gpointer user_data )
 {
   struct binary_info *info = user_data;
 
-  WORD start, length; size_t i;
+  libspectrum_word start, length; size_t i;
   char *buffer;
 
   int error;

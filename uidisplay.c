@@ -26,16 +26,16 @@
 
 #include <config.h>
 
-#include <stdio.h>
+#include <libspectrum.h>
 
 #include "display.h"
 #include "machine.h"
 #include "ui/uidisplay.h"
 
-void uidisplay_spectrum_screen( const BYTE *screen, int border )
+void uidisplay_spectrum_screen( const libspectrum_byte *screen, int border )
 {
   int x,y;
-  BYTE attr,data; int ink, paper;
+  libspectrum_byte attr, data; int ink, paper;
 
   int scale = machine_current->timex ? 2 : 1;
 

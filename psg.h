@@ -1,5 +1,5 @@
 /* psg.h: recording AY chip output to .psg files
-   Copyright (c) 2003 Matthew Westcott
+   Copyright (c) 2003 Matthew Westcott, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,9 +25,7 @@
 #ifndef FUSE_PSG_H
 #define FUSE_PSG_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
 /* Are we currently recording a .psg file? */
 extern int psg_recording;
@@ -39,7 +37,7 @@ int psg_stop_recording( void );
 
 int psg_frame( void );
 
-int psg_write_register( BYTE reg, BYTE value );
+int psg_write_register( libspectrum_byte reg, libspectrum_byte value );
 
 int psg_end( void );
 

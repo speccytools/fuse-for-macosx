@@ -25,12 +25,14 @@
 #ifndef FUSE_SOUND_H
 #define FUSE_SOUND_H
 
-void sound_init(const char *device);
-void sound_end(void);
-void sound_ay_write(int reg,int val,DWORD now);
-void sound_ay_reset(void);
-void sound_frame(void);
-void sound_beeper(int is_tape,int on);
+#include <libspectrum.h>
+
+void sound_init( const char *device );
+void sound_end( void );
+void sound_ay_write( int reg, int val, libspectrum_dword now );
+void sound_ay_reset( void );
+void sound_frame( void );
+void sound_beeper( int is_tape, int on );
 
 extern int sound_enabled;
 extern int sound_freq;

@@ -28,7 +28,7 @@
 #define FUSE_GTKDISPLAY_H
 
 /* The colour palette in use */
-extern DWORD gtkdisplay_colours[16];
+extern libspectrum_dword gtkdisplay_colours[ 16 ];
 
 int gtkdisplay_init( void );
 int gtkdisplay_end( void );

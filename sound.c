@@ -1,5 +1,5 @@
 /* sound.c: Sound support
-   Copyright (c) 2000-2002 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2003 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+
+#include <libspectrum.h>
 
 #include "fuse.h"
 #include "machine.h"
@@ -105,11 +107,11 @@ static unsigned int ay_tone_period[3],ay_noise_period,ay_env_period;
 static int beeper_last_subpos[2]={0,0};
 
 /* Local copy of the AY registers */
-static BYTE sound_ay_registers[16];
+static libspectrum_byte sound_ay_registers[16];
 
 struct ay_change_tag
   {
-  DWORD tstates;
+  libspectrum_dword tstates;
   unsigned short ofs;
   unsigned char reg,val;
   };
@@ -619,7 +621,7 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
 /* don't make the change immediately; record it for later,
  * to be made by sound_frame() (via sound_ay_overlay()).
  */
-void sound_ay_write(int reg,int val,DWORD now)
+void sound_ay_write(int reg,int val,libspectrum_dword now)
 {
 /* have to allow it across pauses for snap-loading to work,
  * so see if sound has *ever* been enabled.

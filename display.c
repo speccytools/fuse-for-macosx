@@ -45,16 +45,17 @@
 int display_ui_initialised = 0;
 
 /* A copy of every pixel on the screen */
-WORD display_image[2*DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH];
-ptrdiff_t display_pitch = DISPLAY_SCREEN_WIDTH * sizeof( WORD );
+libspectrum_word
+  display_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
+ptrdiff_t display_pitch = DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 
 /* The current border colour */
-BYTE display_lores_border;
-BYTE display_hires_border;
+libspectrum_byte display_lores_border;
+libspectrum_byte display_hires_border;
 
 /* The border colour displayed on every line if it is homogeneous,
    or display_border_mixed (see below) if it's not */
-static BYTE display_current_border[DISPLAY_SCREEN_HEIGHT];
+static libspectrum_byte display_current_border[ DISPLAY_SCREEN_HEIGHT ];
 
 /* The colours of each eight pixel chunk in the top and bottom borders */
 static int top_border[DISPLAY_BORDER_HEIGHT][DISPLAY_SCREEN_WIDTH_COLS];
@@ -66,20 +67,24 @@ static int right_border[DISPLAY_HEIGHT][DISPLAY_BORDER_WIDTH_COLS];
 
 /* Offsets as to where the data and the attributes for each pixel
    line start */
-WORD display_line_start[DISPLAY_HEIGHT];
-WORD display_attr_start[DISPLAY_HEIGHT];
+libspectrum_word display_line_start[ DISPLAY_HEIGHT ];
+libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
 
 /* If you write to the byte at display_dirty_?table[n+0x4000], then
    the eight pixels starting at (8*xtable[n],ytable[n]) must be
    replotted */
-static WORD display_dirty_ytable[DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT];
-static WORD display_dirty_xtable[DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT];
+static libspectrum_word
+  display_dirty_ytable[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT ];
+static libspectrum_word
+  display_dirty_xtable[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT ];
 
 /* If you write to the byte at display_dirty_?table2[n+0x5800], then
    the 64 pixels starting at (8*xtable2[n],ytable2[n]) must be
    replotted */
-static WORD display_dirty_ytable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
-static WORD display_dirty_xtable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
+static libspectrum_word
+  display_dirty_ytable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
+static libspectrum_word
+  display_dirty_xtable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
 
 /* The number of frames mod 32 that have elapsed.
     0<=d_f_c<16 => Flashing characters are normal
@@ -90,9 +95,9 @@ static int display_flash_reversed;
 
 /* Which eight-pixel chunks on each line need to be redisplayed. Bit 0
    corresponds to pixels 0-7, bit 31 to pixels 248-255. */
-static QWORD display_is_dirty[DISPLAY_SCREEN_HEIGHT];
+static libspectrum_qword display_is_dirty[ DISPLAY_SCREEN_HEIGHT ];
 /* This value signifies that the entire line must be redisplayed */
-static QWORD display_all_dirty;
+static libspectrum_qword display_all_dirty;
 
 /* Used to signify that we're redrawing the entire screen */
 static int display_redraw_all;
@@ -118,23 +123,24 @@ struct rectangle *inactive_rectangle = NULL;
 size_t inactive_rectangle_count = 0, inactive_rectangle_allocated = 0;
 
 static void display_draw_line(int y);
-static void display_dirty8(WORD address);
-static void display_dirty64(WORD address);
+static void display_dirty8( libspectrum_word address );
+static void display_dirty64( libspectrum_word address );
 
-static void display_get_attr(int x, int y, BYTE *ink, BYTE *paper);
+static void display_get_attr( int x, int y,
+			      libspectrum_byte *ink, libspectrum_byte *paper);
 
 static void display_set_border(void);
 static int display_border_line(void);
 static int add_rectangle( int y, int x, int w );
 static int end_line( int y );
 
-static void set_border( int x, int y, BYTE colour );
+static void set_border( int x, int y, libspectrum_byte colour );
 
 static void display_dirty_flashing(void);
 static int display_border_column(int time_since_line);
 static void set_border_pixels( int line, int column, int colour );
 
-WORD
+libspectrum_word
 display_get_addr( int x, int y )
 {
   if ( scld_last_dec.name.altdfile ) {
@@ -248,8 +254,8 @@ static void
 display_draw_line( int y )
 {
   int start, x, border_colour, error;
-  BYTE data, data2, ink, paper;
-  WORD hires_data;
+  libspectrum_byte data, data2, ink, paper;
+  libspectrum_word hires_data;
 
   x = 0;
 
@@ -514,7 +520,8 @@ end_line( int y )
 
 /* Mark as `dirty' the pixels which have been changed by a write to byte
    `address'; 0x4000 <= `address' */
-void display_dirty( WORD address )
+void
+display_dirty( libspectrum_word address )
 {
   switch ( scld_last_dec.mask.scrnmode ) {
     case STANDARD: /* standard Speccy screen */
@@ -557,25 +564,27 @@ void display_dirty( WORD address )
   }
 }
 
-static void display_dirty8(WORD address)
+static void
+display_dirty8( libspectrum_word address )
 {
   int x, y;
 
   x=display_dirty_xtable[address-0x4000];
   y=display_dirty_ytable[address-0x4000];
 
-  display_is_dirty[y] |= ( (QWORD)1 << x );
+  display_is_dirty[y] |= ( (libspectrum_qword)1 << x );
   
 }
 
-static void display_dirty64(WORD address)
+static void
+display_dirty64( libspectrum_word address )
 {
   int i, x, y;
 
   x=display_dirty_xtable2[address-0x5800];
   y=display_dirty_ytable2[address-0x5800];
 
-  for( i=0; i<8; i++ ) display_is_dirty[y+i] |= ( (QWORD)1 << x );
+  for( i=0; i<8; i++ ) display_is_dirty[y+i] |= ( (libspectrum_qword)1 << x );
 }
 
 /* Set one pixel in the display */
@@ -596,7 +605,8 @@ display_putpixel( int x, int y, int colour )
 /* Print the 8 pixels in `data' using ink colour `ink' and paper
    colour `paper' to the screen at ( (8*x) , y ) */
 void
-display_plot8( int x, int y, BYTE data, BYTE ink, BYTE paper )
+display_plot8( int x, int y, libspectrum_byte data,
+	       libspectrum_byte ink, libspectrum_byte paper )
 {
   x = (x << 3) + DISPLAY_BORDER_WIDTH / 2;
   y += DISPLAY_BORDER_HEIGHT;
@@ -654,7 +664,8 @@ display_plot8( int x, int y, BYTE data, BYTE ink, BYTE paper )
 /* Print the 16 pixels in `data' using ink colour `ink' and paper
    colour `paper' to the screen at ( (16*x) , y ) */
 void
-display_plot16( int x, int y, WORD data, BYTE ink, BYTE paper )
+display_plot16( int x, int y, libspectrum_word data,
+		libspectrum_byte ink, libspectrum_byte paper )
 {
   x = (x << 4) + DISPLAY_BORDER_WIDTH;
   y = ( y + DISPLAY_BORDER_HEIGHT ) << 1;
@@ -696,7 +707,7 @@ display_plot16( int x, int y, WORD data, BYTE ink, BYTE paper )
 }
 
 static void
-set_border( int x, int y, BYTE colour )
+set_border( int x, int y, libspectrum_byte colour )
 {
   size_t i;
 
@@ -715,9 +726,11 @@ set_border( int x, int y, BYTE colour )
 
 /* Get the attributes for the eight pixels starting at
    ( (8*x) , y ) */
-static void display_get_attr(int x,int y,BYTE *ink,BYTE *paper)
+static void
+display_get_attr( int x, int y,
+		  libspectrum_byte *ink, libspectrum_byte *paper )
 {
-  BYTE attr;
+  libspectrum_byte attr;
 
   if ( scld_last_dec.name.hires ) {
     attr = hires_get_attr();
@@ -732,7 +745,9 @@ static void display_get_attr(int x,int y,BYTE *ink,BYTE *paper)
   display_parse_attr(attr,ink,paper);
 }
 
-void display_parse_attr(BYTE attr, BYTE *ink, BYTE *paper)
+void
+display_parse_attr( libspectrum_byte attr,
+		    libspectrum_byte *ink, libspectrum_byte *paper )
 {
   if( (attr & 0x80) && display_flash_reversed ) {
     *ink  = (attr & ( 0x0f << 3 ) ) >> 3;
@@ -820,15 +835,15 @@ static int display_border_column(int time_since_line)
 static void
 set_border_pixels( int line, int column, int colour )
 {
-  const QWORD right_edge =
-    (QWORD)1 << ( DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS );
+  const libspectrum_qword right_edge =
+    (libspectrum_qword)1 << ( DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS );
 
   /* See if we're in the top/bottom border */
   if( line < DISPLAY_BORDER_HEIGHT ) {
 
     for( ; column < DISPLAY_SCREEN_WIDTH_COLS; column++ ) {
       top_border[line][column] = colour;
-      display_is_dirty[line] |= (QWORD)1 << column;
+      display_is_dirty[line] |= (libspectrum_qword)1 << column;
     }
 
   } else if( line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
@@ -836,7 +851,7 @@ set_border_pixels( int line, int column, int colour )
     for( ; column < DISPLAY_SCREEN_WIDTH_COLS; column++ ) {
       bottom_border[ line - DISPLAY_BORDER_HEIGHT - DISPLAY_HEIGHT ][column] =
 	colour;
-      display_is_dirty[line] |= (QWORD)1 << column;
+      display_is_dirty[line] |= (libspectrum_qword)1 << column;
     }
 
   } else {			/* In main screen */
@@ -883,7 +898,7 @@ int display_frame(void)
 
 static void display_dirty_flashing(void)
 {
-  int offset; BYTE attr;
+  int offset; libspectrum_byte attr;
   
   if ( !scld_last_dec.name.hires ) {
     if ( scld_last_dec.name.b1 ) {

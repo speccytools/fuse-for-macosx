@@ -28,18 +28,16 @@
 #ifndef FUSE_TC2048_H
 #define FUSE_TC2048_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
-BYTE tc2048_readbyte(WORD address);
-BYTE tc2048_readbyte_internal( WORD address );
-BYTE tc2048_read_screen_memory(WORD offset);
-void tc2048_writebyte(WORD address, BYTE b);
-void tc2048_writebyte_internal( WORD address, BYTE b );
+libspectrum_byte tc2048_readbyte( libspectrum_word address );
+libspectrum_byte tc2048_readbyte_internal( libspectrum_word address );
+libspectrum_byte tc2048_read_screen_memory( libspectrum_word offset);
+void tc2048_writebyte( libspectrum_word address, libspectrum_byte b);
+void tc2048_writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
-DWORD tc2048_contend_memory( WORD address );
-DWORD tc2048_contend_port( WORD port );
+libspectrum_dword tc2048_contend_memory( libspectrum_word address );
+libspectrum_dword tc2048_contend_port( libspectrum_word port );
 
 int tc2048_init( fuse_machine_info *machine );
 int tc2048_reset( void );

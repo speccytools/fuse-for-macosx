@@ -26,27 +26,28 @@
 
 #include <config.h>
 
+#include <libspectrum.h>
+
 #include "ui/ui.h"
 #include "keyboard.h"
-#include "types.h"
 #include "scld.h"
 
 /* What to return if no keys are pressed; depends on the last byte
    output to the ULA; see CSS FAQ | Technical Information | Port #FE
    for full details */
-BYTE keyboard_default_value;
+libspectrum_byte keyboard_default_value;
 
 /* Bit masks for each of the eight keyboard half-rows; `AND' the selected
    ones of these with `keyboard_default_value' to get the value to return
 */
-BYTE keyboard_return_values[8];
+libspectrum_byte keyboard_return_values[8];
 
 /* When each Spectrum key is pressed, twiddle this {port,bit} pair
    in `keyboard_return_values'. 
 */
 typedef struct keyboard_key_info {
   keyboard_key_name key;
-  int port; BYTE bit;
+  int port; libspectrum_byte bit;
 } keyboard_key_info;
 
 static keyboard_key_info keyboard_data[] = {
@@ -107,9 +108,10 @@ void fuse_keyboard_init(void)
   keyboard_release_all();
 }
 
-BYTE keyboard_read(BYTE porth)
+libspectrum_byte
+keyboard_read( libspectrum_byte porth )
 {
-  BYTE data=keyboard_default_value; int i;
+  libspectrum_byte data = keyboard_default_value; int i;
 
   for( i=0; i<8; i++,porth>>=1 ) {
     if(! (porth&0x01) ) data &= keyboard_return_values[i];

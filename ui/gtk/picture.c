@@ -35,12 +35,12 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <libspectrum.h>
 
 #include "display.h"
 #include "fuse.h"
 #include "gtkdisplay.h"
 #include "gtkui.h"
-#include "types.h"
 #include "ui/ui.h"
 #include "utils.h"
 
@@ -51,7 +51,7 @@ static const gint picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
 static int screen_drawn = 0;
 
 static int read_screen( const char *filename, utils_file *screen );
-static void draw_screen( BYTE *screen, int border );
+static void draw_screen( libspectrum_byte *screen, int border );
 static gint
 picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data );
 
@@ -145,31 +145,34 @@ read_screen( const char *filename, utils_file *screen )
 }
 
 static void
-draw_screen( BYTE *screen, int border )
+draw_screen( libspectrum_byte *screen, int border )
 {
   int i, x, y, ink, paper;
-  BYTE attr, data; 
+  libspectrum_byte attr, data; 
 
   for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
     for( x=0; x < DISPLAY_ASPECT_WIDTH; x++ ) {
-      *(DWORD*)(picture + y*picture_pitch + 4*x) = gtkdisplay_colours[border];
-      *(DWORD*)( picture +
-		 (y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT) * picture_pitch +
-		 4 * x
-	       ) =
-	gtkdisplay_colours[ border ];
+      *(libspectrum_dword*)( picture + y * picture_pitch + 4 * x ) =
+	gtkdisplay_colours[border];
+      *(libspectrum_dword*)(
+          picture +
+	  ( y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) * picture_pitch +
+	  4 * x
+	) = gtkdisplay_colours[ border ];
     }
   }
 
   for( y=0; y<DISPLAY_HEIGHT; y++ ) {
 
     for( x=0; x < DISPLAY_BORDER_ASPECT_WIDTH; x++ ) {
-      *(DWORD*)(picture + (y + DISPLAY_BORDER_HEIGHT) * picture_pitch + 4*x) =
+      *(libspectrum_dword*)
+	(picture + ( y + DISPLAY_BORDER_HEIGHT) * picture_pitch + 4 * x) =
 	gtkdisplay_colours[ border ];
-      *(DWORD*)( picture +
-		 ( y + DISPLAY_BORDER_HEIGHT ) * picture_pitch +
-		 4 * ( x+DISPLAY_ASPECT_WIDTH-DISPLAY_BORDER_ASPECT_WIDTH ) ) =
-	gtkdisplay_colours[ border ];
+      *(libspectrum_dword*)(
+          picture +
+	  ( y + DISPLAY_BORDER_HEIGHT ) * picture_pitch +
+	  4 * ( x+DISPLAY_ASPECT_WIDTH-DISPLAY_BORDER_ASPECT_WIDTH )
+	) = gtkdisplay_colours[ border ];
     }
 
     for( x=0; x < DISPLAY_WIDTH_COLS; x++ ) {
@@ -182,10 +185,12 @@ draw_screen( BYTE *screen, int border )
       data = screen[ display_line_start[y]+x ];
 
       for( i=0; i<8; i++ ) {
-	*(DWORD*)( picture + ( y + DISPLAY_BORDER_HEIGHT ) * picture_pitch +
-		   4 * ( 8 * x + DISPLAY_BORDER_ASPECT_WIDTH + i ) ) =
-	  ( data & 0x80 ) ? gtkdisplay_colours[ ink ]
-	                  : gtkdisplay_colours[ paper ];
+	*(libspectrum_dword*)(
+	    picture +
+	    ( y + DISPLAY_BORDER_HEIGHT ) * picture_pitch +
+	    4 * ( 8 * x + DISPLAY_BORDER_ASPECT_WIDTH + i )
+	  ) = ( data & 0x80 ) ? gtkdisplay_colours[ ink ]
+	                      : gtkdisplay_colours[ paper ];
 	data <<= 1;
       }
     }

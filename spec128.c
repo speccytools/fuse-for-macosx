@@ -39,7 +39,7 @@
 #include "spec128.h"
 #include "spectrum.h"
 
-static DWORD spec128_contend_delay( void );
+static libspectrum_dword spec128_contend_delay( void );
 
 spectrum_port_info spec128_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -50,17 +50,20 @@ spectrum_port_info spec128_peripherals[] = {
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
-BYTE spec128_unattached_port( void )
+libspectrum_byte
+spec128_unattached_port( void )
 {
   return spectrum_unattached_port( 3 );
 }
 
-BYTE spec128_read_screen_memory(WORD offset)
+libspectrum_byte
+spec128_read_screen_memory( libspectrum_word offset )
 {
   return RAM[machine_current->ram.current_screen][offset];
 }
 
-DWORD spec128_contend_memory( WORD address )
+libspectrum_dword
+spec128_contend_memory( libspectrum_word address )
 {
   /* Contention occurs in pages 1,3, 5 and 7. 0x4000 to 0x7fff is always page
      5, whilst 0xc000 to 0xffff could have one of the contended pages in */
@@ -72,7 +75,8 @@ DWORD spec128_contend_memory( WORD address )
   return 0;
 }
 
-DWORD spec128_contend_port( WORD port )
+libspectrum_dword
+spec128_contend_port( libspectrum_word port )
 {
   /* Contention occurs for the ULA, or for the memory paging port */
   if( ( port & 0x0001 ) == 0x0000 ||
@@ -81,9 +85,10 @@ DWORD spec128_contend_port( WORD port )
   return 0;
 }
 
-static DWORD spec128_contend_delay( void )
+static libspectrum_dword
+spec128_contend_delay( void )
 {
-  WORD tstates_through_line;
+  libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
   if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
@@ -179,7 +184,8 @@ int spec128_reset(void)
 }
 
 void
-spec128_memoryport_write( WORD port GCC_UNUSED, BYTE b )
+spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
+			  libspectrum_byte b )
 {
   int old_screen;
 

@@ -60,13 +60,14 @@
 #include "spectrum.h"
 #include "ui/ui.h"
 
-static DWORD specplus3_contend_delay( void );
+static libspectrum_dword specplus3_contend_delay( void );
 
 #ifdef HAVE_765_H
 static void specplus3_fdc_reset( void );
-static BYTE specplus3_fdc_status( WORD port );
-static BYTE specplus3_fdc_read( WORD port );
-static void specplus3_fdc_write( WORD port, BYTE data );
+static libspectrum_byte specplus3_fdc_status( libspectrum_word port );
+static libspectrum_byte specplus3_fdc_read( libspectrum_word port );
+static void specplus3_fdc_write( libspectrum_word port,
+				 libspectrum_byte data );
 
 void specplus3_fdc_error( int debug, char *format, va_list ap );
 #endif			/* #ifdef HAVE_765_H */
@@ -97,18 +98,18 @@ static FDRV_PTR drive_null;	/* A null drive for drives 2 and 3 of the
 				   FDC */
 #endif				/* #ifdef HAVE_765_H */
 
-BYTE
+libspectrum_byte
 specplus3_unattached_port( void )
 {
   return 0xff;
 }
 
-BYTE specplus3_read_screen_memory(WORD offset)
+libspectrum_byte specplus3_read_screen_memory( libspectrum_word offset )
 {
   return RAM[machine_current->ram.current_screen][offset];
 }
 
-DWORD specplus3_contend_memory( WORD address )
+libspectrum_dword specplus3_contend_memory( libspectrum_word address )
 {
   int bank;
 
@@ -145,17 +146,17 @@ DWORD specplus3_contend_memory( WORD address )
   return 0;
 }
 
-DWORD
-specplus3_contend_port( WORD port GCC_UNUSED )
+libspectrum_dword
+specplus3_contend_port( libspectrum_word port GCC_UNUSED )
 {
   /* Contention does not occur for the ULA.
      FIXME: Unknown for other ports, so let's assume it doesn't for now */
   return 0;
 }
 
-static DWORD specplus3_contend_delay( void )
+static libspectrum_dword specplus3_contend_delay( void )
 {
-  WORD tstates_through_line;
+  libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
   if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
@@ -305,7 +306,8 @@ int specplus3_reset(void)
 }
 
 void
-specplus3_memoryport_write( WORD port GCC_UNUSED, BYTE b )
+specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
+			    libspectrum_byte b )
 {
   /* Let the parallel printer code know about the strobe bit */
   printer_parallel_strobe_write( b & 0x10 );
@@ -356,20 +358,20 @@ specplus3_fdc_reset( void )
   fdc_setdrive( fdc, 3, drive_null );
 }
 
-static BYTE
-specplus3_fdc_status( WORD port GCC_UNUSED )
+static libspectrum_byte
+specplus3_fdc_status( libspectrum_word port GCC_UNUSED )
 {
   return fdc_read_ctrl( fdc );
 }
 
-static BYTE
-specplus3_fdc_read( WORD port GCC_UNUSED )
+static libspectrum_byte
+specplus3_fdc_read( libspectrum_word port GCC_UNUSED )
 {
   return fdc_read_data( fdc );
 }
 
 static void
-specplus3_fdc_write( WORD port GCC_UNUSED, BYTE data )
+specplus3_fdc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   fdc_write_data( fdc, data );
 }

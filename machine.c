@@ -252,7 +252,8 @@ machine_select_machine( fuse_machine_info *machine )
 }
 
 int
-machine_load_rom( BYTE **data, char *filename, size_t expected_length )
+machine_load_rom( libspectrum_byte **data, char *filename,
+		  size_t expected_length )
 {
   int fd, error;
   utils_file rom;
@@ -275,7 +276,7 @@ machine_load_rom( BYTE **data, char *filename, size_t expected_length )
   }
 
   /* Take a copy of the ROM in case we want to write to it later */
-  *data = malloc( rom.length * sizeof( BYTE ) );
+  *data = malloc( rom.length * sizeof( libspectrum_byte ) );
   if( !(*data) ) {
     ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
     return 1;
@@ -314,8 +315,8 @@ machine_reset( void )
   /* Make sure we have enough space for the new ROMs */
   if( spectrum_rom_count < machine_current->rom_count ) {
 
-    BYTE **new_ROM = realloc( ROM,
-			      machine_current->rom_count * sizeof( BYTE* ) );
+    libspectrum_byte **new_ROM =
+      realloc( ROM, machine_current->rom_count * sizeof( libspectrum_byte* ) );
     if( !new_ROM ) {
       ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;

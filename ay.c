@@ -34,10 +34,10 @@
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
-BYTE
-ay_registerport_read( WORD port GCC_UNUSED )
+libspectrum_byte
+ay_registerport_read( libspectrum_word port GCC_UNUSED )
 {
-  static BYTE port_input = 0xbf;	/* always allow serial output */
+  static libspectrum_byte port_input = 0xbf; /* always allow serial output */
 
   /* The AY I/O ports return input directly from the port when in
      input mode; but in output mode, they return an AND between the
@@ -63,7 +63,7 @@ ay_registerport_read( WORD port GCC_UNUSED )
 
 /* And when it's written to */
 void
-ay_registerport_write( WORD port GCC_UNUSED, BYTE b )
+ay_registerport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   machine_current->ay.current_register = (b & 15);
 }
@@ -72,7 +72,7 @@ ay_registerport_write( WORD port GCC_UNUSED, BYTE b )
    machines) is written to; no corresponding read function as this
    always returns 0xff */
 void
-ay_dataport_write( WORD port GCC_UNUSED, BYTE b )
+ay_dataport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   machine_current->ay.registers[ machine_current->ay.current_register ] = b;
   sound_ay_write( machine_current->ay.current_register, b, tstates );

@@ -1,5 +1,5 @@
 /* spec16.c: Spectrum 16K specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -28,6 +28,8 @@
 
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "joystick.h"
@@ -50,7 +52,8 @@ spectrum_port_info spec16_peripherals[] = {
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
-static BYTE spec16_unattached_port( void )
+static libspectrum_byte
+spec16_unattached_port( void )
 {
   return spectrum_unattached_port( 1 );
 }

@@ -34,9 +34,9 @@
 
 scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
-BYTE scld_last_hsr   = 0;           /* The last byte sent to Timex HSR port */
+libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 
-BYTE timex_fake_bank[0x2000];
+libspectrum_byte timex_fake_bank[0x2000];
 
 timex_mem timex_exrom_dock[8];
 timex_mem timex_exrom[8];
@@ -44,17 +44,17 @@ timex_mem timex_dock[8];
 timex_mem timex_home[8];
 timex_mem timex_memory[8];
 
-BYTE
-scld_dec_read( WORD port GCC_UNUSED )
+libspectrum_byte
+scld_dec_read( libspectrum_word port GCC_UNUSED )
 {
   return scld_last_dec.byte;
 }
 
 void
-scld_dec_write( WORD port GCC_UNUSED, BYTE b )
+scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   scld old_dec = scld_last_dec;
-  BYTE ink,paper;
+  libspectrum_byte ink,paper;
 
   scld_last_dec.byte = b;
 
@@ -93,7 +93,7 @@ scld_reset(void)
 }
 
 void
-scld_hsr_write( WORD port GCC_UNUSED, BYTE b )
+scld_hsr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int i;
   
@@ -108,20 +108,20 @@ scld_hsr_write( WORD port GCC_UNUSED, BYTE b )
   }
 }
 
-BYTE
-scld_hsr_read( WORD port GCC_UNUSED )
+libspectrum_byte
+scld_hsr_read( libspectrum_word port GCC_UNUSED )
 {
   return scld_last_hsr;
 }
 
-BYTE
+libspectrum_byte
 hires_get_attr( void )
 {
   return( hires_convert_dec( scld_last_dec.byte ) );
 }
 
-BYTE
-hires_convert_dec( BYTE attr )
+libspectrum_byte
+hires_convert_dec( libspectrum_byte attr )
 {
   scld colour;
 
@@ -129,29 +129,14 @@ hires_convert_dec( BYTE attr )
 
   switch ( colour.mask.hirescol )
   {
-    case YELLOWBLUE:
-      return (BYTE) 0x71;
-      break;
-    case CYANRED:
-      return (BYTE) 0x6A;
-      break;
-    case GREENMAGENTA:
-      return (BYTE) 0x63;
-      break;
-    case MAGENTAGREEN:
-      return (BYTE) 0x5C;
-      break;
-    case REDCYAN:
-      return (BYTE) 0x55;
-      break;
-    case BLUEYELLOW:
-      return (BYTE) 0x4E;
-      break;
-    case BLACKWHITE:
-      return (BYTE) 0x47;
-      break;
-    default:  /* WHITEBLACK */
-      return (BYTE) 0x78;
+    case BLACKWHITE:   return 0x47;
+    case BLUEYELLOW:   return 0x4e;
+    case REDCYAN:      return 0x55;
+    case MAGENTAGREEN: return 0x5c;
+    case GREENMAGENTA: return 0x63;
+    case CYANRED:      return 0x6a;
+    case YELLOWBLUE:   return 0x71;
+    default:	       return 0x78; /* WHITEBLACK */
   }
 }
 

@@ -70,7 +70,7 @@ static GtkWidget *dialog,		/* The debugger dialog box */
 static GtkObject *disassembly_scrollbar_adjustment;
 
 /* The top line of the current disassembly */
-static WORD disassembly_top;
+static libspectrum_word disassembly_top;
 
 /* Have we created the above yet? */
 static int dialog_created = 0;
@@ -302,7 +302,7 @@ ui_debugger_update( void )
   gchar *breakpoint_text[5] = { &buffer[  0], &buffer[ 40], &buffer[80],
 			        &buffer[120], &buffer[160]               },
     *disassembly_text[2] = { &buffer[0], &buffer[40] };
-  WORD address;
+  libspectrum_word address;
   const char *format_16_bit, *format_8_bit;
   GSList *ptr;
   int capabilities; size_t length;
@@ -316,10 +316,10 @@ ui_debugger_update( void )
 				  "IX", "IY",
                                 };
 
-  WORD *value_ptr[] = { &PC, &SP,  &AF, &AF_,
-			&BC, &BC_, &DE, &DE_,
-			&HL, &HL_, &IX, &IY,
-                      };
+  libspectrum_word *value_ptr[] = { &PC, &SP,  &AF, &AF_,
+				    &BC, &BC_, &DE, &DE_,
+				    &HL, &HL_, &IX, &IY,
+				  };
 
   if( debugger_output_base == 10 ) {
     format_16_bit = "%5d"; format_8_bit = "%3d";
@@ -419,8 +419,8 @@ ui_debugger_update( void )
 
   for( i = 0, address = SP + 38; i < 20; i++, address -= 2 ) {
     
-    WORD contents = readbyte_internal( address ) +
-                    0x100 * readbyte_internal( address + 1 );
+    libspectrum_word contents = readbyte_internal( address ) +
+				0x100 * readbyte_internal( address + 1 );
 
     snprintf( disassembly_text[0], 40, format_16_bit, address );
     snprintf( disassembly_text[1], 40, format_16_bit, contents );
@@ -435,7 +435,7 @@ ui_debugger_update( void )
 static int
 update_disassembly( void )
 {
-  size_t i, length; WORD address;
+  size_t i, length; libspectrum_word address;
   char buffer[80];
   char *disassembly_text[2] = { &buffer[0], &buffer[40] };
 
@@ -469,7 +469,7 @@ deactivate_debugger( void )
 
 /* Set the disassembly to start at 'address' */
 int
-ui_debugger_disassemble( WORD address )
+ui_debugger_disassemble( libspectrum_word address )
 {
   GTK_ADJUSTMENT( disassembly_scrollbar_adjustment )->value =
     disassembly_top = address;

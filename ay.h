@@ -1,5 +1,5 @@
 /* ay.h: AY-8-3912 routines
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -27,19 +27,17 @@
 #ifndef FUSE_AY_H
 #define FUSE_AY_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
 typedef struct ayinfo {
   int present;
   int current_register;
-  BYTE registers[16];
+  libspectrum_byte registers[16];
 } ayinfo;
 
-BYTE ay_registerport_read(WORD port);
-void ay_registerport_write(WORD port, BYTE b);
+libspectrum_byte ay_registerport_read( libspectrum_word port );
+void ay_registerport_write( libspectrum_word port, libspectrum_byte b );
 
-void ay_dataport_write(WORD port, BYTE b);
+void ay_dataport_write( libspectrum_word port, libspectrum_byte b );
 
 #endif			/* #ifndef FUSE_AY_H */

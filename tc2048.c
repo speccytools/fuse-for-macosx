@@ -41,7 +41,7 @@
 #include "spectrum.h"
 #include "tc2048.h"
 
-static DWORD tc2048_contend_delay( void );
+static libspectrum_dword tc2048_contend_delay( void );
 
 spectrum_port_info tc2048_peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
@@ -56,18 +56,22 @@ spectrum_port_info tc2048_peripherals[] = {
 };
 
 
-static BYTE tc2048_unattached_port( void )
+static libspectrum_byte
+tc2048_unattached_port( void )
 {
-  /* TC2048 does not have floating ULA values on any port (despite rumours to */
-  /* the contrary), it returns 0xff on unattached ports */
+  /* TC2048 does not have floating ULA values on any port (despite rumours
+     to the contrary), it returns 0xff on unattached ports */
   return 0xff;
 }
-BYTE tc2048_read_screen_memory(WORD offset)
+
+libspectrum_byte
+tc2048_read_screen_memory( libspectrum_word offset )
 {
   return RAM[5][offset];
 }
 
-DWORD tc2048_contend_memory( WORD address )
+libspectrum_dword
+tc2048_contend_memory( libspectrum_word address )
 {
   /* Contention occurs only in the lowest 16Kb of RAM */
   if( address < 0x4000 || address > 0x7fff ) return 0;
@@ -75,7 +79,8 @@ DWORD tc2048_contend_memory( WORD address )
   return tc2048_contend_delay();
 }
 
-DWORD tc2048_contend_port( WORD port )
+libspectrum_dword
+tc2048_contend_port( libspectrum_word port )
 {
   /* Contention occurs for ports FE and F4 (SCLD and HSR) */
   /* Contention occurs for port FF (SCLD DEC) */
@@ -86,9 +91,10 @@ DWORD tc2048_contend_port( WORD port )
   return 0;
 }
 
-static DWORD tc2048_contend_delay( void )
+static libspectrum_dword
+tc2048_contend_delay( void )
 {
-  WORD tstates_through_line;
+  libspectrum_word tstates_through_line;
   
   /* No contention in the upper border */
   if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )

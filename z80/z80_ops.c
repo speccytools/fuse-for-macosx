@@ -41,11 +41,12 @@
 #include "z80_macros.h"
 
 #ifndef HAVE_ENOUGH_MEMORY
-static void z80_cbxx(BYTE opcode2);
-static void z80_ddxx(BYTE opcode2);
-static void z80_edxx(BYTE opcode2);
-static void z80_fdxx(BYTE opcode2);
-static void z80_ddfdcbxx(BYTE opcode3, WORD tempaddr);
+static void z80_cbxx( libspectrum_byte opcode2 );
+static void z80_ddxx( libspectrum_byte opcode2 );
+static void z80_edxx( libspectrum_byte opcode2 );
+static void z80_fdxx( libspectrum_byte opcode2 );
+static void z80_ddfdcbxx( libspectrum_byte opcode3,
+			  libspectrum_word tempaddr );
 #endif				/* #ifndef HAVE_ENOUGH_MEMORY */
 
 /* Execute Z80 opcodes until the next event */
@@ -54,7 +55,7 @@ void z80_do_opcodes()
 
   while(tstates < event_next_event ) {
 
-    BYTE opcode;
+    libspectrum_byte opcode;
 
     /* If we're due an interrupt from RZX playback, generate one */
     if( rzx_playback &&
@@ -94,14 +95,16 @@ void z80_do_opcodes()
 
 #ifndef HAVE_ENOUGH_MEMORY
 
-static void z80_cbxx(BYTE opcode2)
+static void
+z80_cbxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
 #include "z80_cb.c"
   }
 }
 
-static void z80_ddxx(BYTE opcode2)
+static void
+z80_ddxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
 #define REGISTER  IX
@@ -114,14 +117,16 @@ static void z80_ddxx(BYTE opcode2)
   }
 }
 
-static void z80_edxx(BYTE opcode2)
+static void
+z80_edxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
 #include "z80_ed.c"
   }
 }
 
-static void z80_fdxx(BYTE opcode2)
+static void
+z80_fdxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
 #define REGISTER  IY
@@ -134,7 +139,8 @@ static void z80_fdxx(BYTE opcode2)
   }
 }
 
-static void z80_ddfdcbxx(BYTE opcode3, WORD tempaddr)
+static void
+z80_ddfdcbxx( libspectrum_byte opcode3, libspectrum_word tempaddr )
 {
   switch(opcode3) {
 #include "z80_ddfdcb.c"

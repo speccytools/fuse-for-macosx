@@ -88,7 +88,7 @@ debugger_end( void )
 
 /* Check whether the debugger should become active at this point */
 int
-debugger_check( debugger_breakpoint_type type, WORD value )
+debugger_check( debugger_breakpoint_type type, libspectrum_word value )
 {
   GSList *ptr; debugger_breakpoint *bp, *active;
 
@@ -172,7 +172,7 @@ debugger_run( void )
 
 /* Add a breakpoint */
 int
-debugger_breakpoint_add( debugger_breakpoint_type type, WORD value,
+debugger_breakpoint_add( debugger_breakpoint_type type, libspectrum_word value,
 			 size_t ignore, debugger_breakpoint_life life )
 {
   debugger_breakpoint *bp;
@@ -239,7 +239,7 @@ find_breakpoint_by_id( gconstpointer data, gconstpointer user_data )
 
 /* Remove all breakpoints at the given address */
 int
-debugger_breakpoint_clear( WORD address )
+debugger_breakpoint_clear( libspectrum_word address )
 {
   GSList *ptr;
 
@@ -275,7 +275,7 @@ static gint
 find_breakpoint_by_address( gconstpointer data, gconstpointer user_data )
 {
   const debugger_breakpoint *bp = data;
-  WORD address = *(const WORD*)user_data;
+  libspectrum_word address = *(const libspectrum_word*)user_data;
 
   if( bp->type == DEBUGGER_BREAKPOINT_TYPE_EXECUTE ||
       bp->type == DEBUGGER_BREAKPOINT_TYPE_READ ||
@@ -317,7 +317,9 @@ free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 int
 debugger_breakpoint_exit( void )
 {
-  WORD target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
+  libspectrum_word target;
+
+  target = readbyte_internal( SP ) + 0x100 * readbyte_internal( SP+1 );
 
   if( debugger_breakpoint_add( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, target, 0,
 			       DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) )
@@ -358,7 +360,7 @@ debugger_breakpoint_set_condition( size_t id, debugger_expression *condition )
 
 /* Poke a value into RAM */
 int
-debugger_poke( WORD address, BYTE value )
+debugger_poke( libspectrum_word address, libspectrum_byte value )
 {
   writebyte_internal( address, value );
   return 0;
@@ -366,7 +368,7 @@ debugger_poke( WORD address, BYTE value )
 
 /* Write a value to a port */
 int
-debugger_port_write( WORD port, BYTE value )
+debugger_port_write( libspectrum_word port, libspectrum_byte value )
 {
   writeport( port, value );
   return 0;

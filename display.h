@@ -29,9 +29,7 @@
 
 #include <stddef.h>
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
 /* The width and height of the Speccy's screen */
 #define DISPLAY_WIDTH_COLS  32
@@ -67,26 +65,30 @@
 
 extern int display_ui_initialised;
 
-extern WORD display_image[2*DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH];
+extern libspectrum_word
+  display_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
 extern ptrdiff_t display_pitch;
 
-extern BYTE display_lores_border;
-extern BYTE display_hires_border;
+extern libspectrum_byte display_lores_border;
+extern libspectrum_byte display_hires_border;
 
 /* Offsets as to where the data and the attributes for each pixel
    line start */
-extern WORD display_line_start[DISPLAY_HEIGHT];
-extern WORD display_attr_start[DISPLAY_HEIGHT];
+extern libspectrum_word display_line_start[ DISPLAY_HEIGHT ];
+extern libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
 
 int display_init(int *argc, char ***argv);
 void display_line(void);
 
-void display_dirty( WORD address );
+void display_dirty( libspectrum_word address );
 void display_putpixel( int x, int y, int colour );
-void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper);
-void display_plot16(int x, int y, WORD data, BYTE ink, BYTE paper);
+void display_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
+		    libspectrum_byte paper );
+void display_plot16( int x, int y, libspectrum_word data, libspectrum_byte ink,
+		     libspectrum_byte paper);
 
-void display_parse_attr(BYTE attr, BYTE *ink, BYTE *paper);
+void display_parse_attr( libspectrum_byte attr, libspectrum_byte *ink,
+			 libspectrum_byte *paper );
 
 void display_set_lores_border(int colour);
 void display_set_hires_border(int colour);
@@ -95,6 +97,6 @@ int display_dirty_border(void);
 int display_frame(void);
 void display_refresh_all(void);
 
-WORD display_get_addr( int x, int y );
+libspectrum_word display_get_addr( int x, int y );
 
 #endif			/* #ifndef FUSE_DISPLAY_H */

@@ -29,6 +29,8 @@
 #ifndef FUSE_TRDOS_H
 #define FUSE_TRDOS_H
 
+#include <libspectrum.h>
+
 extern int trdos_active;     /* TRDOS enabled? */
 
 int trdos_init( void );
@@ -37,21 +39,21 @@ void trdos_reset( void );
 
 void trdos_end( void );
 
-void trdos_cr_write( WORD port, BYTE b );
+void trdos_cr_write( libspectrum_word port, libspectrum_byte b );
 
-BYTE trdos_sr_read( WORD port );
+libspectrum_byte trdos_sr_read( libspectrum_word port );
 
-BYTE trdos_tr_read( WORD port );
-void trdos_tr_write( WORD port, BYTE b );
+libspectrum_byte trdos_tr_read( libspectrum_word port );
+void trdos_tr_write( libspectrum_word port, libspectrum_byte b );
 
-BYTE trdos_sec_read( WORD port );
-void trdos_sec_write( WORD port, BYTE b );
+libspectrum_byte trdos_sec_read( libspectrum_word port );
+void trdos_sec_write( libspectrum_word port, libspectrum_byte b );
 
-BYTE trdos_dr_read( WORD port );
-void trdos_dr_write( WORD port, BYTE b );
+libspectrum_byte trdos_dr_read( libspectrum_word port );
+void trdos_dr_write( libspectrum_word port, libspectrum_byte b );
 
-BYTE trdos_sp_read( WORD port );
-void trdos_sp_write( WORD port, BYTE b );
+libspectrum_byte trdos_sp_read( libspectrum_word port );
+void trdos_sp_write( libspectrum_word port, libspectrum_byte b );
 
 typedef enum trdos_drive_number {
   TRDOS_DRIVE_A = 0,
@@ -60,7 +62,7 @@ typedef enum trdos_drive_number {
 
 int trdos_disk_insert( trdos_drive_number which, const char *filename );
 int trdos_disk_eject( trdos_drive_number which );
-int trdos_event_cmd_done( DWORD last_tstates );
-int trdos_event_index( DWORD last_tstates );
+int trdos_event_cmd_done( libspectrum_dword last_tstates );
+int trdos_event_index( libspectrum_dword last_tstates );
 
 #endif                  /* #ifndef FUSE_TRDOS_H */

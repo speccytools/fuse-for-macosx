@@ -1,5 +1,5 @@
 /* spec16.h: Spectrum 16K specific routines
-   Copyright (c) 1999-2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -27,14 +27,12 @@
 #ifndef FUSE_SPEC16_H
 #define FUSE_SPEC16_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
-BYTE spec16_readbyte(WORD address);
-BYTE spec16_readbyte_internal( WORD address );
-void spec16_writebyte(WORD address, BYTE b);
-void spec16_writebyte_internal( WORD address, BYTE b );
+libspectrum_byte spec16_readbyte( libspectrum_word address );
+libspectrum_byte spec16_readbyte_internal( libspectrum_word address );
+void spec16_writebyte( libspectrum_word address, libspectrum_byte b );
+void spec16_writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
 int spec16_init( fuse_machine_info *machine );
 int spec16_reset( void );

@@ -520,7 +520,8 @@ int tape_stop( void )
   return 0;
 }
 
-int tape_next_edge( DWORD last_tstates )
+int
+tape_next_edge( libspectrum_dword last_tstates )
 {
   int error; libspectrum_error libspec_error;
 

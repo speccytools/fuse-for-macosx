@@ -1,5 +1,5 @@
 /* z80.c: z80 supplementary functions
-   Copyright (c) 1999, 2000, 2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,16 +24,15 @@
 
 #include <config.h>
 
-#include <stdio.h>
+#include <libspectrum.h>
 
 #include "fuse.h"
 #include "rzx.h"
+#include "scld.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80.h"
 #include "z80_macros.h"
-
-#include "scld.h"
 
 /* Whether a half carry occured or not can be determined by looking at
    the 3rd bit of the two arguments and the result; these are hashed
@@ -41,19 +40,21 @@
    result, 1 is the 3rd bit of the 1st argument and 2 is the
    third bit of the 2nd argument; the tables differ for add and subtract
    operations */
-BYTE halfcarry_add_table[] = { 0, FLAG_H, FLAG_H, FLAG_H, 0, 0, 0, FLAG_H };
-BYTE halfcarry_sub_table[] = { 0, 0, FLAG_H, 0, FLAG_H, 0, FLAG_H, FLAG_H };
+libspectrum_byte halfcarry_add_table[] =
+  { 0, FLAG_H, FLAG_H, FLAG_H, 0, 0, 0, FLAG_H };
+libspectrum_byte halfcarry_sub_table[] =
+  { 0, 0, FLAG_H, 0, FLAG_H, 0, FLAG_H, FLAG_H };
 
 /* Similarly, overflow can be determined by looking at the 7th bits; again
    the hash into this table is r12 */
-BYTE overflow_add_table[] = { 0, 0, 0, FLAG_V, FLAG_V, 0, 0, 0 };
-BYTE overflow_sub_table[] = { 0, FLAG_V, 0, 0, 0, 0, FLAG_V, 0 };
+libspectrum_byte overflow_add_table[] = { 0, 0, 0, FLAG_V, FLAG_V, 0, 0, 0 };
+libspectrum_byte overflow_sub_table[] = { 0, FLAG_V, 0, 0, 0, 0, FLAG_V, 0 };
 
 /* Some more tables; initialised in z80_init_tables() */
 
-BYTE sz53_table[0x100]; /* The S, Z, 5 and 3 bits of the lookup value */
-BYTE parity_table[0x100]; /* The parity of the lookup value */
-BYTE sz53p_table[0x100]; /* OR the above two tables together */
+libspectrum_byte sz53_table[0x100]; /* The S, Z, 5 and 3 bits of the index */
+libspectrum_byte parity_table[0x100]; /* The parity of the lookup value */
+libspectrum_byte sz53p_table[0x100]; /* OR the above two tables together */
 
 /* This is what everything acts on! */
 processor z80;
@@ -70,7 +71,7 @@ void z80_init(void)
 static void z80_init_tables(void)
 {
   int i,j,k;
-  BYTE parity;
+  libspectrum_byte parity;
 
   for(i=0;i<0x100;i++) {
     sz53_table[i]= i & ( FLAG_3 | FLAG_5 | FLAG_S );
@@ -118,7 +119,7 @@ z80_interrupt( void )
       case 1: PC = 0x0038; tstates+=13; break;
       case 2: 
 	{
-	  WORD inttemp=(0x100*I)+0xff;
+	  libspectrum_word inttemp=(0x100*I)+0xff;
 	  PCL = readbyte(inttemp++); PCH = readbyte(inttemp);
 	  tstates+=19;
 	  break;

@@ -32,10 +32,16 @@
 #define FUSE_SCALER_INTERNALS_H
 
 #define DECLARE_SCALER( name ) \
-         extern void scaler_##name##_16( const BYTE *srcPtr, DWORD srcPitch, \
-                        BYTE *dstPtr, DWORD dstPitch, int width, int height); \
-         extern void scaler_##name##_32( const BYTE *srcPtr, DWORD srcPitch, \
-                        BYTE *dstPtr, DWORD dstPitch, int width, int height)
+         extern void scaler_##name##_16( const libspectrum_byte *srcPtr, \
+					 libspectrum_dword srcPitch, \
+					 libspectrum_byte *dstPtr, \
+					 libspectrum_dword dstPitch, \
+					 int width, int height ); \
+         extern void scaler_##name##_32( const libspectrum_byte *srcPtr, \
+					 libspectrum_dword srcPitch, \
+					 libspectrum_byte *dstPtr, \
+					 libspectrum_dword dstPitch, \
+					 int width, int height );
 
 DECLARE_SCALER(2xSaI);
 DECLARE_SCALER(Super2xSaI);

@@ -200,7 +200,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
     if( slt_length[i] ) {
 
-      slt[i] = (BYTE*)malloc( slt_length[i] * sizeof( BYTE ) );
+      slt[i] = malloc( slt_length[i] * sizeof( libspectrum_byte ) );
       if( slt[i] == NULL ) {
 	for( j=0; j<i; j++ ) {
 	  if( slt_length[j] ) { free( slt[j] ); slt_length[j] = 0; }
@@ -216,7 +216,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   if( libspectrum_snap_slt_screen( snap ) ) {
 
-    slt_screen = (BYTE*)malloc( 6912 * sizeof( BYTE ) );
+    slt_screen = malloc( 6912 * sizeof( libspectrum_byte ) );
     if( slt_screen == NULL ) {
       for( i=0; i<256; i++ ) {
 	if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }

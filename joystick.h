@@ -1,5 +1,5 @@
 /* joystick.h: Joystick emulation support
-   Copyright (c) 2001 Russell Marks, Philip Kendall
+   Copyright (c) 2001-2003 Russell Marks, Philip Kendall
 
    $Id$
 
@@ -27,12 +27,10 @@
 #ifndef FUSE_JOYSTICK_H
 #define FUSE_JOYSTICK_H
 
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif			/* #ifndef FUSE_TYPES_H */
+#include <libspectrum.h>
 
-BYTE joystick_kempston_read(WORD port);
-void joystick_kempston_write(WORD port, BYTE b);
-BYTE joystick_timex_read( WORD port, int which );
+libspectrum_byte joystick_kempston_read( libspectrum_word port );
+void joystick_kempston_write( libspectrum_word port, libspectrum_byte b );
+libspectrum_byte joystick_timex_read( libspectrum_word port, int which );
 
 #endif			/* #ifndef FUSE_JOYSTICK_H */

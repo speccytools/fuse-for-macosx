@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
@@ -30,10 +30,6 @@
 #include <stdlib.h>
 
 #include <libspectrum.h>
-
-#ifndef FUSE_TYPES_H
-#include "types.h"
-#endif
 
 /* The current state of the debugger */
 enum debugger_mode_t
@@ -70,7 +66,7 @@ typedef struct debugger_expression debugger_expression;
 typedef struct debugger_breakpoint {
   size_t id;
   enum debugger_breakpoint_type type;
-  WORD value;
+  libspectrum_word value;
   size_t ignore;		/* Ignore this breakpoint this many times */
   enum debugger_breakpoint_life life;
   debugger_expression *condition; /* Conditional expression to activate this
@@ -88,7 +84,7 @@ int debugger_reset( void );
 
 int debugger_end( void );
 
-int debugger_check( debugger_breakpoint_type type, WORD value );
+int debugger_check( debugger_breakpoint_type type, libspectrum_word value );
 
 int debugger_trap( void );	/* Activate the debugger */
 
@@ -99,7 +95,7 @@ int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
 /* Disassemble the instruction at 'address', returning its length in
    '*length' */
 void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
-			   WORD address );
+			   libspectrum_word address );
 
 /* Evaluate a debugger command */
 int debugger_command_evaluate( const char *command );

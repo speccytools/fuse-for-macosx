@@ -85,7 +85,7 @@ static guchar rgb_colours[16][3] = {
 };
 
 /* And the colours 32-bit format */
-DWORD gtkdisplay_colours[16];
+libspectrum_dword gtkdisplay_colours[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int gtkdisplay_current_size=1;
@@ -116,7 +116,8 @@ gtkdisplay_init( void )
 
   for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
     for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
-      *(DWORD*)( rgb_image + y * rgb_pitch + 4 * x ) = gtkdisplay_colours[0];
+      *(libspectrum_dword*)( rgb_image + y * rgb_pitch + 4 * x ) =
+	gtkdisplay_colours[0];
 
   display_ui_initialised = 1;
 
@@ -257,7 +258,8 @@ uidisplay_area( int x, int y, int w, int h )
   /* Create the RGB image */
   for( xx = x; xx < x + w; xx++ )
     for( yy = y; yy < y + h; yy++ ) {
-      *(DWORD*)(rgb_image + ( yy + 2 ) * rgb_pitch + 4 * ( xx + 1 ) ) =
+      *(libspectrum_dword*)
+	(rgb_image + ( yy + 2 ) * rgb_pitch + 4 * ( xx + 1 ) ) =
 	gtkdisplay_colours[ display_image[yy][xx] ];
     }
 
