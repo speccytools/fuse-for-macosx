@@ -832,17 +832,35 @@ display_set_hires_border( int colour )
 }
 
 static void
+set_border( int y, int start, int end, int colour )
+{
+  if( machine_current->timex ) {
+
+    y <<= 1;
+    start <<= 4; end <<= 4;
+
+    for( ; start < end; start++ ) {
+      display_image[ y     ][ start ] = colour;
+      display_image[ y + 1 ][ start ] = colour;
+    }
+
+  } else {
+
+    start <<= 3; end <<= 3;
+
+    for( ; start < end; start++ ) display_image[ y ][ start ] = colour;
+  }
+}
+
+static void
 border_change_write( int y, int start, int end, int colour )
 {
-  int scaled_start = start << 3, scaled_end = end << 3;
-
   if(   y <  DISPLAY_BORDER_HEIGHT                    ||
       ( y >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT )    ) {
 
     /* Top and bottom borders */
     add_rectangle( y, start, end - start );
-    for( ; scaled_start < scaled_end; scaled_start++ )
-      display_image[ y ][ scaled_start ] = colour;
+    set_border( y, start, end, colour );
 
   } else {
 
@@ -853,22 +871,17 @@ border_change_write( int y, int start, int end, int colour )
 	end > DISPLAY_BORDER_WIDTH_COLS ? DISPLAY_BORDER_WIDTH_COLS : end;
 
       add_rectangle( y, start, left_end - start );
-      for( ; scaled_start < left_end << 3; scaled_start++ )
-	display_image[ y ][ scaled_start ] = colour;
+      set_border( y, start, left_end, colour );
     }
 
     /* Right border */
     if( end > DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
 
-      if( start < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
+      if( start < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS )
 	start = DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS;
-	scaled_start = start << 3;
-      }
 
       add_rectangle( y, start, end - start );
-      for( ; scaled_start < scaled_end; scaled_start++ )
-	display_image[ y ][ scaled_start ] = colour;
-
+      set_border( y, start, end, colour );
     }
 
   }
