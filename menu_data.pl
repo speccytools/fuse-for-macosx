@@ -152,7 +152,9 @@ sub _dump_widget ($$) {
     if( $path eq 'menu' ) {
 	$s = 'const widget_menu_entry widget_menu[]';
     } else {
-	$s = "const static widget_menu_entry ${path}[]";
+    	# Slight ugliness here is because "${path}[]" doesn't work under
+	# Perl 5.6
+	$s = "const static widget_menu_entry $path" . "[]";
     }
 
     $s .= " = {\n  { \"$menu_name\" },\n";

@@ -737,3 +737,4 @@
 	 assumption makes unnecessary.
 20040411 menu.c,menu_data.c,settings-header.pl,settings.pl: allow the
 	 +3e ROMs to be selected from the user interfaces.
+20040413 menu_data.pl: Perl 5.6 fixup.
