@@ -34,6 +34,8 @@ Some thanks (in alphabetical order):
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
 
+* Darren Salt: some bits of code (see `AUTHORS')
+
 * Miklos Szeredi: his `SpectEmu' (http://www.inf.bme.hu/~mszeredi/spectemu/)
   gave the inspiration for an important rewrite of the Z80 core, and was
   also _very_ useful whilst trying to track down some bugs.
@@ -41,6 +43,8 @@ Some thanks (in alphabetical order):
 * Martijn van der Heide: for World of Spectrum
   (http://www.worldofspectrum.org/) -- simply the best Speccy Web site out
   there.
+
+* Alexander Yurchenko: for the OpenBSD/Solaris sound code (see `AUTHORS')
 
 * Matan Ziv-Av: for various bits of code (see `AUTHORS')
 

@@ -9,7 +9,10 @@ Fuse has been brought to you by:
 
 * Ian Collier: the original ZX Printer emulation (for xz80).
 
-* Darren Salt: the original version of the SLT support code.
+* Darren Salt: the original version of the SLT support code, and the
+  original MITSHM code (for the Xlib UI).
+
+* Alexander Yurchenko: the OpenBSD/Solaris-specific sound code.
 
 * Philip Kendall: everything else.
 

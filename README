@@ -1,9 +1,9 @@
-The Free Unix Spectrum Emulator (Fuse) 0.4.1
+The Free Unix Spectrum Emulator (Fuse) 0.4.2
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.4.1.
+is Fuse (the Free Unix Spectrum Emulator), version 0.4.2.
 
 What Fuse does have:
 
@@ -12,14 +12,15 @@ What Fuse does have:
   speed on a SparcStation 4 unless you do too much graphics intensive
   stuff).
 * Support for loading from .tzx files.
-* Sound (on systems supporting the Open Sound System).
+* Sound (on systems supporting the Open Sound System, or something
+  like OpenBSD or Solaris's /dev/audio).
 * Kempston joystick emulation.
 * Emulation of some of the printers you could attach to a Spectrum.
+* Very basic support for RZX files.
 
 What Fuse doesn't have:
 
 * Emulation of any other peripherals (bar the tape deck)
-* A keyboard picture, so you can find those keywords
 * ...
 
 What you'll need to run Fuse:
@@ -80,6 +81,6 @@ may be useful (information on internals, etc) are in the hacking/
 directory.
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-4 February 2002
+23 March 2002
 
 $Id$
