@@ -46,6 +46,13 @@
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
+typedef enum snapshot_type {
+  SNAPSHOT_TYPE_SNA,
+  SNAPSHOT_TYPE_Z80,
+} snapshot_type;
+
+static snapshot_type snapshot_identify( const char *filename );
+
 static int snapshot_copy_from( libspectrum_snap *snap );
 static int snapshot_copy_to( libspectrum_snap *snap );
 
@@ -94,7 +101,9 @@ int snapshot_read( char *filename )
     return 1;
   }
 
-  if( strncmp( &filename[ strlen(filename) - 4 ], ".sna", 4 ) == 0 ) {
+  switch( snapshot_identify( filename ) ) {
+
+  case SNAPSHOT_TYPE_SNA:
 
     error = libspectrum_sna_read( buffer, file_info.st_size, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
@@ -103,8 +112,9 @@ int snapshot_read( char *filename )
       munmap( buffer, file_info.st_size );
       return 1;
     }
+    break;
 
-  } else {
+  case SNAPSHOT_TYPE_Z80:
 
     error = libspectrum_z80_read( buffer, file_info.st_size, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
@@ -113,6 +123,12 @@ int snapshot_read( char *filename )
       munmap( buffer, file_info.st_size );
       return 1;
     }
+    break;
+
+  default:
+
+    fprintf(stderr, "%s: Unknown snapshot type\n", fuse_progname );
+    return 1;
 
   }
 
@@ -135,6 +151,16 @@ int snapshot_read( char *filename )
 
   return 0;
 
+}
+
+static snapshot_type snapshot_identify( const char *filename )
+{
+  if(    strlen( filename ) < 4
+      || strncmp( &filename[ strlen(filename) - 4 ], ".sna", 4 ) ) {
+    return SNAPSHOT_TYPE_Z80;
+  } else {
+    return SNAPSHOT_TYPE_SNA;
+  }
 }
 
 static int snapshot_copy_from( libspectrum_snap *snap )
