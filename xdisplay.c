@@ -24,6 +24,8 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
@@ -43,6 +45,9 @@ static GC gc;			/* A graphics context to draw with */
 static char* progname;
 
 static unsigned long colours[16];
+
+/* The current size of the window (in units of DISPLAY_SCREEN_*) */
+static int xdisplay_current_size=1;
 
 static int xdisplay_allocate_colours(int numColours, unsigned long *colours);
 static int xdisplay_allocate_gc(Window window, GC *gc);
@@ -100,9 +105,6 @@ int xdisplay_init(int argc, char **argv, int width, int height)
 
   screenNum=DefaultScreen(display);
 
-/*   fprintf(stderr,"%s: connected to screen %d on X server %s\n",progname, */
-/* 	  screenNum,XDisplayName(displayName)); */
-
   /* Create the main window */
 
   mainWindow = XCreateSimpleWindow(
@@ -111,11 +113,17 @@ int xdisplay_init(int argc, char **argv, int width, int height)
 
   /* Set standard window properties */
 
-  sizeHints->flags = PBaseSize | PResizeInc;
-  sizeHints->base_width=width;
-  sizeHints->base_height=height;
+  sizeHints->flags = PBaseSize | PResizeInc | PAspect | PMaxSize;
+  sizeHints->base_width=0;
+  sizeHints->base_height=0;
   sizeHints->width_inc=width;
   sizeHints->height_inc=height;
+  sizeHints->min_aspect.x=width;
+  sizeHints->min_aspect.y=height;
+  sizeHints->max_aspect.x=width;
+  sizeHints->max_aspect.y=height;
+  sizeHints->max_width=3*width;
+  sizeHints->max_height=3*height;
 
   wmHints->flags=StateHint | InputHint;
   wmHints->initial_state=NormalState;
@@ -144,9 +152,6 @@ int xdisplay_init(int argc, char **argv, int width, int height)
   if(xdisplay_allocate_gc(mainWindow,&gc)) return 1;
   if(xdisplay_allocate_image(width,height)) return 1;
 
-  /* Set the background (aka border) colour */
-  xdisplay_set_border(7);
-  
   /* And finally display the window */
   XMapWindow(display,mainWindow);
 
@@ -183,11 +188,13 @@ static int xdisplay_allocate_colours(int numColours, unsigned long *colours)
 
   for(i=0;i<numColours;i++) {
     if( XParseColor(display, currentMap, colour_names[i], &colour) == 0 ) {
-      fprintf(stderr,"%s: couldn't parse `%s'\n",progname,colour_names[i]);
+      fprintf(stderr,"%s: couldn't parse colour `%s'\n",progname,
+	      colour_names[i]);
       return 1;
     }
     if( XAllocColor(display, currentMap, &colour) == 0 ) {
-      fprintf(stderr,"%s: couldn't allocate `%s'\n",progname,colour_names[i]);
+      fprintf(stderr,"%s: couldn't allocate colour `%s'\n",progname,
+	      colour_names[i]);
       if(currentMap == DefaultColormap(display,screenNum)) {
 	fprintf(stderr,"%s: switching to private colour map\n",progname);
 	currentMap=XCopyColormapAndFree(display,currentMap);
@@ -217,14 +224,14 @@ static int xdisplay_allocate_image(int width, int height)
 {
   image=XCreateImage(display, DefaultVisual(display,screenNum),
 		     DefaultDepth(display,screenNum),ZPixmap,0,NULL,
-		     width,height,8,0);
+		     3*width,3*height,8,0);
 
   if(!image) {
     fprintf(stderr,"%s: couldn't create image\n",progname);
     return 1;
   }
 
-  if( (image->data=(char*)malloc(image->bytes_per_line*height)) == NULL ) {
+  if( (image->data=(char*)malloc(image->bytes_per_line*3*height)) == NULL ) {
     fprintf(stderr,"%s: out of memory for image data\n",progname);
     return 1;
   }
@@ -232,26 +239,127 @@ static int xdisplay_allocate_image(int width, int height)
   return 0;
 }
 
+int xdisplay_configure_notify(int width, int height)
+{
+  int y,size;
+
+  size = width / DISPLAY_SCREEN_WIDTH;
+
+  /* If we're the same size as before, nothing special needed */
+  if( size == xdisplay_current_size ) return 0;
+
+  /* Else set ourselves to the new height */
+  xdisplay_current_size=size;
+
+  /* Redraw the entire screen... */
+  display_refresh_all();
+
+  /* And the entire border */
+  for(y=0;y<DISPLAY_BORDER_HEIGHT;y++) {
+    xdisplay_set_border(y,0,DISPLAY_SCREEN_WIDTH,display_border);
+    xdisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y,0,
+			DISPLAY_SCREEN_WIDTH,display_border);
+  }
+
+  for(y=DISPLAY_BORDER_HEIGHT;y<DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT;y++) {
+    xdisplay_set_border(y,0,DISPLAY_BORDER_WIDTH,display_border);
+    xdisplay_set_border(y,DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
+			DISPLAY_SCREEN_WIDTH,display_border);
+  }
+
+  return 0;
+}
+
 void xdisplay_putpixel(int x,int y,int colour)
 {
-  XPutPixel(image,x,y,colours[colour]);
+  switch(xdisplay_current_size) {
+  case 1:
+    XPutPixel(image,  x  ,  y  ,colours[colour]);
+    break;
+  case 2:
+    XPutPixel(image,2*x,  2*y  ,colours[colour]);
+    XPutPixel(image,2*x+1,2*y  ,colours[colour]);
+    XPutPixel(image,2*x  ,2*y+1,colours[colour]);
+    XPutPixel(image,2*x+1,2*y+1,colours[colour]);
+    break;
+  case 3:
+    XPutPixel(image,3*x,  3*y  ,colours[colour]);
+    XPutPixel(image,3*x+1,3*y  ,colours[colour]);
+    XPutPixel(image,3*x+2,3*y  ,colours[colour]);
+    XPutPixel(image,3*x  ,3*y+1,colours[colour]);
+    XPutPixel(image,3*x+1,3*y+1,colours[colour]);
+    XPutPixel(image,3*x+2,3*y+1,colours[colour]);
+    XPutPixel(image,3*x  ,3*y+2,colours[colour]);
+    XPutPixel(image,3*x+1,3*y+2,colours[colour]);
+    XPutPixel(image,3*x+2,3*y+2,colours[colour]);
+    break;
+  }
 }
 
 void xdisplay_line(int y)
 {
-/*   fprintf(stderr,"Copying line %d to window\n",y); */
-  XPutImage(display,mainWindow,gc,image,0,y,display_border_width,
-	    y+display_border_height,256,1);
+  XPutImage(display,mainWindow,gc,image,
+	    0,xdisplay_current_size*y,
+	    0,xdisplay_current_size*y,
+	    xdisplay_current_size*DISPLAY_SCREEN_WIDTH,xdisplay_current_size);
 }
 
 void xdisplay_area(int x, int y, int width, int height)
 {
-/*   fprintf(stderr,"Displaying area %dx%d+%d+%d\n",width,height,x,y); */
-  XPutImage(display,mainWindow,gc,image,x,y,x+display_border_width,
-	    y+display_border_height,width,height);
+  XPutImage(display,mainWindow,gc,image,x,y,x,y,width,height);
 }
 
-void xdisplay_set_border(int colour)
+void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {
-  XSetWindowBackground(display,mainWindow,colours[colour]);
+  int x;
+  
+  switch(xdisplay_current_size) {
+  case 1:
+    for(x=pixel_from;x<pixel_to;x++) {
+      XPutPixel(image,  x  ,  line  ,colours[colour]);
+    }
+    break;
+  case 2:
+    for(x=pixel_from;x<pixel_to;x++) {
+      XPutPixel(image,2*x  ,2*line  ,colours[colour]);
+      XPutPixel(image,2*x+1,2*line  ,colours[colour]);
+      XPutPixel(image,2*x  ,2*line+1,colours[colour]);
+      XPutPixel(image,2*x+1,2*line+1,colours[colour]);
+    }
+    break;
+  case 3:
+    for(x=pixel_from;x<pixel_to;x++) {
+      XPutPixel(image,3*x  ,3*line  ,colours[colour]);
+      XPutPixel(image,3*x+1,3*line  ,colours[colour]);
+      XPutPixel(image,3*x+2,3*line  ,colours[colour]);
+      XPutPixel(image,3*x  ,3*line+1,colours[colour]);
+      XPutPixel(image,3*x+1,3*line+1,colours[colour]);
+      XPutPixel(image,3*x+2,3*line+1,colours[colour]);
+      XPutPixel(image,3*x  ,3*line+2,colours[colour]);
+      XPutPixel(image,3*x+1,3*line+2,colours[colour]);
+      XPutPixel(image,3*x+2,3*line+2,colours[colour]);
+    }
+    break;
+  }
+}
+
+int xdisplay_end(void)
+{
+  /* Don't display the window whilst doing all this! */
+  XUnmapWindow(display,mainWindow);
+
+  /* Free the XImage used to store screen data; also frees the malloc'd
+     data */
+  XDestroyImage(image);
+
+  /* Free the allocated GC */
+  XFreeGC(display,gc);
+
+  /* Now free up the window itself */
+  XDestroyWindow(display,mainWindow);
+
+  /* And disconnect from the X server */
+  XCloseDisplay(display);
+
+  return 0;
 }

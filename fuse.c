@@ -24,9 +24,12 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
 
 #include "display.h"
+#include "event.h"
 #include "keyboard.h"
 #include "snapshot.h"
 #include "spectrum.h"
@@ -35,8 +38,12 @@
 #include "x.h"
 #include "z80.h"
 
+/* A flag to say when we want to exit the emulator */
+int fuse_exiting;
+
 static int fuse_init(int argc, char **argv);
 static void fuse_show_copyright(void);
+static int fuse_end(void);
 
 int main(int argc,char **argv)
 {
@@ -45,11 +52,12 @@ int main(int argc,char **argv)
     return 1;
   }
 
-  while(1) {
-    display_line();
-    if(spectrum_interrupt()) if(x_event()) break;
-    z80_do_opcode();
+  while( !fuse_exiting ) {
+    z80_do_opcodes();
+    event_do_events();
   }
+
+  fuse_end();
   
   return 0;
 
@@ -59,9 +67,11 @@ static int fuse_init(int argc, char **argv)
 {
   fuse_show_copyright();
 
-  timer_init();
-  machine.machine=SPECTRUM_MACHINE_48; spectrum_init();
   if(display_init(argc,argv)) return 1;
+  if(event_init()) return 1;
+  timer_init();
+
+  machine.machine=SPECTRUM_MACHINE_48; spectrum_init(); machine.reset();
   keyboard_init();
   z80_init();
 
@@ -74,11 +84,20 @@ static void fuse_show_copyright(void)
   printf(
    "The Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n"
    "Copyright (c) 1999-2000 Philip Kendall <pak@ast.cam.ac.uk> and others;\n"
-   "For other contributors, see the file `ChangeLog'.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"
    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
    "GNU General Public License for more details.\n\n");
 
+}
+
+/* Tidy-up function called at end of emulation */
+static int fuse_end(void)
+{
+  timer_end();
+  event_end();
+  display_end();
+
+  return 0;
 }

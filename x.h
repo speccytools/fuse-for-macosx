@@ -1,4 +1,4 @@
-/* x.c: Routines for dealing with X events
+/* x.h: Routines for dealing with X events
    Copyright (c) 2000 Philip Kendall
 
    $Id$

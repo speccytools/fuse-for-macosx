@@ -123,7 +123,7 @@
   F = ( add16temp & 0x10000 ? FLAG_C : 0 )|\
     overflow_add_table[lookup >> 4] |\
     ( H & ( FLAG_3 | FLAG_5 | FLAG_S ) ) |\
-    halfcarry_add_table[lookup&0x0f]|\
+    halfcarry_add_table[lookup&0x07]|\
     ( HL ? 0 : FLAG_Z );\
 }
 
@@ -304,16 +304,16 @@
 
 #define SBC16(value)\
 {\
-  DWORD sub16temp= HL - (value) - ( F & FLAG_C );\
+  DWORD sub16temp = HL - (value) - (F & FLAG_C);\
   BYTE lookup = ( ( HL & 0x8800 ) >> 11 ) |\
     ( ( (value) & 0x8800 ) >> 10 ) |\
     ( ( sub16temp & 0x8800 ) >> 9 );\
   HL = sub16temp;\
-  F = sub16temp & 0x10000 ? FLAG_C : 0|\
+  F = ( sub16temp & 0x10000 ? FLAG_C : 0 ) |\
     FLAG_N | overflow_sub_table[lookup >> 4] |\
     ( H & ( FLAG_3 | FLAG_5 | FLAG_S ) ) |\
-    halfcarry_sub_table[lookup&0x0f] |\
-    ( sub16temp ? 0 : FLAG_Z ) ;\
+    halfcarry_sub_table[lookup&0x07] |\
+    ( HL ? 0 : FLAG_Z) ;\
 }
 
 #define SLA(value)\

@@ -1,5 +1,5 @@
-/* keyboard.h: Routines for dealing with the Spectrum's keyboard
-   Copyright (c) 1999-2000 Philip Kendall
+/* event.c: Routines needed for dealing with the event list
+   Copyright (c) 2000 Philip Kendall
 
    $Id$
 
@@ -24,17 +24,41 @@
 
 */
 
-#ifndef FUSE_KEYBOARD_H
-#define FUSE_KEYBOARD_H
+#ifndef FUSE_EVENT_H
+#define FUSE_EVENT_H
 
 #ifndef FUSE_TYPES_H
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
-extern BYTE keyboard_default_value;
-extern BYTE keyboard_return_values[8];
+/* Information about an event */
+typedef struct event_t {
+  DWORD tstates;
+  int type;
+} event_t;
 
-void keyboard_init(void);
-BYTE keyboard_read(BYTE porth);
+/* The various types of event which can occur */
+enum event_types { EVENT_TYPE_INTERRUPT, EVENT_TYPE_LINE };
 
-#endif			/* #ifndef FUSE_KEYBOARD_H */
+/* A large value to mean `no events due' */
+extern const DWORD event_no_events;
+
+/* When will the next event happen? */
+DWORD event_next_event;
+
+/* Set up the event list */
+int event_init(void);
+
+/* Add an event at the correct place in the event list */
+int event_add(DWORD tstates, int type);
+
+/* Do all events which have passed */
+int event_do_events(void);
+
+/* Called on interrupt to reduce T-state count of all entries */
+int event_interrupt(DWORD tstates);
+
+/* Clear the event stack */
+int event_reset(void);
+
+#endif				/* #ifndef FUSE_EVENT_H */

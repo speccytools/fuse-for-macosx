@@ -1,4 +1,4 @@
-/* xdisplay.h: Routines for dealing with the X display
+/* fuse.h: Variables exported from the main file
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -24,18 +24,9 @@
 
 */
 
-#ifndef FUSE_XDISPLAY_H
-#define FUSE_XDISPLAY_H
+#ifndef FUSE_FUSE_H
+#define FUSE_FUSE_H
 
-int xdisplay_init(int argc, char **argv, int width, int height);
+extern int fuse_exiting;
 
-int xdisplay_configure_notify(int width, int height);
-
-void xdisplay_putpixel(int x,int y,int colour);
-void xdisplay_line(int y);
-void xdisplay_area(int x, int y, int width, int height);
-void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour);
-
-int xdisplay_end(void);
-
-#endif			/* #ifndef FUSE_XDISPLAY_H */
+#endif			/* #ifndef FUSE_FUSE_H */

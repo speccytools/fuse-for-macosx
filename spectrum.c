@@ -24,10 +24,13 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
 #include <unistd.h>
 
 #include "display.h"
+#include "event.h"
 #include "keyboard.h"
 #include "spec128.h"
 #include "spec48.h"
@@ -35,6 +38,7 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "timer.h"
+#include "x.h"
 #include "z80.h"
 
 BYTE ROM[4][0x4000];
@@ -59,41 +63,50 @@ int spectrum_init()
   }
 }
 
-void spectrum_set_timings(WORD cycles_per_line,WORD lines_per_frame,DWORD hz,
-			  DWORD first_line)
+void spectrum_set_timings(WORD left_border_cycles,  WORD screen_cycles,
+			  WORD right_border_cycles, WORD retrace_cycles,
+			  WORD lines_per_frame, DWORD hz, DWORD first_line)
 {
   int y;
 
-  machine.cycles_per_line=cycles_per_line;
+  machine.left_border_cycles =left_border_cycles;
+  machine.screen_cycles      =screen_cycles;
+  machine.right_border_cycles=right_border_cycles;
+  machine.retrace_cycles     =retrace_cycles;
+
+  machine.cycles_per_line=left_border_cycles+screen_cycles+
+    right_border_cycles+retrace_cycles;
+
   machine.lines_per_frame=lines_per_frame;
-  machine.cycles_per_frame=cycles_per_line*(DWORD)lines_per_frame;
+  machine.cycles_per_frame=machine.cycles_per_line*(DWORD)lines_per_frame;
 
   machine.hz=hz;
 
-  for(y=0;y<192;y++) {
-    first_line+=cycles_per_line;
-    machine.line_times[y]=first_line;
+  machine.line_times[0]=first_line;
+  for(y=1;y<DISPLAY_SCREEN_HEIGHT+1;y++) {
+    machine.line_times[y]=machine.line_times[y-1]+machine.cycles_per_line;
   }
-  machine.line_times[192]=0xFFFFFFFF;	/* End marker */
 
 }
 
 int spectrum_interrupt(void)
 {
-  if(tstates>=machine.cycles_per_frame) {
-    tstates-=machine.cycles_per_frame;
-    timer_sleep(); timer_count--;
-    display_frame();
-    z80_interrupt();
-    return 1;
-  }
+  tstates-=machine.cycles_per_frame;
+  if(event_interrupt(machine.cycles_per_frame)) return 1;
+
+  timer_sleep(); timer_count--;
+  if(display_frame()) return 1;
+  z80_interrupt();
+
+  if(event_add(machine.cycles_per_frame,EVENT_TYPE_INTERRUPT)) return 1;
+
   return 0;
 }
 
 BYTE readport(WORD port)
 {
   if ( ! (port & 0x01) ) {
-    return read_keyboard( ( port >> 8 ) );
+    return keyboard_read( ( port >> 8 ) );
   } else if ( machine.ay.present && port==machine.ay.readport ) {
     return machine.ay.registers[machine.ay.current_register];
   }
@@ -102,7 +115,24 @@ BYTE readport(WORD port)
 
 void writeport(WORD port,BYTE b)
 {
-  if( ! (port & 0x01) ) display_set_border(b&0x07);
+  if( ! (port & 0x01) ) {
+    display_set_border(b&0x07);
+
+#ifdef ISSUE2
+    if( b & 0x18 ) {
+      keyboard_default_value=0xff;
+    } else {
+      keyboard_default_value=0xbf;
+    }
+#else				/* #ifdef ISSUE2 */
+    if( b & 0x10 ) {
+      keyboard_default_value=0xff;
+    } else {
+      keyboard_default_value=0xbf;
+    }
+#endif				/* #ifdef ISSUE2 */
+  }
+
   if( port==machine.ram.port && 
       ( machine.ram.type==SPECTRUM_MACHINE_128 || 
 	machine.ram.type==SPECTRUM_MACHINE_PLUS3 ) &&

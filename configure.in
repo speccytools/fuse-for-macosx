@@ -21,9 +21,10 @@ dnl E-mail: pak@ast.cam.ac.uk
 dnl Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 AC_INIT(fuse.c)
+AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.2.0)
+AM_INIT_AUTOMAKE(fuse, 0.2.1)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -60,6 +61,25 @@ AC_C_CONST
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(setitimer)
+
+dnl Check for libraries
+AC_CHECK_LIB(glib, g_slist_append)
+if test $ac_cv_lib_glib_g_slist_append = yes; then
+    CFLAGS="$CFLAGS `glib-config --cflags`"
+fi
+
+dnl Do we want issue 2 keyboard emulation?
+AC_MSG_CHECKING(whether Issue 2 emulation requested)
+AC_ARG_ENABLE(issue2,
+[  --enable-issue2         emulate an Issue 2 Spectrum],
+if test "$enableval" = yes; then
+    issue2=yes;
+    AC_DEFINE(ISSUE2)
+else
+    issue2=no;
+fi,
+issue2=no)
+AC_MSG_RESULT($issue2)
 
 AC_SUBST(X_CFLAGS)
 AC_SUBST(X_LIBS)

@@ -28,7 +28,9 @@
 #include <string.h>
 
 #include "ay.h"
+#include "config.h"
 #include "display.h"
+#include "event.h"
 #include "keyboard.h"
 #include "specplus3.h"
 #include "spectrum.h"
@@ -145,7 +147,7 @@ int specplus3_init(void)
 
   tstates=0;
 
-  spectrum_set_timings(228,311,3.54690e6,14361);
+  spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
   machine.reset=specplus3_reset;
 
   machine.ram.type=SPECTRUM_MACHINE_PLUS3;
@@ -160,11 +162,15 @@ int specplus3_init(void)
 
 }
 
-void specplus3_reset(void)
+int specplus3_reset(void)
 {
   machine.ram.current_page=0; machine.ram.current_rom=0;
   machine.ram.current_screen=5;
   machine.ram.locked=0;
   machine.ram.special=0; machine.ram.specialcfg=0;
+  event_reset();
+  if(event_add(machine.cycles_per_frame,EVENT_TYPE_INTERRUPT)) return 1;
+  if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
   z80_reset();
+  return 0;
 }

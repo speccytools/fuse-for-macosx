@@ -24,37 +24,36 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
 
 #include "display.h"
+#include "event.h"
 #include "spectrum.h"
 #include "xdisplay.h"
 
-/* Width and height of the emulated border */
-int display_border_width=32;
-int display_border_height=24;
-
-/* Palette entry to use for the Spectrum border colour */
-static const int DISPLAY_BORDER=16;
 /* The current border colour */
-int display_border;
+BYTE display_border;
+/* The border colour current displayed on every line */
+static BYTE display_current_border[DISPLAY_SCREEN_HEIGHT];
 
 /* Offsets as to where the data and the attributes for each pixel
    line start */
-static WORD display_line_start[192];
-static WORD display_attr_start[192];
+static WORD display_line_start[DISPLAY_HEIGHT];
+static WORD display_attr_start[DISPLAY_HEIGHT];
 
 /* If you write to the byte at display_dirty_?table[n+0x4000], then
    the eight pixels starting at (xtable[n],ytable[n]) must be
    replotted */
-static WORD display_dirty_ytable[6144];
-static WORD display_dirty_xtable[6144];
+static WORD display_dirty_ytable[(DISPLAY_WIDTH*DISPLAY_HEIGHT)/8];
+static WORD display_dirty_xtable[(DISPLAY_WIDTH*DISPLAY_HEIGHT)/8];
 
 /* If you write to the byte at display_dirty_?table2[n+0x5800], then
    the 64 pixels starting at (xtable2[n],ytable2[n]) must be
    replotted */
-static WORD display_dirty_ytable2[768];
-static WORD display_dirty_xtable2[768];
+static WORD display_dirty_ytable2[ (DISPLAY_WIDTH/8) * (DISPLAY_HEIGHT/8) ];
+static WORD display_dirty_xtable2[ (DISPLAY_WIDTH/8) * (DISPLAY_HEIGHT/8) ];
 
 /* The number of frames mod 32 that have elapsed.
     0<=d_f_c<16 => Flashing characters are normal
@@ -64,25 +63,36 @@ static BYTE display_frame_count;
 static int display_flash_reversed;
 
 /* Does this line need to be redisplayed? */
-static BYTE display_is_dirty[192];
+static BYTE display_is_dirty[DISPLAY_SCREEN_HEIGHT];
 
 /* The next line to be replotted */
 static int display_next_line;
-static DWORD display_next_line_time;
+
+/* Value used to signify we're in vertical retrace */
+const static int display_border_retrace=-1;
+
+/* Value used to signify a border line has more than one colour on it. */
+const static int display_border_mixed = 0xff;
 
 static void display_draw_line(int y);
 static void display_dirty8(WORD address, BYTE data);
 static void display_dirty64(WORD address, BYTE attr);
 
-static void display_plot8(int x,int y,BYTE data,BYTE ink,BYTE paper);
-static void display_get_attr(int x,int y,BYTE *ink,BYTE *paper);
-static void display_parse_attr(BYTE attr,BYTE *ink,BYTE *paper);
+static void display_plot8(int x, int y, BYTE data, BYTE ink, BYTE paper);
+static void display_get_attr(int x, int y, BYTE *ink, BYTE *paper);
+static void display_parse_attr(BYTE attr, BYTE *ink, BYTE *paper);
+
+static int display_border_line(void);
 
 static void display_dirty_flashing(void);
+static int display_border_column(int time_since_line);
 
 int display_init(int argc, char **argv)
 {
   int i,j,k,x,y;
+
+  if(xdisplay_init(argc,argv,DISPLAY_SCREEN_WIDTH,DISPLAY_SCREEN_HEIGHT))
+    return 1;
 
   for(i=0;i<3;i++)
     for(j=0;j<8;j++)
@@ -90,47 +100,73 @@ int display_init(int argc, char **argv)
 	display_line_start[ (64*i) + (8*j) + k ] =
 	  32 * ( (64*i) + j + (k*8) );
 
-  for(y=0;y<192;y++)
+  for(y=0;y<DISPLAY_HEIGHT;y++)
     display_attr_start[y]=6144 + (32*(y/8));
 
-  for(y=0;y<192;y++)
-    for(x=0;x<32;x++) {
+  for(y=0;y<DISPLAY_HEIGHT;y++)
+    for(x=0;x<(DISPLAY_WIDTH)/8;x++) {
       display_dirty_ytable[display_line_start[y]+x]=y;
       display_dirty_xtable[display_line_start[y]+x]=x;
     }
 
-  for(y=0;y<24;y++)
-    for(x=0;x<32;x++) {
+  for(y=0;y<(DISPLAY_HEIGHT/8);y++)
+    for(x=0;x<(DISPLAY_WIDTH/8);x++) {
       display_dirty_ytable2[ (32*y) + x ]=8*y;
       display_dirty_xtable2[ (32*y) + x ]=x;
     }
 
   display_frame_count=0; display_flash_reversed=0;
 
-  x=256+ (2*display_border_width );
-  y=192+ (2*display_border_height);
-
-  if(xdisplay_init(argc,argv,x,y)) return 1;
+  for(y=0;y<DISPLAY_SCREEN_HEIGHT;y++)
+    display_current_border[y]=display_border_mixed;
 
   return 0;
 
 }
 
+/* Draw the current screen line, and increment the line count. Called
+   one more time after the entire screen has been displayed so we know
+   this fact */
 void display_line(void)
 {
-  if(tstates>=display_next_line_time) {
-    display_draw_line(display_next_line++);
-    display_next_line_time=machine.line_times[display_next_line];
+  if( display_next_line < DISPLAY_SCREEN_HEIGHT ) {
+    display_draw_line(display_next_line);
+    event_add(machine.line_times[display_next_line+1],EVENT_TYPE_LINE);
   }
+  display_next_line++;
 }   
 
-/* Redraw any bits of pixel line y which are flagged as `dirty' */
+/* Redraw pixel line y if it is flagged as `dirty' */
 static void display_draw_line(int y)
 {
   if(display_is_dirty[y]) {
-    display_is_dirty[y]=0;
     xdisplay_line(y);
+    display_is_dirty[y]=0;
   }
+
+  if(display_current_border[y] != display_border) {
+
+    /* See if we're in the top/bottom border */
+    if(y < DISPLAY_BORDER_HEIGHT ||
+       y >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
+
+      /* Colour in all the border to the very right edge */
+      xdisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, display_border);
+
+    } else {			/* In main screen */
+
+      /* Colour in the left and right borders */
+      xdisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, display_border);
+      xdisplay_set_border(y, DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH,
+			  DISPLAY_SCREEN_WIDTH, display_border);
+
+    }
+
+    display_current_border[y] = display_border;
+    display_is_dirty[y]=1;	/* Need to redisplay this line next time */
+
+  }
+
 }
 
 /* Mark as `dirty' the pixels which have been changed by a write to byte
@@ -154,7 +190,7 @@ static void display_dirty8(WORD address, BYTE data)
 
   display_plot8(x,y,data,ink,paper);
 
-  display_is_dirty[y] = 1;
+  display_is_dirty[DISPLAY_BORDER_HEIGHT+y] = 1;
   
 }
 
@@ -171,7 +207,7 @@ static void display_dirty64(WORD address, BYTE attr)
     display_plot8(x,y+i,data,ink,paper);
   }
 
-  memset(&display_is_dirty[y],1,8*sizeof(BYTE));
+  memset(&display_is_dirty[DISPLAY_BORDER_HEIGHT+y],1,8*sizeof(BYTE));
 
 }
 
@@ -179,7 +215,8 @@ static void display_dirty64(WORD address, BYTE attr)
    colour `paper' to the screen at ( (8*x) , y ) */
 static void display_plot8(int x,int y,BYTE data,BYTE ink,BYTE paper)
 {
-  x*=8;
+  x = (8*x) + DISPLAY_BORDER_WIDTH;
+  y += DISPLAY_BORDER_HEIGHT;
   xdisplay_putpixel(x+0,y, ( data & 0x80 ) ? ink : paper );
   xdisplay_putpixel(x+1,y, ( data & 0x40 ) ? ink : paper );
   xdisplay_putpixel(x+2,y, ( data & 0x20 ) ? ink : paper );
@@ -211,23 +248,100 @@ static void display_parse_attr(BYTE attr,BYTE *ink,BYTE *paper)
 
 void display_set_border(int colour)
 {
+  int current_line,time_since_line,current_pixel;
+
   display_border=colour;
-  xdisplay_set_border(colour);
+
+  current_line=display_border_line();
+
+  /* Check if we're in vertical retrace; if we are, don't need to do
+     change anything in the display buffer */
+  if(current_line==display_border_retrace) return;
+
+  /* If the current line is already this colour, don't need to do anything */
+  if(display_current_border[current_line] == colour) return;
+
+  time_since_line = tstates - machine.line_times[current_line];
+
+  /* Now check we're not in horizonal retrace. Again, do nothing
+     if we are */
+  if(time_since_line >= machine.left_border_cycles + machine.screen_cycles +
+     machine.right_border_cycles ) return;
+      
+  current_pixel=display_border_column(time_since_line);
+
+  /* See if we're in the top/bottom border */
+  if(current_line < DISPLAY_BORDER_HEIGHT ||
+     current_line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) {
+
+    /* Colour in all the border to the very right edge */
+    xdisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
+			colour);
+
+  } else {			/* In main screen */
+
+    /* If we're in the left border, colour that bit in */
+    if(current_pixel < DISPLAY_BORDER_WIDTH)
+      xdisplay_set_border(current_line, current_pixel, DISPLAY_BORDER_WIDTH,
+			  colour);
+
+    /* Advance to the right edge of the screen */
+    if(current_pixel < DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH)
+      current_pixel = DISPLAY_BORDER_WIDTH + DISPLAY_WIDTH;
+
+    /* Draw the right border */
+    xdisplay_set_border(current_line, current_pixel, DISPLAY_SCREEN_WIDTH,
+			colour);
+
+  }
+
+  /* And note this line has more than one colour on it */
+  display_current_border[current_line]=display_border_mixed;
+
 }
 
-void display_frame(void)
+static int display_border_line(void)
+{
+  if( 0 < display_next_line && display_next_line <= DISPLAY_SCREEN_HEIGHT ) {
+    return display_next_line-1;
+  } else {
+    return display_border_retrace;
+  }
+}
+
+static int display_border_column(int time_since_line)
+{
+  int column;
+
+  /* 2 pixels per T-state, rounded _up_ to the next multiple of eight */
+  column = ( (time_since_line+3)/4 ) * 8;
+
+  /* But now need to correct because our displayed border isn't necessarily
+     the same size as the ULA's. */
+  column -= ( 2*machine.left_border_cycles - DISPLAY_BORDER_WIDTH );
+  if(column < 0) {
+    column=0;
+  } else if(column > DISPLAY_SCREEN_WIDTH) {
+    column=DISPLAY_SCREEN_WIDTH;
+  }
+
+  return column;
+}
+
+int display_frame(void)
 {
   display_next_line=0;
-  display_next_line_time=machine.line_times[0];
+  if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
   display_frame_count++;
   if(display_frame_count==16) {
     display_flash_reversed=1;
     display_dirty_flashing();
   } else if(display_frame_count==32) {
-    display_frame_count=0;
     display_flash_reversed=0;
     display_dirty_flashing();
+    display_frame_count=0;
   }
+  return 0;
 }
 
 static void display_dirty_flashing(void)
@@ -245,15 +359,24 @@ void display_refresh_all(void)
 {
   int x,y,z; BYTE ink,paper;
 
-  for(y=0;y<192;y+=8) {
-    for(x=0;x<32;x++) {
+  for(y=0;y<DISPLAY_HEIGHT;y+=8) {
+    for(x=0;x<(DISPLAY_WIDTH/8);x++) {
       display_parse_attr(read_screen_memory(display_attr_start[y]+x),
 			 &ink,&paper);
       for(z=0;z<8;z++) {
 	display_plot8(x,y+z,read_screen_memory(display_line_start[y+z]+x),
 		      ink,paper);
-	display_is_dirty[y+z]=1;
+	display_is_dirty[DISPLAY_BORDER_HEIGHT+y+z]=1;
       }
     }
   }
+}
+
+int display_end(void)
+{
+  int error;
+
+  if( (error=xdisplay_end()) != 0 ) return error;
+
+  return 0;
 }

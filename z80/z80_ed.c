@@ -379,7 +379,8 @@ break;
 case 0xb0:	/* LDIR */
 tstates+=16;
 {
-  BYTE bytetemp=readbyte(HL);
+  BYTE bytetemp;
+  bytetemp=readbyte(HL);
   writebyte(DE,bytetemp);
   HL++; DE++; BC--;
   bytetemp += A;

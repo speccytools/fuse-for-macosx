@@ -1,4 +1,4 @@
-/* xdisplay.h: Routines for dealing with the X display
+/* acconfig.h: Descriptions of macros produced by autoconf
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -24,18 +24,5 @@
 
 */
 
-#ifndef FUSE_XDISPLAY_H
-#define FUSE_XDISPLAY_H
-
-int xdisplay_init(int argc, char **argv, int width, int height);
-
-int xdisplay_configure_notify(int width, int height);
-
-void xdisplay_putpixel(int x,int y,int colour);
-void xdisplay_line(int y);
-void xdisplay_area(int x, int y, int width, int height);
-void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour);
-
-int xdisplay_end(void);
-
-#endif			/* #ifndef FUSE_XDISPLAY_H */
+/* Defined if Issue 2 emulation requested */
+#undef ISSUE2

@@ -28,12 +28,13 @@
 #include <string.h>
 
 #include "ay.h"
+#include "config.h"
 #include "display.h"
+#include "event.h"
 #include "keyboard.h"
+#include "spec128.h"
 #include "spectrum.h"
 #include "z80.h"
-
-void spec128_reset(void);
 
 BYTE spec128_readbyte(WORD address)
 {
@@ -91,7 +92,7 @@ int spec128_init(void)
 
   tstates=0;
 
-  spectrum_set_timings(228,311,3.54690e6,14361);
+  spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
   machine.reset=spec128_reset;
 
   machine.ram.type=SPECTRUM_MACHINE_128;
@@ -105,10 +106,14 @@ int spec128_init(void)
 
 }
 
-void spec128_reset(void)
+int spec128_reset(void)
 {
   machine.ram.current_page=0; machine.ram.current_rom=0;
   machine.ram.current_screen=5;
   machine.ram.locked=0;
+  event_reset();
+  if(event_add(machine.cycles_per_frame,EVENT_TYPE_INTERRUPT)) return 1;
+  if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
   z80_reset();
+  return 0;
 }

@@ -1,4 +1,4 @@
-/* xdisplay.h: Routines for dealing with the X display
+/* config.h.top: Preamble for config.h
    Copyright (c) 2000 Philip Kendall
 
    $Id$
@@ -23,19 +23,3 @@
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
-
-#ifndef FUSE_XDISPLAY_H
-#define FUSE_XDISPLAY_H
-
-int xdisplay_init(int argc, char **argv, int width, int height);
-
-int xdisplay_configure_notify(int width, int height);
-
-void xdisplay_putpixel(int x,int y,int colour);
-void xdisplay_line(int y);
-void xdisplay_area(int x, int y, int width, int height);
-void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour);
-
-int xdisplay_end(void);
-
-#endif			/* #ifndef FUSE_XDISPLAY_H */

@@ -1,5 +1,5 @@
 /* z80.c: z80 supplementary functions
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,10 +17,12 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
+
+#include <config.h>
 
 #include <stdio.h>
 

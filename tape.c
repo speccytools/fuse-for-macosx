@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "z80.h"

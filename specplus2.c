@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "config.h"
 #include "spec128.h"
 #include "spectrum.h"
 
@@ -50,7 +51,7 @@ int specplus2_init(void)
 
   tstates=0;
 
-  spectrum_set_timings(228,311,3.54690e6,14361);
+  spectrum_set_timings(24,128,24,52,311,3.54690e6,8865);
   machine.reset=spec128_reset;
 
   machine.ram.type=SPECTRUM_MACHINE_128;

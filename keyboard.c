@@ -24,29 +24,43 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
 
 #include "types.h"
 
+extern int traceFlag;
+
+/* What to return if no keys are pressed; depends on the last byte
+   output to the ULA; see CSS FAQ | Technical Information | Port #FE
+   for full details */
+BYTE keyboard_default_value;
+
+/* Bit masks for each of the eight keyboard half-rows; `AND' the selected
+   ones of these with `keyboard_default_value' to get the value to return
+*/
 BYTE keyboard_return_values[8];
 
 void keyboard_init(void)
 {
   int i;
   
+  keyboard_default_value=0xff;
   for(i=0;i<8;i++) keyboard_return_values[i]=0xff;
 }
 
-BYTE read_keyboard(BYTE porth)
+BYTE keyboard_read(BYTE porth)
 {
-  BYTE data=0xff; int i;
+  BYTE data=keyboard_default_value; int i;
 
   for(i=0;i<8;i++) {
-    if(! (porth&0x01) ) data &= keyboard_return_values[i];
+    if(! (porth&0x01) ) {
+      data &= keyboard_return_values[i];
+    }
     porth >>= 1;
   }
 
   return data;
 
 }
-

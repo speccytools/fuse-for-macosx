@@ -1,5 +1,7 @@
 /* z80.h: z80 emulation core
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -54,8 +56,7 @@ void z80_init(void);
 void z80_reset(void);
 void z80_interrupt(void);
 
-void z80_do_opcode(void);
-void z80_dumpopcodes(void);
+void z80_do_opcodes(void);
 
 extern processor z80;
 extern BYTE halfcarry_add_table[];

@@ -28,10 +28,16 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "spectrum.h"
 #include "timer.h"
 
 volatile int timer_count;
+
+/* Just places to store the old timer and signal handlers; restored
+   on exit */
+static struct itimerval timer_old_timer;
+static struct sigaction timer_old_handler;
 
 void timer_init(void);
 static void timer_setup_timer(void);
@@ -52,7 +58,7 @@ static void timer_setup_timer(void)
   timer.it_interval.tv_usec=20000;
   timer.it_value.tv_sec=0;
   timer.it_value.tv_usec=20000;
-  setitimer(ITIMER_REAL,&timer,0);
+  setitimer(ITIMER_REAL,&timer,&timer_old_timer);
 }
 
 static void timer_setup_handler(void)
@@ -61,7 +67,7 @@ static void timer_setup_handler(void)
   handler.sa_handler=timer_signal;
   sigemptyset(&handler.sa_mask);
   handler.sa_flags=0;
-  sigaction(SIGALRM,&handler,NULL);
+  sigaction(SIGALRM,&handler,&timer_old_handler);
 }  
 
 void timer_signal(int signal)
@@ -72,4 +78,16 @@ void timer_signal(int signal)
 void timer_sleep(void)
 {
   if(timer_count<=0) pause();
+}
+
+int timer_end(void)
+{
+  /* Restore the old timer */
+  setitimer(ITIMER_REAL,&timer_old_timer,NULL);
+
+  /* And the old signal handler */
+  sigaction(SIGALRM,&timer_old_handler,NULL);
+
+  return 0;
+
 }

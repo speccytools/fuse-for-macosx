@@ -1,5 +1,7 @@
 /* spec48.h: Spectrum 48K specific routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -33,6 +35,6 @@ BYTE spec48_readbyte(WORD address);
 BYTE spec48_read_screen_memory(WORD offset);
 void spec48_writebyte(WORD address, BYTE b);
 int spec48_init(void);
-void spec48_reset(void);
+int spec48_reset(void);
 
 #endif			/* #ifndef FUSE_SPEC48_H */

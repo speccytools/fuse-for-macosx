@@ -31,14 +31,26 @@
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
-extern int display_border;
-extern int display_border_width,display_border_height;
+/* The width and height of the Speccy's screen */
+#define DISPLAY_WIDTH  256
+#define DISPLAY_HEIGHT 192
+
+/* The width and height of the (emulated) border */
+#define DISPLAY_BORDER_WIDTH  32
+#define DISPLAY_BORDER_HEIGHT 24
+
+/* The width and height of the window we'll be displaying */
+#define DISPLAY_SCREEN_WIDTH  ( DISPLAY_WIDTH  + 2 * DISPLAY_BORDER_WIDTH  )
+#define DISPLAY_SCREEN_HEIGHT ( DISPLAY_HEIGHT + 2 * DISPLAY_BORDER_HEIGHT )
+
+extern BYTE display_border;
 
 int display_init(int argc, char **argv);
 void display_line(void);
 void display_dirty(WORD address, BYTE data);
 void display_set_border(int colour);
-void display_frame(void);
+int display_frame(void);
 void display_refresh_all(void);
+int display_end(void);
 
 #endif			/* #ifndef FUSE_DISPLAY_H */

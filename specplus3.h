@@ -1,5 +1,7 @@
 /* specplus3.h: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -33,6 +35,6 @@ BYTE specplus3_readbyte(WORD address);
 BYTE specplus3_read_screen_memory(WORD offset);
 void specplus3_writebyte(WORD address, BYTE b);
 int specplus3_init(void);
-void specplus3_reset(void);
+int specplus3_reset(void);
 
 #endif			/* #ifndef FUSE_SPECPLUS3_H */

@@ -1,5 +1,7 @@
 /* z80_ops.c: Process the next opcode
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,39 +19,36 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
 
+#include "config.h"
+#include "event.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "z80.h"
 
 #include "z80_macros.h"
 
-BYTE normal_opcodes[256];
-BYTE cb_opcodes[256];
-BYTE ed_opcodes[256];
-BYTE dd_opcodes[256];
-BYTE ddcb_opcodes[256];
-
-/* Read the next opcode and act upon it */
-void z80_do_opcode()
+/* Execute Z80 opcodes until the next event */
+void z80_do_opcodes()
 {
 
-  BYTE opcode;
+  while(tstates < event_next_event ) {
 
-  /* If the z80 is HALTed, execute a NOP-equivalent and return */
-  if(z80.halted) {
-    tstates+=4;
-    return;
-  }
+    BYTE opcode;
 
-  opcode=readbyte(PC++); R++;
-  normal_opcodes[opcode]=1;
+    /* If the z80 is HALTed, execute a NOP-equivalent and loop again */
+    if(z80.halted) {
+      tstates+=4;
+      continue;
+    }
 
-  switch(opcode) {
+    opcode=readbyte(PC++); R++;
+
+    switch(opcode) {
     case 0x00:		/* NOP */
       tstates+=4;
       break;
@@ -331,7 +330,7 @@ void z80_do_opcode()
       PC++;
       break;
     case 0x39:		/* ADD HL,SP */
-     tstates+=11;
+      tstates+=11;
       ADD16(HL,SP);
       break;
     case 0x3a:		/* LD A,(nnnn) */
@@ -542,7 +541,7 @@ void z80_do_opcode()
       tstates+=4;
       break;
     case 0x6e:		/* LD L,(HL) */
-      tstates+=4;
+      tstates+=7;
       L=readbyte(HL);
       break;
     case 0x6f:		/* LD L,A */
@@ -946,7 +945,7 @@ void z80_do_opcode()
     case 0xcb:		/* CBxx opcodes */
       {
 	BYTE opcode2=readbyte(PC++);
-	R++; cb_opcodes[opcode2]=1;
+	R++;
 	switch(opcode2) {
 #include "z80_cb.c"
 	}
@@ -1041,7 +1040,7 @@ void z80_do_opcode()
 #define REGISTERL IXL
 #define REGISTERH IXH
 	BYTE opcode2=readbyte(PC++);
-	R++; dd_opcodes[opcode2]=1;
+	R++;
 	switch(opcode2) {
 #include "z80_ddfd.c"
 	}
@@ -1129,7 +1128,7 @@ void z80_do_opcode()
     case 0xed:		/* EDxx opcodes */
       {
 	BYTE opcode2=readbyte(PC++);
-	R++; ed_opcodes[opcode2]=1;
+	R++;
 	switch(opcode2) {
 #include "z80_ed.c"
 	}
@@ -1211,7 +1210,7 @@ void z80_do_opcode()
 #define REGISTERH IYH
       {
 	BYTE opcode2=readbyte(PC++);
-	R++; dd_opcodes[opcode2]=1;
+	R++;
 	switch(opcode2) {
 #include "z80_ddfd.c"
 	}
@@ -1231,16 +1230,9 @@ void z80_do_opcode()
       tstates+=11;
       RST(0x38);
       break;
-  }
-}
 
-#include <stdio.h>
+    }			/* Matches switch(opcode) { */
 
-void z80_dumpopcodes(void)
-{
-  int i;
+  }			/* Matches while( tstates < event_next_event ) { */
 
-  for(i=0;i<256;i++) {
-    printf("0x%02x %d %d %d %d %d\n",i,normal_opcodes[i],cb_opcodes[i],dd_opcodes[i],ddcb_opcodes[i],ed_opcodes[i]);
-  }
 }

@@ -24,6 +24,8 @@
 
 */
 
+#include <config.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
@@ -42,20 +44,14 @@ int x_event(void)
   int x,y,width,height;
 
   while(XCheckIfEvent(display,&event,x_trueFunction,NULL)) {
-/*     fprintf(stderr,"%s: got an event of type %d\n",progname,event.type); */
     switch(event.type) {
-    case ButtonPress:
-      return 1;
+    case ConfigureNotify:
+      xdisplay_configure_notify(event.xconfigure.width,
+				event.xconfigure.height);
+      break;
     case Expose:
-      x=event.xexpose.x-display_border_width;
-      y=event.xexpose.y-display_border_height;
-      width=event.xexpose.width;
-      height=event.xexpose.height;
-      if(x<0) {  width += x; x=0; }
-      if(y<0) { height += y; y=0; }
-      if( width>256)  width=256;
-      if(height>192) height=192;
-      xdisplay_area(x,y,width,height);
+      xdisplay_area(event.xexpose.x,event.xexpose.y,
+		    event.xexpose.width,event.xexpose.height);
       break;
     case KeyPress:
       return xkeyboard_keypress(&(event.xkey));

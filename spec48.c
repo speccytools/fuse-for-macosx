@@ -27,12 +27,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "config.h"
 #include "display.h"
+#include "event.h"
 #include "keyboard.h"
+#include "spec48.h"
 #include "spectrum.h"
 #include "z80.h"
-
-void spec48_reset(void);
 
 BYTE spec48_readbyte(WORD address)
 {
@@ -83,7 +84,7 @@ int spec48_init(void)
 
   tstates=0;
 
-  spectrum_set_timings(224,312,3.5e6,14336);
+  spectrum_set_timings(24,128,24,48,312,3.5e6,8936);
   machine.reset=spec48_reset;
 
   machine.ram.type=SPECTRUM_MACHINE_48;
@@ -93,7 +94,11 @@ int spec48_init(void)
 
 }
 
-void spec48_reset(void)
+int spec48_reset(void)
 {
-  z80_reset();		/* No special actions needed */
+  event_reset();
+  if(event_add(machine.cycles_per_frame,EVENT_TYPE_INTERRUPT)) return 1;
+  if(event_add(machine.line_times[0],EVENT_TYPE_LINE)) return 1;
+  z80_reset();
+  return 0;
 }

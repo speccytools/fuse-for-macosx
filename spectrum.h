@@ -1,5 +1,7 @@
 /* spectrum.h: Spectrum 48K specific routines
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -25,11 +27,17 @@
 #ifndef FUSE_SPECTRUM_H
 #define FUSE_SPECTRUM_H
 
+#ifndef FUSE_AY_H
+#include "ay.h"
+#endif			/* #ifndef FUSE_AY_H */
+
+#ifndef FUSE_DISPLAY_H
+#include "display.h"
+#endif			/* #ifndef FUSE_DISPLAY_H */
+
 #ifndef FUSE_TYPES_H
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
-
-#include "ay.h"
 
 typedef struct raminfo {
   int type;
@@ -46,17 +54,21 @@ typedef struct raminfo {
 typedef struct machine_info {
   int machine;
 
-  WORD cycles_per_line;
+  WORD left_border_cycles;  /* T-states spent drawing left border */
+  WORD screen_cycles;	    /* T-states spent drawing screen */
+  WORD right_border_cycles; /* T-states spent drawing right border */
+  WORD retrace_cycles;	    /* T-states spent in horizontal retrace */
+
+  WORD cycles_per_line;	/* = sum of above four values */
   WORD lines_per_frame;
   DWORD cycles_per_frame; /* = cycles_per_line*lines_per_frame */
 
   DWORD hz;		/* Processor speed in Hz */
 
-  /* Redraw line y this many tstates after interrupt; l_t[192] is just an
-     end marker */
-  DWORD	line_times[192+1];
+  /* Redraw line y this many tstates after interrupt */
+  DWORD	line_times[DISPLAY_SCREEN_HEIGHT+1];
 
-  void (*reset)(void);	/* Reset function */
+  int (*reset)(void);	/* Reset function */
 
   raminfo ram;          /* RAM paging information */
   ayinfo ay;		/* The AY-8-3912 chip */
@@ -64,8 +76,9 @@ typedef struct machine_info {
 } machine_info;
 
 int spectrum_init();
-void spectrum_set_timings(WORD cycles_per_line,WORD lines_per_frame,DWORD hz,
-			  DWORD first_line);
+void spectrum_set_timings(WORD left_border_cycles,  WORD screen_cycles,
+			  WORD right_border_cycles, WORD retrace_cycles,
+			  WORD lines_per_frame, DWORD hz, DWORD first_line);
 int spectrum_interrupt(void);
 
 BYTE (*readbyte)(WORD address);

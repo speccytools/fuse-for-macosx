@@ -1,5 +1,7 @@
 /* z80_ddfd.c: z80 DDxx and FDxx opcodes
-   Copyright (c) 1999 Philip Kendall
+   Copyright (c) 1999-2000 Philip Kendall
+
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,7 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21@cam.ac.uk
+   E-mail: pak@ast.cam.ac.uk
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -470,7 +472,6 @@ case 0xcb:		/* {DD,FD}CBxx opcodes */
 {
   WORD tempaddr=REGISTER + (SBYTE)readbyte(PC++);
   BYTE opcode3=readbyte(PC++);
-  ddcb_opcodes[opcode3]=1;
   switch(opcode3) {
 #include "z80_ddfdcb.c"
   }
@@ -486,7 +487,8 @@ case 0xe3:		/* EX (SP),REGISTER */
 tstates+=23;
 {
   BYTE bytetempl=readbyte(SP), bytetemph=readbyte(SP+1);
-  writebyte(SP,REGISTER); writebyte(SP+1,REGISTERH);
+  /* Was writebyte(SP,REGISTER); writebyte(SP+1,REGISTERH); */
+  writebyte(SP,REGISTERL); writebyte(SP+1,REGISTERH);
   REGISTERL=bytetempl; REGISTERH=bytetemph;
 }
 break;
@@ -505,7 +507,7 @@ break;
    this is because all EX DE,HL does is switch an internal flip-flop
    in the Z80 which says which way round DE and HL are, which can't
    be used with IX or IY. (This is also why EX DE,HL is very quick
-   at only 4 T states)
+   at only 4 T states).
 */
 
 case 0xf9:		/* LD SP,REGISTER */
