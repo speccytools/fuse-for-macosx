@@ -331,3 +331,4 @@
 	 interfaces etc get into the dist tarball (thanks, Erik Kunze).
 20031103 rzx.c: add Win32 timing routines (Marek).
 20031103 fuse.c: add Win32 uname-like routines (Marek).
+20031105 configure.in: explicitly link in zlib if using libpng.
