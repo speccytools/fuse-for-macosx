@@ -339,7 +339,6 @@ print hashline( __LINE__ ), << 'CODE';
 
   while( 1 ) {
 
-    struct option *ptr;
     int c;
 
     c = getopt_long( argc, argv, "d:hm:o:p:r:s:t:v:V", long_options, NULL );
