@@ -1002,3 +1002,4 @@
 20040715 pokefinder/pokefinder.c,ui/gtk/pokefinder.c: allow pokefinder to
 	 search all 272K of normal RAM.
 20040715 autogen.sh: copy auxiliary files rather than linking them.
+20040715 man/fuse.1: Fix typo in pokefinder section.
