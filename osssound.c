@@ -34,6 +34,7 @@
 #include <sys/soundcard.h>
 
 #include "osssound.h"
+#include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -62,11 +63,13 @@ if(device==NULL) device = "/dev/dsp";
  */
 if((soundfd=open(device,O_WRONLY|O_NONBLOCK))==-1)
   {
+  settings_current.sound = 0;
   ui_error(UI_ERROR_ERROR,"couldn't open sound device '%s': %s",device,strerror(errno));
   return 1;
   }
 if((flags=fcntl(soundfd,F_GETFL))==-1)
   {
+  settings_current.sound = 0;
   ui_error(UI_ERROR_ERROR,"couldn't get flags from sound device: %s",strerror(errno));
   close(soundfd);
   return 1;
@@ -74,6 +77,7 @@ if((flags=fcntl(soundfd,F_GETFL))==-1)
 flags &= ~O_NONBLOCK;
 if(fcntl(soundfd,F_SETFL,flags)==-1)
   {
+  settings_current.sound = 0;
   ui_error(UI_ERROR_ERROR,"couldn't set sound device non-blocking: %s",strerror(errno));
   close(soundfd);
   return 1;
@@ -86,6 +90,7 @@ if(ioctl(soundfd,SNDCTL_DSP_SETFMT,&tmp)==-1)
   tmp=AFMT_S16_LE;
   if((ioctl(soundfd,SNDCTL_DSP_SETFMT,&tmp))==-1)
     {
+    settings_current.sound = 0;
     ui_error(UI_ERROR_ERROR,"couldn't set sound device into 16-bit mode: %s",strerror(errno));
     close(soundfd);
     return 1;
@@ -102,6 +107,7 @@ if(ioctl(soundfd,SNDCTL_DSP_STEREO,&tmp)<0)
   tmp=(*stereoptr)?0:1;
   if(ioctl(soundfd,SNDCTL_DSP_STEREO,&tmp)<0)
     {
+    settings_current.sound = 0;
     ui_error(UI_ERROR_ERROR,"couldn't set sound device into either mono or stereo mode: %s",strerror(errno));
     close(soundfd);
     return 1;
@@ -113,6 +119,7 @@ frag=(0x80000|BASE_SOUND_FRAG_PWR);
 
 if(ioctl(soundfd,SNDCTL_DSP_SPEED,freqptr)<0)
   {
+  settings_current.sound = 0;
   ui_error(UI_ERROR_ERROR,"couldn't set sound device speed to %d: %s",*freqptr, strerror(errno));
   close(soundfd);
   return 1;
@@ -126,6 +133,7 @@ if(sixteenbit) frag++;
 
 if(ioctl(soundfd,SNDCTL_DSP_SETFRAGMENT,&frag)<0)
   {
+  settings_current.sound = 0;
   ui_error(UI_ERROR_ERROR,"couldn't set sound device fragment size to %d: %s",frag,strerror(errno));
   close(soundfd);
   return 1;

@@ -40,6 +40,7 @@
 #endif
 #include <unistd.h>
 
+#include "settings.h"
 #include "sunsound.h"
 #include "ui/ui.h"
 
@@ -65,11 +66,13 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 	   being used by something else, but then set it blocking
 	   again as that's what we actually want */
 	if ((soundfd = open(device, O_WRONLY | O_NONBLOCK )) == -1) {
+		settings_current.sound = 0;
 	        ui_error( UI_ERROR_ERROR, "Couldn't open sound device '%s'",
 			  device );
 		return 1;
 	}
 	if ((flags = fcntl(soundfd, F_GETFL)) == -1) {
+		settings_current.sound = 0;
 	        ui_error( UI_ERROR_ERROR, "Couldn't fcntl sound device '%s'",
 			  device );
 	        close(soundfd);
@@ -77,6 +80,7 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 	}
 	flags &= ~O_NONBLOCK;
 	if (fcntl(soundfd, F_SETFL, flags) == -1) {
+		settings_current.sound = 0;
 	        ui_error( UI_ERROR_ERROR,
 			  "Couldn't set sound device '%s' blocking",
 			  device );
@@ -93,6 +97,7 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 		ai.play.encoding = AUDIO_ENCODING_LINEAR;
 		ai.play.precision = 16;
 		if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+			settings_current.sound = 0;
 		        ui_error( UI_ERROR_ERROR,
 				"Couldn't set bit size of sound device '%s'",
 				  device );
@@ -107,6 +112,7 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 		/* if it failed make sure the opposite is ok */
 		ai.play.channels = *stereoptr ? 1 : 2;
 		if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+			settings_current.sound = 0;
 		        ui_error( UI_ERROR_ERROR,
 				"Couldn't set channels of sound device '%s'",
 				  device );
@@ -118,6 +124,7 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 
 	ai.play.sample_rate = *freqptr;
 	if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+		settings_current.sound = 0;
 	        ui_error( UI_ERROR_ERROR,
 			  "Couldn't set sample rate of sound device '%s'",
 			  device );
@@ -142,6 +149,7 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 	if (ai.hiwat == 0)
 		ai.hiwat = 65536;
 	if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
+		settings_current.sound = 0;
 	        ui_error( UI_ERROR_ERROR,
 			  "Couldn't set block size of sound device '%s'",
 			  device );

@@ -26,7 +26,9 @@
 #include <string.h>
 
 #include <SDL.h>
+
 #include "sdlsound.h"
+#include "settings.h"
 #include "ui/ui.h"
 
 /* using (7) 32 byte frags for 8kHz, scale up for higher */
@@ -69,7 +71,8 @@ sdlsound_init( const char *device, int *freqptr, int *stereoptr )
   requested.samples = 1 << frag;
 
   if ( SDL_OpenAudio( &requested, NULL ) < 0 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't open sound device:%s",
+    settings_current.sound = 0;
+    ui_error( UI_ERROR_ERROR, "Couldn't open sound device: %s",
               SDL_GetError() );
     return 1;
   }

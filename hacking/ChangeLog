@@ -302,9 +302,13 @@
 	 "delete_event".
 20031027 widget/widget.c: Win32 timing routines (Marek).
 20031028 Generalise the timer routines (see hacking/timer.txt).
-20031029 fuse.[ch], machine.c, utils.c: when looking for ROM/library
+20031028 fuse.[ch], machine.c, utils.c: when looking for ROM/library
 	 files, look relative to the directory Fuse started in, not the
 	 current directory.
-20031029 sdlsound.c: fix memset typo (Marek).
-20031029 timer.c: restore old timers only if they exist in timer_pop().
-20031029 timer.c: ensure we have the prototype for strerror().
+20031028 sdlsound.c: fix memset typo (Marek).
+20031028 timer.c: restore old timers only if they exist in timer_pop().
+20031028 timer.c: ensure we have the prototype for strerror().
+20031029 osssound.c, sdlsound.c, sunsound.c: ensure that we don't try and
+	 recursively open the sound device if an error occurs when opening
+	 it.
+
