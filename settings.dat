@@ -45,6 +45,7 @@ writable_roms, boolean, 0
 autosave_settings, boolean, 0
 colour_tv, boolean, 1
 confirm_dangerous, boolean, 1
+printer, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1

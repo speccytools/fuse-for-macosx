@@ -11,6 +11,7 @@ Checkbox, Allow (w)rites to ROM, writable_roms, KEYBOARD_w
 Checkbox, A(u)to-save settings, autosave_settings, KEYBOARD_u
 Checkbox, (C)olour TV, colour_tv, KEYBOARD_c
 Checkbox, Confirm (d)angerous actions, confirm_dangerous, KEYBOARD_d
+Checkbox, Emulate (p)rinters, printer, KEYBOARD_p
 
 rzx
 RZX Options

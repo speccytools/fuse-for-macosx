@@ -375,6 +375,8 @@ frames++;
  */
 libspectrum_byte printer_zxp_read(libspectrum_word port GCC_UNUSED)
 {
+if(!settings_current.printer)
+  return(0xff);
 if(!printer_graphics_enabled)
   return(0xff);
 
@@ -419,6 +421,8 @@ else
 
 void printer_zxp_write(libspectrum_word port GCC_UNUSED,libspectrum_byte b)
 {
+if(!settings_current.printer)
+  return;
 if(!zxpspeed)
   {
   if(!(b&4))
@@ -611,6 +615,8 @@ old_on=on;
 
 libspectrum_byte printer_parallel_read(libspectrum_word port GCC_UNUSED)
 {
+if(!settings_current.printer)
+  return(0xff);
 /* bit 0 = busy. other bits high? */
 
 return(0xfe);	/* never busy */
@@ -620,6 +626,8 @@ return(0xfe);	/* never busy */
 void printer_parallel_write(libspectrum_word port GCC_UNUSED,
 			    libspectrum_byte b)
 {
+if(!settings_current.printer)
+  return;
 parallel_data=b;
 }
 

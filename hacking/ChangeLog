@@ -263,3 +263,5 @@
 20031009 configure.in, ui/sdl/sdljoystick.c: if using SDL, use its
 	 joystick code by default. Change BYTE etc in sdljoystick.c to
 	 libspectrum_byte. Add missing ; to configure.in (Darren).
+20031010 printer.c, settings.dat, ui/options.dat: add option to disable
+	 ZX (etc) printer.
