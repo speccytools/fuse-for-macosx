@@ -26,8 +26,6 @@
 
 #include <config.h>
 
-#include <stdio.h> 
-
 #include "debugger.h"
 #include "debugger_internals.h"
 #include "spectrum.h"
@@ -52,7 +50,6 @@ static gint find_breakpoint_by_id( gconstpointer data,
 static gint find_breakpoint_by_address( gconstpointer data,
 					gconstpointer user_data );
 static void free_breakpoint( gpointer data, gpointer user_data );
-static void show_breakpoint( gpointer data, gpointer user_data );
 
 /* Textual represenations of the breakpoint types and lifetimes */
 const char *debugger_breakpoint_type_text[] = {
@@ -296,15 +293,6 @@ static void
 free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 {
   free( data );
-}
-
-static void
-show_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
-{
-  debugger_breakpoint *bp = data;
-
-  printf( "%lu: %d 0x%04x %lu %d\n", (unsigned long)bp->id, bp->type,
-	  bp->value, (unsigned long)bp->ignore, bp->life );
 }
 
 /* Exit from the last CALL etc by setting a oneshot breakpoint at
