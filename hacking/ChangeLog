@@ -1268,3 +1268,4 @@
          tape_plus2a.[szx|z80], tape_plus3.[szx|z80], tape_scorpion.[szx|z80]}:
          Make configure choose compressed or uncompressed auto-load snapshots
          based on libspectrum support for the feature (Fred).
+20050306 configure.in: Annoyingly missed path from link invocation (Fred).

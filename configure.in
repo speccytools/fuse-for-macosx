@@ -320,20 +320,20 @@ void test()
 CPPFLAGS="$ac_save_CPPFLAGS"
 AC_SUBST(AUTOLOAD_SNAPS)
 AC_LINK_FILES([
-	"$AUTOLOAD_SNAPS"/disk_plus3.szx
-	"$AUTOLOAD_SNAPS"/tape_128.szx
-	"$AUTOLOAD_SNAPS"/tape_16.szx
-	"$AUTOLOAD_SNAPS"/tape_2048.szx
-	"$AUTOLOAD_SNAPS"/tape_2068.szx
-	"$AUTOLOAD_SNAPS"/tape_48.szx
-	"$AUTOLOAD_SNAPS"/tape_plus2.szx
-	"$AUTOLOAD_SNAPS"/tape_plus2a.szx
-	"$AUTOLOAD_SNAPS"/tape_plus3.szx
-	"$AUTOLOAD_SNAPS"/tape_plus3e.szx
-	"$AUTOLOAD_SNAPS"/tape_pentagon.szx
-	"$AUTOLOAD_SNAPS"/tape_scorpion.szx
-	"$AUTOLOAD_SNAPS"/tape_se.szx
-	"$AUTOLOAD_SNAPS"/tape_ts2068.szx],
+	lib/"$AUTOLOAD_SNAPS"/disk_plus3.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_128.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_16.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_2048.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_2068.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_48.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_plus2.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_plus2a.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_plus3.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_plus3e.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_pentagon.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_scorpion.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_se.szx
+	lib/"$AUTOLOAD_SNAPS"/tape_ts2068.szx],
 	[lib/disk_plus3.szx
 	lib/tape_128.szx
 	lib/tape_16.szx
