@@ -166,8 +166,8 @@ utils_open_file( const char *filename, int autoload,
 
 /* Find the auxillary file called `filename'; look in the lib
    directory below where the Fuse executable is and the defined
-   package data directory; returns a fd for the ROM on success, -1 if
-   it couldn't find the ROM */
+   package data directory; returns a fd for the file on success, -1 if
+   it couldn't find the file */
 int utils_find_lib( const char *filename )
 {
   int fd;
@@ -175,8 +175,12 @@ int utils_find_lib( const char *filename )
   char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
   char *fuse_dir;
 
-  strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
-  strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  if( fuse_progname[0] == '/' ) {
+    strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  } else {
+    strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
+    strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  }
   fuse_dir = dirname( fuse_path );
 
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/lib/%s", fuse_dir, filename );

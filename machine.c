@@ -414,8 +414,12 @@ int machine_find_rom( const char *filename )
   /* Then in a 'roms' subdirectory off where the Fuse executable is
      (useful when Fuse hasn't been installed into /usr/local or
      wherever) */
-  strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
-  strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  if( fuse_progname[0] == '/' ) {
+    strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  } else {
+    strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
+    strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
+  }
   fuse_dir = dirname( fuse_path );
 
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/roms/%s", fuse_dir, filename );

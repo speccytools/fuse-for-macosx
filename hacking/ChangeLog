@@ -316,3 +316,5 @@
 	 (Marek).
 20031029 settings.pl, utils.[ch], ui/uijoystick.c: add and use
 	 utils_get_home_path function.
+20031030 machine.c, utils.c: make machine_find_rom and utils_find_lib work
+	 if argv[0] is a full path.
