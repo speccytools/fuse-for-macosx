@@ -35,6 +35,7 @@
 #include "scld.h"
 #include "settings.h"
 #include "types.h"
+#include "ui/scaler/scaler.h"
 #include "ui/ui.h"
 #include "utils.h"
 
@@ -73,13 +74,16 @@ screenshot_write( const char *filename )
   png_structp png_ptr;
   png_infop info_ptr;
 
-  BYTE rgb_data[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 4 ],
+  BYTE rgb_data1[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 4 ],
+       rgb_data2[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 4 ],
        png_data[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 3 ],
        *row_pointers[480];
   size_t rgb_stride = DISPLAY_SCREEN_WIDTH * 4,
          png_stride = DISPLAY_SCREEN_WIDTH * 3;
-  size_t y, base_height, base_width;
+  size_t y, base_height, base_width, height, width;
   int error;
+
+  scaler_type scaler;
 
   if( machine_current->timex ) {
     base_height = 2 * DISPLAY_SCREEN_HEIGHT;
@@ -89,16 +93,26 @@ screenshot_write( const char *filename )
     base_width = DISPLAY_ASPECT_WIDTH;
   }
 
-  error = get_rgb32_data( rgb_data, rgb_stride, base_height, base_width );
+  /* Change from paletted data to RGB data */
+  error = get_rgb32_data( rgb_data1, rgb_stride, base_height, base_width );
   if( error ) return error;
 
-  /* FIXME: add scalers in here */
+  scaler = SCALER_DOUBLESIZE;
 
-  error = rgb32_to_rgb24( png_data, png_stride, rgb_data, rgb_stride,
-			  base_height, base_width );
+  /* Actually scale the data here */
+  scaler_get_proc32( scaler )( rgb_data1, rgb_stride, NULL,
+			       rgb_data2, rgb_stride,
+			       base_width, base_height );
+
+  height = base_height * scaler_get_scaling_factor( scaler );
+  width  = base_width  * scaler_get_scaling_factor( scaler );
+
+  /* Reduce from RGB(padding byte) to just RGB */
+  error = rgb32_to_rgb24( png_data, png_stride, rgb_data2, rgb_stride,
+			  height, width );
   if( error ) return error;
 
-  for( y = 0; y < base_height; y++ )
+  for( y = 0; y < height; y++ )
     row_pointers[y] = &png_data[ y * png_stride ];
 
   f = fopen( filename, "wb" );
@@ -139,7 +153,7 @@ screenshot_write( const char *filename )
   png_set_compression_level( png_ptr, Z_BEST_COMPRESSION );
 
   png_set_IHDR( png_ptr, info_ptr,
-		base_width, base_height, 8, 
+		width, height, 8, 
 		PNG_COLOR_TYPE_RGB,
 		PNG_INTERLACE_NONE,
 		PNG_COMPRESSION_TYPE_DEFAULT,
