@@ -41,31 +41,8 @@ static void add_rom( GtkWidget *table, gint row, const char *name );
 static void select_new_rom( GtkWidget *widget, gpointer data );
 static void roms_done( GtkWidget *widget, gpointer data );
 
-/* The number of ROMs we can change */
-#define ROM_COUNT 14
-
-/* The ROM filenames as selected */
-GtkWidget *rom[ ROM_COUNT ];
-
-/* And which settings entries these correspond to */
-char **settings[ ROM_COUNT ] = {
-
-  &settings_current.rom_48,
-  &settings_current.rom_128_0,
-  &settings_current.rom_128_1,
-  &settings_current.rom_plus2_0,
-  &settings_current.rom_plus2_1,
-  &settings_current.rom_plus2a_0,
-  &settings_current.rom_plus2a_1,
-  &settings_current.rom_plus2a_2,
-  &settings_current.rom_plus2a_3,
-  &settings_current.rom_plus3_0,
-  &settings_current.rom_plus3_1,
-  &settings_current.rom_plus3_2,
-  &settings_current.rom_plus3_3,
-  &settings_current.rom_tc2048,
-
-};
+/* The labels used to display the current ROMs */
+GtkWidget *rom[ SETTINGS_ROM_COUNT ];
 
 void
 gtkui_roms( GtkWidget *widget, gpointer data )
@@ -77,15 +54,6 @@ gtkui_roms( GtkWidget *widget, gpointer data )
 
   size_t i;
 
-  const char *name[ ROM_COUNT ] = {
-    "48K ROM", 
-    "128K ROM 0", "128K ROM 1",
-    "+2 ROM 0",   "+2 ROM 1",
-    "+2A ROM 0",  "+2A ROM 1", "+2A ROM 2", "+2A ROM 3",
-    "+3 ROM 0",   "+3 ROM 1",  "+3 ROM 2",  "+3 ROM 3",
-    "TC2048",
-  };
-
   /* Firstly, stop emulation */
   fuse_emulation_pause();
 
@@ -94,12 +62,13 @@ gtkui_roms( GtkWidget *widget, gpointer data )
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Select ROMs" );
 
   /* A table to put all the labels in */
-  table = gtk_table_new( ROM_COUNT, 3, FALSE );
+  table = gtk_table_new( SETTINGS_ROM_COUNT, 3, FALSE );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
 		     table );
 
   /* And the current values of each of the ROMs */
-  for( i = 0; i < ROM_COUNT; i++ ) add_rom( table, i, name[i] );
+  for( i = 0; i < SETTINGS_ROM_COUNT; i++ )
+    add_rom( table, i, settings_rom_name[i] );
 
   /* Create the OK and Cancel buttons */
   ok_button = gtk_button_new_with_label( "OK" );
@@ -147,7 +116,8 @@ add_rom( GtkWidget *table, gint row, const char *name )
   label = gtk_label_new( name );
   gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1, row, row + 1 );
 
-  rom[ row ] = gtk_label_new( *(settings[ row ]) );
+  rom[ row ] =
+    gtk_label_new( *( settings_get_rom_setting( &settings_current, row ) ) );
   gtk_table_attach_defaults( GTK_TABLE( table ), rom[ row ], 1, 2,
 			     row, row + 1 );
 
@@ -180,9 +150,11 @@ roms_done( GtkWidget *widget, gpointer data )
   
   char *string;
 
-  for( i = 0; i < ROM_COUNT; i++ ) {
+  for( i = 0; i < SETTINGS_ROM_COUNT; i++ ) {
     gtk_label_get( GTK_LABEL( rom[i] ), &string );
-    error = settings_set_string( settings[i], string );
+    error =
+      settings_set_string( settings_get_rom_setting( &settings_current, i ),
+			   string );
     if( error ) return;
   }
 

@@ -63,6 +63,9 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 /* The filename to return */
 char* widget_filesel_name;
 
+/* Should we exit all widgets when we're done with this selector? */
+static int exit_all_widgets;
+
 static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 			   int (*select_fn)(const struct dirent*) )
 {
@@ -218,11 +221,19 @@ static int widget_scan_compare( const struct widget_dirent **a,
 /* File selection widget */
 
 int
-widget_filesel_draw( void* data GCC_UNUSED )
+widget_filesel_draw( void *data )
 {
   char *directory;
 
   int error;
+
+  /* Should we exit all widgets when we're done with the fileselector;
+     defaults to 'yes' if no data given for backward compatability reasons */
+  if( !data || *(int*)data ) {
+    exit_all_widgets = 1;
+  } else {
+    exit_all_widgets = 0;
+  }
 
   directory = widget_getcwd();
   if( directory == NULL ) return 1;
@@ -424,7 +435,11 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     if(chdir(fn)==-1) {
       if(errno==ENOTDIR) {
 	widget_filesel_name = fn;
-	widget_end_all( WIDGET_FINISHED_OK );
+	if( exit_all_widgets ) {
+	  widget_end_all( WIDGET_FINISHED_OK );
+	} else {
+	  widget_end_widget( WIDGET_FINISHED_OK );
+	}
       }
     } else {
       widget_scan( fn ); free( fn );

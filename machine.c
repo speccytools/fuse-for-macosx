@@ -166,12 +166,7 @@ machine_get_id( libspectrum_machine type )
 
 static int machine_select_machine( fuse_machine_info *machine )
 {
-  if( settings_current.start_machine ) free( settings_current.start_machine );
-  settings_current.start_machine = strdup( machine->id );
-  if( !settings_current.start_machine ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
+  settings_set_string( &settings_current.start_machine, machine->id );
   
   tstates = 0;
 

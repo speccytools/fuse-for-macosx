@@ -139,6 +139,7 @@ static widget_menu_entry widget_menu_file_recording[] = {
 static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 static widget_menu_widget_t options_sound   = { WIDGET_TYPE_SOUND,   NULL };
 static widget_menu_widget_t options_rzx     = { WIDGET_TYPE_RZX,     NULL };
+static widget_menu_widget_t options_roms    = { WIDGET_TYPE_ROM,     NULL };
 
 static widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
@@ -146,6 +147,8 @@ static widget_menu_entry widget_menu_options[] = {
   { "(G)eneral...", KEYBOARD_g, widget_menu_widget, &options_general },
   { "(S)ound...",   KEYBOARD_s, widget_menu_widget, &options_sound   },
   { "(R)ZX...",	    KEYBOARD_r, widget_menu_widget, &options_rzx     },
+  { "S(e)lect ROMS...",
+                    KEYBOARD_e, widget_menu_widget, &options_roms    },
 
 #ifdef HAVE_LIB_XML2
   { "S(a)ve",	    KEYBOARD_a, widget_menu_save_options, NULL       },

@@ -105,6 +105,17 @@ static int parse_xml( xmlDocPtr doc, settings_info *settings );
 static int settings_command_line( settings_info *settings, int *first_arg,
 				  int argc, char **argv );
 
+/* The names for each of the ROMs */
+const char *
+settings_rom_name[ SETTINGS_ROM_COUNT ] = { 
+  "48K ROM", 
+  "128K ROM 0", "128K ROM 1",
+  "+2 ROM 0",   "+2 ROM 1",
+  "+2A ROM 0",  "+2A ROM 1", "+2A ROM 2", "+2A ROM 3",
+  "+3 ROM 0",   "+3 ROM 1",  "+3 ROM 2",  "+3 ROM 3",
+  "TC2048",
+};
+
 /* Called on emulator startup */
 int
 settings_init( int *first_arg, int argc, char **argv )
@@ -368,7 +379,7 @@ foreach my $name ( sort keys %options ) {
     if( $type eq 'boolean' ) {
 	# Do nothing
     } elsif( $type eq 'string' ) {
-	print "    case $short: settings->$name = optarg; break;\n";
+	print "    case $short: settings_set_string( &settings->$name, optarg ); break;\n";
     } elsif( $type eq 'numeric' ) {
 	print "    case $short: settings->$name = atoi( optarg ); break;\n";
     } else {
@@ -428,8 +439,30 @@ print hashline( __LINE__ ), << 'CODE';
   return 0;
 }
 
+char **
+settings_get_rom_setting( settings_info *settings, size_t which )
+{
+  switch( which ) {
+  case  0: return &( settings->rom_48       );
+  case  1: return &( settings->rom_128_0    );
+  case  2: return &( settings->rom_128_1    );
+  case  3: return &( settings->rom_plus2_0  );
+  case  4: return &( settings->rom_plus2_1  );
+  case  5: return &( settings->rom_plus2a_0 );
+  case  6: return &( settings->rom_plus2a_1 );
+  case  7: return &( settings->rom_plus2a_2 );
+  case  8: return &( settings->rom_plus2a_3 );
+  case  9: return &( settings->rom_plus3_0  );
+  case 10: return &( settings->rom_plus3_1  );
+  case 11: return &( settings->rom_plus3_2  );
+  case 12: return &( settings->rom_plus3_3  );
+  case 13: return &( settings->rom_tc2048   );
+  default: return NULL;
+  }
+}
+
 int
-settings_set_string( char **string_setting, char *value )
+settings_set_string( char **string_setting, const char *value )
 {
   if( *string_setting) free( *string_setting );
   *string_setting = strdup( value );

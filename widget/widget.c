@@ -501,5 +501,6 @@ widget_t widget_data[] = {
   { widget_browse_draw,   widget_browse_finish,  widget_browse_keyhandler   },
   { widget_text_draw,	  widget_text_finish,	 widget_text_keyhandler     },
   { widget_debugger_draw, NULL,			 widget_debugger_keyhandler },
+  { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
 
 };

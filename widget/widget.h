@@ -56,6 +56,7 @@ typedef enum widget_type {
   WIDGET_TYPE_BROWSE,		/* Browse tape */
   WIDGET_TYPE_TEXT,		/* Text entry widget */
   WIDGET_TYPE_DEBUGGER,		/* Debugger widget */
+  WIDGET_TYPE_ROM,		/* ROM selector widget */
 
 } widget_type;
 

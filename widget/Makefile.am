@@ -27,7 +27,8 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libwidget.a
 
 libwidget_a_SOURCES = browse.c debugger.c error.c filesel.c menu_data.c \
-picture.c widget.c menu.c options.c select.c text.c
+picture.c widget.c menu.c options.c select.c text.c \
+	roms.c
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 

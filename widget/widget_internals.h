@@ -215,6 +215,11 @@ int widget_debugger_draw( void *data );
 void widget_debugger_keyhandler( keyboard_key_name key,
 				 keyboard_key_name key2 );
 
+/* The ROM selector widget */
+int widget_roms_draw( void* data );
+void widget_roms_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+int widget_roms_finish( widget_finish_state finished );
+
 /* The widgets actually available */
 
 extern widget_t widget_data[];
