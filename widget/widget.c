@@ -1,5 +1,5 @@
 /* widget.c: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall, Russell Marks
 
    $Id$
 
@@ -138,6 +138,35 @@ void widget_rectangle( int x, int y, int w, int h, int col )
     for( my = 0; my < h; my++ )
       for( mx = 0; mx < w; mx++ )
         widget_putpixel( x + mx, y + my, col );
+}
+
+/* Arrows for any scrollable widget */
+void
+widget_up_arrow( int x, int y, int colour )
+{
+  int i, j;
+  x = x * 8;
+  y = y * 8 + 7;
+  for( j = 6; j; --j ) {
+    for( i = (j + 1) / 2; i < 4; ++i ) {
+      widget_putpixel( x +     i, y - j, colour );
+      widget_putpixel( x + 7 - i, y - j, colour );
+    }
+  }
+}
+
+void
+widget_down_arrow( int x, int y, int colour )
+{
+  int i, j;
+  x = x * 8;
+  y = y * 8;
+  for( j = 6; j; --j ) {
+    for( i = (j + 1) / 2; i < 4; ++i ) {
+      widget_putpixel( x +     i, y + j, colour );
+      widget_putpixel( x + 7 - i, y + j, colour );
+    }
+  }
 }
 
 /* Force screen lines y to (y+h) inclusive to be redrawn */

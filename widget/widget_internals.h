@@ -1,5 +1,5 @@
 /* widget_internals.h: Functions internal to the widget code
-   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -71,6 +71,9 @@ int widget_timer_end( void );
 void widget_rectangle( int x, int y, int w, int h, int col );
 void widget_printstring( int x, int y, int col, const char *s );
 void widget_display_lines( int y, int h );
+
+void widget_up_arrow( int x, int y, int colour );
+void widget_down_arrow( int x, int y, int colour );
 
 extern widget_finish_state widget_finished;
 

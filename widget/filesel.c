@@ -322,6 +322,8 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
     widget_printstring( 15 - strlen( dir ) / 2, 3, WIDGET_COLOUR_FOREGROUND,
 			dir );
 
+  if( top_left ) widget_up_arrow( 1, 4, WIDGET_COLOUR_FOREGROUND );
+
   /* Print the filenames, mostly normally, but with the currently
      selected file inverted */
   for( i=top_left; i<n && i<top_left+36; i++ ) {
@@ -331,6 +333,8 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
       widget_print_filename( filenames[i], i-top_left, 0 );
     }
   }
+
+  if( i < n ) widget_down_arrow( 1, 21, WIDGET_COLOUR_FOREGROUND );
 
   /* Display that lot */
   widget_display_lines( 2, 21 );
