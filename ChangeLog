@@ -1,3 +1,56 @@
+200?-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.6.2 released.
+
+	* New features:
+	  + Real joystick support (Darren Salt, Fredrick Meunier).
+	  + The 'pokefinder' (Philip Kendall).
+	  + Black and white TV mode for the GTK+ and SDL user interfaces
+	    (Fredrick Meunier).
+	  + Status bar for the GTK+ UI (Philip Kendall).
+	  + Options to disable the GTK+ confirmation dialogs and the
+	    printer emulation (Philip Kendall).
+
+	* Z80 core improvements:
+          + Improved memory handling. Should be both quicker and more
+	    flexible.
+	  + Support for retriggered interrupts.
+	  + Don't allow interrupts after an EI instruction.
+	  (Philip Kendall).
+
+	* Debugger improvements:
+	  + Better error recovery after a malformed command.
+	  + New 'pending events' pane.
+	  + Allow individual panes to be hidden.
+	  + Correct behaviour if the debugger window is closed via window
+	    manager functions, rather than by the 'close' button.
+	  (Philip Kendall).
+
+	* RZX improvements:
+	  + Option to always embed an RZX snapshot.
+	  + Make it possible to record a non-competition mode RZX file
+	    after having recorded one in competition mode.
+	  + Add some small bits of system information (operating system,
+	    libspectrum version, libgcrypt version) into the RZX custom
+	    data.
+	  (Philip Kendall).
+
+	* Miscellaneous improvements:
+	  + Look for ROMs and library files relative to the Fuse
+	    executable, not relative to the current directory. Helps when
+	    dealing with a non-installed copy of Fuse.
+	  + Use $TMPDIR for temporary files if it's specified.
+	  (Philip Kendall).
+
+	* Minor bugfixes:
+	  + Get the pause lengths correct when writing PSG files
+	    (Russell Marks, Philip Kendall).
+	  + Pressing F3 in the SVGAlib UI will now open all file types as
+	    it does in the other UIs (Philip Kendall).
+	  + Don't segfault if there are empty string entries in Fuse's
+	    config file (Philip Kendall).
+	  + QNX6 compilation fixes (Mike Gorchak).
+
 2003-09-30  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.6.1.1 released.
