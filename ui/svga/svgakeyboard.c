@@ -113,7 +113,7 @@ static void svgakeyboard_keypress(int keysym)
     break;
   case SCANCODE_F7:
     fuse_emulation_pause();
-    widget_apply_to_file( tape_open );
+    widget_apply_to_file( tape_open_default_autoload );
     fuse_emulation_unpause();
     break;
   case SCANCODE_F8:

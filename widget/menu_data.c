@@ -162,7 +162,7 @@ static widget_menu_entry widget_menu_tape[] = {
   { "Tape", 0, 0, NULL },		/* Menu title */
 
   { "(O)pen tape...",           KEYBOARD_o, widget_apply_to_file,    
-                                            tape_open                     },
+                                            tape_open_default_autoload    },
   { "(P)lay tape",              KEYBOARD_p, widget_menu_play_tape,   NULL },
   { "(B)rowse tape...",		KEYBOARD_b, widget_menu_widget, &tape_browse },
   { "(R)ewind tape",            KEYBOARD_r, widget_menu_rewind_tape, NULL },

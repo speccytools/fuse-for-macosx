@@ -162,7 +162,7 @@ fbkeyboard_keypress( int keysym )
     break;
   case 0x41:			/* F7 */
     fuse_emulation_pause();
-    widget_apply_to_file( tape_open );
+    widget_apply_to_file( tape_open_default_autoload );
     fuse_emulation_unpause();
     break;
   case 0x42:			/* F8 */

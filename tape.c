@@ -80,6 +80,13 @@ int tape_init( void )
   return 0;
 }
 
+/* Open a tape using the current option for whether to autoload or not */
+int
+tape_open_default_autoload( const char *filename )
+{
+  return tape_open( filename, settings_current.auto_load );
+}
+
 int tape_open( const char *filename, int autoload )
 {
   unsigned char *buffer; size_t length;

@@ -103,7 +103,7 @@ void xkeyboard_keypress(XKeyEvent *event)
     fuse_emulation_pause();
     widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
     if( widget_filesel_name )
-      tape_open( widget_filesel_name, settings_current.auto_load );
+      tape_open_default_autoload( widget_filesel_name );
     fuse_emulation_unpause();
     break;
   case XK_F8:
