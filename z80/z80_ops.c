@@ -308,7 +308,7 @@ void z80_do_opcodes()
       }
       break;
     case 0x33:		/* INC SP */
-      tstates+=6;
+      tstates += 2;
       SP++;
       break;
     case 0x34:		/* INC (HL) */
