@@ -197,7 +197,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 
   { "/Cartridge",		NULL , NULL,		    0, "<Branch>"    },
   { "/Cartridge/_Insert...",	NULL , cartridge_insert,    0, NULL          },
-  { "/Cartridge/_Eject...",	NULL , cartridge_eject,     0, NULL          },
+  { "/Cartridge/_Eject",	NULL , cartridge_eject,     0, NULL          },
 
   { "/Help",			NULL , NULL,		    0, "<Branch>"    },
   { "/Help/_Keyboard...",	NULL , gtkui_help_keyboard, 0, NULL	     },

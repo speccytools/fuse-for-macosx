@@ -64,6 +64,12 @@ dck_insert( const char *filename )
 void
 dck_eject( void )
 {
+  if ( !( libspectrum_machine_capabilities( machine_current->machine ) &
+	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) ) {
+    ui_error( UI_ERROR_ERROR, "This machine does not support the dock" );
+    return;
+  }
+
   if( settings_current.dck_file ) free( settings_current.dck_file );
   settings_current.dck_file = NULL;
 
