@@ -905,6 +905,153 @@ files are shown, whether Fuse would be able to load them or not.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH MONITOR/DEBUGGER
+.PP
+If you're using the GTK+ or Mac OS X user interfaces, Fuse features a
+moderately powerful, completely transparent monitor/debugger, which
+can be activated via the
+.I "Machine, Break ..."
+menu option. A debugger window will appear, showing the current state
+of the emulated machine: the top-left shows the current state of the
+Z80 and the last bytes written to any emulated peripherals. The
+bottom-left panel lists any active breakpoints. The centre panel gives
+a disassembly starting at the current program counter and the right
+panel shows the current stack. Below the displays are an entry box for
+debugger commands, and five buttons for controlling the debugger:
+.PP
+.I Evaluate
+.RS
+Evaluate the command currently in the entry box.
+.RE
+.PP
+.I "Single Step"
+.RS
+Run precisely one Z80 opcode and then stop emulation again.
+.RE
+.PP
+.I Continue
+.RS
+Restart emulation, but leave the debugger window open. Note that the
+debugger window will not be updated whilst emulation is running.
+.RE
+.PP
+.I Break
+.RS
+Stop emulation and return to the debugger.
+.RE
+.PP
+.I Close
+.RS
+Close the debugger window and restart emulation.
+.RE
+.PP
+The main power of the debugger is via the commands entered into the
+entry box, which are similar in nature (but definitely not identical
+to or as powerful as) to those in
+.IR gdb (1).
+In general, the debugger is case-insensitive, and numbers will be
+interpreted as decimal, unless prefixed by either
+.RI ` 0x '
+or
+.RI ` $ '
+when they will be interpreted as hex. Each command can be abbreviated
+to the portion not in curly braces.
+.PP
+ba{se}
+.I number
+.RS
+Change the debugger window to displaying output in base
+.IR number .
+Available values are 10 (decimal) or 16 (hex).
+.RE
+.PP
+br{eakpoint}
+.RI [ number ]
+.RS
+Set a breakpoint to stop emulation and return to the debugger whenever
+an opcode is executed at
+.IR number .
+If
+.I number
+is omitted, it defaults to the current value of PC.
+.RE
+.PP
+br{eakpoint} cl{ear}
+.RI (al{l}| number )
+.RS
+Remove either all breakpoints or that with id
+.IR number .
+.RE
+.PP
+br{eakpoint} i{gnore}
+.I id count
+.RS
+Do not trigger the next
+.I count
+times that breakpoint
+.I id
+would have triggered.
+.RE
+.PP
+br{eakpoint} (r{ead}|w{rite})
+.RI [ number ]
+.RS
+Set a breakpoint to trigger whenever
+.I number
+is read from (other than via an opcode fetch) or written to.
+.I number
+again defaults to the current value of PC if omitted.
+.RE
+.PP
+co{ntinue}
+.RS
+Equivalent to the
+.I Continue
+button.
+.RE
+.PP
+di{sassemble}
+.I number
+.RS
+Set the centre panel disassembly to begin at
+.IR number .
+.RE
+.PP
+ex{it}
+.RS
+Exit from the current CALL or equivalent. This works by setting a
+one-time only breakpoint at the current contents of the stack pointer,
+so will not work correctly if the code returns to some other point or
+plays with its stack in other ways.
+.RE
+.PP
+n{ext}
+.RS
+Step to the opcode following the current one. Again, this works by
+setting a one-time breakpoint at the next opcode, so is not
+infalliable. Also, any other breakpoints can cause the debugger to be
+activated early; The one-time breakpoint will remain, so the
+`continue' command can be used to return to it.
+.RE
+.PP
+se{t}
+.I register number
+.RS
+Set the value of the Z80 register
+.I register
+to
+.IR number .
+.RE
+.PP
+s{tep}
+.RS
+Equivalent to the
+.I "Single Step"
+button.
+.RE
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH THE .DSK FORMAT
 .PP
 In general, disk images for the +3 Spectrum are thought of as being in
