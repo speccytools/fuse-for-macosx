@@ -1037,3 +1037,4 @@
 20040724 keysyms.pl,ui/fb/fbkeyboard.c: reintegrate the framebuffer keyboard
          mapping code into keysyms.pl.
 20040729 z80/tests/README: document .in and .out file formats.
+20040730 configure.in,ui/fb/fbdisplay.c: actually use the GPM code (Darren).

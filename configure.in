@@ -120,6 +120,19 @@ if test -z "$UI"; then
     AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
     UI=fb; WIDGET=widget;
     UI_LIBS="ui/fb/libuifb.a widget/libwidget.a"
+    dnl Look for libgpm (default=yes)
+    AC_MSG_CHECKING(whether gpm requested)
+    AC_ARG_WITH(gpm,
+    [  --without-gpm           don't use libgpm for e.g. Kempston mouse],
+    if test "$withval" = no; then gpm=no; else gpm=yes; fi,
+    gpm=yes)
+    AC_MSG_RESULT($gpm)
+    if test "$gpm" = yes; then
+      AC_CHECK_HEADER(gpm.h,
+		      UI_LIBS="$UI_LIBS -lgpm";
+		      AC_DEFINE([HAVE_GPM_H], 1, [Defined if gpm in use]),
+		      AC_MSG_ERROR([libgpm not found]))
+    fi
   fi
 fi
 

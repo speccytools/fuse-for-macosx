@@ -40,6 +40,10 @@
 #include <sys/ioctl.h>
 #include <string.h>
 
+#ifdef HAVE_GPM_H
+#include <gpm.h>
+#endif				/* #ifdef HAVE_GPM_H */
+
 #include "fuse.h"
 #include "display.h"
 #include "screenshot.h"
@@ -255,7 +259,6 @@ fb_select_mode( const fuse_fb_mode_t *fb_mode )
   {
     Gpm_Connect conn = { 0, 0, 0, ~0 };		/* mouse event sink */
     Gpm_Open( &conn, 0 );
-    gpm_connected = 1;
   }
 #endif				/* #ifdef HAVE_GPM_H */
 
@@ -407,7 +410,6 @@ fbdisplay_end( void )
     fputs( "\x1B[H\x1B[J\x1B[?25h", stdout );	/* clear screen, show cursor */
 
 #ifdef HAVE_GPM_H
-    gpm_connected = 0;
     Gpm_Close();
 #endif				/* #ifdef HAVE_GPM_H */
 
