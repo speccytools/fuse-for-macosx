@@ -180,6 +180,7 @@ expressionornull:   /* empty */ { $$ = NULL; }
 ;
 
 number:   expression { $$ = debugger_expression_evaluate( $1 ); }
+;
 
 expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 		       if( !$$ ) YYABORT;
