@@ -23,12 +23,21 @@
 
 #if defined(HAVE_SYS_AUDIOIO_H)		/* SUN sound */
 
+#if defined(__SVR4) && defined(__sun)
+#define solaris
+#else
+#undef solaris
+#endif
+
 #include <sys/types.h>
 #include <sys/audioio.h>
 #include <sys/ioctl.h>
 
 #include <fcntl.h>
 #include <string.h>
+#ifdef solaris
+#include <stropts.h>
+#endif
 #include <unistd.h>
 
 #include "sunsound.h"
@@ -43,7 +52,9 @@ int
 sunsound_init(freqptr, stereoptr)
 	int *freqptr, *stereoptr;
 {
+#ifndef solaris
 	int frag;
+#endif
 	struct audio_info ai;
 
 	if ((soundfd = open("/dev/audio", O_WRONLY)) == -1)
@@ -51,10 +62,11 @@ sunsound_init(freqptr, stereoptr)
 
 	AUDIO_INITINFO(&ai);
 
-	ai.play.encoding = AUDIO_ENCODING_ULINEAR;
+	ai.play.encoding = AUDIO_ENCODING_LINEAR8;
 	ai.play.precision = 8;
 	if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
 		/* try 16-bit, may be a 16-bit only device */
+		ai.play.encoding = AUDIO_ENCODING_LINEAR;
 		ai.play.precision = 16;
 		if (ioctl(soundfd, AUDIO_SETINFO, &ai) == -1) {
 			close(soundfd);
@@ -80,6 +92,7 @@ sunsound_init(freqptr, stereoptr)
 		return 1;
 	}
 
+#ifndef solaris
 	frag = 0x80000 | BASE_SOUND_FRAG_PWR;
 	if (*freqptr > 8250)
 		frag++;
@@ -99,6 +112,7 @@ sunsound_init(freqptr, stereoptr)
 		close(soundfd);
 		return 1;
 	}
+#endif
 
 	return 0;
 }
@@ -106,7 +120,11 @@ sunsound_init(freqptr, stereoptr)
 void
 sunsound_end()
 {
+#ifdef solaris
+	ioctl(soundfd, I_FLUSH, FLUSHW);
+#else
 	ioctl(soundfd, AUDIO_FLUSH);
+#endif
 	close(soundfd);
 }
 
