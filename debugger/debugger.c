@@ -38,28 +38,22 @@
 /* The current activity state of the debugger */
 enum debugger_mode_t debugger_mode;
 
-/* Information about a breakpoint */
-struct breakpoint {
-  WORD pc;
-  enum debugger_breakpoint_type type;
-};
-
 /* The current breakpoints */
-static GSList *breakpoints;
+GSList *debugger_breakpoints;
 
 static void free_breakpoint( gpointer data, gpointer user_data );
 
 int
 debugger_init( void )
 {
-  breakpoints = NULL;
+  debugger_breakpoints = NULL;
   return debugger_reset();
 }
 
 int
 debugger_reset( void )
 {
-  g_slist_foreach( breakpoints, free_breakpoint, NULL );
+  g_slist_foreach( debugger_breakpoints, free_breakpoint, NULL );
   debugger_mode = DEBUGGER_MODE_INACTIVE;
 
   return 0;
@@ -74,7 +68,7 @@ free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 int
 debugger_end( void )
 {
-  g_slist_foreach( breakpoints, free_breakpoint, NULL );
+  g_slist_foreach( debugger_breakpoints, free_breakpoint, NULL );
   return 0;
 }
 
@@ -82,7 +76,7 @@ debugger_end( void )
 int
 debugger_check( void )
 {
-  GSList *ptr; struct breakpoint *bp, *active;
+  GSList *ptr; debugger_breakpoint *bp, *active;
 
   switch( debugger_mode ) {
 
@@ -90,13 +84,13 @@ debugger_check( void )
 
   case DEBUGGER_MODE_ACTIVE:
     active = NULL;
-    for( ptr = breakpoints; ptr; ptr = ptr->next ) {
+    for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
       bp = ptr->data;
       if( bp->pc == PC ) { active = bp; break; }
     }
     if( active ) {
       if( active->type == DEBUGGER_BREAKPOINT_TYPE_ONESHOT ) {
-	breakpoints = g_slist_remove( breakpoints, active );
+	debugger_breakpoints = g_slist_remove( debugger_breakpoints, active );
 	free( active );
       }
       debugger_mode = DEBUGGER_MODE_HALTED;
@@ -147,18 +141,20 @@ debugger_next( void )
 int
 debugger_run( void )
 {
-  debugger_mode = breakpoints ? DEBUGGER_MODE_ACTIVE : DEBUGGER_MODE_INACTIVE;
+  debugger_mode = debugger_breakpoints ?
+                  DEBUGGER_MODE_ACTIVE :
+                  DEBUGGER_MODE_INACTIVE;
   ui_debugger_deactivate( 1 );
   return 0;
 }
 
 /* Add a breakpoint */
 int
-debugger_breakpoint_add( WORD pc, enum debugger_breakpoint_type type )
+debugger_breakpoint_add( WORD pc, debugger_breakpoint_type type )
 {
-  struct breakpoint *bp;
+  debugger_breakpoint *bp;
 
-  bp = malloc( sizeof( struct breakpoint ) );
+  bp = malloc( sizeof( debugger_breakpoint ) );
   if( !bp ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
@@ -166,7 +162,7 @@ debugger_breakpoint_add( WORD pc, enum debugger_breakpoint_type type )
 
   bp->pc = pc; bp->type = type;
 
-  breakpoints = g_slist_append( breakpoints, bp );
+  debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
 
   if( debugger_mode == DEBUGGER_MODE_INACTIVE )
     debugger_mode = DEBUGGER_MODE_ACTIVE;

@@ -33,10 +33,32 @@
 
 #include "debugger.h"
 
+static void
+show_breakpoint( gpointer data, gpointer user_data )
+{
+  debugger_breakpoint *bp = data;
+
+  printf( "%04x %d\n", bp->pc, bp->type );
+}
+
 int
 debugger_command_parse( const char *command )
 {
-  if( !strcmp( command, "c" ) ) {
+  unsigned breakpoint;
+  int found;
+
+  if( !strncmp( command, "b ", 2 ) ) {
+
+    if( !strcmp( &command[2], "show" ) ) {
+      g_slist_foreach( debugger_breakpoints, show_breakpoint, NULL );
+    } else {
+      found = sscanf( &command[2], "%x", &breakpoint );
+      if( found == 1 )
+	debugger_breakpoint_add( breakpoint,
+				 DEBUGGER_BREAKPOINT_TYPE_PERMANENT );
+    }
+
+  } else if( !strcmp( command, "c" ) ) {
     debugger_run();
   } else if( !strcmp( command, "s" ) ) {
     debugger_step();

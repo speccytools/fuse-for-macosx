@@ -52,10 +52,19 @@ enum debugger_mode_t
 extern enum debugger_mode_t debugger_mode;
 
 /* Types of breakpoint */
-enum debugger_breakpoint_type {
+typedef enum debugger_breakpoint_type {
   DEBUGGER_BREAKPOINT_TYPE_PERMANENT,
   DEBUGGER_BREAKPOINT_TYPE_ONESHOT,
-};
+} debugger_breakpoint_type;
+
+/* The breakpoint structure */
+typedef struct debugger_breakpoint {
+  WORD pc;
+  enum debugger_breakpoint_type type;
+} debugger_breakpoint;
+
+/* The current breakpoints */
+extern GSList *debugger_breakpoints;
 
 int debugger_init( void );
 int debugger_reset( void );
