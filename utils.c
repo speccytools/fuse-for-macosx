@@ -345,13 +345,13 @@ utils_get_temp_path( void )
   */
   dir = getenv( "TMP" ); if( dir ) return dir;
   dir = getenv( "TEMP" ); if( dir ) return dir;
-  return "./";
+  return ".";
 
 #else				/* #ifdef WIN32 */
 
   /* Unix-ish. Use TMPDIR if specified, if not /tmp */
   dir = getenv( "TMPDIR" ); if( dir ) return dir;
-  return "/tmp/";
+  return "/tmp";
 
 #endif				/* #ifdef WIN32 */
   

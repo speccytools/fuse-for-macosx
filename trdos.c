@@ -414,7 +414,9 @@ insert_scl( trdos_drive_number which, const char *filename )
 
   temp_path = utils_get_temp_path();
 
-  length = strlen( temp_path ) + strlen( SCL_TMP_FILE_TEMPLATE ) + 1;
+  /* +2 is for the slash between the path and the template and for the
+     null at the end */
+  length = strlen( temp_path ) + strlen( SCL_TMP_FILE_TEMPLATE ) + 2;
 
   trd_template = malloc( length );
   if( !trd_template ) {
@@ -422,7 +424,7 @@ insert_scl( trdos_drive_number which, const char *filename )
     return 1;
   }
 
-  snprintf( trd_template, length, "%s%s", temp_path, SCL_TMP_FILE_TEMPLATE );
+  snprintf( trd_template, length, "%s/%s", temp_path, SCL_TMP_FILE_TEMPLATE );
 
   discs[ which ].disc_ready = 0;
 
