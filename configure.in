@@ -417,6 +417,7 @@ compat/Makefile \
 debugger/Makefile \
 hacking/Makefile \
 lib/Makefile \
+machines/Makefile \
 man/Makefile \
 perl/Makefile \
 perl/Fuse/Makefile \

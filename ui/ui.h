@@ -32,7 +32,7 @@
 #include <libspectrum.h>
 
 #include "compat.h"
-#include "specplus3.h"
+#include "machines/specplus3.h"
 #include "trdos.h"
 #include "ui/scaler/scaler.h"
 

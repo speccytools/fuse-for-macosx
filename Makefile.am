@@ -30,6 +30,7 @@ SUBDIRS = compat \
 	  debugger \
 	  hacking \
 	  lib \
+	  machines \
 	  man \
 	  perl \
 	  pokefinder \
@@ -62,28 +63,18 @@ fuse_SOURCES = ay.c \
 	keyboard.c \
 	machine.c \
 	memory.c \
-	pentagon.c \
 	periph.c \
 	printer.c \
 	psg.c \
 	rzx.c \
 	scld.c \
-	scorpion.c \
 	screenshot.c \
 	settings.c \
 	simpleide.c \
 	snapshot.c \
 	sound.c \
-	spec128.c \
-	spec16.c \
-	spec48.c \
-	specplus2.c \
-	specplus2a.c \
-	specplus3.c \
 	spectrum.c \
 	tape.c \
-	tc2048.c \
-	tc2068.c \
 	timer.c \
 	trdos.c \
 	ui.c \
@@ -92,6 +83,7 @@ fuse_SOURCES = ay.c \
 
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
+machines/libmachines.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
 ui/scaler/libscaler.a \
@@ -130,26 +122,21 @@ noinst_HEADERS = ay.h \
 	keyboard.h \
 	machine.h \
 	memory.h \
-	pentagon.h \
 	periph.h \
 	psg.h \
 	rzx.h \
-	scorpion.h \
 	screenshot.h \
 	settings.h \
 	simpleide.h \
 	snapshot.h \
 	sound.h \
-        spec128.h \
-	spec16.h spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h\
+	spectrum.h \
 	tape.h \
 	timer.h \
 	trdos.h \
 	utils.h \
 	joystick.h \
 	printer.h \
-	tc2048.h \
-	tc2068.h \
 	scld.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl \

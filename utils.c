@@ -49,10 +49,10 @@
 
 #include "dck.h"
 #include "fuse.h"
+#include "machines/specplus3.h"
 #include "memory.h"
 #include "rzx.h"
 #include "snapshot.h"
-#include "specplus3.h"
 #include "tape.h"
 #include "trdos.h"
 #include "utils.h"

@@ -53,7 +53,7 @@
 #include "settings.h"
 #include "simpleide.h"
 #include "snapshot.h"
-#include "specplus3.h"
+#include "machines/specplus3.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"

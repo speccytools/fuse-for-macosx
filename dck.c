@@ -39,7 +39,6 @@
 #include "machine.h"
 #include "settings.h"
 #include "scld.h"
-#include "tc2068.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "debugger/debugger.h"

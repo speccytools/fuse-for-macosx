@@ -62,7 +62,6 @@
 #include "sound.h"
 #include "sound/lowlevel.h"
 #include "spectrum.h"
-#include "specplus3.h"
 #include "tape.h"
 #include "timer.h"
 #include "trdos.h"
