@@ -198,8 +198,8 @@ int rzx_stop_recording( void )
   );
 
   length = 0;
-  libspec_error = libspectrum_rzx_write2(
-    &buffer, &length, rzx, NULL, LIBSPECTRUM_ID_UNKNOWN, fuse_creator,
+  libspec_error = libspectrum_rzx_write(
+    &buffer, &length, rzx, LIBSPECTRUM_ID_UNKNOWN, fuse_creator,
     settings_current.rzx_compression, rzx_competition_mode ? &rzx_key : NULL
   );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
