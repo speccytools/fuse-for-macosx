@@ -43,6 +43,7 @@
 #include "tape.h"
 #include "ui/ui.h"
 #include "spectrum.h"
+#include "z80/z80.h"
 
 /* A large value to mean `no events due' */
 const DWORD event_no_events = 0xffffffff;
