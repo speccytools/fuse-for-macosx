@@ -32,7 +32,7 @@
 #endif				/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
 /* The offset used to get the count of instructions from the R register */
-extern size_t rzx_instructions_offset;
+extern int rzx_instructions_offset;
 
 /* The number of bytes read via IN during the current frame */
 extern size_t rzx_in_count;
@@ -49,11 +49,8 @@ extern int rzx_recording;
 /* Are we currently playing back a .rzx file? */
 extern int rzx_playback;
 
-/* The .rzx frame we're currently playing */
-extern size_t rzx_current_frame;
-
-/* And the RZX frame we're getting IN data from */
-extern size_t rzx_data_frame;
+/* The number of instructions in the current .rzx playback frame */
+extern size_t rzx_instruction_count;
 
 /* The actual RZX data */
 extern libspectrum_rzx *rzx;

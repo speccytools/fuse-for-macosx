@@ -115,18 +115,12 @@ BYTE readport(WORD port)
   /* If we're doing RZX playback, get a byte from the RZX file */
   if( rzx_playback ) {
 
-    /* Check we're not trying to read off the end of the array */
-    if( rzx_in_count >= rzx->frames[ rzx_data_frame ].count ) {
-      ui_error( UI_ERROR_ERROR,
-		"More INs during frame %d than stored in RZX file (%d)",
-		rzx_current_frame, rzx->frames[ rzx_data_frame ].count );
-      rzx_stop_playback( 1 );
-      /* And get the byte normally */
-      return readport( port );
-    }
+    libspectrum_error error;
 
-    /* Otherwise, just return the next RZX byte */
-    return rzx->frames[ rzx_data_frame ].in_bytes[ rzx_in_count++ ];
+    error = libspectrum_rzx_playback( rzx, &return_value );
+    if( error ) { rzx_stop_playback( 1 ); return readport( port ); }
+
+    return return_value;
   }
 
   /* If we're not doing RZX playback, get the byte normally */

@@ -48,7 +48,7 @@
 
 /* The offset used to get the count of instructions from the R register;
    (instruction count) = R + rzx_instructions_offset */
-size_t rzx_instructions_offset;
+int rzx_instructions_offset;
 
 /* The number of bytes read via IN during the current frame */
 size_t rzx_in_count;
@@ -72,11 +72,8 @@ static size_t rzx_snap_length;
 /* Are we currently playing back a .rzx file? */
 int rzx_playback;
 
-/* The .rzx frame we're currently playing */
-size_t rzx_current_frame;
-
-/* And the RZX frame we're getting IN data from */
-size_t rzx_data_frame;
+/* The number of instructions in the current .rzx playback frame */
+size_t rzx_instruction_count;
 
 /* The current RZX data */
 libspectrum_rzx *rzx;
@@ -154,7 +151,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
   }
 
   /* Start the count of instruction fetches here */
-  counter_reset();
+  counter_reset(); rzx_in_count = 0;
 
   libspectrum_rzx_set_tstates( rzx, tstates );
 
@@ -265,9 +262,11 @@ int rzx_start_playback( const char *filename, int (*load_snap)(void) )
   if( error ) { libspectrum_rzx_free( rzx ); return error; }
 
   /* We're now playing this RZX file */
+  if( libspectrum_rzx_start_playback( rzx ) ) return 1;
+
   tstates = libspectrum_rzx_tstates( rzx );
+  rzx_instruction_count = libspectrum_rzx_instructions( rzx );
   rzx_playback = 1;
-  rzx_current_frame = rzx_data_frame = 0;
   counter_reset();
 
   return 0;
@@ -310,52 +309,42 @@ static int recording_frame( void )
 {
   libspectrum_error error;
 
-  error = libspectrum_rzx_frame( rzx, R + rzx_instructions_offset,
-				 rzx_in_count, rzx_in_bytes );
+  error = libspectrum_rzx_store_frame( rzx, R + rzx_instructions_offset,
+				       rzx_in_count, rzx_in_bytes );
   if( error ) return error;
 
   /* Reset the instruction counter */
-  counter_reset();
+  rzx_in_count = 0; counter_reset();
 
   return 0;
 }
 
 static int playback_frame( void )
 {
-  /* Check we read the correct number of INs during this frame */
-  if( rzx_in_count != rzx->frames[ rzx_data_frame ].count ) {
-    ui_error( UI_ERROR_ERROR,
-	      "Not enough INs during frame %d: expected %d, got %d",
-	      rzx_current_frame, rzx->frames[ rzx_data_frame ].count,
-	      rzx_in_count );
-    return rzx_stop_playback( 0 );
-  }
+  int error, finished;
 
-  /* Increment the frame count and see if we've finished with this file */
-  if( ++rzx_current_frame >= rzx->count ) {
+  error = libspectrum_rzx_playback_frame( rzx, &finished );
+  if( error ) return rzx_stop_playback( 0 );
+
+  if( finished ) {
     ui_error( UI_ERROR_INFO, "Finished RZX playback" );
     return rzx_stop_playback( 0 );
   }
 
-  /* Move the data frame pointer along, unless we're supposed to be
-     repeating the last frame */
-  if( !rzx->frames[ rzx_current_frame ].repeat_last )
-    rzx_data_frame = rzx_current_frame;
-
-  /* If we've got more frame to do, just reset the count and continue */
+  /* If we've got another frame to do, fetch the new instruction count and
+     continue */
+  rzx_instruction_count = libspectrum_rzx_instructions( rzx );
   counter_reset();
 
   return 0;
 }
 
-/* Reset the RZX counters; also, take this opportunity to normalise the
+/* Reset the RZX counter; also, take this opportunity to normalise the
    R register */
 static int counter_reset( void )
 {
   R &= 0x7f;		/* Clear all but the 7 lowest bits of the R register */
   rzx_instructions_offset = -R; /* Gives us a zero count */
-
-  rzx_in_count = 0;
 
   return 0;
 }
