@@ -641,7 +641,50 @@ FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Half )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
+FUNCTION( scaler_AdvMame3x )( BYTE *srcPtr, DWORD srcPitch,
+			      BYTE *dstPtr, DWORD dstPitch,
+			      int width, int height )
+{
+  unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
+  scaler_data_type *p = (scaler_data_type*) srcPtr;
+
+  unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
+  scaler_data_type *q = (scaler_data_type*) dstPtr;
+
+  scaler_data_type /* A, */ B, C;
+  scaler_data_type D, E, F;
+  scaler_data_type /* G, */ H, I;
+
+  while (height--) {
+    int i;
+
+    B = C = *(p - nextlineSrc);
+    E = *(p - 1); F = *(p);
+    H = I = *(p + nextlineSrc);
+    for (i = 0; i < width; ++i) {
+      p++;
+      /* A = B; */ B = C; C = *(p - nextlineSrc);
+      D = E; E = F; F = *(p);
+      /* G = H; */ H = I; I = *(p + nextlineSrc);
+
+      *(q) = D == B && B != F && D != H ? D : E;
+      *(q + 1) = E;
+      *(q + 2) = B == F && B != D && F != H ? F : E;
+      *(q + nextlineDst) = E;
+      *(q + nextlineDst + 1) = E;
+      *(q + nextlineDst + 2) = E;
+      *(q + 2 * nextlineDst) = D == H && D != B && H != F ? D : E;
+      *(q + 2 * nextlineDst + 1) = E;
+      *(q + 2 * nextlineDst + 2) = H == F && D != H && B != F ? F : E;
+      q += 3;
+    }
+    p += nextlineSrc - width;
+    q += (nextlineDst - width) * 3;
+  }
+}
+
+void 
+FUNCTION( scaler_Half )( BYTE *srcPtr, DWORD srcPitch,
 			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   scaler_data_type *r;

@@ -256,7 +256,8 @@ screenshot_available_scalers( scaler_type scaler )
 
     case SCALER_NORMAL: case SCALER_DOUBLESIZE: case SCALER_TRIPLESIZE:
     case SCALER_2XSAI: case SCALER_SUPER2XSAI: case SCALER_SUPEREAGLE:
-    case SCALER_ADVMAME2X: case SCALER_TV2X: case SCALER_DOTMATRIX:
+    case SCALER_ADVMAME2X: case SCALER_ADVMAME3X: case SCALER_TV2X:
+    case SCALER_DOTMATRIX:
       return 1;
     default:
       return 0;

@@ -83,6 +83,8 @@ static struct scaler_info available_scalers[] = {
     scaler_SuperEagle_16, scaler_SuperEagle_32, expand_sai          },
   { "AdvMAME 2x",      "advmame2x",  SCALER_FLAGS_EXPAND,      2.0, 
     scaler_AdvMame2x_16,  scaler_AdvMame2x_32,  expand_1            },
+  { "AdvMAME 3x",      "advmame3x",  SCALER_FLAGS_EXPAND,      3.0, 
+    scaler_AdvMame3x_16,  scaler_AdvMame3x_32,  expand_1            },
   { "TV 2x",	       "tv2x",	     SCALER_FLAGS_NONE,        2.0, 
     scaler_TV2x_16,       scaler_TV2x_32,       NULL                },
   { "Timex TV",	       "timextv",    SCALER_FLAGS_NONE,        1.0, 
