@@ -51,6 +51,15 @@ static gint find_breakpoint( gconstpointer data, gconstpointer user_data );
 static void free_breakpoint( gpointer data, gpointer user_data );
 static void show_breakpoint( gpointer data, gpointer user_data );
 
+/* Textual represenations of the breakpoint types and lifetimes */
+char *debugger_breakpoint_type_text[] = {
+  "Execute", "Read", "Write", "Port Read", "Port Write",
+};
+
+char *debugger_breakpoint_life_text[] = {
+  "Permanent", "One Shot",
+};
+
 int
 debugger_init( void )
 {

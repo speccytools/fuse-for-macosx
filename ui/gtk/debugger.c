@@ -337,10 +337,12 @@ ui_debugger_update( void )
     debugger_breakpoint *bp = ptr->data;
 
     snprintf( breakpoint_text[0], 40, "%lu", (unsigned long)bp->id );
-    snprintf( breakpoint_text[1], 40, "%d", bp->type );
+    snprintf( breakpoint_text[1], 40, "%s",
+	      debugger_breakpoint_type_text[ bp->type ] );
     snprintf( breakpoint_text[2], 40, format_16_bit, bp->value );
     snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );
-    snprintf( breakpoint_text[4], 40, "%d", bp->life );
+    snprintf( breakpoint_text[4], 40, "%s",
+	      debugger_breakpoint_life_text[ bp->life ] );
 
     gtk_clist_append( GTK_CLIST( breakpoints ), breakpoint_text );
   }
