@@ -164,27 +164,27 @@ int libspectrum_write_dword( libspectrum_byte **buffer, libspectrum_dword d );
 
 /* .sna specific routines */
 
-int libspectrum_sna_read( uchar *buffer, size_t buffer_length,
+int libspectrum_sna_read( const uchar *buffer, size_t buffer_length,
 			  libspectrum_snap *snap );
-int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
+int libspectrum_sna_read_header( const uchar *buffer, size_t buffer_length,
 				 libspectrum_snap *snap );
-int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
+int libspectrum_sna_read_data( const uchar *buffer, size_t buffer_length,
 			       libspectrum_snap *snap );
 
 /* .z80 specific routines */
 
-int libspectrum_z80_read( libspectrum_byte *buffer, size_t buffer_length,
+int libspectrum_z80_read( const libspectrum_byte *buffer, size_t buffer_length,
 			  libspectrum_snap *snap );
-int libspectrum_z80_read_header( libspectrum_byte *buffer,
+int libspectrum_z80_read_header( const libspectrum_byte *buffer,
 				 libspectrum_snap *snap,
-				 libspectrum_byte **data );
-int libspectrum_z80_read_blocks( libspectrum_byte *buffer,
+				 const libspectrum_byte **data );
+int libspectrum_z80_read_blocks( const libspectrum_byte *buffer,
 				 size_t buffer_length,
 				 libspectrum_snap *snap );
-int libspectrum_z80_read_block( libspectrum_byte *buffer,
+int libspectrum_z80_read_block( const libspectrum_byte *buffer,
 				libspectrum_snap *snap,
-				libspectrum_byte **next_block,
-				libspectrum_byte *end );
+				const libspectrum_byte **next_block,
+				const libspectrum_byte *end );
 
 int libspectrum_z80_write( libspectrum_byte **buffer, size_t *length,
 			   libspectrum_snap *snap );

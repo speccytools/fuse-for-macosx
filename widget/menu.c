@@ -46,6 +46,8 @@
 
 widget_menu_entry *menu;
 
+static int widget_load_snapshot( void );
+
 int widget_menu_draw( void *data )
 {
   widget_menu_entry *ptr;
@@ -144,36 +146,16 @@ int widget_menu_rzx_recording( void *data )
 /* File/Recording/Play */
 int widget_menu_rzx_playback( void *data )
 {
-  char *snapshot;
-
   if( rzx_playback || rzx_recording ) return 0;
 
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( widget_filesel_name ) {
-    snapshot = strdup( widget_filesel_name );
-    if( !snapshot ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
-    }
-  } else {
-    return 0;	/* Fileselector cancelled, therefore non-error return */
-  }
 
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
-  if( widget_filesel_name ) {
-    if( snapshot_read( snapshot ) ) {
-      free( snapshot );
-      return 1;
-    }
-    free( snapshot );
+  return rzx_start_playback( widget_filesel_name, widget_load_snapshot );
+}
 
-    widget_end_all( WIDGET_FINISHED_OK );
-    return rzx_start_playback( widget_filesel_name );
-  }
-
-  /* Recording file selector cancelled */
-  free( snapshot );
-  return 0;
+static int widget_load_snapshot( void )
+{
+  return widget_apply_to_file( snapshot_read );
 }
 
 /* File/Recording/Stop */

@@ -36,9 +36,8 @@ rzx_read_header( const libspectrum_byte **ptr, const libspectrum_byte *end );
 static libspectrum_error
 rzx_read_creator( const libspectrum_byte **ptr, const libspectrum_byte *end );
 static libspectrum_error
-rzx_write_snapshot( libspectrum_byte **buffer, libspectrum_byte **ptr,
-		    size_t *length, libspectrum_byte *snap,
-		    size_t snap_length );
+rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
+		   const libspectrum_byte *end, libspectrum_snap **snap );
 static libspectrum_error
 rzx_read_input( libspectrum_rzx *rzx,
 		const libspectrum_byte **ptr, const libspectrum_byte *end );
@@ -50,6 +49,10 @@ static libspectrum_error
 rzx_write_creator( libspectrum_byte **buffer, libspectrum_byte **ptr,
 		   size_t *length, const char *program, libspectrum_word major,
 		   libspectrum_word minor );
+static libspectrum_error
+rzx_write_snapshot( libspectrum_byte **buffer, libspectrum_byte **ptr,
+		    size_t *length, libspectrum_byte *snap,
+		    size_t snap_length );
 static libspectrum_error
 rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
 		 libspectrum_byte **ptr, size_t *length );
@@ -110,7 +113,7 @@ libspectrum_rzx_free( libspectrum_rzx *rzx )
 
 libspectrum_error
 libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
-		      const size_t length )
+		      const size_t length, libspectrum_snap **snap )
 {
   libspectrum_error error;
   const libspectrum_byte *ptr, *end;
@@ -130,6 +133,11 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
 
     case LIBSPECTRUM_RZX_CREATOR_BLOCK:
       error = rzx_read_creator( &ptr, end );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+      break;
+      
+    case LIBSPECTRUM_RZX_SNAPSHOT_BLOCK:
+      error = rzx_read_snapshot( rzx, &ptr, end, snap );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
       break;
 
@@ -204,6 +212,64 @@ rzx_read_creator( const libspectrum_byte **ptr, const libspectrum_byte *end )
 }
 
 static libspectrum_error
+rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
+		   const libspectrum_byte *end, libspectrum_snap **snap )
+{
+  size_t blocklength, snaplength; libspectrum_error error;
+
+  if( end - (*ptr) < 16 ) {
+    libspectrum_print_error("rzx_read_snapshot: not enough data in buffer\n");
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  blocklength = (*ptr)[0]             +
+                (*ptr)[1] *     0x100 +
+	        (*ptr)[2] *   0x10000 +
+                (*ptr)[3] * 0x1000000 ;
+  (*ptr) += 4;
+
+  if( end - (*ptr) < blocklength - 5 ) {
+    libspectrum_print_error("rzx_read_snapshot: not enough data in buffer\n");
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Skip the flags */
+  (*ptr) += 4;
+
+  snaplength = (*ptr)[4]             +
+               (*ptr)[5] *     0x100 +
+	       (*ptr)[6] *   0x10000 +
+               (*ptr)[7] * 0x1000000 ;
+
+  /* Check the snap length is consistent */
+  if( snaplength + 17 != blocklength ) return LIBSPECTRUM_ERROR_CORRUPT;
+
+  (*snap) = malloc( sizeof( libspectrum_snap ) );
+  if( *snap == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  if( !strcmp( *ptr, "Z80" ) ) {
+    error = libspectrum_z80_read( (*ptr) + 8, snaplength, (*snap) );
+  } else if( !strcmp( *ptr, "SNA" ) ) {
+    error = libspectrum_sna_read( (*ptr) + 8, snaplength, (*snap) );
+  } else {
+    libspectrum_print_error(
+      "rzx_read_snapshot: unrecognised snapshot format\n"
+    );
+    free( *snap ); (*snap) = 0;
+    return LIBSPECTRUM_ERROR_UNKNOWN;
+  }
+
+  (*ptr) += 8 + snaplength;
+
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    libspectrum_snap_destroy( *snap );
+    free( *snap ); (*snap) = 0;
+  }
+
+  return error;
+}
+
+static libspectrum_error
 rzx_read_input( libspectrum_rzx *rzx,
 		const libspectrum_byte **ptr, const libspectrum_byte *end )
 {
@@ -220,15 +286,15 @@ rzx_read_input( libspectrum_rzx *rzx,
   /* Skip the length */
   (*ptr) += 4;
 
-  /* Frame size is undefined, so just skip it */
-  (*ptr)++;
-
   /* Get the number of frames */
   rzx->count = (*ptr)[0]             +
                (*ptr)[1] *     0x100 +
                (*ptr)[2] *   0x10000 +
                (*ptr)[3] * 0x1000000 ;
   (*ptr) += 4;
+
+  /* Frame size is undefined, so just skip it */
+  (*ptr)++;
 
   /* Allocate memory for the frames */
   rzx->frames =

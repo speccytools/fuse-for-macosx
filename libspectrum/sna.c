@@ -33,13 +33,14 @@
 
 static int libspectrum_sna_identify( size_t buffer_length, 
 				     libspectrum_machine *type );
-static int libspectrum_sna_read_128_header( uchar *buffer,
+static int libspectrum_sna_read_128_header( const uchar *buffer,
 					    size_t buffer_length,
 					    libspectrum_snap *snap );
-static int libspectrum_sna_read_128_data( uchar *buffer, size_t buffer_length,
+static int libspectrum_sna_read_128_data( const uchar *buffer,
+					  size_t buffer_length,
 					  libspectrum_snap *snap );
 
-int libspectrum_sna_read( uchar *buffer, size_t buffer_length,
+int libspectrum_sna_read( const uchar *buffer, size_t buffer_length,
 			  libspectrum_snap *snap )
 {
   int error;
@@ -77,7 +78,7 @@ static int libspectrum_sna_identify( size_t buffer_length,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
+int libspectrum_sna_read_header( const uchar *buffer, size_t buffer_length,
 				 libspectrum_snap *snap )
 {
   if( buffer_length < LIBSPECTRUM_SNA_HEADER_LENGTH ) {
@@ -114,7 +115,7 @@ int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
+int libspectrum_sna_read_data( const uchar *buffer, size_t buffer_length,
 			       libspectrum_snap *snap )
 {
   int error;
@@ -190,7 +191,7 @@ int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-static int libspectrum_sna_read_128_header( uchar *buffer,
+static int libspectrum_sna_read_128_header( const uchar *buffer,
 					    size_t buffer_length,
 					    libspectrum_snap *snap )
 {
@@ -207,8 +208,9 @@ static int libspectrum_sna_read_128_header( uchar *buffer,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-static int libspectrum_sna_read_128_data( uchar *buffer, size_t buffer_length,
-					  libspectrum_snap *snap )
+static int
+libspectrum_sna_read_128_data( const uchar *buffer, size_t buffer_length,
+			       libspectrum_snap *snap )
 {
   int i, page;
 

@@ -34,6 +34,7 @@
 typedef enum libspectrum_rzx_block_t {
 
   LIBSPECTRUM_RZX_CREATOR_BLOCK = 0x10,
+  LIBSPECTRUM_RZX_SNAPSHOT_BLOCK = 0x30,
   LIBSPECTRUM_RZX_INPUT_BLOCK = 0x80,
 
 } libspectrum_rzx_block_t;
@@ -66,7 +67,7 @@ libspectrum_error libspectrum_rzx_free( libspectrum_rzx *rzx );
 
 libspectrum_error
 libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
-		      const size_t length );
+		      const size_t length, libspectrum_snap **snap );
 
 libspectrum_error
 libspectrum_rzx_write( libspectrum_rzx *rzx,

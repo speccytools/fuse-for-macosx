@@ -46,17 +46,17 @@ static const int LIBSPECTRUM_Z80_HEADER_LENGTH = 30;
 static libspectrum_byte slt_signature[] = "\0\0\0SLT";
 static size_t slt_signature_length = 6;
 
-static int read_v1_block( libspectrum_byte *buffer, int is_compressed, 
+static int read_v1_block( const libspectrum_byte *buffer, int is_compressed, 
 			  libspectrum_byte **uncompressed,
-			  libspectrum_byte **next_block,
-			  libspectrum_byte *end );
-static int read_v2_block( libspectrum_byte *buffer, libspectrum_byte **block,
-			  size_t *length, int *page,
-			  libspectrum_byte **next_block,
-			  libspectrum_byte *end );
+			  const libspectrum_byte **next_block,
+			  const libspectrum_byte *end );
+static int
+read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
+	       size_t *length, int *page, const libspectrum_byte **next_block,
+	       const libspectrum_byte *end );
 static int libspectrum_z80_read_slt( libspectrum_snap *snap,
-				     libspectrum_byte **next_block,
-				     libspectrum_byte *end );
+				     const libspectrum_byte **next_block,
+				     const libspectrum_byte *end );
 static int libspectrum_z80_write_slt( libspectrum_byte **buffer,
 				      libspectrum_byte **ptr, size_t *length,
 				      libspectrum_snap *snap );
@@ -67,11 +67,11 @@ static int libspectrum_z80_write_slt_entry( libspectrum_byte **buffer,
 					    libspectrum_word id,
 					    libspectrum_dword slt_length );
 
-int libspectrum_z80_read( libspectrum_byte *buffer, size_t buffer_length,
+int libspectrum_z80_read( const libspectrum_byte *buffer, size_t buffer_length,
 			  libspectrum_snap *snap )
 {
   int error;
-  libspectrum_byte *data;
+  const libspectrum_byte *data;
 
   error = libspectrum_z80_read_header( buffer, snap, &data );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
@@ -83,12 +83,12 @@ int libspectrum_z80_read( libspectrum_byte *buffer, size_t buffer_length,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_read_header( libspectrum_byte *buffer,
+int libspectrum_z80_read_header( const libspectrum_byte *buffer,
 				 libspectrum_snap *snap,
-				 libspectrum_byte **data )
+				 const libspectrum_byte **data )
 {
 
-  libspectrum_byte *header = buffer;
+  const libspectrum_byte *header = buffer;
 
   snap->a   = header[ 0]; snap->f  = header[ 1];
   snap->bc  = header[ 2] + header[ 3]*0x100;
@@ -114,7 +114,7 @@ int libspectrum_z80_read_header( libspectrum_byte *buffer,
   if( snap->pc == 0 ) {	/* PC == 0x0000 => v2 or greater .z80 */
 
     size_t extra_length;
-    libspectrum_byte *extra_header;
+    const libspectrum_byte *extra_header;
     libspectrum_dword quarter_tstates;
 
     extra_length = header[ LIBSPECTRUM_Z80_HEADER_LENGTH     ] +
@@ -234,10 +234,10 @@ int libspectrum_z80_read_header( libspectrum_byte *buffer,
 
 }
 
-int libspectrum_z80_read_blocks( libspectrum_byte *buffer,
+int libspectrum_z80_read_blocks( const libspectrum_byte *buffer,
 				 size_t buffer_length, libspectrum_snap *snap )
 {
-  libspectrum_byte *end,*next_block;
+  const libspectrum_byte *end, *next_block;
 
   end = buffer + buffer_length; next_block = buffer;
 
@@ -274,8 +274,8 @@ int libspectrum_z80_read_blocks( libspectrum_byte *buffer,
 }
 
 static int libspectrum_z80_read_slt( libspectrum_snap *snap,
-				     libspectrum_byte **next_block,
-				     libspectrum_byte *end )
+				     const libspectrum_byte **next_block,
+				     const libspectrum_byte *end )
 {
   size_t slt_length[256], offsets[256];
   size_t whence = 0;
@@ -422,10 +422,10 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_read_block( libspectrum_byte *buffer,
+int libspectrum_z80_read_block( const libspectrum_byte *buffer,
 				libspectrum_snap *snap,
-				libspectrum_byte **next_block,
-				libspectrum_byte *end )
+				const libspectrum_byte **next_block,
+				const libspectrum_byte *end )
 {
   int error;
   libspectrum_byte *uncompressed;
@@ -498,14 +498,14 @@ int libspectrum_z80_read_block( libspectrum_byte *buffer,
 
 }
 
-static int read_v1_block( libspectrum_byte *buffer, int is_compressed, 
+static int read_v1_block( const libspectrum_byte *buffer, int is_compressed, 
 			  libspectrum_byte **uncompressed,
-			  libspectrum_byte **next_block,
-			  libspectrum_byte *end )
+			  const libspectrum_byte **next_block,
+			  const libspectrum_byte *end )
 {
   if( is_compressed ) {
     
-    libspectrum_byte *ptr;
+    const libspectrum_byte *ptr;
     int state,error;
     size_t uncompressed_length = 0;
 
@@ -593,10 +593,10 @@ static int read_v1_block( libspectrum_byte *buffer, int is_compressed,
 
 }
 
-static int read_v2_block( libspectrum_byte *buffer, libspectrum_byte **block,
-			  size_t *length, int *page,
-			  libspectrum_byte **next_block,
-			  libspectrum_byte *end )
+static int
+read_v2_block( const libspectrum_byte *buffer, libspectrum_byte **block,
+	       size_t *length, int *page, const libspectrum_byte **next_block,
+	       const libspectrum_byte *end )
 {
   size_t length2;
 

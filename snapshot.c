@@ -54,8 +54,6 @@ typedef enum snapshot_type {
 
 static snapshot_type snapshot_identify( const char *filename );
 
-static int snapshot_copy_from( libspectrum_snap *snap );
-
 int snapshot_read( const char *filename )
 {
   unsigned char *buffer; size_t length;
@@ -144,7 +142,7 @@ void snapshot_flush_slt (void)
   slt_screen = NULL;
 }
 
-static int snapshot_copy_from( libspectrum_snap *snap )
+int snapshot_copy_from( libspectrum_snap *snap )
 {
   int i,j; int error;
 
