@@ -181,17 +181,6 @@ uidisplay_area(int x, int y, int width, int height)
   }
 }
 
-void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
-{
-  if( hires ) {
-    memset( image + line * DISPLAY_SCREEN_WIDTH + pixel_from,     colour,
-	    pixel_to     - pixel_from     );
-  } else {
-    memset( image + line * DISPLAY_ASPECT_WIDTH + pixel_from / 2, colour,
-	    pixel_to / 2 - pixel_from / 2 );
-  }
-}
-
 int uidisplay_end(void)
 {
     vga_setmode(TEXT);

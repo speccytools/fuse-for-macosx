@@ -230,26 +230,6 @@ uidisplay_area( int x, int start, int width, int height)
   }
 }
 
-void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
-{
-  int i;
-  WORD *ptr;
-  colour = colours[colour];
-
-  switch( fb_resolution ) {
-  case FB_RES( 640, 480 ):
-  case FB_RES( 640, 240 ):
-    ptr = image + line * 640 + pixel_from;
-    for( i = pixel_from; i < pixel_to; i++ ) *ptr++ = colour;
-    break;
-  case FB_RES( 320, 240 ):
-    ptr = image + line * 320 + pixel_from / 2;
-    for( i = pixel_from / 2; i < pixel_to / 2; i++ ) *ptr++ = colour;
-    break;
-  default:;		/* Shut gcc up */
-  }
-}
-
 int uidisplay_end(void)
 {
   if( fb_fd != -1 ) {
