@@ -55,9 +55,10 @@ int image_scale;
 int image_width, image_height;
 
 /* A scaled copy of the image displayed on the Spectrum's screen */
-static WORD scaled_image[2*DISPLAY_SCREEN_HEIGHT][2*DISPLAY_SCREEN_WIDTH];
+static libspectrum_word
+  scaled_image[2*DISPLAY_SCREEN_HEIGHT][2*DISPLAY_SCREEN_WIDTH];
 static const ptrdiff_t scaled_pitch =
-                                     2 * DISPLAY_SCREEN_WIDTH * sizeof( WORD );
+  2 * DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 
 /* Are we in a Timex display mode? */
 static int hires;
@@ -71,7 +72,7 @@ static const short colours[] = {
 };
 
 static int fb_fd = -1;		/* The framebuffer's file descriptor */
-static WORD *image = 0, *gm = 0;
+static libspectrum_word *image = 0, *gm = 0;
 
 static struct fb_fix_screeninfo fixed;
 static struct fb_var_screeninfo orig_display, display;
@@ -262,7 +263,7 @@ uidisplay_area( int x, int start, int width, int height)
     for( y = start; y < start + height; y++ )
     {
       int i;
-      WORD *point;
+      libspectrum_word *point;
 
       if( hires ) {
 
@@ -288,7 +289,7 @@ uidisplay_area( int x, int start, int width, int height)
     for( y = start; y < start + height; y++ )
     {
       int i;
-      WORD *point;
+      libspectrum_word *point;
 
       if( hires ) {
 
@@ -312,7 +313,7 @@ uidisplay_area( int x, int start, int width, int height)
     for( y = start; y < start + height; y++ )
     {
       int i;
-      WORD *point;
+      libspectrum_word *point;
 
       for( i = 0, point = gm + y * display.xres_virtual + x;
 	   i < width;

@@ -243,3 +243,5 @@
 20031006 settings.dat, ui/options.dat, ui/gtk/confirm.c: add option to
 	 disable the 'confirm' dialogs.
 20031006 debugger/command.c, debugger/commandy.y: better error recovery
+20031007 ui/fb/fbdisplay.c, ui/fb/fbkeyboard.c: fix up framebuffer UI
+	 (Darren).

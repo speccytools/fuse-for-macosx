@@ -1,5 +1,5 @@
 /* fbkeyboard.c: routines for dealing with the linux fbdev display
-   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Darren Salt
+   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Darren Salt
 
    $Id$
 
@@ -28,6 +28,7 @@
 
 #ifdef UI_FB			/* Use this iff we're using fbdev */
 
+#include <stdio.h>
 #include <errno.h>
 #include <linux/kd.h>
 #include <termios.h>
