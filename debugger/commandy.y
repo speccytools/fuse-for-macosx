@@ -1,5 +1,5 @@
 /* commandy.y: Parse a debugger command
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
@@ -28,6 +28,7 @@
 
 #include <config.h>
 
+#include <stdio.h>		/* Needed by the OS X build */
 #include <stdlib.h>
 #include <string.h>
 

@@ -56,11 +56,12 @@ fuse_SOURCES = ay.c \
 	screenshot.c \
 	sdlsound.c
 
-fuse_LDADD = memory_internal.o @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ \
+fuse_LDADD = memory_internal.o \
 @GETOPT_LIBS@ \
 debugger/libdebugger.a \
 @UI_LIBS@ debugger/libdebugger.a z80/libz80.a @DSKLIBS@ \
-@LIBSPEC_LIBS@
+@LIBSPEC_LIBS@ \
+@GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@
 
 fuse_DEPENDENCIES = memory_internal.o @UI_LIBS@ debugger/libdebugger.a \
 	            z80/libz80.a
