@@ -50,6 +50,7 @@ void yyerror( char *s );
 
   int integer;
   debugger_breakpoint_type bptype;
+  debugger_breakpoint_life bplife;
 
 }
 
@@ -57,6 +58,7 @@ void yyerror( char *s );
 
 %token		 BASE
 %token		 BREAK
+%token		 TBREAK
 %token		 CLEAR
 %token		 CONTINUE
 %token		 DELETE
@@ -80,6 +82,7 @@ void yyerror( char *s );
 
 /* Derived types */
 
+%type  <bplife>  breakpointlife
 %type  <bptype>  breakpointtype
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
@@ -91,15 +94,11 @@ input:	 /* empty */
 ;
 
 command:   BASE NUMBER { debugger_output_base = $2; }
-	 | BREAK breakpointtype numberorpc {
-             debugger_breakpoint_add(
-	       $2, $3, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-	     );
+	 | breakpointlife breakpointtype numberorpc {
+             debugger_breakpoint_add( $2, $3, 0, $1 );
 	   }
-	 | BREAK PORT portbreakpointtype NUMBER {
-             debugger_breakpoint_add(
-               $3, $4, 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT
-	     );
+	 | breakpointlife PORT portbreakpointtype NUMBER {
+	     debugger_breakpoint_add( $3, $4, 0, $1 );
            }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONTINUE { debugger_run(); }
@@ -114,6 +113,9 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;
+
+breakpointlife:   BREAK  { $$ = DEBUGGER_BREAKPOINT_LIFE_PERMANENT; }
+		| TBREAK { $$ = DEBUGGER_BREAKPOINT_LIFE_ONESHOT; }
 
 breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
 	        | READ        { $$ = DEBUGGER_BREAKPOINT_TYPE_READ; }

@@ -66,6 +66,8 @@ p|po|por|port { return PORT; }
 r|re|rea|read { return READ; }
 se|set { return SET; }
 s|st|ste|step { return STEP; }
+t|tb|tbr|tbre|tbrea|tbreak|tbreakp|tbreakpo|tbreakpoi|tbreakpoin|tbreakpoint {
+							       return TBREAK; }
 w|wr|wri|writ|write { return WRITE; }
 
 a|b|c|d|e|f|h|l { yylval.integer = tolower( *yytext ); return REGISTER; }
