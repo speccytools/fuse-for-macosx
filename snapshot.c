@@ -119,7 +119,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
   int i,j; int error;
   int capabilities;
 
-  libspectrum_machine machine = snap->machine;
+  libspectrum_machine machine = libspectrum_snap_machine( snap );
 
   error = machine_select( machine );
   if( error ) {
@@ -152,47 +152,57 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   z80.halted = 0;
 
-  A  = snap->a ; F  = snap->f ;
-  A_ = snap->a_; F_ = snap->f_;
+  A  = libspectrum_snap_a ( snap ); F  = libspectrum_snap_f ( snap );
+  A_ = libspectrum_snap_a_( snap ); F_ = libspectrum_snap_f_( snap );
 
-  BC  = snap->bc ; DE  = snap->de ; HL  = snap->hl ;
-  BC_ = snap->bc_; DE_ = snap->de_; HL_ = snap->hl_;
+  BC  = libspectrum_snap_bc ( snap ); DE  = libspectrum_snap_de ( snap );
+  HL  = libspectrum_snap_hl ( snap ); BC_ = libspectrum_snap_bc_( snap );
+  DE_ = libspectrum_snap_de_( snap ); HL_ = libspectrum_snap_hl_( snap );
 
-  IX = snap->ix; IY = snap->iy; I = snap->i; R = snap->r;
-  SP = snap->sp; PC = snap->pc;
+  IX = libspectrum_snap_ix( snap ); IY = libspectrum_snap_iy( snap );
+  I  = libspectrum_snap_i ( snap ); R   = libspectrum_snap_r( snap );
+  SP = libspectrum_snap_sp( snap ); PC = libspectrum_snap_pc( snap );
 
-  IFF1 = snap->iff1; IFF2 = snap->iff2; IM = snap->im;
+  IFF1 = libspectrum_snap_iff1( snap ); IFF2 = libspectrum_snap_iff2( snap );
+  IM = libspectrum_snap_im( snap );
 
-  spectrum_ula_write( 0x00fe, snap->out_ula );
+  spectrum_ula_write( 0x00fe, libspectrum_snap_out_ula( snap ) );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
-    ay_registerport_write( 0xfffd, snap->out_ay_registerport );
+    ay_registerport_write( 0xfffd,
+			   libspectrum_snap_out_ay_registerport( snap ) );
     for( i=0; i<16; i++ ) {
-      machine_current->ay.registers[i] = snap->ay_registers[i];
-      sound_ay_write( i, snap->ay_registers[i], 0 );
+      machine_current->ay.registers[i] =
+	libspectrum_snap_ay_registers( snap, i );
+      sound_ay_write( i, machine_current->ay.registers[i], 0 );
     }
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )
-    spec128_memoryport_write( 0x7ffd, snap->out_128_memoryport );
+    spec128_memoryport_write( 0x7ffd,
+			      libspectrum_snap_out_128_memoryport( snap ) );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY )
-    specplus3_memoryport_write( 0x1ffd, snap->out_plus3_memoryport );
+    specplus3_memoryport_write( 0x1ffd,
+				libspectrum_snap_out_plus3_memoryport( snap ));
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY )
-    scld_hsr_write( 0x00fd, snap->out_scld_hsr );
+    scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
-    scld_dec_write( 0x00ff, snap->out_scld_dec );
+    scld_dec_write( 0x00ff, libspectrum_snap_out_scld_dec( snap ) );
 
-  tstates = snap->tstates;
+  tstates = libspectrum_snap_tstates( snap );
 
   for( i=0; i<8; i++ ) {
-    if( snap->pages[i] != NULL ) memcpy( RAM[i], snap->pages[i], 0x4000 );
+    if( libspectrum_snap_pages( snap, i ) )
+      memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
   }
 
-  memcpy( slt_length, snap->slt_length, sizeof(slt_length) );
   for( i=0; i<256; i++ ) {
+
+    slt_length[i] = libspectrum_snap_slt_length( snap, i );
+
     if( slt_length[i] ) {
 
       slt[i] = (BYTE*)malloc( slt_length[i] * sizeof( BYTE ) );
@@ -204,11 +214,12 @@ int snapshot_copy_from( libspectrum_snap *snap )
 	}
       }
 
-      memcpy( slt[i], snap->slt[i], slt_length[i] );
+      memcpy( slt[i], libspectrum_snap_slt( snap, i ),
+	      libspectrum_snap_slt_length( snap, i ) );
     }
   }
 
-  if( snap->slt_screen ) {
+  if( libspectrum_snap_slt_screen( snap ) ) {
 
     slt_screen = (BYTE*)malloc( 6912 * sizeof( BYTE ) );
     if( slt_screen == NULL ) {
@@ -219,8 +230,8 @@ int snapshot_copy_from( libspectrum_snap *snap )
       }
     }
 
-    memcpy( slt_screen, snap->slt_screen, 6912 );
-    slt_screen_level = snap->slt_screen_level;
+    memcpy( slt_screen, libspectrum_snap_slt_screen( snap ), 6912 );
+    slt_screen_level = libspectrum_snap_slt_screen_level( snap );
   }
 	  
   return 0;
@@ -256,81 +267,124 @@ int snapshot_copy_to( libspectrum_snap *snap )
 {
   int i,j;
 
-  snap->machine = machine_current->machine;
+  libspectrum_snap_set_machine( snap, machine_current->machine );
 
-  snap->a  = A ; snap->f  = F ;
-  snap->a_ = A_; snap->f_ = F_;
+  libspectrum_snap_set_a  ( snap, A   ); libspectrum_snap_set_f  ( snap, F   );
+  libspectrum_snap_set_a_ ( snap, A_  ); libspectrum_snap_set_f_ ( snap, F_  );
 
-  snap->bc  = BC ; snap->de  = DE ; snap->hl  = HL ;
-  snap->bc_ = BC_; snap->de_ = DE_; snap->hl_ = HL_;
+  libspectrum_snap_set_bc ( snap, BC  ); libspectrum_snap_set_de ( snap, DE  );
+  libspectrum_snap_set_hl ( snap, HL  ); libspectrum_snap_set_bc_( snap, BC_ );
+  libspectrum_snap_set_de_( snap, DE_ ); libspectrum_snap_set_hl_( snap, HL_ );
 
-  snap->ix = IX; snap->iy = IY; snap->i = I; snap->r = R;
-  snap->sp = SP; snap->pc = PC;
+  libspectrum_snap_set_ix ( snap, IX  ); libspectrum_snap_set_iy ( snap, IY  );
+  libspectrum_snap_set_i  ( snap, I   ); libspectrum_snap_set_r  ( snap, R   );
+  libspectrum_snap_set_sp ( snap, SP  ); libspectrum_snap_set_pc ( snap, PC  );
 
-  snap->iff1 = IFF1; snap->iff2 = IFF2; snap->im = IM;
+  libspectrum_snap_set_iff1( snap, IFF1 );
+  libspectrum_snap_set_iff2( snap, IFF2 );
+  libspectrum_snap_set_im( snap, IM );
 
-  snap->out_ula = spectrum_last_ula;
+  libspectrum_snap_set_out_ula( snap, spectrum_last_ula );
   
   /* These won't necessarily be valid in some machine configurations, but
      this shouldn't cause anything to go wrong */
-  snap->out_128_memoryport = machine_current->ram.last_byte;
-  snap->out_ay_registerport = machine_current->ay.current_register;
-  for( i=0; i<16; i++ )
-    snap->ay_registers[i] = machine_current->ay.registers[i];
-  snap->out_plus3_memoryport = machine_current->ram.last_byte2;
-  snap->out_scld_hsr = scld_last_hsr; snap->out_scld_dec = scld_last_dec.byte;
+  libspectrum_snap_set_out_128_memoryport( snap,
+					   machine_current->ram.last_byte );
+  libspectrum_snap_set_out_ay_registerport(
+    snap, machine_current->ay.current_register
+  );
 
-  snap->tstates = tstates;
+  for( i=0; i<16; i++ )
+    libspectrum_snap_set_ay_registers(
+      snap, i, machine_current->ay.registers[i]
+    );
+
+  libspectrum_snap_set_out_plus3_memoryport( snap,
+					     machine_current->ram.last_byte2 );
+
+  libspectrum_snap_set_out_scld_hsr( snap, scld_last_hsr );
+  libspectrum_snap_set_out_scld_dec( snap, scld_last_dec.byte );
+
+  libspectrum_snap_set_tstates( snap, tstates );
 
   for( i=0; i<8; i++ ) {
     if( RAM[i] != NULL ) {
 
-      snap->pages[i] =
-	(libspectrum_byte*)malloc( 0x4000 * sizeof( libspectrum_byte ) );
-      if( snap->pages[i] == NULL ) {
+      libspectrum_byte *buffer;
+
+      buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+      if( !buffer ) {
 	for( j=0; j<i; j++ )
-	  if( snap->pages[j] ) { free(snap->pages[j]); snap->pages[j] = NULL; }
+	  if( libspectrum_snap_pages( snap, j ) ) {
+	    free( libspectrum_snap_pages( snap, j ) );
+	    libspectrum_snap_set_pages( snap, j, NULL );
+	  }
 	ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_to" );
 	return 1;
       }
 
-      memcpy( snap->pages[i], RAM[i], 0x4000 );
+      memcpy( buffer, RAM[i], 0x4000 );
+      libspectrum_snap_set_pages( snap, i, buffer );
     }
   }
 
-  memcpy( snap->slt_length, slt_length, sizeof(snap->slt_length) );
   for( i=0; i<256; i++ ) {
+
+    libspectrum_snap_set_slt_length( snap, i, slt_length[i] );
+
     if( slt_length[i] ) {
 
-      snap->slt[i] =
-	(libspectrum_byte*)malloc( slt_length[i] * sizeof(libspectrum_byte) );
-      if( snap->slt[i] == NULL ) {
+      libspectrum_byte *buffer;
+
+      buffer = malloc( slt_length[i] * sizeof(libspectrum_byte) );
+      if( !buffer ) {
+
 	for( j=0; j<8; j++ )
-	  if( snap->pages[j] ) { free(snap->pages[j]); snap->pages[j] = NULL; }
+	  if( libspectrum_snap_pages( snap, j ) ) {
+	    free( libspectrum_snap_pages( snap, j ) );
+	    libspectrum_snap_set_pages( snap, j, NULL );
+	  }
 	for( j=0; j<i; j++ )
-	  if( snap->slt[j] ) { free( snap->slt[j] ); snap->slt_length[j] = 0; }
+	  if( libspectrum_snap_slt( snap, j ) ) {
+	    free( libspectrum_snap_slt( snap, j ) );
+	    libspectrum_snap_set_slt_length( snap, j, 0 );
+	  }
 	ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_to" );
 	return 1;
+
       }
 
-      memcpy( snap->slt[i], slt[i], slt_length[i] );
+      memcpy( buffer, slt[i], slt_length[i] );
+      libspectrum_snap_set_slt( snap, i, buffer );
     }
   }
 
   if( slt_screen ) {
-    snap->slt_screen =
-      (libspectrum_byte*)malloc( 6912 * sizeof( libspectrum_byte ) );
-    if( snap->slt_screen == NULL ) {
+ 
+    libspectrum_byte *buffer;
+
+    buffer = malloc( 6912 * sizeof( libspectrum_byte ) );
+
+    if( !buffer ) {
+
       for( i=0; i<8; i++ )
-	if( snap->pages[i] ) { free( snap->pages[i] ); snap->pages[i] = NULL; }
+	if( libspectrum_snap_pages( snap, i ) ) {
+	  free( libspectrum_snap_pages( snap, i ) );
+	  libspectrum_snap_set_pages( snap, i, NULL );
+	}
       for( i=0; i<256; i++ )
-	if( snap->slt[i] ) { free( snap->slt[i] ); snap->slt_length[i] = 0; }
+	if( libspectrum_snap_slt( snap, i ) ) {
+	  free( libspectrum_snap_slt( snap, i ) );
+	  libspectrum_snap_set_slt_length( snap, i, 0 );
+	}
       ui_error( UI_ERROR_ERROR, "Out of memory in snapshot_copy_to" );
       return 1;
+
     }
 
-    memcpy( snap->slt_screen, slt_screen, 6912 );
-    snap->slt_screen_level = slt_screen_level;
+    memcpy( buffer, slt_screen, 6912 );
+    libspectrum_snap_set_slt_screen( snap, buffer );
+    libspectrum_snap_set_slt_screen_level( snap, slt_screen_level );
   }
     
   return 0;
