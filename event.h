@@ -40,7 +40,7 @@ typedef struct event_t {
 } event_t;
 
 /* The various types of event which can occur */
-enum event_types {
+typedef enum event_type {
 
   EVENT_TYPE_EDGE,
   EVENT_TYPE_FRAME,
@@ -51,7 +51,7 @@ enum event_types {
   EVENT_TYPE_TRDOS_CMD_DONE,
   EVENT_TYPE_TRDOS_INDEX,
 
-};
+} event_type;
 
 /* A large value to mean `no events due' */
 extern const libspectrum_dword event_no_events;
@@ -63,7 +63,7 @@ extern libspectrum_dword event_next_event;
 int event_init(void);
 
 /* Add an event at the correct place in the event list */
-int event_add( libspectrum_dword event_time, int type );
+int event_add( libspectrum_dword event_time, event_type type );
 
 /* Do all events which have passed */
 int event_do_events(void);
@@ -72,7 +72,7 @@ int event_do_events(void);
 int event_frame( libspectrum_dword tstates_per_frame );
 
 /* Remove all events of a specific type from the stack */
-int event_remove_type( int type );
+int event_remove_type( event_type type );
 
 /* Clear the event stack */
 int event_reset(void);
@@ -82,7 +82,7 @@ int event_foreach( void (*function)( gpointer data, gpointer user_data ),
 		   gpointer user_data );
 
 /* A textual representation of each event type */
-const char *event_name( int type );
+const char *event_name( event_type type );
 
 /* Called on exit to clean up */
 int event_end(void);

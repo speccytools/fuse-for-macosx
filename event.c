@@ -78,7 +78,7 @@ int event_init(void)
 
 /* Add an event at the correct place in the event list */
 int
-event_add( libspectrum_dword event_time, int type )
+event_add( libspectrum_dword event_time, event_type type )
 {
   event_t *ptr;
 
@@ -190,7 +190,8 @@ void event_reduce_tstates(gpointer data,gpointer user_data)
 }
 
 /* Remove all events of a specific type from the stack */
-int event_remove_type( int type )
+int
+event_remove_type( event_type type )
 {
   /* FIXME: this is an ugly hack. Just set all events of the given
      type to be of a null type, meaning they do nothing */
@@ -201,7 +202,7 @@ int event_remove_type( int type )
 static void set_event_null( gpointer data, gpointer user_data )
 {
   event_t *ptr = (event_t*)data;
-  int type = *(int*)user_data;
+  event_type type = *(event_type*)user_data;
 
   if( ptr->type == type ) ptr->type = EVENT_TYPE_NULL;
 }
@@ -256,7 +257,7 @@ event_foreach( void (*function)( gpointer data, gpointer user_data),
 
 /* A textual representation of each event type */
 const char *
-event_name( int type )
+event_name( event_type type )
 {
   switch( type ) {
 

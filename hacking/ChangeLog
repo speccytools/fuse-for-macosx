@@ -380,3 +380,4 @@
 	 off.
 20031206 event.[ch], ui/gtk/debugger.c: add a 'pending events' pane to the
 	 debugger.
+20031207 event.[ch]: use the defined enum for event type variables.
