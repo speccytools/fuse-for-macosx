@@ -55,3 +55,6 @@
 
 /* Defined if Xlib UI in use */
 #undef UI_X
+
+/* Defined if we're going to be using the installed libpng */
+#undef USE_LIBPNG

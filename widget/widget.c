@@ -197,9 +197,9 @@ int widget_do( widget_type which, void *data )
   /* If we're the top-level widget, save the screen and set up the timer */
   if( ! widget_level ) {
 
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
     error = screenshot_save(); if( error ) { widget_level--; return error; }
-#endif				/* #ifdef HAVE_PNG_H */
+#endif				/* #ifdef USE_LIBPNG */
 
     error = widget_timer_init(); if( error ) { widget_level--; return error; }
   }

@@ -321,9 +321,9 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
   screenshot_screen[y][x] = colour;
-#endif			/* #ifdef HAVE_PNG_H */
+#endif			/* #ifdef USE_LIBPNG */
 
   switch(xdisplay_current_size) {
   case 1:

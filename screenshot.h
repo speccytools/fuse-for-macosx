@@ -27,13 +27,13 @@
 #ifndef FUSE_SCREENSHOT_H
 #define FUSE_SCREENSHOT_H
 
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
 
 extern BYTE screenshot_screen[240][640];
 
 int screenshot_save( void );
 int screenshot_write( const char *filename );
 
-#endif				/* #ifdef HAVE_PNG_H */
+#endif				/* #ifdef USE_LIBPNG */
 
 #endif				/* #ifndef FUSE_SCREENSHOT_H */

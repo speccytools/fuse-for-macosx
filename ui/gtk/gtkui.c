@@ -80,9 +80,9 @@ static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
 static int gtkui_open_snap( void );
 
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
 static void gtkui_save_screen( GtkWidget *widget, gpointer data );
-#endif				/* #ifdef HAVE_PNG_H */
+#endif				/* #ifdef USE_LIBPNG */
 
 static void gtkui_quit(GtkWidget *widget, gpointer data);
 
@@ -128,9 +128,9 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
   { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
 
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
   { "/File/Save S_creen...",    NULL , gtkui_save_screen,   0, NULL          },
-#endif				/* #ifdef HAVE_PNG_H */
+#endif				/* #ifdef USE_LIBPNG */
 
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
@@ -446,7 +446,7 @@ gtkui_open_snap( void )
   return error;
 }
 
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
 /* File/Save Screenshot */
 static void
 gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
@@ -465,7 +465,7 @@ gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
   fuse_emulation_unpause();
 }
-#endif				/* #ifdef HAVE_PNG_H */
+#endif				/* #ifdef USE_LIBPNG */
 
 /* Called by the menu when File/Exit selected */
 static void

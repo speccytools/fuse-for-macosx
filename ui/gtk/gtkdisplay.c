@@ -179,9 +179,9 @@ static int gtkdisplay_configure_notify( int width )
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
   screenshot_screen[y][x] = colour;
-#endif			/* #ifdef HAVE_PNG_H */
+#endif			/* #ifdef USE_LIBPNG */
 
   switch(gtkdisplay_current_size) {
   case 1:

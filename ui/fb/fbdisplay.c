@@ -197,9 +197,9 @@ fb_set_mode( void )
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
   screenshot_screen[y][x] = colour;
-#endif			/* #ifdef HAVE_PNG_H */
+#endif			/* #ifdef USE_LIBPNG */
 
   if( IF_FB_WIDTH( 320 ) ) {
     if( ( x & 1 ) == 0 )

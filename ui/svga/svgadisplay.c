@@ -156,9 +156,9 @@ static int svgadisplay_allocate_image(int width, int height)
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
   screenshot_screen[y][x] = colour;
-#endif			/* #ifdef HAVE_PNG_H */
+#endif			/* #ifdef USE_LIBPNG */
 
   if( hires ) {
     image[ x     + y * DISPLAY_SCREEN_WIDTH ] = colour;

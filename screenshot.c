@@ -34,7 +34,7 @@
 #include "types.h"
 #include "ui/ui.h"
 
-#ifdef HAVE_PNG_H
+#ifdef USE_LIBPNG
 
 #include <png.h>
 
@@ -160,4 +160,4 @@ screenshot_write( const char *filename )
   return 0;
 }
 
-#endif				/* #ifdef HAVE_PNG_H */
+#endif				/* #ifdef USE_LIBPNG */
