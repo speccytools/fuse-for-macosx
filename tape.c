@@ -1,6 +1,8 @@
 /* tape.c: tape handling routines
    Copyright (c) 1999-2001 Philip Kendall
 
+   $Id$
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -36,6 +38,7 @@
 #include "fuse.h"
 #include "libspectrum/tape.h"
 #include "settings.h"
+#include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "z80/z80.h"
@@ -57,6 +60,7 @@ int tape_init( void )
   tape.blocks = NULL;
   tape_playing = 0;
   tape_microphone = 0;
+  sound_beeper( 1, tape_microphone );
   return 0;
 }
 
@@ -345,6 +349,7 @@ int tape_play( void )
   
   tape_playing = 1;
   tape_microphone = 0;
+  sound_beeper( 1, tape_microphone );
 
   error = tape_next_edge(); if( error ) return error;
 
@@ -375,6 +380,7 @@ int tape_next_edge( void )
   /* Invert the microphone state */
   if( edge_tstates || stop_tape ) {
     tape_microphone = !tape_microphone;
+    sound_beeper( 1, tape_microphone );
   }
 
   /* And put this into the event queue */

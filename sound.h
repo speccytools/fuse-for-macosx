@@ -30,7 +30,7 @@ void sound_end(void);
 void sound_ay_write(int reg,int val,DWORD tstates);
 void sound_ay_reset(void);
 void sound_frame(void);
-void sound_beeper(int on);
+void sound_beeper(int is_tape,int on);
 
 extern int sound_enabled;
 extern int sound_freq;

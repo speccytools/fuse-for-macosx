@@ -113,7 +113,7 @@ BYTE spectrum_ula_read(WORD port)
 void spectrum_ula_write(WORD port, BYTE b)
 {
   display_set_border( b & 0x07 );
-  sound_beeper( b & 0x10 );
+  sound_beeper( 0, b & 0x10 );
 
   if( settings_current.issue2 ) {
     if( b & 0x18 ) {

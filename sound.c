@@ -74,13 +74,11 @@ static int sound_stereo_ay=0;	/* local copy of settings_current.stereo_ay */
 #define AY_CLOCK		1773400
 
 /* assume all three tone channels together match the beeper volume (ish).
- * Must be <=127 for all channels; 52+(24*3) = 124.
+ * Must be <=127 for all channels; 50+2+(24*3) = 124.
  */
-#define AMPL_BEEPER		52
+#define AMPL_BEEPER		50
+#define AMPL_TAPE		2
 #define AMPL_AY_TONE		24	/* three of these */
-
-/* full range of beeper volume */
-#define VOL_BEEPER		(AMPL_BEEPER*2)
 
 /* max. number of sub-frame AY port writes allowed;
  * given the number of port writes theoretically possible in a
@@ -94,24 +92,27 @@ static int sound_channels;
 
 static unsigned char ay_tone_levels[16];
 
-static unsigned char *sound_buf;
-static unsigned char *sound_ptr;
-static int sound_oldpos,sound_fillpos,sound_oldval,sound_oldval_orig;
+static unsigned char *sound_buf,*tape_buf;
+
+/* beeper stuff */
+static int sound_oldpos[2],sound_fillpos[2];
+static int sound_oldval[2],sound_oldval_orig[2];
 
 /* timer used for fadeout after beeper-toggle;
  * fixed-point with low 24 bits as fractional part.
  */
-static unsigned int beeper_tick,beeper_tick_incr;
+static unsigned int beeper_tick[2],beeper_tick_incr;
 
-/* tick/incr/periods are all fixed-point with low 16 bits as
- * fractional part, except ay_env_{tick,period} which count as the chip does.
+/* foo_subcycles are fixed-point with low 16 bits as fractional part.
+ * The other bits count as the chip does.
  */
 static unsigned int ay_tone_tick[3],ay_tone_high[3],ay_noise_tick;
-static unsigned int ay_env_internal_tick,ay_env_tick,ay_env_subcycles;
+static unsigned int ay_tone_subcycles,ay_env_subcycles;
+static unsigned int ay_env_internal_tick,ay_env_tick;
 static unsigned int ay_tick_incr;
 static unsigned int ay_tone_period[3],ay_noise_period,ay_env_period;
 
-static int beeper_last_subpos=0;
+static int beeper_last_subpos[2]={0,0};
 
 /* Local copy of the AY registers */
 static BYTE sound_ay_registers[15];
@@ -153,8 +154,9 @@ ay_tone_levels[0]=0;
 
 ay_noise_tick=ay_noise_period=0;
 ay_env_internal_tick=ay_env_tick=ay_env_period=0;
+ay_tone_subcycles=ay_env_subcycles=0;
 for(f=0;f<3;f++)
-  ay_tone_tick[f]=ay_tone_high[f]=0,ay_tone_period[f]=(8<<16);
+  ay_tone_tick[f]=ay_tone_high[f]=0,ay_tone_period[f]=1;
 
 ay_tick_incr=(int)(65536.*AY_CLOCK/sound_freq);
 
@@ -210,8 +212,14 @@ sound_enabled=sound_enabled_ever=1;
 sound_channels=(sound_stereo?2:1);
 sound_framesiz=sound_freq/50;
 
-if((sound_buf=malloc(sound_framesiz*sound_channels))==NULL)
+if((sound_buf=malloc(sound_framesiz*sound_channels))==NULL ||
+   (tape_buf=malloc(sound_framesiz))==NULL)
   {
+  if(sound_buf)
+    {
+    free(sound_buf);
+    sound_buf=NULL;
+    }
   sound_end();
   return;
   }
@@ -220,9 +228,8 @@ if((sound_buf=malloc(sound_framesiz*sound_channels))==NULL)
  * gets reset. The minimum we can do is the beeper
  * buffer positions, so that's here.
  */
-sound_oldpos=-1;
-sound_fillpos=0;
-sound_ptr=sound_buf;
+sound_oldpos[0]=sound_oldpos[1]=-1;
+sound_fillpos[0]=sound_fillpos[1]=0;
 
 /* this stuff should only happen on the initial call.
  * (We currently assume the new sample rate will be the
@@ -233,9 +240,12 @@ if(first_init)
   {
   first_init=0;
 
-  sound_oldval=sound_oldval_orig=128;
-  beeper_tick=0;
   beeper_tick_incr=(1<<24)/sound_freq;
+  for(f=0;f<2;f++)
+    {
+    sound_oldval[f]=sound_oldval_orig[f]=128;
+    beeper_tick[f]=0;
+    }
   
   sound_ay_init();
   }
@@ -308,20 +318,20 @@ if(pstereopos>=pstereobufsiz)
  * a fairly short routine, and it saves messing about.
  * (XXX ummm, possibly not so true any more :-))
  */
-#define AY_GET_SUBVAL(tick)	(level*2*tick/ay_tick_incr)
+#define AY_GET_SUBVAL(chan)	(level*2*ay_tone_tick[chan]/tone_count)
 
 #define AY_DO_TONE(var,chan) \
   (var)=0;								\
-  was_high=0;								\
+  is_low=0;								\
   if(level)								\
     {									\
     if(ay_tone_high[chan])						\
       (var)= (level);							\
     else								\
-      (var)=-(level),was_high=1;					\
+      (var)=-(level),is_low=1;						\
     }									\
   									\
-  ay_tone_tick[chan]+=ay_tick_incr;					\
+  ay_tone_tick[chan]+=tone_count;					\
   count=0;								\
   while(ay_tone_tick[chan]>=ay_tone_period[chan])			\
     {									\
@@ -330,12 +340,12 @@ if(pstereopos>=pstereobufsiz)
     ay_tone_high[chan]=!ay_tone_high[chan];				\
     									\
     /* has to be here, unfortunately... */				\
-    if(count==1 && level && ay_tone_tick[chan]<ay_tone_period[chan])	\
+    if(count==1 && level && ay_tone_tick[chan]<tone_count)		\
       {									\
-      if(was_high)							\
-        (var)+=AY_GET_SUBVAL(ay_tone_tick[chan]);			\
+      if(is_low)							\
+        (var)+=AY_GET_SUBVAL(chan);					\
       else								\
-        (var)-=AY_GET_SUBVAL(ay_tone_tick[chan]);			\
+        (var)-=AY_GET_SUBVAL(chan);					\
       }									\
     }									\
   									\
@@ -378,13 +388,14 @@ static int noise_toggle=0;
 static int env_first=1,env_rev=0,env_counter=15;
 int tone_level[3];
 int mixer,envshape;
-int f,g,level,tmp,count;
+int f,g,level,count;
 unsigned char *ptr;
 struct ay_change_tag *change_ptr=ay_change;
 int changes_left=ay_change_count;
 int reg,r;
-int was_high;
+int is_low;
 int chan1,chan2,chan3;
+unsigned int tone_count,noise_count;
 
 /* If no AY chip, don't produce any AY sound (!) */
 if(!machine_current->ay.present) return;
@@ -412,19 +423,20 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
       case 0: case 1: case 2: case 3: case 4: case 5:
         r=reg>>1;
         /* a zero-len period is the same as 1 */
-        tmp=(sound_ay_registers[reg&~1]|(sound_ay_registers[reg|1]&15)<<8);
-        if(!tmp) tmp++;
-        ay_tone_period[r]=(8*tmp)<<16;
+        ay_tone_period[r]=(sound_ay_registers[reg&~1]|
+                           (sound_ay_registers[reg|1]&15)<<8);
+        if(!ay_tone_period[r])
+          ay_tone_period[r]++;
 
         /* important to get this right, otherwise e.g. Ghouls 'n' Ghosts
          * has really scratchy, horrible-sounding vibrato.
          */
-        if(ay_tone_tick[r]>=ay_tone_period[r])
-          ay_tone_tick[r]%=ay_tone_period[r];
+        if(ay_tone_tick[r]>=ay_tone_period[r]*2)
+          ay_tone_tick[r]%=ay_tone_period[r]*2;
         break;
       case 6:
         ay_noise_tick=0;
-        ay_noise_period=(16*(sound_ay_registers[reg]&31))<<16;
+        ay_noise_period=(sound_ay_registers[reg]&31);
         break;
       case 11: case 12:
         /* this one *isn't* fixed-point */
@@ -455,10 +467,11 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
    * Has to be a while, as this is sub-output-sample res.
    */
   ay_env_subcycles+=ay_tick_incr;
+  noise_count=0;
   while(ay_env_subcycles>=(16<<16))
     {
     ay_env_subcycles-=(16<<16);
-
+    noise_count++;
     ay_env_tick++;
     while(ay_env_tick>=ay_env_period)
       {
@@ -518,6 +531,10 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
   chan2=tone_level[1];
   chan3=tone_level[2];
   mixer=sound_ay_registers[7];
+  
+  ay_tone_subcycles+=ay_tick_incr;
+  tone_count=ay_tone_subcycles>>(3+16);
+  ay_tone_subcycles&=(8<<16)-1;
   
   if((mixer&1)==0)
     {
@@ -581,7 +598,7 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
     }
   
   /* update noise RNG/filter */
-  ay_noise_tick+=ay_tick_incr;
+  ay_noise_tick+=noise_count;
   while(ay_noise_tick>=ay_noise_period)
     {
     ay_noise_tick-=ay_noise_period;
@@ -637,6 +654,7 @@ for(f=0;f<15;f++)
   sound_ay_write(f,0,0);
 for(f=0;f<3;f++)
   ay_tone_high[f]=0;
+ay_tone_subcycles=ay_env_subcycles=0;
 }
 
 
@@ -654,18 +672,18 @@ for(f=0;f<3;f++)
  * rest position, which I'm a lot happier with. :-)
  */
 
-#define BEEPER_FADEOUT	(((1<<24)/150)/AMPL_BEEPER)
+#define BEEPER_FADEOUT	(((1<<24)/150)/ampl)
 
-#define BEEPER_OLDVAL_ADJUST \
-  beeper_tick+=beeper_tick_incr;	\
-  if(beeper_tick>=BEEPER_FADEOUT)	\
-    {					\
-    beeper_tick-=BEEPER_FADEOUT;	\
-    if(sound_oldval>128)		\
-      sound_oldval--;			\
-    else				\
-      if(sound_oldval<128)		\
-        sound_oldval++;			\
+#define BEEPER_OLDVAL_ADJUST(is_tape) \
+  beeper_tick[is_tape]+=beeper_tick_incr;	\
+  if(beeper_tick[is_tape]>=BEEPER_FADEOUT)	\
+    {						\
+    beeper_tick[is_tape]-=BEEPER_FADEOUT;	\
+    if(sound_oldval[is_tape]>128)		\
+      sound_oldval[is_tape]--;			\
+    else					\
+      if(sound_oldval[is_tape]<128)		\
+        sound_oldval[is_tape]++;		\
     }
 
 /* write stereo or mono beeper sample, and incr ptr */
@@ -686,102 +704,144 @@ for(f=0;f<3;f++)
     }						\
   while(0)
 
+/* the tape version works by writing to a separate mono buffer,
+ * which gets added after being generated.
+ */
+#define SOUND_WRITE_BUF(is_tape,ptr,val) \
+  if(is_tape)					\
+    *(ptr)++=(val);				\
+  else						\
+    SOUND_WRITE_BUF_BEEPER(ptr,val)
+
 
 void sound_frame(void)
 {
-unsigned char *ptr;
-int f;
+unsigned char *ptr,*tptr;
+int f,bchan;
+int ampl=AMPL_BEEPER;
 
 if(!sound_enabled) return;
 
-ptr=sound_buf+(sound_stereo?sound_fillpos*2:sound_fillpos);
-for(f=sound_fillpos;f<sound_framesiz;f++)
+/* fill in remaining beeper/tape sound */
+ptr=sound_buf+(sound_stereo?sound_fillpos[0]*2:sound_fillpos[0]);
+for(bchan=0;bchan<2;bchan++)
   {
-  BEEPER_OLDVAL_ADJUST;
-  SOUND_WRITE_BUF_BEEPER(ptr,sound_oldval);
+  for(f=sound_fillpos[bchan];f<sound_framesiz;f++)
+    {
+    BEEPER_OLDVAL_ADJUST(bchan);
+    SOUND_WRITE_BUF(bchan,ptr,sound_oldval[bchan]);
+    }
+
+  ptr=tape_buf+sound_fillpos[1];
+  ampl=AMPL_TAPE;
   }
 
+/* overlay tape sound */
+ptr=sound_buf;
+tptr=tape_buf;
+for(f=0;f<sound_framesiz;f++,tptr++)
+  {
+  (*ptr++)+=*tptr-128;
+  if(sound_stereo)
+    (*ptr++)+=*tptr-128;
+  }
+
+/* overlay AY sound */
 sound_ay_overlay();
 
 #if defined(HAVE_SYS_SOUNDCARD_H)
 osssound_frame(sound_buf,sound_framesiz*sound_channels);
 #endif
 
-sound_oldpos=-1;
-sound_fillpos=0;
-sound_ptr=sound_buf;
+sound_oldpos[0]=sound_oldpos[1]=-1;
+sound_fillpos[0]=sound_fillpos[1]=0;
 
 ay_change_count=0;
 }
 
 
-void sound_beeper(int on)
+/* two beepers are supported - the real beeper (call with is_tape==0)
+ * and a `fake' beeper which lets you hear when a tape is being played.
+ */
+void sound_beeper(int is_tape,int on)
 {
 unsigned char *ptr;
 int newpos,subpos;
 int val,subval;
 int f;
+int bchan=(is_tape?1:0);
+int ampl=(is_tape?AMPL_TAPE:AMPL_BEEPER);
+int vol=ampl*2;
 
 if(!sound_enabled) return;
 
-val=(on?128-AMPL_BEEPER:128+AMPL_BEEPER);
+val=(on?128-ampl:128+ampl);
 
-if(val==sound_oldval_orig) return;
+if(val==sound_oldval_orig[bchan]) return;
 
 /* XXX a lookup table might help here, but would need to regenerate it
  * whenever cycles_per_frame were changed (i.e. when machine type changed).
  */
 newpos=(tstates*sound_framesiz)/machine_current->timings.cycles_per_frame;
 /* the >>1s are to avoid overflow when int is 32-bit */
-subpos=((tstates>>1)*sound_framesiz*VOL_BEEPER)/
-       (machine_current->timings.cycles_per_frame>>1)-VOL_BEEPER*newpos;
+subpos=((tstates>>1)*sound_framesiz*vol)/
+       (machine_current->timings.cycles_per_frame>>1)-vol*newpos;
 
 /* if we already wrote here, adjust the level.
  */
-if(newpos==sound_oldpos)
+if(newpos==sound_oldpos[bchan])
   {
   /* adjust it as if the rest of the sample period were all in
    * the new state. (Often it will be, but if not, we'll fix
    * it later by doing this again.)
    */
   if(on)
-    beeper_last_subpos+=VOL_BEEPER-subpos;
+    beeper_last_subpos[bchan]+=vol-subpos;
   else
-    beeper_last_subpos-=VOL_BEEPER-subpos;
+    beeper_last_subpos[bchan]-=vol-subpos;
   }
 else
-  beeper_last_subpos=(on?VOL_BEEPER-subpos:subpos);
+  beeper_last_subpos[bchan]=(on?vol-subpos:subpos);
 
-subval=128+AMPL_BEEPER-beeper_last_subpos;
+subval=128+ampl-beeper_last_subpos[bchan];
 
 if(newpos>=0)
   {
+  int oldval=sound_oldval[bchan];
+  
   /* fill gap from previous position */
-  ptr=sound_buf+(sound_stereo?sound_fillpos*2:sound_fillpos);
-  for(f=sound_fillpos;f<newpos && f<sound_framesiz;f++)
+  if(is_tape)
+    ptr=tape_buf+sound_fillpos[1];
+  else
+    ptr=sound_buf+(sound_stereo?sound_fillpos[0]*2:sound_fillpos[0]);
+  
+  for(f=sound_fillpos[bchan];f<newpos && f<sound_framesiz;f++)
     {
-    BEEPER_OLDVAL_ADJUST;
-    SOUND_WRITE_BUF_BEEPER(ptr,sound_oldval);
+    BEEPER_OLDVAL_ADJUST(bchan);
+    SOUND_WRITE_BUF(bchan,ptr,oldval);
     }
 
   if(newpos<sound_framesiz)
     {
     /* newpos may be less than sound_fillpos, so... */
-    ptr=sound_buf+(sound_stereo?newpos*2:newpos);
+    if(is_tape)
+      ptr=tape_buf+newpos;
+    else
+      ptr=sound_buf+(sound_stereo?newpos*2:newpos);
 
     /* limit subval in case of faded beeper level,
      * to avoid slight spikes on ordinary tones.
      */
-    if((sound_oldval<128 && subval<sound_oldval) ||
-       (sound_oldval>=128 && subval>sound_oldval))
-      subval=sound_oldval;
+    if((oldval<128 && subval<oldval) ||
+       (oldval>=128 && subval>oldval))
+      subval=oldval;
 
     /* write subsample value */
-    SOUND_WRITE_BUF_BEEPER(ptr,subval);
+    SOUND_WRITE_BUF(bchan,ptr,subval);
     }
   }
 
-sound_oldpos=newpos;
-sound_fillpos=newpos+1;
-sound_oldval=sound_oldval_orig=val;
+sound_oldpos[bchan]=newpos;
+sound_fillpos[bchan]=newpos+1;
+sound_oldval[bchan]=sound_oldval_orig[bchan]=val;
 }
