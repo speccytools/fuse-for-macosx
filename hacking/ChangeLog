@@ -904,3 +904,5 @@
 	 z80/{Makefile.am,z80.[ch]}: move routines to (de)serialise
 	 each bit of the snapshot structure into their own source files.
 	 Improves encapsulation somewhat.
+20040609 slt.[ch],spectrum.[ch],z80/{coretest.c,z80.pl,z80_ops.c}:
+	 improve encapsulation of SLT data.

@@ -347,6 +347,12 @@ debugger_trap( void )
   abort();
 }
 
+int
+slt_trap( libspectrum_word address, libspectrum_byte level )
+{
+  return 0;
+}
+
 int trdos_available = 0;
 int trdos_active = 0;
 

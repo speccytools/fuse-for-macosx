@@ -35,6 +35,7 @@
 #include "periph.h"
 #include "rzx.h"
 #include "settings.h"
+#include "slt.h"
 #include "tape.h"
 #include "trdos.h"
 #include "z80.h"

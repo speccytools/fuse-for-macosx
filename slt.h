@@ -29,6 +29,8 @@
 
 #include <libspectrum.h>
 
+int slt_trap( libspectrum_word address, libspectrum_byte level );
+
 int slt_from_snapshot( libspectrum_snap *snap );
 int slt_to_snapshot( libspectrum_snap *snap );
 

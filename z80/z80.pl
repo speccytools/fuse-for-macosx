@@ -1002,16 +1002,7 @@ sub opcode_SUB (@) { arithmetic_logical( 'SUB', $_[0], $_[1] ); }
 sub opcode_XOR (@) { arithmetic_logical( 'XOR', $_[0], $_[1] ); }
 
 sub opcode_slttrap ($) {
-    print << "slttrap";
-      if( settings_current.slt_traps ) {
-	if( slt_length[A] ) {
-	  libspectrum_word base = HL;
-	  libspectrum_byte *data = slt[A];
-	  size_t length = slt_length[A];
-	  while( length-- ) writebyte( base++, *data++ );
-	}
-      }
-slttrap
+    print "      slt_trap( HL, A );\n";
 }
 
 sub opcode_shift (@) {

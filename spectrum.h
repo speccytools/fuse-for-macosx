@@ -86,14 +86,4 @@ libspectrum_byte spectrum_unattached_port( int offset );
 
 int spectrum_frame( void );
 
-/* Data from .slt files */
-
-extern size_t slt_length[256];		/* Length of data for this value of A
-					   0 => no data */
-extern libspectrum_byte *slt[256];	/* Actual data for each value of A */
-
-extern libspectrum_byte *slt_screen;	/* The screenshot from the .slt file */
-extern int slt_screen_level;		/* The level of the screenshot.
-					   Not used for anything AFAIK */
-
 #endif			/* #ifndef FUSE_SPECTRUM_H */

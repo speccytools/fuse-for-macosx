@@ -28,8 +28,39 @@
 
 #include <libspectrum.h>
 
+#include "settings.h"
+#include "slt.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+
+/* .slt level data */
+
+static libspectrum_byte *slt[256];
+static size_t slt_length[256];
+
+static libspectrum_byte *slt_screen;	/* The screenshot from the .slt file */
+static int slt_screen_level;		/* The level of the screenshot.
+					   Not used for anything AFAIK */
+
+int
+slt_trap( libspectrum_word address, libspectrum_byte level )
+{
+  size_t length;
+  libspectrum_byte *data;
+
+  if( !settings_current.slt_traps ) return 0;
+
+  if( slt_length[ level ] ) {
+    
+    length = slt_length[ level ];
+    data = slt[ level ];
+
+    while( length-- ) writebyte( address++, *data++ );
+
+  }
+
+  return 0;
+}
 
 int
 slt_from_snapshot( libspectrum_snap *snap )

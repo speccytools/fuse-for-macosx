@@ -59,15 +59,6 @@ spectrum_contention_delay_function contend_delay;
 
 libspectrum_byte spectrum_contention[ 80000 ];
 
-/* Level data from .slt files */
-
-libspectrum_byte *slt[256];
-size_t slt_length[256];
-
-libspectrum_byte *slt_screen;	/* The screenshot from the .slt file */
-int slt_screen_level;		/* The level of the screenshot.
-				   Not used for anything AFAIK */
-
 int
 spectrum_frame( void )
 {
