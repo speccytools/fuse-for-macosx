@@ -1,5 +1,5 @@
 /* svgajoystick.c: Joystick emulation (using svgalib)
-   Copyright (c) 2003 Darren Salt
+   Copyright (c) 2003-4 Darren Salt
 
    $Id$
 
@@ -53,22 +53,27 @@
 #include "machine.h"
 #include "ui/ui.h"
 
+static int sticks = 0;
+static int buttons[2];
+
 static int
 init_stick( int which )
 {
-  if( !joystick_init( which, JOY_CALIB_STDOUT ) )
-  {
+  if( !joystick_init( which, JOY_CALIB_STDOUT ) ) {
     ui_error( UI_ERROR_ERROR, "failed to initialise joystick %i: %s",
 	      which + 1, errno ? strerror (errno) : "not configured?" );
     return 1;
   }
 
-  if( joystick_getnumaxes( which ) < 2 || joystick_getnumbuttons( which ) < 1 )
-  {
+  if( joystick_getnumaxes( which ) < 2    ||
+      joystick_getnumbuttons( which ) < 1    ) {
     joystick_close( which );
     ui_error( UI_ERROR_ERROR, "sorry, joystick %i is inadequate!", which + 1 );
     return 1;
   }
+
+  buttons[which] = joystick_getnumbuttons( which );
+  if( buttons[which] > 10 ) buttons[which] = 10;
 
   return 0;
 }
@@ -77,9 +82,15 @@ int
 ui_joystick_init( void )
 {
   /* If we can't init the first, don't try the second */
-  if( init_stick( 0 ) ) return 0;
-  if( init_stick( 1 ) ) return 1;
-  return 2;
+  if( init_stick( 0 ) ) {
+    sticks = 0;
+  } else if( init_stick( 1 ) ) {
+    sticks = 1;
+  } else {
+    sticks = 2;
+  }
+
+  return sticks;
 }
 
 void
@@ -88,26 +99,54 @@ ui_joystick_end( void )
   joystick_close( -1 );
 }
 
-libspectrum_byte
-ui_joystick_read( libspectrum_word port, libspectrum_byte which )
+static void
+do_axis( int which, int position, input_joystick_button negative,
+	 input_joystick_button positive )
 {
-  libspectrum_byte ret = 0;
-  int x, y;
+  input_event_t event1, event2;
+
+  event1.types.joystick.which = event2.types.joystick.which = which;
+
+  event1.types.joystick.button = positive;
+  event2.types.joystick.button = negative;
+
+  event1.type = position > 0 ? INPUT_EVENT_JOYSTICK_PRESS :
+                               INPUT_EVENT_JOYSTICK_RELEASE;
+  event2.type = position < 0 ? INPUT_EVENT_JOYSTICK_PRESS :
+                               INPUT_EVENT_JOYSTICK_RELEASE;
+
+  input_event( &event1 );
+  input_event( &event2 );
+}
+
+static void
+do_buttons( int which )
+{
+  input_event_t event;
+  int i;
+
+  event.types.joystick.which = which;
+  for( i = 0; i < buttons[which]; i++ ) {
+    event.type = joystick_getbutton( which, i )
+               ? INPUT_EVENT_JOYSTICK_PRESS
+               : INPUT_EVENT_JOYSTICK_RELEASE;
+    event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + i;
+    input_event( &event );
+  }
+}
+
+void
+ui_joystick_poll( void )
+{
+  int i;
 
   joystick_update();
 
-  x = joystick_x( which );
-  y = joystick_y( which );
-
-       if( x > 0 ) ret |= 1; /* right */
-  else if( x < 0 ) ret |= 2; /* left */
-
-       if( y > 0 ) ret |= 4; /* down */
-  else if( y < 0 ) ret |= 8; /* up */
-
-  if( joystick_button1( which ) ) ret |= 16; /* fire */
-
-  return ret;
+  for( i = 0; i < sticks; i++ ) {
+    do_axis( i, joystick_x( i ), INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
+    do_axis( i, joystick_y( i ), INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
+    do_buttons( i );
+  }
 }
 
 #endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
