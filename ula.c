@@ -80,6 +80,7 @@ ula_from_snapshot( libspectrum_snap *snap )
 {
   ula_write( 0x00fe, libspectrum_snap_out_ula( snap ) );
   tstates = libspectrum_snap_tstates( snap );
+  settings_current.issue2 = libspectrum_snap_issue2( snap );
 
   return 0;
 }
@@ -89,6 +90,7 @@ ula_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_snap_set_out_ula( snap, last_byte );
   libspectrum_snap_set_tstates( snap, tstates );
+  libspectrum_snap_set_issue2( snap, settings_current.issue2 );
 
   return 0;
 }  

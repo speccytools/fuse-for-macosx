@@ -1026,3 +1026,4 @@
 	 creation code. Add GTK+ 2.x stock buttons (Darren).
 20040721 ui/fb/fbkeyboard.c: restore old keyboard mode on exit.
 20040721 ui/gtk/pixmaps.c: #include <config.h>
+20040721 ula.c: Add issue 2 keyboard snapshot support.
