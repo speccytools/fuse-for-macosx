@@ -150,7 +150,11 @@ int widget_menu_rzx_playback( void *data )
 
   widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
 
-  return rzx_start_playback( widget_filesel_name, widget_load_snapshot );
+  if( widget_filesel_name ) {
+    return rzx_start_playback( widget_filesel_name, widget_load_snapshot );
+  } else {
+    return 0;
+  }
 }
 
 static int widget_load_snapshot( void )
