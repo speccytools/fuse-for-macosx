@@ -318,7 +318,7 @@ int tape_save_trap( void )
 
   libspectrum_byte parity;
 
-  int i;
+  int i; libspectrum_error error;
 
   /* Do nothing if tape traps aren't active */
   if( ! settings_current.tape_traps ) return 2;
@@ -361,15 +361,8 @@ int tape_save_trap( void )
   rom_block->pause = 1000;
 
   /* Add the block to the current tape file */
-  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
-
-  /* If we previously didn't have a tape loaded ( implied by
-     tape->current_block == NULL ), set up so that we point to the
-     start of the tape */
-  if( !tape->current_block ) {
-    tape->current_block = tape->blocks;
-    libspectrum_tape_init_block((libspectrum_tape_block*)tape->blocks->data);
-  }
+  error = libspectrum_tape_append_block( tape, block );
+  if( error ) return error;
 
   /* And then return via the RET at #053E */
   PC = 0x053e;
