@@ -49,6 +49,7 @@ HEX	[0-9a-fA-F]
 b|br|bre|brea|break { return BREAK; }
 c|co|con|cont|contin|continu|continue { return CONTINUE; }
 n|ne|nex|next { return NEXT; }
+sh|sho|show { return SHOW; }
 s|st|ste|step { return STEP; }
 
 ${HEX}+		{ yylval = strtol( yytext+1, NULL, 16 ); return NUMBER; }

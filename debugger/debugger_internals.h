@@ -30,6 +30,8 @@
 /* Add a breakpoint */
 int debugger_breakpoint_add( WORD pc, enum debugger_breakpoint_type type );
 
+int debugger_breakpoint_show( void );
+
 /* Callback used by the flex parser to get input */
 int debugger_command_input( char *buf, int *result, int max_size );
 

@@ -41,6 +41,7 @@ enum debugger_mode_t debugger_mode;
 GSList *debugger_breakpoints;
 
 static void free_breakpoint( gpointer data, gpointer user_data );
+static void show_breakpoint( gpointer data, gpointer user_data );
 
 int
 debugger_init( void )
@@ -168,3 +169,28 @@ debugger_breakpoint_add( WORD pc, debugger_breakpoint_type type )
 
   return 0;
 }
+
+/* Show all breakpoints */
+int
+debugger_breakpoint_show( void )
+{
+  size_t index = 0;
+
+  printf( "Current breakpoints:\n" );
+
+  g_slist_foreach( debugger_breakpoints, show_breakpoint, &index );
+
+  return 0;
+}
+
+static void
+show_breakpoint( gpointer data, gpointer user_data )
+{
+  debugger_breakpoint *bp = data;
+  size_t *index = user_data;
+
+  printf( "%d: 0x%04x %d\n", *index, bp->pc, bp->type );
+
+  (*index)++;
+}
+
