@@ -480,7 +480,7 @@ gtkui_rzx_start_snap( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
     free( snap ); free( recording ); fuse_emulation_unpause(); return;
   }
 
-  rzx_start_recording( recording, 0 );
+  rzx_start_recording( recording, settings_current.embed_snapshot );
 
   free( recording );
 

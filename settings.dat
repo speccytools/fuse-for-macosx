@@ -55,6 +55,7 @@ stereo_beeper, boolean, 0,, beeper-stereo
 rzx_compression, boolean, 0,, compress-rzx
 competition_mode, boolean, 0
 competition_code, numeric, 0
+embed_snapshot, boolean, 1
 
 snapshot, string, NULL, 's'
 tape_file, string, NULL, 't', tape, tapefile

@@ -40,6 +40,7 @@
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
@@ -185,7 +186,7 @@ widget_menu_rzx_recording_snap( void *data GCC_UNUSED )
     return error;
   }
 
-  return rzx_start_recording( "record.rzx", 0 );
+  return rzx_start_recording( "record.rzx", settings_current.embed_snapshot );
 }
 
 /* File/Recording/Play */

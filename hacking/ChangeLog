@@ -256,3 +256,6 @@
 20031008 ui/svga/svgakeyboard.c: F3 should open all files, not just
 	 snapshots.
 20031009 fuse.c: make the --record option record rather than playback.
+20031009 fuse.c, settings.dat, ui/options.dat, ui/gtk/gtkui.c,
+	 widget/menu.c: add option as to whether to embed snapshot when
+	 creating RZX files from a given snapshot.
