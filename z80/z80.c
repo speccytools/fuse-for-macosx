@@ -128,13 +128,13 @@ z80_interrupt( void )
     R++; rzx_instructions_offset--;
 
     switch(IM) {
-      case 0: PC = 0x0038; tstates+=12; break;
-      case 1: PC = 0x0038; tstates+=13; break;
+      case 0: PC = 0x0038; tstates += 6; break;
+      case 1: PC = 0x0038; tstates += 7; break;
       case 2: 
 	{
 	  libspectrum_word inttemp=(0x100*I)+0xff;
 	  PCL = readbyte(inttemp++); PCH = readbyte(inttemp);
-	  tstates+=19;
+	  tstates += 7;
 	  break;
 	}
       default:

@@ -783,3 +783,4 @@
 20040430 z80/z80.pl,z80/tests/{dde3.out,e3.out,fde3.out}; improved
 	 contended memory timings for EX (SP),HL, EX (SP),IX and EX
 	 (SP),IY (thanks, Mark Woodmass and Jonathan Needle).
+20040505 z80.c: fix times for interrupt acknowledgement.
