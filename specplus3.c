@@ -325,7 +325,9 @@ specplus3_memoryport_write( libspectrum_word port GCC_UNUSED,
   if( libspectrum_machine_capabilities( machine_current->machine ) &&
       LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) {
     fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
-    ui_statusbar_disk( b & 0x08 );
+    ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
+			 b & 0x08 ? UI_STATUSBAR_STATE_ACTIVE :
+				    UI_STATUSBAR_STATE_INACTIVE );
   }
 #endif			/* #ifdef HAVE_765_H */
 

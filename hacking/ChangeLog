@@ -227,3 +227,5 @@
 	 gtkinternals.h.
 20031004 specplus3.c, ui/ui.h, ui/gtk: add disk motor indicator to the
 	 status bar.
+20031005 specplus3.c, tape.c, ui/ui.h, ui/gtk: better encapsulation of the
+	 status bar routines.

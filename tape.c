@@ -484,7 +484,7 @@ int tape_play( void )
   tape_microphone = 0;
 
   /* Update the status bar */
-  ui_statusbar_tape( 1 );
+  ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_ACTIVE );
 
   /* Timex machines have no loading noise */
   if( ( !( machine_current->timex ) ) && settings_current.sound_load )
@@ -507,7 +507,7 @@ int tape_toggle_play( void )
 int tape_stop( void )
 {
   tape_playing = 0;
-  ui_statusbar_tape( 0 );
+  ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
   return 0;
 }
 

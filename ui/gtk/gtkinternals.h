@@ -55,11 +55,7 @@ int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
  * Statusbar routines (statusbar.c)
  */
 
-/* Is the disk motor running? */
-extern GtkWidget *gtkstatusbar_disk;
-
-/* Is the tape running? */
-extern GtkWidget *gtkstatusbar_tape;
+int gtkstatusbar_create( GtkBox *parent );
 
 /*
  * General user interface routines (gtkui.c)

@@ -1,5 +1,5 @@
 /* statusbar.c: routines for updating the status bar
-   Copyright (c) 2003 Philip Kendall, Russell Marks
+   Copyright (c) 2003 Philip Kendall
 
    $Id$
 
@@ -31,27 +31,53 @@
 #include <gtk/gtk.h>
 
 #include "gtkinternals.h"
+#include "ui/ui.h"
 
 /* Is the disk motor running? */
-GtkWidget *gtkstatusbar_disk;
+GtkWidget *disk_status;
 
 /* Is the tape running? */
-GtkWidget *gtkstatusbar_tape;
+GtkWidget *tape_status;
 
 int
-ui_statusbar_disk( int running )
+gtkstatusbar_create( GtkBox *parent )
 {
-  gtk_label_set( GTK_LABEL( gtkstatusbar_disk ),
-		 running ? "Disk: 1" : "Disk: 0" );
+  GtkWidget *status_bar;
+
+  status_bar = gtk_hbox_new( FALSE, 3 );
+  gtk_box_pack_start_defaults( parent, status_bar );
+
+  disk_status = gtk_label_new( "Disk: 0" );
+  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), disk_status );
+
+  tape_status = gtk_label_new( "Tape: 0" );
+  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), tape_status );
+
   return 0;
 }
 
 int
-ui_statusbar_tape( int running )
+ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 {
-  gtk_label_set( GTK_LABEL( gtkstatusbar_tape ),
-		 running ? "Tape: 1" : "Tape: 0" );
-  return 0;
+  switch( item ) {
+
+  case UI_STATUSBAR_ITEM_DISK:
+    gtk_label_set( GTK_LABEL( disk_status ),
+		   state == UI_STATUSBAR_STATE_ACTIVE ? "Disk: 1" : "Disk: 0"
+		 );
+    return 0;
+
+  case UI_STATUSBAR_ITEM_TAPE:
+    gtk_label_set( GTK_LABEL( tape_status ),
+		   state == UI_STATUSBAR_STATE_ACTIVE ? "Tape: 1" : "Tape: 0"
+		 );
+    return 0;
+
+  }
+
+  ui_error( UI_ERROR_ERROR, "Attempt to update unknown statusbar item %d",
+	    item );
+  return 1;
 }
 
 #endif			/* #ifdef UI_GTK */

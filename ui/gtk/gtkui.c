@@ -238,7 +238,7 @@ static guint gtkui_menu_data_size =
 int
 ui_init( int *argc, char ***argv )
 {
-  GtkWidget *box, *menu_bar, *status_bar;
+  GtkWidget *box, *menu_bar;
   GtkAccelGroup *accel_group;
   GdkGeometry geometry;
   GdkWindowHints hints;
@@ -293,15 +293,7 @@ ui_init( int *argc, char ***argv )
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, FALSE, FALSE, 0 );
 
   /* Create the statusbar */
-
-  status_bar = gtk_hbox_new( FALSE, 3 );
-  gtk_box_pack_start_defaults( GTK_BOX( box ), status_bar );
-
-  gtkstatusbar_disk = gtk_label_new( "Disk: 0" );
-  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), gtkstatusbar_disk );
-
-  gtkstatusbar_tape = gtk_label_new( "Tape: 0" );
-  gtk_box_pack_start_defaults( GTK_BOX( status_bar ), gtkstatusbar_tape );
+  gtkstatusbar_create( GTK_BOX( box ) );
 
   hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
           GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;

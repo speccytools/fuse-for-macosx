@@ -84,7 +84,21 @@ int ui_menu_activate_recording( int recording );
 int ui_menu_activate_ay_logging( int recording );
 
 /* Functions to update the statusbar */
-int ui_statusbar_tape( int running );
-int ui_statusbar_disk( int running );
+
+typedef enum ui_statusbar_item {
+
+  UI_STATUSBAR_ITEM_DISK,
+  UI_STATUSBAR_ITEM_TAPE,
+
+} ui_statusbar_item;
+
+typedef enum ui_statusbar_state {
+
+  UI_STATUSBAR_STATE_INACTIVE,
+  UI_STATUSBAR_STATE_ACTIVE,
+
+} ui_statusbar_state;
+
+int ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state );
 
 #endif			/* #ifndef FUSE_UI_H */
