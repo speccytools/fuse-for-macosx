@@ -82,6 +82,9 @@ int svgakeyboard_keypress(int keysym)
     return 0;
   }
 
+  if(widget_active)
+    return 0;
+
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
   case SCANCODE_F2:

@@ -169,6 +169,15 @@ int f,ret;
 return;
 #endif
 
+if(sound_enabled)
+  {
+  fprintf(stderr,
+          "%s: sound_init() called with sound_enabled set, can't happen!\n",
+          fuse_progname);
+  sound_end();
+  return;
+  }
+
 #if defined(HAVE_SYS_SOUNDCARD_H)
 ret=osssound_init(&sound_freq,&sound_stereo);
 #endif

@@ -63,6 +63,9 @@ int xkeyboard_keypress(XKeyEvent *event)
     return 0;
   }
 
+  if(widget_active)
+    return 0;
+
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
   case XK_F2:
