@@ -61,6 +61,9 @@ int rzx_start_recording( const char *filename, int embed_snapshot );
 int rzx_stop_recording( void );
 
 int rzx_start_playback( const char *filename, int (*load_snap)(void) );
+int
+rzx_start_playback_from_buffer( const unsigned char *buffer, size_t length );
+
 int rzx_stop_playback( int add_interrupt );
 
 int rzx_frame( void );

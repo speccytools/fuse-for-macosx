@@ -34,6 +34,9 @@
 int tape_init( void );
 
 int tape_open( const char *filename );
+int tape_open_tap_buffer( unsigned char *buffer, size_t length );
+int tape_open_tzx_buffer( unsigned char *buffer, size_t length );
+
 int tape_close( void );
 int tape_select_block( size_t n );
 int tape_get_current_block( void );

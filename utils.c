@@ -141,4 +141,80 @@ int utils_write_file( const char *filename, const unsigned char *buffer,
   return 0;
 }
 
+/* Make a 'best guess' as to what sort of file this is */
+int
+utils_identify_file( int *type, const char *filename,
+		     const unsigned char *buffer, size_t length )
+{
+  struct type {
 
+    int type;
+
+    char *extension;
+
+    char *signature; size_t offset, length;
+
+    int score;
+
+  };
+
+  struct type *ptr,
+    types[] = {
+      
+      { UTILS_TYPE_UNKNOWN,       NULL,  NULL,       0, 0, 0 },
+
+      { UTILS_TYPE_RECORDING_RZX, "rzx", "RZX!",     0, 4, 0 },
+
+      { UTILS_TYPE_SNAPSHOT_SNA,  "sna", NULL,       0, 0, 0 },
+      { UTILS_TYPE_SNAPSHOT_Z80,  "z80", "\0\0",     6, 2, 0 },
+
+      { UTILS_TYPE_TAPE_TAP,      "tap", "\x13\0\0", 0, 3, 0 },
+      { UTILS_TYPE_TAPE_TZX,      "tzx", "ZXTape!",  0, 7, 0 },
+
+      { -1, NULL, NULL, 0, 0, 0 }, /* End marker */
+
+    };
+
+  const char *extension;
+  int best_guess, best_score, duplicate_best;
+
+  /* Get the filename extension, if it exists */
+  extension = strrchr( filename, '.' ); if( extension ) extension++;
+
+  /* Compare against known extensions and signatures */
+  for( ptr = types; ptr->type != -1; ptr++ ) {
+
+    if( extension && ptr->extension &&
+	!strcasecmp( extension, ptr->extension ) )
+      ptr->score++;
+
+    if( ptr->signature && length >= ptr->offset + ptr->length &&
+	!memcmp( &buffer[ ptr->offset ], ptr->signature, ptr->length ) )
+      ptr->score += 2;
+
+  }
+
+  best_guess = UTILS_TYPE_UNKNOWN;
+  best_score = 0;
+  duplicate_best = 0;
+
+  /* See what the best match was */
+  for( ptr = types; ptr->type != -1; ptr++ ) {
+
+    if( ptr->score > best_score ) {
+      best_guess = ptr->type; best_score = ptr->score; duplicate_best = 0;
+    } else if( ptr->score == best_score ) {
+      duplicate_best = 1;
+    }
+  }
+
+  /* If two things were equally good, we can't identify this. Otherwise,
+     return our best guess */
+  if( duplicate_best ) {
+    *type = UTILS_TYPE_UNKNOWN;
+  } else {
+    *type = best_guess;
+  }
+
+  return 0;
+}

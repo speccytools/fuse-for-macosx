@@ -76,21 +76,15 @@ int snapshot_read( const char *filename )
   case SNAPSHOT_TYPE_SNA:
 
     snapshot_flush_slt();
-    error = libspectrum_sna_read( snap, buffer, length );
-    if( error != LIBSPECTRUM_ERROR_NONE ) {
-      munmap( buffer, length );
-      return 1;
-    }
+    error = snapshot_open_sna_buffer( buffer, length );
+    if( error ) { munmap( buffer, length ); return 1; }
     break;
 
   case SNAPSHOT_TYPE_Z80:
 
     snapshot_flush_slt();
-    error = libspectrum_z80_read( snap, buffer, length );
-    if( error != LIBSPECTRUM_ERROR_NONE ) {
-      munmap( buffer, length );
-      return 1;
-    }
+    error = snapshot_open_z80_buffer( buffer, length );
+    if( error ) { munmap( buffer, length ); return 1; }
     break;
 
   default:
@@ -136,6 +130,42 @@ void snapshot_flush_slt (void)
     slt_length[i] = 0;
   }
   slt_screen = NULL;
+}
+
+int
+snapshot_open_sna_buffer( const unsigned char *buffer, size_t length )
+{
+  libspectrum_snap *snap; int error;
+
+  error = libspectrum_snap_alloc( &snap ); if( error ) return error;
+
+  error = libspectrum_sna_read( snap, buffer, length );
+  if( error ) { libspectrum_snap_free( snap ); return error; }
+
+  error = snapshot_copy_from( snap );
+  if( error ) { libspectrum_snap_free( snap ); return error; }
+
+  error = libspectrum_snap_free( snap ); if( error ) return error;
+
+  return 0;
+}
+
+int
+snapshot_open_z80_buffer( const unsigned char *buffer, size_t length )
+{
+  libspectrum_snap *snap; int error;
+
+  error = libspectrum_snap_alloc( &snap ); if( error ) return error;
+
+  error = libspectrum_z80_read( snap, buffer, length );
+  if( error ) { libspectrum_snap_free( snap ); return error; }
+
+  error = snapshot_copy_from( snap );
+  if( error ) { libspectrum_snap_free( snap ); return error; }
+
+  error = libspectrum_snap_free( snap ); if( error ) return error;
+
+  return 0;
 }
 
 int snapshot_copy_from( libspectrum_snap *snap )

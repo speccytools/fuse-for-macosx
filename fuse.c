@@ -26,8 +26,11 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
+#include <sys/mman.h>
 
 #include "display.h"
 #include "event.h"
@@ -43,6 +46,7 @@
 #include "tape.h"
 #include "timer.h"
 #include "ui/ui.h"
+#include "utils.h"
 #include "widget/widget.h"
 #include "z80/z80.h"
 
@@ -66,6 +70,8 @@ static int fuse_init(int argc, char **argv);
 static void fuse_show_copyright(void);
 static void fuse_show_version( void );
 static void fuse_show_help( void );
+
+static int parse_nonoption_args( int argc, char **argv, int first_arg );
 
 static int fuse_end(void);
 
@@ -92,12 +98,12 @@ int main(int argc,char **argv)
 
 static int fuse_init(int argc, char **argv)
 {
-  int error;
+  int error, first_arg;
 
   fuse_progname=argv[0];
   libspectrum_error_function = ui_libspectrum_error;
   
-  if( settings_init( argc, argv ) ) return 1;
+  if( settings_init( &first_arg, argc, argv ) ) return 1;
 
   if( settings_current.show_version ) {
     fuse_show_version();
@@ -152,6 +158,8 @@ static int fuse_init(int argc, char **argv)
   } else if( settings_current.record_file ) {
     rzx_start_recording( settings_current.record_file, 1 );
   }
+
+  if( parse_nonoption_args( argc, argv, first_arg ) ) return 1;
 
   fuse_emulation_paused = 0;
 
@@ -246,6 +254,70 @@ int fuse_emulation_unpause(void)
   else if( fuse_sound_in_use ) {
     timer_init();
     fuse_sound_in_use = 0;
+  }
+
+  return 0;
+}
+
+/* Make 'best guesses' as to what to do with non-option arguments */
+static int
+parse_nonoption_args( int argc, char **argv, int first_arg )
+{
+  unsigned char *buffer; size_t length; int type;
+  int error = 0;
+
+  while( first_arg < argc ) {
+
+    if( utils_read_file( argv[ first_arg ], &buffer, &length ) ) return 1;
+
+    if( utils_identify_file( &type, argv[ first_arg ], buffer, length ) ) {
+      munmap( buffer, length );
+      return 1;
+    }
+
+    switch( type ) {
+
+    case UTILS_TYPE_UNKNOWN:
+      fprintf( stderr, "%s: couldn't identify `%s'\n", fuse_progname,
+	       argv[ first_arg ] );
+      munmap( buffer, length );
+      return 1;
+
+    case UTILS_TYPE_RECORDING_RZX:
+      error = rzx_start_playback_from_buffer( buffer, length );
+      break;
+
+    case UTILS_TYPE_SNAPSHOT_SNA:
+      error = snapshot_open_sna_buffer( buffer, length );
+      break;
+
+    case UTILS_TYPE_SNAPSHOT_Z80:
+      error = snapshot_open_z80_buffer( buffer, length );
+      break;
+
+    case UTILS_TYPE_TAPE_TAP:
+      error = tape_open_tap_buffer( buffer, length );
+      break;
+
+    case UTILS_TYPE_TAPE_TZX:
+      error = tape_open_tzx_buffer( buffer, length );
+      break;
+
+    default:
+      fprintf( stderr, "%s: parse_nonoption_args: unknown type %d!\n",
+	       fuse_progname, type );
+      fuse_abort();
+    }
+
+    if( error ) { munmap( buffer, length ); return 1; }
+
+    if( munmap( buffer, length ) ) {
+      fprintf( stderr, "%s: parse_nonoption_args: couldn't munmap `%s': %s\n",
+	       fuse_progname, argv[ first_arg ], strerror( errno ) );
+      return 1;
+    }
+
+    first_arg++;
   }
 
   return 0;

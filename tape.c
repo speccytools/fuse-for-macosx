@@ -110,7 +110,6 @@ int tape_open( const char *filename )
   libspectrum_error_function = old_error_fn;
 
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    tape_close();
     munmap( buffer, length );
     return error;
   }
@@ -127,6 +126,32 @@ int tape_open( const char *filename )
 
   return 0;
 
+}
+
+/* Use an already open .tap file as the current tape */
+int
+tape_open_tap_buffer( unsigned char *buffer, size_t length )
+{
+  int error;
+
+  if( libspectrum_tape_present( tape ) ) {
+    error = tape_close(); if( error ) return error;
+  }
+
+  return libspectrum_tap_read( tape, buffer, length );
+}
+
+/* Use an already open .tzx file as the current tape */
+int
+tape_open_tzx_buffer( unsigned char *buffer, size_t length )
+{
+  int error;
+
+  if( libspectrum_tape_present( tape ) ) {
+    error = tape_close(); if( error ) return error;
+  }
+
+  return libspectrum_tzx_read( tape, buffer, length );
 }
 
 /* Close the active tape file */
