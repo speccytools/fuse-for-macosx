@@ -1,0 +1,52 @@
+# settings.dat: configuration options for Fuse
+# Copyright (c) 2002 Philip Kendall
+
+# $Id$
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+# Author contact information:
+
+# E-mail: pak21-fuse@srcf.ucam.org
+# Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+# Format is
+
+# <name in settings_info structure>,
+# <type>,
+# <short option>,
+# <name on command line>, (defaults to <settings_info name> =~ s/_/-/g)
+# <name in config file>, (defaults to <command line> =~ s/-//g)
+
+issue2, boolean
+joy_kempston, boolean,, kempston
+tape_traps, boolean,, traps, tapetraps
+slt_traps, boolean,, slt, slttraps
+
+sound_device, string, d
+sound, boolean
+sound_load, boolean,, loading-sound
+stereo_ay, boolean,, separation
+stereo_beeper, boolean,, beeper-stereo
+
+rzx_compression, boolean,, compress-rzx
+
+snapshot, string, s
+tape_file, string, t, tape, tapefile
+start_machine, string, m, machine
+record_file, string, r, record, recordfile
+playback_file, string, p, playback, playbackfile
+
+svga_mode, numeric, v, svgamode

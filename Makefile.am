@@ -34,6 +34,11 @@ fuse_SOURCES = ay.c display.c event.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c
 
+BUILT_SOURCES = settings.c
+
+settings.c: settings.pl settings.dat
+	@PERL@ settings.pl settings.dat > settings.c
+
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@\
@@ -47,4 +52,4 @@ noinst_HEADERS = ay.h display.h event.h\
 	sunsound.h tape.h timer.h types.h utils.h\
 	joystick.h printer.h tc2048.h scld.h
 
-EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl
+EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl
