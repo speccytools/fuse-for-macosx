@@ -166,7 +166,7 @@ fi
 AC_MSG_RESULT($smallmem)
 
 dnl If it appears we're using gcc as our compiler, turn on warnings
-if test "$ac_cv_prog_CC" = gcc; then
+if test "$ac_cv_prog_cc_g" = yes; then
     CFLAGS="$CFLAGS -Wall"
 fi
 
