@@ -1,25 +1,26 @@
 What you need to implement for Fuse's timing routines
 =====================================================
 
-Fuse's timing routines require three functions to be implemented;
-those which return values should return zero on success and non-zero
-on error.
+Fuse's timing routines require four functions to be implemented, and
+'timer_type' to be defined in timer.h as a type appropriate for the
+platform in question.
 
-* int timer_push( int msec, timer_function_type which )
+* int timer_get_real_time( timer_type *real_time )
 
-Arrange for the action specified by 'which' to occur every 'msec'
-milliseconds. 'timer_function_type' is defined in timer.h, and can
-take the following values:
+Set the implementation-dependant time structure real_time to the current
+time. Return zero on success and non-zero on error.
 
-TIMER_FUNCTION_WAKE	Wake up if sleeping.
-TIMER_FUNCTION_TICK	Wake up if sleeping and then call 'timer_tick'.
+* float timer_get_time_difference( timer_type *a, timer_type *b )
 
-* int timer_pop( void )
+Return a float representing the difference between the implementation-dependant
+time structures a and b in seconds.
 
-Stop the action specified in the last call to 'timer_push' occuring.
+* void timer_add_time_difference( timer_type *a, long msec )
 
-* void timer_pause( void )
+Add msec milliseconds to the implementation-dependant time structure a.
 
-Cause Fuse to go to sleep until the next timer action occurs.
+* void timer_sleep_ms( int ms )
+
+Cause Fuse to go to sleep for the given number of milliseconds.
 
 $Id$

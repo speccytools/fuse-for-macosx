@@ -50,6 +50,7 @@ typedef enum event_type {
   EVENT_TYPE_NULL,
   EVENT_TYPE_TRDOS_CMD_DONE,
   EVENT_TYPE_TRDOS_INDEX,
+  EVENT_TYPE_TIMER,
 
 } event_type;
 

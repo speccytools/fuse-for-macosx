@@ -1179,3 +1179,8 @@
 20050105 man/fuse.1: tweak comment about select SDL audio output type.
 20050106 man/fuse.1: more hyphen fixups for UTF-8 and an open quote
 	 (patch #1096868) (Stuart Brady).
+20050107 event.[ch],fuse.c,machine.c,sound.[ch],spectrum.c,timer.[ch],
+	 hacking/timer.txt,sound/lowlevel.h: modify timing routines to
+	 simply execute enough tstates to match the (real) elapsed time.
+	 Also allows variable frame rates (ie 60Hz for the TS2068)
+	 (rest of patch #1080531) (Fred).

@@ -33,6 +33,12 @@
 
 typedef Uint32 timer_type;
 
+#elif defined(WIN32)		/* #ifdef UI_SDL */
+
+#include <windows.h>
+
+typedef DWORD timer_type;
+
 #else				/* #ifdef UI_SDL */
 
 #include <sys/time.h>
@@ -48,8 +54,8 @@ int timer_get_real_time( timer_type *real_time );
 float timer_get_time_difference( timer_type *a, timer_type *b );
 
 int timer_init(void);
-void timer_sleep(void);
 void timer_sleep_ms( int ms );
+int timer_frame( libspectrum_dword last_tstates );
 int timer_end(void);
 
 extern float current_speed;

@@ -39,6 +39,7 @@ void sound_beeper( int is_tape, int on );
 extern int sound_enabled;
 extern int sound_enabled_ever;
 extern int sound_freq;
+extern int sound_framesiz;
 extern int sound_stereo;
 extern int sound_stereo_beeper;
 extern int sound_stereo_ay;

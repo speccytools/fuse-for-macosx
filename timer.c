@@ -31,7 +31,9 @@
 #include <unistd.h>
 
 #include "fuse.h"
+#include "event.h"
 #include "settings.h"
+#include "sound.h"
 #include "timer.h"
 #include "ui/ui.h"
 
@@ -51,19 +53,11 @@ static int frames_until_update;
 /* The number of time samples we have for estimating speed */
 static int samples;
 
-static timer_type speccy_time;
-
 float current_speed = 100.0;
 
-int
-timer_estimate_reset( void )
-{
-  int error = timer_get_real_time( &speccy_time ); if( error ) return error;
-  samples = 0;
-  next_stored_time = 0;
-  frames_until_update = 0;
-  return 0;
-}
+static timer_type start_time;
+
+static const int TEN_MS = 10;
 
 int
 timer_estimate_speed( void )
@@ -76,23 +70,18 @@ timer_estimate_speed( void )
 
   error = timer_get_real_time( &current_time ); if( error ) return error;
 
-  if( samples == 0 ) {
+  if( samples < 10 ) {
 
-    /* If we don't have any data, assume we're running at the desired
+    /* If we don't have enough data, assume we're running at the desired
        speed :-) */
     current_speed = settings_current.emulation_speed;
-
-  } else if( samples < 10 ) {
-
-    difference = timer_get_time_difference( &current_time, &stored_times[0] );
-    current_speed = 100 * ( samples / difference );
 
   } else {
 
     difference =
       timer_get_time_difference( &current_time,
 				 &stored_times[ next_stored_time ] );
-      current_speed = 100 * ( 10.0 / difference );
+    current_speed = 100 * ( 10.0 / difference );
 
   }
 
@@ -101,7 +90,9 @@ timer_estimate_speed( void )
   stored_times[ next_stored_time ] = current_time;
 
   next_stored_time = ( next_stored_time + 1 ) % 10;
-  frames_until_update = 49;
+  frames_until_update = 
+    ( machine_current->timings.processor_speed /
+    machine_current->timings.tstates_per_frame ) - 1;
 
   samples++;
 
@@ -121,13 +112,13 @@ timer_get_real_time( timer_type *real_time )
 float
 timer_get_time_difference( timer_type *a, timer_type *b )
 {
-  return ( *a - *b ) / 1000.0;
+  return ( (long)*a - (long)*b ) / 1000.0;
 }
 
 void
-timer_add_time_difference( timer_type *a, long usec )
+timer_add_time_difference( timer_type *a, long msec )
 {
-  *a += usec / 1000;
+  *a += msec;
 }
 
 void
@@ -136,7 +127,35 @@ timer_sleep_ms( int ms )
   SDL_Delay( ms );
 }
 
-#else            /* #ifdef UI_SDL */
+#elif defined(WIN32)            /* #ifdef UI_SDL */
+
+int
+timer_get_real_time( timer_type *real_time )
+{
+  *real_time = GetTickCount();
+
+  return 0;
+}
+
+float
+timer_get_time_difference( timer_type *a, timer_type *b )
+{
+  return ( (long)*a - (long)*b ) / 1000.0;
+}
+
+void
+timer_add_time_difference( timer_type *a, long msec )
+{
+  *a += msec;
+}
+
+void
+timer_sleep_ms( int ms )
+{
+  Sleep( ms );
+}
+
+#else                           /* #ifdef UI_SDL */
 
 int
 timer_get_real_time( timer_type *real_time )
@@ -159,12 +178,15 @@ timer_get_time_difference( timer_type *a, timer_type *b )
 }
 
 void
-timer_add_time_difference( timer_type *a, long usec )
+timer_add_time_difference( timer_type *a, long msec )
 {
-  a->tv_usec += usec;
+  a->tv_usec += msec * 1000;
   if( a->tv_usec >= 1000000 ) {
     a->tv_usec -= 1000000;
     a->tv_sec += 1;
+  } else if( a->tv_usec < 0 ) {
+    a->tv_usec += 1000000;
+    a->tv_sec -= 1;
   }
 }
 
@@ -176,17 +198,24 @@ timer_sleep_ms( int ms )
 
 #endif            /* #ifdef UI_SDL */
 
-/*
- * Routines for speed control; used either when sound is not in use, or
- * when the SDL sound routines are being used
- */
+int
+timer_estimate_reset( void )
+{
+  int error = timer_get_real_time( &start_time ); if( error ) return error;
+  samples = 0;
+  next_stored_time = 0;
+  frames_until_update = 0;
+
+  return 0;
+}
 
 int
 timer_init( void )
 {
-  int error;
+  int error = timer_get_real_time( &start_time ); if( error ) return error;
 
-  error = timer_get_real_time( &speccy_time ); if( error ) return error;
+  error = event_add( 0, EVENT_TYPE_TIMER );
+  if( error ) return error;
 
   return 0;
 }
@@ -194,42 +223,93 @@ timer_init( void )
 int
 timer_end( void )
 {
+  return event_remove_type( EVENT_TYPE_TIMER );
+}
+
+#ifdef UI_SDL
+
+/* Callback-style sound based timer */
+#include "sound/sfifo.h"
+
+extern sfifo_t sound_fifo;
+
+int
+timer_frame_callback_sound( libspectrum_dword last_tstates )
+{
+  for(;;) {
+
+    /* Sleep while fifo is full */
+    if( sfifo_space( &sound_fifo ) < sound_framesiz ) {
+      timer_sleep_ms( TEN_MS );
+    } else {
+      break;
+    }
+
+  }
+
+  if( event_add( last_tstates + machine_current->timings.tstates_per_frame,
+                 EVENT_TYPE_TIMER ) )
+    return 1;
+
   return 0;
 }
 
-void
-timer_sleep( void )
+#else                           /* #ifdef UI_SDL */
+
+/* Blocking socket-style sound based timer */
+int
+timer_frame_callback_sound( libspectrum_dword last_tstates )
+{
+  if( event_add( last_tstates + machine_current->timings.tstates_per_frame,
+                 EVENT_TYPE_TIMER ) )
+    return 1;
+
+  return 0;
+}
+  
+#endif                          /* #ifdef UI_SDL */
+
+int
+timer_frame( libspectrum_dword last_tstates )
 {
   int error;
   timer_type current_time;
   float difference;
-  int speed = settings_current.emulation_speed < 1 ?
-              100                                  :
-              settings_current.emulation_speed;
+  float speed = ( settings_current.emulation_speed < 1 ?
+		  100                                  :
+		  settings_current.emulation_speed ) / 100.0;
+  long tstates;
 
-  /* Interrupts at true 48k 50.08Hz etc. */
-  int speccy_frame_time_usec = ( 
-    1000000.0 *
-    libspectrum_timings_tstates_per_frame( machine_current->machine ) /
-    libspectrum_timings_processor_speed( machine_current->machine ) ) *
-    100.0 / speed;
+  if( sound_enabled )
+    return timer_frame_callback_sound( last_tstates );
 
-start:
-  /* Get current time */
-  error = timer_get_real_time( &current_time ); if( error ) return;
+  while( 1 ) {
 
-  /* Compare current time with emulation time */
-  difference = timer_get_time_difference( &current_time, &speccy_time );
+    error = timer_get_real_time( &current_time ); if( error ) return 1;
 
-  /* If speccy is less than 2 frames ahead of real time don't sleep */
-  /* If the next frame is due in less than 5ms just do it now */
-  /* (linear interpolation) */
-  if( difference < ( ( 2.0 * speccy_frame_time_usec / 1000000.0 ) - 0.005 ) ) {
-    /* Check at or around 100Hz (usual timer resolution on *IX) */
-    timer_sleep_ms( 10 );
-    goto start;
+    difference = timer_get_time_difference( &current_time, &start_time );
+
+    /* Sleep while we are still 10ms ahead */
+    if( difference < 0 ) {
+      timer_sleep_ms( TEN_MS );
+    } else {
+      break;
+    }
+
   }
+  
+  error = timer_get_real_time( &current_time ); if( error ) return 1;
 
-  /* And note that we've done a frame's worth of Speccy time */
-  timer_add_time_difference( &speccy_time, speccy_frame_time_usec );
+  difference = timer_get_time_difference( &current_time, &start_time );
+
+  tstates = ( ( difference + TEN_MS / 1000.0 ) *
+              machine_current->timings.processor_speed
+	      ) * speed + 0.5;
+
+  if( event_add( last_tstates + tstates, EVENT_TYPE_TIMER ) ) return 1;
+
+  start_time = current_time;
+  timer_add_time_difference( &start_time, TEN_MS );
+
+  return 0;
 }

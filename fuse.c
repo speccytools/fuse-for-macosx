@@ -244,19 +244,13 @@ static int fuse_init(int argc, char **argv)
   if( settings_current.sound && settings_current.emulation_speed == 100 )
     sound_init( settings_current.sound_device );
 
-  /* Timing: if we're not producing sound or using sound routines which
-     don't do timing control for us, use the timer_* routines */
-#ifdef ALWAYS_USE_TIMER
-  if( sound_enabled ) fuse_sound_in_use = 1;
-  if( timer_init() ) return 1;
-#else			/* #ifdef ALWAYS_USE_TIMER */
-  if(sound_enabled) {
+  if( sound_enabled ) {
     fuse_sound_in_use = 1;
   } else {
     settings_current.sound = 0;
-    if(timer_init()) return 1;
   }
-#endif			/* #ifdef ALWAYS_USE_TIMER */
+
+  if( timer_init() ) return 1;
 
   error = timer_estimate_reset(); if( error ) return error;
 
@@ -463,12 +457,6 @@ int fuse_emulation_unpause(void)
   if( sound_enabled_ever && settings_current.sound &&
       settings_current.emulation_speed == 100 ) {
 
-    /* If sound has just started providing the timing, remove the old
-       SIGALRM timer */
-#ifndef ALWAYS_USE_TIMER
-    if( !fuse_sound_in_use ) timer_end();
-#endif				/* #ifndef ALWAYS_USE_TIMER */
-
     sound_init( settings_current.sound_device );
 
     /* If the sound code couldn't re-initialise, fall back to the
@@ -480,25 +468,12 @@ int fuse_emulation_unpause(void)
       fuse_emulation_paused++;
       fuse_emulation_paused--;
       settings_current.sound = fuse_sound_in_use = 0;
-      /* FIXME: How to deal with error return here? */
-#ifndef ALWAYS_USE_TIMER
-      timer_init();
-#endif				/* #ifndef ALWAYS_USE_TIMER */
 
     }
-#ifdef ALWAYS_USE_TIMER
-    timer_init();
-#endif				/* #ifdef ALWAYS_USE_TIMER */
     fuse_sound_in_use = sound_enabled;
-  }
-#ifndef ALWAYS_USE_TIMER
-  /* If we don't want sound any more, put previously did, start the SIGALRM
-     timer */
-  else if( fuse_sound_in_use ) {
-    timer_init();
+  } else if( fuse_sound_in_use ) {
     fuse_sound_in_use = 0;
   }
-#endif				/* #ifndef ALWAYS_USE_TIMER */
 
   /* Restart speed estimation with no information */
   error = timer_estimate_reset(); if( error ) return error;
@@ -751,15 +726,11 @@ static int fuse_end(void)
 
   machine_end();
 
-#ifdef ALWAYS_USE_TIMER
   timer_end();
-#else				/* #ifdef ALWAYS_USE_TIMER */
-  if(!sound_enabled) timer_end();
-#endif				/* #ifdef ALWAYS_USE_TIMER */
 
   sound_end();
   event_end();
-  fuse_joystick_end ();
+  fuse_joystick_end();
   ui_end();
 
 #ifdef USE_WIDGET

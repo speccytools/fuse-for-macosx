@@ -76,7 +76,7 @@ static int sound_stereo_beeper=0;   /* and settings_current.stereo_beeper */
  */
 #define AY_CHANGE_MAX		8000
 
-static int sound_framesiz;
+int sound_framesiz;
 
 static int sound_channels;
 

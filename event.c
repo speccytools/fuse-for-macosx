@@ -39,6 +39,7 @@
 #include "psg.h"
 #include "rzx.h"
 #include "tape.h"
+#include "timer.h"
 #include "trdos.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
@@ -127,6 +128,10 @@ int event_do_events(void)
     switch(ptr->type) {
 
     case EVENT_TYPE_EDGE: tape_next_edge( ptr->tstates ); break;
+
+    case EVENT_TYPE_TIMER:
+      timer_frame( ptr->tstates );
+      break;
 
     case EVENT_TYPE_FRAME:
       if( rzx_playback ) event_force_events();
@@ -277,6 +282,7 @@ event_name( event_type type )
   case EVENT_TYPE_TRDOS_CMD_DONE: return "End of TR-DOS command";
   case EVENT_TYPE_TRDOS_INDEX: return "TR-DOS index";
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
+  case EVENT_TYPE_TIMER: return "Timer";
 
   }
 

@@ -20,9 +20,7 @@
 */
 
 /* This header file should define HAVE_SOUND if any form of sound API
-   is available. If so, it should define one of the SOUND_xxx defines,
-   and ALWAYS_USE_TIMER if that sound API doesn't provide speed
-   control */
+   is available. If so, it should define one of the SOUND_xxx defines. */
 
 #ifndef FUSE_SOUND_LOWLEVEL_H
 #define FUSE_SOUND_LOWLEVEL_H
@@ -31,13 +29,11 @@
 
 #define HAVE_SOUND
 #define SOUND_SDL
-#define ALWAYS_USE_TIMER
 
 #elif defined USE_LIBAO	/* #if defined UI_SDL */
 
 #define HAVE_SOUND
 #define SOUND_AO
-#define ALWAYS_USE_TIMER
 
 #elif defined HAVE_SYS_AUDIO_H		/* #if defined UI_SDL */
 
@@ -71,7 +67,6 @@
 
 #define HAVE_SOUND
 #define SOUND_DX
-#define ALWAYS_USE_TIMER
 
 #endif					/* #if defined UI_SDL */
 
