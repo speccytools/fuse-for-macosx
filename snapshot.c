@@ -253,9 +253,17 @@ int snapshot_write( const char *filename )
 				  LIBSPECTRUM_ID_SNAPSHOT_Z80, 0 );
   if( error ) return error;
 
-  if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS )
-    ui_error( UI_ERROR_INFO,
-	      "Some information may have been lost in conversion" );
+  if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MAJOR_INFO_LOSS ) {
+    ui_error(
+      UI_ERROR_INFO,
+      "A large amount of information has been lost in conversion; the snapshot probably won't work"
+    );
+  } else if( flags & LIBSPECTRUM_FLAG_SNAPSHOT_MINOR_INFO_LOSS ) {
+    ui_error(
+      UI_ERROR_INFO,
+      "Some information has been lost in conversion; the snapshot may not work"
+    );
+  }
 
   error = libspectrum_snap_free( snap );
   if( error ) { free( buffer ); return 1; }
