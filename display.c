@@ -34,6 +34,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
@@ -172,6 +173,8 @@ int display_init(int *argc, char ***argv)
    this fact */
 void display_line(void)
 {
+  static int frame_count = 0;
+
   if( display_next_line < DISPLAY_SCREEN_HEIGHT ) {
     display_draw_line(display_next_line);
     event_add( machine_current->line_times[display_next_line+1],
@@ -185,7 +188,10 @@ void display_line(void)
       uidisplay_lines( display_blocked_write_start, display_next_line-1 );
       display_blocked_write_start = display_blocked_write_none;
     }
-    uidisplay_frame_end();
+    if( settings_current.frame_rate <= ++frame_count ) {
+      frame_count = 0;
+      uidisplay_frame_end();
+    }
   }
 
   display_next_line++;
