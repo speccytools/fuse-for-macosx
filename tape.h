@@ -47,7 +47,6 @@ int tape_write( const char *filename );
 int tape_load_trap( void );
 int tape_save_trap( void );
 
-int tape_play( void );
 int tape_toggle_play( void );
 
 int tape_next_edge( libspectrum_dword last_tstates );

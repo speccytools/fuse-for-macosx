@@ -1245,3 +1245,6 @@
 20050226 ui/gtk/{debugger.c,gtkinternals.h,gtkui.c,memory.c}: make the
 	 scroll wheel work when used over the disassembly pane or the
 	 memory dump (patch #1150709) (Darren).
+20050226 tape.[ch]: Media/Tape/Play always starts the tape playing, even
+	 if tape traps are active. Makes working with normal speed custom
+	 loader blocks less painful (patch #1150682) (Darren).
