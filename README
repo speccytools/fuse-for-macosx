@@ -1,4 +1,4 @@
-The Free Unix Spectrum Emulator (Fuse) 0.3.1
+The Free Unix Spectrum Emulator (Fuse) 0.3.2
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
@@ -14,7 +14,6 @@ What Fuse does have:
 What Fuse doesn't have:
 
 * Any sound output under operating systems other than Linux.
-* A nice GUI.
 * The ability to save to tape files
 * Emulation of any peripherals (bar the tape deck)
 * A keyboard picture, so you can find those keywords
@@ -34,7 +33,6 @@ There are now some options you can give to configure; `configure
 
 --with-svgalib		Use the SVGAlib interface, rather than GTK+.
 --without-gtk		Use the plain Xlib interface, rather than GTK+.
---enable-issue2		Emulate an Issue 2 Spectrum, rather than an Issue 3.
 
 If glib is installed on your system, Fuse will use this for a couple
 of things; however, it isn't necessary (unless you're using the GTK+
@@ -59,24 +57,27 @@ in which case you should get that instead. Numbers, letters, etc
 should now work as they do on the Speccy (plus a few others eg
 Backspace = CAPS + 0). Also:
 
- F2: Save snapshot (see below)
- F3: Load snapshot (see below)
- F5: Reset Spectrum
- F7: Rewind tape file to start
+ F2: Save snapshot.
+ F3: Load snapshot.
+ F4: Select options.
+ F5: Reset Spectrum.
+ F7: Open tape file.
+ F8: Start/stop tape.
  F9: Switch between 48K/128K/+2/+2A emulation
 F10: Quit Fuse
 
-The snapshot loading is _very_ simple: it loads from a .z80 snapshot
-(either 48K or 128K) called `snapshot.z80' in the current
-directory. (If you need to convert your snaps to .z80, try SnapConv:
-http://www.srcf.ucam.org/~pak21/spectrum/snapconv.html). Saving is
-also to `snapshot.z80', and will happily overwrite any other file you
-may have with that name.
+Snapshots can be in either .z80 or .sna format; (If you need to
+convert your snaps to .z80, try SnapConv:
+http://www.srcf.ucam.org/~pak21/spectrum/snapconv.html). If you're not
+using the GTK+ user interface, snapshots will be saved to
+`snapshot.z80', and will happily overwrite any other file you may have
+with that name.
 
-The tape loading is also simple: it reads from a .tap file called
-`tape.tap' in the current directory. Press F7 to rewind the tape
-file to the start. Currently, only programs using the standard ROM
-loader will work.
+There are two forms of tape loading, toggled via the F4 options
+menu. In `fast' mode (tape traps active), Fuse will recognise when
+you're trying to load a block from tape and instantly copy that block
+from the emulated tape file into memory. In `slow' mode, you'll get
+the full border stripes effect as you would on a real Spectrum.
 
 Fuse is copyrighted under the GNU General Public License (see the file
 `COPYING' for details). However, note the GPL does *not* apply to the
@@ -103,6 +104,6 @@ Finally, if you want to see how a Unix Speccy emulator should be done,
 check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-13 August 2001
+6 October 2001
 
 $Id$

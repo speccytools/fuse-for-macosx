@@ -1,19 +1,16 @@
-2001-09-xx  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+2001-10-06  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
-	* Added file selection dialog boxes for snapshot opening and
-	  closing, and opening tape files. GTK+ only (Philip Kendall).
+	* Added file selection dialog boxes for snapshot and tape loading,
+	  and (GTK+ only) snapshot saving (Philip Kendall, Matan Ziv-Av).
 
-	* Allowed changing of Issue 2/3 keyboard at run-time. There's only
-	  any way of changing this if you're using GTK+ at the moment,
-	  though (Philip Kendall).
+	* Allowed changing of Issue 2/3 keyboard at run-time. (Philip
+	  Kendall).
 	
 	* Basically complete rewrite of the tape handling routines (Philip
- 	  Kendall).
+	  Kendall).
 
 	* Allow `slow' tape loading with border effects, sound, et al.
-	  The code should work for all user interfaces, but there's no
-	  way of turning off the tape traps unless you're using GTK+ at
-	  the moment (Philip Kendall).
+	  (Philip Kendall).
 
 	* Changed the default install location to `/usr/local' (Philip
  	  Kendall).
