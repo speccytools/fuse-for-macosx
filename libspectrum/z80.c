@@ -824,8 +824,10 @@ int libspectrum_z80_write_pages( libspectrum_byte **buffer,
     if( snap->slt_length[i] ) write_slt = 1;
 
   /* Write the data if we've got any */
-  error = libspectrum_z80_write_slt( buffer, ptr, length, snap );
-  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  if( write_slt ) {
+    error = libspectrum_z80_write_slt( buffer, ptr, length, snap );
+    if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  }
 
   return LIBSPECTRUM_ERROR_NONE;
 
