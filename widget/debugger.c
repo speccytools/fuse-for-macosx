@@ -117,3 +117,13 @@ widget_debugger_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   }
 }
+
+int ui_debugger_disassemble( WORD address )
+{
+  return 0;
+}
+
+int ui_debugger_update( void )
+{
+  return 0;
+}
