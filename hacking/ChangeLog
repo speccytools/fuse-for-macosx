@@ -240,3 +240,5 @@
 	 disk motor when the +2A/+3 memory port is written to.
 20031006 machine.c: remove duplicated code from machine_select_machine()
 20031006 settings.pl: change config file name to 'fuse.cfg' on Win32
+20031006 settings.dat, ui/options.dat, ui/gtk/confirm.c: add option to
+	 disable the 'confirm' dialogs.

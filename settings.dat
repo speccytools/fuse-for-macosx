@@ -44,6 +44,7 @@ full_screen, boolean, 0
 writable_roms, boolean, 0
 autosave_settings, boolean, 0
 colour_tv, boolean, 1
+confirm_dangerous, boolean, 1
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1

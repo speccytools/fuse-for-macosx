@@ -33,6 +33,7 @@
 
 #include "fuse.h"
 #include "gtkinternals.h"
+#include "settings.h"
 
 struct confirm_data {
 
@@ -50,6 +51,10 @@ gtkui_confirm( const char *string )
 
   GtkWidget *label, *button;
   GtkAccelGroup *accelerators;
+
+  /* Return value isn't an error code, but signifies whether to undertake
+     the action */
+  if( !settings_current.confirm_dangerous ) return 1;
 
   fuse_emulation_pause();
 
