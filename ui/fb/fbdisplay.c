@@ -294,6 +294,7 @@ uidisplay_area( int x, int start, int width, int height)
     break;
 
   case FB_RES( 640, 240 ):
+    if( hires ) { start >>= 1; height >>= 1; }
     for( y = start; y < start + height; y++ )
     {
       int i;
@@ -308,7 +309,7 @@ uidisplay_area( int x, int start, int width, int height)
 
       } else {
 
-	for( i = 0, point = gm + 2 * y * display.xres_virtual + x * 2;
+	for( i = 0, point = gm + y * display.xres_virtual + x * 2;
 	     i < width;
 	     i++, point+=2 )
 	  *point = *(point+1) = colours[display_image[y][x+i]];
@@ -318,15 +319,28 @@ uidisplay_area( int x, int start, int width, int height)
     break;
 
   case FB_RES( 320, 240 ):
+    if( hires ) { start >>= 1; height >>= 1; x >>= 1; width >>= 1; }
     for( y = start; y < start + height; y++ )
     {
       int i;
       libspectrum_word *point;
 
-      for( i = 0, point = gm + y * display.xres_virtual + x;
-	   i < width;
-	   i++, point++ )
-        *point = colours[display_image[y][x+i]];
+      if( hires ) {
+
+	/* Drop every second pixel */
+	for ( i = 0, point = gm + y * display.xres_virtual + x;
+	      i < width;
+	      i++, point++ )
+	  *point = colours[display_image[y*2][(x+i)*2]];
+
+      } else {
+
+	for( i = 0, point = gm + y * display.xres_virtual + x;
+	     i < width;
+	     i++, point++ )
+	  *point = colours[display_image[y][x+i]];
+
+      }
 
     }
     break;
