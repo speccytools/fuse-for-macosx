@@ -51,6 +51,7 @@
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "pokefinder/pokefinder.h"
 #include "printer.h"
 #include "psg.h"
 #include "rzx.h"
