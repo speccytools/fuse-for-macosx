@@ -127,9 +127,10 @@ if test -z "$UI"; then
     if test "$withval" = no; then gpm=no; else gpm=yes; fi,
     gpm=yes)
     AC_MSG_RESULT($gpm)
+    dnl Note: we use libdl to get libgpm at runtime
     if test "$gpm" = yes; then
       AC_CHECK_HEADER(gpm.h,
-		      UI_LIBS="$UI_LIBS -lgpm";
+		      UI_LIBS="$UI_LIBS -ldl";
 		      AC_DEFINE([HAVE_GPM_H], 1, [Defined if gpm in use]),
 		      AC_MSG_ERROR([libgpm not found]))
     fi

@@ -82,6 +82,12 @@ keypress( const input_event_key_t *event )
   }
 #endif				/* #ifdef USE_WIDGET */
 
+  /* Escape => ask UI to end mouse grab, return if grab ended */
+  if( key == INPUT_KEY_Escape && ui_mouse_grabbed ) {
+    ui_mouse_grabbed = ui_mouse_release( 0 );
+    if( !ui_mouse_grabbed ) return 0;
+  }
+
   swallow = 0;
   /* Joystick emulation via QAOP<space> */
   switch( key ) {

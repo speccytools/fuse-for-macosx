@@ -30,7 +30,9 @@
 
 #include <stdio.h>
 
+#include <vga.h>
 #include <vgakeyboard.h>
+#include <vgamouse.h>
 
 #include "display.h"
 #include "fuse.h"
@@ -38,6 +40,8 @@
 #include "svgakeyboard.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+
+static int oldbutton = 0, oldx = 0, oldy = 0;
 
 int ui_init(int *argc, char ***argv)
 {
@@ -49,13 +53,41 @@ int ui_init(int *argc, char ***argv)
   error = svgakeyboard_init();
   if(error) return error;
 
+  vga_setmousesupport( 1 );
+  mouse_setxrange( 0, 255);
+  mouse_setyrange( 0, 255);
+  mouse_setscale( 64 );
+  mouse_setwrap( MOUSE_WRAPX | MOUSE_WRAPY );
+  mouse_setposition( 128, 128 );
+
+  ui_mouse_present = 1;
+
   return 0;
 }
 
 int
 ui_event( void )
 {
+  int x, y, b, bd;
+
   keyboard_update();
+  mouse_update();
+
+  x = mouse_getx();
+  y = mouse_gety();
+  b = mouse_getbutton();
+
+  bd = b ^ oldbutton;
+  if( bd & MOUSE_LEFTBUTTON ) ui_mouse_button( 1, b & MOUSE_LEFTBUTTON );
+  if( bd & MOUSE_MIDDLEBUTTON ) ui_mouse_button( 2, b & MOUSE_MIDDLEBUTTON );
+  if( bd & MOUSE_RIGHTBUTTON ) ui_mouse_button( 3, b & MOUSE_RIGHTBUTTON );
+  oldbutton = b;
+
+  if( x != oldx || y != oldy ) {
+    ui_mouse_motion( x - oldx, y - oldy );
+    oldx = x; oldy = y;
+  }
+
   return 0;
 }
 
@@ -70,6 +102,18 @@ int ui_end(void)
   if(error) return error;
 
   return 0;
+}
+
+int
+ui_mouse_grab( int startup GCC_UNUSED )
+{
+  return 1;
+}
+
+int
+ui_mouse_release( int suspend )
+{
+  return !suspend;
 }
 
 #endif				/* #ifdef UI_SVGA */

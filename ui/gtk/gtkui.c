@@ -41,6 +41,7 @@
 #include "debugger/debugger.h"
 #include "fuse.h"
 #include "gtkinternals.h"
+#include "keyboard.h"
 #include "machine.h"
 #include "menu.h"
 #include "psg.h"
@@ -89,6 +90,9 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				GtkItemFactoryEntry *menu_data,
 				guint menu_data_size);
 
+static gboolean gtkui_lose_focus( GtkWidget*, GdkEvent*, gpointer );
+static gboolean gtkui_gain_focus( GtkWidget*, GdkEvent*, gpointer );
+
 static gboolean gtkui_delete( GtkWidget *widget, GdkEvent *event,
 			      gpointer data );
 
@@ -131,7 +135,9 @@ ui_init( int *argc, char ***argv )
 
   /* If we lose the focus, disable all keys */
   gtk_signal_connect( GTK_OBJECT( gtkui_window ), "focus-out-event",
-		      GTK_SIGNAL_FUNC( gtkkeyboard_release_all ), NULL );
+		      GTK_SIGNAL_FUNC( gtkui_lose_focus ), NULL );
+  gtk_signal_connect( GTK_OBJECT( gtkui_window ), "focus-in-event",
+		      GTK_SIGNAL_FUNC( gtkui_gain_focus ), NULL );
 
   box = gtk_vbox_new( FALSE, 0 );
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);
@@ -152,6 +158,15 @@ ui_init( int *argc, char ***argv )
   }
   gtk_drawing_area_size( GTK_DRAWING_AREA(gtkui_drawing_area),
 			 DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
+
+  gtk_widget_add_events( GTK_WIDGET( gtkui_drawing_area ),
+    GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK );
+  gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "motion-notify-event",
+		      GTK_SIGNAL_FUNC( gtkmouse_position ), NULL );
+  gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "button-press-event",
+		      GTK_SIGNAL_FUNC( gtkmouse_button ), NULL );
+  gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "button-release-event",
+		      GTK_SIGNAL_FUNC( gtkmouse_button ), NULL );
 
   gtk_box_pack_start( GTK_BOX(box), gtkui_drawing_area, FALSE, FALSE, 0 );
 
@@ -184,7 +199,16 @@ ui_init( int *argc, char ***argv )
   gtk_widget_show_all( gtkui_window );
   gtkstatusbar_set_visibility( settings_current.statusbar );
 
+  ui_mouse_present = 1;
+
   return 0;
+}
+
+static void
+gtkui_menu_deactivate( GtkMenuShell *menu GCC_UNUSED,
+		       gpointer data GCC_UNUSED )
+{
+  ui_mouse_resume();
 }
 
 static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
@@ -198,6 +222,8 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
   gtk_item_factory_create_items( menu_factory, menu_data_size, menu_data,
 				 NULL);
   *menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
+  gtk_signal_connect( GTK_OBJECT( *menu_bar ), "deactivate",
+		      GTK_SIGNAL_FUNC( gtkui_menu_deactivate ), NULL );
 
   /* We have to recreate the menus for the popup, unfortunately... */
   popup_factory = gtk_item_factory_new( GTK_TYPE_MENU, "<main>", NULL );
@@ -310,6 +336,23 @@ ui_error_specific( ui_error_level severity, const char *message )
 }
   
 /* The callbacks used by various routines */
+
+static gboolean
+gtkui_lose_focus( GtkWidget *widget GCC_UNUSED,
+		  GdkEvent *event GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  keyboard_release_all();
+  ui_mouse_suspend();
+  return TRUE;
+}
+
+static gboolean
+gtkui_gain_focus( GtkWidget *widget GCC_UNUSED,
+		  GdkEvent *event GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  ui_mouse_resume();
+  return TRUE;
+}
 
 /* Called by the main window on a "delete-event" */
 static gboolean

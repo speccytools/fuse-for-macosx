@@ -276,6 +276,13 @@ Emulate a Kempston joystick. Same as the Peripherals Options dialog's
 option.
 .RE
 .PP
+.I --kempston-mouse
+.RS
+Emulate a Kempston mouse. Same as the Peripherals Options dialog's
+.I "Kempston mouse"
+option.
+.RE
+.PP
 .I --loading-sound
 .RS
 Specify whether the sound made while tapes are loading should be
@@ -958,6 +965,24 @@ Kempston joystick in a game, this option must be enabled, and you must
 also select a Kempston joystick the
 .I "Options, Joysticks"
 menu.
+.RE
+.PP
+.I "Kempston mouse"
+.RS
+If this option is selected, Fuse will emulate a Kempston mouse interface.
+.PP
+If you're using Fuse full-screen, your mouse is automatically used as if
+attached to the Kempston interface. Otherwise, you'll need to click on the
+Spectrum display in order to tell Fuse to grab the pointer (and make it
+invisible); to tell Fuse to release it, click the middle button (or wheel) or
+press Escape.
+.PP
+With the framebuffer UI, Fuse prefers to use GPM; if this is not available,
+it will fall back to built-in PS/2 mouse support. In this mode, it tries
+\fI/dev/input/mice\fR, \fI/dev/mouse\fR then \fI/dev/psaux\fR, stopping when
+it successfully opens one. The first of these is preferred since (at least on
+Linux, with a 2.6-series kernel) any type of mouse can be used and any
+connected mouse may be used.
 .RE
 .PP
 .I "Interface II"

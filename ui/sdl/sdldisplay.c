@@ -222,6 +222,11 @@ uidisplay_init( int width, int height )
   /* We can now output error messages to our output device */
   display_ui_initialised = 1;
 
+  if( ui_mouse_grabbed ) {
+    SDL_ShowCursor( 0 );
+    SDL_WarpMouse( 128, 128 );
+  }
+
   sdl_load_status_icon( "cassette.bmp", red_cassette, green_cassette );
   sdl_load_status_icon( "plus3disk.bmp", red_disk, green_disk );
 

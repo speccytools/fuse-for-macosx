@@ -35,6 +35,7 @@
 
 #include "fbdisplay.h"
 #include "fbkeyboard.h"
+#include "fbmouse.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
@@ -72,6 +73,9 @@ ui_init( int *argc, char ***argv )
   error = fbkeyboard_init();
   if( error ) return error;
 
+  error = fbmouse_init();
+  if( error ) return error;
+
   error = fbdisplay_init();
   if( error ) return error;
 
@@ -81,6 +85,7 @@ ui_init( int *argc, char ***argv )
 int ui_event()
 {
   keyboard_update();
+  mouse_update();
   return 0;
 }
 

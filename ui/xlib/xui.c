@@ -48,6 +48,8 @@ int xui_screenNum;		/* Which screen are we using on our
 				   X server? */
 Window xui_mainWindow;		/* Window ID for the main Fuse window */
 
+Cursor nullpointer;
+
 /* FIXME: not a prototype. What should it be? */
 Bool xui_trueFunction();
 
@@ -157,7 +159,23 @@ ui_init( int *argc, char ***argv )
 
   XSelectInput(display, xui_mainWindow, ExposureMask | KeyPressMask |
 	       KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
-	       StructureNotifyMask | FocusChangeMask );
+	       StructureNotifyMask | FocusChangeMask | PointerMotionMask );
+
+  {
+    static XColor dummy = { 0, 0, 0, 0, 4, 0 };
+    XGCValues xgc;
+    GC gc;
+
+    Pixmap mask =
+      XCreatePixmap( display, RootWindow( display, xui_screenNum ), 1, 1, 1 );
+
+    xgc.function = GXclear;
+    gc = XCreateGC( display, mask, GCFunction, &xgc );
+    XFillRectangle( display, mask, gc, 0, 0, 1, 1 );
+    nullpointer = XCreatePixmapCursor( display, mask,mask, &dummy,&dummy, 0,0 );
+    XFreePixmap( display, mask );
+    XFreeGC( display, gc );
+  }
 
   /* Ask to be notified of window close requests */
 
@@ -168,6 +186,8 @@ ui_init( int *argc, char ***argv )
 
   /* And finally display the window */
   XMapWindow(display,xui_mainWindow);
+
+  ui_mouse_present = 1;
 
   return 0;
 }
@@ -186,8 +206,25 @@ int ui_event(void)
       xdisplay_area( event.xexpose.x, event.xexpose.y,
 		     event.xexpose.width, event.xexpose.height );
       break;
+    case ButtonPress:
+      ui_mouse_button( event.xbutton.button, 1 );
+      break;
+    case ButtonRelease:
+      ui_mouse_button( event.xbutton.button, 0 );
+      break;
+    case MotionNotify:
+      if( ui_mouse_grabbed ) {
+        ui_mouse_motion( event.xmotion.x - 128, event.xmotion.y - 128 );
+        if( event.xmotion.x != 128 || event.xmotion.y != 128 )
+          XWarpPointer( display, None, xui_mainWindow, 0, 0, 0, 0, 128, 128 );
+      }
+      break;
     case FocusOut:
       keyboard_release_all();
+      ui_mouse_suspend();
+      break;
+    case FocusIn:
+      ui_mouse_resume();
       break;
     case KeyPress:
       xkeyboard_keypress(&(event.xkey));
@@ -225,6 +262,33 @@ int ui_end(void)
   /* And disconnect from the X server */
   XCloseDisplay(display);
 
+  return 0;
+}
+
+int
+ui_mouse_grab( int startup )
+{
+  if( startup ) return 0;
+
+  switch( XGrabPointer( display, xui_mainWindow, True,
+			ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+			GrabModeAsync, GrabModeAsync, xui_mainWindow,
+			nullpointer, CurrentTime )
+	) {
+  case GrabSuccess:
+  case GrabNotViewable:
+    XWarpPointer( display, None, xui_mainWindow, 0, 0, 0, 0, 128, 128 );
+    return 1;
+  default:
+    ui_error( UI_ERROR_WARNING, "Mouse grab failed" );
+    return 0;
+  }
+}
+
+int
+ui_mouse_release( int suspend GCC_UNUSED )
+{
+  XUngrabPointer( display, CurrentTime );
   return 0;
 }
 

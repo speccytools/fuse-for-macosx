@@ -260,4 +260,16 @@ blit( void )
   return;
 }
 
+int
+ui_mouse_grab( int startup )
+{
+  return 0; /* FIXME */
+}
+
+int
+ui_mouse_release( int suspend )
+{
+  return 0; /* FIXME */
+}
+
 #endif			/* #ifdef UI_WIN32 */

@@ -62,6 +62,7 @@ fuse_SOURCES = ay.c \
 	if2.c \
 	input.c \
 	joystick.c \
+	kempmouse.c \
 	keyboard.c \
 	machine.c \
 	memory.c \

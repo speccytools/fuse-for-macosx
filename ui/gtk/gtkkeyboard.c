@@ -47,6 +47,11 @@ gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
   input_key fuse_keysym;
   input_event_t fuse_event;
 
+#ifdef UI_GTK2
+  if( event->key.keyval == GDK_F10 && event->key.state == 0 )
+    ui_mouse_suspend();
+#endif
+
   gdk_keysym = gtkkeyboard_unshift_keysym( event->key.keyval );
 
   fuse_keysym = keysyms_remap( gdk_keysym );
@@ -94,13 +99,4 @@ static guint gtkkeyboard_unshift_keysym(guint keysym)
 			  0);
 }
 
-/* Release all keys (called when focus lost) */
-int
-gtkkeyboard_release_all( GtkWidget *widget GCC_UNUSED,
-			 GdkEvent *event GCC_UNUSED, gpointer data GCC_UNUSED )
-{
-  keyboard_release_all();
-  return TRUE;
-}
-			  
 #endif			/* #ifdef UI_GTK */

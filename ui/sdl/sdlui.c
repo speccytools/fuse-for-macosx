@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include <SDL.h>
+#include <SDL_syswm.h>
 
 #include "display.h"
 #include "fuse.h"
@@ -39,6 +40,12 @@
 #include "sdljoystick.h"
 #include "sdlkeyboard.h"
 #include "ui/scaler/scaler.h"
+
+#if 0 /* FIXME: OS X */
+#define sdl_in_window 1
+#else
+static int sdl_in_window;
+#endif
 
 void
 atexit_proc( void )
@@ -51,6 +58,7 @@ int
 ui_init( int *argc, char ***argv )
 {
   int error;
+  SDL_SysWMinfo info;
 
 /* Comment out to Work around a bug in OS X 10.1 related to OpenGL in windowed
    mode */
@@ -59,6 +67,12 @@ ui_init( int *argc, char ***argv )
   error = SDL_Init( SDL_INIT_VIDEO );
   if ( error )
     return error;
+
+  SDL_VERSION( &info.version );
+#if 1 /* FIXME: ! OS X */
+  sdl_in_window = SDL_GetWMInfo( &info );
+#endif
+  ui_mouse_present = 1;
 
   return 0;
 }
@@ -75,6 +89,20 @@ ui_event( void )
       break;
     case SDL_KEYUP:
       sdlkeyboard_keyrelease( &(event.key) );
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+      ui_mouse_button( event.button.button, 1 );
+      break;
+    case SDL_MOUSEBUTTONUP:
+      ui_mouse_button( event.button.button, 0 );
+      break;
+    case SDL_MOUSEMOTION:
+      if( ui_mouse_grabbed ) {
+        ui_mouse_motion( event.motion.x - 128, event.motion.y - 128 );
+        if( event.motion.x != 128 || event.motion.y != 128 )
+          SDL_WarpMouse( 128, 128 );
+      }	
       break;
 
 #if defined USE_JOYSTICK && !defined HAVE_JSW_H
@@ -96,6 +124,11 @@ ui_event( void )
       break;
     case SDL_VIDEOEXPOSE:
       display_refresh_all();
+      break;
+    case SDL_ACTIVEEVENT:
+      if( event.active.state & 2 ) {
+	if( event.active.gain ) ui_mouse_resume(); else ui_mouse_suspend();
+      }
       break;
     default:
       break;
@@ -128,6 +161,38 @@ ui_statusbar_update_speed( float speed )
 
   SDL_WM_SetCaption( buffer, buffer );
 
+  return 0;
+}
+
+int
+ui_mouse_grab( int startup )
+{
+  if( !sdl_in_window ) {
+    SDL_ShowCursor( 0 );
+    SDL_WarpMouse( 128, 128 );
+    return 1;
+  }
+  if( startup ) return 0;
+
+  switch( SDL_WM_GrabInput( SDL_GRAB_ON ) ) {
+  case SDL_GRAB_ON:
+  case SDL_GRAB_FULLSCREEN:
+    SDL_ShowCursor( 0 );
+    SDL_WarpMouse( 128, 128 );
+    return 1;
+  default:
+    ui_error( UI_ERROR_WARNING, "Mouse grab failed" );
+    return 0;
+  }
+}
+
+int
+ui_mouse_release( int suspend )
+{
+  if( !sdl_in_window ) return !suspend;
+
+  SDL_WM_GrabInput( SDL_GRAB_OFF );
+  SDL_ShowCursor( 1 );
   return 0;
 }
 

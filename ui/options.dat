@@ -16,6 +16,7 @@ Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 peripherals
 Peripheral Options
 Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
+Checkbox, Kempston (m)ouse, kempston_mouse, INPUT_KEY_m
 Checkbox, (I)nterface II, interface2, INPUT_KEY_i
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, Simple (8)-bit IDE, simpleide_active, INPUT_KEY_8

@@ -40,10 +40,6 @@
 #include <sys/ioctl.h>
 #include <string.h>
 
-#ifdef HAVE_GPM_H
-#include <gpm.h>
-#endif				/* #ifdef HAVE_GPM_H */
-
 #include "fuse.h"
 #include "display.h"
 #include "screenshot.h"
@@ -255,13 +251,6 @@ fb_select_mode( const fuse_fb_mode_t *fb_mode )
     return 1;
   }
 
-#ifdef HAVE_GPM_H
-  {
-    Gpm_Connect conn = { 0, 0, 0, ~0 };		/* mouse event sink */
-    Gpm_Open( &conn, 0 );
-  }
-#endif				/* #ifdef HAVE_GPM_H */
-
   fb_resolution = FB_RES( display.xres, display.yres );
   return 0;			/* success */
 }
@@ -408,12 +397,8 @@ fbdisplay_end( void )
     close( fb_fd );
     fb_fd = -1;
     fputs( "\x1B[H\x1B[J\x1B[?25h", stdout );	/* clear screen, show cursor */
-
-#ifdef HAVE_GPM_H
-    Gpm_Close();
-#endif				/* #ifdef HAVE_GPM_H */
-
   }
+
   return 0;
 }
 

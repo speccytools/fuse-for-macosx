@@ -1038,3 +1038,9 @@
          mapping code into keysyms.pl.
 20040729 z80/tests/README: document .in and .out file formats.
 20040730 configure.in,ui/fb/fbdisplay.c: actually use the GPM code (Darren).
+20040807 Makefile.am,configure.in,fuse.c,input.c,kempmouse.[ch],periph.c,
+	 settings.dat,ui.c,man/fuse.1,ui/{options.dat,ui.h},
+	 ui/fb/{Makefile.am,fbdisplay.c,fbmouse.[ch],fbui.c},
+	 ui/gtk/{Makefile.am,gtkinternals.h,gtkkeyboard.c,gtkmouse.c,gtkui.c},
+	 ui/sdl/{sdldisplay.c,sdlui.c}, ui/svga/svgaui.c, ui/win32/win32ui.c,
+	 ui/xlib/xui.c: Kempston mouse support (Darren).

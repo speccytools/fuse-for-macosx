@@ -31,6 +31,7 @@ INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 libuifb_a_SOURCES = fbdisplay.c \
 		    fbjoystick.c \
 	 	    fbkeyboard.c \
+	 	    fbmouse.c \
 		    fbui.c \
 		    keysyms.c
 

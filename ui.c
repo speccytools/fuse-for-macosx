@@ -35,6 +35,8 @@
 
 #include "fuse.h"
 #include "ui/ui.h"
+#include "kempmouse.h"
+#include "settings.h"
 
 #define MESSAGE_MAX_LENGTH 256
 
@@ -130,4 +132,47 @@ void
 ui_error_frame( void )
 {
   frames_since_last_message++;
+}
+
+int ui_mouse_present = 0;
+int ui_mouse_grabbed = 0;
+static int mouse_grab_suspended = 0;
+
+void
+ui_mouse_button( int button, int down )
+{
+  if( !ui_mouse_grabbed && !mouse_grab_suspended ) button = 2;
+
+  /* Possibly we'll end up handling _more_ than one mouse interface... */
+  switch( button ) {
+  case 1: if( ui_mouse_grabbed ) kempmouse_update( 0, 0, 0, down ); break;
+  case 3: if( ui_mouse_grabbed ) kempmouse_update( 0, 0, 1, down ); break;
+  case 2:
+    if( ui_mouse_present && settings_current.kempston_mouse
+	&& !down && !mouse_grab_suspended )
+      ui_mouse_grabbed =
+	ui_mouse_grabbed ? ui_mouse_release( 1 ) : ui_mouse_grab( 0 );
+    break;
+  }
+}
+
+void
+ui_mouse_motion( int x, int y )
+{
+  if( ui_mouse_grabbed ) kempmouse_update( x, y, -1, 0 );
+}
+
+void
+ui_mouse_suspend( void )
+{
+  if( !ui_mouse_grabbed ) return;
+  mouse_grab_suspended = 1 + !!ui_mouse_grabbed;
+  ui_mouse_grabbed = ui_mouse_release( 1 );
+}
+
+void
+ui_mouse_resume( void )
+{
+  if( mouse_grab_suspended == 2) ui_mouse_grabbed = ui_mouse_grab( 0 );
+  mouse_grab_suspended = 0;
 }

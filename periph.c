@@ -31,6 +31,7 @@
 #include "debugger/debugger.h"
 #include "if2.h"
 #include "joystick.h"
+#include "kempmouse.h"
 #include "periph.h"
 #include "rzx.h"
 #include "settings.h"
@@ -277,6 +278,8 @@ periph_setup( const periph_t *peripherals_list, size_t n,
   periph_register_n( zxatasp_peripherals, zxatasp_peripherals_count );
   periph_register_n( zxcf_peripherals, zxcf_peripherals_count );
 
+  periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
+
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
 
   kempston_present = kempston;
@@ -329,6 +332,14 @@ periph_update( void )
   }
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
 		    periph_interface2_active );
+
+  if( ui_mouse_present ) {
+    if( settings_current.kempston_mouse ) {
+      if( !ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_grab( 1 );
+    } else {
+      if(  ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_release( 1 );
+    }
+  }
 
   update_ide_menu();
 }

@@ -78,6 +78,16 @@ typedef enum ui_confirm_save_t {
 
 ui_confirm_save_t ui_confirm_save( const char *message );
 
+/* Mouse handling */
+
+extern int ui_mouse_present, ui_mouse_grabbed;
+void ui_mouse_suspend( void );
+void ui_mouse_resume( void );
+void ui_mouse_button( int button, int down );
+void ui_mouse_motion( int dx, int dy );
+int ui_mouse_grab( int startup ); /* UI: grab, return 1 if done */
+int ui_mouse_release( int suspend ); /* UI: ungrab, return 0 if done */
+
 /* Write the current tape out */
 int ui_tape_write( void );
 
