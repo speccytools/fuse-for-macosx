@@ -7,7 +7,7 @@ is Fuse (the Free Unix Spectrum Emulator), version 0.5.1.
 
 What Fuse does have:
 
-* Working 16K/48K/128K/+2/+2A/+3 Speccy, and Timex TC2048
+* Working 16K/48K/128K/+2/+2A/+3 Speccy and Timex TC2048
   emulation, running at true Speccy speed on any computer you're
   likely to try it on.
 * Support for loading from .tzx files.
