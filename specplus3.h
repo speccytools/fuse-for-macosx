@@ -51,8 +51,8 @@ typedef enum specplus3_drive_number {
   SPECPLUS3_DRIVE_B,
 } specplus3_drive_number;
 
-int specplus3_disk_insert( specplus3_drive_number drive,
+int specplus3_disk_insert( specplus3_drive_number which,
 			   const char *filename );
-int specplus3_disk_eject( specplus3_drive_number drive );
+int specplus3_disk_eject( specplus3_drive_number which );
 
 #endif			/* #ifndef FUSE_SPECPLUS3_H */

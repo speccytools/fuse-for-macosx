@@ -29,8 +29,13 @@
 #include <stdio.h>
 
 #ifdef HAVE_765_H
+#include <errno.h>
+#include <fcntl.h>
 #include <limits.h>		/* Needed to get PATH_MAX */
 #include <stdarg.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <765.h>
 #endif				/* #ifdef HAVE_765_H */
@@ -82,7 +87,11 @@ spectrum_port_info specplus3_peripherals[] = {
 
 #if HAVE_765_H
 static FDC_PTR fdc;
+
 static FDRV_PTR drive_a, drive_b;
+static int drive_a_fd, drive_b_fd;	/* File descriptors used to lock
+					   each disk file before inserting it
+					*/
 static FDRV_PTR drive_null;
 #endif			/* #ifdef HAVE_765_H */
 
@@ -310,12 +319,14 @@ int specplus3_init( machine_info *machine )
   fd_setheads( drive_a, 1 );
   fd_setcyls( drive_a, 40 );
   fd_setreadonly( drive_a, 0 );
+  drive_a_fd = -1;			/* Nothing inserted */
 
   drive_b = fd_newdsk();
   fd_settype( drive_b, FD_30 );
   fd_setheads( drive_b, 1 );
   fd_setcyls( drive_b, 40 );
   fd_setreadonly( drive_b, 0 );
+  drive_b_fd = -1;
 
   /* And a null drive to use for the other two drives lib765 supports */
   drive_null = fd_new();
@@ -434,18 +445,83 @@ fdc_dprintf( int debug, char *format, ... )
 }
 
 int
-specplus3_disk_insert( specplus3_drive_number drive, const char *filename )
+specplus3_disk_insert( specplus3_drive_number which, const char *filename )
 {
-  fprintf( stderr, "%s: specplus3_disk_insert not implemented yet. Sorry.\n",
-	   fuse_progname );
+  FDRV_PTR drive = NULL;
+  int *fd = NULL;
+
+  struct flock lock; int error;
+
+  switch( which ) {
+  case SPECPLUS3_DRIVE_A: drive = drive_a; fd = &drive_a_fd; break;
+  case SPECPLUS3_DRIVE_B: drive = drive_b; fd = &drive_b_fd; break;
+  default:
+    ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d\n",
+	      which );
+    fuse_abort();
+  }
+
+  /* Eject any disk already in the drive */
+  if( *fd != -1 ) specplus3_disk_eject( which );
+
+  *fd = open( filename, O_RDWR );
+  if( *fd == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
+	      strerror( errno ) );
+    return 1;
+  }
+
+  /* Exclusively lock the entire file */
+  lock.l_type = F_WRLCK;
+  lock.l_start = 0;
+  lock.l_whence = SEEK_SET;
+  lock.l_len = 0;		/* Entire file */
+
+  error = fcntl( *fd, F_SETLK, &lock );
+  if( error == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Couldn't lock '%s': %s", filename,
+	      strerror( errno ) );
+    close( *fd );
+    return 1;
+  }
+
+  /* And now insert the disk */
+  fdd_setfilename( drive, filename );
+
   return 0;
 }
 
 int
-specplus3_disk_eject( specplus3_drive_number drive )
+specplus3_disk_eject( specplus3_drive_number which )
 {
-  fprintf( stderr, "%s: specplus3_disk_eject not implemented yet. Sorry.\n",
-	   fuse_progname );
+  FDRV_PTR drive = NULL;
+  int *fd = NULL;
+  
+  int error;
+
+  switch( which ) {
+  case SPECPLUS3_DRIVE_A: drive = drive_a; fd = &drive_a_fd; break;
+  case SPECPLUS3_DRIVE_B: drive = drive_b; fd = &drive_b_fd; break;
+  default:
+    ui_error( UI_ERROR_ERROR, "specplus3_disk_eject: unknown drive %d\n",
+	      which );
+    fuse_abort();
+  }
+
+  /* NB: the fclose() called here will cause the lock on the file to
+     be released */
+  fd_eject( drive );
+
+  if( *fd != -1 ) {
+    error = close( *fd );
+    if( error == -1 ) {
+      ui_error( UI_ERROR_ERROR, "Couldn't close the disk: %s\n",
+		strerror( errno ) );
+      return 1;
+    }
+    *fd = -1;
+  }
+
   return 0;
 }
 
