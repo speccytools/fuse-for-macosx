@@ -1,7 +1,5 @@
-/* svga.c: Main svgalib routines
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
-
-   $Id$
+/* osssound.h: OSS (e.g. Linux) sound I/O
+   Copyright (c) 2000-2001 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,27 +15,13 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-   Author contact information:
-
-   E-mail: pak@ast.cam.ac.uk
-   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
-
 */
 
-/* Should this file really exist? At the moment, it's here more for
-   symmetry with the GTK+/Xlib versions that for any good reason of its
-   own
-*/
+#ifndef FUSE_OSSSOUND_H
+#define FUSE_OSSSOUND_H
 
-#include <config.h>
+int osssound_init(int *freqptr,int *stereoptr);
+void osssound_end(void);
+void osssound_frame(unsigned char *data,int len);
 
-#ifdef UI_SVGA			/* Use this iff we're using svgalib */
-
-#include <vgakeyboard.h>
-
-int svga_event() {
-    keyboard_update();
-    return 0;
-}
-
-#endif				/* #ifdef UI_SVGA */
+#endif				/* #ifndef FUSE_OSSSOUND_H */

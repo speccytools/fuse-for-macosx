@@ -28,22 +28,17 @@
 
 #include <stdlib.h>
 
+#ifdef HAVE_LIB_GLIB		/* If we're using glib */
 #include <glib.h>
+#else				/* #ifdef HAVE_LIB_GLIB */
+#include "glib.h"		/* If not, use the local replacement */
+#endif
 
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "ui.h"
 #include "spectrum.h"
-
-#if defined( UI_GTK )
-#include "gtk.h"
-#elif defined( UI_X )
-#include "x.h"
-#elif defined( UI_SVGA )
-#include "svga.h"
-#else
-#error No user interface selected
-#endif			/* #if defined( UI_GTK ) */
 
 /* A large value to mean `no events due' */
 const DWORD event_no_events = 0xffffffff;
@@ -115,13 +110,7 @@ int event_do_events(void)
     switch(ptr->type) {
     case EVENT_TYPE_INTERRUPT:
       spectrum_interrupt();
-#if defined( UI_GTK )
-      gtk_event();
-#elif defined( UI_X )
-      fuse_exiting=x_event();
-#elif defined( UI_SVGA )
-      svga_event();
-#endif			/* #if defined( UI_GTK ) */
+      ui_event();
       break;
     case EVENT_TYPE_LINE:
       display_line();

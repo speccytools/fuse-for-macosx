@@ -1,9 +1,9 @@
-The Free Unix Spectrum Emulator (Fuse) 0.3.0
+The Free Unix Spectrum Emulator (Fuse) 0.3.1
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.3.0.
+is Fuse (the Free Unix Spectrum Emulator), version 0.3.1.
 
 What Fuse does have:
 
@@ -22,7 +22,7 @@ What Fuse doesn't have:
 
 What you'll need to run Fuse:
 
-* A version of Un*x with glib, and either X or svgalib. If you have GTK+
+* A version of Un*x with either X or svgalib. If you have GTK+
   installed, you'll get a nicer user interface under X.
 
 To compile Fuse:
@@ -35,6 +35,12 @@ There are now some options you can give to configure; `configure
 --with-svgalib		Use the SVGAlib interface, rather than GTK+.
 --without-gtk		Use the plain Xlib interface, rather than GTK+.
 --enable-issue2		Emulate an Issue 2 Spectrum, rather than an Issue 3.
+
+If glib is installed on your system, Fuse will use this for a couple
+of things; however, it isn't necessary (unless you're using the GTK+
+interface, as GTK+ depends on glib). If you're having problem with
+your glib setup, you can use the `--without-glib' option to
+`configure', which will use some simple replacement routines.
 
 Then just:
 
@@ -95,6 +101,6 @@ Finally, if you want to see how a Unix Speccy emulator should be done,
 check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
 
 Philip Kendall <pak@ast.cam.ac.uk>
-31 January 2001
+<Day> <Month> 2001
 
 $Id$

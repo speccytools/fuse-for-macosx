@@ -35,9 +35,9 @@
 
 #include "display.h"
 #include "fuse.h"
-#include "x.h"
 #include "xdisplay.h"
 #include "xui.h"
+#include "uidisplay.h"
 
 static XImage *image;		/* The image structure to draw the
 				   Speccy's screen on */
@@ -52,7 +52,7 @@ static int xdisplay_allocate_colours(int numColours, unsigned long *colours);
 static int xdisplay_allocate_gc(Window window, GC *gc);
 static int xdisplay_allocate_image(int width, int height);
 
-int xdisplay_init(int width, int height)
+int uidisplay_init(int width, int height)
 {
   if(xdisplay_allocate_colours(16,colours)) return 1;
   if(xdisplay_allocate_gc(xui_mainWindow,&gc)) return 1;
@@ -159,21 +159,21 @@ int xdisplay_configure_notify(int width, int height)
 
   /* And the entire border */
   for(y=0;y<DISPLAY_BORDER_HEIGHT;y++) {
-    xdisplay_set_border(y,0,DISPLAY_SCREEN_WIDTH,display_border);
-    xdisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y,0,
-			DISPLAY_SCREEN_WIDTH,display_border);
+    uidisplay_set_border(y, 0, DISPLAY_SCREEN_WIDTH, display_border);
+    uidisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y, 0,
+			 DISPLAY_SCREEN_WIDTH, display_border);
   }
 
   for(y=DISPLAY_BORDER_HEIGHT;y<DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT;y++) {
-    xdisplay_set_border(y,0,DISPLAY_BORDER_WIDTH,display_border);
-    xdisplay_set_border(y,DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
-			DISPLAY_SCREEN_WIDTH,display_border);
+    uidisplay_set_border(y, 0, DISPLAY_BORDER_WIDTH, display_border);
+    uidisplay_set_border(y, DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
+			 DISPLAY_SCREEN_WIDTH, display_border);
   }
 
   return 0;
 }
 
-void xdisplay_putpixel(int x,int y,int colour)
+void uidisplay_putpixel(int x,int y,int colour)
 {
   switch(xdisplay_current_size) {
   case 1:
@@ -199,7 +199,7 @@ void xdisplay_putpixel(int x,int y,int colour)
   }
 }
 
-void xdisplay_line(int y)
+void uidisplay_line(int y)
 {
   XPutImage(display, xui_mainWindow, gc, image,
 	    0, xdisplay_current_size*y,
@@ -212,7 +212,7 @@ void xdisplay_area(int x, int y, int width, int height)
   XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
 }
 
-void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
+void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {
   int x;
   
@@ -246,7 +246,7 @@ void xdisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
   }
 }
 
-int xdisplay_end(void)
+int uidisplay_end(void)
 {
   /* Free the XImage used to store screen data; also frees the malloc'd
      data */

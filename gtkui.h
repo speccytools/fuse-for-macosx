@@ -34,7 +34,4 @@
 extern GtkWidget* gtkui_window;
 extern GtkWidget* gtkui_drawing_area;
 
-int gtkui_init(int *argc, char ***argv, int width, int height);
-int gtkui_end(void);
-
 #endif			/* #ifndef FUSE_GTKUI_H */

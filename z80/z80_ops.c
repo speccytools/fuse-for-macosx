@@ -32,6 +32,14 @@
 
 #include "z80_macros.h"
 
+#ifndef HAVE_ENOUGH_MEMORY
+static void z80_cbxx(BYTE opcode2);
+static void z80_ddxx(BYTE opcode2);
+static void z80_edxx(BYTE opcode2);
+static void z80_fdxx(BYTE opcode2);
+static void z80_ddfdcbxx(BYTE opcode3, WORD tempaddr);
+#endif				/* #ifndef HAVE_ENOUGH_MEMORY */
+
 /* Execute Z80 opcodes until the next event */
 void z80_do_opcodes()
 {
@@ -946,9 +954,13 @@ void z80_do_opcodes()
       {
 	BYTE opcode2=readbyte(PC++);
 	R++;
+#ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #include "z80_cb.c"
 	}
+#else			/* #ifdef HAVE_ENOUGH_MEMORY */
+	z80_cbxx(opcode2);
+#endif			/* #ifdef HAVE_ENOUGH_MEMORY */
       }
       break;
     case 0xcc:		/* CALL Z,nnnn */
@@ -1036,18 +1048,22 @@ void z80_do_opcodes()
       break;
     case 0xdd:		/* DDxx opcodes */
       {
+	BYTE opcode2=readbyte(PC++);
+	R++;
+#ifdef HAVE_ENOUGH_MEMORY
+	switch(opcode2) {
 #define REGISTER  IX
 #define REGISTERL IXL
 #define REGISTERH IXH
-	BYTE opcode2=readbyte(PC++);
-	R++;
-	switch(opcode2) {
 #include "z80_ddfd.c"
-	}
-      }
 #undef REGISTERH
 #undef REGISTERL
 #undef REGISTER
+	}
+#else			/* #ifdef HAVE_ENOUGH_MEMORY */
+	z80_ddxx(opcode2);
+#endif			/* #ifdef HAVE_ENOUGH_MEMORY */
+      }
       break;
     case 0xde:		/* SBC A,nn */
       tstates+=4;
@@ -1129,9 +1145,13 @@ void z80_do_opcodes()
       {
 	BYTE opcode2=readbyte(PC++);
 	R++;
+#ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #include "z80_ed.c"
 	}
+#else			/* #ifdef HAVE_ENOUGH_MEMORY */
+	z80_edxx(opcode2);
+#endif			/* #ifdef HAVE_ENOUGH_MEMORY */
       }
       break;
     case 0xee:		/* XOR A,nn */
@@ -1205,19 +1225,23 @@ void z80_do_opcodes()
       else PC+=2;
       break;
     case 0xfd:		/* FDxx opcodes */
-#define REGISTER  IY
-#define REGISTERL IYL
-#define REGISTERH IYH
       {
 	BYTE opcode2=readbyte(PC++);
 	R++;
+#ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
+#define REGISTER  IY
+#define REGISTERL IYL
+#define REGISTERH IYH
 #include "z80_ddfd.c"
-	}
-      }
 #undef REGISTERH
 #undef REGISTERL
 #undef REGISTER
+	}
+#else			/* #ifdef HAVE_ENOUGH_MEMORY */
+	z80_fdxx(opcode2);
+#endif			/* #ifdef HAVE_ENOUGH_MEMORY */
+      }
       break;
     case 0xfe:		/* CP nn */
       tstates+=7;
@@ -1236,3 +1260,54 @@ void z80_do_opcodes()
   }			/* Matches while( tstates < event_next_event ) { */
 
 }
+
+#ifndef HAVE_ENOUGH_MEMORY
+
+static void z80_cbxx(BYTE opcode2)
+{
+  switch(opcode2) {
+#include "z80_cb.c"
+  }
+}
+
+static void z80_ddxx(BYTE opcode2)
+{
+  switch(opcode2) {
+#define REGISTER  IX
+#define REGISTERL IXL
+#define REGISTERH IXH
+#include "z80_ddfd.c"
+#undef REGISTERH
+#undef REGISTERL
+#undef REGISTER
+  }
+}
+
+static void z80_edxx(BYTE opcode2)
+{
+  switch(opcode2) {
+#include "z80_ed.c"
+  }
+}
+
+static void z80_fdxx(BYTE opcode2)
+{
+  switch(opcode2) {
+#define REGISTER  IY
+#define REGISTERL IYL
+#define REGISTERH IYH
+#include "z80_ddfd.c"
+#undef REGISTERH
+#undef REGISTERL
+#undef REGISTER
+  }
+}
+
+static void z80_ddfdcbxx(BYTE opcode3, WORD tempaddr)
+{
+  switch(opcode3) {
+#include "z80_ddfdcb.c"
+  }
+}
+
+#endif			/* #ifndef HAVE_ENOUGH_MEMORY */

@@ -35,11 +35,12 @@
 
 #include "display.h"
 #include "fuse.h"
-#include "gtkdisplay.h"
 #include "gtkkeyboard.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "ui.h"
+#include "uidisplay.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -75,7 +76,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
 };
 static guint gtkui_menu_data_size = 10;
   
-int gtkui_init(int *argc, char ***argv, int width, int height)
+int ui_init(int *argc, char ***argv, int width, int height)
 {
   GtkWidget *box,*menu_bar;
   GtkAccelGroup *accel_group;
@@ -136,7 +137,7 @@ int gtkui_init(int *argc, char ***argv, int width, int height)
 
   gtk_widget_show(gtkui_drawing_area);
 
-  if(gtkdisplay_init(width,height)) return 1;
+  if(uidisplay_init(width,height)) return 1;
 
   gtk_widget_show(gtkui_window);
 
@@ -160,14 +161,22 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
   return FALSE;
 }
 
-int gtkui_end(void)
+int ui_event(void)
+{
+  while(gtk_events_pending())
+    gtk_main_iteration();
+  return 0;
+}
+
+int ui_end(void)
 {
   int error;
   
   /* Don't display the window whilst doing all this! */
   gtk_widget_hide(gtkui_window);
 
-  error=gtkdisplay_end(); if(error) return error;
+  /* Tidy up the low-level stuff */
+  error = uidisplay_end(); if(error) return error;
 
   /* Now free up the window itself */
 /*    XDestroyWindow(display,mainWindow); */

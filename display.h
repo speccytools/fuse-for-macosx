@@ -51,6 +51,5 @@ void display_dirty(WORD address, BYTE data);
 void display_set_border(int colour);
 int display_frame(void);
 void display_refresh_all(void);
-int display_end(void);
 
 #endif			/* #ifndef FUSE_DISPLAY_H */

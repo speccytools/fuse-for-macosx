@@ -24,14 +24,25 @@
 
 */
 
+/* Defined if we've got enough memory to compile z80_ops.c */
+#undef HAVE_ENOUGH_MEMORY
+
+/* Defined if we've got glib */
+#undef HAVE_LIB_GLIB
+
+/* Defined if Issue 2 emulation requested */
+#undef ISSUE2
+
+/* Defined if framebuffer UI in use */
+#undef UI_FB
+
 /* Defined if GTK+ UI in use */
 #undef UI_GTK
-
-/* Defined if Xlib UI in use */
-#undef UI_X
 
 /* Defined if svgalib UI in use */
 #undef UI_SVGA
 
-/* Defined if Issue 2 emulation requested */
-#undef ISSUE2
+/* Defined if Xlib UI in use */
+#undef UI_X
+
+

@@ -15,6 +15,11 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
+   Author contact information:
+
+   E-mail: pak@ast.cam.ac.uk
+   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
 */
 
 #ifndef FUSE_SOUND_H

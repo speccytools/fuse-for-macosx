@@ -34,8 +34,8 @@
 
 #include "display.h"
 #include "fuse.h"
-#include "gtkdisplay.h"
 #include "gtkui.h"
+#include "uidisplay.h"
 
 static GdkGC *gc;
 static GdkImage *image;
@@ -46,6 +46,8 @@ static unsigned long colours[16];
 static int gtkdisplay_current_size=1;
 
 static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours);
+static void gtkdisplay_area(int x, int y, int width, int height);
+static int gtkdisplay_configure_notify(int width, int height);
 
 /* Callbacks */
 
@@ -54,7 +56,7 @@ static gint gtkdisplay_expose(GtkWidget *widget, GdkEvent *event,
 static gint gtkdisplay_configure(GtkWidget *widget, GdkEvent *event,
 				 gpointer data);
 
-int gtkdisplay_init(int width, int height)
+int uidisplay_init(int width, int height)
 {
   int x,y,get_width,get_height, depth;
   GdkGCValues gc_values;
@@ -141,7 +143,7 @@ static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
 
 }
   
-int gtkdisplay_configure_notify(int width, int height)
+static int gtkdisplay_configure_notify(int width, int height)
 {
   int y,size;
 
@@ -161,21 +163,21 @@ int gtkdisplay_configure_notify(int width, int height)
 
   /* And the entire border */
   for(y=0;y<DISPLAY_BORDER_HEIGHT;y++) {
-    gtkdisplay_set_border(y,0,DISPLAY_SCREEN_WIDTH,display_border);
-    gtkdisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y,0,
-			  DISPLAY_SCREEN_WIDTH,display_border);
+    uidisplay_set_border(y,0,DISPLAY_SCREEN_WIDTH,display_border);
+    uidisplay_set_border(DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT+y,0,
+			 DISPLAY_SCREEN_WIDTH,display_border);
   }
 
   for(y=DISPLAY_BORDER_HEIGHT;y<DISPLAY_BORDER_HEIGHT+DISPLAY_HEIGHT;y++) {
-    gtkdisplay_set_border(y,0,DISPLAY_BORDER_WIDTH,display_border);
-    gtkdisplay_set_border(y,DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
-			  DISPLAY_SCREEN_WIDTH,display_border);
+    uidisplay_set_border(y,0,DISPLAY_BORDER_WIDTH,display_border);
+    uidisplay_set_border(y,DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
+			 DISPLAY_SCREEN_WIDTH,display_border);
   }
 
   return 0;
 }
 
-void gtkdisplay_putpixel(int x,int y,int colour)
+void uidisplay_putpixel(int x,int y,int colour)
 {
   switch(gtkdisplay_current_size) {
   case 1:
@@ -201,7 +203,7 @@ void gtkdisplay_putpixel(int x,int y,int colour)
   }
 }
 
-void gtkdisplay_line(int y)
+void uidisplay_line(int y)
 {
   gdk_draw_image(gtkui_drawing_area->window, gc, image,
 		 0,gtkdisplay_current_size*y,
@@ -210,12 +212,12 @@ void gtkdisplay_line(int y)
 		 gtkdisplay_current_size);
 }
 
-void gtkdisplay_area(int x, int y, int width, int height)
+static void gtkdisplay_area(int x, int y, int width, int height)
 {
   gdk_draw_image(gtkui_drawing_area->window,gc,image,x,y,x,y,width,height);
 }
 
-void gtkdisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
+void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {
   int x;
   
@@ -249,7 +251,7 @@ void gtkdisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
   }
 }
 
-int gtkdisplay_end(void)
+int uidisplay_end(void)
 {
   /* Free the XImage used to store screen data; also frees the malloc'd
      data */

@@ -36,7 +36,7 @@
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
-#include "x.h"
+#include "ui.h"
 #include "z80.h"
 
 /* What name were we called under? */
@@ -90,7 +90,7 @@ static void fuse_show_copyright(void)
 {
   printf(
    "The Free Unix Spectrum Emulator (Fuse) version " VERSION ".\n"
-   "Copyright (c) 1999-2000 Philip Kendall <pak@ast.cam.ac.uk> and others.\n"
+   "Copyright (c) 1999-2001 Philip Kendall <pak@ast.cam.ac.uk> and others.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"
    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
@@ -105,7 +105,7 @@ static int fuse_end(void)
   if(!sound_enabled) timer_end();
   sound_end();
   event_end();
-  display_end();
+  ui_end();
 
   return 0;
 }

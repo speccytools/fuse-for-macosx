@@ -1,5 +1,5 @@
-/* x.c: Routines for dealing with X events
-   Copyright (c) 2000 Philip Kendall
+/* fbui.c: Routines for dealing with the linux fbdev user interface
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -26,43 +26,45 @@
 
 #include <config.h>
 
-#ifdef UI_X			/* Use this iff we're using Xlib */
+#ifdef UI_FB			/* Use this iff we're using fbdev */
 
-#include <X11/Xlib.h>
+#include <stdio.h>
 
-#include "xdisplay.h"
-#include "xkeyboard.h"
+#include "fuse.h"
+#include "fbkeyboard.h"
+#include "ui.h"
+#include "uidisplay.h"
 
-Display *display;		/* Which display are we connected to */
-
-Bool x_trueFunction();
-
-int x_event(void)
+int ui_init(int *argc, char ***argv, int width, int height)
 {
-  XEvent event;
+  int error;
 
-  while(XCheckIfEvent(display,&event,x_trueFunction,NULL)) {
-    switch(event.type) {
-    case ConfigureNotify:
-      xdisplay_configure_notify(event.xconfigure.width,
-				event.xconfigure.height);
-      break;
-    case Expose:
-      xdisplay_area(event.xexpose.x,event.xexpose.y,
-		    event.xexpose.width,event.xexpose.height);
-      break;
-    case KeyPress:
-      return xkeyboard_keypress(&(event.xkey));
-    case KeyRelease:
-      xkeyboard_keyrelease(&(event.xkey));
-    }
-  }
+  error = uidisplay_init(width, height);
+  if(error) return error;
+
+  error = fbkeyboard_init();
+  if(error) return error;
+
   return 0;
 }
-    
-Bool x_trueFunction()
+
+int ui_event()
 {
-  return True;
+  keyboard_update();
+  return 0;
 }
 
-#endif				/* #ifdef UI_X */
+int ui_end(void)
+{
+  int error;
+
+  error = fbkeyboard_end();
+  if(error) return error;
+
+  error = uidisplay_end();
+  if(error) return error;
+
+  return 0;
+}
+
+#endif				/* #ifdef UI_FB */

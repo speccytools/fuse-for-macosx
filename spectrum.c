@@ -1,5 +1,5 @@
 /* spectrum.c: Generic Spectrum routines
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -38,7 +38,6 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "timer.h"
-#include "x.h"
 #include "z80.h"
 
 BYTE ROM[4][0x4000];
@@ -154,8 +153,6 @@ BYTE spectrum_ula_read(WORD port)
 void spectrum_ula_write(WORD port, BYTE b)
 {
   display_set_border( b & 0x07 );
-  sound_beeper(b&0x10);
-
   sound_beeper( b & 0x10 );
 
 #ifdef ISSUE2

@@ -34,15 +34,20 @@
 #include <X11/Xutil.h>
 
 #include "fuse.h"
-#include "x.h"
+#include "ui.h"
+#include "uidisplay.h"
 #include "xdisplay.h"
+#include "xkeyboard.h"
 #include "xui.h"
 
+Display *display;		/* Which display are we connected to */
 int xui_screenNum;		/* Which screen are we using on our
 				   X server? */
 Window xui_mainWindow;		/* Window ID for the main Fuse window */
 
-int xui_init(int argc, char **argv, int width, int height)
+Bool xui_trueFunction();
+
+int ui_init(int *argc, char ***argv, int width, int height)
 {
   char *displayName=NULL;	/* Use default display */
   XWMHints *wmHints;
@@ -119,8 +124,8 @@ int xui_init(int argc, char **argv, int width, int height)
   classHint->res_name=fuse_progname;
   classHint->res_class="Fuse";
 
-  XSetWMProperties(display, xui_mainWindow, &windowName, &iconName, argv, argc,
-		   sizeHints,wmHints,classHint);
+  XSetWMProperties(display, xui_mainWindow, &windowName, &iconName,
+		   *argv, *argc, sizeHints, wmHints, classHint);
 
   /* Ask the server to use its backing store for this window */
 
@@ -136,7 +141,7 @@ int xui_init(int argc, char **argv, int width, int height)
 	       KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
 	       StructureNotifyMask);
 
-  if(xdisplay_init(width,height)) return 1;
+  if(uidisplay_init(width,height)) return 1;
 
   /* And finally display the window */
   XMapWindow(display,xui_mainWindow);
@@ -144,7 +149,37 @@ int xui_init(int argc, char **argv, int width, int height)
   return 0;
 }
 
-int xui_end(void)
+int ui_event(void)
+{
+  XEvent event;
+
+  while(XCheckIfEvent(display,&event,xui_trueFunction,NULL)) {
+    switch(event.type) {
+    case ConfigureNotify:
+      xdisplay_configure_notify(event.xconfigure.width,
+				event.xconfigure.height);
+      break;
+    case Expose:
+      xdisplay_area(event.xexpose.x,event.xexpose.y,
+		    event.xexpose.width,event.xexpose.height);
+      break;
+    case KeyPress:
+      fuse_exiting=xkeyboard_keypress(&(event.xkey));
+      break;
+    case KeyRelease:
+      xkeyboard_keyrelease(&(event.xkey));
+      break;
+    }
+  }
+  return 0;
+}
+    
+Bool xui_trueFunction()
+{
+  return True;
+}
+
+int ui_end(void)
 {
   int error;
 
@@ -152,7 +187,7 @@ int xui_end(void)
   XUnmapWindow(display,xui_mainWindow);
 
   /* Tidy up the low level stuff */
-  error=xdisplay_end(); if(error) return error;
+  error=uidisplay_end(); if(error) return error;
 
   /* Now free up the window itself */
   XDestroyWindow(display,xui_mainWindow);

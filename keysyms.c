@@ -47,6 +47,7 @@
 #define KEY(keysym) XK_ ## keysym
 #elif defined( UI_SVGA )
 #include <vgakeyboard.h>
+#elif defined( UI_FB )
 #else
 #error No user interface selected
 #endif
@@ -133,7 +134,7 @@ static keysyms_key_info keysyms_data[] = {
 
 };
 
-#else				/* #if defined( UI_GTK ) || defined( UI_X ) */
+#elif defined( UI_SVGA )		/* #if defined( UI_GTK ) || defined( UI_X ) */
 
 static keysyms_key_info keysyms_data[] = {
 
@@ -195,9 +196,13 @@ static keysyms_key_info keysyms_data[] = {
 
   { SCANCODE_LEFTCONTROL  , KEYBOARD_Symbol, KEYBOARD_NONE },
   { SCANCODE_LEFTALT      , KEYBOARD_Symbol, KEYBOARD_NONE },
+#ifdef SCANCODE_LEFTWIN
   { SCANCODE_LEFTWIN      , KEYBOARD_Symbol, KEYBOARD_NONE },
+#endif				/* #ifdef SCANCODE_LEFTWIN */
   { SCANCODE_SPACE        , KEYBOARD_space,  KEYBOARD_NONE },
+#ifdef SCANCODE_RIGHTWIN
   { SCANCODE_RIGHTWIN     , KEYBOARD_Symbol, KEYBOARD_NONE },
+#endif				/* #ifdef SCANCODE_RIGHTWIN */
   { 127                   , KEYBOARD_Symbol, KEYBOARD_NONE }, /* Menu */
   { SCANCODE_RIGHTALT     , KEYBOARD_Symbol, KEYBOARD_NONE },
   { SCANCODE_RIGHTCONTROL , KEYBOARD_Symbol, KEYBOARD_NONE },
@@ -205,7 +210,16 @@ static keysyms_key_info keysyms_data[] = {
   { 0, 0, 0 }			/* End marker: DO NOT MOVE! */
 
 };
+#elif defined( UI_FB )
 
+static keysyms_key_info keysyms_data[] = {
+
+  { 1<<9            , KEYBOARD_0,      KEYBOARD_NONE },
+  { 1<<10            , KEYBOARD_Enter,      KEYBOARD_NONE },
+  { 1<<11            , KEYBOARD_p,      KEYBOARD_NONE },
+  { 1<<12            , KEYBOARD_q,      KEYBOARD_NONE },
+  { 0, 0, 0 }			/* End marker: DO NOT MOVE! */
+};
 #endif				/* #if defined( UI_GTK ) || defined( UI_X ) */
 
 keysyms_key_info* keysyms_get_data(unsigned keysym)

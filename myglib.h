@@ -1,5 +1,5 @@
-/* svga.h: Top-level svgalib routines
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+/* myglib.h: Replacements for glib routines
+   Copyright (c) 2001 Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -24,10 +24,38 @@
 
 */
 
-#ifndef FUSE_SVGAUI_H
-#define FUSE_SVGAUI_H
+#ifndef FUSE_MYGLIB_H
+#define FUSE_MYGLIB_H
 
-int svgaui_init(int argc, char **argv, int width, int height);
-int svgaui_end(void);
+typedef int gint;
+typedef const void * gconstpointer;
+typedef void * gpointer;
 
-#endif			/* #ifndef FUSE_SVGA_H */
+typedef struct _GSList GSList;
+
+struct _GSList {
+    gpointer data;
+    GSList *next;
+};
+
+typedef void		(*GFunc)		(gpointer	data,
+						 gpointer	user_data);
+
+typedef gint		(*GCompareFunc)		(gconstpointer	a,
+						 gconstpointer	b);
+
+
+GSList* g_slist_insert_sorted	(GSList		*list,
+				 gpointer	 data,
+				 GCompareFunc	 func);
+
+GSList* g_slist_remove		(GSList		*list,
+				 gpointer	 data);
+
+void	g_slist_foreach		(GSList		*list,
+				 GFunc		 func,
+				 gpointer	 user_data);
+
+void	g_slist_free		(GSList		*list);
+
+#endif				/* #ifndef FUSE_MYGLIB_H */

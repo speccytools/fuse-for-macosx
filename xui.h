@@ -31,9 +31,7 @@
 #include <X11/Xlib.h>
 #endif
 
-int xui_init(int argc, char **argv, int width, int height);
-int xui_end(void);
-
+extern Display *display;	/* Which display are we connected to? */
 extern int xui_screenNum;	/* Which screen are we using on our
 				   X server? */
 extern Window xui_mainWindow;	/* Window ID for the main Fuse window */

@@ -1,5 +1,5 @@
-/* svgadisplay.h: Routines for dealing with the svgalib display
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+/* ui.h: General UI event handling routines
+   Copyright (c) 2000-2001 Philip Kendall
 
    $Id$
 
@@ -24,17 +24,11 @@
 
 */
 
-#ifndef FUSE_SVGADISPLAY_H
-#define FUSE_SVGADISPLAY_H
+#ifndef FUSE_UI_H
+#define FUSE_UI_H
 
-int svgadisplay_init(int width, int height);
+int ui_init(int *argc, char ***argv, int width, int height);
+int ui_event(void);
+int ui_end(void);
 
-void svgadisplay_putpixel(int x,int y,int colour);
-void svgadisplay_line(int y);
-void svgadisplay_area(int x, int y, int width, int height);
-void svgadisplay_set_border(int line, int pixel_from, int pixel_to,
-			    int colour);
-
-int svgadisplay_end(void);
-
-#endif			/* #ifndef FUSE_SVGADISPLAY_H */
+#endif			/* #ifndef FUSE_UI_H */

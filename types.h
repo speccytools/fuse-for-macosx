@@ -27,13 +27,34 @@
 #ifndef FUSE_TYPES_H
 #define FUSE_TYPES_H
 
-typedef   signed char SBYTE;
-typedef unsigned char  BYTE;
+#if   SIZEOF_CHAR  == 1
+typedef   signed  char SBYTE;
+typedef unsigned  char  BYTE;
+#elif SIZEOF_SHORT == 1
+typedef   signed short SBYTE
+typedef unsigned short  BYTE;
+#else
+#error No plausible 8 bit types found
+#endif
 
+#if   SIZEOF_SHORT == 2
 typedef   signed short SWORD;
 typedef unsigned short  WORD;
+#elif SIZEOF_INT   == 2
+typedef   signed   int SWORD;
+typedef unsigned   int  WORD;
+#else
+#error No plausible 16 bit types found
+#endif
 
-typedef   signed int SDWORD;
-typedef unsigned int  DWORD;
+#if   SIZEOF_INT   == 4
+typedef   signed  int SDWORD;
+typedef unsigned  int  DWORD;
+#elif SIZEOF_LONG  == 4
+typedef   signed long SDWORD;
+typedef unsigned long  DWORD;
+#else
+#error No plausible 32 bit types found
+#endif
 
 #endif			/* #ifndef FUSE_TYPES_H */

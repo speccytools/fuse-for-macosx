@@ -1,5 +1,5 @@
-/* x.h: Routines for dealing with X events
-   Copyright (c) 2000 Philip Kendall
+/* uidisplay.h: Low-level display routines
+   Copyright (c) 2000-2001 Philip Kendall
 
    $Id$
 
@@ -24,15 +24,16 @@
 
 */
 
-#ifndef FUSE_X_H
-#define FUSE_X_H
+#ifndef FUSE_UIDISPLAY_H
+#define FUSE_UIDISPLAY_H
 
-#ifndef _XLIB_H_
-#include <X11/Xlib.h>
-#endif			/* #ifndef _XLIB_H_ */
+int uidisplay_init(int width, int height);
 
-extern Display *display;
+void uidisplay_putpixel(int x,int y,int colour);
+void uidisplay_line(int y);
+void uidisplay_set_border(int line, int pixel_from, int pixel_to,
+			  int colour);
 
-int x_event(void);
+int uidisplay_end(void);
 
-#endif			/* #ifndef FUSE_X_H */
+#endif			/* #ifndef FUSE_UIDISPLAY_H */

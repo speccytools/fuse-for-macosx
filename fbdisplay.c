@@ -1,4 +1,4 @@
-/* svgadisplay.c: Routines for dealing with the svgalib display
+/* fbdisplay.c: Routines for dealing with the linux fbdev display
    Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
@@ -26,78 +26,79 @@
 
 #include <config.h>
 
-#ifdef UI_SVGA			/* Use this iff we're using svgalib */
+#ifdef UI_FB			/* Use this iff we're using fbdev */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
-#include <vga.h>
-#include <vgakeyboard.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <linux/fb.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <string.h>
 
 #include "fuse.h"
 #include "display.h"
 #include "uidisplay.h"
 
-static unsigned char *image;
+static unsigned short *image, *gm;
 
 static int colours[16];
+static int fd;
 
-static int svgadisplay_allocate_colours(int numColours, int *colours);
-static int svgadisplay_allocate_image(int width, int height);
+static int fbdisplay_allocate_colours(int numColours, int *colours);
+static int fbdisplay_allocate_image(int width, int height);
 
 /* Never used, so commented out to avoid warning */
-/*  static void svgadisplay_area(int x, int y, int width, int height); */
+/*  static void fbdisplay_area(int x, int y, int width, int height); */
 
 int uidisplay_init(int width, int height)
 {
+  struct fb_fix_screeninfo fi;
 
-  vga_init();
-#ifdef G320x240x256V
-  vga_setmode(G320x240x256V);
-#else				/* #ifdef G320x240x256V */
-  vga_setmode(G320x240x256);
-#endif				/* #ifdef G320x240x256V */
-  
-  svgadisplay_allocate_image(DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_HEIGHT);
-  svgadisplay_allocate_colours(16, colours);  
+/* fb is assumed to be in 320x240x65K colour mode */
+  fd=open("/dev/fb",O_RDWR);
+  ioctl(fd, FBIOGET_FSCREENINFO, &fi);
+  gm=mmap(0, fi.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  fbdisplay_allocate_image(DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_HEIGHT);
+  fbdisplay_allocate_colours(16, colours);  
 
   return 0;
 }
 
-static int svgadisplay_allocate_colours(int numColours, int *colours)
+static int fbdisplay_allocate_colours(int numColours, int *colours)
 {
   int colour_palette[] = {
-  0,0,0,
-  0,0,192,
-  192,0,0,
-  192,0,192,
-  0,192,0,
-  0,192,192,
-  192,192,0,
-  192,192,192,
-  0,0,0,
-  0,0,255,
-  255,0,0,
-  255,0,255,
-  0,255,0,
-  0,255,255,
-  255,255,0,
-  255,255,255
-  };
-  
+  0x0000,
+  0x0018,
+  0xc000,
+  0xc018,
+  0x0600,
+  0x0618,
+  0xc600,
+  0xc618,
+  0x0000,
+  0x001f,
+  0xf800,
+  0xf81f,
+  0x07e0,
+  0x07ff,
+  0xffe0,
+  0xffff
+};
   int i;
 
   for(i=0;i<numColours;i++) {
-    colours[i]=i;
-    vga_setpalette(i,colour_palette[i*3]>>2,colour_palette[i*3+1]>>2,
-		   colour_palette[i*3+2]>>2);
+    colours[i]=colour_palette[i];
   }
 
   return 0;
 }
   
-static int svgadisplay_allocate_image(int width, int height)
+static int fbdisplay_allocate_image(int width, int height)
 {
-  image=malloc(width*height);
+  image=malloc(width*height*2);
 
   if(!image) {
     fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
@@ -109,35 +110,34 @@ static int svgadisplay_allocate_image(int width, int height)
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
-  *(image+x+y*DISPLAY_SCREEN_WIDTH)=colour;
+  *(image+x+y*DISPLAY_SCREEN_WIDTH)=colours[colour];
 }
 
 void uidisplay_line(int y)
 {
-    vga_drawscansegment(image+y*DISPLAY_SCREEN_WIDTH,0,y,DISPLAY_SCREEN_WIDTH);
+    memcpy(gm+y*320, image+y*DISPLAY_SCREEN_WIDTH, DISPLAY_SCREEN_WIDTH*2);
 }
 
 /* Never used, so commented out to avoid warning */
-/*  static void svgadisplay_area(int x, int y, int width, int height) */
+/*  static void fbdisplay_area(int x, int y, int width, int height) */
 /*  { */
 /*      int yy; */
 /*      for(yy=y; yy<y+height; yy++) */
-/*          vga_drawscansegment(image+yy*DISPLAY_SCREEN_WIDTH+x,x,yy,width); */
+/*          memcpy(gm+yy*320+x, image+yy*DISPLAY_SCREEN_WIDTH+x, width*2); */
 /*  } */
 
 void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
 {
     int x;
-  
+
     for(x=pixel_from;x<pixel_to;x++)
         *(image+line*DISPLAY_SCREEN_WIDTH+x)=colours[colour];
 }
 
 int uidisplay_end(void)
 {
-    vga_setmode(TEXT);
-
+    close(fd);
     return 0;
 }
 
-#endif				/* #ifdef UI_SVGA */
+#endif				/* #ifdef UI_FB */

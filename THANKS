@@ -1,7 +1,7 @@
 Some thanks (in alphabetical order):
 
-* Michael Bukin: for XWinAllegro (used by previous versions of Fuse
-  for the graphical display)
+* Michael Bukin: for XWinAllegro, which was used by previous versions of
+  Fuse for the graphical display.
   (http://www.canvaslink.com/allegro/xwinallegro/)
 
 * Ian Collier: the source to his xz80
@@ -20,7 +20,8 @@ Some thanks (in alphabetical order):
   (ftp://ftp.void.jump.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
   got me started on this emulation lark all those years ago...
 
-* Russell Marks: for most of the Linux sound code.
+* Russell Marks: for the beeper/AY emulation, and the Linux specific sound
+  code.
 
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
@@ -33,6 +34,7 @@ Some thanks (in alphabetical order):
   -- simply the best Speccy Web site out there.
 
 * Matan Ziv-Av: for adding svgalib (http://www.svgalib.org/) support to
-  Fuse, and also work on the Linux sound code.
+  Fuse, some work on the sound code and the replacement functions used
+  if glib isn't available.
 
 $Id$

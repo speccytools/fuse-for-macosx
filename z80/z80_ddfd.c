@@ -1,5 +1,5 @@
 /* z80_ddfd.c: z80 DDxx and FDxx opcodes
-   Copyright (c) 1999-2000 Philip Kendall
+   Copyright (c) 1999-2001 Philip Kendall
 
    $Id$
 
@@ -472,9 +472,13 @@ case 0xcb:		/* {DD,FD}CBxx opcodes */
 {
   WORD tempaddr=REGISTER + (SBYTE)readbyte(PC++);
   BYTE opcode3=readbyte(PC++);
+#ifdef HAVE_ENOUGH_MEMORY
   switch(opcode3) {
 #include "z80_ddfdcb.c"
   }
+#else			/* #ifdef HAVE_ENOUGH_MEMORY */
+  z80_ddfdcbxx(opcode3,tempaddr);
+#endif			/* #ifdef HAVE_ENOUGH_MEMORY */
 }
 break;
 

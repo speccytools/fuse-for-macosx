@@ -30,16 +30,18 @@
 
 #include <stdio.h>
 
-#include "fuse.h"
-#include "svgadisplay.h"
-#include "svgakeyboard.h"
-#include "svgaui.h"
+#include <vgakeyboard.h>
 
-int svgaui_init(int argc, char **argv, int width, int height)
+#include "fuse.h"
+#include "svgakeyboard.h"
+#include "ui.h"
+#include "uidisplay.h"
+
+int ui_init(int *argc, char ***argv, int width, int height)
 {
   int error;
 
-  error = svgadisplay_init(width, height);
+  error = uidisplay_init(width, height);
   if(error) return error;
 
   error = svgakeyboard_init();
@@ -48,14 +50,20 @@ int svgaui_init(int argc, char **argv, int width, int height)
   return 0;
 }
 
-int svgaui_end(void)
+int ui_event()
+{
+  keyboard_update();
+  return 0;
+}
+
+int ui_end(void)
 {
   int error;
 
   error = svgakeyboard_end();
   if(error) return error;
 
-  error = svgadisplay_end();
+  error = uidisplay_end();
   if(error) return error;
 
   return 0;
