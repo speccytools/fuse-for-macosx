@@ -44,6 +44,9 @@ static libspectrum_error
 tzx_read_pure_tone( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		    const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_pulses_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		       const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
 static libspectrum_error
@@ -95,6 +98,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
       error = tzx_read_pure_tone( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+      error = tzx_read_pulses_block( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -252,6 +259,55 @@ tzx_read_pure_tone( libspectrum_tape *tape, const libspectrum_byte **ptr,
   tone_block->pulses = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
   
   /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  /* And return with no error */
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_read_pulses_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		       const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_pulses_block *pulses_block;
+
+  int i;
+
+  /* Check the count byte exists */
+  if( (*ptr) == end ) return LIBSPECTRUM_ERROR_CORRUPT;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  /* This is a `list of pulses' block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_PULSES;
+  pulses_block = &(block->types.pulses);
+
+  /* Get the count byte */
+  pulses_block->count = **ptr; (*ptr)++;
+
+  /* Check enough data exists for every pulse */
+  if( end - (*ptr) < 2 * pulses_block->count ) {
+    free( block );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Allocate memory for the actual list of lengths */
+  pulses_block->lengths = 
+    (libspectrum_dword*)malloc( pulses_block->count*sizeof(libspectrum_dword));
+  if( pulses_block->lengths == NULL ) {
+    free( block );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* Copy the data across */
+  for( i=0; i<pulses_block->count; i++ ) {
+    pulses_block->lengths[i] = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  }
+
+  /* Put the block into the block list */
   tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
 
   /* And return with no error */

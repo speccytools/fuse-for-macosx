@@ -47,6 +47,7 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_ROM = 0x10,
   LIBSPECTRUM_TAPE_BLOCK_TURBO,
   LIBSPECTRUM_TAPE_BLOCK_PURE_TONE,
+  LIBSPECTRUM_TAPE_BLOCK_PULSES,
 
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START = 0x21,
 
@@ -142,6 +143,18 @@ typedef struct libspectrum_tape_pure_tone_block {
 
 } libspectrum_tape_pure_tone_block;
 
+/* A list of pulses of different lengths */
+typedef struct libspectrum_tape_pulses_block {
+
+  size_t count;
+  libspectrum_dword *lengths;
+
+  /* Private data */
+
+  size_t edge_count;
+
+} libspectrum_tape_pulses_block;
+
 /* A group start block */
 typedef struct libspectrum_tape_group_start_block {
 
@@ -172,7 +185,10 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_rom_block rom;
     libspectrum_tape_turbo_block turbo;
     libspectrum_tape_pure_tone_block pure_tone;
+    libspectrum_tape_pulses_block pulses;
+
     libspectrum_tape_group_start_block group_start;
+
     libspectrum_tape_archive_info_block archive_info;
   } types;
 

@@ -124,6 +124,7 @@ main( int argc, char **argv )
     libspectrum_tape_rom_block *rom_block;
     libspectrum_tape_turbo_block *turbo_block;
     libspectrum_tape_pure_tone_block *tone_block;
+    libspectrum_tape_pulses_block *pulses_block;
     libspectrum_tape_archive_info_block *info_block;
 
     error = libspectrum_tape_block_description(
@@ -160,6 +161,13 @@ main( int argc, char **argv )
       tone_block = &(block->types.pure_tone);
       printf("  %d pulses of %d tstates\n",
 	     tone_block->pulses, tone_block->length );
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+      pulses_block = &(block->types.pulses);
+      for( i=0; i<pulses_block->count; i++ )
+	printf("  Pulse %3d: length %d tstates\n",
+	       i, pulses_block->lengths[i] );
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:

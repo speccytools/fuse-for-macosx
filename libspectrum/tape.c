@@ -59,6 +59,10 @@ static libspectrum_error
 tone_edge( libspectrum_tape_pure_tone_block *block, libspectrum_dword *tstates,
 	   int *end_of_block );
 
+static libspectrum_error
+pulses_edge( libspectrum_tape_pulses_block *block, libspectrum_dword *tstates,
+	     int *end_of_block );
+
 /*** Function definitions ****/
 
 /* Free up a list of blocks */
@@ -80,15 +84,21 @@ block_free( gpointer data, gpointer user_data )
   int i;
 
   switch( block->type ) {
+
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     free( block->types.rom.data );
     break;
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     free( block->types.turbo.data );
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+    free( block->types.pulses.lengths );
+    break;
+
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
     free( block->types.group_start.name );
     break;
+
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     for( i=0; i<block->types.archive_info.count; i++ ) {
       free( block->types.archive_info.strings[i] );
@@ -108,12 +118,17 @@ libspectrum_error
 libspectrum_tape_init_block( libspectrum_tape_block *block )
 {
   switch( block->type ) {
+
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
     return rom_init( &(block->types.rom) );
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     return turbo_init( &(block->types.turbo) );
   case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
     block->types.pure_tone.edge_count = block->types.pure_tone.pulses;
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+    block->types.pulses.edge_count = 0;
+    break;
 
   /* These blocks need no initialisation */
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
@@ -121,8 +136,10 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
     return LIBSPECTRUM_ERROR_NONE;
 
   default:
-    return LIBSPECTRUM_ERROR_UNKNOWN;
+    return LIBSPECTRUM_ERROR_LOGIC;
   }
+
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 static libspectrum_error
@@ -154,8 +171,8 @@ turbo_init( libspectrum_tape_turbo_block *block )
 }
 
 /* The main function: called with a tape object and returns the number of
-   t-states until the next edge (or LIBSPECTRUM_TAPE_END if that was the
-   last edge) */
+   t-states until the next edge, and a marker if this was the last edge
+   on the tape */
 libspectrum_error
 libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 				libspectrum_dword *tstates, int *end_of_tape )
@@ -184,9 +201,13 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
     error = tone_edge( &(block->types.pure_tone), tstates, &end_of_block );
     if( error ) return error;
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+    error = pulses_edge( &(block->types.pulses), tstates, &end_of_block );
+    if( error ) return error;
+    break;
 
   /* For blocks which contain no Spectrum-readable data, return zero
-     tstates and end of block set so we instantly get the next block */
+     tstates and set end of block set so we instantly get the next block */
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     *tstates = 0; end_of_block = 1;
@@ -194,7 +215,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
   default:
     *tstates = 0;
-    return LIBSPECTRUM_ERROR_UNKNOWN;
+    return LIBSPECTRUM_ERROR_LOGIC;
   }
 
   /* If that ended the block, move onto the next block */
@@ -430,6 +451,18 @@ tone_edge( libspectrum_tape_pure_tone_block *block, libspectrum_dword *tstates,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+pulses_edge( libspectrum_tape_pulses_block *block, libspectrum_dword *tstates,
+	     int *end_of_block )
+{
+  /* Get the length of this edge */
+  *tstates = block->lengths[ block->edge_count ];
+  /* Was that the last edge? */
+  if( ++(block->edge_count) == block->count ) (*end_of_block) = 1;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 libspectrum_error
 libspectrum_tape_block_description( libspectrum_tape_block *block,
 				    char *buffer, size_t length )
@@ -443,6 +476,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
     strncpy( buffer, "Pure Tone Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+    strncpy( buffer, "List of Pulses", length );
     break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
     strncpy( buffer, "Group Start Block", length );
