@@ -39,7 +39,8 @@ while(<>) {
 
     chomp;
 
-    my( $name, $type, $short, $commandline, $configfile ) = split /\s*,\s*/;
+    my( $name, $type, $default, $short, $commandline, $configfile ) =
+	split /\s*,\s*/;
 
     if( not defined $commandline ) {
 	$commandline = $name;
@@ -51,7 +52,7 @@ while(<>) {
 	$configfile =~ s/-//g;
     }
 
-    $options{$name} = { type => $type, short => $short,
+    $options{$name} = { type => $type, default => $default, short => $short,
 			commandline => $commandline,
 			configfile => $configfile };
 }
@@ -122,32 +123,19 @@ int settings_init( int argc, char **argv )
 /* Fill the settings structure with sensible defaults */
 int settings_defaults( settings_info *settings )
 {
-  settings->issue2 = 0;
-  settings->joy_kempston = 0;
-  settings->tape_traps = 1;
-  settings->slt_traps = 1;
+CODE
+
+    foreach my $name ( sort keys %options ) {
+	print "  settings->$name = $options{$name}->{default};\n";
+    }
+
+    print << 'CODE';
   
 #ifdef HAVE_LIBZ
   settings->rzx_compression = 1;
-#else			/* #ifdef HAVE_LIBZ */
-  settings->rzx_compression = 0;
 #endif			/* #ifdef HAVE_LIBZ */
 
-  settings->sound_device = NULL;
-  settings->sound = 1;
-  settings->sound_load = 1;
-  settings->stereo_ay = 0;
-  settings->stereo_beeper = 0;
-
-  settings->snapshot = NULL;
-  settings->tape_file = NULL;
-
-  settings->record_file = settings->playback_file = NULL;
-
-  settings->start_machine = strdup( "48" );
   if( !settings->start_machine ) return 1;
-
-  settings->svga_mode = 320;
 
   return 0;
 }

@@ -26,27 +26,28 @@
 
 # <name in settings_info structure>,
 # <type>,
+# <default value>,
 # <short option>,
 # <name on command line>, (defaults to <settings_info name> =~ s/_/-/g)
 # <name in config file>, (defaults to <command line> =~ s/-//g)
 
-issue2, boolean
-joy_kempston, boolean,, kempston
-tape_traps, boolean,, traps, tapetraps
-slt_traps, boolean,, slt, slttraps
+issue2, boolean, 0
+joy_kempston, boolean, 0,, kempston
+tape_traps, boolean, 1,, traps, tapetraps
+slt_traps, boolean, 1,, slt, slttraps
 
-sound_device, string, d
-sound, boolean
-sound_load, boolean,, loading-sound
-stereo_ay, boolean,, separation
-stereo_beeper, boolean,, beeper-stereo
+sound_device, string, NULL, d
+sound, boolean, 1
+sound_load, boolean, 1,, loading-sound
+stereo_ay, boolean, 0,, separation
+stereo_beeper, boolean, 0,, beeper-stereo
 
-rzx_compression, boolean,, compress-rzx
+rzx_compression, boolean, 0,, compress-rzx
 
-snapshot, string, s
-tape_file, string, t, tape, tapefile
-start_machine, string, m, machine
-record_file, string, r, record, recordfile
-playback_file, string, p, playback, playbackfile
+snapshot, string, NULL, s
+tape_file, string, NULL, t, tape, tapefile
+start_machine, string, strdup( "48" ), m, machine
+record_file, string, NULL, r, record, recordfile
+playback_file, string, NULL, p, playback, playbackfile
 
-svga_mode, numeric, v, svgamode
+svga_mode, numeric, 320, v, svgamode
