@@ -64,12 +64,11 @@ void z80_do_opcodes()
 			   the interrupt happen */
     }
 
+    /* If the z80 is HALTed, repeat the HALT instruction */
+    if( z80.halted ) PC--;
+
     /* Do the instruction fetch */
     contend( PC, 4 ); R++;
-
-    /* If the z80 is HALTed, do nothing */
-    if( z80.halted ) continue;
-
     opcode=readbyte( PC++ );
 
     switch(opcode) {
