@@ -95,7 +95,7 @@ print_error_to_stderr( ui_error_level severity, const char *message )
        using for graphics output, and writing text to it isn't a good
        idea. Things are OK if we're exiting though */
 #if defined( UI_FB ) || defined( UI_SVGA )
-    if( isatty( STDERR_FILENO ) && !fuse_exiting ) return;
+    if( isatty( STDERR_FILENO ) && !fuse_exiting ) return 1;
 #endif			/* #if defined( UI_FB ) || defined( UI_SVGA ) */
 
     fprintf( stderr, "%s: ", fuse_progname );

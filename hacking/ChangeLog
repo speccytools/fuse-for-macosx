@@ -1012,3 +1012,4 @@
 20040719 ui/fb/fbdisplay.c: hide/restore cursor on startup/exit (Darren).
 20040719 ui/fb/fbdisplay.c: remove unused variables (Darren).
 20040719 ui/xlib/xui.c: catch window close events (Darren).
+20040720 ui.c: fix missing return value (Darren).
