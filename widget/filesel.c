@@ -1,5 +1,5 @@
 /* filesel.c: File selection dialog box
-   Copyright (c) 2001 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2001,2002 Matan Ziv-Av, Philip Kendall, Russell Marks
 
    $Id$
 
@@ -431,6 +431,8 @@ void widget_filesel_keyhandler( keyboard_key_name key )
       current_file = 1; top_left_file = 1;
     }
     break;
+
+  default:	/* Keep gcc happy */
 
   }
 

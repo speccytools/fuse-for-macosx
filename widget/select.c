@@ -84,6 +84,8 @@ void widget_select_keyhandler( keyboard_key_name key )
     widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
     return;
 
+  default:	/* Keep gcc happy */
+
   }
 
   if( key >= KEYBOARD_a && key <= KEYBOARD_z &&

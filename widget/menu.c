@@ -83,6 +83,8 @@ void widget_menu_keyhandler( keyboard_key_name key )
     widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
     return;
 
+  default:	/* Keep gcc happy */
+
   }
 
   for( ptr=&menu[1]; ptr->text; ptr++ ) {
