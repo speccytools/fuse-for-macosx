@@ -87,12 +87,14 @@ static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
 static void gtkui_tape_clear( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
+#ifdef HAVE_765_H
 static void gtkui_disk_open_a( GtkWidget *widget, gpointer data );
 static void gtkui_disk_open_b( GtkWidget *widget, gpointer data );
 static void gtkui_disk_eject_a( GtkWidget *widget, gpointer data );
 static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data );
 
 static void gtkui_disk_open( specplus3_drive_number drive );
+#endif				/* #ifdef HAVE_765_H */
 
 static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
