@@ -59,7 +59,8 @@ debugger_command_evaluate( const char *command )
   /* Start parsing at the start of the given command */
   command_ptr = command_buffer;
     
-  yyparse();
+  /* Parse the command. If there was a problem, skip the rest of this line */
+  if( yyparse() ) command_ptr = "\0";
 
   ui_debugger_update();
 
