@@ -42,6 +42,7 @@
 #endif				/* #ifndef FUSE_WIDGET_H */
 
 /* The default colours used in the widget */
+#define WIDGET_COLOUR_DISABLED   0	/* Black */
 #define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
 #define WIDGET_COLOUR_FOREGROUND 7	/* White */
 

@@ -70,9 +70,12 @@ int widget_menu_draw( void *data )
   widget_printstring( 15 - strlen( menu->text ) / 2, 2,
 		      WIDGET_COLOUR_FOREGROUND, menu->text );
 
-  for( i=0; i<menu_entries; i++ )
-    widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND,
-			menu[i+1].text );
+  for( i = 0; i < menu_entries; i++ ) {
+    int colour = menu[i+1].inactive ?
+                 WIDGET_COLOUR_DISABLED :
+		 WIDGET_COLOUR_FOREGROUND;
+    widget_printstring( 2, i+4, colour, menu[i+1].text );
+  }
 
   widget_display_lines( 2, menu_entries + 2 );
 
@@ -106,7 +109,7 @@ widget_menu_keyhandler( input_key key )
   }
 
   for( ptr=&menu[1]; ptr->text; ptr++ ) {
-    if( key == ptr->key ) {
+    if( !ptr->inactive && key == ptr->key ) {
 
       if( ptr->submenu ) {
 	widget_do( WIDGET_TYPE_MENU, ptr->submenu );
@@ -440,12 +443,43 @@ menu_help_keyboard( int action )
   if( utils_close_file( &file ) ) return;
 }
 
-/* Function to (de)activate specific menu items */
-/* FIXME: make this work */
-int
-ui_menu_activate( ui_menu_item item, int active )
+static int
+set_active( struct widget_menu_entry *menu, const char *path, int active )
 {
-  return 0;
+  if( *path == '/' ) path++;
+
+  /* Skip the menu title */
+  menu++;
+
+  for( ; menu->text; menu++ ) {
+
+    const char *p = menu->text, *q = path;
+
+    /* Compare the two strings, but skip and '(' and ')' characters
+       in the menu (used to designate the hotkey) */
+    do {
+      if( *p == '(' || *p == ')' ) p++;
+    } while( *p && *p++ == *q++ );
+
+    if( *p ) continue;		/* not matched */
+
+    /* match, but with a submenu */
+    if( *q == '/' ) return set_active( menu->submenu, q, active );
+
+    if( *q ) continue;		/* not matched */
+
+    /* we have a match */
+    menu->inactive = !active;
+    return 0; 
+  }
+
+  return 1;
+}
+
+int
+ui_menu_item_set_active( const char *path, int active )
+{
+  return set_active( widget_menu, path, active );
 }
 
 #endif				/* #ifdef USE_WIDGET */

@@ -121,6 +121,7 @@ typedef enum ui_menu_item {
 } ui_menu_item;
 
 int ui_menu_activate( ui_menu_item item, int active );
+int ui_menu_item_set_active( const char *path, int active );
 
 /* Functions to update the statusbar */
 

@@ -1055,3 +1055,6 @@
 	 roms.c,stock.c}: add stock dialog creation function (Darren).
 20040816 ui/gtk/{fileselector.c,memory.c}: use DEFAULT_DESTROY wherever
 	 possible (Darren).
+20040816 ui.c,ui/ui.h,ui/gtk/gtkui.c,widget/{menu.c,widget.[ch],
+	 widget_internals.h}: (de)activate widget menu items where
+	 appropriate (mostly Darren).

@@ -95,6 +95,7 @@ typedef struct widget_menu_entry {
   widget_menu_callback_fn callback;
 
   int action;
+  int inactive;
 
 } widget_menu_entry;
 
