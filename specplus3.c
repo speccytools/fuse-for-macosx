@@ -68,7 +68,7 @@ static BYTE specplus3_fdc_status( WORD port );
 static BYTE specplus3_fdc_read( WORD port );
 static void specplus3_fdc_write( WORD port, BYTE data );
 
-void fdc_dprintf( int debug, char *format, ... );
+void specplus3_fdc_error( int debug, char *format, ... );
 #endif			/* #ifdef HAVE_765_H */
 
 static int specplus3_shutdown( void );
@@ -311,6 +311,9 @@ int specplus3_init( fuse_machine_info *machine )
 
 #ifdef HAVE_765_H
 
+  /* Register lib765 error callback */
+  lib765_register_error_function( specplus3_fdc_error );
+
   /* Create the FDC */
   fdc = fdc_new();
 
@@ -434,9 +437,9 @@ specplus3_fdc_write( WORD port GCC_UNUSED, BYTE data )
 
 /* FDC UI related functions */
 
-/* lib765's `print an error message' callback */
+/* Used as lib765's `print an error message' callback */
 void
-fdc_dprintf( int debug, char *format, ... )
+specplus3_fdc_error( int debug, char *format, ... )
 {
   va_list ap;
 
