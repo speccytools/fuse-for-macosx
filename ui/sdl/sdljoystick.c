@@ -91,8 +91,8 @@ ui_joystick_init( void )
   return retval;
 }
 
-BYTE
-ui_joystick_read( WORD port, BYTE which )
+libspectrum_byte
+ui_joystick_read( libspectrum_word port, libspectrum_byte which )
 {
   if( which ) return joystick2_return_value.byte;
 
