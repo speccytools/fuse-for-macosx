@@ -213,8 +213,7 @@ static int xdisplay_allocate_image(int width, int height)
     }
   }
 
-  if( shm_used ) puts ("\nUsing SHM extension.");
-  else if( image ) xdisplay_destroy_image ();
+  if( !shm_used && image ) xdisplay_destroy_image ();
 
 #endif				/* #ifdef X_USE_SHM */
 
@@ -308,8 +307,6 @@ void xdisplay_area(int x, int y, int width, int height)
   if( shm_used ) {
     XShmPutImage( display, xui_mainWindow, gc, image,
 		  x, y, x, y, width, height, True );
-    /*shmfinished = 0;*/
-    /*do { ui_event (); } while (!shmfinished);*/
   } else {
     XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
   }
