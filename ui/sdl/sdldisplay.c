@@ -215,17 +215,15 @@ uidisplay_init( int width, int height )
   timex = machine_current->timex;
 
   init_scalers();
+
+  if ( scaler_select_scaler( current_scaler ) ) scaler_select_scaler( SCALER_NORMAL );
+
   sdldisplay_load_gfx_mode();
 
   SDL_WM_SetCaption( "Fuse", "Fuse" );
 
   /* We can now output error messages to our output device */
   display_ui_initialised = 1;
-
-  if( ui_mouse_grabbed ) {
-    SDL_ShowCursor( 0 );
-    SDL_WarpMouse( 128, 128 );
-  }
 
   sdl_load_status_icon( "cassette.bmp", red_cassette, green_cassette );
   sdl_load_status_icon( "plus3disk.bmp", red_disk, green_disk );
@@ -281,6 +279,8 @@ sdldisplay_load_gfx_mode( void )
     return 1;
   }
 
+  sdldisplay_is_full_screen = settings_current.full_screen = !!(sdldisplay_gc->flags & SDL_FULLSCREEN);
+
   /* Distinguish 555 and 565 mode */
   if( sdldisplay_gc->format->Gmask >> sdldisplay_gc->format->Gshift == 0x1f )
     scaler_select_bitformat( 555 );
@@ -330,12 +330,14 @@ uidisplay_hotswap_gfx_mode( void )
   /* reset palette */
   SDL_SetColors( sdldisplay_gc, colour_palette, 0, 16 );
 
-  /* Mac OS  resets the state of the cursor after a switch to full screen
+  /* Mac OS X resets the state of the cursor after a switch to full screen
      mode */
-  if ( settings_current.full_screen )
+  if ( settings_current.full_screen || ui_mouse_grabbed ) {
     SDL_ShowCursor( SDL_DISABLE );
-  else
+    SDL_WarpMouse( 128, 128 );
+  } else {
     SDL_ShowCursor( SDL_ENABLE );
+  }
 
   fuse_emulation_unpause();
 }
@@ -445,7 +447,6 @@ uidisplay_frame_end( void )
      the switch to fullscreen (e.g. Mac OS X) */
   if( sdldisplay_is_full_screen != settings_current.full_screen ) {
     uidisplay_hotswap_gfx_mode();
-    sdldisplay_is_full_screen = !sdldisplay_is_full_screen;
   }
 
   /* Force a full redraw if requested */
@@ -593,6 +594,10 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 
   case UI_STATUSBAR_ITEM_TAPE:
     sdl_tape_state = state;
+    return 0;
+
+  case UI_STATUSBAR_ITEM_MOUSE:
+    // We don't support showing a grab icon
     return 0;
 
   }

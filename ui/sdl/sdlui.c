@@ -30,27 +30,21 @@
 
 #include <stdio.h>
 #include <SDL.h>
-#include <SDL_syswm.h>
 
 #include "display.h"
 #include "fuse.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+#include "settings.h"
 #include "sdldisplay.h"
 #include "sdljoystick.h"
 #include "sdlkeyboard.h"
 #include "ui/scaler/scaler.h"
 
-#if 0 /* FIXME: OS X */
-#define sdl_in_window 1
-#else
-static int sdl_in_window;
-#endif
-
 void
 atexit_proc( void )
 { 
-  SDL_ShowCursor(SDL_ENABLE);
+  SDL_ShowCursor( SDL_ENABLE );
   SDL_Quit();
 }
 
@@ -58,7 +52,6 @@ int
 ui_init( int *argc, char ***argv )
 {
   int error;
-  SDL_SysWMinfo info;
 
 /* Comment out to Work around a bug in OS X 10.1 related to OpenGL in windowed
    mode */
@@ -68,10 +61,6 @@ ui_init( int *argc, char ***argv )
   if ( error )
     return error;
 
-  SDL_VERSION( &info.version );
-#if 1 /* FIXME: ! OS X */
-  sdl_in_window = SDL_GetWMInfo( &info );
-#endif
   ui_mouse_present = 1;
 
   return 0;
@@ -126,7 +115,7 @@ ui_event( void )
       display_refresh_all();
       break;
     case SDL_ACTIVEEVENT:
-      if( event.active.state & 2 ) {
+      if( event.active.state & SDL_APPINPUTFOCUS ) {
 	if( event.active.gain ) ui_mouse_resume(); else ui_mouse_suspend();
       }
       break;
@@ -167,8 +156,7 @@ ui_statusbar_update_speed( float speed )
 int
 ui_mouse_grab( int startup )
 {
-  if( !sdl_in_window ) {
-    SDL_ShowCursor( 0 );
+  if( settings_current.full_screen ) {
     SDL_WarpMouse( 128, 128 );
     return 1;
   }
@@ -177,7 +165,7 @@ ui_mouse_grab( int startup )
   switch( SDL_WM_GrabInput( SDL_GRAB_ON ) ) {
   case SDL_GRAB_ON:
   case SDL_GRAB_FULLSCREEN:
-    SDL_ShowCursor( 0 );
+    SDL_ShowCursor( SDL_DISABLE );
     SDL_WarpMouse( 128, 128 );
     return 1;
   default:
@@ -189,10 +177,10 @@ ui_mouse_grab( int startup )
 int
 ui_mouse_release( int suspend )
 {
-  if( !sdl_in_window ) return !suspend;
+  if( settings_current.full_screen ) return !suspend;
 
   SDL_WM_GrabInput( SDL_GRAB_OFF );
-  SDL_ShowCursor( 1 );
+  SDL_ShowCursor( SDL_ENABLE );
   return 0;
 }
 
