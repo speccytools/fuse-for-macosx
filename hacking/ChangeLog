@@ -295,3 +295,4 @@
 20031025 ui/gtk/pokefinder.c: keyboard shortcuts
 20031026 ui/gtk/debugger.c, ui/gtk/pokefinder.c: correct behaviour if the
 	 window receives a delete event.
+20031026 pokefinder/pokefinder.c: ensure we get a prototype for memset.
