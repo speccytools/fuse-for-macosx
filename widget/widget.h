@@ -92,6 +92,9 @@ extern widget_menu_entry widget_menu_main[];
 
 extern char* widget_filesel_name;
 
+/* Get a filename and do something with it */
+int widget_apply_to_file( void *data );
+     
 /* The error widget data type */
 
 typedef struct widget_error_t {

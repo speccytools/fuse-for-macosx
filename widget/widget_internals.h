@@ -154,9 +154,6 @@ typedef struct widget_menu_widget_t {
   void *data;		/* with this data parameter */
 } widget_menu_widget_t;
 
-/* The callback to get a filename and do something with it */
-int widget_apply_to_file( void *data );
-     
 /* More callbacks */
 int widget_menu_save_snapshot( void *data ); /* File/Save */
 int widget_menu_rzx_recording( void *data ); /* File/Recording/Record */
