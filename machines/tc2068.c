@@ -41,6 +41,7 @@
 #include "printer.h"
 #include "scld.h"
 #include "settings.h"
+#include "ui/ui.h"
 
 static libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
 						     int *attached );
@@ -246,7 +247,11 @@ tc2068_reset( void )
   }
 
   if( settings_current.dck_file ) {
-    error = dck_read( settings_current.dck_file ); if( error ) return error;
+    error = dck_read( settings_current.dck_file );
+    if( error ) {
+      ui_error( UI_ERROR_INFO, "Ignoring Timex dock file '%s'",
+		settings_current.dck_file );
+    }
   }
 
   scld_dec_write( 0x00ff, 0x80 );

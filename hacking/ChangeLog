@@ -770,3 +770,6 @@
 	 we have verified that the file loads successfully.
 20040423 tape.c: further improvements to the register values after the
 	 tape loading trap (patch #939572) (Darren).
+20040423 machines/tc2068.c: if we couldn't load a dock file on reset
+	 (its contents may have changed behind our back), just ignore it,
+	 rather than cause the reset to fail (which causes Fuse to abort).
