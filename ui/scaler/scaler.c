@@ -80,17 +80,14 @@ static struct scaler_info available_scalers[] = {
   { "Timex TV",	       "timextv",    SCALER_EXPAND_2_Y_PIXELS, TimexTV    },
 };
 
-scaler_type current_scaler;
+scaler_type current_scaler = SCALER_NUM;
 ScalerProc *scaler_proc;
 scaler_flags_t scaler_flags;
 
 int
 scaler_select_scaler( scaler_type scaler )
 {
-  if( !scaler_is_supported( scaler ) ) return 1;
-
-  if( scaler_proc &&				/* Deal with startup */
-      current_scaler == scaler ) return 0;
+  if( current_scaler == scaler ) return 0;
 
   current_scaler = scaler;
 
@@ -117,7 +114,7 @@ scaler_select_id( const char *id )
 
   for( i=0; i < SCALER_NUM; i++ ) {
     if( ! strcmp( available_scalers[i].id, id ) ) {
-      current_scaler = i;
+      scaler_select_scaler( i );
       return 0;
     }
   }
