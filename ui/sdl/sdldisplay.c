@@ -54,22 +54,43 @@ static int tmp_screen_width;
 static Uint32 colour_values[16];
 
 static SDL_Color colour_palette[] = {
-  { 000, 000, 000, 000 }, 
-  { 000, 000, 192, 000 }, 
-  { 192, 000, 000, 000 }, 
-  { 192, 000, 192, 000 }, 
-  { 000, 192, 000, 000 }, 
-  { 000, 192, 192, 000 }, 
-  { 192, 192, 000, 000 }, 
-  { 192, 192, 192, 000 }, 
-  { 000, 000, 000, 000 }, 
-  { 000, 000, 255, 000 }, 
-  { 255, 000, 000, 000 }, 
-  { 255, 000, 255, 000 }, 
-  { 000, 255, 000, 000 }, 
-  { 000, 255, 255, 000 }, 
-  { 255, 255, 000, 000 }, 
-  { 255, 255, 255, 000 }
+  {   0,   0,   0,   0 }, 
+  {   0,   0, 192,   0 }, 
+  { 192,   0,   0,   0 }, 
+  { 192,   0, 192,   0 }, 
+  {   0, 192,   0,   0 }, 
+  {   0, 192, 192,   0 }, 
+  { 192, 192,   0,   0 }, 
+  { 192, 192, 192,   0 }, 
+  {   0,   0,   0,   0 }, 
+  {   0,   0, 255,   0 }, 
+  { 255,   0,   0,   0 }, 
+  { 255,   0, 255,   0 }, 
+  {   0, 255,   0,   0 }, 
+  {   0, 255, 255,   0 }, 
+  { 255, 255,   0,   0 }, 
+  { 255, 255, 255,   0 }
+};
+
+static Uint32 bw_values[16];
+
+static SDL_Color bw_palette[] = {
+  {   0,   0,   0,   0 }, 
+  {  64,  64,  64,   0 }, 
+  {  64,  64,  64,   0 }, 
+  { 128, 128, 128,   0 }, 
+  {  64,  64,  64,   0 }, 
+  { 128, 128, 128,   0 }, 
+  { 128, 128, 128,   0 }, 
+  { 192, 192, 192,   0 }, 
+  {   0,   0,   0,   0 }, 
+  {  85,  85,  85,   0 }, 
+  {  85,  85,  85,   0 }, 
+  { 170, 170, 170,   0 }, 
+  {  85,  85,  85,   0 }, 
+  { 170, 170, 170,   0 }, 
+  { 170, 170, 170,   0 }, 
+  { 255, 255, 255,   0 }
 };
 
 /* This is a rule of thumb for the maximum number of rects that can be updated
@@ -90,7 +111,8 @@ static int image_height;
 static int timex;
 
 static void init_scalers( void );
-static int sdldisplay_allocate_colours( int numColours, Uint32 *colour_values );
+static int sdldisplay_allocate_colours( int numColours, Uint32 *colour_values,
+                                        Uint32 *bw_values );
 
 static int sdldisplay_load_gfx_mode( void );
 
@@ -143,13 +165,16 @@ uidisplay_init( int width, int height )
 }
 
 static int
-sdldisplay_allocate_colours( int numColours, Uint32 *colour_values )
+sdldisplay_allocate_colours( int numColours, Uint32 *colour_values,
+                             Uint32 *bw_values )
 {
   int i;
 
   for( i = 0; i < numColours; i++ ) {
-    colour_values[i] = SDL_MapRGB( tmp_screen->format, colour_palette[i].r,
-                              colour_palette[i].g, colour_palette[i].b );
+    colour_values[i] = SDL_MapRGB( tmp_screen->format,  colour_palette[i].r,
+				   colour_palette[i].g, colour_palette[i].b  );
+    bw_values[i]     = SDL_MapRGB( tmp_screen->format,  bw_palette[i].r,
+				   bw_palette[i].g,     bw_palette[i].b      );
   }
 
   return 0;
@@ -204,7 +229,7 @@ sdldisplay_load_gfx_mode( void )
     return 1;
   }
 
-  sdldisplay_allocate_colours( 16, colour_values );
+  sdldisplay_allocate_colours( 16, colour_values, bw_values );
 
   /* Redraw the entire screen... */
   display_refresh_all();
@@ -247,6 +272,8 @@ uidisplay_frame_end( void )
   SDL_Rect *r;
   Uint32 tmp_screen_pitch, dstPitch;
   SDL_Rect *last_rect;
+  Uint32 *palette_values = settings_current.colour_tv ? colour_values :
+                           bw_values;
 
   /* We check for a switch to fullscreen here to give systems with a
      windowed-only UI a chance to free menu etc. resources before
@@ -290,7 +317,7 @@ uidisplay_frame_end( void )
     for( yy = r->y; yy < r->y + r->h; yy++ ) {
 
       for( xx = r->x, dest = dest_base; xx < r->x + r->w; xx++, dest++ )
-	*dest = colour_values[ display_image[yy][xx] ];
+	*dest = palette_values[ display_image[yy][xx] ];
 
       dest_base = (libspectrum_word*)
 	( (libspectrum_byte*)dest_base + tmp_screen_pitch );
