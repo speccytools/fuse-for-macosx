@@ -134,7 +134,7 @@ static void svgakeyboard_keypress(int keysym)
 
 static void svgakeyboard_keyrelease(int keysym)
 {
-  keysyms_key_info *ptr;
+  const keysyms_key_info *ptr;
 
   ptr=keysyms_get_data(keysym);
 
