@@ -167,7 +167,7 @@ option.
 .PP
 .I --loading-sound
 .RS
-Specify whether the sound made whilst tapes are loading should be
+Specify whether the sound made while tapes are loading should be
 emulated. (Enabled by default, but you can use
 .RI ` --no-loading-sound '
 to disable). Same as the Sound Option dialog's
@@ -385,20 +385,27 @@ for those items which have them:
 .\"
 .I F3
 .br
-.I "File, Open Snapshot..."
+.I "File, Open..."
 .RS
-Load a snapshot (of machine state, memory contents etc.), which should
-be in Z80, SNA, or SLT format. See the
+Open a Spectrum file. Snapshots will be loaded into memory; tape
+images will be inserted into the emulated tape deck, and if the
+.I "Auto-load tapes"
+option is set will being loading. Opening a disk image or a Timex dock
+image will cause the appropriate machine type (+3, Pentagon or TC2068)
+to be selected with the image inserted. See the
 .B "FILE SELECTION"
-section below for details on how to choose the file.
+section below for details on how to choose the file. Note that this
+behaviour is different from previous versions of Fuse, when this
+option would open only snapshots.
 .RE
 .PP
 .I F2
 .br
 .I "File, Save Snapshot..."
 .RS
-Save a snapshot in Z80 format. The GTK+ UI lets you select a filename,
-but the others just write the file as
+Save a snapshot (machine state, memory contents, etc.) in Z80
+format. The GTK+ UI lets you select a filename, but the others just
+write the file as
 .IR snapshot.z80 ,
 and have a differently-named menu item to match.
 .RE
@@ -406,7 +413,7 @@ and have a differently-named menu item to match.
 .I "File, Recording, Record..."
 .RS
 Start recording input to an RZX file. Again, the GTK+ UI lets you
-select a filename, whilst the others just write to
+select a filename, while the others just write to
 .IR record.rzx
 .RE
 .PP
@@ -428,7 +435,7 @@ Stop any currently-recording/playing RZX file.
 .RS
 Save a copy of whatever's currently displayed on the Spectrum's screen
 as a PNG file. Once again, the GTK+ UI lets you choose a filename,
-whilst the others will just write to
+while the others will just write to
 .IR "fuse.png" .
 .RE
 .PP
@@ -508,7 +515,7 @@ When tape-loading traps are disabled, you need to start tape playback
 manually, by pressing
 .I F8
 or choosing the
-.I "Tape, Play"
+.I "Media, Tape, Play"
 menu item.
 .RE
 .PP
@@ -644,7 +651,7 @@ available which make use of this feature.
 .PP
 .I F7
 .br
-.I "Tape, Open..."
+.I "Media, Tape, Open..."
 .RS
 Choose a TAP or TZX virtual-tape file to load from. See the
 .B "FILE SELECTION"
@@ -662,7 +669,7 @@ sure tape-loading traps are disabled in the General Options dialog,
 then press
 .I F8
 (or do
-.IR "Tape, Play" ).
+.IR "Media, Tape, Play" ).
 That said, most TZXs will work with tape-loading traps enabled (often
 quickly loading partway, then loading the rest real-time), so you
 might want to try it that way first.
@@ -670,7 +677,7 @@ might want to try it that way first.
 .PP
 .I F8
 .br
-.I "Tape, Play"
+.I "Media, Tape, Play"
 .RS
 Start playing the TAP or TZX file, if required. (Choosing the option
 (or pressing
@@ -684,7 +691,7 @@ circumstances, e.g. TZXs containing multi-load games may have a
 stop-the-tape request (which Fuse obeys).
 .RE
 .PP
-.I "Tape, Browse"
+.I "Media, Tape, Browse"
 .RS
 Browse through the current tape. A brief display of each of the data
 blocks on the current tape will appear, from which you can select
@@ -699,24 +706,24 @@ button (in the GTK+ UI) or press
 .IR Escape .
 .RE
 .PP
-.I "Tape, Rewind"
+.I "Media, Tape, Rewind"
 .RS
 Rewind the current virtual tape, so it can be read again from the
 beginning.
 .RE
 .PP
-.I "Tape, Clear"
+.I "Media, Tape, Clear"
 .RS
 Clear the current virtual tape. This is particularly useful when you
 want a `clean slate' to add newly-saved files to, before doing
-.I "Tape, Write..."
+.I "Media, Tape, Write..."
 (or
 .IR F6 ).
 .RE
 .PP
 .I F6
 .br
-.I "Tape, Write..."
+.I "Media, Tape, Write..."
 .RS
 Write the current virtual-tape contents to a TZX file. The GTK+ UI
 lets you select a filename (see
@@ -726,17 +733,17 @@ below), the others just write the file as
 and have a slightly different menu item. The virtual-tape contents are
 the contents of the previously-loaded tape (if any has been loaded
 since you last did a
-.IR "Tape, Clear" ),
+.IR "Media, Tape, Clear" ),
 followed by anything you've saved from the emulated machine since.
 These newly-saved files are
 .I not
 written to any tape file until you choose this option!
 .RE
 .PP
-.I "Disk"
+.I "Media, Disk"
 .RS
 Virtual disk images are only accessible when emulating a +3 or
-Pentagon. If any of the disk options are selected whilst emulating a
+Pentagon. If any of the disk options are selected while emulating a
 +3, they refer to the +3's disk drives, which are both of the 3" type
 (in effect, the internal drive plus an external FD-1). With the usual
 +3 format, these have a capacity of 173K. If any other machine is
@@ -751,24 +758,24 @@ and
 sections below for notes on the file formats supported).
 .RE
 .PP
-.I "Disk, Drive A:, Insert"
+.I "Media, Disk, Drive A:, Insert"
 .RS
 Select a disk-image file to read/write in the emulated drive
 A:.
 .RE
 .PP
-.I "Disk, Drive A:, Eject"
+.I "Media, Disk, Drive A:, Eject"
 .RS
 Deselect the disk image currently in drive A: - or from the emulated
 machine;s perspective, eject it.
 .RE
 .PP
-.I "Disk, Drive B:, Insert"
+.I "Media, Disk, Drive B:, Insert"
 .RS
 As above, but for drive B:.
 .RE
 .PP
-.I "Disk, Drive B:, Eject"
+.I "Media, Disk, Drive B:, Eject"
 .RS
 As above, but for drive B:.
 .RE
@@ -866,7 +873,7 @@ possibilities. Support for graphics filters varies between the
 different user interfaces, but there are two general classes: the GTK+
 and SDL user interfaces (and the saving of .png screenshots) support
 `interpolating' filters which use a palette larger than the Spectrum's
-16 colours, whilst the Xlib and SVGAlib user interfaces support only
+16 colours, while the Xlib and SVGAlib user interfaces support only
 `non-interpolating' filters. The framebuffer user interface currently
 does not support filters at all.
 .PP
@@ -889,7 +896,7 @@ Two Timex-machine specific filters which scale the screen down to half
 normal (Timex) size; that is, the same size as a normal Spectrum
 screen. The difference between these two filters is in how they handle
 the high-resolution mode: the `smoothed' version is an interpolating
-filter which averages pairs of adjacent pixels, whilst the `skipping'
+filter which averages pairs of adjacent pixels, while the `skipping'
 version is a non-interpolating filter which simply drops every other
 pixel.
 .RE
@@ -933,7 +940,7 @@ diagonal lines.
 .RS
 Two filters which attempt to emulate the effect of television
 scanlines. The former is a double-sizing filter for non-Timex
-machines, whilst the latter is a single-sizing filter for Timex
+machines, while the latter is a single-sizing filter for Timex
 machines (note that this means both produce the same size output).
 .RE
 .PP
@@ -1098,7 +1105,7 @@ Run precisely one Z80 opcode and then stop emulation again.
 .I Continue
 .RS
 Restart emulation, but leave the debugger window open. Note that the
-debugger window will not be updated whilst emulation is running.
+debugger window will not be updated while emulation is running.
 .RE
 .PP
 .I Break
@@ -1262,7 +1269,7 @@ one format will start `MV - CPCEMU' and the other will start
 .PP
 The `lib765' library used by Fuse to emulate the +3's FDC supports the
 `CPCEMU' format, but not the extended format. If the `libdsk' library
-was also found whilst compiling Fuse, this is used to provide support
+was also found while compiling Fuse, this is used to provide support
 for the extended format, as well as for other goodies such as gzip
 compressed disk images.
 .\"
