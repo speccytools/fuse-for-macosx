@@ -39,4 +39,7 @@ libdebugger_a_SOURCES = breakpoint.c \
 commandl.c: commandy.c
 commandy.h: commandy.c
 
-noinst_HEADERS = commandy.h debugger.h debugger_internals.h
+noinst_HEADERS = breakpoint.h \
+		 commandy.h \
+		 debugger.h \
+		 debugger_internals.h
