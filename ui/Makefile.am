@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -25,5 +25,13 @@
 AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = @UI@ scaler
+
+DIST_SUBDIRS = fb \
+	       ggi \
+	       gtk \
+	       scaler \
+	       sdl \
+	       svga \
+	       xlib
 
 noinst_HEADERS = ui.h uidisplay.h options.dat
