@@ -475,4 +475,5 @@ break;
 default:		/* Instruction did not involve H or L, so backtrack
 			   one instruction and parse again */
 PC--;			/* FIXME: will be contended again */
+R--; rzx_instructions--; /* Decrement the instruction counters as well */
 break;
