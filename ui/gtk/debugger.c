@@ -377,7 +377,7 @@ ui_debugger_update( void )
   gtk_clist_freeze( GTK_CLIST( stack ) );
   gtk_clist_clear( GTK_CLIST( stack ) );
 
-  for( address = SP + 38; address >= SP; address -= 2 ) {
+  for( i = 0, address = SP + 38; i < 20; i++, address -= 2 ) {
     
     WORD contents = readbyte_internal( address ) +
                     0x100 * readbyte_internal( address + 1 );
