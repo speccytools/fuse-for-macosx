@@ -86,7 +86,7 @@ main( int argc, char **argv )
   contend_port = trivial_contend_port;
 
   /* Get ourselves into a known state */
-  z80_reset();
+  z80_reset(); tstates = 0;
   for( i = 0; i < 0x10000; i += 4 ) {
     memory[ i     ] = 0xde; memory[ i + 1 ] = 0xad;
     memory[ i + 2 ] = 0xbe; memory[ i + 3 ] = 0xef;
@@ -156,7 +156,7 @@ read_test_file( const char *filename, DWORD *end_tstates )
 
   unsigned af, bc, de, hl, af_, bc_, de_, hl_, ix, iy, sp, pc;
   unsigned i, r, iff1, iff2, im;
-  unsigned start_tstates, end_tstates2;
+  unsigned end_tstates2;
   unsigned address;
 
   f = fopen( filename, "r" );
@@ -179,8 +179,8 @@ read_test_file( const char *filename, DWORD *end_tstates )
   AF_ = af_; BC_ = bc_; DE_ = de_; HL_ = hl_;
   IX  = ix;  IY  = iy;  SP  = sp;  PC  = pc;
 
-  if( fscanf( f, "%x %x %u %u %u %d %d %d", &i, &r, &iff1, &iff2, &im,
-	      &z80.halted, &start_tstates, &end_tstates2 ) != 8 ) {
+  if( fscanf( f, "%x %x %u %u %u %d %d", &i, &r, &iff1, &iff2, &im,
+	      &z80.halted, &end_tstates2 ) != 7 ) {
     fprintf( stderr, "%s: second registers line in `%s' corrupt\n", progname,
 	     filename );
     fclose( f );
@@ -188,7 +188,7 @@ read_test_file( const char *filename, DWORD *end_tstates )
   }
 
   I = i; R = R7 = r; IFF1 = iff1; IFF2 = iff2; IM = im;
-  tstates = start_tstates; *end_tstates = end_tstates2;
+  *end_tstates = end_tstates2;
 
   while( 1 ) {
 
@@ -249,7 +249,7 @@ dump_memory_state( void )
 
     if( memory[ i ] == initial_memory[ i ] ) continue;
 
-    printf( "%4x ", i );
+    printf( "%4x ", (unsigned)i );
 
     while( i < 0x10000 && memory[ i ] != initial_memory[ i ] )
       printf( "%2x ", memory[ i++ ] );
