@@ -56,7 +56,7 @@
 machine_info **machine_types = NULL; /* Array of available machines */
 int machine_count = 0;
 
-machine_info *machine_current;  /* The currently selected machine */
+machine_info *machine_current = NULL; /* The currently selected machine */
 static int machine_location;	/* Where is the current machine in
 				   machine_types[...]? */
 
@@ -304,6 +304,8 @@ int machine_end( void )
 static int machine_free_machine( machine_info *machine )
 {
   size_t i;
+
+  if( machine->shutdown ) machine->shutdown();
 
   for( i=0; i<machine->rom_count; i++ ) {
 

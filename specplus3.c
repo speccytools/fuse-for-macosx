@@ -61,6 +61,8 @@ static void specplus3_fdc_write( WORD port, BYTE data );
 void fdc_dprintf( int debug, char *format, ... );
 #endif			/* #ifdef HAVE_765_H */
 
+static int specplus3_shutdown( void );
+
 spectrum_port_info specplus3_peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
@@ -322,6 +324,8 @@ int specplus3_init( machine_info *machine )
   specplus3_fdc_reset();
 #endif				/* #ifdef HAVE_765_H */
 
+  machine->shutdown = specplus3_shutdown;
+
   return 0;
 
 }
@@ -446,3 +450,17 @@ specplus3_disk_eject( specplus3_drive_number drive )
 }
 
 #endif			/* #ifdef HAVE_765_H */
+
+static int
+specplus3_shutdown( void )
+{
+#ifdef HAVE_765_H
+  fd_destroy( &drive_a );
+  fd_destroy( &drive_b );
+  fd_destroy( &drive_null );
+
+  fdc_destroy( &fdc );
+#endif			/* #ifdef HAVE_765_H */
+
+  return 0;
+}

@@ -93,6 +93,8 @@ typedef struct machine_info {
 
   ayinfo ay;		/* The AY-8-3912 chip */
 
+  int (*shutdown)( void );
+
 } machine_info;
 
 extern machine_info **machine_types;	/* All available machines */

@@ -189,6 +189,8 @@ int spec128_init( machine_info *machine )
 
   machine->ay.present = 1;
 
+  machine->shutdown = NULL;
+
   return 0;
 
 }

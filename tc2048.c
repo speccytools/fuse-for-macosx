@@ -196,6 +196,8 @@ int tc2048_init( machine_info *machine )
 
   machine->ay.present = 0;
 
+  machine->shutdown = NULL;
+
   return 0;
 
 }
