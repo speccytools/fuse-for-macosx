@@ -172,7 +172,7 @@ sub inc_dec ($$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	tstates++;
+	contend( HL, 1 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
       }
@@ -366,7 +366,7 @@ sub res_set ($$$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	tstates++;
+	contend( HL, 1 );
 	writebyte( HL, bytetemp $operator $hex_mask );
       }
 CODE
@@ -388,7 +388,7 @@ sub rotate_shift ($$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte(HL);
-	tstates++;
+	contend( HL, 1 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
       }
@@ -431,7 +431,7 @@ BIT
 	print << "BIT";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	tstates++;
+	contend( HL, 1 );
 	BIT( $bit, bytetemp );
       }
 BIT
@@ -908,7 +908,7 @@ sub opcode_RLD (@) {
     print << "RLD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	tstates += 4;
+	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
 	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
 	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
 	F = ( F & FLAG_C ) | sz53p_table[A];
@@ -943,7 +943,7 @@ sub opcode_RRD (@) {
     print << "RRD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	tstates += 4;
+	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
 	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
 	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
 	F = ( F & FLAG_C ) | sz53p_table[A];

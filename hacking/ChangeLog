@@ -773,3 +773,7 @@
 20040423 machines/tc2068.c: if we couldn't load a dock file on reset
 	 (its contents may have changed behind our back), just ignore it,
 	 rather than cause the reset to fail (which causes Fuse to abort).
+20040428 z80/z80.pl,z80/tests/{34,35,cb?[6e],ed67,ed6f}.out: improved
+	 contended memory timings for INC/DEC (HL), <shift/rotate> (HL),
+	 BIT/SET/RES b,(HL), RLD and RRD (thanks, Mark Woodmass and
+	 Jonathan Needle).
