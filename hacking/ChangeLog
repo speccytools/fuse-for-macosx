@@ -1126,3 +1126,6 @@
 20041128 if1.c: split if1_port_{in,out} into multiple functions.
 20041128 if1.c: declare local variables as static.
 20041128 if1.c: various formatting 'improvements'.
+20041128 if1.c,machine.c,lib/{Makefile.am,microdrive.bmp},ui/ui.h,
+	 ui/gtk/statusbar.c,ui/sdl/sdldisplay.c: global rename of
+	 'microdrv' to 'microdrive'.

@@ -25,7 +25,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 FILES = cassette.bmp \
-	microdrv.bmp \
+	microdrive.bmp \
 	disk_plus3.z80 \
 	keyboard.scr \
 	plus3disk.bmp \

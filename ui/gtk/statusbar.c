@@ -46,7 +46,7 @@ static GdkPixmap
 static GdkBitmap *pause_mask;
 
 static GtkWidget
-  *microdrv_status,	/* Is any microdrive motor running? */
+  *microdrive_status,	/* Is any microdrive motor running? */
   *disk_status,		/* Is the disk motor running? */
   *mouse_status,	/* Have we grabbed the mouse? */
   *pause_status,	/* Is emulation paused (via the menu option)? */
@@ -99,8 +99,9 @@ gtkstatusbar_create( GtkBox *parent )
   tape_status = gtk_pixmap_new( pixmap_tape_inactive, NULL );
   gtk_box_pack_end( GTK_BOX( status_bar ), tape_status, FALSE, FALSE, 0 );
 
-  microdrv_status = gtk_pixmap_new( pixmap_mdr_inactive, NULL );
-  gtk_box_pack_end( GTK_BOX( status_bar ), microdrv_status, FALSE, FALSE, 0 );
+  microdrive_status = gtk_pixmap_new( pixmap_mdr_inactive, NULL );
+  gtk_box_pack_end( GTK_BOX( status_bar ), microdrive_status, FALSE, FALSE,
+		    0 );
 
   disk_status = gtk_pixmap_new( pixmap_disk_inactive, NULL );
   gtk_box_pack_end( GTK_BOX( status_bar ), disk_status, FALSE, FALSE, 0 );
@@ -163,17 +164,19 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
     gtk_pixmap_set( GTK_PIXMAP( pause_status ), which, pause_mask  );
     return 0;
 
-  case UI_STATUSBAR_ITEM_MICRODRV:
+  case UI_STATUSBAR_ITEM_MICRODRIVE:
     switch( state ) {
     case UI_STATUSBAR_STATE_NOT_AVAILABLE:
-      gtk_widget_hide( microdrv_status ); break;
+      gtk_widget_hide( microdrive_status ); break;
     case UI_STATUSBAR_STATE_ACTIVE:
-      gtk_widget_show( microdrv_status );
-      gtk_pixmap_set( GTK_PIXMAP( microdrv_status ), pixmap_mdr_active, NULL );
+      gtk_widget_show( microdrive_status );
+      gtk_pixmap_set( GTK_PIXMAP( microdrive_status ), pixmap_mdr_active,
+		      NULL );
       break;
     default:
-      gtk_widget_show( microdrv_status );
-      gtk_pixmap_set( GTK_PIXMAP( microdrv_status ), pixmap_mdr_inactive, NULL );
+      gtk_widget_show( microdrive_status );
+      gtk_pixmap_set( GTK_PIXMAP( microdrive_status ), pixmap_mdr_inactive,
+		      NULL );
       break;
     }      
     return 0;

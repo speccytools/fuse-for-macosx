@@ -349,8 +349,8 @@ machine_reset( void )
     ula_contention[ i ] = machine_current->ram.contend_delay( i );
 
   /* Check for an Interface I ROM */
-  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
-    UI_STATUSBAR_STATE_NOT_AVAILABLE );
+  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
+		       UI_STATUSBAR_STATE_NOT_AVAILABLE );
   
   error = if1_reset(); if( error ) return error;
 

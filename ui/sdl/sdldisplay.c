@@ -228,7 +228,7 @@ uidisplay_init( int width, int height )
   display_ui_initialised = 1;
 
   sdl_load_status_icon( "cassette.bmp", red_cassette, green_cassette );
-  sdl_load_status_icon( "microdrv.bmp", red_mdr, green_mdr );
+  sdl_load_status_icon( "microdrive.bmp", red_mdr, green_mdr );
   sdl_load_status_icon( "plus3disk.bmp", red_disk, green_disk );
 
   return 0;
@@ -622,7 +622,7 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
     sdl_tape_state = state;
     return 0;
 
-  case UI_STATUSBAR_ITEM_MICRODRV:
+  case UI_STATUSBAR_ITEM_MICRODRIVE:
     sdl_mdr_state = state;
     return 0;
 

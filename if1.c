@@ -50,7 +50,7 @@
 
 #define CARTRIDGE_LEN 137922
 
-typedef struct microdrv_s {
+typedef struct microdrive_t {
   char *filename;
   int inserted;
   int motor_on;
@@ -63,9 +63,9 @@ typedef struct microdrv_s {
   libspectrum_byte gap;
   libspectrum_byte nogap;
   libspectrum_byte cartridge[CARTRIDGE_LEN + 1];
-} microdrv_t;
+} microdrive_t;
 
-typedef struct if1_ula_s {
+typedef struct if1_ula_t {
   int fd_r;	/* file descriptor for reading bytes or bits RS232 */
   int fd_t;	/* file descriptor for writing bytes or bits RS232 */
   int fd_net;	/* file descriptor for rw bytes or bits SinclairNET */
@@ -94,7 +94,7 @@ int if1_active = 0;
 int if1_available = 0;
 static int if1_mdr_status = 0;
 
-static microdrv_t microdrv[8] = {
+static microdrive_t microdrive[8] = {
   { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
   { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
   { .filename = NULL, .inserted = 0, .modified = 0, .wp = 0 },
@@ -120,8 +120,8 @@ static void microdrives_reset( void );
 static void microdrives_restart( void );
 static void increment_head( int m );
 
-#define IN(m) microdrv[m - 1].inserted
-#define WP(m) microdrv[m - 1].wp
+#define IN(m) microdrive[m - 1].inserted
+#define WP(m) microdrive[m - 1].wp
 
 enum if1_menu_item {
 
@@ -226,7 +226,7 @@ if1_reset( void )
   microdrives_reset();
 
   update_menu( UMENU_ALL );
-  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
+  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_INACTIVE );
   if1_mdr_status = 0;
   
@@ -263,17 +263,17 @@ microdrives_reset( void )
 
   for( m = 0; m < 8; m++ ) {
     
-    microdrv[m].head_pos = 0;
-    microdrv[m].motor_on = 0; /* motor off */
-    microdrv[m].gap      = 15;
-    microdrv[m].nogap    = 15;
+    microdrive[m].head_pos = 0;
+    microdrive[m].motor_on = 0; /* motor off */
+    microdrive[m].gap      = 15;
+    microdrive[m].nogap    = 15;
 /*
-    microdrv[m].wp       = 0;  no write protected 
-    microdrv[m].modified = 0;  not modified 
-    microdrv[m].filename = NULL;
-    microdrv[m].inserted = 0;  no cartridge  */
+    microdrive[m].wp       = 0;  no write protected 
+    microdrive[m].modified = 0;  not modified 
+    microdrive[m].filename = NULL;
+    microdrive[m].inserted = 0;  no cartridge  */
   }
-  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
+  ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_INACTIVE );
   if1_mdr_status = 0;
 
@@ -310,7 +310,7 @@ port_mdr_in( void )
 
   for( i = 0; i < 8; i++ ) {
 
-    microdrv_t *drive = &microdrv[ i ];
+    microdrive_t *drive = &microdrive[ i ];
 
     if( drive->motor_on && drive->inserted ) {
 
@@ -336,7 +336,7 @@ port_ctr_in( void )
 
   for( i = 0; i < 8; i++ ) {
 
-    microdrv_t *drive = &microdrv[ i ];
+    microdrive_t *drive = &microdrive[ i ];
 
     if( drive->motor_on && drive->inserted ) {
       if( drive->gap ) {
@@ -451,7 +451,7 @@ port_mdr_out( libspectrum_byte val )
   /* allow access to the port only if motor 1 is ON and there's a file open */
   for( i = 0; i < 8; i++ ) {
 
-    microdrv_t *drive = &microdrv[ i ];
+    microdrive_t *drive = &microdrive[ i ];
 
     if( drive->motor_on && drive->inserted ) {
 
@@ -475,20 +475,24 @@ port_ctr_out( libspectrum_byte val )
   size_t m;
 
   if( !( val & 0x02 ) && ( if1_ula.comms_clk ) ) {	/* ~~\__ */
-    for( m = 7; m > 0; m-- )
-      microdrv[m].motor_on = microdrv[m - 1].motor_on; /* rotate one drive */
-    microdrv[0].motor_on = (val & 0x01) ? 0 : 1;
-    if( microdrv[0].motor_on || microdrv[1].motor_on || 
-	microdrv[2].motor_on || microdrv[3].motor_on ||
-	microdrv[4].motor_on || microdrv[5].motor_on ||
-	microdrv[6].motor_on || microdrv[7].motor_on ) {
+
+    for( m = 7; m > 0; m-- ) {
+      /* Rotate one drive */
+      microdrive[m].motor_on = microdrive[m - 1].motor_on;
+    }
+    microdrive[0].motor_on = (val & 0x01) ? 0 : 1;
+
+    if( microdrive[0].motor_on || microdrive[1].motor_on || 
+	microdrive[2].motor_on || microdrive[3].motor_on ||
+	microdrive[4].motor_on || microdrive[5].motor_on ||
+	microdrive[6].motor_on || microdrive[7].motor_on ) {
       if( !if1_mdr_status ) {
-	ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
+	ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 	                     UI_STATUSBAR_STATE_ACTIVE );
 	if1_mdr_status = 1;
       }
     } else if ( if1_mdr_status ) {
-      ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRV,
+      ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 			   UI_STATUSBAR_STATE_INACTIVE );
       if1_mdr_status = 0;
     }
@@ -611,9 +615,8 @@ if1_port_out( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 static void
 increment_head( int m )
 {
-  microdrv[m].head_pos++;
-  if( microdrv[m].head_pos >= CARTRIDGE_LEN )
-    microdrv[m].head_pos = 0;	
+  microdrive[m].head_pos++;
+  if( microdrive[m].head_pos >= CARTRIDGE_LEN ) microdrive[m].head_pos = 0;
 }
 
 static void
@@ -622,16 +625,16 @@ microdrives_restart( void )
   int m;
 
   for( m = 0; m < 8; m++ ) {
-    while( ( microdrv[m].head_pos % 543 ) != 0  &&
-           ( microdrv[m].head_pos % 543 ) != 15    )
+    while( ( microdrive[m].head_pos % 543 ) != 0  &&
+           ( microdrive[m].head_pos % 543 ) != 15    )
       increment_head( m ); /* put head in the start of a block */
 	
-    microdrv[m].transfered = 0; /* reset current number of bytes written */
+    microdrive[m].transfered = 0; /* reset current number of bytes written */
 
-    if( ( microdrv[m].head_pos % 543 ) == 0 ) {
-      microdrv[m].max_bytes = 15; /* up to 15 bytes for header blocks */
+    if( ( microdrive[m].head_pos % 543 ) == 0 ) {
+      microdrive[m].max_bytes = 15; /* up to 15 bytes for header blocks */
     } else {
-      microdrv[m].max_bytes = 528; /* up to 528 bytes for data blocks */
+      microdrive[m].max_bytes = 528; /* up to 528 bytes for data blocks */
     }
   }	
 }
@@ -639,8 +642,8 @@ microdrives_restart( void )
 void
 if1_mdr_writep( int w, int drive )
 {
-  microdrv[drive].wp = w ? 1 : 0;
-  microdrv[drive].modified = 1;
+  microdrive[drive].wp = w ? 1 : 0;
+  microdrive[drive].modified = 1;
 
   update_menu( UMENU_MDRV1 + drive );
 }
@@ -648,19 +651,19 @@ if1_mdr_writep( int w, int drive )
 void
 if1_mdr_new( int drive )
 {
-  if( microdrv[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
+  if( microdrive[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
     ui_error( UI_ERROR_ERROR,
 	      "New cartridge in drive, please eject manually" );
     return;
   }
 
   /* Erase the entire cartridge */
-  memset( microdrv[drive].cartridge, 0xff, CARTRIDGE_LEN );
-  microdrv[drive].wp = 0; /* but don't write-protect */
+  memset( microdrive[drive].cartridge, 0xff, CARTRIDGE_LEN );
+  microdrive[drive].wp = 0; /* but don't write-protect */
 
-  microdrv[drive].filename = NULL;
-  microdrv[drive].inserted = 1;
-  microdrv[drive].modified = 1;
+  microdrive[drive].filename = NULL;
+  microdrive[drive].inserted = 1;
+  microdrive[drive].modified = 1;
 
   update_menu( UMENU_MDRV1 + drive );
 }
@@ -671,7 +674,7 @@ if1_mdr_insert( char *filename, int drive )
   FILE *file;
   char wp;
 
-  if( microdrv[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
+  if( microdrive[drive].inserted && if1_mdr_eject( NULL, drive ) ) {
     ui_error( UI_ERROR_ERROR,
 	      "New cartridge in drive, please eject manually" );
     return;
@@ -686,7 +689,7 @@ if1_mdr_insert( char *filename, int drive )
 
   /* FIXME: should check for short read count; however, we'll replace
      this with libspectrum routines soon so probably not worth it */
-  if( !fread( microdrv[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
+  if( !fread( microdrive[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
     ui_error( UI_ERROR_ERROR, "Error reading data from '%s': %s", filename,
 	      strerror( errno ) );
     return;
@@ -704,12 +707,12 @@ if1_mdr_insert( char *filename, int drive )
     return;
   }
 
-  microdrv[drive].wp = wp ? 1 : 0;
-  microdrv[drive].inserted = 1;
+  microdrive[drive].wp = wp ? 1 : 0;
+  microdrive[drive].inserted = 1;
 
-  microdrv[drive].filename = malloc( strlen( filename ) + 1 );
-  if( microdrv[drive].filename ) {
-    strcpy( microdrv[drive].filename, filename );
+  microdrive[drive].filename = malloc( strlen( filename ) + 1 );
+  if( microdrive[drive].filename ) {
+    strcpy( microdrive[drive].filename, filename );
   } else {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d\n", __FILE__, __LINE__ );
   }
@@ -723,15 +726,15 @@ if1_mdr_sync( char *filename, int drive )
   FILE *file;
   char wp;
   
-  if( microdrv[drive].modified ) {
+  if( microdrive[drive].modified ) {
 
-    if( !microdrv[drive].filename ) {	/* New cartridge */
+    if( !microdrive[drive].filename ) {	/* New cartridge */
       if( !filename ) return 1;		/* We need a filename :-) */
     } else {
-      filename = microdrv[drive].filename;
+      filename = microdrive[drive].filename;
     }
 
-    wp = microdrv[drive].wp ? 0xff : 0;
+    wp = microdrive[drive].wp ? 0xff : 0;
     file = fopen( filename, "w" );
 
     if( !file ) {
@@ -742,7 +745,7 @@ if1_mdr_sync( char *filename, int drive )
 
   /* FIXME: should check for short write count; however, we'll replace
      this with libspectrum routines soon so probably not worth it */
-    if( !fwrite( microdrv[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
+    if( !fwrite( microdrive[drive].cartridge, CARTRIDGE_LEN, 1, file) ) {
       ui_error( UI_ERROR_ERROR, "Error writing data to '%s': %s",
 		filename, strerror( errno ) );
       return 1;
@@ -760,10 +763,10 @@ if1_mdr_sync( char *filename, int drive )
       return 1;
     }
 
-    if( !microdrv[drive].filename ) {	/* New cartridge */
-      microdrv[drive].filename = malloc( strlen( filename ) + 1 );
-      if( microdrv[drive].filename )
-        strcpy( microdrv[drive].filename, filename );
+    if( !microdrive[drive].filename ) {	/* New cartridge */
+      microdrive[drive].filename = malloc( strlen( filename ) + 1 );
+      if( microdrive[drive].filename )
+        strcpy( microdrive[drive].filename, filename );
     }
   }
 
@@ -777,9 +780,9 @@ if1_mdr_eject( char *filename, int drive )
   /* Report if we need a filename */
   if( if1_mdr_sync( filename, drive ) ) return 1;  
 
-  microdrv[drive].inserted = 0;
-  free( microdrv[drive].filename );
-  microdrv[drive].filename = NULL;
+  microdrive[drive].inserted = 0;
+  free( microdrive[drive].filename );
+  microdrive[drive].filename = NULL;
   
   update_menu( UMENU_MDRV1 + drive );
   return 0;
