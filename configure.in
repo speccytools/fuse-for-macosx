@@ -446,7 +446,6 @@ roms/Makefile \
 sound/Makefile \
 ui/Makefile \
 ui/fb/Makefile \
-ui/ggi/Makefile \
 ui/gtk/Makefile \
 ui/svga/Makefile \
 ui/sdl/Makefile \

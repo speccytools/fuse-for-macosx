@@ -44,6 +44,7 @@ DIST_SUBDIRS = compat \
 	       debugger \
 	       hacking \
 	       lib \
+	       machines \
 	       man \
 	       perl \
 	       pokefinder \
