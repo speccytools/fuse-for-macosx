@@ -32,10 +32,10 @@ libuigtk_a_SOURCES = gtkdisplay.c gtkkeyboard.c gtkui.c options.c
 
 BUILT_SOURCES = options.c options.h
 
-options.c: options.pl options.dat
-	@PERL@ options.pl options.dat > options.c
+options.c: options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
+	@PERL@ options.pl ../options.dat > options.c
 
-options.h: options-header.pl options.dat
-	@PERL@ options-header.pl options.dat > options.h
+options.h: options-header.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
+	@PERL@ options-header.pl ../options.dat > options.h
 
-noinst_HEADERS = gtkkeyboard.h gtkui.h
+noinst_HEADERS = gtkkeyboard.h gtkui.h options.h

@@ -42,6 +42,8 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "keyboard.h"
+#include "options.h"
+#include "timer.h"
 #include "widget.h"
 
 static void printchar(int x, int y, int col, int ch);
@@ -52,6 +54,9 @@ static char widget_font[768];
 
 /* The data used for recursive widgets */
 widget_recurse_t widget_return[10];
+
+/* The settings used whilst playing with an options dialog box */
+settings_info widget_options_settings;
 
 static int widget_read_font( const char *filename, size_t offset )
 {
@@ -365,15 +370,57 @@ int widget_dialog_with_border( int x, int y, int width, int height )
   return 0;
 }
 
+/* General functions used by the options dialogs */
+
+int widget_options_print_option( int number, const char* string, int value )
+{
+  char buffer[29];
+
+  snprintf( buffer, 23, "%-22s", string );
+  strcat( buffer, " : " );
+  strcat( buffer, value ? " On" : "Off" );
+
+  widget_printstring( 2, number+4, WIDGET_COLOUR_FOREGROUND, buffer );
+
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
+		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
+
+  return 0;
+}
+
+int widget_options_print_value( int number, int value )
+{
+  widget_rectangle( 27*8, (number+4)*8, 24, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 27, number+4, WIDGET_COLOUR_FOREGROUND,
+		      value ? " On" : "Off" );
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
+		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
+  return 0;
+}
+
+int widget_options_finish( widget_finish_state finished )
+{
+  int error;
+
+  /* If we exited normally, actually set the options */
+  if( finished == WIDGET_FINISHED_OK ) {
+    error = settings_copy( &settings_current, &widget_options_settings );
+    if( error ) return error;
+  }
+
+  return 0;
+}
+
 /* The widgets actually available. Make sure the order here matches the
    order defined in enum widget_type (widget.h) */
 
 widget_t widget_data[] = {
 
   { widget_filesel_draw,  widget_filesel_finish, widget_filesel_keyhandler  },
-  { widget_general_draw,  widget_general_finish, widget_general_keyhandler  },
+  { widget_general_draw,  widget_options_finish, widget_general_keyhandler  },
   { widget_picture_draw,  NULL,                  widget_picture_keyhandler  },
   { widget_menu_draw,	  NULL,			 widget_menu_keyhandler     },
   { widget_select_draw,   widget_select_finish,  widget_select_keyhandler   },
+  { widget_sound_draw,	  widget_options_finish, widget_sound_keyhandler    },
 
 };

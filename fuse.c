@@ -201,8 +201,12 @@ int fuse_emulation_pause(void)
 /* Restart emulation activities */
 int fuse_emulation_unpause(void)
 {
-  /* If we were previously using sound, re-enable it */
-  if( fuse_sound_in_use ) {
+  /* If we now want sound, enable it */
+  if( settings_current.sound ) {
+
+    /* If sound wasn't in use before, remove the old SIGALRM timer */
+    if( !fuse_sound_in_use ) timer_end();
+
     sound_init( settings_current.sound_device );
 
     /* If the sound code couldn't re-initialise, fall back to the
@@ -212,7 +216,15 @@ int fuse_emulation_unpause(void)
       settings_current.sound = fuse_sound_in_use = 0;
       /* FIXME: How to deal with error return here? */
       timer_init();
+
     }
+    fuse_sound_in_use = sound_enabled;
+  }
+  /* If we don't want sound any more, put previously did, start the SIGALRM
+     timer */
+  else if( fuse_sound_in_use ) {
+    timer_init();
+    fuse_sound_in_use = 0;
   }
 
   fuse_emulation_running = 1;

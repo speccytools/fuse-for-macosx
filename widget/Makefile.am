@@ -27,6 +27,14 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libwidget.a
 
 libwidget_a_SOURCES = filesel.c menu_data.c\
-picture.c widget.c general.c menu.c select.c
+picture.c widget.c menu.c options.c select.c
 
-noinst_HEADERS = widget.h
+BUILT_SOURCES = options.c options.h
+
+options.c: options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
+	@PERL@ options.pl ../ui/options.dat > options.c
+
+options.h: options-header.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
+	@PERL@ options-header.pl ../ui/options.dat > options.h
+
+noinst_HEADERS = widget.h options.h

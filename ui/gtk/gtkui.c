@@ -603,19 +603,4 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data )
   gtk_main_quit();
 }
 
-/* Callback used by the Options/Sound dialog */
-void gtkui_sound_posthook( gtkoptions_sound_t *ptr )
-{
-  /* If we've changed the sound status, set fuse_sound_in_use to reflect
-     this and start or stop the SIGALARM timer as appropriate. */
-  if( fuse_sound_in_use != settings_current.sound ) {
-    fuse_sound_in_use = settings_current.sound;
-    if( !fuse_sound_in_use ) {
-      timer_init();
-    } else {
-      timer_end();
-    }
-  }
-}
-
 #endif			/* #ifdef UI_GTK */

@@ -39,6 +39,10 @@
 #include "keyboard.h"
 #endif				/* #ifndef FUSE_KEYBOARD_H */
 
+#ifndef FUSE_SETTINGS_H
+#include "settings.h"
+#endif				/* #ifndef FUSE_SETTINGS_H */
+
 /* The default colours used in the widget */
 #define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
 #define WIDGET_COLOUR_FOREGROUND 7	/* White */
@@ -51,6 +55,7 @@ typedef enum widget_type {
   WIDGET_TYPE_PICTURE,		/* Keyboard picture */
   WIDGET_TYPE_MENU,		/* General menu */
   WIDGET_TYPE_SELECT,		/* Select machine */
+  WIDGET_TYPE_SOUND,		/* Sound options */
 
 } widget_type;
 
@@ -138,12 +143,6 @@ void widget_filesel_keyhandler( keyboard_key_name key );
 
 extern char* widget_filesel_name;
 
-/* General options */
-
-int widget_general_draw( void* data );
-int widget_general_finish( widget_finish_state finished );
-void widget_general_keyhandler( keyboard_key_name key );
-
 /* Tape menu */
 
 int widget_tape_draw( void* data );
@@ -219,6 +218,12 @@ extern widget_menu_entry widget_menu_main[];
 int widget_select_draw( void* data );
 void widget_select_keyhandler( keyboard_key_name key );
 int widget_select_finish( widget_finish_state finished );
+
+/* General functions used by options dialogs */
+extern settings_info widget_options_settings;
+int widget_options_print_option( int number, const char* string, int value );
+int widget_options_print_value( int number, int value );
+int widget_options_finish( widget_finish_state finished );
 
 /* The widgets actually available */
 
