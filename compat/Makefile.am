@@ -29,3 +29,5 @@ noinst_LIBRARIES = libcompat.a
 libcompat_a_SOURCES = getopt.c \
 		      getopt1.c \
 	              mkstemp.c
+
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
