@@ -1036,3 +1036,4 @@
 20040724 ui/gtk/pokefinder.c: remove unnecessary accelerator code (Darren).
 20040724 keysyms.pl,ui/fb/fbkeyboard.c: reintegrate the framebuffer keyboard
          mapping code into keysyms.pl.
+20040729 z80/tests/README: document .in and .out file formats.

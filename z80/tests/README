@@ -1,4 +1,47 @@
-Why some specific tests are here:
+File formats
+============
+
+.in files
+---------
+
+AF BC DE HL AF' BC' DE' HL' IX IY SP PC
+I R IFF1 IFF2 <halted> <tstates>
+
+<halted> specifies whether the Z80 is halted.
+<tstates> specifies the number of tstates to run the test for.
+
+Then followed by lines specifying the initial memory setup. Each has
+the format:
+
+<start address> <byte1> <byte2> ... -1
+
+eg
+
+1234 56 78 9a -1
+
+says to put 0x56 at 0x1234, 0x78 at 0x1235 and 0x9a at 0x1236.
+
+.out files
+----------
+
+A list of 'events': each has the format
+
+<time> <type> <address> <data>
+
+<time> is simply the time at which the event occurs.
+<type> is one of MR (memory read), MW (memory write), MC (memory
+       contend), PR (port read), PW (port write) or PC (port contend).
+<address> is the address (or IO port) affected.
+<data> is the byte written or read. Missing for contentions.
+
+After that, lines specifying AF, BC etc as for .in files. <tstates>
+now specifies the final time.
+
+After that, lines specifying which bits of memory have changed since
+the initial setup. Same format as for .in files.
+
+Why some specific tests are here
+================================
 
 37_{1,2,3}: check the behaviour of SCF with respect to bits 3 and 5
 	    (bug fixed on 20040225).
