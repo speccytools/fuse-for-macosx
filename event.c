@@ -54,7 +54,7 @@ DWORD event_next_event;
 static GSList* event_list;
 
 /* Comparision function so events stay in t-state order */
-gint event_add_cmp(gconstpointer a, gconstpointer b);
+static gint event_add_cmp( gconstpointer a, gconstpointer b );
 
 /* User function for event_interrupt(...) */
 void event_reduce_tstates(gpointer data,gpointer user_data);
@@ -95,18 +95,10 @@ int event_add(DWORD event_time, int type)
 }
 
 /* Comparision function so events stay in t-state order */
-gint event_add_cmp(gconstpointer a, gconstpointer b)
+static gint
+event_add_cmp( gconstpointer a, gconstpointer b )
 {
-  const event_t *ptr1=(const event_t *)a;
-  const event_t *ptr2=(const event_t *)b;
-
-  if(ptr1->tstates < ptr2->tstates) {
-    return -1;
-  } else if(ptr1->tstates > ptr2->tstates) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return ((const event_t*)a)->tstates - ((const event_t*)b)->tstates;
 }
 
 /* Do all events which have passed */
