@@ -153,15 +153,15 @@ tape_select_block( size_t n )
 int
 tape_get_current_block( void )
 {
-  GSList *block; int n;
+  int n;
+  libspectrum_error error;
 
   if( !libspectrum_tape_present( tape ) ) return -1;
 
-  for( block = tape->blocks, n = 0; block; block = block->next, n++ ) {
-    if( block == tape->current_block ) return n;
-  }
+  error = libspectrum_tape_position( &n, tape );
+  if( error ) return -1;
 
-  return -1;
+  return n;
 }
 
 /* Write the current in-memory tape file out to disk */
