@@ -37,6 +37,8 @@
 
 #ifdef HAVE_765_H
 #include <limits.h>	/* Needed to get PATH_MAX */
+#include <sys/types.h>
+
 #include <765.h>
 #endif			/* #ifdef HAVE_765_H */
 
