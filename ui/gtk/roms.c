@@ -114,19 +114,20 @@ add_rom( GtkWidget *table, gint row, const char *name )
   GtkWidget *label, *change_button;
 
   label = gtk_label_new( name );
-  gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1, row, row + 1 );
+  gtk_table_attach( GTK_TABLE( table ), label, 0, 1, row, row + 1,
+		    0, 0, 2, 2 );
 
   rom[ row ] =
     gtk_label_new( *( settings_get_rom_setting( &settings_current, row ) ) );
-  gtk_table_attach_defaults( GTK_TABLE( table ), rom[ row ], 1, 2,
-			     row, row + 1 );
+  gtk_table_attach( GTK_TABLE( table ), rom[ row ], 1, 2, row, row + 1,
+		    0, 0, 2, 2 );
 
   change_button = gtk_button_new_with_label( "Change" );
   gtk_signal_connect( GTK_OBJECT( change_button ), "clicked",
 		      GTK_SIGNAL_FUNC( select_new_rom ),
 		      rom[ row ] );
-  gtk_table_attach_defaults( GTK_TABLE( table ), change_button, 2, 3,
-			     row, row + 1 );
+  gtk_table_attach( GTK_TABLE( table ), change_button, 2, 3, row, row + 1,
+		    0, 0, 2, 2 );
 }
 
 static void
