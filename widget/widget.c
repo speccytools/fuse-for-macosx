@@ -423,4 +423,11 @@ ui_tape_browser_update( void )
   return 0;
 }
 
+/* FIXME: make this do something useful */
+ui_confirm_save_t
+ui_confirm_save( const char *message )
+{
+  return UI_CONFIRM_SAVE_DONTSAVE;
+}
+
 #endif				/* #ifdef USE_WIDGET */

@@ -407,6 +407,12 @@ int widget_menu_clear_tape( void *data GCC_UNUSED )
 /* Tape/Write */
 int widget_menu_write_tape( void *data GCC_UNUSED )
 {
+  return ui_tape_write();
+}
+
+int
+ui_tape_write( void )
+{
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_write( "tape.tzx" );
 }
