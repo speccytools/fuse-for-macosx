@@ -1,0 +1,97 @@
+# keysyms.dat: data file for use by keysyms.pl to generate keysyms.c
+# Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av, Russell Marks
+
+# $Id$
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 49 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+# Author contact information:
+
+# E-mail: pak21-fuse@srcf.ucam.org
+# Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+# Format here is <keysym>, <key1>, <key2>.
+
+# <keysym> should be a Xlib XK_ keysym; keysyms.pl must convert any which
+# differ for svgalib
+
+# <key1> and <key2> are two Spectrum keys as defined in keyboard.h (or
+# NONE for no key)
+
+1           , 1,     NONE
+2           , 2,     NONE
+3           , 3,     NONE
+4           , 4,     NONE
+5           , 5,     NONE
+6           , 6,     NONE
+7           , 7,     NONE
+8           , 8,     NONE
+9           , 9,     NONE
+0           , 0,     NONE
+minus       , j,     Symbol
+equal       , l,     Symbol
+BackSpace   , 0,     Caps
+
+q           , q,     NONE
+w           , w,     NONE
+e           , e,     NONE
+r           , r,     NONE
+t           , t,     NONE
+y           , y,     NONE
+u           , u,     NONE
+i           , i,     NONE
+o           , o,     NONE
+p           , p,     NONE
+
+Caps_Lock   , 2,     Caps
+a           , a,     NONE
+s           , s,     NONE
+d           , d,     NONE
+f           , f,     NONE
+g           , g,     NONE
+h           , h,     NONE
+j           , j,     NONE
+k           , k,     NONE
+l           , l,     NONE
+semicolon   , o,     Symbol
+apostrophe  , 7,     Symbol
+numbersign  , 3,     Symbol
+Return      , Enter, NONE
+
+Shift_L     , NONE,  Caps
+z           , z,     NONE
+x           , x,     NONE
+c           , c,     NONE
+v           , v,     NONE
+b           , b,     NONE
+n           , n,     NONE
+m           , m,     NONE
+comma       , n,     Symbol
+period      , m,     Symbol
+slash       , v,     Symbol
+Shift_R     , NONE,  Caps
+
+Control_L   , NONE,  Symbol
+Alt_L       , NONE,  Symbol
+Meta_L      , NONE,  Symbol
+Super_L     , NONE,  Symbol
+Hyper_L     , NONE,  Symbol
+space       , space, NONE
+Hyper_R     , NONE,  Symbol
+Super_R     , NONE,  Symbol
+Meta_R      , NONE,  Symbol
+Alt_R       , NONE,  Symbol
+Control_R   , NONE,  Symbol
+Mode_switch , NONE,  Symbol
