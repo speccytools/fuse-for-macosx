@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002 Darren Salt, Philip Kendall
+   Copyright (c) 2002 Philip Kendall
 
    $Id$
 
@@ -19,9 +19,7 @@
 
    Author contact information:
 
-   Darren: linux@youmustbejoking.demon.co.uk
-
-   Philip: pak21-fuse@srcf.ucam.org
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */

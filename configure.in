@@ -31,6 +31,12 @@ AC_PROG_CC
 AC_PROG_RANLIB
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
+AM_PROG_LEX
+AC_PROG_YACC
+
+dnl Generate commandy.h
+YFLAGS="$YFLAGS -d"
+AC_SUBST(YFLAGS)
 
 dnl Check for big endianness
 AC_C_BIGENDIAN

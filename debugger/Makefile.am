@@ -28,6 +28,9 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 noinst_LIBRARIES = libdebugger.a
 
-libdebugger_a_SOURCES = command.c debugger.c disassemble.c
+libdebugger_a_SOURCES = command.c commandl.l commandy.y debugger.c \
+disassemble.c
 
-noinst_HEADERS = debugger.h
+commandl.c: commandy.h
+
+noinst_HEADERS = commandy.h debugger.h

@@ -256,7 +256,7 @@ deactivate_debugger( void )
 static void
 evaluate_command( GtkWidget *widget, gpointer user_data GCC_UNUSED )
 {
-  debugger_command_parse( gtk_entry_get_text( GTK_ENTRY( widget ) ) );
+  debugger_command_evaluate( gtk_entry_get_text( GTK_ENTRY( widget ) ) );
 }
 
 static void

@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002 Darren Salt, Philip Kendall
+   Copyright (c) 2002 Philip Kendall
 
    $Id$
 
@@ -19,9 +19,7 @@
 
    Author contact information:
 
-   Darren: linux@youmustbejoking.demon.co.uk
-
-   Philip: pak21-fuse@srcf.ucam.org
+   E-mail: pak21-fuse@srcf.ucam.org
    Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
 */
@@ -83,10 +81,7 @@ int debugger_run( void ); /* Set debugger_mode so that emulation will occur */
 void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
 			   WORD address );
 
-/* Parse a debugger command */
-int debugger_command_parse( const char *command );
-
-/* Add a breakpoint */
-int debugger_breakpoint_add( WORD pc, enum debugger_breakpoint_type type );
+/* Evaluate a debugger command */
+int debugger_command_evaluate( const char *command );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */
