@@ -87,7 +87,7 @@ static int fuse_init(int argc, char **argv)
 
   fuse_progname=argv[0];
   
-  if( settings_init() ) return 1;
+  if( settings_init( argc, argv ) ) return 1;
 
   if( tape_init() ) return 1;
 
@@ -113,7 +113,8 @@ static int fuse_init(int argc, char **argv)
   error = machine_select_first();
   if( error ) return error;
 
-  if( argc >= 2 ) snapshot_read( argv[1] );
+  if( settings_current.snapshot ) snapshot_read( settings_current.snapshot );
+  if( settings_current.tape_file ) tape_open( settings_current.tape_file );
 
   fuse_emulation_running = 1;
 

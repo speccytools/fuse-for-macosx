@@ -26,17 +26,28 @@
 
 #include <config.h>
 
+#include <getopt.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "fuse.h"
 #include "settings.h"
 
 /* The current settings of options, etc */
 settings_info settings_current;
 
+static int settings_command_line( int argc, char **argv,
+				  settings_info *settings );
+
 /* Called on emulator startup */
-int settings_init( void )
+int settings_init( int argc, char **argv )
 {
   int error;
 
   error = settings_defaults( &settings_current );
+  if( error ) return error;
+
+  error = settings_command_line( argc, argv, &settings_current );
   if( error ) return error;
 
   return 0;
@@ -49,6 +60,64 @@ int settings_defaults( settings_info *settings )
   settings->joy_kempston = 0;
   settings->tape_traps = 1;
   settings->stereo_ay = 0;
+
+  settings->snapshot = NULL;
+  settings->tape_file = NULL;
+
+  return 0;
+}
+
+/* Read options from the command line */
+static int settings_command_line( int argc, char **argv,
+				  settings_info *settings )
+{
+
+  struct option long_options[] = {
+
+    {        "issue2", 0, &(settings->issue2), 1 },
+    {     "no-issue2", 0, &(settings->issue2), 0 },
+
+    {    "separation", 0, &(settings->stereo_ay), 1 },
+    { "no-separation", 0, &(settings->stereo_ay), 0 },
+
+    {      "kempston", 0, &(settings->joy_kempston), 1 },
+    {   "no-kempston", 0, &(settings->joy_kempston), 0 },
+
+    {         "traps", 0, &(settings->tape_traps), 1 },
+    {      "no-traps", 0, &(settings->tape_traps), 0 },
+
+    {      "snapshot", 1, NULL, 's' },
+    {          "tape", 1, NULL, 't' },
+
+    { 0, 0, 0, 0 }		/* End marker: DO NOT REMOVE */
+  };
+
+  while( 1 ) {
+
+    int c = getopt_long( argc, argv, "", long_options, NULL );
+
+    if( c == -1 ) break;	/* End of option list */
+
+    switch( c ) {
+
+    case 's': settings->snapshot = optarg; break;
+    case 't': settings->tape_file = optarg; break;
+
+    case ':':
+      fprintf( stderr, "%s: missing parameter on command line\n",
+	       fuse_progname );
+      break;
+
+    case '?':
+      break;
+
+    default:
+      fprintf( stderr, "%s: getopt_long returned `%c'\n",
+	       fuse_progname, (char)c );
+      break;
+
+    }
+  }
 
   return 0;
 }

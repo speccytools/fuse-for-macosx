@@ -36,11 +36,16 @@ typedef struct settings_info {
   int tape_traps;	/* Use tape loading traps? */
   int stereo_ay;	/* Stereo separation for AY channels? */
 
+  /* Used on startup */
+
+  char *snapshot;
+  char *tape_file;
+
 } settings_info;
 
 extern settings_info settings_current;
 
-int settings_init( void );
+int settings_init( int argc, char **argv );
 int settings_defaults( settings_info *settings );
 int settings_copy( settings_info *dest, settings_info *src );
 
