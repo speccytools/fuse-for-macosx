@@ -137,21 +137,22 @@ if test -z "$ui"; then
   fi
 fi
 
+dnl Disabled until the font handling is fixed [PAK 20030326]
 dnl Look for GTK+ 2.0 (default=no)
-if test -z "$ui"; then
-  AC_MSG_CHECKING(whether GTK2 UI requested)
-  AC_ARG_WITH(gtk2,
-  [  --with-gtk2             use GTK+ 2.x library for user interface],
-  if test "$withval" = no; then gtk2=no; else gtk2=yes; fi,
-  gtk2=no)
-  AC_MSG_RESULT($gtk2)
-  if test "$gtk2" = yes; then
-    AM_PATH_GTK_2_0(2.0.0,
-		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB)
-	        ui=gtk; UI_LIBS="ui/gtk/libuigtk.a", 
-		AC_MSG_WARN([GTK+ 2.0 not found. Reverting to GTK+ 1.2]))
-  fi
-fi
+dnl if test -z "$ui"; then
+dnl   AC_MSG_CHECKING(whether GTK2 UI requested)
+dnl   AC_ARG_WITH(gtk2,
+dnl   [  --with-gtk2             use GTK+ 2.x library for user interface],
+dnl   if test "$withval" = no; then gtk2=no; else gtk2=yes; fi,
+dnl   gtk2=no)
+dnl   AC_MSG_RESULT($gtk2)
+dnl   if test "$gtk2" = yes; then
+dnl     AM_PATH_GTK_2_0(2.0.0,
+dnl 		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB)
+dnl 	        ui=gtk; UI_LIBS="ui/gtk/libuigtk.a", 
+dnl 		AC_MSG_WARN([GTK+ 2.0 not found. Reverting to GTK+ 1.2]))
+dnl   fi
+dnl fi
 
 dnl Look for GTK+ (default=yes); fall back to Xlib if not found
 if test -z "$ui"; then
