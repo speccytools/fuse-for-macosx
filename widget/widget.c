@@ -412,10 +412,7 @@ int widget_options_print_option( int number, const char* string, int value )
 {
   char buffer[29];
 
-  snprintf( buffer, 23, "%-22s", string );
-  strcat( buffer, " : " );
-  strcat( buffer, value ? " On" : "Off" );
-
+  snprintf( buffer, 29, "%-22s : %s", string, value ? " On" : "Off" );
   widget_printstring( 2, number+4, WIDGET_COLOUR_FOREGROUND, buffer );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
