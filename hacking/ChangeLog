@@ -1188,3 +1188,4 @@
 	 (fixes TR-DOS machines) (Fred).
 20050111 machines/pentagon.c: Don't allow Interface I to be used with the
 	 Pentagon, it masks the TR-DOS interface (Fred).
+20050111 machines/pentagon.c: Remove if1 from peripherals array (Fred).
