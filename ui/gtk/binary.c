@@ -189,7 +189,7 @@ load_data( GtkButton *button, gpointer user_data )
   if( length > info->file.length ) {
     ui_error( UI_ERROR_ERROR,
 	      "'%s' contains only %lu bytes",
-	      info->filename, info->file.length );
+	      info->filename, (unsigned long)info->file.length );
     return;
   }
 
