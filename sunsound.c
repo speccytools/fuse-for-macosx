@@ -143,8 +143,13 @@ sunsound_frame(data, len)
 		src = data;
 		dst = buf16;
 		for (f = 0; f < len; f++) {
+#ifdef WORDS_BIGENDIAN
+		        *dst++ = *src++ - 128;
+		        *dst++ = 128;
+#else			/* #ifdef WORDS_BIGENDIAN */
 			*dst++ = 128;
 			*dst++ = *src++ - 128;
+#endif			/* #ifdef WORDS_BIGENDIAN */
 		}
 
 		data = buf16;
