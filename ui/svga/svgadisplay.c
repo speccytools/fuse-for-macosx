@@ -36,6 +36,7 @@
 
 #include "fuse.h"
 #include "display.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
@@ -155,6 +156,10 @@ static int svgadisplay_allocate_image(int width, int height)
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
+#ifdef HAVE_PNG_H
+  screenshot_screen[y][x] = colour;
+#endif			/* #ifdef HAVE_PNG_H */
+
   if( hires ) {
     image[ x     + y * DISPLAY_SCREEN_WIDTH ] = colour;
   } else if( ! ( x & 1 ) ) {

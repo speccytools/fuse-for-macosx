@@ -54,6 +54,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "keyboard.h"
+#include "screenshot.h"
 #include "xdisplay.h"
 #include "xui.h"
 #include "ui/uidisplay.h"
@@ -330,6 +331,10 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
+#ifdef HAVE_PNG_H
+  screenshot_screen[y][x] = colour;
+#endif			/* #ifdef HAVE_PNG_H */
+
   switch(xdisplay_current_size) {
   case 1:
     if(x%2!=0) return;

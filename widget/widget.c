@@ -193,9 +193,10 @@ int widget_do( widget_type which, void *data )
   /* We're now one widget level deeper */
   widget_level++;
 
-  /* If we're the top-level widget, set up the timer */
+  /* If we're the top-level widget, save the screen and set up the timer */
   if( ! widget_level ) {
-    error = widget_timer_init(); if( error ) return error;
+    error = screenshot_save(); if( error ) { widget_level--; return error; }
+    error = widget_timer_init(); if( error ) { widget_level--; return error; }
   }
 
   /* Store what type of widget we are and what data we were given */

@@ -36,6 +36,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "rzx.h"
+#include "screenshot.h"
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
@@ -206,6 +207,14 @@ widget_menu_rzx_stop( void *data GCC_UNUSED )
   widget_end_all( WIDGET_FINISHED_OK );
   return 0;
 }  
+
+/* File/Save Screenshot */
+int
+widget_menu_save_screen( void *data GCC_UNUSED )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+  return screenshot_write( "fuse.png" );
+}
 
 /* File/Exit */
 int widget_menu_exit( void *data GCC_UNUSED )

@@ -32,7 +32,7 @@ fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c keysyms.c machine.c osssound.c rzx.c settings.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus2a.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
-	utils.c	joystick.c printer.c tc2048.c scld.c
+	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c
 
 BUILT_SOURCES = keysyms.c
 
@@ -40,7 +40,7 @@ keysyms.c: keysyms.pl perl/Fuse.pm keysyms.dat
 	@PERL@ keysyms.pl keysyms.dat > keysyms.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
-LDADD = @GLIB_LIBS@ @GTK_LIBS@ \
+LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@\
 ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/svga/libuisvga.a\
 ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 

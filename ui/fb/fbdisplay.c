@@ -41,6 +41,7 @@
 
 #include "fuse.h"
 #include "display.h"
+#include "screenshot.h"
 #include "ui/uidisplay.h"
 #include "settings.h"
 
@@ -195,6 +196,10 @@ fb_set_mode( void )
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
+#ifdef HAVE_PNG_H
+  screenshot_screen[y][x] = colour;
+#endif			/* #ifdef HAVE_PNG_H */
+
   if( IF_FB_WIDTH( 320 ) ) {
     if( ( x & 1 ) == 0 )
       *( image + 320 * y + (x >> 1) ) = colours[colour];

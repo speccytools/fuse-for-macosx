@@ -35,6 +35,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "gtkui.h"
+#include "screenshot.h"
 #include "ui/uidisplay.h"
 #include "widget/widget.h"
 #include "scld.h"
@@ -186,6 +187,10 @@ static int gtkdisplay_configure_notify( int width )
 
 void uidisplay_putpixel(int x,int y,int colour)
 {
+#ifdef HAVE_PNG_H
+  screenshot_screen[y][x] = colour;
+#endif			/* #ifdef HAVE_PNG_H */
+
   switch(gtkdisplay_current_size) {
   case 1:
     if(x%2!=0) return;

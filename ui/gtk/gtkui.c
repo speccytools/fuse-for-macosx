@@ -44,6 +44,7 @@
 #include "machine.h"
 #include "options.h"
 #include "rzx.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "specplus3.h"
@@ -78,6 +79,10 @@ static void gtkui_rzx_start_snap( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
 static int gtkui_open_snap( void );
+
+#ifdef HAVE_PNG_H
+static void gtkui_save_screen( GtkWidget *widget, gpointer data );
+#endif				/* #ifdef HAVE_PNG_H */
 
 static void gtkui_quit(GtkWidget *widget, gpointer data);
 static void gtkui_reset(GtkWidget *widget, gpointer data);
@@ -117,6 +122,11 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
                                 NULL , gtkui_rzx_start_snap,0, NULL          },
   { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
   { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
+
+#ifdef HAVE_PNG_H
+  { "/File/Save S_creen...",    NULL , gtkui_save_screen,   0, NULL          },
+#endif				/* #ifdef HAVE_PNG_H */
+
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
   { "/Options",		        NULL , NULL,                0, "<Branch>"    },
@@ -424,6 +434,27 @@ gtkui_open_snap( void )
   free( filename );
   return error;
 }
+
+#ifdef HAVE_PNG_H
+/* File/Save Screenshot */
+static void
+gtkui_save_screen( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = gtkui_fileselector_get_filename( "Fuse - Save Screenshot" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_save();
+  screenshot_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+#endif				/* #ifdef HAVE_PNG_H */
 
 /* Called by the menu when File/Exit selected */
 static void

@@ -182,6 +182,11 @@ if test "$plus3disk" = yes; then
   fi
 fi
 AC_SUBST(DSKLIBS)
+
+dnl Check if libpng is available
+AC_CHECK_HEADERS(png.h,PNG_LIBS='-lpng -lm',
+		 AC_MSG_WARN(png.h not found - saving screenshots disable))
+AC_SUBST(PNG_LIBS)
 	       
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
