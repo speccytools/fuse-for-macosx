@@ -671,3 +671,5 @@
 	 layer.
 20040327 input.[ch], rzx.c, ui/uijoystick.c, ui/sdl/sdljoystick.c: make
 	 the 'real joystick' code actually use the input layer.
+20040328 compat.h,configure.in,compat/{Makefile.am,dirname.c}: add dirname
+	 replacement.

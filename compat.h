@@ -44,6 +44,10 @@
 #endif				/* #ifndef O_BINARY */
 
 /* Replacement functions */
+#ifndef HAVE_DIRNAME
+char *dirname( char *path );
+#endif				/* #ifndef HAVE_DIRNAME */
+
 #ifndef HAVE_GETOPT_LONG
 #include "compat/getopt.h"
 #endif				/* #ifndef HAVE_GETOPT_LONG */

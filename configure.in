@@ -58,7 +58,7 @@ AC_INLINE
 
 dnl Checks for library functions.
 AC_FUNC_MMAP
-AC_CHECK_FUNCS(geteuid getopt_long mkstemp)
+AC_CHECK_FUNCS(dirname geteuid getopt_long mkstemp)
 
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,

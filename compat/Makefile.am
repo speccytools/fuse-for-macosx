@@ -26,7 +26,8 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libcompat.a
 
-libcompat_a_SOURCES = getopt.c \
+libcompat_a_SOURCES = dirname.c \
+		      getopt.c \
 		      getopt1.c \
 	              mkstemp.c
 
