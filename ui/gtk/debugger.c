@@ -58,6 +58,8 @@ static void gtkui_debugger_done_step( GtkWidget *widget, gpointer user_data );
 static void gtkui_debugger_done_continue( GtkWidget *widget,
 					  gpointer user_data );
 static void gtkui_debugger_break( GtkWidget *widget, gpointer user_data );
+static gboolean delete_dialog( GtkWidget *widget, GdkEvent *event,
+			       gpointer user_data );
 static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 
 static GtkWidget *dialog,		/* The debugger dialog box */
@@ -258,9 +260,8 @@ create_dialog( void )
 		     close_button );
 
   /* Deleting the window is the same as pressing 'Close' */
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
-		      GTK_SIGNAL_FUNC( gtkui_debugger_done_close ),
-		      (gpointer) NULL );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
 
   /* Keyboard shortcuts */
   accel_group = gtk_accel_group_new();
@@ -571,6 +572,13 @@ gtkui_debugger_break( GtkWidget *widget GCC_UNUSED,
   debugger_mode = DEBUGGER_MODE_HALTED;
   gtk_widget_set_sensitive( continue_button, 1 );
   gtk_widget_set_sensitive( break_button, 0 );
+}
+
+static gboolean
+delete_dialog( GtkWidget *widget, GdkEvent *event, gpointer user_data )
+{
+  gtkui_debugger_done_close( widget, user_data );
+  return TRUE;
 }
 
 static void

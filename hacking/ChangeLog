@@ -291,5 +291,7 @@
 20031023 Add simple 'poke finder'.
 20031023 fuse.c, osssound.c: more useful error messages if we couldn't
 	 initialise the OSS sound code.
-20031025 pokefinder.c: UI improvements.
-20031025 pokefinder.c: keyboard shortcuts
+20031025 ui/gtk/pokefinder.c: UI improvements.
+20031025 ui/gtk/pokefinder.c: keyboard shortcuts
+20031026 ui/gtk/debugger.c, ui/gtk/pokefinder.c: correct behaviour if the
+	 window receives a delete event.

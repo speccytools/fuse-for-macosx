@@ -37,6 +37,8 @@ static int create_dialog( void );
 static void gtkui_pokefinder_search( GtkWidget *widget, gpointer user_data );
 static void gtkui_pokefinder_reset( GtkWidget *widget, gpointer user_data );
 static void gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data );
+static gboolean delete_dialog( GtkWidget *widget, GdkEvent *event,
+			       gpointer user_data );
 static void update_pokefinder( void );
 
 static int dialog_created = 0;
@@ -64,12 +66,9 @@ create_dialog( void )
 {
   GtkWidget *hbox, *vbox, *label, *entry, *button;
   GtkAccelGroup *accel_group;
-  int error;
   size_t i;
 
   gchar *location_titles[] = { "Page", "Offset" };
-
-  error = pokefinder_clear(); if( error ) return error;
 
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Poke Finder" );
@@ -128,6 +127,9 @@ create_dialog( void )
   /* Users shouldn't be able to resize this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
 
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
+
   dialog_created = 1;
 
   return 0;
@@ -145,6 +147,13 @@ gtkui_pokefinder_reset( GtkWidget *widget, gpointer user_data )
 {
   pokefinder_clear();
   update_pokefinder();
+}
+
+static gboolean
+delete_dialog( GtkWidget *widget, GdkEvent *event, gpointer user_data )
+{
+  gtkui_pokefinder_close( widget, user_data );
+  return TRUE;
 }
 
 static void
