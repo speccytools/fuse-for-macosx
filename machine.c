@@ -145,11 +145,12 @@ int machine_select( int type )
 
       /* If we couldn't select the new machine type, try falling back
 	 to plain old 48K */
-      error = machine_select( LIBSPECTRUM_MACHINE_48 );
+      if( type != LIBSPECTRUM_MACHINE_48 ) 
+	error = machine_select( LIBSPECTRUM_MACHINE_48 );
 	
       /* If that still didn't work, give up */
       if( error ) {
-	ui_error( UI_ERROR_ERROR, "can't select 48K either. Giving up" );
+	ui_error( UI_ERROR_ERROR, "can't select 48K machine. Giving up." );
 	fuse_abort();
       } else {
 	ui_error( UI_ERROR_INFO, "selecting 48K machine" );
