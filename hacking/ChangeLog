@@ -877,3 +877,7 @@
 20040528 periph.c: Enable/disable Interface II menu items as interface is
          enabled and disabled.
 20040528 periph.c: simplify code slightly.
+20040529 ui/gtk/debugger.c: display the DEC if the Timex memory capability
+	 is set (as it controls dock/exrom selection). Display both DEC
+	 and HSR if SE memory capability set. Display ZXCF memory control
+	 port if ZXCF active.

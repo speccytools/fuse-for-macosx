@@ -43,9 +43,11 @@
 #include "machine.h"
 #include "memory.h"
 #include "scld.h"
+#include "settings.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+#include "zxcf.h"
 
 /* The various debugger panes */
 typedef enum debugger_pane {
@@ -700,17 +702,27 @@ ui_debugger_update( void )
 	      machine_current->ram.last_byte2 );
   }
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO ) {
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO  ||
+      capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ||
+      capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY       ) {
     sprintf( format_string, "\nTmxDec %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string,
 	      scld_last_dec.byte );
   }
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) {
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ||
+      capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY       ) {
     sprintf( format_string, "\nTmxHsr %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string, scld_last_hsr );
+  }
+
+  if( settings_current.zxcf_active ) {
+    sprintf( format_string, "\n  ZXCF %s", format_8_bit() );
+    length = strlen( buffer );
+    snprintf( &buffer[length], 1024-length, format_string,
+	      zxcf_last_memctl() );
   }
 
   gtk_label_set_text( GTK_LABEL( registers[17] ), buffer );
