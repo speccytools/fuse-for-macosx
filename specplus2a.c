@@ -76,13 +76,17 @@ specplus2a_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, settings_current.rom_plus2a_0 );
+  error = machine_allocate_rom( machine, 0, settings_current.rom_plus2a_0,
+				0x4000 );
   if( error ) return error;
-  error = machine_read_rom( machine, 1, settings_current.rom_plus2a_1 );
+  error = machine_allocate_rom( machine, 1, settings_current.rom_plus2a_1,
+				0x4000 );
   if( error ) return error;
-  error = machine_read_rom( machine, 2, settings_current.rom_plus2a_2 );
+  error = machine_allocate_rom( machine, 2, settings_current.rom_plus2a_2,
+				0x4000 );
   if( error ) return error;
-  error = machine_read_rom( machine, 3, settings_current.rom_plus2a_3 );
+  error = machine_allocate_rom( machine, 3, settings_current.rom_plus2a_3,
+				0x4000 );
   if( error ) return error;
 
   machine->peripherals = specplus2a_peripherals;

@@ -221,13 +221,17 @@ int specplus3_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, settings_current.rom_plus3_0 );
+  error = machine_allocate_rom( machine, 0, settings_current.rom_plus3_0,
+				0x4000 );
   if( error ) return error;
-  error = machine_read_rom( machine, 1, settings_current.rom_plus3_1 );
+  error = machine_allocate_rom( machine, 1, settings_current.rom_plus3_1,
+				0x4000 );
   if( error ) return error;
-  error = machine_read_rom( machine, 2, settings_current.rom_plus3_2 );
+  error = machine_allocate_rom( machine, 2, settings_current.rom_plus3_2,
+				0x4000 );
   if( error ) return error;
-  error = machine_read_rom( machine, 3, settings_current.rom_plus3_3 );
+  error = machine_allocate_rom( machine, 3, settings_current.rom_plus3_3,
+				0x4000 );
   if( error ) return error;
 
   machine->peripherals=specplus3_peripherals;

@@ -47,8 +47,18 @@
 #include "ui/ui.h"
 #include "z80/z80.h"
 
-BYTE **ROM;
+/* The number of ROMs we have allocated space for; they might not all be
+   in use at the moment */
+size_t spectrum_rom_count = 0;
+
+/* The ROMs themselves */
+BYTE **ROM = NULL;
+
+/* And the RAM */
 BYTE RAM[8][0x4000];
+
+/* How many tstates have elapsed since the last interrupt? (or more
+   precisely, since the ULA last pulled the /INT line to the Z80 low) */
 DWORD tstates;
 
 /* The last byte written to the ULA */

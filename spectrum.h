@@ -33,6 +33,8 @@
 #include "types.h"
 #endif			/* #ifndef FUSE_TYPES_H */
 
+/* How many tstates have elapsed since the last interrupt? (or more
+   precisely, since the ULA last pulled the /INT line to the Z80 low) */
 extern DWORD tstates;
 
 /* The last byte written to the ULA */
@@ -40,7 +42,14 @@ extern BYTE spectrum_last_ula;
 
 /* Things relating to memory */
 
+/* The number of ROMs we have allocated space for; they might not all be
+   in use at the moment */
+extern size_t spectrum_rom_count;
+
+/* The ROMs themselves */
 extern BYTE **ROM;
+
+/* And the RAM */
 extern BYTE RAM[8][0x4000];
 
 typedef BYTE (*spectrum_memory_read_function) ( WORD address );

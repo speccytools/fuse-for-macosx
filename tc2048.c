@@ -151,7 +151,8 @@ int tc2048_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, settings_current.rom_tc2048 );
+  error = machine_allocate_rom( machine, 0, settings_current.rom_tc2048,
+				0x4000 );
   if( error ) return error;
 
   machine->peripherals = tc2048_peripherals;

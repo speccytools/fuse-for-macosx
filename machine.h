@@ -83,9 +83,9 @@ typedef struct fuse_machine_info {
   spectrum_raminfo ram; /* How do we access memory, and what's currently
 			   paged in */
 
-  size_t rom_count;
-  BYTE **roms;
-  size_t *rom_lengths;
+  size_t rom_count;	/* How many ROMs does this machine use? */
+  char **rom_name;	/* What filenames are the ROMs in? */
+  size_t *rom_length;	/* And how long is each ROM? */
 
   spectrum_port_info *peripherals; /* Which peripherals do we have? */
   spectrum_unattached_port_fn unattached_port; /* What to return if we read
@@ -115,8 +115,8 @@ void machine_set_timings( fuse_machine_info *machine, DWORD hz,
 			  WORD lines_per_frame, DWORD first_line);
 
 int machine_allocate_roms( fuse_machine_info *machine, size_t count );
-int machine_read_rom( fuse_machine_info *machine, size_t number,
-		      const char* filename );
+int machine_allocate_rom( fuse_machine_info *machine, size_t number,
+			  const char *filename, size_t length );
 int machine_find_rom( const char *filename );
 
 int machine_reset( void );

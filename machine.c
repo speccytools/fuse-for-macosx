@@ -66,7 +66,9 @@ static int machine_location;	/* Where is the current machine in
 
 static int machine_add_machine( int (*init_function)(fuse_machine_info *machine) );
 static int machine_select_machine( fuse_machine_info *machine );
-static int machine_free_machine( fuse_machine_info *machine );
+static int machine_load_roms( fuse_machine_info *machine );
+static int machine_load_rom( BYTE **ROM, char *filename,
+			     size_t expected_length );
 
 int machine_init_machines( void )
 {
@@ -167,14 +169,15 @@ machine_get_id( libspectrum_machine type )
 
 static int machine_select_machine( fuse_machine_info *machine )
 {
-  machine_current = machine;
-
   if( settings_current.start_machine ) free( settings_current.start_machine );
-  settings_current.start_machine = strdup( machine_current->id );
+  settings_current.start_machine = strdup( machine->id );
   if( !settings_current.start_machine ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
+  
+  /* Load the appropriate ROMs */
+  if( machine_load_roms( machine ) ) return 1;
 
   tstates = 0;
 
@@ -184,6 +187,8 @@ static int machine_select_machine( fuse_machine_info *machine )
     return 1;
   if( event_add( machine->line_times[0], EVENT_TYPE_LINE) ) return 1;
 
+  machine_current = machine;
+
   readbyte = machine->ram.read_memory;
   readbyte_internal = machine->ram.read_memory_internal;
   read_screen_memory = machine->ram.read_screen;
@@ -192,9 +197,83 @@ static int machine_select_machine( fuse_machine_info *machine )
   contend_memory = machine->ram.contend_memory;
   contend_port = machine->ram.contend_port;
   
-  ROM = machine->roms;
-
   if( machine_reset() ) return 1;
+
+  return 0;
+}
+
+static int
+machine_load_roms( fuse_machine_info *machine )
+{
+  size_t i;
+  int error;
+
+  /* Remove any ROMs we've got in memory at the moment */
+  for( i = 0; i < spectrum_rom_count; i++ ) {
+    if( ROM[i] ) { free( ROM[i] ); ROM[i] = 0; }
+  }
+    
+  /* Make sure we have enough space for the new ROMs */
+  if( spectrum_rom_count < machine->rom_count ) {
+
+    BYTE **new_ROM = realloc( ROM, machine->rom_count * sizeof( BYTE* ) );
+    if( !new_ROM ) {
+      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+      return 1;
+    }
+
+    ROM = new_ROM;
+  }
+  spectrum_rom_count = machine->rom_count;
+
+  /* And actually load the ROMs in */
+  for( i = 0; i < spectrum_rom_count; i++ ) {
+
+    error = machine_load_rom( &ROM[i], machine->rom_name[i],
+			      machine->rom_length[i] );
+    if( error ) return error;
+  }
+
+  return 0;
+}
+
+static int
+machine_load_rom( BYTE **ROM, char *filename, size_t expected_length )
+{
+  int fd, error;
+  unsigned char *buffer; size_t length;
+
+  fd = machine_find_rom( filename );
+  if( fd == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
+    return 1;
+  }
+  
+  error = utils_read_fd( fd, filename, &buffer, &length );
+  if( error ) return error;
+  
+  if( length != expected_length ) {
+    ui_error( UI_ERROR_ERROR,
+	      "ROM '%s' is %ld bytes long; expected %ld bytes",
+	      filename, (unsigned long)length,
+	      (unsigned long)expected_length );
+    return 1;
+  }
+
+  /* Take a copy of the ROM in case we want to write to it later */
+  *ROM = malloc( length * sizeof( BYTE ) );
+  if( !(*ROM) ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
+    return 1;
+  }
+
+  memcpy( *ROM, buffer, length );
+
+  if( munmap( buffer, length ) == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't munmap ROM '%s': %s", filename,
+	      strerror( errno ) );
+    return 1;
+  }
 
   return 0;
 }
@@ -253,40 +332,34 @@ int machine_allocate_roms( fuse_machine_info *machine, size_t count )
 {
   machine->rom_count = count;
 
-  machine->roms = (BYTE**)malloc( count * sizeof(BYTE*) );
-  if( machine->roms == NULL ) {
+  machine->rom_name = malloc( count * sizeof(char*) );
+  if( !machine->rom_name ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
-  machine->rom_lengths = (size_t*)malloc( count * sizeof(size_t) );
-  if( machine->rom_lengths == NULL ) {
+  machine->rom_length = malloc( count * sizeof(size_t) );
+  if( machine->rom_length == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    free( machine->roms );
+    free( machine->rom_length );
     return 1;
   }
 
   return 0;
 }
 
-int machine_read_rom( fuse_machine_info *machine, size_t number,
-		      const char* filename )
+int
+machine_allocate_rom( fuse_machine_info *machine, size_t number,
+		      const char *filename, size_t length )
 {
-  int fd;
-
-  int error;
-
-  assert( number < machine->rom_count );
-
-  fd = machine_find_rom( filename );
-  if( fd == -1 ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
+  machine->rom_name[ number ] = malloc( strlen( filename ) + 1 );
+  if( !machine->rom_name[ number ] ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
-  error = utils_read_fd( fd, filename, &(machine->roms[number]),
-			 &(machine->rom_lengths[number]) );
-  if( error ) return error;
+  strcpy( machine->rom_name[ number ], filename );
+  machine->rom_length[ number ] = length;
 
   return 0;
 
@@ -324,33 +397,13 @@ int machine_find_rom( const char *filename )
 int machine_end( void )
 {
   int i;
-  int error;
 
   for( i=0; i<machine_count; i++ ) {
-    error = machine_free_machine( machine_types[i] );
-    if( error ) return error;
+    if( machine_types[i]->shutdown ) machine_types[i]->shutdown();
     free( machine_types[i] );
   }
 
   free( machine_types );
-
-  return 0;
-}
-
-static int machine_free_machine( fuse_machine_info *machine )
-{
-  size_t i;
-
-  if( machine->shutdown ) machine->shutdown();
-
-  for( i=0; i<machine->rom_count; i++ ) {
-
-    if( munmap( machine->roms[i], machine->rom_lengths[i] ) == -1 ) {
-      ui_error( UI_ERROR_ERROR, "couldn't munmap ROM %lu: %s",
-		(unsigned long)i, strerror( errno ) );
-      return 1;
-    }
-  }
 
   return 0;
 }

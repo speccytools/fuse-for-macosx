@@ -58,9 +58,11 @@ int specplus2_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, settings_current.rom_plus2_0 );
+  error = machine_allocate_rom( machine, 0, settings_current.rom_plus2_0,
+				0x4000 );
   if( error ) return error;
-  error = machine_read_rom( machine, 1, settings_current.rom_plus2_1 );
+  error = machine_allocate_rom( machine, 1, settings_current.rom_plus2_1,
+				0x4000 );
   if( error ) return error;
 
   machine->peripherals = spec128_peripherals;
