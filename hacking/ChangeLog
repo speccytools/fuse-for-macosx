@@ -713,3 +713,6 @@
 20040406 input.c,input.h,keyboard.h,settings.dat: make the 'real joystick
 	 fire' action configurable to be either 'emulated joystick fire'
 	 or 'press a key'.
+20040407 ui/gtk/{browse.c,debugger.c,pokefinder.c}: prevent segfault if
+	 the keyboard (space) is used to select things from a GtkCList
+	 (Darren).

@@ -260,8 +260,8 @@ possible_click( GtkCList *clist, gint row, gint column,
 {
   int error;
 
-  /* Ignore events which aren't a double-click */
-  if( event->type != GDK_2BUTTON_PRESS ) return;
+  /* Ignore events which aren't double-clicks or select-via-keyboard */
+  if( event && event->type != GDK_2BUTTON_PRESS ) return;
 
   error = debugger_breakpoint_add_address(
     DEBUGGER_BREAKPOINT_TYPE_WRITE, possible_page[ row ],

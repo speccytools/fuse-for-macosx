@@ -201,8 +201,8 @@ select_row( GtkCList *clist, gint row, gint column GCC_UNUSED,
 {
   int current_block;
 
-  /* Ignore events which aren't double-clicks */
-  if( event->type != GDK_2BUTTON_PRESS ) return;
+  /* Ignore events which aren't double-clicks or select-via-keyboard */
+  if( event && event->type != GDK_2BUTTON_PRESS ) return;
 
   /* Don't do anything if the current block was clicked on */
   current_block = tape_get_current_block();

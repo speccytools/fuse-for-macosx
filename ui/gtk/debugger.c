@@ -439,8 +439,8 @@ stack_click( GtkCList *clist, gint row, gint column,
   libspectrum_word address, destination;
   int error;
 
-  /* Ignore events which aren't a double-click */
-  if( event->type != GDK_2BUTTON_PRESS ) return;
+  /* Ignore events which aren't double-clicks or select-via-keyboard */
+  if( event && event->type != GDK_2BUTTON_PRESS ) return;
 
   address = SP + ( 19 - row ) * 2;
 
@@ -482,8 +482,8 @@ events_click( GtkCList *clist, gint row, gint column,
   gchar *buffer;
   libspectrum_dword tstates;
 
-  /* Ignore events which aren't a double-click */
-  if( event->type != GDK_2BUTTON_PRESS ) return;
+  /* Ignore events which aren't double-clicks or select-via-keyboard */
+  if( event && event->type != GDK_2BUTTON_PRESS ) return;
 
   got_text = gtk_clist_get_text( clist, row, 0, &buffer );
   if( !got_text ) {
