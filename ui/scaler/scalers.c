@@ -522,8 +522,8 @@ FUNCTION( scaler_2xSaI )( const libspectrum_byte *srcPtr,
 	    product = INTERPOLATE(colorA, colorB);
 
 	    r += GetResult(colorA, colorB, colorG, colorE);
-	    r += GetResult(colorB, colorA, colorK, colorF);
-	    r += GetResult(colorB, colorA, colorH, colorN);
+	    r -= GetResult(colorB, colorA, colorK, colorF);
+	    r -= GetResult(colorB, colorA, colorH, colorN);
 	    r += GetResult(colorA, colorB, colorL, colorO);
 
 	    if (r > 0)

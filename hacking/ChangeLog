@@ -178,3 +178,4 @@
 20030902 THANKS: Add Ivan Ruiz Etxabe and David Muriel.
 20030902 ChangeLog: bring up to date.
 20030902 AUTHORS: Add Matthew Westcott.
+20030903 ui/scaler/scalers.c: small fix to 2xSaI scaler (Fred/ScummVM team).
