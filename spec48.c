@@ -84,7 +84,7 @@ void spec48_writebyte(WORD address, BYTE b)
       fuse_abort();
     }
     if(address<0x5b00) {	/* 0x4000 - 0x5aff = display file */
-      display_dirty(address,b);	/* Replot necessary pixels */
+      display_dirty( address );	/* Replot necessary pixels */
     }
   }
 }

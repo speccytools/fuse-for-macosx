@@ -44,8 +44,8 @@
 /* XXX presumably want these selectable eventually, but these
  * should be ok for now.
  */
-static char *printer_graphics_filename="printout.pbm";
-static char *printer_text_filename="printout.txt";
+static const char *printer_graphics_filename="printout.pbm";
+static const char *printer_text_filename="printout.txt";
 
 static int printer_graphics_enabled=0;
 static int printer_text_enabled=0;
@@ -53,7 +53,8 @@ static FILE *printer_graphics_file=NULL;
 static FILE *printer_text_file=NULL;
 
 /* for the ZX Printer */
-static int zxpframes,zxpcycles,zxpspeed,zxpnewspeed;
+static int zxpframes,zxpspeed,zxpnewspeed;
+static DWORD zxpcycles;
 static int zxpheight,zxppixel,zxpstylus;
 static unsigned char zxpline[256];
 static unsigned int frames=0;
@@ -83,7 +84,7 @@ static void printer_text_init(void)
 
 static int printer_zxp_open_file(void)
 {
-static char *pbmstart="P4\n256 ";
+static const char *pbmstart="P4\n256 ";
 FILE *tmpf;
 int overwrite=1;
 
@@ -270,7 +271,7 @@ if(printer_text_file)
 
 
 /* output the last line printed as text. */
-void printer_zxp_output_as_text(void)
+static void printer_zxp_output_as_text(void)
 {
 static unsigned char charset[256*8];
 static unsigned char outbuf[32];

@@ -45,10 +45,9 @@ static unsigned long colours[16];
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int gtkdisplay_current_size=1;
 
-static int gtkdisplay_allocate_colours( int numColours,
-					unsigned long *pixel_values );
+static int gtkdisplay_allocate_colours( unsigned long *pixel_values );
 static void gtkdisplay_area(int x, int y, int width, int height);
-static int gtkdisplay_configure_notify(int width, int height);
+static int gtkdisplay_configure_notify( int width );
 
 /* Callbacks */
 
@@ -75,13 +74,12 @@ int uidisplay_init(int width, int height)
   gc = gtk_gc_get(depth, gtk_widget_get_colormap(gtkui_drawing_area),
 		  &gc_values, (GdkGCValuesMask) 0 );
 
-  if(gtkdisplay_allocate_colours(16,colours)) return 1;
+  if( gtkdisplay_allocate_colours( colours ) ) return 1;
 
   return 0;
 }
 
-static int gtkdisplay_allocate_colours( int numColours,
-					unsigned long *pixel_values )
+static int gtkdisplay_allocate_colours( unsigned long *pixel_values )
 {
   GdkColor gdk_colours[16];
   GdkColormap *current_map;
@@ -145,7 +143,7 @@ static int gtkdisplay_allocate_colours( int numColours,
 
 }
   
-static int gtkdisplay_configure_notify(int width, int height)
+static int gtkdisplay_configure_notify( int width )
 {
   int y,size;
 
@@ -287,7 +285,7 @@ static gint gtkdisplay_expose(GtkWidget *widget, GdkEvent *event,
 static gint gtkdisplay_configure(GtkWidget *widget, GdkEvent *event,
 				 gpointer data)
 {
-  gtkdisplay_configure_notify(event->configure.width, event->configure.height);
+  gtkdisplay_configure_notify( event->configure.width );
   return FALSE;
 }
 

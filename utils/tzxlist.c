@@ -39,7 +39,8 @@
 
 static const char *progname;
 
-const char* hardware_desc( int type, int id )
+static const char*
+hardware_desc( int type, int id )
 {
   switch( type ) {
   case 0:
@@ -84,7 +85,7 @@ process_tzx( char *filename )
 
   GSList *ptr;
 
-  int i;
+  size_t i;
 
   tape.blocks = NULL;
 

@@ -47,7 +47,7 @@ size_t widget_numfiles;	  /* The number of files in the current
 /* The number of the filename in the top-left corner of the current
    display, that of the filename which the `cursor' is on, and that
    which it will be on after this keypress */
-static int top_left_file, current_file, new_current_file;
+static size_t top_left_file, current_file, new_current_file;
 
 static void widget_scan( char *dir );
 static int widget_select_file( const struct dirent *dirent );
@@ -63,8 +63,8 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 /* The filename to return */
 char* widget_filesel_name;
 
-int widget_scandir( const char *dir, struct widget_dirent ***namelist,
-		    int (*select)(const struct dirent*) )
+static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
+			   int (*select_fn)(const struct dirent*) )
 {
   DIR *directory; struct dirent *dirent;
 
@@ -103,7 +103,7 @@ int widget_scandir( const char *dir, struct widget_dirent ***namelist,
       }
     }
 
-    if( select( dirent ) ) {
+    if( select_fn( dirent ) ) {
 
       if( ++number > allocated ) {
 	struct widget_dirent **oldptr = *namelist;
@@ -183,7 +183,7 @@ static void widget_scan( char *dir )
 
   widget_numfiles = widget_scandir( dir, &widget_filenames,
 				    widget_select_file );
-  if( widget_numfiles == -1 ) return;
+  if( widget_numfiles == (size_t)-1 ) return;
 
   for( i=0; i<widget_numfiles; i++ ) {
     error = stat( widget_filenames[i]->name, &file_info );

@@ -69,7 +69,7 @@ static int display_flash_reversed;
    corresponds to pixels 0-7, bit 31 to pixels 248-255. */
 static DWORD display_is_dirty[DISPLAY_HEIGHT];
 /* This value signifies that the entire line must be redisplayed */
-const static DWORD display_all_dirty = 0xffffffffUL;
+static const DWORD display_all_dirty = 0xffffffffUL;
 
 /* Which border lines need to be redrawn */
 static int display_border_dirty[DISPLAY_SCREEN_HEIGHT];
@@ -78,16 +78,16 @@ static int display_border_dirty[DISPLAY_SCREEN_HEIGHT];
 static int display_next_line;
 
 /* Value used to signify we're in vertical retrace */
-const static int display_border_retrace=-1;
+static const int display_border_retrace=-1;
 
 /* Value used to signify a border line has more than one colour on it. */
-const static int display_border_mixed = 0xff;
+static const int display_border_mixed = 0xff;
 
 /* Where the current block of lines to send to the screen starts */
 static int display_blocked_write_start;
 
 /* Value to signify `no block to send to screen' */
-const static int display_blocked_write_none = -1;
+static const int display_blocked_write_none = -1;
 
 static void display_draw_line(int y);
 static void display_dirty8(WORD address);
@@ -258,7 +258,7 @@ static void display_draw_line(int y)
 
 /* Mark as `dirty' the pixels which have been changed by a write to byte
    `address'; 0x4000 <= address < 0x5b00 */
-void display_dirty(WORD address, BYTE data)
+void display_dirty( WORD address )
 {
   if(address<0x5800) {		/* 0x5800 = first attributes byte */
     display_dirty8(address);

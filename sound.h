@@ -27,7 +27,7 @@
 
 void sound_init(void);
 void sound_end(void);
-void sound_ay_write(int reg,int val,DWORD tstates);
+void sound_ay_write(int reg,int val,DWORD now);
 void sound_ay_reset(void);
 void sound_frame(void);
 void sound_beeper(int is_tape,int on);

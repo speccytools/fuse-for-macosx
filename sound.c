@@ -295,7 +295,7 @@ if(sound_enabled)
 
 
 /* write sample to buffer as pseudo-stereo */
-void sound_write_buf_pstereo(unsigned char *out,int c)
+static void sound_write_buf_pstereo(unsigned char *out,int c)
 {
 int bl=(c-128-pstereobuf[pstereopos])/2;
 int br=(c-128+pstereobuf[pstereopos])/2;
@@ -624,7 +624,7 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
 /* don't make the change immediately; record it for later,
  * to be made by sound_frame() (via sound_ay_overlay()).
  */
-void sound_ay_write(int reg,int val,DWORD tstates)
+void sound_ay_write(int reg,int val,DWORD now)
 {
 /* have to allow it across pauses for snap-loading to work,
  * so see if sound has *ever* been enabled.
@@ -633,7 +633,7 @@ if(!sound_enabled_ever) return;
 
 if(ay_change_count<AY_CHANGE_MAX)
   {
-  ay_change[ay_change_count].tstates=tstates;
+  ay_change[ay_change_count].tstates=now;
   ay_change[ay_change_count].reg=(reg&15);
   ay_change[ay_change_count].val=val;
   ay_change_count++;

@@ -438,7 +438,7 @@ tzx_write_select( libspectrum_tape_select_block *block,
 {
   libspectrum_error error;
 
-  size_t total_length; int i;
+  size_t total_length, i;
 
   /* The count byte, and ( 2 offset bytes and 1 length byte ) per selection */
   total_length = 1 + 3 * block->count;
@@ -628,8 +628,7 @@ static libspectrum_error
 tzx_write_bytes( libspectrum_byte **ptr, size_t length,
 		 size_t length_bytes, libspectrum_byte *data )
 {
-  int i;
-  size_t shifter;
+  size_t i, shifter;
 
   /* Write out the appropriate number of length bytes */
   for( i=0, shifter = length; i<length_bytes; i++, shifter >>= 8 )

@@ -38,7 +38,7 @@
 
 static settings_info settings;
 
-static int widget_options_show_all( settings_info *settings );
+static int widget_options_show_all( settings_info *show );
 static int widget_options_print_option( int number, const char* string,
 					int value );
 static int widget_options_print_value( int number, int value );
@@ -76,26 +76,26 @@ int widget_options_finish( widget_finish_state finished )
   return 0;
 }
 
-static int widget_options_show_all( settings_info *settings )
+static int widget_options_show_all( settings_info *show )
 {
   int error;
 
   widget_printstring( 9, 2, WIDGET_COLOUR_FOREGROUND, "General Options" );
 
   error = widget_options_print_option( 0, "Issue (2) emulation",
-				       settings->issue2 );
+				       show->issue2 );
   if( error ) return error;
 
   error = widget_options_print_option( 1, "(K)empston joystick",
-				       settings->joy_kempston );
+				       show->joy_kempston );
   if( error ) return error;
 
   error = widget_options_print_option( 2, "(F)ast tape loading",
-				       settings->tape_traps );
+				       show->tape_traps );
   if( error ) return error;
 
   error = widget_options_print_option( 3, "(A)Y stereo separation",
-				       settings->stereo_ay );
+				       show->stereo_ay );
   if( error ) return error;
 
   return 0;

@@ -117,7 +117,7 @@ static void printchar(int x, int y, int col, int ch) {
     }
 }
 
-void widget_printstring(int x, int y, int col, char *s)
+void widget_printstring(int x, int y, int col, const char *s)
 {
     int i;
     i=0;
@@ -154,7 +154,7 @@ int widget_init( void )
 
 int widget_end( void )
 {
-  int i;
+  size_t i;
 
   if( widget_filenames ) {
     for( i=0; i<widget_numfiles; i++) {

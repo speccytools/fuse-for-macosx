@@ -134,7 +134,7 @@ void specplus3_writebyte(WORD address, BYTE b)
   }
   RAM[bank][address]=b;
   if(bank==machine_current->ram.current_screen && address < 0x1b00) {
-    display_dirty(address+0x4000,b); /* Replot necessary pixels */
+    display_dirty( address+0x4000 ); /* Replot necessary pixels */
   }
 }
 

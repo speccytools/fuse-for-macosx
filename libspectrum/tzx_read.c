@@ -86,8 +86,7 @@ static libspectrum_error
 tzx_read_concat( const libspectrum_byte **ptr, const libspectrum_byte *end );
 
 static libspectrum_error
-tzx_read_empty_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
-		      const libspectrum_byte *end, libspectrum_tape_type id );
+tzx_read_empty_block( libspectrum_tape *tape, libspectrum_tape_type id );
 
 static libspectrum_error
 tzx_read_data( const libspectrum_byte **ptr, const libspectrum_byte *end,
@@ -166,7 +165,7 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
-      error = tzx_read_empty_block( tape, &ptr, end, id );
+      error = tzx_read_empty_block( tape, id );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
     case LIBSPECTRUM_TAPE_BLOCK_JUMP:
@@ -178,7 +177,7 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
     case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
-      error = tzx_read_empty_block( tape, &ptr, end, id );
+      error = tzx_read_empty_block( tape, id );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -381,7 +380,7 @@ tzx_read_pulses_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
   libspectrum_tape_block* block;
   libspectrum_tape_pulses_block *pulses_block;
 
-  int i;
+  size_t i;
 
   /* Check the count byte exists */
   if( (*ptr) == end ) {
@@ -632,7 +631,7 @@ tzx_read_select( libspectrum_tape *tape, const libspectrum_byte **ptr,
   libspectrum_tape_select_block *select_block;
   libspectrum_error error;
 
-  size_t length; int i,j;
+  size_t length, i, j;
 
   /* Check there's enough left in the buffer for the length and the count
      byte */
@@ -835,7 +834,7 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
   libspectrum_tape_archive_info_block *info_block;
   libspectrum_error error;
 
-  int i;
+  size_t i;
 
   /* Check there's enough left in the buffer for the length and the count
      byte */
@@ -883,7 +882,7 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
     /* Must be ID byte and length byte */
     if( end - (*ptr) < 2 ) {
-      int j;
+      size_t j;
       for( j=0; j<i; j++ ) free( info_block->strings[i] );
       free( info_block->strings ); free( info_block->ids );
       free( block );
@@ -899,7 +898,7 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
     /* Read in the string itself */
     error = tzx_read_string( ptr, end, &(info_block->strings[i] ) );
     if( error ) {
-      int j; for( j=0; j<i; j++ ) free( info_block->strings[i] );
+      size_t j; for( j=0; j<i; j++ ) free( info_block->strings[i] );
       free( info_block->strings ); free( info_block->ids );
       free( block );
       return error;
@@ -920,7 +919,7 @@ tzx_read_hardware( libspectrum_tape *tape, const libspectrum_byte **ptr,
   libspectrum_tape_block* block;
   libspectrum_tape_hardware_block *hardware_block;
 
-  int i;
+  size_t i;
 
   /* Check there's enough left in the buffer for the count byte */
   if( (*ptr) == end ) {
@@ -1051,8 +1050,7 @@ tzx_read_concat( const libspectrum_byte **ptr, const libspectrum_byte *end )
 }
   
 static libspectrum_error
-tzx_read_empty_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
-		      const libspectrum_byte *end, libspectrum_tape_type id )
+tzx_read_empty_block( libspectrum_tape *tape, libspectrum_tape_type id )
 {
   libspectrum_tape_block *block;
 

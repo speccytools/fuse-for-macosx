@@ -282,7 +282,8 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
 
   size_t screen_length = 0, screen_offset = 0;
 
-  int i, error;
+  int i;
+  libspectrum_error error;
 
   /* Zero all lengths to imply `not present' */
   for( i=0; i<256; i++ ) slt_length[i]=0;
@@ -364,8 +365,6 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
   /* Read in the data for each level */
   for( i=0; i<256; i++ ) {
     if( slt_length[i] ) {
-
-      libspectrum_error error;
 
       /* Check this data actually exists */
       if( *next_block + offsets[i] + slt_length[i] > end ) {
