@@ -57,9 +57,10 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_COMMENT = 0x30,
 
   LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO = 0x32,
+  LIBSPECTRUM_TAPE_BLOCK_HARDWARE,
 } libspectrum_tape_type;
 
-/* A huge number of states available; encompasses all possible block types */
+/* The states which a block can be in */
 typedef enum libspectrum_tape_state_type {
 
   /* Normal/turbo loaders */
@@ -220,6 +221,17 @@ typedef struct libspectrum_tape_archive_info_block {
 
 } libspectrum_tape_archive_info_block;
 
+/* A hardware info block */
+typedef struct libspectrum_tape_hardware_block {
+
+  /* Number of entries */
+  size_t count;
+
+  /* For each entry, a type, an ID and a value */
+  int *types, *ids, *values;
+
+} libspectrum_tape_hardware_block;
+
 /* A generic tape block */
 typedef struct libspectrum_tape_block {
 
@@ -239,6 +251,7 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_comment_block comment;
 
     libspectrum_tape_archive_info_block archive_info;
+    libspectrum_tape_hardware_block hardware;
   } types;
 
 } libspectrum_tape_block;

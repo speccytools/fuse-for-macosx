@@ -37,6 +37,37 @@
 #define ERROR_MESSAGE_MAX_LENGTH 1024
 #define DESCRIPTION_LENGTH 80
 
+const char* hardware_desc( int type, int id )
+{
+  switch( type ) {
+  case 0:
+    switch( id ) {
+    case 0: return "16K Spectrum";
+    case 1: return "48K Spectrum/Spectrum +";
+    case 2: return "48K Spectrum (Issue 1)";
+    case 3: return "128K Spectrum";
+    case 4: return "Spectrum +2";
+    case 5: return "Spectrum +2A/+3";
+    default: return "Unknown machine";
+    }
+  case 3:
+    switch( id ) {
+    case 0: return "AY-3-8192";
+    default: return "Unknown sound device";
+    }
+  case 4:
+    switch( id ) {
+    case 0: return "Kempston joystick";
+    case 1: return "Cursor/Protek/AGF joystick";
+    case 2: return "Sinclair joystick (Left)";
+    case 3: return "Sinclair joystick (Right)";
+    case 4: return "Fuller joystick";
+    default: return "Unknown joystick";
+    }
+  default: return "Unknown type";
+  }
+}
+
 int
 main( int argc, char **argv )
 {
@@ -130,6 +161,7 @@ main( int argc, char **argv )
     libspectrum_tape_pulses_block *pulses_block;
     libspectrum_tape_pure_data_block *data_block;
     libspectrum_tape_archive_info_block *info_block;
+    libspectrum_tape_hardware_block *hardware_block;
 
     error = libspectrum_tape_block_description(
       block, description, DESCRIPTION_LENGTH
@@ -217,6 +249,24 @@ main( int argc, char **argv )
 	 default: printf("(Unknown string): "); break;
 	}
 	printf(" %s\n", info_block->strings[i] );
+      }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+      hardware_block = &(block->types.hardware);
+      for( i=0; i<hardware_block->count; i++ ) {
+	printf( "  %s: ",
+	        hardware_desc( hardware_block->types[i],
+			       hardware_block->ids[i]
+			     )
+	      );
+	switch( hardware_block->values[i] ) {
+	case 0: printf("runs"); break;
+	case 1: printf("runs, using hardware"); break;
+	case 2: printf("runs, does not use hardware"); break;
+	case 3: printf("does not run"); break;
+	}
+	printf("\n");
       }
       break;
 

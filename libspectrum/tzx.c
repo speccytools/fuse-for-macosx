@@ -64,6 +64,9 @@ tzx_read_comment( libspectrum_tape *tape, const libspectrum_byte **ptr,
 static libspectrum_error
 tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		       const libspectrum_byte *end );
+static libspectrum_error
+tzx_read_hardware( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		   const libspectrum_byte *end );
 
 static libspectrum_error
 tzx_write_rom( libspectrum_tape_rom_block *rom_block,
@@ -98,6 +101,9 @@ static libspectrum_error
 tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
 			libspectrum_byte **buffer, size_t *offset,
 			size_t *length );
+static libspectrum_error
+tzx_write_hardware( libspectrum_tape_hardware_block *hardware_block,
+		    libspectrum_byte **buffer, size_t *offset, size_t *length);
 
 /*** Function definitions ***/
 
@@ -180,6 +186,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       error = tzx_read_archive_info( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+      error = tzx_read_hardware( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -783,6 +793,81 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+static libspectrum_error
+tzx_read_hardware( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		   const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_hardware_block *hardware_block;
+
+  int i;
+
+  /* Check there's enough left in the buffer for the count byte */
+  if( (*ptr) == end ) {
+    libspectrum_print_error(
+      "tzx_read_hardware: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) {
+    libspectrum_print_error( "tzx_read_hardware: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* This is an archive info block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_HARDWARE;
+  hardware_block = &(block->types.hardware);
+
+  /* Get the number of string */
+  hardware_block->count = **ptr; (*ptr)++;
+
+  /* Check there's enough data in the buffer for all the data */
+  if( end - (*ptr) < 3*hardware_block->count ) {
+    libspectrum_print_error(
+      "tzx_read_hardware: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Allocate memory */
+  hardware_block->types  = (int*)malloc( hardware_block->count * sizeof(int) );
+  if( hardware_block->types == NULL ) {
+    free( block );
+    libspectrum_print_error( "tzx_read_hardware: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+  hardware_block->ids    = (int*)malloc( hardware_block->count * sizeof(int) );
+  if( hardware_block->ids == NULL ) {
+    free( hardware_block->types );
+    free( block );
+    libspectrum_print_error( "tzx_read_hardware: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+  hardware_block->values = (int*)malloc( hardware_block->count * sizeof(int) );
+  if( hardware_block->values == NULL ) {
+    free( hardware_block->ids   );
+    free( hardware_block->types );
+    free( block );
+    libspectrum_print_error( "tzx_read_hardware: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* Actually read in all the data */
+  for( i=0; i<hardware_block->count; i++ ) {
+    hardware_block->types[i]  = **ptr; (*ptr)++;
+    hardware_block->ids[i]    = **ptr; (*ptr)++;
+    hardware_block->values[i] = **ptr; (*ptr)++;
+  }
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
 /* The main write function */
 
 libspectrum_error
@@ -854,6 +939,11 @@ libspectrum_tzx_write( libspectrum_tape *tape,
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       error = tzx_write_archive_info( &(block->types.archive_info),
 				      buffer, &offset, length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+      error = tzx_write_hardware( &(block->types.hardware),
+				  buffer, &offset, length);
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
       break;
 
@@ -1137,6 +1227,38 @@ tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
 
   /* Update offset and return */
   (*offset) += total_length + 2;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_hardware( libspectrum_tape_hardware_block *block,
+		    libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  size_t i;
+
+  /* We need one ID byte, one count byte and then three bytes for every
+     entry */
+  error = libspectrum_make_room( buffer, (*offset) + 3 * block->count + 2,
+				 &ptr, length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  /* Write out the metadata */
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_HARDWARE;
+  *ptr++ = block->count;
+
+  /* And the info */
+  for( i=0; i<block->count; i++ ) {
+    *ptr++ = block->types[i];
+    *ptr++ = block->ids[i];
+    *ptr++ = block->values[i];
+  }
+
+  /* Update offset and return */
+  (*offset) += 3 * block->count + 2;
 
   return LIBSPECTRUM_ERROR_NONE;
 }

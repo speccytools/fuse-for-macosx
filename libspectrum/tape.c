@@ -127,7 +127,11 @@ block_free( gpointer data, gpointer user_data )
     free( block->types.archive_info.ids );
     free( block->types.archive_info.strings );
     break;
-
+  case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+    free( block->types.hardware.types  );
+    free( block->types.hardware.ids    );
+    free( block->types.hardware.values );
+    break;
   }
 }
 
@@ -156,6 +160,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+  case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
     return LIBSPECTRUM_ERROR_NONE;
 
   default:
@@ -262,6 +267,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
+  case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
     *tstates = 0; end_of_block = 1;
     break;
 
@@ -638,6 +644,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
 
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     strncpy( buffer, "Archive Info Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
+    strncpy( buffer, "Hardware Information Block", length );
     break;
 
   default:
