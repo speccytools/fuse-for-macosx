@@ -59,6 +59,7 @@ fuse_SOURCES = ay.c \
 	display.c \
 	event.c \
 	fuse.c \
+	ide.c \
 	if1.c \
 	if2.c \
 	input.c \
@@ -131,6 +132,7 @@ noinst_HEADERS = ay.h \
 	display.h \
 	event.h \
 	fuse.h \
+	ide.h \
 	if1.h \
 	if2.h \
 	input.h \

@@ -25,12 +25,13 @@
 
 */
 
-#include <compat.h>
+#include <config.h>
 
 #include <string.h>
 
 #include <libspectrum.h>
 
+#include "ide.h"
 #include "machine.h"
 #include "memory.h"
 #include "periph.h"
@@ -145,21 +146,24 @@ zxcf_commit( void )
   return error;
 }
 
+static int
+zxcf_commit_wrapper( libspectrum_ide_unit unit )
+{
+  if( unit != LIBSPECTRUM_IDE_MASTER ) {
+    ui_error( UI_ERROR_ERROR, "%s:%d: unit is %d, not LIBSPECTRUM_IDE_MASTER",
+	      __FILE__, __LINE__, unit );
+    abort();
+  }
+
+  return zxcf_commit();
+}
+
 int
 zxcf_eject( void )
 {
-  int error;
-  
-  free( settings_current.simpleide_master_file );
-  settings_current.simpleide_master_file = NULL;
-  
-  error = libspectrum_ide_eject( zxcf_idechn, LIBSPECTRUM_IDE_MASTER );
-  if( error ) return error;
-
-  error = ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 1 );
-  if( error ) return error;
-
-  return 0;
+  return ide_eject( zxcf_idechn, LIBSPECTRUM_IDE_MASTER, zxcf_commit_wrapper,
+		    &settings_current.zxcf_pri_file,
+		    UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT );
 }
 
 static void

@@ -25,12 +25,13 @@
 
 */
 
-#include <compat.h>
+#include <config.h>
 
 #include <string.h>
 
 #include <libspectrum.h>
 
+#include "ide.h"
 #include "machine.h"
 #include "memory.h"
 #include "periph.h"
@@ -237,31 +238,24 @@ zxatasp_commit( libspectrum_ide_unit unit )
 int
 zxatasp_eject( libspectrum_ide_unit unit )
 {
+  char **setting;
   ui_menu_item item;
-  int error;
-  
+
   switch( unit ) {
   case LIBSPECTRUM_IDE_MASTER:
-    free( settings_current.zxatasp_master_file );
-    settings_current.zxatasp_master_file = NULL;
+    setting = &settings_current.zxatasp_master_file;
     item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT;
     break;
-    
+
   case LIBSPECTRUM_IDE_SLAVE:
-    free( settings_current.zxatasp_slave_file );
-    settings_current.zxatasp_slave_file = NULL;
+    setting = &settings_current.zxatasp_slave_file;
     item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT;
     break;
     
   default: return 1;
   }
-  
-  error = libspectrum_ide_eject( zxatasp_idechn0, unit );
-  if( error ) return error;
-  
-  error = ui_menu_activate( item, 0 ); if( error ) return error;
 
-  return 0;
+  return ide_eject( zxatasp_idechn0, unit, zxatasp_commit, setting, item );
 }
 
 /* Port read/writes */

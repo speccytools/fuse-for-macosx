@@ -1213,3 +1213,5 @@
 	 z80_ops.c}: add very simple profiler; just records which
 	 locations where executed at the moment.
 20050217 profile.[ch],spectrum.c: make the profiler actually profile.
+20050218 Makefile.am,ide.[ch],simpleide.c,zxatasp.c,zxcf.c: add "Save,
+	 Don't Save, Cancel" functionality on IDE disk eject.
