@@ -26,6 +26,6 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libuisvga.a
 
-libuisvga_a_SOURCES = svgadisplay.c svgakeyboard.c svgaui.c
+libuisvga_a_SOURCES = error.c svgadisplay.c svgakeyboard.c svgaui.c
 
 noinst_HEADERS = svgakeyboard.h
