@@ -115,85 +115,64 @@ if1_ula_t if1_ula = { .fd_r = -1, .fd_t = -1, .rs232_mode = RS232_INT,
 		  .fd_net = -1, .s_net_mode = S_NET_INT, };
 
 #define IN(m) microdrv[m - 1].inserted
-#define EJ(m) !microdrv[m - 1].inserted
 #define WP(m) microdrv[m - 1].wp
 
-#define UMENU_ALL   0
-#define UMENU_MDRV1 1
-#define UMENU_MDRV2 2
-#define UMENU_MDRV3 3
-#define UMENU_MDRV4 4
-#define UMENU_MDRV5 5
-#define UMENU_MDRV6 6
-#define UMENU_MDRV7 7
-#define UMENU_MDRV8 8
-#define UMENU_RS232 9
+enum if1_menu_item {
 
-void
-if1_update_menu( what )		/* 0 - all, 1-8 microdrv, 9 - if1_ula, 10 - snet*/
+  UMENU_ALL = 0,
+  UMENU_MDRV1,
+  UMENU_MDRV2,
+  UMENU_MDRV3,
+  UMENU_MDRV4,
+  UMENU_MDRV5,
+  UMENU_MDRV6,
+  UMENU_MDRV7,
+  UMENU_MDRV8,
+  UMENU_RS232,
+
+};
+
+static void
+if1_update_menu( enum if1_menu_item what )
 {
   if( what == UMENU_ALL || what == UMENU_MDRV1 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_SYNC, IN( 1 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_EJECT, IN( 1 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_WP, IN( 1 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET, !WP( 1 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_WP_REMOVE, WP( 1 ) );
   }
 
   if( what == UMENU_ALL || what == UMENU_MDRV2 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_SYNC, IN( 2 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_EJECT, IN( 2 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_WP, IN( 2 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET, !WP( 2 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_WP_REMOVE, WP( 2 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV3 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_SYNC, IN( 3 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_EJECT, IN( 3 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_WP, IN( 3 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET, !WP( 3 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_WP_REMOVE, WP( 3 ) );
   }
 
   if( what == UMENU_ALL || what == UMENU_MDRV4 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_SYNC, IN( 4 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_EJECT, IN( 4 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_WP, IN( 4 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET, !WP( 4 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_WP_REMOVE, WP( 4 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV5 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_SYNC, IN( 5 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_EJECT, IN( 5 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_WP, IN( 5 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET, !WP( 5 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_WP_REMOVE, WP( 5 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV6 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_SYNC, IN( 6 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_EJECT, IN( 6 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_WP, IN( 6 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET, !WP( 6 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_WP_REMOVE, WP( 6 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV7 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_SYNC, IN( 7 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_EJECT, IN( 7 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_WP, IN( 7 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET, !WP( 7 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_WP_REMOVE, WP( 7 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV8 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_SYNC, IN( 8 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_EJECT, IN( 8 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_WP, IN( 8 ) );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET, !WP( 8 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_WP_REMOVE, WP( 8 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_RS232 ) {
