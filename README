@@ -102,7 +102,7 @@ ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/
 Finally, if you want to see how a Unix Speccy emulator should be done,
 check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
 
-Philip Kendall <pak@ast.cam.ac.uk>
+Philip Kendall <pak21-fuse@srcf.ucam.org>
 13 August 2001
 
 $Id$
