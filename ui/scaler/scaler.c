@@ -87,6 +87,8 @@ scaler_flags_t scaler_flags;
 int
 scaler_select_scaler( scaler_type scaler )
 {
+  if( !scaler_is_supported( scaler ) ) return 1;
+
   if( current_scaler == scaler ) return 0;
 
   current_scaler = scaler;
@@ -141,7 +143,7 @@ scaler_register( scaler_type scaler )
 int
 scaler_is_supported( scaler_type scaler )
 {
-  return scaler_supported[scaler];
+  return ( scaler >= SCALER_NUM ? 0 : scaler_supported[scaler] );
 }
 
 const char *

@@ -170,13 +170,13 @@ static int fuse_init(int argc, char **argv)
   }
 #endif			/* #ifdef UI_SDL */
 
-  error = scaler_select_id( settings_current.start_scaler_mode );
-  if( error ) return error;
-
   error = machine_init_machines();
   if( error ) return error;
 
   error = machine_select_id( settings_current.start_machine );
+  if( error ) return error;
+
+  error = scaler_select_id( settings_current.start_scaler_mode );
   if( error ) return error;
 
   if( settings_current.snapshot ) {
