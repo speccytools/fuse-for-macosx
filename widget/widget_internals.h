@@ -154,6 +154,8 @@ int widget_menu_rzx_recording_snap( void *data ); /* File/Recording/Record
 						     from snap */
 int widget_menu_rzx_playback( void *data );  /* File/Recording/Play */
 int widget_menu_rzx_stop( void *data );	     /* File/Recording/Stop */
+int widget_menu_psg_record( void *data );    /* File/AY Logging/Record */
+int widget_menu_psg_stop( void *data );	     /* File/AY Logging/Stop */
 int widget_menu_save_screen( void *data );   /* File/Save Screenshot */
 int widget_menu_save_scr( void *data );	     /* File/Save Scr */
 int widget_menu_exit( void *data );	     /* File/Exit */

@@ -219,6 +219,26 @@ widget_menu_rzx_stop( void *data GCC_UNUSED )
   return 0;
 }  
 
+/* File/AY Logging/Record */
+int
+widget_menu_psg_record( void *data GCC_UNUSED )
+{
+  if( psg_recording ) return 0;
+
+  widget_end_all( WIDGET_FINISHED_OK );
+
+  return psg_start_recording( "ay.psg" );
+}
+
+/* File/AY Logging/Stop */
+int
+widget_menu_psg_stop( void *data GCC_UNUSED )
+{
+  if( !psg_recording ) return 0;
+  
+  return psg_stop_recording();
+}  
+
 #ifdef USE_LIBPNG
 /* File/Save Screenshot */
 int
@@ -427,5 +447,6 @@ int ui_menu_activate_media_cartridge_eject( int active ) { return 0; }
 int ui_menu_activate_media_disk( int active ) { return 0; }
 int ui_menu_activate_media_disk_eject( int which, int active ) { return 0; }
 int ui_menu_activate_recording( int active ) { return 0; }
+int ui_menu_activate_ay_logging( int active ) { return 0; }
 
 #endif				/* #ifdef USE_WIDGET */

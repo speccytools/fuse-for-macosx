@@ -29,6 +29,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "printer.h"
+#include "psg.h"
 #include "sound.h"
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
@@ -75,6 +76,8 @@ ay_dataport_write( WORD port GCC_UNUSED, BYTE b )
 {
   machine_current->ay.registers[ machine_current->ay.current_register ] = b;
   sound_ay_write( machine_current->ay.current_register, b, tstates );
+  if( psg_recording )
+    psg_write_register( machine_current->ay.current_register, b );
 
   if(machine_current->ay.current_register==14)
     printer_serial_write( b );

@@ -39,6 +39,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "psg.h"
 #include "rzx.h"
 #include "tape.h"
 #include "trdos.h"
@@ -129,6 +130,7 @@ int event_do_events(void)
     case EVENT_TYPE_INTERRUPT:
       if( rzx_playback ) event_force_events();
       rzx_frame();
+      psg_frame();
       spectrum_interrupt();
       ui_event();
       break;

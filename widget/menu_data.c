@@ -42,6 +42,7 @@
 
 static widget_menu_entry widget_menu_file[];
 static widget_menu_entry widget_menu_file_recording[];
+static widget_menu_entry widget_menu_file_aylogging[];
 
 static widget_menu_entry widget_menu_machine[];
 
@@ -95,6 +96,8 @@ static widget_menu_entry widget_menu_file[] = {
   { "(S)ave to 'snapshot.z80'", KEYBOARD_s, widget_menu_save_snapshot, NULL },
   { "(R)ecording",		KEYBOARD_r, widget_menu_widget,
 					    &file_recording                 },
+  { "A(Y) Logging",		KEYBOARD_y, widget_menu_widget,
+					    &file_aylogging                 },
   { "O(p)en SCR screenshot...", KEYBOARD_p, widget_apply_to_file,
                                             screenshot_scr_read             },
   { "S(a)ve Screen to 'fuse.scr'", KEYBOARD_a, widget_menu_save_scr,   NULL },
@@ -117,6 +120,17 @@ static widget_menu_entry widget_menu_file_recording[] = {
   { "Record (f)rom snap...", KEYBOARD_f, widget_menu_rzx_recording_snap,NULL },
   { "(P)lay...",   KEYBOARD_p, widget_menu_rzx_playback,   NULL },
   { "(S)top",	   KEYBOARD_s, widget_menu_rzx_stop,       NULL },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* File/AY Logging menu */
+
+static widget_menu_entry widget_menu_file_recording[] = {
+  { "AY Logging", 0, 0, NULL },		/* Menu title */
+
+  { "(R)ecord...", KEYBOARD_r, widget_menu_ay_record, NULL },
+  { "(S)top",	   KEYBOARD_s, widget_menu_ay_stop,   NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

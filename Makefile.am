@@ -35,6 +35,7 @@ fuse_SOURCES = ay.c \
 	fuse.c keyboard.c machine.c memory.c \
 	osssound.c \
 	pentagon.c \
+	psg.c \
 	rzx.c \
 	settings.c \
 	snapshot.c sound.c spec128.c \
@@ -88,6 +89,7 @@ noinst_HEADERS = ay.h \
 	machine.h \
 	osssound.h \
 	pentagon.h \
+	psg.h \
 	rzx.h \
 	screenshot.h \
 	settings.h \

@@ -49,6 +49,7 @@
 #include "gtkui.h"
 #include "machine.h"
 #include "options.h"
+#include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
@@ -107,6 +108,9 @@ static void gtkui_rzx_stop( GtkWidget *widget, gpointer data );
 static void gtkui_rzx_play( GtkWidget *widget, gpointer data );
 static int gtkui_open_snap( void );
 
+static void gtkui_psg_start( GtkWidget *widget, gpointer data );
+static void gtkui_psg_stop( GtkWidget *widget, gpointer data );
+
 static void gtkui_open_scr( GtkWidget *widget, gpointer data );
 static void gtkui_save_scr( GtkWidget *widget, gpointer data );
 #ifdef USE_LIBPNG
@@ -164,6 +168,9 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
                                 NULL , gtkui_rzx_start_snap,0, NULL          },
   { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
   { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
+  { "/File/A_Y Logging",        NULL , NULL,                0, "<Branch>"    },
+  { "/File/AY Logging/_Record...",NULL, gtkui_psg_start,    0, NULL          },
+  { "/File/AY Logging/_Stop",   NULL , gtkui_psg_stop,      0, NULL          },
 
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/O_pen SCR Screenshot...", NULL, gtkui_open_scr,  0, NULL          },
@@ -330,6 +337,9 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 
   /* Start the recording menu off in the 'not playing' state */
   ui_menu_activate_recording( 0 );
+
+  /* Start the AY logging menu off in the 'not playing' state */
+  ui_menu_activate_ay_logging( 0 );
 
   return FALSE;
 }
@@ -509,6 +519,42 @@ gtkui_rzx_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   ui_menu_activate_recording( 1 );
 
   fuse_emulation_unpause();
+}
+
+/* Called when File/AY Logging/Record selected */
+static void
+gtkui_psg_start( GtkWidget *widget, gpointer data )
+{
+  char *psgfile;
+
+  if( psg_recording ) return;
+
+  fuse_emulation_pause();
+
+  psgfile = gtkui_fileselector_get_filename( "Fuse - Start AY log" );
+  if ( !psgfile ) { fuse_emulation_unpause(); return; }
+
+  psg_start_recording( psgfile );
+
+  free( psgfile );
+
+  display_refresh_all();
+
+  ui_menu_activate_ay_logging( 1 );
+
+  fuse_emulation_unpause();
+}
+
+/* Called when File/AY Logging/Stop selected */
+static void
+gtkui_psg_stop( GtkWidget *widget, gpointer data )
+{
+  if ( !psg_recording ) return;
+  psg_stop_recording();
+
+  ui_menu_activate_ay_logging( 0 );
+
+  return;
 }
 
 static int
@@ -1181,6 +1227,17 @@ ui_menu_activate_recording( int active )
   if( error ) return error;
 
   return set_menu_item_active( "/File/Recording/Stop", active );
+}
+
+int
+ui_menu_activate_ay_logging( int active )
+{
+  int error;
+
+  error = set_menu_item_active( "/File/AY Logging/Record...", !active );
+  if( error ) return error;
+
+  return set_menu_item_active( "/File/AY Logging/Stop", active );
 }
 
 #endif			/* #ifdef UI_GTK */

@@ -44,6 +44,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
+#include "psg.h"
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
@@ -161,6 +162,7 @@ static int fuse_init(int argc, char **argv)
 
   if( printer_init() ) return 1;
   if( rzx_init() ) return 1;
+  if( psg_init() ) return 1;
   if( trdos_init() ) return 1;
 
   z80_init();
@@ -380,6 +382,7 @@ static int fuse_end(void)
      set from memory for the text output */
   printer_end();
 
+  psg_end();
   rzx_end();
   debugger_end();
 
