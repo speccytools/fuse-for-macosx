@@ -77,21 +77,22 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		        NULL , NULL,            0, "<Branch>"    },
-  { "/File/_Open Snapshot..." , "F3" , gtkui_open,      0, NULL          },
-  { "/File/_Save Snapshot..." , "F2" , gtkui_save,      0, NULL          },
-  { "/File/separator",          NULL , NULL,            0, "<Separator>" },
-  { "/File/E_xit",	        "F10", gtkui_quit,      0, NULL          },
-  { "/Options",		        NULL , NULL,            0, "<Branch>"    },
-  { "/Options/_General...",     "F4" , gtkui_options,   0, NULL          },
-  { "/Machine",		        NULL , NULL,            0, "<Branch>"    },
-  { "/Machine/_Reset",	        "F5" , gtkui_reset,     0, NULL          },
-  { "/Machine/_Switch",         "F9" , gtkui_switch,    0, NULL          },
-  { "/Tape",                    NULL , NULL,            0, "<Branch>"    },
-  { "/Tape/_Open...",	        "F7" , gtkui_tape_open, 0, NULL          },
-  { "/Tape/_Play",	        "F8" , gtkui_tape_play, 0, NULL          },
+  { "/File",		        NULL , NULL,             0, "<Branch>"    },
+  { "/File/_Open Snapshot..." , "F3" , gtkui_open,       0, NULL          },
+  { "/File/_Save Snapshot..." , "F2" , gtkui_save,       0, NULL          },
+  { "/File/separator",          NULL , NULL,             0, "<Separator>" },
+  { "/File/E_xit",	        "F10", gtkui_quit,       0, NULL          },
+  { "/Options",		        NULL , NULL,             0, "<Branch>"    },
+  { "/Options/_General...",     "F4" , gtkui_options,    0, NULL          },
+  { "/Machine",		        NULL , NULL,             0, "<Branch>"    },
+  { "/Machine/_Reset",	        "F5" , gtkui_reset,      0, NULL          },
+  { "/Machine/_Switch",         "F9" , gtkui_switch,     0, NULL          },
+  { "/Tape",                    NULL , NULL,             0, "<Branch>"    },
+  { "/Tape/_Open...",	        "F7" , gtkui_tape_open,  0, NULL          },
+  { "/Tape/_Play",	        "F8" , gtkui_tape_play,  0, NULL          },
+  { "/Tape/_Write",		"F6" , gtkui_tape_write, 0, NULL          },
 };
-static guint gtkui_menu_data_size = 13;
+static guint gtkui_menu_data_size = 14;
   
 int ui_init(int *argc, char ***argv, int width, int height)
 {
@@ -383,6 +384,23 @@ static void gtkui_tape_play( GtkWidget *widget, gpointer data )
     tape_play();
   }
 
+}
+
+/* Called by the menu when Tape/Write selected */
+static void gtkui_tape_play( GtkWidget *widget, gpointer data )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = gtkui_fileselector_get_filename();
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  tape_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
 }
 
 /* Generic `tidy-up' callback */

@@ -109,6 +109,11 @@ int svgakeyboard_keypress(int keysym)
   case SCANCODE_F5:
     machine_current->reset();
     break;
+  case SCANCODE_F6:
+    fuse_emulation_pause();
+    tape_write( "tape.tzx" );
+    fuse_emulation_unpause();
+    break;
   case SCANCODE_F7:
     fuse_emulation_pause();
     filename = widget_selectfile();
