@@ -700,14 +700,14 @@ ui_debugger_update( void )
 	      machine_current->ram.last_byte2 );
   }
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) {
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO ) {
     sprintf( format_string, "\nTmxDec %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string,
 	      scld_last_dec.byte );
   }
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO ) {
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) {
     sprintf( format_string, "\nTmxHsr %s", format_8_bit() );
     length = strlen( buffer );
     snprintf( &buffer[length], 1024-length, format_string, scld_last_hsr );

@@ -873,3 +873,4 @@
 	 ui/gtk/gtkui.c: (De)activate IDE menu items as appropriate.
 20040528 ui/gtk/gtkui.c: refactor the menu item (de)activation code.
 20040528 settings.pl: Make 2048 ROM label consistent with the others.
+20040528 ui/gtk/debugger.c: Fix Timex HSR and DEC register display.
