@@ -101,21 +101,11 @@ create_dialog( void )
 {
   size_t i;
   GtkWidget *hbox, *vbox;
-  GtkWidget *table, *label;
+  GtkWidget *table;
   GtkWidget *entry, *eval_button;
   GtkWidget *step_button, *close_button;
   GtkAccelGroup *accel_group;
   GtkStyle *style;
-
-  const char *register_name[] = { "PC", "SP",
-				  "AF", "AF'",
-				  "BC", "BC'",
-				  "DE", "DE'",
-				  "HL", "HL'",
-				  "IX", "IY",
-				  "I",  "R",
-				  "T-states", 
-                                };
 
   gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life" },
     *disassembly_titles[] = { "Address", "Instruction" };
@@ -141,32 +131,27 @@ create_dialog( void )
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
 
   /* 'table' contains the register display */
-  table = gtk_table_new( 10, 4, FALSE );
+  table = gtk_table_new( 9, 2, FALSE );
   gtk_box_pack_start_defaults( GTK_BOX( vbox ), table );
 
   for( i = 0; i < 15; i++ ) {
 
-    label = gtk_label_new( register_name[i] );
-    gtk_widget_set_style( label, style );
-    gtk_table_attach_defaults( GTK_TABLE( table ), label,
-			       2*(i%2),   2*(i%2)+1, i/2, i/2+1 );
-
     registers[i] = gtk_label_new( "" );
     gtk_widget_set_style( registers[i], style );
     gtk_table_attach_defaults( GTK_TABLE( table ), registers[i],
-			       2*(i%2)+1, 2*(i%2)+2, i/2, i/2+1 );
+			       i%2, i%2+1, i/2, i/2+1 );
 
   }
 
   /* Interrupt mode */
   registers[15] = gtk_label_new( "" );
   gtk_widget_set_style( registers[15], style );
-  gtk_table_attach_defaults( GTK_TABLE( table ), registers[15], 2, 4, 7, 8 );
+  gtk_table_attach_defaults( GTK_TABLE( table ), registers[15], 1, 2, 7, 8 );
 
   /* Flags */
   registers[16] = gtk_label_new( "" );
   gtk_widget_set_style( registers[16], style );
-  gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 2, 8, 9 );
+  gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 1, 8, 9 );
 
   /* The breakpoint CList */
   breakpoints = gtk_clist_new_with_titles( 5, breakpoint_titles );
@@ -269,27 +254,38 @@ ui_debugger_update( void )
   char *format_16_bit, *format_8_bit;
   GSList *ptr;
 
+  const char *register_name[] = { "PC", "SP",
+				  "AF", "AF'",
+				  "BC", "BC'",
+				  "DE", "DE'",
+				  "HL", "HL'",
+				  "IX", "IY",
+                                };
+
   WORD *value_ptr[] = { &PC, &SP,  &AF, &AF_,
 			&BC, &BC_, &DE, &DE_,
 			&HL, &HL_, &IX, &IY,
                       };
 
   if( debugger_output_base == 10 ) {
-    format_16_bit = format_8_bit = "%d";
+    format_16_bit = format_8_bit = "%5d";
   } else {
-    format_16_bit = "0x%04X"; format_8_bit = "0x%02X";
+    format_16_bit = "0x%04X"; format_8_bit = "0x  %02X";
   }
 
   for( i = 0; i < 12; i++ ) {
-    snprintf( buffer, 80, format_16_bit, *value_ptr[i] );
+    snprintf( buffer, 5, "%3s ", register_name[i] );
+    snprintf( &buffer[4], 76, format_16_bit, *value_ptr[i] );
     gtk_label_set_text( GTK_LABEL( registers[i] ), buffer );
   }
 
-  snprintf( buffer, 80, format_8_bit, I );
+  strcpy( buffer, "  I " ); snprintf( &buffer[4], 76, format_8_bit, I );
   gtk_label_set_text( GTK_LABEL( registers[12] ), buffer );
-  snprintf( buffer, 80, format_8_bit, ( R & 0x7f ) | ( R7 | 0x80 ) );
+  strcpy( buffer, "  R " );
+  snprintf( &buffer[4], 80, format_8_bit, ( R & 0x7f ) | ( R7 & 0x80 ) );
   gtk_label_set_text( GTK_LABEL( registers[13] ), buffer );
-  snprintf( buffer, 80, "%d", tstates );
+
+  snprintf( buffer, 80, "T-states %5d", tstates );
   gtk_label_set_text( GTK_LABEL( registers[14] ), buffer );
   snprintf( buffer, 80, "IM %d", IM );
   gtk_label_set_text( GTK_LABEL( registers[15] ), buffer );
