@@ -218,7 +218,12 @@ int fuse_emulation_unpause(void)
     /* If the sound code couldn't re-initialise, fall back to the
        signal based routines */
     if( !sound_enabled ) {
+      /* Increment pause_count, report, decrement pause_count
+       * (i.e. avoid the effects of fuse_emulation_{,un}pause).
+       * Otherwise, we may be recursively reporting this error. */
+      fuse_emulation_paused++;
       ui_error( UI_ERROR_ERROR, "Couldn't reinitialise sound" );
+      fuse_emulation_paused--;
       settings_current.sound = fuse_sound_in_use = 0;
       /* FIXME: How to deal with error return here? */
       timer_init();
