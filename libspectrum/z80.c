@@ -43,29 +43,35 @@ static const int LIBSPECTRUM_Z80_HEADER_LENGTH = 30;
 #define LIBSPECTRUM_Z80_V3X_LENGTH 55
 
 /* The signature used to designate the .slt extensions */
-static uchar slt_signature[] = "\0\0\0SLT";
+static libspectrum_byte slt_signature[] = "\0\0\0SLT";
 static size_t slt_signature_length = 6;
 
-static int read_v1_block( uchar *buffer, int is_compressed, 
-			  uchar **uncompressed, uchar **next_block,
-			  uchar *end );
-static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
-			  int *page, uchar **next_block, uchar *end );
+static int read_v1_block( libspectrum_byte *buffer, int is_compressed, 
+			  libspectrum_byte **uncompressed,
+			  libspectrum_byte **next_block,
+			  libspectrum_byte *end );
+static int read_v2_block( libspectrum_byte *buffer, libspectrum_byte **block,
+			  size_t *length, int *page,
+			  libspectrum_byte **next_block,
+			  libspectrum_byte *end );
 static int libspectrum_z80_read_slt( libspectrum_snap *snap,
-				     uchar **next_block, uchar *end );
-static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
-				      size_t *length, libspectrum_snap *snap );
-static int libspectrum_z80_write_slt_entry( uchar **buffer, size_t *offset,
+				     libspectrum_byte **next_block,
+				     libspectrum_byte *end );
+static int libspectrum_z80_write_slt( libspectrum_byte **buffer,
+				      libspectrum_byte **ptr, size_t *length,
+				      libspectrum_snap *snap );
+static int libspectrum_z80_write_slt_entry( libspectrum_byte **buffer, 
+					    libspectrum_byte **ptr,
 					    size_t *length,
 					    libspectrum_word type,
 					    libspectrum_word id,
 					    libspectrum_dword slt_length );
 
-int libspectrum_z80_read( uchar *buffer, size_t buffer_length,
+int libspectrum_z80_read( libspectrum_byte *buffer, size_t buffer_length,
 			  libspectrum_snap *snap )
 {
   int error;
-  uchar *data;
+  libspectrum_byte *data;
 
   error = libspectrum_z80_read_header( buffer, snap, &data );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
@@ -77,11 +83,12 @@ int libspectrum_z80_read( uchar *buffer, size_t buffer_length,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
-				 uchar **data )
+int libspectrum_z80_read_header( libspectrum_byte *buffer,
+				 libspectrum_snap *snap,
+				 libspectrum_byte **data )
 {
 
-  uchar *header = buffer;
+  libspectrum_byte *header = buffer;
 
   snap->a   = header[ 0]; snap->f  = header[ 1];
   snap->bc  = header[ 2] + header[ 3]*0x100;
@@ -107,7 +114,7 @@ int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
   if( snap->pc == 0 ) {	/* PC == 0x0000 => v2 or greater .z80 */
 
     size_t extra_length;
-    uchar *extra_header;
+    libspectrum_byte *extra_header;
     libspectrum_dword quarter_tstates;
 
     extra_length = header[ LIBSPECTRUM_Z80_HEADER_LENGTH     ] +
@@ -227,10 +234,10 @@ int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
 
 }
 
-int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
-				 libspectrum_snap *snap )
+int libspectrum_z80_read_blocks( libspectrum_byte *buffer,
+				 size_t buffer_length, libspectrum_snap *snap )
 {
-  uchar *end,*next_block;
+  libspectrum_byte *end,*next_block;
 
   end = buffer + buffer_length; next_block = buffer;
 
@@ -267,7 +274,8 @@ int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
 }
 
 static int libspectrum_z80_read_slt( libspectrum_snap *snap,
-				     uchar **next_block, uchar *end )
+				     libspectrum_byte **next_block,
+				     libspectrum_byte *end )
 {
   size_t slt_length[256], offsets[256];
   size_t whence = 0;
@@ -415,11 +423,13 @@ static int libspectrum_z80_read_slt( libspectrum_snap *snap,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
-				uchar **next_block, uchar *end )
+int libspectrum_z80_read_block( libspectrum_byte *buffer,
+				libspectrum_snap *snap,
+				libspectrum_byte **next_block,
+				libspectrum_byte *end )
 {
   int error;
-  uchar *uncompressed;
+  libspectrum_byte *uncompressed;
   
   if( snap->version == 1 ) {
 
@@ -489,13 +499,14 @@ int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
 
 }
 
-static int read_v1_block( uchar *buffer, int is_compressed, 
-			  uchar **uncompressed, uchar **next_block,
-			  uchar *end )
+static int read_v1_block( libspectrum_byte *buffer, int is_compressed, 
+			  libspectrum_byte **uncompressed,
+			  libspectrum_byte **next_block,
+			  libspectrum_byte *end )
 {
   if( is_compressed ) {
     
-    uchar *ptr;
+    libspectrum_byte *ptr;
     int state,error;
     size_t uncompressed_length = 0;
 
@@ -567,7 +578,7 @@ static int read_v1_block( uchar *buffer, int is_compressed,
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    (*uncompressed) = (uchar*)malloc( 0xc000 * sizeof(uchar) );
+    (*uncompressed) = (libspectrum_byte*)malloc( 0xc000 * sizeof(libspectrum_byte) );
     if( (*uncompressed) == NULL ) {
       libspectrum_print_error( "read_v1_block: out of memory\n" );
       return LIBSPECTRUM_ERROR_MEMORY;
@@ -583,8 +594,10 @@ static int read_v1_block( uchar *buffer, int is_compressed,
 
 }
 
-static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
-			  int *page, uchar **next_block, uchar *end )
+static int read_v2_block( libspectrum_byte *buffer, libspectrum_byte **block,
+			  size_t *length, int *page,
+			  libspectrum_byte **next_block,
+			  libspectrum_byte *end )
 {
   size_t length2;
 
@@ -628,7 +641,7 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
-    (*block) = (uchar*)malloc( 0x4000 * sizeof(uchar) );
+    (*block) = (libspectrum_byte*)malloc( 0x4000 * sizeof(libspectrum_byte) );
     if( (*block) == NULL ) {
       libspectrum_print_error( "read_v2_block: out of memory\n" );
       return LIBSPECTRUM_ERROR_MEMORY;
@@ -645,80 +658,76 @@ static int read_v2_block( uchar *buffer, uchar **block, size_t *length,
 
 }
 
-int libspectrum_z80_write( uchar **buffer, size_t *length,
+int libspectrum_z80_write( libspectrum_byte **buffer, size_t *length,
 			   libspectrum_snap *snap )
 {
-  int error; size_t offset;
+  int error;
+  libspectrum_byte *ptr = *buffer;
 
-  offset = 0;
-
-  error = libspectrum_z80_write_header( buffer, &offset, length, snap );
+  error = libspectrum_z80_write_header( buffer, &ptr, length, snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  error = libspectrum_z80_write_pages( buffer, &offset, length, snap );
+  error = libspectrum_z80_write_pages( buffer, &ptr, length, snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  (*length) = offset;
+  (*length) = ptr - *buffer;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_write_header( uchar **buffer, size_t *offset,
-				  size_t *length, libspectrum_snap *snap )
+int libspectrum_z80_write_header( libspectrum_byte **buffer,
+				  libspectrum_byte **ptr, size_t *length,
+				  libspectrum_snap *snap )
 {
   int error;
 
-  error = libspectrum_z80_write_base_header( buffer, offset, length, snap );
+  error = libspectrum_z80_write_base_header( buffer, ptr, length, snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  error = libspectrum_z80_write_extended_header( buffer, offset,
-						 length, snap );
+  error = libspectrum_z80_write_extended_header( buffer, ptr, length, snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_write_base_header( uchar **buffer, size_t *offset,
-				       size_t *length, libspectrum_snap *snap )
+int libspectrum_z80_write_base_header( libspectrum_byte **buffer,
+				       libspectrum_byte **ptr, size_t *length,
+				       libspectrum_snap *snap )
 {
   int error;
 
-  uchar *ptr = (*buffer) + (*offset);
-
-  error = libspectrum_make_room( buffer,
-				 LIBSPECTRUM_Z80_HEADER_LENGTH,
-				 &ptr, length );
+  error = libspectrum_make_room( buffer, LIBSPECTRUM_Z80_HEADER_LENGTH, ptr,
+				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  (*offset) += LIBSPECTRUM_Z80_HEADER_LENGTH;
-  
-  ptr[0] = snap->a; ptr[1] = snap->f;
-  libspectrum_write_word( &ptr[ 2], snap->bc  );
-  libspectrum_write_word( &ptr[ 4], snap->hl  );
+  *(*ptr)++ = snap->a; *(*ptr)++ = snap->f;
+  libspectrum_write_word( *ptr, snap->bc  ); *ptr += 2;
+  libspectrum_write_word( *ptr, snap->hl  ); *ptr += 2;
 
-  libspectrum_write_word( &ptr[ 6], 0 ); /* PC; zero denotes >= v2 */
+  libspectrum_write_word( *ptr, 0 ); *ptr += 2; /* PC; zero denotes >= v2 */
 
-  libspectrum_write_word( &ptr[ 8], snap->sp  );
-  ptr[10] = snap->i; ptr[11] = ( snap->r & 0x7f );
+  libspectrum_write_word( *ptr, snap->sp  ); *ptr += 2;
+  *(*ptr)++ = snap->i; *(*ptr)++ = ( snap->r & 0x7f );
 
-  ptr[12] = ( snap->r >> 7 ) + ( ( snap->out_ula & 0x07 ) << 1 );
+  *(*ptr)++ = ( snap->r >> 7 ) + ( ( snap->out_ula & 0x07 ) << 1 );
 
-  libspectrum_write_word( &ptr[13], snap->de  );
-  libspectrum_write_word( &ptr[15], snap->bc_ );
-  libspectrum_write_word( &ptr[17], snap->de_ );
-  libspectrum_write_word( &ptr[19], snap->hl_ );
-  ptr[21] = snap->a_; ptr[22] = snap->f_;
-  libspectrum_write_word( &ptr[23], snap->iy  );
-  libspectrum_write_word( &ptr[25], snap->ix  );
+  libspectrum_write_word( *ptr, snap->de  ); *ptr += 2;
+  libspectrum_write_word( *ptr, snap->bc_ ); *ptr += 2;
+  libspectrum_write_word( *ptr, snap->de_ ); *ptr += 2;
+  libspectrum_write_word( *ptr, snap->hl_ ); *ptr += 2;
+  *(*ptr)++ = snap->a_; *(*ptr)++ = snap->f_;
+  libspectrum_write_word( *ptr, snap->iy  ); *ptr += 2;
+  libspectrum_write_word( *ptr, snap->ix  ); *ptr += 2;
 
-  ptr[27] = snap->iff1 ? 0xff : 0x00;
-  ptr[28] = snap->iff2 ? 0xff : 0x00;
-  ptr[29] = snap->im;
+  *(*ptr)++ = snap->iff1 ? 0xff : 0x00;
+  *(*ptr)++ = snap->iff2 ? 0xff : 0x00;
+  *(*ptr)++ = snap->im;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_write_extended_header( uchar **buffer, size_t *offset,
+int libspectrum_z80_write_extended_header( libspectrum_byte **buffer,
+					   libspectrum_byte **ptr,
 					   size_t *length,
 					   libspectrum_snap *snap )
 {
@@ -726,118 +735,112 @@ int libspectrum_z80_write_extended_header( uchar **buffer, size_t *offset,
 
   libspectrum_dword quarter_states;
 
-  uchar *ptr = (*buffer) + (*offset);
-
   /* +2 here to deal with the two length bytes */
-  error = libspectrum_make_room( buffer,
-				 LIBSPECTRUM_Z80_V3_LENGTH + 2,
-				 &ptr, length );
+  error = libspectrum_make_room( buffer, LIBSPECTRUM_Z80_V3_LENGTH + 2, ptr,
+				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  (*offset) += LIBSPECTRUM_Z80_V3_LENGTH + 2;
-
-  libspectrum_write_word( &ptr[ 0], LIBSPECTRUM_Z80_V3_LENGTH );
+  libspectrum_write_word( *ptr, LIBSPECTRUM_Z80_V3_LENGTH ); *ptr += 2;
   
-  libspectrum_write_word( &ptr[ 2], snap->pc );
+  libspectrum_write_word( *ptr, snap->pc ); *ptr += 2;
 
   switch( snap->machine ) {
   case LIBSPECTRUM_MACHINE_48:
-    ptr[4] = 0; break;
+    *(*ptr)++ = 0; break;
   case LIBSPECTRUM_MACHINE_128:
-    ptr[4] = 4; break;
+    *(*ptr)++ = 4; break;
   case LIBSPECTRUM_MACHINE_PLUS3:
-    ptr[4] = 7; break;
+    *(*ptr)++ = 7; break;
   case LIBSPECTRUM_MACHINE_PENT:
-    ptr[4] = 9; break;
+    *(*ptr)++ = 9; break;
   }
 
-  ptr[5] = snap->out_128_memoryport;
-  ptr[6] = 0;			/* IF1 disabled */
-  ptr[7] = 0;			/* No special emulation features */
-  ptr[8] = snap->out_ay_registerport;
-  memcpy( &ptr[9], snap->ay_registers, 16 );
+  *(*ptr)++ = snap->out_128_memoryport;
+  *(*ptr)++ = '\0';		/* IF1 disabled */
+  *(*ptr)++ = '\0';		/* No special emulation features */
+  *(*ptr)++ = snap->out_ay_registerport;
+  memcpy( *ptr, snap->ay_registers, 16 ); *ptr += 16;
 
   /* Number of T-states in 1/4 of a frame */
   quarter_states = ( snap->machine == LIBSPECTRUM_MACHINE_48 ) ?
     17472 : 17727;
-  libspectrum_write_word( &ptr[25],
-			  quarter_states -
-			  ( snap->tstates % quarter_states ) -
-			  1 );
-  ptr[27] = ( ( snap->tstates / quarter_states ) + 3 ) % 4;
+  libspectrum_write_word(
+    *ptr, quarter_states - ( snap->tstates % quarter_states ) - 1
+  );
+  *ptr += 2;
+
+  *(*ptr)++ = ( ( snap->tstates / quarter_states ) + 3 ) % 4;
 
   /* Spectator, MGT and Multiface disabled */
-  ptr[28] = ptr[29] = ptr[30] = 0;
+  *(*ptr)++ = '\0'; *(*ptr)++ = '\0'; *(*ptr)++ = '\0';
 
   /* Is 0x0000 to 0x3fff RAM? Currently iff we're in a +3 special
      configuration */
-  ptr[31] = ( ( snap->machine == LIBSPECTRUM_MACHINE_PLUS3 ) && 
+  *(*ptr)++ = ( ( snap->machine == LIBSPECTRUM_MACHINE_PLUS3 ) && 
 	      ( snap->out_plus3_memoryport & 0x01 ) ? 0xff : 0x00 );
   /* Ditto for 0x3fff to 0x7fff */
-  ptr[32] = ( ( snap->machine == LIBSPECTRUM_MACHINE_PLUS3 ) && 
+  *(*ptr)++ = ( ( snap->machine == LIBSPECTRUM_MACHINE_PLUS3 ) && 
 	      ( snap->out_plus3_memoryport & 0x01 ) ? 0xff : 0x00 );
 
   /* Joystick settings, etc */
-  for( i=33; i<LIBSPECTRUM_Z80_V3_LENGTH; i++ ) ptr[i] = 0;
+  for( i=32; i<=LIBSPECTRUM_Z80_V3_LENGTH; i++ ) *(*ptr)++ = '\0';
 
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_write_pages( uchar **buffer, size_t *offset,
-				 size_t *length, libspectrum_snap *snap )
+int libspectrum_z80_write_pages( libspectrum_byte **buffer,
+				 libspectrum_byte **ptr, size_t *length,
+				 libspectrum_snap *snap )
 {
   int i, error;
+  int write_slt;
 
   if( snap->machine == LIBSPECTRUM_MACHINE_48 ) {
-      error = libspectrum_z80_write_page( buffer, offset, length,
-					  4, snap->pages[2] );
+      error = libspectrum_z80_write_page( buffer, ptr, length, 4,
+					  snap->pages[2] );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
-      error = libspectrum_z80_write_page( buffer, offset, length,
-					  5, snap->pages[0] );
+      error = libspectrum_z80_write_page( buffer, ptr, length, 5,
+					  snap->pages[0] );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
-      error = libspectrum_z80_write_page( buffer, offset, length,
-					  8, snap->pages[5] );
+      error = libspectrum_z80_write_page( buffer, ptr, length, 8,
+					  snap->pages[5] );
       if( error != LIBSPECTRUM_ERROR_NONE ) return error;
   } else {
 
     for( i=0; i<8; i++ ) {
       if( snap->pages[i] != NULL ) {
-	error = libspectrum_z80_write_page( buffer, offset, length,
-					    i+3, snap->pages[i] );
+	error = libspectrum_z80_write_page( buffer, ptr, length, i+3,
+					    snap->pages[i] );
 	if( error != LIBSPECTRUM_ERROR_NONE ) return error;
       }
     }
 
   }
 
-  /* If we've got any .slt data, add that to the end of the buffer */
-  for( i=0; i<256; i++ ) {
-    if( snap->slt_length[i] ) {
+  /* Do we want to write .slt data? Definitely if we've got a loading
+     screen */
+  write_slt = ( snap->slt_screen != NULL );
 
-      /* This call will write all the .slt data */
-      error = libspectrum_z80_write_slt( buffer, offset, length, snap );
-      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  /* If not, see if any level data exists */
+  for( i=0; !write_slt && i<256; i++ )
+    if( snap->slt_length[i] ) write_slt = 1;
 
-      /* so now quit the loop */
-      break;
-    }
-  }
+  /* Write the data if we've got any */
+  error = libspectrum_z80_write_slt( buffer, ptr, length, snap );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   return LIBSPECTRUM_ERROR_NONE;
 
 }
 
-int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
-				size_t *length, int page_num,
-				uchar *page )
+int libspectrum_z80_write_page( libspectrum_byte **buffer,
+				libspectrum_byte **ptr, size_t *length,
+				int page_num, libspectrum_byte *page )
 {
-  uchar *compressed; size_t compressed_length;
+  libspectrum_byte *compressed; size_t compressed_length;
   int error;
 
-  uchar *ptr;
-
   compressed_length = 0;
-  ptr = (*buffer) + (*offset);
 
   error = libspectrum_z80_compress_block( &compressed, &compressed_length,
 					  page, 0x4000 );
@@ -845,27 +848,21 @@ int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
 
   if( compressed_length >= 0x4000 ) {
 
-    error = libspectrum_make_room( buffer, 3 + 0x4000, &ptr,
-				   length );
+    error = libspectrum_make_room( buffer, 3 + 0x4000, ptr, length );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-    (*offset) += 3 + 0x4000;
-
-    libspectrum_write_word( ptr, 0xffff );
-    ptr[2] = page_num;
-    memcpy( &ptr[3], page, 0x4000 );
+    libspectrum_write_word( *ptr, 0xffff ); *ptr += 2;
+    *(*ptr)++ = page_num;
+    memcpy( *ptr, page, 0x4000 ); *ptr += 0x4000;
 
   } else {
 
-    libspectrum_make_room( buffer, 3 + compressed_length,
-			   &ptr, length );
+    libspectrum_make_room( buffer, 3 + compressed_length, ptr, length );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-    (*offset) += 3 + compressed_length;
-
-    libspectrum_write_word( ptr, compressed_length );
-    ptr[2] = page_num;
-    memcpy( &ptr[3], compressed, compressed_length );
+    libspectrum_write_word( *ptr, compressed_length ); *ptr += 2;
+    *(*ptr)++ = page_num;
+    memcpy( *ptr, compressed, compressed_length ); *ptr += compressed_length;
 
   }
 
@@ -875,26 +872,25 @@ int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
 
 }
 
-static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
-				      size_t *length, libspectrum_snap *snap )
+static int libspectrum_z80_write_slt( libspectrum_byte **buffer,
+				      libspectrum_byte **ptr, size_t *length,
+				      libspectrum_snap *snap )
 {
   int i,j;
-  uchar *ptr = *buffer + *offset;
 
   size_t compressed_length[256];
-  uchar* compressed_data[256];
+  libspectrum_byte* compressed_data[256];
 
-  size_t compressed_screen_length; uchar* compressed_screen;
+  size_t compressed_screen_length; libspectrum_byte* compressed_screen;
 
   libspectrum_error error;
 
   /* Make room for the .slt signature */
-  error = libspectrum_make_room( buffer, slt_signature_length,
-				 &ptr, length );
+  error = libspectrum_make_room( buffer, slt_signature_length, ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  memcpy( ptr, slt_signature, slt_signature_length );
-  (*offset) += slt_signature_length;
+  memcpy( *ptr, slt_signature, slt_signature_length );
+  *ptr += slt_signature_length;
 
   /* Now write out the .slt directory, compressing the data along
      the way */
@@ -913,10 +909,10 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
 	for( j=0; j<i; j++ ) if(snap->slt_length[j]) free(compressed_data[j]);
 	return error;
       }
-					     
+
       error = libspectrum_z80_write_slt_entry(
-                buffer, offset, length,
-		LIBSPECTRUM_SLT_TYPE_LEVEL, i, compressed_length[i]
+                buffer, ptr, length,
+                LIBSPECTRUM_SLT_TYPE_LEVEL, i, compressed_length[i]
               );
       if( error != LIBSPECTRUM_ERROR_NONE ) {
 	for( j=0; j<i; j++ ) if(snap->slt_length[j]) free(compressed_data[j]);
@@ -925,7 +921,7 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
     }
   }
 
-  /* Write the loading screen out if we've got one */
+  /* Write the directory entry for the loading screen out if we've got one */
   if( snap->slt_screen ) {
 
     compressed_screen_length = 0;
@@ -946,7 +942,7 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
 
     /* Write the directory entry */
     error = libspectrum_z80_write_slt_entry(
-	      buffer, offset, length,
+	      buffer, ptr, length,
 	      LIBSPECTRUM_SLT_TYPE_SCREEN, snap->slt_screen_level,
 	      compressed_screen_length
 	    );
@@ -958,24 +954,21 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   }
 
   /* and the directory end marker */
-  error = libspectrum_z80_write_slt_entry( buffer, offset, length, 0, 0, 0);
+  error = libspectrum_z80_write_slt_entry( buffer, ptr, length,
+					   LIBSPECTRUM_SLT_TYPE_END, 0, 0 );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     for( i=0; i<256; i++ ) if( snap->slt_length[i] ) free(compressed_data[i]);
     if( snap->slt_screen ) free( compressed_screen );
     return error;
   }
 
-  /* Reset the current data pointer */
-  ptr = *buffer + *offset;
-
   /* Then write the actual level data */
   for( i=0; i<256; i++ ) {
     if( snap->slt_length[i] ) {
       
       /* Make room for the data */
-      error = libspectrum_make_room( buffer, compressed_length[i],
-				     &ptr, length 
-				   );
+      error = libspectrum_make_room( buffer, compressed_length[i], ptr,
+				     length );
       if( error != LIBSPECTRUM_ERROR_NONE ) {
 	for(j=0; j<256; j++) if(snap->slt_length[j]) free(compressed_data[j]);
 	if( snap->slt_screen ) free( compressed_screen );
@@ -983,8 +976,8 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
       }
 
       /* And copy it across */
-      memcpy( ptr, compressed_data[i], compressed_length[i] );
-      ptr += compressed_length[i];
+      memcpy( *ptr, compressed_data[i], compressed_length[i] );
+      *ptr += compressed_length[i];
     }
   }
 
@@ -992,9 +985,8 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   if( snap->slt_screen ) {
 
     /* Make room */
-    error = libspectrum_make_room( buffer, compressed_screen_length,
-				   &ptr, length
-				 );
+    error = libspectrum_make_room( buffer, compressed_screen_length, ptr,
+				   length );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       for(i=0; i<256; i++) if( snap->slt_length[i] ) free(compressed_data[i]);
       if( snap->slt_screen ) free( compressed_screen );
@@ -1002,55 +994,53 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
     }
 
     /* Copy the data */
-    memcpy( ptr, compressed_screen, compressed_screen_length );
-    ptr += compressed_screen_length;
+    memcpy( *ptr, compressed_screen, compressed_screen_length );
+    *ptr += compressed_screen_length;
   }
 
   /* Free up the compressed data */
   for( i=0; i<256; i++ ) if( snap->slt_length[i] ) free( compressed_data[i] );
   if( snap->slt_screen ) free( compressed_screen );
 
-  /* And update our length pointer */
-  (*offset) = ptr - *buffer;
-
   /* That's your lot */
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-static int libspectrum_z80_write_slt_entry( uchar **buffer, size_t *offset,
+static int libspectrum_z80_write_slt_entry( libspectrum_byte **buffer,
+					    libspectrum_byte **ptr,
 					    size_t *length,
 					    libspectrum_word type,
 					    libspectrum_word id,
 					    libspectrum_dword slt_length )
 {
-  uchar *ptr = *buffer + *offset;
-
   libspectrum_error error;
 
   /* We need 8 bytes of space */
-  error = libspectrum_make_room( buffer, 8, &ptr, length );
+  error = libspectrum_make_room( buffer, 8, ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  libspectrum_write_word( &ptr[0], type );
-  libspectrum_write_word( &ptr[2], id );
-  libspectrum_write_word( &ptr[4], slt_length & 0xffff );
-  libspectrum_write_word( &ptr[6], slt_length >> 16 );
-  (*offset) += 8;
+  libspectrum_write_word( *ptr, type );                *ptr += 2;
+  libspectrum_write_word( *ptr, id );                  *ptr += 2;
+  libspectrum_write_word( *ptr, slt_length & 0xffff ); *ptr += 2;
+  libspectrum_write_word( *ptr, slt_length >> 16 );    *ptr += 2;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-int libspectrum_z80_compress_block( uchar **dest, size_t *dest_length,
-				    const uchar *src, size_t src_length)
+int libspectrum_z80_compress_block( libspectrum_byte **dest,
+				    size_t *dest_length,
+				    const libspectrum_byte *src,
+				    size_t src_length)
 {
-  const uchar *in_ptr;
-  uchar *out_ptr;
+  const libspectrum_byte *in_ptr;
+  libspectrum_byte *out_ptr;
   int last_char_ed = 0;
 
   /* Allocate memory for dest if requested */
   if( *dest_length == 0 ) {
     *dest_length = src_length/2;
-    *dest = (uchar*)malloc( *dest_length * sizeof(uchar) );
+    *dest =
+      (libspectrum_byte*)malloc( *dest_length * sizeof(libspectrum_byte) );
   }
   if( *dest == NULL ) {
     libspectrum_print_error("libspectrum_z80_compress_block: out of memory\n");
@@ -1080,7 +1070,7 @@ int libspectrum_z80_compress_block( uchar **dest, size_t *dest_length,
        the last thing output wasn't a single 0xed */
     if( *in_ptr == *(in_ptr+1) && !last_char_ed ) {
 
-      uchar repeated;
+      libspectrum_byte repeated;
       size_t run_length;
       
       /* Reset the `last character was a 0xed' flag */
@@ -1149,16 +1139,19 @@ int libspectrum_z80_compress_block( uchar **dest, size_t *dest_length,
 
 }
 
-int libspectrum_z80_uncompress_block( uchar **dest, size_t *dest_length,
-				      const uchar *src, size_t src_length)
+int libspectrum_z80_uncompress_block( libspectrum_byte **dest,
+				      size_t *dest_length,
+				      const libspectrum_byte *src,
+				      size_t src_length)
 {
-  const uchar *in_ptr;
-  uchar *out_ptr;
+  const libspectrum_byte *in_ptr;
+  libspectrum_byte *out_ptr;
 
   /* Allocate memory for dest if requested */
   if( *dest_length == 0 ) {
     *dest_length = src_length/2;
-    *dest = (uchar*)malloc( *dest_length * sizeof(uchar) );
+    *dest =
+      (libspectrum_byte*)malloc( *dest_length * sizeof(libspectrum_byte) );
   }
   if( *dest == NULL ) {
     libspectrum_print_error(
@@ -1190,7 +1183,7 @@ int libspectrum_z80_uncompress_block( uchar **dest, size_t *dest_length,
     if( *in_ptr == 0xed && *(in_ptr+1) == 0xed ) {
 
       size_t run_length;
-      uchar repeated;
+      libspectrum_byte repeated;
       
       in_ptr+=2;
       run_length = *in_ptr++;

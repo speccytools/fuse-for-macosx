@@ -172,34 +172,45 @@ int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
 
 /* .z80 specific routines */
 
-int libspectrum_z80_read( uchar *buffer, size_t buffer_length,
+int libspectrum_z80_read( libspectrum_byte *buffer, size_t buffer_length,
 			  libspectrum_snap *snap );
-int libspectrum_z80_read_header( uchar *buffer, libspectrum_snap *snap,
-				 uchar **data );
-int libspectrum_z80_read_blocks( uchar *buffer, size_t buffer_length,
+int libspectrum_z80_read_header( libspectrum_byte *buffer,
+				 libspectrum_snap *snap,
+				 libspectrum_byte **data );
+int libspectrum_z80_read_blocks( libspectrum_byte *buffer,
+				 size_t buffer_length,
 				 libspectrum_snap *snap );
-int libspectrum_z80_read_block( uchar *buffer, libspectrum_snap *snap,
-				uchar **next_block, uchar *end );
+int libspectrum_z80_read_block( libspectrum_byte *buffer,
+				libspectrum_snap *snap,
+				libspectrum_byte **next_block,
+				libspectrum_byte *end );
 
-int libspectrum_z80_write( uchar **buffer, size_t *length,
+int libspectrum_z80_write( libspectrum_byte **buffer, size_t *length,
 			   libspectrum_snap *snap );
-int libspectrum_z80_write_header( uchar **buffer, size_t *offset,
-				  size_t *length, libspectrum_snap *snap );
-int libspectrum_z80_write_base_header( uchar **buffer, size_t *offset,
-				       size_t *length,
+int libspectrum_z80_write_header( libspectrum_byte **buffer,
+				  libspectrum_byte **ptr, size_t *length,
+				  libspectrum_snap *snap );
+int libspectrum_z80_write_base_header( libspectrum_byte **buffer,
+				       libspectrum_byte **ptr, size_t *length,
 				       libspectrum_snap *snap );
-int libspectrum_z80_write_extended_header( uchar **buffer, size_t *offset,
+int libspectrum_z80_write_extended_header( libspectrum_byte **buffer,
+					   libspectrum_byte **ptr,
 					   size_t *length,
 					   libspectrum_snap *snap );
-int libspectrum_z80_write_pages( uchar **buffer, size_t *offset,
-				 size_t *length, libspectrum_snap *snap );
-int libspectrum_z80_write_page( uchar **buffer, size_t *offset,
-				size_t *length, int page_num,
-				uchar *page );
+int libspectrum_z80_write_pages( libspectrum_byte **buffer,
+				 libspectrum_byte **ptr, size_t *length,
+				 libspectrum_snap *snap );
+int libspectrum_z80_write_page( libspectrum_byte **buffer,
+				libspectrum_byte **ptr, size_t *length,
+				int page_num, libspectrum_byte *page );
 
-int libspectrum_z80_compress_block( uchar **dest, size_t *dest_length,
-				    const uchar *src, size_t src_length);
-int libspectrum_z80_uncompress_block( uchar **dest, size_t *dest_length,
-				      const uchar *src, size_t src_length);
+int libspectrum_z80_compress_block( libspectrum_byte **dest,
+				    size_t *dest_length,
+				    const libspectrum_byte *src,
+				    size_t src_length);
+int libspectrum_z80_uncompress_block( libspectrum_byte **dest,
+				      size_t *dest_length,
+				      const libspectrum_byte *src,
+				      size_t src_length);
 
 #endif				/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */

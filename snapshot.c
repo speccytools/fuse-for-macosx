@@ -222,7 +222,7 @@ static int snapshot_copy_from( libspectrum_snap *snap )
 
   if( snap->slt_screen ) {
 
-    slt_screen = (BYTE*)malloc( 6192 * sizeof( BYTE ) );
+    slt_screen = (BYTE*)malloc( 6912 * sizeof( BYTE ) );
     if( slt_screen == NULL ) {
       for( i=0; i<256; i++ ) {
 	if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }
@@ -232,7 +232,7 @@ static int snapshot_copy_from( libspectrum_snap *snap )
       }
     }
 
-    memcpy( slt_screen, snap->slt_screen, 6192 );
+    memcpy( slt_screen, snap->slt_screen, 6912 );
     slt_screen_level = snap->slt_screen_level;
   }
 	  
@@ -352,7 +352,7 @@ static int snapshot_copy_to( libspectrum_snap *snap )
 
   if( slt_screen ) {
     snap->slt_screen =
-      (libspectrum_byte*)malloc( 6192 * sizeof( libspectrum_byte ) );
+      (libspectrum_byte*)malloc( 6912 * sizeof( libspectrum_byte ) );
     if( snap->slt_screen == NULL ) {
       for( i=0; i<8; i++ )
 	if( snap->pages[i] ) { free( snap->pages[i] ); snap->pages[i] = NULL; }
@@ -363,7 +363,7 @@ static int snapshot_copy_to( libspectrum_snap *snap )
       return 1;
     }
 
-    memcpy( snap->slt_screen, slt_screen, 6192 );
+    memcpy( snap->slt_screen, slt_screen, 6912 );
     snap->slt_screen_level = slt_screen_level;
   }
     
