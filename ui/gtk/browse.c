@@ -29,6 +29,7 @@
 #ifdef UI_GTK		/* Use this file iff we're using GTK+ */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
