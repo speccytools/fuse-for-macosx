@@ -31,6 +31,7 @@
 #include "compat.h"
 #include "display.h"
 #include "scld.h"
+#include "z80/z80.h"
 
 scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
