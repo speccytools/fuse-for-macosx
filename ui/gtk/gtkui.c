@@ -123,6 +123,10 @@ int ui_init(int *argc, char ***argv, int width, int height)
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "key-release-event",
 		     GTK_SIGNAL_FUNC(gtkkeyboard_keyrelease), NULL);
 
+  /* If we lose the focus, disable all keys */
+  gtk_signal_connect( GTK_OBJECT( gtkui_window ), "focus-out-event",
+		      GTK_SIGNAL_FUNC( gtkkeyboard_release_all ), NULL );
+
   box = gtk_vbox_new( FALSE, 0 );
   gtk_container_add(GTK_CONTAINER(gtkui_window), box);
   gtk_widget_show(box);

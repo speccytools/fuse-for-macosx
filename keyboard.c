@@ -101,10 +101,8 @@ static keyboard_key_info keyboard_data[] = {
    with keyboard_init... */
 void fuse_keyboard_init(void)
 {
-  int i;
-  
   keyboard_default_value=0xff;
-  for(i=0;i<8;i++) keyboard_return_values[i]=0xff;
+  keyboard_release_all();
 }
 
 BYTE keyboard_read(BYTE porth)
@@ -149,4 +147,13 @@ void keyboard_release(keyboard_key_name key)
     }
   }
   return;
+}
+
+int keyboard_release_all( void )
+{
+  int i;
+
+  for( i=0; i<8; i++ ) keyboard_return_values[i] = 0xff;
+
+  return 0;
 }

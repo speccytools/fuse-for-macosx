@@ -98,5 +98,6 @@ void fuse_keyboard_init(void);
 BYTE keyboard_read(BYTE porth);
 void keyboard_press(keyboard_key_name key);
 void keyboard_release(keyboard_key_name key);
+int keyboard_release_all( void );
 
 #endif			/* #ifndef FUSE_KEYBOARD_H */

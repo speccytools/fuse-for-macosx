@@ -31,5 +31,7 @@ int gtkkeyboard_keypress(GtkWidget *widget, GdkEvent *event,
 			 gpointer data);
 int gtkkeyboard_keyrelease(GtkWidget *widget, GdkEvent *event,
 			   gpointer data);
+int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
+			     gpointer data );
 
 #endif			/* #ifndef FUSE_GTKKEYBOARD_H */

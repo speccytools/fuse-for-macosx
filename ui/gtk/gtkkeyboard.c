@@ -88,5 +88,13 @@ static guint gtkkeyboard_unshift_keysym(guint keysym)
 			  XKeysymToKeycode(gdk_display,keysym),
 			  0);
 }
+
+/* Release all keys (called when focus lost) */
+int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
+			     gpointer data )
+{
+  keyboard_release_all();
+  return TRUE;
+}
 			  
 #endif			/* #ifdef UI_GTK */

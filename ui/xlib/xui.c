@@ -34,6 +34,7 @@
 #include <X11/Xutil.h>
 
 #include "fuse.h"
+#include "keyboard.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "xdisplay.h"
@@ -139,7 +140,7 @@ int ui_init(int *argc, char ***argv, int width, int height)
 
   XSelectInput(display, xui_mainWindow, ExposureMask | KeyPressMask |
 	       KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
-	       StructureNotifyMask);
+	       StructureNotifyMask | FocusChangeMask );
 
   if(uidisplay_init(width,height)) return 1;
 
@@ -154,6 +155,9 @@ int ui_event(void)
   XEvent event;
 
   while(XCheckIfEvent(display,&event,xui_trueFunction,NULL)) {
+
+    fprintf( stderr, "Event type: %d\n", event.type );
+
     switch(event.type) {
     case ConfigureNotify:
       xdisplay_configure_notify(event.xconfigure.width,
@@ -162,6 +166,9 @@ int ui_event(void)
     case Expose:
       xdisplay_area(event.xexpose.x,event.xexpose.y,
 		    event.xexpose.width,event.xexpose.height);
+      break;
+    case FocusOut:
+      keyboard_release_all();
       break;
     case KeyPress:
       xkeyboard_keypress(&(event.xkey));
