@@ -289,10 +289,10 @@ FUNCTION( tc2048_readbyte )( WORD address )
 #endif				/* #ifndef INTERNAL */
 
   switch( address >> 14 ) {
-  case 0: return ROM[0][offset]; break;
-  case 1: return RAM[5][offset]; break;
-  case 2: return RAM[2][offset]; break;
-  case 3: return RAM[0][offset]; break;
+  case 0: return ROM[0][offset];
+  case 1: return RAM[5][offset];
+  case 2: return RAM[2][offset];
+  case 3: return RAM[0][offset];
   }
   return 0; /* Keep gcc happy */
 }
