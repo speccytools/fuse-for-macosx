@@ -57,12 +57,12 @@ typedef unsigned long  DWORD;
 #error No plausible 32 bit types found
 #endif
 
-#if   SIZEOF_INT   == 8
-typedef   signed  int SQWORD;
-typedef unsigned  int  QWORD;
-#elif SIZEOF_LONG  == 8
+#if   SIZEOF_LONG   == 8
 typedef   signed long SQWORD;
 typedef unsigned long  QWORD;
+#elif SIZEOF_LONG_LONG  == 8
+typedef   signed long long SQWORD;
+typedef unsigned long long  QWORD;
 #else
 #error No plausible 64 bit types found
 #endif
