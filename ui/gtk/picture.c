@@ -1,5 +1,5 @@
 /* picture.c: GTK+ routines to draw the keyboard picture
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2005 Philip Kendall
 
    $Id$
 
@@ -47,61 +47,56 @@
 static guchar picture[ DISPLAY_SCREEN_HEIGHT * DISPLAY_ASPECT_WIDTH * 4 ];
 static const gint picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
 
-static int screen_drawn = 0;
+static int dialog_created = 0;
 
 static int read_screen( const char *filename, utils_file *screen );
 static void draw_screen( libspectrum_byte *screen, int border );
 static gint
 picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data );
 
+static GtkWidget *dialog;
+
 int
 gtkui_picture( const char *filename, int border )
 {
   utils_file screen;
 
-  GtkWidget *dialog;
-
   GtkWidget *drawing_area;
 
-  fuse_emulation_pause();
-
-  if( !screen_drawn ) {
+  if( !dialog_created ) {
 
     if( read_screen( filename, &screen ) ) {
-      fuse_emulation_unpause();
       return 1;
     }
 
     draw_screen( screen.buffer, border );
 
     if( utils_close_file( &screen ) ) {
-      fuse_emulation_unpause();
       return 1;
     }
 
-    screen_drawn = 1;
+    dialog = gtkstock_dialog_new( "Fuse - Keyboard",
+				  GTK_SIGNAL_FUNC( gtk_widget_hide ) );
+  
+    drawing_area = gtk_drawing_area_new();
+    gtk_drawing_area_size( GTK_DRAWING_AREA( drawing_area ),
+			   DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
+    gtk_signal_connect( GTK_OBJECT( drawing_area ),
+			"expose_event", GTK_SIGNAL_FUNC( picture_expose ),
+			NULL );
+    gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
+		       drawing_area );
+
+    gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( gtk_widget_hide ),
+			   FALSE );
+
+    /* Stop users resizing this window */
+    gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
+
+    dialog_created = 1;
   }
 
-  dialog = gtkstock_dialog_new( "Fuse - Keyboard", NULL );
-
-  drawing_area = gtk_drawing_area_new();
-  gtk_drawing_area_size( GTK_DRAWING_AREA( drawing_area ),
-			 DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
-  gtk_signal_connect( GTK_OBJECT( drawing_area ),
-		      "expose_event", GTK_SIGNAL_FUNC( picture_expose ),
-		      NULL );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
-		     drawing_area );
-
-  gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( gtk_widget_destroy ),
-			 FALSE );
-
-  /* Stop users resizing this window */
-  gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
-
   gtk_widget_show_all( dialog );
-
-  fuse_emulation_unpause();
 
   return 0;
 }

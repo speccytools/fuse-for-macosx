@@ -1292,3 +1292,5 @@
 20050325 ui/gtk/gtkui.c,widget/widget.c: add GTK+ joystick confirmation
 	 dialog.
 20050325 ui/gtk/gtkui.c: don't prompt for joysticks if disabled in config.
+20050325 ui/gtk/picture.c: allow input to continue while the keyboard help
+	 is being displayed (fixes bug #1145084).
