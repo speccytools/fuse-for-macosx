@@ -59,7 +59,8 @@ Some thanks (in alphabetical order):
 
 * Mark Woodmass: for putting me on the track of (and finding the
   solution to) bugs with regard to Fuse's R register emulation during
-  HALTs and interrupts. Mark's another one who's written an emulator:
+  HALTs and interrupts and Fuse's mask for the memory control port on
+  the 128K/+2 machines. Mark's another one who's written an emulator:
   see 'SPIN' at http://www.worldofspectrum.org/emulators.html#pcwin
 
 * Alexander Yurchenko: for the OpenBSD/Solaris sound code (see `AUTHORS')

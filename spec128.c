@@ -47,7 +47,7 @@ spectrum_port_info spec128_peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, spectrum_port_noread, ay_dataport_write },
-  { 0xc002, 0x4000, spectrum_port_noread, spec128_memoryport_write },
+  { 0x8002, 0x0000, spectrum_port_noread, spec128_memoryport_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
