@@ -49,6 +49,10 @@
 #include "utils.h"
 #include "widget_internals.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 static void printchar(int x, int y, int col, int ch);
 static void widget_putpixel( int x, int y, int colour );
 
@@ -215,7 +219,11 @@ int widget_do( widget_type which, void *data )
   while( ! widget_return[widget_level].finished ) {
 
     /* Go to sleep for a bit */
+#ifndef WIN32
     pause();
+#else
+    Sleep(0);
+#endif
 
     /* Process any events */
     ui_event();
@@ -275,6 +283,7 @@ int widget_end_all( widget_finish_state state )
     
 /* Widget timer routines */
 
+#ifndef WIN32
 static struct sigaction widget_timer_old_handler;
 static struct itimerval widget_timer_old_timer;
 
@@ -329,6 +338,53 @@ int widget_timer_end( void )
 
   return 0;
 }
+
+#else				/* #ifndef WIN32 */
+
+static MMRESULT widget_TimerID;
+UINT widget_TimerRes;
+static void CALLBACK widget_timer_signal( UINT wTimerID, UINT msg,
+					  DWORD dwUser, DWORD dw1, DWORD dw2 );
+
+#define TARGET_RESOLUTION 1	/* 1-millisecond target resolution */
+
+int
+widget_timer_init( void )
+{
+  TIMECAPS tc;
+    
+  if( timeGetDevCaps( &tc, sizeof( TIMECAPS ) ) != TIMERR_NOERROR ) return 1;
+    
+  widget_TimerRes = min( max( tc.wPeriodMin, TARGET_RESOLUTION ),
+			 tc.wPeriodMax );
+
+  timeBeginPeriod( widget_TimerRes );
+
+  widget_TimerID = timeSetEvent( 100, widget_TimerRes, widget_timer_signal,
+				 (DWORD)NULL, TIME_PERIODIC );
+  if( !widget_TimerID ) return 1;
+  
+  return 0;
+}
+
+/* The signal handler: just wake up */
+void CALLBACK
+widget_timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1,
+		     DWORD dw2 )
+{
+  return;
+}
+
+int
+widget_timer_end( void )
+{
+  timeKillEvent( widget_TimerID );
+  widget_TimerID = 0;
+
+  return 0;
+}
+
+#endif				/* #ifndef WIN32 */
 
 /* End of timer functions */
 
