@@ -162,6 +162,13 @@ int snapshot_copy_from( libspectrum_snap *snap )
       return 1;
     }
     break;
+  case LIBSPECTRUM_MACHINE_PLUS2:
+    error = machine_select( SPECTRUM_MACHINE_PLUS2 );
+    if( error ) {
+      ui_error( UI_ERROR_ERROR, "Loading +2 snapshot, but +2 unavailable" );
+      return 1;
+    }
+    break;
   case LIBSPECTRUM_MACHINE_PLUS2A:
     error = machine_select( SPECTRUM_MACHINE_PLUS2A );
     if( error ) {
@@ -301,6 +308,9 @@ int snapshot_copy_to( libspectrum_snap *snap )
     break;
   case SPECTRUM_MACHINE_128:
     snap->machine = LIBSPECTRUM_MACHINE_128;
+    break;
+  case SPECTRUM_MACHINE_PLUS2:
+    snap->machine = LIBSPECTRUM_MACHINE_PLUS2;
     break;
   case SPECTRUM_MACHINE_PLUS2A:
     snap->machine = LIBSPECTRUM_MACHINE_PLUS2A;
