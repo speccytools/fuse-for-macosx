@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "17th March, 2002" "Version 0.4.2" "Emulators"
+.TH fuse 1 "21st March, 2002" "Version 0.4.2" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -52,7 +52,8 @@ The emulator can load Z80 and SNA snapshots, and TAP and TZX
 virtual-tape files. Saving to both Z80 snapshots and TZX tape files is
 supported. The SLT extension to the Z80 format is partly supported
 (enough for multi-load games); however, loading of the old DAT-file
-variant is not.
+variant is not. There is also very basic support for the RZX input
+recording format.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -258,16 +259,23 @@ and have a differently-named menu item to match.
 .PP
 .I "Recording, Record..."
 .RS
-Start recording input to an RZX file.
+Start recording input to an RZX file. In the GTK+ UI, you get to
+select
+.I two
+files: the first specifies a Z80 format snapshot to save the
+Spectrum's current state in, and the second is the RZX file to save
+the input to. Under the other UIs, the snapshot is saved to
+.I record.z80
+and the recording to
+.IR record.rzx .
 .RE
 .PP
 .I "Recording, Play..."
 .RS
 Playback recorded input from an RZX file. This lets you replay
-keypresses recorded previously. Note that currently, it's up to you to
-make sure the emulated Spectrum is in the same state as it was when
-the input was originally recorded (which in practice may not be
-possible in some cases).
+keypresses recorded previously. Again, you must select two files: the
+first is the snapshot to restore the Spectrum's state from and the
+second is the actual RZX file.
 .RE
 .PP
 .I "Recording, Stop"
