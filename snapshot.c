@@ -27,12 +27,10 @@
 #include <config.h>
 
 #include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #include "display.h"
@@ -43,6 +41,7 @@
 #include "snapshot.h"
 #include "spec128.h"
 #include "spectrum.h"
+#include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
@@ -60,7 +59,7 @@ static int snapshot_copy_to( libspectrum_snap *snap );
 
 int snapshot_read( const char *filename )
 {
-  struct stat file_info; int fd; uchar *buffer;
+  unsigned char *buffer; size_t length;
 
   libspectrum_snap snap;
 
@@ -68,49 +67,19 @@ int snapshot_read( const char *filename )
 
   libspectrum_snap_initalise( &snap );
 
-  fd = open( filename, O_RDONLY );
-  if( fd == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: couldn't open `%s'", fuse_progname, filename );
-    perror( error_message );
-    return 1;
-  }
-
-  if( fstat( fd, &file_info) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't stat `%s'", fuse_progname, filename );
-    perror( error_message );
-    close(fd);
-    return 1;
-  }
-
-  buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
-  if( buffer == (void*)-1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
-    perror( error_message );
-    close(fd);
-    return 1;
-  }
-
-  if( close(fd) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't close `%s'", fuse_progname, filename );
-    perror( error_message );
-    munmap( buffer, file_info.st_size );
-    return 1;
-  }
+  error = utils_read_file( filename, &buffer, &length );
+  if( error ) return error;
 
   switch( snapshot_identify( filename ) ) {
 
   case SNAPSHOT_TYPE_SNA:
 
     snapshot_flush_slt();
-    error = libspectrum_sna_read( buffer, file_info.st_size, &snap );
+    error = libspectrum_sna_read( buffer, length, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       fprintf(stderr, "%s: Error from libspectrum_sna_read: %s\n",
 	      fuse_progname, libspectrum_error_message(error) );
-      munmap( buffer, file_info.st_size );
+      munmap( buffer, length );
       return 1;
     }
     break;
@@ -118,11 +87,11 @@ int snapshot_read( const char *filename )
   case SNAPSHOT_TYPE_Z80:
 
     snapshot_flush_slt();
-    error = libspectrum_z80_read( buffer, file_info.st_size, &snap );
+    error = libspectrum_z80_read( buffer, length, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
       fprintf(stderr, "%s: Error from libspectrum_z80_read: %s\n",
 	      fuse_progname, libspectrum_error_message(error) );
-      munmap( buffer, file_info.st_size );
+      munmap( buffer, length );
       return 1;
     }
     break;
@@ -130,11 +99,12 @@ int snapshot_read( const char *filename )
   default:
 
     fprintf(stderr, "%s: Unknown snapshot type\n", fuse_progname );
+    munmap( buffer, length );
     return 1;
 
   }
 
-  if( munmap( buffer, file_info.st_size ) == -1 ) {
+  if( munmap( buffer, length ) == -1 ) {
     snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
 	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
     perror( error_message );

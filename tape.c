@@ -26,12 +26,10 @@
 
 #include <config.h>
 
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #include "event.h"
@@ -42,6 +40,7 @@
 #include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
@@ -74,66 +73,37 @@ int tape_init( void )
 
 int tape_open( const char *filename )
 {
-  struct stat file_info; int fd; unsigned char *buffer;
+  unsigned char *buffer; size_t length;
 
   int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+
+  /* Get the file's data */
+  error = utils_read_file( filename, &buffer, &length );
+  if( error ) return error;
 
   /* If we already have a tape file open, close it */
   if( tape.blocks ) {
     error = tape_close();
-    if( error ) return error;
-  }
-
-  fd = open( filename, O_RDONLY );
-  if( fd == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: couldn't open `%s'", fuse_progname, filename );
-    perror( error_message );
-    return 1;
-  }
-
-  if( fstat( fd, &file_info) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't stat `%s'", fuse_progname, filename );
-    perror( error_message );
-    close(fd);
-    return 1;
-  }
-
-  buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
-  if( buffer == (void*)-1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
-    perror( error_message );
-    close(fd);
-    return 1;
-  }
-
-  if( close(fd) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't close `%s'", fuse_progname, filename );
-    perror( error_message );
-    munmap( buffer, file_info.st_size );
-    return 1;
+    if( error ) { munmap( buffer, length ); return error; }
   }
 
   /* First, try opening the file as a .tzx file; if we get back an
      error saying it didn't have the .tzx signature, then try opening
      it as a .tap file */
-  error = libspectrum_tzx_create( &tape, buffer, file_info.st_size );
+  error = libspectrum_tzx_create( &tape, buffer, length );
   if( error == LIBSPECTRUM_ERROR_SIGNATURE ) {
-    error = libspectrum_tap_create( &tape, buffer, file_info.st_size );
+    error = libspectrum_tap_create( &tape, buffer, length );
   }
 
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr,
 	     "%s: error reading `%s': %s\n",
 	     fuse_progname, filename, libspectrum_error_message(error) );
-      munmap( buffer, file_info.st_size );
+      munmap( buffer, length );
       return error;
   }
 
-  if( munmap( buffer, file_info.st_size ) == -1 ) {
+  if( munmap( buffer, length ) == -1 ) {
     snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
 	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
     perror( error_message );

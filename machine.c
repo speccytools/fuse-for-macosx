@@ -43,6 +43,7 @@
 #include "specplus2.h"
 #include "specplus3.h"
 #include "tape.h"
+#include "utils.h"
 #include "z80/z80.h"
 
 #define ERROR_MESSAGE_MAX_LENGTH 1024
@@ -218,11 +219,9 @@ int machine_allocate_roms( machine_info *machine, size_t count )
 int machine_read_rom( machine_info *machine, size_t number,
 		      const char* filename )
 {
-  int fd;
+  int fd; size_t length;
 
-  struct stat file_info;
-
-  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+  int error;
 
   assert( number < machine->rom_count );
 
@@ -232,30 +231,8 @@ int machine_read_rom( machine_info *machine, size_t number,
     return 1;
   }
 
-  if( fstat( fd, &file_info) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't stat `%s'", fuse_progname, filename );
-    perror( error_message );
-    close(fd);
-    return 1;
-  }
-
-  machine->roms[number] = mmap( 0, file_info.st_size, PROT_READ,
-				MAP_SHARED, fd, 0 );
-  if( machine->roms[number] == (void*)-1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
-    perror( error_message );
-    close(fd);
-    return 1;
-  }
-
-  if( close(fd) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't close `%s'", fuse_progname, filename );
-    perror( error_message );
-    return 1;
-  }
+  error = utils_read_fd( fd, filename, &(machine->roms[number]), &length );
+  if( error ) return error;
 
   return 0;
 
