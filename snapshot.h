@@ -25,8 +25,15 @@
 #ifndef FUSE_SNAPSHOT_H
 #define FUSE_SNAPSHOT_H
 
+#ifndef FUSE_LIBSPECTRUM_H
+#include "libspectrum/libspectrum.h"
+#endif
+
 int snapshot_read( const char *filename );
+
 int snapshot_write( const char *filename );
+int snapshot_copy_to( libspectrum_snap *snap );
+
 void snapshot_flush_slt( void );
 
 #endif

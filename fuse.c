@@ -140,7 +140,7 @@ static int fuse_init(int argc, char **argv)
   if( settings_current.playback_file ) {
     rzx_start_playback( settings_current.playback_file );
   } else if( settings_current.record_file ) {
-    rzx_start_recording( settings_current.record_file );
+    rzx_start_recording( settings_current.record_file, 1 );
   }
 
   fuse_emulation_paused = 0;

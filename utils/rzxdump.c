@@ -25,6 +25,8 @@ do_file( const char *filename );
 static int
 read_creator_block( unsigned char **ptr, unsigned char *end );
 static int
+read_snapshot_block( unsigned char **ptr, unsigned char *end );
+static int
 read_input_block( unsigned char **ptr, unsigned char *end );
 
 WORD read_word( unsigned char **ptr )
@@ -141,6 +143,11 @@ do_file( const char *filename )
       if( error ) { munmap( buffer, file_info.st_size ); return 1; }
       break;
 
+    case 0x30:
+      error = read_snapshot_block( &ptr, end );
+      if( error ) { munmap( buffer, file_info.st_size ); return 1; }
+      break;
+
     case 0x80:
       error = read_input_block( &ptr, end );
       if( error ) { munmap( buffer, file_info.st_size ); return 1; }
@@ -183,6 +190,35 @@ read_creator_block( unsigned char **ptr, unsigned char *end )
   printf( "  Creator minor version: %d\n", read_word( ptr ) );
   printf( "  Creator custom data: %d bytes\n", length - 29 );
   (*ptr) += length - 29;
+
+  return 0;
+}
+
+static int
+read_snapshot_block( unsigned char **ptr, unsigned char *end )
+{
+  size_t snap_length;
+
+  if( end - *ptr < 16 ) {
+    fprintf( stderr,
+	     "%s: Not enough bytes for snapshot block\n", progname );
+    return 1;
+  }
+
+  printf( "Found a snapshot block\n" );
+  printf( "  Length: %d bytes\n", read_dword( ptr ) );
+  printf( "  Flags: 0x%02x\n", *(*ptr)++ );
+  printf( "  Snapshot extension: `%s'\n", *ptr ); (*ptr) += 4;
+
+  snap_length = read_dword( ptr );
+  printf( "  Snap length: %d bytes\n", snap_length );
+
+  if( end - *ptr < snap_length ) {
+    fprintf( stderr,
+	     "%s: Not enough bytes for snapshot\n", progname );
+    return 1;
+  }
+  (*ptr) += snap_length;
 
   return 0;
 }

@@ -55,7 +55,6 @@ typedef enum snapshot_type {
 static snapshot_type snapshot_identify( const char *filename );
 
 static int snapshot_copy_from( libspectrum_snap *snap );
-static int snapshot_copy_to( libspectrum_snap *snap );
 
 int snapshot_read( const char *filename )
 {
@@ -270,7 +269,7 @@ int snapshot_write( const char *filename )
 
 }
 
-static int snapshot_copy_to( libspectrum_snap *snap )
+int snapshot_copy_to( libspectrum_snap *snap )
 {
   int i,j;
 

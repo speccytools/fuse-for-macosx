@@ -324,26 +324,18 @@ static void gtkui_save(GtkWidget *widget, gpointer data)
 /* Called when File/Recording/Record selected */
 static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
 {
-  char *snapshot, *recording;
+  char *recording;
 
   if( rzx_playback || rzx_recording ) return;
 
   fuse_emulation_pause();
 
-  snapshot = gtkui_fileselector_get_filename( "Fuse - Recording Snapshot" );
-  if( !snapshot ) { fuse_emulation_unpause(); return; }
-  
   recording = gtkui_fileselector_get_filename( "Fuse - Start Recording" );
-  if( !recording ) { free( snapshot ); fuse_emulation_unpause(); return; }
+  if( !recording ) { fuse_emulation_unpause(); return; }
 
-  if( snapshot_write( snapshot ) ) {
-    free( snapshot ); free( recording );
-    return;
-  }
+  rzx_start_recording( recording, 1 );
 
-  rzx_start_recording( recording );
-
-  free( snapshot ); free( recording );
+  free( recording );
 
   fuse_emulation_unpause();
 }

@@ -57,7 +57,7 @@ extern libspectrum_rzx rzx;
 
 int rzx_init( void );
 
-int rzx_start_recording( const char *filename );
+int rzx_start_recording( const char *filename, int embed_snapshot );
 int rzx_stop_recording( void );
 
 int rzx_start_playback( const char *filename );
