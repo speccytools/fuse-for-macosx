@@ -110,5 +110,7 @@ int settings_free( settings_info *settings );
 
 int settings_write_config( settings_info *settings );
 
+int settings_end( void );
+
 #endif				/* #ifndef FUSE_SETTINGS_H */
 CODE

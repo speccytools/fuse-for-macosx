@@ -466,6 +466,8 @@ static int fuse_end(void)
   widget_end();
 #endif                          /* #ifdef USE_WIDGET */
 
+  settings_end();
+
   libspectrum_creator_free( fuse_creator );
 
   return 0;

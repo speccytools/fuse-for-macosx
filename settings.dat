@@ -42,6 +42,7 @@ slt_traps, boolean, 1,, slt, slttraps
 double_screen, null, 0
 full_screen, boolean, 0
 writable_roms, boolean, 0
+autosave_settings, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1

@@ -516,4 +516,17 @@ print hashline( __LINE__ ), << 'CODE';
 
   return 0;
 }
+
+int
+settings_end( void )
+{
+#ifdef HAVE_LIB_XML2
+  if( settings_current.autosave_settings )
+    settings_write_config( &settings_current );
+#endif			/* #ifdef HAVE_LIB_XML2 */
+
+  settings_free( &settings_current );
+
+  return 0;
+}
 CODE

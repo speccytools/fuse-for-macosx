@@ -8,6 +8,7 @@ Checkbox, Use (t)ape traps, tape_traps, KEYBOARD_t
 Checkbox, (A)uto-load tapes, auto_load, KEYBOARD_a
 Checkbox, Use .(s)lt traps, slt_traps, KEYBOARD_s
 Checkbox, Allow (w)rites to ROM, writable_roms, KEYBOARD_w
+Checkbox, A(u)to-save settings, autosave_settings, KEYBOARD_u
 
 rzx
 RZX Options
