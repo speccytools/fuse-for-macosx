@@ -234,6 +234,23 @@ int widget_menu_exit( void *data GCC_UNUSED )
   return 0;
 }
 
+/* Options/Filter */
+int
+widget_menu_filter( void *data GCC_UNUSED )
+{
+  int error;
+
+  error = widget_do( WIDGET_TYPE_SCALER, scaler_is_supported );
+  if( error ) return error;
+
+  if( widget_scaler == SCALER_NUM ) return 0;
+
+  if( widget_scaler != current_scaler )
+    return scaler_select_scaler( widget_scaler );
+
+  return 0;
+}
+
 #ifdef HAVE_LIB_XML2
 /* Options/Save */
 int

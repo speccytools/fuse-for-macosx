@@ -31,6 +31,10 @@
 #include "keyboard.h"
 #endif				/* #ifndef FUSE_KEYBOARD_H */
 
+#ifndef SCALER_H
+#include "ui/scaler/scaler.h"
+#endif				/* #ifndef SCALER_H */
+
 #ifndef FUSE_UI_H
 #include "ui/ui.h"
 #endif
@@ -104,5 +108,8 @@ typedef struct widget_error_t {
   ui_error_level severity;
   const char *message;
 } widget_error_t;
+
+/* The scaler returned from the scaler widget */
+scaler_type widget_scaler;
 
 #endif				/* #ifndef FUSE_WIDGET_H */

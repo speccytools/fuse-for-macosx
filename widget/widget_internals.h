@@ -104,6 +104,9 @@ void widget_tape_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
 int widget_file_draw( void* data );
 void widget_file_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
 
+/* Options menu */
+int widget_menu_filter( void *data );
+
 /* Machine menu */
 
 int widget_machine_draw( void* data );

@@ -133,8 +133,6 @@ static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 static widget_menu_widget_t options_sound   = { WIDGET_TYPE_SOUND,   NULL };
 static widget_menu_widget_t options_rzx     = { WIDGET_TYPE_RZX,     NULL };
 static widget_menu_widget_t options_roms    = { WIDGET_TYPE_ROM,     NULL };
-static widget_menu_widget_t options_scaler  = { WIDGET_TYPE_SCALER,
-						scaler_is_supported       };
 
 static widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
@@ -146,7 +144,7 @@ static widget_menu_entry widget_menu_options[] = {
                     KEYBOARD_e, widget_menu_widget, &options_roms    },
 
 #if defined( UI_SDL ) || defined( UI_X )
-  { "(F)ilter...",  KEYBOARD_f, widget_menu_widget, &options_scaler  },
+  { "(F)ilter...",  KEYBOARD_f, widget_menu_filter, NULL             },
 #endif				/* #if defined( UI_SDL ) || defined( UI_X ) */
 
 #ifdef HAVE_LIB_XML2

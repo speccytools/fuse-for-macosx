@@ -51,7 +51,7 @@ static int scaler_count;
 static int scaler[SCALER_NUM];
 
 /* Scaler type we're going to switch to */
-int new_scaler;
+scaler_type widget_scaler;
 
 int
 widget_scaler_draw( void *data )
@@ -143,22 +143,14 @@ widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
     widget_display_lines( 2, scaler_count + 2 );
 
-    /* And set this as the new machine type */
-    new_scaler = scaler[highlight_line];
+    /* And set this as the new scaler */
+    widget_scaler = scaler[highlight_line];
   }
 }
 
 int widget_scaler_finish( widget_finish_state finished )
 {
-  /* If we exited normally and we're not on the same scaler type as
-     we started on, force a graphic mode hotswap */
-  if( finished == WIDGET_FINISHED_OK &&
-      current_scaler != new_scaler ) {
-    if( scaler_select_scaler( new_scaler ) ) return 1;
-  }
-
   if( finished == WIDGET_FINISHED_OK ) widget_end_all( WIDGET_FINISHED_OK );
-
   return 0;
 }
 
