@@ -306,7 +306,7 @@ int widget_timer_init( void )
 }
 
 /* The signal handler: just wake up */
-static void widget_timer_signal( int signo )
+static void widget_timer_signal( int signo GCC_UNUSED )
 {
   return;
 }

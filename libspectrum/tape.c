@@ -98,7 +98,7 @@ libspectrum_tape_free( libspectrum_tape *tape )
 
 /* Free the memory used by one block */
 static void
-block_free( gpointer data, gpointer user_data )
+block_free( gpointer data, gpointer user_data GCC_UNUSED )
 {
   libspectrum_tape_block *block = (libspectrum_tape_block*)data;
   size_t i;

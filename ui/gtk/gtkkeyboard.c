@@ -32,6 +32,7 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
+#include "fuse.h"
 #include "gtkkeyboard.h"
 #include "gtkui.h"
 #include "keyboard.h"
@@ -40,8 +41,9 @@
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);
 
-int gtkkeyboard_keypress(GtkWidget *widget, GdkEvent *event,
-			 gpointer data)
+int
+gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
+		      gpointer data GCC_UNUSED )
 {
   guint keysym; keysyms_key_info *ptr;
 
@@ -72,8 +74,9 @@ int gtkkeyboard_keypress(GtkWidget *widget, GdkEvent *event,
   return FALSE;
 }
 
-int gtkkeyboard_keyrelease(GtkWidget *widget, GdkEvent *event,
-			   gpointer data)
+int
+gtkkeyboard_keyrelease( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
+		        gpointer data GCC_UNUSED )
 {
   guint keysym; keysyms_key_info *ptr;
 
@@ -105,8 +108,9 @@ static guint gtkkeyboard_unshift_keysym(guint keysym)
 }
 
 /* Release all keys (called when focus lost) */
-int gtkkeyboard_release_all( GtkWidget *widget, GdkEvent *event,
-			     gpointer data )
+int
+gtkkeyboard_release_all( GtkWidget *widget GCC_UNUSED,
+			 GdkEvent *event GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   keyboard_release_all();
   return TRUE;

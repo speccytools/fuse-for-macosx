@@ -207,7 +207,8 @@ int event_reset(void)
 }
 
 /* Free the memory used by a specific entry */
-void event_free_entry(gpointer data, gpointer user_data)
+void
+event_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
 {
   event_t *ptr=(event_t*)data;
   free(ptr);

@@ -237,8 +237,9 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
   return FALSE;
 }
 
-static void gtkui_popup_menu_pos( GtkMenu *menu, gint *xp, gint *yp,
-				  GtkWidget *data)
+static void
+gtkui_popup_menu_pos( GtkMenu *menu GCC_UNUSED, gint *xp, gint *yp,
+		      GtkWidget *data GCC_UNUSED )
 {
   gdk_window_get_position( gtkui_window->window, xp, yp );
 }
@@ -280,15 +281,17 @@ int ui_end(void)
 /* The callbacks used by various routines */
 
 /* Called by the main window on a "delete_event" */
-static gint gtkui_delete(GtkWidget *widget, GdkEvent *event,
-			 gpointer data)
+static gint
+gtkui_delete( GtkWidget *widget GCC_UNUSED, GdkEvent *event GCC_UNUSED,
+	      gpointer data GCC_UNUSED )
 {
   fuse_exiting=1;
   return TRUE;
 }
 
 /* Called by the menu when File/Open selected */
-static void gtkui_open(GtkWidget *widget, gpointer data)
+static void
+gtkui_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -307,7 +310,8 @@ static void gtkui_open(GtkWidget *widget, gpointer data)
 }
 
 /* Called by the menu when File/Save selected */
-static void gtkui_save(GtkWidget *widget, gpointer data)
+static void
+gtkui_save( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -324,7 +328,8 @@ static void gtkui_save(GtkWidget *widget, gpointer data)
 }
 
 /* Called when File/Recording/Record selected */
-static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
+static void
+gtkui_rzx_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *recording;
 
@@ -343,14 +348,16 @@ static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
 }
 
 /* Called when File/Recording/Stop selected */
-static void gtkui_rzx_stop( GtkWidget *widget, gpointer data )
+static void
+gtkui_rzx_stop( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback( 1 );
 }
 
 /* Called when File/Recording/Play selected */
-static void gtkui_rzx_play( GtkWidget *widget, gpointer data )
+static void
+gtkui_rzx_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *recording;
 
@@ -385,13 +392,15 @@ gtkui_open_snap( void )
 }
 
 /* Called by the menu when File/Exit selected */
-static void gtkui_quit(GtkWidget *widget, gpointer data)
+static void
+gtkui_quit( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   fuse_exiting=1;
 }
 
 /* Called by the menu when Machine/Reset selected */
-static void gtkui_reset(GtkWidget *widget, gpointer data)
+static void
+gtkui_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   machine_current->reset();
 }
@@ -404,7 +413,8 @@ typedef struct gtkui_select_info {
 } gtkui_select_info;
 
 /* Called by the menu when Machine/Select selected */
-static void gtkui_select(GtkWidget *widget, gpointer data)
+static void
+gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_select_info dialog;
   GSList *button_group;
@@ -484,7 +494,8 @@ static void gtkui_select(GtkWidget *widget, gpointer data)
 }
 
 /* Callback used by the machine selection dialog */
-static void gtkui_select_done( GtkWidget *widget, gpointer user_data )
+static void
+gtkui_select_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 {
   int i;
   gtkui_select_info *ptr = (gtkui_select_info*)user_data;
@@ -503,7 +514,8 @@ static void gtkui_select_done( GtkWidget *widget, gpointer user_data )
 }
     
 /* Called by the menu when Tape/Open selected */
-static void gtkui_tape_open( GtkWidget *widget, gpointer data )
+static void
+gtkui_tape_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -520,25 +532,29 @@ static void gtkui_tape_open( GtkWidget *widget, gpointer data )
 }
 
 /* Called by the menu when Tape/Play selected */
-static void gtkui_tape_play( GtkWidget *widget, gpointer data )
+static void
+gtkui_tape_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   tape_toggle_play();
 }
 
 /* Called by the menu when Tape/Rewind selected */
-static void gtkui_tape_rewind( GtkWidget *widget, gpointer data )
+static void
+gtkui_tape_rewind( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   tape_rewind();
 }
 
 /* Called by the menu when Tape/Clear selected */
-static void gtkui_tape_clear( GtkWidget *widget, gpointer data )
+static void
+gtkui_tape_clear( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   tape_close();
 }
 
 /* Called by the menu when Tape/Write selected */
-static void gtkui_tape_write( GtkWidget *widget, gpointer data )
+static void
+gtkui_tape_write( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *filename;
 
@@ -557,12 +573,14 @@ static void gtkui_tape_write( GtkWidget *widget, gpointer data )
 #ifdef HAVE_765_H
 
 /* Called by the mnu when Disk/Drive ?:/Open selected */
-static void gtkui_disk_open_a( GtkWidget *widget, gpointer data )
+static void
+gtkui_disk_open_a( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_disk_open( SPECPLUS3_DRIVE_A );
 }
 
-static void gtkui_disk_open_b( GtkWidget *widget, gpointer data )
+static void
+gtkui_disk_open_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_disk_open( SPECPLUS3_DRIVE_B );
 }
@@ -584,19 +602,22 @@ static void gtkui_disk_open( specplus3_drive_number drive )
   fuse_emulation_unpause();
 }
 
-static void gtkui_disk_eject_a( GtkWidget *widget, gpointer data )
+static void
+gtkui_disk_eject_a( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   specplus3_disk_eject( SPECPLUS3_DRIVE_A );
 }
 
-static void gtkui_disk_eject_b( GtkWidget *widget, gpointer data )
+static void
+gtkui_disk_eject_b( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   specplus3_disk_eject( SPECPLUS3_DRIVE_B );
 }
 
 #endif			/* #ifdef HAVE_765_H */
 
-static void gtkui_help_keyboard( GtkWidget *widget, gpointer data )
+static void
+gtkui_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   widget_picture_data picture_data = { "keyboard.scr", NULL, 0 };
 
@@ -604,7 +625,8 @@ static void gtkui_help_keyboard( GtkWidget *widget, gpointer data )
 }
 
 /* Generic `tidy-up' callback */
-void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data )
+void
+gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data GCC_UNUSED )
 {
   gtk_widget_destroy( widget );
   gtk_main_quit();
@@ -658,7 +680,8 @@ static char* gtkui_fileselector_get_filename( const char *title )
   return selector.filename;
 }
 
-static void gtkui_fileselector_done( GtkButton *button, gpointer user_data )
+static void
+gtkui_fileselector_done( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
   char *filename;
@@ -674,7 +697,8 @@ static void gtkui_fileselector_done( GtkButton *button, gpointer user_data )
   gtk_main_quit();
 }
 
-static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data )
+static void
+gtkui_fileselector_cancel( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   gtkui_fileselector_info *ptr = (gtkui_fileselector_info*) user_data;
 

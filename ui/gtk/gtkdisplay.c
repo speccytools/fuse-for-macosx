@@ -229,8 +229,9 @@ int uidisplay_end(void)
 /* Callbacks */
 
 /* Called by gtkui_drawing_area on "expose_event" */
-static gint gtkdisplay_expose(GtkWidget *widget, GdkEvent *event,
-			      gpointer data)
+static gint
+gtkdisplay_expose( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
+		   gpointer data GCC_UNUSED )
 {
   gtkdisplay_area(event->expose.area.x, event->expose.area.y,
 		  event->expose.area.width, event->expose.area.height);
@@ -238,8 +239,9 @@ static gint gtkdisplay_expose(GtkWidget *widget, GdkEvent *event,
 }
 
 /* Called by gtkui_drawing_area on "configure_event" */
-static gint gtkdisplay_configure(GtkWidget *widget, GdkEvent *event,
-				 gpointer data)
+static gint
+gtkdisplay_configure( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
+		      gpointer data GCC_UNUSED )
 {
   gtkdisplay_configure_notify( event->configure.width );
   return FALSE;

@@ -27,6 +27,12 @@
 #ifndef FUSE_FUSE_H
 #define FUSE_FUSE_H
 
+#ifdef __GNUC__
+#define GCC_UNUSED __attribute__ ((unused))
+#else				/* #ifdef __GNUC__ */
+#define GCC_UNUSED
+#endif				/* #ifdef __GNUC__ */
+
 extern char* fuse_progname;		/* argv[0] */
 
 extern int fuse_exiting;		/* Shall we exit now? */

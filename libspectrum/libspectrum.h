@@ -57,6 +57,12 @@ typedef unsigned long libspectrum_dword;
 #error No plausible 32 bit types found
 #endif
 
+#ifdef __GNUC__
+#define GCC_UNUSED __attribute__ ((unused))
+#else				/* #ifdef __GNUC__ */
+#define GCC_UNUSED
+#endif				/* #ifdef __GNUC__ */
+
 typedef unsigned char uchar;
 
 /* The various errors which can occur */

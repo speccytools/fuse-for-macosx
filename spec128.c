@@ -209,7 +209,8 @@ int spec128_reset(void)
   return 0;
 }
 
-void spec128_memoryport_write(WORD port, BYTE b)
+void
+spec128_memoryport_write( WORD port GCC_UNUSED, BYTE b )
 {
   int old_screen;
 

@@ -156,14 +156,16 @@ void writeport(WORD port, BYTE b)
 }
 
 /* A dummy function for non-readable ports */
-BYTE spectrum_port_noread(WORD port)
+BYTE
+spectrum_port_noread( WORD port GCC_UNUSED )
 {
   /* FIXME: should this return the floating bus value? */
   return 0xff;
 }
 
 /* And one for non-writable ports */
-void spectrum_port_nowrite( WORD port, BYTE value )
+void
+spectrum_port_nowrite( WORD port GCC_UNUSED, BYTE value GCC_UNUSED )
 {
   return;
 }
@@ -175,7 +177,8 @@ BYTE spectrum_ula_read(WORD port)
 }
 
 /* What happens when we write to the ULA? */
-void spectrum_ula_write(WORD port, BYTE b)
+void
+spectrum_ula_write( WORD port GCC_UNUSED, BYTE b )
 {
   display_set_lores_border( b & 0x07 );
   sound_beeper( 0, b & 0x10 );

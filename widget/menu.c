@@ -130,14 +130,16 @@ int widget_apply_to_file( void *data )
 /* File menu callbacks */
 
 /* File/Save */
-int widget_menu_save_snapshot( void *data )
+int
+widget_menu_save_snapshot( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return snapshot_write( "snapshot.z80" );
 }
 
 /* File/Recording/Record */
-int widget_menu_rzx_recording( void *data )
+int
+widget_menu_rzx_recording( void *data GCC_UNUSED )
 {
   if( rzx_playback || rzx_recording ) return 0;
 
@@ -147,7 +149,8 @@ int widget_menu_rzx_recording( void *data )
 }
 
 /* File/Recording/Play */
-int widget_menu_rzx_playback( void *data )
+int
+widget_menu_rzx_playback( void *data GCC_UNUSED )
 {
   int error;
 
@@ -170,7 +173,8 @@ static int widget_load_snapshot( void )
 }
 
 /* File/Recording/Stop */
-int widget_menu_rzx_stop( void *data )
+int
+widget_menu_rzx_stop( void *data GCC_UNUSED )
 {
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback( 1 );
@@ -180,7 +184,7 @@ int widget_menu_rzx_stop( void *data )
 }  
 
 /* File/Exit */
-int widget_menu_exit( void *data )
+int widget_menu_exit( void *data GCC_UNUSED )
 {
   fuse_exiting = 1;
   widget_end_all( WIDGET_FINISHED_OK );
@@ -188,21 +192,21 @@ int widget_menu_exit( void *data )
 }
 
 /* Machine/Reset */
-int widget_menu_reset( void *data )
+int widget_menu_reset( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return machine_current->reset();
 }
 
 /* Tape/Play */
-int widget_menu_play_tape( void *data )
+int widget_menu_play_tape( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_toggle_play();
 }
 
 /* Tape/Rewind */
-int widget_menu_rewind_tape( void *data )
+int widget_menu_rewind_tape( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_rewind();
@@ -235,14 +239,14 @@ widget_menu_eject_disk( void *data )
 #endif				/* #ifdef HAVE_765_H */
 
 /* Tape/Clear */
-int widget_menu_clear_tape( void *data )
+int widget_menu_clear_tape( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_close();
 }
 
 /* Tape/Write */
-int widget_menu_write_tape( void *data )
+int widget_menu_write_tape( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return tape_write( "tape.tzx" );

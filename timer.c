@@ -72,7 +72,8 @@ static void timer_setup_handler(void)
   sigaction(SIGALRM,&handler,&timer_old_handler);
 }  
 
-void timer_signal( int signo )
+void
+timer_signal( int signo GCC_UNUSED )
 {
   /* If the emulator is running, note that time has passed */
   if( !fuse_emulation_paused ) timer_count++;

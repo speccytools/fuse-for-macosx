@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "ui/uidisplay.h"
@@ -44,7 +45,7 @@ static char descriptions[10][40];
 /* Machine type we're going to switch to */
 int new_machine;
 
-int widget_select_draw( void* data )
+int widget_select_draw( void* data GCC_UNUSED )
 {
   int i;
 

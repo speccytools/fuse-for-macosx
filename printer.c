@@ -378,7 +378,7 @@ frames++;
  * very little brain. :-) Or at least, I don't grok it that well.
  * It works wonderfully though.
  */
-BYTE printer_zxp_read(WORD port)
+BYTE printer_zxp_read(WORD port GCC_UNUSED)
 {
 if(!printer_graphics_enabled)
   return(0xff);
@@ -422,7 +422,7 @@ else
 }
 
 
-void printer_zxp_write(WORD port,BYTE b)
+void printer_zxp_write(WORD port GCC_UNUSED,BYTE b)
 {
 if(!zxpspeed)
   {
@@ -614,7 +614,7 @@ old_on=on;
 }
 
 
-BYTE printer_parallel_read(WORD port)
+BYTE printer_parallel_read(WORD port GCC_UNUSED)
 {
 /* bit 0 = busy. other bits high? */
 
@@ -622,7 +622,7 @@ return(0xfe);	/* never busy */
 }
 
 
-void printer_parallel_write(WORD port,BYTE b)
+void printer_parallel_write(WORD port GCC_UNUSED,BYTE b)
 {
 parallel_data=b;
 }

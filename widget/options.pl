@@ -42,6 +42,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include <config.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "options.h"
 #include "ui/uidisplay.h"
 CODE
@@ -53,7 +54,7 @@ foreach( @dialogs ) {
     print << "CODE";
 static int widget_$_->{name}_show_all( settings_info *show );
 
-int widget_$_->{name}_draw( void *data )
+int widget_$_->{name}_draw( void *data GCC_UNUSED )
 {
   int error;
   

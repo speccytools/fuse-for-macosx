@@ -35,6 +35,7 @@
 #include <unistd.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
 #include "widget.h"
@@ -217,7 +218,8 @@ static int widget_scan_compare( const struct widget_dirent **a,
 
 /* File selection widget */
 
-int widget_filesel_draw( void* data )
+int
+widget_filesel_draw( void* data GCC_UNUSED )
 {
   char *directory;
 

@@ -57,7 +57,8 @@ foreach( @dialogs ) {
 
 static void gtkoptions_$_->{name}_done( GtkWidget *widget, gpointer user_data );
 
-void gtkoptions_$_->{name}( GtkWidget *widget, gpointer data )
+void
+gtkoptions_$_->{name}( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkoptions_$_->{name}_t dialog;
   GtkWidget *ok_button, *cancel_button;
@@ -133,7 +134,8 @@ CODE
   fuse_emulation_unpause();
 }
 
-static void gtkoptions_$_->{name}_done( GtkWidget *widget, gpointer user_data )
+static void
+gtkoptions_$_->{name}_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 {
   gtkoptions_$_->{name}_t *ptr = (gtkoptions_$_->{name}_t*)user_data;
 

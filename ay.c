@@ -26,13 +26,15 @@
 
 #include <config.h>
 
+#include "fuse.h"
 #include "machine.h"
 #include "printer.h"
 #include "sound.h"
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
-BYTE ay_registerport_read(WORD port)
+BYTE
+ay_registerport_read( WORD port GCC_UNUSED )
 {
   static BYTE port_input = 0xbf;	/* always allow serial output */
 
@@ -59,7 +61,8 @@ BYTE ay_registerport_read(WORD port)
 }
 
 /* And when it's written to */
-void ay_registerport_write(WORD port, BYTE b)
+void
+ay_registerport_write( WORD port GCC_UNUSED, BYTE b )
 {
   machine_current->ay.current_register = (b & 15);
 }
@@ -67,7 +70,8 @@ void ay_registerport_write(WORD port, BYTE b)
 /* What happens when the AY data port (traditionally 0xbffd on the 128K
    machines) is written to; no corresponding read function as this
    always returns 0xff */
-void ay_dataport_write(WORD port, BYTE b)
+void
+ay_dataport_write( WORD port GCC_UNUSED, BYTE b )
 {
   machine_current->ay.registers[ machine_current->ay.current_register ] = b;
   sound_ay_write( machine_current->ay.current_register, b, tstates );

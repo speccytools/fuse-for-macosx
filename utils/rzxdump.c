@@ -306,7 +306,7 @@ read_input_block( unsigned char **ptr, unsigned char *end )
 
       printf( "  IN count: %ld\n", (unsigned long)count );
 
-      if( end - *ptr < count ) {
+      if( end - *ptr < (ptrdiff_t)count ) {
 	fprintf( stderr,
 		 "%s: Not enough data for frame %ld (expected %ld bytes)\n",
 		 progname, (unsigned long)i, (unsigned long)count );

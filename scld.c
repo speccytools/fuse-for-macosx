@@ -1,5 +1,5 @@
 /* scld.c: Routines for handling the Timex SCLD
-   Copyright (c) 2002 Fredrick Meunier
+   Copyright (c) 2002 Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 
 #include "scld.h"
 #include "display.h"
+#include "fuse.h"
 
 BYTE scld_altdfile   = 0;
 BYTE scld_extcolour  = 0;
@@ -42,12 +43,14 @@ BYTE scld_last_dec   = 0;           /* The last byte sent to Timex DEC port */
 
 BYTE scld_last_hsr   = 0;           /* The last byte sent to Timex HSR port */
 
-BYTE scld_dec_read(WORD port)
+BYTE
+scld_dec_read( WORD port GCC_UNUSED )
 {
   return scld_last_dec;
 }
 
-void scld_dec_write(WORD port, BYTE b)
+void
+scld_dec_write( WORD port GCC_UNUSED, BYTE b )
 {
   int old_dec       = scld_last_dec;
   BYTE old_hirescol = hires_get_attr();
@@ -90,12 +93,14 @@ void scld_reset(void)
   scld_last_dec   = 0;
 }
 
-void scld_hsr_write (WORD port, BYTE b)
+void
+scld_hsr_write( WORD port GCC_UNUSED, BYTE b )
 {
   scld_last_hsr = b;
 }
 
-BYTE scld_hsr_read (WORD port)
+BYTE
+scld_hsr_read( WORD port GCC_UNUSED )
 {
   return scld_last_hsr;
 }

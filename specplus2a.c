@@ -114,7 +114,7 @@ int specplus2a_reset(void)
 }
 
 void
-specplus2a_memoryport_write( WORD port, BYTE b )
+specplus2a_memoryport_write( WORD port GCC_UNUSED, BYTE b )
 {
   /* Let the parallel printer code know about the strobe bit */
   printer_parallel_strobe_write( b & 0x10 );

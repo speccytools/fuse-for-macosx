@@ -225,7 +225,8 @@ DWORD specplus3_contend_memory( WORD address )
   return 0;
 }
 
-DWORD specplus3_contend_port( WORD port )
+DWORD
+specplus3_contend_port( WORD port GCC_UNUSED )
 {
   /* Contention does not occur for the ULA.
      FIXME: Unknown for other ports, so let's assume it doesn't for now */
@@ -366,7 +367,8 @@ int specplus3_reset(void)
   return 0;
 }
 
-void specplus3_memoryport_write(WORD port, BYTE b)
+void
+specplus3_memoryport_write( WORD port GCC_UNUSED, BYTE b )
 {
   /* Let the parallel printer code know about the strobe bit */
   printer_parallel_strobe_write( b & 0x10 );
@@ -414,19 +416,19 @@ specplus3_fdc_reset( void )
 }
 
 static BYTE
-specplus3_fdc_status( WORD port )
+specplus3_fdc_status( WORD port GCC_UNUSED )
 {
   return fdc_read_ctrl( fdc );
 }
 
 static BYTE
-specplus3_fdc_read( WORD port )
+specplus3_fdc_read( WORD port GCC_UNUSED )
 {
   return fdc_read_data( fdc );
 }
 
 static void
-specplus3_fdc_write( WORD port, BYTE data )
+specplus3_fdc_write( WORD port GCC_UNUSED, BYTE data )
 {
   fdc_write_data( fdc, data );
 }
