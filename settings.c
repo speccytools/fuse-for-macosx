@@ -100,6 +100,9 @@ static int settings_command_line( int argc, char **argv,
     {    "separation", 0, &(settings->stereo_ay), 1 },
     { "no-separation", 0, &(settings->stereo_ay), 0 },
 
+    {           "slt", 0, &(settings->slt_traps), 1 },
+    {        "no-slt", 0, &(settings->slt_traps), 0 },
+
     {      "kempston", 0, &(settings->joy_kempston), 1 },
     {   "no-kempston", 0, &(settings->joy_kempston), 0 },
 
