@@ -80,7 +80,7 @@ int tape_init( void )
   return 0;
 }
 
-int tape_open( const char *filename )
+int tape_open( const char *filename, int autoload )
 {
   unsigned char *buffer; size_t length;
 
@@ -123,7 +123,7 @@ int tape_open( const char *filename )
     return 1;
   }
 
-  if( settings_current.auto_load ) {
+  if( autoload ) {
     error = tape_autoload( machine_current->machine );
     if( error ) return error;
   }
@@ -134,7 +134,7 @@ int tape_open( const char *filename )
 
 /* Use an already open .tap file as the current tape */
 int
-tape_open_tap_buffer( unsigned char *buffer, size_t length )
+tape_open_tap_buffer( unsigned char *buffer, size_t length, int autoload )
 {
   int error;
 
@@ -142,12 +142,20 @@ tape_open_tap_buffer( unsigned char *buffer, size_t length )
     error = tape_close(); if( error ) return error;
   }
 
-  return libspectrum_tap_read( tape, buffer, length );
+  error = libspectrum_tap_read( tape, buffer, length );
+  if( error ) return error;
+
+  if( autoload ) {
+    error = tape_autoload( machine_current->machine );
+    if( error ) return error;
+  }
+
+  return 0;
 }
 
 /* Use an already open .tzx file as the current tape */
 int
-tape_open_tzx_buffer( unsigned char *buffer, size_t length )
+tape_open_tzx_buffer( unsigned char *buffer, size_t length, int autoload )
 {
   int error;
 
@@ -155,7 +163,15 @@ tape_open_tzx_buffer( unsigned char *buffer, size_t length )
     error = tape_close(); if( error ) return error;
   }
 
-  return libspectrum_tzx_read( tape, buffer, length );
+  error = libspectrum_tzx_read( tape, buffer, length );
+  if( error ) return error;
+
+  if( autoload ) {
+    error = tape_autoload( machine_current->machine );
+    if( error ) return error;
+  }
+
+  return 0;
 }
 
 /* Load a snap to start the current tape autoloading */

@@ -611,7 +611,7 @@ gtkui_tape_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   filename = gtkui_fileselector_get_filename( "Fuse - Open Tape" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  tape_open( filename );
+  tape_open( filename, settings_current.auto_load );
 
   free( filename );
 

@@ -71,7 +71,8 @@ static void fuse_show_copyright(void);
 static void fuse_show_version( void );
 static void fuse_show_help( void );
 
-static int parse_nonoption_args( int argc, char **argv, int first_arg );
+static int parse_nonoption_args( int argc, char **argv, int first_arg,
+				 int autoload );
 
 static int fuse_end(void);
 
@@ -99,11 +100,13 @@ int main(int argc,char **argv)
 static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
+  int autoload;			/* Should we autoload tapes? */
 
   fuse_progname=argv[0];
   libspectrum_error_function = ui_libspectrum_error;
   
   if( settings_init( &first_arg, argc, argv ) ) return 1;
+  autoload = settings_current.auto_load;
 
   if( settings_current.show_version ) {
     fuse_show_version();
@@ -150,8 +153,14 @@ static int fuse_init(int argc, char **argv)
     if(timer_init()) return 1;
   }
 
-  if( settings_current.snapshot ) snapshot_read( settings_current.snapshot );
-  if( settings_current.tape_file ) tape_open( settings_current.tape_file );
+  if( settings_current.snapshot ) {
+    snapshot_read( settings_current.snapshot ); autoload = 0;
+  }
+
+  /* Insert any tape file; if no snapshot file already specified,
+     autoload the tape */
+  if( settings_current.tape_file )
+    tape_open( settings_current.tape_file, autoload );
 
   if( settings_current.playback_file ) {
     rzx_start_playback( settings_current.playback_file, NULL );
@@ -159,7 +168,7 @@ static int fuse_init(int argc, char **argv)
     rzx_start_recording( settings_current.record_file, 1 );
   }
 
-  if( parse_nonoption_args( argc, argv, first_arg ) ) return 1;
+  if( parse_nonoption_args( argc, argv, first_arg, autoload ) ) return 1;
 
   fuse_emulation_paused = 0;
 
@@ -261,7 +270,7 @@ int fuse_emulation_unpause(void)
 
 /* Make 'best guesses' as to what to do with non-option arguments */
 static int
-parse_nonoption_args( int argc, char **argv, int first_arg )
+parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
 {
   unsigned char *buffer; size_t length; int type;
   int error = 0;
@@ -289,18 +298,20 @@ parse_nonoption_args( int argc, char **argv, int first_arg )
 
     case UTILS_TYPE_SNAPSHOT_SNA:
       error = snapshot_open_sna_buffer( buffer, length );
+      if( !error ) autoload = 0;
       break;
 
     case UTILS_TYPE_SNAPSHOT_Z80:
       error = snapshot_open_z80_buffer( buffer, length );
+      if( !error ) autoload = 0;
       break;
 
     case UTILS_TYPE_TAPE_TAP:
-      error = tape_open_tap_buffer( buffer, length );
+      error = tape_open_tap_buffer( buffer, length, autoload );
       break;
 
     case UTILS_TYPE_TAPE_TZX:
-      error = tape_open_tzx_buffer( buffer, length );
+      error = tape_open_tzx_buffer( buffer, length, autoload );
       break;
 
     default:
