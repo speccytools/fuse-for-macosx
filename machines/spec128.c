@@ -176,7 +176,8 @@ spec128_common_reset( int contention )
     memory_map_ram[ 2 * i     ].contended =
       memory_map_ram[ 2 * i + 1 ].contended = i & 1 ? contention : 0;
 
-  for( i = 0; i < 8; i++ ) memory_map[i] = *memory_map_home[i];
+  for( i = 0; i < 8; i++ )
+    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   return 0;
 }
@@ -197,31 +198,21 @@ spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
 void
 spec128_select_rom( int rom )
 {
-  size_t i;
-
   memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
   memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
-
-  for( i = 0; i < 2; i++ )
-    if( memory_map[i].bank == MEMORY_BANK_HOME )
-      memory_map[i] = *memory_map_home[i];
-
   machine_current->ram.current_rom = rom;
+
+  memory_update_home( 0, 2 );
 }
 
 void
 spec128_select_page( int page )
 {
-  size_t i;
-
   memory_map_home[6] = &memory_map_ram[ 2 * page     ];
   memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
-
-  for( i = 6; i < 8; i++ )
-    if( memory_map[i].bank == MEMORY_BANK_HOME )
-      memory_map[i] = *memory_map_home[i];
-
   machine_current->ram.current_page = page;
+
+  memory_update_home( 6, 2 );
 }
 
 int

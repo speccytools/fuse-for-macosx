@@ -134,7 +134,14 @@ spectrum_contend_port( libspectrum_word port )
 }
 
 void
-contend( libspectrum_word address, libspectrum_dword time )
+contend_read( libspectrum_word address, libspectrum_dword time )
+{
+  printf( "%5d MC %04x\n", tstates, address );
+  tstates += time;
+}
+
+void
+contend_write( libspectrum_word address, libspectrum_dword time )
 {
   printf( "%5d MC %04x\n", tstates, address );
   tstates += time;

@@ -141,9 +141,9 @@ scld_memory_map( void )
 
   for( i = 0; i < 8; i++ ) {
     if( scld_last_hsr & ( 1 << i ) ) {
-      memory_map[i] = *exrom_dock[i];
+      memory_map_read[i] = memory_map_write[i] = *exrom_dock[i];
     } else {
-      memory_map[i] = *memory_map_home[i];
+      memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
     }
   }
 }

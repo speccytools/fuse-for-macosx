@@ -207,12 +207,28 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 }
 
 static int
-encode_bank_and_page( libspectrum_word address )
+encode_bank_and_page( debugger_breakpoint_type type, libspectrum_word address )
 {
-  memory_page *page;
+  memory_page *read_write, *page;
   breakpoint_page_offset offset;
 
-  page = &memory_map[ address >> 13 ];
+  switch( type ) {
+  case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
+  case DEBUGGER_BREAKPOINT_TYPE_READ:
+    read_write = memory_map_read;
+    break;
+
+  case DEBUGGER_BREAKPOINT_TYPE_WRITE:
+    read_write = memory_map_write;
+    break;
+
+  default:
+    ui_error( UI_ERROR_ERROR,
+	      "encode_bank_and_page: unexpected breakpoint type %d", type );
+    return -1;
+  }
+
+  page = &read_write[ address >> 13 ];
 
   switch( page->bank ) {
   case MEMORY_BANK_HOME:
@@ -257,7 +273,7 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
 
   if( bp->type != type ) return 0;
 
-  switch( bp->type ) {
+  switch( type ) {
 
   case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
   case DEBUGGER_BREAKPOINT_TYPE_READ:
@@ -270,7 +286,7 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
     if( page == -1 ) {
       if( bp->value.address.offset != value ) return 0;
     } else {
-      if( page != encode_bank_and_page( value ) ) return 0;
+      if( page != encode_bank_and_page( type, value ) ) return 0;
       if( bp->value.address.offset != ( value & 0x3fff ) ) return 0;
     }
     break;

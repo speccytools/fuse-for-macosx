@@ -756,15 +756,15 @@ update_memory_map( void )
     snprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
     gtk_label_set_text( GTK_LABEL( map_label[i][0] ), buffer );
 
-    snprintf( buffer, 40, "%s %d", memory_bank_name( &memory_map[i] ),
-	      memory_map[i].page_num );
+    snprintf( buffer, 40, "%s %d", memory_bank_name( &memory_map_read[i] ),
+	      memory_map_read[i].page_num );
     gtk_label_set_text( GTK_LABEL( map_label[i][1] ), buffer );
 
     gtk_label_set_text( GTK_LABEL( map_label[i][2] ),
-			memory_map[i].writable ? "Y" : "N" );
+			memory_map_read[i].writable ? "Y" : "N" );
 
     gtk_label_set_text( GTK_LABEL( map_label[i][3] ),
-			memory_map[i].contended ? "Y" : "N" );
+			memory_map_read[i].contended ? "Y" : "N" );
   }
 
   return 0;

@@ -816,3 +816,8 @@
 20040516 spectrum.c: use Ramsoft's screen/attributes pattern for the
 	 floating bus, but stick to the 14335/14361 timings. Arkanoid and
 	 Sidewize now work.
+20040517 memory.[ch],scld.c,tape.c,trdos.c,utils.c,debuggger/breakpoint.c,
+	 machines/{scorpion.c,spec128.c,spec16.c,spec48.c,spec_se.c,
+	 specplus3.c},ui/gtk/debugger.c,z80/{coretest.c,z80.pl,z80_macros.h,
+	 z80_ops.c}: refactor to introduce separate mappings for reading
+	 and writing.

@@ -271,7 +271,8 @@ specplus3_plus2a_common_reset( void )
   memory_screen_mask = 0xffff;
 
   /* All memory comes from the home bank */
-  for( i = 0; i < 8; i++ ) memory_map[i].bank = MEMORY_BANK_HOME;
+  for( i = 0; i < 8; i++ )
+    memory_map_read[i].bank = memory_map_write[i].bank = MEMORY_BANK_HOME;
 
   /* RAM pages 4, 5, 6 and 7 contended */
   for( i = 0; i < 8; i++ )
@@ -286,8 +287,6 @@ specplus3_plus2a_common_reset( void )
 static int
 normal_memory_map( int rom, int page )
 {
-  size_t i;
-
   /* ROM as specified */
   memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
   memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
@@ -304,9 +303,7 @@ normal_memory_map( int rom, int page )
   memory_map_home[6] = &memory_map_ram[ 2 * page     ];
   memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
 
-  for( i = 0; i < 8; i++ )
-    if( memory_map[i].bank == MEMORY_BANK_HOME )
-      memory_map[i] = *memory_map_home[i];
+  memory_update_home( 0, 8 );
 
   return 0;
 }
@@ -329,8 +326,6 @@ special_memory_map( int which )
 static int
 select_special_map( int page1, int page2, int page3, int page4 )
 {
-  size_t i;
-
   memory_map_home[0] = &memory_map_ram[ 2 * page1     ];
   memory_map_home[1] = &memory_map_ram[ 2 * page1 + 1 ];
 
@@ -343,9 +338,7 @@ select_special_map( int page1, int page2, int page3, int page4 )
   memory_map_home[6] = &memory_map_ram[ 2 * page4     ];
   memory_map_home[7] = &memory_map_ram[ 2 * page4 + 1 ];
 
-  for( i = 0; i < 8; i++ )
-    if( memory_map[i].bank == MEMORY_BANK_HOME )
-      memory_map[i] = *memory_map_home[i];
+  memory_update_home( 0, 8 );
 
   return 0;
 }

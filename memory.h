@@ -57,11 +57,14 @@ typedef struct memory_page {
 #define MEMORY_PAGE_SIZE 0x2000
 
 /* Each 8Kb RAM chunk accessible by the Z80 */
-extern memory_page memory_map[8];
+extern memory_page memory_map_read[8];
+extern memory_page memory_map_write[8];
 
 /* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
 extern memory_page memory_map_romcs[2];
 
+/* 8 8Kb memory chunks accessible by the Z80 for normal RAM (home) and
+   the Timex Dock and Exrom */
 extern memory_page *memory_map_home[8];
 extern memory_page *memory_map_dock[8];
 extern memory_page *memory_map_exrom[8];
@@ -81,6 +84,8 @@ void memory_pool_free( void );
 
 const char *memory_bank_name( memory_page *page );
 
+void memory_update_home( size_t start, size_t n );
+
 /* Map in alternate bank if ROMCS is set */
 void memory_romcs_map( void );
 
@@ -92,7 +97,7 @@ libspectrum_byte readbyte( libspectrum_word address );
 #ifndef CORETEST
 
 #define readbyte_internal( address ) \
-  memory_map[ (libspectrum_word)(address) >> 13 ].page[ (address) & 0x1fff ]
+  memory_map_read[ (libspectrum_word)(address) >> 13 ].page[ (address) & 0x1fff ]
 
 #else				/* #ifndef CORETEST */
 

@@ -61,8 +61,8 @@ sub arithmetic_logical ($$$) {
       {
 	libspectrum_byte offset, bytetemp;
 	offset = readbyte( PC );
-	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
-	contend( PC, 1 ); PC++;
+	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
+	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
 	bytetemp = readbyte( REGISTER + (libspectrum_signed_byte)offset );
 	$opcode(bytetemp);
       }
@@ -101,7 +101,7 @@ sub call_jp ($$$) {
       if( $condition_string ) {
 	$opcode();
       } else {
-	contend( PC, 3 ); contend( PC + 1, 3 ); PC += 2;
+	contend_read( PC, 3 ); contend_read( PC + 1, 3 ); PC += 2;
       }
 CALL
     }
@@ -119,8 +119,8 @@ sub cpi_cpd ($) {
 	  lookup = ( (        A & 0x08 ) >> 3 ) |
 	           ( (  (value) & 0x08 ) >> 2 ) |
 	           ( ( bytetemp & 0x08 ) >> 1 );
-	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
-	contend( HL, 1 );
+	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
+	contend_read( HL, 1 ); contend_read( HL, 1 );
 	HL$modifier; BC--;
 	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
 	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
@@ -143,8 +143,8 @@ sub cpir_cpdr ($) {
 	  lookup = ( (        A & 0x08 ) >> 3 ) |
 		   ( (  (value) & 0x08 ) >> 2 ) |
 		   ( ( bytetemp & 0x08 ) >> 1 );
-	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
-	contend( HL, 1 );
+	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
+	contend_read( HL, 1 ); contend_read( HL, 1 );
 	HL$modifier; BC--;
 	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
 	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
@@ -152,8 +152,8 @@ sub cpir_cpdr ($) {
 	if(F & FLAG_H) bytetemp--;
 	F |= ( bytetemp & FLAG_3 ) | ( (bytetemp&0x02) ? FLAG_5 : 0 );
 	if( ( F & ( FLAG_V | FLAG_Z ) ) == FLAG_V ) {
-	  contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
-	  contend( HL, 1 ); contend( HL, 1 );
+	  contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
+	  contend_read( HL, 1 ); contend_read( HL, 1 );
 	  PC-=2;
 	}
       }
@@ -174,7 +174,7 @@ sub inc_dec ($$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 1 );
+	contend_read( HL, 1 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
       }
@@ -185,11 +185,11 @@ CODE
 	libspectrum_byte offset, bytetemp;
 	libspectrum_word wordtemp;
 	offset = readbyte( PC );
-	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
-	contend( PC, 1 ); PC++;
+	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
+	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
 	wordtemp = REGISTER + (libspectrum_signed_byte)offset;
 	bytetemp = readbyte( wordtemp );
-	contend( wordtemp, 1 );
+	contend_read( wordtemp, 1 );
 	$opcode(bytetemp);
 	writebyte(wordtemp,bytetemp);
       }
@@ -231,8 +231,9 @@ sub inir_indr ($) {
 	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
 	if(B) {
-	  contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
-	  contend( HL, 1 );
+	  contend_write( HL, 1 ); contend_write( HL, 1 );
+	  contend_write( HL, 1 ); contend_write( HL, 1 );
+	  contend_write( HL, 1 );
 	  PC-=2;
 	}
       }
@@ -251,7 +252,7 @@ sub ldi_ldd ($) {
 	libspectrum_byte bytetemp=readbyte( HL );
 	BC--;
 	writebyte(DE,bytetemp);
-	contend( DE, 1 ); contend( DE, 1 );
+	contend_write( DE, 1 ); contend_write( DE, 1 );
 	DE$modifier; HL$modifier;
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
@@ -270,14 +271,15 @@ sub ldir_lddr ($) {
       {
 	libspectrum_byte bytetemp=readbyte( HL );
 	writebyte(DE,bytetemp);
-	contend( DE, 1 ); contend( DE, 1 );
+	contend_write( DE, 1 ); contend_write( DE, 1 );
 	HL$modifier; DE$modifier; BC--;
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
 	  ( bytetemp & FLAG_3 ) | ( (bytetemp & 0x02) ? FLAG_5 : 0 );
 	if(BC) {
-	  contend( DE, 1 ); contend( DE, 1 ); contend( DE, 1 );
-	  contend( DE, 1 ); contend( DE, 1 );
+	  contend_write( DE, 1 ); contend_write( DE, 1 );
+	  contend_write( DE, 1 ); contend_write( DE, 1 );
+	  contend_write( DE, 1 );
 	  PC-=2;
 	}
       }
@@ -301,8 +303,8 @@ sub otir_otdr ($) {
 	/* C,H and P/V flags not implemented */
 	spectrum_contend_port( BC );
 	if(B) {
-	  contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
-	  contend( PC, 1 ); contend( PC - 1, 1 );
+	  contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
+	  contend_read( PC, 1 ); contend_read( PC - 1, 1 );
 	  PC-=2;
 	}
       }
@@ -369,7 +371,7 @@ sub res_set ($$$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 1 );
+	contend_read( HL, 1 );
 	writebyte( HL, bytetemp $operator $hex_mask );
       }
 CODE
@@ -378,7 +380,7 @@ CODE
       {
 	libspectrum_byte bytetemp;
 	bytetemp = readbyte( tempaddr );
-	contend( tempaddr, 1 );
+	contend_read( tempaddr, 1 );
 	writebyte( tempaddr, bytetemp $operator $hex_mask );
       }
 CODE
@@ -395,7 +397,7 @@ sub rotate_shift ($$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte(HL);
-	contend( HL, 1 );
+	contend_read( HL, 1 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
       }
@@ -404,7 +406,7 @@ CODE
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte(tempaddr);
-	contend( tempaddr, 1 );
+	contend_read( tempaddr, 1 );
 	$opcode(bytetemp);
 	writebyte(tempaddr,bytetemp);
       }
@@ -430,7 +432,7 @@ sub opcode_BIT (@) {
 	print << "BIT";
       {
 	libspectrum_byte bytetemp = readbyte( tempaddr );
-	contend( tempaddr, 1 );
+	contend_read( tempaddr, 1 );
 	BIT( $bit, bytetemp );
       }
 BIT
@@ -438,7 +440,7 @@ BIT
 	print << "BIT";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 1 );
+	contend_read( HL, 1 );
 	BIT( $bit, bytetemp );
       }
 BIT
@@ -501,7 +503,7 @@ sub opcode_DJNZ (@) {
       if(B) {
 	JR();
       } else {
-	contend( PC, 3 );
+	contend_read( PC, 3 );
       }
       PC++;
 DJNZ
@@ -550,7 +552,8 @@ EX
 	bytetempl = readbyte( SP );
 	bytetemph = readbyte( SP + 1 ); tstates++;
 	writebyte( SP,     $low  );
-	writebyte( SP + 1, $high ); contend( SP + 1, 1 ); contend( SP + 1, 1 );
+	writebyte( SP + 1, $high );
+	contend_write( SP + 1, 1 ); contend_write( SP + 1, 1 );
 	$low=bytetempl; $high=bytetemph;
       }
 EX
@@ -651,7 +654,7 @@ sub opcode_JR (@) {
       if( $condition_string ) {
         JR();
       } else {
-        contend( PC, 3 );
+        contend_read( PC, 3 );
       }
 JR
     }
@@ -708,8 +711,8 @@ LD
       {
 	libspectrum_byte offset;
 	offset = readbyte( PC );
-	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
-	contend( PC, 1 ); PC++;
+	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
+	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
 	$dest = readbyte( REGISTER + (libspectrum_signed_byte)offset );
       }
 LD
@@ -780,8 +783,8 @@ LD
       {
 	libspectrum_byte offset;
 	offset = readbyte( PC );
-	contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
-	contend( PC, 1 ); PC++;
+	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
+	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
 	writebyte( REGISTER + (libspectrum_signed_byte)offset, $src );
       }
 LD
@@ -791,7 +794,7 @@ LD
 	libspectrum_byte offset, value;
 	offset = readbyte( PC++ );
 	value = readbyte( PC );
-	contend( PC, 1 ); contend( PC, 1 ); PC++;
+	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
 	writebyte( REGISTER + (libspectrum_signed_byte)offset, value );
       }
 LD
@@ -922,7 +925,8 @@ sub opcode_RLD (@) {
     print << "RLD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
+	contend_read( HL, 1 );
 	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
 	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
 	F = ( F & FLAG_C ) | sz53p_table[A];
@@ -957,7 +961,8 @@ sub opcode_RRD (@) {
     print << "RRD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
+	contend_read( HL, 1 );
 	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
 	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
 	F = ( F & FLAG_C ) | sz53p_table[A];
@@ -1020,12 +1025,12 @@ sub opcode_shift (@) {
 	print << "shift";
       {
 	libspectrum_word tempaddr; libspectrum_byte opcode3;
-	contend( PC, 3 );
+	contend_read( PC, 3 );
 	tempaddr =
 	    REGISTER + (libspectrum_signed_byte)readbyte_internal( PC );
-	PC++; contend( PC, 3 );
+	PC++; contend_read( PC, 3 );
 	opcode3 = readbyte_internal( PC );
-	contend( PC, 1 ); contend( PC, 1 ); PC++;
+	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode3) {
 #include "z80_ddfdcb.c"
@@ -1039,7 +1044,7 @@ shift
 	print << "shift";
       {
 	libspectrum_byte opcode2;
-	contend( PC, 4 );
+	contend_read( PC, 4 );
 	opcode2 = readbyte_internal( PC ); PC++;
 	R++;
 #ifdef HAVE_ENOUGH_MEMORY
@@ -1139,7 +1144,7 @@ while(<>) {
 
 	    print << "CODE";
       $register = readbyte(tempaddr) $operator $hexmask;
-      contend( tempaddr, 1 );
+      contend_read( tempaddr, 1 );
       writebyte(tempaddr, $register);
       break;
 CODE
@@ -1147,7 +1152,7 @@ CODE
 
 	    print << "CODE";
       $register=readbyte(tempaddr);
-      contend( tempaddr, 1 );
+      contend_read( tempaddr, 1 );
       $opcode($register);
       writebyte(tempaddr, $register);
       break;

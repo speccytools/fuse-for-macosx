@@ -173,7 +173,8 @@ spec48_common_reset( void )
   memory_map_home[ 4]->contended = memory_map_home[ 5]->contended = 0;
   memory_map_home[ 6]->contended = memory_map_home[ 7]->contended = 0;
 
-  for( i = 0; i < 8; i++ ) memory_map[i] = *memory_map_home[i];
+  for( i = 0; i < 8; i++ )
+    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   return 0;
 }

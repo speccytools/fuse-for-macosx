@@ -150,7 +150,7 @@ z80_do_opcodes( void )
 
   opcode_delay:
 
-    contend( PC, 4 );
+    contend_read( PC, 4 );
 
     /* Check to see if M1 cycles happen on even tstates */
     CHECK( evenm1, even_m1, 3 )

@@ -37,7 +37,8 @@
 #include "ui/ui.h"
 
 /* Each 8Kb RAM chunk accessible by the Z80 */
-memory_page memory_map[8];
+memory_page memory_map_read[8];
+memory_page memory_map_write[8];
 
 /* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
 memory_page memory_map_romcs[2];
@@ -165,7 +166,7 @@ readbyte( libspectrum_word address )
   memory_page *mapping;
 
   bank = address >> 13;
-  mapping = &memory_map[ bank ];
+  mapping = &memory_map_read[ bank ];
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
@@ -184,7 +185,7 @@ writebyte( libspectrum_word address, libspectrum_byte b )
   memory_page *mapping;
 
   bank = address >> 13;
-  mapping = &memory_map[ bank ];
+  mapping = &memory_map_write[ bank ];
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
@@ -204,7 +205,7 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   libspectrum_byte *memory;
 
   bank = address >> 13; offset = address & 0x1fff;
-  mapping = &memory_map[ bank ];
+  mapping = &memory_map_write[ bank ];
   memory = mapping->page;
 
   if( mapping->writable || settings_current.writable_roms ) {
@@ -225,10 +226,22 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 }
 
 void
+memory_update_home( size_t start, size_t n )
+{
+  for( ; n; start++, n-- ) {
+    if( memory_map_read[start].bank == MEMORY_BANK_HOME )
+      memory_map_read[start] = *memory_map_home[start];
+    if( memory_map_write[start].bank == MEMORY_BANK_HOME )
+      memory_map_write[start] = *memory_map_home[start];
+  }
+}
+
+void
 memory_romcs_map( void )
 {
   if( machine_current->ram.romcs ) {
-    memory_map[0] = memory_map_romcs[0];
-    memory_map[1] = memory_map_romcs[1];
+    memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
+    memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
   }
 }
+

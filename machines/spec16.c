@@ -117,7 +117,8 @@ spec16_reset( void )
   /* The RAM page is contended */
   memory_map_home[2]->contended = memory_map_home[3]->contended = 1;
 
-  for( i = 0; i < 8; i++ ) memory_map[i] = *memory_map_home[i];
+  for( i = 0; i < 8; i++ )
+    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;

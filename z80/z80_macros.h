@@ -102,14 +102,20 @@
 
 #ifndef CORETEST
 
-#define contend(address,time) \
-  if( memory_map[ (address) >> 13 ].contended ) \
+#define contend_read(address,time) \
+  if( memory_map_read[ (address) >> 13 ].contended ) \
+    tstates += spectrum_contention[ tstates ]; \
+  tstates += (time);
+
+#define contend_write(address,time) \
+  if( memory_map_write[ (address) >> 13 ].contended ) \
     tstates += spectrum_contention[ tstates ]; \
   tstates += (time);
 
 #else				/* #ifndef CORETEST */
 
-void contend( libspectrum_word address, libspectrum_dword time );
+void contend_read( libspectrum_word address, libspectrum_dword time );
+void contend_write( libspectrum_word address, libspectrum_dword time );
 
 #endif				/* #ifndef CORETEST */
 
@@ -188,7 +194,7 @@ void contend( libspectrum_word address, libspectrum_dword time );
   libspectrum_byte calltempl, calltemph; \
   calltempl=readbyte(PC++);\
   calltemph=readbyte( PC ); \
-  contend( PC, 1 ); PC++;\
+  contend_read( PC, 1 ); PC++;\
   PUSH16(PCL,PCH);\
   PCL=calltempl; PCH=calltemph;\
 }
@@ -267,8 +273,8 @@ break
 #define JR()\
 {\
   libspectrum_signed_byte jrtemp = readbyte( PC ); \
-  contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );\
-  contend( PC, 1 );\
+  contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 ); \
+  contend_read( PC, 1 ); contend_read( PC, 1 ); \
   PC += jrtemp; \
 }
 

@@ -158,7 +158,6 @@ scorpion_reset(void)
 static int
 scorpion_memory_map( void )
 {
-  size_t i;
   int rom;
 
   int page = ( machine_current->ram.last_byte & 0x07 ) |
@@ -201,10 +200,7 @@ scorpion_memory_map( void )
     memory_map_home[0] = &memory_map_ram[ 0 ];
     memory_map_home[1] = &memory_map_ram[ 1 ];
     machine_current->ram.special = 1;
-
-    for( i = 0; i < 2; i++ )
-      if( memory_map[i].bank == MEMORY_BANK_HOME )
-	memory_map[i] = *memory_map_home[i];
+    memory_update_home( 0, 2 );
 
   } else {
     spec128_select_rom( rom );

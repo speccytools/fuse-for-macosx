@@ -223,7 +223,7 @@ spec_se_reset( void )
 static int
 spec_se_memory_map( void )
 {
-  memory_page **exrom_dock;
+  memory_page **exrom_dock, **bank;
 
   /* Spectrum SE memory paging is just a combination of the 128K
      0x7ffd and TimexDOCK/EXROM paging schemes with some small
@@ -240,10 +240,11 @@ spec_se_memory_map( void )
   exrom_dock = 
     scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
 
-  memory_map[6] =
-    scld_last_hsr & ( 1 << 2 ) ? *exrom_dock[6] : *memory_map_home[6];
-  memory_map[7] =
-    scld_last_hsr & ( 1 << 3 ) ? *exrom_dock[7] : *memory_map_home[7];
+  bank = scld_last_hsr & ( 1 << 2 ) ? exrom_dock : memory_map_home;
+  memory_map_read[6] = memory_map_write[6] = *bank[6];
+
+  bank = scld_last_hsr & ( 1 << 3 ) ? exrom_dock : memory_map_home;
+  memory_map_read[7] = memory_map_write[7] = *bank[7];
 
   return 0;
 }

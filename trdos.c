@@ -214,31 +214,23 @@ trdos_end( void )
 void
 trdos_page( void )
 {
-  size_t i;
-
   trdos_active = 1;
   memory_map_home[0] = &memory_map_rom[4];
   memory_map_home[1] = &memory_map_rom[5];
 
-  for( i = 0; i < 2; i++ )
-    if( memory_map[i].bank == MEMORY_BANK_HOME )
-      memory_map[i] = *memory_map_home[i];
+  memory_update_home( 0, 2 );
 }
 
 void
 trdos_unpage( void )
 {
-  size_t i;
-
   trdos_active = 0;
   memory_map_home[0] = 
     &memory_map_rom[ 2 * machine_current->ram.current_rom     ];
   memory_map_home[1] =
     &memory_map_rom[ 2 * machine_current->ram.current_rom + 1 ];
 
-  for( i = 0; i < 2; i++ )
-    if( memory_map[i].bank == MEMORY_BANK_HOME )
-      memory_map[i] = *memory_map_home[i];
+  memory_update_home( 0, 2 );
 }
 
 static
