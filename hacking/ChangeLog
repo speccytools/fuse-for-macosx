@@ -863,3 +863,5 @@
 20040527 snapshot.c: Save Timex HSR register for the Spectrum SE.
 20040527 snapshot.c: Use existing memory pages for Dock/Exrom when loading SE
          snapshots.
+20040527 snapshot.c: Enable dock cartridge eject menu item when loading 2068
+         snapshots with Dock cartridges installed.

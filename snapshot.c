@@ -334,7 +334,8 @@ snapshot_copy_from( libspectrum_snap *snap )
 
     }
 
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 1 );
+    if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK )
+      ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 1 );
 
     machine_current->memory_map();
   }
