@@ -340,23 +340,15 @@ uidisplay_area( int x, int y, int width, int height )
 
   /* Extend the dirty region by 1 pixel for scalers
      that "smear" the screen, e.g. 2xSAI */
-  if( scaler_flags & SCALER_EXPAND_1_PIXEL ) {
-    x--;
-    y--;
-    width+=2;   
-    height+=2;
-  } else if ( scaler_flags & SCALER_EXPAND_2_Y_PIXELS ) {
-    y-=2;
-    height+=4;
-  }
+  if( scaler_flags & SCALER_FLAGS_EXPAND ) {
+    
+    scaler_expander( &x, &y, &w, &h );
 
-  /* clip */
-  if ( x < 0 ) { width+=x; x=0; }
-  if ( y < 0 ) { height+=y; y=0; }
-  if ( width > image_width - x )
-    width = image_width - x;
-  if ( height > image_height - y )
-    height = image_height - y;
+    if ( x < 0 ) { width+=x; x=0; }
+    if ( y < 0 ) { height+=y; y=0; }
+    if ( width > image_width - x ) width = image_width - x;
+    if ( height > image_height - y ) height = image_height - y;
+  }
 
   updated_rects[num_rects].x = x;
   updated_rects[num_rects].y = y;

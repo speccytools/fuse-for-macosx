@@ -255,20 +255,12 @@ uidisplay_area( int x, int y, int w, int h )
   float scale = (float)gtkdisplay_current_size / image_scale;
   int scaled_x, scaled_y, xx, yy;
 
-  if( scaler_flags ) {
+  /* Extend the dirty region by 1 pixel for scalers
+     that "smear" the screen, e.g. 2xSAI */
+  if( scaler_flags & SCALER_FLAGS_EXPAND ) {
 
-    /* Extend the dirty region by 1 pixel for scalers
-       that "smear" the screen, e.g. 2xSAI */
-    if( scaler_flags & SCALER_EXPAND_1_PIXEL ) {
-      x--;
-      y--;
-      w += 2;   
-      h += 2;
-    } else if ( scaler_flags & SCALER_EXPAND_2_Y_PIXELS ) {
-      y -= 2;
-      h += 4;
-    }
-
+    scaler_expander( &x, &y, &w, &h );
+    
     /* clip */
     if ( x < 0 ) { w += x; x=0; }
     if ( y < 0 ) { h += y; y=0; }

@@ -44,40 +44,48 @@ struct scaler_info {
   enum scaler_flags_t flags;
   float scaling_factor;
   ScalerProc *scaler16, *scaler32;
+  scaler_expand_fn *expander;
 
 };
+
+/* The expander functions */
+static void expand_1( int *x, int *y, int *w, int *h );
+static void expand_tv( int *x, int *y, int *w, int *h );
+static void expand_timextv( int *x, int *y, int *w, int *h );
+static void expand_sai( int *x, int *y, int *w, int *h );
 
 /* Information on each of the available scalers. Make sure this array stays
    in the same order as scaler.h:scaler_type */
 static struct scaler_info available_scalers[] = {
 
   { "Timex Half (smoothed)", "half", SCALER_FLAGS_NONE,	       0.5,
-    scaler_Half_16,       scaler_Half_32                            },
+    scaler_Half_16,       scaler_Half_32,       NULL                },
   { "Timex Half (skipping)", "halfskip", SCALER_FLAGS_NONE,    0.5,
-    scaler_HalfSkip_16,   scaler_HalfSkip_32                        },
+    scaler_HalfSkip_16,   scaler_HalfSkip_32,   NULL                },
   { "Normal",	       "normal",     SCALER_FLAGS_NONE,	       1.0, 
-    scaler_Normal1x_16,   scaler_Normal1x_32                        },
+    scaler_Normal1x_16,   scaler_Normal1x_32,   NULL                },
   { "Double size",     "2x",	     SCALER_FLAGS_NONE,	       2.0, 
-    scaler_Normal2x_16,   scaler_Normal2x_32                        },
+    scaler_Normal2x_16,   scaler_Normal2x_32,   NULL                },
   { "Triple size",     "3x",	     SCALER_FLAGS_NONE,	       3.0, 
-    scaler_Normal3x_16,   scaler_Normal3x_32			    },
-  { "2xSaI",	       "2xsai",	     SCALER_EXPAND_1_PIXEL,    2.0, 
-    scaler_2xSaI_16,      scaler_2xSaI_32                           },
-  { "Super 2xSaI",     "super2xsai", SCALER_EXPAND_1_PIXEL,    2.0, 
-    scaler_Super2xSaI_16, scaler_2xSaI_32                           },
-  { "SuperEagle",      "supereagle", SCALER_EXPAND_1_PIXEL,    2.0, 
-    scaler_SuperEagle_16, scaler_SuperEagle_32                      },
-  { "AdvMAME 2x",      "advmame2x",  SCALER_EXPAND_1_PIXEL,    2.0, 
-    scaler_AdvMame2x_16,  scaler_AdvMame2x_32		            },
-  { "TV 2x",	       "tv2x",	     SCALER_EXPAND_1_PIXEL,    2.0, 
-    scaler_TV2x_16,       scaler_TV2x_32                            },
-  { "Timex TV",	       "timextv",    SCALER_EXPAND_2_Y_PIXELS, 1.0, 
-    scaler_TimexTV_16,    scaler_TimexTV_32		            },
+    scaler_Normal3x_16,   scaler_Normal3x_32,   NULL		    },
+  { "2xSaI",	       "2xsai",	     SCALER_FLAGS_EXPAND,      2.0, 
+    scaler_2xSaI_16,      scaler_2xSaI_32,      expand_sai          },
+  { "Super 2xSaI",     "super2xsai", SCALER_FLAGS_EXPAND,      2.0, 
+    scaler_Super2xSaI_16, scaler_2xSaI_32,      expand_sai          },
+  { "SuperEagle",      "supereagle", SCALER_FLAGS_EXPAND,      2.0, 
+    scaler_SuperEagle_16, scaler_SuperEagle_32, expand_sai          },
+  { "AdvMAME 2x",      "advmame2x",  SCALER_FLAGS_EXPAND,      2.0, 
+    scaler_AdvMame2x_16,  scaler_AdvMame2x_32,  expand_1            },
+  { "TV 2x",	       "tv2x",	     SCALER_FLAGS_EXPAND,      2.0, 
+    scaler_TV2x_16,       scaler_TV2x_32,       expand_tv           },
+  { "Timex TV",	       "timextv",    SCALER_FLAGS_EXPAND,      1.0, 
+    scaler_TimexTV_16,    scaler_TimexTV_32,    expand_timextv      },
 };
 
 scaler_type current_scaler = SCALER_NUM;
 ScalerProc *scaler_proc16, *scaler_proc32;
 scaler_flags_t scaler_flags;
+scaler_expand_fn *scaler_expander;
 
 int
 scaler_select_scaler( scaler_type scaler )
@@ -99,6 +107,7 @@ scaler_select_scaler( scaler_type scaler )
   scaler_proc16 = scaler_get_proc16( current_scaler );
   scaler_proc32 = scaler_get_proc32( current_scaler );
   scaler_flags = scaler_get_flags( current_scaler );
+  scaler_expander = scaler_get_expander( current_scaler );
 
   uidisplay_hotswap_gfx_mode();
 
@@ -170,4 +179,40 @@ float
 scaler_get_scaling_factor( scaler_type scaler )
 {
   return available_scalers[scaler].scaling_factor;
+}
+
+scaler_expand_fn*
+scaler_get_expander( scaler_type scaler )
+{
+  return available_scalers[scaler].expander;
+}
+
+/* The expansion functions */
+
+/* Expand one pixel in all directions */
+static void
+expand_1( int *x, int *y, int *w, int *h )
+{
+  (*x)--; (*y)--; (*w)+=2; (*h)+=2;
+}
+
+/* Expand one pixel upwards */
+static void
+expand_tv( int *x, int *y, int *w, int *h )
+{
+  if( *y ) { (*y)--; (*h)++; }
+}
+
+/* Expand two pixels in upwards */
+static void
+expand_timextv( int *x, int *y, int *w, int *h )
+{
+  (*y)-=2; (*h)+=2;
+}
+
+/* Expand two pixels up and left and one pixel down and right */
+static void
+expand_sai( int *x, int *y, int *w, int *h )
+{
+  (*x)-=2; (*y)-=2; (*w)+=3; (*h)+=3;
 }
