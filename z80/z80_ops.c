@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 #include "event.h"
+#include "rzx.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "tape.h"
@@ -59,7 +60,7 @@ void z80_do_opcodes()
     }
 
     contend( PC, 4 );
-    opcode=readbyte(PC++); R++;
+    opcode=readbyte(PC++); R++; rzx_instructions++;
 
     switch(opcode) {
     case 0x00:		/* NOP */
@@ -839,7 +840,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 );
 	opcode2 = readbyte(PC++);
-	R++;
+	R++; rzx_instructions++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #include "z80_cb.c"
@@ -944,7 +945,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 );
 	opcode2 = readbyte(PC++);
-	R++;
+	R++; rzx_instructions++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #define REGISTER  IX
@@ -1038,7 +1039,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 );
 	opcode2 = readbyte(PC++);
-	R++;
+	R++; rzx_instructions++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #include "z80_ed.c"
@@ -1120,7 +1121,7 @@ void z80_do_opcodes()
 	BYTE opcode2;
 	contend( PC, 4 ); 
 	opcode2 = readbyte(PC++);
-	R++;
+	R++; rzx_instructions++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode2) {
 #define REGISTER  IY

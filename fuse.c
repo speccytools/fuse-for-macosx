@@ -34,6 +34,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "printer.h"
+#include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -77,10 +78,14 @@ int main(int argc,char **argv)
   if( settings_current.show_help ||
       settings_current.show_version ) return 0;
 
+  rzx_start_recording();
+
   while( !fuse_exiting ) {
     z80_do_opcodes();
     event_do_events();
   }
+
+  rzx_stop_recording();
 
   fuse_end();
   
@@ -114,6 +119,7 @@ static int fuse_init(int argc, char **argv)
   if(event_init()) return 1;
   
   if( printer_init() ) return 1;
+  if( rzx_init() ) return 1;
 
   fuse_sound_in_use = 0;
   sound_init();

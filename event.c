@@ -38,6 +38,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "rzx.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "spectrum.h"
@@ -113,6 +114,7 @@ int event_do_events(void)
     case EVENT_TYPE_INTERRUPT:
       spectrum_interrupt();
       ui_event();
+      rzx_frame();
       break;
     case EVENT_TYPE_LINE:
       display_line();

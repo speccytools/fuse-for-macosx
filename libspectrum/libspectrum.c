@@ -197,3 +197,14 @@ int libspectrum_write_word( uchar **buffer, libspectrum_word w )
   *(*buffer)++ = w >> 8;
   return LIBSPECTRUM_ERROR_NONE;
 }
+
+/* Write an LSB dword to buffer */
+int libspectrum_write_dword( libspectrum_byte **buffer, libspectrum_dword d )
+{
+  *(*buffer)++ = d & 0x000000ff      ;
+  *(*buffer)++ = d & 0x0000ff00 >>  8;
+  *(*buffer)++ = d & 0x00ff0000 >> 16;
+  *(*buffer)++ = d & 0xff000000 >> 24;
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
