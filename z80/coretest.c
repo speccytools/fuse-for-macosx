@@ -249,10 +249,10 @@ dump_memory_state( void )
 
     if( memory[ i ] == initial_memory[ i ] ) continue;
 
-    printf( "%4x ", (unsigned)i );
+    printf( "%04x ", (unsigned)i );
 
     while( i < 0x10000 && memory[ i ] != initial_memory[ i ] )
-      printf( "%2x ", memory[ i++ ] );
+      printf( "%02x ", memory[ i++ ] );
 
     printf( "-1\n" );
   }
