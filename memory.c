@@ -32,6 +32,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "if2.h"
+#include "machines/spec128.h"
 #include "memory.h"
 #include "settings.h"
 #include "spectrum.h"
