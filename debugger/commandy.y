@@ -47,6 +47,7 @@ void yyerror( char *s );
 %}
 
 %token BREAK
+%token CLEAR
 %token CONTINUE
 %token NEXT
 %token SHOW
@@ -64,6 +65,8 @@ input:   /* empty */
 
 command:   BREAK    { debugger_breakpoint_add( PC,
 		        DEBUGGER_BREAKPOINT_TYPE_PERMANENT ); }
+         | BREAK CLEAR { debugger_breakpoint_remove_all(); }
+         | BREAK CLEAR NUMBER { debugger_breakpoint_remove( $3 ); }
 	 | BREAK NUMBER { debugger_breakpoint_add( $2,
 			    DEBUGGER_BREAKPOINT_TYPE_PERMANENT ); }
 	 | BREAK SHOW { debugger_breakpoint_show(); }

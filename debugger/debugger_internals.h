@@ -27,9 +27,9 @@
 #ifndef FUSE_DEBUGGER_INTERNALS_H
 #define FUSE_DEBUGGER_INTERNALS_H
 
-/* Add a breakpoint */
 int debugger_breakpoint_add( WORD pc, enum debugger_breakpoint_type type );
-
+int debugger_breakpoint_remove( size_t n );
+int debugger_breakpoint_remove_all( void );
 int debugger_breakpoint_show( void );
 
 /* Callback used by the flex parser to get input */

@@ -53,22 +53,16 @@ debugger_init( void )
 int
 debugger_reset( void )
 {
-  g_slist_foreach( debugger_breakpoints, free_breakpoint, NULL );
+  debugger_breakpoint_remove_all();
   debugger_mode = DEBUGGER_MODE_INACTIVE;
 
   return 0;
 }
 
-static void
-free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
-{
-  free( data );
-}
-
 int
 debugger_end( void )
 {
-  g_slist_foreach( debugger_breakpoints, free_breakpoint, NULL );
+  debugger_breakpoint_remove_all();
   return 0;
 }
 
@@ -170,6 +164,43 @@ debugger_breakpoint_add( WORD pc, debugger_breakpoint_type type )
   return 0;
 }
 
+/* Remove the 'n'th breakpoint */
+int
+debugger_breakpoint_remove( size_t n )
+{
+  GSList *ptr;
+
+  ptr = g_slist_nth( debugger_breakpoints, n );
+  if( !ptr ) return 1;
+
+  debugger_breakpoints = g_slist_remove( debugger_breakpoints, ptr->data );
+  if( debugger_mode == DEBUGGER_MODE_ACTIVE && !debugger_breakpoints )
+    debugger_mode = DEBUGGER_MODE_INACTIVE;
+
+  free( ptr->data );
+
+  return 0;
+}
+
+/* Remove all breakpoints */
+int
+debugger_breakpoint_remove_all( void )
+{
+  g_slist_foreach( debugger_breakpoints, free_breakpoint, NULL );
+  g_slist_free( debugger_breakpoints ); debugger_breakpoints = NULL;
+
+  if( debugger_mode == DEBUGGER_MODE_ACTIVE )
+    debugger_mode = DEBUGGER_MODE_INACTIVE;
+
+  return 0;
+}
+
+static void
+free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
+{
+  free( data );
+}
+
 /* Show all breakpoints */
 int
 debugger_breakpoint_show( void )
@@ -193,4 +224,3 @@ show_breakpoint( gpointer data, gpointer user_data )
 
   (*index)++;
 }
-

@@ -48,6 +48,7 @@ HEX	[0-9a-fA-F]
 
 b|br|bre|brea|break { return BREAK; }
 c|co|con|cont|contin|continu|continue { return CONTINUE; }
+cl|cle|clea|clear { return CLEAR; }
 n|ne|nex|next { return NEXT; }
 sh|sho|show { return SHOW; }
 s|st|ste|step { return STEP; }
