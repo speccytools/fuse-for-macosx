@@ -442,8 +442,6 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
 /* Tidy-up function called at end of emulation */
 static int fuse_end(void)
 {
-  int error;
-
   /* Must happen before memory is deallocated as we read the character
      set from memory for the text output */
   printer_end();
@@ -452,8 +450,7 @@ static int fuse_end(void)
   rzx_end();
   debugger_end();
 
-  error = machine_end();
-  if( error ) return error;
+  machine_end();
 
 #ifdef UI_SDL
   timer_end();
