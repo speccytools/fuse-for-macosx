@@ -50,6 +50,7 @@
 #include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+#include "zxatasp.h"
 #include "zxcf.h"
 
 int snapshot_read( const char *filename )
@@ -244,6 +245,30 @@ snapshot_copy_from( libspectrum_snap *snap )
     slt_screen_level = libspectrum_snap_slt_screen_level( snap );
   }
 
+  if( libspectrum_snap_zxatasp_active( snap ) ) {
+
+    libspectrum_byte portA, portB, portC, control;
+    size_t page;
+
+    settings_current.zxatasp_active = 1;
+    settings_current.zxatasp_upload = libspectrum_snap_zxatasp_upload( snap );
+    settings_current.zxatasp_wp =
+      libspectrum_snap_zxatasp_writeprotect( snap );
+
+    portA   = libspectrum_snap_zxatasp_port_a ( snap );
+    portB   = libspectrum_snap_zxatasp_port_b ( snap );
+    portC   = libspectrum_snap_zxatasp_port_c ( snap );
+    control = libspectrum_snap_zxatasp_control( snap );
+    page    = libspectrum_snap_zxatasp_current_page( snap );
+
+    zxatasp_restore( portA, portB, portC, control, page );
+
+    for( i = 0; i < libspectrum_snap_zxatasp_pages( snap ); i++ )
+      if( libspectrum_snap_zxatasp_ram( snap, i ) )
+	memcpy( zxatasp_ram( i ), libspectrum_snap_zxatasp_ram( snap, i ),
+		0x4000 );
+  }
+    
   if( libspectrum_snap_zxcf_active( snap ) ) {
 
     settings_current.zxcf_active = 1;
@@ -505,6 +530,49 @@ snapshot_copy_to( libspectrum_snap *snap )
     memcpy( buffer, slt_screen, 6912 );
     libspectrum_snap_set_slt_screen( snap, buffer );
     libspectrum_snap_set_slt_screen_level( snap, slt_screen_level );
+  }
+
+  if( settings_current.zxatasp_active ) {
+
+    libspectrum_byte value;
+    int attached;
+
+    libspectrum_snap_set_zxatasp_active( snap, 1 );
+
+    libspectrum_snap_set_zxatasp_upload( snap,
+					 settings_current.zxatasp_upload );
+    libspectrum_snap_set_zxatasp_writeprotect( snap,
+					       settings_current.zxatasp_wp );
+
+    value = zxatasp_portA_read( 0x009f, &attached );
+    libspectrum_snap_set_zxatasp_port_a( snap, value );
+
+    value = zxatasp_portB_read( 0x019f, &attached );
+    libspectrum_snap_set_zxatasp_port_b( snap, value );
+
+    value = zxatasp_portC_read( 0x029f, &attached );
+    libspectrum_snap_set_zxatasp_port_c( snap, value );
+
+    value = zxatasp_control_read( 0x039f, &attached );
+    libspectrum_snap_set_zxatasp_control( snap, value );
+
+    libspectrum_snap_set_zxatasp_current_page( snap, zxatasp_current_page() );
+
+    libspectrum_snap_set_zxatasp_pages( snap, 32 );
+
+    for( i = 0; i < 32; i++ ) {
+
+      buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
+      if( !buffer ) {
+	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+		  __LINE__ );
+	return 1;
+      }
+
+      memcpy( buffer, zxatasp_ram( i ), 0x4000 );
+      libspectrum_snap_set_zxatasp_ram( snap, i, buffer );
+
+    }
   }
 
   if( settings_current.zxcf_active ) {
