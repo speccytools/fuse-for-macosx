@@ -32,9 +32,9 @@
 #define FUSE_SCALER_INTERNALS_H
 
 #define DECLARE_SCALER( name ) \
-         extern void scaler_##name##_16( BYTE *srcPtr, DWORD srcPitch, \
+         extern void scaler_##name##_16( const BYTE *srcPtr, DWORD srcPitch, \
                         BYTE *dstPtr, DWORD dstPitch, int width, int height); \
-         extern void scaler_##name##_32( BYTE *srcPtr, DWORD srcPitch, \
+         extern void scaler_##name##_32( const BYTE *srcPtr, DWORD srcPitch, \
                         BYTE *dstPtr, DWORD dstPitch, int width, int height)
 
 DECLARE_SCALER(2xSaI);

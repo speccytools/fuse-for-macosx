@@ -153,69 +153,24 @@ static const DWORD dotmatrix[16] = {
 #endif				/* #if SCALER_DATA_SIZE == 2 or 4 */
 
 static inline int 
-GetResult1(DWORD A, DWORD B, DWORD C, DWORD D, DWORD E)
-{
-  int x = 0;
-  int y = 0;
-  int r = 0;
-
-  if (A == C)
-    x += 1;
-  else if (B == C)
-    y += 1;
-  if (A == D)
-    x += 1;
-  else if (B == D)
-    y += 1;
-  if (x <= 1)
-    r += 1;
-  if (y <= 1)
-    r -= 1;
-  return r;
-}
-
-static inline int 
-GetResult2(DWORD A, DWORD B, DWORD C, DWORD D, DWORD E)
-{
-  int x = 0;
-  int y = 0;
-  int r = 0;
-
-  if (A == C)
-    x += 1;
-  else if (B == C)
-    y += 1;
-  if (A == D)
-    x += 1;
-  else if (B == D)
-    y += 1;
-  if (x <= 1)
-    r -= 1;
-  if (y <= 1)
-    r += 1;
-  return r;
-}
-
-static inline int 
 GetResult(DWORD A, DWORD B, DWORD C, DWORD D)
 {
-  int x = 0;
-  int y = 0;
-  int r = 0;
-
-  if (A == C)
-    x += 1;
-  else if (B == C)
-    y += 1;
-  if (A == D)
-    x += 1;
-  else if (B == D)
-    y += 1;
-  if (x <= 1)
-    r += 1;
-  if (y <= 1)
-    r -= 1;
-  return r;
+  const int ac = (A==C);
+  const int bc = (B==C);
+  const int x1 = ac;
+  const int y1 = (bc & !ac);
+  const int ad = (A==D);
+  const int bd = (B==D);
+  const int x2 = ad;
+  const int y2 = (bd & !ad);
+  const int x = x1+x2;
+  const int y = y1+y2;
+  static const int rmap[3][3] = {
+      {0, 0, -1},
+      {0, 0, -1},
+      {1, 1,  0}
+    };
+  return rmap[y][x];
 }
 
 static inline DWORD 
@@ -240,18 +195,19 @@ Q_INTERPOLATE(DWORD A, DWORD B, DWORD C, DWORD D)
 }
 
 void 
-FUNCTION( scaler_Super2xSaI )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_Super2xSaI )( const BYTE *srcPtr, DWORD srcPitch,
 	BYTE *dstPtr, DWORD dstPitch, int width, int height)
 {
-  scaler_data_type *bP, *dP;
+  const scaler_data_type *bP;
+  scaler_data_type *dP;
 
   {
-    DWORD Nextline = srcPitch / sizeof( scaler_data_type );
+    const DWORD Nextline = srcPitch / sizeof( scaler_data_type );
     DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
     DWORD finish;
 
     while (height--) {
-      bP = (scaler_data_type*)srcPtr;
+      bP = (const scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
 
       for( finish = width; finish; finish-- ) {
@@ -350,19 +306,20 @@ FUNCTION( scaler_Super2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_SuperEagle )( const BYTE *srcPtr, DWORD srcPitch,
 			       BYTE *dstPtr, DWORD dstPitch,
 			       int width, int height )
 {
-  scaler_data_type *bP, *dP;
+  const scaler_data_type *bP;
+  scaler_data_type *dP;
 
   {
     DWORD finish;
-    DWORD Nextline = srcPitch / sizeof( scaler_data_type );
+    const DWORD Nextline = srcPitch / sizeof( scaler_data_type );
     DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
 
     while (height--) {
-      bP = (scaler_data_type*)srcPtr;
+      bP = (const scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
       for( finish = width; finish; finish-- ) {
 	DWORD color4, color5, color6;
@@ -460,10 +417,11 @@ FUNCTION( scaler_SuperEagle )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_2xSaI )( const BYTE *srcPtr, DWORD srcPitch,
 			  BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
-  scaler_data_type *bP, *dP;
+  const scaler_data_type *bP;
+  scaler_data_type *dP;
 
   {
     DWORD Nextline = srcPitch / sizeof( scaler_data_type );
@@ -471,7 +429,7 @@ FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 
     while (height--) {
       DWORD finish;
-      bP = (scaler_data_type*)srcPtr;
+      bP = (const scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
 
       for( finish = width; finish; finish-- ) {
@@ -552,10 +510,10 @@ FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 	    product1 = INTERPOLATE(colorA, colorC);
 	    product = INTERPOLATE(colorA, colorB);
 
-	    r += GetResult1(colorA, colorB, colorG, colorE, colorI);
-	    r += GetResult2(colorB, colorA, colorK, colorF, colorJ);
-	    r += GetResult2(colorB, colorA, colorH, colorN, colorM);
-	    r += GetResult1(colorA, colorB, colorL, colorO, colorP);
+	    r += GetResult(colorA, colorB, colorG, colorE);
+	    r += GetResult(colorB, colorA, colorK, colorF);
+	    r += GetResult(colorB, colorA, colorH, colorN);
+	    r += GetResult(colorA, colorB, colorL, colorO);
 
 	    if (r > 0)
 	      product2 = colorA;
@@ -602,12 +560,12 @@ FUNCTION( scaler_2xSaI )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_AdvMame2x )( const BYTE *srcPtr, DWORD srcPitch,
 			      BYTE *dstPtr, DWORD dstPitch,
 			      int width, int height )
 {
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  scaler_data_type *p = (scaler_data_type*) srcPtr;
+  const scaler_data_type *p = (const scaler_data_type*) srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*) dstPtr;
@@ -644,12 +602,12 @@ FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_AdvMame3x )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_AdvMame3x )( const BYTE *srcPtr, DWORD srcPitch,
 			      BYTE *dstPtr, DWORD dstPitch,
 			      int width, int height )
 {
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  scaler_data_type *p = (scaler_data_type*) srcPtr;
+  const scaler_data_type *p = (const scaler_data_type*) srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*) dstPtr;
@@ -691,7 +649,7 @@ FUNCTION( scaler_AdvMame3x )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Half )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_Half )( const BYTE *srcPtr, DWORD srcPitch,
 			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   scaler_data_type *r;
@@ -715,7 +673,7 @@ FUNCTION( scaler_Half )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_HalfSkip )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_HalfSkip )( const BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch, int width,
 			     int height )
 {
@@ -737,7 +695,7 @@ FUNCTION( scaler_HalfSkip )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_Normal1x )( const BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )
 {
@@ -749,15 +707,16 @@ FUNCTION( scaler_Normal1x )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Normal2x )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_Normal2x )( const BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )
 {
-  scaler_data_type i, *s, *d, *d2;
+  const scaler_data_type *s;
+  scaler_data_type i, *d, *d2;
 
   while( height-- ) {
 
-    for( i = 0, s = (scaler_data_type*)srcPtr,
+    for( i = 0, s = (const scaler_data_type*)srcPtr,
 	   d = (scaler_data_type*)dstPtr,
 	   d2 = (scaler_data_type*)(dstPtr + dstPitch);
 	 i < width;
@@ -771,7 +730,7 @@ FUNCTION( scaler_Normal2x )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_Normal3x )( const BYTE *srcPtr, DWORD srcPitch,
 			     BYTE *dstPtr, DWORD dstPitch,
 			     int width, int height )
 {
@@ -783,7 +742,7 @@ FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch,
     int i;
     r = dstPtr;
     for (i = 0; i < width; ++i, r += 3 * SCALER_DATA_SIZE ) {
-      scaler_data_type color = *(((scaler_data_type*) srcPtr) + i);
+      scaler_data_type color = *(((const scaler_data_type*) srcPtr) + i);
 
       *(scaler_data_type*)( r +                    0             ) = color;
       *(scaler_data_type*)( r +     SCALER_DATA_SIZE             ) = color;
@@ -801,12 +760,12 @@ FUNCTION( scaler_Normal3x )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void
-FUNCTION( scaler_TV2x )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_TV2x )( const BYTE *srcPtr, DWORD srcPitch,
 			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
 {
   int i, j;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  scaler_data_type *p = (scaler_data_type*)srcPtr;
+  const scaler_data_type *p = (const scaler_data_type*)srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*)dstPtr;
@@ -830,13 +789,13 @@ FUNCTION( scaler_TV2x )( BYTE *srcPtr, DWORD srcPitch,
 }
 
 void
-FUNCTION( scaler_TimexTV )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_TimexTV )( const BYTE *srcPtr, DWORD srcPitch,
 			    BYTE *dstPtr, DWORD dstPitch,
 			    int width, int height )
 {
   int i, j;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  scaler_data_type *p = (scaler_data_type *)srcPtr;
+  const scaler_data_type *p = (const scaler_data_type *)srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type *)dstPtr;
@@ -864,13 +823,13 @@ static inline scaler_data_type DOT_16(scaler_data_type c, int j, int i) {
 }
 
 void
-FUNCTION( scaler_DotMatrix )( BYTE *srcPtr, DWORD srcPitch,
+FUNCTION( scaler_DotMatrix )( const BYTE *srcPtr, DWORD srcPitch,
 			    BYTE *dstPtr, DWORD dstPitch,
 			    int width, int height )
 {
   int i, j, ii, jj;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
-  scaler_data_type *p = (scaler_data_type *)srcPtr;
+  const scaler_data_type *p = (const scaler_data_type *)srcPtr;
 
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type *)dstPtr;

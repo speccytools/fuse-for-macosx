@@ -49,7 +49,7 @@ typedef enum scaler_flags_t {
   SCALER_FLAGS_EXPAND      = 1 << 0,
 } scaler_flags_t;
 
-typedef void ScalerProc(BYTE *srcPtr, DWORD srcPitch,
+typedef void ScalerProc(const BYTE *srcPtr, DWORD srcPitch,
 	                BYTE *dstPtr, DWORD dstPitch, int width, int height);
 
 /* The type of function used to expand the area dirtied by a scaler */
