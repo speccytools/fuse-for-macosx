@@ -47,6 +47,9 @@
 /* Defined if framebuffer UI in use */
 #undef UI_FB
 
+/* Defined if GGI UI in use */
+#undef UI_GGI
+
 /* Defined if GTK+ UI in use */
 #undef UI_GTK
 

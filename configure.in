@@ -89,7 +89,7 @@ if test "$svgalib" = yes; then
   AC_CHECK_HEADER(vga.h,
                   LIBS="$LIBS -lvga"; AC_DEFINE(UI_SVGA) AC_DEFINE(USE_WIDGET)
                   ui=svga;
-                  UI_LIBS="ui/svga/libuisvga.a ui/scaler/libscaler.a widget/libwidget.a",
+                  UI_LIBS="ui/svga/libuisvga.a widget/libwidget.a",
                   AC_MSG_ERROR([svgalib not found]))
 fi
 
@@ -117,7 +117,7 @@ if test -z "$ui"; then
   fb=no)
   AC_MSG_RESULT($fb)
   if test "$fb" = yes; then
-    AC_DEFINE(UI_FB) AC_DEFINE(USE_WIDGET) ui=fb; UI_LIBS="ui/fb/libuifb.a ui/scaler/libscaler.a widget/libwidget.a"
+    AC_DEFINE(UI_FB) AC_DEFINE(USE_WIDGET) ui=fb; UI_LIBS="ui/fb/libuifb.a widget/libwidget.a"
   fi
 fi
 
@@ -133,12 +133,29 @@ if test -z "$ui"; then
     SDL_VERSION=1.2.4
     AM_PATH_SDL($SDL_VERSION,
 		AC_DEFINE(UI_SDL) AC_DEFINE(USE_WIDGET) ui=sdl
-	        UI_LIBS="ui/sdl/libuisdl.a ui/scaler/libscaler.a widget/libwidget.a", 
+	        UI_LIBS="ui/sdl/libuisdl.a widget/libwidget.a", 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
     CFLAGS="$CFLAGS $SDL_CFLAGS"
     CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
     LIBS="$LIBS $SDL_LIBS"
   fi
+fi
+
+dnl Look for GGI (default=no)
+if test -z "$ui"; then
+  AC_MSG_CHECKING(whether GGI UI requested)
+  AC_ARG_WITH(ggi,
+  [  --with-ggi              use GGI for user interface],
+  if test "$withval" = no; then sdl=no; else ggi=yes; fi,
+  ggi=no)
+  AC_MSG_RESULT($ggi)
+  if test "$ggi" = yes; then
+    AC_CHECK_HEADER(ggi/ggi.h,
+	            AC_DEFINE(UI_GGI) AC_DEFINE(USE_WIDGET) ui=ggi
+	            UI_LIBS="ui/ggi/libuiggi.a widget/libwidget.a",
+	            AC_MSG_ERROR([ggi/ggi.h not found]))
+  fi
+  LIBS="$LIBS -lggi"
 fi
 
 dnl Disabled until the font handling is fixed [PAK 20030326]
@@ -169,7 +186,7 @@ if test -z "$ui"; then
   if test "$gtk" = yes; then
     AM_PATH_GTK(1.2.0,
 		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB)
-		ui=gtk; UI_LIBS="ui/gtk/libuigtk.a ui/scaler/libscaler.a",
+		ui=gtk; UI_LIBS="ui/gtk/libuigtk.a",
 		AC_MSG_WARN([GTK+ not found. Reverting to Xlib UI]))
   fi
 fi
@@ -205,7 +222,7 @@ if test -z "$ui"; then
   AC_DEFINE(UI_X)
   ui=xlib
   AC_DEFINE(USE_WIDGET)
-  UI_LIBS="ui/xlib/libuixlib.a ui/scaler/libscaler.a widget/libwidget.a"
+  UI_LIBS="ui/xlib/libuixlib.a widget/libwidget.a"
 fi
 
 AC_SUBST(UI_LIBS)
@@ -333,6 +350,11 @@ fi
 AC_OUTPUT(Makefile debugger/Makefile getopt/Makefile hacking/Makefile \
 lib/Makefile \
 man/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \
-ui/Makefile ui/aalib/Makefile ui/fb/Makefile ui/gtk/Makefile ui/svga/Makefile \
+ui/Makefile \
+ui/aalib/Makefile \
+ui/fb/Makefile \
+ui/ggi/Makefile \
+ui/gtk/Makefile \
+ui/svga/Makefile \
 ui/sdl/Makefile ui/scaler/Makefile \
 ui/xlib/Makefile widget/Makefile z80/Makefile)

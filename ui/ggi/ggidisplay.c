@@ -1,0 +1,173 @@
+/* ggiui.c: Routines for dealing with the GGI user interface
+   Copyright (c) 2003 Catalin Mihaila <catalin@idgrup.ro>
+
+   $Id$
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+   Author contact information:
+
+   E-mail: pak21-fuse@srcf.ucam.org
+   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+   Catalin: catalin@idgrup.ro
+
+*/
+
+#include "config.h"
+
+#ifdef UI_GGI
+
+#include <ggi/ggi.h>
+
+#include "display.h"
+#include "ggi_internals.h"
+#include "ui/ui.h"
+
+static unsigned int colour_pal[] = {
+
+    0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0xC000,
+    0xC000, 0x0000, 0x0000,
+    0xC000, 0x0000, 0xC000,
+    0x0000, 0xC000, 0x0000,
+    0x0000, 0xC000, 0xC000,
+    0xC000, 0xC000, 0x0000,
+    0xC000, 0xC000, 0xC000,
+    0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0xFFFF,
+    0xFFFF, 0x0000, 0x0000,
+    0xFFFF, 0x0000, 0xFFFF,
+    0x0000, 0xFFFF, 0x0000,
+    0x0000, 0xFFFF, 0xFFFF,
+    0xFFFF, 0xFFFF, 0x0000,
+    0xFFFF, 0xFFFF, 0xFFFF
+
+};
+
+static ggi_visual_t vis;
+static ggi_mode mo;
+static ggi_color col;
+
+void
+uidisplay_area( int x, int y, int width, int height )
+{
+  int disp_x, disp_y;
+
+  for(disp_x=x;disp_x < x+width;disp_x++) {
+
+    for(disp_y=y;disp_y < y+height;disp_y++) {
+
+      col.r = colour_pal[ (       3 * display_image[disp_y][disp_x] )   ];
+      col.g = colour_pal[ ( 1 + ( 3 * display_image[disp_y][disp_x] ) ) ];
+      col.b = colour_pal[ ( 2 + ( 3 * display_image[disp_y][disp_x] ) ) ];
+
+      ggiSetGCForeground( vis, ggiMapColor( vis, &col ) );
+      ggiDrawPixel( vis, disp_x, disp_y );
+
+    }
+  }
+}
+
+int
+uidisplay_end( void )
+{
+  if( vis == NULL ) return 0;
+
+  display_ui_initialised = 0;
+
+  ggiClose( vis );
+  ggiExit();
+
+  return 0;
+}
+
+void
+uidisplay_frame_end( void )
+{
+  ggiFlush( vis );
+}
+
+int
+uidisplay_init( int width, int height )
+{
+  ggiInit();
+
+  vis = ggiOpen( NULL );
+
+  if(vis == NULL) {
+    ui_error( UI_ERROR_ERROR,
+	      "uidisplay_init: unable to open default visual" );
+    return 1;
+  }
+
+  ggiSetFlags( vis, GGIFLAG_ASYNC );
+
+  mo.virt.x = width;
+  mo.virt.y = height;
+
+  mo.visible.x = GGI_AUTO;
+  mo.visible.y = GGI_AUTO;
+
+  mo.frames = GGI_AUTO;
+  mo.graphtype = GGI_AUTO;
+
+  mo.dpp.x = 1;
+  mo.dpp.y = 1;
+
+  ggiCheckMode( vis, &mo );
+  ggiSetMode( vis, &mo );
+
+  display_ui_initialised = 1;
+
+  return 0;
+}
+
+
+void
+uidisplay_hotswap_gfx_mode( void )
+{
+  return;
+}
+
+void
+uiggi_event( void )
+{
+  ggi_event ev;
+  ggi_event_mask mask;
+  struct timeval t = { 0, 0 };
+
+  mask = ggiEventPoll( vis, emAll, &t );
+  if( !mask ) return;
+
+  while( ggiEventsQueued( vis, mask ) ) {
+
+    ggiEventRead( vis, &ev, mask );
+
+    switch( ev.any.type ) {
+
+    case evKeyPress:
+      ggikeyboard_keypress( ev.key.sym );
+      break;
+
+    case evKeyRelease:
+      ggikeyboard_keyrelease( ev.key.sym );
+      break;
+
+    }
+  }
+}
+
+#endif				/* #ifdef UI_GGI */

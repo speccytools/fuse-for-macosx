@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2003 Philip Kendall
 
 ## $Id$
 
@@ -24,6 +24,15 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = aalib fb ggi gtk sdl svga xlib scaler
+noinst_LIBRARIES = libuiggi.a
 
-noinst_HEADERS = ui.h uidisplay.h options.dat
+INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+
+libuiggi_a_SOURCES = error.c ggidisplay.c ggikeyboard.c ggiui.c keysyms.c
+
+BUILT_SOURCES = keysyms.c
+
+keysyms.c: ../../keysyms.pl ../../keysyms.dat
+	@PERL@ ../../keysyms.pl ggi ../../keysyms.dat > $@
+
+noinst_HEADERS = ggi_internals.h
