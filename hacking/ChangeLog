@@ -242,3 +242,4 @@
 20031006 settings.pl: change config file name to 'fuse.cfg' on Win32
 20031006 settings.dat, ui/options.dat, ui/gtk/confirm.c: add option to
 	 disable the 'confirm' dialogs.
+20031006 debugger/command.c, debugger/commandy.y: better error recovery

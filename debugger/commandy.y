@@ -128,6 +128,7 @@ void yyerror( char *s );
 
 input:	 /* empty */
        | command
+       | error
 ;
 
 command:   BASE number { debugger_output_base = $2; }
