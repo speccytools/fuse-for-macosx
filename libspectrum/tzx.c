@@ -101,6 +101,9 @@ static libspectrum_error
 tzx_write_comment( libspectrum_tape_comment_block *comment_block,
 		   libspectrum_byte **buffer, size_t *offset, size_t *length );
 static libspectrum_error
+tzx_write_message( libspectrum_tape_message_block *message_block,
+		   libspectrum_byte **buffer, size_t *offset, size_t *length );
+static libspectrum_error
 tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
 			libspectrum_byte **buffer, size_t *offset,
 			size_t *length );
@@ -1002,7 +1005,11 @@ libspectrum_tzx_write( libspectrum_tape *tape,
 				 length);
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
       break;
-
+    case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
+      error = tzx_write_message( &(block->types.message), buffer, &offset,
+				 length);
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       error = tzx_write_archive_info( &(block->types.archive_info),
 				      buffer, &offset, length);
@@ -1252,6 +1259,30 @@ tzx_write_comment( libspectrum_tape_comment_block *comment_block,
   memcpy( ptr, comment_block->text, comment_length ); ptr += comment_length;
 
   (*offset) += 2 + comment_length;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_message( libspectrum_tape_message_block *message_block,
+		   libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  size_t text_length = strlen( message_block->text );
+
+  /* Make room for the ID byte, the time byte, length byte and the name */
+  error = libspectrum_make_room( buffer, (*offset) + 3 + text_length, &ptr,
+				 length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_COMMENT;
+  *ptr++ = message_block->time;
+  *ptr++ = text_length;
+  memcpy( ptr, message_block->text, text_length ); ptr += text_length;
+
+  (*offset) += 3 + text_length;
 
   return LIBSPECTRUM_ERROR_NONE;
 }
