@@ -34,6 +34,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#ifdef HAVE_STRINGS_H
+#include <strings.h>		/* Needed for strncasecmp() on QNX6 */
+#endif				/* #ifdef HAVE_STRINGS_H */
 #include <limits.h>
 #include <sys/stat.h>
 

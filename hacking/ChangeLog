@@ -278,3 +278,5 @@
 	 warning if a competition mode recording is started, but gcrypt is
 	 not available.
 20031014 configure.in: no longer need to explicitly link against zlib
+20031014 configure.in, trdos.c: we need <strings.h> for strncasecmp on
+	 QNX6 (thanks, Mike Gorchak).
