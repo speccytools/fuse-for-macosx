@@ -65,8 +65,10 @@ sub arithmetic_logical ($$$) {
       }
 CODE
 	}
-    } else {
+    } elsif( $opcode eq 'ADD' ) {
 	print "      ${opcode}16($arg1,$arg2);\n";
+    } elsif( $arg1 eq 'HL' and length $arg2 == 2 ) {
+	print "      tstates += 7;\n      ${opcode}16($arg2);\n";
     }
 }
 
@@ -88,11 +90,62 @@ sub call_jp ($$$) {
     }
 }
 
+sub cpi_cpd ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'CPI' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	BYTE value=readbyte(HL),bytetemp=A-value,
+	  lookup = ( (A & 0x08) >> 3 ) | ( ( (value) & 0x08 ) >> 2 ) |
+	  ( (bytetemp & 0x08) >> 1 );
+	contend( HL, 3 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	contend( HL, 1 ); contend( HL, 1 );
+	HL$modifier; BC--;
+	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
+	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
+	  ( bytetemp & FLAG_S );
+	if(F & FLAG_H) bytetemp--;
+	F |= ( bytetemp & FLAG_3 ) | ( (bytetemp&0x02) ? FLAG_5 : 0 );
+      }
+CODE
+}
+
+sub cpir_cpdr ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'CPIR' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	BYTE value=readbyte(HL),bytetemp=A-value,
+	  lookup = ( (A & 0x08) >> 3 ) | ( ( (value) & 0x08 ) >> 2 ) |
+	  ( (bytetemp & 0x08) >> 1 );
+	contend( HL, 3 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	contend( HL, 1 ); contend( HL, 1 );
+	HL$modifier; BC--;
+	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
+	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
+	  ( bytetemp & FLAG_S );
+	if(F & FLAG_H) bytetemp--;
+	F |= ( bytetemp & FLAG_3 ) | ( (bytetemp&0x02) ? FLAG_5 : 0 );
+	if( ( F & ( FLAG_V | FLAG_Z ) ) == FLAG_V ) {
+	  contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	  contend( HL, 1 ); contend( HL, 1 );
+	  PC-=2;
+	}
+      }
+CODE
+}
+
 sub inc_dec ($$) {
 
     my( $opcode, $arg ) = @_;
 
-    my $modifier = ( $opcode eq 'DEC' ? '--' : '++' );
+    my $modifier = ( $opcode eq 'INC' ? '++' : '--' );
 
     if( length $arg == 1 ) {
 	print "      $opcode($arg);\n";
@@ -109,6 +162,138 @@ sub inc_dec ($$) {
       }
 CODE
     }
+}
+
+sub ini_ind ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'INI' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	WORD initemp=readport(BC);
+	tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
+	writebyte(HL,initemp);
+	B--; HL$modifier;
+	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
+	/* C,H and P/V flags not implemented */
+      }
+CODE
+}
+
+sub inir_indr ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'INIR' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	WORD initemp=readport(BC);
+	tstates += 2; contend_io( BC, 3 ); contend( HL, 3 );
+	writebyte(HL,initemp);
+	B--; HL$modifier;
+	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
+	/* C,H and P/V flags not implemented */
+	if(B) {
+	  contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 ); contend( HL, 1 );
+	  contend( HL, 1 );
+	  PC-=2;
+	}
+      }
+CODE
+}
+
+
+sub ldi_ldd ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'LDI' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	BYTE bytetemp=readbyte(HL);
+	contend( HL, 3 ); contend( DE, 3 ); contend( DE, 1 ); contend( DE, 1 );
+	BC--;
+	writebyte(DE,bytetemp);
+	DE$modifier; HL$modifier;
+	bytetemp += A;
+	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
+	  ( bytetemp & FLAG_3 ) | ( (bytetemp & 0x02) ? FLAG_5 : 0 );
+      }
+CODE
+}
+
+sub ldir_lddr ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'LDIR' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	BYTE bytetemp=readbyte(HL);
+	contend( HL, 3 ); contend( DE, 3 ); contend( DE, 1 ); contend( DE, 1 );
+	writebyte(DE,bytetemp);
+	HL$modifier; DE$modifier; BC--;
+	bytetemp += A;
+	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
+	  ( bytetemp & FLAG_3 ) | ( (bytetemp & 0x02) ? FLAG_5 : 0 );
+	if(BC) {
+	  contend( DE, 1 ); contend( DE, 1 ); contend( DE, 1 );
+	  contend( DE, 1 ); contend( DE, 1 );
+	  PC-=2;
+	}
+      }
+CODE
+}
+
+sub otir_otdr ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'OTIR' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	WORD outitemp=readbyte(HL);
+	tstates++; contend( HL, 4 );
+	B--; HL$modifier; /* This does happen first, despite what the specs say */
+	writeport(BC,outitemp);
+	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
+	/* C,H and P/V flags not implemented */
+	if(B) {
+	  contend_io( BC, 1 );
+	  contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
+	  contend( PC, 1 ); contend( PC, 1 ); contend( PC, 1 );
+	  contend( PC - 1, 1 );
+	  PC-=2;
+	} else {
+	  contend_io( BC, 3 );
+	}
+      }
+CODE
+}
+
+sub outi_outd ($) {
+
+    my( $opcode ) = @_;
+
+    my $modifier = ( $opcode eq 'OUTI' ? '++' : '--' );
+
+    print << "CODE";
+      {
+	WORD outitemp=readbyte(HL);
+	B--;	/* This does happen first, despite what the specs say */
+	tstates++; contend( HL, 4 ); contend_io( BC, 3 );
+	HL$modifier;
+	writeport(BC,outitemp);
+	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
+	/* C,H and P/V flags not implemented */
+      }
+CODE
 }
 
 sub push_pop ($$) {
@@ -196,6 +381,14 @@ CCF
 }
 
 sub opcode_CP (@) { arithmetic_logical( 'CP', $_[0], $_[1] ); }
+
+sub opcode_CPD (@) { cpi_cpd( 'CPD' ); }
+
+sub opcode_CPDR (@) { cpir_cpdr( 'CPDR' ); }
+
+sub opcode_CPI (@) { cpi_cpd( 'CPI' ); }
+
+sub opcode_CPIR (@) { cpir_cpdr( 'CPIR' ); }
 
 sub opcode_CPL (@) {
     print << "CPL";
@@ -286,6 +479,13 @@ EXX
 
 sub opcode_HALT (@) { print "      z80.halted=1;\n      PC--;\n"; }
 
+sub opcode_IM (@) {
+
+    my( $mode ) = @_;
+
+    print "      IM=$mode;\n";
+}
+
 sub opcode_IN (@) {
 
     my( $register, $port ) = @_;
@@ -300,10 +500,31 @@ sub opcode_IN (@) {
         A=readport( intemp );
       }
 IN
+    } elsif( $register eq 'F' and $port eq '(C)' ) {
+	print << "IN";
+      tstates += 1;
+      {
+	BYTE bytetemp;
+	IN(bytetemp,BC);
+      }
+IN
+    } elsif( length $register == 1 and $port eq '(C)' ) {
+	print << "IN";
+      tstates += 1;
+      IN($register,BC);
+IN
     }
 }
 
 sub opcode_INC (@) { inc_dec( 'INC', $_[0] ); }
+
+sub opcode_IND (@) { ini_ind( 'IND' ); }
+
+sub opcode_INDR (@) { inir_indr( 'INDR' ); }
+
+sub opcode_INI (@) { ini_ind( 'INI' ); }
+
+sub opcode_INIR (@) { inir_indr( 'INIR' ); }
 
 sub opcode_JP (@) {
 
@@ -343,7 +564,27 @@ sub opcode_LD (@) {
     if( length $dest == 1 ) {
 
 	if( length $src == 1 ) {
-	    print "      $dest=$src;\n" if $dest ne $src;
+
+	    if( $dest eq 'R' and $src eq 'A' ) {
+		print << "LD";
+      tstates += 1;
+      /* Keep the RZX instruction counter right */
+      rzx_instructions_offset += ( R - A );
+      R=R7=A;
+LD
+            } elsif( $dest eq 'A' and $src eq 'R' ) {
+		print << "LD";
+      tstates += 1;
+      A=(R&0x7f) | (R7&0x80);
+      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );
+LD
+	    } else {
+		print "      tstates += 1;\n" if $src eq 'I' or $dest eq 'I';
+		print "      $dest=$src;\n" if $dest ne $src;
+		if( $dest eq 'A' and $src eq 'I' ) {
+		    print "      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );\n";
+		}
+	    }
 	} elsif( $src eq 'nn' ) {
 	    print "      contend( PC, 3 );\n      $dest=readbyte(PC++);\n";
 	} elsif( $src =~ /^\(..\)$/ ) {
@@ -371,7 +612,7 @@ LD
 	my( $high, $low );
 
 	if( $dest eq 'SP' ) {
-	    ( $high, $low ) = ( 'SPH', 'SPL' );
+	    ( $high, $low ) = qw( SPH SPL );
 	} else {
 	    ( $high, $low ) = ( $dest =~ /^(.)(.)$/ );
 	}
@@ -419,16 +660,47 @@ LD
 	writebyte(wordtemp,A);
       }
 LD
-        } elsif( $src eq 'HL' ) {
-	    print "      LD16_NNRR(L,H);\n";
+        } elsif( $src =~ /^(.)(.)$/ ) {
+
+	    my( $high, $low );
+
+	    if( $src eq 'SP' ) {
+		( $high, $low ) = qw( SPH SPL );
+	    } else {
+		( $high, $low ) = ( $1, $2 );
+	    }
+
+	    print "      LD16_NNRR($low,$high);\n";
 	}
     }
 
 }
 
+sub opcode_LDD (@) { ldi_ldd( 'LDD' ); }
+
+sub opcode_LDDR (@) { ldir_lddr( 'LDDR' ); }
+
+sub opcode_LDI (@) { ldi_ldd( 'LDI' ); }
+
+sub opcode_LDIR (@) { ldir_lddr( 'LDIR' ); }
+
+sub opcode_NEG (@) {
+    print << "NEG";
+      {
+	BYTE bytetemp=A;
+	A=0;
+	SUB(bytetemp);
+      }
+NEG
+}
+
 sub opcode_NOP (@) { }
 
 sub opcode_OR (@) { arithmetic_logical( 'OR', $_[0], $_[1] ); }
+
+sub opcode_OTDR (@) { otir_otdr( 'OTDR' ); }
+
+sub opcode_OTIR (@) { otir_otdr( 'OTIR' ); }
 
 sub opcode_OUT (@) {
 
@@ -443,8 +715,18 @@ sub opcode_OUT (@) {
 	OUT( outtemp , A );
       }
 OUT
+    } elsif( $port eq '(C)' and length $register == 1 ) {
+	print << "OUT";
+      tstates += 1;
+      OUT(BC,$register);
+OUT
     }
 }
+
+
+sub opcode_OUTD (@) { outi_outd( 'OUTD' ); }
+
+sub opcode_OUTI (@) { outi_outd( 'OUTI' ); }
 
 sub opcode_POP (@) { push_pop( 'POP', $_[0] ); }
 
@@ -483,6 +765,14 @@ RET
     }
 }
 
+sub opcode_RETN (@) { 
+
+    print << "RETN";
+      IFF1=IFF2;
+      RET();
+RETN
+}
+
 sub opcode_RL (@) { rotate_shift( 'RL', $_[0] ); }
 
 sub opcode_RLC (@) { rotate_shift( 'RLC', $_[0] ); }
@@ -506,6 +796,18 @@ sub opcode_RLA (@) {
 RLA
 }
 
+sub opcode_RLD (@) {
+    print << "RLD";
+      {
+	BYTE bytetemp=readbyte(HL);
+	contend( HL, 7 ); contend( HL, 3 );
+	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
+	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
+	F = ( F & FLAG_C ) | sz53p_table[A];
+      }
+RLD
+}
+
 sub opcode_RR (@) { rotate_shift( 'RR', $_[0] ); }
 
 sub opcode_RRA (@) {
@@ -527,6 +829,18 @@ sub opcode_RRCA (@) {
       A = ( A >> 1) | ( A << 7 );
       F |= ( A & ( FLAG_3 | FLAG_5 ) );
 RRCA
+}
+
+sub opcode_RRD (@) {
+    print << "RRD";
+      {
+	BYTE bytetemp=readbyte(HL);
+	contend( HL, 7 ); contend( HL, 3 );
+	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
+	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
+	F = ( F & FLAG_C ) | sz53p_table[A];
+      }
+RRD
 }
 
 sub opcode_RST (@) {
@@ -558,6 +872,19 @@ sub opcode_SRL (@) { rotate_shift( 'SRL', $_[0] ); }
 sub opcode_SUB (@) { arithmetic_logical( 'SUB', $_[0], $_[1] ); }
 
 sub opcode_XOR (@) { arithmetic_logical( 'XOR', $_[0], $_[1] ); }
+
+sub opcode_slttrap ($) {
+    print << "slttrap";
+      if( settings_current.slt_traps ) {
+	if( slt_length[A] ) {
+	  WORD base = HL;
+	  BYTE *data = slt[A];
+	  size_t length = slt_length[A];
+	  while( length-- ) writebyte( base++, *data++ );
+	}
+      }
+slttrap
+}
 
 sub opcode_shift (@) {
 
@@ -604,17 +931,20 @@ shift
 my %description = (
 
     'opcodes_cb.dat'   => 'opcodes_cb.c: Z80 CBxx opcodes',
+    'opcodes_ed.dat'   => 'opcodes_ed.c: Z80 CBxx opcodes',
     'opcodes_base.dat' => 'opcodes_base.c: unshifted Z80 opcodes',
 
 );
 
 # Main program
 
-print Fuse::GPL( $description{ $ARGV[0] }, '1999-2003 Philip Kendall' );
+my $data_file = $ARGV[0];
+
+print Fuse::GPL( $description{ $data_file }, '1999-2003 Philip Kendall' );
 
 print << "COMMENT";
 
-/* NB: this file is autogenerated by '$0' from '$ARGV[0]',
+/* NB: this file is autogenerated by '$0' from '$data_file',
    and included in 'z80_ops.c' */
 
 COMMENT
@@ -631,7 +961,12 @@ while(<>) {
 
     my( $number, $opcode, $arguments ) = split;
 
-    $arguments ||= '';
+    if( not defined $opcode ) {
+	print "    case $number:\n";
+	next;
+    }
+
+    $arguments = '' if not defined $arguments;
     my @arguments = split ',', $arguments;
 
     print "    case $number:\t\t/* $opcode";
@@ -645,10 +980,16 @@ while(<>) {
 
 	if( exists &{ "opcode_$opcode" } ) {
 	    "opcode_$opcode"->( @arguments );
-	} else {
-	    print STDERR "$opcode unknown\n";
 	}
     }
 
     print "      break;\n";
 }
+
+if( $data_file eq 'opcodes_ed.dat' ) {
+    print << "NOPD";
+    default:		/* All other opcodes are NOPD */
+      break;
+NOPD
+}
+
