@@ -58,6 +58,7 @@ playback_file, string, NULL, 'p', playback, playbackfile
 
 svga_mode, numeric, 320, 'v', svgamode
 
+rom_16, string, strdup( "48.rom" ),
 rom_48, string, strdup( "48.rom" ),
 rom_128_0, string, strdup( "128-0.rom" ),
 rom_128_1, string, strdup( "128-1.rom" ),

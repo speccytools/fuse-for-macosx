@@ -31,7 +31,8 @@ SUBDIRS = debugger getopt hacking lib man perl roms ui widget z80
 fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c machine.c memory.c memory_internal.c \
         osssound.c rzx.c settings.c\
-	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus2a.c\
+	snapshot.c sound.c spec128.c \
+	spec16.c spec48.c specplus2.c specplus2a.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
 	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c
 
@@ -54,7 +55,8 @@ debugger/libdebugger.a \
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
 	machine.h osssound.h rzx.h screenshot.h settings.h snapshot.h sound.h\
-        spec128.h spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h\
+        spec128.h \
+	spec16.h spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h\
 	sunsound.h tape.h timer.h types.h utils.h sdlsound.h\
 	joystick.h printer.h tc2048.h scld.h
 

@@ -44,6 +44,7 @@
 #include "scld.h"
 #include "snapshot.h"
 #include "sound.h"
+#include "spec16.h"
 #include "spec48.h"
 #include "spec128.h"
 #include "specplus2.h"
@@ -71,6 +72,8 @@ int machine_init_machines( void )
 {
   int error;
 
+  error = machine_add_machine( spec16_init    );
+  if (error ) return error;
   error = machine_add_machine( spec48_init    );
   if (error ) return error;
   error = machine_add_machine( spec128_init   );

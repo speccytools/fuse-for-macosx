@@ -47,6 +47,48 @@
 #endif				/* #ifdef INTERNAL */
 
 BYTE
+FUNCTION( spec16_readbyte )( WORD address )
+{
+
+#ifndef INTERNAL
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
+  switch( address >> 14 ) {
+  case 0: return ROM[0][ address & 0x3fff ];
+  case 1: return RAM[5][ address & 0x3fff ];
+  case 2: return 0xff;
+  case 3: return 0xff;
+  }
+  return 0; /* Keep gcc happy */
+}
+
+void
+FUNCTION( spec16_writebyte )( WORD address, BYTE b )
+{
+
+#ifndef INTERNAL
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
+  switch( address >> 14 ) {
+  case 0:
+    if( settings_current.writable_roms ) ROM[0][ address & 0x3fff ] = b;
+    break;
+  case 1:
+    if( ( address & 0x3fff ) < 0x1b00 && RAM[5][ address & 0x3fff ] != b )
+      display_dirty( address );
+    RAM[5][ address & 0x3fff ] = b; break;
+  case 2: break;
+  case 3: break;
+  }
+}
+
+BYTE
 FUNCTION( spec48_readbyte )( WORD address )
 {
 
