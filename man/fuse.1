@@ -67,6 +67,42 @@ format.
 .\" the options list is in alphabetical order by long option name (or
 .\" short option name if none).
 .\"
+.I --auto-load
+.RS
+Specify whether tape files should be automatically loaded when they
+are opened. (Enabled by default, but you can use
+.RI ` --no-auto-load '
+to disable.) Same as the General Option dialog's
+.I "Auto-load tapes"
+option.
+.RE
+.PP
+.I --beeper-stero
+.RS
+Specify whether fake stereo should be added to the emulation of the
+Spectrum beeper. Same as the Sound Option dialog's
+.I "Beeper psuedo-stereo"
+option.
+.RE
+.PP
+.I --compress-rzx
+.RS
+Specify whether RZX files should be written out compressed. (Enabled
+by default, but you can use
+.RI ` --no-compress-rzx '
+to disable.) Same as the RZX Options dialog's
+.I "Compress RZX data"
+option.
+.RE
+.PP
+.I --double-screen
+.RS
+Specify whether screenshots should be saved as double size. Same as
+the General Option dialog's
+.I "Double-sized screens"
+option.
+.RE
+.PP
 .I -h
 .br
 .I --help
@@ -85,6 +121,16 @@ option.
 .RS
 Emulate a Kempston joystick. Same as the General Options dialog's
 .I "Kempston joystick"
+option.
+.RE
+.PP
+.I --loading-sound
+.RS
+Specify whether the sound made whilst tapes are loading should be
+emulated. (Enabled by default, but you can use
+.RI ` --no-loading-sound '
+to disable.) Same as the Sound Option dialog's
+.I "Loading sound"
 option.
 .RE
 .PP
@@ -143,12 +189,31 @@ Specify a snapshot file to load. The file must be in Z80,
 SNA, or SLT format.
 .RE
 .PP
+.I --sound
+.RS
+Specify whether Fuse should produce sound. (Enabled by default, but
+you can use
+.RI ` --no-sound '
+to disable.) Same as the Sound Option dialog's
+.I "Sound enabled"
+option.
+.RE
+.PP
 .I "-d device"
 .br
 .I "--sound-device device"
 .RS
 Specify the sound output device to use. Generally you shouldn't need
 to specify this, but it might be useful if you have more than one.
+.RE
+.PP
+.I "--speed percentage"
+.RS
+Specify the speed (as a percentage of real Spectrum speed) at which
+emulation should attempt to proceed. Same as the General Options
+dialog's
+.I "Emulation speed"
+option.
 .RE
 .PP
 .I "-v mode"
@@ -166,9 +231,6 @@ are `320' (which corresponds to a 320x240x256 mode), the default and
 .I "--tape file"
 .RS
 Specify a virtual tape file to use. It must be in TAP or TZX format.
-Note that unlike snapshots, tape files are
-.I not
-automatically loaded, even if specified on the command line.
 .RE
 .PP
 .I --traps
@@ -269,14 +331,14 @@ but the others just write the file as
 and have a differently-named menu item to match.
 .RE
 .PP
-.I "Recording, Record..."
+.I "File, Recording, Record..."
 .RS
 Start recording input to an RZX file. Again, the GTK+ UI lets you
 select a filename, whilst the others just write to
 .IR record.rzx
 .RE
 .PP
-.I "Recording, Play..."
+.I "File, Recording, Play..."
 .RS
 Playback recorded input from an RZX file. This lets you replay
 keypresses recorded previously. RZX files generally contain a snapshot
@@ -285,9 +347,17 @@ selected RZX file doesn't, you'll be prompted for a snapshot to load
 as well.
 .RE
 .PP
-.I "Recording, Stop"
+.I "File, Recording, Stop"
 .RS
 Stop any currently-recording/playing RZX file.
+.RE
+.PP
+.I "File, Save Screen..."
+.RS
+Save a copy of whatever's currently displayed on the Spectrum's screen
+as a PNG file. Once again, the GTK+ UI lets you choose a filename,
+whilst the others will just write to
+.IR "fuse.png" .
 .RE
 .PP
 .I F10
@@ -310,6 +380,15 @@ aborts.) Note that any changed settings only apply to the
 currently-running Fuse.
 .PP
 The options available are:
+.PP
+.I "Emulation speed"
+.RS
+Set how fast Fuse will attempt to emulate the Spectrum, as a
+percentage of the speed at which the real machine runs. If your
+machine isn't fast enough to keep up with the requested speed, Fuse
+will just run as fast as it can. Note that if the emulation speed is
+not exactly 100%, no sound output will be produced.
+.RE
 .PP
 .I "Issue 2 keyboard"
 .RS
@@ -354,6 +433,15 @@ or choosing the
 menu item.
 .RE
 .PP
+.I "Auto-load tapes"
+.RS
+On many occasions when you open a tape file, it's because it's got a
+program in you want to load and run. If this option is selected, this
+will automatically happen for you when you open a tape file. If you
+want to use tapes for saving data to, or for loading data into an
+already running program, you'll want to turn this option off.
+.RE
+.PP
 .I "Use .slt traps"
 .RS
 The multi-load aspect of SLT files requires a trap instruction to be
@@ -361,6 +449,17 @@ supported. This instruction is not generally used except for this
 trap, but since it's not inconceivable that a program could be wanting
 to use the real instruction instead, you can choose whether to support
 the trap or not.
+.RE
+.PP
+.I "Double-sized screens"
+.RS
+The screenshots saved via the option on the
+.I "File"
+menu are normally saved as 320x240 pixels (the extra size relative to
+the Spectrum's screen of 256x192 is for the border). If this option is
+selected, they will be saved as 640x480 pixels, which is especially
+useful if you're using the TC2048's hiresolution mode, which has a
+natural resolution of 512x192 pixels.
 .RE
 .RE
 .PP
@@ -405,6 +504,43 @@ The Spectrum beeper is inherently mono, but enabling this option adds
 a simple fake-stereo effect. While the slight echo involved can
 sometimes make beeper noise sound worse, in many cases it gives an
 acceptable result.
+.RE
+.RE
+.PP
+.I "Options, RZX"
+.RS
+Display the RZX Options dialog, letting you configure how Fuse's deals
+with RZX input recordings. (With the widget UI, the keys shown in
+brackets toggle the options,
+.I Enter
+confirms any changes, and
+.I Esc
+aborts.) Note that any changed settings only apply to the
+currently-running Fuse.
+.PP
+.I "Compress RZX data"
+.RS
+If this option is selected, and
+.I zlib
+was available when Fuse was compiled, any RZX files written by Fuse
+will be compressed. This is generally a good thing as it makes the
+files significantly smaller, and you probably want to turn it off only
+if you're debugging the RZX files or there's some other program which
+doesn't support compressed RZX files.
+.RE
+.RE
+.PP
+.I "Options, Save"
+.RS
+If
+.I libxml2
+was available when Fuse was compiled, this will cause Fuse's current
+options to be written to
+.I .fuserc
+in your home directory, from which they will be picked up again when
+Fuse is restarted. The best way to update this file is by this option,
+but it's a simple XML file and shouldn't be too hard to edit by hand
+if you really want to.
 .RE
 .PP
 .I F5
@@ -462,6 +598,21 @@ also have to `press play', so to speak :-), and this is how you do
 that. You may also need to `press play' like this in certain other
 circumstances, e.g. TZXs containing multi-load games may have a
 stop-the-tape request (which Fuse obeys).
+.RE
+.PP
+.I "Tape, Browse"
+.RS
+Browse through the current tape. A brief display of each of the data
+blocks on the current tape will appear, from which you can select
+which block Fuse will play next. In the GTK+ UI, select the block with
+the mouse and use the
+.RI ` OK '
+button to exit; in the others, use the cursor keys and press
+.IR Enter .
+If you decide you don't want to change block, either use the
+.RI ` Cancel '
+button (in the GTK+ UI) or press
+.IR Escape .
 .RE
 .PP
 .I "Tape, Rewind"
@@ -538,8 +689,10 @@ As above, but for drive B:.
 .I "Help, Keyboard picture..."
 .RS
 Display a diagram showing the Spectrum keyboard, and the various
-keywords that can be generated with each key from (48K) BASIC. The
-picture remains onscreen (and the emulator paused) until you press
+keywords that can be generated with each key from (48K) BASIC. Under
+the GTK+ UI, this will appear in a separate window and emulation
+continues. With the other UIs, the picture remains onscreen (and the
+emulator paused) until you press
 .I Esc
 or
 .IR Enter .
@@ -753,7 +906,13 @@ Not many peripherals are supported.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH FILES
+.I "~/.fuserc"
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH SEE ALSO
+.IR tzxconv "(1),"
 .IR tzxlist "(1),"
 .IR rzxdump "(1),"
 .IR rzxtool "(1),"
