@@ -32,7 +32,10 @@ What you'll need to run Fuse:
   get support for extended .dsk files (see 'THE .DSK FORMAT' section in
   fuse(1) for more details on this).
 
-To compile Fuse:
+Building Fuse
+-------------
+
+To compile Fuse (see below for OS X instructions):
 
 $ ./configure
 
@@ -64,6 +67,27 @@ if you want to place Fuse into the main directories on your system
 do this bit.
 
 Once you've got Fuse configured and built, read the man page :-)
+
+Building Fuse on OS X
+---------------------
+
+It is possible to build and run Fuse on OS X, but it can really be
+done only by someone who is already familiar with compiling Unix
+programs. If you are happy with that, use the Fink project
+( http://fink.sourceforge.net/ ) to install autoconf 2.52,
+automake 1.5, libtool 1.3.5, XFree86 4.2 and GTK+ 1.2.10. Then run:
+
+$ aclocal
+$ autoheader
+$ automake --add-missing
+$ autoconf
+$ ./configure
+$ make
+
+and you will end up with an executable that you can run from an xterm.
+
+Closing comments
+----------------
 
 If you have any bug reports, suggestions or (particularly
 appreciated!) patches for Fuse, mail them to me at
