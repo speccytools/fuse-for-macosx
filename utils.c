@@ -92,9 +92,7 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_ID_DISK_DSK:
 #ifdef HAVE_765_H
-    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
-    if( error ) return error;
-
+    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 ); if( error ) break;
     error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
 #else				/* #ifdef HAVE_765_H */
     ui_error( UI_ERROR_INFO, "lib765 not present so can't handle .dsk files" );
@@ -103,15 +101,13 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_ID_DISK_SCL:
   case LIBSPECTRUM_ID_DISK_TRD:
-    error = machine_select( LIBSPECTRUM_MACHINE_PENT );
-    if( error ) return error;
-
+    error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     error = trdos_disk_insert( TRDOS_DRIVE_A, filename );
     break;
 
   case LIBSPECTRUM_ID_CARTRIDGE_DCK:
-    error = machine_select( LIBSPECTRUM_MACHINE_TC2068 );
-    if( !error ) error = dck_read( filename );
+    error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
+    error = dck_read( filename );
     break;
 
   default:
