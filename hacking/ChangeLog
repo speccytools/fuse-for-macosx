@@ -952,3 +952,5 @@
 20040621 man/fuse.1: small man page update.
 20040621 ChangeLog: Darren did the initial Spectrum SE emulation.
 20040623 man/fuse.1: Updates for Interface II and IDE command line options.
+20040626 spectrum.c: Now need to include "sound/lowlevel.h" to get
+         ALWAYS_USE_TIMER defined for SDL
