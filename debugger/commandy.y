@@ -95,6 +95,7 @@ void yyerror( char *s );
 %type  <bptype>  breakpointtype
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
+%type  <integer> number
 
 %type  <exp>     expressionornull
 %type  <exp>     expression;
@@ -118,11 +119,11 @@ input:	 /* empty */
        | command
 ;
 
-command:   BASE NUMBER { debugger_output_base = $2; }
+command:   BASE number { debugger_output_base = $2; }
 	 | breakpointlife breakpointtype numberorpc {
              debugger_breakpoint_add( $2, $3, 0, $1 );
 	   }
-	 | breakpointlife PORT portbreakpointtype NUMBER {
+	 | breakpointlife PORT portbreakpointtype number {
 	     debugger_breakpoint_add( $3, $4, 0, $1 );
            }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
@@ -131,14 +132,14 @@ command:   BASE NUMBER { debugger_output_base = $2; }
            }
 	 | CONTINUE { debugger_run(); }
 	 | DELETE { debugger_breakpoint_remove_all(); }
-	 | DELETE NUMBER { debugger_breakpoint_remove( $2 ); }
-	 | DISASSEMBLE NUMBER { ui_debugger_disassemble( $2 ); }
+	 | DELETE number { debugger_breakpoint_remove( $2 ); }
+	 | DISASSEMBLE number { ui_debugger_disassemble( $2 ); }
 	 | FINISH   { debugger_breakpoint_exit(); }
-	 | IGNORE NUMBER NUMBER { debugger_breakpoint_ignore( $2, $3 ); }
+	 | IGNORE NUMBER number { debugger_breakpoint_ignore( $2, $3 ); }
 	 | NEXT	    { debugger_next(); }
-	 | DEBUGGER_OUT NUMBER NUMBER { debugger_port_write( $2, $3 ); }
-	 | SET NUMBER NUMBER { debugger_poke( $2, $3 ); }
-	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
+	 | DEBUGGER_OUT number NUMBER { debugger_port_write( $2, $3 ); }
+	 | SET NUMBER number { debugger_poke( $2, $3 ); }
+	 | SET REGISTER number { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;
 
@@ -156,12 +157,14 @@ portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
 ;
 
 numberorpc:   /* empty */ { $$ = PC; }
-            | NUMBER	  { $$ = $1; }
+	    | number      { $$ = $1; }
 ;
 
 expressionornull:   /* empty */ { $$ = NULL; }
 	          | expression  { $$ = $1; }
 ;
+
+number:   expression { $$ = debugger_expression_evaluate( $1 ); }
 
 expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 		       if( !$$ ) YYABORT;
