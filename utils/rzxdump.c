@@ -236,10 +236,11 @@ read_input_block( unsigned char **ptr, unsigned char *end )
 
   printf( "Found an input recording block\n" );
   printf( "  Length: %d bytes\n", read_dword( ptr ) );
-  printf( "  Frame length (obsolete): %d bytes\n", *(*ptr)++ );
 
   frames = read_dword( ptr );
   printf( "  Frame count: %d\n", frames );
+
+  printf( "  Frame length (obsolete): %d bytes\n", *(*ptr)++ );
   printf( "  Tstate counter: %d\n", read_dword( ptr ) );
   printf( "  Flags: %d\n", read_dword( ptr ) );
 

@@ -431,11 +431,11 @@ rzx_write_input( libspectrum_rzx *rzx, libspectrum_byte **buffer,
   for( i=0; i<rzx->count; i++ ) size += rzx->frames[i].count;
   libspectrum_write_dword( ptr, size );
 
-  /* Each frame has an undefined length, so write a zero */
-  *(*ptr)++ = 0;
-
   /* How many frames? */
   libspectrum_write_dword( ptr, rzx->count );
+
+  /* Each frame has an undefined length, so write a zero */
+  *(*ptr)++ = 0;
 
   /* T-state counter. Zero for now */
   libspectrum_write_dword( ptr, rzx->tstates );
