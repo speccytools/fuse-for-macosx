@@ -1,5 +1,5 @@
 /* dxsound.c: DirectX sound I/O
-   Copyright (c) 2003 Marek Januszewski
+   Copyright (c) 2003 Marek Januszewski, Philip Kendall
 
    $Id$
 
@@ -32,7 +32,7 @@
 #include <mmsystem.h>
 #include <dsound.h>
 
-#include "dxsound.h"
+#include "sound.h"
 #include "ui/ui.h"
 
 /* same as for SDL Sound */
@@ -44,7 +44,7 @@ LPDIRECTSOUNDBUFFER lpDSBuffer; /* sound buffer */
 DWORD nextpos; /* next position is circular buffer */
 
 int
-dxsound_init( const char *device, int *freqptr, int *stereoptr )
+sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
 
   WAVEFORMATEX pcmwf; /* waveformat struct */ 
@@ -116,7 +116,7 @@ dxsound_init( const char *device, int *freqptr, int *stereoptr )
 }
 
 void
-dxsound_end( void )
+sound_lowlevel_end( void )
 {
   if( IDirectSoundBuffer_Stop( lpDSBuffer ) != DS_OK ) {
     ui_error( UI_ERROR_ERROR, "Couldn't stop sound." );
@@ -129,7 +129,7 @@ dxsound_end( void )
 
 /* Copying data to the buffer */
 void
-dxsound_frame( unsigned char *data, int len )
+sound_lowlevel_frame( unsigned char *data, int len )
 {
   HRESULT hres;
   int i;

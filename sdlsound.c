@@ -1,5 +1,6 @@
 /* sdlsound.c: SDL sound I/O
-   Copyright (c) 2002 Alexander Yurchenko, Russell Marks, Philip Kendall, Fredrick Meunier
+   Copyright (c) 2002-2003 Alexander Yurchenko, Russell Marks, Philip Kendall,
+			   Fredrick Meunier
 
    $Id$
 
@@ -27,8 +28,8 @@
 
 #include <SDL.h>
 
-#include "sdlsound.h"
 #include "settings.h"
+#include "sound.h"
 #include "ui/ui.h"
 
 /* using (7) 32 byte frags for 8kHz, scale up for higher */
@@ -46,7 +47,7 @@ volatile unsigned int ringbuffer_read = 0;
 volatile unsigned int ringbuffer_write = 0;
 
 int
-sdlsound_init( const char *device, int *freqptr, int *stereoptr )
+sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
   SDL_AudioSpec requested;
   int frag;
@@ -83,7 +84,7 @@ sdlsound_init( const char *device, int *freqptr, int *stereoptr )
 }
 
 void
-sdlsound_end( void )
+sound_lowlevel_end( void )
 {
   SDL_PauseAudio( 1 );
   SDL_LockAudio();
@@ -93,7 +94,7 @@ sdlsound_end( void )
 
 /* Copy data to ringbuffer */
 void
-sdlsound_frame( unsigned char *data, int len )
+sound_lowlevel_frame( unsigned char *data, int len )
 {
   int i;
 

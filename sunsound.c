@@ -1,5 +1,5 @@
 /* sunsound.c: OpenBSD sound I/O
-   Copyright (c) 2002 Alexander Yurchenko, Russell Marks, Philip Kendall
+   Copyright (c) 2002-2003 Alexander Yurchenko, Russell Marks, Philip Kendall
 
    $Id$
 
@@ -41,7 +41,7 @@
 #include <unistd.h>
 
 #include "settings.h"
-#include "sunsound.h"
+#include "sound.h"
 #include "ui/ui.h"
 
 /* using (8) 64 byte frags for 8kHz, scale up for higher */
@@ -51,7 +51,7 @@ static int soundfd = -1;
 static int sixteenbit = 0;
 
 int
-sunsound_init(const char *device,int *freqptr, int *stereoptr)
+sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
 #ifndef solaris
 	int frag;
@@ -119,6 +119,7 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 			close(soundfd);
 			return 1;
 		}
+		/* FIXME: is this line correct? */
 		*stereoptr = *stereoptr ? 1 : 2;
 	}
 
@@ -162,7 +163,7 @@ sunsound_init(const char *device,int *freqptr, int *stereoptr)
 }
 
 void
-sunsound_end()
+sound_lowlevel_end( void )
 {
 #ifdef solaris
 	ioctl(soundfd, I_FLUSH, FLUSHW);
@@ -173,7 +174,7 @@ sunsound_end()
 }
 
 void
-sunsound_frame(data, len)
+sound_lowlevel_frame(data, len)
 	unsigned char *data;
 	int len;
 {

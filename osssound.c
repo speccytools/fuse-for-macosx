@@ -33,7 +33,6 @@
 #include <fcntl.h>
 #include <sys/soundcard.h>
 
-#include "osssound.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
@@ -50,7 +49,7 @@ static int sixteenbit=0;
 /* returns 0 on *success*, and adjusts freq/stereo args to reflect
  * what we've actually got.
  */
-int osssound_init(const char *device,int *freqptr,int *stereoptr)
+int sound_lowlevel_init(const char *device,int *freqptr,int *stereoptr)
 {
 int frag,tmp,flags;
 
@@ -143,14 +142,14 @@ return 0;	/* success */
 }
 
 
-void osssound_end(void)
+void sound_lowlevel_end(void)
 {
 if(soundfd!=-1)
   close(soundfd);
 }
 
 
-void osssound_frame(unsigned char *data,int len)
+void sound_lowlevel_frame(unsigned char *data,int len)
 {
 static unsigned char buf16[8192];
 int ret=0,ofs=0;

@@ -42,4 +42,10 @@ extern int sound_stereo_ay;
 extern int sound_stereo_ay_abc;
 extern int sound_stereo_ay_narrow;
 
+/* The low-level sound interface */
+
+int sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr );
+void sound_lowlevel_end( void );
+void sound_lowlevel_frame( unsigned char *data, int len );
+
 #endif				/* #ifndef FUSE_SOUND_H */

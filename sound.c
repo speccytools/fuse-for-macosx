@@ -35,25 +35,12 @@
 
 #include <config.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-
 #include <libspectrum.h>
 
 #include "fuse.h"
 #include "machine.h"
-#include "osssound.h"
-#include "sdlsound.h"
 #include "settings.h"
 #include "sound.h"
-#include "spectrum.h"
-#include "sunsound.h"
 #include "ui/ui.h"
 
 /* configuration */
@@ -167,7 +154,7 @@ static int first_init=1;
 int f,ret;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
-#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SYS_AUDIOIO_H) && !defined(UI_SDL)
+#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SYS_AUDIOIO_H) && !defined(UI_SDL) && !defined(HAVE_DSOUND_H)
 return;
 #endif
 
@@ -185,14 +172,7 @@ sound_stereo_beeper=settings_current.stereo_beeper;
 /* only try for stereo if we need it */
 if(sound_stereo_ay || sound_stereo_beeper)
   sound_stereo=1;
-
-#if defined(UI_SDL)
-ret=sdlsound_init(device,&sound_freq,&sound_stereo);
-#elif defined(HAVE_SYS_SOUNDCARD_H)
-ret=osssound_init(device,&sound_freq,&sound_stereo);
-#elif defined(HAVE_SYS_AUDIOIO_H)
-ret=sunsound_init(device,&sound_freq,&sound_stereo);
-#endif
+ret=sound_lowlevel_init(device,&sound_freq,&sound_stereo);
 
 if(ret)
   return;
@@ -279,13 +259,7 @@ if(sound_enabled)
   {
   if(sound_buf)
     free(sound_buf);
-#if defined(UI_SDL)
-  sdlsound_end();
-#elif defined(HAVE_SYS_SOUNDCARD_H)
-  osssound_end();
-#elif defined(HAVE_SYS_AUDIOIO_H)
-  sunsound_end();
-#endif
+  sound_lowlevel_end();
   sound_enabled=0;
   }
 }
@@ -720,13 +694,7 @@ for(f=0;f<sound_framesiz;f++,tptr++)
 /* overlay AY sound */
 sound_ay_overlay();
 
-#if defined(UI_SDL)
-sdlsound_frame(sound_buf,sound_framesiz*sound_channels);
-#elif defined(HAVE_SYS_SOUNDCARD_H)
-osssound_frame(sound_buf,sound_framesiz*sound_channels);
-#elif defined(HAVE_SYS_AUDIOIO_H)
-sunsound_frame(sound_buf,sound_framesiz*sound_channels);
-#endif
+sound_lowlevel_frame(sound_buf,sound_framesiz*sound_channels);
 
 sound_oldpos[0]=sound_oldpos[1]=-1;
 sound_fillpos[0]=sound_fillpos[1]=0;

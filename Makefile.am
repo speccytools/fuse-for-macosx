@@ -113,12 +113,10 @@ noinst_HEADERS = ay.h \
 	compat.h \
 	dck.h \
 	display.h \
-	dxsound.h \
 	event.h \
 	fuse.h keyboard.h keysyms.h\
 	machine.h \
 	memory.h \
-	osssound.h \
 	pentagon.h \
 	psg.h \
 	rzx.h \
@@ -128,12 +126,10 @@ noinst_HEADERS = ay.h \
 	sound.h \
         spec128.h \
 	spec16.h spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h\
-	sunsound.h \
 	tape.h \
 	timer.h \
 	trdos.h \
 	utils.h \
-	sdlsound.h \
 	joystick.h \
 	printer.h \
 	tc2048.h \
