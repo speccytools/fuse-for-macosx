@@ -1,3 +1,63 @@
+2002-03-26  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Version 0.4.2 released
+
+	* Simple support for a very limited form of RZX files (Philip
+	  Kendall).
+
+	* Sound support for OpenBSD and Solaris (Alexander Yurchenko).
+
+	* Use the MIT-SHM extension if available under the Xlib UI
+	  (originally from Darren Salt, extensively rewritten by Philip
+	  Kendall).
+
+	* A new Options/Sound menu, giving the option to turn sound on
+	  and off (Philip Kendall).
+
+	* Under the GTK+ UI, press F1 to get a pop-up main menu (Russell
+	  Marks).
+
+	* Add the ability to select which device to use for sound output
+	  (Philip Kendall).
+
+	* Create a dialog box when errors occur (idea from Darren Salt,
+	  written by Philip Kendall).
+
+	* Titles for the GTK+ UI file selection dialog boxes (Darren
+	  Salt).
+
+	* Update the man page (Russell Marks).
+
+	* Fix the segfault which could occur if you pressed Page Down in
+	  the file selector widget with less than a full screen of files
+	  in (Philip Kendall).
+
+	* Get the R register emulation correct if a DDxx or FDxx
+	  instruction doesn't use IX or IY (Philip Kendall).
+
+	* Get the timings of tape edges write (previously, we could be
+	  slow by up to (length of last instruction) t-states) (Philip
+	  Kendall).
+
+	* Don't write to the printer unless we get a valid stop bit
+	  (Russell Marks).
+
+	* Open the sound devices non-blocking to avoid hangs on some
+	  systems (reported by Erik Kunze, fixed by Alexander Yurchenko).
+
+	* Don't write SLT data to .z80 files unless some actually exists
+	  (reported by Russell Marks, fixed by Philip Kendall).
+
+	* Search a system-wide directory for the ROMs; see Debian's
+	  spectrum-roms package for why this will be useful (Philip
+	  Kendall).
+
+	* Get the lengths of ROMs correct when munmap(2)ing them (Darren
+	  Salt/Philip Kendall).
+
+	* Add a small document describing the preferred coding style for
+	  Fuse (Philip Kendall).
+
 2002-02-04  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.4.1 released.
