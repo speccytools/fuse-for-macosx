@@ -65,6 +65,7 @@ static void gtkui_reset(GtkWidget *widget, gpointer data);
 static void gtkui_switch(GtkWidget *widget, gpointer data);
 
 static char* gtkui_fileselector_get_filename( void );
+static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
@@ -301,8 +302,12 @@ static char* gtkui_fileselector_get_filename( void )
   gtk_signal_connect(
        GTK_OBJECT( GTK_FILE_SELECTION( selector.selector )->cancel_button),
        "clicked",
-       GTK_SIGNAL_FUNC (gtkui_fileselector_cancel),
+       GTK_SIGNAL_FUNC(gtkui_fileselector_cancel ),
        (gpointer) &selector );
+
+  gtk_signal_connect( GTK_OBJECT( selector.selector ), "delete_event",
+		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
+		      (gpointer) &selector );
 
   gtk_window_set_modal( GTK_WINDOW( selector.selector ), TRUE );
 
@@ -311,6 +316,12 @@ static char* gtkui_fileselector_get_filename( void )
   gtk_main();
 
   return selector.done ? selector.filename : NULL;
+}
+
+static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data )
+{
+  gtk_widget_destroy( widget );
+  gtk_main_quit();
 }
 
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data )
