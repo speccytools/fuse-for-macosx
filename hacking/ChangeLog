@@ -1,0 +1,177 @@
+20030505 snapshot.c: use the fully encapsulated libspectrum_snap
+	 implementation
+20030506 ui/gtk/options.pl: make 'cancel via Escape' GTK+ 2.0 compatible
+	 (Matthew Westcott)
+20030506 ui/fb/fbdisplay.c: make bright black also be black (Witold).
+20030508 ui/gtk/debugger.c: add disassembly scrollbar and other small
+	 improvements
+20030510 fall back to normal IO if mmap(2) fails
+20030513 fuse.c, utils.c: use libspectrum_identify_class
+20030514 machine.c: fall back to 48K if selected machine not available
+20030514 ui/gtk/browse.c, ui/gtk/debugger.c: improvements on resizing
+	 windows
+20030516 ui/scaler/scalers.c: fix initialisation bug in AdvMame2x
+	 scaler (Fred)
+20030516 widget/options.pl: refresh screen when dialog finished (Fred?)
+20030516 change scaler calling convention to remove unused paramter
+	 macroise the declarations in ui/scaler/scaler_internals.h
+	 (Fred/ScummVM team)
+20030516 Add AdvMame3x scaler (Fred/ScummVM team)
+20030519 ui/scaler/scalers.c: use ScummVM's fix for the AdvMame2x bug
+	 (Fred/ScummVM team)
+20030520 keysyms.pl: tidy up
+20030524 z80/z80_ops.c: Add missing memory contention on SBC A,nn
+20030524 z80/z80_ops.c: autogenerate
+20030525 dck.c: support for dock files with RAM in the HOME bank
+	 (Fred)
+20030525 z80/z80_cb.c: autogenerate
+20030525 tape.c: TC2068 traps apply only when in EXROM (Fred)
+20030525 tc2068.c: memory contention applies only in home bank (Fred)
+20030525 z80/z80_ed.c, z80_ddfd.c, z80_cbddfd.c: autogenerate
+20030525 TAG: Release-0_6_1pre1
+20030527 Deactivate inappropriate menu items
+20030528 BRANCH: Release-0_6_0-bugfix-branch (from Release-0_6_0)
+20030528 trdos.c: fix race conditions (Release-0_6_0-bugfix-branch)
+20030529 ui/scaler/scalers.c: apply AdvMame2x bugfix from HEAD
+	 (Release-0_6_0-bugfix-branch)
+20030529 ui/gtk/debugger.c: 'return' evaluates current command
+	 (Random)
+20030529 spec128.c: get port mask right when checking for contention
+20030531 TAG: Release-0_6_0_1 (on Release-0_6_0-bugfix-branch)
+20030531 merge from Release-0_6_0-bugfix-branch onto HEAD
+20030601 make the File/Recording menu items activate correctly
+20030602 PSG logging (Matthew Westcott)
+20030603 sdlsound.c: let SDL convert sound formats for us
+	 (Fred/Steven Harrison)
+20030605 z80/coretest.c: beginnings of core test program
+20030606 first tests for the core tester (0x00, 0x01)
+20030607 z80/tests/: tests for 0x02 to 0x0f
+20030608 z80/tests/: tests for 0x11 to 0x1f
+20030608 specplus3.c: fix call signature of lib765's error function
+20030609 z80/tests/: tests for 'most of' 0x20 to 0x3f
+20030610 z80/tests/: tests for 0x20, 0x28, 0x30, 0x38 and 0x40 to 0x7f
+20030610 snapshot.c: new snapshot writing API
+20030611 z80/tests/: tests for 0x80 to 0xbf, "RET and friends",
+20030611 snapshot.c: print appropriate warning on major info loss when
+	 writing
+20030612 rzx.c: use libspectrum_creator
+20030612 rzx.c: File/Recording menu should still be active when
+	 recording
+20030613 snapshot.c: use libspectrum_creator
+20030614 debugger/: "out" command to write to a port
+20030615 add ability to load/save arbitrary chunks of memory
+20030616 machine.c: use new "dock" capability
+20030616 sdlsound.c: remove bits now unused due to SDL doing the sound
+	 format conversions
+20030616 ui/gtk/binary.c: typecast info->file.length to unsigned long
+	 when printing
+20030616 trdos.c: use libspectrum to identify TRDOS disks
+20030618 ui/gtk: add confirmation dialogs for reset and exit
+20030618 keysyms.pl, widget/menu.c, widget/menu_data.c: fix
+	 compilation failures
+20030620 ui/scaler: various cleanups (Fred/ScummVM team)
+20030620 move gcc compatibility macros into compat.h
+20030620 explicitly open files as O_BINARY. #define O_BINARY to 0 on
+	 systems where this isn't needed
+20030620 widget/widget.c: use utils_file_{open,close} (Marek)
+20030620 utils.c: never try and munmap a file if mmap not present.
+20030621 ui/gtk/confirm.c: add keyboard shortcuts
+20030621 ui/gtk/binary.c, ui/gtk/confirm.c: don't compile if not using
+	 the GTK+ UI
+20030621 Add mkstemp code from glibc 2.3.1.
+20030621 Move the getopt replacement code into compat/
+20030623 trdos.c, utils.c, utils.h: Add utils_get_temp_path and use it
+	 in trdos.c:insert_scl
+20030623 utils.c: optionally autoload TRDOS disks.
+20030623 Make GTK+ 2.x work again (Marek)
+20030623 Removed unneeded #include <sys/mman.h>s; Win32 fix (Marek)
+20030623 timer.c: remove unused #include <spectrum.h>
+20030624 z80/tests: add tests for {c,d,e,f}1: POP regpair,
+	 {c,d,e,f}{2,a}: JP condition, location,  c3: JP nnnn,
+	 {c,d,e,f}{4,c}: CALL condition, location, {c,d,e,f}5: PUSH
+	 regpair, {c,d,e,f}{6,e}: arithmetic/logical nn,
+	 {c,d,e,f}{7,f}: RST nn, cd: CALL nnnn, d{3,b}: OUT (nn),A and
+	 IN A,(nn), d9: EXX, e{3,b}: EX (SP),HL and EX DE,HL, e9: JP
+	 HL, f{3,9,b}: DI, LD SP,HL and EI and 10: DJNZ.
+20030624 Rename DATADIR to FUSEDATADIR; Win32 compatability.
+20030624 timer.c: add Win32 timing routines (Marek)
+20030625 lib/disk_plus3.z80, utils.c: autoloading for +3 disks.
+20030626 z80/tests: add tests for 27 (DAA) and all of the cb xx
+	 opcodes.
+20030626 timer.c: put Unix-specific includes inside the #ifndef WIN32
+20030626 trdos.c: #include <compat.h>
+20030629 z80/tests: add some ed xx tests
+20030705 z80/tests: add more ed xx tests
+20030706 z80/tests: finish ed xx tests
+20030706 z80/tests: add tests for all of dd xx and fd xx
+20030708 debugger/commandl.l, debugger/commandy.y: use derived types
+	 to reduce the number of commands needed
+20030708 debugger/: remove the obsolete 'breakpoint show' command
+20030708 debugger/commandl.l, debugger/commandy.y: add tbreak command
+20030709 debugger/debugger.c: remove last remnants of 'breakpoint
+	 show'
+20030710 debugger/: first bits of code for conditional breakpoints
+20030710 z80/tests/: add tests for all of dd cb xx and fd cb xx
+	 opcodes
+20030711 use libspectrum_word etc rather than WORD
+20030711 debugger/commandy.y: add missing semicolons at end of rules
+20030712 debugger/, ui/gtk/debugger.c: more conditional breakpoint
+	 code
+20030713 debugger/: yet more conditional breakpoint code
+20030715 specplus3.c: allow opening of read-only disk images (bug
+	 pointed out by Erik Kunze)
+20030716 configure.in: remove unused sizeof(...) tests
+20030717 tape.c: use encapsulated tape block API
+20030719 tape.c: use encapsulated tape API
+20030722 Sync the crypto branch (Release-0_5_1pre1-crypto-branch) with
+	 current HEAD
+20030722 Create tag Release-0_5_1pre1-crypto-branch-1
+	 (Release-0_5_1pre1-crypto-branch)
+20030723 Add 'competition' mode (Release-0_5_1pre1-crypto-branch)
+20030724 timer.c: tidy up the multiple #ifndef DEBUG_MODE directives
+	 (Release-0_5_1pre1-crypto-branch)
+20030725 timer.c: stop competition mode recording if the emulator gets
+	 more than 0.5s behind 'real time' (Release-0_5_1pre1-crypto-branch)
+20030725 Add separate rzx_competition_mode variable
+	 (Release-0_5_1pre1-crypto-branch)
+20030725 rzx.c: Set speed to 100% when starting competition mode
+	 recording (Release-0_5_1pre1-crypto-branch)
+20030727 fuse.c, rzx.c: start rzx recording after parsing all
+	 non-option arguments (Release-0_5_1pre1-crypto-branch)
+20030728 rzx.c, timer.c: use gettimeofday for speed regulation
+	 (Release-0_5_1pre1-crypto-branch)
+20030804 rzx.c: use new crypto API (Release-0_5_1pre1-crypto-branch)
+20030804 rzx.c: get division the right way up when calculating
+	 relative speeds (Release-0_5_1pre1-crypto-branch)
+20030812 rzx.c, settings.dat, options.dat: add support for competition
+	 codes (Release-0_5_1pre1-crypto-branch)
+20030812 ui/gtk/options.pl: improve spacing around text entry options
+	 (Release-0_5_1pre1-crypto-branch)
+20030812 ui/gtk/options.pl: pressing 'Return' is equivalent to 'OK'
+	 (Release-0_5_1pre1-crypto-branch)
+20030812 hacking/cvs-tags: document the crypto-branch tags
+	 (Release-0_5_1pre1-crypto-branch)
+20030812 Merge the crypto branch (at Release-0_5_1pre1-crypto-branch-2)
+	 onto HEAD (at Release-0_6_1pre1-merge-2)
+20030814 ui/gtk/debugger.c: print the Timex DEC field out properly
+20030817 dck.c: use the libspectrum dock capability
+20030817 ui/sdl/sdlui.c: handle SDL_VIDEOEXPOSE event (Fred)
+20030817 fuse.c: don't ever exit early from fuse_end
+20030817 rzx.h: add missing extern on rzx_competition_mode (Fred)
+20030817 joystick.c: use Kempston joystick capability
+20030818 settings.pl: check no strdup() calls return NULL.
+20030820 compat/Makefile.am: add @INCLUDES@
+20030820 debugger/commandy.y: add missing ';'
+20030821 rzx.c: deactivate recording menu before checking the start
+	 time (or OS X loses too much time and stops competition mode
+	 recording) (Fred)
+20030822 ui/sdl/sdlui.c: #include "display.h"
+20030822 fuse/fuse.c: check whether emulation is paused before
+	 displaying 'stopping competition mode recording'.
+20030825 rzx.c: read in external snapshots before starting RZX
+	 playback.
+20030901 ui/options.dat: rename "auto-load tapes" to "auto-load
+	 tapes/disks".
+20030901 man/fuse.1: bring up to date.
+20030902 man/fuse.1: use \fB rather than .B for large bit of bold text
+	 in the 'competition mode' entry (works much better on Solaris).
