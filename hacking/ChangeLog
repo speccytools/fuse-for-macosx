@@ -1004,3 +1004,4 @@
 20040715 autogen.sh: copy auxiliary files rather than linking them.
 20040715 man/fuse.1: Fix typo in pokefinder section.
 20040716 rzx.c: change over to using the release RZX signing key.
+20040716 configure.in: bump version number to 0.7.0.
