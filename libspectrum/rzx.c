@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#include <string.h>
+
 #include "rzx.h"
 
 static libspectrum_error
