@@ -100,7 +100,6 @@ noinst_HEADERS = ay.h \
 	tape.h \
 	timer.h \
 	trdos.h \
-	types.h \
 	utils.h \
 	sdlsound.h \
 	joystick.h \
