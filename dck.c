@@ -89,9 +89,6 @@ dck_read( const char *filename )
   libspectrum_dck *dck;
   int error;
 
-  int i;
-  memory_page **mem;
-
   error = libspectrum_dck_alloc( &dck ); if( error ) return error;
 
   error = utils_read_file( filename, &file );
@@ -108,6 +105,8 @@ dck_read( const char *filename )
   }
 
   while( dck->dck[num_block] != NULL ) {
+    memory_page **mem;
+    int i;
 
     switch( dck->dck[num_block]->bank ) {
     case LIBSPECTRUM_DCK_BANK_HOME:
