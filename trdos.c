@@ -361,7 +361,7 @@ trdos_disk_insert_trd( trdos_drive_number which, const char *filename )
     }
 
     temp = malloc( TRDOS_DISC_SIZE );
-    bzero( temp, TRDOS_DISC_SIZE );
+    memset( temp, TRDOS_DISC_SIZE, 0 );
     write( fil, temp, TRDOS_DISC_SIZE );
     free( temp );
 
