@@ -236,3 +236,5 @@
 	 routines.
 20031005 widget/menu.c, widget/widget.c: use the new statusbar and menu
 	 activation routines.
+20031006 specplus3.c: if emulating a +2A, don't update the status of the
+	 disk motor when the +2A/+3 memory port is written to.
