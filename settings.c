@@ -199,6 +199,7 @@ int settings_copy( settings_info *dest, settings_info *src )
   dest->tape_traps   = src->tape_traps;
   dest->stereo_ay    = src->stereo_ay;
   dest->slt_traps    = src->slt_traps;
+  dest->sound_device = src->sound_device;
 
   return 0;
 }
