@@ -74,25 +74,6 @@ static SDL_Color colour_palette[] = {
 
 static Uint32 bw_values[16];
 
-static SDL_Color bw_palette[] = {
-  {   0,   0,   0,   0 }, 
-  {  64,  64,  64,   0 }, 
-  {  64,  64,  64,   0 }, 
-  { 128, 128, 128,   0 }, 
-  {  64,  64,  64,   0 }, 
-  { 128, 128, 128,   0 }, 
-  { 128, 128, 128,   0 }, 
-  { 192, 192, 192,   0 }, 
-  {   0,   0,   0,   0 }, 
-  {  85,  85,  85,   0 }, 
-  {  85,  85,  85,   0 }, 
-  { 170, 170, 170,   0 }, 
-  {  85,  85,  85,   0 }, 
-  { 170, 170, 170,   0 }, 
-  { 170, 170, 170,   0 }, 
-  { 255, 255, 255,   0 }
-};
-
 /* This is a rule of thumb for the maximum number of rects that can be updated
    each frame. If more are generated we just update the whole screen */
 #define MAX_UPDATE_RECT 300
@@ -170,11 +151,17 @@ sdldisplay_allocate_colours( int numColours, Uint32 *colour_values,
 {
   int i;
 
+  Uint8 red, green, blue, grey;
+
+    red = colour_palette[i].r;
+  green = colour_palette[i].g;
+   blue = colour_palette[i].b;
+
+   grey = 0.299 * red + 0.587 * green + 0.114 * blue;
+
   for( i = 0; i < numColours; i++ ) {
-    colour_values[i] = SDL_MapRGB( tmp_screen->format,  colour_palette[i].r,
-				   colour_palette[i].g, colour_palette[i].b  );
-    bw_values[i]     = SDL_MapRGB( tmp_screen->format,  bw_palette[i].r,
-				   bw_palette[i].g,     bw_palette[i].b      );
+    colour_values[i] = SDL_MapRGB( tmp_screen->format,  red, green, blue );
+    bw_values[i]     = SDL_MapRGB( tmp_screen->format, grey,  grey, grey );
   }
 
   return 0;

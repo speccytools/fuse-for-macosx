@@ -85,12 +85,6 @@ static guchar rgb_colours[16][3] = {
 
 };
 
-/* And the black and white palette */
-static guchar rgb_bw[16] = {
-  0, 64, 64, 128, 64, 128, 128, 192,
-  0, 85, 85, 170, 85, 170, 170, 255
-};
-
 /* And the colours (and black and white 'colours') in 32-bit format */
 libspectrum_dword gtkdisplay_colours[16];
 static libspectrum_dword bw_colours[16];
@@ -141,19 +135,23 @@ init_colours( void )
 
   for( i = 0; i < 16; i++ ) {
 
+    guchar red, green, blue, grey;
+
+    red   = rgb_colours[i][0];
+    green = rgb_colours[i][1];
+    blue  = rgb_colours[i][2];
+
+    grey = 0.299 * red + 0.587 * green + 0.114 * blue;
+
 #ifdef WORDS_BIGENDIAN
 
-    gtkdisplay_colours[i] = rgb_colours[i][0] << 24 |
-			    rgb_colours[i][1] << 16 |
-			    rgb_colours[i][2] <<  8 ;
-    bw_colours[i] = rgb_bw[i] << 24 | rgb_bw[i] << 16 | rgb_bw[i] << 8;
+    gtkdisplay_colours[i] =  red << 24 | green << 16 | blue << 8;
+            bw_colours[i] = grey << 24 |  grey << 16 | grey << 8;
 
 #else				/* #ifdef WORDS_BIGENDIAN */
 
-    gtkdisplay_colours[i] = rgb_colours[i][0]       |
-			    rgb_colours[i][1] <<  8 |
-			    rgb_colours[i][2] << 16 ;
-    bw_colours[i] = rgb_bw[i] | rgb_bw[i] << 8 | rgb_bw[i] << 16;
+    gtkdisplay_colours[i] =  red | green << 8 | blue << 16;
+            bw_colours[i] = grey |  grey << 8 | grey << 16;
 
 #endif				/* #ifdef WORDS_BIGENDIAN */
 

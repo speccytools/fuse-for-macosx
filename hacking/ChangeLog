@@ -201,3 +201,5 @@
 20030919 Makefile.am, configure.in, ui/Makefile.am: step into only the UI
 	 directory for the one we're actually building (similarly for the
 	 widget directory).
+20030919 ui/gtk/gtkdisplay.c, ui/sdl/sdldisplay.c: get greyscale values
+	 via 0.299r+0.587g+0.114b rather than 0.333r+0.333g+0.333b.
