@@ -301,4 +301,6 @@ periph_update( void )
     periph_interface2_active = settings_current.interface2; break;
   case PERIPH_PRESENT_ALWAYS: periph_interface2_active = 1; break;
   }
+  
+  machine_current->memory_map();
 }

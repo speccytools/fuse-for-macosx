@@ -31,6 +31,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "if2.h"
 #include "memory.h"
 #include "settings.h"
 #include "spectrum.h"
@@ -243,22 +244,16 @@ memory_update_home( size_t start, size_t n )
 void
 memory_romcs_map( void )
 {
-  int zxatasp, zxcf;
-
   /* Nothing changes if /ROMCS is not set */
   if( !machine_current->ram.romcs ) return;
 
-  zxatasp = settings_current.zxatasp_active && settings_current.zxatasp_upload;
-  zxcf = settings_current.zxcf_active && settings_current.zxcf_upload;
+  /* FIXME: what should we do if more than one of these devices is
+     active? */
+  if( machine_current->capabilities &
+      LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )
+    trdos_memory_map();
 
-  /* If we're not uploading to either the ZXATASP or ZXCF interfaces,
-     reads come from the chip select bank */
-  if( !zxatasp && !zxcf ) {
-    memory_map_read[0] = memory_map_romcs[0];
-    memory_map_read[1] = memory_map_romcs[1];
-  }
-
-  /* Writes always go to the chip select bank */
-  memory_map_write[0] = memory_map_romcs[0];
-  memory_map_write[1] = memory_map_romcs[1];
+  if( if2_active ) if2_memory_map();
+  if( settings_current.zxatasp_active ) zxatasp_memory_map();
+  if( settings_current.zxcf_active ) zxcf_memory_map();
 }

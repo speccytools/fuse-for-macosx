@@ -35,5 +35,6 @@ extern int if2_active;
 int if2_insert( const char *filename );
 void if2_eject( void );
 int if2_reset( void );
+void if2_memory_map( void );
 
 #endif				/* #ifndef FUSE_IF2_H */

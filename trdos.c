@@ -227,6 +227,13 @@ trdos_unpage( void )
   machine_current->memory_map();
 }
 
+void
+trdos_memory_map( void )
+{
+  memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
+  memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
+}
+  
 static
 void trdos_update_index_impulse( void )
 {

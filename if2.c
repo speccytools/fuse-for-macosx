@@ -106,11 +106,17 @@ if2_reset( void )
 
   machine_current->ram.romcs = 1;
 
-  memory_romcs_map();
-
   if2_active = 1;
+  memory_romcs_map();
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 1 );
 
   return 0;
+}
+
+void
+if2_memory_map( void )
+{
+  memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
+  memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
 }

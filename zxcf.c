@@ -1,6 +1,8 @@
 /* zxcf.c: ZXCF interface routines
    Copyright (c) 2003-2004 Garry Lancaster,
 		 2004 Philip Kendall
+		 
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -221,4 +223,16 @@ libspectrum_byte*
 zxcf_ram( size_t page )
 {
   return ZXCFMEM[ page ];
+}
+
+void
+zxcf_memory_map( void )
+{
+  if( !settings_current.zxcf_upload ) {
+    memory_map_read[0] = memory_map_romcs[0];
+    memory_map_read[1] = memory_map_romcs[1];
+  }
+
+  memory_map_write[0] = memory_map_romcs[0];
+  memory_map_write[1] = memory_map_romcs[1];
 }

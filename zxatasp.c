@@ -2,6 +2,8 @@
    Copyright (c) 2003-2004 Garry Lancaster,
 		 2004 Philip Kendall
 
+   $Id$
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -275,7 +277,7 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
   libspectrum_byte newC;
   
   if( !settings_current.zxatasp_active ) return;
-  
+
   /* Determine new port C value, dependent on I/O modes */
   newC = ( zxatasp_control & MC8255_PORT_C_LOW_IO )
             ? ( oldC & 0x0f ) : ( data & 0x0f );
@@ -425,4 +427,22 @@ zxatasp_writeide(libspectrum_ide_channel *chn,
   
   if( idereg == LIBSPECTRUM_IDE_REGISTER_DATA )
     libspectrum_ide_write( chn, idereg, dataHi );
+}
+
+void
+zxatasp_memory_map( void )
+{
+  int writable;
+
+  writable = settings_current.zxatasp_wp ? 0 : 1;
+
+  memory_map_romcs[0].writable = memory_map_romcs[1].writable = writable;
+
+  if( !settings_current.zxatasp_upload ) {
+    memory_map_read[0] = memory_map_romcs[0];
+    memory_map_read[1] = memory_map_romcs[1];
+  }
+
+  memory_map_write[0] = memory_map_romcs[0];
+  memory_map_write[1] = memory_map_romcs[1];
 }

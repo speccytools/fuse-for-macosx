@@ -38,6 +38,6 @@ void zxatasp_reset( void );
 int zxatasp_insert( const char *filename, libspectrum_ide_unit unit );
 int zxatasp_commit( libspectrum_ide_unit unit );
 int zxatasp_eject( libspectrum_ide_unit unit );
-void zxatasp_mem_setcs( void );
+void zxatasp_memory_map( void );
 
 #endif			/* #ifndef FUSE_ZXATASP_H */

@@ -38,6 +38,7 @@ void zxcf_reset( void );
 int zxcf_insert( const char *filename );
 int zxcf_commit();
 int zxcf_eject( void );
+void zxcf_memory_map( void );
 
 void zxcf_memctl_write( libspectrum_word port, libspectrum_byte data );
 libspectrum_byte zxcf_last_memctl( void );

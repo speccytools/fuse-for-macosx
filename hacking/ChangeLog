@@ -865,3 +865,5 @@
          snapshots.
 20040527 snapshot.c: Enable dock cartridge eject menu item when loading 2068
          snapshots with Dock cartridges installed.
+20040527 if2.[ch],memory.c,periph.c,trdos.[ch],zxatasp.[ch],zxcf.[ch]:
+	 simplify the handling of /ROMCS memory mapping.
