@@ -325,7 +325,6 @@ static int playback_frame( void )
 	      "Not enough INs during frame %d: expected %d, got %d",
 	      rzx_current_frame, rzx.frames[ rzx_data_frame ].count,
 	      rzx_in_count );
-    abort();
     return rzx_stop_playback( 0 );
   }
 
