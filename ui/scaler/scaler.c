@@ -442,20 +442,17 @@ static void
 SuperEagle(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 	   BYTE *dstPtr, DWORD dstPitch, int width, int height)
 {
-  BYTE *dP;
-  WORD *bP;
-  DWORD inc_bP;
+  scaler_data_type *bP, *dP;
 
   {
     DWORD finish;
-    DWORD Nextline = srcPitch >> 1;
-
-    inc_bP = 1;
+    DWORD Nextline = srcPitch / sizeof( scaler_data_type );
+    DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
 
     while (height--) {
-      bP = (WORD *) srcPtr;
-      dP = dstPtr;
-      for (finish = width; finish; finish -= inc_bP) {
+      bP = (scaler_data_type*)srcPtr;
+      dP = (scaler_data_type*)dstPtr;
+      for( finish = width; finish; finish-- ) {
 	DWORD color4, color5, color6;
 	DWORD color1, color2, color3;
 	DWORD colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
@@ -538,18 +535,10 @@ SuperEagle(BYTE *srcPtr, DWORD srcPitch, BYTE *deltaPtr,
 	  product1b = Q_INTERPOLATE(color6, color6, color6, product1b);
 	}
 
-#ifdef WORDS_BIGENDIAN
-	product1a = product1b | (product1a << 16);
-	product2a = product2b | (product2a << 16);
-#else
-	product1a = product1a | (product1b << 16);
-	product2a = product2a | (product2b << 16);
-#endif
-	*((DWORD *) dP) = product1a;
-	*((DWORD *) (dP + dstPitch)) = product2a;
+	*dP = product1a; *(dP+nextDstLine) = product2a; dP++;
+	*dP = product1b; *(dP+nextDstLine) = product2b; dP++;
 
-	bP += inc_bP;
-	dP += sizeof(DWORD);
+	bP++;
       }				/* end of for ( finish= width etc..) */
 
       srcPtr += srcPitch;

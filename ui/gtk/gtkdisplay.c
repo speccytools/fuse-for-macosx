@@ -224,6 +224,7 @@ register_scalers( void )
       scaler_register( SCALER_TV2X );
       scaler_register( SCALER_ADVMAME2X );
       scaler_register( SCALER_SUPER2XSAI );
+      scaler_register( SCALER_SUPEREAGLE );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_DOUBLESIZE );
       return 0;
