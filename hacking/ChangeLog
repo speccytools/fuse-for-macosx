@@ -1288,3 +1288,4 @@
 20050325 menu_data.c,widget/{Makefile.am,menu.c,pokefinder.c,widget.[ch],
 	 widget_internals.h}: add widget pokefinder (patch #1150703)
 	 (Darren).
+20050325 ChangeLog: bring up to date.

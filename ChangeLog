@@ -1,3 +1,58 @@
+2005-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* New features:
+	  * RZX 'rollback' support (Philip Kendall).
+	  * TS2068 support (Fredrick Meunier).
+	  * Interface I and microdrive emulation (Gergely Szasz).
+	  * Kempston mouse emulation (Darren Salt).
+	  * Allow SDL full screen mode to be used (Darren Salt).
+	  * Add the ability to save 'movies' as collections of screenshots
+	    (Gergely Szasz).
+	  * Widget pokefinder (Darren Salt).
+	  * Add a simple code profiler (Philip Kendall).
+	  * New libao sound driver (Gergely Szasz).
+
+	* Emulation core improvements:
+	  * Improved screen rendering code (now character accurate rather
+	    than line accurate) (Philip Kendall).
+	  * Improved ULA emulation with respect to interrupt length
+	    (thanks, Jon Needle, Ramsoft and Mark Woodmass) (Philip
+	    Kendall).
+	  * Improved speed control code (Fredrick Meunier).
+
+	* Miscellaneous:
+	  * Allow filenames to be selected from the widget UIs (Darren
+	    Salt).
+	  * Add a 'save, don't save, cancel' confirmation dialog before any
+	    changes to media are lost under the GTK+ UIs (Philip Kendall).
+	  * Store current joystick information in snapshots (Fredrick
+	    Meunier).
+	  * Optional use of doublescan modes in the framebuffer and
+	    SVGAlib UIs (Darren Salt).
+	  * Black and white TV support for the framebuffer, SVGAlib and
+	    Xlib UIs (Darren Salt).
+	  * Catch 'window close' events in the Xlib UI (Darren Salt).
+	  * Use stock button icons in the GTK+ 2.x UI (Darren Salt).
+	  * Save/restore the 'issue 2 keyboard' flag from snapshots
+	    (Philip Kendall).
+	  * Deactivate widget menu items when they are inappropriate
+	    (Darren Salt).
+	  * Correctly quote '-' characters in the man page (needed for
+	    UTF-8 environments) (Darren Salt, Stuart Brady).
+	  * Use separate menus for controlling +3 and TR-DOS disks (Philip
+	    Kendall).
+	  * Fix behaviour of ZXATASP and ZXCF on reset (Garry Lancaster).
+	  * Improved window scaling behaviour (Darren Salt).
+	  * Allow use of the mouse scroll wheel in the GTK+ debugger
+	    (Darren Salt).
+	  * Improved interaction between Media/Tape/Play and tape traps
+	    (Darren Salt).
+	  * Various minor improvements to the framebuffer UI (Darren
+	    Salt).
+
+	* Various other minor bugfixes (Fredrick Meunier, Philip Kendall,
+	  Mark Round, Darren Salt, Paul van der Laan).
+
 2004-07-16  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.7.0 released.
