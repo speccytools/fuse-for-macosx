@@ -1,9 +1,9 @@
-The Free Unix Spectrum Emulator (Fuse) 0.3.2
+The Free Unix Spectrum Emulator (Fuse) 0.4.0
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.3.2.
+is Fuse (the Free Unix Spectrum Emulator), version 0.4.0.
 
 What Fuse does have:
 
@@ -11,12 +11,13 @@ What Fuse does have:
   speed on any computer you're likely to try it on (it runs at full
   speed on a SparcStation 4 unless you do too much graphics intensive
   stuff).
+* Support for loading from .tzx files.
 * Sound (on systems supporting the Open Sound System).
+* Kempston joystick emulation.
 
 What Fuse doesn't have:
 
-* The ability to save to tape files
-* Emulation of any peripherals (bar the tape deck)
+* Emulation of any other peripherals (bar the tape deck)
 * A keyboard picture, so you can find those keywords
 * ...
 
@@ -41,44 +42,36 @@ interface, as GTK+ depends on glib). If you're having problem with
 your glib setup, you can use the `--without-glib' option to
 `configure', which will use some simple replacement routines.
 
+On a FreeBSD system, you may have to do
+
+$ GTK_CONFIG=`which gtk12-config` GLIB_CONFIG=`which glib12-config` ./configure
+
+if you want to use either GTK+ or glib.
+
 Then just:
 
 $ make
+
+(or `gmake' if that's what GNU Make is called on your system)
+
+and then
+
+$ make install
+
+if you want to place Fuse into the main directories on your system
+(under /usr/local by default, although you can change this with the
+--prefix argument to `configure'). You'll probably need to be root to
+do this bit.
 
 To run fuse:
 
 $ fuse [snapshot]
 
-Not too difficult. You should then be presented with the familiar
+Not too difficult. For everything after that,
 
-`(c) 1982 Sinclair Research Ltd'
+$ man fuse
 
-message, unless you gave a .z80 or .sna snapshot on the command line,
-in which case you should get that instead. Numbers, letters, etc
-should now work as they do on the Speccy (plus a few others eg
-Backspace = CAPS + 0). Also:
-
- F2: Save snapshot.
- F3: Load snapshot.
- F4: Select options.
- F5: Reset Spectrum.
- F7: Open tape file.
- F8: Start/stop tape.
- F9: Switch between 48K/128K/+2/+2A emulation
-F10: Quit Fuse
-
-Snapshots can be in either .z80 or .sna format; (If you need to
-convert your snaps to .z80, try SnapConv:
-http://www.srcf.ucam.org/~pak21/spectrum/snapconv.html). If you're not
-using the GTK+ user interface, snapshots will be saved to
-`snapshot.z80', and will happily overwrite any other file you may have
-with that name.
-
-There are two forms of tape loading, toggled via the F4 options
-menu. In `fast' mode (tape traps active), Fuse will recognise when
-you're trying to load a block from tape and instantly copy that block
-from the emulated tape file into memory. In `slow' mode, you'll get
-the full border stripes effect as you would on a real Spectrum.
+is your friend.
 
 Fuse is copyrighted under the GNU General Public License (see the file
 `COPYING' for details). However, note the GPL does *not* apply to the
@@ -101,10 +94,7 @@ or the latest version should be available from the World of Spectrum
 
 ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/unix/
 
-Finally, if you want to see how a Unix Speccy emulator should be done,
-check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
-
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-7 October 2001
+20 December 2001
 
 $Id$

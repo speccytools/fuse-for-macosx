@@ -4,7 +4,8 @@ Fuse has been brought to you by:
   replacement code, some work on the sound code and the original
   `widget' code.
 
-* Russell Marks: the generic and OSS-specific sound code.
+* Russell Marks: the generic and OSS-specific sound code, the man page
+  and the Kempston joystick emulation.
 
 * Philip Kendall: everything else.
 
