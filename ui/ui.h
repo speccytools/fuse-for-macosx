@@ -75,4 +75,10 @@ libspectrum_error ui_libspectrum_error( libspectrum_error error,
 typedef int (*ui_scaler_available)( scaler_type scaler );
 scaler_type ui_get_scaler( ui_scaler_available available );
 
+/* Functions to (de)activate certain menu items */
+int ui_menu_activate_media_cartridge( int active );
+int ui_menu_activate_media_cartridge_eject( int active );
+int ui_menu_activate_media_disk( int active );
+int ui_menu_activate_media_disk_eject( int which, int active );
+
 #endif			/* #ifndef FUSE_UI_H */

@@ -161,6 +161,7 @@ static int fuse_init(int argc, char **argv)
 
   if( printer_init() ) return 1;
   if( rzx_init() ) return 1;
+  if( trdos_init() ) return 1;
 
   z80_init();
 

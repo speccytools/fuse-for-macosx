@@ -72,6 +72,12 @@ GtkWidget *gtkui_drawing_area;
 /* Popup menu widget(s), as invoked by F1 */
 GtkWidget *gtkui_menu_popup;
 
+/* The item factory used to create the menu bar */
+GtkItemFactory *menu_factory;
+
+/* And that used to create the popup menus */
+GtkItemFactory *popup_factory;
+
 /* Structure used by the radio button selection widgets (the graphics
    filter selectors and Machine/Select) */
 typedef struct gtkui_select_info {
@@ -144,6 +150,9 @@ static void gtkui_help_keyboard( GtkWidget *widget, gpointer data );
 
 static void gtkui_fileselector_done( GtkButton *button, gpointer user_data );
 static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
+
+/* Set a menu item (in)active in both the menu bar and the popup menus */
+static int set_menu_item_active( const char *path, int active );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File",		        NULL , NULL,                0, "<Branch>"    },
@@ -306,18 +315,18 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				GtkItemFactoryEntry *menu_data,
 				guint menu_data_size)
 {
-  GtkItemFactory *item_factory;
-
   *accel_group = gtk_accel_group_new();
-  item_factory = gtk_item_factory_new( GTK_TYPE_MENU_BAR, "<main>",
+  menu_factory = gtk_item_factory_new( GTK_TYPE_MENU_BAR, "<main>",
 				       *accel_group );
-  gtk_item_factory_create_items(item_factory, menu_data_size, menu_data, NULL);
-  *menu_bar = gtk_item_factory_get_widget( item_factory, "<main>" );
+  gtk_item_factory_create_items( menu_factory, menu_data_size, menu_data,
+				 NULL);
+  *menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
 
   /* We have to recreate the menus for the popup, unfortunately... */
-  item_factory = gtk_item_factory_new( GTK_TYPE_MENU, "<main>", NULL );
-  gtk_item_factory_create_items(item_factory, menu_data_size, menu_data, NULL);
-  gtkui_menu_popup = gtk_item_factory_get_widget( item_factory, "<main>" );
+  popup_factory = gtk_item_factory_new( GTK_TYPE_MENU, "<main>", NULL );
+  gtk_item_factory_create_items( popup_factory, menu_data_size, menu_data,
+				 NULL);
+  gtkui_menu_popup = gtk_item_factory_get_widget( popup_factory, "<main>" );
 
   return FALSE;
 }
@@ -1089,6 +1098,60 @@ gtkui_fileselector_cancel( GtkButton *button GCC_UNUSED, gpointer user_data )
   gtk_widget_destroy( ptr->selector );
 
   gtk_main_quit();
+}
+
+/* Functions to activate and deactivate certain menu items */
+
+static int
+set_menu_item_active( const char *path, int active )
+{
+  GtkWidget *menu_item;
+
+  menu_item = gtk_item_factory_get_widget( menu_factory, path );
+  if( !menu_item ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get menu item '%s' from menu_factory",
+	      path );
+    return 1;
+  }
+  gtk_widget_set_sensitive( menu_item, active );
+
+  menu_item = gtk_item_factory_get_widget( popup_factory, path );
+  if( !menu_item ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get menu item '%s' from popup_factory",
+	      path );
+    return 1;
+  }
+  gtk_widget_set_sensitive( menu_item, active );
+
+  return 0;
+}
+
+int
+ui_menu_activate_media_cartridge( int active )
+{
+  return set_menu_item_active( "/Media/Cartridge", active );
+}
+
+int
+ui_menu_activate_media_cartridge_eject( int active )
+{
+  return set_menu_item_active( "/Media/Cartridge/Eject", active );
+}
+
+int
+ui_menu_activate_media_disk( int active )
+{
+  return set_menu_item_active( "/Media/Disk", active );
+}
+
+int
+ui_menu_activate_media_disk_eject( int which, int active )
+{
+  if( which == 0 ) {
+    return set_menu_item_active( "/Media/Disk/Drive A:/Eject", active );
+  } else {
+    return set_menu_item_active( "/Media/Disk/Drive B:/Eject", active );
+  }
 }
 
 #endif			/* #ifdef UI_GTK */

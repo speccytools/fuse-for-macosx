@@ -75,6 +75,8 @@ dck_eject( void )
   if( settings_current.dck_file ) free( settings_current.dck_file );
   settings_current.dck_file = NULL;
 
+  ui_menu_activate_media_cartridge_eject( 0 );
+
   machine_reset();
 }
 
@@ -160,6 +162,9 @@ dck_read( const char *filename )
     }
     num_block++;
   }
+
+  /* Make the menu item to eject the cartridge active */
+  ui_menu_activate_media_cartridge_eject( 1 );
 
   /* Don't deallocate the memory banks! */
   return libspectrum_dck_free( dck, 1 );

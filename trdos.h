@@ -1,5 +1,5 @@
 /* trdos.h: Routines for handling the Betadisk interface
-   Copyright (c) 2003 Fredrick Meunier
+   Copyright (c) 2003 Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -19,7 +19,10 @@
 
    Author contact information:
 
-   E-mail: fredm@spamcop.net
+   E-mail: pak21-fuse@srcf.ucam.org
+     Post: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+
+     Fred: fredm@spamcop.net
 
 */
 
@@ -27,6 +30,8 @@
 #define FUSE_TRDOS_H
 
 extern int trdos_active;     /* TRDOS enabled? */
+
+int trdos_init( void );
 
 void trdos_reset( void );
 

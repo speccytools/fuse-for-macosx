@@ -293,6 +293,12 @@ int specplus3_reset(void)
 			    machine_current->rom_length[3] );
   if( error ) return error;
 
+  /* We can eject disks only if they are currently present */
+  ui_menu_activate_media_disk_eject( SPECPLUS3_DRIVE_A,
+				     drives[ SPECPLUS3_DRIVE_A ].fd != -1 );
+  ui_menu_activate_media_disk_eject( SPECPLUS3_DRIVE_B,
+				     drives[ SPECPLUS3_DRIVE_B ].fd != -1 );
+
   return 0;
 }
 
@@ -473,6 +479,9 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
   fdd_setfilename( drives[which].drive, filename );
 #endif				/* #ifdef HAVE_LIBDSK_H */
 
+  /* And set the `eject' item active */
+  ui_menu_activate_media_disk_eject( which, 1 );
+
   return 0;
 }
 
@@ -500,6 +509,9 @@ specplus3_disk_eject( specplus3_drive_number which )
     }
     drives[which].fd = -1;
   }
+
+  /* Set the appropriate `eject' item inactive */
+  ui_menu_activate_media_disk_eject( which, 0 );
 
   return 0;
 }

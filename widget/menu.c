@@ -420,4 +420,11 @@ int widget_menu_keyboard( void *data )
   return 0;
 }
 
+/* Functions to (de)activate specific menu items */
+/* TODO: make these work */
+int ui_menu_activate_media_cartridge( int active ) { return 0; }
+int ui_menu_activate_media_cartridge_eject( int active ) { return 0; }
+int ui_menu_activate_media_disk( int active ) { return 0; }
+int ui_menu_activate_media_disk_eject( int which, int active ) { return 0; }
+
 #endif				/* #ifdef USE_WIDGET */

@@ -234,6 +234,24 @@ machine_select_machine( fuse_machine_info *machine )
 
   if( machine_reset() ) return 1;
 
+  /* Activate appropriate menu items */
+  capabilities = libspectrum_machine_capabilities( machine_current->machine );
+
+  if( ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) ||
+      ( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )    ) {
+    ui_menu_activate_media_disk( 1 );
+  } else {
+    ui_menu_activate_media_disk( 0 );
+  }
+
+  /* FIXME: put a capability in libspectrum for this */
+  if( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) {
+    ui_menu_activate_media_cartridge( 1 );
+    ui_menu_activate_media_cartridge_eject( 0 );
+  } else {
+    ui_menu_activate_media_cartridge( 0 );
+  };
+      
   return 0;
 }
 

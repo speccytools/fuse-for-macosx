@@ -169,6 +169,17 @@ static int insert_trd( trdos_drive_number which, const char *filename );
 static DWORD lsb2dw( BYTE *mem );
 static void dw2lsb( BYTE *mem, DWORD value );
 
+int
+trdos_init( void )
+{
+  discs[0].disc_ready = 0;
+  discs[1].disc_ready = 0;
+  discs[2].disc_ready = 0;
+  discs[3].disc_ready = 0;
+
+  return 0;
+}
+
 void
 trdos_reset( void )
 {
@@ -176,10 +187,11 @@ trdos_reset( void )
 
   trdos_event_index( 0 );
 
-  discs[0].disc_ready = 0;
-  discs[1].disc_ready = 0;
-  discs[2].disc_ready = 0;
-  discs[3].disc_ready = 0;
+  /* We can eject disks only if they are currently present */
+  ui_menu_activate_media_disk_eject( TRDOS_DRIVE_A,
+				     discs[ TRDOS_DRIVE_A ].disc_ready );
+  ui_menu_activate_media_disk_eject( TRDOS_DRIVE_B,
+				     discs[ TRDOS_DRIVE_B ].disc_ready );
 }
 
 void
@@ -462,14 +474,22 @@ int
 trdos_disk_insert( trdos_drive_number which, const char *filename )
 {
   char ext[4];
+  int error;
 
   sprintf(ext,"%s",&filename[strlen(filename)-3]);
 
   if ( strcasecmp( ext, "scl" ) == 0 ) {
-    return trdos_disk_insert_scl( which, filename );
+    error = trdos_disk_insert_scl( which, filename );
+  } else {
+    error = insert_trd( which, filename );
   }
 
-  return insert_trd( which, filename );
+  if( error ) return error;
+
+  /* Set the `eject' item active */
+  ui_menu_activate_media_disk_eject( which, 1 );
+
+  return 0;
 }
 
 int
@@ -478,6 +498,9 @@ trdos_disk_eject( trdos_drive_number which )
   remove_scl( which );
 
   discs[which].disc_ready = 0;
+
+  /* Set the `eject' item inactive */
+  ui_menu_activate_media_disk_eject( which, 0 );
 
   return 0;
 }
