@@ -314,8 +314,6 @@ static int recording_frame( void )
 
 static int playback_frame( void )
 {
-  printf( "Frame %d\n", rzx_current_frame );
-
   /* Check we read the correct number of INs during this frame */
   if( rzx_in_count != rzx.frames[ rzx_current_frame ].count ) {
     ui_error( UI_ERROR_ERROR,
