@@ -161,8 +161,6 @@ utils_identify_file( int *type, const char *filename,
   struct type *ptr,
     types[] = {
       
-      { UTILS_TYPE_UNKNOWN,       NULL,  NULL,       0, 0, 0, 0 },
-
       { UTILS_TYPE_RECORDING_RZX, "rzx", "RZX!",     0, 4, 3, 0 },
 
       { UTILS_TYPE_SNAPSHOT_SNA,  "sna", NULL,       0, 0, 0, 0 },
