@@ -48,6 +48,12 @@
 
 #include <png.h>
 
+static int get_rgb32_data( BYTE *rgb32_data, size_t stride,
+			   size_t height, size_t width );
+static int rgb32_to_rgb24( BYTE *rgb24_data, size_t rgb24_stride,
+			   BYTE *rgb32_data, size_t rgb32_stride,
+			   size_t height, size_t width );
+
 /* A copy of display.c:display_image, taken so we can draw widgets on
    display_image */
 static WORD saved_screen[2*DISPLAY_SCREEN_HEIGHT][DISPLAY_SCREEN_WIDTH];
@@ -67,25 +73,33 @@ screenshot_write( const char *filename )
   png_structp png_ptr;
   png_infop info_ptr;
 
-  BYTE png_data[240][320*3], *row_pointers[240];
-  size_t x, y;
+  BYTE rgb_data[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 4 ],
+       png_data[ 2 * DISPLAY_SCREEN_HEIGHT * DISPLAY_SCREEN_WIDTH * 3 ],
+       *row_pointers[480];
+  size_t rgb_stride = DISPLAY_SCREEN_WIDTH * 4,
+         png_stride = DISPLAY_SCREEN_WIDTH * 3;
+  size_t y, base_height, base_width;
+  int error;
 
-  png_color palette[] = { {   0,   0,   0 },
-			  {   0,   0, 192 },
-			  { 192,   0,   0 },
-			  { 192,   0, 192 },
-			  {   0, 192,   0 },
-			  {   0, 192, 192 },
-			  { 192, 192,   0 },
-			  { 192, 192, 192 },
-			  {   0,   0,   0 },
-			  {   0,   0, 255 },
-			  { 255,   0,   0 },
-			  { 255,   0, 255 },
-			  {   0, 255,   0 },
-			  {   0, 255, 255 },
-			  { 255, 255,   0 },
-			  { 255, 255, 255 } };
+  if( machine_current->timex ) {
+    base_height = 2 * DISPLAY_SCREEN_HEIGHT;
+    base_width = DISPLAY_SCREEN_WIDTH; 
+  } else {
+    base_height = DISPLAY_SCREEN_HEIGHT;
+    base_width = DISPLAY_ASPECT_WIDTH;
+  }
+
+  error = get_rgb32_data( rgb_data, rgb_stride, base_height, base_width );
+  if( error ) return error;
+
+  /* FIXME: add scalers in here */
+
+  error = rgb32_to_rgb24( png_data, png_stride, rgb_data, rgb_stride,
+			  base_height, base_width );
+  if( error ) return error;
+
+  for( y = 0; y < base_height; y++ )
+    row_pointers[y] = &png_data[ y * png_stride ];
 
   f = fopen( filename, "wb" );
   if( !f ) {
@@ -125,23 +139,12 @@ screenshot_write( const char *filename )
   png_set_compression_level( png_ptr, Z_BEST_COMPRESSION );
 
   png_set_IHDR( png_ptr, info_ptr,
-		320, 240, 8, 
+		base_width, base_height, 8, 
 		PNG_COLOR_TYPE_RGB,
 		PNG_INTERLACE_NONE,
 		PNG_COMPRESSION_TYPE_DEFAULT,
 		PNG_FILTER_TYPE_DEFAULT );
 
-  for( y=0; y<240; y++ ) {
-    row_pointers[y] = png_data[y];
-    for( x=0; x<320; x++ ) {
-      int colour = saved_screen[y][x];
-
-      png_data[y][3*x  ] = palette[colour].red;
-      png_data[y][3*x+1] = palette[colour].green;
-      png_data[y][3*x+2] = palette[colour].blue;
-    }
-  }
-  
   png_set_rows( png_ptr, info_ptr, row_pointers );
 
   png_write_png( png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL );
@@ -152,6 +155,62 @@ screenshot_write( const char *filename )
     ui_error( UI_ERROR_ERROR, "Couldn't close `%s': %s", filename,
 	      strerror( errno ) );
     return 1;
+  }
+
+  return 0;
+}
+
+static int
+get_rgb32_data( BYTE *rgb32_data, size_t stride, size_t height, size_t width )
+{
+  size_t x, y, colour;
+
+                          /*  R    G    B */
+  BYTE palette[16][3] = { {   0,   0,   0 },
+			  {   0,   0, 192 },
+			  { 192,   0,   0 },
+			  { 192,   0, 192 },
+			  {   0, 192,   0 },
+			  {   0, 192, 192 },
+			  { 192, 192,   0 },
+			  { 192, 192, 192 },
+			  {   0,   0,   0 },
+			  {   0,   0, 255 },
+			  { 255,   0,   0 },
+			  { 255,   0, 255 },
+			  {   0, 255,   0 },
+			  {   0, 255, 255 },
+			  { 255, 255,   0 },
+			  { 255, 255, 255 } };
+
+  for( y = 0; y < height; y++ ) {
+    for( x = 0; x < width; x++ ) {
+
+      colour = saved_screen[y][x];
+
+      rgb32_data[ y * stride + 4 * x     ] = palette[colour][0];
+      rgb32_data[ y * stride + 4 * x + 1 ] = palette[colour][1];
+      rgb32_data[ y * stride + 4 * x + 2 ] = palette[colour][2];
+      rgb32_data[ y * stride + 4 * x + 3 ] = 0;			/* padding */
+    }
+  }
+
+  return 0;
+}
+
+static int
+rgb32_to_rgb24( BYTE *rgb24_data, size_t rgb24_stride,
+		BYTE *rgb32_data, size_t rgb32_stride,
+		size_t height, size_t width )
+{
+  size_t x, y;
+
+  for( y = 0; y < height; y++ ) {
+    for( x = 0; x < width; x++ ) {
+      rgb24_data[y*rgb24_stride +3*x   ] = rgb32_data[y*rgb32_stride +4*x   ];
+      rgb24_data[y*rgb24_stride +3*x +1] = rgb32_data[y*rgb32_stride +4*x +1];
+      rgb24_data[y*rgb24_stride +3*x +2] = rgb32_data[y*rgb32_stride +4*x +2];
+    }
   }
 
   return 0;
