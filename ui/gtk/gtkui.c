@@ -592,7 +592,7 @@ ui_get_scaler( ui_scaler_available available )
 
   GtkWidget *ok_button, *cancel_button;
 
-  int i, count;
+  int count;
   scaler_type scaler;
 
   /* Store the function which tells us which scalers are currently
