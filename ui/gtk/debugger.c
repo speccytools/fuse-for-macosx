@@ -178,7 +178,7 @@ create_dialog( void )
   gtk_signal_connect_object( GTK_OBJECT( eval_button ), "clicked",
 			     GTK_SIGNAL_FUNC( evaluate_command ),
 			     GTK_OBJECT( entry ) );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), eval_button );
+  gtk_box_pack_start( GTK_BOX( hbox ), eval_button, FALSE, FALSE, 0 );
 
   /* The action buttons for the dialog box */
 
