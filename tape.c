@@ -182,7 +182,7 @@ int tape_write( const char* filename )
     free( buffer );
     return 1;
   }
-	    
+
   if( fwrite( buffer, 1, length, f ) != length ) {
     snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
 	      "%s: error writing to `%s'", fuse_progname, filename );

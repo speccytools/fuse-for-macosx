@@ -624,6 +624,7 @@ tzx_read_jump( libspectrum_tape *tape, const libspectrum_byte **ptr,
 	       const libspectrum_byte *end )
 {
   libspectrum_tape_block *block;
+  libspectrum_tape_jump_block *jump_block;
   
   /* Check the offset exists */
   if( end - (*ptr) < 2 ) {
@@ -642,9 +643,11 @@ tzx_read_jump( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   /* This is a jump block */
   block->type = LIBSPECTRUM_TAPE_BLOCK_JUMP;
+  jump_block = &(block->types.jump);
 
   /* Get the offset */
-  block->types.jump.offset = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  jump_block->offset = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  if( jump_block->offset >= 32768 ) jump_block->offset -= 65536;
 
   /* Finally, put the block into the block list */
   tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
@@ -1463,12 +1466,16 @@ tzx_write_jump( libspectrum_tape_jump_block *block,
   libspectrum_error error;
   libspectrum_byte *ptr = (*buffer) + (*offset);
 
+  int u_offset;
+
   /* Make room for the ID byte and the offset */
   error = libspectrum_make_room( buffer, (*offset) + 3, &ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_JUMP;
-  libspectrum_write_word( ptr, block->offset ); ptr += 2;
+
+  u_offset = block->offset; if( u_offset < 0 ) u_offset += 65536;
+  libspectrum_write_word( ptr, u_offset ); ptr += 2;
   
   (*offset) += 3;
 
