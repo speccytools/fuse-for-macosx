@@ -917,3 +917,4 @@
 	 no need to put machine name in ROM titles any more as they're
 	 now on their own menus.
 20040610 ay.c: add 'return 0' to the end of ay_to_snapshot.
+20040610 ui/gtk/roms.c: improve user interface a bit.

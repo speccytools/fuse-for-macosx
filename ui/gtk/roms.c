@@ -41,7 +41,7 @@
 #include "settings.h"
 #include "ui/ui.h"
 
-static void add_rom( GtkWidget *table, size_t start, gint row );
+static void add_rom( GtkBox *parent, size_t start, gint row );
 static void select_new_rom( GtkWidget *widget, gpointer data );
 static void roms_done( GtkButton *button, gpointer data );
 
@@ -59,8 +59,8 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
 {
   GtkWidget *dialog;
   GtkAccelGroup *accel_group;
-  GtkWidget *table;
   GtkWidget *ok_button, *cancel_button;
+  GtkBox *vbox;
 
   struct callback_info info;
 
@@ -76,13 +76,8 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
 	    libspectrum_machine_name( machine ) );
   gtk_window_set_title( GTK_WINDOW( dialog ), buffer );
 
-  /* A table to put all the labels in */
-  table = gtk_table_new( n, 3, FALSE );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->vbox ),
-		     table );
-
-  /* And the current values of each of the ROMs */
-  for( i = 0; i < n; i++ ) add_rom( table, start, i );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
+		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
   /* Create the OK and Cancel buttons */
   ok_button = gtk_button_new_with_label( "OK" );
@@ -105,15 +100,18 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( dialog ) );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
+  /* And the current values of each of the ROMs */
+  vbox = GTK_BOX( GTK_DIALOG( dialog )->vbox );
+
+  gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
+  for( i = 0; i < n; i++ ) add_rom( vbox, start, i );
+
+  /* Keyboard accelerator (Esc to cancel) */
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-
-  /* Allow Esc to cancel */
-  gtk_widget_add_accelerator( cancel_button, "clicked",
-			      accel_group, GDK_Escape, 0, 0);
+  gtk_widget_add_accelerator( cancel_button, "clicked", accel_group,
+			      GDK_Escape, 0, 0 );
 
   /* Users shouldn't be able to resize this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
@@ -132,27 +130,29 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
 }
 
 static void
-add_rom( GtkWidget *table, size_t start, gint row )
+add_rom( GtkBox *parent, size_t start, gint row )
 {
-  GtkWidget *label, *change_button;
+  GtkWidget *frame, *hbox, *change_button;
   char buffer[ 80 ], **setting;
 
   snprintf( buffer, 80, "ROM %d", row );
-  label = gtk_label_new( buffer );
-  gtk_table_attach( GTK_TABLE( table ), label, 0, 1, row, row + 1,
-		    0, 0, 2, 2 );
+  frame = gtk_frame_new( buffer );
+  gtk_box_pack_start( parent, frame, FALSE, FALSE, 2 );
+
+  hbox = gtk_hbox_new( FALSE, 4 );
+  gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );
+  gtk_container_add( GTK_CONTAINER( frame ), hbox );
 
   setting = settings_get_rom_setting( &settings_current, start + row );
-  rom[ row ] = gtk_label_new( *setting );
-  gtk_table_attach( GTK_TABLE( table ), rom[ row ], 1, 2, row, row + 1,
-		    0, 0, 2, 2 );
+  rom[ row ] = gtk_entry_new();
+  gtk_entry_set_text( GTK_ENTRY( rom[ row ] ), *setting );
+  gtk_box_pack_start( GTK_BOX( hbox ), rom[ row ], FALSE, FALSE, 2 );
 
-  change_button = gtk_button_new_with_label( "Change" );
+  change_button = gtk_button_new_with_label( "Select" );
   gtk_signal_connect( GTK_OBJECT( change_button ), "clicked",
 		      GTK_SIGNAL_FUNC( select_new_rom ),
 		      rom[ row ] );
-  gtk_table_attach( GTK_TABLE( table ), change_button, 2, 3, row, row + 1,
-		    0, 0, 2, 2 );
+  gtk_box_pack_start( GTK_BOX( hbox ), change_button, FALSE, FALSE, 2 );
 }
 
 static void
@@ -160,12 +160,12 @@ select_new_rom( GtkWidget *widget GCC_UNUSED, gpointer data )
 {
   char *filename;
 
-  GtkWidget *label = data;
+  GtkWidget *entry = data;
 
   filename = menu_get_filename( "Fuse - Select ROM" );
   if( !filename ) return;
 
-  gtk_label_set( GTK_LABEL( label ), filename );
+  gtk_entry_set_text( GTK_ENTRY( entry ), filename );
 }
 
 static void
@@ -181,7 +181,7 @@ roms_done( GtkButton *button GCC_UNUSED, gpointer data )
   for( i = 0; i < info->n; i++ ) {
 
     setting = settings_get_rom_setting( &settings_current, info->start + i );
-    gtk_label_get( GTK_LABEL( rom[i] ), &string );
+    string = gtk_entry_get_text( GTK_ENTRY( rom[i] ) );
 
     error = settings_set_string( setting, string ); if( error ) return;
 
