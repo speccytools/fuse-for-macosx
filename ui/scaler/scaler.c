@@ -70,7 +70,7 @@ static struct scaler_info available_scalers[] = {
   { "2xSaI",	       "2xsai",	     SCALER_FLAGS_EXPAND,      2.0, 
     scaler_2xSaI_16,      scaler_2xSaI_32,      expand_sai          },
   { "Super 2xSaI",     "super2xsai", SCALER_FLAGS_EXPAND,      2.0, 
-    scaler_Super2xSaI_16, scaler_2xSaI_32,      expand_sai          },
+    scaler_Super2xSaI_16, scaler_Super2xSaI_32, expand_sai          },
   { "SuperEagle",      "supereagle", SCALER_FLAGS_EXPAND,      2.0, 
     scaler_SuperEagle_16, scaler_SuperEagle_32, expand_sai          },
   { "AdvMAME 2x",      "advmame2x",  SCALER_FLAGS_EXPAND,      2.0, 
