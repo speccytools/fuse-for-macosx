@@ -11,8 +11,8 @@ What Fuse does have:
   running at true Speccy speed on any computer you're likely to try it
   on.
 * Support for loading from .tzx files.
-* Sound (on systems supporting the Open Sound System, or something
-  like OpenBSD or Solaris's /dev/audio).
+* Sound (on systems supporting the Open Sound System, something
+  like OpenBSD or Solaris's /dev/audio, or SDL).
 * Kempston joystick emulation.
 * Emulation of some of the printers you could attach to a Spectrum.
 * Support for the new RZX input recording file format.
