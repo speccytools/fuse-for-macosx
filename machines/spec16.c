@@ -40,7 +40,6 @@
 #include "settings.h"
 #include "spec48.h"
 
-static int spec16_memory_map( void );
 static int spec16_reset( void );
 
 static libspectrum_byte empty_chunk[ MEMORY_PAGE_SIZE ];
