@@ -120,7 +120,7 @@ gtk_tape_browse( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( dialog ) );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
   accel_group = gtk_accel_group_new();

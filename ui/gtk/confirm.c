@@ -62,7 +62,7 @@ gtkui_confirm( const char *string )
 
   data.dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( data.dialog ), "Fuse - Confirm" );
-  gtk_signal_connect( GTK_OBJECT( data.dialog ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( data.dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
   accelerators = gtk_accel_group_new();

@@ -75,7 +75,7 @@ gtkui_load_binary_data( GtkWidget *widget GCC_UNUSED, gpointer data
 
   info.dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( info.dialog ), "Fuse - Load Binary Data" );
-  gtk_signal_connect( GTK_OBJECT( info.dialog ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( info.dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
   /* Information display */
@@ -219,7 +219,7 @@ gtkui_save_binary_data( GtkWidget *widget GCC_UNUSED, gpointer data
 
   info.dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( info.dialog ), "Fuse - Save Binary Data" );
-  gtk_signal_connect( GTK_OBJECT( info.dialog ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( info.dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
   /* Information display */

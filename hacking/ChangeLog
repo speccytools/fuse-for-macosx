@@ -298,3 +298,5 @@
 20031026 pokefinder/pokefinder.c: ensure we get a prototype for memset.
 20031027 ui/gtk/gtkui.c: add confirmation dialog if the main window
 	 receives a delete-event.
+20031027 ui/gtk: "delete-event" is spelt "delete-event", not
+	 "delete_event".

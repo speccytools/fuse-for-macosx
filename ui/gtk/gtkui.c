@@ -731,7 +731,7 @@ ui_get_scaler( ui_scaler_available available )
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( dialog.dialog ) );
-  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) NULL );
 
@@ -862,7 +862,7 @@ gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 			     GTK_OBJECT( dialog.dialog ) );
-  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) NULL );
 
@@ -1108,7 +1108,7 @@ gtkui_fileselector_get_filename( const char *title )
        GTK_SIGNAL_FUNC(gtkui_fileselector_cancel ),
        (gpointer) &selector );
 
-  gtk_signal_connect( GTK_OBJECT( selector.selector ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( selector.selector ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) &selector );
 

@@ -109,7 +109,7 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
   gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtk_widget_destroy ),
 			     GTK_OBJECT( dialog ) );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtk_widget_destroy ), (gpointer) NULL );
 
   accel_group = gtk_accel_group_new();
