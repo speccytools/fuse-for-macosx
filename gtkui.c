@@ -65,8 +65,10 @@ static void gtkui_quit(GtkWidget *widget, gpointer data);
 static void gtkui_options( GtkWidget *widget, gpointer data );
 static void gtkui_reset(GtkWidget *widget, gpointer data);
 static void gtkui_switch(GtkWidget *widget, gpointer data);
+
 static void gtkui_tape_open( GtkWidget *widget, gpointer data );
 static void gtkui_tape_play( GtkWidget *widget, gpointer data );
+static void gtkui_tape_rewind( GtkWidget *widget, gpointer data );
 static void gtkui_tape_write( GtkWidget *widget, gpointer data );
 
 static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
@@ -78,22 +80,23 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		        NULL , NULL,             0, "<Branch>"    },
-  { "/File/_Open Snapshot..." , "F3" , gtkui_open,       0, NULL          },
-  { "/File/_Save Snapshot..." , "F2" , gtkui_save,       0, NULL          },
-  { "/File/separator",          NULL , NULL,             0, "<Separator>" },
-  { "/File/E_xit",	        "F10", gtkui_quit,       0, NULL          },
-  { "/Options",		        NULL , NULL,             0, "<Branch>"    },
-  { "/Options/_General...",     "F4" , gtkui_options,    0, NULL          },
-  { "/Machine",		        NULL , NULL,             0, "<Branch>"    },
-  { "/Machine/_Reset",	        "F5" , gtkui_reset,      0, NULL          },
-  { "/Machine/_Switch",         "F9" , gtkui_switch,     0, NULL          },
-  { "/Tape",                    NULL , NULL,             0, "<Branch>"    },
-  { "/Tape/_Open...",	        "F7" , gtkui_tape_open,  0, NULL          },
-  { "/Tape/_Play",	        "F8" , gtkui_tape_play,  0, NULL          },
-  { "/Tape/_Write...",		"F6" , gtkui_tape_write, 0, NULL          },
+  { "/File",		        NULL , NULL,              0, "<Branch>"    },
+  { "/File/_Open Snapshot..." , "F3" , gtkui_open,        0, NULL          },
+  { "/File/_Save Snapshot..." , "F2" , gtkui_save,        0, NULL          },
+  { "/File/separator",          NULL , NULL,              0, "<Separator>" },
+  { "/File/E_xit",	        "F10", gtkui_quit,        0, NULL          },
+  { "/Options",		        NULL , NULL,              0, "<Branch>"    },
+  { "/Options/_General...",     "F4" , gtkui_options,     0, NULL          },
+  { "/Machine",		        NULL , NULL,              0, "<Branch>"    },
+  { "/Machine/_Reset",	        "F5" , gtkui_reset,       0, NULL          },
+  { "/Machine/_Switch",         "F9" , gtkui_switch,      0, NULL          },
+  { "/Tape",                    NULL , NULL,              0, "<Branch>"    },
+  { "/Tape/_Open...",	        "F7" , gtkui_tape_open,   0, NULL          },
+  { "/Tape/_Play",	        "F8" , gtkui_tape_play,   0, NULL          },
+  { "/Tape/Rewind",		NULL , gtkui_tape_rewind, 0, NULL          },
+  { "/Tape/_Write...",		"F6" , gtkui_tape_write,  0, NULL          },
 };
-static guint gtkui_menu_data_size = 14;
+static guint gtkui_menu_data_size = 15;
   
 int ui_init(int *argc, char ***argv, int width, int height)
 {
@@ -389,6 +392,12 @@ static void gtkui_tape_play( GtkWidget *widget, gpointer data )
     tape_play();	/* Won't start the tape if traps are active
 			   and the next block is a ROM block */
   }
+}
+
+/* Called by the menu when Tape/Rewind selected */
+static void gtkui_tape_rewind( GtkWidget *widget, gpointer data )
+{
+  tape_rewind();
 }
 
 /* Called by the menu when Tape/Write selected */

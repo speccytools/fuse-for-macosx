@@ -31,6 +31,7 @@ int tape_init( void );
 
 int tape_open( const char *filename );
 int tape_close( void );
+int tape_rewind( void );
 int tape_write( const char *filename );
 
 int tape_load_trap( void );

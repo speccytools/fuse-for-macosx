@@ -158,6 +158,16 @@ int tape_close( void )
   return 0;
 }
 
+/* Rewind the current tape file to the start */
+int tape_rewind( void )
+{
+  if( tape.blocks == NULL ) return 1;
+
+  tape.current_block = tape.blocks;
+
+  return 0;
+}
+
 /* Write the current in-memory tape file out to disk */
 int tape_write( const char* filename )
 {

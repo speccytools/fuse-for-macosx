@@ -68,6 +68,11 @@ int xkeyboard_keypress(XKeyEvent *event)
 
   /* Now deal with the non-Speccy keys */
   switch(keysym) {
+  case XK_F1:
+    fuse_emulation_pause();
+    widget_tape();
+    fuse_emulation_unpause();
+    break;
   case XK_F2:
     fuse_emulation_pause();
     snapshot_write( "snapshot.z80" );

@@ -77,4 +77,8 @@ size_t widget_numfiles;
 
 int widget_options( void );
 
+/* Tape dialog */
+
+int widget_tape( void );
+
 #endif				/* #ifndef FUSE_WIDGET_H */
