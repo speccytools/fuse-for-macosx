@@ -349,6 +349,7 @@ static int
 parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
 {
   libspectrum_id_t type;
+  libspectrum_class_t class;
   int error;
 
   while( first_arg < argc ) {
@@ -356,10 +357,12 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
     error = utils_open_file( argv[ first_arg ], autoload, &type );
     if( error ) return error;
 
+    error = libspectrum_identify_class( &class, type );
+    if( error ) return error;
+
     /* If we had a snapshot on the command line, don't autoload any tapes
        specified as well */
-    if( type == LIBSPECTRUM_ID_SNAPSHOT_SNA ||
-	type == LIBSPECTRUM_ID_SNAPSHOT_Z80    ) autoload = 0;
+    if( class == LIBSPECTRUM_CLASS_SNAPSHOT ) autoload = 0;
 
     first_arg++;
   }

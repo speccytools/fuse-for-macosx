@@ -57,7 +57,8 @@ utils_open_file( const char *filename, int autoload,
 {
   utils_file file;
   libspectrum_id_t type;
-  int error = 0;
+  libspectrum_class_t class;
+  int error;
 
   /* Read the file into a buffer */
   if( utils_read_file( filename, &file ) ) return 1;
@@ -69,30 +70,32 @@ utils_open_file( const char *filename, int autoload,
     return 1;
   }
 
-  switch( type ) {
+  error = libspectrum_identify_class( &class, type );
+  if( error ) return error;
+
+  error = 0;
+
+  switch( class ) {
     
-  case LIBSPECTRUM_ID_UNKNOWN:
+  case LIBSPECTRUM_CLASS_UNKNOWN:
     ui_error( UI_ERROR_ERROR, "utils_open_file: couldn't identify `%s'",
 	      filename );
     utils_close_file( &file );
     return 1;
 
-  case LIBSPECTRUM_ID_RECORDING_RZX:
+  case LIBSPECTRUM_CLASS_RECORDING:
     error = rzx_start_playback_from_buffer( file.buffer, file.length );
     break;
 
-  case LIBSPECTRUM_ID_SNAPSHOT_SNA:
-  case LIBSPECTRUM_ID_SNAPSHOT_Z80:
+  case LIBSPECTRUM_CLASS_SNAPSHOT:
     error = snapshot_read_buffer( file.buffer, file.length, type );
     break;
 
-  case LIBSPECTRUM_ID_TAPE_TAP:
-  case LIBSPECTRUM_ID_TAPE_TZX:
-  case LIBSPECTRUM_ID_TAPE_WARAJEVO:
+  case LIBSPECTRUM_CLASS_TAPE:
     error = tape_read_buffer( file.buffer, file.length, type, autoload );
     break;
 
-  case LIBSPECTRUM_ID_DISK_DSK:
+  case LIBSPECTRUM_CLASS_DISK_PLUS3:
 #ifdef HAVE_765_H
     error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 ); if( error ) break;
     error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
@@ -101,19 +104,19 @@ utils_open_file( const char *filename, int autoload,
 #endif				/* #ifdef HAVE_765_H */
     break;
 
-  case LIBSPECTRUM_ID_DISK_SCL:
-  case LIBSPECTRUM_ID_DISK_TRD:
+  case LIBSPECTRUM_CLASS_DISK_TRDOS:
     error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     error = trdos_disk_insert( TRDOS_DRIVE_A, filename );
     break;
 
-  case LIBSPECTRUM_ID_CARTRIDGE_DCK:
+  case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
     error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
     error = dck_read( filename );
     break;
 
   default:
-    ui_error( UI_ERROR_ERROR, "utils_open_file: unknown type %d", type );
+    ui_error( UI_ERROR_ERROR, "utils_open_file: unknown class %d", type );
+    error = 1;
     break;
   }
 
