@@ -185,3 +185,14 @@ gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
   };
   return gtkstock_create_buttons( widget, accel, &btn, 1 );
 }
+
+GtkWidget*
+gtkstock_dialog_new( const gchar *title, GtkSignalFunc destroy )
+{
+  GtkWidget *dialog = gtk_dialog_new();
+  if( title ) gtk_window_set_title( GTK_WINDOW( dialog ), title );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      destroy ? destroy : DEFAULT_DESTROY, NULL );
+  if( destroy == NULL ) gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
+  return dialog;
+}

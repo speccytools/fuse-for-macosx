@@ -1050,3 +1050,6 @@
 20040809 z80/Makefile.am: Link coretest against @LIBSPEC_LIBS@.
 20040813 ui/fb/fbdisplay.c, ui/svga/svgadisplay.c, ui/xlib/xdisplay.c:
 	 add support for black and white TV option (Darren).
+20040813 ui/gtk/{binary.c,browse.c,confirm.c,debugger.c,gtkinternals.h,
+	 gtkjoystick.c,gtkui.c,memory.c,options.pl,picture.c,pokefinder.c,
+	 roms.c,stock.c}: add stock dialog creation function (Darren).

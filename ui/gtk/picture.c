@@ -82,8 +82,7 @@ gtkui_picture( const char *filename, int border )
     screen_drawn = 1;
   }
 
-  dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Keyboard" );
+  dialog = gtkstock_dialog_new( "Fuse - Keyboard", NULL );
 
   drawing_area = gtk_drawing_area_new();
   gtk_drawing_area_size( GTK_DRAWING_AREA( drawing_area ),

@@ -101,10 +101,7 @@ menu_machine_memorybrowser( void )
 
   error = gtkui_get_monospaced_font( &font ); if( error ) return;
 
-  dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Memory Browser" );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+  dialog = gtkstock_dialog_new( "Fuse - Memory Browser", NULL );
 
   gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( memory_done ), FALSE );
 
@@ -126,9 +123,7 @@ menu_machine_memorybrowser( void )
   scrollbar = gtk_vscrollbar_new( GTK_ADJUSTMENT( adjustment ) );
   gtk_box_pack_start( GTK_BOX( box ), scrollbar, FALSE, FALSE, 0 );
 
-  gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
   gtk_widget_show_all( dialog );
-
   gtk_main();
 
   gtkui_free_font( font );

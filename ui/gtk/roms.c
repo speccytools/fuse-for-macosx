@@ -69,13 +69,9 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
   fuse_emulation_pause();
 
   /* Give me a new dialog box */
-  dialog = gtk_dialog_new();
   snprintf( buffer, 256, "Fuse - Select ROMs - %s",
 	    libspectrum_machine_name( machine ) );
-  gtk_window_set_title( GTK_WINDOW( dialog ), buffer );
-
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+  dialog = gtkstock_dialog_new( buffer, NULL );
 
   info.start = start;
   info.n = n;
@@ -93,8 +89,7 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
   /* Users shouldn't be able to resize this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
 
-  /* Set the window to be modal and display it */
-  gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
+  /* Display the window */
   gtk_widget_show_all( dialog );
 
   /* Process events until the window is done with */

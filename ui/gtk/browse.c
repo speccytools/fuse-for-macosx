@@ -87,10 +87,8 @@ create_dialog( void )
   gchar *titles[3] = { "", "Block type", "Data" };
 
   /* Give me a new dialog box */
-  dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Browse Tape" );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
+  dialog = gtkstock_dialog_new( "Fuse - Browse Tape",
+				GTK_SIGNAL_FUNC( delete_dialog ) );
 
   /* And a scrolled window to pack the CList into */
   scrolled_window = gtk_scrolled_window_new( NULL, NULL );

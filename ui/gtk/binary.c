@@ -74,10 +74,7 @@ menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   error = utils_read_file( info.filename, &info.file );
   if( error ) { free( info.filename ); fuse_emulation_unpause(); return; }
 
-  info.dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( info.dialog ), "Fuse - Load Binary Data" );
-  gtk_signal_connect( GTK_OBJECT( info.dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+  info.dialog = gtkstock_dialog_new( "Fuse - Load Binary Data", NULL );
 
   /* Information display */
 
@@ -125,10 +122,7 @@ menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
 			     &info, NULL );
 
   /* Process the dialog */
-
-  gtk_window_set_modal( GTK_WINDOW( info.dialog ), TRUE );
   gtk_widget_show_all( info.dialog );
-
   gtk_main();
 
   free( info.filename );
@@ -207,10 +201,7 @@ menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
   info.filename = menu_get_filename( "Fuse - Save Binary Data" );
   if( !info.filename ) { fuse_emulation_unpause(); return; }
 
-  info.dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( info.dialog ), "Fuse - Save Binary Data" );
-  gtk_signal_connect( GTK_OBJECT( info.dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+  info.dialog = gtkstock_dialog_new( "Fuse - Save Binary Data", NULL );
 
   /* Information display */
 
@@ -257,10 +248,7 @@ menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
 			     &info, NULL );
 
   /* Process the dialog */
-
-  gtk_window_set_modal( GTK_WINDOW( info.dialog ), TRUE );
   gtk_widget_show_all( info.dialog );
-
   gtk_main();
 
   free( info.filename );

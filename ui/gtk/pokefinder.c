@@ -88,8 +88,8 @@ create_dialog( void )
 
   gchar *location_titles[] = { "Page", "Offset" };
 
-  dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Poke Finder" );
+  dialog = gtkstock_dialog_new( "Fuse - Poke Finder",
+				GTK_SIGNAL_FUNC( delete_dialog ) );
 
   hbox = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
@@ -134,9 +134,6 @@ create_dialog( void )
 
   /* Users shouldn't be able to resize this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );
-
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
 
   dialog_created = 1;
 

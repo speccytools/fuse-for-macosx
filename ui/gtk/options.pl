@@ -82,8 +82,7 @@ menu_options_$_->{name}( GtkWidget *widget GCC_UNUSED,
   fuse_emulation_pause();
 
   /* Create the necessary widgets */
-  dialog.dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog.dialog ), "Fuse - $_->{title}" );
+  dialog.dialog = gtkstock_dialog_new( "Fuse - $_->{title}", NULL );
 
   /* Create the various widgets */
 CODE
@@ -141,12 +140,7 @@ CODE
 			     GTK_SIGNAL_FUNC( menu_options_$_->{name}_done ),
 			     (gpointer) &dialog, NULL );
 
-  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-		      (gpointer) NULL );
-
-  /* Set the window to be modal and display it */
-  gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
+  /* Display the window */
   gtk_widget_show_all( dialog.dialog );
 
   /* Process events until the window is done with */

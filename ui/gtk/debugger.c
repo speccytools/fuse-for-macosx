@@ -274,16 +274,12 @@ create_dialog( void )
 
   error = gtkui_get_monospaced_font( &font ); if( error ) return error;
 
-  dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
+  dialog = gtkstock_dialog_new( "Fuse - Debugger",
+				GTK_SIGNAL_FUNC( delete_dialog ) );
 
   /* Keyboard shortcuts */
   accel_group = gtk_accel_group_new();
   gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-
-  /* Catch attempts to close the window and just hide it instead */
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
 
   /* The menu bar */
   error = create_menu_bar( GTK_BOX( GTK_DIALOG( dialog )->vbox ),

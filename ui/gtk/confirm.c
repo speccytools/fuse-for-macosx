@@ -55,10 +55,7 @@ gtkui_confirm( const char *string )
 
   confirm = 0;
 
-  dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Confirm" );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+  dialog = gtkstock_dialog_new( "Fuse - Confirm", NULL );
 
   label = gtk_label_new( string );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
@@ -67,9 +64,7 @@ gtkui_confirm( const char *string )
   gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( set_confirmed ),
 			     &confirm, NULL );
 
-  gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
   gtk_widget_show_all( dialog );
-
   gtk_main();
 
   fuse_emulation_unpause();
@@ -97,10 +92,7 @@ ui_confirm_save( const char *message )
 
   confirm = UI_CONFIRM_SAVE_CANCEL;
 
-  dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Confirm" );
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
+  dialog = gtkstock_dialog_new( "Fuse - Confirm", NULL );
 
   label = gtk_label_new( message );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
@@ -117,9 +109,7 @@ ui_confirm_save( const char *message )
 			     sizeof( btn ) / sizeof( btn[0] ) );
   }
 
-  gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
   gtk_widget_show_all( dialog );
-
   gtk_main();
 
   fuse_emulation_unpause();

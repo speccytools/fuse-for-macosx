@@ -135,6 +135,8 @@ GtkAccelGroup* gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
        /* gets accel Alt-N, Escape */
 #endif			/* #ifndef UI_GTK2 */
 
+GtkWidget *gtkstock_dialog_new( const gchar *title, GtkSignalFunc destroy );
+
 #ifdef UI_GTK2
 typedef PangoFontDescription *gtkui_font;
 #else				/* #ifdef UI_GTK2 */

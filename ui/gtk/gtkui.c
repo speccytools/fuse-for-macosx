@@ -286,28 +286,21 @@ int
 ui_error_specific( ui_error_level severity, const char *message )
 {
   GtkWidget *dialog, *label, *vbox;
+  const gchar *title;
 
   /* If we don't have a UI yet, we can't output widgets */
   if( !display_ui_initialised ) return 0;
 
-  /* Create the dialog box */
-  dialog = gtk_dialog_new();
-
   /* Set the appropriate title */
   switch( severity ) {
-
-  case UI_ERROR_INFO:
-    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Info" ); break;
-  case UI_ERROR_WARNING:
-    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Warning" ); break;
-  case UI_ERROR_ERROR:
-    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Error" ); break;
-  default:
-    gtk_window_set_title( GTK_WINDOW( dialog ),
-			  "Fuse - (Unknown error level)" );
-    break;
-
+  case UI_ERROR_INFO:	 title = "Fuse - Info"; break;
+  case UI_ERROR_WARNING: title = "Fuse - Warning"; break;
+  case UI_ERROR_ERROR:	 title = "Fuse - Error"; break;
+  default:		 title = "Fuse - (Unknown error level)"; break;
   }
+
+  /* Create the dialog box */
+  dialog = gtkstock_dialog_new( title, GTK_SIGNAL_FUNC( gtk_widget_destroy ) );
 
   /* Add the OK button into the lower half */
   gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC (gtk_widget_destroy),
@@ -327,9 +320,6 @@ ui_error_specific( ui_error_level severity, const char *message )
   /* Put the label in it */
   gtk_container_add( GTK_CONTAINER( vbox ), label );
 
-  /* Add some ways to finish the dialog box */
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtk_widget_destroy ), (gpointer) NULL );
   gtk_widget_show_all( dialog );
 
   return 0;
@@ -546,8 +536,7 @@ menu_get_scaler( scaler_available_fn selector )
   count = 0;
 
   /* Create the necessary widgets */
-  dialog.dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog.dialog ), "Fuse - Select Scaler" );
+  dialog.dialog = gtkstock_dialog_new( "Fuse - Select Scaler", NULL );
 
   for( scaler = 0; scaler < SCALER_NUM; scaler++ ) {
 
@@ -572,13 +561,6 @@ menu_get_scaler( scaler_available_fn selector )
 			     GTK_SIGNAL_FUNC( menu_options_filter_done ),
 			     (gpointer) &dialog, NULL );
 
-  /* Add the necessary callbacks */
-  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-		      (gpointer) NULL );
-
-  /* Set the window to be modal and display it */
-  gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
   gtk_widget_show_all( dialog.dialog );
 
   /* Process events until the window is done with */
@@ -673,8 +655,7 @@ menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   fuse_emulation_pause();
 
   /* Create the necessary widgets */
-  dialog.dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog.dialog ), "Fuse - Select Machine" );
+  dialog.dialog = gtkstock_dialog_new( "Fuse - Select Machine", NULL );
 
   dialog.buttons[0] =
     gtk_radio_button_new_with_label(
@@ -701,13 +682,6 @@ menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 			     GTK_SIGNAL_FUNC( menu_machine_select_done ),
 			     (gpointer) &dialog, NULL );
 
-  /* Add the necessary callbacks */
-  gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-		      (gpointer) NULL );
-
-  /* Set the window to be modal and display it */
-  gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
   gtk_widget_show_all( dialog.dialog );
 
   /* Process events until the window is done with */
