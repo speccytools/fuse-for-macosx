@@ -53,7 +53,7 @@ gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
   if(ptr) {
 
     if( widget_level >= 0 ) {
-      widget_keyhandler( ptr->key1 );
+      widget_keyhandler( ptr->key1, ptr->key2 );
     } else {
       if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
       if(ptr->key2 != KEYBOARD_NONE) keyboard_press(ptr->key2);

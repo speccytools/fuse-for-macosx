@@ -324,7 +324,7 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
   }
 
   /* If widgets are active, redraw the widget */
-  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize );
+  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
 
   return 0;
 }

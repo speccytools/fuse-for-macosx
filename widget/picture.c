@@ -42,7 +42,8 @@ int widget_picture_draw( void* data )
   return 0;
 }
 
-void widget_picture_keyhandler( keyboard_key_name key )
+void
+widget_picture_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 {
   switch( key ) {
 
@@ -51,7 +52,8 @@ void widget_picture_keyhandler( keyboard_key_name key )
     break;
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
-    widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
+    if( key2 == KEYBOARD_Caps )
+      widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     break;
 
   case KEYBOARD_Enter:

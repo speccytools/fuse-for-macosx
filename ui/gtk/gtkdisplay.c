@@ -180,7 +180,8 @@ static int gtkdisplay_configure_notify( int width )
 
   /* Redraw widgets if they're active. Needed here as the keyboard help
      is implemented as a widget */
-  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize );
+  if( widget_level >= 0 )
+    widget_keyhandler( KEYBOARD_Resize, KEYBOARD_NONE );
 
   return 0;
 }

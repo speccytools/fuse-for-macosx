@@ -58,7 +58,8 @@ foreach( @dialogs ) {
 
     print << "CODE";
 int widget_$_->{name}_draw( void *data );
-void widget_$_->{name}_keyhandler( keyboard_key_name key );
+void widget_$_->{name}_keyhandler( keyboard_key_name key,
+				   keyboard_key_name key2 );
 
 CODE
 }
