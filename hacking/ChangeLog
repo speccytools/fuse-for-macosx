@@ -344,3 +344,5 @@
 20031107 event.[ch], spectrum.c, z80/coretest.c, z80/z80.[ch], z80/z80.pl:
 	 improved retrigged interrupt support: interrupts no longer
 	 accepted after an EI/EI or EI/DI sequence.
+20031107 snapshot.c: use libspectrum's support for the 'last instruction
+	 EI' flag.

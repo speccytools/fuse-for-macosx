@@ -189,6 +189,9 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   tstates = libspectrum_snap_tstates( snap );
 
+  z80.interrupts_enabled_at =
+    libspectrum_snap_last_instruction_ei( snap ) ? tstates : -1;
+
   for( i=0; i<8; i++ ) {
     if( libspectrum_snap_pages( snap, i ) )
       memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
@@ -295,6 +298,9 @@ int snapshot_copy_to( libspectrum_snap *snap )
   libspectrum_snap_set_im( snap, IM );
 
   libspectrum_snap_set_halted( snap, z80.halted );
+  libspectrum_snap_set_last_instruction_ei(
+    snap, z80.interrupts_enabled_at == tstates
+  );
 
   libspectrum_snap_set_out_ula( snap, spectrum_last_ula );
   
