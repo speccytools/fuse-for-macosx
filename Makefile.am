@@ -43,4 +43,4 @@ noinst_HEADERS = ay.h display.h event.h fuse.h gtk.h gtkdisplay.h\
 	z80_ed.c z80_macros.h 
 
 EXTRA_DIST = 128-0.rom 128-1.rom 48.rom	plus2-0.rom plus2-1.rom plus3-0.rom\
-	plus3-1.rom plus3-2.rom plus3-3.rom
+	plus3-1.rom plus3-2.rom plus3-3.rom THANKS README

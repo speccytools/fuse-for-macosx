@@ -14,7 +14,7 @@ What Fuse does have:
 What Fuse doesn't have:
 
 * Any sound output under operating systems other than Linux.
-* A nice GUI. Or really any user interface at all!
+* A nice GUI.
 * The ability to save to tape files
 * Emulation of any peripherals (bar the tape deck)
 * A keyboard picture, so you can find those keywords
@@ -22,7 +22,8 @@ What Fuse doesn't have:
 
 What you'll need to run Fuse:
 
-* A version of Un*x, with X and glib.
+* A version of Un*x with glib, and either X or svgalib. If you have GTK+
+  installed, you'll get a nicer user interface under X.
 
 To compile Fuse:
 
@@ -94,6 +95,6 @@ Finally, if you want to see how a Unix Speccy emulator should be done,
 check out Erik Kunze's `xzx': http://www.zx-spectrum.net/xzx/
 
 Philip Kendall <pak@ast.cam.ac.uk>
-30 January 2001
+31 January 2001
 
 $Id$

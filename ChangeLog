@@ -1,6 +1,6 @@
-2001-xx-yy  Philip Kendall  <pak@ast.cam.ac.uk>
+2001-01-31  Philip Kendall  <pak@ast.cam.ac.uk>
 
-	* Version 0.2.2 released.
+	* Version 0.3.0 released.
 
 	* Fixed a large bug in the 48K snapshot saving routine.
 
