@@ -44,7 +44,14 @@ fuse_SOURCES = ay.c display.c event.c\
 	trdos.c \
 	ui.c \
 	uidisplay.c \
-	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c
+	utils.c	\
+	joystick.c \
+	printer.c \
+	tc2048.c \
+	tc2068.c \
+	scld.c \
+	screenshot.c \
+	sdlsound.c
 
 fuse_LDADD = memory_internal.o @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ \
 @GETOPT_LIBS@ \
@@ -88,7 +95,11 @@ noinst_HEADERS = ay.h display.h event.h\
 	types.h \
 	utils.h \
 	sdlsound.h \
-	joystick.h printer.h tc2048.h scld.h
+	joystick.h \
+	printer.h \
+	tc2048.h \
+	tc2068.h \
+	scld.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl \
 	     settings-header.pl settings.dat

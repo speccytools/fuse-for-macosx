@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2002 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2003 Philip Kendall, Darren Salt, Witold Filipczyk
 
    $Id$
 
@@ -279,8 +279,12 @@ int tape_load_trap( void )
 
   rom_block = &(current_block->types.rom);
 
-  /* All returns made via the RET at #05E2 */
-  PC = 0x05e2;
+  /* All returns made via the RET at #05E2, except on Timex 2068 at #0136 */
+  if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) {
+    PC = 0x0136;
+  } else {
+    PC = 0x05e2;
+  }
 
   error = trap_load_block( rom_block );
   if( error ) return error;
@@ -420,8 +424,12 @@ int tape_save_trap( void )
   error = libspectrum_tape_append_block( tape, block );
   if( error ) return error;
 
-  /* And then return via the RET at #053E */
-  PC = 0x053e;
+  /* And then return via the RET at #053E, except on Timex 2068 at #00E4 */
+  if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ) {
+    PC = 0x00e4;
+  } else {
+    PC = 0x053e;
+  }
 
   return 0;
 
@@ -434,6 +442,7 @@ int trap_check_rom( void )
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:
   case LIBSPECTRUM_MACHINE_TC2048:
+  case LIBSPECTRUM_MACHINE_TC2068: /* FIXME: not always OK? */
     return 1;		/* Always OK here */
 
   case LIBSPECTRUM_MACHINE_128:
@@ -536,14 +545,15 @@ int tape_next_edge( DWORD last_tstates )
 
   /* If we've been requested to stop the tape, do so and then
      return without stacking another edge */
-  /* The TC2048 and T[SC]2068 should stop as they all have 48Kb of RAM,
-     now what should a 16K do here :) ?
-     Yet more brokeness in the TZX format... */
   if( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ||
       ( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP48 ) && 
-      ( machine_current->machine == LIBSPECTRUM_MACHINE_48 ||
-       machine_current->machine == LIBSPECTRUM_MACHINE_TC2048 ) )
-    ) {
+	( !( libspectrum_machine_capabilities( machine_current->machine ) &
+	     LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY
+	   )
+	)
+      )
+    )
+  {
     error = tape_stop(); if( error ) return error;
     return 0;
   }

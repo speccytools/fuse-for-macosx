@@ -36,6 +36,7 @@
 #include "display.h"
 #include "machine.h"
 #include "pentagon.h"
+#include "scld.h"
 #include "settings.h"
 #include "spec16.h"
 #include "spec48.h"
@@ -377,4 +378,41 @@ FUNCTION( pentagon_writebyte )( WORD address, BYTE b )
     display_dirty( ( address & 0x3fff ) | 0x4000 );
     
   RAM[ bank ][ address & 0x3fff ] = b;
+}
+
+BYTE
+FUNCTION( tc2068_readbyte )( WORD address )
+{
+  WORD offset = address & 0x1fff;
+  int chunk = address >> 13;
+
+#ifndef INTERNAL
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
+  return timex_memory[chunk][offset];
+}
+
+void
+FUNCTION( tc2068_writebyte )( WORD address, BYTE b )
+{
+  WORD offset = address & 0x1fff;
+  int chunk = address >> 13;
+
+#ifndef INTERNAL
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
+      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
+    debugger_mode = DEBUGGER_MODE_HALTED;
+#endif				/* #ifndef INTERNAL */
+
+  switch( chunk ) {
+  case 2:
+  case 3:
+    if( timex_memory[chunk][offset] != b ) display_dirty( address );
+    /* Fall through */
+  default:
+    if( timex_chunk_writeable[chunk] == 1 ) timex_memory[chunk][offset] = b;
+  }
 }

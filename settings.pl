@@ -115,6 +115,7 @@ settings_rom_name[ SETTINGS_ROM_COUNT ] = {
   "+2A ROM 0",  "+2A ROM 1", "+2A ROM 2", "+2A ROM 3",
   "+3 ROM 0",   "+3 ROM 1",  "+3 ROM 2",  "+3 ROM 3",
   "TC2048",
+  "TC2068 ROM 0", "TC2068 ROM 1"
   "P128K ROM 0", "P128K ROM 1", "P128K ROM 2",
 };
 
@@ -478,9 +479,11 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 12: return &( settings->rom_plus3_2  );
   case 13: return &( settings->rom_plus3_3  );
   case 14: return &( settings->rom_tc2048   );
-  case 15: return &( settings->rom_pentagon_0 );
-  case 16: return &( settings->rom_pentagon_1 );
-  case 17: return &( settings->rom_pentagon_2 );
+  case 15: return &( settings->rom_tc2068_0 );
+  case 16: return &( settings->rom_tc2068_1 );
+  case 17: return &( settings->rom_pentagon_0 );
+  case 18: return &( settings->rom_pentagon_1 );
+  case 19: return &( settings->rom_pentagon_2 );
   default: return NULL;
   }
 }

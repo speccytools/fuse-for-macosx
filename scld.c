@@ -1,5 +1,5 @@
 /* scld.c: Routines for handling the Timex SCLD
-   Copyright (c) 2002 Fredrick Meunier, Philip Kendall
+   Copyright (c) 2002-2003 Fredrick Meunier, Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -35,6 +35,19 @@ scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
 BYTE scld_last_hsr   = 0;           /* The last byte sent to Timex HSR port */
 
+BYTE timex_fake_bank[8192];
+BYTE timex_exrom_dock_writeable[8]; /* 1 - chunk writeable,
+				       0 - chunk read only */
+BYTE timex_dock_writeable[8];
+BYTE timex_home_writeable[8];    
+BYTE timex_exrom_writeable;
+BYTE timex_chunk_writeable[8];
+BYTE *timex_exrom;                  /* address of memory chunk */
+BYTE *timex_exrom_dock[8];
+BYTE *timex_dock[8];
+BYTE *timex_home[8];
+BYTE *timex_memory[8];
+
 BYTE
 scld_dec_read( WORD port GCC_UNUSED )
 {
@@ -58,6 +71,23 @@ scld_dec_write( WORD port GCC_UNUSED, BYTE b )
     display_refresh_all();
   }
 
+  if( scld_last_dec.name.altmembank != old_dec.name.altmembank ) {
+    int i;
+    
+    if( scld_last_dec.name.altmembank ) {
+      for( i = 0; i < 8; i++ ) {
+        timex_exrom_dock[i] = timex_exrom;
+        timex_exrom_dock_writeable[i] = timex_exrom_writeable;
+      }
+    } else {
+      for( i = 0; i < 8; i++ ) {
+        timex_exrom_dock[i] = timex_dock[i];
+        timex_exrom_dock_writeable[i] = timex_dock_writeable[i];
+      }
+    }
+    scld_hsr_write( 0xf4, scld_last_hsr );
+  }
+
   display_parse_attr( hires_get_attr(), &ink, &paper );
   display_set_hires_border( paper );
 }
@@ -71,7 +101,19 @@ scld_reset(void)
 void
 scld_hsr_write( WORD port GCC_UNUSED, BYTE b )
 {
+  int i;
+  
   scld_last_hsr = b;
+
+  for( i = 0; i < 8; i++ ) {
+    if( b & (1<<i) ) {
+      timex_memory[i] = timex_exrom_dock[i];
+      timex_chunk_writeable[i] = timex_exrom_dock_writeable[i];
+    } else {
+      timex_memory[i] = timex_home[i];
+      timex_chunk_writeable[i] = timex_home_writeable[i];
+    }
+  }
 }
 
 BYTE

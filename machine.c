@@ -52,6 +52,7 @@
 #include "specplus2a.h"
 #include "specplus3.h"
 #include "tc2048.h"
+#include "tc2068.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
@@ -95,6 +96,8 @@ int machine_init_machines( void )
 
   error = machine_add_machine( tc2048_init );
   if (error ) return error;
+  error = machine_add_machine( tc2068_init );
+  if( error ) return error;
   error = machine_add_machine( pentagon_init );
   if (error ) return error;
 

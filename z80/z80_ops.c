@@ -1,5 +1,5 @@
 /* z80_ops.c: Process the next opcode
-   Copyright (c) 1999-2000,2002 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -119,7 +119,8 @@ void z80_do_opcodes()
     case 0x08:		/* EX AF,AF' */
       /* Tape saving trap: note this traps the EX AF,AF' at #04d0, not
 	 #04d1 as PC has already been incremented */
-      if( PC == 0x04d1 ) {
+     /* 0x76 - Timex 2068 save routine in EXROM */
+      if( PC == 0x04d1 || PC == 0x0077) {
 	if( tape_save_trap() == 0 ) break;
       }
 
@@ -812,7 +813,7 @@ void z80_do_opcodes()
       break;
     case 0xc0:		/* RET NZ */
       tstates++;
-      if( PC==0x056c ) {
+      if( PC==0x056c || PC == 0x0112) {
 	if( tape_load_trap() == 0 ) break;
       }
       if( ! ( F & FLAG_Z ) ) { RET(); }
