@@ -1146,7 +1146,7 @@ CODE
     {
 	no strict qw( refs );
 
-	if( exists &{ "opcode_$opcode" } ) {
+	if( defined &{ "opcode_$opcode" } ) {
 	    "opcode_$opcode"->( @arguments );
 	}
     }
