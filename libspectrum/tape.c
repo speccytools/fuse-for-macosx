@@ -99,6 +99,8 @@ block_free( gpointer data, gpointer user_data )
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     free( block->types.turbo.data );
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
+    break;
   case LIBSPECTRUM_TAPE_BLOCK_PULSES:
     free( block->types.pulses.lengths );
     break;
@@ -106,8 +108,12 @@ block_free( gpointer data, gpointer user_data )
     free( block->types.pure_data.data );
     break;
 
+  case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+    break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
     free( block->types.group_start.name );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
@@ -118,10 +124,6 @@ block_free( gpointer data, gpointer user_data )
     free( block->types.archive_info.strings );
     break;
 
-  /* Nothing needs doing for these blocks */
-  case LIBSPECTRUM_TAPE_BLOCK_PURE_TONE:
-  case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
-    break;
   }
 }
 
@@ -145,6 +147,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
     return pure_data_init( &(block->types.pure_data) );
 
   /* These blocks need no initialisation */
+  case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
@@ -236,6 +239,11 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
     error = pure_data_edge( &(block->types.pure_data), tstates, &end_of_block);
     if( error ) return error;
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+    *tstates = block->types.pause.length; end_of_block = 1;
+    /* FIXME: What to do for 0 ms pause => stop tape? */
     break;
 
   /* For blocks which contain no Spectrum-readable data, return zero
@@ -593,6 +601,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     strncpy( buffer, "Pure Data Block", length );
     break;
 
+  case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+    strncpy( buffer, "Pause Block", length );
+    break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
     strncpy( buffer, "Group Start Block", length );
     break;

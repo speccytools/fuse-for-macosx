@@ -180,6 +180,10 @@ main( int argc, char **argv )
       printf("  Pause length: %d ms\n", data_block->pause );
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+      printf("  Length: %d ms\n", block->types.pause.length );
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
       printf("  Name: %s\n", block->types.group_start.name );
       break;

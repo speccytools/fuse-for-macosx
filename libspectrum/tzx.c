@@ -50,6 +50,9 @@ static libspectrum_error
 tzx_read_pure_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		    const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_pause( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
 static libspectrum_error
@@ -113,6 +116,10 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
+      error = tzx_read_pause( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
       error = tzx_read_group_start( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
@@ -381,6 +388,34 @@ tzx_read_pure_data( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
 }
 
+static libspectrum_error
+tzx_read_pause( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		const libspectrum_byte *end )
+{
+  libspectrum_tape_block *block;
+  libspectrum_tape_pause_block *pause_block;
+
+  /* Check the pause actually exists */
+  if( end - (*ptr) < 2 ) return LIBSPECTRUM_ERROR_CORRUPT;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  /* This is a pause block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_PAUSE;
+  pause_block = &(block->types.pause);
+
+  /* Get the pause length */
+  pause_block->length  = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+
+  /* Put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  /* And return */
+  return LIBSPECTRUM_ERROR_NONE;
+}
+  
 static libspectrum_error
 tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end )

@@ -50,7 +50,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_PULSES,
   LIBSPECTRUM_TAPE_BLOCK_PURE_DATA,
 
-  LIBSPECTRUM_TAPE_BLOCK_GROUP_START = 0x21,
+  LIBSPECTRUM_TAPE_BLOCK_PAUSE = 0x20,
+  LIBSPECTRUM_TAPE_BLOCK_GROUP_START,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_END,
 
   LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO = 0x32,
@@ -180,12 +181,21 @@ typedef struct libspectrum_tape_pure_data_block {
 
 } libspectrum_tape_pure_data_block;
 
+/* A pause block */
+typedef struct libspectrum_tape_pause_block {
+
+  libspectrum_dword length;
+
+} libspectrum_tape_pause_block;
+
 /* A group start block */
 typedef struct libspectrum_tape_group_start_block {
 
   libspectrum_byte *name;
 
 } libspectrum_tape_group_start_block;
+
+/* No group end block needed as it contains no data */
 
 /* An archive info block */
 typedef struct libspectrum_tape_archive_info_block {
@@ -213,7 +223,9 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_pulses_block pulses;
     libspectrum_tape_pure_data_block pure_data;
 
+    libspectrum_tape_pause_block pause;
     libspectrum_tape_group_start_block group_start;
+    /* No group end block needed as it contains no data */
 
     libspectrum_tape_archive_info_block archive_info;
   } types;
