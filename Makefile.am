@@ -99,6 +99,7 @@ compat/libcompat.a
 
 fuse_DEPENDENCIES = @UI_LIBS@ \
 		    debugger/libdebugger.a \
+		    machines/libmachines.a \
 		    sound/libsound.a \
 	            z80/libz80.a
 

@@ -39,7 +39,7 @@ specplus3e_init( fuse_machine_info *machine )
 {
   int error;
 
-  machine->machine = LIBSPECTRUM_MACHINE_PLUS3;
+  machine->machine = LIBSPECTRUM_MACHINE_PLUS3E;
   machine->id = "plus3e";
 
   machine->reset = specplus3e_reset;
