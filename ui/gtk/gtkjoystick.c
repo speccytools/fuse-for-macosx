@@ -139,6 +139,8 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Configure joystick" );
   gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
   hbox = gtk_hbox_new( FALSE, 4 );
   gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );

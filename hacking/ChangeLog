@@ -1005,3 +1005,4 @@
 20040715 man/fuse.1: Fix typo in pokefinder section.
 20040716 rzx.c: change over to using the release RZX signing key.
 20040716 configure.in: bump version number to 0.7.0.
+20040716 gtkjoystick.c: add delete-event handler (thanks, Darren).
