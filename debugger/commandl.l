@@ -53,9 +53,11 @@ n|ne|nex|next { return NEXT; }
 sh|sho|show { return SHOW; }
 s|st|ste|step { return STEP; }
 
-${HEX}+		{ yylval = strtol( yytext+1, NULL, 16 ); return NUMBER; }
-0x{HEX}+	{ yylval = strtol( yytext+2, NULL, 16 ); return NUMBER; }
-{DIGIT}+	{ yylval = atoi( yytext ); return NUMBER; }
+${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
+		  return NUMBER; }
+0x{HEX}+	{ yylval.integer = strtol( yytext+2, NULL, 16 );
+	          return NUMBER; }
+{DIGIT}+	{ yylval.integer = atoi( yytext ); return NUMBER; }
 
 [ \n]+		/* Swallow whitespace */
 

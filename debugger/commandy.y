@@ -39,23 +39,27 @@
 #define YYDEBUG 1
 #define YYERROR_VERBOSE
 
-#define YYSTYPE int
-
 int yylex( void );
 void yyerror( char *s );
 
 %}
 
-%token BREAK
-%token CLEAR
-%token CONTINUE
-%token NEXT
-%token SHOW
-%token STEP
+%union {
 
-%token NUMBER
+  int integer;
 
-%token ERROR
+}
+
+%token		 BREAK
+%token		 CLEAR
+%token		 CONTINUE
+%token		 NEXT
+%token		 SHOW
+%token		 STEP
+
+%token <integer> NUMBER
+
+%token		 ERROR
 
 %%
 
