@@ -51,4 +51,4 @@ noinst_HEADERS = ay.h display.h event.h\
 	tape.h timer.h types.h\
 	joystick.h
 
-EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl
+EXTRA_DIST = AUTHORS README THANKS hacking/ui.txt keysyms.dat keysyms.pl
