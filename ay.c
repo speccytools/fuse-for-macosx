@@ -131,4 +131,6 @@ ay_to_snapshot( libspectrum_snap *snap )
   for( i = 0; i < 16; i++ )
     libspectrum_snap_set_ay_registers( snap, i,
 				       machine_current->ay.registers[i] );
+
+  return 0;
 }
