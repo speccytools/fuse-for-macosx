@@ -25,7 +25,9 @@ Some thanks (in alphabetical order):
   (ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/pc/dos/z80-400.zip)
   got me started on this emulation lark all those years ago...
 
-* Anders Holmberg: for reporting a bug in the z80 v1.45 load routines.
+* Anders Holmberg: for reporting a bug in the z80 v1.45 load routines. Anders
+  has done what is basically a port of Fuse 0.4.0 to the PocketPC: see
+  http://pocketclive.emuunlim.com/.
 
 * Russell Marks: for various bits of code (see `AUTHORS')
 

@@ -1,3 +1,59 @@
+2002-02-04  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Version 0.4.1 released.
+
+	* Add contention of memory and io ports. Should make multicolour
+	  effects better (Philip Kendall).
+
+	* Emulation of reading from unattached ports (eg #FF). Makes some
+	  more games (eg Sidewize) work (Philip Kendall).
+
+	* Add a keyboard picture -- see the Help menu (Philip Kendall,
+	  Russell Marks).
+
+	* Support for .slt files (Philip Kendall, Darren Salt).
+
+	* Support for the ZX Printer (48K), serial printer (128K/+2)
+	  and parallel printer (+2A) (Russell Marks).
+
+	* Add the ability to select a machine type directly, rather than
+	  cycling through the available machines (Philip Kendall).
+
+	* Add command-line options; see the man page for details (Philip
+	  Kendall).
+
+	* Lots of improvements to the widgets to make them much more
+	  similar to the GTK+ menus (Philip Kendall).
+
+	* Cleaner shutdown on 'impossible' conditions; especially useful
+	  with the SVGAlib UI (Philip Kendall).
+
+	* Add 'tape rewind' and 'tape clear' options (Philip Kendall).
+
+	* Make tzxlist able to deal with multiple files, and give it
+	  a man page (Darren Salt).
+
+	* Man page update (Russell Marks).
+
+	* Remove coredump if an empty .tzx file was loaded (Philip Kendall).
+
+	* Various bits of codebase reorganisation. Most significant is the
+	  move of each UI to its own directory (Philip Kendall).
+
+	* Fix a fairly major thinko in libspectrum which meant that it
+	  was using approximately twice as much memory as it needed to
+	  (Philip Kendall).
+
+	* Things probably of more interest to developers:
+	  + A --enable-warnings option to configure to turn on lots more
+	    warning options if you're using gcc.
+	  + Detect gcc properly in configure.in.
+	  + Remove many of the warnings generated when --enable-warnings
+	    is used.
+	  + Add a hacking/ui.txt file giving details on how to implement
+	    a new UI for Fuse.
+	  (Philip Kendall).
+
 2001-12-20  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Version 0.4.0 released.

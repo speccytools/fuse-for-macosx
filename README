@@ -1,9 +1,9 @@
-The Free Unix Spectrum Emulator (Fuse) 0.4.0
+The Free Unix Spectrum Emulator (Fuse) 0.4.1
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.4.0.
+is Fuse (the Free Unix Spectrum Emulator), version 0.4.1.
 
 What Fuse does have:
 
@@ -14,6 +14,7 @@ What Fuse does have:
 * Support for loading from .tzx files.
 * Sound (on systems supporting the Open Sound System).
 * Kempston joystick emulation.
+* Emulation of some of the printers you could attach to a Spectrum.
 
 What Fuse doesn't have:
 
@@ -42,12 +43,6 @@ interface, as GTK+ depends on glib). If you're having problem with
 your glib setup, you can use the `--without-glib' option to
 `configure', which will use some simple replacement routines.
 
-On a FreeBSD system, you may have to do
-
-$ GTK_CONFIG=`which gtk12-config` GLIB_CONFIG=`which glib12-config` ./configure
-
-if you want to use either GTK+ or glib.
-
 Then just:
 
 $ make
@@ -63,21 +58,7 @@ if you want to place Fuse into the main directories on your system
 --prefix argument to `configure'). You'll probably need to be root to
 do this bit.
 
-To run fuse:
-
-$ fuse [snapshot]
-
-Not too difficult. For everything after that,
-
-$ man fuse
-
-is your friend.
-
-Fuse is copyrighted under the GNU General Public License (see the file
-`COPYING' for details). However, note the GPL does *not* apply to the
-Spectrum ROM files (`128-?.rom', `48.rom', `plus2-?.rom' and
-`plus3-?.rom'), which are still copyrighted to Amstrad, although their
-free distribution with emulators is permitted.
+Then, read the man page :-)
 
 If you have any bug reports, suggestions or (particularly
 appreciated!) patches for Fuse, mail them to me at
@@ -99,6 +80,6 @@ may be useful (information on internals, etc) are in the hacking/
 directory.
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-20 December 2001
+4 February 2002
 
 $Id$
