@@ -473,3 +473,5 @@
 	 a simple memory browser.
 20040110 machine.c: remove pointless free( NULL ) (patch #874507)
 	 (Stuart Brady).
+20040110 TAG: Release-0_6_2-trunk
+	 BRANCH: Release-0_6_2-branch (from Release-0_6_2-trunk)
