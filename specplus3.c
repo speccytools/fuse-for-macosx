@@ -262,7 +262,7 @@ int specplus3_reset(void)
 }
 
 int
-specplus3_plus2a_common_reset()
+specplus3_plus2a_common_reset( void )
 {
   int error;
   size_t i;

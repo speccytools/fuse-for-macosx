@@ -374,3 +374,4 @@
 20031128 fuse.c: initialise the poke finder on startup.
 20031128 ui/gtk/gtkui.c: split create_dialog into multiple functions.
 20031201 spec16.c: ensure we have a prototype for memset().
+20031202 Some --enable-warnings tidy-ups.

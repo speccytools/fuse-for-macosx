@@ -56,7 +56,7 @@ libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
 int specplus3_init( fuse_machine_info *machine );
 int specplus3_reset(void);
 
-int specplus3_plus2a_common_reset();
+int specplus3_plus2a_common_reset( void );
 
 void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );

@@ -31,6 +31,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "compat.h"
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "settings.h"
@@ -100,7 +101,7 @@ gtkui_confirm( const char *string )
 }
 
 static void
-set_confirmed( GtkButton *button, gpointer user_data )
+set_confirmed( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   struct confirm_data *data = user_data;
 

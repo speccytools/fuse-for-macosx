@@ -148,7 +148,7 @@ gtkui_load_binary_data( GtkWidget *widget GCC_UNUSED, gpointer data
 }
 
 static void
-change_load_filename( GtkButton *button, gpointer user_data )
+change_load_filename( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   struct binary_info *info = user_data;
   
@@ -181,7 +181,7 @@ change_load_filename( GtkButton *button, gpointer user_data )
 }
 
 static void
-load_data( GtkButton *button, gpointer user_data )
+load_data( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   struct binary_info *info = user_data;
 
@@ -290,7 +290,7 @@ gtkui_save_binary_data( GtkWidget *widget GCC_UNUSED, gpointer data
 }
 
 static void
-change_save_filename( GtkButton *button, gpointer user_data )
+change_save_filename( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   struct binary_info *info = user_data;
   char *new_filename;
@@ -306,7 +306,7 @@ change_save_filename( GtkButton *button, gpointer user_data )
 }
 
 static void
-save_data( GtkButton *button, gpointer user_data )
+save_data( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   struct binary_info *info = user_data;
 

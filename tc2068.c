@@ -50,6 +50,7 @@
 #define ADDR_TO_CHUNK(addr) 2 + (addr >> 13)
 
 static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
+static int dock_exrom_reset( void );
 
 spectrum_port_info tc2068_peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
@@ -211,8 +212,8 @@ tc2068_init( fuse_machine_info *machine )
   return 0;
 }
 
-int
-tc2068_dock_exrom_reset( void )
+static int
+dock_exrom_reset( void )
 {
   int i;
   int error;
@@ -271,7 +272,7 @@ tc2068_reset( void )
 			    machine_current->rom_length[1] );
   if( error ) return error;
 
-  error = tc2068_dock_exrom_reset(); if( error ) return error;
+  error = dock_exrom_reset(); if( error ) return error;
 
   scld_dec_write( 0x00ff, 0x80 );
   scld_dec_write( 0x00ff, 0x00 );

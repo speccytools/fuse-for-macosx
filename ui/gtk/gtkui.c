@@ -529,7 +529,7 @@ gtkui_rzx_play( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
 /* Called when File/AY Logging/Record selected */
 static void
-gtkui_psg_start( GtkWidget *widget, gpointer data )
+gtkui_psg_start( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   char *psgfile;
 
@@ -553,7 +553,7 @@ gtkui_psg_start( GtkWidget *widget, gpointer data )
 
 /* Called when File/AY Logging/Stop selected */
 static void
-gtkui_psg_stop( GtkWidget *widget, gpointer data )
+gtkui_psg_stop( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   if ( !psg_recording ) return;
   psg_stop_recording();

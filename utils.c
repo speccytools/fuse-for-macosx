@@ -175,7 +175,7 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
   int fd;
 
   char fuse_path[ PATHNAME_MAX_LENGTH ], path[ PATHNAME_MAX_LENGTH ];
-  char *fuse_dir, *path_segment;
+  char *fuse_dir; const char *path_segment;
 
   switch( type ) {
 

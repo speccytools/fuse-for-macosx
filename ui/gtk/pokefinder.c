@@ -31,6 +31,8 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "compat.h"
+#include "gtkinternals.h"
 #include "pokefinder/pokefinder.h"
 
 static int create_dialog( void );
@@ -49,7 +51,7 @@ static GtkWidget
   *location_list;		/* The list of possible locations */
 
 void
-gtkui_pokefinder( GtkWidget *widget, gpointer data )
+gtkui_pokefinder( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   int error;
 
@@ -136,28 +138,30 @@ create_dialog( void )
 }
 
 static void
-gtkui_pokefinder_search( GtkWidget *widget, gpointer user_data )
+gtkui_pokefinder_search( GtkWidget *widget, gpointer user_data GCC_UNUSED )
 {
   pokefinder_search( atoi( gtk_entry_get_text( GTK_ENTRY( widget ) ) ) );
   update_pokefinder();
 }
 
 static void
-gtkui_pokefinder_reset( GtkWidget *widget, gpointer user_data )
+gtkui_pokefinder_reset( GtkWidget *widget GCC_UNUSED,
+			gpointer user_data GCC_UNUSED)
 {
   pokefinder_clear();
   update_pokefinder();
 }
 
 static gboolean
-delete_dialog( GtkWidget *widget, GdkEvent *event, gpointer user_data )
+delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
+	       gpointer user_data )
 {
   gtkui_pokefinder_close( widget, user_data );
   return TRUE;
 }
 
 static void
-gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data )
+gtkui_pokefinder_close( GtkWidget *widget, gpointer user_data GCC_UNUSED )
 {
   gtk_widget_hide_all( widget );
 }

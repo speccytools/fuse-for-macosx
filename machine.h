@@ -100,7 +100,7 @@ extern fuse_machine_info *machine_current;	/* The currently selected machine */
 
 int machine_init_machines( void );
 
-int machine_select( int type );
+int machine_select( libspectrum_machine type );
 int machine_select_id( const char *id );
 const char* machine_get_id( libspectrum_machine type );
 

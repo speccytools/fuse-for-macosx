@@ -103,11 +103,11 @@ timer_estimate_speed( void )
 #ifndef WIN32
 
 int
-timer_get_real_time( timer_type *time )
+timer_get_real_time( timer_type *real_time )
 {
   int error;
 
-  error = gettimeofday( time, NULL );
+  error = gettimeofday( real_time, NULL );
   if( error ) {
     ui_error( UI_ERROR_INFO, "error getting time: %s", strerror( errno ) );
     return 1;

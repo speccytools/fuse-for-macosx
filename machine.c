@@ -129,7 +129,8 @@ static int machine_add_machine( int (*init_function)( fuse_machine_info *machine
   return 0;
 }
 
-int machine_select( int type )
+int
+machine_select( libspectrum_machine type )
 {
   int i;
   int error;

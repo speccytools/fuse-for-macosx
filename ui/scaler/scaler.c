@@ -230,8 +230,9 @@ expand_sai( int *x, int *y, int *w, int *h, int image_width, int image_height )
 
 /* Expand to a even y co-ord */
 static void
-expand_dotmatrix( int *x, int *y, int *w, int *h,
-		  int image_width, int image_height )
+expand_dotmatrix( int *x GCC_UNUSED, int *y GCC_UNUSED, int *w GCC_UNUSED,
+		  int *h, int image_width GCC_UNUSED,
+		  int image_height GCC_UNUSED )
 {
   int y_mod = (*y) % 2;
 

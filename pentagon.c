@@ -100,7 +100,7 @@ pentagon_contend_port( libspectrum_word port GCC_UNUSED )
 }
 
 static libspectrum_byte
-pentagon_contend_delay( libspectrum_dword time )
+pentagon_contend_delay( libspectrum_dword time GCC_UNUSED )
 {
   /* No contention */
   return 0;

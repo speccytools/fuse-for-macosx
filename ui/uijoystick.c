@@ -40,6 +40,7 @@
 
 #include "../joystick.h"
 #include "joystick.h"
+#include "uijoystick.h"
 
 #if defined USE_JOYSTICK && defined HAVE_JSW_H
 
@@ -189,11 +190,7 @@ ui_joystick_init( void )
   return 0;
 }
 
-int
-ui_joystick_end( void )
-{
-  return 0;
-}
+void ui_joystick_end( void ) { }
 
 libspectrum_byte
 ui_joystick_read(libspectrum_word port, libspectrum_byte which)

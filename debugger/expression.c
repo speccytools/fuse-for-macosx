@@ -378,8 +378,8 @@ static int
 deparse_unaryop( char *buffer, size_t length,
 		 const struct unaryop_type *unaryop )
 {
-  char *operand_buffer, *operation_string = NULL;
-  int brackets_necessary;
+  char *operand_buffer; const char *operation_string = NULL;
+  int brackets;
 
   int error;
 
@@ -403,12 +403,12 @@ deparse_unaryop( char *buffer, size_t length,
     fuse_abort();
   }
 
-  brackets_necessary = ( unaryop->op->precedence                  < 
-			 unaryop_precedence( unaryop->operation )   );
+  brackets = ( unaryop->op->precedence                  < 
+	       unaryop_precedence( unaryop->operation )   );
     
   snprintf( buffer, length, "%s%s%s%s", operation_string,
-	    brackets_necessary ? "( " : "", operand_buffer,
-	    brackets_necessary ? " )" : "" );
+	    brackets ? "( " : "", operand_buffer,
+	    brackets ? " )" : "" );
 
   free( operand_buffer );
 
@@ -419,7 +419,7 @@ static int
 deparse_binaryop( char *buffer, size_t length,
 		  const struct binaryop_type *binaryop )
 {
-  char *operand1_buffer, *operand2_buffer, *operation_string = NULL;
+  char *operand1_buffer, *operand2_buffer; const char *operation_string = NULL;
   int brackets_necessary1, brackets_necessary2;
 
   int error;

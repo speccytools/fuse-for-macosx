@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "scaler.h"
+#include "scaler_internals.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
@@ -134,12 +135,12 @@ static const libspectrum_dword dotmatrix[16] = {
 
 #else				/* #ifdef WORDS_BIGENDIAN */
 
-const static libspectrum_dword colorMask = 0x00FEFEFE;
-const static libspectrum_dword lowPixelMask = 0x00010101;
-const static libspectrum_dword qcolorMask = 0x00FCFCFC;
-const static libspectrum_dword qlowpixelMask = 0x00030303;
-const static libspectrum_qword redblueMask = 0x00FF00FF;
-const static libspectrum_qword greenMask = 0x0000FF00;
+static const libspectrum_dword colorMask = 0x00FEFEFE;
+static const libspectrum_dword lowPixelMask = 0x00010101;
+static const libspectrum_dword qcolorMask = 0x00FCFCFC;
+static const libspectrum_dword qlowpixelMask = 0x00030303;
+static const libspectrum_qword redblueMask = 0x00FF00FF;
+static const libspectrum_qword greenMask = 0x0000FF00;
 
 static const libspectrum_dword dotmatrix[16] = {
   0x00003F00, 0x003F0000, 0x0000003F, 0x00000000,
@@ -704,7 +705,7 @@ FUNCTION( scaler_HalfSkip )( const libspectrum_byte *srcPtr,
 
     if( ( height & 1 ) == 0 ) {
       for (i = 0; i < width; i+=2, ++r) {
-        *r = *(((scaler_data_type*) srcPtr) + i + 1);
+        *r = *(((const scaler_data_type*) srcPtr) + i + 1);
       }
       dstPtr += dstPitch;
     }

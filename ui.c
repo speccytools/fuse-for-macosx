@@ -47,7 +47,8 @@ ui_error( ui_error_level severity, const char *format, ... )
 }
 
 libspectrum_error
-ui_libspectrum_error( libspectrum_error error, const char *format, va_list ap )
+ui_libspectrum_error( libspectrum_error error GCC_UNUSED, const char *format,
+		      va_list ap )
 {
   char new_format[ 257 ];
   snprintf( new_format, 256, "libspectrum: %s", format );

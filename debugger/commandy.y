@@ -41,9 +41,6 @@
 #define YYDEBUG 1
 #define YYERROR_VERBOSE
 
-int yylex( void );
-void yyerror( char *s );
-
 %}
 
 %union {

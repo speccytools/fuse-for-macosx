@@ -42,8 +42,8 @@ static char *command_buffer = NULL;
 /* And a pointer as to how much we've parsed */
 static char *command_ptr;
 
-/* Necessary declaration */
 int yyparse( void );
+int yywrap( void );
 
 /* Evaluate the debugger command given in 'command' */
 int
@@ -84,7 +84,7 @@ debugger_command_input( char *buf, int *result, int max_size )
 
   if( !length ) {
     return 0;
-  } else if( length < max_size ) {
+  } else if( length < (size_t)max_size ) {
     memcpy( buf, command_ptr, length );
     *result = length; command_ptr += length;
     return 1;
@@ -140,7 +140,7 @@ debugger_register_hash( const char *name )
 
 /* The error callback if yyparse finds an error */
 void
-yyerror( char *s )
+yyerror( const char *s )
 {
   ui_error( UI_ERROR_ERROR, "Invalid debugger command: %s", s );
 }

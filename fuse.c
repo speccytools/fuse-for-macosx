@@ -513,7 +513,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
   libspectrum_class_t class;
   int error;
 
-  for( i = first_arg; i < argc; i++ ) {
+  for( i = first_arg; i < (size_t)argc; i++ ) {
 
     filename = argv[i];
 

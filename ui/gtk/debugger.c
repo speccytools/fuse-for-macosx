@@ -486,7 +486,7 @@ ui_debugger_update( void )
     if( bp->condition ) {
       debugger_expression_deparse( breakpoint_text[5], 80, bp->condition );
     } else {
-      breakpoint_text[5] = "";
+      strcpy( breakpoint_text[5], "" );
     }
 
     gtk_clist_append( GTK_CLIST( breakpoints ), breakpoint_text );
@@ -650,7 +650,8 @@ gtkui_debugger_break( GtkWidget *widget GCC_UNUSED,
 }
 
 static gboolean
-delete_dialog( GtkWidget *widget, GdkEvent *event, gpointer user_data )
+delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
+	       gpointer user_data )
 {
   gtkui_debugger_done_close( widget, user_data );
   return TRUE;

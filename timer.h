@@ -44,7 +44,7 @@ typedef DWORD timer_type;
 
 int timer_estimate_reset( void );
 int timer_estimate_speed( void );
-int timer_get_real_time( timer_type *time );
+int timer_get_real_time( timer_type *real_time );
 float timer_get_time_difference( timer_type *a, timer_type *b );
 
 extern volatile float timer_count;

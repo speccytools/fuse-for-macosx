@@ -33,6 +33,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "compat.h"
 #include "fuse.h"
 #include "gtkinternals.h"
 #include "settings.h"
@@ -45,7 +46,7 @@ static void roms_done( GtkWidget *widget, gpointer data );
 GtkWidget *rom[ SETTINGS_ROM_COUNT ];
 
 void
-gtkui_roms( GtkWidget *widget, gpointer data )
+gtkui_roms( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   GtkWidget *dialog;
   GtkAccelGroup *accel_group;
@@ -134,7 +135,7 @@ add_rom( GtkWidget *table, gint row, const char *name )
 }
 
 static void
-select_new_rom( GtkWidget *widget, gpointer data )
+select_new_rom( GtkWidget *widget GCC_UNUSED, gpointer data )
 {
   char *filename;
 
@@ -147,7 +148,7 @@ select_new_rom( GtkWidget *widget, gpointer data )
 }
 
 static void
-roms_done( GtkWidget *widget, gpointer data )
+roms_done( GtkWidget *widget, gpointer data GCC_UNUSED )
 {
   size_t i;
   int error;
