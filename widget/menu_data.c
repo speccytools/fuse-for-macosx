@@ -60,8 +60,12 @@ static widget_menu_widget_t main_machine = { WIDGET_TYPE_MENU,
 					     &widget_menu_machine };
 static widget_menu_widget_t main_tape =    { WIDGET_TYPE_MENU,
 					     &widget_menu_tape    };
+
+#ifdef HAVE_765_H
 static widget_menu_widget_t main_disk =    { WIDGET_TYPE_MENU,
 					     &widget_menu_disk    };
+#endif
+
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
 					     &widget_menu_help    };
 
