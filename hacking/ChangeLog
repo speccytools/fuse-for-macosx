@@ -960,3 +960,4 @@
 	 slightly.
 20040701 configure.in,utils.c,ui/gtk/fileselector.c: check we have
 	 <libgen.h> before #including it (thanks, Marek).
+20040702 ui/gtk/debugger.c: add column headings to the memory map pane.

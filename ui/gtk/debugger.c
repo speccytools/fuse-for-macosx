@@ -395,20 +395,32 @@ create_register_display( GtkBox *parent, gtkui_font font )
 static int
 create_memory_map( GtkBox *parent )
 {
-  GtkWidget *table;
+  GtkWidget *table, *label;
   size_t i, j;
 
   memorymap = gtk_frame_new( "Memory Map" );
   gtk_box_pack_start( parent, memorymap, FALSE, FALSE, 0 );
 
-  table = gtk_table_new( 8, 4, FALSE );
+  table = gtk_table_new( 9, 4, FALSE );
   gtk_container_add( GTK_CONTAINER( memorymap ), table );
+
+  label = gtk_label_new( "Address" );
+  gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 0, 1, 0, 0, 2, 2 );
+
+  label = gtk_label_new( "Source" );
+  gtk_table_attach( GTK_TABLE( table ), label, 1, 2, 0, 1, 0, 0, 2, 2 );
+
+  label = gtk_label_new( "Writable?" );
+  gtk_table_attach( GTK_TABLE( table ), label, 2, 3, 0, 1, 0, 0, 2, 2 );
+
+  label = gtk_label_new( "Contended?" );
+  gtk_table_attach( GTK_TABLE( table ), label, 3, 4, 0, 1, 0, 0, 2, 2 );
 
   for( i = 0; i < 8; i++ ) {
     for( j = 0; j < 4; j++ ) {
       map_label[i][j] = gtk_label_new( "" );
       gtk_table_attach( GTK_TABLE( table ), map_label[i][j],
-			j, j + 1, 7 - i, 8 - i, 0, 0, 2, 2 );
+			j, j + 1, 8 - i, 9 - i, 0, 0, 2, 2 );
     }
   }
 
