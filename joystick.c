@@ -64,6 +64,8 @@ joystick_press( joystick_button button, int press )
 {
   libspectrum_byte mask;
 
+  mask = 0x00;			/* Avoid warning */
+
   switch( button ) {
   case JOYSTICK_BUTTON_RIGHT: mask = 0x01; break;
   case JOYSTICK_BUTTON_LEFT:  mask = 0x02; break;
