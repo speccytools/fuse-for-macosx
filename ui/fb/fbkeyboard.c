@@ -53,6 +53,7 @@
 #include "input.h"
 
 static struct termios old_ts;
+static int old_kbmode = K_XLATE;
 static int got_old_ts = 0;
 
 static const enum input_key keymap[128] = {
@@ -120,6 +121,7 @@ int fbkeyboard_init(void)
   }
 
   tcgetattr( STDIN_FILENO, &old_ts );
+  ioctl( STDIN_FILENO, KDGKBMODE, &old_kbmode );
   got_old_ts = 1;
 
   /* We need non-blocking semi-cooked keyboard input */
@@ -151,8 +153,10 @@ int fbkeyboard_end(void)
   int i = 0;
 
   ioctl( STDIN_FILENO, FIONBIO, &i );
-  if( got_old_ts ) tcsetattr( STDIN_FILENO, TCSAFLUSH, &old_ts );
-  ioctl( STDIN_FILENO, KDSKBMODE, K_XLATE );
+  if( got_old_ts ) {
+    tcsetattr( STDIN_FILENO, TCSAFLUSH, &old_ts );
+    ioctl( STDIN_FILENO, KDSKBMODE, old_kbmode );
+  }
 
   return 0;
 }

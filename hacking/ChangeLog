@@ -1024,3 +1024,4 @@
 	 gtkinternals.h,gtkjoystick.c,gtkui.c,memory.c,options.pl,
 	 picture.c,pokefinder.c,roms.c,stock.c}: factor out common button
 	 creation code. Add GTK+ 2.x stock buttons (Darren).
+20040721 ui/fb/fbkeyboard.c: restore old keyboard mode on exit.
