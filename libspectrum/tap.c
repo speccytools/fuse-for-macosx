@@ -46,12 +46,18 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
        gone wrong, so gone home */
     if( ( end - ptr ) < 2 ) {
       libspectrum_tape_free( tape );
+      libspectrum_print_error(
+        "libspectrum_tap_create: not enough data in buffer\n"
+      );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
     /* Get memory for a new block */
     block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
-    if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+    if( block == NULL ) {
+      libspectrum_print_error( "libspectrum_tap_create: out of memory\n" );
+      return LIBSPECTRUM_ERROR_MEMORY;
+    }
 
     /* This is a standard ROM loader */
     block->type = LIBSPECTRUM_TAPE_BLOCK_ROM;
@@ -64,6 +70,9 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     if( ( end - ptr ) < rom_block->length ) {
       libspectrum_tape_free( tape );
       free( block );
+      libspectrum_print_error(
+        "libspectrum_tap_create: not enough data in buffer\n"
+      );
       return LIBSPECTRUM_ERROR_CORRUPT;
     }
 
@@ -73,6 +82,7 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     if( rom_block->data == NULL ) {
       libspectrum_tape_free( tape );
       free( block );
+      libspectrum_print_error( "libspectrum_tap_create: out of memory\n" );
       return LIBSPECTRUM_ERROR_MEMORY;
     }
 

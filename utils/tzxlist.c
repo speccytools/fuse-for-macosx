@@ -55,6 +55,9 @@ main( int argc, char **argv )
 
   int i;
 
+  /* Show libspectrum error messages */
+  libspectrum_show_errors = 1;
+
   tape.blocks = NULL;
 
   if( argc < 2 ) {

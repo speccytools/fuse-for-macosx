@@ -70,6 +70,7 @@ static int libspectrum_sna_identify( size_t buffer_length,
     *type = LIBSPECTRUM_MACHINE_128;
     break;
   default:
+    libspectrum_print_error( "libspectrum_sna_identify: unknown length\n" );
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
@@ -79,8 +80,12 @@ static int libspectrum_sna_identify( size_t buffer_length,
 int libspectrum_sna_read_header( uchar *buffer, size_t buffer_length,
 				 libspectrum_snap *snap )
 {
-  if( buffer_length < LIBSPECTRUM_SNA_HEADER_LENGTH )
+  if( buffer_length < LIBSPECTRUM_SNA_HEADER_LENGTH ) {
+    libspectrum_print_error(
+      "libspectrum_sna_read_header: not enough data in buffer\n"
+    );
     return LIBSPECTRUM_ERROR_CORRUPT;
+  }
 
   snap->a   = buffer[22]; snap->f  = buffer[21];
   snap->bc  = buffer[13] + buffer[14]*0x100;
@@ -116,7 +121,12 @@ int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
   int offset; int page;
   int i,j;
 
-  if( buffer_length < 0xc000 ) return LIBSPECTRUM_ERROR_CORRUPT;
+  if( buffer_length < 0xc000 ) {
+    libspectrum_print_error(
+      "libspectrum_sna_read_data: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
 
   switch( snap->machine ) {
   case LIBSPECTRUM_MACHINE_48:
@@ -140,6 +150,7 @@ int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
       snap->pages[i] = (uchar*)malloc( 0x4000 * sizeof(uchar) );
       if( snap->pages[i] == NULL ) {
 	for( j=0; j<i; j++ ) { free( snap->pages[i] ); snap->pages[i] = NULL; }
+	libspectrum_print_error("libspectrum_sna_read_data: out of memory\n");
 	return LIBSPECTRUM_ERROR_MEMORY;
       }
     }
@@ -154,8 +165,12 @@ int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
 
     page = snap->out_ula & 0x07;
     if( page == 5 || page == 2 ) {
-      if( memcmp( snap->pages[page], &buffer[0x8000], 0x4000 ) )
+      if( memcmp( snap->pages[page], &buffer[0x8000], 0x4000 ) ) {
+	libspectrum_print_error(
+	  "libspectrum_sna_read_data: duplicated page not identical\n"
+	);
 	return LIBSPECTRUM_ERROR_CORRUPT;
+      }
     } else {
       memcpy( snap->pages[page], &buffer[0x8000], 0x4000 );
     }
@@ -168,6 +183,7 @@ int libspectrum_sna_read_data( uchar *buffer, size_t buffer_length,
     break;
 
   default:
+    libspectrum_print_error( "libspectrum_sna_read_data: unknown machine\n" );
     return LIBSPECTRUM_ERROR_LOGIC;
   }
   
@@ -178,7 +194,12 @@ static int libspectrum_sna_read_128_header( uchar *buffer,
 					    size_t buffer_length,
 					    libspectrum_snap *snap )
 {
-  if( buffer_length < 4 ) return LIBSPECTRUM_ERROR_CORRUPT;
+  if( buffer_length < 4 ) {
+    libspectrum_print_error(
+      "libspectrum_sna_read_128_header: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
 
   snap->pc = buffer[0] + 0x100 * buffer[1];
   snap->out_ula = buffer[2];
@@ -198,7 +219,12 @@ static int libspectrum_sna_read_128_data( uchar *buffer, size_t buffer_length,
     if( i==2 || i==5 || i==page ) continue; /* Already got this page */
 
     /* Check we've still got some data to read */
-    if( buffer_length < 0x4000 ) return LIBSPECTRUM_ERROR_CORRUPT;
+    if( buffer_length < 0x4000 ) {
+      libspectrum_print_error(
+        "libspectrum_sna_read_128_data: not enough data in buffer\n"
+      );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
     
     /* Copy the data across */
     memcpy( snap->pages[i], buffer, 0x4000 );
