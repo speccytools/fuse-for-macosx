@@ -133,7 +133,7 @@ void uidisplay_set_border(int line, int pixel_from, int pixel_to, int colour)
     int x;
   
     for(x=pixel_from;x<pixel_to;x++)
-        *(image+line*DISPLAY_ASPECT_WIDTH+x)=colours[colour];
+        *(image+line*DISPLAY_ASPECT_WIDTH+(x>>1))=colours[colour];
 }
 
 int uidisplay_end(void)
