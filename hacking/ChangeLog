@@ -751,3 +751,4 @@
 	 menu.c (GTK+ changes).
 20040415 widget/{menu.c,widget.h}: generalise more functions into menu.c
 	 (widget changes).
+20040415 menu.[ch]: add copyright and GPL notice.
