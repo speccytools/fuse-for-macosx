@@ -1,9 +1,9 @@
-The Free Unix Spectrum Emulator (Fuse) 0.5.0
+The Free Unix Spectrum Emulator (Fuse) 0.5.1
 ============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.5.0.
+is Fuse (the Free Unix Spectrum Emulator), version 0.5.1.
 
 What Fuse does have:
 
@@ -24,13 +24,24 @@ What Fuse doesn't have:
 
 What you'll need to run Fuse:
 
-* A version of Unix with either X or svgalib. If you have GTK+
-  installed, you'll get a nicer user interface under X.
+* A version of Unix with any of X, svgalib or framebuffer support installed.
+  If you have GTK+, you'll get a nicer user interface under X.
+* libspectrum: this is available from
+  http://www.srcf.ucam.org/~pak21/spectrum/libspectrum.html
 * If you want +3 support, you'll need John Elliott's lib765 installed;
   this is available from http://www.seasip.demon.co.uk/Unix/LibDsk/
   If you also have libdsk (from the same location) installed, you'll also
   get support for extended .dsk files (see 'THE .DSK FORMAT' section in
   fuse(1) for more details on this).
+* Other libraries will give you some extended functionality:
+  * libpng: the ability to save screenshots
+  * libxml2: the ability to load and save Fuse's current configuration
+  * zlib: support for compressed RZX files
+
+If you've used Fuse up to version 0.5.0, note that the external
+utilities (tzxlist, etc) are now available separately from Fuse
+itself. See http://www.srcf.ucam.org/~pak21/spectrum/fuse.html for
+details.
 
 Building Fuse
 -------------
@@ -42,14 +53,22 @@ $ ./configure
 There are now some options you can give to configure; `configure
 --help' will list them all, but the most important are:
 
---with-svgalib		Use the SVGAlib interface, rather than GTK+.
---without-gtk		Use the plain Xlib interface, rather than GTK+.
+--with-fb		Use the framebuffer interface, rather than GTK+.
+--with-svgalib		Use the SVGAlib interface.
+--without-gtk		Use the plain Xlib interface.
 
 If glib is installed on your system, Fuse will use this for a couple
 of things; however, it isn't necessary (unless you're using the GTK+
 interface, as GTK+ depends on glib). If you're having problem with
 your glib setup, you can use the `--without-glib' option to
 `configure', which will use some simple replacement routines.
+
+Another useful option is `--with-local-prefix=DIRECTORY' which allows
+you to specify that you have some the the libraries needed by Fuse in
+`<DIRECTORY>/lib' and the necessary header files in
+`<DIRECTORY>/include'. If you specify the `--prefix' option to tell
+Fuse to install itself somewhere other than in /usr/local, that
+directory will automatically be searched as well.
 
 Then just:
 
@@ -109,6 +128,6 @@ may be useful (information on internals, etc) are in the hacking/
 directory.
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-17 August 2002
+4 December 2002
 
 $Id$
