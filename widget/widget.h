@@ -127,7 +127,7 @@ int widget_timer_end( void );
 void widget_rectangle( int x, int y, int w, int h, int col );
 void widget_printstring( int x, int y, int col, const char *s );
 
-extern widget_finish_state widget_finished;;
+extern widget_finish_state widget_finished;
 
 int widget_dialog( int x, int y, int width, int height );
 int widget_dialog_with_border( int x, int y, int width, int height );
