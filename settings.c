@@ -68,6 +68,7 @@ int settings_defaults( settings_info *settings )
   settings->tape_traps = 1;
   settings->stereo_ay = 0;
   settings->slt_traps = 1;
+  settings->sound_device = NULL;
 
   settings->snapshot = NULL;
   settings->tape_file = NULL;
@@ -105,6 +106,8 @@ static int settings_command_line( int argc, char **argv,
     {      "playback", 1, NULL, 'p' },
     {        "record", 1, NULL, 'r' },
 
+    {  "sound-device", 1, NULL, 'd' },
+
     {        "issue2", 0, &(settings->issue2), 1 },
     {     "no-issue2", 0, &(settings->issue2), 0 },
 
@@ -132,9 +135,9 @@ static int settings_command_line( int argc, char **argv,
     int c;
 
 #ifdef HAVE_GETOPT_LONG
-    c = getopt_long( argc, argv, "hm:o:s:t:V", long_options, NULL );
+    c = getopt_long( argc, argv, "d:hm:o:s:t:V", long_options, NULL );
 #else				/* #ifdef HAVE_GETOPT_LONG */
-    c = getopt( argc, argv, "hm:o:s:t:V" );
+    c = getopt( argc, argv, "d:hm:o:s:t:V" );
 #endif				/* #ifdef HAVE_GETOPT_LONG */
 
     if( c == -1 ) break;	/* End of option list */
@@ -142,6 +145,10 @@ static int settings_command_line( int argc, char **argv,
     switch( c ) {
 
     case 0: break;	/* Used for long option returns */
+
+    case 'd':
+      settings->sound_device = optarg;
+      break;
 
     case 'm':
       settings->start_machine = optarg;

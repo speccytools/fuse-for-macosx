@@ -1,5 +1,5 @@
 /* settings.h: Handling configuration settings
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001-2002 Philip Kendall
 
    $Id$
 
@@ -36,6 +36,8 @@ typedef struct settings_info {
   int tape_traps;	/* Use tape loading traps? */
   int stereo_ay;	/* Stereo separation for AY channels? */
   int slt_traps;	/* Use .slt loading traps/ */
+
+  const char *sound_device; /* Where to output sound */
 
   /* Used on startup */
 

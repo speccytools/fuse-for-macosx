@@ -118,7 +118,7 @@ static int fuse_init(int argc, char **argv)
   if( rzx_init() ) return 1;
 
   fuse_sound_in_use = 0;
-  sound_init();
+  sound_init( settings_current.sound_device );
   if(sound_enabled) {
     fuse_sound_in_use = 1;
   } else {
@@ -203,7 +203,7 @@ int fuse_emulation_unpause(void)
 {
   /* If we were previously using sound, re-enable it */
   if( fuse_sound_in_use ) {
-    sound_init();
+    sound_init( settings_current.sound_device );
 
     /* If the sound code couldn't re-initialise, fall back to the
        signal based routines */

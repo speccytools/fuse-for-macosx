@@ -1,5 +1,5 @@
 /* sunsound.c: OpenBSD sound I/O
-   Copyright (c) 2002 Alexander Yurchenko, Russell Marks
+   Copyright (c) 2002 Alexander Yurchenko, Russell Marks, Philip Kendall
 
    $Id$
 
@@ -49,15 +49,17 @@ static int soundfd = -1;
 static int sixteenbit = 0;
 
 int
-sunsound_init(freqptr, stereoptr)
-	int *freqptr, *stereoptr;
+sunsound_init(const char *device,int *freqptr, int *stereoptr)
 {
 #ifndef solaris
 	int frag;
 #endif
 	struct audio_info ai;
 
-	if ((soundfd = open("/dev/audio", O_WRONLY)) == -1)
+	if (device == NULL)
+		device = "/dev/audio";
+
+	if ((soundfd = open(device, O_WRONLY)) == -1)
 		return 1;
 
 	AUDIO_INITINFO(&ai);

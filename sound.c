@@ -164,7 +164,7 @@ ay_change_count=0;
 }
 
 
-void sound_init(void)
+void sound_init(const char *device)
 {
 static int first_init=1;
 int f,ret;
@@ -190,10 +190,10 @@ if(sound_stereo_ay || sound_stereo_beeper)
   sound_stereo=1;
 
 #if defined(HAVE_SYS_SOUNDCARD_H)
-ret=osssound_init(&sound_freq,&sound_stereo);
+ret=osssound_init(device,&sound_freq,&sound_stereo);
 #endif
 #if defined(HAVE_SYS_AUDIOIO_H)
-ret=sunsound_init(&sound_freq,&sound_stereo);
+ret=sunsound_init(device,&sound_freq,&sound_stereo);
 #endif
 
 if(ret)

@@ -1,5 +1,5 @@
 /* sound.h: Sound support
-   Copyright (c) 2000-2001 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2002 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #ifndef FUSE_SOUND_H
 #define FUSE_SOUND_H
 
-void sound_init(void);
+void sound_init(const char *device);
 void sound_end(void);
 void sound_ay_write(int reg,int val,DWORD now);
 void sound_ay_reset(void);

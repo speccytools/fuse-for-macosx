@@ -1,5 +1,5 @@
 /* osssound.c: OSS (e.g. Linux) sound I/O
-   Copyright (c) 2000-2001 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2002 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,11 +49,14 @@ static int sixteenbit=0;
 /* returns 0 on *success*, and adjusts freq/stereo args to reflect
  * what we've actually got.
  */
-int osssound_init(int *freqptr,int *stereoptr)
+int osssound_init(const char *device,int *freqptr,int *stereoptr)
 {
 int frag,tmp;
 
-if((soundfd=open("/dev/dsp",O_WRONLY))<0)
+/* select a default device if we weren't explicitly given one */
+if(device==NULL) device = "/dev/dsp";
+
+if((soundfd=open(device,O_WRONLY))<0)
   return 1;
 
 tmp=AFMT_U8;

@@ -1,5 +1,5 @@
 /* sunsound.h: OpenBSD sound I/O
-   Copyright (c) 2002 Alexander Yurchenko, Russell Marks
+   Copyright (c) 2002 Alexander Yurchenko, Russell Marks, Philip Kendall
 
    $Id$
 
@@ -22,7 +22,7 @@
 #ifndef FUSE_SUNSOUND_H
 #define FUSE_SUNSOUND_H
 
-int sunsound_init(int *, int *);
+int sunsound_init(const char *device, int *freqptr, int *stereoptr);
 void sunsound_end(void);
 void sunsound_frame(unsigned char *, int);
 

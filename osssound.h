@@ -1,5 +1,5 @@
 /* osssound.h: OSS (e.g. Linux) sound I/O
-   Copyright (c) 2000-2001 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2002 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef FUSE_OSSSOUND_H
 #define FUSE_OSSSOUND_H
 
-int osssound_init(int *freqptr,int *stereoptr);
+int osssound_init(const char *device,int *freqptr,int *stereoptr);
 void osssound_end(void);
 void osssound_frame(unsigned char *data,int len);
 
