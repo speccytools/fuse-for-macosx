@@ -29,7 +29,7 @@ noinst_LIBRARIES = libwidget.a
 libwidget_a_SOURCES = error.c filesel.c menu_data.c\
 picture.c widget.c menu.c options.c select.c
 
-INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@
+INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 BUILT_SOURCES = options.c options.h
 

@@ -55,6 +55,11 @@ AC_CHECK_SIZEOF(long, 4)
 dnl Check that zlib is available
 AC_CHECK_LIB(z,zlibVersion)
 
+dnl Allow the user to say that various libraries are in one place
+AC_ARG_WITH(local-prefix,
+[  --with-local-prefix=PFX local libraries installed in PFX (optional)],
+CFLAGS="$CFLAGS -I$withval/include"; LDFLAGS="$LDFLAGS -L$withval/lib")
+
 dnl Select a user interface
 
 dnl Try various UI options; set the `ui' variable when we've got one
@@ -160,11 +165,16 @@ if test "$ui" != gtk; then
 fi
 
 dnl Check that libspectrum is available
+AC_ARG_WITH(libspectrum-prefix,
+[  --with-libspectrum-prefix=PFX where libspectrum is installed (optional)],
+LIBSPEC_CFLAGS=-I$withval/include; LIBSPEC_LIBS=-L$withval/lib,
+LIBSPEC_CFLAGS=""; LIBSPEC_LIBS="")
 ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CFLAGS $GTK_CFLAGS $GLIB_CFLAGS"
-AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS=-lspectrum,
+CPPFLAGS="$CFLAGS $LIBSPEC_CFLAGS $GTK_CFLAGS $GLIB_CFLAGS"
+AC_CHECK_HEADERS(libspectrum.h,LIBSPEC_LIBS="$LIBSPEC_LIBS -lspectrum",
 	         AC_MSG_ERROR(Sorry - I need libspectrum to be available))
 CPPFLAGS="$ac_save_CPPFLAGS"
+AC_SUBST(LIBSPEC_CFLAGS)
 AC_SUBST(LIBSPEC_LIBS)
 
 dnl Do we want +3 disk support?
@@ -175,12 +185,20 @@ AC_ARG_WITH(plus3-disk,
   plus3disk=yes)
 AC_MSG_RESULT($plus3disk)
 if test "$plus3disk" = yes; then
-  AC_CHECK_HEADERS(765.h, DSKLIBS=-l765; lib765=yes,
+  AC_ARG_WITH(plus3-disk-prefix,
+  [  --with-plus3-disk-prefix=PFX where the +3 libraries are installed (optional)],
+  DSK_CFLAGS=-I$withval/include; DSKLIBS=-L$withval/lib,
+  DSK_CFLAGS=""; DSK_LIBS="")
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CFLAGS $DSK_CFLAGS"
+  AC_CHECK_HEADERS(765.h, DSKLIBS="$DSKLIBS -l765"; lib765=yes,
                    AC_MSG_WARN(765.h not found - disk support disabled))
   if test "$lib765" = yes; then
     AC_CHECK_HEADERS(libdsk.h, DSKLIBS="$DSKLIBS -ldsk")
   fi
+  CPPFLAGS="$ac_save_CPPFLAGS"
 fi
+AC_SUBST(DSK_CFLAGS)
 AC_SUBST(DSKLIBS)
 
 dnl Check if libpng is available
