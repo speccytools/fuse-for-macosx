@@ -38,6 +38,24 @@
 #define HAVE_SOUND
 #define SOUND_OSS
 
+#elif defined HAVE_SYS_AUDIO_H		/* #if defined UI_SDL */
+
+#include <sys/audio.h>
+
+#if defined AUDIO_SETINFO
+
+#define HAVE_SOUND
+#define SOUND_SUN
+
+#elif defined AUDIO_FORMAT_LINEAR16BIT	/* #if defined AUDIO_SETINFO */
+
+#define HAVE_SOUND
+#define SOUND_HP
+
+#endif					/* #if defined AUDIO_SETINFO */
+
+/* TODO: does OpenBSD have <sys/audio.h>? Solaris does, so the above
+   check will do there */
 #elif defined HAVE_SYS_AUDIOIO_H	/* #if defined UI_SDL */
 
 #define HAVE_SOUND

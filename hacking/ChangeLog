@@ -624,3 +624,5 @@
 20040310 Move the low-level sound files into the new sound/ directory.
 20040310 fuse.c,sound.c,spectrum.c,timer.c,sound/: move the sound code
 	 detection logic into the new sound/lowlevel.h.
+20040310 configure.in,sound/{Makefile.am,hpsound.c,lowlevel.h}: add HP-UX
+         sound support (patch #911651) (Stuart Brady).

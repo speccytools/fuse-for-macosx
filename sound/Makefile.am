@@ -27,6 +27,7 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libsound.a
 
 libsound_a_SOURCES = dxsound.c \
+		     hpsound.c \
 		     nullsound.c \
 		     osssound.c \
 		     sdlsound.c \

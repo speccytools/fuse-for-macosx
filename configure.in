@@ -43,7 +43,14 @@ AC_C_BIGENDIAN
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(dsound.h sys/soundcard.h sys/audioio.h siginfo.h strings.h)
+AC_CHECK_HEADERS(
+  dsound.h \
+  siginfo.h \
+  strings.h \
+  sys/soundcard.h \
+  sys/audio.h \
+  sys/audioio.h
+)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
