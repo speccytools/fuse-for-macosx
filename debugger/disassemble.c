@@ -525,6 +525,7 @@ disassemble_ed( WORD address, char *buffer, size_t buflen, size_t *length )
 
     case 0x06: case 0x0e:
       snprintf( buffer, buflen, "IM %d", im_modes[ ( b >> 3 ) & 0x03 ] );
+      *length = 1;
       break;
 
     case 0x07: case 0x0f:
