@@ -70,7 +70,7 @@ ui_error( const char *format, ... )
   
   va_start( ap, format );
 
-   fprintf( stderr, "%s: ", fuse_progname );
+   fprintf( stderr, "%s: error: ", fuse_progname );
   vfprintf( stderr, format, ap );
 
   va_end( ap );
