@@ -47,6 +47,7 @@ AC_CHECK_HEADERS(sys/soundcard.h sys/audioio.h siginfo.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+AC_INLINE
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(getopt_long,,GETOPT_LIBS=getopt/libgetopt.a)

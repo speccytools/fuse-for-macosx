@@ -807,7 +807,7 @@ FUNCTION( scaler_TimexTV )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
   }
 }
 
-static inline scaler_data_type DOT(scaler_data_type c, int j, int i) {
+static inline scaler_data_type DOT_16(scaler_data_type c, int j, int i) {
   return c - ((c >> 2) & *(dotmatrix + ((j & 3) << 2) + (i & 3)));
 }
 
@@ -826,10 +826,10 @@ FUNCTION( scaler_DotMatrix )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
   for (j = 0, jj = 0; j < height; ++j, jj += 2) {
     for (i = 0, ii = 0; i < width; ++i, ii += 2) {
       scaler_data_type c = *(p + i);
-      *(q + ii) = DOT(c, jj, ii);
-      *(q + ii + 1) = DOT(c, jj, ii + 1);
-      *(q + ii + nextlineDst) = DOT(c, jj + 1, ii);
-      *(q + ii + nextlineDst + 1) = DOT(c, jj + 1, ii + 1);
+      *(q + ii) = DOT_16(c, jj, ii);
+      *(q + ii + 1) = DOT_16(c, jj, ii + 1);
+      *(q + ii + nextlineDst) = DOT_16(c, jj + 1, ii);
+      *(q + ii + nextlineDst + 1) = DOT_16(c, jj + 1, ii + 1);
     }
     p += nextlineSrc;
     q += nextlineDst << 1;
