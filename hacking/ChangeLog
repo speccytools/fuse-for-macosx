@@ -416,3 +416,4 @@
 	 (patch #867906) (Fred).
 20031231 z80/z80_ops.c: use gcc's computed goto feature to give a small
 	 performance boost.
+20031231 ui/gtk/fileselector.c: remove incorrect pointer warnings.
