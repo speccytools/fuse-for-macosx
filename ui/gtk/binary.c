@@ -85,34 +85,37 @@ gtkui_load_binary_data( GtkWidget *widget GCC_UNUSED, gpointer data
 			       table );
 
   label = gtk_label_new( "Filename" );
-  gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1, 0, 1 );
+  gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 0, 1,
+		    GTK_FILL, GTK_FILL, 3, 3 );
 
   info.filename_widget = gtk_label_new( info.filename );
-  gtk_table_attach_defaults( GTK_TABLE( table ), info.filename_widget, 1, 2,
-			     0, 1 );
+  gtk_table_attach( GTK_TABLE( table ), info.filename_widget, 1, 2, 0, 1,
+		    GTK_FILL, GTK_FILL, 3, 3 );
 
   button = gtk_button_new_with_label( "Browse..." );
-  gtk_table_attach_defaults( GTK_TABLE( table ), button, 2, 3, 0, 1 );
+  gtk_table_attach( GTK_TABLE( table ), button, 2, 3, 0, 1,
+		    GTK_FILL, GTK_FILL, 3, 3 );
   gtk_signal_connect( GTK_OBJECT( button ), "clicked",
 		      GTK_SIGNAL_FUNC( change_load_filename ), &info );
 
   label = gtk_label_new( "Start" );
-  gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1, 1, 2 );
+  gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 1, 2, 0, 0, 3, 3 );
 
   info.start_widget = gtk_entry_new();
-  gtk_table_attach_defaults( GTK_TABLE( table ), info.start_widget, 1, 3,
-			     1, 2 );
+  gtk_table_attach( GTK_TABLE( table ), info.start_widget, 1, 3, 1, 2,
+		    GTK_FILL, GTK_FILL, 3, 3 );
   gtk_signal_connect( GTK_OBJECT( info.start_widget ), "activate",
 		      GTK_SIGNAL_FUNC( load_data ), &info );
 
   label = gtk_label_new( "Length" );
-  gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 1, 2, 3 );
+  gtk_table_attach( GTK_TABLE( table ), label, 0, 1, 2, 3,
+		    GTK_FILL, GTK_FILL, 3, 3 );
 
   snprintf( buffer, 80, "%lu", (unsigned long)info.file.length );
   info.length_widget = gtk_entry_new();
   gtk_entry_set_text( GTK_ENTRY( info.length_widget ), buffer );
-  gtk_table_attach_defaults( GTK_TABLE( table ), info.length_widget, 1, 3,
-			     2, 3 );
+  gtk_table_attach( GTK_TABLE( table ), info.length_widget, 1, 3, 2, 3,
+		    GTK_FILL, GTK_FILL, 3, 3 );
   gtk_signal_connect( GTK_OBJECT( info.length_widget ), "activate",
 		      GTK_SIGNAL_FUNC( load_data ), &info );
 
