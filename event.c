@@ -86,7 +86,7 @@ int event_add(DWORD event_time, int type)
 
   event_list=g_slist_insert_sorted(event_list,(gpointer)ptr,event_add_cmp);
 
-  if(tstates<event_next_event) event_next_event = event_time;
+  if( event_time < event_next_event ) event_next_event = event_time;
 
   return 0;
 }
@@ -159,6 +159,13 @@ int event_do_events(void)
 int event_interrupt( DWORD tstates_per_frame )
 {
   g_slist_foreach(event_list, event_reduce_tstates, &tstates_per_frame );
+
+  if( event_list == NULL ) {
+    event_next_event = event_no_events;
+  } else {
+    event_next_event= ( (event_t*) (event_list->data) ) -> tstates;
+  }
+
   return 0;
 }
 
