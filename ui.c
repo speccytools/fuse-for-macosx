@@ -52,7 +52,7 @@ ui_libspectrum_error( libspectrum_error error, const char *format, va_list ap )
   char new_format[ 257 ];
   snprintf( new_format, 256, "libspectrum: %s", format );
 
-  ui_error( UI_ERROR_ERROR, new_format, ap );
+  ui_verror( UI_ERROR_ERROR, new_format, ap );
 
   return LIBSPECTRUM_ERROR_NONE;
 }
