@@ -45,7 +45,7 @@ gtkstatusbar_create( GtkBox *parent )
   GtkWidget *status_bar;
 
   status_bar = gtk_hbox_new( FALSE, 3 );
-  gtk_box_pack_start_defaults( parent, status_bar );
+  gtk_box_pack_start( parent, status_bar, FALSE, FALSE, 0 );
 
   disk_status = gtk_label_new( "Disk: N/A" );
   gtk_box_pack_start_defaults( GTK_BOX( status_bar ), disk_status );
