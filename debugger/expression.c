@@ -31,23 +31,44 @@
 #include "debugger_internals.h"
 #include "ui/ui.h"
 
-typedef enum debugger_expression_type {
+typedef enum expression_type {
 
   DEBUGGER_EXPRESSION_TYPE_INTEGER,
   DEBUGGER_EXPRESSION_TYPE_REGISTER,
+  DEBUGGER_EXPRESSION_TYPE_UNARYOP,
+  DEBUGGER_EXPRESSION_TYPE_BINARYOP,
 
-} debugger_expression_type;
+} expression_type;
+
+struct unaryop_type {
+
+  int operation;
+  debugger_expression *op;
+
+};
+
+struct binaryop_type {
+
+  int operation;
+  debugger_expression *op1, *op2;
+
+};
 
 struct debugger_expression {
 
-  debugger_expression_type type;
+  expression_type type;
 
   union {
     int integer;
     int reg;
+    struct unaryop_type unaryop;
+    struct binaryop_type binaryop;
   } types;
 
 };
+
+static int evaluate_unaryop( struct unaryop_type *unaryop );
+static int evaluate_binaryop( struct binaryop_type *binary );
 
 debugger_expression*
 debugger_expression_new_number( int number )
@@ -83,9 +104,66 @@ debugger_expression_new_register( int which )
   return exp;
 }
 
+debugger_expression*
+debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
+				  debugger_expression *operand2 )
+{
+  debugger_expression *exp;
+
+  exp = malloc( sizeof( debugger_expression ) );
+  if( !exp ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return NULL;
+  }
+
+  exp->type = DEBUGGER_EXPRESSION_TYPE_BINARYOP;
+  exp->types.binaryop.operation = operation;
+  exp->types.binaryop.op1 = operand1;
+  exp->types.binaryop.op2 = operand2;
+
+  return exp;
+}
+
+
+debugger_expression*
+debugger_expression_new_unaryop( int operation, debugger_expression *operand )
+{
+  debugger_expression *exp;
+
+  exp = malloc( sizeof( debugger_expression ) );
+  if( !exp ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return NULL;
+  }
+
+  exp->type = DEBUGGER_EXPRESSION_TYPE_UNARYOP;
+  exp->types.unaryop.operation = operation;
+  exp->types.unaryop.op = operand;
+
+  return exp;
+}
+
+
 void
 debugger_expression_delete( debugger_expression *exp )
 {
+  switch( exp->type ) {
+    
+  case DEBUGGER_EXPRESSION_TYPE_INTEGER:
+  case DEBUGGER_EXPRESSION_TYPE_REGISTER:
+    break;
+
+  case DEBUGGER_EXPRESSION_TYPE_UNARYOP:
+    debugger_expression_delete( exp->types.unaryop.op );
+    break;
+
+  case DEBUGGER_EXPRESSION_TYPE_BINARYOP:
+    debugger_expression_delete( exp->types.binaryop.op1 );
+    debugger_expression_delete( exp->types.binaryop.op2 );
+    break;
+
+  }
+    
   free( exp );
 }
 
@@ -100,8 +178,49 @@ debugger_expression_evaluate( debugger_expression *exp )
   case DEBUGGER_EXPRESSION_TYPE_REGISTER:
     return debugger_register_get( exp->types.reg );
 
-  default:
-    ui_error( UI_ERROR_ERROR, "unknown expression type %d", exp->type );
-    return 0;
+  case DEBUGGER_EXPRESSION_TYPE_UNARYOP:
+    return evaluate_unaryop( &( exp->types.unaryop ) );
+
+  case DEBUGGER_EXPRESSION_TYPE_BINARYOP:
+    return evaluate_binaryop( &( exp->types.binaryop ) );
+
   }
+
+  ui_error( UI_ERROR_ERROR, "unknown expression type %d", exp->type );
+  return 0;
+}
+
+static int
+evaluate_unaryop( struct unaryop_type *unary )
+{
+  switch( unary->operation ) {
+
+  case '-': return -debugger_expression_evaluate( unary->op );
+
+  }
+
+  ui_error( UI_ERROR_ERROR, "unknown unary operator %d", unary->operation );
+  return 0;
+}
+
+static int
+evaluate_binaryop( struct binaryop_type *binary )
+{
+  switch( binary->operation ) {
+
+  case '+': return debugger_expression_evaluate( binary->op1 ) +
+		   debugger_expression_evaluate( binary->op2 );
+
+  case '-': return debugger_expression_evaluate( binary->op1 ) -
+		   debugger_expression_evaluate( binary->op2 );
+
+  case '*': return debugger_expression_evaluate( binary->op1 ) *
+		   debugger_expression_evaluate( binary->op2 );
+
+  case '/': return debugger_expression_evaluate( binary->op1 ) /
+		   debugger_expression_evaluate( binary->op2 );
+  }
+
+  ui_error( UI_ERROR_ERROR, "unknown binary operator %d", binary->operation );
+  return 0;
 }

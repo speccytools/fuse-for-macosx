@@ -48,6 +48,8 @@ void yyerror( char *s );
 
 %union {
 
+  int token;
+
   int integer;
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
@@ -57,6 +59,8 @@ void yyerror( char *s );
 }
 
 /* Tokens as returned from the Flex scanner (commandl.l) */
+
+%token <token>	 TIMES_DIVIDE	/* '*' or '/' */
 
 %token		 BASE
 %token		 BREAK
@@ -90,8 +94,18 @@ void yyerror( char *s );
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
 
-%type  <exp>     expressionornull;
+%type  <exp>     expressionornull
 %type  <exp>     expression;
+
+/* Operator precedences */
+
+/* Low precedence */
+
+%left '+' '-'
+%left TIMES_DIVIDE
+%left NEG		/* Unary minus (also unary plus) */
+
+/* High precedence */
 
 %%
 
@@ -150,6 +164,24 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 	    | REGISTER { $$ = debugger_expression_new_register( $1 );
 			 if( !$$ ) YYABORT;
 		       }
+	    | '(' expression ')' { $$ = $2; }
+	    | '+' expression %prec NEG { $$ = $2; }
+	    | '-' expression %prec NEG {
+	        $$ = debugger_expression_new_unaryop( '-', $2 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression '+' expression {
+	        $$ = debugger_expression_new_binaryop( '+', $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression '-' expression {
+	        $$ = debugger_expression_new_binaryop( '-', $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
+	    | expression TIMES_DIVIDE expression {
+	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
+		if( !$$ ) YYABORT;
+	      }
 ;
 
 %%

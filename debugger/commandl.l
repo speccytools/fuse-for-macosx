@@ -75,6 +75,14 @@ a|b|c|d|e|f|h|l { yylval.integer = tolower( *yytext ); return REGISTER; }
 af|bc|de|hl|sp|pc|ix|iy { yylval.integer = debugger_reg16_index( yytext );
 	                  return REGISTER; }
 
+"("		{ return '('; }
+")"		{ return ')'; }
+
+"+"		{ return '+'; }
+"-"		{ return '-'; }
+"*"		{ yylval.token = '*'; return TIMES_DIVIDE; }
+"/"		{ yylval.token = '/'; return TIMES_DIVIDE; }
+
 ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  return NUMBER; }
 0x{HEX}+	{ yylval.integer = strtol( yytext+2, NULL, 16 );

@@ -55,6 +55,11 @@ int debugger_reg16_index( char *reg );
 
 debugger_expression* debugger_expression_new_number( int number );
 debugger_expression* debugger_expression_new_register( int which );
+debugger_expression*
+debugger_expression_new_unaryop( int operation, debugger_expression *operand );
+debugger_expression*
+debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
+				  debugger_expression *operand2 );
 
 void debugger_expression_delete( debugger_expression* expression );
 
