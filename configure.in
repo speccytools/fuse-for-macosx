@@ -112,7 +112,7 @@ if test -z "$ui"; then
   fb=no)
   AC_MSG_RESULT($fb)
   if test "$fb" = yes; then
-    AC_DEFINE(UI_FB) ui=fb; UI_LIBS="ui/libuifb.a"
+    AC_DEFINE(UI_FB) ui=fb; UI_LIBS="ui/fb/libuifb.a widget/libwidget.a"
   fi
 fi
 
@@ -128,7 +128,7 @@ if test -z "$ui"; then
     SDL_VERSION=1.2.4
     AM_PATH_SDL($SDL_VERSION,
 		AC_DEFINE(UI_SDL) ui=sdl
-	        UI_LIBS="ui/libuisdl.a widget/libwidget.a", 
+	        UI_LIBS="ui/sdl/libuisdl.a widget/libwidget.a", 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
     CFLAGS="$CFLAGS $SDL_CFLAGS"
     CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
