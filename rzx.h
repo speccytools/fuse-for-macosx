@@ -50,7 +50,7 @@ extern int rzx_recording;
 extern int rzx_playback;
 
 /* Is the .rzx file being recorded in competition mode? */
-int rzx_competition_mode;
+extern int rzx_competition_mode;
 
 /* The number of instructions in the current .rzx playback frame */
 extern size_t rzx_instruction_count;
