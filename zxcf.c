@@ -139,18 +139,19 @@ static void
 set_zxcf_bank( int bank )
 {
   memory_page *page;
-  size_t i;
+  size_t i, offset;
 
   for( i = 0; i < 2; i++ ) {
 
     page = &memory_map_romcs[i];
-
-    page->page = ZXCFMEM[ bank ];
+    offset = i & 1 ? MEMORY_PAGE_SIZE : 0x0000;
+    
+    page->page = &ZXCFMEM[ bank ][ offset ];
     page->writable = zxcf_writeenable;
     page->contended = 0;
     
     page->page_num = bank;
-    page->offset = i & 1 ? 0x2000 : 0x0000;
+    page->offset = offset;
   }
 }  
 

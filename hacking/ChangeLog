@@ -828,5 +828,7 @@
 	 machines/{machines.h,spec16.c,spec48.[ch],tc2048.c,tc2068.c},
 	 options.dat: ZXATASP/ZXCF closer to working and some related
 	 tidy-ups.
+20040517 zxatasp.c,zxcf.c: get page mappings (closer to) correct. ZXCF
+	 now boots, although ZXATASP doesn't.
 20040518 configure.in,acconfig,h: Remove need for acconfig.h for newer
          autotools per patch #953734.

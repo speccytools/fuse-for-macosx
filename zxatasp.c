@@ -376,18 +376,19 @@ static void
 set_zxatasp_bank( int bank )
 {
   memory_page *page;
-  size_t i;
+  size_t i, offset;
 
   for( i = 0; i < 2; i++ ) {
 
     page = &memory_map_romcs[i];
+    offset = i & 1 ? MEMORY_PAGE_SIZE : 0x0000;
 
-    page->page = ZXATASPMEM[ bank ];
+    page->page = &ZXATASPMEM[ bank ][ offset ];
     page->writable = !settings_current.zxatasp_wp;
     page->contended = 0;
     
     page->page_num = bank;
-    page->offset = i & 1 ? 0x2000 : 0x0000;
+    page->offset = offset;
   }
 }
 
