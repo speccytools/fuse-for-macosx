@@ -55,7 +55,7 @@ size_t spectrum_rom_count = 0;
 libspectrum_byte **ROM = NULL;
 
 /* And the RAM */
-libspectrum_byte RAM[8][0x4000];
+libspectrum_byte RAM[16][0x4000];
 
 /* How many tstates have elapsed since the last interrupt? (or more
    precisely, since the ULA last pulled the /INT line to the Z80 low) */

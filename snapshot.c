@@ -37,6 +37,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "scld.h"
+#include "scorpion.h"
 #include "sound.h"
 #include "snapshot.h"
 #include "spec128.h"
@@ -109,7 +110,8 @@ snapshot_read_buffer( const unsigned char *buffer, size_t length,
   return 0;
 }
 
-int snapshot_copy_from( libspectrum_snap *snap )
+int
+snapshot_copy_from( libspectrum_snap *snap )
 {
   int i,j; int error;
   int capabilities;
@@ -178,8 +180,14 @@ int snapshot_copy_from( libspectrum_snap *snap )
 			      libspectrum_snap_out_128_memoryport( snap ) );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY )
-    specplus3_memoryport_write( 0x1ffd,
-				libspectrum_snap_out_plus3_memoryport( snap ));
+    specplus3_memoryport2_write(
+      0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
+    );
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SCORP_MEMORY )
+    scorpion_memoryport2_write(
+      0x1ffd, libspectrum_snap_out_plus3_memoryport( snap )
+    );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY )
     scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );

@@ -168,6 +168,8 @@ spec128_common_reset( int contention )
   size_t i;
 
   machine_current->ram.locked=0;
+  machine_current->ram.last_byte = 0;
+
   machine_current->ram.current_page=0;
   machine_current->ram.current_rom=0;
 

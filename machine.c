@@ -35,6 +35,7 @@
 #include "pentagon.h"
 #include "printer.h"
 #include "scld.h"
+#include "scorpion.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -90,6 +91,8 @@ int machine_init_machines( void )
   if( error ) return error;
   error = machine_add_machine( pentagon_init );
   if (error ) return error;
+  error = machine_add_machine( scorpion_init );
+  if ( error ) return error;
 
   return 0;
 }

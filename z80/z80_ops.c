@@ -127,14 +127,14 @@ z80_do_opcodes( void )
     CHECK( trdos, trdos_available, 2 )
 
     if( trdos_active ) {
-      if( machine_current->ram.current_rom == 1 &&
+      if( machine_current->ram.current_rom &&
 	  PC >= 16384 ) {
 	trdos_active = 0;
 	memory_map[0].page = &ROM[ machine_current->ram.current_rom ][0x0000];
 	memory_map[1].page = &ROM[ machine_current->ram.current_rom ][0x2000];
       }
     } else if( ( PC & 0xff00 ) == 0x3d00 &&
-	       machine_current->ram.current_rom == 1 ) {
+	       machine_current->ram.current_rom ) {
       trdos_active = 1;
       memory_map[0].page = &ROM[2][0x0000];
       memory_map[1].page = &ROM[2][0x2000];

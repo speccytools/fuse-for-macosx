@@ -48,7 +48,7 @@ extern size_t spectrum_rom_count;
 extern libspectrum_byte **ROM;
 
 /* And the RAM */
-extern libspectrum_byte RAM[8][0x4000];
+extern libspectrum_byte RAM[16][0x4000];
 
 typedef libspectrum_byte
   (*spectrum_screen_read_function)( libspectrum_word offset );

@@ -1,5 +1,7 @@
 Some thanks (in alphabetical order):
 
+* Stuart Brady: for the Scorpion support (see `AUTHORS')
+
 * Michael Bukin: for XWinAllegro, which was used by previous versions of
   Fuse for the graphical display.
   (http://www.canvaslink.com/allegro/xwinallegro/)

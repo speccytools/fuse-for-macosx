@@ -33,6 +33,8 @@ Fuse has been brought to you by:
 * Marek Januszewski: Some patches making Fuse much closer to compiling under
   Win32, and fixing up the GTK+ 2.0 interface.
 
+* Stuart Brady: for the Scorpion support.
+
 * Philip Kendall: everything else.
 
 $Id$

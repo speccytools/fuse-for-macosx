@@ -599,3 +599,10 @@
 	 masks to be applied before checking for port breakpoints.
 20040227 event.c,ui.[ch]: don't display an error message if the same
 	 message was displayed within the past second (fixes bug #901023).
+20040301 trdos.c: make the TR-DOS read/write functions be no-ops if the
+	 TR-DOS ROM is not active (part of patch #874504 from Stuart
+	 Brady, but a separate bugfix IMO).
+20040301 machine.c,scorpion.[ch],settings-header.pl,settings.{dat,pl},
+	 snapshot.c,spec128.c,spectrum.[ch],tape.c,roms/256s-?.rom,
+	 z80/z80_ops.c: Scorpion support (rest of patch #874504) (Stuart
+	 Brady).

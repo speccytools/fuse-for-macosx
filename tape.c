@@ -478,6 +478,7 @@ int trap_check_rom( void )
 	    machine_current->ram.current_rom == 3 );
 
   case LIBSPECTRUM_MACHINE_PENT:
+  case LIBSPECTRUM_MACHINE_SCORP:
     /* OK if we're in ROM 1  and TRDOS is not active */
     return( machine_current->ram.current_rom == 1 && !trdos_active );
 

@@ -67,6 +67,7 @@ fuse_SOURCES = ay.c \
 	psg.c \
 	rzx.c \
 	scld.c \
+	scorpion.c \
 	screenshot.c \
 	sdlsound.c \
 	settings.c \
@@ -130,6 +131,7 @@ noinst_HEADERS = ay.h \
 	periph.h \
 	psg.h \
 	rzx.h \
+	scorpion.h \
 	screenshot.h \
 	settings.h \
 	snapshot.h \
