@@ -376,3 +376,5 @@
 20031201 spec16.c: ensure we have a prototype for memset().
 20031202 Some --enable-warnings tidy-ups.
 20031202 machine.c: fix a small (but definite) memory leak.
+20031203 ui/gtk/debugger.c: add ability to turn individual 'panes' on and
+	 off.

@@ -52,7 +52,27 @@ typedef PangoFontDescription *font_spec;
 typedef GtkStyle *font_spec;
 #endif				/* #ifdef UI_GTK2 */
 
+/* The various debugger panes */
+typedef enum debugger_pane {
+
+  DEBUGGER_PANE_BEGIN = 1,	/* Start marker */
+
+  DEBUGGER_PANE_REGISTERS = DEBUGGER_PANE_BEGIN,
+  DEBUGGER_PANE_BREAKPOINTS,
+  DEBUGGER_PANE_DISASSEMBLY,
+  DEBUGGER_PANE_STACK,
+
+  DEBUGGER_PANE_END		/* End marker */
+
+} debugger_pane;
+
 static int create_dialog( void );
+static int hide_hidden_panes( void );
+static GtkCheckMenuItem* get_pane_menu_item( debugger_pane pane );
+static GtkWidget* get_pane( debugger_pane pane );
+static int create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group );
+static void toggle_display( gpointer callback_data, guint callback_action,
+			    GtkWidget *widget );
 static int create_register_display( GtkBox *parent, font_spec font );
 static int create_breakpoints( GtkBox *parent );
 static int create_disassembly( GtkBox *parent, font_spec font );
@@ -81,7 +101,8 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *register_display,			/* The register display */
   *registers[18],			/* Individual registers */
   *breakpoints,				/* The breakpoint display */
-  *disassembly,				/* The disassembly */
+  *disassembly_box,			/* A box to hold the disassembly */
+  *disassembly,				/* The actual disassembly widget */
   *stack;				/* The stack display */
 
 static GtkObject *disassembly_scrollbar_adjustment;
@@ -95,15 +116,35 @@ static int dialog_created = 0;
 /* Is the debugger window active (as opposed to the debugger itself)? */
 static int debugger_active;
 
+/* The factory used to create the menu bar */
+static GtkItemFactory *menu_factory;
+
+/* The debugger's menu bar */
+static GtkItemFactoryEntry menu_data[] = {
+
+  { "/_View", NULL, NULL, 0, "<Branch>" },
+  { "/View/_Registers", NULL, toggle_display, DEBUGGER_PANE_REGISTERS, "<ToggleItem>" },
+  { "/View/_Breakpoints", NULL, toggle_display, DEBUGGER_PANE_BREAKPOINTS, "<ToggleItem>" },
+  { "/View/_Disassembly", NULL, toggle_display, DEBUGGER_PANE_DISASSEMBLY, "<ToggleItem>" },
+  { "/View/_Stack", NULL, toggle_display, DEBUGGER_PANE_STACK, "<ToggleItem>" },
+
+};
+
+static guint menu_data_count =
+  sizeof( menu_data ) / sizeof( GtkItemFactoryEntry );
+
 int
 ui_debugger_activate( void )
 {
+  int error;
+
   fuse_emulation_pause();
 
   /* Create the dialog box if it doesn't already exist */
   if( !dialog_created ) if( create_dialog() ) return 1;
 
   gtk_widget_show_all( dialog );
+  error = hide_hidden_panes(); if( error ) return error;
 
   gtk_widget_set_sensitive( continue_button, 1 );
   gtk_widget_set_sensitive( break_button, 0 );
@@ -112,6 +153,74 @@ ui_debugger_activate( void )
   return 0;
 }
 
+static int
+hide_hidden_panes( void )
+{
+  debugger_pane i;
+  GtkCheckMenuItem *checkitem; GtkWidget *pane;
+
+  for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
+
+    checkitem = get_pane_menu_item( i ); if( !checkitem ) return 1;
+
+    if( checkitem->active ) continue;
+
+    pane = get_pane( i ); if( !pane ) return 1;
+
+    gtk_widget_hide_all( pane );
+  }
+
+  return 0;
+}
+
+static GtkCheckMenuItem*
+get_pane_menu_item( debugger_pane pane )
+{
+  const gchar *path;
+  GtkWidget *menu_item;
+
+  path = NULL;
+
+  switch( pane ) {
+  case DEBUGGER_PANE_REGISTERS: path = "/View/Registers"; break;
+  case DEBUGGER_PANE_BREAKPOINTS: path = "/View/Breakpoints"; break;
+  case DEBUGGER_PANE_DISASSEMBLY: path = "/View/Disassembly"; break;
+  case DEBUGGER_PANE_STACK: path = "/View/Stack"; break;
+
+  case DEBUGGER_PANE_END: break;
+  }
+
+  if( !path ) {
+    ui_error( UI_ERROR_ERROR, "unknown debugger pane %u\n", pane );
+    return NULL;
+  }
+
+  menu_item = gtk_item_factory_get_widget( menu_factory, path );
+  if( !menu_item ) {
+    ui_error( UI_ERROR_ERROR, "couldn't get menu item '%s' from factory",
+	      path );
+    return NULL;
+  }
+
+  return GTK_CHECK_MENU_ITEM( menu_item );
+}
+
+static GtkWidget*
+get_pane( debugger_pane pane )
+{
+  switch( pane ) {
+  case DEBUGGER_PANE_REGISTERS: return register_display;
+  case DEBUGGER_PANE_BREAKPOINTS: return breakpoints;
+  case DEBUGGER_PANE_DISASSEMBLY: return disassembly_box;
+  case DEBUGGER_PANE_STACK: return stack;
+
+  case DEBUGGER_PANE_END: break;
+  }
+
+  ui_error( UI_ERROR_ERROR, "unknown debugger pane %u\n", pane );
+  return NULL;
+}
+  
 int
 ui_debugger_deactivate( int interruptable )
 {
@@ -129,6 +238,7 @@ create_dialog( void )
   int error;
   GtkWidget *hbox, *vbox;
   GtkAccelGroup *accel_group;
+  debugger_pane i;
 
   font_spec font;
 
@@ -165,6 +275,11 @@ create_dialog( void )
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
 
+  /* The menu bar */
+  error = create_menu_bar( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+			   accel_group );
+  if( error ) return error;
+
   /* A couple of boxes to contain the things we want to display */
   hbox = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox,
@@ -195,6 +310,15 @@ create_dialog( void )
 			  accel_group );
   if( error ) return error;
 
+  /* Initially, have all the panes visible */
+  for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
+    
+    GtkCheckMenuItem *check_item;
+
+    check_item = get_pane_menu_item( i ); if( !check_item ) break;
+    gtk_check_menu_item_set_active( check_item, TRUE );
+  }
+
 #ifdef UI_GTK2
   pango_font_description_free( font );
 #endif				/* #ifdef UI_GTK2 */
@@ -202,6 +326,37 @@ create_dialog( void )
   dialog_created = 1;
 
   return 0;
+}
+
+static int
+create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group )
+{
+  GtkWidget *menu_bar;
+
+  menu_factory = gtk_item_factory_new( GTK_TYPE_MENU_BAR, "<main>",
+				       accel_group );
+  gtk_item_factory_create_items( menu_factory, menu_data_count, menu_data,
+				 NULL);
+  menu_bar = gtk_item_factory_get_widget( menu_factory, "<main>" );
+
+  gtk_box_pack_start_defaults( parent, menu_bar );
+  
+  return 0;
+}
+
+static void
+toggle_display( gpointer callback_data, guint callback_action,
+		GtkWidget *widget )
+{
+  GtkWidget *pane;
+
+  pane = get_pane( callback_action ); if( !pane ) return;
+
+  if( GTK_CHECK_MENU_ITEM( widget )->active ) {
+    gtk_widget_show_all( pane );
+  } else {
+    gtk_widget_hide_all( pane );
+  }
 }
 
 static int
@@ -247,13 +402,17 @@ create_disassembly( GtkBox *parent, font_spec font )
   GtkWidget *scrollbar;
   gchar *disassembly_titles[] = { "Address", "Instruction" };
 
+  /* A box to hold the disassembly listing and the scrollbar */
+  disassembly_box = gtk_hbox_new( FALSE, 0 );
+  gtk_box_pack_start_defaults( parent, disassembly_box );
+
   /* The disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
   set_font( disassembly, font );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( disassembly ), i, TRUE );
-  gtk_box_pack_start_defaults( parent, disassembly );
+  gtk_box_pack_start_defaults( GTK_BOX( disassembly_box ), disassembly );
 
   /* The disassembly scrollbar */
   disassembly_scrollbar_adjustment =
@@ -263,7 +422,7 @@ create_disassembly( GtkBox *parent, font_spec font )
 		      NULL );
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
-  gtk_box_pack_start( parent, scrollbar, FALSE, FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
 
   return 0;
 }
