@@ -28,6 +28,8 @@
 
 #ifdef USE_WIDGET
 
+#include <string.h>
+
 #include "widget_internals.h"
 
 /* Data for drawing the cursor */
