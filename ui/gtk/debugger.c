@@ -137,11 +137,12 @@ create_dialog( void )
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
 
   /* A couple of boxes to contain the things we want to display */
-  hbox = gtk_hbox_new( FALSE, 5 );
-  gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox );
+  hbox = gtk_hbox_new( FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox,
+		      TRUE, TRUE, 5 );
 
   vbox = gtk_vbox_new( FALSE, 5 );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), vbox );
+  gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
 
   /* 'table' contains the register display */
   table = gtk_table_new( 9, 2, FALSE );
@@ -173,13 +174,13 @@ create_dialog( void )
 		      NULL );
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), scrollbar );
+  gtk_box_pack_start( GTK_BOX( hbox ), scrollbar, FALSE, FALSE, 0 );
 
   /* And the stack CList */
   stack = gtk_clist_new_with_titles( 2, stack_titles );
   gtk_widget_set_style( stack, style );
   gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), stack );
+  gtk_box_pack_start( GTK_BOX( hbox ), stack, TRUE, TRUE, 5 );
 
   /* Another hbox to hold the command entry widget and the 'evaluate'
      button */
