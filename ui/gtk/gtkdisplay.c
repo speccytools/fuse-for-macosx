@@ -36,6 +36,7 @@
 #include "fuse.h"
 #include "gtkui.h"
 #include "ui/uidisplay.h"
+#include "widget/widget.h"
 #include "scld.h"
 
 static GdkGC *gc;
@@ -175,6 +176,10 @@ static int gtkdisplay_configure_notify( int width )
     uidisplay_set_border(y,DISPLAY_BORDER_WIDTH+DISPLAY_WIDTH,
 			 DISPLAY_SCREEN_WIDTH,colour);
   }
+
+  /* Redraw widgets if they're active. Needed here as the keyboard help
+     is implemented as a widget */
+  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize );
 
   return 0;
 }
