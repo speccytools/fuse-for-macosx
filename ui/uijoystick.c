@@ -177,8 +177,9 @@ ui_joystick_end( void )
 void
 ui_joystick_poll( void )
 {
-  poll_joystick( 0 );
-  poll_joystick( 1 );
+  int i;
+
+  for( i = 0; i < joysticks_supported; i++ ) poll_joystick( i );
 }
 
 static void
