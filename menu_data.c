@@ -77,6 +77,7 @@ Options/Select ROMs/Spectrum 12_8K..., Item,, menu_options_selectroms_select, 3
 Options/Select ROMs/Spectrum +_2..., Item,, menu_options_selectroms_select, 4
 Options/Select ROMs/Spectrum +2_A..., Item,, menu_options_selectroms_select, 5
 Options/Select ROMs/Spectrum +_3..., Item,, menu_options_selectroms_select, 6
+Options/Select ROMs/Spectrum +3_e..., Item,, menu_options_selectroms_select, 11
 Options/Select ROMs/Timex _TC2048..., Item,, menu_options_selectroms_select, 7
 Options/Select ROMs/Timex T_C2068..., Item,, menu_options_selectroms_select, 8
 Options/Select ROMs/_Pentagon 128K..., Item,, menu_options_selectroms_select, 9

@@ -731,7 +731,9 @@
 20040410 ui/gtk/browse.c: #include <string.h> for strcpy.
 20040111 Revamp of menu system to share code between the GTK+ and widget
 	 implementations (patch #931017).
-20040406 compat.h,debugger/expression.c,fuse.[ch],input.c,joystick.c,
+20040411 compat.h,debugger/expression.c,fuse.[ch],input.c,joystick.c,
 	 nullsound.c,tape.c,utils.c,widget/menu.c: declare fuse_abort()
 	 to never return and remove the 'keep gcc happy' bits this
 	 assumption makes unnecessary.
+20040411 menu.c,menu_data.c,settings-header.pl,settings.pl: allow the
+	 +3e ROMs to be selected from the user interfaces.

@@ -54,6 +54,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case  8: menu_select_roms( LIBSPECTRUM_MACHINE_TC2068, 15, 2 ); return;
   case  9: menu_select_roms( LIBSPECTRUM_MACHINE_PENT,   17, 3 ); return;
   case 10: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,  20, 4 ); return;
+  case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3E, 24, 4 ); return;
 
   }
 

@@ -126,6 +126,7 @@ settings_rom_name[ SETTINGS_ROM_COUNT ] = {
   "2068 ROM 0", "2068 ROM 1",
   "P128 ROM 0", "P128 ROM 1", "P128 ROM 2",
   "S256 ROM 0", "S256 ROM 1", "S256 ROM 2", "S256 ROM 3",
+  "+3e ROM 0",  "+3e ROM 1",  "+3e ROM 2",  "+3e ROM 3",
 };
 
 /* Called on emulator startup */
@@ -494,6 +495,10 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 21: return &( settings->rom_scorpion_1 );
   case 22: return &( settings->rom_scorpion_2 );
   case 23: return &( settings->rom_scorpion_3 );
+  case 24: return &( settings->rom_plus3e_0 );
+  case 25: return &( settings->rom_plus3e_1 );
+  case 26: return &( settings->rom_plus3e_2 );
+  case 27: return &( settings->rom_plus3e_3 );
   default: return NULL;
   }
 }
