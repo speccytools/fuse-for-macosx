@@ -876,3 +876,4 @@
 20040528 ui/gtk/debugger.c: Fix Timex HSR and DEC register display.
 20040528 periph.c: Enable/disable Interface II menu items as interface is
          enabled and disabled.
+20040528 periph.c: simplify code slightly.

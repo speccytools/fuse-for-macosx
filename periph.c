@@ -313,21 +313,22 @@ periph_update( void )
     periph_kempston_active = settings_current.joy_kempston; break;
   case PERIPH_PRESENT_ALWAYS: periph_kempston_active = 1; break;
   }
+
   switch( interface2_present ) {
+
   case PERIPH_PRESENT_NEVER:
     periph_interface2_active = 0;
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, 0 );
     break;
   case PERIPH_PRESENT_OPTIONAL:
     periph_interface2_active = settings_current.interface2;
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
-                      periph_interface2_active );
     break;
   case PERIPH_PRESENT_ALWAYS:
     periph_interface2_active = 1;
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, 1 );
     break;
+
   }
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
+		    periph_interface2_active );
 
   update_ide_menu();
 }
