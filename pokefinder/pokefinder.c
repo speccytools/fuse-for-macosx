@@ -32,7 +32,7 @@
 
 #include "spectrum.h"
 
-int pokefinder_possible[8][0x4000];
+int pokefinder_possible[ SPECTRUM_RAM_PAGES ][0x4000];
 size_t pokefinder_count;
 
 int
@@ -40,11 +40,11 @@ pokefinder_clear( void )
 {
   size_t page, offset;
 
-  for( page = 0; page < 8; page++ )
+  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ )
     for( offset = 0; offset < 0x4000; offset++ ) 
       pokefinder_possible[page][offset] = RAM[page][offset];
 
-  pokefinder_count = 8 * 0x4000;
+  pokefinder_count = SPECTRUM_RAM_PAGES * 0x4000;
 
   return 0;
 }
@@ -54,7 +54,7 @@ pokefinder_search( libspectrum_byte value )
 {
   size_t page, offset;
 
-  for( page = 0; page < 8; page++ )
+  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ )
     for( offset = 0; offset < 0x4000; offset++ ) {
 
       if( pokefinder_possible[page][offset] == -1 ) continue;
@@ -73,7 +73,7 @@ pokefinder_incremented( void )
 {
   size_t page, offset;
 
-  for( page = 0; page < 8; page++ ) {
+  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ ) {
     for( offset = 0; offset < 0x4000; offset++ ) {
 
       if( pokefinder_possible[page][offset] == -1 ) continue;
@@ -96,7 +96,7 @@ pokefinder_decremented( void )
 {
   size_t page, offset;
 
-  for( page = 0; page < 8; page++ ) {
+  for( page = 0; page < SPECTRUM_RAM_PAGES; page++ ) {
     for( offset = 0; offset < 0x4000; offset++ ) {
 
       if( pokefinder_possible[page][offset] == -1 ) continue;

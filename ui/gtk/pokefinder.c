@@ -228,7 +228,7 @@ update_pokefinder( void )
 
     which = 0;
 
-    for( page = 0; page < 8; page++ )
+    for( page = 0; page < SPECTRUM_RAM_PAGES; page++ )
       for( offset = 0; offset < 0x4000; offset++ )
 	if( pokefinder_possible[page][offset] != -1 ) {
 

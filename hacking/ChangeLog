@@ -999,3 +999,6 @@
 20040710 ui/fb/fbui.c: #include <errno.h> and <string.h>
 20040715 ui/svga/svgajoystick.c: fix up for new input layer (Darren).
 20040715 ChangeLog,README,man/fuse.1: more 0.7.0 doc updates.
+20040715 pokefinder/pokefinder.c,ui/gtk/pokefinder.c: allow pokefinder to
+	 search all 272K of normal RAM.
+20040715 autogen.sh: copy auxiliary files rather than linking them.
