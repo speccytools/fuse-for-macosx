@@ -29,6 +29,10 @@
 
 #include <stdlib.h>
 
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#endif				/* #ifdef HAVE_LIB_GLIB */
+
 #include <libspectrum.h>
 
 /* The current state of the debugger */
