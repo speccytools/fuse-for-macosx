@@ -1,5 +1,5 @@
 /* filesel.c: File selection dialog box
-   Copyright (c) 2001-2004 Matan Ziv-Av, Philip Kendall, Russell Marks,
+   Copyright (c) 2001-2005 Matan Ziv-Av, Philip Kendall, Russell Marks,
 			   Marek Januszewski
 
    $Id$
@@ -51,6 +51,8 @@ struct widget_dirent **widget_filenames; /* Filenames in the current
 size_t widget_numfiles;	  /* The number of files in the current
 			     directory */
 
+static const char *title;
+
 /* The number of the filename in the top-left corner of the current
    display, that of the filename which the `cursor' is on, and that
    which it will be on after this keypress */
@@ -63,7 +65,8 @@ static int widget_scan_compare( const widget_dirent **a,
 
 static char* widget_getcwd( void );
 static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
-				       int top_left, int current );
+				       int top_left, int current,
+				       const char *dir );
 static int widget_print_filename( struct widget_dirent *filename, int position,
 				  int inverted );
 
@@ -230,17 +233,12 @@ static int widget_scan_compare( const struct widget_dirent **a,
 int
 widget_filesel_draw( void *data )
 {
+  widget_filesel_data *filesel_data = data;
   char *directory;
-
   int error;
 
-  /* Should we exit all widgets when we're done with the fileselector;
-     defaults to 'yes' if no data given for backward compatability reasons */
-  if( !data || *(int*)data ) {
-    exit_all_widgets = 1;
-  } else {
-    exit_all_widgets = 0;
-  }
+  exit_all_widgets = filesel_data->exit_all_widgets;
+  title = filesel_data->title;
 
   directory = widget_getcwd();
   if( directory == NULL ) return 1;
@@ -250,12 +248,12 @@ widget_filesel_draw( void *data )
   top_left_file = 0;
 
   /* Create the dialog box */
-  error = widget_dialog_with_border( 1, 2, 30, 20 );
+  error = widget_dialog_with_border( 1, 2, 30, 21 );
   if( error ) { free( directory ); return error; }
     
   /* Show all the filenames */
   widget_print_all_filenames( widget_filenames, widget_numfiles,
-			      top_left_file, current_file );
+			      top_left_file, current_file, directory );
 
   return 0;
 }
@@ -304,14 +302,25 @@ static char* widget_getcwd( void )
 }
 
 static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
-				       int top_left, int current )
+				       int top_left, int current,
+				       const char *dir )
 {
   int i;
   int error;
 
   /* Give us a clean box to start with */
-  error = widget_dialog( 1, 2, 30, 20 );
+  error = widget_dialog( 1, 2, 30, 21 );
   if( error ) return error;
+
+  widget_printstring( 15 - strlen( title ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
+		      title );
+  if( ( i = strlen( dir ) ) > 30 ) {
+    widget_printstring( 1, 3, WIDGET_COLOUR_FOREGROUND, "..." );
+    widget_printstring( 4, 3, WIDGET_COLOUR_FOREGROUND, dir + i - 27 );
+  }
+  else
+    widget_printstring( 15 - strlen( dir ) / 2, 3, WIDGET_COLOUR_FOREGROUND,
+			dir );
 
   /* Print the filenames, mostly normally, but with the currently
      selected file inverted */
@@ -324,7 +333,7 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   }
 
   /* Display that lot */
-  widget_display_lines( 2, 20 );
+  widget_display_lines( 2, 21 );
 
   return 0;
 }
@@ -336,7 +345,7 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
   char buffer[14];
 
   int x = (position & 1) ? 17 : 2,
-      y = 3 + position/2;
+      y = 4 + position/2;
 
   int foreground = inverted ? WIDGET_COLOUR_BACKGROUND
                             : WIDGET_COLOUR_FOREGROUND,
@@ -487,13 +496,15 @@ widget_filesel_keyhandler( input_key key )
 
       top_left_file = new_current_file & ~1;
       widget_print_all_filenames( widget_filenames, widget_numfiles,
-				  top_left_file, new_current_file );
+				  top_left_file, new_current_file,
+				  widget_getcwd() );
 
     } else if( new_current_file >= top_left_file+36 ) {
 
       top_left_file = new_current_file & ~1; top_left_file -= 34;
       widget_print_all_filenames( widget_filenames, widget_numfiles,
-				  top_left_file, new_current_file );
+				  top_left_file, new_current_file,
+				  widget_getcwd() );
 
     } else {
 
@@ -506,7 +517,7 @@ widget_filesel_keyhandler( input_key key )
       widget_print_filename( widget_filenames[ new_current_file ],
 			     new_current_file - top_left_file, 1 );
         
-      widget_display_lines( 2, 20 );
+      widget_display_lines( 2, 21 );
     }
 
     /* Reset the current file marker */

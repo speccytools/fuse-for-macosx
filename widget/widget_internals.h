@@ -84,6 +84,11 @@ typedef struct widget_dirent {
   char *name;
 } widget_dirent;
 
+typedef struct widget_filesel_data {
+  int exit_all_widgets;
+  const char *title;
+} widget_filesel_data;
+
 extern struct widget_dirent **widget_filenames;
 extern size_t widget_numfiles;
 

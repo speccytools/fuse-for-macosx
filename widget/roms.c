@@ -136,11 +136,17 @@ widget_roms_keyhandler( input_key key )
 
     char **setting;
     int error;
-    int constant_zero = 0;
+    char buf[32];
+    widget_filesel_data data;
 
     key -= INPUT_KEY_a;
 
-    widget_do( WIDGET_TYPE_FILESELECTOR, &constant_zero );
+    snprintf( buf, sizeof( buf ), "%s - ROM %d",
+	      libspectrum_machine_name( info->machine ), key );
+
+    data.exit_all_widgets = 0;
+    data.title = buf;
+    widget_do( WIDGET_TYPE_FILESELECTOR, &data );
     if( !widget_filesel_name ) return;
 
     setting = settings_get_rom_setting( widget_settings, key + first_rom );

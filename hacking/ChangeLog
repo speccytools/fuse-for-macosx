@@ -1271,3 +1271,5 @@
 20050306 configure.in: Annoyingly missed path from link invocation (Fred).
 20050314 display.c: don't extend y past the end of the screen to avoid array
          overruns (Fred).
+20050331 widget/{filesel.c,menu.c,roms.c,widget_internals_h}: add title to
+	 fileselector widget (half of patch #1150689) (Darren).

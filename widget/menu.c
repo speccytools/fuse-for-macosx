@@ -1,5 +1,5 @@
 /* menu.c: general menu widget
-   Copyright (c) 2001-2004 Philip Kendall
+   Copyright (c) 2001-2005 Philip Kendall
 
    $Id$
 
@@ -129,7 +129,12 @@ menu_get_filename( const char *title )
 {
   char *filename = NULL;
 
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  widget_filesel_data data;
+
+  data.exit_all_widgets = 1;
+  data.title = title;
+
+  widget_do( WIDGET_TYPE_FILESELECTOR, &data );
   if( widget_filesel_name ) {
     filename = strdup( widget_filesel_name );
     if( !filename )
@@ -165,19 +170,23 @@ void
 menu_file_recording_recordfromsnapshot( int action )
 {
   int error;
+  widget_filesel_data data;
 
   if( rzx_playback || rzx_recording ) return;
 
   /* Get a snapshot name */
-  widget_do( WIDGET_TYPE_FILESELECTOR, NULL );
+  data.exit_all_widgets = 1;
+  data.title = "Fuse - record from snapshot";
+  widget_do( WIDGET_TYPE_FILESELECTOR, &data );
 
-  if( !widget_filesel_name ) widget_end_widget( WIDGET_FINISHED_CANCEL );
-
-  error = snapshot_read( widget_filesel_name );
-  if( error ) {
-    if( widget_filesel_name ) free( widget_filesel_name );
+  if( !widget_filesel_name ) {
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
   }
+
+  error = snapshot_read( widget_filesel_name );
+  if( error )
+    return;
 
   rzx_start_recording( "record.rzx", settings_current.embed_snapshot );
 }
