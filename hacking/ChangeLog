@@ -417,3 +417,4 @@
 20031231 z80/z80_ops.c: use gcc's computed goto feature to give a small
 	 performance boost.
 20031231 ui/gtk/fileselector.c: remove incorrect pointer warnings.
+20031231 ui/sdl/sdljoystick.c: 'port' is unused in ui_joystick_read().

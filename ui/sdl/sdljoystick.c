@@ -37,6 +37,7 @@
 
 #include <SDL.h>
 
+#include "compat.h"
 #include "sdljoystick.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -92,7 +93,7 @@ ui_joystick_init( void )
 }
 
 libspectrum_byte
-ui_joystick_read( libspectrum_word port, libspectrum_byte which )
+ui_joystick_read( libspectrum_word port GCC_UNUSED, libspectrum_byte which )
 {
   if( which ) return joystick2_return_value.byte;
 
