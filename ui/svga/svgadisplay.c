@@ -1,5 +1,5 @@
 /* svgadisplay.c: Routines for dealing with the svgalib display
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+   Copyright (c) 2000-2003 Philip Kendall, Matan Ziv-Av, Witold Filipczy
 
    $Id$
 
@@ -46,8 +46,6 @@ static int hires;
 
 static int svgadisplay_allocate_colours( int numColours );
 static int svgadisplay_allocate_image(int width, int height);
-
-static void svgadisplay_area(int x, int y, int width, int height);
 
 typedef struct svga_mode_t {
   int fuse_id;
@@ -154,31 +152,14 @@ static int svgadisplay_allocate_image(int width, int height)
   return 0;
 }
 
-void uidisplay_putpixel(int x,int y,int colour)
-{
-#ifdef USE_LIBPNG
-  screenshot_screen[y][x] = colour;
-#endif			/* #ifdef USE_LIBPNG */
-
-  if( hires ) {
-    image[ x     + y * DISPLAY_SCREEN_WIDTH ] = colour;
-  } else if( ! ( x & 1 ) ) {
-    image[ x / 2 + y * DISPLAY_ASPECT_WIDTH ] = colour;
-  }
-}
-
 void
 uidisplay_frame_end( void ) 
 {
   return;
 }
 
-void uidisplay_lines( int start, int end )
-{
-  svgadisplay_area( 0, start, DISPLAY_ASPECT_WIDTH, ( end - start + 1 ) );
-}
-
-static void svgadisplay_area(int x, int y, int width, int height)
+void
+uidisplay_area(int x, int y, int width, int height)
 {
   int yy;
 
