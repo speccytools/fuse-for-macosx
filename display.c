@@ -191,9 +191,12 @@ void display_line(void)
 
   /* If we're at the end of the frame, and we've got some data to
      send to the screen, send it now */
-  else if( display_blocked_write_start != display_blocked_write_none ) {
-    uidisplay_lines( display_blocked_write_start, display_next_line-1 );
-    display_blocked_write_start = display_blocked_write_none;
+  else {
+    if( display_blocked_write_start != display_blocked_write_none ) {
+      uidisplay_lines( display_blocked_write_start, display_next_line-1 );
+      display_blocked_write_start = display_blocked_write_none;
+    }
+    uidisplay_frame_end();
   }
 
   display_next_line++;

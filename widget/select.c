@@ -73,6 +73,7 @@ int widget_select_draw( void* data GCC_UNUSED )
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 16 + (machine_count+2)*8 );
+  uidisplay_frame_end();
 
   return 0;
 }
@@ -119,6 +120,7 @@ widget_select_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
     uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		     DISPLAY_BORDER_HEIGHT + 16 + (machine_count+2)*8 );
+    uidisplay_frame_end();
 
     /* And set this as the new machine type */
     new_machine = machine_types[highlight_line]->machine;

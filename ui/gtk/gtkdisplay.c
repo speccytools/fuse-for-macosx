@@ -205,6 +205,12 @@ void uidisplay_putpixel(int x,int y,int colour)
   }
 }
 
+void
+uidisplay_frame_end( void ) 
+{
+  return;
+}
+
 void uidisplay_lines( int start, int end )
 {
   gtkdisplay_area( 0, gtkdisplay_current_size*start,

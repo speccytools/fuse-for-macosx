@@ -101,6 +101,12 @@ void uidisplay_putpixel(int x,int y,int colour)
   }
 }
 
+void
+uidisplay_frame_end( void )
+{
+  return;
+}
+
 void uidisplay_lines( int start, int end )
 {
   return;

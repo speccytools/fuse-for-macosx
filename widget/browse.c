@@ -60,6 +60,7 @@ widget_browse_draw( void *data GCC_UNUSED )
 
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Browse Tape" );
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16, DISPLAY_BORDER_HEIGHT + 23 );
+  uidisplay_frame_end();
 
   highlight = tape_get_current_block();
   top_line = highlight - 8; if( top_line < 0 ) top_line = 0;
@@ -89,6 +90,7 @@ show_blocks( void )
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 32,
 		   DISPLAY_BORDER_HEIGHT + 32 + 18 * 8 );
+  uidisplay_frame_end();
 }
 
 void

@@ -38,6 +38,7 @@ int widget_picture_draw( void* data )
   ptr = (widget_picture_data*)data;
 
   uidisplay_spectrum_screen( ptr->screen, ptr->border );
+  uidisplay_frame_end();
 
   return 0;
 }

@@ -402,6 +402,7 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT    + 8*(y       -1),
 		   DISPLAY_BORDER_HEIGHT -1 + 8*(y+height+1)  );
+  uidisplay_frame_end();
 
   return 0;
 }
@@ -417,6 +418,7 @@ int widget_options_print_option( int number, const char* string, int value )
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
 		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
+  uidisplay_frame_end();
 
   return 0;
 }
@@ -428,6 +430,7 @@ int widget_options_print_value( int number, int value )
 		      value ? " On" : "Off" );
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
 		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
+  uidisplay_frame_end();
   return 0;
 }
 

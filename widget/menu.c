@@ -71,6 +71,7 @@ int widget_menu_draw( void *data )
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 16 + (menu_entries+2)*8 );
+  uidisplay_frame_end();
 
   return 0;
 }

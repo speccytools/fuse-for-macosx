@@ -73,6 +73,7 @@ int widget_$_->{name}_draw( void *data GCC_UNUSED )
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 32 + $count * 8 );
+  uidisplay_frame_end();
 
   return 0;
 }

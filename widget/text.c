@@ -65,6 +65,7 @@ widget_text_draw( void *data )
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
 		   DISPLAY_BORDER_HEIGHT + 16 + 3 * 8 );
+  uidisplay_frame_end();
 
   return 0;
 }

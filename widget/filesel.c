@@ -310,6 +310,7 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   /* Display that lot */
   uidisplay_lines( DISPLAY_BORDER_HEIGHT,
 		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
+  uidisplay_frame_end();
 
   return 0;
 }
@@ -474,6 +475,7 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
         
       uidisplay_lines(DISPLAY_BORDER_HEIGHT,
 		      DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
+      uidisplay_frame_end();
 	  
     }
 
