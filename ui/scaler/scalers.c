@@ -24,8 +24,10 @@
  */
 
 #include <config.h>
+
 #include <string.h>
-#include "types.h"
+
+#include <libspectrum.h>
 
 #include "scaler.h"
 #include "settings.h"
@@ -36,32 +38,32 @@
 
 #if SCALER_DATA_SIZE == 2
 
-typedef WORD scaler_data_type;
+typedef libspectrum_word scaler_data_type;
 #define FUNCTION( name ) name##_16
 
-static DWORD colorMask;
-static DWORD lowPixelMask;
-static DWORD qcolorMask;
-static DWORD qlowpixelMask;
-static DWORD redblueMask;
-static DWORD greenMask;
+static libspectrum_dword colorMask;
+static libspectrum_dword lowPixelMask;
+static libspectrum_dword qcolorMask;
+static libspectrum_dword qlowpixelMask;
+static libspectrum_dword redblueMask;
+static libspectrum_dword greenMask;
 
-static const WORD dotmatrix_565[16] = {
+static const libspectrum_word dotmatrix_565[16] = {
   0x01E0, 0x0007, 0x3800, 0x0000,
   0x39E7, 0x0000, 0x39E7, 0x0000,
   0x3800, 0x0000, 0x01E0, 0x0007,
   0x39E7, 0x0000, 0x39E7, 0x0000
 };
-static const WORD dotmatrix_555[16] = {
+static const libspectrum_word dotmatrix_555[16] = {
   0x00E0, 0x0007, 0x1C00, 0x0000,
   0x1CE7, 0x0000, 0x1CE7, 0x0000,
   0x1C00, 0x0000, 0x00E0, 0x0007,
   0x1CE7, 0x0000, 0x1CE7, 0x0000
 };
-static const WORD *dotmatrix;
+static const libspectrum_word *dotmatrix;
 
 int 
-scaler_select_bitformat( DWORD BitFormat )
+scaler_select_bitformat( libspectrum_dword BitFormat )
 {
   switch( BitFormat ) {
 
@@ -106,7 +108,7 @@ scaler_select_bitformat( DWORD BitFormat )
 
 #elif SCALER_DATA_SIZE == 4	/* #if SCALER_DATA_SIZE == 2 */
 
-typedef DWORD scaler_data_type;
+typedef libspectrum_dword scaler_data_type;
 #define FUNCTION( name ) name##_32
 
 /* The assumption here is that the colour fields are laid out in
@@ -116,14 +118,14 @@ typedef DWORD scaler_data_type;
 
 #ifdef WORDS_BIGENDIAN
 
-const static DWORD colorMask = 0xFEFEFE00;
-const static DWORD lowPixelMask = 0x01010100;
-const static DWORD qcolorMask = 0xFCFCFC00;
-const static DWORD qlowpixelMask = 0x03030300;
-const static QWORD redblueMask = 0xFF00FF00;
-const static QWORD greenMask = 0x00FF0000;
+const static libspectrum_dword colorMask = 0xFEFEFE00;
+const static libspectrum_dword lowPixelMask = 0x01010100;
+const static libspectrum_dword qcolorMask = 0xFCFCFC00;
+const static libspectrum_dword qlowpixelMask = 0x03030300;
+const static libspectrum_qword redblueMask = 0xFF00FF00;
+const static libspectrum_qword greenMask = 0x00FF0000;
 
-static const DWORD dotmatrix[16] = {
+static const libspectrum_dword dotmatrix[16] = {
   0x003F0000, 0x00003F00, 0x3F000000, 0x00000000,
   0x3F3F3F00, 0x00000000, 0x3F3F3F00, 0x00000000,
   0x3F000000, 0x00000000, 0x003F0000, 0x00003F00,
@@ -132,14 +134,14 @@ static const DWORD dotmatrix[16] = {
 
 #else				/* #ifdef WORDS_BIGENDIAN */
 
-const static DWORD colorMask = 0x00FEFEFE;
-const static DWORD lowPixelMask = 0x00010101;
-const static DWORD qcolorMask = 0x00FCFCFC;
-const static DWORD qlowpixelMask = 0x00030303;
-const static QWORD redblueMask = 0x00FF00FF;
-const static QWORD greenMask = 0x0000FF00;
+const static libspectrum_dword colorMask = 0x00FEFEFE;
+const static libspectrum_dword lowPixelMask = 0x00010101;
+const static libspectrum_dword qcolorMask = 0x00FCFCFC;
+const static libspectrum_dword qlowpixelMask = 0x00030303;
+const static libspectrum_qword redblueMask = 0x00FF00FF;
+const static libspectrum_qword greenMask = 0x0000FF00;
 
-static const DWORD dotmatrix[16] = {
+static const libspectrum_dword dotmatrix[16] = {
   0x00003F00, 0x003F0000, 0x0000003F, 0x00000000,
   0x003F3F3F, 0x00000000, 0x003F3F3F, 0x00000000,
   0x0000003F, 0x00000000, 0x00003F00, 0x003F0000,
@@ -153,7 +155,8 @@ static const DWORD dotmatrix[16] = {
 #endif				/* #if SCALER_DATA_SIZE == 2 or 4 */
 
 static inline int 
-GetResult(DWORD A, DWORD B, DWORD C, DWORD D)
+GetResult( libspectrum_dword A, libspectrum_dword B, libspectrum_dword C,
+	   libspectrum_dword D )
 {
   const int ac = (A==C);
   const int bc = (B==C);
@@ -173,8 +176,8 @@ GetResult(DWORD A, DWORD B, DWORD C, DWORD D)
   return rmap[y][x];
 }
 
-static inline DWORD 
-INTERPOLATE(DWORD A, DWORD B)
+static inline libspectrum_dword 
+INTERPOLATE( libspectrum_dword A, libspectrum_dword B )
 {
   if (A != B) {
     return (((A & colorMask) >> 1) + ((B & colorMask) >> 1) + (A & B & lowPixelMask));
@@ -182,12 +185,13 @@ INTERPOLATE(DWORD A, DWORD B)
     return A;
 }
 
-static inline DWORD 
-Q_INTERPOLATE(DWORD A, DWORD B, DWORD C, DWORD D)
+static inline libspectrum_dword 
+Q_INTERPOLATE( libspectrum_dword A, libspectrum_dword B, libspectrum_dword C,
+	       libspectrum_dword D )
 {
-  register DWORD x = ((A & qcolorMask) >> 2) +
+  register libspectrum_dword x = ((A & qcolorMask) >> 2) +
   ((B & qcolorMask) >> 2) + ((C & qcolorMask) >> 2) + ((D & qcolorMask) >> 2);
-  register DWORD y = (A & qlowpixelMask) +
+  register libspectrum_dword y = (A & qlowpixelMask) +
   (B & qlowpixelMask) + (C & qlowpixelMask) + (D & qlowpixelMask);
 
   y = (y >> 2) & qlowpixelMask;
@@ -195,27 +199,30 @@ Q_INTERPOLATE(DWORD A, DWORD B, DWORD C, DWORD D)
 }
 
 void 
-FUNCTION( scaler_Super2xSaI )( const BYTE *srcPtr, DWORD srcPitch,
-	BYTE *dstPtr, DWORD dstPitch, int width, int height)
+FUNCTION( scaler_Super2xSaI )( const libspectrum_byte *srcPtr,
+			       libspectrum_dword srcPitch,
+			       libspectrum_byte *dstPtr,
+			       libspectrum_dword dstPitch,
+			       int width, int height )
 {
   const scaler_data_type *bP;
   scaler_data_type *dP;
 
   {
-    const DWORD Nextline = srcPitch / sizeof( scaler_data_type );
-    DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
-    DWORD finish;
+    const libspectrum_dword Nextline = srcPitch / sizeof( scaler_data_type );
+    libspectrum_dword nextDstLine = dstPitch / sizeof( scaler_data_type );
+    libspectrum_dword finish;
 
     while (height--) {
       bP = (const scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
 
       for( finish = width; finish; finish-- ) {
-	DWORD color4, color5, color6;
-	DWORD color1, color2, color3;
-	DWORD colorA0, colorA1, colorA2, colorA3, colorB0, colorB1, colorB2,
-	 colorB3, colorS1, colorS2;
-	DWORD product1a, product1b, product2a, product2b;
+	libspectrum_dword color4, color5, color6;
+	libspectrum_dword color1, color2, color3;
+	libspectrum_dword colorA0, colorA1, colorA2, colorA3, colorB0, colorB1,
+	  colorB2, colorB3, colorS1, colorS2;
+	libspectrum_dword product1a, product1b, product2a, product2b;
 
 /*---------------------------------------    B1 B2
                                            4  5  6 S2
@@ -306,26 +313,28 @@ FUNCTION( scaler_Super2xSaI )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_SuperEagle )( const BYTE *srcPtr, DWORD srcPitch,
-			       BYTE *dstPtr, DWORD dstPitch,
+FUNCTION( scaler_SuperEagle )( const libspectrum_byte *srcPtr,
+			       libspectrum_dword srcPitch,
+			       libspectrum_byte *dstPtr,
+			       libspectrum_dword dstPitch,
 			       int width, int height )
 {
   const scaler_data_type *bP;
   scaler_data_type *dP;
 
   {
-    DWORD finish;
-    const DWORD Nextline = srcPitch / sizeof( scaler_data_type );
-    DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
+    libspectrum_dword finish;
+    const libspectrum_dword Nextline = srcPitch / sizeof( scaler_data_type );
+    libspectrum_dword nextDstLine = dstPitch / sizeof( scaler_data_type );
 
     while (height--) {
       bP = (const scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
       for( finish = width; finish; finish-- ) {
-	DWORD color4, color5, color6;
-	DWORD color1, color2, color3;
-	DWORD colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
-	DWORD product1a, product1b, product2a, product2b;
+	libspectrum_dword color4, color5, color6;
+	libspectrum_dword color1, color2, color3;
+	libspectrum_dword colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
+	libspectrum_dword product1a, product1b, product2a, product2b;
 
 	colorB1 = *(bP - Nextline);
 	colorB2 = *(bP - Nextline + 1);
@@ -417,27 +426,29 @@ FUNCTION( scaler_SuperEagle )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_2xSaI )( const BYTE *srcPtr, DWORD srcPitch,
-			  BYTE *dstPtr, DWORD dstPitch, int width, int height )
+FUNCTION( scaler_2xSaI )( const libspectrum_byte *srcPtr,
+			  libspectrum_dword srcPitch, libspectrum_byte *dstPtr,
+			  libspectrum_dword dstPitch,
+			  int width, int height )
 {
   const scaler_data_type *bP;
   scaler_data_type *dP;
 
   {
-    DWORD Nextline = srcPitch / sizeof( scaler_data_type );
-    DWORD nextDstLine = dstPitch / sizeof( scaler_data_type );
+    libspectrum_dword Nextline = srcPitch / sizeof( scaler_data_type );
+    libspectrum_dword nextDstLine = dstPitch / sizeof( scaler_data_type );
 
     while (height--) {
-      DWORD finish;
+      libspectrum_dword finish;
       bP = (const scaler_data_type*)srcPtr;
       dP = (scaler_data_type*)dstPtr;
 
       for( finish = width; finish; finish-- ) {
 
-	register DWORD colorA, colorB;
-	DWORD colorC, colorD, colorE, colorF, colorG, colorH, colorI, colorJ,
-	 colorK, colorL, colorM, colorN, colorO, colorP;
-	DWORD product, product1, product2;
+	register libspectrum_dword colorA, colorB;
+	libspectrum_dword colorC, colorD, colorE, colorF, colorG, colorH,
+	  colorI, colorJ, colorK, colorL, colorM, colorN, colorO, colorP;
+	libspectrum_dword product, product1, product2;
 
 /*---------------------------------------
    Map of the pixels:                    I|E F|J
@@ -560,8 +571,10 @@ FUNCTION( scaler_2xSaI )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_AdvMame2x )( const BYTE *srcPtr, DWORD srcPitch,
-			      BYTE *dstPtr, DWORD dstPitch,
+FUNCTION( scaler_AdvMame2x )( const libspectrum_byte *srcPtr,
+			      libspectrum_dword srcPitch,
+			      libspectrum_byte *dstPtr,
+			      libspectrum_dword dstPitch,
 			      int width, int height )
 {
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
@@ -602,8 +615,10 @@ FUNCTION( scaler_AdvMame2x )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_AdvMame3x )( const BYTE *srcPtr, DWORD srcPitch,
-			      BYTE *dstPtr, DWORD dstPitch,
+FUNCTION( scaler_AdvMame3x )( const libspectrum_byte *srcPtr,
+			      libspectrum_dword srcPitch,
+			      libspectrum_byte *dstPtr,
+			      libspectrum_dword dstPitch,
 			      int width, int height )
 {
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
@@ -649,8 +664,10 @@ FUNCTION( scaler_AdvMame3x )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Half )( const BYTE *srcPtr, DWORD srcPitch,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
+FUNCTION( scaler_Half )( const libspectrum_byte *srcPtr,
+			 libspectrum_dword srcPitch, libspectrum_byte *dstPtr,
+			 libspectrum_dword dstPitch,
+			 int width, int height )
 {
   scaler_data_type *r;
 
@@ -673,9 +690,11 @@ FUNCTION( scaler_Half )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_HalfSkip )( const BYTE *srcPtr, DWORD srcPitch,
-			     BYTE *dstPtr, DWORD dstPitch, int width,
-			     int height )
+FUNCTION( scaler_HalfSkip )( const libspectrum_byte *srcPtr,
+			     libspectrum_dword srcPitch,
+			     libspectrum_byte *dstPtr,
+			     libspectrum_dword dstPitch,
+			     int width, int height )
 {
   scaler_data_type *r;
 
@@ -695,8 +714,10 @@ FUNCTION( scaler_HalfSkip )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Normal1x )( const BYTE *srcPtr, DWORD srcPitch,
-			     BYTE *dstPtr, DWORD dstPitch,
+FUNCTION( scaler_Normal1x )( const libspectrum_byte *srcPtr,
+			     libspectrum_dword srcPitch,
+			     libspectrum_byte *dstPtr,
+			     libspectrum_dword dstPitch,
 			     int width, int height )
 {
   while( height-- ) {
@@ -707,8 +728,10 @@ FUNCTION( scaler_Normal1x )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Normal2x )( const BYTE *srcPtr, DWORD srcPitch,
-			     BYTE *dstPtr, DWORD dstPitch,
+FUNCTION( scaler_Normal2x )( const libspectrum_byte *srcPtr,
+			     libspectrum_dword srcPitch,
+			     libspectrum_byte *dstPtr,
+			     libspectrum_dword dstPitch,
 			     int width, int height )
 {
   const scaler_data_type *s;
@@ -730,13 +753,15 @@ FUNCTION( scaler_Normal2x )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void 
-FUNCTION( scaler_Normal3x )( const BYTE *srcPtr, DWORD srcPitch,
-			     BYTE *dstPtr, DWORD dstPitch,
+FUNCTION( scaler_Normal3x )( const libspectrum_byte *srcPtr,
+			     libspectrum_dword srcPitch,
+			     libspectrum_byte *dstPtr,
+			     libspectrum_dword dstPitch,
 			     int width, int height )
 {
-  BYTE *r;
-  DWORD dstPitch2 = dstPitch * 2;
-  DWORD dstPitch3 = dstPitch * 3;
+  libspectrum_byte *r;
+  libspectrum_dword dstPitch2 = dstPitch * 2;
+  libspectrum_dword dstPitch3 = dstPitch * 3;
 
   while (height--) {
     int i;
@@ -760,8 +785,10 @@ FUNCTION( scaler_Normal3x )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void
-FUNCTION( scaler_TV2x )( const BYTE *srcPtr, DWORD srcPitch,
-			 BYTE *dstPtr, DWORD dstPitch, int width, int height )
+FUNCTION( scaler_TV2x )( const libspectrum_byte *srcPtr,
+			 libspectrum_dword srcPitch, libspectrum_byte *dstPtr,
+			 libspectrum_dword dstPitch,
+			 int width, int height )
 {
   int i, j;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
@@ -789,8 +816,10 @@ FUNCTION( scaler_TV2x )( const BYTE *srcPtr, DWORD srcPitch,
 }
 
 void
-FUNCTION( scaler_TimexTV )( const BYTE *srcPtr, DWORD srcPitch,
-			    BYTE *dstPtr, DWORD dstPitch,
+FUNCTION( scaler_TimexTV )( const libspectrum_byte *srcPtr,
+			    libspectrum_dword srcPitch,
+			    libspectrum_byte *dstPtr,
+			    libspectrum_dword dstPitch,
 			    int width, int height )
 {
   int i, j;
@@ -823,9 +852,11 @@ static inline scaler_data_type DOT_16(scaler_data_type c, int j, int i) {
 }
 
 void
-FUNCTION( scaler_DotMatrix )( const BYTE *srcPtr, DWORD srcPitch,
-			    BYTE *dstPtr, DWORD dstPitch,
-			    int width, int height )
+FUNCTION( scaler_DotMatrix )( const libspectrum_byte *srcPtr,
+			      libspectrum_dword srcPitch,
+			      libspectrum_byte *dstPtr,
+			      libspectrum_dword dstPitch,
+			      int width, int height )
 {
   int i, j, ii, jj;
   unsigned int nextlineSrc = srcPitch / sizeof( scaler_data_type );
