@@ -25,20 +25,6 @@
 # E-mail: pak21-fuse@srcf.ucam.org
 # Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
-# TODO:
-
-# svga needs #ifdef <keysym> wrappers around the /WIN$/ keysyms
-# fb needs to looks things up in the cooked_keysyms table:
-
-# 	for( my $i = 0; $i <= $#cooked_keysyms; $i++ ) {
-#	    if( defined $cooked_keysyms[$i] and
-#		$cooked_keysyms[$i] eq $keysym ) {
-#		printf "  { %3i, KEYBOARD_%-9s KEYBOARD_%-6s },\n", $i,
-#		    "$key1,", $key2;
-#		last;
-#	    }
-#	}
-
 use strict;
 
 use lib '../../perl';
