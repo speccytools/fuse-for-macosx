@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = compat debugger getopt hacking lib man perl roms ui widget z80
+SUBDIRS = compat debugger hacking lib man perl roms ui widget z80
 
 fuse_SOURCES = ay.c \
 	dck.c \
@@ -58,7 +58,6 @@ fuse_SOURCES = ay.c \
 	sdlsound.c
 
 fuse_LDADD = memory_internal.o \
-@GETOPT_LIBS@ \
 debugger/libdebugger.a \
 @UI_LIBS@ ui/scaler/libscaler.a debugger/libdebugger.a z80/libz80.a @DSKLIBS@ \
 @LIBSPEC_LIBS@ \

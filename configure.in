@@ -51,9 +51,7 @@ AC_INLINE
 
 dnl Checks for library functions.
 AC_FUNC_MMAP
-AC_CHECK_FUNCS(getopt_long,,GETOPT_LIBS=getopt/libgetopt.a)
-AC_CHECK_FUNCS(mkstemp)
-AC_SUBST(GETOPT_LIBS)
+AC_CHECK_FUNCS(getopt_long mkstemp)
 
 dnl Check sizes of various types; second parameter is a `default' for
 dnl cross-compiling. Will obviously break everything if this is wrong...
@@ -351,7 +349,6 @@ fi
 AC_OUTPUT(Makefile \
 compat/Makefile \
 debugger/Makefile \
-getopt/Makefile \
 hacking/Makefile \
 lib/Makefile \
 man/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \

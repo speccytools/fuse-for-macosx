@@ -80,7 +80,7 @@ print hashline( __LINE__ ), << 'CODE';
 #ifdef HAVE_GETOPT_LONG		/* Did our libc include getopt_long? */
 #include <getopt.h>
 #else				/* #ifdef HAVE_GETOPT_LONG */
-#include "getopt/getopt.h"	/* If not, use ours */
+#include "compat.h"		/* If not, use ours */
 #endif				/* #ifdef HAVE_GETOPT_LONG */
 
 #ifdef HAVE_LIB_XML2

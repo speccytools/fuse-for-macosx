@@ -44,6 +44,10 @@
 #endif				/* #ifndef O_BINARY */
 
 /* Replacement functions */
+#ifndef HAVE_GETOPT_LONG
+#include "compat/getopt.h"
+#endif				/* #ifndef HAVE_GETOPT_LONG */
+
 #ifndef HAVE_MKSTEMP
 int mkstemp( char *template );
 #endif				/* #ifndef HAVE_MKSTEMP */
