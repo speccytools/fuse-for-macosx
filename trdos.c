@@ -38,12 +38,15 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <libspectrum.h>
+
 #include "event.h"
 #include "machine.h"
 #include "spectrum.h"
 #include "types.h"
 #include "trdos.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 #define TRDOS_DISC_SIZE 655360
 
@@ -74,7 +77,7 @@ typedef struct
   unsigned b4  : 1;  /* When set, it indicates that the desired track, sector,
                         or side were not found. This bit is reset when
                         updated. */
-  unsigned b3  : 1;  /* If b4 is set, an error is found in one or more ID
+  unsigned b3  : 1;  /* If this is set, an error is found in one or more ID
                         fields; otherwise it indicates error in data field.
                         This bit is reset when updated. */
   unsigned b2  : 1;  /* When set, it indicates the computer did not respond to
@@ -105,7 +108,7 @@ typedef struct
                         DRQ in one byte time. This bit is reset to zero when
                         update. On type 1 commands, this bit reflects the
                         status of the TRACK 00 pin. */
-  unsigned b3  : 1;  /* If b4 is set, an error is found in one or more ID
+  unsigned b3  : 1;  /* If this is set, an error is found in one or more ID
                         fields; otherwise it indicates error in data field.
                         This bit is reset when updated. */
   unsigned b4  : 1;  /* When set, it indicates that the desired track, sector,
@@ -124,7 +127,7 @@ typedef struct
 # define CurrentDiscNum (last_vg93_system & 3)
 # define CurrentDisk discs[CurrentDiscNum]
 
-static int cmd_done = 0;
+static int busy = 0;
 static int index_impulse = 0;
 
 static int towrite = 0;
@@ -200,8 +203,7 @@ trdos_end( void )
 static
 void trdos_update_index_impulse( void )
 {
-  if ( vg_spin ) 
-  {
+  if ( vg_spin ) {
     vg_rs.bit.b1 = 0;
     if ( CurrentDisk.disc_ready && index_impulse ) {
       vg_rs.bit.b1 = 1;
@@ -266,8 +268,7 @@ trdos_dr_read( WORD port GCC_UNUSED )
 
   toread_position++;
 
-  if ( toread_position == toread_num )
-  {
+  if ( toread_position == toread_num ) {
     vg_portFF_in = 0x80;
 
     vg_rs.byte = 0;
@@ -315,7 +316,7 @@ trdos_sp_read( WORD port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
-  if ( cmd_done == 1 ) {
+  if ( busy == 1 ) {
     return( vg_portFF_in &~ 0x40 );
   }
 
@@ -435,16 +436,43 @@ int
 trdos_disk_insert( trdos_drive_number which, const char *filename )
 {
   int error;
+  utils_file file;
+  libspectrum_id_t type;
+  libspectrum_class_t class;
 
   if( discs[ which ].disc_ready ) {
     if( trdos_disk_eject( which ) ) return 1;
   }
 
-  if( strlen( filename ) >= 4 &&
-      strcasecmp( &filename[ strlen( filename ) - 4 ], ".scl" ) == 0 ) {
+  if( utils_read_file( filename, &file ) ) return 1;
+
+  if( libspectrum_identify_file( &type, filename, file.buffer, file.length ) ) {
+    utils_close_file( &file );
+    return 1;
+  }
+
+  error = libspectrum_identify_class( &class, type );
+  if( error ) return 1;
+
+  if( class != LIBSPECTRUM_CLASS_DISK_TRDOS ) {
+    ui_error( UI_ERROR_ERROR,
+              "trdos_disk_insert: file `%s' is not a TR-DOS disk", filename );
+    return 1;
+  }
+
+  if( utils_close_file( &file ) ) return 1;
+
+  switch( type ) {
+  case LIBSPECTRUM_ID_DISK_SCL:
     error = insert_scl( which, filename );
-  } else {
+    break;
+  case LIBSPECTRUM_ID_DISK_TRD:
     error = insert_trd( which, filename );
+    break;
+  default:
+    ui_error( UI_ERROR_ERROR,
+              "trdos_disk_insert: file `%s' is an unsupported TR-DOS disk", filename );
+    error = 1;
   }
 
   if( error ) return error;
@@ -475,7 +503,7 @@ trdos_disk_eject( trdos_drive_number which )
 int
 trdos_event_cmd_done( DWORD last_tstates GCC_UNUSED )
 {
-  cmd_done = 0;
+  busy = 0;
 
   return 0;
 }
@@ -515,7 +543,7 @@ vg_seek_delay(BYTE dst_track)
   if ( ( dst_track - CurrentDisk.trk ) < 0 )
     vg_direction = 0;
 
-  cmd_done = 1;
+  busy = 1;
 
   if ( !CurrentDisk.disc_ready ) vg_portFF_in = 0x80;
   else vg_portFF_in = 0x80;
@@ -666,7 +694,7 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
         toread_position = 0;
 
         /* schedule event */
-        cmd_done = 1;
+        busy = 1;
         error = event_add( tstates + machine_current->timings.processor_speed
                                      / 1000 * 30,
                            EVENT_TYPE_TRDOS_CMD_DONE );
@@ -699,7 +727,7 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
     toread_position = 0;
 
     /* schedule event */
-    cmd_done = 1;
+    busy = 1;
     vg_spin = 0;
 
     error = event_add( tstates + machine_current->timings.processor_speed
