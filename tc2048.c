@@ -36,6 +36,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "printer.h"
+#include "settings.h"
 #include "scld.h"
 #include "spectrum.h"
 #include "tc2048.h"
@@ -150,7 +151,7 @@ int tc2048_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 1 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, "tc2048.rom" );
+  error = machine_read_rom( machine, 0, settings_current.rom_tc2048 );
   if( error ) return error;
 
   machine->peripherals = tc2048_peripherals;

@@ -30,6 +30,7 @@
 
 #include <libspectrum.h>
 
+#include "settings.h"
 #include "spec128.h"
 #include "specplus2.h"
 
@@ -57,9 +58,9 @@ int specplus2_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 2 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, "plus2-0.rom" );
+  error = machine_read_rom( machine, 0, settings_current.rom_plus2_0 );
   if( error ) return error;
-  error = machine_read_rom( machine, 1, "plus2-1.rom" );
+  error = machine_read_rom( machine, 1, settings_current.rom_plus2_1 );
   if( error ) return error;
 
   machine->peripherals = spec128_peripherals;

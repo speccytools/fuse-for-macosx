@@ -58,3 +58,16 @@ playback_file, string, NULL, 'p', playback, playbackfile
 svga_mode, numeric, 320, 'v', svgamode
 
 rom_48, string, strdup( "48.rom" ),
+rom_128_0, string, strdup( "128-0.rom" ),
+rom_128_1, string, strdup( "128-1.rom" ),
+rom_plus2_0, string, strdup( "plus2-0.rom" ),
+rom_plus2_1, string, strdup( "plus2-1.rom" ),
+rom_plus2a_0, string, strdup( "plus3-0.rom" ),
+rom_plus2a_1, string, strdup( "plus3-1.rom" ),
+rom_plus2a_2, string, strdup( "plus3-2.rom" ),
+rom_plus2a_3, string, strdup( "plus3-3.rom" ),
+rom_plus3_0, string, strdup( "plus3-0.rom" ),
+rom_plus3_1, string, strdup( "plus3-1.rom" ),
+rom_plus3_2, string, strdup( "plus3-2.rom" ),
+rom_plus3_3, string, strdup( "plus3-3.rom" ),
+rom_tc2048, string, strdup( "tc2048.rom" ),

@@ -35,6 +35,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "printer.h"
+#include "settings.h"
 #include "spec128.h"
 #include "specplus2a.h"
 #include "specplus3.h"
@@ -75,13 +76,13 @@ specplus2a_init( fuse_machine_info *machine )
 
   error = machine_allocate_roms( machine, 4 );
   if( error ) return error;
-  error = machine_read_rom( machine, 0, "plus3-0.rom" );
+  error = machine_read_rom( machine, 0, settings_current.rom_plus2a_0 );
   if( error ) return error;
-  error = machine_read_rom( machine, 1, "plus3-1.rom" );
+  error = machine_read_rom( machine, 1, settings_current.rom_plus2a_1 );
   if( error ) return error;
-  error = machine_read_rom( machine, 2, "plus3-2.rom" );
+  error = machine_read_rom( machine, 2, settings_current.rom_plus2a_2 );
   if( error ) return error;
-  error = machine_read_rom( machine, 3, "plus3-3.rom" );
+  error = machine_read_rom( machine, 3, settings_current.rom_plus2a_3 );
   if( error ) return error;
 
   machine->peripherals = specplus2a_peripherals;
