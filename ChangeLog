@@ -1,3 +1,73 @@
+2004-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.7.0 released.
+
+	* New features:
+	  + Scorpion ZS 256 support (Stuart Brady).
+	  + Spectrum SE support (Fredrick Meunier).
+	  + Support for the simple 8-bit IDE interface (as used by the
+	    +3e) and the ZXATASP and ZXCF interfaces (Garry Lancaster).
+	  + Spectrum +3e support: just a +3 with different ROMs (Philip
+	    Kendall).
+	  + Interface II support (Fredrick Meunier).
+	  + Emulation of joysticks other than the Kempston (Philip
+	    Kendall).
+
+	* Z80 core improvements:
+	  + Get undocumented flags right after SCF and BIT (thanks, Erik
+	    Kunze and Thomas Harte).
+	  + Improved contended memory timings for RLD, RRD and
+	    instructions involving (HL), (SP), (IX+dd), (IY+dd) (thanks,
+	    Mark Woodmass and Jonathan Needle).
+	  (Philip Kendall)
+
+	* Debugger improvements:
+	  + Memory map pane showing what is present in each 8K chunk.
+	  + Allow port values to be masked before checking for port
+	    read/write breakpoints.
+	  + Ability to set breakpoints in non-RAM pages.
+	  (Philip Kendall)
+
+	* Miscellaneous improvements:
+	  + Improved display timings (thanks, Mark Woodmass and Jonathan
+	    Needle) (Philip Kendall).
+	  + Improved floating bus timings; Arkanoid and Sidewize now work
+	    (Philip Kendall).
+	  + Fuse can now save snapshot formats other than .z80 and tape
+	    formats other than .tap; the appropriate format will be
+	    selected according to the extension given (Philip Kendall).
+	  + Improved sound emulation, now using 16 bit samples (Russell
+	    Marks, Stuart Brady).
+	  + Allow real joystick buttons to be equivalent to either
+	    'emulated joystick fire' or 'press a key' (Philip Kendall).
+	  + The pokefinder can now search for bytes which have increased
+	    or decreased since the last search (Philip Kendall).
+	  + HP-UX sound support (Stuart Brady).
+	  + After 'flashloading' a tape block, set the registers to the
+	    values they would have if the block had been loaded normally;
+	    'The Rats' now loads successfully (thanks, Simon Stuart)
+	    (Darren Salt).
+	  + GTK+ 2.x user interface preferred to GTK+ 1.2 by default if
+	    available (Philip Kendall).
+	  + Don't display an error message if the same message was
+	    displayed within the last second (Philip Kendall).
+	  + Writing to the Betadisk ports is a no-op if TR-DOS isn't
+	    active (Stuart Brady).
+	  + Keep Timex Dock cartridge inserted after reset if it had been
+	    inserted via File/Open or from the command line (Philip
+	    Kendall).
+	  + Split the 'ROM selection' dialog into one dialog for each
+	    machine (Philip Kendall).
+	  + Unused bits of AY registers are zeroed (Stuart Brady).
+	  + Remove segfault if one ROM of a multi-ROM machine didn't load
+	    (Philip Kendall).
+	  + Don't segfault if Space rather than a mouse double click is
+	    used to select things in the GTK+ tape browser, debugger or
+	    pokefinder (Darren Salt).
+	  + Stop output to the serial printer when printer emulation is
+	    disabled; prevents the random appearance of 'printout.txt'
+	    (Philip Kendall).
+	  
 2004-02-19  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.6.2.1 released.

@@ -1,6 +1,7 @@
 Some thanks (in alphabetical order):
 
-* Stuart Brady: for the Scorpion support (see `AUTHORS')
+* Stuart Brady: for the Scorpion emulation and HP-UX sound support
+  (see `AUTHORS')
 
 * Michael Bukin: for XWinAllegro, which was used by previous versions of
   Fuse for the graphical display.
@@ -38,6 +39,9 @@ Some thanks (in alphabetical order):
   in the current version).
 
 * Erik Kunze: for lots of helpful hints on how to program under Unix.
+
+* Garry Lancaster: for the simple 8-bit IDE, ZXATASP and ZXCF
+  emulations (see `AUTHORS')
 
 * Gerton Lunter: his wonderful z80
   (ftp://ftp.worldofspectrum.org/pub/sinclair/emulators/pc/dos/z80-400.zip)

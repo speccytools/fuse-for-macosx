@@ -20,7 +20,8 @@ Fuse has been brought to you by:
 * Alexander Yurchenko: the OpenBSD/Solaris-specific sound code.
 
 * Fredrick Meunier: for TC2048 support, the SDL user interface, the
-  graphics filters, Pentagon support and more.
+  graphics filters, Pentagon support, Spectrum SE support, Interface
+  II support and more.
 
 * Ludvig Strigeus and The ScummVM project: the original graphics filter code.
 
@@ -33,7 +34,9 @@ Fuse has been brought to you by:
 * Marek Januszewski: Some patches making Fuse much closer to compiling under
   Win32, and fixing up the GTK+ 2.0 interface.
 
-* Stuart Brady: for the Scorpion support.
+* Stuart Brady: for the Scorpion emulation and HP-UX sound support.
+
+* Garry Lancaster: the simple 8-bit IDE, ZXATASP and ZXCF support.
 
 * Philip Kendall: everything else.
 
