@@ -28,6 +28,7 @@
 
 #ifdef UI_X                     /* Use this iff we're using Xlib */
 
+#include <stdarg.h>
 #include <stdio.h>
 
 #include <X11/Xlib.h>
