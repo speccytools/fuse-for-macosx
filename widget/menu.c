@@ -32,6 +32,7 @@
 
 #include "display.h"
 #include "fuse.h"
+#include "machine.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "utils.h"
@@ -76,11 +77,11 @@ void widget_menu_keyhandler( int key )
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
-    break;
+    return;
 
   case KEYBOARD_Enter:
     widget_return[ widget_level ].finished = WIDGET_FINISHED_OK;
-    break;
+    return;
 
   }
 
@@ -115,6 +116,12 @@ int widget_menu_open_snapshot( void *data )
 int widget_menu_save_snapshot( void *data )
 {
   return snapshot_write( "snapshot.z80" );
+}
+
+/* Machine/Reset */
+int widget_menu_reset( void *data )
+{
+  return machine_current->reset();
 }
 
 /* Tape/Open */

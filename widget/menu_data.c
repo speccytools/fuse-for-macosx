@@ -38,7 +38,8 @@ static widget_menu_widget_t main_file =    { WIDGET_TYPE_MENU,
 					     &widget_menu_file    };
 static widget_menu_widget_t main_options = { WIDGET_TYPE_MENU,
 					     &widget_menu_options };
-static widget_menu_widget_t main_machine = { WIDGET_TYPE_MACHINE, NULL };
+static widget_menu_widget_t main_machine = { WIDGET_TYPE_MENU, 
+					     &widget_menu_machine };
 static widget_menu_widget_t main_tape =    { WIDGET_TYPE_MENU,
 					     &widget_menu_tape    };
 static widget_menu_widget_t main_help =    { WIDGET_TYPE_MENU,
@@ -75,6 +76,19 @@ widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */
 
   { "(G)eneral...", KEYBOARD_g, widget_menu_widget, &options_general },
+
+  { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
+};
+
+/* Machine menu */
+
+static widget_menu_widget_t machine_select = { WIDGET_TYPE_SELECT, NULL };
+
+widget_menu_entry widget_menu_machine[] = {
+  { "Machine", 0, 0, NULL },		/* Menu title */
+
+  { "(R)eset",     KEYBOARD_r, widget_menu_reset,  NULL            },
+  { "(S)elect...", KEYBOARD_s, widget_menu_widget, &machine_select },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
