@@ -948,3 +948,4 @@
          Samohýl).
 20040620 zxatasp.c,zxcf.c: more literal constant removal.
 20040620 README,autogen.sh: add script to do the autotools invocation.
+20040621 configure.in: restore autoconf2.13 compatability.
