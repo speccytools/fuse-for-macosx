@@ -247,6 +247,13 @@ rzx_read_snapshot( libspectrum_rzx *rzx, const libspectrum_byte **ptr,
   (*snap) = malloc( sizeof( libspectrum_snap ) );
   if( *snap == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
 
+  /* Initialise the snap */
+  error = libspectrum_snap_initalise( *snap );
+  if( error != LIBSPECTRUM_ERROR_NONE ) {
+    free( *snap ); *snap = 0;
+    return error;
+  }
+
   if( !strcmp( *ptr, "Z80" ) ) {
     error = libspectrum_z80_read( (*ptr) + 8, snaplength, (*snap) );
   } else if( !strcmp( *ptr, "SNA" ) ) {
