@@ -99,6 +99,7 @@ int fbkeyboard_keypress(int keysym)
     tape_open( "tape.tap" );
     fuse_emulation_unpause();
     break;
+  /* FIXME: F8: toggle tape playing. What's the magic number? */
   case 1<<14:
     machine_select_next();
     break;

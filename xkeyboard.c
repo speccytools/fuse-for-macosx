@@ -1,5 +1,5 @@
 /* xkeyboard.c: X routines for dealing with the keyboard
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000-2001 Philip Kendall
 
    $Id$
 
@@ -74,6 +74,17 @@ int xkeyboard_keypress(XKeyEvent *event)
     fuse_emulation_pause();
     tape_open( "tape.tap" );
     fuse_emulation_unpause();
+    break;
+  case XK_F8:
+    /* If tape traps active, do nothing */
+    if( settings_current.tape_traps ) return;
+
+    /* Otherwise, toggle whether the tape is playing or not */
+    if( tape_playing ) {
+      tape_stop();
+    } else {
+      tape_play();
+    }
     break;
   case XK_F9:
     machine_select_next();

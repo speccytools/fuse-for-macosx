@@ -95,6 +95,17 @@ int svgakeyboard_keypress(int keysym)
     tape_open( "tape.tap" );
     fuse_emulation_unpause();
     break;
+  case SCANCODE_F8:
+    /* If tape traps active, do nothing */
+    if( settings_current.tape_traps ) return;
+
+    /* Otherwise, toggle whether the tape is playing or not */
+    if( tape_playing ) {
+      tape_stop();
+    } else {
+      tape_play();
+    }
+    break;
   case SCANCODE_F9:
     machine_select_next();
     break;
