@@ -269,3 +269,4 @@
 20031011 machine.c, utils.c: when looking for ROMs or library files, look
 	 in the roms/ or lib/ directory off where the Fuse executable is,
 	 not off the current directory.
+20031011 Remove the now unused getopt/ directory.
