@@ -965,6 +965,8 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   char title[ 80 ];
   int i;
   GSList *group = NULL;
+
+  if( !settings_current.joy_prompt ) return UI_CONFIRM_JOYSTICK_NONE;
   
   /* Some space to store the radio buttons in */
   dialog.buttons =

@@ -1291,3 +1291,4 @@
 20050325 ChangeLog: bring up to date.
 20050325 ui/gtk/gtkui.c,widget/widget.c: add GTK+ joystick confirmation
 	 dialog.
+20050325 ui/gtk/gtkui.c: don't prompt for joysticks if disabled in config.
