@@ -43,10 +43,14 @@
 #include "display.h"
 #include "ui/uidisplay.h"
 
-static unsigned short *image, *gm;
+/* rrrrrggggggbbbbb */
+static const short colours[] = {
+  0x0000, 0x0018, 0xC000, 0xC018, 0x0600, 0x0618, 0xC600, 0xC618,
+  0x4208, 0x001F, 0xF800, 0xF81F, 0x07E0, 0x07FF, 0xFFE0, 0xFFFF
+};
 
-static int colours[16];
 static int fb_fd = -1;		/* The framebuffer's file descriptor */
+static WORD *image = 0, *gm = 0;
 
 static struct fb_fix_screeninfo fixed;
 static struct fb_var_screeninfo orig_display, display;
