@@ -96,8 +96,8 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
 				GtkItemFactoryEntry *menu_data,
 				guint menu_data_size);
 
-static gint gtkui_delete(GtkWidget *widget, GdkEvent *event,
-			      gpointer data);
+static gboolean gtkui_delete( GtkWidget *widget, GdkEvent *event,
+			      gpointer data );
 static void gtkui_open(GtkWidget *widget, gpointer data);
 static void gtkui_save(GtkWidget *widget, gpointer data);
 
@@ -260,7 +260,7 @@ ui_init( int *argc, char ***argv )
   gtk_window_set_default_size( GTK_WINDOW(gtkui_window),
 			       DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
 
-  gtk_signal_connect(GTK_OBJECT(gtkui_window), "delete_event",
+  gtk_signal_connect(GTK_OBJECT(gtkui_window), "delete-event",
 		     GTK_SIGNAL_FUNC(gtkui_delete), NULL);
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "key-press-event",
 		     GTK_SIGNAL_FUNC(gtkkeyboard_keypress), NULL);
@@ -395,12 +395,11 @@ int ui_end(void)
 
 /* The callbacks used by various routines */
 
-/* Called by the main window on a "delete_event" */
-static gint
-gtkui_delete( GtkWidget *widget GCC_UNUSED, GdkEvent *event GCC_UNUSED,
-	      gpointer data GCC_UNUSED )
+/* Called by the main window on a "delete-event" */
+static gboolean
+gtkui_delete( GtkWidget *widget, GdkEvent *event GCC_UNUSED, gpointer data )
 {
-  fuse_exiting=1;
+  gtkui_quit( widget, data );
   return TRUE;
 }
 
