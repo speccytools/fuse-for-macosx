@@ -397,3 +397,5 @@
 20031227 ui/gtk/debugger.c, debugger/: add page-specific breakpoints.
 20031227 debugger/debugger{,_internals}.h, ui/gtk/pokefinder.c: add ability
 	 to set write breakpoints by clicking on the appropriate 'possible'.
+20031228 ui/gtk/debugger.c, ui/gtk/pokefinder.c: update the debugger display
+	 after adding a breakpoint with the pokefinder.

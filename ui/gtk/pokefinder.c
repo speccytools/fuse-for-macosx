@@ -35,6 +35,7 @@
 #include "debugger/debugger.h"
 #include "gtkinternals.h"
 #include "pokefinder/pokefinder.h"
+#include "ui/ui.h"
 
 static int create_dialog( void );
 static void gtkui_pokefinder_search( GtkWidget *widget, gpointer user_data );
@@ -235,4 +236,6 @@ possible_click( GtkCList *clist, gint row, gint column,
 			     possible_page[ row ], possible_offset[ row ],
 			     0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL );
   if( error ) return;
+
+  ui_debugger_update();
 }

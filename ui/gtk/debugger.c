@@ -584,6 +584,8 @@ ui_debugger_update( void )
 				    &HL, &HL_, &IX, &IY,
 				  };
 
+  if( !dialog_created ) return 0;
+
   if( debugger_output_base == 10 ) {
     format_16_bit = "%5d"; format_8_bit = "%3d";
   } else {
