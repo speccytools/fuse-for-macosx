@@ -39,6 +39,12 @@ ui_debugger_activate( void )
 {
   return widget_do( WIDGET_TYPE_DEBUGGER, NULL );
 }
+
+int
+ui_debugger_deactivate( int interruptable )
+{
+  return 0;
+}
 #endif				/* #ifndef UI_GTK */
 
 int
