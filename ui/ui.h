@@ -27,9 +27,17 @@
 #ifndef FUSE_UI_H
 #define FUSE_UI_H
 
+/* The various severities of error level, increasing downwards */
+typedef enum ui_error_level {
+
+  UI_ERROR_INFO,		/* Informational message */
+  UI_ERROR_ERROR,		/* An actual error */
+
+} ui_error_level;
+
 int ui_init(int *argc, char ***argv, int width, int height);
 int ui_event(void);
-int ui_error( const char *format, ... );
+int ui_error( ui_error_level severity, const char *format, ... );
 int ui_end(void);
 
 #endif			/* #ifndef FUSE_UI_H */

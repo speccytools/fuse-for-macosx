@@ -95,7 +95,7 @@ int rzx_start_recording( const char *filename )
   /* Store the filename */
   rzx_filename = (char*)malloc( strlen(filename) + 1 );
   if( rzx_filename == NULL ) {
-    ui_error( "out of memory in rzx_start_recording" );
+    ui_error( UI_ERROR_ERROR, "out of memory in rzx_start_recording" );
     return 1;
   }
   strcpy( rzx_filename, filename );
@@ -114,7 +114,7 @@ int rzx_stop_recording( void )
   length = 0;
   libspec_error = libspectrum_rzx_write( &rzx, &buffer, &length );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    ui_error( "error during libspectrum_rzx_write: %s",
+    ui_error( UI_ERROR_ERROR, "error during libspectrum_rzx_write: %s",
 	      libspectrum_error_message( libspec_error ) );
     libspectrum_rzx_free( &rzx );
     return libspec_error;
@@ -128,7 +128,7 @@ int rzx_stop_recording( void )
 
   libspec_error = libspectrum_rzx_free( &rzx );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    ui_error( "error during libspectrum_rzx_free: %s",
+    ui_error( UI_ERROR_ERROR, "error during libspectrum_rzx_free: %s",
 	      libspectrum_error_message( libspec_error ) );
     return libspec_error;
   }
@@ -148,14 +148,15 @@ int rzx_start_playback( const char *filename )
 
   libspec_error = libspectrum_rzx_read( &rzx, buffer, length );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    ui_error( "error during libspectrum_rzx_read: %s",
+    ui_error( UI_ERROR_ERROR, "error during libspectrum_rzx_read: %s",
 	      libspectrum_error_message( libspec_error ) );
     munmap( buffer, length );
     return libspec_error;
   }
 
   if( munmap( buffer, length ) == -1 ) {
-    ui_error( "Couldn't munmap '%s': %s", filename, strerror( errno ) );
+    ui_error( UI_ERROR_ERROR, "Couldn't munmap '%s': %s", filename,
+	      strerror( errno ) );
     return 1;
   }
 
@@ -184,7 +185,7 @@ int rzx_stop_playback( void )
 
   libspec_error = libspectrum_rzx_free( &rzx );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    ui_error( "libspec_error during libspectrum_rzx_free: %s",
+    ui_error( UI_ERROR_ERROR, "libspec_error during libspectrum_rzx_free: %s",
 	      libspectrum_error_message( libspec_error ) );
     return libspec_error;
   }
@@ -221,7 +222,7 @@ static int playback_frame( void )
 {
   /* Increment the frame count and see if we've finished with this file */
   if( ++rzx_current_frame >= rzx.count ) {
-    ui_error( "Finished RZX playback" );
+    ui_error( UI_ERROR_INFO, "Finished RZX playback" );
     return rzx_stop_playback();
   }
 

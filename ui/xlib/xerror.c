@@ -67,21 +67,39 @@ xerror_handler( Display *display, XErrorEvent *error )
 }
 
 int
-ui_error( const char *format, ... )
+ui_error( ui_error_level severity, const char *format, ... )
 {
   char message[ MESSAGE_MAX_LENGTH + 1 ];
   va_list ap;
+  widget_error_t error_info;
   
   /* Create the message from the given arguments */
   va_start( ap, format );
   vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
   va_end( ap );
 
-  /* Print the message to stderr, along with a program identifier */
-  fprintf( stderr, "%s: error: %s\n", fuse_progname, message );
+  /* If this is a 'severe' error, print it to stderr with a program
+     identifier and a level indicator */
+  if( severity >= UI_ERROR_ERROR ) {
+
+    fprintf( stderr, "%s: ", fuse_progname );
+
+    switch( severity ) {
+    case UI_ERROR_ERROR:
+      fprintf( stderr, "error: " ); break;
+    default:             
+      fprintf( stderr, "(unknown level): " ); break;
+    }
+
+    fprintf( stderr, "%s\n", message );
+
+  }
+
+  error_info.severity = severity;
+  error_info.message  = message;
 
   fuse_emulation_pause();
-  widget_do( WIDGET_TYPE_ERROR, message );
+  widget_do( WIDGET_TYPE_ERROR, &error_info );
   fuse_emulation_unpause();
 
   return 0;

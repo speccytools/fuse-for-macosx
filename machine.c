@@ -87,14 +87,14 @@ static int machine_add_machine( int (*init_function)( machine_info *machine ) )
     (machine_info**)realloc( machine_types, 
 			     machine_count * sizeof( machine_info* ) );
   if( machine_types == NULL ) {
-    ui_error( "out of memory at %s:%d", __FILE__, __LINE__ );
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
   machine_types[ machine_count - 1 ] =
     (machine_info*)malloc( sizeof( machine_info ) );
   if( machine_types[ machine_count - 1 ] == NULL ) {
-    ui_error( "out of memory at %s:%d", __FILE__, __LINE__ );
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
@@ -118,7 +118,7 @@ int machine_select( int type )
     }
   }
 
-  ui_error( "Machine type '%d' unavailable", type );
+  ui_error( UI_ERROR_ERROR, "Machine type '%d' unavailable", type );
   return 1;
 }
 
@@ -134,7 +134,7 @@ int machine_select_id( const char *id )
     }
   }
 
-  ui_error( "Machine id '%s' unknown", id );
+  ui_error( UI_ERROR_ERROR, "Machine id '%s' unknown", id );
   return 1;
 }
 
@@ -205,13 +205,13 @@ int machine_allocate_roms( machine_info *machine, size_t count )
 
   machine->roms = (BYTE**)malloc( count * sizeof(BYTE*) );
   if( machine->roms == NULL ) {
-    ui_error( "out of memory at %s:%d", __FILE__, __LINE__ );
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
   machine->rom_lengths = (size_t*)malloc( count * sizeof(size_t) );
   if( machine->rom_lengths == NULL ) {
-    ui_error( "out of memory at %s:%d", __FILE__, __LINE__ );
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     free( machine->roms );
     return 1;
   }
@@ -230,7 +230,7 @@ int machine_read_rom( machine_info *machine, size_t number,
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    ui_error( "couldn't find ROM '%s'", filename );
+    ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
     return 1;
   }
 
@@ -294,8 +294,8 @@ static int machine_free_machine( machine_info *machine )
   for( i=0; i<machine->rom_count; i++ ) {
 
     if( munmap( machine->roms[i], machine->rom_lengths[i] ) == -1 ) {
-      ui_error( "couldn't munmap ROM %lu: %s", (unsigned long)i,
-		strerror( errno ) );
+      ui_error( UI_ERROR_ERROR, "couldn't munmap ROM %lu: %s",
+		(unsigned long)i, strerror( errno ) );
       return 1;
     }
   }

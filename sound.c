@@ -177,7 +177,8 @@ return;
 
 if(sound_enabled)
   {
-  ui_error("sound_init() called with sound_enabled set, can't happen!" );
+  ui_error(UI_ERROR_ERROR,
+	   "sound_init() called with sound_enabled set, can't happen!" );
   sound_end();
   return;
   }

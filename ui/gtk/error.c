@@ -35,10 +35,11 @@
 #include <gtk/gtk.h>
 
 #include "fuse.h"
+#include "ui/ui.h"
 
 #define MESSAGE_MAX_LENGTH 256
 
-int ui_error( const char *format, ... )
+int ui_error( ui_error_level severity, const char *format, ... )
 {
   va_list ap;
   GtkWidget *dialog, *ok_button, *label;
@@ -49,12 +50,38 @@ int ui_error( const char *format, ... )
   vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
   va_end( ap );
 
-  /* Print the message to stderr, along with a program identifier */
-  fprintf( stderr, "%s: error: %s\n", fuse_progname, message );
+  /* If this is a 'severe' error, print it to stderr with a program
+     identifier and a level indicator */
+  if( severity >= UI_ERROR_ERROR ) {
+
+    fprintf( stderr, "%s: ", fuse_progname );
+
+    switch( severity ) {
+    case UI_ERROR_ERROR:
+      fprintf( stderr, "error: " ); break;
+    default:             
+      fprintf( stderr, "(unknown level): " ); break;
+    }
+
+    fprintf( stderr, "%s\n", message );
+
+  }
 
   /* Create the dialog box */
   dialog = gtk_dialog_new();
-  gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Error" );
+
+  /* Set the appropriate title */
+  switch( severity ) {
+
+  case UI_ERROR_INFO:
+    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Info" ); break;
+  case UI_ERROR_ERROR:
+    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Error" ); break;
+  default:
+    gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - (Unknown error)" );
+    break;
+
+  }
   
   /* Add the OK button into the lower half */
   ok_button = gtk_button_new_with_label( "OK" );

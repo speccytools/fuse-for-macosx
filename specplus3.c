@@ -83,7 +83,7 @@ BYTE specplus3_readbyte(WORD address)
 	case 3: return RAM[3][address];
       }
       default:
-	ui_error( "Unknown +3 special configuration %d",
+	ui_error( UI_ERROR_ERROR, "Unknown +3 special configuration %d",
 		  machine_current->ram.specialcfg );
 	fuse_abort();
     }

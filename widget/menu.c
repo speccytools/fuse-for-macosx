@@ -154,7 +154,7 @@ int widget_menu_rzx_playback( void *data )
   if( widget_filesel_name ) {
     snapshot = strdup( widget_filesel_name );
     if( !snapshot ) {
-      ui_error( "Out of memory at %s:%d", __FILE__, __LINE__ );
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
       return 1;
     }
   } else {
@@ -240,7 +240,8 @@ int widget_menu_keyboard( void *data )
 
   fd = utils_find_lib( ptr->filename );
   if( fd == -1 ) {
-    ui_error( "couldn't find keyboard picture ('%s')", ptr->filename );
+    ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
+	      ptr->filename );
     return 1;
   }
   
@@ -248,7 +249,7 @@ int widget_menu_keyboard( void *data )
   if( error ) return error;
 
   if( length != 6912 ) {
-    ui_error( "keyboard picture ('%s') is not 6912 bytes long",
+    ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
 	      ptr->filename );
     return 1;
   }
@@ -256,7 +257,7 @@ int widget_menu_keyboard( void *data )
   widget_do( WIDGET_TYPE_PICTURE, ptr );
 
   if( munmap( ptr->screen, length ) == -1 ) {
-    ui_error( "Couldn't munmap keyboard picture ('%s'): %s",
+    ui_error( UI_ERROR_ERROR, "Couldn't munmap keyboard picture ('%s'): %s",
 	      ptr->filename, strerror( errno ) );
     return 1;
   }

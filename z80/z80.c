@@ -117,7 +117,7 @@ void z80_interrupt()
 	  break;
 	}
       default:
-	ui_error( "Unknown interrupt mode %d", IM );
+	ui_error( UI_ERROR_ERROR, "Unknown interrupt mode %d", IM );
 	fuse_abort();
     }
   }

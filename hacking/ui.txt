@@ -39,12 +39,13 @@ current UIs, for example the GTK+ UI use this to do most of their
 processing such as reading the keyboard and the like, whilst others,
 for example the SVGAlib UI do much less here.
 
-* int ui_error( const char *format, ... )
+* int ui_error( ui_error_level severity, const char *format, ... )
 
 This will be called whenever the emulator wishes to output an error
-message of some form to the user; typical actions will include writing
-the message to stderr and/or some form of dialog box for the user to
-read.
+message of some form to the user; `severity' specifies how severe the
+error is - possible values are in "ui/ui.h". Typical actions will
+include writing the message to stderr and/or some form of dialog box
+for the user to read.
 
 * int ui_end( void )
 

@@ -39,23 +39,35 @@ static int split_message( const char *message, char ***lines, size_t *count,
 
 int widget_error_draw( void *data )
 {
-  char *message = (char*)data;
+  widget_error_t *error_info = (widget_error_t*)data;
   char **lines; size_t count;
   size_t i;
 
-  if( split_message( message, &lines, &count, 28 ) ) return 1;
+  if( split_message( error_info->message, &lines, &count, 28 ) ) return 1;
   
-  widget_dialog_with_border( 1, 2, 30, count );
+  widget_dialog_with_border( 1, 2, 30, count+2 );
+
+  switch( error_info->severity ) {
+  case UI_ERROR_INFO:
+    widget_printstring( 13, 2, WIDGET_COLOUR_FOREGROUND, "Info" );
+    break;
+  case UI_ERROR_ERROR:
+    widget_printstring( 13, 2, WIDGET_COLOUR_FOREGROUND, "Error" );
+    break;
+  default:
+    widget_printstring(  7, 2, WIDGET_COLOUR_FOREGROUND, "(Unknown message)" );
+    break;
+  }
 
   for( i=0; i<count; i++ ) {
-    widget_printstring( 2, i+2, WIDGET_COLOUR_FOREGROUND, lines[i] );
+    widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND, lines[i] );
     free( lines[i] );
   }
 
   free( lines );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 15 + count*8 );
+		   DISPLAY_BORDER_HEIGHT + 31 + count*8 );
 
   return 0;
 }
@@ -89,7 +101,7 @@ split_message( const char *message, char ***lines, size_t *count,
       char **new_lines; int i;
 
       /* If we've filled the screen, stop */
-      if( *count == 20 ) return 0;
+      if( *count == 18 ) return 0;
 
       new_lines = (char**)realloc( (*lines), (*count + 1) * sizeof( char** ) );
       if( new_lines == NULL ) {
@@ -145,6 +157,3 @@ void widget_error_keyhandler( keyboard_key_name key )
 
   }
 }
-
-
-

@@ -43,6 +43,10 @@
 #include "settings.h"
 #endif				/* #ifndef FUSE_SETTINGS_H */
 
+#ifndef FUSE_UI_H
+#include "ui/ui.h"
+#endif
+
 /* The default colours used in the widget */
 #define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
 #define WIDGET_COLOUR_FOREGROUND 7	/* White */
@@ -227,6 +231,12 @@ int widget_options_print_value( int number, int value );
 int widget_options_finish( widget_finish_state finished );
 
 /* The error widget */
+
+typedef struct widget_error_t {
+  ui_error_level severity;
+  const char *message;
+} widget_error_t;
+
 int widget_error_draw( void *data );
 void widget_error_keyhandler( keyboard_key_name key );
 
