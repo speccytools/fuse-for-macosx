@@ -705,7 +705,9 @@ ui_debugger_update( void )
 
     case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
     case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
-      snprintf( breakpoint_text[2], 40, format_16_bit, bp->value.port );
+      sprintf( format_string, "%s:%s", format_16_bit, format_16_bit );
+      snprintf( breakpoint_text[2], 40, format_string,
+		bp->value.port.mask, bp->value.port.port );
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_TIME:

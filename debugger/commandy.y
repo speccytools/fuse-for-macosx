@@ -51,7 +51,7 @@
   libspectrum_dword integer;
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
-  struct { int page; libspectrum_word offset; } bpaddress;
+  struct { int value1; libspectrum_word value2; } pair;
 
   debugger_expression* exp;
 
@@ -97,7 +97,7 @@
 
 %type  <bplife>  breakpointlife
 %type  <bptype>  breakpointtype
-%type  <bpaddress> breakpointaddress
+%type  <pair>    breakpointpair
 %type  <bptype>  portbreakpointtype
 %type  <integer> numberorpc
 %type  <integer> number
@@ -132,12 +132,15 @@ input:	 /* empty */
 ;
 
 command:   BASE number { debugger_output_base = $2; }
-	 | breakpointlife breakpointtype breakpointaddress optionalcondition {
-             debugger_breakpoint_add_address( $2, $3.page, $3.offset, 0, $1,
+	 | breakpointlife breakpointtype breakpointpair optionalcondition {
+             debugger_breakpoint_add_address( $2, $3.value1, $3.value2, 0, $1,
 					      $4 );
 	   }
-	 | breakpointlife PORT portbreakpointtype number optionalcondition {
-	     debugger_breakpoint_add_port( $3, $4, 0, $1, $5 );
+	 | breakpointlife PORT portbreakpointtype breakpointpair optionalcondition {
+	     int mask; libspectrum_word port;
+	     mask = $4.value1; port = $4.value2;
+	     if( mask == -1 ) mask = ( port < 0x100 ? 0x00ff : 0xffff );
+	     debugger_breakpoint_add_port( $3, port, mask, 0, $1, $5 );
            }
 	 | breakpointlife TIME number optionalcondition {
 	     debugger_breakpoint_add_time( DEBUGGER_BREAKPOINT_TYPE_TIME,
@@ -169,8 +172,8 @@ breakpointtype:   /* empty */ { $$ = DEBUGGER_BREAKPOINT_TYPE_EXECUTE; }
                 | WRITE       { $$ = DEBUGGER_BREAKPOINT_TYPE_WRITE; }
 ;
 
-breakpointaddress:   numberorpc { $$.page = -1; $$.offset = $1; }
-		   | number ':' number { $$.page = $1; $$.offset = $3; }
+breakpointpair:   numberorpc { $$.value1 = -1; $$.value2 = $1; }
+		| number ':' number { $$.value1 = $1; $$.value2 = $3; }
 ;
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }

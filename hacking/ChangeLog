@@ -595,3 +595,5 @@
 20040226 debugger/{breakpoint.[ch],Makefile.am,commandy.y,debugger.[ch]},
 	 ui/gtk/{debugger.c,pokefinder.c}: stop the evil multiplexing of
 	 the 'value' parameter to debugger_breakpoint_add().
+20040226 debugger/{breakpoint.[ch], commandy.y}, ui/gtk/debugger.c: allow
+	 masks to be applied before checking for port breakpoints.

@@ -96,8 +96,8 @@ debugger_breakpoint_add_address( debugger_breakpoint_type type, int page,
 
 int
 debugger_breakpoint_add_port( debugger_breakpoint_type type,
-			      libspectrum_word port, size_t ignore,
-			      debugger_breakpoint_life life,
+			      libspectrum_word port, libspectrum_word mask,
+			      size_t ignore, debugger_breakpoint_life life,
 			      debugger_expression *condition )
 {
   debugger_breakpoint_value value;
@@ -113,7 +113,8 @@ debugger_breakpoint_add_port( debugger_breakpoint_type type,
     fuse_abort();
   }
 
-  value.port = port;
+  value.port.port = port;
+  value.port.mask = mask;
 
   return breakpoint_add( type, value, ignore, life, condition );
 }
@@ -233,11 +234,10 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
     }
     break;
 
-    /* Port values must match exactly */
-    /* FIXME: add facility to for a port mask */
+    /* Port values must match after masking */
   case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
   case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
-    if( bp->value.port != value ) return 0;
+    if( ( value & bp->value.port.mask ) != bp->value.port.port ) return 0;
     break;
 
     /* Timed breakpoints trigger if we're past the relevant time */

@@ -54,10 +54,17 @@ typedef struct debugger_breakpoint_address {
 
 } debugger_breakpoint_address;
 
+typedef struct debugger_breakpoint_port {
+
+  libspectrum_word port;
+  libspectrum_word mask;
+
+} debugger_breakpoint_port;
+
 typedef union debugger_breakpoint_value {
 
   debugger_breakpoint_address address;
-  libspectrum_word port;
+  debugger_breakpoint_port port;
   libspectrum_dword tstates;
 
 } debugger_breakpoint_value;
@@ -91,7 +98,7 @@ debugger_breakpoint_add_address(
 
 int
 debugger_breakpoint_add_port(
-  debugger_breakpoint_type type, libspectrum_word port,
+  debugger_breakpoint_type type, libspectrum_word port, libspectrum_word mask,
   size_t ignore, debugger_breakpoint_life life, debugger_expression *condition
 );
 
