@@ -64,7 +64,7 @@ static void svgakeyboard_keystroke(int scancode, int press)  {
 
 static void svgakeyboard_keypress(int keysym)
 {
-  keysyms_key_info *ptr;
+  const keysyms_key_info *ptr;
 
   ptr=keysyms_get_data(keysym);
 
