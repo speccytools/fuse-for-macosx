@@ -418,3 +418,4 @@
 	 performance boost.
 20031231 ui/gtk/fileselector.c: remove incorrect pointer warnings.
 20031231 ui/sdl/sdljoystick.c: 'port' is unused in ui_joystick_read().
+20031231 rzx.c, ui/gkt/gtkui.c: always assign float values to timer_count.

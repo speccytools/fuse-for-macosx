@@ -165,7 +165,7 @@ int rzx_start_recording( const char *filename, int embed_snapshot )
 
     expected_time = 0;
     settings_current.emulation_speed = 100;
-    timer_count = 0;
+    timer_count = 0.0;
     rzx_competition_mode = 1;
     
   } else {
