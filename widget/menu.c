@@ -135,12 +135,12 @@ int widget_menu_rzx_recording( void *data )
 {
   if( rzx_playback || rzx_recording ) return 0;
 
-  if( snapshot_write( "snapshot.z80" ) ) {
+  if( snapshot_write( "record.z80" ) ) {
     return 1;
   }
 
   widget_end_all( WIDGET_FINISHED_OK );
-  return rzx_start_recording( "recording.rzx" );
+  return rzx_start_recording( "record.rzx" );
 }
 
 /* File/Recording/Play */
