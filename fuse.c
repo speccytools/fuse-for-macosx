@@ -231,6 +231,8 @@ static int fuse_init(int argc, char **argv)
     trdos_disk_insert( TRDOS_DRIVE_A, settings_current.trdosdisk_file );
   }
 
+  if( parse_nonoption_args( argc, argv, first_arg, autoload ) ) return 1;
+
   /* Do this after we've parsed the non-option arguments or otherwise
      something like `./fuse snapshot.z80 -r recording.rzx' ends up with
      the startup snapshot stored in the RZX file, not snapshot.z80 */
@@ -252,8 +254,6 @@ static int fuse_init(int argc, char **argv)
 
     trdos_disk_insert( TRDOS_DRIVE_A, settings_current.trdosdisk_file );
   }
-
-  if( parse_nonoption_args( argc, argv, first_arg, autoload ) ) return 1;
 
   fuse_emulation_paused = 0;
 
