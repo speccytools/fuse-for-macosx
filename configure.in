@@ -167,13 +167,15 @@ dnl 	            AC_MSG_ERROR([ggi/ggi.h not found]))
 dnl   fi
 dnl fi
 
-dnl Look for GTK+ 2.0 (default=yes); fall back to GTK+ 1.2 if not found
+dnl Look for GTK+ 2.0 (default=yes unless --without-gtk); fall back to GTK+
+dnl 1.2 if not found
+if test "$with_gtk" = no; then gtk=no; else gtk=yes; fi
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether GTK+ 2.x UI requested)
   AC_ARG_WITH(gtk2,
   [  --without-gtk2          don't use GTK+ 2.x library for user interface],
   if test "$withval" = no; then gtk2=no; else gtk2=yes; fi,
-  gtk2=yes)
+  gtk2="$gtk")
   AC_MSG_RESULT($gtk2)
   if test "$gtk2" = yes; then
     AM_PATH_GTK_2_0(2.0.0,

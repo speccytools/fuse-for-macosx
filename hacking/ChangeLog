@@ -975,3 +975,5 @@
 	 format.
 20040704 ui/uijoystick.h: remove unused kempston_bits and kempston_type
 	 types.
+20040704 configure.in: --without-gtk disables GTK+ 2.0 user interface
+	 (Darren).
