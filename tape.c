@@ -182,16 +182,6 @@ tape_autoload( libspectrum_machine hardware )
   char filename[80];
   unsigned char *snap; size_t length;
 
-  /* If no hardware specified, get a best guess from the tape */
-  if( hardware == LIBSPECTRUM_MACHINE_UNKNOWN ) {
-    error = libspectrum_tape_guess_hardware( &hardware, tape );
-    if( error ) return error;
-
-    /* If we still don't know, default to 48K */
-    if( hardware == LIBSPECTRUM_MACHINE_UNKNOWN )
-      hardware = LIBSPECTRUM_MACHINE_48;
-  }
-
   id = machine_get_id( hardware );
   if( !id ) {
     ui_error( UI_ERROR_ERROR, "Unknown machine type %d!", hardware );
