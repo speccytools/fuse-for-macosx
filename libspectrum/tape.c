@@ -211,7 +211,7 @@ pure_data_init( libspectrum_tape_pure_data_block *block )
    on the tape */
 libspectrum_error
 libspectrum_tape_get_next_edge( libspectrum_tape *tape,
-				libspectrum_dword *tstates, int *end_of_tape )
+				libspectrum_dword *tstates, int *stop_tape )
 {
   int error;
 
@@ -221,8 +221,8 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   /* Has this edge ended the block? */
   int end_of_block = 0;
 
-  /* By default, assume the tape hasn't ended */
-  *end_of_tape = 0;
+  /* By default, assume the tape will keep playing */
+  *stop_tape = 0;
 
   switch( block->type ) {
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
@@ -248,7 +248,8 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
     *tstates = block->types.pause.length; end_of_block = 1;
-    /* FIXME: What to do for 0 ms pause => stop tape? */
+    /* 0 ms pause => stop tape */
+    if( *tstates == 0 ) { *stop_tape = 1; }
     break;
 
   /* For blocks which contain no Spectrum-readable data, return zero
@@ -269,7 +270,9 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   if( end_of_block ) {
     tape->current_block = tape->current_block->next;
     if( tape->current_block == NULL ) {
-      *end_of_tape = 1;
+      *stop_tape = 1;
+      /* `Rewind' to the start of the tape */
+      tape->current_block = tape->blocks;
     } else {
       /* Initialise the new block */
       block = (libspectrum_tape_block*)tape->current_block->data;

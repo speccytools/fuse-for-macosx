@@ -362,18 +362,18 @@ int tape_next_edge( void )
   int error; libspectrum_error libspec_error;
 
   libspectrum_dword edge_tstates;
-  int end_of_tape;
+  int stop_tape;
 
   /* If the tape's not playing, just return */
   if( ! tape_playing ) return 0;
 
   /* Get the time until the next edge */
   libspec_error = libspectrum_tape_get_next_edge( &tape, &edge_tstates,
-						  &end_of_tape );
+						  &stop_tape );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;
 
   /* Invert the microphone state */
-  if( edge_tstates || end_of_tape ) {
+  if( edge_tstates || stop_tape ) {
     tape_microphone = !tape_microphone;
   }
 
@@ -381,8 +381,8 @@ int tape_next_edge( void )
   error = event_add( tstates + edge_tstates, EVENT_TYPE_EDGE );
   if( error ) return error;
 
-  /* If this was the end of the tape, stop playing */
-  if( end_of_tape) {
+  /* If we've been requested to stop the tape, do so! */
+  if( stop_tape) {
     error = tape_stop();
     if( error ) return error;
   }
