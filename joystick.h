@@ -33,5 +33,6 @@
 
 BYTE joystick_kempston_read(WORD port);
 void joystick_kempston_write(WORD port, BYTE b);
+BYTE joystick_timex_read( WORD port, int which );
 
 #endif			/* #ifndef FUSE_JOYSTICK_H */

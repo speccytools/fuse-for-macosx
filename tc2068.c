@@ -51,8 +51,6 @@ static DWORD tc2068_contend_delay( void );
 spectrum_port_info tc2068_peripherals[] = {
 
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
-  { 0x00ff, 0x00f5, spectrum_port_noread, ay_registerport_write},
-  { 0x00ff, 0x00f6, ay_registerport_read, ay_dataport_write },
 
   /* TS2040/Alphacom printer */
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
@@ -60,10 +58,47 @@ spectrum_port_info tc2068_peripherals[] = {
   /* Lower 8 bits of Timex ports are fully decoded */
   { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
 
+  { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
+  { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },
+
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
   { 0, 0, NULL, NULL } /* End marker. DO NOT REMOVE */
 };
 
+BYTE
+tc2068_ay_registerport_read( WORD port )
+{
+  return   machine_current->ay.current_register != 14
+         ? ay_registerport_read( port )
+         : 0xff;
+}
+
+BYTE
+tc2068_ay_dataport_read( WORD port )
+{
+  if (machine_current->ay.current_register != 14) {
+    return ay_registerport_read( port );
+  } else {
+
+    BYTE ret =   machine_current->ay.registers[7] & 0x40
+               ? machine_current->ay.registers[14]
+               : 0xff;
+
+    switch( port & 0x0300 ) {
+    case 0x0100:
+      ret &= ~joystick_timex_read( port, 0 );
+      break;
+    case 0x0200:
+      ret &= ~joystick_timex_read( port, 1 );
+      break;
+    case 0x0300:
+      ret &= ~joystick_timex_read( port, 0 ) | ~joystick_timex_read( port, 1 );
+      break;
+    }
+
+    return ret;
+  }
+}
 
 static
 BYTE tc2068_unattached_port( void )
