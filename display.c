@@ -27,6 +27,7 @@
 
 #include <config.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -126,6 +127,20 @@ size_t inactive_rectangle_count = 0, inactive_rectangle_allocated = 0;
 /* The last point at which we updated the screen display */
 int critical_region_x = 0, critical_region_y = 0;
 
+/* The border colour changes which have occured in this frame */
+struct border_change_t {
+  int x, y;
+  int colour;
+};
+
+static struct border_change_t border_change_end_sentinel =
+  { DISPLAY_SCREEN_WIDTH_COLS, DISPLAY_SCREEN_HEIGHT - 1, 0 };
+
+GSList *border_changes;
+
+/* The current border colour */
+int current_border[ DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH_COLS ];
+
 static void display_draw_line(int y);
 static void display_dirty8( libspectrum_word address );
 static void display_dirty64( libspectrum_word address );
@@ -154,9 +169,29 @@ display_get_addr( int x, int y )
   }
 }
 
-int display_init(int *argc, char ***argv)
+static int
+add_border_sentinel( void )
 {
-  int i,j,k,x,y;
+  struct border_change_t *sentinel = malloc( sizeof( *sentinel ) );
+
+  if( !sentinel ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
+
+  sentinel->x = sentinel->y = 0;
+  sentinel->colour = display_lores_border;
+
+  border_changes = g_slist_prepend( border_changes, sentinel );
+
+  return 0;
+}
+
+int
+display_init( int *argc, char ***argv )
+{
+  int i, j, k, x, y;
+  int error;
 
   if(ui_init(argc, argv))
     return 1;
@@ -198,6 +233,9 @@ int display_init(int *argc, char ***argv)
   }
 
   display_redraw_all = 0;
+
+  border_changes = NULL;
+  error = add_border_sentinel(); if( error ) return error;
 
   return 0;
 }
@@ -541,7 +579,7 @@ copy_critical_region_line( int y, int x, int end )
   libspectrum_qword bit_mask, dirty;
 
   /* Build a mask for the bits we're interested in */
-  bit_mask = -1;
+  bit_mask = display_all_dirty;
 
   bit_mask >>= x;
   bit_mask <<= x + ( 64 - end );
@@ -649,7 +687,11 @@ copy_critical_region_line( int y, int x, int end )
     error = add_rectangle( y, start, x - start ); if( error ) return;
   }
   
-  error = end_line( y ); if( error ) return;
+  /* If that was the end of the line, compress the active rectangles
+     list */
+  if( end == DISPLAY_SCREEN_WIDTH_COLS ) {
+    error = end_line( y ); if( error ) return;
+  }
 }
 
 /* Copy any dirty data from the critical region to display_image[] */
@@ -911,18 +953,47 @@ display_parse_attr( libspectrum_byte attr,
   }
 }
 
-void display_set_lores_border(int colour)
+static void
+push_border_change( int colour )
 {
-  display_lores_border=colour;
+  int beam_x, beam_y;
+  struct border_change_t *change;
 
-  display_set_border();
+  get_beam_position( &beam_x, &beam_y );
+
+  if( beam_x < 0 ) beam_x = 0;
+  if( beam_x > DISPLAY_BORDER_WIDTH_COLS ) beam_x = DISPLAY_BORDER_WIDTH_COLS;
+  if( beam_y < 0 ) beam_y = 0;
+
+  change = malloc( sizeof( *change ) );
+  if( !change ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return;
+  }
+
+  change->x = beam_x;
+  change->y = beam_y;
+  change->colour = colour;
+
+  border_changes = g_slist_append( border_changes, change );
 }
 
-void display_set_hires_border(int colour)
+void
+display_set_lores_border( int colour )
 {
-  display_hires_border=colour;
+  if( display_lores_border != colour ) {
+    display_lores_border = colour;
+    push_border_change( colour );
+  }
+}
 
-  display_set_border();
+void
+display_set_hires_border( int colour )
+{
+  if( display_hires_border != colour ) {
+    display_hires_border = colour;
+    push_border_change( colour );
+  }
 }
 
 static void display_set_border(void)
@@ -1030,23 +1101,131 @@ set_border_pixels( int line, int column, int colour )
       display_is_dirty[line] |= right_edge << column;
     }
   }
-}  
+}
+
+static void
+border_change_write( int y, int start, int end, int colour )
+{
+/*   fprintf( stderr, "%s( %d, %d, %d, %d )\n", __FUNCTION__, y, start, end, colour ); */
+  int scaled_start = start << 3, scaled_end = end << 3;
+
+  if(   y <  DISPLAY_BORDER_HEIGHT                    ||
+      ( y >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT )    ) {
+
+    /* Top and bottom borders */
+    add_rectangle( y, start, end - start );
+    for( ; scaled_start < scaled_end; scaled_start++ )
+      display_image[ y ][ scaled_start ] = colour;
+
+  } else {
+
+    /* Left border */
+    if( start < DISPLAY_BORDER_WIDTH_COLS ) {
+
+      int left_end =
+	end > DISPLAY_BORDER_WIDTH_COLS ? DISPLAY_BORDER_WIDTH_COLS : end;
+
+      add_rectangle( y, start, left_end - start );
+      for( ; scaled_start < left_end << 3; scaled_start++ )
+	display_image[ y ][ scaled_start ] = colour;
+    }
+
+    /* Right border */
+    if( end > DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
+
+      if( start < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS ) {
+	start = DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS;
+	scaled_start = start << 3;
+      }
+
+      add_rectangle( y, start, end - start );
+      for( ; scaled_start < scaled_end; scaled_start++ )
+	display_image[ y ][ scaled_start ] = colour;
+
+    }
+
+  }
+}
+
+static void
+border_change_line_part( int y, int start, int end, int colour )
+{
+  border_change_write( y, start, end, colour );
+  display_current_border[ y ] = display_border_mixed;
+}
+
+static void
+border_change_line( int y, int colour )
+{
+  if( display_current_border[y] != colour ) {
+    border_change_write( y, 0, DISPLAY_SCREEN_WIDTH_COLS, colour );
+    display_current_border[ y ] = colour;
+  }
+
+}
+
+static void
+do_border_change( struct border_change_t *first,
+		  struct border_change_t *second )
+{
+  if( first->x ) {
+    if( first->x != DISPLAY_SCREEN_WIDTH_COLS )
+      border_change_line_part( first->y, first->x, DISPLAY_SCREEN_WIDTH_COLS,
+			       first->colour );
+    end_line( first->y );
+    first->y++;
+  }
+
+  for( ; first->y < second->y; first->y++ ) {
+    border_change_line( first->y, first->colour );
+    end_line( first->y );
+  }
+
+  if( second->x ) {
+    if( second->x == DISPLAY_SCREEN_WIDTH_COLS ) {
+      border_change_line( first->y, first->colour );
+    } else {
+      border_change_line_part( first->y, 0, second->x, first->colour );
+    }
+    end_line( first->y );
+  }
+}
+
+/* Take account of all the border colour changes which happened in this
+   frame */
+static void
+update_border( void )
+{
+  GSList *first, *second;
+  int error;
+
+  /* Put the final sentinel onto the list */
+  border_changes = g_slist_append( border_changes,
+				   &border_change_end_sentinel );
+
+  for( first = border_changes, second = first->next;
+       first->next;
+       first = second, second = second->next ) {
+    do_border_change( first->data, second->data );
+    free( first->data );
+  }
+
+  g_slist_free( border_changes ); border_changes = NULL;
+
+  error = add_border_sentinel(); if( error ) return;
+
+  /* Force all rectangles into the inactive list */
+  error = end_line( DISPLAY_SCREEN_HEIGHT ); if( error ) return;
+}
 
 /* Send the updated screen to the UI-specific code */
 static void
 update_ui_screen( void )
 {
   static int frame_count = 0;
-  int error, scale = machine_current->timex ? 2 : 1;
+  int scale = machine_current->timex ? 2 : 1;
   size_t i;
   struct rectangle *ptr;
-
-  /* Copy all the critical region to display_image[] */
-  copy_critical_region( DISPLAY_SCREEN_WIDTH_COLS, DISPLAY_SCREEN_HEIGHT - 1 );
-  critical_region_x = critical_region_y = 0;
-
-  /* Force all rectangles into the inactive list */
-  error = end_line( display_next_line ); if( error ) return;
 
   if( settings_current.frame_rate <= ++frame_count ) {
     frame_count = 0;
@@ -1074,6 +1253,17 @@ update_ui_screen( void )
 int
 display_frame( void )
 {
+  int error;
+
+  /* Copy all the critical region to display_image[] */
+  copy_critical_region( DISPLAY_SCREEN_WIDTH_COLS, DISPLAY_SCREEN_HEIGHT - 1 );
+  critical_region_x = critical_region_y = 0;
+
+  /* Force all rectangles into the inactive list */
+  error = end_line( DISPLAY_SCREEN_HEIGHT ); if( error ) return error;
+
+  update_border();
+
   update_ui_screen();
 
   if( screenshot_movie_record == 1 ) {

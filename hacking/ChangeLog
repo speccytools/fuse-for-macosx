@@ -1143,3 +1143,4 @@
 20041225 display.c,event.[ch],machine.c: first pass at character-accurate
 	 rendering.
 20041225 widget/widget.c: Add joystick prompt when loading snaps for widget UI.
+20041227 display.c: reenable border emulation.
