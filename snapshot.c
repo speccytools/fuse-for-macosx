@@ -57,15 +57,13 @@ static snapshot_type snapshot_identify( const char *filename );
 static int snapshot_copy_from( libspectrum_snap *snap );
 static int snapshot_copy_to( libspectrum_snap *snap );
 
-#define ERROR_MESSAGE_MAX_LENGTH 1024
-
 int snapshot_read( const char *filename )
 {
   unsigned char *buffer; size_t length;
 
   libspectrum_snap snap;
 
-  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+  int error;
 
   libspectrum_snap_initalise( &snap );
 
@@ -107,9 +105,7 @@ int snapshot_read( const char *filename )
   }
 
   if( munmap( buffer, length ) == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't munmap `%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 

@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -41,8 +42,6 @@
 #include "widget.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
-
-#define ERROR_MESSAGE_MAX_LENGTH 1024
 
 widget_menu_entry *menu;
 
@@ -206,8 +205,6 @@ int widget_menu_keyboard( void *data )
   int error, fd;
   size_t length;
 
-  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
-
   fd = utils_find_lib( ptr->filename );
   if( fd == -1 ) {
     ui_error( "couldn't find keyboard picture (`%s')\n", ptr->filename );
@@ -226,10 +223,8 @@ int widget_menu_keyboard( void *data )
   widget_do( WIDGET_TYPE_PICTURE, ptr );
 
   if( munmap( ptr->screen, length ) == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't munmap keyboard picture (`%s')",
-	      fuse_progname, ptr->filename );
-    perror( error_message );
+    ui_error( "Couldn't munmap keyboard picture (`%s'): %s\n",
+	      ptr->filename, strerror( errno ) );
     return 1;
   }
 

@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,8 +56,6 @@ int tape_playing;
 /* Is there a high input to the EAR socket? */
 int tape_microphone;
 
-#define ERROR_MESSAGE_MAX_LENGTH 1024
-
 /* Function prototypes */
 
 static int trap_load_block( libspectrum_tape_rom_block *block );
@@ -77,7 +76,7 @@ int tape_open( const char *filename )
 {
   unsigned char *buffer; size_t length;
 
-  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+  int error;
 
   /* Get the file's data */
   error = utils_read_file( filename, &buffer, &length );
@@ -105,9 +104,7 @@ int tape_open( const char *filename )
   }
 
   if( munmap( buffer, length ) == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't munmap `%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 

@@ -50,8 +50,6 @@ static void printchar(int x, int y, int col, int ch);
 
 static char widget_font[768];
 
-#define ERROR_MESSAGE_MAX_LENGTH 1024
-
 /* The data used for recursive widgets */
 widget_recurse_t widget_return[10];
 
@@ -62,8 +60,6 @@ static int widget_read_font( const char *filename, size_t offset )
 {
   int fd; struct stat file_info; unsigned char *buffer;
 
-  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
-
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
     ui_error( "couldn't find ROM `%s'\n", filename );
@@ -71,26 +67,20 @@ static int widget_read_font( const char *filename, size_t offset )
   }
 
   if( fstat( fd, &file_info) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't stat `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't stat `%s': %s\n", filename, strerror( errno ) );
     close(fd);
     return errno;
   }
 
   buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
   if( buffer == (void*)-1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't mmap `%s': %s\n", filename, strerror( errno ) );
     close(fd);
     return errno;
   }
 
   if( close(fd) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't close `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't close `%s': %s\n", filename, strerror( errno ) );
     munmap( buffer, file_info.st_size );
     return errno;
   }
@@ -98,9 +88,7 @@ static int widget_read_font( const char *filename, size_t offset )
   memcpy( widget_font, buffer+offset-1, 768 );
 
   if( munmap( buffer, file_info.st_size ) == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't munmap `%s': %s\n", filename, strerror( errno ) );
     return errno;
   }
 

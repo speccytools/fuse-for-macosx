@@ -26,17 +26,19 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <ui/ui.h>
 #include <unistd.h>
 
 #include "fuse.h"
 #include "utils.h"
 
-#define ERROR_MESSAGE_MAX_LENGTH 1024
 #define PATHNAME_MAX_LENGTH 1024
 
 /* Find a ROM called `filename'; look in the current directory, ./roms
@@ -64,13 +66,11 @@ int utils_read_file( const char *filename, unsigned char **buffer,
 {
   int fd;
 
-  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
+  int error;
 
   fd = open( filename, O_RDONLY );
   if( fd == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: couldn't open `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "couldn't open `%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 
@@ -85,12 +85,8 @@ int utils_read_fd( int fd, const char *filename,
 {
   struct stat file_info;
 
-  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
-
   if( fstat( fd, &file_info) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't stat `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't stat `%s': %s\n", filename, strerror( errno ) );
     close(fd);
     return 1;
   }
@@ -99,17 +95,13 @@ int utils_read_fd( int fd, const char *filename,
 
   (*buffer) = mmap( 0, *length, PROT_READ, MAP_SHARED, fd, 0 );
   if( *buffer == (void*)-1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't mmap `%s': %s\n", filename, strerror( errno ) );
     close(fd);
     return 1;
   }
 
   if( close(fd) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't close `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "Couldn't close `%s': %s\n", filename, strerror( errno ) );
     munmap( *buffer, *length );
     return 1;
   }
@@ -122,28 +114,20 @@ int utils_write_file( const char *filename, const unsigned char *buffer,
 {
   FILE *f;
 
-  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
-
   f=fopen( filename, "wb" );
   if(!f) { 
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: error opening `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "error opening `%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 	    
   if( fwrite( buffer, 1, length, f ) != length ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: error writing to `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "error writing to `%s': %s\n", filename, strerror( errno ) );
     fclose(f);
     return 1;
   }
 
   if( fclose( f ) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: error closing `%s'", fuse_progname, filename );
-    perror( error_message );
+    ui_error( "error closing `%s': %s\n", filename, strerror( errno ) );
     return 1;
   }
 

@@ -26,15 +26,16 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include <libspectrum/tape.h>
 
-#define ERROR_MESSAGE_MAX_LENGTH 1024
 #define DESCRIPTION_LENGTH 80
 
 static const char *progname;
@@ -78,7 +79,6 @@ process_tzx( char *filename )
   struct stat file_info;
 
   int error;
-  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
 
   unsigned char *buffer;
   libspectrum_tape tape;
@@ -91,33 +91,29 @@ process_tzx( char *filename )
 
   fd = open( filename, O_RDONLY );
   if( fd == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: couldn't open `%s'", progname, filename );
-    perror( error_message );
+    fprintf( stderr, "%s: couldn't open `%s': %s\n", progname, filename,
+	     strerror( errno ) );
     return 1;
   }
 
   if( fstat( fd, &file_info) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't stat `%s'", progname, filename );
-    perror( error_message );
+    fprintf( stderr, "%s: couldn't stat `%s': %s\n", progname, filename,
+	     strerror( errno ) );
     close(fd);
     return 1;
   }
 
   buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
   if( buffer == (void*)-1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't mmap `%s'", progname, filename );
-    perror( error_message );
+    fprintf( stderr, "%s: couldn't mmap `%s': %s\n", progname, filename,
+	     strerror( errno ) );
     close(fd);
     return 1;
   }
 
   if( close(fd) ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't close `%s'", progname, filename );
-    perror( error_message );
+    fprintf( stderr, "%s: couldn't close `%s': %s\n", progname, filename,
+	     strerror( errno ) );
     munmap( buffer, file_info.st_size );
     return 1;
   }
@@ -129,9 +125,8 @@ process_tzx( char *filename )
   }
 
   if( munmap( buffer, file_info.st_size ) == -1 ) {
-    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-	      "%s: Couldn't munmap `%s'", progname, filename );
-    perror( error_message );
+    fprintf( stderr, "%s: couldn't munmap `%s': %s\n", progname, filename,
+	     strerror( errno ) );
     return 1;
   }
 

@@ -27,6 +27,7 @@
 #include <config.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
@@ -47,7 +48,6 @@
 #include "utils.h"
 #include "z80/z80.h"
 
-#define ERROR_MESSAGE_MAX_LENGTH 1024
 #define PATHNAME_MAX_LENGTH 1024
 
 machine_info **machine_types = NULL; /* Array of available machines */
@@ -291,15 +291,11 @@ static int machine_free_machine( machine_info *machine )
 {
   size_t i;
 
-  char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
-
   for( i=0; i<machine->rom_count; i++ ) {
 
     if( munmap( machine->roms[i], machine->rom_lengths[i] ) == -1 ) {
-      snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-		"%s: couldn't munmap ROM %lu",
-		fuse_progname, (unsigned long)i );
-      perror( error_message );
+      ui_error( "couldn't munmap ROM %lu: %s\n", (unsigned long)i,
+		strerror( errno ) );
       return 1;
     }
   }
