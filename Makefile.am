@@ -43,7 +43,7 @@ keysyms.c: keysyms.pl keysyms.dat
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ -DROMSDIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ libspectrum/libspectrum.a z80/libz80.a
 
-noinst_HEADERS = ay.h display.h event.h fbkeyboard.h\
+noinst_HEADERS = ay.h display.h event.h fbkeyboard.h font.c\
 	fuse.h gtkkeyboard.h gtkui.h keyboard.h keysyms.h\
 	machine.h myglib.h osssound.h settings.h snapshot.h sound.h spec128.h\
 	spec48.h specplus2.h specplus3.h spectrum.h svgakeyboard.h\
