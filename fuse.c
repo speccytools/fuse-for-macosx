@@ -147,12 +147,19 @@ static int fuse_init(int argc, char **argv)
   if( settings_current.sound && settings_current.emulation_speed == 100 )
     sound_init( settings_current.sound_device );
 
+  /* Timing: if we're not producing sound, or we're using the SDL sound
+     routines (which don't do timing for us), use the SIGALRM based timer */
+#ifdef UI_SDL
+  if( sound_enabled ) fuse_sound_in_use = 1;
+  if( timer_init() ) return 1;
+#else			/* #ifdef UI_SDL */
   if(sound_enabled) {
     fuse_sound_in_use = 1;
   } else {
     settings_current.sound = 0;
     if(timer_init()) return 1;
   }
+#endif			/* #ifdef UI_SDL */
 
   if( settings_current.snapshot ) {
     snapshot_read( settings_current.snapshot ); autoload = 0;
@@ -250,8 +257,11 @@ int fuse_emulation_unpause(void)
   /* If we now want sound, enable it */
   if( settings_current.sound && settings_current.emulation_speed == 100 ) {
 
-    /* If sound wasn't in use before, remove the old SIGALRM timer */
+    /* If sound has just started providing the timing, remove the old
+       SIGALRM timer (the SDL sound routines do not provide timing) */
+#ifndef UI_SDL
     if( !fuse_sound_in_use ) timer_end();
+#endif				/* #ifndef UI_SDL */
 
     sound_init( settings_current.sound_device );
 
@@ -266,17 +276,24 @@ int fuse_emulation_unpause(void)
       fuse_emulation_paused--;
       settings_current.sound = fuse_sound_in_use = 0;
       /* FIXME: How to deal with error return here? */
+#ifndef UI_SDL
       timer_init();
+#endif				/* #ifndef UI_SDL */
 
     }
+#ifdef UI_SDL
+    timer_init();
+#endif				/* #ifdef UI_SDL */
     fuse_sound_in_use = sound_enabled;
   }
+#ifndef UI_SDL
   /* If we don't want sound any more, put previously did, start the SIGALRM
      timer */
   else if( fuse_sound_in_use ) {
     timer_init();
     fuse_sound_in_use = 0;
   }
+#endif				/* #ifndef UI_SDL */
 
   return 0;
 }
@@ -355,7 +372,12 @@ static int fuse_end(void)
   error = machine_end();
   if( error ) return error;
 
+#ifdef UI_SDL
+  timer_end();
+#else				/* #ifdef UI_SDL */
   if(!sound_enabled) timer_end();
+#endif				/* #ifdef UI_SDL */
+
   sound_end();
   event_end();
   ui_end();

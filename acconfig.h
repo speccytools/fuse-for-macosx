@@ -47,6 +47,9 @@
 /* Defined if GTK+ UI in use */
 #undef UI_GTK
 
+/* Defined if the SDL UI in use */
+#undef UI_SDL
+
 /* Defined if svgalib UI in use */
 #undef UI_SVGA
 

@@ -32,7 +32,7 @@ fuse_SOURCES = ay.c display.c event.c\
 	fuse.c keyboard.c machine.c osssound.c rzx.c settings.c\
 	snapshot.c sound.c spec128.c spec48.c specplus2.c specplus2a.c\
 	specplus3.c spectrum.c sunsound.c tape.c timer.c ui.c uidisplay.c\
-	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c
+	utils.c	joystick.c printer.c tc2048.c scld.c screenshot.c sdlsound.c
 
 BUILT_SOURCES = settings.c settings.h
 
@@ -45,14 +45,15 @@ settings.h: settings-header.pl settings.dat
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ -DDATADIR="\"${pkgdatadir}\""
 LDADD = @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @XML_LIBS@ @GETOPT_LIBS@\
-ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/svga/libuisvga.a\
+ui/aalib/libuiaalib.a ui/fb/libuifb.a ui/gtk/libuigtk.a ui/sdl/libuisdl.a \
+ui/svga/libuisvga.a\
 ui/xlib/libuixlib.a widget/libwidget.a z80/libz80.a @DSKLIBS@ @LIBSPEC_LIBS@
 
 noinst_HEADERS = ay.h display.h event.h\
 	fuse.h keyboard.h keysyms.h\
 	machine.h osssound.h rzx.h screenshot.h settings.h snapshot.h sound.h\
         spec128.h spec48.h specplus2.h specplus2a.h specplus3.h spectrum.h\
-	sunsound.h tape.h timer.h types.h utils.h\
+	sunsound.h tape.h timer.h types.h utils.h sdlsound.h\
 	joystick.h printer.h tc2048.h scld.h
 
 EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl settings.pl \

@@ -106,6 +106,25 @@ if test -z "$ui"; then
   if test "$fb" = yes; then AC_DEFINE(UI_FB) ui=fb; fi
 fi
 
+dnl Look for SDL (default=no)
+if test -z "$ui"; then
+  AC_MSG_CHECKING(whether SDL UI requested)
+  AC_ARG_WITH(sdl,
+  [  --with-sdl              use SDL for user interface],
+  if test "$withval" = no; then sdl=no; else sdl=yes; fi,
+  sdl=no)
+  AC_MSG_RESULT($sdl)
+  if test "$sdl" = yes; then
+    SDL_VERSION=1.2.5
+    AM_PATH_SDL($SDL_VERSION,
+		AC_DEFINE(UI_SDL) ui=sdl, 
+                AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
+    CFLAGS="$CFLAGS $SDL_CFLAGS"
+    CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+    LIBS="$LIBS $SDL_LIBS"
+  fi
+fi
+
 dnl Look for GTK+ (default=yes); fall back to Xlib if not found
 if test -z "$ui"; then
   AC_MSG_CHECKING(whether GTK UI requested)
@@ -253,4 +272,5 @@ fi
 AC_OUTPUT(Makefile getopt/Makefile hacking/Makefile lib/Makefile \
 man/Makefile perl/Makefile perl/Fuse/Makefile roms/Makefile \
 ui/Makefile ui/aalib/Makefile ui/fb/Makefile ui/gtk/Makefile ui/svga/Makefile \
+ui/sdl/Makefile \
 ui/xlib/Makefile widget/Makefile z80/Makefile)

@@ -73,6 +73,11 @@ int slt_screen_level;		/* The level of the screenshot.
 
 int spectrum_interrupt(void)
 {
+  /* FIXME: find some better way to deal with speed == 0 */
+  int speed =
+    settings_current.emulation_speed < 1 ? 1 :
+    settings_current.emulation_speed;
+
   /* Reduce the t-state count of both the processor and all the events
      scheduled to occur. Done slightly differently if RZX playback is
      occuring
@@ -85,19 +90,18 @@ int spectrum_interrupt(void)
     tstates -= machine_current->timings.cycles_per_frame;
   }
 
+#ifdef UI_SDL		/* SDL sound routines do not provide speed control */
+  if( sound_enabled ) sound_frame();
+  timer_sleep();
+  timer_count -= 100.0 / speed;
+#else			/* #ifdef UI_SDL */
   if(sound_enabled) {
     sound_frame();
   } else {
     timer_sleep();
-
-    /* FIXME: find some better way to deal with speed == 0 */
-    if( settings_current.emulation_speed < 1 ) {
-      /* Assume 1% speed */
-      timer_count -= 100.0;
-    } else {
-      timer_count -= 100.0 / settings_current.emulation_speed;
-    }
+    timer_count -= 100.0 / speed;
   }
+#endif			/* #ifdef UI_SDL */
 
   if(display_frame()) return 1;
   printer_frame();

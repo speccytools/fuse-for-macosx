@@ -105,11 +105,4 @@ void keyboard_press(keyboard_key_name key);
 void keyboard_release(keyboard_key_name key);
 int keyboard_release_all( void );
 
-typedef struct keysyms_key_info {
-  unsigned long keysym;
-  keyboard_key_name key1, key2;
-} keysyms_key_info;
-
-const keysyms_key_info* keysyms_get_data( unsigned keysym );
-
 #endif			/* #ifndef FUSE_KEYBOARD_H */

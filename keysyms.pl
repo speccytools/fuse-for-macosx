@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
 # keysyms.pl: generate keysyms.c from keysyms.dat
-# Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av, Russell Marks
+# Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Russell Marks,
+#			  Frederick Meunier
 
 # $Id$
 
@@ -34,7 +35,7 @@ my $ui = shift;
 $ui = 'gtk' unless defined $ui;
 
 die "$0: unrecognised user interface: $ui\n"
-  unless 0 < grep { $ui eq $_ } ('gtk', 'x', 'svga', 'fb', 'aa');
+  unless 0 < grep { $ui eq $_ } ( 'gtk', 'x', 'svga', 'fb', 'aa', 'sdl' );
 
 # Some keysyms which don't easily do the Xlib -> SVGAlib conversion
 my %svga_keysyms = (
@@ -47,6 +48,16 @@ my %svga_keysyms = (
     DOWN       => 'CURSORBLOCKDOWN',
     UP         => 'CURSORBLOCKUP',
     RIGHT      => 'CURSORBLOCKRIGHT',
+);
+
+# Some keysyms which don't easily do the Xlib -> SDL conversion
+my %sdl_keysyms = (
+
+    CAPS_LOCK  => 'CAPSLOCK',
+    NUMBERSIGN => 'HASH',
+    EQUAL => 'EQUALS',
+    APOSTROPHE => 'QUOTE',
+    MODE_SWITCH => 'MENU',
 );
 
 # Translation table for any UI which uses keyboard mode K_MEDIUMRAW
@@ -95,7 +106,7 @@ my $declare = "const keysyms_key_info keysyms_data[] =\n{";
 
 my $preamble = Fuse::GPL(
     'keysyms.c: keysym to Spectrum key mappings for both Xlib and GDK',
-    '2000-2001 Philip Kendall, Matan Ziv-Av, Russell Marks' ) .
+    '2000-2002 Philip Kendall, Matan Ziv-Av, Russell Marks, Frederick Meunier' ) .
     "\n#include <config.h>\n";
 
 my $includes = << 'CODE';
@@ -197,6 +208,43 @@ CODE
 	}
     }
 
+} elsif( $ui eq 'sdl' ) {
+  print << "CODE";
+$preamble
+#ifdef UI_SDL
+$includes
+#include <SDL.h>
+$declare
+CODE
+
+    foreach( @keys ) {
+
+        my( $keysym, $key1, $key2 ) = @$_;
+
+        # SDL doesn't believe in these keys
+        next if( $keysym =~ /^Hyper_/ );
+
+        # General translations
+
+        if ( $keysym =~ /[a-zA-Z][a-z]+/ ) {
+          $keysym =~ tr/a-z/A-Z/;
+        }
+        $keysym =~ s/^CONTROL/CTRL/;
+        $keysym =~ s/(.*)_L$/L$1/;
+        $keysym =~ s/(.*)_R$/R$1/;
+        $keysym =~ s/^PAGE_/PAGE/;
+
+        # Some specific translations
+        $keysym = $sdl_keysyms{$keysym} if $sdl_keysyms{$keysym};
+
+        # All the magic #defines start with `SDLK_'
+        $keysym = "SDLK_$keysym";
+    
+        printf "  { %-25s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
+          $keysym, "$key1,", $key2;
+
+    }
+  
 } elsif( $ui eq 'fb' ) {
   print << "CODE";
 $preamble

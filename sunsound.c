@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#if defined(HAVE_SYS_AUDIOIO_H)		/* SUN sound */
+#if !defined(UI_SDL) && defined(HAVE_SYS_AUDIOIO_H)		/* SUN sound */
 
 #if defined(__SVR4) && defined(__sun)
 #define solaris
@@ -200,4 +200,5 @@ sunsound_frame(data, len)
 	}
 }
 
-#endif /* HAVE_SYS_AUDIOIO_H */
+#endif /* #if !defined(UI_SDL) && defined(HAVE_SYS_AUDIOIO_H) */
+

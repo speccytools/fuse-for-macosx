@@ -19,7 +19,7 @@
 
 #include <config.h>
 
-#if defined(HAVE_SYS_SOUNDCARD_H)	/* OSS sound */
+#if !defined(UI_SDL) && defined(HAVE_SYS_SOUNDCARD_H)	/* OSS sound */
 
 #include <stdio.h>
 #include <string.h>
@@ -162,4 +162,4 @@ while(len)
   }
 }
 
-#endif	/* HAVE_SYS_SOUNDCARD_H */
+#endif	/* #if !defined(UI_SDL) && defined(HAVE_SYS_SOUNDCARD_H) */

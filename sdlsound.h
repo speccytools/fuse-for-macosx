@@ -1,5 +1,5 @@
-/* keysyms.h: keysym to Spectrum key mappings for both Xlib and GDK
-   Copyright (c) 2000,2002 Philip Kendall
+/* sdlsound.h: SDL sound I/O
+   Copyright (c) 2002 Alexander Yurchenko, Russell Marks, Philip Kendall, Fredrick Meunier
 
    $Id$
 
@@ -17,25 +17,13 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-   Author contact information:
-
-   E-mail: pak21-fuse@srcf.ucam.org
-   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
-
 */
 
-#ifndef FUSE_KEYSYMS_H
-#define FUSE_KEYSYMS_H
+#ifndef FUSE_SDLSOUND_H
+#define FUSE_SDLSOUND_H
 
-#ifndef FUSE_KEYBOARD_H
-#include "keyboard.h"
-#endif			/* #ifndef FUSE_KEYBOARD_H */
+int sdlsound_init(const char *device, int *freqptr, int *stereoptr);
+void sdlsound_end(void);
+void sdlsound_frame(unsigned char *, int);
 
-typedef struct keysyms_key_info {
-  unsigned long keysym;
-  keyboard_key_name key1,key2;
-} keysyms_key_info;
-
-const keysyms_key_info* keysyms_get_data( unsigned keysym );
-
-#endif			/* #ifndef FUSE_KEYSYMS_H */
+#endif /* FUSE_SDLSOUND_H */

@@ -47,6 +47,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "osssound.h"
+#include "sdlsound.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
@@ -166,7 +167,7 @@ static int first_init=1;
 int f,ret;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
-#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SYS_AUDIOIO_H)
+#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SYS_AUDIOIO_H) && !defined(UI_SDL)
 return;
 #endif
 
@@ -185,10 +186,11 @@ sound_stereo_beeper=settings_current.stereo_beeper;
 if(sound_stereo_ay || sound_stereo_beeper)
   sound_stereo=1;
 
-#if defined(HAVE_SYS_SOUNDCARD_H)
+#if defined(UI_SDL)
+ret=sdlsound_init(device,&sound_freq,&sound_stereo);
+#elif defined(HAVE_SYS_SOUNDCARD_H)
 ret=osssound_init(device,&sound_freq,&sound_stereo);
-#endif
-#if defined(HAVE_SYS_AUDIOIO_H)
+#elif defined(HAVE_SYS_AUDIOIO_H)
 ret=sunsound_init(device,&sound_freq,&sound_stereo);
 #endif
 
@@ -279,10 +281,11 @@ if(sound_enabled)
   {
   if(sound_buf)
     free(sound_buf);
-#if defined(HAVE_SYS_SOUNDCARD_H)
+#if defined(UI_SDL)
+  sdlsound_end();
+#elif defined(HAVE_SYS_SOUNDCARD_H)
   osssound_end();
-#endif
-#if defined(HAVE_SYS_AUDIOIO_H)
+#elif defined(HAVE_SYS_AUDIOIO_H)
   sunsound_end();
 #endif
   sound_enabled=0;
@@ -716,10 +719,11 @@ for(f=0;f<sound_framesiz;f++,tptr++)
 /* overlay AY sound */
 sound_ay_overlay();
 
-#if defined(HAVE_SYS_SOUNDCARD_H)
+#if defined(UI_SDL)
+sdlsound_frame(sound_buf,sound_framesiz*sound_channels);
+#elif defined(HAVE_SYS_SOUNDCARD_H)
 osssound_frame(sound_buf,sound_framesiz*sound_channels);
-#endif
-#if defined(HAVE_SYS_AUDIOIO_H)
+#elif defined(HAVE_SYS_AUDIOIO_H)
 sunsound_frame(sound_buf,sound_framesiz*sound_channels);
 #endif
 
