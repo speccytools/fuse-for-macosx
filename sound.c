@@ -53,7 +53,6 @@ int sound_enabled=0;		/* Are we currently using the sound card;
 				   cf fuse.c:fuse_sound_in_use */
 int sound_enabled_ever=0;	/* if it's *ever* been in use; see
                                    sound_ay_write() and sound_ay_reset() */
-int sound_freq=32000;
 int sound_stereo=0;		/* true for stereo *output sample* (only) */
 int sound_stereo_ay_abc=0;	/* (AY stereo) true for ABC stereo, else ACB */
 int sound_stereo_ay_narrow=0;	/* (AY stereo) true for narrow AY st. sep. */
@@ -148,7 +147,9 @@ ay_tone_subcycles=ay_env_subcycles=0;
 for(f=0;f<3;f++)
   ay_tone_tick[f]=ay_tone_high[f]=0,ay_tone_period[f]=1;
 
-ay_tick_incr=(int)(65536.*libspectrum_timings_ay_speed(machine_current->machine)/sound_freq);
+ay_tick_incr=(int)(65536.*
+                   libspectrum_timings_ay_speed(machine_current->machine)/
+                   settings_current.sound_freq);
 
 ay_change_count=0;
 }
@@ -158,6 +159,7 @@ void sound_init(const char *device)
 {
 static int first_init=1;
 int f,ret;
+int sound_max_framesiz;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
 #ifndef HAVE_SOUND
@@ -178,7 +180,7 @@ sound_stereo_beeper=settings_current.stereo_beeper;
 /* only try for stereo if we need it */
 if(sound_stereo_ay || sound_stereo_beeper)
   sound_stereo=1;
-ret=sound_lowlevel_init(device,&sound_freq,&sound_stereo);
+ret=sound_lowlevel_init(device,&settings_current.sound_freq,&sound_stereo);
 
 if(ret)
   return;
@@ -197,11 +199,11 @@ if(!sound_stereo)
 sound_enabled=sound_enabled_ever=1;
 
 sound_channels=(sound_stereo?2:1);
-sound_framesiz=sound_freq/50;
+sound_max_framesiz=settings_current.sound_freq/50;
 
 if((sound_buf=malloc(sizeof(libspectrum_signed_word)*
-                     sound_framesiz*sound_channels))==NULL ||
-   (tape_buf=malloc(sizeof(libspectrum_signed_word)*sound_framesiz))==NULL)
+                     sound_max_framesiz*sound_channels))==NULL ||
+   (tape_buf=malloc(sizeof(libspectrum_signed_word)*sound_max_framesiz))==NULL)
   {
   if(sound_buf)
     {
@@ -237,12 +239,12 @@ if(sound_stereo_beeper)
   for(f=0;f<STEREO_BUF_SIZE;f++)
     pstereobuf[f]=0;
   pstereopos=0;
-  pstereobufsiz=(sound_freq*psgap)/22000;
+  pstereobufsiz=(settings_current.sound_freq*psgap)/22000;
   }
 
 if(sound_stereo_ay)
   {
-  int pos=(sound_stereo_ay_narrow?3:6)*sound_freq/8000;
+  int pos=(sound_stereo_ay_narrow?3:6)*settings_current.sound_freq/8000;
 
   for(f=0;f<STEREO_BUF_SIZE;f++)
     rstereobuf_l[f]=rstereobuf_r[f]=0;
@@ -381,7 +383,7 @@ if(!machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY) return;
 
 /* convert change times to sample offsets */
 for(f=0;f<ay_change_count;f++)
-  ay_change[f].ofs=(ay_change[f].tstates*sound_freq)/
+  ay_change[f].ofs=(ay_change[f].tstates*settings_current.sound_freq)/
                    machine_current->timings.processor_speed;
 
 for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
@@ -624,6 +626,7 @@ if(ay_change_count<AY_CHANGE_MAX)
 void sound_ay_reset(void)
 {
 int f;
+float hz = 50;
 
 /* as above... */
 if(!sound_enabled_ever) return;
@@ -637,6 +640,11 @@ for(f=0;f<16;f++)
 for(f=0;f<3;f++)
   ay_tone_high[f]=0;
 ay_tone_subcycles=ay_env_subcycles=0;
+
+hz = (float)machine_current->timings.processor_speed /
+     machine_current->timings.tstates_per_frame;
+
+sound_framesiz = settings_current.sound_freq / hz;
 }
 
 

@@ -1191,3 +1191,8 @@
 20050111 machines/pentagon.c: Remove if1 from peripherals array (Fred).
 20050112 lib/{tape_ts2068.szx|Makefile.am}: Add TS2068 tape auto-load snapshot
          tape.c: Fix tape traps for TS2068 (Fred).
+20050113 settings.dat,sound.c,sound/sdlsound.c,man/fuse.1: Allow the user to
+         set the frequency to use with the sound card, and make the SDL sound
+         driver pass back the obtained frequency if it is not able to get that
+         originally requested as long as it gets a native endian 16 bit format
+         (Fred).

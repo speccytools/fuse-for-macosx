@@ -52,7 +52,7 @@ sfifo_t sound_fifo;
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
-  SDL_AudioSpec requested;
+  SDL_AudioSpec requested, received;
   int frag;
   int error;
 
@@ -82,18 +82,51 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 
   requested.samples = 1 << frag;
 
-  /* Convert from 16-bit stereo samples to bytes plus some headroom */
-  frag = 1 << (frag+4);
-  if( ( error = sfifo_init( &sound_fifo, frag ) ) ) {
-    ui_error( UI_ERROR_ERROR, "Problem initialising sound fifo: %s",
-              strerror ( error ) );
-    return 1;
-  }
-
-  if ( SDL_OpenAudio( &requested, NULL ) < 0 ) {
+  if ( SDL_OpenAudio( &requested, &received ) < 0 ) {
     settings_current.sound = 0;
     ui_error( UI_ERROR_ERROR, "Couldn't open sound device: %s",
               SDL_GetError() );
+    return 1;
+  }
+
+  *freqptr = received.freq;
+
+  if( received.format != AUDIO_S16SYS ) {
+    /* close audio and then just let SDL convert to this wacky format at a
+       supported sample rate */
+    SDL_CloseAudio();
+
+    requested.freq = *freqptr;
+
+    frag = BASE_SOUND_FRAG_PWR;
+    if (*freqptr > 8250)   
+      frag++;  
+    if (*freqptr > 16500)
+      frag++;      
+    if (*freqptr > 33000)
+      frag++;
+
+    requested.samples = 1 << frag;
+
+    if( SDL_OpenAudio( &requested, NULL ) < 0 ) {
+      settings_current.sound = 0;
+      ui_error( UI_ERROR_ERROR, "Couldn't open sound device: %s",
+                SDL_GetError() );
+      return 1;
+    }
+
+    /* Convert from 16-bit stereo samples to bytes plus some headroom */
+    frag = 1 << (frag+3);
+
+  } else {
+    *freqptr = received.freq;
+    *stereoptr = received.channels == 1 ? 0 : 1;
+    frag = received.size;
+  }
+
+  if( ( error = sfifo_init( &sound_fifo, 2 * frag + 1 ) ) ) {
+    ui_error( UI_ERROR_ERROR, "Problem initialising sound fifo: %s",
+              strerror ( error ) );
     return 1;
   }
 
