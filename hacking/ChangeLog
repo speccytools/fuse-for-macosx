@@ -372,3 +372,4 @@
 20031124 timer.c: prevent too big a 'backlog' from occuring.
 20031127 memory.h: ensure 'address' is a 16-bit value before using it.
 20031128 fuse.c: initialise the poke finder on startup.
+20031128 ui/gtk/gtkui.c: split create_dialog into multiple functions.

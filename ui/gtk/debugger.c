@@ -46,7 +46,21 @@
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
+#ifdef UI_GTK2
+typedef PangoFontDescription *font_spec;
+#else				/* #ifdef UI_GTK2 */
+typedef GtkStyle *font_spec;
+#endif				/* #ifdef UI_GTK2 */
+
 static int create_dialog( void );
+static int create_register_display( GtkBox *parent, font_spec font );
+static int create_breakpoints( GtkBox *parent );
+static int create_disassembly( GtkBox *parent, font_spec font );
+static int create_stack_display( GtkBox *parent, font_spec font );
+static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
+static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
+static void set_font( GtkWidget *widget, font_spec font );
+
 static int activate_debugger( void );
 static int update_disassembly( void );
 static int deactivate_debugger( void );
@@ -64,7 +78,8 @@ static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 
 static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
-  *registers[18],			/* The register display */
+  *register_display,			/* The register display */
+  *registers[18],			/* Individual registers */
   *breakpoints,				/* The breakpoint display */
   *disassembly,				/* The disassembly */
   *stack;				/* The stack display */
@@ -111,43 +126,44 @@ ui_debugger_deactivate( int interruptable )
 static int
 create_dialog( void )
 {
-  size_t i;
+  int error;
   GtkWidget *hbox, *vbox;
-  GtkWidget *table;
-  GtkWidget *entry, *eval_button;
-  GtkWidget *step_button, *close_button;
   GtkAccelGroup *accel_group;
-#ifdef UI_GTK2
-  PangoFontDescription *font_desc;
-#else				/* #ifdef UI_GTK2 */
-  GtkStyle *style;
-#endif				/* #ifdef UI_GTK2 */
 
-  GtkWidget *scrollbar;
-
-  gchar
-    *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life",
-			     "Condition" },
-    *disassembly_titles[] = { "Address", "Instruction" },
-    *stack_titles[] = { "Address", "Value" };
+  font_spec font;
 
   /* Try and get a monospaced font */
 #ifdef UI_GTK2
-  font_desc = pango_font_description_from_string( "Monospace 12" );
-  if( !font_desc ) {
-#else				/* #ifdef UI_GTK2 */
-  style = gtk_style_new();
-  gdk_font_unref( style->font );
 
-  style->font = gdk_font_load( "-*-courier-medium-r-*-*-12-*-*-*-*-*-*-*" );
-  if( !style->font ) {
-#endif				/* #ifdef UI_GTK2 */
+  font = pango_font_description_from_string( "Monospace 12" );
+  if( !font ) {
     ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
     return 1;
   }
 
+#else				/* #ifdef UI_GTK2 */
+
+  font = gtk_style_new();
+  gdk_font_unref( font->font );
+
+  font->font = gdk_font_load( "-*-courier-medium-r-*-*-12-*-*-*-*-*-*-*" );
+  if( !font->font ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
+    return 1;
+  }
+
+#endif				/* #ifdef UI_GTK2 */
+
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
+
+  /* Keyboard shortcuts */
+  accel_group = gtk_accel_group_new();
+  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
+
+  /* Catch attempts to close the window and just hide it instead */
+  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
+		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
 
   /* A couple of boxes to contain the things we want to display */
   hbox = gtk_hbox_new( FALSE, 0 );
@@ -157,39 +173,87 @@ create_dialog( void )
   vbox = gtk_vbox_new( FALSE, 5 );
   gtk_box_pack_start( GTK_BOX( hbox ), vbox, TRUE, TRUE, 5 );
 
-  /* 'table' contains the register display */
-  table = gtk_table_new( 9, 2, FALSE );
-  gtk_box_pack_start( GTK_BOX( vbox ), table, FALSE, FALSE, 0 );
+  /* The main display areas */
+  error = create_register_display( GTK_BOX( vbox ), font );
+  if( error ) return error;
+
+  error = create_breakpoints( GTK_BOX( vbox ) ); if( error ) return error;
+
+  error = create_disassembly( GTK_BOX( hbox ), font );
+  if( error ) return error;
+
+  error = create_stack_display( GTK_BOX( hbox ), font );
+  if( error ) return error;
+
+  error = create_command_entry( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
+				accel_group );
+  if( error ) return error;
+
+  /* The action buttons */
+
+  error = create_buttons( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
+			  accel_group );
+  if( error ) return error;
+
+#ifdef UI_GTK2
+  pango_font_description_free( font );
+#endif				/* #ifdef UI_GTK2 */
+
+  dialog_created = 1;
+
+  return 0;
+}
+
+static int
+create_register_display( GtkBox *parent, font_spec font )
+{
+  size_t i;
+
+  register_display = gtk_table_new( 9, 2, FALSE );
+  gtk_box_pack_start( parent, register_display, FALSE, FALSE, 0 );
 
   for( i = 0; i < 18; i++ ) {
     registers[i] = gtk_label_new( "" );
-#ifdef UI_GTK2
-    gtk_widget_modify_font( registers[i], font_desc );
-#else				/* #ifdef UI_GTK2 */
-    gtk_widget_set_style( registers[i], style );
-#endif				/* #ifdef UI_GTK2 */
-    gtk_table_attach( GTK_TABLE( table ), registers[i], i%2, i%2+1, i/2, i/2+1,
-		      0, 0, 2, 2 );
+    set_font( registers[i], font );
+    gtk_table_attach( GTK_TABLE( register_display ), registers[i],
+		      i%2, i%2+1, i/2, i/2+1, 0, 0, 2, 2 );
   }
 
-  /* The breakpoint CList */
+  return 0;
+}
+
+static int
+create_breakpoints( GtkBox *parent )
+{
+  size_t i;
+
+  gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life",
+				 "Condition" };
+
   breakpoints = gtk_clist_new_with_titles( 6, breakpoint_titles );
   gtk_clist_column_titles_passive( GTK_CLIST( breakpoints ) );
   for( i = 0; i < 6; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( breakpoints ), i, TRUE );
-  gtk_box_pack_start_defaults( GTK_BOX( vbox ), breakpoints );
+  gtk_box_pack_start_defaults( parent, breakpoints );
 
-  /* Create the disassembly CList itself */
+  return 0;
+}
+
+static int
+create_disassembly( GtkBox *parent, font_spec font )
+{
+  size_t i;
+
+  GtkWidget *scrollbar;
+  gchar *disassembly_titles[] = { "Address", "Instruction" };
+
+  /* The disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
-#ifdef UI_GTK2
-  gtk_widget_modify_font( disassembly, font_desc );
-#else				/* #ifdef UI_GTK2 */
-  gtk_widget_set_style( disassembly, style );
-#endif				/* #ifdef UI_GTK2 */
+  set_font( disassembly, font );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( disassembly ), i, TRUE );
-  gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
+  gtk_box_pack_start_defaults( parent, disassembly );
 
   /* The disassembly scrollbar */
   disassembly_scrollbar_adjustment =
@@ -199,25 +263,35 @@ create_dialog( void )
 		      NULL );
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
-  gtk_box_pack_start( GTK_BOX( hbox ), scrollbar, FALSE, FALSE, 0 );
+  gtk_box_pack_start( parent, scrollbar, FALSE, FALSE, 0 );
 
-  /* And the stack CList */
+  return 0;
+}
+
+static int
+create_stack_display( GtkBox *parent, font_spec font )
+{
+  size_t i;
+  gchar *stack_titles[] = { "Address", "Value" };
+
   stack = gtk_clist_new_with_titles( 2, stack_titles );
-#ifdef UI_GTK2
-  gtk_widget_modify_font( stack, font_desc );
-#else				/* #ifdef UI_GTK2 */
-  gtk_widget_set_style( stack, style );
-#endif				/* #ifdef UI_GTK2 */
+  set_font( stack, font );
   gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
-  gtk_box_pack_start( GTK_BOX( hbox ), stack, TRUE, TRUE, 5 );
+  gtk_box_pack_start( parent, stack, TRUE, TRUE, 5 );
 
-  /* Another hbox to hold the command entry widget and the 'evaluate'
-     button */
+  return 0;
+}
+
+static int
+create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
+{
+  GtkWidget *hbox, *entry, *eval_button;
+
+  /* An hbox to hold the command entry widget and the 'evaluate' button */
   hbox = gtk_hbox_new( FALSE, 5 );
-  gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), hbox,
-		      FALSE, FALSE, 0 );
+  gtk_box_pack_start( parent, hbox, FALSE, FALSE, 0 );
 
   /* The command entry widget */
   entry = gtk_entry_new();
@@ -232,57 +306,58 @@ create_dialog( void )
 			     GTK_OBJECT( entry ) );
   gtk_box_pack_start( GTK_BOX( hbox ), eval_button, FALSE, FALSE, 0 );
 
-  /* The action buttons for the dialog box */
+  /* Return is equivalent to clicking on 'evaluate' */
+  gtk_widget_add_accelerator( eval_button, "clicked", accel_group,
+			      GDK_Return, 0, 0 );
+
+  return 0;
+}
+
+static int
+create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group )
+{
+  GtkWidget *step_button, *close_button;
+
+  /* Create the action buttons for the dialog box */
 
   step_button = gtk_button_new_with_label( "Single Step" );
   gtk_signal_connect( GTK_OBJECT( step_button ), "clicked",
 		      GTK_SIGNAL_FUNC( gtkui_debugger_done_step ), NULL );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     step_button );
+  gtk_container_add( parent, step_button );
 
   continue_button = gtk_button_new_with_label( "Continue" );
   gtk_signal_connect( GTK_OBJECT( continue_button ), "clicked",
 		      GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ), NULL );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     continue_button );
+  gtk_container_add( parent, continue_button );
 
   break_button = gtk_button_new_with_label( "Break" );
   gtk_signal_connect( GTK_OBJECT( break_button ), "clicked",
 		      GTK_SIGNAL_FUNC( gtkui_debugger_break ), NULL );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     break_button );
+  gtk_container_add( parent, break_button );
 
   close_button = gtk_button_new_with_label( "Close" );
   gtk_signal_connect_object( GTK_OBJECT( close_button ), "clicked",
 			     GTK_SIGNAL_FUNC( gtkui_debugger_done_close ),
 			     GTK_OBJECT( dialog ) );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     close_button );
-
-  /* Deleting the window is the same as pressing 'Close' */
-  gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
-		      GTK_SIGNAL_FUNC( delete_dialog ), NULL );
-
-  /* Keyboard shortcuts */
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-
-  /* Return is equivalent to clicking on 'evaluate' */
-  gtk_widget_add_accelerator( eval_button, "clicked", accel_group,
-			      GDK_Return, 0, 0 );
+  gtk_container_add( parent, close_button );
 
   /* Esc is equivalent to clicking on 'close' */
   gtk_widget_add_accelerator( close_button, "clicked", accel_group,
                               GDK_Escape, 0, 0 );
 
-#ifdef UI_GTK2
-  pango_font_description_free( font_desc );
-#endif				/* #ifdef UI_GTK2 */
-
-  dialog_created = 1;
-
   return 0;
 }
+
+static void
+set_font( GtkWidget *widget, font_spec font )
+{
+#ifdef UI_GTK2
+  gtk_widget_modify_font( widget, font );
+#else				/* #ifdef UI_GTK2 */
+  gtk_widget_set_style( widget, font );
+#endif				/* #ifdef UI_GTK2 */
+}
+
 
 static int
 activate_debugger( void )
