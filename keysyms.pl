@@ -26,6 +26,20 @@
 
 use strict;
 
+# Some keysyms which don't easily do the Xlib -> SVGAlib conversion
+my %svga_keysyms = (
+
+    CAPS_LOCK  => 'CAPSLOCK',
+    NUMBERSIGN => 'BACKSLASH',	# That's what `#' returns on a UK keyboard!
+    RETURN     => 'ENTER',
+
+    LEFT       => 'CURSORBLOCKLEFT',
+    DOWN       => 'CURSORBLOCKDOWN',
+    UP         => 'CURSORBLOCKUP',
+    RIGHT      => 'CURSORBLOCKRIGHT',
+
+);
+
 my @keys;
 while(<>) {
 
@@ -144,20 +158,21 @@ foreach( @keys ) {
     $keysym =~ s/(.*)_L$/LEFT$1/;
     $keysym =~ s/(.*)_R$/RIGHT$1/;
     $keysym =~ s/META$/WIN/;		# Fairly sensible mapping
-    $keysym =~ s/CAPS_LOCK/CAPSLOCK/;
-    $keysym =~ s/NUMBERSIGN/BACKSLASH/; # This is what `#' returns on
-                                        # a UK keyboard!
-    $keysym =~ s/RETURN/ENTER/;
 
+    # Some specific translations
+    $keysym = $svga_keysyms{$keysym} if $svga_keysyms{$keysym};
+
+    # All the magic #defines start with `SCANCODE_'
     $keysym = "SCANCODE_$keysym";
     
+    # Apart from this one :-)
     $keysym =~ s/SCANCODE_MODE_SWITCH/127/; # `Menu' key
 
     if( $keysym =~ /WIN$/ ) {
 	print "#ifdef $keysym\n";
     }
 
-    printf "  { %-21s , KEYBOARD_%-6s KEYBOARD_%-6s },\n",
+    printf "  { %-25s , KEYBOARD_%-6s KEYBOARD_%-6s },\n",
       $keysym, "$key1,", $key2;
 
     if( $keysym =~ /WIN$/ ) {

@@ -98,3 +98,8 @@ Meta_R      , NONE,  Symbol
 Alt_R       , NONE,  Symbol
 Control_R   , NONE,  Symbol
 Mode_switch , NONE,  Symbol
+
+Left        , 5,     Caps
+Down        , 6,     Caps
+Up          , 7,     Caps
+Right       , 8,     Caps
