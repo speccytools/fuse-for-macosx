@@ -184,3 +184,4 @@
          data. Add padding around the save binary data dialog widgets.
 20030905 debugger/expression.c: get brackets right when deparsing
          expressions.
+20030908 dck.c: use Timex dock capability in dck_read

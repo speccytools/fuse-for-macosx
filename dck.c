@@ -89,7 +89,7 @@ dck_read( const char *filename )
   timex_mem *mem;
 
   if ( !( libspectrum_machine_capabilities( machine_current->machine ) &
-	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) ) {
+	  LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
     ui_error( UI_ERROR_ERROR, "This machine does not support the dock" );
     return 1;
   }
