@@ -31,7 +31,7 @@ INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@
 rzxdump_SOURCES = rzxdump.c
 
 rzxtool_SOURCES = rzxtool.c
-rzxtool_LDADD = ../libspectrum/libspectrum.a @ZLIB_LIBS@
+rzxtool_LDADD = @GLIB_LIBS@ @GTK_LIBS@ @ZLIB_LIBS@ -lspectrum
 
 tzxlist_SOURCES = tzxlist.c
-tzxlist_LDADD = @GLIB_LIBS@ @GTK_LIBS@ ../libspectrum/libspectrum.a ../myglib/libmyglib.a
+tzxlist_LDADD = @GLIB_LIBS@ @GTK_LIBS@ @ZLIB_LIBS@ ../myglib/libmyglib.a -lspectrum

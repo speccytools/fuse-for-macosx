@@ -1,6 +1,3 @@
-/*.tap
-/*.tzx
-/*.z80
 /.deps
 /Makefile
 /Makefile.in
@@ -14,8 +11,8 @@
 /fuse
 /install-sh
 /keysyms.c
+/libtool
 /missing
 /mkinstalldirs
 /stamp-h
-/stamp-h1
 /stamp-h.in
