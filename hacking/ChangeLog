@@ -282,3 +282,6 @@
 	 QNX6 (thanks, Mike Gorchak).
 20031015 ui/gtk/statusbar.c: the statusbar should not expand to fill the
 	 space available.
+20031016 compat/Makefile.am: distribute getopt.h.
+
+	

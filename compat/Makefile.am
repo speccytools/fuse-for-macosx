@@ -31,3 +31,5 @@ libcompat_a_SOURCES = getopt.c \
 	              mkstemp.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
+
+noinst_HEADERS = getopt.h
