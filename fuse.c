@@ -160,8 +160,10 @@ static int fuse_init(int argc, char **argv)
   
   if( display_init(&argc,&argv) ) return 1;
 
+#ifdef HAVE_GETEUID
   /* Drop root privs if we have them */
   if( !geteuid() ) { setuid( getuid() ); }
+#endif				/* #ifdef HAVE_GETEUID */
 
   if( debugger_init() ) return 1;
 

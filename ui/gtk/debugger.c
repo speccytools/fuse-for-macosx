@@ -115,7 +115,11 @@ create_dialog( void )
   GtkWidget *entry, *eval_button;
   GtkWidget *step_button, *close_button;
   GtkAccelGroup *accel_group;
+#ifdef UI_GTK2
+  PangoFontDescription *font_desc;
+#else				/* #ifdef UI_GTK2 */
   GtkStyle *style;
+#endif				/* #ifdef UI_GTK2 */
 
   GtkWidget *scrollbar;
 
@@ -124,11 +128,16 @@ create_dialog( void )
     *stack_titles[] = { "Address", "Value" };
 
   /* Try and get a monospaced font */
+#ifdef UI_GTK2
+  font_desc = pango_font_description_from_string( "Monospace 12" );
+  if( !font_desc ) {
+#else				/* #ifdef UI_GTK2 */
   style = gtk_style_new();
   gdk_font_unref( style->font );
 
   style->font = gdk_font_load( "-*-courier-medium-r-*-*-12-*-*-*-*-*-*-*" );
   if( !style->font ) {
+#endif				/* #ifdef UI_GTK2 */
     ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
     return 1;
   }
@@ -150,7 +159,11 @@ create_dialog( void )
 
   for( i = 0; i < 18; i++ ) {
     registers[i] = gtk_label_new( "" );
+#ifdef UI_GTK2
+    gtk_widget_modify_font( registers[i], font_desc );
+#else				/* #ifdef UI_GTK2 */
     gtk_widget_set_style( registers[i], style );
+#endif				/* #ifdef UI_GTK2 */
     gtk_table_attach( GTK_TABLE( table ), registers[i], i%2, i%2+1, i/2, i/2+1,
 		      0, 0, 2, 2 );
   }
@@ -164,7 +177,11 @@ create_dialog( void )
 
   /* Create the disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
+#ifdef UI_GTK2
+  gtk_widget_modify_font( disassembly, font_desc );
+#else				/* #ifdef UI_GTK2 */
   gtk_widget_set_style( disassembly, style );
+#endif				/* #ifdef UI_GTK2 */
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( disassembly ), i, TRUE );
@@ -182,7 +199,11 @@ create_dialog( void )
 
   /* And the stack CList */
   stack = gtk_clist_new_with_titles( 2, stack_titles );
+#ifdef UI_GTK2
+  gtk_widget_modify_font( stack, font_desc );
+#else				/* #ifdef UI_GTK2 */
   gtk_widget_set_style( stack, style );
+#endif				/* #ifdef UI_GTK2 */
   gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
   for( i = 0; i < 2; i++ )
     gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
@@ -250,6 +271,10 @@ create_dialog( void )
   /* Esc is equivalent to clicking on 'close' */
   gtk_widget_add_accelerator( close_button, "clicked", accel_group,
                               GDK_Escape, 0, 0 );
+
+#ifdef UI_GTK2
+  pango_font_description_free( font_desc );
+#endif				/* #ifdef UI_GTK2 */
 
   dialog_created = 1;
 

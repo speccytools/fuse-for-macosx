@@ -18,8 +18,7 @@ Some thanks (in alphabetical order):
   see http://www.seasip.demon.co.uk/Unix/LibDsk/
 
 * Martin Garton: making the GTK+ user interface compatible with GTK+ 2.0,
-  although this isn't currently in due to the fact I broke it in other
-  ways.
+  although I then went and broke it in other ways.
 
 * Ian Greenway: for information about reading from unattached ports. If
   you've got an Amiga, you may well like to check out Ian's Spectrum

@@ -50,8 +50,11 @@
 /* Defined if GGI UI in use */
 #undef UI_GGI
 
-/* Defined if GTK+ UI in use */
+/* Defined if GTK+ UI (either 1.2 or 2.x) is in use */
 #undef UI_GTK
+
+/* Defined if GTK+ 2.0 is in use */
+#undef UI_GTK2
 
 /* Defined if the SDL UI in use */
 #undef UI_SDL
