@@ -39,4 +39,5 @@ options.c: options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
 options.h: options-header.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
 	@PERL@ options-header.pl ../ui/options.dat > options.h
 
-noinst_HEADERS = widget.h options.h options.pl options-header.pl
+noinst_HEADERS = widget.h widget_internals.h \
+		 options.h options.pl options-header.pl
