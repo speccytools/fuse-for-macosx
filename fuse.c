@@ -348,78 +348,18 @@ int fuse_emulation_unpause(void)
 static int
 parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
 {
-  unsigned char *buffer; size_t length; libspectrum_id_t type;
-  int error = 0;
+  libspectrum_id_t type;
+  int error;
 
   while( first_arg < argc ) {
 
-    if( utils_read_file( argv[ first_arg ], &buffer, &length ) ) return 1;
+    error = utils_open_file( argv[ first_arg ], autoload, &type );
+    if( error ) return error;
 
-    if( libspectrum_identify_file( &type, argv[ first_arg ], buffer,
-				   length ) ) {
-      munmap( buffer, length );
-      return 1;
-    }
-
-    switch( type ) {
-
-    case LIBSPECTRUM_ID_UNKNOWN:
-      fprintf( stderr, "%s: couldn't identify `%s'\n", fuse_progname,
-	       argv[ first_arg ] );
-      munmap( buffer, length );
-      return 1;
-
-    case LIBSPECTRUM_ID_RECORDING_RZX:
-      error = rzx_start_playback_from_buffer( buffer, length );
-      break;
-
-    case LIBSPECTRUM_ID_SNAPSHOT_SNA:
-    case LIBSPECTRUM_ID_SNAPSHOT_Z80:
-      error = snapshot_read_buffer( buffer, length, type );
-      if( !error ) autoload = 0;
-      break;
-
-    case LIBSPECTRUM_ID_TAPE_TAP:
-    case LIBSPECTRUM_ID_TAPE_TZX:
-      error = tape_read_buffer( buffer, length, type, autoload );
-      break;
-
-#ifdef HAVE_765_H
-    case LIBSPECTRUM_ID_DISK_DSK:
-      error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
-      if( error ) return error;
-
-      error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, argv[ first_arg ] );
-      break;
-#endif				/* #ifdef HAVE_765_H */
-
-    case LIBSPECTRUM_ID_DISK_SCL:
-    case LIBSPECTRUM_ID_DISK_TRD:
-      error = machine_select( LIBSPECTRUM_MACHINE_PENT );
-      if( error ) return error;
-
-      error = trdos_disk_insert( TRDOS_DRIVE_A, argv[ first_arg ] );
-      break;
-
-    case LIBSPECTRUM_ID_CARTRIDGE_DCK:
-      error = machine_select( LIBSPECTRUM_MACHINE_TC2068 );
-      if( !error ) error = dck_read( argv[ first_arg ] );
-
-      break;
-
-    default:
-      fprintf( stderr, "%s: parse_nonoption_args: unknown type %d!\n",
-	       fuse_progname, type );
-      fuse_abort();
-    }
-
-    if( error ) { munmap( buffer, length ); return 1; }
-
-    if( length && munmap( buffer, length ) ) {
-      fprintf( stderr, "%s: parse_nonoption_args: couldn't munmap `%s': %s\n",
-	       fuse_progname, argv[ first_arg ], strerror( errno ) );
-      return 1;
-    }
+    /* If we had a snapshot on the command line, don't autoload any tapes
+       specified as well */
+    if( type == LIBSPECTRUM_ID_SNAPSHOT_SNA ||
+	type == LIBSPECTRUM_ID_SNAPSHOT_Z80    ) autoload = 0;
 
     first_arg++;
   }

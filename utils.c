@@ -36,10 +36,95 @@
 #include <ui/ui.h>
 #include <unistd.h>
 
+#include <libspectrum.h>
+
+#include "dck.h"
 #include "fuse.h"
+#include "rzx.h"
+#include "snapshot.h"
+#include "specplus3.h"
+#include "tape.h"
+#include "trdos.h"
 #include "utils.h"
 
 #define PATHNAME_MAX_LENGTH 1024
+
+/* Open `filename' and do something sensible with it; autoload tapes
+   if `autoload' is true and return the type of file found in `type' */
+int
+utils_open_file( const char *filename, int autoload, libspectrum_id_t *type )
+{
+  unsigned char *buffer; size_t length;
+  int error = 0;
+
+  /* Read the file into a buffer */
+  if( utils_read_file( filename, &buffer, &length ) ) return 1;
+
+  /* See if we can work out what it is */
+  if( libspectrum_identify_file( type, filename, buffer, length ) ) {
+    munmap( buffer, length );
+    return 1;
+  }
+
+  switch( *type ) {
+    
+  case LIBSPECTRUM_ID_UNKNOWN:
+    ui_error( UI_ERROR_ERROR, "utils_open_file: couldn't identify `%s'",
+	      filename );
+    munmap( buffer, length );
+    return 1;
+
+  case LIBSPECTRUM_ID_RECORDING_RZX:
+    error = rzx_start_playback_from_buffer( buffer, length );
+    break;
+
+  case LIBSPECTRUM_ID_SNAPSHOT_SNA:
+  case LIBSPECTRUM_ID_SNAPSHOT_Z80:
+    error = snapshot_read_buffer( buffer, length, *type );
+    break;
+
+  case LIBSPECTRUM_ID_TAPE_TAP:
+  case LIBSPECTRUM_ID_TAPE_TZX:
+    error = tape_read_buffer( buffer, length, *type, autoload );
+    break;
+
+#ifdef HAVE_765_H
+  case LIBSPECTRUM_ID_DISK_DSK:
+    error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 );
+    if( error ) return error;
+
+    error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename );
+    break;
+#endif				/* #ifdef HAVE_765_H */
+
+  case LIBSPECTRUM_ID_DISK_SCL:
+  case LIBSPECTRUM_ID_DISK_TRD:
+    error = machine_select( LIBSPECTRUM_MACHINE_PENT );
+    if( error ) return error;
+
+    error = trdos_disk_insert( TRDOS_DRIVE_A, filename );
+    break;
+
+  case LIBSPECTRUM_ID_CARTRIDGE_DCK:
+    error = machine_select( LIBSPECTRUM_MACHINE_TC2068 );
+    if( !error ) error = dck_read( filename );
+    break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "utils_open_file: unknown type %d", *type );
+    fuse_abort();
+  }
+
+  if( error ) { munmap( buffer, length ); return error; }
+
+  if( length && munmap( buffer, length ) ) {
+    ui_error( UI_ERROR_ERROR, "utils_open_file: couldn't munmap `%s': %s",
+	      filename, strerror( errno ) );
+    return 1;
+  }
+
+  return 0;
+}
 
 /* Find a ROM called `filename'; look in the current directory, ./roms
    and the defined roms directory; returns a fd for the ROM on success,

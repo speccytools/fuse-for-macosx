@@ -37,6 +37,8 @@
 
 #include <glib.h>
 
+#include <libspectrum.h>
+
 #include "dck.h"
 #include "debugger/debugger.h"
 #include "display.h"
@@ -59,6 +61,7 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "ui/scaler/scaler.h"
+#include "utils.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -144,9 +147,8 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File",		        NULL , NULL,                0, "<Branch>"    },
-  { "/File/_Open Snapshot..." , "F3" , gtkui_open,          0, NULL          },
+  { "/File/_Open...",		"F3" , gtkui_open,          0, NULL          },
   { "/File/_Save Snapshot..." , "F2" , gtkui_save,          0, NULL          },
-  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/_Recording",		NULL , NULL,		    0, "<Branch>"    },
   { "/File/Recording/_Record...",NULL, gtkui_rzx_start,     0, NULL	     },
   { "/File/Recording/Record _from snapshot...",
@@ -154,6 +156,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
   { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
 
+  { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/O_pen SCR Screenshot...", NULL, gtkui_open_scr,  0, NULL          },
   { "/File/S_ave Screen as SCR...", NULL, gtkui_save_scr,   0, NULL          },
 #ifdef USE_LIBPNG
@@ -367,14 +370,14 @@ gtkui_delete( GtkWidget *widget GCC_UNUSED, GdkEvent *event GCC_UNUSED,
 static void
 gtkui_open( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
-  char *filename;
+  char *filename; libspectrum_id_t type;
 
   fuse_emulation_pause();
 
-  filename = gtkui_fileselector_get_filename( "Fuse - Load Snapshot" );
+  filename = gtkui_fileselector_get_filename( "Fuse - Open Spectrum File" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  snapshot_read( filename );
+  utils_open_file( filename, settings_current.auto_load, &type );
 
   free( filename );
 

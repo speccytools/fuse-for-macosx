@@ -27,6 +27,10 @@
 #ifndef FUSE_UTILS_H
 #define FUSE_UTILS_H
 
+#include <libspectrum.h>
+
+int utils_open_file( const char *filename, int autoload,
+		     libspectrum_id_t *type );
 int utils_find_lib( const char *filename );
 int utils_read_file( const char *filename, unsigned char **buffer,
 		     size_t *length );
