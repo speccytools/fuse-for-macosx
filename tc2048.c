@@ -46,7 +46,7 @@
 static DWORD tc2048_contend_delay( void );
 
 spectrum_port_info tc2048_peripherals[] = {
-  { 0x00e0, 0x0000, joystick_kempston_read, joystick_kempston_write },
+  { 0x00e0, 0x0000, joystick_kempston_read, spectrum_port_nowrite },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write }, /* TS2040/Alphacom printer */
 

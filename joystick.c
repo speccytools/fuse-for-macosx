@@ -54,9 +54,3 @@ BYTE joystick_kempston_read(WORD port)
 
   return return_value;
 }
-
-
-void joystick_kempston_write(WORD port, BYTE b)
-{
-  /* nothing, presumably... */
-}
