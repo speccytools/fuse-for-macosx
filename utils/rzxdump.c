@@ -250,7 +250,7 @@ read_input_block( unsigned char **ptr, unsigned char *end )
 
     printf( "Examining frame %d\n", i );
     
-    if( end - *ptr < 8 ) {
+    if( end - *ptr < 4 ) {
       fprintf( stderr, "%s: Not enough data for frame %d\n", progname, i );
       return 1;
     }
