@@ -34,11 +34,10 @@
 static libspectrum_error
 rzx_read_header( const libspectrum_byte **ptr, const libspectrum_byte *end );
 static libspectrum_error
+rzx_read_creator( const libspectrum_byte **ptr, const libspectrum_byte *end );
+static libspectrum_error
 rzx_read_input( libspectrum_rzx *rzx,
 		const libspectrum_byte **ptr, const libspectrum_byte *end );
-static libspectrum_error
-rzx_read_frames( libspectrum_rzx *rzx,
-		 const libspectrum_byte **ptr, const libspectrum_byte *end );
 
 static libspectrum_error
 rzx_write_header( libspectrum_byte **buffer, libspectrum_byte **ptr,
@@ -117,11 +116,31 @@ libspectrum_rzx_read( libspectrum_rzx *rzx, const libspectrum_byte *buffer,
   error = rzx_read_header( &ptr, end );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  error = rzx_read_input( rzx, &ptr, end );
-  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+  while( ptr < end ) {
 
-  error = rzx_read_frames( rzx, &ptr, end );
-  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+    libspectrum_byte id;
+
+    id = *ptr++;
+
+    switch( id ) {
+
+    case LIBSPECTRUM_RZX_CREATOR_BLOCK:
+      error = rzx_read_creator( &ptr, end );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+      break;
+
+    case LIBSPECTRUM_RZX_INPUT_BLOCK:
+      error = rzx_read_input( rzx, &ptr, end );
+      if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+      break;
+
+    default:
+      libspectrum_print_error(
+        "libspectrum_rzx_read: unknown RZX block ID 0x%02x\n", id
+      );
+      return LIBSPECTRUM_ERROR_UNKNOWN;
+    }
+  }
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -151,9 +170,41 @@ rzx_read_header( const libspectrum_byte **ptr, const libspectrum_byte *end )
 }
 
 static libspectrum_error
+rzx_read_creator( const libspectrum_byte **ptr, const libspectrum_byte *end )
+{
+  size_t length;
+
+  /* Check we've got enough data for the block */
+  if( end - (*ptr) < 28 ) {
+    libspectrum_print_error(
+      "rzx_read_creator: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get the length */
+  length = (*ptr)[0] + 0x100 * (*ptr)[1];
+
+  /* Check there's still enough data (the -1 is because we've already read
+     the block ID) */
+  if( end - (*ptr) < length - 1 ) {
+    libspectrum_print_error(
+      "rzx_read_creator: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  (*ptr) += length - 1;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
 rzx_read_input( libspectrum_rzx *rzx,
 		const libspectrum_byte **ptr, const libspectrum_byte *end )
 {
+  size_t i,j;
+
   /* Check we've got enough data for the block */
   if( end - (*ptr) < 18 ) {
     libspectrum_print_error(
@@ -162,16 +213,8 @@ rzx_read_input( libspectrum_rzx *rzx,
     return LIBSPECTRUM_ERROR_CORRUPT;
   }
 
-  /* Check the block ID */
-  if( **ptr != 0x80 ) {
-    libspectrum_print_error(
-      "rzx_read_input: wrong block ID 0x%02x\n", (int)**ptr
-    );
-    return LIBSPECTRUM_ERROR_CORRUPT;
-  }
-
-  /* Skip some stuff */
-  (*ptr) += 5;
+  /* Skip the length */
+  (*ptr) += 4;
 
   /* Frame size is undefined, so just skip it */
   (*ptr)++;
@@ -205,22 +248,13 @@ rzx_read_input( libspectrum_rzx *rzx,
   /* Skip flags */
   (*ptr) += 4;
 
-  return LIBSPECTRUM_ERROR_NONE;
-}
-
-static libspectrum_error
-rzx_read_frames( libspectrum_rzx *rzx,
-		 const libspectrum_byte **ptr, const libspectrum_byte *end )
-{
-  size_t i,j;
-
-  /* And read it in */
+  /* And read in the frames */
   for( i=0; i < rzx->count; i++ ) {
 
     /* Check the two length bytes exist */
     if( end - (*ptr) < 4 ) {
       libspectrum_print_error(
-	"rzx_read_frames: not enough data in buffer\n"
+	"rzx_read_input: not enough data in buffer\n"
       );
       for( j=0; j<i; j++ ) {
 	free( rzx->frames[j].in_bytes );
@@ -234,7 +268,7 @@ rzx_read_frames( libspectrum_rzx *rzx,
 
     if( (*ptr) - end < rzx->frames[i].count ) {
       libspectrum_print_error(
-	"rzx_read_frames: not enough data in buffer\n"
+	"rzx_read_input: not enough data in buffer\n"
       );
       for( j=0; j<i; j++ ) {
 	free( rzx->frames[j].in_bytes );
@@ -248,7 +282,7 @@ rzx_read_frames( libspectrum_rzx *rzx,
 				 sizeof( libspectrum_byte ) );
     if( rzx->frames[i].in_bytes == NULL ) {
       libspectrum_print_error(
-	"rzx_read_frames: out of memory\n"
+	"rzx_read_input: out of memory\n"
       );
       for( j=0; j<i; j++ ) {
 	free( rzx->frames[j].in_bytes );

@@ -31,6 +31,13 @@
 #include "libspectrum.h"
 #endif			/* #ifndef LIBSPECTRUM_LIBSPECTRUM_H */
 
+typedef enum libspectrum_rzx_block_t {
+
+  LIBSPECTRUM_RZX_CREATOR_BLOCK = 0x10,
+  LIBSPECTRUM_RZX_INPUT_BLOCK = 0x80,
+
+} libspectrum_rzx_block_t;
+
 typedef struct libspectrum_rzx_frame_t {
 
   size_t instructions;
