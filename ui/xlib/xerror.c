@@ -24,9 +24,16 @@
 
 */
 
+#include <config.h>
+
+#ifdef UI_X			/* Use this iff we're using Xlib */
+
+#include <stdarg.h>
 #include <stdio.h>
 
 #include <X11/Xlib.h>
+
+#include "fuse.h"
 
 /* Are we expecting an X error to occur? */
 int xerror_expecting;
@@ -55,3 +62,20 @@ xerror_handler( Display *display, XErrorEvent *error )
 
   return 0;
 }
+
+int
+ui_error( const char *format, ... )
+{
+  va_list ap;
+  
+  va_start( ap, format );
+
+   fprintf( stderr, "%s: ", fuse_progname );
+  vfprintf( stderr, format, ap );
+
+  va_end( ap );
+
+  return 0;
+}
+
+#endif				/* #ifdef UI_X */

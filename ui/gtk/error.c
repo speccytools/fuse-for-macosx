@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
+
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -81,3 +83,4 @@ int ui_error( const char *format, ... )
   return 0;
 }
   
+#endif			/* #ifdef UI_GTK */
