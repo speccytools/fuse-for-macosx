@@ -619,9 +619,12 @@ FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch,
   while (height--) {
     int i;
 
-    B = C = *(p - nextlineSrc);
-    E = *(p - 1); F = *(p);
-    H = I = *(p + nextlineSrc);
+    B = *(p - 1 - nextlineSrc);
+    E = *(p - 1);
+    H = *(p - 1 + nextlineSrc);
+    C = *(p - nextlineSrc);
+    F = *(p);
+    I = *(p + nextlineSrc);
 
     for (i = 0; i < width; ++i) {
       p++;
@@ -658,9 +661,13 @@ FUNCTION( scaler_AdvMame3x )( BYTE *srcPtr, DWORD srcPitch,
   while (height--) {
     int i;
 
-    B = C = *(p - nextlineSrc);
-    E = *(p - 1); F = *(p);
-    H = I = *(p + nextlineSrc);
+    B = *(p - 1 - nextlineSrc);
+    E = *(p - 1);
+    H = *(p - 1 + nextlineSrc);
+    C = *(p - nextlineSrc);
+    F = *(p);
+    I = *(p + nextlineSrc);
+
     for (i = 0; i < width; ++i) {
       p++;
       /* A = B; */ B = C; C = *(p - nextlineSrc);
