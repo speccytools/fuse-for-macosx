@@ -121,7 +121,7 @@ static int ay_change_count;
 
 
 
-void sound_ay_init(void)
+static void sound_ay_init(void)
 {
 int f;
 double v;

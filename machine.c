@@ -204,7 +204,8 @@ int machine_allocate_roms( machine_info *machine, size_t count )
   return 0;
 }
 
-int machine_read_rom( machine_info *machine, int number, char* filename )
+int machine_read_rom( machine_info *machine, size_t number,
+		      const char* filename )
 {
   int fd;
 
@@ -282,7 +283,7 @@ int machine_end( void )
 
 static int machine_free_machine( machine_info *machine )
 {
-  int i;
+  size_t i;
 
   char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
 
@@ -291,7 +292,8 @@ static int machine_free_machine( machine_info *machine )
     /* FIXME: should carry the length through properly */
     if( munmap( machine->roms[i], 0x4000 ) == -1 ) {
       snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
-		"%s: couldn't munmap ROM %d", fuse_progname, i );
+		"%s: couldn't munmap ROM %lu",
+		fuse_progname, (unsigned long)i );
       perror( error_message );
       return 1;
     }

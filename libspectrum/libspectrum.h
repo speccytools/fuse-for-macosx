@@ -123,7 +123,7 @@ typedef struct libspectrum_snap {
 int libspectrum_snap_initalise( libspectrum_snap *snap );
 int libspectrum_snap_destroy( libspectrum_snap *snap );
 
-char* libspectrum_error_message( libspectrum_error error );
+const char* libspectrum_error_message( libspectrum_error error );
 
 int libspectrum_split_to_48k_pages( libspectrum_snap *snap,
 				    const uchar* data );

@@ -65,19 +65,19 @@ int event_init(void)
 }
 
 /* Add an event at the correct place in the event list */
-int event_add(DWORD tstates, int type)
+int event_add(DWORD event_time, int type)
 {
   event_t *ptr;
 
   ptr=(event_t*)malloc(sizeof(event_t));
   if(!ptr) return 1;
 
-  ptr->tstates=tstates;
+  ptr->tstates= event_time;
   ptr->type=type;
 
   event_list=g_slist_insert_sorted(event_list,(gpointer)ptr,event_add_cmp);
 
-  if(tstates<event_next_event) event_next_event = tstates;
+  if(tstates<event_next_event) event_next_event = event_time;
 
   return 0;
 }
@@ -129,9 +129,9 @@ int event_do_events(void)
 }
 
 /* Called on interrupt to reduce T-state count of all entries */
-int event_interrupt(DWORD tstates)
+int event_interrupt( DWORD tstates_per_frame )
 {
-  g_slist_foreach(event_list,event_reduce_tstates,&tstates);
+  g_slist_foreach(event_list, event_reduce_tstates, &tstates_per_frame );
   return 0;
 }
 
@@ -139,9 +139,9 @@ int event_interrupt(DWORD tstates)
 void event_reduce_tstates(gpointer data,gpointer user_data)
 {
   event_t *ptr=(event_t*)data;
-  DWORD *tstates=(DWORD*)user_data;
+  DWORD *tstates_per_frame = (DWORD*)user_data;
 
-  ptr->tstates -= (*tstates) ;
+  ptr->tstates -= (*tstates_per_frame) ;
 }
 
 /* Clear the event stack */

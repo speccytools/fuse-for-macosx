@@ -98,7 +98,8 @@ void machine_set_timings( machine_info *machine, DWORD hz,
 			  WORD lines_per_frame, DWORD first_line);
 
 int machine_allocate_roms( machine_info *machine, size_t count );
-int machine_read_rom( machine_info *machine, int number, char* filename );
+int machine_read_rom( machine_info *machine, size_t number,
+		      const char* filename );
 
 int machine_end( void );
 

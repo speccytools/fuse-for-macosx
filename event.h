@@ -50,13 +50,13 @@ DWORD event_next_event;
 int event_init(void);
 
 /* Add an event at the correct place in the event list */
-int event_add(DWORD tstates, int type);
+int event_add(DWORD event_time, int type);
 
 /* Do all events which have passed */
 int event_do_events(void);
 
 /* Called on interrupt to reduce T-state count of all entries */
-int event_interrupt(DWORD tstates);
+int event_interrupt( DWORD tstates_per_frame );
 
 /* Clear the event stack */
 int event_reset(void);

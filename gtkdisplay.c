@@ -45,7 +45,8 @@ static unsigned long colours[16];
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int gtkdisplay_current_size=1;
 
-static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours);
+static int gtkdisplay_allocate_colours( int numColours,
+					unsigned long *pixel_values );
 static void gtkdisplay_area(int x, int y, int width, int height);
 static int gtkdisplay_configure_notify(int width, int height);
 
@@ -79,13 +80,14 @@ int uidisplay_init(int width, int height)
   return 0;
 }
 
-static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
+static int gtkdisplay_allocate_colours( int numColours,
+					unsigned long *pixel_values )
 {
   GdkColor gdk_colours[16];
   GdkColormap *current_map;
   gboolean success[16];
 
-  char *colour_names[] = {
+  const char *colour_names[] = {
     "black",
     "blue3",
     "red3",
@@ -137,7 +139,7 @@ static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
     gtk_widget_set_colormap( gtkui_window, current_map );
   }
 
-  for(i=0;i<16;i++) colours[i]=gdk_colours[i].pixel;
+  for(i=0;i<16;i++) pixel_values[i] = gdk_colours[i].pixel;
 
   return 0;
 

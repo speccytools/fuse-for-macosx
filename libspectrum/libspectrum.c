@@ -49,7 +49,7 @@ int libspectrum_snap_destroy( libspectrum_snap *snap )
   return LIBSPECTRUM_ERROR_NONE;
 }
 
-char* libspectrum_error_message( libspectrum_error error )
+const char* libspectrum_error_message( libspectrum_error error )
 {
   switch( error ) {
   case LIBSPECTRUM_ERROR_NONE:

@@ -41,7 +41,7 @@ static struct sigaction timer_old_handler;
 
 static void timer_setup_timer(void);
 static void timer_setup_handler(void);
-void timer_signal(int signal);
+void timer_signal( int signo );
 
 int timer_init(void)
 {
@@ -70,7 +70,7 @@ static void timer_setup_handler(void)
   sigaction(SIGALRM,&handler,&timer_old_handler);
 }  
 
-void timer_signal(int signal)
+void timer_signal( int signo )
 {
   timer_count++;
 }

@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 #include "spec128.h"
+#include "specplus2.h"
 #include "spectrum.h"
 
 /* The +2 emulation just uses the 128K routines */
