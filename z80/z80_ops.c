@@ -904,8 +904,10 @@ void z80_do_opcodes()
       break;
     case 0xc0:		/* RET NZ */
       tstates+=5;
-      if(PC==0x056c) { tape_trap(); }
-      else if( ! ( F & FLAG_Z ) ) { tstates+=6; RET(); }
+      if(PC==0x056c) {
+	if( tape_trap() == 0 ) break;
+      }
+      if( ! ( F & FLAG_Z ) ) { tstates+=6; RET(); }
       break;
     case 0xc1:		/* POP BC */
       tstates+=10;

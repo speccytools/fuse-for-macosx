@@ -24,89 +24,265 @@
 
 #include <config.h>
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+#ifdef HAVE_LIB_GLIB		/* If we're using glib */
+#include <glib.h>
+#else				/* #ifdef HAVE_LIB_GLIB */
+#include "myglib.h"		/* If not, use the local replacement */
+#endif
+
+#include "fuse.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 
-FILE *tape_file=0;
+/* The list of tape blocks */
+static GSList* tape_block_list;
 
-int tape_trap(void)
+/* The current tape block */
+static GSList* tape_block_pointer;
+
+#define ERROR_MESSAGE_MAX_LENGTH 1024
+
+static int tape_buffer_to_block_list( GSList **block_list_ptr,
+				      const unsigned char *buffer,
+				      const size_t length );
+static int tape_block_list_clear( GSList **block_list_ptr );
+static void tape_free_entry( gpointer data, gpointer user_data );
+
+int tape_init( void )
 {
-  BYTE parity,*buffer,*ptr; WORD i; int load;
+  tape_block_list = NULL;
+  return 0;
+}
 
-  buffer=(BYTE*)malloc(0x10000*sizeof(BYTE));
-  if(!buffer) return 2;
-  ptr=buffer;
+int tape_open( const char *filename )
+{
+  struct stat file_info; int fd; unsigned char *buffer;
 
-  if(!tape_file) return 1;
+  int error; char error_message[ ERROR_MESSAGE_MAX_LENGTH ];
 
-  load= ( F_ & FLAG_C );
+  /* If we already have a tape file open, close it */
+  if( tape_block_list ) {
+    error = tape_close();
+    if( error ) return error;
+  }
 
-  /* All returns made via the RET at the #05E2 */
-  PC=0x5e2;
+  fd = open( filename, O_RDONLY );
+  if( fd == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: couldn't open `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
 
-  i=fgetc(tape_file)+0x100*fgetc(tape_file);
+  if( fstat( fd, &file_info) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't stat `%s'", fuse_progname, filename );
+    perror( error_message );
+    close(fd);
+    return 1;
+  }
+
+  buffer = mmap( 0, file_info.st_size, PROT_READ, MAP_SHARED, fd, 0 );
+  if( buffer == (void*)-1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't mmap `%s'", fuse_progname, filename );
+    perror( error_message );
+    close(fd);
+    return 1;
+  }
+
+  if( close(fd) ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't close `%s'", fuse_progname, filename );
+    perror( error_message );
+    munmap( buffer, file_info.st_size );
+    return 1;
+  }
+
+  error = tape_buffer_to_block_list( &tape_block_list, buffer,
+				     file_info.st_size );
+  if( error ) {
+    fprintf( stderr, "%s: error from tape_buffer_to_block_list: %d\n",
+	     fuse_progname, error );
+    munmap( buffer, file_info.st_size );
+    return error;
+  }
+
+  if( munmap( buffer, file_info.st_size ) == -1 ) {
+    snprintf( error_message, ERROR_MESSAGE_MAX_LENGTH,
+	      "%s: Couldn't munmap `%s'", fuse_progname, filename );
+    perror( error_message );
+    return 1;
+  }
+
+  /* Current block is the first block on the tape */
+  tape_block_pointer = tape_block_list;
+
+  return 0;
+
+}
+
+static int tape_buffer_to_block_list( GSList **block_list_ptr,
+				      const unsigned char *buffer,
+				      const size_t length )
+{
+  const unsigned char *ptr, *end;
+
+  tape_block_t *block_ptr;
+
+  ptr = buffer; end = buffer + length;
+
+  while( ptr < end ) {
+
+    /* If we've got less than two bytes for the length, something's
+       gone wrong, so gone home */
+    if( ( end - ptr ) < 2 ) {
+      tape_block_list_clear( block_list_ptr );
+      return 1;
+    }
+
+    /* Get memory for a new block */
+    block_ptr = (tape_block_t*)malloc( sizeof( tape_block_t ) );
+    if( block_ptr == NULL ) return 1;
+
+    /* Get the length of the next block, and move along */
+    block_ptr->length = ptr[0] + ptr[1] * 0x100; ptr += 2;
+
+    /* Have we got enough bytes left in buffer? */
+    if( ( end - ptr ) < block_ptr->length ) {
+      tape_block_list_clear( block_list_ptr );
+      free( block_ptr );
+      return 1;
+    }
+
+    /* Allocate memory for the data */
+    block_ptr->data = (unsigned char*)malloc( block_ptr->length *
+					      sizeof( unsigned char ) );
+    if( block_ptr->data == NULL ) {
+      tape_block_list_clear( block_list_ptr );
+      return 1;
+    }
+
+    /* Copy the block data across, and move along */
+    memcpy( block_ptr->data, ptr, block_ptr->length );
+    ptr += block_ptr->length;
+
+    /* And put it into the block list */
+    *(block_list_ptr) = g_slist_append( (*block_list_ptr),
+					(gpointer)block_ptr );
+
+  }
+
+  return 0;
+
+}
+
+/* Close the active tape file */
+int tape_close( void )
+{
+  int error;
+
+  error = tape_block_list_clear( &tape_block_list );
+  if( error ) return error;
+
+  return 0;
+}
+
+/* Free all the memory used by a block list */
+static int tape_block_list_clear( GSList **block_list_ptr )
+{
+  g_slist_foreach( *(block_list_ptr), tape_free_entry, NULL );
+  g_slist_free( *(block_list_ptr) );
+
+  *(block_list_ptr) = NULL;
   
+  return 0;
+}
+
+/* Free the memory used by a specific entry */
+static void tape_free_entry( gpointer data, gpointer user_data )
+{
+  tape_block_t *ptr = (tape_block_t*)data;
+  free(ptr);
+}
+
+/* Load the next tape block into memory */
+int tape_trap( void )
+{
+  tape_block_t *current_block;
+
+  int loading;			/* Load (true) or verify (false) */
+  BYTE parity, *ptr;
+
+  int i;
+
+  fprintf( stderr, "tape_trap()\n" );
+
+  if( tape_block_list == NULL ) return 1;
+
+  current_block = (tape_block_t*)(tape_block_pointer->data);
+
+  /* We've done this block; move onto the next one. If we hit the end
+     of the tape, loop back to the start */
+  tape_block_pointer = tape_block_pointer->next;
+  if( tape_block_pointer == NULL ) tape_block_pointer = tape_block_list;
+
+  /* All returns made via the RET at #05E2 */
+  PC = 0x05e2;
+
   /* If the block's too short, give up and go home (with carry reset
      to indicate error */
-  if(i<DE) { 
-    fseek(tape_file,i,SEEK_CUR);
+  if( current_block->length < DE ) { 
     F = ( F & ~FLAG_C );
-    free(buffer);
     return 0;
   }
-    
-  fread(buffer,i,1,tape_file);
-  if(feof(tape_file) || ferror(tape_file) ) {
-    fclose(tape_file); tape_file=0;
-    F = ( F & ~FLAG_C );
-    free(buffer);
-    return 3;
-  }
 
-  parity=*ptr;
+  ptr = current_block->data;
+  parity = *ptr;
 
   /* If the flag byte does not match, reset carry and return */
-  if( *ptr++ != A_ ) { F = ( F & ~FLAG_C ); free(buffer); return 0; }
+  if( *ptr++ != A_ ) {
+    F = ( F & ~FLAG_C );
+    return 0;
+  }
 
-  if(load) {
-    for(i=0;i<DE;i++) { writebyte(IX+i,*ptr); parity^=*ptr++; }
+  /* Loading or verifying determined by the carry flag of F' */
+  loading = ( F_ & FLAG_C );
+
+  if( loading ) {
+    for( i=0; i<DE; i++ ) {
+      writebyte( IX+i, *ptr );
+      parity ^= *ptr++;
+    }
   } else {		/* verifying */
-    for(i=0;i<DE;i++) {
-      parity^=*ptr;
-      if(*ptr++!=readbyte(IX+i)) {
+    for( i=0; i<DE; i++) {
+      parity ^= *ptr;
+      if( *ptr++ != readbyte(IX+i) ) {
 	F = ( F & ~FLAG_C );
-	free(buffer);
 	return 0;
       }
     }
   }
 
   /* If the parity byte does not match, reset carry and return */
-  if(*ptr++!=parity) {
+  if( *ptr++ != parity ) {
     F = ( F & ~FLAG_C );
-    free(buffer);
     return 0;
   }
 
   /* Else return with carry set */
   F |= FLAG_C;
 
-  free(buffer);
-
   return 0;
 
-}
-
-int tape_open( const char *filename )
-{
-  if(tape_file) fclose(tape_file);
-
-  tape_file=fopen( filename, "rb" );
-
-  return !tape_file;
 }

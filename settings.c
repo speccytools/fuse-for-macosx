@@ -46,6 +46,7 @@ int settings_init( void )
 int settings_defaults( settings_info *settings )
 {
   settings->issue2 = 0;
+  settings->tape_traps = 1;
 
   return 0;
 }

@@ -25,7 +25,18 @@
 #ifndef FUSE_TAPE_H
 #define FUSE_TAPE_H
 
+typedef struct tape_block_t {
+  
+  unsigned char *data;
+  size_t length;
+
+} tape_block_t;
+
+int tape_init( void );
+
 int tape_open( const char *filename );
-int tape_trap(void);
+int tape_close( void );
+
+int tape_trap( void );
 
 #endif

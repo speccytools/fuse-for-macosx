@@ -32,6 +32,7 @@
 #include "event.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "spectrum.h"
@@ -84,6 +85,10 @@ static int fuse_init(int argc, char **argv)
   fuse_show_copyright();
 
   fuse_progname=argv[0];
+  
+  if( settings_init() ) return 1;
+
+  if( tape_init() ) return 1;
 
   if(display_init(&argc,&argv)) return 1;
   if(event_init()) return 1;

@@ -60,11 +60,12 @@ static gint gtkui_delete(GtkWidget *widget, GdkEvent *event,
 			      gpointer data);
 static void gtkui_open(GtkWidget *widget, gpointer data);
 static void gtkui_save(GtkWidget *widget, gpointer data);
-static void gtkui_tape(GtkWidget *widget, gpointer data);
 static void gtkui_quit(GtkWidget *widget, gpointer data);
 static void gtkui_options( GtkWidget *widget, gpointer data );
 static void gtkui_reset(GtkWidget *widget, gpointer data);
 static void gtkui_switch(GtkWidget *widget, gpointer data);
+static void gtkui_tape_open( GtkWidget *widget, gpointer data );
+static void gtkui_tape_play( GtkWidget *widget, gpointer data );
 
 static void gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data );
 
@@ -75,20 +76,21 @@ static void gtkui_fileselector_cancel( GtkButton *button, gpointer user_data );
 static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data );
 
 static GtkItemFactoryEntry gtkui_menu_data[] = {
-  { "/File",		     NULL , NULL,          0, "<Branch>"    },
-  { "/File/_Open Snapshot" , "F3" , gtkui_open,    0, NULL          },
-  { "/File/_Save Snapshot" , "F2" , gtkui_save,    0, NULL          },
-  { "/File/separator1",      NULL , NULL,          0, "<Separator>" },
-  { "/File/Open _Tape File", "F7" , gtkui_tape,    0, NULL          },
-  { "/File/separator2",      NULL , NULL,          0, "<Separator>" },
-  { "/File/E_xit",	     "F10", gtkui_quit,    0, NULL          },
-  { "/Options",		     NULL , NULL,          0, "<Branch>"    },
-  { "/Options/_General",     "F4",  gtkui_options, 0, NULL	    },
-  { "/Machine",		     NULL , NULL,          0, "<Branch>"    },
-  { "/Machine/_Reset",	     "F5" , gtkui_reset,   0, NULL          },
-  { "/Machine/_Switch",      "F9" , gtkui_switch,  0, NULL          },
+  { "/File",		     NULL , NULL,            0, "<Branch>"    },
+  { "/File/_Open Snapshot" , "F3" , gtkui_open,      0, NULL          },
+  { "/File/_Save Snapshot" , "F2" , gtkui_save,      0, NULL          },
+  { "/File/separator",       NULL , NULL,            0, "<Separator>" },
+  { "/File/E_xit",	     "F10", gtkui_quit,      0, NULL          },
+  { "/Options",		     NULL , NULL,            0, "<Branch>"    },
+  { "/Options/_General",     "F4" , gtkui_options,   0, NULL          },
+  { "/Machine",		     NULL , NULL,            0, "<Branch>"    },
+  { "/Machine/_Reset",	     "F5" , gtkui_reset,     0, NULL          },
+  { "/Machine/_Switch",      "F9" , gtkui_switch,    0, NULL          },
+  { "/Tape",                 NULL , NULL,            0, "<Branch>"    },
+  { "/Tape/_Open",	     "F7" , gtkui_tape_open, 0, NULL          },
+  { "/Tape/_Play",	     "F8" , gtkui_tape_play, 0, NULL          },
 };
-static guint gtkui_menu_data_size = 12;
+static guint gtkui_menu_data_size = 13;
   
 int ui_init(int *argc, char ***argv, int width, int height)
 {
@@ -247,23 +249,6 @@ static void gtkui_save(GtkWidget *widget, gpointer data)
   fuse_emulation_unpause();
 }
 
-/* Called by the menu when File/Tape selected */
-static void gtkui_tape(GtkWidget *widget, gpointer data)
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename = gtkui_fileselector_get_filename();
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  tape_open( filename );
-
-  free( filename );
-
-  fuse_emulation_unpause();
-}
-
 /* Called by the menu when File/Exit selected */
 static void gtkui_quit(GtkWidget *widget, gpointer data)
 {
@@ -273,7 +258,9 @@ static void gtkui_quit(GtkWidget *widget, gpointer data)
 typedef struct gtkui_options_info {
 
   GtkWidget *dialog;
+
   GtkWidget *issue2;
+  GtkWidget *tape_traps;
 
 } gtkui_options_info;
 
@@ -296,12 +283,20 @@ static void gtkui_options( GtkWidget *widget, gpointer data )
   gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.issue2 ),
 				settings_current.issue2 );
 
+  dialog.tape_traps =
+    gtk_check_button_new_with_label( "Use tape loading traps" );
+  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.tape_traps ),
+				settings_current.tape_traps );
+
   ok_button = gtk_button_new_with_label( "OK" );
   cancel_button = gtk_button_new_with_label( "Cancel" );
 
   /* Put everything into the dialog box */
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
 		     dialog.issue2 );
+  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
+		     dialog.tape_traps );
+
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
 		     ok_button );
   gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
@@ -339,6 +334,41 @@ static void gtkui_reset(GtkWidget *widget, gpointer data)
 static void gtkui_switch(GtkWidget *widget, gpointer data)
 {
   machine_select_next();
+}
+
+/* Called by the menu when Tape/Open selected */
+static void gtkui_tape_open( GtkWidget *widget, gpointer data )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = gtkui_fileselector_get_filename();
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  tape_open( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+/* Called by the menu when Tape/Play selected */
+static void gtkui_tape_play( GtkWidget *widget, gpointer data )
+{
+  /* If tape traps active, do nothing */
+  if( settings_current.tape_traps ) return;
+
+  /* For now, just return anyway... */
+  return;
+
+  /* Otherwise, toggle whether the tape is playing or not */
+/*    if( tape_playing() ) { */
+/*      tape_stop(); */
+/*    } else { */
+/*      tape_play(); */
+/*    } */
+
 }
 
 /* Generic `tidy-up' callback */
@@ -421,6 +451,9 @@ static void gtkui_options_done( GtkCheckButton *issue2, gpointer user_data )
 
   settings_current.issue2 =
     gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->issue2 ) );
+
+  settings_current.tape_traps =
+    gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( ptr->tape_traps ) );
 
   gtk_widget_destroy( ptr->dialog );
 

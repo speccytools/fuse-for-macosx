@@ -32,11 +32,13 @@
 typedef struct settings_info {
 
   int issue2;		/* Issue 2 keyboard emulation? */
+  int tape_traps;	/* Use tape loading traps? */
 
 } settings_info;
 
 extern settings_info settings_current;
 
+int settings_init( void );
 int settings_defaults( settings_info *settings );
 
 #endif				/* #ifndef FUSE_SETTINGS_H */
