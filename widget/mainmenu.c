@@ -37,16 +37,18 @@
 int widget_mainmenu_draw( void )
 {
   /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 2 );
+  widget_dialog_with_border( 1, 2, 30, 4 );
 
-  widget_printstring( 2, 2, WIDGET_COLOUR_FOREGROUND,
+  widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Main menu" );
+
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND,
 		      "General (o)ptions" );
 
-  widget_printstring( 2, 3, WIDGET_COLOUR_FOREGROUND,
+  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND,
 		      "(T)ape control" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 32 );
 
   return 0;
 }

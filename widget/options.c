@@ -53,9 +53,12 @@ int widget_options_draw( void )
   if( error ) return error;
 
   /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 4 );
+  widget_dialog_with_border( 1, 2, 30, 6 );
   error = widget_options_show_all( &settings );
   if( error ) return error;
+
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
+		   DISPLAY_BORDER_HEIGHT + 16 + 48 );
 
   return 0;
 
@@ -78,8 +81,7 @@ static int widget_options_show_all( settings_info *settings )
 {
   int error;
 
-  /* Blank the main display area */
-  widget_dialog( 1, 2, 30, 4 );
+  widget_printstring( 9, 2, WIDGET_COLOUR_FOREGROUND, "General Options" );
 
   error = widget_options_print_option( 0, "Issue (2) emulation",
 				       settings->issue2 );
@@ -97,9 +99,6 @@ static int widget_options_show_all( settings_info *settings )
 				       settings->stereo_ay );
   if( error ) return error;
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
-
   return 0;
 }
 
@@ -112,21 +111,21 @@ static int widget_options_print_option( int number, const char* string,
   strcat( buffer, " : " );
   strcat( buffer, value ? " On" : "Off" );
 
-  widget_printstring( 2, number+2, WIDGET_COLOUR_FOREGROUND, buffer );
+  widget_printstring( 2, number+4, WIDGET_COLOUR_FOREGROUND, buffer );
 
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+2)*8,
-		   DISPLAY_BORDER_HEIGHT + (number+3)*8  );
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
+		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
 
   return 0;
 }
 
 static int widget_options_print_value( int number, int value )
 {
-  widget_rectangle( 27*8, (number+2)*8, 24, 8, WIDGET_COLOUR_BACKGROUND );
-  widget_printstring( 27, number+2, WIDGET_COLOUR_FOREGROUND,
+  widget_rectangle( 27*8, (number+4)*8, 24, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 27, number+4, WIDGET_COLOUR_FOREGROUND,
 		      value ? " On" : "Off" );
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+2)*8,
-		   DISPLAY_BORDER_HEIGHT + (number+3)*8  );
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
+		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
   return 0;
 }
 

@@ -38,15 +38,17 @@
 int widget_tape_draw( void )
 {
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, 2 );
+  widget_dialog_with_border( 1, 2, 30, 4 );
 
-  widget_printstring( 2, 2, WIDGET_COLOUR_FOREGROUND,
+  widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Tape Control" );
+
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND,
 		      "(C)lear tape" );
-  widget_printstring( 2, 3, WIDGET_COLOUR_FOREGROUND,
+  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND,
 		      "(R)ewind tape" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
+		   DISPLAY_BORDER_HEIGHT + 16 + 32 );
 
   return 0;
 }
