@@ -33,6 +33,7 @@
 #include "snapshot.h"
 #include "specplus3.h"
 #include "tape.h"
+#include "ui/scaler/scaler.h"
 #include "widget_internals.h"
 
 /* FIXME: there must be a better way of initialising all the menu data */
@@ -132,7 +133,8 @@ static widget_menu_widget_t options_general = { WIDGET_TYPE_GENERAL, NULL };
 static widget_menu_widget_t options_sound   = { WIDGET_TYPE_SOUND,   NULL };
 static widget_menu_widget_t options_rzx     = { WIDGET_TYPE_RZX,     NULL };
 static widget_menu_widget_t options_roms    = { WIDGET_TYPE_ROM,     NULL };
-static widget_menu_widget_t options_scaler  = { WIDGET_TYPE_SCALER,  NULL };
+static widget_menu_widget_t options_scaler  = { WIDGET_TYPE_SCALER,
+						scaler_is_supported       };
 
 static widget_menu_entry widget_menu_options[] = {
   { "Options", 0, 0, NULL },		/* Menu title */

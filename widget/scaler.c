@@ -45,32 +45,47 @@
 static int highlight_line;
 static char descriptions[SCALER_NUM][40];
 
+/* The available scalers */
+static ui_scaler_available available;
+static int scaler_count;
 static int scaler[SCALER_NUM];
 
 /* Scaler type we're going to switch to */
 int new_scaler;
 
-int widget_scaler_draw( void* data GCC_UNUSED )
+int
+widget_scaler_draw( void *data )
 {
   int i, j;
 
+  /* Store our scaler availiablity function */
+  if( data ) available = data;
+
+  scaler_count = 0;
+  for( i = 0; i < SCALER_NUM; i++ ) {
+    if( available( i ) ) {
+
+      scaler[ scaler_count ] = i;
+
+      snprintf( descriptions[ scaler_count ], 40, "(%c): %s",
+		((char)scaler_count)+'A', scaler_name( i ) );
+      descriptions[ scaler_count ][ 28 ] = '\0';
+
+      scaler_count++;
+    }
+    
+  }
+
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, scalers_registered+2 );
+  widget_dialog_with_border( 1, 2, 30, scaler_count + 2 );
 
   widget_printstring( 8, 2, WIDGET_COLOUR_FOREGROUND, "Select Scaler" );
 
   j = 0;
 
   for( i=0; i<SCALER_NUM; i++ ) {
-    if(!scaler_is_supported(i)) continue;
+    if( !available( i ) ) continue;
 
-    scaler[j] = i;
-
-    snprintf( descriptions[j], 40, "(%c): %s",
-	      ((char)j)+'A',
-        scaler_name( i ) );
-    descriptions[j][ 28 ] = '\0';
-    
     if( current_scaler == i ) {
       highlight_line = j;
       widget_rectangle( 2*8, (j+4)*8, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
@@ -82,7 +97,7 @@ int widget_scaler_draw( void* data GCC_UNUSED )
     j++;
   }
 
-  widget_display_lines( 2, scalers_registered + 2 );
+  widget_display_lines( 2, scaler_count + 2 );
 
   return 0;
 }
@@ -110,7 +125,7 @@ widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
   }
 
   if( key >= KEYBOARD_a && key <= KEYBOARD_z &&
-      key - KEYBOARD_a < (ptrdiff_t)SCALER_NUM ) {
+      key - KEYBOARD_a < (ptrdiff_t)scaler_count ) {
     
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
@@ -126,7 +141,7 @@ widget_scaler_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
     widget_printstring( 2, highlight_line+4, WIDGET_COLOUR_BACKGROUND,
 			descriptions[ highlight_line ] );
 
-    widget_display_lines( 2, scalers_registered + 2 );
+    widget_display_lines( 2, scaler_count + 2 );
 
     /* And set this as the new machine type */
     new_scaler = scaler[highlight_line];
@@ -140,7 +155,6 @@ int widget_scaler_finish( widget_finish_state finished )
   if( finished == WIDGET_FINISHED_OK &&
       current_scaler != new_scaler ) {
     if( scaler_select_scaler( new_scaler ) ) return 1;
-    uidisplay_hotswap_gfx_mode();
   }
 
   if( finished == WIDGET_FINISHED_OK ) widget_end_all( WIDGET_FINISHED_OK );
