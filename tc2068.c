@@ -121,8 +121,12 @@ tc2068_read_screen_memory( WORD offset )
 DWORD
 tc2068_contend_memory( WORD address )
 {
-  /* Contention occurs only in the lowest 16Kb of RAM */
+  int chunk = ADDR_TO_CHUNK(address);
+
+  /* Contention occurs only in the lowest 16Kb of RAM in the HOME bank */
   if( address < 0x4000 || address > 0x7fff ) return 0;
+
+  if( timex_memory[chunk].page != timex_home[chunk].page ) return 0;
 
   return tc2068_contend_delay();
 }
