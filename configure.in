@@ -24,7 +24,7 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.4.0)
+AM_INIT_AUTOMAKE(fuse, 0.4.1pre1)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -43,7 +43,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(scandir setitimer)
+AC_CHECK_FUNCS(getopt_long)
 
 dnl Check sizes of various types; second parameter is a `default' for
 dnl cross-compiling. Will obviously break everything if this is wrong...

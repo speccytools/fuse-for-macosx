@@ -1,5 +1,5 @@
 /* settings.c: Handling configuration settings
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001-2 Philip Kendall
 
    $Id$
 
@@ -26,9 +26,12 @@
 
 #include <config.h>
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef HAVE_GETOPT_LONG
+#include <getopt.h>
+#endif				/* #ifdef HAVE_GETOPT_LONG */
 
 #include "fuse.h"
 #include "settings.h"
@@ -72,10 +75,21 @@ static int settings_command_line( int argc, char **argv,
 				  settings_info *settings )
 {
 
+#ifndef HAVE_GETOPT_LONG
+
+    struct option {
+      const char *name;
+      int has_arg;
+      int *flag;
+      int val;
+    }
+
+#endif				/* #ifndef HAVE_GETOPT_LONG */
+
   struct option long_options[] = {
 
-    {          "help", 0, &(settings->show_help), 1 },
-    {       "version", 0, &(settings->show_version), 1 },
+    {      "snapshot", 1, NULL, 's' },
+    {          "tape", 1, NULL, 't' },
 
     {        "issue2", 0, &(settings->issue2), 1 },
     {     "no-issue2", 0, &(settings->issue2), 0 },
@@ -89,15 +103,22 @@ static int settings_command_line( int argc, char **argv,
     {         "traps", 0, &(settings->tape_traps), 1 },
     {      "no-traps", 0, &(settings->tape_traps), 0 },
 
-    {      "snapshot", 1, NULL, 's' },
-    {          "tape", 1, NULL, 't' },
+    {          "help", 0, NULL, 'h' },
+    {       "version", 0, NULL, 'V' },
 
     { 0, 0, 0, 0 }		/* End marker: DO NOT REMOVE */
   };
 
   while( 1 ) {
 
-    int c = getopt_long( argc, argv, "", long_options, NULL );
+    struct option *ptr;
+    int c;
+
+#ifdef HAVE_GETOPT_LONG
+    c = getopt_long( argc, argv, "ho:s:t:V", long_options, NULL );
+#else				/* #ifdef HAVE_GETOPT_LONG */
+    c = getopt( argc, argv, "ho:s:t:V" );
+#endif				/* #ifdef HAVE_GETOPT_LONG */
 
     if( c == -1 ) break;	/* End of option list */
 
@@ -105,14 +126,26 @@ static int settings_command_line( int argc, char **argv,
 
     case 0: break;	/* Used for long option returns */
 
+    case 'o':
+      for( ptr = long_options; ptr->name; ptr++ ) {
+	
+	if( ptr->flag == NULL ) continue;
+
+	if( ! strcmp( optarg, ptr->name ) ) {
+	  *(ptr->flag) = ptr->val;
+	  break;
+	}
+      }
+      break;
+
+    case 'h': settings->show_help = 1; break;
+
     case 's': settings->snapshot = optarg; break;
     case 't': settings->tape_file = optarg; break;
 
-    case ':':
-      fprintf( stderr, "%s: missing parameter on command line\n",
-	       fuse_progname );
-      break;
+    case 'V': settings->show_version = 1; break;
 
+    case ':':
     case '?':
       break;
 
