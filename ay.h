@@ -29,9 +29,11 @@
 
 #include <libspectrum.h>
 
+#define AY_REGISTERS 16
+
 typedef struct ayinfo {
   int current_register;
-  libspectrum_byte registers[16];
+  libspectrum_byte registers[ AY_REGISTERS ];
 } ayinfo;
 
 libspectrum_byte ay_registerport_read( libspectrum_word port, int *attached );

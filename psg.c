@@ -32,10 +32,10 @@
 /* Are we currently recording a .psg file? */
 int psg_recording;
 
-static libspectrum_byte psg_register_values[16];
+static libspectrum_byte psg_register_values[ AY_REGISTERS ];
 
 /* booleans to indicate the registers written to in this frame */
-static int psg_registers_written[16];
+static int psg_registers_written[ AY_REGISTERS ];
 
 /* number of prior frames with no AY events */
 static int psg_empty_frame_count;
@@ -72,7 +72,7 @@ psg_start_recording( const char *filename )
   for( i = 0; i < 12; i++ ) putc( 0, psg_file );
 
   /* begin with no registers written */
-  for( i = 0; i < 16; i++ ) psg_registers_written[i] = 0;
+  for( i = 0; i < AY_REGISTERS; i++ ) psg_registers_written[i] = 0;
 
   psg_empty_frame_count = 1;
 
@@ -150,7 +150,7 @@ psg_frame( void )
 
   }
 
-  for( i = 0; i < 16; i++ ) psg_registers_written[i] = 0;
+  for( i = 0; i < AY_REGISTERS; i++ ) psg_registers_written[i] = 0;
   return 0;
 }
 

@@ -34,7 +34,7 @@
 
 /* Unused bits in the AY registers are silently zeroed out; these masks
    accomplish this */
-static const libspectrum_byte mask[16] = {
+static const libspectrum_byte mask[ AY_REGISTERS ] = {
 
   0xff, 0x0f, 0xff, 0x0f, 0xff, 0x0f, 0x1f, 0xff,
   0x1f, 0x1f, 0x1f, 0xff, 0xff, 0x0f, 0xff, 0xff,
@@ -108,7 +108,7 @@ ay_from_snapshot( libspectrum_snap *snap, int capabilities )
     ay_registerport_write( 0xfffd,
 			   libspectrum_snap_out_ay_registerport( snap ) );
 
-    for( i = 0; i < 16; i++ ) {
+    for( i = 0; i < AY_REGISTERS; i++ ) {
       machine_current->ay.registers[i] =
 	libspectrum_snap_ay_registers( snap, i );
       sound_ay_write( i, machine_current->ay.registers[i], 0 );
@@ -128,7 +128,7 @@ ay_to_snapshot( libspectrum_snap *snap )
     snap, machine_current->ay.current_register
   );
 
-  for( i = 0; i < 16; i++ )
+  for( i = 0; i < AY_REGISTERS; i++ )
     libspectrum_snap_set_ay_registers( snap, i,
 				       machine_current->ay.registers[i] );
 
