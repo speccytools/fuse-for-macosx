@@ -148,6 +148,9 @@ static int numfiles;
 static char **filenames;
 
 #ifndef HAVE_SCANDIR
+
+/* FIXME: memory leaks on failure */
+
 int scandir( const char *dir, struct dirent ***namelist,
 	     int (*select)(const struct dirent *),
 	     int (*compar)(const struct dirent *, const struct dirent*))
@@ -274,7 +277,10 @@ int widget_end( void )
 
 /* Widget timer routines */
 
-/* FIXME: race conditions */
+/* FIXME: * race conditions.
+          * Do I really need a signal function here, or can I just ignore it?
+	    Re-read Stevens.
+*/
 
 static struct sigaction widget_timer_old_handler;
 static struct itimerval widget_timer_old_timer;
@@ -318,6 +324,8 @@ static int widget_timer_end( void )
 }
 
 /* File selection widget */
+
+/* FIXME: memory leak when a new directory is selected */
 
 /* The number of the filename in the top-left corner of the current
    display, that of the filename which the `cursor' is on, and that
@@ -462,6 +470,7 @@ static int widget_print_all_filenames( char **filenames, int n,
   return 0;
 }
 
+/* Print a filename onto the dialog box */
 static int widget_print_filename( char *filename, int position, int colour )
 {
   char buffer[14];
