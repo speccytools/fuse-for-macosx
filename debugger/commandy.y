@@ -57,7 +57,7 @@ void yyerror( char *s );
 %token		 CONTINUE
 %token		 DELETE
 %token		 DISASSEMBLE
-%token		 EXIT
+%token		 FINISH
 %token		 IGNORE
 %token		 NEXT
 %token		 PORT
@@ -129,7 +129,7 @@ command:   BASE NUMBER { debugger_output_base = $2; }
 	 | DELETE { debugger_breakpoint_remove_all(); }
 	 | DELETE NUMBER { debugger_breakpoint_remove( $2 ); }
 	 | DISASSEMBLE NUMBER { ui_debugger_disassemble( $2 ); }
-	 | EXIT	    { debugger_breakpoint_exit(); }
+	 | FINISH   { debugger_breakpoint_exit(); }
 	 | IGNORE NUMBER NUMBER { debugger_breakpoint_ignore( $2, $3 ); }
 	 | NEXT	    { debugger_next(); }
 	 | SET REGISTER NUMBER { debugger_register_set( $2, $3 ); }
