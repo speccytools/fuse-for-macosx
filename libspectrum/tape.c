@@ -136,6 +136,21 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
   return LIBSPECTRUM_ERROR_NONE;
 }
 
+/* The timings for the standard ROM loader */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_PILOT = 2168; /* Pilot */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC1 =  667; /* Sync 1 */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC2 =  735; /* Sync 2 */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA0 =  855; /* Reset */
+const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA1 = 1710; /* Set */
+
+/* The number of pilot pulses for the standard ROM loader
+   NB: These disagree with the .tzx specification (they're one less), but
+       are correct. Entering the loop at #04D8 in the 48K ROM with HL == #0001
+       will produce the first sync pulse, not a pilot pulse.
+*/
+const size_t LIBSPECTRUM_TAPE_PILOTS_HEADER = 0x1f7f;
+const size_t LIBSPECTRUM_TAPE_PILOTS_DATA   = 0x0c97;
+
 static libspectrum_error
 rom_edge( libspectrum_tape_rom_block *block, libspectrum_dword *tstates,
 	  int *end_of_block )
@@ -182,8 +197,8 @@ rom_edge( libspectrum_tape_rom_block *block, libspectrum_dword *tstates,
 
   case LIBSPECTRUM_TAPE_STATE_PAUSE:
     /* The pause at the end of the block */
-    *tstates = block->pause * 69888; /* FIXME: should vary with tstates per
-					frame */
+    *tstates = (block->pause * 69888)/50; /* FIXME: should vary with tstates
+					     per frame */
     *end_of_block = 1;
     break;
 

@@ -34,6 +34,7 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
 {
   libspectrum_tape_block *block;
   libspectrum_tape_rom_block *rom_block;
+  libspectrum_error error;
 
   const libspectrum_byte *ptr, *end;
 
@@ -79,10 +80,22 @@ libspectrum_tap_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
     memcpy( rom_block->data, ptr, rom_block->length );
     ptr += rom_block->length;
 
+    /* Give a 1s pause after each block */
+    rom_block->pause = 1000;
+
     /* Finally, put the block into the block list */
     tape->blocks = g_slist_append( tape->blocks, (gpointer)rom_block );
 
   }
+
+  /* And we're pointing to the first block */
+  tape->current_block = tape->blocks;
+
+  /* Which we should then initialise */
+  error = libspectrum_tape_init_block(
+            (libspectrum_tape_block*)tape->current_block->data
+          );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   return LIBSPECTRUM_ERROR_NONE;
 }

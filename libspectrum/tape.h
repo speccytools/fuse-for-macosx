@@ -80,19 +80,19 @@ typedef struct libspectrum_tape_rom_block {
 } libspectrum_tape_rom_block;
 
 /* The timings for the standard ROM loader */
-const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_PILOT = 2168; /* Pilot */
-const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC1 =  667; /* Sync 1 */
-const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC2 =  735; /* Sync 2 */
-const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA0 =  855; /* Reset */
-const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA1 = 1710; /* Set */
+extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_PILOT; /* Pilot */
+extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC1; /* Sync 1 */
+extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_SYNC2; /* Sync 2 */
+extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA0; /* Reset bit */
+extern const libspectrum_dword LIBSPECTRUM_TAPE_TIMING_DATA1; /* Set bit */
 
 /* The number of pilot pulses for the standard ROM loader
    NB: These disagree with the .tzx specification (they're one less), but
        are correct. Entering the loop at #04D8 in the 48K ROM with HL == #0001
        will produce the first sync pulse, not a pilot pulse.
 */
-const size_t LIBSPECTRUM_TAPE_PILOTS_HEADER = 0x1f7f;
-const size_t LIBSPECTRUM_TAPE_PILOTS_DATA   = 0x0c97;
+extern const size_t LIBSPECTRUM_TAPE_PILOTS_HEADER;
+extern const size_t LIBSPECTRUM_TAPE_PILOTS_DATA;
 
 /* A generic tape block */
 typedef struct libspectrum_tape_block {
