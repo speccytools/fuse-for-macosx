@@ -29,6 +29,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -39,7 +40,7 @@
 #include "uidisplay.h"
 #include "widget.h"
 
-struct dirent **widget_filenames; /* Filenames in the current
+struct widget_dirent **widget_filenames; /* Filenames in the current
 					    directory */
 size_t widget_numfiles;	  /* The number of files in the current
 			     directory */
@@ -50,28 +51,27 @@ size_t widget_numfiles;	  /* The number of files in the current
 static int top_left_file, current_file, new_current_file;
 
 static void widget_scan( char *dir );
-static int widget_select_file(const struct dirent *dirent);
-static int widget_scan_compare( const void *a, const void *b );
+static int widget_select_file( const struct dirent *dirent );
+static int widget_scan_compare( const widget_dirent **a,
+				const widget_dirent **b );
 
 static char* widget_getcwd( void );
-static int widget_print_all_filenames( struct dirent **filenames, int n,
+static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 				       int top_left, int current );
-static int widget_print_filename( struct dirent *filename, int position,
+static int widget_print_filename( struct widget_dirent *filename, int position,
 				  int inverted );
 static void widget_selectfile_keyhandler( int key );
 
-#ifndef HAVE_SCANDIR
-
-int scandir( const char *dir, struct dirent ***namelist,
-	     int (*select)(const struct dirent *),
-	     int (*compar)(const struct dirent *,const struct dirent*))
+int widget_scandir( const char *dir, struct widget_dirent ***namelist,
+		    int (*select)(const struct dirent*) )
 {
   DIR *directory; struct dirent *dirent;
 
   int allocated, number;
   int i;
 
-  (*namelist) = (struct dirent**)malloc( 32 * sizeof(struct dirent*) );
+  (*namelist) =
+    (struct widget_dirent**)malloc( 32 * sizeof(struct widget_dirent*) );
   if( *namelist == NULL ) return -1;
 
   allocated = 32; number = 0;
@@ -91,7 +91,10 @@ int scandir( const char *dir, struct dirent ***namelist,
       if( errno == 0 ) {	/* End of directory */
 	break;
       } else {
-	for( i=0; i<number; i++ ) free( (*namelist)[number] );
+	for( i=0; i<number; i++ ) {
+	  free( (*namelist)[i]->name );
+	  free( (*namelist)[i] );
+	}
 	free( *namelist );
 	*namelist = NULL;
 	closedir( directory );
@@ -102,13 +105,16 @@ int scandir( const char *dir, struct dirent ***namelist,
     if( select( dirent ) ) {
 
       if( ++number > allocated ) {
-	struct dirent **oldptr = *namelist;
+	struct widget_dirent **oldptr = *namelist;
 
-	(*namelist)=
-	  (struct dirent**)realloc( (*namelist),
-				    2 * allocated * sizeof(struct dirent*) );
+	(*namelist) = (struct widget_dirent**)realloc(
+	  (*namelist), 2 * allocated * sizeof(struct widget_dirent*)
+	);
 	if( *namelist == NULL ) {
-	  for( i=0; i<number-1; i++ ) free( (*namelist)[number] );
+	  for( i=0; i<number-1; i++ ) {
+	    free( oldptr[i]->name );
+	    free( oldptr[i] );
+	  }
 	  free( oldptr );
 	  closedir( directory );
 	  return -1;
@@ -116,73 +122,92 @@ int scandir( const char *dir, struct dirent ***namelist,
 	allocated *= 2;
       }
 
-      (*namelist)[number-1] = (struct dirent*)malloc( sizeof(struct dirent) );
+      (*namelist)[number-1] =
+	(struct widget_dirent*)malloc( sizeof(struct widget_dirent) );
       if( (*namelist)[number-1] == NULL ) {
-	for( i=0; i<number-1; i++ ) free( (*namelist)[number] );
+	for( i=0; i<number-1; i++ ) {
+	  free( (*namelist)[i]->name );
+	  free( (*namelist)[i] );
+	}
 	free( *namelist );
+	*namelist = NULL;
+	closedir( directory );
 	return -1;
       }
 
-      memcpy( (*namelist)[number-1], dirent, sizeof(struct dirent) );
+      (*namelist)[number-1]->name =
+	(char*)malloc( strlen(dirent->d_name)+1 * sizeof(char) );
+      if( (*namelist)[number-1]->name == NULL ) {
+	free( (*namelist)[number-1] );
+	for( i=0; i<number-1; i++ ) {
+	  free( (*namelist)[i]->name );
+	  free( (*namelist)[i] );
+	}
+	free( *namelist );
+      }
+
+      strcpy( (*namelist)[number-1]->name, dirent->d_name );
 
     }
 
   }
 
   if( closedir( directory ) ) {
-    for( i=0; i<number; i++ ) free( (*namelist)[number] );
+    for( i=0; i<number; i++ ) {
+      free( (*namelist)[i]->name );
+      free( (*namelist)[i] );
+    }
     free( *namelist );
     *namelist = NULL;
     return -1;
   }
 
-  if( compar != NULL ) { 
-    qsort( (*namelist), number, sizeof(struct dirent*),
-	   (int(*)(const void*,const void*))compar );
-  }
-
   return number;
 
 }
-#endif				/* #ifndef HAVE_SCANDIR */
 
 static void widget_scan( char *dir )
 {
-  size_t i;
+  struct stat file_info;
 
+  size_t i; int error;
+  
   /* Free the memory belonging to the files in the previous directory */
-  for( i=0; i<widget_numfiles; i++ ) free( widget_filenames[i] );
+  for( i=0; i<widget_numfiles; i++ ) {
+    free( widget_filenames[i]->name );
+    free( widget_filenames[i] );
+  }
 
-  widget_numfiles = scandir( dir, &widget_filenames,
-			     widget_select_file, widget_scan_compare );
+  widget_numfiles = widget_scandir( dir, &widget_filenames,
+				    widget_select_file );
+  if( widget_numfiles == -1 ) return;
+
+  for( i=0; i<widget_numfiles; i++ ) {
+    error = stat( widget_filenames[i]->name, &file_info );
+    widget_filenames[i]->mode = error ? 0 : file_info.st_mode;
+  }
+
+  qsort( widget_filenames, widget_numfiles, sizeof(struct widget_dirent*),
+	 (int(*)(const void*,const void*))widget_scan_compare );
+
 }
 
 static int widget_select_file(const struct dirent *dirent){
   return( dirent->d_name && strcmp( dirent->d_name, "." ) );
 }
 
-static int widget_scan_compare( const void *a, const void *b )
+static int widget_scan_compare( const struct widget_dirent **a,
+				const struct widget_dirent **b )
 {
-  const char *name1 = (*(const struct dirent**)a)->d_name;
-  const char *name2 = (*(const struct dirent**)b)->d_name;
+  int isdir1 = S_ISDIR( (*a)->mode ),
+      isdir2 = S_ISDIR( (*b)->mode );
 
-  struct stat file_info;
-  int isdir1, isdir2;
-
-  int error;
-
-  error = stat( name1, &file_info ); if( error ) return 0;
-  isdir1 = S_ISDIR( file_info.st_mode );
-  
-  error = stat( name2, &file_info ); if( error ) return 0;
-  isdir2 = S_ISDIR( file_info.st_mode );
-  
   if( isdir1 && !isdir2 ) {
     return -1;
   } else if( isdir2 && !isdir1 ) {
     return 1;
   } else {
-    return strcmp( name1, name2 );
+    return strcmp( (*a)->name, (*b)->name );
   }
 
 }
@@ -287,7 +312,7 @@ const char* widget_selectfile( void )
 
   /* Now return, either with a filename or without as appropriate */
   if( widget_finished == WIDGET_FINISHED_OK ) {
-    return widget_filenames[ current_file ]->d_name;
+    return widget_filenames[ current_file ]->name;
   } else {
     return NULL;
   }
@@ -326,7 +351,7 @@ static char* widget_getcwd( void )
   return directory;
 }
 
-static int widget_print_all_filenames( struct dirent **filenames, int n,
+static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 				       int top_left, int current )
 {
   int i;
@@ -358,7 +383,7 @@ static int widget_print_all_filenames( struct dirent **filenames, int n,
 }
 
 /* Print a filename onto the dialog box */
-static int widget_print_filename( struct dirent *filename, int position,
+static int widget_print_filename( struct widget_dirent *filename, int position,
 				  int inverted )
 {
   char buffer[14];
@@ -374,7 +399,7 @@ static int widget_print_filename( struct dirent *filename, int position,
 
   widget_rectangle( 8 * x, 8 * y, 8 * 13, 8, background );
 
-  strncpy( buffer, filename->d_name, 13 ); buffer[13] = '\0';
+  strncpy( buffer, filename->name, 13 ); buffer[13] = '\0';
   widget_printstring( x, y, foreground, buffer );
 
   return 0;
@@ -393,18 +418,22 @@ static void widget_selectfile_keyhandler( int key )
     break;
   
   case KEYBOARD_5:		/* Left */
+  case KEYBOARD_h:
     if( current_file > 0                 ) new_current_file--;
     break;
 
   case KEYBOARD_6:		/* Down */
+  case KEYBOARD_j:
     if( current_file < widget_numfiles-2 ) new_current_file += 2;
     break;
 
   case KEYBOARD_7:		/* Up */
+  case KEYBOARD_k:
     if( current_file > 1                 ) new_current_file -= 2;
     break;
 
   case KEYBOARD_8:		/* Right */
+  case KEYBOARD_l:
     if( current_file < widget_numfiles-1 ) new_current_file++;
     break;
 
@@ -417,7 +446,7 @@ static void widget_selectfile_keyhandler( int key )
     }
     ptr = fn;
     fn = realloc( fn,
-       ( strlen(fn) + 1 + strlen( widget_filenames[ current_file ]->d_name ) +
+       ( strlen(fn) + 1 + strlen( widget_filenames[ current_file ]->name ) +
 	 1 ) * sizeof(char)
     );
     if( fn == NULL ) {
@@ -425,7 +454,7 @@ static void widget_selectfile_keyhandler( int key )
       widget_finished = WIDGET_FINISHED_CANCEL;
       return;
     }
-    strcat( fn, "/" ); strcat( fn, widget_filenames[ current_file ]->d_name );
+    strcat( fn, "/" ); strcat( fn, widget_filenames[ current_file ]->name );
 			
     if(chdir(fn)==-1) {
       if(errno==ENOTDIR) {

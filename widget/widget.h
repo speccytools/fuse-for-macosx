@@ -63,9 +63,14 @@ int widget_dialog_with_border( int x, int y, int width, int height );
 
 /* File selector */
 
+typedef struct widget_dirent {
+  int mode;
+  char *name;
+} widget_dirent;
+
 const char* widget_selectfile(void);
 
-struct dirent **widget_filenames;
+struct widget_dirent **widget_filenames;
 size_t widget_numfiles;
 
 /* Options dialog */

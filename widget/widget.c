@@ -167,7 +167,10 @@ int widget_end( void )
   int i;
 
   if( widget_filenames ) {
-    for( i=0; i<widget_numfiles; i++) free( widget_filenames[i] );
+    for( i=0; i<widget_numfiles; i++) {
+      free( widget_filenames[i]->name );
+      free( widget_filenames[i] );
+    }
     free( widget_filenames );
   }
 
