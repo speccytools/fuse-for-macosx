@@ -1,5 +1,5 @@
 /* tape-widget.c: Widget for tape-related actions
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001,2002 Philip Kendall
 
    $Id$
 
@@ -42,9 +42,9 @@ int widget_tape_draw( void )
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Tape Control" );
 
   widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen tape" );
-  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(P)lay tape" );
-  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(C)lear tape" );
-  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(R)ewind tape" );
+  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(P)lay tape" ); 
+  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(R)ewind tape" );
+  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(C)lear tape" );
   widget_printstring( 2, 8, WIDGET_COLOUR_FOREGROUND,
 		      "(W)rite tape to 'tape.tzx'" );
 

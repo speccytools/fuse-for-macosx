@@ -1,5 +1,5 @@
 /* snapshot-widget.c: Widget for snapshot-related actions
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001,2002 Philip Kendall
 
    $Id$
 
@@ -41,7 +41,7 @@ int widget_snapshot_draw( void )
 
   widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Snapshot Menu" );
 
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(L)oad snapshot" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(O)pen snapshot" );
   widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND,
 		      "(S)ave to 'snapshot.z80'" );
 
@@ -59,7 +59,7 @@ void widget_snapshot_keyhandler( int key )
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     break;
 
-  case KEYBOARD_l:
+  case KEYBOARD_o:
     widget_do( WIDGET_TYPE_FILESELECTOR );
     if( widget_filesel_name ) snapshot_read( widget_filesel_name );
     break;

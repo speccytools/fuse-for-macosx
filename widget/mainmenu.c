@@ -1,5 +1,5 @@
 /* mainmenu.c: Main menu widget
-   Copyright (c) 2001 Philip Kendall
+   Copyright (c) 2001,2002 Philip Kendall
 
    $Id$
 
@@ -40,10 +40,10 @@ int widget_mainmenu_draw( void )
 
   widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Main menu" );
 
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(S)napshot menu" );
-  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "General (o)ptions" );
-  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(M)achine control" );
-  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(T)ape control" );
+  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(F)ile" );
+  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "(O)ptions" );
+  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(M)achine" );
+  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(T)ape" );
   widget_printstring( 2, 8, WIDGET_COLOUR_FOREGROUND, "(K)eyboard picture" );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
@@ -60,6 +60,10 @@ void widget_mainmenu_keyhandler( int key )
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     break;
 
+  case KEYBOARD_f:
+    widget_do( WIDGET_TYPE_SNAPSHOT );
+    break;
+
   case KEYBOARD_k:
     widget_do( WIDGET_TYPE_PICTURE );
     break;
@@ -70,10 +74,6 @@ void widget_mainmenu_keyhandler( int key )
 
   case KEYBOARD_o:
     widget_do( WIDGET_TYPE_OPTIONS );
-    break;
-
-  case KEYBOARD_s:
-    widget_do( WIDGET_TYPE_SNAPSHOT );
     break;
 
   case KEYBOARD_t:
