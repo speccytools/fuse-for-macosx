@@ -24,7 +24,7 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.5.0pre1)
+AM_INIT_AUTOMAKE(fuse, 0.5.0pre2)
 
 dnl Checks for programs.
 AC_PROG_CC
