@@ -68,8 +68,6 @@ static int sound_stereo_ay=0;	/* local copy of settings_current.stereo_ay */
 static int sound_stereo_beeper=0;   /* and settings_current.stereo_beeper */
 
 
-#define AY_CLOCK		1773400
-
 /* assume all three tone channels together match the beeper volume (ish).
  * Must be <=127 for all channels; 50+2+(24*3) = 124.
  */
@@ -155,7 +153,7 @@ ay_tone_subcycles=ay_env_subcycles=0;
 for(f=0;f<3;f++)
   ay_tone_tick[f]=ay_tone_high[f]=0,ay_tone_period[f]=1;
 
-ay_tick_incr=(int)(65536.*AY_CLOCK/sound_freq);
+ay_tick_incr=(int)(65536.*machine_current->timings.ay_hz/sound_freq);
 
 ay_change_count=0;
 }
@@ -243,8 +241,6 @@ if(first_init)
 
   for(f=0;f<2;f++)
     sound_oldval[f]=sound_oldval_orig[f]=128;
-  
-  sound_ay_init();
   }
 
 if(sound_stereo_beeper)
@@ -649,6 +645,9 @@ int f;
 
 /* as above... */
 if(!sound_enabled_ever) return;
+
+/* recalculate timings based on new machines ay clock */
+sound_ay_init();
 
 ay_change_count=0;
 for(f=0;f<16;f++)
