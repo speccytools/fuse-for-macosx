@@ -45,5 +45,6 @@ int tc2048_port_contended( libspectrum_word port );
 
 int tc2068_init( fuse_machine_info *machine );
 libspectrum_byte tc2068_unattached_port( void );
+int tc2068_memory_map( void );
 
 #endif			/* #ifndef FUSE_MACHINES_H */

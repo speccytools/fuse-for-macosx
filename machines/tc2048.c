@@ -40,7 +40,6 @@
 #include "spec48.h"
 
 static int tc2048_reset( void );
-static int tc2048_memory_map( void );
 static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );
 
 const static periph_t peripherals[] = {
@@ -135,7 +134,7 @@ int tc2048_init( fuse_machine_info *machine )
 
   machine->shutdown = NULL;
 
-  machine->memory_map = tc2048_memory_map;
+  machine->memory_map = tc2068_memory_map;
 
   return 0;
 
@@ -158,14 +157,4 @@ tc2048_reset( void )
   memory_screen_mask = 0xdfff;
 
   return spec48_common_reset();
-}
-
-static int
-tc2048_memory_map( void )
-{
-  scld_memory_map();
-
-  memory_romcs_map();
-
-  return 0;
 }

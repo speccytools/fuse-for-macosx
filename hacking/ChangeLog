@@ -824,5 +824,9 @@
 20040517 Makefile.am,fuse.c,machine.c,memory.c,menu.[ch],menu_data.c,
 	 periph.c,settings.dat,zxatasp.[ch],zxcf.[ch],ui/options.dat:
 	 first commit of ZXATASP/ZXCF code. Not working yet.
+20040517 memory.c,menu.h,menu_data.c,zxatasp.[ch],zxcf.c,
+	 machines/{machines.h,spec16.c,spec48.[ch],tc2048.c,tc2068.c},
+	 options.dat: ZXATASP/ZXCF closer to working and some related
+	 tidy-ups.
 20040518 configure.in,acconfig,h: Remove need for acconfig.h for newer
          autotools per patch #953734.

@@ -42,7 +42,6 @@
 
 static int spec16_memory_map( void );
 static int spec16_reset( void );
-static int spec16_memory_map( void );
 
 static libspectrum_byte empty_chunk[ MEMORY_PAGE_SIZE ];
 static memory_page empty_mapping;
@@ -84,7 +83,7 @@ int spec16_init( fuse_machine_info *machine )
 
   machine->shutdown = NULL;
 
-  machine->memory_map = spec16_memory_map;
+  machine->memory_map = spec48_memory_map;
 
   return 0;
 
@@ -122,14 +121,6 @@ spec16_reset( void )
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
-
-  return 0;
-}
-
-static int
-spec16_memory_map( void )
-{
-  memory_romcs_map();
 
   return 0;
 }

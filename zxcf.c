@@ -23,8 +23,11 @@
 
 */
 
-#include "compat.h"
+#include <compat.h>
+
 #include <libspectrum.h>
+
+#include "machine.h"
 #include "memory.h"
 #include "periph.h"
 #include "settings.h"
@@ -56,7 +59,6 @@ const periph_t zxcf_peripherals[] = {
 const size_t zxcf_peripherals_count =
   sizeof( zxcf_peripherals ) / sizeof( periph_t );
 
-static int zxcf_memenable;
 static int zxcf_writeenable;
 
 static libspectrum_ide_channel *zxcf_idechn;
@@ -88,7 +90,6 @@ zxcf_end( void )
 void
 zxcf_reset( void )
 {
-  zxcf_memenable = 1;
   set_zxcf_bank( 0 );
   zxcf_writeenable = 0;
 
@@ -158,7 +159,7 @@ set_zxcf_bank( int bank )
 static libspectrum_byte
 zxcf_memctl_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if ( !settings_current.zxcf_active ) return 0xff;
+  if( !settings_current.zxcf_active ) return 0xff;
 
   *attached = 1;
 
@@ -170,14 +171,16 @@ zxcf_memctl_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   if( !settings_current.zxcf_active ) return;
 
-  // Bit 7 MEMOFF: 0=mem on, 1 =mem off
-  zxcf_memenable = ( data & 0x80 ) ? 0 : 1;
+  /* Bit 7 MEMOFF: 0=mem on, 1 =mem off */
+  machine_current->ram.romcs = ( data & 0x80 ) ? 0 : 1;
 
-  // Bit 6 /MWRPROT: 0=mem protected, 1=mem writable
+  /* Bit 6 /MWRPROT: 0=mem protected, 1=mem writable */
   zxcf_writeenable = ( data & 0x40 ) ? 1 : 0;
   
-  // Bits 5-0: MEMBANK
+  /* Bits 5-0: MEMBANK */
   set_zxcf_bank( data & 0x3f );
+
+  machine_current->memory_map();
 }
 
 static libspectrum_byte

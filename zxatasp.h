@@ -32,8 +32,6 @@
 extern const periph_t zxatasp_peripherals[];
 extern const size_t zxatasp_peripherals_count;
 
-extern int zxatasp_memenable;
-
 int zxatasp_init( void );
 int zxatasp_end( void );
 void zxatasp_reset( void );
@@ -41,26 +39,5 @@ int zxatasp_insert( const char *filename, libspectrum_ide_unit unit );
 int zxatasp_commit( libspectrum_ide_unit unit );
 int zxatasp_eject( libspectrum_ide_unit unit );
 void zxatasp_mem_setcs( void );
-
-/* We're ignoring all mode bits and only emulating mode 0, basic I/O */
-#define MC8255_PORT_C_LOW_IO  0x01
-#define MC8255_PORT_B_IO      0x02
-#define MC8255_PORT_C_HI_IO   0x08
-#define MC8255_PORT_A_IO      0x10
-#define MC8255_SETMODE        0x80
-
-#define ZXATASP_IDE_REG       0x07
-#define ZXATASP_RAM_BANK      0x1f
-#define ZXATASP_IDE_WR        0x08
-#define ZXATASP_IDE_RD        0x10
-#define ZXATASP_IDE_PRIMARY   0x20
-#define ZXATASP_RAM_LATCH     0x40
-#define ZXATASP_RAM_DISABLE   0x80
-#define ZXATASP_IDE_SECONDARY 0x80
-
-#define ZXATASP_READ_PRIMARY( x )     ( ( x & 0x78 ) == 0x30 )
-#define ZXATASP_WRITE_PRIMARY( x )    ( ( x & 0x78 ) == 0x28 )
-#define ZXATASP_READ_SECONDARY( x )   ( ( x & 0xd8 ) == 0x90 )
-#define ZXATASP_WRITE_SECONDARY( x )  ( ( x & 0xd8 ) == 0x88 )
 
 #endif			/* #ifndef FUSE_ZXATASP_H */

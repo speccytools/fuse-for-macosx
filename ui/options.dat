@@ -3,7 +3,6 @@ General Options
 Entry, (E)mulation speed, emulation_speed, INPUT_KEY_e, 3, %
 Entry, F(r)ame rate (1:n), frame_rate, INPUT_KEY_r, 1, frames
 Checkbox, Issue (2) Keyboard, issue2, INPUT_KEY_2
-Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
 Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
 Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
 Checkbox, Use .(s)lt traps, slt_traps, INPUT_KEY_s
@@ -11,12 +10,19 @@ Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w
 Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
 Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
-Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
-Checkbox, Simple (8)-bit IDE, simpleide_active, INPUT_KEY_8
-Checkbox, (Z)XATASP, zxatasp_active, INPUT_KEY_z
-Checkbox, ZXC(F), zxcf_active, INPUT_KEY_f
+
+peripherals
+Peripheral Options
+Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
 Checkbox, (I)nterface II, interface2, INPUT_KEY_i
+Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p
+Checkbox, Simple (8)-bit IDE, simpleide_active, INPUT_KEY_8
+Checkbox, (Z)XATASP interface, zxatasp_active, INPUT_KEY_z
+Checkbox, ZXATASP (u)pload, zxatasp_upload, INPUT_KEY_u
+Checkbox, ZXATASP (w)rite protect, zxatasp_wp, INPUT_KEY_w
+Checkbox, ZX(C)F interface, zxcf_active, INPUT_KEY_c
+Checkbox, ZXCF up(l)oad, zxcf_upload, INPUT_KEY_l
 Posthook, periph_update
 
 rzx

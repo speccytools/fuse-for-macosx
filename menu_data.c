@@ -63,6 +63,7 @@ File/E_xit..., Item, F10
 _Options, Branch
 Options/_General..., Item, F4
 Options/_Sound..., Item
+Options/_Peripherals..., Item
 Options/_RZX..., Item
 
 Options/_Joysticks, Branch
@@ -157,15 +158,11 @@ Media/IDE/ZXATASP/_Slave, Branch
 Media/IDE/ZXATASP/Slave/_Insert..., Item,, menu_media_ide_insert, 4
 Media/IDE/ZXATASP/Slave/_Commit..., Item,, menu_media_ide_commit, 4
 Media/IDE/ZXATASP/Slave/_Eject..., Item,, menu_media_ide_eject, 4
-Media/IDE/ZXATASP/_Upload, Item
-Media/IDE/ZXATASP/_Write protect, Item
 
-Media/IDE/ZX_CF, Branch
-Media/IDE/ZXCF/_CompactFlash, Branch
-Media/IDE/ZXCF/CompactFlash/_Insert..., Item,, menu_media_ide_insert, 5
-Media/IDE/ZXCF/CompactFlash/_Commit..., Item,, menu_media_ide_commit, 5
-Media/IDE/ZXCF/CompactFlash/_Eject..., Item,, menu_media_ide_eject, 5
-Media/IDE/ZXCF/_Upload, Item
+Media/IDE/ZX_CF CompactFlash, Branch
+Media/IDE/ZXCF CompactFlash/_Insert..., Item,, menu_media_ide_insert, 5
+Media/IDE/ZXCF CompactFlash/_Commit..., Item,, menu_media_ide_commit, 5
+Media/IDE/ZXCF CompactFlash/_Eject..., Item,, menu_media_ide_eject, 5
 
 _Help, Branch
 Help/_Keyboard..., Item

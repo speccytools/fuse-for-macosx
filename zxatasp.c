@@ -23,8 +23,10 @@
 
 */
 
-#include "compat.h"
+#include <compat.h>
+
 #include <libspectrum.h>
+
 #include "machine.h"
 #include "memory.h"
 #include "periph.h"
@@ -77,8 +79,6 @@ const periph_t zxatasp_peripherals[] = {
 const size_t zxatasp_peripherals_count =
   sizeof( zxatasp_peripherals ) / sizeof( periph_t );
 
-int zxatasp_memenable;
-
 static libspectrum_byte zxatasp_control;
 static libspectrum_byte zxatasp_portA;
 static libspectrum_byte zxatasp_portB;
@@ -88,6 +88,27 @@ static libspectrum_ide_channel *zxatasp_idechn0;
 static libspectrum_ide_channel *zxatasp_idechn1;
 
 static libspectrum_byte ZXATASPMEM[ 32 ][ 0x4000 ];
+
+/* We're ignoring all mode bits and only emulating mode 0, basic I/O */
+#define MC8255_PORT_C_LOW_IO  0x01
+#define MC8255_PORT_B_IO      0x02
+#define MC8255_PORT_C_HI_IO   0x08
+#define MC8255_PORT_A_IO      0x10
+#define MC8255_SETMODE        0x80
+
+#define ZXATASP_IDE_REG       0x07
+#define ZXATASP_RAM_BANK      0x1f
+#define ZXATASP_IDE_WR        0x08
+#define ZXATASP_IDE_RD        0x10
+#define ZXATASP_IDE_PRIMARY   0x20
+#define ZXATASP_RAM_LATCH     0x40
+#define ZXATASP_RAM_DISABLE   0x80
+#define ZXATASP_IDE_SECONDARY 0x80
+
+#define ZXATASP_READ_PRIMARY( x )     ( ( x & 0x78 ) == 0x30 )
+#define ZXATASP_WRITE_PRIMARY( x )    ( ( x & 0x78 ) == 0x28 )
+#define ZXATASP_READ_SECONDARY( x )   ( ( x & 0xd8 ) == 0x90 )
+#define ZXATASP_WRITE_SECONDARY( x )  ( ( x & 0xd8 ) == 0x88 )
 
 /* Housekeeping functions */
 
@@ -125,7 +146,6 @@ zxatasp_end( void )
 void
 zxatasp_reset( void )
 {
-  zxatasp_memenable = 1;
   set_zxatasp_bank( 0 );
   zxatasp_control = 0x9b;
   zxatasp_resetports();
@@ -296,7 +316,7 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 
   if( newC & ZXATASP_RAM_LATCH ) {
     set_zxatasp_bank( newC & ZXATASP_RAM_BANK );
-    zxatasp_memenable = !( newC & ZXATASP_RAM_DISABLE );
+    machine_current->ram.romcs = !( newC & ZXATASP_RAM_DISABLE );
 
     machine_current->memory_map();
     return;

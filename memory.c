@@ -246,8 +246,7 @@ memory_romcs_map( void )
   /* Nothing changes if /ROMCS is not set */
   if( !machine_current->ram.romcs ) return;
 
-  zxatasp = settings_current.zxatasp_active && zxatasp_memenable &&
-    settings_current.zxatasp_upload;
+  zxatasp = settings_current.zxatasp_active && settings_current.zxatasp_upload;
   zxcf = settings_current.zxcf_active && settings_current.zxcf_upload;
 
   /* If we're not uploading to either the ZXATASP or ZXCF interfaces,

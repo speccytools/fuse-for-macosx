@@ -40,7 +40,6 @@
 #include "spectrum.h"
 
 static int spec48_reset( void );
-static int spec48_memory_map( void );
 
 const static periph_t peripherals[] = {
   { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
@@ -179,9 +178,13 @@ spec48_common_reset( void )
   return 0;
 }
 
-static int
+int
 spec48_memory_map( void )
 {
+  /* By default, 0x0000 to 0x3fff come from the home bank */
+  memory_map_read[0] = memory_map_write[0] = *memory_map_home[0];
+  memory_map_read[1] = memory_map_write[1] = *memory_map_home[1];
+
   memory_romcs_map();
 
   return 0;

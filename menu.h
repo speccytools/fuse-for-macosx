@@ -107,6 +107,7 @@ MENU_CALLBACK( menu_file_savescreenaspng );
 
 MENU_CALLBACK( menu_options_general );
 MENU_CALLBACK( menu_options_sound );
+MENU_CALLBACK( menu_options_peripherals );
 MENU_CALLBACK( menu_options_rzx );
 MENU_CALLBACK( menu_options_joysticks_select );
 

@@ -51,7 +51,6 @@ static libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
 
 static int tc2068_reset( void );
-static int tc2068_memory_map( void );
 
 const static periph_t peripherals[] = {
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
@@ -255,7 +254,7 @@ tc2068_reset( void )
   return 0;
 }
 
-static int
+int
 tc2068_memory_map( void )
 {
   scld_memory_map();
