@@ -191,9 +191,9 @@ int libspectrum_make_room( uchar **dest, size_t requested, uchar **ptr,
 }
 
 /* Write an (LSB) word to buffer */
-int libspectrum_write_word( uchar *buffer, libspectrum_word w )
+int libspectrum_write_word( uchar **buffer, libspectrum_word w )
 {
-  (*buffer++) = w & 0xff;
-  (*buffer  ) = w >> 8;
+  *(*buffer)++ = w & 0xff;
+  *(*buffer)++ = w >> 8;
   return LIBSPECTRUM_ERROR_NONE;
 }

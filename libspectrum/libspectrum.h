@@ -159,7 +159,7 @@ int libspectrum_split_to_48k_pages( libspectrum_snap *snap,
 int libspectrum_make_room( uchar **dest, size_t requested, uchar **ptr,
 			   size_t *allocated );
 
-int libspectrum_write_word( uchar *buffer, libspectrum_word w );
+int libspectrum_write_word( uchar **buffer, libspectrum_word w );
 
 /* .sna specific routines */
 

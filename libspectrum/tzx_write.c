@@ -246,7 +246,7 @@ tzx_write_rom( libspectrum_tape_rom_block *rom_block,
 
   /* Write the ID byte and the pause */
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_ROM;
-  libspectrum_write_word( *ptr, rom_block->pause ); *ptr += 2;
+  libspectrum_write_word( ptr, rom_block->pause );
 
   /* Copy the data across */
   error = tzx_write_bytes( ptr, rom_block->length, 2, rom_block->data );
@@ -269,14 +269,14 @@ tzx_write_turbo( libspectrum_tape_turbo_block *turbo_block,
 
   /* Write the ID byte and the metadata */
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_TURBO;
-  libspectrum_write_word( *ptr, turbo_block->pilot_length ); *ptr += 2;
-  libspectrum_write_word( *ptr, turbo_block->sync1_length ); *ptr += 2;
-  libspectrum_write_word( *ptr, turbo_block->sync2_length ); *ptr += 2;
-  libspectrum_write_word( *ptr, turbo_block->bit0_length  ); *ptr += 2;
-  libspectrum_write_word( *ptr, turbo_block->bit1_length  ); *ptr += 2;
-  libspectrum_write_word( *ptr, turbo_block->pilot_pulses ); *ptr += 2;
+  libspectrum_write_word( ptr, turbo_block->pilot_length );
+  libspectrum_write_word( ptr, turbo_block->sync1_length );
+  libspectrum_write_word( ptr, turbo_block->sync2_length );
+  libspectrum_write_word( ptr, turbo_block->bit0_length  );
+  libspectrum_write_word( ptr, turbo_block->bit1_length  );
+  libspectrum_write_word( ptr, turbo_block->pilot_pulses );
   *(*ptr)++ = turbo_block->bits_in_last_byte;
-  libspectrum_write_word( *ptr, turbo_block->pause        ); *ptr += 2;
+  libspectrum_write_word( ptr, turbo_block->pause        );
 
   /* Copy the data across */
   error = tzx_write_bytes( ptr, turbo_block->length, 3, turbo_block->data );
@@ -297,8 +297,8 @@ tzx_write_pure_tone( libspectrum_tape_pure_tone_block *tone_block,
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_PURE_TONE;
-  libspectrum_write_word( *ptr, tone_block->length ); *ptr += 2;
-  libspectrum_write_word( *ptr, tone_block->pulses ); *ptr += 2;
+  libspectrum_write_word( ptr, tone_block->length );
+  libspectrum_write_word( ptr, tone_block->pulses );
   
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -322,7 +322,7 @@ tzx_write_pulses( libspectrum_tape_pulses_block *pulses_block,
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_PULSES;
   *(*ptr)++ = pulses_block->count;
   for( i=0; i<pulses_block->count; i++ ) {
-    libspectrum_write_word( *ptr, pulses_block->lengths[i] ); *ptr += 2;
+    libspectrum_write_word( ptr, pulses_block->lengths[i] );
   }
   
   return LIBSPECTRUM_ERROR_NONE;
@@ -342,10 +342,10 @@ tzx_write_data( libspectrum_tape_pure_data_block *data_block,
 
   /* Write the ID byte and the metadata */
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_PURE_DATA;
-  libspectrum_write_word( *ptr, data_block->bit0_length  ); *ptr += 2;
-  libspectrum_write_word( *ptr, data_block->bit1_length  ); *ptr += 2;
+  libspectrum_write_word( ptr, data_block->bit0_length  );
+  libspectrum_write_word( ptr, data_block->bit1_length  );
   *(*ptr)++ = data_block->bits_in_last_byte;
-  libspectrum_write_word( *ptr, data_block->pause        ); *ptr += 2;
+  libspectrum_write_word( ptr, data_block->pause        );
 
   /* Copy the data across */
   error = tzx_write_bytes( ptr, data_block->length, 3, data_block->data );
@@ -366,7 +366,7 @@ tzx_write_pause( libspectrum_tape_pause_block *pause_block,
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_PAUSE;
-  libspectrum_write_word( *ptr, pause_block->length ); *ptr += 2;
+  libspectrum_write_word( ptr, pause_block->length );
   
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -408,7 +408,7 @@ tzx_write_jump( libspectrum_tape_jump_block *block,
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_JUMP;
 
   u_offset = block->offset; if( u_offset < 0 ) u_offset += 65536;
-  libspectrum_write_word( *ptr, u_offset ); *ptr += 2;
+  libspectrum_write_word( ptr, u_offset );
   
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -426,7 +426,7 @@ tzx_write_loop_start( libspectrum_tape_loop_start_block *block,
 
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_LOOP_START;
 
-  libspectrum_write_word( *ptr, block->count ); *ptr += 2;
+  libspectrum_write_word( ptr, block->count );
   
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -451,11 +451,11 @@ tzx_write_select( libspectrum_tape_select_block *block,
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_SELECT;
-  libspectrum_write_word( *ptr, total_length ); *ptr += 2;
+  libspectrum_write_word( ptr, total_length );
   *(*ptr)++ = block->count;
 
   for( i=0; i<block->count; i++ ) {
-    libspectrum_write_word( *ptr, block->offsets[i] ); *ptr += 2;
+    libspectrum_write_word( ptr, block->offsets[i] );
     error = tzx_write_string( ptr, block->descriptions[i] );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
   }
@@ -544,7 +544,7 @@ tzx_write_archive_info( libspectrum_tape_archive_info_block *info_block,
 
   /* Write out the metadata */
   *(*ptr)++ = LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO;
-  libspectrum_write_word( *ptr, total_length ); *ptr += 2;
+  libspectrum_write_word( ptr, total_length );
   *(*ptr)++ = info_block->count;
 
   /* And the strings */

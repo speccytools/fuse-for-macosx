@@ -701,23 +701,23 @@ int libspectrum_z80_write_base_header( libspectrum_byte **buffer,
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
   *(*ptr)++ = snap->a; *(*ptr)++ = snap->f;
-  libspectrum_write_word( *ptr, snap->bc  ); *ptr += 2;
-  libspectrum_write_word( *ptr, snap->hl  ); *ptr += 2;
+  libspectrum_write_word( ptr, snap->bc  );
+  libspectrum_write_word( ptr, snap->hl  );
 
-  libspectrum_write_word( *ptr, 0 ); *ptr += 2; /* PC; zero denotes >= v2 */
+  libspectrum_write_word( ptr, 0 ); /* PC; zero denotes >= v2 */
 
-  libspectrum_write_word( *ptr, snap->sp  ); *ptr += 2;
+  libspectrum_write_word( ptr, snap->sp  );
   *(*ptr)++ = snap->i; *(*ptr)++ = ( snap->r & 0x7f );
 
   *(*ptr)++ = ( snap->r >> 7 ) + ( ( snap->out_ula & 0x07 ) << 1 );
 
-  libspectrum_write_word( *ptr, snap->de  ); *ptr += 2;
-  libspectrum_write_word( *ptr, snap->bc_ ); *ptr += 2;
-  libspectrum_write_word( *ptr, snap->de_ ); *ptr += 2;
-  libspectrum_write_word( *ptr, snap->hl_ ); *ptr += 2;
+  libspectrum_write_word( ptr, snap->de  );
+  libspectrum_write_word( ptr, snap->bc_ );
+  libspectrum_write_word( ptr, snap->de_ );
+  libspectrum_write_word( ptr, snap->hl_ );
   *(*ptr)++ = snap->a_; *(*ptr)++ = snap->f_;
-  libspectrum_write_word( *ptr, snap->iy  ); *ptr += 2;
-  libspectrum_write_word( *ptr, snap->ix  ); *ptr += 2;
+  libspectrum_write_word( ptr, snap->iy  );
+  libspectrum_write_word( ptr, snap->ix  );
 
   *(*ptr)++ = snap->iff1 ? 0xff : 0x00;
   *(*ptr)++ = snap->iff2 ? 0xff : 0x00;
@@ -740,9 +740,9 @@ int libspectrum_z80_write_extended_header( libspectrum_byte **buffer,
 				 length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  libspectrum_write_word( *ptr, LIBSPECTRUM_Z80_V3_LENGTH ); *ptr += 2;
+  libspectrum_write_word( ptr, LIBSPECTRUM_Z80_V3_LENGTH );
   
-  libspectrum_write_word( *ptr, snap->pc ); *ptr += 2;
+  libspectrum_write_word( ptr, snap->pc );
 
   switch( snap->machine ) {
   case LIBSPECTRUM_MACHINE_48:
@@ -765,9 +765,8 @@ int libspectrum_z80_write_extended_header( libspectrum_byte **buffer,
   quarter_states = ( snap->machine == LIBSPECTRUM_MACHINE_48 ) ?
     17472 : 17727;
   libspectrum_write_word(
-    *ptr, quarter_states - ( snap->tstates % quarter_states ) - 1
+    ptr, quarter_states - ( snap->tstates % quarter_states ) - 1
   );
-  *ptr += 2;
 
   *(*ptr)++ = ( ( snap->tstates / quarter_states ) + 3 ) % 4;
 
@@ -851,7 +850,7 @@ int libspectrum_z80_write_page( libspectrum_byte **buffer,
     error = libspectrum_make_room( buffer, 3 + 0x4000, ptr, length );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-    libspectrum_write_word( *ptr, 0xffff ); *ptr += 2;
+    libspectrum_write_word( ptr, 0xffff );
     *(*ptr)++ = page_num;
     memcpy( *ptr, page, 0x4000 ); *ptr += 0x4000;
 
@@ -860,7 +859,7 @@ int libspectrum_z80_write_page( libspectrum_byte **buffer,
     libspectrum_make_room( buffer, 3 + compressed_length, ptr, length );
     if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-    libspectrum_write_word( *ptr, compressed_length ); *ptr += 2;
+    libspectrum_write_word( ptr, compressed_length );
     *(*ptr)++ = page_num;
     memcpy( *ptr, compressed, compressed_length ); *ptr += compressed_length;
 
@@ -1019,10 +1018,10 @@ static int libspectrum_z80_write_slt_entry( libspectrum_byte **buffer,
   error = libspectrum_make_room( buffer, 8, ptr, length );
   if( error != LIBSPECTRUM_ERROR_NONE ) return error;
 
-  libspectrum_write_word( *ptr, type );                *ptr += 2;
-  libspectrum_write_word( *ptr, id );                  *ptr += 2;
-  libspectrum_write_word( *ptr, slt_length & 0xffff ); *ptr += 2;
-  libspectrum_write_word( *ptr, slt_length >> 16 );    *ptr += 2;
+  libspectrum_write_word( ptr, type );
+  libspectrum_write_word( ptr, id );
+  libspectrum_write_word( ptr, slt_length & 0xffff );
+  libspectrum_write_word( ptr, slt_length >> 16 );
 
   return LIBSPECTRUM_ERROR_NONE;
 }
