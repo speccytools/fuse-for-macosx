@@ -155,9 +155,6 @@ int ui_event(void)
   XEvent event;
 
   while(XCheckIfEvent(display,&event,xui_trueFunction,NULL)) {
-
-    fprintf( stderr, "Event type: %d\n", event.type );
-
     switch(event.type) {
     case ConfigureNotify:
       xdisplay_configure_notify(event.xconfigure.width,
