@@ -84,13 +84,16 @@ block_free( gpointer data, gpointer user_data )
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     free( block->types.turbo.data );
     break;
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+    free( block->types.group_start.name );
+    break;
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     for( i=0; i<block->types.archive_info.count; i++ ) {
       free( block->types.archive_info.strings[i] );
     }
+    free( block->types.archive_info.ids );
+    free( block->types.archive_info.strings );
     break;
-  default:
-    /* Do nothing */
   }
 }
 
@@ -105,6 +108,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
     return turbo_init( &(block->types.turbo) );
 
   /* These blocks need no initialisation */
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     return LIBSPECTRUM_ERROR_NONE;
 
@@ -171,6 +175,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
 
   /* For blocks which contain no Spectrum-readable data, return zero
      tstates and end of block set so we instantly get the next block */
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     *tstates = 0; end_of_block = 1;
     break;
@@ -411,6 +416,9 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
     strncpy( buffer, "Turbo Speed Data Block", length );
+    break;
+  case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+    strncpy( buffer, "Group Start Block", length );
     break;
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
     strncpy( buffer, "Archive Info Block", length );

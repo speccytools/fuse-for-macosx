@@ -148,6 +148,10 @@ main( int argc, char **argv )
       printf("  Pause length: %d ms\n", turbo_block->pause );
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+      printf("  Name: %s\n", block->types.group_start.name );
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       info_block = &(block->types.archive_info);
       for( i=0; i<info_block->count; i++ ) {
@@ -165,7 +169,7 @@ main( int argc, char **argv )
 	case 255: printf("   Comment:"); break;
 	 default: printf("(Unknown string): "); break;
 	}
-	printf(" `%s'\n", info_block->strings[i] );
+	printf(" %s\n", info_block->strings[i] );
       }
       break;
 

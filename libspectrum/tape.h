@@ -47,6 +47,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_ROM = 0x10,
   LIBSPECTRUM_TAPE_BLOCK_TURBO,
 
+  LIBSPECTRUM_TAPE_BLOCK_GROUP_START = 0x21,
+
   LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO = 0x32,
 } libspectrum_tape_type;
 
@@ -127,6 +129,13 @@ typedef struct libspectrum_tape_turbo_block {
 
 } libspectrum_tape_turbo_block;
 
+/* A group start block */
+typedef struct libspectrum_tape_group_start_block {
+
+  libspectrum_byte *name;
+
+} libspectrum_tape_group_start_block;
+
 /* An archive info block */
 typedef struct libspectrum_tape_archive_info_block {
 
@@ -149,6 +158,7 @@ typedef struct libspectrum_tape_block {
   union {
     libspectrum_tape_rom_block rom;
     libspectrum_tape_turbo_block turbo;
+    libspectrum_tape_group_start_block group_start;
     libspectrum_tape_archive_info_block archive_info;
   } types;
 

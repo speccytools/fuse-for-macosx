@@ -32,14 +32,6 @@
 /* The .tzx file signature (first 8 bytes) */
 static const libspectrum_byte *signature = "ZXTape!\x1a";
 
-/* The types of block available */
-typedef enum tzx_block_type {
-  TZX_ROM = 0x10,
-  TZX_TURBO,
-
-  TZX_ARCHIVE_INFO = 0x32,
-} tzx_block_type;
-
 /*** Local function prototypes ***/
 
 static libspectrum_error
@@ -47,6 +39,10 @@ tzx_read_rom_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		    const libspectrum_byte *end );
 static libspectrum_error
 tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		      const libspectrum_byte *end );
+
+static libspectrum_error
+tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		      const libspectrum_byte *end );
 
 static libspectrum_error
@@ -83,18 +79,24 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
   while( ptr < end ) {
 
     /* Get the ID of the next block */
-    tzx_block_type id = *ptr++;
+    libspectrum_tape_type id = *ptr++;
+
+    fprintf( stderr, "Block type 0x%02x\n", id );
 
     switch( id ) {
-    case TZX_ROM:
+    case LIBSPECTRUM_TAPE_BLOCK_ROM:
       error = tzx_read_rom_block( tape, &ptr, end );
-      if( error ) { libspectrum_tape_free( tape ); return error; }
+       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
-    case TZX_TURBO:
+    case LIBSPECTRUM_TAPE_BLOCK_TURBO:
       error = tzx_read_turbo_block( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
-    case TZX_ARCHIVE_INFO:
+    case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
+      error = tzx_read_group_start( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+    case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
       error = tzx_read_archive_info( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
@@ -223,6 +225,51 @@ tzx_read_turbo_block( libspectrum_tape *tape, const libspectrum_byte **ptr,
 }
 
 static libspectrum_error
+tzx_read_group_start( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		      const libspectrum_byte *end )
+{
+  libspectrum_tape_block *block;
+  libspectrum_tape_group_start_block *start_block;
+
+  size_t length;
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
+
+  /* This is a group start block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_GROUP_START;
+  start_block = &(block->types.group_start);
+
+  /* Get the length */
+  length = **ptr; (*ptr)++;
+
+  /* Check we've got enough bytes left for the string */
+  if( end - (*ptr) < length ) {
+    free( block );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Allocate memory */
+  start_block->name =
+    (libspectrum_byte*)malloc( (length+1) * sizeof( libspectrum_byte ) );
+  if( start_block->name == NULL ) {
+    free( block );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* Copy the string across, and move along */
+  strncpy( start_block->name, (*ptr), length );
+  start_block->name[length] = '\0';
+  (*ptr) += length;
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
 tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		       const libspectrum_byte *end )
 {
@@ -238,7 +285,7 @@ tzx_read_archive_info( libspectrum_tape *tape, const libspectrum_byte **ptr,
   block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
   if( block == NULL ) return LIBSPECTRUM_ERROR_MEMORY;
 
-  /* This is an archive info loader */
+  /* This is an archive info block */
   block->type = LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO;
   info_block = &(block->types.archive_info);
 
