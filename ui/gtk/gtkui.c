@@ -97,9 +97,9 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/File/_Save Snapshot..." , "F2" , gtkui_save,          0, NULL          },
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/_Recording",		NULL , NULL,		    0, "<Branch>"    },
-  { "/File/Recording/_Start...",NULL , gtkui_rzx_start,	    0, NULL	     },
+  { "/File/Recording/_Record...",NULL, gtkui_rzx_start,     0, NULL	     },
   { "/File/Recording/_Play...", NULL , gtkui_rzx_play,	    0, NULL          },
-  { "/File/Recording/S_top",    NULL , gtkui_rzx_stop,	    0, NULL          },
+  { "/File/Recording/_Stop",    NULL , gtkui_rzx_stop,	    0, NULL          },
   { "/File/separator",          NULL , NULL,                0, "<Separator>" },
   { "/File/E_xit",	        "F10", gtkui_quit,          0, NULL          },
   { "/Options",		        NULL , NULL,                0, "<Branch>"    },
@@ -297,8 +297,6 @@ static void gtkui_rzx_start( GtkWidget *widget, gpointer data )
   free( filename );
 
   fuse_emulation_unpause();
-
-  return;
 }
 
 /* Called when File/Recording/Stop selected */
@@ -306,7 +304,6 @@ static void gtkui_rzx_stop( GtkWidget *widget, gpointer data )
 {
   if( rzx_recording ) rzx_stop_recording();
   if( rzx_playback  ) rzx_stop_playback();
-  return;
 }
 
 /* Called when File/Recording/Play selected */
@@ -326,9 +323,6 @@ static void gtkui_rzx_play( GtkWidget *widget, gpointer data )
   free( filename );
 
   fuse_emulation_unpause();
-
-  return;
-
 }
 
 /* Called by the menu when File/Exit selected */
