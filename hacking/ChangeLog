@@ -180,3 +180,5 @@
 20030902 AUTHORS: Add Matthew Westcott.
 20030903 ui/scaler/scalers.c: small fix to 2xSaI scaler (Fred/ScummVM team).
 20030903 ui/gtk/binary.c: add padding around widgets
+20030905 ui/gtk/binary.c: call save_data not load_data when saving binary
+         data. Add padding around the save binary data dialog widgets.
