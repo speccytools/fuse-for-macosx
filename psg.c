@@ -100,18 +100,21 @@ psg_stop_recording( void )
 static int
 write_frame_separator( void )
 {
-  while( psg_empty_frame_count > 0xff ) {
+  while( psg_empty_frame_count >= 4 ) {
+
+    int count;
+
+    count = psg_empty_frame_count / 4;
+    if( count > 0xff ) count = 0xff;
+
     putc( 0xfe, psg_file );
-    putc( 0xff, psg_file );
-    psg_empty_frame_count -= 0xff;
+    putc( count, psg_file );
+
+    psg_empty_frame_count -= 4 * count;
   }
 
-  if( psg_empty_frame_count > 1 ) {
-    putc( 0xfe, psg_file );
-    putc( psg_empty_frame_count, psg_file );
-  } else if( psg_empty_frame_count == 1 ) {
+  for( ; psg_empty_frame_count; psg_empty_frame_count-- )
     putc( 0xff, psg_file );
-  }
 
   return 0;
 }
