@@ -111,10 +111,10 @@ int tape_open( const char *filename )
     return 1;
   }
 
-  error = libspectrum_tap_create( &tape, buffer, file_info.st_size );
+  error = libspectrum_tzx_create( &tape, buffer, file_info.st_size );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     fprintf( stderr,
-	     "%s: error from libspectrum_tap_create whilst reading `%s': %s\n",
+	     "%s: error from libspectrum_tzx_create whilst reading `%s': %s\n",
 	     fuse_progname, filename, libspectrum_error_message(error) );
     munmap( buffer, file_info.st_size );
     return error;

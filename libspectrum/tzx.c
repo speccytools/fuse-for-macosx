@@ -24,12 +24,13 @@
 
 */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "tape.h"
 
 /* The .tzx file signature (first 8 bytes) */
-static const libspectrum_byte *signature = "ZXTape!\0x1a";
+static const libspectrum_byte *signature = "ZXTape!\x1a";
 
 /* The types of block available */
 typedef enum tzx_block_type {
