@@ -25,6 +25,20 @@
 # E-mail: pak21-fuse@srcf.ucam.org
 # Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 
+# TODO:
+
+# svga needs #ifdef <keysym> wrappers around the /WIN$/ keysyms
+# fb needs to looks things up in the cooked_keysyms table:
+
+# 	for( my $i = 0; $i <= $#cooked_keysyms; $i++ ) {
+#	    if( defined $cooked_keysyms[$i] and
+#		$cooked_keysyms[$i] eq $keysym ) {
+#		printf "  { %3i, KEYBOARD_%-9s KEYBOARD_%-6s },\n", $i,
+#		    "$key1,", $key2;
+#		last;
+#	    }
+#	}
+
 use strict;
 
 use lib '../../perl';
@@ -37,17 +51,15 @@ $ui = 'gtk' unless defined $ui;
 die "$0: unrecognised user interface: $ui\n"
   unless 0 < grep { $ui eq $_ } ( 'ggi', 'gtk', 'x', 'svga', 'fb', 'sdl' );
 
-# The define and header files needed for each UI
-my %preprocessor_directives = (
+sub fb_keysym ($) {
 
-    fb   => [ 'FB',   [ ],                   ],
-    ggi  => [ 'GGI',  [ 'ggi/ggi.h' ]        ],
-    gtk  => [ 'GTK',  [ 'gdk/gdkkeysyms.h' ] ],
-    sdl  => [ 'SDL',  [ 'sdl.h' ],	     ],
-    svga => [ 'SVGA', [ 'vgakeyboard.h' ]    ],
-    x    => [ 'X',    [ 'X11/keysym.h' ]     ],
+    my $keysym = shift;
 
-);
+    $keysym =~ tr/a-z/A-Z/;
+    substr( $keysym, 0, 4 ) = 'WIN' if substr( $keysym, 0, 5 ) eq 'META_';
+
+    return $keysym;
+}
 
 # The GGI keysyms which start with `GIIK', not `GIIUC'
 my %ggi_giik_keysyms = map { $_ => 1 } qw(
@@ -77,37 +89,131 @@ my %ggi_giik_keysyms = map { $_ => 1 } qw(
 
 );
 
-# Some keysyms which don't easily do the Xlib -> GGI conversion
-my %ggi_keysyms = (
+sub ggi_keysym ($) {
 
-    Control_L   => 'CtrlL',
-    Control_R   => 'CtrlR',
-    Mode_switch => 'Menu',
-    numbersign  => 'DoubleQuote',
+    my $keysym = shift;
 
-);
+    # GGI keysyms start with a capitial letter
+    $keysym = ucfirst $keysym;
 
-# Some keysyms which don't easily do the Xlib -> SVGAlib conversion
-my %svga_keysyms = (
+    # and have no underscores
+    $keysym =~ s/_//g;
 
-    CAPS_LOCK  => 'CAPSLOCK',
-    NUMBERSIGN => 'BACKSLASH',	# That's what `#' returns on a UK keyboard!
-    RETURN     => 'ENTER',
+    if( $ggi_giik_keysyms{ $keysym } ) {
+	$keysym = "GIIK_$keysym";
+    } else {
+	$keysym = "GIIUC_$keysym";
+    }
 
-    LEFT       => 'CURSORBLOCKLEFT',
-    DOWN       => 'CURSORBLOCKDOWN',
-    UP         => 'CURSORBLOCKUP',
-    RIGHT      => 'CURSORBLOCKRIGHT',
-);
+    return $keysym;
+}
 
-# Some keysyms which don't easily do the Xlib -> SDL conversion
-my %sdl_keysyms = (
+sub sdl_keysym ($) {
 
-    CAPS_LOCK  => 'CAPSLOCK',
-    NUMBERSIGN => 'HASH',
-    EQUAL => 'EQUALS',
-    APOSTROPHE => 'QUOTE',
-    MODE_SWITCH => 'MENU',
+    my $keysym = shift;
+
+    if ( $keysym =~ /[a-zA-Z][a-z]+/ ) {
+	$keysym =~ tr/a-z/A-Z/;
+    }
+    $keysym =~ s/(.*)_L$/L$1/;
+    $keysym =~ s/(.*)_R$/R$1/;
+    
+    # All the magic #defines start with `SDLK_'
+    $keysym = "SDLK_$keysym";
+
+    return $keysym;
+}
+
+sub svga_keysym ($) {
+    
+    my $keysym = shift;
+
+    $keysym =~ tr/a-z/A-Z/;
+    $keysym =~ s/(.*)_L$/LEFT$1/;
+    $keysym =~ s/(.*)_R$/RIGHT$1/;
+    $keysym =~ s/META$/WIN/;		# Fairly sensible mapping
+    $keysym =~ s/^PAGE_/PAGE/;
+
+    # All the magic #defines start with `SCANCODE_'
+    $keysym = "SCANCODE_$keysym";
+    
+    # Apart from this one :-)
+    $keysym = "127" if $keysym eq 'SCANCODE_MODE_SWITCH';
+
+    return $keysym;
+}
+
+# Parameters for each UI
+my %ui_data = (
+
+    fb   => { headers => [ ],
+	      # max_length not used
+	      skips => { },
+	      translations => { 
+	          Mode_switch => 'MENU',
+	      },
+	      function => \&fb_keysym
+	    },
+
+    ggi  => { headers => [ 'ggi/ggi.h' ],
+	      max_length => 18,
+	      skips => { },
+	      translations => {
+	          Control_L   => 'CtrlL',
+		  Control_R   => 'CtrlR',
+		  Mode_switch => 'Menu',
+		  apostrophe  => 'DoubleQuote',
+		  numbersign  => 'Hash',
+	      },
+	      function => \&ggi_keysym,
+	    },
+
+    gtk  => { headers => [ 'gdk/gdkkeysyms.h' ],
+	      max_length => 16,
+	      skips => { },
+	      translations => { },
+	      function => sub ($) { "GDK_$_[0]" },
+    	    },
+
+    sdl  => { headers => [ 'sdl.h' ],
+	      max_length => 15,
+	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R ) },
+	      translations => {
+		  apostrophe  => 'QUOTE',
+		  Caps_Lock   => 'CAPSLOCK',
+		  Control_L   => 'LCTRL',	 
+		  Control_R   => 'RCTRL',	 
+		  equal       => 'EQUALS',
+		  numbersign  => 'HASH',
+		  Mode_switch => 'MENU',
+		  Page_Up     => 'PAGEUP',
+		  Page_Down   => 'PAGEDOWN',
+	      },
+	      function => \&sdl_keysym,
+	    },
+
+    svga => { headers => [ 'vgakeyboard.h' ],
+	      max_length => 26,
+	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R
+					     Super_L Super_R ) },
+	      translations => {
+		  Caps_Lock  => 'CAPSLOCK',
+		  numbersign => 'BACKSLASH',
+		  Return     => 'ENTER',
+		  Left       => 'CURSORBLOCKLEFT',
+		  Down       => 'CURSORBLOCKDOWN',
+		  Up         => 'CURSORBLOCKUP',
+		  Right      => 'CURSORBLOCKRIGHT',
+	      },
+	      function => \&svga_keysym,
+	    },
+
+    x    => { headers => [ 'X11/keysym.h' ],
+	      max_length => 15,
+	      skips => { },
+	      translations => { },
+	      function => sub ($) { "XK_$_[0]" },
+	    },
 );
 
 # Translation table for any UI which uses keyboard mode K_MEDIUMRAW
@@ -138,76 +244,6 @@ my @cooked_keysyms = (
     undef, undef, undef, undef, undef, 'WIN_L', 'WIN_R', 'MENU'
 );
 
-sub ggi_keysym ($) {
-
-    my $keysym = shift;
-
-    # Some specific translations
-    $keysym = $ggi_keysyms{$keysym} if $ggi_keysyms{$keysym};
-
-    # GGI keysyms start with a capitial letter
-    $keysym = ucfirst $keysym;
-
-    # and have no underscores
-    $keysym =~ s/_//g;
-
-    if( $ggi_giik_keysyms{ $keysym } ) {
-	$keysym = "GIIK_$keysym";
-    } else {
-	$keysym = "GIIUC_$keysym";
-    }
-
-    return $keysym;
-}
-
-sub gtk_keysym ($) { "GDK_$_[0]" }
-    
-sub sdl_keysym ($) {
-
-    my $keysym = shift;
-
-    if ( $keysym =~ /[a-zA-Z][a-z]+/ ) {
-	$keysym =~ tr/a-z/A-Z/;
-    }
-    $keysym =~ s/^CONTROL/CTRL/;
-    $keysym =~ s/(.*)_L$/L$1/;
-    $keysym =~ s/(.*)_R$/R$1/;
-    $keysym =~ s/^PAGE_/PAGE/;
-    
-    # Some specific translations
-    $keysym = $sdl_keysyms{$keysym} if $sdl_keysyms{$keysym};
-
-    # All the magic #defines start with `SDLK_'
-    $keysym = "SDLK_$keysym";
-
-    return $keysym;
-}
-
-sub svgalib_keysym ($) {
-    
-    my $keysym = shift;
-
-    # General translations
-    $keysym =~ tr/a-z/A-Z/;
-    $keysym =~ s/(.*)_L$/LEFT$1/;
-    $keysym =~ s/(.*)_R$/RIGHT$1/;
-    $keysym =~ s/META$/WIN/;		# Fairly sensible mapping
-    $keysym =~ s/^PAGE_/PAGE/;
-
-    # Some specific translations
-    $keysym = $svga_keysyms{$keysym} if $svga_keysyms{$keysym};
-
-    # All the magic #defines start with `SCANCODE_'
-    $keysym = "SCANCODE_$keysym";
-    
-    # Apart from this one :-)
-    $keysym = "127" if $keysym eq 'SCANCODE_MODE_SWITCH';
-
-    return $keysym;
-}
-
-sub xlib_keysym ($) { "XK_$_[0]" }
-
 my @keys;
 while(<>) {
 
@@ -224,6 +260,8 @@ while(<>) {
 
 my $declare = "const keysyms_key_info keysyms_data[] =\n{";
 
+my $define = uc $ui;
+
 print Fuse::GPL(
     'keysyms.c: keysym to Spectrum key mappings for both Xlib and GDK',
     "2000-2003 Philip Kendall, Matan Ziv-Av, Russell Marks,\n" .
@@ -235,7 +273,7 @@ print Fuse::GPL(
 
 #include <config.h>
 
-#ifdef UI_$preprocessor_directives{$ui}[0]
+#ifdef UI_$define
 
 #include <stdlib.h>
 
@@ -246,88 +284,31 @@ CODE
 
 # Comment to unbreak Emacs' perl mode
 
-foreach my $header ( @{ $preprocessor_directives{$ui}[1] } ) {
+foreach my $header ( @{ $ui_data{$ui}{headers} } ) {
     print "#include <$header>\n";
 }
 
 print "\nconst keysyms_key_info keysyms_data[] = {\n\n";
 
-if( $ui eq 'ggi' ) {
+KEY:
+foreach( @keys ) {
 
-    foreach( @keys ) {
+    my( $keysym, $key1, $key2 ) = @$_;
 
-	my( $keysym, $key1, $key2 ) = @$_;
+    next if $ui_data{$ui}{skips}{$keysym};
 
-	printf "  { %-17s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
-	    ggi_keysym( $keysym ), "$key1,", $key2;
+    $keysym = $ui_data{$ui}{translations}{$keysym} if
+	$ui_data{$ui}{translations}{$keysym};
+
+    $keysym = $ui_data{$ui}{function}->( $keysym );
+
+    if( $ui eq 'svga' and $keysym =~ /WIN$/ ) {
+	print "#ifdef $keysym\n";
     }
 
-} elsif( $ui eq 'gtk' ) {
+    if( $ui eq 'fb' ) {
 
-    foreach ( @keys ) {
-	my( $keysym, $key1, $key2 ) = @$_;
-
-	printf "  { %-15s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
-	    gtk_keysym( $keysym ), "$key1,", $key2;
-    }
-
-} elsif( $ui eq 'x' ) {
-
-    foreach ( @keys ) {
-	my( $keysym, $key1, $key2 ) = @$_;
-
-	printf "  { %-14s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
-	    xlib_keysym( $keysym ), "$key1,", $key2;
-    }
-
-} elsif( $ui eq 'svga' ) {
-
-    foreach( @keys ) {
-
-	my( $keysym, $key1, $key2 ) = @$_;
-
-	# svgalib doesn't believe in these keys
-	next if( $keysym =~ /^Super_/ or $keysym =~ /^Hyper_/ );
-
-	if( $keysym =~ /WIN$/ ) {
-	    print "#ifdef $keysym\n";
-	}
-
-	printf "  { %-25s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
-	    svgalib_keysym( $keysym ), "$key1,", $key2;
-
-	if( $keysym =~ /WIN$/ ) {
-	    print "#endif                          /* #ifdef $keysym */\n";
-	}
-    }
-
-} elsif( $ui eq 'sdl' ) {
-
-    foreach( @keys ) {
-
-        my( $keysym, $key1, $key2 ) = @$_;
-
-        # SDL doesn't believe in these keys
-        next if( $keysym =~ /^Hyper_/ );
-
-        printf "  { %-25s , KEYBOARD_%-9s KEYBOARD_%-6s },\n",
-          sdl_keysym( $keysym ), "$key1,", $key2;
-
-    }
-  
-} elsif( $ui eq 'fb' ) {
-
-    foreach (@keys) {
-
-	my ($keysym, $key1, $key2) = @$_;
-
-	# General translations
-	$keysym =~ tr/a-z/A-Z/;
-	substr( $keysym, 0, 4 ) = 'WIN' if substr( $keysym, 0, 5 ) eq 'META_';
-	$keysym = 'MENU' if $keysym eq 'MODE_SWITCH';
-
-	my $i;
-	for( $i = 0; $i <= $#cooked_keysyms; $i++) {
+	for( my $i = 0; $i <= $#cooked_keysyms; $i++ ) {
 	    if( defined $cooked_keysyms[$i] and
 		$cooked_keysyms[$i] eq $keysym ) {
 		printf "  { %3i, KEYBOARD_%-9s KEYBOARD_%-6s },\n", $i,
@@ -335,6 +316,16 @@ if( $ui eq 'ggi' ) {
 		last;
 	    }
 	}
+
+    } else {
+
+	printf "  { %-$ui_data{$ui}{max_length}s KEYBOARD_%-9s KEYBOARD_%-6s },\n",
+            "$keysym,", "$key1,", $key2;
+
+    }
+
+    if( $ui eq 'svga' and $keysym =~ /WIN$/ ) {
+	print "#endif                          /* #ifdef $keysym */\n";
     }
 
 }
@@ -347,4 +338,3 @@ print << "CODE";
 
 #endif
 CODE
-
