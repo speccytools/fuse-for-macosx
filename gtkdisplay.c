@@ -102,7 +102,7 @@ static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
     "white",
   };
 
-  int i;
+  int i,ok;
 
   current_map = gtk_widget_get_colormap( gtkui_drawing_area );
 
@@ -114,15 +114,20 @@ static int gtkdisplay_allocate_colours(int numColours, unsigned long *colours)
     }
   }
 
-  if( gdk_colormap_alloc_colors( current_map, gdk_colours, 16, FALSE, FALSE,
-				 success ) != 16 ) {
+  gdk_colormap_alloc_colors( current_map, gdk_colours, 16, FALSE, FALSE,
+			     success );
+  for(i=0,ok=1;i<16;i++) if(!success[i]) ok=0;
+
+  if(!ok) {
     fprintf(stderr,"%s: Couldn't allocate all colours in default colourmap\n"
 	    "%s: switching to private colourmap\n",
 	    fuse_progname,fuse_progname);
     /* FIXME: should free colours in default map here */
     current_map = gdk_colormap_new( gdk_visual_get_system(), FALSE );
-    if( gdk_colormap_alloc_colors( current_map, gdk_colours, 16, FALSE, FALSE,
-				   success ) != 16 ) {
+    gdk_colormap_alloc_colors( current_map, gdk_colours, 16, FALSE, FALSE,
+			       success );
+    for(i=0,ok=1;i<16;i++) if(!success[i]) ok=0;
+    if( !ok ) {
       fprintf(stderr,"%s: Still couldn't allocate all colours\n",
 	      fuse_progname);
       return 1;

@@ -32,6 +32,7 @@
 #include "event.h"
 #include "keyboard.h"
 #include "snapshot.h"
+#include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"
@@ -74,7 +75,8 @@ static int fuse_init(int argc, char **argv)
 
   if(display_init(&argc,&argv)) return 1;
   if(event_init()) return 1;
-  if(timer_init()) return 1;
+  sound_init();		/* sound-init failure non-fatal? */
+  if(!sound_enabled) if(timer_init()) return 1;
 
   machine.machine=SPECTRUM_MACHINE_48; spectrum_init(); machine.reset();
   fuse_keyboard_init();
@@ -100,7 +102,8 @@ static void fuse_show_copyright(void)
 /* Tidy-up function called at end of emulation */
 static int fuse_end(void)
 {
-  timer_end();
+  if(!sound_enabled) timer_end();
+  sound_end();
   event_end();
   display_end();
 

@@ -33,6 +33,7 @@
 #include <vga.h>
 #include <vgakeyboard.h>
 
+#include "fuse.h"
 #include "display.h"
 #include "svgadisplay.h"
 
@@ -59,13 +60,13 @@ static int svgadisplay_allocate_colours(int numColours, int *colours)
 {
   int colour_palette[] = {
   0,0,0,
-  0,0,128,
-  128,0,0,
-  128,0,128,
-  0,128,0,
-  0,128,128,
-  128,128,0,
-  128,128,128,
+  0,0,192,
+  192,0,0,
+  192,0,192,
+  0,192,0,
+  0,192,192,
+  192,192,0,
+  192,192,192,
   0,0,0,
   0,0,255,
   255,0,0,
@@ -92,7 +93,7 @@ static int svgadisplay_allocate_image(int width, int height)
   image=malloc(width*height);
 
   if(!image) {
-    fprintf(stderr,"%s: couldn't create image\n",progname);
+    fprintf(stderr,"%s: couldn't create image\n",fuse_progname);
     return 1;
   }
 

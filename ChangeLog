@@ -11,6 +11,12 @@
 	* Made peripheral emulation much more modular, and added proper
 	  decoding of ports.
 
+	* Fixing timings for INI, OUTI, IND, OUTD and the repeated
+	  versions (they were all one T-state too short).
+
+	* Sound support under Linux (thanks to Russell Marks and Matan
+	  Ziv-Av).
+
 2000-12-17  Philip Kendall  <pak@ast.cam.ac.uk>
 
 	* Version 0.2.1 released.

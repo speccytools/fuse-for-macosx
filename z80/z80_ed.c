@@ -305,7 +305,7 @@ tstates+=16;
 break;
 
 case 0xa2:	/* INI */
-tstates+=15;
+tstates+=16;
 {
   WORD initemp=readport(BC);
   writebyte(HL,initemp);
@@ -316,7 +316,7 @@ tstates+=15;
 break;
 
 case 0xa3:	/* OUTI */
-tstates+=15;
+tstates+=16;
 {
   WORD outitemp=readbyte(HL);
   B--;	HL++;	/* This does happen first, despite what the specs say */
@@ -355,7 +355,7 @@ tstates+=16;
 break;
 
 case 0xaa:	/* IND */
-tstates+=15;
+tstates+=16;
 {
   WORD initemp=readport(BC);
   writebyte(HL,initemp);
@@ -366,7 +366,7 @@ tstates+=15;
 break;
 
 case 0xab:	/* OUTD */
-tstates+=15;
+tstates+=16;
 {
   WORD outitemp=readbyte(HL);
   B--; HL--;	/* This does happen first, despite what the specs say */
@@ -407,7 +407,7 @@ tstates+=16;
 break;
   
 case 0xb2:	/* INIR */
-tstates+=15;
+tstates+=16;
 {
   WORD initemp=readport(BC);
   writebyte(HL,initemp);
@@ -419,7 +419,7 @@ tstates+=15;
 break;
 
 case 0xb3:	/* OTIR */
-tstates+=15;
+tstates+=16;
 {
   WORD outitemp=readbyte(HL);
   B--;	HL++;	/* This does happen first, despite what the specs say */
@@ -460,7 +460,7 @@ tstates+=16;
 break;
 
 case 0xba:	/* INDR */
-tstates+=15;
+tstates+=16;
 {
   WORD initemp=readport(BC);
   writebyte(HL,initemp);
@@ -472,7 +472,7 @@ tstates+=15;
 break;
 
 case 0xbb:	/* OTDR */
-tstates+=15;
+tstates+=16;
 {
   WORD outitemp=readbyte(HL);
   B--; HL--;	/* This does happen first, despite what the specs say */

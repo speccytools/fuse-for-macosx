@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include "sound.h"
 #include "spectrum.h"
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
@@ -47,4 +48,5 @@ void ay_registerport_write(WORD port, BYTE b)
 void ay_dataport_write(WORD port, BYTE b)
 {
   machine.ay.registers[machine.ay.current_register]=b;
+  sound_ay_write(machine.ay.current_register,b);
 }

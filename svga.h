@@ -1,5 +1,5 @@
-/* gtk.c: General GTK+ routines
-   Copyright (c) 2000 Philip Kendall
+/* svga.h: Top-level svgalib routines
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -24,17 +24,9 @@
 
 */
 
-#include <config.h>
+#ifndef FUSE_SVGA_H
+#define FUSE_SVGA_H
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
+int svga_event(void);
 
-#include <gtk/gtk.h>
-
-int gtk_event(void)
-{
-  while(gtk_events_pending())
-    gtk_main_iteration();
-  return 0;
-}
-
-#endif			/* #ifdef UI_GTK */
+#endif			/* #ifndef FUSE_SVGA_H */

@@ -34,17 +34,23 @@
 #include <vgakeyboard.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "keyboard.h"
+#include "keysyms.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
 
-static int exitcode=0;
+void svgakeyboard_keystroke(int scancode, int press);
+int svgakeyboard_keypress(int keysym);
+void svgakeyboard_keyrelease(int keysym);
+
 
 int svgakeyboard_init(void)
 {
   keyboard_init();
   keyboard_seteventhandler(svgakeyboard_keystroke);
+  return 0;
 }
 
 void svgakeyboard_keystroke(int scancode, int press)  {
@@ -59,7 +65,7 @@ int svgakeyboard_keypress(int keysym)
 {
   keysyms_key_info *ptr;
 
-  ptr=keysyms_get_info(keysym);
+  ptr=keysyms_get_data(keysym);
 
   if(ptr) {
     if(ptr->key1 != KEYBOARD_NONE) keyboard_press(ptr->key1);
@@ -126,6 +132,7 @@ void svgakeyboard_keyrelease(int keysym)
 int svgakeyboard_end(void)
 {
   keyboard_close();
+  return 0;
 }
 
 #endif				/* #ifdef UI_SVGA */

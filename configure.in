@@ -24,7 +24,7 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.2.2-pre2)
+AM_INIT_AUTOMAKE(fuse, 0.2.2-pre3)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -34,7 +34,7 @@ AC_C_BIGENDIAN
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(sys/time.h unistd.h)
+AC_CHECK_HEADERS(sys/time.h unistd.h sys/soundcard.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -43,15 +43,38 @@ dnl Checks for library functions.
 AC_CHECK_FUNCS(setitimer)
 
 dnl Check for libraries
+AC_MSG_CHECKING(whether svgalib UI requested)
+AC_ARG_WITH(svgalib,
+[  --with-svgalib          use svgalib for user interface],
+if test "$withval" = no; then
+    svgalib=no
+else
+    svgalib=yes
+fi,
+svgalib=no)
+AC_MSG_RESULT($svgalib)
+if test "$svgalib" = yes; then
+    AC_CHECK_HEADER(vga.h,
+                    LIBS="$LIBS -lvga",
+		    AC_MSG_ERROR([svgalib not found]))
+    AM_PATH_GLIB(1.2.0,
+		 AC_DEFINE(UI_SVGA),
+		 AC_MSG_ERROR([Fuse cannot run without glib. Sorry.]))
+fi
+
 AC_MSG_CHECKING(whether GTK UI requested)
 AC_ARG_WITH(gtk,
 [  --with-gtk              use GTK+ library for user interface],
-if test "$withval" = no; then
+if test "$withval" = no -o "$svgalib" = yes; then
     gtk=no
 else
     gtk=yes
 fi,
-gtk=yes)
+if test "$svgalib" = yes; then
+    gtk=no
+else
+    gtk=yes
+fi)
 AC_MSG_RESULT($gtk)
 if test "$gtk" = yes; then
     AM_PATH_GTK(1.2.0,
@@ -59,8 +82,8 @@ if test "$gtk" = yes; then
 		gtk=no; AC_MSG_WARN([GTK+ not found. Reverting to Xlib UI]))
 fi
 
-dnl If we're not using GTK+, go and look for X ourselves
-if test "$gtk" = no; then
+dnl If we're not using GTK+ or svgalib, go and look for X ourselves
+if test "$gtk" = no -a "$svgalib" = no; then
     if test "$with_x" = no; then
 	AC_MSG_ERROR([Fuse cannot run without X. Sorry.])
     fi

@@ -31,6 +31,7 @@
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"
+#include "sound.h"
 #include "spec128.h"
 #include "spec48.h"
 #include "specplus2.h"
@@ -93,7 +94,13 @@ int spectrum_interrupt(void)
   tstates-=machine.cycles_per_frame;
   if(event_interrupt(machine.cycles_per_frame)) return 1;
 
-  timer_sleep(); timer_count--;
+  if(sound_enabled) {
+    sound_frame();
+  } else {
+    timer_sleep();
+    timer_count--;
+  }
+
   if(display_frame()) return 1;
   z80_interrupt();
 
@@ -147,6 +154,9 @@ BYTE spectrum_ula_read(WORD port)
 void spectrum_ula_write(WORD port, BYTE b)
 {
   display_set_border( b & 0x07 );
+  sound_beeper(b&0x10);
+
+  sound_beeper( b & 0x10 );
 
 #ifdef ISSUE2
   if( b & 0x18 ) {
@@ -161,5 +171,4 @@ void spectrum_ula_write(WORD port, BYTE b)
     keyboard_default_value=0xbf;
   }
 #endif				/* #ifdef ISSUE2 */
-
 }

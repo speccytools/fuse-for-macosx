@@ -1,5 +1,5 @@
 /* keysyms.c: keysym to Spectrum key mappings for both Xlib and GDK
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av, Russell Marks
 
    $Id$
 
@@ -174,6 +174,10 @@ static keysyms_key_info keysyms_data[] = {
   { SCANCODE_L            , KEYBOARD_l,      KEYBOARD_NONE },
   { SCANCODE_SEMICOLON    , KEYBOARD_Symbol, KEYBOARD_o    },
   { SCANCODE_APOSTROPHE   , KEYBOARD_Symbol, KEYBOARD_7    },
+  /* this is what `#' returns on a UK keyboard
+   * (`\' returns SCANCODE_LESS).
+   */
+  { SCANCODE_BACKSLASH    , KEYBOARD_Symbol, KEYBOARD_3    },
   { SCANCODE_ENTER	  , KEYBOARD_Enter,  KEYBOARD_NONE },
 
   { SCANCODE_LEFTSHIFT    , KEYBOARD_Caps,   KEYBOARD_NONE },
@@ -191,20 +195,12 @@ static keysyms_key_info keysyms_data[] = {
 
   { SCANCODE_LEFTCONTROL  , KEYBOARD_Symbol, KEYBOARD_NONE },
   { SCANCODE_LEFTALT      , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { SCANCODE_LEFTWIN      , KEYBOARD_Symbol, KEYBOARD_NONE },
   { SCANCODE_SPACE        , KEYBOARD_space,  KEYBOARD_NONE },
+  { SCANCODE_RIGHTWIN     , KEYBOARD_Symbol, KEYBOARD_NONE },
+  { 127                   , KEYBOARD_Symbol, KEYBOARD_NONE }, /* Menu */
   { SCANCODE_RIGHTALT     , KEYBOARD_Symbol, KEYBOARD_NONE },
   { SCANCODE_RIGHTCONTROL , KEYBOARD_Symbol, KEYBOARD_NONE },
-
-  /* These not available in svgalib??
-  { KEY(numbersign)	, KEYBOARD_Symbol, KEYBOARD_3    },
-  { KEY(Meta_L)         , KEYBOARD_Symbol, KEYBOARD_NONE },
-  { KEY(Super_L)        , KEYBOARD_Symbol, KEYBOARD_NONE },
-  { KEY(Hyper_L)        , KEYBOARD_Symbol, KEYBOARD_NONE },
-  { KEY(Hyper_R)        , KEYBOARD_Symbol, KEYBOARD_NONE },
-  { KEY(Super_R)        , KEYBOARD_Symbol, KEYBOARD_NONE },
-  { KEY(Meta_R)         , KEYBOARD_Symbol, KEYBOARD_NONE },
-  { KEY(Mode_switch)    , KEYBOARD_Symbol, KEYBOARD_NONE },
-  */
 
   { 0, 0, 0 }			/* End marker: DO NOT MOVE! */
 
