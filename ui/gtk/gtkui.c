@@ -175,7 +175,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Machine",		        NULL , NULL,                0, "<Branch>"    },
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
-  { "/Machine/_Break...",	NULL , gtkui_break,	    0, NULL          },
+  { "/Machine/_Debugger...",	NULL , gtkui_break,	    0, NULL          },
   { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
   { "/Tape",                    NULL , NULL,                0, "<Branch>"    },
   { "/Tape/_Open...",	        "F7" , gtkui_tape_open,     0, NULL          },
