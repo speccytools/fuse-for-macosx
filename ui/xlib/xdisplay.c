@@ -292,7 +292,8 @@ get_shm_id( const int size )
 }
 #endif			/* #ifdef X_USE_SHM */
 
-int xdisplay_configure_notify(int width, int height)
+int
+xdisplay_configure_notify( int width, int height GCC_UNUSED )
 {
   int y,size,colour;
 
