@@ -43,6 +43,8 @@ static DWORD colorMask;
 static DWORD lowPixelMask;
 static DWORD qcolorMask;
 static DWORD qlowpixelMask;
+static DWORD redblueMask;
+static DWORD greenMask;
 
 int 
 scaler_select_bitformat( DWORD BitFormat )
@@ -62,6 +64,8 @@ scaler_select_bitformat( DWORD BitFormat )
     lowPixelMask = 0x00000821;
     qcolorMask = 0x0000E79C;
     qlowpixelMask = 0x00001863;
+    redblueMask = 0x0000F81F;
+    greenMask = 0x000007E0;
     break;
 
   case 555:
@@ -69,6 +73,8 @@ scaler_select_bitformat( DWORD BitFormat )
     lowPixelMask = 0x00000421;
     qcolorMask = 0x0000739C;
     qlowpixelMask = 0x00000C63;
+    redblueMask = 0x00007C1F;
+    greenMask = 0x000003E0;
     break;
 
   default:
@@ -96,6 +102,8 @@ const static DWORD colorMask = 0xFEFEFE00;
 const static DWORD lowPixelMask = 0x01010100;
 const static DWORD qcolorMask = 0xFCFCFC00;
 const static DWORD qlowpixelMask = 0x03030300;
+const static QWORD redblueMask = 0xFF00FF00;
+const static QWORD greenMask = 0x00FF0000;
 
 #else				/* #ifdef WORDS_BIGENDIAN */
 
@@ -103,6 +111,8 @@ const static DWORD colorMask = 0x00FEFEFE;
 const static DWORD lowPixelMask = 0x00010101;
 const static DWORD qcolorMask = 0x00FCFCFC;
 const static DWORD qlowpixelMask = 0x00030303;
+const static QWORD redblueMask = 0x00FF00FF;
+const static QWORD greenMask = 0x0000FF00;
 
 #endif				/* #ifdef WORDS_BIGENDIAN */
 
@@ -736,8 +746,10 @@ FUNCTION( scaler_TV2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
   while(height--) {
     for (i = 0, j = 0; i < width; ++i, j += 2) {
       scaler_data_type p1 = *(p + i);
-      scaler_data_type p2 = *(p + i + nextlineSrc);
-      scaler_data_type pi = ((INTERPOLATE(p1, p2) & colorMask) >> 1);
+      scaler_data_type pi;
+
+      pi  = (((p1 & redblueMask) * 7) >> 3) & redblueMask;
+      pi |= (((p1 & greenMask  ) * 7) >> 3) & greenMask;
 
       *(q + j) = p1;
       *(q + j + 1) = p1;
@@ -765,8 +777,10 @@ FUNCTION( scaler_TimexTV )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
     if( ( height & 1 ) == 0 ) {
       for (i = 0, j = 0; i < width; ++i, j++ ) {
         scaler_data_type p1 = *(p + i);
-        scaler_data_type p2 = *(p + i + nextlineSrc + nextlineSrc);
-        scaler_data_type pi = ((INTERPOLATE(p1, p2) & colorMask) >> 1);
+        scaler_data_type pi;
+
+	pi  = (((p1 & redblueMask) * 7) >> 3) & redblueMask;
+	pi |= (((p1 & greenMask  ) * 7) >> 3) & greenMask;
 
         *(q + j) = p1;
         *(q + j + nextlineDst) = pi;
