@@ -24,6 +24,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+INCLUDES = @LIBSPEC_CFLAGS@
+
 noinst_LIBRARIES = libsound.a
 
 libsound_a_SOURCES = dxsound.c \

@@ -638,3 +638,4 @@
 	 ROMs of a multi-ROM machine didn't load.
 20040312 ay.c: unused bits of AY registers are silently zeroed (basically
 	 equivalent to patch #911206 by Stuart Brady).
+20040317 sound/Makefile.am: Add libspectrum path to includes.
