@@ -35,6 +35,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "machine.h"
+#include "settings.h"
 #include "spectrum.h"
 #include "types.h"
 #include "ui/ui.h"
@@ -75,7 +76,9 @@ FUNCTION( spec48_writebyte )( WORD address, BYTE b )
 #endif				/* #ifndef INTERNAL */
 
   switch( address >> 14 ) {
-  case 0: break;
+  case 0:
+    if( settings_current.writable_roms ) ROM[0][ address & 0x3fff ] = b;
+    break;
   case 1:
     if( ( address & 0x3fff ) < 0x1b00 && RAM[5][ address & 0x3fff ] != b )
       display_dirty( address );
@@ -116,7 +119,12 @@ FUNCTION( spec128_writebyte )( WORD address, BYTE b )
 #endif				/* #ifndef INTERNAL */
 
   switch( bank ) {
-  case 0: return;
+
+  case 0:
+    if( settings_current.writable_roms )
+      ROM[ machine_current->ram.current_rom ][ address & 0x3fff ] = b;
+    return;
+
   case 1: bank = 5;				    break;
   case 2: bank = 2;				    break;
   case 3: bank = machine_current->ram.current_page; break;
@@ -206,7 +214,12 @@ FUNCTION( specplus3_writebyte )( WORD address, BYTE b )
     }
   } else {
     switch( bank ) {
-      case 0: return;
+
+      case 0:
+	if( settings_current.writable_roms )
+	  ROM[ machine_current->ram.current_rom ][ address & 0x3fff ] = b;
+	return;
+
       case 1: bank=5;				      break;
       case 2: bank=2;				      break;
       case 3: bank=machine_current->ram.current_page; break;
@@ -254,7 +267,9 @@ FUNCTION( tc2048_writebyte )( WORD address, BYTE b )
 #endif				/* #ifndef INTERNAL */
 
   switch( address >> 14 ) {
-  case 0: break;
+  case 0:
+    if( settings_current.writable_roms ) ROM[0][ address & 0x3fff ] = b;
+    break;
   case 1: 
     if( RAM[5][offset] != b ) { display_dirty( address ); RAM[5][offset] = b; }
     break;

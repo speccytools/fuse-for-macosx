@@ -176,9 +176,6 @@ static int machine_select_machine( fuse_machine_info *machine )
     return 1;
   }
   
-  /* Load the appropriate ROMs */
-  if( machine_load_roms( machine ) ) return 1;
-
   tstates = 0;
 
   /* Reset the event stack */
@@ -281,6 +278,8 @@ machine_load_rom( BYTE **ROM, char *filename, size_t expected_length )
 int
 machine_reset( void )
 {
+  int error;
+
   /* These things should happen on all resets */
   z80_reset();
   sound_ay_reset();
@@ -288,6 +287,9 @@ machine_reset( void )
   printer_zxp_reset();
   scld_reset();
   tape_stop();
+
+  /* Load in the ROMs */
+  error = machine_load_roms( machine_current ); if( error ) return error;
 
   /* Do any machine-specific bits */
   if( machine_current->reset ) machine_current->reset();
