@@ -53,6 +53,7 @@
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"
+#include "snapshot.h"
 #include "spec128.h"
 #include "specplus3.h"
 #include "spectrum.h"

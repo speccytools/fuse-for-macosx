@@ -1068,3 +1068,4 @@
 20040908 menu.c,trdos.[ch],utils.c,machines/specplus3.[ch]: change +3 and
          TR-DOS autoload to work for any disk insert operation ala tapes.
 20040909 rzx.c: use new libspectrum_rzx_write API.
+20040909 machines/specplus3.c: #include "snapshot.h"
