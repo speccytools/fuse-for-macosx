@@ -44,6 +44,7 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "trdos.h"
+#include "ula.h"
 
 static libspectrum_byte scorpion_select_1f_read( libspectrum_word port,
 						 int *attached );
@@ -59,7 +60,7 @@ const static periph_t peripherals[] = {
   { 0x00ff, 0x003f, trdos_tr_read, trdos_tr_write },
   { 0x00ff, 0x005f, trdos_sec_read, trdos_sec_write },
   { 0x00ff, 0x007f, trdos_dr_read, trdos_dr_write },
-  { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
+  { 0x00ff, 0x00fe, ula_read, ula_write },
   { 0x00ff, 0x00ff, scorpion_select_ff_read, trdos_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },

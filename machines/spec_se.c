@@ -50,6 +50,7 @@
 #include "spectrum.h"
 #include "scld.h"
 #include "ui/ui.h"
+#include "ula.h"
 
 static libspectrum_byte spec_se_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
@@ -70,7 +71,7 @@ const static periph_t peripherals[] = {
   { 0xffff, 0x7ffd, NULL, spec128_memoryport_write },
 
   /* Lower 8 bits of Timex ports are fully decoded */
-  { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
+  { 0x00ff, 0x00fe, ula_read, ula_write },
 
   /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
   { 0x00ff, 0x00f5, ay_registerport_read, ay_registerport_write },

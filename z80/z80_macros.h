@@ -104,12 +104,12 @@
 
 #define contend_read(address,time) \
   if( memory_map_read[ (address) >> 13 ].contended ) \
-    tstates += spectrum_contention[ tstates ]; \
+    tstates += ula_contention[ tstates ]; \
   tstates += (time);
 
 #define contend_write(address,time) \
   if( memory_map_write[ (address) >> 13 ].contended ) \
-    tstates += spectrum_contention[ tstates ]; \
+    tstates += ula_contention[ tstates ]; \
   tstates += (time);
 
 #else				/* #ifndef CORETEST */
@@ -231,7 +231,7 @@ break
 
 #define Z80_IN( reg, port )\
 {\
-  spectrum_contend_port( port ); \
+  ula_contend_port( port ); \
   (reg)=readport((port));\
   F = ( F & FLAG_C) | sz53p_table[(reg)];\
 }
@@ -286,7 +286,7 @@ break
 
 #define Z80_OUT( port, reg )\
 {\
-  spectrum_contend_port( port ); \
+  ula_contend_port( port ); \
   writeport(port,reg);\
 }
 

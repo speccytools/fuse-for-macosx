@@ -906,3 +906,8 @@
 	 Improves encapsulation somewhat.
 20040609 slt.[ch],spectrum.[ch],z80/{coretest.c,z80.pl,z80_ops.c}:
 	 improve encapsulation of SLT data.
+20040609 Makefile.am,machine.c,memory.c,snapshot.c,spectrum.h,
+	 machines/{pentagon.c,scorpion.c,spec128.c,spec16.c,spec48.c,
+	 spec_se.c,specplus2a.c,specplus3.c,tc2048.c,tc2068.c},
+	 ui/gtk/debugger.c,ula.[ch],z80/{coretest.c,z80.pl,z80_macros.h,
+	 z80_ops.c}: place ULA routines in their own source file.

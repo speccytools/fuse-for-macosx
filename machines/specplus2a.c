@@ -34,11 +34,12 @@
 #include "settings.h"
 #include "spec128.h"
 #include "specplus3.h"
+#include "ula.h"
 
 static int specplus2a_reset( void );
 
 const static periph_t peripherals[] = {
-  { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x0001, 0x0000, ula_read, ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },

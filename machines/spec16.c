@@ -39,6 +39,7 @@
 #include "printer.h"
 #include "settings.h"
 #include "spec48.h"
+#include "ula.h"
 
 static int spec16_reset( void );
 
@@ -46,7 +47,7 @@ static libspectrum_byte empty_chunk[ MEMORY_PAGE_SIZE ];
 static memory_page empty_mapping;
 
 const static periph_t peripherals[] = {
-  { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x0001, 0x0000, ula_read, ula_write },
   { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
 };

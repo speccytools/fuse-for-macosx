@@ -43,6 +43,7 @@
 #include "spec48.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "ula.h"
 
 static libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
 						     int *attached );
@@ -59,7 +60,7 @@ const static periph_t peripherals[] = {
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
 
   /* Lower 8 bits of Timex ports are fully decoded */
-  { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
+  { 0x00ff, 0x00fe, ula_read, ula_write },
 
   { 0x00ff, 0x00f5, tc2068_ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, tc2068_ay_dataport_read, ay_dataport_write },

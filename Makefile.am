@@ -82,6 +82,7 @@ fuse_SOURCES = ay.c \
 	trdos.c \
 	ui.c \
 	uidisplay.c \
+	ula.c \
 	utils.c \
 	zxatasp.c \
 	zxcf.c
@@ -146,6 +147,7 @@ noinst_HEADERS = ay.h \
 	joystick.h \
 	printer.h \
 	scld.h \
+	ula.h \
 	zxatasp.h \
 	zxcf.h
 

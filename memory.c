@@ -37,6 +37,7 @@
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+#include "ula.h"
 #include "zxatasp.h"
 #include "zxcf.h"
 
@@ -178,7 +179,7 @@ readbyte( libspectrum_word address )
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
-  if( mapping->contended ) tstates += spectrum_contention[ tstates ];
+  if( mapping->contended ) tstates += ula_contention[ tstates ];
   tstates += 3;
 
   return mapping->page[ address & 0x1fff ];
@@ -197,7 +198,7 @@ writebyte( libspectrum_word address, libspectrum_byte b )
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
     debugger_mode = DEBUGGER_MODE_HALTED;
 
-  if( mapping->contended ) tstates += spectrum_contention[ tstates ];
+  if( mapping->contended ) tstates += ula_contention[ tstates ];
   tstates += 3;
 
   writebyte_internal( address, b );

@@ -47,6 +47,7 @@
 #include "tape.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+#include "ula.h"
 #include "utils.h"
 #include "z80/z80.h"
 #include "zxatasp.h"
@@ -340,7 +341,7 @@ machine_reset( void )
 
   /* Set up the contention array */
   for( i = 0; i < machine_current->timings.tstates_per_frame; i++ )
-    spectrum_contention[ i ] = machine_current->ram.contend_delay( i );
+    ula_contention[ i ] = machine_current->ram.contend_delay( i );
 
   /* Check for an Interface II ROM */
   error = if2_reset(); if( error ) return error;

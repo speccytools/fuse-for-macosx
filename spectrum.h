@@ -35,12 +35,6 @@
    precisely, since the ULA last pulled the /INT line to the Z80 low) */
 extern libspectrum_dword tstates;
 
-/* The last byte written to the ULA */
-extern libspectrum_byte spectrum_last_ula;
-
-int spectrum_ula_from_snapshot( libspectrum_snap *snap );
-int spectrum_ula_to_snapshot( libspectrum_snap *snap );
-
 /* Things relating to memory */
 
 /* 272 Kb of RAM */
@@ -73,13 +67,6 @@ typedef struct spectrum_raminfo {
 
 } spectrum_raminfo;
 
-/* How much contention do we get at every tstate? */
-extern libspectrum_byte spectrum_contention[ 80000 ];
-
-libspectrum_byte spectrum_ula_read( libspectrum_word port, int *attached );
-void spectrum_ula_write( libspectrum_word port, libspectrum_byte b );
-
-void spectrum_contend_port( libspectrum_word port );
 libspectrum_byte spectrum_unattached_port( int offset );
 
 /* Miscellaneous stuff */

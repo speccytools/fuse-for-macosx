@@ -38,6 +38,7 @@
 #include "settings.h"
 #include "scld.h"
 #include "spec48.h"
+#include "ula.h"
 
 static int tc2048_reset( void );
 static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );
@@ -50,7 +51,7 @@ const static periph_t peripherals[] = {
   { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
 
   /* Lower 8 bits of Timex ports are fully decoded */
-  { 0x00ff, 0x00fe, spectrum_ula_read, spectrum_ula_write },
+  { 0x00ff, 0x00fe, ula_read, ula_write },
 
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };

@@ -207,7 +207,7 @@ sub ini_ind ($) {
     print << "CODE";
       {
 	libspectrum_word initemp = readport( BC );
-	tstates++; spectrum_contend_port( BC );
+	tstates++; ula_contend_port( BC );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
 	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -225,7 +225,7 @@ sub inir_indr ($) {
     print << "CODE";
       {
 	libspectrum_word initemp=readport( BC );
-	tstates++; spectrum_contend_port( BC );
+	tstates++; ula_contend_port( BC );
 	writebyte(HL,initemp);
 	B--; HL$modifier;
 	F = (initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -301,7 +301,7 @@ sub otir_otdr ($) {
 	writeport(BC,outitemp);
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
-	spectrum_contend_port( BC );
+	ula_contend_port( BC );
 	if(B) {
 	  contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
 	  contend_read( PC, 1 ); contend_read( PC - 1, 1 );
@@ -323,7 +323,7 @@ sub outi_outd ($) {
 	tstates++;
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
-	spectrum_contend_port( BC );
+	ula_contend_port( BC );
 	HL$modifier;
 	writeport(BC,outitemp);
 	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
@@ -595,7 +595,7 @@ sub opcode_IN (@) {
       { 
 	libspectrum_word intemp;
 	intemp = readbyte( PC++ ) + ( A << 8 );
-	spectrum_contend_port( intemp );
+	ula_contend_port( intemp );
         A=readport( intemp );
       }
 IN

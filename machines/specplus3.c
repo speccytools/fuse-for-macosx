@@ -57,6 +57,7 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
+#include "ula.h"
 #include "utils.h"
 
 static int normal_memory_map( int rom, int page );
@@ -82,7 +83,7 @@ static const char *dsk_template = "fuse.dsk.XXXXXX";
 static int specplus3_reset( void );
 
 const periph_t specplus3_peripherals[] = {
-  { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x0001, 0x0000, ula_read, ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },

@@ -38,6 +38,7 @@
 #include "slt.h"
 #include "tape.h"
 #include "trdos.h"
+#include "ula.h"
 #include "z80.h"
 
 #include "z80_macros.h"

@@ -40,11 +40,12 @@
 #include "spec128.h"
 #include "spec48.h"
 #include "trdos.h"
+#include "ula.h"
 
 static int spec128_reset( void );
 
 const periph_t spec128_peripherals[] = {
-  { 0x0001, 0x0000, spectrum_ula_read, spectrum_ula_write },
+  { 0x0001, 0x0000, ula_read, ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },

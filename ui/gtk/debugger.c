@@ -45,6 +45,7 @@
 #include "scld.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "ula.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
 #include "zxcf.h"
@@ -679,7 +680,7 @@ ui_debugger_update( void )
   capabilities = libspectrum_machine_capabilities( machine_current->machine );
 
   sprintf( format_string, "   ULA %s", format_8_bit() );
-  snprintf( buffer, 1024, format_string, spectrum_last_ula );
+  snprintf( buffer, 1024, format_string, ula_last_byte() );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
     sprintf( format_string, "\n    AY %s", format_8_bit() );

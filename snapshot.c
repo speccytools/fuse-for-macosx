@@ -36,9 +36,9 @@
 #include "scld.h"
 #include "slt.h"
 #include "snapshot.h"
-#include "spectrum.h"
 #include "trdos.h"
 #include "ui/ui.h"
+#include "ula.h"
 #include "utils.h"
 #include "z80/z80.h"
 #include "zxatasp.h"
@@ -143,7 +143,7 @@ snapshot_copy_from( libspectrum_snap *snap )
   capabilities = machine_current->capabilities;
 
   error = z80_from_snapshot( snap ); if( error ) return error;
-  error = spectrum_ula_from_snapshot( snap ); if( error ) return error;
+  error = ula_from_snapshot( snap ); if( error ) return error;
   error = ay_from_snapshot( snap, capabilities ); if( error ) return error;
   error = trdos_from_snapshot( snap, capabilities ); if( error ) return error;
   error = memory_ram_from_snapshot( snap, capabilities );
@@ -217,7 +217,7 @@ snapshot_copy_to( libspectrum_snap *snap )
   libspectrum_snap_set_machine( snap, machine_current->machine );
 
   error = z80_to_snapshot( snap ); if( error ) return error;
-  error = spectrum_ula_to_snapshot( snap ); if( error ) return error;
+  error = ula_to_snapshot( snap ); if( error ) return error;
   error = ay_to_snapshot( snap ); if( error ) return error;
   error = trdos_to_snapshot( snap ); if( error ) return error;
   error = memory_ram_to_snapshot( snap ); if( error ) return error;
