@@ -116,14 +116,6 @@ int machine_select_first( void )
   return 0;
 }
 
-int machine_select_next( void )
-{
-  if( ++machine_location == machine_count ) machine_location = 0;
-  machine_select_machine( machine_types[ machine_location ] );
-  
-  return 0;
-}
-
 int machine_select( int type )
 {
   int i;

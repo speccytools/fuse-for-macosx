@@ -1,5 +1,5 @@
 /* svgakeyboard.c: svgalib routines for dealing with the keyboard
-   Copyright (c) 2000-2001 Philip Kendall, Matan Ziv-Av
+   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av
 
    $Id$
 
@@ -128,7 +128,9 @@ int svgakeyboard_keypress(int keysym)
     tape_toggle_play();
     break;
   case SCANCODE_F9:
-    machine_select_next();
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_SELECT, NULL );
+    fuse_emulation_unpause();
     break;
   case SCANCODE_F10:
     fuse_exiting=1;

@@ -1,5 +1,5 @@
 /* xkeyboard.c: X routines for dealing with the keyboard
-   Copyright (c) 2000-2001 Philip Kendall
+   Copyright (c) 2000-2002 Philip Kendall
 
    $Id$
 
@@ -110,7 +110,9 @@ int xkeyboard_keypress(XKeyEvent *event)
     tape_toggle_play();
     break;
   case XK_F9:
-    machine_select_next();
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_SELECT, NULL );
+    fuse_emulation_unpause();
     break;
   case XK_F10:
     return 1;
