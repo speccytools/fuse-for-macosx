@@ -54,8 +54,9 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "compat.h"
 #include "display.h"
 #include "fuse.h"
+#include "gtkinternals.h"
+#include "options.h"
 #include "settings.h"
-#include "gtkui.h"
 CODE
 
 foreach( @dialogs ) {

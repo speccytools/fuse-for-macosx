@@ -1,5 +1,5 @@
 /* confirm.c: Confirmation dialog box
-   Copyright (c) 2000-2002 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2003 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -32,7 +32,7 @@
 #include <gtk/gtk.h>
 
 #include "fuse.h"
-#include "gtkui.h"
+#include "gtkinternals.h"
 
 struct confirm_data {
 

@@ -34,7 +34,7 @@
 #include <gtk/gtk.h>
 
 #include "fuse.h"
-#include "gtkui.h"
+#include "gtkinternals.h"
 #include "settings.h"
 
 static void add_rom( GtkWidget *table, gint row, const char *name );

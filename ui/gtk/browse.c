@@ -35,7 +35,7 @@
 
 #include "compat.h"
 #include "fuse.h"
-#include "gtkui.h"
+#include "gtkinternals.h"
 #include "tape.h"
 
 struct browse_data {

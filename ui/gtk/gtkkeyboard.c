@@ -33,8 +33,7 @@
 #include <gtk/gtk.h>
 
 #include "compat.h"
-#include "gtkkeyboard.h"
-#include "gtkui.h"
+#include "gtkinternals.h"
 #include "keysyms.h"
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);

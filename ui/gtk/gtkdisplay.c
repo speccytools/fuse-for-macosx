@@ -36,8 +36,7 @@
 
 #include "display.h"
 #include "fuse.h"
-#include "gtkdisplay.h"
-#include "gtkui.h"
+#include "gtkinternals.h"
 #include "screenshot.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"

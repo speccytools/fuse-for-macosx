@@ -223,3 +223,5 @@
 20031004 tape.c, tape.h: make tape and tape_playing static.
 20031004 tape.c, ui/ui.h, ui/gtk: add very simple statusbar showing tape
 	 status.
+20031004 ui/gtk: merge gtkdisplay.h, gtkkeyboard.h and gtkui.h into
+	 gtkinternals.h.

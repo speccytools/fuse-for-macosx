@@ -34,7 +34,7 @@
 #include <libspectrum.h>
 
 #include "fuse.h"
-#include "gtkui.h"
+#include "gtkinternals.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "utils.h"

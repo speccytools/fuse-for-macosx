@@ -1,5 +1,5 @@
 /* debugger.c: the GTK+ debugger
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2003 Philip Kendall
 
    $Id$
 
@@ -38,7 +38,7 @@
 
 #include "debugger/debugger.h"
 #include "fuse.h"
-#include "gtkui.h"
+#include "gtkinternals.h"
 #include "machine.h"
 #include "scld.h"
 #include "spectrum.h"
