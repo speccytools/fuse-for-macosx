@@ -51,7 +51,7 @@ static int frames_until_update;
 static int samples;
 
 /* Timer calibration */
-static float calibration_factor = 100.0;
+static float calibration_factor = 1000.0;
 static int calibrated = 0;
 
 int
@@ -182,7 +182,7 @@ calibrate( void )
 
   timer_end();
 
-  calibration_factor = 10.0 / timer_get_time_difference( &end, &start );
+  calibration_factor = 100.0 / timer_get_time_difference( &end, &start );
   calibrated = 1;
 
   timer_count = 0.0;
@@ -229,7 +229,7 @@ timer_sleep( void )
           100                                  :
           settings_current.emulation_speed;
 
-  timer_count -= calibration_factor / speed;
+  timer_count -= 100.0 / speed;
 }
 
 static void
@@ -320,9 +320,9 @@ timer_push( int msec, timer_function_type which )
   }
 
   timer.it_interval.tv_sec  = 0;
-  timer.it_interval.tv_usec = msec * 1000L;
+  timer.it_interval.tv_usec = msec * calibration_factor;
   timer.it_value.tv_sec     = 0;
-  timer.it_value.tv_usec    = msec * 1000L;
+  timer.it_value.tv_usec    = msec * calibration_factor;
 
   error = setitimer( ITIMER_REAL, &timer, old_timer );
   if( error ) {
