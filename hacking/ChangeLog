@@ -1171,3 +1171,4 @@
 	 (in)active if libpng not present.
 20050103 if1.c: fdatasync is from the POSIX Realtime Extension, use fsync
          instead.
+20050103 screenshot.[ch], ui.c: Further fixes for compiling without libpng.

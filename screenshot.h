@@ -31,10 +31,11 @@
 #include "ui/scaler/scaler.h"
 #endif				/* #ifndef SCALER_H */
 
-#ifdef USE_LIBPNG
-
 int screenshot_save( void );
 int screenshot_write( const char *filename, scaler_type scaler );
+
+#ifdef USE_LIBPNG
+
 int screenshot_write_fast( const char *filename, scaler_type scaler );
 int screenshot_available_scalers( scaler_type scaler );
 
