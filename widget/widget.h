@@ -73,7 +73,7 @@ typedef struct widget_menu_entry {
 typedef int (*widget_draw_fn)( void *data );
 
 /* A function to handle keypresses */
-typedef void (*widget_keyhandler_fn)( int key );
+typedef void (*widget_keyhandler_fn)( keyboard_key_name key );
 
 /* The information we need to store for each widget */
 typedef struct widget_t {
@@ -130,7 +130,7 @@ size_t widget_numfiles;
 
 int widget_filesel_draw( void* data );
 int widget_filesel_finish( widget_finish_state finished );
-void widget_filesel_keyhandler( int key );
+void widget_filesel_keyhandler( keyboard_key_name key );
 
 extern char* widget_filesel_name;
 
@@ -138,27 +138,27 @@ extern char* widget_filesel_name;
 
 int widget_general_draw( void* data );
 int widget_general_finish( widget_finish_state finished );
-void widget_general_keyhandler( int key );
+void widget_general_keyhandler( keyboard_key_name key );
 
 /* Tape menu */
 
 int widget_tape_draw( void* data );
-void widget_tape_keyhandler( int key );
+void widget_tape_keyhandler( keyboard_key_name key );
 
 /* File menu */
 
 int widget_file_draw( void* data );
-void widget_file_keyhandler( int key );
+void widget_file_keyhandler( keyboard_key_name key );
 
 /* Machine menu */
 
 int widget_machine_draw( void* data );
-void widget_machine_keyhandler( int key );
+void widget_machine_keyhandler( keyboard_key_name key );
 
 /* Keyboard picture */
 
 int widget_picture_draw( void* data );
-void widget_picture_keyhandler( int key );
+void widget_picture_keyhandler( keyboard_key_name key );
 
 /* The data for the keyboard picture */
 
@@ -167,12 +167,12 @@ extern BYTE widget_keyboard_picture[6912];
 /* Help menu */
 
 int widget_help_draw( void* data );
-void widget_help_keyhandler( int key );
+void widget_help_keyhandler( keyboard_key_name key );
 
 /* General menu code */
 
 int widget_menu_draw( void* data );
-void widget_menu_keyhandler( int key );
+void widget_menu_keyhandler( keyboard_key_name key );
 
 /* The callback function to call another widget */
 int widget_menu_widget( void *data );
@@ -210,7 +210,7 @@ extern widget_menu_entry widget_menu_help[];
 /* The select machine widget */
 
 int widget_select_draw( void* data );
-void widget_select_keyhandler( int key );
+void widget_select_keyhandler( keyboard_key_name key );
 int widget_select_finish( widget_finish_state finished );
 
 /* The widgets actually available */

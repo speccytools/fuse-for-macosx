@@ -348,7 +348,7 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
   return 0;
 }
 
-void widget_filesel_keyhandler( int key )
+void widget_filesel_keyhandler( keyboard_key_name key )
 {
   char *fn, *ptr;
 

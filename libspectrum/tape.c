@@ -93,7 +93,7 @@ static void
 block_free( gpointer data, gpointer user_data )
 {
   libspectrum_tape_block *block = (libspectrum_tape_block*)data;
-  int i;
+  size_t i;
 
   switch( block->type ) {
 

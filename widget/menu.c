@@ -46,7 +46,7 @@ widget_menu_entry *menu;
 int widget_menu_draw( void *data )
 {
   widget_menu_entry *ptr;
-  size_t menu_entries; int i;
+  size_t menu_entries, i;
 
   menu = (widget_menu_entry*)data;
 
@@ -69,7 +69,7 @@ int widget_menu_draw( void *data )
   return 0;
 }
 
-void widget_menu_keyhandler( int key )
+void widget_menu_keyhandler( keyboard_key_name key )
 {
   widget_menu_entry *ptr;
 

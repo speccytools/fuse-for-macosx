@@ -72,7 +72,7 @@ int widget_select_draw( void* data )
   return 0;
 }
 
-void widget_select_keyhandler( int key )
+void widget_select_keyhandler( keyboard_key_name key )
 {
   switch( key ) {
 

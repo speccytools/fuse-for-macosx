@@ -133,7 +133,7 @@ static int widget_general_print_value( int number, int value )
 }
 
 
-void widget_general_keyhandler( int key )
+void widget_general_keyhandler( keyboard_key_name key )
 {
   int error;
 

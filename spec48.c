@@ -114,7 +114,7 @@ DWORD spec48_contend_port( WORD port )
 
 static DWORD spec48_contend_delay( void )
 {
-  DWORD tstates_through_line;
+  WORD tstates_through_line;
   
   /* No contention in the upper border */
   if( tstates < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )

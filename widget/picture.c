@@ -38,7 +38,7 @@ int widget_picture_draw( void* data )
   return 0;
 }
 
-void widget_picture_keyhandler( int key )
+void widget_picture_keyhandler( keyboard_key_name key )
 {
   switch( key ) {
     
