@@ -88,11 +88,8 @@ widget_menu_entry widget_menu_main[] = {
 
 /* File menu */
 
-static widget_text_t foo_data = { "Foo", "Bar" };
-
 static widget_menu_widget_t
-  file_recording = { WIDGET_TYPE_MENU, &widget_menu_file_recording },
-  file_text      = { WIDGET_TYPE_TEXT, &foo_data };
+  file_recording = { WIDGET_TYPE_MENU, &widget_menu_file_recording };
 
 static widget_menu_entry widget_menu_file[] = {
   { "File", 0, 0, NULL },		/* Menu title */
@@ -105,9 +102,6 @@ static widget_menu_entry widget_menu_file[] = {
 #ifdef HAVE_PNG_H
   { "Save S(c)reen to 'fuse.png'",KEYBOARD_c, widget_menu_save_screen, NULL },
 #endif				/* #ifdef HAVE_PNG_H */
-
-  { "Enter (t)ext",		KEYBOARD_t, widget_menu_widget,
-					    &file_text                      },
 
   { "E(x)it",			KEYBOARD_x, widget_menu_exit,          NULL },
 

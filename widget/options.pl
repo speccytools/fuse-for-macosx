@@ -41,6 +41,8 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include <config.h>
 
+#include <stdio.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "options.h"
@@ -95,12 +97,19 @@ CODE
   if( error ) return error;
 
 CODE
-            $which++;
 	} elsif( $widget->{type} eq "Entry" ) {
-	    # FIXME: Make this work
+
+	    print << "CODE";
+  error = widget_options_print_entry( $which, "$widget->{text}",
+				      show->$widget->{value},
+				      "$widget->{data2}" );
+  if( error ) return error;
+CODE
 	} else {
 	    die "Unknown type `$widget->{type}'";
 	}
+
+        $which++;
     }
         
     print << "CODE";
@@ -111,6 +120,9 @@ void
 widget_$_->{name}_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 \{
   int error;
+  widget_text_t text_data;
+
+  text_data = text_data;	/* Keep gcc happy */
 
   switch( key ) \{
 
@@ -139,12 +151,34 @@ CODE
     break;
 
 CODE
-           $which++;
 	} elsif( $widget->{type} eq "Entry" ) {
-	    # FIXME: Make this work
+
+	    my $title = $widget->{text};
+
+	    $title =~ tr/()//d;
+
+	    print << "CODE";
+  case $widget->{key}:
+    text_data.title = "$title";
+    snprintf( text_data.text, 40, "%d",
+	      widget_options_settings.$widget->{value} );
+    error = widget_do( WIDGET_TYPE_TEXT, &text_data ); if( error ) return;
+    if( widget_text_text ) {
+      widget_options_settings.$widget->{value} = atoi( widget_text_text );
+      error = widget_options_print_entry(
+        $which, "$widget->{text}",
+	widget_options_settings.$widget->{value}, "$widget->{data2}"
+      );
+    }
+	    
+    break;
+
+CODE
 	} else {
 	    die "Unknown type `$widget->{type}'";
 	}
+
+	$which++;
     }
 
     print << "CODE";

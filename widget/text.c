@@ -134,8 +134,6 @@ widget_text_finish( widget_finish_state finished )
 {
   if( finished == WIDGET_FINISHED_OK ) {
 
-    widget_end_all( finished );
-
     widget_text_text = malloc( strlen( text ) + 1 );
     if( !widget_text_text ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );

@@ -434,6 +434,22 @@ int widget_options_print_value( int number, int value )
   return 0;
 }
 
+int
+widget_options_print_entry( int number, const char *prefix, int value,
+			    const char *suffix )
+{
+  char buffer[29];
+
+  widget_rectangle( 2*8, (number+4)*8, 28*8, 8, WIDGET_COLOUR_BACKGROUND );
+  
+  snprintf( buffer, 29, "%s: %d %s", prefix, value, suffix );
+  widget_printstring( 2, number + 4, WIDGET_COLOUR_FOREGROUND, buffer );
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT + (number+4)*8,
+		   DISPLAY_BORDER_HEIGHT + (number+5)*8  );
+
+  return 0;
+}
+
 int widget_options_finish( widget_finish_state finished )
 {
   int error;
