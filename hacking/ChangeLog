@@ -1064,3 +1064,4 @@
 20040818 ui/sdl/sdldisplay.c: Wrap long lines.
 20040905 fuse.c,menu.[ch],menu_data.c,rzx.c: support multiple input
 	 recording blocks in an RZX file.
+20040907 trdos.c: Fix disk ejection (thanks Paul van der Laan).

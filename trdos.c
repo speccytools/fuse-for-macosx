@@ -566,8 +566,8 @@ trdos_disk_eject( trdos_drive_number which, int write )
     if( error ) {
       ui_error( UI_ERROR_ERROR, "Error closing '%s': %s",
 		discs[which].filename, strerror( errno ) );
+      return 1;
     }
-    return 1;
   }
 
   discs[which].disc_ready = 0;
