@@ -73,6 +73,7 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_equal,       { KEYBOARD_l,     KEYBOARD_Symbol } },
   { INPUT_KEY_BackSpace,   { KEYBOARD_0,     KEYBOARD_Caps   } },
 
+  { INPUT_KEY_Tab,         { KEYBOARD_Caps,  KEYBOARD_Symbol } },
   { INPUT_KEY_q,           { KEYBOARD_q,     KEYBOARD_NONE   } },
   { INPUT_KEY_w,           { KEYBOARD_w,     KEYBOARD_NONE   } },
   { INPUT_KEY_e,           { KEYBOARD_e,     KEYBOARD_NONE   } },

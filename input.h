@@ -43,6 +43,8 @@ typedef enum input_key {
 
   INPUT_KEY_NONE = 0x00,
 
+  INPUT_KEY_Tab = 0x09,
+
   INPUT_KEY_Return = 0x0d,
 
   INPUT_KEY_Escape = 0x1b,
