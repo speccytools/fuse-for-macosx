@@ -50,4 +50,4 @@ noinst_HEADERS = ay.h display.h event.h fbkeyboard.h\
 	tape.h timer.h types.h ui.h uidisplay.h xdisplay.h\
 	xkeyboard.h xui.h widget.h aalibui.h aalibkeyboard.h
 
-EXTRA_DIST = AUTHORS README THANKS
+EXTRA_DIST = AUTHORS README THANKS keysyms.dat keysyms.pl
