@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
 #include "machine.h"
@@ -244,6 +245,15 @@ int widget_menu_reset( void *data GCC_UNUSED )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   return machine_current->reset();
+}
+
+/* Machine/Break */
+int
+widget_menu_break( void *data GCC_UNUSED )
+{
+  debugger_mode = DEBUGGER_MODE_HALTED;
+  widget_end_all( WIDGET_FINISHED_OK );
+  return 0;
 }
 
 /* Tape/Play */

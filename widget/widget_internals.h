@@ -167,6 +167,7 @@ int widget_menu_exit( void *data );	     /* File/Exit */
 int widget_menu_save_options( void *data );  /* Options/Save */
 
 int widget_menu_reset( void *data );	     /* Machine/Reset */
+int widget_menu_break( void *data );	     /* Machine/Break */
 
 int widget_menu_play_tape( void *data );     /* Tape/Play */
 int widget_menu_rewind_tape( void *data );   /* Tape/Rewind */
@@ -217,6 +218,12 @@ int widget_options_finish( widget_finish_state finished );
 
 int widget_error_draw( void *data );
 void widget_error_keyhandler( keyboard_key_name key, keyboard_key_name key2 );
+
+/* The debugger widget */
+
+int widget_debugger_draw( void *data );
+void widget_debugger_keyhandler( keyboard_key_name key,
+				 keyboard_key_name key2 );
 
 /* The widgets actually available */
 

@@ -480,5 +480,6 @@ widget_t widget_data[] = {
   { widget_rzx_draw,      widget_options_finish, widget_rzx_keyhandler      },
   { widget_browse_draw,   widget_browse_finish,  widget_browse_keyhandler   },
   { widget_text_draw,	  widget_text_finish,	 widget_text_keyhandler     },
+  { widget_debugger_draw, NULL,			 widget_debugger_keyhandler },
 
 };

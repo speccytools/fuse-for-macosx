@@ -55,6 +55,7 @@ typedef enum widget_type {
   WIDGET_TYPE_RZX,		/* RZX options */
   WIDGET_TYPE_BROWSE,		/* Browse tape */
   WIDGET_TYPE_TEXT,		/* Text entry widget */
+  WIDGET_TYPE_DEBUGGER,		/* Debugger widget */
 
 } widget_type;
 
