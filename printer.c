@@ -528,7 +528,7 @@ if(!reading)
   {
   if(!high)
     {
-    bits_to_get=8;
+    bits_to_get=9;
     reading=1;
     }
   }
@@ -537,11 +537,12 @@ else /* reading */
   if(bits_to_get)
     {
     ser_byte>>=1;
-    ser_byte|=(high?0x80:0);
+    ser_byte|=(high?0x100:0);
     bits_to_get--;
     if(!bits_to_get)
       {
-      printer_text_output_char(ser_byte);
+      if(ser_byte&0x100)	/* check stop bit is valid */
+        printer_text_output_char(ser_byte&0xff);
       reading=0;
       }
     }
