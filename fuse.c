@@ -135,7 +135,8 @@ static int fuse_init(int argc, char **argv)
   if( error ) return error;
 
   settings_current.sound = fuse_sound_in_use = 0;
-  sound_init( settings_current.sound_device );
+  if( settings_current.sound ) sound_init( settings_current.sound_device );
+
   if(sound_enabled) {
     settings_current.sound = fuse_sound_in_use = 1;
   } else {

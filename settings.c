@@ -170,11 +170,20 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
   node = node->xmlChildrenNode;
   while( node ) {
 
-    if( !strcmp( node->name, (const xmlChar*)"issue2" ) ) {
+    if( !strcmp( node->name, (const xmlChar*)"beeperstereo" ) ) {
+      settings->stereo_beeper =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"compressrzx" ) ) {
+      settings->rzx_compression =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"issue2" ) ) {
       settings->issue2 =
 	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"kempston" ) ) {
       settings->joy_kempston =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"loadingsound" ) ) {
+      settings->sound_load =
 	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"machine" ) ) {
       settings->start_machine =
@@ -194,6 +203,9 @@ parse_xml( xmlDocPtr doc, settings_info *settings )
     } else if( !strcmp( node->name, (const xmlChar*)"snapshot" ) ) {
       settings->snapshot =
 	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    } else if( !strcmp( node->name, (const xmlChar*)"sound" ) ) {
+      settings->sound =
+	atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else if( !strcmp( node->name, (const xmlChar*)"sounddevice" ) ) {
       settings->sound_device =
 	strdup( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
@@ -241,9 +253,15 @@ settings_write_config( settings_info *settings )
   root = xmlNewNode( NULL, "settings" );
   xmlDocSetRootElement( doc, root );
 
+  xmlNewTextChild( root, NULL, "beeperstereo",
+		   settings->stereo_beeper ? "1" : "0" );
+  xmlNewTextChild( root, NULL, "compressrzx",
+		   settings->rzx_compression ? "1" : "0" );
   xmlNewTextChild( root, NULL, "issue2", settings->issue2 ? "1" : "0" );
   xmlNewTextChild( root, NULL, "kempston",
 		   settings->joy_kempston ? "1" : "0" );
+  xmlNewTextChild( root, NULL, "loadingsound",
+		   settings->sound_load ? "1" : "0" );
   if( settings->playback_file )
     xmlNewTextChild( root, NULL, "playbackfile", settings->playback_file );
   if( settings->record_file )
@@ -252,6 +270,7 @@ settings_write_config( settings_info *settings )
   xmlNewTextChild( root, NULL, "slttraps", settings->slt_traps ? "1" : "0" );
   if( settings->snapshot )
     xmlNewTextChild( root, NULL, "snapshot", settings->snapshot );
+  xmlNewTextChild( root, NULL, "sound", settings->sound ? "1" : "0" );
   if( settings->sound_device )
     xmlNewTextChild( root, NULL, "sounddevice", settings->sound_device );
   if( settings->svga_mode ) {
@@ -287,18 +306,26 @@ static int settings_command_line( int argc, char **argv,
 
   struct option long_options[] = {
 
-    {	    "machine", 1, NULL, 'm' },
+    { "beeper-stereo", 0, &(settings->stereo_beeper), 1 },
+    { "no-beeper-stereo", 0, &(settings->stereo_beeper), 0 },
 
-    {      "snapshot", 1, NULL, 's' },
-    {          "tape", 1, NULL, 't' },
+    {  "compress-rzx", 0, &(settings->rzx_compression), 1 },
+    { "no-compress-rzx", 0, &(settings->rzx_compression), 0 },
 
-    {      "playback", 1, NULL, 'p' },
-    {        "record", 1, NULL, 'r' },
-
-    {  "sound-device", 1, NULL, 'd' },
+    {          "help", 0, NULL, 'h' },
 
     {        "issue2", 0, &(settings->issue2), 1 },
     {     "no-issue2", 0, &(settings->issue2), 0 },
+
+    {      "kempston", 0, &(settings->joy_kempston), 1 },
+    {   "no-kempston", 0, &(settings->joy_kempston), 0 },
+
+    { "loading-sound", 0, &(settings->sound_load), 1 },
+    { "no-loading-sound", 0, &(settings->sound_load), 0 },
+
+    {	    "machine", 1, NULL, 'm' },
+    {      "playback", 1, NULL, 'p' },
+    {        "record", 1, NULL, 'r' },
 
     {    "separation", 0, &(settings->stereo_ay), 1 },
     { "no-separation", 0, &(settings->stereo_ay), 0 },
@@ -306,16 +333,19 @@ static int settings_command_line( int argc, char **argv,
     {           "slt", 0, &(settings->slt_traps), 1 },
     {        "no-slt", 0, &(settings->slt_traps), 0 },
 
-    {      "kempston", 0, &(settings->joy_kempston), 1 },
-    {   "no-kempston", 0, &(settings->joy_kempston), 0 },
+    {      "snapshot", 1, NULL, 's' },
+
+    {         "sound", 0, &(settings->sound), 1 },
+    {      "no-sound", 0, &(settings->sound), 0 },
+
+    {  "sound-device", 1, NULL, 'd' },
+    {     "svga-mode", 1, NULL, 'v' },
+    {          "tape", 1, NULL, 't' },
 
     {         "traps", 0, &(settings->tape_traps), 1 },
     {      "no-traps", 0, &(settings->tape_traps), 0 },
 
-    {          "help", 0, NULL, 'h' },
     {       "version", 0, NULL, 'V' },
-
-    {     "svga-mode", 1, NULL, 'v' },
 
     { 0, 0, 0, 0 }		/* End marker: DO NOT REMOVE */
   };
