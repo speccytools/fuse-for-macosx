@@ -1,5 +1,5 @@
 /* gtkui.c: GTK+ routines for dealing with the user interface
-   Copyright (c) 2000-2004 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2005 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -973,5 +973,104 @@ gtkui_set_font( GtkWidget *widget, gtkui_font font )
   gtk_widget_set_style( widget, font );
 #endif				/* #ifdef UI_GTK2 */
 }  
+
+static void
+key_scroll_event( GtkCList *clist, GtkScrollType scroll, gfloat position,
+		  gpointer user_data )
+{
+  GtkAdjustment *adjustment = user_data;
+  long int oldbase = adjustment->value;
+  long int base = oldbase;
+
+  switch( scroll )
+  {
+  case GTK_SCROLL_JUMP:
+    base = position ? adjustment->upper : adjustment->lower;
+    break;
+  case GTK_SCROLL_STEP_BACKWARD:
+    base -= adjustment->step_increment;
+    break;
+  case GTK_SCROLL_STEP_FORWARD:
+    base += adjustment->step_increment;
+    break;
+  case GTK_SCROLL_PAGE_BACKWARD:
+    base -= adjustment->page_increment;
+    break;
+  case GTK_SCROLL_PAGE_FORWARD:
+    base += adjustment->page_increment;
+    break;
+  default:
+    return;
+  }
+
+  if( base < 0 ) {
+    base = 0;
+  } else if( base > adjustment->upper - adjustment->page_size ) {
+    base = adjustment->upper - adjustment->page_size;
+  }
+
+  if( base != oldbase ) gtk_adjustment_set_value( adjustment, base );
+}
+
+static gboolean
+wheel_scroll_event( GtkWidget *clist, GdkEvent *event, gpointer user_data )
+{
+  GtkAdjustment *adjustment = user_data;
+  long int oldbase = adjustment->value;
+  long int base = oldbase;
+
+#ifdef UI_GTK2
+  switch( event->scroll.direction )
+  {
+  case GDK_SCROLL_UP:
+    base -= adjustment->page_increment / 2;
+    break;
+  case GDK_SCROLL_DOWN:
+    base += adjustment->page_increment / 2;
+    break;
+  default:
+    return FALSE;
+  }
+#else			/* #ifdef UI_GTK2 */
+  if( event->type != GDK_BUTTON_PRESS )
+    return FALSE;
+
+  switch (event->button.button)
+  {
+  case 4:
+    base -= adjustment->page_increment / 2;
+    break;
+  case 5:
+    base += adjustment->page_increment / 2;
+    break;
+  default:
+    return FALSE;
+  }
+#endif			/* #ifdef UI_GTK2 */
+
+  if( base < 0 ) {
+    base = 0;
+  } else if( base > adjustment->upper - adjustment->page_size ) {
+    base = adjustment->upper - adjustment->page_size;
+  }
+
+  if( base != oldbase ) gtk_adjustment_set_value( adjustment, base );
+
+  return TRUE;
+}
+
+void
+gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj )
+{
+  gtk_signal_connect( GTK_OBJECT( clist ), "scroll-vertical",
+		      GTK_SIGNAL_FUNC( key_scroll_event ), adj );
+#ifdef UI_GTK2
+  gtk_signal_connect( GTK_OBJECT( clist ), "scroll-event",
+		      GTK_SIGNAL_FUNC( wheel_scroll_event ), adj );
+#else			/* #ifdef UI_GTK2 */
+  gtk_signal_connect( GTK_OBJECT( clist ), "button-press-event",
+		      GTK_SIGNAL_FUNC( wheel_scroll_event ), adj );
+#endif			/* #ifdef UI_GTK2 */
+}
 
 #endif			/* #ifdef UI_GTK */

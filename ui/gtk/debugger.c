@@ -1,5 +1,5 @@
 /* debugger.c: the GTK+ debugger
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2005 Philip Kendall
 
    $Id$
 
@@ -468,6 +468,9 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
   gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
+
+  gtkui_scroll_connect( GTK_CLIST( disassembly ),
+			GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
 
   return 0;
 }

@@ -1,5 +1,5 @@
 /* gtkinternals.h: stuff internal to the GTK+ UI
-   Copyright (c) 2003-2004 Philip Kendall
+   Copyright (c) 2003-2005 Philip Kendall
 
    $Id$
 
@@ -175,5 +175,11 @@ extern char *gtkpixmap_mouse_active[];
 
 int gtkstatusbar_create( GtkBox *parent );
 int gtkstatusbar_set_visibility( int visible );
+
+/*
+ * Scrolling for GtkCList widgets
+ */
+
+void gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj );
 
 #endif				/* #ifndef FUSE_GTKINTERNALS_H */

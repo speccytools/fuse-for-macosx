@@ -1,5 +1,5 @@
 /* memory.c: the GTK+ memory browser
-   Copyright (c) 2004 Philip Kendall
+   Copyright (c) 2004-2005 Philip Kendall
 
    $Id$
 
@@ -113,6 +113,8 @@ menu_machine_memorybrowser( void )
   adjustment = gtk_adjustment_new( 0, 0x0000, 0xffff, 0x10, 0xa0, 0x13f );
   gtk_signal_connect( adjustment, "value-changed", GTK_SIGNAL_FUNC( scroller ),
 		      clist );
+
+  gtkui_scroll_connect( GTK_CLIST( clist ), GTK_ADJUSTMENT( adjustment ) );
 
   scrollbar = gtk_vscrollbar_new( GTK_ADJUSTMENT( adjustment ) );
   gtk_box_pack_start( GTK_BOX( box ), scrollbar, FALSE, FALSE, 0 );
