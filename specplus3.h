@@ -60,7 +60,7 @@ void specplus3_memoryport_write(WORD port, BYTE b);
 /* The +3's drives */
 
 typedef enum specplus3_drive_number {
-  SPECPLUS3_DRIVE_A = 0,
+  SPECPLUS3_DRIVE_A = 0,	/* First drive must be number zero */
   SPECPLUS3_DRIVE_B,
 } specplus3_drive_number;
 

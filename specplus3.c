@@ -460,7 +460,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
   struct flock lock;
   size_t i; int error;
 
-  if( which < SPECPLUS3_DRIVE_A || which > SPECPLUS3_DRIVE_B ) {
+  if( which > SPECPLUS3_DRIVE_B ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d\n",
 	      which );
     fuse_abort();
@@ -552,7 +552,7 @@ specplus3_disk_eject( specplus3_drive_number which )
 {
   int error;
 
-  if( which < SPECPLUS3_DRIVE_A || which > SPECPLUS3_DRIVE_B ) {
+  if( which > SPECPLUS3_DRIVE_B ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_eject: unknown drive %d\n",
 	      which );
     fuse_abort();
