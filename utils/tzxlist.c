@@ -210,7 +210,7 @@ main( int argc, char **argv )
 	case   3: printf("      Year:"); break;
 	case   4: printf(" Langugage:"); break;
 	case   5: printf("  Category:"); break;
-	case   6: printf("    Budget:"); break;
+	case   6: printf("     Price:"); break;
 	case   7: printf("    Loader:"); break;
 	case   8: printf("    Origin:"); break;
 	case 255: printf("   Comment:"); break;
