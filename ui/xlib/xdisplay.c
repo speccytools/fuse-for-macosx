@@ -307,6 +307,7 @@ void xdisplay_area(int x, int y, int width, int height)
   if( shm_used ) {
     XShmPutImage( display, xui_mainWindow, gc, image,
 		  x, y, x, y, width, height, True );
+    /* FIXME: should wait for an ShmCompletion event here */
   } else {
     XPutImage(display, xui_mainWindow, gc, image, x, y, x, y, width, height);
   }

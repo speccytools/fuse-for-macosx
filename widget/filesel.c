@@ -309,10 +309,6 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   uidisplay_lines( DISPLAY_BORDER_HEIGHT,
 		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
 
-  /* Now print the currently selected file uninverted so we don't have
-     to worry about doing it later */
-  widget_print_filename( filenames[ current_file ], current_file-top_left, 0 );
-
   return 0;
 }
 
@@ -440,39 +436,40 @@ void widget_filesel_keyhandler( keyboard_key_name key )
   /* If we moved the cursor */
   if( new_current_file != current_file ) {
 
-    current_file = new_current_file;
-
     /* If we've got off the top or bottom of the currently displayed
        file list, then reset the top-left corner and display the whole
        thing */
-    if( current_file < top_left_file ) {
+    if( new_current_file < top_left_file ) {
 
-      top_left_file = current_file & ~1;
+      top_left_file = new_current_file & ~1;
       widget_print_all_filenames( widget_filenames, widget_numfiles,
-				  top_left_file, current_file );
+				  top_left_file, new_current_file );
 
-    } else if( current_file >= top_left_file+36 ) {
+    } else if( new_current_file >= top_left_file+36 ) {
 
-      top_left_file = current_file & ~1; top_left_file -= 34;
+      top_left_file = new_current_file & ~1; top_left_file -= 34;
       widget_print_all_filenames( widget_filenames, widget_numfiles,
-				  top_left_file, current_file );
+				  top_left_file, new_current_file );
 
     } else {
 
-      /* Otherwise, print the new current file inverted, display the
-	 screen, and then print the current file back uninverted so we
-	 don't have to do so later */
+      /* Otherwise, print the current file uninverted and the
+	 new current file inverted */
 
       widget_print_filename( widget_filenames[ current_file ],
-			     current_file - top_left_file, 1 );
+			     current_file - top_left_file, 0 );
+	  
+      widget_print_filename( widget_filenames[ new_current_file ],
+			     new_current_file - top_left_file, 1 );
         
       uidisplay_lines(DISPLAY_BORDER_HEIGHT,
 		      DISPLAY_BORDER_HEIGHT + DISPLAY_SCREEN_HEIGHT );
 	  
-      widget_print_filename( widget_filenames[ current_file ],
-			     current_file - top_left_file, 0 );
-	  
     }
+
+    /* Reset the current file marker */
+    current_file = new_current_file;
+
   }
 
 }
