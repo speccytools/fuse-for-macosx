@@ -434,7 +434,11 @@ zxatasp_memory_map( void )
 {
   int writable;
 
-  writable = settings_current.zxatasp_wp ? 0 : 1;
+  if( settings_current.zxatasp_wp && ( memory_map_romcs[0].page_num & 1 ) ) {
+    writable = 0;
+  } else {
+    writable = 1;
+  }
 
   memory_map_romcs[0].writable = memory_map_romcs[1].writable = writable;
 
