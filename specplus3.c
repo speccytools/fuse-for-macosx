@@ -57,7 +57,7 @@ spectrum_port_info specplus3_peripherals[] = {
 
 static BYTE specplus3_unattached_port( void )
 {
-  return spectrum_unattached_port( 3 ); /* FIXME: is this right? */
+  return 0xff;
 }
 
 BYTE specplus3_readbyte(WORD address)
