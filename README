@@ -97,9 +97,8 @@ Cocoa port by fredm@spamcop.net. This comes as a set of
 ProjectBuilder projects for lib765, libdsk, libspectrum and fuse
 itself.
 
-Directly compiling the Unix version of Fuse on Mac OS X is
-possible, but would require some porting (there are at least
-issues with linking the getopt files).
+Directly compiling the Unix version of Fuse on Mac OS X works on
+Mac OS X 10.3 (Panther) or newer.
 
 Closing comments
 ----------------
