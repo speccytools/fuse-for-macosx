@@ -39,6 +39,7 @@
 
 #include "debugger/debugger.h"
 #include "display.h"
+#include "event.h"
 #include "fuse.h"
 #include "gtkkeyboard.h"
 #include "gtkui.h"
@@ -97,6 +98,7 @@ static void gtkui_select(GtkWidget *widget, gpointer data);
 static void gtkui_select_done( GtkWidget *widget, gpointer user_data );
 
 static void gtkui_break( GtkWidget *widget, gpointer data );
+static void gtkui_nmi( GtkWidget *widget, gpointer data );
 
 static void gtkui_tape_open( GtkWidget *widget, gpointer data );
 static void gtkui_tape_play( GtkWidget *widget, gpointer data );
@@ -150,6 +152,7 @@ static GtkItemFactoryEntry gtkui_menu_data[] = {
   { "/Machine/_Reset",	        "F5" , gtkui_reset,         0, NULL          },
   { "/Machine/_Select...",      "F9" , gtkui_select,        0, NULL          },
   { "/Machine/_Break...",	NULL , gtkui_break,	    0, NULL          },
+  { "/Machine/_NMI",		NULL , gtkui_nmi,	    0, NULL          },
   { "/Tape",                    NULL , NULL,                0, "<Branch>"    },
   { "/Tape/_Open...",	        "F7" , gtkui_tape_open,     0, NULL          },
   { "/Tape/_Play",	        "F8" , gtkui_tape_play,     0, NULL          },
@@ -613,6 +616,14 @@ static void
 gtkui_break( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
+}
+
+/* Machine/NMI */
+static void
+gtkui_nmi( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  /* Add an NMI to go off as soon as possible */
+  if( event_add( 0, EVENT_TYPE_NMI ) ) return;
 }
     
 /* Called by the menu when Tape/Open selected */

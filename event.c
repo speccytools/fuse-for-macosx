@@ -139,6 +139,10 @@ int event_do_events(void)
       tape_next_edge( ptr->tstates );
       break;
 
+    case EVENT_TYPE_NMI:
+      z80_nmi();
+      break;
+
     default:
       ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );
       break;

@@ -164,6 +164,7 @@ static widget_menu_entry widget_menu_machine[] = {
   { "(R)eset",     KEYBOARD_r, widget_menu_reset,  NULL         },
   { "(S)elect...", KEYBOARD_s, widget_menu_widget, &machine_sel },
   { "(B)reak...",  KEYBOARD_b, widget_menu_break, NULL          },
+  { "(N)MI",       KEYBOARD_n, widget_menu_nmi,    NULL         },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

@@ -57,7 +57,9 @@ typedef struct {
 
 void z80_init(void);
 void z80_reset(void);
+
 void z80_interrupt(void);
+void z80_nmi( void );
 
 void z80_do_opcodes(void);
 

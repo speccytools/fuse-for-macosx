@@ -157,6 +157,7 @@ int widget_menu_save_options( void *data );  /* Options/Save */
 
 int widget_menu_reset( void *data );	     /* Machine/Reset */
 int widget_menu_break( void *data );	     /* Machine/Break */
+int widget_menu_nmi( void *data );	     /* Machine/NMI */
 
 int widget_menu_play_tape( void *data );     /* Tape/Play */
 int widget_menu_rewind_tape( void *data );   /* Tape/Rewind */

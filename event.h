@@ -43,6 +43,7 @@ enum event_types {
   EVENT_TYPE_INTERRUPT,
   EVENT_TYPE_LINE,
   EVENT_TYPE_EDGE,
+  EVENT_TYPE_NMI,
 };
 
 /* A large value to mean `no events due' */

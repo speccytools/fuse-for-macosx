@@ -128,3 +128,19 @@ z80_interrupt( void )
     }
   }
 }
+
+/* Process a z80 non-maskable interrupt */
+void
+z80_nmi( void )
+{
+  /* FIXME: what happens if the z80 is HALTed? */
+
+  IFF1 = 0;
+
+  writebyte( --SP, PCH ); writebyte( --SP, PCL );
+
+  /* FIXME: how is R affected? */
+
+  /* FIXME: how does contention apply here? */
+  tstates += 11; PC = 0x0066;
+}

@@ -33,6 +33,7 @@
 #include <sys/mman.h>
 
 #include "debugger/debugger.h"
+#include "event.h"
 #include "fuse.h"
 #include "machine.h"
 #include "rzx.h"
@@ -247,6 +248,18 @@ widget_menu_break( void *data GCC_UNUSED )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
   widget_do( WIDGET_TYPE_DEBUGGER, NULL );
+  return 0;
+}
+
+/* Machine/NMI */
+int
+widget_menu_nmi( void *data GCC_UNUSED )
+{
+  int error;
+
+  error = event_add( 0, EVENT_TYPE_NMI );
+  if( error ) return error;
+
   return 0;
 }
 
