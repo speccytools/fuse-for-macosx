@@ -364,3 +364,5 @@
 	 unpause (or startup).
 20031117 memory.h, scld.c, tape.c, tc2068.c: get TC2068 memory routines
 	 working again.
+20031118 ui/gtk/gtkui.c: make speed estimates work properly after the GTK+
+	 pause function is used.

@@ -808,6 +808,8 @@ gtkui_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
     paused = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
 			 UI_STATUSBAR_STATE_INACTIVE );
+    timer_estimate_reset();
+    timer_count = 0;
     gtk_main_quit();
   } else {
     paused = 1;
