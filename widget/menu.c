@@ -39,6 +39,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
+#include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
 #include "snapshot.h"

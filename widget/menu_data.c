@@ -42,7 +42,7 @@
 
 static widget_menu_entry widget_menu_file[];
 static widget_menu_entry widget_menu_file_recording[];
-static widget_menu_entry widget_menu_file_aylogging[];
+static widget_menu_entry file_aylogging[];
 
 static widget_menu_entry widget_menu_machine[];
 
@@ -126,11 +126,11 @@ static widget_menu_entry widget_menu_file_recording[] = {
 
 /* File/AY Logging menu */
 
-static widget_menu_entry widget_menu_file_recording[] = {
+static widget_menu_entry file_aylogging[] = {
   { "AY Logging", 0, 0, NULL },		/* Menu title */
 
-  { "(R)ecord...", KEYBOARD_r, widget_menu_ay_record, NULL },
-  { "(S)top",	   KEYBOARD_s, widget_menu_ay_stop,   NULL },
+  { "(R)ecord...", KEYBOARD_r, widget_menu_psg_record, NULL },
+  { "(S)top",	   KEYBOARD_s, widget_menu_psg_stop,   NULL },
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };

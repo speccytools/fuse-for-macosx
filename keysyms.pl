@@ -161,7 +161,7 @@ my %ui_data = (
 	      function => sub ($) { "GDK_$_[0]" },
     	    },
 
-    sdl  => { headers => [ 'sdl.h' ],
+    sdl  => { headers => [ 'SDL.h' ],
 	      max_length => 15,
 	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R ) },
 	      translations => {
