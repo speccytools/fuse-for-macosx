@@ -83,12 +83,7 @@ int tape_init( void )
 int tape_open( const char *filename, int autoload )
 {
   unsigned char *buffer; size_t length;
-
-  int error; libspectrum_error_function_t old_error_fn;
-
-  /* Get the file's data */
-  error = utils_read_file( filename, &buffer, &length );
-  if( error ) return error;
+  int error;
 
   /* If we already have a tape file open, close it */
   if( libspectrum_tape_present( tape ) ) {
@@ -96,21 +91,12 @@ int tape_open( const char *filename, int autoload )
     if( error ) { munmap( buffer, length ); return error; }
   }
 
-  /* First, try opening the file as a .tzx file; if we get back an
-     error saying it didn't have the .tzx signature, then try opening
-     it as a .tap file */
+  /* Get the file's data */
+  error = utils_read_file( filename, &buffer, &length );
+  if( error ) return error;
 
-  /* Temporarily ignore signature errors */
-  old_error_fn = libspectrum_error_function;
-  libspectrum_error_function = ui_libspectrum_error_ignore_sig;
-
-  error = libspectrum_tzx_read( tape, buffer, length );
-  if( error == LIBSPECTRUM_ERROR_SIGNATURE ) {
-    error = libspectrum_tap_read( tape, buffer, length );
-  }
-
-  libspectrum_error_function = old_error_fn;
-
+  error = libspectrum_tape_read( tape, buffer, length, LIBSPECTRUM_ID_UNKNOWN,
+				 filename );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     munmap( buffer, length );
     return error;
@@ -129,12 +115,12 @@ int tape_open( const char *filename, int autoload )
   }
 
   return 0;
-
 }
 
-/* Use an already open .tap file as the current tape */
+/* Use an already open tape file as the current tape */
 int
-tape_open_tap_buffer( unsigned char *buffer, size_t length, int autoload )
+tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
+		  int autoload )
 {
   int error;
 
@@ -142,28 +128,7 @@ tape_open_tap_buffer( unsigned char *buffer, size_t length, int autoload )
     error = tape_close(); if( error ) return error;
   }
 
-  error = libspectrum_tap_read( tape, buffer, length );
-  if( error ) return error;
-
-  if( autoload ) {
-    error = tape_autoload( machine_current->machine );
-    if( error ) return error;
-  }
-
-  return 0;
-}
-
-/* Use an already open .tzx file as the current tape */
-int
-tape_open_tzx_buffer( unsigned char *buffer, size_t length, int autoload )
-{
-  int error;
-
-  if( libspectrum_tape_present( tape ) ) {
-    error = tape_close(); if( error ) return error;
-  }
-
-  error = libspectrum_tzx_read( tape, buffer, length );
+  error = libspectrum_tape_read( tape, buffer, length, type, NULL );
   if( error ) return error;
 
   if( autoload ) {

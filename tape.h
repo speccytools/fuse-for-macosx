@@ -27,6 +27,8 @@
 #ifndef FUSE_TAPE_H
 #define FUSE_TAPE_H
 
+#include <libspectrum.h>
+
 #ifndef FUSE_TYPES_H
 #include "types.h"
 #endif
@@ -34,8 +36,8 @@
 int tape_init( void );
 
 int tape_open( const char *filename, int autoload );
-int tape_open_tap_buffer( unsigned char *buffer, size_t length, int autoload );
-int tape_open_tzx_buffer( unsigned char *buffer, size_t length, int autoload );
+int tape_read_buffer( unsigned char *buffer, size_t length,
+		      libspectrum_id_t type, int autoload );
 
 int tape_close( void );
 int tape_select_block( size_t n );

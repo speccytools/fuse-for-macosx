@@ -56,13 +56,3 @@ ui_libspectrum_error( libspectrum_error error, const char *format, va_list ap )
 
   return LIBSPECTRUM_ERROR_NONE;
 }
-
-libspectrum_error
-ui_libspectrum_error_ignore_sig( libspectrum_error error,
-				 const char *format, va_list ap )
-{
-  if( error != LIBSPECTRUM_ERROR_SIGNATURE )
-    return ui_libspectrum_error( error, format, ap );
-
-  return LIBSPECTRUM_ERROR_NONE;
-}

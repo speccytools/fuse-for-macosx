@@ -60,8 +60,5 @@ int ui_error( ui_error_level severity, const char *format, ... )
      GCC_PRINTF( 2, 3 );
 libspectrum_error ui_libspectrum_error( libspectrum_error error,
 					const char *format, va_list ap );
-libspectrum_error
-ui_libspectrum_error_ignore_sig( libspectrum_error error,
-				 const char *format, va_list ap );
 
 #endif			/* #ifndef FUSE_UI_H */

@@ -304,11 +304,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg, int autoload )
       break;
 
     case LIBSPECTRUM_ID_TAPE_TAP:
-      error = tape_open_tap_buffer( buffer, length, autoload );
-      break;
-
     case LIBSPECTRUM_ID_TAPE_TZX:
-      error = tape_open_tzx_buffer( buffer, length, autoload );
+      error = tape_read_buffer( buffer, length, type, autoload );
       break;
 
     default:
