@@ -196,6 +196,8 @@ create_dialog( void )
 
   /* The command entry widget */
   entry = gtk_entry_new();
+  gtk_signal_connect( GTK_OBJECT( entry ), "activate",
+		      GTK_SIGNAL_FUNC( evaluate_command ), NULL );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), entry );
 
   /* The 'command evaluate' button */
