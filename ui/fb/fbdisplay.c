@@ -60,12 +60,6 @@ int image_scale;
 /* The height and width of a 1x1 image in pixels */
 int image_width, image_height;
 
-/* A scaled copy of the image displayed on the Spectrum's screen */
-static libspectrum_word
-  scaled_image[2*DISPLAY_SCREEN_HEIGHT][2*DISPLAY_SCREEN_WIDTH];
-static const ptrdiff_t scaled_pitch =
-  2 * DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
-
 /* Are we in a Timex display mode? */
 static int hires;
 
@@ -78,7 +72,7 @@ static const short colours[] = {
 };
 
 static int fb_fd = -1;		/* The framebuffer's file descriptor */
-static libspectrum_word *image = 0, *gm = 0;
+static libspectrum_word *gm = 0;
 
 static struct fb_fix_screeninfo fixed;
 static struct fb_var_screeninfo orig_display, display;
@@ -212,18 +206,9 @@ fb_select_mode( size_t index )
     return 1;
   }
 
-  image = malloc( display.xres_virtual * 240 * 2 );
-  if( !image ) {
-    munmap( gm, fixed.smem_len );
-    fprintf( stderr, "%s: couldn't create image\n", fuse_progname );
-    return 1;
-  }
-
-  fputs( "\x1B[H\x1B[J", stdout );	/* clear tty */
-  memset( gm, 0, display.xres_virtual * display.yres_virtual * 2 );
-
+  display.activate = FB_ACTIVATE_TEST;
   if( ioctl( fb_fd, FBIOPUT_VSCREENINFO, &display ) ) {
-    free( image ); munmap( gm, fixed.smem_len );
+    munmap( gm, fixed.smem_len );
     return 1;
   }
 
