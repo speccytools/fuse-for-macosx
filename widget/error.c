@@ -26,21 +26,102 @@
 
 #include <config.h>
 
+#include <stdio.h>
+#include <string.h>
+
 #include "display.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
 #include "widget.h"
 
+static int split_message( const char *message, char ***lines, size_t *count,
+			  const size_t line_length );
+
 int widget_error_draw( void *data )
 {
   char *message = (char*)data;
-  
-  widget_dialog_with_border( 1, 2, 30, 1 );
+  char **lines; size_t count;
+  size_t i;
 
-  widget_printstring( 2, 2, WIDGET_COLOUR_FOREGROUND, "An error has occured" );
+  if( split_message( message, &lines, &count, 28 ) ) return 1;
+  
+  widget_dialog_with_border( 1, 2, 30, count );
+
+  for( i=0; i<count; i++ ) {
+    widget_printstring( 2, i+2, WIDGET_COLOUR_FOREGROUND, lines[i] );
+    free( lines[i] );
+  }
+
+  free( lines );
 
   uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 16 );
+		   DISPLAY_BORDER_HEIGHT + 16 + (count+2)*8 );
+
+  return 0;
+}
+
+static int
+split_message( const char *message, char ***lines, size_t *count,
+	       const size_t line_length )
+{
+  const char *ptr = message;
+  int position;
+
+  /* Setup so we'll allocate the first line as soon as we get the first
+     word */
+  *lines = NULL; *count = 0; position = line_length;
+
+  *lines = (char**)malloc( sizeof(char**) );
+  if( *lines == NULL ) return 1;
+
+  (*lines)[0] = (char*)malloc( line_length * sizeof(char) );
+  if( (*lines)[0] == NULL ) { free( *lines ); return 1; }
+
+  while( *ptr ) {
+
+    /* Skip any whitespace */
+    while( *ptr == ' ' ) ptr++; message = ptr;
+
+    /* Find end of word */
+    while( *ptr && *ptr++ != ' ' ) /* Do nothing */;
+
+    /* message now points to a word of length (ptr-message-1), so check
+       we've got room for that, plus the prefixing space */
+    if( position + ( ptr - message ) > line_length ) {
+      char **new_lines; int i;
+
+      new_lines = (char**)realloc( (*lines), (*count + 1) * sizeof( char** ) );
+      if( new_lines == NULL ) {
+	for( i=0; i<*count; i++ ) free( (*lines)[i] );
+	if(*lines) free( (*lines) );
+	return 1;
+      }
+
+      (*lines)[*count] = (char*)malloc( (line_length+1) * sizeof(char) );
+      if( (*lines)[*count] == NULL ) {
+	for( i=0; i<*count; i++ ) free( (*lines)[i] );
+	free( (*lines) );
+	return 1;
+      }
+      
+      strncpy( (*lines)[*count], message, ptr - message - 1 );
+      (*lines)[*count][position] = '\0';
+
+      position = ptr - message - 1;
+      (*count)++;
+
+    } else {		/* Enough room on this line */
+
+      strcat( (*lines)[*count-1], " " );
+      strncat( (*lines)[*count-1], message, ptr-message-1 );
+      position += ptr-message;
+      (*lines)[*count-1][position] = '\0';
+
+    }
+
+    message = ptr;
+    
+  }
 
   return 0;
 }
