@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include "display.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
@@ -65,3 +67,5 @@ widget_picture_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   }
 }
+
+#endif				/* #ifdef USE_WIDGET */

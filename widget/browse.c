@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -172,3 +174,5 @@ widget_browse_finish( widget_finish_state finished )
     
   return 0;
 }
+
+#endif				/* #ifdef USE_WIDGET */

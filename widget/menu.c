@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -418,3 +420,5 @@ int widget_menu_keyboard( void *data )
 
   return 0;
 }
+
+#endif				/* #ifdef USE_WIDGET */

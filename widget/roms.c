@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -136,3 +138,5 @@ widget_roms_finish( widget_finish_state finished )
   settings_free( widget_settings ); free( widget_settings );
   return 0;
 }
+
+#endif				/* #ifdef USE_WIDGET */

@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <sys/types.h>
 #include <dirent.h>
 #include <errno.h>
@@ -492,3 +494,5 @@ widget_filesel_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
   }
 
 }
+
+#endif				/* #ifdef USE_WIDGET */

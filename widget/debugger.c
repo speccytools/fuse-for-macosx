@@ -26,14 +26,14 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <stdio.h>
 
 #include "debugger/debugger.h"
 #include "widget_internals.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
-
-#ifdef USE_WIDGET
 
 int
 ui_debugger_activate( void )
@@ -46,8 +46,6 @@ ui_debugger_deactivate( int interruptable )
 {
   return 0;
 }
-
-#endif				/* #ifdef USE_WIDGET */
 
 int
 widget_debugger_draw( void *data GCC_UNUSED )
@@ -127,3 +125,5 @@ int ui_debugger_update( void )
 {
   return 0;
 }
+
+#endif				/* #ifdef USE_WIDGET */

@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <stdlib.h>
 
 #include "rzx.h"
@@ -258,3 +260,5 @@ static widget_menu_entry widget_menu_help[] = {
 
   { NULL, 0, 0, NULL }			/* End marker: DO NOT REMOVE */
 };
+
+#endif				/* #ifdef USE_WIDGET */

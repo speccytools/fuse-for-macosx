@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <errno.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -471,3 +473,5 @@ widget_t widget_data[] = {
   { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
 
 };
+
+#endif				/* #ifdef USE_WIDGET */

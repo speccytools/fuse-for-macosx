@@ -41,6 +41,8 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <stdio.h>
 
 #include "fuse.h"
@@ -190,3 +192,6 @@ CODE
 CODE
 
 }
+
+print "\n#endif				/* #ifdef USE_WIDGET */\n";
+

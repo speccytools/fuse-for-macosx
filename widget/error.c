@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -162,3 +164,5 @@ widget_error_keyhandler( keyboard_key_name key, keyboard_key_name key2 )
 
   }
 }
+
+#endif				/* #ifdef USE_WIDGET */

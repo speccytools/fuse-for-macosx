@@ -27,6 +27,8 @@
 #ifndef FUSE_WIDGET_H
 #define FUSE_WIDGET_H
 
+#ifdef USE_WIDGET
+
 #ifndef FUSE_KEYBOARD_H
 #include "keyboard.h"
 #endif				/* #ifndef FUSE_KEYBOARD_H */
@@ -112,4 +114,7 @@ typedef struct widget_error_t {
 /* The scaler returned from the scaler widget */
 scaler_type widget_scaler;
 
+#endif				/* #ifdef USE_WIDGET */
+
 #endif				/* #ifndef FUSE_WIDGET_H */
+

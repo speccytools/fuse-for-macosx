@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#ifdef USE_WIDGET
+
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -159,3 +161,4 @@ int widget_scaler_finish( widget_finish_state finished )
   return 0;
 }
 
+#endif				/* #ifdef USE_WIDGET */
