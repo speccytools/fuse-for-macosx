@@ -293,12 +293,10 @@ foreach( @keys ) {
     if( $ui eq 'fb' ) {
 
 	for( my $i = 0; $i <= $#cooked_keysyms; $i++ ) {
-	    if( defined $cooked_keysyms[$i] and
-		$cooked_keysyms[$i] eq $ui_keysym ) {
-#		printf "  { %3i, KEYBOARD_%-9s KEYBOARD_%-6s },\n", $i,
-#		    "$key1,", $key2;
-		last;
-	    }
+	    next unless defined $cooked_keysyms[$i] and
+			$cooked_keysyms[$i] eq $ui_keysym;
+	    printf "  { %3i, INPUT_KEY_%-11s },\n", $i, $keysym;
+	    last;
 	}
 
     } else {

@@ -1034,3 +1034,5 @@
          565/555 mode detection.
 20040724 widget/text.c: fix small memory leak (Darren).
 20040724 ui/gtk/pokefinder.c: remove unnecessary accelerator code (Darren).
+20040724 keysyms.pl,ui/fb/fbkeyboard.c: reintegrate the framebuffer keyboard
+         mapping code into keysyms.pl.
