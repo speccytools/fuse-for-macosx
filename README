@@ -1,9 +1,9 @@
-The Free Unix Spectrum Emulator (Fuse) 0.6.0
-============================================
+The Free Unix Spectrum Emulator (Fuse) 0.6.0.1
+==============================================
 
 Given the current proliferation of DOS/Windows Speccy emulators, I
 decided it was time to redress the Unix balance a bit. Therefore, here
-is Fuse (the Free Unix Spectrum Emulator), version 0.6.0.
+is Fuse (the Free Unix Spectrum Emulator), version 0.6.0.1.
 
 What Fuse does have:
 
@@ -122,6 +122,6 @@ may be useful (information on internals, etc) are in the hacking/
 directory.
 
 Philip Kendall <pak21-fuse@srcf.ucam.org>
-20 April 2003
+31 May 2003
 
 $Id$

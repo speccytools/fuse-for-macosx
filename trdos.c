@@ -49,10 +49,16 @@
 
 typedef struct 
 {
-  char filename[PATH_MAX];
-  int disc_ready;
+  int disc_ready;		/* Is this disk present? */
+
+  char filename[PATH_MAX];	/* The filename we used to open this disk */
+  int fd;			/* The fd will we use to access this disk */
+
+  int ro;			/* True if we have read-only access to this
+				   disk */
+
   BYTE trk;
-  int ro;
+
 } discs_type;
 
 #ifdef WORDS_BIGENDIAN
@@ -151,20 +157,11 @@ static discs_type discs[4];
 
 int trdos_active=0;
 
-/* The filenames (if any) used for the results of our SCL->TRD conversions */
-static char *scl_files[2] = { NULL, NULL };
-
-/* The file descriptors used mkstemp(3) returned for those temporary files */
-static int scl_fds[2];
-
 /* The template used for naming the results of the SCL->TRD conversion */
 #define SCL_TMP_FILE_TEMPLATE "/tmp/fuse.scl.XXXXXX"
 
-/* Remove any temporary file associated with drive 'which' */
-static int remove_scl( trdos_drive_number which );
-
-static int FileExists(const char * arg);
-static int Scl2Trd( const char *oldname, const char *newname );
+static int Scl2Trd( const char *oldname, int TRD );
+static int insert_scl( trdos_drive_number which, const char *filename );
 static int insert_trd( trdos_drive_number which, const char *filename );
 static DWORD lsb2dw( BYTE *mem );
 static void dw2lsb( BYTE *mem, DWORD value );
@@ -197,9 +194,7 @@ trdos_reset( void )
 void
 trdos_end( void )
 {
-  int i;
-
-  for( i=0; i<2; i++ ) remove_scl( i );
+  ;
 }
 
 static
@@ -289,41 +284,30 @@ trdos_dr_read( WORD port GCC_UNUSED )
 void
 trdos_dr_write( WORD port GCC_UNUSED, BYTE b )
 {
-  int trd_file;
-
   vg_reg_dat = b;
 
-  if ( towrite == 0 )
-    return;
+  if( towrite == 0 ) return;
 
-  trd_file = open( CurrentDisk.filename, O_WRONLY );
-  if ( trd_file == -1 )
-    return;
-
-  if ( lseek( trd_file, towriteaddr, SEEK_SET ) != towriteaddr )
-  {
+  if( lseek( CurrentDisk.fd, towriteaddr, SEEK_SET ) == -1 ) {
     towrite = 0;
 
     ui_error( UI_ERROR_ERROR,
-              "trdos_dr_write : seek failed '%s'. pointer = %d",
-              strerror(errno), towriteaddr );
-    close( trd_file );
+              "trdos_dr_write: seeking in '%s' failed: %s",
+	      CurrentDisk.filename, strerror( errno ) );
     return;
   }
 
-  write( trd_file, &b, 1 );
-  close( trd_file );
+  write( CurrentDisk.fd, &b, 1 );
 
   towrite--;
   towriteaddr++;
 
-  if ( towrite == 0 )
-  {
-    close( trd_file );
+  if( towrite == 0 ) {
     vg_portFF_in = 0x80;
     vg_rs.byte = 0;
-  } else
+  } else {
     vg_portFF_in = 0x40;
+  }
 }
 
 BYTE
@@ -345,121 +329,98 @@ trdos_sp_write( WORD port GCC_UNUSED, BYTE b )
 }
 
 static int
-FileExists(const char * arg)
-{
-  struct stat buf;
-
-  if ( stat( arg, &buf ) == -1 ) {
-    return(0);
-  }
-
-  return(1);
-}
-
-static int
 insert_trd( trdos_drive_number which, const char *filename )
 {
   int fil;
-  BYTE * temp;
+  BYTE *temp;
 
-  if ( !FileExists( filename ) ) {
-    ui_error( UI_ERROR_INFO, "%s - No such file. Creating it", filename );
+  discs[which].ro = 0;
 
-    fil = open( filename, O_CREAT|O_TRUNC|O_WRONLY, 00644 );
+  fil = open( filename, O_RDWR );
+  if( fil == -1 ) {
 
+    /* If we couldn't open the file read-write, try opening it read-only */
+    if( errno == EACCES ) {
+      discs[which].ro = 1;
+      fil = open( filename, O_RDONLY );
+    }
+  }
+
+  if( fil == -1 ) {
+
+    ssize_t written;
+
+    /* If we got an error other than 'file doesn't exist', don't try
+       anything else */
+    if( errno != ENOENT ) {
+      ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
+		strerror( errno ) );
+      return 1;
+    }
+
+    ui_error( UI_ERROR_INFO, "No such file '%s'; creating it", filename );
+    discs[which].ro = 0;
+
+    /* FIXME: NFS locking problems */
+    fil = open( filename, O_CREAT | O_EXCL | O_RDWR );
     if( fil == -1 ) {
-      discs[which].disc_ready = 0;
-
-      ui_error( UI_ERROR_ERROR,
-              "Can't create %s. You must be able read and write this directory",
-              filename );
-
+      ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
+		strerror( errno ) );
       return 1;
     }
 
     temp = malloc( TRDOS_DISC_SIZE );
-    memset( temp, TRDOS_DISC_SIZE, 0 );
-    write( fil, temp, TRDOS_DISC_SIZE );
-    free( temp );
-
-    close( fil );
-  }
-
-  fil = open( filename, O_RDWR );
-
-  if( fil == -1 ) {
-    close( fil );
-    fil = open( filename, O_RDONLY );
-
-    if ( fil == -1 ) {	
-      discs[which].disc_ready = 0;
-
-      ui_error( UI_ERROR_INFO, "Can't open %s", filename );
-
+    if( !temp ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      close( fil );
       return 1;
     }
 
-    discs[which].ro = 1;
-  } else {
-    discs[which].ro = 0;
-  }	
+    memset( temp, TRDOS_DISC_SIZE, 0 );
 
+    written = write( fil, temp, TRDOS_DISC_SIZE );
+    if( written != TRDOS_DISC_SIZE ) {
+      if( written == -1 ) {
+	ui_error( UI_ERROR_ERROR, "Error writing to '%s': %s", filename,
+		  strerror( errno ) );
+      } else {
+	ui_error( UI_ERROR_ERROR,
+		  "Only wrote %lu bytes out of %d to '%s'",
+		  (unsigned long)written, TRDOS_DISC_SIZE, filename );
+      }
+      close( fil );
+      return 1;
+    }
+
+  }
+
+  discs[which].fd = fil;
   strcpy( discs[which].filename, filename );
   discs[which].disc_ready = 1;
-  close( fil );
 
   return 0;
 }
 
 static int
-remove_scl( trdos_drive_number which )
-{
-  int error = 0;
-
-  if( scl_files[ which ] ) {
-
-    if( close( scl_fds[ which ] ) ) {
-      ui_error( UI_ERROR_ERROR, "couldn't close temporary file %s: %s",
-		scl_files[ which ], strerror( errno ) );
-    }
-
-    error = unlink( scl_files[ which ] );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "couldn't remove temporary .trd file %s: %s",
-		scl_files[ which ], strerror( errno ) );
-    }
-    free( scl_files[ which ] ); scl_files[ which ] = 0;
-
-  }
-
-  return error;
-}  
-
-int
-trdos_disk_insert_scl( trdos_drive_number which, const char *filename )
+insert_scl( trdos_drive_number which, const char *filename )
 {
   char trd_template[] = SCL_TMP_FILE_TEMPLATE;
   int ret;
 
-  ret = remove_scl( which ); if( ret ) return ret;
+  discs[ which ].disc_ready = 0;
 
-  scl_fds[ which ] = mkstemp( trd_template );
-  if( scl_fds[ which ] == -1 ) {
+  discs[ which ].fd = mkstemp( trd_template );
+  if( discs[ which ].fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't get a temporary filename: %s",
 	      strerror( errno ) );
-    return ret;
-  }
-
-  scl_files[ which ] = malloc( strlen( trd_template ) + 1 );
-  if( !scl_files[ which ] ) {
-    unlink( trd_template );
-    close( scl_fds[ which ] );
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
-  strcpy( scl_files[ which ], trd_template );
+  
+  /* Unlink the file so it will be removed when the fd is closed */
+  unlink( trd_template );
 
-  if( ( ret = Scl2Trd( filename, trd_template ) ) ) {
+  if( ( ret = Scl2Trd( filename, discs[ which ].fd ) ) ) {
+    close( discs[ which ].fd );
     return ret;
   }
 
@@ -473,13 +434,15 @@ trdos_disk_insert_scl( trdos_drive_number which, const char *filename )
 int
 trdos_disk_insert( trdos_drive_number which, const char *filename )
 {
-  char ext[4];
   int error;
 
-  sprintf(ext,"%s",&filename[strlen(filename)-3]);
+  if( discs[ which ].disc_ready ) {
+    if( trdos_disk_eject( which ) ) return 1;
+  }
 
-  if ( strcasecmp( ext, "scl" ) == 0 ) {
-    error = trdos_disk_insert_scl( which, filename );
+  if( strlen( filename ) >= 4 &&
+      strcasecmp( &filename[ strlen( filename ) - 4 ], ".scl" ) == 0 ) {
+    error = insert_scl( which, filename );
   } else {
     error = insert_trd( which, filename );
   }
@@ -495,7 +458,11 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
 int
 trdos_disk_eject( trdos_drive_number which )
 {
-  remove_scl( which );
+  if( close( discs[which].fd ) == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Error closing '%s': %s", discs[which].filename,
+	      strerror( errno ) );
+    return 1;
+  }
 
   discs[which].disc_ready = 0;
 
@@ -582,7 +549,7 @@ vg_setFlagsSeeks( void )
 void
 trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
 {
-  int trd_file, error;
+  int error;
 
   if ( last_vg93_system & 0x10 )
     side = 0;
@@ -659,26 +626,13 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
       return;
     }
 
-    trd_file = open( CurrentDisk.filename, O_RDONLY );
-
-    if ( trd_file == -1 ) {
-      ui_error( UI_ERROR_ERROR,
-                "trdos_cr_write : Can't open file %s last_vg93_system=%x",
-                CurrentDisk.filename, last_vg93_system );
-
-      vg_rs.byte = 0x90;
-      vg_portFF_in = 0x80; 
-
-      return;
-    }
-
     pointer = ( CurrentDisk.trk * 2 + side ) * 256 * 16 + ( vg_reg_sec - 1 ) *
               256;
 
-    if ( lseek( trd_file, pointer, SEEK_SET) != pointer ) {
+    if( lseek( CurrentDisk.fd, pointer, SEEK_SET) == -1 ) {
       ui_error( UI_ERROR_ERROR,
-                "trdos_cr_write : seek failed, pointer = %d", pointer );
-      close( trd_file );
+		"trdos_cr_write: seeking in '%s' failed: %s",
+		CurrentDisk.filename, strerror( errno ) );
 
       vg_rs.byte |= 0x10; /*  sector not found */
       vg_portFF_in = 0x80;
@@ -691,14 +645,13 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
                 "Unimplemented multi sector read:read vg_reg_sec=%d",
                 vg_reg_sec );
 
-      read( trd_file, track, 256 * ( 17 - vg_reg_sec ) );
+      read( CurrentDisk.fd, track, 256 * ( 17 - vg_reg_sec ) );
 
-      lseek( trd_file, -256 * ( ( 17 - vg_reg_sec ) + ( vg_reg_sec - 1 ) ),
+      lseek( CurrentDisk.fd,
+	     -256 * ( ( 17 - vg_reg_sec ) + ( vg_reg_sec - 1 ) ),
              SEEK_CUR );
-      read( trd_file, track, 256 * ( vg_reg_sec - 1 ) );
+      read( CurrentDisk.fd, track, 256 * ( vg_reg_sec - 1 ) );
  
-      close( trd_file );
-
       toread = track;
       toread_num = 256 * ( 16 );
       toread_position =  0;
@@ -706,8 +659,7 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
       /* vg_portFF_in=0x80; */
       /* todo : Eto proverit' !!! */
     } else {
-      if ( read( trd_file, track, 256 ) == 256 ) {
-        close( trd_file );
+      if( read( CurrentDisk.fd, track, 256 ) == 256 ) {
 
         toread = track;
         toread_num = 256;
@@ -719,12 +671,12 @@ trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
                                      / 1000 * 30,
                            EVENT_TYPE_TRDOS_CMD_DONE );
       } else {
-        close( trd_file );
 
         vg_rs.byte |= 0x10; /*  sector not found */
         vg_portFF_in = 0x80;
         
-        ui_error( UI_ERROR_ERROR, "read(trd_file, track, 256)!=256" );
+        ui_error( UI_ERROR_ERROR, "Error reading from '%s'",
+		  CurrentDisk.filename );
       }
     }
 
@@ -832,12 +784,12 @@ dw2lsb( BYTE *mem, DWORD value )
   mem[3] = ret.b.b3;
 }
 
-static int 
-Scl2Trd( const char *oldname, const char *newname )
+static int
+Scl2Trd( const char *oldname, int TRD )
 {
-  int TRD, SCL, i;
+  int SCL, i;
 
-  void *TRDh;
+  BYTE *TRDh;
 
   BYTE *trd_free;
   BYTE *trd_fsec;
@@ -853,6 +805,8 @@ Scl2Trd( const char *oldname, const char *newname )
   DWORD fptr;
   size_t x;
 
+  ssize_t written;
+
   BYTE template[34] =
   { 0x01, 0x16, 0x00, 0xF0,
     0x09, 0x10, 0x00, 0x00,
@@ -864,62 +818,95 @@ Scl2Trd( const char *oldname, const char *newname )
     0x00, 0x00, 0x46, 0x55
   };
 
-  FILE *fh;
   BYTE *mem;
 
-  fh = fopen( newname, "w" );
-  if( fh ) {
-    mem = (BYTE *) malloc( BLOCKSIZE );
-    memset( mem, 0, BLOCKSIZE );
+  mem = malloc( BLOCKSIZE );
+  if( !mem ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    return 1;
+  }
 
-    if( mem ) {
-      memcpy( &mem[TRD_DIRSTART], template, TRD_DIRLEN );
-      strncpy( &mem[TRD_NAMEOFFSET], "Fuse", TRD_MAXNAMELENGTH );
-      fwrite( (void *) mem, 1, BLOCKSIZE, fh );
-      memset( mem, 0, BLOCKSIZE );
+  memset( mem, 0, BLOCKSIZE );
 
-      for( i = 0; i < 63; i++ )
-	fwrite( (void *)mem, 1, BLOCKSIZE, fh );
+  memcpy( &mem[TRD_DIRSTART], template, TRD_DIRLEN );
+  strncpy( &mem[TRD_NAMEOFFSET], "Fuse", TRD_MAXNAMELENGTH );
 
+  written = write( TRD, mem, BLOCKSIZE );
+  if( written != BLOCKSIZE ) {
+    ui_error( UI_ERROR_ERROR, "Error writing to temporary TRD file" );
+    free( mem );
+    return 1;
+  }
+
+  memset( mem, 0, BLOCKSIZE );
+
+  for( i = 0; i < 63; i++ ) {
+
+    written = write( TRD, mem, BLOCKSIZE );
+    if( written != BLOCKSIZE ) {
+      ui_error( UI_ERROR_ERROR, "Error writing to temporary TRD file" );
       free( mem );
-      fclose( fh );
+      return 1;
     }
   }
 
-  if( ( TRD = open( newname, O_RDWR ) ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Error - cannot open TRD disk image %s",
-              newname );
+  free( mem );
+
+  if( lseek( TRD, 0, SEEK_SET ) == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Error seeking in temporary TRD file" );
+    return 1;
+  }
+  
+  TRDh = malloc( 4096 );
+  if( !TRDh ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 
-  TRDh = malloc( 4096 );
-  read( TRD, TRDh, 4096 );
+  if( read( TRD, TRDh, 4096 ) != 4096 ) {
+    ui_error( UI_ERROR_ERROR, "Error reading from temporary TRD file" );
+    free( TRDh );
+    return 1;
+  }
 
-  trd_free = (BYTE *) TRDh + 0x8E5;
-  trd_files = (BYTE *) TRDh + 0x8E4;
-  trd_fsec = (BYTE *) TRDh + 0x8E1;
-  trd_ftrk = (BYTE *) TRDh + 0x8E2;
+  trd_free = TRDh + 0x8E5;
+  trd_files = TRDh + 0x8E4;
+  trd_fsec = TRDh + 0x8E1;
+  trd_ftrk = TRDh + 0x8E2;
 
   if( ( SCL = open( oldname, O_RDONLY ) ) == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Can't open SCL file %s", oldname );
-    close( TRD );
-    close( SCL );
+    ui_error( UI_ERROR_ERROR, "Can't open SCL file '%s': %s", oldname,
+	      strerror( errno ) );
+    free( TRDh );
     return 1;
   }
 
-  read( SCL, &signature, 8 );
+  if( read( SCL, &signature, 8 ) != 8 ) {
+    ui_error( UI_ERROR_ERROR, "Error reading from '%s'", oldname );
+    close( SCL ); free( TRDh );
+    return 1;
+  }
 
   if( strncasecmp( signature, "SINCLAIR", 8 ) ) {
-    ui_error( UI_ERROR_ERROR, "Wrong signature=%s", signature );
-    close( TRD );
-    close( SCL );
+    ui_error( UI_ERROR_ERROR, "SCL file '%s' has the wrong signature",
+	      oldname );
+    close( SCL ); free( TRDh );
     return 1;
   }
 
-  read( SCL, &blocks, 1 );
+  if( read( SCL, &blocks, 1 ) != 1 ) {
+    ui_error( UI_ERROR_ERROR, "Error reading from '%s'", oldname );
+    close( SCL ); free( TRDh );
+    return 1;
+  }
 
-  for( x = 0; x < blocks; x++ )
-    read( SCL, &(headers[x][0]), 14 );
+  for( x = 0; x < blocks; x++ ) {
+    if( read( SCL, &(headers[x][0]), 14 ) != 14 ) {
+      ui_error( UI_ERROR_ERROR, "Error reading from '%s'", oldname );
+      close( SCL ); free( TRDh );
+      return 1;
+    }
+  }
 
   for( x = 0; x < blocks; x++ ) {
     size = headers[x][13];
@@ -927,27 +914,32 @@ Scl2Trd( const char *oldname, const char *newname )
       ui_error( UI_ERROR_ERROR,
                 "File is too long to fit in the image *trd_free=%u < size=%u",
                 lsb2dw( trd_free ), size );
-      close( SCL );
       goto Finish;
     }
 
     if( *trd_files > 127 ) {
       ui_error( UI_ERROR_ERROR, "Image is full" );
-      close( SCL );
       goto Finish;
     }
 
-    memcpy( (void *) ((BYTE *) TRDh + *trd_files * 16),
-	    (void *) headers[x], 14 );
+    memcpy( TRDh + *trd_files * 16, headers[x], 14 );
 
-    memcpy( (void *) ((BYTE *) TRDh + *trd_files * 16 + 0x0E ),
-	    (void *) trd_fsec, 2 );
+    memcpy( TRDh + *trd_files * 16 + 0x0E, trd_fsec, 2 );
 
     tmpscl = malloc( 32000 );
+    if( !tmpscl ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      goto Finish;
+    }
 
-    left = (DWORD) ( headers[x][13] ) * 256L;
-    fptr = (*trd_ftrk) * 4096L + (*trd_fsec) * 256L;
-    lseek( TRD, fptr, SEEK_SET );
+    left = ( headers[x][13] ) * (DWORD)256;
+    fptr = (*trd_ftrk) * (DWORD)4096 + (*trd_fsec) * (DWORD)256;
+    
+    if( lseek( TRD, fptr, SEEK_SET ) == -1 ) {
+      ui_error( UI_ERROR_ERROR, "Error seeking in temporary TRD file: %s",
+		strerror( errno ) );
+      goto Finish;
+    }
 
     while ( left > 32000 ) {
       read( SCL, tmpscl, 32000 );
@@ -976,12 +968,10 @@ Scl2Trd( const char *oldname, const char *newname )
     }
   }
 
-  close( SCL );
-
 Finish:
+  close( SCL );
   lseek( TRD, 0L, SEEK_SET );
   write( TRD, TRDh, 4096 );
-  close( TRD );
   free( TRDh );
 
   return 0;

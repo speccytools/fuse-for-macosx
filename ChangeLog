@@ -1,3 +1,14 @@
+2003-05-31  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.6.0.1 released
+
+	* [SECURITY] Fix race conditions in trdos.c which could be used
+	  to overwrite any file owned by the user running Fuse (Philip
+	  Kendall).
+
+	* Fix a off-by-one error in the AdvMame2x scaler (Fredrick
+	  Meunier/ScummVM team).
+
 2003-04-27  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
 	* Fuse 0.6.0 released.
