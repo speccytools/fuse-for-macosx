@@ -36,6 +36,7 @@
 #include "gtkinternals.h"
 #include "input.h"
 #include "keyboard.h"
+#include "ui/ui.h"
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);
 
