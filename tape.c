@@ -369,22 +369,22 @@ int tape_save_trap( void )
 int trap_check_rom( void )
 {
   switch( machine_current->machine ) {
-  case SPECTRUM_MACHINE_48:
+  case LIBSPECTRUM_MACHINE_48:
+  case LIBSPECTRUM_MACHINE_TC2048:
     return 1;		/* Always OK here */
 
-  case SPECTRUM_MACHINE_128:
-  case SPECTRUM_MACHINE_PLUS2:
+  case LIBSPECTRUM_MACHINE_128:
+  case LIBSPECTRUM_MACHINE_PLUS2:
     /* OK if we're in ROM 1 */
     return( machine_current->ram.current_rom == 1 );
 
-  case SPECTRUM_MACHINE_PLUS2A:
-  case SPECTRUM_MACHINE_PLUS3:
+  case LIBSPECTRUM_MACHINE_PLUS2A:
+  case LIBSPECTRUM_MACHINE_PLUS3:
     /* OK if we're not in a 64Kb RAM configuration and we're in
        ROM 3 */
     return( ! machine_current->ram.special &&
 	    machine_current->ram.current_rom == 3 );
 
-  case SPECTRUM_MACHINE_2048:
     return 1;		/* Always OK here */
   }
 
@@ -464,9 +464,11 @@ int tape_next_edge( DWORD last_tstates )
 
   /* If we've been requested to stop the tape, do so and then
      return without stacking another edge */
+  /* FIXME: what should we do if we're emulating the TC2048 here?
+     Yet more brokeness in the TZX format... */
   if( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ||
       ( ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP48 ) && 
-	machine_current->machine == SPECTRUM_MACHINE_48 )
+	machine_current->machine == LIBSPECTRUM_MACHINE_48 )
     ) {
     error = tape_stop(); if( error ) return error;
     return 0;

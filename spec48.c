@@ -160,8 +160,7 @@ int spec48_init( fuse_machine_info *machine )
 {
   int error;
 
-  machine->machine = SPECTRUM_MACHINE_48;
-  machine->description = "Spectrum 48K";
+  machine->machine = LIBSPECTRUM_MACHINE_48;
   machine->id = "48";
 
   machine->reset = spec48_reset;

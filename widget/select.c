@@ -56,7 +56,8 @@ int widget_select_draw( void* data GCC_UNUSED )
 
   for( i=0; i<machine_count; i++ ) {
     snprintf( descriptions[i], 40, "(%c): %s",
-	      ((char)i)+'A', machine_types[i]->description );
+	      ((char)i)+'A',
+	      libspectrum_machine_name( machine_types[i]->machine ) );
     descriptions[i][ 28 ] = '\0';
     
     if( machine_current->machine == machine_types[i]->machine ) {

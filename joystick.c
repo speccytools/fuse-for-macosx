@@ -26,6 +26,8 @@
 
 #include <config.h>
 
+#include <libspectrum.h>
+
 #include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
@@ -43,7 +45,7 @@ BYTE joystick_kempston_read(WORD port)
   int i;
 
   /* The TC2048 has a unremoveable Kempston interface */
-  if( ( machine_current->machine != SPECTRUM_MACHINE_2048 )
+  if( ( machine_current->machine != LIBSPECTRUM_MACHINE_TC2048 )
 	  && !settings_current.joy_kempston )
     return spectrum_port_noread(port);
 

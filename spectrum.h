@@ -115,13 +115,4 @@ extern BYTE *slt_screen;		/* The screenshot from the .slt file */
 extern int slt_screen_level;		/* The level of the screenshot.
 				   Not used for anything AFAIK */
 
-/* The machines available */
-enum { SPECTRUM_MACHINE_48,
-       SPECTRUM_MACHINE_128,
-       SPECTRUM_MACHINE_PLUS2,
-       SPECTRUM_MACHINE_PLUS2A,
-       SPECTRUM_MACHINE_PLUS3,
-       SPECTRUM_MACHINE_2048,
-     };
-
 #endif			/* #ifndef FUSE_SPECTRUM_H */

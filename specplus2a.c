@@ -60,8 +60,7 @@ specplus2a_init( fuse_machine_info *machine )
 {
   int error;
 
-  machine->machine = SPECTRUM_MACHINE_PLUS2A;
-  machine->description = "Spectrum +2A";
+  machine->machine = LIBSPECTRUM_MACHINE_PLUS2A;
   machine->id = "plus2a";
 
   machine->reset = specplus2a_reset;

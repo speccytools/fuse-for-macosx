@@ -39,6 +39,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "machine.h"
+#include "scld.h"
 #include "sound.h"
 #include "snapshot.h"
 #include "spec128.h"
@@ -150,59 +151,36 @@ int snapshot_copy_from( libspectrum_snap *snap )
   int i,j; int error;
   int capabilities;
 
-  switch( snap->machine ) {
-  case LIBSPECTRUM_MACHINE_48:
-    error = machine_select( SPECTRUM_MACHINE_48 );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "48K Spectrum unavailable" );
-      return 1;
-    }
-    break;
-  case LIBSPECTRUM_MACHINE_128:
-    error = machine_select( SPECTRUM_MACHINE_128 );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "128K Spectrum unavailable" );
-      return 1;
-    }
-    break;
-  case LIBSPECTRUM_MACHINE_PLUS2:
-    error = machine_select( SPECTRUM_MACHINE_PLUS2 );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "Loading +2 snapshot, but +2 unavailable" );
-      return 1;
-    }
-    break;
-  case LIBSPECTRUM_MACHINE_PLUS2A:
-    error = machine_select( SPECTRUM_MACHINE_PLUS2A );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "Loading +2A snapshot, but +2A unavailable" );
-      return 1;
-    }
-    break;
-  case LIBSPECTRUM_MACHINE_PLUS3:
-    error = machine_select( SPECTRUM_MACHINE_PLUS3 );
-    if( error ) {
-      error = machine_select( SPECTRUM_MACHINE_PLUS2A );
+  error = machine_select( snap->machine );
+  if( error ) {
+
+    /* If we failed on a +3 snapshot, try falling back to +2A (in case
+       we were compiled without lib765) */
+    if( snap->machine == LIBSPECTRUM_MACHINE_PLUS3 ) {
+      error = machine_select( LIBSPECTRUM_MACHINE_PLUS2A );
       if( error ) {
 	ui_error( UI_ERROR_ERROR,
-          "Loading +3 snapshot, but neither +3 nor +2A available."
-	);
+		  "Loading a %s snapshot, but neither that nor %s available",
+		  libspectrum_machine_name( snap->machine ),
+		  libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )    );
 	return 1;
       } else {
 	ui_error( UI_ERROR_INFO,
-	  "Loading +3 snapshot, but +3 not available. Using +2A instead."
-        );
+		  "Loading a %s snapshot, but that's not available. "
+		  "Using %s instead",
+		  libspectrum_machine_name( snap->machine ),
+		  libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )  );
       }
+    } else {			/* Not trying a +3 snapshot */
+      ui_error( UI_ERROR_ERROR,
+		"Loading a %s snapshot, but that's not available",
+		libspectrum_machine_name( snap->machine ) );
     }
-    break;
-  default:
-    ui_error( UI_ERROR_ERROR, "Unknown machine type %d (%s)", snap->machine,
-	      libspectrum_machine_name( snap->machine ) );
-    return 1;
   }
+
   machine_current->reset();
 
-  capabilities = machine_capabilities( machine_current->machine );
+  capabilities = libspectrum_machine_capabilities( machine_current->machine );
 
   z80.halted = 0;
 
@@ -219,7 +197,7 @@ int snapshot_copy_from( libspectrum_snap *snap )
 
   spectrum_ula_write( 0x00fe, snap->out_ula );
 
-  if( capabilities & MACHINE_CAPABILITY_AY ) {
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
     ay_registerport_write( 0xfffd, snap->out_ay_registerport );
     for( i=0; i<16; i++ ) {
       machine_current->ay.registers[i] = snap->ay_registers[i];
@@ -227,10 +205,10 @@ int snapshot_copy_from( libspectrum_snap *snap )
     }
   }
 
-  if( capabilities & MACHINE_CAPABILITY_128_MEMORY )
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )
     spec128_memoryport_write( 0x7ffd, snap->out_128_memoryport );
 
-  if( capabilities & MACHINE_CAPABILITY_PLUS3_MEMORY )
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY )
     specplus3_memoryport_write( 0x1ffd, snap->out_plus3_memoryport );
 
   tstates = snap->tstates;
@@ -313,28 +291,7 @@ int snapshot_copy_to( libspectrum_snap *snap )
 {
   int i,j;
 
-  switch( machine_current->machine ) {
-  case SPECTRUM_MACHINE_48:
-    snap->machine = LIBSPECTRUM_MACHINE_48;
-    break;
-  case SPECTRUM_MACHINE_128:
-    snap->machine = LIBSPECTRUM_MACHINE_128;
-    break;
-  case SPECTRUM_MACHINE_PLUS2:
-    snap->machine = LIBSPECTRUM_MACHINE_PLUS2;
-    break;
-  case SPECTRUM_MACHINE_PLUS2A:
-    snap->machine = LIBSPECTRUM_MACHINE_PLUS2A;
-    break;
-  case SPECTRUM_MACHINE_PLUS3:
-    snap->machine = LIBSPECTRUM_MACHINE_PLUS3;
-    break;
-  default:
-    ui_error( UI_ERROR_ERROR, "Can't handle machine type %d (%s) in snapshots",
-	      machine_current->machine,
-	      machine_name( machine_current->machine ) );
-    return 1;
-  }
+  snap->machine = machine_current->machine;
 
   snap->a  = A ; snap->f  = F ;
   snap->a_ = A_; snap->f_ = F_;
@@ -356,6 +313,7 @@ int snapshot_copy_to( libspectrum_snap *snap )
   for( i=0; i<16; i++ )
     snap->ay_registers[i] = machine_current->ay.registers[i];
   snap->out_plus3_memoryport = machine_current->ram.last_byte2;
+  snap->out_scld_hsr = scld_last_hsr; snap->out_scld_dec = scld_last_dec;
 
   snap->tstates = tstates;
 

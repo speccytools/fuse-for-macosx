@@ -440,7 +440,9 @@ gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   gtk_window_set_title( GTK_WINDOW( dialog.dialog ), "Fuse - Select Machine" );
 
   dialog.buttons[0] =
-    gtk_radio_button_new_with_label( NULL, machine_types[0]->description );
+    gtk_radio_button_new_with_label(
+      NULL, libspectrum_machine_name( machine_types[0]->machine )
+    );
   button_group =
     gtk_radio_button_group( GTK_RADIO_BUTTON( dialog.buttons[0] ) );
 
@@ -448,7 +450,7 @@ gtkui_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
     dialog.buttons[i] =
       gtk_radio_button_new_with_label(
         gtk_radio_button_group (GTK_RADIO_BUTTON (dialog.buttons[i-1] ) ),
-	machine_types[i]->description
+	libspectrum_machine_name( machine_types[i]->machine )
       );
   }
 

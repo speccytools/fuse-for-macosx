@@ -283,8 +283,7 @@ int specplus3_init( fuse_machine_info *machine )
   int i;
 #endif			/* #ifdef HAVE_765_H */
 
-  machine->machine = SPECTRUM_MACHINE_PLUS3;
-  machine->description = "Spectrum +3";
+  machine->machine = LIBSPECTRUM_MACHINE_PLUS3;
   machine->id = "plus3";
 
   machine->reset = specplus3_reset;
@@ -383,8 +382,8 @@ specplus3_memoryport_write( WORD port GCC_UNUSED, BYTE b )
   /* If this was called by a machine which has a +3-style disk (ie the +3
      as opposed to the +2A), set the state of both ( 3 = ( 1<<0 ) + ( 1<<1 ) )
      floppy drive motors */
-  if( machine_capabilities( machine_current->machine ) &&
-      MACHINE_CAPABILITY_PLUS3_DISK )
+  if( libspectrum_machine_capabilities( machine_current->machine ) &&
+      LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK )
     fdc_set_motor( fdc, ( b & 0x08 ) ? 3 : 0 );
 #endif			/* #ifdef HAVE_765_H */
 

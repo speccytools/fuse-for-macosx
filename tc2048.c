@@ -171,8 +171,7 @@ int tc2048_init( fuse_machine_info *machine )
 {
   int error;
 
-  machine->machine = SPECTRUM_MACHINE_2048;
-  machine->description = "Timex TC2048";
+  machine->machine = LIBSPECTRUM_MACHINE_TC2048;
   machine->id = "2048";
 
   machine->reset = tc2048_reset;

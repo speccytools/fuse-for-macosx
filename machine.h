@@ -68,7 +68,6 @@ typedef BYTE (*spectrum_unattached_port_fn)( void );
 typedef struct fuse_machine_info {
 
   int machine;		/* which machine type is this? */
-  const char *description; /* Textual description of this machine */
   const char *id;	/* Used used to select from command line */
 
   int (*reset)(void);	/* Reset function */
@@ -124,8 +123,5 @@ int machine_read_rom( fuse_machine_info *machine, size_t number,
 int machine_find_rom( const char *filename );
 
 int machine_end( void );
-
-const char* machine_name( int type );
-int machine_capabilities( int type );
 
 #endif			/* #ifndef FUSE_MACHINE_H */

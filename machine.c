@@ -64,12 +64,6 @@ static int machine_add_machine( int (*init_function)(fuse_machine_info *machine)
 static int machine_select_machine( fuse_machine_info *machine );
 static int machine_free_machine( fuse_machine_info *machine );
 
-/* The various capabilities of the different machines */
-const int MACHINE_CAPABILITY_AY 	  = 1 << 0; /* AY-3-8192 */
-const int MACHINE_CAPABILITY_128_MEMORY   = 1 << 1; /* 128 memory paging */
-const int MACHINE_CAPABILITY_PLUS3_MEMORY = 1 << 2; /* +3 memory paging */
-const int MACHINE_CAPABILITY_PLUS3_DISK   = 1 << 3; /* +3-style disk drive */
-
 int machine_init_machines( void )
 {
   int error;
@@ -323,62 +317,3 @@ static int machine_free_machine( fuse_machine_info *machine )
 
   return 0;
 }
-
-/* Get the name from a SPECTRUM_MACHINE_* id */
-const char *
-machine_name( int type )
-{
-  switch( type ) {
-  case SPECTRUM_MACHINE_48:     return "Spectrum 48K";
-  case SPECTRUM_MACHINE_128:    return "Spectrum 128K";
-  case SPECTRUM_MACHINE_PLUS2:  return "Spectrum +2";
-  case SPECTRUM_MACHINE_PLUS2A: return "Spectrum +2A";
-  case SPECTRUM_MACHINE_PLUS3:  return "Spectrum +3";
-  case SPECTRUM_MACHINE_2048:   return "TC2048";
-  default:			return "unknown";
-  }
-}
-
-/* Given a machine type, what features does it have? */
-int
-machine_capabilities( int type )
-{
-  int capabilities = 0;
-
-  /* AY-3-8912 */
-  switch( type ) {
-  case SPECTRUM_MACHINE_128: case SPECTRUM_MACHINE_PLUS2:
-  case SPECTRUM_MACHINE_PLUS2A: case SPECTRUM_MACHINE_PLUS3:
-    capabilities |= MACHINE_CAPABILITY_AY; break;
-  default:
-    break;
-  }
-
-  /* 128K Spectrum-style 0x7ffd memory paging */
-  switch( type ) {
-  case SPECTRUM_MACHINE_128: case SPECTRUM_MACHINE_PLUS2:
-  case SPECTRUM_MACHINE_PLUS2A: case SPECTRUM_MACHINE_PLUS3:
-    capabilities |= MACHINE_CAPABILITY_128_MEMORY; break;
-  default:
-    break;
-  }
-
-  /* +3 Spectrum-style 0x1ffd memory paging */
-  switch( type ) {
-  case SPECTRUM_MACHINE_PLUS2A: case SPECTRUM_MACHINE_PLUS3:
-    capabilities |= MACHINE_CAPABILITY_PLUS3_MEMORY; break;
-  default:
-    break;
-  }
-
-  /* +3 Spectrum-style disk */
-  switch( type ) {
-  case SPECTRUM_MACHINE_PLUS3:
-    capabilities |= MACHINE_CAPABILITY_PLUS3_DISK; break;
-  default:
-    break;
-  }
-
-  return capabilities;
-}
-

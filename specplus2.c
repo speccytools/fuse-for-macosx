@@ -28,6 +28,8 @@
 
 #include <stdio.h>
 
+#include <libspectrum.h>
+
 #include "spec128.h"
 #include "specplus2.h"
 #include "spectrum.h"
@@ -38,8 +40,7 @@ int specplus2_init( fuse_machine_info *machine )
 {
   int error;
 
-  machine->machine = SPECTRUM_MACHINE_PLUS2;
-  machine->description = "Spectrum +2";
+  machine->machine = LIBSPECTRUM_MACHINE_PLUS2;
   machine->id = "plus2";
 
   machine->reset = spec128_reset;
