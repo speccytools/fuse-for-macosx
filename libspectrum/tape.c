@@ -116,6 +116,14 @@ block_free( gpointer data, gpointer user_data )
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
     break;
 
+  case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+    for( i=0; i<block->types.select.count; i++ ) {
+      free( block->types.select.descriptions[i] );
+    }
+    free( block->types.select.descriptions );
+    free( block->types.select.offsets );
+    break;
+
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
     break;
 
@@ -167,6 +175,7 @@ libspectrum_tape_init_block( libspectrum_tape_block *block )
   case LIBSPECTRUM_TAPE_BLOCK_PAUSE:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START:
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+  case LIBSPECTRUM_TAPE_BLOCK_SELECT:
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
   case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
@@ -287,6 +296,7 @@ libspectrum_tape_get_next_edge( libspectrum_tape *tape,
      tstates and set end of block set so we instantly get the next block */
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_START: 
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
+  case LIBSPECTRUM_TAPE_BLOCK_SELECT:
   case LIBSPECTRUM_TAPE_BLOCK_COMMENT:
   case LIBSPECTRUM_TAPE_BLOCK_MESSAGE:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
@@ -663,6 +673,10 @@ libspectrum_tape_block_description( libspectrum_tape_block *block,
     break;
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
     strncpy( buffer, "Group End Block", length );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+    strncpy( buffer, "Select Block", length );
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:

@@ -54,6 +54,8 @@ typedef enum libspectrum_tape_type {
   LIBSPECTRUM_TAPE_BLOCK_GROUP_START,
   LIBSPECTRUM_TAPE_BLOCK_GROUP_END,
 
+  LIBSPECTRUM_TAPE_BLOCK_SELECT = 0x28,
+
   LIBSPECTRUM_TAPE_BLOCK_STOP48 = 0x2a,
 
   LIBSPECTRUM_TAPE_BLOCK_COMMENT = 0x30,
@@ -205,7 +207,20 @@ typedef struct libspectrum_tape_group_start_block {
 } libspectrum_tape_group_start_block;
 
 /* No group end block needed as it contains no data */
-/* No `stop tape if in 48K mode' block either */
+
+/* A select block */
+typedef struct libspectrum_tape_select_block {
+
+  /* Number of selections */
+  size_t count;
+
+  /* Offset of each selection, and a description of each */
+  int *offsets;
+  libspectrum_byte **descriptions;
+
+} libspectrum_tape_select_block;
+
+/* No `stop tape if in 48K mode' block as it contains no data */
 
 /* A comment block */
 typedef struct libspectrum_tape_comment_block {
@@ -275,7 +290,9 @@ typedef struct libspectrum_tape_block {
     libspectrum_tape_group_start_block group_start;
     /* No group end block needed as it contains no data */
 
-    /* No `stop tape if in 48K mode' block needed either */
+    libspectrum_tape_select_block select;
+
+    /* No `stop tape if in 48K mode' block as it contains no data */
 
     libspectrum_tape_comment_block comment;
     libspectrum_tape_message_block message;

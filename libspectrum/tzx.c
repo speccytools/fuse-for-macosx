@@ -59,6 +59,9 @@ static libspectrum_error
 tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
 		    const libspectrum_byte *end );
 static libspectrum_error
+tzx_read_select( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		 const libspectrum_byte *end );
+static libspectrum_error
 tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
 	       const libspectrum_byte *end );
 static libspectrum_error
@@ -103,6 +106,9 @@ tzx_write_group_start( libspectrum_tape_group_start_block *start_block,
 static libspectrum_error
 tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
 		     size_t *length );
+static libspectrum_error
+tzx_write_select( libspectrum_tape_select_block *block,
+		  libspectrum_byte **buffer, size_t *offset, size_t *length );
 static libspectrum_error
 tzx_write_stop( libspectrum_byte **buffer, size_t *offset, size_t *length );
 static libspectrum_error
@@ -193,6 +199,11 @@ libspectrum_tzx_create( libspectrum_tape *tape, const libspectrum_byte *buffer,
       break;
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
       error = tzx_read_group_end( tape, &ptr, end );
+      if( error ) { libspectrum_tape_free( tape ); return error; }
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+      error = tzx_read_select( tape, &ptr, end );
       if( error ) { libspectrum_tape_free( tape ); return error; }
       break;
 
@@ -654,6 +665,119 @@ tzx_read_group_end( libspectrum_tape *tape, const libspectrum_byte **ptr,
 
   return LIBSPECTRUM_ERROR_NONE;
 }  
+
+static libspectrum_error
+tzx_read_select( libspectrum_tape *tape, const libspectrum_byte **ptr,
+		 const libspectrum_byte *end )
+{
+  libspectrum_tape_block* block;
+  libspectrum_tape_select_block *select_block;
+
+  size_t length; int i,j;
+
+  /* Check there's enough left in the buffer for the length and the count
+     byte */
+  if( end - (*ptr) < 3 ) {
+    libspectrum_print_error(
+      "tzx_read_select: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get the length, and check we've got that many bytes in the buffer */
+  length = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+  if( end - (*ptr) < length ) {
+    libspectrum_print_error(
+      "tzx_read_select: not enough data in buffer\n"
+    );
+    return LIBSPECTRUM_ERROR_CORRUPT;
+  }
+
+  /* Get memory for a new block */
+  block = (libspectrum_tape_block*)malloc( sizeof( libspectrum_tape_block ));
+  if( block == NULL ) {
+    libspectrum_print_error( "tzx_read_select: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* This is an select block */
+  block->type = LIBSPECTRUM_TAPE_BLOCK_SELECT;
+  select_block = &(block->types.select);
+
+  /* Get the number of selections */
+  select_block->count = **ptr; (*ptr)++;
+
+  /* Allocate memory */
+  select_block->offsets = (int*)malloc( select_block->count * sizeof(int) );
+  if( select_block->offsets == NULL ) {
+    free( block );
+    libspectrum_print_error( "tzx_read_select: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+  select_block->descriptions = 
+    (libspectrum_byte**)malloc(select_block->count*sizeof(libspectrum_byte*));
+  if( select_block->descriptions == NULL ) {
+    free( select_block->offsets );
+    free( block );
+    libspectrum_print_error( "tzx_read_select: out of memory\n" );
+    return LIBSPECTRUM_ERROR_MEMORY;
+  }
+
+  /* Read in the data */
+  for( i=0; i<select_block->count; i++ ) {
+
+    /* Check we've got the offset and a length byte */
+    if( end - (*ptr) < 3 ) {
+      for( j=0; j<i; j++) free( select_block->descriptions[j] );
+      free( select_block->descriptions );
+      free( select_block->offsets );
+      libspectrum_print_error(
+	"tzx_read_select: not enough data in buffer\n"
+      );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+
+    /* Get the offset */
+    select_block->offsets[i] = (*ptr)[0] + (*ptr)[1] * 0x100; (*ptr) += 2;
+
+    /* And the length of the description */
+    length = **ptr; (*ptr)++;
+
+    /* Check we've got that many bytes left */
+    if( end - (*ptr) < length ) {
+      for( j=0; j<i; j++) free( select_block->descriptions[j] );
+      free( select_block->descriptions );
+      free( select_block->offsets );
+      libspectrum_print_error(
+	"tzx_read_select: not enough data in buffer\n"
+      );
+      return LIBSPECTRUM_ERROR_CORRUPT;
+    }
+
+    /* Allocate memory */
+    select_block->descriptions[i] =
+      (libspectrum_byte*)malloc( (length+1) * sizeof( libspectrum_byte ) );
+    if( select_block->descriptions[i] == NULL ) {
+      for( j=0; j<i; j++) free( select_block->descriptions[j] );
+      free( select_block->descriptions );
+      free( select_block->offsets );
+      libspectrum_print_error(
+	"tzx_read_select: out of memory\n"
+      );
+      return LIBSPECTRUM_ERROR_MEMORY;
+    }
+
+    /* Copy the description across */
+    memcpy( select_block->descriptions[i], (*ptr), length ); (*ptr) += length;
+    select_block->descriptions[i][length] = '\0';
+
+  }
+
+  /* Finally, put the block into the block list */
+  tape->blocks = g_slist_append( tape->blocks, (gpointer)block );
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
 
 static libspectrum_error
 tzx_read_stop( libspectrum_tape *tape, const libspectrum_byte **ptr,
@@ -1125,6 +1249,12 @@ libspectrum_tzx_write( libspectrum_tape *tape,
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
       break;
 
+    case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+      error = tzx_write_select( &(block->types.select), buffer, &offset,
+				length );
+      if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
+      break;
+
     case LIBSPECTRUM_TAPE_BLOCK_STOP48:
       error = tzx_write_stop( buffer, &offset, length );
       if( error != LIBSPECTRUM_ERROR_NONE ) { free( *buffer ); return error; }
@@ -1372,6 +1502,43 @@ tzx_write_group_end( libspectrum_byte **buffer, size_t *offset,
   *ptr++ = LIBSPECTRUM_TAPE_BLOCK_GROUP_END;
 
   (*offset)++;
+
+  return LIBSPECTRUM_ERROR_NONE;
+}
+
+static libspectrum_error
+tzx_write_select( libspectrum_tape_select_block *block,
+		  libspectrum_byte **buffer, size_t *offset, size_t *length )
+{
+  libspectrum_error error;
+  libspectrum_byte *ptr = (*buffer) + (*offset);
+
+  size_t total_length; int i;
+
+  /* The count byte, and ( 2 offset bytes and 1 length byte ) per selection */
+  total_length = 1 + 3 * block->count;
+
+  for( i=0; i<block->count; i++ )
+    total_length += strlen( block->descriptions[i] );
+
+  /* On top of that, we need an id byte and 2 length bytes */
+  error = libspectrum_make_room( buffer, (*offset) + total_length + 3, &ptr,
+				 length );
+  if( error != LIBSPECTRUM_ERROR_NONE ) return error;
+
+  *ptr++ = LIBSPECTRUM_TAPE_BLOCK_SELECT;
+  libspectrum_write_word( ptr, total_length ); ptr += 2;
+  *ptr++ = block->count;
+
+  for( i=0; i<block->count; i++ ) {
+    size_t string_length = strlen( block->descriptions[i] );
+    libspectrum_write_word( ptr, block->offsets[i] ); ptr += 2;
+
+    *ptr++ = string_length;
+    memcpy( ptr, block->descriptions[i], string_length ); ptr += string_length;
+  }
+
+  (*offset) += total_length + 3;
 
   return LIBSPECTRUM_ERROR_NONE;
 }

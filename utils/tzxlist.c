@@ -157,6 +157,7 @@ main( int argc, char **argv )
     libspectrum_tape_pure_tone_block *tone_block;
     libspectrum_tape_pulses_block *pulses_block;
     libspectrum_tape_pure_data_block *data_block;
+    libspectrum_tape_select_block *select_block;
     libspectrum_tape_archive_info_block *info_block;
     libspectrum_tape_hardware_block *hardware_block;
 
@@ -218,6 +219,14 @@ main( int argc, char **argv )
 
     case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
       /* Do nothing */
+      break;
+
+    case LIBSPECTRUM_TAPE_BLOCK_SELECT:
+      select_block = &(block->types.select);
+      for( i=0; i<select_block->count; i++ ) {
+	printf("  Choice %2d: Offset %d: %s\n", i, select_block->offsets[i],
+	       select_block->descriptions[i] );
+      }
       break;
 
     case LIBSPECTRUM_TAPE_BLOCK_STOP48:
