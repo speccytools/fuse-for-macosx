@@ -1198,4 +1198,4 @@
          (Fred).
 20050113 ui/scaler/{scaler.[ch],scaler_internals.h,scalers.c},
          ui/sdl/sdldisplay.c: Undo accidental commit (Fred).
-
+20050113 menu_data.c: add TS2068 to change ROMs menu.
