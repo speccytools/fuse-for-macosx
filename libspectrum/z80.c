@@ -884,6 +884,8 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
   size_t compressed_length[256];
   uchar* compressed_data[256];
 
+  size_t compressed_screen_length; uchar* compressed_screen;
+
   libspectrum_error error;
 
   /* Make room for the .slt signature */
@@ -912,8 +914,10 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
 	return error;
       }
 					     
-      error = libspectrum_z80_write_slt_entry( buffer, offset, length,
-					       1, i, compressed_length[i] );
+      error = libspectrum_z80_write_slt_entry(
+                buffer, offset, length,
+		LIBSPECTRUM_SLT_TYPE_LEVEL, i, compressed_length[i]
+              );
       if( error != LIBSPECTRUM_ERROR_NONE ) {
 	for( j=0; j<i; j++ ) if(snap->slt_length[j]) free(compressed_data[j]);
 	return error;
@@ -921,26 +925,62 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
     }
   }
 
+  /* Write the loading screen out if we've got one */
+  if( snap->slt_screen ) {
+
+    compressed_screen_length = 0;
+    error = libspectrum_z80_compress_block(
+              &compressed_screen, &compressed_screen_length,
+	      snap->slt_screen, 6192
+	    );
+    if( error != LIBSPECTRUM_ERROR_NONE ) {
+      for( i=0; i<256; i++ ) if(snap->slt_length[i]) free(compressed_data[i]);
+      return error;
+    }
+
+    /* If length >= 6192, write out uncompressed */
+    if( compressed_screen_length >= 6192 ) {
+      compressed_screen_length = 6192;
+      memcpy( compressed_screen, snap->slt_screen, 6192 );
+    }
+
+    /* Write the directory entry */
+    error = libspectrum_z80_write_slt_entry(
+	      buffer, offset, length,
+	      LIBSPECTRUM_SLT_TYPE_SCREEN, snap->slt_screen_level,
+	      compressed_screen_length
+	    );
+    if( error != LIBSPECTRUM_ERROR_NONE ) {
+      for( i=0; i<256; i++ ) if(snap->slt_length[i]) free(compressed_data[i]);
+      free( compressed_screen );
+      return error;
+    }
+  }
+
   /* and the directory end marker */
   error = libspectrum_z80_write_slt_entry( buffer, offset, length, 0, 0, 0);
   if( error != LIBSPECTRUM_ERROR_NONE ) {
     for( i=0; i<256; i++ ) if( snap->slt_length[i] ) free(compressed_data[i]);
+    if( snap->slt_screen ) free( compressed_screen );
     return error;
   }
 
   /* Reset the current data pointer */
   ptr = *buffer + *offset;
 
-  /* Then write the actual data */
+  /* Then write the actual level data */
   for( i=0; i<256; i++ ) {
     if( snap->slt_length[i] ) {
       
+      fprintf( stderr, "%d %d\n", *offset, ptr-*buffer, *length );
+
       /* Make room for the data */
       error = libspectrum_make_room( buffer, (*offset) + compressed_length[i],
 				     &ptr, length 
 				   );
       if( error != LIBSPECTRUM_ERROR_NONE ) {
 	for(j=0; j<256; j++) if(snap->slt_length[j]) free(compressed_data[j]);
+	if( snap->slt_screen ) free( compressed_screen );
 	return error;
       }
 
@@ -950,8 +990,27 @@ static int libspectrum_z80_write_slt( uchar **buffer, size_t *offset,
     }
   }
 
+  /* And the loading screen */
+  if( snap->slt_screen ) {
+
+    /* Make room */
+    error = libspectrum_make_room( buffer, (*offset)+compressed_screen_length,
+				   &ptr, length
+				 );
+    if( error != LIBSPECTRUM_ERROR_NONE ) {
+      for(i=0; i<256; i++) if( snap->slt_length[i] ) free(compressed_data[i]);
+      if( snap->slt_screen ) free( compressed_screen );
+      return error;
+    }
+
+    /* Copy the data */
+    memcpy( ptr, compressed_screen, compressed_screen_length );
+    (*offset) += compressed_screen_length;
+  }
+
   /* Free up the compressed data */
   for( i=0; i<256; i++ ) if( snap->slt_length[i] ) free( compressed_data[i] );
+  if( snap->slt_screen ) free( compressed_screen );
 
   /* That's your lot */
   return LIBSPECTRUM_ERROR_NONE;

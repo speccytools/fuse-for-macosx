@@ -58,6 +58,7 @@ int libspectrum_snap_destroy( libspectrum_snap *snap )
       snap->slt_length[i] = 0;
     }
   }
+  if( snap->slt_screen ) { free( snap->slt_screen ); }
 
   return LIBSPECTRUM_ERROR_NONE;
 }
@@ -157,6 +158,8 @@ int libspectrum_make_room( uchar **dest, size_t requested, uchar **ptr,
   size_t current_length;
 
   current_length = *ptr - *dest;
+
+  fprintf( stderr, "* %d %d\n", current_length, requested );
 
   if( *allocated == 0 ) {
 
