@@ -113,6 +113,7 @@ static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
   int autoload;			/* Should we autoload tapes? */
+  char *start_scaler;
 
   fuse_progname=argv[0];
   libspectrum_error_function = ui_libspectrum_error;
@@ -128,10 +129,18 @@ static int fuse_init(int argc, char **argv)
     return 0;
   }
 
+  start_scaler = strdup( settings_current.start_scaler_mode );
+  if( !start_scaler ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s: %d", __FILE__, __LINE__ );
+    return 1;
+  }
+
   fuse_show_copyright();
 
   /* FIXME: order of these initialisation calls. Work out what depends on
      what */
+  /* FIXME FIXME 20030407: really do this soon. This is getting *far* too
+     hairy */
   fuse_keyboard_init();
 
   if( tape_init() ) return 1;
@@ -178,7 +187,7 @@ static int fuse_init(int argc, char **argv)
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
 
-  error = scaler_select_id( settings_current.start_scaler_mode );
+  error = scaler_select_id( start_scaler ); free( start_scaler );
   if( error ) return error;
 
   if( settings_current.snapshot ) {

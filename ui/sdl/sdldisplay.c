@@ -210,25 +210,19 @@ sdldisplay_load_gfx_mode( void )
 void
 uidisplay_hotswap_gfx_mode( void )
 {
-  /* Keep around the old image & tmp_screen so we can restore the screen data
-     after the mode switch. */
-  SDL_Surface *oldtmp_screen = tmp_screen;
-
   fuse_emulation_pause();
+
+  /* Free the old surface */
+  if( tmp_screen ) {
+    free( tmp_screen->pixels );
+    SDL_FreeSurface( tmp_screen ); tmp_screen = NULL;
+  }
 
   /* Setup the new GFX mode */
   sdldisplay_load_gfx_mode();
 
   /* reset palette */
   SDL_SetColors( gc, colour_palette, 0, 16 );
-
-  /* Restore old screen content */
-  SDL_BlitSurface(oldtmp_screen, NULL, tmp_screen, NULL);
-  SDL_UpdateRect(tmp_screen, 0,  0, 0, 0);
-
-  /* Free the old surfaces */
-  if( oldtmp_screen ) free( oldtmp_screen->pixels );
-  SDL_FreeSurface(oldtmp_screen);
 
   /* Mac OS X resets the state of the cursor after a switch to full screen mode */
   if ( settings_current.full_screen )
@@ -365,8 +359,8 @@ uidisplay_end( void )
 {
   display_ui_initialised = 0;
   if ( tmp_screen ) {
-    free(tmp_screen->pixels);
-    SDL_FreeSurface(tmp_screen);
+    free( tmp_screen->pixels );
+    SDL_FreeSurface( tmp_screen ); tmp_screen = NULL;
   }
   return 0;
 }
