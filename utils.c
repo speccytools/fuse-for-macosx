@@ -139,11 +139,11 @@ int utils_find_lib( const char *filename )
   char path[ PATHNAME_MAX_LENGTH ];
 
   snprintf( path, PATHNAME_MAX_LENGTH, "lib/%s", filename );
-  fd = open( path, O_RDONLY );
+  fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", DATADIR, filename );
-  fd = open( path, O_RDONLY );
+  fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
   return -1;
@@ -156,7 +156,7 @@ utils_read_file( const char *filename, utils_file *file )
 
   int error;
 
-  fd = open( filename, O_RDONLY );
+  fd = open( filename, O_RDONLY | O_BINARY );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't open '%s': %s", filename,
 	      strerror( errno ) );

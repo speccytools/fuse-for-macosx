@@ -403,28 +403,28 @@ int machine_find_rom( const char *filename )
   char path[ PATHNAME_MAX_LENGTH ];
 
   /* If this is an absolute path, just look there */
-  if( filename[0] == '/' ) return open( filename, O_RDONLY );
+  if( filename[0] == '/' ) return open( filename, O_RDONLY | O_BINARY );
 
   /* If not, look in some likely places. Firstly, relative to the current
      directory */
-  fd = open( filename, O_RDONLY ); if( fd != -1 ) return fd;
+  fd = open( filename, O_RDONLY | O_BINARY ); if( fd != -1 ) return fd;
 
   /* Then in a 'roms' subdirectory (very useful when Fuse hasn't been
      installed into /usr/local or wherever) */
   snprintf( path, PATHNAME_MAX_LENGTH, "roms/%s", filename );
-  fd = open( path, O_RDONLY );
+  fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
   /* Then look where Fuse may have installed the ROMs */
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", DATADIR, filename );
-  fd = open( path, O_RDONLY );
+  fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 
 #ifdef ROMSDIR
   /* Finally look in a system-wide directory for ROMs. Debian uses
      /usr/share/spectrum-roms/ here */
   snprintf( path, PATHNAME_MAX_LENGTH, "%s/%s", ROMSDIR, filename );
-  fd = open( path, O_RDONLY );
+  fd = open( path, O_RDONLY | O_BINARY );
   if( fd != -1 ) return fd;
 #endif
 

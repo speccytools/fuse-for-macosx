@@ -36,4 +36,11 @@
 #define GCC_PRINTF( fmtstring, args )
 #endif				/* #ifdef __GNUC__ */
 
+/* Certain brain damaged operating systems (DOS/Windows) treat text
+   and binary files different in open(2) and need to be given the
+   O_BINARY flag to tell them it's a binary file */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif				/* #ifndef O_BINARY */
+
 #endif				/* #ifndef FUSE_COMPAT_H */

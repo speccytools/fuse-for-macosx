@@ -403,7 +403,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename )
   if( drives[which].fd != -1 ) specplus3_disk_eject( which );
 
   /* Open the disk file */
-  drives[which].fd = open( filename, O_RDWR );
+  drives[which].fd = open( filename, O_RDWR | O_BINARY );
   if( drives[which].fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
 	      strerror( errno ) );

@@ -337,13 +337,13 @@ insert_trd( trdos_drive_number which, const char *filename )
 
   discs[which].ro = 0;
 
-  fil = open( filename, O_RDWR );
+  fil = open( filename, O_RDWR | O_BINARY );
   if( fil == -1 ) {
 
     /* If we couldn't open the file read-write, try opening it read-only */
     if( errno == EACCES ) {
       discs[which].ro = 1;
-      fil = open( filename, O_RDONLY );
+      fil = open( filename, O_RDONLY | O_BINARY );
     }
   }
 
@@ -363,7 +363,7 @@ insert_trd( trdos_drive_number which, const char *filename )
     discs[which].ro = 0;
 
     /* FIXME: NFS locking problems */
-    fil = open( filename, O_CREAT | O_EXCL | O_RDWR );
+    fil = open( filename, O_CREAT | O_EXCL | O_RDWR | O_BINARY );
     if( fil == -1 ) {
       ui_error( UI_ERROR_ERROR, "Couldn't open '%s': %s", filename,
 		strerror( errno ) );
@@ -902,7 +902,7 @@ Scl2Trd( const char *oldname, int TRD )
   trd_fsec = TRDh + 0x8E1;
   trd_ftrk = TRDh + 0x8E2;
 
-  if( ( SCL = open( oldname, O_RDONLY ) ) == -1 ) {
+  if( ( SCL = open( oldname, O_RDONLY | O_BINARY ) ) == -1 ) {
     ui_error( UI_ERROR_ERROR, "Can't open SCL file '%s': %s", oldname,
 	      strerror( errno ) );
     free( TRDh );
