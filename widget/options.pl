@@ -108,6 +108,11 @@ void widget_$_->{name}_keyhandler( keyboard_key_name key )
   int error;
 
   switch( key ) \{
+
+  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+    widget_dialog_with_border( 1, 2, 30, 9 );
+    widget_general_show_all( &widget_options_settings );
+    break;
     
   case KEYBOARD_1: /* 1 used as \`Escape\' generates \`Edit\', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;

@@ -79,6 +79,10 @@ void widget_menu_keyhandler( keyboard_key_name key )
   widget_menu_entry *ptr;
 
   switch( key ) {
+
+  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+    widget_menu_draw( menu );
+    break;
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;

@@ -92,6 +92,11 @@ typedef enum keyboard_key_name {
   KEYBOARD_Home,
   KEYBOARD_End,
 
+  /* Fake keypress used on window resize to cause widgets to redraw
+     themselves */
+
+  KEYBOARD_Resize = 0x400,
+
 } keyboard_key_name;
 
 void fuse_keyboard_init(void);

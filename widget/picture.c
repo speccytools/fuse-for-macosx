@@ -31,9 +31,11 @@
 #include "ui/uidisplay.h"
 #include "widget.h"
 
+static widget_picture_data *ptr;
+
 int widget_picture_draw( void* data )
 {
-  widget_picture_data *ptr = (widget_picture_data*)data;
+  ptr = (widget_picture_data*)data;
 
   uidisplay_spectrum_screen( ptr->screen, ptr->border );
 
@@ -43,6 +45,10 @@ int widget_picture_draw( void* data )
 void widget_picture_keyhandler( keyboard_key_name key )
 {
   switch( key ) {
+
+  case KEYBOARD_Resize:		/* Fake keypress used on widget resize */
+    widget_picture_draw( ptr );
+    break;
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;

@@ -322,6 +322,9 @@ xdisplay_configure_notify( int width, int height GCC_UNUSED )
 			 DISPLAY_SCREEN_WIDTH, colour);
   }
 
+  /* If widgets are active, redraw the widget */
+  if( widget_level >= 0 ) widget_keyhandler( KEYBOARD_Resize );
+
   return 0;
 }
 

@@ -28,4 +28,6 @@ noinst_LIBRARIES = libuixlib.a
 
 libuixlib_a_SOURCES = xdisplay.c xerror.c xkeyboard.c xui.c
 
+INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@
+
 noinst_HEADERS = xdisplay.h xkeyboard.h xui.h

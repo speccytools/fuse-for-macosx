@@ -38,12 +38,14 @@
 static int split_message( const char *message, char ***lines, size_t *count,
 			  const size_t line_length );
 
+widget_error_t *error_info;
+
 int widget_error_draw( void *data )
 {
-  widget_error_t *error_info = (widget_error_t*)data;
   char **lines; size_t count;
   size_t i;
 
+  error_info = (widget_error_t*)data;
   if( split_message( error_info->message, &lines, &count, 28 ) ) return 1;
   
   widget_dialog_with_border( 1, 2, 30, count+2 );
@@ -144,6 +146,10 @@ split_message( const char *message, char ***lines, size_t *count,
 void widget_error_keyhandler( keyboard_key_name key )
 {
   switch( key ) {
+
+  case KEYBOARD_Resize:	/* Fake keypress generated on window resize */
+    widget_error_draw( error_info );
+    break;
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;

@@ -81,6 +81,10 @@ void widget_select_keyhandler( keyboard_key_name key )
 {
   switch( key ) {
 
+  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+    widget_select_draw( NULL );
+    break;
+
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
     return;

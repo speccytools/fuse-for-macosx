@@ -353,6 +353,12 @@ void widget_filesel_keyhandler( keyboard_key_name key )
   new_current_file = current_file;
 
   switch(key) {
+  case KEYBOARD_Resize:		/* Fake keypress used on window resize */
+    widget_dialog_with_border( 1, 2, 30, 20 );
+    widget_print_all_filenames( widget_filenames, widget_numfiles,
+				top_left_file, current_file        );
+    break;
+    
   case KEYBOARD_1:		/* 1 used as `Escape' generates `EDIT',
 				   which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
@@ -465,7 +471,7 @@ void widget_filesel_keyhandler( keyboard_key_name key )
 			     new_current_file - top_left_file, 1 );
         
       uidisplay_lines(DISPLAY_BORDER_HEIGHT,
-		      DISPLAY_BORDER_HEIGHT + DISPLAY_SCREEN_HEIGHT );
+		      DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
 	  
     }
 
