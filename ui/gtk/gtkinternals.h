@@ -66,6 +66,68 @@ int gtkui_picture( const char *filename, int border );
 
 extern void gtkui_popup_menu(void);
 
+GtkAccelGroup* gtkstock_add_accel_group( GtkWidget *widget );
+
+/* Set modifier=0 to use the first default accel key.
+ * Set modifier_alt=0 to use the second default accel key.
+ * For either, GDK_VoidSymbol means "no accel key".
+ */
+typedef struct gtkstock_button {
+  gchar *label;
+  GtkSignalFunc action;		/* "clicked" func; data is actiondata. */
+  gpointer actiondata;
+  GtkSignalFunc destroy;	/* "clicked" func; data is parent widget */
+  guint shortcut;
+  GdkModifierType modifier;     /* primary shortcut */
+  guint shortcut_alt;
+  GdkModifierType modifier_alt; /* secondary shortcut */
+} gtkstock_button;
+
+/* GTK1: create a simple button with the given label.
+ *   "gtk-" prefixes are stripped and are used to select default accel keys.
+ * GTK2: chooses between stock and normal based on "gtk-" prefix.
+ *
+ * Some stock labels are defined below for use with GTK1: their names are the
+ * same as in GTK2, but the strings are different.
+ *
+ * If the target widget is a GtkDialog, then created buttons are put in its
+ * action area.
+ *
+ * If the label begins with "!", then gtk_signal_connect_object, rather than
+ * gtk_signal_connect, is used to connect the action function.
+ */
+GtkWidget* gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
+				   const gtkstock_button *btn );
+GtkAccelGroup*
+gtkstock_create_buttons( GtkWidget *widget, GtkAccelGroup *accel,
+			 const gtkstock_button *buttons, size_t count );
+GtkAccelGroup* gtkstock_create_ok_cancel( GtkWidget *widget,
+					  GtkAccelGroup *accel,
+	/* for OK button -> */	          GtkSignalFunc action,
+				          gpointer actiondata,
+	/* for both buttons -> */         GtkSignalFunc destroy );
+GtkAccelGroup* gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
+				      GtkSignalFunc destroy,
+				      gboolean esconly );
+	/* destroy==NULL => use DEFAULT_DESTROY */
+
+#define DEFAULT_DESTROY ( GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ) )
+
+#ifndef UI_GTK2
+#define GTK_STOCK_OK		"gtk-OK"
+       /* gets accel Return */
+#define GTK_STOCK_CANCEL	"gtk-Cancel"
+       /* gets accel Escape */
+#define GTK_STOCK_CLOSE		"gtk-Close"
+       /* gets accel Return, Escape */
+#define GTK_STOCK_SAVE		"gtk-Save"
+       /* gets accel Alt-S, Return */
+#define GTK_STOCK_YES		"gtk-Yes"
+       /* gets accel Alt-Y, Return */
+#define GTK_STOCK_NO		"gtk-No"
+       /* gets accel Alt-N, Escape */
+#endif			/* #ifndef UI_GTK2 */
+
 #ifdef UI_GTK2
 typedef PangoFontDescription *gtkui_font;
 #else				/* #ifdef UI_GTK2 */

@@ -82,7 +82,7 @@ menu_machine_pokefinder( GtkWidget *widget GCC_UNUSED,
 static int
 create_dialog( void )
 {
-  GtkWidget *hbox, *vbox, *label, *entry, *button;
+  GtkWidget *hbox, *vbox, *label, *entry;
   GtkAccelGroup *accel_group;
   size_t i;
 
@@ -121,41 +121,20 @@ create_dialog( void )
   gtk_signal_connect( GTK_OBJECT( location_list ), "select-row",
 		      GTK_SIGNAL_FUNC( possible_click ), NULL );
 
-  button = gtk_button_new_with_label( "Incremented" );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_pokefinder_incremented ), NULL );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-
-  button = gtk_button_new_with_label( "Decremented" );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_pokefinder_decremented ), NULL );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-
-  button = gtk_button_new_with_label( "Search" );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_pokefinder_search ),
-		      GTK_OBJECT( entry ) );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_widget_add_accelerator( button, "clicked", accel_group, GDK_Return,
-			      0, 0 );
-
-  button = gtk_button_new_with_label( "Reset" );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_pokefinder_reset ), NULL );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-
-  button = gtk_button_new_with_label( "Close" );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_pokefinder_close ),
-			     GTK_OBJECT( dialog ) );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_widget_add_accelerator( button, "clicked", accel_group, GDK_Escape,
-			      0, 0 );
+  {
+    static gtkstock_button btn[] = {
+      { "Incremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_incremented ) },
+      { "Decremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_decremented ) },
+      { "!Search", GTK_SIGNAL_FUNC( gtkui_pokefinder_search ), NULL, NULL,
+        GDK_Return },
+      { "Reset", GTK_SIGNAL_FUNC( gtkui_pokefinder_reset ) }
+    };
+    btn[2].actiondata = GTK_OBJECT( entry );
+    accel_group = gtkstock_create_buttons( dialog, NULL, btn,
+					   sizeof( btn ) / sizeof( btn[0] ) );
+    gtkstock_create_close( dialog, accel_group,
+			   GTK_SIGNAL_FUNC( gtkui_pokefinder_close ), TRUE );
+  }
 
   /* Users shouldn't be able to resize this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );

@@ -81,9 +81,7 @@ menu_media_tape_browse( GtkWidget *widget GCC_UNUSED,
 static int
 create_dialog( void )
 {
-  GtkAccelGroup *accel_group;
   GtkWidget *scrolled_window;
-  GtkWidget *ok_button;
 
   size_t i;
   gchar *titles[3] = { "", "Block type", "Data" };
@@ -122,19 +120,7 @@ create_dialog( void )
 		      FALSE, FALSE, 0 );
 
   /* Create the OK button */
-  ok_button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     ok_button );
-  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( browse_done ), NULL );
-
-  /* Return or Esc will close the dialog box */
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-  gtk_widget_add_accelerator( ok_button, "clicked",
-			      accel_group, GDK_Return, 0, 0);
-  gtk_widget_add_accelerator( ok_button, "clicked",
-			      accel_group, GDK_Escape, 0, 0);
+  gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( browse_done ), FALSE );
 
   /* Make the window big enough to show at least some data */
   gtk_window_set_default_size( GTK_WINDOW( dialog ), -1, 200 );

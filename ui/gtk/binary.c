@@ -121,19 +121,8 @@ menu_file_loadbinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
 		      GTK_SIGNAL_FUNC( load_data ), &info );
 
   /* Command buttons */
-
-  button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( info.dialog )->action_area ),
-		     button );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( load_data ), &info );
-
-  button = gtk_button_new_with_label( "Cancel" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( info.dialog )->action_area ),
-		     button );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( info.dialog ) );
+  gtkstock_create_ok_cancel( info.dialog, NULL, GTK_SIGNAL_FUNC( load_data ),
+			     &info, NULL );
 
   /* Process the dialog */
 
@@ -264,19 +253,8 @@ menu_file_savebinarydata( GtkWidget *widget GCC_UNUSED, gpointer data
 		      GTK_SIGNAL_FUNC( save_data ), &info );
 
   /* Command buttons */
-
-  button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( info.dialog )->action_area ),
-		     button );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( save_data ), &info );
-
-  button = gtk_button_new_with_label( "Cancel" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( info.dialog )->action_area ),
-		     button );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( info.dialog ) );
+  gtkstock_create_ok_cancel( info.dialog, NULL, GTK_SIGNAL_FUNC( save_data ),
+			     &info, NULL );
 
   /* Process the dialog */
 

@@ -91,8 +91,7 @@ scroller( GtkAdjustment *adjustment, gpointer user_data )
 void
 menu_machine_memorybrowser( void )
 {
-  GtkWidget *dialog, *button, *box, *clist, *scrollbar;
-  GtkAccelGroup *accel_group;
+  GtkWidget *dialog, *box, *clist, *scrollbar;
   GtkObject *adjustment;
   size_t i;
   int error;
@@ -107,19 +106,7 @@ menu_machine_memorybrowser( void )
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-
-  button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( memory_done ),
-			     (gpointer)dialog );
-  gtk_widget_add_accelerator( button, "clicked", accel_group,
-			      GDK_Return, 0, 0 );
-  gtk_widget_add_accelerator( button, "clicked", accel_group,
-			      GDK_Escape, 0, 0 );
+  gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC( memory_done ), FALSE );
 
   box = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( dialog )->vbox ), box );

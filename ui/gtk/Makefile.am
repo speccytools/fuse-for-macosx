@@ -45,7 +45,8 @@ libuigtk_a_SOURCES = binary.c \
 		     pixmaps.c \
 		     pokefinder.c \
 		     roms.c \
-		     statusbar.c
+		     statusbar.c \
+		     stock.c
 
 BUILT_SOURCES = keysyms.c \
 		menu_data.c \

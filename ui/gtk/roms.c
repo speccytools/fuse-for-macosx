@@ -58,8 +58,6 @@ int
 menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
 {
   GtkWidget *dialog;
-  GtkAccelGroup *accel_group;
-  GtkWidget *ok_button, *cancel_button;
   GtkBox *vbox;
 
   struct callback_info info;
@@ -79,39 +77,18 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete_event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
-  /* Create the OK and Cancel buttons */
-  ok_button = gtk_button_new_with_label( "OK" );
-  cancel_button = gtk_button_new_with_label( "Cancel" );
-
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     ok_button );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     cancel_button );
-  
   info.start = start;
   info.n = n;
-  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( roms_done ), &info );
 
-  gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-
-  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
+  /* Create the OK and Cancel buttons */
+  gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( roms_done ), &info,
+			     NULL );
 
   /* And the current values of each of the ROMs */
   vbox = GTK_BOX( GTK_DIALOG( dialog )->vbox );
 
   gtk_container_set_border_width( GTK_CONTAINER( vbox ), 5 );
   for( i = 0; i < n; i++ ) add_rom( vbox, start, i );
-
-  /* Keyboard accelerator (Esc to cancel) */
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accel_group );
-  gtk_widget_add_accelerator( cancel_button, "clicked", accel_group,
-			      GDK_Escape, 0, 0 );
 
   /* Users shouldn't be able to resize this window */
   gtk_window_set_policy( GTK_WINDOW( dialog ), FALSE, FALSE, TRUE );

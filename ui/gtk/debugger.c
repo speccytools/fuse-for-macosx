@@ -84,7 +84,7 @@ static int create_events( GtkBox *parent );
 static void events_click( GtkCList *clist, gint row, gint column,
 			  GdkEventButton *event, gpointer user_data );
 static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
-static int create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group );
+static int create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group );
 
 static int activate_debugger( void );
 static int update_memory_map( void );
@@ -323,8 +323,7 @@ create_dialog( void )
 
   /* The action buttons */
 
-  error = create_buttons( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-			  accel_group );
+  error = create_buttons( GTK_DIALOG( dialog ), accel_group );
   if( error ) return error;
 
   /* Initially, have all the panes visible */
@@ -595,36 +594,21 @@ create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group )
 }
 
 static int
-create_buttons( GtkContainer *parent, GtkAccelGroup *accel_group )
+create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group )
 {
-  GtkWidget *step_button, *close_button;
+  static const gtkstock_button
+    step  = { "Single step", GTK_SIGNAL_FUNC( gtkui_debugger_done_step ) },
+    cont  = { "Continue", GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ) },
+    brk   = { "Break", GTK_SIGNAL_FUNC( gtkui_debugger_break ) };
 
   /* Create the action buttons for the dialog box */
-
-  step_button = gtk_button_new_with_label( "Single Step" );
-  gtk_signal_connect( GTK_OBJECT( step_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_debugger_done_step ), NULL );
-  gtk_container_add( parent, step_button );
-
-  continue_button = gtk_button_new_with_label( "Continue" );
-  gtk_signal_connect( GTK_OBJECT( continue_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ), NULL );
-  gtk_container_add( parent, continue_button );
-
-  break_button = gtk_button_new_with_label( "Break" );
-  gtk_signal_connect( GTK_OBJECT( break_button ), "clicked",
-		      GTK_SIGNAL_FUNC( gtkui_debugger_break ), NULL );
-  gtk_container_add( parent, break_button );
-
-  close_button = gtk_button_new_with_label( "Close" );
-  gtk_signal_connect_object( GTK_OBJECT( close_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_debugger_done_close ),
-			     GTK_OBJECT( dialog ) );
-  gtk_container_add( parent, close_button );
-
-  /* Esc is equivalent to clicking on 'close' */
-  gtk_widget_add_accelerator( close_button, "clicked", accel_group,
-                              GDK_Escape, 0, 0 );
+  gtkstock_create_button( GTK_WIDGET( parent ), accel_group, &step );
+  continue_button = gtkstock_create_button( GTK_WIDGET( parent ), accel_group,
+					    &cont );
+  break_button = gtkstock_create_button( GTK_WIDGET( parent ), accel_group,
+					 &brk );
+  gtkstock_create_close( GTK_WIDGET( parent ), accel_group,
+			 GTK_SIGNAL_FUNC( gtkui_debugger_done_close ), TRUE );
 
   return 0;
 }

@@ -62,7 +62,6 @@ static void
 create_fire_button_selector( const char *title, struct button_info *info,
 			     GtkBox *parent );
 static void set_key_text( GtkWidget *label, keyboard_key_name key );
-static void create_buttons( GtkWidget *dialog, struct joystick_info *info );
 
 static void key_callback( gpointer data, guint action, GtkWidget *widget );
 static void nothing_callback( gpointer data, guint action, GtkWidget *widget );
@@ -159,7 +158,8 @@ menu_options_joysticks_select( gpointer callback_data, guint callback_action,
 				   GTK_BOX( vbox ) );
     }
 
-  create_buttons( dialog, &info );
+  gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( joystick_done ),
+			     &info, NULL );
 
   gtk_widget_show_all( dialog );
   gtk_main();
@@ -295,29 +295,6 @@ set_key_text( GtkWidget *label, keyboard_key_name key )
   snprintf( buffer, 40, "%s", text );
 
   gtk_label_set_text( GTK_LABEL( label ), buffer );
-}
-
-static void
-create_buttons( GtkWidget *dialog, struct joystick_info *info )
-{
-  GtkWidget *button;
-
-  /* Create and add the action buttons to the dialog box */
-  button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( joystick_done ), info );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-
-  button = gtk_button_new_with_label( "Cancel" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
 }
 
 

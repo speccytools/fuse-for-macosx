@@ -1020,3 +1020,7 @@
 20040720 settings.dat,man/fuse.1,ui/fb/fbdisplay.c,ui/svga/svgadisplay.c:
 	 optionally use doublescan modes for SVGAlib and fb (Darren).
 20040720 tape.c: improve 'tape modified' confirmation message (Darren).
+20040721 ui/gtk/{Makefile.am,binary.c,browse.c,confirm.c,debugger.c,
+	 gtkinternals.h,gtkjoystick.c,gtkui.c,memory.c,options.pl,
+	 picture.c,pokefinder.c,roms.c,stock.c}: factor out common button
+	 creation code. Add GTK+ 2.x stock buttons (Darren).

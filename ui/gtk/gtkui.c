@@ -259,8 +259,7 @@ int ui_end(void)
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
-  GtkWidget *dialog, *ok_button, *label, *vbox;
-  GtkAccelGroup *accel_group;
+  GtkWidget *dialog, *label, *vbox;
 
   /* If we don't have a UI yet, we can't output widgets */
   if( !display_ui_initialised ) return 0;
@@ -283,11 +282,10 @@ ui_error_specific( ui_error_level severity, const char *message )
     break;
 
   }
-  
+
   /* Add the OK button into the lower half */
-  ok_button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     ok_button );
+  gtkstock_create_close( dialog, NULL, GTK_SIGNAL_FUNC (gtk_widget_destroy),
+			 FALSE );
 
   /* Create a label with that message */
   label = gtk_label_new( message );
@@ -304,22 +302,8 @@ ui_error_specific( ui_error_level severity, const char *message )
   gtk_container_add( GTK_CONTAINER( vbox ), label );
 
   /* Add some ways to finish the dialog box */
-  gtk_signal_connect_object( GTK_OBJECT( ok_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtk_widget_destroy ),
-			     GTK_OBJECT( dialog ) );
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtk_widget_destroy ), (gpointer) NULL );
-
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group(GTK_WINDOW(dialog), accel_group);
-
-  gtk_widget_add_accelerator( ok_button, "clicked",
-			      accel_group,
-			      GDK_Return, 0, 0 );
-  gtk_widget_add_accelerator( ok_button, "clicked",
-			      accel_group,
-			      GDK_Escape, 0, 0 );
-
   gtk_widget_show_all( dialog );
 
   return 0;
@@ -497,10 +481,7 @@ scaler_type
 menu_get_scaler( scaler_available_fn selector )
 {
   gtkui_select_info dialog;
-  GtkAccelGroup *accel_group;
   GSList *button_group = NULL;
-
-  GtkWidget *ok_button, *cancel_button;
 
   int count;
   scaler_type scaler;
@@ -544,32 +525,14 @@ menu_get_scaler( scaler_available_fn selector )
   }
 
   /* Create and add the actions buttons to the dialog box */
-  ok_button = gtk_button_new_with_label( "OK" );
-  cancel_button = gtk_button_new_with_label( "Cancel" );
-
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
-		     ok_button );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
-		     cancel_button );
+  gtkstock_create_ok_cancel( dialog.dialog, NULL,
+			     GTK_SIGNAL_FUNC( menu_options_filter_done ),
+			     (gpointer) &dialog, NULL );
 
   /* Add the necessary callbacks */
-  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( menu_options_filter_done ),
-		      (gpointer) &dialog );
-  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog.dialog ) );
   gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) NULL );
-
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog.dialog ), accel_group);
-
-  /* Allow Esc to cancel */
-  gtk_widget_add_accelerator( cancel_button, "clicked",
-                              accel_group,
-                              GDK_Escape, 0, 0 );
 
   /* Set the window to be modal and display it */
   gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );
@@ -653,9 +616,6 @@ void
 menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_select_info dialog;
-  GtkAccelGroup *accel_group;
-
-  GtkWidget *ok_button, *cancel_button;
 
   int i;
   
@@ -694,32 +654,14 @@ menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   }
 
   /* Create and add the actions buttons to the dialog box */
-  ok_button = gtk_button_new_with_label( "OK" );
-  cancel_button = gtk_button_new_with_label( "Cancel" );
-
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
-		     ok_button );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->action_area ),
-		     cancel_button );
+  gtkstock_create_ok_cancel( dialog.dialog, NULL,
+			     GTK_SIGNAL_FUNC( menu_machine_select_done ),
+			     (gpointer) &dialog, NULL );
 
   /* Add the necessary callbacks */
-  gtk_signal_connect( GTK_OBJECT( ok_button ), "clicked",
-		      GTK_SIGNAL_FUNC( menu_machine_select_done ),
-		      (gpointer) &dialog );
-  gtk_signal_connect_object( GTK_OBJECT( cancel_button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog.dialog ) );
   gtk_signal_connect( GTK_OBJECT( dialog.dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
 		      (gpointer) NULL );
-
-  accel_group = gtk_accel_group_new();
-  gtk_window_add_accel_group(GTK_WINDOW(dialog.dialog), accel_group);
-
-  /* Allow Esc to cancel */
-  gtk_widget_add_accelerator( cancel_button, "clicked",
-                              accel_group,
-                              GDK_Escape, 0, 0 );
 
   /* Set the window to be modal and display it */
   gtk_window_set_modal( GTK_WINDOW( dialog.dialog ), TRUE );

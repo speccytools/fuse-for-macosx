@@ -44,8 +44,7 @@ static void set_dont_save( GtkButton *button, gpointer user_data );
 int
 gtkui_confirm( const char *string )
 {
-  GtkWidget *dialog, *label, *button;
-  GtkAccelGroup *accelerators;
+  GtkWidget *dialog, *label;
   int confirm;
 
   /* Return value isn't an error code, but signifies whether to undertake
@@ -61,32 +60,12 @@ gtkui_confirm( const char *string )
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
-  accelerators = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accelerators );
-
   label = gtk_label_new( string );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
 		      TRUE, TRUE, 5 );
 
-  button = gtk_button_new_with_label( "OK" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( set_confirmed ), &confirm );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-  gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Return, 0,
-			      0);
-
-  button = gtk_button_new_with_label( "Cancel" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-  gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Escape, 0,
-			      0);
+  gtkstock_create_ok_cancel( dialog, NULL, GTK_SIGNAL_FUNC( set_confirmed ),
+			     &confirm, NULL );
 
   gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
   gtk_widget_show_all( dialog );
@@ -109,8 +88,7 @@ set_confirmed( GtkButton *button GCC_UNUSED, gpointer user_data )
 ui_confirm_save_t
 ui_confirm_save( const char *message )
 {
-  GtkWidget *dialog, *label, *button;
-  GtkAccelGroup *accelerators;
+  GtkWidget *dialog, *label;
   ui_confirm_save_t confirm;
 
   if( !settings_current.confirm_actions ) return UI_CONFIRM_SAVE_DONTSAVE;
@@ -124,39 +102,20 @@ ui_confirm_save( const char *message )
   gtk_signal_connect( GTK_OBJECT( dialog ), "delete-event",
 		      GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ), NULL );
 
-  accelerators = gtk_accel_group_new();
-  gtk_window_add_accel_group( GTK_WINDOW( dialog ), accelerators );
-
   label = gtk_label_new( message );
   gtk_box_pack_start( GTK_BOX( GTK_DIALOG( dialog )->vbox ), label,
 		      TRUE, TRUE, 5 );
 
-  button = gtk_button_new_with_label( "Save" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( set_save ), &confirm );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-
-  button = gtk_button_new_with_label( "Don't Save" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect( GTK_OBJECT( button ), "clicked",
-		      GTK_SIGNAL_FUNC( set_dont_save ), &confirm );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-
-  button = gtk_button_new_with_label( "Cancel" );
-  gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog )->action_area ),
-		     button );
-  gtk_signal_connect_object( GTK_OBJECT( button ), "clicked",
-			     GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ),
-			     GTK_OBJECT( dialog ) );
-  gtk_widget_add_accelerator( button, "clicked", accelerators, GDK_Escape, 0,
-			      0);
+  {
+    static gtkstock_button btn[] = {
+      { GTK_STOCK_NO, GTK_SIGNAL_FUNC( set_dont_save ), NULL, DEFAULT_DESTROY, 0, 0, GDK_VoidSymbol, 0 }, /* override Escape */
+      { GTK_STOCK_CANCEL, NULL, NULL, DEFAULT_DESTROY, 0, 0, 0, 0 },
+      { GTK_STOCK_SAVE, GTK_SIGNAL_FUNC( set_save ), NULL, DEFAULT_DESTROY, 0, 0, 0, 0 }
+    };
+    btn[0].actiondata = btn[2].actiondata = &confirm;
+    gtkstock_create_buttons( dialog, NULL, btn,
+			     sizeof( btn ) / sizeof( btn[0] ) );
+  }
 
   gtk_window_set_modal( GTK_WINDOW( dialog ), TRUE );
   gtk_widget_show_all( dialog );
