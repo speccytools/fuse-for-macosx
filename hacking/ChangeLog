@@ -1205,3 +1205,5 @@
 20050115 sound/aosound.c: small fixes (Gergely).
 20050115 man/fuse.1: add documentation for libao sound driver (Gergely).
 20050205 Makefile.am: Add kempmouse.h to headers list (Fred).
+20050205 sound/sdlsound.c: Remove unused socket header and replace setenv with
+         putenv for Windows compatibility (Fred).
