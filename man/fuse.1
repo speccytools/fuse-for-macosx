@@ -23,7 +23,7 @@
 .\" Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
 .\"
 .\"
-.TH fuse 1 "20th January, 2002" "Version 0.4.1" "Emulators"
+.TH fuse 1 "29th January, 2002" "Version 0.4.1" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -83,6 +83,20 @@ option.
 Emulate a Kempston joystick. Same as the General Options dialog's
 .I "Kempston joystick"
 option.
+.RE
+.PP
+.I "-m type"
+.br
+.I "--machine type"
+.RS
+Specify machine type to emulate initially. The default is
+.IR 48 ,
+a 48K Spectrum. The available options are
+.IR 48 ,
+.IR 128 ,
+.IR plus2 ,
+and
+.IR plus2a .
 .RE
 .PP
 .I "-o long_option"
@@ -412,11 +426,6 @@ picture remains onscreen (and the emulator paused) until you press
 .I Esc
 or
 .IR Enter .
-.PP
-(Currently the GTK+ UI does not support displaying this picture, and
-also lacks a
-.I Help
-menu.)
 .RE
 .PP
 .\"
