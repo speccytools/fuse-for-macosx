@@ -116,7 +116,7 @@ foreach( @keys ) {
 
     my( $keysym, $key1, $key2 ) = @$_;
 
-    printf "  { KEY(%-12s, KEYBOARD_%-6s KEYBOARD_%-6s },\n",
+    printf "  { KEY(%-12s , KEYBOARD_%-6s KEYBOARD_%-6s },\n",
       "$keysym)", "$key1,", $key2;
 }
 
