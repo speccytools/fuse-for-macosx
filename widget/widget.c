@@ -1,5 +1,5 @@
 /* widget.c: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001 Matan Ziv-Av, Philip Kendall, Russell Marks
+   Copyright (c) 2001,2002 Matan Ziv-Av, Philip Kendall, Russell Marks
 
    $Id$
 
@@ -342,5 +342,6 @@ widget_t widget_data[] = {
   { widget_tape_draw,     NULL,			 widget_tape_keyhandler     },
   { widget_snapshot_draw, NULL,			 widget_snapshot_keyhandler },
   { widget_machine_draw,  NULL,			 widget_machine_keyhandler  },
+  { widget_picture_draw,  NULL,                  widget_picture_keyhandler  },
 
 };

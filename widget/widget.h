@@ -1,5 +1,5 @@
 /* widget.h: Simple dialog boxes for all user interfaces.
-   Copyright (c) 2001 Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2001,2002 Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -44,6 +44,7 @@ typedef enum widget_type {
   WIDGET_TYPE_TAPE,		/* Tape options */
   WIDGET_TYPE_SNAPSHOT,		/* Snapshot options */
   WIDGET_TYPE_MACHINE,		/* Machine control */
+  WIDGET_TYPE_PICTURE,		/* Keyboard picture */
 
 } widget_type;
 
@@ -135,6 +136,15 @@ void widget_snapshot_keyhandler( int key );
 
 int widget_machine_draw( void );
 void widget_machine_keyhandler( int key );
+
+/* Keyboard picture */
+
+int widget_picture_draw( void );
+void widget_picture_keyhandler( int key );
+
+/* The data for the keyboard picture */
+
+extern int widget_picture_data[DISPLAY_HEIGHT][DISPLAY_WIDTH];
 
 /* The widgets actually available */
 

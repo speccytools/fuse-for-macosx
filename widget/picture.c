@@ -1,5 +1,5 @@
-/* mainmenu.c: Main menu widget
-   Copyright (c) 2001 Philip Kendall
+/* picture.c: Keyboard picture
+   Copyright (c) 2001,2002 Philip Kendall
 
    $Id$
 
@@ -26,58 +26,32 @@
 
 #include <config.h>
 
-#include <unistd.h>
-
 #include "display.h"
 #include "keyboard.h"
 #include "ui/uidisplay.h"
 #include "widget.h"
 
-int widget_mainmenu_draw( void )
+int widget_picture_draw( void )
 {
-  /* Draw the dialog box */
-  widget_dialog_with_border( 1, 2, 30, 7 );
+  int x; int y;
 
-  widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Main menu" );
-
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "(S)napshot menu" );
-  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "General (o)ptions" );
-  widget_printstring( 2, 6, WIDGET_COLOUR_FOREGROUND, "(M)achine control" );
-  widget_printstring( 2, 7, WIDGET_COLOUR_FOREGROUND, "(T)ape control" );
-  widget_printstring( 2, 8, WIDGET_COLOUR_FOREGROUND, "(K)eyboard picture" );
-
-  uidisplay_lines( DISPLAY_BORDER_HEIGHT + 16,
-		   DISPLAY_BORDER_HEIGHT + 16 + 56 );
+  for( y=0; y<DISPLAY_HEIGHT; y++ )
+    for( x=0; x<DISPLAY_WIDTH; x++ )
+      uidisplay_putpixel( DISPLAY_BORDER_WIDTH + x, DISPLAY_BORDER_HEIGHT + y,
+			  widget_picture_data[y][x] );
+  
+  uidisplay_lines( DISPLAY_BORDER_HEIGHT,
+		   DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT );
 
   return 0;
 }
 
-void widget_mainmenu_keyhandler( int key )
+void widget_picture_keyhandler( int key )
 {
   switch( key ) {
     
   case KEYBOARD_1: /* 1 used as `Escape' generates `Edit', which is Caps + 1 */
     widget_return[ widget_level ].finished = WIDGET_FINISHED_CANCEL;
-    break;
-
-  case KEYBOARD_k:
-    widget_do( WIDGET_TYPE_PICTURE );
-    break;
-
-  case KEYBOARD_m:
-    widget_do( WIDGET_TYPE_MACHINE );
-    break;
-
-  case KEYBOARD_o:
-    widget_do( WIDGET_TYPE_OPTIONS );
-    break;
-
-  case KEYBOARD_s:
-    widget_do( WIDGET_TYPE_SNAPSHOT );
-    break;
-
-  case KEYBOARD_t:
-    widget_do( WIDGET_TYPE_TAPE );
     break;
 
   case KEYBOARD_Enter:
