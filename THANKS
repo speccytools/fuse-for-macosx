@@ -17,6 +17,10 @@ Some thanks (in alphabetical order):
   FDC, and libdsk which provides support for more disk image formats:
   see http://www.seasip.demon.co.uk/Unix/LibDsk/
 
+* Martin Garton: making the GTK+ user interface compatible with GTK+ 2.0,
+  although this isn't currently in due to the fact I broke it in other
+  ways.
+
 * Ian Greenway: for information about reading from unattached ports. If
   you've got an Amiga, you may well like to check out Ian's Spectrum
   Emulator, ASp: http://www.greew.freeserve.co.uk/ASp.html
@@ -41,10 +45,16 @@ Some thanks (in alphabetical order):
 
 * Fredrick Meunier: for TC2048 support and more (see `AUTHORS')
 
+* Catalin Mihaila: for writing an SDL user interface for Fuse. Not in
+  the code as this has already been done by Fred :-(
+
 * Santiago Romero: for putting me on the track of a bug in Fuse's keyboard
   emulation.
 
 * Darren Salt: quite a few bits of code (see `AUTHORS')
+
+* Dmitry Sanarin: the author of Glukalka (http://glukalka.sf.net/),
+  from which Fuse's TR-DOS emulation code was taken.
 
 * Steve Snake (via Mark Woodmass): for pointing out which memory pages
   on the 128K machine are actually contended. Grab Steve's emulator, Klive,
@@ -61,6 +71,8 @@ Some thanks (in alphabetical order):
 * Martijn van der Heide: for World of Spectrum
   (http://www.worldofspectrum.org/) -- simply the best Speccy Web site out
   there.
+
+* Witold Filipczyk: for TC2068 support and more (see `AUTHORS')
 
 * Mark Woodmass: for putting me on the track of (and finding the
   solution to) bugs with regard to Fuse's R register emulation during

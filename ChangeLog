@@ -1,4 +1,53 @@
-2002-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+2003-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.6.0 released.
+
+	* Pentagon 128 support (Fredrick Meunier, with thanks also to
+	  Dmitry Sanarin for Glukalka from which the TR-DOS emulation was
+	  taken).
+
+	* TC2068 support (Witold Filipczyk).
+
+	* Graphics filters: essentially arbitrary filters which can be
+	  applied to the Spectrum's screen to give scanlines, smoothing
+	  and all sorts of other possiblities (mostly Fredrick Meunier
+	  and Philip Kendall; based on the same feature in ScummVM).
+
+	* Transparent monitor/debugger (Philip Kendall).
+
+	* A rewrite of the display code to update only those rectangles
+	  which have been changed, rather than entire lines. Performance
+	  improvement, and also allows effects similar to flipping between
+	  the 128K Spectrum's two screens to work much better (Fredrick
+	  Meunier/Philip Kendall).
+
+	* New SDL user interface (Fredrick Meunier).
+
+	* 16K Spectrum support (Fredrick Meunier).
+
+	* Load and save .scr files, including vbSpec's Timex mode
+	  extensions (Fredrick Meunier).
+
+	* Selectable ROMs for each machine type (Philip Kendall).
+
+	* Optionally writable 'ROM's (Philip Kendall).
+
+	* Get the behaviour of the TC2048 video modes correct (Witold
+	  Filipczyk).
+
+	* Optional frame-skipping on output (Fredrick Meunier).
+
+	* New --(no-)aspect-hint option to not give aspect hints to the
+	  window manager under GTK+ or Xlib UIs. Useful for some window
+	  managers which otherwise won't let you resize Fuse's window
+	  (Philip Kendall/Russell Marks).
+
+	* Lots of other minor bug fixes/improvements (everyone mentioned
+	  above).
+
+2002-12-09  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.5.1 released
 
 	* Separate out libspectrum (the file format handling) into its own
 	  library; changes occuring solely in libspectrum's code will not
