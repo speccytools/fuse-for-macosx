@@ -83,7 +83,7 @@ widget_roms_draw( void *data )
   for( i = 0; i < info->count; i++ ) {
 
     snprintf( buffer, 32, "(%c) %10s:", ((char)i) + 'A',
-	      settings_rom_name[i] );
+	      settings_rom_name[ first_rom + i ] );
     widget_printstring( 2, i + 4, WIDGET_COLOUR_FOREGROUND, buffer );
 
     print_rom( i );

@@ -692,3 +692,4 @@
 20040401 machine.c,machines/: general tidy-up of the machines/ directory.
 20040401 machine.c,settings.dat,machines/{Makefile.am,machines.h,
 	 specplus3.[ch],specplus3e.c}: Spectrum +3e support.
+20040403 widget/roms.c: Fix ROM name lookup for labels
