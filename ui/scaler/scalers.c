@@ -615,22 +615,22 @@ FUNCTION( scaler_AdvMame2x )( BYTE *srcPtr, DWORD srcPitch, BYTE *null,
   unsigned int nextlineDst = dstPitch / sizeof( scaler_data_type );
   scaler_data_type *q = (scaler_data_type*) dstPtr;
 
-  scaler_data_type A, B, C;
+  scaler_data_type /* A, */ B, C;
   scaler_data_type D, E, F;
-  scaler_data_type G, H, I;
+  scaler_data_type /* G, */ H, I;
 
   while (height--) {
     int i;
 
     B = C = *(p - nextlineSrc);
-    E = F = *(p);
+    E = *(p - 1); F = *(p);
     H = I = *(p + nextlineSrc);
 
     for (i = 0; i < width; ++i) {
       p++;
-      A = B; B = C; C = *(p - nextlineSrc);
+      /* A = B; */ B = C; C = *(p - nextlineSrc);
       D = E; E = F; F = *(p);
-      G = H; H = I; I = *(p + nextlineSrc);
+      /* G = H; */ H = I; I = *(p + nextlineSrc);
 
       *(q) = D == B && B != F && D != H ? D : E;
       *(q + 1) = B == F && B != D && F != H ? F : E;
