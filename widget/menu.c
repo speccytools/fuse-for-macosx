@@ -39,6 +39,7 @@
 #include "tape.h"
 #include "utils.h"
 #include "widget.h"
+#include "ui/ui.h"
 #include "ui/uidisplay.h"
 
 #define ERROR_MESSAGE_MAX_LENGTH 1024
@@ -209,8 +210,7 @@ int widget_menu_keyboard( void *data )
 
   fd = utils_find_lib( ptr->filename );
   if( fd == -1 ) {
-    fprintf( stderr, "%s: couldn't find keyboard picture (`%s')\n",
-	     fuse_progname, ptr->filename );
+    ui_error( "couldn't find keyboard picture (`%s')\n", ptr->filename );
     return 1;
   }
   
@@ -218,8 +218,8 @@ int widget_menu_keyboard( void *data )
   if( error ) return error;
 
   if( length != 6912 ) {
-    fprintf( stderr, "%s: keyboard picture (`%s') is not 6912 bytes long\n",
-	     fuse_progname, ptr->filename );
+    ui_error( "keyboard picture (`%s') is not 6912 bytes long\n",
+	      ptr->filename );
     return 1;
   }
 

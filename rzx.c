@@ -39,6 +39,7 @@
 #include "libspectrum/rzx.h"
 #include "rzx.h"
 #include "types.h"
+#include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80_macros.h"
 
@@ -95,8 +96,7 @@ int rzx_start_recording( const char *filename )
   /* Store the filename */
   rzx_filename = (char*)malloc( strlen(filename) + 1 );
   if( rzx_filename == NULL ) {
-    fprintf( stderr, "%s: out of memory in rzx_start_recording\n",
-	     fuse_progname );
+    ui_error( "out of memory in rzx_start_recording\n" );
     return 1;
   }
   strcpy( rzx_filename, filename );
@@ -115,8 +115,8 @@ int rzx_stop_recording( void )
   length = 0;
   libspec_error = libspectrum_rzx_write( &rzx, &buffer, &length );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: error during libspectrum_rzx_write: %s\n",
-	    fuse_progname, libspectrum_error_message( libspec_error ) );
+    ui_error( "error during libspectrum_rzx_write: %s\n",
+	      libspectrum_error_message( libspec_error ) );
     libspectrum_rzx_free( &rzx );
     return libspec_error;
   }
@@ -129,8 +129,8 @@ int rzx_stop_recording( void )
 
   libspec_error = libspectrum_rzx_free( &rzx );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: error during libspectrum_rzx_free: %s\n",
-	    fuse_progname, libspectrum_error_message( libspec_error ) );
+    ui_error( "error during libspectrum_rzx_free: %s\n",
+	      libspectrum_error_message( libspec_error ) );
     return libspec_error;
   }
 
@@ -150,8 +150,8 @@ int rzx_start_playback( const char *filename )
 
   libspec_error = libspectrum_rzx_read( &rzx, buffer, length );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf( stderr, "%s: error during libspectrum_rzx_read: %s\n",
-	     fuse_progname, libspectrum_error_message( libspec_error ) );
+    ui_error( "error during libspectrum_rzx_read: %s\n",
+	      libspectrum_error_message( libspec_error ) );
     munmap( buffer, length );
     return libspec_error;
   }
@@ -188,9 +188,8 @@ int rzx_stop_playback( void )
 
   libspec_error = libspectrum_rzx_free( &rzx );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf( stderr, "%s: libspec_error during libspectrum_rzx_free: %s\n",
-	     fuse_progname, libspectrum_error_message( libspec_error )
-	   );
+    ui_error( "libspec_error during libspectrum_rzx_free: %s\n",
+	      libspectrum_error_message( libspec_error ) );
     return libspec_error;
   }
 

@@ -38,6 +38,7 @@
 #include "sound.h"
 #include "spec48.h"
 #include "spectrum.h"
+#include "ui/ui.h"
 #include "z80/z80.h"
 
 static DWORD spec48_contend_delay( void );
@@ -65,8 +66,8 @@ BYTE spec48_readbyte(WORD address)
     case 2: return RAM[2][address]; break;
     case 3: return RAM[0][address]; break;
     default:
-      fprintf(stderr, "%s: access to impossible bank %d at %s:%d\n",
-	      fuse_progname, bank, __FILE__, __LINE__);
+      ui_error( "access to impossible bank %d at %s:%d\n",
+		bank, __FILE__, __LINE__ );
       fuse_abort();
   }
   return 0; /* Keep gcc happy */
@@ -86,8 +87,8 @@ void spec48_writebyte(WORD address, BYTE b)
     case 2: RAM[2][offset]=b; break;
     case 3: RAM[0][offset]=b; break;
     default:
-      fprintf(stderr, "%s: access to impossible bank %d at %s:%d\n",
-	      fuse_progname, bank, __FILE__, __LINE__);
+      ui_error( "access to impossible bank %d at %s:%d\n",
+		bank, __FILE__, __LINE__ );
       fuse_abort();
     }
     if(address<0x5b00) {	/* 0x4000 - 0x5aff = display file */

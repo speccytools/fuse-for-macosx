@@ -1,5 +1,5 @@
 /* event.c: Routines needed for dealing with the event list
-   Copyright (c) 2000 Philip Kendall
+   Copyright (c) 2000,2002 Philip Kendall
 
    $Id$
 
@@ -37,7 +37,6 @@
 
 #include "display.h"
 #include "event.h"
-#include "fuse.h"
 #include "machine.h"
 #include "rzx.h"
 #include "tape.h"
@@ -145,8 +144,7 @@ int event_do_events(void)
       break;
 
     default:
-      fprintf( stderr, "%s: unknown event type %d\n", fuse_progname,
-	       ptr->type );
+      ui_error( "unknown event type %d\n", ptr->type );
       break;
     }
     free(ptr);

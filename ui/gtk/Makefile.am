@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001 Philip Kendall
+## Copyright (c) 2001-2002 Philip Kendall
 
 ## $Id$
 
@@ -28,7 +28,7 @@ noinst_LIBRARIES = libuigtk.a
 
 INCLUDES = @GTK_CFLAGS@
 
-libuigtk_a_SOURCES = gtkdisplay.c gtkkeyboard.c gtkui.c options.c
+libuigtk_a_SOURCES = error.c gtkdisplay.c gtkkeyboard.c gtkui.c options.c
 
 BUILT_SOURCES = options.c options.h
 

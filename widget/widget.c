@@ -66,7 +66,7 @@ static int widget_read_font( const char *filename, size_t offset )
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    fprintf( stderr,"%s: couldn't find ROM `%s'\n", fuse_progname, filename );
+    ui_error( "couldn't find ROM `%s'\n", filename );
     return 1;
   }
 

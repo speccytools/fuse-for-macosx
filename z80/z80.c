@@ -28,6 +28,7 @@
 
 #include "../fuse.h"
 #include "../spectrum.h"
+#include "ui/ui.h"
 #include "z80.h"
 
 #include "z80_macros.h"
@@ -116,7 +117,7 @@ void z80_interrupt()
 	  break;
 	}
       default:
-	fprintf(stderr,"Unknown interrupt mode %d\n",IM);
+	ui_error( "Unknown interrupt mode %d\n", IM );
 	fuse_abort();
     }
   }

@@ -42,6 +42,7 @@
 #include "snapshot.h"
 #include "spec128.h"
 #include "spectrum.h"
+#include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -78,8 +79,8 @@ int snapshot_read( const char *filename )
     snapshot_flush_slt();
     error = libspectrum_sna_read( buffer, length, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
-      fprintf(stderr, "%s: Error from libspectrum_sna_read: %s\n",
-	      fuse_progname, libspectrum_error_message(error) );
+      ui_error( "Error from libspectrum_sna_read: %s\n",
+		libspectrum_error_message(error) );
       munmap( buffer, length );
       return 1;
     }
@@ -90,8 +91,8 @@ int snapshot_read( const char *filename )
     snapshot_flush_slt();
     error = libspectrum_z80_read( buffer, length, &snap );
     if( error != LIBSPECTRUM_ERROR_NONE ) {
-      fprintf(stderr, "%s: Error from libspectrum_z80_read: %s\n",
-	      fuse_progname, libspectrum_error_message(error) );
+      ui_error( "Error from libspectrum_z80_read: %s\n",
+		libspectrum_error_message(error) );
       munmap( buffer, length );
       return 1;
     }
@@ -99,7 +100,7 @@ int snapshot_read( const char *filename )
 
   default:
 
-    fprintf(stderr, "%s: Unknown snapshot type\n", fuse_progname );
+    ui_error( "Unknown snapshot type\n" );
     munmap( buffer, length );
     return 1;
 
@@ -117,8 +118,8 @@ int snapshot_read( const char *filename )
 
   error = libspectrum_snap_destroy( &snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: Error from libspectrum_snap_destroy: %s\n",
-	    fuse_progname, libspectrum_error_message(error) );
+    ui_error( "Error from libspectrum_snap_destroy: %s\n",
+	      libspectrum_error_message(error) );
     return 1;
   }
 
@@ -155,20 +156,19 @@ static int snapshot_copy_from( libspectrum_snap *snap )
   case LIBSPECTRUM_MACHINE_48:
     error = machine_select( SPECTRUM_MACHINE_48 );
     if( error ) {
-      fprintf(stderr,"%s: 48K Spectrum unavailable\n", fuse_progname );
+      ui_error( "48K Spectrum unavailable\n" );
       return 1;
     }
     break;
   case LIBSPECTRUM_MACHINE_128:
     error = machine_select( SPECTRUM_MACHINE_128 );
     if( error ) {
-      fprintf(stderr,"%s: 128K Spectrum unavailable\n", fuse_progname );
+      ui_error( "128K Spectrum unavailable\n" );
       return 1;
     }
     break;
   default:
-    fprintf(stderr,"%s: Unknown machine type %d\n", fuse_progname,
-	    snap->machine);
+    ui_error( "Unknown machine type %d\n", snap->machine );
     return 1;
   }
   machine_current->reset();
@@ -211,8 +211,7 @@ static int snapshot_copy_from( libspectrum_snap *snap )
       if( slt[i] == NULL ) {
 	for( j=0; j<i; j++ ) {
 	  if( slt_length[j] ) { free( slt[j] ); slt_length[j] = 0; }
-	  fprintf( stderr, "%s: out of memory in snapshot_copy_from\n",
-		   fuse_progname );
+	  ui_error( "out of memory in snapshot_copy_from\n" );
 	  return 1;
 	}
       }
@@ -227,8 +226,7 @@ static int snapshot_copy_from( libspectrum_snap *snap )
     if( slt_screen == NULL ) {
       for( i=0; i<256; i++ ) {
 	if( slt_length[i] ) { free( slt[i] ); slt_length[i] = 0; }
-	fprintf( stderr, "%s: out of memory in snapshot_copy_from\n",
-		 fuse_progname );
+	ui_error( "out of memory in snapshot_copy_from\n" );
 	return 1;
       }
     }
@@ -255,15 +253,15 @@ int snapshot_write( const char *filename )
   length = 0;
   error = libspectrum_z80_write( &buffer, &length, &snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: error from libspectrum_z80_write: %s\n",
-	    fuse_progname, libspectrum_error_message(error) );
+    ui_error( "error from libspectrum_z80_write: %s\n",
+	      libspectrum_error_message(error) );
     return error;
   }
 
   error = libspectrum_snap_destroy( &snap );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: Error from libspectrum_snap_destroy: %s\n",
-	    fuse_progname, libspectrum_error_message(error) );
+    ui_error( "Error from libspectrum_snap_destroy: %s\n",
+	      libspectrum_error_message(error) );
     free( buffer );
     return 1;
   }
@@ -287,8 +285,7 @@ static int snapshot_copy_to( libspectrum_snap *snap )
     snap->machine = LIBSPECTRUM_MACHINE_128;
     break;
   default:
-    fprintf(stderr,"%s: Can't handle machine type %d in snapshots\n",
-	    fuse_progname, snap->machine);
+    ui_error( "Can't handle machine type %d in snapshots\n", snap->machine );
     return 1;
   }
 
@@ -322,8 +319,7 @@ static int snapshot_copy_to( libspectrum_snap *snap )
       if( snap->pages[i] == NULL ) {
 	for( j=0; j<i; j++ )
 	  if( snap->pages[j] ) { free(snap->pages[j]); snap->pages[j] = NULL; }
-	fprintf( stderr, "%s: out of memory in snapshot_copy_to\n",
-		 fuse_progname );
+	ui_error( "out of memory in snapshot_copy_to\n" );
 	return 1;
       }
 
@@ -342,8 +338,7 @@ static int snapshot_copy_to( libspectrum_snap *snap )
 	  if( snap->pages[j] ) { free(snap->pages[j]); snap->pages[j] = NULL; }
 	for( j=0; j<i; j++ )
 	  if( snap->slt[j] ) { free( snap->slt[j] ); snap->slt_length[j] = 0; }
-	fprintf( stderr, "%s: out of memory in snapshot_copy_to\n",
-		 fuse_progname );
+	ui_error( "out of memory in snapshot_copy_to\n" );
 	return 1;
       }
 
@@ -359,8 +354,7 @@ static int snapshot_copy_to( libspectrum_snap *snap )
 	if( snap->pages[i] ) { free( snap->pages[i] ); snap->pages[i] = NULL; }
       for( i=0; i<256; i++ )
 	if( snap->slt[i] ) { free( snap->slt[i] ); snap->slt_length[i] = 0; }
-      fprintf( stderr, "%s: out of memory in snapshot_copy_to\n",
-	       fuse_progname );
+      ui_error( "out of memory in snapshot_copy_to\n" );
       return 1;
     }
 

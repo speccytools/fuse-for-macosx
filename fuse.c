@@ -212,7 +212,7 @@ int fuse_emulation_unpause(void)
     /* If the sound code couldn't re-initialise, fall back to the
        signal based routines */
     if( !sound_enabled ) {
-      fprintf( stderr, "%s: Couldn't reinitialise sound\n", fuse_progname );
+      ui_error( "Couldn't reinitialise sound\n" );
       settings_current.sound = fuse_sound_in_use = 0;
       /* FIXME: How to deal with error return here? */
       timer_init();

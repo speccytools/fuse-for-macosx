@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2001 Philip Kendall
+   Copyright (c) 1999-2002 Philip Kendall
 
    $Id$
 
@@ -43,6 +43,7 @@
 #include "specplus2.h"
 #include "specplus3.h"
 #include "tape.h"
+#include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80.h"
 
@@ -86,16 +87,14 @@ static int machine_add_machine( int (*init_function)( machine_info *machine ) )
     (machine_info**)realloc( machine_types, 
 			     machine_count * sizeof( machine_info* ) );
   if( machine_types == NULL ) {
-    fprintf(stderr, "%s: out of memory at %s:%d\n", fuse_progname,
-	    __FILE__, __LINE__ );
+    ui_error( "out of memory at %s:%d\n", __FILE__, __LINE__ );
     return 1;
   }
 
   machine_types[ machine_count - 1 ] =
     (machine_info*)malloc( sizeof( machine_info ) );
   if( machine_types[ machine_count - 1 ] == NULL ) {
-    fprintf(stderr, "%s: out of memory at %s:%d\n", fuse_progname,
-	    __FILE__, __LINE__ );
+    ui_error( "out of memory at %s:%d\n", __FILE__, __LINE__ );
     return 1;
   }
 
@@ -119,8 +118,7 @@ int machine_select( int type )
     }
   }
 
-  fprintf( stderr, "%s: Machine type `%d' unavailable\n", fuse_progname,
-	   type );
+  ui_error( "Machine type `%d' unavailable\n", type );
   return 1;
 }
 
@@ -136,7 +134,7 @@ int machine_select_id( const char *id )
     }
   }
 
-  fprintf( stderr, "%s: Machine id `%s' unknown\n", fuse_progname, id );
+  ui_error( "Machine id `%s' unknown\n", id );
   return 1;
 }
 
@@ -207,15 +205,13 @@ int machine_allocate_roms( machine_info *machine, size_t count )
 
   machine->roms = (BYTE**)malloc( count * sizeof(BYTE*) );
   if( machine->roms == NULL ) {
-    fprintf(stderr, "%s: out of memory at %s:%d\n", fuse_progname,
-	    __FILE__, __LINE__ );
+    ui_error( "out of memory at %s:%d\n", __FILE__, __LINE__ );
     return 1;
   }
 
   machine->rom_lengths = (size_t*)malloc( count * sizeof(size_t) );
   if( machine->rom_lengths == NULL ) {
-    fprintf(stderr, "%s: out of memory at %s:%d\n", fuse_progname,
-	    __FILE__, __LINE__ );
+    ui_error( "out of memory at %s:%d\n", __FILE__, __LINE__ );
     free( machine->roms );
     return 1;
   }
@@ -234,7 +230,7 @@ int machine_read_rom( machine_info *machine, size_t number,
 
   fd = machine_find_rom( filename );
   if( fd == -1 ) {
-    fprintf( stderr, "%s: couldn't find ROM `%s'\n", fuse_progname, filename );
+    ui_error( "couldn't find ROM `%s'\n", filename );
     return 1;
   }
 

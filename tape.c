@@ -41,6 +41,7 @@
 #include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -97,11 +98,10 @@ int tape_open( const char *filename )
   }
 
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf( stderr,
-	     "%s: error reading `%s': %s\n",
-	     fuse_progname, filename, libspectrum_error_message(error) );
-      munmap( buffer, length );
-      return error;
+    ui_error( "error reading `%s': %s\n",
+	      filename, libspectrum_error_message(error) );
+    munmap( buffer, length );
+    return error;
   }
 
   if( munmap( buffer, length ) == -1 ) {
@@ -156,8 +156,8 @@ int tape_write( const char* filename )
   length = 0;
   error = libspectrum_tzx_write( &tape, &buffer, &length );
   if( error != LIBSPECTRUM_ERROR_NONE ) {
-    fprintf(stderr, "%s: error during libspectrum_tzx_write: %s\n",
-	    fuse_progname, libspectrum_error_message(error) );
+    ui_error( "error during libspectrum_tzx_write: %s\n",
+	      libspectrum_error_message(error) );
     return error;
   }
 
@@ -382,7 +382,7 @@ int trap_check_rom( void )
 
   }
 
-  fprintf( stderr, "Impossible machine type %d", machine_current->machine );
+  ui_error( "Impossible machine type %d", machine_current->machine );
   fuse_abort();
   return 0; /* Keep gcc happy */
 }

@@ -51,6 +51,7 @@
 #include "sound.h"
 #include "spectrum.h"
 #include "sunsound.h"
+#include "ui/ui.h"
 
 /* configuration */
 int sound_enabled=0;		/* Are we currently using the sound card;
@@ -176,9 +177,7 @@ return;
 
 if(sound_enabled)
   {
-  fprintf(stderr,
-          "%s: sound_init() called with sound_enabled set, can't happen!\n",
-          fuse_progname);
+  ui_error("sound_init() called with sound_enabled set, can't happen!\n" );
   sound_end();
   return;
   }

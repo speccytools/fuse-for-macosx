@@ -1,5 +1,5 @@
 /* ui.h: General UI event handling routines
-   Copyright (c) 2000-2001 Philip Kendall
+   Copyright (c) 2000-2002 Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 
 int ui_init(int *argc, char ***argv, int width, int height);
 int ui_event(void);
+int ui_error( const char *format, ... );
 int ui_end(void);
 
 #endif			/* #ifndef FUSE_UI_H */

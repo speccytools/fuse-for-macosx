@@ -39,7 +39,7 @@
 #include "machine.h"
 #include "printer.h"
 #include "spectrum.h"
-
+#include "ui/ui.h"
 
 /* XXX presumably want these selectable eventually, but these
  * should be ok for now.
@@ -138,8 +138,8 @@ if((tmpf=fopen(printer_graphics_filename,"rb"))!=NULL)
 if((printer_graphics_file=fopen(printer_graphics_filename,
                                 overwrite?"wb":"r+b"))==NULL)
   {
-  fprintf(stderr,"%s: Couldn't open `%s', graphics printout disabled\n",
-          fuse_progname,printer_graphics_filename);
+  ui_error("Couldn't open `%s', graphics printout disabled\n",
+	   printer_graphics_filename);
   printer_graphics_enabled=0;
   return(0);
   }
@@ -157,9 +157,7 @@ else
            strlen(pbmstart)+10+1+(256/8)*zxpheight,
            SEEK_SET)!=0)
     {
-    fprintf(stderr,
-            "%s: Couldn't seek on file, graphics printout disabled\n",
-            fuse_progname);
+    ui_error("Couldn't seek on file, graphics printout disabled\n");
     fclose(printer_graphics_file);
     printer_graphics_file=NULL;
     printer_graphics_enabled=0;
@@ -178,8 +176,8 @@ if(!printer_text_enabled || !printer_text_filename)
 /* append to any existing file... */
 if((printer_text_file=fopen(printer_text_filename,"a"))==NULL)
   {
-  fprintf(stderr,"%s: Couldn't open `%s', text printout disabled\n",
-          fuse_progname,printer_text_filename);
+  ui_error("Couldn't open `%s', text printout disabled\n",
+	   printer_text_filename);
   printer_text_enabled=0;
   return(0);
   }
@@ -217,8 +215,7 @@ pos=ftell(printer_graphics_file);
 
 /* seek back to write the image height */
 if(fseek(printer_graphics_file,strlen("P4\n256 "),SEEK_SET)!=0)
-  fprintf(stderr,"%s: Couldn't seek to write graphics printout image height\n",
-          fuse_progname);
+  ui_error("Couldn't seek to write graphics printout image height\n");
 else
   {
   /* I originally had spaces after the image height, but that actually
@@ -230,8 +227,7 @@ else
 
 if(fseek(printer_graphics_file,pos,SEEK_SET)!=0)
   {
-  fprintf(stderr,"%s: Couldn't re-seek on file, graphics printout disabled\n",
-          fuse_progname);
+  ui_error("Couldn't re-seek on file, graphics printout disabled\n");
   fclose(printer_graphics_file);
   printer_graphics_file=NULL;
   printer_graphics_enabled=0;
