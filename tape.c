@@ -246,9 +246,6 @@ int tape_write( const char* filename )
 int tape_load_trap( void )
 {
   libspectrum_tape_block *block, *next_block;
-
-  GSList *block_ptr;
-
   int error;
 
   /* Do nothing if tape traps aren't active, or the tape is already playing */
@@ -260,7 +257,7 @@ int tape_load_trap( void )
   /* Return with error if no tape file loaded */
   if( !libspectrum_tape_present( tape ) ) return 1;
 
-  block = tape->current_block->data;
+  block = libspectrum_tape_current_block( tape );
 
   /* If this block isn't a ROM loader, start it playing
      Then return with `error' so that we actually do whichever instruction
@@ -285,15 +282,11 @@ int tape_load_trap( void )
 
   /* Peek at the next block. If it's a ROM block, move along, initialise
      the block, and return */
-  block_ptr = tape->current_block->next;
-  if( block_ptr == NULL ) block_ptr = tape->blocks;
-
-  next_block = block_ptr->data;
+  next_block = libspectrum_tape_peek_next_block( tape );
 
   if( libspectrum_tape_block_type(next_block) == LIBSPECTRUM_TAPE_BLOCK_ROM ) {
-    tape->current_block = block_ptr;
-    error = libspectrum_tape_init_block( tape->current_block );
-    if( error ) return error;
+    next_block = libspectrum_tape_select_next_block( tape );
+    if( !next_block ) return 1;
 
     return 0;
   }
@@ -473,7 +466,7 @@ int tape_play( void )
 
   if( !libspectrum_tape_present( tape ) ) return 1;
   
-  block = (libspectrum_tape_block*)(tape->current_block->data);
+  block = libspectrum_tape_current_block( tape );
 
   /* If tape traps are active and the current block is a ROM block, do
      nothing, _unless_ the ROM block has already reached the pause at
@@ -555,7 +548,7 @@ tape_next_edge( libspectrum_dword last_tstates )
   /* If that was the end of a block, tape traps are active _and_ the
      new block is a ROM loader, return without putting another event
      into the queue */
-  block = tape->current_block->data;
+  block = libspectrum_tape_current_block( tape );
   if( ( flags & LIBSPECTRUM_TAPE_FLAGS_BLOCK ) &&
       settings_current.tape_traps &&
       libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
@@ -577,17 +570,18 @@ tape_next_edge( libspectrum_dword last_tstates )
 int
 tape_get_block_list( char ****list, size_t *n )
 {
-  GSList *block_list = tape->blocks;
+  libspectrum_tape_iterator iterator;
+  libspectrum_tape_block *block;
   size_t allocated;
   int offset;
 
   *list = NULL; *n = 0; allocated = 0;
 
-  while( block_list ) {
+  for( block = libspectrum_tape_iterator_init( &iterator, tape );
+       block;
+       block = libspectrum_tape_iterator_next( &iterator ) )
+  {
 
-    libspectrum_tape_block *block =
-      (libspectrum_tape_block*)(block_list->data);
-    
     /* Get more space if we need it */
     if( *n == allocated ) {
       size_t new_size = allocated ? 2 * allocated : 1;
@@ -690,7 +684,7 @@ tape_get_block_list( char ****list, size_t *n )
 
     }
 
-    (*n)++; block_list = block_list->next;
+    (*n)++;
   }
 
   return 0;
