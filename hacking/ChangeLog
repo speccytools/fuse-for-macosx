@@ -606,3 +606,4 @@
 	 snapshot.c,spec128.c,spectrum.[ch],tape.c,roms/256s-?.rom,
 	 z80/z80_ops.c: Scorpion support (rest of patch #874504) (Stuart
 	 Brady).
+20040301 configure.in: make GTK+ 2.x the default user interface.

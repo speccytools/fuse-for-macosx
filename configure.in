@@ -150,27 +150,27 @@ if test -z "$UI"; then
   fi
 fi
 
-dnl Look for GTK+ 2.0 (default=no)
+dnl Look for GTK+ 2.0 (default=yes); fall back to GTK+ 1.2 if not found
 if test -z "$UI"; then
-  AC_MSG_CHECKING(whether GTK2 UI requested)
+  AC_MSG_CHECKING(whether GTK+ 2.x UI requested)
   AC_ARG_WITH(gtk2,
-  [  --with-gtk2             use GTK+ 2.x library for user interface],
+  [  --without-gtk2          don't use GTK+ 2.x library for user interface],
   if test "$withval" = no; then gtk2=no; else gtk2=yes; fi,
-  gtk2=no)
+  gtk2=yes)
   AC_MSG_RESULT($gtk2)
   if test "$gtk2" = yes; then
     AM_PATH_GTK_2_0(2.0.0,
 		AC_DEFINE(UI_GTK) AC_DEFINE(UI_GTK2) AC_DEFINE(HAVE_LIB_GLIB)
 	        UI=gtk; UI_LIBS="ui/gtk/libuigtk.a", 
-		AC_MSG_WARN([GTK+ 2.0 not found. Reverting to GTK+ 1.2]))
+		AC_MSG_WARN([GTK+ 2.x not found. Reverting to GTK+ 1.2]))
   fi
 fi
 
-dnl Look for GTK+ (default=yes); fall back to Xlib if not found
+dnl Look for GTK+ 1.2 (default=yes); fall back to Xlib if not found
 if test -z "$UI"; then
-  AC_MSG_CHECKING(whether GTK UI requested)
+  AC_MSG_CHECKING(whether GTK+ 1.2 UI requested)
   AC_ARG_WITH(gtk,
-  [  --without-gtk           don't use GTK+ library for user interface],
+  [  --without-gtk           don't use GTK+ 1.2 library for user interface],
   if test "$withval" = no; then gtk=no; else gtk=yes; fi,
   gtk=yes)
   AC_MSG_RESULT($gtk)
@@ -178,7 +178,7 @@ if test -z "$UI"; then
     AM_PATH_GTK(1.2.0,
 		AC_DEFINE(UI_GTK) AC_DEFINE(HAVE_LIB_GLIB)
 		UI=gtk; UI_LIBS="ui/gtk/libuigtk.a",
-		AC_MSG_WARN([GTK+ not found. Reverting to Xlib UI]))
+		AC_MSG_WARN([GTK+ 1.2 not found. Reverting to Xlib UI]))
   fi
 fi
 
