@@ -1184,3 +1184,5 @@
 	 simply execute enough tstates to match the (real) elapsed time.
 	 Also allows variable frame rates (ie 60Hz for the TS2068)
 	 (rest of patch #1080531) (Fred).
+20050107 zxcf.c: Stop zxcf_reset overwriting romcs bank when zxcf isn't active
+	 (fixes TR-DOS machines) (Fred).

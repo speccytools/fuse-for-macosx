@@ -106,7 +106,9 @@ zxcf_end( void )
 void
 zxcf_reset( void )
 {
-  if( settings_current.zxcf_active ) machine_current->ram.romcs = 1;
+  if( !settings_current.zxcf_active ) return;
+
+  machine_current->ram.romcs = 1;
 
   set_zxcf_bank( 0 );
   zxcf_writeenable = 0;
