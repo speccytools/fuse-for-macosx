@@ -218,7 +218,7 @@ machine_select_machine( fuse_machine_info *machine )
 }
 
 int
-machine_load_rom( BYTE **ROM, char *filename, size_t expected_length )
+machine_load_rom( BYTE **data, char *filename, size_t expected_length )
 {
   int fd, error;
   unsigned char *buffer; size_t length;
@@ -241,13 +241,13 @@ machine_load_rom( BYTE **ROM, char *filename, size_t expected_length )
   }
 
   /* Take a copy of the ROM in case we want to write to it later */
-  *ROM = malloc( length * sizeof( BYTE ) );
-  if( !(*ROM) ) {
+  *data = malloc( length * sizeof( BYTE ) );
+  if( !(*data) ) {
     ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
     return 1;
   }
 
-  memcpy( *ROM, buffer, length );
+  memcpy( *data, buffer, length );
 
   if( munmap( buffer, length ) == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't munmap ROM '%s': %s", filename,

@@ -70,7 +70,7 @@ widget_browse_draw( void *data GCC_UNUSED )
 static void
 show_blocks( void )
 {
-  int i; char buffer[30];
+  size_t i; char buffer[30];
 
   widget_rectangle( 2*8, 4*8, 28*8, 18*8, WIDGET_COLOUR_BACKGROUND );
 

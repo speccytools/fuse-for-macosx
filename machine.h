@@ -53,7 +53,7 @@ typedef BYTE (*spectrum_unattached_port_fn)( void );
 
 typedef struct fuse_machine_info {
 
-  int machine;		/* which machine type is this? */
+  libspectrum_machine machine; /* which machine type is this? */
   const char *id;	/* Used to select from command line */
 
   int (*reset)(void);	/* Reset function */
@@ -95,7 +95,7 @@ const char* machine_get_id( libspectrum_machine type );
 int machine_set_timings( fuse_machine_info *machine );
 
 int machine_allocate_roms( fuse_machine_info *machine, size_t count );
-int machine_load_rom( BYTE **ROM, char *filename, size_t expected_length );
+int machine_load_rom( BYTE **data, char *filename, size_t expected_length );
 int machine_find_rom( const char *filename );
 
 int machine_reset( void );

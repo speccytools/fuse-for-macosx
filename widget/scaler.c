@@ -56,7 +56,7 @@ scaler_type widget_scaler;
 int
 widget_scaler_draw( void *data )
 {
-  int i, j;
+  scaler_type i; int j;
 
   /* Store our scaler availiablity function */
   if( data ) available = data;

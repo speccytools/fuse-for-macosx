@@ -32,6 +32,7 @@
 
 #include "display.h"
 #include "machine.h"
+#include "screenshot.h"
 #include "scld.h"
 #include "settings.h"
 #include "types.h"

@@ -252,7 +252,7 @@ ui_debugger_update( void )
 			        &buffer[120], &buffer[160]               },
     *disassembly_text[2] = { &buffer[0], &buffer[40] };
   WORD address;
-  char *format_16_bit, *format_8_bit;
+  const char *format_16_bit, *format_8_bit;
   GSList *ptr;
   int capabilities; size_t length;
 
@@ -363,8 +363,6 @@ ui_debugger_update( void )
   gtk_clist_clear( GTK_CLIST( disassembly ) );
 
   for( i = 0, address = disassembly_top; i < 20; i++ ) {
-
-    size_t length;
 
     snprintf( disassembly_text[0], 40, format_16_bit, address );
     debugger_disassemble( disassembly_text[1], 40, &length, address );

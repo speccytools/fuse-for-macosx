@@ -93,7 +93,7 @@ pentagon_read_screen_memory(WORD offset)
 }
 
 DWORD
-pentagon_contend_memory( WORD address )
+pentagon_contend_memory( WORD address GCC_UNUSED )
 {
   /* No contended memory */
 
@@ -101,7 +101,7 @@ pentagon_contend_memory( WORD address )
 }
 
 DWORD
-pentagon_contend_port( WORD port )
+pentagon_contend_port( WORD port GCC_UNUSED )
 {
   /* No contention on ports AFAIK */
 

@@ -163,7 +163,11 @@ static int scl_fds[2];
 /* Remove any temporary file associated with drive 'which' */
 static int remove_scl( trdos_drive_number which );
 
-int Scl2Trd( const char *oldname, const char *newname );
+static int FileExists(const char * arg);
+static int Scl2Trd( const char *oldname, const char *newname );
+static int insert_trd( trdos_drive_number which, const char *filename );
+static DWORD lsb2dw( BYTE *mem );
+static void dw2lsb( BYTE *mem, DWORD value );
 
 void
 trdos_reset( void )
@@ -199,7 +203,7 @@ void trdos_update_index_impulse( void )
 }
 
 BYTE
-trdos_sr_read( WORD port )
+trdos_sr_read( WORD port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -211,7 +215,7 @@ trdos_sr_read( WORD port )
 }
 
 BYTE
-trdos_tr_read( WORD port )
+trdos_tr_read( WORD port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -219,13 +223,13 @@ trdos_tr_read( WORD port )
 }
 
 void
-trdos_tr_write( WORD port, BYTE b )
+trdos_tr_write( WORD port GCC_UNUSED, BYTE b )
 {
   vg_reg_trk = b;
 }
 
 BYTE
-trdos_sec_read( WORD port )
+trdos_sec_read( WORD port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -233,13 +237,13 @@ trdos_sec_read( WORD port )
 }
 
 void
-trdos_sec_write( WORD port, BYTE b )
+trdos_sec_write( WORD port GCC_UNUSED, BYTE b )
 {
   vg_reg_sec = b;
 }
 
 BYTE
-trdos_dr_read( WORD port )
+trdos_dr_read( WORD port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -271,7 +275,7 @@ trdos_dr_read( WORD port )
 }
 
 void
-trdos_dr_write( WORD port, BYTE b )
+trdos_dr_write( WORD port GCC_UNUSED, BYTE b )
 {
   int trd_file;
 
@@ -311,7 +315,7 @@ trdos_dr_write( WORD port, BYTE b )
 }
 
 BYTE
-trdos_sp_read( WORD port )
+trdos_sp_read( WORD port GCC_UNUSED )
 {
   trdos_update_index_impulse();
 
@@ -323,12 +327,13 @@ trdos_sp_read( WORD port )
 }
 
 void
-trdos_sp_write( WORD port, BYTE b )
+trdos_sp_write( WORD port GCC_UNUSED, BYTE b )
 {
   last_vg93_system = b;
 }
 
-int FileExists(const char * arg)
+static int
+FileExists(const char * arg)
 {
   struct stat buf;
 
@@ -339,8 +344,8 @@ int FileExists(const char * arg)
   return(1);
 }
 
-int
-trdos_disk_insert_trd( trdos_drive_number which, const char *filename )
+static int
+insert_trd( trdos_drive_number which, const char *filename )
 {
   int fil;
   BYTE * temp;
@@ -464,7 +469,7 @@ trdos_disk_insert( trdos_drive_number which, const char *filename )
     return trdos_disk_insert_scl( which, filename );
   }
 
-  return trdos_disk_insert_trd( which, filename );
+  return insert_trd( which, filename );
 }
 
 int
@@ -478,7 +483,7 @@ trdos_disk_eject( trdos_drive_number which )
 }
 
 int
-trdos_event_cmd_done( DWORD last_tstates )
+trdos_event_cmd_done( DWORD last_tstates GCC_UNUSED )
 {
   cmd_done = 0;
 
@@ -536,7 +541,7 @@ vg_seek_delay(BYTE dst_track)
 }
 
 static void
-vg_setFlagsSeeks()
+vg_setFlagsSeeks( void )
 {
   vg_rs.bit.b0 = 0;
 
@@ -552,7 +557,7 @@ vg_setFlagsSeeks()
 }
 
 void
-trdos_cr_write( WORD port, BYTE b )
+trdos_cr_write( WORD port GCC_UNUSED, BYTE b )
 {
   int trd_file, error;
 
@@ -782,14 +787,14 @@ typedef union {
   DWORD dword;
 } lsb_dword;
 
-DWORD 
+static DWORD 
 lsb2dw( BYTE *mem )
 {
   return ( mem[0] + ( mem[1] * 256 ) + ( mem[2] * 256 * 256 )
           + ( mem[3] * 256 * 256 * 256 ) );
 }
 
-void
+static void
 dw2lsb( BYTE *mem, DWORD value )
 {
   lsb_dword ret;
@@ -802,7 +807,7 @@ dw2lsb( BYTE *mem, DWORD value )
   mem[3] = ret.b.b3;
 }
 
-int 
+static int 
 Scl2Trd( const char *oldname, const char *newname )
 {
   int TRD, SCL, i;

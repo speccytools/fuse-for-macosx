@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include "debugger.h"
+#include "debugger_internals.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"

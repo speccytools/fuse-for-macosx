@@ -51,7 +51,7 @@ static void unselect_row( GtkWidget *widget, gint row, gint column,
 static void browse_done( GtkWidget *widget, gpointer data );
 
 void
-gtk_tape_browse( GtkWidget *widget, gpointer data )
+gtk_tape_browse( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   GtkWidget *dialog;
   GtkAccelGroup *accel_group;
@@ -159,15 +159,16 @@ gtk_tape_browse( GtkWidget *widget, gpointer data )
 
 /* Called when a row is selected */
 static void
-select_row( GtkWidget *widget, gint row, gint column, GdkEventButton *event,
-	    gpointer data )
+select_row( GtkWidget *widget GCC_UNUSED, gint row, gint column GCC_UNUSED,
+	    GdkEventButton *event GCC_UNUSED, gpointer data )
 {
   *( (gint*)data ) = row;
 }
 
 /* Called when a row is unselected */
 static void
-unselect_row( GtkWidget *widget, gint row, gint column, GdkEventButton *event,
+unselect_row( GtkWidget *widget GCC_UNUSED, gint row GCC_UNUSED,
+	      gint column GCC_UNUSED, GdkEventButton *event GCC_UNUSED,
 	      gpointer data )
 {
   *( (gint*)data ) = -1;
@@ -175,7 +176,7 @@ unselect_row( GtkWidget *widget, gint row, gint column, GdkEventButton *event,
 
 /* Called if the OK button is clicked */
 static void
-browse_done( GtkWidget *widget, gpointer data )
+browse_done( GtkWidget *widget GCC_UNUSED, gpointer data )
 {
   struct browse_data *callback_data = (struct browse_data*)data;
 

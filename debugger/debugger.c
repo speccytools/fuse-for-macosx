@@ -55,11 +55,11 @@ static void free_breakpoint( gpointer data, gpointer user_data );
 static void show_breakpoint( gpointer data, gpointer user_data );
 
 /* Textual represenations of the breakpoint types and lifetimes */
-char *debugger_breakpoint_type_text[] = {
+const char *debugger_breakpoint_type_text[] = {
   "Execute", "Read", "Write", "Port Read", "Port Write",
 };
 
-char *debugger_breakpoint_life_text[] = {
+const char *debugger_breakpoint_life_text[] = {
   "Permanent", "One Shot",
 };
 
@@ -222,7 +222,7 @@ static gint
 find_breakpoint_by_id( gconstpointer data, gconstpointer user_data )
 {
   const debugger_breakpoint *bp = data;
-  size_t id = *(size_t*)user_data;
+  size_t id = *(const size_t*)user_data;
 
   return bp->id - id;
 }
@@ -265,7 +265,7 @@ static gint
 find_breakpoint_by_address( gconstpointer data, gconstpointer user_data )
 {
   const debugger_breakpoint *bp = data;
-  WORD address = *(WORD*)user_data;
+  WORD address = *(const WORD*)user_data;
 
   if( bp->type == DEBUGGER_BREAKPOINT_TYPE_EXECUTE ||
       bp->type == DEBUGGER_BREAKPOINT_TYPE_READ ||
@@ -310,7 +310,7 @@ debugger_breakpoint_show( void )
 }
 
 static void
-show_breakpoint( gpointer data, gpointer user_data )
+show_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 {
   debugger_breakpoint *bp = data;
 

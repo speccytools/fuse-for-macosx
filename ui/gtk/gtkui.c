@@ -593,6 +593,7 @@ ui_get_scaler( ui_scaler_available available )
   GtkWidget *ok_button, *cancel_button;
 
   int i, count;
+  scaler_type scaler;
 
   /* Store the function which tells us which scalers are currently
      available */
@@ -614,17 +615,17 @@ ui_get_scaler( ui_scaler_available available )
   dialog.dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog.dialog ), "Fuse - Select Scaler" );
 
-  for( i = 0; i < SCALER_NUM; i++ ) {
+  for( scaler = 0; scaler < SCALER_NUM; scaler++ ) {
 
     if( !available( i ) ) continue;
 
     dialog.buttons[ count ] =
-      gtk_radio_button_new_with_label( button_group, scaler_name( i ) );
+      gtk_radio_button_new_with_label( button_group, scaler_name( scaler ) );
     button_group =
       gtk_radio_button_group( GTK_RADIO_BUTTON( dialog.buttons[ count ] ) );
 
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dialog.buttons[ count ] ),
-				  current_scaler == i );
+				  current_scaler == scaler );
 
     gtk_container_add( GTK_CONTAINER( GTK_DIALOG( dialog.dialog )->vbox ),
 		       dialog.buttons[ count ] );

@@ -58,7 +58,7 @@ typedef enum debugger_breakpoint_type {
   DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE,
 } debugger_breakpoint_type;
 
-extern char *debugger_breakpoint_type_text[];
+extern const char *debugger_breakpoint_type_text[];
 
 /* Lifetime of a breakpoint */
 typedef enum debugger_breakpoint_life {
@@ -66,7 +66,7 @@ typedef enum debugger_breakpoint_life {
   DEBUGGER_BREAKPOINT_LIFE_ONESHOT,
 } debugger_breakpoint_life;
 
-extern char *debugger_breakpoint_life_text[];
+extern const char *debugger_breakpoint_life_text[];
 
 /* The breakpoint structure */
 typedef struct debugger_breakpoint {

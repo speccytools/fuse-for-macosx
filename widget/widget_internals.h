@@ -195,7 +195,7 @@ int widget_browse_finish( widget_finish_state finished );
 /* The text entry widget */
 
 typedef struct widget_text_t {
-  char *title;
+  const char *title;
   char text[40];
 } widget_text_t;
 

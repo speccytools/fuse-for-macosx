@@ -206,7 +206,7 @@ expand_sai( int *x, int *y, int *w, int *h )
 
 /* Expand to a even y co-ord */
 static void
-expand_dotmatrix( int *x, int *y, int *w, int *h )
+expand_dotmatrix( int *x GCC_UNUSED, int *y, int *w GCC_UNUSED, int *h )
 {
   int y_mod = (*y) % 2;
 

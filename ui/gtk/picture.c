@@ -40,6 +40,7 @@
 #include "display.h"
 #include "fuse.h"
 #include "gtkdisplay.h"
+#include "gtkui.h"
 #include "types.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -196,7 +197,7 @@ draw_screen( BYTE *screen, int border )
 }
 
 static gint
-picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data )
+picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data GCC_UNUSED )
 {
   int x = event->expose.area.x, y = event->expose.area.y;
 
