@@ -898,3 +898,4 @@
 	 SE snaps now more likely to work properly.
 20040604 widget/Makefile.am: ensure config.h can be found when building
 	 menu_data.c
+20040604 ui/uijoystick.c: #include "joystick.h"
