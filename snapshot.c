@@ -422,14 +422,9 @@ int snapshot_write( const char *filename )
 
 }
 
-int
-snapshot_copy_to( libspectrum_snap *snap )
+static int
+copy_z80_to( libspectrum_snap *snap )
 {
-  size_t i;
-  libspectrum_byte *buffer;
-
-  libspectrum_snap_set_machine( snap, machine_current->machine );
-
   libspectrum_snap_set_a  ( snap, A   ); libspectrum_snap_set_f  ( snap, F   );
   libspectrum_snap_set_a_ ( snap, A_  ); libspectrum_snap_set_f_ ( snap, F_  );
 
@@ -450,8 +445,23 @@ snapshot_copy_to( libspectrum_snap *snap )
     snap, z80.interrupts_enabled_at == tstates
   );
 
+  return 0;
+}
+
+static int
+copy_ula_to( libspectrum_snap *snap )
+{
   libspectrum_snap_set_out_ula( snap, spectrum_last_ula );
-  
+  libspectrum_snap_set_tstates( snap, tstates );
+
+  return 0;
+}
+
+static int
+copy_128k_to( libspectrum_snap *snap )
+{
+  size_t i;
+
   /* These won't necessarily be valid in some machine configurations, but
      this shouldn't cause anything to go wrong */
   libspectrum_snap_set_out_128_memoryport( snap,
@@ -468,9 +478,12 @@ snapshot_copy_to( libspectrum_snap *snap )
   libspectrum_snap_set_out_plus3_memoryport( snap,
 					     machine_current->ram.last_byte2 );
 
-  libspectrum_snap_set_out_scld_hsr( snap, scld_last_hsr );
-  libspectrum_snap_set_out_scld_dec( snap, scld_last_dec.byte );
+  return 0;
+}
 
+static int
+copy_betadisk_to( libspectrum_snap *snap )
+{
   libspectrum_snap_set_beta_paged( snap, trdos_active );
   libspectrum_snap_set_beta_direction( snap, trdos_direction );
   libspectrum_snap_set_beta_status( snap, trdos_status_register );
@@ -479,7 +492,14 @@ snapshot_copy_to( libspectrum_snap *snap )
   libspectrum_snap_set_beta_data  ( snap, trdos_sector_register );
   libspectrum_snap_set_beta_system( snap, trdos_data_register );
 
-  libspectrum_snap_set_tstates( snap, tstates );
+  return 0;
+}
+
+static int
+copy_ram_to( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
 
   for( i = 0; i < 16; i++ ) {
     if( RAM[i] != NULL ) {
@@ -495,6 +515,15 @@ snapshot_copy_to( libspectrum_snap *snap )
       libspectrum_snap_set_pages( snap, i, buffer );
     }
   }
+
+  return 0;
+}
+
+static int
+copy_slt_to( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
 
   for( i=0; i<256; i++ ) {
 
@@ -518,8 +547,6 @@ snapshot_copy_to( libspectrum_snap *snap )
 
   if( slt_screen ) {
  
-    libspectrum_byte *buffer;
-
     buffer = malloc( 6912 * sizeof( libspectrum_byte ) );
 
     if( !buffer ) {
@@ -532,10 +559,17 @@ snapshot_copy_to( libspectrum_snap *snap )
     libspectrum_snap_set_slt_screen_level( snap, slt_screen_level );
   }
 
-  if( settings_current.zxatasp_active ) {
+  return 0;
+}
 
-    libspectrum_byte value;
-    int attached;
+static int
+copy_zxatasp_to( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer, value;
+  int attached;
+
+  if( settings_current.zxatasp_active ) {
 
     libspectrum_snap_set_zxatasp_active( snap, 1 );
 
@@ -575,6 +609,15 @@ snapshot_copy_to( libspectrum_snap *snap )
     }
   }
 
+  return 0;
+}
+
+static int
+copy_zxcf_to( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
+
   if( settings_current.zxcf_active ) {
 
     libspectrum_snap_set_zxcf_upload( snap, settings_current.zxcf_upload );
@@ -597,6 +640,14 @@ snapshot_copy_to( libspectrum_snap *snap )
     }
   }
 
+  return 0;
+}
+
+static int
+copy_if2_to( libspectrum_snap *snap )
+{
+  libspectrum_byte *buffer;
+
   if( if2_active ) {
 
     libspectrum_snap_set_interface2_active( snap, 1 );
@@ -615,6 +666,18 @@ snapshot_copy_to( libspectrum_snap *snap )
     libspectrum_snap_set_interface2_rom( snap, 0, buffer );
 
   }
+
+  return 0;
+}
+
+static int
+copy_timex_to( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
+
+  libspectrum_snap_set_out_scld_hsr( snap, scld_last_hsr );
+  libspectrum_snap_set_out_scld_dec( snap, scld_last_dec.byte );
 
   if( dck_active ) {
 
@@ -654,6 +717,27 @@ snapshot_copy_to( libspectrum_snap *snap )
     }
 
   }
+
+  return 0;
+}
+
+int
+snapshot_copy_to( libspectrum_snap *snap )
+{
+  int error;
+
+  libspectrum_snap_set_machine( snap, machine_current->machine );
+
+  error = copy_z80_to( snap ); if( error ) return error;
+  error = copy_ula_to( snap ); if( error ) return error;
+  error = copy_128k_to( snap ); if( error ) return error;
+  error = copy_betadisk_to( snap ); if( error ) return error;
+  error = copy_ram_to( snap ); if( error ) return error;
+  error = copy_slt_to( snap ); if( error ) return error;
+  error = copy_zxatasp_to( snap ); if( error ) return error;
+  error = copy_zxcf_to( snap ); if( error ) return error;
+  error = copy_if2_to( snap ); if( error ) return error;
+  error = copy_timex_to( snap ); if( error ) return error;
 
   return 0;
 }
