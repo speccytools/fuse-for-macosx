@@ -311,4 +311,4 @@
 20031029 osssound.c, sdlsound.c, sunsound.c: ensure that we don't try and
 	 recursively open the sound device if an error occurs when opening
 	 it.
-
+20031030 timer.c: fix typos in Win32 time routines (Marek).

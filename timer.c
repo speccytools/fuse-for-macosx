@@ -234,10 +234,10 @@ signal_tick( int signo GCC_UNUSED )
 
 static GSList *timer_ids;
 
-static void CALLBACK timer_null( UINT wTimerID, UINT msg, DWORD dwUser,
-				 DWORD dw1, DWORD dw2 );
-static void CALLBACK timer_signal( UINT wTimerID, UINT msg, DWORD dwUser,
-				   DWORD dw1, DWORD dw2 );
+static void CALLBACK signal_wake( UINT wTimerID, UINT msg, DWORD dwUser,
+				  DWORD dw1, DWORD dw2 );
+static void CALLBACK signal_tick( UINT wTimerID, UINT msg, DWORD dwUser,
+				  DWORD dw1, DWORD dw2 );
 
 #define TARGET_RESOLUTION 1	/* 1-millisecond target resolution */
 
@@ -315,10 +315,10 @@ timer_pause( void )
 }
 
 static void CALLBACK
-timer_null( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 ) { }
+signal_wake( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 ) { }
 
 static void CALLBACK
-timer_signal( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 )
+signal_tick( UINT wTimerID, UINT msg, DWORD dwUser, DWORD dw1, DWORD dw2 )
 {
   timer_tick();
 }
