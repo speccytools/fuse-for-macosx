@@ -1233,3 +1233,8 @@
 20050223 display.c: force border to be redrawn in display_refresh_all();
 	 means the border gets correctly restored after Help/Keyboard
 	 widget.
+20050226 input.c: drive the joystick from the Spectrum keysym, not the
+	 native one, or (the emulating machine's) Caps Lock causes
+	 problems.
+
+	 
