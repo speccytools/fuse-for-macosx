@@ -1,0 +1,49 @@
+Implementation notes for some of Fuse's systems
+===============================================
+
+Contents:
+
+1. The main emulation loop
+
+1. The main emulation loop
+==========================
+
+The main emulation loop (the while loop in fuse.c:main) is essentially
+fairly simple: it just runs Z80 opcodes until something `interesting'
+happens, at which point it deals with the `interesting' thing.
+
+The question here is how do we know when something `interesting' has
+occured: the simple answer is that something interesting occurs when
+the `tstates' global variable (which counts tstates since the last
+interrupt occured) reaches `event_next_event'. It should be noted here
+that these events are purely a Fuse concept, and not related to any OS
+feature.
+
+Perhaps the most obvious type of event which can occur is an
+interrupt, which (on the 48K machine anyway) will occur 69888 tstates
+after the last interrupt. When each interrupt occurs, the code sets
+another interrupt to occur one frame later (the event_add() call in
+spectrum.c:spectrum_interrupt). `event_next_event' will then be set by
+the code in event.c.
+
+The above paragraph is actually overly simplistic: the execution of
+Z80 opcodes is also stopped to draw the lines of the Spectrum's
+screen; this produces an event of type EVENT_TYPE_LINE at the start of
+each of the 240 lines which are drawn by Fuse (the main screen and the
+24 lines in each of the top and bottom borders), starting 8936 tstates
+after the interrupt (on the 48K machine. FWIW, 8936 is 70 lines at 128
+tstates each, minus 24 for the left border).
+
+TZX playback is handled in much the same way: an event (of type
+EVENT_TYPE_EDGE) is scheduled to occur whenever the signal from the
+(emulated) tape changes. That event then toggles the input to the
+ULA's EAR bit, and schedules another event to occur whenever the next
+edge is due from the tape.
+
+RZX playback cannot be handled in the same way, as it is not known
+after how many tstates the interrupt will occur. In this case, the
+interrupt is forced when it is due to occur by scheduling an event
+from the main Z80 emulation loop (z80/z80_ops.c:z80_do_opcodes) and
+then breaking out of the loop.
+
+$Id$
