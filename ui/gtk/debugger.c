@@ -34,9 +34,13 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include <libspectrum.h>
+
 #include "debugger/debugger.h"
 #include "fuse.h"
 #include "gtkui.h"
+#include "machine.h"
+#include "scld.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
@@ -55,7 +59,7 @@ static void gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data );
 
 static GtkWidget *dialog,		/* The debugger dialog box */
   *continue_button, *break_button,	/* Two of its buttons */
-  *registers[17],			/* The register display */
+  *registers[18],			/* The register display */
   *breakpoints,				/* The breakpoint display */
   *disassembly;				/* The disassembly */
 
@@ -134,24 +138,12 @@ create_dialog( void )
   table = gtk_table_new( 9, 2, FALSE );
   gtk_box_pack_start_defaults( GTK_BOX( vbox ), table );
 
-  for( i = 0; i < 15; i++ ) {
-
+  for( i = 0; i < 18; i++ ) {
     registers[i] = gtk_label_new( "" );
     gtk_widget_set_style( registers[i], style );
     gtk_table_attach_defaults( GTK_TABLE( table ), registers[i],
 			       i%2, i%2+1, i/2, i/2+1 );
-
   }
-
-  /* Interrupt mode */
-  registers[15] = gtk_label_new( "" );
-  gtk_widget_set_style( registers[15], style );
-  gtk_table_attach_defaults( GTK_TABLE( table ), registers[15], 1, 2, 7, 8 );
-
-  /* Flags */
-  registers[16] = gtk_label_new( "" );
-  gtk_widget_set_style( registers[16], style );
-  gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 1, 8, 9 );
 
   /* The breakpoint CList */
   breakpoints = gtk_clist_new_with_titles( 5, breakpoint_titles );
@@ -246,13 +238,14 @@ int
 ui_debugger_update( void )
 {
   size_t i;
-  char buffer[1024];
+  char buffer[1024], format_string[1024];
   gchar *breakpoint_text[5] = { &buffer[  0], &buffer[ 40], &buffer[80],
 			        &buffer[120], &buffer[160]               },
     *disassembly_text[2] = { &buffer[0], &buffer[40] };
   WORD address;
   char *format_16_bit, *format_8_bit;
   GSList *ptr;
+  int capabilities; size_t length;
 
   const char *register_name[] = { "PC", "SP",
 				  "AF", "AF'",
@@ -268,9 +261,9 @@ ui_debugger_update( void )
                       };
 
   if( debugger_output_base == 10 ) {
-    format_16_bit = format_8_bit = "%5d";
+    format_16_bit = "%5d"; format_8_bit = "%3d";
   } else {
-    format_16_bit = "0x%04X"; format_8_bit = "0x  %02X";
+    format_16_bit = "0x%04X"; format_8_bit = "0x%02X";
   }
 
   for( i = 0; i < 12; i++ ) {
@@ -279,10 +272,10 @@ ui_debugger_update( void )
     gtk_label_set_text( GTK_LABEL( registers[i] ), buffer );
   }
 
-  strcpy( buffer, "  I " ); snprintf( &buffer[4], 76, format_8_bit, I );
+  strcpy( buffer, "  I   " ); snprintf( &buffer[6], 76, format_8_bit, I );
   gtk_label_set_text( GTK_LABEL( registers[12] ), buffer );
-  strcpy( buffer, "  R " );
-  snprintf( &buffer[4], 80, format_8_bit, ( R & 0x7f ) | ( R7 & 0x80 ) );
+  strcpy( buffer, "  R   " );
+  snprintf( &buffer[6], 80, format_8_bit, ( R & 0x7f ) | ( R7 & 0x80 ) );
   gtk_label_set_text( GTK_LABEL( registers[13] ), buffer );
 
   snprintf( buffer, 80, "T-states %5d", tstates );
@@ -294,6 +287,46 @@ ui_debugger_update( void )
   for( i = 0; i < 8; i++ ) buffer[i+9] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
   buffer[17] = '\0';
   gtk_label_set_text( GTK_LABEL( registers[16] ), buffer );
+
+  capabilities = libspectrum_machine_capabilities( machine_current->machine );
+
+  sprintf( format_string, "   ULA %s", format_8_bit );
+  snprintf( buffer, 1024, format_string, spectrum_last_ula );
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
+    sprintf( format_string, "\n    AY %s", format_8_bit );
+    length = strlen( buffer );
+    snprintf( &buffer[length], 1024-length, format_string,
+	      machine_current->ay.current_register );
+  }
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) {
+    sprintf( format_string, "\n128Mem %s", format_8_bit );
+    length = strlen( buffer );
+    snprintf( &buffer[length], 1024-length, format_string,
+	      machine_current->ram.last_byte );
+  }
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) {
+    sprintf( format_string, "\n+3 Mem %s", format_8_bit );
+    length = strlen( buffer );
+    snprintf( &buffer[length], 1024-length, format_string,
+	      machine_current->ram.last_byte2 );
+  }
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ) {
+    sprintf( format_string, "\nTmxDec %s", format_8_bit );
+    length = strlen( buffer );
+    snprintf( &buffer[length], 1024-length, format_string, scld_last_dec );
+  }
+
+  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO ) {
+    sprintf( format_string, "\nTmxHsr %s", format_8_bit );
+    length = strlen( buffer );
+    snprintf( &buffer[length], 1024-length, format_string, scld_last_hsr );
+  }
+
+  gtk_label_set_text( GTK_LABEL( registers[17] ), buffer );
 
   /* Create the breakpoint list */
   gtk_clist_freeze( GTK_CLIST( breakpoints ) );
