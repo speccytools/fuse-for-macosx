@@ -399,7 +399,7 @@ rzx_write_snapshot( libspectrum_byte **buffer, libspectrum_byte **ptr,
 
   *(*ptr)++ = 0x30;			/* Block identififer */
   libspectrum_write_dword( ptr, 17 + snap_length ); /* Block length */
-  *(*ptr)++ = 0;			/* Flags */
+  libspectrum_write_dword( ptr, 0 );	/* Flags */
   strcpy( *ptr, "Z80" ); (*ptr) += 4;	/* Snapshot type */
   libspectrum_write_dword( ptr, snap_length );	/* Snapshot length */
   memcpy( *ptr, snap, snap_length ); (*ptr) += snap_length;

@@ -207,7 +207,7 @@ read_snapshot_block( unsigned char **ptr, unsigned char *end )
 
   printf( "Found a snapshot block\n" );
   printf( "  Length: %d bytes\n", read_dword( ptr ) );
-  printf( "  Flags: 0x%02x\n", *(*ptr)++ );
+  printf( "  Flags: %d\n", read_dword( ptr ) );
   printf( "  Snapshot extension: `%s'\n", *ptr ); (*ptr) += 4;
 
   snap_length = read_dword( ptr );
