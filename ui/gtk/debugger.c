@@ -104,6 +104,7 @@ create_dialog( void )
   GtkWidget *entry, *eval_button;
   GtkWidget *step_button, *close_button;
   GtkAccelGroup *accel_group;
+  GtkStyle *style;
 
   const char *register_name[] = { "PC", "SP",
 				  "AF", "AF'",
@@ -116,6 +117,16 @@ create_dialog( void )
                                 };
 
   gchar *titles[] = { "Address", "Instruction" };
+
+  /* Try and get a monospaced font */
+  style = gtk_style_new();
+  gdk_font_unref( style->font );
+
+  style->font = gdk_font_load( "-*-courier-medium-r-*-*-12-*-*-*-*-*-*-*" );
+  if( !style->font ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
+    return 1;
+  }
 
   dialog = gtk_dialog_new();
   gtk_window_set_title( GTK_WINDOW( dialog ), "Fuse - Debugger" );
@@ -135,6 +146,7 @@ create_dialog( void )
 			       2*(i%2),   2*(i%2)+1, i/2, i/2+1 );
 
     registers[i] = gtk_label_new( "" );
+    gtk_widget_set_style( registers[i], style );
     gtk_table_attach_defaults( GTK_TABLE( table ), registers[i],
 			       2*(i%2)+1, 2*(i%2)+2, i/2, i/2+1 );
 
@@ -144,13 +156,16 @@ create_dialog( void )
   gtk_table_attach_defaults( GTK_TABLE( table ), registers[15], 2, 4, 7, 8 );
 
   label = gtk_label_new( "SZ5H3PNC" );
+  gtk_widget_set_style( label, style );
   gtk_table_attach_defaults( GTK_TABLE( table ), label, 0, 2, 8, 9 );
 
   registers[16] = gtk_label_new( "" );
+  gtk_widget_set_style( label, style );
   gtk_table_attach_defaults( GTK_TABLE( table ), registers[16], 0, 2, 9, 10 );
 
   /* Create the disassembly CList itself */
   disassembly = gtk_clist_new_with_titles( 2, titles );
+  gtk_widget_set_style( disassembly, style );
   gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
   gtk_box_pack_start_defaults( GTK_BOX( hbox ), disassembly );
 
