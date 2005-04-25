@@ -1,5 +1,5 @@
 /* tc2048.c: Timex TC2048 specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2005 Philip Kendall
    Copyright (c) 2002-2004 Fredrick Meunier
 
    $Id$
@@ -65,9 +65,6 @@ const static periph_t peripherals[] = {
 
 const static size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
-
-static libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
-static memory_page fake_mapping;
 
 static libspectrum_byte
 tc2048_unattached_port( void )

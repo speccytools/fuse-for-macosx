@@ -1027,7 +1027,7 @@ Scl2Trd( const char *oldname, int TRD )
   memset( mem, 0, BLOCKSIZE );
 
   memcpy( &mem[TRD_DIRSTART], template, TRD_DIRLEN );
-  strncpy( &mem[TRD_NAMEOFFSET], "Fuse", TRD_MAXNAMELENGTH );
+  memcpy( &mem[TRD_NAMEOFFSET], "Fuse", 5 );
 
   written = write( TRD, mem, BLOCKSIZE );
   if( written != BLOCKSIZE ) {

@@ -318,7 +318,9 @@ int creator_init( void )
 
   error = libspectrum_creator_alloc( &fuse_creator ); if( error ) return error;
 
-  error = libspectrum_creator_set_program( fuse_creator, "Fuse" );
+  error = libspectrum_creator_set_program(
+    fuse_creator, (const libspectrum_byte*)"Fuse"
+  );
   if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
 
   error = libspectrum_creator_set_major( fuse_creator,
@@ -362,8 +364,9 @@ int creator_init( void )
 
 #endif				/* #ifndef WIN32 */
 
-  error = libspectrum_creator_set_custom( fuse_creator,
-					  custom, strlen( custom ) );
+  error = libspectrum_creator_set_custom(
+    fuse_creator, (libspectrum_byte*)custom, strlen( custom )
+  );
   if( error ) {
     free( custom ); libspectrum_creator_free( fuse_creator );
     return error;

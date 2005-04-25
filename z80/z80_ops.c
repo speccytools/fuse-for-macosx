@@ -1,5 +1,5 @@
 /* z80_ops.c: Process the next opcode
-   Copyright (c) 1999-2004 Philip Kendall, Witold Filipczyk
+   Copyright (c) 1999-2005 Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -92,19 +92,15 @@ static void z80_ddfdcbxx( libspectrum_byte opcode3,
 void
 z80_do_opcodes( void )
 {
-  int even_m1;
-  void *cgoto[6]; size_t next;
   libspectrum_byte opcode = 0x00;
 
-  /* Avoid 'variable not used' warnings if we're not using gcc */
-  cgoto[0] = cgoto[0]; next = next;
-
-  even_m1 =
+  int even_m1 =
     machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_EVEN_M1; 
 
 #ifdef __GNUC__
 
-  next = 0;
+  void *cgoto[6]; size_t next = 0;
+
   SETUP_CHECK( profile, profile_active, 0 );
   SETUP_CHECK( rzx, rzx_playback, 1 );
   SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 );

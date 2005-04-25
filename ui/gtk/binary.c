@@ -1,5 +1,5 @@
 /* binary.c: GTK+ routines to load/save chunks of binary data
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2005 Philip Kendall
 
    $Id$
 
@@ -278,7 +278,7 @@ save_data( GtkButton *button GCC_UNUSED, gpointer user_data )
   struct binary_info *info = user_data;
 
   libspectrum_word start, length; size_t i;
-  char *buffer;
+  libspectrum_byte *buffer;
 
   int error;
 

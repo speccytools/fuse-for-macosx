@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # settings.pl: generate settings.c from settings.dat
-# Copyright (c) 2002 Philip Kendall
+# Copyright (c) 2002-2005 Philip Kendall
 
 # $Id$
 
@@ -223,16 +223,16 @@ foreach my $name ( sort keys %options ) {
     if( $type eq 'boolean' or $type eq 'numeric' ) {
 
 	print << "CODE";
-    if( !strcmp( node->name, (const xmlChar*)"$options{$name}->{configfile}" ) ) {
-      settings->$name = atoi( xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+    if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
+      settings->$name = atoi( (const char*)xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
     } else
 CODE
 
     } elsif( $type eq 'string' ) {
 
 	    print << "CODE";
-    if( !strcmp( node->name, (const xmlChar*)"$options{$name}->{configfile}" ) ) {
-      string = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
+    if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
+      string = (const char*)xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
       settings->$name = string ? strdup( string ) : NULL;
     } else
 CODE
@@ -240,7 +240,7 @@ CODE
     } elsif( $type eq 'null' ) {
 
 	    print << "CODE";
-    if( !strcmp( node->name, (const xmlChar*)"$options{$name}->{configfile}" ) ) {
+    if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
       /* Do nothing */
     } else
 CODE
@@ -251,7 +251,7 @@ CODE
 }
 
 print hashline( __LINE__ ), << 'CODE';
-    if( !strcmp( node->name, (const xmlChar*)"text" ) ) {
+    if( !strcmp( (const char*)node->name, "text" ) ) {
       /* Do nothing */
     } else {
       ui_error( UI_ERROR_WARNING, "Unknown setting '%s' in config file",
@@ -276,9 +276,9 @@ settings_write_config( settings_info *settings )
   snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
 
   /* Create the XML document */
-  doc = xmlNewDoc( "1.0" );
+  doc = xmlNewDoc( (const xmlChar*)"1.0" );
 
-  root = xmlNewNode( NULL, "settings" );
+  root = xmlNewNode( NULL, (const xmlChar*)"settings" );
   xmlDocSetRootElement( doc, root );
 CODE
 
@@ -288,18 +288,18 @@ foreach my $name ( sort keys %options ) {
 
     if( $type eq 'boolean' ) {
 
-	print "  xmlNewTextChild( root, NULL, \"$options{$name}->{configfile}\", settings->$name ? \"1\" : \"0\" );\n";
+	print "  xmlNewTextChild( root, NULL, (const xmlChar*)\"$options{$name}->{configfile}\", (const xmlChar*)(settings->$name ? \"1\" : \"0\") );\n";
 
     } elsif( $type eq 'string' ) {
 	print << "CODE";
   if( settings->$name )
-    xmlNewTextChild( root, NULL, "$options{$name}->{configfile}", settings->$name );
+    xmlNewTextChild( root, NULL, (const xmlChar*)"$options{$name}->{configfile}", (const xmlChar*)settings->$name );
 CODE
     } elsif( $type eq 'numeric' ) {
 	print << "CODE";
   if( settings->$name ) {
     snprintf( buffer, 80, "%d", settings->$name );
-    xmlNewTextChild( root, NULL, "$options{$name}->{configfile}", buffer );
+    xmlNewTextChild( root, NULL, (const xmlChar*)"$options{$name}->{configfile}", (const xmlChar*)buffer );
   }
 CODE
     } elsif( $type eq 'null' ) {

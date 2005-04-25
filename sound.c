@@ -1,5 +1,5 @@
 /* sound.c: Sound support
-   Copyright (c) 2000-2004 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2005 Russell Marks, Matan Ziv-Av, Philip Kendall
 
    $Id$
 
@@ -57,8 +57,8 @@ int sound_stereo=0;		/* true for stereo *output sample* (only) */
 int sound_stereo_ay_abc=0;	/* (AY stereo) true for ABC stereo, else ACB */
 int sound_stereo_ay_narrow=0;	/* (AY stereo) true for narrow AY st. sep. */
 
-static int sound_stereo_ay=0;	/* local copy of settings_current.stereo_ay */
-static int sound_stereo_beeper=0;   /* and settings_current.stereo_beeper */
+int sound_stereo_ay=0;	/* local copy of settings_current.stereo_ay */
+int sound_stereo_beeper=0;   /* and settings_current.stereo_beeper */
 
 
 /* assume all three tone channels together match the beeper volume (ish).

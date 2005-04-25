@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2004 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 1999-2005 Philip Kendall, Darren Salt, Witold Filipczyk
 
    $Id$
 
@@ -67,7 +67,7 @@ static int tape_autoload( libspectrum_machine hardware );
 static int trap_load_block( libspectrum_tape_block *block );
 static int tape_play( int force );
 static int trap_check_rom( void );
-static void make_name( char *name, const char *data );
+static void make_name( unsigned char *name, const unsigned char *data );
 
 /* Function defintions */
 
@@ -714,7 +714,7 @@ tape_block_details( char *buffer, size_t length,
 		    libspectrum_tape_block *block )
 {
   libspectrum_byte *data;
-  const char *type; char name[11];
+  const char *type; unsigned char name[11];
   int offset;
 
   switch( libspectrum_tape_block_type( block ) ) {
@@ -811,7 +811,7 @@ tape_block_details( char *buffer, size_t length,
 }
 
 static void
-make_name( char *name, const char *data )
+make_name( unsigned char *name, const unsigned char *data )
 {
   size_t i;
 
