@@ -1308,3 +1308,6 @@
 	 monitor to work (fixes bug #1094070) (thanks, Erik Kunze).
 20050425 fuse.c,settings.pl,sound.c,tape.c,trdos.c,machines/tc2048.c,
 	 ui/gtk/binary.c,z80/z80_ops.c: gcc 4.0 fixups.
+20050427 event.c: don't reset tstates at the end of
+	 event.c:event_force_events() (fixes bug #1163983; thanks, Jon
+	 Needle).

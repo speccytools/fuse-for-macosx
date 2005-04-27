@@ -253,9 +253,6 @@ static int event_force_events( void )
 
   }
 
-  /* Finally, jump to the interrupt time */
-  tstates = machine_current->timings.tstates_per_frame;
-
   return 0;
 }
 
