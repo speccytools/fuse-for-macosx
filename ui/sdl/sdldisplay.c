@@ -1,5 +1,5 @@
 /* sdldisplay.c: Routines for dealing with the SDL display
-   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2005 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
 
    $Id$
 
@@ -89,6 +89,9 @@ static Uint32 bw_values[16];
 static SDL_Rect updated_rects[MAX_UPDATE_RECT];
 static int num_rects = 0;
 static libspectrum_byte sdldisplay_force_full_refresh = 1;
+
+static int min_fullscreen_width;
+static int min_fullscreen_height;
 
 /* The current size of the display (in units of DISPLAY_SCREEN_*) */
 static float sdldisplay_current_size = 1;
@@ -210,6 +213,25 @@ sdl_load_status_icon( const char*filename, SDL_Surface **red, SDL_Surface **gree
 int
 uidisplay_init( int width, int height )
 {
+  SDL_Rect **modes;
+  int i;
+
+  /* Get available fullscreen/software modes */
+  modes=SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_SWSURFACE);
+  /* Check if there are any modes available, or if our resolution is restricted
+     at all */
+  if( modes == (SDL_Rect **) 0 || modes == (SDL_Rect **) -1 ){
+    /* Just try whatever we have and see what happens */
+    min_fullscreen_width = 320;
+    min_fullscreen_height = 240;
+  } else {
+    /* Record the smallest supported fullscreen software mode */
+    for( i=0; modes[i]; ++i ) {
+      min_fullscreen_width = modes[i]->w;
+      min_fullscreen_height = modes[i]->h;
+    }
+  }
+
   image_width = width;
   image_height = height;
 
@@ -257,6 +279,38 @@ sdldisplay_allocate_colours( int numColours, Uint32 *colour_values,
   return 0;
 }
 
+static void
+sdldisplay_find_best_fullscreen_scaler( void )
+{
+  static int windowed_scaler = -1;
+
+  /* Make sure we have at least more than half of the screen covered in
+     fullscreen to avoid the "postage stamp" on machines that don't support
+     320x240 anymore e.g. Mac notebooks */
+  if( settings_current.full_screen ) {
+    int i = 0;
+    while( i < SCALER_NUM &&
+           image_height * sdldisplay_current_size <= min_fullscreen_height/2 ) {
+      if( windowed_scaler == -1) windowed_scaler = current_scaler;
+      while( !scaler_is_supported(i) ) i++;
+      scaler_select_scaler( i++ );
+      sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
+      /* if we failed to find a suitable size scaler, just use what the user had
+         originally */
+      if( image_height * sdldisplay_current_size <= min_fullscreen_height/2 ) {
+        scaler_select_scaler( windowed_scaler );
+        sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
+      }
+    }
+  } else {
+    if( windowed_scaler != -1 ) {
+      scaler_select_scaler( windowed_scaler );
+      windowed_scaler = -1;
+      sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
+    }
+  }
+}
+
 static int
 sdldisplay_load_gfx_mode( void )
 {
@@ -268,6 +322,8 @@ sdldisplay_load_gfx_mode( void )
   tmp_screen_width = (image_width + 3);
 
   sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
+
+  sdldisplay_find_best_fullscreen_scaler();
 
   /* Create the surface that contains the scaled graphics in 16 bit mode */
   sdldisplay_gc = SDL_SetVideoMode(

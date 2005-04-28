@@ -1311,3 +1311,5 @@
 20050427 event.c: don't reset tstates at the end of
 	 event.c:event_force_events() (fixes bug #1163983; thanks, Jon
 	 Needle).
+20050427 ui/sdl/sdldisplay.c: check smallest supported fullscreen resolution, and
+         if we don't have a resonable match try to find one (Fred).
