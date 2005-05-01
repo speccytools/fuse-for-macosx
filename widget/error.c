@@ -65,21 +65,21 @@ int widget_error_draw( void *data )
 
   switch( error_info->severity ) {
   case UI_ERROR_INFO:
-    widget_printstring( 13, 2, WIDGET_COLOUR_FOREGROUND, "Info" );
+    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Info" );
     break;
   case UI_ERROR_WARNING:
-    widget_printstring( 12, 2, WIDGET_COLOUR_FOREGROUND, "Warning" );
+    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Warning" );
     break;
   case UI_ERROR_ERROR:
-    widget_printstring( 13, 2, WIDGET_COLOUR_FOREGROUND, "Error" );
+    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Error" );
     break;
   default:
-    widget_printstring(  7, 2, WIDGET_COLOUR_FOREGROUND, "(Unknown message)" );
+    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "(Unknown message)" );
     break;
   }
 
   for( i=0; i<count; i++ ) {
-    widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND, lines[i] );
+    widget_printstring( 17, i*8+32, WIDGET_COLOUR_FOREGROUND, lines[i] );
     free( lines[i] );
   }
 
@@ -92,10 +92,12 @@ int widget_error_draw( void *data )
 
 int
 split_message( const char *message, char ***lines, size_t *count,
-	       const size_t line_length )
+	       size_t line_length )
 {
   const char *ptr = message;
   int position;
+
+  line_length *= 8;
 
   /* Setup so we'll allocate the first line as soon as we get the first
      word */
@@ -112,17 +114,19 @@ split_message( const char *message, char ***lines, size_t *count,
     /* message now points to a word of length (ptr-message); if
        that's longer than an entire line (most likely filenames), just
        take the last bit */
-    if( ptr - message > (ptrdiff_t)line_length ) message = ptr - line_length;
+    while( widget_substringwidth( message, ptr - message ) >= line_length )
+      message++;
 
-    /* Check we've got room for the word, plus the prefixing space */
-    if( position + ( ptr - message + 1 ) > (ptrdiff_t)line_length ) {
+    /* Check we've got room for the word, plus some prefixing space */
+    if( position + widget_substringwidth( message, ptr - message ) + 4
+ 	>= line_length ) {
 
       char **new_lines; size_t i;
 
       /* If we've filled the screen, stop */
       if( *count == 18 ) return 0;
 
-      new_lines = (char**)realloc( (*lines), (*count + 1) * sizeof( char** ) );
+      new_lines = realloc( (*lines), (*count + 1) * sizeof( char** ) );
       if( new_lines == NULL ) {
 	for( i=0; i<*count; i++ ) free( (*lines)[i] );
 	if(*lines) free( (*lines) );
@@ -130,7 +134,7 @@ split_message( const char *message, char ***lines, size_t *count,
       }
       (*lines) = new_lines;
 
-      (*lines)[*count] = (char*)malloc( (line_length+1) * sizeof(char) );
+      (*lines)[*count] = malloc( (line_length+1) );
       if( (*lines)[*count] == NULL ) {
 	for( i=0; i<*count; i++ ) free( (*lines)[i] );
 	free( (*lines) );
@@ -138,17 +142,17 @@ split_message( const char *message, char ***lines, size_t *count,
       }
       
       strncpy( (*lines)[*count], message, ptr - message );
-      position = ptr - message;
-      (*lines)[*count][position] = '\0';
+      position = widget_substringwidth( message, ptr - message );
+      (*lines)[*count][ptr - message] = '\0';
 
       (*count)++;
 
     } else {		/* Enough room on this line */
 
       strcat( (*lines)[*count-1], " " );
+      (*lines)[*count-1][strlen( (*lines)[*count-1] ) + ptr - message] = '\0';
       strncat( (*lines)[*count-1], message, ptr - message );
-      position += ptr - message + 1;
-      (*lines)[*count-1][position] = '\0';
+      position += widget_substringwidth( message, ptr - message ) + 4;
 
     }
 

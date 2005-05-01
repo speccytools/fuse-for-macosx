@@ -49,7 +49,7 @@ widget_roms_draw( void *data )
 {
   int i, error;
   char buffer[32];
-  const char *name;
+  char key[] = "\x0A ";
 
   if( data ) info = data;
 
@@ -76,14 +76,16 @@ widget_roms_draw( void *data )
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, rom_count + 3 );
 
-  name = libspectrum_machine_name( info->machine );
-  widget_printstring( 15 - strlen( name ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
-		      name );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND,
+		      libspectrum_machine_name( info->machine ) );
+  widget_display_lines( 2, 1 );
 
-  for( i = 0; i < info->count; i++ ) {
+  for( i=0; i < info->count; i++ ) {
 
-    snprintf( buffer, 32, "(%c) ROM %d:", ((char)i) + 'A', i );
-    widget_printstring( 2, i + 4, WIDGET_COLOUR_FOREGROUND, buffer );
+    snprintf( buffer, sizeof( buffer ), "ROM %d:", i );
+    key[1] = 'A' + i;
+    widget_printstring_right( 24, i*8+32, WIDGET_COLOUR_FOREGROUND, key );
+    widget_printstring( 28, i*8+32, WIDGET_COLOUR_FOREGROUND, buffer );
 
     print_rom( i );
   }
@@ -95,15 +97,16 @@ static void
 print_rom( int which )
 {
   const char *setting;
-  size_t length;
 
   setting = *( settings_get_rom_setting( widget_settings,
 					 which + first_rom ) );
-  length = strlen( setting ); if( length > 17 ) setting += length - 17;
+  while( widget_stringwidth( setting ) >= 232 - 68 )
+    ++setting;
 
-  widget_rectangle( 13 * 8, ( which + 4 ) * 8, 17 * 8, 1 * 8,
+  widget_rectangle( 68, ( which + 4 ) * 8, 232 - 68, 8,
 		    WIDGET_COLOUR_BACKGROUND );
-  widget_printstring( 13, which + 4, WIDGET_COLOUR_FOREGROUND, setting );
+  widget_printstring (68, ( which + 4 ) * 8,
+				   WIDGET_COLOUR_FOREGROUND, setting );
   widget_display_lines( which + 4, 1 );
 }
 

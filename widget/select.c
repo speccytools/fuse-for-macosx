@@ -34,13 +34,21 @@
 
 /* Data for drawing the cursor */
 static size_t highlight_line;
-static char **descriptions;
-static char *buffer;
 
 const char *title;
 const char **options;
 static size_t count;
 static int *result;
+
+static void print_item (int index, int colour)
+{
+  char key[] = "\x0A ";
+  key[1] = 'A' + index;
+  widget_printstring_right( 24, index*8+32, colour, key );
+  widget_printstring( 25, index*8+32, colour, ": " );
+  widget_printstring( 25 + widget_stringwidth (": "), index*8+32,
+				   colour, options[index]);
+}
 
 int
 widget_select_draw( void *data )
@@ -58,37 +66,19 @@ widget_select_draw( void *data )
 
     highlight_line = ptr->current;
 
-    descriptions = malloc( count * sizeof( char* ) );
-    if( !descriptions ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
-    }
-
-    buffer = malloc( count * 40 );
-    if( !buffer ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      free( descriptions );
-      return 1;
-    }
-
   }
 
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, count + 2 );
 
-  widget_printstring( 15 - strlen( title ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
-		      title );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
 
   for( i = 0; i < count; i++ ) {
-    descriptions[i] = &buffer[ i * 40 ];
-    snprintf( descriptions[i], 40, "(%c): %s", ((char)i)+'A', options[ i ] );
-    descriptions[i][ 28 ] = '\0';
-    
     if( i == highlight_line ) {
       widget_rectangle( 2*8, (i+4)*8, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
-      widget_printstring( 2, i+4, WIDGET_COLOUR_BACKGROUND, descriptions[i] );
+      print_item( i, WIDGET_COLOUR_BACKGROUND );
     } else {
-      widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND, descriptions[i] );
+      print_item( i, WIDGET_COLOUR_FOREGROUND );
     }
   }
 
@@ -147,8 +137,7 @@ widget_select_keyhandler( input_key key )
     /* Remove the old highlight */
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
 		      WIDGET_COLOUR_BACKGROUND );
-    widget_printstring( 2, highlight_line+4, WIDGET_COLOUR_FOREGROUND,
-			descriptions[ highlight_line ] );
+    print_item( highlight_line, WIDGET_COLOUR_FOREGROUND );
 
     /*  draw the new one */
     if( cursor_pressed ) {
@@ -159,18 +148,14 @@ widget_select_keyhandler( input_key key )
     
     widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
 		      WIDGET_COLOUR_FOREGROUND );
-    widget_printstring( 2, highlight_line+4, WIDGET_COLOUR_BACKGROUND,
-			descriptions[ highlight_line ] );
-    
+    print_item( highlight_line, WIDGET_COLOUR_BACKGROUND );
+
     widget_display_lines( 2, count + 2 );
   }
 }
 
 int widget_select_finish( widget_finish_state finished )
 {
-  free( buffer );
-  free( descriptions );
-
   if( finished == WIDGET_FINISHED_OK ) {
     *result = highlight_line;
     widget_end_all( WIDGET_FINISHED_OK );

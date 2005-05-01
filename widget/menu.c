@@ -58,6 +58,7 @@ int widget_menu_draw( void *data )
 {
   widget_menu_entry *ptr;
   size_t menu_entries, i;
+  char buffer[128];
 
   menu = (widget_menu_entry*)data;
 
@@ -67,14 +68,16 @@ int widget_menu_draw( void *data )
 
   widget_dialog_with_border( 1, 2, 30, menu_entries + 2 );
 
-  widget_printstring( 15 - strlen( menu->text ) / 2, 2,
-		      WIDGET_COLOUR_FOREGROUND, menu->text );
+  snprintf( buffer, sizeof( buffer ), "\x0A%s", menu->text );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, buffer );
 
   for( i = 0; i < menu_entries; i++ ) {
-    int colour = menu[i+1].inactive ?
-                 WIDGET_COLOUR_DISABLED :
-		 WIDGET_COLOUR_FOREGROUND;
-    widget_printstring( 2, i+4, colour, menu[i+1].text );
+    int colour;
+    snprintf( buffer, sizeof (buffer), menu[i+1].text );
+    colour = menu[i+1].inactive ?
+	     WIDGET_COLOUR_DISABLED :
+	     WIDGET_COLOUR_FOREGROUND;
+    widget_printstring( 17, i*8+32, colour, buffer );
   }
 
   widget_display_lines( 2, menu_entries + 2 );
@@ -544,10 +547,9 @@ set_active( struct widget_menu_entry *menu, const char *path, int active )
 
     const char *p = menu->text, *q = path;
 
-    /* Compare the two strings, but skip and '(' and ')' characters
-       in the menu (used to designate the hotkey) */
+    /* Compare the two strings, but skip hotkey-delimiter characters */
     do {
-      if( *p == '(' || *p == ')' ) p++;
+      if( *p == 9 || *p == 10 ) p++;
     } while( *p && *p++ == *q++ );
 
     if( *p ) continue;		/* not matched */

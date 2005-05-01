@@ -37,15 +37,17 @@ char *widget_text_text = NULL;	/* What we return the text in */
 
 static const char *title;	/* The window title */
 static widget_text_input_allow allow;
-static char text[40];		/* The current entry text */
 
+#define WIDGET_TEXT_LENGTH 64
+static char text[WIDGET_TEXT_LENGTH];	/* The current entry text */
+
+static int widget_text_draw_text( void );
 static void delete_character( void );
 static void append_character( char c );
 
 int
 widget_text_draw( void *data )
 {
-  char buffer[32];
   widget_text_t* text_data = data;
 
   if( data ) {
@@ -56,18 +58,35 @@ widget_text_draw( void *data )
 
   widget_dialog_with_border( 1, 2, 30, 3 );
 
-  widget_printstring( 15 - strlen( title ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
-		      title );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
+  widget_printstring_right( 12, 32, 5, "[" );
+  widget_printstring( 244, 32, 5, "]" );
 
-  strcpy( buffer, "[ " );
-  strncpy( &buffer[2], text, 23 ); buffer[23] = '\0';
-  strcat( buffer, "_" );
+  widget_display_lines( 2, 2 );
 
-  widget_printstring(  2, 4, WIDGET_COLOUR_FOREGROUND, buffer );
-  widget_printstring( 29, 4, WIDGET_COLOUR_FOREGROUND, "]" );
+  return widget_text_draw_text();
+}
 
-  widget_display_lines( 2, 3 );
+static int
+widget_text_draw_text( void )
+{
+  int width;
+  const char *tptr;
 
+  widget_rectangle( 12, 32, 232, 8, WIDGET_COLOUR_BACKGROUND );
+
+  tptr = text - 1;
+  do {
+    width = widget_stringwidth (++tptr);
+  } while (width > 28 * 8 - 4);
+
+  if( tptr != text )
+    widget_rectangle( 14, 33, 1, 6, 5 );
+
+  widget_printstring( 16, 32, WIDGET_COLOUR_FOREGROUND, tptr );
+  widget_rectangle( 17 + width, 39, 4, 1, 5 );
+
+  widget_display_lines( 4, 1 );
   return 0;
 }
 
@@ -77,7 +96,7 @@ widget_text_keyhandler( input_key key )
   switch( key ) {
 
   case INPUT_KEY_BackSpace:	/* Backspace generates DEL which is Caps + 0 */
-    delete_character(); widget_text_draw( NULL );
+    delete_character(); widget_text_draw_text();
     return;
 
   case INPUT_KEY_Escape:
@@ -120,7 +139,7 @@ widget_text_keyhandler( input_key key )
   /* If we've got this far, we have a valid key */
   append_character( key );
  
-  widget_text_draw( NULL );
+  widget_text_draw_text();
 }
 
 static void 

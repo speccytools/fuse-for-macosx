@@ -117,6 +117,7 @@ sub cname ($) {
     my( $name ) = @_;
 
     my $cname = lc $name;
+    $cname =~ s/\\01[12]//g if $ui eq 'widget';
     $cname =~ tr/a-z0-9_//cd;
 
     return $cname;
@@ -161,8 +162,14 @@ sub _dump_widget ($$) {
 	next if $item->{type} eq 'Separator';
 
 	my $name = $item->{name};
-	$name =~ s/_(.)/($1)/;
-	my $key = lc $1 if $1;
+	my $key;
+	if( $ui eq 'widget' ) {
+	    $name =~ s/_(.)/\\012$1\\011/;
+	    $key = lc $1 if $1;
+	} else {
+	    $name =~ s/_(.)/($1)/;
+	    $key = lc $1 if $1;
+	}
 	
 	$s .= "  { \"$name\", INPUT_KEY_" . ( $key || 'NONE' ) . ', ';
 

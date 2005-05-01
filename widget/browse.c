@@ -69,7 +69,7 @@ widget_browse_draw( void *data GCC_UNUSED )
 
   widget_dialog_with_border( 1, 2, 30, 20 );
 
-  widget_printstring( 10, 2, WIDGET_COLOUR_FOREGROUND, "Browse Tape" );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Browse Tape" );
   widget_display_lines( 2, 1 );
 
   highlight = tape_get_current_block();
@@ -98,8 +98,17 @@ add_block_description( libspectrum_tape_block *block, void *user_data )
 static void
 show_blocks( void )
 {
-  size_t i; char buffer[30];
+  size_t i; char buffer[64];
   GSList *ptr;
+  int numpos = g_slist_length( blocks );
+
+  if( numpos < 10 ) {
+    numpos = 24;
+  } else if( numpos < 100 ) {
+    numpos = 32;
+  } else {
+    numpos = 40;
+  }
 
   widget_rectangle( 2*8, 4*8, 28*8, 18*8, WIDGET_COLOUR_BACKGROUND );
 
@@ -107,16 +116,16 @@ show_blocks( void )
        i < 18 && ptr;
        i++, ptr = ptr->next ) {
 
-    snprintf( buffer, 30, "%2lu: %s", (unsigned long)( top_line + i + 1 ),
-	      (char*)ptr->data );
+    int colour = ( top_line + i == highlight )
+		 ? WIDGET_COLOUR_BACKGROUND : WIDGET_COLOUR_FOREGROUND;
 
-    if( top_line+i == highlight ) {
-      widget_rectangle( 2*8, (i+4)*8, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
-      widget_printstring( 2, i+4, WIDGET_COLOUR_BACKGROUND, buffer );
-    } else {
-      widget_printstring( 2, i+4, WIDGET_COLOUR_FOREGROUND, buffer );
-    }
+    if( top_line + i == highlight )
+      widget_rectangle( 16, i*8+32, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
 
+    sprintf( buffer, "%lu", (unsigned long)( top_line + i + 1 ) );
+    widget_printstring_right( numpos, i*8+32, colour, buffer );
+    snprintf( buffer, sizeof( buffer ), ": %s", (char *)ptr->data );
+    widget_printstring( numpos + 1, i*8+32, colour, buffer );
   }
 
   widget_display_lines( 2, 18 );

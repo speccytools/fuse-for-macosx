@@ -329,17 +329,18 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   error = widget_dialog( 1, 2, 30, 21 );
   if( error ) return error;
 
-  widget_printstring( 15 - strlen( title ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
-		      title );
-  if( ( i = strlen( dir ) ) > 30 ) {
-    widget_printstring( 1, 3, WIDGET_COLOUR_FOREGROUND, "..." );
-    widget_printstring( 4, 3, WIDGET_COLOUR_FOREGROUND, dir + i - 27 );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
+  if( widget_stringwidth( dir ) > 223 ) {
+    char buffer[128];
+    int prefix = widget_stringwidth( "..." ) + 1;
+    while( widget_stringwidth( dir ) > 223 - prefix ) dir++;
+    snprintf( buffer, sizeof( buffer ), "...%s", dir );
+    widget_print_title( 28, WIDGET_COLOUR_FOREGROUND, buffer );  
+  } else {
+    widget_print_title( 28, WIDGET_COLOUR_FOREGROUND, dir );
   }
-  else
-    widget_printstring( 15 - strlen( dir ) / 2, 3, WIDGET_COLOUR_FOREGROUND,
-			dir );
 
-  if( top_left ) widget_up_arrow( 1, 4, WIDGET_COLOUR_FOREGROUND );
+  if( top_left ) widget_up_arrow( 1, 5, WIDGET_COLOUR_FOREGROUND );
 
   /* Print the filenames, mostly normally, but with the currently
      selected file inverted */
@@ -352,11 +353,15 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   }
 
   if( is_saving )
-    widget_printstring( 1, 21, WIDGET_COLOUR_FOREGROUND,
-			"Return=select   TAB=enter name" );
+  {
+    widget_printstring( 12, 22 * 8, WIDGET_COLOUR_FOREGROUND,
+				     "\012RETURN\011 = select" );
+    widget_printstring_right( 244, 22 * 8, WIDGET_COLOUR_FOREGROUND,
+					   "\012TAB\011 = enter name" );
+  }
 
   if( i < n )
-    widget_down_arrow( 1, is_saving ? 19 : 21, WIDGET_COLOUR_FOREGROUND );
+    widget_down_arrow( 1, is_saving ? 20 : 22, WIDGET_COLOUR_FOREGROUND );
 
   /* Display that lot */
   widget_display_lines( 2, 21 );
@@ -368,10 +373,16 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 static int widget_print_filename( struct widget_dirent *filename, int position,
 				  int inverted )
 {
-  char buffer[14];
+  char buffer[64], suffix[64], *dot = 0;
+  int width, suffix_width = 0;
+  int dir = S_ISDIR( filename->mode );
+  int truncated = 0, suffix_truncated = 0;
 
-  int x = (position & 1) ? 17 : 2,
-      y = 4 + position/2;
+#define FILENAME_WIDTH 112
+#define MAX_SUFFIX_WIDTH 56
+
+  int x = (position & 1) ? 132 : 16,
+      y = 40 + (position >> 1) * 8;
 
   int foreground = inverted ? WIDGET_COLOUR_BACKGROUND
                             : WIDGET_COLOUR_FOREGROUND,
@@ -379,19 +390,67 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
       background = inverted ? WIDGET_COLOUR_FOREGROUND
                             : WIDGET_COLOUR_BACKGROUND;
 
-  widget_rectangle( 8 * x, 8 * y, 8 * 13, 8, background );
+  widget_rectangle( x, y, FILENAME_WIDTH, 8, background );
 
-  strncpy( buffer, filename->name, 13 ); buffer[13] = '\0';
+  strncpy( buffer, filename->name, sizeof( buffer ) - dir - 1);
+  buffer[sizeof( buffer ) - dir - 1] = '\0';
 
-  if( S_ISDIR( filename->mode ) ) {
-    if( strlen( buffer ) >= 13 ) {
-      buffer[12] = '/';
-    } else {
-      strcat( buffer, "/" );
+  if (dir)
+    dir = widget_charwidth( '/' );
+  else {
+    /* get filename extension */
+    dot = strrchr( filename->name, '.' );
+
+    /* if .gz or .bz2, we want the previous component too */
+    if( dot &&( !strcasecmp( dot, ".gz" ) || !strcasecmp( dot, ".bz2" ) ) ) {
+      char *olddot = dot;
+      *olddot = '\0';
+      dot = strrchr( filename->name, '.' );
+      *olddot = '.';
+      if (!dot)
+	dot = olddot;
+    }
+
+    /* if the dot is at the start of the name, ignore it */
+    if( dot == filename->name )
+      dot = 0;
+  }
+
+  if( dot ) {
+    /* split filename at extension separator */
+    buffer[dot - filename->name] = '\0';
+
+    /* get extension width (for display purposes) */
+    snprintf( suffix, sizeof( suffix ), "%s", dot );
+    while( ( suffix_width = ( dot && !dir )
+	     ? widget_stringwidth( suffix ) : 0 ) > 110 ) {
+      suffix_truncated = 1;
+      suffix[strlen( suffix ) - 1] = '\0';
     }
   }
 
-  widget_printstring( x, y, foreground, buffer );
+  while( ( width = widget_stringwidth( buffer ) ) >=
+	 FILENAME_WIDTH - dir - ( dot ? truncated + suffix_width : 0 ) ) {
+    truncated = 2;
+    if( suffix_width >= MAX_SUFFIX_WIDTH ) {
+      suffix_truncated = 2;
+      suffix[strlen (suffix) - 1] = '\0';
+      suffix_width = widget_stringwidth (suffix);
+    }
+    else
+      buffer[strlen (buffer) - 1] = '\0';
+  }
+  if( dir )
+    strcat (buffer, "/");
+
+  widget_printstring( x + 1, y, foreground, buffer );
+  if( truncated )
+    widget_rectangle( x + width + 2, y, 1, 8, 4 );
+  if( dot )
+    widget_printstring( x + width + 2 + truncated, y,
+			foreground ^ 2, suffix );
+  if( suffix_truncated )
+    widget_rectangle( x + FILENAME_WIDTH, y, 1, 8, 4 );
 
   return 0;
 }

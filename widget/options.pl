@@ -86,11 +86,12 @@ static int widget_$_->{name}_show_all( settings_info *show )
 
 CODE
 
-    my $centre = int( 16.5 - (length $_->{title}) / 2 );
-    print "  widget_printstring( $centre, 2, WIDGET_COLOUR_FOREGROUND, \"$_->{title}\" );\n\n";
+    print "  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, \"$_->{title}\" );\n\n";
 
     my $which = 0;
     foreach my $widget ( @{ $_->{widgets} } ) {
+
+	$widget->{text} =~ s/\((.)\)/\\012\1\\011/;
 
 	if( $widget->{type} eq "Checkbox" ) {
 
@@ -159,7 +160,7 @@ CODE
 
 	    my $title = $widget->{text};
 
-	    $title =~ tr/()//d;
+	    $title =~ s/\\01[12]//g;
 
 	    print << "CODE";
   case $widget->{key}:

@@ -70,10 +70,15 @@ int widget_timer_end( void );
 
 void widget_rectangle( int x, int y, int w, int h, int col );
 int widget_printstring( int x, int y, int col, const char *s );
+int widget_printstring_fixed( int x, int y, int col, const char *s );
 void widget_printchar_fixed( int x, int y, int col, int c );
 void widget_print_title( int y, int col, const char *s );
 void widget_printstring_right( int x, int y, int col, const char *s );
 void widget_display_lines( int y, int h );
+
+size_t widget_stringwidth( const char *s );
+size_t widget_substringwidth( const char *s, size_t count );
+size_t widget_charwidth( int c );
 
 void widget_up_arrow( int x, int y, int colour );
 void widget_down_arrow( int x, int y, int colour );

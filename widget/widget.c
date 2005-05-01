@@ -182,8 +182,48 @@ widget_left_one_char( const char *s, size_t index )
   return index - 1;
 }
 
+static int
+printchar( int x, int y, int col, int ch )
+{
+  int mx, my;
+  const widget_font_character *bitmap = widget_char( ch );
+
+  for( mx = 0; mx < bitmap->width; mx++ ) {
+    int b = bitmap->bitmap[mx];
+    for( my = 0; my < 8; my++ )
+      if( b & 128 >> my ) widget_putpixel( x + mx, y + my, col );
+  }
+
+  return x + bitmap->width + 1;
+}
+
 int
 widget_printstring( int x, int y, int col, const char *s )
+{
+  int c;
+  int shadow = 0;
+  if( !s ) return x;
+
+  while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
+	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
+    if( c && c < 9 ) { col = c - 1; continue; }
+    if( c < 18 ) { shadow = c - 9; continue; }
+
+    if( shadow && col ) {
+      printchar( x - 1, y,     shadow - 1, c );
+      printchar( x + 1, y,     shadow - 1, c );
+      printchar( x,     y - 1, shadow - 1, c );
+      printchar( x,     y + 1, shadow - 1, c );
+      printchar( x + 1, y + 1, shadow - 1, c );
+      x = printchar( x, y, col ^ 8, c );
+    } else
+      x = printchar( x, y, col, c );
+  }
+  return x;
+}
+
+int
+widget_printstring_fixed( int x, int y, int col, const char *s )
 {
   int c;
 
@@ -228,6 +268,42 @@ widget_printchar_fixed( int x, int y, int col, int c )
     for( my = 0; my < 8; my++ )
       if( b & 128 >> my ) widget_putpixel( x + mx, y + my, col );
   }
+}
+
+void widget_print_title( int y, int col, const char *s )
+{
+  char buffer[128];
+  snprintf( buffer, sizeof( buffer ), "\x0A%s", s );
+  widget_printstring( 128 - widget_stringwidth( buffer ) / 2, y, col, buffer );
+}
+
+void widget_printstring_right( int x, int y, int col, const char *s )
+{
+  widget_printstring( x - widget_stringwidth( s ), y, col, s );
+}
+
+size_t widget_stringwidth( const char *s )
+{
+  return widget_substringwidth( s, UINT_MAX );
+}
+
+size_t widget_substringwidth( const char *s, size_t count )
+{
+  size_t width = 0;
+  int c;
+  if( !s )
+    return 0;
+  while( count-- && (c = *(libspectrum_byte *)s++) != 0 ) {
+    if( c < 18 )
+      continue;
+    width += widget_char( c )->width + 1;
+  }
+  return width - 1;
+}
+
+size_t widget_charwidth( int c )
+{
+  return widget_char( c )->width;
 }
 
 void widget_rectangle( int x, int y, int w, int h, int col )
@@ -467,24 +543,45 @@ widget_putpixel( int x, int y, int colour )
 
 /* General functions used by the options dialogs */
 
+static int widget_options_print_label( int number, const char *string );
+static int widget_options_print_data( int number, const char *string );
+
 int widget_options_print_option( int number, const char* string, int value )
 {
-  char buffer[29];
+  widget_options_print_label( number, string );
+  widget_options_print_value( number, value );
+  return 0;
+}
 
-  snprintf( buffer, 29, "%-22s : %s", string, value ? " On" : "Off" );
-  widget_printstring( 2, number+4, WIDGET_COLOUR_FOREGROUND, buffer );
+static int widget_options_print_label( int number, const char *string )
+{
+  char buffer[128];
+  size_t l, w;
 
-  widget_display_lines( number + 4, 1 );
+  snprintf( buffer, sizeof( buffer ), "%s", string );
+  l = strlen( buffer );
 
+  if( l >= sizeof( buffer ) )
+    l = sizeof( buffer ) - 1;
+  while( ( w = widget_substringwidth( string, l ) ) >= 224 )
+    --l;
+  buffer[l] = '\0';
+  widget_printstring( 17, number*8+32, WIDGET_COLOUR_FOREGROUND, buffer );
   return 0;
 }
 
 int widget_options_print_value( int number, int value )
 {
-  widget_rectangle( 27*8, (number+4)*8, 24, 8, WIDGET_COLOUR_BACKGROUND );
-  widget_printstring( 27, number+4, WIDGET_COLOUR_FOREGROUND,
-		      value ? " On" : "Off" );
+  return widget_options_print_data( number, value ? "On" : "Off" );
+}
 
+static int widget_options_print_data( int number, const char *string )
+{
+  size_t width = widget_stringwidth( string );
+  widget_rectangle( 240 - width - 8, (number + 4) * 8, width + 8, 8,
+  		    WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 240 - width, number * 8 + 32,
+		      WIDGET_COLOUR_FOREGROUND, string );
   widget_display_lines( number + 4, 1 );
 
   return 0;
@@ -494,16 +591,10 @@ int
 widget_options_print_entry( int number, const char *prefix, int value,
 			    const char *suffix )
 {
-  char buffer[29];
-
-  widget_rectangle( 2*8, (number+4)*8, 28*8, 8, WIDGET_COLOUR_BACKGROUND );
-  
-  snprintf( buffer, 29, "%s: %d %s", prefix, value, suffix );
-  widget_printstring( 2, number + 4, WIDGET_COLOUR_FOREGROUND, buffer );
-
-  widget_display_lines( number + 4, 1 );
-
-  return 0;
+  char buffer[128];
+  widget_options_print_label( number, prefix );
+  snprintf( buffer, sizeof( buffer ), "%d %s", value, suffix );
+  return widget_options_print_data( number, buffer );
 }
 
 int widget_options_finish( widget_finish_state finished )

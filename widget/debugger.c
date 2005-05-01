@@ -70,16 +70,16 @@ widget_debugger_draw( void *data GCC_UNUSED )
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, 11 );
 
-  widget_printstring( 11, 2, WIDGET_COLOUR_FOREGROUND, "Debugger" );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Debugger" );
 
   for( i = 0; i < 10; i++ ) {
     snprintf( buffer, 9, "%-3s %04x", register_names[i], *register_values[i] );
-    widget_printstring( 3 + 10*(i%2), 4 + i/2, WIDGET_COLOUR_FOREGROUND,
+    widget_printstring_fixed( 3 + 10*(i%2), 4 + i/2, WIDGET_COLOUR_FOREGROUND,
 			buffer );
   }
 
-  widget_printstring( 3, 10, WIDGET_COLOUR_FOREGROUND, "(S)tep" );
-  widget_printstring( 3, 11, WIDGET_COLOUR_FOREGROUND, "(C)ontinue" );
+  widget_printstring( 25, 80, WIDGET_COLOUR_FOREGROUND, "\x0AS\x09tep" );
+  widget_printstring( 25, 88, WIDGET_COLOUR_FOREGROUND, "\x0A" "C\x09ontinue" );
 
   widget_display_lines( 2, 11 );
 
