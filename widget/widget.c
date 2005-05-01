@@ -103,7 +103,7 @@ static int widget_read_font( const char *filename )
   int error;
   int i;
 
-  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_WIDGET );
   if( fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't find font file '%s'", filename );
     return 1;

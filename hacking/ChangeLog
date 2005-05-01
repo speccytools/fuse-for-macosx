@@ -1324,3 +1324,5 @@
 	 patch #1150693) (Darren).
 20050501 keysyms.pl,ui/sdl/{sdlkeyboard.[ch],sdlui.c}: SDL support for
 	 'native' keysyms change (patch #1152497) (Fred).
+20050501 utils.[ch],widget/widget.c: find the Fuse font file when running
+	 in the build tree.
