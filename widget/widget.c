@@ -34,6 +34,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -56,10 +57,27 @@
 #include <windows.h>
 #endif
 
-static void printchar(int x, int y, int col, int ch);
+static int printchar( int x, int y, int col, int ch );
 static void widget_putpixel( int x, int y, int colour );
 
-static char widget_font[768];
+/* Bitmap font storage */
+typedef struct {
+  libspectrum_byte bitmap[15], left, width, defined;
+} widget_font_character;
+
+static widget_font_character *widget_font[1] = {0};
+
+static const widget_font_character default_invalid = {
+  { 0x7E, 0xDF, 0x9F, 0xB5, 0xA5, 0x8F, 0xDF, 0x7E }, 0, 8, 1
+}; /* "(?)" (inv) */
+
+static const widget_font_character default_unknown = {
+  { 0x7C, 0xDE, 0xBE, 0xAA, 0xDE, 0x7C }, 1, 6, 1
+}; /* "(?)" */
+
+static const widget_font_character default_keyword = {
+  { 0x7C, 0x82, 0xEE, 0xD6, 0xBA, 0x7C }, 1, 6, 1
+}; /* "(K)" */
 
 /* The current widget keyhandler */
 widget_keyhandler_fn widget_keyhandler;
@@ -79,22 +97,69 @@ static widget_recurse_t widget_return[10]; /* The stack to recurse on */
 /* The settings used whilst playing with an options dialog box */
 settings_info widget_options_settings;
 
-static int widget_read_font( const char *filename, size_t offset )
+static int widget_read_font( const char *filename )
 {
   int fd;
   utils_file file;
   int error;
+  int i;
 
-  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_ROM );
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
   if( fd == -1 ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
+    ui_error( UI_ERROR_ERROR, "couldn't find font file '%s'", filename );
     return 1;
   }
 
   error = utils_read_fd( fd, filename, &file );
   if( error ) return error;
 
-  memcpy( widget_font, file.buffer + offset - 1, 768 );
+  i = 0;
+  while( i < file.length ) {
+    int code, page, left, width;
+
+    if( i + 3 > file.length ) {
+      ui_error( UI_ERROR_ERROR, "font contains invalid character" );
+      utils_close_file( &file );
+      return 1;
+    }
+
+    code = file.buffer[i];
+    page = file.buffer[i+1];
+    if( page == 0 && ( code == 0xA3 || ( code < 0x7F && code != 0x60 ) ) ) {
+      left = file.buffer[i+2] & 7;
+    } else {
+      left = -1;
+    }
+    width = file.buffer[i+2] >> 4 & 15;
+
+    /* weed out invalid character codes and misdefined characters */
+    if( page != 0 /* we don't currently have more than page 0 */
+	|| i + 3 + width > file.length || (left >= 0 && left + width > 8) )
+    {
+      ui_error( UI_ERROR_ERROR, "font contains invalid character" );
+      utils_close_file( &file );
+      return 1;
+    }
+
+    if( !widget_font[page] )
+    {
+      int z;
+      widget_font[page] = calloc( 256, sizeof( widget_font_character ) );
+      if( !widget_font[page] )
+      {
+        ui_error( UI_ERROR_ERROR, "out of memory" );
+        utils_close_file( &file );
+        return 1;
+      }
+    }
+
+    widget_font[page][code].defined = 1;
+    widget_font[page][code].left = left < 0 ? 0 : left;
+    widget_font[page][code].width = width ? width : 3;
+    memcpy( &widget_font[page][code].bitmap, &file.buffer[i+3], width );
+
+    i += 3 + width;
+  }
 
   error = utils_close_file( &file );
   if( error ) return error;
@@ -102,34 +167,69 @@ static int widget_read_font( const char *filename, size_t offset )
   return 0;
 }
 
-static void printchar(int x, int y, int col, int ch) {
-    
-    int mx, my;
-
-    if((ch<32)||(ch>127)) ch=33;
-    ch-=32;
-
-    for(my=0; my<8; my++) {
-        int b;
-        b=widget_font[ch*8+my];
-        for(mx=0; mx<8; mx++) {
-            if( b & 0x80 ) widget_putpixel( mx + 8 * x, my + 8 * y, col );
-            b<<=1;
-        }
-    }
+static const widget_font_character *
+widget_char( int pp )
+{
+  if( pp < 0 || pp >= 256 ) return &default_invalid;
+  if( !widget_font[pp >> 8] || !widget_font[pp >> 8][pp & 255].defined )
+    return &default_unknown;
+  return &widget_font[ pp >> 8 ][ pp & 255 ];
 }
 
-void widget_printstring(int x, int y, int col, const char *s)
+size_t
+widget_left_one_char( const char *s, size_t index )
 {
-    int i;
-    i=0;
-    if(s) {
-        while((x<32) && s[i]) {
-            printchar(x,y,col,s[i]);
-            i++;
-            x++;
-        }
-    }
+  if( index == -1 ) index = strlen( s );
+  if( !index ) return 0;
+  return index - 1;
+}
+
+int
+widget_printstring( int x, int y, int col, const char *s )
+{
+  int c;
+
+  if( !s ) return x;
+
+  while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
+	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
+    widget_printchar_fixed(x, y, col, c);
+    ++x;
+  }
+  return x;
+}
+
+void
+widget_printchar_fixed( int x, int y, int col, int c )
+{
+  int mx, my;
+  int inverse = 0;
+  const widget_font_character *bitmap;
+
+  x *= 8; y *= 8;
+
+  if( c < 128 )
+    bitmap = widget_char( c );
+  else if( c < 144 ) {
+    if( c & 1 ) widget_rectangle( x + 4, y    , 4, 4, col );
+    if( c & 2 ) widget_rectangle( x    , y    , 4, 4, col );
+    if( c & 4 ) widget_rectangle( x + 4, y + 4, 4, 4, col );
+    if( c & 8 ) widget_rectangle( x    , y + 4, 4, 4, col );
+    return;
+  } else if( c < 165 ) {
+    inverse = 1;
+    bitmap = widget_char( c - 144 + 'A' );
+  } else {
+    bitmap = &default_keyword;
+  }
+
+  x += bitmap->left;
+  for( mx = 0; mx < bitmap->width; mx++ ) {
+    int b = bitmap->bitmap[mx];
+    if( inverse ) b = ~b;
+    for( my = 0; my < 8; my++ )
+      if( b & 128 >> my ) widget_putpixel( x + mx, y + my, col );
+  }
 }
 
 void widget_rectangle( int x, int y, int w, int h, int col )
@@ -187,7 +287,7 @@ int widget_init( void )
 {
   int error;
 
-  error = widget_read_font( "48.rom", 15617 );
+  error = widget_read_font( "fuse.font" );
   if( error ) return error;
 
   widget_filenames = NULL;
