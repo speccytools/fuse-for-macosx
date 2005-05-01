@@ -1313,3 +1313,5 @@
 	 Needle).
 20050427 ui/sdl/sdldisplay.c: check smallest supported fullscreen resolution, and
          if we don't have a resonable match try to find one (Fred).
+20050501 widget/{.cvsignore,Makefile.am,fuse.font.sbf,mkfusefont.pl}: add
+	 proportional font (part of patch #1150693) (Darren).

@@ -46,7 +46,8 @@ INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 BUILT_SOURCES = menu_data.c \
 		options.c \
-		options.h
+		options.h \
+		fuse.font
 
 menu_data.c: ../perl/cpp-perl.pl ../menu_data.c ../menu_data.pl ../config.h
 	@PERL@ ../perl/cpp-perl.pl ../config.h ../menu_data.c | @PERL@ ../menu_data.pl widget > $@
@@ -57,5 +58,10 @@ options.c: ../perl/cpp-perl.pl ../config.h options.pl ../ui/options.dat ../perl/
 options.h: ../perl/cpp-perl.pl ../config.h options-header.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
 	@PERL@ ../perl/cpp-perl.pl ../config.h ../ui/options.dat | @PERL@ options-header.pl - > options.h
 
+fuse.font: mkfusefont.pl fuse.font.sbf
+	@PERL@ mkfusefont.pl fuse.font.sbf > fuse.font
+
 noinst_HEADERS = widget.h widget_internals.h \
 		 options.h options.pl options-header.pl
+
+pkgdata_DATA = fuse.font
