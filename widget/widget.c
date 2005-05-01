@@ -57,7 +57,6 @@
 #include <windows.h>
 #endif
 
-static int printchar( int x, int y, int col, int ch );
 static void widget_putpixel( int x, int y, int colour );
 
 /* Bitmap font storage */
@@ -143,7 +142,6 @@ static int widget_read_font( const char *filename )
 
     if( !widget_font[page] )
     {
-      int z;
       widget_font[page] = calloc( 256, sizeof( widget_font_character ) );
       if( !widget_font[page] )
       {

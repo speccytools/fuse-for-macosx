@@ -304,8 +304,6 @@ menu_get_scaler( scaler_available_fn selector )
 void
 menu_file_exit( int action )
 {
-  int confirm;
-
   if( widget_do( WIDGET_TYPE_QUERY, "Exit Fuse?" ) || !widget_query.confirm )
     return;
 
