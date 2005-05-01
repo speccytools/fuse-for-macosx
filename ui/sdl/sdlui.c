@@ -61,6 +61,10 @@ ui_init( int *argc, char ***argv )
   if ( error )
     return error;
 
+  SDL_EnableUNICODE( 1 );
+
+  sdlkeyboard_init();
+
   ui_mouse_present = 1;
 
   return 0;
@@ -135,6 +139,8 @@ ui_end( void )
   error = uidisplay_end();
   if ( error )
     return error;
+
+  sdlkeyboard_end();
 
   SDL_Quit();
 

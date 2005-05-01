@@ -1,5 +1,6 @@
 /* sdlkeyboard.h: routines for dealing with the SDL keyboard
    Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2005 Fredrick Meunier
 
    $Id$
 
@@ -27,6 +28,8 @@
 #ifndef FUSE_SDLKEYBOARD_H
 #define FUSE_SDLKEYBOARD_H
 
+void sdlkeyboard_init(void);
+void sdlkeyboard_end(void);
 void sdlkeyboard_keypress(SDL_KeyboardEvent *keyevent);
 void sdlkeyboard_keyrelease(SDL_KeyboardEvent *keyevent);
 

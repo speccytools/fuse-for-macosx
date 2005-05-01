@@ -1,5 +1,5 @@
 /* sdlkeyboard.c: routines for dealing with the SDL keyboard
-   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2005 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
 
    $Id$
 
@@ -46,18 +46,58 @@
 #endif				/* #ifdef USE_WIDGET */
 #include "sdlkeyboard.h"
 
+/* Map low byte of UCS-2(?) Unicode to Fuse input layer keysym for
+   upper case letters */
+extern const keysyms_map_t unicode_keysyms_map[];
+
+static GHashTable *unicode_keysyms_hash;
+
+static input_key
+unicode_keysyms_remap( libspectrum_dword ui_keysym )
+{
+  const input_key *ptr;
+
+  ptr = g_hash_table_lookup( unicode_keysyms_hash, &ui_keysym );
+
+  return ptr ? *ptr : INPUT_KEY_NONE;
+}
+
+void
+sdlkeyboard_init(void)
+{
+  keysyms_map_t *ptr3;
+
+  unicode_keysyms_hash = g_hash_table_new( g_int_hash, g_int_equal );
+
+  for( ptr3 = (keysyms_map_t *)unicode_keysyms_map; ptr3->ui; ptr3++ )
+    g_hash_table_insert( unicode_keysyms_hash, &( ptr3->ui ),
+                         &( ptr3->fuse ) );
+}
+
+void
+sdlkeyboard_end(void)
+{
+  g_hash_table_destroy( unicode_keysyms_hash );
+}
+
 void
 sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
 {
-  input_key fuse_keysym;
+  input_key fuse_keysym, unicode_keysym;
   input_event_t fuse_event;
 
   fuse_keysym = keysyms_remap( keyevent->keysym.sym );
+  unicode_keysym = unicode_keysyms_remap( keyevent->keysym.unicode & 0xff80 );
 
-  if( fuse_keysym == INPUT_KEY_NONE ) return;
+  if( fuse_keysym == INPUT_KEY_NONE && unicode_keysym == INPUT_KEY_NONE )
+    return;
 
   fuse_event.type = INPUT_EVENT_KEYPRESS;
-  fuse_event.types.key.key = fuse_keysym;
+  if( unicode_keysym == INPUT_KEY_NONE )
+    fuse_event.types.key.native_key = fuse_keysym;
+  else
+    fuse_event.types.key.native_key = unicode_keysym;
+  fuse_event.types.key.spectrum_key = fuse_keysym;
 
   input_event( &fuse_event );
 }
@@ -73,7 +113,11 @@ sdlkeyboard_keyrelease( SDL_KeyboardEvent *keyevent )
   if( fuse_keysym == INPUT_KEY_NONE ) return;
 
   fuse_event.type = INPUT_EVENT_KEYRELEASE;
-  fuse_event.types.key.key = fuse_keysym;
+  /* SDL doesn't provide key release information for UNICODE, assuming that
+     the values will just be used for dialog boxes et. al. so put in SDL keysym
+     equivalent and hope for the best */
+  fuse_event.types.key.native_key = fuse_keysym;
+  fuse_event.types.key.spectrum_key = fuse_keysym;
 
   input_event( &fuse_event );
 }

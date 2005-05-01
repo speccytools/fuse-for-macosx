@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # keysyms.pl: generate keysyms.c from keysyms.dat
-# Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Russell Marks,
+# Copyright (c) 2000-2005 Philip Kendall, Matan Ziv-Av, Russell Marks,
 #			  Fredrick Meunier
 
 # $Id$
@@ -110,6 +110,18 @@ sub sdl_keysym ($) {
     return $keysym;
 }
 
+sub sdl_unicode_keysym ($) {
+
+    my $keysym = shift;
+
+    if ( $keysym eq "'" ) {
+        $keysym = "\\'";
+    }
+    $keysym = "'$keysym'";
+
+    return $keysym;
+}
+
 sub svga_keysym ($) {
     
     my $keysym = shift;
@@ -163,7 +175,14 @@ my %ui_data = (
 
     sdl  => { headers => [ 'SDL.h' ],
 	      max_length => 15,
-	      skips => { map { $_ => 1 } qw( Hyper_L Hyper_R Caps_Lock ) },
+	      skips => { map { $_ => 1 } ( 'Hyper_L','Hyper_R','Caps_Lock',
+                         'A' .. 'Z' ) },
+	      unicode_skips => { map { $_ => 1 } qw( Hyper_L Hyper_R Caps_Lock
+                         Escape F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12
+                         BackSpace Tab Caps_Lock Return Shift_L Shift_R
+                         Control_L Control_R Alt_L Alt_R Meta_L Meta_R
+                         Super_L Super_R Mode_switch Up Down Left Right
+                         Insert Delete Home End Page_Up Page_Down ) },
 	      translations => {
 		  apostrophe  => 'QUOTE',
 		  Control_L   => 'LCTRL',	 
@@ -174,7 +193,19 @@ my %ui_data = (
 		  Page_Up     => 'PAGEUP',
 		  Page_Down   => 'PAGEDOWN',
 	      },
+	      unicode_translations => {
+                  space       => ' ',
+                  numbersign  => '#',
+                  apostrophe  => "'",
+                  comma       => ',',
+                  minus       => '-',
+                  period      => '.',
+                  slash       => '/',
+                  semicolon   => ';',
+                  equal       => '=',
+	      },
 	      function => \&sdl_keysym,
+	      unicode_function => \&sdl_unicode_keysym,
 	    },
 
     svga => { headers => [ 'vgakeyboard.h' ],
@@ -247,7 +278,7 @@ my $define = uc $ui;
 
 print Fuse::GPL(
     'keysyms.c: UI keysym to Fuse input layer keysym mappings',
-    "2000-2004 Philip Kendall, Matan Ziv-Av, Russell Marks,\n" .
+    "2000-2005 Philip Kendall, Matan Ziv-Av, Russell Marks,\n" .
     "                           Fredrick Meunier, Catalin Mihaila"  ),
     << "CODE";
 
@@ -322,5 +353,39 @@ print << "CODE";
 
 };
 
+CODE
+
+if( $ui eq 'sdl' ) {
+
+print "\nkeysyms_map_t unicode_keysyms_map[] = {\n\n";
+
+    foreach( @keys ) {
+
+        my( $keysym ) = @$_;
+
+        next if $ui_data{$ui}{unicode_skips}{$keysym};
+
+        my $ui_keysym = $keysym;
+
+        $ui_keysym = $ui_data{$ui}{unicode_translations}{$keysym} if
+            $ui_data{$ui}{unicode_translations}{$keysym};
+
+        $ui_keysym = $ui_data{$ui}{unicode_function}->( $ui_keysym );
+
+	printf "  { %-$ui_data{$ui}{max_length}s INPUT_KEY_%-11s },\n",
+            "$ui_keysym,", $keysym;
+
+    }
+
+print << "CODE";
+
+  { 0, 0 }			/* End marker: DO NOT MOVE! */
+
+};
+
+CODE
+}
+
+print << "CODE";
 #endif
 CODE
