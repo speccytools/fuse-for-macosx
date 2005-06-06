@@ -151,10 +151,12 @@ int
 ui_statusbar_update_speed( float speed )
 {
   char buffer[15];
+  const char fuse[] = "Fuse";
 
-  snprintf( buffer, 15, "Fuse - %3.0f%%", speed );
+  snprintf( buffer, 15, "%s - %3.0f%%", fuse, speed );
 
-  SDL_WM_SetCaption( buffer, buffer );
+  /* FIXME: Icon caption should be snapshot name? */
+  SDL_WM_SetCaption( buffer, fuse );
 
   return 0;
 }

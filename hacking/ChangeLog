@@ -1328,3 +1328,4 @@
 	 in the build tree.
 20050606 input.c: also drive the joystick from the Spectrum keysym on release
 	 (Fred).
+20050606 ui/sdl/sdlui.c: Set miminised Fuse name to exclude speed (Fred).
