@@ -188,7 +188,7 @@ keyrelease( const input_event_key_t *event )
   }
 
   /* Joystick emulation via QAOP<space> */
-  switch( event->native_key ) {
+  switch( event->spectrum_key ) {
 
   case INPUT_KEY_q:
     joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_UP   , 0 ); break;
