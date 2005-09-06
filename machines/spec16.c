@@ -103,11 +103,12 @@ spec16_reset( void )
   error = machine_load_rom( 0, 0, settings_current.rom_16, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_OPTIONAL );
+  error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
+  periph_update();
 
   /* ROM 0, RAM 5, nothing, nothing */
   memory_map_home[0] = &memory_map_rom[ 0];

@@ -291,10 +291,7 @@ periph_present interface2_present;
 int periph_interface2_active;
 
 int
-periph_setup( const periph_t *peripherals_list, size_t n,
-	      periph_present kempston,
-	      periph_present interface1,
-	      periph_present interface2 )
+periph_setup( const periph_t *peripherals_list, size_t n )
 {
   int error;
 
@@ -311,13 +308,26 @@ periph_setup( const periph_t *peripherals_list, size_t n,
 
   error = periph_register_n( peripherals_list, n ); if( error ) return error;
 
-  kempston_present = kempston;
-  interface1_present = interface1;
-  interface2_present = interface2;
-
-  periph_update();
+  kempston_present = PERIPH_PRESENT_NEVER;
+  interface1_present = PERIPH_PRESENT_NEVER;
+  interface2_present = PERIPH_PRESENT_NEVER;
 
   return 0;
+}
+
+void
+periph_setup_kempston( periph_present present ) {
+  kempston_present = present;
+}
+
+void
+periph_setup_interface1( periph_present present ) {
+  interface1_present = present;
+}
+
+void
+periph_setup_interface2( periph_present present ) {
+  interface2_present = present;
 }
 
 static void

@@ -70,11 +70,12 @@ specplus2_reset( void )
   error = machine_load_rom( 2, 1, settings_current.rom_plus2_1, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( spec128_peripherals, spec128_peripherals_count,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_OPTIONAL );
+  error = periph_setup( spec128_peripherals, spec128_peripherals_count );
   if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
+  periph_update();
 
   return spec128_common_reset( 1 );
 }

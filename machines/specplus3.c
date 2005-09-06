@@ -249,11 +249,11 @@ specplus3_reset( void )
   error = machine_load_rom( 6, 3, settings_current.rom_plus3_3, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( specplus3_peripherals, specplus3_peripherals_count,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_NEVER );
+  error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
   if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
+  periph_update();
 
 #ifdef HAVE_765_H
 

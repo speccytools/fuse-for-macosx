@@ -91,11 +91,11 @@ specplus2a_reset( void )
   error = machine_load_rom( 6, 3, settings_current.rom_plus2a_3, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_NEVER );
+  error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
+  periph_update();
 
   return specplus3_plus2a_common_reset();
 }

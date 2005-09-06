@@ -164,11 +164,12 @@ tc2048_reset( void )
   error = machine_load_rom( 0, 0, settings_current.rom_tc2048, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count,
-			PERIPH_PRESENT_ALWAYS,
-			PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_OPTIONAL );
+  error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_ALWAYS );
+  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
+  periph_update();
 
   for( i = 0; i < 8; i++ ) {
 

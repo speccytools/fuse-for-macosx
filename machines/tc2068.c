@@ -196,11 +196,11 @@ tc2068_reset( void )
   error = machine_load_rom( 2, -1, settings_current.rom_tc2068_1, 0x2000 );
   if( error ) return error;
 
-  error = periph_setup( tc2068_peripherals, tc2068_peripherals_count,
-                        PERIPH_PRESENT_OPTIONAL,
-			PERIPH_PRESENT_NEVER,
-                        PERIPH_PRESENT_OPTIONAL );
+  error = periph_setup( tc2068_peripherals, tc2068_peripherals_count );
   if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
+  periph_update();
 
   for( i = 0; i < 8; i++ ) {
 
