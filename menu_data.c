@@ -108,10 +108,7 @@ Machine/_Reset..., Item, F5
 Machine/_Select..., Item, F9
 Machine/_Debugger..., Item
 Machine/P_oke Finder..., Item
-
-#ifndef USE_WIDGET
 Machine/_Memory Browser..., Item
-#endif
 
 Machine/Pro_filer, Branch
 Machine/Profiler/_Start, Item

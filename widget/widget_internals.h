@@ -220,6 +220,11 @@ void widget_debugger_keyhandler( input_key key );
 int widget_pokefinder_draw( void *data );
 void widget_pokefinder_keyhandler( input_key key );
 
+/* The memory browser widget */
+
+int widget_memory_draw( void *data );
+void widget_memory_keyhandler( input_key key, long rawkey );
+
 /* The ROM selector widget */
 
 typedef struct widget_roms_info {

@@ -31,6 +31,7 @@ libwidget_a_SOURCES = \
 	debugger.c \
 	error.c \
 	filesel.c \
+	memory.c \
 	menu.c \
 	menu_data.c \
 	options.c \
