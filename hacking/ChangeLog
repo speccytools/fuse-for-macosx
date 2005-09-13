@@ -1327,12 +1327,15 @@
 20050501 utils.[ch],widget/widget.c: find the Fuse font file when running
 	 in the build tree.
 20050606 input.c: also drive the joystick from the Spectrum keysym on release
-	 (Fred).
+         (Fred).
 20050606 ui/sdl/sdlui.c: Set miminised Fuse name to exclude speed (Fred).
 20050906 periph.[ch],machines/{pentagon.c,scorpion.c,spec128.c,spec16.c,
          spec48.c,spec_se.c,specplus2.c,specplus2a.c,specplus3.c,specplus3e.c,
-	 tc2048.c,tc2068.c,ts2068.c}: Split periph_setup into separate
+         tc2048.c,tc2068.c,ts2068.c}: Split periph_setup into separate
          functions for each device (patch #1144590) (Stuart Brady).
 20050910 menu_data.c,widget/{Makefile.am,memory.c,menu.c,widget.[ch],
          widget_internals.h} : add widget memory browser (patch #1150704)
+         (Darren).
+20050913 widget/{error.c,menu.c,roms.c,select.c,text.c,widget.c,
+         widget_internals.h} : prettify widget interface (patch #1150706)
          (Darren).

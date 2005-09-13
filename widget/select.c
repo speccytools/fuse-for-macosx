@@ -44,9 +44,9 @@ static void print_item (int index, int colour)
 {
   char key[] = "\x0A ";
   key[1] = 'A' + index;
-  widget_printstring_right( 24, index*8+32, colour, key );
-  widget_printstring( 25, index*8+32, colour, ": " );
-  widget_printstring( 25 + widget_stringwidth (": "), index*8+32,
+  widget_printstring_right( 24, index*8+28, colour, key );
+  widget_printstring( 25, index*8+28, colour, ": " );
+  widget_printstring( 25 + widget_stringwidth (": "), index*8+28,
 				   colour, options[index]);
 }
 
@@ -75,7 +75,7 @@ widget_select_draw( void *data )
 
   for( i = 0; i < count; i++ ) {
     if( i == highlight_line ) {
-      widget_rectangle( 2*8, (i+4)*8, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
+      widget_rectangle( 2*8, i*8+28, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
       print_item( i, WIDGET_COLOUR_BACKGROUND );
     } else {
       print_item( i, WIDGET_COLOUR_FOREGROUND );
@@ -135,7 +135,7 @@ widget_select_keyhandler( input_key key )
     ) {
     
     /* Remove the old highlight */
-    widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
+    widget_rectangle( 2*8, highlight_line*8+28, 28*8, 1*8,
 		      WIDGET_COLOUR_BACKGROUND );
     print_item( highlight_line, WIDGET_COLOUR_FOREGROUND );
 
@@ -146,7 +146,7 @@ widget_select_keyhandler( input_key key )
       highlight_line = key - INPUT_KEY_a;
     }
     
-    widget_rectangle( 2*8, (highlight_line+4)*8, 28*8, 1*8,
+    widget_rectangle( 2*8, highlight_line*8+28, 28*8, 1*8,
 		      WIDGET_COLOUR_FOREGROUND );
     print_item( highlight_line, WIDGET_COLOUR_BACKGROUND );
 

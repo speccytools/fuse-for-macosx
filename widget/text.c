@@ -59,8 +59,8 @@ widget_text_draw( void *data )
   widget_dialog_with_border( 1, 2, 30, 3 );
 
   widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
-  widget_printstring_right( 12, 32, 5, "[" );
-  widget_printstring( 244, 32, 5, "]" );
+  widget_printstring_right( 12, 28, 5, "[" );
+  widget_printstring( 244, 28, 5, "]" );
 
   widget_display_lines( 2, 2 );
 
@@ -73,7 +73,7 @@ widget_text_draw_text( void )
   int width;
   const char *tptr;
 
-  widget_rectangle( 12, 32, 232, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_rectangle( 12, 28, 232, 8, WIDGET_COLOUR_BACKGROUND );
 
   tptr = text - 1;
   do {
@@ -81,12 +81,12 @@ widget_text_draw_text( void )
   } while (width > 28 * 8 - 4);
 
   if( tptr != text )
-    widget_rectangle( 14, 33, 1, 6, 5 );
+    widget_rectangle( 14, 29, 1, 6, 5 );
 
-  widget_printstring( 16, 32, WIDGET_COLOUR_FOREGROUND, tptr );
-  widget_rectangle( 17 + width, 39, 4, 1, 5 );
+  widget_printstring( 16, 28, WIDGET_COLOUR_FOREGROUND, tptr );
+  widget_rectangle( 17 + width, 35, 4, 1, 5 );
 
-  widget_display_lines( 4, 1 );
+  widget_display_rasters( 28, 8 );
   return 0;
 }
 

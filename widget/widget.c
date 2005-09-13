@@ -344,14 +344,14 @@ widget_down_arrow( int x, int y, int colour )
   }
 }
 
-/* Force screen lines y to (y+h) inclusive to be redrawn */
+/* Force screen rasters y to (y+h) inclusive to be redrawn */
 void
-widget_display_lines( int y, int h )
+widget_display_rasters( int y, int h )
 {
   int scale = machine_current->timex ? 2 : 1;
 
-  uidisplay_area( 0, scale * ( DISPLAY_BORDER_HEIGHT + 8 * y ),
-		  scale * DISPLAY_ASPECT_WIDTH, scale * 8 * h );
+  uidisplay_area( 0, scale * ( DISPLAY_BORDER_HEIGHT + y ),
+		  scale * DISPLAY_ASPECT_WIDTH, scale * h );
   uidisplay_frame_end();
 }
 
@@ -566,7 +566,10 @@ static int widget_options_print_label( int number, const char *string )
   while( ( w = widget_substringwidth( string, l ) ) >= 224 )
     --l;
   buffer[l] = '\0';
-  widget_printstring( 17, number*8+32, WIDGET_COLOUR_FOREGROUND, buffer );
+  w = widget_printstring( 17, number*8+28, WIDGET_COLOUR_FOREGROUND, buffer )
+      - 1;
+  while ((w += 3) < 240)
+    widget_putpixel (w, number*8+35, 0);
   return 0;
 }
 
@@ -578,11 +581,11 @@ int widget_options_print_value( int number, int value )
 static int widget_options_print_data( int number, const char *string )
 {
   size_t width = widget_stringwidth( string );
-  widget_rectangle( 240 - width - 8, (number + 4) * 8, width + 8, 8,
+  widget_rectangle( 240 - width - 2, number * 8 + 28, width + 2, 8,
   		    WIDGET_COLOUR_BACKGROUND );
-  widget_printstring( 240 - width, number * 8 + 32,
+  widget_printstring( 240 - width, number * 8 + 28,
 		      WIDGET_COLOUR_FOREGROUND, string );
-  widget_display_lines( number + 4, 1 );
+  widget_display_rasters( number * 8 + 28, 8 );
 
   return 0;
 }

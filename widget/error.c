@@ -79,7 +79,7 @@ int widget_error_draw( void *data )
   }
 
   for( i=0; i<count; i++ ) {
-    widget_printstring( 17, i*8+32, WIDGET_COLOUR_FOREGROUND, lines[i] );
+    widget_printstring( 17, i*8+28, WIDGET_COLOUR_FOREGROUND, lines[i] );
     free( lines[i] );
   }
 

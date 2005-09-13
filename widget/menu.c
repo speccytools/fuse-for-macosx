@@ -57,27 +57,32 @@ widget_menu_entry *menu;
 int widget_menu_draw( void *data )
 {
   widget_menu_entry *ptr;
-  size_t menu_entries, i;
+  size_t menu_entries, i, height = 0;
   char buffer[128];
 
   menu = (widget_menu_entry*)data;
 
   /* How many menu items do we have? */
-  for( ptr = &menu[1]; ptr->text; ptr++ ) ;
+  for( ptr = &menu[1]; ptr->text; ptr++ )
+    height += ptr->text[0] ? 2 : 1;
   menu_entries = ptr - &menu[1];
 
-  widget_dialog_with_border( 1, 2, 30, menu_entries + 2 );
+  widget_dialog_with_border( 1, 2, 30, 2 + height / 2 );
 
   snprintf( buffer, sizeof( buffer ), "\x0A%s", menu->text );
   widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, buffer );
 
+  height = 28;
   for( i = 0; i < menu_entries; i++ ) {
     int colour;
+    if( !menu[i+1].text[0] ) { height += 4; continue; }
+
     snprintf( buffer, sizeof (buffer), menu[i+1].text );
     colour = menu[i+1].inactive ?
 	     WIDGET_COLOUR_DISABLED :
 	     WIDGET_COLOUR_FOREGROUND;
-    widget_printstring( 17, i*8+32, colour, buffer );
+    widget_printstring( 17, height, colour, buffer );
+    height += 8;
   }
 
   widget_display_lines( 2, menu_entries + 2 );

@@ -74,7 +74,8 @@ int widget_printstring_fixed( int x, int y, int col, const char *s );
 void widget_printchar_fixed( int x, int y, int col, int c );
 void widget_print_title( int y, int col, const char *s );
 void widget_printstring_right( int x, int y, int col, const char *s );
-void widget_display_lines( int y, int h );
+void widget_display_rasters( int y, int h );
+#define widget_display_lines(y,h) widget_display_rasters((y)*8,(h)*8)
 
 size_t widget_stringwidth( const char *s );
 size_t widget_substringwidth( const char *s, size_t count );
