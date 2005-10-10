@@ -1339,3 +1339,5 @@
 20050913 widget/{error.c,menu.c,roms.c,select.c,text.c,widget.c,
          widget_internals.h} : prettify widget interface (patch #1150706)
          (Darren).
+20051010 screenshot.c: Fix writing and reading of Timex screenmode/colour in
+         hires .scr screenshots (thanks, Gergely Szasz) (Fred).

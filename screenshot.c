@@ -328,7 +328,7 @@ screenshot_scr_write( const char *filename )
     memcpy( scr_data + MONO_BITMAP_SIZE,
             &RAM[ memory_current_screen ][display_get_addr(0,0) +
             ALTDFILE_OFFSET], MONO_BITMAP_SIZE );
-    scr_data[HIRES_ATTR] = scld_last_dec.mask.hirescol |
+    scr_data[HIRES_ATTR] = scld_last_dec.byte & HIRESCOLMASK |
                            scld_last_dec.mask.scrnmode;
     scr_length = HIRES_SCR_SIZE;
   }
@@ -354,27 +354,27 @@ screenshot_scr_write( const char *filename )
 #ifdef WORDS_BIGENDIAN
 
 typedef struct {
-  unsigned b7 : 1;
-  unsigned b6 : 1;
-  unsigned b5 : 1;
-  unsigned b4 : 1;
-  unsigned b3 : 1;
-  unsigned b2 : 1;
-  unsigned b1 : 1;
   unsigned b0 : 1;
+  unsigned b1 : 1;
+  unsigned b2 : 1;
+  unsigned b3 : 1;
+  unsigned b4 : 1;
+  unsigned b5 : 1;
+  unsigned b6 : 1;
+  unsigned b7 : 1;
 } byte_field_type;
 
 #else			/* #ifdef WORDS_BIGENDIAN */
 
 typedef struct {
-  unsigned b0 : 1;
-  unsigned b1 : 1;
-  unsigned b2 : 1;
-  unsigned b3 : 1;
-  unsigned b4 : 1;
-  unsigned b5 : 1;
-  unsigned b6 : 1;
   unsigned b7 : 1;
+  unsigned b6 : 1;
+  unsigned b5 : 1;
+  unsigned b4 : 1;
+  unsigned b3 : 1;
+  unsigned b2 : 1;
+  unsigned b1 : 1;
+  unsigned b0 : 1;
 } byte_field_type;
 
 #endif			/* #ifdef WORDS_BIGENDIAN */
@@ -459,6 +459,8 @@ screenshot_scr_read( const char *filename )
             ( scld_last_dec.byte & ~( HIRESCOLMASK | HIRES ) ) |
             ( *(screen.buffer + HIRES_ATTR) & ( HIRESCOLMASK | HIRES ) ) );
     } else {
+      libspectrum_byte attr = hires_convert_dec( *(screen.buffer + HIRES_ATTR) );
+
       for( i = 0; i < MONO_BITMAP_SIZE; i++ )
         RAM[ memory_current_screen ][display_get_addr(0,0) + i] =
           convert_hires_to_lores( *(screen.buffer + MONO_BITMAP_SIZE + i),
@@ -467,8 +469,7 @@ screenshot_scr_read( const char *filename )
       /* set attributes based on hires attribute byte */
       for( i = 0; i < 768; i++ )
         RAM[ memory_current_screen ][display_get_addr(0,0) +
-            MONO_BITMAP_SIZE + i] =
-	  hires_convert_dec( *(screen.buffer + HIRES_ATTR) );
+            MONO_BITMAP_SIZE + i] = attr;
 
       ui_error( UI_ERROR_INFO,
             "The file contained a TC2048 high-res screen, converted to lores");
