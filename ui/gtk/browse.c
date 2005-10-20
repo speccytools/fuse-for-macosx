@@ -70,7 +70,10 @@ menu_media_tape_browse( GtkWidget *widget GCC_UNUSED,
   if( !dialog_created )
     if( create_dialog() ) { fuse_emulation_unpause(); return; }
 
-  if( ui_tape_browser_update() ) { fuse_emulation_unpause(); return; }
+  if( ui_tape_browser_update( UI_TAPE_BROWSER_NEW_TAPE, NULL ) ) {
+    fuse_emulation_unpause();
+    return;
+  }
 
   gtk_widget_show_all( dialog );
 
@@ -129,7 +132,8 @@ create_dialog( void )
 }
 
 int
-ui_tape_browser_update( void )
+ui_tape_browser_update( ui_tape_browser_update_type change,
+                        libspectrum_tape_block *block )
 {
   int error, current_block;
 

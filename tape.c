@@ -128,7 +128,7 @@ tape_read_buffer( unsigned char *buffer, size_t length, libspectrum_id_t type,
   if( error ) return error;
 
   tape_modified = 0;
-  ui_tape_browser_update();
+  ui_tape_browser_update( UI_TAPE_BROWSER_NEW_TAPE, NULL );
 
   if( autoload ) {
     error = tape_autoload( machine_current->machine );
@@ -219,7 +219,7 @@ int tape_close( void )
   if( error ) return error;
 
   tape_modified = 0;
-  ui_tape_browser_update();
+  ui_tape_browser_update( UI_TAPE_BROWSER_NEW_TAPE, NULL );
 
   return 0;
 }
@@ -232,7 +232,7 @@ tape_select_block( size_t n )
 
   error = tape_select_block_no_update( n ); if( error ) return error;
 
-  ui_tape_browser_update();
+  ui_tape_browser_update( UI_TAPE_BROWSER_SELECT_BLOCK, NULL );
 
   return 0;
 }
@@ -286,7 +286,7 @@ int tape_write( const char* filename )
   if( error ) { free( buffer ); return error; }
 
   tape_modified = 0;
-  ui_tape_browser_update();
+  ui_tape_browser_update( UI_TAPE_BROWSER_MODIFIED, NULL );
 
   return 0;
 
@@ -349,7 +349,7 @@ int tape_load_trap( void )
     next_block = libspectrum_tape_select_next_block( tape );
     if( !next_block ) return 1;
 
-    ui_tape_browser_update();
+    ui_tape_browser_update( UI_TAPE_BROWSER_SELECT_BLOCK, NULL );
 
     return 0;
   }
@@ -512,7 +512,7 @@ int tape_save_trap( void )
   if( error ) return error;
 
   tape_modified = 1;
-  ui_tape_browser_update();
+  ui_tape_browser_update( UI_TAPE_BROWSER_NEW_BLOCK, block );
 
   /* And then return via the RET at #053E, except on Timex 2068 at #00E4 */
   if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ||
@@ -669,7 +669,7 @@ tape_next_edge( libspectrum_dword last_tstates )
   /* If that was the end of a block, update the browser */
   if( flags & LIBSPECTRUM_TAPE_FLAGS_BLOCK ) {
 
-    ui_tape_browser_update();
+    ui_tape_browser_update( UI_TAPE_BROWSER_SELECT_BLOCK, NULL );
 
     /* If tape traps are active _and_ the new block is a ROM loader,
      return without putting another event into the queue */

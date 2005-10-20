@@ -1341,3 +1341,5 @@
          (Darren).
 20051010 screenshot.c: Fix writing and reading of Timex screenmode/colour in
          hires .scr screenshots (thanks, Gergely Szasz) (Fred).
+20051020 tape.c,ui/ui.h,ui/gtk/browse.c,widget/widget.c: add support for
+         partial updating of the tape browser (Fred).

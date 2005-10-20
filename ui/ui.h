@@ -197,7 +197,19 @@ typedef enum ui_statusbar_state {
 int ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state );
 int ui_statusbar_update_speed( float speed );
 
+typedef enum ui_tape_browser_update_type {
+
+  UI_TAPE_BROWSER_NEW_TAPE,             /* Whole tape image has changed
+                                           implies modified reset */
+  UI_TAPE_BROWSER_SELECT_BLOCK,         /* Tape block selected has changed */
+  UI_TAPE_BROWSER_NEW_BLOCK,            /* A new block has been appended,
+                                           implies modified set */
+  UI_TAPE_BROWSER_MODIFIED,             /* Tape modified status has changed */
+
+} ui_tape_browser_update_type;
+
 /* Cause the tape browser to be updated */
-int ui_tape_browser_update( void );
+int ui_tape_browser_update( ui_tape_browser_update_type change,
+                            libspectrum_tape_block *block );
 
 #endif			/* #ifndef FUSE_UI_H */
