@@ -328,7 +328,7 @@ screenshot_scr_write( const char *filename )
     memcpy( scr_data + MONO_BITMAP_SIZE,
             &RAM[ memory_current_screen ][display_get_addr(0,0) +
             ALTDFILE_OFFSET], MONO_BITMAP_SIZE );
-    scr_data[HIRES_ATTR] = scld_last_dec.byte & HIRESCOLMASK |
+    scr_data[HIRES_ATTR] = ( scld_last_dec.byte & HIRESCOLMASK ) |
                            scld_last_dec.mask.scrnmode;
     scr_length = HIRES_SCR_SIZE;
   }

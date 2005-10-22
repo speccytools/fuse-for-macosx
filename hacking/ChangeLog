@@ -1343,3 +1343,4 @@
          hires .scr screenshots (thanks, Gergely Szasz) (Fred).
 20051020 tape.c,ui/ui.h,ui/gtk/browse.c,widget/widget.c: add support for
          partial updating of the tape browser (Fred).
+20051012 screenshot.c: Fix warning in hires byte assignment (Fred).
