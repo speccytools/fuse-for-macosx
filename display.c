@@ -159,7 +159,8 @@ add_border_sentinel( void )
   }
 
   sentinel->x = sentinel->y = 0;
-  sentinel->colour = display_lores_border;
+  sentinel->colour = scld_last_dec.name.hires ?
+                            display_hires_border : display_lores_border;
 
   border_changes = g_slist_prepend( border_changes, sentinel );
 
@@ -818,7 +819,8 @@ display_set_lores_border( int colour )
 {
   if( display_lores_border != colour ) {
     display_lores_border = colour;
-    push_border_change( colour );
+    if( !scld_last_dec.name.hires )
+      push_border_change( colour );
   }
 }
 
@@ -827,7 +829,8 @@ display_set_hires_border( int colour )
 {
   if( display_hires_border != colour ) {
     display_hires_border = colour;
-    push_border_change( colour );
+    if( scld_last_dec.name.hires )
+      push_border_change( colour );
   }
 }
 

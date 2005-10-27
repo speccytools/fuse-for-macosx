@@ -1345,3 +1345,5 @@
          partial updating of the tape browser (Fred).
 20051012 screenshot.c: fix warning in hires byte assignment (Fred).
 20051027 snapshot.c: make default snapshot format .szx (Fred).
+20051027 display.c: make border changes only apply to the correct mode (e.g.
+         loading a tape in hires mode should not show border stripes) (Fred).
