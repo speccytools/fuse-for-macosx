@@ -173,13 +173,13 @@ int snapshot_write( const char *filename )
   int error;
 
   /* Work out what sort of file we want from the filename; default to
-     .z80 if we couldn't guess */
+     .szx if we couldn't guess */
   error = libspectrum_identify_file_with_class( &type, &class, filename, NULL,
 						0 );
   if( error ) return error;
 
   if( class != LIBSPECTRUM_CLASS_SNAPSHOT || type == LIBSPECTRUM_ID_UNKNOWN )
-    type = LIBSPECTRUM_ID_SNAPSHOT_Z80;
+    type = LIBSPECTRUM_ID_SNAPSHOT_SZX;
 
   error = libspectrum_snap_alloc( &snap ); if( error ) return error;
 
