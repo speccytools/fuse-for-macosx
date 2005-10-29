@@ -47,4 +47,4 @@ void divide_refresh_page_state( void );
 void divide_reset( void );
 void divide_memory_map( void );
 
-#endif			/* #ifndef FUSE_ZXATASP_H */
+#endif			/* #ifndef FUSE_DIVIDE_H */
