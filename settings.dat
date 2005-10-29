@@ -116,6 +116,8 @@ zxatasp_slave_file, string, NULL,, zxatasp-slavefile
 zxcf_active, boolean, 0,, zxcf
 zxcf_upload, boolean, 0,, zxcf-upload
 zxcf_pri_file, string, NULL,, zxcf-cffile
+divide_enabled, boolean, 0,, divide
+divide_wp, boolean, 0,, divide-write-protect
 
 printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
 printer_text_filename, string, strdup( "printout.txt" ),, textfile

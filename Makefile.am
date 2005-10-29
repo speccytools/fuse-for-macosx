@@ -57,6 +57,7 @@ DIST_SUBDIRS = compat \
 fuse_SOURCES = ay.c \
 	dck.c \
 	display.c \
+	divide.c \
 	event.c \
 	fuse.c \
 	ide.c \
@@ -130,6 +131,7 @@ noinst_HEADERS = ay.h \
 	compat.h \
 	dck.h \
 	display.h \
+	divide.h \
 	event.h \
 	fuse.h \
 	ide.h \

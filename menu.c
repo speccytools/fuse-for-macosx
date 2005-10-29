@@ -29,6 +29,7 @@
 #include <libspectrum.h>
 
 #include "dck.h"
+#include "divide.h"
 #include "event.h"
 #include "fuse.h"
 #include "if1.h"
@@ -588,6 +589,13 @@ MENU_CALLBACK( menu_media_ide_zxatasp_writeprotect )
 MENU_CALLBACK( menu_media_ide_zxcf_upload )
 {
   settings_current.zxcf_upload = !settings_current.zxcf_upload;
+  WIDGET_END;
+}
+
+MENU_CALLBACK( menu_media_ide_divide_writeprotect )
+{
+  settings_current.divide_wp = !settings_current.divide_wp;
+  divide_refresh_page_state();
   WIDGET_END;
 }
 

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "divide.h"
 #include "event.h"
 #include "fuse.h"
 #include "if1.h"
@@ -345,6 +346,10 @@ machine_reset( void )
   scld_reset();
   tape_stop();
   simpleide_reset();
+  /* DivIDE does not page in immediately on a reset condition (we do that by
+  trapping PC instead); however, it needs to perform housekeeping tasks upon
+  reset */
+  divide_reset();
 
   memory_pool_free();
 

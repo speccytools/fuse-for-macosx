@@ -98,6 +98,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject );
 MENU_CALLBACK( menu_media_ide_zxatasp_upload );
 MENU_CALLBACK( menu_media_ide_zxatasp_writeprotect );
 MENU_CALLBACK( menu_media_ide_zxcf_upload );
+MENU_CALLBACK( menu_media_ide_divide_writeprotect );
 
 int menu_open_snap( void );
 

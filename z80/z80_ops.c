@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 #include "debugger/debugger.h"
+#include "divide.h"
 #include "event.h"
 #include "machine.h"
 #include "memory.h"
@@ -99,21 +100,23 @@ z80_do_opcodes( void )
 
 #ifdef __GNUC__
 
-  void *cgoto[6]; size_t next = 0;
+  void *cgoto[8]; size_t next = 0;
 
   SETUP_CHECK( profile, profile_active, 0 );
   SETUP_CHECK( rzx, rzx_playback, 1 );
   SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 );
   SETUP_CHECK( trdos, trdos_available, 3 );
   SETUP_CHECK( if1p, if1_available, 4 );
-  if( next != 5 ) { cgoto[ next ] = &&opcode_delay; }
+  SETUP_CHECK( divide_early, settings_current.divide_enabled, 5 );
+  if( next != 6 ) { cgoto[ next ] = &&opcode_delay; }
 
-  next = 5;
-  SETUP_CHECK( evenm1, even_m1, 5 );
-  if( next != 6 ) { cgoto[ next ] = &&run_opcode; }
   next = 6;
-  SETUP_CHECK( if1u, if1_available, 6 );
-  if( next != 7 ) { cgoto[ next ] = &&end_opcode; }
+  SETUP_CHECK( evenm1, even_m1, 6 );
+  if( next != 7 ) { cgoto[ next ] = &&run_opcode; }
+  next = 7;
+  SETUP_CHECK( if1u, if1_available, 7 );
+  SETUP_CHECK( divide_late, settings_current.divide_enabled, 8 );
+  if( next != 9 ) { cgoto[ next ] = &&end_opcode; }
 
 #endif				/* #ifdef __GNUC__ */
 
@@ -167,12 +170,20 @@ z80_do_opcodes( void )
 
     END_CHECK
 
+    CHECK( divide_early, settings_current.divide_enabled, 5 )
+    
+    if( ( PC & 0xff00 ) == 0x3d00 ) {
+      divide_set_automap( 1 );
+    }
+    
+    END_CHECK
+
   opcode_delay:
 
     contend_read( PC, 4 );
 
     /* Check to see if M1 cycles happen on even tstates */
-    CHECK( evenm1, even_m1, 5 )
+    CHECK( evenm1, even_m1, 6 )
 
     if( tstates & 1 ) tstates++;
 
@@ -183,12 +194,23 @@ z80_do_opcodes( void )
        triggering read breakpoints */
     opcode = readbyte_internal( PC );
 
-    CHECK( if1u, if1_available, 6 )
+    CHECK( if1u, if1_available, 7 )
 
     if( PC == 0x0700 ) {
       if1_unpage();
     }
 
+    END_CHECK
+
+    CHECK( divide_late, settings_current.divide_enabled, 8 )
+
+    if( ( PC & 0xfff8 ) == 0x1ff8 ) {
+      divide_set_automap( 0 );
+    } else if( (PC == 0x0000) || (PC == 0x0008) || (PC == 0x0038)
+      || (PC == 0x0066) || (PC == 0x04c6) || (PC == 0x0562) ) {
+      divide_set_automap( 1 );
+    }
+    
     END_CHECK
 
   end_opcode:

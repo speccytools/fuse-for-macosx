@@ -364,6 +364,7 @@ slt_trap( libspectrum_word address, libspectrum_byte level )
 int trdos_available = 0;
 int trdos_active = 0;
 int if1_available = 0;
+int divide_active = 0;
 
 void
 trdos_page( void )
@@ -385,6 +386,12 @@ if1_page( void )
 
 void
 if1_unpage( void )
+{
+  abort();
+}
+
+void
+divide_set_automap( int state )
 {
   abort();
 }
@@ -427,6 +434,7 @@ init_dummies( void )
   rzx_playback = 0;
   scld_last_dec.name.intdisable = 0;
   settings_current.slt_traps = 0;
+  settings_current.divide_enabled = 0;
 
   return 0;
 }

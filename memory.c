@@ -32,6 +32,7 @@
 
 #include "debugger/debugger.h"
 #include "display.h"
+#include "divide.h"
 #include "fuse.h"
 #include "if1.h"
 #include "if2.h"
@@ -266,6 +267,7 @@ memory_romcs_map( void )
   if( if2_active ) if2_memory_map();
   if( settings_current.zxatasp_active ) zxatasp_memory_map();
   if( settings_current.zxcf_active ) zxcf_memory_map();
+  if( divide_active ) divide_memory_map();
 }
 
 int

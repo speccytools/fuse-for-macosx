@@ -29,6 +29,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "divide.h"
 #include "if1.h"
 #include "if2.h"
 #include "joystick.h"
@@ -303,6 +304,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
 
   periph_register_n( zxatasp_peripherals, zxatasp_peripherals_count );
   periph_register_n( zxcf_peripherals, zxcf_peripherals_count );
+  periph_register_n( divide_peripherals, divide_peripherals_count );
 
   periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
 
