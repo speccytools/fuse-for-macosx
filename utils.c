@@ -50,6 +50,7 @@
 #include <libspectrum.h>
 
 #include "dck.h"
+#include "divide.h"
 #include "fuse.h"
 #include "if1.h"
 #include "if2.h"
@@ -164,6 +165,7 @@ utils_open_file( const char *filename, int autoload,
   case LIBSPECTRUM_CLASS_HARDDISK:
     if( !settings_current.simpleide_active &&
 	!settings_current.zxatasp_active   &&
+	!settings_current.divide_enabled   &&
 	!settings_current.zxcf_active         ) {
       settings_current.zxcf_active = 1;
       periph_update();
@@ -173,8 +175,10 @@ utils_open_file( const char *filename, int autoload,
       error = zxcf_insert( filename );
     } else if( settings_current.zxatasp_active ) {
       error = zxatasp_insert( filename, LIBSPECTRUM_IDE_MASTER );
-    } else {
+    } else if( settings_current.simpleide_active ) {
       error = simpleide_insert( filename, LIBSPECTRUM_IDE_MASTER );
+    } else {
+      error = divide_insert( filename, LIBSPECTRUM_IDE_MASTER );
     }
     if( error ) return error;
     

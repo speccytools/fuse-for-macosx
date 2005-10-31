@@ -267,5 +267,15 @@ Media/IDE/ZXCF CompactFlash/_Insert..., Item,, menu_media_ide_insert, 5
 Media/IDE/ZXCF CompactFlash/_Commit, Item,, menu_media_ide_commit, 5
 Media/IDE/ZXCF CompactFlash/_Eject, Item,, menu_media_ide_eject, 5
 
+Media/IDE/_DivIDE, Branch
+Media/IDE/DivIDE/_Master, Branch
+Media/IDE/DivIDE/Master/_Insert..., Item,, menu_media_ide_insert, 6
+Media/IDE/DivIDE/Master/_Commit, Item,, menu_media_ide_commit, 6
+Media/IDE/DivIDE/Master/_Eject, Item,, menu_media_ide_eject, 6
+Media/IDE/DivIDE/_Slave, Branch
+Media/IDE/DivIDE/Slave/_Insert..., Item,, menu_media_ide_insert, 7
+Media/IDE/DivIDE/Slave/_Commit, Item,, menu_media_ide_commit, 7
+Media/IDE/DivIDE/Slave/_Eject, Item,, menu_media_ide_eject, 7
+
 _Help, Branch
 Help/_Keyboard..., Item

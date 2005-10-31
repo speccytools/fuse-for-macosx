@@ -333,6 +333,16 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/IDE/ZXCF CompactFlash/Commit",
     "/Media/IDE/ZXCF CompactFlash/Eject", 0 },
 
+  { UI_MENU_ITEM_MEDIA_IDE_DIVIDE, "/Media/IDE/DivIDE" },
+
+  { UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT,
+    "/Media/IDE/DivIDE/Master/Commit",
+    "/Media/IDE/DivIDE/Master/Eject", 0 },
+
+  { UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT,
+    "/Media/IDE/DivIDE/Slave/Commit",
+    "/Media/IDE/DivIDE/Slave/Eject", 0 },
+
   { UI_MENU_ITEM_RECORDING,
     "/File/Recording/Stop", 
     "/File/Recording/Record...", 1,

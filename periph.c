@@ -351,18 +351,20 @@ update_cartridge_menu( void )
 static void
 update_ide_menu( void )
 {
-  int ide, simpleide, zxatasp, zxcf;
+  int ide, simpleide, zxatasp, zxcf, divide;
 
   simpleide = settings_current.simpleide_active;
   zxatasp = settings_current.zxatasp_active;
   zxcf = settings_current.zxcf_active;
+  divide = settings_current.divide_enabled;
 
-  ide = simpleide || zxatasp || zxcf;
+  ide = simpleide || zxatasp || zxcf || divide;
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE, ide );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT, simpleide );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP, zxatasp );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF, zxcf );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE, divide );
 }
 
 void

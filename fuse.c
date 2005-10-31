@@ -47,6 +47,7 @@
 #include "dck.h"
 #include "debugger/debugger.h"
 #include "display.h"
+#include "divide.h"
 #include "event.h"
 #include "fuse.h"
 #include "if1.h"
@@ -118,6 +119,7 @@ typedef struct start_files_t {
   const char *simpleide_master, *simpleide_slave;
   const char *zxatasp_master, *zxatasp_slave;
   const char *zxcf;
+  const char *divide_master, *divide_slave;
 
 } start_files_t;
 
@@ -235,6 +237,7 @@ static int fuse_init(int argc, char **argv)
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
   if( if1_init() ) return 1;
+  if( divide_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 
@@ -504,6 +507,9 @@ setup_start_files( start_files_t *start_files )
 
   start_files->zxcf = settings_current.zxcf_pri_file;
 
+  start_files->divide_master = settings_current.divide_master_file;
+  start_files->divide_slave  = settings_current.divide_slave_file;
+
   return 0;
 }
 
@@ -545,6 +551,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 	start_files->zxatasp_master = filename;
       } else if( settings_current.simpleide_active ) {
 	start_files->simpleide_master = filename;
+      } else if( settings_current.divide_enabled ) {
+	start_files->divide_master = filename;
       } else {
 	/* No IDE interface active, so activate the ZXCF */
 	settings_current.zxcf_active = 1;
@@ -697,6 +705,18 @@ do_start_files( start_files_t *start_files )
     error = zxcf_insert( start_files->zxcf ); if( error ) return error;
   }
 
+  if( start_files->divide_master ) {
+    error = divide_insert( start_files->divide_master,
+			    LIBSPECTRUM_IDE_MASTER );
+    if( error ) return error;
+  }
+
+  if( start_files->divide_slave ) {
+    error = divide_insert( start_files->divide_slave,
+			    LIBSPECTRUM_IDE_SLAVE );
+    if( error ) return error;
+  }
+
   /* Input recordings */
 
   if( start_files->playback ) {
@@ -726,6 +746,7 @@ static int fuse_end(void)
   simpleide_end();
   zxatasp_end();
   zxcf_end();
+  divide_end();
 
   machine_end();
 

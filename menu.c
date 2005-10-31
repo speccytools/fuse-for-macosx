@@ -533,6 +533,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
   case 3: zxatasp_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
   case 4: zxatasp_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
   case 5: zxcf_insert( filename ); break;
+  case 6: divide_insert( filename, LIBSPECTRUM_IDE_MASTER ); break;
+  case 7: divide_insert( filename, LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
   free( filename );
@@ -550,6 +552,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_commit )
   case 3: zxatasp_commit( LIBSPECTRUM_IDE_MASTER ); break;
   case 4: zxatasp_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
   case 5: zxcf_commit(); break;
+  case 6: divide_commit( LIBSPECTRUM_IDE_MASTER ); break;
+  case 7: divide_commit( LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
   fuse_emulation_unpause();
@@ -567,6 +571,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_eject )
   case 3: zxatasp_eject( LIBSPECTRUM_IDE_MASTER ); break;
   case 4: zxatasp_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
   case 5: zxcf_eject(); break;
+  case 6: divide_eject( LIBSPECTRUM_IDE_MASTER ); break;
+  case 7: divide_eject( LIBSPECTRUM_IDE_SLAVE  ); break;
   }
 
   fuse_emulation_unpause();
@@ -658,6 +664,16 @@ menu_check_media_changed( void )
 
   if( settings_current.zxcf_pri_file ) {
     confirm = zxcf_eject(); if( confirm ) return 1;
+  }
+
+  if( settings_current.divide_master_file ) {
+    confirm = divide_eject( LIBSPECTRUM_IDE_MASTER );
+    if( confirm ) return 1;
+  }
+
+  if( settings_current.divide_slave_file ) {
+    confirm = divide_eject( LIBSPECTRUM_IDE_SLAVE );
+    if( confirm ) return 1;
   }
 
   return 0;
