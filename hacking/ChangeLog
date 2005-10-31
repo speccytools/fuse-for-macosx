@@ -1347,3 +1347,10 @@
 20051027 snapshot.c: make default snapshot format .szx (Fred).
 20051027 display.c: make border changes only apply to the correct mode (e.g.
          loading a tape in hires mode should not show border stripes) (Fred).
+20051029 Makefile.am,divide.[ch],machine.c,memory.c,menu.[ch],periph.c,
+         settings.dat,ui/options.dat,z80/{coretest.c,z80_ops.c}: initial
+         DivIDE implementation (Matthew Westcott).
+20051029 divide.h: fix typo in comment.
+20051031 divide.[ch],fuse.c,menu.c,menu_data.c,periph.c,settings.dat,ui.c,
+	 utils.c: Improved DivIDE emulation: actual connection to IDE
+	 devices (Matthew Westcott).
