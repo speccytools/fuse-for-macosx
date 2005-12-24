@@ -1355,3 +1355,5 @@
 	 utils.c: Improved DivIDE emulation: actual connection to IDE
 	 devices (Matthew Westcott).
 20051224 z80/coretest.c: remove unused variable (Markus Oberhumer).
+20051224 autogen.sh: add --automake to libtoolize invocation (Markus
+         Oberhumer). Remove --copy from automake invocation.

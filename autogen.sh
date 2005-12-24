@@ -29,7 +29,7 @@ set -e
 
 aclocal
 # Mac OS X: Use glibtoolize instead
-libtoolize
+libtoolize --automake
 autoheader
-automake --add-missing --copy
+automake --add-missing
 autoconf
