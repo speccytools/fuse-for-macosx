@@ -1354,3 +1354,4 @@
 20051031 divide.[ch],fuse.c,menu.c,menu_data.c,periph.c,settings.dat,ui.c,
 	 utils.c: Improved DivIDE emulation: actual connection to IDE
 	 devices (Matthew Westcott).
+20051224 z80/coretest.c: remove unused variable (Markus Oberhumer).

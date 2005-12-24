@@ -412,8 +412,6 @@ event_add( libspectrum_dword event_time, int type )
 fuse_machine_info *machine_current;
 static fuse_machine_info dummy_machine;
 
-const int LIBSPECTRUM_MACHINE_CAPABILITY_EVEN_M1 = 1;
-
 settings_info settings_current;
 
 /* Initialise the dummy variables such that we're running on a clean a
