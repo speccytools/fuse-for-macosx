@@ -1357,3 +1357,5 @@
 20051224 z80/coretest.c: remove unused variable (Markus Oberhumer).
 20051224 autogen.sh: add --automake to libtoolize invocation (Markus
          Oberhumer). Remove --copy from automake invocation.
+20060514 widgets/menu.c: allow 'File/Movies/Stop movie recording' to work
+	 under the widget UIs (part of bug #1439280) (Gergely Szasz).

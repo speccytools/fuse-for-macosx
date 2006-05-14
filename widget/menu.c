@@ -244,6 +244,7 @@ menu_file_movies_recordmovieasscr( int action )
 {
   widget_end_all( WIDGET_FINISHED_OK );
   screenshot_movie_record = 1;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
 }
 
 #ifdef USE_LIBPNG
@@ -274,6 +275,7 @@ menu_file_movies_recordmovieaspng( int action )
   
   screenshot_movie_scaler = scaler;
   screenshot_movie_record = 2;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
 }
 #endif			/* #ifdef USE_LIBPNG */
 
