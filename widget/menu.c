@@ -1,5 +1,5 @@
 /* menu.c: general menu widget
-   Copyright (c) 2001-2005 Philip Kendall
+   Copyright (c) 2001-2006 Philip Kendall
 
    $Id$
 
@@ -239,12 +239,26 @@ menu_file_savescreenasscr( int action )
     screenshot_scr_write( widget_filesel_name );
 }
 
+static void
+record_movie( int type, const char *title )
+{
+  widget_filesel_data data;
+
+  widget_end_all( WIDGET_FINISHED_OK );
+  data.exit_all_widgets = 1;
+  data.title = title;
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  if( widget_filesel_name ) {
+    screenshot_movie_record = type;
+    snprintf( screenshot_movie_file, 192, "%s", widget_filesel_name );
+    ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
+  }
+}
+
 void
 menu_file_movies_recordmovieasscr( int action )
 {
-  widget_end_all( WIDGET_FINISHED_OK );
-  screenshot_movie_record = 1;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
+  record_movie( 1, "Fuse - Record Movie as SCR" );
 }
 
 #ifdef USE_LIBPNG
@@ -268,14 +282,10 @@ menu_file_savescreenaspng( int action )
 void
 menu_file_movies_recordmovieaspng( int action )
 {
-  scaler_type scaler;
+  screenshot_movie_scaler = menu_get_scaler( screenshot_available_scalers );
+  if( screenshot_movie_scaler == SCALER_NUM ) return;
 
-  scaler = menu_get_scaler( screenshot_available_scalers );
-  if( scaler == SCALER_NUM ) return;
-  
-  screenshot_movie_scaler = scaler;
-  screenshot_movie_record = 2;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
+  record_movie( 2, "Fuse - Record Movie as PNG" );
 }
 #endif			/* #ifdef USE_LIBPNG */
 

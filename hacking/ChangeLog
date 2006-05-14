@@ -1359,3 +1359,6 @@
          Oberhumer). Remove --copy from automake invocation.
 20060514 widgets/menu.c: allow 'File/Movies/Stop movie recording' to work
 	 under the widget UIs (part of bug #1439280) (Gergely Szasz).
+20060514 screenshot.c,widgets/menu.c: allow selection of a filename for
+	 movie recording under the widget UIs (more of patch #1439280) (Gergely
+	 Szasz).
