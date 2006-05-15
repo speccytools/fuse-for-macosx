@@ -54,6 +54,7 @@ ptrdiff_t display_pitch = DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 /* The current border colour */
 libspectrum_byte display_lores_border;
 libspectrum_byte display_hires_border;
+libspectrum_byte display_last_border;
 
 /* The border colour displayed on every line if it is homogeneous,
    or display_border_mixed (see below) if it's not */
@@ -215,6 +216,8 @@ display_init( int *argc, char ***argv )
 
   border_changes = NULL;
   error = add_border_sentinel(); if( error ) return error;
+  display_last_border = scld_last_dec.name.hires ?
+                            display_hires_border : display_lores_border;
 
   return 0;
 }
@@ -814,14 +817,28 @@ push_border_change( int colour )
   border_changes = g_slist_append( border_changes, change );
 }
 
+/* Change border colour if the colour in use changes */
+static void
+check_border_change()
+{
+  if( scld_last_dec.name.hires &&
+      display_hires_border != display_last_border ) {
+	push_border_change( display_hires_border );
+	display_last_border = display_hires_border;
+  } else if( !scld_last_dec.name.hires &&
+             display_lores_border != display_last_border ) {
+	push_border_change( display_lores_border );
+	display_last_border = display_lores_border;
+  }
+}
+
 void
 display_set_lores_border( int colour )
 {
   if( display_lores_border != colour ) {
     display_lores_border = colour;
-    if( !scld_last_dec.name.hires )
-      push_border_change( colour );
   }
+  check_border_change();
 }
 
 void
@@ -829,9 +846,8 @@ display_set_hires_border( int colour )
 {
   if( display_hires_border != colour ) {
     display_hires_border = colour;
-    if( scld_last_dec.name.hires )
-      push_border_change( colour );
   }
+  check_border_change();
 }
 
 static void
@@ -983,7 +999,7 @@ update_ui_screen( void )
       for( i = 0, ptr = inactive_rectangle;
 	   i < inactive_rectangle_count;
 	   i++, ptr++ ) {
-	uidisplay_area( 8 * scale * ptr->x, scale * ptr->y,
+            uidisplay_area( 8 * scale * ptr->x, scale * ptr->y,
 			8 * scale * ptr->w, scale * ptr->h );
       }
     }
@@ -1069,7 +1085,7 @@ static void display_dirty_flashing(void)
     } else { /* Standard Speccy screen */
 
       for( offset = 0x1800; offset < 0x1b00; offset++ ) {
-	attr = screen[ offset ];
+        attr = screen[ offset ];
         if( attr & 0x80 ) display_dirty64( offset );
       }
 

@@ -1362,3 +1362,4 @@
 20060514 screenshot.c,widgets/menu.c: allow selection of a filename for
 	 movie recording under the widget UIs (more of patch #1439280) (Gergely
 	 Szasz).
+20060515 display.c: Restore hires/standard mixed mode support in borders (Fred).
