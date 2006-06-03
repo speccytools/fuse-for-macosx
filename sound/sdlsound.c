@@ -166,6 +166,8 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   while( len ) {
     if( ( i = sfifo_write( &sound_fifo, bytes, len ) ) < 0 ) {
       break;
+    } else if (!i) {
+      SDL_Delay(10);
     }
     bytes += i;
     len -= i;

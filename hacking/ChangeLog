@@ -1363,3 +1363,6 @@
 	 movie recording under the widget UIs (more of patch #1439280) (Gergely
 	 Szasz).
 20060515 display.c: Restore hires/standard mixed mode support in borders (Fred).
+20060603 sound/sdlsound.c: Add 10ms delay if SDL sound fifo is full (meaning
+         we already have a frame worth of sound information built up) to ease
+         up on CPU usage (Fred).
