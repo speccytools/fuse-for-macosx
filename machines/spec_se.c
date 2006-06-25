@@ -58,6 +58,8 @@ static libspectrum_byte spec_se_contend_delay( libspectrum_dword time );
 static int dock_exrom_reset( void );
 static int spec_se_reset( void );
 static int spec_se_memory_map( void );
+static void spec_se_memoryport_write( libspectrum_word port,
+                                      libspectrum_byte b );
 
 const static periph_t peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
@@ -70,7 +72,7 @@ const static periph_t peripherals[] = {
   { 0xffff, 0xfffd, ay_registerport_read, ay_registerport_write },
   { 0xffff, 0xbffd, NULL, ay_dataport_write },
 
-  { 0xffff, 0x7ffd, NULL, spec128_memoryport_write },
+  { 0xffff, 0x7ffd, NULL, spec_se_memoryport_write },
 
   /* Lower 8 bits of Timex ports are fully decoded */
   { 0x00ff, 0x00fe, ula_read, ula_write },
@@ -281,3 +283,13 @@ spec_se_memory_map( void )
 
   return 0;
 }
+
+void
+spec_se_memoryport_write( libspectrum_word port GCC_UNUSED,
+			  libspectrum_byte b )
+{
+  machine_current->ram.last_byte = b;
+
+  machine_current->memory_map();
+}
+

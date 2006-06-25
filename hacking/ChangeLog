@@ -1366,3 +1366,4 @@
 20060603 sound/sdlsound.c: Add 10ms delay if SDL sound fifo is full (meaning
          we already have a frame worth of sound information built up) to ease
          up on CPU usage (Fred).
+20060625 machines/spec_se.c: SE does not have 128 style memory lockout (Fred).
