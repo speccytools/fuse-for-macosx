@@ -1367,3 +1367,5 @@
          we already have a frame worth of sound information built up) to ease
          up on CPU usage (Fred).
 20060625 machines/spec_se.c: SE does not have 128 style memory lockout (Fred).
+20060625 roms/se-0.rom: Change 3 bytes at 0x240 to XOR A, OUT (00), A instead
+         of XOR A, OUT (FF), A to properly reset the SCLD.
