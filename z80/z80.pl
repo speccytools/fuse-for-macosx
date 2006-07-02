@@ -562,9 +562,9 @@ EX
 	libspectrum_byte bytetempl, bytetemph;
 	bytetempl = readbyte( SP );
 	bytetemph = readbyte( SP + 1 ); contend_read( SP + 1, 1 );
-	writebyte( SP,     $low  );
 	writebyte( SP + 1, $high );
-	contend_write( SP + 1, 1 ); contend_write( SP + 1, 1 );
+	writebyte( SP,     $low  );
+	contend_write( SP, 1 ); contend_write( SP, 1 );
 	$low=bytetempl; $high=bytetemph;
       }
 EX

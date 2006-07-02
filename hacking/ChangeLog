@@ -1372,3 +1372,5 @@
 20060702 fuse.c: reset AY chip when starting sound (fixes bug #1515666).
 20060702 z80/z80.pl: get contention right for EX (SP),HL, EX (SP), IX and
 	 EX (SP),IY (thanks, Mark Woodmass).
+20060702 z80/z80.pl: swap order of writes in EX (SP),HL and friends (thanks,
+	 Mark Woodmass).
