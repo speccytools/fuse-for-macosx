@@ -3,7 +3,7 @@
 # z80.pl: generate C code for Z80 opcodes
 # $Id$
 
-# Copyright (c) 1999-2004 Philip Kendall
+# Copyright (c) 1999-2006 Philip Kendall
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -561,7 +561,7 @@ EX
       {
 	libspectrum_byte bytetempl, bytetemph;
 	bytetempl = readbyte( SP );
-	bytetemph = readbyte( SP + 1 ); tstates++;
+	bytetemph = readbyte( SP + 1 ); contend_read( SP + 1, 1 );
 	writebyte( SP,     $low  );
 	writebyte( SP + 1, $high );
 	contend_write( SP + 1, 1 ); contend_write( SP + 1, 1 );

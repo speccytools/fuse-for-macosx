@@ -1370,3 +1370,5 @@
 20060625 roms/se-0.rom: Change 3 bytes at 0x240 to XOR A, OUT (00), A instead
          of XOR A, OUT (FF), A to properly reset the SCLD.
 20060702 fuse.c: reset AY chip when starting sound (fixes bug #1515666).
+20060702 z80/z80.pl: get contention right for EX (SP),HL, EX (SP), IX and
+	 EX (SP),IY (thanks, Mark Woodmass).
