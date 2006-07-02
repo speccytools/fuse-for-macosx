@@ -460,10 +460,10 @@ int fuse_emulation_unpause(void)
   if( --fuse_emulation_paused ) return 0;
 
   /* If we now want sound, enable it */
-  if( sound_enabled_ever && settings_current.sound &&
-      settings_current.emulation_speed == 100 ) {
+  if( settings_current.sound && settings_current.emulation_speed == 100 ) {
 
     sound_init( settings_current.sound_device );
+    sound_ay_reset();
 
     /* If the sound code couldn't re-initialise, fall back to the
        signal based routines */
