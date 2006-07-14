@@ -313,8 +313,8 @@ sub otir_otdr ($) {
 	/* C,H and P/V flags not implemented */
 
 	if( B ) {
-	  contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
-	  contend_read( HL, 1 ); contend_read( HL, 1 );
+	  contend_read( BC, 1 ); contend_read( BC, 1 ); contend_read( BC, 1 );
+	  contend_read( BC, 1 ); contend_read( BC, 1 );
 	  PC -= 2;
 	}
       }
