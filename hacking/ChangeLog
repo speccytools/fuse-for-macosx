@@ -1374,3 +1374,8 @@
 	 EX (SP),IY (thanks, Mark Woodmass).
 20060702 z80/z80.pl: swap order of writes in EX (SP),HL and friends (thanks,
 	 Mark Woodmass).
+20060713 z80/tests/{e3.in,dde3.in,fde3.in}: update tests to match corrections
+	 to EX (SP),HL and friends.
+20060714 z80/coretest.c,z80/tests/{d{3,b},ed{4,5,6,7}{0,1,8,9},
+	 ed{a,b}{2,3,a,b}}.out: update IN and OUT tests so we actually
+	 pass our own test suite.

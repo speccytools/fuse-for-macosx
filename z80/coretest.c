@@ -147,19 +147,56 @@ contend_write( libspectrum_word address, libspectrum_dword time )
   tstates += time;
 }
 
+static void
+contend_port_preio( libspectrum_word port )
+{
+  if( ( port & 0xc000 ) == 0x4000 ) {
+    printf( "%5d PC %04x\n", tstates, port );
+  }
+
+  tstates++;
+}
+
+static void
+contend_port_postio( libspectrum_word port )
+{
+  if( port & 0x0001 ) {
+    
+    if( ( port & 0xc000 ) == 0x4000 ) {
+      printf( "%5d PC %04x\n", tstates, port ); tstates++;
+      printf( "%5d PC %04x\n", tstates, port ); tstates++;
+      printf( "%5d PC %04x\n", tstates, port ); tstates++;
+    } else {
+      tstates += 3;
+    }
+
+  } else {
+
+    printf( "%5d PC %04x\n", tstates, port ); tstates += 3;
+
+  }
+}
+
 libspectrum_byte
 readport( libspectrum_word port )
 {
-  /* For now, just return 0xff. May need to make this more complicated later */
+  contend_port_preio( port );
+
   printf( "%5d PR %04x %02x\n", tstates, port, 0xff );
+
+  contend_port_postio( port );
+
   return 0xff;
 }
 
 void
 writeport( libspectrum_word port, libspectrum_byte b )
 {
-  /* Don't need to do anything here */
+  contend_port_preio( port );
+
   printf( "%5d PW %04x %02x\n", tstates, port, b );
+
+  contend_port_postio( port );
 }
 
 static int
