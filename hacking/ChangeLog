@@ -1383,3 +1383,6 @@
 	 check for all four contention possibilities on IO.
 20060714 z80/z80.pl, z80/tests/edb{3,b}.out: get contention right for
 	 OTIR and OTDR (thanks, Mark Woodmass).
+20060715 fuse.[ch],settings.dat,tape.[ch],timer.c: implement fastloading
+	 (part of patch #1511906; also thanks to Gergely Szasz for patch
+	 #1291273).

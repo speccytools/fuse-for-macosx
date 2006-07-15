@@ -606,6 +606,9 @@ tape_play( int force )
 
   error = tape_next_edge( tstates ); if( error ) return error;
 
+  /* If we're fastloading, turn sound off */
+  if( settings_current.fastload ) fuse_sound_disable();
+
   return 0;
 }
 
@@ -620,10 +623,23 @@ int tape_toggle_play( void )
 
 int tape_stop( void )
 {
-  tape_playing = 0;
-  traps_suspended = 0;
-  ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
+  if( tape_playing ) {
+
+    tape_playing = 0;
+    traps_suspended = 0;
+    ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
+
+    /* If we were fastloading, sound was off, so turn it back on */
+    if( settings_current.fastload ) fuse_sound_enable();
+  }
+
   return 0;
+}
+
+int
+tape_is_playing( void )
+{
+  return tape_playing;
 }
 
 int
@@ -825,4 +841,3 @@ make_name( unsigned char *name, const unsigned char *data )
 
   *name = '\0';
 }
-

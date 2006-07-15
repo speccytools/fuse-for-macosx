@@ -428,6 +428,43 @@ static void fuse_show_help( void )
    "--version              Print version number and exit.\n\n" );
 }
 
+/* Start sound output */
+void
+fuse_sound_enable(void)
+{
+  /* No sound if fastloading in progress */
+  if( settings_current.fastload && tape_is_playing() ) return;
+
+  /* If we now want sound, enable it */
+  if( settings_current.sound && settings_current.emulation_speed == 100 ) {
+
+    sound_init( settings_current.sound_device );
+    sound_ay_reset();
+
+    /* If the sound code couldn't re-initialise, fall back to the
+       signal based routines */
+    if( !sound_enabled ) {
+      /* Increment pause_count, report, decrement pause_count
+       * (i.e. avoid the effects of fuse_emulation_{,un}pause).
+       * Otherwise, we may be recursively reporting this error. */
+      fuse_emulation_paused++;
+      fuse_emulation_paused--;
+      settings_current.sound = fuse_sound_in_use = 0;
+
+    }
+    fuse_sound_in_use = sound_enabled;
+  } else if( fuse_sound_in_use ) {
+    fuse_sound_in_use = 0;
+  }
+}
+
+/* Stop sound output */
+void
+fuse_sound_disable(void)
+{
+  if( sound_enabled ) sound_end();
+}
+
 /* Stop all activities associated with actual Spectrum emulation */
 int fuse_emulation_pause(void)
 {
@@ -458,28 +495,6 @@ int fuse_emulation_unpause(void)
   /* If this doesn't start us running again, just return. In any case,
      decrement the pause count */
   if( --fuse_emulation_paused ) return 0;
-
-  /* If we now want sound, enable it */
-  if( settings_current.sound && settings_current.emulation_speed == 100 ) {
-
-    sound_init( settings_current.sound_device );
-    sound_ay_reset();
-
-    /* If the sound code couldn't re-initialise, fall back to the
-       signal based routines */
-    if( !sound_enabled ) {
-      /* Increment pause_count, report, decrement pause_count
-       * (i.e. avoid the effects of fuse_emulation_{,un}pause).
-       * Otherwise, we may be recursively reporting this error. */
-      fuse_emulation_paused++;
-      fuse_emulation_paused--;
-      settings_current.sound = fuse_sound_in_use = 0;
-
-    }
-    fuse_sound_in_use = sound_enabled;
-  } else if( fuse_sound_in_use ) {
-    fuse_sound_in_use = 0;
-  }
 
   /* Restart speed estimation with no information */
   error = timer_estimate_reset(); if( error ) return error;

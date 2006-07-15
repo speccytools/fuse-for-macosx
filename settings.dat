@@ -39,6 +39,7 @@ joy_prompt, boolean, 0,, joystick-prompt
 joy_kempston, boolean, 0,, kempston
 kempston_mouse, boolean, 0
 tape_traps, boolean, 1,, traps, tapetraps
+fastload, boolean, 1
 auto_load, boolean, 1
 slt_traps, boolean, 1,, slt, slttraps
 double_screen, null, 0

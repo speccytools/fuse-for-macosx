@@ -36,6 +36,7 @@
 #include "sound.h"
 #include "timer.h"
 #include "ui/ui.h"
+#include "ula.h"
 
 /*
  * Routines for estimating emulation speed
@@ -283,33 +284,47 @@ timer_frame( libspectrum_dword last_tstates )
   if( sound_enabled )
     return timer_frame_callback_sound( last_tstates );
 
-  while( 1 ) {
+  /* If we're fastloading, just schedule another check in a frame's time
+     and do nothing else */
+  if( settings_current.fastload && tape_is_playing() ) {
 
-    error = timer_get_real_time( &current_time ); if( error ) return 1;
+    libspectrum_dword next_check_time =
+      last_tstates + machine_current->timings.tstates_per_frame;
 
-    difference = timer_get_time_difference( &current_time, &start_time );
+    if( event_add( next_check_time, EVENT_TYPE_TIMER ) )
+      return 1;
 
-    /* Sleep while we are still 10ms ahead */
-    if( difference < 0 ) {
-      timer_sleep_ms( TEN_MS );
-    } else {
-      break;
+  } else {
+
+    while( 1 ) {
+
+      error = timer_get_real_time( &current_time ); if( error ) return 1;
+      
+      difference = timer_get_time_difference( &current_time, &start_time );
+
+      /* Sleep while we are still 10ms ahead */
+      if( difference < 0 ) {
+	timer_sleep_ms( TEN_MS );
+      } else {
+	break;
+      }
+
     }
 
-  }
+    error = timer_get_real_time( &current_time ); if( error ) return 1;
+    
+    difference = timer_get_time_difference( &current_time, &start_time );
   
-  error = timer_get_real_time( &current_time ); if( error ) return 1;
+    tstates = ( ( difference + TEN_MS / 1000.0 ) *
+		machine_current->timings.processor_speed
+		) * speed + 0.5;
+  
+    if( event_add( last_tstates + tstates, EVENT_TYPE_TIMER ) ) return 1;
 
-  difference = timer_get_time_difference( &current_time, &start_time );
+    start_time = current_time;
+    timer_add_time_difference( &start_time, TEN_MS );
 
-  tstates = ( ( difference + TEN_MS / 1000.0 ) *
-              machine_current->timings.processor_speed
-	      ) * speed + 0.5;
-
-  if( event_add( last_tstates + tstates, EVENT_TYPE_TIMER ) ) return 1;
-
-  start_time = current_time;
-  timer_add_time_difference( &start_time, TEN_MS );
+  }
 
   return 0;
 }

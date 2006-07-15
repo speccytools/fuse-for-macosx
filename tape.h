@@ -52,6 +52,7 @@ int tape_toggle_play( void );
 int tape_next_edge( libspectrum_dword last_tstates );
 
 int tape_stop( void );
+int tape_is_playing( void );
 
 /* Call a user-supplied function for every block in the current tape */
 int
