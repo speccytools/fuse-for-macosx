@@ -40,7 +40,7 @@ size_t pokefinder_count;
 int
 pokefinder_clear( void )
 {
-  size_t page, offset;
+  size_t page;
 
   pokefinder_count = 0;
   for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; ++page )
