@@ -185,6 +185,16 @@ to disable). Same as the RZX Options dialog's
 option.
 .RE
 .PP
+.I "\-\-fastload"
+.RS
+Specify whether Fuse should run at the fastest possible speed when the
+virtual tape is playing. (Enabled by default, but you can use
+.RI ` \-\-no\-fastload'
+to disable). The same as the General Option dialog's
+.I "Fastloading"
+option.
+.RE
+.PP
 .I "\-f frequency"
 .br
 .I "\-\-sound\-freq frequency"
@@ -1037,6 +1047,14 @@ manually, by pressing
 or choosing the
 .I "Media, Tape, Play"
 menu item.
+.RE
+.PP
+.I "Fastloading"
+.RS
+If this option is enabled, then Fuse will run at the fastest possible
+speed when the virtual tape is playing, thus dramatically reducing the
+time it takes to load programs. You may wish to disable this option if
+you wish to stop the tape at a specific point.
 .RE
 .PP
 .I "Auto-load media"

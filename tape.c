@@ -43,6 +43,7 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
+#include "timer.h"
 #include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -629,8 +630,12 @@ int tape_stop( void )
     traps_suspended = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
 
-    /* If we were fastloading, sound was off, so turn it back on */
-    if( settings_current.fastload ) fuse_sound_enable();
+    /* If we were fastloading, sound was off, so turn it back on, and
+       reset the speed counter */
+    if( settings_current.fastload ) {
+      fuse_sound_enable();
+      timer_estimate_reset();
+    }
   }
 
   return 0;

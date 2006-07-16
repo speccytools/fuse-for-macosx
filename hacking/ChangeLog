@@ -1388,3 +1388,6 @@
 	 #1291273).
 20060716 timer.c: #include "ula.h"
 20060716 pokerfinder/pokefinder.c: remove unused variable.
+20060716 tape.c,man/fuse.1,ui/options.dat: reset speed estimate when
+	 fastloading finished. Add fastloading option to General Options
+	 dialog. Document fastloading.
