@@ -1386,3 +1386,4 @@
 20060715 fuse.[ch],settings.dat,tape.[ch],timer.c: implement fastloading
 	 (part of patch #1511906; also thanks to Gergely Szasz for patch
 	 #1291273).
+20060716 timer.c: #include "ula.h"

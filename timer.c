@@ -34,6 +34,7 @@
 #include "event.h"
 #include "settings.h"
 #include "sound.h"
+#include "tape.h"
 #include "timer.h"
 #include "ui/ui.h"
 #include "ula.h"
