@@ -250,7 +250,8 @@ record_movie( int type, const char *title )
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   if( widget_filesel_name ) {
     screenshot_movie_record = type;
-    snprintf( screenshot_movie_file, 192, "%s", widget_filesel_name );
+    snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
+              widget_filesel_name );
     ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
   }
 }

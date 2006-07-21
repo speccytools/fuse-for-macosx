@@ -1030,16 +1030,18 @@ display_frame( void )
 
   if( screenshot_movie_record == 1 ) {
 
-    snprintf( screenshot_movie_name, 256, "%s-frame-%09ld.scr",
-	      screenshot_movie_file, screenshot_movie_frame++ );
+    snprintf( screenshot_movie_name, SCREENSHOT_MOVIE_FILE_MAX,
+              "%s-frame-%09ld.scr", screenshot_movie_file,
+              screenshot_movie_frame++ );
     screenshot_scr_write( screenshot_movie_name );
 
 #ifdef USE_LIBPNG
 
   } else if( screenshot_movie_record == 2 ) {
 
-    snprintf( screenshot_movie_name, 256, "%s-frame-%09ld.png",
-	      screenshot_movie_file, screenshot_movie_frame++ );
+    snprintf( screenshot_movie_name, SCREENSHOT_MOVIE_FILE_MAX,
+              "%s-frame-%09ld.scr", screenshot_movie_file,
+              screenshot_movie_frame++ );
     screenshot_save();
     screenshot_write_fast( screenshot_movie_name, screenshot_movie_scaler );
 

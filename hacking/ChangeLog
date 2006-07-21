@@ -1391,3 +1391,5 @@
 20060716 tape.c,man/fuse.1,ui/options.dat: reset speed estimate when
 	 fastloading finished. Add fastloading option to General Options
 	 dialog. Document fastloading.
+20060721 display.c,screenshot.c,screenshot.h,ui/gtk/gtkui.c,widget/menu.c:
+         Allow movie paths to be up to PATH_MAX (Fred).

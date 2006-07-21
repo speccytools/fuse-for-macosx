@@ -49,4 +49,6 @@ extern long int screenshot_movie_frame;
 extern int screenshot_movie_record;
 extern scaler_type screenshot_movie_scaler;
 
+#define SCREENSHOT_MOVIE_FILE_MAX 256
+
 #endif				/* #ifndef FUSE_SCREENSHOT_H */

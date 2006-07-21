@@ -475,7 +475,7 @@ menu_file_movies_recordmovieasscr( GtkWidget *widget GCC_UNUSED,
   filename = menu_get_filename( "Fuse - Record Movie as SCR" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  snprintf( screenshot_movie_file, 192, "%s", filename );
+  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s", filename );
 
   screenshot_movie_record = 1;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
@@ -530,7 +530,7 @@ menu_file_movies_recordmovieaspng( GtkWidget *widget GCC_UNUSED,
   filename = menu_get_filename( "Fuse - Record Movie as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  snprintf( screenshot_movie_file, 192, "%s", filename );
+  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s", filename );
 
   screenshot_movie_record = 2;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
