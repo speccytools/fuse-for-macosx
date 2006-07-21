@@ -14,7 +14,7 @@ Checkbox, Raw RS-2(3)2, raw_rs232, INPUT_KEY_3
 Checkbox, Raw Sinclair(N)ET, raw_s_net, INPUT_KEY_n
 Checkbox, Black and white T(V), bw_tv, INPUT_KEY_v
 #ifdef UI_SDL
-Checkbox, Full (s)creen, full_screen, INPUT_KEY_f
+Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
 #endif
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
