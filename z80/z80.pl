@@ -1176,9 +1176,10 @@ if( $data_file eq 'opcodes_ddfd.dat' ) {
     print << "CODE";
     default:		/* Instruction did not involve H or L, so backtrack
 			   one instruction and parse again */
-      PC--;		/* FIXME: will be contended again */
-      R--;		/* Decrement the R register as well */
-      break;
+      PC--;
+      R--;
+      opcode = opcode2;
+      goto end_opcode;
 CODE
 
 } elsif( $data_file eq 'opcodes_ed.dat' ) {

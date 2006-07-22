@@ -1394,3 +1394,5 @@
 20060721 display.c,screenshot.c,screenshot.h,ui/gtk/gtkui.c,widget/menu.c:
          Allow movie paths to be up to PATH_MAX (Fred).
 20060721 ui/options.dat: Stop key binding clash over f in SDL ui (Fred).
+20060722 z80/z80.pl,z80/tests/{README,dd00.{in,out},ddfd00.{in,out}}: fix
+	 timings of "extended NOP" opcodes (partial fix for bug #1526868)
