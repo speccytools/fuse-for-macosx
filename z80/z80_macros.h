@@ -170,7 +170,6 @@ void contend_write( libspectrum_word address, libspectrum_dword time );
   libspectrum_byte lookup = ( (  (value1) & 0x0800 ) >> 11 ) | \
 			    ( (  (value2) & 0x0800 ) >> 10 ) | \
 			    ( ( add16temp & 0x0800 ) >>  9 );  \
-  tstates += 7;\
   (value1) = add16temp;\
   F = ( F & ( FLAG_V | FLAG_Z | FLAG_S ) ) |\
     ( add16temp & 0x10000 ? FLAG_C : 0 )|\

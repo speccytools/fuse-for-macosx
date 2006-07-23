@@ -1396,3 +1396,5 @@
 20060721 ui/options.dat: Stop key binding clash over f in SDL ui (Fred).
 20060722 z80/z80.pl,z80/tests/{README,dd00.{in,out},ddfd00.{in,out}}: fix
 	 timings of "extended NOP" opcodes (partial fix for bug #1526868)
+20060723 z80/{z80.pl,z80_macros.h}: move tstate addition out of ADD16 macro
+	 for consistency with ADC16 and SBC16.

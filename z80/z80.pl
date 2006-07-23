@@ -78,7 +78,7 @@ CODE
 CODE
 	}
     } elsif( $opcode eq 'ADD' ) {
-	print "      ${opcode}16($arg1,$arg2);\n";
+	print "      tstates += 7;\n      ${opcode}16($arg1,$arg2);\n";
     } elsif( $arg1 eq 'HL' and length $arg2 == 2 ) {
 	print "      tstates += 7;\n      ${opcode}16($arg2);\n";
     }
