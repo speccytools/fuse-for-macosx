@@ -52,7 +52,7 @@ int
 ts2068_init( fuse_machine_info *machine )
 {
   machine->machine = LIBSPECTRUM_MACHINE_TS2068;
-  machine->id = "TS2068";
+  machine->id = "ts2068";
 
   machine->reset = ts2068_reset;
 

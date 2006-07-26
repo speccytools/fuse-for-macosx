@@ -1398,3 +1398,5 @@
 	 timings of "extended NOP" opcodes (partial fix for bug #1526868)
 20060723 z80/{z80.pl,z80_macros.h}: move tstate addition out of ADD16 macro
 	 for consistency with ADC16 and SBC16.
+20060726 machines/ts2068.c: change TS2068 machine id to match tape loading snap
+         name (fixes bug #1526688; thanks Phil!) (Fred).
