@@ -1400,3 +1400,4 @@
 	 for consistency with ADC16 and SBC16.
 20060726 machines/ts2068.c: change TS2068 machine id to match tape loading snap
          name (fixes bug #1526688; thanks Phil!) (Fred).
+20060729 fuse.c: reenable sound in fuse_emulation_unpause (Fred).

@@ -499,6 +499,8 @@ int fuse_emulation_unpause(void)
   /* Restart speed estimation with no information */
   error = timer_estimate_reset(); if( error ) return error;
 
+  fuse_sound_enable();
+
   return 0;
 }
 
