@@ -67,6 +67,7 @@ fuse_SOURCES = ay.c \
 	joystick.c \
 	kempmouse.c \
 	keyboard.c \
+	loader.c \
 	machine.c \
 	memory.c \
 	menu.c \
@@ -140,6 +141,7 @@ noinst_HEADERS = ay.h \
 	input.h \
 	keyboard.h \
 	kempmouse.h \
+	loader.h \
 	machine.h \
 	memory.h \
 	menu.h \

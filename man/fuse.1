@@ -168,6 +168,17 @@ the same as the General Options dialog's
 option.
 .RE
 .PP
+.I "\-\-detect\-loader"
+.RS
+Specify whether Fuse should attempt to detect when the tape is being
+accessed and start and stop the virtual tape playing
+automatically. (Enabled by default, but you can use
+.RI ` \-\-no\-detect\-loader'
+to disable). Same as the General Option dialog's
+.I "Detect loaders"
+option.
+.RE
+.PP
 .I "\-\-dock file"
 .RS
 Insert the specified file into the emulated Timex TC2068 dock; also select
@@ -1055,6 +1066,15 @@ If this option is enabled, then Fuse will run at the fastest possible
 speed when the virtual tape is playing, thus dramatically reducing the
 time it takes to load programs. You may wish to disable this option if
 you wish to stop the tape at a specific point.
+.RE
+.PP
+.I "Detect loaders"
+.RS
+If this option is enabled, Fuse will attempt to detect when a loading
+routine is in progress, and then automatically start the virtual tape
+to load the program in. This is done by using a heuristic to identify
+a loading routine, so is by no means infalliable, but works in most
+cases.
 .RE
 .PP
 .I "Auto-load media"

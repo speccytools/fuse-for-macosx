@@ -29,11 +29,12 @@
 #include <libspectrum.h>
 
 #include "compat.h"
-#include "display.h"
 #include "keyboard.h"
+#include "loader.h"
 #include "machine.h"
 #include "settings.h"
 #include "sound.h"
+#include "spectrum.h"
 #include "tape.h"
 
 static libspectrum_byte last_byte;
@@ -44,6 +45,8 @@ libspectrum_byte
 ula_read( libspectrum_word port, int *attached )
 {
   *attached = 1;
+
+  loader_detect_loader();
 
   return ( keyboard_read( port >> 8 ) ^ ( tape_microphone ? 0x40 : 0x00 ) );
 }

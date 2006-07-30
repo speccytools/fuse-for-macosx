@@ -1408,3 +1408,7 @@
 20060730 z80/tests/{[0123][39b],10,[cdef][08]_[12],[cdef]5,[cdef][7f],f9,
 	 [df]d{[0123]9,2[3b],e5,f9},ed{[4567][2a],[45][7f],[ab][23ab]}}.
 	 {in,out}: update tests for IR contention.
+20060730 Makefile.am,loader.[ch],menu.c,settings.dat,spectrum.c,tape.[ch],
+	 ula.c,lib/{un,}compressed/tape_{16,48,128,plus2,pentagon,scorpion,
+	 2048,ts2068}.szx,ui/options.dat: loader detection (patch
+	 #1511906).

@@ -32,6 +32,7 @@
 #include "display.h"
 #include "event.h"
 #include "keyboard.h"
+#include "loader.h"
 #include "machine.h"
 #include "memory.h"
 #include "printer.h"
@@ -89,6 +90,8 @@ spectrum_frame( void )
     if( event_add( machine_current->timings.tstates_per_frame,
 		   EVENT_TYPE_FRAME ) ) return 1;
   }
+
+  loader_frame( frame_length );
 
   return 0;
 }

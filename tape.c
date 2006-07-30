@@ -35,6 +35,7 @@
 
 #include "event.h"
 #include "fuse.h"
+#include "loader.h"
 #include "machine.h"
 #include "memory.h"
 #include "scld.h"
@@ -57,7 +58,10 @@ static libspectrum_tape *tape;
 int tape_modified;
 
 /* Is the emulated tape deck playing? */
-static int tape_playing, traps_suspended;
+static int tape_playing;
+
+/* Was the tape playing started automatically? */
+static int tape_autoplay;
 
 /* Is there a high input to the EAR socket? */
 int tape_microphone;
@@ -66,7 +70,7 @@ int tape_microphone;
 
 static int tape_autoload( libspectrum_machine hardware );
 static int trap_load_block( libspectrum_tape_block *block );
-static int tape_play( int force );
+static int tape_play( int autoplay );
 static int trap_check_rom( void );
 static void make_name( unsigned char *name, const unsigned char *data );
 
@@ -85,7 +89,6 @@ int tape_init( void )
      so we can't update the statusbar */
   tape_playing = 0;
   tape_microphone = 0;
-  traps_suspended = 0;
   if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
   return 0;
 }
@@ -293,12 +296,6 @@ int tape_write( const char* filename )
 
 }
 
-static int
-traps_active( void )
-{
-  return settings_current.tape_traps && !traps_suspended;
-}
-
 /* Load the next tape block into memory; returns 0 if a block was
    loaded (even if it had an tape loading error or equivalent) or
    non-zero if there was an error at the emulator level, or tape traps
@@ -309,7 +306,7 @@ int tape_load_trap( void )
   int error;
 
   /* Do nothing if tape traps aren't active, or the tape is already playing */
-  if( !traps_active() || tape_playing ) return 2;
+  if( !settings_current.tape_traps || tape_playing ) return 2;
 
   /* Do nothing if we're not in the correct ROM */
   if( ! trap_check_rom() ) return 3;
@@ -319,13 +316,16 @@ int tape_load_trap( void )
 
   block = libspectrum_tape_current_block( tape );
 
-  /* If this block isn't a ROM loader, start it playing
-     Then return with `error' so that we actually do whichever instruction
-     it was that caused the trap to hit */
+  /* If this block isn't a ROM loader, start the block playing. After
+     that, return with `error' so that we actually do whichever
+     instruction it was that caused the trap to hit */
   if( libspectrum_tape_block_type( block ) != LIBSPECTRUM_TAPE_BLOCK_ROM ) {
 
-    error = tape_play( 0 );
-    if( error ) return 3;
+    error = tape_play( 1 );
+    /* If there wasn't an error and the tape isn't playing, that means
+       that it was a zero-length block (eg a comment), so try running the
+       trap again */
+    if( !error && !tape_playing ) return tape_load_trap();
 
     return -1;
   }
@@ -359,14 +359,7 @@ int tape_load_trap( void )
      next thing to occur is the pause at the end of the current block */
   libspectrum_tape_block_set_state( block, LIBSPECTRUM_TAPE_STATE_PAUSE );
 
-  /* And start the tape playing */
-  error = tape_play( 0 );
-  /* On error, still return without error as we did sucessfully do
-     the tape trap, and so don't want to do the trigger instruction */
-  if( error ) return 0;
-
   return 0;
-
 }
 
 static int
@@ -475,7 +468,7 @@ int tape_save_trap( void )
   int i; libspectrum_error error;
 
   /* Do nothing if tape traps aren't active */
-  if( !traps_active() ) return 2;
+  if( !settings_current.tape_traps ) return 2;
 
   /* Check we're in the right ROM */
   if( ! trap_check_rom() ) return 3;
@@ -574,7 +567,7 @@ trap_check_rom( void )
 }
 
 static int
-tape_play( int force )
+tape_play( int autoplay )
 {
   libspectrum_tape_block* block;
 
@@ -584,19 +577,10 @@ tape_play( int force )
   
   block = libspectrum_tape_current_block( tape );
 
-  /* If tape traps are active and the current block is a ROM block, do
-     nothing, _unless_ the ROM block has already reached the pause at
-     its end which (hopefully) means we're in the magic state involving
-     starting slow loading whilst tape traps are active */
-  if( !force && traps_active() &&
-      libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM &&
-      libspectrum_tape_block_state( block ) != LIBSPECTRUM_TAPE_STATE_PAUSE )
-    return 0;
-
   /* Otherwise, start the tape going */
   tape_playing = 1;
+  tape_autoplay = autoplay;
   tape_microphone = 0;
-  if( force ) traps_suspended = 1;
 
   /* Update the status bar */
   ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_ACTIVE );
@@ -610,15 +594,27 @@ tape_play( int force )
   /* If we're fastloading, turn sound off */
   if( settings_current.fastload ) fuse_sound_disable();
 
+  loader_tape_play();
+
   return 0;
 }
 
-int tape_toggle_play( void )
+int
+tape_do_play( int autoplay )
+{
+  if( !tape_playing ) {
+    return tape_play( autoplay );
+  } else {
+    return 0;
+  }
+}
+
+int tape_toggle_play( int autoplay )
 {
   if( tape_playing ) {
     return tape_stop();
   } else {
-    return tape_play( 1 );
+    return tape_play( autoplay );
   }
 }
 
@@ -627,8 +623,8 @@ int tape_stop( void )
   if( tape_playing ) {
 
     tape_playing = 0;
-    traps_suspended = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_INACTIVE );
+    loader_tape_stop();
 
     /* If we were fastloading, sound was off, so turn it back on, and
        reset the speed counter */
@@ -636,6 +632,8 @@ int tape_stop( void )
       fuse_sound_enable();
       timer_estimate_reset();
     }
+
+    event_remove_type( EVENT_TYPE_EDGE );
   }
 
   return 0;
@@ -692,10 +690,11 @@ tape_next_edge( libspectrum_dword last_tstates )
 
     ui_tape_browser_update( UI_TAPE_BROWSER_SELECT_BLOCK, NULL );
 
-    /* If tape traps are active _and_ the new block is a ROM loader,
-     return without putting another event into the queue */
+    /* If the tape was started automatically, tape traps are active
+       and the new block is a ROM loader, stop the tape and return
+       without putting another event into the queue */
     block = libspectrum_tape_current_block( tape );
-    if( traps_active() &&
+    if( tape_autoplay && settings_current.tape_traps &&
 	libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
       ) {
       error = tape_stop(); if( error ) return error;

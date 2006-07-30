@@ -311,7 +311,7 @@ MENU_CALLBACK( menu_media_tape_open )
 MENU_CALLBACK( menu_media_tape_play )
 {
   WIDGET_END;
-  tape_toggle_play();
+  tape_toggle_play( 0 );
 }
 
 MENU_CALLBACK( menu_media_tape_rewind )

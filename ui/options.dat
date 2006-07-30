@@ -5,6 +5,7 @@ Entry, F(r)ame rate (1:n), frame_rate, INPUT_KEY_r, 1, frames
 Checkbox, Issue (2) Keyboard, issue2, INPUT_KEY_2
 Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
 Checkbox, (F)astloading, fastload, INPUT_KEY_f
+Checkbox, (D)etect loaders, detect_loader, INPUT_KEY_d
 Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
 Checkbox, Use .s(l)t traps, slt_traps, INPUT_KEY_l
 Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w
