@@ -2,6 +2,7 @@
     4 MR 0000 ed
     4 MC 0001
     8 MR 0001 ba
+    8 MC 0002
    10 PR 069f ff
    13 MC 6b55
    16 MW 6b55 ff
@@ -14,6 +15,7 @@
    25 MR 0000 ed
    25 MC 0001
    29 MR 0001 ba
+   29 MC 0004
    31 PR 059f ff
    34 MC 6b54
    37 MW 6b54 ff
@@ -26,6 +28,7 @@
    46 MR 0000 ed
    46 MC 0001
    50 MR 0001 ba
+   50 MC 0006
    52 PR 049f ff
    55 MC 6b53
    58 MW 6b53 ff
@@ -38,6 +41,7 @@
    67 MR 0000 ed
    67 MC 0001
    71 MR 0001 ba
+   71 MC 0008
    73 PR 039f ff
    76 MC 6b52
    79 MW 6b52 ff
@@ -50,6 +54,7 @@
    88 MR 0000 ed
    88 MC 0001
    92 MR 0001 ba
+   92 MC 000a
    94 PR 029f ff
    97 MC 6b51
   100 MW 6b51 ff
@@ -62,6 +67,7 @@
   109 MR 0000 ed
   109 MC 0001
   113 MR 0001 ba
+  113 MC 000c
   115 PR 019f ff
   118 MC 6b50
   121 MW 6b50 ff

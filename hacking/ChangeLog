@@ -1405,3 +1405,6 @@
 	 bug #1526868).
 20060730 z80/{z80.pl,z80_macros.h}: add IR contention (thanks, Mark Woodmass)
 	 (patch #1527439).
+20060730 z80/tests/{[0123][39b],10,[cdef][08]_[12],[cdef]5,[cdef][7f],f9,
+	 [df]d{[0123]9,2[3b],e5,f9},ed{[4567][2a],[45][7f],[ab][23ab]}}.
+	 {in,out}: update tests for IR contention.

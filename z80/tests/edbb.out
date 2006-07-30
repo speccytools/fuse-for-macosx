@@ -2,6 +2,7 @@
     4 MR 0000 ed
     4 MC 0001
     8 MR 0001 bb
+    8 MC 0002
     9 MC 1dd0
    12 MR 1dd0 b6
    13 PW 033b b6
@@ -14,6 +15,7 @@
    25 MR 0000 ed
    25 MC 0001
    29 MR 0001 bb
+   29 MC 0004
    30 MC 1dcf
    33 MR 1dcf c5
    34 PW 023b c5
@@ -26,6 +28,7 @@
    46 MR 0000 ed
    46 MC 0001
    50 MR 0001 bb
+   50 MC 0006
    51 MC 1dce
    54 MR 1dce 71
    55 PW 013b 71
@@ -38,6 +41,7 @@
    67 MR 0000 ed
    67 MC 0001
    71 MR 0001 bb
+   71 MC 0008
    72 MC 1dcd
    75 MR 1dcd f9
    76 PW 003b f9
