@@ -1401,3 +1401,5 @@
 20060726 machines/ts2068.c: change TS2068 machine id to match tape loading snap
          name (fixes bug #1526688; thanks Phil!) (Fred).
 20060729 fuse.c: reenable sound in fuse_emulation_unpause (Fred).
+20060730 z80/z80.c: IM 0 takes 13 tstates to acknowledge (partial fix for
+	 bug #1526868).

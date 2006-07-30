@@ -130,7 +130,7 @@ z80_interrupt( void )
     R++; rzx_instructions_offset--;
 
     switch(IM) {
-      case 0: PC = 0x0038; tstates += 6; break;
+      case 0: PC = 0x0038; tstates += 7; break;
       case 1: PC = 0x0038; tstates += 7; break;
       case 2: 
 	{
