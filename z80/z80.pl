@@ -78,9 +78,27 @@ CODE
 CODE
 	}
     } elsif( $opcode eq 'ADD' ) {
-	print "      tstates += 7;\n      ${opcode}16($arg1,$arg2);\n";
+	print << "CODE";
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      ${opcode}16($arg1,$arg2);
+CODE
     } elsif( $arg1 eq 'HL' and length $arg2 == 2 ) {
-	print "      tstates += 7;\n      ${opcode}16($arg2);\n";
+	print << "CODE";
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      ${opcode}16($arg2);
+CODE
     }
 }
 
@@ -169,7 +187,11 @@ sub inc_dec ($$) {
     if( length $arg == 1 or $arg =~ /^REGISTER[HL]$/ ) {
 	print "      $opcode($arg);\n";
     } elsif( length $arg == 2 or $arg eq 'REGISTER' ) {
-	print "      tstates += 2;\n      ${arg}$modifier;\n";
+	print << "CODE";
+	contend_read( IR, 1 );
+	contend_read( IR, 1 );
+	${arg}$modifier;
+CODE
     } elsif( $arg eq '(HL)' ) {
 	print << "CODE";
       {
@@ -208,7 +230,7 @@ sub ini_ind ($) {
       {
 	libspectrum_word initemp;
 
-	tstates++;
+	contend_read( IR, 1 );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
@@ -229,7 +251,7 @@ sub inir_indr ($) {
       {
 	libspectrum_word initemp;
 
-	tstates++;
+	contend_read( IR, 1 );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
@@ -303,7 +325,7 @@ sub otir_otdr ($) {
       {
 	libspectrum_word outitemp;
 
-	tstates++;
+	contend_read( IR, 1 );
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
 	writeport(BC,outitemp);
@@ -331,7 +353,7 @@ sub outi_outd ($) {
       {
 	libspectrum_word outitemp;
 
-	tstates++;
+	contend_read( IR, 1 );
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
 	writeport(BC,outitemp);
@@ -509,7 +531,7 @@ sub opcode_DI (@) { print "      IFF1=IFF2=0;\n"; }
 
 sub opcode_DJNZ (@) {
     print << "DJNZ";
-      tstates++;
+      contend_read( IR, 1 );
       B--;
       if(B) {
 	JR();
@@ -682,19 +704,19 @@ sub opcode_LD (@) {
 
 	    if( $dest eq 'R' and $src eq 'A' ) {
 		print << "LD";
-      tstates += 1;
+      contend_read( IR, 1 );
       /* Keep the RZX instruction counter right */
       rzx_instructions_offset += ( R - A );
       R=R7=A;
 LD
             } elsif( $dest eq 'A' and $src eq 'R' ) {
 		print << "LD";
-      tstates += 1;
+      contend_read( IR, 1 );
       A=(R&0x7f) | (R7&0x80);
       F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );
 LD
 	    } else {
-		print "      tstates += 1;\n" if $src eq 'I' or $dest eq 'I';
+		print "      contend_read( IR, 1 );\n" if $src eq 'I' or $dest eq 'I';
 		print "      $dest=$src;\n" if $dest ne $src;
 		if( $dest eq 'A' and $src eq 'I' ) {
 		    print "      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );\n";
@@ -745,7 +767,11 @@ LD
       $high=readbyte(PC++);
 LD
         } elsif( $src eq 'HL' or $src eq 'REGISTER' ) {
-	    print "      tstates += 2;\n      SP=$src;\n";
+	    print << "LD";
+      contend_read( IR, 1 );
+      contend_read( IR, 1 );
+      SP = $src;
+LD
         } elsif( $src eq '(nnnn)' ) {
 	    print "      LD16_RRNN($low,$high);\n";
 	}
@@ -867,7 +893,7 @@ sub opcode_PUSH (@) {
 
     my( $regpair ) = @_;
 
-    print "      tstates++;\n";
+    print "      contend_read( IR, 1 );\n";
     push_pop( 'PUSH', $regpair );
 }
 
@@ -880,7 +906,7 @@ sub opcode_RET (@) {
     if( not defined $condition ) {
 	print "      RET();\n";
     } else {
-	print "      tstates++;\n";
+	print "      contend_read( IR, 1 );\n";
 	
 	if( $condition eq 'NZ' ) {
 	    print << "RET";
@@ -982,7 +1008,7 @@ sub opcode_RST (@) {
 
     my( $value ) = @_;
 
-    printf "      tstates++;\n      RST(0x%02x);\n", hex $value;
+    printf "      contend_read( IR, 1 );\n      RST(0x%02x);\n", hex $value;
 }
 
 sub opcode_SBC (@) { arithmetic_logical( 'SBC', $_[0], $_[1] ); }

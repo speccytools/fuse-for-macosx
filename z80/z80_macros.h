@@ -84,6 +84,8 @@
 #define IFF2 z80.iff2
 #define IM   z80.im
 
+#define IR ( ( z80.i ) << 8 | ( z80.r7 & 0x80 ) | ( z80.r & 0x7f ) )
+
 /* The flags */
 
 #define FLAG_C	0x01

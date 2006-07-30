@@ -1403,3 +1403,5 @@
 20060729 fuse.c: reenable sound in fuse_emulation_unpause (Fred).
 20060730 z80/z80.c: IM 0 takes 13 tstates to acknowledge (partial fix for
 	 bug #1526868).
+20060730 z80/{z80.pl,z80_macros.h}: add IR contention (thanks, Mark Woodmass)
+	 (patch #1527439).
