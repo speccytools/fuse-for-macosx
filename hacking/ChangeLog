@@ -1412,3 +1412,5 @@
 	 ula.c,lib/{un,}compressed/tape_{16,48,128,plus2,pentagon,scorpion,
 	 2048,ts2068}.szx,ui/options.dat: loader detection (patch
 	 #1511906).
+20060730 tape.c: don't use tape traps unless we're at the very start of a
+	 ROM block (partial fix for bug #1531346).
