@@ -66,42 +66,35 @@ two vertically adjacent pixels in the array (as the hires modes double
 only the horizontal resolution, not the vertical resolution). In both
 cases, the values in this array are the Spectrum colours (0 to 15).
 
-Every time the screen memory is written to (and actually changed, as
-opposed to the data already there being written back again), three
-things occur:
+Fuse models the process wereby the ULA/SCLD reads the screen at set
+points in the frame to constuct the main screen two bytes at a time
+(usually pixels + attribute, but in Timex hires mode two blocks of
+pixels).
 
-* Fuse works out if it needs to update the display. It does this by
-  looking at the region between the current position of the electron
-  beam and the position it was in the last time it updated the
-  display. If the write affects this 'critical' region, then the
-  display_image array is updated with any 'dirty' chunks (see below)
-  in the critical region.
+An event (of type EVENT_TYPE_DISPLAY_WRITE) is scheduled for each
+point the ULA/SCLD would read the screen. When triggered, that event
+converts the tstate trigger value into the current beam x and y
+co-ordinates. It gets a copy of all three bytes of source data that
+can affect the screen display (generally screen pixel data, attribute
+byte and SCLD screen mode), and checks to see if there are any actual
+changes since the display was last updated by checking the
+display.c:display_last_screen array.
 
-  Each run of dirty pixels is noted, and a list of rectangles of such
-  pixels is built up by display.c:add_rectangle() and
-  display.c:end_line(). At the end of the frame, each of these
-  rectangles is passed off to the user-interface specific rendering
-  code to be drawn onto the emulating machine's screen.
+If so, we plot the data to the display_image array, update the
+display_last_screen array with the data used to generate the update,
+and mark any pixels affected by the write as 'dirty' in the
+display.c:display_is_dirty array.
 
-* The new data is now written to RAM.
+Each bit in each entry represents an 8 (non-Timex) or 16 (Timex) pixel
+chunk of the screen plus border which must be updated. The least
+significant bit represents the left-most 8 (16) pixels, the second
+bit the next 8 (16) and so on.
 
-* Fuse marks any pixels affected by the write as 'dirty' in the
-  display.c:display_is_dirty array. Each bit in each entry represents
-  an 8 (non-Timex) or 16 (Timex) pixel chunk of the screen plus border
-  which must be updated. The least significant bit represents the
-  left-most 8 (16) pixels, the second bit the next 8 (16) and so
-  on. (For the rest of this section, I'll take the doubling in pixel
-  numbers for Timex machines as read).
-
-  If the `data' area of memory is written to, one 8 pixel chunk is
-  marked as `dirty', whilst 64 pixels (in an 8x8 square) are marked as
-  dirty if the attributes area is written to. `FLASH'ing characters
-  will also cause 8x8 pixel chunks to be marked as dirty every 16
-  frames (display.c:display_dirty_flashing()).  The arrays
-  display_dirty_xtable and display_dirty_ytable store the address to
-  coordinate mappings for the data area of the Spectrum's screen,
-  whilst display_dirty_xtable2 and display_dirty_ytable2 serves the
-  same function for the attributes area.
+At the end of the frame, a list of rectangles of dirty pixels is built
+up from the display_is_dirty by display.c:add_rectangle() and
+display.c:end_line(). Then each of these rectangles is passed off to
+the user-interface specific rendering code to be drawn onto the
+emulating machine's screen.
 
 2.2. From display_image to the emulating machine's screen
 ---------------------------------------------------------

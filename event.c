@@ -1,5 +1,5 @@
 /* event.c: Routines needed for dealing with the event list
-   Copyright (c) 2000-2004 Philip Kendall
+   Copyright (c) 2000-2006 Philip Kendall
 
    $Id$
 
@@ -168,6 +168,8 @@ int event_do_events(void)
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );
       break;
 
+    case EVENT_TYPE_DISPLAY_WRITE: display_write( ptr->tstates ); break;
+
     default:
       ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );
       break;
@@ -280,6 +282,7 @@ event_name( event_type type )
   case EVENT_TYPE_TRDOS_INDEX: return "TR-DOS index";
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
   case EVENT_TYPE_TIMER: return "Timer";
+  case EVENT_TYPE_DISPLAY_WRITE: return "ULA display write";
 
   }
 

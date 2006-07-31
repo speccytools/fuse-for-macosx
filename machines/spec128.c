@@ -1,5 +1,5 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2006 Philip Kendall
 
    $Id$
 
@@ -225,20 +225,12 @@ spec128_select_page( int page )
 int
 spec128_memory_map( void )
 {
-  int page, screen, rom;
+  int page, rom;
   size_t i;
 
   page = machine_current->ram.last_byte & 0x07;
-  screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
+  memory_current_screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
-
-  /* If we changed the active screen, mark the entire display file as
-     dirty so we redraw it on the next pass */
-  /* FIXME: Could do better with checksumming and rect submitting */
-  if( memory_current_screen != screen ) {
-    display_refresh_all();
-    memory_current_screen = screen;
-  }
 
   spec128_select_rom( rom );
   spec128_select_page( page );

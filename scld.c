@@ -1,5 +1,5 @@
 /* scld.c: Routines for handling the Timex SCLD
-   Copyright (c) 2002-2004 Fredrick Meunier, Philip Kendall, Witold Filipczyk
+   Copyright (c) 2002-2006 Fredrick Meunier, Philip Kendall, Witold Filipczyk
 
    $Id$
 
@@ -64,15 +64,6 @@ scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   libspectrum_byte ink,paper;
 
   scld_last_dec.byte = b;
-
-  /* If we changed the active screen, or change the colour in hires
-   * mode mark the entire display file as dirty so we redraw it on
-   * the next pass */
-  if((scld_last_dec.mask.scrnmode != old_dec.mask.scrnmode)
-       || (scld_last_dec.name.hires &&
-           (scld_last_dec.mask.hirescol != old_dec.mask.hirescol))) {
-    display_refresh_all();
-  }
 
   /* If we just reenabled interrupts, check for a retriggered interrupt */
   if( old_dec.name.intdisable && !scld_last_dec.name.intdisable )

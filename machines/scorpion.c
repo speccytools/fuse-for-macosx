@@ -1,5 +1,5 @@
 /* scorpion.c: Scorpion 256K specific routines
-   Copyright (c) 1999-2004 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2006 Philip Kendall and Fredrick Meunier
    Copyright (c) 2004 Stuart Brady
 
    $Id$
@@ -164,14 +164,10 @@ scorpion_reset(void)
 static int
 scorpion_memory_map( void )
 {
-  int rom, page, screen;
+  int rom, page;
   size_t i;
 
-  screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
-  if( memory_current_screen != screen ) {
-    display_refresh_all();
-    memory_current_screen = screen;
-  }
+  memory_current_screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
 
   if( machine_current->ram.last_byte2 & 0x02 ) {
     rom = 2;

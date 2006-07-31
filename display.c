@@ -1,5 +1,5 @@
 /* display.c: Routines for printing the Spectrum screen
-   Copyright (c) 1999-2004 Philip Kendall, Thomas Harte, Witold Filipczyk
+   Copyright (c) 1999-2006 Philip Kendall, Thomas Harte, Witold Filipczyk
                            and Fredrick Meunier
 
    $Id$
@@ -60,26 +60,14 @@ libspectrum_byte display_last_border;
    or display_border_mixed (see below) if it's not */
 static libspectrum_byte display_current_border[ DISPLAY_SCREEN_HEIGHT ];
 
+/* Stores the pixel, attribute and SCLD screen mode information used to
+   draw each 8x1 group of pixels last ULA scan */
+static libspectrum_byte display_last_screen[ DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT*3 ];
+
 /* Offsets as to where the data and the attributes for each pixel
    line start */
 libspectrum_word display_line_start[ DISPLAY_HEIGHT ];
 libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
-
-/* If you write to the byte at display_dirty_?table[n+0x4000], then
-   the eight pixels starting at (8*xtable[n],ytable[n]) must be
-   replotted */
-static libspectrum_word
-  display_dirty_ytable[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT ];
-static libspectrum_word
-  display_dirty_xtable[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT ];
-
-/* If you write to the byte at display_dirty_?table2[n+0x5800], then
-   the 64 pixels starting at (8*xtable2[n],ytable2[n]) must be
-   replotted */
-static libspectrum_word
-  display_dirty_ytable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
-static libspectrum_word
-  display_dirty_xtable2[ DISPLAY_WIDTH_COLS * DISPLAY_HEIGHT_ROWS ];
 
 /* The number of frames mod 32 that have elapsed.
     0<=d_f_c<16 => Flashing characters are normal
@@ -128,16 +116,11 @@ GSList *border_changes;
 /* The current border colour */
 int current_border[ DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH_COLS ];
 
-static void display_dirty8( libspectrum_word address );
-static void display_dirty64( libspectrum_word address );
-
 static void display_get_attr( int x, int y,
 			      libspectrum_byte *ink, libspectrum_byte *paper);
 
 static int add_rectangle( int y, int x, int w );
 static int end_line( int y );
-
-static void display_dirty_flashing(void);
 
 libspectrum_word
 display_get_addr( int x, int y )
@@ -171,7 +154,7 @@ add_border_sentinel( void )
 int
 display_init( int *argc, char ***argv )
 {
-  int i, j, k, x, y;
+  int i, j, k, y;
   int error;
 
   if(ui_init(argc, argv))
@@ -182,6 +165,9 @@ display_init( int *argc, char ***argv )
   for( i = 0; i < DISPLAY_WIDTH_COLS; i++ )
     display_all_dirty = ( display_all_dirty << 1 ) | 0x01;
 
+  for( i = 0; i < DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT*3; i++ )
+    display_last_screen[ i ] = 255;
+
   for(i=0;i<3;i++)
     for(j=0;j<8;j++)
       for(k=0;k<8;k++)
@@ -191,18 +177,6 @@ display_init( int *argc, char ***argv )
   for(y=0;y<DISPLAY_HEIGHT;y++) {
     display_attr_start[y]=6144 + (32*(y/8));
   }
-
-  for(y=0;y<DISPLAY_HEIGHT;y++)
-    for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
-      display_dirty_ytable[ display_line_start[y]+x ] =	y;
-      display_dirty_xtable[ display_line_start[y]+x ] = x;
-    }
-
-  for(y=0;y<DISPLAY_HEIGHT_ROWS;y++)
-    for(x=0;x<DISPLAY_WIDTH_COLS;x++) {
-      display_dirty_ytable2[ (32*y) + x ] = y * 8;
-      display_dirty_xtable2[ (32*y) + x ] = x;
-    }
 
   display_frame_count=0; display_flash_reversed=0;
 
@@ -383,184 +357,54 @@ end_line( int y )
   return 0;
 }
 
-/* Mark as 'dirty' the pixels which have been changed by a write to
-   'offset' within the RAM page containing the screen */
-void
-display_dirty( libspectrum_word offset )
-{
-  switch ( scld_last_dec.mask.scrnmode ) {
-
-    case STANDARD: /* standard Speccy screen */
-    case HIRESATTR: /* strange mode */
-      if( offset >= 0x1b00 ) break;
-      if( offset <  0x1800 ) {		/* 0x1800 = first attributes byte */
-        display_dirty8( offset );
-      } else {
-        display_dirty64( offset );
-      }
-      break;
-
-    case ALTDFILE: /* second screen */
-    case HIRESATTRALTD: /* strange mode using second screen */      
-      if( offset < 0x2000 || offset >= 0x3b00 ) break;
-      if( offset < 0x3800 ) {		/* 0x3800 = first attributes byte */
-        display_dirty8( offset - ALTDFILE_OFFSET );
-      } else {
-        display_dirty64( offset - ALTDFILE_OFFSET );
-      }
-      break;
-
-    case EXTCOLOUR: /* extended colours */
-    case HIRES: /* hires mode */
-      if( offset >= 0x3800 ) break;
-      if( offset >= 0x1800 && offset < 0x2000 ) break;
-      if( offset >= 0x2000 ) offset -= ALTDFILE_OFFSET;
-      display_dirty8( offset );
-      break;
-
-    default:
-    /* case EXTCOLALTD: extended colours, but attributes and data
-       taken from second screen */
-    /* case HIRESDOUBLECOL: hires mode, but data taken only from
-       second screen */
-      if( offset >= 0x2000 && offset < 0x3800 )
-	display_dirty8( offset - ALTDFILE_OFFSET );
-      break;
-  }
-}
-
-/* Copy any dirty data from ( x, y ) to ( end, y ) of the critical
-   region to display_image[] */
 static void
-copy_critical_region_line( int y, int x, int end )
+update_dirty_rects( void )
 {
-  int start, error;
-  libspectrum_byte data, data2, ink, paper;
-  libspectrum_word hires_data;
-  libspectrum_dword bit_mask, dirty;
+  int start, y, error;
 
-  if( x < DISPLAY_WIDTH_COLS ) {
+  for( y=0; y<DISPLAY_HEIGHT; y++ ) {
+    int x = 0;
+    while( display_is_dirty[y] ) {
 
-    /* Build a mask for the bits we're interested in */
-    bit_mask = display_all_dirty;
+      /* Find the first dirty chunk on this row */
+      while( !( display_is_dirty[y] & 0x01 ) ) {
+        display_is_dirty[y] >>= 1;
+        x++;
+      }
 
-    bit_mask >>= x;
-    bit_mask <<= x + ( 32 - end );
-    bit_mask >>= ( 32 - end );
+      start = x;
 
-    /* Get the bits we're interested in */
-    dirty = ( display_is_dirty[y] & bit_mask ) >> x;
+      /* Walk to the end of the dirty region, writing the bytes to the
+         drawing area along the way */
+      do {
 
-    /* And remove those bits from the dirty mask */
-    display_is_dirty[y] &= ~bit_mask;
+        display_is_dirty[y] >>= 1;
+        x++;
 
-  } else {
+      } while( display_is_dirty[y] & 0x01 );
 
-    dirty = 0;
-
-  }
-
-  while( dirty ) {
-
-    /* Find the first dirty chunk on this row */
-    while( !( dirty & 0x01 ) ) {
-      dirty >>= 1;
-      x++;
+      error = add_rectangle( DISPLAY_BORDER_HEIGHT + y,
+                             DISPLAY_BORDER_WIDTH_COLS + start, x - start );
+      if( error ) return;
     }
-
-    start = x;
-
-    /* Walk to the end of the dirty region, writing the bytes to the
-       drawing area along the way */
-    do {
-
-      libspectrum_word offset;
-      libspectrum_byte *screen;
-
-      screen = RAM[ memory_current_screen ];
-      
-      display_get_attr( x, y, &ink, &paper );
-
-      offset = display_get_addr( x, y );
-      data = screen[ offset ];
-
-      if( scld_last_dec.name.hires ) {
-	switch( scld_last_dec.mask.scrnmode ) {
-
-	case HIRESATTRALTD:
-	  offset = display_attr_start[ y ] + x + ALTDFILE_OFFSET;
-	  data2 = screen[ offset ];
-	  break;
-
-	case HIRES:
-	  data2 = screen[ offset + ALTDFILE_OFFSET ];
-	  break;
-
-	case HIRESDOUBLECOL:
-	  data2 = data;
-	  break;
-
-	default: /* case HIRESATTR: */
-	  offset = display_attr_start[ y ] + x;
-	  data2 = screen[ offset ];
-	  break;
-
-	}
-	hires_data = (data << 8) + data2;
-	display_plot16( x, y, hires_data, ink, paper );
-      } else {
-	display_plot8( x, y, data, ink, paper );
-      }    
-
-      dirty >>= 1;
-      x++;
-
-    } while( dirty & 0x01 );
-
-    error = add_rectangle( DISPLAY_BORDER_HEIGHT + y,
-			   DISPLAY_BORDER_WIDTH_COLS + start, x - start );
-    if( error ) return;
-  }
   
-  /* If that was the end of the line, compress the active rectangles
-     list */
-  if( end == DISPLAY_WIDTH_COLS ) {
+    /* compress the active rectangles list */
     error = end_line( DISPLAY_BORDER_HEIGHT + y ); if( error ) return;
   }
+
+  /* Force all rectangles into the inactive list */
+  error = end_line( DISPLAY_HEIGHT ); if( error ) return;
 }
 
-/* Copy any dirty data from the critical region to display_image[] */
-static void
-copy_critical_region( int beam_x, int beam_y )
+static inline void
+get_beam_position( int time, int *x, int *y )
 {
-  if( critical_region_y == beam_y ) {
-
-    copy_critical_region_line( critical_region_y, critical_region_x, beam_x );
-
-  } else {
-
-    copy_critical_region_line( critical_region_y++, critical_region_x,
-			       DISPLAY_WIDTH_COLS );
-  
-    for( ; critical_region_y < beam_y; critical_region_y++ )
-      copy_critical_region_line( critical_region_y, 0,
-				 DISPLAY_WIDTH_COLS );
-
-    copy_critical_region_line( critical_region_y, 0, beam_x );
-  }
-
-  critical_region_x = beam_x;
-}
-
-static void
-get_beam_position( int *x, int *y )
-{
-  if( tstates < machine_current->line_times[ 0 ] ) {
+  if( time < machine_current->line_times[ 0 ] ) {
     *x = *y = -1;
     return;
   }
 
-  *y = ( tstates - machine_current->line_times[ 0 ] ) /
+  *y = ( time - machine_current->line_times[ 0 ] ) /
     machine_current->timings.tstates_per_line;
 
   if( *y >= DISPLAY_SCREEN_HEIGHT ) {
@@ -569,67 +413,7 @@ get_beam_position( int *x, int *y )
     return;
   }
 
-  *x = ( tstates - machine_current->line_times[ *y ] ) / 4;
-}
-
-/* Mark the 8-pixel chunk at (x,y) as dirty and update the critical
-   region as appropriate */
-static void
-display_dirty_chunk( int x, int y )
-{
-  /* If the write is between the start of the critical region and the
-     current beam position, then we must copy the critical region now */
-  if(   y >  critical_region_y                             ||
-      ( y == critical_region_y && x >= critical_region_x )    ) {
-
-    int beam_x, beam_y;
-
-    get_beam_position( &beam_x, &beam_y );
-
-    beam_x -= DISPLAY_BORDER_WIDTH_COLS;
-    beam_y -= DISPLAY_BORDER_HEIGHT;
-
-    if( beam_y < 0 ) {
-      beam_x = beam_y = 0;
-    } else if( beam_y >= DISPLAY_HEIGHT ) {
-      beam_x = DISPLAY_WIDTH_COLS;
-      beam_y = DISPLAY_HEIGHT - 1;
-    }
-
-    if( beam_x < 0 ) {
-      beam_x = 0;
-    } else if( beam_x > DISPLAY_WIDTH_COLS ) {
-      beam_x = DISPLAY_WIDTH_COLS;
-    }
-
-    if(   y <  beam_y                 ||
-	( y == beam_y && x < beam_x )    )
-      copy_critical_region( beam_x, beam_y );
-  }
-
-  display_is_dirty[y] |= ( (libspectrum_dword)1 << x );
-}
-
-static void
-display_dirty8( libspectrum_word offset )
-{
-  int x, y;
-
-  x=display_dirty_xtable[ offset ];
-  y=display_dirty_ytable[ offset ];
-
-  display_dirty_chunk( x, y );
-}
-
-static void
-display_dirty64( libspectrum_word offset )
-{
-  int i, x, y;
-
-  x=display_dirty_xtable2[ offset - 0x1800 ];
-  y=display_dirty_ytable2[ offset - 0x1800 ];
-
-  for( i = 0; i < 8; i++ ) display_dirty_chunk( x, y + i );
+  *x = ( time - machine_current->line_times[ *y ] ) / 4;
 }
 
 /* Set one pixel in the display */
@@ -657,43 +441,27 @@ display_plot8( int x, int y, libspectrum_byte data,
   y += DISPLAY_BORDER_HEIGHT;
 
   if( machine_current->timex ) {
+    int i;
 
     x <<= 1; y <<= 1;
-    display_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
-    display_image[y][x+ 1] = ( data & 0x80 ) ? ink : paper;
-    display_image[y][x+ 2] = ( data & 0x40 ) ? ink : paper;
-    display_image[y][x+ 3] = ( data & 0x40 ) ? ink : paper;
-    display_image[y][x+ 4] = ( data & 0x20 ) ? ink : paper;
-    display_image[y][x+ 5] = ( data & 0x20 ) ? ink : paper;
-    display_image[y][x+ 6] = ( data & 0x10 ) ? ink : paper;
-    display_image[y][x+ 7] = ( data & 0x10 ) ? ink : paper;
-    display_image[y][x+ 8] = ( data & 0x08 ) ? ink : paper;
-    display_image[y][x+ 9] = ( data & 0x08 ) ? ink : paper;
-    display_image[y][x+10] = ( data & 0x04 ) ? ink : paper;
-    display_image[y][x+11] = ( data & 0x04 ) ? ink : paper;
-    display_image[y][x+12] = ( data & 0x02 ) ? ink : paper;
-    display_image[y][x+13] = ( data & 0x02 ) ? ink : paper;
-    display_image[y][x+14] = ( data & 0x01 ) ? ink : paper;
-    display_image[y][x+15] = ( data & 0x01 ) ? ink : paper;
-
-    y++;
-    display_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
-    display_image[y][x+ 1] = ( data & 0x80 ) ? ink : paper;
-    display_image[y][x+ 2] = ( data & 0x40 ) ? ink : paper;
-    display_image[y][x+ 3] = ( data & 0x40 ) ? ink : paper;
-    display_image[y][x+ 4] = ( data & 0x20 ) ? ink : paper;
-    display_image[y][x+ 5] = ( data & 0x20 ) ? ink : paper;
-    display_image[y][x+ 6] = ( data & 0x10 ) ? ink : paper;
-    display_image[y][x+ 7] = ( data & 0x10 ) ? ink : paper;
-    display_image[y][x+ 8] = ( data & 0x08 ) ? ink : paper;
-    display_image[y][x+ 9] = ( data & 0x08 ) ? ink : paper;
-    display_image[y][x+10] = ( data & 0x04 ) ? ink : paper;
-    display_image[y][x+11] = ( data & 0x04 ) ? ink : paper;
-    display_image[y][x+12] = ( data & 0x02 ) ? ink : paper;
-    display_image[y][x+13] = ( data & 0x02 ) ? ink : paper;
-    display_image[y][x+14] = ( data & 0x01 ) ? ink : paper;
-    display_image[y][x+15] = ( data & 0x01 ) ? ink : paper;
-
+    for( i=0; i<2; i++,y++ ) {
+      display_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
+      display_image[y][x+ 1] = ( data & 0x80 ) ? ink : paper;
+      display_image[y][x+ 2] = ( data & 0x40 ) ? ink : paper;
+      display_image[y][x+ 3] = ( data & 0x40 ) ? ink : paper;
+      display_image[y][x+ 4] = ( data & 0x20 ) ? ink : paper;
+      display_image[y][x+ 5] = ( data & 0x20 ) ? ink : paper;
+      display_image[y][x+ 6] = ( data & 0x10 ) ? ink : paper;
+      display_image[y][x+ 7] = ( data & 0x10 ) ? ink : paper;
+      display_image[y][x+ 8] = ( data & 0x08 ) ? ink : paper;
+      display_image[y][x+ 9] = ( data & 0x08 ) ? ink : paper;
+      display_image[y][x+10] = ( data & 0x04 ) ? ink : paper;
+      display_image[y][x+11] = ( data & 0x04 ) ? ink : paper;
+      display_image[y][x+12] = ( data & 0x02 ) ? ink : paper;
+      display_image[y][x+13] = ( data & 0x02 ) ? ink : paper;
+      display_image[y][x+14] = ( data & 0x01 ) ? ink : paper;
+      display_image[y][x+15] = ( data & 0x01 ) ? ink : paper;
+    }
   } else {
     display_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
     display_image[y][x+ 1] = ( data & 0x40 ) ? ink : paper;
@@ -712,50 +480,34 @@ void
 display_plot16( int x, int y, libspectrum_word data,
 		libspectrum_byte ink, libspectrum_byte paper )
 {
+  int i;
   x = (x << 4) + DISPLAY_BORDER_WIDTH;
   y = ( y + DISPLAY_BORDER_HEIGHT ) << 1;
 
-  display_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;
-  display_image[y][x+ 1] = ( data & 0x4000 ) ? ink : paper;
-  display_image[y][x+ 2] = ( data & 0x2000 ) ? ink : paper;
-  display_image[y][x+ 3] = ( data & 0x1000 ) ? ink : paper;
-  display_image[y][x+ 4] = ( data & 0x0800 ) ? ink : paper;
-  display_image[y][x+ 5] = ( data & 0x0400 ) ? ink : paper;
-  display_image[y][x+ 6] = ( data & 0x0200 ) ? ink : paper;
-  display_image[y][x+ 7] = ( data & 0x0100 ) ? ink : paper;
-  display_image[y][x+ 8] = ( data & 0x0080 ) ? ink : paper;
-  display_image[y][x+ 9] = ( data & 0x0040 ) ? ink : paper;
-  display_image[y][x+10] = ( data & 0x0020 ) ? ink : paper;
-  display_image[y][x+11] = ( data & 0x0010 ) ? ink : paper;
-  display_image[y][x+12] = ( data & 0x0008 ) ? ink : paper;
-  display_image[y][x+13] = ( data & 0x0004 ) ? ink : paper;
-  display_image[y][x+14] = ( data & 0x0002 ) ? ink : paper;
-  display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
-
-  y++;
-  display_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;
-  display_image[y][x+ 1] = ( data & 0x4000 ) ? ink : paper;
-  display_image[y][x+ 2] = ( data & 0x2000 ) ? ink : paper;
-  display_image[y][x+ 3] = ( data & 0x1000 ) ? ink : paper;
-  display_image[y][x+ 4] = ( data & 0x0800 ) ? ink : paper;
-  display_image[y][x+ 5] = ( data & 0x0400 ) ? ink : paper;
-  display_image[y][x+ 6] = ( data & 0x0200 ) ? ink : paper;
-  display_image[y][x+ 7] = ( data & 0x0100 ) ? ink : paper;
-  display_image[y][x+ 8] = ( data & 0x0080 ) ? ink : paper;
-  display_image[y][x+ 9] = ( data & 0x0040 ) ? ink : paper;
-  display_image[y][x+10] = ( data & 0x0020 ) ? ink : paper;
-  display_image[y][x+11] = ( data & 0x0010 ) ? ink : paper;
-  display_image[y][x+12] = ( data & 0x0008 ) ? ink : paper;
-  display_image[y][x+13] = ( data & 0x0004 ) ? ink : paper;
-  display_image[y][x+14] = ( data & 0x0002 ) ? ink : paper;
-  display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
+  for( i=0; i<2; i++,y++ ) {
+    display_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;
+    display_image[y][x+ 1] = ( data & 0x4000 ) ? ink : paper;
+    display_image[y][x+ 2] = ( data & 0x2000 ) ? ink : paper;
+    display_image[y][x+ 3] = ( data & 0x1000 ) ? ink : paper;
+    display_image[y][x+ 4] = ( data & 0x0800 ) ? ink : paper;
+    display_image[y][x+ 5] = ( data & 0x0400 ) ? ink : paper;
+    display_image[y][x+ 6] = ( data & 0x0200 ) ? ink : paper;
+    display_image[y][x+ 7] = ( data & 0x0100 ) ? ink : paper;
+    display_image[y][x+ 8] = ( data & 0x0080 ) ? ink : paper;
+    display_image[y][x+ 9] = ( data & 0x0040 ) ? ink : paper;
+    display_image[y][x+10] = ( data & 0x0020 ) ? ink : paper;
+    display_image[y][x+11] = ( data & 0x0010 ) ? ink : paper;
+    display_image[y][x+12] = ( data & 0x0008 ) ? ink : paper;
+    display_image[y][x+13] = ( data & 0x0004 ) ? ink : paper;
+    display_image[y][x+14] = ( data & 0x0002 ) ? ink : paper;
+    display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
+  }
 }
 
-/* Get the attributes for the eight pixels starting at
+/* Get the attribute byte or equivalent for the eight pixels starting at
    ( (8*x) , y ) */
-static void
-display_get_attr( int x, int y,
-		  libspectrum_byte *ink, libspectrum_byte *paper )
+static inline libspectrum_byte
+display_get_attr_byte( int x, int y )
 {
   libspectrum_byte attr;
 
@@ -776,7 +528,16 @@ display_get_attr( int x, int y,
     attr = RAM[ memory_current_screen ][ offset ];
   }
 
-  display_parse_attr(attr,ink,paper);
+  return attr;
+}
+
+/* Get the attributes for the eight pixels starting at
+   ( (8*x) , y ) */
+static void
+display_get_attr( int x, int y,
+		  libspectrum_byte *ink, libspectrum_byte *paper )
+{
+  display_parse_attr( display_get_attr_byte( x, y ), ink, paper );
 }
 
 void
@@ -798,7 +559,7 @@ push_border_change( int colour )
   int beam_x, beam_y;
   struct border_change_t *change;
 
-  get_beam_position( &beam_x, &beam_y );
+  get_beam_position( tstates, &beam_x, &beam_y );
 
   if( beam_x < 0 ) beam_x = 0;
   if( beam_x > DISPLAY_SCREEN_WIDTH_COLS ) beam_x = DISPLAY_SCREEN_WIDTH_COLS;
@@ -823,12 +584,12 @@ check_border_change()
 {
   if( scld_last_dec.name.hires &&
       display_hires_border != display_last_border ) {
-	push_border_change( display_hires_border );
-	display_last_border = display_hires_border;
+    push_border_change( display_hires_border );
+    display_last_border = display_hires_border;
   } else if( !scld_last_dec.name.hires &&
              display_lores_border != display_last_border ) {
-	push_border_change( display_lores_border );
-	display_last_border = display_lores_border;
+    push_border_change( display_lores_border );
+    display_last_border = display_lores_border;
   }
 }
 
@@ -920,7 +681,6 @@ border_change_line( int y, int colour )
     border_change_write( y, 0, DISPLAY_SCREEN_WIDTH_COLS, colour );
     display_current_border[ y ] = colour;
   }
-
 }
 
 static void
@@ -1013,16 +773,9 @@ update_ui_screen( void )
 int
 display_frame( void )
 {
-  int error;
-
   assert( display_all_dirty == 0xffffffff );
 
-  /* Copy all the critical region to display_image[] */
-  copy_critical_region( DISPLAY_WIDTH_COLS, DISPLAY_HEIGHT - 1 );
-  critical_region_x = critical_region_y = 0;
-
-  /* Force all rectangles into the inactive list */
-  error = end_line( DISPLAY_HEIGHT ); if( error ) return error;
+  update_dirty_rects();
 
   update_border();
 
@@ -1052,47 +805,14 @@ display_frame( void )
   display_frame_count++;
   if(display_frame_count==16) {
     display_flash_reversed=1;
-    display_dirty_flashing();
   } else if(display_frame_count==32) {
     display_flash_reversed=0;
-    display_dirty_flashing();
     display_frame_count=0;
   }
   
+  display_write( 0 );
+
   return 0;
-}
-
-static void display_dirty_flashing(void)
-{
-  libspectrum_word offset;
-  libspectrum_byte *screen, attr;
-
-  screen = RAM[ memory_current_screen ];
-  
-  if( !scld_last_dec.name.hires ) {
-    if( scld_last_dec.name.b1 ) {
-
-      for( offset = ALTDFILE_OFFSET; offset < 0x3800; offset++ ) {
-        attr = screen[ offset ];
-        if( attr & 0x80 ) display_dirty8( offset - ALTDFILE_OFFSET );
-      }
-
-    } else if( scld_last_dec.name.altdfile ) {
-
-      for( offset= 0x3800; offset < 0x3b00; offset++ ) {
-        attr = screen[ offset ];
-        if( attr & 0x80 ) display_dirty64( offset - ALTDFILE_OFFSET );
-      }
-
-    } else { /* Standard Speccy screen */
-
-      for( offset = 0x1800; offset < 0x1b00; offset++ ) {
-        attr = screen[ offset ];
-        if( attr & 0x80 ) display_dirty64( offset );
-      }
-
-    }
-  }
 }
 
 void display_refresh_all(void)
@@ -1106,4 +826,98 @@ void display_refresh_all(void)
 
   for( i = 0; i < DISPLAY_SCREEN_HEIGHT; i++ )
     display_current_border[i] = display_border_mixed;
+
+  for( i = 0; i < DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT*3; i++ )
+    display_last_screen[ i ] = 255;
+}
+
+void
+display_write( libspectrum_dword last_tstates )
+{
+  static int next_ula = 0;
+  int beam_x, beam_y;
+  int x, y;
+  libspectrum_word offset;
+  libspectrum_byte *screen;
+  libspectrum_byte data, data2;
+  libspectrum_byte mode_data;
+  libspectrum_word hires_data;
+
+  /* last_tstates == 0 means schedule first event of the frame */
+  if( !last_tstates ) {
+    next_ula = 0;
+    event_add( machine_current->ula_read_sequence[ next_ula ],
+               EVENT_TYPE_DISPLAY_WRITE );
+    return;
+  }
+
+  /* Convert tstates to address */
+  get_beam_position( last_tstates, &beam_x, &beam_y );
+  x = beam_x - DISPLAY_BORDER_WIDTH_COLS;
+  y = beam_y - DISPLAY_BORDER_HEIGHT;
+  offset = display_get_addr( x, y );
+
+  /* Read byte, atrr/byte, and screen mode */
+  screen = RAM[ memory_current_screen ];
+  data = screen[ offset ];
+  mode_data = ( display_flash_reversed<<7 |
+                scld_last_dec.mask.hirescol |
+                scld_last_dec.mask.scrnmode
+              );
+
+  if( scld_last_dec.name.hires ) {
+    switch( scld_last_dec.mask.scrnmode ) {
+
+    case HIRESATTRALTD:
+      offset = display_attr_start[ y ] + x + ALTDFILE_OFFSET;
+      data2 = screen[ offset ];
+      break;
+
+    case HIRES:
+      data2 = screen[ offset + ALTDFILE_OFFSET ];
+      break;
+
+    case HIRESDOUBLECOL:
+      data2 = data;
+      break;
+
+    default: /* case HIRESATTR: */
+      offset = display_attr_start[ y ] + x;
+      data2 = screen[ offset ];
+      break;
+
+    }
+    hires_data = (data << 8) + data2;
+  } else {
+    data2 = display_get_attr_byte( x, y );
+  }
+
+  /* And draw it if it is different to what was there last time */
+  int index = (x + y * DISPLAY_WIDTH_COLS)*3;
+  if( display_last_screen[ index ] != data ||
+      display_last_screen[ index+1 ] != data2 ||
+      display_last_screen[ index+2 ] != mode_data
+    ) {
+    libspectrum_byte ink, paper;
+    display_get_attr( x, y, &ink, &paper );
+    if( scld_last_dec.name.hires ) {
+      display_plot16( x, y, hires_data, ink, paper );
+    } else {
+      display_plot8( x, y, data, ink, paper );
+    }
+
+    /* Update last display record */
+    display_last_screen[ index ] = data;
+    display_last_screen[ index+1 ] = data2;
+    display_last_screen[ index+2 ] = mode_data;
+
+    /* And now mark it dirty */
+    display_is_dirty[y] |= ( (libspectrum_dword)1 << x );
+  }
+
+  /* Schedule next EVENT_TYPE_DISPLAY_WRITE as long as there are reads
+     still to be done this frame */
+  if( ++next_ula < DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT )
+    event_add( machine_current->ula_read_sequence[ next_ula ],
+                EVENT_TYPE_DISPLAY_WRITE );
 }

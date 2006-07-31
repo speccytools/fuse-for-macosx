@@ -1,5 +1,5 @@
 /* event.h: Routines needed for dealing with the event list
-   Copyright (c) 2000-2004 Philip Kendall
+   Copyright (c) 2000-2006 Philip Kendall
 
    $Id$
 
@@ -51,6 +51,7 @@ typedef enum event_type {
   EVENT_TYPE_TRDOS_CMD_DONE,
   EVENT_TYPE_TRDOS_INDEX,
   EVENT_TYPE_TIMER,
+  EVENT_TYPE_DISPLAY_WRITE,
 
 } event_type;
 
