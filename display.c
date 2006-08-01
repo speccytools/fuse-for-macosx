@@ -61,8 +61,9 @@ libspectrum_byte display_last_border;
 static libspectrum_byte display_current_border[ DISPLAY_SCREEN_HEIGHT ];
 
 /* Stores the pixel, attribute and SCLD screen mode information used to
-   draw each 8x1 group of pixels last ULA scan */
-static libspectrum_byte display_last_screen[ DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT*3 ];
+   draw each 8x1 group of pixels (including border) last frame */
+static libspectrum_byte
+display_last_screen[ DISPLAY_SCREEN_WIDTH_COLS*DISPLAY_SCREEN_HEIGHT*3 ];
 
 /* Offsets as to where the data and the attributes for each pixel
    line start */
@@ -76,11 +77,12 @@ libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
 static int display_frame_count;
 static int display_flash_reversed;
 
-/* Which eight-pixel chunks on each line need to be redisplayed. Bit 0
-   corresponds to pixels 0-7, bit 31 to pixels 248-255. */
-static libspectrum_dword display_is_dirty[ DISPLAY_HEIGHT ];
+/* Which eight-pixel chunks on each line (including border) need to
+   be redisplayed. Bit 0 corresponds to pixels 0-7, bit 39 to
+   pixels 311-319. */
+static libspectrum_qword display_is_dirty[ DISPLAY_SCREEN_HEIGHT ];
 /* This value signifies that the entire line must be redisplayed */
-static libspectrum_dword display_all_dirty;
+static libspectrum_qword display_all_dirty;
 
 /* Used to signify that we're redrawing the entire screen */
 static int display_redraw_all;
@@ -162,11 +164,11 @@ display_init( int *argc, char ***argv )
 
   /* Set up the 'all pixels must be refreshed' marker */
   display_all_dirty = 0;
-  for( i = 0; i < DISPLAY_WIDTH_COLS; i++ )
+  for( i = 0; i < DISPLAY_SCREEN_WIDTH_COLS; i++ )
     display_all_dirty = ( display_all_dirty << 1 ) | 0x01;
 
-  for( i = 0; i < DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT*3; i++ )
-    display_last_screen[ i ] = 255;
+  memset( display_last_screen, 255,
+          DISPLAY_SCREEN_WIDTH_COLS*DISPLAY_SCREEN_HEIGHT*3 );
 
   for(i=0;i<3;i++)
     for(j=0;j<8;j++)
@@ -180,7 +182,7 @@ display_init( int *argc, char ***argv )
 
   display_frame_count=0; display_flash_reversed=0;
 
-  for( y = 0; y < DISPLAY_HEIGHT; y++ )
+  for( y = 0; y < DISPLAY_SCREEN_HEIGHT; y++ )
     display_is_dirty[ y ] = display_all_dirty;
 
   for( y = 0; y < DISPLAY_SCREEN_HEIGHT; y++ )
@@ -362,7 +364,7 @@ update_dirty_rects( void )
 {
   int start, y, error;
 
-  for( y=0; y<DISPLAY_HEIGHT; y++ ) {
+  for( y=0; y<DISPLAY_SCREEN_HEIGHT; y++ ) {
     int x = 0;
     while( display_is_dirty[y] ) {
 
@@ -383,17 +385,16 @@ update_dirty_rects( void )
 
       } while( display_is_dirty[y] & 0x01 );
 
-      error = add_rectangle( DISPLAY_BORDER_HEIGHT + y,
-                             DISPLAY_BORDER_WIDTH_COLS + start, x - start );
+      error = add_rectangle( y, start, x - start );
       if( error ) return;
     }
   
     /* compress the active rectangles list */
-    error = end_line( DISPLAY_BORDER_HEIGHT + y ); if( error ) return;
+    error = end_line( y ); if( error ) return;
   }
 
   /* Force all rectangles into the inactive list */
-  error = end_line( DISPLAY_HEIGHT ); if( error ) return;
+  error = end_line( DISPLAY_SCREEN_HEIGHT ); if( error ) return;
 }
 
 static inline void
@@ -437,8 +438,7 @@ void
 display_plot8( int x, int y, libspectrum_byte data,
 	       libspectrum_byte ink, libspectrum_byte paper )
 {
-  x = (x << 3) + DISPLAY_BORDER_WIDTH / 2;
-  y += DISPLAY_BORDER_HEIGHT;
+  x <<= 3;
 
   if( machine_current->timex ) {
     int i;
@@ -481,8 +481,7 @@ display_plot16( int x, int y, libspectrum_word data,
 		libspectrum_byte ink, libspectrum_byte paper )
 {
   int i;
-  x = (x << 4) + DISPLAY_BORDER_WIDTH;
-  y = ( y + DISPLAY_BORDER_HEIGHT ) << 1;
+  x <<= 4;
 
   for( i=0; i<2; i++,y++ ) {
     display_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;
@@ -614,21 +613,27 @@ display_set_hires_border( int colour )
 static void
 set_border( int y, int start, int end, int colour )
 {
-  if( machine_current->timex ) {
+  /* Fake byte */
+  libspectrum_byte data = 255;
+  /* and fake screen mode */
+  libspectrum_byte mode_data = 0;
+  int index = (start + y * DISPLAY_SCREEN_WIDTH_COLS)*3;
 
-    y <<= 1;
-    start <<= 4; end <<= 4;
+  for( ; start < end; start++ ) {
+    /* Draw it if it is different to what was there last time - we know that
+       data and mode will have been the same*/
+    if( display_last_screen[ index+1 ] != colour ) {
+      display_plot8( start, y, data, colour, 0 );
 
-    for( ; start < end; start++ ) {
-      display_image[ y     ][ start ] = colour;
-      display_image[ y + 1 ][ start ] = colour;
+      /* Update last display record */
+      display_last_screen[ index ] = data;
+      display_last_screen[ index+1 ] = colour;
+      display_last_screen[ index+2 ] = mode_data;
+
+      /* And now mark it dirty */
+      display_is_dirty[y] |= ( (libspectrum_qword)1 << start );
     }
-
-  } else {
-
-    start <<= 3; end <<= 3;
-
-    for( ; start < end; start++ ) display_image[ y ][ start ] = colour;
+    index += 3;
   }
 }
 
@@ -639,7 +644,6 @@ border_change_write( int y, int start, int end, int colour )
       ( y >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT )    ) {
 
     /* Top and bottom borders */
-    add_rectangle( y, start, end - start );
     set_border( y, start, end, colour );
 
   } else {
@@ -650,7 +654,6 @@ border_change_write( int y, int start, int end, int colour )
       int left_end =
 	end > DISPLAY_BORDER_WIDTH_COLS ? DISPLAY_BORDER_WIDTH_COLS : end;
 
-      add_rectangle( y, start, left_end - start );
       set_border( y, start, left_end, colour );
     }
 
@@ -660,7 +663,6 @@ border_change_write( int y, int start, int end, int colour )
       if( start < DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS )
 	start = DISPLAY_BORDER_WIDTH_COLS + DISPLAY_WIDTH_COLS;
 
-      add_rectangle( y, start, end - start );
       set_border( y, start, end, colour );
     }
 
@@ -773,11 +775,9 @@ update_ui_screen( void )
 int
 display_frame( void )
 {
-  assert( display_all_dirty == 0xffffffff );
+  update_border();
 
   update_dirty_rects();
-
-  update_border();
 
   update_ui_screen();
 
@@ -821,14 +821,14 @@ void display_refresh_all(void)
 
   display_redraw_all = 1;
 
-  for( i = 0; i < DISPLAY_HEIGHT; i++ )
+  for( i = 0; i < DISPLAY_SCREEN_HEIGHT; i++ )
     display_is_dirty[i] = display_all_dirty;
 
   for( i = 0; i < DISPLAY_SCREEN_HEIGHT; i++ )
     display_current_border[i] = display_border_mixed;
 
-  for( i = 0; i < DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT*3; i++ )
-    display_last_screen[ i ] = 255;
+  memset( display_last_screen, 255,
+          DISPLAY_SCREEN_WIDTH_COLS*DISPLAY_SCREEN_HEIGHT*3 );
 }
 
 void
@@ -893,7 +893,7 @@ display_write( libspectrum_dword last_tstates )
   }
 
   /* And draw it if it is different to what was there last time */
-  int index = (x + y * DISPLAY_WIDTH_COLS)*3;
+  int index = (beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS)*3;
   if( display_last_screen[ index ] != data ||
       display_last_screen[ index+1 ] != data2 ||
       display_last_screen[ index+2 ] != mode_data
@@ -901,9 +901,9 @@ display_write( libspectrum_dword last_tstates )
     libspectrum_byte ink, paper;
     display_get_attr( x, y, &ink, &paper );
     if( scld_last_dec.name.hires ) {
-      display_plot16( x, y, hires_data, ink, paper );
+      display_plot16( beam_x, beam_y, hires_data, ink, paper );
     } else {
-      display_plot8( x, y, data, ink, paper );
+      display_plot8( beam_x, beam_y, data, ink, paper );
     }
 
     /* Update last display record */
@@ -912,7 +912,7 @@ display_write( libspectrum_dword last_tstates )
     display_last_screen[ index+2 ] = mode_data;
 
     /* And now mark it dirty */
-    display_is_dirty[y] |= ( (libspectrum_dword)1 << x );
+    display_is_dirty[beam_y] |= ( (libspectrum_qword)1 << beam_x );
   }
 
   /* Schedule next EVENT_TYPE_DISPLAY_WRITE as long as there are reads

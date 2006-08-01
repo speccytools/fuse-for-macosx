@@ -1419,3 +1419,5 @@
          hacking/implementation_notes.txt: new character based renderer fixes
          regressions with various demos and mixed mode Timex screens (fixes
          bug #1105190) (Fred).
+20060801 display.c: integrate border with display_last_screen and use
+         display_plot8 for drawing (Fred).
