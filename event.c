@@ -56,6 +56,9 @@ libspectrum_dword event_next_event;
 /* The actual list of events */
 static GSList* event_list;
 
+/* The list of events ready to be reused */
+static GSList* event_free_list;
+
 /* Comparision function so events stay in t-state order */
 static gint event_add_cmp( gconstpointer a, gconstpointer b );
 
@@ -75,6 +78,7 @@ static int event_force_events( void );
 int event_init(void)
 {
   event_list=NULL;
+  event_free_list=NULL;
   event_next_event=event_no_events;
   return 0;
 }
@@ -85,8 +89,13 @@ event_add( libspectrum_dword event_time, event_type type )
 {
   event_t *ptr;
 
-  ptr=(event_t*)malloc(sizeof(event_t));
-  if(!ptr) return 1;
+  if( event_free_list ) {
+    ptr=((event_t*)(event_free_list->data) );
+    event_free_list=g_slist_remove(event_free_list,ptr);
+  } else {
+    ptr=(event_t*)malloc(sizeof(event_t));
+    if(!ptr) return 1;
+  }
 
   ptr->tstates= event_time;
   ptr->type=type;
@@ -174,7 +183,7 @@ int event_do_events(void)
       ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );
       break;
     }
-    free(ptr);
+    event_free_list=g_slist_prepend(event_free_list,ptr);
   }
 
   return 0;
@@ -228,6 +237,9 @@ int event_reset(void)
   g_slist_foreach(event_list,event_free_entry,NULL);
   g_slist_free(event_list);
   event_list=NULL;
+  g_slist_foreach(event_free_list,event_free_entry,NULL);
+  g_slist_free(event_free_list);
+  event_free_list=NULL;
   event_next_event=event_no_events;
   return 0;
 }

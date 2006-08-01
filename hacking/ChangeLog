@@ -1421,3 +1421,5 @@
          bug #1105190) (Fred).
 20060801 display.c: integrate border with display_last_screen and use
          display_plot8 for drawing (Fred).
+20060801 event.c: store old events in a free list rather than mallocing and
+         freeing them each time (Fred).
