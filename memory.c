@@ -1,5 +1,5 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2006 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -33,7 +33,6 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "divide.h"
-#include "event.h"
 #include "fuse.h"
 #include "if1.h"
 #include "if2.h"
@@ -205,13 +204,9 @@ writebyte( libspectrum_word address, libspectrum_byte b )
 
   if( mapping->contended ) tstates += ula_contention[ tstates ];
 
-  /* Update tstates to the point before the write takes effect */
-  tstates += 2;
-
   writebyte_internal( address, b );
 
-  /* and now we've done the write, the final tstate */
-  tstates += 1;
+  tstates += 3;
 }
 
 void
@@ -230,19 +225,14 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
     /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
     libspectrum_word offset2 = offset + mapping->offset;
 
-    /* If this is a write to the current screen and we have a pending
-       event which may be a display read event that will read this
-       memory location, then do the events up to now before the write
-       takes effect */
+    /* If this is a write to the current screen (and it actually changes
+       the destination), redraw that bit */
     if( mapping->bank == MEMORY_BANK_HOME && 
 	mapping->page_num == memory_current_screen &&
 	( offset2 & memory_screen_mask ) < 0x1b00 &&
-        event_next_event <= tstates &&
-        event_next_event >= machine_current->ula_read_sequence[ 0 ] &&
-        event_next_event <= machine_current->ula_read_sequence[
-                                    DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT-1 ] ) {
-        event_do_events();
-    }
+	memory[ offset ] != b )
+      display_dirty( offset2 );
+
     memory[ offset ] = b;
   }
 }

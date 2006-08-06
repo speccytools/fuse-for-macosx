@@ -1,5 +1,5 @@
 /* event.c: Routines needed for dealing with the event list
-   Copyright (c) 2000-2006 Philip Kendall
+   Copyright (c) 2000-2004 Philip Kendall
 
    $Id$
 
@@ -56,9 +56,6 @@ libspectrum_dword event_next_event;
 /* The actual list of events */
 static GSList* event_list;
 
-/* The list of events ready to be reused */
-static GSList* event_free_list;
-
 /* Comparision function so events stay in t-state order */
 static gint event_add_cmp( gconstpointer a, gconstpointer b );
 
@@ -78,7 +75,6 @@ static int event_force_events( void );
 int event_init(void)
 {
   event_list=NULL;
-  event_free_list=NULL;
   event_next_event=event_no_events;
   return 0;
 }
@@ -89,13 +85,8 @@ event_add( libspectrum_dword event_time, event_type type )
 {
   event_t *ptr;
 
-  if( event_free_list ) {
-    ptr=((event_t*)(event_free_list->data) );
-    event_free_list=g_slist_remove(event_free_list,ptr);
-  } else {
-    ptr=(event_t*)malloc(sizeof(event_t));
-    if(!ptr) return 1;
-  }
+  ptr=(event_t*)malloc(sizeof(event_t));
+  if(!ptr) return 1;
 
   ptr->tstates= event_time;
   ptr->type=type;
@@ -177,13 +168,11 @@ int event_do_events(void)
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );
       break;
 
-    case EVENT_TYPE_DISPLAY_WRITE: display_write( ptr->tstates ); break;
-
     default:
       ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );
       break;
     }
-    event_free_list=g_slist_prepend(event_free_list,ptr);
+    free(ptr);
   }
 
   return 0;
@@ -237,9 +226,6 @@ int event_reset(void)
   g_slist_foreach(event_list,event_free_entry,NULL);
   g_slist_free(event_list);
   event_list=NULL;
-  g_slist_foreach(event_free_list,event_free_entry,NULL);
-  g_slist_free(event_free_list);
-  event_free_list=NULL;
   event_next_event=event_no_events;
   return 0;
 }
@@ -294,7 +280,6 @@ event_name( event_type type )
   case EVENT_TYPE_TRDOS_INDEX: return "TR-DOS index";
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
   case EVENT_TYPE_TIMER: return "Timer";
-  case EVENT_TYPE_DISPLAY_WRITE: return "ULA display write";
 
   }
 

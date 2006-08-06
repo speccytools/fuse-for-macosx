@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2006 Philip Kendall
+   Copyright (c) 1999-2005 Philip Kendall
 
    $Id$
 
@@ -269,8 +269,6 @@ machine_select_machine( fuse_machine_info *machine )
   /* Reset any dialogue boxes etc. which contain machine-dependent state */
   ui_widgets_reset();
 
-  display_write( 0 );
-
   return 0;
 }
 
@@ -385,8 +383,7 @@ machine_reset( void )
 int
 machine_set_timings( fuse_machine_info *machine )
 {
-  size_t x,y;
-  int tstate, line_start;
+  size_t y;
 
   /* Pull timings we use repeatedly out of libspectrum and store them
      for ourself */
@@ -425,26 +422,6 @@ machine_set_timings( fuse_machine_info *machine )
   for( y=1; y<DISPLAY_SCREEN_HEIGHT+1; y++ ) {
     machine->line_times[y] = machine->line_times[y-1] + 
                              machine->timings.tstates_per_line;
-  }
-
-  /*
-     libspectrum_timings_top_left_pixel gives us the number of tstates
-     after the interrupt at which the top-left pixel of the screen is
-     read by the ULA to be displayed.
-
-     We would then like the number of tstates to each subsequent read
-     of memory for each element in the non-border display.
-  */
-
-  tstate = libspectrum_timings_top_left_pixel( machine->machine );
-  line_start = tstate;
-  for( y=0; y<DISPLAY_HEIGHT; y++ ) {
-    for( x=0; x<DISPLAY_WIDTH_COLS; x++ ) {
-      machine->ula_read_sequence[ x + y * DISPLAY_WIDTH_COLS ] = tstate;
-      tstate += 4;
-    }
-    line_start += machine->timings.tstates_per_line;
-    tstate=line_start;
   }
 
   return 0;

@@ -1414,12 +1414,3 @@
 	 #1511906).
 20060730 tape.c: don't use tape traps unless we're at the very start of a
 	 ROM block (partial fix for bug #1531346).
-20060731 display.[ch],event.[ch],machine.[ch],memory.c,scld.c,screenshot.c,
-         machines/{scorpion.c,spec128.c,specplus3.c},
-         hacking/implementation_notes.txt: new character based renderer fixes
-         regressions with various demos and mixed mode Timex screens (fixes
-         bug #1105190) (Fred).
-20060801 display.c: integrate border with display_last_screen and use
-         display_plot8 for drawing (Fred).
-20060801 event.c: store old events in a free list rather than mallocing and
-         freeing them each time (Fred).

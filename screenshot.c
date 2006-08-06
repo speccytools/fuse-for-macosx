@@ -483,5 +483,7 @@ screenshot_scr_read( const char *filename )
 
   utils_close_file( &screen );
 
+  display_refresh_all();
+
   return error;
 }

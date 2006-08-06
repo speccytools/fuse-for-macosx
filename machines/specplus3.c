@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2006 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -386,14 +386,21 @@ specplus3_memoryport2_write( libspectrum_word port GCC_UNUSED,
 int
 specplus3_memory_map( void )
 {
-  int page, rom;
+  int page, rom, screen;
   size_t i;
 
   page = machine_current->ram.last_byte & 0x07;
-  memory_current_screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
+  screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   rom =
     ( ( machine_current->ram.last_byte  & 0x10 ) >> 4 ) |
     ( ( machine_current->ram.last_byte2 & 0x04 ) >> 1 );
+
+  /* If we changed the active screen, mark the entire display file as
+     dirty so we redraw it on the next pass */
+  if( memory_current_screen != screen ) {
+    display_refresh_all();
+    memory_current_screen = screen;
+  }
 
   /* Check whether we want a special RAM configuration */
   if( machine_current->ram.last_byte2 & 0x01 ) {

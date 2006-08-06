@@ -1,5 +1,5 @@
 /* display.h: Routines for printing the Spectrum's screen
-   Copyright (c) 1999-2006 Philip Kendall
+   Copyright (c) 1999-2003 Philip Kendall
 
    $Id$
 
@@ -80,6 +80,7 @@ extern libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
 int display_init(int *argc, char ***argv);
 void display_line(void);
 
+void display_dirty( libspectrum_word address );
 void display_putpixel( int x, int y, int colour );
 void display_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
 		    libspectrum_byte paper );
@@ -97,7 +98,5 @@ int display_frame(void);
 void display_refresh_all(void);
 
 libspectrum_word display_get_addr( int x, int y );
-
-void display_write( libspectrum_dword last_tstates );
 
 #endif			/* #ifndef FUSE_DISPLAY_H */

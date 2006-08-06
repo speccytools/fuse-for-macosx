@@ -1,5 +1,5 @@
 /* machine.h: Routines for handling the various machine types
-   Copyright (c) 1999-2006 Philip Kendall
+   Copyright (c) 1999-2004 Philip Kendall
 
    $Id$
 
@@ -70,9 +70,6 @@ typedef struct fuse_machine_info {
   machine_timings timings; /* How long do things take to happen? */
   /* Redraw line y this many tstates after interrupt */
   libspectrum_dword line_times[DISPLAY_SCREEN_HEIGHT+1];
-
-  /* An array of each point at which a screen reading should be taken */
-  libspectrum_word ula_read_sequence[DISPLAY_WIDTH_COLS*DISPLAY_HEIGHT];
 
   spectrum_raminfo ram; /* How do we access memory, and what's currently
 			   paged in */
