@@ -1419,3 +1419,6 @@
 	 (thanks Mark Woodmass for testing on a real machine).
 20060806 profile.c: ensure changes in profiling state are picked up by the
 	 main loop (fixes bug #1530345).
+20060806 tape.c: make actually starting the tape the very last action in
+	 tape_play(), as this can cause the tape to stop again which can
+	 lead to our internal state becoming inconsistent.

@@ -590,12 +590,12 @@ tape_play( int autoplay )
   if( ( !( machine_current->timex ) ) && settings_current.sound_load )
     sound_beeper( 1, tape_microphone );
 
-  error = tape_next_edge( tstates ); if( error ) return error;
-
   /* If we're fastloading, turn sound off */
   if( settings_current.fastload ) fuse_sound_disable();
 
   loader_tape_play();
+
+  error = tape_next_edge( tstates ); if( error ) return error;
 
   return 0;
 }
