@@ -129,5 +129,10 @@ $Id$
 | Release-0_6_2-merge-1
 | Release-0_7_0pre1
 | Release-0_7_0
+| Release-0_7_0-trunk
+|
++-\					Branch for Fred's renderer changes
+| |
+| | Release-0_7_0-render-branch
 |
 HEAD
