@@ -183,10 +183,8 @@ void contend_write( libspectrum_word address, libspectrum_dword time );
    right thing assuming it's given a constant for 'bit' */
 #define BIT( bit, value ) \
 { \
-  F = ( F & FLAG_C ) | FLAG_H; \
+  F = ( F & FLAG_C ) | FLAG_H | ( value & ( FLAG_3 | FLAG_5 ) ); \
   if( ! ( (value) & ( 0x01 << (bit) ) ) ) F |= FLAG_P | FLAG_Z; \
-  if( (bit) == 3 && (value) & 0x08 ) F |= FLAG_3; \
-  if( (bit) == 5 && (value) & 0x20 ) F |= FLAG_5; \
   if( (bit) == 7 && (value) & 0x80 ) F |= FLAG_S; \
 }
 

@@ -1414,3 +1414,6 @@
 	 #1511906).
 20060730 tape.c: don't use tape traps unless we're at the very start of a
 	 ROM block (partial fix for bug #1531346).
+20060806 z80/z80_macros.h,z80/tests/{*cb*,README}: bits 3 and 5 of the value
+	 are copied to F on all BIT instructions, not just BIT 3,r and BIT 5,r
+	 (thanks Mark Woodmass for testing on a real machine).
