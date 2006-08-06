@@ -30,6 +30,7 @@
 
 #include <libspectrum.h>
 
+#include "event.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 
@@ -48,13 +49,18 @@ profile_start( void )
   profile_last_pc = z80.pc.w;
   profile_last_tstates = tstates;
 
+  /* Schedule an event to ensure that the main z80 emulation loop recognises
+     profiling is turned on; otherwise problems occur if we we started while
+     the debugger was active (bug #1530345) */
+  event_add( tstates, EVENT_TYPE_NULL );
+
   ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 1 );
 }
 
 void
 profile_map( libspectrum_word pc )
 {
-  if( tstates - profile_last_tstates > 256 ) abort();
+  if( tstates - profile_last_tstates > 256 ) fuse_abort();
 
   total_tstates[ profile_last_pc ] += tstates - profile_last_tstates;
 
@@ -90,5 +96,10 @@ profile_finish( const char *filename )
   }
 
   profile_active = 0;
+
+  /* Again, schedule an event to ensure this change is picked up by
+     the main loop */
+  event_add( tstates, EVENT_TYPE_NULL );
+
   ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 0 );
 }

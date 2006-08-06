@@ -1417,3 +1417,5 @@
 20060806 z80/z80_macros.h,z80/tests/{*cb*,README}: bits 3 and 5 of the value
 	 are copied to F on all BIT instructions, not just BIT 3,r and BIT 5,r
 	 (thanks Mark Woodmass for testing on a real machine).
+20060806 profile.c: ensure changes in profiling state are picked up by the
+	 main loop (fixes bug #1530345).
