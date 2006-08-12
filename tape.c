@@ -331,6 +331,13 @@ int tape_load_trap( void )
     return -1;
   }
 
+  /* We don't properly handle the case of partial loading, so don't run
+     the traps in that situation */
+  if( libspectrum_tape_block_data_length( block ) != DE + 2 ) {
+    tape_play( 1 );
+    return -1;
+  }
+
   /* All returns made via the RET at #05E2, except on Timex 2068 at #0136 */
   if ( machine_current->machine == LIBSPECTRUM_MACHINE_TC2068 ||
        machine_current->machine == LIBSPECTRUM_MACHINE_TS2068 ) {

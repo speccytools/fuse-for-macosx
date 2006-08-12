@@ -1424,3 +1424,5 @@
 	 lead to our internal state becoming inconsistent.
 20060812 tape.c: ensure tapes with multiple metadata blocks use traps
 	 correctly (see bug #1531346).
+20060812 tape.c: don't use tape traps when loading part of a block (Technician
+	 Ted as part of bug #1531346).
