@@ -316,18 +316,18 @@ int tape_load_trap( void )
 
   block = libspectrum_tape_current_block( tape );
 
+  /* Skip over any meta-data blocks */
+  while( libspectrum_tape_block_metadata( block ) ) {
+    block = libspectrum_tape_select_next_block( tape );
+    if( !block ) return 1;
+  }
+  
   /* If this block isn't a ROM loader, start the block playing. After
      that, return with `error' so that we actually do whichever
      instruction it was that caused the trap to hit */
   if( libspectrum_tape_block_type( block ) != LIBSPECTRUM_TAPE_BLOCK_ROM ||
       libspectrum_tape_block_state( block ) != LIBSPECTRUM_TAPE_STATE_PILOT ) {
-
-    error = tape_play( 1 );
-    /* If there wasn't an error and the tape isn't playing, that means
-       that it was a zero-length block (eg a comment), so try running the
-       trap again */
-    if( !error && !tape_playing ) return tape_load_trap();
-
+    tape_play( 1 );
     return -1;
   }
 

@@ -1422,3 +1422,5 @@
 20060806 tape.c: make actually starting the tape the very last action in
 	 tape_play(), as this can cause the tape to stop again which can
 	 lead to our internal state becoming inconsistent.
+20060812 tape.c: ensure tapes with multiple metadata blocks use traps
+	 correctly (see bug #1531346).
