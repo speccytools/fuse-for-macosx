@@ -502,9 +502,8 @@ sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
     sdl_blit_icon( green_cassette, &r, tmp_screen_pitch, dstPitch );
     break;
   case UI_STATUSBAR_STATE_INACTIVE:
-    sdl_blit_icon( red_cassette, &r, tmp_screen_pitch, dstPitch );
-    break;
   case UI_STATUSBAR_STATE_NOT_AVAILABLE:
+    sdl_blit_icon( red_cassette, &r, tmp_screen_pitch, dstPitch );
     break;
   }
 }

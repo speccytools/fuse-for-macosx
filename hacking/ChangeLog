@@ -1426,3 +1426,5 @@
 	 correctly (see bug #1531346).
 20060812 tape.c: don't use tape traps when loading part of a block (Technician
 	 Ted as part of bug #1531346).
+20060814 ui/sdl/sdldisplay.c: fix tape icon display before a tape is played
+         (Fred).
