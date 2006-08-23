@@ -1428,3 +1428,6 @@
 	 Ted as part of bug #1531346).
 20060814 ui/sdl/sdldisplay.c: fix tape icon display before a tape is played
          (Fred).
+20060823 menu.c,menu_data.c,trdos.h,ui/gtk/gtkui.c: add support for up to four
+         drives and four interfaces in the UI 
+	 (patch #1145082) (Stuart).

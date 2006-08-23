@@ -820,7 +820,13 @@ ui_trdos_disk_write( trdos_drive_number which )
 {
   char drive, *filename, title[80];
 
-  drive = which == TRDOS_DRIVE_A ? 'A' : 'B';
+  switch( which ) {
+    case TRDOS_DRIVE_A: drive = 'A'; break;
+    case TRDOS_DRIVE_B: drive = 'B'; break;
+    case TRDOS_DRIVE_C: drive = 'C'; break;
+    case TRDOS_DRIVE_D: drive = 'D'; break;
+    default: drive = '?'; break;
+  }
 
   fuse_emulation_pause();
 

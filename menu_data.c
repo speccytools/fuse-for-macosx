@@ -216,21 +216,21 @@ Media/Disk/+_3, Branch
 Media/Disk/+3/Drive _A:, Branch
 Media/Disk/+3/Drive A:/_Insert..., Item,, menu_media_disk_insert, 1
 Media/Disk/+3/Drive A:/_Eject, Item,, menu_media_disk_eject, 1
-Media/Disk/+3/Drive A:/Eject and _write..., Item,, menu_media_disk_eject, 3
+Media/Disk/+3/Drive A:/Eject and _write..., Item,, menu_media_disk_eject, 17
 Media/Disk/+3/Drive _B:, Branch
 Media/Disk/+3/Drive B:/_Insert..., Item,, menu_media_disk_insert, 2
 Media/Disk/+3/Drive B:/_Eject, Item,, menu_media_disk_eject, 2
-Media/Disk/+3/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 4
+Media/Disk/+3/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 18
 
 Media/Disk/_TR-DOS, Branch
 Media/Disk/TR-DOS/Drive _A:, Branch
-Media/Disk/TR-DOS/Drive A:/_Insert..., Item,, menu_media_disk_insert, 3
+Media/Disk/TR-DOS/Drive A:/_Insert..., Item,, menu_media_disk_insert, 5
 Media/Disk/TR-DOS/Drive A:/_Eject, Item,, menu_media_disk_eject, 5
-Media/Disk/TR-DOS/Drive A:/Eject and _write..., Item,, menu_media_disk_eject, 7
+Media/Disk/TR-DOS/Drive A:/Eject and _write..., Item,, menu_media_disk_eject, 21
 Media/Disk/TR-DOS/Drive _B:, Branch
-Media/Disk/TR-DOS/Drive B:/_Insert..., Item,, menu_media_disk_insert, 4
+Media/Disk/TR-DOS/Drive B:/_Insert..., Item,, menu_media_disk_insert, 6
 Media/Disk/TR-DOS/Drive B:/_Eject, Item,, menu_media_disk_eject, 6
-Media/Disk/TR-DOS/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 8
+Media/Disk/TR-DOS/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 22
 
 Media/_Cartridge, Branch
 Media/Cartridge/_Timex Dock, Branch

@@ -432,20 +432,23 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
   int which, type;
   
   action--;
-  which = action & 0x01;
-  type  = action & 0x02;
+  which = action & 0x03;
+  type = ( action & 0x0c ) >> 2;
 
   fuse_emulation_pause();
 
   filename = menu_get_filename( "Fuse - Insert disk" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  if( type ) {
-    trdos_disk_insert_default_autoload( which, filename );
-  } else {
+  switch( type ) {
+  case 0:
 #ifdef HAVE_765_H
     specplus3_disk_insert_default_autoload( which, filename );
 #endif				/* #ifdef HAVE_765_H */
+    break;
+  case 1:
+    trdos_disk_insert_default_autoload( which, filename );
+    break;
   }
 
   free( filename );
@@ -460,16 +463,19 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
   WIDGET_END;
 
   action--;
-  which = action & 0x01;
-  write = action & 0x02;
-  type  = action & 0x04;
+  which = action & 0x03;
+  type = ( action & 0x0c ) >> 2;
+  write = action & 0x10;
 
-  if( type ) {
-    trdos_disk_eject( which, write );
-  } else {
+  switch( type ) {
+  case 0:
 #ifdef HAVE_765_H
     specplus3_disk_eject( which, write );
 #endif			/* #ifdef HAVE_765_H */
+    break;
+  case 1:
+    trdos_disk_eject( which, write );
+    break;
   }
 
 }

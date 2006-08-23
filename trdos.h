@@ -66,6 +66,8 @@ void trdos_sp_write( libspectrum_word port, libspectrum_byte b );
 typedef enum trdos_drive_number {
   TRDOS_DRIVE_A = 0,
   TRDOS_DRIVE_B,
+  TRDOS_DRIVE_C,
+  TRDOS_DRIVE_D,
 } trdos_drive_number;
 
 int trdos_disk_insert( trdos_drive_number which, const char *filename,
