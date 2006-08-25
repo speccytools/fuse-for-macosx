@@ -238,7 +238,11 @@ add_rectangle( int y, int x, int w )
 
     if( active_rectangle[i].x == x &&
 	active_rectangle[i].w == w    ) {
-      active_rectangle[i].h++;
+      /* Don't extend rect past the end of the screen - probably implies
+         we are overdrawing the border sometimes? */
+      if( active_rectangle[i].y + active_rectangle[i].h <
+          DISPLAY_SCREEN_HEIGHT )
+        active_rectangle[i].h++;
       return 0;
     }
   }

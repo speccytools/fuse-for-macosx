@@ -1434,3 +1434,5 @@
 20060825 man/fuse.1: fix typo (Stuart Brady).
 20060825 TAG: Release-0_7_0-trunk-1
 20060825 BRANCH: Release-0_7_0-disciple-branch
+20060825 display.c: don't extend rects past the end of the screen (fixes bug
+         #1304939) (Fred).
