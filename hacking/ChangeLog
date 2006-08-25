@@ -1432,3 +1432,5 @@
          drives and four interfaces in the UI 
 	 (patch #1145082) (Stuart Brady).
 20060825 man/fuse.1: fix typo (Stuart Brady).
+20060825 TAG: Release-0_7_0-trunk-1
+20060825 BRANCH: Release-0_7_0-disciple-branch

@@ -135,4 +135,10 @@ $Id$
 | |
 | | Release-0_7_0-render-branch
 |
+| Release-0_7_0-trunk-1
+|
++-\					Branch for Disciple support
+| |
+| | Release-0_7_0-disciple-branch
+|
 HEAD
