@@ -1430,4 +1430,5 @@
          (Fred).
 20060823 menu.c,menu_data.c,trdos.h,ui/gtk/gtkui.c: add support for up to four
          drives and four interfaces in the UI 
-	 (patch #1145082) (Stuart).
+	 (patch #1145082) (Stuart Brady).
+20060825 man/fuse.1: fix typo (Stuart Brady).
