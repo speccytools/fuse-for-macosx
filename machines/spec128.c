@@ -236,7 +236,8 @@ spec128_memory_map( void )
      dirty so we redraw it on the next pass */
   /* FIXME: Could do better with checksumming and rect submitting */
   if( memory_current_screen != screen ) {
-    display_refresh_all();
+    display_update_critical( 0, 0 );
+    display_refresh_main_screen();
     memory_current_screen = screen;
   }
 

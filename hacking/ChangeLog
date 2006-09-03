@@ -1436,3 +1436,7 @@
 20060825 BRANCH: Release-0_7_0-disciple-branch
 20060825 display.c: don't extend rects past the end of the screen (fixes bug
          #1304939) (Fred).
+20060903 display.[ch],machines/{scorpion.c,spec128.c,specplus3.c},memory.c,
+         scld.c: update critical region on 128 screen switch and SCLD mode
+         change, update tstates on memory write before checking critical
+         region (fixes bug #1105190) (Fred).

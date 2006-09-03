@@ -169,7 +169,8 @@ scorpion_memory_map( void )
 
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
   if( memory_current_screen != screen ) {
-    display_refresh_all();
+    display_update_critical( 0, 0 );
+    display_refresh_main_screen();
     memory_current_screen = screen;
   }
 

@@ -204,9 +204,9 @@ writebyte( libspectrum_word address, libspectrum_byte b )
 
   if( mapping->contended ) tstates += ula_contention[ tstates ];
 
-  writebyte_internal( address, b );
-
   tstates += 3;
+
+  writebyte_internal( address, b );
 }
 
 void

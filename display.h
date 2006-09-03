@@ -95,8 +95,11 @@ void display_set_hires_border(int colour);
 int display_dirty_border(void);
 
 int display_frame(void);
+void display_refresh_main_screen(void);
 void display_refresh_all(void);
 
 libspectrum_word display_get_addr( int x, int y );
+
+void display_update_critical( int x, int y );
 
 #endif			/* #ifndef FUSE_DISPLAY_H */

@@ -1,5 +1,5 @@
 /* display.c: Routines for printing the Spectrum screen
-   Copyright (c) 1999-2004 Philip Kendall, Thomas Harte, Witold Filipczyk
+   Copyright (c) 1999-2006 Philip Kendall, Thomas Harte, Witold Filipczyk
                            and Fredrick Meunier
 
    $Id$
@@ -576,6 +576,34 @@ get_beam_position( int *x, int *y )
   *x = ( tstates - machine_current->line_times[ *y ] ) / 4;
 }
 
+void
+display_update_critical( int x, int y )
+{
+  int beam_x, beam_y;
+
+  get_beam_position( &beam_x, &beam_y );
+
+  beam_x -= DISPLAY_BORDER_WIDTH_COLS;
+  beam_y -= DISPLAY_BORDER_HEIGHT;
+
+  if( beam_y < 0 ) {
+    beam_x = beam_y = 0;
+  } else if( beam_y >= DISPLAY_HEIGHT ) {
+    beam_x = DISPLAY_WIDTH_COLS;
+    beam_y = DISPLAY_HEIGHT - 1;
+  }
+
+  if( beam_x < 0 ) {
+    beam_x = 0;
+  } else if( beam_x > DISPLAY_WIDTH_COLS ) {
+    beam_x = DISPLAY_WIDTH_COLS;
+  }
+
+  if(   y <  beam_y                 ||
+      ( y == beam_y && x < beam_x )    )
+    copy_critical_region( beam_x, beam_y );
+}
+
 /* Mark the 8-pixel chunk at (x,y) as dirty and update the critical
    region as appropriate */
 static void
@@ -586,29 +614,7 @@ display_dirty_chunk( int x, int y )
   if(   y >  critical_region_y                             ||
       ( y == critical_region_y && x >= critical_region_x )    ) {
 
-    int beam_x, beam_y;
-
-    get_beam_position( &beam_x, &beam_y );
-
-    beam_x -= DISPLAY_BORDER_WIDTH_COLS;
-    beam_y -= DISPLAY_BORDER_HEIGHT;
-
-    if( beam_y < 0 ) {
-      beam_x = beam_y = 0;
-    } else if( beam_y >= DISPLAY_HEIGHT ) {
-      beam_x = DISPLAY_WIDTH_COLS;
-      beam_y = DISPLAY_HEIGHT - 1;
-    }
-
-    if( beam_x < 0 ) {
-      beam_x = 0;
-    } else if( beam_x > DISPLAY_WIDTH_COLS ) {
-      beam_x = DISPLAY_WIDTH_COLS;
-    }
-
-    if(   y <  beam_y                 ||
-	( y == beam_y && x < beam_x )    )
-      copy_critical_region( beam_x, beam_y );
+    display_update_critical( x, y );
   }
 
   display_is_dirty[y] |= ( (libspectrum_dword)1 << x );
@@ -1099,15 +1105,22 @@ static void display_dirty_flashing(void)
   }
 }
 
+void display_refresh_main_screen(void)
+{
+  size_t i;
+
+  for( i = 0; i < DISPLAY_HEIGHT; i++ )
+    display_is_dirty[i] = display_all_dirty;
+}
+
 void display_refresh_all(void)
 {
   size_t i;
 
   display_redraw_all = 1;
 
-  for( i = 0; i < DISPLAY_HEIGHT; i++ )
-    display_is_dirty[i] = display_all_dirty;
-
   for( i = 0; i < DISPLAY_SCREEN_HEIGHT; i++ )
     display_current_border[i] = display_border_mixed;
+
+  display_refresh_main_screen();
 }
