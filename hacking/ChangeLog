@@ -1444,3 +1444,4 @@
          in case we need a new one soon to save on malloc/free overhead, 
          and if we know an event will go on the front of a list just prepend
          rather than insert sorted (Fred).
+20060904 widget/menu.c: fix saving PNG screenshots from the widget UI (Fred).

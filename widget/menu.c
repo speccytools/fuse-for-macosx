@@ -276,8 +276,10 @@ menu_file_savescreenaspng( int action )
   data.exit_all_widgets = 1;
   data.title = "Fuse - save screenshot as PNG";
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
-  if( widget_filesel_name )
+  if( widget_filesel_name ) {
+    screenshot_save();
     screenshot_write( widget_filesel_name, scaler );
+  }
 }
 
 void
