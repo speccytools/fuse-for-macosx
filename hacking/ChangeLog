@@ -1440,3 +1440,7 @@
          scld.c: update critical region on 128 screen switch and SCLD mode
          change, update tstates on memory write before checking critical
          region (fixes bug #1105190) (Fred).
+20060904 event.c: minor event optimisations - keep most recent event around
+         in case we need a new one soon to save on malloc/free overhead, 
+         and if we know an event will go on the front of a list just prepend
+         rather than insert sorted (Fred).
