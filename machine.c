@@ -409,14 +409,16 @@ machine_set_timings( fuse_machine_info *machine )
      displayed. However, what's more useful for Fuse is when the first
      pixel of the top line of the border is displayed.
 
-     Fuse shows 24 lines of top border and DISPLAY_BORDER_WIDTH_COLS
-     columns of left border, so we subtract the appropriate offset to
-     get when the top-left pixel of the border is displayed.
+     Fuse shows DISPLAY_BORDER_HEIGHT lines of top border and
+     DISPLAY_BORDER_WIDTH_COLS columns of left border, so we subtract
+     the appropriate offset to get when the top-left pixel of the
+     border is displayed.
   */
 
   machine->line_times[0]=
     libspectrum_timings_top_left_pixel( machine->machine ) -
-    24 * machine->timings.tstates_per_line -	/* 24 lines of top border */
+    /* DISPLAY_BORDER_HEIGHT lines of top border */
+    DISPLAY_BORDER_HEIGHT * machine->timings.tstates_per_line -
     4 * DISPLAY_BORDER_WIDTH_COLS; /* Left border at 4 tstates per column */
 
   for( y=1; y<DISPLAY_SCREEN_HEIGHT+1; y++ ) {
