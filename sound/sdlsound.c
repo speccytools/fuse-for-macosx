@@ -189,6 +189,8 @@ sdlwrite( void *userdata, Uint8 *stream, int len )
     stream += f;
     len -= f;
   }
+
+  /* If we ran out of sound, make do with silence :( */
   if( f < 0 ) {
     for( f=0; f<len; f++ ) {
       *stream++ = 0;

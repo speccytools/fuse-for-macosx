@@ -1445,3 +1445,4 @@
          and if we know an event will go on the front of a list just prepend
          rather than insert sorted (Fred).
 20060904 widget/menu.c: fix saving PNG screenshots from the widget UI (Fred).
+20060904 sound/sdlsound.c: add extra comment (Fred).
