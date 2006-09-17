@@ -1,5 +1,5 @@
 /* sdldisplay.c: Routines for dealing with the SDL display
-   Copyright (c) 2000-2005 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2006 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
 
    $Id$
 
@@ -508,14 +508,155 @@ sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
   }
 }
 
+/* Set one pixel in the display */
+void
+uidisplay_putpixel( int x, int y, int colour )
+{
+  libspectrum_word *dest_base, *dest;
+  Uint32 *palette_values = settings_current.bw_tv ? bw_values :
+                           colour_values;
+
+  Uint32 palette_colour = palette_values[ colour ];
+
+  if( machine_current->timex ) {
+    x <<= 1; y <<= 1;
+    dest_base = dest =
+      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
+                           (x+1) * tmp_screen->format->BytesPerPixel +
+                           (y+1) * tmp_screen->pitch);
+
+    *(dest++) = palette_colour;
+    *(dest++) = palette_colour;
+    dest = (libspectrum_word*)
+      ( (libspectrum_byte*)dest_base + tmp_screen->pitch);
+    *(dest++) = palette_colour;
+    *(dest++) = palette_colour;
+  } else {
+    dest =
+      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
+                           (x+1) * tmp_screen->format->BytesPerPixel +
+                           (y+1) * tmp_screen->pitch);
+
+    *dest = palette_colour;
+  }
+}
+
+/* Print the 8 pixels in `data' using ink colour `ink' and paper
+   colour `paper' to the screen at ( (8*x) , y ) */
+void
+uidisplay_plot8( int x, int y, libspectrum_byte data,
+	         libspectrum_byte ink, libspectrum_byte paper )
+{
+  libspectrum_word *dest;
+  Uint32 *palette_values = settings_current.bw_tv ? bw_values :
+                           colour_values;
+
+  Uint32 palette_ink = palette_values[ ink ];
+  Uint32 palette_paper = palette_values[ paper ];
+
+  if( machine_current->timex ) {
+    int i;
+    libspectrum_word *dest_base;
+
+    x <<= 4; y <<= 1;
+
+    dest_base =
+      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
+                           (x+1) * tmp_screen->format->BytesPerPixel +
+                           (y+1) * tmp_screen->pitch);
+
+    for( i=0; i<2; i++ ) {
+      dest = dest_base;
+
+      *(dest++) = ( data & 0x80 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x80 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x40 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x40 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x20 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x20 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x10 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x10 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x08 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x08 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x04 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x04 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x02 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x02 ) ? palette_ink : palette_paper;
+      *(dest++) = ( data & 0x01 ) ? palette_ink : palette_paper;
+      *dest     = ( data & 0x01 ) ? palette_ink : palette_paper;
+
+      dest_base = (libspectrum_word*)
+        ( (libspectrum_byte*)dest_base + tmp_screen->pitch);
+    }
+  } else {
+    x <<= 3;
+
+    dest =
+      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
+                           (x+1) * tmp_screen->format->BytesPerPixel +
+                           (y+1) * tmp_screen->pitch);
+
+    *(dest++) = ( data & 0x80 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x40 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x20 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x10 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x08 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x04 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x02 ) ? palette_ink : palette_paper;
+    *dest     = ( data & 0x01 ) ? palette_ink : palette_paper;
+  }
+}
+
+/* Print the 16 pixels in `data' using ink colour `ink' and paper
+   colour `paper' to the screen at ( (16*x) , y ) */
+void
+uidisplay_plot16( int x, int y, libspectrum_word data,
+		  libspectrum_byte ink, libspectrum_byte paper )
+{
+  libspectrum_word *dest_base, *dest;
+  int i;
+  Uint32 *palette_values = settings_current.bw_tv ? bw_values :
+                           colour_values;
+  Uint32 palette_ink = palette_values[ ink ];
+  Uint32 palette_paper = palette_values[ paper ];
+  x <<= 4; y <<= 1;
+
+  dest_base =
+    (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
+                         (x+1) * tmp_screen->format->BytesPerPixel +
+                         (y+1) * tmp_screen->pitch);
+
+  for( i=0; i<2; i++ ) {
+    dest = dest_base;
+
+    *(dest++) = ( data & 0x8000 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x4000 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x2000 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x1000 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0800 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0400 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0200 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0100 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0080 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0040 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0020 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0010 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0008 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0004 ) ? palette_ink : palette_paper;
+    *(dest++) = ( data & 0x0002 ) ? palette_ink : palette_paper;
+    *dest     = ( data & 0x0001 ) ? palette_ink : palette_paper;
+
+    dest_base = (libspectrum_word*)
+      ( (libspectrum_byte*)dest_base + tmp_screen->pitch);
+  }
+}
+
 void
 uidisplay_frame_end( void )
 {
   SDL_Rect *r;
   Uint32 tmp_screen_pitch, dstPitch;
   SDL_Rect *last_rect;
-  Uint32 *palette_values = settings_current.bw_tv ? bw_values :
-                           colour_values;
 
   /* We check for a switch to fullscreen here to give systems with a
      windowed-only UI a chance to free menu etc. resources before
@@ -540,7 +681,6 @@ uidisplay_frame_end( void )
   if ( num_rects == 0 ) return;
 #endif                  /* #ifdef USE_WIDGET */
 
-  if( SDL_MUSTLOCK( tmp_screen ) ) SDL_LockSurface( tmp_screen );
   if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_LockSurface( sdldisplay_gc );
 
   tmp_screen_pitch = tmp_screen->pitch;
@@ -551,25 +691,9 @@ uidisplay_frame_end( void )
 
   for( r = updated_rects; r != last_rect; r++ ) {
 
-    libspectrum_word *dest_base, *dest;
-    size_t xx,yy;
     int dst_y = r->y * sdldisplay_current_size;
     int dst_h = r->h;
 
-    dest_base =
-      (libspectrum_word*)( (libspectrum_byte*)tmp_screen->pixels +
-                           (r->x+1) * tmp_screen->format->BytesPerPixel +
-			   (r->y+1)*tmp_screen_pitch );
-
-    for( yy = r->y; yy < r->y + r->h; yy++ ) {
-
-      for( xx = r->x, dest = dest_base; xx < r->x + r->w; xx++, dest++ )
-        *dest = palette_values[ display_image[yy][xx] ];
-
-      dest_base = (libspectrum_word*)
-        ( (libspectrum_byte*)dest_base + tmp_screen_pitch );
-    }
-	  
     scaler_proc16(
       (libspectrum_byte*)tmp_screen->pixels +
                         (r->x+1) * tmp_screen->format->BytesPerPixel +
@@ -593,7 +717,6 @@ uidisplay_frame_end( void )
   if ( settings_current.statusbar )
     sdl_icon_overlay( tmp_screen_pitch, dstPitch );
 
-  if( SDL_MUSTLOCK( tmp_screen ) ) SDL_UnlockSurface( tmp_screen );
   if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_UnlockSurface( sdldisplay_gc );
 
   /* Finally, blit all our changes to the screen */
@@ -670,7 +793,7 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
     return 0;
 
   case UI_STATUSBAR_ITEM_PAUSED:
-    // We don't support pausing this version of Fuse
+    /* We don't support pausing this version of Fuse */
     return 0;
 
   case UI_STATUSBAR_ITEM_TAPE:
@@ -682,7 +805,7 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
     return 0;
 
   case UI_STATUSBAR_ITEM_MOUSE:
-    // We don't support showing a grab icon
+    /* We don't support showing a grab icon */
     return 0;
 
   }

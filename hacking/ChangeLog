@@ -1447,3 +1447,18 @@
 20060904 widget/menu.c: fix saving PNG screenshots from the widget UI (Fred).
 20060904 sound/sdlsound.c: add extra comment (Fred).
 20060904 machine.c: reduce magic number count (Fred).
+20060917 display.[ch],screenshot.[ch],uidisplay.c,machines/spec128.c,
+         ui/uidisplay.h,ui/fb/fbdisplay.c,ui/ggi/ggidisplay.c,
+         ui/gtk/gtkdisplay.c,ui/gtk/gtkui.c,ui/sdl/sdldisplay.c,
+         ui/svga/svgadisplay.c,ui/win32/win32display.c,ui/xlib/xdisplay.c,
+         widget/menu.c,widget/widget.c: move display_plot* over to the UIs
+         and remove the screen copy in display.c to allow SDL (and maybe GTK
+         if Phil is so inclined) to draw directly into their existing
+         temporary screens ready for scaling to reduce unnecessary copying
+         of screen data. Restore display_last_screen for less overdraw in
+         screen/mode switch situations. Move border updating into the
+         display_*_dirty/display_plot8 system to reduce overdraw with
+         frequent border changes - e.g. loading and Shock II. Fix updating
+         of last border line after the end of the screen (fixes Shock II last
+         border line). Bulk allocate border change objects. Make
+         display_get_addr a macro. (patch #1551481) (Fred).

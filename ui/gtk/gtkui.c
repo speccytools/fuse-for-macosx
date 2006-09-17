@@ -505,7 +505,6 @@ menu_file_savescreenaspng( GtkWidget *widget GCC_UNUSED,
     menu_get_filename( "Fuse - Save Screenshot as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  screenshot_save();
   screenshot_write( filename, scaler );
 
   free( filename );

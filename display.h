@@ -1,5 +1,5 @@
 /* display.h: Routines for printing the Spectrum's screen
-   Copyright (c) 1999-2003 Philip Kendall
+   Copyright (c) 1999-2006 Philip Kendall
 
    $Id$
 
@@ -65,10 +65,6 @@
 
 extern int display_ui_initialised;
 
-extern libspectrum_word
-  display_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
-extern ptrdiff_t display_pitch;
-
 extern libspectrum_byte display_lores_border;
 extern libspectrum_byte display_hires_border;
 
@@ -80,12 +76,7 @@ extern libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
 int display_init(int *argc, char ***argv);
 void display_line(void);
 
-void display_dirty( libspectrum_word address );
-void display_putpixel( int x, int y, int colour );
-void display_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
-		    libspectrum_byte paper );
-void display_plot16( int x, int y, libspectrum_word data, libspectrum_byte ink,
-		     libspectrum_byte paper);
+void display_dirty( libspectrum_word offset );
 
 void display_parse_attr( libspectrum_byte attr, libspectrum_byte *ink,
 			 libspectrum_byte *paper );
@@ -98,7 +89,10 @@ int display_frame(void);
 void display_refresh_main_screen(void);
 void display_refresh_all(void);
 
-libspectrum_word display_get_addr( int x, int y );
+#define display_get_addr( x, y ) \
+  scld_last_dec.name.altdfile ? display_line_start[(y)]+(x)+ALTDFILE_OFFSET : \
+  display_line_start[(y)]+(x)
+int display_getpixel( int x, int y );
 
 void display_update_critical( int x, int y );
 

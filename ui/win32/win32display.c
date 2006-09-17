@@ -43,6 +43,13 @@ int image_scale;
 /* The height and width of a 1x1 image in pixels */
 int image_width, image_height;
 
+/* A copy of every pixel on the screen, replaceable by plotting directly into
+   rgb_image below */
+libspectrum_word
+  win32display_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
+ptrdiff_t win32display_pitch = DISPLAY_SCREEN_WIDTH *
+                               sizeof( libspectrum_word );
+
 /* An RGB image of the Spectrum screen; slightly bigger than the real
    screen to handle the smoothing filters which read around each pixel */
 char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
@@ -350,7 +357,7 @@ uidisplay_area( int x, int y, int w, int h )
     rgb = (libspectrum_dword*)( rgb_image + ( yy + 2 ) * rgb_pitch );
     rgb += x + 1;
 
-    display = &display_image[yy][x];
+    display = &win32display_image[yy][x];
 
     for( i = 0; i < w; i++, rgb++, display++ ) *rgb = palette[ *display ];
   }
@@ -400,9 +407,9 @@ void win32display_area(int x, int y, int width, int height)
     for(disp_y=y;disp_y < y+height;disp_y++)
     {
       pix_colour = 
-        colour_pal[3*display_image[disp_y][disp_x]] + 
-        colour_pal[(1+(3*display_image[disp_y][disp_x]))] * 256 +
-        colour_pal[(2+(3*display_image[disp_y][disp_x]))] * 256 * 256;
+        colour_pal[3*win32display_image[disp_y][disp_x]] + 
+        colour_pal[(1+(3*win32display_image[disp_y][disp_x]))] * 256 +
+        colour_pal[(2+(3*win32display_image[disp_y][disp_x]))] * 256 * 256;
       SetPixel( dc, disp_x, disp_y, pix_colour);
     }
   }
@@ -455,6 +462,92 @@ int
 uidisplay_end( void )
 {
   return 0;
+}
+
+/* Set one pixel in the display */
+void
+uidisplay_putpixel( int x, int y, int colour )
+{
+  if( machine_current->timex ) {
+    x <<= 1; y <<= 1;
+    win32display_image[y  ][x  ] = colour;
+    win32display_image[y  ][x+1] = colour;
+    win32display_image[y+1][x  ] = colour;
+    win32display_image[y+1][x+1] = colour;
+  } else {
+    win32display_image[y][x] = colour;
+  }
+}
+
+/* Print the 8 pixels in `data' using ink colour `ink' and paper
+   colour `paper' to the screen at ( (8*x) , y ) */
+void
+uidisplay_plot8( int x, int y, libspectrum_byte data,
+                libspectrum_byte ink, libspectrum_byte paper )
+{
+  x <<= 3;
+
+  if( machine_current->timex ) {
+    int i;
+
+    x <<= 1; y <<= 1;
+    for( i=0; i<2; i++,y++ ) {
+      win32display_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
+      win32display_image[y][x+ 1] = ( data & 0x80 ) ? ink : paper;
+      win32display_image[y][x+ 2] = ( data & 0x40 ) ? ink : paper;
+      win32display_image[y][x+ 3] = ( data & 0x40 ) ? ink : paper;
+      win32display_image[y][x+ 4] = ( data & 0x20 ) ? ink : paper;
+      win32display_image[y][x+ 5] = ( data & 0x20 ) ? ink : paper;
+      win32display_image[y][x+ 6] = ( data & 0x10 ) ? ink : paper;
+      win32display_image[y][x+ 7] = ( data & 0x10 ) ? ink : paper;
+      win32display_image[y][x+ 8] = ( data & 0x08 ) ? ink : paper;
+      win32display_image[y][x+ 9] = ( data & 0x08 ) ? ink : paper;
+      win32display_image[y][x+10] = ( data & 0x04 ) ? ink : paper;
+      win32display_image[y][x+11] = ( data & 0x04 ) ? ink : paper;
+      win32display_image[y][x+12] = ( data & 0x02 ) ? ink : paper;
+      win32display_image[y][x+13] = ( data & 0x02 ) ? ink : paper;
+      win32display_image[y][x+14] = ( data & 0x01 ) ? ink : paper;
+      win32display_image[y][x+15] = ( data & 0x01 ) ? ink : paper;
+    }
+  } else {
+    win32display_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
+    win32display_image[y][x+ 1] = ( data & 0x40 ) ? ink : paper;
+    win32display_image[y][x+ 2] = ( data & 0x20 ) ? ink : paper;
+    win32display_image[y][x+ 3] = ( data & 0x10 ) ? ink : paper;
+    win32display_image[y][x+ 4] = ( data & 0x08 ) ? ink : paper;
+    win32display_image[y][x+ 5] = ( data & 0x04 ) ? ink : paper;
+    win32display_image[y][x+ 6] = ( data & 0x02 ) ? ink : paper;
+    win32display_image[y][x+ 7] = ( data & 0x01 ) ? ink : paper;
+  }
+}
+
+/* Print the 16 pixels in `data' using ink colour `ink' and paper
+   colour `paper' to the screen at ( (16*x) , y ) */
+void
+uidisplay_plot16( int x, int y, libspectrum_word data,
+                 libspectrum_byte ink, libspectrum_byte paper )
+{
+  int i;
+  x <<= 4;
+
+  for( i=0; i<2; i++,y++ ) {
+    win32display_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;
+    win32display_image[y][x+ 1] = ( data & 0x4000 ) ? ink : paper;
+    win32display_image[y][x+ 2] = ( data & 0x2000 ) ? ink : paper;
+    win32display_image[y][x+ 3] = ( data & 0x1000 ) ? ink : paper;
+    win32display_image[y][x+ 4] = ( data & 0x0800 ) ? ink : paper;
+    win32display_image[y][x+ 5] = ( data & 0x0400 ) ? ink : paper;
+    win32display_image[y][x+ 6] = ( data & 0x0200 ) ? ink : paper;
+    win32display_image[y][x+ 7] = ( data & 0x0100 ) ? ink : paper;
+    win32display_image[y][x+ 8] = ( data & 0x0080 ) ? ink : paper;
+    win32display_image[y][x+ 9] = ( data & 0x0040 ) ? ink : paper;
+    win32display_image[y][x+10] = ( data & 0x0020 ) ? ink : paper;
+    win32display_image[y][x+11] = ( data & 0x0010 ) ? ink : paper;
+    win32display_image[y][x+12] = ( data & 0x0008 ) ? ink : paper;
+    win32display_image[y][x+13] = ( data & 0x0004 ) ? ink : paper;
+    win32display_image[y][x+14] = ( data & 0x0002 ) ? ink : paper;
+    win32display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
+  }
 }
 
 int

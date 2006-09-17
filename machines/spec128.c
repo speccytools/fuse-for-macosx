@@ -234,7 +234,6 @@ spec128_memory_map( void )
 
   /* If we changed the active screen, mark the entire display file as
      dirty so we redraw it on the next pass */
-  /* FIXME: Could do better with checksumming and rect submitting */
   if( memory_current_screen != screen ) {
     display_update_critical( 0, 0 );
     display_refresh_main_screen();

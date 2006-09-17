@@ -41,18 +41,18 @@ void uidisplay_spectrum_screen( const libspectrum_byte *screen, int border )
 
   for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
     for( x=0; x < DISPLAY_ASPECT_WIDTH; x++ ) {
-      display_putpixel( x, y, border );
-      display_putpixel( x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
-			border );
+      uidisplay_putpixel( x, y, border );
+      uidisplay_putpixel( x, y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT,
+			  border );
     }
   }
 
   for( y=0; y<DISPLAY_HEIGHT; y++ ) {
 
     for( x=0; x < DISPLAY_BORDER_WIDTH; x++ ) {
-      display_putpixel( x, y + DISPLAY_BORDER_HEIGHT, border );
-      display_putpixel( x + DISPLAY_ASPECT_WIDTH - DISPLAY_BORDER_ASPECT_WIDTH,
-			y + DISPLAY_BORDER_HEIGHT, border );
+      uidisplay_putpixel( x, y + DISPLAY_BORDER_HEIGHT, border );
+      uidisplay_putpixel( x + DISPLAY_ASPECT_WIDTH - DISPLAY_BORDER_ASPECT_WIDTH,
+			  y + DISPLAY_BORDER_HEIGHT, border );
     }
 
     for( x=0; x < DISPLAY_WIDTH_COLS; x++ ) {
@@ -66,7 +66,7 @@ void uidisplay_spectrum_screen( const libspectrum_byte *screen, int border )
 
       data = screen[ display_line_start[y]+x ];
 
-      display_plot8( x, y, data, ink, paper );
+      uidisplay_plot8( x, y, data, ink, paper );
     }
   }
 

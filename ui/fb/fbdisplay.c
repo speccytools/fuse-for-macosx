@@ -47,6 +47,11 @@
 #include "ui/uidisplay.h"
 #include "settings.h"
 
+/* A copy of every pixel on the screen */
+libspectrum_word
+  fbdisplay_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
+ptrdiff_t fbdisplay_pitch = DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
+
 /* The environment variable specifying which device to use */
 static const char *DEVICE_VARIABLE = "FRAMEBUFFER";
 
@@ -319,7 +324,7 @@ uidisplay_area( int x, int start, int width, int height)
 	for( i = 0, point = gm + y * display.xres_virtual + x;
 	     i < width;
 	     i++, point++ )
-	  *point = colours[display_image[y][x+i]];
+	  *point = colours[fbdisplay_image[y][x+i]];
 
       } else {
 
@@ -328,7 +333,7 @@ uidisplay_area( int x, int start, int width, int height)
 	     i++, point += 2 )
 	  *  point       = *( point +     display.xres_virtual ) =
 	  *( point + 1 ) = *( point + 1 + display.xres_virtual ) = 
-	    colours[display_image[y][x+i]];
+	    colours[fbdisplay_image[y][x+i]];
 
       }
     }
@@ -346,14 +351,14 @@ uidisplay_area( int x, int start, int width, int height)
 	for ( i = 0, point = gm + y * display.xres_virtual + x;
 	      i < width;
 	      i++, point++ )
-	  *point = colours[display_image[y*2][x+i]];
+	  *point = colours[fbdisplay_image[y*2][x+i]];
 
       } else {
 
 	for( i = 0, point = gm + y * display.xres_virtual + x * 2;
 	     i < width;
 	     i++, point+=2 )
-	  *point = *(point+1) = colours[display_image[y][x+i]];
+	  *point = *(point+1) = colours[fbdisplay_image[y][x+i]];
 
       }
     }
@@ -372,14 +377,14 @@ uidisplay_area( int x, int start, int width, int height)
 	for ( i = 0, point = gm + y * display.xres_virtual + x;
 	      i < width;
 	      i++, point++ )
-	  *point = colours[display_image[y*2][(x+i)*2]];
+	  *point = colours[fbdisplay_image[y*2][(x+i)*2]];
 
       } else {
 
 	for( i = 0, point = gm + y * display.xres_virtual + x;
 	     i < width;
 	     i++, point++ )
-	  *point = colours[display_image[y][x+i]];
+	  *point = colours[fbdisplay_image[y][x+i]];
 
       }
 
@@ -408,6 +413,92 @@ fbdisplay_end( void )
   }
 
   return 0;
+}
+
+/* Set one pixel in the display */
+void
+uidisplay_putpixel( int x, int y, int colour )
+{
+  if( machine_current->timex ) {
+    x <<= 1; y <<= 1;
+    fbdisplay_image[y  ][x  ] = colour;
+    fbdisplay_image[y  ][x+1] = colour;
+    fbdisplay_image[y+1][x  ] = colour;
+    fbdisplay_image[y+1][x+1] = colour;
+  } else {
+    fbdisplay_image[y][x] = colour;
+  }
+}
+
+/* Print the 8 pixels in `data' using ink colour `ink' and paper
+   colour `paper' to the screen at ( (8*x) , y ) */
+void
+uidisplay_plot8( int x, int y, libspectrum_byte data,
+                libspectrum_byte ink, libspectrum_byte paper )
+{
+  x <<= 3;
+
+  if( machine_current->timex ) {
+    int i;
+
+    x <<= 1; y <<= 1;
+    for( i=0; i<2; i++,y++ ) {
+      fbdisplay_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
+      fbdisplay_image[y][x+ 1] = ( data & 0x80 ) ? ink : paper;
+      fbdisplay_image[y][x+ 2] = ( data & 0x40 ) ? ink : paper;
+      fbdisplay_image[y][x+ 3] = ( data & 0x40 ) ? ink : paper;
+      fbdisplay_image[y][x+ 4] = ( data & 0x20 ) ? ink : paper;
+      fbdisplay_image[y][x+ 5] = ( data & 0x20 ) ? ink : paper;
+      fbdisplay_image[y][x+ 6] = ( data & 0x10 ) ? ink : paper;
+      fbdisplay_image[y][x+ 7] = ( data & 0x10 ) ? ink : paper;
+      fbdisplay_image[y][x+ 8] = ( data & 0x08 ) ? ink : paper;
+      fbdisplay_image[y][x+ 9] = ( data & 0x08 ) ? ink : paper;
+      fbdisplay_image[y][x+10] = ( data & 0x04 ) ? ink : paper;
+      fbdisplay_image[y][x+11] = ( data & 0x04 ) ? ink : paper;
+      fbdisplay_image[y][x+12] = ( data & 0x02 ) ? ink : paper;
+      fbdisplay_image[y][x+13] = ( data & 0x02 ) ? ink : paper;
+      fbdisplay_image[y][x+14] = ( data & 0x01 ) ? ink : paper;
+      fbdisplay_image[y][x+15] = ( data & 0x01 ) ? ink : paper;
+    }
+  } else {
+    fbdisplay_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
+    fbdisplay_image[y][x+ 1] = ( data & 0x40 ) ? ink : paper;
+    fbdisplay_image[y][x+ 2] = ( data & 0x20 ) ? ink : paper;
+    fbdisplay_image[y][x+ 3] = ( data & 0x10 ) ? ink : paper;
+    fbdisplay_image[y][x+ 4] = ( data & 0x08 ) ? ink : paper;
+    fbdisplay_image[y][x+ 5] = ( data & 0x04 ) ? ink : paper;
+    fbdisplay_image[y][x+ 6] = ( data & 0x02 ) ? ink : paper;
+    fbdisplay_image[y][x+ 7] = ( data & 0x01 ) ? ink : paper;
+  }
+}
+
+/* Print the 16 pixels in `data' using ink colour `ink' and paper
+   colour `paper' to the screen at ( (16*x) , y ) */
+void
+uidisplay_plot16( int x, int y, libspectrum_word data,
+                 libspectrum_byte ink, libspectrum_byte paper )
+{
+  int i;
+  x <<= 4;
+
+  for( i=0; i<2; i++,y++ ) {
+    fbdisplay_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;
+    fbdisplay_image[y][x+ 1] = ( data & 0x4000 ) ? ink : paper;
+    fbdisplay_image[y][x+ 2] = ( data & 0x2000 ) ? ink : paper;
+    fbdisplay_image[y][x+ 3] = ( data & 0x1000 ) ? ink : paper;
+    fbdisplay_image[y][x+ 4] = ( data & 0x0800 ) ? ink : paper;
+    fbdisplay_image[y][x+ 5] = ( data & 0x0400 ) ? ink : paper;
+    fbdisplay_image[y][x+ 6] = ( data & 0x0200 ) ? ink : paper;
+    fbdisplay_image[y][x+ 7] = ( data & 0x0100 ) ? ink : paper;
+    fbdisplay_image[y][x+ 8] = ( data & 0x0080 ) ? ink : paper;
+    fbdisplay_image[y][x+ 9] = ( data & 0x0040 ) ? ink : paper;
+    fbdisplay_image[y][x+10] = ( data & 0x0020 ) ? ink : paper;
+    fbdisplay_image[y][x+11] = ( data & 0x0010 ) ? ink : paper;
+    fbdisplay_image[y][x+12] = ( data & 0x0008 ) ? ink : paper;
+    fbdisplay_image[y][x+13] = ( data & 0x0004 ) ? ink : paper;
+    fbdisplay_image[y][x+14] = ( data & 0x0002 ) ? ink : paper;
+    fbdisplay_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
+  }
 }
 
 #endif				/* #ifdef UI_FB */

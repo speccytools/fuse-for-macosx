@@ -61,11 +61,6 @@ static int rgb32_to_rgb24( libspectrum_byte *rgb24_data, size_t rgb24_stride,
    creating via the scalers */
 #define MAX_SIZE 3
 
-/* A copy of display.c:display_image, taken so we can draw widgets on
-   display_image */
-static libspectrum_word
-  saved_screen[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
-
 /* The space used for drawing the screen image on. Out here to avoid placing
    these large objects on the stack */
 static libspectrum_byte
@@ -74,13 +69,6 @@ static libspectrum_byte
    png_data[ MAX_SIZE * DISPLAY_SCREEN_HEIGHT * 3 * DISPLAY_ASPECT_WIDTH * 3 ];
 
 scaler_type screenshot_movie_scaler = SCALER_NUM;
-
-int
-screenshot_save( void )
-{
-  memcpy( saved_screen, display_image, sizeof( display_image ) );
-  return 0;
-}
 
 static int
 screenshot_write2( const char *filename, scaler_type scaler, int compression )
@@ -232,7 +220,7 @@ get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
       size_t colour;
       libspectrum_byte red, green, blue;
 
-      colour = saved_screen[y][x];
+      colour = display_getpixel( x, y );
 
       if( settings_current.bw_tv ) {
 

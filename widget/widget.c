@@ -406,15 +406,6 @@ int widget_do( widget_type which, void *data )
   /* We're now one widget level deeper */
   widget_level++;
 
-  /* If we're the top-level widget, save the screen and set up the timer */
-  if( ! widget_level ) {
-
-#ifdef USE_LIBPNG
-    error = screenshot_save(); if( error ) { widget_level--; return error; }
-#endif				/* #ifdef USE_LIBPNG */
-
-  }
-
   /* Store what type of widget we are and what data we were given */
   widget_return[widget_level].type = which;
   widget_return[widget_level].data = data;
@@ -537,8 +528,8 @@ int widget_dialog_with_border( int x, int y, int width, int height )
 static void
 widget_putpixel( int x, int y, int colour )
 {
-  display_putpixel( x + DISPLAY_BORDER_ASPECT_WIDTH, y + DISPLAY_BORDER_HEIGHT,
-		    colour );
+  uidisplay_putpixel( x + DISPLAY_BORDER_ASPECT_WIDTH, y + DISPLAY_BORDER_HEIGHT,
+                      colour );
 }
 
 /* General functions used by the options dialogs */
