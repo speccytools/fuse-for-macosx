@@ -210,6 +210,8 @@ int snapshot_write( const char *filename )
   error = utils_write_file( filename, buffer, length );
   if( error ) { free( buffer ); return error; }
 
+  free( buffer );
+
   return 0;
 
 }

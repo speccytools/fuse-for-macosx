@@ -292,6 +292,8 @@ int tape_write( const char* filename )
   tape_modified = 0;
   ui_tape_browser_update( UI_TAPE_BROWSER_MODIFIED, NULL );
 
+  free( buffer );
+
   return 0;
 
 }

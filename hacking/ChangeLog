@@ -1462,3 +1462,5 @@
          of last border line after the end of the screen (fixes Shock II last
          border line). Bulk allocate border change objects. Make
          display_get_addr a macro. (patch #1551481) (Fred).
+20061017 snapshot.c,tape.c: fix memory leaks on snapshot and tape write (fixes
+         bug #1568084; thanks, crabfists) (Fred).
