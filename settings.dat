@@ -99,7 +99,7 @@ embed_snapshot, boolean, 1
 
 snapshot, string, NULL, 's'
 tape_file, string, NULL, 't', tape, tapefile
-start_machine, string, strdup( "48" ), 'm', machine
+start_machine, string, "48", 'm', machine
 record_file, string, NULL, 'r', record, recordfile
 playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
@@ -123,45 +123,45 @@ divide_wp, boolean, 0,, divide-write-protect
 divide_master_file, string, NULL,, divide-masterfile
 divide_slave_file, string, NULL,, divide-slavefile
 
-printer_graphics_filename, string, strdup( "printout.pbm" ),, graphicsfile
-printer_text_filename, string, strdup( "printout.txt" ),, textfile
+printer_graphics_filename, string, "printout.pbm",, graphicsfile
+printer_text_filename, string, "printout.txt",, textfile
 
 aspect_hint, boolean, 1
 svga_mode, numeric, 320, 'v', svgamode
 doublescan_mode, numeric, 1, 'D', doublescan-mode
 
-start_scaler_mode, string, strdup( "normal" ), 'g', graphics-filter
+start_scaler_mode, string, "normal", 'g', graphics-filter
 
-rom_16, string, strdup( "48.rom" ),
-rom_48, string, strdup( "48.rom" ),
-rom_128_0, string, strdup( "128-0.rom" ),
-rom_128_1, string, strdup( "128-1.rom" ),
-rom_plus2_0, string, strdup( "plus2-0.rom" ),
-rom_plus2_1, string, strdup( "plus2-1.rom" ),
-rom_plus2a_0, string, strdup( "plus3-0.rom" ),
-rom_plus2a_1, string, strdup( "plus3-1.rom" ),
-rom_plus2a_2, string, strdup( "plus3-2.rom" ),
-rom_plus2a_3, string, strdup( "plus3-3.rom" ),
-rom_plus3_0, string, strdup( "plus3-0.rom" ),
-rom_plus3_1, string, strdup( "plus3-1.rom" ),
-rom_plus3_2, string, strdup( "plus3-2.rom" ),
-rom_plus3_3, string, strdup( "plus3-3.rom" ),
-rom_plus3e_0, string, strdup( "plus3e-0.rom" ),
-rom_plus3e_1, string, strdup( "plus3e-1.rom" ),
-rom_plus3e_2, string, strdup( "plus3e-2.rom" ),
-rom_plus3e_3, string, strdup( "plus3e-3.rom" ),
-rom_tc2048, string, strdup( "tc2048.rom" ),
-rom_tc2068_0, string, strdup( "tc2068-0.rom" ),
-rom_tc2068_1, string, strdup( "tc2068-1.rom" ),
-rom_ts2068_0, string, strdup( "tc2068-0.rom" ),
-rom_ts2068_1, string, strdup( "tc2068-1.rom" ),
-rom_pentagon_0, string, strdup( "128p-0.rom" ),
-rom_pentagon_1, string, strdup( "128p-1.rom" ),
-rom_pentagon_2, string, strdup( "trdos.rom" ),
-rom_scorpion_0, string, strdup( "256s-0.rom" ),
-rom_scorpion_1, string, strdup( "256s-1.rom" ),
-rom_scorpion_2, string, strdup( "256s-2.rom" ),
-rom_scorpion_3, string, strdup( "256s-3.rom" ),
-rom_spec_se_0, string, strdup( "se-0.rom" ),
-rom_spec_se_1, string, strdup( "se-1.rom" ),
-rom_interface_i, string, strdup( "if1-2.rom" ),
+rom_16, string, "48.rom",
+rom_48, string, "48.rom",
+rom_128_0, string, "128-0.rom",
+rom_128_1, string, "128-1.rom",
+rom_plus2_0, string, "plus2-0.rom",
+rom_plus2_1, string, "plus2-1.rom",
+rom_plus2a_0, string, "plus3-0.rom",
+rom_plus2a_1, string, "plus3-1.rom",
+rom_plus2a_2, string, "plus3-2.rom",
+rom_plus2a_3, string, "plus3-3.rom",
+rom_plus3_0, string, "plus3-0.rom",
+rom_plus3_1, string, "plus3-1.rom",
+rom_plus3_2, string, "plus3-2.rom",
+rom_plus3_3, string, "plus3-3.rom",
+rom_plus3e_0, string, "plus3e-0.rom",
+rom_plus3e_1, string, "plus3e-1.rom",
+rom_plus3e_2, string, "plus3e-2.rom",
+rom_plus3e_3, string, "plus3e-3.rom",
+rom_tc2048, string, "tc2048.rom",
+rom_tc2068_0, string, "tc2068-0.rom",
+rom_tc2068_1, string, "tc2068-1.rom",
+rom_ts2068_0, string, "tc2068-0.rom",
+rom_ts2068_1, string, "tc2068-1.rom",
+rom_pentagon_0, string, "128p-0.rom",
+rom_pentagon_1, string, "128p-1.rom",
+rom_pentagon_2, string, "trdos.rom",
+rom_scorpion_0, string, "256s-0.rom",
+rom_scorpion_1, string, "256s-1.rom",
+rom_scorpion_2, string, "256s-2.rom",
+rom_scorpion_3, string, "256s-3.rom",
+rom_spec_se_0, string, "se-0.rom",
+rom_spec_se_1, string, "se-1.rom",
+rom_interface_i, string, "if1-2.rom",

@@ -31,6 +31,7 @@
 #include <libspectrum.h>
 
 #include "event.h"
+#include "fuse.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 

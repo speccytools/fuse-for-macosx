@@ -65,9 +65,11 @@ specplus2_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus2_0, 0x4000 );
+  error = machine_load_rom( 0, 0, settings_current.rom_plus2_0,
+                            settings_default.rom_plus2_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus2_1, 0x4000 );
+  error = machine_load_rom( 2, 1, settings_current.rom_plus2_1,
+                            settings_default.rom_plus2_1, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( spec128_peripherals, spec128_peripherals_count );

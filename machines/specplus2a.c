@@ -82,13 +82,17 @@ specplus2a_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus2a_0, 0x4000 );
+  error = machine_load_rom( 0, 0, settings_current.rom_plus2a_0,
+                            settings_default.rom_plus2a_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus2a_1, 0x4000 );
+  error = machine_load_rom( 2, 1, settings_current.rom_plus2a_1,
+                            settings_default.rom_plus2a_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_plus2a_2, 0x4000 );
+  error = machine_load_rom( 4, 2, settings_current.rom_plus2a_2,
+                            settings_default.rom_plus2a_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 6, 3, settings_current.rom_plus2a_3, 0x4000 );
+  error = machine_load_rom( 6, 3, settings_current.rom_plus2a_3,
+                            settings_default.rom_plus2a_3, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count );

@@ -240,6 +240,7 @@ if1_reset( void )
 
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
 				 settings_current.rom_interface_i,
+				 settings_default.rom_interface_i,
 				 MEMORY_PAGE_SIZE );
   if( error ) return error;
 

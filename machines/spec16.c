@@ -100,7 +100,8 @@ spec16_reset( void )
   int error;
   size_t i;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_16, 0x4000 );
+  error = machine_load_rom( 0, 0, settings_current.rom_16, 
+                            settings_default.rom_16, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count );

@@ -105,6 +105,18 @@ print hashline( __LINE__ ), << 'CODE';
 /* The current settings of options, etc */
 settings_info settings_current;
 
+/* The default settings of options, etc */
+settings_info settings_default = {
+CODE
+
+    foreach my $name ( sort keys %options ) {
+	next if $options{$name}->{type} eq 'null';
+	print "  /* $name */ $options{$name}->{default},\n";
+    }
+
+print hashline( __LINE__ ), << 'CODE';
+};
+
 #ifdef HAVE_LIB_XML2
 static int read_config_file( settings_info *settings );
 static int parse_xml( xmlDocPtr doc, settings_info *settings );
@@ -112,6 +124,8 @@ static int parse_xml( xmlDocPtr doc, settings_info *settings );
 
 static int settings_command_line( settings_info *settings, int *first_arg,
 				  int argc, char **argv );
+
+static int settings_copy_internal( settings_info *dest, settings_info *src );
 
 /* Called on emulator startup */
 int
@@ -139,24 +153,7 @@ settings_init( int *first_arg, int argc, char **argv )
 /* Fill the settings structure with sensible defaults */
 int settings_defaults( settings_info *settings )
 {
-CODE
-
-    foreach my $name ( sort keys %options ) {
-	next if $options{$name}->{type} eq 'null';
-	print "  settings->$name = $options{$name}->{default};\n";
-	if( $options{$name}->{type} eq 'string' and
-	    $options{$name}->{default} ne 'NULL'    ) {
-	    print "  if( !settings->$name ) return 1;\n";
-	}
-    }
-
-    print hashline( __LINE__ ), << 'CODE';
-  
-#ifdef HAVE_LIBZ
-  settings->rzx_compression = 1;
-#endif			/* #ifdef HAVE_LIBZ */
-
-  return 0;
+  return settings_copy_internal( settings, &settings_default );
 }
 
 #ifdef HAVE_LIB_XML2
@@ -422,11 +419,17 @@ print hashline( __LINE__ ), << 'CODE';
 }
 
 /* Copy one settings object to another */
-int settings_copy( settings_info *dest, settings_info *src )
+static int
+settings_copy_internal( settings_info *dest, settings_info *src )
 {
-  if( settings_defaults( dest ) ) return 1;
-  free( dest->start_machine ); dest->start_machine = NULL;
-  free( dest->start_scaler_mode ); dest->start_scaler_mode = NULL;
+  if( dest->start_machine ) {
+    free( dest->start_machine );
+    dest->start_machine = NULL;
+  }
+  if( dest->start_scaler_mode ) {
+    free( dest->start_scaler_mode );
+    dest->start_scaler_mode = NULL;
+  }
 
 CODE
 
@@ -438,6 +441,7 @@ foreach my $name ( sort keys %options ) {
 	print "  dest->$name = src->$name;\n";
     } elsif( $type eq 'string' ) {
 	print << "CODE";
+  dest->$name = NULL;
   if( src->$name ) {
     dest->$name = strdup( src->$name );
     if( !dest->$name ) { settings_free( dest ); return 1; }
@@ -449,6 +453,13 @@ CODE
 print hashline( __LINE__ ), << 'CODE';
 
   return 0;
+}
+
+/* Copy one settings object to another */
+int settings_copy( settings_info *dest, settings_info *src )
+{
+  if( settings_defaults( dest ) ) return 1;
+  return settings_copy_internal( dest, src );
 }
 
 char **

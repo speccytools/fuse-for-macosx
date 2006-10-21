@@ -189,9 +189,11 @@ spec_se_reset( void )
 
   error = dock_exrom_reset(); if( error ) return error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_spec_se_0, 0x4000 );
+  error = machine_load_rom( 0, 0, settings_current.rom_spec_se_0,
+                            settings_default.rom_spec_se_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_spec_se_1, 0x4000 );
+  error = machine_load_rom( 2, 1, settings_current.rom_spec_se_1,
+                            settings_default.rom_spec_se_1, 0x4000 );
   if( error ) return error;
 
   error = periph_setup( peripherals, peripherals_count );

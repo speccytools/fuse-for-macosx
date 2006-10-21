@@ -97,6 +97,7 @@ print << 'CODE';
 } settings_info;
 
 extern settings_info settings_current;
+extern settings_info settings_default;
 
 int settings_init( int *first_arg, int argc, char **argv );
 int settings_defaults( settings_info *settings );

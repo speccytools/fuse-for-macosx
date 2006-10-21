@@ -1464,3 +1464,8 @@
          display_get_addr a macro. (patch #1551481) (Fred).
 20061017 snapshot.c,tape.c: fix memory leaks on snapshot and tape write (fixes
          bug #1568084; thanks, crabfists) (Fred).
+20061021 if1.c,if2.c,machine.[ch],machines/{pentagon.c,scorpion.c,spec128.c,
+         spec16.c,spec48.c,spec_se.c,specplus2.c,specplus2a.c,specplus3.c,
+         specplus3e.c,tc2048.c,tc2068.c,ts2068.c},profile.c,settings-header.pl,
+         settings.dat,settings.pl,widget/roms.c: fallback to loading default ROM
+         if custom ROM is not found (Fred).

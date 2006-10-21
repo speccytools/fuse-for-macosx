@@ -131,12 +131,15 @@ pentagon_reset(void)
 
   trdos_reset();
 
-  error = machine_load_rom( 0, 0, settings_current.rom_pentagon_0, 0x4000 );
+  error = machine_load_rom( 0, 0, settings_current.rom_pentagon_0,
+                            settings_default.rom_pentagon_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_pentagon_1, 0x4000 );
+  error = machine_load_rom( 2, 1, settings_current.rom_pentagon_1,
+                            settings_default.rom_pentagon_1, 0x4000 );
   if( error ) return error;
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
-				 settings_current.rom_pentagon_2, 0x4000 );
+                                 settings_current.rom_pentagon_2,
+                                 settings_default.rom_pentagon_2, 0x4000 );
   if( error ) return error;
 
   trdos_available = 1;
