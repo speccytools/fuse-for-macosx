@@ -53,9 +53,15 @@ static void do_axis( int which, Sint16 value, input_joystick_button negative,
 int
 ui_joystick_init( void )
 {
-  int retval = SDL_NumJoysticks();
+  int error, retval;
 
-  SDL_InitSubSystem( SDL_INIT_JOYSTICK );
+  error = SDL_InitSubSystem( SDL_INIT_JOYSTICK );
+  if ( error ) {
+    ui_error( UI_ERROR_ERROR, "failed to initialise joystick subsystem" );
+    return 0;
+  }
+
+  retval = SDL_NumJoysticks();
 
   if( retval >= 2 ) {
 
