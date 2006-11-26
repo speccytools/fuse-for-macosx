@@ -269,6 +269,13 @@ Give brief usage help, listing available options.
 Insert the specified file into the emulated Interface II.
 .RE
 .PP
+.I \-\-interface1
+.RS
+Emulate a Sinclair Interface I. Same as the Peripherals Options dialog's
+.I "Interface I"
+option.
+.RE
+.PP
 .I \-\-interface2
 .RS
 Emulate a Sinclair Interface II. Same as the Peripherals Options dialog's
@@ -1246,6 +1253,15 @@ it will fall back to built-in PS/2 mouse support. In this mode, it tries
 it successfully opens one. The first of these is preferred since (at least on
 Linux, with a 2.6-series kernel) any type of mouse can be used and any
 connected mouse may be used.
+.PP
+.I "Interface I"
+.RS
+If this option is selected, Fuse will emulate the simple Sinclair
+Interface I, and allow microdrive cartriges to be
+connected and disconnected via the
+.I "Media, Interface I, Microdrive"
+menus. It also enables support for the Interface I RS-232 and Sinclair
+network interfaces.
 .RE
 .PP
 .I "Interface II"
