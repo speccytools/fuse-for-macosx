@@ -315,6 +315,28 @@ void widget_rectangle( int x, int y, int w, int h, int col )
         widget_putpixel( x + mx, y + my, col );
 }
 
+void widget_print_checkbox( int x, int y, int value )
+{
+    static const int CHECK_COLOR=7;
+    int z;
+
+    y += 2;
+    x += 6;
+    widget_rectangle( x, y - 1, 3, 3, WIDGET_COLOUR_BACKGROUND );
+    widget_rectangle( x - 5, y, 5, 5, 0 );
+    widget_rectangle( x - 4, y + 1, 3, 3, WIDGET_COLOUR_BACKGROUND );
+    if( value ) {	/* checked */
+      for( z = -1; z < 3; z++ ) {
+        widget_putpixel( x - z, y + z, CHECK_COLOR );
+        widget_putpixel( x - z + 1, y + z, CHECK_COLOR );
+      }
+      widget_putpixel( x - z + 1, y + z, CHECK_COLOR );
+      widget_putpixel( x - z, y + z - 1, CHECK_COLOR );
+      widget_putpixel( x - z, y + z - 2, CHECK_COLOR );
+      widget_putpixel( x - z - 1, y + z - 2, CHECK_COLOR );
+    }
+}
+
 /* Arrows for any scrollable widget */
 void
 widget_up_arrow( int x, int y, int colour )
@@ -566,7 +588,10 @@ static int widget_options_print_label( int number, const char *string )
 
 int widget_options_print_value( int number, int value )
 {
-  return widget_options_print_data( number, value ? "On" : "Off" );
+  widget_rectangle( 233, number * 8 + 28, 7, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_print_checkbox( 233, number * 8 + 28, value );
+  widget_display_rasters( number * 8 + 28, 8 );
+  return 0;
 }
 
 static int widget_options_print_data( int number, const char *string )

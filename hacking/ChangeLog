@@ -1473,3 +1473,5 @@
 20061126 man/fuse.1: add a smidgeon of content about Interface I (Fred).
 20061202 widget/widget.c: guard against the double free on the options dialog
          (Fred).
+20061202 widget/widget.c: use checkbox instead of "On/Off" text in widget UIs
+         (patch #1309374) (Gergely Szasz).
