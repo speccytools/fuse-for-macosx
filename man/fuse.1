@@ -58,7 +58,8 @@ partly supported (enough for multi-load games); however, loading of
 the old DAT-file variant is not. DSK disk images are supported when
 emulating a +3, TRD and SCL disk images are supported when emulating
 a Pentagon or Scorpion and DCK cartridge images are supported when
-emulating a TC2068. Interface II ROM cartridges are also supported.
+emulating a Timex 2068 variant. Interface II ROM cartridges are also
+supported.
 .PP
 Finally, there is also support for reading and writing the RZX input recording
 format.
@@ -181,8 +182,8 @@ option.
 .PP
 .I "\-\-dock file"
 .RS
-Insert the specified file into the emulated Timex TC2068 dock; also select
-the TC2068 on startup if available.
+Insert the specified file into the emulated Timex 2068 variant dock;
+also select the TC2068 on startup if available.
 .RE
 .PP
 .I "\-\-embed\-snapshot"
@@ -352,8 +353,10 @@ a 48K Spectrum. The available options are
 .IR plus3 ,
 .IR 2048 ,
 .IR 2068 ,
+.IR ts2068 ,
+.IR pentagon ,
 and
-.IR pentagon .
+.IR scorpion .
 .RE
 .PP
 .I "\-p file"
@@ -1474,8 +1477,8 @@ respectively.
 .br
 .I Timex 2
 .RS
-The `left' and `right' joysticks as attached to the TC2068's built-in
-joystick interface.
+The `left' and `right' joysticks as attached to the Timex 2068 variant's
+built-in joystick interface.
 .RE
 .RE
 .PP
@@ -1540,9 +1543,11 @@ you're using the GTK+ UI.
 .RS
 Choose a type of Spectrum to emulate. An brief overview of the
 Sinclair, Amstrad and Timex can be found at
-.IR "http://www.nvg.ntnu.no/sinclair/computers/zxspectrum/zxspectrum.htm" ,
+.IR "http://www.nvg.ntnu.no/sinclair/computers/zxspectrum/zxspectrum.htm"
 while more technical information can be found at
-.IR "http://www.worldofspectrum.org/faq/reference/reference.htm" .
+.IR "http://www.worldofspectrum.org/faq/reference/reference.htm" ,
+and
+.IR "http://www.worldofspectrum.org/faq/reference/tmxreference.htm" .
 .PP
 .I "Spectrum 16K"
 .br
@@ -1586,9 +1591,11 @@ for more details.
 .br
 .I "Timex TC2068"
 .RS
-The variants of the Spectrum as released by Timex in Portugal. See
-.I "http://www.worldofspectrum.org/faq/reference/tmxreference.htm"
-for more details.
+The variants of the Spectrum as released by Timex in Portugal.
+.RE
+.I "Timex TS2048"
+.RS
+The variant of the Spectrum released by Timex in North America.
 .RE
 .PP
 .I "Pentagon 128K"
@@ -1808,14 +1815,14 @@ respectively.
 .PP
 .I "Media, Cartridge, Timex Dock, Insert..."
 .RS
-Insert a cartridge into the TC2068's dock. This will cause the
-emulated machine to be changed to the TC2068 (if it wasn't already)
-and reset.
+Insert a cartridge into the Timex 2068 dock. This will cause the
+emulated machine to be changed to the TC2068 (if it wasn't already
+a 2068 variant) and reset.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Eject"
 .RS
-Remove the cartridge from the TC2068's dock. This will cause the
+Remove the cartridge from the Timex 2068 dock. This will cause the
 emulated machine to be reset.
 .RE
 .PP
@@ -2106,7 +2113,7 @@ The various models of Spectrum supported a range of ways to connect
 printers, three of which are supported by Fuse. Different printers are
 made available for the different models:
 .TP
-.IR 16 ", " 48 ", " TC2048 ", " TC2068
+.IR 16 ", " 48 ", " TC2048 ", " TC2068 ", " TS2068
 ZX Printer
 .TP
 .IR 128 / +2 / Pentagon
@@ -2725,9 +2732,9 @@ and RZX embedded snapshots and compression.
 .PP
 Alexander Yurchenko wrote the OpenBSD/Solaris-specific sound code.
 .PP
-Fredrick Meunier wrote the TC2048, Pentagon and Spectrum SE support as
-well as maintaining the OS X port and importing the graphics filter
-code.
+Fredrick Meunier wrote the TC2048, TS2068, Pentagon and Spectrum SE
+support as well as maintaining the OS X port and importing the
+graphics filter code.
 .PP
 Ludvig Strigeus and The ScummVM project wrote the original graphics
 filter code.
