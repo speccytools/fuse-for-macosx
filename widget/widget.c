@@ -599,6 +599,7 @@ int widget_options_finish( widget_finish_state finished )
   if( finished == WIDGET_FINISHED_OK ) {
     error = settings_copy( &settings_current, &widget_options_settings );
     settings_free( &widget_options_settings );
+    memset( &widget_options_settings, 0, sizeof( settings_info ) );
     if( error ) return error;
 
     /* Bring the peripherals list into sync with the new options */

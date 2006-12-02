@@ -1471,3 +1471,5 @@
          if custom ROM is not found (Fred).
 20061126 ui/sdl/sdljoystick.c: fix joystick support in SDL UI (Fred).
 20061126 man/fuse.1: add a smidgeon of content about Interface I (Fred).
+20061202 widget/widget.c: guard against the double free on the options dialog
+         (Fred).
