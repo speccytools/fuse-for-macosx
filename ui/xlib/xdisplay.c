@@ -452,7 +452,7 @@ uidisplay_area( int x, int y, int w, int h )
   scaled_x = scale * x; scaled_y = scale * y;
 
   /* Create scaled image */
-  scaler_proc16( (libspectrum_byte*)&xdisplay_image[y][x], display_pitch,
+  scaler_proc16( (libspectrum_byte*)&xdisplay_image[y][x], xdisplay_pitch,
 		 (libspectrum_byte*)&scaled_image[scaled_y][scaled_x],
 		 scaled_pitch, w, h );
 
