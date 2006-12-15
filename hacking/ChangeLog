@@ -1477,3 +1477,5 @@
          (patch #1309374) (Gergely Szasz).
 20061202 man/fuse.1: add some more TS2068 stuff (Fred).
 20061213 ui/xlib/xdisplay.c: fix compilation.
+20061215 debugger/breakpoint.c: fix segfault on "clear" command (thanks,
+	 Stuart Brady)
