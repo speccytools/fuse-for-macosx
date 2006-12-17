@@ -326,10 +326,10 @@ machine_load_rom_bank( memory_page* bank_map, size_t which, int page_num,
                        const char *filename, const char *fallback,
                        size_t expected_length )
 {
-  int retval = machine_load_rom_bank_internal( memory_map_rom, which, page_num,
+  int retval = machine_load_rom_bank_internal( bank_map, which, page_num,
                                                filename, expected_length );
   if( retval && fallback )
-    retval = machine_load_rom_bank_internal( memory_map_rom, which, page_num,
+    retval = machine_load_rom_bank_internal( bank_map, which, page_num,
                                              fallback, expected_length );
   return retval;
 }

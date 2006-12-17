@@ -1479,3 +1479,5 @@
 20061213 ui/xlib/xdisplay.c: fix compilation.
 20061215 debugger/breakpoint.c: fix segfault on "clear" command (thanks,
 	 Stuart Brady)
+20061217 machine.c: load rom into correct memory bank (fixes If1 ROM paging)
+         (Fred).
