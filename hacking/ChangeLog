@@ -1481,3 +1481,5 @@
 	 Stuart Brady)
 20061217 machine.c: load rom into correct memory bank (fixes If1 ROM paging)
          (Fred).
+20061217 menu.c,rzx.[ch]: reset rzx_instructions_offset on rollback to fix
+	 replay of rolled back recordings (and some refactoring).

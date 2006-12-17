@@ -97,7 +97,6 @@ MENU_CALLBACK( menu_file_recording_insertsnapshot )
 
 MENU_CALLBACK( menu_file_recording_rollback )
 {
-  libspectrum_snap *snap;
   libspectrum_error error;
   
   if( !rzx_recording ) return;
@@ -106,13 +105,7 @@ MENU_CALLBACK( menu_file_recording_rollback )
 
   fuse_emulation_pause();
 
-  error = libspectrum_rzx_rollback( rzx, &snap );
-  if( error ) { fuse_emulation_unpause(); return; }
-
-  error = snapshot_copy_from( snap );
-  if( error ) { fuse_emulation_unpause(); return; }
-
-  error = libspectrum_rzx_start_input( rzx, tstates );
+  error = rzx_rollback();
   if( error ) { fuse_emulation_unpause(); return; }
 
   fuse_emulation_unpause();
@@ -120,9 +113,6 @@ MENU_CALLBACK( menu_file_recording_rollback )
 
 MENU_CALLBACK( menu_file_recording_rollbackto )
 {
-  GSList *rollback_points;
-  libspectrum_snap *snap;
-  int which;
   libspectrum_error error;
 
   if( !rzx_recording ) return;
@@ -131,19 +121,7 @@ MENU_CALLBACK( menu_file_recording_rollbackto )
 
   fuse_emulation_pause();
 
-  rollback_points = rzx_get_rollback_list( rzx );
-
-  which = ui_get_rollback_point( rollback_points );
-
-  if( which == -1 ) { fuse_emulation_unpause(); return; }
-
-  error = libspectrum_rzx_rollback_to( rzx, &snap, which );
-  if( error ) { fuse_emulation_unpause(); return; }
-
-  error = snapshot_copy_from( snap );
-  if( error ) { fuse_emulation_unpause(); return; }
-
-  error = libspectrum_rzx_start_input( rzx, tstates );
+  error = rzx_rollback_to();
   if( error ) { fuse_emulation_unpause(); return; }
 
   fuse_emulation_unpause();

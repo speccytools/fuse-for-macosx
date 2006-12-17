@@ -77,6 +77,8 @@ int rzx_store_byte( libspectrum_byte value );
 
 int rzx_end( void );
 
-GSList* rzx_get_rollback_list( libspectrum_rzx *rzx );
+int rzx_rollback( void );
+
+int rzx_rollback_to( void );
 
 #endif			/* #ifndef FUSE_RZX_H */

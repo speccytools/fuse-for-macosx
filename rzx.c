@@ -423,8 +423,8 @@ int rzx_end( void )
   return 0;
 }
 
-GSList*
-rzx_get_rollback_list( libspectrum_rzx *rzx )
+static GSList*
+get_rollback_list( libspectrum_rzx *rzx )
 {
   libspectrum_rzx_iterator it;
   GSList *rollback_points;
@@ -460,4 +460,58 @@ rzx_get_rollback_list( libspectrum_rzx *rzx )
 				      GINT_TO_POINTER( frames ) );
   
   return rollback_points;
+}
+
+static int
+start_after_rollback( libspectrum_snap *snap )
+{
+  int error;
+
+  error = snapshot_copy_from( snap );
+  if( error ) return error;
+
+  error = libspectrum_rzx_start_input( rzx, tstates );
+  if( error ) return error;
+
+  error = counter_reset();
+  if( error ) return error;
+
+  return 0;
+}
+
+int
+rzx_rollback( void )
+{
+  libspectrum_snap *snap;
+  int error;
+
+  error = libspectrum_rzx_rollback( rzx, &snap );
+  if( error ) return error;
+
+  error = start_after_rollback( snap );
+  if( error ) return error;
+
+  return 0;
+}
+
+int
+rzx_rollback_to( void )
+{
+  GSList *rollback_points;
+  libspectrum_snap *snap;
+  int which, error;
+
+  rollback_points = get_rollback_list( rzx );
+
+  which = ui_get_rollback_point( rollback_points );
+
+  if( which == -1 ) return 1;
+
+  error = libspectrum_rzx_rollback_to( rzx, &snap, which );
+  if( error ) return error;
+
+  error = start_after_rollback( snap );
+  if( error ) return error;
+
+  return 0;
 }
