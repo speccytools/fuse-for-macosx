@@ -1483,3 +1483,4 @@
          (Fred).
 20061217 menu.c,rzx.[ch]: reset rzx_instructions_offset on rollback to fix
 	 replay of rolled back recordings (and some refactoring).
+20061222 sound/sdlsound.c: clear sound fifo before closing (Fred).

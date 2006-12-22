@@ -150,6 +150,7 @@ sound_lowlevel_end( void )
   SDL_LockAudio();
   SDL_CloseAudio();
   SDL_QuitSubSystem( SDL_INIT_AUDIO );
+  sfifo_flush( &sound_fifo );
   sfifo_close( &sound_fifo );
 }
 
