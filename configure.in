@@ -397,14 +397,22 @@ if test "$libao" = yes; then
   AC_CHECK_LIB( ao, ao_open_live,
     [AC_CHECK_HEADER(
       ao/ao.h,
-      [AC_DEFINE([USE_LIBAO], 1, [Defined if we're going to be using the instal
-ed libao]) AO_LIBS='-lao'],
+      [AC_DEFINE([USE_LIBAO], 1, [Defined if we're going to be using the installed libao]) AO_LIBS='-lao'],
       [AC_MSG_WARN(ao/ao.h not found - no libao sound output)]
     )],
     [AC_MSG_WARN(ao_open_live not found - no libao sound output)]
   )
   AC_SUBST(AO_LIBS)
 fi
+
+dnl Check if a version of libao which supplies ao_open_live is available
+  CoreAudio/AudioHardware.h
+AC_CHECK_HEADER(
+  CoreAudio/AudioHardware.h,
+  [AC_DEFINE([USE_COREAUDIO], 1, [Defined if we're going to be using CoreAudio]) COREAUDIO_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices'],
+  [AC_MSG_WARN(CoreAudio/AudioHardware.h not found - no CoreAudio sound output)]
+)
+AC_SUBST(COREAUDIO_LIBS)
 
 dnl Are we supplying the ROMs or relying on another package?
 AC_MSG_CHECKING(where to find the Spectrum ROM images)

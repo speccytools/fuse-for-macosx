@@ -107,6 +107,7 @@ z80/libz80.a \
 @GLIB_LIBS@ \
 @PNG_LIBS@ \
 @AO_LIBS@ \
+@COREAUDIO_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
 compat/libcompat.a

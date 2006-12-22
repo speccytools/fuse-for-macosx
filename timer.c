@@ -228,7 +228,7 @@ timer_end( void )
   return event_remove_type( EVENT_TYPE_TIMER );
 }
 
-#ifdef UI_SDL
+#if defined UI_SDL || defined USE_COREAUDIO
 
 /* Callback-style sound based timer */
 #include "sound/sfifo.h"

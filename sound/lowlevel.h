@@ -68,6 +68,11 @@
 #define HAVE_SOUND
 #define SOUND_DX
 
+#elif defined USE_COREAUDIO /* #if defined UI_SDL */
+
+#define HAVE_SOUND
+#define SOUND_COREAUDIO
+
 #endif					/* #if defined UI_SDL */
 
 #endif			/* #ifndef FUSE_SOUND_LOWLEVEL_H */   

@@ -30,6 +30,7 @@ noinst_LIBRARIES = libsound.a
 
 libsound_a_SOURCES = dxsound.c \
 		     aosound.c \
+		     coreaudiosound.c \
 		     hpsound.c \
 		     nullsound.c \
 		     osssound.c \

@@ -18,7 +18,7 @@ TODO:
 
 #include "lowlevel.h"
 
-#ifdef SOUND_SDL
+#if defined SOUND_SDL || defined SOUND_COREAUDIO
 
 #ifdef __KERNEL__
 #	include	<linux/string.h>
