@@ -45,7 +45,8 @@ OSStatus coreaudiowrite( void *inRefCon,
 /* info about the format used for writing to output unit */
 static AudioStreamBasicDescription deviceFormat;
 
-/* converts from Fuse format to CoreAudio format */
+/* converts from Fuse format (signed 16 bit ints) to CoreAudio format (floats)
+ */
 static AudioUnit gOutputUnit;
 
 int
@@ -59,10 +60,9 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   int error;
 
   /* get the default output device for the HAL */
-  count = sizeof( device );   /* it is required to pass the size of the data
-                                 to be returned */
+  count = sizeof( device );
   err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,
-                                  &count, (void *) &device );
+                                  &count, (void *)&device );
   if ( err != kAudioHardwareNoError ) {
     ui_error( UI_ERROR_ERROR,
               "get kAudioHardwarePropertyDefaultOutputDevice error %ld",
@@ -71,8 +71,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   }
 
   /* get the buffersize that the default device uses for IO */
-  count = sizeof( deviceBufferSize ); /* it is required to pass the size of
-                                         the data to be returned */
+  count = sizeof( deviceBufferSize );
   err = AudioDeviceGetProperty( device, 0, false, kAudioDevicePropertyBufferSize,
                                 &count, &deviceBufferSize );
   if( err != kAudioHardwareNoError ) {
@@ -82,8 +81,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   }
 
   /* get a description of the data format used by the default device */
-  count = sizeof( deviceFormat ); /* it is required to pass the size of the
-                                     data to be returned */
+  count = sizeof( deviceFormat );
   err = AudioDeviceGetProperty( device, 0, false,
                                 kAudioDevicePropertyStreamFormat, &count,
                                 &deviceFormat );
@@ -121,7 +119,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
     return 1;
   }
 
-  err = OpenAComponent(comp, &gOutputUnit);
+  err = OpenAComponent( comp, &gOutputUnit );
   if( comp == NULL ) {
     ui_error( UI_ERROR_ERROR, "OpenAComponent=%ld", err );
     return 1;
@@ -132,29 +130,29 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   input.inputProc = coreaudiowrite;
   input.inputProcRefCon = NULL;
 
-  err = AudioUnitSetProperty (gOutputUnit,                       
+  err = AudioUnitSetProperty( gOutputUnit,                       
                               kAudioUnitProperty_SetRenderCallback,
                               kAudioUnitScope_Input,
                               0,
                               &input,
-                              sizeof(input));
+                              sizeof( input ) );
   if( err ) {
     ui_error( UI_ERROR_ERROR, "AudioUnitSetProperty-CB=%ld", err );
     return 1;
   }
 
-  err = AudioUnitSetProperty (gOutputUnit,
+  err = AudioUnitSetProperty( gOutputUnit,
                               kAudioUnitProperty_StreamFormat,
                               kAudioUnitScope_Input,
                               0,
                               &deviceFormat,
-                              sizeof(AudioStreamBasicDescription));
+                              sizeof( AudioStreamBasicDescription ) );
   if( err ) {
     ui_error( UI_ERROR_ERROR, "AudioUnitSetProperty-SF=%4.4s, %ld", (char*)&err, err );
     return 1;
   }
 
-  err = AudioUnitInitialize(gOutputUnit);
+  err = AudioUnitInitialize( gOutputUnit );
   if( err ) {
     ui_error( UI_ERROR_ERROR, "AudioUnitInitialize=%ld", err );
     return 1;
@@ -170,8 +168,8 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   /* Start the rendering
      The DefaultOutputUnit will do any format conversions to the format of the
      default device */
-  err = AudioOutputUnitStart (gOutputUnit);
-  if (err) {
+  err = AudioOutputUnitStart( gOutputUnit );
+  if( err ) {
     ui_error( UI_ERROR_ERROR, "AudioOutputUnitStart=%ld", err );
     return 1;
   }
@@ -184,9 +182,9 @@ sound_lowlevel_end( void )
 {
   OSStatus err;
 
-  verify_noerr (AudioOutputUnitStop (gOutputUnit));
+  verify_noerr( AudioOutputUnitStop( gOutputUnit ) );
 
-  err = AudioUnitUninitialize (gOutputUnit);
+  err = AudioUnitUninitialize( gOutputUnit );
   if( err ) {
     printf( "AudioUnitUninitialize=%ld", err );
   }
@@ -210,8 +208,8 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   while( len ) {
     if( ( i = sfifo_write( &sound_fifo, bytes, len ) ) < 0 ) {
       break;
-    } else if (!i) {
-      usleep(10000);
+    } else if( !i ) {
+      usleep( 10000 );
     }
     bytes += i;
     len -= i;
