@@ -1488,3 +1488,4 @@
          lowlevel.h,sfifo.c},timer.c: add CoreAudio sound driver for Mac OS X
          (Fred).
 20061223 configure.in: fix CoreAudio comment (Fred).
+20061223 configure.in: fix typo in above! (Fred).

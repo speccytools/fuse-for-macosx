@@ -406,7 +406,6 @@ if test "$libao" = yes; then
 fi
 
 dnl Check if CoreAudio is available
-  CoreAudio/AudioHardware.h
 AC_CHECK_HEADER(
   CoreAudio/AudioHardware.h,
   [AC_DEFINE([USE_COREAUDIO], 1, [Defined if we're going to be using CoreAudio]) COREAUDIO_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices'],
