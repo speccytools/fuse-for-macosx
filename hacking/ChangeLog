@@ -1484,3 +1484,7 @@
 20061217 menu.c,rzx.[ch]: reset rzx_instructions_offset on rollback to fix
 	 replay of rolled back recordings (and some refactoring).
 20061222 sound/sdlsound.c: clear sound fifo before closing (Fred).
+20061222 Makefile.am,configure.in,sound/{Makefile.am,coreaudiosound.c,
+         lowlevel.h,sfifo.c},timer.c: add CoreAudio sound driver for Mac OS X
+         (Fred).
+20061223 configure.in: fix CoreAudio comment (Fred).
