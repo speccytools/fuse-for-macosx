@@ -922,6 +922,29 @@ to
 .IR record.rzx .
 .RE
 .PP
+.I Insert
+.br
+.I "File, Recording, Insert snapshot"
+.RS
+Inserts a snapshot of the current state into the RZX file. This can
+be used at a later point to roll back to the inserted state by using
+one of the commands below.
+.RE
+.PP
+.I Delete
+.br
+.I "File, Recording, Rollback"
+.RS
+Rolls back the recording to the point at which the previous snapshot
+was inserted. Recording will continue from that point.
+.RE
+.PP
+.I "File, Recording, Rollback to..."
+.RS
+Roll back the recording to any snapshot which has been inserted into
+the recording.
+.RE
+.PP
 .I "File, Recording, Play..."
 .RS
 Playback recorded input from an RZX file. This lets you replay

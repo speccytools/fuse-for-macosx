@@ -1489,3 +1489,5 @@
          (Fred).
 20061223 configure.in: fix CoreAudio comment (Fred).
 20061223 configure.in: fix typo in above! (Fred).
+20070101 menu_data.c,ui.c,man/fuse.1: change capitalisation of
+	 "Insert snapshot" command and document rollback commands.
