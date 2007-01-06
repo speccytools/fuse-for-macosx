@@ -1491,3 +1491,5 @@
 20061223 configure.in: fix typo in above! (Fred).
 20070101 menu_data.c,ui.c,man/fuse.1: change capitalisation of
 	 "Insert snapshot" command and document rollback commands.
+20070106 tape.c: support "no edge", "level low" and "level high" from
+	 tape edges.

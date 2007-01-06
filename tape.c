@@ -674,7 +674,17 @@ tape_next_edge( libspectrum_dword last_tstates )
 
   /* Invert the microphone state */
   if( edge_tstates || ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ) {
-    tape_microphone = !tape_microphone;
+
+    if( flags & LIBSPECTRUM_TAPE_FLAGS_NO_EDGE ) {
+      /* Do nothing */
+    } else if( flags & LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW ) {
+      tape_microphone = 0;
+    } else if( flags & LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH ) {
+      tape_microphone = 1;
+    } else {
+      tape_microphone = !tape_microphone;
+    }
+
     /* Timex machines have no loading noise */
     if( !machine_current->timex && settings_current.sound_load )
       sound_beeper( 1, tape_microphone );
