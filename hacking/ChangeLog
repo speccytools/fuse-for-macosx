@@ -1493,3 +1493,5 @@
 	 "Insert snapshot" command and document rollback commands.
 20070106 tape.c: support "no edge", "level low" and "level high" from
 	 tape edges.
+20070111 tape.c: display vaguely useful information in the tape browser for
+	 generalised data blocks.

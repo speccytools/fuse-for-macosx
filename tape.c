@@ -757,6 +757,8 @@ tape_block_details( char *buffer, size_t length,
   const char *type; unsigned char name[11];
   int offset;
 
+  buffer[0] = '\0';
+
   switch( libspectrum_tape_block_type( block ) ) {
 
   case LIBSPECTRUM_TAPE_BLOCK_ROM:
@@ -836,13 +838,21 @@ tape_block_details( char *buffer, size_t length,
 	      (unsigned long)libspectrum_tape_block_count( block ) );
     break;
 
+  case LIBSPECTRUM_TAPE_BLOCK_GENERALISED_DATA:
+    snprintf( buffer, length, "%lu data symbols",
+	      (unsigned long)libspectrum_tape_generalised_data_symbol_table_symbols_in_block( libspectrum_tape_block_data_table( block ) ) );
+    break;
+
+  case LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE:
+    /* Could do something better with this one */
+    break;
+
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
   case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
-  default:
-    buffer[0] = '\0';
+  case LIBSPECTRUM_TAPE_BLOCK_CONCAT:
     break;
 
   }
