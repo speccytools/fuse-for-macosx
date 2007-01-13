@@ -1495,3 +1495,4 @@
 	 tape edges.
 20070111 tape.c: display vaguely useful information in the tape browser for
 	 generalised data blocks.
+20070113 ChangeLog: bring up to date.

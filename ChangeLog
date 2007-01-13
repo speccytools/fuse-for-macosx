@@ -1,10 +1,19 @@
-2005-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+2007-??-??  Philip Kendall  <pak21-fuse@srcf.ucam.org>
+
+	* Fuse 0.8.0 released
 
 	* New features:
+	  * Loader improvements: automatically run at full speed while
+	    a loader is in progress and automatically start/stop the tape
+	    when the start/end of a loader is detected (Philip Kendall).
 	  * RZX 'rollback' support (Philip Kendall).
-	  * TS2068 support (Fredrick Meunier).
+	  * DivIDE support (Matthew Westcott)
 	  * Interface I and microdrive emulation (Gergely Szasz).
+	  * TS2068 support (Fredrick Meunier).
 	  * Kempston mouse emulation (Darren Salt).
+	  * TZX generalized data block (0x19) support (Philip Kendall).
+	  * Much improved widget UI, including allowing selection of
+	    filenames (Darren Salt, Gergely Szasz).
 	  * Allow SDL full screen mode to be used (Darren Salt).
 	  * Add the ability to save 'movies' as collections of screenshots
 	    (Gergely Szasz).
@@ -14,17 +23,32 @@
 
 	* Emulation core improvements:
 	  * Improved screen rendering code (now character accurate rather
-	    than line accurate) (Philip Kendall).
+	    than line accurate) (Philip Kendall, Fredrick Meunier).
+	  * Corrections to write ordering and contention for EX (SP),HL,
+	    EX (SP),IX and EX (SP),IY (Philip Kendall; thanks, Mark
+	    Woodmass).
+	  * Corrections to contention for OTIR and OTDR (Philip Kendall;
+	    thanks, Mark Woodmass).
+	  * IR contention (Philip Kendall; thanks, Mark Woodmass).
+	  * Flag bits 3 and 5 are copied on all BIT instructions (Philip
+	    Kendall; thanks, Mark Woodmass).
 	  * Improved ULA emulation with respect to interrupt length
 	    (thanks, Jon Needle, Ramsoft and Mark Woodmass) (Philip
 	    Kendall).
+	  * Fix timings of shifted no operation opcodes (Philip Kendall).
+	  * An interrupt in IM 0 takes 13 tstates to acknowledge, not 12
+	    (Philip Kendall).
 	  * Improved speed control code (Fredrick Meunier).
 
 	* Miscellaneous:
-	  * Allow filenames to be selected from the widget UIs (Darren
-	    Salt).
 	  * Add a 'save, don't save, cancel' confirmation dialog before any
 	    changes to media are lost under the GTK+ UIs (Philip Kendall).
+	  * On the Pentagon, page in the TR-DOS ROM on NMI, allowing the
+	    snapshot function to work (Philip Kendall). On the Scorpion,
+	    page in ROM 2, allowing the monitor to work (thanks, Erik
+	    Kunze).
+	  * Default snapshot format is now .szx rather than .z80 (Fredrick
+	    Meunier)
 	  * Store current joystick information in snapshots (Fredrick
 	    Meunier).
 	  * Optional use of doublescan modes in the framebuffer and
@@ -35,11 +59,8 @@
 	  * Use stock button icons in the GTK+ 2.x UI (Darren Salt).
 	  * Save/restore the 'issue 2 keyboard' flag from snapshots
 	    (Philip Kendall).
-	  * Deactivate widget menu items when they are inappropriate
-	    (Darren Salt).
 	  * Correctly quote '-' characters in the man page (needed for
 	    UTF-8 environments) (Darren Salt, Stuart Brady).
-	  * Widget query confirmation dialog (Darren Salt).
 	  * Use separate menus for controlling +3 and TR-DOS disks (Philip
 	    Kendall).
 	  * Fix behaviour of ZXATASP and ZXCF on reset (Garry Lancaster).
@@ -50,9 +71,13 @@
 	    (Darren Salt).
 	  * Various minor improvements to the framebuffer UI (Darren
 	    Salt).
+	  * Various fixes to allow compilation with gcc 4.x (Philip
+	    Kendall).
 
-	* Various other minor bugfixes (Fredrick Meunier, Philip Kendall,
-	  Mark Round, Darren Salt, Paul van der Laan).
+	* Various other minor bugfixes (Philip Kendall, Fredrick Meunier,
+	  Jon Needle, Markus Oberhumer, Mark Round, Darren Salt, Gergely
+	  Szasz, Paul van der Laan and other people to whom I apologise
+	  for forgetting).
 
 2004-07-16  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 
