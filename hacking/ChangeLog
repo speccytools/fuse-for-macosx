@@ -1499,3 +1499,4 @@
 20040115 fuse.[ch],machine.c,sound.[ch],tape.c: make the sound lifecycle be
          treated more like the uidisplay - initialised and ended based on machine
          lifecycle (fixes bug #1582087) (Fred).
+20070115 ChangeLog: add reference to new CoreAudio sound driver (Fred).

@@ -20,6 +20,7 @@
 	  * Widget pokefinder (Darren Salt).
 	  * Add a simple code profiler (Philip Kendall).
 	  * New libao sound driver (Gergely Szasz).
+	  * New CoreAudio sound driver (Fredrick Meunier).
 
 	* Emulation core improvements:
 	  * Improved screen rendering code (now character accurate rather
