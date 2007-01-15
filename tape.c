@@ -600,7 +600,7 @@ tape_play( int autoplay )
     sound_beeper( 1, tape_microphone );
 
   /* If we're fastloading, turn sound off */
-  if( settings_current.fastload ) fuse_sound_disable();
+  if( settings_current.fastload ) sound_pause();
 
   loader_tape_play();
 
@@ -639,7 +639,7 @@ int tape_stop( void )
     /* If we were fastloading, sound was off, so turn it back on, and
        reset the speed counter */
     if( settings_current.fastload ) {
-      fuse_sound_enable();
+      sound_unpause();
       timer_estimate_reset();
     }
 

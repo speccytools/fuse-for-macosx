@@ -222,6 +222,8 @@ machine_select_machine( fuse_machine_info *machine )
   if( event_add( machine->timings.tstates_per_frame, EVENT_TYPE_FRAME ) )
     return 1;
 
+  sound_end();
+
   if( uidisplay_end() ) return 1;
 
   capabilities = libspectrum_machine_capabilities( machine->machine );
@@ -236,6 +238,8 @@ machine_select_machine( fuse_machine_info *machine )
   }
 
   if( uidisplay_init( width, height ) ) return 1;
+
+  sound_init( settings_current.sound_device );
 
   /* Mark RAM as not-present/read-only. The machine's reset function will
    * mark available pages as present/writeable.
@@ -351,8 +355,6 @@ machine_reset( void )
   /* These things should happen on all resets */
   z80_reset();
 
-  /* sound_ay_reset() *absolutely must* be called before either
-     sound_frame() or sound_ay_write() */
   sound_ay_reset();
 
   printer_zxp_reset();

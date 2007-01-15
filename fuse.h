@@ -42,12 +42,7 @@ extern int fuse_emulation_paused;	/* Is Spectrum emulation paused? */
 int fuse_emulation_pause(void);		/* Stop and start emulation */
 int fuse_emulation_unpause(void);
 
-void fuse_sound_enable();		/* Start sound output */
-void fuse_sound_disable();		/* Stop sound output */
-
 void fuse_abort( void ) GCC_NORETURN;	/* Emergency shutdown */
-
-extern int fuse_sound_in_use;		/* Are we trying to produce sound? */
 
 extern libspectrum_creator *fuse_creator; /* Creator information for file
 					     formats which support this */

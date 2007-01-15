@@ -44,13 +44,13 @@
 #include "settings.h"
 #include "sound.h"
 #include "sound/lowlevel.h"
+#include "tape.h"
 #include "ui/ui.h"
 
 /* Do we have any of our sound devices available? */
 
 /* configuration */
-int sound_enabled=0;		/* Are we currently using the sound card;
-				   cf fuse.c:fuse_sound_in_use */
+int sound_enabled=0;		/* Are we currently using the sound card */
 int sound_enabled_ever=0;	/* if it's *ever* been in use; see
                                    sound_ay_write() and sound_ay_reset() */
 int sound_stereo=0;		/* true for stereo *output sample* (only) */
@@ -147,10 +147,6 @@ ay_tone_subcycles=ay_env_subcycles=0;
 for(f=0;f<3;f++)
   ay_tone_tick[f]=ay_tone_high[f]=0,ay_tone_period[f]=1;
 
-ay_tick_incr=(int)(65536.*
-                   libspectrum_timings_ay_speed(machine_current->machine)/
-                   settings_current.sound_freq);
-
 ay_change_count=0;
 }
 
@@ -159,20 +155,16 @@ void sound_init(const char *device)
 {
 static int first_init=1;
 int f,ret;
-int sound_max_framesiz;
+float hz;
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
 #ifndef HAVE_SOUND
 return;
 #endif
 
-if(sound_enabled)
-  {
-  ui_error(UI_ERROR_ERROR,
-	   "sound_init() called with sound_enabled set, can't happen!" );
-  sound_end();
+if( !(!sound_enabled && settings_current.sound &&
+      settings_current.emulation_speed == 100) )
   return;
-  }
 
 sound_stereo_ay=settings_current.stereo_ay;
 sound_stereo_beeper=settings_current.stereo_beeper;
@@ -199,11 +191,15 @@ if(!sound_stereo)
 sound_enabled=sound_enabled_ever=1;
 
 sound_channels=(sound_stereo?2:1);
-sound_max_framesiz=settings_current.sound_freq/50;
+
+hz = (float)machine_current->timings.processor_speed /
+     machine_current->timings.tstates_per_frame;
+
+sound_framesiz = settings_current.sound_freq / hz;
 
 if((sound_buf=malloc(sizeof(libspectrum_signed_word)*
-                     sound_max_framesiz*sound_channels))==NULL ||
-   (tape_buf=malloc(sizeof(libspectrum_signed_word)*sound_max_framesiz))==NULL)
+                     sound_framesiz*sound_channels))==NULL ||
+   (tape_buf=malloc(sizeof(libspectrum_signed_word)*sound_framesiz))==NULL)
   {
   if(sound_buf)
     {
@@ -258,7 +254,35 @@ if(sound_stereo_ay)
     rchan2pos=pos,rchan3pos=0;
   }
 
-fuse_sound_in_use=1;
+ay_tick_incr=(int)(65536.*
+                   libspectrum_timings_ay_speed(machine_current->machine)/
+                   settings_current.sound_freq);
+}
+
+void sound_pause(void)
+{
+if(sound_enabled) sound_end();
+}
+
+
+void sound_unpause(void)
+{
+/* No sound if fastloading in progress */
+if(settings_current.fastload && tape_is_playing()) return;
+
+sound_init(settings_current.sound_device);
+
+/* If the sound code couldn't re-initialise, fall back to the
+   signal based routines */
+if(!sound_enabled)
+  {
+  /* Increment pause_count, report, decrement pause_count
+   * (i.e. avoid the effects of fuse_emulation_{,un}pause).
+   * Otherwise, we may be recursively reporting this error. */
+  fuse_emulation_paused++;
+  fuse_emulation_paused--;
+  settings_current.sound = 0;
+  }
 }
 
 
@@ -605,11 +629,6 @@ for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
  */
 void sound_ay_write(int reg,int val,libspectrum_dword now)
 {
-/* have to allow it across pauses for snap-loading to work,
- * so see if sound has *ever* been enabled.
- */
-if(!sound_enabled_ever) return;
-
 if(ay_change_count<AY_CHANGE_MAX)
   {
   ay_change[ay_change_count].tstates=now;
@@ -626,10 +645,6 @@ if(ay_change_count<AY_CHANGE_MAX)
 void sound_ay_reset(void)
 {
 int f;
-float hz = 50;
-
-/* as above... */
-if(!sound_enabled_ever) return;
 
 /* recalculate timings based on new machines ay clock */
 sound_ay_init();
@@ -640,11 +655,6 @@ for(f=0;f<16;f++)
 for(f=0;f<3;f++)
   ay_tone_high[f]=0;
 ay_tone_subcycles=ay_env_subcycles=0;
-
-hz = (float)machine_current->timings.processor_speed /
-     machine_current->timings.tstates_per_frame;
-
-sound_framesiz = settings_current.sound_freq / hz;
 }
 
 

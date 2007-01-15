@@ -92,12 +92,6 @@ int fuse_exiting;
 /* Is Spectrum emulation currently paused, and if so, how many times? */
 int fuse_emulation_paused;
 
-/* Are we going to try and use the sound card; this differs from
-   sound.c:sound_enabled in that this gives a desire, whereas sound_enabled
-   is an actual state; when the Spectrum emulation is not running, this
-   stores whether we try to reenable the sound card afterwards */
-int fuse_sound_in_use;
-
 /* The creator information we'll store in file formats that support this */
 libspectrum_creator *fuse_creator;
 
@@ -242,16 +236,6 @@ static int fuse_init(int argc, char **argv)
   error = pokefinder_clear(); if( error ) return error;
 
   z80_init();
-
-  fuse_sound_in_use = 0;
-  if( settings_current.sound && settings_current.emulation_speed == 100 )
-    sound_init( settings_current.sound_device );
-
-  if( sound_enabled ) {
-    fuse_sound_in_use = 1;
-  } else {
-    settings_current.sound = 0;
-  }
 
   if( timer_init() ) return 1;
 
@@ -428,43 +412,6 @@ static void fuse_show_help( void )
    "--version              Print version number and exit.\n\n" );
 }
 
-/* Start sound output */
-void
-fuse_sound_enable(void)
-{
-  /* No sound if fastloading in progress */
-  if( settings_current.fastload && tape_is_playing() ) return;
-
-  /* If we now want sound, enable it */
-  if( settings_current.sound && settings_current.emulation_speed == 100 ) {
-
-    sound_init( settings_current.sound_device );
-    sound_ay_reset();
-
-    /* If the sound code couldn't re-initialise, fall back to the
-       signal based routines */
-    if( !sound_enabled ) {
-      /* Increment pause_count, report, decrement pause_count
-       * (i.e. avoid the effects of fuse_emulation_{,un}pause).
-       * Otherwise, we may be recursively reporting this error. */
-      fuse_emulation_paused++;
-      fuse_emulation_paused--;
-      settings_current.sound = fuse_sound_in_use = 0;
-
-    }
-    fuse_sound_in_use = sound_enabled;
-  } else if( fuse_sound_in_use ) {
-    fuse_sound_in_use = 0;
-  }
-}
-
-/* Stop sound output */
-void
-fuse_sound_disable(void)
-{
-  if( sound_enabled ) sound_end();
-}
-
 /* Stop all activities associated with actual Spectrum emulation */
 int fuse_emulation_pause(void)
 {
@@ -482,7 +429,7 @@ int fuse_emulation_pause(void)
       
   /* If we had sound enabled (and hence doing the speed regulation),
      turn it off */
-  if( sound_enabled ) sound_end();
+  sound_pause();
 
   return 0;
 }
@@ -496,10 +443,11 @@ int fuse_emulation_unpause(void)
      decrement the pause count */
   if( --fuse_emulation_paused ) return 0;
 
+  /* If we now want sound, enable it */
+  sound_unpause();
+
   /* Restart speed estimation with no information */
   error = timer_estimate_reset(); if( error ) return error;
-
-  fuse_sound_enable();
 
   return 0;
 }

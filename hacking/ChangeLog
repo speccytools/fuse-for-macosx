@@ -1496,3 +1496,6 @@
 20070111 tape.c: display vaguely useful information in the tape browser for
 	 generalised data blocks.
 20070113 ChangeLog: bring up to date.
+20040115 fuse.[ch],machine.c,sound.[ch],tape.c: make the sound lifecycle be
+         treated more like the uidisplay - initialised and ended based on machine
+         lifecycle (fixes bug #1582087) (Fred).
