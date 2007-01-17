@@ -711,6 +711,7 @@ static int fuse_end(void)
   simpleide_end();
   zxatasp_end();
   zxcf_end();
+  if1_end();
   divide_end();
 
   machine_end();

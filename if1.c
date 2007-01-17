@@ -71,13 +71,13 @@ typedef struct if1_ula_t {
   int fd_r;	/* file descriptor for reading bytes or bits RS232 */
   int fd_t;	/* file descriptor for writing bytes or bits RS232 */
   int fd_net;	/* file descriptor for rw bytes or bits SinclairNET */
-  int rs232_mode;	/* comunication mode: RS232_RAW, RS232_INT */
-  int s_net_mode;	/* comunication mode: S_NET_RAW, S_NET_INT */
+  int rs232_mode;	/* communication mode: RS232_RAW, RS232_INT */
+  int s_net_mode;	/* communication mode: S_NET_RAW, S_NET_INT */
   int status;	/* if1_ula/SinclairNET */
-  int comms_data;	/* the previouse data comms state */
-  int comms_clk;	/* the previouse data comms state */
-  int cts;	/* CTS */
-  int dtr;	/* DTR */
+  int comms_data;	/* the previous data comms state */
+  int comms_clk;	/* the previous data comms state */
+  int cts;	/* CTS of peripheral */
+  int dtr;	/* DTR of peripheral */
   int tx;	/* TxD the name is very kind, because this is the read end of
                    the TxD wire of DATA machine (really RxD the view of
 		   spectrum */
@@ -104,28 +104,8 @@ static int if1_mdr_status = 0;
 unsigned int mdr_seed;
 int rnd_factor = ( ( RAND_MAX >> 2 ) << 2 ) / 19 + 1;
 
-static microdrive_t microdrive[8] = {
-  { .filename = NULL, .inserted = 0, .modified = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0 },
-  { .filename = NULL, .inserted = 0, .modified = 0 }
-};		/* We have 8 microdrive */
-
-static if1_ula_t if1_ula = {
-  .fd_r = -1,
-  .fd_t = -1,
-  .rs232_mode = RS232_INT,
-  .dtr = 0,
-  .comms_clk = 0,
-  .comms_data = 0, /* realy? */
-  .fd_net = -1,
-  .s_net_mode = S_NET_INT,
-  .net = 0,
-};
+static microdrive_t microdrive[8];		/* We have 8 microdrive */
+static if1_ula_t if1_ula;
 
 static void microdrives_reset( void );
 static void microdrives_restart( void );
@@ -213,13 +193,40 @@ if1_init( void )
 {
   size_t i;
 
+  if1_ula.fd_r = -1;
+  if1_ula.fd_t = -1;
+  if1_ula.rs232_mode = RS232_INT;
+  if1_ula.dtr = 0;
+  if1_ula.comms_clk = 0;
+  if1_ula.comms_data = 0; /* really? */
+  if1_ula.fd_net = -1;
+  if1_ula.s_net_mode = S_NET_INT;
+  if1_ula.net = 0;
+
   for( i = 0; i < 8; i++ ) {
     libspectrum_error error =
       libspectrum_microdrive_alloc( &( microdrive[i].cartridge ) );
     if( error ) return error;
+    microdrive[i].filename = NULL;
+    microdrive[i].inserted = 0;
+    microdrive[i].modified = 0;
   }
 
   return 0;
+}
+
+libspectrum_error
+if1_end( void )
+{
+  size_t i;
+
+  for( i = 0; i < 8; i++ ) {
+    libspectrum_error error =
+      libspectrum_microdrive_free( microdrive[i].cartridge );
+    if( error ) return error;
+  }
+
+  return LIBSPECTRUM_ERROR_NONE;
 }
 
 void
