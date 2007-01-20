@@ -1,5 +1,5 @@
 /* if2.c: Interface I handling routines
-   Copyright (c) 2004-2005 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2007 Gergely Szasz, Philip Kendall
 
    $Id$
 
@@ -721,16 +721,16 @@ microdrives_restart( void )
   int m;
 
   for( m = 0; m < 8; m++ ) {
-    while( ( microdrive[m].head_pos % 543 ) != 0  &&
-           ( microdrive[m].head_pos % 543 ) != 15    )
+    while( ( microdrive[m].head_pos % LIBSPECTRUM_MICRODRIVE_BLOCK_LEN ) != 0  &&
+           ( microdrive[m].head_pos % LIBSPECTRUM_MICRODRIVE_BLOCK_LEN ) != LIBSPECTRUM_MICRODRIVE_HEAD_LEN )
       increment_head( m ); /* put head in the start of a block */
 	
     microdrive[m].transfered = 0; /* reset current number of bytes written */
 
-    if( ( microdrive[m].head_pos % 543 ) == 0 ) {
-      microdrive[m].max_bytes = 15; /* up to 15 bytes for header blocks */
+    if( ( microdrive[m].head_pos % LIBSPECTRUM_MICRODRIVE_BLOCK_LEN ) == 0 ) {
+      microdrive[m].max_bytes = LIBSPECTRUM_MICRODRIVE_HEAD_LEN; /* up to 15 bytes for header blocks */
     } else {
-      microdrive[m].max_bytes = 528; /* up to 528 bytes for data blocks */
+      microdrive[m].max_bytes = LIBSPECTRUM_MICRODRIVE_HEAD_LEN + LIBSPECTRUM_MICRODRIVE_DATA_LEN + 1; /* up to 528 bytes for data blocks */
     }
   }	
 }
@@ -767,7 +767,7 @@ if1_mdr_new( int drive )
 		  / rnd_factor;
   } else
     len = settings_current.mdr_len = settings_current.mdr_len < 10 ? 10 : 
-	    settings_current.mdr_len > 254 ? 254 : settings_current.mdr_len;
+	    settings_current.mdr_len > LIBSPECTRUM_MICRODRIVE_BLOCK_MAX ? LIBSPECTRUM_MICRODRIVE_BLOCK_MAX : settings_current.mdr_len;
   
   /* Erase the entire cartridge */
   libspectrum_microdrive_set_cartridge_len( mdr->cartridge, len );

@@ -1502,3 +1502,4 @@
 20070115 ChangeLog: add reference to new CoreAudio sound driver (Fred).
 20070117 fuse.c, if1.[ch]: free memory on exit. Use C89-style struct
 	 initialisation (patch #1637020) (Gergely Szasz).
+20070120 if1.c: reduce magic number count.
