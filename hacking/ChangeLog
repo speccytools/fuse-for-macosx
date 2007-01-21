@@ -1503,3 +1503,5 @@
 20070117 fuse.c, if1.[ch]: free memory on exit. Use C89-style struct
 	 initialisation (patch #1637020) (Gergely Szasz).
 20070120 if1.c: reduce magic number count.
+20070122 display.c: inline get_beam_position and display_dirty_chunk for more
+         speed (Fred).

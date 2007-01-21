@@ -641,7 +641,7 @@ copy_critical_region( int beam_x, int beam_y )
   critical_region_x = beam_x;
 }
 
-static void
+inline static void
 get_beam_position( int *x, int *y )
 {
   if( tstates < machine_current->line_times[ 0 ] ) {
@@ -685,7 +685,7 @@ display_update_critical( int x, int y )
 
 /* Mark the 8-pixel chunk at (x,y) as maybe dirty and update the critical
    region as appropriate */
-static void
+inline static void
 display_dirty_chunk( int x, int y )
 {
   /* If the write is between the start of the critical region and the
