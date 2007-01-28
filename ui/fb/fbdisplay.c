@@ -479,7 +479,7 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
                  libspectrum_byte ink, libspectrum_byte paper )
 {
   int i;
-  x <<= 4;
+  x <<= 4; y <<= 1;
 
   for( i=0; i<2; i++,y++ ) {
     fbdisplay_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;

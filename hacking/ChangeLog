@@ -1510,3 +1510,6 @@
          scalers that attempt to reproduce TV-esque colur reproduction (patch
          #1537920) (Gergely Szasz).
 20070128 ChangeLog,man/fuse.1: add information about PAL scalers (Fred).
+20070128 ui/{fb/fbdisplay.c,ggi/ggidisplay.c,gtk/gtkdisplay.c,
+         svga/svgadisplay.c,win32/win32display.c,xlib/xdisplay.c}: fix hires
+         Timex display (Fred).
