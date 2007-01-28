@@ -21,6 +21,7 @@
 	  * Add a simple code profiler (Philip Kendall).
 	  * New libao sound driver (Gergely Szasz).
 	  * New CoreAudio sound driver (Fredrick Meunier).
+	  * New PALTV 1-3x and TV3x graphics scalers (Gergely Szasz).
 
 	* Emulation core improvements:
 	  * Improved screen rendering code (now character accurate rather

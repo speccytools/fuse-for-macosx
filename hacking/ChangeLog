@@ -1509,3 +1509,4 @@
          ui/scaler/{scaler.[ch],scaler_internals.h,scalers.c}: add new PAL TV
          scalers that attempt to reproduce TV-esque colur reproduction (patch
          #1537920) (Gergely Szasz).
+20070128 ChangeLog,man/fuse.1: add information about PAL scalers (Fred).

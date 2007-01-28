@@ -243,8 +243,11 @@ which uses no filtering. The available options are
 .IR supereagle ,
 .IR timex15x ,
 .IR timextv ,
+.IR tv2x ,
+.IR paltv ,
+.IR paltv2x ,
 and
-.IR tv2x .
+.IR paltv3x .
 See the
 .B "GRAPHICS FILTERS"
 section for more details.
@@ -364,6 +367,15 @@ and
 .I "\-\-playback file"
 .RS
 Specify an RZX file to begin playback from.
+.RE
+.PP
+.I \-\-paltv2x
+.RS
+Specify whether the PAL TV 2x and PAL TV 3x scalers should also produce
+scanlines along the lines of the TV 2x and Timex TV scalers.
+The same as the General Options dialog's
+.I "PAL-TV use TV2x effect"
+option.
 .RE
 .PP
 .I "\-\-plus3disk file"
@@ -1168,6 +1180,13 @@ configuration file.
 This option allows you to choose whether to simulate a colour or black
 and white television. This is effective only under the GTK+ and SDL
 user interfaces: the others will always simulate a colour TV.
+.RE
+.PP
+.I "PAL-TV use TV2x effect"
+.RS
+This option allows you to choose whether the PAL TV 2x and higher scalers
+also reproduce scanlines in the same way as the TV 2x, 3x and Timex TV
+scalers.
 .RE
 .PP
 .I "Confirm actions"
@@ -2091,12 +2110,27 @@ of non-Timex machines.
 .PP
 .IR "TV 2x " ( tv2x )
 .br
+.IR "TV 3x " ( tv3x )
+.br
 .IR "Timex TV " ( timextv )
 .RS
-Two filters which attempt to emulate the effect of television
-scanlines. The former is a double-sizing filter for non-Timex
-machines, while the latter is a single-sizing filter for Timex
-machines (note that this means both produce the same size output).
+Three filters which attempt to emulate the effect of television
+scanlines. The first is a double-sizing filter for non-Timex
+machines, the second is a similar triple-sizing filter, while the last
+is a single-sizing filter for Timex machines (note that this means TV 2X
+and Timex TV produce the same size output).
+.RE
+.PP
+.IR "PAL TV" ( paltv )
+.br
+.IR "PAL TV 2x " ( paltv2x )
+.br
+.IR "PAL TV 3x " ( paltv3x )
+.RS
+Three filters which attempt to emulate the effect of the PAL TV system
+which layers a lower-resolution colour image over the top of a
+higher-resolution black-and-white image. The filters can also optionally
+add scanlines like the other TV series scalers.
 .RE
 .PP
 .IR "Dot matrix " ( dotmatrix )
