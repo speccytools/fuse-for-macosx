@@ -60,6 +60,10 @@ static void expand_1( int *x, int *y, int *w, int *h,
 		      int image_width, int image_height );
 static void expand_sai( int *x, int *y, int *w, int *h,
 			int image_width, int image_height );
+static void expand_pal1( int *x, int *y, int *w, int *h,
+			int image_width, int image_height );
+static void expand_pal( int *x, int *y, int *w, int *h,
+			int image_width, int image_height );
 static void expand_dotmatrix( int *x, int *y, int *w, int *h,
 			      int image_width, int image_height );
 
@@ -89,12 +93,20 @@ static const struct scaler_info available_scalers[] = {
     scaler_AdvMame3x_16,  scaler_AdvMame3x_32,  expand_1            },
   { "TV 2x",	       "tv2x",	     SCALER_FLAGS_NONE,        2.0, 
     scaler_TV2x_16,       scaler_TV2x_32,       NULL                },
+  { "TV 3x",	       "tv3x",	     SCALER_FLAGS_NONE,        3.0, 
+    scaler_TV3x_16,       scaler_TV3x_32,       NULL                },
   { "Timex TV",	       "timextv",    SCALER_FLAGS_NONE,        1.0, 
     scaler_TimexTV_16,    scaler_TimexTV_32,    NULL                },
   { "Dot Matrix",      "dotmatrix",  SCALER_FLAGS_EXPAND,      2.0,
     scaler_DotMatrix_16,  scaler_DotMatrix_32,  expand_dotmatrix    },
   { "Timex 1.5x",      "timex15x",   SCALER_FLAGS_NONE,        1.5,
     scaler_Timex1_5x_16,  scaler_Timex1_5x_32,  NULL                },
+  { "PAL TV",	       "paltv",     SCALER_FLAGS_EXPAND,       1.0,
+    scaler_PalTV_16,  	  scaler_PalTV_32,  expand_pal1        	    },
+  { "PAL TV 2x",       "paltv2x",   SCALER_FLAGS_EXPAND,       2.0,
+    scaler_PalTV2x_16,    scaler_PalTV2x_32,  expand_pal            },
+  { "PAL TV 3x",       "paltv3x",   SCALER_FLAGS_EXPAND,       3.0,
+    scaler_PalTV3x_16,    scaler_PalTV3x_32,  expand_pal            },
 };
 
 scaler_type current_scaler = SCALER_NUM;
@@ -227,6 +239,24 @@ static void
 expand_sai( int *x, int *y, int *w, int *h, int image_width, int image_height )
 {
   (*x)-=2; (*y)-=2; (*w)+=3; (*h)+=3;
+  clip( x, y, w, h, image_width, image_height );
+}
+
+/* Expand two pixels left and right */
+static void
+expand_pal1( int *x, int *y, int *w, int *h, int image_width, int image_height )
+{
+  int w_mod = (*w) % 2;
+  (*x)-=2; (*w)+=4;
+  (*w)+=w_mod;		/* expand to even*/
+  clip( x, y, w, h, image_width, image_height );
+}
+
+/* Expand one pixels left and right */
+static void
+expand_pal( int *x, int *y, int *w, int *h, int image_width, int image_height )
+{
+  (*x)-=1; (*w)+=2;
   clip( x, y, w, h, image_width, image_height );
 }
 

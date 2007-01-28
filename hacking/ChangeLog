@@ -1505,3 +1505,7 @@
 20070120 if1.c: reduce magic number count.
 20070122 display.c: inline get_beam_position and display_dirty_chunk for more
          speed (Fred).
+20070128 settings.dat,ui/options.dat,ui/gtk/gtkdisplay.c,ui/sdl/sdldisplay.c,
+         ui/scaler/{scaler.[ch],scaler_internals.h,scalers.c}: add new PAL TV
+         scalers that attempt to reproduce TV-esque colur reproduction (patch
+         #1537920) (Gergely Szasz).

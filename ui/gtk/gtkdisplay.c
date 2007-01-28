@@ -216,6 +216,7 @@ register_scalers( void )
     switch( image_scale ) {
     case 1:
       scaler_register( SCALER_NORMAL );
+      scaler_register( SCALER_PALTV );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_NORMAL );
       return 0;
@@ -238,12 +239,14 @@ register_scalers( void )
       scaler_register( SCALER_SUPER2XSAI );
       scaler_register( SCALER_SUPEREAGLE );
       scaler_register( SCALER_DOTMATRIX );
+      scaler_register( SCALER_PALTV2X );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_DOUBLESIZE );
       return 0;
     case 2:
       scaler_register( SCALER_NORMAL );
       scaler_register( SCALER_TIMEXTV );
+      scaler_register( SCALER_PALTV );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_NORMAL );
       return 0;
@@ -254,7 +257,9 @@ register_scalers( void )
     switch( image_scale ) {
     case 1:
       scaler_register( SCALER_TRIPLESIZE );
+      scaler_register( SCALER_TV3X );
       scaler_register( SCALER_ADVMAME3X );
+      scaler_register( SCALER_PALTV3X );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_TRIPLESIZE );
       return 0;

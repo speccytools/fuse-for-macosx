@@ -57,6 +57,7 @@ interface1, boolean, 0
 mdr_len, numeric, 180
 interface2, boolean, 1
 snapsasz80, null, 0
+pal_tv2x, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1

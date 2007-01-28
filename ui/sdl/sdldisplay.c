@@ -123,6 +123,7 @@ init_scalers( void )
   scaler_register( SCALER_ADVMAME2X );
   scaler_register( SCALER_ADVMAME3X );
   scaler_register( SCALER_DOTMATRIX );
+  scaler_register( SCALER_PALTV );
   if( machine_current->timex ) {
     scaler_register( SCALER_HALF ); 
     scaler_register( SCALER_HALFSKIP );
@@ -130,6 +131,9 @@ init_scalers( void )
     scaler_register( SCALER_TIMEX1_5X );
   } else {
     scaler_register( SCALER_TV2X );
+    scaler_register( SCALER_TV3X );
+    scaler_register( SCALER_PALTV2X );
+    scaler_register( SCALER_PALTV3X );
   }
   
   if( scaler_is_supported( current_scaler ) ) {

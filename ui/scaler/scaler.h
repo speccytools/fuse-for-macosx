@@ -36,9 +36,13 @@ typedef enum scaler_type {
   SCALER_ADVMAME2X,
   SCALER_ADVMAME3X,
   SCALER_TV2X,
+  SCALER_TV3X,
   SCALER_TIMEXTV,
   SCALER_DOTMATRIX,
   SCALER_TIMEX1_5X,
+  SCALER_PALTV,
+  SCALER_PALTV2X,
+  SCALER_PALTV3X,
 
   SCALER_NUM		/* End marker; do not remove */
 } scaler_type;
