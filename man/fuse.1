@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
 .\" fuse.1: Fuse man page
-.\" Copyright (c) 2001-2004 Russell Marks, Philip Kendall, Darren Salt,
+.\" Copyright (c) 2001-2007 Russell Marks, Philip Kendall, Darren Salt,
 .\"                         Fredrick Meunier
 .\"
 .\" This program is free software; you can redistribute it and/or modify
@@ -906,32 +906,23 @@ option would open only snapshots.
 .br
 .I "File, Save Snapshot..."
 .RS
-Save a snapshot (machine state, memory contents, etc.) in Z80
-format. The GTK+ UI lets you select a filename, but the others just
-write the file as either
-.I snapshot.szx
-or
-.I snapshot.z80
-(depending on the state of the General Options dialog's
-.I "Save snaps as .z80"
-option).
+Save a snapshot (machine state, memory contents, etc.) to file. You
+can select the filename to be saved to. If it has a .szx, .z80 or .sna
+extension, the snapshot will be saved in that format. Otherwise, it
+will be saved as a .szx file.
 .RE
 .PP
 .I "File, Recording, Record..."
 .RS
 Start recording input to an RZX file, initialised from the current
-emulation state. Again, the GTK+ UI lets you select a filename, while
-the others just write to
-.IR record.rzx .
+emulation state. You will be prompted for a filename to use.
 .RE
 .PP
 .I "File, Recording, Record from snapshot..."
 .RS
 Start recording input to an RZX file, initialised from a snapshot. You
-will first be asked for the snapshot to use and then (under the GTK+
-UI) for the file to save the recording to; the other UIs again write
-to
-.IR record.rzx .
+will first be asked for the snapshot to use and then the file to save
+the recording to.
 .RE
 .PP
 .I Insert
@@ -974,9 +965,7 @@ Stop any currently-recording/playing RZX file.
 .I "File, AY Logging, Record..."
 .RS
 Start recording the bytes output via the AY-3-8192 sound chip to a PSG
-file. The GTK+ UI lets you choose a filename, whilst the others will
-write to
-.IR "ay.psg" .
+file. You will be prompted for a filename to save the recording to.
 .RE
 .PP
 .I "File, AY Logging, Stop"
@@ -996,25 +985,21 @@ hi-colour or hi-res screenshot is loaded onto a non-Timex machine.
 .I "File, Save Screen as SCR..."
 .RS
 Save a copy of whatever's currently displayed on the Spectrum's screen
-as an SCR file. Once again, the GTK+ UI lets you choose a filename,
-while the others will just write to
-.IR "fuse.scr" .
+as an SCR file. You will be prompted for a filename to save the
+screenshot to.
 .RE
 .PP
 .I "File, Save Screen as PNG..."
 .RS
-Save the current screen as a PNG file. The GTK+ UI lets you choose a
-filename, while the others will use
-.IR "fuse.png" .
+Save the current screen as a PNG file. You will be prompted for a
+filename to save the screenshot to.
 .RE
 .PP
 .I "File, Movies, Record Movie as SCR..."
 .RS
-Start recording a `movie' as a series of SCR screenshots. The GTK+ UI
-will ask for a filename, and then save the screenshots to
+Start recording a `movie' as a series of SCR screenshots. You will be
+prompted for a filename, and the screenshots will then be saved to
 .RI ` <name>\-frame\-000000000.scr "', `" <name>\-frame\-000000001.scr '
-and so on, while the other UIs will use
-.RI ` fuse\-frame\-000000000.scr "', `" fuse\-frame\-000000001.scr '
 and so on.
 .RE
 .PP
@@ -1049,8 +1034,8 @@ you wish to save.
 .br
 .I "File, Exit"
 .RS
-Exit the emulator. If you're using the GTK+ UI, a confirmation dialog
-will appear checking you actually want to do this.
+Exit the emulator. A confirmation dialog will appear checking you
+actually want to do this.
 .RE
 .PP
 .I F4
@@ -1131,21 +1116,6 @@ files. To use tapes or disks for saving data to, or for loading data
 into an already running program, you'll want to turn this option off.
 .RE
 .PP
-.I "Save snaps as .z80"
-.RS
-Select the format used by the the widget based user interfaces for
-saving snapshots: they will be saved as .szx files if this option is
-disabled, or .z80 if this option is enabled. The .szx format is
-superior to .z80 both in terms of accuracy and hardware supported, and
-is therefore probably the better choice unless other concerns
-apply. Two situations you may wish to use .z80 are when giving
-snapshots to users of other emulators, as .szx is not well supported
-by other emulators, and when using .slt files, as these are not
-supported by the .szx format.
-.PP
-This option has no effect on the GTK+ user interfaces.
-.RE
-.PP
 .I "Use .slt traps"
 .RS
 The multi-load aspect of SLT files requires a trap instruction to be
@@ -1175,6 +1145,21 @@ afterwards to ensure that this setting gets written to Fuse's
 configuration file.
 .RE
 .PP
+.I "MDR cartridge len"
+.RS
+TODO
+.RE
+.PP
+.I "Raw RS-232"
+.RS
+TODO
+.RE
+.PP
+.I "Raw SinclairNET"
+.RS
+TODO
+.RE
+.PP
 .I "Black and white TV"
 .RS
 This option allows you to choose whether to simulate a colour or black
@@ -1193,7 +1178,7 @@ scalers.
 .RS
 Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
-occuring. This option is effective only under the GTK+ UI.
+occuring.
 .RE
 .PP
 .I "Show statusbar"
@@ -1202,6 +1187,11 @@ For the GTK+ UI, enables the statusbar beneath the display. For the
 SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. This option has no effect for the other user
 interfaces.
+.RE
+.PP
+.I "Snap joystick prompt"
+.RS
+TODO
 .RE
 .RE
 .PP
@@ -1375,6 +1365,21 @@ This option controls the state of the ZXCF upload jumper. See the
 .B "ZXATASP AND ZXCF"
 section for more details.
 .RE
+.PP
+.I "DivIDE interface"
+.RS
+If this option is selected, Fuse will emulate the DivIDE
+interface. See the
+.B "DIVIDE"
+section for more details.
+.RE
+.PP
+.I "DivIDE write protect"
+.RS
+This option controls the state of the DivIDE write protection
+jumper. See the
+.B "DIVIDE"
+section for more details.
 .RE
 .PP
 .I "Options, RZX..."
@@ -1635,7 +1640,7 @@ for more details.
 .RS
 The variants of the Spectrum as released by Timex in Portugal.
 .RE
-.I "Timex TS2048"
+.I "Timex TS2068"
 .RS
 The variant of the Spectrum released by Timex in North America.
 .RE
@@ -1679,9 +1684,9 @@ section for more information.
 .PP
 .I "Machine, Memory Browser..."
 .RS
-Start the memory browser (again available only under the GTK+ UI). It
-should be fairly obvious what this does; perhaps the only thing worth
-noting is that emulation is paused until you close the window.
+Start the memory browser. It should be fairly obvious what this does;
+perhaps the only thing worth noting is that emulation is paused until
+you close the window.
 .RE
 .PP
 .I "Machine, NMI"
@@ -1765,19 +1770,104 @@ want a `clean slate' to add newly-saved files to, before doing
 .br
 .I "Media, Tape, Write..."
 .RS
-Write the current virtual-tape contents to a TZX file. The GTK+ UI
-lets you select a filename (see
-.B "FILE SELECTION"
-below), the others just write the file as
-.IR tape.tzx ,
-and have a slightly different menu item. The virtual-tape contents are
-the contents of the previously-loaded tape (if any has been loaded
-since you last did a
+Write the current virtual-tape contents to a TZX file. You will be
+prompted for a filename. The virtual-tape contents are the contents of
+the previously-loaded tape (if any has been loaded since you last did
+a
 .IR "Media, Tape, Clear" ),
 followed by anything you've saved from the emulated machine since.
 These newly-saved files are
 .I not
 written to any tape file until you choose this option!
+.RE
+.PP
+.I "Media, Interface I"
+.RS
+Virtual microdrive images are accessible only when the Interface I is
+active from the
+.I "Options, Peripherals"
+menu. Note that any changes to the microdrive image will not be
+written to the file on disk until the appropriate `sync' or `eject'
+option is used.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Insert New"
+.RS
+Insert a new (unformatted) microdrive cartridge into emulated
+Microdrive 1.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Insert..."
+.RS
+Insert an existing microdrive cartridge image into emulated Microdrive
+1. You will be prompted for a filename.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Sync"
+.RS
+Synchronise any changes to the microdrive image in Microdrive 1 with
+the file on sync. You will be prompted for a filename if one has not
+supplied already for this image.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Eject"
+.RS
+Eject the microdrive image in Microdrive 1. If the image has been
+modified, you will be asked as to whether you want any changes saved.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Write protect, Set"
+.RS
+Set the write protect tab for the image in Microdrive 1.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Write protect, Remove"
+.RS
+Remove the write protect tab for the image in Microdrive 1.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 2, ..."
+.br
+.I "Media, Interface I, Microdrive 3, ..."
+.br
+.I "Media, Interface I, Microdrive 4, ..."
+.br
+.I "Media, Interface I, Microdrive 5, ..."
+.br
+.I "Media, Interface I, Microdrive 6, ..."
+.br
+.I "Media, Interface I, Microdrive 7, ..."
+.br
+.I "Media, Interface I, Microdrive 8, ..."
+.RS
+Equivalent options for the other emulated Microdrives.
+.RE
+.PP
+.I "Media, Interface I, RS232, Plug RxD"
+.RS
+TODO
+.RE
+.I "Media, Interface I, RS232, Unplug RxD"
+.RS
+TODO
+.RE
+.I "Media, Interface I, RS232, Plug TxD"
+.RS
+TODO
+.RE
+.I "Media, Interface I, RS232, Unlug TxD"
+.RS
+TODO
+.RE
+.PP
+.I "Media, Interface I, Sinclair NET, Plug in"
+.RS
+TODO
+.RE
+.PP
+.I "Media, Interface I, Sinclair NET, Unplug"
+.RS
+TODO
 .RE
 .PP
 .I "Media, Disk"
@@ -1789,8 +1879,7 @@ and
 .B "TR-DOS DISK FORMATS"
 sections below for notes on the file formats supported).
 .PP
-Note that (since version 0.6.2), Fuse works with true virtual disk
-images: any changes made to a disk image will not affect the file
+Once again, any changes made to a disk image will not affect the file
 which was `inserted' into the drive. If you do want to keep any
 changes, use the appropriate `eject and write' option before exiting
 Fuse.
@@ -1938,6 +2027,23 @@ entries above, but for the two channels of the ZXATASP interface.
 The same as the
 .I "Media, IDE, Simple 8-bit, Master"
 entries above, but for the ZXCF interface's CompactFlash slot.
+.RE
+.PP
+.I "Media, IDE, DivIDE, Master, Insert..."
+.br
+.I "Media, IDE, DivIDE, Master, Commit"
+.br
+.I "Media, IDE, DivIDE, Eject"
+.br
+.I "Media, IDE, DivIDE, Slave, Insert..."
+.br
+.I "Media, IDE, DivIDE, Slave, Commit"
+.br
+.I "Media, IDE, DivIDE, Eject"
+.RS
+The same as the
+.I "Media, IDE, Simple 8-bit"
+entries above, but for the two channels of the DivIDE interface.
 .RE
 .PP
 .I "Help, Keyboard picture..."
@@ -2244,6 +2350,21 @@ accessing the mass storage devices and a task manager allowing
 virtually instant switching between programs on the Spectrum. See
 .I "http://www.zxplus3e.plus.com/residos/index.html"
 for more details.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH "DIVIDE"
+The DivIDE is another IDE interface for the Spectrum, of which full
+details can be found at 
+.IR "http://insert.divide.url/" .
+The interface can be activated via the
+.I "DivIDE interface"
+option from the
+.I "Options, Peripherals..."
+dialog, and the state of its write protect jumper controlled via the
+.IR "DivIDE write protect option" .
+If you're going to be using the DivIDE, you'll probably want one of
+the firmwares available from the DivIDE homepage.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -2785,13 +2906,14 @@ Ian Collier wrote the ZX Printer emulation (for xz80).
 .PP
 Darren Salt wrote the original versions of the code for +3 emulation,
 SLT support, MITSHM support (for the Xlib UI), TZX raw data blocks,
-and RZX embedded snapshots and compression.
+RZX embedded snapshots and compression, the Kempston mouse emulation
+and made many improvements to the widget code.
 .PP
 Alexander Yurchenko wrote the OpenBSD/Solaris-specific sound code.
 .PP
 Fredrick Meunier wrote the TC2048, TS2068, Pentagon and Spectrum SE
-support as well as maintaining the OS X port and importing the
-graphics filter code.
+support, the CoreAudio sound code, as well as maintaining the OS X
+port and importing the graphics filter code.
 .PP
 Ludvig Strigeus and The ScummVM project wrote the original graphics
 filter code.
@@ -2800,7 +2922,7 @@ Dmitry Sanarin wrote the original TR-DOS emulation (for Glukalka).
 .PP
 Witold Filipczyk wrote the TC2068 support.
 .PP
-Matthew Westcott wrote the AY logging code.
+Matthew Westcott wrote the AY logging code and the DivIDE emulation.
 .PP
 Marek Januszewski wrote various bits of code to make Fuse work under
 Win32, including the DirectDraw user interface.
@@ -2809,3 +2931,7 @@ Stuart Brady wrote the Scorpion emulation and the HP-UX sound code.
 .PP
 Garry Lancaster wrote the 8-bit IDE, ZXATASP and ZXCF interface
 emulations.
+.PP
+Gergely Szasz wrote the Interface I and microdrive emulation, the PAL
+TV scalers, the TV 3x scaler, the movie logging code, the libao sound
+code, and made many improvements to the widget code.

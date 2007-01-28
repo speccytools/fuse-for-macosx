@@ -1513,3 +1513,4 @@
 20070128 ui/{fb/fbdisplay.c,ggi/ggidisplay.c,gtk/gtkdisplay.c,
          svga/svgadisplay.c,win32/win32display.c,xlib/xdisplay.c}: fix hires
          Timex display (Fred).
+20070128 man/fuse.1: updates.
