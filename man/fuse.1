@@ -1147,7 +1147,9 @@ configuration file.
 .PP
 .I "MDR cartridge len"
 .RS
-TODO
+This option controls the number of blocks in a new microdrive cartridge.
+0 means select a random capacity, otherwise selects the number of blocks
+available.
 .RE
 .PP
 .I "Raw RS-232"
@@ -1191,8 +1193,9 @@ interfaces.
 .PP
 .I "Snap joystick prompt"
 .RS
-TODO
-.RE
+If set, Fuse will prompt you which physical joystick or keyboard you want
+to connect to the joystick interface enabled in the snapshot unless it
+already matches your current configuration.
 .RE
 .PP
 .I "Options, Sound..."

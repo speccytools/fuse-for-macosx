@@ -1514,3 +1514,5 @@
          svga/svgadisplay.c,win32/win32display.c,xlib/xdisplay.c}: fix hires
          Timex display (Fred).
 20070128 man/fuse.1: updates.
+20070129 man/fuse.1: add documentation for "MDR cartridge len" and "Snap
+         joystick prompt" (Fred).
