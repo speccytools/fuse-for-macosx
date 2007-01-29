@@ -1507,7 +1507,7 @@
          speed (Fred).
 20070128 settings.dat,ui/options.dat,ui/gtk/gtkdisplay.c,ui/sdl/sdldisplay.c,
          ui/scaler/{scaler.[ch],scaler_internals.h,scalers.c}: add new PAL TV
-         scalers that attempt to reproduce TV-esque colur reproduction (patch
+         scalers that attempt to reproduce TV-esque colour reproduction (patch
          #1537920) (Gergely Szasz).
 20070128 ChangeLog,man/fuse.1: add information about PAL scalers (Fred).
 20070128 ui/{fb/fbdisplay.c,ggi/ggidisplay.c,gtk/gtkdisplay.c,
@@ -1516,3 +1516,5 @@
 20070128 man/fuse.1: updates.
 20070129 man/fuse.1: add documentation for "MDR cartridge len" and "Snap
          joystick prompt" (Fred).
+20070129 ui/scaler/scalers.c: corrections to YUV to RGB conversions etc.
+         (more from patch #1537920) (Gergely Szasz).

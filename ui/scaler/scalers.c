@@ -994,9 +994,9 @@ FUNCTION( scaler_DotMatrix )( const libspectrum_byte *srcPtr,
     V  =  0.50000 * R - 0.41869 * G - 0.08131 * B  (+ 128)
 */
 
-#define RGB_TO_Y(r, g, b) ( ( 2449L * r + 4809L * g + 934L * b + 4096 ) >> 11 )
-#define RGB_TO_U(r, g, b) ( ( 4096L * b - 1383L * r - 2713L * g + 4096 ) >> 11 )
-#define RGB_TO_V(r, g, b) ( ( 4096L * r - 3430L * g - 666L * b +  4096 ) >> 11 )
+#define RGB_TO_Y(r, g, b) ( ( 2449L * r + 4809L * g + 934L * b + 1024 ) >> 11 )
+#define RGB_TO_U(r, g, b) ( ( 4096L * b - 1383L * r - 2713L * g + 1024 ) >> 11 )
+#define RGB_TO_V(r, g, b) ( ( 4096L * r - 3430L * g - 666L * b +  1024 ) >> 11 )
 
 /*
     R = Y + 1.402 (V-128)
@@ -1010,11 +1010,24 @@ FUNCTION( scaler_DotMatrix )( const libspectrum_byte *srcPtr,
 
 #define RGB_TO_PIXEL_555(r,g,b) \
         (((r * 125) >> 10) + (((g * 125) >> 5) & greenMask) + \
-                ((b * 249) & blueMask))
+                ((b * 125) & blueMask))
 
 #define RGB_TO_PIXEL_565(r,g,b) \
         (((r * 125) >> 10) + (((g * 253) >> 5) & greenMask) + \
                 ((b * 249) & blueMask))
+
+#define R_TO_R(r) \
+        ( ( ( (r) & redMask ) * 8424 ) >> 10 )
+
+#define G_TO_G(g) \
+      ( green6bit ? \
+        ( ( ( (g) & greenMask ) >> 5 ) * 4145 ) >> 10 : \
+        ( ( ( (g) & greenMask ) >> 5 ) * 8424 ) >> 10 )
+
+#define B_TO_B(b) \
+      ( green6bit ? \
+        ( ( ( (b) & blueMask ) >> 11 ) * 8424 ) >> 10 : \
+        ( ( ( (b) & blueMask ) >> 10 ) * 8424 ) >> 10 )
 
 void
 FUNCTION( scaler_PalTV )( const libspectrum_byte *srcPtr,
@@ -1057,32 +1070,17 @@ FUNCTION( scaler_PalTV )( const libspectrum_byte *srcPtr,
     p = p0 - 1; q = q0;
 #if SCALER_DATA_SIZE == 2
     /* 1.a. RGB => RGB */
-    r2 = ((*p & redMask) * 8424) >> 10;
-    if( green6bit ) {
-      g2 = (((*p & greenMask) >> 5) * 4145) >> 10;
-      b2 = (((*p & blueMask) >> 11) * 8424) >> 10;
-    } else {
-      g2 = (((*p & greenMask) >> 5) * 8424) >> 10;
-      b2 = (((*p & blueMask) >> 10) * 8424) >> 10;
-    }
+    r2 = R_TO_R( *p );
+    g2 = G_TO_G( *p );
+    b2 = B_TO_B( *p );
     p++;
-    r0 = ((*p & redMask) * 8424) >> 10;
-    if( green6bit ) {
-      g0 = (((*p & greenMask) >> 5) * 4145) >> 10;
-      b0 = (((*p & blueMask) >> 11) * 8424) >> 10;
-    } else {
-      g0 = (((*p & greenMask) >> 5) * 8424) >> 10;
-      b0 = (((*p & blueMask) >> 10) * 8424) >> 10;
-    }
+    r0 = R_TO_R( *p );
+    g0 = G_TO_G( *p );
+    b0 = B_TO_B( *p );
     p++;
-    r1 = ((*p & redMask) * 8424) >> 10;
-    if( green6bit ) {
-      g1 = (((*p & greenMask) >> 5) * 4145) >> 10;
-      b1 = (((*p & blueMask) >> 11) * 8424) >> 10;
-    } else {
-      g1 = (((*p & greenMask) >> 5) * 8424) >> 10;
-      b1 = (((*p & blueMask) >> 10) * 8424) >> 10;
-    }
+    r1 = R_TO_R( *p );
+    g1 = G_TO_G( *p );
+    b1 = B_TO_B( *p );
     p++;
 #else
     r2 = (*p & redMask);
@@ -1105,23 +1103,13 @@ FUNCTION( scaler_PalTV )( const libspectrum_byte *srcPtr,
     for( i = width; i; i -= 2 ) {
 #if SCALER_DATA_SIZE == 2
       /* 1.a. RGB => RGB */
-      r2 = ((*p & redMask) * 8424) >> 10;
-      if( green6bit ) {
-        g2 = (((*p & greenMask) >> 5) * 4145) >> 10;
-        b2 = (((*p & blueMask) >> 11) * 8424) >> 10;
-      } else {
-        g2 = (((*p & greenMask) >> 5) * 8424) >> 10;
-        b2 = (((*p & blueMask) >> 10) * 8424) >> 10;
-      }
+      r2 = R_TO_R( *p );
+      g2 = G_TO_G( *p );
+      b2 = B_TO_B( *p );
       p++;
-      r3 = ((*p & redMask) * 8424) >> 10;
-      if( green6bit ) {
-        g3 = (((*p & greenMask) >> 5) * 4145) >> 10;
-        b3 = (((*p & blueMask) >> 11) * 8424) >> 10;
-      } else {
-        g3 = (((*p & greenMask) >> 5) * 8424) >> 10;
-        b3 = (((*p & blueMask) >> 10) * 8424) >> 10;
-      }
+      r3 = R_TO_R( *p );
+      g3 = G_TO_G( *p );
+      b3 = B_TO_B( *p );
       p++;
 #else
       r2 = (*p & redMask);
@@ -1213,23 +1201,13 @@ FUNCTION( scaler_PalTV2x )( const libspectrum_byte *srcPtr,
   for( j = height; j; j-- ) {
     p = p0 - 1; q = q0;
 #if SCALER_DATA_SIZE == 2
-    r0 = ((*p & redMask) * 8424) >> 10;
-    if( green6bit ) {
-      g0 = (((*p & greenMask) >> 5) * 4145) >> 10;
-      b0 = (((*p & blueMask) >> 11) * 8424) >> 10;
-    } else {
-      g0 = (((*p & greenMask) >> 5) * 8424) >> 10;
-      b0 = (((*p & blueMask) >> 10) * 8424) >> 10;
-    }
+    r0 = R_TO_R( *p );
+    g0 = G_TO_G( *p );
+    b0 = B_TO_B( *p );
     p++;
-    r1 = ((*p & redMask) * 8424) >> 10;
-    if( green6bit ) {
-      g1 = (((*p & greenMask) >> 5) * 4145) >> 10;
-      b1 = (((*p & blueMask) >> 11) * 8424) >> 10;
-    } else {
-      g1 = (((*p & greenMask) >> 5) * 8424) >> 10;
-      b1 = (((*p & blueMask) >> 10) * 8424) >> 10;
-    }
+    r1 = R_TO_R( *p );
+    g1 = G_TO_G( *p );
+    b1 = B_TO_B( *p );
 #else
     r0 = *p & redMask;
     g0 = (*p & greenMask) >> 8;
@@ -1246,14 +1224,9 @@ FUNCTION( scaler_PalTV2x )( const libspectrum_byte *srcPtr,
       p++;      /* next point */
 #if SCALER_DATA_SIZE == 2
       /* 1.a. RGB => RGB */
-      r0 = ((*p & redMask) * 8424) >> 10;
-      if( green6bit ) {
-        g0 = (((*p & greenMask) >> 5) * 4145) >> 10;
-        b0 = (((*p & blueMask) >> 11) * 8424) >> 10;
-      } else {
-        g0 = (((*p & greenMask) >> 5) * 8424) >> 10;
-        b0 = (((*p & blueMask) >> 10) * 8424) >> 10;
-      }
+      r0 = R_TO_R( *p );
+      g0 = G_TO_G( *p );
+      b0 = B_TO_B( *p );
 #else
       r0 = (*p & redMask);
       g0 = (*p & greenMask) >> 8;
@@ -1361,23 +1334,13 @@ FUNCTION( scaler_PalTV3x )( const libspectrum_byte *srcPtr,
   for( j = height; j; j-- ) {
     p = p0 - 1; q = q0;
 #if SCALER_DATA_SIZE == 2
-    r0 = ((*p & redMask) * 8424) >> 10;
-    if( green6bit ) {
-      g0 = (((*p & greenMask) >> 5) * 4145) >> 10;
-      b0 = (((*p & blueMask) >> 11) * 8424) >> 10;
-    } else {
-      g0 = (((*p & greenMask) >> 5) * 8424) >> 10;
-      b0 = (((*p & blueMask) >> 10) * 8424) >> 10;
-    }
+    r0 = R_TO_R( *p );
+    g0 = G_TO_G( *p );
+    b0 = B_TO_B( *p );
     p++;
-    r1 = ((*p & redMask) * 8424) >> 10;
-    if( green6bit ) {
-      g1 = (((*p & greenMask) >> 5) * 4145) >> 10;
-      b1 = (((*p & blueMask) >> 11) * 8424) >> 10;
-    } else {
-      g1 = (((*p & greenMask) >> 5) * 8424) >> 10;
-      b1 = (((*p & blueMask) >> 10) * 8424) >> 10;
-    }
+    r1 = R_TO_R( *p );
+    g1 = G_TO_G( *p );
+    b1 = B_TO_B( *p );
 #else
     r0 = *p & redMask;
     g0 = (*p & greenMask) >> 8;
@@ -1394,14 +1357,9 @@ FUNCTION( scaler_PalTV3x )( const libspectrum_byte *srcPtr,
       p++;
 #if SCALER_DATA_SIZE == 2
       /* 1.a. RGB => RGB */
-      r0 = ((*p & redMask) * 8424) >> 10;
-      if( green6bit ) {
-        g0 = (((*p & greenMask) >> 5) * 4145) >> 10;
-        b0 = (((*p & blueMask) >> 11) * 8424) >> 10;
-      } else {
-        g0 = (((*p & greenMask) >> 5) * 8424) >> 10;
-        b0 = (((*p & blueMask) >> 10) * 8424) >> 10;
-      }
+      r0 = R_TO_R( *p );
+      g0 = G_TO_G( *p );
+      b0 = B_TO_B( *p );
 #else
       r0 = (*p & redMask);
       g0 = (*p & greenMask) >> 8;
