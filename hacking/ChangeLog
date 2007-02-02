@@ -1518,3 +1518,5 @@
          joystick prompt" (Fred).
 20070129 ui/scaler/scalers.c: corrections to YUV to RGB conversions etc.
          (more from patch #1537920) (Gergely Szasz).
+20070202 <almost everything>: change my e-mail address to @shadowmagic and
+	 remove my postal address.

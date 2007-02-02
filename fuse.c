@@ -19,8 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21-fuse@srcf.ucam.org
-   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+   E-mail: philip-fuse@shadowmagic.org.uk
 
 */
 
@@ -367,7 +366,7 @@ static void fuse_show_copyright(void)
   printf( "\n" );
   fuse_show_version();
   printf(
-   "Copyright (c) 1999-2005 Philip Kendall <pak21-fuse@srcf.ucam.org>\n"
+   "Copyright (c) 1999-2005 Philip Kendall <philip-fuse@shadowmagic.org.uk>\n"
    "and others; see the file 'AUTHORS' for more details.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"

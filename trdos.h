@@ -19,8 +19,7 @@
 
    Author contact information:
 
-   E-mail: pak21-fuse@srcf.ucam.org
-     Post: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+   E-mail: philip-fuse@shadowmagic.org.uk
 
      Fred: fredm@spamcop.net
 

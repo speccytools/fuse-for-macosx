@@ -17,8 +17,7 @@ dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 dnl
 dnl Author contact information:
 dnl
-dnl E-mail: pak21-fuse@srcf.ucam.org
-dnl Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
