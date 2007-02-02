@@ -141,4 +141,11 @@ $Id$
 | |
 | | Release-0_7_0-disciple-branch
 |
+| Release-0_8_0-trunk
+|
++-\
+| | Release-0_8_0-pre1
+| |
+| | Release-0_8_0-branch
+|
 HEAD

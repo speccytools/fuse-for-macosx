@@ -1520,3 +1520,7 @@
          (more from patch #1537920) (Gergely Szasz).
 20070202 <almost everything>: change my e-mail address to @shadowmagic and
 	 remove my postal address.
+20070202 TAG: Release-0_8_0-trunk
+20070202 BRANCH: Release-0_8_0-branch
+20070202 TAG: Release-0_8_0-pre1 (Release-0_8_0-branch)
+
