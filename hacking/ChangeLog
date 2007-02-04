@@ -1523,4 +1523,5 @@
 20070202 TAG: Release-0_8_0-trunk
 20070202 BRANCH: Release-0_8_0-branch
 20070202 TAG: Release-0_8_0-pre1 (Release-0_8_0-branch)
-
+20070204 sound.c: don't disable sound completely if we don't enable sound
+         after an unpause (fixes bug #1648246) (Fred).

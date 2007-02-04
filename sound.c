@@ -270,18 +270,6 @@ void sound_unpause(void)
 if(settings_current.fastload && tape_is_playing()) return;
 
 sound_init(settings_current.sound_device);
-
-/* If the sound code couldn't re-initialise, fall back to the
-   signal based routines */
-if(!sound_enabled)
-  {
-  /* Increment pause_count, report, decrement pause_count
-   * (i.e. avoid the effects of fuse_emulation_{,un}pause).
-   * Otherwise, we may be recursively reporting this error. */
-  fuse_emulation_paused++;
-  fuse_emulation_paused--;
-  settings_current.sound = 0;
-  }
 }
 
 
