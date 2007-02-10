@@ -28,6 +28,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -41,19 +42,23 @@
 #include "sound.h"
 #include "ui/ui.h"
 
-/* using (7) 32 byte frags for 8kHz, scale up for higher */
-#define BASE_SOUND_FRAG_PWR	7
-
 static void sdlwrite( void *userdata, Uint8 *stream, int len );
 
 sfifo_t sound_fifo;
+
+/* Number of Spectrum frames audio latency to use */
+#define NUM_FRAMES 2
+
+/* Records sound writer status information */
+static int audio_output_started;
 
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
   SDL_AudioSpec requested, received;
-  int frag;
   int error;
+  float hz;
+  int sound_framesiz;
 
   /* I'd rather just use setenv, but Windows doesn't have it */
   if( device ) {
@@ -80,15 +85,10 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   requested.format = AUDIO_S16SYS;
   requested.callback = sdlwrite;
 
-  frag = BASE_SOUND_FRAG_PWR;
-  if (*freqptr > 8250)   
-    frag++;  
-  if (*freqptr > 16500)
-    frag++;      
-  if (*freqptr > 33000)
-    frag++;
-
-  requested.samples = 1 << frag;
+  hz = (float)machine_current->timings.processor_speed /
+              machine_current->timings.tstates_per_frame;
+  sound_framesiz = *freqptr / hz;
+  requested.samples = pow(2.0, floor(log2(sound_framesiz)));
 
   if ( SDL_OpenAudio( &requested, &received ) < 0 ) {
     settings_current.sound = 0;
@@ -106,15 +106,10 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 
     requested.freq = *freqptr;
 
-    frag = BASE_SOUND_FRAG_PWR;
-    if (*freqptr > 8250)   
-      frag++;  
-    if (*freqptr > 16500)
-      frag++;      
-    if (*freqptr > 33000)
-      frag++;
-
-    requested.samples = 1 << frag;
+    hz = (float)machine_current->timings.processor_speed /
+                machine_current->timings.tstates_per_frame;
+    sound_framesiz = *freqptr / hz;
+    requested.samples = pow(2.0, floor(log2(sound_framesiz)));
 
     if( SDL_OpenAudio( &requested, NULL ) < 0 ) {
       settings_current.sound = 0;
@@ -122,23 +117,25 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
                 SDL_GetError() );
       return 1;
     }
-
-    /* Convert from 16-bit stereo samples to bytes plus some headroom */
-    frag = 1 << (frag+3);
-
   } else {
-    *freqptr = received.freq;
     *stereoptr = received.channels == 1 ? 0 : 1;
-    frag = received.size;
   }
 
-  if( ( error = sfifo_init( &sound_fifo, 2 * frag + 1 ) ) ) {
+  hz = (float)machine_current->timings.processor_speed /
+              machine_current->timings.tstates_per_frame;
+  sound_framesiz = *freqptr / hz;
+  sound_framesiz <<= 1;
+
+  if( ( error = sfifo_init( &sound_fifo, NUM_FRAMES
+                                         * received.channels
+                                         * sound_framesiz + 1 ) ) ) {
     ui_error( UI_ERROR_ERROR, "Problem initialising sound fifo: %s",
               strerror ( error ) );
     return 1;
   }
 
-  SDL_PauseAudio( 0 );
+  /* wait to run sound until we have some sound to play */
+  audio_output_started = 0;
 
   return 0;
 }
@@ -176,6 +173,11 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   if( i < 0 ) {
     ui_error( UI_ERROR_ERROR, "Couldn't write sound fifo: %s\n",
               strerror( i ) );
+  }
+
+  if( !audio_output_started ) {
+    SDL_PauseAudio( 0 );
+    audio_output_started = 1;
   }
 }
 

@@ -28,11 +28,15 @@
 #include <CoreAudio/AudioHardware.h>
 #include <AudioUnit/AudioUnit.h>
 
+#include "settings.h"
 #include "sfifo.h"
 #include "sound.h"
 #include "ui/ui.h"
 
 sfifo_t sound_fifo;
+
+/* Number of Spectrum frames audio latency to use */
+#define NUM_FRAMES 2
 
 static
 OSStatus coreaudiowrite( void *inRefCon,
@@ -49,6 +53,9 @@ static AudioStreamBasicDescription deviceFormat;
  */
 static AudioUnit gOutputUnit;
 
+/* Records sound writer status information */
+static int audio_output_started;
+
 int
 sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
 {
@@ -58,6 +65,8 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
   UInt32 deviceBufferSize;  /* bufferSize returned by
                                kAudioDevicePropertyBufferSize */
   int error;
+  float hz;
+  int sound_framesiz;
 
   /* get the default output device for the HAL */
   count = sizeof( device );
@@ -158,21 +167,21 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
     return 1;
   }
 
-  if( ( error = sfifo_init( &sound_fifo, 2 * deviceFormat.mChannelsPerFrame
-                                         * deviceBufferSize + 1 ) ) ) {
+  hz = (float)machine_current->timings.processor_speed /
+              machine_current->timings.tstates_per_frame;
+  sound_framesiz = deviceFormat.mSampleRate / hz;
+
+  if( ( error = sfifo_init( &sound_fifo, NUM_FRAMES
+                                         * deviceFormat.mBytesPerFrame
+                                         * deviceFormat.mChannelsPerFrame
+                                         * sound_framesiz + 1 ) ) ) {
     ui_error( UI_ERROR_ERROR, "Problem initialising sound fifo: %s",
               strerror ( error ) );
     return 1;
   }
 
-  /* Start the rendering
-     The DefaultOutputUnit will do any format conversions to the format of the
-     default device */
-  err = AudioOutputUnitStart( gOutputUnit );
-  if( err ) {
-    ui_error( UI_ERROR_ERROR, "AudioOutputUnitStart=%ld", err );
-    return 1;
-  }
+  /* wait to run sound until we have some sound to play */
+  audio_output_started = 0;
 
   return 0;
 }
@@ -182,7 +191,8 @@ sound_lowlevel_end( void )
 {
   OSStatus err;
 
-  verify_noerr( AudioOutputUnitStop( gOutputUnit ) );
+  if( audio_output_started )
+    verify_noerr( AudioOutputUnitStop( gOutputUnit ) );
 
   err = AudioUnitUninitialize( gOutputUnit );
   if( err ) {
@@ -217,6 +227,19 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   if( i < 0 ) {
     ui_error( UI_ERROR_ERROR, "Couldn't write sound fifo: %s",
               strerror( i ) );
+  }
+
+  if( !audio_output_started ) {
+    /* Start the rendering
+       The DefaultOutputUnit will do any format conversions to the format of the
+       default device */
+    OSStatus err = AudioOutputUnitStart( gOutputUnit );
+    if( err ) {
+      ui_error( UI_ERROR_ERROR, "AudioOutputUnitStart=%ld", err );
+      return;
+    }
+
+    audio_output_started = 1;
   }
 }
 
