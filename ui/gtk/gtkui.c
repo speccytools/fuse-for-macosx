@@ -187,11 +187,17 @@ ui_init( int *argc, char ***argv )
 
   if( settings_current.aspect_hint ) {
     hints |= GDK_HINT_ASPECT;
-    geometry.min_aspect = geometry.max_aspect =
-      ((float)DISPLAY_ASPECT_WIDTH)/DISPLAY_SCREEN_HEIGHT;
+    if( settings_current.strict_aspect_hint ) {
+      geometry.min_aspect = geometry.max_aspect =
+	(float)DISPLAY_ASPECT_WIDTH / DISPLAY_SCREEN_HEIGHT;
+    } else {
+      geometry.min_aspect = 1.2;
+      geometry.max_aspect = 1.5;
+    }
   }
 
-  gtk_window_set_geometry_hints( GTK_WINDOW(gtkui_window), gtkui_drawing_area,
+  gtk_window_set_geometry_hints( GTK_WINDOW(gtkui_window),
+				 GTK_WIDGET(gtkui_drawing_area),
 				 &geometry, hints );
 
   if( gtkdisplay_init() ) return 1;

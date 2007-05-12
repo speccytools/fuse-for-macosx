@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "16th July, 2004" "Version 0.7.0" "Emulators"
+.TH fuse 1 "11th May, 2007" "Version 0.8.0.1" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -83,15 +83,15 @@ or
 .I \-\-aspect\-hint
 .RS
 Specify whether the GTK+ and Xlib user interfaces should `hint' to the
-window manager about the preferred aspect ratio for the top-level
+window manager about the preferred aspect ratio for the graphics
 window, thus preventing resizing to non-square sizes which lead to
-Fuse not displaying correctly. However, with some window managers (for
-example
-.IR icewm (1))
-this prevents the window from being resized at all. (Enabled by
+Fuse not displaying correctly. This option has been observed to cause
+problems with some window managers when using the GTK+ UI which can
+prevent the window from being resized or moved at all. (Enabled by
 default, but you can use
 .RI ` \-\-no\-aspect\-hint '
-to disable).
+to disable). See also the
+.RI ` \-\-strict\-aspect\-hint ' option.
 .RE
 .PP
 .I \-\-autosave\-settings
@@ -406,6 +406,102 @@ option.
 Specify an RZX file to begin recording to.
 .RE
 .PP
+.I "\-\-rom\-16 file"
+.br
+.I "\-\-rom\-48 file"
+.br
+.I "\-\-rom\-128-0 file"
+.br
+.I "\-\-rom\-128-1 file"
+.br
+.I "\-\-rom\-plus2-0 file"
+.br
+.I "\-\-rom\-plus2-1 file"
+.br
+.I "\-\-rom\-plus2a-0 file"
+.br
+.I "\-\-rom\-plus2a-1 file"
+.br
+.I "\-\-rom\-plus2a-2 file"
+.br
+.I "\-\-rom\-plus2a-3 file"
+.br
+.I "\-\-rom\-plus3-0 file"
+.br
+.I "\-\-rom\-plus3-1 file"
+.br
+.I "\-\-rom\-plus3-2 file"
+.br
+.I "\-\-rom\-plus3-3 file"
+.br
+.I "\-\-rom\-plus3e-0 file"
+.br
+.I "\-\-rom\-plus3e-1 file"
+.br
+.I "\-\-rom\-plus3e-2 file"
+.br
+.I "\-\-rom\-plus3e-3 file"
+.br
+.I "\-\-rom\-tc2048 file"
+.br
+.I "\-\-rom\-tc2068-0 file"
+.br
+.I "\-\-rom\-tc2068-1 file"
+.br
+.I "\-\-rom\-ts2068-0 file"
+.br
+.I "\-\-rom\-ts2068-1 file"
+.br
+.I "\-\-rom\-pentagon-0 file"
+.br
+.I "\-\-rom\-pentagon-1 file"
+.br
+.I "\-\-rom\-pentagon-2 file"
+.br
+.I "\-\-rom\-scorpion-0 file"
+.br
+.I "\-\-rom\-scorpion-1 file"
+.br
+.I "\-\-rom\-scorpion-2 file"
+.br
+.I "\-\-rom\-scorpion-3 file"
+.br
+.I "\-\-rom\-spec-se-0 file"
+.br
+.I "\-\-rom\-spec-se-1 file"
+.br
+.I "\-\-rom\-interface-1 file"
+.RS
+Specify the file to be used for ROM(s) used for each machine. The
+options respectively refer to the 16K Spectrum
+.RI ( 48.rom ),
+48K Spectrum
+.RI ( 48.rom ),
+the two ROMs for the 128K Spectrum
+.RI ( 128-0.rom " and " 128-1.rom ),
+the two ROMs for the +2
+.RI ( plus2-0.rom " and " plus2-1.rom ),
+the four ROMs for the +2A
+.RI ( plus3-0.rom ", " plus3-1.rom ", " plus3-2.rom " and " plus3-3.rom ),
+the four ROMs for the +3
+.RI ( plus3-0.rom ", " plus3-1.rom ", " plus3-2.rom " and " plus3-3.rom ),
+the TC2048 ROM
+.RI ( tc2048.rom ),
+the two ROMs for the TC2068
+.RI ( tc2068-0.rom " and " tc2068-1.rom ),
+the two ROMs for the TS2068
+.RI ( tc2068-0.rom " and " tc2068-1.rom ),
+the two main ROMs and the TR-DOS ROM for the Pentagon 128
+.RI ( 128p-0.rom ", " 128p-1.rom " and " trdos.rom ),
+the four ROMs for the Scorpion 256
+.RI ( 256s-0.rom ", " 256s-1.rom ", " 256s-2.rom " and " 256s-3.rom ),
+the two ROMs for the Spectrum SE
+.RI ( se-0.rom " and " se-1.rom ),
+and the Interface I ROM
+.RI ( if1-2.rom ).
+The names in brackets denote the defaults.
+.RE
+.PP
 .I \-\-separation
 .RS
 Give stereo separation of the 128's AY sound channels. Same as the
@@ -556,12 +652,16 @@ specfies the ALSA device e.g. hw:1.2
 .RI buffer_time= num
 .br
 .RI ` num '
-gives the ALSA buffer time.
+gives the ALSA buffer time in microseconds.
 .IP \[bu]
 .RI period_time= num
 .br
 .RI ` num '
-gives the ALSA period time.
+gives the ALSA period time in microseconds.
+.IP \[bu]
+.RI use_mmap= yes|y|true|t|1
+.br
+specifies that libao use memory mapped transfer.
 .RE
 .IP \[bu]
 .IR arts :
@@ -689,6 +789,19 @@ SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. Same as the General Options dialog's
 .I "Show statusbar"
 option.
+.RE
+.PP
+.I "\-\-strict\-aspect\-hint"
+.RS
+For the GTK+ UI, use stricter limits for the aspect ratio limits set
+by the
+.RI ` \-\-aspect\-hint ' 
+option. This can cause some window managers (for example,
+.IR metacity (1))
+to not allow the window to be resized and moved, but is necessary to
+prevent others (for example,
+.IR fvwm (1))
+from being able resize the window away from square.
 .RE
 .PP
 .I "\-v mode"
@@ -2358,7 +2471,7 @@ for more details.
 .SH "DIVIDE"
 The DivIDE is another IDE interface for the Spectrum, of which full
 details can be found at 
-.IR "http://insert.divide.url/" .
+.IR "http://baze.au.com/divide/" .
 The interface can be activated via the
 .I "DivIDE interface"
 option from the

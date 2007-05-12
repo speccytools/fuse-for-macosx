@@ -1,5 +1,5 @@
 /* pentagon.c: Pentagon 128K specific routines
-   Copyright (c) 1999-2004 Philip Kendall and Fredrick Meunier
+   Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
 
    $Id$
 
@@ -84,7 +84,7 @@ pentagon_select_ff_read( libspectrum_word port, int *attached )
 static libspectrum_byte
 pentagon_unattached_port( void )
 {
-  return spectrum_unattached_port( 3 );
+  return spectrum_unattached_port();
 }
 
 int

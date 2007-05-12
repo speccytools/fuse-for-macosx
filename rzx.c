@@ -79,11 +79,11 @@ libspectrum_rzx *rzx;
 
 /* Fuse's DSA key */
 libspectrum_rzx_dsa_key rzx_key = {
-  "9E140C4CEA9CA011AA8AD17443CB5DC18DC634908474992D38AB7D4A27038CBB209420BA2CAB8508CED35ADF8CBD31A0A034FC082A168A0E190FFC4CCD21706F", /* p */
-  "C52E9CA1804BD021FFAD30E8FB89A94437C2E4CB",	       /* q */
-  "90E56D9493DE80E1A35F922007357888A1A47805FD365AD27BC5F184601EBC74E44F576AA4BF8C5244D202BBAE697C4F9132DFB7AD0A56892A414C96756BD21A", /* g */
-  "7810A35AC94EA5750934FB9C922351EE597C71E2B83913C121C6655EA25CE7CBE2C259FA3168F8475B2510AA29C5FEB50ACAB25F34366C2FFC93B3870A522232", /* y */
-  "9A4E53CC249750C3194A38A3BE3EDEED28B171A9"	       /* x */
+  "A9E3BD74E136A9ABD41E614383BB1B01EB24B2CD7B920ED6A62F786A879AC8B00F2FF318BF96F81654214B1A064889FF6D8078858ED00CF61D2047B2AAB7888949F35D166A2BBAAE23A331BD4728A736E76901D74B195B68C4A2BBFB9F005E3655BDE8256C279A626E00C7087A2D575F78D7DC5CA6E392A535FFE47A816BA503", /* p */
+  "FE8D540EED2CAE1983690E2886259F8956FB5A19",	       /* q */
+  "9680ABFFB98EF2021945ADDF86C21D6EE3F7C8777FB0A0220AB59E9DFA3A3338611B32CFD1F22F8F26547858754ED93BFBDD87DC13C09F42B42A36B2024467D98EB754DEB2847FCA7FC60C81A99CF95133847EA38AD9D037AFE9DD189E9F0EE47624848CEE840D7E3724A39681E71B97ECF777383DC52A48C0A2C93BADA93F4C", /* g */
+  "46605F0514D56BC0B4207A350367A5038DBDD4DD62B7C997D26D0ADC5BE42D01F852C199E34553BCBCE5955FF80E3B402B55316606D7E39C0F500AE5EE41A7B7A4DCE78EC19072C21FCC7BA48DFDC830C17B72BCAA2B2D70D9DFC0AAD9B7E73F7AEB6241E54D55C33E41AB749CAAFBE7AB00F2D74C500E5F5DD63BD299C65778", /* y */
+  "948744AA7A1D1BE9EE65150B0A95A678B4181F0E"	       /* x */
 };
 
 /* By how much is the speed allowed to deviate from 100% whilst recording
@@ -288,7 +288,7 @@ start_playback( libspectrum_rzx *rzx )
   counter_reset();
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
-  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 1 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
 
   return 0;
 }
@@ -307,9 +307,22 @@ int rzx_stop_playback( int add_interrupt )
      out of frames, as this occurs just before a normal end of frame
      and everything works normally as rzx_playback is now zero again */
   if( add_interrupt ) {
+
     error = event_add( machine_current->timings.tstates_per_frame,
 		       EVENT_TYPE_FRAME );
     if( error ) return error;
+
+    /* We're no longer doing RZX playback, so tstates now be <= the
+       normal frame count */
+    if( tstates > machine_current->timings.tstates_per_frame )
+      tstates = machine_current->timings.tstates_per_frame;
+
+  } else {
+
+    /* Ensure that tstates will be zero after it is reduced in
+       spectrum_frame() */
+    tstates = machine_current->timings.tstates_per_frame;
+
   }
 
   libspec_error = libspectrum_rzx_free( rzx );
@@ -360,13 +373,19 @@ static int recording_frame( void )
 static int playback_frame( void )
 {
   int error, finished;
+  libspectrum_snap *snap;
 
-  error = libspectrum_rzx_playback_frame( rzx, &finished );
+  error = libspectrum_rzx_playback_frame( rzx, &finished, &snap );
   if( error ) return rzx_stop_playback( 0 );
 
   if( finished ) {
     ui_error( UI_ERROR_INFO, "Finished RZX playback" );
     return rzx_stop_playback( 0 );
+  }
+
+  if( snap ) {
+    error = snapshot_copy_from( snap );
+    if( error ) return rzx_stop_playback( 0 );
   }
 
   /* If we've got another frame to do, fetch the new instruction count and

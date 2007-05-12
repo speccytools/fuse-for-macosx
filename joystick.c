@@ -32,6 +32,7 @@
 #include "joystick.h"
 #include "keyboard.h"
 #include "periph.h"
+#include "rzx.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "machine.h"
@@ -217,7 +218,8 @@ joystick_from_snapshot( libspectrum_snap* snap )
 
     if( settings_current.joystick_keyboard_output != fuse_type &&
         settings_current.joystick_1_output != fuse_type &&
-        settings_current.joystick_2_output != fuse_type ) {
+        settings_current.joystick_2_output != fuse_type &&
+        !rzx_playback ) {
       switch( ui_confirm_joystick( libspectrum_snap_joystick_list(snap,i),
                                    libspectrum_snap_joystick_inputs(snap,i)) ) {
       case UI_CONFIRM_JOYSTICK_KEYBOARD:

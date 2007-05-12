@@ -1,5 +1,5 @@
-The Free Unix Spectrum Emulator (Fuse) 0.7.0
-============================================
+The Free Unix Spectrum Emulator (Fuse) 0.8.0.1
+==============================================
 
 Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
 unsurprisingly, an emulator of the ZX Spectrum (a popular 1980s home
@@ -10,9 +10,10 @@ better-known ZX Spectrum clones as well.
 
 What Fuse does have:
 
-* Working Spectrum 16K/48K/128K/+2/+2A/+3/+3e/SE, Timex TC2048/TC2068,
-  Pentagon 128 and Scorpion ZS 256 emulation, running at true Speccy
-  speed on any computer you're likely to try it on.
+* Working Spectrum 16K/48K/128K/+2/+2A/+3/+3e/SE, Timex TC2048,
+  TC2068 and TS2068, Pentagon 128 and Scorpion ZS 256 emulation,
+  running at true Speccy speed on any computer you're likely to try it
+  on.
 * Support for loading from .tzx files.
 * Sound (on systems supporting the Open Sound System, SDL, or OpenBSD/
   Solaris's /dev/audio).
@@ -20,8 +21,9 @@ What Fuse does have:
   (including Kempston, Sinclair and Cursor joysticks).
 * Emulation of some of the printers you could attach to a Spectrum.
 * Support for the RZX input recording file format, including
-  'competition mode'.
-* Emulation of the Spectrum +3e, ZXATASP and ZXCF IDE interfaces.
+  rollback and 'competition mode'.
+* Emulation of the DivIDE, Interface I, Kempston mouse, Spectrum +3e,
+  ZXATASP and ZXCF interfaces.
 
 What you'll need to run Fuse
 ----------------------------
@@ -30,8 +32,8 @@ Unix, Linux, BSD, etc.
 
 Required:
 
-* X, SDL, svgalib, framebuffer support. If you have GTK+, you'll get a
-  (much) nicer user interface under X.
+* X, SDL, svgalib or framebuffer support. If you have GTK+, you'll get
+  a (much) nicer user interface under X.
 * libspectrum: this is available from
   http://fuse-emulator.sourceforge.net/libspectrum.php
 
@@ -137,6 +139,6 @@ the Usenet group 'comp.sys.sinclair', but do read the FAQ
 ( http://www.worldofspectrum.org/faq/index.html ) first!
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-16 July 2004
+11 May 2007
 
 $Id$

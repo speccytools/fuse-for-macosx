@@ -136,9 +136,13 @@ snapshot_copy_from( libspectrum_snap *snap )
 
   machine = libspectrum_snap_machine( snap );
 
-  error = machine_select( machine );
-  if( error ) {
-    error = try_fallback_machine( machine ); if( error ) return error;
+  if( machine != machine_current->machine ) {
+    error = machine_select( machine );
+    if( error ) {
+      error = try_fallback_machine( machine ); if( error ) return error;
+    }
+  } else {
+    machine_reset();
   }
 
   capabilities = machine_current->capabilities;

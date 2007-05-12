@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2005 Philip Kendall
+   Copyright (c) 1999-2007 Philip Kendall
 
    $Id$
 
@@ -113,6 +113,7 @@ typedef struct start_files_t {
   const char *zxatasp_master, *zxatasp_slave;
   const char *zxcf;
   const char *divide_master, *divide_slave;
+  const char *mdr[8];
 
 } start_files_t;
 
@@ -304,9 +305,7 @@ int creator_init( void )
 
   error = libspectrum_creator_alloc( &fuse_creator ); if( error ) return error;
 
-  error = libspectrum_creator_set_program(
-    fuse_creator, (const libspectrum_byte*)"Fuse"
-  );
+  error = libspectrum_creator_set_program( fuse_creator, "Fuse" );
   if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
 
   error = libspectrum_creator_set_major( fuse_creator,
@@ -366,7 +365,7 @@ static void fuse_show_copyright(void)
   printf( "\n" );
   fuse_show_version();
   printf(
-   "Copyright (c) 1999-2005 Philip Kendall <philip-fuse@shadowmagic.org.uk>\n"
+   "Copyright (c) 1999-2007 Philip Kendall <philip-fuse@shadowmagic.org.uk>\n"
    "and others; see the file 'AUTHORS' for more details.\n"
    "\n"
    "This program is distributed in the hope that it will be useful,\n"
@@ -474,6 +473,15 @@ setup_start_files( start_files_t *start_files )
   start_files->divide_master = settings_current.divide_master_file;
   start_files->divide_slave  = settings_current.divide_slave_file;
 
+  start_files->mdr[0] = settings_current.mdr_file;
+  start_files->mdr[1] = settings_current.mdr_file2;
+  start_files->mdr[2] = settings_current.mdr_file3;
+  start_files->mdr[3] = settings_current.mdr_file4;
+  start_files->mdr[4] = settings_current.mdr_file5;
+  start_files->mdr[5] = settings_current.mdr_file6;
+  start_files->mdr[6] = settings_current.mdr_file7;
+  start_files->mdr[7] = settings_current.mdr_file8;
+
   return 0;
 }
 
@@ -482,7 +490,7 @@ static int
 parse_nonoption_args( int argc, char **argv, int first_arg,
 		      start_files_t *start_files )
 {
-  size_t i;
+  size_t i, j;
   const char *filename;
   utils_file file;
   libspectrum_id_t type;
@@ -536,6 +544,15 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_SNAPSHOT:
       start_files->snapshot = filename; break;
 
+    case LIBSPECTRUM_CLASS_MICRODRIVE:
+      for( j = 0; j < 8; j++ ) {
+        if( !start_files->mdr[j] ) {
+	  start_files->mdr[j] = filename;
+	  break;
+	}
+      }
+      break;
+
     case LIBSPECTRUM_CLASS_TAPE:
       start_files->tape = filename; break;
 
@@ -558,7 +575,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 static int
 do_start_files( start_files_t *start_files )
 {
-  int autoload, error;
+  int autoload, error, i;
 
   /* Can't do both input recording and playback */
   if( start_files->playback && start_files->recording ) {
@@ -635,6 +652,15 @@ do_start_files( start_files_t *start_files )
   if( start_files->tape ) {
     error = utils_open_file( start_files->tape, autoload, NULL );
     if( error ) return error;
+  }
+
+  /* Microdrive cartridges */
+
+  for( i = 0; i < 8; i++ ) {
+    if( start_files->mdr[i] ) {
+      error = utils_open_file( start_files->mdr[i], autoload, NULL );
+      if( error ) return error;
+    }
   }
 
   /* IDE hard disk images */

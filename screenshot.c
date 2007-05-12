@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <errno.h>
+#include <limits.h>
 #include <string.h>
 
 #include <libspectrum.h>

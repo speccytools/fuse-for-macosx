@@ -1524,8 +1524,100 @@
 20070202 BRANCH: Release-0_8_0-branch
 20070202 TAG: Release-0_8_0-pre1 (Release-0_8_0-branch)
 20070204 sound.c: don't disable sound completely if we don't enable sound
-         after an unpause (fixes bug #1648246) (Fred).
+         after an unpause (fixes bug #1648246) (Release-0_8_0-branch) (Fred).
+20070204 rzx.c: use new libspectrum_rzx_playback_frame() API to allow
+	 loading of snapshots (necessary for playing back RZX files made with
+	 SPIN's "RZX Pause" feature).
+20070207 man/fuse.1: document that metacity needs --no-aspect-hint
+	 (Thanks, Stuart Brady and dave in #spin) (Release-0_8_0-branch).
+20070208 rzx.c: ensure tstates is sane after RZX completion
+	 (bug #1654165) (Release-0_8_0-branch).
+20070209 rzx.c: ensure tstates is sane after RZX desync
+	 (Release-0_8_0-branch).
 20070210 sound/{coreaudiosound.c,sdlsound.c}: make sound fifo two frames in
          size rather than a multiple of the sound fragment size, make sound
          callbacks run after some sound is available, calculate SDL fragment
-         size based on machine speed and output frequency (Fred).
+         size based on machine speed and output frequency
+	 (Release-0_8_0-branch) (Fred).
+20070217 widget/filesel.c: allow absolute pathnames to be used (fixes bug
+	 #1651433) (Release-0_8_0-branch) (Gergely Szasz).
+20070217 sound/aosound.c: stop possible segfaults (part of bug #1659865)
+	 (Release-0_8_0-branch) (Gergely Szasz).
+20070217 man/fuse.1: small ao improvements (rest of bug #1659865)
+	 (Release-0_8_0-branch) (Gergely Szasz).
+20070217 fuse.c,if1.c,settings.dat,utils.c: allow microdrive cartridge images
+	 to be used on startup (bug #1660099) (Release-0_8_0-branch)
+	 (Gergely Szasz).
+20070303 settings.dat,man/fuse.1,ui/gtk/gtkui.c: new --strict-aspect-hint
+	 option to improve situation with Metacity not being able to resize
+	 or move GTK+ window (bug #1539655) (Release-0_8_0-branch).
+20070303 configure.in: don't use libao by default (bug #1668916)
+	 (Release-0_8_0-branch).
+20070303 TAG: Release-0_8_0-pre2 (Release-0_8_0-branch)
+20070303 man/fuse.1: document --rom-* options (bug #1262547)
+	 (Release-0_8_0-branch).
+20070304 ui.c: swap Kempston mouse buttons (bug #1507684)
+	 (Release-0_8_0-branch).
+20070306 sound.c: don't leak memory for tape_buf (Release-0_8_0-branch) (Fred).
+20070306 display.c: don't overrun line_times array (Release-0_8_0-branch)
+	 (Fred).
+20070310 man/fuse.1: add divide url (Release-0_8_0-branch) (Fred).
+20070311 machines/spec_se.c: fix marking Dock and EXROM banks as writable in
+         the SE (Release-0_8_0-branch) (thanks, Andrew Owen) (Fred).
+20070317 compat/mkstemp.c: remove abberant break (thanks, Marek Januszewski)
+	 (Release-0_8_0-branch).
+20070321 periph.c: when stopping RZX playback due to overrun, ensure the
+	 change is picked up in z80_do_opcodes() (thanks, Julian Wiseman)
+	 (Release-0_8_0-branch).
+20070327 joystick.c: don't prompt for joystick config changes when loading a
+         snap during RZX playback (Release-0_8_0-branch)
+	 (thanks, Julian Wiseman) (Fred).
+20070404 printer.c: don't buffer output so text is available as it is
+         printed (Release-0_8_0-branch) (Fred).
+20070409 ChangeLog,README,configure.in,man/fuse.1: updates for 0.8 release
+	 (Release-0_8_0-branch).
+20070409 rzx.c: change over to the 'release' DSA key (Release-0_8_0-branch).
+20070409 fuse.c: remove warning (Release-0_8_0-branch).
+20070410 rzx.c: don't allow use of rollback commands during playback (thanks,
+	 Julian Wiseman) (Release-0_8_0-branch).
+20070411 README: these aren't all IDE interfaces (Release-0_8_0-branch).
+20070411 fuse.c: update copyright date to 2007 (Release-0_8_0-branch).
+20070416 widget/Makefile.am: distribute fuse.font.sbf and mkfusefont.pl
+         (Release-0_8_0-branch) (Fred).
+20070424 TAG: Release-0_8_0 (Release-0_8_0-branch).
+20070425 uidisplay.c,widget/menu.c: initialise border in help screen and
+         center keyboard picture on help screen (thanks, Alberto Garcia)
+         (Release-0_8_0-branch).
+20070425 widget/pokefinder.c: fix up for non-proportional display
+	 (thanks, Alberto Garcia) (Release-0_8_0-branch).
+20070428 hacking/ui.txt,ui/{uidisplay.h,fb/fbdisplay.c,ggi/ggidisplay.c,
+         gtk/gtkdisplay.c,scaler/scaler.c,sdl/sdldisplay.c,
+         svga/svgadisplay.c,win32/win32display.c,xlib/xdisplay.c}:
+         check that we don't exceed maximum fullscreen dimensions with
+         SDL UI and attempt a more graceful failure if things go wrong
+         (fixes bug #1708636; thanks Alberto Garcia) (Release-0_8_0-branch)
+         (Fred).
+20070501 screenshot.c: include limits.h for PATH_MAX (Release-0_8_0-branch)
+         (Fred).
+20070501 ui/scaler/scalers.c: make sure MIN and ABS are defined
+         (Release-0_8_0-branch) (Fred).
+20070503 periph.c,spectrum.[ch],ula.[ch],machines/{pentagon.c,scorpion.c,
+	 spec128.c,spec16.c,spec48.c}: fix IN timings and consequent fixes
+	 to floating bus behaviour (fixes bug #1708597) (thanks, Pegaz and
+	 Mark Woodmass) (Release-0_8_0-branch).
+20070507 lib/Makefile.am: distribute autoload snapshots
+         (thanks Stuart Brady and Arda Erdikmen) (Release-0_8_0-branch)
+         (Fred).
+20070509 snapshot.c: call machine_select() only if the machine has changed
+	 (fixes bug #1701246) (thanks, Julian Wiseman) (Release-0_8_0-branch)
+	 (Fred).
+20070509 acinclude.m4: remove warnings about underquoted definitions
+	 (Release-0_8_0-branch) (Stuart Brady).
+20070510 ChangeLog,README,configure.in,man/fuse.1: doc updates for 0.8.0.1
+	 release (Release-0_8_0-branch).
+20070511 TAG: Release-0_8_0_1 (Release-0_8_0-branch).
+20070512 ui/scaler/scalers.c: make sure ABS is correctly defined
+         (Release-0_8_0-branch) (Fred).
+20070512 hacking/cvs-tags: document merge to trunk (Release-0_8_0-branch).
+20070512 Merge from Release-0_8_0-branch).
+20070512 TAG: Release-0_8_0-merge-1

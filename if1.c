@@ -788,7 +788,25 @@ if1_mdr_new( int drive )
 void
 if1_mdr_insert( const char *filename, int drive )
 {
-  microdrive_t *mdr = &microdrive[drive];
+  microdrive_t *mdr;
+  int i;
+  
+  if( drive == -1 ) {	/* find an emtpty one */
+    for( i = 0; i < 8; i++ ) {
+      if( !microdrive[i].inserted ) {
+        drive = i;
+	break;
+      }
+    }
+  }
+  
+  if( drive == -1 ) {
+    ui_error( UI_ERROR_ERROR,
+	      "Cannot insert cartridge '%s', all microdrive loaded", filename );
+    return;
+  }
+
+  mdr = &microdrive[drive];
 
   if( mdr->inserted && if1_mdr_eject( NULL, drive ) ) {
     ui_error( UI_ERROR_ERROR,

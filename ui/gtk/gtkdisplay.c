@@ -332,7 +332,7 @@ static void gtkdisplay_area(int x, int y, int width, int height)
 			 scaled_pitch );
 }
 
-void
+int
 uidisplay_hotswap_gfx_mode( void )
 {
   fuse_emulation_pause();
@@ -341,6 +341,8 @@ uidisplay_hotswap_gfx_mode( void )
   display_refresh_all();
 
   fuse_emulation_unpause();
+
+  return 0;
 }
 
 int

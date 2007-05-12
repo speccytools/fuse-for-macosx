@@ -1,5 +1,5 @@
 /* spec48.c: Spectrum 48K specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2007 Philip Kendall
 
    $Id$
 
@@ -57,7 +57,7 @@ const static size_t peripherals_count =
 static libspectrum_byte
 spec48_unattached_port( void )
 {
-  return spectrum_unattached_port( 1 );
+  return spectrum_unattached_port();
 }
 
 int

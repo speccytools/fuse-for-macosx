@@ -520,26 +520,33 @@ widget_filesel_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Tab:
-    if( is_saving )
-    {
+    if( is_saving ) {
       widget_text_t text_data;
       text_data.title = title;
       text_data.allow = WIDGET_INPUT_ASCII;
       text_data.text[0] = 0;
-      if( widget_do( WIDGET_TYPE_TEXT, &text_data )
-          || !widget_text_text || !*widget_text_text )
+      if( widget_do( WIDGET_TYPE_TEXT, &text_data ) ||
+	  !widget_text_text || !*widget_text_text      )
 	break;
-      /* Get current dir name and allocate space for the leafname */
-      fn = widget_getcwd();
-      if( fn )
-        fn = realloc( fn, strlen( fn ) + strlen( widget_text_text ) + 2 );
-      if( !fn ) {
-	widget_end_widget( WIDGET_FINISHED_CANCEL );
-	return;
+      if( *widget_text_text != '/' ) {	/* relative name */
+        /* Get current dir name and allocate space for the leafname */
+        fn = widget_getcwd();
+        if( fn )
+    	  fn = realloc( fn, strlen( fn ) + strlen( widget_text_text ) + 2 );
+        if( !fn ) {
+	  widget_end_widget( WIDGET_FINISHED_CANCEL );
+	  return;
+        }
+        /* Append the leafname and return it */
+        strcat( fn, "/" );
+        strcat( fn, widget_text_text );
+      } else {				/* absolute name */
+	fn = strdup( widget_text_text );
+        if( !fn ) {
+	  widget_end_widget( WIDGET_FINISHED_CANCEL );
+	  return;
+        }
       }
-      /* Append the leafname and return it */
-      strcat( fn, "/" );
-      strcat( fn, widget_text_text );
       widget_filesel_name = fn;
       if( exit_all_widgets ) {
 	widget_end_all( WIDGET_FINISHED_OK );

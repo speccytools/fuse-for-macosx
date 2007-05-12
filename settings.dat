@@ -107,6 +107,14 @@ trdosdisk_file, string, NULL,, trdosdisk
 dck_file, string, NULL,, dock
 if2_file, string, NULL,, if2cart
 
+mdr_file, string, NULL,, microdrive-file
+mdr_file2, string, NULL,, microdrive-2-file
+mdr_file3, string, NULL,, microdrive-3-file
+mdr_file4, string, NULL,, microdrive-4-file
+mdr_file5, string, NULL,, microdrive-5-file
+mdr_file6, string, NULL,, microdrive-6-file
+mdr_file7, string, NULL,, microdrive-7-file
+mdr_file8, string, NULL,, microdrive-8-file
 simpleide_active, boolean, 0,, simpleide
 simpleide_master_file, string, NULL,, simpleide-masterfile
 simpleide_slave_file, string, NULL,, simpleide-slavefile
@@ -127,6 +135,7 @@ printer_graphics_filename, string, "printout.pbm",, graphicsfile
 printer_text_filename, string, "printout.txt",, textfile
 
 aspect_hint, boolean, 1
+strict_aspect_hint, boolean, 0
 svga_mode, numeric, 320, 'v', svgamode
 doublescan_mode, numeric, 1, 'D', doublescan-mode
 

@@ -182,6 +182,9 @@ if((printer_text_file=fopen(settings_current.printer_text_filename,"a"))==NULL)
   return(0);
   }
 
+/* ensure users have immediate access to text file contents */
+setbuf( printer_text_file, NULL );
+
 return(1);
 }
 

@@ -293,10 +293,10 @@ fb_set_mode( void )
   return 1;
 }
 
-void
+int
 uidisplay_hotswap_gfx_mode( void )
 {
-  return;
+  return 0;
 }
 
 void

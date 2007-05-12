@@ -26,9 +26,8 @@ AUTOMAKE_OPTIONS = foreign
 FILES = cassette.bmp \
 	keyboard.scr \
 	microdrive.bmp \
-	plus3disk.bmp
-
-noinst_FILES = @AUTOLOAD_SNAPS@/disk_plus3.szx \
+	plus3disk.bmp \
+	@AUTOLOAD_SNAPS@/disk_plus3.szx \
 	@AUTOLOAD_SNAPS@/tape_128.szx \
 	@AUTOLOAD_SNAPS@/tape_16.szx \
 	@AUTOLOAD_SNAPS@/tape_2048.szx \

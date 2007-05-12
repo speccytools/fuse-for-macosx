@@ -216,10 +216,10 @@ svgadisplay_allocate_colours( int numColours )
   return 0;
 }
   
-void
+int
 uidisplay_hotswap_gfx_mode( void )
 {
-  return;
+  return 0;
 }
 
 void

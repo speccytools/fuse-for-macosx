@@ -553,6 +553,7 @@ menu_help_keyboard( int action )
 
   info.filename = filename;
   info.screen = file.buffer;
+  info.border = 0;
 
   widget_do( WIDGET_TYPE_PICTURE, &info );
 

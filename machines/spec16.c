@@ -1,5 +1,5 @@
 /* spec16.c: Spectrum 16K specific routines
-   Copyright (c) 1999-2005 Philip Kendall
+   Copyright (c) 1999-2007 Philip Kendall
 
    $Id$
 
@@ -61,7 +61,7 @@ const static size_t peripherals_count =
 static libspectrum_byte
 spec16_unattached_port( void )
 {
-  return spectrum_unattached_port( 1 );
+  return spectrum_unattached_port();
 }
 
 int spec16_init( fuse_machine_info *machine )

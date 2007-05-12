@@ -52,18 +52,17 @@ int
 widget_pokefinder_draw( void *data )
 {
   widget_dialog_with_border( 1, 2, 30, 12 );
-  widget_printstring( 15 - strlen( title ) / 2, 2, WIDGET_COLOUR_FOREGROUND,
-		      title );
-  widget_printstring( 2, 4, WIDGET_COLOUR_FOREGROUND, "Possible: " );
-  widget_printstring( 2, 5, WIDGET_COLOUR_FOREGROUND, "Value: " );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
+  widget_printstring( 16, 32, WIDGET_COLOUR_FOREGROUND, "Possible: " );
+  widget_printstring( 16, 40, WIDGET_COLOUR_FOREGROUND, "Value: " );
 
   update_possible();
   display_possible();
   display_value();
 
-  widget_printstring( 2, 12, WIDGET_COLOUR_FOREGROUND,
-		      "(I)nc'd (D)ec'd (S)earch" );
-  widget_printstring( 2, 13, WIDGET_COLOUR_FOREGROUND, "(R)eset (C)lose" );
+  widget_printstring( 16, 96, WIDGET_COLOUR_FOREGROUND,
+		      "\x0AI\x09nc'd \x0A" "D\x09" "ec'd \x0AS\x09" "earch" );
+  widget_printstring( 16, 104, WIDGET_COLOUR_FOREGROUND, "\x0AR\x09" "eset \x0A" "C\x09lose" );
 
   widget_display_lines( 2, 12 );
 
@@ -98,10 +97,10 @@ display_possible( void )
   widget_rectangle(  96,  32,  48,  8, WIDGET_COLOUR_BACKGROUND );
   widget_rectangle(  16,  56, 128, 32, WIDGET_COLOUR_BACKGROUND );
   widget_rectangle(  16,  88, 136,  8, WIDGET_COLOUR_BACKGROUND );
-  widget_rectangle( 144, 104,  56,  8, WIDGET_COLOUR_BACKGROUND );
+  widget_rectangle(  82, 104,  56,  8, WIDGET_COLOUR_BACKGROUND );
 
   snprintf( buf, sizeof( buf ), "%d", pokefinder_count );
-  widget_printstring( 12, 4, WIDGET_COLOUR_FOREGROUND, buf );
+  widget_printstring( 96, 32, WIDGET_COLOUR_FOREGROUND, buf );
 
   if( FEW_ENOUGH() ) {
     size_t i;
@@ -120,10 +119,10 @@ display_possible( void )
 
       snprintf( buf, sizeof( buf ), "%2d:%04X", possible_page[i],
 		possible_offset[i] );
-      widget_printstring( x, y, colour, buf );
+      widget_printstring( x * 8, y * 8, colour, buf );
     }
 
-    widget_printstring( 18, 13, WIDGET_COLOUR_FOREGROUND, "(B)reak" );
+    widget_printstring( 83, 104, WIDGET_COLOUR_FOREGROUND, "\x0A" "B\x09reak" );
   }
 
   widget_display_lines( 4, 10 );
@@ -136,7 +135,7 @@ display_value( void )
 
   snprintf( buf, sizeof( buf ), "%d", value );
   widget_rectangle( 72, 40, 24, 8, WIDGET_COLOUR_BACKGROUND );
-  widget_printstring( 9, 5, WIDGET_COLOUR_FOREGROUND, buf );
+  widget_printstring( 72, 40, WIDGET_COLOUR_FOREGROUND, buf );
   widget_display_lines( 5, 1 );
 }
 
@@ -202,10 +201,10 @@ widget_pokefinder_keyhandler( input_key key )
 	    possible_offset[selected], 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT,
 	    NULL
 	  ) ) {
-	widget_printstring( 2, 11, WIDGET_COLOUR_FOREGROUND,
+	widget_printstring( 16, 88, WIDGET_COLOUR_FOREGROUND,
 			    "Breakpoint failed" );
       } else {
-	widget_printstring( 2, 11, WIDGET_COLOUR_FOREGROUND,
+	widget_printstring( 16, 88, WIDGET_COLOUR_FOREGROUND,
 			    "Breakpoint added" );
       }
       widget_display_lines( 11, 1 );

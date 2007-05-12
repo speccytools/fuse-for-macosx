@@ -153,7 +153,7 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_MICRODRIVE:
-    if1_mdr_insert( filename, 0 );
+    if1_mdr_insert( filename, -1 );
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:

@@ -37,7 +37,7 @@ libspectrum_byte ula_last_byte( void );
 int ula_from_snapshot( libspectrum_snap *snap );
 int ula_to_snapshot( libspectrum_snap *snap );
 
-void ula_contend_port_preio( libspectrum_word port );
-void ula_contend_port_postio( libspectrum_word port );
+void ula_contend_port_early( libspectrum_word port );
+void ula_contend_port_late( libspectrum_word port );
 
 #endif			/* #ifndef FUSE_ULA_H */

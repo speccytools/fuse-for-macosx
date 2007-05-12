@@ -97,7 +97,7 @@ spectrum_frame( void )
 
 /* What happens if we read from an unattached port? */
 libspectrum_byte
-spectrum_unattached_port( int offset )
+spectrum_unattached_port( void )
 {
   int line, tstates_through_line, column;
 
@@ -110,24 +110,26 @@ spectrum_unattached_port( int offset )
 	   machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] ) /
     machine_current->timings.tstates_per_line;
 
-  /* Idle bus if we're in the lower or upper borders */
+  /* Idle bus if we're in the lower border */
   if( line >= DISPLAY_HEIGHT ) return 0xff;
 
-  /* Work out where we are in this line */
+  /* Work out where we are in this line, remembering that line_times[] holds
+     the first pixel we display, not the start of where the Spectrum produced
+     the left border */
   tstates_through_line = tstates -
-    machine_current->line_times[ DISPLAY_BORDER_HEIGHT + line ];
+    machine_current->line_times[ DISPLAY_BORDER_HEIGHT + line ] +
+    ( machine_current->timings.left_border - DISPLAY_BORDER_WIDTH_COLS * 4 );
 
   /* Idle bus if we're in the left border */
-  if( tstates_through_line < machine_current->timings.left_border - offset )
+  if( tstates_through_line < machine_current->timings.left_border )
     return 0xff;
 
   /* Or the right border or retrace */
   if( tstates_through_line >= machine_current->timings.left_border +
-                              machine_current->timings.horizontal_screen -
-                              offset )
+                              machine_current->timings.horizontal_screen  )
     return 0xff;
 
-  column = ( ( tstates_through_line + 1 -
+  column = ( ( tstates_through_line -
 	       machine_current->timings.left_border ) / 8 ) * 2;
 
   switch( tstates_through_line % 8 ) {
@@ -137,24 +139,24 @@ spectrum_unattached_port( int offset )
        http://www.ramsoft.bbk.org/floatingbus.html
 
        However, the timings used are based on the first byte being
-       returned at 14335 (48K) and 14361 (128K) respectively, not
+       returned at 14338 (48K) and 14364 (128K) respectively, not
        14347 and 14368 as used by Ramsoft.
 
        In contrast to previous versions of this code, Arkanoid and
        Sidewize now work. */
 
     /* Attribute bytes */
-    case 3: column++;
-    case 1:
+    case 5: column++;
+    case 3:
       return RAM[ memory_current_screen ][ display_attr_start[line] + column ];
 
     /* Screen data */
-    case 2: column++;
-    case 0:
+    case 4: column++;
+    case 2:
       return RAM[ memory_current_screen ][ display_line_start[line] + column ];
 
     /* Idle bus */
-    case 4: case 5: case 6: case 7:
+    case 0: case 1: case 6: case 7:
       return 0xff;
 
   }

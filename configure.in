@@ -24,7 +24,7 @@ AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.7.0)
+AM_INIT_AUTOMAKE(fuse, 0.8.0.1)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -388,9 +388,9 @@ AC_SUBST(PNG_LIBS)
 dnl Check if a version of libao which supplies ao_open_live is available
 AC_MSG_CHECKING(whether libao requested)
 AC_ARG_WITH(libao,
-[  --without-libao           don't use libao],
+[  --with-libao            use libao for sound output],
 if test "$withval" = no; then libao=no; else libao=yes; fi,
-libao=yes)
+libao=no)
 AC_MSG_RESULT($libao)
 if test "$libao" = yes; then
   AC_CHECK_LIB( ao, ao_open_live,

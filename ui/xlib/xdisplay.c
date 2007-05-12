@@ -496,10 +496,10 @@ static void xdisplay_destroy_image (void)
   if( image ) XDestroyImage( image ); image = 0;
 }
 
-void
+int
 uidisplay_hotswap_gfx_mode( void )
 {
-  return;
+  return 0;
 }
 
 int

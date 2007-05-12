@@ -65,3 +65,6 @@ noinst_HEADERS = widget.h widget_internals.h \
 		 options.h options.pl options-header.pl
 
 pkgdata_DATA = fuse.font
+
+EXTRA_DIST = mkfusefont.pl \
+	     fuse.font.sbf

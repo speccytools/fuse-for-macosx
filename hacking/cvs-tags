@@ -145,7 +145,12 @@ $Id$
 |
 +-\
 | | Release-0_8_0-pre1
+| | Release-0_8_0-pre2
+| | Release-0_8_0
+| | Release-0_8_0_1			Merged to HEAD at Release-0_8_0-merge-1
 | |
 | | Release-0_8_0-branch
+|
+| Release-0_8_0-merge-1
 |
 HEAD

@@ -1,5 +1,5 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2007 Philip Kendall
 
    $Id$
 
@@ -61,7 +61,7 @@ const size_t spec128_peripherals_count =
 libspectrum_byte
 spec128_unattached_port( void )
 {
-  return spectrum_unattached_port( 3 );
+  return spectrum_unattached_port();
 }
 
 libspectrum_byte

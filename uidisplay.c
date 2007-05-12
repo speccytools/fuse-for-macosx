@@ -65,7 +65,8 @@ void uidisplay_spectrum_screen( const libspectrum_byte *screen, int border )
 
       data = screen[ display_line_start[y]+x ];
 
-      uidisplay_plot8( x, y, data, ink, paper );
+      uidisplay_plot8( x + DISPLAY_BORDER_WIDTH_COLS, y + DISPLAY_BORDER_HEIGHT,
+                       data, ink, paper );
     }
   }
 

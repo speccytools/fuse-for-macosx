@@ -66,7 +66,7 @@ typedef struct spectrum_raminfo {
 
 } spectrum_raminfo;
 
-libspectrum_byte spectrum_unattached_port( int offset );
+libspectrum_byte spectrum_unattached_port( void );
 
 /* Miscellaneous stuff */
 

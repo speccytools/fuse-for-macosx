@@ -444,7 +444,7 @@ void win32display_area(int x, int y, int width, int height)
 
 }    
 
-void
+int
 uidisplay_hotswap_gfx_mode( void )
 {
 /* TODO: pause hangs emulator
@@ -455,6 +455,8 @@ uidisplay_hotswap_gfx_mode( void )
 /* TODO: pause hangs emulator
   fuse_emulation_unpause();
 */
+
+  return 0;
 }
 
 int

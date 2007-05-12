@@ -89,7 +89,7 @@ static SDL_Rect updated_rects[MAX_UPDATE_RECT];
 static int num_rects = 0;
 static libspectrum_byte sdldisplay_force_full_refresh = 1;
 
-static int min_fullscreen_width;
+static int max_fullscreen_height;
 static int min_fullscreen_height;
 
 /* The current size of the display (in units of DISPLAY_SCREEN_*) */
@@ -225,12 +225,14 @@ uidisplay_init( int width, int height )
      at all */
   if( modes == (SDL_Rect **) 0 || modes == (SDL_Rect **) -1 ){
     /* Just try whatever we have and see what happens */
-    min_fullscreen_width = 320;
+    max_fullscreen_height = 480;
     min_fullscreen_height = 240;
   } else {
+    /* Record the largest supported fullscreen software mode */
+    max_fullscreen_height = modes[0]->h;
+
     /* Record the smallest supported fullscreen software mode */
     for( i=0; modes[i]; ++i ) {
-      min_fullscreen_width = modes[i]->w;
       min_fullscreen_height = modes[i]->h;
     }
   }
@@ -245,7 +247,7 @@ uidisplay_init( int width, int height )
   if ( scaler_select_scaler( current_scaler ) )
     scaler_select_scaler( SCALER_NORMAL );
 
-  sdldisplay_load_gfx_mode();
+  if( sdldisplay_load_gfx_mode() ) return 1;
 
   SDL_WM_SetCaption( "Fuse", "Fuse" );
 
@@ -293,15 +295,17 @@ sdldisplay_find_best_fullscreen_scaler( void )
   if( settings_current.full_screen ) {
     int i = 0;
     while( i < SCALER_NUM &&
-           image_height * sdldisplay_current_size <= min_fullscreen_height/2 ) {
+           ( image_height*sdldisplay_current_size <= min_fullscreen_height/2 ||
+             image_height*sdldisplay_current_size > max_fullscreen_height ) ) {
       if( windowed_scaler == -1) windowed_scaler = current_scaler;
       while( !scaler_is_supported(i) ) i++;
       scaler_select_scaler( i++ );
       sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
-      /* if we failed to find a suitable size scaler, just use what the user had
-         originally */
-      if( image_height * sdldisplay_current_size <= min_fullscreen_height/2 ) {
-        scaler_select_scaler( windowed_scaler );
+      /* if we failed to find a suitable size scaler, just use normal (what the
+         user had originally may be too big) */
+      if( image_height * sdldisplay_current_size <= min_fullscreen_height/2 ||
+          image_height * sdldisplay_current_size > max_fullscreen_height ) {
+        scaler_select_scaler( SCALER_NORMAL );
         sdldisplay_current_size = scaler_get_scaling_factor( current_scaler );
       }
     }
@@ -337,8 +341,8 @@ sdldisplay_load_gfx_mode( void )
                                  : SDL_SWSURFACE
   );
   if( !sdldisplay_gc ) {
-    fprintf( stderr, "%s: couldn't create gc\n", fuse_progname );
-    return 1;
+    fprintf( stderr, "%s: couldn't create SDL graphics context\n", fuse_progname );
+    fuse_abort();
   }
 
   sdldisplay_is_full_screen =
@@ -365,7 +369,7 @@ sdldisplay_load_gfx_mode( void )
 
   if( !tmp_screen ) {
     fprintf( stderr, "%s: couldn't create tmp_screen\n", fuse_progname );
-    return 1;
+    fuse_abort();
   }
 
   sdldisplay_allocate_colours( 16, colour_values, bw_values );
@@ -376,7 +380,7 @@ sdldisplay_load_gfx_mode( void )
   return 0;
 }
 
-void
+int
 uidisplay_hotswap_gfx_mode( void )
 {
   fuse_emulation_pause();
@@ -388,7 +392,7 @@ uidisplay_hotswap_gfx_mode( void )
   }
 
   /* Setup the new GFX mode */
-  sdldisplay_load_gfx_mode();
+  if( sdldisplay_load_gfx_mode() ) return 1;
 
   /* reset palette */
   SDL_SetColors( sdldisplay_gc, colour_palette, 0, 16 );
@@ -403,6 +407,8 @@ uidisplay_hotswap_gfx_mode( void )
   }
 
   fuse_emulation_unpause();
+
+  return 0;
 }
 
 static void
@@ -664,8 +670,10 @@ uidisplay_frame_end( void )
   /* We check for a switch to fullscreen here to give systems with a
      windowed-only UI a chance to free menu etc. resources before
      the switch to fullscreen (e.g. Mac OS X) */
-  if( sdldisplay_is_full_screen != settings_current.full_screen ) {
-    uidisplay_hotswap_gfx_mode();
+  if( sdldisplay_is_full_screen != settings_current.full_screen &&
+      uidisplay_hotswap_gfx_mode() ) {
+    fprintf( stderr, "%s: Error switching to fullscreen\n", fuse_progname );
+    fuse_abort();
   }
 
   /* Force a full redraw if requested */

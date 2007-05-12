@@ -35,6 +35,14 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
+#ifndef MIN
+#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef ABS
+#define ABS(x)     ((x)>=0?(x):-(x))
+#endif
+
 /* The actual code for the scalers starts here */
 
 #if SCALER_DATA_SIZE == 2

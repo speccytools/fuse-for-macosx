@@ -278,7 +278,12 @@ void sound_end(void)
 if(sound_enabled)
   {
   if(sound_buf)
+    {
     free(sound_buf);
+    sound_buf=NULL;
+    free(tape_buf);
+    tape_buf=NULL;
+    }
   sound_lowlevel_end();
   sound_enabled=0;
   }

@@ -95,7 +95,6 @@ mkstemp (char *tmpl)
       XXXXXX[5] = letters[v % 62];
 
       fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-      break;
 
       if (fd >= 0)
 	{

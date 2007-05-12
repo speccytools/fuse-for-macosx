@@ -71,7 +71,7 @@ the emulated border, not that of the actual screen.
 This is called at the end of every spectrum frame, giving the ui a
 chance to flush all the drawing done over the course of the frame.
 
-* void uidisplay_hotswap_gfx_mode( void )
+* int uidisplay_hotswap_gfx_mode( void )
 
 This is called when the user has changed the scaler in use by the
 emulator. The ui should change the window to a multiple of the

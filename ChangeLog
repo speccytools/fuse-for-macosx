@@ -1,4 +1,23 @@
-2007-??-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2007-05-11  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+	* Fuse 0.8.0.1 released (bug fix release)
+
+	* Fix IN timings and floating bus behaviour: fixes Sidewize (thanks,
+	  Pegaz and Mark Woodmass) (Philip Kendall).
+	* Fix widget UI pokefinder and keyboard help picture
+	  (thanks, Alberto Garcia) (Philip Kendall and Fredrick Meunier).
+	* Fix crash if fullscreen mode attempted a resolution higher than
+	  the native graphics mode could handle (thanks, Alberto Garcia)
+	  (Fredrick Meunier).
+	* Ensure ABS, MIN and PATH_MAX are available where needed (Fredrick
+	  Meunier).
+	* Distribute autoload snapshots (thanks, Stuart Brady and Arda
+	  Erdikmen) (Fredrick Meunier).
+	* Remove flicker when playing back RZX files with embedded
+	  snapshots (thanks, Julian Wiseman) (Fredrick Meunier).
+	* Remove warnings when building from CVS (Stuart Brady).
+
+2007-04-11  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
 	* Fuse 0.8.0 released
 
@@ -80,6 +99,11 @@
 	  Jon Needle, Markus Oberhumer, Mark Round, Darren Salt, Gergely
 	  Szasz, Paul van der Laan and other people to whom I apologise
 	  for forgetting).
+
+	* On a personal note, I (Philip) would like to dedicate the 0.8
+	  release of Fuse to the memory of Chris "Oggie" Lightfoot. I
+	  don't know whether he would have loved or hated some of the code
+	  in Fuse, but I'm sure he would have expressed his opinion.
 
 2004-07-16  Philip Kendall  <pak21-fuse@srcf.ucam.org>
 

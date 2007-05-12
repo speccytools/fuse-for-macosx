@@ -160,10 +160,10 @@ uidisplay_init( int width, int height )
 }
 
 
-void
+int
 uidisplay_hotswap_gfx_mode( void )
 {
-  return;
+  return 0;
 }
 
 /* Set one pixel in the display */

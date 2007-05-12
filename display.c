@@ -651,7 +651,9 @@ get_beam_position( int *x, int *y )
   *y = ( tstates - machine_current->line_times[ 0 ] ) /
     machine_current->timings.tstates_per_line;
 
-  *x = ( tstates - machine_current->line_times[ *y ] ) / 4;
+  if( *y >= 0 && *y <= DISPLAY_SCREEN_HEIGHT )
+    *x = ( tstates - machine_current->line_times[ *y ] ) / 4;
+  else *x = 0;
 }
 
 void

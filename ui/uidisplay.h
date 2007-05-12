@@ -34,7 +34,7 @@ int uidisplay_init( int width, int height );
 
 void uidisplay_area( int x, int y, int w, int h );
 void uidisplay_frame_end( void );
-void uidisplay_hotswap_gfx_mode( void );
+int uidisplay_hotswap_gfx_mode( void );
 
 int uidisplay_end(void);
 
@@ -44,8 +44,8 @@ void uidisplay_spectrum_screen( const libspectrum_byte *screen, int border );
 
 void uidisplay_putpixel( int x, int y, int colour );
 void uidisplay_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
-		    libspectrum_byte paper );
+                      libspectrum_byte paper );
 void uidisplay_plot16( int x, int y, libspectrum_word data, libspectrum_byte ink,
-		     libspectrum_byte paper);
+                       libspectrum_byte paper);
 
 #endif			/* #ifndef FUSE_UIDISPLAY_H */

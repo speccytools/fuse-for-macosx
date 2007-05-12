@@ -43,6 +43,7 @@ static ao_device *dev_for_ao;
 static int sixteenbit = 1;
 static char *filename = NULL;
 static const char *default_filename = "fuse-sound.ao";
+static int first_init = 1;
 
 static void
 driver_error( void )
@@ -87,6 +88,9 @@ parse_driver_options( const char *device, int *driver_id, ao_option **options )
   char *mutable, *option, *key, *value;
 
   /* Get a copy of the device string we can modify */
+  if( !device || *device == '\0' )
+    return 0;
+
   mutable = strdup( device );
   if( !mutable ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
@@ -97,7 +101,8 @@ parse_driver_options( const char *device, int *driver_id, ao_option **options )
   option = strchr( mutable, ':' );
   if( option ) *option++ = '\0';
 
-  *driver_id = ao_driver_id( mutable );
+  if( *mutable )				/* ! \0 */
+    *driver_id = ao_driver_id( mutable );
 
   /* Now parse any further options */
   while( option ) {
@@ -118,8 +123,11 @@ parse_driver_options( const char *device, int *driver_id, ao_option **options )
 	free( mutable );
 	return 1;
       }
-    } else {
+    } else if( key && value) {
       ao_append_option( options, key, value );
+    } else if ( first_init ) {
+	ui_error( UI_ERROR_ERROR, "ignoring badly formed libao option (%s%s)",
+		key ? key : "", value ? value : "" );
     }
 
   }
@@ -148,20 +156,15 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 
   ao_initialize();
 
-  if( !device || *device == '\0' ) {
-
-    driver_id = ao_default_driver_id();
-
-  } else {
-
-    error = parse_driver_options( device, &driver_id, &options );
-    if( error ) {
-      settings_current.sound = 0;
-      sound_lowlevel_init_in_progress = 0;
-      return error;
-    }
-
+  error = parse_driver_options( device, &driver_id, &options );
+  if( error ) {
+    settings_current.sound = 0;
+    sound_lowlevel_init_in_progress = 0;
+    return error;
   }
+
+  if( driver_id == -1 )
+    driver_id = ao_default_driver_id();
 
   if( driver_id == -1 ) {
     ui_error( UI_ERROR_ERROR, "ao: driver '%s' unknown",
@@ -191,7 +194,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 
   } else {
 
-    if( !filename ) filename = default_filename;
+    if( !filename ) filename = (char *)default_filename;
     dev_for_ao = ao_open_file( driver_id, filename, 1, &format, options);
 
   }
@@ -206,6 +209,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   ao_free_options( options );
   
   sound_lowlevel_init_in_progress = 0;
+  first_init = 0;
 
   return 0;
 }
@@ -221,8 +225,8 @@ sound_lowlevel_end( void )
 void
 sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
-  static unsigned char buf8[4096];
-  signed char *data8 = ( signed char* )data;
+  static signed char buf8[4096];
+  void *data8 = data;
 
   len <<= 1;	/* now in bytes */
 

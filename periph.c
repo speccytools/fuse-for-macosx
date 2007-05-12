@@ -1,5 +1,5 @@
 /* periph.c: code for handling peripherals
-   Copyright (c) 2005 Philip Kendall
+   Copyright (c) 2005-2007 Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 
 #include "debugger/debugger.h"
 #include "divide.h"
+#include "event.h"
 #include "if1.h"
 #include "if2.h"
 #include "joystick.h"
@@ -167,9 +168,10 @@ readport( libspectrum_word port )
 {
   libspectrum_byte b;
 
-  ula_contend_port_preio( port );
+  ula_contend_port_early( port );
+  ula_contend_port_late( port );
   b = readport_internal( port );
-  ula_contend_port_postio( port );
+  tstates++;
 
   return b;
 }
@@ -191,7 +193,14 @@ readport_internal( libspectrum_word port )
     libspectrum_byte value;
 
     error = libspectrum_rzx_playback( rzx, &value );
-    if( error ) { rzx_stop_playback( 1 ); return readport_internal( port ); }
+    if( error ) {
+      rzx_stop_playback( 1 );
+
+      /* Add a null event to mean we pick up the RZX state change in
+	 z80_do_opcodes() */
+      event_add( tstates, EVENT_TYPE_NULL );
+      return readport_internal( port );
+    }
 
     return value;
   }
@@ -232,9 +241,9 @@ read_peripheral( gpointer data, gpointer user_data )
 void
 writeport( libspectrum_word port, libspectrum_byte b )
 {
-  ula_contend_port_preio( port );
+  ula_contend_port_early( port );
   writeport_internal( port, b );
-  ula_contend_port_postio( port );
+  ula_contend_port_late( port ); tstates++;
 }
 
 void

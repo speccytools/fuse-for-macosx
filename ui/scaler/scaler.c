@@ -136,9 +136,7 @@ scaler_select_scaler( scaler_type scaler )
   scaler_flags = scaler_get_flags( current_scaler );
   scaler_expander = scaler_get_expander( current_scaler );
 
-  uidisplay_hotswap_gfx_mode();
-
-  return 0;
+  return uidisplay_hotswap_gfx_mode();
 }
 
 int
