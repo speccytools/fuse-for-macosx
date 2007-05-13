@@ -25,17 +25,22 @@
 #ifndef FUSE_SOUND_LOWLEVEL_H
 #define FUSE_SOUND_LOWLEVEL_H
 
-#if defined UI_SDL
+#if defined USE_DIRECTSOUND
+
+#define HAVE_SOUND
+#define SOUND_DX
+
+#elif defined UI_SDL			/* #if defined USE_DIRECTSOUND */
 
 #define HAVE_SOUND
 #define SOUND_SDL
 
-#elif defined USE_LIBAO	/* #if defined UI_SDL */
+#elif defined USE_LIBAO			/* #if defined USE_DIRECTSOUND */
 
 #define HAVE_SOUND
 #define SOUND_AO
 
-#elif defined HAVE_SYS_AUDIO_H		/* #if defined UI_SDL */
+#elif defined HAVE_SYS_AUDIO_H		/* #if defined USE_DIRECTSOUND */
 
 #include <sys/audio.h>
 
@@ -51,28 +56,23 @@
 
 #endif					/* #if defined AUDIO_SETINFO */
 
-#elif defined HAVE_SYS_SOUNDCARD_H	/* #if defined UI_SDL */
+#elif defined HAVE_SYS_SOUNDCARD_H	/* #if defined USE_DIRECTSOUND */
 
 #define HAVE_SOUND
 #define SOUND_OSS
 
 /* TODO: does OpenBSD have <sys/audio.h>? Solaris does, so the above
    check will do there */
-#elif defined HAVE_SYS_AUDIOIO_H	/* #if defined UI_SDL */
+#elif defined HAVE_SYS_AUDIOIO_H	/* #if defined USE_DIRECTSOUND */
 
 #define HAVE_SOUND
 #define SOUND_SUN
 
-#elif defined HAVE_DSOUND_H		/* #if defined UI_SDL */
-
-#define HAVE_SOUND
-#define SOUND_DX
-
-#elif defined USE_COREAUDIO /* #if defined UI_SDL */
+#elif defined USE_COREAUDIO		/* #if defined USE_DIRECTSOUND */
 
 #define HAVE_SOUND
 #define SOUND_COREAUDIO
 
-#endif					/* #if defined UI_SDL */
+#endif					/* #if defined USE_DIRECTSOUND */
 
 #endif			/* #ifndef FUSE_SOUND_LOWLEVEL_H */   

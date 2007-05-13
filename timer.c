@@ -33,6 +33,7 @@
 #include "event.h"
 #include "settings.h"
 #include "sound.h"
+#include "sound/lowlevel.h"
 #include "tape.h"
 #include "timer.h"
 #include "ui/ui.h"
@@ -227,7 +228,7 @@ timer_end( void )
   return event_remove_type( EVENT_TYPE_TIMER );
 }
 
-#if defined UI_SDL || defined USE_COREAUDIO
+#if defined SOUND_SDL || defined SOUND_COREAUDIO
 
 /* Callback-style sound based timer */
 #include "sound/sfifo.h"
@@ -255,7 +256,7 @@ timer_frame_callback_sound( libspectrum_dword last_tstates )
   return 0;
 }
 
-#else                           /* #ifdef UI_SDL */
+#else                           /* #if defined SOUND_SDL || defined SOUND_COREAUDIO */
 
 /* Blocking socket-style sound based timer */
 int
@@ -268,7 +269,7 @@ timer_frame_callback_sound( libspectrum_dword last_tstates )
   return 0;
 }
   
-#endif                          /* #ifdef UI_SDL */
+#endif                          /* #if defined SOUND_SDL || defined SOUND_COREAUDIO */
 
 int
 timer_frame( libspectrum_dword last_tstates )

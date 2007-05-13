@@ -45,7 +45,6 @@ AC_C_BIGENDIAN
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(
-  dsound.h \
   libgen.h \
   siginfo.h \
   strings.h \
@@ -403,6 +402,14 @@ if test "$libao" = yes; then
   )
   AC_SUBST(AO_LIBS)
 fi
+
+dnl Check if DirectSound is available
+AC_CHECK_HEADER(
+  dsound.h,
+  [AC_DEFINE([USE_DIRECTSOUND], 1, [Defined if we're going to be using DirectSound]) DIRECTSOUND_LIBS='-ldsound -lole32 -ldxguid'],
+  [AC_MSG_WARN(dsound.h not found - no DirectSound output)]
+)
+AC_SUBST(DIRECTSOUND_LIBS)
 
 PKG_CHECK_MODULES(SAMPLERATE, samplerate >= 0.1.0,
                   AC_DEFINE([HAVE_SAMPLERATE],1,[Define to 1 if you have libsamplerate.]),

@@ -1632,3 +1632,5 @@
 	 (patch #1711412) (Stuart Brady).
 20070513 dxsound.c: add synchronisation, 16-bit sound support and improved
 	 error handling (patch #1713519) (Stuart Brady).
+20070513 Makefile.am,configure.in,timer.c,sound/lowlevel.h: use DirectSound
+	 if available (patch #1716734) (Stuart Brady).
