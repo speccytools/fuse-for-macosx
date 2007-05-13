@@ -1630,3 +1630,5 @@
 	 (fixes bug #1629741) (Fred).
 20070513 debugger/{commandl.l,commandy.y}: fix clashes with Win32 API
 	 (patch #1711412) (Stuart Brady).
+20070513 dxsound.c: add synchronisation, 16-bit sound support and improved
+	 error handling (patch #1713519) (Stuart Brady).
