@@ -1634,3 +1634,6 @@
 	 error handling (patch #1713519) (Stuart Brady).
 20070513 Makefile.am,configure.in,timer.c,sound/lowlevel.h: use DirectSound
 	 if available (patch #1716734) (Stuart Brady).
+20070513 z80/z80.pl,z80/tests/{edb0,edb1,edb2,edb8,edb9,edba}.out: on
+	 LD?R, CP?R and IN?R, the pre-modified value is used for the
+	 contention (thanks, Mark Woodmass).

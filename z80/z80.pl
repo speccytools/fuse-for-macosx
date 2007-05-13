@@ -162,7 +162,7 @@ sub cpir_cpdr ($) {
 		   ( ( bytetemp & 0x08 ) >> 1 );
 	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
 	contend_read( HL, 1 ); contend_read( HL, 1 );
-	HL$modifier; BC--;
+	BC--;
 	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
 	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
 	  ( bytetemp & FLAG_S );
@@ -173,6 +173,7 @@ sub cpir_cpdr ($) {
 	  contend_read( HL, 1 ); contend_read( HL, 1 );
 	  PC-=2;
 	}
+	HL$modifier;
       }
 CODE
 }
@@ -254,7 +255,7 @@ sub inir_indr ($) {
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
-	B--; HL$modifier;
+	B--;
 	F = ( initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
 	/* C,H and P/V flags not implemented */
 
@@ -264,6 +265,7 @@ sub inir_indr ($) {
 	  contend_write( HL, 1 );
 	  PC -= 2;
 	}
+	HL$modifier;
       }
 CODE
 }
@@ -300,7 +302,7 @@ sub ldir_lddr ($) {
 	libspectrum_byte bytetemp=readbyte( HL );
 	writebyte(DE,bytetemp);
 	contend_write( DE, 1 ); contend_write( DE, 1 );
-	HL$modifier; DE$modifier; BC--;
+	BC--;
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
 	  ( bytetemp & FLAG_3 ) | ( (bytetemp & 0x02) ? FLAG_5 : 0 );
@@ -310,6 +312,7 @@ sub ldir_lddr ($) {
 	  contend_write( DE, 1 );
 	  PC-=2;
 	}
+        HL$modifier; DE$modifier;
       }
 CODE
 }
