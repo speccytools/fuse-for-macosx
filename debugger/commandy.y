@@ -58,6 +58,8 @@
 
 /* Tokens as returned from the Flex scanner (commandl.l) */
 
+/* Some tokens are named DEBUGGER_* to avoid clashes with <windows.h> */
+
 %token		 LOGICAL_OR	/* || */
 %token		 LOGICAL_AND	/* && */
 %token <token>	 COMPARISION	/* < > <= >= */
@@ -71,14 +73,13 @@
 %token		 CLEAR
 %token		 CONDITION
 %token		 CONTINUE
-%token		 DELETE
+%token		 DEBUGGER_DELETE
 %token		 DISASSEMBLE
 %token		 FINISH
 %token		 IF
-%token		 IGNORE
+%token		 DEBUGGER_IGNORE
 %token		 NEXT
-%token		 DEBUGGER_OUT	/* Different name to avoid clashing with
-				   OUT from windows.h */
+%token		 DEBUGGER_OUT
 %token		 PORT
 %token		 READ
 %token		 SET
@@ -91,7 +92,7 @@
 
 %token <integer> NUMBER
 
-%token		 ERROR
+%token		 DEBUGGER_ERROR
 
 /* Derived types */
 
@@ -152,11 +153,13 @@ command:   BASE number { debugger_output_base = $2; }
 	     debugger_breakpoint_set_condition( $2, $3 );
            }
 	 | CONTINUE { debugger_run(); }
-	 | DELETE { debugger_breakpoint_remove_all(); }
-	 | DELETE number { debugger_breakpoint_remove( $2 ); }
+	 | DEBUGGER_DELETE { debugger_breakpoint_remove_all(); }
+	 | DEBUGGER_DELETE number { debugger_breakpoint_remove( $2 ); }
 	 | DISASSEMBLE number { ui_debugger_disassemble( $2 ); }
 	 | FINISH   { debugger_breakpoint_exit(); }
-	 | IGNORE NUMBER number { debugger_breakpoint_ignore( $2, $3 ); }
+	 | DEBUGGER_IGNORE NUMBER number {
+	     debugger_breakpoint_ignore( $2, $3 );
+	   }
 	 | NEXT	    { debugger_next(); }
 	 | DEBUGGER_OUT number NUMBER { debugger_port_write( $2, $3 ); }
 	 | SET NUMBER number { debugger_poke( $2, $3 ); }

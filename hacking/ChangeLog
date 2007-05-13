@@ -1628,3 +1628,5 @@
          sound.c,man/fuse.1,ui/options.dat: add support for using
          libsamplerate to reduce aliasing noise in beeper emulation
 	 (fixes bug #1629741) (Fred).
+20070513 debugger/{commandl.l,commandy.y}: fix clashes with Win32 API
+	 (patch #1711412) (Stuart Brady).

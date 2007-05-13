@@ -53,12 +53,12 @@ br|bre|brea|break|breakp|breakpo|breakpoi|breakpoin|breakpoint { return BREAK;}
 co|con|cont|contin|continu|continue { return CONTINUE; }
 cond|condi|condit|conditi|conditio|condition { return CONDITION; }
 cl|cle|clea|clear { return CLEAR; }
-del|dele|delet|delete { return DELETE; }
+del|dele|delet|delete { return DEBUGGER_DELETE; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
 	                                                  return DISASSEMBLE; }
 fi|fin|fini|finis|finish { return FINISH; }
 if { return IF; }
-i|ig|ign|igno|ignor|ignore { return IGNORE; }
+i|ig|ign|igno|ignor|ignore { return DEBUGGER_IGNORE; }
 n|ne|nex|next { return NEXT; }
 o|ou|out { return DEBUGGER_OUT; }	/* Different name to avoid clashing
 					   with OUT from z80/z80_macros.h */
@@ -130,4 +130,4 @@ ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 
 .		{ if( 0 ) unput( '\0' ); /* Prevent warning about yyunput
 					    being defined and not used */
-		  return ERROR; }
+		  return DEBUGGER_ERROR; }
