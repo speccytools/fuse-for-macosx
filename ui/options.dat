@@ -56,3 +56,6 @@ Checkbox, (L)oading sound, sound_load, INPUT_KEY_l
 Checkbox, (A)Y stereo separation, stereo_ay, INPUT_KEY_a
 Checkbox, (B)eeper pseudo-stereo, stereo_beeper, INPUT_KEY_b
 Checkbox, (F)orce 8-bit, sound_force_8bit, INPUT_KEY_f
+#ifdef HAVE_SAMPLERATE 
+Checkbox, (H)i-fi beeper, sound_hifi, INPUT_KEY_h
+#endif /* #ifdef HAVE_SAMPLERATE */

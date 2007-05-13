@@ -50,6 +50,8 @@ Optional:
   * libpng: the ability to save screenshots
   * libxml2: the ability to load and save Fuse's current configuration
   * zlib: support for compressed RZX files
+  * samplerate: support for better beeper sound quality; get it from
+    http://www.mega-nerd.com/SRC/
 
 If you've used Fuse prior to version 0.5.0, note that the external
 utilities (tzxlist, etc) are now available separately from Fuse

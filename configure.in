@@ -404,6 +404,12 @@ if test "$libao" = yes; then
   AC_SUBST(AO_LIBS)
 fi
 
+PKG_CHECK_MODULES(SAMPLERATE, samplerate >= 0.1.0,
+                  AC_DEFINE([HAVE_SAMPLERATE],1,[Define to 1 if you have libsamplerate.]),
+                  [AC_MSG_NOTICE([libsamplerate not present.])])
+AC_SUBST(SAMPLERATE_CFLAGS)
+AC_SUBST(SAMPLERATE_LIBS)
+
 dnl Check if CoreAudio is available
 AC_CHECK_HEADER(
   CoreAudio/AudioHardware.h,

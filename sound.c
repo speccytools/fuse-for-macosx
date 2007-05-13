@@ -1,5 +1,6 @@
 /* sound.c: Sound support
-   Copyright (c) 2000-2005 Russell Marks, Matan Ziv-Av, Philip Kendall
+   Copyright (c) 2000-2007 Russell Marks, Matan Ziv-Av, Philip Kendall,
+                           Fredrick Meunier
 
    $Id$
 
@@ -37,6 +38,9 @@
 #include <config.h>
 
 #include <libspectrum.h>
+#ifdef HAVE_SAMPLERATE 
+#include <samplerate.h>
+#endif /* #ifdef HAVE_SAMPLERATE */
 
 #include "fuse.h"
 #include "machine.h"
@@ -74,13 +78,24 @@ int sound_stereo_beeper=0;   /* and settings_current.stereo_beeper */
  */
 #define AY_CHANGE_MAX		8000
 
+/* frequency to generate sound at for hifi sound */
+#define HIFI_FREQ              88200
+
+#ifdef HAVE_SAMPLERATE 
+static SRC_STATE *src_state;
+#endif /* #ifdef HAVE_SAMPLERATE */
+
+int sound_generator_framesiz;
 int sound_framesiz;
+
+static int sound_generator_freq;
 
 static int sound_channels;
 
 static unsigned int ay_tone_levels[16];
 
 static libspectrum_signed_word *sound_buf,*tape_buf;
+static float *convert_input_buffer,*convert_output_buffer;
 
 /* beeper stuff */
 static int sound_oldpos[2],sound_fillpos[2];
@@ -111,7 +126,7 @@ static struct ay_change_tag ay_change[AY_CHANGE_MAX];
 static int ay_change_count;
 
 
-#define STEREO_BUF_SIZE 1024
+#define STEREO_BUF_SIZE 4096
 
 static int pstereobuf[STEREO_BUF_SIZE];
 static int pstereobufsiz,pstereopos;
@@ -155,6 +170,9 @@ void sound_init(const char *device)
 static int first_init=1;
 int f,ret;
 float hz;
+#ifdef HAVE_SAMPLERATE 
+int error;
+#endif /* #ifdef HAVE_SAMPLERATE */
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
 #ifndef HAVE_SOUND
@@ -194,11 +212,12 @@ sound_channels=(sound_stereo?2:1);
 hz = (float)machine_current->timings.processor_speed /
      machine_current->timings.tstates_per_frame;
 
-sound_framesiz = settings_current.sound_freq / hz;
+sound_generator_freq = settings_current.sound_hifi ? HIFI_FREQ : settings_current.sound_freq;
+sound_generator_framesiz = sound_generator_freq / hz;
 
 if((sound_buf=malloc(sizeof(libspectrum_signed_word)*
-                     sound_framesiz*sound_channels))==NULL ||
-   (tape_buf=malloc(sizeof(libspectrum_signed_word)*sound_framesiz))==NULL)
+                     sound_generator_framesiz*sound_channels))==NULL ||
+   (tape_buf=malloc(sizeof(libspectrum_signed_word)*sound_generator_framesiz))==NULL)
   {
   if(sound_buf)
     {
@@ -208,6 +227,36 @@ if((sound_buf=malloc(sizeof(libspectrum_signed_word)*
   sound_end();
   return;
   }
+
+sound_framesiz = (float)settings_current.sound_freq / hz;
+
+#ifdef HAVE_SAMPLERATE 
+if(settings_current.sound_hifi)
+  {
+  if((convert_input_buffer=malloc(sizeof(float)*
+                       sound_generator_framesiz*sound_channels))==NULL ||
+     (convert_output_buffer=malloc(sizeof(float)*sound_framesiz*sound_channels))==NULL)
+    {
+    if(convert_input_buffer)
+      {
+      free(convert_input_buffer);
+      convert_input_buffer=NULL;
+      }
+    sound_end();
+    return;
+    }
+  }
+
+src_state = src_new(SRC_SINC_MEDIUM_QUALITY,sound_channels,&error);
+if(error)
+  {
+  ui_error( UI_ERROR_ERROR,
+            "error initialising sample rate converter %s",
+            src_strerror(error) );
+  sound_end();
+  return;
+  }
+#endif /* #ifdef HAVE_SAMPLERATE */
 
 /* if we're resuming, we need to be careful about what
  * gets reset. The minimum we can do is the beeper
@@ -234,12 +283,12 @@ if(sound_stereo_beeper)
   for(f=0;f<STEREO_BUF_SIZE;f++)
     pstereobuf[f]=0;
   pstereopos=0;
-  pstereobufsiz=(settings_current.sound_freq*psgap)/22000;
+  pstereobufsiz=(sound_generator_freq*psgap)/22000;
   }
 
 if(sound_stereo_ay)
   {
-  int pos=(sound_stereo_ay_narrow?3:6)*settings_current.sound_freq/8000;
+  int pos=(sound_stereo_ay_narrow?3:6)*sound_generator_freq/8000;
 
   for(f=0;f<STEREO_BUF_SIZE;f++)
     rstereobuf_l[f]=rstereobuf_r[f]=0;
@@ -255,7 +304,7 @@ if(sound_stereo_ay)
 
 ay_tick_incr=(int)(65536.*
                    libspectrum_timings_ay_speed(machine_current->machine)/
-                   settings_current.sound_freq);
+                   sound_generator_freq);
 }
 
 void sound_pause(void)
@@ -284,6 +333,20 @@ if(sound_enabled)
     free(tape_buf);
     tape_buf=NULL;
     }
+  if(convert_input_buffer)
+    {
+    free(convert_input_buffer);
+    convert_input_buffer=NULL;
+    }
+  if(convert_output_buffer)
+    {
+    free(convert_output_buffer);
+    convert_output_buffer=NULL;
+    }
+#ifdef HAVE_SAMPLERATE
+  if(src_state)
+    src_state=src_delete(src_state);
+#endif /* #ifdef HAVE_SAMPLERATE */
   sound_lowlevel_end();
   sound_enabled=0;
   }
@@ -377,6 +440,7 @@ if(pstereopos>=pstereobufsiz)
 #define AY_ENV_ALT	2
 #define AY_ENV_HOLD	1
 
+#define HZ_COMMON_DENOMINATOR 50
 
 static void sound_ay_overlay(void)
 {
@@ -393,16 +457,19 @@ int reg,r;
 int is_low;
 int chan1,chan2,chan3;
 unsigned int tone_count,noise_count;
+libspectrum_dword sfreq,cpufreq;
 
 /* If no AY chip, don't produce any AY sound (!) */
 if(!machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY) return;
 
-/* convert change times to sample offsets */
+/* convert change times to sample offsets, use common denominator of 50 to
+   avoid overflowing a dword */
+sfreq = sound_generator_freq/HZ_COMMON_DENOMINATOR;
+cpufreq = machine_current->timings.processor_speed/HZ_COMMON_DENOMINATOR;
 for(f=0;f<ay_change_count;f++)
-  ay_change[f].ofs=(ay_change[f].tstates*settings_current.sound_freq)/
-                   machine_current->timings.processor_speed;
+  ay_change[f].ofs=(ay_change[f].tstates*sfreq)/cpufreq;
 
-for(f=0,ptr=sound_buf;f<sound_framesiz;f++)
+for(f=0,ptr=sound_buf;f<sound_generator_framesiz;f++)
   {
   /* update ay registers. All this sub-frame change stuff
    * is pretty hairy, but how else would you handle the
@@ -677,6 +744,43 @@ ay_tone_subcycles=ay_env_subcycles=0;
   else						\
     SOUND_WRITE_BUF_BEEPER(ptr,val)
 
+#ifdef HAVE_SAMPLERATE 
+static void sound_resample(void)
+{
+int error;
+SRC_DATA data;
+
+data.data_in=convert_input_buffer;
+data.input_frames=sound_generator_framesiz;
+data.data_out=convert_output_buffer;
+data.output_frames=sound_framesiz;
+data.src_ratio=(double)settings_current.sound_freq/sound_generator_freq;
+data.end_of_input=0;
+
+src_short_to_float_array((const short *)sound_buf,convert_input_buffer,
+                         sound_generator_framesiz*sound_channels);
+
+while(data.input_frames)
+  {
+  error=src_process(src_state,&data);
+  if(error)
+    {
+    ui_error( UI_ERROR_ERROR, "hifi sound downsample error %s",
+              src_strerror(error) );
+    sound_end();
+    return;
+    }
+
+  src_float_to_short_array(convert_output_buffer,(short *)sound_buf,
+                           data.output_frames_gen*sound_channels);
+
+  sound_lowlevel_frame(sound_buf,data.output_frames_gen*sound_channels);
+
+  data.data_in+=data.input_frames_used*sound_channels ;
+  data.input_frames-=data.input_frames_used ;
+  }
+}
+#endif /* #ifdef HAVE_SAMPLERATE */
 
 void sound_frame(void)
 {
@@ -690,7 +794,7 @@ if(!sound_enabled) return;
 ptr=sound_buf+(sound_stereo?sound_fillpos[0]*2:sound_fillpos[0]);
 for(bchan=0;bchan<2;bchan++)
   {
-  for(f=sound_fillpos[bchan];f<sound_framesiz;f++)
+  for(f=sound_fillpos[bchan];f<sound_generator_framesiz;f++)
     SOUND_WRITE_BUF(bchan,ptr,sound_oldval[bchan]);
 
   ptr=tape_buf+sound_fillpos[1];
@@ -700,7 +804,7 @@ for(bchan=0;bchan<2;bchan++)
 /* overlay tape sound */
 ptr=sound_buf;
 tptr=tape_buf;
-for(f=0;f<sound_framesiz;f++,tptr++)
+for(f=0;f<sound_generator_framesiz;f++,tptr++)
   {
   (*ptr++)+=*tptr;
   if(sound_stereo)
@@ -710,7 +814,13 @@ for(f=0;f<sound_framesiz;f++,tptr++)
 /* overlay AY sound */
 sound_ay_overlay();
 
-sound_lowlevel_frame(sound_buf,sound_framesiz*sound_channels);
+#ifdef HAVE_SAMPLERATE 
+/* resample from generated frequency down to output frequency if required */
+if(settings_current.sound_hifi)
+  sound_resample();
+else
+#endif /* #ifdef HAVE_SAMPLERATE */
+  sound_lowlevel_frame(sound_buf,sound_generator_framesiz*sound_channels);
 
 sound_oldpos[0]=sound_oldpos[1]=-1;
 sound_fillpos[0]=sound_fillpos[1]=0;
@@ -741,8 +851,8 @@ if(val==sound_oldval_orig[bchan]) return;
 /* XXX a lookup table might help here, but would need to regenerate it
  * whenever cycles_per_frame were changed (i.e. when machine type changed).
  */
-newpos=(tstates*sound_framesiz)/machine_current->timings.tstates_per_frame;
-subpos=(((libspectrum_signed_qword)tstates)*sound_framesiz*vol)/
+newpos=(tstates*sound_generator_framesiz)/machine_current->timings.tstates_per_frame;
+subpos=(((libspectrum_signed_qword)tstates)*sound_generator_framesiz*vol)/
        (machine_current->timings.tstates_per_frame)-vol*newpos;
 
 /* if we already wrote here, adjust the level.
@@ -771,10 +881,10 @@ if(newpos>=0)
   else
     ptr=sound_buf+(sound_stereo?sound_fillpos[0]*2:sound_fillpos[0]);
   
-  for(f=sound_fillpos[bchan];f<newpos && f<sound_framesiz;f++)
+  for(f=sound_fillpos[bchan];f<newpos && f<sound_generator_framesiz;f++)
     SOUND_WRITE_BUF(bchan,ptr,sound_oldval[bchan]);
 
-  if(newpos<sound_framesiz)
+  if(newpos<sound_generator_framesiz)
     {
     /* newpos may be less than sound_fillpos, so... */
     if(is_tape)

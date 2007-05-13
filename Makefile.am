@@ -106,6 +106,7 @@ z80/libz80.a \
 @GLIB_LIBS@ \
 @PNG_LIBS@ \
 @AO_LIBS@ \
+@SAMPLERATE_LIBS@ \
 @COREAUDIO_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
@@ -126,7 +127,7 @@ settings.h: settings-header.pl settings.dat
 	@PERL@ settings-header.pl settings.dat > settings.h
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
-@XML_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\""
+@XML_CFLAGS@ @SAMPLERATE_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\""
 
 noinst_HEADERS = ay.h \
 	compat.h \

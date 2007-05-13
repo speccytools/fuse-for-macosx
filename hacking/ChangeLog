@@ -1623,4 +1623,8 @@
 20070512 TAG: Release-0_8_0-merge-1
 20070513 dck.h,if1.[ch],if2.h,snapshot.h,debugger/{debugger.c,disassemble.c},
          ui/{ggi/ggidisplay.c,gtk/rollback.c,xlib/xjoystick.c},z80/z80.pl:
-	 Fix filenames in comments (patch #1716201) (Stuart Brady).
+	 fix filenames in comments (patch #1716201) (Stuart Brady).
+20070513 README,Makefile.am,acinclude.m4,configure.in,settings.dat,
+         sound.c,man/fuse.1,ui/options.dat: add support for using
+         libsamplerate to reduce aliasing noise in beeper emulation
+	 (fixes bug #1629741) (Fred).
