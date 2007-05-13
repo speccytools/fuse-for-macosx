@@ -1,4 +1,4 @@
-/* if2.c: Interface I handling routines
+/* if1.c: Interface I handling routines
    Copyright (c) 2004-2007 Gergely Szasz, Philip Kendall
 
    $Id$

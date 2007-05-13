@@ -1,4 +1,4 @@
-/* ggiui.c: Routines for dealing with the GGI user interface
+/* ggidisplay.c: Routines for dealing with the GGI user interface
    Copyright (c) 2003 Catalin Mihaila, Philip Kendall
 
    $Id$

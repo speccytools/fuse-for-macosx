@@ -1,4 +1,4 @@
-/* pokefinder.c: select a rollback point
+/* rollback.c: select a rollback point
    Copyright (c) 2004 Philip Kendall
 
    $Id$

@@ -1,4 +1,4 @@
-/* fbjoystick.c: Joystick emulation
+/* xjoystick.c: Joystick emulation
    Copyright (c) 2003 Darren Salt
 
    $Id$

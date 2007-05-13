@@ -1,4 +1,4 @@
-/* disassemble.h: Fuse's disassembler
+/* disassemble.c: Fuse's disassembler
    Copyright (c) 2002-2003 Darren Salt, Philip Kendall
 
    $Id$

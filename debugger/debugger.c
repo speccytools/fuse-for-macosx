@@ -1,4 +1,4 @@
-/* debugger.h: Fuse's monitor/debugger
+/* debugger.c: Fuse's monitor/debugger
    Copyright (c) 2002-2004 Philip Kendall
 
    $Id$

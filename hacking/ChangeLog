@@ -1621,3 +1621,6 @@
 20070512 hacking/cvs-tags: document merge to trunk (Release-0_8_0-branch).
 20070512 Merge from Release-0_8_0-branch).
 20070512 TAG: Release-0_8_0-merge-1
+20070513 dck.h,if1.[ch],if2.h,snapshot.h,debugger/{debugger.c,disassemble.c},
+         ui/{ggi/ggidisplay.c,gtk/rollback.c,xlib/xjoystick.c},z80/z80.pl:
+	 Fix filenames in comments (patch #1716201) (Stuart Brady).

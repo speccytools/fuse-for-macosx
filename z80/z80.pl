@@ -1104,10 +1104,10 @@ shift
 
 my %description = (
 
-    'opcodes_cb.dat'     => 'opcodes_cb.c: Z80 CBxx opcodes',
-    'opcodes_ddfd.dat'   => 'opcodes_ddfd.c Z80 {DD,FD}xx opcodes',
-    'opcodes_ddfdcb.dat' => 'opcodes_ddfdcb.c Z80 {DD,FD}CBxx opcodes',
-    'opcodes_ed.dat'     => 'opcodes_ed.c: Z80 CBxx opcodes',
+    'opcodes_cb.dat'     => 'z80_cb.c: Z80 CBxx opcodes',
+    'opcodes_ddfd.dat'   => 'z80_ddfd.c Z80 {DD,FD}xx opcodes',
+    'opcodes_ddfdcb.dat' => 'z80_ddfdcb.c Z80 {DD,FD}CBxx opcodes',
+    'opcodes_ed.dat'     => 'z80_ed.c: Z80 CBxx opcodes',
     'opcodes_base.dat'   => 'opcodes_base.c: unshifted Z80 opcodes',
 
 );

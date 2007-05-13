@@ -1,4 +1,4 @@
-/* dck.c: dock snapshot (Warajevo .DCK) handling routines
+/* dck.h: dock snapshot (Warajevo .DCK) handling routines
    Copyright (c) 2003 Darren Salt, Fredrick Meunier
 
    $Id$
