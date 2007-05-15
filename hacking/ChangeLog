@@ -1638,7 +1638,7 @@
 	 LD?R, CP?R and IN?R, the pre-modified value is used for the
 	 contention (thanks, Mark Woodmass).
 20070515 configure.in,if1.c: check that fsync is available before using it
-	 (thanks, Stuart Brady) (Fred).
+	 (thanks, Chris Young) (Fred).
 20070515 debugger/{breakpoint.[ch],command.c},widget/debugger.c: add
          more comprehensive widget debugger (patch #1150698) (Darren).
 20070515 compat/mkstemp.c,if1.c: use O_BINARY in mkstemp() and if1_plug(),
