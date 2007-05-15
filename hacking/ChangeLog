@@ -1644,3 +1644,5 @@
 20070515 compat/mkstemp.c,if1.c: use O_BINARY in mkstemp() and if1_plug(),
          fixes +3 disk support on Win32 (patch #1716167) (thanks,
          Mark Woodmass) (Stuart Brady).
+20070515 configure.in,ui/aalib/*: retire the aalib code, use the aalib
+         target for SDL if required (Fred).

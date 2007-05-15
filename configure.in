@@ -92,21 +92,6 @@ if test "$svgalib" = yes; then
                   AC_MSG_ERROR([svgalib not found]))
 fi
 
-dnl Look for aalib (default=no)
-dnl Remove until this works PAK 20030419
-dnl AC_MSG_CHECKING(whether aalib UI requested)
-dnl AC_ARG_WITH(aalib,
-dnl [  --with-aalib            use aalib for user interface],
-dnl if test "$withval" = no; then aalib=no; else aalib=yes; fi,
-dnl aalib=no)
-dnl AC_MSG_RESULT($aalib)
-dnl if test "$aalib" = yes; then
-dnl   AC_CHECK_HEADER(aalib.h,
-dnl                   LIBS="$LIBS -laa"; AC_DEFINE([UI_AALIB], 1, [Defined if aalib UI in use]) AC_DEFINE(USE_WIDGET)
-dnl 		  ui=aalib; UI_LIBS="ui/aalib/libuiaalib.a widget/libwidget.a",
-dnl                   AC_MSG_ERROR([aalib not found]))
-dnl fi
-
 dnl Look for framebuffer interface for SA1110 (default=no)
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether framebuffer UI requested)
