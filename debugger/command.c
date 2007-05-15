@@ -48,6 +48,8 @@ int yywrap( void );
 int
 debugger_command_evaluate( const char *command )
 {
+  if( !command ) return 0;
+
   if( command_buffer ) free( command_buffer );
 
   command_buffer = strdup( command );

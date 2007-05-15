@@ -46,8 +46,16 @@ const char *debugger_breakpoint_type_text[] = {
   "Execute", "Read", "Write", "Port Read", "Port Write", "Time",
 };
 
+const char debugger_breakpoint_type_abbr[][4] = {
+  "Exe", "Rd", "Wr", "PtR", "PtW", "Tm",
+};
+
 const char *debugger_breakpoint_life_text[] = {
   "Permanent", "One Shot",
+};
+
+const char debugger_breakpoint_life_abbr[][5] = {
+  "Perm", "Once",
 };
 
 static int breakpoint_add( debugger_breakpoint_type type,
