@@ -1637,3 +1637,5 @@
 20070513 z80/z80.pl,z80/tests/{edb0,edb1,edb2,edb8,edb9,edba}.out: on
 	 LD?R, CP?R and IN?R, the pre-modified value is used for the
 	 contention (thanks, Mark Woodmass).
+20070515 configure.in,if1.c: check that fsync is available before using it
+	 (thanks, Stuart Brady) (Fred).

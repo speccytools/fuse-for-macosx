@@ -653,7 +653,9 @@ port_net_out( libspectrum_byte val )
       if1_ula.net = ( val & 0x01 ) ? 0 : 1;		/* set rx */
       lseek( if1_ula.fd_net, 0, SEEK_SET );		/* we save only the state of the wire*/
       do ; while( write( if1_ula.fd_net, &if1_ula.net, 1 ) == -1 );
+#ifdef HAVE_FSYNC
       fsync( if1_ula.fd_net );
+#endif /* #ifdef HAVE_FSYNC */
 #ifdef IF1_DEBUGX
       fprintf( stderr, "Send SinclairNET: %d\n", if1_ula.net );
 #endif
@@ -669,7 +671,9 @@ port_net_out( libspectrum_byte val )
 /*	lseek( if1_ula.fd_net, 0, SEEK_SET );  start a packet */
 		/* first we send the station number */
         do ; while( write( if1_ula.fd_net, &if1_ula.net_data, 1 ) == -1 );
+#ifdef HAVE_FSYNC
         fsync( if1_ula.fd_net );
+#endif /* #ifdef HAVE_FSYNC */
 #ifdef IF1_DEBUG
 	fprintf( stderr, "SC-OUT send network number: %d\n",
 	                                   if1_ula.net_data ^ 0xff );
