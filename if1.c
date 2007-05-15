@@ -31,6 +31,7 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "compat.h"
 #include "if1.h"
 #include "machine.h"
 #include "memory.h"
@@ -892,18 +893,18 @@ if1_plug( const char *filename, int what )
   case 1:
     if( if1_ula.fd_r >= 0 )
       close( if1_ula.fd_r );
-    fd = if1_ula.fd_r = open( filename, O_RDONLY | O_NONBLOCK );
+    fd = if1_ula.fd_r = open( filename, O_RDONLY | O_BINARY | O_NONBLOCK );
     break;
   case 2:
     if( if1_ula.fd_t >= 0 )
       close( if1_ula.fd_t );
-    fd = if1_ula.fd_t = open( filename, O_WRONLY | O_NONBLOCK );
+    fd = if1_ula.fd_t = open( filename, O_WRONLY | O_BINARY | O_NONBLOCK );
     if1_ula.dtr = fd == -1 ? 0 : 1;
     break;
   case 3:
     if( if1_ula.fd_net >= 0 )
       close( if1_ula.fd_net );
-    fd = if1_ula.fd_net = open( filename, O_RDWR | O_NONBLOCK );
+    fd = if1_ula.fd_net = open( filename, O_RDWR | O_BINARY | O_NONBLOCK );
     break;
   }
 
