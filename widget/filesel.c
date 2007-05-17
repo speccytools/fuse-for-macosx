@@ -86,14 +86,13 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
   int allocated, number;
   int i; size_t length;
 
-  (*namelist) =
-    (struct widget_dirent**)malloc( 32 * sizeof(struct widget_dirent*) );
-  if( *namelist == NULL ) return -1;
+  *namelist = malloc( 32 * sizeof(**namelist) );
+  if( !*namelist ) return -1;
 
   allocated = 32; number = 0;
 
   directory = opendir( dir );
-  if( directory == NULL ) {
+  if( !directory ) {
     free( *namelist );
     *namelist = NULL;
     return -1;
@@ -103,7 +102,7 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
     errno = 0;
     dirent = readdir( directory );
 
-    if( dirent == NULL ) {
+    if( !dirent ) {
       if( errno == 0 ) {	/* End of directory */
 	break;
       } else {
@@ -123,9 +122,7 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
       if( ++number > allocated ) {
 	struct widget_dirent **oldptr = *namelist;
 
-	(*namelist) = (struct widget_dirent**)realloc(
-	  (*namelist), 2 * allocated * sizeof(struct widget_dirent*)
-	);
+	*namelist = realloc( (*namelist), 2 * allocated * sizeof(**namelist) );
 	if( *namelist == NULL ) {
 	  for( i=0; i<number-1; i++ ) {
 	    free( oldptr[i]->name );
@@ -138,9 +135,8 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 	allocated *= 2;
       }
 
-      (*namelist)[number-1] =
-	(struct widget_dirent*)malloc( sizeof(struct widget_dirent) );
-      if( (*namelist)[number-1] == NULL ) {
+      (*namelist)[number-1] = malloc( sizeof(***namelist) );
+      if( !(*namelist)[number-1] ) {
 	for( i=0; i<number-1; i++ ) {
 	  free( (*namelist)[i]->name );
 	  free( (*namelist)[i] );
@@ -154,8 +150,8 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
       length = strlen( dirent->d_name ) + 1;
       if( length < 16 ) length = 16;
 
-      (*namelist)[number-1]->name = (char*)malloc( length * sizeof(char) );
-      if( (*namelist)[number-1]->name == NULL ) {
+      (*namelist)[number-1]->name = malloc( length );
+      if( !(*namelist)[number-1]->name ) {
 	free( (*namelist)[number-1] );
 	for( i=0; i<number-1; i++ ) {
 	  free( (*namelist)[i]->name );
@@ -164,7 +160,8 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 	free( *namelist );
       }
 
-      strcpy( (*namelist)[number-1]->name, dirent->d_name );
+      strncpy( (*namelist)[number-1]->name, dirent->d_name, length );
+      (*namelist)[number-1]->name[ length - 1 ] = 0;
 
     }
 
@@ -417,7 +414,8 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 
   if( dot ) {
     /* split filename at extension separator */
-    buffer[dot - filename->name] = '\0';
+    if( dot - filename->name < sizeof( buffer ) )
+      buffer[dot - filename->name] = '\0';
 
     /* get extension width (for display purposes) */
     snprintf( suffix, sizeof( suffix ), "%s", dot );

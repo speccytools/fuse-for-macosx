@@ -1646,3 +1646,6 @@
          Mark Woodmass) (Stuart Brady).
 20070515 configure.in,ui/aalib/*: retire the aalib code, use the aalib
          target for SDL if required (Fred).
+20070516 widget/filesel.c: fix possible buffer overflows and tidy code
+	 (includes patch #1720377) (thanks, Arda Erdikmen) (Stuart Brady and
+	 Phil).
