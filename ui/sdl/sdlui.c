@@ -39,6 +39,7 @@
 #include "sdljoystick.h"
 #include "sdlkeyboard.h"
 #include "ui/scaler/scaler.h"
+#include "menu.h"
 
 void
 atexit_proc( void )
@@ -112,7 +113,11 @@ ui_event( void )
 #endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
 
     case SDL_QUIT:
+#ifdef USE_WIDGET
+      menu_file_exit(0);
+#else 				/* #ifdef USE_WIDGET */
       fuse_exiting = 1;
+#endif				/* #ifdef USE_WIDGET */
       break;
     case SDL_VIDEOEXPOSE:
       display_refresh_all();

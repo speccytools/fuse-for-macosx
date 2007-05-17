@@ -1649,3 +1649,5 @@
 20070516 widget/filesel.c: fix possible buffer overflows and tidy code
 	 (includes patch #1720377) (thanks, Arda Erdikmen) (Stuart Brady and
 	 Phil).
+20070517 ui/sdl/sdlui.c: prompt to see if we really want to exit
+         (fixes bug #1720384) (thanks, Stuart Brady) (Fred).
