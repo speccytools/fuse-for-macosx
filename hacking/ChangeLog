@@ -1659,3 +1659,4 @@
 	 (Stuart Brady).
 20070519 Makefile.am,configure.in,windres.rc: add resource file to allow
 	 for an icon for the Win32 build (patch #1716742) (Stuart Brady).
+20070519 .cvsignore: ignore more auto-generated files.
