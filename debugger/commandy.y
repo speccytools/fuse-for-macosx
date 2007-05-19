@@ -88,7 +88,7 @@
 %token		 WRITE
 
 %token <integer> PAGE
-%token <reg>	 REGISTER
+%token <reg>	 DEBUGGER_REGISTER
 
 %token <integer> NUMBER
 
@@ -163,7 +163,7 @@ command:   BASE number { debugger_output_base = $2; }
 	 | NEXT	    { debugger_next(); }
 	 | DEBUGGER_OUT number NUMBER { debugger_port_write( $2, $3 ); }
 	 | SET NUMBER number { debugger_poke( $2, $3 ); }
-	 | SET REGISTER number { debugger_register_set( $2, $3 ); }
+	 | SET DEBUGGER_REGISTER number { debugger_register_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;
 
@@ -205,7 +205,7 @@ number:   expression { $$ = debugger_expression_evaluate( $1 ); }
 expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 		       if( !$$ ) YYABORT;
 		     }
-	    | REGISTER { $$ = debugger_expression_new_register( $1 );
+	    | DEBUGGER_REGISTER { $$ = debugger_expression_new_register( $1 );
 			 if( !$$ ) YYABORT;
 		       }
 	    | '(' expression ')' { $$ = $2; }

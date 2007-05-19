@@ -72,18 +72,18 @@ ti|tim|time { return TIME; }
 w|wr|wri|writ|write { return WRITE; }
 
 a|b|c|d|e|f|h|l { yylval.reg = debugger_register_hash( yytext );
-		  return REGISTER; }
+		  return DEBUGGER_REGISTER; }
 
 "a'"|"b'"|"c'"|"d'"|"e'"|"f'"|"h'"|"l'" {
                              yylval.reg = debugger_register_hash( yytext );
-			     return REGISTER; }
+			     return DEBUGGER_REGISTER; }
 
 af|bc|de|hl|"af\'"|"bc\'"|"de\'"|"hl\'" {
                              yylval.reg = debugger_register_hash( yytext );
-			     return REGISTER; }
+			     return DEBUGGER_REGISTER; }
 
 sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
-	      return REGISTER; }
+	      return DEBUGGER_REGISTER; }
 
 "("		{ return '('; }
 ")"		{ return ')'; }

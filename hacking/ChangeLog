@@ -1653,3 +1653,5 @@
          (fixes bug #1720384) (thanks, Stuart Brady) (Fred).
 20070519 utils.c: add Amiga settings and temp dir paths (part of patch
          #1712260) (Chris Young).
+20070519 debugger/{commandl.l,commandy.y}: fix clashes with Amiga API
+	 (more of patch #1712260) (Chris Young).
