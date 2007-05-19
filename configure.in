@@ -35,6 +35,14 @@ AM_PROG_LEX
 AC_PROG_YACC
 AC_PROG_LIBTOOL
 
+dnl Check for Win32 resource tool
+AC_CHECK_TOOL(WINDRES, windres, no)
+AC_SUBST(WINDRES)
+if test "$WINDRES" != no; then
+  WINDRES_OBJ="windres.o"
+fi
+AC_SUBST(WINDRES_OBJ)
+
 dnl Generate commandy.h
 YFLAGS="$YFLAGS -d"
 AC_SUBST(YFLAGS)

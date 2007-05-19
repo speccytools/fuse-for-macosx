@@ -90,8 +90,11 @@ fuse_SOURCES = ay.c \
 	uidisplay.c \
 	ula.c \
 	utils.c \
+	windres.rc \
 	zxatasp.c \
 	zxcf.c
+
+EXTRA_fuse_SOURCES = windres.rc
 
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
@@ -111,15 +114,20 @@ z80/libz80.a \
 @COREAUDIO_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
-compat/libcompat.a
+compat/libcompat.a \
+@WINDRES_OBJ@
 
 fuse_DEPENDENCIES = @UI_LIBS@ \
 		    debugger/libdebugger.a \
 		    machines/libmachines.a \
 		    sound/libsound.a \
-	            z80/libz80.a
+	            z80/libz80.a \
+	            @WINDRES_OBJ@
 
 BUILT_SOURCES = settings.c settings.h
+
+windres.o: windres.rc winfuse.ico
+	@WINDRES@ windres.rc windres.o
 
 settings.c: settings.pl settings.dat
 	@PERL@ settings.pl settings.dat > settings.c
