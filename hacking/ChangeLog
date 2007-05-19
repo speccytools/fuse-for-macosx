@@ -1651,3 +1651,5 @@
 	 Phil).
 20070517 ui/sdl/sdlui.c: prompt to see if we really want to exit
          (fixes bug #1720384) (thanks, Stuart Brady) (Fred).
+20070519 utils.c: add Amiga settings and temp dir paths (part of patch
+         #1712260) (Chris Young).

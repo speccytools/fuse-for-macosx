@@ -504,7 +504,12 @@ utils_get_temp_path( void )
 {
   const char *dir;
 
-#ifdef WIN32
+#ifdef AMIGA
+
+  /* Amiga, just use T: */
+  return "T:";
+
+#elif defined WIN32
 
   /* Something close to this algorithm specified at
      http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/gettemppath.asp
@@ -529,7 +534,12 @@ utils_get_home_path( void )
 {
   const char *dir;
 
-#ifdef WIN32
+#ifdef AMIGA
+
+  dir = strdup("PROGDIR:settings");
+	if( dir ) return dir;
+
+#elif defined WIN32
 
   dir = getenv( "USERPROFILE" ); if( dir ) return dir;
   dir = getenv( "WINDIR" ); if( dir ) return dir;
