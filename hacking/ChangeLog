@@ -1655,3 +1655,5 @@
          #1712260) (Chris Young).
 20070519 debugger/{commandl.l,commandy.y}: fix clashes with Amiga API
 	 (more of patch #1712260) (Chris Young).
+20070519 ui/options.dat: allow 5 digit emulation speed (patch #1718215)
+	 (Stuart Brady).
