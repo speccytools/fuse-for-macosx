@@ -166,7 +166,7 @@ static int fuse_init(int argc, char **argv)
 	      strerror( errno ) );
     return 1;
   }
-  strcat( fuse_directory, "/" );
+  strcat( fuse_directory, FUSE_DIR_SEP_STR );
 
   if( settings_init( &first_arg, argc, argv ) ) return 1;
 

@@ -77,6 +77,18 @@ typedef struct path_context {
 static void init_path_context( path_context *ctx, utils_aux_type type );
 static int get_next_path( path_context *ctx );
 
+int
+utils_is_absolute_path( const char *filename )
+{
+  if( filename[0] == FUSE_DIR_SEP_CHR )
+    return 1;
+#ifdef WIN32
+  if( filename[0] && filename[1] == ':' )
+    return 1;
+#endif
+  return 0;
+}
+
 /* Open `filename' and do something sensible with it; autoload tapes
    if `autoload' is true and return the type of file found in `type' */
 int
@@ -209,14 +221,15 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
   path_context ctx;
 
   /* If given an absolute path, just look there */
-  if( filename[0] == '/' ) return open( filename, O_RDONLY | O_BINARY );
+  if( utils_is_absolute_path( filename ) )
+    return open( filename, O_RDONLY | O_BINARY );
 
   /* Otherwise look in some likely locations */
   init_path_context( &ctx, type );
 
   while( get_next_path( &ctx ) ) {
 
-    snprintf( path, PATH_MAX, "%s/%s", ctx.path, filename );
+    snprintf( path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path, filename );
     fd = open( path, O_RDONLY | O_BINARY );
     if( fd != -1 ) return fd;
 
@@ -235,7 +248,7 @@ utils_find_file_path( const char *filename, char *ret_path,
   struct stat stat_info;
 
   /* If given an absolute path, just look there */
-  if( filename[0] == '/' ) {
+  if( utils_is_absolute_path( filename ) ) {
     strncpy( ret_path, filename, PATH_MAX );
     return 0;
   }
@@ -245,7 +258,8 @@ utils_find_file_path( const char *filename, char *ret_path,
 
   while( get_next_path( &ctx ) ) {
 
-    snprintf( ret_path, PATH_MAX, "%s/%s", ctx.path, filename );
+    snprintf( ret_path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path,
+              filename );
     if( !stat( ret_path, &stat_info ) ) return 0;
 
   }
@@ -287,14 +301,15 @@ get_next_path( path_context *ctx )
       return 0;
     }
 
-    if( fuse_progname[0] == '/' ) {
+    if( utils_is_absolute_path( fuse_progname ) ) {
       strncpy( buffer, fuse_progname, PATH_MAX );
       buffer[ PATH_MAX - 1 ] = '\0';
     } else {
       snprintf( buffer, PATH_MAX, "%s%s", fuse_directory, fuse_progname );
     }
     path2 = dirname( buffer );
-    snprintf( ctx->path, PATH_MAX, "%s/%s", path2, path_segment );
+    snprintf( ctx->path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", path2,
+              path_segment );
     return 1;
 
     /* Then where we may have installed the data files */
@@ -466,7 +481,8 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
   utils_file file;
   ssize_t bytes_written;
 
-  snprintf( tempfilename, PATH_MAX, "%s/%s", utils_get_temp_path(), template );
+  snprintf( tempfilename, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s",
+            utils_get_temp_path(), template );
 
   *fd = mkstemp( tempfilename );
   if( *fd == -1 ) {

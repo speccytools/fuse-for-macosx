@@ -1662,3 +1662,5 @@
 20070519 .cvsignore: ignore more auto-generated files.
 20070520 Delete .cvsignore files and ignore some files not automatically
 	 ignored by Subversion.
+20070520 compat.h,fuse.c,trdos.c,utils.[ch],compat/dirname.c,widget/filesel.c:
+	 allow for configurable path separator (patch #1714630) (Stuart Brady).

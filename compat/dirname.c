@@ -30,6 +30,8 @@
 
 #include <string.h>
 
+#include "fuse.h"
+
 static char *
 __memrchr (char *s, int c, size_t n)
 {
@@ -47,7 +49,7 @@ dirname (char *path)
   char *last_slash;
 
   /* Find last '/'.  */
-  last_slash = path != NULL ? strrchr (path, '/') : NULL;
+  last_slash = path != NULL ? strrchr (path, FUSE_DIR_SEP_CHR) : NULL;
 
   if (last_slash != NULL && last_slash != path && last_slash[1] == '\0')
     {
@@ -55,12 +57,12 @@ dirname (char *path)
       char *runp;
 
       for (runp = last_slash; runp != path; --runp)
-	if (runp[-1] != '/')
+	if (runp[-1] != FUSE_DIR_SEP_CHR)
 	  break;
 
       /* The '/' is the last character, we have to look further.  */
       if (runp != path)
-	last_slash = __memrchr (path, '/', runp - path);
+	last_slash = __memrchr (path, FUSE_DIR_SEP_CHR, runp - path);
     }
 
   if (last_slash != NULL)
@@ -69,7 +71,7 @@ dirname (char *path)
       char *runp;
 
       for (runp = last_slash; runp != path; --runp)
-	if (runp[-1] != '/')
+	if (runp[-1] != FUSE_DIR_SEP_CHR)
 	  break;
 
       /* Terminate the path.  */

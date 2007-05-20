@@ -54,6 +54,7 @@ typedef enum utils_aux_type {
 
 } utils_aux_type;
 
+int utils_is_absolute_path( const char *filename );
 int utils_open_file( const char *filename, int autoload,
 		     libspectrum_id_t *type );
 int utils_find_auxiliary_file( const char *filename, utils_aux_type type );

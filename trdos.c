@@ -476,7 +476,8 @@ insert_scl( trdos_drive_number which, const char *filename )
     return 1;
   }
 
-  snprintf( trd_template, length, "%s/%s", temp_path, SCL_TMP_FILE_TEMPLATE );
+  snprintf( trd_template, length, "%s" FUSE_DIR_SEP_STR "%s", temp_path,
+            SCL_TMP_FILE_TEMPLATE );
 
   discs[ which ].disc_ready = 0;
 

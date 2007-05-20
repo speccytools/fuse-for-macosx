@@ -392,7 +392,7 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
   buffer[sizeof( buffer ) - dir - 1] = '\0';
 
   if (dir)
-    dir = widget_charwidth( '/' );
+    dir = widget_charwidth( FUSE_DIR_SEP_CHR );
   else {
     /* get filename extension */
     dot = strrchr( filename->name, '.' );
@@ -438,7 +438,7 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
       buffer[strlen (buffer) - 1] = '\0';
   }
   if( dir )
-    strcat (buffer, "/");
+    strcat (buffer, FUSE_DIR_SEP_STR );
 
   widget_printstring( x + 1, y, foreground, buffer );
   if( truncated )
@@ -526,7 +526,8 @@ widget_filesel_keyhandler( input_key key )
       if( widget_do( WIDGET_TYPE_TEXT, &text_data ) ||
 	  !widget_text_text || !*widget_text_text      )
 	break;
-      if( *widget_text_text != '/' ) {	/* relative name */
+      if( !utils_is_absolute_path( widget_text_text ) ) {
+							/* relative name */
         /* Get current dir name and allocate space for the leafname */
         fn = widget_getcwd();
         if( fn )
@@ -536,9 +537,9 @@ widget_filesel_keyhandler( input_key key )
 	  return;
         }
         /* Append the leafname and return it */
-        strcat( fn, "/" );
+        strcat( fn, FUSE_DIR_SEP_STR );
         strcat( fn, widget_text_text );
-      } else {				/* absolute name */
+      } else {						/* absolute name */
 	fn = strdup( widget_text_text );
         if( !fn ) {
 	  widget_end_widget( WIDGET_FINISHED_CANCEL );
@@ -571,7 +572,8 @@ widget_filesel_keyhandler( input_key key )
       widget_end_widget( WIDGET_FINISHED_CANCEL );
       return;
     }
-    strcat( fn, "/" ); strcat( fn, widget_filenames[ current_file ]->name );
+    strcat( fn, FUSE_DIR_SEP_STR );
+    strcat( fn, widget_filenames[ current_file ]->name );
 			
 /*
   in Win32 errno resulting from chdir on file is EINVAL which may mean many things
