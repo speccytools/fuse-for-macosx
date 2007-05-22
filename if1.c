@@ -29,7 +29,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <time.h>
 
 #include "compat.h"
 #include "if1.h"

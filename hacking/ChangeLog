@@ -1672,3 +1672,4 @@
          utils_is_absolute_path (Fred).
 20070522 widget: ignore *.a libraries (Fred).
 20070522 compat: ignore *.a libraries (Fred).
+20070522 if1.c: don't need time.h anymore (thanks, Stuart Brady) (Fred).
