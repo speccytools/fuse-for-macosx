@@ -1,0 +1,8 @@
+/*.a
+/.deps
+/Makefile
+/Makefile.in
+/fuse.font
+/menu_data.c
+/options.c
+/options.h
