@@ -1666,3 +1666,5 @@
 	 allow for configurable path separator (patch #1714630) (Stuart Brady).
 20070522 sound/{coreaudiosound.c,sdlsound.c}: try to prevent the consumption
          of partial samples with the sfifo using sound interfaces (Fred).
+20070522 fuse.c,if1.c: don't use rand_r as it's not available on all platforms
+         (thanks, Stuart Brady) (Fred).

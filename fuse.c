@@ -28,8 +28,10 @@
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <time.h>
 
 #ifndef WIN32
 #include <sys/utsname.h>
@@ -157,6 +159,10 @@ static int fuse_init(int argc, char **argv)
   int error, first_arg;
   char *start_scaler;
   start_files_t start_files;
+
+  /* Seed the bad but widely-available random number
+     generator with the current time */
+  srand( (unsigned)time( NULL ) );
 
   fuse_progname=argv[0];
   libspectrum_error_function = ui_libspectrum_error;

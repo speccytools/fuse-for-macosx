@@ -102,7 +102,6 @@ int if1_active = 0;
 int if1_available = 0;
 static int if1_mdr_status = 0;
 
-unsigned int mdr_seed;
 int rnd_factor = ( ( RAND_MAX >> 2 ) << 2 ) / 19 + 1;
 
 static microdrive_t microdrive[8];		/* We have 8 microdrive */
@@ -764,11 +763,9 @@ if1_mdr_new( int drive )
     return;
   }
   
-  mdr_seed = time( 0 );
-
   if( settings_current.mdr_len == 0 ) {	/* Random length */
-    len = 171 + ( ( rand_r( &mdr_seed ) >> 2 ) + ( rand_r( &mdr_seed ) >> 2 ) +
-                  ( rand_r( &mdr_seed ) >> 2 ) + ( rand_r( &mdr_seed ) >> 2 ) )
+    len = 171 + ( ( rand() >> 2 ) + ( rand() >> 2 ) +
+                  ( rand() >> 2 ) + ( rand() >> 2 ) )
 		  / rnd_factor;
   } else
     len = settings_current.mdr_len = settings_current.mdr_len < 10 ? 10 : 
