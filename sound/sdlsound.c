@@ -181,11 +181,19 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   }
 }
 
+#ifndef MIN
+#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
+#endif
+
 /* Write len samples from fifo into stream */
 void
 sdlwrite( void *userdata, Uint8 *stream, int len )
 {
   int f;
+
+  /* Try to only read an even number of bytes so as not to fragment a sample */
+  len = MIN( len, sfifo_used( &sound_fifo ) );
+  len &= sound_stereo ? 0xfffc : 0xfffe;
 
   /* Read input_size bytes from fifo into sound stream */
   while( ( f = sfifo_read( &sound_fifo, stream, len ) ) > 0 ) {
@@ -193,13 +201,8 @@ sdlwrite( void *userdata, Uint8 *stream, int len )
     len -= f;
   }
 
-  /* If we ran out of sound, make do with silence :( */
-  if( f < 0 ) {
-    for( f=0; f<len; f++ ) {
-      *stream++ = 0;
-    }
-    return;
-  }
+  /* If we ran out of sound, do nothing else as SDL has prefilled
+     the output buffer with silence :( */
 }
 
 #endif			/* #ifdef SOUND_SDL */

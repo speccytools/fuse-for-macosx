@@ -1664,3 +1664,5 @@
 	 ignored by Subversion.
 20070520 compat.h,fuse.c,trdos.c,utils.[ch],compat/dirname.c,widget/filesel.c:
 	 allow for configurable path separator (patch #1714630) (Stuart Brady).
+20070522 sound/{coreaudiosound.c,sdlsound.c}: try to prevent the consumption
+         of partial samples with the sfifo using sound interfaces (Fred).

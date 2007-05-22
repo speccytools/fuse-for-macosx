@@ -106,8 +106,7 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
 #ifdef WORDS_BIGENDIAN
                     | kLinearPCMFormatFlagIsBigEndian
 #endif      /* #ifdef WORDS_BIGENDIAN */
-                    | kLinearPCMFormatFlagIsPacked
-                    | kAudioFormatFlagIsNonInterleaved;
+                    | kLinearPCMFormatFlagIsPacked;
   deviceFormat.mBytesPerPacket = 2;
   deviceFormat.mFramesPerPacket = 1;
   deviceFormat.mBytesPerFrame = 2;
@@ -243,6 +242,10 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   }
 }
 
+#ifndef MIN
+#define MIN(a,b)    (((a) < (b)) ? (a) : (b))
+#endif
+
 /* This is the audio processing callback. */
 OSStatus coreaudiowrite( void *inRefCon,
                          AudioUnitRenderActionFlags *ioActionFlags,
@@ -253,41 +256,22 @@ OSStatus coreaudiowrite( void *inRefCon,
 {
   int f;
   int len = deviceFormat.mBytesPerFrame * inNumberFrames;
+  uint8_t* out = ioData->mBuffers[0].mData;
 
-  uint8_t* out_l = ioData->mBuffers[0].mData;
-  uint8_t* out_r = deviceFormat.mChannelsPerFrame > 1 ?
-                    ioData->mBuffers[1].mData : 0;
+  /* Try to only read an even number of bytes so as not to fragment a sample */
+  len = MIN( len, sfifo_used( &sound_fifo ) );
+  len &= sound_stereo ? 0xfffc : 0xfffe;
 
-  if( out_r ) {
-    /* Deinterleave the left and right stereo channels into their approptiate
-       buffers */
-    while( sfifo_used( &sound_fifo ) && len ) {
-      f = sfifo_read( &sound_fifo, out_l, deviceFormat.mBytesPerFrame );
-      out_l += deviceFormat.mBytesPerFrame;
-      f = sfifo_read( &sound_fifo, out_r, deviceFormat.mBytesPerFrame );
-      out_r += deviceFormat.mBytesPerFrame;
-      len -= deviceFormat.mBytesPerFrame;
-    }
+  /* Read input_size bytes from fifo into sound stream */
+  while( ( f = sfifo_read( &sound_fifo, out, len ) ) > 0 ) {
+    out += f;
+    len -= f;
+  }
 
-    /* If we ran out of sound, make do with silence :( */
-    if( len ) {
-      for( f=0; f<len; f++ ) {
-        *out_l++ = 0;
-        *out_r++ = 0;
-      }
-    }
-  } else {
-    /* Read input_size bytes from fifo into sound stream */
-    while( ( f = sfifo_read( &sound_fifo, out_l, len ) ) > 0 ) {
-      out_l += f;
-      len -= f;
-    }
-
-    /* If we ran out of sound, make do with silence :( */
-    if( f < 0 ) {
-      for( f=0; f<len; f++ ) {
-        *out_l++ = 0;
-      }
+  /* If we ran out of sound, make do with silence :( */
+  if( f < 0 ) {
+    for( f=0; f<len; f++ ) {
+      *out++ = 0;
     }
   }
 
