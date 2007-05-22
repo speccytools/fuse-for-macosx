@@ -44,6 +44,7 @@
 #include "fuse.h"
 /*  #include "keyboard.h" */
 #include "widget_internals.h"
+#include "utils.h"
 
 struct widget_dirent **widget_filenames; /* Filenames in the current
 					    directory */
