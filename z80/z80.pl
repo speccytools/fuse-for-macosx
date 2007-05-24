@@ -513,16 +513,15 @@ sub opcode_DAA (@) {
     print << "DAA";
       {
 	libspectrum_byte add = 0, carry = ( F & FLAG_C );
-	if( ( F & FLAG_H ) || ( (A & 0x0f)>9 ) ) add=6;
-	if( carry || (A > 0x9f ) ) add|=0x60;
-	if( A > 0x99 ) carry=1;
-	if ( F & FLAG_N ) {
+	if( ( F & FLAG_H ) || ( ( A & 0x0f ) > 9 ) ) add = 6;
+	if( carry || ( A > 0x99 ) ) add |= 0x60;
+	if( A > 0x99 ) carry = FLAG_C;
+	if( F & FLAG_N ) {
 	  SUB(add);
 	} else {
-	  if( (A>0x90) && ( (A & 0x0f)>9) ) add|=0x60;
 	  ADD(add);
 	}
-	F = ( F & ~( FLAG_C | FLAG_P) ) | carry | parity_table[A];
+	F = ( F & ~( FLAG_C | FLAG_P ) ) | carry | parity_table[A];
       }
 DAA
 }
