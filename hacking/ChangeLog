@@ -1685,3 +1685,4 @@
 	 building with the Win32 UI (Stuart).
 20070525 fuse.c: disable copyright message on startup on Win32, to avoid
 	 creating an unwanted Win32 console (Stuart).
+20070525 ui/win32/menu_data.rc: fix accelerator keys in Win32 UI (Stuart).
