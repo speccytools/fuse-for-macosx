@@ -51,6 +51,9 @@ gtkmouse_reset_pointer( void )
   /* Ugh. GDK doesn't have its own move-pointer function :-|
    * Framebuffer users and win32 users will have to make their own
    * arrangements here.
+   *
+   * For Win32, use SetCursorPos() -- see sdpGtkWarpPointer() at
+   * http://k3d.cvs.sourceforge.net/k3d/projects/sdplibs/sdpgtk/sdpgtkutility.cpp?view=markup
    */
   XWarpPointer( GDK_WINDOW_XDISPLAY( gtkui_drawing_area->window ), None,
 		GDK_WINDOW_XWINDOW( gtkui_drawing_area->window ),
