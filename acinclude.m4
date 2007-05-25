@@ -1177,7 +1177,7 @@ main()
   rm -f conf.xmltest
 ])
 
-AC_DEFUN(PKG_CHECK_MODULES, [
+AC_DEFUN([PKG_CHECK_MODULES], [
   succeeded=no
 
   if test -z "$PKG_CONFIG"; then
