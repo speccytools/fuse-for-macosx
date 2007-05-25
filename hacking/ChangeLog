@@ -1677,3 +1677,5 @@
 	 DAA (patch #1724193) (Stuart Brady).
 20070525 widget/filesel.c: refactor widget_scandir() and improve its error
 	 handling (patch #1723371) (Stuart).
+20070525 hacking/win32_todo.txt: move from ui/win32/todo.txt into hacking
+	 directory, and remove completed items (Stuart).

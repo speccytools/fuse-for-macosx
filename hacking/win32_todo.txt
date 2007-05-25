@@ -1,6 +1,11 @@
+Win32 TODO
+==========
+
 http://msdn.microsoft.com/archive/default.asp?url=/archive/en-us/dnardirdraw/html/msdn_directd5.asp
 http://francis.dupont.free.fr/coindev/english/directdraw/clipping.htm
 http://www.fourcc.org/fccovrly.php
+--
+libspectrum: nothing to do - configure with --without-glib
 --
 change include "memory.h" to:
 
@@ -10,64 +15,16 @@ change include "memory.h" to:
 #include "../memory.h"
 37 11 C:\Dev-Cpp-projects\fuse-cvs\debugger\disassemble.c
 #include "../memory.h"
------------------
-in libspectrum:
-nothing to do - configure with --without-glib
---
-implement those 2 things I posted on mingw-devel
-
-in filesel.c
-add
-#include <windows.h>
-
-1. http://thread.gmane.org/gmane.comp.gnu.mingw.user/9203
-
-widget/filesel.c:
-replace
-      if( errno == 0 ) {	/* End of directory */
-with      
-#ifndef WIN32
-      if( errno == 0 ) {	/* End of directory */
-#else
-      if( 1 ) {	/* End of directory */
-#endif
-
-this was fixed in mingw-runtime 3.2
-
-2. http://thread.gmane.org/gmane.comp.gnu.mingw.user/9197
-
-widget/filesel.c:
-replace
-      if(errno==ENOTDIR) {
-with
-#ifndef WIN32
-      if(errno==ENOTDIR) {
-#else
-      if( GetFileAttributes( fn ) != FILE_ATTRIBUTE_DIRECTORY	) {
-#endif
-
-submitted:
-http://sourceforge.net/tracker/index.php?func=detail&aid=859674&group_id=91293&atid=596650
-
---
-ssize_t replacement:
-compat.h
-#ifndef HAVE_SSIZE_T
-  typedef	int ssize_t;
-  #define HAVE_SSIZE_T 1
-#endif
-
-this was fixed in mingw-runtime 3.2
 --
 fuse.c:
-change "main()" to "main1()"
-because program must start from WinMain
-(start with main() if found)
-
+For UI_WIN32, rename main() to fuse_main()
+because the program must start from WinMain()
+and main() is used if found
+--
 is there a -D option?
 --
 strip fuse.exe and compress with http://upx.sf.net/
----
+--
 write .def file for libspectrum.dll
 --
 used libraries to add in win32:
@@ -77,10 +34,9 @@ libgcrypt
 lib765
 libdsk
 --
-add some help to win32 - maybe there's man2help or man2pdf or sth like that
- man2html
---
-fix dirname() implementation for win32
+add some help to win32
+maybe there's man2help or man2pdf or something like that?
+man2html
 --
 gtkkeyboard.c
 line 98:
@@ -90,7 +46,7 @@ line 98:
 			  0);
 */
   return keysym;
-
+--
 gtkui.c
 line 35:
 //#include <gdk/gdkx.h>
@@ -99,20 +55,6 @@ to compile with gtk 2.0
 -mno-cygwin -mms-bitfields -I. -I"C:\Dev-Cpp\include\gtk-2.0" -I"C:\Dev-Cpp\include\gtkdeps-2.0" -I"C:\Dev-Cpp\include\gtk-2.0\include" -I"C:\Dev-Cpp\include\atk-1.0" -I"C:\Dev-Cpp\include\pango-1.0" -I"C:\Dev-Cpp\include\glib-2.0" -I"C:\Dev-Cpp\include\glib-2.0" -I"C:\Dev-Cpp\include\glib-2.0\include" -I"C:\Dev-Cpp\lib\glib-2.0\include" -I"C:\Dev-Cpp\lib\gtk-2.0\include"
 -lgtk-win32-2.0 -lgdk-win32-2.0 -lgthread-2.0 -lgdi32 -lole32 -luuid -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lgdi32 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv
 --
-machine.c, utils.c:
-dirname port
-link 418:
-/*
-  strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
-  fuse_dir = dirname( fuse_path );
-
-  snprintf( path, PATHNAME_MAX_LENGTH, "%s/roms/%s", fuse_dir, filename );
-  fd = open( path, O_RDONLY | O_BINARY );
-  if( fd != -1 ) return fd;
-*/
-----
-fuse
-
 in ui/scaler/scalers.c:
 include in compilation
 override build command:
@@ -180,33 +122,4 @@ typedef long HRESULT;
 [Warning] `HRESULT' previously declared here
 typedef LONG HRESULT;
 --
-in utils.c
-define fuse-wide constant "slash" or "fsdelim" - representing filesystems' filename 
-delimiter depending on system
-and change in many places in utils.c
-also in fuse.c
-  strncat( fuse_directory, "/", 1024 );
---
-full path is determined by
-':' as second character
-namely in util.c:225:
-  if( fuse_progname[0] == '/' ) {
-(and in other places) it should be
-#ifndef WIN32
-  if( fuse_progname[0] == '/' ) {
-#else
-  if ( strlen(fuse_progname) >= 1 )
-    if( fuse_progname[1] == ':' ) {
-#endif
-    strncpy( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
-  } else {
-    strncpy( fuse_path, fuse_directory, PATHNAME_MAX_LENGTH );
-    strncat( fuse_path, fuse_progname, PATHNAME_MAX_LENGTH );
-  }
-
-argc[0] in windows for me always contains full path
-indepentently on how it was run
---
 make appropriate copyright notes
---
-Marek (spec(at)webtech(dot).pl
