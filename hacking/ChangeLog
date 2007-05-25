@@ -1681,3 +1681,5 @@
 	 directory, and remove completed items (Stuart).
 20070525 ui/gtk/gtkmouse.c: add comment suggesting SetCursorPos() for
 	 gtkmouse_reset_pointer() on Win32 (Stuart).
+20070525 fuse.[ch],ui/win32/win32ui.c: rename main() to fuse_main() when
+	 building with the Win32 UI (Stuart).

@@ -154,7 +154,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
   
   hAccels = LoadAccelerators( fuse_hInstance, "win32_accel" );
     
-  return main1(__argc, __argv);
+  return fuse_main(__argc, __argv);
   /* finish - how do deal with returning wParam */
 }
 

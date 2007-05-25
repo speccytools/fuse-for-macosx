@@ -133,7 +133,11 @@ static int do_start_files( start_files_t *start_files );
 
 static int fuse_end(void);
 
+#ifdef UI_WIN32
+int fuse_main(int argc, char **argv)
+#else
 int main(int argc, char **argv)
+#endif
 {
   if(fuse_init(argc,argv)) {
     fprintf(stderr,"%s: error initialising -- giving up!\n", fuse_progname);
