@@ -194,7 +194,11 @@ static int fuse_init(int argc, char **argv)
     return 1;
   }
 
+  /* Windows will create a console for our output if there isn't one already,
+   * so we don't display the copyright message on Win32. */
+#ifndef WIN32
   fuse_show_copyright();
+#endif
 
   /* FIXME: order of these initialisation calls. Work out what depends on
      what */

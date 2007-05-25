@@ -1683,3 +1683,5 @@
 	 gtkmouse_reset_pointer() on Win32 (Stuart).
 20070525 fuse.[ch],ui/win32/win32ui.c: rename main() to fuse_main() when
 	 building with the Win32 UI (Stuart).
+20070525 fuse.c: disable copyright message on startup on Win32, to avoid
+	 creating an unwanted Win32 console (Stuart).
