@@ -61,6 +61,8 @@ static int is_saving;
    which it will be on after this keypress */
 static size_t top_left_file, current_file, new_current_file;
 
+static int widget_add_filename( int *allocated, int *number,
+				struct widget_dirent ***namelist, char *name );
 static void widget_scan( char *dir );
 static int widget_select_file( const struct dirent *dirent );
 static int widget_scan_compare( const widget_dirent **a,
@@ -79,13 +81,65 @@ char* widget_filesel_name;
 /* Should we exit all widgets when we're done with this selector? */
 static int exit_all_widgets;
 
+static int widget_add_filename( int *allocated, int *number,
+				struct widget_dirent ***namelist,
+				char *name ) {
+  int i; size_t length;
+
+  if( ++*number > *allocated ) {
+    struct widget_dirent **oldptr = *namelist;
+
+    *namelist = realloc( (*namelist), 2 * *allocated * sizeof(**namelist) );
+    if( *namelist == NULL ) {
+      for( i=0; i<*number-1; i++ ) {
+	free( oldptr[i]->name );
+	free( oldptr[i] );
+      }
+      free( oldptr );
+      return -1;
+    }
+    *allocated *= 2;
+  }
+
+  (*namelist)[*number-1] = malloc( sizeof(***namelist) );
+  if( !(*namelist)[*number-1] ) {
+    for( i=0; i<*number-1; i++ ) {
+      free( (*namelist)[i]->name );
+      free( (*namelist)[i] );
+    }
+    free( *namelist );
+    *namelist = NULL;
+    return -1;
+  }
+
+  length = strlen( name ) + 1;
+  if( length < 16 ) length = 16;
+
+  (*namelist)[*number-1]->name = malloc( length );
+  if( !(*namelist)[*number-1]->name ) {
+    free( (*namelist)[*number-1] );
+    for( i=0; i<*number-1; i++ ) {
+      free( (*namelist)[i]->name );
+      free( (*namelist)[i] );
+    }
+    free( *namelist );
+    *namelist = NULL;
+    return -1;
+  }
+
+  strncpy( (*namelist)[*number-1]->name, name, length );
+  (*namelist)[*number-1]->name[ length - 1 ] = 0;
+
+  return 0;
+}
+
 static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 			   int (*select_fn)(const struct dirent*) )
 {
   DIR *directory; struct dirent *dirent;
 
   int allocated, number;
-  int i; size_t length;
+  int i;
 
   *namelist = malloc( 32 * sizeof(**namelist) );
   if( !*namelist ) return -1;
@@ -119,53 +173,12 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
     }
 
     if( select_fn( dirent ) ) {
-
-      if( ++number > allocated ) {
-	struct widget_dirent **oldptr = *namelist;
-
-	*namelist = realloc( (*namelist), 2 * allocated * sizeof(**namelist) );
-	if( *namelist == NULL ) {
-	  for( i=0; i<number-1; i++ ) {
-	    free( oldptr[i]->name );
-	    free( oldptr[i] );
-	  }
-	  free( oldptr );
-	  closedir( directory );
-	  return -1;
-	}
-	allocated *= 2;
-      }
-
-      (*namelist)[number-1] = malloc( sizeof(***namelist) );
-      if( !(*namelist)[number-1] ) {
-	for( i=0; i<number-1; i++ ) {
-	  free( (*namelist)[i]->name );
-	  free( (*namelist)[i] );
-	}
-	free( *namelist );
-	*namelist = NULL;
+      if( widget_add_filename( &allocated, &number, namelist,
+			       dirent->d_name ) ) {
 	closedir( directory );
 	return -1;
       }
-
-      length = strlen( dirent->d_name ) + 1;
-      if( length < 16 ) length = 16;
-
-      (*namelist)[number-1]->name = malloc( length );
-      if( !(*namelist)[number-1]->name ) {
-	free( (*namelist)[number-1] );
-	for( i=0; i<number-1; i++ ) {
-	  free( (*namelist)[i]->name );
-	  free( (*namelist)[i] );
-	}
-	free( *namelist );
-      }
-
-      strncpy( (*namelist)[number-1]->name, dirent->d_name, length );
-      (*namelist)[number-1]->name[ length - 1 ] = 0;
-
     }
-
   }
 
   if( closedir( directory ) ) {

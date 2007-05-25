@@ -1675,3 +1675,5 @@
 20070522 if1.c: don't need time.h anymore (thanks, Stuart Brady) (Fred).
 20070524 z80/z80.pl,z80/tests/27_1.{in,out}: fix undocumented behaviour of
 	 DAA (patch #1724193) (Stuart Brady).
+20070525 widget/filesel.c: refactor widget_scandir() and improve its error
+	 handling (patch #1723371) (Stuart).
