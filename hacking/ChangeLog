@@ -1689,3 +1689,4 @@
 20070525 configure.in: add --with-win32 to check for native Win32 UI (Stuart).
 20070525 acinclude.m4: remove warning about underquoted definition (Stuart).
 20070525 ui/win32/menu_data.h: fix junk in GPL notice (Stuart).
+20070526 ui/sdl: ignore *.a libraries (Fred).
