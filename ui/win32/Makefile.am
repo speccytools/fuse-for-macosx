@@ -26,10 +26,14 @@ AUTOMAKE_OPTIONS = foreign
 noinst_LIBRARIES = libuiwin32.a
 
 libuiwin32_a_SOURCES = error.c \
-		       keysyms.c \
 		       win32display.c \
 		       win32keyboard.c \
 		       win32ui.c
+
+BUILT_SOURCES = keysyms.c
+
+keysyms.c: ../../keysyms.pl ../../keysyms.dat
+	@PERL@ ../../keysyms.pl win32 ../../keysyms.dat > $@
 
 noinst_HEADERS = win32display.h \
 		 win32keyboard.h
