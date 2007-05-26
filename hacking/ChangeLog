@@ -1690,3 +1690,6 @@
 20070525 acinclude.m4: remove warning about underquoted definition (Stuart).
 20070525 ui/win32/menu_data.h: fix junk in GPL notice (Stuart).
 20070526 ui/sdl: ignore *.a libraries (Fred).
+20070526 ui/sdl/sdlkeyboard.c: enable key repeat for use in the widget
+         fileselector (part of feature request #1720212) (thanks, Cygnus)
+         (Fred).
