@@ -1693,3 +1693,5 @@
 20070526 ui/sdl/sdlkeyboard.c: enable key repeat for use in the widget
          fileselector (part of feature request #1720212) (thanks, Cygnus)
          (Fred).
+20070526 Makefile.am,menu_data.{dat,pl},ui/gtk/Makefile.am,widget/Makefile.am:
+	 rename menu_data.c to menu_data.dat (Stuart).

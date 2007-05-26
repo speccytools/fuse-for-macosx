@@ -49,8 +49,8 @@ BUILT_SOURCES = menu_data.c \
 		options.h \
 		fuse.font
 
-menu_data.c: ../perl/cpp-perl.pl ../menu_data.c ../menu_data.pl ../config.h
-	@PERL@ ../perl/cpp-perl.pl ../config.h ../menu_data.c | @PERL@ ../menu_data.pl widget > $@
+menu_data.c: ../perl/cpp-perl.pl ../menu_data.dat ../menu_data.pl ../config.h
+	@PERL@ ../perl/cpp-perl.pl ../config.h ../menu_data.dat | @PERL@ ../menu_data.pl widget > $@
 
 options.c: ../perl/cpp-perl.pl ../config.h options.pl ../ui/options.dat ../perl/Fuse.pm ../perl/Fuse/Dialog.pm
 	@PERL@ ../perl/cpp-perl.pl ../config.h ../ui/options.dat | @PERL@ options.pl - > options.c

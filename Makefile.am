@@ -182,7 +182,7 @@ EXTRA_DIST = AUTHORS \
 	     THANKS \
 	     keysyms.dat \
 	     keysyms.pl \
-	     menu_data.c \
+	     menu_data.dat \
 	     menu_data.pl \
 	     settings.pl \
 	     settings-header.pl \
