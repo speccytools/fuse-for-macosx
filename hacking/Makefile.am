@@ -24,4 +24,4 @@
 AUTOMAKE_OPTIONS = foreign
 
 EXTRA_DIST = coding_style.txt cvs-tags implementation_notes.txt \
-	tc2048_tech_notes.txt ui.txt
+	tc2048_tech_notes.txt ui.txt win32_todo.txt

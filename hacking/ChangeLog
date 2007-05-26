@@ -1700,3 +1700,5 @@
 	 boilerplate formatting fixes (Stuart).
 20070526 keysyms.pl,ui/win32/{Makefile.am,keysyms.c}: autogenerate
          ui/win32/keysyms.c from keysyms.dat (Stuart).
+20070526 hacking/Makefile.am,ui/win32/Makefile.am: update EXTRA_DIST lines to
+	 reflect new location of win32_todo.txt (Stuart).

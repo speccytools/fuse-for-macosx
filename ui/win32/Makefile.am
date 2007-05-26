@@ -37,5 +37,3 @@ keysyms.c: ../../keysyms.pl ../../keysyms.dat
 
 noinst_HEADERS = win32display.h \
 		 win32keyboard.h
-
-EXTRA_DIST = todo.txt
