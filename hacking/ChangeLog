@@ -1708,3 +1708,7 @@
 	 undocumented flags after BIT n,(IX+d) instructions (fixes bug
 	 #1726453).
 20070527 if1.c: disable if1_plug() on Win32 (Stuart).
+20070527 menu.h,ui/win32/{Makefile.am,error.c,icons/Makefile.am,menu_data.c,
+	 pokefinder.rc,statusbar.c,win32display.h,win32internals.h,
+	 win32keyboard.c,win32ui.{c,rc}}: build fixes for Win32 UI, and
+	 distribute Win32 UI icons (Stuart).

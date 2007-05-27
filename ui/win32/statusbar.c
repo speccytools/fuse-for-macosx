@@ -35,7 +35,7 @@ HICON
   icon_disk_inactive, icon_disk_active,
   icon_pause_inactive, icon_pause_active;
 
-int
+void
 win32statusbar_create( HWND hWnd )
 {
 /*
@@ -72,12 +72,12 @@ int
 win32statusbar_set_visibility( int visible )
 {
 }
+*/
 
 int
 ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 {
 }
-*/
 
 int
 ui_statusbar_update_speed( float speed )

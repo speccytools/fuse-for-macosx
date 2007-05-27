@@ -1,4 +1,4 @@
-/* pokefinder.rc: Win32 interface to the poke finder
+/* res_pokefinder.rc: Win32 interface to the poke finder
    Copyright (c) 2004 Marek Januszwski
 
    $Id$
@@ -39,7 +39,7 @@ BEGIN
   PUSHBUTTON "Reset", IDC_PF_RESET, 208, 64, 60, 15
   PUSHBUTTON "Close", IDC_PF_CLOSE, 276, 64, 60, 15
 
-  EDITTEXT "", IDC_PF_EDIT, 84, 24, 140, 13, 
+  EDITTEXT IDC_PF_EDIT, 84, 24, 140, 13, 
     WS_CHILD | WS_VISIBLE, WS_EX_CLIENTEDGE
 
   CONTROL "",IDC_PF_LIST,"SysListView32", 

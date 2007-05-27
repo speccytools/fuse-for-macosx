@@ -23,11 +23,11 @@
 
 */
 
-win32bmp_disk_active    BITMAP "ui/win32/icons/disk_active.bmp"
-win32bmp_disk_inactive  BITMAP "ui/win32/icons/disk_inactive.bmp"
-win32bmp_pause_active   BITMAP "ui/win32/icons/pause_active.bmp"
-win32bmp_pause_inactive BITMAP "ui/win32/icons/pause_inactive.bmp"
-win32bmp_tape_active    BITMAP "ui/win32/icons/tape_active.bmp"
-win32bmp_tape_inactive  BITMAP "ui/win32/icons/tape_inactive.bmp"
-win32bmp_tape_marker    BITMAP "ui/win32/icons/tape_marker.bmp"
+win32bmp_disk_active    BITMAP "icons/disk_active.bmp"
+win32bmp_disk_inactive  BITMAP "icons/disk_inactive.bmp"
+win32bmp_pause_active   BITMAP "icons/pause_active.bmp"
+win32bmp_pause_inactive BITMAP "icons/pause_inactive.bmp"
+win32bmp_tape_active    BITMAP "icons/tape_active.bmp"
+win32bmp_tape_inactive  BITMAP "icons/tape_inactive.bmp"
+win32bmp_tape_marker    BITMAP "icons/tape_marker.bmp"
 

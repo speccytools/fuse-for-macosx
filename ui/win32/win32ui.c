@@ -30,12 +30,19 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "menu.h"
 #include "menu_data.h"
+#include "ui/ui.h"
+#include "ui/uijoystick.h"
 #include "win32internals.h"
+#include "win32keyboard.h"
+#include "win32display.h"
 
 HACCEL hAccels;
 
 int paused = 0;
+
+#define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
 void blit( void );
 
@@ -262,13 +269,141 @@ blit( void )
 int
 ui_mouse_grab( int startup )
 {
-  return 0; /* FIXME */
+  STUB;
+  return 0;
 }
 
 int
 ui_mouse_release( int suspend )
 {
-  return 0; /* FIXME */
+  STUB;
+  return 0;
 }
+
+int
+ui_joystick_init( void )
+{
+  STUB;
+  return 0;
+}
+
+void
+ui_joystick_end( void )
+{
+  STUB;
+}
+
+void
+ui_joystick_poll( void )
+{
+  /* STUB; */
+}
+
+int
+ui_widgets_reset( void )
+{
+  STUB;
+  return 0;
+}
+
+int
+menu_select_roms( libspectrum_machine machine, size_t start, size_t count )
+{
+  STUB;
+  return 0;
+}
+
+scaler_type
+menu_get_scaler( scaler_available_fn selector )
+{
+  STUB;
+  return SCALER_NORMAL;
+}
+
+char *
+menu_get_filename( const char *title )
+{
+  STUB;
+  return NULL;
+}
+
+ui_confirm_save_t
+ui_confirm_save( const char *message )
+{
+  STUB;
+  return UI_CONFIRM_SAVE_CANCEL;
+}
+
+ui_confirm_joystick_t
+ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
+{
+  STUB;
+  return UI_CONFIRM_JOYSTICK_NONE;
+}
+
+int
+ui_tape_write( void )
+{
+  STUB;
+  return 1;
+}
+
+int
+ui_tape_browser_update( ui_tape_browser_update_type change,
+                        libspectrum_tape_block *block )
+{
+  STUB;
+  return 0;
+}
+
+int
+ui_plus3_disk_write( specplus3_drive_number which )
+{
+  STUB;
+  return 1;
+}
+
+int
+ui_trdos_disk_write( trdos_drive_number which )
+{
+  STUB;
+  return 1;
+}
+
+int
+ui_get_rollback_point( GSList *points )
+{
+  STUB;
+  return -1;
+}
+
+int
+ui_menu_item_set_active( const char *path, int active )
+{
+  /* STUB; */
+  return 1;
+}
+
+void menu_file_savesnapshot( int action ) { STUB; }
+void menu_file_recording_record( int action ) { STUB; }
+void menu_file_recording_recordfromsnapshot( int action ) { STUB; }
+void menu_file_aylogging_record( int action ) { STUB; }
+void menu_file_savescreenasscr( int action ) { STUB; }
+void menu_file_savescreenaspng( int action ) { STUB; }
+
+void menu_file_exit( int action ) { STUB; }
+
+void menu_options_general( int action ) { STUB; }
+void menu_options_sound( int action ) { STUB; }
+void menu_options_peripherals( int action ) { STUB; }
+void menu_options_rzx( int action ) { STUB; }
+void menu_options_joysticks_select( int action ) { STUB; }
+
+void menu_machine_reset( int action ) { STUB; }
+void menu_machine_select( int action ) { STUB; }
+
+void menu_machine_pokefinder( int action ) { STUB; }
+void menu_media_tape_browse( int action ) { STUB; }
+void menu_help_keyboard( int action ) { STUB; }
 
 #endif			/* #ifdef UI_WIN32 */

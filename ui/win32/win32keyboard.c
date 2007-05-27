@@ -56,7 +56,8 @@ win32keyboard_keypress( WPARAM wParam, LPARAM lParam )
   if( fuse_keysym == INPUT_KEY_NONE ) return;
 
   fuse_event.type = INPUT_EVENT_KEYPRESS;
-  fuse_event.types.key.key = fuse_keysym;
+  fuse_event.types.key.native_key = fuse_keysym;
+  fuse_event.types.key.spectrum_key = fuse_keysym;
 
   input_event( &fuse_event );
 }
@@ -72,7 +73,8 @@ win32keyboard_keyrelease( WPARAM wParam, LPARAM lParam )
   if( fuse_keysym == INPUT_KEY_NONE ) return;
 
   fuse_event.type = INPUT_EVENT_KEYRELEASE;
-  fuse_event.types.key.key = fuse_keysym;
+  fuse_event.types.key.native_key = fuse_keysym;
+  fuse_event.types.key.spectrum_key = fuse_keysym;
 
   input_event( &fuse_event );
 }

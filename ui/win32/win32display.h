@@ -29,6 +29,9 @@
 
 #include "win32internals.h"
 
+int win32display_init( void );
+int win32display_end( void );
+
 void blit( void );
 
 #endif			/* #ifdef UI_WIN32 */

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2004 Philip Kendall
+## Copyright (c) 2007 Stuart Brady
 
 ## $Id$
 
@@ -23,42 +23,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-noinst_LIBRARIES = libuiwin32.a
-
-INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
-
-libuiwin32_a_SOURCES = debugger.c \
-		       debugger.rc \
-		       error.c \
-		       keysyms.c \
-		       menu_data.c \
-		       menu_data.rc \
-		       pokefinder.rc \
-		       statusbar.c \
-		       win32display.c \
-		       win32keyboard.c \
-		       win32ui.c \
-		       win32ui.rc
-
-libuiwin32_a_LIBADD = res_debugger.o \
-		      res_menu_data.o \
-		      res_pokefinder.o \
-		      res_win32ui.o
-
-BUILT_SOURCES = keysyms.c
-
-menu_data.rc: menu_data.h
-pokefinder.rc: pokefinder.h
-
-res_%.o: %.rc
-	@WINDRES@ $< $@
-
-keysyms.c: ../../keysyms.pl ../../keysyms.dat
-	@PERL@ ../../keysyms.pl win32 ../../keysyms.dat > $@
-
-noinst_HEADERS = debugger.h \
-		 menu_data.h \
-		 pokefinder.h \
-		 win32display.h \
-		 win32internals.h \
-		 win32keyboard.h
+EXTRA_DIST = disk_active.bmp disk_inactive.bmp \
+	     pause_active.bmp pause_inactive.bmp \
+	     tape_active.bmp tape_inactive.bmp tape_marker.bmp

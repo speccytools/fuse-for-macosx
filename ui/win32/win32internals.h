@@ -56,11 +56,11 @@ LPDIRECTDRAWCLIPPER lpddc; /* clipper for the window */
 
 #define DD_ERROR( msg )   if ( ddres != DD_OK ) {\
     uidisplay_end();\
-    ui_error( UI_ERROR_ERROR, msg, NULL );\
+    ui_error( UI_ERROR_ERROR, msg );\
     return 1;\
   }
 
-int win32statusbar_create();
+void win32statusbar_create();
 
 int win32statusbar_set_visibility( int visible );
 

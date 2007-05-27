@@ -23,7 +23,10 @@
 
 */
 
+#include <config.h>
+
 #include "menu_data.h"
+#include "menu.h"
 
 void handle_menu( DWORD cmd, HWND okno )
 {
@@ -99,8 +102,10 @@ void handle_menu( DWORD cmd, HWND okno )
         menu_options_selectroms_select( 12 ); break;
     case IDM_MENU_OPTIONS_FILTER: 
         menu_options_filter( 0 ); break;
+#ifdef HAVE_LIB_XML2
     case IDM_MENU_OPTIONS_SAVE: 
         menu_options_save( 0 ); break;
+#endif
     case IDM_MENU_MACHINE_PAUSE: 
 /* TODO:
         menu_machine_pause( 0 ); */ break;

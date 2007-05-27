@@ -28,14 +28,11 @@
 
 #include <libspectrum.h>
 
+#include <config.h>
+
 #include "ui/scaler/scaler.h"
 
-#ifdef USE_WIDGET
-
-#define MENU_CALLBACK( name ) void name( int action )
-#define MENU_CALLBACK_WITH_ACTION( name ) void name( int action )
-
-#else			/* #ifdef USE_WIDGET */
+#ifdef UI_GTK
 
 #include <gtk/gtk.h>
 
@@ -43,7 +40,12 @@
 #define MENU_CALLBACK_WITH_ACTION( name ) \
   void name( gpointer data, guint action, GtkWidget *widget )
 
-#endif			/* #ifdef USE_WIDGET */
+#else			/* #ifdef UI_GTK */
+
+#define MENU_CALLBACK( name ) void name( int action )
+#define MENU_CALLBACK_WITH_ACTION( name ) void name( int action )
+
+#endif			/* #ifdef UI_GTK */
 
 /*
  * Things defined in menu.c
