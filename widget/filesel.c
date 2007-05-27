@@ -496,7 +496,7 @@ widget_filesel_keyhandler( input_key key )
   case INPUT_KEY_Down:
   case INPUT_KEY_6:
   case INPUT_KEY_j:
-    if( current_file < widget_numfiles-2 ) new_current_file += 2;
+    if( current_file+2 < widget_numfiles ) new_current_file += 2;
     break;
 
   case INPUT_KEY_Up:

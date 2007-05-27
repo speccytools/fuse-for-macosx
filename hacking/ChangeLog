@@ -1702,3 +1702,5 @@
          ui/win32/keysyms.c from keysyms.dat (Stuart).
 20070526 hacking/Makefile.am,ui/win32/Makefile.am: update EXTRA_DIST lines to
 	 reflect new location of win32_todo.txt (Stuart).
+20070527 widget/filesel.c: don't segfault when the down key is pressed in a
+	 directory with only one entry (Stuart).
