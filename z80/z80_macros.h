@@ -187,6 +187,13 @@ void contend_write( libspectrum_word address, libspectrum_dword time );
   if( (bit) == 7 && (value) & 0x80 ) F |= FLAG_S; \
 }
 
+#define BIT_I( bit, value, address ) \
+{ \
+  F = ( F & FLAG_C ) | FLAG_H | ( ( address >> 8 ) & ( FLAG_3 | FLAG_5 ) ); \
+  if( ! ( (value) & ( 0x01 << (bit) ) ) ) F |= FLAG_P | FLAG_Z; \
+  if( (bit) == 7 && (value) & 0x80 ) F |= FLAG_S; \
+}  
+
 #define CALL()\
 {\
   libspectrum_byte calltempl, calltemph; \

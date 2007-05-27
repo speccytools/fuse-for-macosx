@@ -468,7 +468,7 @@ sub opcode_BIT (@) {
       {
 	libspectrum_byte bytetemp = readbyte( tempaddr );
 	contend_read( tempaddr, 1 );
-	BIT( $bit, bytetemp );
+	BIT_I( $bit, bytetemp, tempaddr );
       }
 BIT
     } else {
