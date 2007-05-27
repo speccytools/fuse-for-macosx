@@ -1707,3 +1707,4 @@
 20070527 z80/{z80.pl,z80_macros.h},z80/tests/{d,f}dcb{4,5,6,7}?.out: fix
 	 undocumented flags after BIT n,(IX+d) instructions (fixes bug
 	 #1726453).
+20070527 if1.c: disable if1_plug() on Win32 (Stuart).

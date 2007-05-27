@@ -883,6 +883,10 @@ if1_mdr_eject( const char *filename, int drive )
 void
 if1_plug( const char *filename, int what )
 {
+#ifdef WIN32
+  ui_error( UI_ERROR_ERROR, "Not yet implemented on Win32" );
+  return; 
+#else
   int fd = -1;
 
   switch( what ) {
@@ -912,6 +916,7 @@ if1_plug( const char *filename, int what )
   if1_ula.rs232_mode = settings_current.raw_rs232 ? RS232_RAW : RS232_INT;
   if1_ula.s_net_mode = settings_current.raw_s_net ? S_NET_RAW : S_NET_INT;
   update_menu( UMENU_RS232 );
+#endif
 }
 
 void
