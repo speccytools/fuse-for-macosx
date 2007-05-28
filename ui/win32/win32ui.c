@@ -1,5 +1,5 @@
 /* win32ui.c: Win32 routines for dealing with the user interface
-   Copyright (c) 2003 Marek Januszewski, Philip Kendall
+   Copyright (c) 2003-2007 Marek Januszewski, Philip Kendall, Stuart Brady
 
    $Id$
 
@@ -32,6 +32,7 @@
 #include "fuse.h"
 #include "menu.h"
 #include "menu_data.h"
+#include "snapshot.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 #include "win32internals.h"
@@ -45,6 +46,18 @@ int paused = 0;
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
 void blit( void );
+
+int
+win32ui_confirm( const char *string )
+{
+  int result;
+
+  fuse_emulation_pause();
+  result = MessageBox( fuse_hWnd, string, "Fuse - confirm",
+		       MB_YESNO|MB_ICONQUESTION ) == IDYES;
+  fuse_emulation_unpause();
+  return result;
+}
 
 LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -64,8 +77,7 @@ LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       
     case WM_CLOSE:
     {
-      if( MessageBox( fuse_hWnd, "Fuse - confirm", "Exit Fuse?",
-      MB_YESNO|MB_ICONQUESTION ) == IDYES	)
+      if( win32ui_confirm( "Exit Fuse?" ) )
       {
         DestroyWindow(hWnd);
       }
@@ -321,10 +333,69 @@ menu_get_scaler( scaler_available_fn selector )
 }
 
 char *
+get_save_filename( const char *title )
+{
+  OPENFILENAME ofn;
+  char szFile[512];
+  memset( &ofn, 0, sizeof( ofn ) );
+  szFile[0] = '\0';
+
+  ofn.lStructSize = sizeof( ofn );
+  ofn.hwndOwner = NULL;
+  ofn.lpstrFilter = "All Files\0*.*\0\0";
+  ofn.lpstrCustomFilter = NULL;
+  ofn.nFilterIndex = 0;
+  ofn.lpstrFile = szFile;
+  ofn.nMaxFile = sizeof( szFile );
+  ofn.lpstrFileTitle = NULL;
+  ofn.lpstrInitialDir = NULL;
+  ofn.lpstrTitle = title;
+  ofn.Flags = /* OFN_DONTADDTORECENT | */ OFN_PATHMUSTEXIST | OFN_HIDEREADONLY |
+	      OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN;
+  ofn.nFileOffset = 0;
+  ofn.nFileExtension = 0;
+  ofn.lpstrDefExt = NULL;
+  ofn.pvReserved = NULL;
+  ofn.FlagsEx = 0;
+
+  if( !GetSaveFileName( &ofn ) ) {
+    return NULL;
+  } else {
+    return strdup( ofn.lpstrFile );
+  }
+}
+
+char *
 menu_get_filename( const char *title )
 {
-  STUB;
-  return NULL;
+  OPENFILENAME ofn;
+  char szFile[512];
+  memset( &ofn, 0, sizeof( ofn ) );
+  szFile[0] = '\0';
+
+  ofn.lStructSize = sizeof( ofn );
+  ofn.hwndOwner = NULL;
+  ofn.lpstrFilter = "All Files\0*.*\0\0";
+  ofn.lpstrCustomFilter = NULL;
+  ofn.nFilterIndex = 0;
+  ofn.lpstrFile = szFile;
+  ofn.nMaxFile = sizeof( szFile );
+  ofn.lpstrFileTitle = NULL;
+  ofn.lpstrInitialDir = NULL;
+  ofn.lpstrTitle = title;
+  ofn.Flags = /* OFN_DONTADDTORECENT | */ OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST |
+	      OFN_HIDEREADONLY;
+  ofn.nFileOffset = 0;
+  ofn.nFileExtension = 0;
+  ofn.lpstrDefExt = NULL;
+  ofn.pvReserved = NULL;
+  ofn.FlagsEx = 0;
+
+  if( !GetOpenFileName( &ofn ) ) {
+    return NULL;
+  } else {
+    return strdup( ofn.lpstrFile );
+  }
 }
 
 ui_confirm_save_t
@@ -384,14 +455,37 @@ ui_menu_item_set_active( const char *path, int active )
   return 1;
 }
 
-void menu_file_savesnapshot( int action ) { STUB; }
+void
+menu_file_savesnapshot( int action )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = get_save_filename( "Fuse - Save Snapshot" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  snapshot_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
 void menu_file_recording_record( int action ) { STUB; }
 void menu_file_recording_recordfromsnapshot( int action ) { STUB; }
 void menu_file_aylogging_record( int action ) { STUB; }
 void menu_file_savescreenasscr( int action ) { STUB; }
 void menu_file_savescreenaspng( int action ) { STUB; }
 
-void menu_file_exit( int action ) { STUB; }
+void
+menu_file_exit( int action )
+{
+  if( win32ui_confirm( "Exit Fuse?" ) )
+  {
+    DestroyWindow(fuse_hWnd);
+  }
+}
 
 void menu_options_general( int action ) { STUB; }
 void menu_options_sound( int action ) { STUB; }
@@ -399,7 +493,20 @@ void menu_options_peripherals( int action ) { STUB; }
 void menu_options_rzx( int action ) { STUB; }
 void menu_options_joysticks_select( int action ) { STUB; }
 
-void menu_machine_reset( int action ) { STUB; }
+void
+menu_machine_reset( int action )
+{
+  if( win32ui_confirm( "Reset?" ) )
+  {
+    if( machine_reset() ) {
+      ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
+
+      /* FIXME: abort() seems a bit extreme here, but it'll do for now */
+      fuse_abort();
+    }
+  }
+}
+
 void menu_machine_select( int action ) { STUB; }
 
 void menu_machine_pokefinder( int action ) { STUB; }

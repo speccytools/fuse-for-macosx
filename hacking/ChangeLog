@@ -1712,3 +1712,5 @@
 	 pokefinder.rc,statusbar.c,win32display.h,win32internals.h,
 	 win32keyboard.c,win32ui.{c,rc}}: build fixes for Win32 UI, and
 	 distribute Win32 UI icons (Stuart).
+20070528 ui/win32/win32ui.c: implement File->Exit, File->Reset, File->Save,
+	 and menu_get_filename() (Stuart).
