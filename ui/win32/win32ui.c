@@ -64,22 +64,22 @@ LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
   switch( msg )
   {
     case WM_CREATE:
-    {        
-      win32statusbar_create( hWnd ); 
+    {
+      win32statusbar_create( hWnd );
       break;
-    }    
-  
+    }
+
     case WM_COMMAND:
     {
       handle_menu( LOWORD( wParam ), hWnd );
       break;
-    }         
-      
+    }
+
     case WM_CLOSE:
     {
       if( win32ui_confirm( "Exit Fuse?" ) )
       {
-        DestroyWindow(hWnd);
+	DestroyWindow(hWnd);
       }
       break;
     }
@@ -95,26 +95,26 @@ LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       win32keyboard_keyrelease( wParam, lParam );
       break ;
     }
-      
+
     case WM_PAINT:
     {
       if ( display_ui_initialised )
       {
-        PAINTSTRUCT ps;
-        IDirectDrawSurface_SetClipper( lpdds, lpddc );
-        BeginPaint( hWnd, &ps );
-        blit();
-        EndPaint( hWnd, &ps );
-        IDirectDrawSurface_SetClipper( lpdds, NULL );
-        break ;
+	PAINTSTRUCT ps;
+	IDirectDrawSurface_SetClipper( lpdds, lpddc );
+	BeginPaint( hWnd, &ps );
+	blit();
+	EndPaint( hWnd, &ps );
+	IDirectDrawSurface_SetClipper( lpdds, NULL );
+	break ;
       }
     }
-    
+
     case WM_SIZE:
     {
       SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
       break;
-    }    
+    }
 
     case WM_DESTROY:
     {
@@ -128,18 +128,18 @@ LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       return( DefWindowProc( hWnd, msg, wParam, lParam ));
     }
   }
-  
+
   return 0;
 }
 
 /* this is where windows program begins */
 int WINAPI WinMain (HINSTANCE hInstance,
-                    HINSTANCE hPrevInstance,
-                    LPSTR lpCmdLine,
-                    int nCmdShow)
+		    HINSTANCE hPrevInstance,
+		    LPSTR lpCmdLine,
+		    int nCmdShow)
 {
   WNDCLASS wc;
-  
+
   if( !hPrevInstance )
   {
     wc.lpszClassName = "Fuse";
@@ -149,30 +149,30 @@ int WINAPI WinMain (HINSTANCE hInstance,
     wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
     wc.hCursor = LoadCursor( NULL, IDC_ARROW );
     wc.hbrBackground = (HBRUSH)( COLOR_WINDOW+1 );
-    wc.lpszMenuName = "win32_menu"; 
+    wc.lpszMenuName = "win32_menu";
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
-    
+
     if ( !RegisterClass( &wc ) )
       return 0;
   }
-  
+
   fuse_hWnd = CreateWindow( "Fuse", "Fuse",
-    WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX, 
+    WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,
 /*    WS_OVERLAPPEDWINDOW, */
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
     NULL, NULL, hInstance, NULL );
-    
+
   //init windows controls like status bar
   InitCommonControls();
 
   ShowWindow( fuse_hWnd, nCmdShow );
   UpdateWindow( fuse_hWnd );
-  
+
   fuse_hInstance = hInstance;
-  
+
   hAccels = LoadAccelerators( fuse_hInstance, "win32_accel" );
-    
+
   return fuse_main(__argc, __argv);
   /* finish - how do deal with returning wParam */
 }
@@ -195,22 +195,22 @@ ui_init( int *argc, char ***argv )
 int
 ui_event( void )
 {
-  MSG msg;    
+  MSG msg;
   /* Process messages */
   while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
   {
 /* TODO: double check this && */
-    if( !IsDialogMessage( fuse_hPFWnd, &msg) 
+    if( !IsDialogMessage( fuse_hPFWnd, &msg)
      && !IsDialogMessage( fuse_hDBGWnd, &msg) )
     {
       if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) )
       {
-        if( msg.message==WM_QUIT ) break;
-        /* finish - set exit flag somewhere */
-        TranslateMessage( &msg );
-        DispatchMessage( &msg );
-       }    
-    }    
+	if( msg.message==WM_QUIT ) break;
+	/* finish - set exit flag somewhere */
+	TranslateMessage( &msg );
+	DispatchMessage( &msg );
+      }
+    }
   }
 
   return 0;
@@ -239,9 +239,9 @@ void win32_verror( int is_error )
   static LPVOID err_msg;
   last_error = GetLastError();
   FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                 FORMAT_MESSAGE_FROM_SYSTEM,
-                 NULL, last_error, LANG_USER_DEFAULT,
-                 (LPTSTR) &err_msg, 0, NULL );
+		 FORMAT_MESSAGE_FROM_SYSTEM,
+		 NULL, last_error, LANG_USER_DEFAULT,
+		 (LPTSTR) &err_msg, 0, NULL );
   MessageBox( fuse_hWnd, err_msg, "Error", MB_OK );
 }
 
@@ -259,20 +259,20 @@ blit( void )
   {
     RECT srcrec, destrec;
     POINT point;
-  
+
     point.x = 0;
     point.y = 0;
     srcrec.left = 0;
     srcrec.top = 0;
     ClientToScreen( fuse_hWnd, &point );
     GetClientRect( fuse_hWnd, &srcrec );
-  
+
     destrec.top = point.y;
     destrec.left = point.x;
     destrec.bottom = destrec.top + srcrec.bottom;
     destrec.right = destrec.left + srcrec.right;
-  
-    IDirectDrawSurface_Blt( lpdds, &destrec, 
+
+    IDirectDrawSurface_Blt( lpdds, &destrec,
       lpdds2, &srcrec, DDBLT_WAIT, NULL );
   }
   return;
@@ -421,7 +421,7 @@ ui_tape_write( void )
 
 int
 ui_tape_browser_update( ui_tape_browser_update_type change,
-                        libspectrum_tape_block *block )
+			libspectrum_tape_block *block )
 {
   STUB;
   return 0;

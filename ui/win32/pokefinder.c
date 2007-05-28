@@ -44,30 +44,30 @@ void possible_click( GtkCList *clist, gint row, gint column,
 int possible_page[ MAX_POSSIBLE ];
 libspectrum_word possible_offset[ MAX_POSSIBLE ];
 
-BOOL CALLBACK PokefinderProc( HWND hWnd, UINT msg, 
-                              WPARAM wParam, LPARAM lParam ) 
+BOOL CALLBACK PokefinderProc( HWND hWnd, UINT msg,
+			      WPARAM wParam, LPARAM lParam )
 {
-  switch( msg ) 
+  switch( msg )
   {
     case WM_COMMAND:
       switch( LOWORD( wParam ) )
       {
-        case IDC_PF_CLOSE:
-          win32_pokefinder_close();
-          return TRUE;
-        case IDC_PF_INC:
-          win32_pokefinder_incremented();
-          return TRUE;
-        case IDC_PF_DEC:
-          win32_pokefinder_decremented();
-          return TRUE;
-        case IDC_PF_SEARCH:
-          win32_pokefinder_search();
-          return TRUE;
-        case IDC_PF_RESET:
-          win32_pokefinder_reset();
-          return TRUE;
-      }    
+	case IDC_PF_CLOSE:
+	  win32_pokefinder_close();
+	  return TRUE;
+	case IDC_PF_INC:
+	  win32_pokefinder_incremented();
+	  return TRUE;
+	case IDC_PF_DEC:
+	  win32_pokefinder_decremented();
+	  return TRUE;
+	case IDC_PF_SEARCH:
+	  win32_pokefinder_search();
+	  return TRUE;
+	case IDC_PF_RESET:
+	  win32_pokefinder_reset();
+	  return TRUE;
+      }
       return FALSE;
     case WM_CLOSE:
       win32_pokefinder_close();
@@ -103,22 +103,22 @@ update_pokefinder( void )
     for( page = 0; page < 8; page++ )
       for( offset = 0; offset < 0x4000; offset++ )
 	    if( pokefinder_possible[page][offset] != -1 )
-        {
-          possible_page[ which ] = page;
-          possible_offset[ which ] = offset;
-          which++;
-	
-          snprintf( possible_text[0], 128, "%lu", (unsigned long)page );
-          snprintf( possible_text[1], 128, "0x%04X", (unsigned)offset );
-          
-          lvi.iItem = i;
-          lvi.iSubItem = 0;
-          lvi.pszText = possible_text[0];
-          ListView_InsertItem( hLocListView, &lvi );
-          ListView_SetItemText( hLocListView, i, 1, possible_text[1]);
-          i++;
-        }    
-  }  
+	{
+	  possible_page[ which ] = page;
+	  possible_offset[ which ] = offset;
+	  which++;
+
+	  snprintf( possible_text[0], 128, "%lu", (unsigned long)page );
+	  snprintf( possible_text[1], 128, "0x%04X", (unsigned)offset );
+
+	  lvi.iItem = i;
+	  lvi.iSubItem = 0;
+	  lvi.pszText = possible_text[0];
+	  ListView_InsertItem( hLocListView, &lvi );
+	  ListView_SetItemText( hLocListView, i, 1, possible_text[1]);
+	  i++;
+	}
+  }
 
   /* set number of possible locations */
   HWND hPossibleLocs;
@@ -137,14 +137,14 @@ menu_machine_pokefinder( int action )
 {
   if (fuse_hPFWnd == NULL)
   {
-    fuse_hPFWnd = CreateDialog( fuse_hInstance, "DLG_POKEFINDER", fuse_hWnd, 
-      (DLGPROC) PokefinderProc ); 
+    fuse_hPFWnd = CreateDialog( fuse_hInstance, "DLG_POKEFINDER", fuse_hWnd,
+      (DLGPROC) PokefinderProc );
     win32_verror( fuse_hPFWnd == NULL );
 
     /* get handle to the listview and set kind and the column names */
     HWND hLocListView;
     hLocListView = GetDlgItem( fuse_hPFWnd, IDC_PF_LIST );
-    
+
     LVCOLUMN lvc;
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
     lvc.fmt = LVCFMT_LEFT;
@@ -156,11 +156,11 @@ menu_machine_pokefinder( int action )
     ListView_InsertColumn( hLocListView, 1, &lvc );
 
     update_pokefinder();
-  }  
+  }
   else
   {
     SetActiveWindow( fuse_hPFWnd );
-  }    
+  }
 }
 
 void
@@ -181,12 +181,12 @@ void
 win32_pokefinder_search()
 {
   char buffer[256];
-    
+
   HWND hEditBox;
   hEditBox = GetDlgItem( fuse_hPFWnd, IDC_PF_EDIT );
 
   SendMessage( hEditBox, WM_GETTEXT, (WPARAM) 256, (LPARAM) buffer );
-    
+
   pokefinder_search( atoi( buffer ) );
   update_pokefinder();
 }
@@ -198,13 +198,13 @@ win32_pokefinder_reset()
   update_pokefinder();
 }
 
-void 
+void
 win32_pokefinder_close()
 {
   DestroyWindow( fuse_hPFWnd );
   fuse_hPFWnd = NULL;
 }
 
-/* TODO: implement clicking on value in the location 
-         list to set the breakpoint 
+/* TODO: implement clicking on value in the location
+	 list to set the breakpoint
 */

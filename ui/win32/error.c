@@ -43,7 +43,7 @@ ui_error_specific( ui_error_level severity, const char *message )
   HWND hWnd;
 
   fuse_emulation_pause();
-  
+
   hWnd = GetActiveWindow();
 
   switch( severity ) {

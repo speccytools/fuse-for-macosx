@@ -51,24 +51,24 @@ void win32_debugger_done_continue();
 void win32_debugger_done_step();
 void win32_debugger_break();
 
-BOOL CALLBACK DebuggerProc( HWND hWnd, UINT msg, 
-                            WPARAM wParam, LPARAM lParam ) 
+BOOL CALLBACK DebuggerProc( HWND hWnd, UINT msg,
+			    WPARAM wParam, LPARAM lParam )
 {
-  switch( msg ) 
+  switch( msg )
   {
     case WM_COMMAND:
       switch( LOWORD( wParam ) )
       {
-        case IDC_BTN_CLOSE:
-          win32_debugger_done_close();
-          return TRUE;
-        case IDC_BTN_CONT:
-          win32_debugger_done_continue();
-          return TRUE;
-        case IDC_BTN_STEP:
-          win32_debugger_done_continue();
-          return TRUE;
-      }    
+	case IDC_BTN_CLOSE:
+	  win32_debugger_done_close();
+	  return TRUE;
+	case IDC_BTN_CONT:
+	  win32_debugger_done_continue();
+	  return TRUE;
+	case IDC_BTN_STEP:
+	  win32_debugger_done_continue();
+	  return TRUE;
+      }
       return FALSE;
     case WM_CLOSE:
       win32_debugger_close();
@@ -82,15 +82,15 @@ create_dialog()
 {
   if (fuse_hDBGWnd == NULL)
   {
-    fuse_hDBGWnd = CreateDialog( fuse_hInstance, "IDG_DBG", fuse_hWnd, 
-      (DLGPROC) DebuggerProc ); 
+    fuse_hDBGWnd = CreateDialog( fuse_hInstance, "IDG_DBG", fuse_hWnd,
+      (DLGPROC) DebuggerProc );
     win32_verror( fuse_hDBGWnd == NULL );
 
     /* get handle to the listview and set kind and the column names */
 /* TODO: delete - just an example
     HWND hLocListView;
     hLocListView = GetDlgItem( fuse_hPFWnd, IDC_PF_LIST );
-    
+
     LVCOLUMN lvc;
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
     lvc.fmt = LVCFMT_LEFT;
@@ -103,15 +103,15 @@ create_dialog()
 
     update_pokefinder();
 */
-  }  
+  }
   else
   {
     SetActiveWindow( fuse_hDBGWnd );
-  }    
+  }
   return 0;
 }
 
-void 
+void
 win32_debugger_close()
 {
   DestroyWindow( fuse_hDBGWnd );
@@ -122,7 +122,7 @@ int
 ui_debugger_activate( void )
 {
   int error;
- 
+
 /* TODO: pause - probably stops the message loop
   fuse_emulation_pause();
 */
@@ -138,8 +138,8 @@ ui_debugger_activate( void )
   HWND hContButton;
   hContButton = GetDlgItem( fuse_hDBGWnd, IDC_BTN_CONT );
   EnableWindow(hContButton, TRUE);
-  
-  HWND hBreakButton;  
+
+  HWND hBreakButton;
   hBreakButton = GetDlgItem( fuse_hDBGWnd, IDC_BTN_BREAK );
   EnableWindow( hBreakButton, FALSE );
 
@@ -181,8 +181,8 @@ ui_debugger_deactivate( int interruptable )
   HWND hContButton;
   hContButton = GetDlgItem( fuse_hDBGWnd, IDC_BTN_CONT );
   EnableWindow(hContButton, !interruptable ? TRUE : FALSE );
-  
-  HWND hBreakButton;  
+
+  HWND hBreakButton;
   hBreakButton = GetDlgItem( fuse_hDBGWnd, IDC_BTN_BREAK );
   EnableWindow( hBreakButton, interruptable ? TRUE : FALSE );
 
@@ -223,12 +223,12 @@ void
 win32_debugger_break()
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
-  
+
   HWND hContButton;
   hContButton = GetDlgItem( fuse_hDBGWnd, IDC_BTN_CONT );
   EnableWindow(hContButton, TRUE);
-  
-  HWND hBreakButton;  
+
+  HWND hBreakButton;
   hBreakButton = GetDlgItem( fuse_hDBGWnd, IDC_BTN_BREAK );
   EnableWindow( hBreakButton, FALSE );
 }

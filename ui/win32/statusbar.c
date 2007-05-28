@@ -45,8 +45,8 @@ win32statusbar_create( HWND hWnd )
   icon_disk_active = LoadIcon( fuse_hInstance, "win32bmp_disk_active");
   icon_pause_inactive = LoadIcon( fuse_hInstance, "win32bmp_pause_inactive");
   icon_pause_active = LoadIcon( fuse_hInstance, "win32bmp_pause_active");
-*/    
-  fuse_hStatusWindow = CreateStatusWindow( 
+*/
+  fuse_hStatusWindow = CreateStatusWindow(
     WS_CHILD | WS_VISIBLE, "0, 0", hWnd, ID_STATUSBAR );
 
   /* divide status bar */

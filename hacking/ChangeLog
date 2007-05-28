@@ -1714,3 +1714,5 @@
 	 distribute Win32 UI icons (Stuart).
 20070528 ui/win32/win32ui.c: implement File->Exit, File->Reset, File->Save,
 	 and menu_get_filename() (Stuart).
+20070528 ui/win32/{debugger.c,error.c,pokefinder.c,statusbar.c,win32display.c,
+	 win32ui.c,win32ui.rc}: whitespace cleanups (Stuart).
