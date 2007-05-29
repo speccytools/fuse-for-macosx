@@ -246,7 +246,7 @@ void win32_verror( int is_error )
 }
 
 void
-menu_machine_debugger()
+menu_machine_debugger( int action )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
   if( paused ) ui_debugger_activate();
@@ -355,8 +355,8 @@ get_save_filename( const char *title )
   ofn.nFileOffset = 0;
   ofn.nFileExtension = 0;
   ofn.lpstrDefExt = NULL;
-  ofn.pvReserved = NULL;
-  ofn.FlagsEx = 0;
+/* ofn.pvReserved = NULL; */
+/* ofn.FlagsEx = 0; */
 
   if( !GetSaveFileName( &ofn ) ) {
     return NULL;
@@ -388,8 +388,8 @@ menu_get_filename( const char *title )
   ofn.nFileOffset = 0;
   ofn.nFileExtension = 0;
   ofn.lpstrDefExt = NULL;
-  ofn.pvReserved = NULL;
-  ofn.FlagsEx = 0;
+/* ofn.pvReserved = NULL; */
+/* ofn.FlagsEx = 0; */
 
   if( !GetOpenFileName( &ofn ) ) {
     return NULL;
@@ -477,6 +477,10 @@ void menu_file_recording_recordfromsnapshot( int action ) { STUB; }
 void menu_file_aylogging_record( int action ) { STUB; }
 void menu_file_savescreenasscr( int action ) { STUB; }
 void menu_file_savescreenaspng( int action ) { STUB; }
+void menu_file_movies_recordmovieasscr( int action ) { STUB; }
+void menu_file_movies_recordmovieaspng( int action ) { STUB; }
+void menu_file_loadbinarydata( int action ) { STUB; }
+void menu_file_savebinarydata( int action ) { STUB; }
 
 void
 menu_file_exit( int action )
@@ -492,6 +496,7 @@ void menu_options_sound( int action ) { STUB; }
 void menu_options_peripherals( int action ) { STUB; }
 void menu_options_rzx( int action ) { STUB; }
 void menu_options_joysticks_select( int action ) { STUB; }
+void menu_machine_pause( int action ) { STUB; }
 
 void
 menu_machine_reset( int action )
@@ -510,6 +515,7 @@ menu_machine_reset( int action )
 void menu_machine_select( int action ) { STUB; }
 
 void menu_machine_pokefinder( int action ) { STUB; }
+void menu_machine_memorybrowser( int action ) { STUB; }
 void menu_media_tape_browse( int action ) { STUB; }
 void menu_help_keyboard( int action ) { STUB; }
 
