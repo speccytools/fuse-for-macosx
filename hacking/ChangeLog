@@ -1725,3 +1725,4 @@
 	 win32internals.h,win32ui.c}: use winfuse.ico for Win32 UI window,
 	 disable (broken) status bar, change resource IDs to avoid clashes
 	 with menu IDs, various cleanups (Stuart).
+20070530 tape.c: use refactored call to set tape state (patch #1725974) (Fred).

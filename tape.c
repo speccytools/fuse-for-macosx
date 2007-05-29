@@ -327,7 +327,7 @@ int tape_load_trap( void )
      that, return with `error' so that we actually do whichever
      instruction it was that caused the trap to hit */
   if( libspectrum_tape_block_type( block ) != LIBSPECTRUM_TAPE_BLOCK_ROM ||
-      libspectrum_tape_block_state( block ) != LIBSPECTRUM_TAPE_STATE_PILOT ) {
+      libspectrum_tape_state( tape ) != LIBSPECTRUM_TAPE_STATE_PILOT ) {
     tape_play( 1 );
     return -1;
   }
@@ -366,7 +366,7 @@ int tape_load_trap( void )
 
   /* If the next block isn't a ROM block, set ourselves up such that the
      next thing to occur is the pause at the end of the current block */
-  libspectrum_tape_block_set_state( block, LIBSPECTRUM_TAPE_STATE_PAUSE );
+  libspectrum_tape_set_state( tape, LIBSPECTRUM_TAPE_STATE_PAUSE );
 
   return 0;
 }
