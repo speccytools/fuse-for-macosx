@@ -40,18 +40,7 @@ libuiwin32_a_SOURCES = debugger.c \
 		       win32ui.c \
 		       win32ui.rc
 
-libuiwin32_a_LIBADD = res_debugger.o \
-		      res_menu_data.o \
-		      res_pokefinder.o \
-		      res_win32ui.o
-
 BUILT_SOURCES = keysyms.c
-
-menu_data.rc: menu_data.h
-pokefinder.rc: pokefinder.h
-
-res_%.o: %.rc
-	@WINDRES@ $< $@
 
 keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl win32 ../../keysyms.dat > $@

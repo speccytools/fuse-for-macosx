@@ -29,6 +29,7 @@
 #include <windows.h>
 #include <ddraw.h>
 #include <commctrl.h>
+#include <commdlg.h>
 
 #define ID_STATUSBAR 200
 

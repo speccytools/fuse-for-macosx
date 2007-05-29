@@ -1716,3 +1716,6 @@
 	 and menu_get_filename() (Stuart).
 20070528 ui/win32/{debugger.c,error.c,pokefinder.c,statusbar.c,win32display.c,
 	 win32ui.c,win32ui.rc}: whitespace cleanups (Stuart).
+20070529 configure.in,ui/win32/{Makefile.am,win32internals.h,win32ui.rc},
+	 windres.rc: work around linker problems affecting Windows resources,
+	 and link/include commdlg (Stuart).

@@ -1,4 +1,4 @@
-/* windres.rc: Common resource file for Windows
+/* windres.rc: resources for Windows
    Copyright (c) 2007 Stuart Brady
 
    $Id$
@@ -23,4 +23,15 @@
 
 */
 
-1 ICON "winfuse.ico"
+#include "config.h"
+
+win32_icon ICON "winfuse.ico"
+
+#ifdef UI_WIN32
+
+#include "ui/win32/debugger.rc"
+#include "ui/win32/menu_data.rc"
+#include "ui/win32/pokefinder.rc"
+#include "ui/win32/win32ui.rc"
+
+#endif
