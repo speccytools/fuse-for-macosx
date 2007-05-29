@@ -1726,3 +1726,4 @@
 	 disable (broken) status bar, change resource IDs to avoid clashes
 	 with menu IDs, various cleanups (Stuart).
 20070530 tape.c: use refactored call to set tape state (patch #1725974) (Fred).
+20070530 profile.c: remove a couple of warnings (Fred).
