@@ -31,7 +31,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 
-#define ID_STATUSBAR 200
+#define ID_STATUSBAR 900
 
 /* window handler */
 HWND fuse_hWnd;

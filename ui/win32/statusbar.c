@@ -38,6 +38,8 @@ HICON
 void
 win32statusbar_create( HWND hWnd )
 {
+#if 0
+
 /*
   icon_tape_inactive = LoadIcon( fuse_hInstance, "win32bmp_tape_active");
   icon_tape_active = LoadIcon( fuse_hInstance, "win32bmp_tape_active");
@@ -63,6 +65,8 @@ win32statusbar_create( HWND hWnd )
 /*
 http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&safe=off&th=76b04b36db7eaa16&rnum=1
 */
+
+#endif
 }
 
 /*
@@ -82,11 +86,15 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 int
 ui_statusbar_update_speed( float speed )
 {
+#if 0
+
   char buffer[8];
 
   snprintf( buffer, 8, "%3.0f%%", speed );
   SendMessage( fuse_hStatusWindow, SB_SETTEXT, (WPARAM) 2,
     (LPARAM) buffer);
+
+#endif
 
   return 0;
 }

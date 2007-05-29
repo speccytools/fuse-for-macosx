@@ -36,11 +36,11 @@
 #define IDC_BTN_BREAK 1010
 #define IDC_BTN_CLOSE 1011
 
-#define IDM_MENU 400
-#define IDM_DB_VIEW 401
-#define IDM_DB_REG 402
-#define IDM_DB_MEMMAP 403
-#define IDM_DB_BPS 404
-#define IDM_DB_DIS 405
-#define IDM_DB_STACK 406
-#define IDM_DB_EVENTS 407
+#define IDM_DB_MENU 1100
+#define IDM_DB_VIEW 1101
+#define IDM_DB_REG 1102
+#define IDM_DB_MEMMAP 1103
+#define IDM_DB_BPS 1104
+#define IDM_DB_DIS 1105
+#define IDM_DB_STACK 1106
+#define IDM_DB_EVENTS 1107

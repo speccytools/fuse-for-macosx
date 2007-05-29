@@ -146,7 +146,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
     wc.lpfnWndProc = MainWndProc;
     wc.style = CS_OWNDC;
     wc.hInstance = hInstance;
-    wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+    wc.hIcon = LoadIcon( hInstance, "win32_icon" );
     wc.hCursor = LoadCursor( NULL, IDC_ARROW );
     wc.hbrBackground = (HBRUSH)( COLOR_WINDOW+1 );
     wc.lpszMenuName = "win32_menu";
@@ -191,21 +191,21 @@ ui_init( int *argc, char ***argv )
 
   return 0;
 }
-	
+
 int
 ui_event( void )
 {
   MSG msg;
   /* Process messages */
-  while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
+  while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
   {
 /* TODO: double check this && */
-    if( !IsDialogMessage( fuse_hPFWnd, &msg)
-     && !IsDialogMessage( fuse_hDBGWnd, &msg) )
+    if( !IsDialogMessage( fuse_hPFWnd, &msg )
+     && !IsDialogMessage( fuse_hDBGWnd, &msg ) )
     {
       if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) )
       {
-	if( msg.message==WM_QUIT ) break;
+	if( msg.message == WM_QUIT ) break;
 	/* finish - set exit flag somewhere */
 	TranslateMessage( &msg );
 	DispatchMessage( &msg );
@@ -216,19 +216,19 @@ ui_event( void )
   return 0;
   /* finish - somwhere there should be return msg.wParam */
 }
-		
+
 int
 ui_end( void )
 {
-    int error;
+  int error;
 
-    if ( lpdds ) IDirectDrawSurface_Release( lpdds );
-    if ( lpdds2 ) IDirectDrawSurface_Release( lpdds2 );
-    if ( lpddc ) IDirectDrawSurface_Release( lpddc );
-    if ( lpdd ) IDirectDraw_Release( lpdd );
+  if ( lpdds ) IDirectDrawSurface_Release( lpdds );
+  if ( lpdds2 ) IDirectDrawSurface_Release( lpdds2 );
+  if ( lpddc ) IDirectDrawSurface_Release( lpddc );
+  if ( lpdd ) IDirectDraw_Release( lpdd );
 
-    error = win32display_end(); if ( error ) return error;
-    return 0;
+  error = win32display_end(); if ( error ) return error;
+  return 0;
 }
 
 void win32_verror( int is_error )

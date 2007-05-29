@@ -89,7 +89,6 @@ libspectrum_dword bw_colours[16];
 int win32display_current_size=1;
 
 int init_colours( void );
-int win32display_init( void );
 int uidisplay_init( int width, int height );
 int win32display_configure_notify( int width );
 int register_scalers( void );
@@ -97,7 +96,6 @@ void uidisplay_frame_end( void );
 void uidisplay_area( int x, int y, int width, int height );
 void win32display_area(int x, int y, int width, int height);
 int uidisplay_end( void );
-int win32display_end( void );
 
 int
 win32display_init( void )
@@ -170,11 +168,11 @@ uidisplay_init( int width, int height )
   GetClientRect( fuse_hWnd, &rect );
   rect.right = rect.left + width;
 /* TODO: get statusbar height somehow */
-  rect.bottom = rect.top + height + 40;
+  rect.bottom = rect.top + height;
   GetWindowRect( fuse_hWnd, &rect2 );
   AdjustWindowRect( &rect,
-    WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,
-    FALSE );
+    WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,
+    TRUE );
   MoveWindow( fuse_hWnd, rect2.left, rect2.top,
     rect.right - rect.left, rect.bottom - rect.top, TRUE );
 

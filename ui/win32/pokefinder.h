@@ -23,13 +23,12 @@
 
 */
 
-#define IDC_PF_SEARCH_FOR 200
-#define IDC_PF_EDIT 201
-#define IDC_PF_LOCATIONS 202
-#define IDC_PF_LIST 203
-#define IDC_PF_INC 204
-#define IDC_PF_DEC 205
-#define IDC_PF_SEARCH 206
-#define IDC_PF_RESET 207
-#define IDC_PF_CLOSE 208
-
+#define IDC_PF_SEARCH_FOR 2000
+#define IDC_PF_EDIT 2001
+#define IDC_PF_LOCATIONS 2002
+#define IDC_PF_LIST 2003
+#define IDC_PF_INC 2004
+#define IDC_PF_DEC 2005
+#define IDC_PF_SEARCH 2006
+#define IDC_PF_RESET 2007
+#define IDC_PF_CLOSE 2008

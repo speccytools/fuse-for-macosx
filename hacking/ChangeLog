@@ -1721,3 +1721,7 @@
 	 and link/include commdlg (Stuart).
 20070529 ui/win32/{menu_data.{c,h,rc},win32ui.c}: update Win32 menus, and fix
 	 compilation of load/save dialogs (Stuart).
+20070529 ui/win32/{debugger.h,pokefinder.h,statusbar.c,win32display.c,
+	 win32internals.h,win32ui.c}: use winfuse.ico for Win32 UI window,
+	 disable (broken) status bar, change resource IDs to avoid clashes
+	 with menu IDs, various cleanups (Stuart).
