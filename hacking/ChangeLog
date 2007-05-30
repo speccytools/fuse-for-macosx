@@ -1727,3 +1727,4 @@
 	 with menu IDs, various cleanups (Stuart).
 20070530 tape.c: use refactored call to set tape state (patch #1725974) (Fred).
 20070530 profile.c: remove a couple of warnings (Fred).
+20070530 menu_data.pl: add code to generate menu data for Win32 UI (Stuart).
