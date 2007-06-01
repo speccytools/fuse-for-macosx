@@ -123,6 +123,8 @@ Media/Tape/_Browse..., Item
 Media/Tape/_Rewind, Item
 Media/Tape/_Clear, Item
 Media/Tape/_Write..., Item, F6
+Media/Tape/R_ecord Start, Item
+Media/Tape/Recor_d Stop, Item
 
 Media/_Interface I, Branch
 

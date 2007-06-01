@@ -179,6 +179,10 @@ int event_do_events(void)
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );
       break;
 
+    case EVENT_TYPE_TAPE_RECORD:
+      tape_event_record_sample( ptr->tstates );
+      break;
+
     default:
       ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );
       break;
@@ -297,6 +301,7 @@ event_name( event_type type )
   case EVENT_TYPE_TRDOS_INDEX: return "TR-DOS index";
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
   case EVENT_TYPE_TIMER: return "Timer";
+  case EVENT_TYPE_TAPE_RECORD: return "Tape sample record";
 
   }
 

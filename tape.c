@@ -45,6 +45,7 @@
 #include "tape.h"
 #include "timer.h"
 #include "trdos.h"
+#include "ula.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "z80/z80.h"
@@ -477,7 +478,7 @@ int tape_save_trap( void )
   int i; libspectrum_error error;
 
   /* Do nothing if tape traps aren't active */
-  if( !settings_current.tape_traps ) return 2;
+  if( !settings_current.tape_traps || tape_recording ) return 2;
 
   /* Check we're in the right ROM */
   if( ! trap_check_rom() ) return 3;
@@ -652,6 +653,148 @@ int
 tape_is_playing( void )
 {
   return tape_playing;
+}
+
+typedef struct
+{
+  libspectrum_byte *tape_buffer;
+  libspectrum_dword tape_buffer_size;
+  libspectrum_dword tape_buffer_used;
+  int tstates_per_sample;
+  int last_level;
+  int last_level_count;
+} tape_rec_state;
+
+int tape_recording = 0;
+
+static tape_rec_state rec_state;
+
+int
+tape_record_start( void )
+{
+  int error;
+
+  /* sample rate will be 44.1KHz */
+  rec_state.tstates_per_sample =
+    machine_current->timings.processor_speed/44100;
+
+  rec_state.tape_buffer_size = 8192;
+  rec_state.tape_buffer = malloc(rec_state.tape_buffer_size);
+  rec_state.tape_buffer_used = 0;
+
+  /* start scheduling events that record into a buffer that we
+     start allocating here */
+  error = event_add( tstates + rec_state.tstates_per_sample,
+                     EVENT_TYPE_TAPE_RECORD );
+  if( error ) return error;
+
+  rec_state.last_level = ula_tape_level();
+  rec_state.last_level_count = 1;
+
+  tape_recording = 1;
+
+  /* Also want to disable other tape actions */
+  ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 1 );
+
+  return 0;
+}
+
+static int
+write_rec_buffer( libspectrum_byte *tape_buffer,
+                  libspectrum_dword tape_buffer_used,
+                  int last_level_count )
+{
+  if( last_level_count <= 0xff ) {
+    tape_buffer[ tape_buffer_used++ ] = last_level_count;
+  } else {
+    tape_buffer[ tape_buffer_used++ ] = 0;
+    tape_buffer[ tape_buffer_used++ ] = ( last_level_count & 0x000000ff )      ;
+    tape_buffer[ tape_buffer_used++ ] = ( last_level_count & 0x0000ff00 ) >>  8;
+    tape_buffer[ tape_buffer_used++ ] = ( last_level_count & 0x00ff0000 ) >> 16;
+    tape_buffer[ tape_buffer_used++ ] = ( last_level_count & 0xff000000 ) >> 24;
+  }
+
+  return tape_buffer_used;
+}
+
+void
+tape_event_record_sample( libspectrum_dword last_tstates )
+{
+  int error;
+
+  if( rec_state.last_level != (ula_tape_level()) ) {
+    /* put a sample into the recording buffer */
+    rec_state.tape_buffer_used =
+      write_rec_buffer( rec_state.tape_buffer,
+                        rec_state.tape_buffer_used,
+                        rec_state.last_level_count );
+
+    rec_state.last_level_count = 0;
+    rec_state.last_level = ula_tape_level();
+    /* make sure we can still fit a dword and a flag byte in the buffer */
+    if( rec_state.tape_buffer_used+5 >= rec_state.tape_buffer_size ) {
+      rec_state.tape_buffer_size = rec_state.tape_buffer_size*2;
+      rec_state.tape_buffer = realloc( rec_state.tape_buffer,
+                                       rec_state.tape_buffer_size );
+    }
+  }
+
+  rec_state.last_level_count++;
+
+  /* schedule next timer */
+  error = event_add( last_tstates + rec_state.tstates_per_sample,
+                     EVENT_TYPE_TAPE_RECORD );
+  if( error ) {
+    ui_error( UI_ERROR_ERROR,
+              "tape_event_record_sample: error scheduling next event" );
+  }
+}
+
+int
+tape_record_stop( void )
+{
+  libspectrum_tape_block* block;
+  int error;
+
+  /* put last sample into the recording buffer */
+  rec_state.tape_buffer_used = write_rec_buffer( rec_state.tape_buffer,
+                                                 rec_state.tape_buffer_used,
+                                                 rec_state.last_level_count );
+
+  /* stop scheduling events and turn buffer into a block and
+     pop into the current tape */
+  error = event_remove_type( EVENT_TYPE_TAPE_RECORD );
+  if( error ) return error;
+
+  error = libspectrum_tape_block_alloc( &block,
+                                        LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE );
+  if( error ) return error;
+
+  libspectrum_tape_block_set_scale( block, rec_state.tstates_per_sample );
+  libspectrum_tape_block_set_data_length( block, rec_state.tape_buffer_used );
+  libspectrum_tape_block_set_data( block, rec_state.tape_buffer );
+
+  /* Finally, put the block into the block list */
+  error = libspectrum_tape_append_block( tape, block );
+  if( error ) {
+    free( rec_state.tape_buffer );
+    libspectrum_tape_block_free( block );
+    return error;
+  }
+
+  rec_state.tape_buffer = NULL;
+  rec_state.tape_buffer_size = 0;
+  rec_state.tape_buffer_used = 0;
+
+  tape_modified = 1;
+  ui_tape_browser_update( UI_TAPE_BROWSER_NEW_BLOCK, block );
+
+  tape_recording = 0;
+
+  /* Also want to reenable other tape actions */
+  ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 0 );
+
+  return 0;
 }
 
 int

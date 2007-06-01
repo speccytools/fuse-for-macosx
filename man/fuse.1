@@ -1208,6 +1208,10 @@ manually, by pressing
 .I F8
 or choosing the
 .I "Media, Tape, Play"
+menu item. Fuse also uses tape traps to intercept the tape-saving
+routine in the ROM to save tape files quickly, tapes can also be saved
+using the
+.I "Media, Tape, Record Start"
 menu item.
 .RE
 .PP
@@ -1910,6 +1914,22 @@ followed by anything you've saved from the emulated machine since.
 These newly-saved files are
 .I not
 written to any tape file until you choose this option!
+.RE
+.PP
+.I "Media, Tape, Record Start"
+.RS
+Starts directly recording the output from the emulated Spectrum to the
+current virtual-tape. This is useful when you want to record using a
+non-standard ROM or from a custom save routine. Most tape operations
+are disabled during recording. Stop recording with the
+.I "Media, Tape, Write..."
+menu option.
+.RE
+.PP
+.I "Media, Tape, Record Stop"
+.RS
+Stops the direct recording and places the new recording into the
+virtual-tape.
 .RE
 .PP
 .I "Media, Interface I"

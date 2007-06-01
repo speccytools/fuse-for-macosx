@@ -54,6 +54,10 @@ int tape_next_edge( libspectrum_dword last_tstates );
 int tape_stop( void );
 int tape_is_playing( void );
 
+int tape_record_start( void );
+void tape_event_record_sample( libspectrum_dword last_tstates );
+int tape_record_stop( void );
+
 /* Call a user-supplied function for every block in the current tape */
 int
 tape_foreach( void (*function)( libspectrum_tape_block *block,
@@ -67,5 +71,6 @@ int tape_block_details( char *buffer, size_t length,
 
 extern int tape_microphone;
 extern int tape_modified;
+extern int tape_recording;
 
 #endif

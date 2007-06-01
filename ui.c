@@ -181,6 +181,9 @@ struct menu_item_entries {
   const char *string2; int string2_inverted;
   const char *string3; int string3_inverted;
   const char *string4; int string4_inverted;
+  const char *string5; int string5_inverted;
+  const char *string6; int string6_inverted;
+  const char *string7; int string7_inverted;
 };
 
 static const struct menu_item_entries menu_item_lookup[] = {
@@ -357,7 +360,17 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/File/AY Logging/Stop",
     "/File/AY Logging/Record...", 1, },
 
-  { UI_MENU_ITEM_AY_LOGGING, NULL },	/* End marker */
+  { UI_MENU_ITEM_TAPE_RECORDING,
+    "/Media/Tape/Record Stop",
+    "/Media/Tape/Record Start", 1,
+    "/Media/Tape/Open...", 1,
+    "/Media/Tape/Play", 1,
+    "/Media/Tape/Rewind", 1,
+    "/Media/Tape/Clear", 1,
+    "/Media/Tape/Write...", 1 },
+  
+  { UI_MENU_ITEM_TAPE_RECORDING, NULL },	/* End marker */
+
 };
 
 int
@@ -378,6 +391,15 @@ ui_menu_activate( ui_menu_item item, int active )
       if( ptr->string4 )
 	ui_menu_item_set_active( ptr->string4,
 				 ptr->string4_inverted ? !active : active );
+      if( ptr->string5 )
+	ui_menu_item_set_active( ptr->string5,
+				 ptr->string5_inverted ? !active : active );
+      if( ptr->string6 )
+	ui_menu_item_set_active( ptr->string6,
+				 ptr->string6_inverted ? !active : active );
+      if( ptr->string7 )
+	ui_menu_item_set_active( ptr->string7,
+				 ptr->string7_inverted ? !active : active );
       return 0;
     }
 

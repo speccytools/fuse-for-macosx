@@ -75,6 +75,8 @@ MENU_CALLBACK( menu_media_tape_play );
 MENU_CALLBACK( menu_media_tape_rewind );
 MENU_CALLBACK( menu_media_tape_clear );
 MENU_CALLBACK( menu_media_tape_write );
+MENU_CALLBACK( menu_media_tape_recordstart );
+MENU_CALLBACK( menu_media_tape_recordstop );
 
 MENU_CALLBACK_WITH_ACTION( menu_media_mdr_new );
 MENU_CALLBACK_WITH_ACTION( menu_media_mdr_insert );

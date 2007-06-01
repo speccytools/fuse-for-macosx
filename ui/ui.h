@@ -170,6 +170,7 @@ typedef enum ui_menu_item {
   UI_MENU_ITEM_RECORDING,
   UI_MENU_ITEM_RECORDING_ROLLBACK,
   UI_MENU_ITEM_AY_LOGGING,
+  UI_MENU_ITEM_TAPE_RECORDING,
 
 } ui_menu_item;
 

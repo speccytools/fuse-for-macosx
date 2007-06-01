@@ -34,6 +34,8 @@ void ula_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte ula_last_byte( void );
 
+libspectrum_byte ula_tape_level( void );
+
 int ula_from_snapshot( libspectrum_snap *snap );
 int ula_to_snapshot( libspectrum_snap *snap );
 

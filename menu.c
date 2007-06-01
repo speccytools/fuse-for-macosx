@@ -308,6 +308,18 @@ MENU_CALLBACK( menu_media_tape_write )
   ui_tape_write();
 }
 
+MENU_CALLBACK( menu_media_tape_recordstart )
+{
+  WIDGET_END;
+  tape_record_start();
+}
+
+MENU_CALLBACK( menu_media_tape_recordstop )
+{
+  WIDGET_END;
+  tape_record_stop();
+}
+
 MENU_CALLBACK_WITH_ACTION( menu_media_mdr_new )
 {
   WIDGET_END;

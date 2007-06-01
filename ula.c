@@ -77,6 +77,12 @@ ula_last_byte( void )
   return last_byte;
 }
 
+libspectrum_byte
+ula_tape_level( void )
+{
+  return last_byte & 0x8;
+}
+
 int
 ula_from_snapshot( libspectrum_snap *snap )
 {

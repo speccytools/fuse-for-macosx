@@ -243,6 +243,7 @@ static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
   ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
+  ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 0 );
 
   return FALSE;
 }

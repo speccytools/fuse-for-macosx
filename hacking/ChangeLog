@@ -1728,3 +1728,6 @@
 20070530 tape.c: use refactored call to set tape state (patch #1725974) (Fred).
 20070530 profile.c: remove a couple of warnings (Fred).
 20070530 menu_data.pl: add code to generate menu data for Win32 UI (Stuart).
+20070601 event.h,tape.[ch],widget/widget.c,ui.c,ula.[ch],ui/ui.h,
+         ui/gtk/gtkui.c: add support for recording into a RLE raw sample block
+         (feature request #1691821) (Fred).
