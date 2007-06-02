@@ -1,5 +1,5 @@
 /* win32display.c: Routines for dealing with the Win32 DirectDraw display
-   Copyright (c) 2003 Philip Kendall, Marek Januszewski
+   Copyright (c) 2003 Philip Kendall, Marek Januszewski, Stuart Brady
 
    $Id$
 
@@ -29,7 +29,9 @@
 
 #include "display.h"
 #include "machine.h"
+#include "settings.h"
 #include "ui/ui.h"
+#include "ui/uidisplay.h"
 #include "ui/scaler/scaler.h"
 #include "win32keyboard.h"
 #include "win32display.h"
@@ -41,6 +43,8 @@ int image_scale;
 
 /* The height and width of a 1x1 image in pixels */
 int image_width, image_height;
+
+int fuse_nCmdShow;
 
 /* A copy of every pixel on the screen, replaceable by plotting directly into
    rgb_image below */
@@ -56,12 +60,17 @@ char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
 
 const int rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
+BITMAPINFO fuse_BMI;
+HBITMAP fuse_BMP;
+
 /* The scaled image */
 char scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
 			    (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
 const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 
-const char rgb_colours[16][3] = {
+void *win32_pixdata;
+
+const unsigned char rgb_colours[16][3] = {
 
   {   0,   0,   0 },
   {   0,   0, 192 },
@@ -89,13 +98,37 @@ libspectrum_dword bw_colours[16];
 int win32display_current_size=1;
 
 int init_colours( void );
-int uidisplay_init( int width, int height );
-int win32display_configure_notify( int width );
 int register_scalers( void );
-void uidisplay_frame_end( void );
-void uidisplay_area( int x, int y, int width, int height );
+int register_scalers_noresize( void );
 void win32display_area(int x, int y, int width, int height);
-int uidisplay_end( void );
+
+void
+blit( void )
+{
+  if( display_ui_initialised ) {
+    HDC dest_dc, src_dc;
+    RECT dest_rec;
+    HBITMAP src_bmp;
+
+    dest_dc = GetDC( fuse_hWnd );
+    GetClientRect( fuse_hWnd, &dest_rec );
+
+    src_dc = CreateCompatibleDC(0);
+    src_bmp = SelectObject( src_dc, fuse_BMP );
+    BitBlt( dest_dc, 0, 0, image_width * win32display_current_size,
+	    image_height * win32display_current_size, src_dc, 0, 0, SRCCOPY );
+    SelectObject( src_dc, src_bmp );
+    DeleteObject( src_bmp );
+    DeleteDC( src_dc );
+    ReleaseDC( fuse_hWnd, dest_dc );
+
+/* If BitBlt isn't available:
+  SetDIBitsToDevice( dc, 0, 0, dest_rec.right, dest_rec.bottom, 0, 0, 0,
+		       image_height + 100, win32_pixdata, &fuse_BMI,
+		       DIB_RGB_COLORS );
+*/
+  }
+}
 
 int
 win32display_init( void )
@@ -105,14 +138,38 @@ win32display_init( void )
 
   error = init_colours(); if( error ) return error;
 
-/* TODO: implement settings
   black = settings_current.bw_tv ? bw_colours[0] : win32display_colours[0];
-*/
-  black = win32display_colours[0];
 
   for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
     for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
       *(libspectrum_dword*)( rgb_image + y * rgb_pitch + 4 * x ) = black;
+
+  /* create the back buffer */
+
+  memset( &fuse_BMI, 0, sizeof( fuse_BMI ) );
+  fuse_BMI.bmiHeader.biSize = sizeof( fuse_BMI.bmiHeader );
+  fuse_BMI.bmiHeader.biWidth = (size_t)( 1.5 * DISPLAY_SCREEN_WIDTH );
+  /* negative to avoid "shep-mode": */
+  fuse_BMI.bmiHeader.biHeight = -( 3 * DISPLAY_SCREEN_HEIGHT );
+  fuse_BMI.bmiHeader.biPlanes = 1;
+  fuse_BMI.bmiHeader.biBitCount = 32;
+  fuse_BMI.bmiHeader.biCompression = BI_RGB;
+  fuse_BMI.bmiHeader.biSizeImage = 0;
+  fuse_BMI.bmiHeader.biXPelsPerMeter = 0;
+  fuse_BMI.bmiHeader.biYPelsPerMeter = 0;
+  fuse_BMI.bmiHeader.biClrUsed = 0;
+  fuse_BMI.bmiHeader.biClrImportant = 0;
+  fuse_BMI.bmiColors[0].rgbRed = 0;
+  fuse_BMI.bmiColors[0].rgbGreen = 0;
+  fuse_BMI.bmiColors[0].rgbBlue = 0;
+  fuse_BMI.bmiColors[0].rgbReserved = 0;
+
+  HDC dc = GetDC( fuse_hWnd );
+
+  fuse_BMP = CreateDIBSection( dc, &fuse_BMI, DIB_RGB_COLORS, &win32_pixdata,
+			       NULL, 0 );
+
+  ReleaseDC( fuse_hWnd, dc );
 
   display_ui_initialised = 1;
 
@@ -126,7 +183,7 @@ init_colours( void )
 
   for( i = 0; i < 16; i++ ) {
 
-    char red, green, blue, grey;
+    unsigned char red, green, blue, grey;
 
     red   = rgb_colours[i][0];
     green = rgb_colours[i][1];
@@ -152,109 +209,58 @@ init_colours( void )
   return 0;
 }
 
+void
+win32display_setsize()
+{
+  RECT rect, wrect, srect;
+  int statusbar_height;
+  int width = image_width;
+  int height = image_height;
+  float scale = (float)win32display_current_size / image_scale;
+
+  width *= scale;
+  height *= scale;
+
+/*
+  GetClientRect( fuse_hStatusWindow, &srect );
+  statusbar_height = srect.bottom - srect.top;
+*/
+  statusbar_height = 0;
+
+  GetWindowRect( fuse_hWnd, &wrect );
+  GetClientRect( fuse_hWnd, &rect );
+  rect.right = rect.left + width;
+  rect.bottom = rect.top + height + statusbar_height;
+
+  AdjustWindowRect( &rect,
+    WS_CAPTION|WS_SYSMENU|WS_THICKFRAME|WS_MINIMIZEBOX,
+    TRUE );
+  /* 'rect' now holds the size of the window */
+  MoveWindow( fuse_hWnd, wrect.left, wrect.top,
+    rect.right - rect.left, rect.bottom - rect.top, TRUE );
+}
+
 int
 uidisplay_init( int width, int height )
 {
-  int error;
-
   image_width = width; image_height = height;
   image_scale = width / DISPLAY_ASPECT_WIDTH;
 
-//
-  HRESULT ddres;
-  RECT rect, rect2;
-
   /* resize */
-  GetClientRect( fuse_hWnd, &rect );
-  rect.right = rect.left + width;
-/* TODO: get statusbar height somehow */
-  rect.bottom = rect.top + height;
-  GetWindowRect( fuse_hWnd, &rect2 );
-  AdjustWindowRect( &rect,
-    WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,
-    TRUE );
-  MoveWindow( fuse_hWnd, rect2.left, rect2.top,
-    rect.right - rect.left, rect.bottom - rect.top, TRUE );
 
-  /* dd init */
-  ddres = DirectDrawCreate(NULL, &lpdd, NULL);
-  DD_ERROR( "error initializing" )
+  register_scalers();
 
-  /* set cooperative level to normal */
-  ddres = IDirectDraw_SetCooperativeLevel( lpdd, fuse_hWnd, DDSCL_NORMAL );
-  DD_ERROR( "error setting cooperative level" )
+  win32display_current_size = image_scale;
+  win32display_setsize();
 
-  /* fill surface description */
-  memset( &ddsd, 0, sizeof( ddsd ) );
-  ddsd.dwSize = sizeof( ddsd );
-  ddsd.dwFlags = DDSD_CAPS;
-  ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-
-  /* attempt to create primary surface */
-  ddres = IDirectDraw_CreateSurface( lpdd, &ddsd, &lpdds, NULL );
-  DD_ERROR( "error creating primary surface" )
-
-  /* fill off screen surface description based on window size*/
-  GetClientRect( fuse_hWnd, &rect);
-  memset( &ddsd, 0, sizeof( ddsd ) );
-  ddsd.dwSize = sizeof( ddsd );
-  ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-  ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-  ddsd.dwWidth = rect.right - rect.left;
-  ddsd.dwHeight = rect.bottom - rect.top;
-
-  /* attempt to create off screen surface */
-  ddres = IDirectDraw_CreateSurface( lpdd, &ddsd, &lpdds2, NULL );
-  DD_ERROR( "error creating off-screen surface" )
-
-  /* create the clipper */
-  ddres = IDirectDraw_CreateClipper( lpdd, 0, &lpddc, NULL );
-  DD_ERROR( "error creating clipper" )
-
-  /* set the window */
-  ddres = IDirectDrawClipper_SetHWnd( lpddc, 0, fuse_hWnd );
-  DD_ERROR( "error setting window for the clipper" )
-
-  /* set clipper for the primary surface */
-/*
-  moved to WM_PAINT
-  ddres = IDirectDrawSurface_SetClipper( lpdds, lpddc );
-  DD_ERROR( "error setting clipper for primary surface" )
-*/
-
-//
-  error = register_scalers(); if( error ) return error;
+  ShowWindow( fuse_hWnd, fuse_nCmdShow );
 
   display_refresh_all();
-  return 0;
-}
-
-int gtkdisplay_configure_notify( int width )
-{
-  int size, error;
-
-  size = width / DISPLAY_ASPECT_WIDTH;
-
-  /* If we're the same size as before, nothing special needed */
-  if( size == win32display_current_size ) return 0;
-
-  /* Else set ourselves to the new height */
-  win32display_current_size=size;
-/* TODO: change the area size
-  gtk_drawing_area_size( GTK_DRAWING_AREA(gtkui_drawing_area),
-			 size * DISPLAY_ASPECT_WIDTH,
-			 size * DISPLAY_SCREEN_HEIGHT );
-*/
-  error = register_scalers(); if( error ) return error;
-
-  /* Redraw the entire screen... */
-  display_refresh_all();
-
   return 0;
 }
 
 int
-register_scalers( void )
+register_scalers_noresize( void )
 {
   scaler_register_clear();
 
@@ -265,6 +271,7 @@ register_scalers( void )
     switch( image_scale ) {
     case 1:
       scaler_register( SCALER_NORMAL );
+      scaler_register( SCALER_PALTV );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_NORMAL );
       return 0;
@@ -287,12 +294,14 @@ register_scalers( void )
       scaler_register( SCALER_SUPER2XSAI );
       scaler_register( SCALER_SUPEREAGLE );
       scaler_register( SCALER_DOTMATRIX );
+      scaler_register( SCALER_PALTV2X );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_DOUBLESIZE );
       return 0;
     case 2:
       scaler_register( SCALER_NORMAL );
       scaler_register( SCALER_TIMEXTV );
+      scaler_register( SCALER_PALTV );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_NORMAL );
       return 0;
@@ -303,7 +312,9 @@ register_scalers( void )
     switch( image_scale ) {
     case 1:
       scaler_register( SCALER_TRIPLESIZE );
+      scaler_register( SCALER_TV3X );
       scaler_register( SCALER_ADVMAME3X );
+      scaler_register( SCALER_PALTV3X );
       if( !scaler_is_supported( current_scaler ) )
 	scaler_select_scaler( SCALER_TRIPLESIZE );
       return 0;
@@ -319,6 +330,41 @@ register_scalers( void )
   ui_error( UI_ERROR_ERROR, "Unknown display size/image size %d/%d",
 	    win32display_current_size, image_scale );
   return 1;
+}
+
+static int
+register_scalers( void )
+{
+  scaler_register_clear();
+
+  scaler_register( SCALER_NORMAL );
+  scaler_register( SCALER_DOUBLESIZE );
+  scaler_register( SCALER_TRIPLESIZE );
+  scaler_register( SCALER_2XSAI );
+  scaler_register( SCALER_SUPER2XSAI );
+  scaler_register( SCALER_SUPEREAGLE );
+  scaler_register( SCALER_ADVMAME2X );
+  scaler_register( SCALER_ADVMAME3X );
+  scaler_register( SCALER_DOTMATRIX );
+  scaler_register( SCALER_PALTV );
+  if( machine_current->timex ) {
+    scaler_register( SCALER_HALF );
+    scaler_register( SCALER_HALFSKIP );
+    scaler_register( SCALER_TIMEXTV );
+    scaler_register( SCALER_TIMEX1_5X );
+  } else {
+    scaler_register( SCALER_TV2X );
+    scaler_register( SCALER_TV3X );
+    scaler_register( SCALER_PALTV2X );
+    scaler_register( SCALER_PALTV3X );
+  }
+
+  if( scaler_is_supported( current_scaler ) ) {
+    scaler_select_scaler( current_scaler );
+  } else {
+    scaler_select_scaler( SCALER_NORMAL );
+  }
+  return 0;
 }
 
 void
@@ -341,10 +387,7 @@ uidisplay_area( int x, int y, int w, int h )
 
   scaled_x = scale * x; scaled_y = scale * y;
 
-/* TODO: implement settings
   palette = settings_current.bw_tv ? bw_colours : win32display_colours;
-*/
-  palette = win32display_colours;
 
   /* Create the RGB image */
   for( yy = y; yy < y + h; yy++ ) {
@@ -371,75 +414,25 @@ uidisplay_area( int x, int y, int w, int h )
   win32display_area( scaled_x, scaled_y, w, h );
 }
 
-unsigned int colour_pal[] = {
-    0,0,0,
-    0,0,192,
-    192,0,0,
-    192,0,192,
-    0,192,0,
-    0,192,192,
-    192,192,0,
-    192,192,192,
-    0,0,0,
-    0,0,255,
-    255,0,0,
-    255,0,255,
-    0,255,0,
-    0,255,255,
-    255,255,0,
-    255,255,255
-};
-
-void win32display_area(int x, int y, int width, int height)
+void
+win32display_area(int x, int y, int width, int height)
 {
   int disp_x,disp_y;
-  DWORD pix_colour;
+  long ofs;
+  char *pixdata = win32_pixdata;
 
-  HDC dc;
-
-  IDirectDrawSurface_GetDC( lpdds2, &dc );
-
-  for(disp_x=x;disp_x < x+width;disp_x++)
+  for( disp_y = y; disp_y < y + height; disp_y++)
   {
-    for(disp_y=y;disp_y < y+height;disp_y++)
+    for( disp_x = x; disp_x < x + width; disp_x++)
     {
-      pix_colour =
-	colour_pal[3*win32display_image[disp_y][disp_x]] +
-	colour_pal[(1+(3*win32display_image[disp_y][disp_x]))] * 256 +
-	colour_pal[(2+(3*win32display_image[disp_y][disp_x]))] * 256 * 256;
-      SetPixel( dc, disp_x, disp_y, pix_colour);
+      ofs = ( 4 * disp_x ) + ( disp_y * scaled_pitch );
+
+      pixdata[ ofs + 0 ] = scaled_image[ ofs + 2 ]; /* blue */
+      pixdata[ ofs + 1 ] = scaled_image[ ofs + 1 ]; /* green */
+      pixdata[ ofs + 2 ] = scaled_image[ ofs + 0 ]; /* red */
+      pixdata[ ofs + 3 ] = 0; /* unused */
     }
   }
-
-  IDirectDrawSurface_ReleaseDC( lpdds2, dc );
- return;
-/*
-  int disp_x,disp_y;
-  libspectrum_dword pix_colour;
-  char *buf = &scaled_image[ y * scaled_pitch + 4 * x ];
-
-  HDC dc;
-
-  /* get DC of off-screen buffer */
-/*
- IDirectDrawSurface_GetDC( lpdds2, &dc );
-
-  for(disp_x=x;disp_x < x+width;disp_x++)
-  {
-    for(disp_y=y;disp_y < y+height;disp_y++)
-    {
-      pix_colour =
-	buf[ disp_y * scaled_pitch + disp_x * 4 + 0] +
-	buf[ disp_y * scaled_pitch + disp_x * 4 + 1] * 255 +
-	buf[ disp_y * scaled_pitch + disp_x * 4 + 1] * 255 * 255;
-      SetPixel( dc, disp_x, disp_y, pix_colour);
-    }
-  }
-
-  IDirectDrawSurface_ReleaseDC( lpdds2, dc );
-  return;
-*/
-
 }
 
 int
@@ -448,6 +441,9 @@ uidisplay_hotswap_gfx_mode( void )
 /* TODO: pause hangs emulator
   fuse_emulation_pause();
 */
+  win32display_current_size = scaler_get_scaling_factor( current_scaler ) * image_scale;
+  win32display_setsize();
+
   /* Redraw the entire screen... */
   display_refresh_all();
 /* TODO: pause hangs emulator

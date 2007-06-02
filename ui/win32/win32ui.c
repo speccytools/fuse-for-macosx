@@ -45,8 +45,6 @@ int paused = 0;
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
-void blit( void );
-
 int
 win32ui_confirm( const char *string )
 {
@@ -101,13 +99,11 @@ LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       if ( display_ui_initialised )
       {
 	PAINTSTRUCT ps;
-	IDirectDrawSurface_SetClipper( lpdds, lpddc );
 	BeginPaint( hWnd, &ps );
 	blit();
 	EndPaint( hWnd, &ps );
-	IDirectDrawSurface_SetClipper( lpdds, NULL );
-	break ;
       }
+      break ;
     }
 
     case WM_SIZE:
@@ -157,6 +153,8 @@ int WINAPI WinMain (HINSTANCE hInstance,
       return 0;
   }
 
+  fuse_hInstance = hInstance;
+
   fuse_hWnd = CreateWindow( "Fuse", "Fuse",
     WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,
 /*    WS_OVERLAPPEDWINDOW, */
@@ -166,10 +164,8 @@ int WINAPI WinMain (HINSTANCE hInstance,
   //init windows controls like status bar
   InitCommonControls();
 
-  ShowWindow( fuse_hWnd, nCmdShow );
+  fuse_nCmdShow = nCmdShow;
   UpdateWindow( fuse_hWnd );
-
-  fuse_hInstance = hInstance;
 
   hAccels = LoadAccelerators( fuse_hInstance, "win32_accel" );
 
@@ -180,13 +176,6 @@ int WINAPI WinMain (HINSTANCE hInstance,
 int
 ui_init( int *argc, char ***argv )
 {
-/* TODO: what's this
-  if( settings_current.aspect_hint ) {
-    hints |= GDK_HINT_ASPECT;
-    geometry.min_aspect = geometry.max_aspect =
-      ((float)DISPLAY_ASPECT_WIDTH)/DISPLAY_SCREEN_HEIGHT;
-  }
-*/
   if( win32display_init() ) return 1;
 
   return 0;
@@ -222,11 +211,6 @@ ui_end( void )
 {
   int error;
 
-  if ( lpdds ) IDirectDrawSurface_Release( lpdds );
-  if ( lpdds2 ) IDirectDrawSurface_Release( lpdds2 );
-  if ( lpddc ) IDirectDrawSurface_Release( lpddc );
-  if ( lpdd ) IDirectDraw_Release( lpdd );
-
   error = win32display_end(); if ( error ) return error;
   return 0;
 }
@@ -250,32 +234,6 @@ menu_machine_debugger( int action )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
   if( paused ) ui_debugger_activate();
-}
-
-void
-blit( void )
-{
-  if ( display_ui_initialised )
-  {
-    RECT srcrec, destrec;
-    POINT point;
-
-    point.x = 0;
-    point.y = 0;
-    srcrec.left = 0;
-    srcrec.top = 0;
-    ClientToScreen( fuse_hWnd, &point );
-    GetClientRect( fuse_hWnd, &srcrec );
-
-    destrec.top = point.y;
-    destrec.left = point.x;
-    destrec.bottom = destrec.top + srcrec.bottom;
-    destrec.right = destrec.left + srcrec.right;
-
-    IDirectDrawSurface_Blt( lpdds, &destrec,
-      lpdds2, &srcrec, DDBLT_WAIT, NULL );
-  }
-  return;
 }
 
 int

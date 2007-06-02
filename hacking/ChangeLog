@@ -1742,3 +1742,6 @@
          (patch #1425367) (Gergely Szasz).
 20070602 Ignore fuse.exe, ui/win32/keysyms.c and z80/coretest.exe (Stuart).
 20070602 ui/win32: ignore *.a libraries (Stuart).
+20070602 configure.in,ui/win32/{win32display.{c,h},win32ui.c}: replace
+	 DirectDraw-based display code with faster GDI-based code, with
+	 scaler support (Stuart).

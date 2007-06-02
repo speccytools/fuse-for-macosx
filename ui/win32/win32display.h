@@ -29,6 +29,12 @@
 
 #include "win32internals.h"
 
+extern BITMAPINFO fuse_BMI;
+extern HBITMAP fuse_BMP;
+extern int fuse_nCmdShow;
+
+extern void *win32_pixdata;
+
 int win32display_init( void );
 int win32display_end( void );
 
