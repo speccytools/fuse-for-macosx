@@ -129,19 +129,23 @@ widget_menu_keyhandler( input_key key )
   }
 }
 
-/* General callbacks */
-
 char *
-menu_get_filename( const char *title )
+widget_get_filename( const char *title, int saving )
 {
   char *filename = NULL;
+  widget_type wtype;
 
   widget_filesel_data data;
 
   data.exit_all_widgets = 1;
   data.title = title;
 
-  widget_do( WIDGET_TYPE_FILESELECTOR, &data );
+  if( saving ) {
+    wtype = WIDGET_TYPE_FILESELECTOR_SAVE;
+  } else {
+    wtype = WIDGET_TYPE_FILESELECTOR;
+  }
+  widget_do( wtype, &data );
   if( widget_filesel_name ) {
     filename = strdup( widget_filesel_name );
     if( !filename )
@@ -149,6 +153,21 @@ menu_get_filename( const char *title )
   }
 
   return filename;
+  
+}
+
+/* General callbacks */
+
+char *
+menu_get_open_filename( const char *title )
+{
+  widget_get_filename( title, 0 );
+}
+
+char *
+menu_get_save_filename( const char *title )
+{
+  widget_get_filename( title, 1 );
 }
 
 void
@@ -191,7 +210,7 @@ menu_file_recording_recordfromsnapshot( int action )
   /* Get a snapshot name */
   data.exit_all_widgets = 1;
   data.title = "Fuse - record from snapshot";
-  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  widget_do( WIDGET_TYPE_FILESELECTOR, &data );
 
   if( !widget_filesel_name ) {
     widget_end_widget( WIDGET_FINISHED_CANCEL );

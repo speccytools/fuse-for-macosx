@@ -133,7 +133,7 @@ select_new_rom( GtkWidget *widget GCC_UNUSED, gpointer data )
 
   GtkWidget *entry = data;
 
-  filename = menu_get_filename( "Fuse - Select ROM" );
+  filename = menu_get_open_filename( "Fuse - Select ROM" );
   if( !filename ) return;
 
   gtk_entry_set_text( GTK_ENTRY( entry ), filename );

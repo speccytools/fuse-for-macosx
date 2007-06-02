@@ -333,10 +333,12 @@ menu_get_scaler( scaler_available_fn selector )
 }
 
 char *
-get_save_filename( const char *title )
+win32ui_get_filename( const char *title, int is_saving )
 {
   OPENFILENAME ofn;
   char szFile[512];
+  int result;
+
   memset( &ofn, 0, sizeof( ofn ) );
   szFile[0] = '\0';
 
@@ -350,15 +352,25 @@ get_save_filename( const char *title )
   ofn.lpstrFileTitle = NULL;
   ofn.lpstrInitialDir = NULL;
   ofn.lpstrTitle = title;
-  ofn.Flags = /* OFN_DONTADDTORECENT | */ OFN_PATHMUSTEXIST | OFN_HIDEREADONLY |
-	      OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN;
+  ofn.Flags = /* OFN_DONTADDTORECENT | */ OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
+  if( is_saving ) {
+    ofn.Flags |= OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN;
+  } else {
+    ofn.Flags |= OFN_FILEMUSTEXIST;
+  }
   ofn.nFileOffset = 0;
   ofn.nFileExtension = 0;
   ofn.lpstrDefExt = NULL;
 /* ofn.pvReserved = NULL; */
 /* ofn.FlagsEx = 0; */
 
-  if( !GetSaveFileName( &ofn ) ) {
+  if( is_saving ) {
+    result = GetSaveFileName( &ofn );
+  } else {
+    result = GetOpenFileName( &ofn );
+  }
+
+  if( !result ) {
     return NULL;
   } else {
     return strdup( ofn.lpstrFile );
@@ -366,36 +378,15 @@ get_save_filename( const char *title )
 }
 
 char *
-menu_get_filename( const char *title )
+menu_get_open_filename( const char *title )
 {
-  OPENFILENAME ofn;
-  char szFile[512];
-  memset( &ofn, 0, sizeof( ofn ) );
-  szFile[0] = '\0';
+  return win32ui_get_filename( title, 0 );
+}
 
-  ofn.lStructSize = sizeof( ofn );
-  ofn.hwndOwner = NULL;
-  ofn.lpstrFilter = "All Files\0*.*\0\0";
-  ofn.lpstrCustomFilter = NULL;
-  ofn.nFilterIndex = 0;
-  ofn.lpstrFile = szFile;
-  ofn.nMaxFile = sizeof( szFile );
-  ofn.lpstrFileTitle = NULL;
-  ofn.lpstrInitialDir = NULL;
-  ofn.lpstrTitle = title;
-  ofn.Flags = /* OFN_DONTADDTORECENT | */ OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST |
-	      OFN_HIDEREADONLY;
-  ofn.nFileOffset = 0;
-  ofn.nFileExtension = 0;
-  ofn.lpstrDefExt = NULL;
-/* ofn.pvReserved = NULL; */
-/* ofn.FlagsEx = 0; */
-
-  if( !GetOpenFileName( &ofn ) ) {
-    return NULL;
-  } else {
-    return strdup( ofn.lpstrFile );
-  }
+char *
+menu_get_save_filename( const char *title )
+{
+  return win32ui_get_filename( title, 1 );
 }
 
 ui_confirm_save_t
@@ -462,7 +453,7 @@ menu_file_savesnapshot( int action )
 
   fuse_emulation_pause();
 
-  filename = get_save_filename( "Fuse - Save Snapshot" );
+  filename = menu_get_save_filename( "Fuse - Save Snapshot" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snapshot_write( filename );

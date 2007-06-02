@@ -1731,3 +1731,9 @@
 20070601 event.h,tape.[ch],widget/widget.c,ui.c,ula.[ch],ui/ui.h,
          ui/gtk/gtkui.c: add support for recording into a RLE raw sample block
          (feature request #1691821) (Fred).
+20070601 menu.{c,h},ui/{gtk/{binary.c,fileselector.c,gtkui.c,roms.c},
+	 win32/win32ui.c},widget/menu.c: split menu_get_filename() into
+	 menu_get_{open,save}_filename(), use menu_get_save_filename() in some
+	 cases where a filename could not be entered in widget UIs, and use the
+	 'open' file selector in menu_file_recording_recordfromsnapshot() when
+	 choosing a snapshot in widget UIs (patch #1727550) (Stuart).

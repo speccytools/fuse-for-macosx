@@ -60,7 +60,7 @@ MENU_CALLBACK( menu_file_open )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Open Spectrum File" );
+  filename = menu_get_open_filename( "Fuse - Open Spectrum File" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   utils_open_file( filename, settings_current.auto_load, NULL );
@@ -134,7 +134,7 @@ MENU_CALLBACK( menu_file_recording_play )
 
   fuse_emulation_pause();
 
-  recording = menu_get_filename( "Fuse - Start Replay" );
+  recording = menu_get_open_filename( "Fuse - Start Replay" );
   if( !recording ) { fuse_emulation_unpause(); return; }
 
   rzx_start_playback( recording );
@@ -174,7 +174,7 @@ MENU_CALLBACK( menu_file_openscrscreenshot )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Open SCR Screenshot" );
+  filename = menu_get_open_filename( "Fuse - Open SCR Screenshot" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_scr_read( filename );
@@ -253,7 +253,7 @@ MENU_CALLBACK( menu_machine_profiler_stop )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Save profile data" );
+  filename = menu_get_save_filename( "Fuse - Save profile data" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   profile_finish( filename );
@@ -275,7 +275,7 @@ MENU_CALLBACK( menu_media_tape_open )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Open Tape" );
+  filename = menu_get_open_filename( "Fuse - Open Tape" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   tape_open_default_autoload( filename, NULL );
@@ -334,7 +334,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_mdr_insert )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Insert microdrive disk file" );
+  filename = menu_get_open_filename( "Fuse - Insert microdrive disk file" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   if1_mdr_insert( filename, action - 1 );
@@ -352,7 +352,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_mdr_sync )
 
     fuse_emulation_pause();
 
-    filename = menu_get_filename( "Fuse - Write microdrive disk to file" );
+    filename = menu_get_save_filename( "Fuse - Write microdrive disk to file" );
     if( !filename ) { fuse_emulation_unpause(); return; }
 
     if1_mdr_sync( filename, action - 1 );
@@ -373,7 +373,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_mdr_eject )
 
     fuse_emulation_pause();
 
-    filename = menu_get_filename( "Fuse - Write microdrive disk to file" );
+    filename = menu_get_save_filename( "Fuse - Write microdrive disk to file" );
     if( !filename ) { fuse_emulation_unpause(); return; }
 
     if1_mdr_eject( filename, action - 1 );
@@ -404,7 +404,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
     WIDGET_END;
     if1_unplug( action & 0x0f );
   } else {
-    filename = menu_get_filename( "Fuse - Select file for communication" );
+    filename = menu_get_open_filename( "Fuse - Select file for communication" );
     if( !filename ) { fuse_emulation_unpause(); return; }
 
     if1_plug( filename, action );
@@ -426,7 +426,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Insert disk" );
+  filename = menu_get_open_filename( "Fuse - Insert disk" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   switch( type ) {
@@ -475,7 +475,7 @@ MENU_CALLBACK( menu_media_cartridge_timexdock_insert )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Insert Timex Dock Cartridge" );
+  filename = menu_get_open_filename( "Fuse - Insert Timex Dock Cartridge" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   dck_insert( filename );
@@ -497,7 +497,7 @@ MENU_CALLBACK( menu_media_cartridge_interfaceii_insert )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Insert Interface II Cartridge" );
+  filename = menu_get_open_filename( "Fuse - Insert Interface II Cartridge" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   if2_insert( filename );
@@ -519,7 +519,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
 
   fuse_emulation_pause();
 
-  filename = menu_get_filename( "Fuse - Insert hard disk file" );
+  filename = menu_get_open_filename( "Fuse - Insert hard disk file" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   switch( action ) {
@@ -606,7 +606,7 @@ menu_open_snap( void )
   char *filename;
   int error;
 
-  filename = menu_get_filename( "Fuse - Load Snapshot" );
+  filename = menu_get_open_filename( "Fuse - Load Snapshot" );
   if( !filename ) return -1;
 
   error = snapshot_read( filename );
