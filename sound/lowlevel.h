@@ -35,6 +35,11 @@
 #define HAVE_SOUND
 #define SOUND_SDL
 
+#elif defined USE_LIBASOUND		/* #if defined USE_DIRECTSOUND */
+
+#define HAVE_SOUND
+#define SOUND_ALSA
+
 #elif defined USE_LIBAO			/* #if defined USE_DIRECTSOUND */
 
 #define HAVE_SOUND

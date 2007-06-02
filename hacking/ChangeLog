@@ -1737,3 +1737,6 @@
 	 cases where a filename could not be entered in widget UIs, and use the
 	 'open' file selector in menu_file_recording_recordfromsnapshot() when
 	 choosing a snapshot in widget UIs (patch #1727550) (Stuart).
+20070602 Makefile.am,configure.in,man/fuse.1,
+         sound/{Makefile.am,alsasound.c,lowlevel.h}: add ALSA sound driver
+         (patch #1425367) (Gergely Szasz).

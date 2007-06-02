@@ -591,6 +591,8 @@ option.
 Specify the sound output device to use and any options to give that
 device. If you are not using the SDL UI or using
 .I libao
+or
+.I libasound (ALSA)
 for sound output,
 then the
 .I "device"
@@ -752,7 +754,7 @@ Microsoft audio file: no parameters.
 .IR null :
 null output: no parameters.
 .IP \[bu]
-.RI debug :
+.IR debug :
 for debugging libao.
 .PP
 Finally, each of the file output types
@@ -780,6 +782,68 @@ See the `DEVICE' section of
 .I ogg123(1)
 for up to date information of devices and options (except for the
 `file' option which is provided by Fuse itself).
+.br
+If you are using
+.IR libasound " or " ALSA
+for sound output, the
+.I "device"
+parameter allows you to specify the device used for sound output
+and some parameters to be used for that device. In general, the
+.I "device"
+parameter has the form
+.br
+.IR devstr " or"
+.br
+.IR param[=value][,param[=value][,...][,devstr] .
+.IP \[bu]
+.IR "devstr" :
+selects the ALSA device used, it can be any complex or simple ALSA
+device name. e.g.:
+.IR default " or " hw:0 " or " tee:plughw:0,'/tmp/out.raw',raw
+See the alsa-lib pcm api reference at
+http://www.alsa-project.org/alsa-doc/alsa-lib/pcm.html for further
+explanation.
+.br
+.IP \[bu]
+.IR param " and " values :
+.RS
+.IP \[bu]
+.IR buffer=nnnn :
+set the ALSA buffer in frames, smaller value cause smaller sound delay but may
+more buffer underrun (pops and clicks), larger value cause longer delay
+but fewer underrun. By default Fuse determine the buffer size based on the
+actual sound frequency.
+.br
+If you use some special plugin for your pcm device (e.g.: dmix) or your
+card not support some needed parameter (e.g. cannot play other only 48kHz
+stereo sound like some AC97 sound card) may cause Fuse unable to set the
+needed buffer size, apropriate sound frequency, channels and so on, therefore 
+you cannot get optimal result or not hear the sound at all. In this case try
+the
+.IR plughw:# ", (where # mean your card number counted from 0)"
+for ALSA device.
+.br
+.IP \[bu]
+.IR verbose " :
+if given, fuse report ALSA buffer underruns to
+.I stderr
+.br
+.RE
+.PP
+Some examples of use:
+.PP
+.I fuse -d verbose,buffer=2000
+.PP
+causes Fuse to use the default ALSA device with 2000 frame length buffer and
+report ALSA buffer underruns on
+.IR stderr .
+.PP
+.I fuse -d tee:plughw:0,'/tmp/aufwm.raw',raw
+.PP
+causes Fuse to use the first card and paralell save the raw audio samples
+into
+.IR /tmp/aufwm.raw " file."
+.br
 .RE
 .PP
 .I "\-\-speed percentage"

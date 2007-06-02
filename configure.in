@@ -82,6 +82,8 @@ dnl Select a user interface
 dnl Try various UI options; set the `ui' variable when we've got one
 dnl we like, and then don't look at the other options
 
+AC_PATH_XTRA
+
 dnl Look for Win32 UI (default=no)
 AC_MSG_CHECKING(whether Win32 UI requested)
 AC_ARG_WITH(win32,
@@ -391,6 +393,24 @@ AC_CHECK_LIB( png, png_write_png,
 )
 AC_SUBST(PNG_LIBS)
 
+dnl Check if a version of libasound which supplies pcm is available
+AC_MSG_CHECKING(whether ALSA requested)
+AC_ARG_WITH(alsa,
+[  --without-alsa          don't use libasound (ALSA)],
+if test "$withval" = no; then libasound=no; else libasound=yes; fi,
+libasound=yes)
+AC_MSG_RESULT($libasound)
+if test "$libasound" = yes; then
+  AC_CHECK_LIB( asound, snd_pcm_hw_params_set_period_size_near,
+    [AC_CHECK_HEADER(
+      alsa/asoundlib.h,
+      [AC_DEFINE([USE_LIBASOUND], 1, [Defined if we're going to be using the installed libasound]) ASOUND_LIBS='-lasound'],
+      [AC_MSG_WARN(alsa/asoundlib.h not found - no ALSA output)]
+    )],
+    [AC_MSG_WARN(snd_pcm_hw_params_set_period_size_near not found - no ALSA output)]
+  )
+  AC_SUBST(ASOUND_LIBS)
+fi
 
 dnl Check if a version of libao which supplies ao_open_live is available
 AC_MSG_CHECKING(whether libao requested)
