@@ -1740,3 +1740,4 @@
 20070602 Makefile.am,configure.in,man/fuse.1,
          sound/{Makefile.am,alsasound.c,lowlevel.h}: add ALSA sound driver
          (patch #1425367) (Gergely Szasz).
+20070602 Ignore fuse.exe, ui/win32/keysyms.c and z80/coretest.exe (Stuart).
