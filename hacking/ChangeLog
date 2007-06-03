@@ -1497,8 +1497,8 @@
 	 generalised data blocks.
 20070113 ChangeLog: bring up to date.
 20070115 fuse.[ch],machine.c,sound.[ch],tape.c: make the sound lifecycle be
-         treated more like the uidisplay - initialised and ended based on machine
-         lifecycle (fixes bug #1582087) (Fred).
+         treated more like the uidisplay - initialised and ended based on
+         machine lifecycle (fixes bug #1582087) (Fred).
 20070115 ChangeLog: add reference to new CoreAudio sound driver (Fred).
 20070117 fuse.c, if1.[ch]: free memory on exit. Use C89-style struct
 	 initialisation (patch #1637020) (Gergely Szasz).
