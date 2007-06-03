@@ -337,7 +337,7 @@ win32ui_get_filename( const char *title, int is_saving )
   szFile[0] = '\0';
 
   ofn.lStructSize = sizeof( ofn );
-  ofn.hwndOwner = NULL;
+  ofn.hwndOwner = fuse_hWnd;
   ofn.lpstrFilter = "All Files\0*.*\0\0";
   ofn.lpstrCustomFilter = NULL;
   ofn.nFilterIndex = 0;
