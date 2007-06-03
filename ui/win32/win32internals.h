@@ -30,6 +30,7 @@
 #include <ddraw.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <shellapi.h>
 
 #define ID_STATUSBAR 900
 

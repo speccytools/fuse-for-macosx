@@ -1747,3 +1747,5 @@
 	 scaler support (Stuart).
 20070603 configure.in: link with -mwindows for Win32 UI, and remove -lcomdlg32
 	 and -lgdi32 as these are automatically linked by -mwindows (Stuart).
+20070603 ui/win32/{win32internals.h,win32ui.c}: add support for loading files
+	 using drag-and-drop in Win32 UI (Stuart).

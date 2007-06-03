@@ -32,9 +32,11 @@
 #include "fuse.h"
 #include "menu.h"
 #include "menu_data.h"
+#include "settings.h"
 #include "snapshot.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
+#include "utils.h"
 #include "win32internals.h"
 #include "win32keyboard.h"
 #include "win32display.h"
@@ -57,6 +59,32 @@ win32ui_confirm( const char *string )
   return result;
 }
 
+void
+handle_drop( HDROP hDrop )
+{
+  size_t bufsize;
+  char *namebuf;
+
+  /* Check that only one file was dropped */
+  if( DragQueryFile( hDrop, ~0UL, NULL, 0 ) == 1) {
+    bufsize = DragQueryFile( hDrop, 0, NULL, 0 ) + 1;
+    if( ( namebuf = malloc( bufsize ) ) ) {
+      DragQueryFile( hDrop, 0, namebuf, bufsize );
+
+      fuse_emulation_pause();
+
+      utils_open_file( namebuf, settings_current.auto_load, NULL );
+
+      free( namebuf );
+
+      display_refresh_all();
+
+      fuse_emulation_unpause();
+    }
+  }
+  DragFinish( hDrop );
+}
+
 LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg )
@@ -70,6 +98,12 @@ LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_COMMAND:
     {
       handle_menu( LOWORD( wParam ), hWnd );
+      break;
+    }
+
+    case WM_DROPFILES:
+    {
+      handle_drop( (HDROP)wParam );
       break;
     }
 
@@ -168,6 +202,8 @@ int WINAPI WinMain (HINSTANCE hInstance,
   UpdateWindow( fuse_hWnd );
 
   hAccels = LoadAccelerators( fuse_hInstance, "win32_accel" );
+
+  DragAcceptFiles( fuse_hWnd, TRUE );
 
   return fuse_main(__argc, __argv);
   /* finish - how do deal with returning wParam */
