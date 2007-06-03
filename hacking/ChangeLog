@@ -1745,3 +1745,5 @@
 20070602 configure.in,ui/win32/{win32display.{c,h},win32ui.c}: replace
 	 DirectDraw-based display code with faster GDI-based code, with
 	 scaler support (Stuart).
+20070603 configure.in: link with -mwindows for Win32 UI, and remove -lcomdlg32
+	 and -lgdi32 as these are automatically linked by -mwindows (Stuart).
