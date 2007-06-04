@@ -1,4 +1,4 @@
-/* win32display.c: Routines for dealing with the Win32 DirectDraw display
+/* win32display.c: Routines for dealing with the Win32 GDI display
    Copyright (c) 2003 Philip Kendall, Marek Januszewski, Stuart Brady
 
    $Id$

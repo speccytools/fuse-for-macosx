@@ -27,7 +27,6 @@
 #define FUSE_WIN32INTERNALS_H
 
 #include <windows.h>
-#include <ddraw.h>
 #include <commctrl.h>
 #include <commdlg.h>
 #include <shellapi.h>
@@ -48,19 +47,6 @@ HWND fuse_hPFWnd;
 
 /* debugger window handle */
 HWND fuse_hDBGWnd;
-
-/* DirectDraw objects */
-LPDIRECTDRAW lpdd;
-DDSURFACEDESC ddsd;
-LPDIRECTDRAWSURFACE lpdds, /* primary surface */
-                    lpdds2; /* off screen surface */
-LPDIRECTDRAWCLIPPER lpddc; /* clipper for the window */
-
-#define DD_ERROR( msg )   if ( ddres != DD_OK ) {\
-    uidisplay_end();\
-    ui_error( UI_ERROR_ERROR, msg );\
-    return 1;\
-  }
 
 void win32statusbar_create();
 

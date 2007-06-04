@@ -1,4 +1,4 @@
-/* win32display.h:  Routines for dealing with the Win32 DirectDraw display
+/* win32display.h: Routines for dealing with the Win32 GDI display
    Copyright (c) 2003 Marek Januszewski
 
    $Id$

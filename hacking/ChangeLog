@@ -1750,3 +1750,6 @@
 20070603 ui/win32/{win32internals.h,win32ui.c}: add support for loading files
 	 using drag-and-drop in Win32 UI (Stuart).
 20070603 ui/win32/win32ui.c: use modal fileselectors for the Win32 UI (Stuart).
+20070604 ui/win32/{win32display.{c,h},win32internals.h}: remove redundant
+	 DirectDraw definitions and replace references to DirectDraw with GDI
+	 in initial comments (Stuart).
