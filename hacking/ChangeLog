@@ -1754,3 +1754,6 @@
 	 DirectDraw definitions and replace references to DirectDraw with GDI
 	 in initial comments (Stuart).
 20070604 ui/win32/win32ui.c: implement some more menu callbacks (Stuart).
+20070605 compat.h,compat/{getopt.c,getopt1.c},settings.pl: disable use of
+         getopt_long on Amiga due to incompatibility of our replacement with
+         the GNU getopt in their c library (part of patch #1712260) (Fred).

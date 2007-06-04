@@ -78,6 +78,9 @@ print hashline( __LINE__ ), << 'CODE';
 
 #ifdef HAVE_GETOPT_LONG		/* Did our libc include getopt_long? */
 #include <getopt.h>
+#elif defined AMIGA             /* #ifdef HAVE_GETOPT_LONG */
+/* The platform uses GNU getopt, but not getopt_long, so we get
+   symbol clashes on this platform. Just use getopt */
 #else				/* #ifdef HAVE_GETOPT_LONG */
 #include "compat.h"		/* If not, use ours */
 #endif				/* #ifdef HAVE_GETOPT_LONG */
@@ -320,6 +323,8 @@ settings_command_line( settings_info *settings, int *first_arg,
                        int argc, char **argv )
 {
 
+#ifndef AMIGA
+
   struct option long_options[] = {
 
 CODE
@@ -358,11 +363,17 @@ print hashline( __LINE__ ), << 'CODE';
     { 0, 0, 0, 0 }		/* End marker: DO NOT REMOVE */
   };
 
+#endif      /* #ifndef AMIGA */
+
   while( 1 ) {
 
     int c;
 
-    c = getopt_long( argc, argv, "d:hm:o:p:f:r:s:t:v:g:V", long_options, NULL );
+#ifdef AMIGA
+    c = getopt( argc, argv, "d:hm:o:p:f:r:s:t:v:g:j:V" );
+#else                    /* #ifdef AMIGA */
+    c = getopt_long( argc, argv, "d:hm:o:p:f:r:s:t:v:g:j:V", long_options, NULL );
+#endif                   /* #ifdef AMIGA */
 
     if( c == -1 ) break;	/* End of option list */
 

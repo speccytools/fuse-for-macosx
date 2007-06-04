@@ -34,7 +34,7 @@
 # include <config.h>
 #endif
 
-#ifndef HAVE_GETOPT_LONG
+#if !defined HAVE_GETOPT_LONG && !defined AMIGA
 
 #if !defined __STDC__ || !__STDC__
 /* This is a separate conditional since some stdc systems
