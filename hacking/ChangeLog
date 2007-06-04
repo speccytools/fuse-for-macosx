@@ -1753,3 +1753,4 @@
 20070604 ui/win32/{win32display.{c,h},win32internals.h}: remove redundant
 	 DirectDraw definitions and replace references to DirectDraw with GDI
 	 in initial comments (Stuart).
+20070604 ui/win32/win32ui.c: implement some more menu callbacks (Stuart).

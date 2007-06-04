@@ -32,8 +32,12 @@
 #include "fuse.h"
 #include "menu.h"
 #include "menu_data.h"
+#include "psg.h"
+#include "rzx.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "snapshot.h"
+#include "tape.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 #include "utils.h"
@@ -400,8 +404,20 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 int
 ui_tape_write( void )
 {
-  STUB;
-  return 1;
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_save_filename( "Fuse - Write Tape" );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  tape_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
 }
 
 int
@@ -415,15 +431,58 @@ ui_tape_browser_update( ui_tape_browser_update_type change,
 int
 ui_plus3_disk_write( specplus3_drive_number which )
 {
-  STUB;
-  return 1;
+  char drive, *filename, title[80];
+
+  drive = which == SPECPLUS3_DRIVE_A ? 'A' : 'B';
+
+  if( !specplus3_disk_present( which ) ) {
+    ui_error( UI_ERROR_WARNING, "No disk present in drive %c:", drive );
+    return 0;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write +3 Disk %c:", drive );
+
+  filename = menu_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  specplus3_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
 }
 
 int
 ui_trdos_disk_write( trdos_drive_number which )
 {
-  STUB;
-  return 1;
+  char drive, *filename, title[80];
+
+  switch( which ) {
+    case TRDOS_DRIVE_A: drive = 'A'; break;
+    case TRDOS_DRIVE_B: drive = 'B'; break;
+    case TRDOS_DRIVE_C: drive = 'C'; break;
+    case TRDOS_DRIVE_D: drive = 'D'; break;
+    default: drive = '?'; break;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write TR-DOS Disk %c:", drive );
+
+  filename = menu_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  trdos_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
 }
 
 int
@@ -457,13 +516,167 @@ menu_file_savesnapshot( int action )
   fuse_emulation_unpause();
 }
 
-void menu_file_recording_record( int action ) { STUB; }
-void menu_file_recording_recordfromsnapshot( int action ) { STUB; }
-void menu_file_aylogging_record( int action ) { STUB; }
-void menu_file_savescreenasscr( int action ) { STUB; }
-void menu_file_savescreenaspng( int action ) { STUB; }
-void menu_file_movies_recordmovieasscr( int action ) { STUB; }
-void menu_file_movies_recordmovieaspng( int action ) { STUB; }
+void
+menu_file_recording_record( int action )
+{
+  char *recording;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  recording = menu_get_save_filename( "Fuse - Start Recording" );
+  if( !recording ) { fuse_emulation_unpause(); return; }
+
+  rzx_start_recording( recording, 1 );
+
+  free( recording );
+
+  fuse_emulation_unpause();
+}
+
+void
+menu_file_recording_recordfromsnapshot( int action )
+{
+  char *snap, *recording;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  snap = menu_get_open_filename( "Fuse - Load Snapshot " );
+  if( !snap ) { fuse_emulation_unpause(); return; }
+
+  recording = menu_get_save_filename( "Fuse - Start Recording" );
+  if( !recording ) { free( snap ); fuse_emulation_unpause(); return; }
+
+  if( snapshot_read( snap ) ) {
+    free( snap ); free( recording ); fuse_emulation_unpause(); return;
+  }
+
+  rzx_start_recording( recording, settings_current.embed_snapshot );
+
+  free( recording );
+
+  display_refresh_all();
+
+  fuse_emulation_unpause();
+}
+
+void
+menu_file_aylogging_record( int action )
+{
+  char *psgfile;
+
+  if( psg_recording ) return;
+
+  fuse_emulation_pause();
+
+  psgfile = menu_get_save_filename( "Fuse - Start AY log" );
+  if ( !psgfile ) { fuse_emulation_unpause(); return; }
+
+  psg_start_recording( psgfile );
+
+  free( psgfile );
+
+  display_refresh_all();
+
+  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 1 );
+
+  fuse_emulation_unpause();
+}
+
+void
+menu_file_savescreenasscr( int action )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = menu_get_save_filename( "Fuse - Save Screenshot as SCR" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_scr_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+#ifdef USE_LIBPNG
+void
+menu_file_savescreenaspng( int action )
+{
+  scaler_type scaler;
+  char *filename;
+
+  fuse_emulation_pause();
+
+  scaler = menu_get_scaler( screenshot_available_scalers );
+  if( scaler == SCALER_NUM ) {
+    fuse_emulation_unpause();
+    return;
+  }
+
+  filename =
+    menu_get_save_filename( "Fuse - Save Screenshot as PNG" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_write( filename, scaler );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+#endif
+
+void
+menu_file_movies_recordmovieasscr( int action )
+{
+  char *filename;
+  
+  fuse_emulation_pause();
+
+  filename = menu_get_save_filename( "Fuse - Record Movie as SCR" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
+	    filename );
+
+  screenshot_movie_record = 1;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+#ifdef USE_LIBPNG
+void
+menu_file_movies_recordmovieaspng( int action )
+{
+  scaler_type scaler;
+  char *filename;
+
+  fuse_emulation_pause();
+
+  scaler = menu_get_scaler( screenshot_available_scalers );
+  if( scaler == SCALER_NUM ) {
+    fuse_emulation_unpause();
+    return;
+  }
+
+  filename = menu_get_save_filename( "Fuse - Save Screenshot as PNG" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_write( filename, scaler );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+#endif
+
 void menu_file_loadbinarydata( int action ) { STUB; }
 void menu_file_savebinarydata( int action ) { STUB; }
 
