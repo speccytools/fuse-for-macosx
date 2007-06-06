@@ -91,7 +91,8 @@ prevent the window from being resized or moved at all. (Enabled by
 default, but you can use
 .RI ` \-\-no\-aspect\-hint '
 to disable). See also the
-.RI ` \-\-strict\-aspect\-hint ' option.
+.RI ` \-\-strict\-aspect\-hint '
+option.
 .RE
 .PP
 .I \-\-autosave\-settings
@@ -211,9 +212,9 @@ option.
 .I "\-\-sound\-freq frequency"
 .RS
 Specify what frequency Fuse should use for the sound
-device, the default is 32KHz, but some devices only
+device, the default is 32\ kHz, but some devices only
 support a single frequency or a limited range (e.g.
-48KHz or up to 22KHz).
+48\ kHz or up to 22\ kHz).
 .RE
 .PP
 .I "\-\-full\-screen"
@@ -799,7 +800,7 @@ parameter has the form
 .IR "devstr" :
 selects the ALSA device used, it can be any complex or simple ALSA
 device name. e.g.:
-.IR default " or " hw:0 " or " tee:plughw:0,'/tmp/out.raw',raw
+.IR default " or " hw:0 " or " tee:plughw:0,\(aq/tmp/out.raw\(aq,raw
 See the alsa-lib pcm api reference at
 http://www.alsa-project.org/alsa-doc/alsa-lib/pcm.html for further
 explanation.
@@ -815,7 +816,7 @@ but fewer underrun. By default Fuse determine the buffer size based on the
 actual sound frequency.
 .br
 If you use some special plugin for your pcm device (e.g.: dmix) or your
-card not support some needed parameter (e.g. cannot play other only 48kHz
+card not support some needed parameter (e.g. cannot play other only 48\ kHz
 stereo sound like some AC97 sound card) may cause Fuse unable to set the
 needed buffer size, apropriate sound frequency, channels and so on, therefore 
 you cannot get optimal result or not hear the sound at all. In this case try
@@ -838,7 +839,7 @@ causes Fuse to use the default ALSA device with 2000 frame length buffer and
 report ALSA buffer underruns on
 .IR stderr .
 .PP
-.I fuse -d tee:plughw:0,'/tmp/aufwm.raw',raw
+.I fuse -d tee:plughw:0,\(aq/tmp/aufwm.raw\(aq,raw
 .PP
 causes Fuse to use the first card and paralell save the raw audio samples
 into
@@ -894,14 +895,14 @@ are `320' (which corresponds to a 320x240x256 mode), the default and
 Specify whether to use doublescan modes in the SVGALib and FB UIs.
 Available values for
 .I mode
-are 0, 1 and 2. 0 means "never doublescan" (use 640x480 at either 72Hz or
-60Hz), whereas 1 and 2 both mean "try to use doublescan" and will fall back
+are 0, 1 and 2. 0 means `never doublescan' (use 640x480 at either 72\ Hz or
+60\ Hz), whereas 1 and 2 both mean `try to use doublescan' and will fall back
 on the 640x480 modes. These latter two are treated identically for SVGA, but
-for FB, they differ: 1 selects 72Hz modes (the same size and shape as your
-typical 640x480), and 2 selects 60Hz modes (overscan).
+for FB, they differ: 1 selects 72\ Hz modes (the same size and shape as your
+typical 640x480), and 2 selects 60\ Hz modes (overscan).
 .br
 If your monitor displays a blank screen when using 1 or 2, press F10 then
-try a different option or say "\-\-svgamode 640".
+try a different option or say `\-\-svgamode 640'.
 .RE
 .PP
 .I "\-t file"
@@ -2127,7 +2128,7 @@ filename, while the others will write the image to
 .I "Media, Disk, +3, Drive B:, Insert..."
 .RS
 As above, but for the +3's drive B:. Fuse emulates drive B: as a
-second 3\" drive.
+second 3" drive.
 .RE
 .PP
 .I "Media, Disk, +3, Drive B:, Eject"
@@ -3076,8 +3077,8 @@ warnings. This is a GTK+ bug (#144427), which is fixed in GTK+ 2.4.4.
 .PP
 The libao file output devices not work properly with the GTK+ UI.
 No error reporting, but the created file does not contain any sound data.
-If you use a "weak" machine alsa09 make a lot of click and pop with
-.RI ' "ALSA: underrun, at least 0ms." '
+If you use a `weak' machine alsa09 make a lot of click and pop with
+.RI ` "ALSA: underrun, at least 0ms." '
 error messages.
 .\"
 .\"------------------------------------------------------------------
