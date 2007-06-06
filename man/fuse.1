@@ -162,7 +162,7 @@ option.
 Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
 occuring. (Enabled by default, but you can use
-.RI ` \-\-no\-confirm\-actions'
+.RI ` \-\-no\-confirm\-actions '
 to disable). This option is effective only under the GTK+ UI, and is
 the same as the General Options dialog's
 .I "Confirm actions"
@@ -174,7 +174,7 @@ option.
 Specify whether Fuse should attempt to detect when the tape is being
 accessed and start and stop the virtual tape playing
 automatically. (Enabled by default, but you can use
-.RI ` \-\-no\-detect\-loader'
+.RI ` \-\-no\-detect\-loader '
 to disable). Same as the General Option dialog's
 .I "Detect loaders"
 option.
@@ -201,7 +201,7 @@ option.
 .RS
 Specify whether Fuse should run at the fastest possible speed when the
 virtual tape is playing. (Enabled by default, but you can use
-.RI ` \-\-no\-fastload'
+.RI ` \-\-no\-fastload '
 to disable). The same as the General Option dialog's
 .I "Fastloading"
 option.
@@ -514,7 +514,7 @@ option.
 .I \-\-simpleide
 .RS
 Specify whether Fuse will emulate the simple 8-bit IDE interface
-as used by the Spectrum +3e. Same as the Perpherals
+as used by the Spectrum +3e. Same as the Peripherals
 Option dialog's
 .I "Simple 8-bit IDE"
 option.
@@ -841,7 +841,7 @@ report ALSA buffer underruns on
 .PP
 .I fuse -d tee:plughw:0,\(aq/tmp/aufwm.raw\(aq,raw
 .PP
-causes Fuse to use the first card and paralell save the raw audio samples
+causes Fuse to use the first card and parallel save the raw audio samples
 into
 .IR /tmp/aufwm.raw " file."
 .br
@@ -892,7 +892,7 @@ are `320' (which corresponds to a 320x240x256 mode), the default and
 .br
 .I "\-\-doublescan\-mode mode"
 .RS
-Specify whether to use doublescan modes in the SVGALib and FB UIs.
+Specify whether to use doublescan modes in the SVGAlib and FB UIs.
 Available values for
 .I mode
 are 0, 1 and 2. 0 means `never doublescan' (use 640x480 at either 72\ Hz or
@@ -954,7 +954,7 @@ option.
 .I \-\-zxatasp
 .RS
 Specify whether Fuse emulate the ZXATASP interface. Same as the
-Perpherals Option dialog's
+Peripherals Option dialog's
 .I "ZXATASP interface"
 option.
 .RE
@@ -962,7 +962,7 @@ option.
 .I \-\-zxatasp\-upload
 .RS
 Specify the state of the ZXATASP upload jumper. Same as the
-Perpherals Option dialog's
+Peripherals Option dialog's
 .I "ZXATASP upload"
 option.
 .RE
@@ -970,7 +970,7 @@ option.
 .I \-\-zxatasp\-write\-protect
 .RS
 Specify the state of the ZXATASP write protect jumper. Same as the
-Perpherals Option dialog's
+Peripherals Option dialog's
 .I "ZXATASP write protect"
 option.
 .RE
@@ -990,14 +990,14 @@ slave channel.
 .I \-\-zxcf
 .RS
 Specify whether Fuse emulate the ZXCF interface. Same as the
-Perpherals Option dialog's
+Peripherals Option dialog's
 .I "ZXCF interface"
 option.
 .RE
 .PP
 .I \-\-zxcf\-upload
 .RS
-Specify the state of the ZXCF upload jumper. Same as the Perpherals
+Specify the state of the ZXCF upload jumper. Same as the Peripherals
 Option dialog's
 .I "ZXCF upload"
 option.
@@ -1027,7 +1027,7 @@ section for details.
 .\"
 .SH "THE VARIOUS FRONT-ENDS"
 Fuse supports various front-ends, or UIs (user interfaces). The usual
-one is GTK+-based, but there are also SDL, Xlib, svgalib and
+one is GTK+-based, but there are also SDL, Xlib, SVGAlib and
 framebuffer ones.
 .PP
 The important difference to note is that the GTK+ version uses
@@ -1293,7 +1293,7 @@ you wish to stop the tape at a specific point.
 If this option is enabled, Fuse will attempt to detect when a loading
 routine is in progress, and then automatically start the virtual tape
 to load the program in. This is done by using a heuristic to identify
-a loading routine, so is by no means infalliable, but works in most
+a loading routine, so is by no means infallible, but works in most
 cases.
 .RE
 .PP
@@ -1337,7 +1337,7 @@ configuration file.
 .PP
 .I "MDR cartridge len"
 .RS
-This option controls the number of blocks in a new microdrive cartridge.
+This option controls the number of blocks in a new Microdrive cartridge.
 0 means select a random capacity, otherwise selects the number of blocks
 available.
 .RE
@@ -1370,7 +1370,7 @@ scalers.
 .RS
 Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
-occuring.
+occurring.
 .RE
 .PP
 .I "Show statusbar"
@@ -1494,7 +1494,7 @@ connected mouse may be used.
 .I "Interface I"
 .RS
 If this option is selected, Fuse will emulate the simple Sinclair
-Interface I, and allow microdrive cartriges to be
+Interface I, and allow Microdrive cartridges to be
 connected and disconnected via the
 .I "Media, Interface I, Microdrive"
 menus. It also enables support for the Interface I RS-232 and Sinclair
@@ -1736,7 +1736,7 @@ For the real joysticks, it is also possible to configure (although
 currently only when using the GTK+ interface) what effect each button
 on the joystick will have: this can be
 .IR "Joystick Fire" ,
-equivalent to presing the emulated joystick's fire button,
+equivalent to pressing the emulated joystick's fire button,
 .IR "Nothing" ,
 meaning to have no effect, or any Spectrum key, meaning that pressing
 that button will be equivalent to pressing that Spectrum key.
@@ -2002,36 +2002,36 @@ virtual-tape.
 .PP
 .I "Media, Interface I"
 .RS
-Virtual microdrive images are accessible only when the Interface I is
+Virtual Microdrive images are accessible only when the Interface I is
 active from the
 .I "Options, Peripherals"
-menu. Note that any changes to the microdrive image will not be
+menu. Note that any changes to the Microdrive image will not be
 written to the file on disk until the appropriate `sync' or `eject'
 option is used.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Insert New"
 .RS
-Insert a new (unformatted) microdrive cartridge into emulated
+Insert a new (unformatted) Microdrive cartridge into emulated
 Microdrive 1.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Insert..."
 .RS
-Insert an existing microdrive cartridge image into emulated Microdrive
+Insert an existing Microdrive cartridge image into emulated Microdrive
 1. You will be prompted for a filename.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Sync"
 .RS
-Synchronise any changes to the microdrive image in Microdrive 1 with
+Synchronise any changes to the Microdrive image in Microdrive 1 with
 the file on sync. You will be prompted for a filename if one has not
 supplied already for this image.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Eject"
 .RS
-Eject the microdrive image in Microdrive 1. If the image has been
+Eject the Microdrive image in Microdrive 1. If the image has been
 modified, you will be asked as to whether you want any changes saved.
 .RE
 .PP
@@ -2074,7 +2074,7 @@ TODO
 .RS
 TODO
 .RE
-.I "Media, Interface I, RS232, Unlug TxD"
+.I "Media, Interface I, RS232, Unplug TxD"
 .RS
 TODO
 .RE
@@ -2847,7 +2847,7 @@ n{ext}
 .RS
 Step to the opcode following the current one. As with the `finish'
 command, this works by setting a temporary breakpoint at the next
-opcode, so is not infalliable.
+opcode, so is not infallible.
 .RE
 .PP
 o{ut}
@@ -2893,7 +2893,7 @@ once only, and then be removed.
 .RE
 .PP
 Addresses can be specified in one of two forms: either an absolute
-addresses, specifed by an integer in the range 0x0000 to 0xFFFF or as
+addresses, specified by an integer in the range 0x0000 to 0xFFFF or as
 a
 .RI ` page : offset '
 combination, which refers to a location
@@ -2903,7 +2903,7 @@ bytes into into memory bank
 independent of where that bank is currently paged into memory. RAM
 pages are indicated simply by an integer, while ROMs are prefixed by
 .RI ` R '
-(eg offset 0x1234 in ROM 1 is specified as
+(e.g. offset 0x1234 in ROM 1 is specified as
 .RI ` R1:0x1234 "')."
 Pages selected via the /ROMCS line are prefixed with
 .RI ` C "',"
@@ -2924,7 +2924,7 @@ other value being true. In numeric expressions, you can use integer
 constants (all calculations is done in integers), register names
 (which simply evaluate to the value of the register), parentheses, the
 standard four numeric operations (`+', `\-', `*' and `/'), the
-(non-)equality operators `==' and `!=', the comparision operators `>',
+(non-)equality operators `==' and `!=', the comparison operators `>',
 `<', `>=' and `<=', bitwise and (`&'), or (`|') and exclusive or (`^')
 and logical and (`&&') and or (`||').
 .\"
@@ -2933,10 +2933,10 @@ and logical and (`&&') and or (`||').
 .SH THE POKE FINDER
 .PP
 The `poke finder', available only under the GTK+ UI, is a tool which
-is designed to make the task of finding (infinite lives etc) pokes for
+is designed to make the task of finding (infinite lives etc.) pokes for
 games a bit easier: it is similar to the `Lifeguard' utility which was
 available for use with the Multiface. It works by maintaining a list
-of locations in which the current number of lives (etc) may be stored,
+of locations in which the current number of lives (etc.) may be stored,
 and having the ability to remove from that list any locations which
 don't contain a specified value.
 .PP
@@ -3109,7 +3109,7 @@ The comp.sys.sinclair Spectrum FAQ, at
 .SH AUTHOR
 Philip Kendall (philip\-fuse@shadowmagic.org.uk).
 .PP
-Matan Ziv-Av wrote the svgalib and framebuffer UIs, the glib
+Matan Ziv-Av wrote the SVGAlib and framebuffer UIs, the glib
 replacement code, and did some work on the OSS-specific sound code and
 the original widget UI code.
 .PP
@@ -3151,6 +3151,6 @@ Stuart Brady wrote the Scorpion emulation and the HP-UX sound code.
 Garry Lancaster wrote the 8-bit IDE, ZXATASP and ZXCF interface
 emulations.
 .PP
-Gergely Szasz wrote the Interface I and microdrive emulation, the PAL
+Gergely Szasz wrote the Interface I and Microdrive emulation, the PAL
 TV scalers, the TV 3x scaler, the movie logging code, the libao sound
 code, and made many improvements to the widget code.
