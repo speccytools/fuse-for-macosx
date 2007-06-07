@@ -1762,3 +1762,4 @@
 20070606 man/fuse.1: spelling fixes (Stuart).
 20070608 widget/filesel.c: use more native ASL requester on the Amiga in the
          widget UI (more of patch #1712260) (Chris Young).
+20070608 widget/pokefinder.c: fix up printf() related warnings (Fred).
