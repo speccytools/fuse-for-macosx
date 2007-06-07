@@ -161,13 +161,13 @@ widget_get_filename( const char *title, int saving )
 char *
 menu_get_open_filename( const char *title )
 {
-  widget_get_filename( title, 0 );
+  return widget_get_filename( title, 0 );
 }
 
 char *
 menu_get_save_filename( const char *title )
 {
-  widget_get_filename( title, 1 );
+  return widget_get_filename( title, 1 );
 }
 
 void

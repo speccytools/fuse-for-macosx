@@ -1764,3 +1764,4 @@
          widget UI (more of patch #1712260) (Chris Young).
 20070608 widget/pokefinder.c: fix up printf() related warnings (Fred).
 20070608 machines: ignore .a archive files (Fred).
+20070608 widget/menu.c: fix bug in menu_get_{open,save}_filename() (Stuart).
