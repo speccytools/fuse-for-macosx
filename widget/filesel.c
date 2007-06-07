@@ -46,6 +46,20 @@
 #include "widget_internals.h"
 #include "utils.h"
 
+#ifdef AMIGA
+#include <proto/asl.h>
+#include <proto/dos.h>
+#include <proto/exec.h>
+
+struct Library *AslBase;
+struct AslIFace *IAsl;
+struct Library *DOSBase;
+struct DOSIFace *IDOS;
+struct Library *ExecBase;
+
+int err = 0;
+#endif /* ifdef AMIGA */
+
 struct widget_dirent **widget_filenames; /* Filenames in the current
 					    directory */
 size_t widget_numfiles;	  /* The number of files in the current
@@ -68,7 +82,9 @@ static int widget_select_file( const struct dirent *dirent );
 static int widget_scan_compare( const widget_dirent **a,
 				const widget_dirent **b );
 
+#ifndef AMIGA
 static char* widget_getcwd( void );
+#endif /* ifndef AMIGA */
 static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 				       int top_left, int current,
 				       const char *dir );
@@ -132,6 +148,40 @@ static int widget_add_filename( int *allocated, int *number,
 
   return 0;
 }
+
+#ifdef AMIGA
+static char *
+amiga_asl( char *title ) {
+  char *filename;
+  struct FileRequester *filereq;
+
+  if( AslBase = IExec->OpenLibrary( "asl.library", 52 ) ) {
+    if( IAsl = ( struct AslIFace * ) IExec->GetInterface( AslBase,"main",1,NULL ) ) {
+      filereq = IAsl->AllocAslRequestTags( ASL_FileRequest,
+                                           ASLFR_RejectIcons,TRUE,
+                                           ASLFR_TitleText,title,
+                                           ASLFR_DoSaveMode,is_saving,
+                                           ASLFR_InitialPattern,"#?.(sna|z80|szx|sp|snp|zxs|tap|tzx|csw|rzx|dsk|trd|scl|mdr|dck|hdf|rom|psg|scr|png|gz|bz2)",
+                                           ASLFR_DoPatterns,TRUE,
+                                           TAG_DONE );
+
+      if( err = IAsl->AslRequest( filereq, NULL ) ) {
+        filename = ( STRPTR ) IExec->AllocVec( 1024, MEMF_CLEAR );
+        strcpy( filename,filereq->fr_Drawer );	
+        IDOS->AddPart( filename, filereq->fr_File, 1024 );
+        widget_filesel_name = strdup( filename );
+        IExec->FreeVec( filename );
+        err = WIDGET_FINISHED_OK;
+      } else {
+        err = WIDGET_FINISHED_CANCEL;
+      }
+      IExec->DropInterface( ( struct Interface * )IAsl );
+    }
+    IExec->CloseLibrary( AslBase );
+  }
+  return widget_filesel_name;
+}
+#else /* ifdef AMIGA */
 
 static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 			   int (*select_fn)(const struct dirent*) )
@@ -240,6 +290,7 @@ static int widget_scan_compare( const struct widget_dirent **a,
   }
 
 }
+#endif /* ifdef AMIGA */
 
 /* File selection widget */
 
@@ -253,6 +304,7 @@ widget_filesel_draw( void *data )
   exit_all_widgets = filesel_data->exit_all_widgets;
   title = filesel_data->title;
 
+#ifndef AMIGA
   directory = widget_getcwd();
   if( directory == NULL ) return 1;
 
@@ -267,6 +319,9 @@ widget_filesel_draw( void *data )
   /* Show all the filenames */
   widget_print_all_filenames( widget_filenames, widget_numfiles,
 			      top_left_file, current_file, directory );
+#else  /* ifndef AMIGA */
+  amiga_asl(title);
+#endif /* ifndef AMIGA */
 
   return 0;
 }
@@ -296,6 +351,7 @@ widget_filesel_save_draw( void *data )
   return widget_filesel_draw( data );
 }
 
+#ifndef AMIGA
 static char* widget_getcwd( void )
 {
   char *directory; size_t directory_length;
@@ -465,10 +521,18 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 
   return 0;
 }
+#endif /* ifndef AMIGA */
 
 void
 widget_filesel_keyhandler( input_key key )
 {
+#ifdef AMIGA
+  if( exit_all_widgets ) {
+    widget_end_all( err );
+  } else {
+    widget_end_widget( err );
+  }
+#else  /* ifndef AMIGA */
   char *fn, *ptr;
 
   new_current_file = current_file;
@@ -598,9 +662,9 @@ widget_filesel_keyhandler( input_key key )
     if(chdir(fn)==-1) {
 #ifndef WIN32
       if(errno==ENOTDIR) {
-#else
+#else   /* #ifndef WIN32 */
       if( GetFileAttributes( fn ) != FILE_ATTRIBUTE_DIRECTORY	) {
-#endif
+#endif  /* #ifndef WIN32 */
 	widget_filesel_name = fn;
 	if( exit_all_widgets ) {
 	  widget_end_all( WIDGET_FINISHED_OK );
@@ -659,7 +723,7 @@ widget_filesel_keyhandler( input_key key )
     current_file = new_current_file;
 
   }
-
+#endif /* ifdef AMIGA */
 }
 
 #endif				/* #ifdef USE_WIDGET */
