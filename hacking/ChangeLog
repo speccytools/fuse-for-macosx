@@ -1766,3 +1766,4 @@
 20070608 machines: ignore .a archive files (Fred).
 20070608 widget/menu.c: fix bug in menu_get_{open,save}_filename() (Stuart).
 20070608 ui/xlib: ignore .a archive files (Fred).
+20070608 man/fuse.1: fix dashes (Stuart).
