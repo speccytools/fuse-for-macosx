@@ -1,0 +1,5 @@
+/*.a
+/.deps
+/Makefile
+/Makefile.in
+/keysyms.c
