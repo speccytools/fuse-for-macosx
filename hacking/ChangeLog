@@ -1768,3 +1768,4 @@
 20070608 ui/xlib: ignore .a archive files (Fred).
 20070608 man/fuse.1: fix dashes (Stuart).
 20070608 sound/alsasound.c: update FSF address (Stuart).
+20070609 profile.c: fix printf() warning.

@@ -92,7 +92,7 @@ profile_finish( const char *filename )
 
     if( !total_tstates[ i ] ) continue;
 
-    fprintf( f, "0x%04lx,%d\n", i, total_tstates[ i ] );
+    fprintf( f, "0x%04lx,%d\n", (unsigned long)i, total_tstates[ i ] );
 
   }
 
