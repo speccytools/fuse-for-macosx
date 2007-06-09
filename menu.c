@@ -42,11 +42,16 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "widget/widget.h"
 #include "zxatasp.h"
 #include "zxcf.h"
+
+#ifdef HAVE_LIBDSK_H
+#include "disk/plusd.h"
+#endif				/* #ifdef HAVE_LIBDSK_H */
 
 #ifdef USE_WIDGET
 #define WIDGET_END widget_finish()
@@ -438,6 +443,11 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
   case 1:
     trdos_disk_insert_default_autoload( which, filename );
     break;
+  case 2:
+#ifdef HAVE_LIBDSK_H
+    plusd_disk_insert_default_autoload( which, filename );
+#endif				/* #ifdef HAVE_LIBDSK_H */
+    break;
   }
 
   free( filename );
@@ -464,6 +474,11 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
     break;
   case 1:
     trdos_disk_eject( which, write );
+    break;
+  case 2:
+#ifdef HAVE_LIBDSK_H
+    plusd_disk_eject( which, write );
+#endif			/* #ifdef HAVE_LIBDSK_H */
     break;
   }
 

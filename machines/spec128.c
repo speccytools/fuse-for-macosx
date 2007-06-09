@@ -146,6 +146,7 @@ spec128_reset( void )
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   return spec128_common_reset( 1 );

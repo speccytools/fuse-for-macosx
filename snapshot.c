@@ -44,6 +44,10 @@
 #include "zxatasp.h"
 #include "zxcf.h"
 
+#ifdef HAVE_LIBDSK_H
+#include "disk/plusd.h"
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
 int snapshot_read( const char *filename )
 {
   utils_file file;
@@ -151,6 +155,9 @@ snapshot_copy_from( libspectrum_snap *snap )
   error = ula_from_snapshot( snap ); if( error ) return error;
   error = ay_from_snapshot( snap, capabilities ); if( error ) return error;
   error = trdos_from_snapshot( snap, capabilities ); if( error ) return error;
+#ifdef HAVE_LIBDSK_H
+  error = plusd_from_snapshot( snap, capabilities ); if( error ) return error;
+#endif			/* #ifdef HAVE_LIBDSK_H */
   error = memory_ram_from_snapshot( snap, capabilities );
   if( error ) return error;
   error = slt_from_snapshot( snap ); if( error ) return error;
@@ -230,6 +237,9 @@ snapshot_copy_to( libspectrum_snap *snap )
   error = ula_to_snapshot( snap ); if( error ) return error;
   error = ay_to_snapshot( snap ); if( error ) return error;
   error = trdos_to_snapshot( snap ); if( error ) return error;
+#ifdef HAVE_LIBDSK_H
+  error = plusd_to_snapshot( snap ); if( error ) return error;
+#endif			/* #ifdef HAVE_LIBDSK_H */
   error = memory_ram_to_snapshot( snap ); if( error ) return error;
   error = slt_to_snapshot( snap ); if( error ) return error;
   error = zxatasp_to_snapshot( snap ); if( error ) return error;

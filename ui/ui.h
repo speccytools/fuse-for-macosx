@@ -28,6 +28,8 @@
 
 #include <stdarg.h>
 
+#include <config.h>
+
 #ifdef HAVE_LIB_GLIB
 #include <glib.h>
 #endif
@@ -38,6 +40,10 @@
 #include "machines/specplus3.h"
 #include "trdos.h"
 #include "ui/scaler/scaler.h"
+
+#ifdef HAVE_LIBDSK_H
+#include "disk/plusd.h"
+#endif
 
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {
@@ -110,9 +116,12 @@ int ui_mouse_release( int suspend ); /* UI: ungrab, return 0 if done */
 /* Write the current tape out */
 int ui_tape_write( void );
 
-/* Write a +3 or TRDOS disk out */
+/* Write a +3, BetaDisk or +D disk out */
 int ui_plus3_disk_write( specplus3_drive_number which );
 int ui_trdos_disk_write( trdos_drive_number which );
+#ifdef HAVE_LIBDSK_H
+int ui_plusd_disk_write( plusd_drive_number which );
+#endif
 
 /* Get a rollback point from the given list */
 int ui_get_rollback_point( GSList *points );
@@ -155,6 +164,13 @@ typedef enum ui_menu_item {
   UI_MENU_ITEM_MEDIA_DISK_TRDOS,
   UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT,
   UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT,
+#ifdef HAVE_LIBDSK_H
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD,
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD_3_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD_4_EJECT,
+#endif
   UI_MENU_ITEM_MEDIA_IDE,
   UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT,
   UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT,

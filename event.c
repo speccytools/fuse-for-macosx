@@ -173,7 +173,19 @@ int event_do_events(void)
       trdos_event_cmd_done( ptr->tstates );
       break;
 
-    case EVENT_TYPE_TRDOS_INDEX: trdos_event_index( ptr->tstates ); break;
+    case EVENT_TYPE_TRDOS_INDEX:
+      trdos_event_index( ptr->tstates );
+      break;
+
+#ifdef HAVE_LIBDSK_H
+    case EVENT_TYPE_PLUSD_CMD_DONE:
+      plusd_event_cmd_done( ptr->tstates );
+      break;
+
+    case EVENT_TYPE_PLUSD_INDEX:
+      plusd_event_index( ptr->tstates );
+      break;
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
     case EVENT_TYPE_BREAKPOINT:
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );
@@ -297,8 +309,10 @@ event_name( event_type type )
   case EVENT_TYPE_INTERRUPT: return "Retriggered interrupt";
   case EVENT_TYPE_NMI: return "Non-maskable interrupt";
   case EVENT_TYPE_NULL: return "[Deleted event]";
-  case EVENT_TYPE_TRDOS_CMD_DONE: return "End of TR-DOS command";
-  case EVENT_TYPE_TRDOS_INDEX: return "TR-DOS index";
+  case EVENT_TYPE_TRDOS_CMD_DONE: return "End of BetaDisk command";
+  case EVENT_TYPE_TRDOS_INDEX: return "BetaDisk index";
+  case EVENT_TYPE_PLUSD_CMD_DONE: return "End of +D command";
+  case EVENT_TYPE_PLUSD_INDEX: return "+D index";
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
   case EVENT_TYPE_TIMER: return "Timer";
   case EVENT_TYPE_TAPE_RECORD: return "Tape sample record";

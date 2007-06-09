@@ -545,6 +545,23 @@ ui_trdos_disk_write( trdos_drive_number which )
 	 ? trdos_disk_write( which, widget_filesel_name ) : 0;
 }
 
+#ifdef HAVE_LIBDSK_H
+int
+ui_plusd_disk_write( plusd_drive_number which )
+{
+  char title[ 30 ];
+  widget_filesel_data data;
+
+  snprintf( title, sizeof( title ), "Fuse - write +D drive %i:",
+	    which + 1 );
+  data.exit_all_widgets = 1;
+  data.title = title;
+  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
+  return widget_filesel_name
+	 ? plusd_disk_write( which, widget_filesel_name ) : 0;
+}
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
 void
 menu_help_keyboard( int action )
 {

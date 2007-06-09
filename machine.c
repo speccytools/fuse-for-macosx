@@ -207,7 +207,7 @@ machine_select_machine( fuse_machine_info *machine )
 {
   int width, height, i;
   int capabilities;
-  int plus3, trdos;
+  int plus3, trdos, plusd;
 
   machine_current = machine;
 
@@ -251,8 +251,11 @@ machine_select_machine( fuse_machine_info *machine )
   /* Set the disk menu items and statusbar appropriately */
   plus3 = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
   trdos = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK;
+#ifdef HAVE_LIBDSK_H
+  plusd = plusd_available;
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
-  if( plus3 || trdos ) {
+  if( plus3 || trdos || plusd ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
     ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
   } else {
@@ -263,7 +266,10 @@ machine_select_machine( fuse_machine_info *machine )
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3, plus3 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_TRDOS, trdos );
-    
+#ifdef HAVE_LIBDSK_H
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
   /* And the dock menu item */
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
@@ -390,6 +396,9 @@ machine_reset( void )
   /* Other interfaces that may assert /ROMCS */
   zxatasp_reset();
   zxcf_reset();
+#ifdef HAVE_LIBDSK_H
+  plusd_reset();
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
   return 0;
 }

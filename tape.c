@@ -534,6 +534,11 @@ int tape_save_trap( void )
 static int
 trap_check_rom( void )
 {
+#ifdef HAVE_LIBDSK_H
+  if( plusd_available && plusd_active )
+    return 0;		/* +D must not be active */
+#endif
+
   switch( machine_current->machine ) {
   case LIBSPECTRUM_MACHINE_16:
   case LIBSPECTRUM_MACHINE_48:

@@ -241,6 +241,9 @@ static int fuse_init(int argc, char **argv)
   if( rzx_init() ) return 1;
   if( psg_init() ) return 1;
   if( trdos_init() ) return 1;
+#ifdef HAVE_LIBDSK_H
+  if( plusd_init() ) return 1;
+#endif			/* #ifdef HAVE_LIBDSK_H */
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
@@ -752,6 +755,9 @@ static int fuse_end(void)
   zxcf_end();
   if1_end();
   divide_end();
+#ifdef HAVE_LIBDSK_H
+  plusd_end();
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
   machine_end();
 

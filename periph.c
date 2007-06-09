@@ -299,6 +299,14 @@ periph_present interface2_present;
 /* Is the Interface II currently active */
 int periph_interface2_active;
 
+#ifdef HAVE_LIBDSK_H
+/* What sort of +D interface does the curret machine have */
+periph_present plusd_present;
+
+/* Is the +D currently active */
+int periph_plusd_active;
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
 int
 periph_setup( const periph_t *peripherals_list, size_t n )
 {
@@ -321,6 +329,9 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   kempston_present = PERIPH_PRESENT_NEVER;
   interface1_present = PERIPH_PRESENT_NEVER;
   interface2_present = PERIPH_PRESENT_NEVER;
+#ifdef HAVE_LIBDSK_H
+  plusd_present = PERIPH_PRESENT_NEVER;
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
   return 0;
 }
@@ -338,6 +349,13 @@ periph_setup_interface1( periph_present present ) {
 void
 periph_setup_interface2( periph_present present ) {
   interface2_present = present;
+}
+
+void
+periph_setup_plusd( periph_present present ) {
+#ifdef HAVE_LIBDSK_H
+  plusd_present = present;
+#endif			/* #ifdef HAVE_LIBDSK_H */
 }
 
 static void
@@ -375,6 +393,17 @@ update_ide_menu( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE, divide );
 }
 
+#ifdef HAVE_LIBDSK_H
+static void
+update_plusd_menu( void )
+{
+  int plusd = settings_current.plusd;
+
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, plusd );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
+}
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
 void
 periph_update( void )
 {
@@ -411,6 +440,19 @@ periph_update( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
 		    periph_interface2_active );
 
+#ifdef HAVE_LIBDSK_H
+  switch( plusd_present ) {
+  case PERIPH_PRESENT_NEVER: periph_plusd_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_plusd_active = settings_current.plusd; break;
+  case PERIPH_PRESENT_ALWAYS: periph_plusd_active = 1; break;
+  }
+
+  if( periph_plusd_active ) {
+    periph_register_n( plusd_peripherals, plusd_peripherals_count );
+  }
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
   if( ui_mouse_present ) {
     if( settings_current.kempston_mouse ) {
       if( !ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_grab( 1 );
@@ -422,5 +464,8 @@ periph_update( void )
   update_cartridge_menu();
   update_ide_menu();
   if1_update_menu();
+#ifdef HAVE_LIBDSK_H
+  update_plusd_menu();
+#endif
   machine_current->memory_map();
 }

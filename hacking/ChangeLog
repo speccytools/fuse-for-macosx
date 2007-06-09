@@ -1769,3 +1769,10 @@
 20070608 man/fuse.1: fix dashes (Stuart).
 20070608 sound/alsasound.c: update FSF address (Stuart).
 20070609 profile.c: fix printf() warning.
+20070609 BRANCH: plusd_20070609
+20070609 Makefile.am,configure.in,disk/{Makefile.am,plusd.{c,h},wd1770.{c,h}},
+	 event.{c,h},fuse.c,machine.c,machines/{spec128.c,spec48.c},memory.c,
+	 menu.c,menu_data.dat,periph.{c,h},roms/{Makefile.am,plusd.rom},
+	 settings.dat,snapshot.c,tape.c,ui.c,ui/{gtk/gtkui.c,options.dat,ui.h},
+	 widget/menu.c,z80/{coretest.c,z80.c,z80_ops.c}: +D emulation
+	 (part of patch #1546570) (Stuart).

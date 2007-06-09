@@ -307,6 +307,26 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Disk/TR-DOS/Drive B:/Eject",
     "/Media/Disk/TR-DOS/Drive B:/Eject and write...", 0 },
 
+#ifdef HAVE_LIBDSK_H
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD, "/Media/Disk/+D" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
+    "/Media/Disk/+D/Drive 1/Eject",
+    "/Media/Disk/+D/Drive 1/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
+    "/Media/Disk/+D/Drive 2/Eject",
+    "/Media/Disk/+D/Drive 2/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_3_EJECT,
+    "/Media/Disk/+D/Drive 3/Eject",
+    "/Media/Disk/+D/Drive 3/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_4_EJECT,
+    "/Media/Disk/+D/Drive 4/Eject",
+    "/Media/Disk/+D/Drive 4/Eject and write...", 0 },
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
   { UI_MENU_ITEM_MEDIA_IDE, "/Media/IDE" },
 
   { UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT, "/Media/IDE/Simple 8-bit" },

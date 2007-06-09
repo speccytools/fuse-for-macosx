@@ -57,6 +57,7 @@ mdr_len, numeric, 180
 interface2, boolean, 1
 snapsasz80, null, 0
 pal_tv2x, boolean, 0
+plusd, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1
@@ -175,3 +176,4 @@ rom_scorpion_3, string, "256s-3.rom",
 rom_spec_se_0, string, "se-0.rom",
 rom_spec_se_1, string, "se-1.rom",
 rom_interface_i, string, "if1-2.rom",
+rom_plusd, string, "plusd.rom",

@@ -45,6 +45,12 @@
 
 #include "z80_macros.h"
 
+#ifdef HAVE_LIBDSK_H
+#include "disk/plusd.h"
+#else			/* #ifdef HAVE_LIBDSK_H */
+const int plusd_available = 0;
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
 #ifndef HAVE_ENOUGH_MEMORY
 static void z80_cbxx( libspectrum_byte opcode2 );
 static void z80_ddxx( libspectrum_byte opcode2 );
@@ -99,23 +105,24 @@ z80_do_opcodes( void )
 
 #ifdef __GNUC__
 
-  void *cgoto[8]; size_t next = 0;
+  void *cgoto[9]; size_t next = 0;
 
   SETUP_CHECK( profile, profile_active, 0 );
   SETUP_CHECK( rzx, rzx_playback, 1 );
   SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 );
   SETUP_CHECK( trdos, trdos_available, 3 );
-  SETUP_CHECK( if1p, if1_available, 4 );
-  SETUP_CHECK( divide_early, settings_current.divide_enabled, 5 );
-  if( next != 6 ) { cgoto[ next ] = &&opcode_delay; }
+  SETUP_CHECK( plusd, plusd_available, 4 );
+  SETUP_CHECK( if1p, if1_available, 5 );
+  SETUP_CHECK( divide_early, settings_current.divide_enabled, 6 );
+  if( next != 7 ) { cgoto[ next ] = &&opcode_delay; }
 
-  next = 6;
-  SETUP_CHECK( evenm1, even_m1, 6 );
-  if( next != 7 ) { cgoto[ next ] = &&run_opcode; }
   next = 7;
-  SETUP_CHECK( if1u, if1_available, 7 );
-  SETUP_CHECK( divide_late, settings_current.divide_enabled, 8 );
-  if( next != 9 ) { cgoto[ next ] = &&end_opcode; }
+  SETUP_CHECK( evenm1, even_m1, 7 );
+  if( next != 8 ) { cgoto[ next ] = &&run_opcode; }
+  next = 8;
+  SETUP_CHECK( if1u, if1_available, 8 );
+  SETUP_CHECK( divide_late, settings_current.divide_enabled, 9 );
+  if( next != 10 ) { cgoto[ next ] = &&end_opcode; }
 
 #endif				/* #ifdef __GNUC__ */
 
@@ -154,14 +161,24 @@ z80_do_opcodes( void )
 	  PC >= 16384 ) {
 	trdos_unpage();
       }
-    } else if( ( PC & 0xff00 ) == 0x3d00 &&
+    } else if( ( PC & 0xff00 ) == 0x3d00 && 
 	       machine_current->ram.current_rom ) {
       trdos_page();
     }
 
     END_CHECK
 
-    CHECK( if1p, if1_available, 4 )
+    CHECK( plusd, plusd_available, 4 )
+
+#ifdef HAVE_LIBDSK_H
+    if( !plusd_active ) {
+      if( PC == 0x0008 || PC == 0x0066 || PC == 0x003a ) {
+	plusd_page();
+      }
+    }
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
+    CHECK( if1p, if1_available, 5 )
 
     if( PC == 0x0008 || PC == 0x1708 ) {
       if1_page();
@@ -169,7 +186,7 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( divide_early, settings_current.divide_enabled, 5 )
+    CHECK( divide_early, settings_current.divide_enabled, 6 )
     
     if( ( PC & 0xff00 ) == 0x3d00 ) {
       divide_set_automap( 1 );
@@ -182,7 +199,7 @@ z80_do_opcodes( void )
     contend_read( PC, 4 );
 
     /* Check to see if M1 cycles happen on even tstates */
-    CHECK( evenm1, even_m1, 6 )
+    CHECK( evenm1, even_m1, 7 )
 
     if( tstates & 1 ) tstates++;
 
@@ -193,7 +210,7 @@ z80_do_opcodes( void )
        triggering read breakpoints */
     opcode = readbyte_internal( PC );
 
-    CHECK( if1u, if1_available, 7 )
+    CHECK( if1u, if1_available, 8 )
 
     if( PC == 0x0700 ) {
       if1_unpage();
@@ -201,7 +218,7 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( divide_late, settings_current.divide_enabled, 8 )
+    CHECK( divide_late, settings_current.divide_enabled, 9 )
 
     if( ( PC & 0xfff8 ) == 0x1ff8 ) {
       divide_set_automap( 0 );
