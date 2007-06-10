@@ -75,7 +75,8 @@ svgakeyboard_keypress( int keysym )
   if( fuse_keysym == INPUT_KEY_NONE ) return 0;
 
   fuse_event.type = INPUT_EVENT_KEYPRESS;
-  fuse_event.types.key.key = fuse_keysym;
+  fuse_event.types.key.native_key = fuse_keysym;
+  fuse_event.types.key.spectrum_key = fuse_keysym;
 
   return input_event( &fuse_event );
 }
@@ -91,7 +92,8 @@ svgakeyboard_keyrelease( int keysym )
   if( fuse_keysym == INPUT_KEY_NONE ) return 0;
 
   fuse_event.type = INPUT_EVENT_KEYRELEASE;
-  fuse_event.types.key.key = fuse_keysym;
+  fuse_event.types.key.native_key = fuse_keysym;
+  fuse_event.types.key.spectrum_key = fuse_keysym;
 
   return input_event( &fuse_event );
 }

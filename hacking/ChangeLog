@@ -1776,3 +1776,5 @@
 20070610 widget/error.c: don't try and output widgets if we don't have a
 	 display yet (fixes bug #1718115).
 20070610 man/fuse.1: remove outdated widget-specific sections (Stuart).
+20070610 keysyms.pl,ui/svga/{svgakeyboard.c,svgadisplay.c}: fix bitrot
+	 (fixes bug #1727516) (Gergely Szasz).
