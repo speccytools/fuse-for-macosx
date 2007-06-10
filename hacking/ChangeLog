@@ -1769,3 +1769,6 @@
 20070608 man/fuse.1: fix dashes (Stuart).
 20070608 sound/alsasound.c: update FSF address (Stuart).
 20070609 profile.c: fix printf() warning.
+20070610 event.[ch],spectrum.c,rzx.[ch],ula.h: add RZX "sentinel" event to
+	 prevent running off the end of the contention array on very long
+	 frames (see bug #1057471).

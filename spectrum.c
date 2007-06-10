@@ -59,8 +59,6 @@ libspectrum_byte spectrum_last_ula;
    structure lookup too often */
 spectrum_contention_delay_function contend_delay;
 
-libspectrum_byte spectrum_contention[ 80000 ];
-
 int
 spectrum_frame( void )
 {
