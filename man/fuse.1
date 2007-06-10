@@ -2,7 +2,7 @@
 .\"
 .\" fuse.1: Fuse man page
 .\" Copyright (c) 2001-2007 Russell Marks, Philip Kendall, Darren Salt,
-.\"                         Fredrick Meunier
+.\"                         Fredrick Meunier, Stuart Brady
 .\"
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -384,6 +384,13 @@ Insert the specified file into the emulated +3's A: drive; also select
 the +3 on startup if available.
 .RE
 .PP
+.I \-\-plusd
+.RS
+Emulate a +D interface. Same as the Peripherals Options dialog's
+.I "+D interface"
+option.
+.RE
+.PP
 .I "\-\-printer"
 .RS
 Specify whether the emulation should include a printer. Same as the
@@ -472,6 +479,8 @@ Specify an RZX file to begin recording to.
 .I "\-\-rom\-spec\-se\-1 file"
 .br
 .I "\-\-rom\-interface\-1 file"
+.br
+.I "\-\-rom\-plusd file"
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
 options respectively refer to the 16K Spectrum
@@ -498,8 +507,10 @@ the four ROMs for the Scorpion 256
 .RI ( 256s\-0.rom ", " 256s\-1.rom ", " 256s\-2.rom " and " 256s\-3.rom ),
 the two ROMs for the Spectrum SE
 .RI ( se\-0.rom " and " se\-1.rom ),
-and the Interface I ROM
-.RI ( if1\-2.rom ).
+the Interface I ROM
+.RI ( if1\-2.rom ),
+and the +D ROM
+.RI ( plusd.rom ).
 The names in brackets denote the defaults.
 .RE
 .PP
@@ -1575,6 +1586,13 @@ jumper. See the
 .B "DIVIDE"
 section for more details.
 .RE
+.PP
+.I "+D interface"
+.RS
+If this option is selected, Fuse will emulate the +D interface.  See the
+.B "+D EMULATION"
+section for more details.
+.RE
 .RE
 .PP
 .I "Options, RZX..."
@@ -1888,7 +1906,10 @@ you close the window.
 .RS
 Sends a non-maskable interrupt to the emulated Spectrum. Due to a typo
 in the standard 48K ROM, this will cause a reset, but modified ROMs are 
-available which make use of this feature.
+available which make use of this feature. When the +D is emulated, this
+is used to access the +D's screenshot and snapshot features (see the
+.B "+D EMULATION"
+section below).
 .RE
 .PP
 .I F7
@@ -2145,6 +2166,35 @@ As above, but for drive B:.
 .br
 .RS
 As above, but for the emulated TR-DOS drives.
+.RE
+.PP
+.I "Media, Disk, +D, Drive 1, Insert..."
+.br
+.I "Media, Disk, +D, Drive 1, Eject"
+.br
+.I "Media, Disk, +D, Drive 1, Eject and write..."
+.br
+.I "Media, Disk, +D, Drive 2, Insert..."
+.br
+.I "Media, Disk, +D, Drive 2, Eject"
+.br
+.I "Media, Disk, +D, Drive 2, Eject and write..."
+.br
+.I "Media, Disk, +D, Drive 3, Insert..."
+.br
+.I "Media, Disk, +D, Drive 3, Eject"
+.br
+.I "Media, Disk, +D, Drive 3, Eject and write..."
+.br
+.I "Media, Disk, +D, Drive 4, Insert..."
+.br
+.I "Media, Disk, +D, Drive 4, Eject"
+.br
+.I "Media, Disk, +D, Drive 4, Eject and write..."
+.br
+.RS
+As above, but for the emulated +D drives. You will be prompted for a
+filename.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Insert..."
@@ -3016,6 +3066,32 @@ utility before use with Fuse.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH +D EMULATION
+.PP
+Fuse supports .MGT and .IMG images in its +D emulation.  The +D's
+printer and joystick ports are not yet emulated.  The +D may only be
+used with 48K, 128K and +2 (not +2A) emulation.  To access disks,
+load G+DOS, by inserting a disk containing the DOS file (+SYS) and
+entering "RUN".  Once DOS is loaded, you can load to/from +D disks
+by prefixing filenames with
+.RI `d n '
+where
+.RI ` n '
+is the number of the drive in use.  For example,
+.RI ` "LOAD d1\(dqmyfile\(dq" '
+would load the file named `myfile' from the emulated drive 1.
+Microdrive syntax may also be used.
+.PP
+To save a snapshot, choose the `Machine, NMI' menu option, and then
+press `4' to save a 48K snapshot, or `5' to save a 128K snapshot.
+When saving a 128K snapshot, you must then press Y or N to indicate
+whether the screen changed while saving the snapshot, to finish
+saving.  You can also choose `3' to save a screenshot to disk.
+Options `1' and `2' allow screenshots to be printed, but the +D
+printer port is not yet emulated.
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH COMPRESSED FILES
 .PP
 Assuming the appropriate libraries were available when
@@ -3027,9 +3103,9 @@ or
 .IR gzip (3)
 just as if they were uncompressed.
 .I libdsk
-provides an equivalent functionality for +3 disk images if available,
-but there is currently no support for reading compressed TR-DOS disk
-images.
+provides an equivalent functionality for +3 and +D disk images if
+available, but there is currently no support for reading compressed
+TR-DOS disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3129,7 +3205,8 @@ Matthew Westcott wrote the AY logging code and the DivIDE emulation.
 Marek Januszewski wrote various bits of code to make Fuse work under
 Win32, including the DirectDraw user interface.
 .PP
-Stuart Brady wrote the Scorpion emulation and the HP-UX sound code.
+Stuart Brady wrote the +D emulation, Scorpion emulation and the HP-UX
+sound code.
 .PP
 Garry Lancaster wrote the 8-bit IDE, ZXATASP and ZXCF interface
 emulations.

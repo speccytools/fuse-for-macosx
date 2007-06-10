@@ -1786,3 +1786,4 @@
 20070610 keysyms.pl,ui/svga/{svgakeyboard.c,svgadisplay.c}: fix bitrot
 	 (fixes bug #1727516) (Gergely Szasz).
 20070610 ui/svga: ignore *.a files.
+20070610 man/fuse.1: add +D documentation (Stuart) (plusd_20070609).
