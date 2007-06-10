@@ -42,9 +42,13 @@
 #include "snapshot.h"
 #include "timer.h"
 #include "ui/ui.h"
+#include "ula.h"
 #include "utils.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+
+#define RZX_SENTINEL_TIME ( ULA_CONTENTION_SIZE - 1000 )
+#define RZX_SENTINEL_TIME_REDUCE 8000
 
 /* The offset used to get the count of instructions from the R register;
    (instruction count) = R + rzx_instructions_offset */
@@ -282,6 +286,10 @@ start_playback( libspectrum_rzx *rzx )
   error = event_remove_type( EVENT_TYPE_FRAME );
   if( error ) return error;
 
+  /* Add a sentinel event to prevent tstates overrun (bug #1057471) */
+  error = event_add( RZX_SENTINEL_TIME, EVENT_TYPE_RZX_SENTINEL );
+  if( error ) return error;
+
   tstates = libspectrum_rzx_tstates( rzx );
   rzx_instruction_count = libspectrum_rzx_instructions( rzx );
   rzx_playback = 1;
@@ -301,6 +309,10 @@ int rzx_stop_playback( int add_interrupt )
 
   ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
   ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
+
+  /* Remove our RZX sentinel event */
+  error = event_remove_type( EVENT_TYPE_RZX_SENTINEL );
+  if( error ) return error;
 
   /* We've now finished with the RZX file, so add an end of frame
      event if we've been requested to do so; we don't if we just run
@@ -382,6 +394,12 @@ static int playback_frame( void )
     ui_error( UI_ERROR_INFO, "Finished RZX playback" );
     return rzx_stop_playback( 0 );
   }
+
+  /* Move the RZX sentinel back out to 79000 tstates; the addition of
+     the frame length is because everything is reduced by that in
+     event_frame() */
+  event_remove_type( EVENT_TYPE_RZX_SENTINEL );
+  event_add( RZX_SENTINEL_TIME + tstates, EVENT_TYPE_RZX_SENTINEL );
 
   if( snap ) {
     error = snapshot_copy_from( snap );
@@ -532,4 +550,20 @@ rzx_rollback_to( void )
   if( error ) return error;
 
   return 0;
+}
+
+void
+rzx_sentinel( void )
+{
+  int error;
+
+  ui_error( UI_ERROR_WARNING, "RZX frame is longer than %u tstates",
+	    RZX_SENTINEL_TIME );
+  tstates -= RZX_SENTINEL_TIME_REDUCE;
+  z80.interrupts_enabled_at -= RZX_SENTINEL_TIME_REDUCE;
+
+  /* Add another sentinel event in case this frame continues a lot more after
+     this */
+  error = event_add( RZX_SENTINEL_TIME, EVENT_TYPE_RZX_SENTINEL );
+  if( error ) return;
 }

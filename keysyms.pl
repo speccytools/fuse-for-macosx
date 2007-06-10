@@ -237,6 +237,7 @@ my %ui_data = (
 		  Caps_Lock  => 'CAPSLOCK',
 		  numbersign => 'BACKSLASH',
 		  Return     => 'ENTER',
+		  Delete     => 'REMOVE',
 		  Left       => 'CURSORBLOCKLEFT',
 		  Down       => 'CURSORBLOCKDOWN',
 		  Up         => 'CURSORBLOCKUP',

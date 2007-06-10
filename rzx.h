@@ -80,4 +80,6 @@ int rzx_rollback( void );
 
 int rzx_rollback_to( void );
 
+void rzx_sentinel( void );
+
 #endif			/* #ifndef FUSE_RZX_H */

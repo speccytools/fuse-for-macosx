@@ -223,7 +223,7 @@ void widget_pokefinder_keyhandler( input_key key );
 /* The memory browser widget */
 
 int widget_memory_draw( void *data );
-void widget_memory_keyhandler( input_key key, long rawkey );
+void widget_memory_keyhandler( input_key key );
 
 /* The ROM selector widget */
 

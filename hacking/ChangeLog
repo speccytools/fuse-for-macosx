@@ -1775,4 +1775,14 @@
 	 menu.c,menu_data.dat,periph.{c,h},roms/{Makefile.am,plusd.rom},
 	 settings.dat,snapshot.c,tape.c,ui.c,ui/{gtk/gtkui.c,options.dat,ui.h},
 	 widget/menu.c,z80/{coretest.c,z80.c,z80_ops.c}: +D emulation
-	 (part of patch #1546570) (Stuart).
+	 (part of patch #1546570) (plusd_20070609) (Stuart).
+20070610 event.[ch],spectrum.c,rzx.[ch],ula.h: add RZX "sentinel" event to
+	 prevent running off the end of the contention array on very long
+	 frames (see bug #1057471).
+20070610 widget/{memory.c,pokefinder.c,widget_internals.h}: fix up warnings.
+20070610 widget/error.c: don't try and output widgets if we don't have a
+	 display yet (fixes bug #1718115).
+20070610 man/fuse.1: remove outdated widget-specific sections (Stuart).
+20070610 keysyms.pl,ui/svga/{svgakeyboard.c,svgadisplay.c}: fix bitrot
+	 (fixes bug #1727516) (Gergely Szasz).
+20070610 ui/svga: ignore *.a files.

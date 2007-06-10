@@ -26,8 +26,10 @@
 #ifndef FUSE_ULA_H
 #define FUSE_ULA_H
 
+#define ULA_CONTENTION_SIZE 80000
+
 /* How much contention do we get at every tstate? */
-extern libspectrum_byte ula_contention[ 80000 ];
+extern libspectrum_byte ula_contention[ ULA_CONTENTION_SIZE ];
 
 libspectrum_byte ula_read( libspectrum_word port, int *attached );
 void ula_write( libspectrum_word port, libspectrum_byte b );

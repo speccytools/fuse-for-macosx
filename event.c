@@ -195,9 +195,10 @@ int event_do_events(void)
       tape_event_record_sample( ptr->tstates );
       break;
 
-    default:
-      ui_error( UI_ERROR_ERROR, "unknown event type %d", ptr->type );
+    case EVENT_TYPE_RZX_SENTINEL:
+      rzx_sentinel();
       break;
+
     }
     if( event_free ) {
       free( ptr );
@@ -316,6 +317,7 @@ event_name( event_type type )
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
   case EVENT_TYPE_TIMER: return "Timer";
   case EVENT_TYPE_TAPE_RECORD: return "Tape sample record";
+  case EVENT_TYPE_RZX_SENTINEL: return "RZX sentinel";
 
   }
 
