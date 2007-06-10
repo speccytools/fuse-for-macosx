@@ -100,7 +100,7 @@ display_possible( void )
   widget_rectangle(  16,  88, 136,  8, WIDGET_COLOUR_BACKGROUND );
   widget_rectangle(  82, 104,  56,  8, WIDGET_COLOUR_BACKGROUND );
 
-  snprintf( buf, sizeof( buf ), "%lu", (unsigned int)pokefinder_count );
+  snprintf( buf, sizeof( buf ), "%lu", (unsigned long)pokefinder_count );
   widget_printstring( 96, 32, WIDGET_COLOUR_FOREGROUND, buf );
 
   if( FEW_ENOUGH() ) {

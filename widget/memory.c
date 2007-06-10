@@ -70,7 +70,7 @@ widget_memory_draw( void *data )
 }
 
 void
-widget_memory_keyhandler( input_key key, long rawkey )
+widget_memory_keyhandler( input_key key )
 {
   switch ( key ) {
   case INPUT_KEY_Escape:	/* Close widget */

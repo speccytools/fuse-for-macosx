@@ -1772,3 +1772,4 @@
 20070610 event.[ch],spectrum.c,rzx.[ch],ula.h: add RZX "sentinel" event to
 	 prevent running off the end of the contention array on very long
 	 frames (see bug #1057471).
+20070610 widget/{memory.c,pokefinder.c,widget_internals.h}: fix up warnings.
