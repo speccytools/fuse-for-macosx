@@ -1773,3 +1773,6 @@
 	 prevent running off the end of the contention array on very long
 	 frames (see bug #1057471).
 20070610 widget/{memory.c,pokefinder.c,widget_internals.h}: fix up warnings.
+20070610 widget/error.c: don't try and output widgets if we don't have a
+	 display yet (fixes bug #1718115).
+

@@ -40,6 +40,9 @@ widget_error_t *error_info;
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
+  /* Can't output widgets if we don't have a display yet */
+  if( !display_ui_initialised ) return 0;
+
   widget_error_t error_info;
 
   error_info.severity = severity;
