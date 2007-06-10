@@ -550,14 +550,6 @@ format supported by
 .IR libspectrum "(3)."
 .RE
 .PP
-.I \-\-snaps\-as\-z80
-.RS
-Specify whether the widget based user interfaces should save snapshots
-as .szx or .z80 files. The same as the General Options dialog's
-.I "Save snaps as .z80"
-option.
-.RE
-.PP
 .I \-\-sound
 .RS
 Specify whether Fuse should produce sound. (Enabled by default, but
@@ -1880,7 +1872,7 @@ section for more information.
 .PP
 .I "Machine, Poke Finder..."
 .RS
-Start the `poke finder' (available only under the GTK+ UI). See the
+Start the `poke finder'. See the
 .B "POKE FINDER"
 section for more information.
 .RE
@@ -2120,9 +2112,7 @@ changes made to the image will not be saved.
 .I "Media, Disk, +3, Drive A:, Eject and write..."
 .RS
 Deselect the disk image currently in the +3's drive A: and write the
-current state of the disk to a file. The GTK+ UI lets you select a
-filename, while the others will write the image to
-.RI ` drivea.dsk '.
+current state of the disk to a file. You will be prompted for a filename.
 .RE
 .PP
 .I "Media, Disk, +3, Drive B:, Insert..."
@@ -2138,8 +2128,7 @@ As above, but for drive B:.
 .PP
 .I "Media, Disk, +3, Drive B:, Eject and write"
 .RS
-As above, but for drive B:. The widget-based UIs will save to
-.RI ` driveb.dsk '.
+As above, but for drive B:.
 .RE
 .PP
 .I "Media, Disk, TR-DOS, Drive A:, Insert..."
@@ -2155,12 +2144,7 @@ As above, but for drive B:. The widget-based UIs will save to
 .I "Media, Disk, TR-DOS, Drive B:, Eject and write..."
 .br
 .RS
-As above, but for the emulated TR-DOS drives. The widget-based UIs
-will save to
-.RI ` drivea.trd '
-and
-.RI ` driveb.trd '
-respectively.
+As above, but for the emulated TR-DOS drives.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Insert..."
@@ -2932,13 +2916,12 @@ and logical and (`&&') and or (`||').
 .\"
 .SH THE POKE FINDER
 .PP
-The `poke finder', available only under the GTK+ UI, is a tool which
-is designed to make the task of finding (infinite lives etc.) pokes for
-games a bit easier: it is similar to the `Lifeguard' utility which was
-available for use with the Multiface. It works by maintaining a list
-of locations in which the current number of lives (etc.) may be stored,
-and having the ability to remove from that list any locations which
-don't contain a specified value.
+The `poke finder' is a tool which is designed to make the task of
+finding (infinite lives etc.) pokes for games a bit easier: it is
+similar to the `Lifeguard' utility which was available for use with the
+Multiface. It works by maintaining a list of locations in which the
+current number of lives (etc.) may be stored, and having the ability to
+remove from that list any locations which don't contain a specified value.
 .PP
 The poke finder dialog contains an entry box for specifying the value
 to be searched for, a count of the current number of possible

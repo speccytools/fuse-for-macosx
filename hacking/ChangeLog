@@ -1775,4 +1775,4 @@
 20070610 widget/{memory.c,pokefinder.c,widget_internals.h}: fix up warnings.
 20070610 widget/error.c: don't try and output widgets if we don't have a
 	 display yet (fixes bug #1718115).
-
+20070610 man/fuse.1: remove outdated widget-specific sections (Stuart).
