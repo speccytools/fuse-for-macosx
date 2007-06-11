@@ -417,7 +417,7 @@ plusd_disk_eject( plusd_drive_number which, int write )
   d = &plusd_drives[ which ];
 
   if( !d->disk )
-    return 1;
+    return 0;
 
   if( write ) {
 
