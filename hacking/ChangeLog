@@ -1780,3 +1780,5 @@
 	 (fixes bug #1727516) (Gergely Szasz).
 20070610 ui/svga: ignore *.a files.
 20070610 man/fuse.1: spelling fixes (Stuart).
+20070611 machines/specplus3.c: save disk images if their 'dirty' state cannot
+	 be determined (Stuart).

@@ -604,8 +604,8 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
     if( ui_plus3_disk_write( which ) ) return 1;
 
   } else {
-
-    if( fd_dirty( drives[which].drive ) == FD_D_DIRTY ) {
+    int dirty = fd_dirty( drives[which].drive );
+    if( dirty == FD_D_DIRTY ) {
 
       ui_confirm_save_t confirm = ui_confirm_save(
         "Disk has been modified.\nDo you want to save it?"
@@ -621,6 +621,8 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
       case UI_CONFIRM_SAVE_CANCEL: return 1;
 
       }
+    } else if( dirty == FD_D_UNAVAILABLE ) {
+      if( ui_plus3_disk_write( which ) ) return 1;
     }
   }
   
