@@ -56,7 +56,6 @@ void
 sound_lowlevel_end( void )
 {
 /* Stop PCM device and drop pending frames */
-  settings_current.sound = 0;
   snd_pcm_drop( pcm_handle );
   snd_pcm_close( pcm_handle );
 }
@@ -230,7 +229,8 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     return 1;
   }
 
-  if( first_init && sound_framesiz != exact_framesiz ) {
+  if( first_init && ( exact_framesiz < sound_framesiz / 1.5 ||
+		      exact_framesiz > sound_framesiz * 1.5    ) ) {
     ui_error( UI_ERROR_WARNING,
               "The period size %d is not supported by your hardware. "
               "Using %d instead.\n", (int)sound_framesiz,

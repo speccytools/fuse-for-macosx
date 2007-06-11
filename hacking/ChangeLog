@@ -1782,3 +1782,6 @@
 20070610 man/fuse.1: spelling fixes (Stuart).
 20070611 machines/specplus3.c: save disk images if their 'dirty' state cannot
 	 be determined (Stuart).
+20070611 sound/alsasound.c: stop sound_lowlevel_end() from disabling sound
+	 (fixes bug #1733567) and disable warning when a sound buffer of
+	 exactly the right size could not be obtained (Stuart).
