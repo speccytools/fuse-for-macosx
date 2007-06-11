@@ -1790,3 +1790,5 @@
 20070611 machines/specplus2.c: enable +D support (plusd_20070609) (Stuart).
 20070611 disk/plusd.c,menu.c: check for modifications to +D disks in
 	 menu_check_media_changed() (plusd_20070609) (Stuart).
+20070611 machine.c,periph.c,ui.c,ui/ui.h: fix disk menu activation
+	 (plusd_20070609) (Stuart).

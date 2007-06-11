@@ -193,6 +193,8 @@ typedef enum ui_menu_item {
 int ui_menu_activate( ui_menu_item item, int active );
 int ui_menu_item_set_active( const char *path, int active );
 
+void ui_menu_disk_update( void );
+
 /* Functions to update the statusbar */
 
 typedef enum ui_statusbar_item {

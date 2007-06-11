@@ -428,3 +428,34 @@ ui_menu_activate( ui_menu_item item, int active )
   ui_error( UI_ERROR_ERROR, "ui_menu_activate: unknown item %d\n", item );
   return 1;
 }
+
+void
+ui_menu_disk_update( void )
+{
+  int plus3, trdos, plusd;
+  int capabilities;
+
+  capabilities = machine_current->capabilities;
+
+  /* Set the disk menu items and statusbar appropriately */
+  plus3 = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
+  trdos = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK;
+#ifdef HAVE_LIBDSK_H
+  plusd = plusd_available;
+#endif                  /* #ifdef HAVE_LIBDSK_H */
+
+  if( plus3 || trdos || plusd ) {
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
+    ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
+  } else {
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 0 );
+    ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
+                         UI_STATUSBAR_STATE_NOT_AVAILABLE );
+  }
+
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3, plus3 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_TRDOS, trdos );
+#ifdef HAVE_LIBDSK_H
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
+#endif                  /* #ifdef HAVE_LIBDSK_H */
+}

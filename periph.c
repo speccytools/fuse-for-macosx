@@ -393,17 +393,6 @@ update_ide_menu( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE, divide );
 }
 
-#ifdef HAVE_LIBDSK_H
-static void
-update_plusd_menu( void )
-{
-  int plusd = settings_current.plusd;
-
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, plusd );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
-}
-#endif			/* #ifdef HAVE_LIBDSK_H */
-
 void
 periph_update( void )
 {
@@ -464,8 +453,5 @@ periph_update( void )
   update_cartridge_menu();
   update_ide_menu();
   if1_update_menu();
-#ifdef HAVE_LIBDSK_H
-  update_plusd_menu();
-#endif
   machine_current->memory_map();
 }
