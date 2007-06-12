@@ -71,8 +71,7 @@ void plusd_cn_write( libspectrum_word port, libspectrum_byte b );
 libspectrum_byte plusd_mem_read( libspectrum_word port, int *attached );
 void plusd_mem_write( libspectrum_word port, libspectrum_byte b );
 
-libspectrum_byte plusd_print_read( libspectrum_word port, int *attached );
-void plusd_print_write( libspectrum_word port, libspectrum_byte b );
+libspectrum_byte plusd_printer_read( libspectrum_word port, int *attached );
 
 typedef enum plusd_drive_number {
   PLUSD_DRIVE_1 = 0,

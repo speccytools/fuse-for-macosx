@@ -47,6 +47,7 @@
 #include "event.h"
 #include "machine.h"
 #include "plusd.h"
+#include "printer.h"
 #include "settings.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -102,11 +103,11 @@ const periph_t plusd_peripherals[] = {
   { 0x00ff, 0x00fb, plusd_dr_read, plusd_dr_write },
 
   /* ---- ---- 1110 1111 */
-  { 0x00ff, 0x00ef, plusd_joy_read, plusd_cn_write },
+  { 0x00ff, 0x00ef, NULL, plusd_cn_write },
   /* ---- ---- 1110 0111 */
   { 0x00ff, 0x00e7, plusd_mem_read, plusd_mem_write },
   /* 0000 0000 1111 0111 */
-  { 0x00ff, 0x00f7, plusd_print_read, plusd_print_write },
+  { 0x00ff, 0x00f7, plusd_printer_read, printer_parallel_write },
 };
 
 const size_t plusd_peripherals_count =
@@ -269,22 +270,18 @@ plusd_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   wd1770_dr_write( plusd_current, b );
 }
 
-libspectrum_byte
-plusd_joy_read( libspectrum_word port GCC_UNUSED, int *attached )
-{
-  /* XXX */
-  return 0;
-}
-
 void
 plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int drive, side;
 
   drive = b & 0x03;
-  side = (b & 0x80) ? 1 : 0;
+  side = ( b & 0x80 ) ? 1 : 0;
+
   plusd_current = &plusd_drives[ side ];
   plusd_current->side = side;
+
+  printer_parallel_strobe_write( b & 0x40 );
 }
 
 libspectrum_byte
@@ -301,16 +298,10 @@ plusd_mem_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 libspectrum_byte
-plusd_print_read( libspectrum_word port GCC_UNUSED, int *attached )
+plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  /* XXX */
-  return 0;
-}
-
-void
-plusd_print_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
-{
-  /* XXX */
+  *attached = 1;
+  return 0; /* never busy */
 }
 
 int

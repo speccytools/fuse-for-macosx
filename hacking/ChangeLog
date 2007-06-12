@@ -1792,3 +1792,5 @@
 	 menu_check_media_changed() (plusd_20070609) (Stuart).
 20070611 machine.c,periph.c,ui.c,ui/ui.h: fix disk menu activation
 	 (plusd_20070609) (Stuart).
+20070612 disk/plusd.{c,h},man/fuse.1: implement +D printer port routines and
+	 remove DISCiPLE-specific joystick ports (plusd_20070609) (Stuart).
