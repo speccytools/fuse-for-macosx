@@ -78,14 +78,15 @@ typedef enum plusd_drive_number {
   PLUSD_DRIVE_2,
 } plusd_drive_number;
 
+extern wd1770_fdc plusd_fdc;
+
 #define PLUSD_NUM_DRIVES 2
 extern wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
-extern wd1770_drive *plusd_current;
 
 int plusd_disk_insert( plusd_drive_number which, const char *filename,
-                          int autoload );
+		       int autoload );
 int plusd_disk_insert_default_autoload( plusd_drive_number which,
-                                           const char *filename );
+					const char *filename );
 int plusd_disk_eject( plusd_drive_number which, int write );
 int plusd_disk_write( plusd_drive_number which, const char *filename );
 int plusd_event_cmd_done( libspectrum_dword last_tstates );

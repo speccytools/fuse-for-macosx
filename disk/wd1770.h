@@ -53,10 +53,15 @@ typedef struct wd1770_drive {
   int index_pulse;
   int index_interrupt;
 
-  int rates[ 4 ];
-  int spin_cycles;
   int track;
   int side;
+} wd1770_drive;
+
+typedef struct wd1770_fdc {
+  wd1770_drive *current_drive;
+
+  int rates[ 4 ];
+  int spin_cycles;
   int direction;                /* 0 = spindlewards, 1 = rimwards */
 
   enum wd1770_state {
@@ -81,34 +86,33 @@ typedef struct wd1770_drive {
   int data_multisector;
   int data_offset;
 
-  /* FIXME: these should be per-fdc, not per-drive: */
   libspectrum_byte status_register;     /* status register */
   libspectrum_byte track_register;      /* track register */
   libspectrum_byte sector_register;     /* sector register */
   libspectrum_byte data_register;       /* data register */
 
-  void ( *set_cmdint ) ( struct wd1770_drive *d );
-  void ( *reset_cmdint ) ( struct wd1770_drive *d );
-  void ( *set_datarq ) ( struct wd1770_drive *d );
-  void ( *reset_datarq ) ( struct wd1770_drive *d );
+  void ( *set_cmdint ) ( struct wd1770_fdc *f );
+  void ( *reset_cmdint ) ( struct wd1770_fdc *f );
+  void ( *set_datarq ) ( struct wd1770_fdc *f );
+  void ( *reset_datarq ) ( struct wd1770_fdc *f );
   void *iface;
-} wd1770_drive;
+} wd1770_fdc;
 
-libspectrum_byte wd1770_sr_read( wd1770_drive *d );
-void wd1770_cr_write( wd1770_drive *d, libspectrum_byte b );
+libspectrum_byte wd1770_sr_read( wd1770_fdc *f );
+void wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b );
 
-libspectrum_byte wd1770_tr_read( wd1770_drive *d );
-void wd1770_tr_write( wd1770_drive *d, libspectrum_byte b );
+libspectrum_byte wd1770_tr_read( wd1770_fdc *f );
+void wd1770_tr_write( wd1770_fdc *f, libspectrum_byte b );
 
-libspectrum_byte wd1770_sec_read( wd1770_drive *d );
-void wd1770_sec_write( wd1770_drive *d, libspectrum_byte b );
+libspectrum_byte wd1770_sec_read( wd1770_fdc *f );
+void wd1770_sec_write( wd1770_fdc *f, libspectrum_byte b );
 
-libspectrum_byte wd1770_dr_read( wd1770_drive *d );
-void wd1770_dr_write( wd1770_drive *d, libspectrum_byte b );
+libspectrum_byte wd1770_dr_read( wd1770_fdc *f );
+void wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b );
 
-void wd1770_set_cmdint( wd1770_drive *d );
-void wd1770_reset_cmdint( wd1770_drive *d );
-void wd1770_set_datarq( wd1770_drive *d );
-void wd1770_reset_datarq( wd1770_drive *d );
+void wd1770_set_cmdint( wd1770_fdc *f );
+void wd1770_reset_cmdint( wd1770_fdc *f );
+void wd1770_set_datarq( wd1770_fdc *f );
+void wd1770_reset_datarq( wd1770_fdc *f );
 
 #endif                  /* #ifndef FUSE_WD1770_H */

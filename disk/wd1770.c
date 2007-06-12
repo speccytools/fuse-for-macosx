@@ -61,71 +61,73 @@ statusbar_update( int busy )
 }
 
 void
-wd1770_set_cmdint( wd1770_drive *d )
+wd1770_set_cmdint( wd1770_fdc *f )
 {
-  if( d->set_cmdint )
-    d->set_cmdint( d );
+  if( f->set_cmdint )
+    f->set_cmdint( f );
 }
 
 void
-wd1770_reset_cmdint( wd1770_drive *d )
+wd1770_reset_cmdint( wd1770_fdc *f )
 {
-  if( d->reset_cmdint )
-    d->reset_cmdint( d );
+  if( f->reset_cmdint )
+    f->reset_cmdint( f );
 }
 
 void
-wd1770_set_datarq( wd1770_drive *d )
+wd1770_set_datarq( wd1770_fdc *f )
 {
-  d->status_register |= WD1770_SR_IDX_DRQ;
-  if( d->set_datarq )
-    d->set_datarq( d );
+  f->status_register |= WD1770_SR_IDX_DRQ;
+  if( f->set_datarq )
+    f->set_datarq( f );
 }
 
 void
-wd1770_reset_datarq( wd1770_drive *d )
+wd1770_reset_datarq( wd1770_fdc *f )
 {
-  d->status_register &= ~WD1770_SR_IDX_DRQ;
-  if( d->reset_datarq )
-    d->reset_datarq( d );
+  f->status_register &= ~WD1770_SR_IDX_DRQ;
+  if( f->reset_datarq )
+    f->reset_datarq( f );
 }
 
 static void
-wd1770_seek( wd1770_drive *d, int track, int update, int verify )
+wd1770_seek( wd1770_fdc *f, int track, int update, int verify )
 {
+  wd1770_drive *d = f->current_drive;
+
   if( track < d->track ) {
-    d->direction = -1;
-    if( d->track_register == 0 )
-      d->track_register = 255;
+    f->direction = -1;
+    if( f->track_register == 0 )
+      f->track_register = 255;
     else if( update ) {
-      int trk = d->track_register;
+      int trk = f->track_register;
 
       trk += track - d->track + 256;
       trk %= 256;
-      d->track_register = trk;
+      f->track_register = trk;
     }
   } else if( track > d->track ) {
-    d->direction = 1;
-    if( d->track_register == 255 )
-      d->track_register = 0;
+    f->direction = 1;
+    if( f->track_register == 255 )
+      f->track_register = 0;
     else if( update ) {
-      int trk = d->track_register;
+      int trk = f->track_register;
 
       trk += track - d->track;
       trk %= 256;
-      d->track_register = trk;
+      f->track_register = trk;
     }
   }
 
   if( verify ) {
     if( track < 0 )
-      d->status_register |= WD1770_SR_RNF;
+      f->status_register |= WD1770_SR_RNF;
     else if( track >= d->geom.dg_cylinders )
-      d->status_register |= WD1770_SR_RNF;
+      f->status_register |= WD1770_SR_RNF;
     else
-      d->status_register &= ~WD1770_SR_RNF;
+      f->status_register &= ~WD1770_SR_RNF;
   } else
-    d->status_register &= ~WD1770_SR_RNF;
+    f->status_register &= ~WD1770_SR_RNF;
 
   if( track < 0 )
     track = 0;
@@ -134,63 +136,67 @@ wd1770_seek( wd1770_drive *d, int track, int update, int verify )
   d->track = track;
 
   if( d->track == 0 )
-    d->status_register |= WD1770_SR_LOST;
+    f->status_register |= WD1770_SR_LOST;
   else
-    d->status_register &= ~WD1770_SR_LOST;
+    f->status_register &= ~WD1770_SR_LOST;
 }
 
 libspectrum_byte
-wd1770_sr_read( wd1770_drive *d )
+wd1770_sr_read( wd1770_fdc *f )
 {
-  d->status_register &= ~( WD1770_SR_MOTORON | WD1770_SR_SPINUP |
-                           WD1770_SR_WRPROT | WD1770_SR_CRCERR );
-  if( d->status_type == wd1770_status_type1 ) {
-    d->status_register &= ~WD1770_SR_IDX_DRQ;
+  wd1770_drive *d = f->current_drive;
+
+  f->status_register &= ~( WD1770_SR_MOTORON | WD1770_SR_SPINUP |
+			   WD1770_SR_WRPROT | WD1770_SR_CRCERR );
+  if( f->status_type == wd1770_status_type1 ) {
+    f->status_register &= ~WD1770_SR_IDX_DRQ;
     if( !d->disk || d->index_pulse )
-      d->status_register |= WD1770_SR_IDX_DRQ;
+      f->status_register |= WD1770_SR_IDX_DRQ;
   }
-  return d->status_register;
+  return f->status_register;
 }
 
 
 void
-wd1770_cr_write( wd1770_drive *d, libspectrum_byte b )
+wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
 {
+  wd1770_drive *d = f->current_drive;
+
   /* command register: */
   if( ( b & 0xf0 ) == 0xd0 ) {                  /* Type IV - Force Interrupt */
     statusbar_update(0);
-    d->status_register &= ~WD1770_SR_BUSY;
-    d->status_register &= ~WD1770_SR_WRPROT;
-    d->status_register &= ~WD1770_SR_CRCERR;
-    d->status_register &= ~WD1770_SR_IDX_DRQ;
-    d->state = wd1770_state_none;
-    d->status_type = wd1770_status_type1;
+    f->status_register &= ~WD1770_SR_BUSY;
+    f->status_register &= ~WD1770_SR_WRPROT;
+    f->status_register &= ~WD1770_SR_CRCERR;
+    f->status_register &= ~WD1770_SR_IDX_DRQ;
+    f->state = wd1770_state_none;
+    f->status_type = wd1770_status_type1;
     if( d->track == 0 )
-      d->status_register |= WD1770_SR_LOST;
+      f->status_register |= WD1770_SR_LOST;
     else
-      d->status_register &= ~WD1770_SR_LOST;
-    wd1770_reset_datarq( d );
+      f->status_register &= ~WD1770_SR_LOST;
+    wd1770_reset_datarq( f );
     if( b & 0x08 )
-      wd1770_set_cmdint( d );
+      wd1770_set_cmdint( f );
     if( b & 0x04 )
       d->index_interrupt = 1;
     return;
   }
 
-  if( d->status_register & WD1770_SR_BUSY )
+  if( f->status_register & WD1770_SR_BUSY )
     return;
 
   /*
-  d->status_register |= WD1770_SR_BUSY;
+  f->status_register |= WD1770_SR_BUSY;
   event_add( tstates +
     10 * machine_current->timings.processor_speed / 1000,
     EVENT_TYPE_PLUSD_CMD_DONE );
   */
 
   if( !( b & 0x08 ) ) {
-    d->spin_cycles = 5;
-    d->status_register |= WD1770_SR_MOTORON;
-    d->status_register |= WD1770_SR_SPINUP;
+    f->spin_cycles = 5;
+    f->status_register |= WD1770_SR_MOTORON;
+    f->status_register |= WD1770_SR_SPINUP;
   }
 
   if( !( b & 0x80 ) ) {                         /* Type I */
@@ -201,56 +207,56 @@ wd1770_cr_write( wd1770_drive *d, libspectrum_byte b )
     switch( ( b >> 5 ) & 0x03 ) {
     case 0x00:
       if( ( b & 0x4 ) ) {                               /* Restore */
-        d->track_register = d->track;
-        wd1770_seek( d, 0, update, verify );
+	f->track_register = d->track;
+	wd1770_seek( f, 0, update, verify );
       } else {                                          /* Seek */
-        wd1770_seek( d, d->data_register, 0, verify );
+	wd1770_seek( f, f->data_register, 0, verify );
       }
-      d->direction = 1;
+      f->direction = 1;
       break;
     case 0x01:                                          /* Step */
-      wd1770_seek( d, d->track + d->direction, update, verify );
+      wd1770_seek( f, d->track + f->direction, update, verify );
       break;
     case 0x02:                                          /* Step In */
-      wd1770_seek( d, d->track + 1, update, verify );
+      wd1770_seek( f, d->track + 1, update, verify );
       break;
     case 0x03:                                          /* Step Out */
-      wd1770_seek( d, d->track - 1, update, verify );
+      wd1770_seek( f, d->track - 1, update, verify );
       break;
     }
-    d->status_type = wd1770_status_type1;
-    wd1770_set_cmdint( d );
-    wd1770_reset_datarq( d );
+    f->status_type = wd1770_status_type1;
+    wd1770_set_cmdint( f );
+    wd1770_reset_datarq( f );
   } else if( !( b & 0x40 ) ) {                  /* Type II */
     int multisector = b & 0x10 ? 1 : 0;
     int delay       = b & 0x04 ? 1 : 0;
 
     if( !( b & 0x20 ) ) {                               /* Read Sector */
-      d->state = wd1770_state_read;
+      f->state = wd1770_state_read;
     } else {                                            /* Write Sector */
       int dammark = b & 0x01;
 
-      d->state = wd1770_state_write;
+      f->state = wd1770_state_write;
     }
-    if( d->sector_register < d->geom.dg_secbase ||
-	d->sector_register >= d->geom.dg_secbase + d->geom.dg_sectors ||
+    if( f->sector_register < d->geom.dg_secbase ||
+	f->sector_register >= d->geom.dg_secbase + d->geom.dg_sectors ||
 	d->track >= d->geom.dg_cylinders ||
 	d->track < 0 ) {
-      d->status_register |= WD1770_SR_RNF;
-      wd1770_set_cmdint( d );
-      wd1770_reset_datarq( d );
+      f->status_register |= WD1770_SR_RNF;
+      wd1770_set_cmdint( f );
+      wd1770_reset_datarq( f );
     } else {
-      wd1770_set_datarq( d );
+      wd1770_set_datarq( f );
       statusbar_update(1);
-      d->status_register |= WD1770_SR_BUSY;
-      d->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
-                               WD1770_SR_CRCERR | WD1770_SR_LOST );
-      d->status_type = wd1770_status_type2;
-      d->data_track = d->track;
-      d->data_sector = d->sector_register;
-      d->data_side = d->side;
-      d->data_offset = 0;
-      d->data_multisector = multisector;
+      f->status_register |= WD1770_SR_BUSY;
+      f->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
+			       WD1770_SR_CRCERR | WD1770_SR_LOST );
+      f->status_type = wd1770_status_type2;
+      f->data_track = d->track;
+      f->data_sector = f->sector_register;
+      f->data_side = d->side;
+      f->data_offset = 0;
+      f->data_multisector = multisector;
     }
   } else if( ( b & 0xf0 ) != 0xd0 ) {           /* Type III */
     int delay = b & 0x04;
@@ -266,112 +272,116 @@ wd1770_cr_write( wd1770_drive *d, libspectrum_byte b )
       fprintf( stderr, "read address not yet implemented\n" );
       break;
     }
-    d->status_type = wd1770_status_type2;
+    f->status_type = wd1770_status_type2;
   }
 }
 
 libspectrum_byte
-wd1770_tr_read( wd1770_drive *d )
+wd1770_tr_read( wd1770_fdc *f )
 {
-  return d->track_register;
+  return f->track_register;
 }
 
 void
-wd1770_tr_write( wd1770_drive *d, libspectrum_byte b )
+wd1770_tr_write( wd1770_fdc *f, libspectrum_byte b )
 {
-  d->track_register = b;
+  f->track_register = b;
 }
 
 libspectrum_byte
-wd1770_sec_read( wd1770_drive *d )
+wd1770_sec_read( wd1770_fdc *f )
 {
-  return d->sector_register;
+  return f->sector_register;
 }
 
 void
-wd1770_sec_write( wd1770_drive *d, libspectrum_byte b )
+wd1770_sec_write( wd1770_fdc *f, libspectrum_byte b )
 {
-  d->sector_register = b;
+  f->sector_register = b;
 }
 
 libspectrum_byte
-wd1770_dr_read( wd1770_drive *d )
+wd1770_dr_read( wd1770_fdc *f )
 {
-  if( d->state == wd1770_state_read ) {
+  wd1770_drive *d = f->current_drive;
+
+  if( f->state == wd1770_state_read ) {
     if( !d->disk ||
-	d->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
-        d->data_track >= d->geom.dg_cylinders ||
-	d->data_side >= d->geom.dg_heads ) {
-      d->status_register |= WD1770_SR_RNF;
+	f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
+	f->data_track >= d->geom.dg_cylinders ||
+	f->data_side >= d->geom.dg_heads ) {
+      f->status_register |= WD1770_SR_RNF;
       fprintf( stderr, "read from non-existent sector\n" );
-      return d->data_register;
+      return f->data_register;
     }
 
-    if( d->data_offset == 0 &&
+    if( f->data_offset == 0 &&
 	( d->geom.dg_secsize > sizeof( secbuf ) ||
-	  dsk_pread( d->disk, &d->geom, secbuf, d->data_track,
-		     d->data_side, d->data_sector ) != DSK_ERR_OK ) ) {
-      d->status_register |= WD1770_SR_RNF;
+	  dsk_pread( d->disk, &d->geom, secbuf, f->data_track,
+		     f->data_side, f->data_sector ) != DSK_ERR_OK ) ) {
+      f->status_register |= WD1770_SR_RNF;
       statusbar_update(0);
-      d->status_register &= ~WD1770_SR_BUSY;
-      d->status_type = wd1770_status_type2;
-      d->state = wd1770_state_none;
-      wd1770_set_cmdint( d );
-      wd1770_reset_datarq( d );
-    } else if( d->data_offset < d->geom.dg_secsize ) {
-      d->data_register = secbuf[ d->data_offset++ ];
-      if( d->data_offset == d->geom.dg_secsize ) {
-        if( d->data_multisector &&
-	    d->data_sector < d->geom.dg_secbase + d->geom.dg_sectors ) {
-          d->data_sector++;
-          d->data_offset = 0;
-        }
-        if( !d->data_multisector ||
-	    d->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
+      f->status_register &= ~WD1770_SR_BUSY;
+      f->status_type = wd1770_status_type2;
+      f->state = wd1770_state_none;
+      wd1770_set_cmdint( f );
+      wd1770_reset_datarq( f );
+    } else if( f->data_offset < d->geom.dg_secsize ) {
+      f->data_register = secbuf[ f->data_offset++ ];
+      if( f->data_offset == d->geom.dg_secsize ) {
+	if( f->data_multisector &&
+	    f->data_sector < d->geom.dg_secbase + d->geom.dg_sectors ) {
+	  f->data_sector++;
+	  f->data_offset = 0;
+	}
+	if( !f->data_multisector ||
+	    f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
 	  statusbar_update(0);
-          d->status_register &= ~WD1770_SR_BUSY;
-          d->status_type = wd1770_status_type2;
-          d->state = wd1770_state_none;
-          wd1770_set_cmdint( d );
-          wd1770_reset_datarq( d );
-        }
+	  f->status_register &= ~WD1770_SR_BUSY;
+	  f->status_type = wd1770_status_type2;
+	  f->state = wd1770_state_none;
+	  wd1770_set_cmdint( f );
+	  wd1770_reset_datarq( f );
+	}
       }
     }
   }
-  return d->data_register;
+  return f->data_register;
 }
 
 void
-wd1770_dr_write( wd1770_drive *d, libspectrum_byte b )
+wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b )
 {
-  d->data_register = b;
-  if( d->state == wd1770_state_write ) {
-    if( !d->disk || d->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
-        d->data_track >= d->geom.dg_cylinders ||
-	d->data_side >= d->geom.dg_heads ) {
-      d->status_register |= WD1770_SR_RNF;
+  wd1770_drive *d = f->current_drive;
+
+  f->data_register = b;
+  if( f->state == wd1770_state_write ) {
+    if( !d->disk || f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
+	f->data_track >= d->geom.dg_cylinders ||
+	f->data_side >= d->geom.dg_heads ) {
+      f->status_register |= WD1770_SR_RNF;
       fprintf( stderr, "write to non-existent sector\n" );
       return;
     }
 
-    if( d->data_offset < sizeof( secbuf ) )
-      secbuf[ d->data_offset++ ] = b;
-    if( d->data_offset == d->geom.dg_secsize ) {
-      dsk_pwrite( d->disk, &d->geom, secbuf, d->data_track,
-		  d->data_side, d->data_sector );
-      if( d->data_multisector &&
-	  d->data_sector < d->geom.dg_secbase + d->geom.dg_sectors ) {
-        d->data_sector++;
-        d->data_offset = 0;
+    if( f->data_offset < sizeof( secbuf ) )
+      secbuf[ f->data_offset++ ] = b;
+    if( f->data_offset == d->geom.dg_secsize ) {
+      dsk_pwrite( d->disk, &d->geom, secbuf, f->data_track,
+		  f->data_side, f->data_sector );
+      if( f->data_multisector &&
+	  f->data_sector < d->geom.dg_secbase + d->geom.dg_sectors ) {
+	f->data_sector++;
+	f->data_offset = 0;
       }
-      if( !d->data_multisector ||
-	  d->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
+      if( !f->data_multisector ||
+	  f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
 	statusbar_update(0);
-        d->status_register &= ~WD1770_SR_BUSY;
-        d->status_type = wd1770_status_type2;
-        d->state = wd1770_state_none;
-        wd1770_set_cmdint( d );
-        wd1770_reset_datarq( d );
+	f->status_register &= ~WD1770_SR_BUSY;
+	f->status_type = wd1770_status_type2;
+	f->state = wd1770_state_none;
+	wd1770_set_cmdint( f );
+	wd1770_reset_datarq( f );
       }
     }
   }
