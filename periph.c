@@ -300,7 +300,7 @@ periph_present interface2_present;
 int periph_interface2_active;
 
 #ifdef HAVE_LIBDSK_H
-/* What sort of +D interface does the curret machine have */
+/* What sort of +D interface does the current machine have */
 periph_present plusd_present;
 
 /* Is the +D currently active */
