@@ -858,8 +858,6 @@ ui_plusd_disk_write( plusd_drive_number which )
   switch( which ) {
     case PLUSD_DRIVE_1: drive = '1'; break;
     case PLUSD_DRIVE_2: drive = '2'; break;
-    case PLUSD_DRIVE_3: drive = '3'; break;
-    case PLUSD_DRIVE_4: drive = '4'; break;
     default: drive = '?'; break;
   }
 

@@ -401,12 +401,6 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   case PLUSD_DRIVE_2:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT, 1 );
     break;
-  case PLUSD_DRIVE_3:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_3_EJECT, 1 );
-    break;
-  case PLUSD_DRIVE_4:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_4_EJECT, 1 );
-    break;
   }
 
   if( autoload ) {
@@ -464,12 +458,6 @@ plusd_disk_eject( plusd_drive_number which, int write )
     break;
   case PLUSD_DRIVE_2:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT, 0 );
-    break;
-  case PLUSD_DRIVE_3:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_3_EJECT, 0 );
-    break;
-  case PLUSD_DRIVE_4:
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_4_EJECT, 0 );
     break;
   }
   return 0;

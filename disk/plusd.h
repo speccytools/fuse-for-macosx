@@ -76,11 +76,9 @@ libspectrum_byte plusd_printer_read( libspectrum_word port, int *attached );
 typedef enum plusd_drive_number {
   PLUSD_DRIVE_1 = 0,
   PLUSD_DRIVE_2,
-  PLUSD_DRIVE_3,
-  PLUSD_DRIVE_4,
 } plusd_drive_number;
 
-#define PLUSD_NUM_DRIVES 4
+#define PLUSD_NUM_DRIVES 2
 extern wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 extern wd1770_drive *plusd_current;
 

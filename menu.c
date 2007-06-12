@@ -660,12 +660,6 @@ menu_check_media_changed( void )
   confirm = plusd_disk_eject( PLUSD_DRIVE_2, 0 );
   if( confirm ) return 1;
 
-  confirm = plusd_disk_eject( PLUSD_DRIVE_3, 0 );
-  if( confirm ) return 1;
-
-  confirm = plusd_disk_eject( PLUSD_DRIVE_4, 0 );
-  if( confirm ) return 1;
-
 #endif			/* #ifdef HAVE_LIBDSK_H */
 
   if( settings_current.simpleide_master_file ) {

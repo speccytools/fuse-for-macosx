@@ -317,14 +317,6 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
     "/Media/Disk/+D/Drive 2/Eject",
     "/Media/Disk/+D/Drive 2/Eject and write...", 0 },
-
-  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_3_EJECT,
-    "/Media/Disk/+D/Drive 3/Eject",
-    "/Media/Disk/+D/Drive 3/Eject and write...", 0 },
-
-  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_4_EJECT,
-    "/Media/Disk/+D/Drive 4/Eject",
-    "/Media/Disk/+D/Drive 4/Eject and write...", 0 },
 #endif			/* #ifdef HAVE_LIBDSK_H */
 
   { UI_MENU_ITEM_MEDIA_IDE, "/Media/IDE" },

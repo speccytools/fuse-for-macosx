@@ -1802,3 +1802,5 @@
 	 connected (plusd_20070609) (Stuart).
 20070612 man/fuse.1: document +D printer emulation (plusd_20070609) (Stuart).
 20070612 periph.c: fix typo in comment (plusd_20070609) (Stuart).
+20070612 disk/plusd.{c,h},menu.c,ui.c,ui/gtk/gtkui.c: remove fictitious +D
+	 drives 3 and 4 (plusd_20070609) (Stuart).
