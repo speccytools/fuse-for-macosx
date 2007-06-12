@@ -202,7 +202,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
   if( !( b & 0x80 ) ) {                         /* Type I */
     int update = b & 0x10 ? 1 : 0;
     int verify = b & 0x04 ? 1 : 0;
-    int rate   = b & 0x03 ? 1 : 0;
+/*  int rate   = b & 0x03 ? 1 : 0; */
 
     switch( ( b >> 5 ) & 0x03 ) {
     case 0x00:
@@ -229,12 +229,12 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
     wd1770_reset_datarq( f );
   } else if( !( b & 0x40 ) ) {                  /* Type II */
     int multisector = b & 0x10 ? 1 : 0;
-    int delay       = b & 0x04 ? 1 : 0;
+/*  int delay       = b & 0x04 ? 1 : 0; */
 
     if( !( b & 0x20 ) ) {                               /* Read Sector */
       f->state = wd1770_state_read;
     } else {                                            /* Write Sector */
-      int dammark = b & 0x01;
+/*    int dammark = b & 0x01; */
 
       f->state = wd1770_state_write;
     }
@@ -259,7 +259,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
       f->data_multisector = multisector;
     }
   } else if( ( b & 0xf0 ) != 0xd0 ) {           /* Type III */
-    int delay = b & 0x04;
+/*  int delay = b & 0x04; */
 
     switch( b & 0xf0 ) {
     case 0x00:                                          /* Read Track */

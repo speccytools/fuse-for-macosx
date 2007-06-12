@@ -1809,3 +1809,4 @@
 	 (plusd_20070609) (Stuart).
 20070612 disk/{plusd.{c,h},wd1770.{c,h}}: separate FDC and disk drive
 	 emulation (plusd_20070609) (Stuart).
+20070612 disk/wd1770.c: comment out unused variables (plusd_20070609) (Stuart).
