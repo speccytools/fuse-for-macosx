@@ -317,8 +317,8 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 {
   int fd, error;
   char tempfilename[ PATH_MAX ];
+  int israw = 0;
   dsk_format_t fmt;
-  char *drv = NULL;
   wd1770_drive *d;
   int l;
 
@@ -345,33 +345,46 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   l = strlen( filename );
   if( l >= 5 ) {
     if( !strcmp( filename + ( l - 4 ), ".dsk" ) ||
-	!strcmp( filename + ( l - 4 ), ".mgt" ) ) {
+	!strcmp( filename + ( l - 4 ), ".mgt" )    ) {
+      israw = 1;
       fmt = FMT_800K;
-      drv = "raw";
     } else if( !strcmp( filename + ( l - 4 ), ".img" ) ) {
+      israw = 1;
       fmt = FMT_MGT800;
-      drv = "raw";
     }
   }
 
   /* And now insert the disk */
-  if( dsk_open( &d->disk, tempfilename, drv, NULL ) != DSK_ERR_OK ) {
-    printf("failed to open disk image\n");
-    return 1;
-  }
+  if( israw ) {
 
-  if( !drv ) {
-    if( dsk_getgeom( d->disk, &d->geom ) != DSK_ERR_OK ) {
-      printf("failed to determine geometry for disk\n");
-      dsk_close( &d->disk );
+    /* If the "logical" driver is not available, try the "raw" driver (unless
+     * we're using FMT_MGT800, for which the raw driver will not work */
+    if( dsk_open( &d->disk, tempfilename, "logical", NULL ) != DSK_ERR_OK &&
+	( fmt == FMT_MGT800 ||
+	  dsk_open( &d->disk, tempfilename, "raw", NULL ) != DSK_ERR_OK ) ) {
+      ui_error( UI_ERROR_ERROR, "Failed to open disk image" );
       return 1;
     }
-  } else {
+
     if( dg_stdformat( &d->geom, fmt, NULL, NULL ) != DSK_ERR_OK ) {
-      printf("failed to set geometry for disk\n");
+      ui_error( UI_ERROR_ERROR, "Failed to set geometry for disk" );
       dsk_close( &d->disk );
       return 1;
     }
+
+  } else {
+
+    if( dsk_open( &d->disk, tempfilename, NULL, NULL ) != DSK_ERR_OK ) {
+      ui_error( UI_ERROR_ERROR, "Failed to open disk image" );
+      return 1;
+    }
+
+    if( dsk_getgeom( d->disk, &d->geom ) != DSK_ERR_OK ) {
+      ui_error( UI_ERROR_ERROR, "Failed to determine geometry for disk" );
+      dsk_close( &d->disk );
+      return 1;
+    }
+
   }
 
   /* Set the 'eject' item active */
