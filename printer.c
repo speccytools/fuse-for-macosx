@@ -382,6 +382,10 @@ if(!settings_current.printer)
   return(0xff);
 if(!printer_graphics_enabled)
   return(0xff);
+#ifdef HAVE_LIBDSK_H
+if(plusd_available)
+  return(0xff);
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
 *attached=1;
 
@@ -428,6 +432,10 @@ void printer_zxp_write(libspectrum_word port GCC_UNUSED,libspectrum_byte b)
 {
 if(!settings_current.printer)
   return;
+#ifdef HAVE_LIBDSK_H
+if(plusd_available)
+  return;
+#endif			/* #ifdef HAVE_LIBDSK_H */
 if(!zxpspeed)
   {
   if(!(b&4))

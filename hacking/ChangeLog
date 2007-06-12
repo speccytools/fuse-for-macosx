@@ -1794,3 +1794,5 @@
 	 (plusd_20070609) (Stuart).
 20070612 disk/plusd.{c,h},man/fuse.1: implement +D printer port routines and
 	 remove DISCiPLE-specific joystick ports (plusd_20070609) (Stuart).
+20070612 printer.c: disable ZX Printer ports when the +D is available
+	 (plusd_20070609) (Stuart).
