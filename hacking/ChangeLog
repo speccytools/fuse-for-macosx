@@ -1800,3 +1800,4 @@
 	 "logical" driver (plusd_20070609) (Stuart).
 20070612 disk/plusd.c: assume printer port is 'busy' when no printer is
 	 connected (plusd_20070609) (Stuart).
+20070612 man/fuse.1: document +D printer emulation (plusd_20070609) (Stuart).

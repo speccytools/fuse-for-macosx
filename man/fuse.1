@@ -2538,6 +2538,9 @@ Serial printer (text-only)
 .IR +2A ", " +3
 Parallel printer (text-only)
 .PP
+If +D emulation is in use and printer emulation is enabled, text-only
+emulation of the +D's parallel printer interface is provided.
+.PP
 Any printout is appended to one (or both) of two files, depending on
 the printer \- these default to
 .I printout.txt
@@ -3068,8 +3071,10 @@ utility before use with Fuse.
 .\"
 .SH +D EMULATION
 .PP
-Fuse supports .MGT and .IMG images in its +D emulation.  The +D's
-printer port is not yet emulated.  The +D may only be
+Fuse supports .MGT and .IMG images in its +D emulation. The +D's
+printer port is emulated. (See the
+.B "PRINTER EMULATION"                                             
+section for more details.) The +D may only be
 used with 48K, 128K and +2 (not +2A) emulation.  To access disks,
 load G+DOS, by inserting a disk containing the DOS file (+SYS) and
 entering "RUN".  Once DOS is loaded, you can load to/from +D disks
@@ -3087,8 +3092,8 @@ press `4' to save a 48K snapshot, or `5' to save a 128K snapshot.
 When saving a 128K snapshot, you must then press Y or N to indicate
 whether the screen changed while saving the snapshot, to finish
 saving.  You can also choose `3' to save a screenshot to disk.
-Options `1' and `2' allow screenshots to be printed, but the +D
-printer port is not yet emulated.
+Options `1' and `2' allow screenshots to be printed (in monochrome)
+if printer emulation is enabled.
 .\"
 .\"------------------------------------------------------------------
 .\"
