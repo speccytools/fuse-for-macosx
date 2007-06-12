@@ -1805,3 +1805,5 @@
 20070612 disk/plusd.{c,h},menu.c,ui.c,ui/gtk/gtkui.c: remove fictitious +D
 	 drives 3 and 4 (plusd_20070609) (Stuart).
 20070612 menu_data.dat: remove +D drives 3 and 4 (plusd_20070609) (Stuart).
+20070612 ui/win32/win32ui.c: implement ui_plusd_disk_write() for Win32
+	 (plusd_20070609) (Stuart).

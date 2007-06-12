@@ -485,6 +485,35 @@ ui_trdos_disk_write( trdos_drive_number which )
   return 0;
 }
 
+#ifdef HAVE_LIBDSK_H
+int
+ui_plusd_disk_write( plusd_drive_number which )
+{
+  char drive, *filename, title[80];
+
+  switch( which ) {
+    case PLUSD_DRIVE_1: drive = '1'; break;
+    case PLUSD_DRIVE_2: drive = '2'; break;
+    default: drive = '?'; break;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write +D Disk %c", drive );
+
+  filename = menu_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  plusd_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
+#endif			/* #ifdef HAVE_LIBDSK_H */
+
 int
 ui_get_rollback_point( GSList *points )
 {
