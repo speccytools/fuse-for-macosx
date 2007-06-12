@@ -1798,3 +1798,5 @@
 	 (plusd_20070609) (Stuart).
 20070612 disk/plusd.c: cleanup disk insertion code and add support for LibDsk's
 	 "logical" driver (plusd_20070609) (Stuart).
+20070612 disk/plusd.c: assume printer port is 'busy' when no printer is
+	 connected (plusd_20070609) (Stuart).

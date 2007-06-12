@@ -301,7 +301,13 @@ libspectrum_byte
 plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
-  return 0; /* never busy */
+
+  /* bit 7 = busy. other bits high? */
+
+  if(!settings_current.printer)
+    return(0xff); /* no printer attached */
+
+  return(0x7f);   /* never busy */
 }
 
 int
