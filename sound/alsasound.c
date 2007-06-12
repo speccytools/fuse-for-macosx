@@ -56,7 +56,6 @@ void
 sound_lowlevel_end( void )
 {
 /* Stop PCM device and drop pending frames */
-  settings_current.sound = 0;
   snd_pcm_drop( pcm_handle );
   snd_pcm_close( pcm_handle );
 }
@@ -168,7 +167,8 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 
 /* Set number of channels, but only if not the same as we require */
 #if SND_LIB_MAJOR == 1
-  snd_pcm_hw_params_get_channels( hw_params, &val );
+  if( snd_pcm_hw_params_get_channels( hw_params, &val ) != 0 )
+    val = 0;		/* multiple channel config */
 #elif SND_LIB_MAJOR == 0 && SND_LIB_MINOR == 9
   val = snd_pcm_hw_params_get_channels( hw_params );
 #else
@@ -181,8 +181,13 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
       ui_error( UI_ERROR_ERROR, "couldn't set %s channel on '%s' using %s.",
     		    (*stereoptr ? "stereo" : "mono"), 
 		    (*stereoptr ? "mono" : "stereo"), pcm_name );
+      if( val != 1 && val != 2 ) {
+	settings_current.sound = 0;
+	snd_pcm_close( pcm_handle );
+	return 1;
+      }
+      *stereoptr = val == 2 ? 1 : 0;
     }
-    *stereoptr = val == 2 ? 1 : 0;
   }
 
   framesize = ch << 1;			/* we always use 16 bit sorry :-( */
@@ -230,7 +235,8 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     return 1;
   }
 
-  if( first_init && sound_framesiz != exact_framesiz ) {
+  if( first_init && ( exact_framesiz < sound_framesiz / 1.5 ||
+		      exact_framesiz > sound_framesiz * 1.5    ) ) {
     ui_error( UI_ERROR_WARNING,
               "The period size %d is not supported by your hardware. "
               "Using %d instead.\n", (int)sound_framesiz,
