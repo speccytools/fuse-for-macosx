@@ -28,6 +28,7 @@
 #include <libspectrum.h>
 
 #include "dck.h"
+#include "disk/plusd.h"
 #include "divide.h"
 #include "event.h"
 #include "fuse.h"
@@ -48,10 +49,6 @@
 #include "widget/widget.h"
 #include "zxatasp.h"
 #include "zxcf.h"
-
-#ifdef HAVE_LIBDSK_H
-#include "disk/plusd.h"
-#endif				/* #ifdef HAVE_LIBDSK_H */
 
 #ifdef USE_WIDGET
 #define WIDGET_END widget_finish()

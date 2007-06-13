@@ -28,6 +28,7 @@
 #include <libspectrum.h>
 
 #include "ay.h"
+#include "disk/plusd.h"
 #include "fuse.h"
 #include "if2.h"
 #include "joystick.h"
@@ -43,10 +44,6 @@
 #include "z80/z80.h"
 #include "zxatasp.h"
 #include "zxcf.h"
-
-#ifdef HAVE_LIBDSK_H
-#include "disk/plusd.h"
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
 int snapshot_read( const char *filename )
 {

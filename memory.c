@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "disk/plusd.h"
 #include "display.h"
 #include "divide.h"
 #include "fuse.h"
@@ -44,10 +45,6 @@
 #include "ula.h"
 #include "zxatasp.h"
 #include "zxcf.h"
-
-#ifdef HAVE_LIBDSK_H
-#include "disk/plusd.h"
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map_read[8];

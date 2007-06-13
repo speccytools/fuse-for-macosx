@@ -207,7 +207,6 @@ machine_select_machine( fuse_machine_info *machine )
 {
   int width, height, i;
   int capabilities;
-  int plus3, trdos, plusd;
 
   machine_current = machine;
 

@@ -28,6 +28,7 @@
 #include <stdio.h>
 
 #include "debugger/debugger.h"
+#include "disk/plusd.h"
 #include "divide.h"
 #include "event.h"
 #include "machine.h"
@@ -45,11 +46,9 @@
 
 #include "z80_macros.h"
 
-#ifdef HAVE_LIBDSK_H
-#include "disk/plusd.h"
-#else			/* #ifdef HAVE_LIBDSK_H */
+#ifndef HAVE_LIBDSK_H
 const int plusd_available = 0;
-#endif			/* #ifdef HAVE_LIBDSK_H */
+#endif			/* #ifndef HAVE_LIBDSK_H */
 
 #ifndef HAVE_ENOUGH_MEMORY
 static void z80_cbxx( libspectrum_byte opcode2 );

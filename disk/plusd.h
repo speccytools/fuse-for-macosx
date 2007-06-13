@@ -29,7 +29,17 @@
 #ifndef FUSE_PLUSD_H
 #define FUSE_PLUSD_H
 
+#include <config.h>
+
+typedef enum plusd_drive_number {
+  PLUSD_DRIVE_1 = 0,
+  PLUSD_DRIVE_2,
+} plusd_drive_number;
+
+#ifdef HAVE_LIBDSK_H
+
 #include <libspectrum.h>
+
 #include "wd1770.h"
 #include "periph.h"
 
@@ -73,11 +83,6 @@ void plusd_mem_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte plusd_printer_read( libspectrum_word port, int *attached );
 
-typedef enum plusd_drive_number {
-  PLUSD_DRIVE_1 = 0,
-  PLUSD_DRIVE_2,
-} plusd_drive_number;
-
 extern wd1770_fdc plusd_fdc;
 
 #define PLUSD_NUM_DRIVES 2
@@ -91,5 +96,7 @@ int plusd_disk_eject( plusd_drive_number which, int write );
 int plusd_disk_write( plusd_drive_number which, const char *filename );
 int plusd_event_cmd_done( libspectrum_dword last_tstates );
 int plusd_event_index( libspectrum_dword last_tstates );
+
+#endif                  /* #ifndef HAVE_LIBDSK_H */
 
 #endif                  /* #ifndef FUSE_PLUSD_H */
