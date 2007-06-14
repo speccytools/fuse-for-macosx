@@ -1821,4 +1821,5 @@
 20070613 disk/plusd.h,machine.c,memory.c,menu.c,snapshot.c,ui/ui.h,
 	 z80/z80_ops.c: cleanup conditional compilation of +D code
 	 (plusd_20070609) (Stuart).
-
+20070614 disk/{plusd.{c,h},wd1770.{c,h}}: update author contact information
+	 (plusd_20070609) (Stuart).
