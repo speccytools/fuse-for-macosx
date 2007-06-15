@@ -1787,3 +1787,5 @@
 	 exactly the right size could not be obtained (Stuart).
 20070611 sound/alsasound.c: refuse to enable sound in ALSA environment with
          more than two channels (fixes bug #1732696) (Gergely Szasz).
+20070615 utils.c: tweak Amiga temp dir path (part of patch #1712260)
+         (Chris Young).
