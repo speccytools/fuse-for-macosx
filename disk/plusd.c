@@ -98,6 +98,8 @@ plusd_unpage( void )
 static void
 plusd_memory_map( void )
 {
+  if( !plusd_active ) return;
+
   memory_map_read[ 0 ] = memory_map_write[ 0 ] = memory_map_romcs[ 0 ];
   memory_map_read[ 1 ] = memory_map_write[ 1 ] = memory_map_ram[ 16 * 2 ];
 }
@@ -164,7 +166,6 @@ static void
 plusd_reset( void )
 {
   int i;
-  int error;
   wd1770_drive *d;
   wd1770_fdc *f = &plusd_fdc;
 

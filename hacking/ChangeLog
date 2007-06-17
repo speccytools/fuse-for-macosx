@@ -1836,3 +1836,5 @@
 	 trdos.[ch],ula.[ch],z80/{coretest.c,z80.[ch]},zxatasp.[ch],zxcf.[ch]:
 	 more explicit modularisation (patch #1734120).
 20070617 disk/plusd.{c,h}: +D modularisation fixes (plusd_20070609) (Stuart).
+20070617 disk/plusd.c: fix plusd_memory_map() and remove unused variable
+	 (plusd_20070609) (Stuart).
