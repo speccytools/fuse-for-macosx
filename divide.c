@@ -75,7 +75,7 @@ static libspectrum_ide_channel *divide_idechn1;
 static libspectrum_byte divide_ram[ DIVIDE_PAGES ][ DIVIDE_PAGE_LENGTH ];
 static libspectrum_byte divide_eprom[ DIVIDE_PAGE_LENGTH ];
 
-static void divide_reset( void );
+static void divide_reset( int hard_reset );
 static void divide_memory_map( void );
 
 static module_info_t divide_module_info = {
@@ -134,13 +134,15 @@ divide_end( void )
    trapping PC instead); however, it needs to perform housekeeping tasks upon
    reset */
 static void
-divide_reset( void )
+divide_reset( int hard_reset )
 {
   if( !settings_current.divide_enabled ) return;
   
-  /* FIXME: MAPRAM bit of control register should be preserved on reset,
-     but cleared on hard restart */
-  divide_control = 0;
+  if( hard_reset ) {
+    divide_control = 0;
+  } else {
+    divide_control &= DIVIDE_CONTROL_MAPRAM;
+  }
   divide_automap = 0;
   divide_refresh_page_state();
 

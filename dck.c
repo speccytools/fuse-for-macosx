@@ -61,7 +61,7 @@ dck_insert( const char *filename )
   error = settings_set_string( &settings_current.dck_file, filename );
   if( error ) return error;
 
-  machine_reset();
+  machine_reset( 0 );
 
   return 0;
 }
@@ -82,7 +82,7 @@ dck_eject( void )
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
 
-  machine_reset();
+  machine_reset( 0 );
 }
 
 int

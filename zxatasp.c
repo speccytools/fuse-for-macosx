@@ -132,7 +132,7 @@ static const libspectrum_byte ZXATASP_IDE_SECONDARY = 0x80;
             ZXATASP_IDE_RD        | ZXATASP_IDE_WR      ) ) == \
           ( ZXATASP_IDE_SECONDARY | ZXATASP_IDE_WR )             )
 
-static void zxatasp_reset( void );
+static void zxatasp_reset( int hard_reset );
 static void zxatasp_memory_map( void );
 static void zxatasp_from_snapshot( libspectrum_snap *snap );
 static void zxatasp_to_snapshot( libspectrum_snap *snap );
@@ -192,7 +192,7 @@ zxatasp_end( void )
 }
 
 static void
-zxatasp_reset( void )
+zxatasp_reset( int hard_reset )
 {
   if( !settings_current.zxatasp_active ) return;
   

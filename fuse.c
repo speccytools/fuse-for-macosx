@@ -703,14 +703,14 @@ do_start_files( start_files_t *start_files )
   if( start_files->simpleide_master ) {
     error = simpleide_insert( start_files->simpleide_master,
 			      LIBSPECTRUM_IDE_MASTER );
-    simpleide_reset();
+    simpleide_reset( 0 );
     if( error ) return error;
   }
 
   if( start_files->simpleide_slave ) {
     error = simpleide_insert( start_files->simpleide_slave,
 			      LIBSPECTRUM_IDE_SLAVE );
-    simpleide_reset();
+    simpleide_reset( 0 );
     if( error ) return error;
   }
 

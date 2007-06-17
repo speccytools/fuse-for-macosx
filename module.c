@@ -47,14 +47,15 @@ static void
 reset( gpointer data, gpointer user_data )
 {
   const module_info_t *module = data;
+  int hard_reset = GPOINTER_TO_INT( user_data );
 
-  if( module->reset ) module->reset();
+  if( module->reset ) module->reset( hard_reset );
 }
 
 void
-module_reset( void )
+module_reset( int hard_reset )
 {
-  g_slist_foreach( registered_modules, reset, NULL );
+  g_slist_foreach( registered_modules, reset, GINT_TO_POINTER( hard_reset ) );
 }
 
 static void

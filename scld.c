@@ -49,7 +49,7 @@ libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 memory_page timex_exrom[8];
 memory_page timex_dock[8];
 
-static void scld_reset( void );
+static void scld_reset( int hard_reset );
 static void scld_from_snapshot( libspectrum_snap *snap );
 static void scld_to_snapshot( libspectrum_snap *snap );
 
@@ -115,7 +115,7 @@ scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 static void
-scld_reset(void)
+scld_reset(int hard_reset)
 {
   scld_last_dec.byte = 0;
 }

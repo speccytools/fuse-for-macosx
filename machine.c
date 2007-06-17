@@ -237,7 +237,7 @@ machine_select_machine( fuse_machine_info *machine )
   for( i = 0; i < 2 * SPECTRUM_RAM_PAGES; i++ )
     memory_map_ram[i].writable = 0;
 
-  if( machine_reset() ) return 1;
+  if( machine_reset( 0 ) ) return 1;
 
   /* And the dock menu item */
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
@@ -321,7 +321,7 @@ machine_load_rom( size_t which, int page_num, const char *filename,
 }
 
 int
-machine_reset( void )
+machine_reset( int hard_reset )
 {
   size_t i;
   int error;
@@ -337,7 +337,7 @@ machine_reset( void )
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;
 
-  module_reset();
+  module_reset( hard_reset );
 
   error = machine_current->memory_map(); if( error ) return error;
 

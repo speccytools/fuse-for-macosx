@@ -97,7 +97,7 @@ simpleide_end( void )
 }
 
 void
-simpleide_reset( void )
+simpleide_reset( int hard_reset )
 {
   libspectrum_ide_reset( simpleide_idechn );
 }

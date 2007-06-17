@@ -1836,6 +1836,13 @@
 	 trdos.[ch],ula.[ch],z80/{coretest.c,z80.[ch]},zxatasp.[ch],zxcf.[ch]:
 	 more explicit modularisation (patch #1734120).
 20070617 disk/plusd.{c,h}: +D modularisation fixes (plusd_20070609) (Stuart).
+20070617 sound/coreaudiosound.c: correct initialisation of stereo output
+         (Fred).
+20070618 dck.c,divide.c,fuse.c,if1.c,if2.c,machine.[ch],menu_data.dat,
+	 module.[ch],printer.c,scld.c,simpleide.[ch],snapshot.c,ui/gtk/gtkui.c,
+	 widget/menu.c,z80/z80.[ch],zxatasp.c,zxcf.c: allow distinction between
+	 "soft" resets (activing the reset line on the Z80) and "hard" resets
+	 (pulling the power). Needed for DivIDE and +D.
 20070617 disk/plusd.c: fix plusd_memory_map() and remove unused variable
 	 (plusd_20070609) (Stuart).
 20070617 disk/wd1770.h: fix typo in comment (plusd_20070609) (Stuart).

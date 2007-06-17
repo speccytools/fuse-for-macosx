@@ -104,7 +104,7 @@ int machine_load_rom_bank( memory_page* bank_map, size_t which, int page_num,
 int machine_load_rom( size_t which, int page_num, const char *filename,
                       const char *fallback, size_t expected_length );
 
-int machine_reset( void );
+int machine_reset( int hard_reset );
 int machine_end( void );
 
 #endif			/* #ifndef FUSE_MACHINE_H */

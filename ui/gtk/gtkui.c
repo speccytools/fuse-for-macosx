@@ -679,9 +679,11 @@ menu_machine_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 
 /* Called by the menu when Machine/Reset selected */
 void
-menu_machine_reset( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+menu_machine_reset( GtkWidget *widget GCC_UNUSED, gpointer data )
 {
-  if( gtkui_confirm( "Reset?" ) && machine_reset() ) {
+  int hard_reset = GPOINTER_TO_INT( data );
+
+  if( gtkui_confirm( "Reset?" ) && machine_reset( hard_reset ) ) {
     ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 
     /* FIXME: abort() seems a bit extreme here, but it'll do for now */
