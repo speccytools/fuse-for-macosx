@@ -391,6 +391,9 @@ machine_reset( void )
   zxatasp_reset();
   zxcf_reset();
 
+  /* clear out old display image ready for new one */
+  display_refresh_all();
+
   return 0;
 }
 

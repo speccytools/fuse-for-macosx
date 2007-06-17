@@ -1789,3 +1789,6 @@
          more than two channels (fixes bug #1732696) (Gergely Szasz).
 20070615 utils.c: tweak Amiga temp dir path (part of patch #1712260)
          (Chris Young).
+20070617 machine.c: refresh display on machine reset to ensure correct display
+         as we don't always call machine_select() after loading a new snapshot
+         (Fred).
