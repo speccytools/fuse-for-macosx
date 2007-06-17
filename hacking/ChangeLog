@@ -1823,6 +1823,11 @@
 	 (plusd_20070609) (Stuart).
 20070614 disk/{plusd.{c,h},wd1770.{c,h}}: update author contact information
 	 (plusd_20070609) (Stuart).
+20070615 utils.c: tweak Amiga temp dir path (part of patch #1712260)
+         (Chris Young).
+20070617 machine.c: refresh display on machine reset to ensure correct display
+         as we don't always call machine_select() after loading a new snapshot
+         (Fred).
 20070617 fuse.c,man/fuse.1,settings.dat,utils.c: allow +D disk images to be
 	 specified on command line or in the config file (includes patch
 	 #1738602) (plusd_20070609) (Phil/Stuart).

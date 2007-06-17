@@ -493,8 +493,12 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
   utils_file file;
   ssize_t bytes_written;
 
+#ifdef AMIGA
+  snprintf( tempfilename, PATH_MAX, "%s%s", utils_get_temp_path(), template );
+#else
   snprintf( tempfilename, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s",
             utils_get_temp_path(), template );
+#endif
 
   *fd = mkstemp( tempfilename );
   if( *fd == -1 ) {

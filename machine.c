@@ -380,6 +380,9 @@ machine_reset( void )
   /* Update the disk menu items */
   ui_menu_disk_update();
 
+  /* clear out old display image ready for new one */
+  display_refresh_all();
+
   return 0;
 }
 
