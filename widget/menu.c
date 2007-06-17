@@ -428,7 +428,7 @@ menu_machine_reset( int action )
     return;
 
   widget_end_all( WIDGET_FINISHED_OK );
-  machine_reset();
+  machine_reset( action );
 }
 
 void

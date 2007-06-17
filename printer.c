@@ -67,7 +67,7 @@ static unsigned char parallel_data=0;
  */
 #define PARALLEL_STROBE_MAX_CYCLES	10000
 
-static void printer_zxp_reset(void);
+static void printer_zxp_reset(int hard_reset);
 
 static module_info_t printer_zxp_module_info={printer_zxp_reset,NULL};
 
@@ -517,7 +517,7 @@ else
 }
 
 
-void printer_zxp_reset(void)
+void printer_zxp_reset(int hard_reset)
 {
 /* stop printer - XXX not sure if the real one does this on reset */
 printer_zxp_write(0xfb,4);

@@ -74,7 +74,7 @@ static libspectrum_byte ZXCFMEM[ ZXCF_PAGES ][ ZXCF_PAGE_LENGTH ];
 
 static libspectrum_byte last_memctl;
 
-static void zxcf_reset( void );
+static void zxcf_reset( int hard_reset );
 static void zxcf_memory_map( void );
 static void zxcf_from_snapshot( libspectrum_snap *snap );
 static void zxcf_to_snapshot( libspectrum_snap *snap );
@@ -121,7 +121,7 @@ zxcf_end( void )
 }
 
 static void
-zxcf_reset( void )
+zxcf_reset( int hard_reset )
 {
   if( !settings_current.zxcf_active ) return;
 

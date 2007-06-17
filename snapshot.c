@@ -143,7 +143,7 @@ snapshot_copy_from( libspectrum_snap *snap )
       error = try_fallback_machine( machine ); if( error ) return error;
     }
   } else {
-    machine_reset();
+    machine_reset( 0 );
   }
 
   capabilities = machine_current->capabilities;

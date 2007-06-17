@@ -42,7 +42,7 @@
 /* IF2 cart inserted? */
 int if2_active = 0;
 
-static void if2_reset( void );
+static void if2_reset( int hard_reset );
 static void if2_memory_map( void );
 static void if2_from_snapshot( libspectrum_snap *snap );
 static void if2_to_snapshot( libspectrum_snap *snap );
@@ -78,7 +78,7 @@ if2_insert( const char *filename )
   error = settings_set_string( &settings_current.if2_file, filename );
   if( error ) return error;
 
-  machine_reset();
+  machine_reset( 0 );
 
   return 0;
 }
@@ -99,11 +99,11 @@ if2_eject( void )
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 0 );
 
-  machine_reset();
+  machine_reset( 0 );
 }
 
 static void
-if2_reset( void )
+if2_reset( int hard_reset )
 {
   if2_active = 0;
 
