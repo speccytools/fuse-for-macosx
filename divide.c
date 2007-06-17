@@ -29,6 +29,7 @@
 
 #include "ide.h"
 #include "machine.h"
+#include "module.h"
 #include "periph.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -74,6 +75,16 @@ static libspectrum_ide_channel *divide_idechn1;
 static libspectrum_byte divide_ram[ DIVIDE_PAGES ][ DIVIDE_PAGE_LENGTH ];
 static libspectrum_byte divide_eprom[ DIVIDE_PAGE_LENGTH ];
 
+static void divide_reset( void );
+static void divide_memory_map( void );
+
+static module_info_t divide_module_info = {
+
+  divide_reset,
+  divide_memory_map,
+
+};
+
 /* Housekeeping functions */
 
 int
@@ -103,6 +114,8 @@ divide_init( void )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT, 1 );
   }
 
+  module_register( &divide_module_info );
+
   return error;
 }
 
@@ -117,7 +130,10 @@ divide_end( void )
   return error;
 }
 
-void
+/* DivIDE does not page in immediately on a reset condition (we do that by
+   trapping PC instead); however, it needs to perform housekeeping tasks upon
+   reset */
+static void
 divide_reset( void )
 {
   if( !settings_current.divide_enabled ) return;
@@ -301,9 +317,13 @@ divide_unpage( void )
 void
 divide_memory_map( void )
 {
+  int upper_ram_page;
+
+  if( !divide_active ) return;
+
   /* low bits of divide_control register give page number to use in upper
      bank; only lowest two bits on original 32K model */
-  int upper_ram_page = divide_control & (DIVIDE_PAGES - 1);
+  upper_ram_page = divide_control & (DIVIDE_PAGES - 1);
   
   if( divide_control & DIVIDE_CONTROL_CONMEM ) {
     memory_map_romcs[0].page = divide_eprom;

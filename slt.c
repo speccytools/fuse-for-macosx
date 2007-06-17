@@ -29,6 +29,7 @@
 
 #include <libspectrum.h>
 
+#include "module.h"
 #include "settings.h"
 #include "slt.h"
 #include "spectrum.h"
@@ -42,6 +43,26 @@ static size_t slt_length[256];
 static libspectrum_byte *slt_screen;	/* The screenshot from the .slt file */
 static int slt_screen_level;		/* The level of the screenshot.
 					   Not used for anything AFAIK */
+
+static void slt_from_snapshot( libspectrum_snap *snap );
+static void slt_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t slt_module_info = {
+
+  NULL,
+  NULL,
+  slt_from_snapshot,
+  slt_to_snapshot,
+
+};
+
+int
+slt_init( void )
+{
+  module_register( &slt_module_info );
+
+  return 0;
+}
 
 int
 slt_trap( libspectrum_word address, libspectrum_byte level )
@@ -63,7 +84,7 @@ slt_trap( libspectrum_word address, libspectrum_byte level )
   return 0;
 }
 
-int
+static void
 slt_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
@@ -79,7 +100,7 @@ slt_from_snapshot( libspectrum_snap *snap )
       if( !slt[i] ) {
 	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
 		  __LINE__ );
-	return 1;
+	return;
       }
 
       memcpy( slt[i], libspectrum_snap_slt( snap, i ),
@@ -92,17 +113,15 @@ slt_from_snapshot( libspectrum_snap *snap )
     slt_screen = memory_pool_allocate( 6912 * sizeof( libspectrum_byte ) );
     if( !slt_screen ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
+      return;
     }
 
     memcpy( slt_screen, libspectrum_snap_slt_screen( snap ), 6912 );
     slt_screen_level = libspectrum_snap_slt_screen_level( snap );
   }
-
-  return 0;
 }
 
-int
+static void
 slt_to_snapshot( libspectrum_snap *snap )
 {
   size_t i;
@@ -120,7 +139,7 @@ slt_to_snapshot( libspectrum_snap *snap )
       if( !buffer ) {
 	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
 		  __LINE__ );
-	return 1;
+	return;
       }
 
       memcpy( buffer, slt[i], slt_length[i] );
@@ -134,13 +153,11 @@ slt_to_snapshot( libspectrum_snap *snap )
 
     if( !buffer ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
+      return;
     }
 
     memcpy( buffer, slt_screen, 6912 );
     libspectrum_snap_set_slt_screen( snap, buffer );
     libspectrum_snap_set_slt_screen_level( snap, slt_screen_level );
   }
-
-  return 0;
 }

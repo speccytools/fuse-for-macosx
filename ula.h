@@ -31,15 +31,14 @@
 /* How much contention do we get at every tstate? */
 extern libspectrum_byte ula_contention[ ULA_CONTENTION_SIZE ];
 
+int ula_init( void );
+
 libspectrum_byte ula_read( libspectrum_word port, int *attached );
 void ula_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte ula_last_byte( void );
 
 libspectrum_byte ula_tape_level( void );
-
-int ula_from_snapshot( libspectrum_snap *snap );
-int ula_to_snapshot( libspectrum_snap *snap );
 
 void ula_contend_port_early( libspectrum_word port );
 void ula_contend_port_late( libspectrum_word port );

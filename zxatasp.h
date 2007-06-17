@@ -35,13 +35,8 @@ extern const size_t zxatasp_peripherals_count;
 
 int zxatasp_init( void );
 int zxatasp_end( void );
-void zxatasp_reset( void );
 int zxatasp_insert( const char *filename, libspectrum_ide_unit unit );
 int zxatasp_commit( libspectrum_ide_unit unit );
 int zxatasp_eject( libspectrum_ide_unit unit );
-void zxatasp_memory_map( void );
-
-int zxatasp_from_snapshot( libspectrum_snap *snap );
-int zxatasp_to_snapshot( libspectrum_snap *snap );
 
 #endif			/* #ifndef FUSE_ZXATASP_H */

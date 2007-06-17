@@ -35,15 +35,10 @@ extern const size_t zxcf_peripherals_count;
 
 int zxcf_init( void );
 int zxcf_end( void );
-void zxcf_reset( void );
 int zxcf_insert( const char *filename );
 int zxcf_commit();
 int zxcf_eject( void );
-void zxcf_memory_map( void );
 libspectrum_byte zxcf_last_memctl( void );
-
-int zxcf_from_snapshot( libspectrum_snap *snap );
-int zxcf_to_snapshot( libspectrum_snap *snap );
 
 #endif			/* #ifndef FUSE_ZXCF_H */
 

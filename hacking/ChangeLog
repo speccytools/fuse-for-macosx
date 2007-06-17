@@ -1831,3 +1831,7 @@
 20070617 fuse.c,man/fuse.1,settings.dat,utils.c: allow +D disk images to be
 	 specified on command line or in the config file (includes patch
 	 #1738602) (plusd_20070609) (Phil/Stuart).
+20070617 ay.[ch],divide.[ch],fuse.c,if1.[ch],if2.[ch],joystick.[ch],Makefile.am,
+	 machine.c,memory.[ch],module.[ch],printer.[ch],scld.[ch],snapshot.c,
+	 trdos.[ch],ula.[ch],z80/{coretest.c,z80.[ch]},zxatasp.[ch],zxcf.[ch]:
+	 more explicit modularisation (patch #1734120).

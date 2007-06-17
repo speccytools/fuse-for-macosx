@@ -38,6 +38,7 @@
 #include "if2.h"
 #include "machines/spec128.h"
 #include "memory.h"
+#include "module.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "trdos.h"
@@ -73,6 +74,18 @@ int memory_current_screen;
 
 /* Which bits to look at when working out where the screen is */
 libspectrum_word memory_screen_mask;
+
+static void memory_ram_from_snapshot( libspectrum_snap *snap );
+static void memory_ram_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t memory_module_info = {
+
+  NULL,
+  NULL,
+  memory_ram_from_snapshot,
+  memory_ram_to_snapshot,
+
+};
 
 /* Set up the information about the normal page mappings.
    Memory contention and useable pages vary from machine to machine and must
@@ -122,6 +135,8 @@ memory_init( void )
       &memory_map_ram[0];
 
   for( i = 0; i < 2; i++ ) memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  module_register( &memory_module_info );
 
   return 0;
 }
@@ -260,27 +275,14 @@ memory_romcs_map( void )
      same position than ROMCS (B25 conn) in the Spectrum edge connector.
      
    */
-  if( machine_current->capabilities &
-      LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK )
-    trdos_memory_map();
-
-#ifdef HAVE_LIBDSK_H
-  if( plusd_active ) {
-    plusd_memory_map();
-  }
-#endif			/* #ifdef HAVE_LIBDSK_H */
-
-  if( if1_active ) if1_memory_map();	/* if2 is superior */
-  if( if2_active ) if2_memory_map();
-  if( settings_current.zxatasp_active ) zxatasp_memory_map();
-  if( settings_current.zxcf_active ) zxcf_memory_map();
-  if( divide_active ) divide_memory_map();
+  module_romcs();
 }
 
-int
-memory_ram_from_snapshot( libspectrum_snap *snap, int capabilities )
+static void
+memory_ram_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
+  int capabilities = machine_current->capabilities;
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY )
     spec128_memoryport_write( 0x7ffd,
@@ -295,11 +297,9 @@ memory_ram_from_snapshot( libspectrum_snap *snap, int capabilities )
   for( i = 0; i < 16; i++ )
     if( libspectrum_snap_pages( snap, i ) )
       memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
-
-  return 0;
 }
 
-int
+static void
 memory_ram_to_snapshot( libspectrum_snap *snap )
 {
   size_t i;
@@ -317,13 +317,11 @@ memory_ram_to_snapshot( libspectrum_snap *snap )
       if( !buffer ) {
 	ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
 		  __LINE__ );
-	return 1;
+	return;
       }
 
       memcpy( buffer, RAM[i], 0x4000 );
       libspectrum_snap_set_pages( snap, i, buffer );
     }
   }
-
-  return 0;
 }

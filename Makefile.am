@@ -72,6 +72,7 @@ fuse_SOURCES = ay.c \
 	machine.c \
 	memory.c \
 	menu.c \
+	module.c \
 	periph.c \
 	printer.c \
 	profile.c \
@@ -160,6 +161,7 @@ noinst_HEADERS = ay.h \
 	machine.h \
 	memory.h \
 	menu.h \
+	module.h \
 	periph.h \
 	psg.h \
 	rzx.h \

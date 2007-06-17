@@ -65,9 +65,6 @@ void z80_do_opcodes(void);
 
 void z80_enable_interrupts( void );
 
-int z80_from_snapshot( libspectrum_snap *snap );
-int z80_to_snapshot( libspectrum_snap *snap );
-
 extern processor z80;
 extern const libspectrum_byte halfcarry_add_table[];
 extern const libspectrum_byte halfcarry_sub_table[];

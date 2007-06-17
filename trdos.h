@@ -41,10 +41,6 @@ void trdos_end( void );
 
 void trdos_page( void );
 void trdos_unpage( void );
-void trdos_memory_map( void );
-
-int trdos_from_snapshot( libspectrum_snap *snap, int capabilities );
-int trdos_to_snapshot( libspectrum_snap *snap );
 
 void trdos_cr_write( libspectrum_word port, libspectrum_byte b );
 

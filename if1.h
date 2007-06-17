@@ -35,7 +35,6 @@ extern int if1_available;
 int if1_init( void );
 libspectrum_error if1_end( void );
 
-int if1_reset( void );
 void if1_page( void );
 void if1_unpage( void );
 void if1_memory_map( void );

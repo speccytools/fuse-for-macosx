@@ -34,12 +34,35 @@
 #include "if2.h"
 #include "machine.h"
 #include "memory.h"
+#include "module.h"
 #include "periph.h"
 #include "settings.h"
 #include "ui/ui.h"
 
 /* IF2 cart inserted? */
 int if2_active = 0;
+
+static void if2_reset( void );
+static void if2_memory_map( void );
+static void if2_from_snapshot( libspectrum_snap *snap );
+static void if2_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t if2_module_info = {
+
+  if2_reset,
+  if2_memory_map,
+  if2_from_snapshot,
+  if2_to_snapshot,
+
+};
+
+int
+if2_init( void )
+{
+  module_register( &if2_module_info );
+
+  return 0;
+}
 
 int
 if2_insert( const char *filename )
@@ -79,27 +102,22 @@ if2_eject( void )
   machine_reset();
 }
 
-int
+static void
 if2_reset( void )
 {
-  int error;
-
   if2_active = 0;
 
   if( !settings_current.if2_file ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 0 );
-    return 0;
+    return;
   }
 
-  if ( !periph_interface2_active ) {
-    return 0;
-  }
+  if ( !periph_interface2_active ) return;
 
-  error = machine_load_rom_bank( memory_map_romcs, 0, 0,
-				 settings_current.if2_file,
-				 settings_default.if2_file,
-				 2 * MEMORY_PAGE_SIZE );
-  if( error ) return error;
+  machine_load_rom_bank( memory_map_romcs, 0, 0,
+			 settings_current.if2_file,
+			 settings_default.if2_file,
+			 2 * MEMORY_PAGE_SIZE );
 
   memory_map_romcs[0].source =
     memory_map_romcs[1].source = MEMORY_SOURCE_CARTRIDGE;
@@ -110,21 +128,21 @@ if2_reset( void )
   memory_romcs_map();
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 1 );
-
-  return 0;
 }
 
-void
+static void
 if2_memory_map( void )
 {
+  if( !if2_active ) return;
+
   memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
   memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
 }
 
-int
+static void
 if2_from_snapshot( libspectrum_snap *snap )
 {
-  if( !libspectrum_snap_interface2_active( snap ) ) return 0;
+  if( !libspectrum_snap_interface2_active( snap ) ) return;
 
   if2_active = 1;
   machine_current->ram.romcs = 1;
@@ -138,7 +156,7 @@ if2_from_snapshot( libspectrum_snap *snap )
 			    sizeof( libspectrum_byte ) );
     if( !memory_map_romcs[0].page ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
+      return;
     }
 
     memcpy( memory_map_romcs[0].page,
@@ -154,29 +172,25 @@ if2_from_snapshot( libspectrum_snap *snap )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 1 );
 
   machine_current->memory_map();
-
-  return 0;
 }
 
-int
+static void
 if2_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
 
-  if( !if2_active ) return 0;
+  if( !if2_active ) return;
 
   libspectrum_snap_set_interface2_active( snap, 1 );
 
   buffer = malloc( 0x4000 * sizeof( libspectrum_byte ) );
   if( !buffer ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
+    return;
   }
 
   memcpy( buffer, memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
   memcpy( buffer + MEMORY_PAGE_SIZE, memory_map_romcs[1].page,
 	  MEMORY_PAGE_SIZE );
   libspectrum_snap_set_interface2_rom( snap, 0, buffer );
-
-  return 0;
 }

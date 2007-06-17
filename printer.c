@@ -37,6 +37,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "memory.h"
+#include "module.h"
 #include "printer.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -66,12 +67,15 @@ static unsigned char parallel_data=0;
  */
 #define PARALLEL_STROBE_MAX_CYCLES	10000
 
+static void printer_zxp_reset(void);
 
+static module_info_t printer_zxp_module_info={printer_zxp_reset,NULL};
 
 static void printer_zxp_init(void)
 {
 zxpstylus=zxpspeed=zxpheight=zxpnewspeed=zxplineofchar=0;
 zxppixel=-1;
+module_register(&printer_zxp_module_info);
 }
 
 

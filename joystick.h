@@ -76,7 +76,4 @@ libspectrum_byte joystick_kempston_read ( libspectrum_word port,
 libspectrum_byte joystick_timex_read ( libspectrum_word port,
 				       libspectrum_byte which );
 
-int joystick_from_snapshot( libspectrum_snap* snap );
-int joystick_to_snapshot( libspectrum_snap *snap );
-
 #endif			/* #ifndef FUSE_JOYSTICK_H */

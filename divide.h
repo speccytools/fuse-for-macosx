@@ -47,10 +47,8 @@ void divide_refresh_page_state( void );
 
 int divide_init( void );
 int divide_end( void );
-void divide_reset( void );
 int divide_insert( const char *filename, libspectrum_ide_unit unit );
 int divide_commit( libspectrum_ide_unit unit );
 int divide_eject( libspectrum_ide_unit unit );
-void divide_memory_map( void );
 
 #endif			/* #ifndef FUSE_DIVIDE_H */
