@@ -34,6 +34,7 @@
 #include "if1.h"
 #include "machine.h"
 #include "memory.h"
+#include "module.h"
 #include "periph.h"
 #include "settings.h"
 #include "utils.h"
@@ -134,6 +135,15 @@ enum if1_port {
   PORT_UNKNOWN,
 };
 
+static void if1_reset( void );
+
+static module_info_t if1_module_info = {
+
+  if1_reset,
+  if1_memory_map,
+
+};
+
 static void
 update_menu( enum if1_menu_item what )
 {
@@ -211,6 +221,8 @@ if1_init( void )
     microdrive[i].modified = 0;
   }
 
+  module_register( &if1_module_info );
+
   return 0;
 }
 
@@ -234,21 +246,18 @@ if1_update_menu( void )
   update_menu( UMENU_ALL );
 }
 
-int
+static void
 if1_reset( void )
 {
-  int error;
-
   if1_active = 0;
   if1_available = 0;
 
-  if( !periph_interface1_active ) return 0;
+  if( !periph_interface1_active ) return;
 
-  error = machine_load_rom_bank( memory_map_romcs, 0, 0,
-				 settings_current.rom_interface_i,
-				 settings_default.rom_interface_i,
-				 MEMORY_PAGE_SIZE );
-  if( error ) return error;
+  machine_load_rom_bank( memory_map_romcs, 0, 0,
+			 settings_current.rom_interface_i,
+			 settings_default.rom_interface_i,
+			 MEMORY_PAGE_SIZE );
 
   memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
@@ -263,7 +272,6 @@ if1_reset( void )
   if1_mdr_status = 0;
   
   if1_available = 1;
-  return 0;
 }
 
 void
@@ -285,6 +293,8 @@ if1_unpage( void )
 void
 if1_memory_map( void )
 {
+  if( !if1_active ) return;
+
   memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
 }
 

@@ -1,6 +1,5 @@
-/* zxatasp.h: ZXATASP interface routines
-   Copyright (c) 2003-2004 Garry Lancaster,
-		 2004 Philip Kendall
+/* module.h: API for Fuse modules
+   Copyright (c) 2007 Philip Kendall
 
    $Id$
 
@@ -24,19 +23,31 @@
 
 */
 
-#ifndef FUSE_ZXATASP_H
-#define FUSE_ZXATASP_H
+#ifndef FUSE_MODULE_H
+#define FUSE_MODULE_H
 
 #include <libspectrum.h>
-#include "periph.h"
 
-extern const periph_t zxatasp_peripherals[];
-extern const size_t zxatasp_peripherals_count;
+typedef void (*module_reset_fn)( void );
+typedef void (*module_romcs_fn)( void );
+typedef void (*module_snapshot_from_fn)( libspectrum_snap *snap );
+typedef void (*module_snapshot_to_fn)( libspectrum_snap *snap );
 
-int zxatasp_init( void );
-int zxatasp_end( void );
-int zxatasp_insert( const char *filename, libspectrum_ide_unit unit );
-int zxatasp_commit( libspectrum_ide_unit unit );
-int zxatasp_eject( libspectrum_ide_unit unit );
+typedef struct module_info_t
+{
 
-#endif			/* #ifndef FUSE_ZXATASP_H */
+  module_reset_fn reset;
+  module_romcs_fn romcs;
+  module_snapshot_from_fn snapshot_from;
+  module_snapshot_to_fn snapshot_to;
+
+} module_info_t;
+
+int module_register( module_info_t *module );
+
+void module_reset( void );
+void module_romcs( void );
+void module_snapshot_from( libspectrum_snap *snap );
+void module_snapshot_to( libspectrum_snap *snap );
+
+#endif			/* #ifndef FUSE_MODULE_H */

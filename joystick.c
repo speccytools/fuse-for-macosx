@@ -31,6 +31,7 @@
 #include "fuse.h"
 #include "joystick.h"
 #include "keyboard.h"
+#include "module.h"
 #include "periph.h"
 #include "rzx.h"
 #include "settings.h"
@@ -75,6 +76,18 @@ const char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
   "Timex 1", "Timex 2"
 };
 
+static void joystick_from_snapshot( libspectrum_snap *snap );
+static void joystick_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t joystick_module_info = {
+
+  NULL,
+  NULL,
+  joystick_from_snapshot,
+  joystick_to_snapshot,
+
+};
+
 /* Init/shutdown functions. Errors aren't important here */
 
 void
@@ -82,6 +95,8 @@ fuse_joystick_init (void)
 {
   joysticks_supported = ui_joystick_init();
   kempston_value = timex1_value = timex2_value = 0x00;
+
+  module_register( &joystick_module_info );
 }
 
 void
@@ -182,8 +197,8 @@ joystick_timex_read( libspectrum_word port, libspectrum_byte which )
   return which ? timex2_value : timex1_value;
 }
 
-int
-joystick_from_snapshot( libspectrum_snap* snap )
+static void
+joystick_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
   size_t num_joysticks = libspectrum_snap_joystick_active_count( snap );
@@ -242,8 +257,6 @@ joystick_from_snapshot( libspectrum_snap* snap )
     if( fuse_type == JOYSTICK_TYPE_KEMPSTON )
       settings_current.joy_kempston = 1;
   }
-
-  return 0;
 }
 
 static void
@@ -292,7 +305,7 @@ add_joystick( libspectrum_snap *snap, joystick_type_t fuse_type, int inputs )
   libspectrum_snap_set_joystick_active_count( snap, num_joysticks + 1 );
 }
 
-int
+static void
 joystick_to_snapshot( libspectrum_snap *snap )
 {
   if( settings_current.joy_kempston ) {
@@ -305,6 +318,4 @@ joystick_to_snapshot( libspectrum_snap *snap )
                 LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_1 );
   add_joystick( snap, settings_current.joystick_2_output,
                 LIBSPECTRUM_JOYSTICK_INPUT_JOYSTICK_2 );
-				
-  return 0;
 }

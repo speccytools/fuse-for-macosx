@@ -33,6 +33,7 @@
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
+#include "module.h"
 #include "scld.h"
 #include "slt.h"
 #include "snapshot.h"
@@ -147,18 +148,7 @@ snapshot_copy_from( libspectrum_snap *snap )
 
   capabilities = machine_current->capabilities;
 
-  error = z80_from_snapshot( snap ); if( error ) return error;
-  error = ula_from_snapshot( snap ); if( error ) return error;
-  error = ay_from_snapshot( snap, capabilities ); if( error ) return error;
-  error = trdos_from_snapshot( snap, capabilities ); if( error ) return error;
-  error = memory_ram_from_snapshot( snap, capabilities );
-  if( error ) return error;
-  error = slt_from_snapshot( snap ); if( error ) return error;
-  error = zxatasp_from_snapshot( snap ); if( error ) return error;
-  error = zxcf_from_snapshot( snap ); if( error ) return error;
-  error = if2_from_snapshot( snap ); if( error ) return error;
-  error = scld_from_snapshot( snap, capabilities ); if( error ) return error;
-  error = joystick_from_snapshot( snap ); if( error ) return error;
+  module_snapshot_from( snap );
 
   periph_update();
 
@@ -222,21 +212,9 @@ int snapshot_write( const char *filename )
 int
 snapshot_copy_to( libspectrum_snap *snap )
 {
-  int error;
-
   libspectrum_snap_set_machine( snap, machine_current->machine );
 
-  error = z80_to_snapshot( snap ); if( error ) return error;
-  error = ula_to_snapshot( snap ); if( error ) return error;
-  error = ay_to_snapshot( snap ); if( error ) return error;
-  error = trdos_to_snapshot( snap ); if( error ) return error;
-  error = memory_ram_to_snapshot( snap ); if( error ) return error;
-  error = slt_to_snapshot( snap ); if( error ) return error;
-  error = zxatasp_to_snapshot( snap ); if( error ) return error;
-  error = zxcf_to_snapshot( snap ); if( error ) return error;
-  error = if2_to_snapshot( snap ); if( error ) return error;
-  error = scld_to_snapshot( snap ); if( error ) return error;
-  error = joystick_to_snapshot( snap ); if( error ) return error;
+  module_snapshot_to( snap );
 
   return 0;
 }

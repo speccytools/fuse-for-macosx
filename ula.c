@@ -31,14 +31,36 @@
 #include "keyboard.h"
 #include "loader.h"
 #include "machine.h"
+#include "module.h"
 #include "settings.h"
 #include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
+#include "ula.h"
 
 static libspectrum_byte last_byte;
 
 libspectrum_byte ula_contention[ 80000 ];
+
+static void ula_from_snapshot( libspectrum_snap *snap );
+static void ula_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t ula_module_info = {
+
+  NULL,
+  NULL,
+  ula_from_snapshot,
+  ula_to_snapshot,
+
+};
+
+int
+ula_init( void )
+{
+  module_register( &ula_module_info );
+
+  return 0;
+}
 
 libspectrum_byte
 ula_read( libspectrum_word port, int *attached )
@@ -83,24 +105,20 @@ ula_tape_level( void )
   return last_byte & 0x8;
 }
 
-int
+static void
 ula_from_snapshot( libspectrum_snap *snap )
 {
   ula_write( 0x00fe, libspectrum_snap_out_ula( snap ) );
   tstates = libspectrum_snap_tstates( snap );
   settings_current.issue2 = libspectrum_snap_issue2( snap );
-
-  return 0;
 }
 
-int
+static void
 ula_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_snap_set_out_ula( snap, last_byte );
   libspectrum_snap_set_tstates( snap, tstates );
   libspectrum_snap_set_issue2( snap, settings_current.issue2 );
-
-  return 0;
 }  
 
 void

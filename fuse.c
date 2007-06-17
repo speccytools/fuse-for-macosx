@@ -45,6 +45,7 @@
 #include <SDL.h>		/* Needed on MacOS X and Windows */
 #endif				/* #ifdef UI_SDL */
 
+#include "ay.h"
 #include "dck.h"
 #include "debugger/debugger.h"
 #include "display.h"
@@ -60,8 +61,10 @@
 #include "printer.h"
 #include "psg.h"
 #include "rzx.h"
+#include "scld.h"
 #include "settings.h"
 #include "simpleide.h"
+#include "slt.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "sound/lowlevel.h"
@@ -71,6 +74,7 @@
 #include "trdos.h"
 #include "ui/ui.h"
 #include "ui/scaler/scaler.h"
+#include "ula.h"
 #include "utils.h"
 #include "zxatasp.h"
 #include "zxcf.h"
@@ -246,6 +250,10 @@ static int fuse_init(int argc, char **argv)
   if( zxcf_init() ) return 1;
   if( if1_init() ) return 1;
   if( divide_init() ) return 1;
+  if( scld_init() ) return 1;
+  if( ula_init() ) return 1;
+  if( ay_init() ) return 1;
+  if( slt_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 

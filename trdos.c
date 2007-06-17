@@ -46,6 +46,7 @@
 #include "event.h"
 #include "machine.h"
 #include "memory.h"
+#include "module.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "trdos.h"
@@ -182,6 +183,19 @@ static int insert_trd( trdos_drive_number which, const char *filename );
 static libspectrum_dword lsb2dw( libspectrum_byte *mem );
 static void dw2lsb( libspectrum_byte *mem, libspectrum_dword value );
 
+static void trdos_memory_map( void );
+static void trdos_from_snapshot( libspectrum_snap *snap );
+static void trdos_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t trdos_module_info = {
+
+  NULL,
+  trdos_memory_map,
+  trdos_from_snapshot,
+  trdos_to_snapshot,
+
+};
+
 int
 trdos_init( void )
 {
@@ -189,6 +203,8 @@ trdos_init( void )
   discs[1].disc_ready = 0;
   discs[2].disc_ready = 0;
   discs[3].disc_ready = 0;
+
+  module_register( &trdos_module_info );
 
   return 0;
 }
@@ -232,17 +248,21 @@ trdos_unpage( void )
   machine_current->memory_map();
 }
 
-void
+static void
 trdos_memory_map( void )
 {
+  if( !( machine_current->capabilities &
+	 LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) ) return;
+
   memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
   memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
 }
   
-int
-trdos_from_snapshot( libspectrum_snap *snap, int capabilities )
+static void
+trdos_from_snapshot( libspectrum_snap *snap )
 {
-  if( !( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) ) return 0;
+  if( !( machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) )
+    return;
 
   trdos_active = libspectrum_snap_beta_paged( snap );
   
@@ -259,11 +279,9 @@ trdos_from_snapshot( libspectrum_snap *snap, int capabilities )
   trdos_sec_write( 0x005f, libspectrum_snap_beta_sector( snap ) );
   trdos_dr_write ( 0x007f, libspectrum_snap_beta_data  ( snap ) );
   trdos_sp_write ( 0x00ff, libspectrum_snap_beta_system( snap ) );
-  
-  return 0;
 }
 
-int
+static void
 trdos_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_snap_set_beta_paged( snap, trdos_active );
@@ -273,8 +291,6 @@ trdos_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_beta_sector( snap, trdos_track_register );
   libspectrum_snap_set_beta_data  ( snap, trdos_sector_register );
   libspectrum_snap_set_beta_system( snap, trdos_data_register );
-
-  return 0;
 }
 
 static

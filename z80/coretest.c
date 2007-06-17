@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "module.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80.h"
@@ -442,6 +443,12 @@ int
 event_add( libspectrum_dword event_time, int type )
 {
   /* Do nothing */
+  return 0;
+}
+
+int
+module_register( module_info_t *module )
+{
   return 0;
 }
 

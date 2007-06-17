@@ -27,6 +27,7 @@
 
 #include "compat.h"
 #include "machine.h"
+#include "module.h"
 #include "printer.h"
 #include "psg.h"
 #include "sound.h"
@@ -39,6 +40,26 @@ static const libspectrum_byte mask[ AY_REGISTERS ] = {
   0x1f, 0x1f, 0x1f, 0xff, 0xff, 0x0f, 0xff, 0xff,
 
 };
+
+static void ay_from_snapshot( libspectrum_snap *snap );
+static void ay_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t ay_module_info = {
+
+  NULL,
+  NULL,
+  ay_from_snapshot,
+  ay_to_snapshot,
+
+};
+
+int
+ay_init( void )
+{
+  module_register( &ay_module_info );
+
+  return 0;
+}
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K
    machines) is read from */
@@ -97,12 +118,12 @@ ay_dataport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   if( current == 14 ) printer_serial_write( b );
 }
 
-int
-ay_from_snapshot( libspectrum_snap *snap, int capabilities )
+static void
+ay_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
 
-  if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
+  if( machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
 
     ay_registerport_write( 0xfffd,
 			   libspectrum_snap_out_ay_registerport( snap ) );
@@ -114,11 +135,9 @@ ay_from_snapshot( libspectrum_snap *snap, int capabilities )
     }
 
   }
-
-  return 0;
 }
 
-int
+static void
 ay_to_snapshot( libspectrum_snap *snap )
 {
   size_t i;
@@ -130,6 +149,4 @@ ay_to_snapshot( libspectrum_snap *snap )
   for( i = 0; i < AY_REGISTERS; i++ )
     libspectrum_snap_set_ay_registers( snap, i,
 				       machine_current->ay.registers[i] );
-
-  return 0;
 }

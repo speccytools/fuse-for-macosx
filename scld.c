@@ -36,6 +36,7 @@
 #include "display.h"
 #include "machine.h"
 #include "memory.h"
+#include "module.h"
 #include "scld.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -47,6 +48,27 @@ libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 
 memory_page timex_exrom[8];
 memory_page timex_dock[8];
+
+static void scld_reset( void );
+static void scld_from_snapshot( libspectrum_snap *snap );
+static void scld_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t scld_module_info = {
+
+  scld_reset,
+  NULL,
+  scld_from_snapshot,
+  scld_to_snapshot,
+
+};
+
+int
+scld_init( void )
+{
+  module_register( &scld_module_info );
+
+  return 0;
+}
 
 libspectrum_byte
 scld_dec_read( libspectrum_word port GCC_UNUSED, int *attached )
@@ -92,7 +114,7 @@ scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   display_set_hires_border( paper );
 }
 
-void
+static void
 scld_reset(void)
 {
   scld_last_dec.byte = 0;
@@ -158,10 +180,11 @@ scld_memory_map( void )
   }
 }
 
-int
-scld_from_snapshot( libspectrum_snap *snap, int capabilities )
+static void
+scld_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
+  int capabilities = machine_current->capabilities;
 
   if( capabilities & ( LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY |
       LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY ) )
@@ -188,7 +211,7 @@ scld_from_snapshot( libspectrum_snap *snap, int capabilities )
           if( !memory_map_dock[i]->page ) {
             ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                       __LINE__ );
-            return 1;
+            return;
           }
         }
 
@@ -208,7 +231,7 @@ scld_from_snapshot( libspectrum_snap *snap, int capabilities )
           if( !memory_map_exrom[i]->page ) {
             ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                       __LINE__ );
-            return 1;
+            return;
           }
         }
 
@@ -223,11 +246,9 @@ scld_from_snapshot( libspectrum_snap *snap, int capabilities )
 
     machine_current->memory_map();
   }
-
-  return 0;
 }
 
-int
+static void
 scld_to_snapshot( libspectrum_snap *snap )
 {
   size_t i;
@@ -248,7 +269,7 @@ scld_to_snapshot( libspectrum_snap *snap )
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                     __LINE__ );
-          return 1;
+          return;
         }
 
         libspectrum_snap_set_exrom_ram( snap, i,
@@ -263,7 +284,7 @@ scld_to_snapshot( libspectrum_snap *snap )
         if( !buffer ) {
           ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
                     __LINE__ );
-          return 1;
+          return;
         }
 
         libspectrum_snap_set_dock_ram( snap, i, memory_map_dock[i]->writable );
@@ -274,6 +295,4 @@ scld_to_snapshot( libspectrum_snap *snap )
     }
 
   }
-
-  return 0;
 }

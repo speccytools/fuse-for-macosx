@@ -28,11 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "divide.h"
 #include "event.h"
 #include "fuse.h"
-#include "if1.h"
-#include "if2.h"
 #include "machine.h"
 #include "machines/machines.h"
 #include "machines/scorpion.h"
@@ -41,10 +38,8 @@
 #include "machines/specplus3.h"
 #include "machines/tc2068.h"
 #include "memory.h"
-#include "printer.h"
-#include "scld.h"
+#include "module.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "tape.h"
@@ -52,9 +47,6 @@
 #include "ui/uidisplay.h"
 #include "ula.h"
 #include "utils.h"
-#include "z80/z80.h"
-#include "zxatasp.h"
-#include "zxcf.h"
 
 fuse_machine_info **machine_types = NULL; /* Array of available machines */
 int machine_count = 0;
@@ -351,19 +343,9 @@ machine_reset( void )
   size_t i;
   int error;
 
-  /* These things should happen on all resets */
-  z80_reset();
-
   sound_ay_reset();
 
-  printer_zxp_reset();
-  scld_reset();
   tape_stop();
-  simpleide_reset();
-  /* DivIDE does not page in immediately on a reset condition (we do that by
-  trapping PC instead); however, it needs to perform housekeeping tasks upon
-  reset */
-  divide_reset();
 
   memory_pool_free();
 
@@ -371,6 +353,8 @@ machine_reset( void )
 
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;
+
+  module_reset();
 
   error = machine_current->memory_map(); if( error ) return error;
 
@@ -382,15 +366,6 @@ machine_reset( void )
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_NOT_AVAILABLE );
   
-  error = if1_reset(); if( error ) return error;
-
-  /* Check for an Interface II ROM */
-  error = if2_reset(); if( error ) return error;
-
-  /* Other interfaces that may assert /ROMCS */
-  zxatasp_reset();
-  zxcf_reset();
-
   /* clear out old display image ready for new one */
   display_refresh_all();
 

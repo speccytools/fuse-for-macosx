@@ -33,6 +33,7 @@
 #include "ide.h"
 #include "machine.h"
 #include "memory.h"
+#include "module.h"
 #include "periph.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -73,6 +74,20 @@ static libspectrum_byte ZXCFMEM[ ZXCF_PAGES ][ ZXCF_PAGE_LENGTH ];
 
 static libspectrum_byte last_memctl;
 
+static void zxcf_reset( void );
+static void zxcf_memory_map( void );
+static void zxcf_from_snapshot( libspectrum_snap *snap );
+static void zxcf_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t zxcf_module_info = {
+
+  zxcf_reset,
+  zxcf_memory_map,
+  zxcf_from_snapshot,
+  zxcf_to_snapshot,
+
+};
+
 /* Housekeeping functions */
 
 int
@@ -94,6 +109,8 @@ zxcf_init( void )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 1 );
   }
 
+  module_register( &zxcf_module_info );
+
   return 0;
 }
 
@@ -103,7 +120,7 @@ zxcf_end( void )
   return libspectrum_ide_free( zxcf_idechn );
 }
 
-void
+static void
 zxcf_reset( void )
 {
   if( !settings_current.zxcf_active ) return;
@@ -235,9 +252,11 @@ zxcf_ide_write( libspectrum_word port, libspectrum_byte data )
   libspectrum_ide_write( zxcf_idechn, idereg, data ); 
 }
 
-void
+static void
 zxcf_memory_map( void )
 {
+  if( !settings_current.zxcf_active ) return;
+
   if( !settings_current.zxcf_upload ) {
     memory_map_read[0] = memory_map_romcs[0];
     memory_map_read[1] = memory_map_romcs[1];
@@ -247,12 +266,12 @@ zxcf_memory_map( void )
   memory_map_write[1] = memory_map_romcs[1];
 }
 
-int
+static void
 zxcf_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
 
-  if( !libspectrum_snap_zxcf_active( snap ) ) return 0;
+  if( !libspectrum_snap_zxcf_active( snap ) ) return;
 
   settings_current.zxcf_active = 1;
   settings_current.zxcf_upload = libspectrum_snap_zxcf_upload( snap );
@@ -263,17 +282,15 @@ zxcf_from_snapshot( libspectrum_snap *snap )
     if( libspectrum_snap_zxcf_ram( snap, i ) )
       memcpy( ZXCFMEM[ i ], libspectrum_snap_zxcf_ram( snap, i ),
 	      ZXCF_PAGE_LENGTH );
-  
-  return 0;
 }
 
-int
+static void
 zxcf_to_snapshot( libspectrum_snap *snap )
 {
   size_t i;
   libspectrum_byte *buffer;
 
-  if( !settings_current.zxcf_active ) return 0;
+  if( !settings_current.zxcf_active ) return;
 
   libspectrum_snap_set_zxcf_active( snap, 1 );
   libspectrum_snap_set_zxcf_upload( snap, settings_current.zxcf_upload );
@@ -285,12 +302,10 @@ zxcf_to_snapshot( libspectrum_snap *snap )
     buffer = malloc( ZXCF_PAGE_LENGTH * sizeof( libspectrum_byte ) );
     if( !buffer ) {
       ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return 1;
+      return;
     }
 
     memcpy( buffer, ZXCFMEM[ i ], ZXCF_PAGE_LENGTH );
     libspectrum_snap_set_zxcf_ram( snap, i, buffer );
   }
-
-  return 0;
 }

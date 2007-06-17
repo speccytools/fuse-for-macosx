@@ -29,6 +29,7 @@
 #include <libspectrum.h>
 
 #include "ide.h"
+#include "module.h"
 #include "periph.h"
 #include "settings.h"
 #include "simpleide.h"
@@ -49,6 +50,13 @@ const size_t simpleide_peripherals_count =
   sizeof( simpleide_peripherals ) / sizeof( periph_t );
 
 static libspectrum_ide_channel *simpleide_idechn;
+
+static module_info_t simpleide_module_info = {
+
+  simpleide_reset,
+  NULL,
+
+};
 
 /* Housekeeping functions */
 
@@ -76,6 +84,8 @@ simpleide_init( void )
     if( error ) return error;
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT, 1 );
   }
+
+  module_register( &simpleide_module_info );
 
   return 0;
 }

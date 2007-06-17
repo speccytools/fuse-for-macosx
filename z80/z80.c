@@ -28,6 +28,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "memory.h"
+#include "module.h"
 #include "rzx.h"
 #include "scld.h"
 #include "spectrum.h"
@@ -61,11 +62,23 @@ libspectrum_byte sz53p_table[0x100]; /* OR the above two tables together */
 processor z80;
 
 static void z80_init_tables(void);
+static void z80_from_snapshot( libspectrum_snap *snap );
+static void z80_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t z80_module_info = {
+
+  z80_reset,
+  NULL,
+  z80_from_snapshot,
+  z80_to_snapshot,
+
+};
 
 /* Set up the z80 emulation */
 void z80_init(void)
 {
   z80_init_tables();
+  module_register( &z80_module_info );
 }
 
 /* Initalise the tables used to set flags */
@@ -182,7 +195,7 @@ z80_nmi( void )
 }
 
 /* Routines for transferring the Z80 contents to and from snapshots */
-int
+static void
 z80_from_snapshot( libspectrum_snap *snap )
 {
   A  = libspectrum_snap_a ( snap ); F  = libspectrum_snap_f ( snap );
@@ -203,11 +216,9 @@ z80_from_snapshot( libspectrum_snap *snap )
 
   z80.interrupts_enabled_at =
     libspectrum_snap_last_instruction_ei( snap ) ? tstates : -1;
-
-  return 0;
 }
   
-int
+static void
 z80_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte r_register;
@@ -234,6 +245,4 @@ z80_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_last_instruction_ei(
     snap, z80.interrupts_enabled_at == tstates
   );
-
-  return 0;
 }
