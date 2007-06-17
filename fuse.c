@@ -53,6 +53,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "if1.h"
+#include "if2.h"
 #include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
@@ -249,6 +250,7 @@ static int fuse_init(int argc, char **argv)
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
   if( if1_init() ) return 1;
+  if( if2_init() ) return 1;
   if( divide_init() ) return 1;
   if( scld_init() ) return 1;
   if( ula_init() ) return 1;
