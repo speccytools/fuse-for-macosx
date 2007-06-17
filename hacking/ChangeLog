@@ -1822,7 +1822,7 @@
 	 z80/z80_ops.c: cleanup conditional compilation of +D code
 	 (plusd_20070609) (Stuart).
 20070614 disk/{plusd.{c,h},wd1770.{c,h}}: update author contact information
-	 (plusd_20070609) (Stuart).
+	 (plusd_20070609) (thanks, Fred) (Stuart).
 20070615 utils.c: tweak Amiga temp dir path (part of patch #1712260)
          (Chris Young).
 20070617 machine.c: refresh display on machine reset to ensure correct display
@@ -1838,3 +1838,4 @@
 20070617 disk/plusd.{c,h}: +D modularisation fixes (plusd_20070609) (Stuart).
 20070617 disk/plusd.c: fix plusd_memory_map() and remove unused variable
 	 (plusd_20070609) (Stuart).
+20070617 disk/wd1770.h: fix typo in comment (plusd_20070609) (Stuart).

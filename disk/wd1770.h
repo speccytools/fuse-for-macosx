@@ -36,7 +36,7 @@
 
 static const int WD1770_SR_MOTORON = 1<<7; /* Motor on */
 static const int WD1770_SR_WRPROT  = 1<<6; /* Write-protect */
-static const int WD1770_SR_SPINUP  = 1<<5; /* Record yype / Spin-up complete */
+static const int WD1770_SR_SPINUP  = 1<<5; /* Record type / Spin-up complete */
 static const int WD1770_SR_RNF     = 1<<4; /* Record Not Found */
 static const int WD1770_SR_CRCERR  = 1<<3; /* CRC error */
 static const int WD1770_SR_LOST    = 1<<2; /* Lost data */
