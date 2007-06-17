@@ -1795,3 +1795,5 @@
 20070617 ay.[ch],divide.[ch],fuse.c,if1.[ch],if2.[ch],joystick.[ch],Makefile.am,         machine.c,memory.[ch],module.[ch],printer.[ch],scld.[ch],snapshot.c,
 	 trdos.[ch],ula.[ch],z80/{coretest.c,z80.[ch]},zxatasp.[ch],zxcf.[ch]:
 	 more explicit modularisation (patch #1734120).
+20070618 sound/coreaudiosound.c: correct initialisation of stereo output
+         (Fred).

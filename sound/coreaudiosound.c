@@ -107,9 +107,9 @@ sound_lowlevel_init( const char *dev, int *freqptr, int *stereoptr )
                     | kLinearPCMFormatFlagIsBigEndian
 #endif      /* #ifdef WORDS_BIGENDIAN */
                     | kLinearPCMFormatFlagIsPacked;
-  deviceFormat.mBytesPerPacket = 2;
+  deviceFormat.mBytesPerPacket = *stereoptr ? 4 : 2;
   deviceFormat.mFramesPerPacket = 1;
-  deviceFormat.mBytesPerFrame = 2;
+  deviceFormat.mBytesPerFrame = *stereoptr ? 4 : 2;
   deviceFormat.mBitsPerChannel = 16;
   deviceFormat.mChannelsPerFrame = *stereoptr ? 2 : 1;
 
