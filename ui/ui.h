@@ -35,6 +35,7 @@
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "disk/plusd.h"
 #include "machines/specplus3.h"
 #include "trdos.h"
 #include "ui/scaler/scaler.h"
@@ -110,9 +111,10 @@ int ui_mouse_release( int suspend ); /* UI: ungrab, return 0 if done */
 /* Write the current tape out */
 int ui_tape_write( void );
 
-/* Write a +3 or TRDOS disk out */
+/* Write a +3, BetaDisk or +D disk out */
 int ui_plus3_disk_write( specplus3_drive_number which );
 int ui_trdos_disk_write( trdos_drive_number which );
+int ui_plusd_disk_write( plusd_drive_number which );
 
 /* Get a rollback point from the given list */
 int ui_get_rollback_point( GSList *points );
@@ -155,6 +157,9 @@ typedef enum ui_menu_item {
   UI_MENU_ITEM_MEDIA_DISK_TRDOS,
   UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT,
   UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD,
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
   UI_MENU_ITEM_MEDIA_IDE,
   UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT,
   UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT,
@@ -176,6 +181,8 @@ typedef enum ui_menu_item {
 
 int ui_menu_activate( ui_menu_item item, int active );
 int ui_menu_item_set_active( const char *path, int active );
+
+void ui_menu_disk_update( void );
 
 /* Functions to update the statusbar */
 

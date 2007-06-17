@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "disk/plusd.h"
 #include "display.h"
 #include "divide.h"
 #include "fuse.h"
@@ -40,6 +41,7 @@
 #include "module.h"
 #include "settings.h"
 #include "spectrum.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "ula.h"
 #include "zxatasp.h"
@@ -273,7 +275,6 @@ memory_romcs_map( void )
      same position than ROMCS (B25 conn) in the Spectrum edge connector.
      
    */
-
   module_romcs();
 }
 

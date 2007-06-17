@@ -108,6 +108,7 @@ static const char *LIBSPECTRUM_MIN_VERSION = "0.2.0.1";
 typedef struct start_files_t {
 
   const char *disk_plus3;
+  const char *disk_plusd;
   const char *disk_trdos;
   const char *dock;
   const char *if2;
@@ -246,6 +247,9 @@ static int fuse_init(int argc, char **argv)
   if( rzx_init() ) return 1;
   if( psg_init() ) return 1;
   if( trdos_init() ) return 1;
+#ifdef HAVE_LIBDSK_H
+  if( plusd_init() ) return 1;
+#endif			/* #ifdef HAVE_LIBDSK_H */
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
@@ -478,6 +482,7 @@ static int
 setup_start_files( start_files_t *start_files )
 {
   start_files->disk_plus3 = settings_current.plus3disk_file;
+  start_files->disk_plusd = settings_current.plusddisk_file;
   start_files->disk_trdos = settings_current.trdosdisk_file;
   start_files->dock = settings_current.dck_file;
   start_files->if2 = settings_current.if2_file;
@@ -558,6 +563,9 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 
     case LIBSPECTRUM_CLASS_DISK_PLUS3:
       start_files->disk_plus3 = filename; break;
+
+    case LIBSPECTRUM_CLASS_DISK_PLUSD:
+      start_files->disk_plusd = filename; break;
 
     case LIBSPECTRUM_CLASS_DISK_TRDOS:
       start_files->disk_trdos = filename; break;
@@ -650,6 +658,11 @@ do_start_files( start_files_t *start_files )
 
   if( start_files->disk_plus3 ) {
     error = utils_open_file( start_files->disk_plus3, autoload, NULL );
+    if( error ) return error;
+  }
+
+  if( start_files->disk_plusd ) {
+    error = utils_open_file( start_files->disk_plusd, autoload, NULL );
     if( error ) return error;
   }
 
@@ -762,6 +775,9 @@ static int fuse_end(void)
   zxcf_end();
   if1_end();
   divide_end();
+#ifdef HAVE_LIBDSK_H
+  plusd_end();
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
   machine_end();
 

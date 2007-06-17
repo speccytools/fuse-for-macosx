@@ -310,7 +310,7 @@ dump_memory_state( void )
 
 /* Error 'handing': dump core as these should never be called */
 
-int
+void
 fuse_abort( void )
 {
   abort();
@@ -414,6 +414,17 @@ trdos_unpage( void )
 {
   abort();
 }
+
+#ifdef HAVE_LIBDSK_H
+int plusd_available = 0;
+int plusd_active = 0;
+
+void
+plusd_page( void )
+{
+  abort();
+}
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
 void
 if1_page( void )

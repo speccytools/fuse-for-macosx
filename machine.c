@@ -199,7 +199,6 @@ machine_select_machine( fuse_machine_info *machine )
 {
   int width, height, i;
   int capabilities;
-  int plus3, trdos;
 
   machine_current = machine;
 
@@ -238,24 +237,9 @@ machine_select_machine( fuse_machine_info *machine )
   for( i = 0; i < 2 * SPECTRUM_RAM_PAGES; i++ )
     memory_map_ram[i].writable = 0;
 
-  if( machine_reset( 0 ) ) return 1;
+  /* Do a hard reset */
+  if( machine_reset( 1 ) ) return 1;
 
-  /* Set the disk menu items and statusbar appropriately */
-  plus3 = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
-  trdos = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK;
-
-  if( plus3 || trdos ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
-    ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
-  } else {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 0 );
-    ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
-			 UI_STATUSBAR_STATE_NOT_AVAILABLE );
-  }
-
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3, plus3 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_TRDOS, trdos );
-    
   /* And the dock menu item */
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK_EJECT, 0 );
@@ -366,6 +350,9 @@ machine_reset( int hard_reset )
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_NOT_AVAILABLE );
   
+  /* Update the disk menu items */
+  ui_menu_disk_update();
+
   /* clear out old display image ready for new one */
   display_refresh_all();
 

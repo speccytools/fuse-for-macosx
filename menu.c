@@ -28,6 +28,7 @@
 #include <libspectrum.h>
 
 #include "dck.h"
+#include "disk/plusd.h"
 #include "divide.h"
 #include "event.h"
 #include "fuse.h"
@@ -42,6 +43,7 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
+#include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "widget/widget.h"
@@ -438,6 +440,11 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
   case 1:
     trdos_disk_insert_default_autoload( which, filename );
     break;
+  case 2:
+#ifdef HAVE_LIBDSK_H
+    plusd_disk_insert_default_autoload( which, filename );
+#endif				/* #ifdef HAVE_LIBDSK_H */
+    break;
   }
 
   free( filename );
@@ -464,6 +471,11 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
     break;
   case 1:
     trdos_disk_eject( which, write );
+    break;
+  case 2:
+#ifdef HAVE_LIBDSK_H
+    plusd_disk_eject( which, write );
+#endif			/* #ifdef HAVE_LIBDSK_H */
     break;
   }
 
@@ -636,6 +648,16 @@ menu_check_media_changed( void )
 
   confirm = trdos_disk_eject( TRDOS_DRIVE_B, 0 );
   if( confirm ) return 1;
+
+#ifdef HAVE_LIBDSK_H
+
+  confirm = plusd_disk_eject( PLUSD_DRIVE_1, 0 );
+  if( confirm ) return 1;
+
+  confirm = plusd_disk_eject( PLUSD_DRIVE_2, 0 );
+  if( confirm ) return 1;
+
+#endif			/* #ifdef HAVE_LIBDSK_H */
 
   if( settings_current.simpleide_master_file ) {
     confirm = simpleide_eject( LIBSPECTRUM_IDE_MASTER );

@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2001 Philip Kendall
+## Copyright (c) 2007 Stuart Brady
 
-## $Id$
+## $Id: Makefile.am 2889 2007-05-26 17:45:08Z zubzero $
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -23,19 +23,12 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-ROMS =  128-0.rom 128-1.rom \
-	48.rom \
-	plus2-0.rom plus2-1.rom \
-	plus3-0.rom plus3-1.rom plus3-2.rom plus3-3.rom \
-	plus3e-0.rom plus3e-1.rom plus3e-2.rom plus3e-3.rom \
-	tc2048.rom \
-	tc2068-0.rom tc2068-1.rom \
-	128p-0.rom 128p-1.rom trdos.rom \
-	256s-0.rom 256s-1.rom 256s-2.rom 256s-3.rom \
-	se-0.rom se-1.rom \
-	if1-1.rom if1-2.rom \
-	plusd.rom
+noinst_LIBRARIES = libdisk.a
 
-pkgdata_DATA = $(ROMS)
+INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 
-EXTRA_DIST = $(ROMS)
+libdisk_a_SOURCES = plusd.c \
+		    wd1770.c
+
+noinst_HEADERS = plusd.h \
+		 wd1770.h

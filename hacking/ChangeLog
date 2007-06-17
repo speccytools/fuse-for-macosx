@@ -1769,6 +1769,13 @@
 20070608 man/fuse.1: fix dashes (Stuart).
 20070608 sound/alsasound.c: update FSF address (Stuart).
 20070609 profile.c: fix printf() warning.
+20070609 BRANCH: plusd_20070609
+20070609 Makefile.am,configure.in,disk/{Makefile.am,plusd.{c,h},wd1770.{c,h}},
+	 event.{c,h},fuse.c,machine.c,machines/{spec128.c,spec48.c},memory.c,
+	 menu.c,menu_data.dat,periph.{c,h},roms/{Makefile.am,plusd.rom},
+	 settings.dat,snapshot.c,tape.c,ui.c,ui/{gtk/gtkui.c,options.dat,ui.h},
+	 widget/menu.c,z80/{coretest.c,z80.c,z80_ops.c}: +D emulation
+	 (part of patch #1546570) (plusd_20070609) (Stuart).
 20070610 event.[ch],spectrum.c,rzx.[ch],ula.h: add RZX "sentinel" event to
 	 prevent running off the end of the contention array on very long
 	 frames (see bug #1057471).
@@ -1779,7 +1786,9 @@
 20070610 keysyms.pl,ui/svga/{svgakeyboard.c,svgadisplay.c}: fix bitrot
 	 (fixes bug #1727516) (Gergely Szasz).
 20070610 ui/svga: ignore *.a files.
+20070610 man/fuse.1: add +D documentation (plusd_20070609) (Stuart).
 20070610 man/fuse.1: spelling fixes (Stuart).
+20070611 machines/specplus2.c: enable +D support (plusd_20070609) (Stuart).
 20070611 machines/specplus3.c: save disk images if their 'dirty' state cannot
 	 be determined (Stuart).
 20070611 sound/alsasound.c: stop sound_lowlevel_end() from disabling sound
@@ -1787,15 +1796,46 @@
 	 exactly the right size could not be obtained (Stuart).
 20070611 sound/alsasound.c: refuse to enable sound in ALSA environment with
          more than two channels (fixes bug #1732696) (Gergely Szasz).
+20070611 disk/plusd.c,menu.c: check for modifications to +D disks in
+	 menu_check_media_changed() (plusd_20070609) (Stuart).
+20070611 machine.c,periph.c,ui.c,ui/ui.h: fix disk menu activation
+	 (plusd_20070609) (Stuart).
+20070612 disk/plusd.{c,h},man/fuse.1: implement +D printer port routines and
+	 remove DISCiPLE-specific joystick ports (plusd_20070609) (Stuart).
+20070612 printer.c: disable ZX Printer ports when the +D is available
+	 (plusd_20070609) (Stuart).
+20070612 disk/plusd.c: cleanup disk insertion code and add support for LibDsk's
+	 "logical" driver (plusd_20070609) (Stuart).
+20070612 disk/plusd.c: assume printer port is 'busy' when no printer is
+	 connected (plusd_20070609) (Stuart).
+20070612 man/fuse.1: document +D printer emulation (plusd_20070609) (Stuart).
+20070612 periph.c: fix typo in comment (plusd_20070609) (Stuart).
+20070612 disk/plusd.{c,h},menu.c,ui.c,ui/gtk/gtkui.c: remove fictitious +D
+	 drives 3 and 4 (plusd_20070609) (Stuart).
+20070612 menu_data.dat: remove +D drives 3 and 4 (plusd_20070609) (Stuart).
+20070612 ui/win32/win32ui.c: implement ui_plusd_disk_write() for Win32
+	 (plusd_20070609) (Stuart).
+20070612 disk/{plusd.{c,h},wd1770.{c,h}}: separate FDC and disk drive
+	 emulation (plusd_20070609) (Stuart).
+20070612 disk/wd1770.c: comment out unused variables (plusd_20070609) (Stuart).
+20070613 disk/plusd.h,machine.c,memory.c,menu.c,snapshot.c,ui/ui.h,
+	 z80/z80_ops.c: cleanup conditional compilation of +D code
+	 (plusd_20070609) (Stuart).
+20070614 disk/{plusd.{c,h},wd1770.{c,h}}: update author contact information
+	 (plusd_20070609) (thanks, Fred) (Stuart).
 20070615 utils.c: tweak Amiga temp dir path (part of patch #1712260)
          (Chris Young).
 20070617 machine.c: refresh display on machine reset to ensure correct display
          as we don't always call machine_select() after loading a new snapshot
          (Fred).
+20070617 fuse.c,man/fuse.1,settings.dat,utils.c: allow +D disk images to be
+	 specified on command line or in the config file (includes patch
+	 #1738602) (plusd_20070609) (Phil/Stuart).
 20070617 ay.[ch],divide.[ch],fuse.c,if1.[ch],if2.[ch],joystick.[ch],Makefile.am,
 	 machine.c,memory.[ch],module.[ch],printer.[ch],scld.[ch],snapshot.c,
 	 trdos.[ch],ula.[ch],z80/{coretest.c,z80.[ch]},zxatasp.[ch],zxcf.[ch]:
 	 more explicit modularisation (patch #1734120).
+20070617 disk/plusd.{c,h}: +D modularisation fixes (plusd_20070609) (Stuart).
 20070617 sound/coreaudiosound.c: correct initialisation of stereo output
          (Fred).
 20070617 dck.c,divide.c,fuse.c,if1.c,if2.c,machine.[ch],menu_data.dat,
@@ -1803,6 +1843,13 @@
 	 widget/menu.c,z80/z80.[ch],zxatasp.c,zxcf.c: allow distinction between
 	 "soft" resets (activing the reset line on the Z80) and "hard" resets
 	 (pulling the power). Needed for DivIDE and +D.
+20070617 disk/plusd.c: fix plusd_memory_map() and remove unused variable
+	 (plusd_20070609) (Stuart).
+20070617 disk/wd1770.h: fix typo in comment (plusd_20070609) (Stuart).
+20070617 disk/plusd.c,machine.c: clear the +D RAM only upon a hard reset, and
+	 perform a hard reset when selecting a machine (plusd_20070609)
+	 (Stuart).
 20070617 man/fuse.1,ui/win32/win32ui.c,z80/coretest.c: fix compilation of
 	 coretest, document hard resets in the man page and fix the reset menu
 	 option for the Win32 UI (Stuart).
+20070617 merge plusd_20070609 branch into trunk (Stuart).
