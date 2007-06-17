@@ -76,7 +76,7 @@ main( int argc, char **argv )
   z80_init();
 
   /* Get ourselves into a known state */
-  z80_reset(); tstates = 0;
+  z80_reset( 1 ); tstates = 0;
   for( i = 0; i < 0x10000; i += 4 ) {
     memory[ i     ] = 0xde; memory[ i + 1 ] = 0xad;
     memory[ i + 2 ] = 0xbe; memory[ i + 3 ] = 0xef;

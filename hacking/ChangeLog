@@ -1792,13 +1792,17 @@
 20070617 machine.c: refresh display on machine reset to ensure correct display
          as we don't always call machine_select() after loading a new snapshot
          (Fred).
-20070617 ay.[ch],divide.[ch],fuse.c,if1.[ch],if2.[ch],joystick.[ch],Makefile.am,         machine.c,memory.[ch],module.[ch],printer.[ch],scld.[ch],snapshot.c,
+20070617 ay.[ch],divide.[ch],fuse.c,if1.[ch],if2.[ch],joystick.[ch],Makefile.am,
+	 machine.c,memory.[ch],module.[ch],printer.[ch],scld.[ch],snapshot.c,
 	 trdos.[ch],ula.[ch],z80/{coretest.c,z80.[ch]},zxatasp.[ch],zxcf.[ch]:
 	 more explicit modularisation (patch #1734120).
 20070617 sound/coreaudiosound.c: correct initialisation of stereo output
          (Fred).
-20070618 dck.c,divide.c,fuse.c,if1.c,if2.c,machine.[ch],menu_data.dat,
+20070617 dck.c,divide.c,fuse.c,if1.c,if2.c,machine.[ch],menu_data.dat,
 	 module.[ch],printer.c,scld.c,simpleide.[ch],snapshot.c,ui/gtk/gtkui.c,
 	 widget/menu.c,z80/z80.[ch],zxatasp.c,zxcf.c: allow distinction between
 	 "soft" resets (activing the reset line on the Z80) and "hard" resets
 	 (pulling the power). Needed for DivIDE and +D.
+20070617 man/fuse.1,ui/win32/win32ui.c,z80/coretest.c: fix compilation of
+	 coretest, document hard resets in the man page and fix the reset menu
+	 option for the Win32 UI (Stuart).

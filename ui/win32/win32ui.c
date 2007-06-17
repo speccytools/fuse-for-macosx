@@ -701,7 +701,7 @@ menu_machine_reset( int action )
 {
   if( win32ui_confirm( "Reset?" ) )
   {
-    if( machine_reset() ) {
+    if( machine_reset( 0 ) ) {
       ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 
       /* FIXME: abort() seems a bit extreme here, but it'll do for now */
