@@ -1853,3 +1853,4 @@
 	 coretest, document hard resets in the man page and fix the reset menu
 	 option for the Win32 UI (Stuart).
 20070617 merge plusd_20070609 branch into trunk (Stuart).
+20070617 memory.c: remove unused #includes (Stuart).
