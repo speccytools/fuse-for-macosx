@@ -1835,3 +1835,4 @@
 	 machine.c,memory.[ch],module.[ch],printer.[ch],scld.[ch],snapshot.c,
 	 trdos.[ch],ula.[ch],z80/{coretest.c,z80.[ch]},zxatasp.[ch],zxcf.[ch]:
 	 more explicit modularisation (patch #1734120).
+20070617 disk/plusd.{c,h}: +D modularisation fixes (plusd_20070609) (Stuart).

@@ -47,6 +47,7 @@
 #include "compat.h"
 #include "event.h"
 #include "machine.h"
+#include "module.h"
 #include "plusd.h"
 #include "printer.h"
 #include "settings.h"
@@ -64,6 +65,20 @@ wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
 static const char *plusd_template = "fuse.plusd.XXXXXX";
 
+static void plusd_reset( void );
+static void plusd_memory_map( void );
+static void plusd_from_snapshot( libspectrum_snap *snap );
+static void plusd_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t plusd_module_info = {
+
+  plusd_reset,
+  plusd_memory_map,
+  plusd_from_snapshot,
+  plusd_to_snapshot,
+
+};
+
 void
 plusd_page( void )
 {
@@ -80,7 +95,7 @@ plusd_unpage( void )
   machine_current->memory_map();
 }
 
-void
+static void
 plusd_memory_map( void )
 {
   memory_map_read[ 0 ] = memory_map_write[ 0 ] = memory_map_romcs[ 0 ];
@@ -140,10 +155,12 @@ plusd_init( void )
   plusd_fdc.rates[ 2 ] = 2;
   plusd_fdc.rates[ 3 ] = 3;
 
+  module_register( &plusd_module_info );
+
   return 0;
 }
 
-int
+static void
 plusd_reset( void )
 {
   int i;
@@ -154,12 +171,11 @@ plusd_reset( void )
   plusd_available = 0;
 
   if( !periph_plusd_active )
-    return 0;
+    return;
 
-  error = machine_load_rom_bank( memory_map_romcs, 0, 0,
-				 settings_default.rom_plusd,
-				 settings_current.rom_plusd, 0x2000 );
-  if( error ) return error;
+  machine_load_rom_bank( memory_map_romcs, 0, 0,
+			 settings_default.rom_plusd,
+			 settings_current.rom_plusd, 0x2000 );
 
   memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
@@ -211,8 +227,6 @@ plusd_reset( void )
   plusd_event_index( 0 );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
-
-  return 0;
 }
 
 void
@@ -542,16 +556,14 @@ plusd_event_index( libspectrum_dword last_tstates )
   return 0;
 }
 
-int
-plusd_from_snapshot( libspectrum_snap *snap, int capabilities )
+static void
+plusd_from_snapshot( libspectrum_snap *snap )
 {
   /* XXX */
-  return 0;
 }
 
-int
+static void
 plusd_to_snapshot( libspectrum_snap *snap )
 {
   /* XXX */
-  return 0;
 }

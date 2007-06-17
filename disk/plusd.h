@@ -50,17 +50,10 @@ extern const periph_t plusd_peripherals[];
 extern const size_t plusd_peripherals_count;
 
 int plusd_init( void );
-
-int plusd_reset( void );
-
 void plusd_end( void );
 
 void plusd_page( void );
 void plusd_unpage( void );
-void plusd_memory_map( void );
-
-int plusd_from_snapshot( libspectrum_snap *snap, int capabilities );
-int plusd_to_snapshot( libspectrum_snap *snap );
 
 libspectrum_byte plusd_sr_read( libspectrum_word port, int *attached );
 void plusd_cr_write( libspectrum_word port, libspectrum_byte b );
