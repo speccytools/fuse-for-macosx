@@ -1823,3 +1823,6 @@
 	 (plusd_20070609) (Stuart).
 20070614 disk/{plusd.{c,h},wd1770.{c,h}}: update author contact information
 	 (plusd_20070609) (Stuart).
+20070617 fuse.c,man/fuse.1,settings.dat,utils.c: allow +D disk images to be
+	 specified on command line or in the config file (includes patch
+	 #1738602) (plusd_20070609) (Phil/Stuart).

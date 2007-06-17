@@ -105,6 +105,7 @@ start_machine, string, "48", 'm', machine
 record_file, string, NULL, 'r', record, recordfile
 playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
+plusddisk_file, string, NULL,, plusddisk
 trdosdisk_file, string, NULL,, trdosdisk
 dck_file, string, NULL,, dock
 if2_file, string, NULL,, if2cart
