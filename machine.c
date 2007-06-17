@@ -237,7 +237,8 @@ machine_select_machine( fuse_machine_info *machine )
   for( i = 0; i < 2 * SPECTRUM_RAM_PAGES; i++ )
     memory_map_ram[i].writable = 0;
 
-  if( machine_reset( 0 ) ) return 1;
+  /* Do a hard reset */
+  if( machine_reset( 1 ) ) return 1;
 
   /* And the dock menu item */
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) {

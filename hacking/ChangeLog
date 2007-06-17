@@ -1846,3 +1846,6 @@
 20070617 disk/plusd.c: fix plusd_memory_map() and remove unused variable
 	 (plusd_20070609) (Stuart).
 20070617 disk/wd1770.h: fix typo in comment (plusd_20070609) (Stuart).
+20070618 disk/plusd.c,machine.c: clear the +D RAM only upon a hard reset, and
+	 perform a hard reset when selecting a machine (plusd_20070609)
+	 (Stuart).

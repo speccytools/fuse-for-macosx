@@ -65,7 +65,7 @@ wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
 static const char *plusd_template = "fuse.plusd.XXXXXX";
 
-static void plusd_reset( void );
+static void plusd_reset( int hard_reset );
 static void plusd_memory_map( void );
 static void plusd_from_snapshot( libspectrum_snap *snap );
 static void plusd_to_snapshot( libspectrum_snap *snap );
@@ -163,7 +163,7 @@ plusd_init( void )
 }
 
 static void
-plusd_reset( void )
+plusd_reset( int hard_reset )
 {
   int i;
   wd1770_drive *d;
@@ -190,9 +190,10 @@ plusd_reset( void )
   plusd_active = 0;
   plusd_index_pulse = 0;
 
-  /* Hard reset: */
-  for( i = 0; i < 8192; i++ ) {
-    memory_map_ram[ 16 * 2 ].page[ i ] = 0;
+  if( hard_reset ) {
+    for( i = 0; i < 8192; i++ ) {
+      memory_map_ram[ 16 * 2 ].page[ i ] = 0;
+    }
   }
 
   f->spin_cycles = 0;
