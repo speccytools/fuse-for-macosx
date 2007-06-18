@@ -65,6 +65,7 @@ specplus2a_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.port_contended	     = specplus3_port_contended;
   machine->ram.contend_delay	     = specplus3_contend_delay;
+  machine->ram.contend_delay_no_mreq = specplus3_contend_delay_no_mreq;
 
   machine->unattached_port = specplus3_unattached_port;
 

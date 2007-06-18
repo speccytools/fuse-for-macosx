@@ -343,8 +343,10 @@ machine_reset( int hard_reset )
   error = machine_current->memory_map(); if( error ) return error;
 
   /* Set up the contention array */
-  for( i = 0; i < machine_current->timings.tstates_per_frame; i++ )
+  for( i = 0; i < machine_current->timings.tstates_per_frame; i++ ) {
     ula_contention[ i ] = machine_current->ram.contend_delay( i );
+    ula_contention_no_mreq[ i ] = machine_current->ram.contend_delay_no_mreq( i );
+  }
 
   /* Check for an Interface I ROM */
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,

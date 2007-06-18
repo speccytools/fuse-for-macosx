@@ -28,8 +28,11 @@
 
 #define ULA_CONTENTION_SIZE 80000
 
-/* How much contention do we get at every tstate? */
+/* How much contention do we get at every tstate when MREQ is active? */
 extern libspectrum_byte ula_contention[ ULA_CONTENTION_SIZE ];
+
+/* And how much when it is inactive */
+extern libspectrum_byte ula_contention_no_mreq[ ULA_CONTENTION_SIZE ];
 
 int ula_init( void );
 

@@ -51,8 +51,11 @@ typedef struct spectrum_raminfo {
   /* Is this port result supplied by the ULA? */
   spectrum_port_contented_function port_contended;
 
-  /* What's the actual delay at the current tstate */
+  /* What's the actual delay at the current tstate with MREQ active */
   spectrum_contention_delay_function contend_delay;
+
+  /* And without MREQ */
+  spectrum_contention_delay_function contend_delay_no_mreq;
 
   int locked;			/* Is the memory configuration locked? */
   int current_page, current_rom; /* Current paged memory */

@@ -44,6 +44,7 @@ extern const size_t specplus3_peripherals_count;
 libspectrum_byte specplus3_unattached_port( void );
 int specplus3_port_contended( libspectrum_word port );
 libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
+libspectrum_byte specplus3_contend_delay_no_mreq( libspectrum_dword time );
 
 int specplus3_init( fuse_machine_info *machine );
 void specplus3_765_init( void );

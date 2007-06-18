@@ -1854,3 +1854,9 @@
 	 option for the Win32 UI (Stuart).
 20070617 merge plusd_20070609 branch into trunk (Stuart).
 20070617 memory.c: remove unused #includes (Stuart).
+20070618 machine.c,spectrum.h,ula.[ch],machines/{pentagon.c,scorpion.c,
+	 spec128.c,spec16.c,spec48.c,specplus2a.c,specplus2.c,specplus3.c,
+	 specplus3e.c,spec_se.c,tc2048.c,tc2068.c,ts2068.c},z80/{coretest.c,
+	 z80_macros.h,z80.pl}: separate out contention when MREQ isn't active,
+	 as the +2A/+3 ULA applies contention only when MREQ is active (fixes
+	 bug #1723250).

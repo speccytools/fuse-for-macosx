@@ -136,6 +136,7 @@ int tc2048_init( fuse_machine_info *machine )
   machine->timex = 1;
   machine->ram.port_contended	     = tc2048_port_contended;
   machine->ram.contend_delay	     = tc2048_contend_delay;
+  machine->ram.contend_delay_no_mreq = tc2048_contend_delay;
 
   memset( fake_bank, 0xff, MEMORY_PAGE_SIZE );
 

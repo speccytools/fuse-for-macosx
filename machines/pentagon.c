@@ -112,6 +112,7 @@ pentagon_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.port_contended = pentagon_port_contended;
   machine->ram.contend_delay  = pentagon_contend_delay;
+  machine->ram.contend_delay_no_mreq = pentagon_contend_delay;
 
   machine->unattached_port = pentagon_unattached_port;
 

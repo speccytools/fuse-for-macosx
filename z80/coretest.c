@@ -147,6 +147,18 @@ contend_write( libspectrum_word address, libspectrum_dword time )
   tstates += time;
 }
 
+void
+contend_read_no_mreq( libspectrum_word address, libspectrum_dword time )
+{
+  contend_read( address, time );
+}
+
+void
+contend_write_no_mreq( libspectrum_word address, libspectrum_dword time )
+{
+  contend_write( address, time );
+}
+
 static void
 contend_port_preio( libspectrum_word port )
 {

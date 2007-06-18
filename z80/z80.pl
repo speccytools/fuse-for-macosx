@@ -78,24 +78,24 @@ CODE
 	}
     } elsif( $opcode eq 'ADD' ) {
 	print << "CODE";
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
       ${opcode}16($arg1,$arg2);
 CODE
     } elsif( $arg1 eq 'HL' and length $arg2 == 2 ) {
 	print << "CODE";
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
       ${opcode}16($arg2);
 CODE
     }
@@ -136,8 +136,9 @@ sub cpi_cpd ($) {
 	  lookup = ( (        A & 0x08 ) >> 3 ) |
 	           ( (  (value) & 0x08 ) >> 2 ) |
 	           ( ( bytetemp & 0x08 ) >> 1 );
-	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
-	contend_read( HL, 1 ); contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	contend_read_no_mreq( HL, 1 );
 	HL$modifier; BC--;
 	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
 	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
@@ -160,8 +161,9 @@ sub cpir_cpdr ($) {
 	  lookup = ( (        A & 0x08 ) >> 3 ) |
 		   ( (  (value) & 0x08 ) >> 2 ) |
 		   ( ( bytetemp & 0x08 ) >> 1 );
-	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
-	contend_read( HL, 1 ); contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	contend_read_no_mreq( HL, 1 );
 	BC--;
 	F = ( F & FLAG_C ) | ( BC ? ( FLAG_V | FLAG_N ) : FLAG_N ) |
 	  halfcarry_sub_table[lookup] | ( bytetemp ? 0 : FLAG_Z ) |
@@ -169,8 +171,9 @@ sub cpir_cpdr ($) {
 	if(F & FLAG_H) bytetemp--;
 	F |= ( bytetemp & FLAG_3 ) | ( (bytetemp&0x02) ? FLAG_5 : 0 );
 	if( ( F & ( FLAG_V | FLAG_Z ) ) == FLAG_V ) {
-	  contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
-	  contend_read( HL, 1 ); contend_read( HL, 1 );
+	  contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	  contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	  contend_read_no_mreq( HL, 1 );
 	  PC-=2;
 	}
 	HL$modifier;
@@ -188,15 +191,15 @@ sub inc_dec ($$) {
 	print "      $opcode($arg);\n";
     } elsif( length $arg == 2 or $arg eq 'REGISTER' ) {
 	print << "CODE";
-	contend_read( IR, 1 );
-	contend_read( IR, 1 );
+	contend_read_no_mreq( IR, 1 );
+	contend_read_no_mreq( IR, 1 );
 	${arg}$modifier;
 CODE
     } elsif( $arg eq '(HL)' ) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
       }
@@ -207,11 +210,12 @@ CODE
 	libspectrum_byte offset, bytetemp;
 	libspectrum_word wordtemp;
 	offset = readbyte( PC );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); PC++;
 	wordtemp = REGISTER + (libspectrum_signed_byte)offset;
 	bytetemp = readbyte( wordtemp );
-	contend_read( wordtemp, 1 );
+	contend_read_no_mreq( wordtemp, 1 );
 	$opcode(bytetemp);
 	writebyte(wordtemp,bytetemp);
       }
@@ -230,7 +234,7 @@ sub ini_ind ($) {
       {
 	libspectrum_word initemp;
 
-	contend_read( IR, 1 );
+	contend_read_no_mreq( IR, 1 );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
@@ -251,7 +255,7 @@ sub inir_indr ($) {
       {
 	libspectrum_word initemp;
 
-	contend_read( IR, 1 );
+	contend_read_no_mreq( IR, 1 );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
@@ -260,9 +264,9 @@ sub inir_indr ($) {
 	/* C,H and P/V flags not implemented */
 
 	if( B ) {
-	  contend_write( HL, 1 ); contend_write( HL, 1 );
-	  contend_write( HL, 1 ); contend_write( HL, 1 );
-	  contend_write( HL, 1 );
+	  contend_write_no_mreq( HL, 1 ); contend_write_no_mreq( HL, 1 );
+	  contend_write_no_mreq( HL, 1 ); contend_write_no_mreq( HL, 1 );
+	  contend_write_no_mreq( HL, 1 );
 	  PC -= 2;
 	}
 	HL$modifier;
@@ -282,7 +286,7 @@ sub ldi_ldd ($) {
 	libspectrum_byte bytetemp=readbyte( HL );
 	BC--;
 	writebyte(DE,bytetemp);
-	contend_write( DE, 1 ); contend_write( DE, 1 );
+	contend_write_no_mreq( DE, 1 ); contend_write_no_mreq( DE, 1 );
 	DE$modifier; HL$modifier;
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
@@ -301,7 +305,7 @@ sub ldir_lddr ($) {
       {
 	libspectrum_byte bytetemp=readbyte( HL );
 	writebyte(DE,bytetemp);
-	contend_write( DE, 1 ); contend_write( DE, 1 );
+	contend_write_no_mreq( DE, 1 ); contend_write_no_mreq( DE, 1 );
 	BC--;
 	bytetemp += A;
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
@@ -327,7 +331,7 @@ sub otir_otdr ($) {
       {
 	libspectrum_word outitemp;
 
-	contend_read( IR, 1 );
+	contend_read_no_mreq( IR, 1 );
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
 	writeport(BC,outitemp);
@@ -337,8 +341,9 @@ sub otir_otdr ($) {
 	/* C,H and P/V flags not implemented */
 
 	if( B ) {
-	  contend_read( BC, 1 ); contend_read( BC, 1 ); contend_read( BC, 1 );
-	  contend_read( BC, 1 ); contend_read( BC, 1 );
+	  contend_read_no_mreq( BC, 1 ); contend_read_no_mreq( BC, 1 );
+	  contend_read_no_mreq( BC, 1 ); contend_read_no_mreq( BC, 1 );
+	  contend_read_no_mreq( BC, 1 );
 	  PC -= 2;
 	}
       }
@@ -355,7 +360,7 @@ sub outi_outd ($) {
       {
 	libspectrum_word outitemp;
 
-	contend_read( IR, 1 );
+	contend_read_no_mreq( IR, 1 );
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
 	writeport(BC,outitemp);
@@ -406,7 +411,7 @@ sub res_set ($$$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 );
 	writebyte( HL, bytetemp $operator $hex_mask );
       }
 CODE
@@ -432,7 +437,7 @@ sub rotate_shift ($$) {
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte(HL);
-	contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 );
 	$opcode(bytetemp);
 	writebyte(HL,bytetemp);
       }
@@ -441,7 +446,7 @@ CODE
 	print << "CODE";
       {
 	libspectrum_byte bytetemp = readbyte(tempaddr);
-	contend_read( tempaddr, 1 );
+	contend_read_no_mreq( tempaddr, 1 );
 	$opcode(bytetemp);
 	writebyte(tempaddr,bytetemp);
       }
@@ -467,7 +472,7 @@ sub opcode_BIT (@) {
 	print << "BIT";
       {
 	libspectrum_byte bytetemp = readbyte( tempaddr );
-	contend_read( tempaddr, 1 );
+	contend_read_no_mreq( tempaddr, 1 );
 	BIT_I( $bit, bytetemp, tempaddr );
       }
 BIT
@@ -475,7 +480,7 @@ BIT
 	print << "BIT";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 );
 	BIT( $bit, bytetemp );
       }
 BIT
@@ -532,7 +537,7 @@ sub opcode_DI (@) { print "      IFF1=IFF2=0;\n"; }
 
 sub opcode_DJNZ (@) {
     print << "DJNZ";
-      contend_read( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
       B--;
       if(B) {
 	JR();
@@ -584,10 +589,10 @@ EX
       {
 	libspectrum_byte bytetempl, bytetemph;
 	bytetempl = readbyte( SP );
-	bytetemph = readbyte( SP + 1 ); contend_read( SP + 1, 1 );
+	bytetemph = readbyte( SP + 1 ); contend_read_no_mreq( SP + 1, 1 );
 	writebyte( SP + 1, $high );
 	writebyte( SP,     $low  );
-	contend_write( SP, 1 ); contend_write( SP, 1 );
+	contend_write_no_mreq( SP, 1 ); contend_write_no_mreq( SP, 1 );
 	$low=bytetempl; $high=bytetemph;
       }
 EX
@@ -705,19 +710,19 @@ sub opcode_LD (@) {
 
 	    if( $dest eq 'R' and $src eq 'A' ) {
 		print << "LD";
-      contend_read( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
       /* Keep the RZX instruction counter right */
       rzx_instructions_offset += ( R - A );
       R=R7=A;
 LD
             } elsif( $dest eq 'A' and $src eq 'R' ) {
 		print << "LD";
-      contend_read( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
       A=(R&0x7f) | (R7&0x80);
       F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );
 LD
 	    } else {
-		print "      contend_read( IR, 1 );\n" if $src eq 'I' or $dest eq 'I';
+		print "      contend_read_no_mreq( IR, 1 );\n" if $src eq 'I' or $dest eq 'I';
 		print "      $dest=$src;\n" if $dest ne $src;
 		if( $dest eq 'A' and $src eq 'I' ) {
 		    print "      F = ( F & FLAG_C ) | sz53_table[A] | ( IFF2 ? FLAG_V : 0 );\n";
@@ -744,8 +749,9 @@ LD
       {
 	libspectrum_byte offset;
 	offset = readbyte( PC );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); PC++;
 	$dest = readbyte( REGISTER + (libspectrum_signed_byte)offset );
       }
 LD
@@ -907,7 +913,7 @@ sub opcode_RET (@) {
     if( not defined $condition ) {
 	print "      RET();\n";
     } else {
-	print "      contend_read( IR, 1 );\n";
+	print "      contend_read_no_mreq( IR, 1 );\n";
 	
 	if( $condition eq 'NZ' ) {
 	    print << "RET";
@@ -960,8 +966,8 @@ sub opcode_RLD (@) {
     print << "RLD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
-	contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
 	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
 	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
 	F = ( F & FLAG_C ) | sz53p_table[A];
@@ -1056,7 +1062,7 @@ sub opcode_shift (@) {
 	    REGISTER + (libspectrum_signed_byte)readbyte_internal( PC );
 	PC++; contend_read( PC, 3 );
 	opcode3 = readbyte_internal( PC );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 ); PC++;
 #ifdef HAVE_ENOUGH_MEMORY
 	switch(opcode3) {
 #include "z80_ddfdcb.c"

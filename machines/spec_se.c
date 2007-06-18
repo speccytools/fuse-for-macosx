@@ -149,6 +149,7 @@ spec_se_init( fuse_machine_info *machine )
   machine->timex = 1;
   machine->ram.port_contended = tc2048_port_contended;
   machine->ram.contend_delay = spec_se_contend_delay;
+  machine->ram.contend_delay_no_mreq = spec_se_contend_delay;
 
   machine->unattached_port = tc2068_unattached_port;
 

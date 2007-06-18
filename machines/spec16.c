@@ -74,6 +74,7 @@ int spec16_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.port_contended = spec48_port_contended;
   machine->ram.contend_delay  = spec48_contend_delay;
+  machine->ram.contend_delay_no_mreq = spec48_contend_delay;
 
   memset( empty_chunk, 0xff, MEMORY_PAGE_SIZE );
 

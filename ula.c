@@ -41,6 +41,7 @@
 static libspectrum_byte last_byte;
 
 libspectrum_byte ula_contention[ 80000 ];
+libspectrum_byte ula_contention_no_mreq[ 80000 ];
 
 static void ula_from_snapshot( libspectrum_snap *snap );
 static void ula_to_snapshot( libspectrum_snap *snap );
@@ -124,7 +125,8 @@ ula_to_snapshot( libspectrum_snap *snap )
 void
 ula_contend_port_early( libspectrum_word port )
 {
-  if( ( port & 0xc000 ) == 0x4000 ) tstates += ula_contention[ tstates ];
+  if( ( port & 0xc000 ) == 0x4000 )
+    tstates += ula_contention_no_mreq[ tstates ];
    
   tstates++;
 }
@@ -139,9 +141,9 @@ ula_contend_port_late( libspectrum_word port )
   } else {
 
     if( ( port & 0xc000 ) == 0x4000 ) {
-      tstates += ula_contention[ tstates ]; tstates++;
-      tstates += ula_contention[ tstates ]; tstates++;
-      tstates += ula_contention[ tstates ];
+      tstates += ula_contention_no_mreq[ tstates ]; tstates++;
+      tstates += ula_contention_no_mreq[ tstates ]; tstates++;
+      tstates += ula_contention_no_mreq[ tstates ];
     } else {
       tstates += 2;
     }

@@ -114,6 +114,7 @@ scorpion_init( fuse_machine_info *machine )
   machine->timex = 0;
   machine->ram.port_contended = pentagon_port_contended;
   machine->ram.contend_delay  = scorpion_contend_delay;
+  machine->ram.contend_delay_no_mreq = scorpion_contend_delay;
 
   machine->unattached_port = scorpion_unattached_port;
 
