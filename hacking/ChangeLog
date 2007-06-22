@@ -1860,3 +1860,5 @@
 	 z80_macros.h,z80.pl}: separate out contention when MREQ isn't active,
 	 as the +2A/+3 ULA applies contention only when MREQ is active (fixes
 	 bug #1723250).
+20070622 widget/widget.c,ui/xlib/xdisplay.c: show emulation speed in titlebar
+         (part of bug #1686228) (Gergely Szasz).

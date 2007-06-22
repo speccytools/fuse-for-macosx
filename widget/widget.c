@@ -669,11 +669,13 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
   return 0;
 }
 
+#ifndef UI_X
 int
 ui_statusbar_update_speed( float speed )
 {
   return 0;
 }
+#endif
 #endif                          /* #ifndef UI_SDL */
 
 /* Tape browser update function. The dialog box is created every time it

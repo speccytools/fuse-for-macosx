@@ -613,4 +613,21 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
   }
 }
 
+int
+ui_statusbar_update_speed( float speed )
+{
+  char *list[2];
+  char buffer[16];
+  XTextProperty text;
+
+  list[0] = buffer;
+  list[1] = 0;
+  snprintf( buffer, 16, "Fuse - %4.0f%%", speed );
+
+  XStringListToTextProperty( list, 1, &text);
+  XSetWMName( display, xui_mainWindow, &text );
+
+  return 0;
+}
+
 #endif				/* #ifdef UI_X */
