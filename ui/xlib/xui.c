@@ -107,7 +107,7 @@ ui_init( int *argc, char ***argv )
   xerror_expecting = xerror_error = 0;
   XSetErrorHandler( xerror_handler );
 
-  xui_screenNum=DefaultScreen(display);
+  xui_screenNum = DefaultScreen(display);
 
   /* Create the main window */
 
