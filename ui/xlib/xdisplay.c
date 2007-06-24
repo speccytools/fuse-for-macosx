@@ -92,7 +92,7 @@ static const ptrdiff_t scaled_pitch =
 static unsigned long colours[16], greys[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
-static int xdisplay_current_size=1;
+static int xdisplay_current_size = 1;
 
 #ifdef X_USE_SHM
 static XShmSegmentInfo shm_info;
@@ -481,7 +481,8 @@ xdisplay_area( int x, int y, int w, int h )
   }
 }
 
-static void xdisplay_destroy_image (void)
+static void
+xdisplay_destroy_image(void)
 {
   /* Free the XImage used to store screen data; also frees the malloc'd
      data */
