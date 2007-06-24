@@ -1864,3 +1864,6 @@
          (part of bug #1686228) (Gergely Szasz).
 20070624 ui/xlib/xdisplay.c: formatting fixes (part of bug #1686228) (Gergely
          Szasz).
+20070624 ui/xlib/xdisplay.c: set minsize WM hint so we don't resize down to
+         nothing, and remove common factors from aspect hints (part of bug
+         #1686228) (Gergely Szasz).

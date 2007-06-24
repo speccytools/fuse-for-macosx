@@ -119,10 +119,13 @@ ui_init( int *argc, char ***argv )
 
   /* Set standard window properties */
 
-  sizeHints->flags = PBaseSize | PResizeInc | PMaxSize;
-  sizeHints->base_width=0;
-  sizeHints->base_height=0;
+  sizeHints->flags = PBaseSize | PResizeInc | PMaxSize | PMinSize;
 
+  sizeHints->base_width = 0;
+  sizeHints->base_height = 0;
+
+  sizeHints->min_width    =     DISPLAY_ASPECT_WIDTH;
+  sizeHints->min_height   =     DISPLAY_SCREEN_HEIGHT;
   sizeHints->width_inc    =     DISPLAY_ASPECT_WIDTH;
   sizeHints->height_inc   =     DISPLAY_SCREEN_HEIGHT;
   sizeHints->max_width    = 2 * DISPLAY_ASPECT_WIDTH;
@@ -130,10 +133,10 @@ ui_init( int *argc, char ***argv )
 
   if( settings_current.aspect_hint ) {
     sizeHints->flags |= PAspect;
-    sizeHints->min_aspect.x = DISPLAY_ASPECT_WIDTH;
-    sizeHints->min_aspect.y = DISPLAY_SCREEN_HEIGHT;
-    sizeHints->max_aspect.x = DISPLAY_ASPECT_WIDTH;
-    sizeHints->max_aspect.y = DISPLAY_SCREEN_HEIGHT;
+    sizeHints->min_aspect.x = 4;
+    sizeHints->min_aspect.y = 3;
+    sizeHints->max_aspect.x = 4;
+    sizeHints->max_aspect.y = 3;
   }
 
   wmHints->flags=StateHint | InputHint;
