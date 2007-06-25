@@ -1869,3 +1869,5 @@
          #1686228) (Gergely Szasz).
 20070624 ui/xlib/xui.c: formatting fixes (part of bug #1686228) (Gergely
          Szasz).
+20070625 sound/alsasound.c: reduce underruns in ALSA environment (fixes bug
+         #1735390) (Gergely Szasz).

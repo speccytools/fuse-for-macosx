@@ -49,8 +49,10 @@ static snd_pcm_t *pcm_handle;
 static snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
 static int ch, framesize;
 static const char *pcm_name = NULL;
-static int verb;
-static snd_pcm_uframes_t exact_framesiz, exact_bsize;
+static int verb = 0;
+static snd_pcm_uframes_t exact_periodsize, exact_bsize;
+
+static snd_output_t *output = NULL;
 
 void
 sound_lowlevel_end( void )
@@ -67,14 +69,19 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   unsigned int val, n;
   snd_pcm_hw_params_t *hw_params;
   snd_pcm_sw_params_t *sw_params;
-  snd_pcm_uframes_t sound_framesiz, bsize = 0;
+  snd_pcm_uframes_t avail_min = 0, sound_periodsize, bsize = 0;
   static int first_init = 1;
+  static int init_running = 0;
   const char *option;
   char tmp;
-  int err, dir;
+  int err, dir, nperiods = NUM_FRAMES;
 
   float hz;
 
+  if( init_running )
+    return 0;
+  
+  init_running = 1;
 /* select a default device if we weren't explicitly given one */
 
   option = device;
@@ -82,11 +89,27 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     tmp = '*';
     if( ( ( err = sscanf( option, " buffer=%i %n%c", &val, &n, &tmp ) == 2 ) &&
 		tmp == ',' ) || ( err == 1 && strlen( option ) == n ) ) {
-      bsize = val;
-      if( bsize < 1 ) {
-	ui_error( UI_ERROR_WARNING, "bad value for ALSA buffer size %i, using default",
+      if( val < 1 ) {
+	fprintf( stderr, "Bad value for ALSA buffer size %i, using default\n",
 		    val );
-	bsize = 0;
+      } else {
+        bsize = val;
+      }
+    } else if( ( ( err = sscanf( option, " frames=%i %n%c", &val, &n, &tmp ) == 2 ) &&
+		tmp == ',' ) || ( err == 1 && strlen( option ) == n ) ) {
+      if( val < 1 ) {
+	fprintf( stderr, "Bad value for ALSA buffer size %i frames, using default (%d)\n",
+		    val, NUM_FRAMES );
+      } else {
+        nperiods = val;
+      }
+    } else if( ( ( err = sscanf( option, " avail=%i %n%c", &val, &n, &tmp ) == 2 ) &&
+		tmp == ',' ) || ( err == 1 && strlen( option ) == n ) ) {
+      if( val < 1 ) {
+	fprintf( stderr, "Bad value for ALSA avail_min size %i frames, using default\n",
+		    val );
+      } else {
+        avail_min = val;
       }
     } else if( ( ( err = sscanf( option, " verbose %n%c", &n, &tmp ) == 1 ) &&
 		tmp == ',' ) || strlen( option ) == n ) {
@@ -114,16 +137,18 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
         ui_error( UI_ERROR_ERROR,
                   "couldn't open sound device 'default' and 'plughw:0,0' check ALSA configuration."
                   );
+	init_running = 0;
         return 1;
       } else {
         if( first_init )
-          ui_error( UI_ERROR_WARNING,
-                    "couldn't open sound device 'default', using 'plughw:0,0' check ALSA configuration."
+          fprintf( stderr,
+                    "Couldn't open sound device 'default', using 'plughw:0,0' check ALSA configuration.\n"
                     );
       }
     }
     settings_current.sound = 0;
     ui_error( UI_ERROR_ERROR, "couldn't open sound device '%s'.", pcm_name );
+    init_running = 0;
     return 1;
   }
 
@@ -137,6 +162,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
               "couldn't get configuration space on sound device '%s'.",
               pcm_name );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
 
@@ -146,6 +172,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     ui_error( UI_ERROR_ERROR, "couldn't set access interleaved on '%s'.",
               pcm_name );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
   
@@ -160,34 +187,27 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     settings_current.sound = 0;
     ui_error( UI_ERROR_ERROR, "couldn't set format on '%s'.", pcm_name );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
 
   ch = *stereoptr ? 2 : 1;
 
-/* Set number of channels, but only if not the same as we require */
-#if SND_LIB_MAJOR == 1
-  if( snd_pcm_hw_params_get_channels( hw_params, &val ) != 0 )
-    val = 0;		/* multiple channel config */
-#elif SND_LIB_MAJOR == 0 && SND_LIB_MINOR == 9
-  val = snd_pcm_hw_params_get_channels( hw_params );
-#else
-#error Alsa lib incompatible! not 0.9.x nor 1.x.x ...
-#endif
-  if( val != ch ) {
+  if( snd_pcm_hw_params_set_channels( pcm_handle, hw_params, ch )
+	    < 0 ) {
+    fprintf( stderr, "Couldn't set %s to '%s'.\n", pcm_name,
+    		    (*stereoptr ? "stereo" : "mono") );
+    ch = *stereoptr ? 1 : 2;		/* try with opposite */
     if( snd_pcm_hw_params_set_channels( pcm_handle, hw_params, ch )
 	    < 0 ) {
+      ui_error( UI_ERROR_ERROR, "couldn't set %s to '%s'.", pcm_name,
+    		    (*stereoptr ? "stereo" : "mono") );
       settings_current.sound = 0;
-      ui_error( UI_ERROR_ERROR, "couldn't set %s channel on '%s' using %s.",
-    		    (*stereoptr ? "stereo" : "mono"), 
-		    (*stereoptr ? "mono" : "stereo"), pcm_name );
-      if( val != 1 && val != 2 ) {
-	settings_current.sound = 0;
-	snd_pcm_close( pcm_handle );
-	return 1;
-      }
-      *stereoptr = val == 2 ? 1 : 0;
+      snd_pcm_close( pcm_handle );
+      init_running = 0;
+      return 1;
     }
+    *stereoptr = *stereoptr ? 0 : 1;		/* write back */
   }
 
   framesize = ch << 1;			/* we always use 16 bit sorry :-( */
@@ -200,20 +220,21 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     ui_error( UI_ERROR_ERROR, "couldn't set rate %d on '%s'.",
 						*freqptr, pcm_name );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
   if( first_init && *freqptr != exact_rate ) {
-    ui_error( UI_ERROR_WARNING,
+    fprintf( stderr, 
               "The rate %d Hz is not supported by your hardware. "
               "Using %d Hz instead.\n", *freqptr, exact_rate );
     *freqptr = exact_rate;
   }
 
   if( bsize != 0 ) {
-    exact_framesiz = sound_framesiz = bsize / NUM_FRAMES;
+    exact_periodsize = sound_periodsize = bsize / nperiods;
     if( bsize < 1 ) {
-      ui_error( UI_ERROR_WARNING,
-                "bad value for ALSA buffer size %i, using default",
+      fprintf( stderr,
+                "bad value for ALSA buffer size %i, using default.\n",
 		val );
       bsize = 0;
     }
@@ -222,50 +243,54 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   if( bsize == 0 ) {
     hz = (float)machine_current->timings.processor_speed /
               machine_current->timings.tstates_per_frame;
-    exact_framesiz = sound_framesiz = *freqptr / hz;
+    exact_periodsize = sound_periodsize = *freqptr / hz;
   }
 
   dir = -1;
   if( snd_pcm_hw_params_set_period_size_near( pcm_handle, hw_params,
-					    &exact_framesiz, &dir ) < 0 ) {
+					    &exact_periodsize, &dir ) < 0 ) {
     settings_current.sound = 0;
     ui_error( UI_ERROR_ERROR, "couldn't set period size %d on '%s'.",
-                              (int)sound_framesiz, pcm_name );
+                              (int)sound_periodsize, pcm_name );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
 
-  if( first_init && ( exact_framesiz < sound_framesiz / 1.5 ||
-		      exact_framesiz > sound_framesiz * 1.5    ) ) {
-    ui_error( UI_ERROR_WARNING,
+  if( first_init && ( exact_periodsize < sound_periodsize / 1.5 ||
+		      exact_periodsize > sound_periodsize * 1.5    ) ) {
+    fprintf( stderr,
               "The period size %d is not supported by your hardware. "
-              "Using %d instead.\n", (int)sound_framesiz,
-              (int)exact_framesiz );
+              "Using %d instead.\n", (int)sound_periodsize,
+              (int)exact_periodsize );
   }
 
-  periods = NUM_FRAMES;
+  periods = nperiods;
 /* Set number of periods. Periods used to be called fragments. */
   if( snd_pcm_hw_params_set_periods_near( pcm_handle, hw_params, &periods,
                                           NULL ) < 0 ) {
     settings_current.sound = 0;
     ui_error( UI_ERROR_ERROR, "couldn't set periods on '%s'.", pcm_name );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
 
-  if( first_init && periods != NUM_FRAMES ) {
-    ui_error( UI_ERROR_WARNING, "%d periods is not supported by your hardware. "
-                    	     "Using %d instead.\n", NUM_FRAMES, periods );
+  if( first_init && periods != nperiods ) {
+    fprintf( stderr, "%d periods is not supported by your hardware. "
+                    	     "Using %d instead.\n", nperiods, periods );
   }
 
   snd_pcm_hw_params_get_buffer_size( hw_params, &exact_bsize );
 
   /* Apply HW parameter settings to */
   /* PCM device and prepare device  */
+
   if( snd_pcm_hw_params( pcm_handle, hw_params ) < 0 ) {
     settings_current.sound = 0;
     ui_error( UI_ERROR_ERROR,"couldn't set hw_params on %s", pcm_name );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
 
@@ -274,30 +299,52 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     ui_error( UI_ERROR_ERROR,"couldn't get sw_params from %s: %s", pcm_name,
               snd_strerror ( err ) );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
   }
 
   if( ( err = snd_pcm_sw_params_set_start_threshold( pcm_handle,
-		     sw_params, exact_framesiz ) ) < 0 ) {
+		     sw_params, exact_periodsize * ( nperiods - 1 ) ) ) < 0 ) {
     ui_error( UI_ERROR_ERROR,"couldn't set start_treshold on %s: %s", pcm_name,
               snd_strerror ( err ) );
     snd_pcm_close( pcm_handle );
+    init_running = 0;
     return 1;
+  }
+
+  if( !avail_min )
+    avail_min = exact_periodsize;
+  if( snd_pcm_sw_params_set_avail_min( pcm_handle,
+		    sw_params, avail_min ) < 0 ) {
+    if( ( err = snd_pcm_sw_params_set_sleep_min( pcm_handle,
+    		    sw_params, 1 ) ) < 0 ) {
+	fprintf( stderr, "Unable to set minimal sleep 1 for %s: %s\n", pcm_name,
+              snd_strerror ( err ) );
+    }
   }
 
   if( ( err = snd_pcm_sw_params_set_xfer_align( pcm_handle, sw_params, 1 ) ) < 0 ) {
     ui_error( UI_ERROR_ERROR,"couldn't set xfer_allign on %s: %s", pcm_name,
               snd_strerror ( err ) );
+    init_running = 0;
     return 1;
   }
   
   if( ( err = snd_pcm_sw_params( pcm_handle, sw_params ) ) < 0 ) {
     ui_error( UI_ERROR_ERROR,"couldn't set sw_params on %s: %s", pcm_name,
               snd_strerror ( err ) );
+    init_running = 0;
     return 1;
   }
 
+
+  if( first_init ) {
+    snd_output_stdio_attach(&output, stdout, 0);
+    snd_pcm_dump(pcm_handle, output);
+  }
+
   first_init = 0;
+  init_running = 0;
   return 0;	/* success */
 }
 
