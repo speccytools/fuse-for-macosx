@@ -187,10 +187,12 @@ CODE
     }
 
     print "  case INPUT_KEY_Return:\n";
+    print << "CODE";
+    widget_end_all( WIDGET_FINISHED_OK );
+CODE
     print "    $_->{posthook}();\n" if $_->{posthook};
     print << "CODE";
     display_refresh_all();
-    widget_end_all( WIDGET_FINISHED_OK );
     break;
 
   default:	/* Keep gcc happy */

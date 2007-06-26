@@ -1871,3 +1871,6 @@
          Szasz).
 20070625 sound/alsasound.c: reduce underruns in ALSA environment (fixes bug
          #1735390) (Gergely Szasz).
+20070626 widget/options.pl: move widget posthook so that settings changes are
+         available in the uidisplay_hotswap_gfx call (fixes bug #1743318)
+         (Gergely Szasz).
