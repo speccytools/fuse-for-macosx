@@ -1885,3 +1885,5 @@
 	 prototype (Stuart).
 20070628 pokefinder/pokefinder.[ch]: make pokefinder_{,im}possible's
 	 declarations consistent with their definitions (Stuart).
+20070628 ui/gtk/memory.c: fix type of menu_machine_memorybrowser() in its
+	 declaration for the GTK+ UI (Stuart).
