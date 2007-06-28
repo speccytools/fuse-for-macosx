@@ -36,7 +36,7 @@ extern const size_t zxcf_peripherals_count;
 int zxcf_init( void );
 int zxcf_end( void );
 int zxcf_insert( const char *filename );
-int zxcf_commit();
+int zxcf_commit( void );
 int zxcf_eject( void );
 libspectrum_byte zxcf_last_memctl( void );
 

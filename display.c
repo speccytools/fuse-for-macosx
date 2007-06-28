@@ -459,7 +459,7 @@ display_get_attr_byte( int x, int y )
 }
 
 static void
-update_dirty_rects()
+update_dirty_rects( void )
 {
   int start, y, error;
 
@@ -767,7 +767,7 @@ push_border_change( int colour )
 
 /* Change border colour if the colour in use changes */
 static void
-check_border_change()
+check_border_change( void )
 {
   if( scld_last_dec.name.hires &&
       display_hires_border != display_last_border ) {

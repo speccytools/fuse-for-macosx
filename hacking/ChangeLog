@@ -1877,3 +1877,4 @@
 20070628 zxatasp.c: remove dead code (Stuart).
 20070628 machines/specplus3.c,trdos.c: use better variable names for temporary
 	 disk image filenames (Stuart).
+20070628 display.c,zxcf.h: remove warnings with -Wstrict-prototypes (Stuart).
