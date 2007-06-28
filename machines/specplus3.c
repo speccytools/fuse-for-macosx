@@ -529,7 +529,7 @@ int
 specplus3_disk_insert( specplus3_drive_number which, const char *filename,
                        int autoload )
 {
-  char template[ PATH_MAX ];
+  char tempfilename[ PATH_MAX ];
   int fd, error;
 
   if( which > SPECPLUS3_DRIVE_B ) {
@@ -545,18 +545,18 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
   }
 
   /* Make a temporary copy of the disk file */
-  error = utils_make_temp_file( &fd, template, filename, dsk_template );
+  error = utils_make_temp_file( &fd, tempfilename, filename, dsk_template );
   if( error ) return error;
 
   /* And now insert the disk */
   drives[ which ].fd = fd;
-  strcpy( drives[ which ].filename, template );
+  strcpy( drives[ which ].filename, tempfilename );
 
 #ifdef HAVE_LIBDSK_H
   fdl_settype( drives[which].drive, NULL ); /* Autodetect disk format */
-  fdl_setfilename( drives[which].drive, template );
+  fdl_setfilename( drives[which].drive, tempfilename );
 #else				/* #ifdef HAVE_LIBDSK_H */
-  fdd_setfilename( drives[which].drive, template );
+  fdd_setfilename( drives[which].drive, tempfilename );
 #endif				/* #ifdef HAVE_LIBDSK_H */
 
   /* And set the appropriate `eject' item active */
