@@ -41,7 +41,7 @@ GSList *debugger_breakpoints;
 /* The next breakpoint ID to use */
 static size_t next_breakpoint_id;
 
-/* Textual represenations of the breakpoint types and lifetimes */
+/* Textual representations of the breakpoint types and lifetimes */
 const char *debugger_breakpoint_type_text[] = {
   "Execute", "Read", "Write", "Port Read", "Port Write", "Time",
 };

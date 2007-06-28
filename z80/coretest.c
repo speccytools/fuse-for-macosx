@@ -84,7 +84,7 @@ main( int argc, char **argv )
 
   if( read_test_file( argv[1], &event_next_event ) ) return 1;
 
-  /* Grab a copy of the memory for comparision at the end */
+  /* Grab a copy of the memory for comparison at the end */
   memcpy( initial_memory, memory, 0x10000 );
 
   z80_do_opcodes();

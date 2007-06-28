@@ -67,7 +67,7 @@ spectrum_frame( void )
 
   /* Reduce the t-state count of both the processor and all the events
      scheduled to occur. Done slightly differently if RZX playback is
-     occuring */
+     occurring */
   frame_length = rzx_playback ? tstates
 			      : machine_current->timings.tstates_per_frame;
 

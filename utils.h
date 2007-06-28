@@ -45,7 +45,7 @@ typedef struct utils_file {
 
 } utils_file;
 
-/* The types of auxillary file we can look for */
+/* The types of auxiliary file we can look for */
 typedef enum utils_aux_type {
 
   UTILS_AUXILIARY_LIB,		/* Something from the lib/ directory */

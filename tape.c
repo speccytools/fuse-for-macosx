@@ -74,7 +74,7 @@ static int tape_play( int autoplay );
 static int trap_check_rom( void );
 static void make_name( unsigned char *name, const unsigned char *data );
 
-/* Function defintions */
+/* Function definitions */
 
 int tape_init( void )
 {

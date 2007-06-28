@@ -1888,3 +1888,9 @@
 20070628 ui/gtk/memory.c: fix type of menu_machine_memorybrowser() in its
 	 declaration for the GTK+ UI (Stuart).
 20070628 ui/gtk/memory.c: fix compilation (Stuart).
+20070628 ChangeLog,compat.h,debugger/{breakpoint.c,commandl.l,commandy.y,
+	 expression.c},display.c,event.c,hacking/{implementation_notes.txt,
+	 input.txt,ui.txt},if1.c,machines/tc2068.c,memory.c,printer.c,
+	 spectrum.c,tape.c,ui/xlib/{xdisplay.h,xerror.c},utils.[ch],
+	 z80/{coretest.c,z80.c,z80_ops.c}: fix misspellings (Stuart).
+

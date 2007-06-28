@@ -589,7 +589,7 @@ port_ctr_out( libspectrum_byte val )
 	 
        OK, the schematics offer a different interpretation, because if
        COMMS_OUT pin level high (>+3V) then Q3 is off (the basis cannot
-       be more higher potential then emitter (NPN transistor), so wathever
+       be more higher potential then emitter (NPN transistor), so whatever
        is on the IC1 RX DATA (pin 33) the basis of Q4 is always on +12V,
        so the collector of Q4 (PNP transistor) always on -12V.
        If COMMS_OUT pin level goes low (~0V), then Q3 basis (connected
@@ -654,7 +654,7 @@ port_net_out( libspectrum_byte val )
     if( if1_ula.s_net_mode == S_NET_RAW ) {	/* if we out bit by bit, do it */
         /* Here is the output routine */
 
-/* OK, examining the schematics of if1 and the dissasembly of if1 ROM, I
+/* OK, examining the schematics of if1 and the dissassembly of if1 ROM, I
    see that the Q1 and Q2 transistors negate the RX DATA signal, and the
    floating state of the net wire is the ~0V level, the forced is the ~3V.
    The if1 software send complemented data and read straight data.

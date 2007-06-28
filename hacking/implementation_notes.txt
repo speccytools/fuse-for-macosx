@@ -15,9 +15,9 @@ fairly simple: it just runs Z80 opcodes until something `interesting'
 happens, at which point it deals with the `interesting' thing.
 
 The question here is how do we know when something `interesting' has
-occured: the simple answer is that something interesting occurs when
+occurred: the simple answer is that something interesting occurs when
 the `tstates' global variable (which counts tstates since the last
-interrupt occured) reaches `event_next_event'. It should be noted here
+interrupt occurred) reaches `event_next_event'. It should be noted here
 that these events are purely a Fuse concept, and not related to any OS
 feature.
 
@@ -44,7 +44,7 @@ then breaking out of the loop.
 ===================
 
 There are two stages to producing the Spectrum's screen on the
-emulating machine's screen: firstly, builiding an image of the
+emulating machine's screen: firstly, building an image of the
 Spectrum's screen in memory, and then translating that image onto the
 emulating machine's screen.
 
@@ -61,7 +61,7 @@ of the Spectrum's screen in the display.c:display_image array. For the
 pixel represents one pixel on the Spectrum's screen (including 32
 pixels of left and right border, and 24 pixels of top and bottom
 border). For the Timex machines, this array is sized 640x480 to
-accomodate the hires modes and each Spectrum pixel is represented by
+accommodate the hires modes and each Spectrum pixel is represented by
 two vertically adjacent pixels in the array (as the hires modes double
 only the horizontal resolution, not the vertical resolution). In both
 cases, the values in this array are the Spectrum colours (0 to 15).

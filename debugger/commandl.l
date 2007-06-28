@@ -97,12 +97,12 @@ sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 "!="		{ yylval.token = DEBUGGER_TOKEN_NOT_EQUAL_TO;
 		  return EQUALITY; }
 
-"<"		{ yylval.token = '<'; return COMPARISION; }
-">"		{ yylval.token = '>'; return COMPARISION; }
+"<"		{ yylval.token = '<'; return COMPARISON; }
+">"		{ yylval.token = '>'; return COMPARISON; }
 "<="		{ yylval.token = DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO;
-		  return COMPARISION; }
+		  return COMPARISON; }
 ">="		{ yylval.token = DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO;
-		  return COMPARISION; }
+		  return COMPARISON; }
 
 "+"		{ return '+'; }
 "-"		{ return '-'; }

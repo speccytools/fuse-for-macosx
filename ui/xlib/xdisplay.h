@@ -35,7 +35,7 @@ void xdisplay_area(int x, int y, int width, int height);
 /* Are we expecting an X error to occur? */
 extern int xerror_expecting;
 
-/* Which error occured? */
+/* Which error occurred? */
 extern int xerror_error;
 
 /* The X error handler */

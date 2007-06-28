@@ -88,7 +88,7 @@ tc2068_ay_dataport_read( libspectrum_word port, int *attached )
     /* In theory, we may need to distinguish cases where some data
        is returned here and were it isn't. In practice, this doesn't
        matter for the TC2068 as it doesn't have a floating bus, so we'll
-       get 0xff in both cases anwyay */
+       get 0xff in both cases anyway */
     *attached = 1;
 
     ret =   machine_current->ay.registers[7] & 0x40

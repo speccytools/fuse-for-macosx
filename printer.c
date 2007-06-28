@@ -579,7 +579,7 @@ else /* reading */
  *
  * The Centronics spec seems to require that the strobe `goes low' for
  * a minimum of 1us to give the printer time to read the data. But that's
- * not even a NOP's worth on the speccy, so we need to allow for longer;
+ * not even a NOP's worth on the Speccy, so we need to allow for longer;
  * 10000 cycles seems reasonable, being thousands of times longer. :-)
  * (And the longest delay I've seen was just over 5000 cycles.)
  */

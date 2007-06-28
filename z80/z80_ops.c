@@ -63,7 +63,7 @@ static void z80_ddfdcbxx( libspectrum_byte opcode3,
    TR-DOS ROM paging) can't be handled within the normal 'events'
    framework as they don't happen at a specified tstate. In order to
    support these, we basically need to check every opcode as to
-   whether they have occured or not.
+   whether they have occurred or not.
 
    There are (fairly common) circumstances under which we know that
    the features will never occur (eg we will never get an interrupt

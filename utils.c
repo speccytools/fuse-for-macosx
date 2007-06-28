@@ -222,7 +222,7 @@ utils_open_file( const char *filename, int autoload,
   return 0;
 }
 
-/* Find the auxillary file called `filename'; returns a fd for the
+/* Find the auxiliary file called `filename'; returns a fd for the
    file on success, -1 if it couldn't find the file */
 int
 utils_find_auxiliary_file( const char *filename, utils_aux_type type )

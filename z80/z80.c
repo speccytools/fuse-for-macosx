@@ -36,7 +36,7 @@
 #include "z80.h"
 #include "z80_macros.h"
 
-/* Whether a half carry occured or not can be determined by looking at
+/* Whether a half carry occurred or not can be determined by looking at
    the 3rd bit of the two arguments and the result; these are hashed
    into this table in the form r12, where r is the 3rd bit of the
    result, 1 is the 3rd bit of the 1st argument and 2 is the

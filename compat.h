@@ -1,4 +1,4 @@
-/* compat.h: various compatbility bits
+/* compat.h: various compatibility bits
    Copyright (c) 2003 Philip Kendall
 
    $Id$

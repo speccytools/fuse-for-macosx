@@ -398,7 +398,7 @@
 	* Fuse 0.5.1 released
 
 	* Separate out libspectrum (the file format handling) into its own
-	  library; changes occuring solely in libspectrum's code will not
+	  library; changes occurring solely in libspectrum's code will not
 	  be listed in this ChangeLog. For structural reasons, the glib
 	  replacement code is also in libspectrum (Philip Kendall).
 

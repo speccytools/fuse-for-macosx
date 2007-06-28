@@ -81,7 +81,7 @@ static module_info_t memory_module_info = {
 };
 
 /* Set up the information about the normal page mappings.
-   Memory contention and useable pages vary from machine to machine and must
+   Memory contention and usable pages vary from machine to machine and must
    be set in the appropriate _reset function */
 int
 memory_init( void )
@@ -263,7 +263,7 @@ memory_romcs_map( void )
        Interface 2 connected to J1 would disable both ROM IC2 (if1 ROM) and
        the Spectrum ROM, via isolating diodes D10 and D9 respectively.
      
-     All comment in paranthesis added by me (Gergely Szasz).
+     All comment in parenthesis added by me (Gergely Szasz).
      The ROMCS2 (B25 conn) in Interface 1 J1 edge connector is in the
      same position than ROMCS (B25 conn) in the Spectrum edge connector.
      

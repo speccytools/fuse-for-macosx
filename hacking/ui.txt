@@ -21,7 +21,7 @@ ui.h
 
 * int ui_init( int *argc, char ***argv )
 
-Initalise all of the UI-specific bits except the display (keyboard, etc).
+Initialise all of the UI-specific bits except the display (keyboard, etc).
 `argc' and `argv' are pointers to `argc' and `argv' as supplied to
 `main()'.
 
@@ -51,7 +51,7 @@ uidisplay.h
 
 * int uidisplay_init( int width, int height )
 
-Initalise all of the display-specific bits for a display of (preferred)
+Initialise all of the display-specific bits for a display of (preferred)
 size `width' x `height' pixels; note that `width' and `height' refer
 to the entire canvas on which the screen and emulated border is to be
 drawn, not just the Spectrum's screen. This will be called each time
@@ -89,7 +89,7 @@ machine and ui in question. For example the half size scaler only
 makes sense for Timex machines (as it drops even scanlines), and
 you may only want to enable it when a Timex machine has been
 enabled.
-Alteratively, if your emulator has a fixed display mode (say
+Alternatively, if your emulator has a fixed display mode (say
 320x240), then you may want to only enable the scalers that will
 generate a 320x240 screen (i.e. Normal1x for Sinclair/Amstrad
 machines, and Half for Timex models).

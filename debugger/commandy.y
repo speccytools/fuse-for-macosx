@@ -62,7 +62,7 @@
 
 %token		 LOGICAL_OR	/* || */
 %token		 LOGICAL_AND	/* && */
-%token <token>	 COMPARISION	/* < > <= >= */
+%token <token>	 COMPARISON	/* < > <= >= */
 %token <token>   EQUALITY	/* == != */
 %token <token>   NEGATE		/* ! ~ */
 %token <token>	 TIMES_DIVIDE	/* * / */
@@ -119,7 +119,7 @@
 %left '^'
 %left '&'
 %left EQUALITY
-%left COMPARISION
+%left COMPARISON
 %left '+' '-'
 %left TIMES_DIVIDE
 %right NEGATE		/* Unary minus, unary plus, !, ~ */
@@ -234,7 +234,7 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
 	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
 		if( !$$ ) YYABORT;
 	      }
-	    | expression COMPARISION expression {
+	    | expression COMPARISON expression {
 	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
 		if( !$$ ) YYABORT;
 	      }

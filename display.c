@@ -115,7 +115,7 @@ size_t inactive_rectangle_count = 0, inactive_rectangle_allocated = 0;
 /* The last point at which we updated the screen display */
 int critical_region_x = 0, critical_region_y = 0;
 
-/* The border colour changes which have occured in this frame */
+/* The border colour changes which have occurred in this frame */
 struct border_change_t {
   int x, y;
   int colour;

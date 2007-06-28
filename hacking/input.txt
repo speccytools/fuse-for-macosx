@@ -22,7 +22,7 @@ typedef struct input_event_t {
 
 } input_event_t;
 
-The 'type' member specifies what sort of input has occured. The
+The 'type' member specifies what sort of input has occurred. The
 following event types are supported:
 
 * Key events

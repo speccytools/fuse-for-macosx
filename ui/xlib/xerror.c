@@ -40,7 +40,7 @@
 /* Are we expecting an X error to occur? */
 int xerror_expecting;
 
-/* Which error occured? */
+/* Which error occurred? */
 int xerror_error;
 
 #define MESSAGE_MAX_LENGTH 256

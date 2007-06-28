@@ -58,7 +58,7 @@ static GSList* event_list;
 /* An event ready to be reused */
 static event_t *event_free;
 
-/* Comparision function so events stay in t-state order */
+/* Comparison function so events stay in t-state order */
 static gint event_add_cmp( gconstpointer a, gconstpointer b );
 
 /* User function for event_interrupt(...) */
@@ -109,7 +109,7 @@ event_add( libspectrum_dword event_time, event_type type )
   return 0;
 }
 
-/* Comparision function so events stay in t-state and event type order */
+/* Comparison function so events stay in t-state and event type order */
 static gint
 event_add_cmp( gconstpointer a1, gconstpointer b1 )
 {

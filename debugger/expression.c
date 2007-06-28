@@ -50,7 +50,7 @@ enum precedence_t {
   PRECEDENCE_BITWISE_XOR,
   PRECEDENCE_BITWISE_AND,
   PRECEDENCE_EQUALITY,
-  PRECEDENCE_COMPARISION,
+  PRECEDENCE_COMPARISON,
   PRECEDENCE_ADDITION,
   PRECEDENCE_MULTIPLICATION,
   PRECEDENCE_NEGATE,
@@ -132,7 +132,7 @@ binaryop_precedence( int operation )
   case    '<': case    '>':
   case DEBUGGER_TOKEN_LESS_THAN_OR_EQUAL_TO:
   case DEBUGGER_TOKEN_GREATER_THAN_OR_EQUAL_TO:
-    return PRECEDENCE_COMPARISION;
+    return PRECEDENCE_COMPARISON;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown binary operator %d", operation );
@@ -534,7 +534,7 @@ is_non_associative( int operation )
   case '+': case '*': return 0;
   case '-': case '/': return 1;
 
-  /* None of the comparision operators are associative due to them
+  /* None of the comparison operators are associative due to them
      returning truth values */
   case DEBUGGER_TOKEN_EQUAL_TO:
   case DEBUGGER_TOKEN_NOT_EQUAL_TO:
