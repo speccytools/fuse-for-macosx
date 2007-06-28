@@ -33,6 +33,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "compat.h"
 #include "gtkinternals.h"
 #include "memory.h"
 
