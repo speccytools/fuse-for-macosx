@@ -1881,3 +1881,5 @@
 20070628 machines/{pentagon.c,scorpion.c,spec16.c,spec48.c,spec_se.c,
 	 specplus2a.c,tc2048.c},ui/scaler/scalers.c: remove "'static' is not at
 	 beginning of declaration" warning with -Wextra (Stuart).
+20070628 menu.h,ui/gtk/gtkjoystick.c: fix menu_options_joysticks_select()'s
+	 prototype (Stuart).
