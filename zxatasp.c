@@ -480,18 +480,6 @@ zxatasp_writeide(libspectrum_ide_channel *chn,
     libspectrum_ide_write( chn, idereg, dataHi );
 }
 
-size_t
-zxatasp_current_page( void )
-{
-  return current_page;
-}
-
-libspectrum_byte*
-zxatasp_ram( size_t page )
-{
-  return ZXATASPMEM[ page ];
-}
-
 static void
 zxatasp_memory_map( void )
 {
