@@ -136,13 +136,13 @@ typedef libspectrum_dword scaler_data_type;
 
 #ifdef WORDS_BIGENDIAN
 
-const static libspectrum_dword colorMask = 0xFEFEFE00;
-const static libspectrum_dword lowPixelMask = 0x01010100;
-const static libspectrum_dword qcolorMask = 0xFCFCFC00;
-const static libspectrum_dword qlowpixelMask = 0x03030300;
-const static libspectrum_qword redblueMask = 0xFF00FF00;
-const static libspectrum_qword redMask =   0xFF000000;
-const static libspectrum_qword greenMask = 0x00FF0000;
+static const libspectrum_dword colorMask = 0xFEFEFE00;
+static const libspectrum_dword lowPixelMask = 0x01010100;
+static const libspectrum_dword qcolorMask = 0xFCFCFC00;
+static const libspectrum_dword qlowpixelMask = 0x03030300;
+static const libspectrum_qword redblueMask = 0xFF00FF00;
+static const libspectrum_qword redMask =   0xFF000000;
+static const libspectrum_qword greenMask = 0x00FF0000;
 static const libspectrum_qword blueMask =  0x0000FF00;
 
 static const libspectrum_dword dotmatrix[16] = {

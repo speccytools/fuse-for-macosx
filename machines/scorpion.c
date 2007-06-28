@@ -53,7 +53,7 @@ static int scorpion_reset( void );
 static int scorpion_shutdown( void );
 static int scorpion_memory_map( void );
 
-const static periph_t peripherals[] = {
+static const periph_t peripherals[] = {
   { 0x00ff, 0x001f, scorpion_select_1f_read, trdos_cr_write },
   { 0x00ff, 0x003f, trdos_tr_read, trdos_tr_write },
   { 0x00ff, 0x005f, trdos_sec_read, trdos_sec_write },
@@ -66,7 +66,7 @@ const static periph_t peripherals[] = {
   { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
 };
 
-const static size_t peripherals_count =
+static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte

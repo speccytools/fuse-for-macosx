@@ -60,7 +60,7 @@ static int spec_se_memory_map( void );
 static void spec_se_memoryport_write( libspectrum_word port,
                                       libspectrum_byte b );
 
-const static periph_t peripherals[] = {
+static const periph_t peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
@@ -88,7 +88,7 @@ const static periph_t peripherals[] = {
   { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
 };
 
-const static size_t peripherals_count =
+static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte

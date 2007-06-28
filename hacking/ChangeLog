@@ -1878,3 +1878,6 @@
 20070628 machines/specplus3.c,trdos.c: use better variable names for temporary
 	 disk image filenames (Stuart).
 20070628 display.c,zxcf.h: remove warnings with -Wstrict-prototypes (Stuart).
+20070628 machines/{pentagon.c,scorpion.c,spec16.c,spec48.c,spec_se.c,
+	 specplus2a.c,tc2048.c},ui/scaler/scalers.c: remove "'static' is not at
+	 beginning of declaration" warning with -Wextra (Stuart).

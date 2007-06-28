@@ -42,7 +42,7 @@
 
 static int spec48_reset( void );
 
-const static periph_t peripherals[] = {
+static const periph_t peripherals[] = {
   { 0x0001, 0x0000, ula_read, ula_write },
   { 0x0018, 0x0010, if1_port_in, if1_port_out },
   { 0x0018, 0x0008, if1_port_in, if1_port_out },
@@ -51,7 +51,7 @@ const static periph_t peripherals[] = {
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
 };
 
-const static size_t peripherals_count =
+static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte

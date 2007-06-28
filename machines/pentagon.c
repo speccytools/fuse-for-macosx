@@ -45,7 +45,7 @@ static libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
 static int pentagon_reset( void );
 static int pentagon_shutdown( void );
 
-const static periph_t peripherals[] = {
+static const periph_t peripherals[] = {
   { 0x00ff, 0x001f, pentagon_select_1f_read, trdos_cr_write },
   { 0x00ff, 0x003f, trdos_tr_read, trdos_tr_write },
   { 0x00ff, 0x005f, trdos_sec_read, trdos_sec_write },
@@ -57,7 +57,7 @@ const static periph_t peripherals[] = {
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },
 };
 
-const static size_t peripherals_count =
+static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte
