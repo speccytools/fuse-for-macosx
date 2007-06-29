@@ -51,6 +51,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "options.h"
 #include "periph.h"
 #include "widget_internals.h"
+#include "ui/uidisplay.h"
 
 CODE
 

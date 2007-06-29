@@ -21,9 +21,6 @@ Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
-#ifdef UI_SDL
-Posthook, uidisplay_hotswap_gfx_mode
-#endif
 
 peripherals
 Peripheral Options

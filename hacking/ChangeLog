@@ -1893,4 +1893,6 @@
 	 input.txt,ui.txt},if1.c,machines/tc2068.c,memory.c,printer.c,
 	 spectrum.c,tape.c,ui/xlib/{xdisplay.h,xerror.c},utils.[ch],
 	 z80/{coretest.c,z80.c,z80_ops.c}: fix misspellings (Stuart).
-
+20070629 widget/{widget.c,options.pl},ui/options.dat: move
+         uidisplay_hotswap_gfx_mode directly to widget_options_finish (more
+         from bug #1743318) (Gergely Szasz).

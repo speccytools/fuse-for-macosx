@@ -629,6 +629,8 @@ int widget_options_finish( widget_finish_state finished )
 
     /* Bring the peripherals list into sync with the new options */
     periph_update();
+    /* make the needed UI changes */
+    uidisplay_hotswap_gfx_mode();
   }
 
   return 0;
