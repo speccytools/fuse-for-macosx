@@ -67,16 +67,17 @@
 #endif				/* #ifdef USE_WIDGET */
 #include "scld.h"
 
-static XImage *image = 0;	/* The image structure to draw the
+static XImage *image = NULL;	/* The image structure to draw the
 				   Speccy's screen on */
 static GC gc;			/* A graphics context to draw with */
 
 /* The size of a 1x1 image in units of
-   DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */
-int image_scale;
+   DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT
+   scale * 4, so 2 => 0.5, 6 => 1.5, 4 => 1.0 */
+static int image_scale = 1;
 
 /* The height and width of a 1x1 image in pixels */
-int image_width, image_height;
+static int image_width, image_height, scaled_image_w, scaled_image_h;
 
 /* A copy of every pixel on the screen */
 libspectrum_word
@@ -85,14 +86,15 @@ ptrdiff_t xdisplay_pitch = DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 
 /* A scaled copy of the image displayed on the Spectrum's screen */
 static libspectrum_word
-  scaled_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ 2 * DISPLAY_SCREEN_WIDTH ];
+  scaled_image[3 * DISPLAY_SCREEN_HEIGHT][3 * DISPLAY_SCREEN_WIDTH];
 static const ptrdiff_t scaled_pitch =
-  2 * DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
+  3 * DISPLAY_SCREEN_WIDTH * 2;
 
 static unsigned long colours[16], greys[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int xdisplay_current_size = 1;
+static libspectrum_byte xdisplay_force_full_refresh = 1;
 
 #ifdef X_USE_SHM
 static XShmSegmentInfo shm_info;
@@ -109,7 +111,7 @@ static int xdisplay_allocate_colours( void );
 static int xdisplay_allocate_gc( Window window, GC *new_gc );
 
 static int xdisplay_allocate_image(int width, int height);
-static int register_scalers( void );
+static void register_scalers( void );
 static void xdisplay_destroy_image( void );
 static void xdisplay_catch_signal( int sig );
 
@@ -129,7 +131,7 @@ xdisplay_alloc_colour( Colormap *map, XColor *colour, int grey,
                        const char *cname )
 {
   for(;;) {
-    if( XAllocColor(display, *map, colour) )
+    if( XAllocColor( display, *map, colour ) )
       return 0;
 
     fprintf(stderr,"%s: couldn't allocate %s `%s'\n", fuse_progname,
@@ -173,7 +175,7 @@ xdisplay_allocate_colours( void )
 
   int i;
 
-  currentMap=DefaultColormap(display,xui_screenNum);
+  currentMap = DefaultColormap( display, xui_screenNum );
 
   for(i=0;i<16;i++) {
     if( XParseColor(display, currentMap, colour_names[i], &colour) == 0 ) {
@@ -233,7 +235,8 @@ static int xdisplay_allocate_image(int width, int height)
       return 1;
     }
 
-    if( (image->data=(char*)malloc(image->bytes_per_line*3*height)) == NULL ) {
+    if( ( image->data = (char*)malloc( image->bytes_per_line *
+						 image->height ) ) == NULL ) {
       fprintf(stderr, "%s: out of memory for image data\n", fuse_progname);
       return 1;
     }
@@ -343,89 +346,96 @@ get_shm_id( const int size )
 int
 uidisplay_init( int width, int height )
 {
-  int error;
+  image_width  = width;
+  image_height = height;
 
-  image_width = width; image_height = height;
-  image_scale = width / DISPLAY_ASPECT_WIDTH;
+  if( !scaler_is_supported( current_scaler ) ) {
+    if( machine_current->timex )
+      scaler_select_scaler( SCALER_HALFSKIP );
+    else
+      scaler_select_scaler( SCALER_NORMAL );
+  }
 
-  error = register_scalers(); if( error ) return error;
-
+  register_scalers();
   display_ui_initialised = 1;
 
   display_refresh_all();
-
   return 0;
 }
 
-static int
+static void
+resize_window( int w, int h )
+{
+    if( xdisplay_current_size != w / DISPLAY_ASPECT_WIDTH ) {
+      XResizeWindow( display, xui_mainWindow, w, h );
+      xdisplay_current_size = w / DISPLAY_ASPECT_WIDTH;
+    }
+}
+
+static void
 register_scalers( void )
 {
+  int f = -1;
+  
   scaler_register_clear();
 
-  switch( xdisplay_current_size ) {
+  scaler_register( SCALER_NORMAL );
+  if( machine_current->timex ) {
+    scaler_register( SCALER_HALFSKIP );
+    scaler_register( SCALER_TIMEX1_5X );
+  } else {
+    scaler_register( SCALER_DOUBLESIZE );
+    scaler_register( SCALER_ADVMAME2X );
 
-  case 1:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_NORMAL );
-      scaler_select_scaler( SCALER_NORMAL );
-      return 0;
-    case 2:
-      scaler_register( SCALER_HALFSKIP );
-      scaler_select_scaler( SCALER_HALFSKIP );
-      return 0;
-    }
-
-  case 2:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_DOUBLESIZE );
-      scaler_register( SCALER_ADVMAME2X );
-      scaler_select_scaler( SCALER_DOUBLESIZE );
-      return 0;
-    case 2:
-      scaler_register( SCALER_NORMAL );
-      scaler_select_scaler( SCALER_NORMAL );
-      return 0;
-    }
-
+    scaler_register( SCALER_TRIPLESIZE );
+    scaler_register( SCALER_ADVMAME3X );
   }
-
-  ui_error( UI_ERROR_ERROR, "Unknown display size/image size %d/%d",
-	    xdisplay_current_size, image_scale );
-  return 1;
+  if( current_scaler != SCALER_NUM )
+    f = 4.0 * scaler_get_scaling_factor( current_scaler ) * 
+	    ( machine_current->timex ? 2 : 1 );
+  if( scaler_is_supported( current_scaler ) &&
+	( xdisplay_current_size * 4 == f ) ) {
+    uidisplay_hotswap_gfx_mode();
+  } else {
+    switch( xdisplay_current_size ) {
+    case 1:
+      scaler_select_scaler( machine_current->timex ? SCALER_HALFSKIP : SCALER_NORMAL );
+      break;
+    case 2:
+      scaler_select_scaler( machine_current->timex ? SCALER_NORMAL : SCALER_DOUBLESIZE );
+      break;
+    case 3:
+      scaler_select_scaler( machine_current->timex ? SCALER_TIMEX1_5X : SCALER_TRIPLESIZE );
+      break;
+    }
+  }
 }
 
 int
 xdisplay_configure_notify( int width, int height )
 {
-  int error, size, x, y;
-
-  size = width / DISPLAY_ASPECT_WIDTH;
-  if( size > height / DISPLAY_SCREEN_HEIGHT )
-    size = height / DISPLAY_SCREEN_HEIGHT;
+  int size;
 
   /* If we're the same size as before, nothing special needed */
-  if( size == xdisplay_current_size ) return 0;
+  size = width / DISPLAY_ASPECT_WIDTH;
+  if( size != height / DISPLAY_SCREEN_HEIGHT ) {	/* out of aspect */
+    if( size > height / DISPLAY_SCREEN_HEIGHT ) {
+      size = height / DISPLAY_SCREEN_HEIGHT;
+      width = size * DISPLAY_ASPECT_WIDTH;
+    } else {
+      height = size * DISPLAY_SCREEN_HEIGHT;
+    }
+    xdisplay_current_size = 0;				/* force resize */
+    resize_window( width, height );
+  } else if( size == xdisplay_current_size ) {
+    return 0;
+  }
 
   /* Else set ourselves to the new height */
-  xdisplay_current_size=size;
-
+  xdisplay_current_size = size;
+  
   /* Get a new scaler */
-  error = register_scalers(); if( error ) return error;
-
-  /* Redraw the entire screen... */
-  for( y = 0; y < 3 * DISPLAY_SCREEN_HEIGHT; y++ )
-    for( x = 0; x < 3 * DISPLAY_ASPECT_WIDTH; x++ )
-      XPutPixel( image, x, y, colours[0] );
-
-  if( machine_current->timex )
-    uidisplay_area( 0, 0,
-		    2 * DISPLAY_ASPECT_WIDTH, 2 * DISPLAY_SCREEN_HEIGHT );
-  else
-    uidisplay_area( 0, 0, DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
+  register_scalers();
 
   return 0;
 }
@@ -439,7 +449,6 @@ uidisplay_frame_end( void )
 void
 uidisplay_area( int x, int y, int w, int h )
 {
-  float scale = (float)xdisplay_current_size / image_scale;
   int scaled_x, scaled_y, xx, yy;
   const unsigned long *palette = settings_current.bw_tv ? greys : colours;
 
@@ -448,14 +457,14 @@ uidisplay_area( int x, int y, int w, int h )
   if( scaler_flags & SCALER_FLAGS_EXPAND )
     scaler_expander( &x, &y, &w, &h, image_width, image_height );
 
-  scaled_x = scale * x; scaled_y = scale * y;
+  scaled_x = x * image_scale >> 2; scaled_y = y * image_scale >> 2;
 
   /* Create scaled image */
   scaler_proc16( (libspectrum_byte*)&xdisplay_image[y][x], xdisplay_pitch,
 		 (libspectrum_byte*)&scaled_image[scaled_y][scaled_x],
 		 scaled_pitch, w, h );
 
-  w *= scale; h *= scale;
+  w = w * image_scale >> 2; h = h * image_scale >> 2;
 
   /* Call putpixel multiple times */
   for( yy = scaled_y; yy < scaled_y + h; yy++ )
@@ -471,6 +480,13 @@ uidisplay_area( int x, int y, int w, int h )
 void
 xdisplay_area( int x, int y, int w, int h )
 {
+/* e.g. dwm first expose with too big w and h */
+  if( x + w > 3 * DISPLAY_ASPECT_WIDTH )
+    w = 3 * DISPLAY_ASPECT_WIDTH - x;
+
+  if( y + h > 3 * DISPLAY_SCREEN_HEIGHT )
+    h = 3 * DISPLAY_SCREEN_HEIGHT - y;
+
   if( shm_used ) {
 #ifdef X_USE_SHM
     XShmPutImage( display, xui_mainWindow, gc, image, x, y, x, y, w, h, True );
@@ -494,12 +510,19 @@ xdisplay_destroy_image(void)
     shm_used = 0;
   }
 #endif
-  if( image ) XDestroyImage( image ); image = 0;
+  if( image ) XDestroyImage( image ); image = NULL;
 }
 
 int
 uidisplay_hotswap_gfx_mode( void )
 {
+  image_scale = 4.0 * scaler_get_scaling_factor( current_scaler );
+  scaled_image_w = image_width  * image_scale >> 2;
+  scaled_image_h = image_height * image_scale >> 2;
+
+  xdisplay_force_full_refresh = 1;
+  resize_window( scaled_image_w, scaled_image_h );
+  display_refresh_all();
   return 0;
 }
 

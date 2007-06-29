@@ -1896,3 +1896,6 @@
 20070629 widget/{widget.c,options.pl},ui/options.dat: move
          uidisplay_hotswap_gfx_mode directly to widget_options_finish (more
          from bug #1743318) (Gergely Szasz).
+20070630 ui/xlib/{xui.c,xdisplay.c}: allow the use of 3x scalers and add the
+         ability for the window to resize itself (more of bug #1686228) (Gergely
+         Szasz).
