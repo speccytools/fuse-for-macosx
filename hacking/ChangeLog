@@ -1899,3 +1899,5 @@
 20070630 ui/xlib/{xui.c,xdisplay.c}: allow the use of 3x scalers and add the
          ability for the window to resize itself (more of bug #1686228) (Gergely
          Szasz).
+20070630 ui/xlib/xdisplay.c: support more colour depths and more scalers (more
+         of bug #1686228) (Gergely Szasz).
