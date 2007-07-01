@@ -1905,3 +1905,5 @@
          if requested to do so (Fred).
 20070701 disk/plusd.c: add some more information to errors in plusd_disk_insert
          (Fred).
+20070701 configure.in,ui/gtk/{gtkkeyboard.c,gtkinternals.h,gtkui.c,stock.c}:
+	 remove GTK+ 1.x UI. Outdated, and didn't link.

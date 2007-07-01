@@ -73,7 +73,6 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
 
   if( !accel ) accel = gtkstock_add_accel_group (widget);
 
-#ifdef UI_GTK2
   if( is_stock ) {
     btn = gtk_button_new_from_stock( button->label + link_object );
 
@@ -88,10 +87,6 @@ gtkstock_create_button( GtkWidget *widget, GtkAccelGroup *accel,
     btn = gtk_button_new_with_label( button->label + link_object +
 				     ( is_stock ? 4 : 0 ) );
   }
-#else			/* #ifdef UI_GTK2 */
-  btn = gtk_button_new_with_label( button->label + link_object +
-				   ( is_stock ? 4 : 0 ) );
-#endif			/* #ifdef UI_GTK2 */
 
   if( GTK_IS_DIALOG( widget ) ) {
     gtk_container_add( GTK_CONTAINER( GTK_DIALOG( widget )->action_area ),
@@ -154,7 +149,6 @@ gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
 			   GtkSignalFunc action, gpointer actiondata,
 			   GtkSignalFunc destroy )
 {
-#ifdef UI_GTK2
   gtkstock_button btn[] = {
     { GTK_STOCK_CANCEL, NULL, NULL, NULL, 0, 0 },
     { GTK_STOCK_OK, NULL, NULL, NULL, 0, 0 },
@@ -162,15 +156,6 @@ gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
   btn[1].destroy = btn[0].destroy = destroy ? destroy : DEFAULT_DESTROY;
   btn[1].action = action;
   btn[1].actiondata = actiondata;
-#else			/* #ifdef UI_GTK2 */
-  gtkstock_button btn[] = {
-    { GTK_STOCK_OK, NULL, NULL, NULL, 0, 0 },
-    { GTK_STOCK_CANCEL, NULL, NULL, NULL, 0, 0 },
-  };
-  btn[0].destroy = btn[1].destroy = destroy ? destroy : DEFAULT_DESTROY;
-  btn[0].action = action;
-  btn[0].actiondata = actiondata;
-#endif			/* #ifdef UI_GTK2 */
 
   return gtkstock_create_buttons( widget, accel, btn,
 				  sizeof( btn ) / sizeof( btn[0] ) );

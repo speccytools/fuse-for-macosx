@@ -119,28 +119,9 @@ GtkAccelGroup* gtkstock_create_close( GtkWidget *widget, GtkAccelGroup *accel,
 
 #define DEFAULT_DESTROY ( GTK_SIGNAL_FUNC( gtkui_destroy_widget_and_quit ) )
 
-#ifndef UI_GTK2
-#define GTK_STOCK_OK		"gtk-OK"
-       /* gets accel Return */
-#define GTK_STOCK_CANCEL	"gtk-Cancel"
-       /* gets accel Escape */
-#define GTK_STOCK_CLOSE		"gtk-Close"
-       /* gets accel Return, Escape */
-#define GTK_STOCK_SAVE		"gtk-Save"
-       /* gets accel Alt-S, Return */
-#define GTK_STOCK_YES		"gtk-Yes"
-       /* gets accel Alt-Y, Return */
-#define GTK_STOCK_NO		"gtk-No"
-       /* gets accel Alt-N, Escape */
-#endif			/* #ifndef UI_GTK2 */
-
 GtkWidget *gtkstock_dialog_new( const gchar *title, GtkSignalFunc destroy );
 
-#ifdef UI_GTK2
 typedef PangoFontDescription *gtkui_font;
-#else				/* #ifdef UI_GTK2 */
-typedef GtkStyle *gtkui_font;
-#endif				/* #ifdef UI_GTK2 */
 
 int gtkui_get_monospaced_font( gtkui_font *font );
 void gtkui_free_font( gtkui_font font );

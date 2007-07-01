@@ -1021,26 +1021,11 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 int
 gtkui_get_monospaced_font( gtkui_font *font )
 {
-#ifdef UI_GTK2
-
   *font = pango_font_description_from_string( "Monospace 10" );
   if( !(*font) ) {
     ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
     return 1;
   }
-
-#else				/* #ifdef UI_GTK2 */
-
-  *font = gtk_style_new();
-  gdk_font_unref( (*font)->font );
-
-  (*font)->font = gdk_font_load( "-*-courier-medium-r-*-*-12-*-*-*-*-*-*-*" );
-  if( !(*font)->font ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
-    return 1;
-  }
-
-#endif				/* #ifdef UI_GTK2 */
 
   return 0;
 }
@@ -1048,21 +1033,13 @@ gtkui_get_monospaced_font( gtkui_font *font )
 void
 gtkui_free_font( gtkui_font font )
 {
-#ifdef UI_GTK2
   pango_font_description_free( font );
-#else				/* #ifdef UI_GTK2 */
-  gtk_style_detach( font );
-#endif				/* #ifdef UI_GTK2 */
 }
 
 void
 gtkui_set_font( GtkWidget *widget, gtkui_font font )
 {
-#ifdef UI_GTK2
   gtk_widget_modify_font( widget, font );
-#else				/* #ifdef UI_GTK2 */
-  gtk_widget_set_style( widget, font );
-#endif				/* #ifdef UI_GTK2 */
 }  
 
 static void
@@ -1110,7 +1087,6 @@ wheel_scroll_event( GtkWidget *clist, GdkEvent *event, gpointer user_data )
   long int oldbase = adjustment->value;
   long int base = oldbase;
 
-#ifdef UI_GTK2
   switch( event->scroll.direction )
   {
   case GDK_SCROLL_UP:
@@ -1122,22 +1098,6 @@ wheel_scroll_event( GtkWidget *clist, GdkEvent *event, gpointer user_data )
   default:
     return FALSE;
   }
-#else			/* #ifdef UI_GTK2 */
-  if( event->type != GDK_BUTTON_PRESS )
-    return FALSE;
-
-  switch (event->button.button)
-  {
-  case 4:
-    base -= adjustment->page_increment / 2;
-    break;
-  case 5:
-    base += adjustment->page_increment / 2;
-    break;
-  default:
-    return FALSE;
-  }
-#endif			/* #ifdef UI_GTK2 */
 
   if( base < 0 ) {
     base = 0;
@@ -1155,13 +1115,8 @@ gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj )
 {
   gtk_signal_connect( GTK_OBJECT( clist ), "scroll-vertical",
 		      GTK_SIGNAL_FUNC( key_scroll_event ), adj );
-#ifdef UI_GTK2
   gtk_signal_connect( GTK_OBJECT( clist ), "scroll-event",
 		      GTK_SIGNAL_FUNC( wheel_scroll_event ), adj );
-#else			/* #ifdef UI_GTK2 */
-  gtk_signal_connect( GTK_OBJECT( clist ), "button-press-event",
-		      GTK_SIGNAL_FUNC( wheel_scroll_event ), adj );
-#endif			/* #ifdef UI_GTK2 */
 }
 
 #endif			/* #ifdef UI_GTK */

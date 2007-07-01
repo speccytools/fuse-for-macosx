@@ -58,10 +58,8 @@ gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
 {
   input_event_t fuse_event;
 
-#ifdef UI_GTK2
   if( event->key.keyval == GDK_F10 && event->key.state == 0 )
     ui_mouse_suspend();
-#endif
 
   fuse_event.type = INPUT_EVENT_KEYPRESS;
   get_keysyms( &fuse_event, event->key.keyval );
