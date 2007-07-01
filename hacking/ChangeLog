@@ -1903,3 +1903,5 @@
          of bug #1686228) (Gergely Szasz).
 20070701 machines/specplus3.c: if we can't figure out the dirty state, only write
          if requested to do so (Fred).
+20070701 disk/plusd.c: add some more information to errors in plusd_disk_insert
+         (Fred).

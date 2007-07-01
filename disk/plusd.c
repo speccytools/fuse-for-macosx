@@ -349,6 +349,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   char tempfilename[ PATH_MAX ];
   int israw = 0;
   dsk_format_t fmt;
+  dsk_err_t dsk_error;
   wd1770_drive *d;
   int l;
 
@@ -389,28 +390,39 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 
     /* If the "logical" driver is not available, try the "raw" driver (unless
      * we're using FMT_MGT800, for which the raw driver will not work */
-    if( dsk_open( &d->disk, tempfilename, "logical", NULL ) != DSK_ERR_OK &&
+    dsk_error = dsk_open( &d->disk, tempfilename, "logical", NULL );
+    if( dsk_error != DSK_ERR_OK &&
 	( fmt == FMT_MGT800 ||
-	  dsk_open( &d->disk, tempfilename, "raw", NULL ) != DSK_ERR_OK ) ) {
-      ui_error( UI_ERROR_ERROR, "Failed to open disk image" );
+	  ( dsk_error = dsk_open( &d->disk, tempfilename, "raw", NULL ) ) !=
+              DSK_ERR_OK
+        )
+      ) {
+      ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
+                                dsk_strerror( dsk_error ) );
       return 1;
     }
 
-    if( dg_stdformat( &d->geom, fmt, NULL, NULL ) != DSK_ERR_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to set geometry for disk" );
+    dsk_error = dg_stdformat( &d->geom, fmt, NULL, NULL );
+    if( dsk_error != DSK_ERR_OK ) {
+      ui_error( UI_ERROR_ERROR, "Failed to set geometry for disk: %s",
+                                dsk_strerror( dsk_error ) );
       dsk_close( &d->disk );
       return 1;
     }
 
   } else {
 
-    if( dsk_open( &d->disk, tempfilename, NULL, NULL ) != DSK_ERR_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to open disk image" );
+    dsk_error = dsk_open( &d->disk, tempfilename, NULL, NULL );
+    if( dsk_error != DSK_ERR_OK ) {
+      ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
+                                dsk_strerror( dsk_error ) );
       return 1;
     }
 
-    if( dsk_getgeom( d->disk, &d->geom ) != DSK_ERR_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to determine geometry for disk" );
+    dsk_error = dsk_getgeom( d->disk, &d->geom );
+    if( dsk_error != DSK_ERR_OK ) {
+      ui_error( UI_ERROR_ERROR, "Failed to determine geometry for disk: %s",
+                                dsk_strerror( dsk_error ) );
       dsk_close( &d->disk );
       return 1;
     }
