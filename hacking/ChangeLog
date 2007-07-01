@@ -1901,3 +1901,5 @@
          Szasz).
 20070630 ui/xlib/xdisplay.c: support more colour depths and more scalers (more
          of bug #1686228) (Gergely Szasz).
+20070701 machines/specplus3.c: if we can't figure out the dirty state, only write
+         if requested to do so (Fred).

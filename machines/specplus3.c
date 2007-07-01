@@ -630,7 +630,7 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
 
       }
     } else if( dirty == FD_D_UNAVAILABLE ) {
-      if( ui_plus3_disk_write( which ) ) return 1;
+      if( write && ui_plus3_disk_write( which ) ) return 1;
     }
   }
   
