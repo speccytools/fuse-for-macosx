@@ -1910,3 +1910,4 @@
 20070703 utils.c,display.c,fuse.c,compat.h,widget/{filesel.c,error.c},
          sound/sdlsound.c,compat/{getopt.c,getopt1.c},settings.pl,
          ui/sdl/sdlui.c: patches for MorphOS (patch #1746269) (Q-Master).
+20070703 fuse.c: clean up #ifdefs (Stuart).

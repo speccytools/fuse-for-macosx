@@ -315,27 +315,25 @@ int creator_init( void )
 
   for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
 
-#ifndef WIN32
-#ifdef __MORPHOS__
+#if defined(__MORPHOS__)
   snprintf(buf.sysname, __SYS_NMLN, "MorphOS");
   snprintf(buf.release, __SYS_NMLN, "1.4.4");
   snprintf(buf.machine, __SYS_NMLN, "Pegasos");
-#else				/* #ifdef __MORPHOS__ */
-  sys_error = uname( &buf );
-  if( sys_error == -1 ) {
-    ui_error( UI_ERROR_ERROR, "error getting system information: %s",
-	      strerror( errno ) );
-    return 1;
-  }
-#endif				/* #ifdef __MORPHOS__ */
-#else				/* #ifndef WIN32 */
+#elif defined(WIN32)		/* #if defined(__MORPHOS__) */
   buf.dwOSVersionInfoSize = sizeof( buf );
   sys_error = GetVersionEx( &buf );
   if( sys_error == 0 ) {
     ui_error( UI_ERROR_ERROR, "error getting system information." );
     return 1;
   }
-#endif				/* #ifndef WIN32 */
+#else				/* #if defined(__MORPHOS__) */
+  sys_error = uname( &buf );
+  if( sys_error == -1 ) {
+    ui_error( UI_ERROR_ERROR, "error getting system information: %s",
+	      strerror( errno ) );
+    return 1;
+  }
+#endif				/* #if defined(__MORPHOS__) */
 
   error = libspectrum_creator_alloc( &fuse_creator ); if( error ) return error;
 
