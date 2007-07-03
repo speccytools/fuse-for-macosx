@@ -53,7 +53,7 @@
 char *dirname( char *path );
 #endif				/* #ifndef HAVE_DIRNAME */
 
-#if !defined HAVE_GETOPT_LONG && !defined AMIGA
+#if !defined HAVE_GETOPT_LONG && !defined AMIGA && !defined __MORPHOS__
 #include "compat/getopt.h"
 #endif				/* #ifndef HAVE_GETOPT_LONG */
 

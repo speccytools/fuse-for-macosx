@@ -240,8 +240,11 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
   init_path_context( &ctx, type );
 
   while( get_next_path( &ctx ) ) {
-
+#ifdef AMIGA
+    snprintf( path, PATH_MAX, "%s%s", ctx.path, filename );
+#else
     snprintf( path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path, filename );
+#endif
     fd = open( path, O_RDONLY | O_BINARY );
     if( fd != -1 ) return fd;
 
@@ -270,8 +273,12 @@ utils_find_file_path( const char *filename, char *ret_path,
 
   while( get_next_path( &ctx ) ) {
 
+#ifdef AMIGA
+    snprintf( ret_path, PATH_MAX, "%s%s", ctx.path, filename );
+#else
     snprintf( ret_path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path,
               filename );
+#endif
     if( !stat( ret_path, &stat_info ) ) return 0;
 
   }
@@ -298,16 +305,27 @@ get_next_path( path_context *ctx )
   switch( (ctx->state)++ ) {
 
     /* First look relative to the current directory */
-  case 0: strncpy( ctx->path, ".", PATH_MAX ); return 1;
+  case 0:
+#ifdef AMIGA
+    strncpy( ctx->path, "PROGDIR:", PATH_MAX );
+#else
+    strncpy( ctx->path, ".", PATH_MAX );
+#endif
+    return 1;
 
     /* Then relative to the Fuse executable */
   case 1:
 
     switch( ctx->type ) {
-    
+#ifdef AMIGA
+    case UTILS_AUXILIARY_LIB: strncpy( ctx->path, "PROGDIR:lib/", PATH_MAX); return 1;
+    case UTILS_AUXILIARY_ROM: strncpy( ctx->path, "PROGDIR:roms/", PATH_MAX); return 1;
+    case UTILS_AUXILIARY_WIDGET: strncpy( ctx->path, "PROGDIR:widget/", PATH_MAX); return 1;
+#else
     case UTILS_AUXILIARY_LIB: path_segment = "lib"; break;
     case UTILS_AUXILIARY_ROM: path_segment = "roms"; break;
     case UTILS_AUXILIARY_WIDGET: path_segment = "widget"; break;
+#endif
     default:
       ui_error( UI_ERROR_ERROR, "unknown auxiliary file type %d", ctx->type );
       return 0;
@@ -337,7 +355,6 @@ get_next_path( path_context *ctx )
 
   case 3: return 0;
   }
-
   ui_error( UI_ERROR_ERROR, "unknown path_context state %d", ctx->state );
   fuse_abort();
 }
@@ -493,7 +510,7 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
   utils_file file;
   ssize_t bytes_written;
 
-#ifdef AMIGA
+#if defined AMIGA || defined __MORPHOS__
   snprintf( tempfilename, PATH_MAX, "%s%s", utils_get_temp_path(), template );
 #else
   snprintf( tempfilename, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s",
@@ -536,7 +553,7 @@ utils_get_temp_path( void )
 {
   const char *dir;
 
-#ifdef AMIGA
+#if defined AMIGA || defined __MORPHOS__
 
   /* Amiga, just use T: */
   return "T:";
@@ -566,7 +583,7 @@ utils_get_home_path( void )
 {
   const char *dir;
 
-#ifdef AMIGA
+#if defined AMIGA || defined __MORPHOS__
 
   dir = strdup("PROGDIR:settings");
 	if( dir ) return dir;

@@ -1907,3 +1907,6 @@
          (Fred).
 20070701 configure.in,ui/gtk/{gtkkeyboard.c,gtkinternals.h,gtkui.c,stock.c}:
 	 remove GTK+ 1.x UI. Outdated, and didn't link.
+20070703 utils.c,display.c,fuse.c,compat.h,widget/{filesel.c,error.c},
+         sound/sdlsound.c,compat/{getopt.c,getopt1.c},settings.pl,
+         ui/sdl/sdlui.c: patches for MorphOS (patch #1746269) (Q-Master).

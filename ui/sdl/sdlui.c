@@ -61,7 +61,9 @@ ui_init( int *argc, char ***argv )
   if ( error )
     return error;
 
+#ifndef __MORPHOS__
   SDL_EnableUNICODE( 1 );
+#endif				/* #ifndef __MORPHOS__ */
 
   sdlkeyboard_init();
 

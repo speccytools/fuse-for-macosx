@@ -46,16 +46,23 @@
 #include "widget_internals.h"
 #include "utils.h"
 
-#ifdef AMIGA
+#if defined AMIGA || defined __MORPHOS__
 #include <proto/asl.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 
 struct Library *AslBase;
+
+#ifndef __MORPHOS__
 struct AslIFace *IAsl;
 struct Library *DOSBase;
+#endif				/* #ifndef __MORPHOS__ */
+
+#ifndef __MORPHOS__
 struct DOSIFace *IDOS;
 struct Library *ExecBase;
+#endif				/* #ifndef __MORPHOS__ */
+
 
 int err = 0;
 #endif /* ifdef AMIGA */
@@ -82,7 +89,7 @@ static int widget_select_file( const struct dirent *dirent );
 static int widget_scan_compare( const widget_dirent **a,
 				const widget_dirent **b );
 
-#ifndef AMIGA
+#if !defined AMIGA && !defined __MORPHOS__
 static char* widget_getcwd( void );
 #endif /* ifndef AMIGA */
 static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
@@ -149,12 +156,13 @@ static int widget_add_filename( int *allocated, int *number,
   return 0;
 }
 
-#ifdef AMIGA
+#if defined AMIGA || defined __MORPHOS__
 static char *
 amiga_asl( char *title ) {
   char *filename;
   struct FileRequester *filereq;
 
+#ifndef __MORPHOS__
   if( AslBase = IExec->OpenLibrary( "asl.library", 52 ) ) {
     if( IAsl = ( struct AslIFace * ) IExec->GetInterface( AslBase,"main",1,NULL ) ) {
       filereq = IAsl->AllocAslRequestTags( ASL_FileRequest,
@@ -164,20 +172,44 @@ amiga_asl( char *title ) {
                                            ASLFR_InitialPattern,"#?.(sna|z80|szx|sp|snp|zxs|tap|tzx|csw|rzx|dsk|trd|scl|mdr|dck|hdf|rom|psg|scr|png|gz|bz2)",
                                            ASLFR_DoPatterns,TRUE,
                                            TAG_DONE );
-
       if( err = IAsl->AslRequest( filereq, NULL ) ) {
         filename = ( STRPTR ) IExec->AllocVec( 1024, MEMF_CLEAR );
+#else				/* #ifndef __MORPHOS__ */
+  if( AslBase = OpenLibrary( "asl.library", 0 ) ) {
+      filereq = AllocAslRequestTags( ASL_FileRequest,
+                                     ASLFR_RejectIcons,TRUE,
+                                     ASLFR_TitleText,title,
+                                     ASLFR_DoSaveMode,is_saving,
+                                     ASLFR_InitialPattern,"#?.(sna|z80|szx|sp|snp|zxs|tap|tzx|csw|rzx|dsk|trd|scl|mdr|dck|hdf|rom|psg|scr|png|gz|bz2)",
+                                     ASLFR_DoPatterns,TRUE,
+                                     TAG_DONE );
+      if( err = AslRequest( filereq, NULL ) ) {
+        filename = ( STRPTR ) AllocVec( 1024, MEMF_CLEAR );
+#endif				/* #ifndef __MORPHOS__ */
+
         strcpy( filename,filereq->fr_Drawer );	
+#ifndef __MORPHOS__
         IDOS->AddPart( filename, filereq->fr_File, 1024 );
+#else				/* #ifndef __MORPHOS__ */
+        AddPart( filename, filereq->fr_File, 1024 );
+#endif				/* #ifndef __MORPHOS__ */
         widget_filesel_name = strdup( filename );
+#ifndef __MORPHOS__
         IExec->FreeVec( filename );
+#else				/* #ifndef __MORPHOS__ */
+        FreeVec( filename );
+#endif				/* #ifndef __MORPHOS__ */
         err = WIDGET_FINISHED_OK;
       } else {
         err = WIDGET_FINISHED_CANCEL;
       }
+#ifndef __MORPHOS__
       IExec->DropInterface( ( struct Interface * )IAsl );
     }
     IExec->CloseLibrary( AslBase );
+#else				/* #ifndef __MORPHOS__ */
+    CloseLibrary( AslBase );
+#endif				/* #ifndef __MORPHOS__ */
   }
   return widget_filesel_name;
 }
@@ -304,7 +336,7 @@ widget_filesel_draw( void *data )
   exit_all_widgets = filesel_data->exit_all_widgets;
   title = filesel_data->title;
 
-#ifndef AMIGA
+#if !defined AMIGA && !defined __MORPHOS__
   directory = widget_getcwd();
   if( directory == NULL ) return 1;
 
@@ -351,7 +383,7 @@ widget_filesel_save_draw( void *data )
   return widget_filesel_draw( data );
 }
 
-#ifndef AMIGA
+#if !defined AMIGA && !defined __MORPHOS__
 static char* widget_getcwd( void )
 {
   char *directory; size_t directory_length;
@@ -526,7 +558,7 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 void
 widget_filesel_keyhandler( input_key key )
 {
-#ifdef AMIGA
+#if defined AMIGA || defined __MORPHOS__
   if( exit_all_widgets ) {
     widget_end_all( err );
   } else {

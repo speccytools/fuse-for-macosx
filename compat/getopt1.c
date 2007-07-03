@@ -24,7 +24,7 @@
 #include <config.h>
 #endif
 
-#if !defined HAVE_GETOPT_LONG && !defined AMIGA
+#if !defined HAVE_GETOPT_LONG && !defined AMIGA && !defined __MORPHOS__
 
 #ifdef _LIBC
 # include <getopt.h>

@@ -60,6 +60,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   float hz;
   int sound_framesiz;
 
+#ifndef __MORPHOS__    
   /* I'd rather just use setenv, but Windows doesn't have it */
   if( device ) {
     const char *environment = "SDL_AUDIODRIVER=";
@@ -75,6 +76,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
       return 1;
     }
   }
+#endif			/* #ifndef __MORPHOS__ */
 
   SDL_InitSubSystem( SDL_INIT_AUDIO );
 
@@ -88,7 +90,11 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   hz = (float)machine_current->timings.processor_speed /
               machine_current->timings.tstates_per_frame;
   sound_framesiz = *freqptr / hz;
+#ifndef __MORPHOS__  
   requested.samples = pow(2.0, floor(log2(sound_framesiz)));
+#else			/* #ifndef __MORPHOS__ */
+  requested.samples = sound_framesiz;
+#endif			/* #ifndef __MORPHOS__ */
 
   if ( SDL_OpenAudio( &requested, &received ) < 0 ) {
     settings_current.sound = 0;
@@ -109,7 +115,11 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     hz = (float)machine_current->timings.processor_speed /
                 machine_current->timings.tstates_per_frame;
     sound_framesiz = *freqptr / hz;
+#ifndef __MORPHOS__    
     requested.samples = pow(2.0, floor(log2(sound_framesiz)));
+#else			/* #ifndef __MORPHOS__ */
+    requested.samples = sound_framesiz;
+#endif			/* #ifndef __MORPHOS__ */
 
     if( SDL_OpenAudio( &requested, NULL ) < 0 ) {
       settings_current.sound = 0;

@@ -1057,13 +1057,13 @@ display_getpixel( int x, int y )
 
   if( machine_current->timex ) {
     int column = x >> 4;
+    scld mode_data;
 
     y >>= 1;
     index = column + y * DISPLAY_SCREEN_WIDTH_COLS;
 
     data = display_last_screen[ index ] & 0xff;
     data2 = (display_last_screen[ index ] & 0xff00)>>8;
-    scld mode_data;
     mode_data.byte = (display_last_screen[ index ] & 0xff0000)>>16;
 
     if( mode_data.name.hires ) {
