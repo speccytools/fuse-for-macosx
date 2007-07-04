@@ -1914,7 +1914,7 @@
 20070704 z80/z80.c: don't page in the +D on startup (fixes bug #1746073)
 	 (thanks, Fred) (Stuart).
 20070704 z80/coretest.c: remove dead code (Stuart).
-20070704 disk/{plusd.[ch],wd1770.c},display.c,if1.c,machines/{pentagon.c
+20070704 disk/{plusd.[ch],wd1770.c},display.c,if1.c,machines/{pentagon.c,
 	 scorpion.c,specplus2.c,specplus2a.c,specplus3e.c},profile.c,
 	 screenshot.c,timer.c,ui/gtk/{browse.c,fileselector.c,memory.c,
 	 pokefinder.c,rollback.c}: various cleanups (Stuart).
