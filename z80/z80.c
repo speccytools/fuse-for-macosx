@@ -113,12 +113,6 @@ z80_reset( int hard_reset )
   z80.halted=0;
 
   z80.interrupts_enabled_at = -1;
-
-#ifdef HAVE_LIBDSK_H
-  if ( plusd_available && !plusd_active ) {
-    plusd_page();
-  }
-#endif
 }
 
 /* Process a z80 maskable interrupt */
