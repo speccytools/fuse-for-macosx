@@ -127,13 +127,6 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 }
 
 void
-ula_contend_port( libspectrum_word port )
-{
-  printf( "%5d PC %04x\n", tstates, port );
-  tstates += 4;
-}
-
-void
 contend_read( libspectrum_word address, libspectrum_dword time )
 {
   printf( "%5d MC %04x\n", tstates, address );

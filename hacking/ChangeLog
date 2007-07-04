@@ -1913,3 +1913,4 @@
 20070703 fuse.c: clean up #ifdefs (Stuart).
 20070704 z80/z80.c: don't page in the +D on startup (fixes bug #1746073)
 	 (thanks, Fred) (Stuart).
+20070704 z80/coretest.c: remove dead code (Stuart).
