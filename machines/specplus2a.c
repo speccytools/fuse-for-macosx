@@ -28,6 +28,8 @@
 #include <libspectrum.h>
 
 #include "joystick.h"
+#include "machine.h"
+#include "machines.h"
 #include "periph.h"
 #include "printer.h"
 #include "settings.h"

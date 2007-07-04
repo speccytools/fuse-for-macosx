@@ -56,12 +56,17 @@
 #include "wd1770.h"
 #include "z80/z80.h"
 
+static void plusd_set_cmdint( wd1770_fdc *f );
+
 int plusd_available = 0;
 int plusd_active = 0;
-int plusd_index_pulse = 0;
 
-wd1770_fdc plusd_fdc;
-wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
+static int plusd_index_pulse = 0;
+
+#define PLUSD_NUM_DRIVES 2
+
+static wd1770_fdc plusd_fdc;
+static wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
 static const char *plusd_template = "fuse.plusd.XXXXXX";
 
@@ -146,7 +151,7 @@ plusd_init( void )
     d->filename[0] = '\0';
   }
 
-  plusd_fdc.set_cmdint = &plusd_set_cmdint;
+  plusd_fdc.set_cmdint = plusd_set_cmdint;
   plusd_fdc.reset_cmdint = NULL;
   plusd_fdc.set_datarq = NULL;
   plusd_fdc.reset_datarq = NULL;
@@ -311,6 +316,8 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 libspectrum_byte
 plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
+  /* should we set *attached = 1? */
+
   plusd_page();
   return 0;
 }

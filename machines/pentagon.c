@@ -30,6 +30,7 @@
 #include "compat.h"
 #include "joystick.h"
 #include "machine.h"
+#include "machines.h"
 #include "memory.h"
 #include "periph.h"
 #include "settings.h"

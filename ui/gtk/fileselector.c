@@ -38,12 +38,14 @@
 
 #include "compat.h"
 #include "gtkinternals.h"
+#include "menu.h"
 #include "ui/ui.h"
 
 /* The last directory we visited */
 static char *cwd = NULL;
 
 static void fileselector_done( GtkButton *button, gpointer user_data );
+static char *fileselector_get_filename( const char *title );
 
 typedef struct fileselector_info {
 
@@ -52,7 +54,7 @@ typedef struct fileselector_info {
 
 } fileselector_info;
 
-char*
+static char*
 fileselector_get_filename( const char *title )
 {
   fileselector_info selector;

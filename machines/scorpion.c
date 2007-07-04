@@ -33,6 +33,7 @@
 #include "ay.h"
 #include "compat.h"
 #include "joystick.h"
+#include "machine.h"
 #include "machines.h"
 #include "memory.h"
 #include "printer.h"

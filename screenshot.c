@@ -372,7 +372,7 @@ typedef union {
   byte_field_type bit;
 } bft_union;
 
-libspectrum_byte
+static libspectrum_byte
 convert_hires_to_lores( libspectrum_byte high, libspectrum_byte low )
 {
   bft_union ret, h, l;

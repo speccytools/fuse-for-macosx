@@ -141,7 +141,7 @@ static void display_dirty_flashing(void);
 static int border_changes_last = 0;
 static struct border_change_t *border_changes = NULL;
 
-struct border_change_t *
+static struct border_change_t *
 alloc_change(void)
 {
   static int border_changes_size = 0;

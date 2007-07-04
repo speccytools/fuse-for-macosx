@@ -36,6 +36,7 @@
 #include "compat.h"
 #include "gtkinternals.h"
 #include "memory.h"
+#include "menu.h"
 
 static void
 update_display( GtkCList *clist, libspectrum_word base )

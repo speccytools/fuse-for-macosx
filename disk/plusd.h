@@ -44,7 +44,6 @@ typedef enum plusd_drive_number {
 
 extern int plusd_available;  /* Is the +D available for use? */
 extern int plusd_active;     /* +D enabled? */
-extern int plusd_index_pulse;
 
 extern const periph_t plusd_peripherals[];
 extern const size_t plusd_peripherals_count;
@@ -74,11 +73,6 @@ libspectrum_byte plusd_mem_read( libspectrum_word port, int *attached );
 void plusd_mem_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte plusd_printer_read( libspectrum_word port, int *attached );
-
-extern wd1770_fdc plusd_fdc;
-
-#define PLUSD_NUM_DRIVES 2
-extern wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
 int plusd_disk_insert( plusd_drive_number which, const char *filename,
 		       int autoload );

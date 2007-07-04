@@ -25,7 +25,7 @@
 
 #include <config.h>
 
-#include "machine.h"
+#include "machines.h"
 #include "periph.h"
 #include "settings.h"
 #include "specplus3.h"

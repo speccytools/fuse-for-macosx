@@ -620,7 +620,7 @@ port_ctr_out( libspectrum_byte val )
   microdrives_restart();
 }
 
-void
+static void
 port_net_out( libspectrum_byte val )
 {
   if( if1_ula.comms_data == 1 ) {	/* OK, if the comms_data == 1 */

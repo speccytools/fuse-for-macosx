@@ -32,6 +32,7 @@
 
 #include "event.h"
 #include "fuse.h"
+#include "profile.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 

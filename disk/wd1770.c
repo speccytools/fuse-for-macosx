@@ -51,9 +51,11 @@
 #include "wd1770.h"
 #include "z80/z80.h"
 
-char secbuf[1024];
+static void statusbar_update( int busy );
 
-void
+static char secbuf[1024];
+
+static void
 statusbar_update( int busy )
 {
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,

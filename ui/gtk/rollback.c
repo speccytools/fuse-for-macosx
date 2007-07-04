@@ -29,6 +29,7 @@
 
 #include "fuse.h"
 #include "gtkinternals.h"
+#include "ui/ui.h"
 
 GtkWidget *dialog, *list;
 
@@ -65,7 +66,7 @@ create_dialog( void )
   return 0;
 }
 
-int
+static int
 update_list( GSList *points )
 {
   gtk_clist_freeze( GTK_CLIST( list ) );

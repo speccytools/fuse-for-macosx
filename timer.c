@@ -39,6 +39,9 @@
 #include "ui/ui.h"
 #include "ula.h"
 
+static void timer_add_time_difference( timer_type *a, long msec );
+static int timer_frame_callback_sound( libspectrum_dword last_tstates );
+
 /*
  * Routines for estimating emulation speed
  */
@@ -117,7 +120,7 @@ timer_get_time_difference( timer_type *a, timer_type *b )
   return ( (long)*a - (long)*b ) / 1000.0;
 }
 
-void
+static void
 timer_add_time_difference( timer_type *a, long msec )
 {
   *a += msec;
@@ -145,7 +148,7 @@ timer_get_time_difference( timer_type *a, timer_type *b )
   return ( (long)*a - (long)*b ) / 1000.0;
 }
 
-void
+static void
 timer_add_time_difference( timer_type *a, long msec )
 {
   *a += msec;
@@ -179,7 +182,7 @@ timer_get_time_difference( timer_type *a, timer_type *b )
   return ( a->tv_sec - b->tv_sec ) + ( a->tv_usec - b->tv_usec ) / 1000000.0;
 }
 
-void
+static void
 timer_add_time_difference( timer_type *a, long msec )
 {
   a->tv_usec += msec * 1000;
@@ -235,7 +238,7 @@ timer_end( void )
 
 extern sfifo_t sound_fifo;
 
-int
+static int
 timer_frame_callback_sound( libspectrum_dword last_tstates )
 {
   for(;;) {
@@ -259,7 +262,7 @@ timer_frame_callback_sound( libspectrum_dword last_tstates )
 #else                           /* #if defined SOUND_SDL || defined SOUND_COREAUDIO */
 
 /* Blocking socket-style sound based timer */
-int
+static int
 timer_frame_callback_sound( libspectrum_dword last_tstates )
 {
   if( event_add( last_tstates + machine_current->timings.tstates_per_frame,
