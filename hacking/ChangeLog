@@ -1918,3 +1918,5 @@
 	 scorpion.c,specplus2.c,specplus2a.c,specplus3e.c},profile.c,
 	 screenshot.c,timer.c,ui/gtk/{browse.c,fileselector.c,memory.c,
 	 pokefinder.c,rollback.c}: various cleanups (Stuart).
+20070705 z80/z80_ops.c: speed up z80_do_opcodes() with +D enabled (thanks, Fred)
+	 (Stuart).

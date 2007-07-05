@@ -170,10 +170,8 @@ z80_do_opcodes( void )
     CHECK( plusd, plusd_available, 4 )
 
 #ifdef HAVE_LIBDSK_H
-    if( !plusd_active ) {
-      if( PC == 0x0008 || PC == 0x0066 || PC == 0x003a ) {
-	plusd_page();
-      }
+    if( PC == 0x0008 || PC == 0x0066 || PC == 0x003a ) {
+      plusd_page();
     }
 #endif			/* #ifdef HAVE_LIBDSK_H */
 
