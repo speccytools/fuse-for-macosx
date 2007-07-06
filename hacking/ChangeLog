@@ -1920,3 +1920,4 @@
 	 pokefinder.c,rollback.c}: various cleanups (Stuart).
 20070705 z80/z80_ops.c: speed up z80_do_opcodes() with +D enabled (thanks, Fred)
 	 (Stuart).
+20070706 z80/z80_ops.c: fix non-gcc compilation (Fred).

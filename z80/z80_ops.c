@@ -175,6 +175,8 @@ z80_do_opcodes( void )
     }
 #endif			/* #ifdef HAVE_LIBDSK_H */
 
+    END_CHECK
+
     CHECK( if1p, if1_available, 5 )
 
     if( PC == 0x0008 || PC == 0x1708 ) {
