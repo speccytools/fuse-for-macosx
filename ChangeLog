@@ -1,3 +1,30 @@
+2007-xx-xx  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+	* Fuse 0.x.x released
+
+	* New features:
+	  * Add +D disk interface support (Stuart Brady).
+	  * Add Hi-Fi beeper for improved reproduction of multi-channel beeper
+	    tunes (e.g. Fairlight 2, Wham - the Music Box) (Fredrick Meunier).
+	  * Add support for saving tape images without using tape traps (Fredrick
+	    Meunier).
+	  * Add support for loading from WAV tape images (Fredrick Meunier).
+	  * Add support for saving CSW tape images and TZX direct recording
+	    blocks (Fredrick Meunier).
+	  * Allow distinction between "soft" resets (activing the reset line on
+	    the Z80) and "hard" resets (pulling the power) (Stuart Brady).
+
+	* Emulation core improvements:
+	  * Fix contention for LD?R, CP?R and IN?R (Philip Kendall; thanks,
+	    Mark Woodmass).
+	  * Fix undocumented flags after BIT n,(IX+d) instructions (Philip
+	    Kendall).
+	  * Fix undocumented behaviour of DAA (Stuart Brady).
+	  * Separate out contention when MREQ isn't active, as the +2A/+3 ULA
+	    applies contention only when MREQ is active (Philip Kendall).
+
+	* Various other minor bugfixes.
+
 2007-05-11  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
 	* Fuse 0.8.0.1 released (bug fix release)
