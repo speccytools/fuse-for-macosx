@@ -12,7 +12,7 @@
 	  * Add support for saving CSW tape images and TZX direct recording
 	    blocks (Fredrick Meunier).
 	  * Allow distinction between "soft" resets (activing the reset line on
-	    the Z80) and "hard" resets (pulling the power) (Stuart Brady).
+	    the Z80) and "hard" resets (pulling the power) (Philip Kendall).
 
 	* Emulation core improvements:
 	  * Fix contention for LD?R, CP?R and IN?R (Philip Kendall; thanks,
