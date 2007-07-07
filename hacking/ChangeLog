@@ -1923,3 +1923,4 @@
 20070706 z80/z80_ops.c: fix non-gcc compilation (Fred).
 20070707 ChangeLog: chuck in a few entries as we go (Fred).
 20070707 ChangeLog: fix reset attribution (thanks, Stuart) (Fred).
+20070707 ui/win32/win32ui.c: fix compilation without lib765 (Stuart).

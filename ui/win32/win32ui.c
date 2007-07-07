@@ -428,6 +428,7 @@ ui_tape_browser_update( ui_tape_browser_update_type change,
   return 0;
 }
 
+#ifdef HAVE_765_H
 int
 ui_plus3_disk_write( specplus3_drive_number which )
 {
@@ -455,6 +456,7 @@ ui_plus3_disk_write( specplus3_drive_number which )
 
   return 0;
 }
+#endif			/* #ifdef HAVE_765_H */
 
 int
 ui_trdos_disk_write( trdos_drive_number which )
