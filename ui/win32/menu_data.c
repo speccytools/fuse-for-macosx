@@ -118,6 +118,8 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_machine_pause( 0 ); break;
     case IDM_MENU_MACHINE_RESET:
       menu_machine_reset( 0 ); break;
+    case IDM_MENU_MACHINE_HARDRESET:
+      menu_machine_reset( 1 ); break;
     case IDM_MENU_MACHINE_SELECT:
       menu_machine_select( 0 ); break;
     case IDM_MENU_MACHINE_DEBUGGER:
@@ -144,6 +146,10 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_tape_clear( 0 ); break;
     case IDM_MENU_MEDIA_TAPE_WRITE:
       menu_media_tape_write( 0 ); break;
+    case IDM_MENU_MEDIA_TAPE_RECORDSTART:
+      menu_media_tape_recordstart( 0 ); break;
+    case IDM_MENU_MEDIA_TAPE_RECORDSTOP:
+      menu_media_tape_recordstop( 0 ); break;
     case IDM_MENU_MEDIA_INTERFACEI_MICRODRIVE1_INSERTNEW:
       menu_media_mdr_new( 1 ); break;
     case IDM_MENU_MEDIA_INTERFACEI_MICRODRIVE1_INSERT:
@@ -240,18 +246,6 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_mdr_writep( 0x18 ); break;
     case IDM_MENU_MEDIA_INTERFACEI_MICRODRIVE8_WRITEPROTECT_REMOVE:
       menu_media_mdr_writep( 0x08 ); break;
-    case IDM_MENU_MEDIA_INTERFACEI_RS232_PLUGRXD:
-      menu_media_if1_rs232( 0x01 ); break;
-    case IDM_MENU_MEDIA_INTERFACEI_RS232_UNPLUGRXD:
-      menu_media_if1_rs232( 0x11 ); break;
-    case IDM_MENU_MEDIA_INTERFACEI_RS232_PLUGTXD:
-      menu_media_if1_rs232( 0x02 ); break;
-    case IDM_MENU_MEDIA_INTERFACEI_RS232_UNPLUGTXD:
-      menu_media_if1_rs232( 0x12 ); break;
-    case IDM_MENU_MEDIA_INTERFACEI_SINCLAIRNET_PLUGIN:
-      menu_media_if1_rs232( 0x03 ); break;
-    case IDM_MENU_MEDIA_INTERFACEI_SINCLAIRNET_UNPLUG:
-      menu_media_if1_rs232( 0x13 ); break;
     case IDM_MENU_MEDIA_DISK_3_DRIVEA_INSERT:
       menu_media_disk_insert( 1 ); break;
     case IDM_MENU_MEDIA_DISK_3_DRIVEA_EJECT:
@@ -276,6 +270,18 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_disk_eject( 6 ); break;
     case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECTANDWRITE:
       menu_media_disk_eject( 22 ); break;
+    case IDM_MENU_MEDIA_DISK_D_DRIVE1_INSERT:
+      menu_media_disk_insert( 9 ); break;
+    case IDM_MENU_MEDIA_DISK_D_DRIVE1_EJECT:
+      menu_media_disk_eject( 9 ); break;
+    case IDM_MENU_MEDIA_DISK_D_DRIVE1_EJECTANDWRITE:
+      menu_media_disk_eject( 25 ); break;
+    case IDM_MENU_MEDIA_DISK_D_DRIVE2_INSERT:
+      menu_media_disk_insert( 10 ); break;
+    case IDM_MENU_MEDIA_DISK_D_DRIVE2_EJECT:
+      menu_media_disk_eject( 10 ); break;
+    case IDM_MENU_MEDIA_DISK_D_DRIVE2_EJECTANDWRITE:
+      menu_media_disk_eject( 26 ); break;
     case IDM_MENU_MEDIA_CARTRIDGE_TIMEXDOCK_INSERT:
       menu_media_cartridge_timexdock_insert( 0 ); break;
     case IDM_MENU_MEDIA_CARTRIDGE_TIMEXDOCK_EJECT:
