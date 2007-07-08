@@ -7,6 +7,7 @@
 /coretest.out
 /libz80.a
 /opcodes_base.c
+/tests.actual
 /z80_cb.c
 /z80_ddfd.c
 /z80_ddfdcb.c

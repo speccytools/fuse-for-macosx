@@ -76,5 +76,6 @@ coretest.o: coretest.c
 z80_coretest.o: z80_ops.c
 	$(COMPILE) -DCORETEST -c z80_ops.c -o z80_coretest.o
 
-test: coretest harness.pl
-	@PERL@ harness.pl tests/*.in
+test: coretest
+	./coretest tests/tests.in > tests.actual
+	cmp tests.actual tests/tests.expected

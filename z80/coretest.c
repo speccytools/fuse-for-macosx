@@ -37,6 +37,7 @@
 #include "z80_macros.h"
 
 static const char *progname;		/* argv[0] */
+static const char *testsfile;		/* argv[1] */
 
 static int init_dummies( void );
 
@@ -52,8 +53,8 @@ libspectrum_byte readbyte_internal( libspectrum_word address );
 void writebyte( libspectrum_word address, libspectrum_byte b );
 void writebyte_internal( libspectrum_word address, libspectrum_byte b );
 
-static int read_test_file( const char *filename,
-			   libspectrum_dword *end_tstates );
+static int run_test( FILE *f );
+static int read_test( FILE *f, libspectrum_dword *end_tstates );
 
 static void dump_z80_state( void );
 static void dump_memory_state( void );
@@ -61,37 +62,38 @@ static void dump_memory_state( void );
 int
 main( int argc, char **argv )
 {
-  size_t i;
+  FILE *f;
 
   progname = argv[0];
 
   if( argc < 2 ) {
-    fprintf( stderr, "Usage: %s <testfile>\n", progname );
+    fprintf( stderr, "Usage: %s <testsfile>\n", progname );
     return 1;
   }
+
+  testsfile = argv[1];
 
   if( init_dummies() ) return 1;
 
   /* Initialise the tables used by the Z80 core */
   z80_init();
 
-  /* Get ourselves into a known state */
-  z80_reset( 1 ); tstates = 0;
-  for( i = 0; i < 0x10000; i += 4 ) {
-    memory[ i     ] = 0xde; memory[ i + 1 ] = 0xad;
-    memory[ i + 2 ] = 0xbe; memory[ i + 3 ] = 0xef;
+  f = fopen( testsfile, "r" );
+  if( !f ) {
+    fprintf( stderr, "%s: couldn't open tests file `%s': %s\n", progname,
+	     testsfile, strerror( errno ) );
+    return 1;
   }
 
-  if( read_test_file( argv[1], &event_next_event ) ) return 1;
+  while( run_test( f ) ) {
+    /* Do nothing */
+  }
 
-  /* Grab a copy of the memory for comparison at the end */
-  memcpy( initial_memory, memory, 0x10000 );
-
-  z80_do_opcodes();
-
-  /* And dump our final state */
-  dump_z80_state();
-  dump_memory_state();
+  if( fclose( f ) ) {
+    fprintf( stderr, "%s: couldn't close `%s': %s\n", progname, testsfile,
+	     strerror( errno ) );
+    return 1;
+  }
 
   return 0;
 }
@@ -205,28 +207,60 @@ writeport( libspectrum_word port, libspectrum_byte b )
 }
 
 static int
-read_test_file( const char *filename, libspectrum_dword *end_tstates )
+run_test( FILE *f )
 {
-  FILE *f;
+  size_t i;
 
+  /* Get ourselves into a known state */
+  z80_reset( 1 ); tstates = 0;
+  for( i = 0; i < 0x10000; i += 4 ) {
+    memory[ i     ] = 0xde; memory[ i + 1 ] = 0xad;
+    memory[ i + 2 ] = 0xbe; memory[ i + 3 ] = 0xef;
+  }
+
+  if( read_test( f, &event_next_event ) ) return 0;
+
+  /* Grab a copy of the memory for comparison at the end */
+  memcpy( initial_memory, memory, 0x10000 );
+
+  z80_do_opcodes();
+
+  /* And dump our final state */
+  dump_z80_state();
+  dump_memory_state();
+
+  printf( "\n" );
+
+  return 1;
+}
+
+static int
+read_test( FILE *f, libspectrum_dword *end_tstates )
+{
   unsigned af, bc, de, hl, af_, bc_, de_, hl_, ix, iy, sp, pc;
   unsigned i, r, iff1, iff2, im;
   unsigned end_tstates2;
   unsigned address;
+  char test_name[ 80 ];
 
-  f = fopen( filename, "r" );
-  if( !f ) {
-    fprintf( stderr, "%s: couldn't open `%s': %s\n", progname, filename,
-	     strerror( errno ) );
-    return 1;
-  }
+  do {
+
+    if( !fgets( test_name, sizeof( test_name ), f ) ) {
+
+      if( feof( f ) ) return 1;
+
+      fprintf( stderr, "%s: error reading test description from `%s': %s\n",
+	       progname, testsfile, strerror( errno ) );
+      return 1;
+    }
+
+  } while( test_name[0] == '\n' );
 
   /* FIXME: how should we read/write our data types? */
   if( fscanf( f, "%x %x %x %x %x %x %x %x %x %x %x %x", &af, &bc,
 	      &de, &hl, &af_, &bc_, &de_, &hl_, &ix, &iy, &sp, &pc ) != 12 ) {
     fprintf( stderr, "%s: first registers line in `%s' corrupt\n", progname,
-	     filename );
-    fclose( f );
+	     testsfile );
     return 1;
   }
 
@@ -237,8 +271,7 @@ read_test_file( const char *filename, libspectrum_dword *end_tstates )
   if( fscanf( f, "%x %x %u %u %u %d %d", &i, &r, &iff1, &iff2, &im,
 	      &z80.halted, &end_tstates2 ) != 7 ) {
     fprintf( stderr, "%s: second registers line in `%s' corrupt\n", progname,
-	     filename );
-    fclose( f );
+	     testsfile );
     return 1;
   }
 
@@ -248,40 +281,30 @@ read_test_file( const char *filename, libspectrum_dword *end_tstates )
   while( 1 ) {
 
     if( fscanf( f, "%x", &address ) != 1 ) {
-
-      if( feof( f ) ) break;
-
-      fprintf( stderr, "%s: no address found in `%s'\n", progname, filename );
-      fclose( f );
+      fprintf( stderr, "%s: no address found in `%s'\n", progname, testsfile );
       return 1;
     }
+
+    if( address >= 0x10000 ) break;
 
     while( 1 ) {
 
       unsigned byte;
 
       if( fscanf( f, "%x", &byte ) != 1 ) {
-
-	if( feof( f ) ) break;
-
 	fprintf( stderr, "%s: no data byte found in `%s'\n", progname,
-		 filename );
-	fclose( f );
+		 testsfile );
 	return 1;
       }
     
-      if( byte < 0 || byte > 255 ) break;
+      if( byte >= 0x100 ) break;
 
       memory[ address++ ] = byte;
 
     }
   }
 
-  if( fclose( f ) ) {
-    fprintf( stderr, "%s: couldn't close `%s': %s\n", progname, filename,
-	     strerror( errno ) );
-    return 1;
-  }
+  printf( "%s", test_name );
 
   return 0;
 }

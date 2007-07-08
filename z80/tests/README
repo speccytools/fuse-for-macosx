@@ -1,9 +1,12 @@
 File formats
 ============
 
-.in files
----------
+tests.in
+--------
 
+Each test has the format:
+
+<arbitrary test description>
 AF BC DE HL AF' BC' DE' HL' IX IY SP PC
 I R IFF1 IFF2 <halted> <tstates>
 
@@ -21,10 +24,13 @@ eg
 
 says to put 0x56 at 0x1234, 0x78 at 0x1235 and 0x9a at 0x1236.
 
-.out files
-----------
+Finally, -1 to end the test. Blank lines may follow before the next test.
 
-A list of 'events': each has the format
+tests.expected
+--------------
+
+Each test output starts with the test description, followed by a list
+of 'events': each has the format
 
 <time> <type> <address> <data>
 
