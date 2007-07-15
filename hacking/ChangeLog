@@ -1926,3 +1926,4 @@
 20070707 ui/win32/win32ui.c: fix compilation without lib765 (Stuart).
 20070707 ui/win32/menu_data.{c,h,rc}: add hard reset and +D menu items, and
 	 disable RS232 and Sinclair Network menu items in Win32 UI (Stuart).
+20070715 ui/win32/{win32display.c,win32ui.c} coding style cleanups (Stuart).

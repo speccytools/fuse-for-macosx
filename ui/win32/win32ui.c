@@ -89,93 +89,69 @@ handle_drop( HDROP hDrop )
   DragFinish( hDrop );
 }
 
-LRESULT WINAPI MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+LRESULT WINAPI
+MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-  switch( msg )
-  {
+  switch( msg ) {
     case WM_CREATE:
-    {
       win32statusbar_create( hWnd );
       break;
-    }
 
     case WM_COMMAND:
-    {
       handle_menu( LOWORD( wParam ), hWnd );
       break;
-    }
 
     case WM_DROPFILES:
-    {
-      handle_drop( (HDROP)wParam );
+      handle_drop( ( HDROP )wParam );
       break;
-    }
 
     case WM_CLOSE:
-    {
-      if( win32ui_confirm( "Exit Fuse?" ) )
-      {
+      if( win32ui_confirm( "Exit Fuse?" ) ) {
 	DestroyWindow(hWnd);
       }
       break;
-    }
 
     case WM_KEYDOWN:
-    {
       win32keyboard_keypress( wParam, lParam );
-      break ;
-    }
+      break;
 
     case WM_KEYUP:
-    {
       win32keyboard_keyrelease( wParam, lParam );
-      break ;
-    }
+      break;
 
     case WM_PAINT:
-    {
-      if ( display_ui_initialised )
-      {
+      if( display_ui_initialised ) {
 	PAINTSTRUCT ps;
 	BeginPaint( hWnd, &ps );
 	blit();
 	EndPaint( hWnd, &ps );
       }
-      break ;
-    }
+      break;
 
     case WM_SIZE:
-    {
       SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
       break;
-    }
 
     case WM_DESTROY:
-    {
       fuse_exiting = 1;
       PostQuitMessage( 0 );
       break;
-    }
 
     default:
-    {
-      return( DefWindowProc( hWnd, msg, wParam, lParam ));
-    }
+      return( DefWindowProc( hWnd, msg, wParam, lParam ) );
   }
 
   return 0;
 }
 
 /* this is where windows program begins */
-int WINAPI WinMain (HINSTANCE hInstance,
-		    HINSTANCE hPrevInstance,
-		    LPSTR lpCmdLine,
-		    int nCmdShow)
+int WINAPI
+WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
+	 int nCmdShow )
 {
   WNDCLASS wc;
 
-  if( !hPrevInstance )
-  {
+  if( !hPrevInstance ) {
     wc.lpszClassName = "Fuse";
     wc.lpfnWndProc = MainWndProc;
     wc.style = CS_OWNDC;
@@ -187,7 +163,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
 
-    if ( !RegisterClass( &wc ) )
+    if( !RegisterClass( &wc ) )
       return 0;
   }
 
@@ -226,14 +202,11 @@ ui_event( void )
 {
   MSG msg;
   /* Process messages */
-  while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
-  {
+  while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
 /* TODO: double check this && */
     if( !IsDialogMessage( fuse_hPFWnd, &msg )
-     && !IsDialogMessage( fuse_hDBGWnd, &msg ) )
-    {
-      if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) )
-      {
+     && !IsDialogMessage( fuse_hDBGWnd, &msg ) ) {
+      if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
 	if( msg.message == WM_QUIT ) break;
 	/* finish - set exit flag somewhere */
 	TranslateMessage( &msg );
@@ -251,13 +224,14 @@ ui_end( void )
 {
   int error;
 
-  error = win32display_end(); if ( error ) return error;
+  error = win32display_end(); if( error ) return error;
   return 0;
 }
 
-void win32_verror( int is_error )
+void
+win32_verror( int is_error )
 {
-  if ( !is_error ) return;
+  if( !is_error ) return;
 
   DWORD last_error;
   static LPVOID err_msg;
@@ -604,7 +578,7 @@ menu_file_aylogging_record( int action )
   fuse_emulation_pause();
 
   psgfile = menu_get_save_filename( "Fuse - Start AY log" );
-  if ( !psgfile ) { fuse_emulation_unpause(); return; }
+  if( !psgfile ) { fuse_emulation_unpause(); return; }
 
   psg_start_recording( psgfile );
 
@@ -714,8 +688,7 @@ void menu_file_savebinarydata( int action ) { STUB; }
 void
 menu_file_exit( int action )
 {
-  if( win32ui_confirm( "Exit Fuse?" ) )
-  {
+  if( win32ui_confirm( "Exit Fuse?" ) ) {
     DestroyWindow(fuse_hWnd);
   }
 }
@@ -730,8 +703,7 @@ void menu_machine_pause( int action ) { STUB; }
 void
 menu_machine_reset( int action )
 {
-  if( win32ui_confirm( "Reset?" ) )
-  {
+  if( win32ui_confirm( "Reset?" ) ) {
     if( machine_reset( 0 ) ) {
       ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 

@@ -421,10 +421,8 @@ win32display_area(int x, int y, int width, int height)
   long ofs;
   char *pixdata = win32_pixdata;
 
-  for( disp_y = y; disp_y < y + height; disp_y++)
-  {
-    for( disp_x = x; disp_x < x + width; disp_x++)
-    {
+  for( disp_y = y; disp_y < y + height; disp_y++) {
+    for( disp_x = x; disp_x < x + width; disp_x++) {
       ofs = ( 4 * disp_x ) + ( disp_y * scaled_pitch );
 
       pixdata[ ofs + 0 ] = scaled_image[ ofs + 2 ]; /* blue */
