@@ -1928,3 +1928,5 @@
 	 disable RS232 and Sinclair Network menu items in Win32 UI (Stuart).
 20070715 ui/win32/{win32display.c,win32ui.c}: coding style cleanups (Stuart).
 20070715 ui/win32/{error.c,statusbar.c,win32display.c}: more cleanups (Stuart).
+20070715 ui/win32/debugger.c: fix single stepping in the Win32 UI's debugger
+	 (Stuart).

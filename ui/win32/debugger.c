@@ -66,7 +66,7 @@ BOOL CALLBACK DebuggerProc( HWND hWnd, UINT msg,
 	  win32_debugger_done_continue();
 	  return TRUE;
 	case IDC_BTN_STEP:
-	  win32_debugger_done_continue();
+	  win32_debugger_done_step();
 	  return TRUE;
       }
       return FALSE;
