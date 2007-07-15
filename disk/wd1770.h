@@ -66,18 +66,18 @@ typedef struct wd1770_fdc {
   int direction;                /* 0 = spindlewards, 1 = rimwards */
 
   enum wd1770_state {
-    wd1770_state_none = 0,
-    wd1770_state_seek,
-    wd1770_state_read,
-    wd1770_state_write,
-    wd1770_state_readtrack,
-    wd1770_state_writetrack,
-    wd1770_state_readid,
+    WD1770_STATE_NONE = 0,
+    WD1770_STATE_SEEK,
+    WD1770_STATE_READ,
+    WD1770_STATE_WRITE,
+    WD1770_STATE_READTRACK,
+    WD1770_STATE_WRITETRACK,
+    WD1770_STATE_READID,
   } state;
 
   enum wd1770_status_type {
-    wd1770_status_type1,
-    wd1770_status_type2,
+    WD1770_STATUS_TYPE1,
+    WD1770_STATUS_TYPE2,
   } status_type;
 
   /* state during transfer */

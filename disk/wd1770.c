@@ -151,7 +151,7 @@ wd1770_sr_read( wd1770_fdc *f )
 
   f->status_register &= ~( WD1770_SR_MOTORON | WD1770_SR_SPINUP |
 			   WD1770_SR_WRPROT | WD1770_SR_CRCERR );
-  if( f->status_type == wd1770_status_type1 ) {
+  if( f->status_type == WD1770_STATUS_TYPE1 ) {
     f->status_register &= ~WD1770_SR_IDX_DRQ;
     if( !d->disk || d->index_pulse )
       f->status_register |= WD1770_SR_IDX_DRQ;
@@ -172,8 +172,8 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
     f->status_register &= ~WD1770_SR_WRPROT;
     f->status_register &= ~WD1770_SR_CRCERR;
     f->status_register &= ~WD1770_SR_IDX_DRQ;
-    f->state = wd1770_state_none;
-    f->status_type = wd1770_status_type1;
+    f->state = WD1770_STATE_NONE;
+    f->status_type = WD1770_STATUS_TYPE1;
     if( d->track == 0 )
       f->status_register |= WD1770_SR_LOST;
     else
@@ -227,7 +227,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
       wd1770_seek( f, d->track - 1, update, verify );
       break;
     }
-    f->status_type = wd1770_status_type1;
+    f->status_type = WD1770_STATUS_TYPE1;
     wd1770_set_cmdint( f );
     wd1770_reset_datarq( f );
   } else if( !( b & 0x40 ) ) {                  /* Type II */
@@ -235,11 +235,11 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
 /*  int delay       = b & 0x04 ? 1 : 0; */
 
     if( !( b & 0x20 ) ) {                               /* Read Sector */
-      f->state = wd1770_state_read;
+      f->state = WD1770_STATE_READ;
     } else {                                            /* Write Sector */
 /*    int dammark = b & 0x01; */
 
-      f->state = wd1770_state_write;
+      f->state = WD1770_STATE_WRITE;
     }
     if( f->sector_register < d->geom.dg_secbase ||
 	f->sector_register >= d->geom.dg_secbase + d->geom.dg_sectors ||
@@ -254,7 +254,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
       f->status_register |= WD1770_SR_BUSY;
       f->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
 			       WD1770_SR_CRCERR | WD1770_SR_LOST );
-      f->status_type = wd1770_status_type2;
+      f->status_type = WD1770_STATUS_TYPE2;
       f->data_track = d->track;
       f->data_sector = f->sector_register;
       f->data_side = d->side;
@@ -275,7 +275,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
       fprintf( stderr, "read address not yet implemented\n" );
       break;
     }
-    f->status_type = wd1770_status_type2;
+    f->status_type = WD1770_STATUS_TYPE2;
   }
 }
 
@@ -308,7 +308,7 @@ wd1770_dr_read( wd1770_fdc *f )
 {
   wd1770_drive *d = f->current_drive;
 
-  if( f->state == wd1770_state_read ) {
+  if( f->state == WD1770_STATE_READ ) {
     if( !d->disk ||
 	f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
 	f->data_track >= d->geom.dg_cylinders ||
@@ -325,8 +325,8 @@ wd1770_dr_read( wd1770_fdc *f )
       f->status_register |= WD1770_SR_RNF;
       statusbar_update(0);
       f->status_register &= ~WD1770_SR_BUSY;
-      f->status_type = wd1770_status_type2;
-      f->state = wd1770_state_none;
+      f->status_type = WD1770_STATUS_TYPE2;
+      f->state = WD1770_STATE_NONE;
       wd1770_set_cmdint( f );
       wd1770_reset_datarq( f );
     } else if( f->data_offset < d->geom.dg_secsize ) {
@@ -341,8 +341,8 @@ wd1770_dr_read( wd1770_fdc *f )
 	    f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
 	  statusbar_update(0);
 	  f->status_register &= ~WD1770_SR_BUSY;
-	  f->status_type = wd1770_status_type2;
-	  f->state = wd1770_state_none;
+	  f->status_type = WD1770_STATUS_TYPE2;
+	  f->state = WD1770_STATE_NONE;
 	  wd1770_set_cmdint( f );
 	  wd1770_reset_datarq( f );
 	}
@@ -358,7 +358,7 @@ wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b )
   wd1770_drive *d = f->current_drive;
 
   f->data_register = b;
-  if( f->state == wd1770_state_write ) {
+  if( f->state == WD1770_STATE_WRITE ) {
     if( !d->disk || f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
 	f->data_track >= d->geom.dg_cylinders ||
 	f->data_side >= d->geom.dg_heads ) {
@@ -381,8 +381,8 @@ wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b )
 	  f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
 	statusbar_update(0);
 	f->status_register &= ~WD1770_SR_BUSY;
-	f->status_type = wd1770_status_type2;
-	f->state = wd1770_state_none;
+	f->status_type = WD1770_STATUS_TYPE2;
+	f->state = WD1770_STATE_NONE;
 	wd1770_set_cmdint( f );
 	wd1770_reset_datarq( f );
       }

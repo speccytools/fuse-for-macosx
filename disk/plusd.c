@@ -204,8 +204,8 @@ plusd_reset( int hard_reset )
   f->spin_cycles = 0;
   f->direction = 0;
 
-  f->state = wd1770_state_none;
-  f->status_type = wd1770_status_type1;
+  f->state = WD1770_STATE_NONE;
+  f->status_type = WD1770_STATUS_TYPE1;
 
   f->status_register = 0;
   f->track_register = 0;
