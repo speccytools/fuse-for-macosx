@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## Copyright (c) 2007 Stuart Brady
 
-## $Id: Makefile.am 2889 2007-05-26 17:45:08Z zubzero $
+## $Id$
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by

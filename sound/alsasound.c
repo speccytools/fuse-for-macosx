@@ -1,7 +1,7 @@
 /* alsasound.c: ALSA (Linux) sound I/O
    Copyright (c) 2006 Gergely Szasz
 
-   $Id: $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
