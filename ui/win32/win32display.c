@@ -95,12 +95,12 @@ libspectrum_dword win32display_colours[16];
 libspectrum_dword bw_colours[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
-int win32display_current_size=1;
+static int win32display_current_size=1;
 
-int init_colours( void );
-int register_scalers( void );
-int register_scalers_noresize( void );
-void win32display_area(int x, int y, int width, int height);
+static int init_colours( void );
+static int register_scalers( void );
+static int register_scalers_noresize( void );
+static void win32display_area(int x, int y, int width, int height);
 
 void
 blit( void )
@@ -176,7 +176,7 @@ win32display_init( void )
   return 0;
 }
 
-int
+static int
 init_colours( void )
 {
   size_t i;
@@ -259,7 +259,7 @@ uidisplay_init( int width, int height )
   return 0;
 }
 
-int
+static int
 register_scalers_noresize( void )
 {
   scaler_register_clear();
@@ -414,15 +414,15 @@ uidisplay_area( int x, int y, int w, int h )
   win32display_area( scaled_x, scaled_y, w, h );
 }
 
-void
+static void
 win32display_area(int x, int y, int width, int height)
 {
   int disp_x,disp_y;
   long ofs;
   char *pixdata = win32_pixdata;
 
-  for( disp_y = y; disp_y < y + height; disp_y++) {
-    for( disp_x = x; disp_x < x + width; disp_x++) {
+  for( disp_y = y; disp_y < y + height; disp_y++ ) {
+    for( disp_x = x; disp_x < x + width; disp_x++ ) {
       ofs = ( 4 * disp_x ) + ( disp_y * scaled_pitch );
 
       pixdata[ ofs + 0 ] = scaled_image[ ofs + 2 ]; /* blue */

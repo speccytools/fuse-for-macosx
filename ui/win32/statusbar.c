@@ -81,6 +81,7 @@ win32statusbar_set_visibility( int visible )
 int
 ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 {
+  return 0;
 }
 
 int
