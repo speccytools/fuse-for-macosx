@@ -14,7 +14,7 @@ TODO:
 -----------------------------------------------------------
  */
 
-#include "config.h"
+#include <config.h>
 
 #include "lowlevel.h"
 

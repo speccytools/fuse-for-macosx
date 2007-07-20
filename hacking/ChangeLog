@@ -1931,3 +1931,6 @@
 20070715 ui/win32/debugger.c: fix single stepping in the Win32 UI's debugger
 	 (Stuart).
 20070715 disk/{plusd.c,wd1770.[ch]}: coding style cleanups (Stuart).
+20070720 sound/sfifo.c,ui/{ggi/{ggi_internals.h,ggidisplay.c,ggikeyboard.c,
+	 ggiui.c},gtk/gtkmouse.c,win32/{win32display.c,win32display.h}}: use
+	 '#include <config.h>' instead of '#include "config.h"' (Stuart).

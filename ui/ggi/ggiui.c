@@ -25,7 +25,7 @@
 
 */
 
-#include "config.h"
+#include <config.h>
 
 #ifdef UI_GGI
 

@@ -23,7 +23,7 @@
 
 */
 
-#include "config.h"
+#include <config.h>
 
 #ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
 
