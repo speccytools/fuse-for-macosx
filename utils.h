@@ -28,20 +28,10 @@
 
 #include <libspectrum.h>
 
-/* The ways we may have allocated memory for a file */
-typedef enum utils_file_open_mode {
-
-  UTILS_FILE_OPEN_MMAP,
-  UTILS_FILE_OPEN_MALLOC,
-
-} utils_file_open_mode;
-
 typedef struct utils_file {
 
   unsigned char *buffer;
   size_t length;
-
-  utils_file_open_mode mode;
 
 } utils_file;
 

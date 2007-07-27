@@ -393,30 +393,6 @@ utils_read_fd( int fd, const char *filename, utils_file *file )
 
   file->length = file_info.st_size;
 
-#ifdef HAVE_MMAP
-
-  file->buffer = mmap( 0, file->length, PROT_READ, MAP_SHARED, fd, 0 );
-
-  if( file->buffer != (void*)-1 ) {
-
-    file->mode = UTILS_FILE_OPEN_MMAP;
-
-    if( close(fd) ) {
-      ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
-		strerror( errno ) );
-      munmap( file->buffer, file->length );
-      return 1;
-    }
-
-    return 0;
-  }
-
-#endif			/* #ifdef HAVE_MMAP */
-
-  /* Either mmap() isn't available, or it failed for some reason so try
-     using normal IO */
-  file->mode = UTILS_FILE_OPEN_MALLOC;
-
   file->buffer = malloc( file->length );
   if( !file->buffer ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d\n", __FILE__, __LINE__ );
@@ -444,31 +420,7 @@ utils_read_fd( int fd, const char *filename, utils_file *file )
 int
 utils_close_file( utils_file *file )
 {
-  switch( file->mode ) {
-
-  case UTILS_FILE_OPEN_MMAP:
-#ifdef HAVE_MMAP
-    if( file->length ) {
-      if( munmap( file->buffer, file->length ) ) {
-	ui_error( UI_ERROR_ERROR, "Couldn't munmap: %s\n", strerror( errno ) );
-	return 1;
-      }
-    }
-    break;
-#else				/* #ifdef HAVE_MMAP */
-    ui_error( UI_ERROR_ERROR, "utils_close_file: file->mode == UTILS_FILE_OPEN_MMAP, but mmap not available?!" );
-    fuse_abort();
-#endif
-
-  case UTILS_FILE_OPEN_MALLOC:
-    free( file->buffer );
-    break;
-
-  default:
-    ui_error( UI_ERROR_ERROR, "Unknown file open mode %d\n", file->mode );
-    fuse_abort();
-
-  }
+  free( file->buffer );
 
   return 0;
 }

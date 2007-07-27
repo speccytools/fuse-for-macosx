@@ -1934,3 +1934,5 @@
 20070720 sound/sfifo.c,ui/{ggi/{ggi_internals.h,ggidisplay.c,ggikeyboard.c,
 	 ggiui.c},gtk/gtkmouse.c,win32/{win32display.c,win32display.h}}: use
 	 '#include <config.h>' instead of '#include "config.h"' (Stuart).
+20070727 configure.in,utils.[ch]: remove use of mmap(): added complexity for
+	 no real benefit.
