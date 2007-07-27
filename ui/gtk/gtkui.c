@@ -959,7 +959,8 @@ confirm_joystick_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 }
 
 ui_confirm_joystick_t
-ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
+ui_confirm_joystick( libspectrum_joystick libspectrum_type,
+		     int inputs GCC_UNUSED )
 {
   gtkui_select_info dialog;
   char title[ 80 ];
@@ -1043,8 +1044,8 @@ gtkui_set_font( GtkWidget *widget, gtkui_font font )
 }  
 
 static void
-key_scroll_event( GtkCList *clist, GtkScrollType scroll, gfloat position,
-		  gpointer user_data )
+key_scroll_event( GtkCList *clist GCC_UNUSED, GtkScrollType scroll,
+		  gfloat position, gpointer user_data )
 {
   GtkAdjustment *adjustment = user_data;
   long int oldbase = adjustment->value;
@@ -1081,7 +1082,8 @@ key_scroll_event( GtkCList *clist, GtkScrollType scroll, gfloat position,
 }
 
 static gboolean
-wheel_scroll_event( GtkWidget *clist, GdkEvent *event, gpointer user_data )
+wheel_scroll_event( GtkWidget *clist GCC_UNUSED, GdkEvent *event,
+		    gpointer user_data )
 {
   GtkAdjustment *adjustment = user_data;
   long int oldbase = adjustment->value;

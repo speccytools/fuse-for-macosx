@@ -152,7 +152,7 @@ memory_pool_allocate( size_t length )
 }
 
 static void
-free_memory( gpointer data, gpointer user_data )
+free_memory( gpointer data, gpointer user_data GCC_UNUSED )
 {
   free( data );
 }

@@ -103,7 +103,7 @@ if2_eject( void )
 }
 
 static void
-if2_reset( int hard_reset )
+if2_reset( int hard_reset GCC_UNUSED )
 {
   if2_active = 0;
 

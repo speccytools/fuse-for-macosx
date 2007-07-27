@@ -182,7 +182,7 @@ joystick_press( int which, joystick_button button, int press )
 /* Read functions for specific interfaces */
 
 libspectrum_byte
-joystick_kempston_read( libspectrum_word port, int *attached )
+joystick_kempston_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   if( !periph_kempston_active ) return 0xff;
 
@@ -192,7 +192,7 @@ joystick_kempston_read( libspectrum_word port, int *attached )
 }
 
 libspectrum_byte
-joystick_timex_read( libspectrum_word port, libspectrum_byte which )
+joystick_timex_read( libspectrum_word port GCC_UNUSED, libspectrum_byte which )
 {
   return which ? timex2_value : timex1_value;
 }

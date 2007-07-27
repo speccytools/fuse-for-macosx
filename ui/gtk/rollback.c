@@ -37,7 +37,7 @@ static int dialog_created = 0;
 static int current_block;
 
 static void
-select_row( GtkCList *clist, gint row, gint column GCC_UNUSED,
+select_row( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
 	    GdkEventButton *event, gpointer data GCC_UNUSED )
 {
   /* Ignore events which aren't double-clicks or select-via-keyboard */

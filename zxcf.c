@@ -121,7 +121,7 @@ zxcf_end( void )
 }
 
 static void
-zxcf_reset( int hard_reset )
+zxcf_reset( int hard_reset GCC_UNUSED )
 {
   if( !settings_current.zxcf_active ) return;
 

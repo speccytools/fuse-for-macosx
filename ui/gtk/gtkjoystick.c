@@ -123,8 +123,9 @@ static GtkItemFactoryEntry key_menu[] = {
 static const guint key_menu_count = sizeof( key_menu ) / sizeof( key_menu[0] );
 
 void
-menu_options_joysticks_select( gpointer callback_data, guint callback_action,
-			       GtkWidget *widget )
+menu_options_joysticks_select( gpointer callback_data GCC_UNUSED,
+			       guint callback_action,
+			       GtkWidget *widget GCC_UNUSED )
 {
   GtkWidget *dialog, *hbox, *vbox;
   struct joystick_info info;
@@ -303,7 +304,7 @@ set_key_text( GtkWidget *label, keyboard_key_name key )
 
 
 static void
-key_callback( gpointer data, guint action, GtkWidget *widget )
+key_callback( gpointer data, guint action, GtkWidget *widget GCC_UNUSED )
 {
   struct button_info *info = data;
 
@@ -312,7 +313,8 @@ key_callback( gpointer data, guint action, GtkWidget *widget )
 }
 
 static void
-nothing_callback( gpointer data, guint action, GtkWidget *widget )
+nothing_callback( gpointer data, guint action GCC_UNUSED,
+		  GtkWidget *widget GCC_UNUSED )
 {
   key_callback( data, KEYBOARD_NONE, NULL );
 }

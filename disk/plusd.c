@@ -110,7 +110,7 @@ plusd_memory_map( void )
 }
 
 void
-plusd_set_cmdint( wd1770_fdc *f )
+plusd_set_cmdint( wd1770_fdc *f GCC_UNUSED )
 {
   z80_interrupt();
 }
@@ -314,7 +314,7 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 libspectrum_byte
-plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached )
+plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 {
   /* should we set *attached = 1? */
 
@@ -323,7 +323,7 @@ plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached )
 }
 
 void
-plusd_mem_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
+plusd_mem_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
 {
   plusd_unpage();
 }
@@ -546,7 +546,7 @@ plusd_disk_write( plusd_drive_number which, const char *filename )
 }
 
 int
-plusd_event_cmd_done( libspectrum_dword last_tstates )
+plusd_event_cmd_done( libspectrum_dword last_tstates GCC_UNUSED )
 {
   plusd_fdc.status_register &= ~WD1770_SR_BUSY;
   return 0;
@@ -578,13 +578,13 @@ plusd_event_index( libspectrum_dword last_tstates )
 }
 
 static void
-plusd_from_snapshot( libspectrum_snap *snap )
+plusd_from_snapshot( libspectrum_snap *snap GCC_UNUSED )
 {
   /* XXX */
 }
 
 static void
-plusd_to_snapshot( libspectrum_snap *snap )
+plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
 {
   /* XXX */
 }

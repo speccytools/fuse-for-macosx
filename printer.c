@@ -525,7 +525,7 @@ else
 }
 
 
-void printer_zxp_reset(int hard_reset)
+void printer_zxp_reset(int hard_reset GCC_UNUSED)
 {
 /* stop printer - XXX not sure if the real one does this on reset */
 printer_zxp_write(0xfb,4);

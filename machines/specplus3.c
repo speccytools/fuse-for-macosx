@@ -122,7 +122,7 @@ specplus3_unattached_port( void )
 }
 
 int
-specplus3_port_contended( libspectrum_word port )
+specplus3_port_contended( libspectrum_word port GCC_UNUSED )
 {
   /* No contended ports */
   return 0;
@@ -173,7 +173,7 @@ specplus3_contend_delay( libspectrum_dword time )
 }
 
 libspectrum_byte
-specplus3_contend_delay_no_mreq( libspectrum_dword time )
+specplus3_contend_delay_no_mreq( libspectrum_dword time GCC_UNUSED )
 {
   /* No contention if MREQ not active on the +2A/+3 */
   return 0;

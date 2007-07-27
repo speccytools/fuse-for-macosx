@@ -141,6 +141,8 @@ static module_info_t if1_module_info = {
 
   if1_reset,
   if1_memory_map,
+  NULL,
+  NULL,
 
 };
 
@@ -247,7 +249,7 @@ if1_update_menu( void )
 }
 
 static void
-if1_reset( int hard_reset )
+if1_reset( int hard_reset GCC_UNUSED )
 {
   if1_active = 0;
   if1_available = 0;

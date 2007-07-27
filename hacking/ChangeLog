@@ -1936,3 +1936,8 @@
 	 '#include <config.h>' instead of '#include "config.h"' (Stuart).
 20070727 configure.in,utils.[ch]: remove use of mmap(): added complexity for
 	 no real benefit.
+20070727 disk/plusd.c,divide.c,if1.c,if2.c,joystick.c,kempmouse.c,keyboard.c,
+	 machines/specplus3.c,memory.c,module.c,periph.c,printer.c,scld.c,
+	 simpleide.c,tape.c,ui/gtk/{browse.c,debugger.c,gtkjoystick.c,
+	 gtkmouse.c,gtkui.c,pokefinder.c,rollback.c},z80/z80.c,zxatasp.c,
+	 zxcf.c: some -Wextra tidyup (not finished yet).

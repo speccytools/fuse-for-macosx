@@ -354,7 +354,7 @@ create_menu_bar( GtkBox *parent, GtkAccelGroup *accel_group )
 }
 
 static void
-toggle_display( gpointer callback_data, guint callback_action,
+toggle_display( gpointer callback_data GCC_UNUSED, guint callback_action,
 		GtkWidget *widget )
 {
   GtkWidget *pane;
@@ -494,8 +494,8 @@ create_stack_display( GtkBox *parent, gtkui_font font )
 }
 
 static void
-stack_click( GtkCList *clist, gint row, gint column,
-	     GdkEventButton *event, gpointer user_data )
+stack_click( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
+	     GdkEventButton *event, gpointer user_data GCC_UNUSED )
 {
   libspectrum_word address, destination;
   int error;
@@ -536,8 +536,8 @@ create_events( GtkBox *parent )
 }
 
 static void
-events_click( GtkCList *clist, gint row, gint column,
-	      GdkEventButton *event, gpointer user_data )
+events_click( GtkCList *clist, gint row, gint column GCC_UNUSED,
+	      GdkEventButton *event, gpointer user_data GCC_UNUSED )
 {
   int got_text, error;
   gchar *buffer;
@@ -887,7 +887,7 @@ update_events( void )
 }
 
 static void
-add_event( gpointer data, gpointer user_data )
+add_event( gpointer data, gpointer user_data GCC_UNUSED )
 {
   event_t *ptr = data;
 

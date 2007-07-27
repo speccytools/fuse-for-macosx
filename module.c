@@ -31,6 +31,7 @@
 
 #include <libspectrum.h>
 
+#include "compat.h"
 #include "module.h"
 
 static GSList *registered_modules = NULL;
@@ -59,7 +60,7 @@ module_reset( int hard_reset )
 }
 
 static void
-romcs( gpointer data, gpointer user_data )
+romcs( gpointer data, gpointer user_data GCC_UNUSED )
 {
   const module_info_t *module = data;
 

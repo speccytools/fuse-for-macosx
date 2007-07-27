@@ -115,7 +115,7 @@ scld_dec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 }
 
 static void
-scld_reset(int hard_reset)
+scld_reset( int hard_reset GCC_UNUSED )
 {
   scld_last_dec.byte = 0;
 }

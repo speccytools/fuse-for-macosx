@@ -132,8 +132,8 @@ create_dialog( void )
 }
 
 int
-ui_tape_browser_update( ui_tape_browser_update_type change,
-                        libspectrum_tape_block *block )
+ui_tape_browser_update( ui_tape_browser_update_type change GCC_UNUSED,
+                        libspectrum_tape_block *block GCC_UNUSED )
 {
   int error, current_block;
 
@@ -207,7 +207,7 @@ select_row( GtkCList *clist, gint row, gint column GCC_UNUSED,
 
 /* Called if the OK button is clicked */
 static void
-browse_done( GtkWidget *widget GCC_UNUSED, gpointer data )
+browse_done( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtk_widget_hide_all( dialog );
 }

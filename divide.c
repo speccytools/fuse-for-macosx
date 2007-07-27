@@ -82,6 +82,8 @@ static module_info_t divide_module_info = {
 
   divide_reset,
   divide_memory_map,
+  NULL,
+  NULL,
 
 };
 

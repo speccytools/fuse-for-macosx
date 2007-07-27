@@ -55,6 +55,8 @@ static module_info_t simpleide_module_info = {
 
   simpleide_reset,
   NULL,
+  NULL,
+  NULL,
 
 };
 
@@ -97,7 +99,7 @@ simpleide_end( void )
 }
 
 void
-simpleide_reset( int hard_reset )
+simpleide_reset( int hard_reset GCC_UNUSED )
 {
   libspectrum_ide_reset( simpleide_idechn );
 }

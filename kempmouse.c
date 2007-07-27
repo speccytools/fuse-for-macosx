@@ -39,7 +39,7 @@ static struct {
 
 #define READ(name,item) \
   static libspectrum_byte \
-  read_##name( libspectrum_word port, int *attached ) \
+  read_##name( libspectrum_word port GCC_UNUSED, int *attached ) \
   { \
     *attached = 1; \
     return settings_current.kempston_mouse ? kempmouse.item : 0xff; \

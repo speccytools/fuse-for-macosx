@@ -192,7 +192,7 @@ zxatasp_end( void )
 }
 
 static void
-zxatasp_reset( int hard_reset )
+zxatasp_reset( int hard_reset GCC_UNUSED )
 {
   if( !settings_current.zxatasp_active ) return;
   
@@ -377,7 +377,7 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 }
 
 libspectrum_byte
-zxatasp_control_read( libspectrum_word port, int *attached )
+zxatasp_control_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   if( !settings_current.zxatasp_active ) return 0xff;
   

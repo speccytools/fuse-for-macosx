@@ -140,7 +140,7 @@ periph_clear( void )
 }
 
 static void
-free_peripheral( gpointer data, gpointer user_data )
+free_peripheral( gpointer data, gpointer user_data GCC_UNUSED )
 {
   periph_t *private = data;
 

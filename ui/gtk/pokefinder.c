@@ -149,7 +149,7 @@ gtkui_pokefinder_incremented( GtkWidget *widget,
 }
 
 static void
-gtkui_pokefinder_decremented( GtkWidget *widget,
+gtkui_pokefinder_decremented( GtkWidget *widget GCC_UNUSED,
 			      gpointer user_data GCC_UNUSED )
 {
   pokefinder_decremented();
@@ -228,8 +228,8 @@ update_pokefinder( void )
 }  
 
 static void
-possible_click( GtkCList *clist, gint row, gint column,
-		GdkEventButton *event, gpointer user_data )
+possible_click( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
+		GdkEventButton *event, gpointer user_data GCC_UNUSED )
 {
   int error;
 
