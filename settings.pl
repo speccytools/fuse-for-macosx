@@ -117,6 +117,8 @@ CODE
     }
 
 print hashline( __LINE__ ), << 'CODE';
+  /* show_help */ 0,
+  /* show_version */ 0,
 };
 
 #ifdef HAVE_LIB_XML2

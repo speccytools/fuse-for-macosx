@@ -262,7 +262,7 @@ sub _dump_gtk ($$$) {
 	    print 'NULL';
 	}
 
-	print ", ", $item->{action} || 0, ", \"<$item->{type}>\" },\n";
+	print ", ", $item->{action} || 0, ", \"<$item->{type}>\", NULL },\n";
 
 	_dump_gtk( $item, "$gtk_path/$name", $new_cpath ) if $item->{submenu};
     }

@@ -61,8 +61,8 @@ gtkmouse_reset_pointer( void )
 }
 
 gboolean
-gtkmouse_position( GtkWidget *widget, GdkEventMotion *event GCC_UNUSED,
-		   gpointer data GCC_UNUSED )
+gtkmouse_position( GtkWidget *widget GCC_UNUSED,
+		   GdkEventMotion *event GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   if( !ui_mouse_grabbed ) return TRUE;
 
@@ -91,7 +91,7 @@ ui_mouse_grab( int startup )
 
   if( !nullpointer ) {
     const char bits = 0;
-    GdkColor colour = { 0, 0, 0 };
+    GdkColor colour = { 0, 0, 0, 0 };
     GdkPixmap *image = gdk_bitmap_create_from_data( NULL, &bits, 1, 1 );
     nullpointer = gdk_cursor_new_from_pixmap( image, image, &colour, &colour,
 					      1, 1 );

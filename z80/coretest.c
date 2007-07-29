@@ -345,7 +345,7 @@ fuse_abort( void )
 }
 
 int
-ui_error( ui_error_level severity, const char *format, ... )
+ui_error( ui_error_level severity GCC_UNUSED, const char *format, ... )
 {
   va_list ap;
 
@@ -400,14 +400,14 @@ libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 int profile_active = 0;
 
 void
-profile_map( libspectrum_word pc )
+profile_map( libspectrum_word pc GCC_UNUSED )
 {
   /* Should never be called */
   abort();
 }
 
 int
-debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
+debugger_check( debugger_breakpoint_type type GCC_UNUSED, libspectrum_dword value GCC_UNUSED )
 {
   /* Should never be called */
   abort();
@@ -421,7 +421,7 @@ debugger_trap( void )
 }
 
 int
-slt_trap( libspectrum_word address, libspectrum_byte level )
+slt_trap( libspectrum_word address GCC_UNUSED, libspectrum_byte level GCC_UNUSED )
 {
   return 0;
 }
@@ -467,26 +467,26 @@ if1_unpage( void )
 }
 
 void
-divide_set_automap( int state )
+divide_set_automap( int state GCC_UNUSED )
 {
   abort();
 }
 
 void
-writeport_internal( libspectrum_word port, libspectrum_byte b )
+writeport_internal( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
 {
   abort();
 }
 
 int
-event_add( libspectrum_dword event_time, int type )
+event_add( libspectrum_dword event_time GCC_UNUSED, int type GCC_UNUSED )
 {
   /* Do nothing */
   return 0;
 }
 
 int
-module_register( module_info_t *module )
+module_register( module_info_t *module GCC_UNUSED )
 {
   return 0;
 }

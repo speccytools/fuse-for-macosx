@@ -119,11 +119,10 @@ create_dialog( void )
 
   {
     static gtkstock_button btn[] = {
-      { "Incremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_incremented ) },
-      { "Decremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_decremented ) },
-      { "!Search", GTK_SIGNAL_FUNC( gtkui_pokefinder_search ), NULL, NULL,
-        GDK_Return },
-      { "Reset", GTK_SIGNAL_FUNC( gtkui_pokefinder_reset ) }
+      { "Incremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_incremented ), NULL, NULL, 0, 0, 0, 0 },
+      { "Decremented", GTK_SIGNAL_FUNC( gtkui_pokefinder_decremented ), NULL, NULL, 0, 0, 0, 0 },
+      { "!Search", GTK_SIGNAL_FUNC( gtkui_pokefinder_search ), NULL, NULL, GDK_Return, 0, 0, 0 },
+      { "Reset", GTK_SIGNAL_FUNC( gtkui_pokefinder_reset ), NULL, NULL, 0, 0, 0, 0 }
     };
     btn[2].actiondata = GTK_OBJECT( entry );
     accel_group = gtkstock_create_buttons( dialog, NULL, btn,
@@ -141,7 +140,7 @@ create_dialog( void )
 }
 
 static void
-gtkui_pokefinder_incremented( GtkWidget *widget,
+gtkui_pokefinder_incremented( GtkWidget *widget GCC_UNUSED,
 			      gpointer user_data GCC_UNUSED )
 {
   pokefinder_incremented();

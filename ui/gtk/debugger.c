@@ -133,13 +133,13 @@ static GtkItemFactory *menu_factory;
 /* The debugger's menu bar */
 static GtkItemFactoryEntry menu_data[] = {
 
-  { "/_View", NULL, NULL, 0, "<Branch>" },
-  { "/View/_Registers", NULL, toggle_display, DEBUGGER_PANE_REGISTERS, "<ToggleItem>" },
-  { "/View/_Memory Map", NULL, toggle_display, DEBUGGER_PANE_MEMORYMAP, "<ToggleItem>" },
-  { "/View/_Breakpoints", NULL, toggle_display, DEBUGGER_PANE_BREAKPOINTS, "<ToggleItem>" },
-  { "/View/_Disassembly", NULL, toggle_display, DEBUGGER_PANE_DISASSEMBLY, "<ToggleItem>" },
-  { "/View/_Stack", NULL, toggle_display, DEBUGGER_PANE_STACK, "<ToggleItem>" },
-  { "/View/_Events", NULL, toggle_display, DEBUGGER_PANE_EVENTS, "<ToggleItem>" },
+  { "/_View", NULL, NULL, 0, "<Branch>", NULL },
+  { "/View/_Registers", NULL, toggle_display, DEBUGGER_PANE_REGISTERS, "<ToggleItem>", NULL },
+  { "/View/_Memory Map", NULL, toggle_display, DEBUGGER_PANE_MEMORYMAP, "<ToggleItem>", NULL },
+  { "/View/_Breakpoints", NULL, toggle_display, DEBUGGER_PANE_BREAKPOINTS, "<ToggleItem>", NULL },
+  { "/View/_Disassembly", NULL, toggle_display, DEBUGGER_PANE_DISASSEMBLY, "<ToggleItem>", NULL },
+  { "/View/_Stack", NULL, toggle_display, DEBUGGER_PANE_STACK, "<ToggleItem>", NULL },
+  { "/View/_Events", NULL, toggle_display, DEBUGGER_PANE_EVENTS, "<ToggleItem>", NULL },
 
 };
 
@@ -595,9 +595,9 @@ static int
 create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group )
 {
   static const gtkstock_button
-    step  = { "Single step", GTK_SIGNAL_FUNC( gtkui_debugger_done_step ) },
-    cont  = { "Continue", GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ) },
-    brk   = { "Break", GTK_SIGNAL_FUNC( gtkui_debugger_break ) };
+    step  = { "Single step", GTK_SIGNAL_FUNC( gtkui_debugger_done_step ), NULL, NULL, 0, 0, 0, 0 },
+    cont  = { "Continue", GTK_SIGNAL_FUNC( gtkui_debugger_done_continue ), NULL, NULL, 0, 0, 0, 0 },
+    brk   = { "Break", GTK_SIGNAL_FUNC( gtkui_debugger_break ), NULL, NULL, 0, 0, 0, 0 };
 
   /* Create the action buttons for the dialog box */
   gtkstock_create_button( GTK_WIDGET( parent ), accel_group, &step );

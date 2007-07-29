@@ -150,8 +150,8 @@ gtkstock_create_ok_cancel( GtkWidget *widget, GtkAccelGroup *accel,
 			   GtkSignalFunc destroy )
 {
   gtkstock_button btn[] = {
-    { GTK_STOCK_CANCEL, NULL, NULL, NULL, 0, 0 },
-    { GTK_STOCK_OK, NULL, NULL, NULL, 0, 0 },
+    { GTK_STOCK_CANCEL, NULL, NULL, NULL, 0, 0, 0, 0 },
+    { GTK_STOCK_OK, NULL, NULL, NULL, 0, 0, 0, 0 },
   };
   btn[1].destroy = btn[0].destroy = destroy ? destroy : DEFAULT_DESTROY;
   btn[1].action = action;
