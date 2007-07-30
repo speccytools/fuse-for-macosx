@@ -43,7 +43,7 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
-#include "timer.h"
+#include "timer/timer.h"
 #include "trdos.h"
 #include "ula.h"
 #include "ui/ui.h"

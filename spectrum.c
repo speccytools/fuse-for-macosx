@@ -41,7 +41,7 @@
 #include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
-#include "timer.h"
+#include "timer/timer.h"
 #include "z80/z80.h"
 
 /* 272Kb of RAM */

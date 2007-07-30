@@ -40,7 +40,7 @@
 #include "rzx.h"
 #include "settings.h"
 #include "snapshot.h"
-#include "timer.h"
+#include "timer/timer.h"
 #include "ui/ui.h"
 #include "ula.h"
 #include "utils.h"

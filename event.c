@@ -38,12 +38,11 @@
 #include "psg.h"
 #include "rzx.h"
 #include "tape.h"
-#include "timer.h"
+#include "timer/timer.h"
 #include "trdos.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 #include "spectrum.h"
-#include "timer.h"
 #include "z80/z80.h"
 
 /* A large value to mean `no events due' */

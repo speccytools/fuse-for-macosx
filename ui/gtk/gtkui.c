@@ -51,7 +51,7 @@
 #include "snapshot.h"
 #include "machines/specplus3.h"
 #include "tape.h"
-#include "timer.h"
+#include "timer/timer.h"
 #include "ui/ui.h"
 #include "zxatasp.h"
 #include "zxcf.h"

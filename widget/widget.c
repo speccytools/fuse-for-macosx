@@ -48,7 +48,7 @@
 #include "periph.h"
 #include "pokefinder/pokefinder.h"
 #include "screenshot.h"
-#include "timer.h"
+#include "timer/timer.h"
 #include "utils.h"
 #include "widget_internals.h"
 

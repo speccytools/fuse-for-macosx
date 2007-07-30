@@ -1,5 +1,5 @@
 /* timer.c: Speed routines for Fuse
-   Copyright (c) 1999-2004 Philip Kendall, Marek Januszewski, Fredrick Meunier
+   Copyright (c) 1999-2007 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
    $Id$
 
@@ -25,20 +25,13 @@
 
 #include <config.h>
 
-#include <errno.h>
-#include <string.h>
-#include <unistd.h>
-
-#include "fuse.h"
 #include "event.h"
 #include "settings.h"
 #include "sound.h"
 #include "tape.h"
 #include "timer.h"
 #include "ui/ui.h"
-#include "ula.h"
 
-static void timer_add_time_difference( timer_type *a, long msec );
 static int timer_frame_callback_sound( libspectrum_dword last_tstates );
 
 /*
@@ -102,105 +95,6 @@ timer_estimate_speed( void )
 
   return 0;
 }
-
-#ifdef UI_SDL
-
-int
-timer_get_real_time( timer_type *real_time )
-{
-  *real_time = SDL_GetTicks();
-
-  return 0;
-}
-
-float
-timer_get_time_difference( timer_type *a, timer_type *b )
-{
-  return ( (long)*a - (long)*b ) / 1000.0;
-}
-
-static void
-timer_add_time_difference( timer_type *a, long msec )
-{
-  *a += msec;
-}
-
-void
-timer_sleep_ms( int ms )
-{
-  SDL_Delay( ms );
-}
-
-#elif defined(WIN32)            /* #ifdef UI_SDL */
-
-int
-timer_get_real_time( timer_type *real_time )
-{
-  *real_time = GetTickCount();
-
-  return 0;
-}
-
-float
-timer_get_time_difference( timer_type *a, timer_type *b )
-{
-  return ( (long)*a - (long)*b ) / 1000.0;
-}
-
-static void
-timer_add_time_difference( timer_type *a, long msec )
-{
-  *a += msec;
-}
-
-void
-timer_sleep_ms( int ms )
-{
-  Sleep( ms );
-}
-
-#else                           /* #ifdef UI_SDL */
-
-int
-timer_get_real_time( timer_type *real_time )
-{
-  int error;
-
-  error = gettimeofday( real_time, NULL );
-  if( error ) {
-    ui_error( UI_ERROR_ERROR, "error getting time: %s", strerror( errno ) );
-    return 1;
-  }
-
-  return 0;
-}
-
-float
-timer_get_time_difference( timer_type *a, timer_type *b )
-{
-  return ( a->tv_sec - b->tv_sec ) + ( a->tv_usec - b->tv_usec ) / 1000000.0;
-}
-
-static void
-timer_add_time_difference( timer_type *a, long msec )
-{
-  a->tv_usec += msec * 1000;
-  if( a->tv_usec >= 1000000 ) {
-    a->tv_usec -= 1000000;
-    a->tv_sec += 1;
-  } else if( a->tv_usec < 0 ) {
-    a->tv_usec += 1000000;
-    a->tv_sec -= 1;
-  }
-}
-
-void
-timer_sleep_ms( int ms )
-{
-  usleep( ms * 1000 );
-}
-
-#endif            /* #ifdef UI_SDL */
 
 int
 timer_estimate_reset( void )

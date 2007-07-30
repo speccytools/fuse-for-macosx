@@ -1948,3 +1948,7 @@
 	 osssound.c,sdlsound.c,sfifo.c,sound.c,sunsound.c},spectrum.c,timer.c:
 	 move sound selection logic into configure.in (patch #1763265).
 20070730 utils.c: mmap no longer used.
+20070730 Makefile.am,configure.in,event.c,fuse.c,rzx.c,spectrum.c,tape.c,
+	 timer.[ch],timer/{Makefile.am,sdl.c,timer.c,timer.h,unix.c,win32.c},
+	 ui/gtk/gtkui.c,widget/widget.c: move timer code selection logic into
+	 configure.in.

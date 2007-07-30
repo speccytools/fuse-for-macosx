@@ -36,6 +36,7 @@ SUBDIRS = compat \
 	  pokefinder \
 	  roms \
 	  sound \
+	  timer \
 	  ui \
 	  @WIDGET@ \
 	  z80
@@ -87,7 +88,6 @@ fuse_SOURCES = ay.c \
 	sound.c \
 	spectrum.c \
 	tape.c \
-	timer.c \
 	trdos.c \
 	ui.c \
 	uidisplay.c \
@@ -107,6 +107,7 @@ pokefinder/libpokefinder.a \
 sound/libsound.a \
 ui/scaler/libscaler.a \
 debugger/libdebugger.a \
+timer/libtimer.a \
 z80/libz80.a \
 @DSKLIBS@ \
 @LIBSPEC_LIBS@ \
@@ -170,7 +171,6 @@ noinst_HEADERS = ay.h \
 	sound.h \
 	spectrum.h \
 	tape.h \
-	timer.h \
 	trdos.h \
 	utils.h \
 	joystick.h \

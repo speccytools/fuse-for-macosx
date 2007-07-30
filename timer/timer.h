@@ -26,6 +26,8 @@
 #ifndef FUSE_TIMER_H
 #define FUSE_TIMER_H
 
+#include <libspectrum.h>
+
 #ifdef UI_SDL
 
 #include "SDL.h"
@@ -58,5 +60,9 @@ int timer_frame( libspectrum_dword last_tstates );
 int timer_end(void);
 
 extern float current_speed;
+
+/* Internal routines */
+
+void timer_add_time_difference( timer_type *a, long msec );
 
 #endif			/* #ifndef FUSE_TIMER_H */
