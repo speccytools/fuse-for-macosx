@@ -1947,3 +1947,4 @@
 	 aosound.c,coreaudiosound.c,dxsound.c,hpsound.c,lowlevel.h,nullsound.c,
 	 osssound.c,sdlsound.c,sfifo.c,sound.c,sunsound.c},spectrum.c,timer.c:
 	 move sound selection logic into configure.in (patch #1763265).
+20070730 utils.c: mmap no longer used.

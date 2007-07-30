@@ -36,11 +36,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
-#ifdef HAVE_MMAP
-#include <sys/mman.h>
-#endif
-
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <ui/ui.h>
