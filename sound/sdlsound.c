@@ -22,10 +22,6 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_SDL
-
 #include <errno.h>
 #include <fcntl.h>
 #include <math.h>
@@ -214,5 +210,3 @@ sdlwrite( void *userdata, Uint8 *stream, int len )
   /* If we ran out of sound, do nothing else as SDL has prefilled
      the output buffer with silence :( */
 }
-
-#endif			/* #ifdef SOUND_SDL */

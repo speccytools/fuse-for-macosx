@@ -22,9 +22,7 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_HP
+#ifdef AUDIO_FORMAT_LINEAR16BIT
 
 #include <sys/types.h>
 #include <sys/audio.h>
@@ -168,4 +166,4 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   }
 }
 
-#endif			/* #ifdef SOUND_HP */
+#endif				/* #ifdef AUDIO_FORMAT_LINEAR16BIT */

@@ -1943,4 +1943,7 @@
 	 zxcf.c: some -Wextra tidyup (not finished yet).
 20070729 menu_data.pl,printer.c,settings.pl,ui/gtk/{debugger.c,gtkjoystick.c,
 	 gtkmouse.c,pokefinder.c,stock.c},z80/coretest.c: more -Wextra tidyup.
-
+20070730 Makefile.am,configure.in,fuse.c,sound/{Makefile.am,alsasound.c,
+	 aosound.c,coreaudiosound.c,dxsound.c,hpsound.c,lowlevel.h,nullsound.c,
+	 osssound.c,sdlsound.c,sfifo.c,sound.c,sunsound.c},spectrum.c,timer.c:
+	 move sound selection logic into configure.in (patch #1763265).

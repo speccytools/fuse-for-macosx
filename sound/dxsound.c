@@ -25,10 +25,6 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_DX
-
 #include <windows.h>
 #include <mmsystem.h>
 #include <dsound.h>
@@ -234,5 +230,3 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
     IDirectSoundBuffer_Unlock( lpDSBuffer, ucbuffer1, i1, ucbuffer2, i2 );
   }
 }
-
-#endif		/* #ifdef SOUND_DX */

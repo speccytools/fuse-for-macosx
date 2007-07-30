@@ -21,10 +21,6 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_ALSA
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -376,5 +372,3 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
     }
   }
 }
-
-#endif	/* #ifdef SOUND_ALSA */

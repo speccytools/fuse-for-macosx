@@ -16,10 +16,6 @@ TODO:
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#if defined SOUND_SDL || defined SOUND_COREAUDIO
-
 #ifdef __KERNEL__
 #	include	<linux/string.h>
 #	include	<asm/uaccess.h>
@@ -328,5 +324,3 @@ int main()
 }
 
 #endif
-
-#endif      /* SOUND_SDL */

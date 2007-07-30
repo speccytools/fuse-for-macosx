@@ -19,10 +19,6 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_COREAUDIO
-
 #include <errno.h>
 #include <unistd.h>
 #include <CoreAudio/AudioHardware.h>
@@ -277,5 +273,3 @@ OSStatus coreaudiowrite( void *inRefCon,
 
   return noErr;
 }
-
-#endif			/* #ifdef SOUND_COREAUDIO */

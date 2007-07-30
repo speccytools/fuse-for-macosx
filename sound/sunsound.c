@@ -21,9 +21,7 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_SUN
+#if defined AUDIO_SETINFO || defined HAVE_SYS_AUDIOIO_H
 
 #if defined(__SVR4) && defined(__sun)
 #define solaris
@@ -208,4 +206,5 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 	}
 }
 
-#endif		/* #ifdef SOUND_SUN */
+#endif		/* #if defined AUDIO_SETINFO || defined HAVE_SYS_AUDIOIO_H */
+

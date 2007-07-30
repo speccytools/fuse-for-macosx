@@ -112,11 +112,8 @@ z80/libz80.a \
 @LIBSPEC_LIBS@ \
 @GLIB_LIBS@ \
 @PNG_LIBS@ \
-@ASOUND_LIBS@ \
-@AO_LIBS@ \
+@SOUND_LIBS@ \
 @SAMPLERATE_LIBS@ \
-@DIRECTSOUND_LIBS@ \
-@COREAUDIO_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
 compat/libcompat.a \

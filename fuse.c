@@ -68,7 +68,6 @@
 #include "slt.h"
 #include "snapshot.h"
 #include "sound.h"
-#include "sound/lowlevel.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer.h"

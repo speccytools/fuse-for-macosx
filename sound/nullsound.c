@@ -21,12 +21,8 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
 /* Dummy functions for when we don't have a sound device; should never be
    called, so just abort if they are */
-
-#ifndef HAVE_SOUND
 
 #include "fuse.h"
 
@@ -47,5 +43,3 @@ sound_lowlevel_frame( unsigned char *data, int len )
 {
   fuse_abort();
 }
-
-#endif			/* #ifndef HAVE_SOUND */

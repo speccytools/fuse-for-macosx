@@ -351,11 +351,12 @@ AC_ARG_WITH(plus3-disk,
   plus3disk=yes)
 AC_MSG_RESULT($plus3disk)
 if test "$plus3disk" = yes; then
-  AC_CHECK_HEADERS(765.h, DSKLIBS="$DSKLIBS -l765"; lib765=yes,
+  AC_CHECK_HEADERS(765.h, DSKLIBS="$DSKLIBS -l765" lib765=yes,
                    AC_MSG_WARN(765.h not found - +3 disk support disabled))
 fi
 
 dnl Do we want LibDsk support?
+AC_MSG_CHECKING(whether libdsk is available)
 AC_ARG_WITH(libdsk,
   [  --without-libdsk        disable LibDsk support],
   if test "$withval" = no; then libdsk=no; else libdsk=yes; fi,
@@ -396,12 +397,11 @@ if test "$libasound" = yes; then
   AC_CHECK_LIB( asound, snd_pcm_hw_params_set_period_size_near,
     [AC_CHECK_HEADER(
       alsa/asoundlib.h,
-      [AC_DEFINE([USE_LIBASOUND], 1, [Defined if we're going to be using the installed libasound]) ASOUND_LIBS='-lasound'],
+      [alsa_available=yes],
       [AC_MSG_WARN(alsa/asoundlib.h not found - no ALSA output)]
     )],
     [AC_MSG_WARN(snd_pcm_hw_params_set_period_size_near not found - no ALSA output)]
   )
-  AC_SUBST(ASOUND_LIBS)
 fi
 
 dnl Check if a version of libao which supplies ao_open_live is available
@@ -415,21 +415,19 @@ if test "$libao" = yes; then
   AC_CHECK_LIB( ao, ao_open_live,
     [AC_CHECK_HEADER(
       ao/ao.h,
-      [AC_DEFINE([USE_LIBAO], 1, [Defined if we're going to be using the installed libao]) AO_LIBS='-lao'],
+      [ao_available=yes],
       [AC_MSG_WARN(ao/ao.h not found - no libao sound output)]
     )],
     [AC_MSG_WARN(ao_open_live not found - no libao sound output)]
   )
-  AC_SUBST(AO_LIBS)
 fi
 
 dnl Check if DirectSound is available
 AC_CHECK_HEADER(
   dsound.h,
-  [AC_DEFINE([USE_DIRECTSOUND], 1, [Defined if we're going to be using DirectSound]) DIRECTSOUND_LIBS='-ldsound -lole32 -ldxguid'],
+  [dxsound_available=yes],
   [AC_MSG_WARN(dsound.h not found - no DirectSound output)]
 )
-AC_SUBST(DIRECTSOUND_LIBS)
 
 PKG_CHECK_MODULES(SAMPLERATE, samplerate >= 0.1.0,
                   AC_DEFINE([HAVE_SAMPLERATE],1,[Define to 1 if you have libsamplerate.]),
@@ -440,10 +438,55 @@ AC_SUBST(SAMPLERATE_LIBS)
 dnl Check if CoreAudio is available
 AC_CHECK_HEADER(
   CoreAudio/AudioHardware.h,
-  [AC_DEFINE([USE_COREAUDIO], 1, [Defined if we're going to be using CoreAudio]) COREAUDIO_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices'],
+  [coreaudio_available=yes],
   [AC_MSG_WARN(CoreAudio/AudioHardware.h not found - no CoreAudio sound output)]
 )
-AC_SUBST(COREAUDIO_LIBS)
+
+#
+# Decide which sound routines to use
+#
+
+AC_MSG_CHECKING(which sound routines to use)
+if test "$dxsound_available" = yes; then
+  SOUND_LIBADD='dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
+  AC_MSG_RESULT(DirectX)
+elif test "$UI" = sdl; then
+  SOUND_LIBADD='sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+  AC_MSG_RESULT(SDL)
+elif test "$alsa_available" = yes; then
+  SOUND_LIBADD='alsasound.$(OBJEXT)' SOUND_LIBS='-lasound'
+  AC_MSG_RESULT(Alsa)
+elif test "$ao_available" = yes; then
+  SOUND_LIBADD='aosound.$(OBJEXT)' SOUND_LIBS='-lao'
+  AC_MSG_RESULT(libao)
+elif test "$ac_cv_header_dsound_h" = yes; then
+  # Later selection between these two
+  SOUND_LIBADD='sunsound.$(OBJEXT) hpsound.$(OBJEXT)' SOUND_LIBS=''
+  AC_MSG_RESULT(Solaris or HP/UX)
+elif test "$ac_cv_header_sys_soundcard_h" = yes; then
+  SOUND_LIBADD='osssound.$(OBJEXT)' SOUND_LIBS=''
+  AC_MSG_RESULT(OSS)
+elif test "$ac_cv_header_sys_audioio_h" = yes; then
+  # OpenBSD
+  SOUND_LIBADD='sunsound.$(OBJEXT)' SOUND_LIBS=''
+  AC_MSG_RESULT(OpenBSD)
+elif test "$coreaudio_available" = yes; then
+  SOUND_LIBADD='coreaudiosound.$(OBJEXT)' SOUND_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices' sound_fifo=yes
+  AC_MSG_RESULT(CoreAudio)
+else
+  SOUND_LIBADD='nullsound.$(OBJEXT)' SOUND_LIBS=''
+  AC_MSG_RESULT(none)
+  AC_DEFINE([NO_SOUND], 1, [Defined if no sound code is present])
+fi
+
+if test "$sound_fifo" = yes; then
+  # Strange construct used here as += doesn't seem to work on OS X
+  SOUND_LIBADD="$SOUND_LIBADD"' sfifo.$(OBJEXT)'
+  AC_DEFINE([SOUND_FIFO], 1, [Defined if the sound code uses a fifo])
+fi
+
+AC_SUBST(SOUND_LIBADD)
+AC_SUBST(SOUND_LIBS)
 
 dnl Are we supplying the ROMs or relying on another package?
 AC_MSG_CHECKING(where to find the Spectrum ROM images)

@@ -21,10 +21,6 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_OSS
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -183,5 +179,3 @@ while(len)
     ofs+=ret,len-=ret;
   }
 }
-
-#endif	/* #ifdef SOUND_OSS */

@@ -27,15 +27,20 @@ INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 noinst_LIBRARIES = libsound.a
 
-libsound_a_SOURCES = dxsound.c \
-		     alsasound.c \
-		     aosound.c \
-		     coreaudiosound.c \
-		     hpsound.c \
-		     nullsound.c \
-		     osssound.c \
-		     sdlsound.c \
-		     sfifo.c \
-		     sunsound.c
+libsound_a_SOURCES =
 
-noinst_HEADERS = lowlevel.h sfifo.h
+EXTRA_libsound_a_SOURCES = dxsound.c \
+		     	   alsasound.c \
+		     	   aosound.c \
+		     	   coreaudiosound.c \
+		     	   hpsound.c \
+		     	   nullsound.c \
+		     	   osssound.c \
+		     	   sdlsound.c \
+		     	   sfifo.c \
+		     	   sunsound.c
+
+libsound_a_LIBADD = $(SOUND_LIBADD)
+libsound_a_DEPENDENCIES = $(SOUND_LIBADD)
+
+noinst_HEADERS = sfifo.h

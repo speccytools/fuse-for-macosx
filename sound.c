@@ -46,7 +46,6 @@
 #include "machine.h"
 #include "settings.h"
 #include "sound.h"
-#include "sound/lowlevel.h"
 #include "tape.h"
 #include "ui/ui.h"
 
@@ -175,7 +174,7 @@ int error;
 #endif /* #ifdef HAVE_SAMPLERATE */
 
 /* if we don't have any sound I/O code compiled in, don't do sound */
-#ifndef HAVE_SOUND
+#ifdef NO_SOUND
 return;
 #endif
 

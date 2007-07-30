@@ -27,10 +27,6 @@
 
 #include <config.h>
 
-#include "lowlevel.h"
-
-#ifdef SOUND_AO
-
 #include <string.h>
 
 #include <ao/ao.h>
@@ -246,5 +242,3 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 
   ao_play( dev_for_ao, data8, len );
 }
-
-#endif			/* #ifdef SOUND_AO */
