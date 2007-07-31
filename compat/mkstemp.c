@@ -20,8 +20,6 @@
 
 #include <config.h>
 
-#ifndef HAVE_MKSTEMP
-
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -109,5 +107,3 @@ mkstemp (char *tmpl)
   errno = EEXIST;
   return -1;
 }
-
-#endif				/* #ifdef HAVE_MKSTEMP */

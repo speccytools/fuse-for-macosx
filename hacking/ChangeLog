@@ -1953,3 +1953,5 @@
 	 ui/gtk/gtkui.c,widget/widget.c: move timer code selection logic into
 	 configure.in.
 20070731 configure.in: fix spelling of ALSA (thanks, Gergely).
+20070731 configure.in,compat/{Makefile.am,dirname.c,getopt.c,getopt1.c,
+	 mkstemp.c}: move compatability detection logic into configure.in.

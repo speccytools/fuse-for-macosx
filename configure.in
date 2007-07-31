@@ -567,6 +567,35 @@ fi
 
 AC_SUBST(TIMER_LIBADD)
 
+dnl Work out which standard routines we're missing
+AC_MSG_CHECKING(which standard routines we're missing)
+COMPAT_LIBADD=''
+missing_routines=''
+if test "$ac_cv_func_dirname" = no; then
+  COMPAT_LIBADD="$COMPAT_LIBADD"'dirname.$(OBJEXT) '
+  missing_routines="$missing_routines"'dirname '
+fi
+if test "$ac_cv_func_getopt_long" = no; then
+  case "$target_os" in
+    amiga|morphos)
+      dnl Our getopt_long replacement doesn't work, so don't use it
+      ;;
+    *)
+      COMPAT_LIBADD="$COMPAT_LIBADD"'getopt.$(OBJEXT) getopt1.$(OBJEXT) '
+      missing_routines="$missing_routines"'getopt_long '
+      ;;
+  esac
+fi
+if test "$ac_cv_func_mkstemp" = no; then
+  COMPAT_LIBADD="$COMPAT_LIBADD"'mkstemp.$(OBJEXT) '
+  missing_routines="$missing_routines"'mkstemp '
+fi
+if test "x$missing_routines" = x; then
+  missing_routines='(none)'
+fi
+AC_MSG_RESULT($missing_routines)
+AC_SUBST(COMPAT_LIBADD)
+
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
 AC_ARG_ENABLE(smallmem,

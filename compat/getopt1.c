@@ -24,8 +24,6 @@
 #include <config.h>
 #endif
 
-#if !defined HAVE_GETOPT_LONG && !defined AMIGA && !defined __MORPHOS__
-
 #ifdef _LIBC
 # include <getopt.h>
 #else
@@ -198,5 +196,3 @@ main (argc, argv)
 }
 
 #endif /* TEST */
-
-#endif				/* #ifndef HAVE_GETOPT_LONG */

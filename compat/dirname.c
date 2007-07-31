@@ -26,8 +26,6 @@
 
 #include <config.h>
 
-#ifndef HAVE_DIRNAME
-
 #include <string.h>
 
 #include "fuse.h"
@@ -99,5 +97,3 @@ dirname (char *path)
 
   return path;
 }
-
-#endif				/* #ifndef HAVE_DIRNAME */

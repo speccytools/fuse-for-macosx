@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2003 Philip Kendall
+## Copyright (c) 2003-2007 Philip Kendall
 
 ## $Id$
 
@@ -25,10 +25,15 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libcompat.a
 
-libcompat_a_SOURCES = dirname.c \
-		      getopt.c \
-		      getopt1.c \
-	              mkstemp.c
+libcompat_a_SOURCES =
+
+EXTRA_libcompat_a_SOURCES = dirname.c \
+			    getopt.c \
+			    getopt1.c \
+			    mkstemp.c
+
+libcompat_a_LIBADD = $(COMPAT_LIBADD)
+libcompat_a_DEPENDENCIES = $(COMPAT_LIBADD)
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
