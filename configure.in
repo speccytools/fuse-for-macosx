@@ -455,7 +455,7 @@ elif test "$UI" = sdl; then
   AC_MSG_RESULT(SDL)
 elif test "$alsa_available" = yes; then
   SOUND_LIBADD='alsasound.$(OBJEXT)' SOUND_LIBS='-lasound'
-  AC_MSG_RESULT(Alsa)
+  AC_MSG_RESULT(ALSA)
 elif test "$ao_available" = yes; then
   SOUND_LIBADD='aosound.$(OBJEXT)' SOUND_LIBS='-lao'
   AC_MSG_RESULT(libao)

@@ -1952,3 +1952,4 @@
 	 timer.[ch],timer/{Makefile.am,sdl.c,timer.c,timer.h,unix.c,win32.c},
 	 ui/gtk/gtkui.c,widget/widget.c: move timer code selection logic into
 	 configure.in.
+20070731 configure.in: fix spelling of ALSA (thanks, Gergely).
