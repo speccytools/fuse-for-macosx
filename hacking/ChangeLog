@@ -1955,3 +1955,5 @@
 20070731 configure.in: fix spelling of ALSA (thanks, Gergely).
 20070731 configure.in,compat/{Makefile.am,dirname.c,getopt.c,getopt1.c,
 	 mkstemp.c}: move compatability detection logic into configure.in.
+20070731 timer/{Makefile.am,sdl.c,unix.c,win32.c}: add missing properties and
+	 fix initial comments (Stuart).
