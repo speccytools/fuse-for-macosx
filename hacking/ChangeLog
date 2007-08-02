@@ -1957,3 +1957,5 @@
 	 mkstemp.c}: move compatability detection logic into configure.in.
 20070731 timer/{Makefile.am,sdl.c,unix.c,win32.c}: add missing properties and
 	 fix initial comments (Stuart).
+20070802 machines/tc2048.c: correct joystick port mask on TC2048 (verified on
+         real hardware) (Fred).
