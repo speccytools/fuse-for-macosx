@@ -333,11 +333,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     return 1;
   }
 
-
-  if( first_init ) {
-    snd_output_stdio_attach(&output, stdout, 0);
-    snd_pcm_dump(pcm_handle, output);
-  }
+  if( first_init ) snd_output_stdio_attach(&output, stdout, 0);
 
   first_init = 0;
   init_running = 0;

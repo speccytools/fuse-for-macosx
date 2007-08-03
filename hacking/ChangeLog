@@ -1961,3 +1961,5 @@
          real hardware) (Fred).
 20070803 configure.in,timer/timer.h: move timer header selection logic into
 	 configure.in.
+20070803 sound/alsasound.c: release code should not dump 100 lines of stuff
+	 onto the console.
