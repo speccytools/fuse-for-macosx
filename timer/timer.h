@@ -28,26 +28,9 @@
 
 #include <libspectrum.h>
 
-#ifdef UI_SDL
+#include TIMER_HEADER
 
-#include "SDL.h"
-
-typedef Uint32 timer_type;
-
-#elif defined(WIN32)		/* #ifdef UI_SDL */
-
-#include <windows.h>
-
-typedef DWORD timer_type;
-
-#else				/* #ifdef UI_SDL */
-
-#include <sys/time.h>
-#include <time.h>
-
-typedef struct timeval timer_type;
-
-#endif				/* #ifdef UI_SDL */
+typedef TIMER_TYPE timer_type;
 
 int timer_estimate_reset( void );
 int timer_estimate_speed( void );

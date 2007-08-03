@@ -1959,3 +1959,5 @@
 	 fix initial comments (Stuart).
 20070802 machines/tc2048.c: correct joystick port mask on TC2048 (verified on
          real hardware) (Fred).
+20070803 configure.in,timer/timer.h: move timer header selection logic into
+	 configure.in.
