@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2003-2007 Philip Kendall
+## Copyright (c) 2007 Philip Kendall
 
 ## $Id$
 
@@ -23,25 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = @COMPAT_OSNAME@
+noinst_LIBRARIES = libcompatos.a
 
-DIST_SUBDIRS = amiga \
-	       morphos \
-	       unix \
-	       win32
-
-noinst_LIBRARIES = libcompat.a
-
-libcompat_a_SOURCES =
-
-EXTRA_libcompat_a_SOURCES = dirname.c \
-			    getopt.c \
-			    getopt1.c \
-			    mkstemp.c
-
-libcompat_a_LIBADD = $(COMPAT_LIBADD)
-libcompat_a_DEPENDENCIES = $(COMPAT_LIBADD)
+libcompatos_a_SOURCES = osname.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
-
-noinst_HEADERS = getopt.h

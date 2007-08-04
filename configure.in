@@ -604,6 +604,25 @@ fi
 AC_MSG_RESULT($missing_routines)
 AC_SUBST(COMPAT_LIBADD)
 
+dnl Work out which compatability routines to use
+AC_MSG_CHECKING(which compatability routines to use)
+case "$target_os" in
+  amiga)
+    COMPAT_OSNAME='amiga'
+    ;;
+  morphos)
+    COMPAT_OSNAME='morphos'
+    ;;
+  win32)
+    COMPAT_OSNAME='win32'
+    ;;
+  *)
+    COMPAT_OSNAME='unix'
+    ;;
+esac
+AC_MSG_RESULT($COMPAT_OSNAME)
+AC_SUBST(COMPAT_OSNAME)
+
 dnl Do we want the low memory compile?
 AC_MSG_CHECKING(whether low memory compile requested)
 AC_ARG_ENABLE(smallmem,
@@ -658,6 +677,10 @@ fi
 
 AC_OUTPUT(Makefile \
 compat/Makefile \
+compat/amiga/Makefile \
+compat/morphos/Makefile \
+compat/unix/Makefile \
+compat/win32/Makefile \
 debugger/Makefile \
 disk/Makefile \
 hacking/Makefile \

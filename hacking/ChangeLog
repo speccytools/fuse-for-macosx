@@ -1963,3 +1963,7 @@
 	 configure.in.
 20070803 sound/alsasound.c: release code should not dump 100 lines of stuff
 	 onto the console.
+20070804 configure.in,fuse.c,compat/Makefile.am,compat/amiga/Makefile.am,
+	 compat/morphos/{Makefile.am,osname.c},compat/unix/{Makefile.am,
+	 osname.c},compat/win32/{Makefile.am,osname.c}: move OS name function
+	 selection into configure.in.

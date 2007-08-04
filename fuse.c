@@ -296,15 +296,8 @@ int creator_init( void )
 {
   size_t i;
   unsigned int version[4] = { 0, 0, 0, 0 };
-  char *custom;
+  char *custom, osname[ 256 ];
   
-#ifndef WIN32
-  struct utsname buf;
-#else				/* #ifndef WIN32 */
-  OSVERSIONINFO buf;
-  char *windows_name;
-#endif				/* #ifndef WIN32 */
-
   libspectrum_error error; int sys_error;
 
   const char *gcrypt_version;
@@ -314,25 +307,8 @@ int creator_init( void )
 
   for( i=0; i<4; i++ ) if( version[i] > 0xff ) version[i] = 0xff;
 
-#if defined(__MORPHOS__)
-  snprintf(buf.sysname, __SYS_NMLN, "MorphOS");
-  snprintf(buf.release, __SYS_NMLN, "1.4.4");
-  snprintf(buf.machine, __SYS_NMLN, "Pegasos");
-#elif defined(WIN32)		/* #if defined(__MORPHOS__) */
-  buf.dwOSVersionInfoSize = sizeof( buf );
-  sys_error = GetVersionEx( &buf );
-  if( sys_error == 0 ) {
-    ui_error( UI_ERROR_ERROR, "error getting system information." );
-    return 1;
-  }
-#else				/* #if defined(__MORPHOS__) */
-  sys_error = uname( &buf );
-  if( sys_error == -1 ) {
-    ui_error( UI_ERROR_ERROR, "error getting system information: %s",
-	      strerror( errno ) );
-    return 1;
-  }
-#endif				/* #if defined(__MORPHOS__) */
+  sys_error = compat_osname( osname, sizeof( osname ) );
+  if( sys_error ) return 1;
 
   error = libspectrum_creator_alloc( &fuse_creator ); if( error ) return error;
 
@@ -357,28 +333,9 @@ int creator_init( void )
   gcrypt_version = libspectrum_gcrypt_version();
   if( !gcrypt_version ) gcrypt_version = "not available";
 
-#ifndef WIN32	    
-
-  snprintf( custom, 256, "gcrypt: %s\nlibspectrum: %s\nuname: %s %s %s",
-	    gcrypt_version, libspectrum_version(),
-	    buf.sysname, buf.machine, buf.release );
-
-#else				/* #ifndef WIN32 */
-
-  switch( buf.dwPlatformId ) {
-  case VER_PLATFORM_WIN32_NT:	   windows_name = "NT";      break;
-  case VER_PLATFORM_WIN32_WINDOWS: windows_name = "95/98";   break;
-  case VER_PLATFORM_WIN32s:	   windows_name = "3.1";     break;
-  default:			   windows_name = "unknown"; break;
-  }
-
   snprintf( custom, 256,
-	    "gcrypt: %s\nlibspectrum: %s\nuname: Windows %s %d.%d build %d %s",
-	    gcrypt_version, libspectrum_version(),
-	    windows_name, buf.dwMajorVersion, buf.dwMinorVersion,
-	    buf.dwBuildNumber, buf.szCSDVersion );
-
-#endif				/* #ifndef WIN32 */
+	    "gcrypt: %s\nlibspectrum: %s\nuname: %s", gcrypt_version,
+	    libspectrum_version(), osname );
 
   error = libspectrum_creator_set_custom(
     fuse_creator, (libspectrum_byte*)custom, strlen( custom )

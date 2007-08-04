@@ -118,6 +118,7 @@ z80/libz80.a \
 @X_LIBS@ \
 @XML_LIBS@ \
 compat/libcompat.a \
+compat/unix/libcompatos.a \
 @WINDRES_OBJ@
 
 fuse_DEPENDENCIES = @UI_LIBS@ \
