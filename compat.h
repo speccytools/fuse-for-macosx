@@ -26,6 +26,8 @@
 #ifndef FUSE_COMPAT_H
 #define FUSE_COMPAT_H
 
+#include <stdlib.h>
+
 /* Remove the gcc-specific incantations if we're not using gcc */
 #ifdef __GNUC__
 
@@ -69,5 +71,9 @@ int mkstemp( char *template );
 #define FUSE_DIR_SEP_CHR '/'
 #define FUSE_DIR_SEP_STR "/"
 #endif
+
+int compat_osname( char *buffer, size_t length );
+const char* compat_get_temp_path( void );
+const char* compat_get_home_path( void );
 
 #endif				/* #ifndef FUSE_COMPAT_H */

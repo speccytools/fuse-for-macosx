@@ -458,10 +458,10 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
   ssize_t bytes_written;
 
 #if defined AMIGA || defined __MORPHOS__
-  snprintf( tempfilename, PATH_MAX, "%s%s", utils_get_temp_path(), template );
+  snprintf( tempfilename, PATH_MAX, "%s%s", compat_get_temp_path(), template );
 #else
   snprintf( tempfilename, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s",
-            utils_get_temp_path(), template );
+            compat_get_temp_path(), template );
 #endif
 
   *fd = mkstemp( tempfilename );
@@ -492,60 +492,4 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
   if( error ) { close( *fd ); unlink( tempfilename ); return error; }
 
   return 0;
-}
-
-/* Get a path where we can reasonably create temporary files */
-const char*
-utils_get_temp_path( void )
-{
-  const char *dir;
-
-#if defined AMIGA || defined __MORPHOS__
-
-  /* Amiga, just use T: */
-  return "T:";
-
-#elif defined WIN32
-
-  /* Something close to this algorithm specified at
-     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/gettemppath.asp
-  */
-  dir = getenv( "TMP" ); if( dir ) return dir;
-  dir = getenv( "TEMP" ); if( dir ) return dir;
-  return ".";
-
-#else				/* #ifdef WIN32 */
-
-  /* Unix-ish. Use TMPDIR if specified, if not /tmp */
-  dir = getenv( "TMPDIR" ); if( dir ) return dir;
-  return "/tmp";
-
-#endif				/* #ifdef WIN32 */
-  
-}
-
-/* Return the path where we will store our configuration information etc */
-const char*
-utils_get_home_path( void )
-{
-  const char *dir;
-
-#if defined AMIGA || defined __MORPHOS__
-
-  dir = strdup("PROGDIR:settings");
-	if( dir ) return dir;
-
-#elif defined WIN32
-
-  dir = getenv( "USERPROFILE" ); if( dir ) return dir;
-  dir = getenv( "WINDIR" ); if( dir ) return dir;
-
-#else				/* #ifdef WIN32 */
-
-  dir = getenv( "HOME" ); if( dir ) return dir;
-
-#endif				/* #ifdef WIN32 */
-
-  ui_error( UI_ERROR_ERROR, "couldn't find a plausible home directory" );
-  return NULL;
 }

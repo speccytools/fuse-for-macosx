@@ -25,6 +25,7 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_LIBRARIES = libcompatos.a
 
-libcompatos_a_SOURCES = ../unix/osname.c
+libcompatos_a_SOURCES = ../unix/osname.c \
+			paths.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

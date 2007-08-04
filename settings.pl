@@ -172,7 +172,7 @@ read_config_file( settings_info *settings )
 
   xmlDocPtr doc;
 
-  home = utils_get_home_path(); if( !home ) return 1;
+  home = compat_get_home_path(); if( !home ) return 1;
 
   snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
 
@@ -272,7 +272,7 @@ settings_write_config( settings_info *settings )
 
   xmlDocPtr doc; xmlNodePtr root;
 
-  home = utils_get_home_path(); if( !home ) return 1;
+  home = compat_get_home_path(); if( !home ) return 1;
 
   snprintf( path, 256, "%s/%s", home, CONFIG_FILE_NAME );
 

@@ -481,7 +481,7 @@ insert_scl( trdos_drive_number which, const char *filename )
   char* tempfilename;
   int ret;
 
-  temp_path = utils_get_temp_path();
+  temp_path = compat_get_temp_path();
 
   /* +2 is for the slash between the path and the template and for the
      null at the end */

@@ -1967,3 +1967,7 @@
 	 compat/morphos/{Makefile.am,osname.c},compat/unix/{Makefile.am,
 	 osname.c},compat/win32/{Makefile.am,osname.c}: move OS name function
 	 selection into configure.in.
+20070804 compat.h,settings.pl,trdos.c,utils.c,compat/amiga/{Makefile.am,paths.c},
+	 compat/morphos/Makefile.am,compat/unix/{Makefile.am,paths.c},
+	 compat/win32/{Makefile.am,paths.c}: move pathname functions into
+	 compatability directories.
