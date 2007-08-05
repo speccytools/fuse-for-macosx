@@ -1972,3 +1972,5 @@
 	 compat/win32/{Makefile.am,paths.c}: move pathname functions into
 	 compatability directories.
 20070804 configure.in: remove debug mode as its not used anywhere.
+20070806 compat/unix/osname.c: ensure we have the prototype for strerror()
+         (Fred).
