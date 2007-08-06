@@ -71,6 +71,7 @@ int tape_block_details( char *buffer, size_t length,
 
 extern int tape_microphone;
 extern int tape_modified;
+extern int tape_playing;
 extern int tape_recording;
 
 #endif

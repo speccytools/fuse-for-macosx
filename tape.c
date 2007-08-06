@@ -58,7 +58,7 @@ static libspectrum_tape *tape;
 int tape_modified;
 
 /* Is the emulated tape deck playing? */
-static int tape_playing;
+int tape_playing;
 
 /* Was the tape playing started automatically? */
 static int tape_autoplay;

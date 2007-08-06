@@ -1974,3 +1974,5 @@
 20070804 configure.in: remove debug mode as its not used anywhere.
 20070806 compat/unix/osname.c: ensure we have the prototype for strerror()
          (Fred).
+20070806 tape.[ch],ula.c: enable beeper output for MIC bit (an attempt at
+         feature request #1763114) (Fred).
