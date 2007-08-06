@@ -1976,3 +1976,13 @@
          (Fred).
 20070806 tape.[ch],ula.c: enable beeper output for MIC bit (an attempt at
          feature request #1763114) (Fred).
+20070806 keysyms.pl,ui/fb/{fbdisplay.c,fbjoystick.c,fbkeyboard.c,fbmouse.c,
+	 fbui.c},ui/ggi/{ggi_internals.h,ggidisplay.c,ggikeyboard.c,ggiui.c},
+	 ui/gtk/{binary.c,browse.c,confirm.c,debugger.c,fileselector.c,
+	 gtkdisplay.c,gtkjoystick.c,gtkkeyboard.c,gtkmouse.c,gtkui.c,memory.c,
+	 picture.c,roms.c,statusbar.c},ui/sdl/{sdldisplay.c,sdljoystick.c,
+	 sdlkeyboard.c,sdlui.c},ui/svga/{svgadisplay.c,svgajoystick.c,
+	 svgakeyboard.c,svgaui.c},ui/win32/{debugger.c,error.c,statusbar.c,
+	 win32display.c,win32display.h,win32keyboard.c,win32ui.c},
+	 ui/xlib/{xdisplay.c,xerror.c,xjoystick.c,xkeyboard.c,xui.c}:
+	 remove unnecessary #ifdefs.

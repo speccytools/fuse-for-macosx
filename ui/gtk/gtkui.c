@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
@@ -1120,5 +1118,3 @@ gtkui_scroll_connect( GtkCList *clist, GtkAdjustment *adj )
   gtk_signal_connect( GTK_OBJECT( clist ), "scroll-event",
 		      GTK_SIGNAL_FUNC( wheel_scroll_event ), adj );
 }
-
-#endif			/* #ifdef UI_GTK */

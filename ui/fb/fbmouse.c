@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_FB			/* Use this iff we're using fbdev */
-
 #include <stdio.h>
 #include <errno.h>
 
@@ -265,5 +263,3 @@ ui_mouse_release( int suspend )
 {
   return !suspend;
 }
-
-#endif			/* #ifndef FUSE_FBMOUSE_H */

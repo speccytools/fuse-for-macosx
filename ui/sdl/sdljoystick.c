@@ -27,8 +27,6 @@
 
 #include <config.h>
 
-#ifdef UI_SDL			/* Use this iff we're using SDL */
-
 #if !defined USE_JOYSTICK || defined HAVE_JSW_H
 /* Fake joystick, or override UI-specific handling */
 #include "../uijoystick.c"
@@ -189,5 +187,3 @@ ui_joystick_end( void )
 }
 
 #endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
-
-#endif			/* #ifdef UI_SDL */

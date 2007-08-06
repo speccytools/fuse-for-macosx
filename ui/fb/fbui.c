@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_FB			/* Use this iff we're using fbdev */
-
 #include <errno.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -111,5 +109,3 @@ fb_end( void )
   fbkeyboard_end();
   uidisplay_end();
 }
-
-#endif				/* #ifdef UI_FB */

@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_SDL			/* Use this iff we're using SDL */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL.h>
@@ -122,5 +120,3 @@ sdlkeyboard_keyrelease( SDL_KeyboardEvent *keyevent )
 
   input_event( &fuse_event );
 }
-
-#endif			/* #ifdef UI_SDL */

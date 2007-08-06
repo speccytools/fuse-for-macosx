@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -220,5 +218,3 @@ delete_dialog( GtkWidget *widget, GdkEvent *event GCC_UNUSED,
   gtk_widget_hide_all( widget );
   return TRUE;
 }
-
-#endif			/* #ifdef UI_GTK */

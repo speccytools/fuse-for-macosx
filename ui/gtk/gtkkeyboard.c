@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
@@ -93,5 +91,3 @@ static guint gtkkeyboard_unshift_keysym(guint keysym)
 			  XKeysymToKeycode(gdk_display,keysym),
 			  0);
 }
-
-#endif			/* #ifdef UI_GTK */

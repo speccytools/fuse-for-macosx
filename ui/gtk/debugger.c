@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <stdio.h>
 #include <string.h>
 
@@ -1024,5 +1022,3 @@ gtkui_debugger_done_close( GtkWidget *widget, gpointer user_data GCC_UNUSED )
   gtk_widget_hide_all( widget );
   gtkui_debugger_done_continue( NULL, NULL );
 }
-
-#endif			/* #ifdef UI_GTK */

@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
 #include "win32internals.h"
 
 extern BITMAPINFO fuse_BMI;
@@ -39,5 +37,3 @@ int win32display_init( void );
 int win32display_end( void );
 
 void blit( void );
-
-#endif			/* #ifdef UI_WIN32 */

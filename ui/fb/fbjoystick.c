@@ -27,9 +27,4 @@
 
 #include <config.h>
 
-#ifdef UI_FB
-
 #include "../uijoystick.c"
-
-#endif				/* #ifdef UI_FB */
-

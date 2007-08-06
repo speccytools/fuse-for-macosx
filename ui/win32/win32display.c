@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
 #include "display.h"
 #include "machine.h"
 #include "settings.h"
@@ -548,5 +546,3 @@ win32display_end( void )
 {
   return 0;
 }
-
-#endif			/* #ifdef UI_WIN32 */

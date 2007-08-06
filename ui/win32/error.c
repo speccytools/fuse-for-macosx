@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -65,5 +63,3 @@ ui_error_specific( ui_error_level severity, const char *message )
 
   return 0;
 }
-
-#endif			/* #ifdef UI_WIN32 */

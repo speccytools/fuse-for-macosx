@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <errno.h>
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
@@ -148,5 +146,3 @@ fileselector_done( GtkButton *button GCC_UNUSED, gpointer user_data )
   gtk_widget_destroy( ptr->selector );
   gtk_main_quit();
 }
-
-#endif			/* #ifdef UI_GTK */

@@ -27,8 +27,4 @@
 
 #include <config.h>
 
-#ifdef UI_X
-
 #include "../uijoystick.c"
-
-#endif				/* #ifdef UI_X */

@@ -334,8 +334,6 @@ print Fuse::GPL(
 
 #include <config.h>
 
-#ifdef UI_$define
-
 CODE
 
 # Comment to unbreak Emacs' perl mode
@@ -444,7 +442,3 @@ print << "CODE";
 
 CODE
 }
-
-print << "CODE";
-#endif
-CODE

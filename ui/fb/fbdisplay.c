@@ -26,8 +26,6 @@
 
 #include <config.h>
 
-#ifdef UI_FB			/* Use this iff we're using fbdev */
-
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -499,5 +497,3 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
     fbdisplay_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
   }
 }
-
-#endif				/* #ifdef UI_FB */

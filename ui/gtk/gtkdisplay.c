@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -463,5 +461,3 @@ drawing_area_resize_callback( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
   drawing_area_resize( event->configure.width, event->configure.height );
   return TRUE;
 }
-
-#endif			/* #ifdef UI_GTK */

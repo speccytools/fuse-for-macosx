@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <stdio.h>
 
 #include <gtk/gtk.h>
@@ -301,5 +299,3 @@ save_data( GtkButton *button GCC_UNUSED, gpointer user_data )
 
   gtkui_destroy_widget_and_quit( info->dialog, NULL );
 }
-  
-#endif			/* #ifdef UI_GTK */

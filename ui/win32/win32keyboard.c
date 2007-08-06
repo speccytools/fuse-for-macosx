@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
@@ -78,5 +76,3 @@ win32keyboard_keyrelease( WPARAM wParam, LPARAM lParam )
 
   input_event( &fuse_event );
 }
-
-#endif			/* #ifdef UI_WIN32 */

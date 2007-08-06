@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_X			/* Use this iff we're using Xlib */
-
 #include <stdio.h>
 
 #include <X11/Xlib.h>
@@ -293,5 +291,3 @@ ui_mouse_release( int suspend GCC_UNUSED )
   XUngrabPointer( display, CurrentTime );
   return 0;
 }
-
-#endif				/* #ifdef UI_X */

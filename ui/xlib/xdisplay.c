@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_X			/* Use this iff we're using Xlib */
-
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -1007,5 +1005,3 @@ ui_statusbar_update_speed( float speed )
 
   return 0;
 }
-
-#endif				/* #ifdef UI_X */

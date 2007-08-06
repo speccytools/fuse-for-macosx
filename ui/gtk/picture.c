@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -193,5 +191,3 @@ picture_expose( GtkWidget *widget, GdkEvent *event, gpointer data GCC_UNUSED )
 
   return TRUE;
 }
-
-#endif			/* #ifdef UI_GTK */

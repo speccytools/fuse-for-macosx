@@ -27,8 +27,6 @@
 
 #include <config.h>
 
-#ifdef UI_GGI
-
 #include <ggi/ggi.h>
 
 #include "display.h"
@@ -279,5 +277,3 @@ uiggi_event( void )
     }
   }
 }
-
-#endif				/* #ifdef UI_GGI */

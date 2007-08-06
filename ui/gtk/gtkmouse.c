@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK
-
 #include <gdk/gdk.h>
 #include <gtk/gtkwidget.h>
 
@@ -117,5 +115,3 @@ ui_mouse_release( int suspend GCC_UNUSED )
   ui_statusbar_update( UI_STATUSBAR_ITEM_MOUSE, UI_STATUSBAR_STATE_INACTIVE );
   return 0;
 }
-
-#endif

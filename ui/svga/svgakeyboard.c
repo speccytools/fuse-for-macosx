@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_SVGA			/* Use this iff we're using svgalib */
-
 #include <stdio.h>
 
 #include <vga.h>
@@ -103,5 +101,3 @@ int svgakeyboard_end(void)
   keyboard_close();
   return 0;
 }
-
-#endif				/* #ifdef UI_SVGA */

@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_WIN32		/* Use this file iff we're using WIN32 */
-
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
@@ -232,5 +230,3 @@ win32_debugger_break()
   hBreakButton = GetDlgItem( fuse_hDBGWnd, IDC_BTN_BREAK );
   EnableWindow( hBreakButton, FALSE );
 }
-
-#endif			/* #ifdef UI_WIN32 */

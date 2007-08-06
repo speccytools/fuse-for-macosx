@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_SDL			/* Use this iff we're using SDL */
-
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -825,5 +823,3 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
             item );
   return 1;
 }
-
-#endif        /* #ifdef UI_SDL */

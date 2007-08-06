@@ -26,8 +26,6 @@
 
 #include <config.h>
 
-#ifdef UI_SVGA			/* Use this iff we're using svgalib */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -369,5 +367,3 @@ int svgadisplay_end( void )
   vga_setmode( TEXT );
   return 0;
 }
-
-#endif				/* #ifdef UI_SVGA */

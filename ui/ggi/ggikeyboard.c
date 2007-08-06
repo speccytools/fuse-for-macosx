@@ -27,8 +27,6 @@
 
 #include <config.h>
 
-#ifdef UI_GGI
-
 #include <ggi/ggi.h>
 
 #include "ggi_internals.h"
@@ -140,5 +138,3 @@ ggikeyboard_keyrelease( int keysym )
   }
 
 }
-
-#endif				/* #ifdef UI_GGI */

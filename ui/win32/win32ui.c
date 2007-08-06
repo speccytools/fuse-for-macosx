@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_WIN32			/* Use this iff we're using UI_WIN32 */
-
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
@@ -719,5 +717,3 @@ void menu_machine_pokefinder( int action ) { STUB; }
 void menu_machine_memorybrowser( int action ) { STUB; }
 void menu_media_tape_browse( int action ) { STUB; }
 void menu_help_keyboard( int action ) { STUB; }
-
-#endif			/* #ifdef UI_WIN32 */

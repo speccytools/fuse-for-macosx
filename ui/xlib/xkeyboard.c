@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_X			/* Use this iff we're using Xlib */
-
 #include <stdio.h>
 
 #include <X11/Xlib.h>
@@ -78,5 +76,3 @@ void xkeyboard_keyrelease(XKeyEvent *event)
 
   input_event( &fuse_event );
 }
-
-#endif				/* #ifdef UI_X */

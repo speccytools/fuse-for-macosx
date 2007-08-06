@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_FB			/* Use this iff we're using fbdev */
-
 #include <stdio.h>
 #include <errno.h>
 #include <linux/kd.h>
@@ -145,5 +143,3 @@ keyboard_update( void )
       }
   }
 }
-
-#endif			/* #ifdef UI_FB */

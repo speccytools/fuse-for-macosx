@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <stdio.h>
 #include <string.h>
 
@@ -128,5 +126,3 @@ menu_machine_memorybrowser( GtkWidget *widget GCC_UNUSED,
 
   return;
 }
-
-#endif			/* #ifdef UI_GTK */

@@ -27,11 +27,7 @@
 
 #include <config.h>
 
-#ifdef UI_GGI
-
 void uiggi_event( void );
 
 void ggikeyboard_keypress( int keysym );
 void ggikeyboard_keyrelease( int keysym );
-
-#endif

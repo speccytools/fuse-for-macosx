@@ -27,8 +27,6 @@
 
 #include <config.h>
 
-#ifdef UI_SVGA			/* Use this iff we're using svgalib */
-
 #if !defined USE_JOYSTICK || defined HAVE_JSW_H
 
 /* Fake joystick, or override UI-specific handling */
@@ -149,5 +147,3 @@ ui_joystick_poll( void )
 }
 
 #endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
-
-#endif			/* #ifdef UI_SVGA */

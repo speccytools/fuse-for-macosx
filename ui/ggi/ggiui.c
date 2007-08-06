@@ -27,8 +27,6 @@
 
 #include <config.h>
 
-#ifdef UI_GGI
-
 #include <ggi/ggi.h>
 
 #include "ui/uidisplay.h"
@@ -59,5 +57,3 @@ ui_end( void )
 
   return 0;
 }
-
-#endif				/* #ifdef UI_GGI */

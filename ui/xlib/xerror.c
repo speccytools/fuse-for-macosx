@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_X                     /* Use this iff we're using Xlib */
-
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -69,5 +67,3 @@ xerror_handler( Display *display, XErrorEvent *error )
 
   return 0;
 }
-
-#endif				/* #ifdef UI_X */

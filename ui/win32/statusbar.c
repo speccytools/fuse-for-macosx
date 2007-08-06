@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_WIN32		/* Use this file iff we're using Win32 */
-
 #include "ui/ui.h"
 #include "win32internals.h"
 
@@ -99,5 +97,3 @@ ui_statusbar_update_speed( float speed )
 
   return 0;
 }
-
-#endif			/* #ifdef UI_WIN32 */

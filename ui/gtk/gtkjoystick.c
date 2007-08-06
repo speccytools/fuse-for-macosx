@@ -27,8 +27,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK
-
 #include <gtk/gtk.h>
 
 #include "compat.h"
@@ -343,5 +341,3 @@ joystick_done( GtkButton *button GCC_UNUSED, gpointer user_data )
   }
 
 }
-
-#endif				/* #ifdef UI_GTK */

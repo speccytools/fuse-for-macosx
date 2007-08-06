@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -131,5 +129,3 @@ set_dont_save( GtkButton *button GCC_UNUSED, gpointer user_data )
 
   *ptr = UI_CONFIRM_SAVE_DONTSAVE;
 }
-
-#endif				/* #ifdef UI_GTK */

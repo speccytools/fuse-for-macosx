@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_SVGA			/* Use this iff we're using svgalib */
-
 #include <stdio.h>
 
 #include <vga.h>
@@ -114,5 +112,3 @@ ui_mouse_release( int suspend )
 {
   return !suspend;
 }
-
-#endif				/* #ifdef UI_SVGA */

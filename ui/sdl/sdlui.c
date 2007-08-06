@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_SDL			/* Use this iff we're using SDL */
-
 #include <stdio.h>
 #include <SDL.h>
 
@@ -197,5 +195,3 @@ ui_mouse_release( int suspend )
   SDL_ShowCursor( SDL_ENABLE );
   return 0;
 }
-
-#endif				/* #ifdef UI_SDL */

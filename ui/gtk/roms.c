@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef UI_GTK		/* Use this file iff we're using GTK+ */
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -158,5 +156,3 @@ roms_done( GtkButton *button GCC_UNUSED, gpointer data )
 
   }
 }
-
-#endif			/* #ifdef UI_GTK */
