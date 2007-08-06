@@ -1990,3 +1990,6 @@
 20070806 widget/{browse.c,debugger.c,error.c,filesel.c,menu.c,picture.c,
 	 query.c,roms.c,select.c,text.c,widget.[ch]}: remove unnecessary
 	 #ifdefs.
+20070806 ui/gtk/fileselector.c: replace deprecated GtkFileSelection with
+	 GtkFileChooserDialog. TODO: reimplement "current directory"
+	 functionality.
