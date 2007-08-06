@@ -26,8 +26,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <sys/types.h>
 #include <dirent.h>
 #include <errno.h>
@@ -757,5 +755,3 @@ widget_filesel_keyhandler( input_key key )
   }
 #endif /* ifdef AMIGA */
 }
-
-#endif				/* #ifdef USE_WIDGET */

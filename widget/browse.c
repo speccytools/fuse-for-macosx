@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -226,5 +224,3 @@ free_description( gpointer data, gpointer user_data )
 {
   free( data );
 }
-
-#endif				/* #ifdef USE_WIDGET */

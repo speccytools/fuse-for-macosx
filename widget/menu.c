@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -633,5 +631,3 @@ ui_menu_item_set_active( const char *path, int active )
 {
   return set_active( widget_menu, path, active );
 }
-
-#endif				/* #ifdef USE_WIDGET */

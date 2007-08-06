@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -183,5 +181,3 @@ widget_error_keyhandler( input_key key )
 
   }
 }
-
-#endif				/* #ifdef USE_WIDGET */

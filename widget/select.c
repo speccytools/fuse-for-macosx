@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <string.h>
 
 #include "widget_internals.h"
@@ -164,5 +162,3 @@ int widget_select_finish( widget_finish_state finished )
 
   return 0;
 }
-
-#endif				/* #ifdef USE_WIDGET */

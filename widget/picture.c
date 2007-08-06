@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include "display.h"
 #include "ui/uidisplay.h"
 #include "widget_internals.h"
@@ -67,5 +65,3 @@ widget_picture_keyhandler( input_key key )
 
   }
 }
-
-#endif				/* #ifdef USE_WIDGET */

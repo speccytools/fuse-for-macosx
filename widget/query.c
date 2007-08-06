@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -116,5 +114,3 @@ widget_query_save_keyhandler( input_key key )
   default:;
   }
 }
-
-#endif				/* #ifdef USE_WIDGET */

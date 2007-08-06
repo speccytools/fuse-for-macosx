@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <stdio.h>
 #include <string.h>
 
@@ -547,5 +545,3 @@ static void scroll( int step )
 
   widget_debugger_draw( NULL );
 }
-
-#endif				/* #ifdef USE_WIDGET */

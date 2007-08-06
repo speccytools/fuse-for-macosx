@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -741,5 +739,3 @@ ui_widgets_reset( void )
   pokefinder_clear();
   return 0;
 }
-
-#endif				/* #ifdef USE_WIDGET */

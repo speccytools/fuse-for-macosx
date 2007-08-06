@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#ifdef USE_WIDGET
-
 #include <string.h>
 #include <ctype.h>
 
@@ -178,5 +176,3 @@ widget_text_finish( widget_finish_state finished )
 
   return 0;
 }
-
-#endif				/* #ifdef USE_WIDGET */
