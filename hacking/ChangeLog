@@ -1986,3 +1986,4 @@
 	 win32display.c,win32display.h,win32keyboard.c,win32ui.c},
 	 ui/xlib/{xdisplay.c,xerror.c,xjoystick.c,xkeyboard.c,xui.c}:
 	 remove unnecessary #ifdefs.
+20070806 fuse.c: remove duplicated constant.
