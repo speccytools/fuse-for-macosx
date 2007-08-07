@@ -27,14 +27,17 @@
 
 #include <windows.h>
 
+#include "ui/ui.h"
+
 int compat_osname( char *osname, size_t length )
 {
-  OSVERSIONINFO buf;
-  char *windows_name;
+	OSVERSIONINFO buf;
+	char *windows_name;
+	int error;
 
   buf.dwOSVersionInfoSize = sizeof( buf );
-  sys_error = GetVersionEx( &buf );
-  if( sys_error == 0 ) {
+  error = GetVersionEx( &buf );
+  if( error == 0 ) {
     ui_error( UI_ERROR_ERROR, "error getting system information." );
     return 1;
   }
@@ -46,9 +49,7 @@ int compat_osname( char *osname, size_t length )
   default:			   windows_name = "unknown"; break;
   }
 
-  snprintf( osname, length,
-	    "gcrypt: %s\nlibspectrum: %s\nuname: Windows %s %d.%d build %d %s",
-	    gcrypt_version, libspectrum_version(),
+  snprintf( osname, length, "Windows %s %d.%d build %d %s",
 	    windows_name, buf.dwMajorVersion, buf.dwMinorVersion,
 	    buf.dwBuildNumber, buf.szCSDVersion );
 

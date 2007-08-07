@@ -1993,3 +1993,6 @@
 20070806 ui/gtk/fileselector.c: replace deprecated GtkFileSelection with
 	 GtkFileChooserDialog. TODO: reimplement "current directory"
 	 functionality.
+20070807 Makefile.am,compat/win32/osname.c,configure.in: fix dependency on
+	 libcompatos.a on non-Unix systems, fix MinGW build and fix compilation
+	 of Win32 compat_osname() (Stuart).
