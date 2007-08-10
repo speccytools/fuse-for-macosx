@@ -1996,3 +1996,5 @@
 20070807 Makefile.am,compat/win32/osname.c,configure.in: fix dependency on
 	 libcompatos.a on non-Unix systems, fix MinGW build and fix compilation
 	 of Win32 compat_osname() (Stuart).
+20070810 ui/uijoystick.c,utils.h: fix compilation and remove redundant
+	 prototypes (Stuart).

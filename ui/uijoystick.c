@@ -146,7 +146,7 @@ ui_joystick_init( void )
   char *calibration;
   int error;
 
-  home = utils_get_home_path(); if( !home ) return 1;
+  home = compat_get_home_path(); if( !home ) return 1;
 
   /* Default calibration file is ~/.joystick */
   calibration = malloc( strlen( home ) + strlen( JSDefaultCalibration ) + 2 );
