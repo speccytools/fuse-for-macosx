@@ -61,7 +61,7 @@ static void plusd_set_cmdint( wd1770_fdc *f );
 int plusd_available = 0;
 int plusd_active = 0;
 
-static int plusd_index_pulse = 0;
+static int plusd_index_pulse;
 
 #define PLUSD_NUM_DRIVES 2
 
@@ -172,7 +172,6 @@ plusd_reset( int hard_reset )
 {
   int i;
   wd1770_drive *d;
-  wd1770_fdc *f = &plusd_fdc;
 
   plusd_available = 0;
 
@@ -195,22 +194,19 @@ plusd_reset( int hard_reset )
   plusd_active = 0;
   plusd_index_pulse = 0;
 
-  if( hard_reset ) {
-    for( i = 0; i < 8192; i++ ) {
-      memory_map_ram[ 16 * 2 ].page[ i ] = 0;
-    }
-  }
+  if( hard_reset )
+    memset( memory_map_ram[ 16 * 2 ].page, 0, 0x2000 );
 
-  f->spin_cycles = 0;
-  f->direction = 0;
+  plusd_fdc.spin_cycles = 0;
+  plusd_fdc.direction = 0;
 
-  f->state = WD1770_STATE_NONE;
-  f->status_type = WD1770_STATUS_TYPE1;
+  plusd_fdc.state = WD1770_STATE_NONE;
+  plusd_fdc.status_type = WD1770_STATUS_TYPE1;
 
-  f->status_register = 0;
-  f->track_register = 0;
-  f->sector_register = 0;
-  f->data_register = 0;
+  plusd_fdc.status_register = 0;
+  plusd_fdc.track_register = 0;
+  plusd_fdc.sector_register = 0;
+  plusd_fdc.data_register = 0;
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
@@ -221,7 +217,7 @@ plusd_reset( int hard_reset )
     d->side = 0;
   }
 
-  f->status_register |= WD1770_SR_LOST; /* track 0 */
+  plusd_fdc.status_register |= WD1770_SR_LOST; /* track 0 */
 
   /* We can eject disks only if they are currently present */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,

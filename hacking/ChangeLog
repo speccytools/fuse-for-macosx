@@ -1998,3 +1998,4 @@
 	 of Win32 compat_osname() (Stuart).
 20070810 ui/uijoystick.c,utils.h: fix compilation and remove redundant
 	 prototypes (Stuart).
+20070811 disk/plusd.c: various cleanups (Stuart).
