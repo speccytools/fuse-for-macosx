@@ -56,8 +56,6 @@
 #include "wd1770.h"
 #include "z80/z80.h"
 
-static void plusd_set_cmdint( wd1770_fdc *f );
-
 int plusd_available = 0;
 int plusd_active = 0;
 
@@ -109,12 +107,6 @@ plusd_memory_map( void )
   memory_map_read[ 1 ] = memory_map_write[ 1 ] = memory_map_ram[ 16 * 2 ];
 }
 
-void
-plusd_set_cmdint( wd1770_fdc *f GCC_UNUSED )
-{
-  z80_interrupt();
-}
-
 const periph_t plusd_peripherals[] = {
   /* ---- ---- 1110 0011 */
   { 0x00ff, 0x00e3, plusd_sr_read, plusd_cr_write },
@@ -151,7 +143,7 @@ plusd_init( void )
     d->filename[0] = '\0';
   }
 
-  plusd_fdc.set_cmdint = plusd_set_cmdint;
+  plusd_fdc.set_cmdint = NULL;
   plusd_fdc.reset_cmdint = NULL;
   plusd_fdc.set_datarq = NULL;
   plusd_fdc.reset_datarq = NULL;

@@ -1999,3 +1999,4 @@
 20070810 ui/uijoystick.c,utils.h: fix compilation and remove redundant
 	 prototypes (Stuart).
 20070811 disk/plusd.c: various cleanups (Stuart).
+20070812 disk/plusd.c: ignore the cmdint line (thanks, Gergely) (Stuart).
