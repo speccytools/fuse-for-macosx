@@ -6,13 +6,16 @@
 	  * Add +D disk interface support (Stuart Brady).
 	  * Add Hi-Fi beeper for improved reproduction of multi-channel beeper
 	    tunes (e.g. Fairlight 2, Wham - the Music Box) (Fredrick Meunier).
-	  * Add support for saving tape images without using tape traps (Fredrick
-	    Meunier).
+	  * Add support for saving tape images without using tape traps
+	    (Fredrick Meunier).
 	  * Add support for loading from WAV tape images (Fredrick Meunier).
 	  * Add support for saving CSW tape images and TZX direct recording
 	    blocks (Fredrick Meunier).
 	  * Allow distinction between "soft" resets (activing the reset line on
 	    the Z80) and "hard" resets (pulling the power) (Philip Kendall).
+	  * New ALSA sound driver (Gergely Szasz).
+	  * AmigaOS support (Chris Young).
+	  * MorphOS support (Q-Master).
 
 	* Emulation core improvements:
 	  * Fix contention for LD?R, CP?R and IN?R (Philip Kendall; thanks,
@@ -22,6 +25,13 @@
 	  * Fix undocumented behaviour of DAA (Stuart Brady).
 	  * Separate out contention when MREQ isn't active, as the +2A/+3 ULA
 	    applies contention only when MREQ is active (Philip Kendall).
+
+	* Miscellaneous:
+	  * Removed the GTK 1.x UI (please note that GTK 2.x will remain
+	    supported for the forseeable future) (Philip Kendall).
+	  * Updated X11 UI (Gergely Szasz).
+	  * Updated Win32 UI (Stuart Brady).
+	  * Man page fixes (Stuart Brady).
 
 	* Various other minor bugfixes.
 
