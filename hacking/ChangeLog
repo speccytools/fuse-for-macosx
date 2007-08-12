@@ -2003,3 +2003,5 @@
 20070812 disk/{wd1770.c,wd1770.h}: implement the "write track" command
 	 (patch #1768962) (Gergely Szasz).
 20070812 ChangeLog: add more items, fix wordwrapping (Stuart).
+20070812 machines/{spec16.c,tc2048.c}: allow the +D to be used with the 16K
+	 Spectrum and the TC2048 (thanks, Gergely and Fred) (Stuart).
