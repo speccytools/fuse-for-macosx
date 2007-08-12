@@ -1,5 +1,6 @@
 /* wd1770.h: Routines for handling the WD1770 floppy disk controller
-   Copyright (c) 2003-2007 Stuart Brady, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2007 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Gergely Szasz
 
    $Id$
 
@@ -97,6 +98,29 @@ typedef struct wd1770_fdc {
   void ( *set_datarq ) ( struct wd1770_fdc *f );
   void ( *reset_datarq ) ( struct wd1770_fdc *f );
   void *iface;
+
+  DSK_GEOMETRY fgeom;		/* geom for write track */
+  int fill;			/* fill byte for format */
+  int idx;
+  enum wd1770_trcmd_state {
+    WD1770_TRACK_NONE = 0,
+    WD1770_TRACK_GAP1,
+    WD1770_TRACK_GAP2,
+    WD1770_TRACK_SYNC,
+    WD1770_TRACK_IMRK,
+
+    WD1770_TRACK_ID_TRACK,
+    WD1770_TRACK_ID_HEAD,
+    WD1770_TRACK_ID_SECTOR,
+    WD1770_TRACK_ID_SIZE,
+
+    WD1770_TRACK_CRC,
+    WD1770_TRACK_GAP3,
+    WD1770_TRACK_DMRK,
+    WD1770_TRACK_DATA,
+    WD1770_TRACK_GAP4,
+    WD1770_TRACK_FILL,
+  } trcmd_state;
 } wd1770_fdc;
 
 libspectrum_byte wd1770_sr_read( wd1770_fdc *f );

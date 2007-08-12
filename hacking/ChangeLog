@@ -2000,3 +2000,5 @@
 	 prototypes (Stuart).
 20070811 disk/plusd.c: various cleanups (Stuart).
 20070812 disk/plusd.c: ignore the cmdint line (thanks, Gergely) (Stuart).
+20070812 disk/{wd1770.c,wd1770.h}: implement the "write track" command
+	 (patch #1768962) (Gergely Szasz).

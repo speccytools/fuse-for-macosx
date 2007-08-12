@@ -1,6 +1,6 @@
 /* wd1770.c: Routines for handling the WD1770 floppy disk controller
    Copyright (c) 2002-2007 Stuart Brady, Fredrick Meunier, Philip Kendall,
-   Dmitry Sanarin
+   Dmitry Sanarin, Gergely Szasz
 
    $Id$
 
@@ -261,18 +261,34 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
       f->data_offset = 0;
       f->data_multisector = multisector;
     }
-  } else if( ( b & 0xf0 ) != 0xd0 ) {           /* Type III */
+  } else if( ( b & 0x30 ) != 0x10 ) {           /* Type III */
 /*  int delay = b & 0x04; */
 
-    switch( b & 0xf0 ) {
-    case 0x00:                                          /* Read Track */
+    switch( b & 0x30 ) {
+    case 0x00:                                          /* Read Address */
+      fprintf( stderr, "read address not yet implemented\n" );
+      break;
+    case 0x20:                                          /* Read Track */
       fprintf( stderr, "read track not yet implemented\n" );
       break;
-    case 0x01:                                          /* Write Track */
-      fprintf( stderr, "write track not yet implemented\n" );
-      break;
-    case 0x02:                                          /* Read Address */
-      fprintf( stderr, "read address not yet implemented\n" );
+    case 0x30:                                          /* Write Track */
+      f->state = WD1770_STATE_WRITETRACK;
+      f->trcmd_state = WD1770_TRACK_NONE;
+      if( d->track >= d->geom.dg_cylinders || d->track < 0 ) {
+	f->status_register |= WD1770_SR_RNF;
+	wd1770_set_cmdint( f );
+	wd1770_reset_datarq( f );
+      } else {
+	wd1770_set_datarq( f );
+	statusbar_update(1);
+	f->status_register |= WD1770_SR_BUSY;
+	f->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
+				 WD1770_SR_CRCERR | WD1770_SR_LOST );
+	f->data_track = d->track;
+	f->data_sector = f->sector_register;
+	f->data_side = d->side;
+	f->data_offset = 0;
+      }
       break;
     }
     f->status_type = WD1770_STATUS_TYPE2;
@@ -386,6 +402,85 @@ wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b )
 	wd1770_set_cmdint( f );
 	wd1770_reset_datarq( f );
       }
+    }
+  } else if( f->state == WD1770_STATE_WRITETRACK ) {
+    if( !d->disk || 
+	f->data_track >= d->geom.dg_cylinders ||
+	f->data_side >= d->geom.dg_heads ) {
+      f->status_register |= WD1770_SR_RNF;
+      fprintf( stderr, "writetrack to non-existent track\n" );
+      return;
+    }
+    switch( f->trcmd_state ) {
+    case WD1770_TRACK_NONE:
+      statusbar_update(1);
+      f->fgeom = d->geom;		/* set up formattng geometry */
+      f->trcmd_state = WD1770_TRACK_GAP1;
+      break;
+    case WD1770_TRACK_GAP1:
+      if( b == 0xfe )				/* received ID MARK */
+	f->trcmd_state = WD1770_TRACK_IMRK;	/* side/sect/len */
+      break;
+    case WD1770_TRACK_IMRK:
+      f->trcmd_state = WD1770_TRACK_ID_HEAD;	/* track number */
+      break;
+    case WD1770_TRACK_ID_HEAD:
+      if( f->fgeom.dg_heads < b + 1 )		/* setup heads */
+	f->fgeom.dg_heads = b + 1;
+      f->trcmd_state = WD1770_TRACK_ID_SECTOR;	/* sector number */
+      break;
+    case WD1770_TRACK_ID_SECTOR:
+      if( f->fgeom.dg_sectors < b )		/* setup sectors */
+	f->fgeom.dg_sectors = b;
+      f->trcmd_state = WD1770_TRACK_ID_SIZE;	/* size of sector */
+      break;
+    case WD1770_TRACK_ID_SIZE:
+      if( f->fgeom.dg_secsize < ( 0x80 << b ) )
+	f->fgeom.dg_secsize = ( 0x80 << b );
+      f->trcmd_state = WD1770_TRACK_DMRK;	/* sector length */
+      break;
+    case WD1770_TRACK_DMRK:	/* waiting for DMRK */
+      if( b == 0xfb || b == 0xf8 ) {
+	f->trcmd_state = WD1770_TRACK_DATA;
+	f->fill = 0xf7;		/* 0xf7 = CRC so never be a fill byte */
+      }
+      break;
+    case WD1770_TRACK_DATA:	/* wait for next GAP */
+      if( f->fill == 0xf7 )
+	f->fill = b;		/* set up fill byte */
+      if( b == 0x4e ) {
+	f->trcmd_state = WD1770_TRACK_GAP4;
+	f->idx = 128;		/* wait for max 64 GAP... */
+      }
+      break;
+    case WD1770_TRACK_GAP4:
+      if( b == 0x00 )		/* new sector PLL */
+	f->trcmd_state = WD1770_TRACK_GAP1;
+      if( !( f->idx-- ) )
+	f->trcmd_state = WD1770_TRACK_FILL;
+      break;
+    case WD1770_TRACK_FILL:	/* now we actually format the track */
+      if( f->fgeom.dg_heads > 2 || f->fgeom.dg_sectors > 21 ||
+	    f->fgeom.dg_secsize > 1024 ) {
+	fprintf( stderr, "problem during formatting track %d, wrong id data:\n", f->data_track );
+	fprintf( stderr, "    t:%d h:%d spt:%d bps:%d\n", f->data_track,
+				    f->fgeom.dg_heads, f->fgeom.dg_sectors,
+				    (int)f->fgeom.dg_secsize );
+      } else {
+	if( dsk_apform( d->disk, &f->fgeom, f->data_track,
+			f->data_side, f->fill ) != DSK_ERR_OK )
+	fprintf( stderr, "problem during formatting track %d\n", f->data_track );
+      }
+      statusbar_update(0);
+
+      f->status_register &= ~WD1770_SR_BUSY;
+      f->status_type = WD1770_STATUS_TYPE2;
+      f->state = WD1770_STATE_NONE;
+      wd1770_set_cmdint( f );
+      wd1770_reset_datarq( f );
+      break;
+    default:
+      break;
     }
   }
 }
