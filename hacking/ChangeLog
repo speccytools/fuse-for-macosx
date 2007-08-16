@@ -2005,3 +2005,4 @@
 20070812 ChangeLog: add more items, fix wordwrapping (Stuart).
 20070812 machines/{spec16.c,tc2048.c}: allow the +D to be used with the 16K
 	 Spectrum and the TC2048 (thanks, Gergely and Fred) (Stuart).
+20070816 periph.c: fix IF2 menu activation (Fred).

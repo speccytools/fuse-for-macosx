@@ -361,17 +361,16 @@ periph_setup_plusd( periph_present present ) {
 static void
 update_cartridge_menu( void )
 {
-  int cartridge, dock, if2;
+  int cartridge, dock;
 
   dock = machine_current->capabilities &
          LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK;
-  if2 = settings_current.interface2;
 
-  cartridge = dock || if2;
+  cartridge = dock || periph_interface2_active;
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE, cartridge );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, dock );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, if2 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, periph_interface2_active );
 }
 
 static void
