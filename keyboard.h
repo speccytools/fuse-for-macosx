@@ -28,9 +28,7 @@
 
 #include <libspectrum.h>
 
-#ifndef FUSE_INPUT_H
 #include "input.h"
-#endif			/* #ifndef FUSE_INPUT_H */
 
 extern libspectrum_byte keyboard_default_value;
 extern libspectrum_byte keyboard_return_values[8];

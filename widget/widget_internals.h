@@ -32,13 +32,8 @@
 
 #include <libspectrum.h>
 
-#ifndef FUSE_SETTINGS_H
 #include "settings.h"
-#endif				/* #ifndef FUSE_SETTINGS_H */
-
-#ifndef FUSE_WIDGET_H
 #include "widget.h"
-#endif				/* #ifndef FUSE_WIDGET_H */
 
 /* The default colours used in the widget */
 #define WIDGET_COLOUR_DISABLED   0	/* Black */

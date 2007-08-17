@@ -2026,3 +2026,6 @@
 	 menu.c,options.pl,picture.c,pokefinder.c,query.c,roms.c,widget.c,
 	 widget.h},z80/{Makefile.am,coretest.c,z80.c,z80.pl,z80_ops.c}: enable
 	 Fuse to build in directories other than the source directory itself.
+20070817 debugger/debugger_internals.h,keyboard.h,machines/scorpion.h,
+	 widget/widget_internals.h: remove pointless conditional inclusion of
+	 headers.

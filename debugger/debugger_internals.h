@@ -26,9 +26,7 @@
 #ifndef FUSE_DEBUGGER_INTERNALS_H
 #define FUSE_DEBUGGER_INTERNALS_H
 
-#ifndef FUSE_DEBUGGER_H
 #include "debugger.h"
-#endif				/* #ifndef FUSE_DEBUGGER_H */
 
 int debugger_breakpoint_remove( size_t id );
 int debugger_breakpoint_remove_all( void );
