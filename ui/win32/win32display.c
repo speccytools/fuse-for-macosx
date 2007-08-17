@@ -25,12 +25,12 @@
 
 #include <config.h>
 
-#include "display.h"
-#include "machine.h"
-#include "settings.h"
-#include "ui/ui.h"
-#include "ui/uidisplay.h"
-#include "ui/scaler/scaler.h"
+#include "../../display.h"
+#include "../../machine.h"
+#include "../../settings.h"
+#include "../ui.h"
+#include "../uidisplay.h"
+#include "../scaler/scaler.h"
 #include "win32keyboard.h"
 #include "win32display.h"
 #include "win32internals.h"

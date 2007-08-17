@@ -42,8 +42,8 @@ libuiwin32_a_SOURCES = debugger.c \
 
 BUILT_SOURCES = keysyms.c
 
-keysyms.c: ../../keysyms.pl ../../keysyms.dat
-	@PERL@ ../../keysyms.pl win32 ../../keysyms.dat > $@
+keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
+	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl win32 $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = debugger.h \
 		 menu_data.h \

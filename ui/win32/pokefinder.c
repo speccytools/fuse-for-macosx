@@ -24,7 +24,7 @@
 */
 
 #include "win32internals.h"
-#include "pokefinder/pokefinder.h"
+#include "../../pokefinder/pokefinder.h"
 
 #include "pokefinder.h"
 

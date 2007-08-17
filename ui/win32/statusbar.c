@@ -25,7 +25,7 @@
 
 #include <config.h>
 
-#include "ui/ui.h"
+#include "../ui.h"
 #include "win32internals.h"
 
 HICON

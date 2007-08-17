@@ -24,7 +24,7 @@
 */
 
 #include "menu_data.h"
-#include "menu.h"
+#include "../../menu.h"
 
 void handle_menu( DWORD cmd, HWND okno )
 {

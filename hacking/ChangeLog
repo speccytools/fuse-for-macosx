@@ -2031,3 +2031,7 @@
 	 headers.
 20070817 scorpion.h: fix up header path.
 20070817 menu_data.pl: fix up menu.h path (thanks, Fred and Stuart).
+20070817 compat/win32/{osname.c,paths.c},ui/win32/{Makefile.am,debugger.c,
+	 error.c,menu_data.c,pokefinder.c,statusbar.c,win32display.c,
+	 win32keyboard.c,win32ui.c}: allow a builddir to be specified when
+	 building for Win32 (Stuart).
