@@ -2029,3 +2029,4 @@
 20070817 debugger/debugger_internals.h,keyboard.h,machines/scorpion.h,
 	 widget/widget_internals.h: remove pointless conditional inclusion of
 	 headers.
+20070817 scorpion.h: fix up header path.
