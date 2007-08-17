@@ -25,8 +25,6 @@
 
 use strict;
 
-use lib 'perl';
-
 use Fuse;
 
 sub hashline ($) { '#line ', $_[0] + 1, '"', __FILE__, "\"\n" }

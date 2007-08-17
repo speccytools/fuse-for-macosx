@@ -25,8 +25,6 @@
 
 use strict;
 
-use lib '../../perl';
-
 use Fuse;
 use Fuse::Dialog;
 
@@ -50,13 +48,13 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "compat.h"
-#include "display.h"
-#include "fuse.h"
+#include "../../compat.h"
+#include "../../display.h"
+#include "../../fuse.h"
 #include "gtkinternals.h"
 #include "options.h"
-#include "periph.h"
-#include "settings.h"
+#include "../../periph.h"
+#include "../../settings.h"
 CODE
 
 foreach( @dialogs ) {

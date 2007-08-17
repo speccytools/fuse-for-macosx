@@ -28,10 +28,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "compat.h"
-#include "debugger/debugger.h"
-#include "pokefinder/pokefinder.h"
-#include "ui/ui.h"
+#include "../compat.h"
+#include "../debugger/debugger.h"
+#include "../pokefinder/pokefinder.h"
+#include "../ui/ui.h"
 #include "widget.h"
 #include "widget_internals.h"
 

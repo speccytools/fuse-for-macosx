@@ -26,17 +26,9 @@
 #ifndef FUSE_WIDGET_H
 #define FUSE_WIDGET_H
 
-#ifndef FUSE_INPUT_H
-#include "input.h"
-#endif				/* #ifndef FUSE_INPUT_H */
-
-#ifndef SCALER_H
-#include "ui/scaler/scaler.h"
-#endif				/* #ifndef SCALER_H */
-
-#ifndef FUSE_UI_H
-#include "ui/ui.h"
-#endif
+#include "../input.h"
+#include "../ui/scaler/scaler.h"
+#include "../ui/ui.h"
 
 /* How many levels deep have we recursed through widgets; -1 => none */
 extern int widget_level;

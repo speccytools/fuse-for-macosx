@@ -28,7 +28,7 @@
 
 #include <libspectrum.h>
 
-#include "machine.h"
+#include "../machine.h"
 
 int tc2068_init( fuse_machine_info *machine );
 int tc2068_tc2048_common_reset( void );

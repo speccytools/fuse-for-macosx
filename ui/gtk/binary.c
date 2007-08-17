@@ -30,12 +30,12 @@
 #include <gtk/gtk.h>
 #include <libspectrum.h>
 
-#include "fuse.h"
+#include "../../fuse.h"
 #include "gtkinternals.h"
-#include "memory.h"
-#include "menu.h"
-#include "ui/ui.h"
-#include "utils.h"
+#include "../../memory.h"
+#include "../../menu.h"
+#include "../ui.h"
+#include "../../utils.h"
 
 struct binary_info {
 

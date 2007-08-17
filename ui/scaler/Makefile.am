@@ -30,11 +30,11 @@ INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 libscaler_a_SOURCES = scaler.c
 libscaler_a_LIBADD = scalers16.o scalers32.o
 
-scalers16.o: scalers.c
-	$(COMPILE) -DSCALER_DATA_SIZE=2 -c scalers.c -o scalers16.o
+scalers16.o: $(srcdir)/scalers.c
+	$(COMPILE) -DSCALER_DATA_SIZE=2 -c $(srcdir)/scalers.c -o scalers16.o
 
 scalers32.o: scalers.c
-	$(COMPILE) -DSCALER_DATA_SIZE=4 -c scalers.c -o scalers32.o
+	$(COMPILE) -DSCALER_DATA_SIZE=4 -c $(srcdir)/scalers.c -o scalers32.o
 
 noinst_HEADERS = scaler.h scaler_internals.h
 

@@ -28,16 +28,16 @@
 #include <stdio.h>
 #include <SDL.h>
 
-#include "display.h"
-#include "fuse.h"
-#include "ui/ui.h"
-#include "ui/uidisplay.h"
-#include "settings.h"
+#include "../../display.h"
+#include "../../fuse.h"
+#include "../ui.h"
+#include "../uidisplay.h"
+#include "../../settings.h"
 #include "sdldisplay.h"
 #include "sdljoystick.h"
 #include "sdlkeyboard.h"
-#include "ui/scaler/scaler.h"
-#include "menu.h"
+#include "../scaler/scaler.h"
+#include "../../menu.h"
 
 void
 atexit_proc( void )

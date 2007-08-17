@@ -25,9 +25,6 @@
 
 use strict;
 
-use lib '../perl';
-use lib '../../perl';
-
 use Fuse;
 
 sub get_branch ($$);
@@ -65,7 +62,7 @@ print Fuse::GPL( $filename . ': menu structure for Fuse',
 
 #include <config.h>
 
-#include "menu.h"
+#include "../../menu.h"
 
 CODE
 
@@ -147,7 +144,7 @@ sub dump_widget ($) {
     my( $menu ) = @_;
 
     print << "HEADERS";
-#include "input.h"
+#include "../input.h"
 #include "options.h"
 #include "widget_internals.h"
 

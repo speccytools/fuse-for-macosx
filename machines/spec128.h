@@ -28,13 +28,8 @@
 
 #include <libspectrum.h>
 
-#ifndef FUSE_MACHINE_H
-#include "machine.h"
-#endif			/* #ifndef FUSE_MACHINE_H */
-
-#ifndef FUSE_PERIPH_H
-#include "periph.h"
-#endif			/* #ifndef FUSE_PERIPH_H */
+#include "../machine.h"
+#include "../periph.h"
 
 extern const periph_t spec128_peripherals[];
 extern const size_t spec128_peripherals_count;

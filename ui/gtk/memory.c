@@ -31,10 +31,10 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "compat.h"
+#include "../../compat.h"
 #include "gtkinternals.h"
-#include "memory.h"
-#include "menu.h"
+#include "../../memory.h"
+#include "../../menu.h"
 
 static void
 update_display( GtkCList *clist, libspectrum_word base )

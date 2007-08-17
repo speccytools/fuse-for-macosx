@@ -27,16 +27,16 @@
 
 #include <libspectrum.h>
 
-#include "joystick.h"
-#include "machine.h"
+#include "../joystick.h"
+#include "../machine.h"
 #include "machines.h"
-#include "periph.h"
-#include "printer.h"
-#include "settings.h"
+#include "../periph.h"
+#include "../printer.h"
+#include "../settings.h"
 #include "spec128.h"
 #include "specplus3.h"
-#include "ula.h"
-#include "if1.h"
+#include "../ula.h"
+#include "../if1.h"
 
 static int specplus2a_reset( void );
 

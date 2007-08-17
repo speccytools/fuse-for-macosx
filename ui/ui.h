@@ -34,11 +34,11 @@
 
 #include <libspectrum.h>
 
-#include "compat.h"
-#include "disk/plusd.h"
-#include "machines/specplus3.h"
-#include "trdos.h"
-#include "ui/scaler/scaler.h"
+#include "../compat.h"
+#include "../disk/plusd.h"
+#include "../machines/specplus3.h"
+#include "../trdos.h"
+#include "scaler/scaler.h"
 
 /* The various severities of error level, increasing downwards */
 typedef enum ui_error_level {

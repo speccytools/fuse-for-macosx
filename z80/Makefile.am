@@ -31,20 +31,20 @@ INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 BUILT_SOURCES = opcodes_base.c z80_cb.c z80_ddfd.c z80_ddfdcb.c z80_ed.c
 
-opcodes_base.c: z80.pl opcodes_base.dat
-	@PERL@ z80.pl opcodes_base.dat > opcodes_base.c
+opcodes_base.c: $(srcdir)/z80.pl $(srcdir)/opcodes_base.dat
+	@PERL@ -I$(srcdir)/../perl $(srcdir)/z80.pl $(srcdir)/opcodes_base.dat > $@.tmp && mv $@.tmp $@
 
-z80_cb.c: z80.pl opcodes_cb.dat
-	@PERL@ z80.pl opcodes_cb.dat > z80_cb.c
+z80_cb.c: $(srcdir)/z80.pl $(srcdir)/opcodes_cb.dat
+	@PERL@ -I$(srcdir)/../perl $(srcdir)/z80.pl $(srcdir)/opcodes_cb.dat > $@.tmp && mv $@.tmp $@
 
-z80_ddfd.c: z80.pl opcodes_ddfd.dat
-	@PERL@ z80.pl opcodes_ddfd.dat > z80_ddfd.c
+z80_ddfd.c: $(srcdir)/z80.pl $(srcdir)/opcodes_ddfd.dat
+	@PERL@ -I$(srcdir)/../perl $(srcdir)/z80.pl $(srcdir)/opcodes_ddfd.dat > $@.tmp && mv $@.tmp $@
 
-z80_ddfdcb.c: z80.pl opcodes_ddfd.dat
-	@PERL@ z80.pl opcodes_ddfdcb.dat > z80_ddfdcb.c
+z80_ddfdcb.c: $(srcdir)/z80.pl $(srcdir)/opcodes_ddfd.dat
+	@PERL@ -I$(srcdir)/../perl $(srcdir)/z80.pl $(srcdir)/opcodes_ddfdcb.dat > $@.tmp && mv $@.tmp $@
 
-z80_ed.c: z80.pl opcodes_ed.dat
-	@PERL@ z80.pl opcodes_ed.dat > z80_ed.c
+z80_ed.c: $(srcdir)/z80.pl $(srcdir)/opcodes_ed.dat
+	@PERL@ -I$(srcdir)/../perl $(srcdir)/z80.pl $(srcdir)/opcodes_ed.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = z80.h \
 		 z80_macros.h 
@@ -70,12 +70,12 @@ noinst_PROGRAMS = coretest
 coretest_SOURCES = coretest.c z80.c
 coretest_LDADD = z80_coretest.o @LIBSPEC_LIBS@
 
-coretest.o: coretest.c
-	$(COMPILE) -DCORETEST -c coretest.c -o coretest.o
+coretest.o: $(srcdir)/coretest.c
+	$(COMPILE) -DCORETEST -c $(srcdir)/coretest.c -o $@
 
 z80_coretest.o: z80_ops.c
-	$(COMPILE) -DCORETEST -c z80_ops.c -o z80_coretest.o
+	$(COMPILE) -DCORETEST -c $(srcdir)/z80_ops.c -o $@
 
 test: coretest
-	./coretest tests/tests.in > tests.actual
-	cmp tests.actual tests/tests.expected
+	./coretest $(srcdir)/tests/tests.in > tests.actual
+	cmp tests.actual $(srcdir)/tests/tests.expected

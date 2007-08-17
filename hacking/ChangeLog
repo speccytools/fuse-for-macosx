@@ -2007,3 +2007,22 @@
 	 Spectrum and the TC2048 (thanks, Gergely and Fred) (Stuart).
 20070816 periph.c: fix IF2 menu activation (Fred).
 20070817 timer/unix.c: ensure we have the prototype for strerror() (Fred).
+20070817 Makefile.am,compat/unix/{osname.c,paths.c},debugger/{breakpoint.c,
+	 command.c,commandy.y,debugger.c,disassemble.c,expression.c},
+	 disk/{plusd.c,plusd.h,wd1770.c,wd1770.h},hacking/ChangeLog,keysyms.pl,
+	 machines/{machines.h,pentagon.c,scorpion.c,spec128.c,spec128.h,
+	 spec16.c,spec48.c,spec48.h,spec_se.c,specplus2.c,specplus2a.c,
+	 specplus3.c,specplus3.h,specplus3e.c,tc2048.c,tc2068.c,tc2068.h,
+	 ts2068.c},menu_data.pl,pokefinder/pokefinder.c,settings.pl,
+	 sound/{alsasound.c,aosound.c,coreaudiosound.c,dxsound.c,hpsound.c,
+	 nullsound.c,osssound.c,sdlsound.c,sunsound.c},timer/{timer.c,unix.c},
+	 ui/{gtk/{Makefile.am,binary.c,browse.c,confirm.c,debugger.c,
+	 gtkdisplay.c,gtkjoystick.c,gtkkeyboard.c,gtkmouse.c,gtkui.c,memory.c,
+	 options-header.pl,options.pl,picture.c,pokefinder.c,rollback.c,roms.c,
+	 statusbar.c},scaler/{Makefile.am,scaler.c,scalers.c},sdl/{Makefile.am,
+	 sdldisplay.c,sdljoystick.c,sdlkeyboard.c,sdlui.c},ui.h,uijoystick.c,
+	 xlib/{Makefile.am,xdisplay.c,xerror.c,xkeyboard.c,xui.c}},
+	 widget/{Makefile.am,browse.c,debugger.c,error.c,filesel.c,memory.c,
+	 menu.c,options.pl,picture.c,pokefinder.c,query.c,roms.c,widget.c,
+	 widget.h},z80/{Makefile.am,coretest.c,z80.c,z80.pl,z80_ops.c}: enable
+	 Fuse to build in directories other than the source directory itself.

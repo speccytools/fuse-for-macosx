@@ -27,9 +27,9 @@
 
 #include <gtk/gtk.h>
 
-#include "fuse.h"
+#include "../../fuse.h"
 #include "gtkinternals.h"
-#include "ui/ui.h"
+#include "../ui.h"
 
 GtkWidget *dialog, *list;
 

@@ -29,8 +29,8 @@
 #include <stdlib.h>
 
 #include "debugger_internals.h"
-#include "fuse.h"
-#include "ui/ui.h"
+#include "../fuse.h"
+#include "../ui/ui.h"
 
 typedef enum expression_type {
 

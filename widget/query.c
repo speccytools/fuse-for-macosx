@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "fuse.h"
+#include "../fuse.h"
 #include "widget_internals.h"
 
 widget_query_t widget_query;

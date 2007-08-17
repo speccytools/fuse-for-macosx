@@ -34,8 +34,8 @@
 #include <libspectrum.h>
 #endif				/* #ifdef HAVE_LIB_GLIB */
 
-#include "fuse.h"
-#include "tape.h"
+#include "../fuse.h"
+#include "../tape.h"
 #include "widget_internals.h"
 
 /* The descriptions of the blocks */

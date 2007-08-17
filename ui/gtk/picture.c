@@ -34,11 +34,11 @@
 #include <gtk/gtk.h>
 #include <libspectrum.h>
 
-#include "display.h"
-#include "fuse.h"
+#include "../../display.h"
+#include "../../fuse.h"
 #include "gtkinternals.h"
-#include "ui/ui.h"
-#include "utils.h"
+#include "../ui.h"
+#include "../../utils.h"
 
 /* An RGB image of the keyboard picture */
 static guchar picture[ DISPLAY_SCREEN_HEIGHT * DISPLAY_ASPECT_WIDTH * 4 ];

@@ -25,8 +25,8 @@
 
 #include <config.h>
 
-#include "display.h"
-#include "ui/uidisplay.h"
+#include "../display.h"
+#include "../ui/uidisplay.h"
 #include "widget_internals.h"
 
 static widget_picture_data *ptr;

@@ -31,12 +31,12 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "compat.h"
-#include "fuse.h"
+#include "../../compat.h"
+#include "../../fuse.h"
 #include "gtkinternals.h"
-#include "menu.h"
-#include "tape.h"
-#include "ui/ui.h"
+#include "../../menu.h"
+#include "../../tape.h"
+#include "../ui.h"
 
 static int create_dialog( void );
 static void add_block_details( libspectrum_tape_block *block,

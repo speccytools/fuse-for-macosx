@@ -30,18 +30,18 @@
 
 #include <libspectrum.h>
   
-#include "display.h"
-#include "keyboard.h"
-#include "machine.h"
-#include "scld.h"
-#include "ui/uidisplay.h"
-#include "ula.h"
+#include "../display.h"
+#include "../keyboard.h"
+#include "../machine.h"
+#include "../scld.h"
+#include "../ui/uidisplay.h"
+#include "../ula.h"
 #include "widget.h"
-#include "debugger/debugger.h"
+#include "../debugger/debugger.h"
 #include "widget_internals.h"
-#include "z80/z80.h"
-#include "z80/z80_macros.h"
-#include "zxcf.h"
+#include "../z80/z80.h"
+#include "../z80/z80_macros.h"
+#include "../zxcf.h"
 
 static enum {
   DB_REGISTERS, DB_BYTES, DB_TEXT, DB_DISASM, DB_BREAKPT

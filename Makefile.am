@@ -1,4 +1,4 @@
-## Process this file with automake to produce Makefile.in
+# Process this file with automake to produce Makefile.in
 ## Copyright (c) 1999-2004 Philip Kendall
 
 ## $Id$
@@ -135,10 +135,10 @@ windres.o: windres.rc winfuse.ico
 	@WINDRES@ windres.rc windres.o
 
 settings.c: settings.pl settings.dat
-	@PERL@ settings.pl settings.dat > settings.c
+	@PERL@ -I$(srcdir)/perl $(srcdir)/settings.pl $(srcdir)/settings.dat > $@.tmp && mv settings.c.tmp $@
 
 settings.h: settings-header.pl settings.dat
-	@PERL@ settings-header.pl settings.dat > settings.h
+	@PERL@ -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv settings.h.tmp $@
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
 @XML_CFLAGS@ @SAMPLERATE_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\""

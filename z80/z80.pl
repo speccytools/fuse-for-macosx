@@ -25,8 +25,6 @@
 
 use strict;
 
-use lib '../perl';
-
 use Fuse;
 
 # The status of which flags relates to which condition
@@ -1122,7 +1120,7 @@ my %description = (
 
 # Main program
 
-my $data_file = $ARGV[0];
+( my $data_file = $ARGV[0] ) =~ s!.*/!!;
 
 print Fuse::GPL( $description{ $data_file }, '1999-2003 Philip Kendall' );
 

@@ -29,16 +29,16 @@
 
 #include <libspectrum.h>
 
-#include "joystick.h"
-#include "machine.h"
-#include "memory.h"
-#include "periph.h"
-#include "printer.h"
-#include "settings.h"
+#include "../joystick.h"
+#include "../machine.h"
+#include "../memory.h"
+#include "../periph.h"
+#include "../printer.h"
+#include "../settings.h"
 #include "spec48.h"
-#include "spectrum.h"
-#include "ula.h"
-#include "if1.h"
+#include "../spectrum.h"
+#include "../ula.h"
+#include "../if1.h"
 
 static int spec48_reset( void );
 

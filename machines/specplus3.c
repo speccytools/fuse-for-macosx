@@ -43,23 +43,23 @@
 
 #include <libspectrum.h>
 
-#include "ay.h"
-#include "compat.h"
-#include "fuse.h"
-#include "joystick.h"
-#include "machine.h"
-#include "memory.h"
-#include "periph.h"
-#include "printer.h"
-#include "settings.h"
-#include "snapshot.h"
+#include "../ay.h"
+#include "../compat.h"
+#include "../fuse.h"
+#include "../joystick.h"
+#include "../machine.h"
+#include "../memory.h"
+#include "../periph.h"
+#include "../printer.h"
+#include "../settings.h"
+#include "../snapshot.h"
 #include "spec128.h"
 #include "specplus3.h"
-#include "spectrum.h"
-#include "ui/ui.h"
-#include "ula.h"
-#include "if1.h"
-#include "utils.h"
+#include "../spectrum.h"
+#include "../ui/ui.h"
+#include "../ula.h"
+#include "../if1.h"
+#include "../utils.h"
 
 static int normal_memory_map( int rom, int page );
 static int special_memory_map( int which );

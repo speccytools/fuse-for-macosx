@@ -30,9 +30,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "module.h"
-#include "spectrum.h"
-#include "ui/ui.h"
+#include "../module.h"
+#include "../spectrum.h"
+#include "../ui/ui.h"
 #include "z80.h"
 #include "z80_macros.h"
 
@@ -361,10 +361,10 @@ ui_error( ui_error_level severity GCC_UNUSED, const char *format, ... )
  * things used by Fuse, but not by the core test code
  */
 
-#include "debugger/debugger.h"
-#include "machine.h"
-#include "scld.h"
-#include "settings.h"
+#include "../debugger/debugger.h"
+#include "../machine.h"
+#include "../scld.h"
+#include "../settings.h"
 
 libspectrum_byte *slt[256];
 size_t slt_length[256];

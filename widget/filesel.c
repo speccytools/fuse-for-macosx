@@ -39,10 +39,9 @@
 #include <windows.h>
 #endif				/* #ifdef WIN32 */
 
-#include "fuse.h"
-/*  #include "keyboard.h" */
+#include "../fuse.h"
 #include "widget_internals.h"
-#include "utils.h"
+#include "../utils.h"
 
 #if defined AMIGA || defined __MORPHOS__
 #include <proto/asl.h>

@@ -36,8 +36,8 @@ libuisdl_a_SOURCES = sdldisplay.c \
 
 BUILT_SOURCES = keysyms.c
 
-keysyms.c: ../../keysyms.pl ../../keysyms.dat
-	@PERL@ ../../keysyms.pl sdl ../../keysyms.dat > $@
+keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
+	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl sdl $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = sdldisplay.h \
 		 sdljoystick.h \

@@ -32,18 +32,18 @@
 
 #include <libspectrum.h>
 
-#include "display.h"
-#include "fuse.h"
-#include "machine.h"
-#include "scld.h"
-#include "screenshot.h"
-#include "settings.h"
-#include "ui/ui.h"
-#include "ui/scaler/scaler.h"
-#include "ui/uidisplay.h"
-#include "utils.h"
+#include "../../display.h"
+#include "../../fuse.h"
+#include "../../machine.h"
+#include "../../scld.h"
+#include "../../screenshot.h"
+#include "../../settings.h"
+#include "../ui.h"
+#include "../scaler/scaler.h"
+#include "../uidisplay.h"
+#include "../../utils.h"
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "../../widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 
 SDL_Surface *sdldisplay_gc = NULL;   /* Hardware screen */

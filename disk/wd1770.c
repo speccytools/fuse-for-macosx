@@ -44,12 +44,12 @@
 
 #include <libspectrum.h>
 
-#include "compat.h"
-#include "event.h"
-#include "machine.h"
-#include "ui/ui.h"
+#include "../compat.h"
+#include "../event.h"
+#include "../machine.h"
+#include "../ui/ui.h"
 #include "wd1770.h"
-#include "z80/z80.h"
+#include "../z80/z80.h"
 
 static void statusbar_update( int busy );
 

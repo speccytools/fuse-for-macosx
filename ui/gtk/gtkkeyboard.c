@@ -29,11 +29,11 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
-#include "compat.h"
+#include "../../compat.h"
 #include "gtkinternals.h"
-#include "input.h"
-#include "keyboard.h"
-#include "ui/ui.h"
+#include "../../input.h"
+#include "../../keyboard.h"
+#include "../ui.h"
 
 static guint gtkkeyboard_unshift_keysym(guint keysym);
 

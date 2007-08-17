@@ -40,7 +40,7 @@ typedef enum plusd_drive_number {
 #include <libspectrum.h>
 
 #include "wd1770.h"
-#include "periph.h"
+#include "../periph.h"
 
 extern int plusd_available;  /* Is the +D available for use? */
 extern int plusd_active;     /* +D enabled? */

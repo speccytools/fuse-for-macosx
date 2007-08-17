@@ -33,19 +33,19 @@
 
 #include <libspectrum.h>
 
-#include "debugger/debugger.h"
-#include "event.h"
-#include "fuse.h"
+#include "../../debugger/debugger.h"
+#include "../../event.h"
+#include "../../fuse.h"
 #include "gtkinternals.h"
-#include "machine.h"
-#include "memory.h"
-#include "scld.h"
-#include "settings.h"
-#include "ui/ui.h"
-#include "ula.h"
-#include "z80/z80.h"
-#include "z80/z80_macros.h"
-#include "zxcf.h"
+#include "../../machine.h"
+#include "../../memory.h"
+#include "../../scld.h"
+#include "../../settings.h"
+#include "../ui.h"
+#include "../../ula.h"
+#include "../../z80/z80.h"
+#include "../../z80/z80_macros.h"
+#include "../../zxcf.h"
 
 /* The various debugger panes */
 typedef enum debugger_pane {

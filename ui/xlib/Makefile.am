@@ -34,8 +34,8 @@ libuixlib_a_SOURCES = xdisplay.c \
 
 BUILT_SOURCES = keysyms.c
 
-keysyms.c: ../../keysyms.pl ../../keysyms.dat
-	@PERL@ ../../keysyms.pl x ../../keysyms.dat > $@
+keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
+	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl x $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 

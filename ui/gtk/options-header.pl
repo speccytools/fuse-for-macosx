@@ -23,8 +23,6 @@
 
 use strict;
 
-use lib '../../perl';
-
 use Fuse;
 use Fuse::Dialog;
 

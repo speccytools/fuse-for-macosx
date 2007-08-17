@@ -30,12 +30,12 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "compat.h"
-#include "debugger/debugger.h"
+#include "../../compat.h"
+#include "../../debugger/debugger.h"
 #include "gtkinternals.h"
-#include "menu.h"
-#include "pokefinder/pokefinder.h"
-#include "ui/ui.h"
+#include "../../menu.h"
+#include "../../pokefinder/pokefinder.h"
+#include "../ui.h"
 
 static int create_dialog( void );
 static void gtkui_pokefinder_incremented( GtkWidget *widget,

@@ -25,14 +25,14 @@
 
 #include <libspectrum.h>
 
-#include "event.h"
-#include "fuse.h"
-#include "memory.h"
-#include "module.h"
-#include "rzx.h"
-#include "scld.h"
-#include "spectrum.h"
-#include "ui/ui.h"
+#include "../event.h"
+#include "../fuse.h"
+#include "../memory.h"
+#include "../module.h"
+#include "../rzx.h"
+#include "../scld.h"
+#include "../spectrum.h"
+#include "../ui/ui.h"
 #include "z80.h"
 #include "z80_macros.h"
 

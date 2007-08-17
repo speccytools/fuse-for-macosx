@@ -31,15 +31,15 @@
 
 #include <gtk/gtk.h>
 
-#include "display.h"
-#include "fuse.h"
+#include "../../display.h"
+#include "../../fuse.h"
 #include "gtkinternals.h"
-#include "screenshot.h"
-#include "ui/ui.h"
-#include "ui/uidisplay.h"
-#include "ui/scaler/scaler.h"
-#include "scld.h"
-#include "settings.h"
+#include "../../screenshot.h"
+#include "../ui.h"
+#include "../uidisplay.h"
+#include "../scaler/scaler.h"
+#include "../../scld.h"
+#include "../../settings.h"
 
 /* The size of a 1x1 image in units of
    DISPLAY_ASPECT WIDTH x DISPLAY_SCREEN_HEIGHT */

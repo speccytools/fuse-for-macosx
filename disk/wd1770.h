@@ -33,7 +33,7 @@
 
 #include <libspectrum.h>
 
-#include "fuse.h"
+#include "../fuse.h"
 
 static const int WD1770_SR_MOTORON = 1<<7; /* Motor on */
 static const int WD1770_SR_WRPROT  = 1<<6; /* Write-protect */

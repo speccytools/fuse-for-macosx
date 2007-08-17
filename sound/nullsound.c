@@ -24,7 +24,7 @@
 /* Dummy functions for when we don't have a sound device; should never be
    called, so just abort if they are */
 
-#include "fuse.h"
+#include "../fuse.h"
 
 int
 sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )

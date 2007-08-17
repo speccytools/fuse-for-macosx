@@ -56,17 +56,17 @@ BUILT_SOURCES = keysyms.c \
 		options.c \
 		options.h
 
-keysyms.c: ../../keysyms.pl ../../keysyms.dat
-	@PERL@ ../../keysyms.pl gtk ../../keysyms.dat > $@
+keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
+	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl gtk $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
-menu_data.c: ../../perl/cpp-perl.pl ../../menu_data.pl ../../menu_data.dat ../../config.h
-	@PERL@ ../../perl/cpp-perl.pl ../../config.h ../../menu_data.dat | @PERL@ ../../menu_data.pl gtk > $@
+menu_data.c: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(srcdir)/../../menu_data.dat ../../config.h
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl gtk > $@.tmp && mv $@.tmp $@
 
-options.c: ../../perl/cpp-perl.pl ../../config.h options.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
-	@PERL@ ../../perl/cpp-perl.pl ../../config.h ../options.dat | @PERL@ options.pl - > options.c
+options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
 
-options.h: ../../perl/cpp-perl.pl ../../config.h options-header.pl ../options.dat ../../perl/Fuse.pm ../../perl/Fuse/Dialog.pm
-	@PERL@ ../../perl/cpp-perl.pl ../../config.h ../options.dat | @PERL@ options-header.pl - > options.h
+options.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = gtkinternals.h \
 		 options.h \

@@ -50,20 +50,20 @@
 
 #include <libspectrum.h>
 
-#include "display.h"
-#include "fuse.h"
-#include "keyboard.h"
-#include "machine.h"
-#include "screenshot.h"
-#include "settings.h"
+#include "../../display.h"
+#include "../../fuse.h"
+#include "../../keyboard.h"
+#include "../../machine.h"
+#include "../../screenshot.h"
+#include "../../settings.h"
 #include "xdisplay.h"
 #include "xui.h"
-#include "ui/scaler/scaler.h"
-#include "ui/uidisplay.h"
+#include "../scaler/scaler.h"
+#include "../uidisplay.h"
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "../../widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
-#include "scld.h"
+#include "../../scld.h"
 
 typedef enum {
   MSB_RED = 0,			/* 0RGB */

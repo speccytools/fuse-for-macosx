@@ -32,8 +32,8 @@
 #include <libspectrum.h>
 
 #include "debugger.h"
-#include "fuse.h"
-#include "memory.h"
+#include "../fuse.h"
+#include "../memory.h"
 
 /* Used to flag whether we're after a DD or FD prefix */
 enum hl_type { USE_HL, USE_IX, USE_IY };

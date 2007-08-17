@@ -44,17 +44,17 @@
 
 #include <libspectrum.h>
 
-#include "compat.h"
-#include "event.h"
-#include "machine.h"
-#include "module.h"
+#include "../compat.h"
+#include "../event.h"
+#include "../machine.h"
+#include "../module.h"
 #include "plusd.h"
-#include "printer.h"
-#include "settings.h"
-#include "ui/ui.h"
-#include "utils.h"
+#include "../printer.h"
+#include "../settings.h"
+#include "../ui/ui.h"
+#include "../utils.h"
 #include "wd1770.h"
-#include "z80/z80.h"
+#include "../z80/z80.h"
 
 int plusd_available = 0;
 int plusd_active = 0;

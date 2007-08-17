@@ -27,7 +27,7 @@
 
 #include <stdlib.h>
 
-#include "compat.h"
+#include "../../compat.h"
 
 const char*
 compat_get_temp_path( void )
