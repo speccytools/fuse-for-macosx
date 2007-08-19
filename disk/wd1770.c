@@ -395,7 +395,7 @@ wd1770_dr_read( wd1770_fdc *f )
 	f->data_register = f->data_side;
 	break;
       case 2:
-	f->data_register = 1; /* next sector */
+	f->data_register = d->geom.dg_secbase; /* next sector */
 	break;
       case 3:
 	f->data_register = 0;
