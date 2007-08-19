@@ -2061,3 +2061,5 @@
          xkeyboard.c,xdisplay.c},ui/uijoystick.c: use AM_CPPFLAGS rather than
          change every header inclusion to be relaive to the current directory
          (Fred).
+20070819 disk/wd1770.c: fix restore and seek commands and implement 'read
+	 address' command (Stuart).

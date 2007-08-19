@@ -98,11 +98,14 @@ wd1770_seek( wd1770_fdc *f, int track, int update, int verify )
 {
   wd1770_drive *d = f->current_drive;
 
+  if( track < 0 )
+    track = 0;
+  if( track > 255 )
+    track = 255;
+
   if( track < d->track ) {
     f->direction = -1;
-    if( f->track_register == 0 )
-      f->track_register = 255;
-    else if( update ) {
+    if( update ) {
       int trk = f->track_register;
 
       trk += track - d->track + 256;
@@ -111,9 +114,7 @@ wd1770_seek( wd1770_fdc *f, int track, int update, int verify )
     }
   } else if( track > d->track ) {
     f->direction = 1;
-    if( f->track_register == 255 )
-      f->track_register = 0;
-    else if( update ) {
+    if( update ) {
       int trk = f->track_register;
 
       trk += track - d->track;
@@ -132,16 +133,12 @@ wd1770_seek( wd1770_fdc *f, int track, int update, int verify )
   } else
     f->status_register &= ~WD1770_SR_RNF;
 
-  if( track < 0 )
-    track = 0;
-  if( track > 255 )
-    track = 255;
-  d->track = track;
-
-  if( d->track == 0 )
+  if( track == 0 )
     f->status_register |= WD1770_SR_LOST;
   else
     f->status_register &= ~WD1770_SR_LOST;
+
+  d->track = track;
 }
 
 libspectrum_byte
@@ -211,9 +208,12 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
     case 0x00:
       if( ( b & 0x4 ) ) {                               /* Restore */
 	f->track_register = d->track;
-	wd1770_seek( f, 0, update, verify );
+	wd1770_seek( f, 0, 1, verify );
+	f->data_register = 0;
       } else {                                          /* Seek */
-	wd1770_seek( f, f->data_register, 0, verify );
+	wd1770_seek( f, d->track + f->data_register - f->track_register,
+		     1, verify );
+	f->data_register = f->track_register;
       }
       f->direction = 1;
       break;
@@ -266,7 +266,22 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
 
     switch( b & 0x30 ) {
     case 0x00:                                          /* Read Address */
-      fprintf( stderr, "read address not yet implemented\n" );
+      f->state = WD1770_STATE_READID;
+      if( d->track >= d->geom.dg_cylinders ||
+	  d->track < 0 ) {
+	f->status_register |= WD1770_SR_RNF;
+	wd1770_set_cmdint( f );
+	wd1770_reset_datarq( f );
+      } else {
+	wd1770_set_datarq( f );
+	statusbar_update(1);
+	f->status_register |= WD1770_SR_BUSY;
+	f->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
+				 WD1770_SR_CRCERR | WD1770_SR_LOST );
+	f->data_track = d->track;
+	f->data_side = d->side;
+	f->data_offset = 0;
+      }
       break;
     case 0x20:                                          /* Read Track */
       fprintf( stderr, "read track not yet implemented\n" );
@@ -362,6 +377,46 @@ wd1770_dr_read( wd1770_fdc *f )
 	  wd1770_set_cmdint( f );
 	  wd1770_reset_datarq( f );
 	}
+      }
+    }
+  } else if( f->state == WD1770_STATE_READID ) {
+    if( !d->disk ||
+	f->data_track >= d->geom.dg_cylinders ||
+	f->data_side >= d->geom.dg_heads ) {
+      f->status_register |= WD1770_SR_RNF;
+      fprintf( stderr, "readid from non-existent sector\n" );
+      return f->data_register;
+    } else {
+      switch( f->data_offset++ ) {
+      case 0:
+	f->data_register = f->data_track;
+	break;
+      case 1:
+	f->data_register = f->data_side;
+	break;
+      case 2:
+	f->data_register = 1; /* next sector */
+	break;
+      case 3:
+	f->data_register = 0;
+	if( d->geom.dg_secsize > 128 ) f->data_register++;
+	if( d->geom.dg_secsize > 256 ) f->data_register++;
+	if( d->geom.dg_secsize > 512 ) f->data_register++;
+	break;
+      case 4:
+	f->data_register = 0; /* CRC */
+	break;
+      case 5:
+	f->data_register = 0; /* CRC */
+
+	/* finished */
+	statusbar_update(0);
+	f->status_register &= ~WD1770_SR_BUSY;
+	f->status_type = WD1770_STATUS_TYPE2;
+	f->state = WD1770_STATE_NONE;
+	wd1770_set_cmdint( f );
+	wd1770_reset_datarq( f );
+	break;
       }
     }
   }
