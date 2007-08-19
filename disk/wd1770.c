@@ -250,7 +250,8 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
   wd1770_drive *d = f->current_drive;
 
   /* command register: */
-  if( ( b & 0xf0 ) == 0xd0 ) {                  /* Type IV - Force Interrupt */
+  if( ( b & 0xf0 ) == 0xd0 ||
+      ( b & 0xf1 ) == 0xf1 ) {                  /* Type IV - Force Interrupt */
     statusbar_update(0);
     f->status_register &= ~WD1770_SR_BUSY;
     f->status_register &= ~WD1770_SR_WRPROT;
@@ -449,7 +450,7 @@ wd1770_dr_read( wd1770_fdc *f )
       }
     }
   } else if( f->state == WD1770_STATE_READID ) {
-    if( check_track( f ) ) {
+    if( !check_track( f ) ) {
       f->status_register |= WD1770_SR_RNF;
       statusbar_update(0);
       f->status_register &= ~WD1770_SR_BUSY;

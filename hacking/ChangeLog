@@ -2067,3 +2067,6 @@
 	 address command -- use the sector base for the current disk image,
 	 instead (Stuart).
 20070819 disk/plusd.c,disk/wd1770.[ch]: cleanup disk drive emulation (Stuart).
+20070819 disk/wd1770.c: fix a logic error in the read address emulation, and
+	 treat the command byte 'ff' as a force interrupt command (needed for
+	 Betadisk emulation) (Stuart).
