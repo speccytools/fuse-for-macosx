@@ -56,6 +56,7 @@ typedef struct wd1770_drive {
   int index_interrupt;
 
   int track;
+  int sector;
   int side;
 } wd1770_drive;
 
@@ -82,8 +83,6 @@ typedef struct wd1770_fdc {
   } status_type;
 
   /* state during transfer */
-  int data_track;
-  int data_sector;
   int data_side;
   int data_multisector;
   int data_offset;

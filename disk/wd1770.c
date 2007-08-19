@@ -52,6 +52,11 @@
 #include "z80/z80.h"
 
 static void statusbar_update( int busy );
+static void next_sector( wd1770_drive *d );
+static int check_track( wd1770_fdc *f );
+static int check_sector( wd1770_fdc *f );
+static int read_sector( wd1770_fdc *f );
+static int write_sector( wd1770_fdc *f );
 
 static char secbuf[1024];
 
@@ -61,6 +66,88 @@ statusbar_update( int busy )
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK,
 		       busy ? UI_STATUSBAR_STATE_ACTIVE :
 			      UI_STATUSBAR_STATE_INACTIVE );
+}
+
+static void
+next_sector( wd1770_drive *d )
+{
+  int s = d->sector;
+
+  s -= d->geom.dg_secbase;
+  s++;
+  s %= d->geom.dg_sectors;
+  s += d->geom.dg_secbase;
+
+  d->sector = s;
+}
+
+static int
+check_track( wd1770_fdc *f )
+{
+  wd1770_drive *d = f->current_drive;
+
+  if( !d->disk ||
+      d->track >= d->geom.dg_cylinders ||
+      f->data_side >= d->geom.dg_heads ) {
+    fprintf( stderr, "access to non-existent track\n" );
+    return 0;
+  }
+
+  return 1;
+}
+
+static int
+check_sector( wd1770_fdc *f )
+{
+  wd1770_drive *d = f->current_drive;
+
+  if( !check_track( f ) )
+    return 0;
+
+  if( d->sector < d->geom.dg_secbase ||
+      d->sector >= d->geom.dg_secbase + d->geom.dg_sectors) {
+    fprintf( stderr, "access to non-existent sector\n" );
+    return 0;
+  }
+
+  if( d->geom.dg_secsize > sizeof( secbuf ) ) {
+    fprintf( stderr, "sector too large for buffer\n" );
+    return 0;
+  }
+
+  return 1;
+}
+
+static int
+read_sector( wd1770_fdc *f )
+{
+  wd1770_drive *d = f->current_drive;
+
+  if( !check_sector( f ) )
+    return 0;
+
+  if( dsk_pread( d->disk, &d->geom, secbuf, d->track,
+		 f->data_side, d->sector ) != DSK_ERR_OK ) {
+    return 0;
+  }
+
+  return 1;
+}
+
+static int
+write_sector( wd1770_fdc *f )
+{
+  wd1770_drive *d = f->current_drive;
+
+  if( !check_sector( f ) )
+    return 0;
+
+  if( dsk_pwrite( d->disk, &d->geom, secbuf, d->track,
+		  f->data_side, d->sector ) != DSK_ERR_OK ) {
+    return 0;
+  }
+
+  return 1;
 }
 
 void
@@ -255,8 +342,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
       f->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
 			       WD1770_SR_CRCERR | WD1770_SR_LOST );
       f->status_type = WD1770_STATUS_TYPE2;
-      f->data_track = d->track;
-      f->data_sector = f->sector_register;
+      d->sector = f->sector_register;
       f->data_side = d->side;
       f->data_offset = 0;
       f->data_multisector = multisector;
@@ -278,7 +364,6 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
 	f->status_register |= WD1770_SR_BUSY;
 	f->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
 				 WD1770_SR_CRCERR | WD1770_SR_LOST );
-	f->data_track = d->track;
 	f->data_side = d->side;
 	f->data_offset = 0;
       }
@@ -289,7 +374,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
     case 0x30:                                          /* Write Track */
       f->state = WD1770_STATE_WRITETRACK;
       f->trcmd_state = WD1770_TRACK_NONE;
-      if( d->track >= d->geom.dg_cylinders || d->track < 0 ) {
+      if( !check_track( f ) ) {
 	f->status_register |= WD1770_SR_RNF;
 	wd1770_set_cmdint( f );
 	wd1770_reset_datarq( f );
@@ -299,8 +384,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
 	f->status_register |= WD1770_SR_BUSY;
 	f->status_register &= ~( WD1770_SR_WRPROT | WD1770_SR_RNF |
 				 WD1770_SR_CRCERR | WD1770_SR_LOST );
-	f->data_track = d->track;
-	f->data_sector = f->sector_register;
+	d->sector = d->geom.dg_secbase;
 	f->data_side = d->side;
 	f->data_offset = 0;
       }
@@ -340,19 +424,7 @@ wd1770_dr_read( wd1770_fdc *f )
   wd1770_drive *d = f->current_drive;
 
   if( f->state == WD1770_STATE_READ ) {
-    if( !d->disk ||
-	f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
-	f->data_track >= d->geom.dg_cylinders ||
-	f->data_side >= d->geom.dg_heads ) {
-      f->status_register |= WD1770_SR_RNF;
-      fprintf( stderr, "read from non-existent sector\n" );
-      return f->data_register;
-    }
-
-    if( f->data_offset == 0 &&
-	( d->geom.dg_secsize > sizeof( secbuf ) ||
-	  dsk_pread( d->disk, &d->geom, secbuf, f->data_track,
-		     f->data_side, f->data_sector ) != DSK_ERR_OK ) ) {
+    if( !read_sector( f ) ) {
       f->status_register |= WD1770_SR_RNF;
       statusbar_update(0);
       f->status_register &= ~WD1770_SR_BUSY;
@@ -363,13 +435,10 @@ wd1770_dr_read( wd1770_fdc *f )
     } else if( f->data_offset < d->geom.dg_secsize ) {
       f->data_register = secbuf[ f->data_offset++ ];
       if( f->data_offset == d->geom.dg_secsize ) {
-	if( f->data_multisector &&
-	    f->data_sector < d->geom.dg_secbase + d->geom.dg_sectors ) {
-	  f->data_sector++;
-	  f->data_offset = 0;
-	}
+	next_sector( d );
+	f->data_offset = 0;
 	if( !f->data_multisector ||
-	    f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
+	    d->sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
 	  statusbar_update(0);
 	  f->status_register &= ~WD1770_SR_BUSY;
 	  f->status_type = WD1770_STATUS_TYPE2;
@@ -380,22 +449,24 @@ wd1770_dr_read( wd1770_fdc *f )
       }
     }
   } else if( f->state == WD1770_STATE_READID ) {
-    if( !d->disk ||
-	f->data_track >= d->geom.dg_cylinders ||
-	f->data_side >= d->geom.dg_heads ) {
+    if( check_track( f ) ) {
       f->status_register |= WD1770_SR_RNF;
-      fprintf( stderr, "readid from non-existent sector\n" );
-      return f->data_register;
+      statusbar_update(0);
+      f->status_register &= ~WD1770_SR_BUSY;
+      f->status_type = WD1770_STATUS_TYPE2;
+      f->state = WD1770_STATE_NONE;
+      wd1770_set_cmdint( f );
+      wd1770_reset_datarq( f );
     } else {
       switch( f->data_offset++ ) {
       case 0:
-	f->data_register = f->data_track;
+	f->data_register = d->track;
 	break;
       case 1:
 	f->data_register = f->data_side;
 	break;
       case 2:
-	f->data_register = d->geom.dg_secbase; /* next sector */
+	f->data_register = d->sector;
 	break;
       case 3:
 	f->data_register = 0;
@@ -410,6 +481,7 @@ wd1770_dr_read( wd1770_fdc *f )
 	f->data_register = 0; /* CRC */
 
 	/* finished */
+	next_sector( d );
 	statusbar_update(0);
 	f->status_register &= ~WD1770_SR_BUSY;
 	f->status_type = WD1770_STATUS_TYPE2;
@@ -430,37 +502,43 @@ wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b )
 
   f->data_register = b;
   if( f->state == WD1770_STATE_WRITE ) {
-    if( !d->disk || f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ||
-	f->data_track >= d->geom.dg_cylinders ||
-	f->data_side >= d->geom.dg_heads ) {
+    if( !check_sector( f ) ) {
       f->status_register |= WD1770_SR_RNF;
-      fprintf( stderr, "write to non-existent sector\n" );
-      return;
-    }
-
-    if( f->data_offset < sizeof( secbuf ) )
+      statusbar_update(0);
+      f->status_register &= ~WD1770_SR_BUSY;
+      f->status_type = WD1770_STATUS_TYPE2;
+      f->state = WD1770_STATE_NONE;
+      wd1770_set_cmdint( f );
+      wd1770_reset_datarq( f );
+    } else if( f->data_offset < sizeof( secbuf ) ) {
       secbuf[ f->data_offset++ ] = b;
-    if( f->data_offset == d->geom.dg_secsize ) {
-      dsk_pwrite( d->disk, &d->geom, secbuf, f->data_track,
-		  f->data_side, f->data_sector );
-      if( f->data_multisector &&
-	  f->data_sector < d->geom.dg_secbase + d->geom.dg_sectors ) {
-	f->data_sector++;
-	f->data_offset = 0;
-      }
-      if( !f->data_multisector ||
-	  f->data_sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
-	statusbar_update(0);
-	f->status_register &= ~WD1770_SR_BUSY;
-	f->status_type = WD1770_STATUS_TYPE2;
-	f->state = WD1770_STATE_NONE;
-	wd1770_set_cmdint( f );
-	wd1770_reset_datarq( f );
+      if( f->data_offset == d->geom.dg_secsize ) {
+	if( !write_sector( f ) ) {
+	  f->status_register |= WD1770_SR_RNF;
+	  statusbar_update(0);
+	  f->status_register &= ~WD1770_SR_BUSY;
+	  f->status_type = WD1770_STATUS_TYPE2;
+	  f->state = WD1770_STATE_NONE;
+	  wd1770_set_cmdint( f );
+	  wd1770_reset_datarq( f );
+	} else {
+	  next_sector( d );
+	  f->data_offset = 0;
+	  if( !f->data_multisector ||
+	      d->sector >= d->geom.dg_secbase + d->geom.dg_sectors ) {
+	    statusbar_update(0);
+	    f->status_register &= ~WD1770_SR_BUSY;
+	    f->status_type = WD1770_STATUS_TYPE2;
+	    f->state = WD1770_STATE_NONE;
+	    wd1770_set_cmdint( f );
+	    wd1770_reset_datarq( f );
+	  }
+	}
       }
     }
   } else if( f->state == WD1770_STATE_WRITETRACK ) {
     if( !d->disk || 
-	f->data_track >= d->geom.dg_cylinders ||
+	d->track >= d->geom.dg_cylinders ||
 	f->data_side >= d->geom.dg_heads ) {
       f->status_register |= WD1770_SR_RNF;
       fprintf( stderr, "writetrack to non-existent track\n" );
@@ -517,14 +595,14 @@ wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b )
     case WD1770_TRACK_FILL:	/* now we actually format the track */
       if( f->fgeom.dg_heads > 2 || f->fgeom.dg_sectors > 21 ||
 	    f->fgeom.dg_secsize > 1024 ) {
-	fprintf( stderr, "problem during formatting track %d, wrong id data:\n", f->data_track );
-	fprintf( stderr, "    t:%d h:%d spt:%d bps:%d\n", f->data_track,
+	fprintf( stderr, "problem during formatting track %d, wrong id data:\n", d->track );
+	fprintf( stderr, "    t:%d h:%d spt:%d bps:%d\n", d->track,
 				    f->fgeom.dg_heads, f->fgeom.dg_sectors,
 				    (int)f->fgeom.dg_secsize );
       } else {
-	if( dsk_apform( d->disk, &f->fgeom, f->data_track,
+	if( dsk_apform( d->disk, &f->fgeom, d->track,
 			f->data_side, f->fill ) != DSK_ERR_OK )
-	fprintf( stderr, "problem during formatting track %d\n", f->data_track );
+	fprintf( stderr, "problem during formatting track %d\n", d->track );
       }
       statusbar_update(0);
 

@@ -424,6 +424,8 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 
   }
 
+  d->sector = d->geom.dg_secbase;
+
   /* Set the 'eject' item active */
   switch( which ) {
   case PLUSD_DRIVE_1:

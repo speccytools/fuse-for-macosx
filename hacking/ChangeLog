@@ -2066,3 +2066,4 @@
 20070819 disk/wd1770.c: don't use a hardcoded sector number for the read
 	 address command -- use the sector base for the current disk image,
 	 instead (Stuart).
+20070819 disk/plusd.c,disk/wd1770.[ch]: cleanup disk drive emulation (Stuart).
