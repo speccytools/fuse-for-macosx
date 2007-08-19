@@ -29,13 +29,13 @@
 
 #include <gtk/gtk.h>
 
-#include "../../compat.h"
-#include "../../fuse.h"
+#include "compat.h"
+#include "fuse.h"
 #include "gtkinternals.h"
-#include "../../joystick.h"
-#include "../../keyboard.h"
-#include "../../menu.h"
-#include "../../settings.h"
+#include "joystick.h"
+#include "keyboard.h"
+#include "menu.h"
+#include "settings.h"
 
 #include "../uijoystick.c"
 

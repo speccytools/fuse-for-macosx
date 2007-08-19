@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/../..
+
 noinst_LIBRARIES = libuisdl.a
 
 INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@ @SDL_CFLAGS@

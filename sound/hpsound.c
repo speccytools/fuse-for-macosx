@@ -32,9 +32,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "sound.h"
-#include "../ui/ui.h"
+#include "ui/ui.h"
 
 static int soundfd = -1;
 static int sixteenbit = 1;

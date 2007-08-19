@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/../..
+
 noinst_LTLIBRARIES = libuigtk.la
 
 INCLUDES = @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

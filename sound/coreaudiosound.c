@@ -24,10 +24,10 @@
 #include <CoreAudio/AudioHardware.h>
 #include <AudioUnit/AudioUnit.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "sfifo.h"
 #include "sound.h"
-#include "../ui/ui.h"
+#include "ui/ui.h"
 
 sfifo_t sound_fifo;
 

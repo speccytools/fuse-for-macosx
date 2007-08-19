@@ -30,16 +30,16 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
-#include "../../display.h"
-#include "../../fuse.h"
-#include "../../keyboard.h"
-#include "../../machine.h"
-#include "../../settings.h"
-#include "../../snapshot.h"
-#include "../../spectrum.h"
-#include "../../tape.h"
+#include "display.h"
+#include "fuse.h"
+#include "keyboard.h"
+#include "machine.h"
+#include "settings.h"
+#include "snapshot.h"
+#include "spectrum.h"
+#include "tape.h"
 #ifdef USE_WIDGET
-#include "../../widget/widget.h"
+#include "widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 #include "xkeyboard.h"
 

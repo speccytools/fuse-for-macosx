@@ -25,12 +25,12 @@
 
 #include <config.h>
 
-#include "../event.h"
-#include "../settings.h"
-#include "../sound.h"
-#include "../tape.h"
+#include "event.h"
+#include "settings.h"
+#include "sound.h"
+#include "tape.h"
 #include "timer.h"
-#include "../ui/ui.h"
+#include "ui/ui.h"
 
 static int timer_frame_callback_sound( libspectrum_dword last_tstates );
 
@@ -127,7 +127,7 @@ timer_end( void )
 #ifdef SOUND_FIFO
 
 /* Callback-style sound based timer */
-#include "../sound/sfifo.h"
+#include "sound/sfifo.h"
 
 extern sfifo_t sound_fifo;
 

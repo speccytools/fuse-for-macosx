@@ -27,7 +27,7 @@
 
 #include <windows.h>
 
-#include "../../ui/ui.h"
+#include "ui/ui.h"
 
 int compat_osname( char *osname, size_t length )
 {

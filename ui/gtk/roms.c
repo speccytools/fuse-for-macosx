@@ -31,12 +31,12 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "../../compat.h"
-#include "../../fuse.h"
+#include "compat.h"
+#include "fuse.h"
 #include "gtkinternals.h"
-#include "../../menu.h"
-#include "../../settings.h"
-#include "../ui.h"
+#include "menu.h"
+#include "settings.h"
+#include "ui/ui.h"
 
 static void add_rom( GtkBox *parent, size_t start, gint row );
 static void select_new_rom( GtkWidget *widget, gpointer data );

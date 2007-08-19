@@ -30,7 +30,7 @@
 #include <string.h>
 #include <sys/utsname.h>
 
-#include "../../ui/ui.h"
+#include "ui/ui.h"
 
 int compat_osname( char *buffer, size_t length )
 {

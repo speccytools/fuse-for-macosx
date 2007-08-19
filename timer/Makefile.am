@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/..
+
 INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 noinst_LIBRARIES = libtimer.a

@@ -29,9 +29,9 @@
 
 #include <libspectrum.h>
 
-#include "../machine.h"
+#include "machine.h"
 #include "machines.h"
-#include "../settings.h"
+#include "settings.h"
 #include "spec128.h"
 #include "spec48.h"
 

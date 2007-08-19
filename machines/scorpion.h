@@ -27,7 +27,7 @@
 #ifndef FUSE_SCORPION_H
 #define FUSE_SCORPION_H
 
-#include "../machine.h"
+#include "machine.h"
 
 int scorpion_init( fuse_machine_info *machine );
 void scorpion_memoryport2_write( libspectrum_word port, libspectrum_byte b );

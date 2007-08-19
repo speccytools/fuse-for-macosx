@@ -28,7 +28,7 @@
 
 #include <libspectrum.h>
 
-#include "../machine.h"
+#include "machine.h"
 
 int spec48_port_contended( libspectrum_word port );
 libspectrum_byte spec48_contend_delay( libspectrum_dword time );

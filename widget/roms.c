@@ -30,8 +30,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../fuse.h"
-#include "../settings.h"
+#include "fuse.h"
+#include "settings.h"
 #include "widget_internals.h"
 
 static settings_info *widget_settings;

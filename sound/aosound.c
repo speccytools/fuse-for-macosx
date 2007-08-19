@@ -31,9 +31,9 @@
 
 #include <ao/ao.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "sound.h"
-#include "../ui/ui.h"
+#include "ui/ui.h"
 
 static ao_device *dev_for_ao;
 static int sixteenbit = 1;

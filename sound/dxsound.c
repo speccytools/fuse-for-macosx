@@ -29,9 +29,9 @@
 #include <mmsystem.h>
 #include <dsound.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "sound.h"
-#include "../ui/ui.h"
+#include "ui/ui.h"
 
 /* same as for SDL Sound */
 #define MAX_AUDIO_BUFFER 8192*5

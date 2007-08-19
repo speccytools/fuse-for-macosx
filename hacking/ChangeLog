@@ -2035,3 +2035,29 @@
 	 error.c,menu_data.c,pokefinder.c,statusbar.c,win32display.c,
 	 win32keyboard.c,win32ui.c}: allow a builddir to be specified when
 	 building for Win32 (Stuart).
+20070819 pokefinder/{pokefinder.c,Makefile.am},menu_data.pl,widget/{browse.c,
+         menu.c,query.c,memory.c,picture.c,roms.c,widget.c,filesel.c,
+         debugger.c,options.pl,pokefinder.c,Makefile.am,widget.h,error.c},
+         debugger/{breakpoint.c,command.c,expression.c,debugger.c,Makefile.am,
+         disassemble.c,commandy.y},machines/{scorpion.h,spec16.c,ts2068.c,
+         spec48.c,pentagon.c,spec48.h,specplus2.c,spec_se.c,specplus2a.c,
+         specplus3.c,tc2048.c,spec128.c,tc2068.c,specplus3.h,specplus3e.c,
+         Makefile.am,spec128.h,tc2068.h,scorpion.c,machines.h},
+         sound/{sunsound.c,hpsound.c,coreaudiosound.c,nullsound.c,dxsound.c,
+         Makefile.am,aosound.c,alsasound.c,sdlsound.c,osssound.c},
+         disk/{wd1770.h,plusd.c,Makefile.am,wd1770.c,plusd.h},keysyms.pl,
+         timer/{timer.c,unix.c,Makefile.am},z80/{z80.c,z80_ops.c,Makefile.am,
+         coretest.c},compat/win32/{paths.c,osname.c,Makefile.am},
+         compat/unix/{paths.c,osname.c,Makefile.am},compat/morphos/Makefile.am,
+         compat/Makefile.am,compat/amiga/Makefile.am,ui/svga/Makefile.am,
+         ui/sdl/{sdlui.c,sdljoystick.c,sdlkeyboard.c,Makefile.am,sdldisplay.c},
+         ui/win32/{win32ui.c,statusbar.c,win32keyboard.c,debugger.c,
+         pokefinder.c,Makefile.am,win32display.c,error.c,menu_data.c},ui/ui.h,
+         ui/gtk/{gtkmouse.c,browse.c,gtkjoystick.c,gtkkeyboard.c,statusbar.c,
+         memory.c,gtkdisplay.c,picture.c,roms.c,gtkui.c,options.pl,debugger.c,
+         binary.c,pokefinder.c,Makefile.am,rollback.c,confirm.c},
+         ui/ggi/Makefile.am,ui/fb/Makefile.am,ui/scaler/{Makefile.am,scaler.c,
+         scalers.c},ui/Makefile.am,ui/xlib/{xerror.c,xui.c,Makefile.am,
+         xkeyboard.c,xdisplay.c},ui/uijoystick.c: use AM_CPPFLAGS rather than
+         change every header inclusion to be relaive to the current directory
+         (Fred).

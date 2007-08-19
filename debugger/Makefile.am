@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/..
+
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_LIBRARIES = libdebugger.a

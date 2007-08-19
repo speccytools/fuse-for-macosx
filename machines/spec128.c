@@ -29,18 +29,18 @@
 
 #include <libspectrum.h>
 
-#include "../ay.h"
-#include "../compat.h"
-#include "../joystick.h"
-#include "../machine.h"
-#include "../memory.h"
-#include "../periph.h"
-#include "../settings.h"
+#include "ay.h"
+#include "compat.h"
+#include "joystick.h"
+#include "machine.h"
+#include "memory.h"
+#include "periph.h"
+#include "settings.h"
 #include "spec128.h"
 #include "spec48.h"
-#include "../trdos.h"
-#include "../ula.h"
-#include "../if1.h"
+#include "trdos.h"
+#include "ula.h"
+#include "if1.h"
 
 static int spec128_reset( void );
 

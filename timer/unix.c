@@ -30,7 +30,7 @@
 #include <unistd.h>
 
 #include "timer.h"
-#include "../ui/ui.h"
+#include "ui/ui.h"
 
 int
 timer_get_real_time( timer_type *real_time )

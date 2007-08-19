@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/../..
+
 noinst_LIBRARIES = libuiggi.a
 
 INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@

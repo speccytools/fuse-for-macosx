@@ -28,8 +28,8 @@
 
 #include <libspectrum.h>
 
-#include "../machine.h"
-#include "../periph.h"
+#include "machine.h"
+#include "periph.h"
 
 extern const periph_t spec128_peripherals[];
 extern const size_t spec128_peripherals_count;

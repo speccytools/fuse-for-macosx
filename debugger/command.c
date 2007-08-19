@@ -31,9 +31,9 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
-#include "../ui/ui.h"
-#include "../z80/z80.h"
-#include "../z80/z80_macros.h"
+#include "ui/ui.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
 /* The last debugger command we were given to execute */
 static char *command_buffer = NULL;

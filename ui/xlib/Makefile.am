@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/../..
+
 noinst_LIBRARIES = libuixlib.a
 
 libuixlib_a_SOURCES = xdisplay.c \

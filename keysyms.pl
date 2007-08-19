@@ -26,6 +26,8 @@
 
 use strict;
 
+use lib '../../perl';
+
 use Fuse;
 
 my $ui = shift;
@@ -344,8 +346,8 @@ if ( $ui eq 'win32' ) {
 
 print << "CODE";
 
-#include "../../input.h"
-#include "../../keyboard.h"
+#include "input.h"
+#include "keyboard.h"
 
 CODE
 

@@ -28,7 +28,7 @@
 
 #include <libspectrum.h>
 
-#include "../machine.h"
+#include "machine.h"
 
 int pentagon_init( fuse_machine_info *machine );
 int pentagon_port_contended( libspectrum_word port );

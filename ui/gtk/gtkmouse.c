@@ -29,7 +29,7 @@
 #include <gtk/gtkwidget.h>
 
 #include "gtkinternals.h"
-#include "../ui.h"
+#include "ui/ui.h"
 
 /* For XWarpPointer *only* - see below */
 #include <gdk/gdkx.h>

@@ -30,18 +30,18 @@
 
 #include <libspectrum.h>
 
-#include "../joystick.h"
-#include "../machine.h"
+#include "joystick.h"
+#include "machine.h"
 #include "machines.h"
-#include "../memory.h"
-#include "../periph.h"
-#include "../printer.h"
-#include "../settings.h"
-#include "../scld.h"
+#include "memory.h"
+#include "periph.h"
+#include "printer.h"
+#include "settings.h"
+#include "scld.h"
 #include "spec48.h"
 #include "tc2068.h"
-#include "../ula.h"
-#include "../if1.h"
+#include "ula.h"
+#include "if1.h"
 
 static int tc2048_reset( void );
 static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );

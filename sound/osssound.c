@@ -31,10 +31,10 @@
 #include <fcntl.h>
 #include <sys/soundcard.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "sound.h"
-#include "../spectrum.h"
-#include "../ui/ui.h"
+#include "spectrum.h"
+#include "ui/ui.h"
 
 /* using (8) 64 byte frags for 8kHz, scale up for higher */
 #define BASE_SOUND_FRAG_PWR	6

@@ -28,8 +28,8 @@
 
 #include <libspectrum.h>
 
-#include "../machine.h"
-#include "../periph.h"
+#include "machine.h"
+#include "periph.h"
 
 #ifdef HAVE_765_H
 #include <limits.h>	/* Needed to get PATH_MAX */

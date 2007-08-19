@@ -31,9 +31,9 @@
 
 #include "scaler.h"
 #include "scaler_internals.h"
-#include "../../settings.h"
-#include "../ui.h"
-#include "../uidisplay.h"
+#include "settings.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 
 #ifndef MIN
 #define MIN(a,b)    (((a) < (b)) ? (a) : (b))

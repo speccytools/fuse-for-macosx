@@ -27,16 +27,16 @@
 
 #include <libspectrum.h>
 
-#include "../compat.h"
-#include "../joystick.h"
-#include "../machine.h"
+#include "compat.h"
+#include "joystick.h"
+#include "machine.h"
 #include "machines.h"
-#include "../memory.h"
-#include "../periph.h"
-#include "../settings.h"
+#include "memory.h"
+#include "periph.h"
+#include "settings.h"
 #include "spec128.h"
-#include "../trdos.h"
-#include "../ula.h"
+#include "trdos.h"
+#include "ula.h"
 
 static libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
 						 int *attached );

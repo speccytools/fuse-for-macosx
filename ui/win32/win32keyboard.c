@@ -29,15 +29,15 @@
 #include <stdlib.h>
 #include <windows.h>
 
-#include "../../display.h"
-#include "../../fuse.h"
-#include "../../keyboard.h"
-#include "../../machine.h"
-#include "../../settings.h"
-#include "../../snapshot.h"
-#include "../../spectrum.h"
-#include "../../tape.h"
-#include "../../utils.h"
+#include "display.h"
+#include "fuse.h"
+#include "keyboard.h"
+#include "machine.h"
+#include "settings.h"
+#include "snapshot.h"
+#include "spectrum.h"
+#include "tape.h"
+#include "utils.h"
 #include "win32keyboard.h"
 
 void

@@ -31,8 +31,8 @@
 
 #include <windows.h>
 
-#include "../../fuse.h"
-#include "../ui.h"
+#include "fuse.h"
+#include "ui/ui.h"
 
 int
 ui_error_specific( ui_error_level severity, const char *message )

@@ -37,17 +37,17 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "../fuse.h"
-#include "../display.h"
-#include "../machine.h"
-#include "../ui/uidisplay.h"
-#include "../keyboard.h"
+#include "fuse.h"
+#include "display.h"
+#include "machine.h"
+#include "ui/uidisplay.h"
+#include "keyboard.h"
 #include "options.h"
-#include "../periph.h"
-#include "../pokefinder/pokefinder.h"
-#include "../screenshot.h"
-#include "../timer/timer.h"
-#include "../utils.h"
+#include "periph.h"
+#include "pokefinder/pokefinder.h"
+#include "screenshot.h"
+#include "timer/timer.h"
+#include "utils.h"
 #include "widget_internals.h"
 
 #ifdef WIN32

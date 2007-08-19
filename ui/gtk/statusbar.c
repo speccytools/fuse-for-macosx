@@ -30,7 +30,7 @@
 #include <gtk/gtk.h>
 
 #include "gtkinternals.h"
-#include "../ui.h"
+#include "ui/ui.h"
 
 static GtkWidget *status_bar;
 

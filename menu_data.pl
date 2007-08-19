@@ -54,14 +54,6 @@ if( $ui eq 'win32' ) {
   $filename = 'menu_data.c';
 }
 
-my $menu_h_path;
-
-if( $ui eq 'widget' ) {
-  $menu_h_path = '..';
-} else {
-  $menu_h_path = '../..';
-}
-
 print Fuse::GPL( $filename . ': menu structure for Fuse',
 		 '2004-2007 Philip Kendall, Stuart Brady, Marek Januszewski' ) . << "CODE";
 
@@ -70,7 +62,7 @@ print Fuse::GPL( $filename . ': menu structure for Fuse',
 
 #include <config.h>
 
-#include "${menu_h_path}/menu.h"
+#include "menu.h"
 
 CODE
 
@@ -152,7 +144,7 @@ sub dump_widget ($) {
     my( $menu ) = @_;
 
     print << "HEADERS";
-#include "../input.h"
+#include "input.h"
 #include "options.h"
 #include "widget_internals.h"
 

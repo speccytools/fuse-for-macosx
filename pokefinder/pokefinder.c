@@ -29,9 +29,9 @@
 
 #include <libspectrum.h>
 
-#include "../memory.h"
+#include "memory.h"
 #include "pokefinder.h"
-#include "../spectrum.h"
+#include "spectrum.h"
 
 libspectrum_byte pokefinder_possible[ 2 * SPECTRUM_RAM_PAGES ][0x2000];
 libspectrum_byte pokefinder_impossible[ 2 * SPECTRUM_RAM_PAGES ][0x2000/8];

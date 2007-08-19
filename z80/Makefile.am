@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/..
+
 noinst_LIBRARIES = libz80.a
 
 libz80_a_SOURCES = z80.c z80_ops.c

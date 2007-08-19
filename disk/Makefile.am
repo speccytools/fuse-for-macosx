@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/..
+
 noinst_LIBRARIES = libdisk.a
 
 INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@

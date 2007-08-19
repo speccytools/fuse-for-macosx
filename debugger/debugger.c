@@ -27,12 +27,12 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
-#include "../event.h"
-#include "../memory.h"
-#include "../periph.h"
-#include "../ui/ui.h"
-#include "../z80/z80.h"
-#include "../z80/z80_macros.h"
+#include "event.h"
+#include "memory.h"
+#include "periph.h"
+#include "ui/ui.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
 /* The current activity state of the debugger */
 enum debugger_mode_t debugger_mode;

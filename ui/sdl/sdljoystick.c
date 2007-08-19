@@ -35,12 +35,12 @@
 
 #include <SDL.h>
 
-#include "../../compat.h"
-#include "../../input.h"
+#include "compat.h"
+#include "input.h"
 #include "sdljoystick.h"
-#include "../../settings.h"
-#include "../ui.h"
-#include "../uijoystick.h"
+#include "settings.h"
+#include "ui/ui.h"
+#include "ui/uijoystick.h"
 
 static SDL_Joystick *joystick1 = NULL;
 static SDL_Joystick *joystick2 = NULL;

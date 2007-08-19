@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/..
+
 SUBDIRS = @UI@ scaler
 
 DIST_SUBDIRS = fb \

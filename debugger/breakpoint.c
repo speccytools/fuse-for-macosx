@@ -30,10 +30,10 @@
 #include <libspectrum.h>
 
 #include "debugger_internals.h"
-#include "../event.h"
-#include "../fuse.h"
-#include "../memory.h"
-#include "../ui/ui.h"
+#include "event.h"
+#include "fuse.h"
+#include "memory.h"
+#include "ui/ui.h"
 
 /* The current breakpoints */
 GSList *debugger_breakpoints;

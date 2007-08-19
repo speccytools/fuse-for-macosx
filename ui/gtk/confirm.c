@@ -28,11 +28,11 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "../../compat.h"
-#include "../../fuse.h"
+#include "compat.h"
+#include "fuse.h"
 #include "gtkinternals.h"
-#include "../../settings.h"
-#include "../ui.h"
+#include "settings.h"
+#include "ui/ui.h"
 
 static void set_confirmed( GtkButton *button, gpointer user_data );
 static void set_save( GtkButton *button, gpointer user_data );

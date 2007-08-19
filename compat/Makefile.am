@@ -23,6 +23,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+AM_CPPFLAGS = -I$(srcdir)/..
+
 SUBDIRS = @COMPAT_OSNAME@
 
 DIST_SUBDIRS = amiga \

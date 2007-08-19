@@ -33,10 +33,10 @@
 
 #include <SDL.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "sfifo.h"
-#include "../sound.h"
-#include "../ui/ui.h"
+#include "sound.h"
+#include "ui/ui.h"
 
 static void sdlwrite( void *userdata, Uint8 *stream, int len );
 

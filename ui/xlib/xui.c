@@ -30,12 +30,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "../../display.h"
-#include "../../fuse.h"
-#include "../../keyboard.h"
-#include "../../settings.h"
-#include "../ui.h"
-#include "../uidisplay.h"
+#include "display.h"
+#include "fuse.h"
+#include "keyboard.h"
+#include "settings.h"
+#include "ui/ui.h"
+#include "ui/uidisplay.h"
 #include "xdisplay.h"
 #include "xkeyboard.h"
 #include "xui.h"

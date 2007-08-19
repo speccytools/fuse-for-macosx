@@ -32,11 +32,11 @@
 #include <fcntl.h>
 #include <alsa/asoundlib.h>
 
-#include "../settings.h"
+#include "settings.h"
 #include "sfifo.h"
-#include "../sound.h"
-#include "../spectrum.h"
-#include "../ui/ui.h"
+#include "sound.h"
+#include "spectrum.h"
+#include "ui/ui.h"
 
 /* Number of Spectrum frames audio latency to use */
 #define NUM_FRAMES 2

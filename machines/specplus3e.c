@@ -26,10 +26,10 @@
 #include <config.h>
 
 #include "machines.h"
-#include "../periph.h"
-#include "../settings.h"
+#include "periph.h"
+#include "settings.h"
 #include "specplus3.h"
-#include "../ui/ui.h"
+#include "ui/ui.h"
 
 static int specplus3e_reset( void );
 

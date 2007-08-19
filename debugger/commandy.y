@@ -33,9 +33,9 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
-#include "../ui/ui.h"
-#include "../z80/z80.h"
-#include "../z80/z80_macros.h"
+#include "ui/ui.h"
+#include "z80/z80.h"
+#include "z80/z80_macros.h"
 
 #define YYDEBUG 1
 #define YYERROR_VERBOSE
