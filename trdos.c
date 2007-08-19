@@ -215,6 +215,9 @@ trdos_reset( void )
   trdos_active = 0;
   busy = 0;
 
+  event_remove_type( EVENT_TYPE_TRDOS_INDEX );
+  event_remove_type( EVENT_TYPE_TRDOS_CMD_DONE );
+
   trdos_event_index( 0 );
 
   /* We can eject disks only if they are currently present */

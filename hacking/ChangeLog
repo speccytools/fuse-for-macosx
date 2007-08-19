@@ -2070,3 +2070,5 @@
 20070819 disk/wd1770.c: fix a logic error in the read address emulation, and
 	 treat the command byte 'ff' as a force interrupt command (needed for
 	 Betadisk emulation) (Stuart).
+20070819 disk/plusd.c,trdos.c: avoid accumulation of index pulse events
+	 (fixes bug #1764981) (Stuart).

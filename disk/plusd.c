@@ -167,6 +167,8 @@ plusd_reset( int hard_reset )
 
   plusd_available = 0;
 
+  event_remove_type( EVENT_TYPE_PLUSD_INDEX );
+
   if( !periph_plusd_active )
     return;
 
