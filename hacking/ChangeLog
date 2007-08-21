@@ -2076,3 +2076,4 @@
 20070821 trdos.c: correct snapshot register writing (Fred).
 20070821 if2.c: fix bracket indentation (Fred).
 20070821 disk/plusd.c: correct default ROM loading (Fred).
+20070821 disk/plusd.c: clean up +D RAM code (Stuart).

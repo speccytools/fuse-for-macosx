@@ -68,6 +68,8 @@ static wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
 static const char *plusd_template = "fuse.plusd.XXXXXX";
 
+static libspectrum_byte plusd_ram[ 0x2000 ];
+
 static void plusd_reset( int hard_reset );
 static void plusd_memory_map( void );
 static void plusd_from_snapshot( libspectrum_snap *snap );
@@ -104,7 +106,7 @@ plusd_memory_map( void )
   if( !plusd_active ) return;
 
   memory_map_read[ 0 ] = memory_map_write[ 0 ] = memory_map_romcs[ 0 ];
-  memory_map_read[ 1 ] = memory_map_write[ 1 ] = memory_map_ram[ 16 * 2 ];
+  memory_map_read[ 1 ] = memory_map_write[ 1 ] = memory_map_romcs[ 1 ];
 }
 
 const periph_t plusd_peripherals[] = {
@@ -178,18 +180,20 @@ plusd_reset( int hard_reset )
 
   memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
+  memory_map_romcs[1].page = plusd_ram;
+  memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
+
   machine_current->ram.romcs = 0;
 
   memory_map_romcs[ 0 ].writable = 0;
-  memory_map_romcs[ 1 ].writable = 0;
-  memory_map_ram[ 16 * 2 ].writable = 1;
+  memory_map_romcs[ 1 ].writable = 1;
 
   plusd_available = 1;
   plusd_active = 0;
   plusd_index_pulse = 0;
 
   if( hard_reset )
-    memset( memory_map_ram[ 16 * 2 ].page, 0, 0x2000 );
+    memset( plusd_ram, 0, 0x2000 );
 
   plusd_fdc.spin_cycles = 0;
   plusd_fdc.direction = 0;
