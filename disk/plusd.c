@@ -173,8 +173,8 @@ plusd_reset( int hard_reset )
     return;
 
   machine_load_rom_bank( memory_map_romcs, 0, 0,
-			 settings_default.rom_plusd,
-			 settings_current.rom_plusd, 0x2000 );
+			 settings_current.rom_plusd,
+			 settings_default.rom_plusd, 0x2000 );
 
   memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
