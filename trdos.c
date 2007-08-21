@@ -290,10 +290,10 @@ trdos_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_beta_paged( snap, trdos_active );
   libspectrum_snap_set_beta_direction( snap, trdos_direction );
   libspectrum_snap_set_beta_status( snap, trdos_status_register );
-  libspectrum_snap_set_beta_track ( snap, trdos_system_register );
-  libspectrum_snap_set_beta_sector( snap, trdos_track_register );
-  libspectrum_snap_set_beta_data  ( snap, trdos_sector_register );
-  libspectrum_snap_set_beta_system( snap, trdos_data_register );
+  libspectrum_snap_set_beta_track ( snap, trdos_track_register );
+  libspectrum_snap_set_beta_sector( snap, trdos_sector_register );
+  libspectrum_snap_set_beta_data  ( snap, trdos_data_register );
+  libspectrum_snap_set_beta_system( snap, trdos_system_register );
 }
 
 static
