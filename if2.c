@@ -167,7 +167,7 @@ if2_from_snapshot( libspectrum_snap *snap )
     memory_map_romcs[1].page = memory_map_romcs[0].page + MEMORY_PAGE_SIZE;
     memory_map_romcs[1].source =
       memory_map_romcs[0].source = MEMORY_SOURCE_CARTRIDGE;
-    }
+  }
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2_EJECT, 1 );
 
