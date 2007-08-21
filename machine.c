@@ -253,7 +253,8 @@ machine_select_machine( fuse_machine_info *machine )
 
 static int
 machine_load_rom_bank_internal( memory_page* bank_map, size_t which, int page_num,
-                                const char *filename, size_t expected_length )
+                                const char *filename, size_t expected_length,
+                                int custom )
 {
   int fd, error;
   utils_file rom;
@@ -286,6 +287,8 @@ machine_load_rom_bank_internal( memory_page* bank_map, size_t which, int page_nu
   }
 
   memcpy( bank_map[ which ].page, rom.buffer, rom.length );
+  bank_map[ which ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
+                                      MEMORY_SOURCE_SYSTEM;
 
   for( i = 1, offset = MEMORY_PAGE_SIZE;
        offset < expected_length;
@@ -293,6 +296,8 @@ machine_load_rom_bank_internal( memory_page* bank_map, size_t which, int page_nu
     bank_map[ which + i ].offset = offset;
     bank_map[ which + i ].page_num = page_num;
     bank_map[ which + i ].page = bank_map[ which ].page + offset;
+    bank_map[ which + i ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
+                                            MEMORY_SOURCE_SYSTEM;
   }
 
   if( utils_close_file( &rom ) ) return 1;
@@ -305,11 +310,12 @@ machine_load_rom_bank( memory_page* bank_map, size_t which, int page_num,
                        const char *filename, const char *fallback,
                        size_t expected_length )
 {
+  int custom = strcmp( filename, fallback );
   int retval = machine_load_rom_bank_internal( bank_map, which, page_num,
-                                               filename, expected_length );
+                                               filename, expected_length, custom );
   if( retval && fallback )
     retval = machine_load_rom_bank_internal( bank_map, which, page_num,
-                                             fallback, expected_length );
+                                             fallback, expected_length, 0 );
   return retval;
 }
 

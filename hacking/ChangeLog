@@ -2072,3 +2072,4 @@
 	 Betadisk emulation) (Stuart).
 20070819 disk/plusd.c,trdos.c: avoid accumulation of index pulse events
 	 (fixes bug #1764981) (Stuart).
+20070821 machine.c,memory.h: note when we have loaded a custom ROM (Fred).
