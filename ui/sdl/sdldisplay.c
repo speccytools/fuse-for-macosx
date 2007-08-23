@@ -54,6 +54,7 @@ static SDL_Surface *red_mdr[2], *green_mdr[2];
 static SDL_Surface *red_disk[2], *green_disk[2];
 
 static ui_statusbar_state sdl_disk_state, sdl_mdr_state, sdl_tape_state;
+static int sdl_status_updated;
 
 static int tmp_screen_width;
 
@@ -513,6 +514,8 @@ sdl_icon_overlay( Uint32 tmp_screen_pitch, Uint32 dstPitch )
     sdl_blit_icon( red_cassette, &r, tmp_screen_pitch, dstPitch );
     break;
   }
+
+  sdl_status_updated = 0;
 }
 
 /* Set one pixel in the display */
@@ -685,9 +688,9 @@ uidisplay_frame_end( void )
   }
 
 #ifdef USE_WIDGET
-  if ( !(widget_level >= 0) && num_rects == 0 ) return;
+  if ( !(widget_level >= 0) && num_rects == 0 && !sdl_status_updated ) return;
 #else                   /* #ifdef USE_WIDGET */
-  if ( num_rects == 0 ) return;
+  if ( num_rects == 0 && !sdl_status_updated ) return;
 #endif                  /* #ifdef USE_WIDGET */
 
   if( SDL_MUSTLOCK( sdldisplay_gc ) ) SDL_LockSurface( sdldisplay_gc );
@@ -799,6 +802,7 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 
   case UI_STATUSBAR_ITEM_DISK:
     sdl_disk_state = state;
+    sdl_status_updated = 1;
     return 0;
 
   case UI_STATUSBAR_ITEM_PAUSED:
@@ -807,10 +811,12 @@ ui_statusbar_update( ui_statusbar_item item, ui_statusbar_state state )
 
   case UI_STATUSBAR_ITEM_TAPE:
     sdl_tape_state = state;
+    sdl_status_updated = 1;
     return 0;
 
   case UI_STATUSBAR_ITEM_MICRODRIVE:
     sdl_mdr_state = state;
+    sdl_status_updated = 1;
     return 0;
 
   case UI_STATUSBAR_ITEM_MOUSE:
