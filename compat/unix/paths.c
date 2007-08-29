@@ -46,3 +46,9 @@ compat_get_home_path( void )
   dir = getenv( "HOME" ); if( dir ) return dir;
   return ".";
 }
+
+int
+compat_is_absolute_path( const char *path )
+{
+  return path[0] == '/';
+}

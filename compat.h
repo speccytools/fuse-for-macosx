@@ -65,15 +65,14 @@ int mkstemp( char *template );
 
 /* That which separates components in a path name */
 #ifdef WIN32
-#define FUSE_DIR_SEP_CHR '\\'
 #define FUSE_DIR_SEP_STR "\\"
 #else
-#define FUSE_DIR_SEP_CHR '/'
 #define FUSE_DIR_SEP_STR "/"
 #endif
 
 int compat_osname( char *buffer, size_t length );
 const char* compat_get_temp_path( void );
 const char* compat_get_home_path( void );
+int compat_is_absolute_path( const char *path );
 
 #endif				/* #ifndef FUSE_COMPAT_H */

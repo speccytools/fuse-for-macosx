@@ -38,3 +38,10 @@ compat_get_home_path( void )
 {
   return "PROGDIR:settings";
 }
+
+int
+compat_is_absolute_path( const char *path )
+{
+  /* Is this correct? */
+  return path[0] == '/';
+}

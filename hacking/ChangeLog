@@ -2080,3 +2080,5 @@
 20070823 ui/sdl/sdldisplay.c: update screen when only the statusbar has changed
          (thanks, Gergely) (Fred).
 20070828 TODO: remove unused file; handled by SF trackers.
+20070829 compat.h,compat/{amiga,unix,win32}/paths.c,utils.[ch]: move
+	 utils_is_absolute_path() into compatability directories.

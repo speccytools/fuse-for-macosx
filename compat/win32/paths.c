@@ -50,3 +50,11 @@ compat_get_home_path( void )
   dir = getenv( "WINDIR" ); if( dir ) return dir;
   return ".";
 }
+
+int
+compat_is_absolute_path( const char *path )
+{
+  if( path[0] == '\\' ) return 1;
+  if( path[0] && path[1] == ':' ) return 1;
+  return 0;
+}
