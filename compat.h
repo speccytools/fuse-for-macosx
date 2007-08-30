@@ -65,8 +65,10 @@ int mkstemp( char *template );
 
 /* That which separates components in a path name */
 #ifdef WIN32
+#define FUSE_DIR_SEP_CHR '\\'
 #define FUSE_DIR_SEP_STR "\\"
 #else
+#define FUSE_DIR_SEP_CHR '/'
 #define FUSE_DIR_SEP_STR "/"
 #endif
 

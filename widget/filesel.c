@@ -633,7 +633,7 @@ widget_filesel_keyhandler( input_key key )
       if( widget_do( WIDGET_TYPE_TEXT, &text_data ) ||
 	  !widget_text_text || !*widget_text_text      )
 	break;
-      if( !utils_is_absolute_path( widget_text_text ) ) {
+      if( !compat_is_absolute_path( widget_text_text ) ) {
 							/* relative name */
         /* Get current dir name and allocate space for the leafname */
         fn = widget_getcwd();
