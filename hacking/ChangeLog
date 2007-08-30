@@ -2083,3 +2083,4 @@
 20070829 compat.h,compat/{amiga,unix,win32}/paths.c,utils.[ch]: move
 	 utils_is_absolute_path() into compatability directories.
 20070830 compat.h,widget/filesel.c: fix up widget builds.
+20070830 ui/xlib/xdisplay.c: remove debugging bloat.

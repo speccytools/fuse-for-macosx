@@ -211,23 +211,7 @@ xdisplay_find_visual( void )
                              &visual_tmpl, &nvis );
   if( vis != NULL ) {
     for( i = 0; i < nvis; i++ ) {
-/*
-      fprintf( stderr, "X11 %s visual %#lx, depth %d, R:%lX G:%lX B:%lX\n",
-		    vis[i].class == TrueColor ? "TrueColor" : (
-		      vis[i].class == DirectColor ? "DirectColor" : (
-		        vis[i].class == StaticColor ? "StaticColor" : (
-		          vis[i].class == PseudoColor ? "PseudoColor" : (
-		            vis[i].class == StaticGray ? "StaticGray" : (
-		              vis[i].class == GrayScale ? "GrayScale" : "Uhhh??"
-			    )
-			  )
-		        )
-		      )
-		    ),
-                   vis[i].visualid, vis[i].depth,
-                   vis[i].red_mask, vis[i].green_mask,
-                   vis[i].blue_mask );
-*/            /*
+            /*
              * Save the visual index and its depth, if this is the first
              * truecolor visual, or a visual that is 'preferred' over the
              * previous 'best' visual.
@@ -251,7 +235,6 @@ xdisplay_find_visual( void )
     if ( sel_v != -1 ) {
       xdisplay_visual = vis[sel_v].visual;
       xdisplay_depth = vis[sel_v].depth;
-/*      fprintf(stderr, "Selected visual: 0x%lX\n", vis[sel_v].visualid ); */
     }
     XFree(vis);
   }
@@ -379,12 +362,10 @@ xdisplay_allocate_colours8( void )
           c.red = c.green = c.blue = r * 19595 / 3 +
 				     g * 38469 / 7 +
 				     b *  7471 / 3;
-/*  	  fprintf( stderr, "Color %d = grey % 5d\n", i, c.red); */
 	} else {
           c.red = r * 65535 / 3;
 	  c.green = g * 65535 / 7;
           c.blue = b * 65535 / 3;
-/*  	  fprintf( stderr, "Color %d = % 5d,% 5d,% 5d\n", i, c.red, c.green, c.blue ); */
 	}
 	if( xdisplay_alloc_colour( &currentMap, &c ) )
     	    return 1;
