@@ -2084,3 +2084,5 @@
 	 utils_is_absolute_path() into compatability directories.
 20070830 compat.h,widget/filesel.c: fix up widget builds.
 20070830 ui/xlib/xdisplay.c: remove debugging bloat.
+20070831 BRANCH: xvideo-2007-08-31 for integrating Gergely's xvideo code
+	 (patch #1686228).
