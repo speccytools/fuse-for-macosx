@@ -5,6 +5,10 @@
  * Simple portable lock-free FIFO
  * (c) 2000-2002, David Olofson
  * Released under the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
+
+ * Modifications by Philip Kendall (c) 2007
+ * This modified version is released under the GNU GENERAL PUBLIC LICENSE
+ * version 2, or any later version
 -----------------------------------------------------------
 TODO:
 	* Is there a way to avoid losing one byte of buffer
@@ -66,7 +70,7 @@ int sfifo_init(sfifo_t *f, int size)
 		;
 
 	/* Get buffer */
-	if( 0 == (f->buffer = (void *)malloc(f->size)) )
+	if( 0 == (f->buffer = malloc(f->size)) )
 		return -ENOMEM;
 
 	return 0;

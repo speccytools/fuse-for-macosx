@@ -413,7 +413,7 @@ xdisplay_allocate_image( void )
       return 1;
     }
 
-    if( ( image->data = (char*)malloc( image->bytes_per_line *
+    if( ( image->data = malloc( image->bytes_per_line *
 						 image->height ) ) == NULL ) {
       fprintf(stderr, "%s: out of memory for image data\n", fuse_progname);
       return 1;

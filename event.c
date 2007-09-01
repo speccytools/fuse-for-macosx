@@ -91,7 +91,7 @@ event_add( libspectrum_dword event_time, event_type type )
     ptr=event_free;
     event_free=NULL;
   } else {
-    ptr=(event_t*)malloc(sizeof(event_t));
+    ptr=malloc(sizeof(event_t));
     if(!ptr) return 1;
   }
 

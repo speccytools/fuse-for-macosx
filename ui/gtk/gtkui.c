@@ -579,7 +579,7 @@ menu_get_scaler( scaler_available_fn selector )
   dialog.selected = SCALER_NUM;
   
   /* Some space to store the radio buttons in */
-  dialog.buttons = (GtkWidget**)malloc( SCALER_NUM * sizeof(GtkWidget* ) );
+  dialog.buttons = malloc( SCALER_NUM * sizeof(GtkWidget* ) );
   if( dialog.buttons == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return SCALER_NUM;
@@ -698,7 +698,7 @@ menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   int i;
   
   /* Some space to store the radio buttons in */
-  dialog.buttons = (GtkWidget**)malloc( machine_count * sizeof(GtkWidget* ) );
+  dialog.buttons = malloc( machine_count * sizeof(GtkWidget* ) );
   if( dialog.buttons == NULL ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return;

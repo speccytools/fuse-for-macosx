@@ -387,7 +387,7 @@ static char* widget_getcwd( void )
   char *ptr;
 
   directory_length = 64;
-  directory = (char*)malloc( directory_length * sizeof( char ) );
+  directory = malloc( directory_length * sizeof( char ) );
   if( directory == NULL ) {
     return NULL;
   }

@@ -2088,3 +2088,5 @@
 	 (patch #1686228).
 20070901 fuse.c,profile.[ch]: prevent snapshots from triggering the assert
 	 in profile.c (fixes bug #1727669).
+20070901 event.c,sound/sfifo.c,ui/{gtk/gtkui.c,xlib/xdisplay.c},
+	 widget/filesel.c: return value of malloc() shouldn't be cast.
