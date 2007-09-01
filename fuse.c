@@ -259,6 +259,7 @@ static int fuse_init(int argc, char **argv)
   if( ula_init() ) return 1;
   if( ay_init() ) return 1;
   if( slt_init() ) return 1;
+  if( profile_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 

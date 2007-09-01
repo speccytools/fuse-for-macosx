@@ -32,6 +32,7 @@
 
 #include "event.h"
 #include "fuse.h"
+#include "module.h"
 #include "profile.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
@@ -42,14 +43,37 @@ static int total_tstates[ 0x10000 ];
 static libspectrum_word profile_last_pc;
 static libspectrum_dword profile_last_tstates;
 
+static void profile_from_snapshot( libspectrum_snap *snap GCC_UNUSED );
+
+static module_info_t profile_module_info = {
+
+  NULL,
+  NULL,
+  profile_from_snapshot,
+  NULL,
+
+};
+
+int
+profile_init( void )
+{
+  module_register( &profile_module_info );
+}
+
+static void
+init_profiling_counters( void )
+{
+  profile_last_pc = z80.pc.w;
+  profile_last_tstates = tstates;
+}
+
 void
 profile_start( void )
 {
   memset( total_tstates, 0, sizeof( total_tstates ) );
 
   profile_active = 1;
-  profile_last_pc = z80.pc.w;
-  profile_last_tstates = tstates;
+  init_profiling_counters();
 
   /* Schedule an event to ensure that the main z80 emulation loop recognises
      profiling is turned on; otherwise problems occur if we we started while
@@ -74,6 +98,14 @@ void
 profile_frame( libspectrum_dword frame_length )
 {
   profile_last_tstates -= frame_length;
+}
+
+/* On snapshot load, PC and the tstate counter will jump so reset our
+   current views of these */
+static void
+profile_from_snapshot( libspectrum_snap *snap GCC_UNUSED )
+{
+  init_profiling_counters();
 }
 
 void
