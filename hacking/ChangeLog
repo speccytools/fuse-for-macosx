@@ -2090,3 +2090,5 @@
 	 in profile.c (fixes bug #1727669).
 20070901 event.c,sound/sfifo.c,ui/{gtk/gtkui.c,xlib/xdisplay.c},
 	 widget/filesel.c: return value of malloc() shouldn't be cast.
+20070902 debugger/breakpoint.c: fix typo which prevented timed breakpoints
+	 from working properly.

@@ -1,5 +1,5 @@
 /* breakpoint.c: a debugger breakpoint
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2007 Philip Kendall
 
    $Id$
 
@@ -332,7 +332,7 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
 
     /* Timed breakpoints trigger if we're past the relevant time */
   case DEBUGGER_BREAKPOINT_TYPE_TIME:
-    if( bp->value.tstates < tstates ) return 0;
+    if( bp->value.tstates > tstates ) return 0;
     break;
 
   default:
