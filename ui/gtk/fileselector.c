@@ -29,46 +29,46 @@
 
 #include "gtkinternals.h"
 
-/* TODO: reimplement "current directory" functionality */
+static gchar *current_folder;
 
-char*
-menu_get_open_filename( const char *title )
+static char*
+run_dialog( const char *title, GtkFileChooserAction action )
 {
   GtkWidget *dialog;
   char *filename = NULL;
 
   dialog =
     gtk_file_chooser_dialog_new( title, GTK_WINDOW( gtkui_window ),
-				 GTK_FILE_CHOOSER_ACTION_OPEN,
-				 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+				 action, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 				 GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 				 NULL );
 
-  if( gtk_dialog_run( GTK_DIALOG( dialog ) ) == GTK_RESPONSE_ACCEPT )
+  if( current_folder )
+    gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( dialog ), current_folder );
+
+  if( gtk_dialog_run( GTK_DIALOG( dialog ) ) == GTK_RESPONSE_ACCEPT ) {
+    gchar *new_folder = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( dialog ) );
+    if( new_folder ) {
+      g_free( current_folder );
+      current_folder = new_folder;
+    }
     filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( dialog ) );
+  }
 
   gtk_widget_destroy( dialog );
 
   return filename;
 }
 
+
+char*
+menu_get_open_filename( const char *title )
+{
+  return run_dialog( title, GTK_FILE_CHOOSER_ACTION_OPEN );
+}
+
 char*
 menu_get_save_filename( const char *title )
 {
-  GtkWidget *dialog;
-  char *filename = NULL;
-  
-  dialog =
-    gtk_file_chooser_dialog_new( title, GTK_WINDOW( gtkui_window ),
-				 GTK_FILE_CHOOSER_ACTION_SAVE,
-				 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				 GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
-				 NULL );
-
-  if( gtk_dialog_run( GTK_DIALOG( dialog ) ) == GTK_RESPONSE_ACCEPT )
-    filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( dialog ) );
-
-  gtk_widget_destroy( dialog );
-
-  return filename;
+  return run_dialog( title, GTK_FILE_CHOOSER_ACTION_SAVE );
 }

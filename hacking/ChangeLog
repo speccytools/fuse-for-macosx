@@ -2094,3 +2094,5 @@
 	 from working properly.
 20070903 compat/morphos/osname.c: add missing return value from compat_osname
          (thanks, Q-Master) (Fred).
+20070903 ui/gtk/fileselector.c: reimplement "last directory" functionality
+	 (and some obvious refactoring).
