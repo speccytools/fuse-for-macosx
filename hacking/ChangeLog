@@ -2092,3 +2092,5 @@
 	 widget/filesel.c: return value of malloc() shouldn't be cast.
 20070902 debugger/breakpoint.c: fix typo which prevented timed breakpoints
 	 from working properly.
+20070903 compat/morphos/osname.c: add missing return value from compat_osname
+         (thanks, Q-Master) (Fred).
