@@ -60,6 +60,7 @@
 #include "memory.h"
 #include "pokefinder/pokefinder.h"
 #include "printer.h"
+#include "profile.h"
 #include "psg.h"
 #include "rzx.h"
 #include "scld.h"

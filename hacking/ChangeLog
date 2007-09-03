@@ -2096,3 +2096,4 @@
          (thanks, Q-Master) (Fred).
 20070903 ui/gtk/fileselector.c: reimplement "last directory" functionality
 	 (and some obvious refactoring).
+20070903 fuse.c: add missing #include (Stuart).
