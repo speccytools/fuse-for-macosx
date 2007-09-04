@@ -52,6 +52,7 @@ DIST_SUBDIRS = compat \
 	       pokefinder \
 	       roms \
 	       sound \
+	       timer \
 	       ui \
 	       widget \
 	       z80
