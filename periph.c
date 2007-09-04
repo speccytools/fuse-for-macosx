@@ -321,6 +321,9 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   periph_register_n( zxatasp_peripherals, zxatasp_peripherals_count );
   periph_register_n( zxcf_peripherals, zxcf_peripherals_count );
   periph_register_n( divide_peripherals, divide_peripherals_count );
+#ifdef HAVE_LIBDSK_H
+  periph_register_n( plusd_peripherals, plusd_peripherals_count );
+#endif 
 
   periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
 
@@ -434,10 +437,6 @@ periph_update( void )
   case PERIPH_PRESENT_OPTIONAL:
     periph_plusd_active = settings_current.plusd; break;
   case PERIPH_PRESENT_ALWAYS: periph_plusd_active = 1; break;
-  }
-
-  if( periph_plusd_active ) {
-    periph_register_n( plusd_peripherals, plusd_peripherals_count );
   }
 #endif			/* #ifdef HAVE_LIBDSK_H */
 

@@ -73,6 +73,7 @@ libspectrum_byte plusd_mem_read( libspectrum_word port, int *attached );
 void plusd_mem_write( libspectrum_word port, libspectrum_byte b );
 
 libspectrum_byte plusd_printer_read( libspectrum_word port, int *attached );
+void plusd_printer_write( libspectrum_word port, libspectrum_byte b );
 
 int plusd_disk_insert( plusd_drive_number which, const char *filename,
 		       int autoload );

@@ -2099,3 +2099,6 @@
 20070903 fuse.c: add missing #include (Stuart).
 20070904 disk/plusd.c,divide.c: clear plusd_active and divide_active on a reset
 	 (fixes bug #1755555) (Stuart).
+20070904 disk/plusd.[ch],periph.c: register plusd_peripherals in periph_setup()
+	 instead of periph_update(), and modify +D IO port handlers to return
+	 when the +D is not available (fixes #1771585) (Stuart).
