@@ -138,6 +138,8 @@ divide_end( void )
 static void
 divide_reset( int hard_reset )
 {
+  divide_active = 0;
+
   if( !settings_current.divide_enabled ) return;
   
   if( hard_reset ) {

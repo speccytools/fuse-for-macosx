@@ -167,6 +167,7 @@ plusd_reset( int hard_reset )
   int i;
   wd1770_drive *d;
 
+  plusd_active = 0;
   plusd_available = 0;
 
   event_remove_type( EVENT_TYPE_PLUSD_INDEX );
@@ -189,7 +190,6 @@ plusd_reset( int hard_reset )
   memory_map_romcs[ 1 ].writable = 1;
 
   plusd_available = 1;
-  plusd_active = 0;
   plusd_index_pulse = 0;
 
   if( hard_reset )

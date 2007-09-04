@@ -2097,3 +2097,5 @@
 20070903 ui/gtk/fileselector.c: reimplement "last directory" functionality
 	 (and some obvious refactoring).
 20070903 fuse.c: add missing #include (Stuart).
+20070904 disk/plusd.c,divide.c: clear plusd_active and divide_active on a reset
+	 (fixes bug #1755555) (Stuart).
