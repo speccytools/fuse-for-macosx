@@ -429,7 +429,6 @@ slt_trap( libspectrum_word address GCC_UNUSED, libspectrum_byte level GCC_UNUSED
 int trdos_available = 0;
 int trdos_active = 0;
 int if1_available = 0;
-int divide_active = 0;
 
 void
 trdos_page( void )

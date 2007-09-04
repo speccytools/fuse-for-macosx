@@ -2103,3 +2103,4 @@
 	 instead of periph_update(), and modify +D IO port handlers to return
 	 when the +D is not available (fixes #1771585) (Stuart).
 20070904 Makefile.am: distribute the timer directory (Stuart).
+20070904 z80/coretest.c: remove unused variable (Stuart).
