@@ -38,8 +38,8 @@ libuifb_a_SOURCES = fbdisplay.c \
 
 BUILT_SOURCES = keysyms.c
 
-keysyms.c: ../../keysyms.pl ../../keysyms.dat
-	@PERL@ ../../keysyms.pl fb ../../keysyms.dat > $@
+keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
+	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl fb $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = fbdisplay.h \
 	         fbkeyboard.h
