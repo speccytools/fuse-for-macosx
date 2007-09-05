@@ -41,3 +41,5 @@ keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl svga ../../keysyms.dat > $@
 
 noinst_HEADERS = svgadisplay.h svgakeyboard.h
+
+CLEANFILES = keysyms.c

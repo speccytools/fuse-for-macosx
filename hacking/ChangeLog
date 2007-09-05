@@ -2107,4 +2107,7 @@
 20070905 Makefile.am: allow windres.o to build from a directory other than the
 	 source directory (Stuart).
 20070905 Makefile.am,debugger/Makefile.am,lib/Makefile.am,ui/gtk/Makefile.am,
-	 z80/Makefile.am: clean generated files on `make clean' etc.
+	 z80/Makefile.am: clean generated files on 'make clean' etc.
+20070905 ui/{fb/Makefile.am,ggi/Makefile.am,sdl/Makefile.am,svga/Makefile.am,
+	 win32/Makefile.am,xlib/Makefile.am},widget/Makefile.am: clean more
+	 generated files on 'make clean' (Stuart).

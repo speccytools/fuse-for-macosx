@@ -42,3 +42,5 @@ keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 INCLUDES = @GTK_CFLAGS@ @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 noinst_HEADERS = xdisplay.h xkeyboard.h xui.h
+
+CLEANFILES = keysyms.c

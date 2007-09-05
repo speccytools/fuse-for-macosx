@@ -40,3 +40,5 @@ keysyms.c: ../../keysyms.pl ../../keysyms.dat
 	@PERL@ ../../keysyms.pl ggi ../../keysyms.dat > $@
 
 noinst_HEADERS = ggi_internals.h
+
+CLEANFILES = keysyms.c

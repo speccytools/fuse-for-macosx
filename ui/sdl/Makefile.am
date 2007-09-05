@@ -44,3 +44,5 @@ keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 noinst_HEADERS = sdldisplay.h \
 		 sdljoystick.h \
 		 sdlkeyboard.h
+
+CLEANFILES = keysyms.c

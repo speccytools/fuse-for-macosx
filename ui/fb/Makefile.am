@@ -43,3 +43,5 @@ keysyms.c: ../../keysyms.pl ../../keysyms.dat
 
 noinst_HEADERS = fbdisplay.h \
 	         fbkeyboard.h
+
+CLEANFILES = keysyms.c

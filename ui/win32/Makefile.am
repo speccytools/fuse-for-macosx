@@ -53,3 +53,5 @@ noinst_HEADERS = debugger.h \
 		 win32display.h \
 		 win32internals.h \
 		 win32keyboard.h
+
+CLEANFILES = keysyms.c

@@ -70,3 +70,8 @@ pkgdata_DATA = fuse.font
 
 EXTRA_DIST = mkfusefont.pl \
 	     fuse.font.sbf
+
+CLEANFILES = menu_data.c \
+	     options.c \
+	     options.h \
+	     fuse.font
