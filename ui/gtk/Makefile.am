@@ -74,3 +74,8 @@ noinst_HEADERS = gtkinternals.h \
 		 options.h \
 		 options.pl \
 		 options-header.pl
+
+CLEANFILES = keysyms.c \
+	     menu_data.c \
+	     options.c \
+	     options.h

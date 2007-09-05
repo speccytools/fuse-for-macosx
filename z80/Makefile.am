@@ -81,3 +81,9 @@ z80_coretest.o: z80_ops.c
 test: coretest
 	./coretest $(srcdir)/tests/tests.in > tests.actual
 	cmp tests.actual $(srcdir)/tests/tests.expected
+
+CLEANFILES = opcodes_base.c \
+	     z80_cb.c \
+	     z80_ddfd.c \
+	     z80_ddfdcb.c \
+	     z80_ed.c

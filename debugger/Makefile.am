@@ -44,3 +44,7 @@ noinst_HEADERS = breakpoint.h \
 		 commandy.h \
 		 debugger.h \
 		 debugger_internals.h
+
+CLEANFILES = commandl.c \
+	     commandy.c \
+	     commandy.h

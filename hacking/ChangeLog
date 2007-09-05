@@ -2106,3 +2106,5 @@
 20070904 z80/coretest.c: remove unused variable (Stuart).
 20070905 Makefile.am: allow windres.o to build from a directory other than the
 	 source directory (Stuart).
+20070905 Makefile.am,debugger/Makefile.am,lib/Makefile.am,ui/gtk/Makefile.am,
+	 z80/Makefile.am: clean generated files on `make clean' etc.

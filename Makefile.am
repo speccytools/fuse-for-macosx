@@ -193,3 +193,6 @@ EXTRA_DIST = AUTHORS \
 	     settings.pl \
 	     settings-header.pl \
 	     settings.dat
+
+CLEANFILES = settings.c \
+	     settings.h

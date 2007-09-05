@@ -73,3 +73,6 @@ EXTRA_DIST = $(FILES) \
 	uncompressed/tape_scorpion.szx \
 	uncompressed/tape_se.szx \
 	uncompressed/tape_ts2068.szx
+
+distclean-local:
+	rm -f *.szx
