@@ -132,14 +132,20 @@ keyboard_update( void )
       } else if( ( keybuf[i] & 0x7f ) == 0 ) {
 	ignore = 2; /* ignore extended keysyms */
       } else {
+	input_key fuse_keysym;
 	input_event_t fuse_event;
+
+	fuse_keysym = keysyms_remap( keybuf[i] & 0x7f );
+
+	if( fuse_keysym == INPUT_KEY_NONE ) continue;
 
 	fuse_event.type = ( keybuf[i] & 0x80 ) ?
                           INPUT_EVENT_KEYRELEASE :
                           INPUT_EVENT_KEYPRESS;
-	fuse_event.types.key.key = keysyms_remap( keybuf[i] & 0x7f );
+	fuse_event.types.key.native_key = fuse_keysym;
+	fuse_event.types.key.spectrum_key = fuse_keysym;
 
-	if( fuse_event.types.key.key ) input_event( &fuse_event );
+	input_event( &fuse_event );
       }
   }
 }
