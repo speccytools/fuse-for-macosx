@@ -2116,3 +2116,4 @@
 	 other than the source directory (Stuart).
 20070905 ui/svga/Makefile.am: add missing '/' (Stuart).
 20070905 ui/fb/fbkeyboard.c: fix compilation (Stuart).
+20070905 configure.in: fix compilation when target_os is mingw32msvc (Stuart).

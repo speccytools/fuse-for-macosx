@@ -556,7 +556,7 @@ if test "$UI" = sdl; then
   AC_MSG_RESULT(SDL)
 else
   case "$target_os" in
-    mingw32)
+    mingw32*)
       TIMER_LIBADD='win32.$(OBJEXT)'
       timer_header='<windows.h>'
       timer_type='DWORD'
@@ -613,7 +613,7 @@ case "$target_os" in
   morphos)
     COMPAT_OSNAME='morphos'
     ;;
-  mingw32)
+  mingw32*)
     COMPAT_OSNAME='win32'
     ;;
   *)
