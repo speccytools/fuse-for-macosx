@@ -2118,3 +2118,4 @@
 20070905 ui/fb/fbkeyboard.c: fix compilation (Stuart).
 20070905 configure.in: fix compilation when target_os is mingw32msvc (Stuart).
 20070905 configure.in: add --disable-libxml2 option (Stuart).
+20070905 Makefile.am: use $@.tmp consistently (Stuart).
