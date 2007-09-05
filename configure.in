@@ -543,9 +543,17 @@ if test "$stick" = yes; then
 fi
 
 dnl See if libxml2 is available (for the config file handling)
-AM_PATH_XML2(2.0.0,AC_DEFINE([HAVE_LIB_XML2], 1,
-             [Defined if we've got libxml2]),
-             AC_WARN(libxml2 not found - config file use disabled))
+AC_MSG_CHECKING(whether libxml2 support requested)
+  AC_ARG_WITH(libxml2,
+  [  --with-libxml2          use a libxml2 for settings],
+  if test "$withval" = no; then libxml2=no; else libxml2=no; fi,
+  libxml2=yes)
+AC_MSG_RESULT($libxml2)
+if test "$libxml2" = yes; then
+  AM_PATH_XML2(2.0.0,AC_DEFINE([HAVE_LIB_XML2], 1,
+               [Defined if we've got libxml2]),
+               AC_WARN(libxml2 not found - config file use disabled))
+fi
 
 dnl Work out which timer routines to use
 AC_MSG_CHECKING(which timer routines to use)
