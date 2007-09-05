@@ -2111,3 +2111,4 @@
 20070905 ui/{fb/Makefile.am,ggi/Makefile.am,sdl/Makefile.am,svga/Makefile.am,
 	 win32/Makefile.am,xlib/Makefile.am},widget/Makefile.am: clean more
 	 generated files on 'make clean' (Stuart).
+20070905 ui/ggi: remove unused directory.
