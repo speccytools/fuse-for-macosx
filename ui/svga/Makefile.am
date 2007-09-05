@@ -37,7 +37,7 @@ libuisvga_a_SOURCES = svgadisplay.c \
 
 BUILT_SOURCES = keysyms.c
 
-keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)../../keysyms.dat
+keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl svga $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = svgadisplay.h svgakeyboard.h

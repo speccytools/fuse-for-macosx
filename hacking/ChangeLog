@@ -2114,3 +2114,4 @@
 20070905 ui/ggi: remove unused directory.
 20070905 ui/{fb/Makefile.am,svga/Makefile.am}: allow building from a directory
 	 other than the source directory (Stuart).
+20070905 ui/svga/Makefile.am: add missing '/' (Stuart).
