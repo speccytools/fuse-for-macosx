@@ -2104,3 +2104,5 @@
 	 when the +D is not available (fixes #1771585) (Stuart).
 20070904 Makefile.am: distribute the timer directory (Stuart).
 20070904 z80/coretest.c: remove unused variable (Stuart).
+20070905 Makefile.am: allow windres.o to build from a directory other than the
+	 source directory (Stuart).
