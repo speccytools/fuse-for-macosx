@@ -49,7 +49,7 @@ int compat_osname( char *osname, size_t length )
   default:			   windows_name = "unknown"; break;
   }
 
-  snprintf( osname, length, "Windows %s %d.%d build %d %s",
+  snprintf( osname, length, "Windows %s %ld.%ld build %ld %s",
 	    windows_name, buf.dwMajorVersion, buf.dwMinorVersion,
 	    buf.dwBuildNumber, buf.szCSDVersion );
 

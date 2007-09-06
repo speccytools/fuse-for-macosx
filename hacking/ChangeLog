@@ -2122,6 +2122,7 @@
 20070905 configure.in: fix --without-libxml2, add --without-libsamplerate
 	 option, tidy up --with-disk-prefix help and rename --with-joystick to
 	 --without-joystick in help (Stuart).
-20070905 ui/win32/{menu_data.c,menu_data.h,menu_data.rc,win32internals.h}:
+20070906 ui/win32/{menu_data.c,menu_data.h,menu_data.rc,win32internals.h}:
 	 update menu items, clean up #includes, move handle_menu() prototype
 	 and remove redundant menu_machine_pokefinder() prototype (Stuart).
+20070906 compat/win32/osname.c: fix up warnings (Stuart).
