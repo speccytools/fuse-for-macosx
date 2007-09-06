@@ -23,6 +23,10 @@
 
 */
 
+#include <config.h>
+
+#include <windows.h>
+
 #include "menu_data.h"
 #include "menu.h"
 
@@ -56,12 +60,16 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_file_openscrscreenshot( 0 ); break;
     case IDM_MENU_FILE_SAVESCREENASSCR:
       menu_file_savescreenasscr( 0 ); break;
+#ifdef USE_LIBPNG
     case IDM_MENU_FILE_SAVESCREENASPNG:
       menu_file_savescreenaspng( 0 ); break;
+#endif
     case IDM_MENU_FILE_MOVIES_RECORDMOVIEASSCR:
       menu_file_movies_recordmovieasscr( 0 ); break;
+#ifdef USE_LIBPNG
     case IDM_MENU_FILE_MOVIES_RECORDMOVIEASPNG:
       menu_file_movies_recordmovieaspng( 0 ); break;
+#endif
     case IDM_MENU_FILE_MOVIES_STOPMOVIERECORDING:
       menu_file_movies_stopmovierecording( 0 ); break;
     case IDM_MENU_FILE_LOADBINARYDATA:
@@ -114,6 +122,10 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_options_selectroms_select( 13 ); break;
     case IDM_MENU_OPTIONS_FILTER:
       menu_options_filter( 0 ); break;
+#ifdef HAVE_LIB_XML2
+    case IDM_MENU_OPTIONS_SAVE:
+      menu_options_save( 0 ); break;
+#endif
     case IDM_MENU_MACHINE_PAUSE:
       menu_machine_pause( 0 ); break;
     case IDM_MENU_MACHINE_RESET:
@@ -270,6 +282,7 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_disk_eject( 6 ); break;
     case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECTANDWRITE:
       menu_media_disk_eject( 22 ); break;
+#ifdef HAVE_LIBDSK_H
     case IDM_MENU_MEDIA_DISK_D_DRIVE1_INSERT:
       menu_media_disk_insert( 9 ); break;
     case IDM_MENU_MEDIA_DISK_D_DRIVE1_EJECT:
@@ -282,6 +295,7 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_disk_eject( 10 ); break;
     case IDM_MENU_MEDIA_DISK_D_DRIVE2_EJECTANDWRITE:
       menu_media_disk_eject( 26 ); break;
+#endif
     case IDM_MENU_MEDIA_CARTRIDGE_TIMEXDOCK_INSERT:
       menu_media_cartridge_timexdock_insert( 0 ); break;
     case IDM_MENU_MEDIA_CARTRIDGE_TIMEXDOCK_EJECT:

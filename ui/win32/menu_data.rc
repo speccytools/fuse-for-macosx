@@ -23,7 +23,10 @@
 
 */
 
+#include <config.h>
+
 #include <windows.h>
+
 #include "menu_data.h"
 
 win32_menu MENU
@@ -50,12 +53,16 @@ win32_menu MENU
     MENUITEM SEPARATOR
     MENUITEM "O&pen SCR Screenshot...", IDM_MENU_FILE_OPENSCRSCREENSHOT
     MENUITEM "S&ave Screen as SCR...", IDM_MENU_FILE_SAVESCREENASSCR
+#ifdef USE_LIBPNG
     MENUITEM "Save S&creen as PNG...", IDM_MENU_FILE_SAVESCREENASPNG
+#endif
     POPUP "&Movies"
     {
       MENUITEM "Record Movie as &SCR...", IDM_MENU_FILE_MOVIES_RECORDMOVIEASSCR
       MENUITEM "Record Movie as &PNG...", IDM_MENU_FILE_MOVIES_RECORDMOVIEASPNG
+#ifdef USE_LIBPNG
       MENUITEM "S&top Movie Recording", IDM_MENU_FILE_MOVIES_STOPMOVIERECORDING
+#endif
     }
     MENUITEM SEPARATOR
     MENUITEM "Loa&d binary data...", IDM_MENU_FILE_LOADBINARYDATA
@@ -93,6 +100,10 @@ win32_menu MENU
       MENUITEM "Interface &I...", IDM_MENU_OPTIONS_SELECTROMS_INTERFACEI
     }
     MENUITEM "&Filter...", IDM_MENU_OPTIONS_FILTER
+#ifdef HAVE_LIB_XML2
+    MENUITEM SEPARATOR
+    MENUITEM "S&ave", IDM_MENU_OPTIONS_SAVE
+#endif
   }
   POPUP "&Machine"
   {
@@ -254,6 +265,7 @@ win32_menu MENU
           MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECTANDWRITE
         }
       }
+#ifdef HAVE_LIBDSK_H
       POPUP "+&D"
       {
         POPUP "Drive &1"
@@ -269,6 +281,7 @@ win32_menu MENU
           MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_D_DRIVE2_EJECTANDWRITE
         }
       }
+#endif
     }
     POPUP "&Cartridge"
     {

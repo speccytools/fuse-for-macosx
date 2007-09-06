@@ -52,8 +52,8 @@ void win32statusbar_create();
 
 int win32statusbar_set_visibility( int visible );
 
-void menu_machine_pokefinder( int action );
-
 void win32_verror( int is_error );
+
+void handle_menu( DWORD cmd, HWND okno );
 
 #endif				/* #ifndef FUSE_WIN32INTERNALS_H */
