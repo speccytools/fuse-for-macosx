@@ -2128,3 +2128,4 @@
 20070906 compat/win32/osname.c: fix up warnings (Stuart).
 20070908 ui/win32/{options-header.pl,options-resource.pl,options.pl}: add code
 	 to generate options dialogs for Win32 UI (Stuart).
+20070908 ui/win32/menu_data.rc: fix compilation without libpng (Stuart).
