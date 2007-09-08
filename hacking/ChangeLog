@@ -2126,3 +2126,5 @@
 	 update menu items, clean up #includes, move handle_menu() prototype
 	 and remove redundant menu_machine_pokefinder() prototype (Stuart).
 20070906 compat/win32/osname.c: fix up warnings (Stuart).
+20070908 ui/win32/{options-header.pl,options-resource.pl,options.pl}: add code
+	 to generate options dialogs for Win32 UI (Stuart).
