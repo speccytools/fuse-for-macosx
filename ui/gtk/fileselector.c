@@ -36,11 +36,18 @@ run_dialog( const char *title, GtkFileChooserAction action )
 {
   GtkWidget *dialog;
   char *filename = NULL;
+  const char *button;
+
+  if( action == GTK_FILE_CHOOSER_ACTION_SAVE ) {
+    button = GTK_STOCK_SAVE;
+  } else {
+    button = GTK_STOCK_OPEN;
+  }
 
   dialog =
     gtk_file_chooser_dialog_new( title, GTK_WINDOW( gtkui_window ),
 				 action, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				 GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+				 button, GTK_RESPONSE_ACCEPT,
 				 NULL );
 
   if( current_folder )
