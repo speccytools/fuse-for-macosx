@@ -2130,3 +2130,4 @@
 	 to generate options dialogs for Win32 UI (Stuart).
 20070908 ui/win32/menu_data.rc: fix compilation without libpng (Stuart).
 20070908 ui/gtk/fileselector.c: give the save dialog its save button back.
+20070909 settings.pl: fix up a couple of memory leaks.

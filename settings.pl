@@ -202,7 +202,7 @@ static int
 parse_xml( xmlDocPtr doc, settings_info *settings )
 {
   xmlNodePtr node;
-  const char *string;
+  xmlChar *xmlstring;
 
   node = xmlDocGetRootElement( doc );
   if( xmlStrcmp( node->name, (const xmlChar*)"settings" ) ) {
@@ -223,7 +223,9 @@ foreach my $name ( sort keys %options ) {
 
 	print << "CODE";
     if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
-      settings->$name = atoi( (const char*)xmlNodeListGetString( doc, node->xmlChildrenNode, 1 ) );
+      xmlstring = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
+      settings->$name = atoi( (char*)xmlstring );
+      xmlFree( xmlstring );
     } else
 CODE
 
@@ -231,8 +233,10 @@ CODE
 
 	    print << "CODE";
     if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
-      string = (const char*)xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
-      settings->$name = string ? strdup( string ) : NULL;
+      xmlstring = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
+      free( settings->$name );
+      settings->$name = strdup( (char*)xmlstring );
+      xmlFree( xmlstring );
     } else
 CODE
 
