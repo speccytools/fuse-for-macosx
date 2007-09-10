@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2007 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -81,6 +81,9 @@ static const char *dsk_template = "fuse.dsk.XXXXXX";
 
 /* The filename used for the +3 disk autoload snap */
 static const char *disk_autoload_snap = "disk_plus3.szx";
+
+/* Has the FDC been initialised? */
+static int fdc_initialised = 0;
 
 #endif			/* #ifdef HAVE_765_H */
 
@@ -209,6 +212,8 @@ specplus3_765_init( void )
 #ifdef HAVE_765_H
   int i;
 
+  if( fdc_initialised ) return;
+
   /* Register lib765 error callback */
   lib765_register_error_function( specplus3_fdc_error );
 
@@ -237,6 +242,8 @@ specplus3_765_init( void )
   
   /* And reset the FDC */
   specplus3_fdc_reset();
+
+  fdc_initialised = 1;
 
 #endif				/* #ifdef HAVE_765_H */
 
