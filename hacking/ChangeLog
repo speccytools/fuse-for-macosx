@@ -2132,3 +2132,4 @@
 20070908 ui/gtk/fileselector.c: give the save dialog its save button back.
 20070909 settings.pl: fix up a couple of memory leaks.
 20070910 machines/specplus3.c: fix another memory leak.
+20070919 z80/z80.pl: various non-MREQ contention fixes.

@@ -58,8 +58,9 @@ sub arithmetic_logical ($$$) {
       {
 	libspectrum_byte offset, bytetemp;
 	offset = readbyte( PC );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); PC++;
 	bytetemp = readbyte( REGISTER + (libspectrum_signed_byte)offset );
 	$opcode(bytetemp);
       }
@@ -418,7 +419,7 @@ CODE
       {
 	libspectrum_byte bytetemp;
 	bytetemp = readbyte( tempaddr );
-	contend_read( tempaddr, 1 );
+	contend_read_no_mreq( tempaddr, 1 );
 	writebyte( tempaddr, bytetemp $operator $hex_mask );
       }
 CODE
@@ -773,8 +774,8 @@ LD
 LD
         } elsif( $src eq 'HL' or $src eq 'REGISTER' ) {
 	    print << "LD";
-      contend_read( IR, 1 );
-      contend_read( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
+      contend_read_no_mreq( IR, 1 );
       SP = $src;
 LD
         } elsif( $src eq '(nnnn)' ) {
@@ -824,8 +825,9 @@ LD
       {
 	libspectrum_byte offset;
 	offset = readbyte( PC );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); contend_read( PC, 1 );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
+	contend_read_no_mreq( PC, 1 ); PC++;
 	writebyte( REGISTER + (libspectrum_signed_byte)offset, $src );
       }
 LD
@@ -835,7 +837,7 @@ LD
 	libspectrum_byte offset, value;
 	offset = readbyte( PC++ );
 	value = readbyte( PC );
-	contend_read( PC, 1 ); contend_read( PC, 1 ); PC++;
+	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 ); PC++;
 	writebyte( REGISTER + (libspectrum_signed_byte)offset, value );
       }
 LD
@@ -898,7 +900,7 @@ sub opcode_PUSH (@) {
 
     my( $regpair ) = @_;
 
-    print "      contend_read( IR, 1 );\n";
+    print "      contend_read_no_mreq( IR, 1 );\n";
     push_pop( 'PUSH', $regpair );
 }
 
@@ -1000,8 +1002,8 @@ sub opcode_RRD (@) {
     print << "RRD";
       {
 	libspectrum_byte bytetemp = readbyte( HL );
-	contend_read( HL, 1 ); contend_read( HL, 1 ); contend_read( HL, 1 );
-	contend_read( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
+	contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
 	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
 	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
 	F = ( F & FLAG_C ) | sz53p_table[A];
@@ -1013,7 +1015,7 @@ sub opcode_RST (@) {
 
     my( $value ) = @_;
 
-    printf "      contend_read( IR, 1 );\n      RST(0x%02x);\n", hex $value;
+    printf "      contend_read_no_mreq( IR, 1 );\n      RST(0x%02x);\n", hex $value;
 }
 
 sub opcode_SBC (@) { arithmetic_logical( 'SBC', $_[0], $_[1] ); }
@@ -1174,7 +1176,7 @@ while(<>) {
 
 	    print << "CODE";
       $register = readbyte(tempaddr) $operator $hexmask;
-      contend_read( tempaddr, 1 );
+      contend_read_no_mreq( tempaddr, 1 );
       writebyte(tempaddr, $register);
       break;
 CODE
@@ -1182,7 +1184,7 @@ CODE
 
 	    print << "CODE";
       $register=readbyte(tempaddr);
-      contend_read( tempaddr, 1 );
+      contend_read_no_mreq( tempaddr, 1 );
       $opcode($register);
       writebyte(tempaddr, $register);
       break;
