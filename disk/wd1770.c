@@ -294,7 +294,7 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
 
     switch( ( b >> 5 ) & 0x03 ) {
     case 0x00:
-      if( ( b & 0x4 ) ) {                               /* Restore */
+      if( !( b & 0x10 ) ) {                             /* Restore */
 	f->track_register = d->track;
 	wd1770_seek( f, 0, 1, verify );
 	f->data_register = 0;
