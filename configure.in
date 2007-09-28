@@ -335,14 +335,6 @@ AC_LINK_FILES([
 	lib/tape_se.szx
 	lib/tape_ts2068.szx])
 
-dnl LibDsk/lib765 prefix
-AC_ARG_WITH(disk-prefix,
-[  --with-disk-prefix=PFX  where LibDsk and/or lib765 are installed (optional)],
-DSK_CFLAGS=-I$withval/include; DSKLIBS=-L$withval/lib,
-DSK_CFLAGS=""; DSK_LIBS="")
-ac_save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $DSK_CFLAGS"
-
 dnl Do we want +3 disk support?
 AC_MSG_CHECKING(whether +3 disk support requested)
 AC_ARG_WITH(plus3-disk,
@@ -351,28 +343,21 @@ AC_ARG_WITH(plus3-disk,
   plus3disk=yes)
 AC_MSG_RESULT($plus3disk)
 if test "$plus3disk" = yes; then
-  AC_CHECK_HEADERS(765.h, DSKLIBS="$DSKLIBS -l765" lib765=yes,
-                   AC_MSG_WARN(765.h not found - +3 disk support disabled))
+  AC_ARG_WITH(plus3-disk-prefix,
+  [  --with-plus3-disk-prefix=PFX where the +3 libraries are installed (optional)],
+  DSK_CFLAGS=-I$withval/include; DSKLIBS=-L$withval/lib,
+  DSK_CFLAGS=""; DSK_LIBS="")
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS $DSK_CFLAGS"
+  AC_CHECK_HEADERS(765.h, DSKLIBS="$DSKLIBS -l765"; lib765=yes,
+                   AC_MSG_WARN(765.h not found - disk support disabled))
+  if test "$lib765" = yes; then
+    AC_CHECK_HEADERS(libdsk.h, DSKLIBS="$DSKLIBS -ldsk")
+  fi
+  CPPFLAGS="$ac_save_CPPFLAGS"
 fi
-
-dnl Do we want LibDsk support?
-AC_MSG_CHECKING(whether libdsk is available)
-AC_ARG_WITH(libdsk,
-  [  --without-libdsk        disable LibDsk support],
-  if test "$withval" = no; then libdsk=no; else libdsk=yes; fi,
-  libdsk=yes)
-AC_MSG_RESULT($libdsk)
-if test "$libdsk" = yes; then
-  AC_CHECK_HEADERS(libdsk.h, DSKLIBS="$DSKLIBS -ldsk";
-			     DISK_LIBS="disk/libdisk.a"; DISK="disk",
-			     AC_MSG_WARN(libdsk.h not found - LibDsk support disabled))
-fi
-
-CPPFLAGS="$ac_save_CPPFLAGS"
 AC_SUBST(DSK_CFLAGS)
 AC_SUBST(DSKLIBS)
-AC_SUBST(DISK_LIBS)
-AC_SUBST(DISK)
 
 dnl Check if a version of libpng which supplies png_write_png is available
 AC_CHECK_LIB( png, png_write_png,

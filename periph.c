@@ -299,13 +299,11 @@ periph_present interface2_present;
 /* Is the Interface II currently active */
 int periph_interface2_active;
 
-#ifdef HAVE_LIBDSK_H
 /* What sort of +D interface does the current machine have */
 periph_present plusd_present;
 
 /* Is the +D currently active */
 int periph_plusd_active;
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
 int
 periph_setup( const periph_t *peripherals_list, size_t n )
@@ -321,9 +319,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   periph_register_n( zxatasp_peripherals, zxatasp_peripherals_count );
   periph_register_n( zxcf_peripherals, zxcf_peripherals_count );
   periph_register_n( divide_peripherals, divide_peripherals_count );
-#ifdef HAVE_LIBDSK_H
   periph_register_n( plusd_peripherals, plusd_peripherals_count );
-#endif 
 
   periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
 
@@ -332,9 +328,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   kempston_present = PERIPH_PRESENT_NEVER;
   interface1_present = PERIPH_PRESENT_NEVER;
   interface2_present = PERIPH_PRESENT_NEVER;
-#ifdef HAVE_LIBDSK_H
   plusd_present = PERIPH_PRESENT_NEVER;
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
   return 0;
 }
@@ -356,9 +350,7 @@ periph_setup_interface2( periph_present present ) {
 
 void
 periph_setup_plusd( periph_present present ) {
-#ifdef HAVE_LIBDSK_H
   plusd_present = present;
-#endif			/* #ifdef HAVE_LIBDSK_H */
 }
 
 static void
@@ -431,14 +423,12 @@ periph_update( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
 		    periph_interface2_active );
 
-#ifdef HAVE_LIBDSK_H
   switch( plusd_present ) {
   case PERIPH_PRESENT_NEVER: periph_plusd_active = 0; break;
   case PERIPH_PRESENT_OPTIONAL:
     periph_plusd_active = settings_current.plusd; break;
   case PERIPH_PRESENT_ALWAYS: periph_plusd_active = 1; break;
   }
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
   if( ui_mouse_present ) {
     if( settings_current.kempston_mouse ) {

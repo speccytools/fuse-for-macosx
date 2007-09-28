@@ -233,7 +233,6 @@ Media/Disk/TR-DOS/Drive B:/_Insert..., Item,, menu_media_disk_insert, 6
 Media/Disk/TR-DOS/Drive B:/_Eject, Item,, menu_media_disk_eject, 6
 Media/Disk/TR-DOS/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 22
 
-#ifdef HAVE_LIBDSK_H
 Media/Disk/+_D, Branch
 Media/Disk/+D/Drive _1, Branch
 Media/Disk/+D/Drive 1/_Insert..., Item,, menu_media_disk_insert, 9
@@ -243,7 +242,6 @@ Media/Disk/+D/Drive _2, Branch
 Media/Disk/+D/Drive 2/_Insert..., Item,, menu_media_disk_insert, 10
 Media/Disk/+D/Drive 2/_Eject, Item,, menu_media_disk_eject, 10
 Media/Disk/+D/Drive 2/Eject and _write..., Item,, menu_media_disk_eject, 26
-#endif
 
 Media/_Cartridge, Branch
 Media/Cartridge/_Timex Dock, Branch

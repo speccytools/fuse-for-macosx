@@ -46,10 +46,6 @@
 
 #include "z80_macros.h"
 
-#ifndef HAVE_LIBDSK_H
-const int plusd_available = 0;
-#endif			/* #ifndef HAVE_LIBDSK_H */
-
 #ifndef HAVE_ENOUGH_MEMORY
 static void z80_cbxx( libspectrum_byte opcode2 );
 static void z80_ddxx( libspectrum_byte opcode2 );
@@ -169,11 +165,9 @@ z80_do_opcodes( void )
 
     CHECK( plusd, plusd_available, 4 )
 
-#ifdef HAVE_LIBDSK_H
     if( PC == 0x0008 || PC == 0x0066 || PC == 0x003a ) {
       plusd_page();
     }
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
     END_CHECK
 

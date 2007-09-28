@@ -442,7 +442,6 @@ trdos_unpage( void )
   abort();
 }
 
-#ifdef HAVE_LIBDSK_H
 int plusd_available = 0;
 int plusd_active = 0;
 
@@ -451,7 +450,6 @@ plusd_page( void )
 {
   abort();
 }
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
 void
 if1_page( void )

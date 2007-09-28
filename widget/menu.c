@@ -543,7 +543,6 @@ ui_trdos_disk_write( trdos_drive_number which )
 	 ? trdos_disk_write( which, widget_filesel_name ) : 0;
 }
 
-#ifdef HAVE_LIBDSK_H
 int
 ui_plusd_disk_write( plusd_drive_number which )
 {
@@ -558,7 +557,6 @@ ui_plusd_disk_write( plusd_drive_number which )
   return widget_filesel_name
 	 ? plusd_disk_write( which, widget_filesel_name ) : 0;
 }
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
 void
 menu_help_keyboard( int action )

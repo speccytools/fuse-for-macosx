@@ -37,9 +37,7 @@ Checkbox, ZX(C)F interface, zxcf_active, INPUT_KEY_c
 Checkbox, ZXCF up(l)oad, zxcf_upload, INPUT_KEY_l
 Checkbox, (D)ivIDE interface, divide_enabled, INPUT_KEY_d
 Checkbox, DivIDE w(r)ite protect, divide_wp, INPUT_KEY_r
-#ifdef HAVE_LIBDSK_H
 Checkbox, +D i(n)terface, plusd, INPUT_KEY_n
-#endif /* #ifdef HAVE_LIBDSK_H */
 Posthook, periph_update
 
 rzx

@@ -282,7 +282,6 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_disk_eject( 6 ); break;
     case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECTANDWRITE:
       menu_media_disk_eject( 22 ); break;
-#ifdef HAVE_LIBDSK_H
     case IDM_MENU_MEDIA_DISK_D_DRIVE1_INSERT:
       menu_media_disk_insert( 9 ); break;
     case IDM_MENU_MEDIA_DISK_D_DRIVE1_EJECT:
@@ -295,7 +294,6 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_disk_eject( 10 ); break;
     case IDM_MENU_MEDIA_DISK_D_DRIVE2_EJECTANDWRITE:
       menu_media_disk_eject( 26 ); break;
-#endif
     case IDM_MENU_MEDIA_CARTRIDGE_TIMEXDOCK_INSERT:
       menu_media_cartridge_timexdock_insert( 0 ); break;
     case IDM_MENU_MEDIA_CARTRIDGE_TIMEXDOCK_EJECT:

@@ -441,9 +441,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
     trdos_disk_insert_default_autoload( which, filename );
     break;
   case 2:
-#ifdef HAVE_LIBDSK_H
     plusd_disk_insert_default_autoload( which, filename );
-#endif				/* #ifdef HAVE_LIBDSK_H */
     break;
   }
 
@@ -473,9 +471,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
     trdos_disk_eject( which, write );
     break;
   case 2:
-#ifdef HAVE_LIBDSK_H
     plusd_disk_eject( which, write );
-#endif			/* #ifdef HAVE_LIBDSK_H */
     break;
   }
 
@@ -649,15 +645,11 @@ menu_check_media_changed( void )
   confirm = trdos_disk_eject( TRDOS_DRIVE_B, 0 );
   if( confirm ) return 1;
 
-#ifdef HAVE_LIBDSK_H
-
   confirm = plusd_disk_eject( PLUSD_DRIVE_1, 0 );
   if( confirm ) return 1;
 
   confirm = plusd_disk_eject( PLUSD_DRIVE_2, 0 );
   if( confirm ) return 1;
-
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
   if( settings_current.simpleide_master_file ) {
     confirm = simpleide_eject( LIBSPECTRUM_IDE_MASTER );

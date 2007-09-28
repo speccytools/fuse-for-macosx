@@ -134,15 +134,8 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_DISK_PLUSD:
-#ifdef HAVE_LIBDSK_H
 
     error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
-    break;
-
-#else				/* #ifdef HAVE_LIBDSK_H */
-    ui_error( UI_ERROR_WARNING,
-	      "libdsk not present so can't handle .mgt or .img files" );
-#endif				/* #ifdef HAVE_LIBDSK_H */
     break;
 
   case LIBSPECTRUM_CLASS_DISK_TRDOS:

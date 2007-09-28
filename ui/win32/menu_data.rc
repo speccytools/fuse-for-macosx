@@ -265,7 +265,6 @@ win32_menu MENU
           MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECTANDWRITE
         }
       }
-#ifdef HAVE_LIBDSK_H
       POPUP "+&D"
       {
         POPUP "Drive &1"
@@ -281,7 +280,6 @@ win32_menu MENU
           MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_D_DRIVE2_EJECTANDWRITE
         }
       }
-#endif
     }
     POPUP "&Cartridge"
     {

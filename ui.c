@@ -307,7 +307,6 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Disk/TR-DOS/Drive B:/Eject",
     "/Media/Disk/TR-DOS/Drive B:/Eject and write...", 0 },
 
-#ifdef HAVE_LIBDSK_H
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD, "/Media/Disk/+D" },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
@@ -317,7 +316,6 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
     "/Media/Disk/+D/Drive 2/Eject",
     "/Media/Disk/+D/Drive 2/Eject and write...", 0 },
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
   { UI_MENU_ITEM_MEDIA_IDE, "/Media/IDE" },
 
@@ -432,9 +430,7 @@ ui_menu_disk_update( void )
   /* Set the disk menu items and statusbar appropriately */
   plus3 = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
   trdos = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK;
-#ifdef HAVE_LIBDSK_H
   plusd = plusd_available;
-#endif                  /* #ifdef HAVE_LIBDSK_H */
 
   if( plus3 || trdos || plusd ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
@@ -447,7 +443,5 @@ ui_menu_disk_update( void )
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3, plus3 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_TRDOS, trdos );
-#ifdef HAVE_LIBDSK_H
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
-#endif                  /* #ifdef HAVE_LIBDSK_H */
 }

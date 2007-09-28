@@ -178,7 +178,6 @@ int event_do_events(void)
       trdos_event_index( ptr->tstates );
       break;
 
-#ifdef HAVE_LIBDSK_H
     case EVENT_TYPE_PLUSD_CMD_DONE:
       plusd_event_cmd_done( ptr->tstates );
       break;
@@ -191,7 +190,6 @@ int event_do_events(void)
     case EVENT_TYPE_WD1770_MOTOR_OFF:
       wd1770_event( ptr->tstates, ptr->type, ptr->user_data );
       break;
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
     case EVENT_TYPE_BREAKPOINT:
       debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );

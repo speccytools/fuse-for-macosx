@@ -27,7 +27,7 @@ bin_PROGRAMS = fuse
 
 SUBDIRS = compat \
 	  debugger \
-	  @DISK@ \
+	  disk \
 	  hacking \
 	  lib \
 	  machines \
@@ -102,7 +102,7 @@ EXTRA_fuse_SOURCES = windres.rc
 
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
-@DISK_LIBS@ \
+disk/libdisk.a \
 machines/libmachines.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
@@ -123,7 +123,7 @@ compat/@COMPAT_OSNAME@/libcompatos.a \
 @WINDRES_OBJ@
 
 fuse_DEPENDENCIES = @UI_LIBS@ \
-		    @DISK_LIBS@ \
+		    disk/libdisk.a \
 		    debugger/libdebugger.a \
 		    machines/libmachines.a \
 		    sound/libsound.a \

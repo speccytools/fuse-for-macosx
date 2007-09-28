@@ -849,7 +849,6 @@ ui_trdos_disk_write( trdos_drive_number which )
   return 0;
 }
 
-#ifdef HAVE_LIBDSK_H
 int
 ui_plusd_disk_write( plusd_drive_number which )
 {
@@ -876,7 +875,6 @@ ui_plusd_disk_write( plusd_drive_number which )
 
   return 0;
 }
-#endif			/* #ifdef HAVE_LIBDSK_H */
 
 /* Called on machine selection */
 int
