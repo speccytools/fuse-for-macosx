@@ -56,6 +56,9 @@ typedef enum event_type {
   EVENT_TYPE_PLUSD_CMD_DONE,
   EVENT_TYPE_PLUSD_INDEX,
 
+  EVENT_TYPE_WD1770,
+  EVENT_TYPE_WD1770_MOTOR_OFF,
+
 } event_type;
 
 /* A large value to mean `no events due' */

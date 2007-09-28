@@ -29,10 +29,9 @@
 #ifndef FUSE_WD1770_H
 #define FUSE_WD1770_H
 
-#include <libdsk.h>
-
 #include <libspectrum.h>
 
+#include "fdd.h"
 #include "fuse.h"
 
 static const int WD1770_SR_MOTORON = 1<<7; /* Motor on */
@@ -44,32 +43,41 @@ static const int WD1770_SR_LOST    = 1<<2; /* Lost data */
 static const int WD1770_SR_IDX_DRQ = 1<<1; /* Index pulse / Data request */
 static const int WD1770_SR_BUSY    = 1<<0; /* Busy (command under execution) */
 
+typedef enum wd_type_t {
+  WD1773 = 0,		/* WD1773 */
+  FD1793,
+  WD1770,
+  WD1772,
+} wd_type_t;
+
 extern int wd1770_index_pulse;
 extern int wd1770_index_interrupt;
 
 typedef struct wd1770_drive {
-  DSK_PDRIVER disk;
-  DSK_GEOMETRY geom;
-  char filename[ PATH_MAX ];
-
+  fdd_t fdd;			/* floppy disk drive */
+  disk_t disk;			/* the floppy disk itself */
   int index_pulse;
   int index_interrupt;
 
-  int track;
-  int sector;
-  int side;
 } wd1770_drive;
 
 typedef struct wd1770_fdc {
   wd1770_drive *current_drive;
 
+  wd_type_t type;		/* WD1770, WD1772, WD1773 */
+  
   int rates[ 4 ];
   int spin_cycles;
   int direction;                /* 0 = spindlewards, 1 = rimwards */
+  int dden;			/* SD/DD -> FM/MFM */
+  int intrq;			/* INTRQ line status */
+  int head_load;		/* WD1773/FD1793 */
 
   enum wd1770_state {
     WD1770_STATE_NONE = 0,
     WD1770_STATE_SEEK,
+    WD1770_STATE_SEEK_DELAY,
+    WD1770_STATE_VERIFY,
     WD1770_STATE_READ,
     WD1770_STATE_WRITE,
     WD1770_STATE_READTRACK,
@@ -82,15 +90,33 @@ typedef struct wd1770_fdc {
     WD1770_STATUS_TYPE2,
   } status_type;
 
+  enum wd1770_am_type {
+    WD1770_AM_NONE = 0,
+    WD1770_AM_INDEX,
+    WD1770_AM_ID,
+    WD1770_AM_DATA,
+  } id_mark;
+
+  int id_track;
+  int id_head;
+  int id_sector;
+  int id_length;		/* sector length code 0, 1, 2, 3 */
+  int sector_length;		/* sector length from length code */
+  int ddam;			/* read a deleted data mark */
+  int rev;			/* revolution counter */
+
   /* state during transfer */
-  int data_side;
+  int data_check_head;		/* -1 no check, 0/1 wait side 0 or 1 */
   int data_multisector;
   int data_offset;
 
+  libspectrum_byte command_register;    /* command register */
   libspectrum_byte status_register;     /* status register */
   libspectrum_byte track_register;      /* track register */
   libspectrum_byte sector_register;     /* sector register */
   libspectrum_byte data_register;       /* data register */
+
+  libspectrum_word crc;			/* to hold crc */
 
   void ( *set_cmdint ) ( struct wd1770_fdc *f );
   void ( *reset_cmdint ) ( struct wd1770_fdc *f );
@@ -98,29 +124,11 @@ typedef struct wd1770_fdc {
   void ( *reset_datarq ) ( struct wd1770_fdc *f );
   void *iface;
 
-  DSK_GEOMETRY fgeom;		/* geom for write track */
-  int fill;			/* fill byte for format */
-  int idx;
-  enum wd1770_trcmd_state {
-    WD1770_TRACK_NONE = 0,
-    WD1770_TRACK_GAP1,
-    WD1770_TRACK_GAP2,
-    WD1770_TRACK_SYNC,
-    WD1770_TRACK_IMRK,
-
-    WD1770_TRACK_ID_TRACK,
-    WD1770_TRACK_ID_HEAD,
-    WD1770_TRACK_ID_SECTOR,
-    WD1770_TRACK_ID_SIZE,
-
-    WD1770_TRACK_CRC,
-    WD1770_TRACK_GAP3,
-    WD1770_TRACK_DMRK,
-    WD1770_TRACK_DATA,
-    WD1770_TRACK_GAP4,
-    WD1770_TRACK_FILL,
-  } trcmd_state;
 } wd1770_fdc;
+
+/* allocate an fdc */
+wd1770_fdc *wd1770_alloc_fdc( wd_type_t type );
+void wd1770_master_reset( wd1770_fdc *f );
 
 libspectrum_byte wd1770_sr_read( wd1770_fdc *f );
 void wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b );

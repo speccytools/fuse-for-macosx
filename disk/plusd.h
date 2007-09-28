@@ -35,8 +35,6 @@ typedef enum plusd_drive_number {
   PLUSD_DRIVE_2,
 } plusd_drive_number;
 
-#ifdef HAVE_LIBDSK_H
-
 #include <libspectrum.h>
 
 #include "wd1770.h"
@@ -83,7 +81,5 @@ int plusd_disk_eject( plusd_drive_number which, int write );
 int plusd_disk_write( plusd_drive_number which, const char *filename );
 int plusd_event_cmd_done( libspectrum_dword last_tstates );
 int plusd_event_index( libspectrum_dword last_tstates );
-
-#endif                  /* #ifndef HAVE_LIBDSK_H */
 
 #endif                  /* #ifndef FUSE_PLUSD_H */

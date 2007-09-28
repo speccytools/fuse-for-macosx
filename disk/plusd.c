@@ -40,12 +40,12 @@
 #include <limits.h>
 #include <sys/stat.h>
 
-#include <libdsk.h>
-
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "disk.h"
 #include "event.h"
+#include "fdd.h"
 #include "machine.h"
 #include "module.h"
 #include "plusd.h"
@@ -63,10 +63,8 @@ static int plusd_index_pulse;
 
 #define PLUSD_NUM_DRIVES 2
 
-static wd1770_fdc plusd_fdc;
+static wd1770_fdc *plusd_fdc;
 static wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
-
-static const char *plusd_template = "fuse.plusd.XXXXXX";
 
 static libspectrum_byte plusd_ram[ 0x2000 ];
 
@@ -136,25 +134,20 @@ plusd_init( void )
   int i;
   wd1770_drive *d;
 
-  plusd_fdc.current_drive = &plusd_drives[ 0 ];
+  plusd_fdc = wd1770_alloc_fdc( WD1770 );
+  plusd_fdc->current_drive = &plusd_drives[ 0 ];
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
-
-    d->disk = NULL;
-    d->filename[0] = '\0';
+    fdd_init( &d->fdd, 0, 0 );		/* drive geometry 'autodetect' */
   }
 
-  plusd_fdc.set_cmdint = NULL;
-  plusd_fdc.reset_cmdint = NULL;
-  plusd_fdc.set_datarq = NULL;
-  plusd_fdc.reset_datarq = NULL;
-  plusd_fdc.iface = NULL;
-
-  plusd_fdc.rates[ 0 ] = 6;
-  plusd_fdc.rates[ 1 ] = 12;
-  plusd_fdc.rates[ 2 ] = 2;
-  plusd_fdc.rates[ 3 ] = 3;
+  plusd_fdc->dden = 1;
+  plusd_fdc->set_cmdint = NULL;
+  plusd_fdc->reset_cmdint = NULL;
+  plusd_fdc->set_datarq = NULL;
+  plusd_fdc->reset_datarq = NULL;
+  plusd_fdc->iface = NULL;
 
   module_register( &plusd_module_info );
 
@@ -195,35 +188,22 @@ plusd_reset( int hard_reset )
   if( hard_reset )
     memset( plusd_ram, 0, 0x2000 );
 
-  plusd_fdc.spin_cycles = 0;
-  plusd_fdc.direction = 0;
-
-  plusd_fdc.state = WD1770_STATE_NONE;
-  plusd_fdc.status_type = WD1770_STATUS_TYPE1;
-
-  plusd_fdc.status_register = 0;
-  plusd_fdc.track_register = 0;
-  plusd_fdc.sector_register = 0;
-  plusd_fdc.data_register = 0;
+  wd1770_master_reset( plusd_fdc );
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
 
     d->index_pulse = 0;
     d->index_interrupt = 0;
-    d->track = 0;
-    d->side = 0;
   }
-
-  plusd_fdc.status_register |= WD1770_SR_LOST; /* track 0 */
 
   /* We can eject disks only if they are currently present */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
-		    !!plusd_drives[ PLUSD_DRIVE_1 ].disk );
+		    plusd_drives[ PLUSD_DRIVE_1 ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
-		    !!plusd_drives[ PLUSD_DRIVE_2 ].disk );
+		    plusd_drives[ PLUSD_DRIVE_2 ].fdd.loaded );
 
-  plusd_fdc.current_drive = &plusd_drives[ 0 ];
+  plusd_fdc->current_drive = &plusd_drives[ 0 ];
   machine_current->memory_map();
   plusd_event_index( 0 );
 
@@ -242,7 +222,7 @@ plusd_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_sr_read( &plusd_fdc );
+  return wd1770_sr_read( plusd_fdc );
 }
 
 void
@@ -250,7 +230,7 @@ plusd_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_cr_write( &plusd_fdc, b );
+  wd1770_cr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
@@ -259,7 +239,7 @@ plusd_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_tr_read( &plusd_fdc );
+  return wd1770_tr_read( plusd_fdc );
 }
 
 void
@@ -267,7 +247,7 @@ plusd_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_tr_write( &plusd_fdc, b );
+  wd1770_tr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
@@ -276,7 +256,7 @@ plusd_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_sec_read( &plusd_fdc );
+  return wd1770_sec_read( plusd_fdc );
 }
 
 void
@@ -284,7 +264,7 @@ plusd_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_sec_write( &plusd_fdc, b );
+  wd1770_sec_write( plusd_fdc, b );
 }
 
 libspectrum_byte
@@ -293,7 +273,7 @@ plusd_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_dr_read( &plusd_fdc );
+  return wd1770_dr_read( plusd_fdc );
 }
 
 void
@@ -301,7 +281,7 @@ plusd_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_dr_write( &plusd_fdc, b );
+  wd1770_dr_write( plusd_fdc, b );
 }
 
 void
@@ -316,10 +296,10 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   side = ( b & 0x80 ) ? 1 : 0;
 
   /* TODO: set current_drive to NULL when bits 0 and 1 of b are '00' or '11' */
-  plusd_fdc.current_drive = &plusd_drives[ drive ];
+  plusd_fdc->current_drive = &plusd_drives[ drive ];
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
-    plusd_drives[ i ].side = side;
+    fdd_set_head( &plusd_drives[ i ].fdd, side );
   }
 
   printer_parallel_strobe_write( b & 0x40 );
@@ -378,13 +358,8 @@ int
 plusd_disk_insert( plusd_drive_number which, const char *filename,
 		   int autoload )
 {
-  int fd, error;
-  char tempfilename[ PATH_MAX ];
-  int israw = 0;
-  dsk_format_t fmt;
-  dsk_err_t dsk_error;
+  int error;
   wd1770_drive *d;
-  int l;
 
   if( which >= PLUSD_NUM_DRIVES ) {
     ui_error( UI_ERROR_ERROR, "plusd_disk_insert: unknown drive %d",
@@ -395,74 +370,16 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   d = &plusd_drives[ which ];
 
   /* Eject any disk already in the drive */
-  if( d->disk ) {
+  if( d->fdd.loaded ) {
     /* Abort the insert if we want to keep the current disk */
     if( plusd_disk_eject( which, 0 ) ) return 0;
   }
-
-  /* Make a temporary copy of the disk file */
-  error = utils_make_temp_file( &fd, tempfilename, filename, plusd_template );
-  if( error ) return error;
-  strcpy( d->filename, tempfilename );
-
-  /* Determine the disk image format */
-  l = strlen( filename );
-  if( l >= 5 ) {
-    if( !strcmp( filename + ( l - 4 ), ".dsk" ) ||
-	!strcmp( filename + ( l - 4 ), ".mgt" )    ) {
-      israw = 1;
-      fmt = FMT_800K;
-    } else if( !strcmp( filename + ( l - 4 ), ".img" ) ) {
-      israw = 1;
-      fmt = FMT_MGT800;
-    }
+  if( ( error = disk_open( &d->disk, filename, 0 ) != DISK_OK ) ) {
+    ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
+                             disk_strerror( error ) );
+    return 1;
   }
-
-  /* And now insert the disk */
-  if( israw ) {
-
-    /* If the "logical" driver is not available, try the "raw" driver (unless
-     * we're using FMT_MGT800, for which the raw driver will not work */
-    dsk_error = dsk_open( &d->disk, tempfilename, "logical", NULL );
-    if( dsk_error != DSK_ERR_OK &&
-	( fmt == FMT_MGT800 ||
-	  ( dsk_error = dsk_open( &d->disk, tempfilename, "raw", NULL ) ) !=
-              DSK_ERR_OK
-        )
-      ) {
-      ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
-                                dsk_strerror( dsk_error ) );
-      return 1;
-    }
-
-    dsk_error = dg_stdformat( &d->geom, fmt, NULL, NULL );
-    if( dsk_error != DSK_ERR_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to set geometry for disk: %s",
-                                dsk_strerror( dsk_error ) );
-      dsk_close( &d->disk );
-      return 1;
-    }
-
-  } else {
-
-    dsk_error = dsk_open( &d->disk, tempfilename, NULL, NULL );
-    if( dsk_error != DSK_ERR_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
-                                dsk_strerror( dsk_error ) );
-      return 1;
-    }
-
-    dsk_error = dsk_getgeom( d->disk, &d->geom );
-    if( dsk_error != DSK_ERR_OK ) {
-      ui_error( UI_ERROR_ERROR, "Failed to determine geometry for disk: %s",
-                                dsk_strerror( dsk_error ) );
-      dsk_close( &d->disk );
-      return 1;
-    }
-
-  }
-
-  d->sector = d->geom.dg_secbase;
+  fdd_load( &d->fdd, &d->disk, 0 );
 
   /* Set the 'eject' item active */
   switch( which ) {
@@ -491,7 +408,7 @@ plusd_disk_eject( plusd_drive_number which, int write )
 
   d = &plusd_drives[ which ];
 
-  if( !d->disk )
+  if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
   if( write ) {
@@ -500,7 +417,7 @@ plusd_disk_eject( plusd_drive_number which, int write )
 
   } else {
 
-    if( dsk_dirty( plusd_drives[which].disk ) ) {
+    if( d->disk.dirty ) {
 
       ui_confirm_save_t confirm = ui_confirm_save(
 	"Disk has been modified.\nDo you want to save it?"
@@ -519,8 +436,8 @@ plusd_disk_eject( plusd_drive_number which, int write )
     }
   }
 
-  dsk_close( &d->disk );
-  unlink( d->filename );
+  fdd_unload( &d->fdd );
+  disk_close( &d->disk );
 
   /* Set the 'eject' item inactive */
   switch( which ) {
@@ -538,35 +455,14 @@ int
 plusd_disk_write( plusd_drive_number which, const char *filename )
 {
   wd1770_drive *d = &plusd_drives[ which ];
-  utils_file file;
-  FILE *f;
   int error;
-  size_t bytes_written;
+  
+  d->disk.type = DISK_TYPE_NONE;
+  error = disk_write( &d->disk, filename );
 
-  dsk_close( &d->disk );
-
-  f = fopen( filename, "wb" );
-  if( !f ) {
-    ui_error( UI_ERROR_ERROR, "couldn't open '%s' for writing: %s", filename,
-	      strerror( errno ) );
-  }
-
-  error = utils_read_file( d->filename, &file );
-  if( error ) { fclose( f ); return error; }
-
-  bytes_written = fwrite( file.buffer, 1, file.length, f );
-  if( bytes_written != file.length ) {
-    ui_error( UI_ERROR_ERROR, "could write only %lu of %lu bytes to '%s'",
-	      (unsigned long)bytes_written, (unsigned long)file.length,
-	      filename );
-    utils_close_file( &file ); fclose( f );
-  }
-
-  error = utils_close_file( &file ); if( error ) { fclose( f ); return error; }
-
-  if( fclose( f ) ) {
-    ui_error( UI_ERROR_ERROR, "error closing '%s': %s", filename,
-	      strerror( errno ) );
+  if( error != DISK_OK ) {
+    ui_error( UI_ERROR_ERROR, "couldn't write '%s' file: %s", filename,
+	      disk_strerror( error ) );
     return 1;
   }
 
@@ -576,7 +472,7 @@ plusd_disk_write( plusd_drive_number which, const char *filename )
 int
 plusd_event_cmd_done( libspectrum_dword last_tstates GCC_UNUSED )
 {
-  plusd_fdc.status_register &= ~WD1770_SR_BUSY;
+  plusd_fdc->status_register &= ~WD1770_SR_BUSY;
   return 0;
 }
 
@@ -593,7 +489,7 @@ plusd_event_index( libspectrum_dword last_tstates )
 
     d->index_pulse = plusd_index_pulse;
     if( !plusd_index_pulse && d->index_interrupt ) {
-      wd1770_set_cmdint( &plusd_fdc );
+      wd1770_set_cmdint( plusd_fdc );
       d->index_interrupt = 0;
     }
   }

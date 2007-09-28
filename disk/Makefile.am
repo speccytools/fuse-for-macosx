@@ -29,8 +29,14 @@ noinst_LIBRARIES = libdisk.a
 
 INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 
-libdisk_a_SOURCES = plusd.c \
+libdisk_a_SOURCES = crc.c \
+		    disk.c \
+		    fdd.c \
+		    plusd.c \
 		    wd1770.c
 
-noinst_HEADERS = plusd.h \
+noinst_HEADERS = crc.h \
+		 disk.h \
+		 fdd.h \
+		 plusd.h \
 		 wd1770.h

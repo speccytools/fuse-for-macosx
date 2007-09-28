@@ -2135,3 +2135,6 @@
 20070919 z80/z80.pl: various non-MREQ contention fixes.
 20070928 disk/wd1770.c: fix seek/restore command decoding (Stuart).
 20070928 event.[ch]: add 'user_data' event field (Gergely and Stuart).
+20070928 disk/{Makefile.am,crc.[ch],disk.[ch],fdd.[ch],plusd.[ch],wd1770.[ch]},
+	 event.[ch]: new WD17xx emulation, with support for non-uniform sector
+	 layouts (Gergely Szasz).

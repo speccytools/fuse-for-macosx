@@ -186,6 +186,11 @@ int event_do_events(void)
     case EVENT_TYPE_PLUSD_INDEX:
       plusd_event_index( ptr->tstates );
       break;
+
+    case EVENT_TYPE_WD1770:
+    case EVENT_TYPE_WD1770_MOTOR_OFF:
+      wd1770_event( ptr->tstates, ptr->type, ptr->user_data );
+      break;
 #endif			/* #ifdef HAVE_LIBDSK_H */
 
     case EVENT_TYPE_BREAKPOINT:
