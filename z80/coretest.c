@@ -478,7 +478,8 @@ writeport_internal( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNU
 }
 
 int
-event_add( libspectrum_dword event_time GCC_UNUSED, int type GCC_UNUSED )
+event_add_with_data( libspectrum_dword event_time GCC_UNUSED,
+		     int type GCC_UNUSED, void *user_data GCC_UNUSED )
 {
   /* Do nothing */
   return 0;

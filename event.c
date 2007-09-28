@@ -83,7 +83,8 @@ int event_init(void)
 
 /* Add an event at the correct place in the event list */
 int
-event_add( libspectrum_dword event_time, event_type type )
+event_add_with_data( libspectrum_dword event_time, event_type type,
+		     void *user_data )
 {
   event_t *ptr;
 
@@ -97,6 +98,7 @@ event_add( libspectrum_dword event_time, event_type type )
 
   ptr->tstates= event_time;
   ptr->type=type;
+  ptr->user_data = user_data;
 
   if( event_time < event_next_event ) {
     event_next_event = event_time;

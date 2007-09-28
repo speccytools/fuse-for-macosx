@@ -36,6 +36,7 @@
 typedef struct event_t {
   libspectrum_dword tstates;
   int type;
+  void *user_data;
 } event_t;
 
 /* The various types of event which can occur */
@@ -67,7 +68,14 @@ extern libspectrum_dword event_next_event;
 int event_init(void);
 
 /* Add an event at the correct place in the event list */
-int event_add( libspectrum_dword event_time, event_type type );
+int event_add_with_data( libspectrum_dword event_time, event_type type,
+			 void *user_data );
+
+static inline int
+event_add( libspectrum_dword event_time, event_type type )
+{
+  return event_add_with_data( event_time, type, NULL );
+}
 
 /* Do all events which have passed */
 int event_do_events(void);

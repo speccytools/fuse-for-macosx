@@ -2134,3 +2134,4 @@
 20070910 machines/specplus3.c: fix another memory leak.
 20070919 z80/z80.pl: various non-MREQ contention fixes.
 20070928 disk/wd1770.c: fix seek/restore command decoding (Stuart).
+20070928 event.[ch]: add 'user_data' event field (Gergely and Stuart).
