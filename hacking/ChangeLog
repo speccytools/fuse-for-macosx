@@ -2143,3 +2143,4 @@
 	 win32/{menu_data.[ch],menu_data.rc,win32ui.c}},ui.c,utils.c,
 	 widget/menu.c,z80/{coretest.c,z80_ops.c}: make libdisk.a no longer
 	 depend on libdsk (Stuart).
+20071003 disk/wd1770.c: small tidyups.

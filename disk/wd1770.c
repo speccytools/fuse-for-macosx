@@ -52,14 +52,6 @@
 #include "wd1770.h"
 #include "z80/z80.h"
 
-/* #define DEBUG_ON */
-#ifdef DEBUG_ON
-#define dbgprintf(a...) \
-    fprintf(stderr, a)
-#else
-#define dbgprintf(a...)
-#endif
-
 static void statusbar_update( int busy );
 
 static wd1770_fdc *fdc_list;
@@ -91,36 +83,35 @@ wd1770_master_reset( wd1770_fdc *f )
 
 }
 
-wd1770_fdc *
+wd1770_fdc*
 wd1770_alloc_fdc( wd_type_t type )
 {
-    if( ( fdc_list = realloc( fdc_list, ( fdc_num + 1 ) *
-				sizeof(wd1770_fdc) ) ) == NULL ) {
-	return NULL;
-    }
-    switch( type ) {
-    default:
-      type = WD1770;			/* illegal type converted to wd1770 */
-    case FD1793:
-    case WD1773:
-    case WD1770:
-      fdc_list[fdc_num].rates[ 0 ] = 6;
-      fdc_list[fdc_num].rates[ 1 ] = 12;
-      fdc_list[fdc_num].rates[ 2 ] = 20;
-      fdc_list[fdc_num].rates[ 3 ] = 30;
-      break;
-    case WD1772:
-      fdc_list[fdc_num].rates[ 0 ] = 2;
-      fdc_list[fdc_num].rates[ 1 ] = 3;
-      fdc_list[fdc_num].rates[ 2 ] = 5;
-      fdc_list[fdc_num].rates[ 3 ] = 6;
-      break;
-    }
-    fdc_list[fdc_num].type = type;
-    fdc_list[fdc_num].current_drive = NULL;
-    wd1770_master_reset( &fdc_list[fdc_num] );
-    fdc_num++;
-    return fdc_list + fdc_num - 1;
+  fdc_list = realloc( fdc_list, ( fdc_num + 1 ) * sizeof( *fdc_list ) );
+  if( !fdc_list ) return NULL;
+
+  switch( type ) {
+  default:
+    type = WD1770;			/* illegal type converted to wd1770 */
+  case FD1793:
+  case WD1773:
+  case WD1770:
+    fdc_list[fdc_num].rates[ 0 ] = 6;
+    fdc_list[fdc_num].rates[ 1 ] = 12;
+    fdc_list[fdc_num].rates[ 2 ] = 20;
+    fdc_list[fdc_num].rates[ 3 ] = 30;
+    break;
+  case WD1772:
+    fdc_list[fdc_num].rates[ 0 ] = 2;
+    fdc_list[fdc_num].rates[ 1 ] = 3;
+    fdc_list[fdc_num].rates[ 2 ] = 5;
+    fdc_list[fdc_num].rates[ 3 ] = 6;
+    break;
+  }
+  fdc_list[fdc_num].type = type;
+  fdc_list[fdc_num].current_drive = NULL;
+  wd1770_master_reset( &fdc_list[fdc_num] );
+  fdc_num++;
+  return fdc_list + fdc_num - 1;
 }
 
 static void
@@ -134,66 +125,50 @@ statusbar_update( int busy )
 void
 wd1770_set_cmdint( wd1770_fdc *f )
 {
-  dbgprintf( "set_cmdint:" );
   if( ( f->type == WD1770 || f->type == WD1772 ) &&
-	f->status_register & WD1770_SR_MOTORON ) {
+      f->status_register & WD1770_SR_MOTORON        ) {
     event_add_with_data( tstates + 10 * 200 * 
-    		    machine_current->timings.processor_speed / 1000,
-			EVENT_TYPE_WD1770_MOTOR_OFF, f );
+			 machine_current->timings.processor_speed / 1000,
+			 EVENT_TYPE_WD1770_MOTOR_OFF, f );
   }
 
   if( ( f->type == WD1773 || f->type == FD1793 ) &&
-	f->head_load ) {
+      f->head_load				    ) {
     event_add_with_data( tstates + 15 * 200 * 
-    		    machine_current->timings.processor_speed / 1000,
-			EVENT_TYPE_WD1770_MOTOR_OFF, f );
+			 machine_current->timings.processor_speed / 1000,
+			 EVENT_TYPE_WD1770_MOTOR_OFF, f );
   }
   if( f->intrq != 1 ) {
-    dbgprintf( " SET" );
     f->intrq = 1;
-    if( f->set_cmdint )
-      f->set_cmdint( f );
+    if( f->set_cmdint ) f->set_cmdint( f );
   }
-  dbgprintf( "\n" );
 }
 
 void
 wd1770_reset_cmdint( wd1770_fdc *f )
 {
-  dbgprintf( "reset_cmdint:" );
   if( f->intrq == 1 ) {
-    dbgprintf( " RESET" );
     f->intrq = 0;
-    if( f->reset_cmdint )
-      f->reset_cmdint( f );
+    if( f->reset_cmdint ) f->reset_cmdint( f );
   }
-  dbgprintf( "\n" );
 }
 
 void
 wd1770_set_datarq( wd1770_fdc *f )
 {
-  dbgprintf( "set_datarq:" );
   if( !( f->status_register & WD1770_SR_IDX_DRQ ) ) {
-    dbgprintf( " SET" );
     f->status_register |= WD1770_SR_IDX_DRQ;
-    if( f->set_datarq )
-      f->set_datarq( f );
+    if( f->set_datarq ) f->set_datarq( f );
   }
-  dbgprintf( "\n" );
 }
 
 void
 wd1770_reset_datarq( wd1770_fdc *f )
 {
-  dbgprintf( "reset_datarq:" );
   if( f->status_register & WD1770_SR_IDX_DRQ ) {
-    dbgprintf( " RESET" );
     f->status_register &= ~WD1770_SR_IDX_DRQ;
-    if( f->reset_datarq )
-      f->reset_datarq( f );
+    if( f->reset_datarq ) f->reset_datarq( f );
   }
-  dbgprintf( "\n" );
 }
 
 #define CRC_PRESET f->crc = 0xffff
@@ -316,7 +291,7 @@ read_datamark( wd1770_fdc *f )
       return 1;				/* something wrong... */
     } 
     for( ; i > 0; i-- ) {
-       CRC_PRESET;
+      CRC_PRESET;
       fdd_read_write_data( &d->fdd, FDD_READ ); CRC_ADD;
       if( d->fdd.data == 0x00 )
         continue;
@@ -370,7 +345,6 @@ wd1770_sr_read( wd1770_fdc *f )
 {
   wd1770_drive *d = f->current_drive;
   
-  dbgprintf( "READ STATUS\n" );
   wd1770_reset_cmdint( f );
 
   if( f->status_type == WD1770_STATUS_TYPE1 ) {
@@ -426,9 +400,6 @@ wd1770_type_i( wd1770_fdc *f )
   wd1770_drive *d = f->current_drive;
   libspectrum_dword delay;
   
-  dbgprintf( "  -===: %s (%d)\n", b & 0x40 ? ( b & 0x20 ? "STEP OUT" : "STEP IN" ) :
-			     ( b & 0x20 ? "STEP" : ( b & 0x10 ? "SEEK" : "RESTORE")), f->data_register);
-
   if( f->state == WD1770_STATE_SEEK_DELAY ) {	/* after delay */
     if( ( b & 0x60 ) != 0x00 )			/* STEP/STEP-IN/STEP-OUT */
       goto type_i_verify;
@@ -459,7 +430,6 @@ type_i_update:
     f->track_register += f->direction == FDD_STEP_IN ? 1 : -1;
 
 type_i_noupdate:
-    dbgprintf( "-STEP %d (%d/%d)\n", f->direction, f->track_register, f->data_register );
     if( d->fdd.tr00 && f->direction == FDD_STEP_OUT ) {
       f->track_register = 0;
     } else {
@@ -524,9 +494,6 @@ wd1770_type_ii( wd1770_fdc *f )
 
   f->data_multisector = b & 0x10 ? 1 : 0;
 
-  dbgprintf( "  -===: %s (%s) %d\n", f->state ==  WD1770_STATE_READ ? "READ SECTOR" : "WRITE SECTOR",
-			    b & 0x10 ? "MULTI" : "SINGLE", f->sector_register);
-
   f->rev = 5;
   seek_id( f );
 
@@ -541,7 +508,6 @@ wd1770_type_ii( wd1770_fdc *f )
       wd1770_set_cmdint( f );
       return;
     }
-    dbgprintf( "  -===: Found sector: %d\n", f->id_sector);
     if( f->ddam )
       f->status_register |= WD1770_SR_SPINUP;	/* set deleted data mark */
     wd1770_set_datarq( f );
@@ -596,8 +562,6 @@ wd1770_type_iii( wd1770_fdc *f )
   } else {						/* ----READID---- */
     f->rev = 5;
     read_id( f );
-    dbgprintf( "  -===: %s (%d,%d,%d)\n", "READ ID", f->id_head, f->id_track,
-			    f->id_sector);
     if( f->id_mark == WD1770_AM_NONE ) {
       f->status_register |= WD1770_SR_RNF;
       wd1770_set_cmdint( f );
@@ -613,13 +577,6 @@ wd1770_event( libspectrum_dword last_tstates, event_type event, void *user_data 
 {
   wd1770_fdc *f = user_data;
   
-#ifdef DEBUG_ON
-  char *st[] = {
-    "NONE", "SEEK", "SEEK_DELAY", "VERIFY", "READ", "WRITE",
-    "READTRACK", "WRITETRACK", "READID" };
-#endif
-  dbgprintf( "*EVENT: %s state: %s\n", event == EVENT_TYPE_WD1770 ? 
-	"WD1770" : "MOTOR_OFF", st[f->state] );
   if( event == EVENT_TYPE_WD1770_MOTOR_OFF ) {
     if( f->type == WD1770 || f->type == WD1772 )
       f->status_register &= ~WD1770_SR_MOTORON;
@@ -643,9 +600,9 @@ wd1770_event( libspectrum_dword last_tstates, event_type event, void *user_data 
     wd1770_seek_verify( f );
   else if( f->state == WD1770_STATE_READ || f->state == WD1770_STATE_WRITE )
     wd1770_type_ii( f );
-  else if( f->state == WD1770_STATE_READTRACK ||
-	    f->state == WD1770_STATE_READID ||
-	     f->state == WD1770_STATE_WRITETRACK )
+  else if( f->state == WD1770_STATE_READTRACK  ||
+	   f->state == WD1770_STATE_READID     ||
+	   f->state == WD1770_STATE_WRITETRACK    )
     wd1770_type_iii( f );
 
   return 0;
@@ -696,7 +653,6 @@ wd1770_cr_write( wd1770_fdc *f, libspectrum_byte b )
 {
   wd1770_drive *d = f->current_drive;
   
-  dbgprintf( "=CMD: 0x%02x\n", b );
   wd1770_reset_cmdint( f );
   /* command register: */
   if( ( b & 0xf0 ) == 0xd0 ||
@@ -799,8 +755,6 @@ wd1770_dr_read( wd1770_fdc *f )
 {
   wd1770_drive *d = f->current_drive;
   
-  dbgprintf( "." );
-
   if( f->state == WD1770_STATE_READ ) {
     f->data_offset++;				/* count read bytes */
     fdd_read_write_data( &d->fdd, FDD_READ ); CRC_ADD;	/* read a byte */
@@ -887,7 +841,6 @@ wd1770_dr_write( wd1770_fdc *f, libspectrum_byte b )
 {
   wd1770_drive *d = f->current_drive;
 
-  dbgprintf( "+" );
   f->data_register = b;
   if( f->state == WD1770_STATE_WRITE ) {
     d->fdd.data = b;
