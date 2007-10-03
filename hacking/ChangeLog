@@ -2144,3 +2144,4 @@
 	 widget/menu.c,z80/{coretest.c,z80_ops.c}: make libdisk.a no longer
 	 depend on libdsk (Stuart).
 20071003 disk/wd1770.c: small tidyups.
+20071003 sound.c: reindent (Stuart Brady).
