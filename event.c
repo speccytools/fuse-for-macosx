@@ -31,6 +31,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "disk/wd_fdc.h"
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
@@ -186,9 +187,9 @@ int event_do_events(void)
       plusd_event_index( ptr->tstates );
       break;
 
-    case EVENT_TYPE_WD1770:
-    case EVENT_TYPE_WD1770_MOTOR_OFF:
-      wd1770_event( ptr->tstates, ptr->type, ptr->user_data );
+    case EVENT_TYPE_WD_FDC:
+    case EVENT_TYPE_WD_FDC_MOTOR_OFF:
+      wd_fdc_event( ptr->tstates, ptr->type, ptr->user_data );
       break;
 
     case EVENT_TYPE_BREAKPOINT:

@@ -33,10 +33,10 @@ libdisk_a_SOURCES = crc.c \
 		    disk.c \
 		    fdd.c \
 		    plusd.c \
-		    wd1770.c
+		    wd_fdc.c
 
 noinst_HEADERS = crc.h \
 		 disk.h \
 		 fdd.h \
 		 plusd.h \
-		 wd1770.h
+		 wd_fdc.h

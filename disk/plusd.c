@@ -53,7 +53,7 @@
 #include "settings.h"
 #include "ui/ui.h"
 #include "utils.h"
-#include "wd1770.h"
+#include "wd_fdc.h"
 #include "z80/z80.h"
 
 int plusd_available = 0;
@@ -63,8 +63,8 @@ static int plusd_index_pulse;
 
 #define PLUSD_NUM_DRIVES 2
 
-static wd1770_fdc *plusd_fdc;
-static wd1770_drive plusd_drives[ PLUSD_NUM_DRIVES ];
+static wd_fdc *plusd_fdc;
+static wd_fdc_drive plusd_drives[ PLUSD_NUM_DRIVES ];
 
 static libspectrum_byte plusd_ram[ 0x2000 ];
 
@@ -132,9 +132,9 @@ int
 plusd_init( void )
 {
   int i;
-  wd1770_drive *d;
+  wd_fdc_drive *d;
 
-  plusd_fdc = wd1770_alloc_fdc( WD1770 );
+  plusd_fdc = wd_fdc_alloc_fdc( WD1770 );
   plusd_fdc->current_drive = &plusd_drives[ 0 ];
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
@@ -158,7 +158,7 @@ static void
 plusd_reset( int hard_reset )
 {
   int i;
-  wd1770_drive *d;
+  wd_fdc_drive *d;
 
   plusd_active = 0;
   plusd_available = 0;
@@ -188,7 +188,7 @@ plusd_reset( int hard_reset )
   if( hard_reset )
     memset( plusd_ram, 0, 0x2000 );
 
-  wd1770_master_reset( plusd_fdc );
+  wd_fdc_master_reset( plusd_fdc );
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
@@ -222,7 +222,7 @@ plusd_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_sr_read( plusd_fdc );
+  return wd_fdc_sr_read( plusd_fdc );
 }
 
 void
@@ -230,7 +230,7 @@ plusd_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_cr_write( plusd_fdc, b );
+  wd_fdc_cr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
@@ -239,7 +239,7 @@ plusd_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_tr_read( plusd_fdc );
+  return wd_fdc_tr_read( plusd_fdc );
 }
 
 void
@@ -247,7 +247,7 @@ plusd_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_tr_write( plusd_fdc, b );
+  wd_fdc_tr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
@@ -256,7 +256,7 @@ plusd_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_sec_read( plusd_fdc );
+  return wd_fdc_sec_read( plusd_fdc );
 }
 
 void
@@ -264,7 +264,7 @@ plusd_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_sec_write( plusd_fdc, b );
+  wd_fdc_sec_write( plusd_fdc, b );
 }
 
 libspectrum_byte
@@ -273,7 +273,7 @@ plusd_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
   if( !plusd_available ) return 0xff;
 
   *attached = 1;
-  return wd1770_dr_read( plusd_fdc );
+  return wd_fdc_dr_read( plusd_fdc );
 }
 
 void
@@ -281,7 +281,7 @@ plusd_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !plusd_available ) return;
 
-  wd1770_dr_write( plusd_fdc, b );
+  wd_fdc_dr_write( plusd_fdc, b );
 }
 
 void
@@ -359,7 +359,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 		   int autoload )
 {
   int error;
-  wd1770_drive *d;
+  wd_fdc_drive *d;
 
   if( which >= PLUSD_NUM_DRIVES ) {
     ui_error( UI_ERROR_ERROR, "plusd_disk_insert: unknown drive %d",
@@ -401,7 +401,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 int
 plusd_disk_eject( plusd_drive_number which, int write )
 {
-  wd1770_drive *d;
+  wd_fdc_drive *d;
 
   if( which >= PLUSD_NUM_DRIVES )
     return 1;
@@ -454,7 +454,7 @@ plusd_disk_eject( plusd_drive_number which, int write )
 int
 plusd_disk_write( plusd_drive_number which, const char *filename )
 {
-  wd1770_drive *d = &plusd_drives[ which ];
+  wd_fdc_drive *d = &plusd_drives[ which ];
   int error;
   
   d->disk.type = DISK_TYPE_NONE;
@@ -472,7 +472,7 @@ plusd_disk_write( plusd_drive_number which, const char *filename )
 int
 plusd_event_cmd_done( libspectrum_dword last_tstates GCC_UNUSED )
 {
-  plusd_fdc->status_register &= ~WD1770_SR_BUSY;
+  plusd_fdc->status_register &= ~WD_FDC_SR_BUSY;
   return 0;
 }
 
@@ -485,11 +485,11 @@ plusd_event_index( libspectrum_dword last_tstates )
 
   plusd_index_pulse = !plusd_index_pulse;
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
-    wd1770_drive *d = &plusd_drives[ i ];
+    wd_fdc_drive *d = &plusd_drives[ i ];
 
     d->index_pulse = plusd_index_pulse;
     if( !plusd_index_pulse && d->index_interrupt ) {
-      wd1770_set_cmdint( plusd_fdc );
+      wd_fdc_set_cmdint( plusd_fdc );
       d->index_interrupt = 0;
     }
   }
