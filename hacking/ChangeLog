@@ -2147,3 +2147,5 @@
 20071003 sound.c: reindent (Stuart Brady).
 20071005 disk/{Makefile.am,plusd.[ch],wd_fdc.[ch]},event.[ch]: rename
 	 wd1770.[ch] to wd_fdc.[ch], and s/wd1770/wd_fdc/ (Stuart).
+20071006 configure.in: amiga should be detected as amigaos instead of just
+         amiga (Thanks, Chris Young) (Fred).

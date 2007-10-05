@@ -588,7 +588,7 @@ if test "$ac_cv_func_dirname" = no; then
 fi
 if test "$ac_cv_func_getopt_long" = no; then
   case "$target_os" in
-    amiga|morphos)
+    amigaos|morphos)
       dnl Our getopt_long replacement doesn't work, so don't use it
       ;;
     *)
@@ -610,7 +610,7 @@ AC_SUBST(COMPAT_LIBADD)
 dnl Work out which compatability routines to use
 AC_MSG_CHECKING(which compatability routines to use)
 case "$target_os" in
-  amiga)
+  amigaos)
     COMPAT_OSNAME='amiga'
     ;;
   morphos)
