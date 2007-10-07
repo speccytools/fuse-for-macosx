@@ -2149,3 +2149,5 @@
 	 wd1770.[ch] to wd_fdc.[ch], and s/wd1770/wd_fdc/ (Stuart).
 20071006 configure.in: amiga should be detected as amigaos instead of just
          amiga (Thanks, Chris Young) (Fred).
+20070807 roms/{plus3e-0.rom,roms/plus3e-1.rom,roms/plus3e-2.rom}: update to
+         v1.31 of the +3e ROMs (feature request #1808657) (Fred).
