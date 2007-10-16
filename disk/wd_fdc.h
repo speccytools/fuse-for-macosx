@@ -31,6 +31,7 @@
 
 #include <libspectrum.h>
 
+#include "event.h"
 #include "fdd.h"
 #include "fuse.h"
 
@@ -146,5 +147,7 @@ void wd_fdc_set_cmdint( wd_fdc *f );
 void wd_fdc_reset_cmdint( wd_fdc *f );
 void wd_fdc_set_datarq( wd_fdc *f );
 void wd_fdc_reset_datarq( wd_fdc *f );
+
+int wd_fdc_event( libspectrum_dword last_tstates, event_type event, void *user_data );
 
 #endif                  /* #ifndef FUSE_WD_FDC_H */

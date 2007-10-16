@@ -58,6 +58,8 @@ int
 profile_init( void )
 {
   module_register( &profile_module_info );
+
+  return 0;
 }
 
 static void

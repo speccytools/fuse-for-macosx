@@ -21,6 +21,10 @@
 
 #include <config.h>
 
+/* This is necessary to prevent warnings from the calls to
+   snd_pcm_[hs]w_params_alloca() */
+#define NDEBUG
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -30,6 +34,7 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+
 #include <alsa/asoundlib.h>
 
 #include "settings.h"
