@@ -25,24 +25,14 @@
 
 #include <config.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#ifdef HAVE_STRINGS_H
-#include <strings.h>            /* Needed for strncasecmp() on QNX6 */
-#endif                          /* #ifdef HAVE_STRINGS_H */
+#include <unistd.h>
 
 #include <libspectrum.h>
 
-#include "compat.h"
 #include "crc.h"
 #include "disk.h"
-#include "settings.h"
-#include "utils.h"
 
 /* The ordering of these strings must match the order of the
  * the disk_error_t enumeration in disk.h */

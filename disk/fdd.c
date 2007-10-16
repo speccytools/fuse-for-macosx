@@ -25,15 +25,9 @@
 
 #include <config.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-
 #include <libspectrum.h>
 
-#include "compat.h"
-#include "disk.h"
 #include "fdd.h"
-#include "settings.h"
 
 #define FDD_LOAD_FACT 2
 #define FDD_HEAD_FACT 16

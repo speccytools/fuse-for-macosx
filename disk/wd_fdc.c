@@ -28,29 +28,12 @@
 
 #include <config.h>
 
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-#include <strings.h>            /* Needed for strncasecmp() on QNX6 */
-#endif                          /* #ifdef HAVE_STRINGS_H */
-#include <limits.h>
-#include <sys/stat.h>
-
 #include <libspectrum.h>
 
-#include "compat.h"
 #include "crc.h"
-#include "fdd.h"
-#include "disk.h"
 #include "event.h"
-#include "machine.h"
 #include "ui/ui.h"
 #include "wd_fdc.h"
-#include "z80/z80.h"
 
 static void statusbar_update( int busy );
 
