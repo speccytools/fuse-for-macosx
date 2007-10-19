@@ -453,13 +453,6 @@ plusd_disk_write( plusd_drive_number which, const char *filename )
 }
 
 int
-plusd_event_cmd_done( libspectrum_dword last_tstates GCC_UNUSED )
-{
-  plusd_fdc->status_register &= ~WD_FDC_SR_BUSY;
-  return 0;
-}
-
-int
 plusd_event_index( libspectrum_dword last_tstates )
 {
   int error;

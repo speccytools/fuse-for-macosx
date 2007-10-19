@@ -179,10 +179,6 @@ int event_do_events(void)
       trdos_event_index( ptr->tstates );
       break;
 
-    case EVENT_TYPE_PLUSD_CMD_DONE:
-      plusd_event_cmd_done( ptr->tstates );
-      break;
-
     case EVENT_TYPE_PLUSD_INDEX:
       plusd_event_index( ptr->tstates );
       break;
@@ -317,7 +313,6 @@ event_name( event_type type )
   case EVENT_TYPE_NULL: return "[Deleted event]";
   case EVENT_TYPE_TRDOS_CMD_DONE: return "End of BetaDisk command";
   case EVENT_TYPE_TRDOS_INDEX: return "BetaDisk index";
-  case EVENT_TYPE_PLUSD_CMD_DONE: return "End of +D command";
   case EVENT_TYPE_PLUSD_INDEX: return "+D index";
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
   case EVENT_TYPE_TIMER: return "Timer";
