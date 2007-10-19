@@ -734,7 +734,7 @@ open_trd( FILE *file, disk_t *d )
   for( i = 0; i < d->cylinders; i++ ) {
     for( j = 0; j < d->sides; j++ ) {
       if( trackgen( d, file, j, i, SECTOR_BASE_1, sectors, seclen,
-    	    NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) );
+    	    NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) )
 	return d->status = DISK_GEOM;
     }
   }

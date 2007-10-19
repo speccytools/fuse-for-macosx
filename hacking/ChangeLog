@@ -2157,3 +2157,4 @@
 20071019 disk/{fdd.[ch],wd_fdc.[ch]}: remove unnecessary 'direction' member
 	 of fdd_t (Stuart).
 20071019 disk/{plusd.[ch]},event.[ch]: remove unused event (Stuart).
+20071019 disk/disk.c: remove stray semicolon in open_trd() (Stuart).
