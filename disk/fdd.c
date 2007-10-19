@@ -156,12 +156,12 @@ fdd_set_head( fdd_t *d, int head )
 
 /* change current track dir = 1 / -1 */
 void
-fdd_step( fdd_t *d )
+fdd_step( fdd_t *d, fdd_dir_t direction )
 {
-  if( d->direction < 1 ) {	/* STEP_OUT */
+  if( direction == FDD_STEP_OUT ) {
     if( d->c_cylinder > 0 )
       d->c_cylinder--;
-  } else if( d->direction > 0 ) {	/* STEP_IN */
+  } else { /* direction == FDD_STEP_IN */
     if( d->c_cylinder < d->fdd_cylinders - 1 )
       d->c_cylinder++;
   }

@@ -2149,8 +2149,10 @@
 	 wd1770.[ch] to wd_fdc.[ch], and s/wd1770/wd_fdc/ (Stuart).
 20071006 configure.in: amiga should be detected as amigaos instead of just
          amiga (Thanks, Chris Young) (Fred).
-20070807 roms/{plus3e-0.rom,roms/plus3e-1.rom,roms/plus3e-2.rom}: update to
+20071007 roms/{plus3e-0.rom,roms/plus3e-1.rom,roms/plus3e-2.rom}: update to
          v1.31 of the +3e ROMs (feature request #1808657) (Fred).
-20070816 disk/wd_fdc.h,event.c,profile.c,sound/alsasound.c: warnings removal.
-20070816 disk/{crc.c,disk.c,fdd.c,plusd.c,wd_fdc.c}: remove unnecessary
+20071016 disk/wd_fdc.h,event.c,profile.c,sound/alsasound.c: warnings removal.
+20071016 disk/{crc.c,disk.c,fdd.c,plusd.c,wd_fdc.c}: remove unnecessary
 	 header files.
+20071019 disk/{fdd.[ch],wd_fdc.[ch]}: remove unnecessary 'direction' member
+	 of fdd_t (Stuart).

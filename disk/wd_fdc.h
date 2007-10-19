@@ -69,7 +69,7 @@ typedef struct wd_fdc {
   
   int rates[ 4 ];
   int spin_cycles;
-  int direction;                /* 0 = spindlewards, 1 = rimwards */
+  fdd_dir_t direction;	/* 0 = spindlewards, 1 = rimwards */
   int dden;			/* SD/DD -> FM/MFM */
   int intrq;			/* INTRQ line status */
   int head_load;		/* WD1773/FD1793 */

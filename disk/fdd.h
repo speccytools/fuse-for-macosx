@@ -63,7 +63,6 @@ typedef struct fdd_t {
   int index;		/* index hole */
   int wrprot;		/* write protect 0 -> write protect */
   int data;		/* read/write to data byte 0x00nn or 0xffnn */
-  fdd_dir_t direction;	/* direction 0/1 */
   
   disk_t *disk;		/* pointer to inserted disk */
   int loaded;		/* disk loaded */
@@ -91,7 +90,7 @@ void fdd_unload( fdd_t *d );
 /* set fdd head */
 void fdd_set_head( fdd_t *d, int head );
 /* step one track according to d->direction direction. set d->tr00 if reach track 0 */
-void fdd_step( fdd_t *d );
+void fdd_step( fdd_t *d, fdd_dir_t direction );
 /* set floppy position ( upsidedown or not )*/
 void fdd_motoron( fdd_t *d, int on );
 /* start (1) or stop (0) spindle motor */

@@ -54,9 +54,8 @@ wd_fdc_master_reset( wd_fdc *f )
   f->status_type = WD_FDC_STATUS_TYPE1;
 
   if( d != NULL ) {
-    d->fdd.direction = FDD_STEP_OUT;
     while( !d->fdd.tr00 )
-      fdd_step( &d->fdd );
+      fdd_step( &d->fdd, FDD_STEP_OUT );
   }
 
   f->track_register = 0;
@@ -416,8 +415,7 @@ type_i_noupdate:
     if( d->fdd.tr00 && f->direction == FDD_STEP_OUT ) {
       f->track_register = 0;
     } else {
-      d->fdd.direction = f->direction;
-      fdd_step( &d->fdd );
+      fdd_step( &d->fdd, f->direction );
       f->state = WD_FDC_STATE_SEEK_DELAY;
       event_add_with_data( tstates + f->rates[b & 0x03] * 
     		    machine_current->timings.processor_speed / 1000,
