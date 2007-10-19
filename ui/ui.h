@@ -35,9 +35,9 @@
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "disk/beta.h"
 #include "disk/plusd.h"
 #include "machines/specplus3.h"
-#include "trdos.h"
 #include "ui/scaler/scaler.h"
 
 /* The various severities of error level, increasing downwards */
@@ -111,9 +111,9 @@ int ui_mouse_release( int suspend ); /* UI: ungrab, return 0 if done */
 /* Write the current tape out */
 int ui_tape_write( void );
 
-/* Write a +3, BetaDisk or +D disk out */
+/* Write a +3, Beta or +D disk out */
 int ui_plus3_disk_write( specplus3_drive_number which );
-int ui_trdos_disk_write( trdos_drive_number which );
+int ui_beta_disk_write( beta_drive_number which );
 int ui_plusd_disk_write( plusd_drive_number which );
 
 /* Get a rollback point from the given list */
@@ -154,9 +154,11 @@ typedef enum ui_menu_item {
   UI_MENU_ITEM_MEDIA_DISK_PLUS3,
   UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
   UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
-  UI_MENU_ITEM_MEDIA_DISK_TRDOS,
-  UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT,
-  UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_BETA,
+  UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
+  UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
   UI_MENU_ITEM_MEDIA_DISK_PLUSD,
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
   UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,

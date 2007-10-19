@@ -426,18 +426,18 @@ slt_trap( libspectrum_word address GCC_UNUSED, libspectrum_byte level GCC_UNUSED
   return 0;
 }
 
-int trdos_available = 0;
-int trdos_active = 0;
+int beta_available = 0;
+int beta_active = 0;
 int if1_available = 0;
 
 void
-trdos_page( void )
+beta_page( void )
 {
   abort();
 }
 
 void
-trdos_unpage( void )
+beta_unpage( void )
 {
   abort();
 }

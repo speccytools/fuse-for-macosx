@@ -44,6 +44,7 @@
 #include <libspectrum.h>
 
 #include "dck.h"
+#include "disk/beta.h"
 #include "divide.h"
 #include "fuse.h"
 #include "if1.h"
@@ -55,7 +56,6 @@
 #include "simpleide.h"
 #include "snapshot.h"
 #include "tape.h"
-#include "trdos.h"
 #include "utils.h"
 #include "zxatasp.h"
 #include "zxcf.h"
@@ -145,7 +145,7 @@ utils_open_file( const char *filename, int autoload,
       error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     }
 
-    error = trdos_disk_insert( TRDOS_DRIVE_A, filename, autoload );
+    error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:

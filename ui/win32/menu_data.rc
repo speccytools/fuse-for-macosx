@@ -250,19 +250,31 @@ win32_menu MENU
           MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_3_DRIVEB_EJECTANDWRITE
         }
       }
-      POPUP "&TR-DOS"
+      POPUP "&Beta"
       {
         POPUP "Drive &A:"
         {
-          MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEA_INSERT
-          MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEA_EJECT
-          MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEA_EJECTANDWRITE
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_BETA_DRIVEA_INSERT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_BETA_DRIVEA_EJECT
+          MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_BETA_DRIVEA_EJECTANDWRITE
         }
         POPUP "Drive &B:"
         {
-          MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_INSERT
-          MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECT
-          MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECTANDWRITE
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_BETA_DRIVEB_INSERT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_BETA_DRIVEB_EJECT
+          MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_BETA_DRIVEB_EJECTANDWRITE
+        }
+        POPUP "Drive &C:"
+        {
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_BETA_DRIVEC_INSERT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_BETA_DRIVEC_EJECT
+          MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_BETA_DRIVEC_EJECTANDWRITE
+        }
+        POPUP "Drive &D:"
+        {
+          MENUITEM "&Insert...", IDM_MENU_MEDIA_DISK_BETA_DRIVED_INSERT
+          MENUITEM "&Eject", IDM_MENU_MEDIA_DISK_BETA_DRIVED_EJECT
+          MENUITEM "Eject and &write...", IDM_MENU_MEDIA_DISK_BETA_DRIVED_EJECTANDWRITE
         }
       }
       POPUP "+&D"

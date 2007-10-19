@@ -32,6 +32,7 @@
 
 #include <libspectrum.h>
 
+#include "disk/beta.h"
 #include "event.h"
 #include "fuse.h"
 #include "loader.h"
@@ -44,7 +45,6 @@
 #include "snapshot.h"
 #include "tape.h"
 #include "timer/timer.h"
-#include "trdos.h"
 #include "ula.h"
 #include "ui/ui.h"
 #include "utils.h"
@@ -564,8 +564,8 @@ trap_check_rom( void )
 
   case LIBSPECTRUM_MACHINE_PENT:
   case LIBSPECTRUM_MACHINE_SCORP:
-    /* OK if we're in ROM 1  and TRDOS is not active */
-    return( machine_current->ram.current_rom == 1 && !trdos_active );
+    /* OK if we're in ROM 1 and the Beta disk interface is not active */
+    return( machine_current->ram.current_rom == 1 && !beta_active );
 
   case LIBSPECTRUM_MACHINE_UNKNOWN:	/* should never happen */
     ui_error( UI_ERROR_ERROR,

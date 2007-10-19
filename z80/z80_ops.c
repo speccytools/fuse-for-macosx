@@ -28,6 +28,7 @@
 #include <stdio.h>
 
 #include "debugger/debugger.h"
+#include "disk/beta.h"
 #include "disk/plusd.h"
 #include "divide.h"
 #include "event.h"
@@ -40,7 +41,6 @@
 #include "settings.h"
 #include "slt.h"
 #include "tape.h"
-#include "trdos.h"
 #include "ula.h"
 #include "z80.h"
 
@@ -105,7 +105,7 @@ z80_do_opcodes( void )
   SETUP_CHECK( profile, profile_active, 0 );
   SETUP_CHECK( rzx, rzx_playback, 1 );
   SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 );
-  SETUP_CHECK( trdos, trdos_available, 3 );
+  SETUP_CHECK( beta, beta_available, 3 );
   SETUP_CHECK( plusd, plusd_available, 4 );
   SETUP_CHECK( if1p, if1_available, 5 );
   SETUP_CHECK( divide_early, settings_current.divide_enabled, 6 );
@@ -149,16 +149,16 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( trdos, trdos_available, 3 )
+    CHECK( beta, beta_available, 3 )
 
-    if( trdos_active ) {
+    if( beta_active ) {
       if( machine_current->ram.current_rom &&
 	  PC >= 16384 ) {
-	trdos_unpage();
+	beta_unpage();
       }
     } else if( ( PC & 0xff00 ) == 0x3d00 &&
 	       machine_current->ram.current_rom ) {
-      trdos_page();
+      beta_page();
     }
 
     END_CHECK

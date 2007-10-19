@@ -431,26 +431,26 @@ ui_plus3_disk_write( specplus3_drive_number which )
 #endif			/* #ifdef HAVE_765_H */
 
 int
-ui_trdos_disk_write( trdos_drive_number which )
+ui_beta_disk_write( beta_drive_number which )
 {
   char drive, *filename, title[80];
 
   switch( which ) {
-    case TRDOS_DRIVE_A: drive = 'A'; break;
-    case TRDOS_DRIVE_B: drive = 'B'; break;
-    case TRDOS_DRIVE_C: drive = 'C'; break;
-    case TRDOS_DRIVE_D: drive = 'D'; break;
+    case BETA_DRIVE_A: drive = 'A'; break;
+    case BETA_DRIVE_B: drive = 'B'; break;
+    case BETA_DRIVE_C: drive = 'C'; break;
+    case BETA_DRIVE_D: drive = 'D'; break;
     default: drive = '?'; break;
   }
 
   fuse_emulation_pause();
 
-  snprintf( title, 80, "Fuse - Write TR-DOS Disk %c:", drive );
+  snprintf( title, 80, "Fuse - Write Beta Disk Interface Disk %c:", drive );
 
   filename = menu_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
-  trdos_disk_write( which, filename );
+  beta_disk_write( which, filename );
 
   free( filename );
 

@@ -31,6 +31,7 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
+#include "disk/beta.h"
 #include "disk/wd_fdc.h"
 #include "display.h"
 #include "event.h"
@@ -40,7 +41,6 @@
 #include "rzx.h"
 #include "tape.h"
 #include "timer/timer.h"
-#include "trdos.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 #include "spectrum.h"
@@ -171,12 +171,8 @@ int event_do_events(void)
     case EVENT_TYPE_NMI: z80_nmi(); break;
     case EVENT_TYPE_NULL: /* Do nothing */ break;
 
-    case EVENT_TYPE_TRDOS_CMD_DONE:
-      trdos_event_cmd_done( ptr->tstates );
-      break;
-
-    case EVENT_TYPE_TRDOS_INDEX:
-      trdos_event_index( ptr->tstates );
+    case EVENT_TYPE_BETA_INDEX:
+      beta_event_index( ptr->tstates );
       break;
 
     case EVENT_TYPE_PLUSD_INDEX:
@@ -311,8 +307,7 @@ event_name( event_type type )
   case EVENT_TYPE_INTERRUPT: return "Retriggered interrupt";
   case EVENT_TYPE_NMI: return "Non-maskable interrupt";
   case EVENT_TYPE_NULL: return "[Deleted event]";
-  case EVENT_TYPE_TRDOS_CMD_DONE: return "End of BetaDisk command";
-  case EVENT_TYPE_TRDOS_INDEX: return "BetaDisk index";
+  case EVENT_TYPE_BETA_INDEX: return "Beta disk index";
   case EVENT_TYPE_PLUSD_INDEX: return "+D index";
   case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
   case EVENT_TYPE_TIMER: return "Timer";

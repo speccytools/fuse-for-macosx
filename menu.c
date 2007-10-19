@@ -28,6 +28,7 @@
 #include <libspectrum.h>
 
 #include "dck.h"
+#include "disk/beta.h"
 #include "disk/plusd.h"
 #include "divide.h"
 #include "event.h"
@@ -43,7 +44,6 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
-#include "trdos.h"
 #include "ui/ui.h"
 #include "utils.h"
 #include "widget/widget.h"
@@ -438,7 +438,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
 #endif				/* #ifdef HAVE_765_H */
     break;
   case 1:
-    trdos_disk_insert_default_autoload( which, filename );
+    beta_disk_insert_default_autoload( which, filename );
     break;
   case 2:
     plusd_disk_insert_default_autoload( which, filename );
@@ -468,7 +468,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
 #endif			/* #ifdef HAVE_765_H */
     break;
   case 1:
-    trdos_disk_eject( which, write );
+    beta_disk_eject( which, write );
     break;
   case 2:
     plusd_disk_eject( which, write );
@@ -639,10 +639,16 @@ menu_check_media_changed( void )
 
 #endif			/* #ifdef HAVE_765_H */
 
-  confirm = trdos_disk_eject( TRDOS_DRIVE_A, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_A, 0 );
   if( confirm ) return 1;
 
-  confirm = trdos_disk_eject( TRDOS_DRIVE_B, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_B, 0 );
+  if( confirm ) return 1;
+
+  confirm = beta_disk_eject( BETA_DRIVE_C, 0 );
+  if( confirm ) return 1;
+
+  confirm = beta_disk_eject( BETA_DRIVE_D, 0 );
   if( confirm ) return 1;
 
   confirm = plusd_disk_eject( PLUSD_DRIVE_1, 0 );

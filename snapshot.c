@@ -28,6 +28,7 @@
 #include <libspectrum.h>
 
 #include "ay.h"
+#include "disk/beta.h"
 #include "disk/plusd.h"
 #include "fuse.h"
 #include "if2.h"
@@ -38,7 +39,6 @@
 #include "scld.h"
 #include "slt.h"
 #include "snapshot.h"
-#include "trdos.h"
 #include "ui/ui.h"
 #include "ula.h"
 #include "utils.h"

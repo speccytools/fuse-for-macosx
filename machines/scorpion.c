@@ -32,6 +32,7 @@
 
 #include "ay.h"
 #include "compat.h"
+#include "disk/beta.h"
 #include "joystick.h"
 #include "machine.h"
 #include "machines.h"
@@ -42,7 +43,6 @@
 #include "spec128.h"
 #include "specplus3.h"
 #include "spectrum.h"
-#include "trdos.h"
 #include "ula.h"
 
 static libspectrum_byte scorpion_select_1f_read( libspectrum_word port,
@@ -55,12 +55,12 @@ static int scorpion_shutdown( void );
 static int scorpion_memory_map( void );
 
 static const periph_t peripherals[] = {
-  { 0x00ff, 0x001f, scorpion_select_1f_read, trdos_cr_write },
-  { 0x00ff, 0x003f, trdos_tr_read, trdos_tr_write },
-  { 0x00ff, 0x005f, trdos_sec_read, trdos_sec_write },
-  { 0x00ff, 0x007f, trdos_dr_read, trdos_dr_write },
+  { 0x00ff, 0x001f, scorpion_select_1f_read, beta_cr_write },
+  { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
+  { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
+  { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00fe, ula_read, ula_write },
-  { 0x00ff, 0x00ff, scorpion_select_ff_read, trdos_sp_write },
+  { 0x00ff, 0x00ff, scorpion_select_ff_read, beta_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },
@@ -75,7 +75,7 @@ scorpion_select_1f_read( libspectrum_word port, int *attached )
 {
   libspectrum_byte data;
 
-  data = trdos_sr_read( port, attached ); if( *attached ) return data;
+  data = beta_sr_read( port, attached ); if( *attached ) return data;
   data = joystick_kempston_read( port, attached ); if( *attached ) return data;
 
   return 0xff;
@@ -86,7 +86,7 @@ scorpion_select_ff_read( libspectrum_word port, int *attached )
 {
   libspectrum_byte data;
 
-  data = trdos_sp_read( port, attached ); if( *attached ) return data;
+  data = beta_sp_read( port, attached ); if( *attached ) return data;
 
   return 0xff;
 }
@@ -131,7 +131,7 @@ scorpion_reset(void)
 {
   int i, error;
 
-  trdos_reset();
+  beta_reset();
 
   error = machine_load_rom( 0, 0, settings_current.rom_scorpion_0,
                             settings_default.rom_scorpion_0, 0x4000 );
@@ -147,8 +147,8 @@ scorpion_reset(void)
                                  settings_default.rom_scorpion_3, 0x4000 );
   if( error ) return error;
 
-  trdos_available = 1;
-  trdos_active = 0;
+  beta_available = 1;
+  beta_active = 0;
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
@@ -210,7 +210,7 @@ scorpion_memory_map( void )
 static int
 scorpion_shutdown( void )
 {
-  trdos_end();
+  beta_end();
 
   return 0;
 }

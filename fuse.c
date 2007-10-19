@@ -48,6 +48,7 @@
 #include "ay.h"
 #include "dck.h"
 #include "debugger/debugger.h"
+#include "disk/beta.h"
 #include "display.h"
 #include "divide.h"
 #include "event.h"
@@ -72,7 +73,6 @@
 #include "spectrum.h"
 #include "tape.h"
 #include "timer/timer.h"
-#include "trdos.h"
 #include "ui/ui.h"
 #include "ui/scaler/scaler.h"
 #include "ula.h"
@@ -246,7 +246,7 @@ static int fuse_init(int argc, char **argv)
   if( printer_init() ) return 1;
   if( rzx_init() ) return 1;
   if( psg_init() ) return 1;
-  if( trdos_init() ) return 1;
+  if( beta_init() ) return 1;
   if( plusd_init() ) return 1;
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;

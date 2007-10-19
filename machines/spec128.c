@@ -31,6 +31,7 @@
 
 #include "ay.h"
 #include "compat.h"
+#include "disk/beta.h"
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
@@ -38,7 +39,6 @@
 #include "settings.h"
 #include "spec128.h"
 #include "spec48.h"
-#include "trdos.h"
 #include "ula.h"
 #include "if1.h"
 

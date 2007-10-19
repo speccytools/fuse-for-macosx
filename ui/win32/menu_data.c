@@ -270,18 +270,30 @@ void handle_menu( DWORD cmd, HWND okno )
       menu_media_disk_eject( 2 ); break;
     case IDM_MENU_MEDIA_DISK_3_DRIVEB_EJECTANDWRITE:
       menu_media_disk_eject( 18 ); break;
-    case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEA_INSERT:
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEA_INSERT:
       menu_media_disk_insert( 5 ); break;
-    case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEA_EJECT:
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEA_EJECT:
       menu_media_disk_eject( 5 ); break;
-    case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEA_EJECTANDWRITE:
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEA_EJECTANDWRITE:
       menu_media_disk_eject( 21 ); break;
-    case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_INSERT:
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEB_INSERT:
       menu_media_disk_insert( 6 ); break;
-    case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECT:
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEB_EJECT:
       menu_media_disk_eject( 6 ); break;
-    case IDM_MENU_MEDIA_DISK_TRDOS_DRIVEB_EJECTANDWRITE:
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEB_EJECTANDWRITE:
       menu_media_disk_eject( 22 ); break;
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEC_INSERT:
+      menu_media_disk_insert( 7 ); break;
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEC_EJECT:
+      menu_media_disk_eject( 7 ); break;
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVEC_EJECTANDWRITE:
+      menu_media_disk_eject( 23 ); break;
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVED_INSERT:
+      menu_media_disk_insert( 8 ); break;
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVED_EJECT:
+      menu_media_disk_eject( 8 ); break;
+    case IDM_MENU_MEDIA_DISK_BETA_DRIVED_EJECTANDWRITE:
+      menu_media_disk_eject( 24 ); break;
     case IDM_MENU_MEDIA_DISK_D_DRIVE1_INSERT:
       menu_media_disk_insert( 9 ); break;
     case IDM_MENU_MEDIA_DISK_D_DRIVE1_EJECT:

@@ -297,15 +297,23 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Disk/+3/Drive B:/Eject",
     "/Media/Disk/+3/Drive B:/Eject and write...", 0 },
 
-  { UI_MENU_ITEM_MEDIA_DISK_TRDOS, "/Media/Disk/TR-DOS" },
+  { UI_MENU_ITEM_MEDIA_DISK_BETA, "/Media/Disk/Beta" },
 
-  { UI_MENU_ITEM_MEDIA_DISK_TRDOS_A_EJECT,
-    "/Media/Disk/TR-DOS/Drive A:/Eject",
-    "/Media/Disk/TR-DOS/Drive A:/Eject and write...", 0 },
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
+    "/Media/Disk/Beta/Drive A:/Eject",
+    "/Media/Disk/Beta/Drive A:/Eject and write...", 0 },
 
-  { UI_MENU_ITEM_MEDIA_DISK_TRDOS_B_EJECT,
-    "/Media/Disk/TR-DOS/Drive B:/Eject",
-    "/Media/Disk/TR-DOS/Drive B:/Eject and write...", 0 },
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
+    "/Media/Disk/Beta/Drive B:/Eject",
+    "/Media/Disk/Beta/Drive B:/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
+    "/Media/Disk/Beta/Drive C:/Eject",
+    "/Media/Disk/Beta/Drive C:/Eject and write...", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
+    "/Media/Disk/Beta/Drive D:/Eject",
+    "/Media/Disk/Beta/Drive D:/Eject and write...", 0 },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD, "/Media/Disk/+D" },
 
@@ -422,17 +430,17 @@ ui_menu_activate( ui_menu_item item, int active )
 void
 ui_menu_disk_update( void )
 {
-  int plus3, trdos, plusd;
+  int plus3, beta, plusd;
   int capabilities;
 
   capabilities = machine_current->capabilities;
 
   /* Set the disk menu items and statusbar appropriately */
   plus3 = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
-  trdos = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK;
+  beta = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK;
   plusd = plusd_available;
 
-  if( plus3 || trdos || plusd ) {
+  if( plus3 || beta || plusd ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
     ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
   } else {
@@ -442,6 +450,6 @@ ui_menu_disk_update( void )
   }
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3, plus3 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_TRDOS, trdos );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA, beta );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
 }

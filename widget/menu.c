@@ -31,6 +31,7 @@
 
 #include "dck.h"
 #include "debugger/debugger.h"
+#include "disk/beta.h"
 #include "event.h"
 #include "fuse.h"
 #include "joystick.h"
@@ -44,7 +45,6 @@
 #include "simpleide.h"
 #include "snapshot.h"
 #include "tape.h"
-#include "trdos.h"
 #include "ui/uidisplay.h"
 #include "utils.h"
 #include "widget_internals.h"
@@ -529,18 +529,18 @@ ui_plus3_disk_write( specplus3_drive_number which )
 #endif				/* #ifdef HAVE_765_H */
 
 int
-ui_trdos_disk_write( trdos_drive_number which )
+ui_beta_disk_write( beta_drive_number which )
 {
   char title[ 30 ];
   widget_filesel_data data;
 
-  snprintf( title, sizeof (title), "Fuse - write TRD drive %c:",
+  snprintf( title, sizeof (title), "Fuse - write Beta drive %c:",
 	    (char)( 'A' + which ) );
   data.exit_all_widgets = 1;
   data.title = title;
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   return widget_filesel_name
-	 ? trdos_disk_write( which, widget_filesel_name ) : 0;
+	 ? beta_disk_write( which, widget_filesel_name ) : 0;
 }
 
 int

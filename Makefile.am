@@ -89,7 +89,6 @@ fuse_SOURCES = ay.c \
 	sound.c \
 	spectrum.c \
 	tape.c \
-	trdos.c \
 	ui.c \
 	uidisplay.c \
 	ula.c \
@@ -173,7 +172,6 @@ noinst_HEADERS = ay.h \
 	sound.h \
 	spectrum.h \
 	tape.h \
-	trdos.h \
 	utils.h \
 	joystick.h \
 	printer.h \

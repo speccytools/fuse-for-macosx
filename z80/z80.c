@@ -185,7 +185,7 @@ z80_nmi( void )
 	     LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) {
 
     /* Page in TR-DOS ROM */
-    trdos_page();
+    beta_page();
   }
 
   /* FIXME: how is R affected? */

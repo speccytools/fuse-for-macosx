@@ -59,7 +59,7 @@ typedef enum disk_type_t {
   DISK_CPC,
   DISK_ECPC,
 
-  /* Betadisk (TR-DOS) */
+  /* Beta disk interface (TR-DOS) */
   DISK_TRD,
   DISK_SCL,
 

@@ -223,15 +223,23 @@ Media/Disk/+3/Drive B:/_Insert..., Item,, menu_media_disk_insert, 2
 Media/Disk/+3/Drive B:/_Eject, Item,, menu_media_disk_eject, 2
 Media/Disk/+3/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 18
 
-Media/Disk/_TR-DOS, Branch
-Media/Disk/TR-DOS/Drive _A:, Branch
-Media/Disk/TR-DOS/Drive A:/_Insert..., Item,, menu_media_disk_insert, 5
-Media/Disk/TR-DOS/Drive A:/_Eject, Item,, menu_media_disk_eject, 5
-Media/Disk/TR-DOS/Drive A:/Eject and _write..., Item,, menu_media_disk_eject, 21
-Media/Disk/TR-DOS/Drive _B:, Branch
-Media/Disk/TR-DOS/Drive B:/_Insert..., Item,, menu_media_disk_insert, 6
-Media/Disk/TR-DOS/Drive B:/_Eject, Item,, menu_media_disk_eject, 6
-Media/Disk/TR-DOS/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 22
+Media/Disk/_Beta, Branch
+Media/Disk/Beta/Drive _A:, Branch
+Media/Disk/Beta/Drive A:/_Insert..., Item,, menu_media_disk_insert, 5
+Media/Disk/Beta/Drive A:/_Eject, Item,, menu_media_disk_eject, 5
+Media/Disk/Beta/Drive A:/Eject and _write..., Item,, menu_media_disk_eject, 21
+Media/Disk/Beta/Drive _B:, Branch
+Media/Disk/Beta/Drive B:/_Insert..., Item,, menu_media_disk_insert, 6
+Media/Disk/Beta/Drive B:/_Eject, Item,, menu_media_disk_eject, 6
+Media/Disk/Beta/Drive B:/Eject and _write..., Item,, menu_media_disk_eject, 22
+Media/Disk/Beta/Drive _C:, Branch
+Media/Disk/Beta/Drive C:/_Insert..., Item,, menu_media_disk_insert, 7
+Media/Disk/Beta/Drive C:/_Eject, Item,, menu_media_disk_eject, 7
+Media/Disk/Beta/Drive C:/Eject and _write..., Item,, menu_media_disk_eject, 23
+Media/Disk/Beta/Drive _D:, Branch
+Media/Disk/Beta/Drive D:/_Insert..., Item,, menu_media_disk_insert, 8
+Media/Disk/Beta/Drive D:/_Eject, Item,, menu_media_disk_eject, 8
+Media/Disk/Beta/Drive D:/Eject and _write..., Item,, menu_media_disk_eject, 24
 
 Media/Disk/+_D, Branch
 Media/Disk/+D/Drive _1, Branch

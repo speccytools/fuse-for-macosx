@@ -938,10 +938,10 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
-.I "\-\-trdosdisk file"
+.I "\-\-betadisk file"
 .RS
-Insert the specified file into the emulated TR-DOS drive A: and select
-Pentagon mode on startup.
+Insert the specified file into the emulated Beta disk interface's drive A:
+and select Pentagon mode on startup.
 .RE
 .PP
 .I \-V
@@ -1879,7 +1879,7 @@ at
 .IR "http://www.worldofspectrum.org/rusfaq/index.html" ,
 but possibly the most important thing to note about both these
 machines is that they have built in 3.5" disk drives, accessed via the
-Betadisk interface and TR-DOS (the Technology Research Disk Operating
+Beta disk interface and TR-DOS (the Technology Research Disk Operating
 System).
 .RE
 .PP
@@ -2120,7 +2120,7 @@ Virtual disk images are accessible only when emulating a +3, +3e,
 Pentagon or Scorpion. (See
 .B "THE .DSK FORMAT"
 and
-.B "TR-DOS DISK FORMATS"
+.B "BETA DISK FORMATS"
 sections below for notes on the file formats supported).
 .PP
 Once again, any changes made to a disk image will not affect the file
@@ -2164,20 +2164,20 @@ As above, but for drive B:.
 As above, but for drive B:.
 .RE
 .PP
-.I "Media, Disk, TR-DOS, Drive A:, Insert..."
+.I "Media, Disk, Beta, Drive A:, Insert..."
 .br
-.I "Media, Disk, TR-DOS, Drive A:, Eject"
+.I "Media, Disk, Beta, Drive A:, Eject"
 .br
-.I "Media, Disk, TR-DOS, Drive A:, Eject and write..."
+.I "Media, Disk, Beta, Drive A:, Eject and write..."
 .br
-.I "Media, Disk, TR-DOS, Drive B:, Insert..."
+.I "Media, Disk, Beta, Drive B:, Insert..."
 .br
-.I "Media, Disk, TR-DOS, Drive B:, Eject"
+.I "Media, Disk, Beta, Drive B:, Eject"
 .br
-.I "Media, Disk, TR-DOS, Drive B:, Eject and write..."
+.I "Media, Disk, Beta, Drive B:, Eject and write..."
 .br
 .RS
-As above, but for the emulated TR-DOS drives.
+As above, but for the emulated Beta disk interface drives.
 .RE
 .PP
 .I "Media, Disk, +D, Drive 1, Insert..."
@@ -3061,7 +3061,7 @@ compressed disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH TR-DOS DISK FORMATS
+.SH BETA DISK FORMATS
 .PP
 Fuse supports .SCL and .TRD images in its Pentagon and Scorpion
 emulation; truncated .TRD files need to be expanded with another
@@ -3110,7 +3110,7 @@ just as if they were uncompressed.
 .I libdsk
 provides an equivalent functionality for +3 and +D disk images if
 available, but there is currently no support for reading compressed
-TR-DOS disk images.
+Beta disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3201,7 +3201,8 @@ port and importing the graphics filter code.
 Ludvig Strigeus and The ScummVM project wrote the original graphics
 filter code.
 .PP
-Dmitry Sanarin wrote the original TR-DOS emulation (for Glukalka).
+Dmitry Sanarin wrote the original Beta disk interface emulation
+(for Glukalka).
 .PP
 Witold Filipczyk wrote the TC2068 support.
 .PP
