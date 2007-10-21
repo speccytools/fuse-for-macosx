@@ -180,8 +180,8 @@ savetrack( disk_t *d, FILE *file, int head, int track,
   for( s = sector_base; s < sector_base + sectors; s++ ) {
     if( id_seek( d, s ) ) {
       if( datamark_read( d, &del ) ) {		/* write data if we have data */
-        if( data_write_file( d, file, seclen ) )
-          return 1;
+	if( data_write_file( d, file, seclen ) )
+	  return 1;
       }
     } else {
       return 1;
@@ -202,7 +202,7 @@ saverawtrack( disk_t *d, FILE *file, int head, int track  )
   while( id_read( d, &h, &t, &s, &seclen ) ) {
     if( datamark_read( d, &del ) ) {		/* write data if we have data */
       if( data_write_file( d, file, seclen ) )
-        return 1;
+	return 1;
     }
   }
   return 0;
@@ -247,7 +247,7 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
     if( sl != *seclen ) {
       r |= DISK_SECLEN_VARI;
       if( sl > *seclen )
-        *seclen = sl;
+	*seclen = sl;
     }
     if( del )
       r |= DISK_DDAM;
@@ -273,30 +273,30 @@ check_disk_geom( disk_t *d, int *sector_base, int *sectors,
     for( h = 0; h < d->sides; h++ ) {
       r |= guess_track_geom( d, h, t, &sbase, &s, &slen, &m );
       if( *sector_base == -1 )
-        *sector_base = sbase;
+	*sector_base = sbase;
       if( *sectors == -1 )
-        *sectors = s;
+	*sectors = s;
       if( *seclen == -1 )
-        *seclen = slen;
+	*seclen = slen;
       if( *mfm == -1 )
-        *mfm = m;
+	*mfm = m;
       if( sbase != *sector_base ) {
-        r |= DISK_SBASE_VARI;
+	r |= DISK_SBASE_VARI;
 	if( sbase < *sector_base )
 	  *sector_base = sbase;
       }
       if( s != *sectors ) {
-        r |= DISK_SPT_VARI;
+	r |= DISK_SPT_VARI;
 	if( s > *sectors )
 	  *sectors = s;
       }
       if( slen != *seclen ) {
-        r |= DISK_SECLEN_VARI;
+	r |= DISK_SECLEN_VARI;
 	if( slen > *seclen )
 	  *seclen = slen;
       }
       if( m != *mfm ) {
-        r |= DISK_MFM_VARI;
+	r |= DISK_MFM_VARI;
 	*mfm = 1;
       }
     }
@@ -444,7 +444,7 @@ data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gap
     }
   }
   length = 0;
-  while( length < len ) {	/* calculate CRC*/
+  while( length < len ) {	/* calculate CRC */
     crc = crc_fdc( crc, d->track[d->i] );
     d->i++;
     length++;
@@ -504,7 +504,7 @@ trackgen( disk_t *d, FILE *file, int head, int track, int sector_base,
 
   idx = d->i;
   pos = i = 0;
-  for( s = sector_base; s < sector_base + sectors; s++ ) {	/* each sector */
+  for( s = sector_base; s < sector_base + sectors; s++ ) {
     d->i = idx + ( pos + i ) * slen;
     if( id_add( d, head, track, s, sector_length >> 8, gap, CRC_OK ) )
       return 1;
@@ -540,7 +540,6 @@ disk_close( disk_t *d )
  *                            use d->tlen if d->bpt == 0
  *                             or use d->bpt to determine d->density
  *  or use d->density
- *
  */
 static int
 disk_alloc( disk_t *d )
@@ -573,10 +572,10 @@ int
 disk_new( disk_t *d, int sides, int cylinders,
 	     disk_dens_t density, disk_type_t type )
 {
-  if( density < DISK_DENS_AUTO || density > DISK_HD ||	/* unknown dens */
-	type <= DISK_TYPE_NONE || type >= DISK_TYPE_LAST ||	/* unknown type*/
-	 sides < 1 || sides > 2 ||				/* 1 or 2 side */
-	  cylinders < 35 || cylinders > 83 )			/* 35 .. 83 cylinder */
+  if( density < DISK_DENS_AUTO || density > DISK_HD ||	/* unknown density */
+      type <= DISK_TYPE_NONE || type >= DISK_TYPE_LAST || /* unknown type */
+      sides < 1 || sides > 2 ||				/* 1 or 2 side */
+      cylinders < 35 || cylinders > 83 )		/* 35 .. 83 cylinder */
     return d->status = DISK_GEOM;
 
   d->type = type;
@@ -607,6 +606,8 @@ alloc_uncompress_buffer( unsigned char **buffer, int length )
   return 0;
 }
 
+/* open a disk image */
+
 static int
 open_udi( FILE *file, disk_t *d )
 {
@@ -617,7 +618,9 @@ open_udi( FILE *file, disk_t *d )
   d->density = DISK_DENS_AUTO;;
   fseek( file, 16, SEEK_SET );
   d->bpt = 0;
-  for( i = 0; i < d->sides * d->cylinders; i++ ) {	/* scan file for the longest track */
+
+  /* scan file for the longest track */
+  for( i = 0; i < d->sides * d->cylinders; i++ ) {
     if( fread( head, 3, 1, file ) != 1 )
       return d->status = DISK_OPEN;
     bpt = head[1] + 256 * head[2];		/* current track len... */
@@ -628,10 +631,12 @@ open_udi( FILE *file, disk_t *d )
     if( fseek( file, bpt + bpt / 8 + ( bpt % 8 ? 1 : 0 ), SEEK_CUR ) == -1 )
       return d->status = DISK_OPEN;
   }
+
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
   fseek( file, 16, SEEK_SET );
   d->track = d->data;
+
   for( i = 0; i < d->sides * d->cylinders; i++ ) {
     if( fread( head, 3, 1, file ) != 1 )
       return d->status = DISK_OPEN;
@@ -643,6 +648,7 @@ open_udi( FILE *file, disk_t *d )
       return d->status = DISK_OPEN;
     d->track += d->tlen;
   }
+
   return d->status = DISK_OK;
 }
 
@@ -652,36 +658,42 @@ open_mgt_img( FILE *file, disk_t *d, size_t file_length, disk_type_t type )
   int i, j, sectors, seclen;
 
   fseek( file, 0, SEEK_SET );
-    /* guess geometry of disk */
-    /* 2*80*10*512, 2*40*10*512, 1*80*10*512, 1*40*10*512  */
+
+  /* guess geometry of disk:
+   * 2*80*10*512, 1*80*10*512 or 1*40*10*512 */
   if( file_length == 2*80*10*512 ) {
     d->sides = 2; d->cylinders = 80; sectors = 10; seclen = 512;
-  } else if( file_length == 1*80*10*512 ) {  /* we do not know */
+  } else if( file_length == 1*80*10*512 ) {
+    /* we cannot distinguish between a single sided 80 track image
+     * and a double sided 40 track image (2*40*10*512) */
     d->sides = 1; d->cylinders = 80; sectors = 10; seclen = 512;
   } else if( file_length == 1*40*10*512 ) {
     d->sides = 1; d->cylinders = 40; sectors = 10; seclen = 512;
   } else {
     return d->status = DISK_GEOM;
   }
-      /* create a DD disk */
+
+  /* create a DD disk */
   d->density = DISK_DD;
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
+
   if( type == DISK_IMG ) {	/* IMG out-out */
     for( j = 0; j < d->sides; j++ ) {
       for( i = 0; i < d->cylinders; i++ ) {
 	if( trackgen( d, file, j, i, SECTOR_BASE_1, sectors, seclen,
-		NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
+		      NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
 	  return d->status = DISK_GEOM;
       }
     }
   } else {			/* MGT alt */
     for( i = 0; i < d->sides * d->cylinders; i++ ) {
       if( trackgen( d, file, i % 2, i / 2, SECTOR_BASE_1, sectors, seclen,
-		 NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
+		    NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
 	return d->status = DISK_GEOM;
     }
   }
+
   return d->status = DISK_OK;
 }
 
@@ -695,17 +707,20 @@ open_sad( FILE *file, disk_t *d, int preindex )
   d->cylinders = head[19];
   sectors = head[20];
   seclen = head[21] * 64;
-    /* create a DD disk */
+
+  /* create a DD disk */
   d->density = DISK_DD;
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
+
   for( j = 0; j < d->sides; j++ ) {
     for( i = 0; i < d->cylinders; i++ ) {
       if( trackgen( d, file, j, i, SECTOR_BASE_1, sectors, seclen, preindex, 
-		      GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
+		    GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
 	return d->status = DISK_GEOM;
     }
   }
+
   return d->status = DISK_OK;
 }
 
@@ -721,11 +736,12 @@ open_trd( FILE *file, disk_t *d )
   if( head[231] != 0x10 || head[227] < 0x16 || head[227] > 0x19 )
     return d->status = DISK_OPEN;	/*?*/
 
-    /* guess geometry of disk */
+  /* guess geometry of disk */
   d->sides =  head[227] & 0x08 ? 1 : 2;
   d->cylinders = head[227] & 0x01 ? 40 : 80;
   sectors = 16; seclen = 256;
-      /* create a DD disk */
+
+  /* create a DD disk */
   d->density = DISK_DD;
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
@@ -753,7 +769,8 @@ open_fdi( FILE *file, disk_t *d, int preindex )
   data_offset = head[0x0a] + 256 * head[0x0b];
   h = 0x0e + head[0x0c] + 256 * head[0x0d];		/* save head start */
   head_offset = h;
-    /* first determine the longest track */
+
+  /* first determine the longest track */
   d->bpt = 0;
   for( i = 0; i < d->cylinders * d->sides; i++ ) {	/* ALT */
     fseek( file, head_offset, SEEK_SET );
@@ -761,13 +778,13 @@ open_fdi( FILE *file, disk_t *d, int preindex )
       return d->status = DISK_OPEN;
     bpt = 0;
 
-    for( j = 0; j < head[0x06]; j++ )	{		/* calculate track len */
-      if( j % 35 == 0 ) {				/* we read next 35 sector header */
-        if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
-          return d->status = DISK_OPEN;
+    for( j = 0; j < head[0x06]; j++ ) {		/* calculate track len */
+      if( j % 35 == 0 ) {				/* 35-sector header */
+	if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
+	  return d->status = DISK_OPEN;
       }
       if( ( head[0x0b + 7*( j % 35 )] & 0x3f ) != 0 )
-        bpt += 0x80 << head[0x0a + 7*( j % 35 )];
+	bpt += 0x80 << head[0x0a + 7*( j % 35 )];
     }
 
     if( bpt > d->bpt )
@@ -799,9 +816,9 @@ open_fdi( FILE *file, disk_t *d, int preindex )
       if( j % 35 == 0 ) {			/* if we have more than 35 sector in a track,
 						   we have to seek back to the next sector
 						   headers and read it ( max 35 sector header */
-        fseek( file, head_offset + 7 *( j + 1 ), SEEK_SET );
-        if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
-          return d->status = DISK_OPEN;
+	fseek( file, head_offset + 7 *( j + 1 ), SEEK_SET );
+	if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
+	  return d->status = DISK_OPEN;
       }
       id_add( d, head[0x08 + 7*( j % 35 )], head[0x07 + 7*( j % 35 )],
 		head[0x09 + 7*( j % 35 )], head[0x0a + 7*( j % 35 )], gap, 
@@ -986,7 +1003,8 @@ open_td0( FILE *file, disk_t *d, int preindex )
 					/* skip comment block if any */
   data_offset = track_offset = 12 + ( head[7] & 0x80 ? 
 					10 + head[14] + 256 * head[15] : 0 );
-    /* first determine the maximal track length */
+
+  /* determine the greatest track length */
   d->bpt = 0;
   d->cylinders = 0;
   while( 1 ) {
@@ -1027,7 +1045,6 @@ open_td0( FILE *file, disk_t *d, int preindex )
 
   d->track = d->data; d->clocks = d->track + d->bpt;
 
-    /* next we read all sector */
   fseek( file, data_offset, SEEK_SET );	/* first track header */
   while( 1 ) {
     if( fread( head, 1, 1, file ) != 1 )
@@ -1035,127 +1052,128 @@ open_td0( FILE *file, disk_t *d, int preindex )
     if( ( sectors = head[0] ) == 255 ) /* sector number 255 => end of tracks */
       break;
     if( fread( head + 1, 3, 1, file ) != 1 ) { /* finish to read track header */
+      if( buff )
+	free( buff );
+      fclose( file );
+      return d->status = DISK_OPEN;
+    }
+
+    d->track = d->data + ( d->sides * head[1] + ( head[2] & 0x01 ) ) * d->tlen;
+    d->clocks = d->track + d->bpt;
+    d->i = 0;
+    			/* later teledisk -> if head[2] & 0x80 -> FM track */
+    gap = mfm == 0 || head[2] & 0x80 ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM;
+    postindex_add( d, gap );
+
+    for( s = 0; s < sectors; s++ ) {
+      if( fread( head, 6, 1, file ) != 1 ) {  /* sector head */
 	if( buff )
 	  free( buff );
-        fclose( file );
-        return d->status = DISK_OPEN;
+	fclose( file );
+	return d->status = DISK_OPEN;
       }
-      d->track = d->data +
-    		    ( d->sides * head[1] + ( head[2] & 0x01 ) ) * d->tlen;
-      d->clocks = d->track + d->bpt;
-      d->i = 0;
-    			/* later teledisk -> if head[2] & 0x80 -> FM track */
-      gap = mfm == 0 || head[2] & 0x80 ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM;
-      postindex_add( d, gap );
-      for( s = 0; s < sectors; s++ ) {
-	if( fread( head, 6, 1, file ) != 1 ) {  /* sector head */
-	  if( buff )
-	    free( buff );
-	  fclose( file );
-	  return d->status = DISK_OPEN;
-	}
-	if( !( head[4] & 0x40 ) )		/* if we have id we add */
-	  id_add( d, head[1], head[0], head[2], head[3], gap,
-				     head[4] & 0x02 ? CRC_ERROR : CRC_OK );
-	if( !( head[4] & 0x30 ) ) {		/* only if we have data */
-	  if( fread( head + 6, 3, 1, file ) != 1 ) {	/* read data header */
-	    if( buff )
-	      free( buff );
-	    return d->status = DISK_OPEN;
-	  }
-	}
-	if( head[4] & 0x40 ) {		/* if we have _no_ id we drop data... */
-	  fseek( file, head[6] + 256 * head[7] - 1, SEEK_CUR );
-	  continue;		/* next sector */
-	}
-	seclen = 0x80 << head[3];
-	switch( head[8] ) {
-	case 0:				/* raw sector data */
-	  if( head[6] + 256 * head[7] - 1 != seclen ) {
-	    if( buff )
-	      free( buff );
-	    return d->status = DISK_OPEN;
-	  }
-	  if( data_add( d, file, NULL, head[6] + 256 * head[7] - 1,
-		head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
-	    if( buff )
-	      free( buff );
-	    return d->status = DISK_OPEN;
-	  }
-	  break;
-	case 1:				/* Repeated 2-byte pattern */
-	  if( buff == NULL && alloc_uncompress_buffer( &buff, 8192 ) )
-	      return d->status = DISK_MEM;
-	  for( i = 0; i < seclen; ) {			/* fill buffer */
-	    if( fread( head + 9, 4, 1, file ) != 1 ) {/* read block header */
-	        free( buff );
-	        return d->status = DISK_OPEN;
-	    }
-	    if( i + 2 * ( head[9] + 256*head[10] ) > seclen ) {
-	    					    /* too many data bytes */
-	          free( buff );
-	      return d->status = DISK_OPEN;
-	    }
-		/*
-		   ab ab ab ab ab ab ab ab ab ab ab ...
-		*/
-	    for( j = 1; j < head[9] + 256*head[10]; j++ )	/* repeat 'n' times */
-	      memcpy( buff + i + j * 2, &head[11], 2 );
-	    i += 2 * ( head[9] + 256*head[10] );
-	  }
-	  if( data_add( d, NULL, buff, head[6] + 256 * head[7] - 1,
-		head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
-	      free( buff );
-	      return d->status = DISK_OPEN;
-	  }
-	  break;
-	case 2:				/* Run Length Encoded data */
-	  if( buff == NULL && alloc_uncompress_buffer( &buff, 8192 ) )
-	      return d->status = DISK_MEM;
-	  for( i = 0; i < seclen; ) {			/* fill buffer */
-	    if( fread( head + 9, 2, 1, file ) != 1 ) {/* read block header */
-	      free( buff );
-	      return d->status = DISK_OPEN;
-	    }
-	    if( head[9] == 0 ) {		/* raw bytes */
-	      if( i + head[10] > seclen ||	/* too many data bytes */
-			fread( buff + i, head[10], 1, file ) != 1 ) {
-	        free( buff );
-	        return d->status = DISK_OPEN;
-	      }
-	      i += head[10];
-	    } else {				/* repeated samples */
-	      if( i + 2 * head[9] * head[10] > seclen ||/* too many data bytes */
-			fread( buff + i, 2 * head[9], 1, file ) != 1 ) {
-	        free( buff );
-	        return d->status = DISK_OPEN;
-	      }
-		/*
-		   abcdefgh abcdefg abcdefg abcdefg ...
-		   \--v---/ 
-		    2*head[9]
-		   |        |       |       |           |
-		   +- 0     +- 1    +- 2    +- 3    ... +- head[10]-1
-		*/
-	      for( j = 1; j < head[10]; j++ ) /* repeat 'n' times */
-		memcpy( buff + i + j * 2 * head[9], buff + i, 2 * head[9] );
-	      i += 2 * head[9] * head[10];
-	    }
-	  }
-	  if( data_add( d, NULL, buff, head[6] + 256 * head[7] - 1,
-		head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
-	      free( buff );
-	      return d->status = DISK_OPEN;
-	  }
-	  break;
-	default:
+      if( !( head[4] & 0x40 ) )		/* if we have id we add */
+	id_add( d, head[1], head[0], head[2], head[3], gap,
+				   head[4] & 0x02 ? CRC_ERROR : CRC_OK );
+      if( !( head[4] & 0x30 ) ) {		/* only if we have data */
+	if( fread( head + 6, 3, 1, file ) != 1 ) {	/* read data header */
 	  if( buff )
 	    free( buff );
 	  return d->status = DISK_OPEN;
-	  break;
+	}
+      }
+      if( head[4] & 0x40 ) {		/* if we have _no_ id we drop data... */
+	fseek( file, head[6] + 256 * head[7] - 1, SEEK_CUR );
+	continue;		/* next sector */
+      }
+      seclen = 0x80 << head[3];
+
+      switch( head[8] ) {
+      case 0:				/* raw sector data */
+	if( head[6] + 256 * head[7] - 1 != seclen ) {
+	  if( buff )
+	    free( buff );
+	  return d->status = DISK_OPEN;
+	}
+	if( data_add( d, file, NULL, head[6] + 256 * head[7] - 1,
+		      head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
+	  if( buff )
+	    free( buff );
+	  return d->status = DISK_OPEN;
+	}
+	break;
+      case 1:				/* Repeated 2-byte pattern */
+	if( buff == NULL && alloc_uncompress_buffer( &buff, 8192 ) )
+	  return d->status = DISK_MEM;
+	for( i = 0; i < seclen; ) {			/* fill buffer */
+	  if( fread( head + 9, 4, 1, file ) != 1 ) { /* read block header */
+	    free( buff );
+	    return d->status = DISK_OPEN;
+	  }
+	  if( i + 2 * ( head[9] + 256*head[10] ) > seclen ) {
+						  /* too many data bytes */
+	    free( buff );
+	    return d->status = DISK_OPEN;
+	  }
+	  /* ab ab ab ab ab ab ab ab ab ab ab ... */
+	  for( j = 1; j < head[9] + 256*head[10]; j++ )	/* repeat 'n' times */
+	    memcpy( buff + i + j * 2, &head[11], 2 );
+	  i += 2 * ( head[9] + 256*head[10] );
+	}
+	if( data_add( d, NULL, buff, head[6] + 256 * head[7] - 1,
+		      head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
+	  free( buff );
+	  return d->status = DISK_OPEN;
+	}
+	break;
+      case 2:				/* Run Length Encoded data */
+	if( buff == NULL && alloc_uncompress_buffer( &buff, 8192 ) )
+	  return d->status = DISK_MEM;
+	for( i = 0; i < seclen; ) {			/* fill buffer */
+	  if( fread( head + 9, 2, 1, file ) != 1 ) {/* read block header */
+	    free( buff );
+	    return d->status = DISK_OPEN;
+	  }
+	  if( head[9] == 0 ) {		/* raw bytes */
+	    if( i + head[10] > seclen ||	/* too many data bytes */
+		      fread( buff + i, head[10], 1, file ) != 1 ) {
+	      free( buff );
+	      return d->status = DISK_OPEN;
+	    }
+	    i += head[10];
+	  } else {				/* repeated samples */
+	    if( i + 2 * head[9] * head[10] > seclen || /* too many data bytes */
+		      fread( buff + i, 2 * head[9], 1, file ) != 1 ) {
+	      free( buff );
+	      return d->status = DISK_OPEN;
+	    }
+	      /*
+		 abcdefgh abcdefg abcdefg abcdefg ...
+		 \--v---/ 
+		  2*head[9]
+		 |        |       |       |           |
+		 +- 0     +- 1    +- 2    +- 3    ... +- head[10]-1
+	      */
+	    for( j = 1; j < head[10]; j++ ) /* repeat 'n' times */
+	      memcpy( buff + i + j * 2 * head[9], buff + i, 2 * head[9] );
+	    i += 2 * head[9] * head[10];
+	  }
+	}
+	if( data_add( d, NULL, buff, head[6] + 256 * head[7] - 1,
+	      head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
+	  free( buff );
+	  return d->status = DISK_OPEN;
+	}
+	break;
+      default:
+	if( buff )
+	  free( buff );
+	return d->status = DISK_OPEN;
+	break;
       }
     }
   }
+
   gap4_add( d, gap );
   if( buff )
     free( buff );
@@ -1278,11 +1296,9 @@ disk_open( disk_t *d, const char *filename, int preindex )
   d->type = type;
   return d->status = DISK_OK;
 }
-/*
 
------------------------ start of write section ------------------
+/*--------------------- start of write section ----------------*/
 
-*/
 static int
 write_udi( FILE * file, disk_t * d )
 {
@@ -1426,7 +1442,7 @@ write_fdi( FILE * file, disk_t * d )
   }
   h = ( sectors + d->cylinders * d->sides ) * 7;	/* track header len */
   head[0x08] = ( h + 0x0e ) & 0xff;	/* description offset */
-  head[0x09] = ( h + 0x0e ) >> 8;	/*"http://fuse-emulator.sourceforge.net" */
+  head[0x09] = ( h + 0x0e ) >> 8; /* "http://fuse-emulator.sourceforge.net" */
   head[0x0a] = ( h + 0x33 ) & 0xff;	/* data offset */
   head[0x0b] = ( h + 0x33 ) >> 8;
   if( fwrite( head, 14, 1, file ) != 1 )	/* FDI head */
@@ -1536,7 +1552,7 @@ write_cpc( FILE * file, disk_t * d )
 	head[0x19 + k * 8] = h;
 	head[0x1a + k * 8] = s;
 	head[0x1b + k * 8] = b;
-	if( k == 0 && mfm == -1 ) {	/* if mixed mfm/mf tracks */
+	if( k == 0 && mfm == -1 ) {	/* if mixed MFM/FM tracks */
 	  head[0x16] = d->track[d->i] == 0x4e ? 0x4e : 0xff;
 	}
 	k++;
@@ -1565,7 +1581,7 @@ write_scl( FILE * file, disk_t * d )
   d->track = d->data;
   d->clocks = d->track + d->bpt;
 
-/* TR-DOS descriptor */
+  /* TR-DOS descriptor */
   if( !id_seek( d, 9 ) || !datamark_read( d, &del ) )
     return d->status = DISK_GEOM;
 
@@ -1573,7 +1589,7 @@ write_scl( FILE * file, disk_t * d )
 
   if( entries > 128 || d->track[d->i + 231] != 0x10 ||
       ( d->track[d->i + 227] != 0x16 && d->track[d->i + 227] != 0x17 &&
-        d->track[d->i + 227] != 0x18 && d->track[d->i + 227] != 0x19 ) ||
+	d->track[d->i + 227] != 0x18 && d->track[d->i + 227] != 0x19 ) ||
       d->track[d->i] != 0 )
     return d->status = DISK_GEOM;
 
@@ -1615,7 +1631,7 @@ write_scl( FILE * file, disk_t * d )
     d->clocks = d->track + d->bpt;	/* set track 0 */
     if( k == 0 ) {
       if ( !id_seek( d, j ) || !datamark_read( d, &del ) )
-        return d->status = DISK_GEOM;
+	return d->status = DISK_GEOM;
       memcpy( head, d->track + d->i, 256 );
     }
 
@@ -1631,29 +1647,29 @@ write_scl( FILE * file, disk_t * d )
       return d->status = DISK_GEOM;
 
     if( s % 16 == 0 )
-     t--;
+      t--;
     d->track = d->data + t * d->tlen;
     d->clocks = d->track + d->bpt;
 
     for( ; s < sectors; s++ ) {		/* save all sectors */
       if( s % 16 == 0 ) {
-        t++;
-        if( t >= d->sides * d->cylinders )
-          return d->status = DISK_GEOM;
-        d->track = d->data + t * d->tlen;
-        d->clocks = d->track + d->bpt;
+	t++;
+	if( t >= d->sides * d->cylinders )
+	  return d->status = DISK_GEOM;
+	d->track = d->data + t * d->tlen;
+	d->clocks = d->track + d->bpt;
       }
       if( id_seek( d, s % 16 + 1 ) ) {
-        if( datamark_read( d, &del ) ) {	/* write data if we have data */
-          if( data_write_file( d, file, 1 ) ) {
-            return d->status = DISK_GEOM;
+	if( datamark_read( d, &del ) ) {	/* write data if we have data */
+	  if( data_write_file( d, file, 1 ) ) {
+	    return d->status = DISK_GEOM;
 	  } else {
 	    for( l = 0; l < 256; l++ )
 	      sum += d->track[d->i + l];
 	  }
-        }
+	}
       } else {
-        return DISK_GEOM;
+	return DISK_GEOM;
       }
     }
   }
@@ -1740,12 +1756,6 @@ write_log( FILE * file, disk_t * d )
   return d->status = DISK_OK;
 }
 
-/*
- *
- * write a disk image file as d->type
- *
- */
-
 int
 disk_write( disk_t *d, const char *filename )
 {
@@ -1784,6 +1794,7 @@ disk_write( disk_t *d, const char *filename )
     else
       d->type = DISK_UDI;				/* ALT side */
   }
+
   switch( d->type ) {
   case DISK_UDI:
     write_udi( file, d );
@@ -1814,6 +1825,7 @@ disk_write( disk_t *d, const char *filename )
     return d->status = DISK_WRFILE;
     break;
   }
+
   if( d->status != DISK_OK ) {
     fclose( file );
     return d->status;

@@ -359,7 +359,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   }
   if( ( error = disk_open( &d->disk, filename, 0 ) != DISK_OK ) ) {
     ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
-                             disk_strerror( error ) );
+			      disk_strerror( error ) );
     return 1;
   }
   fdd_load( &d->fdd, &d->disk, 0 );
