@@ -46,23 +46,22 @@ fdd_strerror( int error )
 {
   if( error >= FDD_LAST_ERROR )
     error = FDD_LAST_ERROR;
-  return fdd_error[error];
+  return fdd_error[ error ];
 }
 
 /*
-   disk->sides  1  2  1  2  1  2  1  2
-   d->c_head    0  0  1  1  0  0  1  1
-   d->upside    0  0  0  0  1  1  1  1
-   
-   UNREADABLE   0  0  1  0  1  0  0  0
+ * disk->sides  1  2  1  2  1  2  1  2
+ * d->c_head    0  0  1  1  0  0  1  1
+ * d->upside    0  0  0  0  1  1  1  1
+ *
+ * UNREADABLE   0  0  1  0  1  0  0  0
+ */
 
-
-*/
 static void
 fdd_set_data( fdd_t *d, int fact )
 {
   int head = d->upsidedown ? 1 - d->c_head : d->c_head;
-  
+
   if( !d->loaded )
     return;
 
@@ -71,26 +70,19 @@ fdd_set_data( fdd_t *d, int fact )
     d->disk->clocks = NULL;
     return;
   }
-  
+
   d->disk->track = d->disk->data + 
-		( d->disk->sides * d->c_cylinder + head ) * d->disk->tlen;
+		   ( d->disk->sides * d->c_cylinder + head ) * d->disk->tlen;
   d->disk->clocks = d->disk->track + d->disk->bpt;
   d->disk->i += rand() % ( d->disk->bpt / fact );
   while( d->disk->i >= d->disk->bpt )
     d->disk->i -= d->disk->bpt;
 }
 
-/*
- *
- * initialize fdd
- *
- *
- */
-
+/* initialise fdd */
 int
 fdd_init( fdd_t *d, int heads, int cyls )
 {
-  
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = d->wrprot = 0;
   d->upsidedown = d->unreadable = d->loaded = 0; d->index = d->tr00 = 1;
   d->disk = NULL;
@@ -100,23 +92,18 @@ fdd_init( fdd_t *d, int heads, int cyls )
 
   d->fdd_heads = heads;
   d->fdd_cylinders = cyls;
-  
+
   return d->status = DISK_OK;
 }
 
-/*
- *
- * load a disk into fdd
- *
- *
- */
-
+/* load a disk into fdd */
 int
 fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
 {
-  
-  if( disk->sides < 0 || disk->sides > 2 || disk->cylinders < 0 || disk->cylinders > 83 )
+  if( disk->sides < 0 || disk->sides > 2 ||
+      disk->cylinders < 0 || disk->cylinders > 83 )
     return d->status = FDD_GEOM;
+
   if( d->fdd_heads == 0 )
     d->fdd_heads = disk->sides;
   if( d->fdd_cylinders == 0 )
@@ -173,18 +160,13 @@ fdd_step( fdd_t *d, fdd_dir_t direction )
   fdd_set_data( d, FDD_STEP_FACT );
 }
 
-/*
- *
- * read/write next byte from/to sector
- *
- */
+/* read/write next byte from/to sector */
 int
 fdd_read_write_data( fdd_t *d, fdd_write_t write )
 {
-
   if( !d->loaded )
     return d->status = FDD_OK;
-  
+
   if( d->disk->i >= d->disk->bpt ) {		/* next data byte */
     d->disk->i = 0;
   }
@@ -202,15 +184,15 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
       d->index = d->disk->i >= d->disk->bpt ? 1 : 0;
       return d->status = FDD_RDONLY;
     }
-    d->disk->track[d->disk->i] = d->data & 0x00ff;
+    d->disk->track[ d->disk->i ] = d->data & 0x00ff;
     if( d->data & 0xff00 )
-      d->disk->clocks[d->disk->i / 8 ] |= 1 << ( d->disk->i % 8 );
+      d->disk->clocks[ d->disk->i / 8 ] |= 1 << ( d->disk->i % 8 );
     else
-      d->disk->clocks[d->disk->i / 8 ] &= ~( 1 << ( d->disk->i % 8 ) );
+      d->disk->clocks[ d->disk->i / 8 ] &= ~( 1 << ( d->disk->i % 8 ) );
     d->disk->dirty = 1;
   } else {	/* read */
-    d->data = d->disk->track[d->disk->i];
-    if( d->disk->clocks[d->disk->i / 8 ] & ( 1 << ( d->disk->i % 8 ) ) )
+    d->data = d->disk->track[ d->disk->i ];
+    if( d->disk->clocks[ d->disk->i / 8 ] & ( 1 << ( d->disk->i % 8 ) ) )
       d->data |= 0xff00;
   }
   d->disk->i++;

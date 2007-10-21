@@ -77,21 +77,21 @@ wd_fdc_alloc_fdc( wd_type_t type )
   case FD1793:
   case WD1773:
   case WD1770:
-    fdc_list[fdc_num].rates[ 0 ] = 6;
-    fdc_list[fdc_num].rates[ 1 ] = 12;
-    fdc_list[fdc_num].rates[ 2 ] = 20;
-    fdc_list[fdc_num].rates[ 3 ] = 30;
+    fdc_list[ fdc_num ].rates[ 0 ] = 6;
+    fdc_list[ fdc_num ].rates[ 1 ] = 12;
+    fdc_list[ fdc_num ].rates[ 2 ] = 20;
+    fdc_list[ fdc_num ].rates[ 3 ] = 30;
     break;
   case WD1772:
-    fdc_list[fdc_num].rates[ 0 ] = 2;
-    fdc_list[fdc_num].rates[ 1 ] = 3;
-    fdc_list[fdc_num].rates[ 2 ] = 5;
-    fdc_list[fdc_num].rates[ 3 ] = 6;
+    fdc_list[ fdc_num ].rates[ 0 ] = 2;
+    fdc_list[ fdc_num ].rates[ 1 ] = 3;
+    fdc_list[ fdc_num ].rates[ 2 ] = 5;
+    fdc_list[ fdc_num ].rates[ 3 ] = 6;
     break;
   }
-  fdc_list[fdc_num].type = type;
-  fdc_list[fdc_num].current_drive = NULL;
-  wd_fdc_master_reset( &fdc_list[fdc_num] );
+  fdc_list[ fdc_num ].type = type;
+  fdc_list[ fdc_num ].current_drive = NULL;
+  wd_fdc_master_reset( &fdc_list[ fdc_num ] );
   fdc_num++;
   return fdc_list + fdc_num - 1;
 }
@@ -419,7 +419,7 @@ type_i_noupdate:
     } else {
       fdd_step( &d->fdd, f->direction );
       f->state = WD_FDC_STATE_SEEK_DELAY;
-      event_add_with_data( tstates + f->rates[b & 0x03] * 
+      event_add_with_data( tstates + f->rates[ b & 0x03 ] * 
 			   machine_current->timings.processor_speed / 1000,
 			   EVENT_TYPE_WD_FDC, f );
       return;

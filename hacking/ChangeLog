@@ -2169,3 +2169,4 @@
 20071021 ay.c: initialise on machine reset (prevents a lot of Valgrind
 	 warnings on the 2068 machines).
 20071021 disk/{disk.c,plusd.c,wd_fdc.c}: formatting fixes (Stuart).
+20071021 disk/{disk.c,fdd.c,wd_fdc.c}: more formatting fixes (Stuart).

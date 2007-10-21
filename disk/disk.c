@@ -91,7 +91,7 @@ disk_strerror( int error )
 {
   if( error < 0 || error > DISK_LAST_ERROR )
     error = DISK_LAST_ERROR;
-  return disk_error[error];
+  return disk_error[ error ];
 }
 
 static int
@@ -100,17 +100,17 @@ id_read( disk_t *d, int *head, int *track, int *sector, int *length )
   int a1mark = 0;
   
   while( d->i < d->bpt ) {
-    if( d->track[d->i] == 0xa1 && 
-	d->clocks[d->i / 8] & ( 1 << ( d->i % 8 ) ) ) { /* 0xa1 with clock */
+    if( d->track[ d->i ] == 0xa1 && 
+	d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) ) ) { /* 0xa1 with clock */
       a1mark = 1;
-    } else if( d->track[d->i] == 0xfe && 
-	( d->clocks[d->i / 8] & ( 1 << ( d->i % 8 ) )  ||	/* 0xfe with clock */
+    } else if( d->track[ d->i ] == 0xfe && 
+	( d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) )  ||	/* 0xfe with clock */
 	  a1mark ) ) {						/* or 0xfe with 0xa1 */
       d->i++;
-      *track  = d->track[d->i++];
-      *head   = d->track[d->i++];
-      *sector = d->track[d->i++];
-      *length = d->track[d->i++];
+      *track  = d->track[ d->i++ ];
+      *head   = d->track[ d->i++ ];
+      *sector = d->track[ d->i++ ];
+      *length = d->track[ d->i++ ];
       d->i += 2;	/* skip CRC */
       return 1;
     } else {
@@ -127,13 +127,13 @@ datamark_read( disk_t *d, int *deleted )
   int a1mark = 0;
 
   while( d->i < d->bpt ) {
-    if( d->track[d->i] == 0xa1 && 
-	d->clocks[d->i / 8] & ( 1 << ( d->i % 8 ) ) ) { /* 0xa1 with clock */
+    if( d->track[ d->i ] == 0xa1 && 
+	d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) ) ) { /* 0xa1 with clock */
       a1mark = 1;
-    } else if( d->track[d->i] >= 0xf8 && d->track[d->i] <= 0xfe &&
-	( d->clocks[d->i / 8] & ( 1 << ( d->i % 8 ) )  ||	/* 0xfe with clock */
-	  a1mark ) ) {						/* or 0xfe with 0xa1 */
-      *deleted = d->track[d->i] == 0xf8 ? 1 : 0;
+    } else if( d->track[ d->i ] >= 0xf8 && d->track[ d->i ] <= 0xfe &&
+	       ( d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) ) || a1mark ) ) {
+      /* 0xfe with clock or 0xfe after 0xa1 mark */
+      *deleted = d->track[ d->i ] == 0xf8 ? 1 : 0;
       d->i++;
       return 1;
     } else {
@@ -162,7 +162,7 @@ static int
 data_write_file( disk_t *d, FILE *file, int seclen )
 {
   int len = 0x80 << seclen;
-  if( fwrite( &d->track[d->i], len, 1, file ) != 1 )
+  if( fwrite( &d->track[ d->i ], len, 1, file ) != 1 )
     return 1;
   return 0;
 }
@@ -237,7 +237,7 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
     if( *seclen == -1 )
       *seclen = sl;
     if( *mfm == -1 )
-      *mfm = d->track[d->i] == 0x4e ? 1 : 0;	/* not so robust */
+      *mfm = d->track[ d->i ] == 0x4e ? 1 : 0;	/* not so robust */
     if( !datamark_read( d, &del ) )
       r |= DISK_CORRUPT_SECTOR;
     if( /* h != head ||*/ t != track /* || s != *sectors */ )
@@ -333,7 +333,7 @@ preindex_add( disk_t *d, int gap )		/* preindex gap and index mark */
     return 1;
   if( d->density == DISK_SD )
     d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 );	/* set clock mark */
-  d->track[d->i++] = 0xfc;			/* index mark */
+  d->track[ d->i++ ] = 0xfc;			/* index mark */
   return 0;
 }
 
@@ -374,22 +374,22 @@ id_add( disk_t *d, int h, int t, int s, int l, int gap, int crc_error )
 /*------------------------------     header     ------------------------------*/
   if( d->density == DISK_SD )
     d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 );	/* set clock mark */
-  d->track[d->i++] = 0xfe;		/* ID mark */
+  d->track[ d->i++ ] = 0xfe;		/* ID mark */
   if( d->density != DISK_SD ) {
     crc = crc_fdc( crc, 0xa1 );
     crc = crc_fdc( crc, 0xa1 );
     crc = crc_fdc( crc, 0xa1 );
   }
   crc = crc_fdc( crc, 0xfe );
-  d->track[d->i++] = t; crc = crc_fdc( crc, t );
-  d->track[d->i++] = h; crc = crc_fdc( crc, h );
-  d->track[d->i++] = s; crc = crc_fdc( crc, s );
-  d->track[d->i++] = l; crc = crc_fdc( crc, l );
-  d->track[d->i++] = crc >> 8;
+  d->track[ d->i++ ] = t; crc = crc_fdc( crc, t );
+  d->track[ d->i++ ] = h; crc = crc_fdc( crc, h );
+  d->track[ d->i++ ] = s; crc = crc_fdc( crc, s );
+  d->track[ d->i++ ] = l; crc = crc_fdc( crc, l );
+  d->track[ d->i++ ] = crc >> 8;
   if( crc_error ) {
-    d->track[d->i++] = (~crc) & 0xff;	/* record a CRC error */
+    d->track[ d->i++ ] = (~crc) & 0xff;	/* record a CRC error */
   } else {
-    d->track[d->i++] = crc & 0xff;	/* CRC */
+    d->track[ d->i++ ] = crc & 0xff;	/* CRC */
   }
 /*------------------------------     GAP II     ------------------------------*/
   return gap_add( d, 2, 0xa1, gap );
@@ -403,7 +403,7 @@ datamark_add( disk_t *d, int ddam )
 /*------------------------------      data      ------------------------------*/
   if( d->density == DISK_SD )
     d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 );	/* set clock mark */
-  d->track[d->i++] = ddam ? 0xf8 : 0xfb;	/* DATA mark 0xf8 -> deleted data */
+  d->track[ d->i++ ] = ddam ? 0xf8 : 0xfb;	/* DATA mark 0xf8 -> deleted data */
   return 0;
 }
 #define NO_DDAM 0
@@ -439,17 +439,17 @@ data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gap
     if( autofill < 0 )
       return 1;
     while( length < len ) {
-      d->track[d->i + length] = autofill;
+      d->track[ d->i + length ] = autofill;
       length++;
     }
   }
   length = 0;
   while( length < len ) {	/* calculate CRC */
-    crc = crc_fdc( crc, d->track[d->i] );
+    crc = crc_fdc( crc, d->track[ d->i ] );
     d->i++;
     length++;
   }
-  d->track[d->i++] = crc >> 8; d->track[d->i++] = crc & 0xff;    /* CRC */
+  d->track[ d->i++ ] = crc >> 8; d->track[ d->i++ ] = crc & 0xff;    /* CRC */
 /*------------------------------     GAP III    ------------------------------*/
 header_crc_error:
   return ( gap_add( d, 3, 0xa1, gap ) );
@@ -547,15 +547,15 @@ disk_alloc( disk_t *d )
   size_t dlen;
   
   if( d->density != DISK_DENS_AUTO ) {
-    d->bpt = disk_bpt[d->density];
+    d->bpt = disk_bpt[ d->density ];
   } else if( d->bpt > 12000 ) {
     return d->status = DISK_UNSUP;
   } else if( d->bpt > 6000 ) {
-    d->bpt = disk_bpt[DISK_HD];
+    d->bpt = disk_bpt[ DISK_HD ];
   } else if( d->bpt > 3000 ) {
-    d->bpt = disk_bpt[DISK_DD];
+    d->bpt = disk_bpt[ DISK_DD ];
   } else if( d->bpt > 0 ) {
-    d->bpt = disk_bpt[DISK_SD];
+    d->bpt = disk_bpt[ DISK_SD ];
   }
 
   d->tlen = d->bpt + d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 );
@@ -783,14 +783,14 @@ open_fdi( FILE *file, disk_t *d, int preindex )
 	if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
 	  return d->status = DISK_OPEN;
       }
-      if( ( head[0x0b + 7*( j % 35 )] & 0x3f ) != 0 )
-	bpt += 0x80 << head[0x0a + 7*( j % 35 )];
+      if( ( head[ 0x0b + 7 * ( j % 35 ) ] & 0x3f ) != 0 )
+	bpt += 0x80 << head[ 0x0a + 7 * ( j % 35 ) ];
     }
 
     if( bpt > d->bpt )
       d->bpt = bpt;
 
-    head_offset += 7 + 7*head[0x06];
+    head_offset += 7 + 7 * head[ 0x06 ];
   }
 
   d->density = DISK_DENS_AUTO;		/* disk_alloc use d->bpt */
@@ -804,8 +804,8 @@ open_fdi( FILE *file, disk_t *d, int preindex )
     fseek( file, head_offset, SEEK_SET );
     if( fread( head, 7, 1, file ) != 1 ) /* 7 = track head */
       return d->status = DISK_OPEN;
-    track_offset = head[0x00] + 256*head[0x01] +
-    			 65536*head[0x02] + 16777216*head[0x03];
+    track_offset = head[0x00] + 256 * head[0x01] +
+    			 65536 * head[0x02] + 16777216 * head[0x03];
     d->track = d->data + i * d->tlen; d->clocks = d->track + d->bpt;
     d->i = 0;
     if( preindex )
@@ -820,16 +820,18 @@ open_fdi( FILE *file, disk_t *d, int preindex )
 	if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
 	  return d->status = DISK_OPEN;
       }
-      id_add( d, head[0x08 + 7*( j % 35 )], head[0x07 + 7*( j % 35 )],
-		head[0x09 + 7*( j % 35 )], head[0x0a + 7*( j % 35 )], gap, 
-		( head[0x0b + 7*( j % 35 )] & 0x3f ) == 0 ? CRC_ERROR : CRC_OK );
-      sector_offset = head[0x0c + 7*( j % 35 )] + 256*head[0x0d + 7*( j % 35 )];
+      id_add( d, head[ 0x08 + 7 * ( j % 35 ) ], head[ 0x07 + 7*( j % 35 ) ],
+	      head[ 0x09 + 7*( j % 35 ) ], head[ 0x0a + 7*( j % 35 ) ], gap, 
+	      ( head[ 0x0b + 7*( j % 35 ) ] & 0x3f ) ? CRC_OK : CRC_ERROR );
+      sector_offset = head[ 0x0c + 7 * ( j % 35 ) ] +
+		      256 * head[ 0x0d + 7 * ( j % 35 ) ];
       fseek( file, data_offset + track_offset + sector_offset, SEEK_SET );
-      data_add( d, file, NULL, ( head[0x0b + 7*( j % 35 )] & 0x3f ) == 0 ? 
-				-1 : 0x80 << head[0x0a + 7*( j % 35 )],
-			head[0x0b + 7*( j % 35 )] & 0x80 ? DDAM : NO_DDAM, gap, NO_AUTOFILL );
+      data_add( d, file, NULL, ( head[ 0x0b + 7 * ( j % 35 ) ] & 0x3f ) == 0 ? 
+			       -1 : 0x80 << head[ 0x0a + 7 * ( j % 35 ) ],
+		head[ 0x0b + 7 * ( j % 35 ) ] & 0x80 ? DDAM : NO_DDAM,
+		gap, NO_AUTOFILL );
     }
-    head_offset += 7 + 7*head[0x06];
+    head_offset += 7 + 7 * head[0x06];
     gap4_add( d, gap );
   }
   return d->status = DISK_OK;
@@ -847,8 +849,8 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
   } else {
     d->bpt = 0;
     for( i = 0; i < d->sides * d->cylinders; i++ )
-      if( head[0x34+i] > d->bpt )
-	d->bpt = head[0x34+i];
+      if( head[ 0x34 + i ] > d->bpt )
+	d->bpt = head[ 0x34 + i ];
     d->bpt <<= 8;
     d->bpt -= 0x100;
   }
@@ -871,10 +873,11 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       preindex_add( d, gap );
     postindex_add( d, gap );
     for( j = 0; j < head[0x15]; j++ ) {			/* each sector */
-      seclen = d->type == DISK_ECPC ? head[0x1e + 8*j] + 256 * head[0x1f + 8*j ] :
-					    0x80 << head[0x1b + 8*j];
-      id_add( d, head[0x19 + 8*j], head[0x18 + 8*j],
-		   head[0x1A + 8*j], seclen >> 8, gap, CRC_OK );
+      seclen = d->type == DISK_ECPC ? head[ 0x1e + 8 * j ] +
+				      256 * head[ 0x1f + 8 * j ]
+				    : 0x80 << head[ 0x1b + 8 * j ];
+      id_add( d, head[ 0x19 + 8 * j ], head[ 0x18 + 8 * j ],
+		   head[ 0x1a + 8 * j ], seclen >> 8, gap, CRC_OK );
       data_add( d, file, NULL, seclen, NO_DDAM, gap, 0x00 );	/**FIXME deleted? */
     }
     gap4_add( d, gap );
@@ -925,11 +928,11 @@ open_scl( FILE *file, disk_t *d )
   for( i = 0; i < scl_files; i++ ) {	/* read all entry and build TR-DOS dir */
     if( fread( head + j, 14, 1, file ) != 1 )
       return d->status = DISK_OPEN;
-    head[j + 14] = sectors % 16; /* ( sectors + 16 ) % 16 := sectors % 16
+    head[ j + 14 ] = sectors % 16; /* ( sectors + 16 ) % 16 := sectors % 16
     							 starting sector */
-    head[j + 15] = sectors / 16 + 1; /* ( sectors + 16 ) / 16 := sectors / 16 + 1
+    head[ j + 15 ] = sectors / 16 + 1; /* ( sectors + 16 ) / 16 := sectors / 16 + 1
     							 starting track */
-    sectors += head[j + 13];
+    sectors += head[ j + 13 ];
     if( d->data[j] == 0x01 )		/* deleted file */
       scl_deleted++;
     if( sectors > 16 * 159 ) 	/* too many sectors needed */
@@ -1116,9 +1119,9 @@ open_td0( FILE *file, disk_t *d, int preindex )
 	    return d->status = DISK_OPEN;
 	  }
 	  /* ab ab ab ab ab ab ab ab ab ab ab ... */
-	  for( j = 1; j < head[9] + 256*head[10]; j++ )	/* repeat 'n' times */
+	  for( j = 1; j < head[9] + 256 * head[10]; j++ )
 	    memcpy( buff + i + j * 2, &head[11], 2 );
-	  i += 2 * ( head[9] + 256*head[10] );
+	  i += 2 * ( head[9] + 256 * head[10] );
 	}
 	if( data_add( d, NULL, buff, head[6] + 256 * head[7] - 1,
 		      head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
@@ -1180,11 +1183,8 @@ open_td0( FILE *file, disk_t *d, int preindex )
   return d->status = DISK_OK;
 }
 
-/*
- *
- * open a disk image file, read and convert to our format
+/* open a disk image file, read and convert to our format
  * if preindex != 0 we generate preindex gap if needed
- *
  */
 int
 disk_open( disk_t *d, const char *filename, int preindex )
@@ -1473,16 +1473,16 @@ write_fdi( FILE * file, disk_t * d )
       soff = 0;
       while( sectors > 0 ) {
 	while( k < 35 && id_read( d, &h, &t, &s, &b ) ) {
-	  head[0x00 + k * 7] = t;
-	  head[0x01 + k * 7] = h;
-	  head[0x02 + k * 7] = s;
-	  head[0x03 + k * 7] = b;
-	  head[0x05 + k * 7] = soff & 0xff;
-	  head[0x06 + k * 7] = ( soff >> 8 ) & 0xff;
+	  head[ 0x00 + k * 7 ] = t;
+	  head[ 0x01 + k * 7 ] = h;
+	  head[ 0x02 + k * 7 ] = s;
+	  head[ 0x03 + k * 7 ] = b;
+	  head[ 0x05 + k * 7 ] = soff & 0xff;
+	  head[ 0x06 + k * 7 ] = ( soff >> 8 ) & 0xff;
 	  if( !datamark_read( d, &del ) ) {
-	    head[0x04 + k * 7] = 0;	/* corrupt sector data */
+	    head[ 0x04 + k * 7 ] = 0;	/* corrupt sector data */
 	  } else {
-	    head[0x04 + k * 7] = 1 << b | ( del ? 0x80 : 0x00 );
+	    head[ 0x04 + k * 7 ] = 1 << b | ( del ? 0x80 : 0x00 );
 	    soff += 0x80 << b;
 	  }
 	  k++;
@@ -1548,12 +1548,12 @@ write_cpc( FILE * file, disk_t * d )
       head[0x17] = 0xe5;
       k = 0;
       while( id_read( d, &h, &t, &s, &b ) ) {
-	head[0x18 + k * 8] = t;
-	head[0x19 + k * 8] = h;
-	head[0x1a + k * 8] = s;
-	head[0x1b + k * 8] = b;
+	head[ 0x18 + k * 8 ] = t;
+	head[ 0x19 + k * 8 ] = h;
+	head[ 0x1a + k * 8 ] = s;
+	head[ 0x1b + k * 8 ] = b;
 	if( k == 0 && mfm == -1 ) {	/* if mixed MFM/FM tracks */
-	  head[0x16] = d->track[d->i] == 0x4e ? 0x4e : 0xff;
+	  head[0x16] = d->track[ d->i ] == 0x4e ? 0x4e : 0xff;
 	}
 	k++;
       }
@@ -1585,12 +1585,12 @@ write_scl( FILE * file, disk_t * d )
   if( !id_seek( d, 9 ) || !datamark_read( d, &del ) )
     return d->status = DISK_GEOM;
 
-  entries = head[8] = d->track[d->i + 228];	/* number of files */
+  entries = head[8] = d->track[ d->i + 228 ];	/* number of files */
 
-  if( entries > 128 || d->track[d->i + 231] != 0x10 ||
-      ( d->track[d->i + 227] != 0x16 && d->track[d->i + 227] != 0x17 &&
-	d->track[d->i + 227] != 0x18 && d->track[d->i + 227] != 0x19 ) ||
-      d->track[d->i] != 0 )
+  if( entries > 128 || d->track[ d->i + 231 ] != 0x10 ||
+      ( d->track[ d->i + 227 ] != 0x16 && d->track[ d->i + 227 ] != 0x17 &&
+	d->track[ d->i + 227 ] != 0x18 && d->track[ d->i + 227 ] != 0x19 ) ||
+      d->track[ d->i ] != 0 )
     return d->status = DISK_GEOM;
 
   memcpy( head, "SINCLAIR", 8 );
@@ -1611,9 +1611,9 @@ write_scl( FILE * file, disk_t * d )
 
     if( fwrite( d->track + d->i + k, 14, 1, file ) != 1 )
       return d->status = DISK_WRPART;
-    sectors += d->track[d->i + k + 13];	/* file length in sectors */
+    sectors += d->track[ d->i + k + 13 ];	/* file length in sectors */
     for( s = 0; s < 14; s++ ) {
-      sum += d->track[d->i + k];
+      sum += d->track[ d->i + k ];
       k++;
     }
     k += 2;
@@ -1635,9 +1635,9 @@ write_scl( FILE * file, disk_t * d )
       memcpy( head, d->track + d->i, 256 );
     }
 
-    s = head[k + 14];	/* starting sector */
-    t = head[k + 15];	/* starting track */
-    sectors = head[k + 13] + s;	/* last sector */
+    s = head[ k + 14 ];	/* starting sector */
+    t = head[ k + 15 ];	/* starting track */
+    sectors = head[ k + 13 ] + s;	/* last sector */
     k += 16;
     if( k == 256 ) {
       k = 0;
@@ -1665,7 +1665,7 @@ write_scl( FILE * file, disk_t * d )
 	    return d->status = DISK_GEOM;
 	  } else {
 	    for( l = 0; l < 256; l++ )
-	      sum += d->track[d->i + l];
+	      sum += d->track[ d->i + l ];
 	  }
 	}
       } else {
@@ -1723,7 +1723,7 @@ write_log( FILE * file, disk_t * d )
 	while( k < b ) {
 	  if( !( k % 16 ) )
 	    fprintf( file, "0x%08x:", d->i );
-	  fprintf( file, " 0x%02x", d->track[d->i] );
+	  fprintf( file, " 0x%02x", d->track[ d->i ] );
 	  k++;
 	  if( !( k % 16 ) )
 	    fprintf( file, "\n" );
@@ -1743,8 +1743,8 @@ write_log( FILE * file, disk_t * d )
       while( d->i < d->bpt ) {
 	if( !( k % 8 ) )
 	  fprintf( file, "0x%08x:", d->i );
-	fprintf( file, " 0x%04x", d->track[d->i] |
-		 ( d->clocks[d->i / 8] &
+	fprintf( file, " 0x%04x", d->track[ d->i ] |
+		 ( d->clocks[ d->i / 8 ] &
 		   ( 1 << ( d->i % 8 ) ) ? 0xff00 : 0x0000 ) );
 	k++;
 	if( !( k % 8 ) )
