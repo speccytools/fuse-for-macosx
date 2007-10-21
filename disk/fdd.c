@@ -27,6 +27,7 @@
 
 #include <libspectrum.h>
 
+#include "bitmap.h"
 #include "fdd.h"
 
 #define FDD_LOAD_FACT 2
@@ -186,13 +187,13 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
     }
     d->disk->track[ d->disk->i ] = d->data & 0x00ff;
     if( d->data & 0xff00 )
-      d->disk->clocks[ d->disk->i / 8 ] |= 1 << ( d->disk->i % 8 );
+      bitmap_set( d->disk->clocks, d->disk->i );
     else
-      d->disk->clocks[ d->disk->i / 8 ] &= ~( 1 << ( d->disk->i % 8 ) );
+      bitmap_reset( d->disk->clocks, d->disk->i );
     d->disk->dirty = 1;
   } else {	/* read */
     d->data = d->disk->track[ d->disk->i ];
-    if( d->disk->clocks[ d->disk->i / 8 ] & ( 1 << ( d->disk->i % 8 ) ) )
+    if( bitmap_test( d->disk->clocks, d->disk->i ) )
       d->data |= 0xff00;
   }
   d->disk->i++;

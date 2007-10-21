@@ -31,6 +31,7 @@
 
 #include <libspectrum.h>
 
+#include "bitmap.h"
 #include "crc.h"
 #include "disk.h"
 
@@ -101,10 +102,10 @@ id_read( disk_t *d, int *head, int *track, int *sector, int *length )
   
   while( d->i < d->bpt ) {
     if( d->track[ d->i ] == 0xa1 && 
-	d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) ) ) { /* 0xa1 with clock */
+	bitmap_test( d->clocks, d->i ) ) {		/* 0xa1 with clock */
       a1mark = 1;
     } else if( d->track[ d->i ] == 0xfe && 
-	( d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) )  ||	/* 0xfe with clock */
+	( bitmap_test( d->clocks, d->i ) ||		/* 0xfe with clock */
 	  a1mark ) ) {						/* or 0xfe with 0xa1 */
       d->i++;
       *track  = d->track[ d->i++ ];
@@ -128,10 +129,10 @@ datamark_read( disk_t *d, int *deleted )
 
   while( d->i < d->bpt ) {
     if( d->track[ d->i ] == 0xa1 && 
-	d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) ) ) { /* 0xa1 with clock */
+	bitmap_test( d->clocks, d->i ) ) { /* 0xa1 with clock */
       a1mark = 1;
     } else if( d->track[ d->i ] >= 0xf8 && d->track[ d->i ] <= 0xfe &&
-	       ( d->clocks[ d->i / 8 ] & ( 1 << ( d->i % 8 ) ) || a1mark ) ) {
+	       ( bitmap_test( d->clocks, d->i ) || a1mark ) ) {
       /* 0xfe with clock or 0xfe after 0xa1 mark */
       *deleted = d->track[ d->i ] == 0xf8 ? 1 : 0;
       d->i++;
@@ -316,9 +317,9 @@ gap_add( disk_t *d, int gap, int mark, int gaptype )
   memset( d->track + d->i, g->sync, g->sync_len ); d->i += g->sync_len;
   if( d->density != DISK_SD ) {
     memset( d->track + d->i , mark, 3 );
-    d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 ); d->i++;
-    d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 ); d->i++;
-    d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 ); d->i++;
+    bitmap_set( d->clocks, d->i ); d->i++;
+    bitmap_set( d->clocks, d->i ); d->i++;
+    bitmap_set( d->clocks, d->i ); d->i++;
   }
   return 0;
 }
@@ -332,7 +333,7 @@ preindex_add( disk_t *d, int gap )		/* preindex gap and index mark */
   if( d->i + 1 >= d->bpt )  /* too many data bytes */
     return 1;
   if( d->density == DISK_SD )
-    d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 );	/* set clock mark */
+    bitmap_set( d->clocks, d->i ); 		/* set clock mark */
   d->track[ d->i++ ] = 0xfc;			/* index mark */
   return 0;
 }
@@ -373,7 +374,7 @@ id_add( disk_t *d, int h, int t, int s, int l, int gap, int crc_error )
     return 1;
 /*------------------------------     header     ------------------------------*/
   if( d->density == DISK_SD )
-    d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 );	/* set clock mark */
+    bitmap_set( d->clocks, d->i ); 		/* set clock mark */
   d->track[ d->i++ ] = 0xfe;		/* ID mark */
   if( d->density != DISK_SD ) {
     crc = crc_fdc( crc, 0xa1 );
@@ -402,7 +403,7 @@ datamark_add( disk_t *d, int ddam )
     return 1;
 /*------------------------------      data      ------------------------------*/
   if( d->density == DISK_SD )
-    d->clocks[ d->i / 8 ] |= 1 << ( d->i % 8 );	/* set clock mark */
+    bitmap_set( d->clocks, d->i ); 		/* set clock mark */
   d->track[ d->i++ ] = ddam ? 0xf8 : 0xfb;	/* DATA mark 0xf8 -> deleted data */
   return 0;
 }
@@ -1744,8 +1745,7 @@ write_log( FILE * file, disk_t * d )
 	if( !( k % 8 ) )
 	  fprintf( file, "0x%08x:", d->i );
 	fprintf( file, " 0x%04x", d->track[ d->i ] |
-		 ( d->clocks[ d->i / 8 ] &
-		   ( 1 << ( d->i % 8 ) ) ? 0xff00 : 0x0000 ) );
+		 ( bitmap_test( d->clocks, d->i ) ? 0xff00 : 0x0000 ) );
 	k++;
 	if( !( k % 8 ) )
 	  fprintf( file, "\n" );
