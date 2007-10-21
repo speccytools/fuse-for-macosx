@@ -2137,7 +2137,7 @@
 20070928 event.[ch]: add 'user_data' event field (Gergely and Stuart).
 20070928 disk/{Makefile.am,crc.[ch],disk.[ch],fdd.[ch],plusd.[ch],wd1770.[ch]},
 	 event.[ch]: new WD17xx emulation, with support for non-uniform sector
-	 layouts (Gergely Szasz).
+	 layouts (part of patch #1779138) (Gergely Szasz).
 20070928 Makefile.am,configure.in,event.c,fuse.c,menu.c,menu_data.dat,
 	 periph.[ch],printer.c,tape.c,ui/{gtk/gtkui.c,options.dat,
 	 win32/{menu_data.[ch],menu_data.rc,win32ui.c}},ui.c,utils.c,
@@ -2163,10 +2163,11 @@
 	 menu.c,menu_data.dat,snapshot.c,tape.c,trdos.[ch],ui/{gtk/gtkui.c,
 	 ui.h,win32/{menu_data.[ch],menu_data.rc,win32ui.c}},ui.c,utils.c,
 	 widget/menu.c,z80/{coretest.c,z80.c,z80_ops.c}: use new WD FDC code
-	 for Beta disk interface emulation (Stuart).
+	 for Beta disk interface emulation (patch #1772618) (Stuart).
 20071021 machines/{pentagon.c,scorpion.c,spec128.c,specplus2.c,specplus2a.c,
 	 specplus3.c, specplus3e.c}: tidy up a few Valgrind reported errors.
 20071021 ay.c: initialise on machine reset (prevents a lot of Valgrind
 	 warnings on the 2068 machines).
 20071021 disk/{disk.c,plusd.c,wd_fdc.c}: formatting fixes (Stuart).
 20071021 disk/{disk.c,fdd.c,wd_fdc.c}: more formatting fixes (Stuart).
+20071021 disk/wd_fdc.c: remove fdc_list (part of patch #1779138).
