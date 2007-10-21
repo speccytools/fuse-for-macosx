@@ -2171,3 +2171,5 @@
 20071021 disk/{disk.c,plusd.c,wd_fdc.c}: formatting fixes (Stuart).
 20071021 disk/{disk.c,fdd.c,wd_fdc.c}: more formatting fixes (Stuart).
 20071021 disk/wd_fdc.c: remove fdc_list (part of patch #1779138).
+20071021 disk/wd_fdc.c,event.[ch]: add timeout event (part of patch #1779138)
+	 (Gergely Szasz).

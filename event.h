@@ -55,6 +55,7 @@ typedef enum event_type {
   EVENT_TYPE_PLUSD_INDEX,
   EVENT_TYPE_WD_FDC,
   EVENT_TYPE_WD_FDC_MOTOR_OFF,
+  EVENT_TYPE_WD_FDC_TIMEOUT,
 
 } event_type;
 

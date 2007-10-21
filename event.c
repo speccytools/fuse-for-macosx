@@ -181,6 +181,7 @@ int event_do_events(void)
 
     case EVENT_TYPE_WD_FDC:
     case EVENT_TYPE_WD_FDC_MOTOR_OFF:
+    case EVENT_TYPE_WD_FDC_TIMEOUT:
       wd_fdc_event( ptr->tstates, ptr->type, ptr->user_data );
       break;
 
