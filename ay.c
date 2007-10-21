@@ -41,12 +41,13 @@ static const libspectrum_byte mask[ AY_REGISTERS ] = {
 
 };
 
+static void ay_reset( int hard_reset );
 static void ay_from_snapshot( libspectrum_snap *snap );
 static void ay_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t ay_module_info = {
 
-  NULL,
+  ay_reset,
   NULL,
   ay_from_snapshot,
   ay_to_snapshot,
@@ -59,6 +60,15 @@ ay_init( void )
   module_register( &ay_module_info );
 
   return 0;
+}
+
+static void
+ay_reset( int hard_reset )
+{
+  ayinfo *ay = &machine_current->ay;
+
+  ay->current_register = 0;
+  memset( ay->registers, 0, sizeof( ay->registers ) );
 }
 
 /* What happens when the AY register port (traditionally 0xfffd on the 128K

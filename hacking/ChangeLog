@@ -2166,3 +2166,5 @@
 	 for Beta disk interface emulation (Stuart).
 20071021 machines/{pentagon.c,scorpion.c,spec128.c,specplus2.c,specplus2a.c,
 	 specplus3.c, specplus3e.c}: tidy up a few Valgrind reported errors.
+20071021 ay.c: initialise on machine reset (prevents a lot of Valgrind
+	 warnings on the 2068 machines).
