@@ -73,6 +73,9 @@ specplus2_reset( void )
                             settings_default.rom_plus2_1, 0x4000 );
   if( error ) return error;
 
+  error = spec128_common_reset( 1 );
+  if( error ) return error;
+
   error = periph_setup( spec128_peripherals, spec128_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
@@ -81,5 +84,5 @@ specplus2_reset( void )
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
-  return spec128_common_reset( 1 );
+  return 0;
 }

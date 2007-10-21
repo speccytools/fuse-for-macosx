@@ -150,10 +150,8 @@ scorpion_reset(void)
   beta_available = 1;
   beta_active = 0;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = spec128_common_reset( 0 );
   if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_update();
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
@@ -162,7 +160,12 @@ scorpion_reset(void)
   for( i = 16; i < 32; i++ )
     memory_map_ram[i].writable = 1;
 
-  return spec128_common_reset( 0 );
+  error = periph_setup( peripherals, peripherals_count );
+  if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_update();
+
+  return 0;
 }
 
 static int

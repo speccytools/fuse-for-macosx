@@ -144,13 +144,17 @@ spec128_reset( void )
 
   error = periph_setup( spec128_peripherals, spec128_peripherals_count );
   if( error ) return error;
+
+  error = spec128_common_reset( 1 );
+  if( error ) return error;
+
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
-  return spec128_common_reset( 1 );
+  return 0;
 }
 
 int

@@ -145,12 +145,15 @@ pentagon_reset(void)
 
   beta_available = 1;
 
+  error = spec128_common_reset( 0 );
+  if( error ) return error;
+
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
-  return spec128_common_reset( 0 );
+  return 0;
 }
 
 static int

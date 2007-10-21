@@ -97,12 +97,15 @@ specplus2a_reset( void )
                             settings_default.rom_plus2a_3, 0x4000 );
   if( error ) return error;
 
+  error = specplus3_plus2a_common_reset();
+  if( error ) return error;
+
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
-  return specplus3_plus2a_common_reset();
+  return 0;
 }
 

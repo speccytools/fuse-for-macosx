@@ -267,6 +267,9 @@ specplus3_reset( void )
                             settings_default.rom_plus3_3, 0x4000 );
   if( error ) return error;
 
+  error = specplus3_plus2a_common_reset();
+  if( error ) return error;
+
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
@@ -280,7 +283,7 @@ specplus3_reset( void )
 
 #endif				/* #ifdef HAVE_765_H */
 
-  return specplus3_plus2a_common_reset();
+  return 0;
 }
 
 int
