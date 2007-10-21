@@ -2164,5 +2164,5 @@
 	 ui.h,win32/{menu_data.[ch],menu_data.rc,win32ui.c}},ui.c,utils.c,
 	 widget/menu.c,z80/{coretest.c,z80.c,z80_ops.c}: use new WD FDC code
 	 for Beta disk interface emulation (Stuart).
-20071021 machines/{pentagon.c,scorpion.c,spec128.c,specplus2.c,specplus2a.c,specplus3.c,
-	 specplus3e.c}: tidy up a few Valgrind reported errors.
+20071021 machines/{pentagon.c,scorpion.c,spec128.c,specplus2.c,specplus2a.c,
+	 specplus3.c, specplus3e.c}: tidy up a few Valgrind reported errors.
