@@ -111,7 +111,7 @@ statusbar_update( int busy )
 }
 
 void
-wd_fdc_set_cmdint( wd_fdc *f )
+wd_fdc_set_intrq( wd_fdc *f )
 {
   if( ( f->type == WD1770 || f->type == WD1772 ) &&
       f->status_register & WD_FDC_SR_MOTORON        ) {
@@ -128,16 +128,16 @@ wd_fdc_set_cmdint( wd_fdc *f )
   }
   if( f->intrq != 1 ) {
     f->intrq = 1;
-    if( f->set_cmdint ) f->set_cmdint( f );
+    if( f->set_intrq ) f->set_intrq( f );
   }
 }
 
 void
-wd_fdc_reset_cmdint( wd_fdc *f )
+wd_fdc_reset_intrq( wd_fdc *f )
 {
   if( f->intrq == 1 ) {
     f->intrq = 0;
-    if( f->reset_cmdint ) f->reset_cmdint( f );
+    if( f->reset_intrq ) f->reset_intrq( f );
   }
 }
 
@@ -351,7 +351,7 @@ wd_fdc_sr_read( wd_fdc *f )
 {
   wd_fdc_drive *d = f->current_drive;
 
-  wd_fdc_reset_cmdint( f );
+  wd_fdc_reset_intrq( f );
 
   if( f->status_type == WD_FDC_STATUS_TYPE1 ) {
     f->status_register &= ~WD_FDC_SR_IDX_DRQ;
@@ -389,14 +389,14 @@ wd_fdc_seek_verify( wd_fdc *f )
 	f->id_track == f->track_register ) {
       f->state = WD_FDC_STATE_NONE;
       f->status_register &= ~WD_FDC_SR_BUSY;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       return;
     }
   }
   f->state = WD_FDC_STATE_NONE;
   f->status_register |= WD_FDC_SR_RNF;
   f->status_register &= ~WD_FDC_SR_BUSY;
-  wd_fdc_set_cmdint( f );
+  wd_fdc_set_intrq( f );
 }
 
 static void
@@ -477,7 +477,7 @@ type_i_verify:
 
   f->state = WD_FDC_STATE_NONE;
   f->status_register &= ~WD_FDC_SR_BUSY;
-  wd_fdc_set_cmdint( f );
+  wd_fdc_set_intrq( f );
 }
 
 static void
@@ -492,7 +492,7 @@ wd_fdc_type_ii( wd_fdc *f )
       f->status_register |= WD_FDC_SR_WRPROT;
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->state = WD_FDC_STATE_NONE;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       return;
     }
   }
@@ -510,7 +510,7 @@ wd_fdc_type_ii( wd_fdc *f )
       f->status_register |= WD_FDC_SR_RNF;
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->state = WD_FDC_STATE_NONE;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       return;
     }
     if( f->ddam )
@@ -557,7 +557,7 @@ wd_fdc_type_iii( wd_fdc *f )
     if( d->fdd.wrprot ) {
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->status_register |= WD_FDC_SR_WRPROT;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       return;
     }
     f->status_register &= ~WD_FDC_SR_WRPROT;
@@ -573,7 +573,7 @@ wd_fdc_type_iii( wd_fdc *f )
     read_id( f );
     if( f->id_mark == WD_FDC_AM_NONE ) {
       f->status_register |= WD_FDC_SR_RNF;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       return;
     }
     f->data_offset = 0;
@@ -600,7 +600,7 @@ wd_fdc_event( libspectrum_dword last_tstates, event_type event,
       f->state = WD_FDC_STATE_NONE;
       f->status_register |= WD_FDC_SR_LOST;
       f->status_register &= ~WD_FDC_SR_BUSY;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
     }
     return 0;
   }
@@ -682,7 +682,7 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
 {
   wd_fdc_drive *d = f->current_drive;
 
-  wd_fdc_reset_cmdint( f );
+  wd_fdc_reset_intrq( f );
 
   if( ( b & 0xf0 ) == 0xd0 ) {			/* Type IV - Force Interrupt */
     event_remove_type( EVENT_TYPE_WD_FDC );
@@ -693,7 +693,7 @@ wd_fdc_cr_write( wd_fdc *f, libspectrum_byte b )
     wd_fdc_reset_datarq( f );
 
     if( b & 0x08 )
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
     else if( b & 0x04 )
       d->index_interrupt = 1;
 
@@ -791,7 +791,7 @@ wd_fdc_dr_read( wd_fdc *f )
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->status_type = WD_FDC_STATUS_TYPE2;
       f->state = WD_FDC_STATE_NONE;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       wd_fdc_reset_datarq( f );
     } else {
       f->data_register = d->fdd.data;
@@ -820,7 +820,7 @@ wd_fdc_dr_read( wd_fdc *f )
 	    f->status_register |= WD_FDC_SR_CRCERR;
 	  f->status_type = WD_FDC_STATUS_TYPE2;
 	  f->state = WD_FDC_STATE_NONE;
-	  wd_fdc_set_cmdint( f );
+	  wd_fdc_set_intrq( f );
 	  wd_fdc_reset_datarq( f );
 	}
       }
@@ -848,7 +848,7 @@ wd_fdc_dr_read( wd_fdc *f )
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->status_type = WD_FDC_STATUS_TYPE2;
       f->state = WD_FDC_STATE_NONE;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       wd_fdc_reset_datarq( f );
       break;
     default:
@@ -864,7 +864,7 @@ wd_fdc_dr_read( wd_fdc *f )
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->status_type = WD_FDC_STATUS_TYPE2;
       f->state = WD_FDC_STATE_NONE;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       wd_fdc_reset_datarq( f );
     }
   }
@@ -905,7 +905,7 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
 	f->status_register &= ~WD_FDC_SR_BUSY;
 	f->status_type = WD_FDC_STATUS_TYPE2;
 	f->state = WD_FDC_STATE_NONE;
-	wd_fdc_set_cmdint( f );
+	wd_fdc_set_intrq( f );
 	wd_fdc_reset_datarq( f );
       }
     }
@@ -945,7 +945,7 @@ wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b )
       event_remove_type( EVENT_TYPE_WD_FDC_TIMEOUT );	/* clear the timeout */
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->state = WD_FDC_STATE_NONE;
-      wd_fdc_set_cmdint( f );
+      wd_fdc_set_intrq( f );
       wd_fdc_reset_datarq( f );
     }
   }

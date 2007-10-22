@@ -126,8 +126,8 @@ plusd_init( void )
   }
 
   plusd_fdc->dden = 1;
-  plusd_fdc->set_cmdint = NULL;
-  plusd_fdc->reset_cmdint = NULL;
+  plusd_fdc->set_intrq = NULL;
+  plusd_fdc->reset_intrq = NULL;
   plusd_fdc->set_datarq = NULL;
   plusd_fdc->reset_datarq = NULL;
   plusd_fdc->iface = NULL;
@@ -465,7 +465,7 @@ plusd_event_index( libspectrum_dword last_tstates )
 
     d->index_pulse = plusd_index_pulse;
     if( !plusd_index_pulse && d->index_interrupt ) {
-      wd_fdc_set_cmdint( plusd_fdc );
+      wd_fdc_set_intrq( plusd_fdc );
       d->index_interrupt = 0;
     }
   }

@@ -62,7 +62,7 @@ static int beta_index_pulse = 0;
 #define BETA_NUM_DRIVES 4
 
 static int beta_datarq;
-static int beta_cmdint;
+static int beta_intrq;
 
 static wd_fdc *beta_fdc;
 static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
@@ -108,9 +108,9 @@ beta_memory_map( void )
 }
 
 static void
-beta_set_cmdint( wd_fdc *f )
+beta_set_intrq( wd_fdc *f )
 {
-  beta_cmdint = 1;
+  beta_intrq = 1;
 }
 
 static void
@@ -140,8 +140,8 @@ beta_init( void )
   }
 
   beta_fdc->dden = 1;
-  beta_fdc->set_cmdint = beta_set_cmdint;
-  beta_fdc->reset_cmdint = NULL;
+  beta_fdc->set_intrq = beta_set_intrq;
+  beta_fdc->reset_intrq = NULL;
   beta_fdc->set_datarq = beta_set_datarq;
   beta_fdc->reset_datarq = beta_reset_datarq;
 
@@ -288,13 +288,13 @@ beta_sp_read( libspectrum_word port GCC_UNUSED, int *attached )
   *attached = 1;
   b = 0;
 
-  if( beta_cmdint )
+  if( beta_intrq )
     b |= 0x80;
 
   if( beta_datarq )
     b |= 0x40;
 
-  beta_cmdint = 0;
+  beta_intrq = 0;
 /* we should reset beta_datarq, but we first need to raise it for each byte
  * transferred in wd_fdc.c */
 /* beta_datarq = 0; */
@@ -460,7 +460,7 @@ beta_event_index( libspectrum_dword last_tstates )
 /* disabled, until we have better timing emulation,
  * to avoid interrupts while reading/writing data */
     if( !beta_index_pulse && d->index_interrupt ) {
-      wd_fdc_set_cmdint( beta_fdc );
+      wd_fdc_set_intrq( beta_fdc );
       d->index_interrupt = 0;
     }
   }

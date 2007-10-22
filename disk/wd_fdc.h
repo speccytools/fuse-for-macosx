@@ -119,8 +119,8 @@ typedef struct wd_fdc {
 
   libspectrum_word crc;			/* to hold crc */
 
-  void ( *set_cmdint ) ( struct wd_fdc *f );
-  void ( *reset_cmdint ) ( struct wd_fdc *f );
+  void ( *set_intrq ) ( struct wd_fdc *f );
+  void ( *reset_intrq ) ( struct wd_fdc *f );
   void ( *set_datarq ) ( struct wd_fdc *f );
   void ( *reset_datarq ) ( struct wd_fdc *f );
   void *iface;
@@ -143,8 +143,8 @@ void wd_fdc_sec_write( wd_fdc *f, libspectrum_byte b );
 libspectrum_byte wd_fdc_dr_read( wd_fdc *f );
 void wd_fdc_dr_write( wd_fdc *f, libspectrum_byte b );
 
-void wd_fdc_set_cmdint( wd_fdc *f );
-void wd_fdc_reset_cmdint( wd_fdc *f );
+void wd_fdc_set_intrq( wd_fdc *f );
+void wd_fdc_reset_intrq( wd_fdc *f );
 void wd_fdc_set_datarq( wd_fdc *f );
 void wd_fdc_reset_datarq( wd_fdc *f );
 
