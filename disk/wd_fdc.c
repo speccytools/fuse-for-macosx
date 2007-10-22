@@ -162,7 +162,7 @@ wd_fdc_reset_datarq( wd_fdc *f )
 static void
 crc_preset( wd_fdc *f )
 {
-  f->crc = 0xfff;
+  f->crc = 0xffff;
 }
 
 static void

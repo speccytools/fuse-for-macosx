@@ -2178,3 +2178,4 @@
 20071022 disk/{disk.c,wd_fdc.c}: remove TR-DOS workaround, fix formatting, add
 	 missing prototypes and use functions instead of macros for CRC_ADD and
 	 CRC_PRESET (Stuart).
+20071022 disk/wd_fdc.c: fix typo (Stuart).
