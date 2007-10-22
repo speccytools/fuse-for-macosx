@@ -479,8 +479,6 @@ calc_sectorlen( disk_t *d, int sector_length, int gap )
   return len;
 }
 
-#define SECTOR_BASE_0 0
-#define SECTOR_BASE_1 1
 #define NO_INTERLEAVE 1
 #define INTERLEAVE_2 2
 #define NO_PREINDEX 0
@@ -682,14 +680,14 @@ open_mgt_img( FILE *file, disk_t *d, size_t file_length, disk_type_t type )
   if( type == DISK_IMG ) {	/* IMG out-out */
     for( j = 0; j < d->sides; j++ ) {
       for( i = 0; i < d->cylinders; i++ ) {
-	if( trackgen( d, file, j, i, SECTOR_BASE_1, sectors, seclen,
+	if( trackgen( d, file, j, i, 1, sectors, seclen,
 		      NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
 	  return d->status = DISK_GEOM;
       }
     }
   } else {			/* MGT alt */
     for( i = 0; i < d->sides * d->cylinders; i++ ) {
-      if( trackgen( d, file, i % 2, i / 2, SECTOR_BASE_1, sectors, seclen,
+      if( trackgen( d, file, i % 2, i / 2, 1, sectors, seclen,
 		    NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
 	return d->status = DISK_GEOM;
     }
@@ -716,7 +714,7 @@ open_sad( FILE *file, disk_t *d, int preindex )
 
   for( j = 0; j < d->sides; j++ ) {
     for( i = 0; i < d->cylinders; i++ ) {
-      if( trackgen( d, file, j, i, SECTOR_BASE_1, sectors, seclen, preindex, 
+      if( trackgen( d, file, j, i, 1, sectors, seclen, preindex, 
 		    GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
 	return d->status = DISK_GEOM;
     }
@@ -750,7 +748,7 @@ open_trd( FILE *file, disk_t *d )
   fseek( file, 0, SEEK_SET );
   for( i = 0; i < d->cylinders; i++ ) {
     for( j = 0; j < d->sides; j++ ) {
-      if( trackgen( d, file, j, i, SECTOR_BASE_1, sectors, seclen,
+      if( trackgen( d, file, j, i, 1, sectors, seclen,
     	    NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) )
 	return d->status = DISK_GEOM;
     }
@@ -981,7 +979,7 @@ open_scl( FILE *file, disk_t *d )
     
   /* now we continue with the data */
   for( i = 1; i < d->sides * d->cylinders; i++ ) {
-    if( trackgen( d, file, i % 2, i / 2, SECTOR_BASE_1, 16, 256,
+    if( trackgen( d, file, i % 2, i / 2, 1, 16, 256,
     		    NO_PREINDEX, GAP_TRDOS, INTERLEAVE_2, 0x00 ) )
       return d->status = DISK_OPEN;
   }
