@@ -316,6 +316,7 @@ event_name( event_type type )
   case EVENT_TYPE_RZX_SENTINEL: return "RZX sentinel";
   case EVENT_TYPE_WD_FDC: return "WD FDC event";
   case EVENT_TYPE_WD_FDC_MOTOR_OFF: return "WD FDC motor off";
+  case EVENT_TYPE_WD_FDC_TIMEOUT: return "WD FDC timeout";
 
   }
 

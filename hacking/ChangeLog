@@ -2181,3 +2181,4 @@
 20071022 disk/wd_fdc.c: fix typo (Stuart).
 20071022 disk/{beta.c,plusd.c,wd_fdc.c,wd_fdc.h}: rename cmdint to intrq
 	 (Stuart).
+20071023 event.c: handle EVENT_TYPE_WD_FDC_TIMEOUT in event_name() (Stuart).
