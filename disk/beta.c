@@ -145,11 +145,6 @@ beta_init( void )
   beta_fdc->set_datarq = beta_set_datarq;
   beta_fdc->reset_datarq = beta_reset_datarq;
 
-  beta_fdc->rates[ 0 ] = 6;
-  beta_fdc->rates[ 1 ] = 12;
-  beta_fdc->rates[ 2 ] = 20;
-  beta_fdc->rates[ 3 ] = 30;
-
   module_register( &beta_module_info );
 
   return 0;
