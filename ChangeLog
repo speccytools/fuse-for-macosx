@@ -4,6 +4,8 @@
 
 	* New features:
 	  * Add +D disk interface support (Stuart Brady).
+	  * New floppy disk controller emulation for +D and Beta disk
+	    interface emulation (Gergely Szasz and Stuart Brady).
 	  * Add Hi-Fi beeper for improved reproduction of multi-channel beeper
 	    tunes (e.g. Fairlight 2, Wham - the Music Box) (Fredrick Meunier).
 	  * Add support for saving tape images without using tape traps
@@ -29,6 +31,8 @@
 	* Miscellaneous:
 	  * Removed the GTK 1.x UI (please note that GTK 2.x will remain
 	    supported for the forseeable future) (Philip Kendall).
+	  * Enable Fuse to build in directories other than the source
+	    directory itself (Philip Kendall).
 	  * Updated X11 UI (Gergely Szasz).
 	  * Updated Win32 UI (Stuart Brady).
 	  * Man page fixes (Stuart Brady).

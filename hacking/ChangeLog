@@ -2192,3 +2192,4 @@
 	 #1779138) (Gergely Szasz).
 20071023 z80/{Makefile.am,z80_checks.h,z80_ops.c}: use enumerated feature checks
 	 (patch #1785743) (Stuart).
+20071023 ChangeLog: add more entries (Stuart).
