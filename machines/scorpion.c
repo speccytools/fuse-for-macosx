@@ -131,8 +131,6 @@ scorpion_reset(void)
 {
   int i, error;
 
-  beta_reset();
-
   error = machine_load_rom( 0, 0, settings_current.rom_scorpion_0,
                             settings_default.rom_scorpion_0, 0x4000 );
   if( error ) return error;
@@ -159,6 +157,8 @@ scorpion_reset(void)
   /* Mark the second 128K as present/writeable */
   for( i = 16; i < 32; i++ )
     memory_map_ram[i].writable = 1;
+
+  beta_reset();
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;

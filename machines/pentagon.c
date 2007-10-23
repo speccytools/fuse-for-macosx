@@ -130,8 +130,6 @@ pentagon_reset(void)
 {
   int error;
 
-  beta_reset();
-
   error = machine_load_rom( 0, 0, settings_current.rom_pentagon_0,
                             settings_default.rom_pentagon_0, 0x4000 );
   if( error ) return error;
@@ -147,6 +145,8 @@ pentagon_reset(void)
 
   error = spec128_common_reset( 0 );
   if( error ) return error;
+
+  beta_reset();
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;

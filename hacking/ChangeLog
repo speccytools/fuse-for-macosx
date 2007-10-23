@@ -2182,3 +2182,6 @@
 20071022 disk/{beta.c,plusd.c,wd_fdc.c,wd_fdc.h}: rename cmdint to intrq
 	 (Stuart).
 20071023 event.c: handle EVENT_TYPE_WD_FDC_TIMEOUT in event_name() (Stuart).
+20071023 machines/{pentagon.c,scorpion.c}: don't do beta_reset until we've
+         initialised the 128 memory system as beta_reset calls
+         machine_current->memory_map() (Fred).
