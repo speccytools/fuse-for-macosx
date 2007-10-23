@@ -35,8 +35,8 @@
 #include "crc.h"
 #include "disk.h"
 
-/* The ordering of these strings must match the order of the
- * the disk_error_t enumeration in disk.h */
+/* The ordering of these strings must match the order of the 
+ * disk_error_t enumeration in disk.h */
 
 static const char *disk_error[] = {
   "OK",				/* DISK_OK */
@@ -158,7 +158,7 @@ id_seek( disk_t *d, int sector )
   return 0;
 }
 
-/* seclen 00 -> 128, 01 -> 256 ... byte*/
+/* seclen 00 -> 128, 01 -> 256 ... byte */
 static int
 data_write_file( disk_t *d, FILE *file, int seclen )
 {
@@ -241,7 +241,8 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
       *mfm = d->track[ d->i ] == 0x4e ? 1 : 0;	/* not so robust */
     if( !datamark_read( d, &del ) )
       r |= DISK_CORRUPT_SECTOR;
-    if( /* h != head ||*/ t != track /* || s != *sectors */ )
+    /* h != head? s != sectors? */
+    if( t != track )
       r |= DISK_ID_NOTMATCH;
     if( s < *sector_base )
       *sector_base = s;
@@ -993,8 +994,9 @@ open_td0( FILE *file, disk_t *d, int preindex )
   int data_offset, track_offset, sector_offset;
   unsigned char *buff;
 
-  if( head[0] == 't' )		/* signature "td" -> advanced compression  */
-    return d->status = DISK_IMPL;	/* Advenced compression not implemented  */
+  if( head[0] == 't' )		/* signature "td" -> advanced compression */
+    return d->status = DISK_IMPL;	/* not implemented */
+
   buff = NULL;			/* we may use this buffer */
   mfm = head[5] & 0x80 ? 0 : 1;	/* td0notes say: may older teledisk
 					   indicate the SD on high bit of
@@ -1571,7 +1573,7 @@ write_scl( FILE * file, disk_t * d )
 {
   int i, j, k, l, t, s, sbase, sectors, seclen, mfm, del;
   int entries;
-  libspectrum_dword sum = 597;		/* sum of "SINCLAIR"*/
+  libspectrum_dword sum = 597;		/* sum of "SINCLAIR" */
 
   if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm ) ||
       sbase != 1 || seclen != 1 || sectors != 16 )

@@ -2186,3 +2186,4 @@
          initialised the 128 memory system as beta_reset calls
          machine_current->memory_map() (Fred).
 20071023 disk/disk.c: fix Gap IV in open_td0() (thanks, Gergely) (Stuart).
+20071023 disk/disk.c: tidyup comments (Stuart).
