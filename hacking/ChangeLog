@@ -1967,8 +1967,8 @@
 	 compat/morphos/{Makefile.am,osname.c},compat/unix/{Makefile.am,
 	 osname.c},compat/win32/{Makefile.am,osname.c}: move OS name function
 	 selection into configure.in.
-20070804 compat.h,settings.pl,trdos.c,utils.c,compat/amiga/{Makefile.am,paths.c},
-	 compat/morphos/Makefile.am,compat/unix/{Makefile.am,paths.c},
+20070804 compat.h,settings.pl,trdos.c,utils.c,compat/amiga/{Makefile.am,
+	 paths.c},compat/morphos/Makefile.am,compat/unix/{Makefile.am,paths.c},
 	 compat/win32/{Makefile.am,paths.c}: move pathname functions into
 	 compatability directories.
 20070804 configure.in: remove debug mode as its not used anywhere.
@@ -2009,7 +2009,7 @@
 20070817 timer/unix.c: ensure we have the prototype for strerror() (Fred).
 20070817 Makefile.am,compat/unix/{osname.c,paths.c},debugger/{breakpoint.c,
 	 command.c,commandy.y,debugger.c,disassemble.c,expression.c},
-	 disk/{plusd.c,plusd.h,wd1770.c,wd1770.h},hacking/ChangeLog,keysyms.pl,
+	 disk/{plusd.c,plusd.h,wd1770.c,wd1770.h},keysyms.pl,
 	 machines/{machines.h,pentagon.c,scorpion.c,spec128.c,spec128.h,
 	 spec16.c,spec48.c,spec48.h,spec_se.c,specplus2.c,specplus2a.c,
 	 specplus3.c,specplus3.h,specplus3e.c,tc2048.c,tc2068.c,tc2068.h,
