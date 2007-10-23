@@ -1174,9 +1174,9 @@ open_td0( FILE *file, disk_t *d, int preindex )
 	break;
       }
     }
+    gap4_add( d, gap );
   }
 
-  gap4_add( d, gap );
   if( buff )
     free( buff );
   return d->status = DISK_OK;
