@@ -580,10 +580,12 @@ wd_fdc_type_iii( wd_fdc *f )
     wd_fdc_set_datarq( f );
   }
   event_remove_type( EVENT_TYPE_WD_FDC_TIMEOUT );
-  if( f->state != WD_FDC_STATE_READID )
-    event_add_with_data( tstates + 2 * 200 *		/* 2 revolutions */
-			 machine_current->timings.processor_speed / 1000,
-			 EVENT_TYPE_WD_FDC_TIMEOUT, f );
+  event_add_with_data( tstates +
+		       ( f->state == WD_FDC_STATE_READID ?
+			 50 :			/* 1/4 revolution */
+			 2 * 200		/* 2 revolutions */
+		       ) * machine_current->timings.processor_speed / 1000,
+		       EVENT_TYPE_WD_FDC_TIMEOUT, f );
 }
 
 int
@@ -596,7 +598,8 @@ wd_fdc_event( libspectrum_dword last_tstates, event_type event,
     if( f->state == WD_FDC_STATE_READ       ||
 	f->state == WD_FDC_STATE_WRITE      ||
 	f->state == WD_FDC_STATE_READTRACK  ||
-	f->state == WD_FDC_STATE_WRITETRACK   ) {
+	f->state == WD_FDC_STATE_WRITETRACK ||
+	f->state == WD_FDC_STATE_READID        ) {
       f->state = WD_FDC_STATE_NONE;
       f->status_register |= WD_FDC_SR_LOST;
       f->status_register &= ~WD_FDC_SR_BUSY;
@@ -848,6 +851,7 @@ wd_fdc_dr_read( wd_fdc *f )
       f->status_register &= ~WD_FDC_SR_BUSY;
       f->status_type = WD_FDC_STATUS_TYPE2;
       f->state = WD_FDC_STATE_NONE;
+      event_remove_type( EVENT_TYPE_WD_FDC_TIMEOUT );	/* clear the timeout */
       wd_fdc_set_intrq( f );
       wd_fdc_reset_datarq( f );
       break;

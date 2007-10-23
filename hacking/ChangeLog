@@ -2188,3 +2188,5 @@
 20071023 disk/disk.c: fix Gap IV in open_td0() (thanks, Gergely) (Stuart).
 20071023 disk/disk.c: tidyup comments (Stuart).
 20071023 disk/beta.c: remove redundant step rates (thanks, Gergely) (Stuart).
+20071023 disk/wd_fdc.c: add timeout for Read Address command (part of patch
+	 #1779138) (Gergely Szasz).
