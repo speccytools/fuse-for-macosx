@@ -77,14 +77,21 @@ static void z80_ddfdcbxx( libspectrum_byte opcode3,
 
 #ifdef __GNUC__
 
-#define SETUP_CHECK( label, condition, dest ) \
-  if( condition ) { cgoto[ next ] = &&label; next = dest + 1; }
-#define CHECK( label, condition, dest ) goto *cgoto[ dest ]; label:
+#define SETUP_CHECK( label, condition ) \
+  pos_##label,
+#define SETUP_NEXT( label )
+
+enum {
+#include "z80_checks.h"
+  numchecks
+};
+
+#define CHECK( label, condition ) goto *cgoto[ pos_##label ]; label:
 #define END_CHECK
 
 #else				/* #ifdef __GNUC__ */
 
-#define CHECK( label, condition, dest ) if( condition ) {
+#define CHECK( label, condition ) if( condition ) {
 #define END_CHECK }
 
 #endif				/* #ifdef __GNUC__ */
@@ -100,38 +107,33 @@ z80_do_opcodes( void )
 
 #ifdef __GNUC__
 
-  void *cgoto[9]; size_t next = 0;
+#undef SETUP_CHECK
+#define SETUP_CHECK( label, condition ) \
+  if( condition ) { cgoto[ next ] = &&label; next = pos_##label + 1; } \
+  check++;
 
-  SETUP_CHECK( profile, profile_active, 0 );
-  SETUP_CHECK( rzx, rzx_playback, 1 );
-  SETUP_CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 );
-  SETUP_CHECK( beta, beta_available, 3 );
-  SETUP_CHECK( plusd, plusd_available, 4 );
-  SETUP_CHECK( if1p, if1_available, 5 );
-  SETUP_CHECK( divide_early, settings_current.divide_enabled, 6 );
-  if( next != 7 ) { cgoto[ next ] = &&opcode_delay; }
+#undef SETUP_NEXT
+#define SETUP_NEXT( label ) \
+  if( next != check ) { cgoto[ next ] = &&label; } \
+  next = check;
 
-  next = 7;
-  SETUP_CHECK( evenm1, even_m1, 7 );
-  if( next != 8 ) { cgoto[ next ] = &&run_opcode; }
-  next = 8;
-  SETUP_CHECK( if1u, if1_available, 8 );
-  SETUP_CHECK( divide_late, settings_current.divide_enabled, 9 );
-  if( next != 10 ) { cgoto[ next ] = &&end_opcode; }
+  void *cgoto[ numchecks - 1 ]; size_t next = 0; size_t check = 0;
+
+#include "z80_checks.h"
 
 #endif				/* #ifdef __GNUC__ */
 
   while( tstates < event_next_event ) {
 
     /* Profiler */
-    CHECK( profile, profile_active, 0 )
+    CHECK( profile, profile_active )
 
     profile_map( PC );
 
     END_CHECK
 
     /* If we're due an end of frame from RZX playback, generate one */
-    CHECK( rzx, rzx_playback, 1 )
+    CHECK( rzx, rzx_playback )
 
     if( R + rzx_instructions_offset >= rzx_instruction_count ) {
       event_add( tstates, EVENT_TYPE_FRAME );
@@ -142,14 +144,14 @@ z80_do_opcodes( void )
     END_CHECK
 
     /* Check if the debugger should become active at this point */
-    CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE, 2 )
+    CHECK( debugger, debugger_mode != DEBUGGER_MODE_INACTIVE )
 
     if( debugger_check( DEBUGGER_BREAKPOINT_TYPE_EXECUTE, PC ) )
       debugger_trap();
 
     END_CHECK
 
-    CHECK( beta, beta_available, 3 )
+    CHECK( beta, beta_available )
 
     if( beta_active ) {
       if( machine_current->ram.current_rom &&
@@ -163,7 +165,7 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( plusd, plusd_available, 4 )
+    CHECK( plusd, plusd_available )
 
     if( PC == 0x0008 || PC == 0x0066 || PC == 0x003a ) {
       plusd_page();
@@ -171,7 +173,7 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( if1p, if1_available, 5 )
+    CHECK( if1p, if1_available )
 
     if( PC == 0x0008 || PC == 0x1708 ) {
       if1_page();
@@ -179,7 +181,7 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( divide_early, settings_current.divide_enabled, 6 )
+    CHECK( divide_early, settings_current.divide_enabled )
     
     if( ( PC & 0xff00 ) == 0x3d00 ) {
       divide_set_automap( 1 );
@@ -192,7 +194,7 @@ z80_do_opcodes( void )
     contend_read( PC, 4 );
 
     /* Check to see if M1 cycles happen on even tstates */
-    CHECK( evenm1, even_m1, 7 )
+    CHECK( evenm1, even_m1 )
 
     if( tstates & 1 ) tstates++;
 
@@ -203,7 +205,7 @@ z80_do_opcodes( void )
        triggering read breakpoints */
     opcode = readbyte_internal( PC );
 
-    CHECK( if1u, if1_available, 8 )
+    CHECK( if1u, if1_available )
 
     if( PC == 0x0700 ) {
       if1_unpage();
@@ -211,7 +213,7 @@ z80_do_opcodes( void )
 
     END_CHECK
 
-    CHECK( divide_late, settings_current.divide_enabled, 9 )
+    CHECK( divide_late, settings_current.divide_enabled )
 
     if( ( PC & 0xfff8 ) == 0x1ff8 ) {
       divide_set_automap( 0 );

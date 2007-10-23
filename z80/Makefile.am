@@ -49,7 +49,8 @@ z80_ed.c: $(srcdir)/z80.pl $(srcdir)/opcodes_ed.dat
 	@PERL@ -I$(srcdir)/../perl $(srcdir)/z80.pl $(srcdir)/opcodes_ed.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = z80.h \
-		 z80_macros.h 
+		 z80_checks.h \
+		 z80_macros.h
 
 EXTRA_DIST = opcodes_base.c \
 	     opcodes_base.dat \
