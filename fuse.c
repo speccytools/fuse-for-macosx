@@ -196,7 +196,7 @@ static int fuse_init(int argc, char **argv)
 
   start_scaler = strdup( settings_current.start_scaler_mode );
   if( !start_scaler ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s: %d", __FILE__, __LINE__ );
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 

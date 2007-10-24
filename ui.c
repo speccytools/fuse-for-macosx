@@ -423,7 +423,7 @@ ui_menu_activate( ui_menu_item item, int active )
 
   }
 
-  ui_error( UI_ERROR_ERROR, "ui_menu_activate: unknown item %d\n", item );
+  ui_error( UI_ERROR_ERROR, "ui_menu_activate: unknown item %d", item );
   return 1;
 }
 

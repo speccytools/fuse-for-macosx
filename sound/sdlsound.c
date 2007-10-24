@@ -177,7 +177,7 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
     len -= i;
   }
   if( i < 0 ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't write sound fifo: %s\n",
+    ui_error( UI_ERROR_ERROR, "Couldn't write sound fifo: %s",
               strerror( i ) );
   }
 

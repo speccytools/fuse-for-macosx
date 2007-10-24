@@ -841,7 +841,7 @@ if1_mdr_insert( const char *filename, int drive )
   if( mdr->filename ) {
     strcpy( mdr->filename, filename );
   } else {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d\n", __FILE__, __LINE__ );
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
   }
   
   update_menu( UMENU_MDRV1 + drive );

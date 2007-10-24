@@ -174,7 +174,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   
   if( driver_info->type == AO_TYPE_FILE &&
       format.bits != 0 ) {	/* OK. We not want to trunc the file :-) */
-    ui_error( UI_ERROR_WARNING, "ao: must truncate audio file '%s'\n",
+    ui_error( UI_ERROR_WARNING, "ao: must truncate audio file '%s'",
 	      filename );
   }
 

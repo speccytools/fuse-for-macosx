@@ -371,7 +371,7 @@ utils_read_fd( int fd, const char *filename, utils_file *file )
 
   file->buffer = malloc( file->length );
   if( !file->buffer ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d\n", __FILE__, __LINE__ );
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
   }
 

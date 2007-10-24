@@ -438,7 +438,7 @@ int rzx_store_byte( libspectrum_byte value )
         rzx_in_bytes, new_allocated * sizeof(libspectrum_byte)
       );
     if( ptr == NULL ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory in rzx_store_byte\n" );
+      ui_error( UI_ERROR_ERROR, "Out of memory in rzx_store_byte" );
       return 1;
     }
 

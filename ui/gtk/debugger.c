@@ -216,7 +216,7 @@ get_pane_menu_item( debugger_pane pane )
   }
 
   if( !path ) {
-    ui_error( UI_ERROR_ERROR, "unknown debugger pane %u\n", pane );
+    ui_error( UI_ERROR_ERROR, "unknown debugger pane %u", pane );
     return NULL;
   }
 
@@ -244,7 +244,7 @@ get_pane( debugger_pane pane )
   case DEBUGGER_PANE_END: break;
   }
 
-  ui_error( UI_ERROR_ERROR, "unknown debugger pane %u\n", pane );
+  ui_error( UI_ERROR_ERROR, "unknown debugger pane %u", pane );
   return NULL;
 }
   
