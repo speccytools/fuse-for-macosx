@@ -563,6 +563,8 @@ trap_check_rom( void )
 	    machine_current->ram.current_rom == 3 );
 
   case LIBSPECTRUM_MACHINE_PENT:
+  case LIBSPECTRUM_MACHINE_PENT512:
+  case LIBSPECTRUM_MACHINE_PENT1024:
   case LIBSPECTRUM_MACHINE_SCORP:
     /* OK if we're in ROM 1 and the Beta disk interface is not active */
     return( machine_current->ram.current_rom == 1 && !beta_active );

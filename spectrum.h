@@ -36,8 +36,8 @@ extern libspectrum_dword tstates;
 
 /* Things relating to memory */
 
-/* 272 Kb of RAM */
-#define SPECTRUM_RAM_PAGES 17
+/* For the Pentagon 1024 we need 1040 KB of RAM */
+#define SPECTRUM_RAM_PAGES 65
 
 extern libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 

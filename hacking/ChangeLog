@@ -2195,3 +2195,7 @@
 20071023 ChangeLog: add more entries (Stuart).
 20071024 fuse.c,if1.c,rzx.c,sound/{aosound.c,sdlsound.c},ui/gtk/debugger.c,
          ui.c,utils.c: tidy up error messages (Stuart).
+20071024 ChangeLog,machine.c,machines/{Makefile.am,machines.h,pentagon.c,
+	 pentagon1024.c},menu.c,roms/Makefile.am,settings.dat,settings.pl,
+	 spectrum.h,tape.c: add Pentagon 512 and Pentagon 1024 emulation
+	 (part of patch #1774492) (Q-Master).

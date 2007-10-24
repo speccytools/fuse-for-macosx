@@ -500,19 +500,20 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 17: return &( settings->rom_pentagon_0 );
   case 18: return &( settings->rom_pentagon_1 );
   case 19: return &( settings->rom_pentagon_2 );
-  case 20: return &( settings->rom_scorpion_0 );
-  case 21: return &( settings->rom_scorpion_1 );
-  case 22: return &( settings->rom_scorpion_2 );
-  case 23: return &( settings->rom_scorpion_3 );
-  case 24: return &( settings->rom_plus3e_0 );
-  case 25: return &( settings->rom_plus3e_1 );
-  case 26: return &( settings->rom_plus3e_2 );
-  case 27: return &( settings->rom_plus3e_3 );
-  case 28: return &( settings->rom_spec_se_0 );
-  case 29: return &( settings->rom_spec_se_1 );
-  case 30: return &( settings->rom_interface_i );
-  case 31: return &( settings->rom_ts2068_0 );
-  case 32: return &( settings->rom_ts2068_1 );
+  case 20: return &( settings->rom_pentagon_3 );
+  case 21: return &( settings->rom_scorpion_0 );
+  case 22: return &( settings->rom_scorpion_1 );
+  case 23: return &( settings->rom_scorpion_2 );
+  case 24: return &( settings->rom_scorpion_3 );
+  case 25: return &( settings->rom_plus3e_0 );
+  case 26: return &( settings->rom_plus3e_1 );
+  case 27: return &( settings->rom_plus3e_2 );
+  case 28: return &( settings->rom_plus3e_3 );
+  case 29: return &( settings->rom_spec_se_0 );
+  case 30: return &( settings->rom_spec_se_1 );
+  case 31: return &( settings->rom_interface_i );
+  case 32: return &( settings->rom_ts2068_0 );
+  case 33: return &( settings->rom_ts2068_1 );
   default: return NULL;
   }
 }

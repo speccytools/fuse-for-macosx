@@ -6,6 +6,7 @@
 	  * Add +D disk interface support (Stuart Brady).
 	  * New floppy disk controller emulation for +D and Beta disk
 	    interface emulation (Gergely Szasz and Stuart Brady).
+	  * Add Pentagon 512 and Pentagon 1024 emulation (Q-Master).
 	  * Add Hi-Fi beeper for improved reproduction of multi-channel beeper
 	    tunes (e.g. Fairlight 2, Wham - the Music Box) (Fredrick Meunier).
 	  * Add support for saving tape images without using tape traps

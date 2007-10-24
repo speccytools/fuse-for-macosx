@@ -30,6 +30,7 @@ INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 noinst_LIBRARIES = libmachines.a
 
 libmachines_a_SOURCES = pentagon.c \
+			pentagon1024.c \
 			scorpion.c \
 			spec128.c \
 			spec16.c \

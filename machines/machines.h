@@ -31,6 +31,8 @@
 #include "machine.h"
 
 int pentagon_init( fuse_machine_info *machine );
+int pentagon512_init( fuse_machine_info *machine );
+int pentagon1024_init( fuse_machine_info *machine );
 int pentagon_port_contended( libspectrum_word port );
 
 int spec16_init( fuse_machine_info *machine );
