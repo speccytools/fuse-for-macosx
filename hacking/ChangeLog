@@ -2200,3 +2200,5 @@
 	 spectrum.h,tape.c: add Pentagon 512 and Pentagon 1024 emulation
 	 (part of patch #1774492) (Q-Master).
 20071024 machines/pentagon1024.c: move beta_reset() (Stuart).
+20071024 widget/filesel.c: move INPUT_KEY_Return handler into a function
+	 to simplify drive selection on Win32 (Stuart).

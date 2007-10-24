@@ -94,6 +94,7 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 				       const char *dir );
 static int widget_print_filename( struct widget_dirent *filename, int position,
 				  int inverted );
+static int widget_filesel_chdir( void );
 
 /* The filename to return */
 char* widget_filesel_name;
@@ -552,6 +553,59 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 }
 #endif /* ifndef AMIGA */
 
+static int
+widget_filesel_chdir( void )
+{
+  char *fn, *ptr;
+
+  /* Get the new directory name */
+  fn = widget_getcwd();
+  if( fn == NULL ) {
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
+    return 1;
+  }
+  ptr = fn;
+  fn = realloc( fn,
+     ( strlen( fn ) + 1 + strlen( widget_filenames[ current_file ]->name ) +
+       1 ) * sizeof(char)
+  );
+  if( fn == NULL ) {
+    free( ptr );
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
+    return 1;
+  }
+  strcat( fn, FUSE_DIR_SEP_STR );
+  strcat( fn, widget_filenames[ current_file ]->name );
+
+/*
+in Win32 errno resulting from chdir on file is EINVAL which may mean many things
+this will not be fixed in mingw - must use native function instead
+http://thread.gmane.org/gmane.comp.gnu.mingw.user/9197
+*/ 
+
+  if( chdir( fn ) == -1 ) {
+#ifndef WIN32
+    if( errno == ENOTDIR ) {
+#else   /* #ifndef WIN32 */
+    if( GetFileAttributes( fn ) != FILE_ATTRIBUTE_DIRECTORY ) {
+#endif  /* #ifndef WIN32 */
+      widget_filesel_name = fn;
+      if( exit_all_widgets ) {
+	widget_end_all( WIDGET_FINISHED_OK );
+      } else {
+	widget_end_widget( WIDGET_FINISHED_OK );
+      }
+    }
+  } else {
+    widget_scan( fn ); free( fn );
+    new_current_file = 0;
+    /* Force a redisplay of all filenames */
+    current_file = 1; top_left_file = 1;
+  }
+
+  return 0;
+}
+
 void
 widget_filesel_keyhandler( input_key key )
 {
@@ -562,7 +616,7 @@ widget_filesel_keyhandler( input_key key )
     widget_end_widget( err );
   }
 #else  /* ifndef AMIGA */
-  char *fn, *ptr;
+  char *fn;
 
   new_current_file = current_file;
 
@@ -663,49 +717,8 @@ widget_filesel_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Return:
-    /* Get the new directory name */
-    fn = widget_getcwd();
-    if( fn == NULL ) {
-      widget_end_widget( WIDGET_FINISHED_CANCEL );
+    if( widget_filesel_chdir() ) {
       return;
-    }
-    ptr = fn;
-    fn = realloc( fn,
-       ( strlen(fn) + 1 + strlen( widget_filenames[ current_file ]->name ) +
-	 1 ) * sizeof(char)
-    );
-    if( fn == NULL ) {
-      free( ptr );
-      widget_end_widget( WIDGET_FINISHED_CANCEL );
-      return;
-    }
-    strcat( fn, FUSE_DIR_SEP_STR );
-    strcat( fn, widget_filenames[ current_file ]->name );
-			
-/*
-  in Win32 errno resulting from chdir on file is EINVAL which may mean many things
-  this will not be fixed in mingw - must use native function instead
-  http://thread.gmane.org/gmane.comp.gnu.mingw.user/9197
-*/ 
-
-    if(chdir(fn)==-1) {
-#ifndef WIN32
-      if(errno==ENOTDIR) {
-#else   /* #ifndef WIN32 */
-      if( GetFileAttributes( fn ) != FILE_ATTRIBUTE_DIRECTORY	) {
-#endif  /* #ifndef WIN32 */
-	widget_filesel_name = fn;
-	if( exit_all_widgets ) {
-	  widget_end_all( WIDGET_FINISHED_OK );
-	} else {
-	  widget_end_widget( WIDGET_FINISHED_OK );
-	}
-      }
-    } else {
-      widget_scan( fn ); free( fn );
-      new_current_file = 0;
-      /* Force a redisplay of all filenames */
-      current_file = 1; top_left_file = 1;
     }
     break;
 
