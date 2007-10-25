@@ -102,8 +102,8 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
 static int widget_print_filename( struct widget_dirent *filename, int position,
 				  int inverted );
 #ifdef WIN32
-static void widget_filesel_chdrv( void )
-static void widget_filesel_drvlist( void )
+static void widget_filesel_chdrv( void );
+static void widget_filesel_drvlist( void );
 #endif				/* #ifdef WIN32 */
 static int widget_filesel_chdir( void );
 
@@ -658,8 +658,14 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
 static void
 widget_filesel_chdrv( void )
 {
+  char *fn;
+
+  if( !SetCurrentDirectory( widget_filenames[ current_file ]->name ) ) {
+    ui_error( UI_ERROR_ERROR, "Could not change directory" );
+    return;
+  }
+
   is_drivesel = 0;
-  chdir( widget_filenames[ current_file ]->name );
   fn = widget_getcwd();
   widget_scan( fn ); free( fn );
   new_current_file = 0;

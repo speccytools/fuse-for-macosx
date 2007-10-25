@@ -2203,3 +2203,5 @@
 20071024 widget/filesel.c: move INPUT_KEY_Return handler into a function
 	 to simplify drive selection on Win32 (Stuart).
 20071024 widget/filesel.c: add drive selection for Win32 (Stuart).
+20071024 widget/filesel.c: fix compilation and improve error handling for
+	 drive selection (Stuart).
