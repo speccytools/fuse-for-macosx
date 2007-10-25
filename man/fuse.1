@@ -358,6 +358,8 @@ a 48K Spectrum. The available options are
 .IR 2068 ,
 .IR ts2068 ,
 .IR pentagon ,
+.IR pentagon512 ,
+.IR pentagon1024 ,
 and
 .IR scorpion .
 .RE
@@ -471,6 +473,8 @@ Specify an RZX file to begin recording to.
 .br
 .I "\-\-rom\-pentagon\-2 file"
 .br
+.I "\-\-rom\-pentagon\-3 file"
+.br
 .I "\-\-rom\-scorpion\-0 file"
 .br
 .I "\-\-rom\-scorpion\-1 file"
@@ -506,8 +510,8 @@ the two ROMs for the TC2068
 .RI ( tc2068\-0.rom " and " tc2068\-1.rom ),
 the two ROMs for the TS2068
 .RI ( tc2068\-0.rom " and " tc2068\-1.rom ),
-the two main ROMs and the TR-DOS ROM for the Pentagon 128
-.RI ( 128p\-0.rom ", " 128p\-1.rom " and " trdos.rom ),
+the two main ROMs, the TR-DOS ROM and a reset service ROM for the Pentagon
+.RI ( 128p\-0.rom ", " 128p\-1.rom ", " trdos.rom " and " gluck.rom ),
 the four ROMs for the Scorpion 256
 .RI ( 256s\-0.rom ", " 256s\-1.rom ", " 256s\-2.rom " and " 256s\-3.rom ),
 the two ROMs for the Spectrum SE
@@ -1872,9 +1876,13 @@ The variant of the Spectrum released by Timex in North America.
 .PP
 .I "Pentagon 128K"
 .br
+.I "Pentagon 512K"
+.br
+.I "Pentagon 1024K"
+.br
 .I "Scorpion ZS 256"
 .RS
-Two Russian clones of the Spectrum. Some details can be found
+Russian clones of the Spectrum. Some details can be found
 at
 .IR "http://www.worldofspectrum.org/rusfaq/index.html" ,
 but possibly the most important thing to note about both these
