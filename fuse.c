@@ -145,6 +145,10 @@ int fuse_main(int argc, char **argv)
 int main(int argc, char **argv)
 #endif
 {
+#ifdef WIN32
+  SetErrorMode( SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX );
+#endif
+
   if(fuse_init(argc,argv)) {
     fprintf(stderr,"%s: error initialising -- giving up!\n", fuse_progname);
     return 1;

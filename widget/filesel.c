@@ -660,7 +660,7 @@ widget_filesel_chdrv( void )
 {
   char *fn;
 
-  if( !SetCurrentDirectory( widget_filenames[ current_file ]->name ) ) {
+  if( chdir( widget_filenames[ current_file ]->name ) ) {
     ui_error( UI_ERROR_ERROR, "Could not change directory" );
     return;
   }
