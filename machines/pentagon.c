@@ -163,13 +163,8 @@ pentagon_reset(void)
                                  settings_default.rom_pentagon_2, 0x4000 );
   if( error ) return error;
 
-  beta_available = 1;
-  beta_active = 1;
-
   error = spec128_common_reset( 0 );
   if( error ) return error;
-
-  beta_reset();
 
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
@@ -184,6 +179,11 @@ pentagon_reset(void)
     for( i = 16; i < 64; i++ )
       memory_map_ram[i].writable = 1;
   }
+
+  beta_reset();
+
+  beta_available = 1;
+  beta_active = 1;
 
   return 0;
 }

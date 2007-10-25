@@ -2205,3 +2205,5 @@
 20071024 widget/filesel.c: add drive selection for Win32 (Stuart).
 20071024 widget/filesel.c: fix compilation and improve error handling for
 	 drive selection (Stuart).
+20071025 machines/{pentagon.c,pentagon1024.c}: fix activation of Beta disk
+	 interface on reset (Stuart).
