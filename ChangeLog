@@ -14,8 +14,8 @@
 	  * Add support for loading from WAV tape images (Fredrick Meunier).
 	  * Add support for saving CSW tape images and TZX direct recording
 	    blocks (Fredrick Meunier).
-	  * Allow distinction between "soft" resets (activing the reset line on
-	    the Z80) and "hard" resets (pulling the power) (Philip Kendall).
+	  * Allow distinction between "soft" resets (activating the reset line
+	    on the Z80) and "hard" resets (pulling the power) (Philip Kendall).
 	  * New ALSA sound driver (Gergely Szasz).
 	  * AmigaOS support (Chris Young).
 	  * MorphOS support (Q-Master).
@@ -31,7 +31,7 @@
 
 	* Miscellaneous:
 	  * Removed the GTK 1.x UI (please note that GTK 2.x will remain
-	    supported for the forseeable future) (Philip Kendall).
+	    supported for the foreseeable future) (Philip Kendall).
 	  * Enable Fuse to build in directories other than the source
 	    directory itself (Philip Kendall).
 	  * Updated X11 UI (Gergely Szasz).
@@ -501,7 +501,7 @@
 
 	* Changable emulation speed (Philip Kendall).
 
-	* Change to lib765 0.3.0 for Mac OS X compatability
+	* Change to lib765 0.3.0 for Mac OS X compatibility
 	  (Frederick Meunier).
 
 	* Reset the Timex's SCLD when loading snapshot (Philip Kendall,
@@ -617,8 +617,8 @@
 	* Add contention of memory and io ports. Should make multicolour
 	  effects better (Philip Kendall).
 
-	* Emulation of reading from unattached ports (eg #FF). Makes some
-	  more games (eg Sidewize) work (Philip Kendall).
+	* Emulation of reading from unattached ports (e.g. #FF). Makes some
+	  more games (e.g. Sidewize) work (Philip Kendall).
 
 	* Add a keyboard picture -- see the Help menu (Philip Kendall,
 	  Russell Marks).
@@ -678,12 +678,12 @@
 	* Various improvements to the widget dialog boxes: cursor keys,
 	  Page Up, Page Down, Home and End all do what you would expect,
 	  remove the use of `scandir' function to improve inter-Unix
-	  compatability, append `/' to directories to make them more
+	  compatibility, append `/' to directories to make them more
 	  obvious, stop the hangs if you tried to start a widget whilst
 	  one was active. (Philip Kendall, Russell Marks).
 
 	* .z80 snapshots: deal with the case of the end marker being
-	  preceeded by 0x00 or 0x00 0xed (Philip Kendall).
+	  preceded by 0x00 or 0x00 0xed (Philip Kendall).
 
 	* Lots of sound improvements (Russell Marks).
 

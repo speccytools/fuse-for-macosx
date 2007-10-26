@@ -607,8 +607,8 @@ fi
 AC_MSG_RESULT($missing_routines)
 AC_SUBST(COMPAT_LIBADD)
 
-dnl Work out which compatability routines to use
-AC_MSG_CHECKING(which compatability routines to use)
+dnl Work out which compatibility routines to use
+AC_MSG_CHECKING(which compatibility routines to use)
 case "$target_os" in
   amigaos)
     COMPAT_OSNAME='amiga'

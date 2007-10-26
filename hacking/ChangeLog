@@ -2210,3 +2210,5 @@
 20071025 man/fuse.1: updates for Pentagon 512/1024 emulation (Stuart).
 20071025 fuse.c,widget/filesel.c: set error handling mode on Win32 (thanks,
 	 Jon Needle), and use chdir() for drive selection on Win32 (Stuart).
+20071026 ChangeLog,compat/{amiga/paths.c,unix/paths.c,win32/paths.c},
+         configure.in: fix typos (Stuart).

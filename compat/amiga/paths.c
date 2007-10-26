@@ -1,4 +1,4 @@
-/* paths.c: Path-related compatability routines
+/* paths.c: Path-related compatibility routines
    Copyright (c) 1999-2007 Philip Kendall
 
    $Id$
