@@ -2212,3 +2212,5 @@
 	 Jon Needle), and use chdir() for drive selection on Win32 (Stuart).
 20071026 ChangeLog,compat/{amiga/paths.c,unix/paths.c,win32/paths.c},
          configure.in: fix typos (Stuart).
+20071027 menu.c,menu_data.dat,settings.pl: allow the +D ROM to be customised
+         (Fred).
