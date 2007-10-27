@@ -204,14 +204,17 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case  4: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS2,   4, 2 ); return;
   case  5: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS2A,  6, 4 ); return;
   case  6: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3,  10, 4 ); return;
-  case  7: menu_select_roms( LIBSPECTRUM_MACHINE_TC2048, 14, 1 ); return;
-  case  8: menu_select_roms( LIBSPECTRUM_MACHINE_TC2068, 15, 2 ); return;
-  case  9: menu_select_roms( LIBSPECTRUM_MACHINE_PENT,   17, 4 ); return;
-  case 10: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,  21, 4 ); return;
-  case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3E, 25, 4 ); return;
-  case 12: menu_select_roms( LIBSPECTRUM_MACHINE_SE,     29, 2 ); return;
-  case 13: menu_select_roms( LIBSPECTRUM_MACHINE_48,     31, 1 ); return;
-  case 14: menu_select_roms( LIBSPECTRUM_MACHINE_TS2068, 32, 2 ); return;
+  case  7: menu_select_roms( LIBSPECTRUM_MACHINE_PLUS3E, 14, 4 ); return;
+  case  8: menu_select_roms( LIBSPECTRUM_MACHINE_TC2048, 18, 1 ); return;
+  case  9: menu_select_roms( LIBSPECTRUM_MACHINE_TC2068, 19, 2 ); return;
+  case 10: menu_select_roms( LIBSPECTRUM_MACHINE_TS2068, 21, 2 ); return;
+  case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PENT,   23, 4 ); return;
+  case 12: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,  27, 4 ); return;
+  case 13: menu_select_roms( LIBSPECTRUM_MACHINE_SE,     31, 2 ); return;
+
+  /* Interface I */
+  case 14: menu_select_roms( LIBSPECTRUM_MACHINE_48,     33, 1 ); return;
+  /* +D: */
   case 15: menu_select_roms( LIBSPECTRUM_MACHINE_48,     34, 1 ); return;
 
   }

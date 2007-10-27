@@ -2215,3 +2215,4 @@
 20071027 menu.c,menu_data.dat,settings.pl: allow the +D ROM to be customised
          (Fred).
 20071027 disk/disk.c: add #include <string.h> for various prototypes (Fred).
+20071027 menu.c,menu_data.dat,settings.pl: rearrange ROMs (Stuart).
