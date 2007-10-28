@@ -2219,3 +2219,5 @@
 20071028 keyboard.c,ula.c: fix up ULA handling for 128K / +3 machines. Also
 	 move a variable from keyboard.c to ula.c where it makes a lot more
 	 sense for it to be. (Fixes bug #1821604).
+20071028 z80/z80.pl: LD[DI]R were applying contention when they shouldn't on
+	 the +3 (fixes bug #1821389).
