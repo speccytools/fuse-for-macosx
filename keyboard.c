@@ -35,13 +35,8 @@
 #include "keyboard.h"
 #include "scld.h"
 
-/* What to return if no keys are pressed; depends on the last byte
-   output to the ULA; see CSS FAQ | Technical Information | Port #FE
-   for full details */
-libspectrum_byte keyboard_default_value;
-
 /* Bit masks for each of the eight keyboard half-rows; `AND' the selected
-   ones of these with `keyboard_default_value' to get the value to return
+   ones of these to get the value to return
 */
 libspectrum_byte keyboard_return_values[8];
 
@@ -273,7 +268,6 @@ void fuse_keyboard_init(void)
   keysyms_map_t *ptr3;
   struct key_text_t *ptr4;
 
-  keyboard_default_value=0xff;
   keyboard_release_all();
 
   keyboard_data = g_hash_table_new( g_int_hash, g_int_equal );
@@ -302,7 +296,7 @@ void fuse_keyboard_init(void)
 libspectrum_byte
 keyboard_read( libspectrum_byte porth )
 {
-  libspectrum_byte data = keyboard_default_value; int i;
+  libspectrum_byte data = 0xff; int i;
 
   for( i=0; i<8; i++,porth>>=1 ) {
     if(! (porth&0x01) ) data &= keyboard_return_values[i];

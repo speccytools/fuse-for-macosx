@@ -2216,3 +2216,6 @@
          (Fred).
 20071027 disk/disk.c: add #include <string.h> for various prototypes (Fred).
 20071027 menu.c,menu_data.dat,settings.pl: rearrange ROMs (Stuart).
+20071028 keyboard.c,ula.c: fix up ULA handling for 128K / +3 machines. Also
+	 move a variable from keyboard.c to ula.c where it makes a lot more
+	 sense for it to be. (Fixes bug #1821604).

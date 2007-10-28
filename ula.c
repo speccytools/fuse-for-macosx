@@ -43,6 +43,11 @@ static libspectrum_byte last_byte;
 libspectrum_byte ula_contention[ 80000 ];
 libspectrum_byte ula_contention_no_mreq[ 80000 ];
 
+/* What to return if no other input pressed; depends on the last byte
+   output to the ULA; see CSS FAQ | Technical Information | Port #FE
+   for full details */
+libspectrum_byte ula_default_value;
+
 static void ula_from_snapshot( libspectrum_snap *snap );
 static void ula_to_snapshot( libspectrum_snap *snap );
 
@@ -60,17 +65,24 @@ ula_init( void )
 {
   module_register( &ula_module_info );
 
+  ula_default_value = 0xff;
+
   return 0;
 }
 
 libspectrum_byte
 ula_read( libspectrum_word port, int *attached )
 {
+  libspectrum_byte r = ula_default_value;
+
   *attached = 1;
 
   loader_detect_loader();
 
-  return ( keyboard_read( port >> 8 ) ^ ( tape_microphone ? 0x40 : 0x00 ) );
+  r &= keyboard_read( port >> 8 );
+  if( tape_microphone ) r ^= 0x40;
+
+  return r;
 }
 
 /* What happens when we write to the ULA? */
@@ -87,16 +99,28 @@ ula_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
      the normal loading noises at the moment */
   if( !tape_playing ) sound_beeper( 1, b & 0x8 );
 
+  /* FIXME: shouldn't really be using the memory capabilities here */
+
   if( machine_current->timex ) {
-    keyboard_default_value = 0x5f;
-    return;
+
+    ula_default_value = 0x5f;
+
+  } else if( machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) {
+
+    ula_default_value = 0xbf;
+
+  } else if( machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY || !settings_current.issue2 ) {
+
+    /* 128K always acts like an Issue 3 */
+    ula_default_value = b & 0x10 ? 0xff : 0xbf;
+
+  } else {
+
+    /* Issue 2 */
+    ula_default_value = b & 0x18 ? 0xff : 0xbf;
+
   }
 
-  if( settings_current.issue2 ) {
-    keyboard_default_value = b & 0x18 ? 0xff : 0xbf;
-  } else {
-    keyboard_default_value = b & 0x10 ? 0xff : 0xbf;
-  }
 }
 
 libspectrum_byte
