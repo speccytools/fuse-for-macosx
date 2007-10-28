@@ -310,9 +310,9 @@ sub ldir_lddr ($) {
 	F = ( F & ( FLAG_C | FLAG_Z | FLAG_S ) ) | ( BC ? FLAG_V : 0 ) |
 	  ( bytetemp & FLAG_3 ) | ( (bytetemp & 0x02) ? FLAG_5 : 0 );
 	if(BC) {
-	  contend_write( DE, 1 ); contend_write( DE, 1 );
-	  contend_write( DE, 1 ); contend_write( DE, 1 );
-	  contend_write( DE, 1 );
+	  contend_write_no_mreq( DE, 1 ); contend_write_no_mreq( DE, 1 );
+	  contend_write_no_mreq( DE, 1 ); contend_write_no_mreq( DE, 1 );
+	  contend_write_no_mreq( DE, 1 );
 	  PC-=2;
 	}
         HL$modifier; DE$modifier;
