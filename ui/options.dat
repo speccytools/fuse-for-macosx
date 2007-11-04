@@ -2,7 +2,7 @@ general
 General Options
 Entry, (E)mulation speed, emulation_speed, INPUT_KEY_e, 5, %
 Entry, F(r)ame rate (1:n), frame_rate, INPUT_KEY_r, 1, frames
-Checkbox, Issue (2) Keyboard, issue2, INPUT_KEY_2
+Checkbox, Issue (2) keyboard, issue2, INPUT_KEY_2
 Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
 Checkbox, (F)astloading, fastload, INPUT_KEY_f
 Checkbox, (D)etect loaders, detect_loader, INPUT_KEY_d
