@@ -154,7 +154,7 @@ ula_to_snapshot( libspectrum_snap *snap )
 void
 ula_contend_port_early( libspectrum_word port )
 {
-  if( ( port & 0xc000 ) == 0x4000 )
+  if( memory_map_read[ port >> 13 ].contended )
     tstates += ula_contention_no_mreq[ tstates ];
    
   tstates++;
@@ -163,13 +163,13 @@ ula_contend_port_early( libspectrum_word port )
 void
 ula_contend_port_late( libspectrum_word port )
 {
-  if( machine_current->ram.port_contended( port ) ) {
+  if( machine_current->ram.port_from_ula( port ) ) {
 
-    tstates += ula_contention[ tstates ]; tstates += 2;
+    tstates += ula_contention_no_mreq[ tstates ]; tstates += 2;
 
   } else {
 
-    if( ( port & 0xc000 ) == 0x4000 ) {
+    if( memory_map_read[ port >> 13 ].contended ) {
       tstates += ula_contention_no_mreq[ tstates ]; tstates++;
       tstates += ula_contention_no_mreq[ tstates ]; tstates++;
       tstates += ula_contention_no_mreq[ tstates ];

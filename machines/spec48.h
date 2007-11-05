@@ -30,7 +30,7 @@
 
 #include "machine.h"
 
-int spec48_port_contended( libspectrum_word port );
+int spec48_port_from_ula( libspectrum_word port );
 libspectrum_byte spec48_contend_delay( libspectrum_dword time );
 
 int spec48_init( fuse_machine_info *machine );

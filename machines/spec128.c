@@ -116,7 +116,7 @@ int spec128_init( fuse_machine_info *machine )
   machine->reset = spec128_reset;
 
   machine->timex = 0;
-  machine->ram.port_contended	     = spec48_port_contended;
+  machine->ram.port_from_ula	     = spec48_port_from_ula;
   machine->ram.contend_delay	     = spec128_contend_delay;
   machine->ram.contend_delay_no_mreq = spec128_contend_delay;
 

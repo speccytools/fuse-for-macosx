@@ -42,14 +42,14 @@ extern libspectrum_dword tstates;
 extern libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 
 typedef int
-  (*spectrum_port_contented_function)( libspectrum_word port );
+  (*spectrum_port_from_ula_function)( libspectrum_word port );
 typedef libspectrum_byte
   (*spectrum_contention_delay_function)( libspectrum_dword time );
 
 typedef struct spectrum_raminfo {
 
   /* Is this port result supplied by the ULA? */
-  spectrum_port_contented_function port_contended;
+  spectrum_port_from_ula_function port_from_ula;
 
   /* What's the actual delay at the current tstate with MREQ active */
   spectrum_contention_delay_function contend_delay;

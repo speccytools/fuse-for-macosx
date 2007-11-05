@@ -2222,3 +2222,9 @@
 20071028 z80/z80.pl: LD[DI]R were applying contention when they shouldn't on
 	 the +3 (fixes bug #1821389).
 20071104 ui/options.dat: fix letter case for "Issue 2 keyboard" option (Stuart).
+20071105 machines/{machines.h,pentagon.c,pentagon1024.c,scorpion.c,spec128.c,
+	 spec16.c,spec48.[ch],spec_se.c,specplus2.c,specplus2a.c,
+	 specplus3.[ch],specplus3e.c,tc2048.c,tc2068.c,ts2068.c},spectrum.h,
+	 ula.c: high ports can be contended on the 128K/+2. Also, rename
+	 a member to more accurately describe what it does. (fixes bug
+	 #1825241).

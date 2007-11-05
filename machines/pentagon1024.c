@@ -110,7 +110,7 @@ pentagon1024_init( fuse_machine_info *machine )
   machine->reset = pentagon1024_reset;
 
   machine->timex = 0;
-  machine->ram.port_contended = pentagon_port_contended;
+  machine->ram.port_from_ula  = pentagon_port_from_ula;
   machine->ram.contend_delay  = pentagon1024_contend_delay;
   machine->ram.contend_delay_no_mreq = pentagon1024_contend_delay;
 

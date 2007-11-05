@@ -92,7 +92,7 @@ pentagon_unattached_port( void )
 }
 
 int
-pentagon_port_contended( libspectrum_word port GCC_UNUSED )
+pentagon_port_from_ula( libspectrum_word port GCC_UNUSED )
 {
   /* No contended ports */
   return 0;
@@ -116,7 +116,7 @@ pentagon_init( fuse_machine_info *machine )
   machine->reset = pentagon_reset;
 
   machine->timex = 0;
-  machine->ram.port_contended = pentagon_port_contended;
+  machine->ram.port_from_ula  = pentagon_port_from_ula;
   machine->ram.contend_delay  = pentagon_contend_delay;
   machine->ram.contend_delay_no_mreq = pentagon_contend_delay;
 

@@ -125,7 +125,7 @@ specplus3_unattached_port( void )
 }
 
 int
-specplus3_port_contended( libspectrum_word port GCC_UNUSED )
+specplus3_port_from_ula( libspectrum_word port GCC_UNUSED )
 {
   /* No contended ports */
   return 0;
@@ -190,7 +190,7 @@ int specplus3_init( fuse_machine_info *machine )
   machine->reset = specplus3_reset;
 
   machine->timex = 0;
-  machine->ram.port_contended	     = specplus3_port_contended;
+  machine->ram.port_from_ula	     = specplus3_port_from_ula;
   machine->ram.contend_delay	     = specplus3_contend_delay;
   machine->ram.contend_delay_no_mreq = specplus3_contend_delay_no_mreq;
 

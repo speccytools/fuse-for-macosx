@@ -56,7 +56,7 @@ ts2068_init( fuse_machine_info *machine )
   machine->reset = ts2068_reset;
 
   machine->timex = 1;
-  machine->ram.port_contended	     = tc2048_port_contended;
+  machine->ram.port_from_ula	     = tc2048_port_from_ula;
   machine->ram.contend_delay	     = tc2068_contend_delay;
   machine->ram.contend_delay_no_mreq = tc2068_contend_delay;
 

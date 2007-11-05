@@ -42,7 +42,7 @@ extern const periph_t specplus3_peripherals[];
 extern const size_t specplus3_peripherals_count;
 
 libspectrum_byte specplus3_unattached_port( void );
-int specplus3_port_contended( libspectrum_word port );
+int specplus3_port_from_ula( libspectrum_word port );
 libspectrum_byte specplus3_contend_delay( libspectrum_dword time );
 libspectrum_byte specplus3_contend_delay_no_mreq( libspectrum_dword time );
 

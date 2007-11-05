@@ -61,9 +61,9 @@ spec48_unattached_port( void )
 }
 
 int
-spec48_port_contended( libspectrum_word port )
+spec48_port_from_ula( libspectrum_word port )
 {
-  /* All even ports contended */
+  /* All even ports supplied by ULA */
   return !( port & 0x0001 );
 }
 
@@ -119,7 +119,7 @@ int spec48_init( fuse_machine_info *machine )
   machine->reset = spec48_reset;
 
   machine->timex = 0;
-  machine->ram.port_contended        = spec48_port_contended;
+  machine->ram.port_from_ula         = spec48_port_from_ula;
   machine->ram.contend_delay	     = spec48_contend_delay;
   machine->ram.contend_delay_no_mreq = spec48_contend_delay;
 

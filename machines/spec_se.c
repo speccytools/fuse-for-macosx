@@ -147,7 +147,7 @@ spec_se_init( fuse_machine_info *machine )
   machine->reset = spec_se_reset;
 
   machine->timex = 1;
-  machine->ram.port_contended = tc2048_port_contended;
+  machine->ram.port_from_ula = tc2048_port_from_ula;
   machine->ram.contend_delay = spec_se_contend_delay;
   machine->ram.contend_delay_no_mreq = spec_se_contend_delay;
 

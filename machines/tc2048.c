@@ -74,9 +74,9 @@ tc2048_unattached_port( void )
 }
 
 int
-tc2048_port_contended( libspectrum_word port )
+tc2048_port_from_ula( libspectrum_word port )
 {
-  /* Contention occurs for ports F4 (HSR), FE (SCLD) and FF (DEC) */
+  /* Ports F4 (HSR), FE (SCLD) and FF (DEC) supplied by ULA */
   port &= 0xff;
 
   return( port == 0xf4 || port == 0xfe || port == 0xff );
@@ -134,7 +134,7 @@ int tc2048_init( fuse_machine_info *machine )
   machine->reset = tc2048_reset;
 
   machine->timex = 1;
-  machine->ram.port_contended	     = tc2048_port_contended;
+  machine->ram.port_from_ula	     = tc2048_port_from_ula;
   machine->ram.contend_delay	     = tc2048_contend_delay;
   machine->ram.contend_delay_no_mreq = tc2048_contend_delay;
 
