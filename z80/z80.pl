@@ -1101,7 +1101,7 @@ shift
         print << "shift"
 	}
 #else			/* #ifdef HAVE_ENOUGH_MEMORY */
-	z80_${lc_opcode}xx(opcode2);
+	if( z80_${lc_opcode}xx(opcode2) ) goto end_opcode;
 #endif			/* #ifdef HAVE_ENOUGH_MEMORY */
       }
 shift
@@ -1212,7 +1212,11 @@ if( $data_file eq 'opcodes_ddfd.dat' ) {
       PC--;
       R--;
       opcode = opcode2;
+#ifdef HAVE_ENOUGH_MEMORY
       goto end_opcode;
+#else			/* #ifdef HAVE_ENOUGH_MEMORY */
+      return 1;
+#endif			/* #ifdef HAVE_ENOUGH_MEMORY */
 CODE
 
 } elsif( $data_file eq 'opcodes_ed.dat' ) {

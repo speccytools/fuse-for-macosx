@@ -2228,3 +2228,5 @@
 	 ula.c: high ports can be contended on the 128K/+2. Also, rename
 	 a member to more accurately describe what it does. (fixes bug
 	 #1825241).
+20071106 z80/{z80.pl,z80_ops.c}: fix smallmem compilation (fixes bug #1726014)
+	 (Stuart).

@@ -47,10 +47,10 @@
 #include "z80_macros.h"
 
 #ifndef HAVE_ENOUGH_MEMORY
-static void z80_cbxx( libspectrum_byte opcode2 );
-static void z80_ddxx( libspectrum_byte opcode2 );
-static void z80_edxx( libspectrum_byte opcode2 );
-static void z80_fdxx( libspectrum_byte opcode2 );
+static int z80_cbxx( libspectrum_byte opcode2 );
+static int z80_ddxx( libspectrum_byte opcode2 );
+static int z80_edxx( libspectrum_byte opcode2 );
+static int z80_fdxx( libspectrum_byte opcode2 );
 static void z80_ddfdcbxx( libspectrum_byte opcode3,
 			  libspectrum_word tempaddr );
 #endif				/* #ifndef HAVE_ENOUGH_MEMORY */
@@ -96,11 +96,17 @@ enum {
 
 #endif				/* #ifdef __GNUC__ */
 
+#ifndef HAVE_ENOUGH_MEMORY
+static libspectrum_byte opcode = 0x00;
+#endif
+
 /* Execute Z80 opcodes until the next event */
 void
 z80_do_opcodes( void )
 {
+#ifdef HAVE_ENOUGH_MEMORY
   libspectrum_byte opcode = 0x00;
+#endif
 
   int even_m1 =
     machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_EVEN_M1; 
@@ -236,15 +242,16 @@ z80_do_opcodes( void )
 
 #ifndef HAVE_ENOUGH_MEMORY
 
-static void
+static int
 z80_cbxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
 #include "z80_cb.c"
   }
+  return 0;
 }
 
-static void
+static int
 z80_ddxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
@@ -256,17 +263,19 @@ z80_ddxx( libspectrum_byte opcode2 )
 #undef REGISTERL
 #undef REGISTER
   }
+  return 0;
 }
 
-static void
+static int
 z80_edxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
 #include "z80_ed.c"
   }
+  return 0;
 }
 
-static void
+static int
 z80_fdxx( libspectrum_byte opcode2 )
 {
   switch(opcode2) {
@@ -278,6 +287,7 @@ z80_fdxx( libspectrum_byte opcode2 )
 #undef REGISTERL
 #undef REGISTER
   }
+  return 0;
 }
 
 static void
