@@ -456,7 +456,7 @@ port_net_in( void )
    (http://www.wearmouth.demon.co.uk/if1_2.htm#L0FBC) to see
    the line activity:
      11xxxxxx times (192-255) have to get a zero (bit for network)
-     plus 1 times more from SEND-SC. Next SEND-SC send a 0 wich is
+     plus 1 times more from SEND-SC. Next SEND-SC send a 0 which is
      a 1 on the net wire (negated output, straight input!!!)
 
    OK. In input first if1 call WT-SC-E to check Network activity
@@ -656,7 +656,7 @@ port_net_out( libspectrum_byte val )
     if( if1_ula.s_net_mode == S_NET_RAW ) {	/* if we out bit by bit, do it */
         /* Here is the output routine */
 
-/* OK, examining the schematics of if1 and the dissassembly of if1 ROM, I
+/* OK, examining the schematics of if1 and the disassembly of if1 ROM, I
    see that the Q1 and Q2 transistors negate the RX DATA signal, and the
    floating state of the net wire is the ~0V level, the forced is the ~3V.
    The if1 software send complemented data and read straight data.
@@ -804,7 +804,7 @@ if1_mdr_insert( const char *filename, int drive )
   microdrive_t *mdr;
   int i;
   
-  if( drive == -1 ) {	/* find an emtpty one */
+  if( drive == -1 ) {	/* find an empty one */
     for( i = 0; i < 8; i++ ) {
       if( !microdrive[i].inserted ) {
         drive = i;

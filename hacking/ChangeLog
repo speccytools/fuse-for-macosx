@@ -2233,3 +2233,4 @@
 20071109 Makefile.am,configure.in,compat/Makefile.am: directly include compat
          files in fuse_SOURCES removing use of libcompat.a as Mac OS X can't
          do empty ar archives (patch #1827454) (Fred).
+20071109 if1.c: fix typos in comments (Stuart).
