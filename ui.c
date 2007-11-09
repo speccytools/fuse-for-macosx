@@ -36,6 +36,7 @@
 #include "ui/ui.h"
 #include "kempmouse.h"
 #include "settings.h"
+#include "tape.h"
 
 #define MESSAGE_MAX_LENGTH 256
 

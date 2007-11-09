@@ -48,7 +48,6 @@
 #include "simpleide.h"
 #include "snapshot.h"
 #include "machines/specplus3.h"
-#include "tape.h"
 #include "timer/timer.h"
 #include "ui/ui.h"
 #include "zxatasp.h"

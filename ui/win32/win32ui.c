@@ -35,7 +35,6 @@
 #include "screenshot.h"
 #include "settings.h"
 #include "snapshot.h"
-#include "tape.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 #include "utils.h"
