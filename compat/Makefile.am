@@ -21,29 +21,16 @@
 ##
 ## E-mail: philip-fuse@shadowmagic.org.uk
 
-AUTOMAKE_OPTIONS = foreign
+AM_CPPFLAGS += -I$(srcdir)/compat
 
-AM_CPPFLAGS = -I$(srcdir)/..
+DIST_SUBDIRS += compat/amiga \
+	       compat/morphos \
+	       compat/unix \
+	       compat/win32
 
-SUBDIRS = @COMPAT_OSNAME@
+EXTRA_fuse_SOURCES += compat/dirname.c \
+		compat/getopt.c \
+		compat/getopt1.c \
+		compat/mkstemp.c
 
-DIST_SUBDIRS = amiga \
-	       morphos \
-	       unix \
-	       win32
-
-noinst_LIBRARIES = libcompat.a
-
-libcompat_a_SOURCES =
-
-EXTRA_libcompat_a_SOURCES = dirname.c \
-			    getopt.c \
-			    getopt1.c \
-			    mkstemp.c
-
-libcompat_a_LIBADD = $(COMPAT_LIBADD)
-libcompat_a_DEPENDENCIES = $(COMPAT_LIBADD)
-
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
-
-noinst_HEADERS = getopt.h
+noinst_HEADERS += compat/getopt.h

@@ -2230,3 +2230,6 @@
 	 #1825241).
 20071106 z80/{z80.pl,z80_ops.c}: fix smallmem compilation (fixes bug #1726014)
 	 (Stuart).
+20071109 Makefile.am,configure.in,compat/Makefile.am: directly include compat
+         files in fuse_SOURCES removing use of libcompat.a as Mac OS X can't
+         do empty ar archives (patch #1827454) (Fred).

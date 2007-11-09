@@ -25,7 +25,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = fuse
 
-SUBDIRS = compat \
+SUBDIRS = @COMPAT_SUBDIR@ \
 	  debugger \
 	  disk \
 	  hacking \
@@ -97,6 +97,18 @@ fuse_SOURCES = ay.c \
 	zxatasp.c \
 	zxcf.c
 
+if COMPAT_DIRNAME
+fuse_SOURCES += compat/dirname.c
+endif
+
+if COMPAT_GETOPT
+fuse_SOURCES += compat/getopt.c compat/getopt1.c
+endif
+
+if COMPAT_MKSTEMP
+fuse_SOURCES += compat/mkstemp.c
+endif
+
 EXTRA_fuse_SOURCES = windres.rc
 
 fuse_LDADD = debugger/libdebugger.a \
@@ -117,7 +129,6 @@ z80/libz80.a \
 @SAMPLERATE_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
-compat/libcompat.a \
 compat/@COMPAT_OSNAME@/libcompatos.a \
 @WINDRES_OBJ@
 
@@ -195,3 +206,7 @@ EXTRA_DIST = AUTHORS \
 
 CLEANFILES = settings.c \
 	     settings.h
+
+AM_CPPFLAGS =
+
+include compat/Makefile.am

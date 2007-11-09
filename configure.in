@@ -580,32 +580,31 @@ AC_DEFINE_UNQUOTED([TIMER_TYPE], $timer_type, [The type needed for the timer rou
 
 dnl Work out which standard routines we're missing
 AC_MSG_CHECKING(which standard routines we're missing)
-COMPAT_LIBADD=''
 missing_routines=''
 if test "$ac_cv_func_dirname" = no; then
-  COMPAT_LIBADD="$COMPAT_LIBADD"'dirname.$(OBJEXT) '
   missing_routines="$missing_routines"'dirname '
 fi
+AM_CONDITIONAL(COMPAT_DIRNAME, test "$ac_cv_func_dirname" = no)
 if test "$ac_cv_func_getopt_long" = no; then
   case "$target_os" in
     amigaos|morphos)
       dnl Our getopt_long replacement doesn't work, so don't use it
       ;;
     *)
-      COMPAT_LIBADD="$COMPAT_LIBADD"'getopt.$(OBJEXT) getopt1.$(OBJEXT) '
+      compat_getopt=yes
       missing_routines="$missing_routines"'getopt_long '
       ;;
   esac
 fi
+AM_CONDITIONAL(COMPAT_GETOPT, test "$compat_getopt" = yes)
 if test "$ac_cv_func_mkstemp" = no; then
-  COMPAT_LIBADD="$COMPAT_LIBADD"'mkstemp.$(OBJEXT) '
   missing_routines="$missing_routines"'mkstemp '
 fi
+AM_CONDITIONAL(COMPAT_MKSTEMP, test "$ac_cv_func_mkstemp" = no)
 if test "x$missing_routines" = x; then
   missing_routines='(none)'
 fi
 AC_MSG_RESULT($missing_routines)
-AC_SUBST(COMPAT_LIBADD)
 
 dnl Work out which compatibility routines to use
 AC_MSG_CHECKING(which compatibility routines to use)
@@ -624,6 +623,8 @@ case "$target_os" in
     ;;
 esac
 AC_MSG_RESULT($COMPAT_OSNAME)
+COMPAT_SUBDIR="compat/$COMPAT_OSNAME"
+AC_SUBST(COMPAT_SUBDIR)
 AC_SUBST(COMPAT_OSNAME)
 
 dnl Do we want the low memory compile?
@@ -663,7 +664,6 @@ if test "$ac_cv_prog_gcc" = yes; then
 fi
 
 AC_OUTPUT(Makefile \
-compat/Makefile \
 compat/amiga/Makefile \
 compat/morphos/Makefile \
 compat/unix/Makefile \
