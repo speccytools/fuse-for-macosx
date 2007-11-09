@@ -2246,3 +2246,4 @@
 	 +3, +D and Beta disks (part of feature request #1828228) (Stuart).
 20071109 ui/{gtk/gtkui.c,win32/win32ui.c},ui.c: move #include "tape.h" to
 	 where it's needed.
+20071109 ui/fb/{fbdisplay.c,fbmouse.c}: fix warnings (Stuart).

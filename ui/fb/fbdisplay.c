@@ -157,7 +157,7 @@ register_scalers( void )
 int fbdisplay_init(void)
 {
   int i;
-  char *dev;
+  const char *dev;
 
   static libspectrum_word paldata[20] = { 0, 0xbbbb, 0xffff };
   static const struct fb_cmap fb_cmap = {

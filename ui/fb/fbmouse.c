@@ -47,7 +47,7 @@ static void *libgpm = NULL;
 static typeof (Gpm_GetEvent) *gpm_getevent = 0;
 static typeof (gpm_fd) gpmfd = 0;
 static const typeof (gpm_flag) zero = 0;
-static typeof (&gpm_flag) gpmflag = &zero;
+static typeof (&zero) gpmflag = &zero;
 #endif
 
 static int mouse_fd = -1;
