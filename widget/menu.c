@@ -127,46 +127,7 @@ widget_menu_keyhandler( input_key key )
   }
 }
 
-char *
-widget_get_filename( const char *title, int saving )
-{
-  char *filename = NULL;
-  widget_type wtype;
-
-  widget_filesel_data data;
-
-  data.exit_all_widgets = 1;
-  data.title = title;
-
-  if( saving ) {
-    wtype = WIDGET_TYPE_FILESELECTOR_SAVE;
-  } else {
-    wtype = WIDGET_TYPE_FILESELECTOR;
-  }
-  widget_do( wtype, &data );
-  if( widget_filesel_name ) {
-    filename = strdup( widget_filesel_name );
-    if( !filename )
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-  }
-
-  return filename;
-  
-}
-
 /* General callbacks */
-
-char *
-menu_get_open_filename( const char *title )
-{
-  return widget_get_filename( title, 0 );
-}
-
-char *
-menu_get_save_filename( const char *title )
-{
-  return widget_get_filename( title, 1 );
-}
 
 void
 menu_file_savesnapshot( int action )

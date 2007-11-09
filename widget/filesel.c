@@ -42,8 +42,9 @@
 #endif				/* #ifdef WIN32 */
 
 #include "fuse.h"
-#include "widget_internals.h"
+#include "ui/ui.h"
 #include "utils.h"
+#include "widget_internals.h"
 
 #if defined AMIGA || defined __MORPHOS__
 #include <proto/asl.h>
@@ -86,6 +87,8 @@ static int is_rootdir;
    which it will be on after this keypress */
 static size_t top_left_file, current_file, new_current_file;
 
+static char *widget_get_filename( const char *title, int saving );
+
 static int widget_add_filename( int *allocated, int *number,
 				struct widget_dirent ***namelist, char *name );
 static void widget_scan( char *dir );
@@ -112,6 +115,45 @@ char* widget_filesel_name;
 
 /* Should we exit all widgets when we're done with this selector? */
 static int exit_all_widgets;
+
+static char *
+widget_get_filename( const char *title, int saving )
+{
+  char *filename = NULL;
+  widget_type wtype;
+
+  widget_filesel_data data;
+
+  data.exit_all_widgets = 1;
+  data.title = title;
+
+  if( saving ) {
+    wtype = WIDGET_TYPE_FILESELECTOR_SAVE;
+  } else {
+    wtype = WIDGET_TYPE_FILESELECTOR;
+  }
+  widget_do( wtype, &data );
+  if( widget_filesel_name ) {
+    filename = strdup( widget_filesel_name );
+    if( !filename )
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+  }
+
+  return filename;
+  
+}
+
+char *
+ui_get_open_filename( const char *title )
+{
+  return widget_get_filename( title, 0 );
+}
+
+char *
+ui_get_save_filename( const char *title )
+{
+  return widget_get_filename( title, 1 );
+}
 
 static int widget_add_filename( int *allocated, int *number,
 				struct widget_dirent ***namelist,

@@ -69,13 +69,13 @@ run_dialog( const char *title, GtkFileChooserAction action )
 
 
 char*
-menu_get_open_filename( const char *title )
+ui_get_open_filename( const char *title )
 {
   return run_dialog( title, GTK_FILE_CHOOSER_ACTION_OPEN );
 }
 
 char*
-menu_get_save_filename( const char *title )
+ui_get_save_filename( const char *title )
 {
   return run_dialog( title, GTK_FILE_CHOOSER_ACTION_SAVE );
 }

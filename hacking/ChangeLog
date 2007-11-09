@@ -2234,3 +2234,7 @@
          files in fuse_SOURCES removing use of libcompat.a as Mac OS X can't
          do empty ar archives (patch #1827454) (Fred).
 20071109 if1.c: fix typos in comments (Stuart).
+20071109 menu.c,menu.h,ui/{gtk/{binary.c,fileselector.c,gtkui.c,roms.c},
+	 ui.h,win32/win32ui.c},widget/{filesel.c,menu.c}: rename
+	 menu_get_{open,save}_filename() to ui_get_{open,save}_filename() and
+	 move widget_get_filename() to filesel.c (Stuart).

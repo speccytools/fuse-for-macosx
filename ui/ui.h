@@ -224,4 +224,7 @@ typedef enum ui_tape_browser_update_type {
 int ui_tape_browser_update( ui_tape_browser_update_type change,
                             libspectrum_tape_block *block );
 
+char *ui_get_open_filename( const char *title );
+char *ui_get_save_filename( const char *title );
+
 #endif			/* #ifndef FUSE_UI_H */

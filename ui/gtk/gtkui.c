@@ -366,7 +366,7 @@ menu_file_savesnapshot( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  filename = menu_get_save_filename( "Fuse - Save Snapshot" );
+  filename = ui_get_save_filename( "Fuse - Save Snapshot" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snapshot_write( filename );
@@ -386,7 +386,7 @@ menu_file_recording_record( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  recording = menu_get_save_filename( "Fuse - Start Recording" );
+  recording = ui_get_save_filename( "Fuse - Start Recording" );
   if( !recording ) { fuse_emulation_unpause(); return; }
 
   rzx_start_recording( recording, 1 );
@@ -406,10 +406,10 @@ menu_file_recording_recordfromsnapshot( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  snap = menu_get_open_filename( "Fuse - Load Snapshot " );
+  snap = ui_get_open_filename( "Fuse - Load Snapshot " );
   if( !snap ) { fuse_emulation_unpause(); return; }
 
-  recording = menu_get_save_filename( "Fuse - Start Recording" );
+  recording = ui_get_save_filename( "Fuse - Start Recording" );
   if( !recording ) { free( snap ); fuse_emulation_unpause(); return; }
 
   if( snapshot_read( snap ) ) {
@@ -435,7 +435,7 @@ menu_file_aylogging_record( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  psgfile = menu_get_save_filename( "Fuse - Start AY log" );
+  psgfile = ui_get_save_filename( "Fuse - Start AY log" );
   if ( !psgfile ) { fuse_emulation_unpause(); return; }
 
   psg_start_recording( psgfile );
@@ -457,7 +457,7 @@ menu_file_savescreenasscr( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  filename = menu_get_save_filename( "Fuse - Save Screenshot as SCR" );
+  filename = ui_get_save_filename( "Fuse - Save Screenshot as SCR" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_scr_write( filename );
@@ -476,7 +476,7 @@ menu_file_movies_recordmovieasscr( GtkWidget *widget GCC_UNUSED,
   
   fuse_emulation_pause();
 
-  filename = menu_get_save_filename( "Fuse - Record Movie as SCR" );
+  filename = ui_get_save_filename( "Fuse - Record Movie as SCR" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s", filename );
@@ -506,7 +506,7 @@ menu_file_savescreenaspng( GtkWidget *widget GCC_UNUSED,
   }
 
   filename =
-    menu_get_save_filename( "Fuse - Save Screenshot as PNG" );
+    ui_get_save_filename( "Fuse - Save Screenshot as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   screenshot_write( filename, scaler );
@@ -530,7 +530,7 @@ menu_file_movies_recordmovieaspng( GtkWidget *widget GCC_UNUSED,
     return;
   }
 
-  filename = menu_get_save_filename( "Fuse - Record Movie as PNG" );
+  filename = ui_get_save_filename( "Fuse - Record Movie as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s", filename );
@@ -778,7 +778,7 @@ ui_tape_write( void )
 
   fuse_emulation_pause();
 
-  filename = menu_get_save_filename( "Fuse - Write Tape" );
+  filename = ui_get_save_filename( "Fuse - Write Tape" );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   tape_write( filename );
@@ -807,7 +807,7 @@ ui_plus3_disk_write( specplus3_drive_number which )
 
   snprintf( title, 80, "Fuse - Write +3 Disk %c:", drive );
 
-  filename = menu_get_save_filename( title );
+  filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   specplus3_disk_write( which, filename );
@@ -837,7 +837,7 @@ ui_beta_disk_write( beta_drive_number which )
 
   snprintf( title, 80, "Fuse - Write Beta Disk Interface Disk %c:", drive );
 
-  filename = menu_get_save_filename( title );
+  filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   beta_disk_write( which, filename );
@@ -864,7 +864,7 @@ ui_plusd_disk_write( plusd_drive_number which )
 
   snprintf( title, 80, "Fuse - Write +D Disk %c", drive );
 
-  filename = menu_get_save_filename( title );
+  filename = ui_get_save_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   plusd_disk_write( which, filename );
