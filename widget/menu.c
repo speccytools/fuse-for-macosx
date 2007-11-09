@@ -460,65 +460,6 @@ menu_media_tape_browse( int action )
   widget_do( WIDGET_TYPE_BROWSE, NULL );
 }
 
-int
-ui_tape_write( void )
-{
-  widget_filesel_data data;
-
-  widget_end_all( WIDGET_FINISHED_OK );
-  data.exit_all_widgets = 1;
-  data.title = "Fuse - write tape file";
-  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
-  return widget_filesel_name ? tape_write( widget_filesel_name ) : 0;
-}
-
-#ifdef HAVE_765_H
-int
-ui_plus3_disk_write( specplus3_drive_number which )
-{
-  char title[ 30 ];
-  widget_filesel_data data;
-
-  snprintf( title, sizeof( title ), "Fuse - write +3 drive %c:",
-	    (char)( 'A' + which ) );
-  data.exit_all_widgets = 1;
-  data.title = title;
-  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
-  return widget_filesel_name
-	 ? specplus3_disk_write( which, widget_filesel_name ) : 0;
-}
-#endif				/* #ifdef HAVE_765_H */
-
-int
-ui_beta_disk_write( beta_drive_number which )
-{
-  char title[ 30 ];
-  widget_filesel_data data;
-
-  snprintf( title, sizeof (title), "Fuse - write Beta drive %c:",
-	    (char)( 'A' + which ) );
-  data.exit_all_widgets = 1;
-  data.title = title;
-  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
-  return widget_filesel_name
-	 ? beta_disk_write( which, widget_filesel_name ) : 0;
-}
-
-int
-ui_plusd_disk_write( plusd_drive_number which )
-{
-  char title[ 30 ];
-  widget_filesel_data data;
-
-  snprintf( title, sizeof( title ), "Fuse - write +D drive %i:",
-	    which + 1 );
-  data.exit_all_widgets = 1;
-  data.title = title;
-  widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
-  return widget_filesel_name
-	 ? plusd_disk_write( which, widget_filesel_name ) : 0;
-}
-
 void
 menu_help_keyboard( int action )
 {

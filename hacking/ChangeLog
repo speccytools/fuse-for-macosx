@@ -2238,3 +2238,5 @@
 	 ui.h,win32/win32ui.c},widget/{filesel.c,menu.c}: rename
 	 menu_get_{open,save}_filename() to ui_get_{open,save}_filename() and
 	 move widget_get_filename() to filesel.c (Stuart).
+20071109 ui/{gtk/gtkui.c,win32/win32ui.c},ui.c,widget/menu.c: move
+	 ui_{tape,{plus3,beta,plusd}_disk}_write() into ui.c (Stuart).

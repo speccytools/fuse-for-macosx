@@ -453,3 +453,107 @@ ui_menu_disk_update( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA, beta );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
 }
+
+int
+ui_tape_write( void )
+{
+  char *filename;
+
+  fuse_emulation_pause();
+
+  filename = ui_get_save_filename( "Fuse - Write Tape" );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  tape_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
+
+#ifdef HAVE_765_H
+int
+ui_plus3_disk_write( specplus3_drive_number which )
+{
+  char drive, *filename, title[80];
+
+  switch( which ) {
+    case SPECPLUS3_DRIVE_A: drive = 'A'; break;
+    case SPECPLUS3_DRIVE_B: drive = 'B'; break;
+    default: drive = '?'; break;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write +3 Disk %c:", drive );
+
+  filename = ui_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  specplus3_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
+#endif				/* #ifdef HAVE_765_H */  
+
+int
+ui_beta_disk_write( beta_drive_number which )
+{
+  char drive, *filename, title[80];
+
+  switch( which ) {
+    case BETA_DRIVE_A: drive = 'A'; break;
+    case BETA_DRIVE_B: drive = 'B'; break;
+    case BETA_DRIVE_C: drive = 'C'; break;
+    case BETA_DRIVE_D: drive = 'D'; break;
+    default: drive = '?'; break;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write Beta Disk %c:", drive );
+
+  filename = ui_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  beta_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
+
+int
+ui_plusd_disk_write( plusd_drive_number which )
+{
+  char drive, *filename, title[80];
+
+  switch( which ) {
+    case PLUSD_DRIVE_1: drive = '1'; break;
+    case PLUSD_DRIVE_2: drive = '2'; break;
+    default: drive = '?'; break;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write +D Disk %c", drive );
+
+  filename = ui_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  plusd_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
