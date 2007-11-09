@@ -626,7 +626,9 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
     if( dirty == FD_D_DIRTY ) {
 
       ui_confirm_save_t confirm = ui_confirm_save(
-        "Disk has been modified.\nDo you want to save it?"
+        "Disk in +3 drive %c: has been modified.\n"
+	"Do you want to save it?",
+	which == SPECPLUS3_DRIVE_A ? 'A' : 'B'
       );
 
       switch( confirm ) {

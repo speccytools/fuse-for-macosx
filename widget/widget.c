@@ -688,7 +688,7 @@ ui_tape_browser_update( ui_tape_browser_update_type change,
 }
 
 ui_confirm_save_t
-ui_confirm_save( const char *message )
+ui_confirm_save_specific( const char *message )
 {
   if( widget_do( WIDGET_TYPE_QUERY_SAVE, (void *) message ) )
     return UI_CONFIRM_SAVE_CANCEL;

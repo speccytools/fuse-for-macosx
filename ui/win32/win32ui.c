@@ -360,7 +360,7 @@ ui_get_save_filename( const char *title )
 }
 
 ui_confirm_save_t
-ui_confirm_save( const char *message )
+ui_confirm_save_specific( const char *message )
 {
   STUB;
   return UI_CONFIRM_SAVE_CANCEL;

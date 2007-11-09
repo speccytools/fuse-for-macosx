@@ -84,6 +84,23 @@ ui_verror( ui_error_level severity, const char *format, va_list ap )
   return 0;
 }
 
+ui_confirm_save_t
+ui_confirm_save( const char *format, ... )
+{
+  va_list ap;
+  char message[ MESSAGE_MAX_LENGTH ];
+  ui_confirm_save_t confirm;
+
+  va_start( ap, format );
+
+  vsnprintf( message, MESSAGE_MAX_LENGTH, format, ap );
+  confirm = ui_confirm_save_specific( message );
+
+  va_end( ap );
+
+  return confirm;
+}
+
 static int
 print_error_to_stderr( ui_error_level severity, const char *message )
 {

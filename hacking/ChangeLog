@@ -2240,3 +2240,7 @@
 	 move widget_get_filename() to filesel.c (Stuart).
 20071109 ui/{gtk/gtkui.c,win32/win32ui.c},ui.c,widget/menu.c: move
 	 ui_{tape,{plus3,beta,plusd}_disk}_write() into ui.c (Stuart).
+20071109 disk/{beta.c,plusd.c},machines/specplus3.c,ui/{gtk/confirm.c,ui.h,
+	 win32/win32ui.c},ui.c,widget/widget.c: add varargs support to
+	 ui_confirm_save() and use more detailed messages when ejecting
+	 +3, +D and Beta disks (part of feature request #1828228) (Stuart).

@@ -83,7 +83,9 @@ typedef enum ui_confirm_save_t {
 
 } ui_confirm_save_t;
 
-ui_confirm_save_t ui_confirm_save( const char *message );
+ui_confirm_save_t ui_confirm_save( const char *format, ... )
+     GCC_PRINTF( 1, 2 );
+ui_confirm_save_t ui_confirm_save_specific( const char *message );
 
 /* Confirm whether we want to change a joystick setting */
 typedef enum ui_confirm_joystick_t {

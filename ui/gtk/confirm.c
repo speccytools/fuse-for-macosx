@@ -78,7 +78,7 @@ set_confirmed( GtkButton *button GCC_UNUSED, gpointer user_data )
 }
 
 ui_confirm_save_t
-ui_confirm_save( const char *message )
+ui_confirm_save_specific( const char *message )
 {
   GtkWidget *dialog, *label;
   ui_confirm_save_t confirm;

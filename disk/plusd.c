@@ -403,7 +403,9 @@ plusd_disk_eject( plusd_drive_number which, int write )
     if( d->disk.dirty ) {
 
       ui_confirm_save_t confirm = ui_confirm_save(
-	"Disk has been modified.\nDo you want to save it?"
+	"Disk in +D drive %c has been modified.\n"
+	"Do you want to save it?",
+	which == PLUSD_DRIVE_1 ? '1' : '2'
       );
 
       switch( confirm ) {

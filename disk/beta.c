@@ -360,6 +360,7 @@ int
 beta_disk_eject( beta_drive_number which, int write )
 {
   wd_fdc_drive *d;
+  char drive;
   
   if( which >= BETA_NUM_DRIVES )
     return 1;
@@ -377,8 +378,18 @@ beta_disk_eject( beta_drive_number which, int write )
   
     if( d->disk.dirty ) {
 
+      switch( which ) {
+	case BETA_DRIVE_A: drive = 'A'; break;
+	case BETA_DRIVE_B: drive = 'B'; break;
+	case BETA_DRIVE_C: drive = 'C'; break;
+	case BETA_DRIVE_D: drive = 'D'; break;
+	default: drive = '?'; break;
+      }
+
       ui_confirm_save_t confirm = ui_confirm_save(
-	"Disk has been modified.\nDo you want to save it?"
+	"Disk in Beta drive %c: has been modified.\n"
+	"Do you want to save it?",
+	drive
       );
 
       switch( confirm ) {
