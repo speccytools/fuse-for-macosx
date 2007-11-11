@@ -525,10 +525,6 @@ trackgen( disk_t *d, FILE *file, int head, int track, int sector_base,
 void
 disk_close( disk_t *d )
 {
-  if( d->filename != NULL ) {
-    free( d->filename );
-    d->filename = NULL;
-  }
   if( d->data != NULL ) {
     free( d->data );
     d->data = NULL;
@@ -586,8 +582,6 @@ disk_new( disk_t *d, int sides, int cylinders,
   
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
-
-  d->filename = NULL;
 
   return d->status = DISK_OK;
 }
@@ -1288,13 +1282,7 @@ disk_open( disk_t *d, const char *filename, int preindex )
     fclose( file );
     return d->status;
   }
-  if( ( d->filename = malloc( strlen( filename ) + 1 ) ) == NULL ) {
-    free( d->data );
-    fclose( file );
-    return d->status = DISK_MEM;
-  }
   fclose( file );
-  strcpy( d->filename, filename );
   d->type = type;
   return d->status = DISK_OK;
 }

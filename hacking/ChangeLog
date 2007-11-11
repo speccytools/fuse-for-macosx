@@ -2250,3 +2250,4 @@
 20071111 if1.[ch],menu.[ch],menu_data.dat,ui/ui.h,ui.c,utils.c: rewrite
 	 Microdrive cartridge insertion/ejection code (fixes bugs #1828225 and
 	 1828984) (Stuart).
+20071111 disk/disk.[ch]: remove 'filename' member of disk_t (Stuart).
