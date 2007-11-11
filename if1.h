@@ -43,10 +43,10 @@ void if1_port_out( libspectrum_word port, libspectrum_byte val );
 libspectrum_byte if1_port_in( libspectrum_word port, int *attached );
 
 void if1_mdr_new( int drive );
-void if1_mdr_insert( const char *filename, int drive );
-int if1_mdr_sync( const char *filename, int drive );
-int if1_mdr_eject( const char *filename, int drive );
-void if1_mdr_writep( int w, int drive );
+int if1_mdr_insert( int drive, const char *filename );
+int if1_mdr_write( int drive, const char *filename );
+int if1_mdr_eject( int drive, int write );
+void if1_mdr_writeprotect( int w, int drive );
 void if1_plug( const char *filename, int what );
 void if1_unplug( int what );
 

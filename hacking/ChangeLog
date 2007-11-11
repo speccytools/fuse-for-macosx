@@ -2247,3 +2247,6 @@
 20071109 ui/{gtk/gtkui.c,win32/win32ui.c},ui.c: move #include "tape.h" to
 	 where it's needed.
 20071109 ui/fb/{fbdisplay.c,fbmouse.c}: fix warnings (Stuart).
+20071111 if1.[ch],menu.[ch],menu_data.dat,ui/ui.h,ui.c,utils.c: rewrite
+	 Microdrive cartridge insertion/ejection code (fixes bugs #1828225 and
+	 1828984) (Stuart).

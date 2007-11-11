@@ -82,7 +82,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_mdr_new );
 MENU_CALLBACK_WITH_ACTION( menu_media_mdr_insert );
 MENU_CALLBACK_WITH_ACTION( menu_media_mdr_sync );
 MENU_CALLBACK_WITH_ACTION( menu_media_mdr_eject );
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_writep );
+MENU_CALLBACK_WITH_ACTION( menu_media_mdr_writeprotect );
 
 MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 );
 

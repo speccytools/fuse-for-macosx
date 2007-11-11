@@ -34,6 +34,7 @@
 
 #include "fuse.h"
 #include "ui/ui.h"
+#include "if1.h"
 #include "kempmouse.h"
 #include "settings.h"
 #include "tape.h"
@@ -225,64 +226,72 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1, "/Media/Interface I" },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M1_EJECT, "/Media/Interface I/Microdrive 1/Eject",
-    "/Media/Interface I/Microdrive 1/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M1_EJECT,
+    "/Media/Interface I/Microdrive 1/Eject",
+    "/Media/Interface I/Microdrive 1/Eject and write...", 0,
     "/Media/Interface I/Microdrive 1/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET,
     "/Media/Interface I/Microdrive 1/Write protect/Set",
     "/Media/Interface I/Microdrive 1/Write protect/Remove", 1 },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M2_EJECT, "/Media/Interface I/Microdrive 2/Eject",
-    "/Media/Interface I/Microdrive 2/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M2_EJECT,
+    "/Media/Interface I/Microdrive 2/Eject",
+    "/Media/Interface I/Microdrive 2/Eject and write...", 0,
     "/Media/Interface I/Microdrive 2/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET,
     "/Media/Interface I/Microdrive 2/Write protect/Set",
     "/Media/Interface I/Microdrive 2/Write protect/Remove", 1 },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M3_EJECT, "/Media/Interface I/Microdrive 3/Eject",
-    "/Media/Interface I/Microdrive 3/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M3_EJECT,
+    "/Media/Interface I/Microdrive 3/Eject",
+    "/Media/Interface I/Microdrive 3/Eject and write...", 0,
     "/Media/Interface I/Microdrive 3/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET,
     "/Media/Interface I/Microdrive 3/Write protect/Set",
     "/Media/Interface I/Microdrive 3/Write protect/Remove", 1 },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M4_EJECT, "/Media/Interface I/Microdrive 4/Eject",
-    "/Media/Interface I/Microdrive 4/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M4_EJECT,
+    "/Media/Interface I/Microdrive 4/Eject",
+    "/Media/Interface I/Microdrive 4/Eject and write...", 0,
     "/Media/Interface I/Microdrive 4/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET,
     "/Media/Interface I/Microdrive 4/Write protect/Set",
     "/Media/Interface I/Microdrive 4/Write protect/Remove", 1 },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M5_EJECT, "/Media/Interface I/Microdrive 5/Eject",
-    "/Media/Interface I/Microdrive 5/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M5_EJECT,
+    "/Media/Interface I/Microdrive 5/Eject",
+    "/Media/Interface I/Microdrive 5/Eject and write...", 0,
     "/Media/Interface I/Microdrive 5/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET,
     "/Media/Interface I/Microdrive 5/Write protect/Set",
     "/Media/Interface I/Microdrive 5/Write protect/Remove", 1 },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M6_EJECT, "/Media/Interface I/Microdrive 6/Eject",
-    "/Media/Interface I/Microdrive 6/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M6_EJECT,
+    "/Media/Interface I/Microdrive 6/Eject",
+    "/Media/Interface I/Microdrive 6/Eject and write...", 0,
     "/Media/Interface I/Microdrive 6/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET,
     "/Media/Interface I/Microdrive 6/Write protect/Set",
     "/Media/Interface I/Microdrive 6/Write protect/Remove", 1 },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M7_EJECT, "/Media/Interface I/Microdrive 7/Eject",
-    "/Media/Interface I/Microdrive 7/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M7_EJECT,
+    "/Media/Interface I/Microdrive 7/Eject",
+    "/Media/Interface I/Microdrive 7/Eject and write...", 0,
     "/Media/Interface I/Microdrive 7/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET,
     "/Media/Interface I/Microdrive 7/Write protect/Set",
     "/Media/Interface I/Microdrive 7/Write protect/Remove", 1 },
 
-  { UI_MENU_ITEM_MEDIA_IF1_M8_EJECT, "/Media/Interface I/Microdrive 8/Eject",
-    "/Media/Interface I/Microdrive 8/Sync", 0,
+  { UI_MENU_ITEM_MEDIA_IF1_M8_EJECT,
+    "/Media/Interface I/Microdrive 8/Eject",
+    "/Media/Interface I/Microdrive 8/Eject and write...", 0,
     "/Media/Interface I/Microdrive 8/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET,
@@ -568,6 +577,27 @@ ui_plusd_disk_write( plusd_drive_number which )
   if( !filename ) { fuse_emulation_unpause(); return 1; }
 
   plusd_disk_write( which, filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
+
+int
+ui_mdr_write( int which )
+{
+  char *filename, title[80];
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write Microdrive Cartridge %i", which + 1 );
+
+  filename = ui_get_save_filename( title );
+  if( !filename ) { fuse_emulation_unpause(); return 1; }
+
+  if1_mdr_write( which, filename );
 
   free( filename );
 

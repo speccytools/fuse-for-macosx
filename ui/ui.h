@@ -117,6 +117,7 @@ int ui_tape_write( void );
 int ui_plus3_disk_write( specplus3_drive_number which );
 int ui_beta_disk_write( beta_drive_number which );
 int ui_plusd_disk_write( plusd_drive_number which );
+int ui_mdr_write( int which );
 
 /* Get a rollback point from the given list */
 int ui_get_rollback_point( GSList *points );

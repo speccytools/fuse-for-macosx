@@ -340,63 +340,34 @@ MENU_CALLBACK_WITH_ACTION( menu_media_mdr_insert )
 
   fuse_emulation_pause();
 
-  filename = ui_get_open_filename( "Fuse - Insert microdrive disk file" );
+  filename = ui_get_open_filename( "Fuse - Insert Microdrive Cartridge" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  if1_mdr_insert( filename, action - 1 );
+  if1_mdr_insert( action - 1, filename );
 
   free( filename );
 
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_sync )
-{
-
-  if( if1_mdr_sync( NULL, action - 1 ) ) {
-    char *filename;
-
-    fuse_emulation_pause();
-
-    filename = ui_get_save_filename( "Fuse - Write microdrive disk to file" );
-    if( !filename ) { fuse_emulation_unpause(); return; }
-
-    if1_mdr_sync( filename, action - 1 );
-
-    free( filename );
-
-    fuse_emulation_unpause();
-  } else {
-    WIDGET_END;
-  }
-}
-
 MENU_CALLBACK_WITH_ACTION( menu_media_mdr_eject )
 {
+  int which, write;
 
-  if( if1_mdr_eject( NULL, action - 1 ) ) {
-    char *filename;
+  WIDGET_END;
 
-    fuse_emulation_pause();
+  action--;
+  which = action & 0x0f;
+  write = action & 0x10;
 
-    filename = ui_get_save_filename( "Fuse - Write microdrive disk to file" );
-    if( !filename ) { fuse_emulation_unpause(); return; }
-
-    if1_mdr_eject( filename, action - 1 );
-
-    free( filename );
-
-    fuse_emulation_unpause();
-  } else {
-    WIDGET_END;
-  }
+  if1_mdr_eject( which, write );
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_writep )
+MENU_CALLBACK_WITH_ACTION( menu_media_mdr_writeprotect )
 {
   WIDGET_END;
 
-  if1_mdr_writep( action & 0xf0, ( action & 0x0f ) - 1 );
+  if1_mdr_writeprotect( action & 0xf0, ( action & 0x0f ) - 1 );
 
 }
 
@@ -629,7 +600,7 @@ menu_open_snap( void )
 int
 menu_check_media_changed( void )
 {
-  int confirm;
+  int confirm, i;
 
   confirm = tape_close(); if( confirm ) return 1;
 
@@ -660,6 +631,11 @@ menu_check_media_changed( void )
 
   confirm = plusd_disk_eject( PLUSD_DRIVE_2, 0 );
   if( confirm ) return 1;
+
+  for( i = 0; i < 8; i++ ) {
+    confirm = if1_mdr_eject( i, 0 );
+    if( confirm ) return 1;
+  }
 
   if( settings_current.simpleide_master_file ) {
     confirm = simpleide_eject( LIBSPECTRUM_IDE_MASTER );

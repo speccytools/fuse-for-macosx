@@ -51,7 +51,6 @@
 #define MDR_OUT 2
 
 typedef struct microdrive_t {
-  char *filename;
   utils_file file;
   int inserted;
   int motor_on;
@@ -218,7 +217,6 @@ if1_init( void )
     libspectrum_error error =
       libspectrum_microdrive_alloc( &( microdrive[i].cartridge ) );
     if( error ) return error;
-    microdrive[i].filename = NULL;
     microdrive[i].inserted = 0;
     microdrive[i].modified = 0;
   }
@@ -751,7 +749,7 @@ microdrives_restart( void )
 }
 
 void
-if1_mdr_writep( int w, int drive )
+if1_mdr_writeprotect( int w, int drive )
 {
   libspectrum_microdrive_set_write_protect( microdrive[drive].cartridge,
 					    w ? 1 : 0 );
@@ -761,19 +759,25 @@ if1_mdr_writep( int w, int drive )
 }
 
 void
-if1_mdr_new( int drive )
+if1_mdr_new( int which )
 {
+  microdrive_t *mdr;
   libspectrum_byte len;
   size_t i;
 
-  microdrive_t *mdr = &microdrive[drive];
-
-  if( mdr->inserted && if1_mdr_eject( NULL, drive ) ) {
-    ui_error( UI_ERROR_ERROR,
-	      "New cartridge in drive, please eject manually" );
+  if( which >= 8 ) {
+    ui_error( UI_ERROR_ERROR, "if1_mdr_new: unknown drive %d", which );
     return;
   }
-  
+
+  mdr = &microdrive[ which ];
+
+  /* Eject any cartridge already in the drive */
+  if( mdr->inserted ) {
+    /* Abort the insert if we want to keep the current cartridge */
+    if( if1_mdr_eject( which, 0 ) ) return;
+  }
+
   if( settings_current.mdr_len == 0 ) {	/* Random length */
     len = 171 + ( ( rand() >> 2 ) + ( rand() >> 2 ) +
                   ( rand() >> 2 ) + ( rand() >> 2 ) )
@@ -791,104 +795,127 @@ if1_mdr_new( int drive )
   /* but don't write-protect */
   libspectrum_microdrive_set_write_protect( mdr->cartridge, 0 );
 
-  mdr->filename = NULL;
   mdr->inserted = 1;
   mdr->modified = 1;
 
-  update_menu( UMENU_MDRV1 + drive );
+  update_menu( UMENU_MDRV1 + which );
 }
 
-void
-if1_mdr_insert( const char *filename, int drive )
+int
+if1_mdr_insert( int which, const char *filename )
 {
   microdrive_t *mdr;
   int i;
-  
-  if( drive == -1 ) {	/* find an empty one */
+
+  if( which == -1 ) {	/* find an empty one */
     for( i = 0; i < 8; i++ ) {
       if( !microdrive[i].inserted ) {
-        drive = i;
+        which = i;
 	break;
       }
     }
   }
-  
-  if( drive == -1 ) {
+
+  if( which == -1 ) {
     ui_error( UI_ERROR_ERROR,
-	      "Cannot insert cartridge '%s', all microdrive loaded", filename );
-    return;
+	      "Cannot insert cartridge '%s', all Microdrives in use",
+	      filename );
+    return 1;
   }
 
-  mdr = &microdrive[drive];
-
-  if( mdr->inserted && if1_mdr_eject( NULL, drive ) ) {
-    ui_error( UI_ERROR_ERROR,
-	      "New cartridge in drive, please eject manually" );
-    return;
+  if( which >= 8 ) {
+    ui_error( UI_ERROR_ERROR, "if1_mdr_insert: unknown drive %d", which );
+    return 1;
   }
 
-  if( utils_read_file( filename, &mdr->file ) ) return;
+  mdr = &microdrive[ which ];
+
+  /* Eject any cartridge already in the drive */
+  if( mdr->inserted ) {
+    /* Abort the insert if we want to keep the current cartridge */
+    if( if1_mdr_eject( which, 0 ) ) return 0;
+  }
+
+  if( utils_read_file( filename, &mdr->file ) ) {
+    ui_error( UI_ERROR_ERROR, "Failed to open cartridge image" );
+    return 1;
+  }
 
   if( libspectrum_microdrive_mdr_read( mdr->cartridge, mdr->file.buffer,
-				       mdr->file.length                  ) )
-    return;
+				       mdr->file.length ) ) {
+    utils_close_file( &mdr->file );
+    ui_error( UI_ERROR_ERROR, "Failed to open cartridge image" );
+    return 1;
+  }
 
-  if( utils_close_file( &mdr->file ) ) return;
+  if( utils_close_file( &mdr->file ) ) return 1;
 
   mdr->inserted = 1;
+  mdr->modified = 0;
 
-  mdr->filename = malloc( strlen( filename ) + 1 );
-  if( mdr->filename ) {
-    strcpy( mdr->filename, filename );
-  } else {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-  }
-  
-  update_menu( UMENU_MDRV1 + drive );
-}
-
-int
-if1_mdr_sync( const char *filename, int drive )
-{
-  microdrive_t *mdr = &microdrive[drive];  
-  
-  if( mdr->modified ) {
-
-    if( !mdr->filename ) {	/* New cartridge */
-      if( !filename ) return 1;		/* We need a filename :-) */
-    } else {
-      filename = mdr->filename;
-    }
-
-    if( libspectrum_microdrive_mdr_write( mdr->cartridge, &mdr->file.buffer,
-					  &mdr->file.length ) )
-      return 0;
-    
-    if( utils_write_file( filename, mdr->file.buffer, mdr->file.length ) )
-      return 0;
-
-    if( !mdr->filename ) {	/* New cartridge */
-      mdr->filename = malloc( strlen( filename ) + 1 );
-      if( mdr->filename )
-        strcpy( mdr->filename, filename );
-    }
-  }
+  update_menu( UMENU_MDRV1 + which );
 
   return 0;
 }
 
+int
+if1_mdr_eject( int which, int write )
+{
+  microdrive_t *mdr;
+
+  if( which >= 8 )
+    return 1;
+
+  mdr = &microdrive[ which ];
+
+  if( !mdr->inserted )
+    return 0;
+
+  if( write ) {
+
+    if( ui_mdr_write( which ) ) return 1;
+
+  } else {
+
+    if( mdr->modified ) {
+
+      ui_confirm_save_t confirm = ui_confirm_save(
+	"Cartridge in Microdrive %i has been modified.\n"
+	"Do you want to save it?",
+	which + 1
+      );
+
+      switch( confirm ) {
+
+      case UI_CONFIRM_SAVE_SAVE:
+	if( ui_mdr_write( which ) ) return 1;
+	break;
+
+      case UI_CONFIRM_SAVE_DONTSAVE: break;
+      case UI_CONFIRM_SAVE_CANCEL: return 1;
+
+      }
+    }
+  }
+
+  mdr->inserted = 0;
+  
+  update_menu( UMENU_MDRV1 + which );
+  return 0;
+}
 
 int
-if1_mdr_eject( const char *filename, int drive )
+if1_mdr_write( int which, const char *filename )
 {
-  /* Report if we need a filename */
-  if( if1_mdr_sync( filename, drive ) ) return 1;  
-
-  microdrive[drive].inserted = 0;
-  free( microdrive[drive].filename );
-  microdrive[drive].filename = NULL;
+  microdrive_t *mdr = &microdrive[which];  
   
-  update_menu( UMENU_MDRV1 + drive );
+  if( libspectrum_microdrive_mdr_write( mdr->cartridge, &mdr->file.buffer,
+					  &mdr->file.length ) )
+    return 1;
+    
+  if( utils_write_file( filename, mdr->file.buffer, mdr->file.length ) )
+    return 1;
+
   return 0;
 }
 
