@@ -2254,3 +2254,6 @@
 20071112 menu_data.pl,ui/win32/{menu_data.[ch],menu_data.rc}: update menu data
 	 for the Win32 UI (Stuart).
 20071112 menu_data.pl: remove dead code (Stuart).
+20071112 hacking/tc2048_tech_notes.txt,machines/{tc2048.c,tc2068.c}: contention
+         tweak for TC2048 and TC2068 based on test programs from Phil and
+         Mark Woodmass (Fred).

@@ -114,7 +114,7 @@ libspectrum_byte
 tc2068_contend_delay( libspectrum_dword time )
 {
   libspectrum_word tstates_through_line;
-  
+
   /* No contention in the upper border */
   if( time < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
     return 0;
@@ -124,9 +124,11 @@ tc2068_contend_delay( libspectrum_dword time )
 					   DISPLAY_HEIGHT          ] )
     return 0;
 
-  /* Work out where we are in this line */
+  /* Work out where we are in this line, there is nothing magic about the 16
+     below, it is just what is required to align the contention values below
+     to their measured values */
   tstates_through_line =
-    ( time + machine_current->timings.left_border ) %
+    ( time + machine_current->timings.left_border + 16 ) %
     machine_current->timings.tstates_per_line;
 
   /* No contention if we're in the left border */
@@ -141,14 +143,14 @@ tc2068_contend_delay( libspectrum_dword time )
   /* We now know the ULA is reading the screen, so put in the appropriate
      delay */
   switch( tstates_through_line % 8 ) {
-    case 7: return 6; break;
-    case 0: return 5; break;
-    case 1: return 4; break;
-    case 2: return 3; break;
-    case 3: return 2; break;
-    case 4: return 1; break;
-    case 5: return 0; break;
+    case 0: return 6; break;
+    case 1: return 5; break;
+    case 2: return 4; break;
+    case 3: return 3; break;
+    case 4: return 2; break;
+    case 5: return 1; break;
     case 6: return 0; break;
+    case 7: return 0; break;
   }
 
   return 0;	/* Shut gcc up */
