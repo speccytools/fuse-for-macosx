@@ -302,8 +302,6 @@ CODE
 CODE
     } elsif( $mode eq 'h' ) {
 	print << "CODE";
-
-void handle_menu( DWORD cmd, HWND okno );
 CODE
     } elsif( $mode eq 'rc' ) {
 	print << "CODE";

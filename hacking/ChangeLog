@@ -2251,3 +2251,5 @@
 	 Microdrive cartridge insertion/ejection code (fixes bugs #1828225 and
 	 1828984) (Stuart).
 20071111 disk/disk.[ch]: remove 'filename' member of disk_t (Stuart).
+20071112 menu_data.pl,ui/win32/{menu_data.[ch],menu_data.rc}: update menu data
+	 for the Win32 UI (Stuart).
