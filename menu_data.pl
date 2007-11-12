@@ -300,9 +300,6 @@ CODE
   }
 }
 CODE
-    } elsif( $mode eq 'h' ) {
-	print << "CODE";
-CODE
     } elsif( $mode eq 'rc' ) {
 	print << "CODE";
 }
