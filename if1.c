@@ -50,6 +50,18 @@
 #define MDR_BAD 1
 #define MDR_OUT 2
 
+enum {
+  SYNC_NO = 0,
+  SYNC_OK = 0xff
+};
+
+/*
+ Microdrive cartridge
+   GAP      PREAMBLE      15 byte      GAP      PREAMBLE      15 byte    512     1
+ [-----][00 00 ... ff ff][BLOCK HEAD][-----][00 00 ... ff ff][REC HEAD][ DATA ][CHK]
+ Preamble = 10 * 0x00 + 2 * 0xff (12 byte) 
+*/
+ 
 typedef struct microdrive_t {
   utils_file file;
   int inserted;
@@ -58,7 +70,7 @@ typedef struct microdrive_t {
   int transfered;
   int modified;
   long int max_bytes;
-  libspectrum_byte bad[128];	/* bad sectors */
+  libspectrum_byte pream[512];	/* preamble/sync area written */
   libspectrum_byte last;
   libspectrum_byte gap;
   libspectrum_byte sync;
@@ -95,6 +107,20 @@ typedef struct if1_ula_t {
   int wait;	/* Wait state */
   int busy;	/* Indicate busy; if1 software never poll it ... */
 } if1_ula_t;
+
+/*
+                         7   6   5   4   3   2   1   0
+ STATUS RO $EF(239)	--- --- --- BSY DTR GAP SYN WPR
+
+ CONTRO WO $EF(239)     --- --- WAT CTS ERA R/w CLK DTA
+
+ MDR DT RW $E7(231)     D7  D6  D5  D4  D3  D2  D1  D0
+ 
+ COMM I RO $F7(247)     TX  --- --- --- --- --- --- NET
+
+ COMM O WO $F7(247)     --- --- --- --- --- --- --- NET/RX
+
+*/
 
 /* IF1 paged out ROM activated? */
 int if1_active = 0;
@@ -150,42 +176,42 @@ update_menu( enum if1_menu_item what )
 {
   if( what == UMENU_ALL || what == UMENU_MDRV1 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_EJECT, IN( 1 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET, !WP( 1 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET, !IN( 1 ) ? 0 : !WP( 1 ) );
   }
 
   if( what == UMENU_ALL || what == UMENU_MDRV2 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_EJECT, IN( 2 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET, !WP( 2 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET, !IN( 2 ) ? 0 : !WP( 2 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV3 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_EJECT, IN( 3 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET, !WP( 3 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET, !IN( 3 ) ? 0 : !WP( 3 ) );
   }
 
   if( what == UMENU_ALL || what == UMENU_MDRV4 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_EJECT, IN( 4 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET, !WP( 4 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET, !IN( 4 ) ? 0 : !WP( 4 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV5 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_EJECT, IN( 5 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET, !WP( 5 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET, !IN( 5 ) ? 0 : !WP( 5 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV6 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_EJECT, IN( 6 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET, !WP( 6 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET, !IN( 6 ) ? 0 : !WP( 6 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV7 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_EJECT, IN( 7 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET, !WP( 7 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET, !IN( 7 ) ? 0 : !WP( 7 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV8 ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_EJECT, IN( 8 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET, !WP( 8 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET, !IN( 8 ) ? 0 : !WP( 8 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_RS232 ) {
@@ -201,7 +227,7 @@ update_menu( enum if1_menu_item what )
 int
 if1_init( void )
 {
-  size_t i;
+  int m;
 
   if1_ula.fd_r = -1;
   if1_ula.fd_t = -1;
@@ -213,12 +239,12 @@ if1_init( void )
   if1_ula.s_net_mode = S_NET_INT;
   if1_ula.net = 0;
 
-  for( i = 0; i < 8; i++ ) {
+  for( m = 0; m < 8; m++ ) {
     libspectrum_error error =
-      libspectrum_microdrive_alloc( &( microdrive[i].cartridge ) );
+      libspectrum_microdrive_alloc( &( microdrive[m].cartridge ) );
     if( error ) return error;
-    microdrive[i].inserted = 0;
-    microdrive[i].modified = 0;
+    microdrive[m].inserted = 0;
+    microdrive[m].modified = 0;
   }
 
   module_register( &if1_module_info );
@@ -229,11 +255,11 @@ if1_init( void )
 libspectrum_error
 if1_end( void )
 {
-  size_t i;
+  int m;
 
-  for( i = 0; i < 8; i++ ) {
+  for( m = 0; m < 8; m++ ) {
     libspectrum_error error =
-      libspectrum_microdrive_free( microdrive[i].cartridge );
+      libspectrum_microdrive_free( microdrive[m].cartridge );
     if( error ) return error;
   }
 
@@ -308,6 +334,7 @@ microdrives_reset( void )
     microdrive[m].motor_on = 0; /* motor off */
     microdrive[m].gap      = 15;
     microdrive[m].sync     = 15;
+    microdrive[m].transfered = 0;
   }
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_INACTIVE );
@@ -342,22 +369,22 @@ static libspectrum_byte
 port_mdr_in( void )
 {
   libspectrum_byte ret = 0xff;
-  size_t i;
+  int m;
 
-  for( i = 0; i < 8; i++ ) {
+  for( m = 0; m < 8; m++ ) {
 
-    microdrive_t *drive = &microdrive[ i ];
+    microdrive_t *mdr = &microdrive[ m ];
 
-    if( drive->motor_on && drive->inserted ) {
+    if( mdr->motor_on && mdr->inserted ) {
 
-      if( drive->transfered < drive->max_bytes ) {
-	drive->last = libspectrum_microdrive_data( drive->cartridge,
-						   drive->head_pos );
-	increment_head( i );
+      if( mdr->transfered < mdr->max_bytes ) {
+	mdr->last = libspectrum_microdrive_data( mdr->cartridge,
+						   mdr->head_pos );
+	increment_head( m );
       }
 
-      drive->transfered++;
-      ret &= drive->last;  /* I assume negative logic, but how know? */
+      mdr->transfered++;
+      ret &= mdr->last;  /* I assume negative logic, but how know? */
     }
 
   }
@@ -369,27 +396,30 @@ static libspectrum_byte
 port_ctr_in( void )
 {
   libspectrum_byte ret = 0xff;
-  size_t i;
+  int m, block;
 
-  for( i = 0; i < 8; i++ ) {
+  for( m = 0; m < 8; m++ ) {
 
-    microdrive_t *drive = &microdrive[ i ];
+    microdrive_t *mdr = &microdrive[ m ];
 
-    if( drive->motor_on && drive->inserted ) {
-      if( drive->gap ) {
-	/* ret &= 0xff;  GAP and SYNC high */
-	drive->gap--;
-      } else {
-	ret &= 0xf9; /* GAP and SYNC low */
-	if( drive->sync ) {
-	  drive->sync--;
-	} else {
-	  drive->gap = 15;
-	  drive->sync = 15;
-	}
+    if( mdr->motor_on && mdr->inserted ) {
+      block = mdr->head_pos / 543 + ( mdr->max_bytes == 15 ? 0 : 256 );
+      if( mdr->pream[block] == SYNC_OK ) {	/* if formatted */
+	if( mdr->gap ) {
+	/* ret &= 0xff;  GAP and SYNC high ? */
+	  mdr->gap--;
+        } else {
+	  ret &= 0xf9; /* GAP and SYNC low */
+	  if( mdr->sync ) {
+	    mdr->sync--;
+	  } else {
+	    mdr->gap = 15;
+	    mdr->sync = 15;
+	  }
+        }
       }
       /* if write protected */
-      if( libspectrum_microdrive_write_protect( drive->cartridge) )
+      if( libspectrum_microdrive_write_protect( mdr->cartridge) )
 	ret &= 0xfe; /* active bit */
     }
   }
@@ -522,26 +552,37 @@ if1_port_in( libspectrum_word port GCC_UNUSED, int *attached )
 static void
 port_mdr_out( libspectrum_byte val )
 {
-  size_t i;
+  int m, block;
 
   /* allow access to the port only if motor 1 is ON and there's a file open */
-  for( i = 0; i < 8; i++ ) {
+  for( m = 0; m < 8; m++ ) {
 
-    microdrive_t *drive = &microdrive[ i ];
-
-    if( drive->motor_on && drive->inserted ) {
-
-      if( drive->transfered > 11 &&
-	  drive->transfered < drive->max_bytes + 12 ) {
-
-	libspectrum_microdrive_set_data( drive->cartridge, drive->head_pos,
-					 val );
-	increment_head( i );
-	drive->modified = 1;
-
+    microdrive_t *mdr = &microdrive[ m ];
+ 
+    if( mdr->motor_on && mdr->inserted ) {
+#ifdef IF1_DEBUG_MDR
+      fprintf(stderr, "#%05d  %03d(%03d): 0x%02x\n",
+    			mdr->head_pos, mdr->transfered, mdr->max_bytes, val );
+#endif
+      block = mdr->head_pos / 543 + ( mdr->max_bytes == 15 ? 0 : 256 );
+      if( mdr->transfered == 0 && val == 0x00 ) {	/* start pream */
+        mdr->pream[block] = 1;
+      } else if( mdr->transfered > 0 && mdr->transfered < 10 && val == 0x00 ) {
+        mdr->pream[block]++;
+      } else if( mdr->transfered > 9 && mdr->transfered < 12 && val == 0xff ) {
+        mdr->pream[block]++;
+      } else if( mdr->transfered == 12 && mdr->pream[block] == 12 ) {
+        mdr->pream[block] = SYNC_OK;
       }
-
-      drive->transfered++;
+      if( mdr->transfered > 11 &&
+	  mdr->transfered < mdr->max_bytes + 12 ) {
+ 
+	libspectrum_microdrive_set_data( mdr->cartridge, mdr->head_pos,
+ 					 val );
+ 	increment_head( m );
+	mdr->modified = 1;
+      }
+      mdr->transfered++;
     }
   }
 }
@@ -549,7 +590,7 @@ port_mdr_out( libspectrum_byte val )
 static void
 port_ctr_out( libspectrum_byte val )
 {
-  size_t m;
+  int m;
 
   if( !( val & 0x02 ) && ( if1_ula.comms_clk ) ) {	/* ~~\__ */
 
@@ -763,7 +804,7 @@ if1_mdr_new( int which )
 {
   microdrive_t *mdr;
   libspectrum_byte len;
-  size_t i;
+  long int i;
 
   if( which >= 8 ) {
     ui_error( UI_ERROR_ERROR, "if1_mdr_new: unknown drive %d", which );
@@ -805,12 +846,12 @@ int
 if1_mdr_insert( int which, const char *filename )
 {
   microdrive_t *mdr;
-  int i;
+  int m, i;
 
   if( which == -1 ) {	/* find an empty one */
-    for( i = 0; i < 8; i++ ) {
-      if( !microdrive[i].inserted ) {
-        which = i;
+    for( m = 0; m < 8; m++ ) {
+      if( !microdrive[m].inserted ) {
+        which = m;
 	break;
       }
     }
@@ -852,6 +893,10 @@ if1_mdr_insert( int which, const char *filename )
 
   mdr->inserted = 1;
   mdr->modified = 0;
+  /* we assume formatted cartridges */
+  for( i = libspectrum_microdrive_cartridge_len( mdr->cartridge );
+	i > 0; i-- )
+    mdr->pream[255 + i] = mdr->pream[i-1] = SYNC_OK;
 
   update_menu( UMENU_MDRV1 + which );
 

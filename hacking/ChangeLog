@@ -2260,3 +2260,5 @@
 20071112 machines/pentagon.c: revert spec128 memory port change arising from
          Pentagon 512 and Pentagon 1024 emulation merge (patch #1774492), as it
          breaks the Eyeache 2 demo at least (fixes bug #1829280) (Fred).
+20071115 if1.c: unformatted Microdrive cartridge fixes (patch #1769451)
+	 (Gergely Szasz).
