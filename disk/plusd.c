@@ -166,6 +166,7 @@ plusd_reset( int hard_reset )
   memory_map_romcs[ 1 ].writable = 1;
 
   plusd_available = 1;
+  plusd_active = 1;
   plusd_index_pulse = 0;
 
   if( hard_reset )

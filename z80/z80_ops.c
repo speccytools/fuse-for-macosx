@@ -173,7 +173,7 @@ z80_do_opcodes( void )
 
     CHECK( plusd, plusd_available )
 
-    if( PC == 0x0008 || PC == 0x0066 || PC == 0x003a ) {
+    if( PC == 0x0008 || PC == 0x003a || PC == 0x0066 || PC == 0x028e ) {
       plusd_page();
     }
 

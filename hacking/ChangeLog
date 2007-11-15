@@ -2262,3 +2262,5 @@
          breaks the Eyeache 2 demo at least (fixes bug #1829280) (Fred).
 20071115 if1.c: unformatted Microdrive cartridge fixes (patch #1769451)
 	 (Gergely Szasz).
+20071115 disk/plusd.c,z80/z80_ops.c: activate +D on reset and when executing
+	 at 0x028e (KEY-SCAN) (Stuart Brady).
