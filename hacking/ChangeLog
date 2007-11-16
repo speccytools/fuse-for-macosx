@@ -2264,3 +2264,4 @@
 	 (Gergely Szasz).
 20071115 disk/plusd.c,z80/z80_ops.c: activate +D on reset and when executing
 	 at 0x028e (KEY-SCAN) (Stuart Brady).
+20071117 disk/plusd.c: ensure we get a prototype for memset (Fred).
