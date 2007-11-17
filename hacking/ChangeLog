@@ -2267,3 +2267,5 @@
 20071117 disk/plusd.c: ensure we get a prototype for memset (Fred).
 20071117 if2.c, machine.c: fix loading Interface II ROMs (thanks, Stuart Brady)
 	 (Fred).
+20071118 sound/sdlsound.c: don't use power of two sound buffers on Amiga
+         (more of patch #1712260) (Chris Young).

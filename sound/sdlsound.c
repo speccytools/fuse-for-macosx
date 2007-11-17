@@ -86,11 +86,11 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   hz = (float)machine_current->timings.processor_speed /
               machine_current->timings.tstates_per_frame;
   sound_framesiz = *freqptr / hz;
-#ifndef __MORPHOS__  
+#if !defined AMIGA && !defined __MORPHOS__
   requested.samples = pow(2.0, floor(log2(sound_framesiz)));
-#else			/* #ifndef __MORPHOS__ */
+#else			/* #if !defined AMIGA && !defined __MORPHOS__ */
   requested.samples = sound_framesiz;
-#endif			/* #ifndef __MORPHOS__ */
+#endif			/* #if !defined AMIGA && !defined __MORPHOS__ */
 
   if ( SDL_OpenAudio( &requested, &received ) < 0 ) {
     settings_current.sound = 0;
@@ -111,11 +111,11 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     hz = (float)machine_current->timings.processor_speed /
                 machine_current->timings.tstates_per_frame;
     sound_framesiz = *freqptr / hz;
-#ifndef __MORPHOS__    
+#if !defined AMIGA && !defined __MORPHOS__   
     requested.samples = pow(2.0, floor(log2(sound_framesiz)));
-#else			/* #ifndef __MORPHOS__ */
+#else			/* #if !defined AMIGA && !defined __MORPHOS__ */
     requested.samples = sound_framesiz;
-#endif			/* #ifndef __MORPHOS__ */
+#endif			/* #if !defined AMIGA && !defined __MORPHOS__ */
 
     if( SDL_OpenAudio( &requested, NULL ) < 0 ) {
       settings_current.sound = 0;
