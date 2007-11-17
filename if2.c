@@ -116,7 +116,7 @@ if2_reset( int hard_reset GCC_UNUSED )
 
   machine_load_rom_bank( memory_map_romcs, 0, 0,
 			 settings_current.if2_file,
-			 settings_default.if2_file,
+			 NULL,
 			 2 * MEMORY_PAGE_SIZE );
 
   memory_map_romcs[0].source =
