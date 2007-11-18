@@ -2269,3 +2269,5 @@
 	 (Fred).
 20071118 sound/sdlsound.c: don't use power of two sound buffers on Amiga
          (more of patch #1712260) (Chris Young).
+20071118 menu.c,menu_data.dat: simplify menu_media_disk_{insert,eject} action
+	 encoding (thanks, Gergely) (Stuart).

@@ -398,8 +398,8 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
   int which, type;
   
   action--;
-  which = action & 0x03;
-  type = ( action & 0x0c ) >> 2;
+  which = action & 0x0f;
+  type = ( action & 0xf0 ) >> 4;
 
   fuse_emulation_pause();
 
@@ -432,9 +432,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
   WIDGET_END;
 
   action--;
-  which = action & 0x03;
-  type = ( action & 0x0c ) >> 2;
-  write = action & 0x10;
+  which = action & 0x00f;
+  type = ( action & 0x0f0 ) >> 4;
+  write = !!( action & 0x100 );
 
   switch( type ) {
   case 0:
