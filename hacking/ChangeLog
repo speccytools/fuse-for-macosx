@@ -2283,5 +2283,5 @@
 	 request a blank image (more of patch #1834231) (Gergely Szasz).
 20071119 disk/{beta.c,plusd.c},menu.c,menu_data.dat: add UI to insert blank
 	 +D and Beta disks (more of patch #1834231) (Gergely Szasz).
-20071119 menu_data.dat: rename set/remove write protect options to
+20071119 menu_data.dat,ui.c: rename set/remove write protect options to
 	 enable/disable (Stuart).

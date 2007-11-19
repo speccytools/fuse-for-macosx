@@ -232,8 +232,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 1/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET,
-    "/Media/Interface I/Microdrive 1/Write protect/Set",
-    "/Media/Interface I/Microdrive 1/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 1/Write protect/Enable",
+    "/Media/Interface I/Microdrive 1/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M2_EJECT,
     "/Media/Interface I/Microdrive 2/Eject",
@@ -241,8 +241,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 2/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET,
-    "/Media/Interface I/Microdrive 2/Write protect/Set",
-    "/Media/Interface I/Microdrive 2/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 2/Write protect/Enable",
+    "/Media/Interface I/Microdrive 2/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M3_EJECT,
     "/Media/Interface I/Microdrive 3/Eject",
@@ -250,8 +250,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 3/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET,
-    "/Media/Interface I/Microdrive 3/Write protect/Set",
-    "/Media/Interface I/Microdrive 3/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 3/Write protect/Enable",
+    "/Media/Interface I/Microdrive 3/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M4_EJECT,
     "/Media/Interface I/Microdrive 4/Eject",
@@ -259,8 +259,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 4/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET,
-    "/Media/Interface I/Microdrive 4/Write protect/Set",
-    "/Media/Interface I/Microdrive 4/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 4/Write protect/Enable",
+    "/Media/Interface I/Microdrive 4/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M5_EJECT,
     "/Media/Interface I/Microdrive 5/Eject",
@@ -268,8 +268,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 5/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET,
-    "/Media/Interface I/Microdrive 5/Write protect/Set",
-    "/Media/Interface I/Microdrive 5/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 5/Write protect/Enable",
+    "/Media/Interface I/Microdrive 5/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M6_EJECT,
     "/Media/Interface I/Microdrive 6/Eject",
@@ -277,8 +277,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 6/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET,
-    "/Media/Interface I/Microdrive 6/Write protect/Set",
-    "/Media/Interface I/Microdrive 6/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 6/Write protect/Enable",
+    "/Media/Interface I/Microdrive 6/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M7_EJECT,
     "/Media/Interface I/Microdrive 7/Eject",
@@ -286,8 +286,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 7/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET,
-    "/Media/Interface I/Microdrive 7/Write protect/Set",
-    "/Media/Interface I/Microdrive 7/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 7/Write protect/Enable",
+    "/Media/Interface I/Microdrive 7/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M8_EJECT,
     "/Media/Interface I/Microdrive 8/Eject",
@@ -295,8 +295,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Interface I/Microdrive 8/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET,
-    "/Media/Interface I/Microdrive 8/Write protect/Set",
-    "/Media/Interface I/Microdrive 8/Write protect/Remove", 1 },
+    "/Media/Interface I/Microdrive 8/Write protect/Enable",
+    "/Media/Interface I/Microdrive 8/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IF1_RS232_UNPLUG_R,
     "/Media/Interface I/RS232/Unplug RxD" },
