@@ -284,7 +284,7 @@ MENU_CALLBACK( menu_media_tape_open )
   filename = ui_get_open_filename( "Fuse - Open Tape" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  tape_open_default_autoload( filename, NULL );
+  tape_open( filename, 0 );
 
   free( filename );
 
@@ -409,14 +409,14 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   switch( type ) {
   case 0:
 #ifdef HAVE_765_H
-    specplus3_disk_insert_default_autoload( which, filename );
+    specplus3_disk_insert( which, filename, 0 );
 #endif				/* #ifdef HAVE_765_H */
     break;
   case 1:
-    beta_disk_insert_default_autoload( which, filename );
+    beta_disk_insert( which, filename, 0 );
     break;
   case 2:
-    plusd_disk_insert_default_autoload( which, filename );
+    plusd_disk_insert( which, filename, 0 );
     break;
   case 3:
     if1_mdr_insert( which, filename );

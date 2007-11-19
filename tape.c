@@ -93,13 +93,6 @@ int tape_init( void )
   return 0;
 }
 
-/* Open a tape using the current option for whether to autoload or not */
-int
-tape_open_default_autoload( const char *filename, void *data GCC_UNUSED )
-{
-  return tape_open( filename, settings_current.auto_load );
-}
-
 int tape_open( const char *filename, int autoload )
 {
   utils_file file;

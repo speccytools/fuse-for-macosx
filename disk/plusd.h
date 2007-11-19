@@ -74,8 +74,6 @@ void plusd_printer_write( libspectrum_word port, libspectrum_byte b );
 
 int plusd_disk_insert( plusd_drive_number which, const char *filename,
 		       int autoload );
-int plusd_disk_insert_default_autoload( plusd_drive_number which,
-					const char *filename );
 int plusd_disk_eject( plusd_drive_number which, int write );
 int plusd_disk_write( plusd_drive_number which, const char *filename );
 int plusd_disk_writeprotect( plusd_drive_number which, int wrprot );

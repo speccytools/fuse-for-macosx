@@ -392,13 +392,6 @@ beta_disk_writeprotect( beta_drive_number which, int wrprot )
 }
 
 int
-beta_disk_insert_default_autoload( beta_drive_number which,
-				       const char *filename )
-{
-  return beta_disk_insert( which, filename, settings_current.auto_load );
-}
-
-int
 beta_disk_eject( beta_drive_number which, int write )
 {
   wd_fdc_drive *d;

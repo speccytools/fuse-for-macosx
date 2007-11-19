@@ -529,13 +529,6 @@ specplus3_disk_present( specplus3_drive_number which )
 }
 
 int
-specplus3_disk_insert_default_autoload( specplus3_drive_number which,
-                                        const char *filename )
-{
-  return specplus3_disk_insert( which, filename, settings_current.auto_load );
-}
-
-int
 specplus3_disk_insert( specplus3_drive_number which, const char *filename,
                        int autoload )
 {

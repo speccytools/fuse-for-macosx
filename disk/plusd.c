@@ -338,13 +338,6 @@ plusd_printer_write( libspectrum_word port, libspectrum_byte b )
 }
 
 int
-plusd_disk_insert_default_autoload( plusd_drive_number which,
-				    const char *filename )
-{
-  return plusd_disk_insert( which, filename, settings_current.auto_load );
-}
-
-int
 plusd_disk_insert( plusd_drive_number which, const char *filename,
 		   int autoload )
 {
