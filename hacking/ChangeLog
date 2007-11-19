@@ -2271,3 +2271,6 @@
          (more of patch #1712260) (Chris Young).
 20071118 menu.c,menu_data.dat: simplify menu_media_disk_{insert,eject} action
 	 encoding (thanks, Gergely) (Stuart).
+20071119 ui/win32/{Makefile.am,menu_data.c,menu_data.h,menu_data.rc}: remove
+	 pregenerated Win32 menu data, and a add phony target to generate the
+	 Win32 menu data (Stuart).

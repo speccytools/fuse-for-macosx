@@ -34,7 +34,6 @@ libuiwin32_a_SOURCES = debugger.c \
 		       error.c \
 		       keysyms.c \
 		       menu_data.c \
-		       menu_data.rc \
 		       pokefinder.rc \
 		       statusbar.c \
 		       win32display.c \
@@ -42,16 +41,35 @@ libuiwin32_a_SOURCES = debugger.c \
 		       win32ui.c \
 		       win32ui.rc
 
-BUILT_SOURCES = keysyms.c
+BUILT_SOURCES = keysyms.c \
+		menu_data.c \
+		menu_data.rc \
+		menu_data.h
 
 keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl win32 $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
+menu_data.c: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(srcdir)/../../menu_data.dat ../../config.h
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl win32 c > $@.tmp && mv $@.tmp $@
+
+menu_data.h: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(srcdir)/../../menu_data.dat ../../config.h
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl win32 h > $@.tmp && mv $@.tmp $@
+
+menu_data.rc: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(srcdir)/../../menu_data.dat ../../config.h
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl win32 rc > $@.tmp && mv $@.tmp $@
+
+.PHONY: menu_data
+
+menu_data: menu_data.c menu_data.h menu_data.rc
+
 noinst_HEADERS = debugger.h \
-		 menu_data.h \
 		 pokefinder.h \
+		 menu_data.h \
 		 win32display.h \
 		 win32internals.h \
 		 win32keyboard.h
 
-CLEANFILES = keysyms.c
+CLEANFILES = keysyms.c \
+	     menu_data.c \
+	     menu_data.h \
+	     menu_data.rc
