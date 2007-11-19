@@ -103,6 +103,8 @@ void fdd_flip( fdd_t *d, int upsidedown );
    read 0x0100 if disk unreadable or not motor on and/or head not loaded.
 */
 int fdd_read_write_data( fdd_t *d, fdd_write_t write );
+/* set write protect status on loaded disk */
+void fdd_wrprot( fdd_t *d, int wrprot );
 /* to reach index hole */
 void fdd_wait_index_hole( fdd_t *d );
 

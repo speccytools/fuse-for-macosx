@@ -583,6 +583,7 @@ disk_new( disk_t *d, int sides, int cylinders,
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
 
+  d->wrprot = 0;
   d->dirty = 0;
   return d->status = DISK_OK;
 }
@@ -1245,6 +1246,8 @@ disk_open( disk_t *d, const char *filename, int preindex )
 
   if( access( filename, W_OK ) == -1 )		/* file read only */
     d->wrprot = 1;
+  else
+    d->wrprot = 0;
   
   switch ( type ) {
   case DISK_UDI:

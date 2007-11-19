@@ -151,12 +151,20 @@ beta_reset( void )
   /* We can eject disks only if they are currently present */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
 		    beta_drives[ BETA_DRIVE_A ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
+		    !beta_drives[ BETA_DRIVE_A ].fdd.wrprot );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
 		    beta_drives[ BETA_DRIVE_B ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
+		    !beta_drives[ BETA_DRIVE_B ].fdd.wrprot );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
 		    beta_drives[ BETA_DRIVE_C ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
+		    !beta_drives[ BETA_DRIVE_C ].fdd.wrprot );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
 		    beta_drives[ BETA_DRIVE_D ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
+		    !beta_drives[ BETA_DRIVE_D ].fdd.wrprot );
 
   beta_fdc->current_drive = &beta_drives[ 0 ];
   machine_current->memory_map();
@@ -317,15 +325,23 @@ beta_disk_insert( beta_drive_number which, const char *filename,
   switch( which ) {
   case BETA_DRIVE_A:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
+		      !beta_drives[ BETA_DRIVE_A ].fdd.wrprot );
     break;
   case BETA_DRIVE_B:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
+		      !beta_drives[ BETA_DRIVE_B ].fdd.wrprot );
     break;
   case BETA_DRIVE_C:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
+		      !beta_drives[ BETA_DRIVE_C ].fdd.wrprot );
     break;
   case BETA_DRIVE_D:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
+		      !beta_drives[ BETA_DRIVE_D ].fdd.wrprot );
     break;
   }
 
@@ -335,6 +351,43 @@ beta_disk_insert( beta_drive_number which, const char *filename,
     beta_page();
   }
 
+  return 0;
+}
+
+int
+beta_disk_writeprotect( beta_drive_number which, int wrprot )
+{
+  wd_fdc_drive *d;
+
+  if( which >= BETA_NUM_DRIVES )
+    return 1;
+
+  d = &beta_drives[ which ];
+
+  if( !d->fdd.loaded )
+    return 1;
+
+  fdd_wrprot( &d->fdd, wrprot );
+
+  /* Set the 'writeprotect' item */
+  switch( which ) {
+  case BETA_DRIVE_A:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
+		      !beta_drives[ BETA_DRIVE_A ].fdd.wrprot );
+    break;
+  case BETA_DRIVE_B:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
+		      !beta_drives[ BETA_DRIVE_B ].fdd.wrprot );
+    break;
+  case BETA_DRIVE_C:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
+		      !beta_drives[ BETA_DRIVE_C ].fdd.wrprot );
+    break;
+  case BETA_DRIVE_D:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
+		      !beta_drives[ BETA_DRIVE_D ].fdd.wrprot );
+    break;
+  }
   return 0;
 }
 

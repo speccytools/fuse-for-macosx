@@ -78,6 +78,7 @@ int plusd_disk_insert_default_autoload( plusd_drive_number which,
 					const char *filename );
 int plusd_disk_eject( plusd_drive_number which, int write );
 int plusd_disk_write( plusd_drive_number which, const char *filename );
+int plusd_disk_writeprotect( plusd_drive_number which, int wrprot );
 int plusd_event_index( libspectrum_dword last_tstates );
 
 #endif                  /* #ifndef FUSE_PLUSD_H */

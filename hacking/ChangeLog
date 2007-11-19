@@ -2287,3 +2287,6 @@
 	 enable/disable (Stuart).
 20071119 disk/disk.c: mark newly inserted disks as not dirty (more of patch
 	 #1834231) (Gergely Szasz).
+20071119 disk/{beta.[ch],disk.c,fdd.[ch],plusd.[ch]},menu.c,menu_data.dat,
+	 ui/ui.h,ui.c: add write protect options for +D and Beta disks (rest
+	 of patch #1834231) (Gergely Szasz).

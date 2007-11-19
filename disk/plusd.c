@@ -186,8 +186,12 @@ plusd_reset( int hard_reset )
   /* We can eject disks only if they are currently present */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_1 ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
+		    !plusd_drives[ PLUSD_DRIVE_1 ].fdd.wrprot );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_2 ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
+		    !plusd_drives[ PLUSD_DRIVE_2 ].fdd.wrprot );
 
   plusd_fdc->current_drive = &plusd_drives[ 0 ];
   machine_current->memory_map();
@@ -383,9 +387,13 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   switch( which ) {
   case PLUSD_DRIVE_1:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_1 ].fdd.wrprot );
     break;
   case PLUSD_DRIVE_2:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_2 ].fdd.wrprot );
     break;
   }
 
@@ -446,6 +454,35 @@ plusd_disk_eject( plusd_drive_number which, int write )
     break;
   case PLUSD_DRIVE_2:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT, 0 );
+    break;
+  }
+  return 0;
+}
+
+int
+plusd_disk_writeprotect( plusd_drive_number which, int wrprot )
+{
+  wd_fdc_drive *d;
+
+  if( which >= PLUSD_NUM_DRIVES )
+    return 1;
+
+  d = &plusd_drives[ which ];
+
+  if( !d->fdd.loaded )
+    return 1;
+
+  fdd_wrprot( &d->fdd, wrprot );
+
+  /* Update the 'write protect' menu item */
+  switch( which ) {
+  case PLUSD_DRIVE_1:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_1 ].fdd.wrprot );
+    break;
+  case PLUSD_DRIVE_2:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_2 ].fdd.wrprot );
     break;
   }
   return 0;

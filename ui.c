@@ -328,29 +328,59 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
     "/Media/Disk/Beta/Drive A:/Eject",
-    "/Media/Disk/Beta/Drive A:/Eject and write...", 0 },
+    "/Media/Disk/Beta/Drive A:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive A:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
+    "/Media/Disk/Beta/Drive A:/Write protect/Enable",
+    "/Media/Disk/Beta/Drive A:/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
     "/Media/Disk/Beta/Drive B:/Eject",
-    "/Media/Disk/Beta/Drive B:/Eject and write...", 0 },
+    "/Media/Disk/Beta/Drive B:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive B:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
+    "/Media/Disk/Beta/Drive B:/Write protect/Enable",
+    "/Media/Disk/Beta/Drive B:/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
     "/Media/Disk/Beta/Drive C:/Eject",
-    "/Media/Disk/Beta/Drive C:/Eject and write...", 0 },
+    "/Media/Disk/Beta/Drive C:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive C:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
+    "/Media/Disk/Beta/Drive C:/Write protect/Enable",
+    "/Media/Disk/Beta/Drive C:/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
     "/Media/Disk/Beta/Drive D:/Eject",
-    "/Media/Disk/Beta/Drive D:/Eject and write...", 0 },
+    "/Media/Disk/Beta/Drive D:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive D:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
+    "/Media/Disk/Beta/Drive D:/Write protect/Enable",
+    "/Media/Disk/Beta/Drive D:/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD, "/Media/Disk/+D" },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
     "/Media/Disk/+D/Drive 1/Eject",
-    "/Media/Disk/+D/Drive 1/Eject and write...", 0 },
+    "/Media/Disk/+D/Drive 1/Eject and write...", 0,
+    "/Media/Disk/+D/Drive 1/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
+    "/Media/Disk/+D/Drive 1/Write protect/Enable",
+    "/Media/Disk/+D/Drive 1/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
     "/Media/Disk/+D/Drive 2/Eject",
-    "/Media/Disk/+D/Drive 2/Eject and write...", 0 },
+    "/Media/Disk/+D/Drive 2/Eject and write...", 0,
+    "/Media/Disk/+D/Drive 2/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
+    "/Media/Disk/+D/Drive 2/Write protect/Enable",
+    "/Media/Disk/+D/Drive 2/Write protect/Disable", 1 },
 
   { UI_MENU_ITEM_MEDIA_IDE, "/Media/IDE" },
 

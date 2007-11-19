@@ -476,10 +476,10 @@ MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
 #endif			/* #ifdef HAVE_765_H */
     break;
   case 1:
-/*    beta_disk_writeprotect( which, wrprot ); */
+    beta_disk_writeprotect( which, wrprot );
     break;
   case 2:
-/*    plusd_disk_writeprotect( which, wrprot ); */
+    plusd_disk_writeprotect( which, wrprot );
     break;
   case 3:
     if1_mdr_writeprotect( which, wrprot );
