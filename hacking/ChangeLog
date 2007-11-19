@@ -2285,3 +2285,5 @@
 	 +D and Beta disks (more of patch #1834231) (Gergely Szasz).
 20071119 menu_data.dat,ui.c: rename set/remove write protect options to
 	 enable/disable (Stuart).
+20071119 disk/disk.c: mark newly inserted disks as not dirty (more of patch
+	 #1834231) (Gergely Szasz).

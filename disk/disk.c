@@ -583,6 +583,7 @@ disk_new( disk_t *d, int sides, int cylinders,
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
 
+  d->dirty = 0;
   return d->status = DISK_OK;
 }
 
@@ -1284,6 +1285,7 @@ disk_open( disk_t *d, const char *filename, int preindex )
   }
   fclose( file );
   d->type = type;
+  d->dirty = 0;
   return d->status = DISK_OK;
 }
 
