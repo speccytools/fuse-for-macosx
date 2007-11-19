@@ -144,8 +144,9 @@ wd_fdc_reset_intrq( wd_fdc *f )
 void
 wd_fdc_set_datarq( wd_fdc *f )
 {
-  if( !( f->status_register & WD_FDC_SR_IDX_DRQ ) ) {
+  if( f->datarq != 1 ) {
     f->status_register |= WD_FDC_SR_IDX_DRQ;
+    f->datarq = 1;
     if( f->set_datarq ) f->set_datarq( f );
   }
 }
@@ -153,8 +154,9 @@ wd_fdc_set_datarq( wd_fdc *f )
 void
 wd_fdc_reset_datarq( wd_fdc *f )
 {
-  if( f->status_register & WD_FDC_SR_IDX_DRQ ) {
+  if( f->datarq == 1 ) {
     f->status_register &= ~WD_FDC_SR_IDX_DRQ;
+    f->datarq = 0;
     if( f->reset_datarq ) f->reset_datarq( f );
   }
 }

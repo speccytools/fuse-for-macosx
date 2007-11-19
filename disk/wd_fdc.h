@@ -72,6 +72,7 @@ typedef struct wd_fdc {
   fdd_dir_t direction;		/* 0 = spindlewards, 1 = rimwards */
   int dden;			/* SD/DD -> FM/MFM */
   int intrq;			/* INTRQ line status */
+  int datarq;			/* DRQ line status */
   int head_load;		/* WD1773/FD1793 */
 
   enum wd_fdc_state {

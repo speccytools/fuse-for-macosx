@@ -61,9 +61,6 @@ static int beta_index_pulse = 0;
 
 #define BETA_NUM_DRIVES 4
 
-static int beta_datarq;
-static int beta_intrq;
-
 static wd_fdc *beta_fdc;
 static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
 
@@ -107,24 +104,6 @@ beta_memory_map( void )
   memory_map_read[1] = memory_map_write[1] = memory_map_romcs[ 1 ];
 }
 
-static void
-beta_set_intrq( wd_fdc *f )
-{
-  beta_intrq = 1;
-}
-
-static void
-beta_set_datarq( wd_fdc *f )
-{
-  beta_datarq = 1;
-}
-
-static void
-beta_reset_datarq( wd_fdc *f )
-{
-  beta_datarq = 0;
-}
-
 int
 beta_init( void )
 {
@@ -140,10 +119,10 @@ beta_init( void )
   }
 
   beta_fdc->dden = 1;
-  beta_fdc->set_intrq = beta_set_intrq;
+  beta_fdc->set_intrq = NULL;
   beta_fdc->reset_intrq = NULL;
-  beta_fdc->set_datarq = beta_set_datarq;
-  beta_fdc->reset_datarq = beta_reset_datarq;
+  beta_fdc->set_datarq = NULL;
+  beta_fdc->reset_datarq = NULL;
 
   module_register( &beta_module_info );
 
@@ -283,16 +262,14 @@ beta_sp_read( libspectrum_word port GCC_UNUSED, int *attached )
   *attached = 1;
   b = 0;
 
-  if( beta_intrq )
+  if( beta_fdc->intrq )
     b |= 0x80;
 
-  if( beta_datarq )
+  if( beta_fdc->datarq )
     b |= 0x40;
 
-  beta_intrq = 0;
 /* we should reset beta_datarq, but we first need to raise it for each byte
  * transferred in wd_fdc.c */
-/* beta_datarq = 0; */
 
   return b;
 }
