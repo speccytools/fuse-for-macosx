@@ -326,51 +326,6 @@ MENU_CALLBACK( menu_media_tape_recordstop )
   tape_record_stop();
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_new )
-{
-  WIDGET_END;
-
-  if1_mdr_new( action - 1 );
-
-}
-
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_insert )
-{
-  char *filename;
-
-  fuse_emulation_pause();
-
-  filename = ui_get_open_filename( "Fuse - Insert Microdrive Cartridge" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  if1_mdr_insert( action - 1, filename );
-
-  free( filename );
-
-  fuse_emulation_unpause();
-}
-
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_eject )
-{
-  int which, write;
-
-  WIDGET_END;
-
-  action--;
-  which = action & 0x0f;
-  write = action & 0x10;
-
-  if1_mdr_eject( which, write );
-}
-
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_writeprotect )
-{
-  WIDGET_END;
-
-  if1_mdr_writeprotect( action & 0xf0, ( action & 0x0f ) - 1 );
-
-}
-
 MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
 {
   char *filename;
@@ -392,9 +347,38 @@ MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
 
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
+MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
+{
+  int which, type;
+  
+  WIDGET_END;
+
+  action--;
+  which = action & 0x0f;
+  type = ( action & 0xf0 ) >> 4;
+
+  switch( type ) {
+  case 0:
+#ifdef HAVE_765_H
+/*    specplus3_disk_insert( which, NULL ); */
+#endif				/* #ifdef HAVE_765_H */
+    break;
+  case 1:
+/*    beta_disk_insert( which, NULL ); */
+    break;
+  case 2:
+/*    plusd_disk_insert( which, NULL ); */
+    break;
+  case 3:
+    if1_mdr_insert( which, NULL );
+    break;
+  }
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_insert )
 {
   char *filename;
+  char title[80];
   int which, type;
   
   action--;
@@ -403,7 +387,23 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
 
   fuse_emulation_pause();
 
-  filename = ui_get_open_filename( "Fuse - Insert disk" );
+  switch( type ) {
+  case 0:
+    snprintf( title, 80, "Fuse - Insert +3 Disk %c:", 'A' + which );
+    break;
+  case 1:
+    snprintf( title, 80, "Fuse - Insert Beta Disk %c:", 'A' + which );
+    break;
+  case 2:
+    snprintf( title, 80, "Fuse - Insert +D Disk %i", which + 1 );
+    break;
+  case 3:
+    snprintf( title, 80, "Fuse - Insert Microdrive Cartridge %i", which + 1 );
+    break;
+  default:
+    return;
+  }
+  filename = ui_get_open_filename( title );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   switch( type ) {
@@ -418,6 +418,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
   case 2:
     plusd_disk_insert_default_autoload( which, filename );
     break;
+  case 3:
+    if1_mdr_insert( which, filename );
+    break;
   }
 
   free( filename );
@@ -425,7 +428,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert )
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
+MENU_CALLBACK_WITH_ACTION( menu_media_eject )
 {
   int which, write, type;
 
@@ -447,6 +450,39 @@ MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject )
     break;
   case 2:
     plusd_disk_eject( which, write );
+    break;
+  case 3:
+    if1_mdr_eject( which, write );
+    break;
+  }
+
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
+{
+  int which, wrprot, type;
+
+  WIDGET_END;
+
+  action--;
+  which = action & 0x00f;
+  type = ( action & 0x0f0 ) >> 4;
+  wrprot = !!( action & 0x100 );
+
+  switch( type ) {
+  case 0:
+#ifdef HAVE_765_H
+/*    specplus3_disk_writeprotect( which, wrprot ); */
+#endif			/* #ifdef HAVE_765_H */
+    break;
+  case 1:
+/*    beta_disk_writeprotect( which, wrprot ); */
+    break;
+  case 2:
+/*    plusd_disk_writeprotect( which, wrprot ); */
+    break;
+  case 3:
+    if1_mdr_writeprotect( which, wrprot );
     break;
   }
 

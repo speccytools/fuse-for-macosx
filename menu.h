@@ -78,16 +78,12 @@ MENU_CALLBACK( menu_media_tape_write );
 MENU_CALLBACK( menu_media_tape_recordstart );
 MENU_CALLBACK( menu_media_tape_recordstop );
 
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_new );
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_insert );
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_sync );
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_eject );
-MENU_CALLBACK_WITH_ACTION( menu_media_mdr_writeprotect );
+MENU_CALLBACK_WITH_ACTION( menu_media_insert_new );
+MENU_CALLBACK_WITH_ACTION( menu_media_insert );
+MENU_CALLBACK_WITH_ACTION( menu_media_eject );
+MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect );
 
 MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 );
-
-MENU_CALLBACK_WITH_ACTION( menu_media_disk_insert );
-MENU_CALLBACK_WITH_ACTION( menu_media_disk_eject );
 
 MENU_CALLBACK( menu_media_cartridge_timexdock_insert );
 MENU_CALLBACK( menu_media_cartridge_timexdock_eject );

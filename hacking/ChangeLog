@@ -2278,3 +2278,6 @@
 	 address mark is found (part of patch #1834231) (Gergely Szasz).
 20071119 disk/{beta.c,wd_fdc.[ch]}: intrq/datarq fixes (more of patch #1834231)
 	 (Gergely Szasz).
+20071119 if1.[ch],menu.[ch],menu_data.dat: combine menu_media_disk_*() and
+	 menu_media_mdr_*() into menu_media_*(), and use a null filename to
+	 request a blank image (more of patch #1834231) (Gergely Szasz).

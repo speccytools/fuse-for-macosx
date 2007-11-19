@@ -790,34 +790,20 @@ microdrives_restart( void )
 }
 
 void
-if1_mdr_writeprotect( int w, int drive )
+if1_mdr_writeprotect( int drive, int wrprot )
 {
   libspectrum_microdrive_set_write_protect( microdrive[drive].cartridge,
-					    w ? 1 : 0 );
+					    wrprot ? 1 : 0 );
   microdrive[drive].modified = 1;
 
   update_menu( UMENU_MDRV1 + drive );
 }
 
-void
-if1_mdr_new( int which )
+static void
+if1_mdr_new( microdrive_t *mdr )
 {
-  microdrive_t *mdr;
   libspectrum_byte len;
   long int i;
-
-  if( which >= 8 ) {
-    ui_error( UI_ERROR_ERROR, "if1_mdr_new: unknown drive %d", which );
-    return;
-  }
-
-  mdr = &microdrive[ which ];
-
-  /* Eject any cartridge already in the drive */
-  if( mdr->inserted ) {
-    /* Abort the insert if we want to keep the current cartridge */
-    if( if1_mdr_eject( which, 0 ) ) return;
-  }
 
   if( settings_current.mdr_len == 0 ) {	/* Random length */
     len = 171 + ( ( rand() >> 2 ) + ( rand() >> 2 ) +
@@ -833,13 +819,16 @@ if1_mdr_new( int which )
   for( i = 0; i < len * LIBSPECTRUM_MICRODRIVE_BLOCK_LEN; i++ )
     libspectrum_microdrive_set_data( mdr->cartridge, i, 0xff );
 
+  for( i = libspectrum_microdrive_cartridge_len( mdr->cartridge );
+	i > 0; i-- )
+    mdr->pream[255 + i] = mdr->pream[i-1] = SYNC_NO;
+
   /* but don't write-protect */
   libspectrum_microdrive_set_write_protect( mdr->cartridge, 0 );
 
   mdr->inserted = 1;
   mdr->modified = 1;
 
-  update_menu( UMENU_MDRV1 + which );
 }
 
 int
@@ -875,6 +864,12 @@ if1_mdr_insert( int which, const char *filename )
   if( mdr->inserted ) {
     /* Abort the insert if we want to keep the current cartridge */
     if( if1_mdr_eject( which, 0 ) ) return 0;
+  }
+
+  if( filename == NULL ) {	/* insert new unformatted cartridge */
+    if1_mdr_new( mdr );
+    update_menu( UMENU_MDRV1 + which );
+    return 0;
   }
 
   if( utils_read_file( filename, &mdr->file ) ) {
