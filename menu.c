@@ -360,14 +360,14 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
   switch( type ) {
   case 0:
 #ifdef HAVE_765_H
-/*    specplus3_disk_insert( which, NULL ); */
+/*  specplus3_disk_insert( which, NULL, 0 ); */
 #endif				/* #ifdef HAVE_765_H */
     break;
   case 1:
-/*    beta_disk_insert( which, NULL ); */
+    beta_disk_insert( which, NULL, 0 );
     break;
   case 2:
-/*    plusd_disk_insert( which, NULL ); */
+    plusd_disk_insert( which, NULL, 0 );
     break;
   case 3:
     if1_mdr_insert( which, NULL );

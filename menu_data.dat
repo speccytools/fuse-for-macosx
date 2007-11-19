@@ -226,28 +226,34 @@ Media/Disk/+3/Drive B:/Eject and _write..., Item,, menu_media_eject, 0x102
 
 Media/Disk/_Beta, Branch
 Media/Disk/Beta/Drive _A:, Branch
+Media/Disk/Beta/Drive A:/Insert _New, Item,, menu_media_insert_new, 0x11
 Media/Disk/Beta/Drive A:/_Insert..., Item,, menu_media_insert, 0x11
 Media/Disk/Beta/Drive A:/_Eject, Item,, menu_media_eject, 0x011
 Media/Disk/Beta/Drive A:/Eject and _write..., Item,, menu_media_eject, 0x111
 Media/Disk/Beta/Drive _B:, Branch
+Media/Disk/Beta/Drive B:/Insert _New, Item,, menu_media_insert_new, 0x12
 Media/Disk/Beta/Drive B:/_Insert..., Item,, menu_media_insert, 0x12
 Media/Disk/Beta/Drive B:/_Eject, Item,, menu_media_eject, 0x012
 Media/Disk/Beta/Drive B:/Eject and _write..., Item,, menu_media_eject, 0x112
 Media/Disk/Beta/Drive _C:, Branch
+Media/Disk/Beta/Drive C:/Insert _New, Item,, menu_media_insert_new, 0x13
 Media/Disk/Beta/Drive C:/_Insert..., Item,, menu_media_insert, 0x13
 Media/Disk/Beta/Drive C:/_Eject, Item,, menu_media_eject, 0x013
 Media/Disk/Beta/Drive C:/Eject and _write..., Item,, menu_media_eject, 0x113
 Media/Disk/Beta/Drive _D:, Branch
+Media/Disk/Beta/Drive D:/Insert _New, Item,, menu_media_insert_new, 0x14
 Media/Disk/Beta/Drive D:/_Insert..., Item,, menu_media_insert, 0x14
 Media/Disk/Beta/Drive D:/_Eject, Item,, menu_media_eject, 0x014
 Media/Disk/Beta/Drive D:/Eject and _write..., Item,, menu_media_eject, 0x114
 
 Media/Disk/+_D, Branch
 Media/Disk/+D/Drive _1, Branch
+Media/Disk/+D/Drive 1/Insert _New, Item,, menu_media_insert_new, 0x21
 Media/Disk/+D/Drive 1/_Insert..., Item,, menu_media_insert, 0x21
 Media/Disk/+D/Drive 1/_Eject, Item,, menu_media_eject, 0x021
 Media/Disk/+D/Drive 1/Eject and _write..., Item,, menu_media_eject, 0x121
 Media/Disk/+D/Drive _2, Branch
+Media/Disk/+D/Drive 2/Insert _New, Item,, menu_media_insert_new, 0x22
 Media/Disk/+D/Drive 2/_Insert..., Item,, menu_media_insert, 0x22
 Media/Disk/+D/Drive 2/_Eject, Item,, menu_media_eject, 0x022
 Media/Disk/+D/Drive 2/Eject and _write..., Item,, menu_media_eject, 0x122

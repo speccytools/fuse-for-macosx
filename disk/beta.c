@@ -294,11 +294,23 @@ beta_disk_insert( beta_drive_number which, const char *filename,
     /* Abort the insert if we want to keep the current disk */
     if( beta_disk_eject( which, 0 ) ) return 0;
   }
-  if( ( error = disk_open( &d->disk, filename, 0 ) != DISK_OK ) ) {
-    ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
-                             disk_strerror( d->disk.status ) );
-    return 1;
+
+  if( filename ) {
+    error = disk_open( &d->disk, filename, 0 );
+    if( error != DISK_OK ) {
+      ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
+				disk_strerror( d->disk.status ) );
+      return 1;
+    }
+  } else {
+    error = disk_new( &d->disk, 2, 80, DISK_DENS_AUTO, DISK_UDI );
+    if( error != DISK_OK ) {
+      ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
+				disk_strerror( d->disk.status ) );
+      return 1;
+    }
   }
+
   fdd_load( &d->fdd, &d->disk, 0 );
 
   /* Set the 'eject' item active */
@@ -317,7 +329,7 @@ beta_disk_insert( beta_drive_number which, const char *filename,
     break;
   }
 
-  if( autoload ) {
+  if( filename && autoload ) {
     PC = 0;
     machine_current->ram.last_byte |= 0x10;   /* Select ROM 1 */
     beta_page();
