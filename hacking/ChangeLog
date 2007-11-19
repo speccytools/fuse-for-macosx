@@ -2274,3 +2274,5 @@
 20071119 ui/win32/{Makefile.am,menu_data.c,menu_data.h,menu_data.rc}: remove
 	 pregenerated Win32 menu data, and a add phony target to generate the
 	 Win32 menu data (Stuart).
+20071119 disk/wd_fdc.c: clear busy status for a read address command when no
+	 address mark is found (Gergely Szasz) (part of patch #1834231).

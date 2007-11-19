@@ -572,7 +572,9 @@ wd_fdc_type_iii( wd_fdc *f )
     f->rev = 5;
     read_id( f );
     if( f->id_mark == WD_FDC_AM_NONE ) {
+      f->state = WD_FDC_STATE_NONE;
       f->status_register |= WD_FDC_SR_RNF;
+      f->status_register &= ~WD_FDC_SR_BUSY;
       wd_fdc_set_intrq( f );
       return;
     }
