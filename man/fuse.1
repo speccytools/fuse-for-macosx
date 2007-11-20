@@ -106,7 +106,9 @@ option.
 .I \-\-auto\-load
 .RS
 Specify whether tape and disk files should be automatically loaded
-when they are opened. (Enabled by default, but you can use
+when they are opened using the
+.I File, Open...
+menu option. (Enabled by default, but you can use
 .RI ` \-\-no\-auto\-load '
 to disable). Same as the General Options dialog's
 .I "Auto-load media"
@@ -1314,8 +1316,11 @@ cases.
 On many occasions when you open a tape or disk file, it's because it's
 got a program in you want to load and run. If this option is selected,
 this will automatically happen for you when you open one of these
-files. To use tapes or disks for saving data to, or for loading data
-into an already running program, you'll want to turn this option off.
+files using the
+.I File, Open...
+menu option \- you must then use the Media menu to use
+tapes or disks for saving data to, or for loading data into an already
+running program.
 .RE
 .PP
 .I "Use .slt traps"
@@ -1940,10 +1945,13 @@ Choose a TAP or TZX virtual-tape file to load from. See the
 .B "FILE SELECTION"
 section below for details on how to choose the file. If
 .I "Auto-load media"
-is set in the General Options dialog (as it is by default), the tape
-will begin loading. Otherwise, you have to start the load in the
-emulated machine (with LOAD "" or the 128's Tape Loader option, though
-you may need to reset first).
+is set in the General Options dialog (as it is by default),
+you may use the
+.I "File, Open..."
+menu option instead, and the tape will begin loading automatically.
+Otherwise, you have to start the load in the emulated machine
+(with LOAD "" or the 128's Tape Loader option, though you may need
+to reset first).
 .PP
 To
 .I guarantee
@@ -2055,27 +2063,26 @@ Insert an existing Microdrive cartridge image into emulated Microdrive
 1. You will be prompted for a filename.
 .RE
 .PP
-.I "Media, Interface I, Microdrive 1, Sync"
-.RS
-Synchronise any changes to the Microdrive image in Microdrive 1 with
-the file on sync. You will be prompted for a filename if one has not
-supplied already for this image.
-.RE
-.PP
 .I "Media, Interface I, Microdrive 1, Eject"
 .RS
 Eject the Microdrive image in Microdrive 1. If the image has been
 modified, you will be asked as to whether you want any changes saved.
 .RE
 .PP
-.I "Media, Interface I, Microdrive 1, Write protect, Set"
+.I "Media, Interface I, Microdrive 1, Eject and write..."
 .RS
-Set the write protect tab for the image in Microdrive 1.
+Write the Microdrive image in Microdrive 1 to a file, and then eject
+the image.  You will be prompted for a filename.
 .RE
 .PP
-.I "Media, Interface I, Microdrive 1, Write protect, Remove"
+.I "Media, Interface I, Microdrive 1, Write protect, Enable"
 .RS
-Remove the write protect tab for the image in Microdrive 1.
+Enable the write protect tab for the image in Microdrive 1.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Write protect, Disable"
+.RS
+Disable the write protect tab for the image in Microdrive 1.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 2, ..."
@@ -2172,37 +2179,54 @@ As above, but for drive B:.
 As above, but for drive B:.
 .RE
 .PP
+.I "Media, Disk, Beta, Drive A:, Insert New"
+.RS
+Insert a new (unformatted) disk into the emulated Beta drive A:.
+.RE
+.PP
 .I "Media, Disk, Beta, Drive A:, Insert..."
 .br
 .I "Media, Disk, Beta, Drive A:, Eject"
 .br
 .I "Media, Disk, Beta, Drive A:, Eject and write..."
-.br
-.I "Media, Disk, Beta, Drive B:, Insert..."
-.br
-.I "Media, Disk, Beta, Drive B:, Eject"
-.br
-.I "Media, Disk, Beta, Drive B:, Eject and write..."
-.br
 .RS
-As above, but for the emulated Beta disk interface drives.
+As above, but for the emulated Beta disk drive A:.
 .RE
 .PP
+.I "Media, Disk, Beta, Drive A:, Write protect, Enable"
+.RS
+Enable the write protect tab for the image in Beta drive A:.
+.RE
+.PP
+.I "Media, Disk, Beta, Drive A:, Write protect, Disable"
+.RS
+Disable the write protect tab for the image in Beta drive A:.
+.RE
+.PP
+.I "Media, Disk, Beta, Drive B:, ..."
+.br
+.I "Media, Disk, Beta, Drive C:, ..."
+.br
+.I "Media, Disk, Beta, Drive D:, ..."
+.RS
+As above, but for the remaining emulated Beta disk interface drives.
+.RE
+.PP
+.I "Media, Disk, +D, Drive 1, Insert New"
+.br
 .I "Media, Disk, +D, Drive 1, Insert..."
 .br
 .I "Media, Disk, +D, Drive 1, Eject"
 .br
 .I "Media, Disk, +D, Drive 1, Eject and write..."
 .br
-.I "Media, Disk, +D, Drive 2, Insert..."
+.I "Media, Disk, +D, Drive 1, Write protect, Enable"
 .br
-.I "Media, Disk, +D, Drive 2, Eject"
+.I "Media, Disk, +D, Drive 1, Write protect, Disable"
 .br
-.I "Media, Disk, +D, Drive 2, Eject and write..."
-.br
+.I "Media, Disk, +D, Drive 2, ..."
 .RS
-As above, but for the emulated +D drives. You will be prompted for a
-filename.
+As above, but for the emulated +D drives.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Insert..."

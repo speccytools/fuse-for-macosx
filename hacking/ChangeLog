@@ -2293,3 +2293,4 @@
 20071119 disk/{beta.[ch],plusd.[ch]},machines/{specplus3.[ch]},menu.c,tape.[ch]:
 	 don't autoload tapes and disks when using the Media menu (feature
 	 request #1828224) (Stuart).
+20071120 man/fuse.1: update man page for recent media UI changes (Stuart).
