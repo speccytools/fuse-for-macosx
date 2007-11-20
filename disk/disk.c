@@ -545,17 +545,22 @@ disk_alloc( disk_t *d )
   
   if( d->density != DISK_DENS_AUTO ) {
     d->bpt = disk_bpt[ d->density ];
-  } else if( d->bpt > 12000 ) {
+  } else if( d->bpt > 13000 ) {
     return d->status = DISK_UNSUP;
-  } else if( d->bpt > 7000 ) {
+  } else if( d->bpt > 10600 ) {
     d->bpt = disk_bpt[ DISK_HD ];
-  } else if( d->bpt > 3500 ) {
+  } else if( d->bpt > 6500 ) {
+    d->bpt = disk_bpt[ DISK_8_DD ];
+  } else if( d->bpt > 5300 ) {
     d->bpt = disk_bpt[ DISK_DD ];
+  } else if( d->bpt > 3250 ) {
+    d->bpt = disk_bpt[ DISK_8_SD ];
   } else if( d->bpt > 0 ) {
     d->bpt = disk_bpt[ DISK_SD ];
   }
 
-  d->tlen = d->bpt + d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 );
+  if( d->bpt > 0 )
+    d->tlen = d->bpt + d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 );
   dlen = d->sides * d->cylinders * d->tlen;		/* track len with clock marks */
 
   if( ( d->data = calloc( 1, dlen ) ) == NULL )
@@ -608,7 +613,7 @@ alloc_uncompress_buffer( unsigned char **buffer, int length )
 static int
 open_udi( FILE *file, disk_t *d )
 {
-  int i, bpt;
+  int i, j, bpt;
 
   d->sides = head[10] + 1;
   d->cylinders = head[9] + 1;
@@ -629,8 +634,15 @@ open_udi( FILE *file, disk_t *d )
       return d->status = DISK_OPEN;
   }
 
+  if( d->bpt == 0 )
+    return d->status = DISK_GEOM;
+
+  bpt = d->bpt;		/* save the maximal value */
+  d->tlen = bpt + bpt / 8 + ( bpt % 8 ? 1 : 0 );
+  d->bpt = 0;		/* we know exactly the track len... */
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
+  d->bpt = bpt;		/* restore the maximal byte per track */
   fseek( file, 16, SEEK_SET );
   d->track = d->data;
 
@@ -641,8 +653,22 @@ open_udi( FILE *file, disk_t *d )
     if( head[0] != 0x00 )
       return d->status = DISK_UNSUP;
 					        /* read track + clocks */
-    if( fread( d->track, bpt + bpt / 8 + ( bpt % 8 ? 1 : 0 ), 1, file ) != 1 )
-      return d->status = DISK_OPEN;
+    if( d->bpt == bpt ) {		/* if udi track length equal with the maximal track length */
+      if( fread( d->track, bpt + bpt / 8 + ( bpt % 8 ? 1 : 0 ), 1, file ) != 1 )
+        return d->status = DISK_OPEN;
+    } else {
+      if( fread( d->track, bpt , 1, file ) != 1 )	/* first the data */
+        return d->status = DISK_OPEN;
+      d->track += bpt;
+      for( j = d->bpt - bpt; j > 0; j--, d->track++ )
+        *d->track = 0x4e;	/* fill track data with 0x4e */
+      if( fread( d->track, bpt / 8 + ( bpt % 8 ? 1 : 0 ), 1, file ) != 1 )
+        return d->status = DISK_OPEN;		/* next the clock marks */
+      d->track += bpt / 8 + ( bpt % 8 ? 1 : 0 );
+      for( j = ( d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 ) ) -
+    		 ( bpt / 8 + ( bpt % 8 ? 1 : 0 ) ); j > 0; j--, d->track++ )
+        *d->track = 0x00;	/* fill the clocks with 0x00 */
+    }
     d->track += d->tlen;
   }
 
@@ -790,6 +816,9 @@ open_fdi( FILE *file, disk_t *d, int preindex )
     head_offset += 7 + 7 * head[ 0x06 ];
   }
 
+  if( d->bpt == 0 )
+    return d->status = DISK_GEOM;
+
   d->density = DISK_DENS_AUTO;		/* disk_alloc use d->bpt */
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
@@ -851,6 +880,9 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
     d->bpt <<= 8;
     d->bpt -= 0x100;
   }
+
+  if( d->bpt == 0 )
+    return d->status = DISK_GEOM;
 
   d->density = DISK_DENS_AUTO;			/* disk_alloc use d->bpt */
   if( disk_alloc( d ) != DISK_OK )
@@ -1039,6 +1071,9 @@ open_td0( FILE *file, disk_t *d, int preindex )
       d->bpt = bpt;
     track_offset = sector_offset;
   }
+
+  if( d->bpt == 0 )
+    return d->status = DISK_GEOM;
 
   d->density = DISK_DENS_AUTO;
   if( disk_alloc( d ) != DISK_OK )
