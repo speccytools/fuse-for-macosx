@@ -2296,3 +2296,5 @@
 20071120 man/fuse.1: update man page for recent media UI changes (Stuart).
 20071120 compat/win32/osname.c: work around a suspected Wine (or MinGW) bug
 	 (Stuart).
+20071120 disk/disk.c: fix disk density autodetection (patch #1835229) (Gergely
+	 Szasz).

@@ -547,9 +547,9 @@ disk_alloc( disk_t *d )
     d->bpt = disk_bpt[ d->density ];
   } else if( d->bpt > 12000 ) {
     return d->status = DISK_UNSUP;
-  } else if( d->bpt > 6000 ) {
+  } else if( d->bpt > 7000 ) {
     d->bpt = disk_bpt[ DISK_HD ];
-  } else if( d->bpt > 3000 ) {
+  } else if( d->bpt > 3500 ) {
     d->bpt = disk_bpt[ DISK_DD ];
   } else if( d->bpt > 0 ) {
     d->bpt = disk_bpt[ DISK_SD ];
