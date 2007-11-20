@@ -2294,3 +2294,5 @@
 	 don't autoload tapes and disks when using the Media menu (feature
 	 request #1828224) (Stuart).
 20071120 man/fuse.1: update man page for recent media UI changes (Stuart).
+20071120 compat/win32/osname.c: work around a suspected Wine (or MinGW) bug
+	 (Stuart).

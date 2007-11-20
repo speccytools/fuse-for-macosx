@@ -49,9 +49,10 @@ int compat_osname( char *osname, size_t length )
   default:			   windows_name = "unknown"; break;
   }
 
-  snprintf( osname, length, "Windows %s %ld.%ld build %ld %s",
-	    windows_name, buf.dwMajorVersion, buf.dwMinorVersion,
-	    buf.dwBuildNumber, buf.szCSDVersion );
+  /* The casts to int work around a suspected Wine (or MinGW) bug */
+  snprintf( osname, length, "Windows %s %i.%i build %i %s",
+	    windows_name, (int)buf.dwMajorVersion, (int)buf.dwMinorVersion,
+	    (int)buf.dwBuildNumber, buf.szCSDVersion );
 
   return 0;
 }
