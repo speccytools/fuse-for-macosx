@@ -2302,3 +2302,4 @@
 	 autodetection (patch #1835402) (Gergely Szasz).
 20071121 Makefile.am,z80/tests/Makefile.am: distribution fixes (Stuart).
 20071121 widget/widget.h: remove unused variable (thanks, Gergely) (Stuart).
+20071121 utils.c: remove duplicated #includes (Stuart).
