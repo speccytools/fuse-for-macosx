@@ -41,8 +41,7 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  @WIDGET@ \
 	  z80
 
-DIST_SUBDIRS = compat \
-	       debugger \
+DIST_SUBDIRS = debugger \
 	       disk \
 	       hacking \
 	       lib \

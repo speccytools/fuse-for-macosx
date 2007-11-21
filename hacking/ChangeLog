@@ -2300,3 +2300,4 @@
 	 Szasz).
 20071120 disk/disk.c: support variable length tracks and fine tune density
 	 autodetection (patch #1835402) (Gergely Szasz).
+20071121 Makefile.am,z80/tests/Makefile.am: distribution fixes (Stuart).

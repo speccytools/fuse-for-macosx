@@ -23,5 +23,5 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = *.in \
-	     *.out
+EXTRA_DIST = tests.in \
+	     tests.expected
