@@ -109,7 +109,4 @@ typedef struct widget_error_t {
   const char *message;
 } widget_error_t;
 
-/* The scaler returned from the scaler widget */
-scaler_type widget_scaler;
-
 #endif				/* #ifndef FUSE_WIDGET_H */
