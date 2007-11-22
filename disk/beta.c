@@ -182,7 +182,7 @@ beta_end( void )
 libspectrum_byte
 beta_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !beta_active ) return 0;
+  if( !beta_active ) return 0xff;
 
   *attached = 1;
   return wd_fdc_sr_read( beta_fdc );
@@ -199,7 +199,7 @@ beta_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 libspectrum_byte
 beta_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !beta_active ) return 0;
+  if( !beta_active ) return 0xff;
 
   *attached = 1;
   return wd_fdc_tr_read( beta_fdc );
@@ -216,7 +216,7 @@ beta_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 libspectrum_byte
 beta_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !beta_active ) return 0;
+  if( !beta_active ) return 0xff;
 
   *attached = 1;
   return wd_fdc_sec_read( beta_fdc );
@@ -233,7 +233,7 @@ beta_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 libspectrum_byte
 beta_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !beta_active ) return 0;
+  if( !beta_active ) return 0xff;
 
   *attached = 1;
   return wd_fdc_dr_read( beta_fdc );
@@ -265,7 +265,7 @@ beta_sp_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   libspectrum_byte b;
 
-  if( !beta_active ) return 0;
+  if( !beta_active ) return 0xff;
 
   *attached = 1;
   b = 0;
