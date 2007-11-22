@@ -2303,3 +2303,5 @@
 20071121 Makefile.am,z80/tests/Makefile.am: distribution fixes (Stuart).
 20071121 widget/widget.h: remove unused variable (thanks, Gergely) (Stuart).
 20071121 utils.c: remove duplicated #includes (Stuart).
+20071122 kempmouse.c: don't mark ports as attached when the interface is
+	 disabled (fixes bug #1541497) (Stuart).

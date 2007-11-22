@@ -41,8 +41,9 @@ static struct {
   static libspectrum_byte \
   read_##name( libspectrum_word port GCC_UNUSED, int *attached ) \
   { \
+    if( !settings_current.kempston_mouse ) return 0xff; \
     *attached = 1; \
-    return settings_current.kempston_mouse ? kempmouse.item : 0xff; \
+    return kempmouse.item; \
   }
 
 READ( buttons, buttons );
