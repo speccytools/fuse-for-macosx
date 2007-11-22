@@ -68,7 +68,7 @@ static libspectrum_byte
 pentagon_select_1f_read( libspectrum_word port, int *attached )
 {
   libspectrum_byte data;
-  int tmpattached;
+  int tmpattached = 0;
 
   data = beta_sr_read( port, &tmpattached );
   if( !tmpattached )
@@ -86,7 +86,7 @@ static libspectrum_byte
 pentagon_select_ff_read( libspectrum_word port, int *attached )
 {
   libspectrum_byte data;
-  int tmpattached;
+  int tmpattached = 0;
 
   data = beta_sp_read( port, &tmpattached );
 

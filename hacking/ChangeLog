@@ -2307,3 +2307,4 @@
 	 disabled (fixes bug #1541497) (Stuart).
 20071122 machines/{pentagon.c,scorpion.c}: if another device has marked a port
 	 as attached, don't allow this to affect the value returned (Stuart).
+20071122 machines/{pentagon.c,scorpion.c}: add missing initial values (Stuart).
