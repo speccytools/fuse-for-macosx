@@ -44,6 +44,12 @@
 
 HACCEL hAccels;
 
+HWND fuse_hWnd;
+HINSTANCE fuse_hInstance;
+HWND fuse_hStatusWindow;
+HWND fuse_hPFWnd;
+HWND fuse_hDBGWnd;
+
 int paused = 0;
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
