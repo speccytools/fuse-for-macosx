@@ -71,9 +71,15 @@ static libspectrum_byte
 pentagon1024_select_1f_read( libspectrum_word port, int *attached )
 {
   libspectrum_byte data;
+  int tmpattached = 0;
 
-  data = beta_sr_read( port, attached ); if( *attached ) return data;
-  data = joystick_kempston_read( port, attached ); if( *attached ) return data;
+  data = beta_sr_read( port, &tmpattached );
+  data = joystick_kempston_read( port, &tmpattached );
+
+  if( tmpattached ) {
+    *attached = 1;
+    return data;
+  }
 
   return 0xff;
 }
@@ -82,8 +88,14 @@ static libspectrum_byte
 pentagon1024_select_ff_read( libspectrum_word port, int *attached )
 {
   libspectrum_byte data;
+  int tmpattached = 0;
 
-  data = beta_sp_read( port, attached ); if( *attached ) return data;
+  data = beta_sp_read( port, &tmpattached );
+
+  if( tmpattached ) {
+    *attached = 1;
+    return data;
+  }
 
   return 0xff;
 }
