@@ -48,9 +48,6 @@ static libspectrum_byte tc2048_contend_delay( libspectrum_dword time );
 
 static const periph_t peripherals[] = {
   { 0x0020, 0x0000, joystick_kempston_read, NULL },
-  { 0x0018, 0x0010, if1_port_in, if1_port_out },
-  { 0x0018, 0x0008, if1_port_in, if1_port_out },
-  { 0x0018, 0x0000, if1_port_in, if1_port_out },
   { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
 
   /* TS2040/Alphacom printer */

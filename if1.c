@@ -171,6 +171,15 @@ static module_info_t if1_module_info = {
 
 };
 
+const periph_t if1_peripherals[] = {
+  { 0x0018, 0x0010, if1_port_in, if1_port_out },
+  { 0x0018, 0x0008, if1_port_in, if1_port_out },
+  { 0x0018, 0x0000, if1_port_in, if1_port_out },
+};
+
+const size_t if1_peripherals_count =
+  sizeof( if1_peripherals ) / sizeof( periph_t );
+
 static void
 update_menu( enum if1_menu_item what )
 {

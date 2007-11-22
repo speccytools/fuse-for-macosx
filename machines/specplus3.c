@@ -91,9 +91,6 @@ static int specplus3_reset( void );
 
 const periph_t specplus3_peripherals[] = {
   { 0x0001, 0x0000, ula_read, ula_write },
-  { 0x0018, 0x0010, if1_port_in, if1_port_out },
-  { 0x0018, 0x0008, if1_port_in, if1_port_out },
-  { 0x0018, 0x0000, if1_port_in, if1_port_out },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },

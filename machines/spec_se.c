@@ -76,11 +76,6 @@ static const periph_t peripherals[] = {
   /* Lower 8 bits of Timex ports are fully decoded */
   { 0x00ff, 0x00fe, ula_read, ula_write },
 
-  /* Interface 1 */
-  { 0x0018, 0x0010, if1_port_in, if1_port_out },
-  { 0x0018, 0x0008, if1_port_in, if1_port_out },
-  { 0x0018, 0x0000, if1_port_in, if1_port_out },
-
   /* FIXME: The SE has an 8k SRAM attached to its AY dataport */
   { 0x00ff, 0x00f5, ay_registerport_read, ay_registerport_write },
   { 0x00ff, 0x00f6, NULL, ay_dataport_write },

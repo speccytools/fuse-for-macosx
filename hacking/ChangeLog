@@ -2312,3 +2312,6 @@
 20071122 machines/pentagon1024.c: fix for already attached ports (Stuart).
 20071122 ui/win32/{win32internals.h,win32ui.c}: fix duplicated variable
 	 definitions (Stuart).
+20071122 if1.[ch],machines/{spec128.c,spec16.c,spec48.c,spec_se.c,specplus2a.c,
+	 specplus3.c,tc2048.c},periph.c: move specification of if1 ports into
+	 if1.h (Stuart).

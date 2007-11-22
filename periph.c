@@ -320,6 +320,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   periph_register_n( zxcf_peripherals, zxcf_peripherals_count );
   periph_register_n( divide_peripherals, divide_peripherals_count );
   periph_register_n( plusd_peripherals, plusd_peripherals_count );
+  periph_register_n( if1_peripherals, if1_peripherals_count );
 
   periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
 
