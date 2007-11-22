@@ -40,8 +40,6 @@
 
 static libspectrum_byte pentagon_select_1f_read( libspectrum_word port,
 						 int *attached );
-static libspectrum_byte pentagon_select_ff_read( libspectrum_word port,
-						 int *attached );
 static libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
 static int pentagon_reset( void );
 static int pentagon_shutdown( void );
@@ -53,7 +51,7 @@ static const periph_t peripherals[] = {
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00fe, ula_read, ula_write },
-  { 0x00ff, 0x00ff, pentagon_select_ff_read, beta_sp_write },
+  { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },
@@ -73,22 +71,6 @@ pentagon_select_1f_read( libspectrum_word port, int *attached )
   data = beta_sr_read( port, &tmpattached );
   if( !tmpattached )
     data = joystick_kempston_read( port, &tmpattached );
-
-  if( tmpattached ) {
-    *attached = 1;
-    return data;
-  }
-
-  return 0xff;
-}
-
-static libspectrum_byte
-pentagon_select_ff_read( libspectrum_word port, int *attached )
-{
-  libspectrum_byte data;
-  int tmpattached = 0;
-
-  data = beta_sp_read( port, &tmpattached );
 
   if( tmpattached ) {
     *attached = 1;
