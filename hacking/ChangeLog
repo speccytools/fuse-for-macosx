@@ -2321,3 +2321,4 @@
          pentagon1024.c},menu.c,menu_data.dat,settings.dat,settings.pl:
          separate Pentagon variants ROM images and change settings to refer
          to beta rather than trdos (patch #1833435) (Fred).
+20071124 machines/pentagon512.c: fix file mode (thanks, Phil) (Fred).
