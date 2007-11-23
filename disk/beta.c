@@ -542,6 +542,7 @@ beta_to_snapshot( libspectrum_snap *snap )
   int attached;
   wd_fdc *f = beta_fdc;
 
+  libspectrum_snap_set_beta_active( snap, 1 );
   libspectrum_snap_set_beta_paged ( snap, beta_active );
   libspectrum_snap_set_beta_direction( snap, beta_fdc->direction );
   libspectrum_snap_set_beta_status( snap, beta_sr_read( 0x001f, &attached ) );

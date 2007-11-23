@@ -67,6 +67,8 @@ static module_info_t plusd_module_info = {
 
 };
 
+static libspectrum_byte plusd_control_register;
+
 void
 plusd_page( void )
 {
@@ -281,6 +283,8 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   int i;
 
   if( !plusd_available ) return;
+
+  plusd_control_register = b;
 
   drive = ( b & 0x03 ) == 2 ? 1 : 0;
   side = ( b & 0x80 ) ? 1 : 0;
@@ -524,14 +528,80 @@ plusd_event_index( libspectrum_dword last_tstates )
   return 0;
 }
 
+static libspectrum_byte *
+alloc_and_copy_page( libspectrum_byte* source_page )
+{
+  libspectrum_byte *buffer;
+  buffer = malloc( MEMORY_PAGE_SIZE );
+  if( !buffer ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+              __LINE__ );
+    return 0;
+  }
+
+  memcpy( buffer, source_page, MEMORY_PAGE_SIZE );
+  return buffer;
+}
+
 static void
 plusd_from_snapshot( libspectrum_snap *snap GCC_UNUSED )
 {
-  /* XXX */
+  if( !libspectrum_snap_plusd_active( snap ) ) return;
+
+  settings_current.plusd = 1;
+
+  plusd_active = libspectrum_snap_plusd_paged( snap );
+  
+  if( plusd_active ) {
+    plusd_page();
+  } else {
+    plusd_unpage();
+  }
+
+  if( libspectrum_snap_plusd_custom_rom( snap ) &&
+      libspectrum_snap_plusd_rom( snap, 0 ) ) {
+    memcpy( memory_map_romcs[0].page, libspectrum_snap_plusd_rom( snap, 0 ),
+            0x2000 );
+  }
+
+  if( libspectrum_snap_plusd_ram( snap, 0 ) ) {
+    memcpy( plusd_ram,
+            libspectrum_snap_plusd_ram( snap, 0 ), 0x2000 );
+  }
+
+  plusd_fdc->direction = libspectrum_snap_beta_direction( snap );
+
+  plusd_cr_write ( 0x00e3, libspectrum_snap_plusd_status ( snap ) );
+  plusd_tr_write ( 0x00eb, libspectrum_snap_plusd_track  ( snap ) );
+  plusd_sec_write( 0x00f3, libspectrum_snap_plusd_sector ( snap ) );
+  plusd_dr_write ( 0x00fb, libspectrum_snap_plusd_data   ( snap ) );
+  plusd_cn_write ( 0x00ef, libspectrum_snap_plusd_control( snap ) );
 }
 
 static void
 plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
 {
-  /* XXX */
+  libspectrum_byte *buffer;
+
+  if( !periph_plusd_active ) return;
+
+  libspectrum_snap_set_plusd_active( snap, 1 );
+
+  buffer = alloc_and_copy_page( memory_map_romcs[0].page );
+  if( !buffer ) return;
+  libspectrum_snap_set_plusd_rom( snap, 0, buffer );
+  if( memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+    libspectrum_snap_set_plusd_custom_rom( snap, 1 );
+
+  buffer = alloc_and_copy_page( plusd_ram );
+  if( !buffer ) return;
+  libspectrum_snap_set_plusd_ram( snap, 0, buffer );
+
+  libspectrum_snap_set_plusd_paged ( snap, plusd_active );
+  libspectrum_snap_set_plusd_direction( snap, plusd_fdc->direction );
+  libspectrum_snap_set_plusd_status( snap, plusd_fdc->status_register );
+  libspectrum_snap_set_plusd_track ( snap, plusd_fdc->track_register );
+  libspectrum_snap_set_plusd_sector( snap, plusd_fdc->sector_register );
+  libspectrum_snap_set_plusd_data  ( snap, plusd_fdc->data_register );
+  libspectrum_snap_set_plusd_control( snap, plusd_control_register );
 }

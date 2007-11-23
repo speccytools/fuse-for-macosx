@@ -2324,3 +2324,6 @@
 20071124 machines/pentagon512.c: fix file mode (thanks, Phil) (Fred).
 20071124 machines/pentagon512.c: spec128_memoryport_write has the same port
          and mask as the 128k Pentagon (thanks, Q-Master) (Fred).
+20071124 disk/{plusd.c,beta.c}: add support for +D snapshots and mark beta as
+         active when saving Pentagon and Scorpion snapshots (patch #1782512)
+         (Fred).
