@@ -2322,3 +2322,5 @@
          separate Pentagon variants ROM images and change settings to refer
          to beta rather than trdos (patch #1833435) (Fred).
 20071124 machines/pentagon512.c: fix file mode (thanks, Phil) (Fred).
+20071124 machines/pentagon512.c: spec128_memoryport_write has the same port
+         and mask as the 128k Pentagon (thanks, Q-Master) (Fred).
