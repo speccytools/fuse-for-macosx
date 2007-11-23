@@ -31,9 +31,13 @@
 #include "machine.h"
 
 int pentagon_init( fuse_machine_info *machine );
+int pentagon_shutdown( void );
+libspectrum_byte pentagon_select_1f_read( libspectrum_word port, int *attached );
+libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
+int pentagon_port_from_ula( libspectrum_word port );
 int pentagon512_init( fuse_machine_info *machine );
 int pentagon1024_init( fuse_machine_info *machine );
-int pentagon_port_from_ula( libspectrum_word port );
+int pentagon_port_contended( libspectrum_word port );
 
 int spec16_init( fuse_machine_info *machine );
 int spec_se_init( fuse_machine_info *machine );

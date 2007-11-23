@@ -1,7 +1,7 @@
-/* pentagon.c: Pentagon 128K specific routines
+/* pentagon.c: Pentagon 512K specific routines
    Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
 
-   $Id$
+   $Id: pentagon.c 3243 2007-10-25 01:56:20Z zubzero $
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,55 +50,17 @@ static const periph_t peripherals[] = {
   { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
   { 0xc002, 0x8000, NULL, ay_dataport_write },
-  { 0x8002, 0x0000, NULL, spec128_memoryport_write },
+  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
 };
 
 static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-libspectrum_byte
-pentagon_select_1f_read( libspectrum_word port, int *attached )
+int 
+pentagon512_init( fuse_machine_info *machine )
 {
-  libspectrum_byte data;
-  int tmpattached = 0;
-
-  data = beta_sr_read( port, &tmpattached );
-  if( !tmpattached )
-    data = joystick_kempston_read( port, &tmpattached );
-
-  if( tmpattached ) {
-    *attached = 1;
-    return data;
-  }
-
-  return 0xff;
-}
-
-static libspectrum_byte
-pentagon_unattached_port( void )
-{
-  return spectrum_unattached_port();
-}
-
-int
-pentagon_port_from_ula( libspectrum_word port GCC_UNUSED )
-{
-  /* No contended ports */
-  return 0;
-}
-
-libspectrum_byte
-pentagon_contend_delay( libspectrum_dword time GCC_UNUSED )
-{
-  /* No contention */
-  return 0;
-}
-
-int
-pentagon_init( fuse_machine_info *machine )
-{
-  machine->machine = LIBSPECTRUM_MACHINE_PENT;
-  machine->id = "pentagon";
+  machine->machine = LIBSPECTRUM_MACHINE_PENT512;
+  machine->id = "pentagon512";
 
   machine->reset = pentagon_reset;
 
@@ -107,33 +69,33 @@ pentagon_init( fuse_machine_info *machine )
   machine->ram.contend_delay  = pentagon_contend_delay;
   machine->ram.contend_delay_no_mreq = pentagon_contend_delay;
 
-  machine->unattached_port = pentagon_unattached_port;
+  machine->unattached_port = spectrum_unattached_port;
 
   machine->shutdown = pentagon_shutdown;
 
   machine->memory_map = pentagon_memory_map;
 
   return 0;
-
 }
 
 static int
 pentagon_reset(void)
 {
   int error;
+  int i;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_pentagon_0,
-                            settings_default.rom_pentagon_0, 0x4000 );
+  error = machine_load_rom( 0, 0, settings_current.rom_pentagon512_0,
+                            settings_default.rom_pentagon512_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_pentagon_1,
-                            settings_default.rom_pentagon_1, 0x4000 );
+  error = machine_load_rom( 2, 1, settings_current.rom_pentagon512_1,
+                            settings_default.rom_pentagon512_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_pentagon_3,
-                            settings_default.rom_pentagon_3, 0x4000 );
+  error = machine_load_rom( 4, 2, settings_current.rom_pentagon512_3,
+                            settings_default.rom_pentagon512_3, 0x4000 );
   if( error ) return error;
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
-                                 settings_current.rom_pentagon_2,
-                                 settings_default.rom_pentagon_2, 0x4000 );
+                                 settings_current.rom_pentagon512_2,
+                                 settings_default.rom_pentagon512_2, 0x4000 );
   if( error ) return error;
 
   error = spec128_common_reset( 0 );
@@ -147,18 +109,14 @@ pentagon_reset(void)
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
 
+  /* Mark the least 384K as present/writeable */
+  for( i = 16; i < 64; i++ )
+    memory_map_ram[i].writable = 1;
+
   beta_reset();
 
   beta_available = 1;
   beta_active = 1;
-
-  return 0;
-}
-
-int
-pentagon_shutdown( void )
-{
-  beta_end();
 
   return 0;
 }
@@ -187,6 +145,8 @@ pentagon_memory_map( void )
   spec128_select_rom( rom );
 
   page = machine_current->ram.last_byte & 0x07;
+
+  page += ( machine_current->ram.last_byte & 0xC0 ) >> 3;
 
   spec128_select_page( page );
   machine_current->ram.current_page = page;

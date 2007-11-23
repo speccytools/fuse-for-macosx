@@ -109,7 +109,7 @@ typedef struct start_files_t {
 
   const char *disk_plus3;
   const char *disk_plusd;
-  const char *disk_trdos;
+  const char *disk_beta;
   const char *dock;
   const char *if2;
   const char *playback;
@@ -448,7 +448,7 @@ setup_start_files( start_files_t *start_files )
 {
   start_files->disk_plus3 = settings_current.plus3disk_file;
   start_files->disk_plusd = settings_current.plusddisk_file;
-  start_files->disk_trdos = settings_current.trdosdisk_file;
+  start_files->disk_beta = settings_current.betadisk_file;
   start_files->dock = settings_current.dck_file;
   start_files->if2 = settings_current.if2_file;
   start_files->playback = settings_current.playback_file;
@@ -533,7 +533,7 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       start_files->disk_plusd = filename; break;
 
     case LIBSPECTRUM_CLASS_DISK_TRDOS:
-      start_files->disk_trdos = filename; break;
+      start_files->disk_beta = filename; break;
 
     case LIBSPECTRUM_CLASS_RECORDING:
       start_files->playback = filename; break;
@@ -584,7 +584,7 @@ do_start_files( start_files_t *start_files )
   }
 
   /* Can't use both +3 and TR-DOS disks simultaneously */
-  if( start_files->disk_plus3 && start_files->disk_trdos ) {
+  if( start_files->disk_plus3 && start_files->disk_beta ) {
     ui_error(
       UI_ERROR_WARNING,
       "can't use +3 and TR-DOS disks simultaneously; +3 disk ignored"
@@ -593,7 +593,7 @@ do_start_files( start_files_t *start_files )
   }
 
   /* Can't use disks and the dock simultaneously */
-  if( ( start_files->disk_plus3 || start_files->disk_trdos ) &&
+  if( ( start_files->disk_plus3 || start_files->disk_beta ) &&
       start_files->dock                                         ) {
     ui_error(
       UI_ERROR_WARNING,
@@ -603,7 +603,7 @@ do_start_files( start_files_t *start_files )
   }
 
   /* Can't use disks and the Interface II simultaneously */
-  if( ( start_files->disk_plus3 || start_files->disk_trdos ) &&
+  if( ( start_files->disk_plus3 || start_files->disk_beta ) &&
       start_files->if2                                          ) {
     ui_error(
       UI_ERROR_WARNING,
@@ -631,8 +631,8 @@ do_start_files( start_files_t *start_files )
     if( error ) return error;
   }
 
-  if( start_files->disk_trdos ) {
-    error = utils_open_file( start_files->disk_trdos, autoload, NULL );
+  if( start_files->disk_beta ) {
+    error = utils_open_file( start_files->disk_beta, autoload, NULL );
     if( error ) return error;
   }
 

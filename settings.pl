@@ -515,6 +515,14 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 32: return &( settings->rom_spec_se_1 );
   case 33: return &( settings->rom_interface_i );
   case 34: return &( settings->rom_plusd );
+  case 35: return &( settings->rom_pentagon512_0 );
+  case 36: return &( settings->rom_pentagon512_1 );
+  case 37: return &( settings->rom_pentagon512_2 );
+  case 38: return &( settings->rom_pentagon512_3 );
+  case 39: return &( settings->rom_pentagon1024_0 );
+  case 40: return &( settings->rom_pentagon1024_1 );
+  case 41: return &( settings->rom_pentagon1024_2 );
+  case 42: return &( settings->rom_pentagon1024_3 );
   default: return NULL;
   }
 }

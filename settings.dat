@@ -106,7 +106,7 @@ record_file, string, NULL, 'r', record, recordfile
 playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
 plusddisk_file, string, NULL,, plusddisk
-trdosdisk_file, string, NULL,, trdosdisk
+betadisk_file, string, NULL,, betadisk
 dck_file, string, NULL,, dock
 if2_file, string, NULL,, if2cart
 
@@ -171,6 +171,14 @@ rom_pentagon_0, string, "128p-0.rom",
 rom_pentagon_1, string, "128p-1.rom",
 rom_pentagon_2, string, "trdos.rom",
 rom_pentagon_3, string, "gluck.rom",
+rom_pentagon512_0, string, "128p-0.rom",
+rom_pentagon512_1, string, "128p-1.rom",
+rom_pentagon512_2, string, "trdos.rom",
+rom_pentagon512_3, string, "gluck.rom",
+rom_pentagon1024_0, string, "128p-0.rom",
+rom_pentagon1024_1, string, "128p-1.rom",
+rom_pentagon1024_2, string, "trdos.rom",
+rom_pentagon1024_3, string, "gluck.rom",
 rom_scorpion_0, string, "256s-0.rom",
 rom_scorpion_1, string, "256s-1.rom",
 rom_scorpion_2, string, "256s-2.rom",

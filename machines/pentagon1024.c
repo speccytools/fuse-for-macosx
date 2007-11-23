@@ -123,18 +123,18 @@ pentagon1024_reset(void)
   int error;
   int i;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_pentagon_0,
-                            settings_default.rom_pentagon_0, 0x4000 );
+  error = machine_load_rom( 0, 0, settings_current.rom_pentagon1024_0,
+                            settings_default.rom_pentagon1024_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_pentagon_1,
-                            settings_default.rom_pentagon_1, 0x4000 );
+  error = machine_load_rom( 2, 1, settings_current.rom_pentagon1024_1,
+                            settings_default.rom_pentagon1024_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_pentagon_3,
-                            settings_default.rom_pentagon_3, 0x4000 );
+  error = machine_load_rom( 4, 2, settings_current.rom_pentagon1024_3,
+                            settings_default.rom_pentagon1024_3, 0x4000 );
   if( error ) return error;
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
-                                 settings_current.rom_pentagon_2,
-                                 settings_default.rom_pentagon_2, 0x4000 );
+                                 settings_current.rom_pentagon1024_2,
+                                 settings_default.rom_pentagon1024_2, 0x4000 );
   if( error ) return error;
 
   error = spec128_common_reset( 0 );

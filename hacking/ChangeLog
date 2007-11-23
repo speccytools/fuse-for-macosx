@@ -2317,3 +2317,7 @@
 	 if1.c (Stuart).
 20071122 machines/{pentagon.c,pentagon1024.c,scorpion.c}: remove redundant
 	 *_select_ff_read() functions (Stuart).
+20071123 fuse.c,machines/{Makefile.am,machines.h,pentagon.c,pentagon512.c,
+         pentagon1024.c},menu.c,menu_data.dat,settings.dat,settings.pl:
+         separate Pentagon variants ROM images and change settings to refer
+         to beta rather than trdos (patch #1833435) (Fred).
