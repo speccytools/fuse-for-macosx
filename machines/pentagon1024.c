@@ -66,7 +66,7 @@ static const size_t peripherals_count =
 static libspectrum_byte
 pentagon1024_unattached_port( void )
 {
-  return spectrum_unattached_port();
+  return 0xff;
 }
 
 int

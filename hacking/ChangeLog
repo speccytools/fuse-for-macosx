@@ -2338,3 +2338,6 @@
 	 and Pentagon 512, and move Pentagon-specific declarations into
 	 pentagon.h (Stuart).
 20071126 machines/scorpion.c: remove duplicate function (Stuart).
+20071126 machines/{pentagon.[ch],pentagon1024.c,scorpion.c}: fix Pentagon and
+	 Scorpion unattached port and port 0xff handling (thanks, Q-Master)
+	 (Stuart).
