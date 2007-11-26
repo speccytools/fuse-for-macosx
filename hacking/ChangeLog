@@ -2337,3 +2337,4 @@
 	 pentagon512.c,scorpion.c}: share peripherals array for Pentagon 128
 	 and Pentagon 512, and move Pentagon-specific declarations into
 	 pentagon.h (Stuart).
+20071126 machines/scorpion.c: remove duplicate function (Stuart).

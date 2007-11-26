@@ -46,15 +46,13 @@
 #include "spectrum.h"
 #include "ula.h"
 
-static libspectrum_byte scorpion_select_1f_read( libspectrum_word port,
-						 int *attached );
 static libspectrum_byte scorpion_contend_delay( libspectrum_dword time );
 static int scorpion_reset( void );
 static int scorpion_shutdown( void );
 static int scorpion_memory_map( void );
 
 static const periph_t peripherals[] = {
-  { 0x00ff, 0x001f, scorpion_select_1f_read, beta_cr_write },
+  { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
   { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
@@ -68,24 +66,6 @@ static const periph_t peripherals[] = {
 
 static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
-
-static libspectrum_byte
-scorpion_select_1f_read( libspectrum_word port, int *attached )
-{
-  libspectrum_byte data;
-  int tmpattached = 0;
-
-  data = beta_sr_read( port, &tmpattached );
-  if( !tmpattached )
-    data = joystick_kempston_read( port, &tmpattached );
-
-  if( tmpattached ) {
-    *attached = 1;
-    return data;
-  }
-
-  return 0xff;
-}
 
 static libspectrum_byte
 scorpion_unattached_port( void )
