@@ -38,9 +38,6 @@
 #include "spec128.h"
 #include "ula.h"
 
-static libspectrum_byte pentagon1024_select_1f_read( libspectrum_word port,
-						     int *attached );
-static libspectrum_byte pentagon1024_contend_delay( libspectrum_dword time );
 static int pentagon1024_reset( void );
 static int pentagon1024_shutdown( void );
 static void pentagon1024_memoryport_write( libspectrum_word port GCC_UNUSED,
@@ -71,13 +68,6 @@ pentagon1024_unattached_port( void )
   return spectrum_unattached_port();
 }
 
-static libspectrum_byte
-pentagon1024_contend_delay( libspectrum_dword time GCC_UNUSED )
-{
-  /* No contention */
-  return 0;
-}
-
 int
 pentagon1024_init( fuse_machine_info *machine )
 {
@@ -88,8 +78,8 @@ pentagon1024_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.port_from_ula  = pentagon_port_from_ula;
-  machine->ram.contend_delay  = pentagon1024_contend_delay;
-  machine->ram.contend_delay_no_mreq = pentagon1024_contend_delay;
+  machine->ram.contend_delay  = pentagon_contend_delay;
+  machine->ram.contend_delay_no_mreq = pentagon_contend_delay;
 
   machine->unattached_port = pentagon1024_unattached_port;
 
