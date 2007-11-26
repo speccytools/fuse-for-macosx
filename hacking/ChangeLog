@@ -1884,7 +1884,8 @@
 20070628 menu.h,ui/gtk/gtkjoystick.c: fix menu_options_joysticks_select()'s
 	 prototype (Stuart).
 20070628 pokefinder/pokefinder.[ch]: make pokefinder_{,im}possible's
-	 declarations consistent with their definitions (Stuart).
+	 declarations consistent with their definitions (fixes bug #1732504)
+	 (Stuart).
 20070628 ui/gtk/memory.c: fix type of menu_machine_memorybrowser() in its
 	 declaration for the GTK+ UI (Stuart).
 20070628 ui/gtk/memory.c: fix compilation (Stuart).
