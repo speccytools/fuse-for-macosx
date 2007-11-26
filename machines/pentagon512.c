@@ -1,7 +1,7 @@
-/* pentagon.c: Pentagon 512K specific routines
+/* pentagon512.c: Pentagon 512K specific routines
    Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
 
-   $Id: pentagon.c 3243 2007-10-25 01:56:20Z zubzero $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "machine.h"
 #include "machines.h"
 #include "memory.h"
+#include "pentagon.h"
 #include "periph.h"
 #include "settings.h"
 #include "spec128.h"
@@ -40,21 +41,6 @@
 
 static int pentagon_reset( void );
 static int pentagon_memory_map( void );
-
-static const periph_t peripherals[] = {
-  { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
-  { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
-  { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
-  { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
-  { 0x00ff, 0x00fe, ula_read, ula_write },
-  { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
-  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, NULL, ay_dataport_write },
-  { 0x8002, 0x0000, NULL, spec128_memoryport_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
 
 int 
 pentagon512_init( fuse_machine_info *machine )
@@ -101,7 +87,7 @@ pentagon_reset(void)
   error = spec128_common_reset( 0 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_update();

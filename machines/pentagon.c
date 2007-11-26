@@ -33,6 +33,7 @@
 #include "machine.h"
 #include "machines.h"
 #include "memory.h"
+#include "pentagon.h"
 #include "periph.h"
 #include "settings.h"
 #include "spec128.h"
@@ -41,7 +42,7 @@
 static int pentagon_reset( void );
 static int pentagon_memory_map( void );
 
-static const periph_t peripherals[] = {
+const periph_t pentagon_peripherals[] = {
   { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
   { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
@@ -53,8 +54,8 @@ static const periph_t peripherals[] = {
   { 0x8002, 0x0000, NULL, spec128_memoryport_write },
 };
 
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
+const size_t pentagon_peripherals_count =
+  sizeof( pentagon_peripherals ) / sizeof( periph_t );
 
 libspectrum_byte
 pentagon_select_1f_read( libspectrum_word port, int *attached )
@@ -139,7 +140,7 @@ pentagon_reset(void)
   error = spec128_common_reset( 0 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
+  error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_update();

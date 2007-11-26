@@ -1,5 +1,5 @@
-/* machines.h: machine specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+/* pentagon.h: Pentagon specific routines
+   Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
 
    $Id$
 
@@ -23,26 +23,20 @@
 
 */
 
-#ifndef FUSE_MACHINES_H
-#define FUSE_MACHINES_H
+#ifndef FUSE_PENTAGON_H
+#define FUSE_PENTAGON_H
 
 #include <libspectrum.h>
 
 #include "machine.h"
+#include "periph.h"
 
-int pentagon_init( fuse_machine_info *machine );
-int pentagon_shutdown( void );
-int pentagon512_init( fuse_machine_info *machine );
-int pentagon1024_init( fuse_machine_info *machine );
+extern const periph_t pentagon_peripherals[];
+extern const size_t pentagon_peripherals_count;
 
-int spec16_init( fuse_machine_info *machine );
-int spec_se_init( fuse_machine_info *machine );
-int specplus2_init( fuse_machine_info *machine );
-int specplus2a_init( fuse_machine_info *machine );
-int specplus3e_init( fuse_machine_info *machine );
+libspectrum_byte pentagon_select_1f_read( libspectrum_word port, int *attached );
+libspectrum_byte pentagon_contend_delay( libspectrum_dword time );
+int pentagon_port_from_ula( libspectrum_word port );
+int pentagon_port_contended( libspectrum_word port );
 
-int tc2048_init( fuse_machine_info *machine );
-int tc2048_port_from_ula( libspectrum_word port );
-int ts2068_init( fuse_machine_info *machine );
-
-#endif			/* #ifndef FUSE_MACHINES_H */
+#endif			/* #ifndef FUSE_PENTAGON_H */

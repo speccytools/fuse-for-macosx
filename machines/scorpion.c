@@ -37,6 +37,7 @@
 #include "machine.h"
 #include "machines.h"
 #include "memory.h"
+#include "pentagon.h"
 #include "printer.h"
 #include "settings.h"
 #include "scorpion.h"

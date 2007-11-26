@@ -2333,3 +2333,7 @@
 20071126 machines/pentagon1024.c: fix Betadisk (fixes bug #1838612) (Q-Master).
 20071126 machines/pentagon1024.c: remove duplicate functions (thanks, Q-Master)
          (bug #1838612) (Fred).
+20071126 machines/{Makefile.am,machines.h,pentagon.[ch],pentagon1024.c,
+	 pentagon512.c,scorpion.c}: share peripherals array for Pentagon 128
+	 and Pentagon 512, and move Pentagon-specific declarations into
+	 pentagon.h (Stuart).
