@@ -25,6 +25,7 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
@@ -158,7 +159,17 @@ gtkui_pokefinder_decremented( GtkWidget *widget GCC_UNUSED,
 static void
 gtkui_pokefinder_search( GtkWidget *widget, gpointer user_data GCC_UNUSED )
 {
-  pokefinder_search( atoi( gtk_entry_get_text( GTK_ENTRY( widget ) ) ) );
+  long value;
+
+  errno = 0;
+  value = strtol( gtk_entry_get_text( GTK_ENTRY( widget ) ), NULL, 10 );
+
+  if( errno != 0 || value < 0 || value > 255 ) {
+    ui_error( UI_ERROR_ERROR, "Invalid value: use an integer from 0 to 255" );
+    return;
+  }
+
+  pokefinder_search( value );
   update_pokefinder();
 }
 

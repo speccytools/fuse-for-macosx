@@ -2328,3 +2328,5 @@
 20071124 disk/{plusd.c,beta.c}: add support for +D snapshots and mark beta as
          active when saving Pentagon and Scorpion snapshots (patch #1782512)
          (Fred).
+20071126 ui/gtk/pokefinder.c: display an error message if the search value is
+	 invalid (Stuart).
