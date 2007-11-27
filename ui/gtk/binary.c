@@ -25,6 +25,7 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
 
 #include <gtk/gtk.h>
@@ -166,9 +167,15 @@ load_data( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   struct binary_info *info = user_data;
 
-  libspectrum_word start, length; size_t i;
+  long start, length; size_t i;
 
-  length = atoi( gtk_entry_get_text( GTK_ENTRY( info->length_widget ) ) );
+  errno = 0;
+  length = strtol( gtk_entry_get_text( GTK_ENTRY( info->length_widget ) ),
+		   NULL, 10 );
+  if( errno || length < 1 || length > 0x10000 ) {
+    ui_error( UI_ERROR_ERROR, "Length must be between 1 and 65536" );
+    return;
+  }
 
   if( length > info->file.length ) {
     ui_error( UI_ERROR_ERROR,
@@ -177,7 +184,18 @@ load_data( GtkButton *button GCC_UNUSED, gpointer user_data )
     return;
   }
 
-  start = atoi( gtk_entry_get_text( GTK_ENTRY( info->start_widget ) ) );
+  errno = 0;
+  start = strtol( gtk_entry_get_text( GTK_ENTRY( info->start_widget ) ),
+		  NULL, 10 );
+  if( errno || start < 0 || start > 0xffff ) {
+    ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
+    return;
+  }
+
+  if( start + length > 0x10000 ) {
+    ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
+    return;
+  }
 
   for( i = 0; i < length; i++ )
     writebyte( start + i, info->file.buffer[ i ] );
@@ -274,12 +292,18 @@ save_data( GtkButton *button GCC_UNUSED, gpointer user_data )
 {
   struct binary_info *info = user_data;
 
-  libspectrum_word start, length; size_t i;
+  long start, length; size_t i;
   libspectrum_byte *buffer;
 
   int error;
 
-  length = atoi( gtk_entry_get_text( GTK_ENTRY( info->length_widget ) ) );
+  errno = 0;
+  length = strtol( gtk_entry_get_text( GTK_ENTRY( info->length_widget ) ),
+		   NULL, 10 );
+  if( errno || length < 1 || length > 0x10000 ) {
+    ui_error( UI_ERROR_ERROR, "Length must be between 1 and 65536" );
+    return;
+  }
 
   buffer = malloc( length * sizeof( libspectrum_byte ) );
   if( !buffer ) {
@@ -287,7 +311,18 @@ save_data( GtkButton *button GCC_UNUSED, gpointer user_data )
     return;
   }
 
-  start = atoi( gtk_entry_get_text( GTK_ENTRY( info->start_widget ) ) );
+  errno = 0;
+  start = strtol( gtk_entry_get_text( GTK_ENTRY( info->start_widget ) ),
+		  NULL, 10 );
+  if( errno || start < 0 || start > 0xffff ) {
+    ui_error( UI_ERROR_ERROR, "Start must be between 0 and 65535" );
+    return;
+  }
+
+  if( start + length > 0x10000 ) {
+    ui_error( UI_ERROR_ERROR, "Block ends after address 65535" );
+    return;
+  }
 
   for( i = 0; i < length; i++ )
     buffer[ i ] = readbyte( start + i );

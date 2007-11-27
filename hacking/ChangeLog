@@ -2341,3 +2341,5 @@
 20071126 machines/{pentagon.[ch],pentagon1024.c,scorpion.c}: fix Pentagon and
 	 Scorpion unattached port and port 0xff handling (thanks, Q-Master)
 	 (Stuart).
+20071127 ui/gtk/binary.c: validate the length and start fields, and allow a
+	 length of 65536 to be used (fixes bug #1715764) (Stuart).
