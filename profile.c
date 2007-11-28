@@ -116,7 +116,7 @@ profile_finish( const char *filename )
   FILE *f;
   size_t i;
 
-  f = fopen( filename, "wb" );
+  f = fopen( filename, "w" );
   if( !f ) {
     ui_error( UI_ERROR_ERROR, "unable to open profile map '%s' for writing",
 	      filename );
@@ -130,6 +130,8 @@ profile_finish( const char *filename )
     fprintf( f, "0x%04lx,%d\n", (unsigned long)i, total_tstates[ i ] );
 
   }
+
+  fclose( f );
 
   profile_active = 0;
 

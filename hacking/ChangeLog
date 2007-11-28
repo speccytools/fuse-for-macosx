@@ -2345,3 +2345,5 @@
 	 length of 65536 to be used (fixes bug #1715764) (Stuart).
 20071128 ChangeLog: update.
 20071128 ChangeLog: tidy up (Stuart).
+20071128 profile.c: close the file after writing, and open it in text mode
+	 (Stuart).
