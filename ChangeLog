@@ -26,14 +26,43 @@
 	  * Fix undocumented flags after BIT n,(IX+d) instructions (Philip
 	    Kendall).
 	  * Fix undocumented behaviour of DAA (Stuart Brady).
-	  * Separate out contention when MREQ isn't active, as the +2A/+3 ULA
-	    applies contention only when MREQ is active (Philip Kendall).
+          * High ports (0xc000 to 0xffff) are contended on the 128K when a
+            contended RAM page is paged in (Philip Kendall; thanks, Patrik
+            Rak).
+	  * Correct contention for the +2A/+3 ULA (Philip Kendall).
+
+        * Machine specific improvements:
+          * Fix joystick port mask on TC2048 (Fredrick Meunier)
+          * Improved keyboard handling for 128K / +3 machines (Philip Kendall).
+          * Improved contention for TC2048 and TC2068 machines (Fredrick
+            Meunier; thanks, Mark Woodmass).
 
 	* Miscellaneous:
-	  * Removed the GTK 1.x UI (please note that GTK 2.x will remain
+          * Emulation speed no longer artificially limited to 999% (Stuart
+            Brady).
+          * Much improved debugger for the widget UIs (Darren Salt).
+          * Timed breakpoints now work in the debugger (Philip Kendall).
+          * Keys now repeat in the widget fileselector (Fredrick Meunier;
+            thanks, Cygnus).
+	  * Removed the GTK+ 1.x UI (please note that GTK+ 2.x will remain
 	    supported for the foreseeable future) (Philip Kendall).
+          * GTK+ UI now uses the GTK+ 2.x style file selectors (Philip
+            Kendall).
+          * More informative error messages when ejecting disks (Stuart
+            Brady).
+          * Ejecting microdrive cartridges now checks for changes and doesn't
+            automatically overwrite the original file (Stuart Brady).
+          * Snapshots can no longer cause the profiler to assert (Philip
+            Kendall; thanks, Stuart Brady).
+          * DivIDE could page itself in incorrectly after a reset (Stuart
+            Brady).
+          * Stop invalid input causing segfault in GTK+ 'Load Binary Chunk'
+            dialog, and allow a length of 65536 to be used (Stuart Brady).
 	  * Enable Fuse to build in directories other than the source
 	    directory itself (Philip Kendall).
+          * 'make clean' now cleans generated files (Philip Kendall).
+          * Update +3e ROMs to v1.31 (Fredrick Meunier; thanks, Garry
+            Lancaster).
 	  * Updated X11 UI (Gergely Szasz).
 	  * Updated Win32 UI (Stuart Brady).
 	  * Man page fixes (Stuart Brady).

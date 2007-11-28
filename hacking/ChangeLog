@@ -2343,3 +2343,4 @@
 	 (Stuart).
 20071127 ui/gtk/binary.c: validate the length and start fields, and allow a
 	 length of 65536 to be used (fixes bug #1715764) (Stuart).
+20071128 ChangeLog: update.
