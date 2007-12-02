@@ -2347,3 +2347,4 @@
 20071128 ChangeLog: tidy up (Stuart).
 20071128 profile.c: close the file after writing, and open it in text mode
 	 (Stuart).
+20071202 man/fuse.1: cleanups (Stuart).
