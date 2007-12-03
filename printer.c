@@ -69,7 +69,13 @@ static unsigned char parallel_data=0;
 
 static void printer_zxp_reset(int hard_reset);
 
-static module_info_t printer_zxp_module_info={printer_zxp_reset,NULL,NULL,NULL};
+static module_info_t printer_zxp_module_info = {
+  printer_zxp_reset,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+};
 
 static void printer_zxp_init(void)
 {

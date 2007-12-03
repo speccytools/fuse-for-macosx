@@ -2348,3 +2348,10 @@
 20071128 profile.c: close the file after writing, and open it in text mode
 	 (Stuart).
 20071202 man/fuse.1: cleanups (Stuart).
+20071203 ay.c,disk/{beta.c,plusd.c,wd_fdc.c},divide.c,if1.c,if2.c,joystick.c,
+         memory.c,module.[ch],printer.c,profile.c,scld.c,simpleide.c,slt.c,
+         snapshot.c,ula.c,z80/z80.c,zxatasp.c,zxcf.c: separate enabling of
+         hardware in snapshots from the main snapshot load code so that
+         peripherals are enabled when the machine and module reset functions
+         are called - fixes loading snapshots with the +D paged in (thanks,
+         Jonathan Needle for test +D szx snapshots) (Fred).

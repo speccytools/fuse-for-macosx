@@ -51,6 +51,7 @@ static module_info_t if2_module_info = {
 
   if2_reset,
   if2_memory_map,
+  NULL,
   if2_from_snapshot,
   if2_to_snapshot,
 

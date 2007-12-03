@@ -74,6 +74,21 @@ module_romcs( void )
 }
 
 static void
+snapshot_enabled( gpointer data, gpointer user_data )
+{
+  const module_info_t *module = data;
+  libspectrum_snap *snap = user_data;
+
+  if( module->snapshot_enabled ) module->snapshot_enabled( snap );
+}
+
+void
+module_snapshot_enabled( libspectrum_snap *snap )
+{
+  g_slist_foreach( registered_modules, snapshot_enabled, snap );
+}
+
+static void
 snapshot_from( gpointer data, gpointer user_data )
 {
   const module_info_t *module = data;

@@ -83,6 +83,7 @@ static module_info_t joystick_module_info = {
 
   NULL,
   NULL,
+  NULL,
   joystick_from_snapshot,
   joystick_to_snapshot,
 

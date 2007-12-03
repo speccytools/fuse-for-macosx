@@ -30,6 +30,7 @@
 
 typedef void (*module_reset_fn)( int hard_reset );
 typedef void (*module_romcs_fn)( void );
+typedef void (*module_snapshot_enabled_fn)( libspectrum_snap *snap );
 typedef void (*module_snapshot_from_fn)( libspectrum_snap *snap );
 typedef void (*module_snapshot_to_fn)( libspectrum_snap *snap );
 
@@ -38,6 +39,7 @@ typedef struct module_info_t
 
   module_reset_fn reset;
   module_romcs_fn romcs;
+  module_snapshot_enabled_fn snapshot_enabled;
   module_snapshot_from_fn snapshot_from;
   module_snapshot_to_fn snapshot_to;
 
@@ -47,6 +49,7 @@ int module_register( module_info_t *module );
 
 void module_reset( int hard_reset );
 void module_romcs( void );
+void module_snapshot_enabled( libspectrum_snap *snap );
 void module_snapshot_from( libspectrum_snap *snap );
 void module_snapshot_to( libspectrum_snap *snap );
 

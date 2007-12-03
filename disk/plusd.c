@@ -55,6 +55,7 @@ static libspectrum_byte plusd_ram[ 0x2000 ];
 
 static void plusd_reset( int hard_reset );
 static void plusd_memory_map( void );
+static void plusd_enabled_snapshot( libspectrum_snap *snap );
 static void plusd_from_snapshot( libspectrum_snap *snap );
 static void plusd_to_snapshot( libspectrum_snap *snap );
 
@@ -62,6 +63,7 @@ static module_info_t plusd_module_info = {
 
   plusd_reset,
   plusd_memory_map,
+  plusd_enabled_snapshot,
   plusd_from_snapshot,
   plusd_to_snapshot,
 
@@ -544,22 +546,29 @@ alloc_and_copy_page( libspectrum_byte* source_page )
 }
 
 static void
-plusd_from_snapshot( libspectrum_snap *snap GCC_UNUSED )
+plusd_enabled_snapshot( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_plusd_active( snap ) )
+    settings_current.plusd = 1;
+}
+
+static void
+plusd_from_snapshot( libspectrum_snap *snap )
 {
   if( !libspectrum_snap_plusd_active( snap ) ) return;
 
-  settings_current.plusd = 1;
-
-  plusd_active = libspectrum_snap_plusd_paged( snap );
-  
-  if( plusd_active ) {
-    plusd_page();
-  } else {
-    plusd_unpage();
-  }
-
   if( libspectrum_snap_plusd_custom_rom( snap ) &&
       libspectrum_snap_plusd_rom( snap, 0 ) ) {
+    memory_map_romcs[0].offset = 0;
+    memory_map_romcs[0].page_num = 0;
+    memory_map_romcs[0].page =
+      memory_pool_allocate( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
+    if( !memory_map_romcs[0].page ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return;
+    }
+    memory_map_romcs[0].source = MEMORY_SOURCE_CUSTOMROM;
+
     memcpy( memory_map_romcs[0].page, libspectrum_snap_plusd_rom( snap, 0 ),
             0x2000 );
   }
@@ -576,6 +585,12 @@ plusd_from_snapshot( libspectrum_snap *snap GCC_UNUSED )
   plusd_sec_write( 0x00f3, libspectrum_snap_plusd_sector ( snap ) );
   plusd_dr_write ( 0x00fb, libspectrum_snap_plusd_data   ( snap ) );
   plusd_cn_write ( 0x00ef, libspectrum_snap_plusd_control( snap ) );
+
+  if( libspectrum_snap_plusd_paged( snap ) ) {
+    plusd_page();
+  } else {
+    plusd_unpage();
+  }
 }
 
 static void

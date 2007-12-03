@@ -56,6 +56,7 @@ wd_fdc_master_reset( wd_fdc *f )
   f->direction = 0;
   f->head_load = 0;
   f->intrq = 0;
+  f->datarq = 0;
 
   f->state = WD_FDC_STATE_NONE;
   f->status_type = WD_FDC_STATUS_TYPE1;

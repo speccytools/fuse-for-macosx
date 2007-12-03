@@ -51,6 +51,7 @@ static module_info_t slt_module_info = {
 
   NULL,
   NULL,
+  NULL,
   slt_from_snapshot,
   slt_to_snapshot,
 

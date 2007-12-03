@@ -49,6 +49,7 @@ static module_info_t ay_module_info = {
 
   ay_reset,
   NULL,
+  NULL,
   ay_from_snapshot,
   ay_to_snapshot,
 

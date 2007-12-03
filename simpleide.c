@@ -57,6 +57,7 @@ static module_info_t simpleide_module_info = {
   NULL,
   NULL,
   NULL,
+  NULL,
 
 };
 

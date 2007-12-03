@@ -55,6 +55,7 @@ static module_info_t ula_module_info = {
 
   NULL,
   NULL,
+  NULL,
   ula_from_snapshot,
   ula_to_snapshot,
 

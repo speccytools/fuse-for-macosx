@@ -73,6 +73,7 @@ static module_info_t beta_module_info = {
 
   NULL,
   beta_memory_map,
+  NULL,
   beta_from_snapshot,
   beta_to_snapshot,
 

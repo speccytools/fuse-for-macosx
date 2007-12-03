@@ -136,6 +136,8 @@ snapshot_copy_from( libspectrum_snap *snap )
   int capabilities, error;
   libspectrum_machine machine;
 
+  module_snapshot_enabled( snap );
+
   machine = libspectrum_snap_machine( snap );
 
   if( machine != machine_current->machine ) {
@@ -150,8 +152,6 @@ snapshot_copy_from( libspectrum_snap *snap )
   capabilities = machine_current->capabilities;
 
   module_snapshot_from( snap );
-
-  periph_update();
 
   return 0;
 }

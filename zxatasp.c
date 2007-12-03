@@ -141,6 +141,7 @@ static module_info_t zxatasp_module_info = {
 
   zxatasp_reset,
   zxatasp_memory_map,
+  NULL,
   zxatasp_from_snapshot,
   zxatasp_to_snapshot,
 

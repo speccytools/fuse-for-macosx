@@ -75,6 +75,7 @@ static module_info_t memory_module_info = {
 
   NULL,
   NULL,
+  NULL,
   memory_ram_from_snapshot,
   memory_ram_to_snapshot,
 

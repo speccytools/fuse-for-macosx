@@ -83,6 +83,7 @@ static module_info_t zxcf_module_info = {
 
   zxcf_reset,
   zxcf_memory_map,
+  NULL,
   zxcf_from_snapshot,
   zxcf_to_snapshot,
 

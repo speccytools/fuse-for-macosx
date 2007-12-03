@@ -57,6 +57,7 @@ static module_info_t scld_module_info = {
 
   scld_reset,
   NULL,
+  NULL,
   scld_from_snapshot,
   scld_to_snapshot,
 

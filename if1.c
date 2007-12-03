@@ -168,6 +168,7 @@ static module_info_t if1_module_info = {
   if1_memory_map,
   NULL,
   NULL,
+  NULL,
 
 };
 

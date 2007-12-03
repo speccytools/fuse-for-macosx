@@ -69,6 +69,7 @@ static module_info_t z80_module_info = {
 
   z80_reset,
   NULL,
+  NULL,
   z80_from_snapshot,
   z80_to_snapshot,
 
