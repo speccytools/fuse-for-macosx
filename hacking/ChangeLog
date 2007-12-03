@@ -2364,3 +2364,5 @@
 	 under Win32) (Stuart).
 20071203 input.c,ui/sdl/sdlui.c: pause emulation while displaying the exit
 	 dialog (Stuart).
+20071203 ui/win32,ui/win32/{Makefile.am,icons}: ignore generated files and
+	 distribute icons directory (Stuart).
