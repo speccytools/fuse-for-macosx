@@ -136,8 +136,8 @@ static void microdrives_reset( void );
 static void microdrives_restart( void );
 static void increment_head( int m );
 
-#define IN(m) microdrive[m - 1].inserted
-#define WP(m) libspectrum_microdrive_write_protect( microdrive[m - 1].cartridge )
+#define MDR_IN(m) microdrive[m - 1].inserted
+#define MDR_WP(m) libspectrum_microdrive_write_protect( microdrive[m - 1].cartridge )
 
 enum if1_menu_item {
 
@@ -185,43 +185,51 @@ static void
 update_menu( enum if1_menu_item what )
 {
   if( what == UMENU_ALL || what == UMENU_MDRV1 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_EJECT, IN( 1 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET, !IN( 1 ) ? 0 : !WP( 1 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_EJECT, MDR_IN( 1 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET,
+		      !MDR_IN( 1 ) ? 0 : !MDR_WP( 1 ) );
   }
 
   if( what == UMENU_ALL || what == UMENU_MDRV2 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_EJECT, IN( 2 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET, !IN( 2 ) ? 0 : !WP( 2 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_EJECT, MDR_IN( 2 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET,
+		      !MDR_IN( 2 ) ? 0 : !MDR_WP( 2 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV3 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_EJECT, IN( 3 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET, !IN( 3 ) ? 0 : !WP( 3 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_EJECT, MDR_IN( 3 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET,
+		      !MDR_IN( 3 ) ? 0 : !MDR_WP( 3 ) );
   }
 
   if( what == UMENU_ALL || what == UMENU_MDRV4 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_EJECT, IN( 4 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET, !IN( 4 ) ? 0 : !WP( 4 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_EJECT, MDR_IN( 4 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET,
+		      !MDR_IN( 4 ) ? 0 : !MDR_WP( 4 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV5 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_EJECT, IN( 5 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET, !IN( 5 ) ? 0 : !WP( 5 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_EJECT, MDR_IN( 5 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET,
+		      !MDR_IN( 5 ) ? 0 : !MDR_WP( 5 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV6 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_EJECT, IN( 6 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET, !IN( 6 ) ? 0 : !WP( 6 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_EJECT, MDR_IN( 6 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET,
+		      !MDR_IN( 6 ) ? 0 : !MDR_WP( 6 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV7 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_EJECT, IN( 7 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET, !IN( 7 ) ? 0 : !WP( 7 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_EJECT, MDR_IN( 7 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET,
+		      !MDR_IN( 7 ) ? 0 : !MDR_WP( 7 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_MDRV8 ) {
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_EJECT, IN( 8 ) );
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET, !IN( 8 ) ? 0 : !WP( 8 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_EJECT, MDR_IN( 8 ) );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET,
+		      !MDR_IN( 8 ) ? 0 : !MDR_WP( 8 ) );
   }
   
   if( what == UMENU_ALL || what == UMENU_RS232 ) {
