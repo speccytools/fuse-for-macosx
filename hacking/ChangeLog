@@ -2355,3 +2355,4 @@
          peripherals are enabled when the machine and module reset functions
          are called - fixes loading snapshots with the +D paged in (thanks,
          Jonathan Needle for test +D szx snapshots) (Fred).
+20071203 ay.c: add #include <string.h> for memset prototype (Fred).
