@@ -2362,4 +2362,5 @@
 	 reading of ALSA options (fixes bug #1750603) (Gergely Szasz).
 20071203 if1.c: rename IN and WP to MDR_IN and MDR_WP (avoids warnings
 	 under Win32) (Stuart).
-20071203 input.c: pause emulation while displaying the exit dialog (Stuart).
+20071203 input.c,ui/sdl/sdlui.c: pause emulation while displaying the exit
+	 dialog (Stuart).

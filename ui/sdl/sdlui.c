@@ -114,7 +114,9 @@ ui_event( void )
 
     case SDL_QUIT:
 #ifdef USE_WIDGET
+      fuse_emulation_pause();
       menu_file_exit(0);
+      fuse_emulation_unpause();
 #else 				/* #ifdef USE_WIDGET */
       fuse_exiting = 1;
 #endif				/* #ifdef USE_WIDGET */
