@@ -44,7 +44,7 @@
 #include "ui/ui.h"
 
 /* Number of Spectrum frames audio latency to use */
-#define NUM_FRAMES 2
+#define NUM_FRAMES 3
 
 static snd_pcm_t *pcm_handle;
 static snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
