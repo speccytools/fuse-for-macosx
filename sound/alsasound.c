@@ -88,32 +88,32 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   option = device;
   while( option && *option ) {
     tmp = '*';
-    if( ( ( err = sscanf( option, " buffer=%i %n%c", &val, &n, &tmp ) == 2 ) &&
-		tmp == ',' ) || ( err == 1 && strlen( option ) == n ) ) {
+    if( ( err = sscanf( option, " buffer=%i %n%c", &val, &n, &tmp ) > 0 ) &&
+		( tmp == ',' || strlen( option ) == n ) ) {
       if( val < 1 ) {
 	fprintf( stderr, "Bad value for ALSA buffer size %i, using default\n",
 		    val );
       } else {
         bsize = val;
       }
-    } else if( ( ( err = sscanf( option, " frames=%i %n%c", &val, &n, &tmp ) == 2 ) &&
-		tmp == ',' ) || ( err == 1 && strlen( option ) == n ) ) {
+    } else if( ( err = sscanf( option, " frames=%i %n%c", &val, &n, &tmp ) > 0 ) &&
+		( tmp == ',' || strlen( option ) == n ) ) {
       if( val < 1 ) {
 	fprintf( stderr, "Bad value for ALSA buffer size %i frames, using default (%d)\n",
 		    val, NUM_FRAMES );
       } else {
         nperiods = val;
       }
-    } else if( ( ( err = sscanf( option, " avail=%i %n%c", &val, &n, &tmp ) == 2 ) &&
-		tmp == ',' ) || ( err == 1 && strlen( option ) == n ) ) {
+    } else if( ( err = sscanf( option, " avail=%i %n%c", &val, &n, &tmp ) > 0 ) &&
+		( tmp == ',' || strlen( option ) == n ) ) {
       if( val < 1 ) {
 	fprintf( stderr, "Bad value for ALSA avail_min size %i frames, using default\n",
 		    val );
       } else {
         avail_min = val;
       }
-    } else if( ( ( err = sscanf( option, " verbose %n%c", &n, &tmp ) == 1 ) &&
-		tmp == ',' ) || strlen( option ) == n ) {
+    } else if( ( err = sscanf( option, " verbose %n%c", &n, &tmp ) == 1 ) &&
+		( tmp == ','  || strlen( option ) == n ) ) {
       verb = 1;
     } else {					/* try as device name */
 	while( isspace(*option) )
@@ -314,7 +314,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   }
 
   if( !avail_min )
-    avail_min = exact_periodsize;
+    avail_min = exact_periodsize >> 1;
   if( snd_pcm_sw_params_set_avail_min( pcm_handle,
 		    sw_params, avail_min ) < 0 ) {
     if( ( err = snd_pcm_sw_params_set_sleep_min( pcm_handle,
@@ -367,7 +367,7 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
     if( ret < 0 ) {
       snd_pcm_prepare( pcm_handle );
       if( verb )
-        fprintf( stderr, "ALSA: buffer underrun!\n" );
+        fprintf( stderr, "ALSA: *buffer underrun*!\n" );
     } else {
         len -= ret;
     }
