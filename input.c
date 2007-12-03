@@ -163,7 +163,9 @@ keypress( const input_event_key_t *event )
     fuse_emulation_unpause();
     break;
   case INPUT_KEY_F10:
+    fuse_emulation_pause();
     menu_file_exit( 0 );
+    fuse_emulation_unpause();
     break;
 
   default: break;		/* Remove gcc warning */
