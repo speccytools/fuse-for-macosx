@@ -2366,3 +2366,4 @@
 	 dialog (Stuart).
 20071203 ui/win32,ui/win32/{Makefile.am,icons}: ignore generated files and
 	 distribute icons directory (Stuart).
+20071203 ui/win32/win32ui.c: implement pausing (Stuart).

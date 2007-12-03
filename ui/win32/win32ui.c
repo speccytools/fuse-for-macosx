@@ -35,6 +35,7 @@
 #include "screenshot.h"
 #include "settings.h"
 #include "snapshot.h"
+#include "timer/timer.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
 #include "utils.h"
@@ -138,6 +139,10 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_DESTROY:
       fuse_exiting = 1;
       PostQuitMessage( 0 );
+
+      /* Stop the paused state to allow us to exit (occurs from main
+	 emulation loop) */
+      if( paused ) menu_machine_pause( 0 );
       break;
 
     default:
@@ -204,19 +209,26 @@ int
 ui_event( void )
 {
   MSG msg;
-  /* Process messages */
-  while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
-/* TODO: double check this && */
-    if( !IsDialogMessage( fuse_hPFWnd, &msg )
-     && !IsDialogMessage( fuse_hDBGWnd, &msg ) ) {
-      if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
-	if( msg.message == WM_QUIT ) break;
-	/* finish - set exit flag somewhere */
-	TranslateMessage( &msg );
-	DispatchMessage( &msg );
+
+  do {
+
+    /* Process messages */
+    while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
+      if( !IsDialogMessage( fuse_hPFWnd, &msg ) &&
+	  !IsDialogMessage( fuse_hDBGWnd, &msg )   ) {
+	if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
+	  if( msg.message == WM_QUIT ) break;
+	  /* finish - set exit flag somewhere */
+	  TranslateMessage( &msg );
+	  DispatchMessage( &msg );
+	}
       }
     }
-  }
+
+    if( fuse_emulation_paused )
+      Sleep( 25 );
+
+  } while( fuse_emulation_paused );
 
   return 0;
   /* finish - somwhere there should be return msg.wParam */
@@ -594,7 +606,31 @@ void menu_options_sound( int action ) { STUB; }
 void menu_options_peripherals( int action ) { STUB; }
 void menu_options_rzx( int action ) { STUB; }
 void menu_options_joysticks_select( int action ) { STUB; }
-void menu_machine_pause( int action ) { STUB; }
+
+void
+menu_machine_pause( int action )
+{
+  int error;
+
+  if( paused ) {
+    paused = 0;
+    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
+			 UI_STATUSBAR_STATE_INACTIVE );
+    timer_estimate_reset();
+    fuse_emulation_unpause();
+  } else {
+
+    /* Stop recording any competition mode RZX file */
+    if( rzx_recording && rzx_competition_mode ) {
+      ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
+      error = rzx_stop_recording(); if( error ) return;
+    }
+
+    paused = 1;
+    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
+    fuse_emulation_pause();
+  }
+}
 
 void
 menu_machine_reset( int action )
