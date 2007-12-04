@@ -2374,3 +2374,4 @@
 	 ui/options.dat,ui.c: allow the Beta 128 interface to be used with the
 	 128K and +2 machines (feature request #1541506) (Stuart).
 20071204 man/fuse.1: document the 128K/+2 Beta 128 support (Stuart).
+20071204 man/fuse.1: rearrange Interface I TODO items (Stuart).
