@@ -481,13 +481,6 @@ beta_disk_write( beta_drive_number which, const char *filename )
 }
 
 int
-beta_event_cmd_done( libspectrum_dword last_tstates )
-{
-  beta_fdc->status_register &= ~WD_FDC_SR_BUSY;
-  return 0;
-}
-
-int
 beta_event_index( libspectrum_dword last_tstates )
 {
   int error;

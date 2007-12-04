@@ -2368,3 +2368,4 @@
 	 distribute icons directory (Stuart).
 20071203 ui/win32/win32ui.c: implement pausing (Stuart).
 20071204 disk/plusd.c: use MEMORY_PAGE_SIZE define (Fred).
+20071204 disk/{beta.c,beta.h}: remove unused function (Stuart).

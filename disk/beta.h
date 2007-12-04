@@ -70,7 +70,6 @@ int beta_disk_insert( beta_drive_number which, const char *filename,
 int beta_disk_eject( beta_drive_number which, int write );
 int beta_disk_writeprotect( beta_drive_number which, int wrprot );
 int beta_disk_write( beta_drive_number which, const char *filename );
-int beta_event_cmd_done( libspectrum_dword last_tstates );
 int beta_event_index( libspectrum_dword last_tstates );
 
 #endif                  /* #ifndef FUSE_BETA_H */
