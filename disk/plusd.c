@@ -570,7 +570,7 @@ plusd_from_snapshot( libspectrum_snap *snap )
     memory_map_romcs[0].source = MEMORY_SOURCE_CUSTOMROM;
 
     memcpy( memory_map_romcs[0].page, libspectrum_snap_plusd_rom( snap, 0 ),
-            0x2000 );
+            MEMORY_PAGE_SIZE );
   }
 
   if( libspectrum_snap_plusd_ram( snap, 0 ) ) {
