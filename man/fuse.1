@@ -2142,11 +2142,14 @@ TODO
 .PP
 .I "Media, Disk"
 .RS
-Virtual disk images are accessible only when emulating a +3, +3e,
-Pentagon or Scorpion. (See
-.B "THE .DSK FORMAT"
-and
+Virtual floppy disk images are accessible when emulating a +3, +3e,
+Pentagon or Scorpion, or when the Beta 128 or +D interface options
+are enabled and a machine compatible with the chosen interface is
+selected. (See
+.BR "THE .DSK FORMAT" ,
 .B "BETA 128 EMULATION"
+and
+.B "+D EMULATION"
 sections below for notes on the file formats supported).
 .PP
 Once again, any changes made to a disk image will not affect the file
