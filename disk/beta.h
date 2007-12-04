@@ -30,8 +30,14 @@
 
 #include <libspectrum.h>
 
+#include "periph.h"
+
 extern int beta_available;  /* Is the Beta disk interface available for use? */
 extern int beta_active;     /* Is the Beta disk interface enabled? */
+extern int beta_builtin;    /* Is the Beta disk interface built-in? */
+
+extern const periph_t beta_peripherals[];
+extern const size_t beta_peripherals_count;
 
 int beta_init( void );
 
@@ -62,8 +68,6 @@ typedef enum beta_drive_number {
   BETA_DRIVE_C,
   BETA_DRIVE_D,
 } beta_drive_number;
-
-void beta_reset( void );
 
 int beta_disk_insert( beta_drive_number which, const char *filename,
                        int autoload );

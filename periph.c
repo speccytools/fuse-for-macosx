@@ -305,6 +305,12 @@ periph_present plusd_present;
 /* Is the +D currently active */
 int periph_plusd_active;
 
+/* What sort of Beta 128 interface does the current machine have */
+periph_present beta128_present;
+
+/* Is the Beta 128 currently active */
+int periph_beta128_active;
+
 int
 periph_setup( const periph_t *peripherals_list, size_t n )
 {
@@ -330,6 +336,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   interface1_present = PERIPH_PRESENT_NEVER;
   interface2_present = PERIPH_PRESENT_NEVER;
   plusd_present = PERIPH_PRESENT_NEVER;
+  beta128_present = PERIPH_PRESENT_NEVER;
 
   return 0;
 }
@@ -352,6 +359,16 @@ periph_setup_interface2( periph_present present ) {
 void
 periph_setup_plusd( periph_present present ) {
   plusd_present = present;
+}
+
+void
+periph_setup_beta128( periph_present present ) {
+  beta128_present = present;
+}
+
+void
+periph_register_beta128( void ) {
+  periph_register_n( beta_peripherals, beta_peripherals_count );
 }
 
 static void
@@ -429,6 +446,14 @@ periph_update( void )
   case PERIPH_PRESENT_OPTIONAL:
     periph_plusd_active = settings_current.plusd; break;
   case PERIPH_PRESENT_ALWAYS: periph_plusd_active = 1; break;
+  }
+
+  switch( beta128_present ) {
+  case PERIPH_PRESENT_NEVER: periph_beta128_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_beta128_active = settings_current.beta128; break;
+  case PERIPH_PRESENT_ALWAYS: periph_beta128_active = 1;
+    break;
   }
 
   if( ui_mouse_present ) {

@@ -56,6 +56,7 @@
 
 int beta_available = 0;
 int beta_active = 0;
+int beta_builtin = 0;
 
 static int beta_index_pulse = 0;
 
@@ -64,21 +65,31 @@ static int beta_index_pulse = 0;
 static wd_fdc *beta_fdc;
 static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
 
-void beta_reset( void );
+const periph_t beta_peripherals[] = {
+  { 0x00ff, 0x001f, beta_sr_read, beta_cr_write },
+  { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
+  { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
+  { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
+  { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
+};
+
+const size_t beta_peripherals_count =
+  sizeof( beta_peripherals ) / sizeof( periph_t );
+
+static void beta_reset( int hard_reset );
 static void beta_memory_map( void );
 static void beta_from_snapshot( libspectrum_snap *snap );
 static void beta_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t beta_module_info = {
 
-  NULL,
+  beta_reset,
   beta_memory_map,
-  NULL,
+  NULL, /* XXX: beta_enabled_snapshot */
   beta_from_snapshot,
   beta_to_snapshot,
 
 };
-
 
 void
 beta_page( void )
@@ -130,15 +141,21 @@ beta_init( void )
   return 0;
 }
 
-void
-beta_reset( void )
+static void
+beta_reset( int hard_reset )
 {
   int i;
   wd_fdc_drive *d;
 
-  beta_active = 0;
-
   event_remove_type( EVENT_TYPE_BETA_INDEX );
+
+  if( !periph_beta128_active ) {
+    beta_active = 0;
+    beta_available = 0;
+    return;
+  }
+
+  beta_available = 1;
 
   wd_fdc_master_reset( beta_fdc );
 
@@ -147,6 +164,20 @@ beta_reset( void )
 
     d->index_pulse = 0;
     d->index_interrupt = 0;
+  }
+
+  if( !beta_builtin ) {
+    machine_load_rom_bank( memory_map_romcs, 0, 0,
+			   settings_current.rom_beta128,
+			   settings_default.rom_beta128, 0x4000 );
+
+    memory_map_romcs[ 0 ].writable = 0;
+    memory_map_romcs[ 1 ].writable = 0;
+
+    memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
+    memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
+
+    beta_active = 0;
   }
 
   /* We can eject disks only if they are currently present */

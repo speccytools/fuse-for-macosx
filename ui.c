@@ -494,7 +494,7 @@ ui_menu_disk_update( void )
 
   /* Set the disk menu items and statusbar appropriately */
   plus3 = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK;
-  beta = capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK;
+  beta = beta_available;
   plusd = plusd_available;
 
   if( plus3 || beta || plusd ) {

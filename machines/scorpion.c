@@ -48,7 +48,6 @@
 
 static libspectrum_byte scorpion_contend_delay( libspectrum_dword time );
 static int scorpion_reset( void );
-static int scorpion_shutdown( void );
 static int scorpion_memory_map( void );
 
 static const periph_t peripherals[] = {
@@ -95,7 +94,7 @@ scorpion_init( fuse_machine_info *machine )
 
   machine->unattached_port = scorpion_unattached_port;
 
-  machine->shutdown = scorpion_shutdown;
+  machine->shutdown = NULL;
 
   machine->memory_map = scorpion_memory_map;
 
@@ -121,9 +120,6 @@ scorpion_reset(void)
                                  settings_default.rom_scorpion_3, 0x4000 );
   if( error ) return error;
 
-  beta_available = 1;
-  beta_active = 0;
-
   error = spec128_common_reset( 0 );
   if( error ) return error;
 
@@ -134,12 +130,14 @@ scorpion_reset(void)
   for( i = 16; i < 32; i++ )
     memory_map_ram[i].writable = 1;
 
-  beta_reset();
-
   error = periph_setup( peripherals, peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
   periph_update();
+
+  beta_builtin = 1;
+  beta_active = 0;
 
   return 0;
 }
@@ -182,14 +180,6 @@ scorpion_memory_map( void )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
-
-  return 0;
-}
-
-static int
-scorpion_shutdown( void )
-{
-  beta_end();
 
   return 0;
 }

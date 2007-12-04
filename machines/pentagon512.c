@@ -57,7 +57,7 @@ pentagon512_init( fuse_machine_info *machine )
 
   machine->unattached_port = spectrum_unattached_port;
 
-  machine->shutdown = pentagon_shutdown;
+  machine->shutdown = NULL;
 
   machine->memory_map = pentagon_memory_map;
 
@@ -90,7 +90,11 @@ pentagon_reset(void)
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
   periph_update();
+
+  beta_builtin = 1;
+  beta_active = 1;
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
@@ -98,11 +102,6 @@ pentagon_reset(void)
   /* Mark the least 384K as present/writeable */
   for( i = 16; i < 64; i++ )
     memory_map_ram[i].writable = 1;
-
-  beta_reset();
-
-  beta_available = 1;
-  beta_active = 1;
 
   return 0;
 }

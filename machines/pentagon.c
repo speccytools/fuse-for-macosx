@@ -124,7 +124,7 @@ pentagon_init( fuse_machine_info *machine )
 
   machine->unattached_port = pentagon_unattached_port;
 
-  machine->shutdown = pentagon_shutdown;
+  machine->shutdown = NULL;
 
   machine->memory_map = pentagon_memory_map;
 
@@ -157,23 +157,14 @@ pentagon_reset(void)
   error = periph_setup( pentagon_peripherals, pentagon_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
   periph_update();
+
+  beta_builtin = 1;
+  beta_active = 1;
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
-
-  beta_reset();
-
-  beta_available = 1;
-  beta_active = 1;
-
-  return 0;
-}
-
-int
-pentagon_shutdown( void )
-{
-  beta_end();
 
   return 0;
 }
