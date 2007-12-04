@@ -115,6 +115,13 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
+.I \-\-beta128
+.RS
+Emulate a Beta 128 interface. Same as the Peripherals Options dialog's
+.I "Beta 128 interface"
+option.
+.RE
+.PP
 .I \-\-beeper\-stereo
 .RS
 Specify whether fake stereo should be added to the emulation of the
@@ -492,6 +499,8 @@ Specify an RZX file to begin recording to.
 .I "\-\-rom\-interface\-1 file"
 .br
 .I "\-\-rom\-plusd file"
+.br
+.I "\-\-rom\-beta128 file"
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
 options respectively refer to the 16K Spectrum
@@ -520,8 +529,10 @@ the two ROMs for the Spectrum SE
 .RI ( se\-0.rom " and " se\-1.rom ),
 the Interface I ROM
 .RI ( if1\-2.rom ),
-and the +D ROM
-.RI ( plusd.rom ).
+the +D ROM
+.RI ( plusd.rom ),
+and the TR-DOS ROM for Beta 128 emulation with the 128K or +2
+.RI ( trdos.rom ).
 The names in brackets denote the defaults.
 .RE
 .PP
@@ -1607,6 +1618,15 @@ If this option is selected, Fuse will emulate the +D interface.  See the
 .B "+D EMULATION"
 section for more details.
 .RE
+.PP
+.I "Beta 128 interface"
+.RS
+If this option is selected, Fuse will emulate the Beta 128 interface.
+See the
+.B "BETA 128 EMULATION"
+section for more details. Beta 128 emulation is enabled for the
+Pentagon and Scorpion machines regardless of this option.
+.RE
 .RE
 .PP
 .I "Options, RZX..."
@@ -2135,7 +2155,7 @@ Virtual disk images are accessible only when emulating a +3, +3e,
 Pentagon or Scorpion. (See
 .B "THE .DSK FORMAT"
 and
-.B "BETA DISK FORMATS"
+.B "BETA 128 EMULATION"
 sections below for notes on the file formats supported).
 .PP
 Once again, any changes made to a disk image will not affect the file
@@ -3093,10 +3113,14 @@ compressed disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
-.SH BETA DISK FORMATS
+.SH BETA 128 EMULATION
 .PP
 Fuse supports .SCL and .TRD images in its Pentagon and Scorpion
-emulation; truncated .TRD files need to be expanded with another
+emulation, and also under 128K and +2 (but not +2A) emulation if the
+.I Beta 128 interface
+option from the
+.I "Options, Peripherals..."
+dialog is enabled; truncated .TRD files need to be expanded with another
 utility before use with Fuse.
 .\"
 .\"------------------------------------------------------------------
