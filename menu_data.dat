@@ -85,13 +85,13 @@ Options/Select ROMs/Timex _TC2048..., Item,, menu_options_selectroms_select, 8
 Options/Select ROMs/Timex TC206_8..., Item,, menu_options_selectroms_select, 9
 Options/Select ROMs/Timex TS2_068..., Item,, menu_options_selectroms_select, 10
 Options/Select ROMs/_Pentagon 128K..., Item,, menu_options_selectroms_select, 11
-Options/Select ROMs/Pe_ntagon 512K..., Item,, menu_options_selectroms_select, 16
-Options/Select ROMs/Penta_gon 1024K..., Item,, menu_options_selectroms_select, 17
-Options/Select ROMs/S_corpion ZS 256..., Item,, menu_options_selectroms_select, 12
-Options/Select ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select, 13
-Options/Select ROMs/Interface _I..., Item,, menu_options_selectroms_select, 14
-Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select, 15
-Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select, 21
+Options/Select ROMs/Pe_ntagon 512K..., Item,, menu_options_selectroms_select, 12
+Options/Select ROMs/Penta_gon 1024K..., Item,, menu_options_selectroms_select, 13
+Options/Select ROMs/S_corpion ZS 256..., Item,, menu_options_selectroms_select, 14
+Options/Select ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select, 15
+Options/Select ROMs/Interface _I..., Item,, menu_options_selectroms_select, 16
+Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select, 17
+Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select, 18
 
 Options/_Filter..., Item
 
