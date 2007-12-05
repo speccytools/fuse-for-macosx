@@ -161,14 +161,17 @@ enum if1_port {
 };
 
 static void if1_reset( int hard_reset );
+static void if1_enabled_snapshot( libspectrum_snap *snap );
+static void if1_from_snapshot( libspectrum_snap *snap );
+static void if1_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t if1_module_info = {
 
   if1_reset,
   if1_memory_map,
-  NULL,
-  NULL,
-  NULL,
+  if1_enabled_snapshot,
+  if1_from_snapshot,
+  if1_to_snapshot,
 
 };
 
@@ -340,6 +343,103 @@ if1_memory_map( void )
   if( !if1_active ) return;
 
   memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
+}
+
+static void
+if1_enabled_snapshot( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_interface1_active( snap ) )
+    settings_current.interface1 = 1;
+}
+
+static void
+if1_from_snapshot( libspectrum_snap *snap )
+{
+  if( !libspectrum_snap_interface1_active( snap ) ) return;
+
+  if( libspectrum_snap_interface1_custom_rom( snap ) &&
+      libspectrum_snap_interface1_rom( snap, 0 ) ) {
+
+    if( libspectrum_snap_interface1_rom_length( snap, 0 ) >=
+        MEMORY_PAGE_SIZE ) {
+      memory_map_romcs[0].offset = 0;
+      memory_map_romcs[0].page_num = 0;
+      memory_map_romcs[0].page = memory_pool_allocate( MEMORY_PAGE_SIZE );
+      if( !memory_map_romcs[0].page ) {
+        ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                  __LINE__ );
+        return;
+      }
+      memory_map_romcs[0].source = MEMORY_SOURCE_CUSTOMROM;
+
+      memcpy( memory_map_romcs[0].page,
+              libspectrum_snap_interface1_rom( snap, 0 ),
+              MEMORY_PAGE_SIZE );
+    }
+
+    if( libspectrum_snap_interface1_rom_length( snap, 0 ) ==
+        MEMORY_PAGE_SIZE*2 ) {
+
+      memory_map_romcs[1].offset = 0;
+      memory_map_romcs[1].page_num = 0;
+      memory_map_romcs[1].page = memory_pool_allocate( MEMORY_PAGE_SIZE );
+      if( !memory_map_romcs[1].page ) {
+        ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                  __LINE__ );
+        return;
+      }
+
+      memory_map_romcs[1].source = MEMORY_SOURCE_CUSTOMROM;
+
+      memcpy( memory_map_romcs[1].page,
+              libspectrum_snap_interface1_rom( snap, 0 ) + MEMORY_PAGE_SIZE,
+              MEMORY_PAGE_SIZE );
+    }
+  }
+
+  if( libspectrum_snap_interface1_paged( snap ) ) {
+    if1_page();
+  } else {
+    if1_unpage();
+  }
+}
+
+static void
+if1_to_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_byte *buffer;
+
+  if( !periph_interface1_active ) return;
+
+  libspectrum_snap_set_interface1_active( snap, 1 );
+  libspectrum_snap_set_interface1_paged ( snap, if1_active );
+  libspectrum_snap_set_interface1_drive_count( snap, 8 );
+
+  if( memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+    size_t rom_length = MEMORY_PAGE_SIZE;
+
+    if( memory_map_romcs[1].source == MEMORY_SOURCE_CUSTOMROM ) {
+      rom_length <<= 1;
+    }
+
+    libspectrum_snap_set_interface1_custom_rom( snap, 1 );
+    libspectrum_snap_set_interface1_rom_length( snap, 0, rom_length );
+
+    buffer = malloc( rom_length );
+    if( !buffer ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return;
+    }
+
+    memcpy( buffer, memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
+
+    if( rom_length == MEMORY_PAGE_SIZE*2 ) {
+      memcpy( buffer + MEMORY_PAGE_SIZE, memory_map_romcs[1].page,
+              MEMORY_PAGE_SIZE );
+    }
+
+    libspectrum_snap_set_interface1_rom( snap, 0, buffer );
+  }
 }
 
 static void
