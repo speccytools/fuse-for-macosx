@@ -2382,3 +2382,5 @@
 20071205 menu.[ch],menu_data.dat,settings.pl,ui/{gtk/roms.c,win32/win32ui.c},
 	 widget/{menu.c,roms.c,widget_internals.h}: use more appropriate titles
 	 when selecting Interface I and +D ROMs (Stuart).
+20071205 menu.c,menu_data.dat,settings.pl: allow the Beta 128 ROM to be
+	 customised (Stuart).

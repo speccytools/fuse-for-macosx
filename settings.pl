@@ -523,6 +523,7 @@ settings_get_rom_setting( settings_info *settings, size_t which )
   case 40: return &( settings->rom_pentagon1024_1 );
   case 41: return &( settings->rom_pentagon1024_2 );
   case 42: return &( settings->rom_pentagon1024_3 );
+  case 43: return &( settings->rom_beta128 );
   default: return NULL;
   }
 }

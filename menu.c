@@ -217,6 +217,8 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
 
   case 16: menu_select_roms( LIBSPECTRUM_MACHINE_PENT512,  35, 4 ); return;
   case 17: menu_select_roms( LIBSPECTRUM_MACHINE_PENT1024, 39, 4 ); return;
+
+  case 21: menu_select_roms_with_title( "Beta 128",        43, 1 ); return;
   }
 
   ui_error( UI_ERROR_ERROR,
