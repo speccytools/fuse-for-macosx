@@ -2379,3 +2379,6 @@
 	 Disk" section (Stuart).
 20071205 machines/{specplus2a.c,specplus3.c}: Interface 1 doesn't work on the
          +2A and +3 (Fred).
+20071205 menu.[ch],menu_data.dat,settings.pl,ui/{gtk/roms.c,win32/win32ui.c},
+	 widget/{menu.c,roms.c,widget_internals.h}: use more appropriate titles
+	 when selecting Interface I and +D ROMs (Stuart).

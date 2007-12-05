@@ -306,7 +306,7 @@ ui_widgets_reset( void )
 }
 
 int
-menu_select_roms( libspectrum_machine machine, size_t start, size_t count )
+menu_select_roms_with_title( const char *title, size_t start, size_t count )
 {
   STUB;
   return 0;

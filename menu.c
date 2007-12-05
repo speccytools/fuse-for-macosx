@@ -212,10 +212,8 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case 12: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,    27, 4 ); return;
   case 13: menu_select_roms( LIBSPECTRUM_MACHINE_SE,       31, 2 ); return;
 
-  /* Interface I */
-  case 14: menu_select_roms( LIBSPECTRUM_MACHINE_48,       33, 1 ); return;
-  /* +D: */
-  case 15: menu_select_roms( LIBSPECTRUM_MACHINE_48,       34, 1 ); return;
+  case 14: menu_select_roms_with_title( "Interface I",     33, 1 ); return;
+  case 15: menu_select_roms_with_title( "+D",              34, 1 ); return;
 
   case 16: menu_select_roms( LIBSPECTRUM_MACHINE_PENT512,  35, 4 ); return;
   case 17: menu_select_roms( LIBSPECTRUM_MACHINE_PENT1024, 39, 4 ); return;
@@ -710,4 +708,11 @@ menu_check_media_changed( void )
   }
 
   return 0;
+}
+
+int
+menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
+{
+  return menu_select_roms_with_title( libspectrum_machine_name( machine ),
+				      start, n );
 }

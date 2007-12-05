@@ -52,7 +52,7 @@ struct callback_info {
 };
 
 int
-menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
+menu_select_roms_with_title( const char *title, size_t start, size_t n )
 {
   GtkWidget *dialog;
   GtkBox *vbox;
@@ -66,8 +66,7 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
   fuse_emulation_pause();
 
   /* Give me a new dialog box */
-  snprintf( buffer, 256, "Fuse - Select ROMs - %s",
-	    libspectrum_machine_name( machine ) );
+  snprintf( buffer, 256, "Fuse - Select ROMs - %s", title );
   dialog = gtkstock_dialog_new( buffer, NULL );
 
   info.start = start;

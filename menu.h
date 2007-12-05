@@ -142,6 +142,8 @@ MENU_CALLBACK( menu_help_keyboard );
 
 int menu_select_roms( libspectrum_machine machine, size_t start,
 		      size_t count );
+int menu_select_roms_with_title( const char *title, size_t start,
+				 size_t count );
 scaler_type menu_get_scaler( scaler_available_fn selector );
 int menu_check_media_changed( void );
 

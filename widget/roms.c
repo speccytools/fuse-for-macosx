@@ -74,8 +74,7 @@ widget_roms_draw( void *data )
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, rom_count + 3 );
 
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND,
-		      libspectrum_machine_name( info->machine ) );
+  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, info->title );
   widget_display_lines( 2, 1 );
 
   for( i=0; i < info->count; i++ ) {
@@ -142,8 +141,7 @@ widget_roms_keyhandler( input_key key )
 
     key -= INPUT_KEY_a;
 
-    snprintf( buf, sizeof( buf ), "%s - ROM %d",
-	      libspectrum_machine_name( info->machine ), key );
+    snprintf( buf, sizeof( buf ), "%s - ROM %d", info->title, key );
 
     data.exit_all_widgets = 0;
     data.title = buf;

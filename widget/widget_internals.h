@@ -226,7 +226,7 @@ typedef struct widget_roms_info {
 
   int initialised;
 
-  libspectrum_machine machine;
+  const char *title;
   size_t start, count;
 
 } widget_roms_info;

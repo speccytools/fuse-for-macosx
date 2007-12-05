@@ -367,11 +367,11 @@ menu_options_joysticks_select( int action )
 
 /* Options/Select ROMs/<type> */
 int
-menu_select_roms( libspectrum_machine machine, size_t start, size_t count )
+menu_select_roms_with_title( const char *title, size_t start, size_t count )
 {
   widget_roms_info info;
 
-  info.machine = machine;
+  info.title = title;
   info.start = start;
   info.count = count;
   info.initialised = 0;
