@@ -2377,3 +2377,5 @@
 20071204 man/fuse.1: rearrange Interface I TODO items (Stuart).
 20071204 man/fuse.1: mention +D and 128K/+2 Beta 128 support in the "Media,
 	 Disk" section (Stuart).
+20071205 machines/{specplus2a.c,specplus3.c}: Interface 1 doesn't work on the
+         +2A and +3 (Fred).

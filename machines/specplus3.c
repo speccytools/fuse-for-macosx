@@ -270,7 +270,6 @@ specplus3_reset( void )
   error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
 #ifdef HAVE_765_H
