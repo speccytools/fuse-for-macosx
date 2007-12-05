@@ -2384,3 +2384,4 @@
 	 when selecting Interface I and +D ROMs (Stuart).
 20071205 menu.c,menu_data.dat,settings.pl: allow the Beta 128 ROM to be
 	 customised (Stuart).
+20071205 menu_data.dat: fix Beta 128 ROM menu item name (Stuart).

@@ -91,7 +91,7 @@ Options/Select ROMs/S_corpion ZS 256..., Item,, menu_options_selectroms_select, 
 Options/Select ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select, 13
 Options/Select ROMs/Interface _I..., Item,, menu_options_selectroms_select, 14
 Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select, 15
-Options/Select ROMs/+_Beta 128..., Item,, menu_options_selectroms_select, 21
+Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select, 21
 
 Options/_Filter..., Item
 
