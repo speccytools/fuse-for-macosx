@@ -44,7 +44,7 @@
 #include "timer/timer.h"
 #include "z80/z80.h"
 
-/* 272Kb of RAM */
+/* 1040 KB of RAM */
 libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 
 /* How many tstates have elapsed since the last interrupt? (or more

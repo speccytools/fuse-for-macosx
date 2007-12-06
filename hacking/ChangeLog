@@ -2387,3 +2387,4 @@
 20071205 menu_data.dat: fix Beta 128 ROM menu item name (Stuart).
 20071205 if1.c: add support for Interface 1 snapshots (Fred).
 20071205 menu.c,menu_data.dat,settings.pl: rearrange ROMs (Stuart).
+20071206 spectrum.c: update comment to reflect added RAM (Stuart).
