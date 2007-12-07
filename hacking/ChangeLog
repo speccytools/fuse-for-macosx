@@ -2388,3 +2388,4 @@
 20071205 if1.c: add support for Interface 1 snapshots (Fred).
 20071205 menu.c,menu_data.dat,settings.pl: rearrange ROMs (Stuart).
 20071206 spectrum.c: update comment to reflect added RAM (Stuart).
+20071207 disk/disk.c: initialise 'seclen' in open_td0() (Stuart).

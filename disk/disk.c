@@ -1040,6 +1040,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
   /* determine the greatest track length */
   d->bpt = 0;
   d->cylinders = 0;
+  seclen = 0;
   while( 1 ) {
     fseek( file, track_offset, SEEK_SET );
     if( fread( head, 1, 1, file ) != 1 )
