@@ -136,13 +136,6 @@ contend_read( libspectrum_word address, libspectrum_dword time )
 }
 
 void
-contend_write( libspectrum_word address, libspectrum_dword time )
-{
-  printf( "%5d MC %04x\n", tstates, address );
-  tstates += time;
-}
-
-void
 contend_read_no_mreq( libspectrum_word address, libspectrum_dword time )
 {
   contend_read( address, time );
@@ -151,7 +144,8 @@ contend_read_no_mreq( libspectrum_word address, libspectrum_dword time )
 void
 contend_write_no_mreq( libspectrum_word address, libspectrum_dword time )
 {
-  contend_write( address, time );
+  printf( "%5d MC %04x\n", tstates, address );
+  tstates += time;
 }
 
 static void

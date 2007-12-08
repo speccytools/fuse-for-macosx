@@ -108,11 +108,6 @@
     tstates += ula_contention[ tstates ]; \
   tstates += (time);
 
-#define contend_write(address,time) \
-  if( memory_map_write[ (address) >> 13 ].contended ) \
-    tstates += ula_contention[ tstates ]; \
-  tstates += (time);
-
 #define contend_read_no_mreq(address,time) \
   if( memory_map_read[ (address) >> 13 ].contended ) \
     tstates += ula_contention_no_mreq[ tstates ]; \
@@ -126,7 +121,6 @@
 #else				/* #ifndef CORETEST */
 
 void contend_read( libspectrum_word address, libspectrum_dword time );
-void contend_write( libspectrum_word address, libspectrum_dword time );
 void contend_read_no_mreq( libspectrum_word address, libspectrum_dword time );
 void contend_write_no_mreq( libspectrum_word address, libspectrum_dword time );
 
