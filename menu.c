@@ -260,7 +260,7 @@ MENU_CALLBACK( menu_machine_profiler_stop )
 
   fuse_emulation_pause();
 
-  filename = ui_get_save_filename( "Fuse - Save profile data" );
+  filename = ui_get_save_filename( "Fuse - Save Profile Data" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   profile_finish( filename );
@@ -337,7 +337,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_if1_rs232 )
     WIDGET_END;
     if1_unplug( action & 0x0f );
   } else {
-    filename = ui_get_open_filename( "Fuse - Select file for communication" );
+    filename = ui_get_open_filename( "Fuse - Select File for Communication" );
     if( !filename ) { fuse_emulation_unpause(); return; }
 
     if1_plug( filename, action );
@@ -539,7 +539,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_ide_insert )
 
   fuse_emulation_pause();
 
-  filename = ui_get_open_filename( "Fuse - Insert hard disk file" );
+  filename = ui_get_open_filename( "Fuse - Insert Hard Disk File" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   switch( action ) {

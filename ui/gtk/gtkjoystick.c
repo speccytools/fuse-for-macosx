@@ -134,7 +134,7 @@ menu_options_joysticks_select( gpointer callback_data GCC_UNUSED,
 
   setup_info( &info, callback_action );
 
-  dialog = gtkstock_dialog_new( "Fuse - Configure joystick", NULL );
+  dialog = gtkstock_dialog_new( "Fuse - Configure Joystick", NULL );
 
   hbox = gtk_hbox_new( FALSE, 4 );
   gtk_container_set_border_width( GTK_CONTAINER( hbox ), 4 );

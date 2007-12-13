@@ -301,7 +301,7 @@ ui_error_specific( ui_error_level severity, const char *message )
   case UI_ERROR_INFO:	 title = "Fuse - Info"; break;
   case UI_ERROR_WARNING: title = "Fuse - Warning"; break;
   case UI_ERROR_ERROR:	 title = "Fuse - Error"; break;
-  default:		 title = "Fuse - (Unknown error level)"; break;
+  default:		 title = "Fuse - (Unknown Error Level)"; break;
   }
 
   /* Create the dialog box */
@@ -434,7 +434,7 @@ menu_file_aylogging_record( GtkWidget *widget GCC_UNUSED,
 
   fuse_emulation_pause();
 
-  psgfile = ui_get_save_filename( "Fuse - Start AY log" );
+  psgfile = ui_get_save_filename( "Fuse - Start AY Log" );
   if ( !psgfile ) { fuse_emulation_unpause(); return; }
 
   psg_start_recording( psgfile );
@@ -871,7 +871,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
   fuse_emulation_pause();
 
   /* Create the necessary widgets */
-  snprintf( title, sizeof( title ), "Fuse - configure %s joystick",
+  snprintf( title, sizeof( title ), "Fuse - Configure %s Joystick",
 	    libspectrum_joystick_name( libspectrum_type ) );
   dialog.dialog = gtkstock_dialog_new( title, NULL );
 

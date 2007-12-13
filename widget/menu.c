@@ -137,7 +137,7 @@ menu_file_savesnapshot( int action )
   widget_end_all( WIDGET_FINISHED_OK );
 
   data.exit_all_widgets = 1;
-  data.title = "Fuse - save snapshot";
+  data.title = "Fuse - Save Snapshot";
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   if( widget_filesel_name )
     snapshot_write( widget_filesel_name );
@@ -152,7 +152,7 @@ menu_file_recording_record( int action )
 
   widget_end_all( WIDGET_FINISHED_OK );
   data.exit_all_widgets = 1;
-  data.title = "Fuse - save recording file";
+  data.title = "Fuse - Save Recording File";
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   if( widget_filesel_name )
     rzx_start_recording( widget_filesel_name, 1 );
@@ -168,7 +168,7 @@ menu_file_recording_recordfromsnapshot( int action )
 
   /* Get a snapshot name */
   data.exit_all_widgets = 1;
-  data.title = "Fuse - record from snapshot";
+  data.title = "Fuse - Record From Snapshot";
   widget_do( WIDGET_TYPE_FILESELECTOR, &data );
 
   if( !widget_filesel_name ) {
@@ -181,7 +181,7 @@ menu_file_recording_recordfromsnapshot( int action )
     return;
 
   data.exit_all_widgets = 1;
-  data.title = "Fuse - save recording file";
+  data.title = "Fuse - Save Recording File";
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   if( widget_filesel_name )
     rzx_start_recording( widget_filesel_name, settings_current.embed_snapshot );
@@ -197,7 +197,7 @@ menu_file_aylogging_record( int action )
   widget_end_all( WIDGET_FINISHED_OK );
   
   data.exit_all_widgets = 1;
-  data.title = "Fuse - save sound chip file";
+  data.title = "Fuse - Save Sound Chip File";
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   if( widget_filesel_name )
     psg_start_recording( widget_filesel_name );
@@ -210,7 +210,7 @@ menu_file_savescreenasscr( int action )
 
   widget_end_all( WIDGET_FINISHED_OK );
   data.exit_all_widgets = 1;
-  data.title = "Fuse - save screenshot as SCR";
+  data.title = "Fuse - Save Screenshot as SCR";
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   if( widget_filesel_name )
     screenshot_scr_write( widget_filesel_name );
@@ -251,7 +251,7 @@ menu_file_savescreenaspng( int action )
   if( scaler == SCALER_NUM ) return;
 
   data.exit_all_widgets = 1;
-  data.title = "Fuse - save screenshot as PNG";
+  data.title = "Fuse - Save Screenshot as PNG";
   widget_do( WIDGET_TYPE_FILESELECTOR_SAVE, &data );
   if( widget_filesel_name ) {
     screenshot_write( widget_filesel_name, scaler );

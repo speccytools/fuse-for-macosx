@@ -51,7 +51,7 @@ create_dialog( void )
 {
   gchar *title[1] = { "Seconds" };
 
-  dialog = gtkstock_dialog_new( "Fuse - Select rollback point", NULL );
+  dialog = gtkstock_dialog_new( "Fuse - Select Rollback Point", NULL );
 
   gtkstock_create_ok_cancel( dialog, NULL, NULL, NULL, NULL );
 

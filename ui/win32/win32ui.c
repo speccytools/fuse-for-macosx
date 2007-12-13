@@ -61,7 +61,7 @@ win32ui_confirm( const char *string )
   int result;
 
   fuse_emulation_pause();
-  result = MessageBox( fuse_hWnd, string, "Fuse - confirm",
+  result = MessageBox( fuse_hWnd, string, "Fuse - Confirm",
 		       MB_YESNO|MB_ICONQUESTION ) == IDYES;
   fuse_emulation_unpause();
   return result;
@@ -485,7 +485,7 @@ menu_file_aylogging_record( int action )
 
   fuse_emulation_pause();
 
-  psgfile = ui_get_save_filename( "Fuse - Start AY log" );
+  psgfile = ui_get_save_filename( "Fuse - Start AY Log" );
   if( !psgfile ) { fuse_emulation_unpause(); return; }
 
   psg_start_recording( psgfile );

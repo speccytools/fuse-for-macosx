@@ -2398,3 +2398,5 @@
 20071213 man/fuse.1: document the .SAD format, and note that compressed +D
 	 disks are not supported (Stuart).
 20071213 if1.c,settings.dat: fix compilation on Win32 (Stuart).
+20071213 menu.c,ui/{gtk/{gtkjoystick.c,gtkui.c,rollback.c},win32/{error.c,
+	 win32ui.c}},widget/menu.c: update titlebar capitalisation (Stuart).

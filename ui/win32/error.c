@@ -54,7 +54,8 @@ ui_error_specific( ui_error_level severity, const char *message )
   case UI_ERROR_ERROR:
     MessageBox(hWnd, message, "Fuse - Error", MB_ICONERROR|MB_OK ); break;
   default:
-    MessageBox(hWnd, message, "Fuse - (Unknown error)", MB_ICONINFORMATION|MB_OK );
+    MessageBox(hWnd, message, "Fuse - (Unknown Error Level)",
+	       MB_ICONINFORMATION|MB_OK );
     break;
 
   }
