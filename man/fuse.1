@@ -373,6 +373,25 @@ and
 .IR scorpion .
 .RE
 .PP
+.I \-\-microdrive\-file file
+.br
+.I \-\-microdrive\-2\-file file
+.br
+.I \-\-microdrive\-3\-file file
+.br
+.I \-\-microdrive\-4\-file file
+.br
+.I \-\-microdrive\-5\-file file
+.br
+.I \-\-microdrive\-6\-file file
+.br
+.I \-\-microdrive\-7\-file file
+.br
+.I \-\-microdrive\-8\-file file
+.RS
+Specify Interface I Microdrive cartridge files to open.
+.RE
+.PP
 .I "\-p file"
 .br
 .I "\-\-playback file"
@@ -534,6 +553,27 @@ the +D ROM
 and the TR-DOS ROM for Beta 128 emulation with the 128K or +2
 .RI ( trdos.rom ).
 The names in brackets denote the defaults.
+.RE
+.PP
+.I \-\-no\-rs232\-handshake
+.RS
+This option makes Fuse's Interface I emulation assume that the RS-232
+line other end is live when you connect the communication channels.
+See also the
+.RI ` \-\-rs232\-rx '
+and
+.RI ` \-\-rs232\-tx '
+options.
+.RE
+.PP
+.I \-\-rs232\-rx
+.br
+.I \-\-rs232\-tx
+.RS
+Specify the communication channels (FIFO or file) to be used for
+Interface I RS-232 emulation as RxD and TxD wire. See also the
+.RI ` \-\-rs232\-handshake '
+options.
 .RE
 .PP
 .I \-\-separation
@@ -1366,18 +1406,16 @@ configuration file.
 .I "MDR cartridge len"
 .RS
 This option controls the number of blocks in a new Microdrive cartridge.
-0 means select a random capacity, otherwise selects the number of blocks
-available.
+If the value smaller than 4 or greater than 254 Fuse assumes 4 or 254.
 .RE
 .PP
-.I "Raw RS-232"
+.I "RS-232 handshake"
 .RS
-TODO
-.RE
-.PP
-.I "Raw SinclairNET"
-.RS
-TODO
+If you turn this option off, Fuse assumes the RS-232 line other end is
+live when you connect the communication channels.
+See also the
+.RI ` \-\-rs232\-rx \-\-rs232\-tx '
+options.
 .RE
 .PP
 .I "Black and white TV"
@@ -1525,8 +1563,7 @@ If this option is selected, Fuse will emulate the simple Sinclair
 Interface I, and allow Microdrive cartridges to be
 connected and disconnected via the
 .I "Media, Interface I, Microdrive"
-menus. It also enables support for the Interface I RS-232 and Sinclair
-network interfaces.
+menus. It also enables support for the Interface I RS-232 interface.
 .RE
 .PP
 .I "Interface II"
@@ -2067,7 +2104,7 @@ Virtual Microdrive images are accessible only when the Interface I is
 active from the
 .I "Options, Peripherals"
 menu. Note that any changes to the Microdrive image will not be
-written to the file on disk until the appropriate `sync' or `eject'
+written to the file on disk until the appropriate `eject and write'
 option is used.
 .RE
 .PP
@@ -2130,14 +2167,8 @@ Equivalent options for the other emulated Microdrives.
 .br
 .I "Media, Interface I, RS232, Unplug TxD"
 .RS
-TODO
-.RE
-.PP
-.I "Media, Interface I, Sinclair NET, Plug in"
-.br
-.I "Media, Interface I, Sinclair NET, Unplug"
-.RS
-TODO
+Connect or disconnect a communication channels (FIFO or file) to use
+as the RS-232 TxD or RxD wire.
 .RE
 .PP
 .I "Media, Disk"
@@ -3114,8 +3145,7 @@ emulation, and also under 128K and +2 (but not +2A) emulation if the
 .I Beta 128 interface
 option from the
 .I "Options, Peripherals..."
-dialog is enabled; truncated .TRD files need to be expanded with another
-utility before use with Fuse.
+dialog is enabled.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3144,6 +3174,93 @@ whether the screen changed while saving the snapshot, to finish
 saving.  You can also choose `3' to save a screenshot to disk.
 Options `1' and `2' allow screenshots to be printed (in monochrome)
 if printer emulation is enabled.
+.\"
+.\"------------------------------------------------------------------
+.\"
+.SH DISK FILE FORMATS
+.PP
+Fuse supports several disk image formats in its +D and Beta 128 emulation.
+.PP
+For reading:
+.PP
+.I .UDI
+.RS
+Ultra Disk Image; for specification please see 
+.I http://zxmak.narod.ru/docs.htm
+.br
+This is the only image format which can store all the relevant information
+of the recorded data on a magnetic disk, so it can be used for any
+.I non standard
+disk format. Fuse can store and read not just MFM but FM formatted disk data
+in/from this container.
+.RE
+.PP
+.I .FDI
+.RS
+UKV Spectrum Debugger disk image format.
+.RE
+.PP
+.I .MGT
+.I .IMG
+.RS
+DISCiPLE/+D file formats.
+.RE
+.PP
+.I .SAD
+.RS
+TODO
+.RE
+.PP
+.I .TRD
+.RS
+TR-DOS disk image; for detailed information please see
+.I http://www.retroplay.com/Mecenate/ramsoft/tr-info.zip
+.RE
+.PP
+.I .SCL
+.RS
+A simple archive format for TR-DOS disk files.
+.RE
+.PP
+.I .TD0
+.RS
+Teledisk image format; Fuse supports only files not created with
+"Advanced Compression". Detailed description found in
+.I http://www.classiccmp.org/dunfield/img/td0notes.txt
+and
+.I http://www.fpns.net/willy/wteledsk.htm
+.RE
+.PP
+.I .DSK
+.RS
+CPC disk image format; Fuse supports the plain old and the new
+extended CPC format too. Further information please see the
+.B "THE .DSK FORMAT"
+section and the CPCEMU manual section 7.7.1
+.I http://www.cpc-emu.org/linux/cpcemu_e.txt
+.RE
+.PP
+.I .SDF
+.RS
+TODO
+.RE
+.PP
+Fuse supports most of them for writing:
+.I .UDI .FDI .MGT .IMG .SAD .TRD .SCL .DSK
+(only the old CPC format).
+.br
+You can save disk images with any output
+format, just select the appropriate extension. (e.g.
+.I ` elite3.udi '
+to save as an UDI file)
+There is a
+.I .LOG
+` image ' format for debugging purpose. This is a plain text file
+contains three dump of the loaded disk image at different details.
+Not all image format can store all disk image. 
+You cannot save a disk image with an inappropriate format
+that loses some information (e.g. variable track length or
+sector length).
 .\"
 .\"------------------------------------------------------------------
 .\"

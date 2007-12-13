@@ -2392,3 +2392,6 @@
 20071208 z80/{coretest.c,z80_macros.h}: remove contend_write() (Stuart).
 20071213 if1.c,menu_data.dat,settings.dat,ui/options.dat: Interface 1 RS-232
 	 cleanup (patch #1849598) (Gergely Szasz).
+20071213 man/fuse.1: document IF1 options and +D/Beta 128 disk image formats,
+	 remove Sinclair Network section and remove redundant note about lack
+	 of support for truncated .TRD images (patch #1849612) (Gergely Szasz).
