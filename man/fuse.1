@@ -3208,7 +3208,8 @@ DISCiPLE/+D file formats.
 .PP
 .I .SAD
 .RS
-TODO
+For compatibility with SAM Coupé disk images using this format.
+Note that SAM Coupé `.DSK' images share the same format as `.MGT'.
 .RE
 .PP
 .I .TRD
@@ -3275,9 +3276,9 @@ or
 .IR gzip (3)
 just as if they were uncompressed.
 .I libdsk
-provides an equivalent functionality for +3 and +D disk images if
-available, but there is currently no support for reading compressed
-Beta disk images.
+provides an equivalent functionality for +3 images if available,
+but there is currently no support for reading compressed +D or Beta
+disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"

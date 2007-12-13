@@ -2395,3 +2395,5 @@
 20071213 man/fuse.1: document IF1 options and +D/Beta 128 disk image formats,
 	 remove Sinclair Network section and remove redundant note about lack
 	 of support for truncated .TRD images (patch #1849612) (Gergely Szasz).
+20071213 man/fuse.1: document the .SAD format, and note that compressed +D
+	 disks are not supported (Stuart).
