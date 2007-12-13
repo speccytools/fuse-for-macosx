@@ -1926,7 +1926,7 @@
 20070707 ChangeLog: fix reset attribution (thanks, Stuart) (Fred).
 20070707 ui/win32/win32ui.c: fix compilation without lib765 (Stuart).
 20070707 ui/win32/menu_data.{c,h,rc}: add hard reset and +D menu items, and
-	 disable RS232 and Sinclair Network menu items in Win32 UI (Stuart).
+	 disable RS-232 and Sinclair Network menu items in Win32 UI (Stuart).
 20070715 ui/win32/{win32display.c,win32ui.c}: coding style cleanups (Stuart).
 20070715 ui/win32/{error.c,statusbar.c,win32display.c}: more cleanups (Stuart).
 20070715 ui/win32/debugger.c: fix single stepping in the Win32 UI's debugger
@@ -2390,3 +2390,5 @@
 20071206 spectrum.c: update comment to reflect added RAM (Stuart).
 20071207 disk/disk.c: initialise 'seclen' in open_td0() (Stuart).
 20071208 z80/{coretest.c,z80_macros.h}: remove contend_write() (Stuart).
+20071213 if1.c,menu_data.dat,settings.dat,ui/options.dat: Interface 1 RS-232
+	 cleanup (patch #1849598) (Gergely Szasz).

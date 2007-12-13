@@ -27,7 +27,10 @@
 
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
+
 #include <unistd.h>
 
 #include "compat.h"
@@ -40,15 +43,11 @@
 #include "utils.h"
 #include "ui/ui.h"
 
-#define RS232_RAW 0
-#define RS232_INT 1
+#undef IF1_DEBUG_MDR
+#undef IF1_DEBUG_NET
+#undef IF1_DEBUG_NET_1
 
-#define S_NET_RAW 0
-#define S_NET_INT 1
-
-#define MDR_OK 0
-#define MDR_BAD 1
-#define MDR_OUT 2
+#define BUFF_EMPTY 0x100
 
 enum {
   SYNC_NO = 0,
@@ -65,11 +64,11 @@ enum {
 typedef struct microdrive_t {
   utils_file file;
   int inserted;
-  int motor_on;
-  long int head_pos;
-  int transfered;
   int modified;
-  long int max_bytes;
+  int motor_on;
+  int head_pos;
+  int transfered;
+  int max_bytes;
   libspectrum_byte pream[512];	/* preamble/sync area written */
   libspectrum_byte last;
   libspectrum_byte gap;
@@ -83,8 +82,8 @@ typedef struct if1_ula_t {
   int fd_r;	/* file descriptor for reading bytes or bits RS232 */
   int fd_t;	/* file descriptor for writing bytes or bits RS232 */
   int fd_net;	/* file descriptor for rw bytes or bits SinclairNET */
-  int rs232_mode;	/* communication mode: RS232_RAW, RS232_INT */
-  int s_net_mode;	/* communication mode: S_NET_RAW, S_NET_INT */
+  int rs232_buffer;	/* read buffer */
+  int s_net_mode;
   int status;	/* if1_ula/SinclairNET */
   int comms_data;	/* the previous data comms state */
   int comms_clk;	/* the previous data comms state */
@@ -100,6 +99,7 @@ typedef struct if1_ula_t {
   int count_in;
   int data_out; /* interpreted outgoing data */
   int count_out;
+  int esc_in;	/* if we compose an escape seq */
   
   int net;	/* Network in/out (really 1 wire bus :-) */
   int net_data;	/* Interpreted network data */
@@ -120,6 +120,36 @@ typedef struct if1_ula_t {
 
  COMM O WO $F7(247)     --- --- --- --- --- --- --- NET/RX
 
+RS232:
+    DTR -> Data Terminal Ready (DTE -> DCE)
+    CTS -> Clear To Send (DCE -> DTE)
+    TX  -> Transmitted Data (DTE -> DCE)
+    RX  -> Received Data (DCE -> DTE)
+
+    The IF1 serial behaves not as a DTE (Data Terminal Equipment, e.g.
+      a computer) but as a DCE (Data Communications Equipment, e.g. a modem)
+
+    If we were to consider the ZX Spectrum a DTE, we would rename the lines:
+       DTR := DSR (Data Set Ready)
+       CTS := RTS (Request To Send)
+       TX  := RX
+       RX  := TX
+
+  On the communication channels:
+    Bytes interpreted as is, except:
+      0x00 0x00 --> DTR   ~~\__
+      0x00 0x01 --> DTR   __/~~
+      0x00 0x02 --> CTS   ~~\__
+      0x00 0x03 --> CTS   __/~~
+      0x00 ? --> lost
+      0x00 * --> 0x00
+    Additionally:
+      if fuse read 0x00 0x00 => DTR = 0 ~~\__
+      if fuse read 0x00 0x01 => DTR = 1 __/~~
+      if CTS = ~~\__ fuse send 0x00 0x02
+      if CTS = __/~~ fuse send 0x00 0x03
+      if fuse lost send 0x00 + 0x3f (?)
+    every other 0x00 + 0x## are discarded
 */
 
 /* IF1 paged out ROM activated? */
@@ -240,8 +270,10 @@ update_menu( enum if1_menu_item what )
                     ( if1_ula.fd_r > -1 ) ? 1 : 0 );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_RS232_UNPLUG_T,
                     ( if1_ula.fd_t > -1 ) ? 1 : 0 );
+#ifdef BUILD_WITH_SNET
     ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1_SNET_UNPLUG,
                     ( if1_ula.fd_net > -1 ) ? 1 : 0 );
+#endif
   }
 }
 
@@ -252,13 +284,14 @@ if1_init( void )
 
   if1_ula.fd_r = -1;
   if1_ula.fd_t = -1;
-  if1_ula.rs232_mode = RS232_INT;
-  if1_ula.dtr = 0;
+  if1_ula.dtr = 0;		/* No data terminal yet */
+  if1_ula.cts = 2;		/* force to emit first cts status */
   if1_ula.comms_clk = 0;
   if1_ula.comms_data = 0; /* really? */
   if1_ula.fd_net = -1;
-  if1_ula.s_net_mode = S_NET_INT;
+  if1_ula.s_net_mode = 1;
   if1_ula.net = 0;
+  if1_ula.esc_in = 0; /* empty */
 
   for( m = 0; m < 8; m++ ) {
     libspectrum_error error =
@@ -266,6 +299,24 @@ if1_init( void )
     if( error ) return error;
     microdrive[m].inserted = 0;
     microdrive[m].modified = 0;
+  }
+  
+  if( settings_current.rs232_rx ) {
+    if1_plug( settings_current.rs232_rx, 1 );
+    free( settings_current.rs232_rx );
+    settings_current.rs232_rx = NULL;
+  }
+
+  if( settings_current.rs232_tx ) {
+    if1_plug( settings_current.rs232_tx, 2 );
+    free( settings_current.rs232_tx );
+    settings_current.rs232_tx = NULL;
+  }
+
+  if( settings_current.s_net ) {
+    if1_plug( settings_current.s_net, 3 );
+    free( settings_current.s_net );
+    settings_current.s_net = NULL;
   }
 
   module_register( &if1_module_info );
@@ -310,6 +361,12 @@ if1_reset( int hard_reset GCC_UNUSED )
 
   machine_current->ram.romcs = 0;
   
+  if1_ula.cts = 2;		/* force to emit first out if raw */
+  if1_ula.comms_clk = 0;
+  if1_ula.comms_data = 0;
+  if1_ula.net = 0;
+  if1_ula.esc_in = 0;
+
   microdrives_reset();
 
   update_menu( UMENU_ALL );
@@ -457,19 +514,17 @@ microdrives_reset( void )
   ui_statusbar_update( UI_STATUSBAR_ITEM_MICRODRIVE,
 		       UI_STATUSBAR_STATE_INACTIVE );
   if1_mdr_status = 0;
-
-  if1_ula.rs232_mode = settings_current.raw_rs232 ? RS232_RAW : RS232_INT;
-  if1_ula.s_net_mode = settings_current.raw_s_net ? S_NET_RAW : S_NET_INT;
+/*
   if1_ula.comms_data = 0;
   if1_ula.count_in = 0;
   if1_ula.count_out = 0;
   if1_ula.cts = 0;
-/*  if1_ula.dtr = 0; */
+  if1_ula.dtr = 0;
   if1_ula.wait = 0;
   if1_ula.busy = 0;
   if1_ula.net  = 0;
   if1_ula.net_state  = 0;
-
+*/
 }
 
 static enum if1_port
@@ -541,8 +596,34 @@ port_ctr_in( void )
 	ret &= 0xfe; /* active bit */
     }
   }
-  /* Here we have to poll, the if1_ula 'line' dtr flag. That time it come
-     from the if1_ula.fd_t status :-) */
+  /* Here we have to poll, the if1_ula DTR 'line' */
+  if( if1_ula.rs232_buffer > 0xff ) {	/* buffer empty */
+    unsigned char byte;
+    int yes = 1;
+
+    while( yes && read( if1_ula.fd_r, &byte, 1 ) == 1 ) {
+      if( if1_ula.esc_in == 1 ) {
+        if1_ula.esc_in = 0;
+	if( byte == '*' ) {
+          if1_ula.rs232_buffer = 0x00;
+	  yes = 0;
+        } else if( byte == 0x00 ) {
+    	  if( settings_current.rs232_handshake )
+	    if1_ula.dtr = 0;
+        } else if( byte == 0x01 ) {
+          if( settings_current.rs232_handshake )
+            if1_ula.dtr = 1;
+	}
+      } else if( byte == 0x00 ) {
+        if1_ula.esc_in = 1;
+      } else {
+        if1_ula.rs232_buffer = byte;
+        yes = 0;
+        break;
+      }
+    }
+  }
+  
   if( if1_ula.dtr == 0 )
     ret &= 0xf7;	/* %11110111 */
 
@@ -558,43 +639,80 @@ port_ctr_in( void )
   return ret;
 }
 
+/*
+  return 1 if read a byte
+  0 if nothing interesting...
+*/
+
+static int
+read_rs232()
+{
+  if( if1_ula.rs232_buffer <= 0xff ) {	/* we read from the buffer */
+    if1_ula.data_in = if1_ula.rs232_buffer;
+    if1_ula.rs232_buffer = 0x0100;
+    return 1;
+  }
+  while( read( if1_ula.fd_r, &if1_ula.data_in, 1 ) == 1 ) {
+    if( if1_ula.esc_in == 1 ) {
+      if1_ula.esc_in = 0;
+      if( if1_ula.data_in == '*' ) {
+        if1_ula.data_in = 0x00;
+	return 1;
+      } else if( if1_ula.data_in == 0x00 ) {
+        if( settings_current.rs232_handshake )
+	  if1_ula.dtr = 0;
+      } else if( if1_ula.data_in == 0x01 ) {
+        if( settings_current.rs232_handshake )
+	  if1_ula.dtr = 1;
+      }
+    } else if( if1_ula.data_in == 0x00 ) {
+      if1_ula.esc_in = 1;
+    } else {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 static libspectrum_byte
 port_net_in( void )
 {
   libspectrum_byte ret = 0xff;
 
-/* */
-  if( if1_ula.rs232_mode == RS232_RAW ) {		/* if we do raw */
-    /* Here is the input routine */
-    read( if1_ula.fd_r, &if1_ula.tx, 1 );	  /* Ok, if no byte, we send last*/
-  } else if( if1_ula.rs232_mode == RS232_INT ) {  /* if we do interpreted */
-    /* Here is the input routine */
-    if( if1_ula.cts ) {				  /* If CTS == 1 */
-      if( if1_ula.count_in == 0 ) {
-	if( if1_ula.fd_r >= 0 && read( if1_ula.fd_r, &if1_ula.data_in, 1 ) == 1 ) {
-	  if1_ula.count_in++;	/* Ok, if read a byte, we begin */
-	}
-	if1_ula.tx = 0;				/* now send __ to if1
+  if( if1_ula.fd_r == -1 )
+    goto no_rs232_in;
+
+    /* Here is the RS232 input routine */
+  if( if1_ula.cts ) {				  /* If CTS == 1 */
+    if( if1_ula.count_in == 0 ) {
+      if( if1_ula.fd_r >= 0 && read_rs232() == 1 ) {
+	if1_ula.count_in++;	/* Ok, if read a byte, we begin */
+      }
+      if1_ula.tx = 0;				/* now send __ to if1
 	                                           later we raise :-) */
-      } else if( if1_ula.count_in >= 1 && if1_ula.count_in < 5 ) {
-	if1_ula.tx = 1;				/* send ~~ (start bit :-) */
-	if1_ula.count_in++;
-      } else if( if1_ula.count_in >= 5 && if1_ula.count_in < 13 ) {
-	if1_ula.tx = ( if1_ula.data_in & 0x01 ) ? 0 : 1;
+    } else if( if1_ula.count_in >= 1 && if1_ula.count_in < 5 ) {
+      if1_ula.tx = 1;				/* send ~~ (start bit :-) */
+      if1_ula.count_in++;
+    } else if( if1_ula.count_in >= 5 && if1_ula.count_in < 13 ) {
+      if1_ula.tx = ( if1_ula.data_in & 0x01 ) ? 0 : 1;
 	/*				 send .. (data bits :-) */
-	if1_ula.data_in >>= 1;		/* prepare next bit :-) */
-	if1_ula.count_in++;
-      } else 
-	if1_ula.count_in = 0;
-    } else {	/* if( if1_ula.cts ) */
-      if1_ula.count_in = 0;		/* reset serial in */
-      if1_ula.tx = 0;			/* send __ stop bits or s.e. :-) */
-    }
+      if1_ula.data_in >>= 1;		/* prepare next bit :-) */
+      if1_ula.count_in++;
+    } else
+      if1_ula.count_in = 0;
+  } else {	/* if( if1_ula.cts ) */
+    if1_ula.count_in = 0;		/* reset serial in */
+    if1_ula.tx = 0;			/* send __ stop bits or s.e. :-) */
   }
-  if( if1_ula.s_net_mode == S_NET_RAW ) {		/* if we do raw */
+
+no_rs232_in:
+  if( if1_ula.fd_net == -1 )
+    goto no_snet_in;
+
+  if( if1_ula.s_net_mode == 0 ) {		/* if we do raw */
     /* Here is the input routine */
     read( if1_ula.fd_net, &if1_ula.net, 1 );	/* Ok, if no byte, we send last*/
-  } else {/* if( if1_ula.s_net_mode == S_NET_INT ) if we do interpreted */
+  } else {/* if( if1_ula.s_net_mode == 1 ) if we do interpreted */
 /* Here is the input routine. There are several stage in input
    and output. So first for output. if1 first do SEND-SC 
    (http://www.wearmouth.demon.co.uk/if1_2.htm#L101E) to send
@@ -614,7 +732,7 @@ port_net_in( void )
     if( if1_ula.net_state < 0x0100 ) {	/* if1 may in NET-STATE */
       if1_ula.net_state++;
       if1_ula.net = 0;
-#ifdef IF1_DEBUGX
+#ifdef IF1_DEBUG_NET
       fprintf( stderr, "NET-STAT(%03d)? We send 0!\n", if1_ula.net_state );
 #endif
     } else if( if1_ula.net_state == 0x0100 ) { /* probably waiting for input */
@@ -633,11 +751,12 @@ port_net_in( void )
     } else if( if1_ula.net_state == 0x010a ) {
       if1_ula.net = 0;
       if1_ula.net_state = 0;	/* OK, we starting a new byte... */
-#ifdef IF1_DEBUG
+#ifdef IF1_DEBUG_NET
       fprintf( stderr, "NET-STAT(%03d)? Get a byte!\n", if1_ula.net_state );
 #endif
     }
   }
+no_snet_in:
   if( !if1_ula.tx )
     ret &= 0x7f;
   if( !if1_ula.net )
@@ -766,12 +885,19 @@ port_ctr_out( libspectrum_byte val )
       if1_ula.data_in = 0;
     }
   }
-  if1_ula.cts = ( val & 0x10 ) ? 1 : 0;
   if1_ula.wait = ( val & 0x20 ) ? 1 : 0;
   if1_ula.comms_data = ( val & 0x01 ) ? 1 : 0;
   if1_ula.comms_clk = ( val & 0x02 ) ? 1 : 0;
+  val = ( val & 0x10 ) ? 1 : 0;
+  if( settings_current.rs232_handshake && 
+      if1_ula.fd_t != -1 && if1_ula.cts != val ) {
+    char data = val ? 0x03 : 0x02;
+    do ; while( write( if1_ula.fd_t, "", 1 ) != 1 );
+    do ; while( write( if1_ula.fd_t, &data, 1 ) != 1 );
+  }
+  if1_ula.cts = val;
     
-#ifdef IF1_DEBUG
+#ifdef IF1_DEBUG_NET
   fprintf( stderr, "Set CTS to %d, set WAIT to %d and COMMS_DATA to %d\n",
 	   if1_ula.cts, if1_ula.wait, if1_ula.comms_data );
 #endif
@@ -782,35 +908,54 @@ port_ctr_out( libspectrum_byte val )
 static void
 port_net_out( libspectrum_byte val )
 {
-  if( if1_ula.comms_data == 1 ) {	/* OK, if the comms_data == 1 */
-    if( if1_ula.rs232_mode == RS232_INT ) {	/* if we out byte by byte, do it */
-      if( if1_ula.count_out == 0 ) {	/* waiting for up edge __/~~ */
-	if( if1_ula.rx == 0 && ( val & 0x01 ) == 1 ) {
-	  if1_ula.count_out++;		/* get the start bit __/~~ */
-	}
-      } else if( if1_ula.count_out >= 1 && if1_ula.count_out < 9 ) {
-	if1_ula.data_out >>= 1;
-	if1_ula.data_out |= val & 0x01 ? 0 : 128;
-	if1_ula.count_out++;		/* waiting for next data bit */
-      } else if( if1_ula.count_out >= 9 && if1_ula.count_out < 10 ) {
-	if1_ula.count_out++;		/* waiting for the 1st stop bits */
-      } else if( if1_ula.count_out >= 10 ) {	/* The second stopbit */
-        /* Here is the output routine */
-	if( if1_ula.fd_t > -1 ) {
-	  do ; while( write( if1_ula.fd_t, &if1_ula.data_out, 1 ) != 1 );
-	  /*	    fprintf( stderr, "Send: %d\n", if1_ula.data_out );  */
-	}
-	if1_ula.count_out = 0;
-	if1_ula.data_out = 0;
-      }
-      if1_ula.rx = val & 0x01;		/* set rx */
-    } else { /*if( if1_ula.rs232_mode == RS232_RAW )  if we out bit by bit, do it */
-      /* Here is the output routine for RAW communication */
-      if1_ula.rx = val & 0x01;		/* set rx */
-      write( if1_ula.fd_t, &if1_ula.rx, 1 );
+  if( if1_ula.fd_t == -1 )
+    return;				/* nothing to write */
+
+  if( if1_ula.comms_data == 1 ) {	/* OK, RS232 */
+    val &= 0x01;
+    if( if1_ula.count_out == 0 && !val ) {	/* waiting for ~~\__ */
+      if1_ula.count_out++;
+    } else if( if1_ula.count_out == 1 ) {
+      if( if1_ula.cts != 0 || !val )
+	if1_ula.count_out = -1;
+      else
+        if1_ula.count_out++;			/* else get the start bit __/~~ */
+    } else if( if1_ula.count_out >= 2 && if1_ula.count_out <= 9 ) {
+      if1_ula.data_out >>= 1;
+      if1_ula.data_out |= val & 0x01 ? 0 : 128;
+      if1_ula.count_out++;		/* waiting for next data bit */
+    } else if( if1_ula.count_out >= 10 && if1_ula.count_out <= 11 ) {
+      if( val )
+	if1_ula.count_out = -1;
+      else
+	if1_ula.count_out++;
+    } else if( if1_ula.count_out == 12 ) {
+      if( !val )
+        if1_ula.count_out = -1;
+      else
+	if1_ula.count_out++;
+    } else if( if1_ula.count_out == 13 ) {
+      if( val )
+        if1_ula.count_out = -1;
     }
+      
+    if( if1_ula.count_out == -1 ) {
+      if1_ula.count_out = 13;
+      if1_ula.data_out = '?';
+      do ; while( write( if1_ula.fd_t, "", 1 ) != 1 );
+    }
+    if( if1_ula.count_out == 13 ) {
+        /* Here is the output routine */
+      if( if1_ula.data_out == 0x00 ) {
+        if1_ula.data_out = '*';
+        do ; while( write( if1_ula.fd_t, "", 1 ) != 1 );
+      }
+      do ; while( write( if1_ula.fd_t, &if1_ula.data_out, 1 ) != 1 );
+      if1_ula.count_out = 0;
+    }
+    if1_ula.rx = val & 0x01;		/* set rx */
   } else {	/* if( if1_ula.comms_data == 1 ) SinclairNET :-)*/
-    if( if1_ula.s_net_mode == S_NET_RAW ) {	/* if we out bit by bit, do it */
+    if( if1_ula.s_net_mode == 0 ) {	/* if we out bit by bit, do it */
         /* Here is the output routine */
 
 /* OK, examining the schematics of if1 and the disassembly of if1 ROM, I
@@ -824,10 +969,10 @@ port_net_out( libspectrum_byte val )
 #ifdef HAVE_FSYNC
       fsync( if1_ula.fd_net );
 #endif /* #ifdef HAVE_FSYNC */
-#ifdef IF1_DEBUGX
+#ifdef IF1_DEBUG_NET
       fprintf( stderr, "Send SinclairNET: %d\n", if1_ula.net );
 #endif
-    } else { /* if( if1_ula.s_net_mode == S_NET_RAW )  if we out byte by byte, do it */
+    } else { /* if( if1_ula.s_net_mode == 0 )  if we out byte by byte, do it */
       if( if1_ula.net_state >= 0x0200 && if1_ula.net_state < 0x0208 ) {
 	if1_ula.net_state++;
 	if1_ula.net_data <<= 1;
@@ -842,7 +987,7 @@ port_net_out( libspectrum_byte val )
 #ifdef HAVE_FSYNC
         fsync( if1_ula.fd_net );
 #endif /* #ifdef HAVE_FSYNC */
-#ifdef IF1_DEBUG
+#ifdef IF1_DEBUG_NET
 	fprintf( stderr, "SC-OUT send network number: %d\n",
 	                                   if1_ula.net_data ^ 0xff );
 #endif
@@ -852,7 +997,7 @@ port_net_out( libspectrum_byte val )
 /*	  if1_ula.net = 1; */
 	if1_ula.net_state = 0x0200;	/* Send the station number */
       }
-      if1_ula.net = ( val & 0x01 ) ? 0 : 1;		/* set rx */
+      if1_ula.net = ( val & 0x01 ) ? 0 : 1;		/* set net wire? */
     }
   }
   microdrives_restart();
@@ -863,7 +1008,7 @@ if1_port_out( libspectrum_word port GCC_UNUSED, libspectrum_byte val )
 {
   if( !if1_active ) return;
 
-#ifdef IF1_DEBUGX
+#ifdef IF1_DEBUG_NET_1
   fprintf( stderr, "In if1_port_out( %%%d%d%d%d%d%d%d%d => 0x%04x ).\n", 
 	!!(val & 128), !!(val & 64), !!(val & 32), !!(val & 16),
 	!!(val & 8), !!(val & 4), !!(val & 2), !!(val & 1), port);
@@ -923,7 +1068,7 @@ if1_mdr_new( microdrive_t *mdr )
   libspectrum_byte len;
   long int i;
 
-  if( settings_current.mdr_len == 0 ) {	/* Random length */
+  if( settings_current.mdr_random_len ) {	/* Random length */
     len = 171 + ( ( rand() >> 2 ) + ( rand() >> 2 ) +
                   ( rand() >> 2 ) + ( rand() >> 2 ) )
 		  / rnd_factor;
@@ -1077,6 +1222,10 @@ if1_mdr_write( int which, const char *filename )
   return 0;
 }
 
+#ifndef O_NONBLOCK
+#define O_NONBLOCK FNDELAY
+#endif
+
 void
 if1_plug( const char *filename, int what )
 {
@@ -1090,13 +1239,19 @@ if1_plug( const char *filename, int what )
   case 1:
     if( if1_ula.fd_r >= 0 )
       close( if1_ula.fd_r );
-    fd = if1_ula.fd_r = open( filename, O_RDONLY | O_BINARY | O_NONBLOCK );
+    fd = if1_ula.fd_r = open( filename, O_RDWR | O_BINARY | O_NONBLOCK );
+    if( fcntl( fd, F_SETFL, O_RDONLY | O_BINARY | O_NONBLOCK ) )
+      ui_error( UI_ERROR_ERROR, "Cannot set O_RDONLY on '%s': %s",
+		filename, strerror( errno ) );
+    if1_ula.rs232_buffer = 0x100;		/* buffer is empty */
     break;
   case 2:
     if( if1_ula.fd_t >= 0 )
       close( if1_ula.fd_t );
-    fd = if1_ula.fd_t = open( filename, O_WRONLY | O_BINARY | O_NONBLOCK );
-    if1_ula.dtr = fd == -1 ? 0 : 1;
+    fd = if1_ula.fd_t = open( filename, O_RDWR | O_BINARY | O_NONBLOCK );
+    if( fcntl( fd, F_SETFL, O_WRONLY | O_BINARY | O_NONBLOCK ) )
+      ui_error( UI_ERROR_ERROR, "Cannot set O_WRONLY on '%s': %s",
+		filename, strerror( errno ) );
     break;
   case 3:
     if( if1_ula.fd_net >= 0 )
@@ -1105,13 +1260,18 @@ if1_plug( const char *filename, int what )
     break;
   }
 
+  /* rs232_handshake == 0 -> we assume DTR(DSR) always 1 if tx and rx plugged */
+  if( !settings_current.rs232_handshake && 
+	if1_ula.fd_t != -1 && if1_ula.fd_r != -1 )
+    if1_ula.dtr = 1;
+
   if( fd < 0 ) {
     ui_error( UI_ERROR_ERROR, "Error opening '%s': %s",
 		filename, strerror( errno ) );
     return;
   }
-  if1_ula.rs232_mode = settings_current.raw_rs232 ? RS232_RAW : RS232_INT;
-  if1_ula.s_net_mode = settings_current.raw_s_net ? S_NET_RAW : S_NET_INT;
+
+  if1_ula.s_net_mode = settings_current.raw_s_net ? 0 : 1;
   update_menu( UMENU_RS232 );
 #endif
 }
@@ -1137,5 +1297,9 @@ if1_unplug( int what )
     if1_ula.fd_net = -1;
     break;
   }
+  /* rs232_handshake == 0 -> we assume DTR(DSR) always 1 if tx and rx plugged */
+  if( !settings_current.rs232_handshake && 
+	( if1_ula.fd_t == -1 || if1_ula.fd_r == -1 ) )
+    if1_ula.dtr = 0;
   update_menu( UMENU_RS232 );
 }

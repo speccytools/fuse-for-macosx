@@ -211,9 +211,11 @@ Media/Interface I/RS232/_Unplug RxD, Item,, menu_media_if1_rs232, 0x11
 Media/Interface I/RS232/Plug _TxD, Item,, menu_media_if1_rs232, 0x02
 Media/Interface I/RS232/Un_plug TxD, Item,, menu_media_if1_rs232, 0x12
 
+#ifdef BUILD_WITH_SNET
 Media/Interface I/_Sinclair NET, Branch
 Media/Interface I/Sinclair NET/_Plug in, Item,, menu_media_if1_rs232, 0x03
 Media/Interface I/Sinclair NET/_Unplug, Item,, menu_media_if1_rs232, 0x13
+#endif
 
 Media/_Disk, Branch
 
