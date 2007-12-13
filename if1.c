@@ -313,10 +313,10 @@ if1_init( void )
     settings_current.rs232_tx = NULL;
   }
 
-  if( settings_current.s_net ) {
-    if1_plug( settings_current.s_net, 3 );
-    free( settings_current.s_net );
-    settings_current.s_net = NULL;
+  if( settings_current.snet ) {
+    if1_plug( settings_current.snet, 3 );
+    free( settings_current.snet );
+    settings_current.snet = NULL;
   }
 
   module_register( &if1_module_info );

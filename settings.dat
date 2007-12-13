@@ -52,7 +52,7 @@ rs232_tx, string, NULL
 rs232_rx, string, NULL
 raw_rs232, null, 0
 raw_s_net, boolean, 0
-s_net, string, NULL
+snet, string, NULL
 confirm_actions, boolean, 1
 printer, boolean, 0
 statusbar, boolean, 1

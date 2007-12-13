@@ -2397,3 +2397,4 @@
 	 of support for truncated .TRD images (patch #1849612) (Gergely Szasz).
 20071213 man/fuse.1: document the .SAD format, and note that compressed +D
 	 disks are not supported (Stuart).
+20071213 if1.c,settings.dat: fix compilation on Win32 (Stuart).
