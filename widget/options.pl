@@ -91,7 +91,7 @@ CODE
     my $which = 0;
     foreach my $widget ( @{ $_->{widgets} } ) {
 
-	$widget->{text} =~ s/\((.)\)/\\012\1\\011/;
+	$widget->{text} =~ s/\((.)\)/\\012$1\\011/;
 
 	if( $widget->{type} eq "Checkbox" ) {
 

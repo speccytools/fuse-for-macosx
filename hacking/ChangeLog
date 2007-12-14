@@ -2403,3 +2403,4 @@
 20071213 man/fuse.1: use named character for acute E (Stuart).
 20071214 menu_data.dat: don't display the hardware joystick menu options if
 	 joysticks are not available (Stuart).
+20071214 widget/options.pl: remove Perl warning (Stuart).
