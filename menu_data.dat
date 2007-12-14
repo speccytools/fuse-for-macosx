@@ -69,8 +69,10 @@ Options/_Peripherals..., Item
 Options/_RZX..., Item
 
 Options/_Joysticks, Branch
+#ifdef USE_JOYSTICK
 Options/Joysticks/Joystick _1..., Item,, menu_options_joysticks_select, 1
 Options/Joysticks/Joystick _2..., Item,, menu_options_joysticks_select, 2
+#endif
 Options/Joysticks/_Keyboard..., Item,, menu_options_joysticks_select, 3
 
 Options/S_elect ROMs, Branch

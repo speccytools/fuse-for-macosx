@@ -2401,3 +2401,5 @@
 20071213 menu.c,ui/{gtk/{gtkjoystick.c,gtkui.c,rollback.c},win32/{error.c,
 	 win32ui.c}},widget/menu.c: update titlebar capitalisation (Stuart).
 20071213 man/fuse.1: use named character for acute E (Stuart).
+20071214 menu_data.dat: don't display the hardware joystick menu options if
+	 joysticks are not available (Stuart).
