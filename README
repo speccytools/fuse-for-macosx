@@ -1,5 +1,5 @@
-The Free Unix Spectrum Emulator (Fuse) 0.8.0.1
-==============================================
+The Free Unix Spectrum Emulator (Fuse) 0.9.0
+============================================
 
 Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
 unsurprisingly, an emulator of the ZX Spectrum (a popular 1980s home
@@ -10,10 +10,11 @@ better-known ZX Spectrum clones as well.
 
 What Fuse does have:
 
-* Working Spectrum 16K/48K/128K/+2/+2A/+3/+3e/SE, Timex TC2048,
-  TC2068 and TS2068, Pentagon 128 and Scorpion ZS 256 emulation,
-  running at true Speccy speed on any computer you're likely to try it
-  on.
+* Accurate Spectrum 16K/48K/128K/+2/+2A/+3 emulation.
+* Working Spectrum +3e and SE, Timex TC2048, TC2068 and TS2068,
+  Pentagon 128, "512" (Pentagon 128 with extra memory) and 1024 and
+  Scorpion ZS 256 emulation.
+* Runs at true Speccy speed on any computer you're likely to try it on.
 * Support for loading from .tzx files.
 * Sound (on systems supporting the Open Sound System, SDL, or OpenBSD/
   Solaris's /dev/audio).
@@ -23,7 +24,7 @@ What Fuse does have:
 * Support for the RZX input recording file format, including
   rollback and 'competition mode'.
 * Emulation of the DivIDE, Interface I, Kempston mouse, Spectrum +3e,
-  ZXATASP and ZXCF interfaces.
+  ZXATASP, ZXCF, Beta 128 and +D interfaces.
 
 What you'll need to run Fuse
 ----------------------------
@@ -61,6 +62,11 @@ Mac OS X
 
 * Either the native port by Fredrick Meunier, or the original version
   will compile on OS X 10.3 (Panther) or later.
+
+Windows
+
+* The Win32 and SDL UIs can be used under Windows, but the Win32 UI is
+  incomplete.
 
 Building Fuse
 -------------
@@ -141,6 +147,6 @@ the Usenet group 'comp.sys.sinclair', but do read the FAQ
 ( http://www.worldofspectrum.org/faq/index.html ) first!
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-11 May 2007
+18 December 2007
 
 $Id$

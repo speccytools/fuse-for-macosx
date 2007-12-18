@@ -2404,3 +2404,5 @@
 20071214 menu_data.dat: don't display the hardware joystick menu options if
 	 joysticks are not available (Stuart).
 20071214 widget/options.pl: remove Perl warning (Stuart).
+20071218 ChangeLog,README,configure.in,man/fuse.1: update for 0.9.0 release
+	 (Stuart).

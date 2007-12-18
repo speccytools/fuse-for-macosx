@@ -1,6 +1,6 @@
-2007-xx-xx  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2007-12-18  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
-	* Fuse 0.x.x released
+	* Fuse 0.9.0 released
 
 	* New features:
 	  * Add +D disk interface support (Stuart Brady).
