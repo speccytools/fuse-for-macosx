@@ -687,6 +687,7 @@ ui/svga/Makefile \
 ui/sdl/Makefile \
 ui/scaler/Makefile \
 ui/win32/Makefile \
+ui/win32/icons/Makefile \
 ui/xlib/Makefile \
 widget/Makefile \
 z80/Makefile \
