@@ -139,7 +139,8 @@ utils_open_file( const char *filename, int autoload,
   case LIBSPECTRUM_CLASS_DISK_TRDOS:
 
     if( !( machine_current->capabilities &
-	   LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) ) {
+	   LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) &&
+        !periph_beta128_active ) {
       error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     }
 

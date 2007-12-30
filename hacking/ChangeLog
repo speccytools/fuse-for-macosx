@@ -2409,3 +2409,5 @@
 20071218 configure.in: generate ui/win32/icons/Makefile (Stuart).
 20071221 BRANCH: Release-0_9_0-branch
 20071221 TAG: Release-0_9_0-pre1 (from Release-0_9_0-branch)
+20071230 utils.c: recognise periph_beta_active as valid on a .trd open (fixes
+         bug #1860344) (Fred).
