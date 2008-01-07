@@ -459,7 +459,7 @@ header_crc_error:
 }
 
 static int
-calc_sectorlen( disk_t *d, int sector_length, int gap )
+calc_sectorlen( int mfm, int sector_length, int gap )
 {
   int len = 0;
   disk_gap_t *g = &gaps[ gap ];
@@ -468,7 +468,7 @@ calc_sectorlen( disk_t *d, int sector_length, int gap )
   len += 7;
 /*------------------------------     GAP II    ------------------------------*/
   len += g->len[2] + g->sync_len;
-  if( d->density != DISK_SD )
+  if( mfm )
     len += 3;
 /*---------------------------------  data   ---------------------------------*/
   len += 1;		/* DAM */
@@ -476,7 +476,7 @@ calc_sectorlen( disk_t *d, int sector_length, int gap )
   len += 2;		/* CRC */
 /*------------------------------    GAP III    ------------------------------*/
   len += g->len[3] + g->sync_len;
-  if( d->density != DISK_SD )
+  if( mfm )
     len += 3;
   return len;
 }
@@ -487,12 +487,13 @@ calc_sectorlen( disk_t *d, int sector_length, int gap )
 #define PREINDEX 1
 
 static int
-trackgen( disk_t *d, FILE *file, int head, int track, int sector_base,
-	  int sectors, int sector_length, int preindex, int gap, int interleave,
-	  int autofill )
+trackgen( disk_t *d, FILE *file, int head, int track,
+	  int sector_base, int sectors, int sector_length, int preindex,
+	  int gap, int interleave, int autofill )
 {
   int i, s, pos;
-  int slen = calc_sectorlen( d, sector_length, gap );
+  int slen = calc_sectorlen( ( d->density != DISK_SD && d->density != DISK_8_SD ),
+			     sector_length, gap );
   int idx;
   
   d->i = 0;
@@ -548,14 +549,19 @@ disk_alloc( disk_t *d )
   } else if( d->bpt > 13000 ) {
     return d->status = DISK_UNSUP;
   } else if( d->bpt > 10600 ) {
+    d->density = DISK_HD;
     d->bpt = disk_bpt[ DISK_HD ];
   } else if( d->bpt > 6500 ) {
+    d->density = DISK_8_DD;
     d->bpt = disk_bpt[ DISK_8_DD ];
   } else if( d->bpt > 5300 ) {
+    d->density = DISK_DD;
     d->bpt = disk_bpt[ DISK_DD ];
   } else if( d->bpt > 3250 ) {
+    d->density = DISK_8_SD;
     d->bpt = disk_bpt[ DISK_8_SD ];
   } else if( d->bpt > 0 ) {
+    d->density = DISK_SD;
     d->bpt = disk_bpt[ DISK_SD ];
   }
 
@@ -783,7 +789,8 @@ open_trd( FILE *file, disk_t *d )
 static int
 open_fdi( FILE *file, disk_t *d, int preindex )
 {
-  int i, j, h, bpt, gap;
+  int i, j, h, gap;
+  int bpt, bpt_fm, max_bpt = 0, max_bpt_fm = 0;
   int data_offset, track_offset, head_offset, sector_offset;
 
   d->wrprot = head[0x03] == 1 ? 1 : 0;
@@ -799,32 +806,41 @@ open_fdi( FILE *file, disk_t *d, int preindex )
     fseek( file, head_offset, SEEK_SET );
     if( fread( head, 7, 1, file ) != 1 )	/* 7 := track head  */
       return d->status = DISK_OPEN;
-    bpt = 0;
+    bpt = bpt_fm = 0;
 
     for( j = 0; j < head[0x06]; j++ ) {		/* calculate track len */
       if( j % 35 == 0 ) {				/* 35-sector header */
 	if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
 	  return d->status = DISK_OPEN;
       }
-      if( ( head[ 0x0b + 7 * ( j % 35 ) ] & 0x3f ) != 0 )
-	bpt += 0x80 << head[ 0x0a + 7 * ( j % 35 ) ];
+      if( ( head[ 0x0b + 7 * ( j % 35 ) ] & 0x3f ) != 0 ) {
+	bpt += calc_sectorlen( 1, 0x80 << head[ 0x0a + 7 * ( j % 35 ) ], GAP_MINIMAL_MFM );
+	bpt_fm += calc_sectorlen( 0, 0x80 << head[ 0x0a + 7 * ( j % 35 ) ], GAP_MINIMAL_FM );
+      }
     }
-
-    if( bpt > d->bpt )
-      d->bpt = bpt;
+    if( bpt > max_bpt )
+      max_bpt = bpt;
+    if( bpt_fm > max_bpt_fm )
+      max_bpt_fm = bpt_fm;
 
     head_offset += 7 + 7 * head[ 0x06 ];
   }
-
-  if( d->bpt == 0 )
+  
+  if( max_bpt == 0 || max_bpt_fm == 0 )
     return d->status = DISK_GEOM;
 
   d->density = DISK_DENS_AUTO;		/* disk_alloc use d->bpt */
+  if( max_bpt_fm < 3000 ) {		/* we choose an SD disk with FM */
+    d->bpt = max_bpt_fm;
+    gap = GAP_MINIMAL_FM;
+  } else {
+    d->bpt = max_bpt;
+    gap = GAP_MINIMAL_MFM;
+  }
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
     /* start reading the tracks */
-  gap = d->bpt <= 3000 ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM;
-	
+
   head_offset = h;			/* restore head start */
   for( i = 0; i < d->cylinders * d->sides; i++ ) {	/* ALT */
     fseek( file, head_offset, SEEK_SET );
@@ -867,24 +883,33 @@ static int
 open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 {
   int i, j, seclen, gap;
+  int bpt, max_bpt = 0, max_bpt_fm = 0;
 
   d->sides = head[0x31];
   d->cylinders = head[0x30];
   if( type == DISK_CPC ) {
-    d->bpt = head[0x32] + 256 * head[0x33] - 0x100;
+    max_bpt = calc_sectorlen( 1, head[0x32] + 256 * head[0x33] - 0x100, GAP_MINIMAL_MFM );
+    max_bpt_fm = calc_sectorlen( 0, head[0x32] + 256 * head[0x33] - 0x100, GAP_MINIMAL_FM );
   } else {
     d->bpt = 0;
-    for( i = 0; i < d->sides * d->cylinders; i++ )
-      if( head[ 0x34 + i ] > d->bpt )
-	d->bpt = head[ 0x34 + i ];
-    d->bpt <<= 8;
-    d->bpt -= 0x100;
+    for( i = 0; i < d->sides * d->cylinders; i++ ) {
+      bpt = calc_sectorlen( 1, ( head[ 0x34 + i ] << 8 ) - 0x100, GAP_MINIMAL_MFM );
+      if( bpt > max_bpt )
+        max_bpt = bpt;
+      bpt = calc_sectorlen( 0, ( head[ 0x34 + i ] << 8 ) - 0x100, GAP_MINIMAL_FM );
+      if( bpt > max_bpt_fm )
+        max_bpt_fm = bpt;
+    }
   }
-
-  if( d->bpt == 0 )
+  if( max_bpt == 0 || max_bpt_fm == 0 )
     return d->status = DISK_GEOM;
 
   d->density = DISK_DENS_AUTO;			/* disk_alloc use d->bpt */
+  if( max_bpt_fm < 3000 ) {		/* we choose an SD disk with FM */
+    d->bpt = max_bpt_fm;
+  } else {
+    d->bpt = max_bpt;
+  }
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
 
@@ -953,7 +978,7 @@ open_scl( FILE *file, disk_t *d )
 					   TR-DOS directory */
   j = 0;				/* index for head[] */
   memset( head, 0, 256 );
-  seclen = calc_sectorlen( d, 256, GAP_TRDOS );	/* one sector raw length */
+  seclen = calc_sectorlen( 1, 256, GAP_TRDOS );	/* one sector raw length */
   for( i = 0; i < scl_files; i++ ) {	/* read all entry and build TR-DOS dir */
     if( fread( head + j, 14, 1, file ) != 1 )
       return d->status = DISK_OPEN;
@@ -1019,7 +1044,7 @@ open_scl( FILE *file, disk_t *d )
 static int
 open_td0( FILE *file, disk_t *d, int preindex )
 {
-  int i, j, s, sectors, seclen, bpt, gap, mfm;
+  int i, j, s, sectors, seclen, bpt, gap, mfm, mfm_old;
   int data_offset, track_offset, sector_offset;
   unsigned char *buff;
 
@@ -1027,7 +1052,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
     return d->status = DISK_IMPL;	/* not implemented */
 
   buff = NULL;			/* we may use this buffer */
-  mfm = head[5] & 0x80 ? 0 : 1;	/* td0notes say: may older teledisk
+  mfm_old = head[5] & 0x80 ? 0 : 1;	/* td0notes say: may older teledisk
 					   indicate the SD on high bit of
 					   data rate */
   d->sides = head[9];			/* 1 or 2 */
@@ -1053,6 +1078,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
       d->cylinders = head[1] + 1;
     bpt = 0;
     sector_offset = track_offset + 4;
+    mfm = head[2] & 0x80 ? 0 : 1;	/* 0x80 == 1 => SD track */
     for( s = 0; s < sectors; s++ ) {
       fseek( file, sector_offset, SEEK_SET );
       if( fread( head, 6, 1, file ) != 1 )
@@ -1061,7 +1087,8 @@ open_td0( FILE *file, disk_t *d, int preindex )
 	if( fread( head + 6, 3, 1, file ) != 1 )	/* read data header */
 	  return d->status = DISK_OPEN;
 
-	bpt += 0x80 << head[3];
+	bpt += calc_sectorlen( mfm_old || mfm, 0x80 << head[3], 
+				    mfm_old || mfm ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM );
 	if( head[3] > seclen )
 	  seclen = head[3];			/* biggest sector */
 	sector_offset += head[6] + 256 * head[7] - 1;
@@ -1099,7 +1126,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
     d->clocks = d->track + d->bpt;
     d->i = 0;
     			/* later teledisk -> if head[2] & 0x80 -> FM track */
-    gap = mfm == 0 || head[2] & 0x80 ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM;
+    gap = mfm_old || head[2] & 0x80 ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM;
     postindex_add( d, gap );
 
     for( s = 0; s < sectors; s++ ) {

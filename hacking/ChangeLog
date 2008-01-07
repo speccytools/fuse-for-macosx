@@ -2409,5 +2409,19 @@
 20071218 configure.in: generate ui/win32/icons/Makefile (Stuart).
 20071221 BRANCH: Release-0_9_0-branch
 20071221 TAG: Release-0_9_0-pre1 (from Release-0_9_0-branch)
+20071221 display.c: fix copy-and-paste typo (Release-0_9_0-branch).
 20071230 utils.c: recognise periph_beta_active as valid on a .trd open (fixes
-         bug #1860344) (Fred).
+         bug #1860344) (Release-0_9_0-branch) (Fred).
+20080102 man/fuse.1: small Xlib update (patch #1861180) (Release-0_9_0-branch)
+         (Gergely Szasz).
+20080102 disk/disk.[ch]: fix opening of .fdi, .cpc and .td0 files (patch
+         #1860368) (Release-0_9_0-branch) (Gergely Szasz).
+20080102 fuse.c: update copyright date (Release-0_9_0-branch) (Stuart Brady).
+20080103 widget/browse.c: ensure all lines are displayed (patch #1860829)
+         (Release-0_9_0-branch) (Gergely Szasz).
+20080104 ChangeLog,README: set release date (Release-0_9_0-branch).
+20080104 man/fuse.1: update date (Release-0_9_0-branch) (Stuart).
+20080104 man/fuse.1: change date style (Release-0_9_0-branch) (Stuart).
+20080105 disk/disk.c: initialise variables (Release-0_9_0-branch).
+20080105 TAG: Release-0_9_0
+20080107 Merge Release-0_9_0-branch changes r3444:3841 to trunk.

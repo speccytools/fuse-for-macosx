@@ -125,7 +125,7 @@ show_blocks( void )
     widget_printstring( numpos + 1, i*8+32, colour, buffer );
   }
 
-  widget_display_lines( 2, 18 );
+  widget_display_lines( 4, 18 );
 }
 
 void

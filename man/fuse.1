@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "18th December, 2007" "Version 0.9.0" "Emulators"
+.TH fuse 1 "5th January, 2008" "Version 0.9.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -133,7 +133,7 @@ option.
 .I \-\-bw\-tv
 .RS
 Specify whether the display should simulate a colour or black and
-white television. This option is effective only under the GTK+ and SDL
+white television. This option is effective under the GTK+, Xlib and SDL
 user interfaces: the others will always simulate a colour TV. The same
 as the General Options dialog's
 .I "Black and white TV"
@@ -172,8 +172,8 @@ Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
 occurring. (Enabled by default, but you can use
 .RI ` \-\-no\-confirm\-actions '
-to disable). This option is effective only under the GTK+ UI, and is
-the same as the General Options dialog's
+to disable). This option is effective under the GTK+ UI, and is the
+same as the General Options dialog's
 .I "Confirm actions"
 option.
 .RE
@@ -1421,8 +1421,8 @@ options.
 .I "Black and white TV"
 .RS
 This option allows you to choose whether to simulate a colour or black
-and white television. This is effective only under the GTK+ and SDL
-user interfaces: the others will always simulate a colour TV.
+and white television. This is effective only under the GTK+, Xlib and
+SDL user interfaces: the others will always simulate a colour TV.
 .RE
 .PP
 .I "PAL-TV use TV2x effect"
@@ -2469,10 +2469,10 @@ building its image of the Spectrum's screen, and displaying it on the
 emulating machine's monitor. These filters can be used to do various
 forms of smoothing, emulation of TV scanlines and various other
 possibilities. Support for graphics filters varies between the
-different user interfaces, but there are two general classes: the GTK+
-and SDL user interfaces (and the saving of .png screenshots) support
+different user interfaces, but there are two general classes: the GTK+,
+Xlib and SDL user interfaces (and the saving of .png screenshots) support
 `interpolating' filters which use a palette larger than the Spectrum's
-16 colours, while the Xlib and SVGAlib user interfaces support only
+16 colours, while the SVGAlib user interface supports only
 `non-interpolating' filters. The framebuffer user interface currently
 does not support filters at all.
 .PP
@@ -2515,8 +2515,8 @@ Scale the displayed screen up to double size.
 .IR "Triple size " ( 3x )
 .RS
 Scale the displayed screen up to triple size. Available only with the
-GTK+ and SDL user interfaces or when saving screenshots of non-Timex
-machines.
+GTK+, Xlib and SDL user interfaces or when saving screenshots of
+non-Timex machines.
 .RE
 .PP
 .IR "2xSaI " ( 2xsai )
@@ -2540,8 +2540,8 @@ diagonal lines.
 Very similar to
 .IR AdvMAME2x ,
 except that it triples the size of the displayed screen. Available
-only with the GTK+ and SDL user interfaces or when saving screenshots
-of non-Timex machines.
+only with the GTK+, Xlib and SDL user interfaces or when saving
+screenshots of non-Timex machines.
 .RE
 .PP
 .IR "TV 2x " ( tv2x )

@@ -74,9 +74,9 @@ typedef enum disk_type_t {
 
 typedef enum disk_dens_t {
   DISK_DENS_AUTO = 0,
-  DISK_8_SD,		/* 8" SD floppy 5208 */
+  DISK_8_SD,		/* 8" SD floppy 5208 MF */
   DISK_8_DD,		/* 8" DD floppy 10416 */
-  DISK_SD,		/* 3125 bpt */
+  DISK_SD,		/* 3125 bpt MF */
   DISK_DD,		/* 6250 bpt */
   DISK_HD,		/* 12500 bpt*/
 } disk_dens_t;

@@ -966,7 +966,7 @@ display_frame( void )
   } else if( screenshot_movie_record == 2 ) {
 
     snprintf( screenshot_movie_name, SCREENSHOT_MOVIE_FILE_MAX,
-              "%s-frame-%09ld.scr", screenshot_movie_file,
+              "%s-frame-%09ld.png", screenshot_movie_file,
               screenshot_movie_frame++ );
     screenshot_write_fast( screenshot_movie_name, screenshot_movie_scaler );
 
