@@ -2425,3 +2425,6 @@
 20080105 disk/disk.c: initialise variables (Release-0_9_0-branch).
 20080105 TAG: Release-0_9_0
 20080107 Merge Release-0_9_0-branch changes r3444:3841 to trunk.
+20080108 Makefile.am,configure.in,sound/Makefile.am,timer/Makefile.am,
+	 ui/{gtk/Makefile.am,sdl/Makefile.am},widget/Makefile.am: tidy up
+	 use of SDL_CFLAGS and SDL_LIBS.

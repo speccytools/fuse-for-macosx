@@ -28,7 +28,6 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 noinst_LIBRARIES = libuisdl.a
 
 INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@ @SDL_CFLAGS@
-LDADD = @SDL_LIBS@
 
 libuisdl_a_SOURCES = sdldisplay.c \
 		     sdljoystick.c \

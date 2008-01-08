@@ -126,6 +126,7 @@ z80/libz80.a \
 @PNG_LIBS@ \
 @SOUND_LIBS@ \
 @SAMPLERATE_LIBS@ \
+@SDL_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
 compat/@COMPAT_OSNAME@/libcompatos.a \
@@ -151,7 +152,7 @@ settings.h: settings-header.pl settings.dat
 	@PERL@ -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
-@XML_CFLAGS@ @SAMPLERATE_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\""
+@XML_CFLAGS@ @SAMPLERATE_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@
 
 noinst_HEADERS = ay.h \
 	bitmap.h \

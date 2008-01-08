@@ -163,9 +163,6 @@ if test -z "$UI"; then
 		UI=sdl; WIDGET=widget;
 	        UI_LIBS="ui/sdl/libuisdl.a widget/libwidget.a", 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
-    CFLAGS="$CFLAGS $SDL_CFLAGS"
-    CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
-    LIBS="$LIBS $SDL_LIBS"
   fi
 fi
 
