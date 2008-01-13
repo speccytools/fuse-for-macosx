@@ -170,7 +170,7 @@ z80_interrupt( void )
 void
 z80_nmi( void )
 {
-  /* FIXME: what happens if the z80 is HALTed? */
+  if( z80.halted ) { PC++; z80.halted = 0; }
 
   IFF1 = 0;
 

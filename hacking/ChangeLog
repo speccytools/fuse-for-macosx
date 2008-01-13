@@ -2428,3 +2428,4 @@
 20080108 Makefile.am,configure.in,sound/Makefile.am,timer/Makefile.am,
 	 ui/{gtk/Makefile.am,sdl/Makefile.am},widget/Makefile.am: tidy up
 	 use of SDL_CFLAGS and SDL_LIBS.
+20080113 z80/z80.c: unhalt on NMI (thanks, Simon Owen) (Stuart).
