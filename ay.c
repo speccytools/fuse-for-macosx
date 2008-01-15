@@ -66,7 +66,7 @@ ay_init( void )
 }
 
 static void
-ay_reset( int hard_reset )
+ay_reset( int hard_reset GCC_UNUSED )
 {
   ayinfo *ay = &machine_current->ay;
 

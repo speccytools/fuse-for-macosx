@@ -594,7 +594,7 @@ wd_fdc_type_iii( wd_fdc *f )
 }
 
 int
-wd_fdc_event( libspectrum_dword last_tstates, event_type event,
+wd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, event_type event,
 	      void *user_data ) 
 {
   wd_fdc *f = user_data;

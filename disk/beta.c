@@ -142,7 +142,7 @@ beta_init( void )
 }
 
 static void
-beta_reset( int hard_reset )
+beta_reset( int hard_reset GCC_UNUSED )
 {
   int i;
   wd_fdc_drive *d;

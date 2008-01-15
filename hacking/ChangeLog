@@ -2429,3 +2429,4 @@
 	 ui/{gtk/Makefile.am,sdl/Makefile.am},widget/Makefile.am: tidy up
 	 use of SDL_CFLAGS and SDL_LIBS.
 20080113 z80/z80.c: unhalt on NMI (thanks, Simon Owen) (Stuart).
+20080115 ay.c,disk/{beta.c,disk.c,wd_fdc.c}: warnings removal.

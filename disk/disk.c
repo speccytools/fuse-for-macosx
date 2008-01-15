@@ -1042,7 +1042,7 @@ open_scl( FILE *file, disk_t *d )
 }
 
 static int
-open_td0( FILE *file, disk_t *d, int preindex )
+open_td0( FILE *file, disk_t *d )
 {
   int i, j, s, sectors, seclen, bpt, gap, mfm, mfm_old;
   int data_offset, track_offset, sector_offset;
@@ -1337,7 +1337,7 @@ disk_open( disk_t *d, const char *filename, int preindex )
     open_scl( file, d );
     break;
   case DISK_TD0:
-    open_td0( file, d, preindex );
+    open_td0( file, d );
     break;
   default:
     fclose( file );
