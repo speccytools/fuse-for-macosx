@@ -214,12 +214,19 @@ draw_screen( libspectrum_byte *screen, int border )
       data = screen[ display_line_start[y]+x ];
 
       for( i=0; i<8; i++ ) {
+	libspectrum_dword pix =
+	  win32display_colours[ ( data & 0x80 ) ? ink : paper ];
+
+	/* rearrange pixel components */
+	pix = ( pix & 0x0000ff00 ) |
+	      ( ( pix & 0x000000ff ) << 16 ) |
+	      ( ( pix & 0x00ff0000 ) >> 16 );
+
 	*(libspectrum_dword*)(
 	    picture +
 	    ( y + DISPLAY_BORDER_HEIGHT ) * picture_pitch +
 	    4 * ( 8 * x + DISPLAY_BORDER_ASPECT_WIDTH + i )
-	  ) = ( data & 0x80 ) ? win32display_colours[ ink ]
-			      : win32display_colours[ paper ];
+	  ) = pix;
 	data <<= 1;
       }
     }

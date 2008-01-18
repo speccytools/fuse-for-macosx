@@ -2433,3 +2433,4 @@
 20080118 windres.rc,ui/win32/{picture.{c,h,rc},win32display.h,win32internals.h,
 	 win32ui.c,Makefile.am}: add a keyboard help dialog for the Win32 UI
 	 (Marek Januszewski).
+20080118 ui/win32/picture.c: swap red and blue colour components (Stuart).
