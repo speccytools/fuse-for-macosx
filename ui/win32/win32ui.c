@@ -645,9 +645,14 @@ menu_machine_reset( int action )
   }
 }
 
+void
+menu_help_keyboard( int action )
+{
+  win32ui_picture( "keyboard.scr", 0 );
+}
+
 void menu_machine_select( int action ) { STUB; }
 
 void menu_machine_pokefinder( int action ) { STUB; }
 void menu_machine_memorybrowser( int action ) { STUB; }
 void menu_media_tape_browse( int action ) { STUB; }
-void menu_help_keyboard( int action ) { STUB; }

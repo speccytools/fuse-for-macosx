@@ -1,0 +1,228 @@
+/* picture.c: Win32 routines to draw the keyboard picture
+   Copyright (c) 2002-2008 Philip Kendall, Marek Januszewski, Stuart Brady
+
+   $Id$
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+   Author contact information:
+
+   E-mail: philip-fuse@shadowmagic.org.uk
+
+*/
+
+#include "display.h"
+#include "picture.h"
+#include "ui/ui.h"
+#include "utils.h"
+#include "win32internals.h"
+#include "win32display.h"
+
+#include <windows.h>
+
+/* An RGB image of the keyboard picture */
+/* the memory will be allocated by Windows
+   ( DISPLAY_SCREEN_HEIGHT * DISPLAY_ASPECT_WIDTH * 4 bytes ) */
+static void *picture;
+static const int picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
+
+HWND hDialogPicture = NULL;
+utils_file screen;
+HBITMAP picture_BMP;
+
+static int read_screen( const char *filename, utils_file *screen );
+static void draw_screen( libspectrum_byte *screen, int border );
+
+LRESULT WINAPI picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+
+int
+win32ui_picture( const char *filename, int border )
+{
+  if (!hDialogPicture) {
+    hDialogPicture = CreateDialog( fuse_hInstance, "DIALOGPICTURE",
+				   fuse_hWnd, (DLGPROC)picture_wnd_proc);
+
+    BITMAPINFO picture_BMI;
+
+    /* create the picture buffer */
+
+    memset( &picture_BMI, 0, sizeof( picture_BMI ) );
+    picture_BMI.bmiHeader.biSize = sizeof( picture_BMI.bmiHeader );
+    picture_BMI.bmiHeader.biWidth = (size_t)( DISPLAY_ASPECT_WIDTH );
+    /* negative to avoid "shep-mode": */
+    picture_BMI.bmiHeader.biHeight = -DISPLAY_SCREEN_HEIGHT;
+    picture_BMI.bmiHeader.biPlanes = 1;
+    picture_BMI.bmiHeader.biBitCount = 32;
+    picture_BMI.bmiHeader.biCompression = BI_RGB;
+    picture_BMI.bmiHeader.biSizeImage = 0;
+    picture_BMI.bmiHeader.biXPelsPerMeter = 0;
+    picture_BMI.bmiHeader.biYPelsPerMeter = 0;
+    picture_BMI.bmiHeader.biClrUsed = 0;
+    picture_BMI.bmiHeader.biClrImportant = 0;
+    picture_BMI.bmiColors[0].rgbRed = 0;
+    picture_BMI.bmiColors[0].rgbGreen = 0;
+    picture_BMI.bmiColors[0].rgbBlue = 0;
+    picture_BMI.bmiColors[0].rgbReserved = 0;
+
+    HDC dc = GetDC( hDialogPicture );
+    picture_BMP = CreateDIBSection( dc, &picture_BMI, DIB_RGB_COLORS, &picture,
+				    NULL, 0 );
+
+    if( read_screen( filename, &screen ) ) {
+      return 1;
+    }
+
+    draw_screen( screen.buffer, border );
+
+    if( utils_close_file( &screen ) ) {
+      return 1;
+    }
+
+    ReleaseDC( hDialogPicture, dc );
+  }
+
+  return 0;
+}
+
+LRESULT WINAPI
+picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+  switch( msg ) {
+    case WM_PAINT:
+      {
+	PAINTSTRUCT ps;
+	BeginPaint( hWnd, &ps );
+
+	HDC dest_dc, src_dc;
+	RECT dest_rec;
+	HBITMAP src_bmp;
+
+	dest_dc = GetDC( hDialogPicture );
+	GetClientRect( hDialogPicture, &dest_rec );
+
+	src_dc = CreateCompatibleDC(0);
+	src_bmp = SelectObject( src_dc, picture_BMP );
+	BitBlt( dest_dc, 0, 0, DISPLAY_ASPECT_WIDTH,
+		DISPLAY_SCREEN_HEIGHT, src_dc, 0, 0, SRCCOPY );
+
+	SelectObject( src_dc, src_bmp );
+	DeleteObject( src_bmp );
+	DeleteDC( src_dc );
+	ReleaseDC( hDialogPicture, dest_dc );
+
+	EndPaint( hWnd, &ps );
+	break;
+      }
+
+    case WM_COMMAND:
+      switch(LOWORD(wParam))
+      {
+	case ID_CLOSE:
+	{
+	  hDialogPicture = NULL;
+	  DestroyWindow( hWnd );
+	  break;
+	}
+      }
+
+    case WM_CLOSE:
+      {
+	hDialogPicture = NULL;
+	DestroyWindow( hWnd );
+	break;
+      }
+  }
+  return FALSE;
+}
+
+
+static int
+read_screen( const char *filename, utils_file *screen )
+{
+  int fd, error;
+
+  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
+  if( fd == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
+	      filename );
+    return 1;
+  }
+
+  error = utils_read_fd( fd, filename, screen );
+  if( error ) return error;
+
+  if( screen->length != 6912 ) {
+    utils_close_file( screen );
+    ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
+	      filename );
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
+draw_screen( libspectrum_byte *screen, int border )
+{
+  int i, x, y, ink, paper;
+  libspectrum_byte attr, data;
+
+  for( y=0; y < DISPLAY_BORDER_HEIGHT; y++ ) {
+    for( x=0; x < DISPLAY_ASPECT_WIDTH; x++ ) {
+      *(libspectrum_dword*)( picture + y * picture_pitch + 4 * x ) =
+	win32display_colours[border];
+      *(libspectrum_dword*)(
+	  picture +
+	  ( y + DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT ) * picture_pitch +
+	  4 * x
+	) = win32display_colours[ border ];
+    }
+  }
+
+  for( y=0; y<DISPLAY_HEIGHT; y++ ) {
+
+    for( x=0; x < DISPLAY_BORDER_ASPECT_WIDTH; x++ ) {
+      *(libspectrum_dword*)
+	(picture + ( y + DISPLAY_BORDER_HEIGHT) * picture_pitch + 4 * x) =
+	win32display_colours[ border ];
+      *(libspectrum_dword*)(
+	  picture +
+	  ( y + DISPLAY_BORDER_HEIGHT ) * picture_pitch +
+	  4 * ( x+DISPLAY_ASPECT_WIDTH-DISPLAY_BORDER_ASPECT_WIDTH )
+	) = win32display_colours[ border ];
+    }
+
+    for( x=0; x < DISPLAY_WIDTH_COLS; x++ ) {
+
+      attr = screen[ display_attr_start[y] + x ];
+
+      ink = ( attr & 0x07 ) + ( ( attr & 0x40 ) >> 3 );
+      paper = ( attr & ( 0x0f << 3 ) ) >> 3;
+
+      data = screen[ display_line_start[y]+x ];
+
+      for( i=0; i<8; i++ ) {
+	*(libspectrum_dword*)(
+	    picture +
+	    ( y + DISPLAY_BORDER_HEIGHT ) * picture_pitch +
+	    4 * ( 8 * x + DISPLAY_BORDER_ASPECT_WIDTH + i )
+	  ) = ( data & 0x80 ) ? win32display_colours[ ink ]
+			      : win32display_colours[ paper ];
+	data <<= 1;
+      }
+    }
+
+  }
+}

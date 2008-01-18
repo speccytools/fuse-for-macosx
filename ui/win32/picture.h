@@ -1,5 +1,5 @@
-/* win32display.h: Routines for dealing with the Win32 GDI display
-   Copyright (c) 2003 Marek Januszewski
+/* picture.h: Win32 routines to draw the keyboard picture
+   Copyright (c) 2008 Marek Januszewski
 
    $Id$
 
@@ -23,19 +23,4 @@
 
 */
 
-#include <config.h>
-
-#include "win32internals.h"
-
-extern BITMAPINFO fuse_BMI;
-extern HBITMAP fuse_BMP;
-extern int fuse_nCmdShow;
-
-extern void *win32_pixdata;
-
-extern libspectrum_dword win32display_colours[16];
-
-int win32display_init( void );
-int win32display_end( void );
-
-void blit( void );
+#define ID_CLOSE 1200

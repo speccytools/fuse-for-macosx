@@ -34,6 +34,7 @@ libuiwin32_a_SOURCES = debugger.c \
 		       error.c \
 		       keysyms.c \
 		       menu_data.c \
+		       picture.c \
 		       pokefinder.rc \
 		       statusbar.c \
 		       win32display.c \
@@ -65,6 +66,7 @@ menu_data: menu_data.c menu_data.h menu_data.rc
 DIST_SUBDIRS = icons
 
 noinst_HEADERS = debugger.h \
+		 picture.h \
 		 pokefinder.h \
 		 menu_data.h \
 		 win32display.h \

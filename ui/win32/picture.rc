@@ -1,5 +1,5 @@
-/* win32internals.h: stuff internal to the Win32 UI
-   Copyright (c) 2004 Marek Januszewski
+/* picture.rc: Win32 resource file for the keyboard picture
+   Copyright (c) 2008 Marek Januszewski
 
    $Id$
 
@@ -23,39 +23,14 @@
 
 */
 
-#ifndef FUSE_WIN32INTERNALS_H
-#define FUSE_WIN32INTERNALS_H
-
 #include <windows.h>
-#include <commctrl.h>
-#include <commdlg.h>
-#include <shellapi.h>
 
-#define ID_STATUSBAR 900
+#include "picture.h"
 
-/* window handler */
-extern HWND fuse_hWnd;
-
-/* application instance */
-extern HINSTANCE fuse_hInstance;
-
-/* status bar handle */
-extern HWND fuse_hStatusWindow;
-
-/* pokefinder window handle */
-extern HWND fuse_hPFWnd;
-
-/* debugger window handle */
-extern HWND fuse_hDBGWnd;
-
-void win32statusbar_create();
-
-int win32statusbar_set_visibility( int visible );
-
-void win32_verror( int is_error );
-
-void handle_menu( DWORD cmd, HWND okno );
-
-int win32ui_picture( const char *filename, int border );
-
-#endif				/* #ifndef FUSE_WIN32INTERNALS_H */
+DIALOGPICTURE   DIALOG DISCARDABLE 16, 16, 160, 138
+STYLE           DS_MODALFRAME | WS_POPUP | WS_CAPTION
+                | WS_SYSMENU | WS_VISIBLE
+CAPTION         "Fuse - Keyboard"
+BEGIN
+  DEFPUSHBUTTON "Close", ID_CLOSE, 108, 122, 50, 14
+END

@@ -2430,3 +2430,6 @@
 	 use of SDL_CFLAGS and SDL_LIBS.
 20080113 z80/z80.c: unhalt on NMI (thanks, Simon Owen) (Stuart).
 20080115 ay.c,disk/{beta.c,disk.c,wd_fdc.c}: warnings removal.
+20080118 windres.rc,ui/win32/{picture.{c,h,rc},win32display.h,win32internals.h,
+	 win32ui.c,Makefile.am}: add a keyboard help dialog for the Win32 UI
+	 (Marek Januszewski).
