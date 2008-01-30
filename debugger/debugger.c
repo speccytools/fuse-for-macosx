@@ -28,6 +28,7 @@
 #include "debugger.h"
 #include "debugger_internals.h"
 #include "event.h"
+#include "fuse.h"
 #include "memory.h"
 #include "periph.h"
 #include "ui/ui.h"
@@ -145,4 +146,12 @@ debugger_port_write( libspectrum_word port, libspectrum_byte value )
 {
   writeport_internal( port, value );
   return 0;
+}
+
+/* Exit the emulator */
+void
+debugger_exit_emulator( void )
+{
+  fuse_exiting = 1;
+  debugger_run();
 }

@@ -2434,3 +2434,5 @@
 	 win32ui.c,Makefile.am}: add a keyboard help dialog for the Win32 UI
 	 (Marek Januszewski).
 20080118 ui/win32/picture.c: swap red and blue colour components (Stuart).
+20080130 debugger/{commandl.l,commandy.y,debugger.c,debugger_internals.h}:
+         add command to exit emulator.

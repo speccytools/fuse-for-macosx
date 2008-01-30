@@ -56,6 +56,7 @@ cl|cle|clea|clear { return CLEAR; }
 del|dele|delet|delete { return DEBUGGER_DELETE; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
 	                                                  return DISASSEMBLE; }
+ex|exi|exit { return EXIT; }
 fi|fin|fini|finis|finish { return FINISH; }
 if { return IF; }
 i|ig|ign|igno|ignor|ignore { return DEBUGGER_IGNORE; }

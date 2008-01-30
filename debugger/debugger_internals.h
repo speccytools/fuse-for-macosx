@@ -43,6 +43,8 @@ libspectrum_word debugger_register_get( int which );
 void debugger_register_set( int which, libspectrum_word value );
 const char* debugger_register_text( int which );
 
+void debugger_exit_emulator( void );
+
 /* Utility functions called by the flex scanner */
 
 int debugger_command_input( char *buf, int *result, int max_size );
