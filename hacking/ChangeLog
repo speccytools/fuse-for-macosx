@@ -2436,3 +2436,4 @@
 20080118 ui/win32/picture.c: swap red and blue colour components (Stuart).
 20080130 debugger/{commandl.l,commandy.y,debugger.c,debugger_internals.h}:
          add command to exit emulator.
+20080202 ui/gtk/fileselector.c: give a default action for save dialogs.

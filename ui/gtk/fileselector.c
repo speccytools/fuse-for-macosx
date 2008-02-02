@@ -50,6 +50,8 @@ run_dialog( const char *title, GtkFileChooserAction action )
 				 button, GTK_RESPONSE_ACCEPT,
 				 NULL );
 
+  gtk_dialog_set_default_response( GTK_DIALOG( dialog ), GTK_RESPONSE_ACCEPT );
+
   if( current_folder )
     gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( dialog ), current_folder );
 
