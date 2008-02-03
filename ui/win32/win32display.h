@@ -32,10 +32,13 @@ extern HBITMAP fuse_BMP;
 extern int fuse_nCmdShow;
 
 extern void *win32_pixdata;
+extern int win32display_sizechanged;
 
 extern libspectrum_dword win32display_colours[16];
 
 int win32display_init( void );
 int win32display_end( void );
+void win32display_resize( int size );
+void win32display_resize_update( void );
 
 void blit( void );

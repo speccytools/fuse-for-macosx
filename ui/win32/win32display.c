@@ -95,10 +95,15 @@ libspectrum_dword bw_colours[16];
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int win32display_current_size=1;
 
+int win32display_sizechanged = 0;
+static int newsize;
+
 static int init_colours( void );
 static int register_scalers( void );
 static int register_scalers_noresize( void );
 static void win32display_area(int x, int y, int width, int height);
+
+static void win32display_setsize( void );
 
 void
 blit( void )
@@ -208,6 +213,33 @@ init_colours( void )
 }
 
 void
+win32display_resize( int size )
+{
+  if( size == win32display_current_size ) return;
+
+  /* clear the back buffer */
+  memset( win32_pixdata, 0, 4 * 3 * DISPLAY_SCREEN_HEIGHT *
+			    (size_t)( 1.5 * DISPLAY_SCREEN_WIDTH ) );
+
+  newsize = size;
+  win32display_sizechanged = 1;
+}
+
+void
+win32display_resize_update( void )
+{
+  win32display_current_size = newsize;
+
+  register_scalers_noresize();
+
+  display_refresh_all();
+
+  /* redraw, as we pause during resizing */
+  uidisplay_area( 0, 0, image_width, image_height );
+  blit();
+}
+
+static void
 win32display_setsize()
 {
   RECT rect, wrect, srect;

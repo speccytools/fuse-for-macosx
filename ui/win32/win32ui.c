@@ -52,6 +52,7 @@ HWND fuse_hPFWnd;
 HWND fuse_hDBGWnd;
 
 int paused = 0;
+int size_paused = 0;
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
@@ -132,9 +133,96 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       }
       break;
 
+    case WM_SIZING:
+    {
+      RECT *selr, wr, cr, statr;
+      int width, height, size, w_ofs, h_ofs;
+
+      selr = (RECT *)lParam;
+      GetWindowRect( fuse_hWnd, &wr );
+      GetClientRect( fuse_hWnd, &cr );
+/*      GetClientRect( fuse_hStatusWindow, &statr ); */
+
+      w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
+      h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
+/*	+ ( statr.bottom - statr.top ); */
+
+      width = selr->right - selr->left + DISPLAY_ASPECT_WIDTH / 2;
+      height = selr->bottom - selr->top + DISPLAY_SCREEN_HEIGHT / 2;
+
+      width -= w_ofs; height -= h_ofs;
+      width /= DISPLAY_ASPECT_WIDTH; height /= DISPLAY_SCREEN_HEIGHT;
+
+      if( wParam == WMSZ_LEFT || wParam == WMSZ_RIGHT ) {
+	height = width;
+      } else if( wParam == WMSZ_TOP || wParam == WMSZ_BOTTOM ) {
+	width = height;
+      } else if( width < 1 || height < 1 ) {
+	width = 1; height = 1;
+      }
+
+      if( width > 3 ) {
+	width = 3;
+      }
+      if( height > 3 ) {
+	height = 3;
+      }
+
+      if( width < height ) {
+	height = width;
+      } else {
+	width = height;
+      }
+      size = width;
+
+      width *= DISPLAY_ASPECT_WIDTH; height *= DISPLAY_SCREEN_HEIGHT;
+      width += w_ofs; height += h_ofs;
+
+      if( wParam == WMSZ_TOP ||
+	  wParam == WMSZ_TOPLEFT ||
+	  wParam == WMSZ_TOPRIGHT ) {
+	selr->top = selr->bottom - height;
+      } else {
+	selr->bottom = selr->top + height;
+      }
+      if( wParam == WMSZ_LEFT ||
+	  wParam == WMSZ_TOPLEFT ||
+	  wParam == WMSZ_BOTTOMLEFT ) {
+	selr->left = selr->right - width;
+      } else {
+	selr->right = selr->left + width;
+      }
+      win32display_resize( size );
+
+      return TRUE;
+    }
+
     case WM_SIZE:
-      SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
-      break;
+      if( win32display_sizechanged )
+	win32display_resize_update();
+/*      SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam ); */
+      if( wParam == SIZE_MINIMIZED ) {
+	if( !size_paused ) {
+	  size_paused = 1;
+	  fuse_emulation_pause();
+	}
+      } else {
+	if( size_paused ) {
+	  size_paused = 0;
+	  fuse_emulation_unpause();
+	}
+      }
+
+      RECT r;
+/*      GetClientRect( fuse_hStatusWindow, &r ); */
+
+      int cornerwidth = r.bottom - r.top;
+      int parts[2] = { r.right - cornerwidth - 65, r.right - cornerwidth };
+/*      SendMessage( fuse_hStatusWindow, SB_SETPARTS, (WPARAM) 2,
+		   (LPARAM) parts );
+*/
+
+      return 0;
 
     case WM_DESTROY:
       fuse_exiting = 1;
@@ -144,6 +232,20 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	 emulation loop) */
       if( paused ) menu_machine_pause( 0 );
       break;
+
+    case WM_ENTERMENULOOP:
+    case WM_ENTERSIZEMOVE:
+    {
+      fuse_emulation_pause();
+      break;
+    }
+
+    case WM_EXITMENULOOP:
+    case WM_EXITSIZEMOVE:
+    {
+      fuse_emulation_unpause();
+      break;
+    }
 
     default:
       return( DefWindowProc( hWnd, msg, wParam, lParam ) );
@@ -177,9 +279,8 @@ WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
   fuse_hInstance = hInstance;
 
-  fuse_hWnd = CreateWindow( "Fuse", "Fuse",
-    WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,
-/*    WS_OVERLAPPEDWINDOW, */
+  fuse_hWnd = CreateWindow( "Fuse", "Fuse", WS_OVERLAPPED | WS_CAPTION |
+    WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_CLIPCHILDREN,
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
     NULL, NULL, hInstance, NULL );
 

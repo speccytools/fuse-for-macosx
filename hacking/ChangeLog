@@ -2439,3 +2439,5 @@
 20080202 ui/gtk/fileselector.c: give a default action for save dialogs.
 20080203 Makefile.am,winfuse.ico: add a conversion of Paul van der Laan's icon
 	 for Mac OS X Fuse to Windows ICO format (Arda Erdikmen).
+20080203 ui/win32/{win32ui.c,win32display.[ch]}: allow Win32 window to be
+	 resized (Stuart).
