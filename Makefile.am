@@ -202,7 +202,8 @@ EXTRA_DIST = AUTHORS \
 	     menu_data.pl \
 	     settings.pl \
 	     settings-header.pl \
-	     settings.dat
+	     settings.dat \
+	     winfuse.ico
 
 CLEANFILES = settings.c \
 	     settings.h
