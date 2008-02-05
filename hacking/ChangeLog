@@ -2441,3 +2441,6 @@
 	 for Mac OS X Fuse to Windows ICO format (Arda Erdikmen).
 20080203 ui/win32/{win32ui.c,win32display.[ch]}: allow Win32 window to be
 	 resized (Stuart).
+20080205 sound/win32sound.c: Windows Multimedia API sound route - allows to
+	 have sound on Win32 without the need for DirectX headers (mingw currently
+	 doesn't have them)
