@@ -2444,3 +2444,4 @@
 20080205 sound/win32sound.c: Windows Multimedia API sound route - allows to
 	 have sound on Win32 without the need for DirectX headers (mingw currently
 	 doesn't have them)
+20080205 ui/win32/{picture.{c,rc}}: Win32: fix for keyboard help dialog
