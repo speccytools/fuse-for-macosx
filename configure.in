@@ -411,6 +411,14 @@ AC_CHECK_HEADER(
   [AC_MSG_WARN(dsound.h not found - no DirectSound output)]
 )
 
+dnl Check if MS Windows Multimedia API sound is available
+AC_CHECK_HEADER(
+  mmsystem.h,
+  [win32sound_available=yes],
+  [AC_MSG_WARN(mmsystem.h not found - no MS Windows Multimedia API sound output)],
+  [#include <windows.h>]
+)
+
 dnl Check if libsamplerate is available
 AC_MSG_CHECKING(whether libsamplerate support requested)
   AC_ARG_WITH(libsamplerate,
@@ -442,6 +450,9 @@ AC_MSG_CHECKING(which sound routines to use)
 if test "$dxsound_available" = yes; then
   SOUND_LIBADD='dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
   AC_MSG_RESULT(DirectX)
+elif test "$win32sound_available" = yes; then
+  SOUND_LIBADD='win32sound.$(OBJEXT)' SOUND_LIBS='-lwinmm'
+  AC_MSG_RESULT(win32sound)
 elif test "$UI" = sdl; then
   SOUND_LIBADD='sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
   AC_MSG_RESULT(SDL)

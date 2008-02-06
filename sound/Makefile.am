@@ -40,7 +40,8 @@ EXTRA_libsound_a_SOURCES = dxsound.c \
 		     	   osssound.c \
 		     	   sdlsound.c \
 		     	   sfifo.c \
-		     	   sunsound.c
+		     	   sunsound.c \
+		     	   win32sound.c
 
 libsound_a_LIBADD = $(SOUND_LIBADD)
 libsound_a_DEPENDENCIES = $(SOUND_LIBADD)
