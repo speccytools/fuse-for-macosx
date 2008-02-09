@@ -2447,3 +2447,5 @@
 20080205 ui/win32/{picture.{c,rc}}: Win32: fix for keyboard help dialog
 20080206 configure.in,sound/Makefile.am: Win32: make autotools recognize and
 	 use Windows Multimedia API header (mmsystem.h) (Marek)
+20080208 ui/win32/win32ui.c Win32: Machine select dialog,
+	 minor code formatting changes (Marek)

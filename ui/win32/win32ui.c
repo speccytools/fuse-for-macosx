@@ -50,9 +50,12 @@ HINSTANCE fuse_hInstance;
 HWND fuse_hStatusWindow;
 HWND fuse_hPFWnd;
 HWND fuse_hDBGWnd;
+HWND fuse_hMSWnd = NULL; /* machine select dialog object */
+HFONT h_ms_font = NULL; /* machine select dialog's font object */
 
 int paused = 0;
 int size_paused = 0;
+int selected_machine = 0;
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
@@ -63,7 +66,7 @@ win32ui_confirm( const char *string )
 
   fuse_emulation_pause();
   result = MessageBox( fuse_hWnd, string, "Fuse - Confirm",
-		       MB_YESNO|MB_ICONQUESTION ) == IDYES;
+                       MB_YESNO|MB_ICONQUESTION ) == IDYES;
   fuse_emulation_unpause();
   return result;
 }
@@ -112,7 +115,7 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
     case WM_CLOSE:
       if( win32ui_confirm( "Exit Fuse?" ) ) {
-	DestroyWindow(hWnd);
+        DestroyWindow(hWnd);
       }
       break;
 
@@ -126,16 +129,16 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
     case WM_PAINT:
       if( display_ui_initialised ) {
-	PAINTSTRUCT ps;
-	BeginPaint( hWnd, &ps );
-	blit();
-	EndPaint( hWnd, &ps );
+        PAINTSTRUCT ps;
+        BeginPaint( hWnd, &ps );
+        blit();
+        EndPaint( hWnd, &ps );
       }
       break;
 
     case WM_SIZING:
     {
-      RECT *selr, wr, cr, statr;
+      RECT *selr, wr, cr /*, statr */; /* FIXME: unused variable - is it needed? */
       int width, height, size, w_ofs, h_ofs;
 
       selr = (RECT *)lParam;
@@ -145,7 +148,7 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
       w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
       h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
-/*	+ ( statr.bottom - statr.top ); */
+/*      + ( statr.bottom - statr.top ); */
 
       width = selr->right - selr->left + DISPLAY_ASPECT_WIDTH / 2;
       height = selr->bottom - selr->top + DISPLAY_SCREEN_HEIGHT / 2;
@@ -154,24 +157,24 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       width /= DISPLAY_ASPECT_WIDTH; height /= DISPLAY_SCREEN_HEIGHT;
 
       if( wParam == WMSZ_LEFT || wParam == WMSZ_RIGHT ) {
-	height = width;
+        height = width;
       } else if( wParam == WMSZ_TOP || wParam == WMSZ_BOTTOM ) {
-	width = height;
+        width = height;
       } else if( width < 1 || height < 1 ) {
-	width = 1; height = 1;
+        width = 1; height = 1;
       }
 
       if( width > 3 ) {
-	width = 3;
+        width = 3;
       }
       if( height > 3 ) {
-	height = 3;
+        height = 3;
       }
 
       if( width < height ) {
-	height = width;
+        height = width;
       } else {
-	width = height;
+        width = height;
       }
       size = width;
 
@@ -179,18 +182,18 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       width += w_ofs; height += h_ofs;
 
       if( wParam == WMSZ_TOP ||
-	  wParam == WMSZ_TOPLEFT ||
-	  wParam == WMSZ_TOPRIGHT ) {
-	selr->top = selr->bottom - height;
+          wParam == WMSZ_TOPLEFT ||
+          wParam == WMSZ_TOPRIGHT ) {
+        selr->top = selr->bottom - height;
       } else {
-	selr->bottom = selr->top + height;
+        selr->bottom = selr->top + height;
       }
       if( wParam == WMSZ_LEFT ||
-	  wParam == WMSZ_TOPLEFT ||
-	  wParam == WMSZ_BOTTOMLEFT ) {
-	selr->left = selr->right - width;
+          wParam == WMSZ_TOPLEFT ||
+          wParam == WMSZ_BOTTOMLEFT ) {
+        selr->left = selr->right - width;
       } else {
-	selr->right = selr->left + width;
+        selr->right = selr->left + width;
       }
       win32display_resize( size );
 
@@ -199,29 +202,30 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
     case WM_SIZE:
       if( win32display_sizechanged )
-	win32display_resize_update();
+        win32display_resize_update();
 /*      SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam ); */
       if( wParam == SIZE_MINIMIZED ) {
-	if( !size_paused ) {
-	  size_paused = 1;
-	  fuse_emulation_pause();
-	}
+        if( !size_paused ) {
+          size_paused = 1;
+          fuse_emulation_pause();
+        }
       } else {
-	if( size_paused ) {
-	  size_paused = 0;
-	  fuse_emulation_unpause();
-	}
+        if( size_paused ) {
+          size_paused = 0;
+          fuse_emulation_unpause();
+        }
       }
 
+/*
       RECT r;
+*/
 /*      GetClientRect( fuse_hStatusWindow, &r ); */
-
+/*
       int cornerwidth = r.bottom - r.top;
       int parts[2] = { r.right - cornerwidth - 65, r.right - cornerwidth };
-/*      SendMessage( fuse_hStatusWindow, SB_SETPARTS, (WPARAM) 2,
-		   (LPARAM) parts );
+      SendMessage( fuse_hStatusWindow, SB_SETPARTS, (WPARAM) 2,
+                   (LPARAM) parts );
 */
-
       return 0;
 
     case WM_DESTROY:
@@ -229,7 +233,7 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       PostQuitMessage( 0 );
 
       /* Stop the paused state to allow us to exit (occurs from main
-	 emulation loop) */
+         emulation loop) */
       if( paused ) menu_machine_pause( 0 );
       break;
 
@@ -257,7 +261,7 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 /* this is where windows program begins */
 int WINAPI
 WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
-	 int nCmdShow )
+         int nCmdShow )
 {
   WNDCLASS wc;
 
@@ -316,13 +320,14 @@ ui_event( void )
     /* Process messages */
     while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
       if( !IsDialogMessage( fuse_hPFWnd, &msg ) &&
-	  !IsDialogMessage( fuse_hDBGWnd, &msg )   ) {
-	if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
-	  if( msg.message == WM_QUIT ) break;
-	  /* finish - set exit flag somewhere */
-	  TranslateMessage( &msg );
-	  DispatchMessage( &msg );
-	}
+          !IsDialogMessage( fuse_hDBGWnd, &msg ) &&
+          !IsDialogMessage( fuse_hMSWnd, &msg ) ) {
+        if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
+          if( msg.message == WM_QUIT ) break;
+          /* finish - set exit flag somewhere */
+          TranslateMessage( &msg );
+          DispatchMessage( &msg );
+        }
       }
     }
 
@@ -353,9 +358,9 @@ win32_verror( int is_error )
   static LPVOID err_msg;
   last_error = GetLastError();
   FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		 FORMAT_MESSAGE_FROM_SYSTEM,
-		 NULL, last_error, LANG_USER_DEFAULT,
-		 (LPTSTR) &err_msg, 0, NULL );
+                 FORMAT_MESSAGE_FROM_SYSTEM,
+                 NULL, last_error, LANG_USER_DEFAULT,
+                 (LPTSTR) &err_msg, 0, NULL );
   MessageBox( fuse_hWnd, err_msg, "Error", MB_OK );
 }
 
@@ -493,7 +498,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 
 int
 ui_tape_browser_update( ui_tape_browser_update_type change,
-			libspectrum_tape_block *block )
+                        libspectrum_tape_block *block )
 {
   STUB;
   return 0;
@@ -655,7 +660,7 @@ menu_file_movies_recordmovieasscr( int action )
   if( !filename ) { fuse_emulation_unpause(); return; }
 
   snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
-	    filename );
+            filename );
 
   screenshot_movie_record = 1;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
@@ -716,7 +721,7 @@ menu_machine_pause( int action )
   if( paused ) {
     paused = 0;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
-			 UI_STATUSBAR_STATE_INACTIVE );
+                         UI_STATUSBAR_STATE_INACTIVE );
     timer_estimate_reset();
     fuse_emulation_unpause();
   } else {
@@ -752,7 +757,155 @@ menu_help_keyboard( int action )
   win32ui_picture( "keyboard.scr", 0 );
 }
 
-void menu_machine_select( int action ) { STUB; }
+LRESULT CALLBACK
+menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+
+#define IDC_MS_OK     100
+#define IDC_MS_CANCEL 101
+#define IDC_MS_OFFSET 102
+
+  HWND h_temp_handle;
+  int i, pos_y;
+
+  switch( uMsg ) 
+  {
+    case WM_CREATE: 
+    {
+      h_ms_font = CreateFont( -11, 0, 0, 0, 400, 
+                              FALSE, FALSE, FALSE, 
+                              1, 400, 0, 0, 0, 
+                              TEXT( "Ms Shell Dlg 2" ) );
+
+      SendMessage( hwnd, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
+
+      /* create radio buttons */
+      pos_y = 8;
+      for( i=0; i<machine_count; i++ ) {
+        h_temp_handle = CreateWindow( TEXT( "BUTTON" ), libspectrum_machine_name( machine_types[i]->machine ),
+                                      /* no need for WS_GROUP since they're all in the same group */  
+                                      WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON,
+                                      8, pos_y, 155, 16,
+                                      hwnd, (HMENU) ( IDC_MS_OFFSET + i ), fuse_hInstance, 0 );
+        SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
+
+        /* check the radiobutton corresponding to current machine */
+        if( machine_current == machine_types[i] )
+        {
+          selected_machine = i;
+          SendMessage( h_temp_handle, BM_SETCHECK, BST_CHECKED, 0 );
+        }
+
+        pos_y += 16;
+      }
+
+      /* create OK and Cancel buttons */
+      pos_y += 6;
+      h_temp_handle = CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
+                                    WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+                                    6, pos_y, 75, 23,
+                                    hwnd, (HMENU) IDC_MS_OK, fuse_hInstance, 0 );
+      SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
+
+      h_temp_handle = CreateWindow( TEXT( "BUTTON" ), TEXT( "&Cancel" ),
+                                    WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+                                    90, pos_y, 75, 23,
+                                    hwnd, (HMENU) IDC_MS_CANCEL, fuse_hInstance, 0 );
+      SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
+      
+      pos_y += 54;
+      /* the following will only change the size of the window */
+      SetWindowPos( hwnd, NULL, 0, 0, 177, pos_y, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+      
+      return 0; 
+    }
+    case WM_COMMAND:
+    {
+      if ( HIWORD( wParam ) != BN_CLICKED ) return 0;
+
+      /* service OK and Cancel buttons */
+      switch LOWORD( wParam )
+      {
+        case IDC_MS_OK:
+        {
+          if( machine_types[ selected_machine ] != machine_current )
+          {
+            machine_select( machine_types[ selected_machine ]->machine );
+          }
+          fuse_hMSWnd = NULL;
+          DestroyWindow( hwnd );
+          DeleteObject( h_ms_font ); /* delete the font object */
+          UnregisterClass( "fuse_ms", fuse_hInstance );
+          return 0;
+        }
+        case IDC_MS_CANCEL:
+        {
+          fuse_hMSWnd = NULL;
+          DestroyWindow( hwnd );
+          DeleteObject( h_ms_font ); /* delete the font object */
+          UnregisterClass( "fuse_ms", fuse_hInstance );
+          return 0;
+        }
+      }
+
+      /* service clicking radiobuttons */
+      if( ( LOWORD( wParam ) >= IDC_MS_OFFSET ) &&
+          ( LOWORD( wParam ) < ( IDC_MS_OFFSET + machine_count ) ) )
+      {
+        if( SendMessage( (HWND) lParam, BM_GETCHECK, 0, 0 ) == BST_CHECKED )
+        {
+          selected_machine = LOWORD( wParam ) - IDC_MS_OFFSET;
+        }
+      }
+    }
+    default: 
+      return DefWindowProc( hwnd, uMsg, wParam, lParam ); 
+  }
+}
+
+void
+menu_machine_select( int action )
+{
+  /* FIXME: fix accelerators for this window */
+  /* FIXME: this needs to be a modal dialog (currently is modeless) */
+  /* FIXME: choosing spectrum SE crashes Fuse sound_frame () at sound.c:477 "ay_change[f].ofs = ( ay_change[f].tstates * sfreq ) / cpufreq;" */
+  /* FIXME: switching machines changes filter (typically to 1x) */
+
+  WNDCLASSEX wnd_ms;
+
+  if( fuse_hMSWnd != NULL ) return;
+
+  /* Stop emulation */
+  fuse_emulation_pause();
+
+  /* register the machine select window class */
+  memset( &wnd_ms, 0, sizeof( WNDCLASSEX ) );
+  wnd_ms.cbSize = sizeof( WNDCLASSEX );
+  wnd_ms.style = CS_HREDRAW | CS_VREDRAW;
+  wnd_ms.lpfnWndProc = menu_machine_select_proc; 
+  wnd_ms.hInstance = fuse_hInstance; 
+  wnd_ms.lpszMenuName =  "Fuse - Select Machine"; 
+  wnd_ms.lpszClassName = "fuse_ms"; 
+  wnd_ms.hbrBackground = (HBRUSH)( COLOR_MENU+1 );
+
+  if( !RegisterClassEx( &wnd_ms ) )
+  {
+    ui_error( UI_ERROR_ERROR, "Couldn't create the Machine Select window" );
+    return;
+  }
+
+  /* create the machine select window */
+  fuse_hMSWnd = CreateWindow( TEXT( "fuse_ms" ), TEXT( "Fuse - Select Machine" ), 
+                              WS_CAPTION | WS_POPUPWINDOW | WS_DLGFRAME,
+                              0, 0, 177, 247, /* we'll resize it later based on number of items in it */
+                              fuse_hWnd, 0, fuse_hInstance, 0 );
+  ShowWindow( fuse_hMSWnd, SW_SHOW );
+  UpdateWindow( fuse_hMSWnd );
+
+  /* Resume emulation */
+  fuse_emulation_unpause();
+}
+
 
 void menu_machine_pokefinder( int action ) { STUB; }
 void menu_machine_memorybrowser( int action ) { STUB; }
