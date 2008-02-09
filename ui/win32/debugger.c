@@ -50,22 +50,20 @@ void win32_debugger_done_step();
 void win32_debugger_break();
 
 BOOL CALLBACK DebuggerProc( HWND hWnd, UINT msg,
-			    WPARAM wParam, LPARAM lParam )
+                            WPARAM wParam, LPARAM lParam )
 {
-  switch( msg )
-  {
+  switch( msg ) {
     case WM_COMMAND:
-      switch( LOWORD( wParam ) )
-      {
-	case IDC_BTN_CLOSE:
-	  win32_debugger_done_close();
-	  return TRUE;
-	case IDC_BTN_CONT:
-	  win32_debugger_done_continue();
-	  return TRUE;
-	case IDC_BTN_STEP:
-	  win32_debugger_done_step();
-	  return TRUE;
+      switch( LOWORD( wParam ) ) {
+        case IDC_BTN_CLOSE:
+          win32_debugger_done_close();
+          return TRUE;
+        case IDC_BTN_CONT:
+          win32_debugger_done_continue();
+          return TRUE;
+        case IDC_BTN_STEP:
+          win32_debugger_done_step();
+          return TRUE;
       }
       return FALSE;
     case WM_CLOSE:
@@ -78,8 +76,7 @@ BOOL CALLBACK DebuggerProc( HWND hWnd, UINT msg,
 int
 create_dialog()
 {
-  if (fuse_hDBGWnd == NULL)
-  {
+  if (fuse_hDBGWnd == NULL) {
     fuse_hDBGWnd = CreateDialog( fuse_hInstance, "IDG_DBG", fuse_hWnd,
       (DLGPROC) DebuggerProc );
     win32_verror( fuse_hDBGWnd == NULL );
@@ -101,9 +98,7 @@ create_dialog()
 
     update_pokefinder();
 */
-  }
-  else
-  {
+  } else {
     SetActiveWindow( fuse_hDBGWnd );
   }
   return 0;

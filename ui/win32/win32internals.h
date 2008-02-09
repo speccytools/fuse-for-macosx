@@ -58,4 +58,4 @@ void handle_menu( DWORD cmd, HWND okno );
 
 int win32ui_picture( const char *filename, int border );
 
-#endif				/* #ifndef FUSE_WIN32INTERNALS_H */
+#endif                          /* #ifndef FUSE_WIN32INTERNALS_H */

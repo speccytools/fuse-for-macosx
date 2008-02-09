@@ -2449,3 +2449,5 @@
 	 use Windows Multimedia API header (mmsystem.h) (Marek).
 20080208 ui/win32/win32ui.c: Win32: machine select dialog, minor code
 	 formatting changes (Marek).
+20080209 ui/win32/{debugger.c,error.c,picture.c,pokefinder.c,win32display.c,
+	 win32internals.h,win32keyboard.h,win32ui.c}: formatting fixes (Stuart).

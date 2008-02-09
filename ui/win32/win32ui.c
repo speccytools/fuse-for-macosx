@@ -218,9 +218,7 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
 /*
       RECT r;
-*/
-/*      GetClientRect( fuse_hStatusWindow, &r ); */
-/*
+      GetClientRect( fuse_hStatusWindow, &r );
       int cornerwidth = r.bottom - r.top;
       int parts[2] = { r.right - cornerwidth - 65, r.right - cornerwidth };
       SendMessage( fuse_hStatusWindow, SB_SETPARTS, (WPARAM) 2,
@@ -319,9 +317,9 @@ ui_event( void )
 
     /* Process messages */
     while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
-      if( !IsDialogMessage( fuse_hPFWnd, &msg ) &&
+      if( !IsDialogMessage( fuse_hPFWnd, &msg  ) &&
           !IsDialogMessage( fuse_hDBGWnd, &msg ) &&
-          !IsDialogMessage( fuse_hMSWnd, &msg ) ) {
+          !IsDialogMessage( fuse_hMSWnd, &msg  )    ) {
         if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
           if( msg.message == WM_QUIT ) break;
           /* finish - set exit flag somewhere */
@@ -768,8 +766,7 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
   HWND h_temp_handle;
   int i, pos_y;
 
-  switch( uMsg ) 
-  {
+  switch( uMsg ) {
     case WM_CREATE: 
     {
       h_ms_font = CreateFont( -11, 0, 0, 0, 400, 
@@ -790,8 +787,7 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
         SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
 
         /* check the radiobutton corresponding to current machine */
-        if( machine_current == machine_types[i] )
-        {
+        if( machine_current == machine_types[i] ) {
           selected_machine = i;
           SendMessage( h_temp_handle, BM_SETCHECK, BST_CHECKED, 0 );
         }
@@ -824,12 +820,10 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
       if ( HIWORD( wParam ) != BN_CLICKED ) return 0;
 
       /* service OK and Cancel buttons */
-      switch LOWORD( wParam )
-      {
+      switch LOWORD( wParam ) {
         case IDC_MS_OK:
         {
-          if( machine_types[ selected_machine ] != machine_current )
-          {
+          if( machine_types[ selected_machine ] != machine_current ) {
             machine_select( machine_types[ selected_machine ]->machine );
           }
           fuse_hMSWnd = NULL;
@@ -850,10 +844,8 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
       /* service clicking radiobuttons */
       if( ( LOWORD( wParam ) >= IDC_MS_OFFSET ) &&
-          ( LOWORD( wParam ) < ( IDC_MS_OFFSET + machine_count ) ) )
-      {
-        if( SendMessage( (HWND) lParam, BM_GETCHECK, 0, 0 ) == BST_CHECKED )
-        {
+          ( LOWORD( wParam ) < ( IDC_MS_OFFSET + machine_count ) ) ) {
+        if( SendMessage( (HWND) lParam, BM_GETCHECK, 0, 0 ) == BST_CHECKED ) {
           selected_machine = LOWORD( wParam ) - IDC_MS_OFFSET;
         }
       }
@@ -888,8 +880,7 @@ menu_machine_select( int action )
   wnd_ms.lpszClassName = "fuse_ms"; 
   wnd_ms.hbrBackground = (HBRUSH)( COLOR_MENU+1 );
 
-  if( !RegisterClassEx( &wnd_ms ) )
-  {
+  if( !RegisterClassEx( &wnd_ms ) ) {
     ui_error( UI_ERROR_ERROR, "Couldn't create the Machine Select window" );
     return;
   }
@@ -905,7 +896,6 @@ menu_machine_select( int action )
   /* Resume emulation */
   fuse_emulation_unpause();
 }
-
 
 void menu_machine_pokefinder( int action ) { STUB; }
 void menu_machine_memorybrowser( int action ) { STUB; }

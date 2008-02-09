@@ -48,14 +48,17 @@ ui_error_specific( ui_error_level severity, const char *message )
   switch( severity ) {
 
   case UI_ERROR_INFO:
-    MessageBox(hWnd, message, "Fuse - Info", MB_ICONINFORMATION|MB_OK ); break;
+    MessageBox( hWnd, message, "Fuse - Info", MB_ICONINFORMATION | MB_OK );
+    break;
   case UI_ERROR_WARNING:
-    MessageBox(hWnd, message, "Fuse - Warning", MB_ICONWARNING|MB_OK ); break;
+    MessageBox( hWnd, message, "Fuse - Warning", MB_ICONWARNING | MB_OK );
+    break;
   case UI_ERROR_ERROR:
-    MessageBox(hWnd, message, "Fuse - Error", MB_ICONERROR|MB_OK ); break;
+    MessageBox( hWnd, message, "Fuse - Error", MB_ICONERROR | MB_OK );
+    break;
   default:
-    MessageBox(hWnd, message, "Fuse - (Unknown Error Level)",
-	       MB_ICONINFORMATION|MB_OK );
+    MessageBox( hWnd, message, "Fuse - (Unknown Error Level)",
+                MB_ICONINFORMATION | MB_OK );
     break;
 
   }

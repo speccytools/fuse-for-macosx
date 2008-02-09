@@ -49,12 +49,12 @@ int fuse_nCmdShow;
 libspectrum_word
   win32display_image[ 2 * DISPLAY_SCREEN_HEIGHT ][ DISPLAY_SCREEN_WIDTH ];
 ptrdiff_t win32display_pitch = DISPLAY_SCREEN_WIDTH *
-			       sizeof( libspectrum_word );
+                               sizeof( libspectrum_word );
 
 /* An RGB image of the Spectrum screen; slightly bigger than the real
    screen to handle the smoothing filters which read around each pixel */
 char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
-	                    ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
+                            ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
 
 const int rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
@@ -63,7 +63,7 @@ HBITMAP fuse_BMP;
 
 /* The scaled image */
 char scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
-			    (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
+                            (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
 const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 
 void *win32_pixdata;
@@ -119,7 +119,7 @@ blit( void )
     src_dc = CreateCompatibleDC(0);
     src_bmp = SelectObject( src_dc, fuse_BMP );
     BitBlt( dest_dc, 0, 0, image_width * win32display_current_size,
-	    image_height * win32display_current_size, src_dc, 0, 0, SRCCOPY );
+            image_height * win32display_current_size, src_dc, 0, 0, SRCCOPY );
     SelectObject( src_dc, src_bmp );
     DeleteObject( src_bmp );
     DeleteDC( src_dc );
@@ -127,8 +127,8 @@ blit( void )
 
 /* If BitBlt isn't available:
   SetDIBitsToDevice( dc, 0, 0, dest_rec.right, dest_rec.bottom, 0, 0, 0,
-		       image_height + 100, win32_pixdata, &fuse_BMI,
-		       DIB_RGB_COLORS );
+                       image_height + 100, win32_pixdata, &fuse_BMI,
+                       DIB_RGB_COLORS );
 */
   }
 }
@@ -170,7 +170,7 @@ win32display_init( void )
   HDC dc = GetDC( fuse_hWnd );
 
   fuse_BMP = CreateDIBSection( dc, &fuse_BMI, DIB_RGB_COLORS, &win32_pixdata,
-			       NULL, 0 );
+                               NULL, 0 );
 
   ReleaseDC( fuse_hWnd, dc );
 
@@ -198,14 +198,14 @@ init_colours( void )
 #ifdef WORDS_BIGENDIAN
 
     win32display_colours[i] =  red << 24 | green << 16 | blue << 8;
-	      bw_colours[i] = grey << 24 |  grey << 16 | grey << 8;
+              bw_colours[i] = grey << 24 |  grey << 16 | grey << 8;
 
-#else				/* #ifdef WORDS_BIGENDIAN */
+#else                           /* #ifdef WORDS_BIGENDIAN */
 
     win32display_colours[i] =  red | green << 8 | blue << 16;
-	      bw_colours[i] = grey |  grey << 8 | grey << 16;
+              bw_colours[i] = grey |  grey << 8 | grey << 16;
 
-#endif				/* #ifdef WORDS_BIGENDIAN */
+#endif                          /* #ifdef WORDS_BIGENDIAN */
 
   }
 
@@ -219,7 +219,7 @@ win32display_resize( int size )
 
   /* clear the back buffer */
   memset( win32_pixdata, 0, 4 * 3 * DISPLAY_SCREEN_HEIGHT *
-			    (size_t)( 1.5 * DISPLAY_SCREEN_WIDTH ) );
+                            (size_t)( 1.5 * DISPLAY_SCREEN_WIDTH ) );
 
   newsize = size;
   win32display_sizechanged = 1;
@@ -303,13 +303,13 @@ register_scalers_noresize( void )
       scaler_register( SCALER_NORMAL );
       scaler_register( SCALER_PALTV );
       if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_NORMAL );
+        scaler_select_scaler( SCALER_NORMAL );
       return 0;
     case 2:
       scaler_register( SCALER_HALF );
       scaler_register( SCALER_HALFSKIP );
       if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_HALF );
+        scaler_select_scaler( SCALER_HALF );
       return 0;
     }
 
@@ -326,14 +326,14 @@ register_scalers_noresize( void )
       scaler_register( SCALER_DOTMATRIX );
       scaler_register( SCALER_PALTV2X );
       if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_DOUBLESIZE );
+        scaler_select_scaler( SCALER_DOUBLESIZE );
       return 0;
     case 2:
       scaler_register( SCALER_NORMAL );
       scaler_register( SCALER_TIMEXTV );
       scaler_register( SCALER_PALTV );
       if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_NORMAL );
+        scaler_select_scaler( SCALER_NORMAL );
       return 0;
     }
 
@@ -346,19 +346,19 @@ register_scalers_noresize( void )
       scaler_register( SCALER_ADVMAME3X );
       scaler_register( SCALER_PALTV3X );
       if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_TRIPLESIZE );
+        scaler_select_scaler( SCALER_TRIPLESIZE );
       return 0;
     case 2:
       scaler_register( SCALER_TIMEX1_5X );
       if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_TIMEX1_5X );
+        scaler_select_scaler( SCALER_TIMEX1_5X );
       return 0;
     }
 
   }
 
   ui_error( UI_ERROR_ERROR, "Unknown display size/image size %d/%d",
-	    win32display_current_size, image_scale );
+            win32display_current_size, image_scale );
   return 1;
 }
 
@@ -434,9 +434,9 @@ uidisplay_area( int x, int y, int w, int h )
 
   /* Create scaled image */
   scaler_proc32( &rgb_image[ ( y + 2 ) * rgb_pitch + 4 * ( x + 1 ) ],
-		 rgb_pitch,
-		 &scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
-		 scaled_pitch, w, h );
+                 rgb_pitch,
+                 &scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
+                 scaled_pitch, w, h );
 
   w *= scale; h *= scale;
 
@@ -506,7 +506,7 @@ uidisplay_putpixel( int x, int y, int colour )
    colour `paper' to the screen at ( (8*x) , y ) */
 void
 uidisplay_plot8( int x, int y, libspectrum_byte data,
-		 libspectrum_byte ink, libspectrum_byte paper )
+                 libspectrum_byte ink, libspectrum_byte paper )
 {
   x <<= 3;
 
@@ -548,7 +548,7 @@ uidisplay_plot8( int x, int y, libspectrum_byte data,
    colour `paper' to the screen at ( (16*x) , y ) */
 void
 uidisplay_plot16( int x, int y, libspectrum_word data,
-		  libspectrum_byte ink, libspectrum_byte paper )
+                  libspectrum_byte ink, libspectrum_byte paper )
 {
   int i;
   x <<= 4; y <<= 1;

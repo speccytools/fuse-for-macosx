@@ -31,4 +31,4 @@
 void win32keyboard_keypress( WPARAM wParam, LPARAM lParam );
 void win32keyboard_keyrelease( WPARAM wParam, LPARAM lParam );
 
-#endif			/* #ifndef FUSE_WIN32KEYBOARD_H */
+#endif                  /* #ifndef FUSE_WIN32KEYBOARD_H */

@@ -36,7 +36,7 @@ void win32_pokefinder_close();
 void update_pokefinder( void );
 /*
 void possible_click( GtkCList *clist, gint row, gint column,
-			    GdkEventButton *event, gpointer user_data );
+                     GdkEventButton *event, gpointer user_data );
 */
 
 #define MAX_POSSIBLE 20
@@ -45,28 +45,26 @@ int possible_page[ MAX_POSSIBLE ];
 libspectrum_word possible_offset[ MAX_POSSIBLE ];
 
 BOOL CALLBACK PokefinderProc( HWND hWnd, UINT msg,
-			      WPARAM wParam, LPARAM lParam )
+                              WPARAM wParam, LPARAM lParam )
 {
-  switch( msg )
-  {
+  switch( msg ) {
     case WM_COMMAND:
-      switch( LOWORD( wParam ) )
-      {
-	case IDC_PF_CLOSE:
-	  win32_pokefinder_close();
-	  return TRUE;
-	case IDC_PF_INC:
-	  win32_pokefinder_incremented();
-	  return TRUE;
-	case IDC_PF_DEC:
-	  win32_pokefinder_decremented();
-	  return TRUE;
-	case IDC_PF_SEARCH:
-	  win32_pokefinder_search();
-	  return TRUE;
-	case IDC_PF_RESET:
-	  win32_pokefinder_reset();
-	  return TRUE;
+      switch( LOWORD( wParam ) ) {
+        case IDC_PF_CLOSE:
+          win32_pokefinder_close();
+          return TRUE;
+        case IDC_PF_INC:
+          win32_pokefinder_incremented();
+          return TRUE;
+        case IDC_PF_DEC:
+          win32_pokefinder_decremented();
+          return TRUE;
+        case IDC_PF_SEARCH:
+          win32_pokefinder_search();
+          return TRUE;
+        case IDC_PF_RESET:
+          win32_pokefinder_reset();
+          return TRUE;
       }
       return FALSE;
     case WM_CLOSE:
@@ -102,22 +100,21 @@ update_pokefinder( void )
 
     for( page = 0; page < 8; page++ )
       for( offset = 0; offset < 0x4000; offset++ )
-	    if( pokefinder_possible[page][offset] != -1 )
-	{
-	  possible_page[ which ] = page;
-	  possible_offset[ which ] = offset;
-	  which++;
+            if( pokefinder_possible[page][offset] != -1 ) {
+          possible_page[ which ] = page;
+          possible_offset[ which ] = offset;
+          which++;
 
-	  snprintf( possible_text[0], 128, "%lu", (unsigned long)page );
-	  snprintf( possible_text[1], 128, "0x%04X", (unsigned)offset );
+          snprintf( possible_text[0], 128, "%lu", (unsigned long)page );
+          snprintf( possible_text[1], 128, "0x%04X", (unsigned)offset );
 
-	  lvi.iItem = i;
-	  lvi.iSubItem = 0;
-	  lvi.pszText = possible_text[0];
-	  ListView_InsertItem( hLocListView, &lvi );
-	  ListView_SetItemText( hLocListView, i, 1, possible_text[1]);
-	  i++;
-	}
+          lvi.iItem = i;
+          lvi.iSubItem = 0;
+          lvi.pszText = possible_text[0];
+          ListView_InsertItem( hLocListView, &lvi );
+          ListView_SetItemText( hLocListView, i, 1, possible_text[1]);
+          i++;
+        }
   }
 
   /* set number of possible locations */
@@ -125,7 +122,7 @@ update_pokefinder( void )
   hPossibleLocs = GetDlgItem( fuse_hPFWnd, IDC_PF_LOCATIONS );
 
   snprintf( buffer, 256, "Possible locations: %lu",
-	    (unsigned long)pokefinder_count );
+            (unsigned long)pokefinder_count );
   SendMessage( hPossibleLocs, WM_SETTEXT, 0, (LPARAM) buffer );
 /*
   TODO: why doesn't it display 131072???
@@ -135,8 +132,7 @@ update_pokefinder( void )
 void
 menu_machine_pokefinder( int action )
 {
-  if (fuse_hPFWnd == NULL)
-  {
+  if (fuse_hPFWnd == NULL) {
     fuse_hPFWnd = CreateDialog( fuse_hInstance, "DLG_POKEFINDER", fuse_hWnd,
       (DLGPROC) PokefinderProc );
     win32_verror( fuse_hPFWnd == NULL );
@@ -156,9 +152,7 @@ menu_machine_pokefinder( int action )
     ListView_InsertColumn( hLocListView, 1, &lvc );
 
     update_pokefinder();
-  }
-  else
-  {
+  } else {
     SetActiveWindow( fuse_hPFWnd );
   }
 }
@@ -206,5 +200,5 @@ win32_pokefinder_close()
 }
 
 /* TODO: implement clicking on value in the location
-	 list to set the breakpoint
+         list to set the breakpoint
 */
