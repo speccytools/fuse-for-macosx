@@ -141,7 +141,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   int driver_id = -1;
   static ao_sample_format format = { .bits = 0 };
 
-  // To prevent recursive errors
+  /* To prevent recursive errors */
   static int sound_lowlevel_init_in_progress = 0;
 
   int error;

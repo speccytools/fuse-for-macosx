@@ -23,7 +23,7 @@
 
 */
 
-//#define IDG_DBG 1000
+/* #define IDG_DBG 1000 */
 #define IDC_LV_PC 1001
 #define IDC_LV_STACK 1002
 #define IDC_LV_EVENTS 1003

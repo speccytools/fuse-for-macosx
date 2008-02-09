@@ -286,7 +286,7 @@ WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
     NULL, NULL, hInstance, NULL );
 
-  //init windows controls like status bar
+  /* init windows controls such as the status bar */
   InitCommonControls();
 
   fuse_nCmdShow = nCmdShow;
