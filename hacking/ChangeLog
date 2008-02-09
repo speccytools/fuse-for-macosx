@@ -2442,10 +2442,10 @@
 20080203 ui/win32/{win32ui.c,win32display.[ch]}: allow Win32 window to be
 	 resized (Stuart).
 20080205 sound/win32sound.c: Windows Multimedia API sound route - allows to
-	 have sound on Win32 without the need for DirectX headers (mingw currently
-	 doesn't have them)
-20080205 ui/win32/{picture.{c,rc}}: Win32: fix for keyboard help dialog
+	 have sound on Win32 without the need for DirectX headers (MinGW
+	 currently doesn't have them) (Marek).
+20080205 ui/win32/picture.{c,rc}: Win32: fix for keyboard help dialog (Marek).
 20080206 configure.in,sound/Makefile.am: Win32: make autotools recognize and
-	 use Windows Multimedia API header (mmsystem.h) (Marek)
-20080208 ui/win32/win32ui.c Win32: Machine select dialog,
-	 minor code formatting changes (Marek)
+	 use Windows Multimedia API header (mmsystem.h) (Marek).
+20080208 ui/win32/win32ui.c: Win32: machine select dialog, minor code
+	 formatting changes (Marek).
