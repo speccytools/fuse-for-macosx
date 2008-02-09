@@ -2451,3 +2451,5 @@
 	 formatting changes (Marek).
 20080209 ui/win32/{debugger.c,error.c,picture.c,pokefinder.c,win32display.c,
 	 win32internals.h,win32keyboard.h,win32ui.c}: formatting fixes (Stuart).
+20080209 ui/win32/debugger.rc: Win32: include resource definitions from
+	 debugger.h (Stuart).

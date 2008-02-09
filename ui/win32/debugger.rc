@@ -23,20 +23,9 @@
 
 */
 
-//#define IDG_DBG 1000
-#define IDC_LV_PC 1001
-#define IDC_LV_STACK 1002
-#define IDC_LV_EVENTS 1003
-#define IDC_LV_BPS 1004
-#define IDC_ED_EVAL 1005
-#define IDC_BTN_EVAL 1006
-#define IDC_GRP_MEMMAP 1007
-#define IDC_BTN_STEP 1008
-#define IDC_BTN_CONT 1009
-#define IDC_BTN_BREAK 1010
-#define IDC_BTN_CLOSE 1011
-#define IDC_STC1 1012
+#include "debugger.h"
 
+#define IDC_STC1 1012
 #define IDC_STC2 1013
 #define IDC_STC3 1014
 #define IDC_STC4 1015
@@ -113,15 +102,6 @@
 #define IDC_STC75 1086
 #define IDC_STC76 1087
 #define IDC_STC77 1088
-
-//#define IDM_MENU 400
-#define IDM_DB_VIEW 401
-#define IDM_DB_REG 402
-#define IDM_DB_MEMMAP 403
-#define IDM_DB_BPS 404
-#define IDM_DB_DIS 405
-#define IDM_DB_STACK 406
-#define IDM_DB_EVENTS 407
 
 IDG_DBG DIALOGEX 6,5,522,249
 CAPTION "Fuse - Debugger"
