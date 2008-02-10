@@ -2455,3 +2455,5 @@
 	 debugger.h (Stuart).
 20080209 sound/aosound.c,ui/win32/{debugger.h,win32ui.c}: replace C99-style
 	 '// ...' comments with '/* ... */' comments (Stuart).
+20080210 windres.rc,ui/win32/win32ui.c,ui/win32/machine_select.{h,rc}: Win32:
+	 make Machine Select dialog a modal one (Marek)

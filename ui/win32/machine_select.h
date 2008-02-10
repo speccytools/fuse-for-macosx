@@ -1,7 +1,5 @@
-/* windres.rc: resources for Windows
-   Copyright (c) 2007 Stuart Brady
-
-   $Id$
+/* machine_select.h: Machine Select dialog box
+   Copyright (c) 2008 Marek Januszewski
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,17 +21,7 @@
 
 */
 
-#include "config.h"
-
-win32_icon ICON "winfuse.ico"
-
-#ifdef UI_WIN32
-
-#include "ui/win32/debugger.rc"
-#include "ui/win32/menu_data.rc"
-#include "ui/win32/picture.rc"
-#include "ui/win32/pokefinder.rc"
-#include "ui/win32/win32ui.rc"
-#include "ui/win32/machine_select.rc"
-
-#endif
+#define IDD_MS_DIALOG 1000
+#define IDC_MS_OK 1001
+#define IDC_MS_CANCEL 1002
+#define IDC_MS_OFFSET 1003

@@ -28,6 +28,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "machine_select.h"
 #include "menu.h"
 #include "menu_data.h"
 #include "psg.h"
@@ -50,12 +51,11 @@ HINSTANCE fuse_hInstance;
 HWND fuse_hStatusWindow;
 HWND fuse_hPFWnd;
 HWND fuse_hDBGWnd;
-HWND fuse_hMSWnd = NULL; /* machine select dialog object */
 HFONT h_ms_font = NULL; /* machine select dialog's font object */
 
 int paused = 0;
 int size_paused = 0;
-int selected_machine = 0;
+int selected_machine = 0; /* this variable keeps the currently selected machine in the Machine Select dialog */
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
@@ -318,8 +318,7 @@ ui_event( void )
     /* Process messages */
     while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
       if( !IsDialogMessage( fuse_hPFWnd, &msg  ) &&
-          !IsDialogMessage( fuse_hDBGWnd, &msg ) &&
-          !IsDialogMessage( fuse_hMSWnd, &msg  )    ) {
+          !IsDialogMessage( fuse_hDBGWnd, &msg ) ) {
         if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
           if( msg.message == WM_QUIT ) break;
           /* finish - set exit flag somewhere */
@@ -755,27 +754,16 @@ menu_help_keyboard( int action )
   win32ui_picture( "keyboard.scr", 0 );
 }
 
-LRESULT CALLBACK
-menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+INT_PTR CALLBACK
+menu_machine_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-
-#define IDC_MS_OK     100
-#define IDC_MS_CANCEL 101
-#define IDC_MS_OFFSET 102
 
   HWND h_temp_handle;
   int i, pos_y;
 
   switch( uMsg ) {
-    case WM_CREATE: 
+    case WM_INITDIALOG: 
     {
-      h_ms_font = CreateFont( -11, 0, 0, 0, 400, 
-                              FALSE, FALSE, FALSE, 
-                              1, 400, 0, 0, 0, 
-                              TEXT( "Ms Shell Dlg 2" ) );
-
-      SendMessage( hwnd, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
-
       /* create radio buttons */
       pos_y = 8;
       for( i=0; i<machine_count; i++ ) {
@@ -783,7 +771,7 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
                                       /* no need for WS_GROUP since they're all in the same group */  
                                       WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON,
                                       8, pos_y, 155, 16,
-                                      hwnd, (HMENU) ( IDC_MS_OFFSET + i ), fuse_hInstance, 0 );
+                                      hwndDlg, (HMENU) ( IDC_MS_OFFSET + i ), fuse_hInstance, 0 );
         SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
 
         /* check the radiobutton corresponding to current machine */
@@ -798,22 +786,27 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
       /* create OK and Cancel buttons */
       pos_y += 6;
       h_temp_handle = CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
-                                    WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+                                    WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_DEFPUSHBUTTON,
                                     6, pos_y, 75, 23,
-                                    hwnd, (HMENU) IDC_MS_OK, fuse_hInstance, 0 );
+                                    hwndDlg, (HMENU) IDC_MS_OK, fuse_hInstance, 0 );
       SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
 
       h_temp_handle = CreateWindow( TEXT( "BUTTON" ), TEXT( "&Cancel" ),
                                     WS_VISIBLE | WS_CHILD | WS_TABSTOP,
                                     90, pos_y, 75, 23,
-                                    hwnd, (HMENU) IDC_MS_CANCEL, fuse_hInstance, 0 );
+                                    hwndDlg, (HMENU) IDC_MS_CANCEL, fuse_hInstance, 0 );
       SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
       
       pos_y += 54;
       /* the following will only change the size of the window */
-      SetWindowPos( hwnd, NULL, 0, 0, 177, pos_y, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+      SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
       
-      return 0; 
+      return TRUE;
+    }
+    case WM_SETFONT:
+    {
+      h_ms_font = (HFONT) wParam;
+      return TRUE;
     }
     case WM_COMMAND:
     {
@@ -826,19 +819,13 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
           if( machine_types[ selected_machine ] != machine_current ) {
             machine_select( machine_types[ selected_machine ]->machine );
           }
-          fuse_hMSWnd = NULL;
-          DestroyWindow( hwnd );
-          DeleteObject( h_ms_font ); /* delete the font object */
-          UnregisterClass( "fuse_ms", fuse_hInstance );
-          return 0;
+          EndDialog( hwndDlg, 0 );
+          return TRUE;
         }
         case IDC_MS_CANCEL:
         {
-          fuse_hMSWnd = NULL;
-          DestroyWindow( hwnd );
-          DeleteObject( h_ms_font ); /* delete the font object */
-          UnregisterClass( "fuse_ms", fuse_hInstance );
-          return 0;
+          EndDialog( hwndDlg, 0 );
+          return TRUE;
         }
       }
 
@@ -848,50 +835,32 @@ menu_machine_select_proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
         if( SendMessage( (HWND) lParam, BM_GETCHECK, 0, 0 ) == BST_CHECKED ) {
           selected_machine = LOWORD( wParam ) - IDC_MS_OFFSET;
         }
+        return TRUE;
       }
     }
-    default: 
-      return DefWindowProc( hwnd, uMsg, wParam, lParam ); 
+    case WM_DESTROY:
+    {
+      EndDialog( hwndDlg, 0 );
+      return TRUE;
+    }
   }
+  return FALSE;
 }
 
 void
 menu_machine_select( int action )
 {
   /* FIXME: fix accelerators for this window */
-  /* FIXME: this needs to be a modal dialog (currently is modeless) */
   /* FIXME: choosing spectrum SE crashes Fuse sound_frame () at sound.c:477 "ay_change[f].ofs = ( ay_change[f].tstates * sfreq ) / cpufreq;" */
+  /* FIXME: choosing some Timexes crashes (win32) fuse as well */
   /* FIXME: switching machines changes filter (typically to 1x) */
-
-  WNDCLASSEX wnd_ms;
-
-  if( fuse_hMSWnd != NULL ) return;
 
   /* Stop emulation */
   fuse_emulation_pause();
 
-  /* register the machine select window class */
-  memset( &wnd_ms, 0, sizeof( WNDCLASSEX ) );
-  wnd_ms.cbSize = sizeof( WNDCLASSEX );
-  wnd_ms.style = CS_HREDRAW | CS_VREDRAW;
-  wnd_ms.lpfnWndProc = menu_machine_select_proc; 
-  wnd_ms.hInstance = fuse_hInstance; 
-  wnd_ms.lpszMenuName =  "Fuse - Select Machine"; 
-  wnd_ms.lpszClassName = "fuse_ms"; 
-  wnd_ms.hbrBackground = (HBRUSH)( COLOR_MENU+1 );
-
-  if( !RegisterClassEx( &wnd_ms ) ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't create the Machine Select window" );
-    return;
-  }
-
-  /* create the machine select window */
-  fuse_hMSWnd = CreateWindow( TEXT( "fuse_ms" ), TEXT( "Fuse - Select Machine" ), 
-                              WS_CAPTION | WS_POPUPWINDOW | WS_DLGFRAME,
-                              0, 0, 177, 247, /* we'll resize it later based on number of items in it */
-                              fuse_hWnd, 0, fuse_hInstance, 0 );
-  ShowWindow( fuse_hMSWnd, SW_SHOW );
-  UpdateWindow( fuse_hMSWnd );
+  /* start the machine select dialog box */
+  DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDD_MS_DIALOG ),
+             fuse_hWnd, menu_machine_select_proc );
 
   /* Resume emulation */
   fuse_emulation_unpause();
