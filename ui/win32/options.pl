@@ -45,165 +45,127 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include <libspectrum.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "options.h"
 #include "periph.h"
 #include "settings.h"
 #include "win32internals.h"
 
-void win32_options_close( WPARAM wParam );
-void win32_options_done( void );
-
-CODE
-
-foreach( @dialogs ) {
-    print "static void menu_options_$_->{name}_done( void );";
-}
-
-print << "CODE";
-
-BOOL CALLBACK OptionsProc( HWND hWnd, UINT msg,
-			   WPARAM wParam, LPARAM lParam )
-{
-  switch( msg )
-  {
-    case WM_INITDIALOG:
-      /* FIXME: save the handle returned by LoadIcon() in win32ui.c */
-      SendMessage( hWnd, WM_SETICON, ICON_SMALL,
-	(LPARAM)LoadIcon( fuse_hInstance, "win32_icon" ) );
-      return TRUE;
-    case WM_COMMAND:
-      switch( LOWORD( wParam ) )
-      {
-	case IDCANCEL:
-	  win32_options_done();
-	  return TRUE;
 CODE
 
 foreach( @dialogs ) {
     my $idcname = uc( "IDC_OPT_$_->{name}" );
+    my $optname = uc( "OPT_$_->{name}" );
 
-    print << "CODE";
-	case ${idcname}_OK:
-          menu_options_$_->{name}_done();
-	  win32_options_done();
-	  return TRUE;
-	case ${idcname}_CANCEL:
-	  win32_options_done();
-	  return TRUE;
+print << "CODE";
+
+BOOL CALLBACK
+menu_options_$_->{name}_proc( HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+  char buffer[80];
+  buffer[0] = '\\0';		/* Shut gcc up */
+  
+  switch( msg )
+  {
+    case WM_INITDIALOG:
+    {
+      /* FIXME: save the handle returned by LoadIcon() in win32ui.c */
+      SendMessage( hwndDlg, WM_SETICON, ICON_SMALL,
+	(LPARAM)LoadIcon( fuse_hInstance, "win32_icon" ) );
+
+      /* initialize the controls with current settings */
+
+      /* FIXME split *_init and *_done functions out of *_proc function */
 CODE
-}
+
+    foreach my $widget ( @{ $_->{widgets} } ) {
+	my $type = $widget->{type};
+
+	if( $type eq "Checkbox" ) {
+	    my $idcname = uc( "$widget->{value}" );
+        print << "CODE";
+      SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, BM_SETCHECK,
+        settings_current.$widget->{value} ? BST_CHECKED : BST_UNCHECKED, 0 );
+CODE
+	} elsif( $widget->{type} eq "Entry" ) {
+	    my $idcname = uc( "$widget->{value}" );
+        print << "CODE";
+      /* FIXME This is asuming SendDlgItemMessage is not UNICODE */
+      snprintf( buffer, 80, "%d", settings_current.$widget->{value} );
+      SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, WM_SETTEXT,
+        0, (LPARAM) buffer );
+CODE
+	}
+    }
+
+print << "CODE";
+
+      return TRUE;
+    }
+    case WM_COMMAND:
+      switch( LOWORD( wParam ) )
+      {
+	case ${idcname}_OK:
+	{
+          /* Read the controls and apply the settings */
+CODE
+    foreach my $widget ( @{ $_->{widgets} } ) {
+	my $type = $widget->{type};
+
+	if( $type eq "Checkbox" ) {
+	    my $idcname = uc( "$widget->{value}" );
+
+	    print << "CODE";
+          settings_current.$widget->{value} =
+            IsDlgButtonChecked( hwndDlg, IDC_${optname}_${idcname} );
+CODE
+	} elsif( $widget->{type} eq "Entry" ) {
+	    my $idcname = uc( "$widget->{value}" );
+        print << "CODE";
+      /* FIXME This is asuming SendDlgItemMessage is not UNICODE */
+      SendDlgItemMessage( hwndDlg, IDC_${optname}_${idcname}, WM_GETTEXT,
+        80, (LPARAM) buffer );
+      settings_current.$widget->{value} = atoi( buffer );  
+CODE
+	}
+    }
+
+    print "          $_->{posthook}();\n\n" if $_->{posthook};
 
     print << "CODE";
+          display_refresh_all();
+
+	  EndDialog( hwndDlg, 0 );
+	  return TRUE;
+	}
+	case ${idcname}_CANCEL:
+	  EndDialog( hwndDlg, 0 );
+	  return TRUE;
       }
       return FALSE;
     case WM_CLOSE:
-      win32_options_close( wParam );
+      EndDialog( hwndDlg, 0 );
       return TRUE;
   }
   return FALSE;
 }
 
-int
-options_create_dialog( int resource )
-{
-
-  if (fuse_hOptWnd == NULL)
-  {
-/* FIXME: use a modal dialog box:
-    fuse_hOptWnd = DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDG_OPT ),
-			      fuse_hWnd, (DLGPROC) OptionsProc );
- */
-    fuse_hOptWnd = CreateDialog( fuse_hInstance, MAKEINTRESOURCE( resource ),
-				 fuse_hWnd, (DLGPROC) OptionsProc );
-    win32_verror( fuse_hOptWnd == NULL );
-
-    fuse_emulation_pause();
-  }
-  else
-  {
-    SetActiveWindow( fuse_hOptWnd );
-  }
-  return 0;
-}
-
-void
-win32_options_close( WPARAM wParam )
-{
-/*
-  EndDialog( fuse_hOptWnd, wParam );
-*/
-  DestroyWindow( fuse_hOptWnd );
-  fuse_hOptWnd = NULL;
-
-  fuse_emulation_unpause();
-}
-CODE
-
-foreach( @dialogs ) {
-    my $optname = uc( "OPT_$_->{name}" );
-
-    print << "CODE";
-
 void
 menu_options_$_->{name}( int action )
 {
-  options_create_dialog( IDG_$optname );
+  fuse_emulation_pause();
 
-CODE
+  DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDG_$optname ),
+             fuse_hWnd, (DLGPROC) menu_options_$_->{name}_proc );
 
-    foreach my $widget ( @{ $_->{widgets} } ) {
-	my $type = $widget->{type};
-
-	if( $type eq "Checkbox" ) {
-	    my $idcname = uc( "$widget->{value}" );
-
-	    print << "CODE";
-  SendDlgItemMessage( fuse_hOptWnd, IDC_${optname}_${idcname}, BM_SETCHECK,
-    settings_current.$widget->{value} ? BST_CHECKED : BST_UNCHECKED, 0 );
-CODE
-
-	}
-    }
-
-print << "CODE";
+  fuse_emulation_unpause();
 }
 
-static void
-menu_options_$_->{name}_done( void )
-{
 CODE
-
-    foreach my $widget ( @{ $_->{widgets} } ) {
-	my $type = $widget->{type};
-
-	if( $type eq "Checkbox" ) {
-	    my $idcname = uc( "$widget->{value}" );
-
-	    print << "CODE";
-  settings_current.$widget->{value} =
-    IsDlgButtonChecked( fuse_hOptWnd, IDC_${optname}_${idcname} );
-
-CODE
-	}
-    }
-
-    print "  $_->{posthook}();" if $_->{posthook};
+}
 
     print << "CODE";
-    display_refresh_all();
-}
-CODE
 
-    }
-
-print << "CODE";
-
-void
-win32_options_done( void )
-{
-  SendMessage( fuse_hOptWnd, WM_CLOSE, (WPARAM) 0, (LPARAM) 0 );
-}
-
-#endif			/* #ifdef UI_WIN32 */
+#endif                 /* #ifdef UI_WIN32 */
 
 CODE

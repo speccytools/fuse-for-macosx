@@ -704,10 +704,6 @@ menu_file_exit( int action )
   }
 }
 
-void menu_options_general( int action ) { STUB; }
-void menu_options_sound( int action ) { STUB; }
-void menu_options_peripherals( int action ) { STUB; }
-void menu_options_rzx( int action ) { STUB; }
 void menu_options_joysticks_select( int action ) { STUB; }
 
 void

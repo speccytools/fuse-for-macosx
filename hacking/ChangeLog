@@ -2457,3 +2457,6 @@
 	 '// ...' comments with '/* ... */' comments (Stuart).
 20080210 windres.rc,ui/win32/win32ui.c,ui/win32/machine_select.{h,rc}: Win32:
 	 make Machine Select dialog a modal one (Marek)
+20080212 windres.rc,ui/win32/win32ui.c,ui/win32/options-resource.pl,
+	 ui/win32/options-header.pl,ui/win32/options.pl,ui/win32/Makefile.am:
+	 Win32: fix for the 'options' dialogs (Marek)

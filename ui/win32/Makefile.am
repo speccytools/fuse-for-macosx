@@ -34,6 +34,8 @@ libuiwin32_a_SOURCES = debugger.c \
 		       error.c \
 		       keysyms.c \
 		       menu_data.c \
+		       options.c \
+		       options.rc \
 		       picture.c \
 		       pokefinder.rc \
 		       statusbar.c \
@@ -45,7 +47,10 @@ libuiwin32_a_SOURCES = debugger.c \
 BUILT_SOURCES = keysyms.c \
 		menu_data.c \
 		menu_data.rc \
-		menu_data.h
+		menu_data.h \
+		options.c \
+		options.h \
+		options.rc
 
 keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl win32 $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
@@ -58,6 +63,15 @@ menu_data.h: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(src
 
 menu_data.rc: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(srcdir)/../../menu_data.dat ../../config.h
 	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl win32 rc > $@.tmp && mv $@.tmp $@
+
+options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
+
+options.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
+
+options.rc: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-resource.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-resource.pl - > $@.tmp && mv $@.tmp $@
 
 .PHONY: menu_data
 
@@ -76,4 +90,7 @@ noinst_HEADERS = debugger.h \
 CLEANFILES = keysyms.c \
 	     menu_data.c \
 	     menu_data.h \
-	     menu_data.rc
+	     menu_data.rc \
+	     options.c \
+	     options.h \
+	     options.rc

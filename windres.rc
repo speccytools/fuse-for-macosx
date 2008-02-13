@@ -31,6 +31,7 @@ win32_icon ICON "winfuse.ico"
 
 #include "ui/win32/debugger.rc"
 #include "ui/win32/menu_data.rc"
+#include "ui/win32/options.rc"
 #include "ui/win32/picture.rc"
 #include "ui/win32/pokefinder.rc"
 #include "ui/win32/win32ui.rc"

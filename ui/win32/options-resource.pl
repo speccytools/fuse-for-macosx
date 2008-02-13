@@ -3,7 +3,7 @@
 # options-resource.pl: generate options dialog boxes
 # $Id$
 
-# Copyright (c) 2001-2007 Philip Kendall, Stuart Brady
+# Copyright (c) 2001-2007 Philip Kendall, Stuart Brady, Marek Januszewski
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,30 +43,21 @@ CODE
 
 foreach( @dialogs ) {
 
+    my $buffer = ""; # needed because we find out the height at the end at the end
     my $optname = uc( "OPT_$_->{name}" );
     my $y = 5;
-
-    print << "CODE";
-
-IDG_$optname DIALOGEX 6,5,140,245
-  CAPTION "Fuse - $_->{title}"
-  FONT 8,"MS Sans Serif"
-  STYLE WS_POPUP | WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_VISIBLE
-  EXSTYLE 0x00000000
-BEGIN
-CODE
 
     foreach my $widget ( @{ $_->{widgets} } ) {
 
 	my $text = $widget->{text}; $text =~ s/\((.)\)/&$1/;
 	if( $widget->{type} eq "Checkbox" ) {
-	    printf "  AUTOCHECKBOX \"%s\",IDC_%s_%s,5,$y,130,12\n",
+	    $buffer .= sprintf "  AUTOCHECKBOX \"%s\",IDC_%s_%s,5,$y,130,12\n",
 		$text, $optname, uc( $widget->{value}, );
 	    $y += 12;
 	} elsif( $widget->{type} eq "Entry" ) {
-	    printf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y,40,12\n",
+	    $buffer .= sprintf "  LTEXT \"%s\",IDC_%s_LABEL_%s,5,$y,60,12\n",
 		$text, $optname, uc( $widget->{value} );
-	    printf "  EDITTEXT IDC_%s_%s,50,$y,85,10\n",
+	    $buffer .= sprintf "  EDITTEXT IDC_%s_%s,70,$y,85,10\n",
 		$optname, uc( $widget->{value} );
 	    $y += 12;
 	} else {
@@ -76,8 +67,23 @@ CODE
     }
 
     $y += 5;
-    print "\n";
-    printf "  DEFPUSHBUTTON \"OK\",IDC_%s_OK,95,$y,40,13\n", $optname;
-    printf "  PUSHBUTTON \"Cancel\",IDC_%s_CANCEL,50,$y,40,13\n", $optname;
+
+    $buffer .= sprintf "  DEFPUSHBUTTON \"OK\",IDC_%s_OK,40,$y,40,13\n", $optname;
+    $buffer .= sprintf "  PUSHBUTTON \"Cancel\",IDC_%s_CANCEL,85,$y,40,13\n", $optname;
+
+    $y += 13 + 5; #height of the buttons + 5 margin
+   
+    print << "CODE";
+
+IDG_$optname DIALOGEX 6,5,160,$y
+  CAPTION "Fuse - $_->{title}"
+  FONT 8,"Ms Shell Dlg 2",400,0,1
+  STYLE WS_POPUP | WS_CAPTION | WS_BORDER | WS_SYSMENU
+BEGIN
+CODE
+
+    print $buffer;
+
     print "END\n";
+    printf "\n";
 }
