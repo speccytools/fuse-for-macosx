@@ -2460,3 +2460,6 @@
 20080212 windres.rc,ui/win32/win32ui.c,ui/win32/options-resource.pl,
 	 ui/win32/options-header.pl,ui/win32/options.pl,ui/win32/Makefile.am:
 	 Win32: fix for the 'options' dialogs (Marek)
+20080213 windres.rc,ui/win32/win32ui.c,ui/win32/machine_select.{h,rc},
+	 ui/win32/select_template.{h,rc}: Win32: simplification of the Select 
+	 Machine dialog (Marek)

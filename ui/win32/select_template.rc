@@ -1,4 +1,4 @@
-/* machine_select.rc: Machine Select dialog box
+/* select_template.rc: Machine Select dialog box
    Copyright (c) 2008 Marek Januszewski
 
    This program is free software; you can redistribute it and/or modify
@@ -23,14 +23,14 @@
 
 #include <windows.h>
 
-#include "machine_select.h"
+#include "select_template.h"
 
-IDD_MS_DIALOG DIALOGEX 0,0,177,247
+IDD_SELECT_DIALOG DIALOGEX 0,0,177,247
 STYLE DS_MODALFRAME | DS_SETFONT | DS_CENTER | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
-CAPTION "Fuse - Machine Select"
+CAPTION "Fuse - Select"
 FONT 8,"Ms Shell Dlg 2",400,0,1
 BEGIN
 /* those will be generated at runtime on WM_INITDIALOG - easier to control the size and position */
-/*    DEFPUSHBUTTON   "&OK",IDC_MS_OK,6,193,75,23 */
-/*    PUSHBUTTON      "&Cancel",IDC_MS_CANCEL,90,193,75,23 */
+/*    DEFPUSHBUTTON   "&OK",IDC_SELECT_OK,6,193,75,23 */
+/*    PUSHBUTTON      "&Cancel",IDC_SELECT_CANCEL,90,193,75,23 */
 END

@@ -28,12 +28,12 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
-#include "machine_select.h"
 #include "menu.h"
 #include "menu_data.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
+#include "select_template.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "timer/timer.h"
@@ -55,7 +55,6 @@ HFONT h_ms_font = NULL; /* machine select dialog's font object */
 
 int paused = 0;
 int size_paused = 0;
-int selected_machine = 0; /* this variable keeps the currently selected machine in the Machine Select dialog */
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
@@ -751,29 +750,34 @@ menu_help_keyboard( int action )
 }
 
 INT_PTR CALLBACK
-menu_machine_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
+menu_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-
-  HWND h_temp_handle;
   int i, pos_y;
 
-  switch( uMsg ) {
+  switch( uMsg )
+  {
     case WM_INITDIALOG: 
     {
+      /* set the title of the window */
+      SendMessage( hwndDlg, WM_SETTEXT, 0, (LPARAM) TEXT( "Fuse - Select Machine" ) );
+      
       /* create radio buttons */
       pos_y = 8;
-      for( i=0; i<machine_count; i++ ) {
-        h_temp_handle = CreateWindow( TEXT( "BUTTON" ), libspectrum_machine_name( machine_types[i]->machine ),
-                                      /* no need for WS_GROUP since they're all in the same group */  
-                                      WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON,
-                                      8, pos_y, 155, 16,
-                                      hwndDlg, (HMENU) ( IDC_MS_OFFSET + i ), fuse_hInstance, 0 );
-        SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
+      for( i=0; i<machine_count; i++ )
+      {
+        CreateWindow( TEXT( "BUTTON" ), libspectrum_machine_name( machine_types[i]->machine ),
+                      /* no need for WS_GROUP since they're all in the same group */  
+                      WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON,
+                      8, pos_y, 155, 16,
+                      hwndDlg, (HMENU) ( IDC_SELECT_OFFSET + i ), fuse_hInstance, 0 );
+        SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), WM_SETFONT,
+                            (WPARAM) h_ms_font, FALSE );
 
         /* check the radiobutton corresponding to current machine */
-        if( machine_current == machine_types[i] ) {
-          selected_machine = i;
-          SendMessage( h_temp_handle, BM_SETCHECK, BST_CHECKED, 0 );
+        if( machine_current == machine_types[i] )
+        {
+          SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), BM_SETCHECK,
+                              BST_CHECKED, 0 );
         }
 
         pos_y += 16;
@@ -781,21 +785,24 @@ menu_machine_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam 
 
       /* create OK and Cancel buttons */
       pos_y += 6;
-      h_temp_handle = CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
-                                    WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_DEFPUSHBUTTON,
-                                    6, pos_y, 75, 23,
-                                    hwndDlg, (HMENU) IDC_MS_OK, fuse_hInstance, 0 );
-      SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
+      CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
+                    WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_DEFPUSHBUTTON,
+                    6, pos_y, 75, 23,
+                    hwndDlg, (HMENU) IDC_SELECT_OK, fuse_hInstance, 0 );
+      SendDlgItemMessage( hwndDlg, IDC_SELECT_OK, WM_SETFONT,
+                          (WPARAM) h_ms_font, FALSE );
 
-      h_temp_handle = CreateWindow( TEXT( "BUTTON" ), TEXT( "&Cancel" ),
-                                    WS_VISIBLE | WS_CHILD | WS_TABSTOP,
-                                    90, pos_y, 75, 23,
-                                    hwndDlg, (HMENU) IDC_MS_CANCEL, fuse_hInstance, 0 );
-      SendMessage( h_temp_handle, WM_SETFONT, (WPARAM) h_ms_font, FALSE );
+      CreateWindow( TEXT( "BUTTON" ), TEXT( "&Cancel" ),
+                    WS_VISIBLE | WS_CHILD | WS_TABSTOP,
+                    90, pos_y, 75, 23,
+                    hwndDlg, (HMENU) IDC_SELECT_CANCEL, fuse_hInstance, 0 );
+      SendDlgItemMessage( hwndDlg, IDC_SELECT_CANCEL, WM_SETFONT,
+                          (WPARAM) h_ms_font, FALSE );
       
       pos_y += 54;
       /* the following will only change the size of the window */
-      SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+      SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y,
+                    SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
       
       return TRUE;
     }
@@ -809,16 +816,28 @@ menu_machine_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam 
       if ( HIWORD( wParam ) != BN_CLICKED ) return 0;
 
       /* service OK and Cancel buttons */
-      switch LOWORD( wParam ) {
-        case IDC_MS_OK:
+      switch LOWORD( wParam )
+      {
+        case IDC_SELECT_OK:
         {
-          if( machine_types[ selected_machine ] != machine_current ) {
-            machine_select( machine_types[ selected_machine ]->machine );
+          /* check which radiobutton is selected and select the machine */
+          for( i=0; i<machine_count; i++ )
+          {
+            if( SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), 
+                                    BM_GETCHECK, 0, 0 ) == BST_CHECKED )
+            {
+              if( machine_types[ i ] != machine_current )
+              {
+                machine_select( machine_types[ i ]->machine );
+              }
+              break;
+            }
           }
+          
           EndDialog( hwndDlg, 0 );
           return TRUE;
         }
-        case IDC_MS_CANCEL:
+        case IDC_SELECT_CANCEL:
         {
           EndDialog( hwndDlg, 0 );
           return TRUE;
@@ -826,11 +845,9 @@ menu_machine_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam 
       }
 
       /* service clicking radiobuttons */
-      if( ( LOWORD( wParam ) >= IDC_MS_OFFSET ) &&
-          ( LOWORD( wParam ) < ( IDC_MS_OFFSET + machine_count ) ) ) {
-        if( SendMessage( (HWND) lParam, BM_GETCHECK, 0, 0 ) == BST_CHECKED ) {
-          selected_machine = LOWORD( wParam ) - IDC_MS_OFFSET;
-        }
+      if( ( LOWORD( wParam ) >= IDC_SELECT_OFFSET ) &&
+          ( LOWORD( wParam ) < ( IDC_SELECT_OFFSET + machine_count ) ) )
+      {
         return TRUE;
       }
     }
@@ -855,8 +872,8 @@ menu_machine_select( int action )
   fuse_emulation_pause();
 
   /* start the machine select dialog box */
-  DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDD_MS_DIALOG ),
-             fuse_hWnd, menu_machine_select_proc );
+  DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDD_SELECT_DIALOG ),
+             fuse_hWnd, menu_select_proc );
 
   /* Resume emulation */
   fuse_emulation_unpause();

@@ -1,4 +1,4 @@
-/* machine_select.h: Machine Select dialog box
+/* select_template.h: Machine Select dialog box
    Copyright (c) 2008 Marek Januszewski
 
    This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 
 */
 
-#define IDD_MS_DIALOG 1000
-#define IDC_MS_OK 1001
-#define IDC_MS_CANCEL 1002
-#define IDC_MS_OFFSET 1003
+#define IDD_SELECT_DIALOG 1000
+#define IDC_SELECT_OK 1001
+#define IDC_SELECT_CANCEL 1002
+#define IDC_SELECT_OFFSET 1003
