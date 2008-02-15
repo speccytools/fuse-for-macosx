@@ -56,6 +56,18 @@ HFONT h_ms_font = NULL; /* machine select dialog's font object */
 int paused = 0;
 int size_paused = 0;
 
+typedef struct win32ui_select_info {
+
+  int length;
+  int selected;
+  const char **labels;
+  TCHAR *dialog_title;
+
+} win32ui_select_info;
+
+int
+selector_dialog( win32ui_select_info *items );
+
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
 int
@@ -417,8 +429,62 @@ menu_select_roms_with_title( const char *title, size_t start, size_t count )
 scaler_type
 menu_get_scaler( scaler_available_fn selector )
 {
-  STUB;
-  return SCALER_NORMAL;
+	/* FIXME if fuse hasn't been resized prior to opening, Filters... dialog
+	         shows all scalers independently of current window size */
+
+  scaler_type selected_scaler = SCALER_NUM;
+  win32ui_select_info items;
+  int count, i, selection;
+  scaler_type scaler;
+
+  /* Get count of currently applicable scalars first */
+  count = 0; 
+  for( scaler = 0; scaler < SCALER_NUM; scaler++ ) {
+    if( selector( scaler ) ) count++;
+  }
+
+  /* Populate win32ui_select_info */
+  items.dialog_title = TEXT( "Fuse - Select Scaler" );
+  items.labels = malloc( count * sizeof( char * ) );
+  items.length = count; 
+
+  /* Populate the labels with currently applicable scalars */
+  count = 0;
+  
+  for( scaler = 0; scaler < SCALER_NUM; scaler++ ) {
+
+    if( !selector( scaler ) ) continue;
+
+    items.labels[ count ] = scaler_name( scaler );
+
+    if( current_scaler == scaler ) {
+      items.selected = count;
+    }
+
+    count++;
+  }
+
+  /* Start the selection dialog box */
+  selection = selector_dialog( &items );
+  
+  if( selection >= 0 ) {
+    /* Apply the selected scalar */
+    count = 0;
+    
+    for( i = 0; i < SCALER_NUM; i++ ) {
+      if( !selector( i ) ) continue;
+      	
+      if( selection == count ) {
+      	selected_scaler = i;
+      }
+  
+      count++;
+    }
+  }
+	
+  free( items.labels );
+
+  return selected_scaler;
 }
 
 char *
@@ -750,22 +816,27 @@ menu_help_keyboard( int action )
 }
 
 INT_PTR CALLBACK
-menu_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
+selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
   int i, pos_y;
+  win32ui_select_info *items;
+  HWND next_item = NULL;
 
   switch( uMsg )
   {
     case WM_INITDIALOG: 
     {
+      /* items are passed to WM_INITDIALOG as lParam */
+      items = ( win32ui_select_info * ) lParam;
+      
       /* set the title of the window */
-      SendMessage( hwndDlg, WM_SETTEXT, 0, (LPARAM) TEXT( "Fuse - Select Machine" ) );
+      SendMessage( hwndDlg, WM_SETTEXT, 0, (LPARAM) items->dialog_title );
       
       /* create radio buttons */
       pos_y = 8;
-      for( i=0; i<machine_count; i++ )
-      {
-        CreateWindow( TEXT( "BUTTON" ), libspectrum_machine_name( machine_types[i]->machine ),
+      for( i=0; i< items->length; i++ ) {
+
+        CreateWindow( TEXT( "BUTTON" ), items->labels[i],
                       /* no need for WS_GROUP since they're all in the same group */  
                       WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_AUTORADIOBUTTON,
                       8, pos_y, 155, 16,
@@ -773,9 +844,8 @@ menu_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
         SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), WM_SETFONT,
                             (WPARAM) h_ms_font, FALSE );
 
-        /* check the radiobutton corresponding to current machine */
-        if( machine_current == machine_types[i] )
-        {
+        /* check the radiobutton corresponding to current label */
+        if( i == items->selected ) {
           SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), BM_SETCHECK,
                               BST_CHECKED, 0 );
         }
@@ -820,22 +890,18 @@ menu_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       {
         case IDC_SELECT_OK:
         {
-          /* check which radiobutton is selected and select the machine */
-          for( i=0; i<machine_count; i++ )
-          {
+          /* check which radiobutton is selected and return the selection */
+          i = 0;
+          while( ( next_item = GetNextDlgGroupItem( hwndDlg, next_item,
+                                                    FALSE ) ) != NULL ) {
             if( SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), 
-                                    BM_GETCHECK, 0, 0 ) == BST_CHECKED )
-            {
-              if( machine_types[ i ] != machine_current )
-              {
-                machine_select( machine_types[ i ]->machine );
-              }
-              break;
+                                    BM_GETCHECK, 0, 0 ) == BST_CHECKED ) {
+              EndDialog( hwndDlg, i );
+              return TRUE;
             }
+            i++;
           }
-          
-          EndDialog( hwndDlg, 0 );
-          return TRUE;
+          return FALSE; /* program should never reach here */
         }
         case IDC_SELECT_CANCEL:
         {
@@ -843,11 +909,9 @@ menu_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
           return TRUE;
         }
       }
-
       /* service clicking radiobuttons */
-      if( ( LOWORD( wParam ) >= IDC_SELECT_OFFSET ) &&
-          ( LOWORD( wParam ) < ( IDC_SELECT_OFFSET + machine_count ) ) )
-      {
+      /* FIXME should also be checking if wParam < offset + radio count */
+      if( LOWORD( wParam ) >= IDC_SELECT_OFFSET ) {
         return TRUE;
       }
     }
@@ -860,20 +924,56 @@ menu_select_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   return FALSE;
 }
 
+int
+selector_dialog( win32ui_select_info *items )
+{
+  /* selector_dialog will display a modal dialog, with a list of grouped
+     radiobuttons, OK and Cancel buttons. The radiobuttons' labels, their count,
+     current selection and dialog title are provided via win32ui_select_info.
+     The function returns an int corresponding to the selected radiobutton */
+  
+  /* FIXME: fix accelerators for this window */
+  /* FIXME: switching machines changes filter (typically to 1x) */
+
+  return DialogBoxParam( fuse_hInstance, MAKEINTRESOURCE( IDD_SELECT_DIALOG ),
+                         fuse_hWnd, selector_dialog_proc, ( LPARAM )items );
+}
+
 void
 menu_machine_select( int action )
 {
-  /* FIXME: fix accelerators for this window */
   /* FIXME: choosing spectrum SE crashes Fuse sound_frame () at sound.c:477 "ay_change[f].ofs = ( ay_change[f].tstates * sfreq ) / cpufreq;" */
   /* FIXME: choosing some Timexes crashes (win32) fuse as well */
-  /* FIXME: switching machines changes filter (typically to 1x) */
+
+  int selected_machine;
+  win32ui_select_info items;
+  int i;
 
   /* Stop emulation */
   fuse_emulation_pause();
 
+  /* Populate win32ui_select_info */
+  items.dialog_title = TEXT( "Fuse - Select Machine" );
+  items.labels = malloc( machine_count * sizeof( char * ) );
+  items.length = machine_count; 
+
+  for( i=0; i<machine_count; i++ ) {
+
+    items.labels[i] = libspectrum_machine_name( machine_types[i]->machine );
+
+    if( machine_current == machine_types[i] ) {
+      items.selected = i;
+    }
+  }
+
   /* start the machine select dialog box */
-  DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDD_SELECT_DIALOG ),
-             fuse_hWnd, menu_select_proc );
+  selected_machine = selector_dialog( &items );
+  
+  if( machine_types[ selected_machine ] != machine_current ) {
+    machine_select( machine_types[ selected_machine ]->machine );
+  }
+
+  free( items.labels );
 
   /* Resume emulation */
   fuse_emulation_unpause();
