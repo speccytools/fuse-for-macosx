@@ -415,7 +415,7 @@ ui_joystick_poll( void )
 int
 ui_widgets_reset( void )
 {
-  STUB;
+  win32ui_pokefinder_clear();
   return 0;
 }
 
@@ -979,6 +979,5 @@ menu_machine_select( int action )
   fuse_emulation_unpause();
 }
 
-void menu_machine_pokefinder( int action ) { STUB; }
 void menu_machine_memorybrowser( int action ) { STUB; }
 void menu_media_tape_browse( int action ) { STUB; }

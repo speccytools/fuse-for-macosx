@@ -58,4 +58,10 @@ void handle_menu( DWORD cmd, HWND okno );
 
 int win32ui_picture( const char *filename, int border );
 
+/*
+ * Dialog box reset
+ */
+
+void win32ui_pokefinder_clear( void );
+
 #endif                          /* #ifndef FUSE_WIN32INTERNALS_H */

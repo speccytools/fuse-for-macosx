@@ -2465,3 +2465,5 @@
 	 Machine dialog (Marek)
 20080215 ui/win32/win32ui.c: Win32: Implementation of the Filters dialog using a
 	 reusable selector_dialog (Marek)
+20080217 ui/win32/{win32ui.c,pokefinder.{c,rc},win32internals.h,Makefile.am:
+	 Win32: Fixes for pokefinder (Marek)

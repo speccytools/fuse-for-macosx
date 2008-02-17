@@ -37,6 +37,7 @@ libuiwin32_a_SOURCES = debugger.c \
 		       options.c \
 		       options.rc \
 		       picture.c \
+		       pokefinder.c \
 		       pokefinder.rc \
 		       statusbar.c \
 		       win32display.c \
