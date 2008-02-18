@@ -2455,15 +2455,14 @@
 	 debugger.h (Stuart).
 20080209 sound/aosound.c,ui/win32/{debugger.h,win32ui.c}: replace C99-style
 	 '// ...' comments with '/* ... */' comments (Stuart).
-20080210 windres.rc,ui/win32/win32ui.c,ui/win32/machine_select.{h,rc}: Win32:
-	 make Machine Select dialog a modal one (Marek)
-20080212 windres.rc,ui/win32/win32ui.c,ui/win32/options-resource.pl,
-	 ui/win32/options-header.pl,ui/win32/options.pl,ui/win32/Makefile.am:
-	 Win32: fix for the 'options' dialogs (Marek)
-20080213 windres.rc,ui/win32/win32ui.c,ui/win32/machine_select.{h,rc},
-	 ui/win32/select_template.{h,rc}: Win32: simplification of the Select 
-	 Machine dialog (Marek)
-20080215 ui/win32/win32ui.c: Win32: Implementation of the Filters dialog using a
-	 reusable selector_dialog (Marek)
-20080217 ui/win32/{win32ui.c,pokefinder.{c,rc},win32internals.h,Makefile.am:
-	 Win32: Fixes for pokefinder (Marek)
+20080210 windres.rc,ui/win32/{win32ui.c,machine_select.{h,rc}}: Win32:
+	 make Machine Select dialog a modal one (Marek).
+20080212 windres.rc,ui/win32/{win32ui.c,options-resource.pl,options-header.pl,
+	 options.pl,Makefile.am}: Win32: fix for the 'options' dialogs (Marek).
+20080213 windres.rc,ui/win32/{win32ui.c,machine_select.{h,rc},
+	 select_template.{h,rc}}: Win32: simplification of the Select Machine
+	 dialog (Marek).
+20080215 ui/win32/win32ui.c: Win32: implementation of the Filters dialog using a
+	 reusable selector_dialog (Marek).
+20080217 ui/win32/{win32ui.c,pokefinder.{c,rc},win32internals.h,Makefile.am}:
+	 Win32: fixes for pokefinder (Marek).
