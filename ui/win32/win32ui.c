@@ -46,11 +46,6 @@
 
 HACCEL hAccels;
 
-HWND fuse_hWnd;
-HINSTANCE fuse_hInstance;
-HWND fuse_hStatusWindow;
-HWND fuse_hPFWnd;
-HWND fuse_hDBGWnd;
 HFONT h_ms_font = NULL; /* machine select dialog's font object */
 
 int paused = 0;
@@ -764,6 +759,7 @@ void menu_file_savebinarydata( int action ) { STUB; }
 void
 menu_file_exit( int action )
 {
+ /* FIXME: this should really be sending WM_CLOSE, not duplicate code */
   if( win32ui_confirm( "Exit Fuse?" ) ) {
     DestroyWindow(fuse_hWnd);
   }

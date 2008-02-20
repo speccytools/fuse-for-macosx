@@ -34,19 +34,19 @@
 #define ID_STATUSBAR 900
 
 /* window handler */
-extern HWND fuse_hWnd;
+HWND fuse_hWnd;
 
 /* application instance */
-extern HINSTANCE fuse_hInstance;
+HINSTANCE fuse_hInstance;
 
 /* status bar handle */
-extern HWND fuse_hStatusWindow;
+HWND fuse_hStatusWindow;
 
 /* pokefinder window handle */
-extern HWND fuse_hPFWnd;
+HWND fuse_hPFWnd;
 
 /* debugger window handle */
-extern HWND fuse_hDBGWnd;
+HWND fuse_hDBGWnd;
 
 void win32statusbar_create();
 
