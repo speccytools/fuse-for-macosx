@@ -2468,3 +2468,5 @@
 	 Win32: fixes for pokefinder (Marek).
 20080220 ui/win32/{win32ui.c,debugger.{c,h,rc},win32internals.h}: Win32: Partial
 	 implementation of the debugger window (Marek).
+20080221 ui/win32/{debugger.{c,h,rc}}: Win32: implementation of disassembly pane
+	 in the debugger window (Marek).

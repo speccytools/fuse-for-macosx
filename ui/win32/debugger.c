@@ -81,8 +81,8 @@ void toggle_display( void );
 /* int create_register_display( void ); this function is handled by rc */
 /* int create_memory_map( void ); this function is handled by rc */
 int create_breakpoints();
-int create_disassembly( void );
-int create_stack_display( void );
+int create_disassembly();
+int create_stack_display();
 void stack_click( LPNMITEMACTIVATE lpnmitem );
 int create_events();
 void events_click( LPNMITEMACTIVATE lpnmitem );
@@ -92,12 +92,12 @@ void events_click( LPNMITEMACTIVATE lpnmitem );
 int activate_debugger( void );
 int update_memory_map( void );
 int update_breakpoints();
-int update_disassembly( void );
+int update_disassembly();
 int update_events( void );
 void add_event( gpointer data, gpointer user_data GCC_UNUSED );
 int deactivate_debugger( void );
 
-void move_disassembly( void );
+void move_disassembly( WPARAM scroll_command );
 
 void evaluate_command();
 void win32ui_debugger_done_step();
@@ -110,6 +110,11 @@ INT_PTR CALLBACK win32ui_debugger_proc( HWND hWnd, UINT msg,
 
 /* The top line of the current disassembly */
 libspectrum_word disassembly_top;
+
+/* helper constants for disassembly listview's scrollbar */
+const int disassembly_min = 0x0000;
+const int disassembly_max = 0xffff;
+const int disassembly_page = 20;
 
 /* Is the debugger window active (as opposed to the debugger itself)? */
 int debugger_active;
@@ -182,7 +187,7 @@ ui_debugger_deactivate( int interruptable )
 }
 
 int
-create_dialog() /* FIXME: implement */
+create_dialog()
 {
   STUB;
   int error;
@@ -194,9 +199,20 @@ create_dialog() /* FIXME: implement */
 
     error = create_breakpoints(); if( error ) return error;
 
+    error = create_disassembly(); if( error ) return error;
+
     error = create_stack_display(); if( error ) return error;
 
     error = create_events(); if( error ) return error;
+
+    /* Initially, have all the panes visible */
+    for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
+      
+      /* GtkCheckMenuItem *check_item; */
+  
+      check_item = get_pane_menu_item( i ); if( !check_item ) break;
+      /* FIXME: set the menu checkbox for pane( i ) */
+    }
 
   } else {
     SetActiveWindow( fuse_hDBGWnd );
@@ -250,14 +266,52 @@ create_breakpoints()
 }
 
 int
-create_disassembly( void ) /* FIXME: implement */
+create_disassembly()
 {
-  STUB;
+  size_t i;
+
+  TCHAR *disassembly_titles[] = { TEXT( "Address" ), TEXT( "Instruction" ) };
+
+  /* The disassembly listview itself */
+
+  /* set extended listview style to select full row, when an item is selected */
+  DWORD lv_ext_style;
+  lv_ext_style = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
+                                     LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0 ); 
+  lv_ext_style |= LVS_EX_FULLROWSELECT;
+  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
+                      LVM_SETEXTENDEDLISTVIEWSTYLE, 0, lv_ext_style ); 
+
+  /* create columns */
+  LVCOLUMN lvc;
+  lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
+  lvc.fmt = LVCFMT_LEFT;
+
+  for( i = 0; i < 2; i++ ) {
+    if( i != 0 )
+      lvc.mask |= LVCF_SUBITEM;
+    lvc.cx = 60;
+    lvc.pszText = disassembly_titles[i];
+    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC, LVM_INSERTCOLUMN, i,
+                        ( LPARAM ) &lvc );
+  }
+  
+  /* The disassembly scrollbar */
+  SCROLLINFO si;
+  si.cbSize = sizeof(si); 
+  si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE; 
+  si.nPos = 0;
+  si.nMin = disassembly_min;
+  si.nMax = disassembly_max;
+  si.nPage = disassembly_page;
+  SetScrollInfo( GetDlgItem( fuse_hDBGWnd, IDC_DBG_SB_PC ),
+                 SB_CTL, &si, TRUE );
+  
   return 0;
 }
 
 int
-create_stack_display( void )
+create_stack_display()
 {
   size_t i;
   
@@ -457,7 +511,7 @@ ui_debugger_update( void )
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
     _stprintf( format_string, "\n    AY %s", format_8_bit() );
-    length = strlen( buffer );
+    length = _tcslen( buffer );
     _sntprintf( &buffer[length], 1024-length, format_string,
 	        machine_current->ay.current_register );
   }
@@ -511,6 +565,9 @@ ui_debugger_update( void )
   error = update_disassembly(); if( error ) return error;
 
   /* And the stack display */
+  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK,
+                      LVM_DELETEALLITEMS, 0, 0 );
+  
   LV_ITEM lvi;
   lvi.mask = LVIF_TEXT;
 
@@ -543,6 +600,7 @@ ui_debugger_update( void )
 int
 update_memory_map( void )
 {
+  /* FIXME combine _TEXT_ and _REG_ objects, and apply monospace font */
   size_t i;
   TCHAR buffer[ 40 ];
 
@@ -640,7 +698,7 @@ update_breakpoints()
     lvi.iItem = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_BPS,
                                     LVM_GETITEMCOUNT, 0, 0 );
 
-    /* add the breakpoint items */
+    /* append the breakpoint items */
     for( i = 0; i < 6; i++ ) {
       lvi.iSubItem = i;
       lvi.pszText = breakpoint_text[i];
@@ -657,9 +715,42 @@ update_breakpoints()
 }
 
 int
-update_disassembly( void ) /* FIXME: implement */
+update_disassembly()
 {
-  STUB;
+  size_t i, length; libspectrum_word address;
+  TCHAR buffer[80];
+  TCHAR *disassembly_text[2] = { &buffer[0], &buffer[40] };
+
+  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
+                      LVM_DELETEALLITEMS, 0, 0 );
+
+  LV_ITEM lvi;
+  lvi.mask = LVIF_TEXT;
+
+  for( i = 0, address = disassembly_top; i < 20; i++ ) {
+    int l;
+    _sntprintf( disassembly_text[0], 40, format_16_bit(), address );
+    debugger_disassemble( disassembly_text[1], 40, &length, address );
+
+    /* pad to 16 characters (long instruction) to avoid varying width */
+    l = _tcslen( disassembly_text[1] );
+    while( l < 16 ) disassembly_text[1][l++] = ' ';
+    disassembly_text[1][l] = 0;
+
+    address += length;
+
+    /* append the item */
+    lvi.iItem = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
+                                    LVM_GETITEMCOUNT, 0, 0 );
+    lvi.iSubItem = 0;
+    lvi.pszText = disassembly_text[0];
+    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC, LVM_INSERTITEM, 0,
+                        ( LPARAM ) &lvi );
+    lvi.iSubItem = 1;
+    lvi.pszText = disassembly_text[1];
+    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC, LVM_SETITEM, 0,
+                        ( LPARAM ) &lvi );
+  }
 
   return 0;
 }
@@ -681,10 +772,9 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
 {
   event_t *ptr = data;
 
-  char buffer[80];
-  char *event_text[2] = { &buffer[0], &buffer[40] };
+  TCHAR buffer[80];
+  TCHAR *event_text[2] = { &buffer[0], &buffer[40] };
 
-  int i;
   LV_ITEM lvi;
   lvi.mask = LVIF_TEXT;
 
@@ -695,12 +785,9 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
   /* FIXME: event_name() is not unicode compliant */
   _tcsncpy( event_text[1], event_name( ptr->type ), 40 );
 
-  /* get item count */
-  i = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS, LVM_GETITEMCOUNT,
-                          0, 0 );
-
-  /* add the item */
-  lvi.iItem = i;
+  /* append the item */
+  lvi.iItem = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS,
+                                  LVM_GETITEMCOUNT, 0, 0 );
   lvi.iSubItem = 0;
   lvi.pszText = event_text[0];
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS, LVM_INSERTITEM, 0,
@@ -722,17 +809,92 @@ deactivate_debugger( void ) /* FIXME: implement */
 
 /* Set the disassembly to start at 'address' */
 int
-ui_debugger_disassemble( libspectrum_word address ) /* FIXME: implement */
+ui_debugger_disassemble( libspectrum_word address )
 {
-  STUB;
+  SCROLLINFO si;
+  si.cbSize = sizeof(si); 
+  si.fMask = SIF_POS; 
+  si.nPos = disassembly_top = address;
+  SetScrollInfo( GetDlgItem( fuse_hDBGWnd, IDC_DBG_SB_PC ),
+                 SB_CTL, &si, TRUE );
   return 0;
 }
 
 /* Called when the disassembly scrollbar is moved */
 void
-move_disassembly( void ) /* FIXME: implement */
+move_disassembly( WPARAM scroll_command )
 {
-  STUB;
+  SCROLLINFO si;
+  si.cbSize = sizeof(si); 
+  si.fMask = SIF_POS; 
+  GetScrollInfo( GetDlgItem( fuse_hDBGWnd, IDC_DBG_SB_PC ), SB_CTL, &si );
+
+  int value = si.nPos;
+  
+  /* in Windows we have to read the command and scroll the scrollbar manually */
+  switch( LOWORD( scroll_command ) ) {
+    case SB_BOTTOM:
+      value = disassembly_max;
+      break;
+    case SB_TOP:
+      value = disassembly_min;
+      break;
+    case SB_LINEDOWN:
+      value++;
+      break;
+    case SB_LINEUP:
+      value--;
+      break;
+    case SB_PAGEUP:
+      value -= disassembly_page;
+      break;
+    case SB_PAGEDOWN:
+      value += disassembly_page;
+      break;
+    case SB_THUMBPOSITION:
+    case SB_THUMBTRACK:
+      value = HIWORD( scroll_command );
+      break;
+  }
+  if( value > disassembly_max ) value = disassembly_max;
+  if( value < disassembly_min ) value = disassembly_min;
+  /* FIXME when holding sb's down arrow at 0xffff, 0x0000 is showing */
+
+  size_t length;
+
+  /* disassembly_top < value < disassembly_top + 1 => 'down' button pressed
+     Move the disassembly on by one instruction */
+  if( value > disassembly_top && value - disassembly_top < 1 ) {
+
+    debugger_disassemble( NULL, 0, &length, disassembly_top );
+    ui_debugger_disassemble( disassembly_top + length );
+
+  /* disassembly_top - 1 < value < disassembly_top => 'up' button pressed
+     
+     See notes regarding how this function works in GTK's move_disassembly
+  */
+  } else if( value < disassembly_top && disassembly_top - value < 1 ) {
+
+    size_t i, longest = 1;
+
+    for( i = 1; i <= 8; i++ ) {
+
+      debugger_disassemble( NULL, 0, &length, disassembly_top - i );
+      if( length == i ) longest = i;
+
+    }
+
+    ui_debugger_disassemble( disassembly_top - longest );
+
+  /* Anything else, just set disassembly_top to that value */
+  } else {
+
+    ui_debugger_disassemble( value );
+
+  }
+
+  /* And update the disassembly if the debugger is active */
+  if( debugger_active ) update_disassembly();
 }
 
 /* Evaluate the command currently in the entry box */
@@ -790,9 +952,6 @@ win32ui_debugger_break()
 void
 win32ui_debugger_done_close() /* FIXME: implement */
 {
-/* FIXME: does this work? 
-  SendMessage( fuse_hDBGWnd, WM_CLOSE, (WPARAM) 0, (LPARAM) 0 );
-*/
   delete_dialog();
   
   win32ui_debugger_done_continue();
@@ -838,7 +997,13 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
               return TRUE;
           }
       }
-      return FALSE;      
+      return FALSE;
+    case WM_VSCROLL:
+      if( ( HWND ) lParam != NULL ) {
+        move_disassembly( wParam );
+        return 0;
+      }
+      return FALSE;
   }
   return FALSE;
 }
