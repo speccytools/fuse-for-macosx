@@ -327,6 +327,14 @@ gap_add( disk_t *d, int gap, int mark, int gaptype )
 }
 
 static int
+calc_gap_len( disk_t *d, int gap, int mark, int gaptype )
+{
+  disk_gap_t *g = &gaps[ gaptype ];
+  return d->i + g->sync_len + g->len[gap] + 
+	( d->density != DISK_SD ? 3 : 0 ) >= d->bpt;
+}
+
+static int
 preindex_add( disk_t *d, int gap )		/* preindex gap and index mark */
 {
 /*------------------------------ pre-index gap -------------------------------*/
@@ -344,6 +352,18 @@ static int
 postindex_add( disk_t *d, int gap )		/* preindex gap and index mark */
 {
   return gap_add( d, 1, 0xa1, gap );
+}
+
+static int
+preindex_len( disk_t *d, int gap )		/* preindex gap and index mark */
+{
+  return calc_gap_len( d, 0, 0xc2, gap ) + 1;
+}
+
+static int
+postindex_len( disk_t *d, int gap )		/* preindex gap and index mark */
+{
+  return calc_gap_len( d, 1, 0xa1, gap );
 }
 
 static int
@@ -806,8 +826,10 @@ open_fdi( FILE *file, disk_t *d, int preindex )
     fseek( file, head_offset, SEEK_SET );
     if( fread( head, 7, 1, file ) != 1 )	/* 7 := track head  */
       return d->status = DISK_OPEN;
-    bpt = bpt_fm = 0;
-
+    bpt = postindex_len( d, GAP_MINIMAL_MFM ) +
+	  ( preindex ? preindex_len( d, GAP_MINIMAL_MFM ) : 0 ) + 24; /* +gap4 */
+    bpt_fm = postindex_len( d, GAP_MINIMAL_FM ) +
+	     ( preindex ? preindex_len( d, GAP_MINIMAL_FM ) : 0 ) + 12;  /* +gap4 */
     for( j = 0; j < head[0x06]; j++ ) {		/* calculate track len */
       if( j % 35 == 0 ) {				/* 35-sector header */
 	if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
@@ -883,39 +905,56 @@ static int
 open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 {
   int i, j, seclen, gap;
-  int bpt, max_bpt = 0, max_bpt_fm = 0;
+  int bpt, max_bpt = 0, trlen;
 
   d->sides = head[0x31];
   d->cylinders = head[0x30];
-  if( type == DISK_CPC ) {
-    max_bpt = calc_sectorlen( 1, head[0x32] + 256 * head[0x33] - 0x100, GAP_MINIMAL_MFM );
-    max_bpt_fm = calc_sectorlen( 0, head[0x32] + 256 * head[0x33] - 0x100, GAP_MINIMAL_FM );
-  } else {
-    d->bpt = 0;
-    for( i = 0; i < d->sides * d->cylinders; i++ ) {
-      bpt = calc_sectorlen( 1, ( head[ 0x34 + i ] << 8 ) - 0x100, GAP_MINIMAL_MFM );
-      if( bpt > max_bpt )
-        max_bpt = bpt;
-      bpt = calc_sectorlen( 0, ( head[ 0x34 + i ] << 8 ) - 0x100, GAP_MINIMAL_FM );
-      if( bpt > max_bpt_fm )
-        max_bpt_fm = bpt;
+  for( i = 0; i < d->sides*d->cylinders; i++ ) {
+      /* sometimes in the header there are more track than in the file ;( ??? */
+    if( fread( head, 1, 1, file ) != 1 && feof( file ) ) {
+      if( i % d->sides )
+	return d->status = DISK_GEOM;
+      d->cylinders = i / d->sides;	/* the real cylinder number */
+      break;
     }
+    if( fread( head + 1, 255, 1, file ) != 1 ||
+	    memcmp( head, "Track-Info\r\n", 12 ) ) /* read track header */
+	return d->status = DISK_OPEN;
+    gap = (unsigned char)head[0x16] == 0xff ? GAP_MINIMAL_FM :
+    					    GAP_MINIMAL_MFM;
+    trlen = 0;
+    bpt = postindex_len( d, gap ) +
+	    ( preindex ? preindex_len( d, gap ) : 0 ) + 24;
+    for( j = 0; j < head[0x15]; j++ ) {			/* each sector */
+      seclen = type == DISK_ECPC ? head[ 0x1e + 8 * j ] +
+				      256 * head[ 0x1f + 8 * j ]
+				    : 0x80 << head[ 0x1b + 8 * j ];
+      bpt += calc_sectorlen( gap == GAP_MINIMAL_MFM ? 1 : 0, seclen, gap );
+      trlen += seclen;
+    }
+    fseek( file, trlen, SEEK_CUR );
+    if( bpt > max_bpt )
+      max_bpt = bpt;
   }
-  if( max_bpt == 0 || max_bpt_fm == 0 )
+  if( max_bpt == 0 )
     return d->status = DISK_GEOM;
 
   d->density = DISK_DENS_AUTO;			/* disk_alloc use d->bpt */
-  if( max_bpt_fm < 3000 ) {		/* we choose an SD disk with FM */
-    d->bpt = max_bpt_fm;
-  } else {
-    d->bpt = max_bpt;
-  }
+  d->bpt = max_bpt;
   if( disk_alloc( d ) != DISK_OK )
     return d->status;
 
   d->track = d->data; d->clocks = d->track + d->bpt;
+  fseek( file, 256, SEEK_SET );				/* rewind to first track */
   for( i = 0; i < d->sides*d->cylinders; i++ ) {
-    if( fread( head, 256, 1, file ) != 1 ||
+      /* sometimes in the header there are more track than in the file ;( ??? */
+    if( fread( head, 1, 1, file ) != 1 && feof( file ) ) {
+      if( ( i + 1 ) % d->sides )
+	return d->status = DISK_GEOM;
+      d->cylinders = ( i + 1 ) / d->sides;	/* the real cylinder number */
+      break;
+    }
+    if( fread( head + 1, 255, 1, file ) != 1 ||
 	    memcmp( head, "Track-Info\r\n", 12 ) ) /* read track header */
 	return d->status = DISK_OPEN;
     gap = (unsigned char)head[0x16] == 0xff ? GAP_MINIMAL_FM :
@@ -1042,7 +1081,7 @@ open_scl( FILE *file, disk_t *d )
 }
 
 static int
-open_td0( FILE *file, disk_t *d )
+open_td0( FILE *file, disk_t *d, int preindex )
 {
   int i, j, s, sectors, seclen, bpt, gap, mfm, mfm_old;
   int data_offset, track_offset, sector_offset;
@@ -1079,6 +1118,11 @@ open_td0( FILE *file, disk_t *d )
     bpt = 0;
     sector_offset = track_offset + 4;
     mfm = head[2] & 0x80 ? 0 : 1;	/* 0x80 == 1 => SD track */
+    bpt = postindex_len( d, mfm_old || mfm ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM ) +
+	  ( preindex ? 
+	    preindex_len( d, mfm_old || mfm ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM ) :
+	    0 ) +
+	  mfm_old || mfm ? 24 : 12;
     for( s = 0; s < sectors; s++ ) {
       fseek( file, sector_offset, SEEK_SET );
       if( fread( head, 6, 1, file ) != 1 )
@@ -1337,7 +1381,7 @@ disk_open( disk_t *d, const char *filename, int preindex )
     open_scl( file, d );
     break;
   case DISK_TD0:
-    open_td0( file, d );
+    open_td0( file, d, preindex );
     break;
   default:
     fclose( file );
