@@ -56,12 +56,13 @@ typedef enum fdd_dir_t {
 
 typedef struct fdd_t {
   fdd_type_t type;	/* fdd interface Shugart or IBMPC */
+  int auto_geom;	/* change geometry according to loaded disk */
   int fdd_heads;	/* 1 or 2 */
   int fdd_cylinders;	/* 40/40+/80/80+ */
 
   int tr00;		/* track 0 mark */
   int index;		/* index hole */
-  int wrprot;		/* write protect 0 -> write protect */
+  int wrprot;		/* write protect */
   int data;		/* read/write to data byte 0x00nn or 0xffnn */
   
   disk_t *disk;		/* pointer to inserted disk */

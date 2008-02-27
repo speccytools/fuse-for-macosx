@@ -66,7 +66,8 @@ fdd_set_data( fdd_t *d, int fact )
   if( !d->loaded )
     return;
 
-  if( d->unreadable || ( d->disk->sides == 1 && head == 1 ) ) {
+  if( d->unreadable || ( d->disk->sides == 1 && head == 1 ) ||
+      d->c_cylinder >= d->disk->cylinders ) {
     d->disk->track = NULL;
     d->disk->clocks = NULL;
     return;
@@ -78,6 +79,7 @@ fdd_set_data( fdd_t *d, int fact )
   d->disk->i += rand() % ( d->disk->bpt / fact );
   while( d->disk->i >= d->disk->bpt )
     d->disk->i -= d->disk->bpt;
+  d->index = d->disk->i ? 0 : 1;
 }
 
 /* initialise fdd */
@@ -85,12 +87,15 @@ int
 fdd_init( fdd_t *d, int heads, int cyls )
 {
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = d->wrprot = 0;
-  d->upsidedown = d->unreadable = d->loaded = 0; d->index = d->tr00 = 1;
+  d->upsidedown = d->unreadable = d->loaded = d->auto_geom = 0;
+  d->index = d->tr00 = 1;
   d->disk = NULL;
 
   if( heads < 0 || heads > 2 || cyls < 0 || cyls > 83 )
     return d->status = FDD_GEOM;
 
+  if( heads == 0 || cyls == 0 )
+    d->auto_geom = 1;
   d->fdd_heads = heads;
   d->fdd_cylinders = cyls;
 
@@ -105,10 +110,11 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
       disk->cylinders < 0 || disk->cylinders > 83 )
     return d->status = FDD_GEOM;
 
-  if( d->fdd_heads == 0 )
-    d->fdd_heads = disk->sides;
-  if( d->fdd_cylinders == 0 )
-    d->fdd_cylinders = disk->cylinders;
+  if( d->auto_geom )
+    d->fdd_heads = disk->sides;		/* 1 or 2 */
+  if( d->auto_geom )
+    d->fdd_cylinders = disk->cylinders > 42 ? 83 : 42;
+
   if( disk->cylinders > d->fdd_cylinders )
     d->unreadable = 1;
 
@@ -124,7 +130,8 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
 void
 fdd_unload( fdd_t *d )
 {
-  fdd_init( d, d->fdd_heads, d->fdd_cylinders );
+  d->loaded = 0; d->index = 1;
+  d->disk = NULL;
 }
 
 /* change current head */

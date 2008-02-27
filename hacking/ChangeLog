@@ -2481,3 +2481,6 @@
          first 'copy' of the weak sector and fix sector lengths when there are
          weak sectors with multiple images in a file (part of patch #1894441)
          (Gergely Szasz).
+20080227 disk/{fdd.[ch]}: add automatic disk geometry setting from the loaded
+         disk file and set fdd->index if needed (part of patch #1894441)
+         (Gergely Szasz).
