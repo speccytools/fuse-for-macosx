@@ -1755,9 +1755,13 @@ write_log( FILE * file, disk_t * d )
       d->track = d->data + ( ( d->sides * j + i ) * d->tlen );
       d->clocks = d->track + d->bpt;
       d->i = 0;
-      fprintf( file, "*********\nSide: %d, cylinder: %d\n", i, j );
+      fprintf( file, "\n*********\nSide: %d, cylinder: %d\n", i, j );
       while( id_read( d, &h, &t, &s, &b ) ) {
-	fprintf( file, "  h:%d t:%d s:%d l:%d\n", h, t, s, 0x80 << b );
+	fprintf( file, "  h:%d t:%d s:%d l:%d(%d)", h, t, s, b, 0x80 << b );
+	if( datamark_read( d, &del ) )
+	  fprintf( file, " %s\n", del ? "deleted" : "normal" );
+	else
+	  fprintf( file, " noDAM\n" );
       }
     }
   }
@@ -1767,7 +1771,7 @@ write_log( FILE * file, disk_t * d )
       d->track = d->data + ( ( d->sides * j + i ) * d->tlen );
       d->clocks = d->track + d->bpt;
       d->i = 0;
-      fprintf( file, "*********\nSide: %d, cylinder: %d\n", i, j );
+      fprintf( file, "\n*********\nSide: %d, cylinder: %d\n", i, j );
       k = 0;
       while( id_read( d, &h, &t, &s, &b ) ) {
 	b = 0x80 << b;
@@ -1796,7 +1800,7 @@ write_log( FILE * file, disk_t * d )
       d->track = d->data + ( ( d->sides * j + i ) * d->tlen );
       d->clocks = d->track + d->bpt;
       d->i = 0;
-      fprintf( file, "*********\nSide: %d, cylinder: %d\n", i, j );
+      fprintf( file, "\n*********\nSide: %d, cylinder: %d\n", i, j );
       k = 0;
       while( d->i < d->bpt ) {
 	if( !( k % 8 ) )

@@ -2470,3 +2470,5 @@
 	 implementation of the debugger window (Marek).
 20080221 ui/win32/{debugger.{c,h,rc}}: Win32: implementation of disassembly pane
 	 in the debugger window (Marek).
+20080227 disk/disk.c: disk 'log' formatting fixes (part ofpatch #1894441)
+         (Gergely Szasz).
