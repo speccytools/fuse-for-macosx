@@ -434,7 +434,7 @@ datamark_add( disk_t *d, int ddam )
 #define NO_AUTOFILL -1
 /* if 'file' == NULL, then copy data bytes from 'data' */  
 static int
-data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gap, int autofill )
+data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gap, int crc_error, int autofill )
 {
   int length;
   libspectrum_word crc = 0xffff;
@@ -472,6 +472,7 @@ data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gap
     d->i++;
     length++;
   }
+  if( crc_error ) crc ^= 1;	/* mess up CRC */
   d->track[ d->i++ ] = crc >> 8; d->track[ d->i++ ] = crc & 0xff;    /* CRC */
 /*------------------------------     GAP III    ------------------------------*/
 header_crc_error:
@@ -530,7 +531,7 @@ trackgen( disk_t *d, FILE *file, int head, int track,
     d->i = idx + ( pos + i ) * slen;
     if( id_add( d, head, track, s, sector_length >> 8, gap, CRC_OK ) )
       return 1;
-    if( data_add( d, file, NULL, sector_length, NO_DDAM, gap, autofill ) )
+    if( data_add( d, file, NULL, sector_length, NO_DDAM, gap, CRC_OK, autofill ) )
       return 1;
     pos += interleave;
     if( pos >= sectors ) {
@@ -893,7 +894,7 @@ open_fdi( FILE *file, disk_t *d, int preindex )
       data_add( d, file, NULL, ( head[ 0x0b + 7 * ( j % 35 ) ] & 0x3f ) == 0 ? 
 			       -1 : 0x80 << head[ 0x0a + 7 * ( j % 35 ) ],
 		head[ 0x0b + 7 * ( j % 35 ) ] & 0x80 ? DDAM : NO_DDAM,
-		gap, NO_AUTOFILL );
+		gap, CRC_OK, NO_AUTOFILL );
     }
     head_offset += 7 + 7 * head[0x06];
     gap4_add( d, gap );
@@ -966,12 +967,26 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       preindex_add( d, gap );
     postindex_add( d, gap );
     for( j = 0; j < head[0x15]; j++ ) {			/* each sector */
-      seclen = d->type == DISK_ECPC ? head[ 0x1e + 8 * j ] +
+      seclen = type == DISK_ECPC ? head[ 0x1e + 8 * j ] +	/* data length in sector */
 				      256 * head[ 0x1f + 8 * j ]
 				    : 0x80 << head[ 0x1b + 8 * j ];
+
+      if( seclen % ( 0x80 << head[ 0x1b + 8 * j ] ) )		/* seclen == N * len */
+	return d->status = DISK_OPEN;
+
       id_add( d, head[ 0x19 + 8 * j ], head[ 0x18 + 8 * j ],
-		   head[ 0x1a + 8 * j ], seclen >> 8, gap, CRC_OK );
-      data_add( d, file, NULL, seclen, NO_DDAM, gap, 0x00 );	/**FIXME deleted? */
+		   head[ 0x1a + 8 * j ], head[ 0x1b + 8 * j ], gap,
+                  head[ 0x1c + 8 * j ] & 0x20 && !( head[ 0x1d + 8 * j ] & 0x20 ) ? 
+                  CRC_ERROR : CRC_OK );
+      data_add( d, file, NULL, 0x80 << head[ 0x1b + 8 * j ], 
+    		head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
+		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?
+		CRC_ERROR : CRC_OK, 0x00 );
+      if( seclen > 0x80 << head[ 0x1b + 8 * j ] ) {	/* weak sector? */
+        fseek( file, ( seclen / ( 0x80 << head[ 0x1b + 8 * j ] ) - 1 ) * 
+			( 0x80 << head[ 0x1b + 8 * j ] ), SEEK_CUR );	
+						/* ( ( N * len ) / len - 1 ) * len */
+      }
     }
     gap4_add( d, gap );
   }
@@ -1035,7 +1050,7 @@ open_scl( FILE *file, disk_t *d )
     if( j == 256 ) {			/* one sector ready */
       d->i = scl_i + ( ( s - 1 ) % 8 * 2 + ( s - 1 ) / 8 ) * seclen;	/* 1 9 2 10 3 ... */
       id_add( d, 0, 0, s, SECLEN_256, GAP_TRDOS, CRC_OK );
-      data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, NO_AUTOFILL );
+      data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL );
       memset( head, 0, 256 );
       s++;
       j = 0;
@@ -1045,7 +1060,7 @@ open_scl( FILE *file, disk_t *d )
   if( j != 0 ) {	/* we have to add this sector  */
     d->i = scl_i + ( ( s - 1 ) % 8 * 2 + ( s - 1 ) / 8 ) * seclen;	/* 1 9 2 10 3 ... */
     id_add( d, 0, 0, s, SECLEN_256, GAP_TRDOS, CRC_OK );
-    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, NO_AUTOFILL );
+    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL );
     s++;
   }
 			/* and add empty sectors up to No. 16 */
@@ -1065,7 +1080,7 @@ open_scl( FILE *file, disk_t *d )
       head[244] = scl_deleted;	/* number of deleted files */
       memcpy( head + 245, "FUSE-SCL", 8 );
     }
-    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, NO_AUTOFILL );
+    data_add( d, NULL, head, 256, NO_DDAM, GAP_TRDOS, CRC_OK, NO_AUTOFILL );
     if( s == 9 )
       memset( head, 0, 256 );		/* clear sector data... */
   }
@@ -1204,7 +1219,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
 	  return d->status = DISK_OPEN;
 	}
 	if( data_add( d, file, NULL, head[6] + 256 * head[7] - 1,
-		      head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
+		      head[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL ) ) {
 	  if( buff )
 	    free( buff );
 	  return d->status = DISK_OPEN;
@@ -1229,7 +1244,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
 	  i += 2 * ( head[9] + 256 * head[10] );
 	}
 	if( data_add( d, NULL, buff, head[6] + 256 * head[7] - 1,
-		      head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
+		      head[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL ) ) {
 	  free( buff );
 	  return d->status = DISK_OPEN;
 	}
@@ -1268,7 +1283,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
 	  }
 	}
 	if( data_add( d, NULL, buff, head[6] + 256 * head[7] - 1,
-	      head[4] & 0x04 ? DDAM : NO_DDAM, gap, NO_AUTOFILL ) ) {
+	      head[4] & 0x04 ? DDAM : NO_DDAM, gap, CRC_OK, NO_AUTOFILL ) ) {
 	  free( buff );
 	  return d->status = DISK_OPEN;
 	}

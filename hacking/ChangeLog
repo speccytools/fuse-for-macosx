@@ -2477,3 +2477,7 @@
 20080227 disk/disk.c: track length calculation fixes (include gap lengths and
          use sector headers rather than file header lengths (part of patch
          #1894441) (Gergely Szasz).
+20080227 disk/disk.c: add support for DSK/EDSK files with weak sectors, use the
+         first 'copy' of the weak sector and fix sector lengths when there are
+         weak sectors with multiple images in a file (part of patch #1894441)
+         (Gergely Szasz).
