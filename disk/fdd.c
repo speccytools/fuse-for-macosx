@@ -28,7 +28,11 @@
 #include <libspectrum.h>
 
 #include "bitmap.h"
+#include "compat.h"
+#include "event.h"
 #include "fdd.h"
+#include "machine.h"
+#include "spectrum.h"
 
 #define FDD_LOAD_FACT 2
 #define FDD_HEAD_FACT 16
@@ -84,12 +88,13 @@ fdd_set_data( fdd_t *d, int fact )
 
 /* initialise fdd */
 int
-fdd_init( fdd_t *d, int heads, int cyls )
+fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls )
 {
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = d->wrprot = 0;
-  d->upsidedown = d->unreadable = d->loaded = d->auto_geom = 0;
+  d->upsidedown = d->unreadable = d->loaded = d->auto_geom = d->selected = 0;
   d->index = d->tr00 = 1;
   d->disk = NULL;
+  d->type = type;
 
   if( heads < 0 || heads > 2 || cyls < 0 || cyls > 83 )
     return d->status = FDD_GEOM;
@@ -101,6 +106,63 @@ fdd_init( fdd_t *d, int heads, int cyls )
 
   return d->status = DISK_OK;
 }
+
+void
+fdd_motoron( fdd_t *d, int on )
+{
+  if( !d->loaded )
+    return;
+  on = on > 0 ? 1 : 0;
+  if( d->motoron == on )
+    return;
+  d->motoron = on;
+  /*
+  TEAC FD55 Spec:
+  (13) READY output signal
+    i)	The FDD is powered on.
+    ii)	Disk is installed.
+    iii)The disk rotates at more than 50% of the rated speed.
+    iv) Two index pulses have been counted after item iii) is
+	satisfied
+    
+    Note: Pre-ready is the state that at least one INDEX
+	pulse has been detected after item iii) is satisfied
+  */
+  event_remove_type( EVENT_TYPE_FDD_MOTOR );		/* remove pending motor-on event */
+  if( on ) {
+    event_add_with_data( tstates + 4 *			/* 2 revolution: 2 * 200 / 1000 */
+			 machine_current->timings.processor_speed / 10,
+			 EVENT_TYPE_FDD_MOTOR, d );
+  } else {
+    event_add_with_data( tstates + 2 *			/* 1 revolution */
+			 machine_current->timings.processor_speed / 10,
+			 EVENT_TYPE_FDD_MOTOR, d );
+  }
+}
+
+void
+fdd_head_load( fdd_t *d, int load )
+{
+  if( !d->loaded )
+    return;
+
+  d->loadhead = load > 0 ? 1 : 0;
+}
+
+void
+fdd_select( fdd_t *d, int select )
+{
+  d->selected = select > 0 ? 1 : 0;
+  /*
+      ... Drive Select when activated to a logical
+      zero level, will load the R/W head against the
+      diskette enabling contact of the R/W head against
+      the media. ...
+  */
+  if( d->type == FDD_SHUGART )
+    fdd_head_load( d, d->selected );
+}
+
 
 /* load a disk into fdd */
 int
@@ -122,6 +184,8 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
   d->upsidedown = upsidedown > 0 ? 1 : 0;
   d->wrprot = d->disk->wrprot;		/* write protect */
   d->loaded = 1;
+  if( d->type == FDD_SHUGART && d->selected )
+    fdd_head_load( d, 1 );
 
   fdd_set_data( d, FDD_LOAD_FACT );
   return d->status = DISK_OK;
@@ -132,6 +196,8 @@ fdd_unload( fdd_t *d )
 {
   d->loaded = 0; d->index = 1;
   d->disk = NULL;
+  if( d->type == FDD_SHUGART && d->selected )
+    fdd_head_load( d, 0 );
 }
 
 /* change current head */
@@ -172,8 +238,17 @@ fdd_step( fdd_t *d, fdd_dir_t direction )
 int
 fdd_read_write_data( fdd_t *d, fdd_write_t write )
 {
-  if( !d->loaded )
+  if( !d->selected || !d->ready || !d->loadhead ) {
+    if( d->loaded && d->motoron ) {			/* spin the disk */
+      d->disk->i++;
+      if( d->disk->i >= d->disk->bpt ) {
+        d->disk->i = 0;
+	d->index = 1;
+      } else
+        d->index = 0;
+    }
     return d->status = FDD_OK;
+  }
 
   if( d->disk->i >= d->disk->bpt ) {		/* next data byte */
     d->disk->i = 0;
@@ -221,9 +296,18 @@ fdd_wrprot( fdd_t *d, int wrprot )
 void
 fdd_wait_index_hole( fdd_t *d )
 {
-  if( !d->loaded )
+  if( !d->selected || !d->ready )
     return;
 
   d->disk->i = 0;
   d->index = 1;
+}
+
+int
+fdd_event( libspectrum_dword last_tstates GCC_UNUSED, event_type event,
+	      void *user_data ) 
+{
+  fdd_t *d = user_data;
+  d->ready = ( d->motoron & d->loaded );	/* 0x01 & 0x01 */
+  return 0;
 }

@@ -116,19 +116,31 @@ beta_memory_map( void )
   memory_map_read[1] = memory_map_write[1] = memory_map_romcs[ 1 ];
 }
 
+static void
+beta_select_drive( int i )
+{
+  if( beta_fdc->current_drive != &beta_drives[ i & 0x03 ] ) {
+    if( beta_fdc->current_drive != NULL )
+      fdd_select( &beta_fdc->current_drive->fdd, 0 );
+    beta_fdc->current_drive = &beta_drives[ i & 0x03 ];
+    fdd_select( &beta_fdc->current_drive->fdd, 1 );
+  }
+}
+
 int
 beta_init( void )
 {
   int i;
   wd_fdc_drive *d;
   
-  beta_fdc = wd_fdc_alloc_fdc( FD1793 );
-  beta_fdc->current_drive = &beta_drives[ 0 ];
+  beta_fdc = wd_fdc_alloc_fdc( FD1793, 0, WD_FLAG_BETA128 );
+  beta_fdc->current_drive = NULL;
 
   for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
     d = &beta_drives[ i ];
-    fdd_init( &d->fdd, 0, 0 );		/* drive geometry 'autodetect' */
+    fdd_init( &d->fdd, FDD_SHUGART, 0, 0 );	/* drive geometry 'autodetect' */
   }
+  beta_select_drive( 0 );
 
   beta_fdc->dden = 1;
   beta_fdc->set_intrq = NULL;
@@ -198,7 +210,7 @@ beta_reset( int hard_reset GCC_UNUSED )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
 		    !beta_drives[ BETA_DRIVE_D ].fdd.wrprot );
 
-  beta_fdc->current_drive = &beta_drives[ 0 ];
+  beta_select_drive( 0 );
   machine_current->memory_map();
   beta_event_index( 0 );
 
@@ -283,10 +295,11 @@ void
 beta_sp_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   if( !beta_active ) return;
-
-  beta_fdc->current_drive = &beta_drives[ b & 0x03 ];
+  
   /* reset 0x04 and then set it to reset controller */
+  beta_select_drive( b & 0x03 );
   /* 0x08 = block hlt, normally set */
+  wd_fdc_set_hlt( beta_fdc, ( ( b & 0x08 ) ? 1 : 0 ) );
   fdd_set_head( &beta_fdc->current_drive->fdd, ( ( b & 0x10 ) ? 0 : 1 ) );
   /* 0x20 = density, reset = FM, set = MFM */
   beta_fdc->dden = b & 0x20 ? 1 : 0;

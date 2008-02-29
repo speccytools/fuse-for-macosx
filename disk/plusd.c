@@ -123,14 +123,15 @@ plusd_init( void )
   int i;
   wd_fdc_drive *d;
 
-  plusd_fdc = wd_fdc_alloc_fdc( WD1770 );
-  plusd_fdc->current_drive = &plusd_drives[ 0 ];
+  plusd_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
-    fdd_init( &d->fdd, 0, 0 );		/* drive geometry 'autodetect' */
+    fdd_init( &d->fdd, FDD_SHUGART, 0, 0 );	/* drive geometry 'autodetect' */
   }
 
+  plusd_fdc->current_drive = &plusd_drives[ 0 ];
+  fdd_select( &plusd_drives[ 0 ].fdd, 1 );
   plusd_fdc->dden = 1;
   plusd_fdc->set_intrq = NULL;
   plusd_fdc->reset_intrq = NULL;
@@ -198,6 +199,7 @@ plusd_reset( int hard_reset )
 		    !plusd_drives[ PLUSD_DRIVE_2 ].fdd.wrprot );
 
   plusd_fdc->current_drive = &plusd_drives[ 0 ];
+  fdd_select( &plusd_drives[ 0 ].fdd, 1 );
   machine_current->memory_map();
   plusd_event_index( 0 );
 
@@ -292,11 +294,12 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   side = ( b & 0x80 ) ? 1 : 0;
 
   /* TODO: set current_drive to NULL when bits 0 and 1 of b are '00' or '11' */
-  plusd_fdc->current_drive = &plusd_drives[ drive ];
-
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     fdd_set_head( &plusd_drives[ i ].fdd, side );
   }
+  fdd_select( &plusd_drives[ (!drive) ].fdd, 0 );
+  fdd_select( &plusd_drives[ drive ].fdd, 1 );
+  plusd_fdc->current_drive = &plusd_drives[ drive ];
 
   printer_parallel_strobe_write( b & 0x40 );
 }

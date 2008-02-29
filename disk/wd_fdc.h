@@ -44,6 +44,10 @@ static const int WD_FDC_SR_LOST    = 1<<2; /* Lost data */
 static const int WD_FDC_SR_IDX_DRQ = 1<<1; /* Index pulse / Data request */
 static const int WD_FDC_SR_BUSY    = 1<<0; /* Busy (command under execution) */
 
+static const int WD_FLAG_NONE      = 0;
+static const int WD_FLAG_BETA128   = 1<<0; /* Beta128 connects HLD output pin to READY input pin and
+					      MOTOR ON pin on FDD interface */
+
 typedef enum wd_type_t {
   WD1773 = 0,		/* WD1773 */
   FD1793,
@@ -74,6 +78,14 @@ typedef struct wd_fdc {
   int intrq;			/* INTRQ line status */
   int datarq;			/* DRQ line status */
   int head_load;		/* WD1773/FD1793 */
+  int hlt;			/* WD1773/FD1793 Head Load Timing input pin */
+  int hlt_time;			/* "... When a logic high is found on the HLT input
+				   the head is assumed to be enganged. It is typically
+				   derived from a 1 shot triggered by HLD ..."
+				   if hlt_time > 0 it means trigger time in ms, if = 0
+				   then hlt should be set with wd_fdc_set_hlt()  */
+  unsigned int flags;		/* Beta128 connects HLD output pin to READY input pin and
+				   MOTOR ON pin on FDD interface */
 
   enum wd_fdc_state {
     WD_FDC_STATE_NONE = 0,
@@ -86,6 +98,8 @@ typedef struct wd_fdc {
     WD_FDC_STATE_WRITETRACK,
     WD_FDC_STATE_READID,
   } state;
+
+  int read_id;			/* FDC try to read a DAM */
 
   enum wd_fdc_status_type {
     WD_FDC_STATUS_TYPE1,
@@ -129,7 +143,7 @@ typedef struct wd_fdc {
 } wd_fdc;
 
 /* allocate an fdc */
-wd_fdc *wd_fdc_alloc_fdc( wd_type_t type );
+wd_fdc *wd_fdc_alloc_fdc( wd_type_t type, int hlt_time, unsigned int flags );
 void wd_fdc_master_reset( wd_fdc *f );
 
 libspectrum_byte wd_fdc_sr_read( wd_fdc *f );
@@ -148,6 +162,7 @@ void wd_fdc_set_intrq( wd_fdc *f );
 void wd_fdc_reset_intrq( wd_fdc *f );
 void wd_fdc_set_datarq( wd_fdc *f );
 void wd_fdc_reset_datarq( wd_fdc *f );
+void wd_fdc_set_hlt( wd_fdc *f, int hlt );
 
 int wd_fdc_event( libspectrum_dword last_tstates, event_type event, void *user_data );
 
