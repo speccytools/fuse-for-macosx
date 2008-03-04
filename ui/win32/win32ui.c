@@ -975,5 +975,4 @@ menu_machine_select( int action )
   fuse_emulation_unpause();
 }
 
-void menu_machine_memorybrowser( int action ) { STUB; }
 void menu_media_tape_browse( int action ) { STUB; }

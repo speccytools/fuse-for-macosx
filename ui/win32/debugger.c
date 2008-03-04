@@ -187,10 +187,10 @@ ui_debugger_deactivate( int interruptable )
 }
 
 int
-create_dialog()
+create_dialog() /* FIXME: implement */
 {
-  STUB;
   int error;
+  debugger_pane i;
 
   if ( fuse_hDBGWnd == NULL ) {
 
@@ -208,9 +208,11 @@ create_dialog()
     /* Initially, have all the panes visible */
     for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
       
-      /* GtkCheckMenuItem *check_item; */
+    /*
+      GtkCheckMenuItem *check_item;
   
       check_item = get_pane_menu_item( i ); if( !check_item ) break;
+    */
       /* FIXME: set the menu checkbox for pane( i ) */
     }
 

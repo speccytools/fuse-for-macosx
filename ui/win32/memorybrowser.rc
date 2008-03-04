@@ -1,5 +1,5 @@
-/* windres.rc: resources for Windows
-   Copyright (c) 2007 Stuart Brady
+/* memorybrowser.rc: the Win32 memory browser
+   Copyright (c) 2008 Marek Januszewski
 
    $Id$
 
@@ -23,19 +23,19 @@
 
 */
 
-#include "config.h"
+#include <windows.h>
 
-win32_icon ICON "winfuse.ico"
+#include "memorybrowser.h"
 
-#ifdef UI_WIN32
-
-#include "ui/win32/debugger.rc"
-#include "ui/win32/memorybrowser.rc"
-#include "ui/win32/menu_data.rc"
-#include "ui/win32/options.rc"
-#include "ui/win32/picture.rc"
-#include "ui/win32/pokefinder.rc"
-#include "ui/win32/select_template.rc"
-#include "ui/win32/win32ui.rc"
-
-#endif
+IDD_MEM DIALOGEX DISCARDABLE 0,0,371,224
+CAPTION "Fuse - Memory Browser"
+FONT 8,"MS Sans Serif"
+STYLE WS_POPUP | WS_CAPTION | WS_VISIBLE | WS_SYSMENU
+BEGIN
+  CONTROL	"", IDC_MEM_LV, "SysListView32", \
+                WS_CHILD | WS_VISIBLE | LVS_REPORT | \
+                LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSCROLL, \
+                0,0,360,200, WS_EX_CLIENTEDGE
+  SCROLLBAR     IDC_MEM_SB, 360,0,11,195, WS_CHILD | SBS_VERT
+  PUSHBUTTON	"&Close", IDC_MEM_BTN_CLOSE, 315,205,51,14
+END

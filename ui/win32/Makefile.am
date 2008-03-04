@@ -33,6 +33,8 @@ libuiwin32_a_SOURCES = debugger.c \
 		       debugger.rc \
 		       error.c \
 		       keysyms.c \
+		       memorybrowser.c \
+		       memorybrowser.rc \
 		       menu_data.c \
 		       options.c \
 		       options.rc \
@@ -83,6 +85,7 @@ DIST_SUBDIRS = icons
 noinst_HEADERS = debugger.h \
 		 picture.h \
 		 pokefinder.h \
+		 memorybrowser.h \
 		 menu_data.h \
 		 win32display.h \
 		 win32internals.h \

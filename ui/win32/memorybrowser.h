@@ -1,5 +1,5 @@
-/* windres.rc: resources for Windows
-   Copyright (c) 2007 Stuart Brady
+/* memorybrowser.h: the Win32 memory browser
+   Copyright (c) 2008 Marek Januszewski
 
    $Id$
 
@@ -23,19 +23,7 @@
 
 */
 
-#include "config.h"
-
-win32_icon ICON "winfuse.ico"
-
-#ifdef UI_WIN32
-
-#include "ui/win32/debugger.rc"
-#include "ui/win32/memorybrowser.rc"
-#include "ui/win32/menu_data.rc"
-#include "ui/win32/options.rc"
-#include "ui/win32/picture.rc"
-#include "ui/win32/pokefinder.rc"
-#include "ui/win32/select_template.rc"
-#include "ui/win32/win32ui.rc"
-
-#endif
+#define IDD_MEM				4000
+#define IDC_MEM_LV			4001
+#define IDC_MEM_SB			4002
+#define IDC_MEM_BTN_CLOSE		4003
