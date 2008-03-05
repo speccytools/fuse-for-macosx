@@ -2492,3 +2492,5 @@
 20080304 windres.rc,ui/win32/{memorybrowser.{c,h,rc},win32ui.c,debugger.c,
 	 Makefile.am}: Win32: Initial implementation of the Memory Browser
 	 dialog (Marek).
+20080306 disk/plusd.c,if1.c,machine.[ch]: refactor loading custom ROMs from
+         snapshots for +D and Interface 1 (Fred).

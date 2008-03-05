@@ -255,14 +255,46 @@ machine_select_machine( fuse_machine_info *machine )
   return 0;
 }
 
+int
+machine_load_rom_bank_from_buffer( memory_page* bank_map, size_t which,
+                                   int page_num, unsigned char *buffer,
+                                   size_t length, int custom )
+{
+  size_t i, offset;
+  
+  bank_map[ which ].offset = 0;
+  bank_map[ which ].page_num = page_num;
+  bank_map[ which ].page = memory_pool_allocate( length );
+  if( !bank_map[ which ].page ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+              __LINE__ );
+    return 1;
+  }
+
+  memcpy( bank_map[ which ].page, buffer, length );
+  bank_map[ which ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
+                                      MEMORY_SOURCE_SYSTEM;
+
+  for( i = 1, offset = MEMORY_PAGE_SIZE;
+       offset < length;
+       i++, offset += MEMORY_PAGE_SIZE   ) {
+    bank_map[ which + i ].offset = offset;
+    bank_map[ which + i ].page_num = page_num;
+    bank_map[ which + i ].page = bank_map[ which ].page + offset;
+    bank_map[ which + i ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
+                                            MEMORY_SOURCE_SYSTEM;
+  }
+
+  return 0;
+}
+
 static int
-machine_load_rom_bank_internal( memory_page* bank_map, size_t which, int page_num,
-                                const char *filename, size_t expected_length,
-                                int custom )
+machine_load_rom_bank_from_file( memory_page* bank_map, size_t which,
+                                 int page_num, const char *filename,
+                                 size_t expected_length, int custom )
 {
   int fd, error;
   utils_file rom;
-  size_t i, offset;
 
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_ROM );
   if( fd == -1 ) {
@@ -282,31 +314,12 @@ machine_load_rom_bank_internal( memory_page* bank_map, size_t which, int page_nu
     return 1;
   }
 
-  bank_map[ which ].offset = 0;
-  bank_map[ which ].page_num = page_num;
-  bank_map[ which ].page = memory_pool_allocate( rom.length );
-  if( !bank_map[ which ].page ) {
-    utils_close_file( &rom );
-    return 1;
-  }
+  error = machine_load_rom_bank_from_buffer( bank_map, which, page_num,
+                                             rom.buffer, rom.length, custom );
 
-  memcpy( bank_map[ which ].page, rom.buffer, rom.length );
-  bank_map[ which ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
-                                      MEMORY_SOURCE_SYSTEM;
+  error |= utils_close_file( &rom );
 
-  for( i = 1, offset = MEMORY_PAGE_SIZE;
-       offset < expected_length;
-       i++, offset += MEMORY_PAGE_SIZE   ) {
-    bank_map[ which + i ].offset = offset;
-    bank_map[ which + i ].page_num = page_num;
-    bank_map[ which + i ].page = bank_map[ which ].page + offset;
-    bank_map[ which + i ].source = custom ? MEMORY_SOURCE_CUSTOMROM :
-                                            MEMORY_SOURCE_SYSTEM;
-  }
-
-  if( utils_close_file( &rom ) ) return 1;
-
-  return 0;
+  return error;
 }
 
 int
@@ -319,11 +332,11 @@ machine_load_rom_bank( memory_page* bank_map, size_t which, int page_num,
 
   if( fallback ) custom = strcmp( filename, fallback );
 
-  retval = machine_load_rom_bank_internal( bank_map, which, page_num,
-                                           filename, expected_length, custom );
+  retval = machine_load_rom_bank_from_file( bank_map, which, page_num,
+                                            filename, expected_length, custom );
   if( retval && fallback )
-    retval = machine_load_rom_bank_internal( bank_map, which, page_num,
-                                             fallback, expected_length, 0 );
+    retval = machine_load_rom_bank_from_file( bank_map, which, page_num,
+                                              fallback, expected_length, 0 );
   return retval;
 }
 

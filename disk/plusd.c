@@ -561,20 +561,13 @@ plusd_from_snapshot( libspectrum_snap *snap )
   if( !libspectrum_snap_plusd_active( snap ) ) return;
 
   if( libspectrum_snap_plusd_custom_rom( snap ) &&
-      libspectrum_snap_plusd_rom( snap, 0 ) ) {
-    memory_map_romcs[0].offset = 0;
-    memory_map_romcs[0].page_num = 0;
-    memory_map_romcs[0].page =
-      memory_pool_allocate( MEMORY_PAGE_SIZE * sizeof( libspectrum_byte ) );
-    if( !memory_map_romcs[0].page ) {
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-      return;
-    }
-    memory_map_romcs[0].source = MEMORY_SOURCE_CUSTOMROM;
-
-    memcpy( memory_map_romcs[0].page, libspectrum_snap_plusd_rom( snap, 0 ),
-            MEMORY_PAGE_SIZE );
-  }
+      libspectrum_snap_plusd_rom( snap, 0 ) &&
+      machine_load_rom_bank_from_buffer(
+                             memory_map_romcs, 0, 0,
+                             libspectrum_snap_plusd_rom( snap, 0 ),
+                             MEMORY_PAGE_SIZE,
+                             1 ) )
+    return;
 
   if( libspectrum_snap_plusd_ram( snap, 0 ) ) {
     memcpy( plusd_ram,
