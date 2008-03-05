@@ -2489,7 +2489,6 @@
          on/off, head load/unload, spindle motor spin up/down, ready
          state/signal and fdd drive select emulation (remainder of patch
          #1894441) (Gergely Szasz).
-20080304 windres.rc,ui/win32/memorybrowser.rc,ui/win32/win32ui.c
-	 ui/win32/memorybrowser.c,ui/win32/memorybrowser.h,ui/win32/debugger.c
-	 ui/win32/Makefile.am: Win32: Initial implementation of the Memory
-	 Browser dialog (Marek).
+20080304 windres.rc,ui/win32/{memorybrowser.{c,h,rc},win32ui.c,debugger.c,
+	 Makefile.am}: Win32: Initial implementation of the Memory Browser
+	 dialog (Marek).
