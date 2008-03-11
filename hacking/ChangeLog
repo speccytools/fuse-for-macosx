@@ -2496,3 +2496,6 @@
          snapshots for +D and Interface 1 (Fred).
 20080311 memory.c: add support for saving custom machine ROMs in snapshots
          (Fred).
+20080311 ui/win32/{win32ui.{c,rc},statusbar.c,options.pl,win32internals.h,
+         win32display.c,icons/{mouse_active.bmp,mdr_inactive.bmp,
+         mouse_inactive.bmp,mdr_active.bmp}}: Win32: status bar fixes (Marek).

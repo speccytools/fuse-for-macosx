@@ -48,9 +48,11 @@ HWND fuse_hPFWnd;
 /* debugger window handle */
 HWND fuse_hDBGWnd;
 
+/* status bar functions */
 void win32statusbar_create();
-
 int win32statusbar_set_visibility( int visible );
+void win32statusbar_redraw( HWND hWnd, LPARAM lParam );
+void win32statusbar_resize( HWND hWnd );
 
 void win32_verror( int is_error );
 

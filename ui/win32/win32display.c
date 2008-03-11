@@ -251,11 +251,8 @@ win32display_setsize()
   width *= scale;
   height *= scale;
 
-/*
   GetClientRect( fuse_hStatusWindow, &srect );
   statusbar_height = srect.bottom - srect.top;
-*/
-  statusbar_height = 0;
 
   GetWindowRect( fuse_hWnd, &wrect );
   GetClientRect( fuse_hWnd, &rect );

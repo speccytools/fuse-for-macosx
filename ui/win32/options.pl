@@ -133,6 +133,7 @@ CODE
     print "          $_->{posthook}();\n\n" if $_->{posthook};
 
     print << "CODE";
+          win32statusbar_set_visibility( settings_current.statusbar );
           display_refresh_all();
 
 	  EndDialog( hwndDlg, 0 );

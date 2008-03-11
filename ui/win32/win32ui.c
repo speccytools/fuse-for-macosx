@@ -144,17 +144,17 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
     case WM_SIZING:
     {
-      RECT *selr, wr, cr /*, statr */; /* FIXME: unused variable - is it needed? */
+      RECT *selr, wr, cr , statr;
       int width, height, size, w_ofs, h_ofs;
 
       selr = (RECT *)lParam;
       GetWindowRect( fuse_hWnd, &wr );
       GetClientRect( fuse_hWnd, &cr );
-/*      GetClientRect( fuse_hStatusWindow, &statr ); */
+      GetClientRect( fuse_hStatusWindow, &statr );
 
       w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
-      h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top );
-/*      + ( statr.bottom - statr.top ); */
+      h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top )
+              + ( statr.bottom - statr.top );
 
       width = selr->right - selr->left + DISPLAY_ASPECT_WIDTH / 2;
       height = selr->bottom - selr->top + DISPLAY_SCREEN_HEIGHT / 2;
@@ -209,7 +209,8 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     case WM_SIZE:
       if( win32display_sizechanged )
         win32display_resize_update();
-/*      SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam ); */
+      /* FIXME: statusbar needs to be accounted for in size */
+      SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
       if( wParam == SIZE_MINIMIZED ) {
         if( !size_paused ) {
           size_paused = 1;
@@ -222,15 +223,14 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         }
       }
 
-/*
-      RECT r;
-      GetClientRect( fuse_hStatusWindow, &r );
-      int cornerwidth = r.bottom - r.top;
-      int parts[2] = { r.right - cornerwidth - 65, r.right - cornerwidth };
-      SendMessage( fuse_hStatusWindow, SB_SETPARTS, (WPARAM) 2,
-                   (LPARAM) parts );
-*/
+      win32statusbar_resize( hWnd );
       return 0;
+
+    case WM_DRAWITEM:
+      if( wParam == ID_STATUSBAR ) {
+        win32statusbar_redraw( hWnd, lParam );
+        return TRUE;
+      }
 
     case WM_DESTROY:
       fuse_exiting = 1;
@@ -310,6 +310,7 @@ int
 ui_init( int *argc, char ***argv )
 {
   if( win32display_init() ) return 1;
+  win32statusbar_set_visibility( settings_current.statusbar );
 
   return 0;
 }
