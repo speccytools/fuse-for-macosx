@@ -56,8 +56,10 @@ memory_page *memory_map_exrom[8];
 /* Standard mappings for the 'normal' RAM */
 memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
 
+#define SPECTRUM_ROM_PAGES 4
+
 /* Standard mappings for the ROMs */
-memory_page memory_map_rom[8];
+memory_page memory_map_rom[ 2 * SPECTRUM_ROM_PAGES ];
 
 /* All the memory we've allocated for this machine */
 static GSList *pool;
@@ -68,16 +70,16 @@ int memory_current_screen;
 /* Which bits to look at when working out where the screen is */
 libspectrum_word memory_screen_mask;
 
-static void memory_ram_from_snapshot( libspectrum_snap *snap );
-static void memory_ram_to_snapshot( libspectrum_snap *snap );
+static void memory_from_snapshot( libspectrum_snap *snap );
+static void memory_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t memory_module_info = {
 
   NULL,
   NULL,
   NULL,
-  memory_ram_from_snapshot,
-  memory_ram_to_snapshot,
+  memory_from_snapshot,
+  memory_to_snapshot,
 
 };
 
@@ -274,7 +276,7 @@ memory_romcs_map( void )
 }
 
 static void
-memory_ram_from_snapshot( libspectrum_snap *snap )
+memory_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
   int capabilities = machine_current->capabilities;
@@ -292,10 +294,95 @@ memory_ram_from_snapshot( libspectrum_snap *snap )
   for( i = 0; i < 16; i++ )
     if( libspectrum_snap_pages( snap, i ) )
       memcpy( RAM[i], libspectrum_snap_pages( snap, i ), 0x4000 );
+
+  if( libspectrum_snap_custom_rom( snap ) ) {
+    for( i = 0; i < libspectrum_snap_custom_rom_pages( snap ) && i < 4; i++ ) {
+      if( libspectrum_snap_roms( snap, i ) ) {
+        machine_load_rom_bank_from_buffer(
+                                         memory_map_rom, i * 2,
+                                         i, libspectrum_snap_roms( snap, i ),
+                                         libspectrum_snap_rom_length( snap, i ),
+                                         1 );
+      }
+    }
+
+    /* Need to reset memory_map_[read|write] */
+    machine_current->memory_map();
+  }
 }
 
 static void
-memory_ram_to_snapshot( libspectrum_snap *snap )
+write_rom_to_snap( libspectrum_snap *snap, int *current_rom_num,
+                   libspectrum_byte **current_rom, size_t *rom_length )
+{
+  libspectrum_snap_set_roms( snap, *current_rom_num, *current_rom );
+  libspectrum_snap_set_rom_length( snap, *current_rom_num, *rom_length );
+  (*current_rom_num)++;
+  *current_rom = NULL;
+}
+
+static void
+memory_rom_to_snapshot( libspectrum_snap *snap )
+{
+  int custom_roms = 0;
+  libspectrum_byte *current_rom = NULL;
+  int current_page_num = -1;
+  int current_rom_num = 0;
+  size_t rom_length = 0;
+  size_t i;
+
+  /* Look at all ROM entries, if any are marked as MEMORY_SOURCE_CUSTOMROM
+     trigger writing all roms to the snap */
+  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
+    if( memory_map_rom[ i ].source == MEMORY_SOURCE_CUSTOMROM ) custom_roms = 1;
+  }
+
+  if( !custom_roms ) return;
+
+  libspectrum_snap_set_custom_rom( snap, 1 );
+
+  /* write all ROMs to the snap */
+  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
+    if( memory_map_rom[ i ].page ) {
+      if( current_page_num != memory_map_rom[ i ].page_num ) {
+        if( current_rom )
+          write_rom_to_snap( snap, &current_rom_num, &current_rom, &rom_length );
+
+        /* Start a new ROM image */
+        rom_length = MEMORY_PAGE_SIZE;
+        current_rom = malloc( rom_length );
+        if( !current_rom ) {
+          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                    __LINE__ );
+          return;
+        }
+
+        memcpy( current_rom, memory_map_rom[ i ].page, MEMORY_PAGE_SIZE );
+        current_page_num = memory_map_rom[ i ].page_num;
+      } else {
+        /* Extend the current ROM image */
+        current_rom = realloc( current_rom, rom_length + MEMORY_PAGE_SIZE );
+        if( !current_rom ) {
+          ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__,
+                    __LINE__ );
+          return;
+        }
+
+        memcpy( current_rom + rom_length, memory_map_rom[ i ].page,
+                MEMORY_PAGE_SIZE );
+        rom_length += MEMORY_PAGE_SIZE;
+      }
+    }
+  }
+
+  if( current_rom )
+    write_rom_to_snap( snap, &current_rom_num, &current_rom, &rom_length );
+
+  libspectrum_snap_set_custom_rom_pages( snap, current_rom_num );
+}
+
+static void
+memory_to_snapshot( libspectrum_snap *snap )
 {
   size_t i;
   libspectrum_byte *buffer;
@@ -319,4 +406,6 @@ memory_ram_to_snapshot( libspectrum_snap *snap )
       libspectrum_snap_set_pages( snap, i, buffer );
     }
   }
+
+  memory_rom_to_snapshot( snap );
 }

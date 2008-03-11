@@ -2494,3 +2494,5 @@
 	 dialog (Marek).
 20080306 disk/plusd.c,if1.c,machine.[ch]: refactor loading custom ROMs from
          snapshots for +D and Interface 1 (Fred).
+20080311 memory.c: add support for saving custom machine ROMs in snapshots
+         (Fred).
