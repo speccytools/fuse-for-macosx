@@ -54,7 +54,7 @@ win32statusbar_create( HWND hWnd )
 {
   /* FIXME: destroy those icons later on using DeleteObject */
   
-  icon_tape_inactive = LoadImage( fuse_hInstance, "win32bmp_tape_active", 
+  icon_tape_inactive = LoadImage( fuse_hInstance, "win32bmp_tape_inactive", 
                                   IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
   icon_tape_active = LoadImage( fuse_hInstance, "win32bmp_tape_active", 
                                 IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
