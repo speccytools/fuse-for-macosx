@@ -754,9 +754,6 @@ menu_file_movies_recordmovieaspng( int action )
 }
 #endif
 
-void menu_file_loadbinarydata( int action ) { STUB; }
-void menu_file_savebinarydata( int action ) { STUB; }
-
 void
 menu_file_exit( int action )
 {

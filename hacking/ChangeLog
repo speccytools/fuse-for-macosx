@@ -2500,3 +2500,7 @@
          win32display.c,icons/{mouse_active.bmp,mdr_inactive.bmp,
          mouse_inactive.bmp,mdr_active.bmp}}: Win32: status bar fixes (Marek).
 20080311 ui/win32/statusbar.c: Win32: fixed switched inactive tape icon (Marek).
+20080313 windres.rc,ui/win32/{win32ui.c,binary.{c,h,rc},Makefile.am}: Win32:
+         implementation of the routines to load/save chunks of binary data
+         (Marek).
+

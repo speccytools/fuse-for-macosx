@@ -29,7 +29,9 @@ noinst_LIBRARIES = libuiwin32.a
 
 INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
-libuiwin32_a_SOURCES = debugger.c \
+libuiwin32_a_SOURCES = binary.c \
+		       binary.rc \
+		       debugger.c \
 		       debugger.rc \
 		       error.c \
 		       keysyms.c \
@@ -82,7 +84,8 @@ menu_data: menu_data.c menu_data.h menu_data.rc
 
 DIST_SUBDIRS = icons
 
-noinst_HEADERS = debugger.h \
+noinst_HEADERS = binary.h \
+		 debugger.h \
 		 picture.h \
 		 pokefinder.h \
 		 memorybrowser.h \

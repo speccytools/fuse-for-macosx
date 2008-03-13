@@ -1,5 +1,5 @@
-/* windres.rc: resources for Windows
-   Copyright (c) 2007 Stuart Brady
+/* binary.h: Win32 routines to load/save chunks of binary data
+   Copyright (c) 2008 Marek Januszewski
 
    $Id$
 
@@ -23,20 +23,13 @@
 
 */
 
-#include "config.h"
-
-win32_icon ICON "winfuse.ico"
-
-#ifdef UI_WIN32
-
-#include "ui/win32/binary.rc"
-#include "ui/win32/debugger.rc"
-#include "ui/win32/memorybrowser.rc"
-#include "ui/win32/menu_data.rc"
-#include "ui/win32/options.rc"
-#include "ui/win32/picture.rc"
-#include "ui/win32/pokefinder.rc"
-#include "ui/win32/select_template.rc"
-#include "ui/win32/win32ui.rc"
-
-#endif
+#define IDD_BINARY        1300
+#define IDC_TEXT_FILENAME 1301
+#define IDC_FILENAME      1302
+#define IDC_BROWSE        1303
+#define IDC_TEXT_START    1304
+#define IDC_START         1305
+#define IDC_TEXT_LENGTH   1306
+#define IDC_LENGTH        1307
+#define IDC_OK            1308
+#define IDC_CANCEL        1309
