@@ -29,15 +29,15 @@ win32_icon ICON "winfuse.ico"
 
 #ifdef UI_WIN32
 
-#include "ui/win32/binary.rc"
-#include "ui/win32/browse.rc"
-#include "ui/win32/debugger.rc"
-#include "ui/win32/memorybrowser.rc"
-#include "ui/win32/menu_data.rc"
-#include "ui/win32/options.rc"
-#include "ui/win32/picture.rc"
-#include "ui/win32/pokefinder.rc"
-#include "ui/win32/select_template.rc"
-#include "ui/win32/win32ui.rc"
+#include "ui/win32/binary.rc"           /* reserved ids: 1300 - 1399 */
+#include "ui/win32/browse.rc"           /* reserved ids: 1400 - 1499 */
+#include "ui/win32/debugger.rc"         /* reserved ids: 2000 - 2099 */
+#include "ui/win32/memorybrowser.rc"    /* reserved ids: 4000 - 4099 */
+#include "ui/win32/menu_data.rc"        /* reserved ids: 100  - 899  */
+#include "ui/win32/options.rc"          /* reserved ids: 3000 - 3099 */
+#include "ui/win32/picture.rc"          /* reserved ids: 1200 - 1299 */
+#include "ui/win32/pokefinder.rc"       /* reserved ids: 1500 - 1599 */
+#include "ui/win32/select_template.rc"  /* reserved ids: 1000 - 1099 */
+#include "ui/win32/win32ui.rc"          /* reserved ids: 900 (status bar) */
 
 #endif

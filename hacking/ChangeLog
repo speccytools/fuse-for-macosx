@@ -2508,3 +2508,5 @@
 20080314 windres.rc,ui/win32/{win32ui.{c,rc},browse.{c,h,rc},Makefile.am,
          icons/tape_marker_mask.bmp,icons/Makefile.am}: Win32: implementation
          of Browse Tape dialog (Marek).
+20080314 windres.rc,ui/win32/pokefinder.[ch]: Win32: fix conflicting resource
+	 ids between debugger and pokefinder (Marek).

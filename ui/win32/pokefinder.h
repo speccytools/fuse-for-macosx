@@ -23,12 +23,13 @@
 
 */
 
-#define IDC_PF_SEARCH_FOR 2000
-#define IDC_PF_EDIT 2001
-#define IDC_PF_LOCATIONS 2002
-#define IDC_PF_LIST 2003
-#define IDC_PF_INC 2004
-#define IDC_PF_DEC 2005
-#define IDC_PF_SEARCH 2006
-#define IDC_PF_RESET 2007
-#define IDC_PF_CLOSE 2008
+#define IDD_POKEFINDER    1500
+#define IDC_PF_SEARCH_FOR 1501
+#define IDC_PF_EDIT       1502
+#define IDC_PF_LOCATIONS  1503
+#define IDC_PF_LIST       1504
+#define IDC_PF_INC        1505
+#define IDC_PF_DEC        1506
+#define IDC_PF_SEARCH     1507
+#define IDC_PF_RESET      1508
+#define IDC_PF_CLOSE      1509

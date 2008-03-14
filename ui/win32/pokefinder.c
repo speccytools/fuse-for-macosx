@@ -150,8 +150,10 @@ menu_machine_pokefinder( int action )
 {
   if (fuse_hPFWnd == NULL) {
     /* FIXME: Implement accelerators for this dialog */
-    fuse_hPFWnd = CreateDialog( fuse_hInstance, "IDD_POKEFINDER", fuse_hWnd,
-                                (DLGPROC) win32ui_pokefinder_proc );
+    fuse_hPFWnd = CreateDialog( fuse_hInstance,
+                                MAKEINTRESOURCE( IDD_POKEFINDER ),
+                                fuse_hWnd, 
+                                ( DLGPROC ) win32ui_pokefinder_proc );
     if ( fuse_hPFWnd == NULL ) {
       win32_verror( 1 ); /* FIXME: improve this function */
       return;
