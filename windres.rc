@@ -38,6 +38,6 @@ win32_icon ICON "winfuse.ico"
 #include "ui/win32/picture.rc"          /* reserved ids: 1200 - 1299 */
 #include "ui/win32/pokefinder.rc"       /* reserved ids: 1500 - 1599 */
 #include "ui/win32/select_template.rc"  /* reserved ids: 1000 - 1099 */
-#include "ui/win32/win32ui.rc"          /* reserved ids: 900 (status bar) */
+#include "ui/win32/statusbar.rc"        /* reserved ids: 900         */
 
 #endif

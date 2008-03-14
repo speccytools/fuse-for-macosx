@@ -1,4 +1,4 @@
-/* win32ui.rc: resource file for win32 interface
+/* statusbar.rc: icons for the status bar
    Copyright (c) 2004 Marek Januszewski
 
    $Id$
@@ -22,8 +22,6 @@
    E-mail: philip-fuse@shadowmagic.org.uk
 
 */
-
-/* FIXME: consider renaming this file to statusbar.rc */
 
 win32bmp_disk_active    BITMAP "ui/win32/icons/disk_active.bmp"
 win32bmp_disk_inactive  BITMAP "ui/win32/icons/disk_inactive.bmp"

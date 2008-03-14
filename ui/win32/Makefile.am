@@ -46,10 +46,10 @@ libuiwin32_a_SOURCES = binary.c \
 		       pokefinder.c \
 		       pokefinder.rc \
 		       statusbar.c \
+		       statusbar.rc \
 		       win32display.c \
 		       win32keyboard.c \
-		       win32ui.c \
-		       win32ui.rc
+		       win32ui.c
 
 BUILT_SOURCES = keysyms.c \
 		menu_data.c \

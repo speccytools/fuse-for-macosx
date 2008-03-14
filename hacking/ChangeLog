@@ -2510,3 +2510,6 @@
          of Browse Tape dialog (Marek).
 20080314 windres.rc,ui/win32/pokefinder.[ch]: Win32: fix conflicting resource
 	 ids between debugger and pokefinder (Marek).
+20080314 windres.rc,ui/win32/{win32ui.rc,Makefile.am,statusbar.rc}: Win32: moved
+	 win32ui.rc to statusbar.rc, as this resource's contents applied to
+	 statusbar only (Marek).
