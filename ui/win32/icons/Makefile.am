@@ -25,4 +25,5 @@ AUTOMAKE_OPTIONS = foreign
 
 EXTRA_DIST = disk_active.bmp disk_inactive.bmp \
 	     pause_active.bmp pause_inactive.bmp \
-	     tape_active.bmp tape_inactive.bmp tape_marker.bmp
+	     tape_active.bmp tape_inactive.bmp \
+	     tape_marker.bmp tape_marker_mask.bmp

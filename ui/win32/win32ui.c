@@ -555,14 +555,6 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 }
 
 int
-ui_tape_browser_update( ui_tape_browser_update_type change,
-                        libspectrum_tape_block *block )
-{
-  STUB;
-  return 0;
-}
-
-int
 ui_get_rollback_point( GSList *points )
 {
   STUB;
@@ -972,5 +964,3 @@ menu_machine_select( int action )
   /* Resume emulation */
   fuse_emulation_unpause();
 }
-
-void menu_media_tape_browse( int action ) { STUB; }

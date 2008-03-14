@@ -2505,3 +2505,6 @@
          (Marek).
 20080313 hacking/win32_todo.txt,ui/win32/del_o.bat: Win32: deleted obsolete
          files (Marek).
+20080314 windres.rc,ui/win32/{win32ui.{c,rc},browse.{c,h,rc},Makefile.am,
+         icons/tape_marker_mask.bmp,icons/Makefile.am}: Win32: implementation
+         of Browse Tape dialog (Marek).

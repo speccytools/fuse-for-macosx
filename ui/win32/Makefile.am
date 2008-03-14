@@ -31,6 +31,8 @@ INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
 
 libuiwin32_a_SOURCES = binary.c \
 		       binary.rc \
+		       browse.c \
+		       browse.rc \
 		       debugger.c \
 		       debugger.rc \
 		       error.c \
@@ -85,6 +87,7 @@ menu_data: menu_data.c menu_data.h menu_data.rc
 DIST_SUBDIRS = icons
 
 noinst_HEADERS = binary.h \
+		 browse.h \
 		 debugger.h \
 		 picture.h \
 		 pokefinder.h \
