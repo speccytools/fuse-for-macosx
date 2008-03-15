@@ -2525,3 +2525,5 @@
          +3 protected disks with unusual track lengths (long, short and 0
          length) (part of patch #1882836) (Gergely Szasz).
 20080315 disk/disk.c: write_log() fix (part of patch #1882836) (Gergely Szasz).
+20080315 disk/fdd.c: set the write protect flag if there is no disk in the
+         drive (part of patch #1882836) (Gergely Szasz).

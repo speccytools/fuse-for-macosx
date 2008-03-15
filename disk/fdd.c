@@ -90,9 +90,9 @@ fdd_set_data( fdd_t *d, int fact )
 int
 fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls )
 {
-  d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = d->wrprot = 0;
+  d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = 0;
   d->upsidedown = d->unreadable = d->loaded = d->auto_geom = d->selected = 0;
-  d->index = d->tr00 = 1;
+  d->index = d->tr00 = d->wrprot = 1;
   d->disk = NULL;
   d->type = type;
 
@@ -194,7 +194,7 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
 void
 fdd_unload( fdd_t *d )
 {
-  d->loaded = 0; d->index = 1;
+  d->loaded = 0; d->index = d->wrprot = 1;
   d->disk = NULL;
   if( d->type == FDD_SHUGART && d->selected )
     fdd_head_load( d, 0 );
