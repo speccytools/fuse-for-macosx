@@ -1,5 +1,5 @@
 /* beta.c: Routines for handling the Beta disk interface
-   Copyright (c) 2004-2007 Stuart Brady
+   Copyright (c) 2004-2008 Stuart Brady
 
    $Id$
 
@@ -78,6 +78,7 @@ const size_t beta_peripherals_count =
 
 static void beta_reset( int hard_reset );
 static void beta_memory_map( void );
+static void beta_enabled_snapshot( libspectrum_snap *snap );
 static void beta_from_snapshot( libspectrum_snap *snap );
 static void beta_to_snapshot( libspectrum_snap *snap );
 
@@ -85,7 +86,7 @@ static module_info_t beta_module_info = {
 
   beta_reset,
   beta_memory_map,
-  NULL, /* XXX: beta_enabled_snapshot */
+  beta_enabled_snapshot,
   beta_from_snapshot,
   beta_to_snapshot,
 
@@ -553,10 +554,16 @@ beta_event_index( libspectrum_dword last_tstates )
 }
 
 static void
+beta_enabled_snapshot( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_beta_active( snap ) )
+    settings_current.beta128 = 1;
+}
+
+static void
 beta_from_snapshot( libspectrum_snap *snap )
 {
-  if( !( machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) )
-    return;
+  if( !libspectrum_snap_beta_active( snap ) ) return;
 
   beta_active = libspectrum_snap_beta_paged( snap );
 
@@ -565,6 +572,15 @@ beta_from_snapshot( libspectrum_snap *snap )
   } else {
     beta_unpage();
   }
+
+  if( libspectrum_snap_beta_custom_rom( snap ) &&
+      libspectrum_snap_beta_rom( snap, 0 ) &&
+      machine_load_rom_bank_from_buffer(
+                             memory_map_romcs, 0, 0,
+                             libspectrum_snap_beta_rom( snap, 0 ),
+                             MEMORY_PAGE_SIZE * 2,
+                             1 ) )
+    return;
 
   beta_fdc->direction = libspectrum_snap_beta_direction( snap );
 
@@ -580,8 +596,29 @@ beta_to_snapshot( libspectrum_snap *snap )
 {
   int attached;
   wd_fdc *f = beta_fdc;
+  libspectrum_byte *buffer;
+
+  if( !periph_beta128_active ) return;
 
   libspectrum_snap_set_beta_active( snap, 1 );
+
+  if( memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+    size_t rom_length = MEMORY_PAGE_SIZE * 2;
+
+    buffer = malloc( rom_length );
+    if( !buffer ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return;
+    }
+
+    memcpy( buffer, memory_map_romcs[0].page, MEMORY_PAGE_SIZE );
+    memcpy( buffer + MEMORY_PAGE_SIZE, memory_map_romcs[1].page,
+	    MEMORY_PAGE_SIZE );
+
+    libspectrum_snap_set_beta_rom( snap, 0, buffer );
+    libspectrum_snap_set_beta_custom_rom( snap, 1 );
+  }
+
   libspectrum_snap_set_beta_paged ( snap, beta_active );
   libspectrum_snap_set_beta_direction( snap, beta_fdc->direction );
   libspectrum_snap_set_beta_status( snap, beta_sr_read( 0x001f, &attached ) );
