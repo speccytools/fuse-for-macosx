@@ -69,16 +69,17 @@ typedef struct disk_gap_t {
   int gap;			/* gap byte */
   int sync;			/* sync byte */
   int sync_len;
+  int mark;			/* mark byte 0xa1 for MFM -1 for MF */
   int len[4];
 } disk_gap_t;
 
 disk_gap_t gaps[] = {
-  { 0x4e, 0x00, 12, {  0, 60, 22, 24 } },			/* MGT MFM */
-  { 0x4e, 0x00, 12, {  0, 10, 22, 60 } },			/* TRD MFM */
-  { 0xff, 0x00,  6, { 40, 26, 11, 27 } },			/* IBM3740 FM */
-  { 0x4e, 0x00, 12, { 80, 50, 22, 54 } },			/* IBM34 MFM */
-  { 0xff, 0x00,  6, {  0, 16, 11, 10 } },			/* MINIMAL FM */
-  { 0x4e, 0x00, 12, {  0, 32, 22, 24 } },			/* MINIMAL MFM */
+  { 0x4e, 0x00, 12, 0xa1, {  0, 60, 22, 24 } },			/* MGT MFM */
+  { 0x4e, 0x00, 12, 0xa1, {  0, 10, 22, 60 } },			/* TRD MFM */
+  { 0xff, 0x00,  6, -1,   { 40, 26, 11, 27 } },			/* IBM3740 FM */
+  { 0x4e, 0x00, 12, 0xa1, { 80, 50, 22, 54 } },			/* IBM34 MFM */
+  { 0xff, 0x00,  6, -1,   {  0, 16, 11, 10 } },			/* MINIMAL FM */
+  { 0x4e, 0x00, 12, 0xa1, {  0, 32, 22, 24 } },			/* MINIMAL MFM */
 };
 
 #define GAP_MGT_PLUSD	0
@@ -308,69 +309,70 @@ check_disk_geom( disk_t *d, int *sector_base, int *sectors,
 }
 
 static int
-gap_add( disk_t *d, int gap, int mark, int gaptype )
+gap_add( disk_t *d, int gap, int gaptype )
 {
   disk_gap_t *g = &gaps[ gaptype ];
-  if( d->i + g->sync_len + g->len[gap] + 
-	( d->density != DISK_SD ? 3 : 0 ) >= d->bpt )  /* too many data bytes */
+  if( d->i + g->len[gap]  >= d->bpt )  /* too many data bytes */
     return 1;
 /*-------------------------------- given gap --------------------------------*/
   memset( d->track + d->i, g->gap,  g->len[gap] ); d->i += g->len[gap];
-  memset( d->track + d->i, g->sync, g->sync_len ); d->i += g->sync_len;
-  if( d->density != DISK_SD ) {
-    memset( d->track + d->i , mark, 3 );
-    bitmap_set( d->clocks, d->i ); d->i++;
-    bitmap_set( d->clocks, d->i ); d->i++;
-    bitmap_set( d->clocks, d->i ); d->i++;
-  }
   return 0;
 }
 
 static int
-calc_gap_len( disk_t *d, int gap, int mark, int gaptype )
+preindex_len( disk_t *d, int gaptype )		/* preindex gap and index mark */
 {
   disk_gap_t *g = &gaps[ gaptype ];
-  return d->i + g->sync_len + g->len[gap] + 
-	( d->density != DISK_SD ? 3 : 0 ) >= d->bpt;
+  return g->len[0] + g->sync_len + ( g->mark >= 0 ? 3 : 0 ) + 1;
 }
 
+/*
+  [ ....GAP.... ] [ ... SYNC ... ] [ . MARK . ]
+  |------------------------------------------->
+		Preindex 
+*/
 static int
-preindex_add( disk_t *d, int gap )		/* preindex gap and index mark */
+preindex_add( disk_t *d, int gaptype )		/* preindex gap and index mark */
 {
+  disk_gap_t *g = &gaps[ gaptype ];
+  if( d->i + preindex_len( d, gaptype ) >= d->bpt )
+    return 1;
 /*------------------------------ pre-index gap -------------------------------*/
-  if( gap_add( d, 0, 0xc2, gap ) )
+  if( gap_add( d, 0, gaptype ) )
     return 1;
-  if( d->i + 1 >= d->bpt )  /* too many data bytes */
-    return 1;
-  if( d->density == DISK_SD )
+/*------------------------------   sync    ---------------------------*/
+  memset( d->track + d->i, g->sync, g->sync_len ); d->i += g->sync_len;
+  if( g->mark >= 0 ) {
+    memset( d->track + d->i , g->mark, 3 );
+    bitmap_set( d->clocks, d->i ); d->i++;
+    bitmap_set( d->clocks, d->i ); d->i++;
+    bitmap_set( d->clocks, d->i ); d->i++;
+  }
+/*------------------------------     mark     ------------------------------*/
+  if( g->mark < 0 )				/* FM */
     bitmap_set( d->clocks, d->i ); 		/* set clock mark */
   d->track[ d->i++ ] = 0xfc;			/* index mark */
   return 0;
 }
 
 static int
-postindex_add( disk_t *d, int gap )		/* preindex gap and index mark */
+postindex_len( disk_t *d, int gaptype )		/* preindex gap and index mark */
 {
-  return gap_add( d, 1, 0xa1, gap );
+  disk_gap_t *g = &gaps[ gaptype ];
+  return g->len[1];
 }
 
 static int
-preindex_len( disk_t *d, int gap )		/* preindex gap and index mark */
+postindex_add( disk_t *d, int gaptype )		/* postindex gap */
 {
-  return calc_gap_len( d, 0, 0xc2, gap ) + 1;
+  return gap_add( d, 1, gaptype );
 }
 
 static int
-postindex_len( disk_t *d, int gap )		/* preindex gap and index mark */
-{
-  return calc_gap_len( d, 1, 0xa1, gap );
-}
-
-static int
-gap4_add( disk_t *d, int gap )
+gap4_add( disk_t *d, int gaptype )
 {
   int len = d->bpt - d->i;
-  disk_gap_t *g = &gaps[ gap ];
+  disk_gap_t *g = &gaps[ gaptype ];
 
   if( len < 0 ) {
     return 1;
@@ -388,22 +390,35 @@ gap4_add( disk_t *d, int gap )
 #define CRC_OK 0
 #define CRC_ERROR 1
 
+/*
+  [ ....GAP.... ] [ ... SYNC ... ] [ . MARK . ] [ .. DATA .. ] [ . CRC . ]
+                 |------------------------------------------------------->
+		                    ID 
+*/
 static int
-id_add( disk_t *d, int h, int t, int s, int l, int gap, int crc_error )
+id_add( disk_t *d, int h, int t, int s, int l, int gaptype, int crc_error )
 {
   libspectrum_word crc = 0xffff;
-  if( d->i + 7 >= d->bpt )		/* too many data bytes */
+  disk_gap_t *g = &gaps[ gaptype ];
+  if( d->i + g->sync_len + ( g->mark >= 0 ? 3 : 0 ) + 7 >= d->bpt )
     return 1;
-/*------------------------------     header     ------------------------------*/
-  if( d->density == DISK_SD )
-    bitmap_set( d->clocks, d->i ); 		/* set clock mark */
-  d->track[ d->i++ ] = 0xfe;		/* ID mark */
-  if( d->density != DISK_SD ) {
-    crc = crc_fdc( crc, 0xa1 );
-    crc = crc_fdc( crc, 0xa1 );
-    crc = crc_fdc( crc, 0xa1 );
+/*------------------------------   sync    ---------------------------*/
+  memset( d->track + d->i, g->sync, g->sync_len ); d->i += g->sync_len;
+  if( g->mark >= 0 ) {
+    memset( d->track + d->i , g->mark, 3 );
+    bitmap_set( d->clocks, d->i ); d->i++;
+    crc = crc_fdc( crc, g->mark );
+    bitmap_set( d->clocks, d->i ); d->i++;
+    crc = crc_fdc( crc, g->mark );
+    bitmap_set( d->clocks, d->i ); d->i++;
+    crc = crc_fdc( crc, g->mark );
   }
+/*------------------------------     mark     ------------------------------*/
+  if( g->mark < 0 )			/* FM */
+    bitmap_set( d->clocks, d->i ); 	/* set clock mark */
+  d->track[ d->i++ ] = 0xfe;		/* ID mark */
   crc = crc_fdc( crc, 0xfe );
+/*------------------------------     header     ------------------------------*/
   d->track[ d->i++ ] = t; crc = crc_fdc( crc, t );
   d->track[ d->i++ ] = h; crc = crc_fdc( crc, h );
   d->track[ d->i++ ] = s; crc = crc_fdc( crc, s );
@@ -415,41 +430,58 @@ id_add( disk_t *d, int h, int t, int s, int l, int gap, int crc_error )
     d->track[ d->i++ ] = crc & 0xff;	/* CRC */
   }
 /*------------------------------     GAP II     ------------------------------*/
-  return gap_add( d, 2, 0xa1, gap );
+  return gap_add( d, 2, gaptype );
 }
 
+/*
+  [ ....GAP.... ] [ ... SYNC ... ] [ . MARK . ] [ .. DATA .. ] [ . CRC . ]
+ |-------------------------------------------->
+                  datamark
+*/
 static int
-datamark_add( disk_t *d, int ddam )
+datamark_add( disk_t *d, int ddam, int gaptype )
 {
-  if( d->i + 1 >= d->bpt )  /* too many data bytes */
+  disk_gap_t *g = &gaps[ gaptype ];
+  if( d->i + g->len[2] + g->sync_len + ( g->mark >= 0 ? 3 : 0 ) + 1 >= d->bpt )
     return 1;
-/*------------------------------      data      ------------------------------*/
-  if( d->density == DISK_SD )
-    bitmap_set( d->clocks, d->i ); 		/* set clock mark */
+/*------------------------------   sync    ---------------------------*/
+  memset( d->track + d->i, g->sync, g->sync_len ); d->i += g->sync_len;
+  if( g->mark >= 0 ) {
+    memset( d->track + d->i , g->mark, 3 );
+    bitmap_set( d->clocks, d->i ); d->i++;
+    bitmap_set( d->clocks, d->i ); d->i++;
+    bitmap_set( d->clocks, d->i ); d->i++;
+  }
+/*------------------------------     mark     ------------------------------*/
+  if( g->mark < 0 )			/* FM */
+    bitmap_set( d->clocks, d->i ); 	/* set clock mark */
   d->track[ d->i++ ] = ddam ? 0xf8 : 0xfb;	/* DATA mark 0xf8 -> deleted data */
   return 0;
 }
+
 #define NO_DDAM 0
 #define DDAM 1
 #define NO_AUTOFILL -1
 /* if 'file' == NULL, then copy data bytes from 'data' */  
 static int
-data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gap, int crc_error, int autofill )
+data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gaptype, int crc_error, int autofill )
 {
   int length;
   libspectrum_word crc = 0xffff;
+  disk_gap_t *g = &gaps[ gaptype ];
 
-  if( datamark_add( d, ddam ) )
+  if( datamark_add( d, ddam, gaptype ) )
     return 1;
-  if( d->density != DISK_SD ) {
-    crc = crc_fdc( crc, 0xa1 );
-    crc = crc_fdc( crc, 0xa1 );
-    crc = crc_fdc( crc, 0xa1 );
+
+  if( g->mark >= 0 ) {
+    crc = crc_fdc( crc, g->mark );
+    crc = crc_fdc( crc, g->mark );
+    crc = crc_fdc( crc, g->mark );
   }
-  crc = crc_fdc( crc, 0xfb );
+  crc = crc_fdc( crc, ddam ? 0xf8 : 0xfb );	/* deleted or normal */
   if( len < 0 )
-    goto header_crc_error;		/* CRC error */
-  if( d->i + len + 2 >= d->bpt )  /* too many data bytes */
+    goto header_crc_error;			/* CRC error */
+  if( d->i + len + 2 >= d->bpt )  		/* too many data bytes */
     return 1;
 /*------------------------------      data      ------------------------------*/
   if( file == NULL ) {
@@ -476,29 +508,25 @@ data_add( disk_t *d, FILE *file, unsigned char *data, int len, int ddam, int gap
   d->track[ d->i++ ] = crc >> 8; d->track[ d->i++ ] = crc & 0xff;    /* CRC */
 /*------------------------------     GAP III    ------------------------------*/
 header_crc_error:
-  return ( gap_add( d, 3, 0xa1, gap ) );
+  return ( gap_add( d, 3, gaptype ) );
 }
 
 static int
-calc_sectorlen( int mfm, int sector_length, int gap )
+calc_sectorlen( int mfm, int sector_length, int gaptype )
 {
   int len = 0;
-  disk_gap_t *g = &gaps[ gap ];
+  disk_gap_t *g = &gaps[ gaptype ];
   
 /*------------------------------     ID        ------------------------------*/
-  len += 7;
+  len += g->sync_len + ( g->mark >= 0 ? 3 : 0 ) + 7;
 /*------------------------------     GAP II    ------------------------------*/
-  len += g->len[2] + g->sync_len;
-  if( mfm )
-    len += 3;
+  len += g->len[2];
 /*---------------------------------  data   ---------------------------------*/
-  len += 1;		/* DAM */
+  len += g->sync_len + ( g->mark >= 0 ? 3 : 0 ) + 1;		/* DAM */
   len += sector_length;
   len += 2;		/* CRC */
 /*------------------------------    GAP III    ------------------------------*/
-  len += g->len[3] + g->sync_len;
-  if( mfm )
-    len += 3;
+  len += g->len[3];
   return len;
 }
 
@@ -828,9 +856,9 @@ open_fdi( FILE *file, disk_t *d, int preindex )
     if( fread( head, 7, 1, file ) != 1 )	/* 7 := track head  */
       return d->status = DISK_OPEN;
     bpt = postindex_len( d, GAP_MINIMAL_MFM ) +
-	  ( preindex ? preindex_len( d, GAP_MINIMAL_MFM ) : 0 ) + 24; /* +gap4 */
+	  ( preindex ? preindex_len( d, GAP_MINIMAL_MFM ) : 0 ) + 6; /* +gap4 */
     bpt_fm = postindex_len( d, GAP_MINIMAL_FM ) +
-	     ( preindex ? preindex_len( d, GAP_MINIMAL_FM ) : 0 ) + 12;  /* +gap4 */
+	     ( preindex ? preindex_len( d, GAP_MINIMAL_FM ) : 0 ) + 3;  /* +gap4 */
     for( j = 0; j < head[0x06]; j++ ) {		/* calculate track len */
       if( j % 35 == 0 ) {				/* 35-sector header */
 	if( fread( head + 7, 245, 1, file ) != 1 )	/* 7*35 := max 35 sector head */
@@ -925,7 +953,8 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
     					    GAP_MINIMAL_MFM;
     trlen = 0;
     bpt = postindex_len( d, gap ) +
-	    ( preindex ? preindex_len( d, gap ) : 0 ) + 24;
+	    ( preindex ? preindex_len( d, gap ) : 0 ) +
+		( gap == GAP_MINIMAL_MFM ? 6 : 3 );	/* gap4 */
     for( j = 0; j < head[0x15]; j++ ) {			/* each sector */
       seclen = type == DISK_ECPC ? head[ 0x1e + 8 * j ] +
 				      256 * head[ 0x1f + 8 * j ]
@@ -1137,7 +1166,7 @@ open_td0( FILE *file, disk_t *d, int preindex )
 	  ( preindex ? 
 	    preindex_len( d, mfm_old || mfm ? GAP_MINIMAL_FM : GAP_MINIMAL_MFM ) :
 	    0 ) +
-	  mfm_old || mfm ? 24 : 12;
+	  mfm_old || mfm ? 6 : 3;
     for( s = 0; s < sectors; s++ ) {
       fseek( file, sector_offset, SEEK_SET );
       if( fread( head, 6, 1, file ) != 1 )

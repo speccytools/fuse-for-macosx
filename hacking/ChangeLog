@@ -2518,3 +2518,6 @@
 20080315 fuse.c: remove obsolete #include <sys/utsname.h> as uname call has
          been moved to compat/unix/osname.c (more of patch #1712260) (Chris
          Young).
+20080315 disk/disk.[ch]: reorganise gap, sync and mark byte generation to move
+         the sync and the first half of mark bytes to the correct place (part
+         of patch #1894441) (Gergely Szasz).

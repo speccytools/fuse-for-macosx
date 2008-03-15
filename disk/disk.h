@@ -102,7 +102,7 @@ const char *disk_strerror( int error );
 /* create an unformatted disk sides -> (1/2) cylinders -> track/side,
    dens -> 'density' related to unformatted length of a track (SD = 3125,
    DD = 6250, HD = 12500, type -> if write this disk we want to convert
-   into this type of image file (now only UDI implemented)
+   into this type of image file
 */
 int disk_new( disk_t *d, int sides, int cylinders, disk_dens_t dens, disk_type_t type );
 /* open a disk image file. if preindex = 1 and the image file not UDI then
@@ -115,7 +115,6 @@ int disk_open( disk_t *d, const char *filename, int preindex );
    gives the format of file. if it DISK_TYPE_AUTO, disk_write
    try to guess from the file name (extension). if fail save as
    UDI.
-   This time only the UDI format implemented
 */
 int disk_write( disk_t *d, const char *filename );
 /* close a disk and free buffers
