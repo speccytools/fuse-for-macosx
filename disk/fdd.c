@@ -35,8 +35,8 @@
 #include "spectrum.h"
 
 #define FDD_LOAD_FACT 2
-#define FDD_HEAD_FACT 16
-#define FDD_STEP_FACT 256
+#define FDD_HEAD_FACT 16			/* load head */
+#define FDD_STEP_FACT 34
 
 static const char *fdd_error[] = {
   "OK",
@@ -80,9 +80,16 @@ fdd_set_data( fdd_t *d, int fact )
   d->disk->track = d->disk->data + 
 		   ( d->disk->sides * d->c_cylinder + head ) * d->disk->tlen;
   d->disk->clocks = d->disk->track + d->disk->bpt;
-  d->disk->i += rand() % ( d->disk->bpt / fact );
-  while( d->disk->i >= d->disk->bpt )
-    d->disk->i -= d->disk->bpt;
+  if( fact > 0 ) {
+    /* this generate a bpt/fact +-10% rectangular distribution skip in bytes 
+       i know, we should use the higher bits of rand(), but we not
+       keen on _real_ (pseudo)random numbers... ;)
+    */
+    d->disk->i += d->disk->bpt / fact + d->disk->bpt *
+		  ( rand() % 10 + rand() % 10 - 9 ) / fact / 100;
+    while( d->disk->i >= d->disk->bpt )
+      d->disk->i -= d->disk->bpt;
+  }
   d->index = d->disk->i ? 0 : 1;
 }
 
@@ -145,8 +152,11 @@ fdd_head_load( fdd_t *d, int load )
 {
   if( !d->loaded )
     return;
-
-  d->loadhead = load > 0 ? 1 : 0;
+  load = load > 0 ? 1 : 0;
+  if( d->loadhead == load )
+    return;
+  d->loadhead = load;
+  fdd_set_data( d, FDD_HEAD_FACT );
 }
 
 void
@@ -194,8 +204,10 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
 void
 fdd_unload( fdd_t *d )
 {
-  d->loaded = 0; d->index = d->wrprot = 1;
+  d->ready = d->loaded = 0;
+  d->index = d->wrprot = 1;
   d->disk = NULL;
+  fdd_motoron( d, 0 );
   if( d->type == FDD_SHUGART && d->selected )
     fdd_head_load( d, 0 );
 }
@@ -207,12 +219,12 @@ fdd_set_head( fdd_t *d, int head )
   if( d->fdd_heads == 1 )
     return;
 
-  if( head > 0 )
-    d->c_head = 1;
-  else if( head < 1 )
-    d->c_head = 0;
+  head = head > 0 ? 1 : 0;
+  if( d->c_head == head )
+    return;
 
-  fdd_set_data( d, FDD_HEAD_FACT );
+  d->c_head = head;
+  fdd_set_data( d, 0 );
 }
 
 /* change current track dir = 1 / -1 */
@@ -238,14 +250,15 @@ fdd_step( fdd_t *d, fdd_dir_t direction )
 int
 fdd_read_write_data( fdd_t *d, fdd_write_t write )
 {
-  if( !d->selected || !d->ready || !d->loadhead ) {
+  if( !d->selected || !d->ready || !d->loadhead || d->disk->track == NULL ) {
     if( d->loaded && d->motoron ) {			/* spin the disk */
-      d->disk->i++;
-      if( d->disk->i >= d->disk->bpt ) {
+      if( d->disk->i >= d->disk->bpt ) {		/* next data byte */
         d->disk->i = 0;
-	d->index = 1;
-      } else
-        d->index = 0;
+      }
+      if( !write )
+        d->data = 0x100;				/* no data */
+      d->disk->i++;
+      d->index = d->disk->i >= d->disk->bpt ? 1 : 0;
     }
     return d->status = FDD_OK;
   }
@@ -253,14 +266,6 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
   if( d->disk->i >= d->disk->bpt ) {		/* next data byte */
     d->disk->i = 0;
   }
-  if( d->disk->track == NULL ) {
-    if( !write )
-      d->data = 0x100;				/* no data */
-    d->disk->i++;
-    d->index = d->disk->i >= d->disk->bpt ? 1 : 0;
-    return d->status = FDD_OK;
-  }
-
   if( write ) {
     if( d->disk->wrprot ) {
       d->disk->i++;

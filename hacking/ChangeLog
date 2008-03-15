@@ -2529,3 +2529,9 @@
          drive (part of patch #1882836) (Gergely Szasz).
 20080315 disk/beta.c: support for Beta 128 custom ROMs in snapshots
          (patch #1844606) (Stuart).
+20080315 disk/{fdd.c,wd_fdc.c}: make disk timing more accruate - improve
+         emulation of head actions when null actions are performed, improve
+         spin duration calculation, turn off motor and set status to not ready
+         on head unload, add emulation of finding and reading the address mark
+         id and make timeout reset DRQ (fixes bug #1910395) (patch #1913785)
+         (Gergely Szasz).
