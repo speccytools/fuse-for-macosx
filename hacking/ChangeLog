@@ -2520,4 +2520,7 @@
          Young).
 20080315 disk/disk.[ch]: reorganise gap, sync and mark byte generation to move
          the sync and the first half of mark bytes to the correct place (part
-         of patch #1894441) (Gergely Szasz).
+         of patch #1882836) (Gergely Szasz).
+20080315 disk/{beta.c,disk.[ch],plusd.c}: add new flag to disk_t for supporting
+         +3 protected disks with unusual track lengths (long, short and 0
+         length) (part of patch #1882836) (Gergely Szasz).

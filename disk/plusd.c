@@ -128,6 +128,7 @@ plusd_init( void )
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
     fdd_init( &d->fdd, FDD_SHUGART, 0, 0 );	/* drive geometry 'autodetect' */
+    d->disk.flag = DISK_FLAG_NONE;
   }
 
   plusd_fdc->current_drive = &plusd_drives[ 0 ];

@@ -139,6 +139,7 @@ beta_init( void )
   for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
     d = &beta_drives[ i ];
     fdd_init( &d->fdd, FDD_SHUGART, 0, 0 );	/* drive geometry 'autodetect' */
+    d->disk.flag = DISK_FLAG_NONE;
   }
   beta_select_drive( 0 );
 

@@ -28,6 +28,9 @@
 
 #include <config.h>
 
+static const unsigned int DISK_FLAG_NONE = 0x00;
+static const unsigned int DISK_FLAG_PLUS3_CPC = 0x01;	/* try to fix some CPC issue */
+
 typedef enum disk_error_t {
   DISK_OK = 0,
   DISK_IMPL,
@@ -87,6 +90,7 @@ typedef struct disk_t {
   int bpt;		/* bytes per track */
   int wrprot;		/* disk write protect */
   int dirty;		/* disk changed */
+  unsigned int flag;
   disk_error_t status;		/* last error code */
   libspectrum_byte *data;	/* disk data */
 /* private part */
