@@ -1,5 +1,5 @@
 # Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2004 Philip Kendall
+## Copyright (c) 1999-2008 Philip Kendall
 
 ## $Id$
 
@@ -38,6 +38,7 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  sound \
 	  timer \
 	  ui \
+	  unittests \
 	  @WIDGET@ \
 	  z80
 
@@ -53,6 +54,7 @@ DIST_SUBDIRS = debugger \
 	       sound \
 	       timer \
 	       ui \
+	       unittests \
 	       widget \
 	       z80
 
@@ -117,6 +119,7 @@ machines/libmachines.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
 ui/scaler/libscaler.a \
+unittests/libunittests.a \
 debugger/libdebugger.a \
 timer/libtimer.a \
 z80/libz80.a \
@@ -137,6 +140,7 @@ fuse_DEPENDENCIES = @UI_LIBS@ \
 		    debugger/libdebugger.a \
 		    machines/libmachines.a \
 		    sound/libsound.a \
+		    unittests/libunittests.a\
 		    z80/libz80.a \
 		    @WINDRES_OBJ@
 

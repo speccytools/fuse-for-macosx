@@ -74,6 +74,7 @@
 #include "ui/ui.h"
 #include "ui/scaler/scaler.h"
 #include "ula.h"
+#include "unittests/unittests.h"
 #include "utils.h"
 #include "zxatasp.h"
 #include "zxcf.h"
@@ -143,6 +144,8 @@ int fuse_main(int argc, char **argv)
 int main(int argc, char **argv)
 #endif
 {
+  int r;
+
 #ifdef WIN32
   SetErrorMode( SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX );
 #endif
@@ -155,14 +158,19 @@ int main(int argc, char **argv)
   if( settings_current.show_help ||
       settings_current.show_version ) return 0;
 
-  while( !fuse_exiting ) {
-    z80_do_opcodes();
-    event_do_events();
+  if( UNITTESTS ) {
+    r = unittests_run();
+  } else {
+    while( !fuse_exiting ) {
+      z80_do_opcodes();
+      event_do_events();
+    }
+    r = 0;
   }
 
   fuse_end();
   
-  return 0;
+  return r;
 
 }
 
