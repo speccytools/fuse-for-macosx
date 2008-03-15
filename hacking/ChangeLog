@@ -2513,3 +2513,5 @@
 20080314 windres.rc,ui/win32/{win32ui.rc,Makefile.am,statusbar.rc}: Win32: moved
 	 win32ui.rc to statusbar.rc, as this resource's contents applied to
 	 statusbar only (Marek).
+20080315 compat/amiga/{Makefile.am,osname.c}: add AmigaOS-specific osname
+         implementation (more of patch #1712260) (Chris Young).

@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libcompatos.a
 
-libcompatos_a_SOURCES = ../unix/osname.c \
+libcompatos_a_SOURCES = osname.c \
 			paths.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@
