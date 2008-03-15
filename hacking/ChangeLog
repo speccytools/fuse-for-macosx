@@ -2524,3 +2524,4 @@
 20080315 disk/{beta.c,disk.[ch],plusd.c}: add new flag to disk_t for supporting
          +3 protected disks with unusual track lengths (long, short and 0
          length) (part of patch #1882836) (Gergely Szasz).
+20080315 disk/disk.c: write_log() fix (part of patch #1882836) (Gergely Szasz).

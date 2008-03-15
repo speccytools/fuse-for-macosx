@@ -1879,7 +1879,7 @@ write_scl( FILE * file, disk_t * d )
 static int
 write_log( FILE * file, disk_t * d )
 {
-  int i, j, k, del;
+  int i, j, k, del, rev;
   int h, t, s, b;
 
   fprintf( file, "DISK tracks log!\n" );
@@ -1906,7 +1906,7 @@ write_log( FILE * file, disk_t * d )
       d->clocks = d->track + d->bpt;
       d->i = 0;
       fprintf( file, "\n*********\nSide: %d, cylinder: %d\n", i, j );
-      k = 0;
+      rev = k = 0;
       while( id_read( d, &h, &t, &s, &b ) ) {
 	b = 0x80 << b;
 	if( datamark_read( d, &del ) )
@@ -1924,6 +1924,12 @@ write_log( FILE * file, disk_t * d )
 	  if( !( k % 16 ) )
 	    fprintf( file, "\n" );
 	  d->i++;
+	  if( d->i >= d->bpt ) {
+	    d->i = 0;
+	    rev++;
+	    if( rev == 6 )
+	      break;
+	  }
 	}
       }
     }
