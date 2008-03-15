@@ -33,11 +33,9 @@
 #include <sys/types.h>
 #include <time.h>
 
-#ifndef WIN32
-#include <sys/utsname.h>
-#else				/* #ifndef WIN32 */
+#ifdef WIN32
 #include <windows.h>
-#endif				/* #ifndef WIN32 */
+#endif				/* #ifdef WIN32 */
 
 #include <unistd.h>
 

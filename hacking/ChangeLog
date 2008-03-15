@@ -2515,3 +2515,6 @@
 	 statusbar only (Marek).
 20080315 compat/amiga/{Makefile.am,osname.c}: add AmigaOS-specific osname
          implementation (more of patch #1712260) (Chris Young).
+20080315 fuse.c: remove obsolete #include <sys/utsname.h> as uname call has
+         been moved to compat/unix/osname.c (more of patch #1712260) (Chris
+         Young).
