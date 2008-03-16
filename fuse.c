@@ -158,7 +158,7 @@ int main(int argc, char **argv)
   if( settings_current.show_help ||
       settings_current.show_version ) return 0;
 
-  if( UNITTESTS ) {
+  if( settings_current.unittests ) {
     r = unittests_run();
   } else {
     while( !fuse_exiting ) {

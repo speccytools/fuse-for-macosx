@@ -2535,3 +2535,7 @@
          on head unload, add emulation of finding and reading the address mark
          id and make timeout reset DRQ (fixes bug #1910395) (patch #1913785)
          (Gergely Szasz).
+20080315 Makefile.am,configure.in,fuse.c,unittests/{Makefile.am,unittests.[ch]}:
+	 add beginnings of unit testing framework.
+20080316 fuse.c,configure.in,settings.dat: make unit testing framework a 
+	 run-time rather than build-time option.

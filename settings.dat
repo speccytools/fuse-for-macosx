@@ -64,6 +64,7 @@ snapsasz80, null, 0
 pal_tv2x, boolean, 0
 plusd, boolean, 0
 beta128, boolean, 0
+unittests, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1
