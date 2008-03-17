@@ -2539,3 +2539,5 @@
 	 add beginnings of unit testing framework.
 20080316 fuse.c,configure.in,settings.dat: make unit testing framework a 
 	 run-time rather than build-time option.
+20080317 disk/disk.c: add support for some alternate DSK headers (part of patch
+         #1882836) (Gergely Szasz).

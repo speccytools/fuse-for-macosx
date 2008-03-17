@@ -1416,9 +1416,9 @@ disk_open( disk_t *d, const char *filename, int preindex )
 
   if( memcmp( head, "UDI!", 4 ) == 0 )
     type = DISK_UDI;
-  else if( memcmp( head, "EXTENDED CPC DSK File\r\nDisk-Info\r\n", 34 ) == 0 )
+  else if( memcmp( head, "EXTENDED", 8 ) == 0 )
     type = DISK_ECPC;
-  else if( memcmp( head, "MV - CPCEMU Disk-File\r\nDisk-Info\r\n", 34 ) == 0 )
+  else if( memcmp( head, "MV - CPC", 8 ) == 0 )
     type = DISK_CPC;
   else if( memcmp( head, "FDI", 3 ) == 0 )
     type = DISK_FDI;
