@@ -985,9 +985,10 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       }
     }
     fix[i] = plus3_fix;
+    if( fix[i] != 0 ) bpt = 6250;	/* we assume a standard DD track */
 					    /* tracks always N*256 byte long */
     fseek( file, trlen + ( trlen & 0x0ff ? 0x080 : 0 ), SEEK_CUR );
-    if( fix[i] == 0 && bpt > max_bpt )		/* only 'good' tracks */
+    if( bpt > max_bpt )		/* only 'good' tracks */
       max_bpt = bpt;
   }
   if( max_bpt == 0 )

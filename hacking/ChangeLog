@@ -2541,3 +2541,5 @@
 	 run-time rather than build-time option.
 20080317 disk/disk.c: add support for some alternate DSK headers (part of patch
          #1882836) (Gergely Szasz).
+20080317 disk/disk.c: fix max track length problem with Turbo outrun side B
+         (part of patch #1882836) (Gergely Szasz).
