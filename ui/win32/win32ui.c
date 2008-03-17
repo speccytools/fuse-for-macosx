@@ -415,13 +415,6 @@ ui_widgets_reset( void )
   return 0;
 }
 
-int
-menu_select_roms_with_title( const char *title, size_t start, size_t count )
-{
-  STUB;
-  return 0;
-}
-
 scaler_type
 menu_get_scaler( scaler_available_fn selector )
 {

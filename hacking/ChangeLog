@@ -2551,4 +2551,5 @@
 	 contention such that it starts 1 tstate before the top-left pixel is
 	 displayed rather than 16, which must be wrong as we then get
 	 uncontended accesses at the end of each line.
-
+20080317 windres.rc,ui/win32/{win32ui.c,roms.{c,h,rc},Makefile.am}: Win32:
+	 implementation of the ROM selection dialog (Marek).
