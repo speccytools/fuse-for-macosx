@@ -46,7 +46,6 @@
 #include "spectrum.h"
 #include "ula.h"
 
-static libspectrum_byte scorpion_contend_delay( libspectrum_dword time );
 static int scorpion_reset( void );
 static int scorpion_memory_map( void );
 
@@ -72,13 +71,6 @@ scorpion_unattached_port( void )
   return 0xff;
 }
 
-static libspectrum_byte
-scorpion_contend_delay( libspectrum_dword time GCC_UNUSED )
-{
-  /* No contention */
-  return 0;
-}
-
 int
 scorpion_init( fuse_machine_info *machine )
 {
@@ -89,8 +81,8 @@ scorpion_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.port_from_ula  = pentagon_port_from_ula;
-  machine->ram.contend_delay  = scorpion_contend_delay;
-  machine->ram.contend_delay_no_mreq = scorpion_contend_delay;
+  machine->ram.contend_delay  = spectrum_contend_delay_none;
+  machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
   machine->unattached_port = scorpion_unattached_port;
 

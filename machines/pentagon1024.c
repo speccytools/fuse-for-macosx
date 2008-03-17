@@ -78,8 +78,8 @@ pentagon1024_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.port_from_ula  = pentagon_port_from_ula;
-  machine->ram.contend_delay  = pentagon_contend_delay;
-  machine->ram.contend_delay_no_mreq = pentagon_contend_delay;
+  machine->ram.contend_delay  = spectrum_contend_delay_none;
+  machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
   machine->unattached_port = pentagon1024_unattached_port;
 

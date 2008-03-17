@@ -2543,3 +2543,12 @@
          #1882836) (Gergely Szasz).
 20080317 disk/disk.c: fix max track length problem with Turbo outrun side B
          (part of patch #1882836) (Gergely Szasz).
+20080317 machines/{pentagon.c,pentagon.h,pentagon1024.c,pentagon512.c,
+	 scorpion.c,spec128.c,spec128.h,spec16.c,spec48.c,spec48.h,spec_se.c,
+	 specplus2.c,specplus2a.c,specplus3.c,specplus3.h,specplus3e.c,tc2048.c,
+	 tc2068.c,tc2068.h,ts2068.c},spectrum.c,spectrum.h,
+	 unittests/unittests.c: refactor contention functions. Changes TS2068
+	 contention such that it starts 1 tstate before the top-left pixel is
+	 displayed rather than 16, which must be wrong as we then get
+	 uncontended accesses at the end of each line.
+

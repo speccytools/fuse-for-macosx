@@ -57,8 +57,8 @@ ts2068_init( fuse_machine_info *machine )
 
   machine->timex = 1;
   machine->ram.port_from_ula	     = tc2048_port_from_ula;
-  machine->ram.contend_delay	     = tc2068_contend_delay;
-  machine->ram.contend_delay_no_mreq = tc2068_contend_delay;
+  machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
+  machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
 
   memset( fake_bank, 0xff, MEMORY_PAGE_SIZE );
 

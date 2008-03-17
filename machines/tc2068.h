@@ -38,7 +38,6 @@ libspectrum_byte tc2068_ay_registerport_read( libspectrum_word port,
                                               int *attached );
 libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
                                           int *attached );
-libspectrum_byte tc2068_contend_delay( libspectrum_dword time );
 
 int tc2068_memory_map( void );
 

@@ -54,9 +54,9 @@ libspectrum_dword tstates;
 /* The last byte written to the ULA */
 libspectrum_byte spectrum_last_ula;
 
-/* Set these every time we change machine to avoid having to do a
-   structure lookup too often */
-spectrum_contention_delay_function contend_delay;
+/* Contention patterns */
+static int contention_pattern_65432100[] = { 5, 4, 3, 2, 1, 0, 0, 6 };
+static int contention_pattern_76543210[] = { 0, 7, 6, 5, 4, 3, 2, 1 };
 
 int
 spectrum_frame( void )
@@ -90,6 +90,59 @@ spectrum_frame( void )
   loader_frame( frame_length );
 
   return 0;
+}
+
+libspectrum_byte
+spectrum_contend_delay_none( libspectrum_dword time )
+{
+  return 0;
+}
+
+static libspectrum_byte
+contend_delay_common( libspectrum_dword time, int* timings )
+{
+  int line, tstates_through_line;
+
+  line = 
+    (libspectrum_signed_dword)( time - machine_current->line_times[ 0 ] ) /
+    machine_current->timings.tstates_per_line;
+
+  /* Work out where we are in this line, remembering that line_times[0] holds
+     the first pixel we display, not the start of where the Spectrum produced
+     the left border */
+  tstates_through_line = time - machine_current->line_times[ 0 ] +
+    ( machine_current->timings.left_border - DISPLAY_BORDER_WIDTH_COLS * 4 );
+
+  tstates_through_line %= machine_current->timings.tstates_per_line;
+
+  /* No contention in the upper and lower borders */
+  if( line < DISPLAY_BORDER_HEIGHT                   ||
+      line >= DISPLAY_BORDER_HEIGHT + DISPLAY_HEIGHT    ) return 0;
+
+  /* Or in the left border */
+  if( tstates_through_line < machine_current->timings.left_border - 1 ) 
+    return 0;
+
+  /* Or the right border or retrace */
+  if( tstates_through_line >= machine_current->timings.left_border +
+                              machine_current->timings.horizontal_screen - 1 )
+    return 0;
+
+  /* We now know the ULA is reading the screen, so put in the appropriate
+     delay */
+  return timings[ tstates_through_line % 8 ];
+}
+
+libspectrum_byte
+spectrum_contend_delay_65432100( libspectrum_dword time )
+{
+  return contend_delay_common( time, contention_pattern_65432100 );
+}
+
+libspectrum_byte
+spectrum_contend_delay_76543210( libspectrum_dword time )
+{
+  return contend_delay_common( time, contention_pattern_76543210 );
 }
 
 /* What happens if we read from an unattached port? */

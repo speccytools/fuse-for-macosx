@@ -43,8 +43,8 @@ specplus3e_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.port_from_ula	     = specplus3_port_from_ula;
-  machine->ram.contend_delay	     = specplus3_contend_delay;
-  machine->ram.contend_delay_no_mreq = specplus3_contend_delay_no_mreq;
+  machine->ram.contend_delay	     = spectrum_contend_delay_76543210;
+  machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
   machine->unattached_port = specplus3_unattached_port;
 

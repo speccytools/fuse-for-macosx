@@ -128,57 +128,6 @@ specplus3_port_from_ula( libspectrum_word port GCC_UNUSED )
   return 0;
 }
 
-libspectrum_byte
-specplus3_contend_delay( libspectrum_dword time )
-{
-  libspectrum_word tstates_through_line;
-  
-  /* No contention in the upper border */
-  if( time < machine_current->line_times[ DISPLAY_BORDER_HEIGHT ] )
-    return 0;
-
-  /* Or the lower border */
-  if( time >= machine_current->line_times[ DISPLAY_BORDER_HEIGHT + 
-					   DISPLAY_HEIGHT          ] )
-    return 0;
-
-  /* Work out where we are in this line */
-  tstates_through_line =
-    ( time + machine_current->timings.left_border ) %
-    machine_current->timings.tstates_per_line;
-
-  /* No contention if we're in the left border */
-  if( tstates_through_line < machine_current->timings.left_border - 3 ) 
-    return 0;
-
-  /* Or the right border or retrace */
-  if( tstates_through_line >= machine_current->timings.left_border +
-                              machine_current->timings.horizontal_screen - 3 )
-    return 0;
-
-  /* We now know the ULA is reading the screen, so put in the appropriate
-     delay */
-  switch( tstates_through_line % 8 ) {
-    case 5: return 1; break;
-    case 6: return 0; break;
-    case 7: return 7; break;
-    case 0: return 6; break;
-    case 1: return 5; break;
-    case 2: return 4; break;
-    case 3: return 3; break;
-    case 4: return 2; break;
-  }
-
-  return 0;	/* Shut gcc up */
-}
-
-libspectrum_byte
-specplus3_contend_delay_no_mreq( libspectrum_dword time GCC_UNUSED )
-{
-  /* No contention if MREQ not active on the +2A/+3 */
-  return 0;
-}
-
 int specplus3_init( fuse_machine_info *machine )
 {
   machine->machine = LIBSPECTRUM_MACHINE_PLUS3;
@@ -188,8 +137,8 @@ int specplus3_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.port_from_ula	     = specplus3_port_from_ula;
-  machine->ram.contend_delay	     = specplus3_contend_delay;
-  machine->ram.contend_delay_no_mreq = specplus3_contend_delay_no_mreq;
+  machine->ram.contend_delay	     = spectrum_contend_delay_76543210;
+  machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
   machine->unattached_port = specplus3_unattached_port;
 

@@ -70,8 +70,8 @@ int spec16_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.port_from_ula  = spec48_port_from_ula;
-  machine->ram.contend_delay  = spec48_contend_delay;
-  machine->ram.contend_delay_no_mreq = spec48_contend_delay;
+  machine->ram.contend_delay  = spectrum_contend_delay_65432100;
+  machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
 
   memset( empty_chunk, 0xff, MEMORY_PAGE_SIZE );
 

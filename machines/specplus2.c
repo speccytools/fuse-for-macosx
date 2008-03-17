@@ -49,8 +49,8 @@ int specplus2_init( fuse_machine_info *machine )
 
   machine->timex = 0;
   machine->ram.port_from_ula	     = spec48_port_from_ula;
-  machine->ram.contend_delay	     = spec128_contend_delay;
-  machine->ram.contend_delay_no_mreq = spec128_contend_delay;
+  machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
+  machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
 
   machine->unattached_port = spec128_unattached_port;
 

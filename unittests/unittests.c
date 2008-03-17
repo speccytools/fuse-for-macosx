@@ -62,7 +62,7 @@ contention_test( void )
     target = 2307895296UL;
     break;
   case LIBSPECTRUM_MACHINE_TS2068:
-    target = 1975529472UL;
+    target = 1976497152UL;
     break;
   case LIBSPECTRUM_MACHINE_PENT:
   case LIBSPECTRUM_MACHINE_PENT512:
