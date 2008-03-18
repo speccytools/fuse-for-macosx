@@ -243,7 +243,6 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
       *mfm = d->track[ d->i ] == 0x4e ? 1 : 0;	/* not so robust */
     if( !datamark_read( d, &del ) )
       r |= DISK_CORRUPT_SECTOR;
-    /* h != head? s != sectors? */
     if( t != track )
       r |= DISK_ID_NOTMATCH;
     if( s < *sector_base )
@@ -952,8 +951,8 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
     gap = (unsigned char)head[0x16] == 0xff ? GAP_MINIMAL_FM :
     					    GAP_MINIMAL_MFM;
     plus3_fix = trlen = 0;
-    while( i != head[0x10] * d->sides + head[0x11] ) {
-      fix[i] = 0;
+    while( i < head[0x10] * d->sides + head[0x11] ) {
+      if( i < 42 ) fix[i] = 0;
       i++;
     }
     bpt = postindex_len( d, gap ) +
@@ -983,12 +982,15 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 	else if( j > 10 && plus3_fix == 2 )
 	  plus3_fix = 0;
       }
+      if( seclen == 0x80 )		/* every 128byte length sector padded */
+	fseek( file, 0x80, SEEK_CUR );
     }
-    fix[i] = plus3_fix;
-    if( fix[i] != 0 ) bpt = 6250;	/* we assume a standard DD track */
-					    /* tracks always N*256 byte long */
-    fseek( file, trlen + ( trlen & 0x0ff ? 0x080 : 0 ), SEEK_CUR );
-    if( bpt > max_bpt )		/* only 'good' tracks */
+    if( i < 42 ) {
+      fix[i] = plus3_fix;
+      if( fix[i] != 0 ) bpt = 6250;	/* we assume a standard DD track */
+    }
+    fseek( file, trlen, SEEK_CUR );
+    if( bpt > max_bpt )
       max_bpt = bpt;
   }
   if( max_bpt == 0 )
@@ -1061,9 +1063,9 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 			( 0x80 << head[ 0x1b + 8 * j ] ), SEEK_CUR );	
 						/* ( ( N * len ) / len - 1 ) * len */
       }
+      if( seclen == 0x80 )		/* every 128byte length sector padded */
+	fseek( file, 0x80, SEEK_CUR );
     }
-					    /* tracks always N*256 byte long */
-    if( trlen & 0xff ) fseek( file, 128, SEEK_CUR );
     gap4_add( d, gap );
   }
   return d->status = DISK_OK;

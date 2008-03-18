@@ -2556,3 +2556,7 @@
 20080318 unittests/unittests.c: add floating bus unit test. Currently fails
 	 on the Pentagon 512, but I'm convinced that's a copy-and-paste error
 	 in the Pentagon 512 code.
+20080318 disk/disk.c: fix for CPC images to pad every 128 byte length sector to
+         256 bytes immediately after the sector data (128xE5 + 128x00;
+         128xE5+128x00; ...  128xE5+128x00), so every sector uses 256 data
+         bytes (part of patch #1882836) (Gergely Szasz).
