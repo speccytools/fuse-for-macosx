@@ -39,7 +39,7 @@ contention_test( void )
 
   for( i = 0; i < ULA_CONTENTION_SIZE; i++ ) {
     /* Naive, but it will do for now */
-    checksum += ula_contention[ i ] * (libspectrum_dword)( i + 1 );
+    checksum += ula_contention[ i ] * ( i + 1 );
   }
 
   switch( machine_current->machine ) {
@@ -83,12 +83,61 @@ contention_test( void )
   return error;
 }
 
+static int
+floating_bus_test( void )
+{
+  libspectrum_dword checksum = 0, target;
+  libspectrum_word offset;
+  int error = 0;
+
+  for( offset = 0; offset < 8192; offset++ )
+    RAM[ memory_current_screen ][ offset ] = offset % 0x100;
+
+  for( tstates = 0; tstates < ULA_CONTENTION_SIZE; tstates++ )
+    checksum += machine_current->unattached_port() * ( tstates + 1 );
+
+  switch( machine_current->machine ) {
+  case LIBSPECTRUM_MACHINE_16:
+  case LIBSPECTRUM_MACHINE_48:
+    target = 3427723200UL;
+    break;
+  case LIBSPECTRUM_MACHINE_128:
+  case LIBSPECTRUM_MACHINE_PLUS2:
+    target = 2854561728UL;
+    break;
+  case LIBSPECTRUM_MACHINE_PLUS2A:
+  case LIBSPECTRUM_MACHINE_PLUS3:
+  case LIBSPECTRUM_MACHINE_PLUS3E:
+  case LIBSPECTRUM_MACHINE_TC2048:
+  case LIBSPECTRUM_MACHINE_TC2068:
+  case LIBSPECTRUM_MACHINE_TS2068:
+  case LIBSPECTRUM_MACHINE_SE:
+  case LIBSPECTRUM_MACHINE_PENT:
+  case LIBSPECTRUM_MACHINE_PENT512:
+  case LIBSPECTRUM_MACHINE_PENT1024:
+  case LIBSPECTRUM_MACHINE_SCORP:
+    target = 4261381056UL;
+    break;
+  default:
+    target = -1;
+    break;
+  }
+
+  if( checksum != target ) {
+    fprintf( stderr, "%s: floating bus test: checksum = %u, expected = %u\n", fuse_progname, checksum, target );
+    error = 1;
+  }
+
+  return error;
+}
+
 int
 unittests_run( void )
 {
   int r;
 
   r += contention_test();
+  r += floating_bus_test();
 
   return r;
 }
