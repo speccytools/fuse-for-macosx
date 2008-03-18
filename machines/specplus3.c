@@ -115,12 +115,6 @@ static FDRV_PTR drive_null;	/* A null drive for drives 2 and 3 of the
 				   FDC */
 #endif				/* #ifdef HAVE_765_H */
 
-libspectrum_byte
-specplus3_unattached_port( void )
-{
-  return 0xff;
-}
-
 int
 specplus3_port_from_ula( libspectrum_word port GCC_UNUSED )
 {
@@ -140,7 +134,7 @@ int specplus3_init( fuse_machine_info *machine )
   machine->ram.contend_delay	     = spectrum_contend_delay_76543210;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
-  machine->unattached_port = specplus3_unattached_port;
+  machine->unattached_port = spectrum_unattached_port_none;
 
   specplus3_765_init();
 

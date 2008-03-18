@@ -55,12 +55,6 @@ static const periph_t peripherals[] = {
 static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-static libspectrum_byte
-spec16_unattached_port( void )
-{
-  return spectrum_unattached_port();
-}
-
 int spec16_init( fuse_machine_info *machine )
 {
   machine->machine = LIBSPECTRUM_MACHINE_16;
@@ -81,7 +75,7 @@ int spec16_init( fuse_machine_info *machine )
   empty_mapping.bank = MEMORY_BANK_NONE;
   empty_mapping.source = MEMORY_SOURCE_SYSTEM;
 
-  machine->unattached_port = spec16_unattached_port;
+  machine->unattached_port = spectrum_unattached_port;
 
   machine->shutdown = NULL;
 

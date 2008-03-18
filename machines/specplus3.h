@@ -41,7 +41,6 @@
 extern const periph_t specplus3_peripherals[];
 extern const size_t specplus3_peripherals_count;
 
-libspectrum_byte specplus3_unattached_port( void );
 int specplus3_port_from_ula( libspectrum_word port );
 
 int specplus3_init( fuse_machine_info *machine );

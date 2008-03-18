@@ -102,14 +102,6 @@ tc2068_ay_dataport_read( libspectrum_word port, int *attached )
   }
 }
 
-libspectrum_byte
-tc2068_unattached_port( void )
-{
-  /* TC2068 does not have floating ULA values on any port (despite
-     rumours to the contrary), it returns 0xff on unattached ports */
-  return 0xff;
-}
-
 int
 tc2068_init( fuse_machine_info *machine )
 {
@@ -132,7 +124,7 @@ tc2068_init( fuse_machine_info *machine )
   fake_mapping.source = MEMORY_SOURCE_SYSTEM;
   fake_mapping.offset = 0x0000;
 
-  machine->unattached_port = tc2068_unattached_port;
+  machine->unattached_port = spectrum_unattached_port_none;
 
   machine->shutdown = NULL;
 

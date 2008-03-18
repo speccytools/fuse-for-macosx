@@ -2560,3 +2560,8 @@
          256 bytes immediately after the sector data (128xE5 + 128x00;
          128xE5+128x00; ...  128xE5+128x00), so every sector uses 256 data
          bytes (part of patch #1882836) (Gergely Szasz).
+20080318 machines/{pentagon.c,pentagon1024.c,pentagon512.c,scorpion.c,
+	 spec128.[ch],spec16.c,spec48.c,spec_se.c,specplus2.c,specplus2a.c,
+	 specplus3.[ch],specplus3e.c,tc2048.c,tc2068.[ch],ts2068.c},spectrum.c,
+	 spectrum.h: refactor floating bus code, including removing
+	 Pentagon 512 floating bus.

@@ -213,3 +213,9 @@ spectrum_unattached_port( void )
 
   return 0;		/* Keep gcc happy */
 }
+
+libspectrum_byte
+spectrum_unattached_port_none( void )
+{
+  return 0xff;
+}

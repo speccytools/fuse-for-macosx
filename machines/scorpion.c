@@ -65,12 +65,6 @@ static const periph_t peripherals[] = {
 static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-static libspectrum_byte
-scorpion_unattached_port( void )
-{
-  return 0xff;
-}
-
 int
 scorpion_init( fuse_machine_info *machine )
 {
@@ -84,7 +78,7 @@ scorpion_init( fuse_machine_info *machine )
   machine->ram.contend_delay  = spectrum_contend_delay_none;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
-  machine->unattached_port = scorpion_unattached_port;
+  machine->unattached_port = spectrum_unattached_port_none;
 
   machine->shutdown = NULL;
 

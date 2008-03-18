@@ -98,7 +98,7 @@ spec_se_init( fuse_machine_info *machine )
   machine->ram.contend_delay = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
 
-  machine->unattached_port = tc2068_unattached_port;
+  machine->unattached_port = spectrum_unattached_port_none;
 
   machine->shutdown = NULL;
 

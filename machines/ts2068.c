@@ -69,7 +69,7 @@ ts2068_init( fuse_machine_info *machine )
   fake_mapping.source = MEMORY_SOURCE_SYSTEM;
   fake_mapping.offset = 0x0000;
 
-  machine->unattached_port = tc2068_unattached_port;
+  machine->unattached_port = spectrum_unattached_port_none;
 
   machine->shutdown = NULL;
 

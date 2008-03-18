@@ -89,12 +89,6 @@ pentagon_select_ff_read( libspectrum_word port, int *attached )
   return data;
 }
 
-static libspectrum_byte
-pentagon_unattached_port( void )
-{
-  return 0xff;
-}
-
 int
 pentagon_port_from_ula( libspectrum_word port GCC_UNUSED )
 {
@@ -115,7 +109,7 @@ pentagon_init( fuse_machine_info *machine )
   machine->ram.contend_delay  = spectrum_contend_delay_none;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
-  machine->unattached_port = pentagon_unattached_port;
+  machine->unattached_port = spectrum_unattached_port_none;
 
   machine->shutdown = NULL;
 

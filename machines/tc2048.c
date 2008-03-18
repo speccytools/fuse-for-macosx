@@ -61,14 +61,6 @@ static const periph_t peripherals[] = {
 static const size_t peripherals_count =
   sizeof( peripherals ) / sizeof( periph_t );
 
-static libspectrum_byte
-tc2048_unattached_port( void )
-{
-  /* TC2048 does not have floating ULA values on any port (despite rumours
-     to the contrary), it returns 0xff on unattached ports */
-  return 0xff;
-}
-
 int
 tc2048_port_from_ula( libspectrum_word port )
 {
@@ -97,7 +89,7 @@ int tc2048_init( fuse_machine_info *machine )
   fake_mapping.contended = 0;
   fake_mapping.offset = 0x0000;
 
-  machine->unattached_port = tc2048_unattached_port;
+  machine->unattached_port = spectrum_unattached_port_none;
 
   machine->shutdown = NULL;
 

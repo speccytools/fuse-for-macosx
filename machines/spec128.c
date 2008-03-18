@@ -55,12 +55,6 @@ const periph_t spec128_peripherals[] = {
 const size_t spec128_peripherals_count =
   sizeof( spec128_peripherals ) / sizeof( periph_t );
 
-libspectrum_byte
-spec128_unattached_port( void )
-{
-  return spectrum_unattached_port();
-}
-
 int spec128_init( fuse_machine_info *machine )
 {
   machine->machine = LIBSPECTRUM_MACHINE_128;
@@ -73,7 +67,7 @@ int spec128_init( fuse_machine_info *machine )
   machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
 
-  machine->unattached_port = spec128_unattached_port;
+  machine->unattached_port = spectrum_unattached_port;
 
   machine->shutdown = NULL;
 

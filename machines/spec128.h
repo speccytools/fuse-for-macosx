@@ -34,8 +34,6 @@
 extern const periph_t spec128_peripherals[];
 extern const size_t spec128_peripherals_count;
 
-libspectrum_byte spec128_unattached_port( void );
-
 int spec128_init( fuse_machine_info *machine );
 int spec128_common_reset( int contention );
 
