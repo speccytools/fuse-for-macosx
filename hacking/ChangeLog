@@ -2565,3 +2565,5 @@
 	 specplus3.[ch],specplus3e.c,tc2048.c,tc2068.[ch],ts2068.c},spectrum.c,
 	 spectrum.h: refactor floating bus code, including removing
 	 Pentagon 512 floating bus.
+20080319 roms/{plus3e-0.rom,roms/plus3e-1.rom,roms/plus3e-2.rom}: update to
+         v1.35 of the +3e ROMs (Fred).
