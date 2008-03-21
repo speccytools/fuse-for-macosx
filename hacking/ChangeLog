@@ -2567,3 +2567,6 @@
 	 Pentagon 512 floating bus.
 20080319 roms/{plus3e-0.rom,roms/plus3e-1.rom,roms/plus3e-2.rom}: update to
          v1.35 of the +3e ROMs (Fred).
+20080321 machine.[ch],settings.dat,ui/options.dat,unittests/unittests.c:
+	 add --late-timings option to emulate machines with 1 tstate later
+	 timings.

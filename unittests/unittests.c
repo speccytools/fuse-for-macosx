@@ -29,6 +29,7 @@
 
 #include "fuse.h"
 #include "machine.h"
+#include "settings.h"
 #include "ula.h"
 
 static int
@@ -42,37 +43,72 @@ contention_test( void )
     checksum += ula_contention[ i ] * ( i + 1 );
   }
 
-  switch( machine_current->machine ) {
-  case LIBSPECTRUM_MACHINE_16:
-  case LIBSPECTRUM_MACHINE_48:
-  case LIBSPECTRUM_MACHINE_SE:
-    target = 2308862976UL;
-    break;
-  case LIBSPECTRUM_MACHINE_128:
-  case LIBSPECTRUM_MACHINE_PLUS2:
-    target = 2335183872UL;
-    break;
-  case LIBSPECTRUM_MACHINE_PLUS2A:
-  case LIBSPECTRUM_MACHINE_PLUS3:
-  case LIBSPECTRUM_MACHINE_PLUS3E:
-    target = 3113754624UL;
-    break;
-  case LIBSPECTRUM_MACHINE_TC2048:
-  case LIBSPECTRUM_MACHINE_TC2068:
-    target = 2307895296UL;
-    break;
-  case LIBSPECTRUM_MACHINE_TS2068:
-    target = 1976497152UL;
-    break;
-  case LIBSPECTRUM_MACHINE_PENT:
-  case LIBSPECTRUM_MACHINE_PENT512:
-  case LIBSPECTRUM_MACHINE_PENT1024:
-  case LIBSPECTRUM_MACHINE_SCORP:
-    target = 0;
-    break;
-  default:
-    target = -1;
-    break;
+  if( settings_current.late_timings ) {
+    switch( machine_current->machine ) {
+    case LIBSPECTRUM_MACHINE_16:
+    case LIBSPECTRUM_MACHINE_48:
+    case LIBSPECTRUM_MACHINE_SE:
+      target = 2308927488UL;
+      break;
+    case LIBSPECTRUM_MACHINE_128:
+    case LIBSPECTRUM_MACHINE_PLUS2:
+      target = 2335248384UL;
+      break;
+    case LIBSPECTRUM_MACHINE_PLUS2A:
+    case LIBSPECTRUM_MACHINE_PLUS3:
+    case LIBSPECTRUM_MACHINE_PLUS3E:
+      target = 3113840640UL;
+      break;
+    case LIBSPECTRUM_MACHINE_TC2048:
+    case LIBSPECTRUM_MACHINE_TC2068:
+      target = 2307959808UL;
+      break;
+    case LIBSPECTRUM_MACHINE_TS2068:
+      target = 1976561664UL;
+      break;
+    case LIBSPECTRUM_MACHINE_PENT:
+    case LIBSPECTRUM_MACHINE_PENT512:
+    case LIBSPECTRUM_MACHINE_PENT1024:
+    case LIBSPECTRUM_MACHINE_SCORP:
+      target = 0;
+      break;
+    default:
+      target = -1;
+      break;
+    }
+  } else {
+    switch( machine_current->machine ) {
+    case LIBSPECTRUM_MACHINE_16:
+    case LIBSPECTRUM_MACHINE_48:
+    case LIBSPECTRUM_MACHINE_SE:
+      target = 2308862976UL;
+      break;
+    case LIBSPECTRUM_MACHINE_128:
+    case LIBSPECTRUM_MACHINE_PLUS2:
+      target = 2335183872UL;
+      break;
+    case LIBSPECTRUM_MACHINE_PLUS2A:
+    case LIBSPECTRUM_MACHINE_PLUS3:
+    case LIBSPECTRUM_MACHINE_PLUS3E:
+      target = 3113754624UL;
+      break;
+    case LIBSPECTRUM_MACHINE_TC2048:
+    case LIBSPECTRUM_MACHINE_TC2068:
+      target = 2307895296UL;
+      break;
+    case LIBSPECTRUM_MACHINE_TS2068:
+      target = 1976497152UL;
+      break;
+    case LIBSPECTRUM_MACHINE_PENT:
+    case LIBSPECTRUM_MACHINE_PENT512:
+    case LIBSPECTRUM_MACHINE_PENT1024:
+    case LIBSPECTRUM_MACHINE_SCORP:
+      target = 0;
+      break;
+    default:
+      target = -1;
+      break;
+    }
   }
 
   if( checksum != target ) {
@@ -96,31 +132,60 @@ floating_bus_test( void )
   for( tstates = 0; tstates < ULA_CONTENTION_SIZE; tstates++ )
     checksum += machine_current->unattached_port() * ( tstates + 1 );
 
-  switch( machine_current->machine ) {
-  case LIBSPECTRUM_MACHINE_16:
-  case LIBSPECTRUM_MACHINE_48:
-    target = 3427723200UL;
-    break;
-  case LIBSPECTRUM_MACHINE_128:
-  case LIBSPECTRUM_MACHINE_PLUS2:
-    target = 2854561728UL;
-    break;
-  case LIBSPECTRUM_MACHINE_PLUS2A:
-  case LIBSPECTRUM_MACHINE_PLUS3:
-  case LIBSPECTRUM_MACHINE_PLUS3E:
-  case LIBSPECTRUM_MACHINE_TC2048:
-  case LIBSPECTRUM_MACHINE_TC2068:
-  case LIBSPECTRUM_MACHINE_TS2068:
-  case LIBSPECTRUM_MACHINE_SE:
-  case LIBSPECTRUM_MACHINE_PENT:
-  case LIBSPECTRUM_MACHINE_PENT512:
-  case LIBSPECTRUM_MACHINE_PENT1024:
-  case LIBSPECTRUM_MACHINE_SCORP:
-    target = 4261381056UL;
-    break;
-  default:
-    target = -1;
-    break;
+  if( settings_current.late_timings ) {
+    switch( machine_current->machine ) {
+    case LIBSPECTRUM_MACHINE_16:
+    case LIBSPECTRUM_MACHINE_48:
+      target = 3426156480UL;
+      break;
+    case LIBSPECTRUM_MACHINE_128:
+    case LIBSPECTRUM_MACHINE_PLUS2:
+      target = 2852995008UL;
+      break;
+    case LIBSPECTRUM_MACHINE_PLUS2A:
+    case LIBSPECTRUM_MACHINE_PLUS3:
+    case LIBSPECTRUM_MACHINE_PLUS3E:
+    case LIBSPECTRUM_MACHINE_TC2048:
+    case LIBSPECTRUM_MACHINE_TC2068:
+    case LIBSPECTRUM_MACHINE_TS2068:
+    case LIBSPECTRUM_MACHINE_SE:
+    case LIBSPECTRUM_MACHINE_PENT:
+    case LIBSPECTRUM_MACHINE_PENT512:
+    case LIBSPECTRUM_MACHINE_PENT1024:
+    case LIBSPECTRUM_MACHINE_SCORP:
+      target = 4261381056UL;
+      break;
+    default:
+      target = -1;
+      break;
+    }
+  } else {
+    switch( machine_current->machine ) {
+    case LIBSPECTRUM_MACHINE_16:
+    case LIBSPECTRUM_MACHINE_48:
+      target = 3427723200UL;
+      break;
+    case LIBSPECTRUM_MACHINE_128:
+    case LIBSPECTRUM_MACHINE_PLUS2:
+      target = 2854561728UL;
+      break;
+    case LIBSPECTRUM_MACHINE_PLUS2A:
+    case LIBSPECTRUM_MACHINE_PLUS3:
+    case LIBSPECTRUM_MACHINE_PLUS3E:
+    case LIBSPECTRUM_MACHINE_TC2048:
+    case LIBSPECTRUM_MACHINE_TC2068:
+    case LIBSPECTRUM_MACHINE_TS2068:
+    case LIBSPECTRUM_MACHINE_SE:
+    case LIBSPECTRUM_MACHINE_PENT:
+    case LIBSPECTRUM_MACHINE_PENT512:
+    case LIBSPECTRUM_MACHINE_PENT1024:
+    case LIBSPECTRUM_MACHINE_SCORP:
+      target = 4261381056UL;
+      break;
+    default:
+      target = -1;
+      break;
+    }
   }
 
   if( checksum != target ) {

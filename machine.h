@@ -1,5 +1,5 @@
 /* machine.h: Routines for handling the various machine types
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2008 Philip Kendall
 
    $Id$
 
@@ -95,8 +95,6 @@ int machine_init_machines( void );
 int machine_select( libspectrum_machine type );
 int machine_select_id( const char *id );
 const char* machine_get_id( libspectrum_machine type );
-
-int machine_set_timings( fuse_machine_info *machine );
 
 int machine_load_rom_bank_from_buffer( memory_page* bank_map, size_t which,
                                        int page_num, unsigned char *buffer,

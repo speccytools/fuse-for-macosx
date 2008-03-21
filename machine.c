@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2005 Philip Kendall
+   Copyright (c) 1999-2008 Philip Kendall
 
    $Id$
 
@@ -57,6 +57,8 @@ static int machine_location;	/* Where is the current machine in
 
 static int machine_add_machine( int (*init_function)(fuse_machine_info *machine) );
 static int machine_select_machine( fuse_machine_info *machine );
+static void machine_set_const_timings( fuse_machine_info *machine );
+static void machine_set_variable_timings( fuse_machine_info *machine );
 
 int machine_init_machines( void )
 {
@@ -129,7 +131,7 @@ static int machine_add_machine( int (*init_function)( fuse_machine_info *machine
 
   error = init_function( machine ); if( error ) return error;
 
-  error = machine_set_timings( machine ); if( error ) return error;
+  machine_set_const_timings( machine );
 
   machine->capabilities = libspectrum_machine_capabilities( machine->machine );
 
@@ -362,6 +364,8 @@ machine_reset( int hard_reset )
 
   machine_current->ram.romcs = 0;
 
+  machine_set_variable_timings( machine_current );
+
   /* Do the machine-specific bits, including loading the ROMs */
   error = machine_current->reset(); if( error ) return error;
 
@@ -388,11 +392,9 @@ machine_reset( int hard_reset )
   return 0;
 }
 
-int
-machine_set_timings( fuse_machine_info *machine )
+static void
+machine_set_const_timings( fuse_machine_info *machine )
 {
-  size_t y;
-
   /* Pull timings we use repeatedly out of libspectrum and store them
      for ourself */
   machine->timings.processor_speed =
@@ -409,6 +411,12 @@ machine_set_timings( fuse_machine_info *machine )
     libspectrum_timings_interrupt_length( machine->machine );
   machine->timings.tstates_per_frame =
     libspectrum_timings_tstates_per_frame( machine->machine );
+}
+
+static void
+machine_set_variable_timings( fuse_machine_info *machine )
+{
+  size_t y;
 
   /* Magic number alert
 
@@ -429,12 +437,12 @@ machine_set_timings( fuse_machine_info *machine )
     DISPLAY_BORDER_HEIGHT * machine->timings.tstates_per_line -
     4 * DISPLAY_BORDER_WIDTH_COLS; /* Left border at 4 tstates per column */
 
+  if( settings_current.late_timings ) machine->line_times[0]++;
+
   for( y=1; y<DISPLAY_SCREEN_HEIGHT+1; y++ ) {
     machine->line_times[y] = machine->line_times[y-1] + 
                              machine->timings.tstates_per_line;
   }
-
-  return 0;
 }
 
 int machine_end( void )

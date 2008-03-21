@@ -1,5 +1,5 @@
 # settings.dat: configuration options for Fuse
-# Copyright (c) 2002-2004 Philip Kendall
+# Copyright (c) 2002-2008 Philip Kendall
 
 # $Id$
 
@@ -64,6 +64,7 @@ snapsasz80, null, 0
 pal_tv2x, boolean, 0
 plusd, boolean, 0
 beta128, boolean, 0
+late_timings, boolean, 0
 unittests, boolean, 0
 
 sound_device, string, NULL, 'd'

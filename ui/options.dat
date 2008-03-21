@@ -24,6 +24,7 @@ Checkbox, Full (s)creen, full_screen, INPUT_KEY_s
 Checkbox, (C)onfirm actions, confirm_actions, INPUT_KEY_c
 Checkbox, Show status(b)ar, statusbar, INPUT_KEY_b
 Checkbox, Snap (j)oystick prompt, joy_prompt, INPUT_KEY_j
+Checkbox, Late t(i)mings, late_timings, INPUT_KEY_i
 
 peripherals
 Peripheral Options
