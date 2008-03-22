@@ -2572,3 +2572,5 @@
 	 timings.
 20080322 periph.c: implement the "write back" that occurs with any bytes read
 	 from port 0x7ffd on the 128/+2 (thanks, Marat Fayzullin).
+20080322 windres.rc,ui/win32/{rollback.h.{c,h,rc},win32ui.c,Makefile.am}:
+	 Win32: Implementation of the Rollback dialog (Marek).

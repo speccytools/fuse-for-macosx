@@ -548,13 +548,6 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 }
 
 int
-ui_get_rollback_point( GSList *points )
-{
-  STUB;
-  return -1;
-}
-
-int
 ui_menu_item_set_active( const char *path, int active )
 {
   /* STUB; */

@@ -45,6 +45,8 @@ libuiwin32_a_SOURCES = binary.c \
 		       picture.c \
 		       pokefinder.c \
 		       pokefinder.rc \
+		       rollback.c \
+		       rollback.rc \
 		       roms.c \
 		       roms.rc \
 		       statusbar.c \
@@ -93,6 +95,7 @@ noinst_HEADERS = binary.h \
 		 debugger.h \
 		 picture.h \
 		 pokefinder.h \
+		 rollback.h \
 		 roms.h \
 		 memorybrowser.h \
 		 menu_data.h \

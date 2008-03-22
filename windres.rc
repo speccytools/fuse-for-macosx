@@ -29,6 +29,9 @@ win32_icon ICON "winfuse.ico"
 
 #ifdef UI_WIN32
 
+/* FIXME: change ids of all OK and Cancel buttons:
+   http://blogs.msdn.com/oldnewthing/archive/2004/12/14/300204.aspx */
+
 #include "ui/win32/binary.rc"           /* reserved ids: 1300 - 1399 */
 #include "ui/win32/browse.rc"           /* reserved ids: 1400 - 1499 */
 #include "ui/win32/debugger.rc"         /* reserved ids: 2000 - 2099 */
@@ -37,6 +40,7 @@ win32_icon ICON "winfuse.ico"
 #include "ui/win32/options.rc"          /* reserved ids: 3000 - 3099 */
 #include "ui/win32/picture.rc"          /* reserved ids: 1200 - 1299 */
 #include "ui/win32/pokefinder.rc"       /* reserved ids: 1500 - 1599 */
+#include "ui/win32/rollback.rc"         /* reserved ids: 1600 - 1699 */
 #include "ui/win32/roms.rc"             /* reserved ids: 1100 - 1199 */
 #include "ui/win32/select_template.rc"  /* reserved ids: 1000 - 1099 */
 #include "ui/win32/statusbar.rc"        /* reserved ids: 900         */
