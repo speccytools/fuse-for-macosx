@@ -2570,3 +2570,5 @@
 20080321 machine.[ch],settings.dat,ui/options.dat,unittests/unittests.c:
 	 add --late-timings option to emulate machines with 1 tstate later
 	 timings.
+20080322 periph.c: implement the "write back" that occurs with any bytes read
+	 from port 0x7ffd on the 128/+2 (thanks, Marat Fayzullin).

@@ -171,7 +171,16 @@ readport( libspectrum_word port )
   ula_contend_port_early( port );
   ula_contend_port_late( port );
   b = readport_internal( port );
+
+  /* Very ugly to put this here, but unless anything else needs this
+     "writeback" mechanism, no point producing a general framework */
+  if( ( port & 0x8002 ) == 0 &&
+      ( machine_current->machine == LIBSPECTRUM_MACHINE_128   ||
+	machine_current->machine == LIBSPECTRUM_MACHINE_PLUS2    ) )
+    writeport_internal( 0x7ffd, b );
+
   tstates++;
+
 
   return b;
 }
