@@ -596,16 +596,16 @@ disk_alloc( disk_t *d )
     d->bpt = disk_bpt[ d->density ];
   } else if( d->bpt > 12500 ) {
     return d->status = DISK_UNSUP;
-  } else if( d->bpt > 10400 ) {
+  } else if( d->bpt > 10416 ) {
     d->density = DISK_HD;
     d->bpt = disk_bpt[ DISK_HD ];
-  } else if( d->bpt > 6200 ) {
+  } else if( d->bpt > 6250 ) {
     d->density = DISK_8_DD;
     d->bpt = disk_bpt[ DISK_8_DD ];
-  } else if( d->bpt > 5100 ) {
+  } else if( d->bpt > 5208 ) {
     d->density = DISK_DD;
     d->bpt = disk_bpt[ DISK_DD ];
-  } else if( d->bpt > 3100 ) {
+  } else if( d->bpt > 3125 ) {
     d->density = DISK_8_SD;
     d->bpt = disk_bpt[ DISK_8_SD ];
   } else if( d->bpt > 0 ) {

@@ -2574,3 +2574,5 @@
 	 from port 0x7ffd on the 128/+2 (thanks, Marat Fayzullin).
 20080322 windres.rc,ui/win32/{rollback.h.{c,h,rc},win32ui.c,Makefile.am}:
 	 Win32: Implementation of the Rollback dialog (Marek).
+20080318 disk/disk.c: fix for bytes per track settings in auto density
+         selection code (part of patch #1882836) (Gergely Szasz).
