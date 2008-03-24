@@ -2576,3 +2576,5 @@
 	 Win32: Implementation of the Rollback dialog (Marek).
 20080318 disk/disk.c: fix for bytes per track settings in auto density
          selection code (part of patch #1882836) (Gergely Szasz).
+20080318 disk/disk.c: add additional handling for fake sectors (part of patch
+         #1882836) (Gergely Szasz).

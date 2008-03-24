@@ -1042,7 +1042,12 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
                   head[ 0x1c + 8 * j ] & 0x20 && !( head[ 0x1d + 8 * j ] & 0x20 ) ? 
                   CRC_ERROR : CRC_OK );
 
-      if( fix[i] == 2 && j == 0 ) {	/* 6144, 10x512 */
+      if( fix[i] == 1 && j == 0 ) {	/* 6144 */
+        data_add( d, file, NULL, seclen, 
+    		head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
+		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?
+		CRC_ERROR : CRC_OK, 0x00 );
+      } else if( fix[i] == 2 && j == 0 ) {	/* 6144, 10x512 */
         datamark_add( d, head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap );
         gap_add( d, 2, gap );
         fseek( file, seclen, SEEK_CUR );
