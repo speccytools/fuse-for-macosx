@@ -114,8 +114,8 @@ EXTRA_fuse_SOURCES = windres.rc
 
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
-disk/libdisk.a \
 machines/libmachines.a \
+disk/libdisk.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
 ui/scaler/libscaler.a \
@@ -123,7 +123,6 @@ unittests/libunittests.a \
 debugger/libdebugger.a \
 timer/libtimer.a \
 z80/libz80.a \
-@DSKLIBS@ \
 @LIBSPEC_LIBS@ \
 @GLIB_LIBS@ \
 @PNG_LIBS@ \
@@ -155,7 +154,7 @@ settings.c: settings.pl settings.dat
 settings.h: settings-header.pl settings.dat
 	@PERL@ -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
 
-INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ @DSK_CFLAGS@\
+INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
 @XML_CFLAGS@ @SAMPLERATE_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@
 
 noinst_HEADERS = ay.h \

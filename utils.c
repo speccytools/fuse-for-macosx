@@ -115,20 +115,12 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_DISK_PLUS3:
-#ifdef HAVE_765_H
-
     if( !( machine_current->capabilities &
 	   LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_DISK ) ) {
       error = machine_select( LIBSPECTRUM_MACHINE_PLUS3 ); if( error ) break;
     }
 
     error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename, autoload );
-    break;
-
-#else				/* #ifdef HAVE_765_H */
-    ui_error( UI_ERROR_WARNING,
-	      "lib765 not present so can't handle .dsk files" );
-#endif				/* #ifdef HAVE_765_H */
     break;
 
   case LIBSPECTRUM_CLASS_DISK_PLUSD:

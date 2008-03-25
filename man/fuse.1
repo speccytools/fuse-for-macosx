@@ -3130,11 +3130,7 @@ by doing `head \-1
 one format will start `MV \- CPCEMU' and the other will start
 `EXTENDED').
 .PP
-The `lib765' library used by Fuse to emulate the +3's FDC supports the
-`CPCEMU' format, but not the extended format. If the `libdsk' library
-was also found while compiling Fuse, this is used to provide support
-for the extended format, as well as for other goodies such as
-compressed disk images.
+Fuse supports both the `CPCEMU' and `EXTENDED' formats.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3349,9 +3345,8 @@ Russell Marks wrote the sound emulation and OSS-specific sound code,
 the joystick emulation, some of the printer code, and the original
 version of this man page.
 .PP
-John Elliott's lib765 library emulates the +3's disk controller chip,
-providing Fuse's +3 disk support, and his libdsk library provides
-support for more disk image formats.
+John Elliott's lib765 and libdsk libraries were used for the original
++3 disk and disk image support.
 .PP
 Ian Collier wrote the ZX Printer emulation (for xz80).
 .PP
@@ -3387,4 +3382,5 @@ emulations.
 .PP
 Gergely Szasz wrote the Interface I and Microdrive emulation, the PAL
 TV scalers, the TV 3x scaler, the movie logging code, the libao sound
-code, and made many improvements to the widget code.
+code, the upd765 disk controller used in the +3 and made many
+improvements to the widget code.

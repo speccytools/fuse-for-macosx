@@ -40,11 +40,6 @@ Required:
 
 Optional:
 
-* If you want +3 and +3e support, you'll need John Elliott's lib765
-  installed; get it from http://www.seasip.demon.co.uk/Unix/LibDsk/
-  If you also have libdsk (from the same location) installed, you'll
-  also get support for extended .dsk files (see 'THE .DSK FORMAT'
-  section in fuse(1) for more details on this).
 * Other libraries will give you some extended functionality:
   * libgcrypt: the ability to digitally sign input recordings (note that
     Fuse requires version 1.1.42 or later).
@@ -117,8 +112,7 @@ Building the OS X version of Fuse
 ---------------------------------
 
 The native Cocoa port by Fredrick Meunier <fredm@spamcop.net> comes as
-a set of Xcode projects for libbz2, lib765, libdsk, libgcrypt,
-libspectrum and Fuse itself.
+a set of Xcode projects for libgcrypt, libspectrum and Fuse itself.
 
 Closing comments
 ----------------

@@ -84,10 +84,7 @@ specplus3e_reset( void )
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
-#ifdef HAVE_765_H
-  specplus3_fdc_reset();
   specplus3_menu_items();
-#endif				/* #ifdef HAVE_765_H */
 
   return 0;
 }

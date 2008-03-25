@@ -360,9 +360,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
 
   switch( type ) {
   case 0:
-#ifdef HAVE_765_H
-/*  specplus3_disk_insert( which, NULL, 0 ); */
-#endif				/* #ifdef HAVE_765_H */
+    specplus3_disk_insert( which, NULL, 0 );
     break;
   case 1:
     beta_disk_insert( which, NULL, 0 );
@@ -409,9 +407,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
 
   switch( type ) {
   case 0:
-#ifdef HAVE_765_H
     specplus3_disk_insert( which, filename, 0 );
-#endif				/* #ifdef HAVE_765_H */
     break;
   case 1:
     beta_disk_insert( which, filename, 0 );
@@ -442,9 +438,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_eject )
 
   switch( type ) {
   case 0:
-#ifdef HAVE_765_H
     specplus3_disk_eject( which, write );
-#endif			/* #ifdef HAVE_765_H */
     break;
   case 1:
     beta_disk_eject( which, write );
@@ -472,9 +466,7 @@ MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
 
   switch( type ) {
   case 0:
-#ifdef HAVE_765_H
-/*    specplus3_disk_writeprotect( which, wrprot ); */
-#endif			/* #ifdef HAVE_765_H */
+    specplus3_disk_writeprotect( which, wrprot );
     break;
   case 1:
     beta_disk_writeprotect( which, wrprot );
@@ -641,15 +633,11 @@ menu_check_media_changed( void )
 
   confirm = tape_close(); if( confirm ) return 1;
 
-#ifdef HAVE_765_H
-
   confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
   if( confirm ) return 1;
 
   confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
   if( confirm ) return 1;
-
-#endif			/* #ifdef HAVE_765_H */
 
   confirm = beta_disk_eject( BETA_DRIVE_A, 0 );
   if( confirm ) return 1;

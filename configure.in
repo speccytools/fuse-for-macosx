@@ -332,30 +332,6 @@ AC_LINK_FILES([
 	lib/tape_se.szx
 	lib/tape_ts2068.szx])
 
-dnl Do we want +3 disk support?
-AC_MSG_CHECKING(whether +3 disk support requested)
-AC_ARG_WITH(plus3-disk,
-  [  --without-plus3-disk    disable +3 disk support],
-  if test "$withval" = no; then plus3disk = no; else plus3disk=yes; fi,
-  plus3disk=yes)
-AC_MSG_RESULT($plus3disk)
-if test "$plus3disk" = yes; then
-  AC_ARG_WITH(plus3-disk-prefix,
-  [  --with-plus3-disk-prefix=PFX where the +3 libraries are installed (optional)],
-  DSK_CFLAGS=-I$withval/include; DSKLIBS=-L$withval/lib,
-  DSK_CFLAGS=""; DSK_LIBS="")
-  ac_save_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $DSK_CFLAGS"
-  AC_CHECK_HEADERS(765.h, DSKLIBS="$DSKLIBS -l765"; lib765=yes,
-                   AC_MSG_WARN(765.h not found - disk support disabled))
-  if test "$lib765" = yes; then
-    AC_CHECK_HEADERS(libdsk.h, DSKLIBS="$DSKLIBS -ldsk")
-  fi
-  CPPFLAGS="$ac_save_CPPFLAGS"
-fi
-AC_SUBST(DSK_CFLAGS)
-AC_SUBST(DSKLIBS)
-
 dnl Check if a version of libpng which supplies png_write_png is available
 AC_CHECK_LIB( png, png_write_png,
   [AC_CHECK_HEADER(

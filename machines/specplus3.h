@@ -31,13 +31,6 @@
 #include "machine.h"
 #include "periph.h"
 
-#ifdef HAVE_765_H
-#include <limits.h>	/* Needed to get PATH_MAX */
-#include <sys/types.h>
-
-#include <765.h>
-#endif			/* #ifdef HAVE_765_H */
-
 extern const periph_t specplus3_peripherals[];
 extern const size_t specplus3_peripherals_count;
 
@@ -56,30 +49,16 @@ void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );
 
 int specplus3_memory_map( void );
 
-/* We need these outside the HAVE_765_H guards as they're also used
-   for identifying the TRDOS drives */
 typedef enum specplus3_drive_number {
   SPECPLUS3_DRIVE_A = 0,	/* First drive must be number zero */
   SPECPLUS3_DRIVE_B,
 } specplus3_drive_number;
-
-#ifdef HAVE_765_H
-/* The +3's drives */
-
-typedef struct specplus3_drive_t {
-  int fd;			/* The file descriptor for the
-				   temporary file we are using for
-				   this disk */
-  char filename[ PATH_MAX ];	/* And the name of the temporary file */
-
-  FDRV_PTR drive;		/* The lib765 structure for this drive */
-} specplus3_drive_t;
 
 int specplus3_disk_present( specplus3_drive_number which );
 int specplus3_disk_insert( specplus3_drive_number which, const char *filename,
                            int autoload );
 int specplus3_disk_eject( specplus3_drive_number which, int save );
 int specplus3_disk_write( specplus3_drive_number which, const char *filename );
-#endif			/* #ifdef HAVE_765_H */
+int specplus3_disk_writeprotect( specplus3_drive_number which, int wp );
 
 #endif			/* #ifndef FUSE_SPECPLUS3_H */

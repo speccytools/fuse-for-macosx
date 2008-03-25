@@ -75,17 +75,11 @@ int machine_init_machines( void )
   error = machine_add_machine( specplus2a_init );
   if( error ) return error;
 
-#ifdef HAVE_765_H
-  /* Add the +3 only if we have FDC support; otherwise the +2A and +3
-     emulations are identical */
   error = machine_add_machine( specplus3_init );
   if (error ) return error;
 
-  /* FIXME: what should we do about the +3e if we don't have lib765? */
   error = machine_add_machine( specplus3e_init );
   if( error ) return error;
-
-#endif				/* #ifdef HAVE_765_H */
 
   error = machine_add_machine( tc2048_init );
   if (error ) return error;

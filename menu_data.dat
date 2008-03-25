@@ -223,19 +223,27 @@ Media/_Disk, Branch
 
 Media/Disk/+_3, Branch
 Media/Disk/+3/Drive _A:, Branch
+Media/Disk/+3/Drive A:/Insert _New, Item,, menu_media_insert_new, 0x01
 Media/Disk/+3/Drive A:/_Insert..., Item,, menu_media_insert, 0x01
-Media/Disk/+3/Drive A:/_Eject, Item,, menu_media_eject, 0x001
+Media/Disk/+3/Drive A:/_Eject, Item,, menu_media_eject, 0x01
 Media/Disk/+3/Drive A:/Eject and _write..., Item,, menu_media_eject, 0x101
+Media/Disk/+3/Drive A:/Write _protect, Branch
+Media/Disk/+3/Drive A:/Write protect/_Enable, Item,, menu_media_writeprotect, 0x101
+Media/Disk/+3/Drive A:/Write protect/_Disable, Item,, menu_media_writeprotect, 0x001
 Media/Disk/+3/Drive _B:, Branch
+Media/Disk/+3/Drive B:/Insert _New, Item,, menu_media_insert_new, 0x02
 Media/Disk/+3/Drive B:/_Insert..., Item,, menu_media_insert, 0x02
-Media/Disk/+3/Drive B:/_Eject, Item,, menu_media_eject, 0x002
+Media/Disk/+3/Drive B:/_Eject, Item,, menu_media_eject, 0x02
 Media/Disk/+3/Drive B:/Eject and _write..., Item,, menu_media_eject, 0x102
+Media/Disk/+3/Drive B:/Write _protect, Branch
+Media/Disk/+3/Drive B:/Write protect/_Enable, Item,, menu_media_writeprotect, 0x102
+Media/Disk/+3/Drive B:/Write protect/_Disable, Item,, menu_media_writeprotect, 0x002
 
 Media/Disk/_Beta, Branch
 Media/Disk/Beta/Drive _A:, Branch
 Media/Disk/Beta/Drive A:/Insert _New, Item,, menu_media_insert_new, 0x11
 Media/Disk/Beta/Drive A:/_Insert..., Item,, menu_media_insert, 0x11
-Media/Disk/Beta/Drive A:/_Eject, Item,, menu_media_eject, 0x011
+Media/Disk/Beta/Drive A:/_Eject, Item,, menu_media_eject, 0x11
 Media/Disk/Beta/Drive A:/Eject and _write..., Item,, menu_media_eject, 0x111
 Media/Disk/Beta/Drive A:/Write _protect, Branch
 Media/Disk/Beta/Drive A:/Write protect/_Enable, Item,, menu_media_writeprotect, 0x111

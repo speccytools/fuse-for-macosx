@@ -33,6 +33,7 @@
 #include "debugger/debugger.h"
 #include "disk/beta.h"
 #include "disk/fdd.h"
+#include "disk/upd_fdc.h"
 #include "disk/wd_fdc.h"
 #include "display.h"
 #include "event.h"
@@ -186,6 +187,12 @@ int event_do_events(void)
       wd_fdc_event( ptr->tstates, ptr->type, ptr->user_data );
       break;
 
+    case EVENT_TYPE_UPD_FDC:
+    case EVENT_TYPE_UPD_FDC_HEAD:
+    case EVENT_TYPE_UPD_FDC_TIMEOUT:
+      upd_fdc_event( ptr->tstates, ptr->type, ptr->user_data );
+      break;
+
     case EVENT_TYPE_FDD_MOTOR:
       fdd_event( ptr->tstates, ptr->type, ptr->user_data );
       break;
@@ -322,6 +329,9 @@ event_name( event_type type )
   case EVENT_TYPE_WD_FDC: return "WD FDC event";
   case EVENT_TYPE_WD_FDC_MOTOR_OFF: return "WD FDC motor off";
   case EVENT_TYPE_WD_FDC_TIMEOUT: return "WD FDC timeout";
+  case EVENT_TYPE_UPD_FDC: return "UPD FDC event";
+  case EVENT_TYPE_UPD_FDC_HEAD: return "UPD FDC head (un)load";
+  case EVENT_TYPE_UPD_FDC_TIMEOUT: return "UPD FDC timeout";
   case EVENT_TYPE_FDD_MOTOR: return "FDD motor on";
 
   }
