@@ -2578,3 +2578,6 @@
          selection code (part of patch #1882836) (Gergely Szasz).
 20080318 disk/disk.c: add additional handling for fake sectors (part of patch
          #1882836) (Gergely Szasz).
+20080325 disk/disk.[ch]: add support for disks with eak sectors that are longer
+         than 6144 bytes (primarily Coin Op Hits with 6500 bytes per track)
+         (part of patch #1882836) (Gergely Szasz).

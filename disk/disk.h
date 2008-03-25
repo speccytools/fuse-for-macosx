@@ -81,6 +81,7 @@ typedef enum disk_dens_t {
   DISK_8_DD,		/* 8" DD floppy 10416 */
   DISK_SD,		/* 3125 bpt MF */
   DISK_DD,		/* 6250 bpt */
+  DISK_DD_PLUS,		/* 6500 bpt e.g. Coin Op Hits */
   DISK_HD,		/* 12500 bpt*/
 } disk_dens_t;
 

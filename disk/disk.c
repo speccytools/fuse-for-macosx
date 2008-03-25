@@ -60,6 +60,7 @@ static const int disk_bpt[] = {
   10416,			/* 8" DD */
   3125,				/* SD */
   6250,				/* DD */
+  6500,				/* DD+ e.g. Coin Op Hits */
   12500,			/* HD */
 };
 
@@ -599,9 +600,12 @@ disk_alloc( disk_t *d )
   } else if( d->bpt > 10416 ) {
     d->density = DISK_HD;
     d->bpt = disk_bpt[ DISK_HD ];
-  } else if( d->bpt > 6250 ) {
+  } else if( d->bpt > 6500 ) {
     d->density = DISK_8_DD;
     d->bpt = disk_bpt[ DISK_8_DD ];
+  } else if( d->bpt > 6250 ) {
+    d->density = DISK_DD_PLUS;
+    d->bpt = disk_bpt[ DISK_DD_PLUS ];
   } else if( d->bpt > 5208 ) {
     d->density = DISK_DD;
     d->bpt = disk_bpt[ DISK_DD ];
@@ -965,7 +969,9 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       bpt += calc_sectorlen( gap == GAP_MINIMAL_MFM ? 1 : 0, seclen, gap );
       trlen += seclen;
       if( i < 42 && d->flag & DISK_FLAG_PLUS3_CPC ) {
-        if( j == 0 && head[ 0x1b + 8 * j ] == 6 )
+        if( j == 0 && head[ 0x1b + 8 * j ] == 6 && seclen > 6144 )
+	  plus3_fix = 4;
+        else if( j == 0 && head[ 0x1b + 8 * j ] == 6 )
 	  plus3_fix = 1;
 	else if( j == 0 &&
 		 head[ 0x18 + 8 * j ] == j && head[ 0x19 + 8 * j ] == j &&
@@ -987,7 +993,8 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
     }
     if( i < 42 ) {
       fix[i] = plus3_fix;
-      if( fix[i] != 0 ) bpt = 6250;	/* we assume a standard DD track */
+      if( fix[i] == 4 )      bpt = 6500;/* Type 1 variant DD+ (e.g. Coin Op Hits) */
+      else if( fix[i] != 0 ) bpt = 6250;/* we assume a standard DD track */
     }
     fseek( file, trlen, SEEK_CUR );
     if( bpt > max_bpt )
@@ -1004,16 +1011,10 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
   d->track = d->data; d->clocks = d->track + d->bpt;
   fseek( file, 256, SEEK_SET );				/* rewind to first track */
   for( i = 0; i < d->sides*d->cylinders; i++ ) {
-      /* sometimes in the header there are more track than in the file ;( ??? */
-    if( fread( head, 1, 1, file ) != 1 && feof( file ) ) {
-      if( ( i + 1 ) % d->sides )
-	return d->status = DISK_GEOM;
-      d->cylinders = ( i + 1 ) / d->sides;	/* the real cylinder number */
-      break;
-    }
-    if( fread( head + 1, 255, 1, file ) != 1 ||
+    if( fread( head, 256, 1, file ) != 1 ||
 	    memcmp( head, "Track-Info\r\n", 12 ) ) /* read track header */
       return d->status = DISK_OPEN;
+
     gap = (unsigned char)head[0x16] == 0xff ? GAP_MINIMAL_FM :
     					    GAP_MINIMAL_MFM;
 	
@@ -1028,7 +1029,7 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       seclen = type == DISK_ECPC ? head[ 0x1e + 8 * j ] +	/* data length in sector */
 				      256 * head[ 0x1f + 8 * j ]
 				    : 0x80 << head[ 0x1b + 8 * j ];
-      idlen = 0x80 << head[ 0x1b + 8 * j ];			/* sector length from ID */
+      idlen = 0x80 << head[ 0x1b + 8 * j ];		/* sector length from ID */
       
       trlen += seclen;
       if( seclen > idlen && seclen % idlen )		/* seclen != N * len */
@@ -1057,16 +1058,22 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?
 		CRC_ERROR : CRC_OK, 0x00 );
         fseek( file, seclen - 128, SEEK_CUR );
+      } else if( fix[i] == 4 ) {	/* Nx8192 (max 6384 byte ) */
+        data_add( d, file, NULL, 6384,
+    		head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
+		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?
+		CRC_ERROR : CRC_OK, 0x00 );
+        fseek( file, seclen - 6384, SEEK_CUR );
       } else {
         data_add( d, file, NULL, seclen > idlen ? idlen : seclen, 
     		head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
 		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?
 		CRC_ERROR : CRC_OK, 0x00 );
-      }
-      if( seclen > idlen ) {				/* weak sector with multiple copy  */
-        fseek( file, ( seclen / ( 0x80 << head[ 0x1b + 8 * j ] ) - 1 ) * 
+        if( seclen > idlen ) {		/* weak sector with multiple copy  */
+          fseek( file, ( seclen / ( 0x80 << head[ 0x1b + 8 * j ] ) - 1 ) * 
 			( 0x80 << head[ 0x1b + 8 * j ] ), SEEK_CUR );	
-						/* ( ( N * len ) / len - 1 ) * len */
+					/* ( ( N * len ) / len - 1 ) * len */
+        }
       }
       if( seclen == 0x80 )		/* every 128byte length sector padded */
 	fseek( file, 0x80, SEEK_CUR );
