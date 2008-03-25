@@ -2574,10 +2574,16 @@
 	 from port 0x7ffd on the 128/+2 (thanks, Marat Fayzullin).
 20080322 windres.rc,ui/win32/{rollback.h.{c,h,rc},win32ui.c,Makefile.am}:
 	 Win32: Implementation of the Rollback dialog (Marek).
-20080318 disk/disk.c: fix for bytes per track settings in auto density
+20080324 disk/disk.c: fix for bytes per track settings in auto density
          selection code (part of patch #1882836) (Gergely Szasz).
-20080318 disk/disk.c: add additional handling for fake sectors (part of patch
+20080324 disk/disk.c: add additional handling for fake sectors (part of patch
          #1882836) (Gergely Szasz).
 20080325 disk/disk.[ch]: add support for disks with eak sectors that are longer
          than 6144 bytes (primarily Coin Op Hits with 6500 bytes per track)
          (part of patch #1882836) (Gergely Szasz).
+20080325 README,Makefile.am,configure.in,
+         disk/{Makefile.am,upd_fdc.[ch]},event.[ch]},machine.c,
+         machines/{specplus3.[ch],specplus3e.c},man/fuse.1,menu.c,
+         menu_data.dat,ui.c,ui/ui.h,utils.c: replace lib765 and libdsk with
+         new upd765 FDC emulation for +3 (remainder of patch #1882836)
+         (thanks, Mark Woodmass) (Gergely Szasz).
