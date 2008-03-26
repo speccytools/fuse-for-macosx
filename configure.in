@@ -492,7 +492,7 @@ if test "$stick" = yes; then
   dnl If there is none, or you override this here, we use libjsw.
   dnl (svgalib appears to dislike switched joysticks on the parallel port...)
   case "$UI" in
-    svga|sdl)
+    svga|sdl|win32)
       dnl Libraries such as svgalib provide their own joystick code.
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,

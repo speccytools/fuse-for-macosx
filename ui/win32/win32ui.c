@@ -741,8 +741,6 @@ menu_file_exit( int action )
   }
 }
 
-void menu_options_joysticks_select( int action ) { STUB; }
-
 void
 menu_machine_pause( int action )
 {

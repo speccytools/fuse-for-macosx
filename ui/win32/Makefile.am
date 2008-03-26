@@ -52,6 +52,8 @@ libuiwin32_a_SOURCES = binary.c \
 		       statusbar.c \
 		       statusbar.rc \
 		       win32display.c \
+		       win32joystick.c \
+		       win32joystick.rc \
 		       win32keyboard.c \
 		       win32ui.c
 
@@ -101,6 +103,7 @@ noinst_HEADERS = binary.h \
 		 menu_data.h \
 		 win32display.h \
 		 win32internals.h \
+		 win32joystick.h \
 		 win32keyboard.h
 
 CLEANFILES = keysyms.c \

@@ -2587,3 +2587,6 @@
          menu_data.dat,ui.c,ui/ui.h,utils.c: replace lib765 and libdsk with
          new upd765 FDC emulation for +3 (remainder of patch #1882836)
          (thanks, Mark Woodmass) (Gergely Szasz).
+20080326 configure.in,windres.rc,ui/win32/{win32ui.c,win32joystick.{c,h,rc},
+	 Makefile.am}: Win32: Implementation of the Configure Joystick
+	 dialog. Joystick will be read using Windows' mmsystem library (Marek).
