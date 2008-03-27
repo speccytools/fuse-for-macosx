@@ -51,7 +51,8 @@ int
 win32ui_picture( const char *filename, int border )
 {
   if (!hDialogPicture) {
-    hDialogPicture = CreateDialog( fuse_hInstance, "DIALOGPICTURE",
+    hDialogPicture = CreateDialog( fuse_hInstance,
+                                   MAKEINTRESOURCE( "IDD_PICTURE" ),
                                    fuse_hWnd, (DLGPROC)picture_wnd_proc);
 
     BITMAPINFO picture_BMI;

@@ -29,9 +29,6 @@ win32_icon ICON "winfuse.ico"
 
 #ifdef UI_WIN32
 
-/* FIXME: change ids of all OK and Cancel buttons:
-   http://blogs.msdn.com/oldnewthing/archive/2004/12/14/300204.aspx */
-
 #include "ui/win32/binary.rc"           /* reserved ids: 1300 - 1399 */
 #include "ui/win32/browse.rc"           /* reserved ids: 1400 - 1499 */
 #include "ui/win32/debugger.rc"         /* reserved ids: 2000 - 2099 */

@@ -849,15 +849,15 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       CreateWindow( TEXT( "BUTTON" ), TEXT( "&OK" ),
                     WS_VISIBLE | WS_CHILD | WS_TABSTOP | BS_DEFPUSHBUTTON,
                     6, pos_y, 75, 23,
-                    hwndDlg, (HMENU) IDC_SELECT_OK, fuse_hInstance, 0 );
-      SendDlgItemMessage( hwndDlg, IDC_SELECT_OK, WM_SETFONT,
+                    hwndDlg, (HMENU) IDOK, fuse_hInstance, 0 );
+      SendDlgItemMessage( hwndDlg, IDOK, WM_SETFONT,
                           (WPARAM) h_ms_font, FALSE );
 
       CreateWindow( TEXT( "BUTTON" ), TEXT( "&Cancel" ),
                     WS_VISIBLE | WS_CHILD | WS_TABSTOP,
                     90, pos_y, 75, 23,
-                    hwndDlg, (HMENU) IDC_SELECT_CANCEL, fuse_hInstance, 0 );
-      SendDlgItemMessage( hwndDlg, IDC_SELECT_CANCEL, WM_SETFONT,
+                    hwndDlg, (HMENU) IDCANCEL, fuse_hInstance, 0 );
+      SendDlgItemMessage( hwndDlg, IDCANCEL, WM_SETFONT,
                           (WPARAM) h_ms_font, FALSE );
       
       pos_y += 54;
@@ -879,7 +879,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       /* service OK and Cancel buttons */
       switch LOWORD( wParam )
       {
-        case IDC_SELECT_OK:
+        case IDOK:
         {
           /* check which radiobutton is selected and return the selection */
           i = 0;
@@ -894,7 +894,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
           }
           return FALSE; /* program should never reach here */
         }
-        case IDC_SELECT_CANCEL:
+        case IDCANCEL:
         {
           EndDialog( hwndDlg, 0 );
           return TRUE;

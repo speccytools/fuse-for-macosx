@@ -23,4 +23,9 @@
 
 */
 
-#define ID_CLOSE 1200
+#define IDD_PICTURE    1200
+#if (WINVER >= 0x0400)
+#define ID_CLOSE       IDCLOSE
+#else
+#define ID_CLOSE       1201
+#endif

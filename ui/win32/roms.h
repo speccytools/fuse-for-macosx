@@ -24,5 +24,3 @@
 */
 
 #define IDD_ROMS       1100
-#define IDC_ROM_OK     1101
-#define IDC_ROM_CANCEL 1102

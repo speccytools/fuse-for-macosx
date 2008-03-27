@@ -94,12 +94,12 @@ roms_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
 
-        case IDC_ROM_OK:
+        case IDOK:
           roms_done( hwndDlg, GetWindowLong( ( HWND ) hwndDlg, GWL_USERDATA ) );
           EndDialog( hwndDlg, 0 );
           return 0;
 
-        case IDC_ROM_CANCEL:
+        case IDCANCEL:
           EndDialog( hwndDlg, 0 );
           return 0;
           
@@ -138,7 +138,7 @@ roms_init( HWND hwndDlg, LPARAM lParam )
   rect.left = 25; rect.top = ( info->n * 30 ) + 5;
   rect.right = 25 + 50; rect.bottom = ( info->n * 30 ) + 5 + 14;
   MapDialogRect( hwndDlg, &rect );
-  MoveWindow( GetDlgItem( hwndDlg, IDC_ROM_OK ),
+  MoveWindow( GetDlgItem( hwndDlg, IDOK ),
               rect.left, rect.top,
               rect.right - rect.left, rect.bottom - rect.top,
               FALSE );
@@ -146,7 +146,7 @@ roms_init( HWND hwndDlg, LPARAM lParam )
   rect.left = 85; rect.top = ( info->n * 30 ) + 5;
   rect.right = 85 + 50; rect.bottom = ( info->n * 30 ) + 5 + 14;
   MapDialogRect( hwndDlg, &rect );
-  MoveWindow( GetDlgItem( hwndDlg, IDC_ROM_CANCEL ),
+  MoveWindow( GetDlgItem( hwndDlg, IDCANCEL ),
               rect.left, rect.top,
               rect.right - rect.left, rect.bottom - rect.top,
               FALSE );

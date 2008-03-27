@@ -105,7 +105,7 @@ print << "CODE";
     case WM_COMMAND:
       switch( LOWORD( wParam ) )
       {
-	case ${idcname}_OK:
+	case IDOK:
 	{
           /* Read the controls and apply the settings */
 CODE
@@ -139,7 +139,7 @@ CODE
 	  EndDialog( hwndDlg, 0 );
 	  return TRUE;
 	}
-	case ${idcname}_CANCEL:
+	case IDCANCEL:
 	  EndDialog( hwndDlg, 0 );
 	  return TRUE;
       }

@@ -32,4 +32,8 @@
 #define IDC_PF_DEC        1506
 #define IDC_PF_SEARCH     1507
 #define IDC_PF_RESET      1508
+#if (WINVER >= 0x0400)
+#define IDC_PF_CLOSE      IDCLOSE
+#else
 #define IDC_PF_CLOSE      1509
+#endif

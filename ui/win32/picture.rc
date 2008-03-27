@@ -27,7 +27,7 @@
 
 #include "picture.h"
 
-DIALOGPICTURE   DIALOG DISCARDABLE 16, 16, 160, 138
+IDD_PICTURE     DIALOG DISCARDABLE 16, 16, 160, 138
 STYLE           DS_MODALFRAME | WS_POPUP | WS_CAPTION
                 | WS_SYSMENU
 CAPTION         "Fuse - Keyboard"

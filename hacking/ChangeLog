@@ -2594,3 +2594,10 @@
 	 Implementation of the mouse functions (Marek).
 20080327 ui/win32/{binary.{c,h,rc}}: Win32: Added prefix BINARY to Binary
 	 dialogs ids, used Windows' constants for OK and Cancel (Marek).
+20080327 windres.rc,ui/win32/{browse.h,debugger.{h,rc},memorybrowser.h,
+	 options.pl,options-{header,resource}.pl,picture.{c,h,rc},pokefinder.h,
+	 roms.{c,h,rc},select_template.{h,rc},win32ui.c}: Win32: Made dialogs
+	 use IDOK, IDCANCEL, IDCLOSE and IDCONTINUE to use dialog manager's
+	 capabilities
+	 (http://blogs.msdn.com/oldnewthing/archive/2004/12/14/300204.aspx)
+	 (Marek).
