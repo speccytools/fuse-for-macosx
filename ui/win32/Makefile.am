@@ -55,6 +55,7 @@ libuiwin32_a_SOURCES = binary.c \
 		       win32joystick.c \
 		       win32joystick.rc \
 		       win32keyboard.c \
+		       win32mouse.c \
 		       win32ui.c
 
 BUILT_SOURCES = keysyms.c \

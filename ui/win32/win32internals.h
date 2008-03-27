@@ -61,6 +61,13 @@ void handle_menu( DWORD cmd, HWND okno );
 int win32ui_picture( const char *filename, int border );
 
 /*
+ * Mouse routines (win32mouse.c)
+ */
+
+void win32mouse_position( LPARAM lParam );
+void win32mouse_button( int button, int down );
+
+/*
  * Dialog box reset
  */
 

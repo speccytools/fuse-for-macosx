@@ -254,6 +254,39 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       fuse_emulation_unpause();
       break;
     }
+    
+    case WM_LBUTTONUP:
+      win32mouse_button( 1, 0 );
+      return 0;
+      
+    case WM_LBUTTONDOWN:
+      win32mouse_button( 1, 1 );
+      return 0;
+
+    case WM_MBUTTONUP:
+      win32mouse_button( 2, 0 );
+      return 0;
+
+    case WM_MBUTTONDOWN:
+      win32mouse_button( 2, 1 );
+      return 0;
+
+    case WM_RBUTTONUP:
+      win32mouse_button( 3, 0 );
+      return 0;
+
+    case WM_RBUTTONDOWN:
+      win32mouse_button( 3, 1 );
+      return 0;
+      
+    case WM_MOUSEMOVE:
+      win32mouse_position( lParam );
+      return 0;
+      
+    case WM_SETCURSOR:
+    /* prevent the cursor from being redrawn if fuse has grabbed the mouse */
+      if( ui_mouse_grabbed )
+        return TRUE;
 
     default:
       return( DefWindowProc( hWnd, msg, wParam, lParam ) );
@@ -311,6 +344,8 @@ ui_init( int *argc, char ***argv )
 {
   if( win32display_init() ) return 1;
   win32statusbar_set_visibility( settings_current.statusbar );
+
+  ui_mouse_present = 1;
 
   return 0;
 }
@@ -373,20 +408,6 @@ menu_machine_debugger( int action )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
   if( paused ) ui_debugger_activate();
-}
-
-int
-ui_mouse_grab( int startup )
-{
-  STUB;
-  return 0;
-}
-
-int
-ui_mouse_release( int suspend )
-{
-  STUB;
-  return 0;
 }
 
 int

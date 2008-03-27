@@ -2590,3 +2590,5 @@
 20080326 configure.in,windres.rc,ui/win32/{win32ui.c,win32joystick.{c,h,rc},
 	 Makefile.am}: Win32: Implementation of the Configure Joystick
 	 dialog. Joystick will be read using Windows' mmsystem library (Marek).
+20080327 ui/win32/{win32ui.c,win32mouse.c,win32internals.h,Makefile.am}: Win32:
+	 Implementation of the mouse functions (Marek).
