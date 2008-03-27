@@ -1,7 +1,7 @@
 /* upd_fdc.c: NEC floppy disk controller emulation
    Copyright (c) 2007 Gergely Szasz
 
-   $Id:  $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
