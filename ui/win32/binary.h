@@ -23,13 +23,11 @@
 
 */
 
-#define IDD_BINARY        1300
-#define IDC_TEXT_FILENAME 1301
-#define IDC_FILENAME      1302
-#define IDC_BROWSE        1303
-#define IDC_TEXT_START    1304
-#define IDC_START         1305
-#define IDC_TEXT_LENGTH   1306
-#define IDC_LENGTH        1307
-#define IDC_OK            1308
-#define IDC_CANCEL        1309
+#define IDD_BINARY                  1300
+#define IDC_BINARY_STATIC_FILENAME  1301
+#define IDC_BINARY_STATIC_PATH      1302
+#define IDC_BINARY_BUTTON_BROWSE    1303
+#define IDC_BINARY_STATIC_START     1304
+#define IDC_BINARY_EDIT_START       1305
+#define IDC_BINARY_STATIC_LENGTH    1306
+#define IDC_BINARY_EDIT_LENGTH      1307

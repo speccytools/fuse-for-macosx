@@ -104,29 +104,29 @@ binarydata_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
                           
       SendMessage( hwndDlg, WM_SETTEXT, 0, ( LPARAM ) info->dialog_title );
 
-      SendDlgItemMessage( hwndDlg, IDC_FILENAME, WM_SETTEXT,
+      SendDlgItemMessage( hwndDlg, IDC_BINARY_STATIC_PATH, WM_SETTEXT,
                           0, ( LPARAM ) info->filename );
 
       if( info->file.length != -1 ) {
         _sntprintf( buffer, 80, "%lu", (unsigned long) info->file.length );
-        SendDlgItemMessage( hwndDlg, IDC_LENGTH, WM_SETTEXT,
+        SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH, WM_SETTEXT,
                             0, ( LPARAM ) buffer );
       }
       return FALSE;
     }
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
-        case IDC_BROWSE:
+        case IDC_BINARY_BUTTON_BROWSE:
           info = ( struct binary_info * ) GetWindowLong( hwndDlg, GWL_USERDATA );
           info->on_change_filename( hwndDlg, ( LONG ) info ) ;
           return 0;
 
-        case IDC_OK:
+        case IDOK:
           info = ( struct binary_info * ) GetWindowLong( hwndDlg, GWL_USERDATA );
           info->on_execute( hwndDlg, ( LONG ) info ) ;
           return 0;
 
-        case IDC_CANCEL:
+        case IDCANCEL:
           EndDialog( hwndDlg, 0 );
           return 0;
       }
@@ -166,11 +166,11 @@ change_load_filename( HWND hwndDlg, LONG user_data )
   info->filename = new_filename; info->file = new_file;
 
   /* And update the displayed information */
-  SendDlgItemMessage( hwndDlg, IDC_FILENAME, WM_SETTEXT,
+  SendDlgItemMessage( hwndDlg, IDC_BINARY_STATIC_PATH, WM_SETTEXT,
                       0, ( LPARAM ) new_filename );
 
   _sntprintf( buffer, 80, "%lu", (unsigned long) info->file.length );
-  SendDlgItemMessage( hwndDlg, IDC_LENGTH, WM_SETTEXT,
+  SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH, WM_SETTEXT,
                       0, ( LPARAM ) buffer );
 }
 
@@ -185,10 +185,10 @@ load_data( HWND hwndDlg, LONG user_data )
   size_t temp_buffer_len;
 
   errno = 0;
-  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_LENGTH,
+  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH,
                                         WM_GETTEXTLENGTH, 0, 0 );
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
-  SendDlgItemMessage( hwndDlg, IDC_LENGTH, WM_GETTEXT,
+  SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
   length = _tcstol( temp_buffer, NULL, 10 );
   free( temp_buffer );
@@ -205,10 +205,10 @@ load_data( HWND hwndDlg, LONG user_data )
   }
 
   errno = 0;
-  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_START,
+  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_START,
                                         WM_GETTEXTLENGTH, 0, 0 );
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
-  SendDlgItemMessage( hwndDlg, IDC_START, WM_GETTEXT,
+  SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_START, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
   start = _tcstol( temp_buffer, NULL, 10 );
   free( temp_buffer );
@@ -266,7 +266,7 @@ change_save_filename( HWND hwndDlg, LONG user_data )
 
   info->filename = new_filename;
 
-  SendDlgItemMessage( hwndDlg, IDC_FILENAME, WM_SETTEXT,
+  SendDlgItemMessage( hwndDlg, IDC_BINARY_STATIC_PATH, WM_SETTEXT,
                       0, ( LPARAM ) new_filename );
 }
 
@@ -284,10 +284,10 @@ save_data( HWND hwndDlg, LONG user_data )
   int error;
 
   errno = 0;
-  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_LENGTH,
+  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH,
                                         WM_GETTEXTLENGTH, 0, 0 );
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
-  SendDlgItemMessage( hwndDlg, IDC_LENGTH, WM_GETTEXT,
+  SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_LENGTH, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
   length = _tcstol( temp_buffer, NULL, 10 );
   free( temp_buffer );
@@ -303,10 +303,10 @@ save_data( HWND hwndDlg, LONG user_data )
   }
 
   errno = 0;
-  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_START,
+  temp_buffer_len = SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_START,
                                         WM_GETTEXTLENGTH, 0, 0 );
   temp_buffer = malloc( sizeof( TCHAR ) * ( temp_buffer_len + 1 ) );
-  SendDlgItemMessage( hwndDlg, IDC_START, WM_GETTEXT,
+  SendDlgItemMessage( hwndDlg, IDC_BINARY_EDIT_START, WM_GETTEXT,
                       temp_buffer_len + 1, ( LPARAM ) temp_buffer );
   start = _tcstol( temp_buffer, NULL, 10 );
   free( temp_buffer );
