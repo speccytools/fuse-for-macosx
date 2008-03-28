@@ -2601,3 +2601,6 @@
 	 capabilities
 	 (http://blogs.msdn.com/oldnewthing/archive/2004/12/14/300204.aspx)
 	 (Marek).
+20080328 loader.c: let loader detection work with the Digital Integration
+	 loader (ATF, Tomahawk, TT Racer).
+

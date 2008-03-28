@@ -65,7 +65,8 @@ loader_detect_loader( void )
   if( settings_current.detect_loader ) {
 
     if( tape_is_playing() ) {
-      if( tstates_diff > 1000 || ( b_diff != 1 && b_diff != 0xff ) ) {
+      if( tstates_diff > 1000 || ( b_diff != 1 && b_diff != 0 &&
+				   b_diff != 0xff ) ) {
 	successive_reads++;
 	if( successive_reads >= 2 ) {
 	  tape_stop();
