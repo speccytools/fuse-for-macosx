@@ -2607,3 +2607,4 @@
 	 buffer overflow (fixes bug #1931036).
 20080401 loader.[ch],settings.dat,tape.c,ui/options.dat: add support for
 	 tape acceleration (slightly extended version of patch #1880376).
+20080401 loader.c: add acceleration for Search Loader (Deflektor, Rana Rama).

@@ -122,7 +122,9 @@ acceleration_detector( libspectrum_word pc )
       break;
     case 3:
       switch( b ) {
-      case 0x7f: state = 4; break;	/* Data byte */
+      case 0x00:			/* Search Loader */
+      case 0x7f:			/* ROM loader and variants */
+	state = 4; break;		/* Data byte */
       default: return ACCELERATION_MODE_NONE;
       }
       break;
@@ -141,6 +143,7 @@ acceleration_detector( libspectrum_word pc )
     case 6:
       switch( b ) {
       case 0x1f: state = 7; break;	/* RRA */
+      case 0xa9: state = 24; break;	/* XOR C - Search Loader */
       default: return ACCELERATION_MODE_NONE;
       }
       break;
@@ -186,6 +189,9 @@ acceleration_detector( libspectrum_word pc )
 	return ACCELERATION_MODE_NONE;
       }
       break;
+
+      /* Digital Integration loader */
+
     case 13:
       state = 14; break;		/* Possible Digital Integration */
     case 14:
@@ -236,19 +242,47 @@ acceleration_detector( libspectrum_word pc )
       default: return ACCELERATION_MODE_NONE;
       }
       break;
-    case 22:
+    case 22:				/* LSB of jump target */
       if( b == ( z80.pc.w - 4 ) % 0x100 ) {
 	state = 23;
       } else {
 	return ACCELERATION_MODE_NONE;
       }
       break;
-    case 23:
+    case 23:				/* MSB of jump target */
       if( b == ( z80.pc.w - 4 ) / 0x100 ) {
 	return ACCELERATION_MODE_DECREASING;
       } else {
 	return ACCELERATION_MODE_NONE;
       }
+
+      /* Search loader */
+
+    case 24:
+      switch( b ) {
+      case 0xe6: state = 25; break;	/* AND nn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 25:
+      switch( b ) {
+      case 0x40: state = 26; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 26:
+      switch( b ) {
+      case 0xd8: state = 27; break;	/* RET C */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 27:
+      switch( b ) {
+      case 0x00: state = 11; break;	/* NOP */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+	
     default:
       /* Can't happen */
       break;
