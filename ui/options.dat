@@ -6,6 +6,7 @@ Checkbox, Issue (2) keyboard, issue2, INPUT_KEY_2
 Checkbox, Use (t)ape traps, tape_traps, INPUT_KEY_t
 Checkbox, (F)astloading, fastload, INPUT_KEY_f
 Checkbox, (D)etect loaders, detect_loader, INPUT_KEY_d
+Checkbox, Accelerate l(o)aders, accelerate_loader, INPUT_KEY_o
 Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
 Checkbox, Use .s(l)t traps, slt_traps, INPUT_KEY_l
 Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w

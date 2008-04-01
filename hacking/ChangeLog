@@ -2605,3 +2605,5 @@
 	 loader (ATF, Tomahawk, TT Racer).
 20080401 z80/z80_ops.c: cgoto array was one entry too small, leading to
 	 buffer overflow (fixes bug #1931036).
+20080401 loader.[ch],settings.dat,tape.c,ui/options.dat: add support for
+	 tape acceleration (slightly extended version of patch #1880376).

@@ -869,6 +869,9 @@ tape_next_edge( libspectrum_dword last_tstates )
   error = event_add( last_tstates + edge_tstates, EVENT_TYPE_EDGE );
   if( error ) return error;
 
+  /* Store length flags for acceleration purposes */
+  loader_set_acceleration_flags( flags );
+
   return 0;
 }
 

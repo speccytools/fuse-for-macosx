@@ -23,7 +23,11 @@
 
 */
 
+#include <config.h>
+
+#include "event.h"
 #include "loader.h"
+#include "memory.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "tape.h"
@@ -32,6 +36,17 @@
 static int successive_reads = 0;
 static libspectrum_signed_dword last_tstates_read = -100000;
 static libspectrum_byte last_b_read = 0x00;
+static int length_known1 = 0, length_known2 = 0;
+static int length_long1 = 0, length_long2 = 0;
+
+typedef enum acceleration_mode_t {
+  ACCELERATION_MODE_NONE = 0,
+  ACCELERATION_MODE_INCREASING,
+  ACCELERATION_MODE_DECREASING,
+} acceleration_mode_t;
+
+static acceleration_mode_t acceleration_mode;
+static size_t acceleration_pc;
 
 void
 loader_frame( libspectrum_dword frame_length )
@@ -45,12 +60,218 @@ void
 loader_tape_play( void )
 {
   successive_reads = 0;
+  acceleration_mode = ACCELERATION_MODE_NONE;
 }
 
 void
 loader_tape_stop( void )
 {
   successive_reads = 0;
+  acceleration_mode = ACCELERATION_MODE_NONE;
+}
+
+static void
+do_acceleration( void )
+{
+  if( length_known1 ) {
+    int set_b_high = length_long1;
+    set_b_high ^= ( acceleration_mode == ACCELERATION_MODE_DECREASING );
+    if( set_b_high ) {
+      z80.bc.b.h = 0xfe;
+    } else {
+      z80.bc.b.h = 0x00;
+    }
+    z80.af.b.l |= 0x01;
+    z80.pc.b.l = readbyte_internal( z80.sp.w++ );
+    z80.pc.b.h = readbyte_internal( z80.sp.w++ );
+
+    event_remove_type( EVENT_TYPE_EDGE );
+    tape_next_edge( tstates );
+
+    successive_reads = 0;
+  }
+
+  length_known1 = length_known2;
+  length_long1 = length_long2;
+}
+
+static acceleration_mode_t
+acceleration_detector( libspectrum_word pc )
+{
+  int state = 0, count = 0;
+  while( 1 ) {
+    libspectrum_byte b = readbyte_internal( pc ); pc++; count++;
+    switch( state ) {
+    case 0:
+      switch( b ) {
+      case 0x04: state = 1; break;	/* INC B - Many loaders */
+      default: state = 13; break;	/* Possible Digital Integration */
+      }
+      break;
+    case 1:
+      switch( b ) {
+      case 0xc8: state = 2; break;	/* RET Z */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 2:
+      switch( b ) {
+      case 0x3e: state = 3; break;	/* LD A,nn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 3:
+      switch( b ) {
+      case 0x7f: state = 4; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 4:
+      switch( b ) {
+      case 0xdb: state = 5; break;	/* IN A,(nn) */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 5:
+      switch( b ) {
+      case 0xfe: state = 6; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 6:
+      switch( b ) {
+      case 0x1f: state = 7; break;	/* RRA */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 7:
+      switch( b ) {
+      case 0x00:			/* NOP - Bleepload */
+      case 0xa7:			/* AND A - Microsphere */
+      case 0xc8:			/* RET Z - Paul Owens */
+      case 0xd0:			/* RET NC - ROM loader */
+	state = 8; break;
+      case 0xa9: state = 9; break;	/* XOR C - Speedlock */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 8:
+      switch( b ) {
+      case 0xa9: state = 9; break;	/* XOR C */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 9:
+      switch( b ) {
+      case 0xe6: state = 10; break;	/* AND nn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 10:
+      switch( b ) {
+      case 0x20: state = 11; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 11:
+      switch( b ) {
+      case 0x28: state = 12; break;	/* JR nn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 12:
+      if( b == 0x100 - count ) {
+	return ACCELERATION_MODE_INCREASING;
+      } else {
+	return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 13:
+      state = 14; break;		/* Possible Digital Integration */
+    case 14:
+      switch( b ) {
+      case 0x05: state = 15; break;	/* DEC B - Digital Integration */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 15:
+      switch( b ) {
+      case 0xc8: state = 16; break;	/* RET Z */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 16:
+      switch( b ) {
+      case 0xdb: state = 17; break;	/* IN A,(nn) */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 17:
+      switch( b ) {
+      case 0xfe: state = 18; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 18:
+      switch( b ) {
+      case 0xa9: state = 19; break;	/* XOR C */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 19:
+      switch( b ) {
+      case 0xe6: state = 20; break;	/* AND nn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 20:
+      switch( b ) {
+      case 0x40: state = 21; break;	/* Data byte */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 21:
+      switch( b ) {
+      case 0xca: state = 22; break;	/* JP Z,nnnn */
+      default: return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 22:
+      if( b == ( z80.pc.w - 4 ) % 0x100 ) {
+	state = 23;
+      } else {
+	return ACCELERATION_MODE_NONE;
+      }
+      break;
+    case 23:
+      if( b == ( z80.pc.w - 4 ) / 0x100 ) {
+	return ACCELERATION_MODE_DECREASING;
+      } else {
+	return ACCELERATION_MODE_NONE;
+      }
+    default:
+      /* Can't happen */
+      break;
+    }
+  }
+
+}      
+
+static void
+check_for_acceleration( void )
+{
+  /* If the IN occured at a different location to the one we're
+     accelerating, stop acceleration */
+  if( acceleration_mode && z80.pc.w != acceleration_pc )
+    acceleration_mode = ACCELERATION_MODE_NONE;
+
+  /* If we're not accelerating, check if this is a loader */
+  if( !acceleration_mode ) {
+    acceleration_mode = acceleration_detector( z80.pc.w - 6 );
+    acceleration_pc = z80.pc.w;
+  }
+
+  if( acceleration_mode ) do_acceleration();
 }
 
 void
@@ -91,4 +312,21 @@ loader_detect_loader( void )
 
   }
 
+  if( settings_current.accelerate_loader && tape_is_playing() )
+    check_for_acceleration();
+
+}
+
+void
+loader_set_acceleration_flags( int flags )
+{
+  if( flags & LIBSPECTRUM_TAPE_FLAGS_LENGTH_SHORT ) {
+    length_known2 = 1;
+    length_long2 = 0;
+  } else if( flags & LIBSPECTRUM_TAPE_FLAGS_LENGTH_LONG ) {
+    length_known2 = 1;
+    length_long2 = 1;
+  } else {
+    length_known2 = 0;
+  }
 }
