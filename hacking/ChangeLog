@@ -2603,4 +2603,5 @@
 	 (Marek).
 20080328 loader.c: let loader detection work with the Digital Integration
 	 loader (ATF, Tomahawk, TT Racer).
-
+20080401 z80/z80_ops.c: cgoto array was one entry too small, leading to
+	 buffer overflow (fixes bug #1931036).

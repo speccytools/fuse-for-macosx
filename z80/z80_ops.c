@@ -123,7 +123,7 @@ z80_do_opcodes( void )
   if( next != check ) { cgoto[ next ] = &&label; } \
   next = check;
 
-  void *cgoto[ numchecks - 1 ]; size_t next = 0; size_t check = 0;
+  void *cgoto[ numchecks ]; size_t next = 0; size_t check = 0;
 
 #include "z80_checks.h"
 
