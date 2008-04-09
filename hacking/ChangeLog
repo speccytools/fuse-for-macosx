@@ -2565,8 +2565,8 @@
 	 specplus3.[ch],specplus3e.c,tc2048.c,tc2068.[ch],ts2068.c},spectrum.c,
 	 spectrum.h: refactor floating bus code, including removing
 	 Pentagon 512 floating bus.
-20080319 roms/{plus3e-0.rom,roms/plus3e-1.rom,roms/plus3e-2.rom}: update to
-         v1.35 of the +3e ROMs (Fred).
+20080319 roms/{plus3e-0.rom,plus3e-1.rom,plus3e-2.rom}: update to v1.35 of the
+         +3e ROMs (Fred).
 20080321 machine.[ch],settings.dat,ui/options.dat,unittests/unittests.c:
 	 add --late-timings option to emulate machines with 1 tstate later
 	 timings.
@@ -2615,3 +2615,5 @@
          those emulators, leave the Pentagon 512k and 1024k as later issue
          machines (Pentagon SL 1.x and 2.2?) as we are free to specify correct
          snapshot support for those machines (Fred).
+20080409 roms/{plus3e-0.rom,plus3e-2.rom}: update to v1.36 of the +3e ROMs
+         (Fred).
