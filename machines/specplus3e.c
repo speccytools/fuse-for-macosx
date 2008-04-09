@@ -25,6 +25,7 @@
 
 #include <config.h>
 
+#include "disk/upd_fdc.h"
 #include "machines.h"
 #include "periph.h"
 #include "settings.h"
@@ -32,6 +33,7 @@
 #include "ui/ui.h"
 
 static int specplus3e_reset( void );
+extern upd_fdc *specplus3_fdc;
 
 int
 specplus3e_init( fuse_machine_info *machine )
@@ -47,8 +49,6 @@ specplus3e_init( fuse_machine_info *machine )
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
 
   machine->unattached_port = spectrum_unattached_port_none;
-
-  specplus3_765_init();
 
   machine->shutdown = specplus3_shutdown;
 
@@ -84,6 +84,7 @@ specplus3e_reset( void )
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
+  upd_fdc_master_reset( specplus3_fdc );
   specplus3_menu_items();
 
   return 0;

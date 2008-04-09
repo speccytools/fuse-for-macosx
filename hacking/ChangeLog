@@ -2617,3 +2617,5 @@
          snapshot support for those machines (Fred).
 20080409 roms/{plus3e-0.rom,plus3e-2.rom}: update to v1.36 of the +3e ROMs
          (Fred).
+20080409 machines/{specplus3.c,specplus3e.c}: have the +3e share the +3 FDC
+         (fixes bug #1931947) (Gergely Szasz).

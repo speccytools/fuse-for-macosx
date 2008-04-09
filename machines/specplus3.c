@@ -83,7 +83,7 @@ const size_t specplus3_peripherals_count =
   sizeof( specplus3_peripherals ) / sizeof( periph_t );
 
 #define SPECPLUS3_NUM_DRIVES 2
-static upd_fdc *specplus3_fdc;
+upd_fdc *specplus3_fdc;
 static upd_fdc_drive specplus3_drives[ SPECPLUS3_NUM_DRIVES ];
 
 int
