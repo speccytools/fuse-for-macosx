@@ -1,4 +1,6 @@
-/* pentagon.c: Pentagon 128K specific routines
+/* pentagon.c: Pentagon 128K specific routines, this is intended to be a 1991
+               era Pentagon machine with Beta 128 and AY as described in the
+               Russian Speccy FAQ and emulated on most Spectrum emulators.
    Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
 
    $Id$
@@ -40,7 +42,6 @@
 #include "ula.h"
 
 static int pentagon_reset( void );
-static int pentagon_memory_map( void );
 
 const periph_t pentagon_peripherals[] = {
   { 0x00ff, 0x001f, pentagon_select_1f_read, beta_cr_write },
@@ -113,10 +114,9 @@ pentagon_init( fuse_machine_info *machine )
 
   machine->shutdown = NULL;
 
-  machine->memory_map = pentagon_memory_map;
+  machine->memory_map = spec128_memory_map;
 
   return 0;
-
 }
 
 static int
@@ -129,9 +129,6 @@ pentagon_reset(void)
   if( error ) return error;
   error = machine_load_rom( 2, 1, settings_current.rom_pentagon_1,
                             settings_default.rom_pentagon_1, 0x4000 );
-  if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_pentagon_3,
-                            settings_default.rom_pentagon_3, 0x4000 );
   if( error ) return error;
   error = machine_load_rom_bank( memory_map_romcs, 0, 0,
                                  settings_current.rom_pentagon_2,
@@ -152,42 +149,6 @@ pentagon_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
-
-  return 0;
-}
-
-static int
-pentagon_memory_map( void )
-{
-  int rom, page, screen;
-  size_t i;
-
-  screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
-  if( memory_current_screen != screen ) {
-    display_update_critical( 0, 0 );
-    display_refresh_main_screen();
-    memory_current_screen = screen;
-  }
-
-  if( beta_active && !( machine_current->ram.last_byte & 0x10 ) ) {
-    rom = 2;
-  } else {
-    rom = ( machine_current->ram.last_byte & 0x10 ) >> 4;
-  }
-
-  machine_current->ram.current_rom = rom;
-
-  spec128_select_rom( rom );
-
-  page = machine_current->ram.last_byte & 0x07;
-
-  spec128_select_page( page );
-  machine_current->ram.current_page = page;
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
-
-  memory_romcs_map();
 
   return 0;
 }

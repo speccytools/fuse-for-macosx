@@ -1,4 +1,9 @@
-/* pentagon512.c: Pentagon 512K specific routines
+/* pentagon512.c: Pentagon 512K specific routines. This machine is expected to
+                  be a post-1996 Pentagon (a 512k v1.x 1024SL?). It is
+                  different to the Pentagon 128k model as we want to be able to
+                  exchange snapshots with emulators that do not support this
+                  model but do support the older style Pentagon (SPIN,
+                  Spectaculator, xzx-pro etc. etc.)..
    Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
 
    $Id$

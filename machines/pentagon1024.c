@@ -1,4 +1,5 @@
-/* pentagon1024.c: Pentagon 1024 specific routines
+/* pentagon1024.c: Pentagon 1024 specific routines This machine is expected to
+                  be a post-1996 Pentagon (a 1024k v2.2 1024SL?).
    Copyright (c) 1999-2007 Philip Kendall and Fredrick Meunier
 
    $Id$

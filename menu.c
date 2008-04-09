@@ -208,15 +208,15 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case  8: menu_select_roms( LIBSPECTRUM_MACHINE_TC2048,   18, 1 ); return;
   case  9: menu_select_roms( LIBSPECTRUM_MACHINE_TC2068,   19, 2 ); return;
   case 10: menu_select_roms( LIBSPECTRUM_MACHINE_TS2068,   21, 2 ); return;
-  case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PENT,     23, 4 ); return;
-  case 12: menu_select_roms( LIBSPECTRUM_MACHINE_PENT512,  27, 4 ); return;
-  case 13: menu_select_roms( LIBSPECTRUM_MACHINE_PENT1024, 31, 4 ); return;
-  case 14: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,    35, 4 ); return;
-  case 15: menu_select_roms( LIBSPECTRUM_MACHINE_SE,       39, 2 ); return;
+  case 11: menu_select_roms( LIBSPECTRUM_MACHINE_PENT,     23, 3 ); return;
+  case 12: menu_select_roms( LIBSPECTRUM_MACHINE_PENT512,  26, 4 ); return;
+  case 13: menu_select_roms( LIBSPECTRUM_MACHINE_PENT1024, 30, 4 ); return;
+  case 14: menu_select_roms( LIBSPECTRUM_MACHINE_SCORP,    34, 4 ); return;
+  case 15: menu_select_roms( LIBSPECTRUM_MACHINE_SE,       38, 2 ); return;
 
-  case 16: menu_select_roms_with_title( "Interface I",     41, 1 ); return;
-  case 17: menu_select_roms_with_title( "Beta 128",        42, 1 ); return;
-  case 18: menu_select_roms_with_title( "+D",              43, 1 ); return;
+  case 16: menu_select_roms_with_title( "Interface I",     40, 1 ); return;
+  case 17: menu_select_roms_with_title( "Beta 128",        41, 1 ); return;
+  case 18: menu_select_roms_with_title( "+D",              42, 1 ); return;
 
   }
 

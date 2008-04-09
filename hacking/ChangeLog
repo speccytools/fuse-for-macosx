@@ -2608,3 +2608,10 @@
 20080401 loader.[ch],settings.dat,tape.c,ui/options.dat: add support for
 	 tape acceleration (slightly extended version of patch #1880376).
 20080401 loader.c: add acceleration for Search Loader (Deflektor, Rana Rama).
+20080409 machines/{pentagon.c,pentagon512.c,pentagon1024.c},man/fuse.1,menu.c,
+         settings.[dat|pl]: change Pentagon 128k back to being a machine as
+         described in the RusFAQ and emulated by older versions of Fuse and
+         other Spectrum emulators for SZX and other snapshot compatibility with
+         those emulators, leave the Pentagon 512k and 1024k as later issue
+         machines (Pentagon SL 1.x and 2.2?) as we are free to specify correct
+         snapshot support for those machines (Fred).
