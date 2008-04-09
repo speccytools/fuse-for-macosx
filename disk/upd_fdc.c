@@ -127,6 +127,7 @@ upd_fdc_master_reset( upd_fdc *f )
   f->hld_time = 254;
   f->non_dma = 1;
   f->direction = 0;
+  f->head_load = 0;
   f->intrq = UPD_INTRQ_NONE;
   f->state = UPD_FDC_STATE_CMD;
   f->cycle = 0;

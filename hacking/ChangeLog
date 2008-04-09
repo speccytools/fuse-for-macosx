@@ -2619,3 +2619,5 @@
          (Fred).
 20080409 machines/{specplus3.c,specplus3e.c}: have the +3e share the +3 FDC
          (fixes bug #1931947) (Gergely Szasz).
+20080409 disk/upd_fdc.c: initialise head_load member of upd_fdc struct
+         (fixes bug #1931555) (Gergely Szasz).
