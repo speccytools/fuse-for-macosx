@@ -65,7 +65,7 @@ MENU_CALLBACK( menu_file_open )
   filename = ui_get_open_filename( "Fuse - Open Spectrum File" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  utils_open_file( filename, settings_current.auto_load, NULL );
+  utils_open_file( filename, tape_can_autoload(), NULL );
 
   free( filename );
 

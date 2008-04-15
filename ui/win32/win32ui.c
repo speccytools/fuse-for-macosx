@@ -36,6 +36,7 @@
 #include "select_template.h"
 #include "settings.h"
 #include "snapshot.h"
+#include "tape.h"
 #include "timer/timer.h"
 #include "ui/ui.h"
 #include "ui/uijoystick.h"
@@ -91,7 +92,7 @@ handle_drop( HDROP hDrop )
 
       fuse_emulation_pause();
 
-      utils_open_file( namebuf, settings_current.auto_load, NULL );
+      utils_open_file( namebuf, tape_can_autoload(), NULL );
 
       free( namebuf );
 

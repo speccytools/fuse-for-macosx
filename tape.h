@@ -42,6 +42,8 @@ int tape_select_block_no_update( size_t n );
 int tape_get_current_block( void );
 int tape_write( const char *filename );
 
+int tape_can_autoload( void );
+
 int tape_load_trap( void );
 int tape_save_trap( void );
 

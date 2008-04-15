@@ -619,7 +619,7 @@ do_start_files( start_files_t *start_files )
   }
 
   /* If a snapshot has been specified, don't autoload tape, disks etc */
-  autoload = start_files->snapshot ? 0 : settings_current.auto_load;
+  autoload = start_files->snapshot ? 0 : tape_can_autoload();
 
   /* Load in each of the files. Input recording must be done after
      snapshot loading such that the right snapshot is embedded into

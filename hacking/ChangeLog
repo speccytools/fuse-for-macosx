@@ -2621,3 +2621,6 @@
          (fixes bug #1931947) (Gergely Szasz).
 20080409 disk/upd_fdc.c: initialise head_load member of upd_fdc struct
          (fixes bug #1931555) (Gergely Szasz).
+20080415 fuse.c,memory.[ch],menu.c,tape.[ch],ui/win32/win32ui.c: don't use tape
+         traps or auto-load snapshots if we are using a custom ROM as the entry
+         points are very likely to have moved (Fred).

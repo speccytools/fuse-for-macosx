@@ -97,6 +97,9 @@ const char *memory_bank_name( memory_page *page );
 /* Map in alternate bank if ROMCS is set */
 void memory_romcs_map( void );
 
+/* Have we loaded any custom ROMs? */
+int memory_custom_rom( void );
+
 libspectrum_byte readbyte( libspectrum_word address );
 
 /* Use a macro for performance in the main core, but a function for

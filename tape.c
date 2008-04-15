@@ -291,6 +291,11 @@ int tape_write( const char* filename )
 
 }
 
+int tape_can_autoload( void )
+{
+  return( settings_current.auto_load && !memory_custom_rom() );
+}
+
 /* Load the next tape block into memory; returns 0 if a block was
    loaded (even if it had an tape loading error or equivalent) or
    non-zero if there was an error at the emulator level, or tape traps
@@ -529,6 +534,9 @@ trap_check_rom( void )
 {
   if( plusd_available && plusd_active )
     return 0;		/* +D must not be active */
+
+  if( memory_custom_rom() )
+    return 0;           /* and we can't be using a custom ROM */
 
   switch( machine_current->machine ) {
   case LIBSPECTRUM_MACHINE_16:
