@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2007 Philip Kendall
+   Copyright (c) 1999-2008 Philip Kendall
 
    $Id$
 
@@ -55,6 +55,7 @@
 #include "if2.h"
 #include "joystick.h"
 #include "keyboard.h"
+#include "kempmouse.h"
 #include "machine.h"
 #include "memory.h"
 #include "pokefinder/pokefinder.h"
@@ -269,6 +270,7 @@ static int fuse_init(int argc, char **argv)
   if( ay_init() ) return 1;
   if( slt_init() ) return 1;
   if( profile_init() ) return 1;
+  if( kempmouse_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 

@@ -2624,3 +2624,5 @@
 20080415 fuse.c,memory.[ch],menu.c,tape.[ch],ui/win32/win32ui.c: don't use tape
          traps or auto-load snapshots if we are using a custom ROM as the entry
          points are very likely to have moved (Fred).
+20080417 kempmouse.[ch],fuse.c: write Kempston mouse status to snapshots
+         (Fred).

@@ -1,5 +1,5 @@
 /* kempmouse.h: Kempston mouse emulation
-   Copyright (c) 2004 Darren Salt
+   Copyright (c) 2004-2008 Darren Salt, Fredrick Meunier
 
    $Id$
 
@@ -32,6 +32,7 @@
 extern const periph_t kempmouse_peripherals[];
 extern const size_t kempmouse_peripherals_count;
 
+int kempmouse_init( void );
 void kempmouse_update( int dx, int dy, int button, int down );
 
 #endif

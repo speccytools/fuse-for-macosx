@@ -1,5 +1,5 @@
 /* kempmouse.c: Kempston mouse emulation
-   Copyright (c) 2004 Darren Salt
+   Copyright (c) 2004-2008 Darren Salt, Fredrick Meunier
 
    $Id$
 
@@ -28,9 +28,23 @@
 #include <libspectrum.h>
 
 #include "kempmouse.h"
+#include "module.h"
 #include "periph.h"
 #include "settings.h"
 #include "ui/ui.h"
+
+static void kempmouse_from_snapshot( libspectrum_snap *snap );
+static void kempmouse_to_snapshot( libspectrum_snap *snap );
+
+static module_info_t kempmouse_module_info = {
+
+  NULL,
+  NULL,
+  NULL,
+  kempmouse_from_snapshot,
+  kempmouse_to_snapshot,
+
+};
 
 static struct {
   struct { libspectrum_byte x, y; } pos;
@@ -60,6 +74,15 @@ const periph_t kempmouse_peripherals[] = {
 const size_t kempmouse_peripherals_count =
   sizeof( kempmouse_peripherals ) / sizeof( periph_t );
 
+int
+kempmouse_init( void )
+{
+  module_register( &kempmouse_module_info );
+
+  return 0;
+}
+
+
 void
 kempmouse_update( int dx, int dy, int btn, int down )
 {
@@ -71,4 +94,18 @@ kempmouse_update( int dx, int dy, int btn, int down )
     else
       kempmouse.buttons |= 1 << btn;
   }
+}
+
+static void
+kempmouse_from_snapshot( libspectrum_snap *snap )
+{
+  settings_current.kempston_mouse =
+    libspectrum_snap_kempston_mouse_active( snap );
+}
+
+static void
+kempmouse_to_snapshot( libspectrum_snap *snap )
+{
+  libspectrum_snap_set_kempston_mouse_active( snap,
+                                              settings_current.kempston_mouse );
 }
