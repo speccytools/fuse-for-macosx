@@ -2626,3 +2626,5 @@
          points are very likely to have moved (Fred).
 20080417 kempmouse.[ch],fuse.c: write Kempston mouse status to snapshots
          (Fred).
+20080418 simpleide.c: add snapshot support for Simple 8-bit IDE interface
+         (Fred).

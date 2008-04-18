@@ -1,6 +1,7 @@
 /* simpleide.c: Simple 8-bit IDE interface routines
    Copyright (c) 2003-2004 Garry Lancaster,
-		 2004 Philip Kendall
+		 2004 Philip Kendall,
+		 2008 Fredrick Meunier
 
    $Id$
 
@@ -51,13 +52,16 @@ const size_t simpleide_peripherals_count =
 
 static libspectrum_ide_channel *simpleide_idechn;
 
+static void simpleide_from_snapshot( libspectrum_snap *snap );
+static void simpleide_to_snapshot( libspectrum_snap *snap );
+
 static module_info_t simpleide_module_info = {
 
   simpleide_reset,
   NULL,
   NULL,
-  NULL,
-  NULL,
+  simpleide_from_snapshot,
+  simpleide_to_snapshot,
 
 };
 
@@ -189,4 +193,19 @@ simpleide_write( libspectrum_word port, libspectrum_byte data )
   idereg = ( ( port >> 8 ) & 0x01 ) | ( ( port >> 11 ) & 0x06 );
   
   libspectrum_ide_write( simpleide_idechn, idereg, data ); 
+}
+
+static void
+simpleide_from_snapshot( libspectrum_snap *snap )
+{
+  settings_current.simpleide_active =
+    libspectrum_snap_simpleide_active( snap );
+}
+
+static void
+simpleide_to_snapshot( libspectrum_snap *snap )
+{
+  if( !settings_current.simpleide_active ) return;
+
+  libspectrum_snap_set_simpleide_active( snap, 1 );
 }
