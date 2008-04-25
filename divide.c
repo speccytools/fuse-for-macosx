@@ -27,6 +27,8 @@
 
 #include <libspectrum.h>
 
+#include <string.h>
+
 #include "ide.h"
 #include "machine.h"
 #include "module.h"
@@ -77,14 +79,17 @@ static libspectrum_byte divide_eprom[ DIVIDE_PAGE_LENGTH ];
 
 static void divide_reset( int hard_reset );
 static void divide_memory_map( void );
+static void divide_enabled_snapshot( libspectrum_snap *snap );
+static void divide_from_snapshot( libspectrum_snap *snap );
+static void divide_to_snapshot( libspectrum_snap *snap );
 
 static module_info_t divide_module_info = {
 
   divide_reset,
   divide_memory_map,
-  NULL,
-  NULL,
-  NULL,
+  divide_enabled_snapshot,
+  divide_from_snapshot,
+  divide_to_snapshot,
 
 };
 
@@ -353,4 +358,77 @@ divide_memory_map( void )
 
   memory_map_read[0] = memory_map_write[0] = memory_map_romcs[0];
   memory_map_read[1] = memory_map_write[1] = memory_map_romcs[1];
+}
+
+static void
+divide_enabled_snapshot( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_divide_active( snap ) )
+    settings_current.divide_enabled = 1;
+}
+
+static void
+divide_from_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+
+  if( !libspectrum_snap_divide_active( snap ) ) return;
+
+  settings_current.divide_wp =
+    libspectrum_snap_divide_eprom_writeprotect( snap );
+  divide_control_write_internal( libspectrum_snap_divide_control( snap ) );
+
+  if( libspectrum_snap_divide_eprom( snap, 0 ) ) {
+    memcpy( divide_eprom,
+	    libspectrum_snap_divide_eprom( snap, 0 ), DIVIDE_PAGE_LENGTH );
+  }
+
+  for( i = 0; i < libspectrum_snap_divide_pages( snap ); i++ )
+    if( libspectrum_snap_divide_ram( snap, i ) )
+      memcpy( divide_ram[ i ], libspectrum_snap_divide_ram( snap, i ),
+	      DIVIDE_PAGE_LENGTH );
+
+  if( libspectrum_snap_divide_paged( snap ) ) {
+    divide_page();
+  } else {
+    divide_unpage();
+  }
+}
+
+static void
+divide_to_snapshot( libspectrum_snap *snap )
+{
+  size_t i;
+  libspectrum_byte *buffer;
+
+  if( !settings_current.divide_enabled ) return;
+
+  libspectrum_snap_set_divide_active( snap, 1 );
+  libspectrum_snap_set_divide_eprom_writeprotect( snap,
+                                                  settings_current.divide_wp );
+  libspectrum_snap_set_divide_paged( snap, divide_active );
+  libspectrum_snap_set_divide_control( snap, divide_control );
+
+  buffer = malloc( DIVIDE_PAGE_LENGTH * sizeof( libspectrum_byte ) );
+  if( !buffer ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    return;
+  }
+
+  memcpy( buffer, divide_eprom, DIVIDE_PAGE_LENGTH );
+  libspectrum_snap_set_divide_eprom( snap, 0, buffer );
+
+  libspectrum_snap_set_divide_pages( snap, DIVIDE_PAGES );
+
+  for( i = 0; i < DIVIDE_PAGES; i++ ) {
+
+    buffer = malloc( DIVIDE_PAGE_LENGTH * sizeof( libspectrum_byte ) );
+    if( !buffer ) {
+      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+      return;
+    }
+
+    memcpy( buffer, divide_ram[ i ], DIVIDE_PAGE_LENGTH );
+    libspectrum_snap_set_divide_ram( snap, i, buffer );
+  }
 }

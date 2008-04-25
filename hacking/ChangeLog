@@ -2628,3 +2628,4 @@
          (Fred).
 20080418 simpleide.c: add snapshot support for Simple 8-bit IDE interface
          (Fred).
+20080425 divide.c: add snapshot support for DivIDE interface (Fred).
