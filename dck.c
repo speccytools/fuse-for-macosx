@@ -42,7 +42,6 @@
 #include "ui/ui.h"
 #include "utils.h"
 #include "debugger/debugger.h"
-#include "widget/widget.h"
 
 /* Dock cart inserted? */
 int dck_active = 0;

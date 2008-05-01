@@ -39,7 +39,6 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  timer \
 	  ui \
 	  unittests \
-	  @WIDGET@ \
 	  z80
 
 DIST_SUBDIRS = debugger \
@@ -55,7 +54,6 @@ DIST_SUBDIRS = debugger \
 	       timer \
 	       ui \
 	       unittests \
-	       widget \
 	       z80
 
 fuse_SOURCES = ay.c \

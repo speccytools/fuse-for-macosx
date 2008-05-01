@@ -36,7 +36,7 @@
 #include "ui/ui.h"
 #include "utils.h"
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "ui/widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 
 static int keypress( const input_event_key_t *event );

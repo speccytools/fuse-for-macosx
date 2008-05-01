@@ -46,7 +46,7 @@
 #include "tape.h"
 #include "ui/ui.h"
 #include "utils.h"
-#include "widget/widget.h"
+#include "ui/widget/widget.h"
 #include "zxatasp.h"
 #include "zxcf.h"
 

@@ -39,7 +39,7 @@
 #include "spectrum.h"
 #include "tape.h"
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "ui/widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 #include "xkeyboard.h"
 

@@ -25,13 +25,14 @@ AUTOMAKE_OPTIONS = foreign
 
 AM_CPPFLAGS = -I$(srcdir)/..
 
-SUBDIRS = @UI@ scaler
+SUBDIRS = @UI@ @WIDGET@ scaler
 
 DIST_SUBDIRS = fb \
 	       gtk \
 	       scaler \
 	       sdl \
 	       svga \
+	       widget \
 	       win32 \
 	       xlib
 

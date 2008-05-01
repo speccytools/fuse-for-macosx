@@ -32,7 +32,7 @@
 
 #include "fuse.h"
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "ui/widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 
 /* Are we expecting an X error to occur? */

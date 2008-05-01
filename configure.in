@@ -112,7 +112,7 @@ if test "$svgalib" = yes; then
 		  AC_DEFINE([USE_WIDGET], 1,
 		            [Defined if we're using a widget-based UI])
                   UI=svga; WIDGET=widget;
-                  UI_LIBS="ui/svga/libuisvga.a widget/libwidget.a",
+                  UI_LIBS="ui/svga/libuisvga.a ui/widget/libwidget.a",
                   AC_MSG_ERROR([svgalib not found]))
 fi
 
@@ -128,7 +128,7 @@ if test -z "$UI"; then
     AC_DEFINE([UI_FB], 1, [Defined if framebuffer UI in use])
     AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
     UI=fb; WIDGET=widget;
-    UI_LIBS="ui/fb/libuifb.a widget/libwidget.a"
+    UI_LIBS="ui/fb/libuifb.a ui/widget/libwidget.a"
     dnl Look for libgpm (default=yes)
     AC_MSG_CHECKING(whether gpm requested)
     AC_ARG_WITH(gpm,
@@ -161,31 +161,10 @@ if test -z "$UI"; then
 		AC_DEFINE([USE_WIDGET], 1,
 		          [Defined if we're using a widget-based UI])
 		UI=sdl; WIDGET=widget;
-	        UI_LIBS="ui/sdl/libuisdl.a widget/libwidget.a", 
+	        UI_LIBS="ui/sdl/libuisdl.a ui/widget/libwidget.a", 
                 AC_MSG_ERROR([SDL version $SDL_VERSION not found]))
   fi
 fi
-
-dnl Look for GGI (default=no)
-dnl Disabled -- doesn't work and unmaintained -- PAK 20040702
-dnl if test -z "$UI"; then
-dnl   AC_MSG_CHECKING(whether GGI UI requested)
-dnl   AC_ARG_WITH(ggi,
-dnl   [  --with-ggi              use GGI for user interface],
-dnl   if test "$withval" = no; then sdl=no; else ggi=yes; fi,
-dnl   ggi=no)
-dnl   AC_MSG_RESULT($ggi)
-dnl   if test "$ggi" = yes; then
-dnl     AC_CHECK_HEADER(ggi/ggi.h,
-dnl 	            AC_DEFINE([UI_GGI], 1, [Defined if GGI UI in use])
-dnl 		    AC_DEFINE([USE_WIDGET], 1,
-dnl 		              [Defined if we're using a widget-based UI])
-dnl 		    UI=ggi; WIDGET=widget;
-dnl 	            UI_LIBS="ui/ggi/libuiggi.a widget/libwidget.a"
-dnl 		    LIBS="$LIBS -lggi",
-dnl 	            AC_MSG_ERROR([ggi/ggi.h not found]))
-dnl   fi
-dnl fi
 
 dnl Look for GTK+ (default=yes)
 if test -z "$UI"; then
@@ -240,7 +219,7 @@ if test -z "$UI"; then
   AC_DEFINE([UI_X], 1, [Defined if Xlib UI in use])
   UI=xlib; WIDGET=widget;
   AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
-  UI_LIBS="ui/xlib/libuixlib.a widget/libwidget.a"
+  UI_LIBS="ui/xlib/libuixlib.a ui/widget/libwidget.a"
 fi
 
 AC_SUBST(UI)
@@ -670,10 +649,10 @@ ui/gtk/Makefile \
 ui/svga/Makefile \
 ui/sdl/Makefile \
 ui/scaler/Makefile \
+ui/widget/Makefile \
 ui/win32/Makefile \
 ui/win32/icons/Makefile \
 ui/xlib/Makefile \
 unittests/Makefile \
-widget/Makefile \
 z80/Makefile \
 z80/tests/Makefile)

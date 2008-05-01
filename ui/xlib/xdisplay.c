@@ -61,7 +61,7 @@
 #include "ui/scaler/scaler.h"
 #include "ui/uidisplay.h"
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "ui/widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 #include "scld.h"
 

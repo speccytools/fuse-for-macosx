@@ -81,7 +81,7 @@
 #include "zxcf.h"
 
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "ui/widget/widget.h"
 #endif                          /* #ifdef USE_WIDGET */
 
 #include "z80/z80.h"

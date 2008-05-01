@@ -43,7 +43,7 @@
 #include "ui/uidisplay.h"
 #include "utils.h"
 #ifdef USE_WIDGET
-#include "widget/widget.h"
+#include "ui/widget/widget.h"
 #endif				/* #ifdef USE_WIDGET */
 
 SDL_Surface *sdldisplay_gc = NULL;   /* Hardware screen */

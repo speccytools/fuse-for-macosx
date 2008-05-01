@@ -51,14 +51,14 @@ BUILT_SOURCES = menu_data.c \
 		options.h \
 		fuse.font
 
-menu_data.c: $(srcdir)/../perl/cpp-perl.pl $(srcdir)/../menu_data.dat $(srcdir)/../menu_data.pl ../config.h
-	@PERL@ $(srcdir)/../perl/cpp-perl.pl ../config.h $(srcdir)/../menu_data.dat | @PERL@ -I$(srcdir)/../perl $(srcdir)/../menu_data.pl widget > $@.tmp && mv $@.tmp $@
+menu_data.c: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.dat $(srcdir)/../../menu_data.pl ../../config.h
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../menu_data.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/../../menu_data.pl widget > $@.tmp && mv $@.tmp $@
 
-options.c: $(srcdir)/../perl/cpp-perl.pl ../config.h $(srcdir)/options.pl $(srcdir)/../ui/options.dat $(srcdir)/../perl/Fuse.pm $(srcdir)/../perl/Fuse/Dialog.pm
-	@PERL@ $(srcdir)/../perl/cpp-perl.pl ../config.h $(srcdir)/../ui/options.dat | @PERL@ -I$(srcdir)/../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
+options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl $(srcdir)/../options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
 
-options.h: $(srcdir)/../perl/cpp-perl.pl ../config.h $(srcdir)/options-header.pl $(srcdir)/../ui/options.dat $(srcdir)/../perl/Fuse.pm $(srcdir)/../perl/Fuse/Dialog.pm
-	@PERL@ $(srcdir)/../perl/cpp-perl.pl ../config.h $(srcdir)/../ui/options.dat | @PERL@ -I$(srcdir)/../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
+options.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
 
 fuse.font: $(srcdir)/mkfusefont.pl $(srcdir)/fuse.font.sbf
 	@PERL@ $(srcdir)/mkfusefont.pl $(srcdir)/fuse.font.sbf > $@.tmp && mv $@.tmp $@
