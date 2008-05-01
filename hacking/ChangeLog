@@ -2629,3 +2629,9 @@
 20080418 simpleide.c: add snapshot support for Simple 8-bit IDE interface
          (Fred).
 20080425 divide.c: add snapshot support for DivIDE interface (Fred).
+20080501 Makefile.am,configure.in,dck.c,fuse.c,input.c,keysyms.pl,menu.c,
+         ui/Makefile.am,ui/fb/fbkeyboard.c,ui/sdl/{sdldisplay.c,sdlkeyboard.c},
+         ui/svga/svgakeyboard.c,ui/widget,ui/widget/Makefile.am,
+         ui/xlib/{xdisplay.c,xerror.c,xkeyboard.c},utils.c,widget: move the
+         widget UI files to the ui subdirectory, remove remnants of the GGI UI
+         (Fred).
