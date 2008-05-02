@@ -7,6 +7,9 @@
    Copyright (C) 2001  Ludvig Strigeus
    Copyright (C) 2001/2002 The ScummVM project
 
+   HQ2x and HQ3x scalers taken from HiEnd3D Demos (http://www.hiend3d.com)
+   Copyright (C) 2003 MaxSt ( maxst@hiend3d.com )
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -60,5 +63,7 @@ DECLARE_SCALER(DotMatrix);
 DECLARE_SCALER(PalTV);
 DECLARE_SCALER(PalTV2x);
 DECLARE_SCALER(PalTV3x);
+DECLARE_SCALER(HQ2x);
+DECLARE_SCALER(HQ3x);
 
 #endif				/* #ifndef FUSE_SCALER_INTERNALS_H */

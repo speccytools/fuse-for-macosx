@@ -2635,3 +2635,8 @@
          ui/xlib/{xdisplay.c,xerror.c,xkeyboard.c},utils.c,widget: move the
          widget UI files to the ui subdirectory, remove remnants of the GGI UI
          (Fred).
+20080502 ui/gtk/{Makefile.am,gtkdisplay.c},
+         ui/scaler/{Makefile.am,scaler.[ch],scaler_hq[23]x.c,
+         scaler_internals.h,scalers.c},ui/sdl/sdldisplay.c,
+         ui/win32/win32display.c,ui/xlib/xdisplay.c: add HQ2x and HQ3x scalers
+         (patch #1952304) (Gergely Szasz).

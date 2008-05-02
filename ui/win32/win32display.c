@@ -322,6 +322,7 @@ register_scalers_noresize( void )
       scaler_register( SCALER_SUPEREAGLE );
       scaler_register( SCALER_DOTMATRIX );
       scaler_register( SCALER_PALTV2X );
+      scaler_register( SCALER_HQ2X );
       if( !scaler_is_supported( current_scaler ) )
         scaler_select_scaler( SCALER_DOUBLESIZE );
       return 0;
@@ -342,6 +343,7 @@ register_scalers_noresize( void )
       scaler_register( SCALER_TV3X );
       scaler_register( SCALER_ADVMAME3X );
       scaler_register( SCALER_PALTV3X );
+      scaler_register( SCALER_HQ3X );
       if( !scaler_is_supported( current_scaler ) )
         scaler_select_scaler( SCALER_TRIPLESIZE );
       return 0;

@@ -611,11 +611,13 @@ register_scalers( void )
         scaler_register( SCALER_TV2X );
         scaler_register( SCALER_DOTMATRIX );
         scaler_register( SCALER_PALTV2X );
+        scaler_register( SCALER_HQ2X );
 
-	scaler_register( SCALER_TRIPLESIZE );
-	scaler_register( SCALER_ADVMAME3X );
-	scaler_register( SCALER_TV3X );
-	scaler_register( SCALER_PALTV3X );
+        scaler_register( SCALER_TRIPLESIZE );
+        scaler_register( SCALER_ADVMAME3X );
+        scaler_register( SCALER_TV3X );
+        scaler_register( SCALER_PALTV3X );
+        scaler_register( SCALER_HQ3X );
       }
     }
   if( current_scaler != SCALER_NUM )

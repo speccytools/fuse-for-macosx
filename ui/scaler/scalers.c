@@ -1,11 +1,14 @@
 /* scalers.c: the actual graphics scalers
- * Copyright (C) 2003 Fredrick Meunier, Philip Kendall
+ * Copyright (C) 2003-2008 Fredrick Meunier, Philip Kendall, Gergely Szasz
  *
  * $Id$
  * 
  * Originally taken from ScummVM - Scumm Interpreter
  * Copyright (C) 2001  Ludvig Strigeus
  * Copyright (C) 2001-2003 The ScummVM project
+ *
+ * HQ2x and HQ3x scalers taken from HiEnd3D Demos (http://www.hiend3d.com)
+ * Copyright (C) 2003 MaxSt ( maxst@hiend3d.com )
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -55,8 +58,12 @@ static libspectrum_dword lowPixelMask;
 static libspectrum_dword qcolorMask;
 static libspectrum_dword qlowpixelMask;
 static libspectrum_dword redblueMask;
+static libspectrum_dword redblue8_Mask;
+static libspectrum_dword redblue16_Mask;
 static libspectrum_dword redMask;
 static libspectrum_dword greenMask;
+static libspectrum_dword green8_Mask;
+static libspectrum_dword green16_Mask;
 static libspectrum_dword blueMask;
 static int green6bit;
 
@@ -95,9 +102,13 @@ scaler_select_bitformat( libspectrum_dword BitFormat )
     qcolorMask = 0x0000E79C;
     qlowpixelMask = 0x00001863;
     redblueMask = 0x0000F81F;
+    redblue8_Mask = 0x0007C0F8;
+    redblue16_Mask = 0x000F81F0;
     green6bit = 1;
     redMask   = 0x0000001F;
     greenMask = 0x000007E0;
+    green8_Mask = 0x00003F00;
+    green16_Mask = 0x00007E00;
     blueMask  = 0x0000F800;
     dotmatrix = dotmatrix_565;
     break;
@@ -108,9 +119,13 @@ scaler_select_bitformat( libspectrum_dword BitFormat )
     qcolorMask = 0x0000739C;
     qlowpixelMask = 0x00000C63;
     redblueMask = 0x00007C1F;
+    redblue8_Mask = 0x0003E0F8;
+    redblue16_Mask = 0x0007C1F0;
     green6bit = 0;
     redMask   = 0x0000001F;
     greenMask = 0x000003E0;
+    green8_Mask = 0x000001F0;
+    green16_Mask = 0x000003E0;
     blueMask  = 0x00007C00;
     dotmatrix = dotmatrix_555;
     break;
@@ -141,9 +156,13 @@ static const libspectrum_dword lowPixelMask = 0x01010100;
 static const libspectrum_dword qcolorMask = 0xFCFCFC00;
 static const libspectrum_dword qlowpixelMask = 0x03030300;
 static const libspectrum_qword redblueMask = 0xFF00FF00;
-static const libspectrum_qword redMask =   0xFF000000;
-static const libspectrum_qword greenMask = 0x00FF0000;
-static const libspectrum_qword blueMask =  0x0000FF00;
+static const libspectrum_dword redblue8_Mask = 0xF807F807;
+static const libspectrum_dword redblue16_Mask = 0x0FF00FF0;
+static const libspectrum_dword redMask =   0xFF000000;
+static const libspectrum_dword greenMask = 0x00FF0000;
+static const libspectrum_dword blueMask =  0x0000FF00;
+static const libspectrum_dword green8_Mask = 0x008F0700;
+static const libspectrum_dword green8_Mask = 0x000FF000;
 
 static const libspectrum_dword dotmatrix[16] = {
   0x003F0000, 0x00003F00, 0x3F000000, 0x00000000,
@@ -159,9 +178,13 @@ static const libspectrum_dword lowPixelMask = 0x00010101;
 static const libspectrum_dword qcolorMask = 0x00FCFCFC;
 static const libspectrum_dword qlowpixelMask = 0x00030303;
 static const libspectrum_qword redblueMask = 0x00FF00FF;
-static const libspectrum_qword redMask =   0x000000FF;
-static const libspectrum_qword greenMask = 0x0000FF00;
-static const libspectrum_qword blueMask =  0x00FF0000;
+static const libspectrum_dword redblue8_Mask = 0x07F807F8;
+static const libspectrum_dword redblue16_Mask = 0x0FF00FF0;
+static const libspectrum_dword redMask =   0x000000FF;
+static const libspectrum_dword greenMask = 0x0000FF00;
+static const libspectrum_dword blueMask =  0x00FF0000;
+static const libspectrum_dword green8_Mask = 0x0007F800;
+static const libspectrum_dword green16_Mask = 0x000FF000;
 
 static const libspectrum_dword dotmatrix[16] = {
   0x00003F00, 0x003F0000, 0x0000003F, 0x00000000,
@@ -219,6 +242,188 @@ Q_INTERPOLATE( libspectrum_dword A, libspectrum_dword B, libspectrum_dword C,
   y = (y >> 2) & qlowpixelMask;
   return x + y;
 }
+
+/* HQ scalers */
+#define HQ_INTERPOLATE_1(A,B) Q_INTERPOLATE(A,A,A,B)
+
+#define HQ_INTERPOLATE_2(A,B,C) Q_INTERPOLATE(A,A,B,C)
+
+static inline libspectrum_dword
+HQ_INTERPOLATE_3( libspectrum_dword A, libspectrum_dword B )
+{
+  return ( ( ( ( A & greenMask ) * 7 + ( B & greenMask) ) & green8_Mask ) +
+         ( ( ( A & redblueMask ) * 7 + ( B & redblueMask ) ) & redblue8_Mask )
+         ) >> 3;
+}
+
+static inline libspectrum_dword
+HQ_INTERPOLATE_4( libspectrum_dword A, libspectrum_dword B,
+                  libspectrum_dword C )
+{
+  return ( ( ( ( A & greenMask ) * 2 + ( ( B & greenMask) + 
+		( C & greenMask ) ) * 7 ) & green16_Mask) +
+         ( ( ( A & redblueMask ) * 2 + ( ( B & redblueMask ) +
+		( C & redblueMask ) ) * 7 ) & redblue16_Mask ) ) >> 4;
+}
+
+#define HQ_INTERPOLATE_5(A,B) INTERPOLATE(A,B)
+
+static inline libspectrum_dword
+HQ_INTERPOLATE_6( libspectrum_dword A, libspectrum_dword B,
+                  libspectrum_dword C )
+{
+  return ( ( ( ( A & greenMask ) * 5 + ( B & greenMask) * 2 + 
+		( C & greenMask ) ) & green8_Mask) +
+         ( ( ( A & redblueMask ) * 5 + ( B & redblueMask ) * 2 +
+		( C & redblueMask ) ) & redblue8_Mask ) ) >> 3;
+}
+
+static inline libspectrum_dword
+HQ_INTERPOLATE_7( libspectrum_dword A, libspectrum_dword B,
+                  libspectrum_dword C )
+{
+  return ( ( ( ( A & greenMask ) * 6 + ( B & greenMask) + 
+		( C & greenMask ) ) & green8_Mask) +
+         ( ( ( A & redblueMask ) * 6 + ( B & redblueMask ) +
+		( C & redblueMask ) ) & redblue8_Mask ) ) >> 3;
+}
+
+static inline libspectrum_dword
+HQ_INTERPOLATE_9( libspectrum_dword A, libspectrum_dword B,
+                  libspectrum_dword C )
+{
+  return ( ( ( ( A & greenMask ) * 2 + ( ( B & greenMask) + 
+		( C & greenMask ) ) * 3 ) & green8_Mask) +
+         ( ( ( A & redblueMask ) * 2 + ( ( B & redblueMask ) +
+		( C & redblueMask ) ) * 3 ) & redblue8_Mask ) ) >> 3;
+}
+
+static inline libspectrum_dword
+HQ_INTERPOLATE_10( libspectrum_dword A, libspectrum_dword B,
+                   libspectrum_dword C )
+{
+  return ( ( ( ( A & greenMask ) * 14 + ( B & greenMask) + 
+		( C & greenMask ) ) & green16_Mask) +
+         ( ( ( A & redblueMask ) * 14 + ( B & redblueMask ) +
+		( C & redblueMask ) ) & redblue16_Mask ) ) >> 4;
+}
+
+/* dstPtr */
+#define HQ_PIXEL00_0     w[5]
+#define HQ_PIXEL00_10    HQ_INTERPOLATE_1(w[5], w[1])
+#define HQ_PIXEL00_11    HQ_INTERPOLATE_1(w[5], w[4])
+#define HQ_PIXEL00_12    HQ_INTERPOLATE_1(w[5], w[2])
+#define HQ_PIXEL00_20    HQ_INTERPOLATE_2(w[5], w[4], w[2])
+#define HQ_PIXEL00_21    HQ_INTERPOLATE_2(w[5], w[1], w[2])
+#define HQ_PIXEL00_22    HQ_INTERPOLATE_2(w[5], w[1], w[4])
+#define HQ_PIXEL00_60    HQ_INTERPOLATE_6(w[5], w[2], w[4])
+#define HQ_PIXEL00_61    HQ_INTERPOLATE_6(w[5], w[4], w[2])
+#define HQ_PIXEL00_70    HQ_INTERPOLATE_7(w[5], w[4], w[2])
+#define HQ_PIXEL00_90    HQ_INTERPOLATE_9(w[5], w[4], w[2])
+#define HQ_PIXEL00_100   HQ_INTERPOLATE_10(w[5], w[4], w[2])
+/* +1 */
+#define HQ_PIXEL01_0     w[5]
+#define HQ_PIXEL01_10    HQ_INTERPOLATE_1(w[5], w[3])
+#define HQ_PIXEL01_11    HQ_INTERPOLATE_1(w[5], w[2])
+#define HQ_PIXEL01_12    HQ_INTERPOLATE_1(w[5], w[6])
+#define HQ_PIXEL01_20    HQ_INTERPOLATE_2(w[5], w[2], w[6])
+#define HQ_PIXEL01_21    HQ_INTERPOLATE_2(w[5], w[3], w[6])
+#define HQ_PIXEL01_22    HQ_INTERPOLATE_2(w[5], w[3], w[2])
+#define HQ_PIXEL01_60    HQ_INTERPOLATE_6(w[5], w[6], w[2])
+#define HQ_PIXEL01_61    HQ_INTERPOLATE_6(w[5], w[2], w[6])
+#define HQ_PIXEL01_70    HQ_INTERPOLATE_7(w[5], w[2], w[6])
+#define HQ_PIXEL01_90    HQ_INTERPOLATE_9(w[5], w[2], w[6])
+#define HQ_PIXEL01_100   HQ_INTERPOLATE_10(w[5], w[2], w[6])
+/* +dstPitch */
+#define HQ_PIXEL10_0     w[5]
+#define HQ_PIXEL10_10    HQ_INTERPOLATE_1(w[5], w[7])
+#define HQ_PIXEL10_11    HQ_INTERPOLATE_1(w[5], w[8])
+#define HQ_PIXEL10_12    HQ_INTERPOLATE_1(w[5], w[4])
+#define HQ_PIXEL10_20    HQ_INTERPOLATE_2(w[5], w[8], w[4])
+#define HQ_PIXEL10_21    HQ_INTERPOLATE_2(w[5], w[7], w[4])
+#define HQ_PIXEL10_22    HQ_INTERPOLATE_2(w[5], w[7], w[8])
+#define HQ_PIXEL10_60    HQ_INTERPOLATE_6(w[5], w[4], w[8])
+#define HQ_PIXEL10_61    HQ_INTERPOLATE_6(w[5], w[8], w[4])
+#define HQ_PIXEL10_70    HQ_INTERPOLATE_7(w[5], w[8], w[4])
+#define HQ_PIXEL10_90    HQ_INTERPOLATE_9(w[5], w[8], w[4])
+#define HQ_PIXEL10_100   HQ_INTERPOLATE_10(w[5], w[8], w[4])
+/* +dstPitch+1*/
+#define HQ_PIXEL11_0     w[5]
+#define HQ_PIXEL11_10    HQ_INTERPOLATE_1(w[5], w[9])
+#define HQ_PIXEL11_11    HQ_INTERPOLATE_1(w[5], w[6])
+#define HQ_PIXEL11_12    HQ_INTERPOLATE_1(w[5], w[8])
+#define HQ_PIXEL11_20    HQ_INTERPOLATE_2(w[5], w[6], w[8])
+#define HQ_PIXEL11_21    HQ_INTERPOLATE_2(w[5], w[9], w[8])
+#define HQ_PIXEL11_22    HQ_INTERPOLATE_2(w[5], w[9], w[6])
+#define HQ_PIXEL11_60    HQ_INTERPOLATE_6(w[5], w[8], w[6])
+#define HQ_PIXEL11_61    HQ_INTERPOLATE_6(w[5], w[6], w[8])
+#define HQ_PIXEL11_70    HQ_INTERPOLATE_7(w[5], w[6], w[8])
+#define HQ_PIXEL11_90    HQ_INTERPOLATE_9(w[5], w[6], w[8])
+#define HQ_PIXEL11_100   HQ_INTERPOLATE_10(w[5], w[6], w[8])
+
+/* dstPtr */
+#define HQ_PIXEL00_1M  HQ_INTERPOLATE_1(w[5], w[1])
+#define HQ_PIXEL00_1U  HQ_INTERPOLATE_1(w[5], w[2])
+#define HQ_PIXEL00_1L  HQ_INTERPOLATE_1(w[5], w[4])
+#define HQ_PIXEL00_2   HQ_INTERPOLATE_2(w[5], w[4], w[2])
+#define HQ_PIXEL00_4   HQ_INTERPOLATE_4(w[5], w[4], w[2])
+#define HQ_PIXEL00_5   HQ_INTERPOLATE_5(w[4], w[2])
+#define HQ_PIXEL00_C   w[5]
+/* dstPtr+1*/
+#define HQ_PIXEL01_1   HQ_INTERPOLATE_1(w[5], w[2])
+#define HQ_PIXEL01_3   HQ_INTERPOLATE_3(w[5], w[2])
+#define HQ_PIXEL01_6   HQ_INTERPOLATE_1(w[2], w[5])
+#define HQ_PIXEL01_C   w[5]
+/* dstPtr+2*/
+#define HQ_PIXEL02_1M  HQ_INTERPOLATE_1(w[5], w[3])
+#define HQ_PIXEL02_1U  HQ_INTERPOLATE_1(w[5], w[2])
+#define HQ_PIXEL02_1R  HQ_INTERPOLATE_1(w[5], w[6])
+#define HQ_PIXEL02_2   HQ_INTERPOLATE_2(w[5], w[2], w[6])
+#define HQ_PIXEL02_4   HQ_INTERPOLATE_4(w[5], w[2], w[6])
+#define HQ_PIXEL02_5   HQ_INTERPOLATE_5(w[2], w[6])
+#define HQ_PIXEL02_C   w[5]
+/* + dstPitch*/
+#define HQ_PIXEL10_1   HQ_INTERPOLATE_1(w[5], w[4])
+#define HQ_PIXEL10_3   HQ_INTERPOLATE_3(w[5], w[4])
+#define HQ_PIXEL10_6   HQ_INTERPOLATE_1(w[4], w[5])
+#define HQ_PIXEL10_C   w[5]
+/* + dstPitch + 1 */
+#define HQ_PIXEL11     w[5]
+/* + dstPitch + 2 */
+#define HQ_PIXEL12_1   HQ_INTERPOLATE_1(w[5], w[6])
+#define HQ_PIXEL12_3   HQ_INTERPOLATE_3(w[5], w[6])
+#define HQ_PIXEL12_6   HQ_INTERPOLATE_1(w[6], w[5])
+#define HQ_PIXEL12_C   w[5]
+/* + 2*dstPitch */
+#define HQ_PIXEL20_1M  HQ_INTERPOLATE_1(w[5], w[7])
+#define HQ_PIXEL20_1D  HQ_INTERPOLATE_1(w[5], w[8])
+#define HQ_PIXEL20_1L  HQ_INTERPOLATE_1(w[5], w[4])
+#define HQ_PIXEL20_2   HQ_INTERPOLATE_2(w[5], w[8], w[4])
+#define HQ_PIXEL20_4   HQ_INTERPOLATE_4(w[5], w[8], w[4])
+#define HQ_PIXEL20_5   HQ_INTERPOLATE_5(w[8], w[4])
+#define HQ_PIXEL20_C   w[5]
+/* + 2*dstPitch + 1 */
+#define HQ_PIXEL21_1   HQ_INTERPOLATE_1(w[5], w[8])
+#define HQ_PIXEL21_3   HQ_INTERPOLATE_3(w[5], w[8])
+#define HQ_PIXEL21_6   HQ_INTERPOLATE_1(w[8], w[5])
+#define HQ_PIXEL21_C   w[5]
+/* + 2*dstPitch + 2 */
+#define HQ_PIXEL22_1M  HQ_INTERPOLATE_1(w[5], w[9])
+#define HQ_PIXEL22_1D  HQ_INTERPOLATE_1(w[5], w[8])
+#define HQ_PIXEL22_1R  HQ_INTERPOLATE_1(w[5], w[6])
+#define HQ_PIXEL22_2   HQ_INTERPOLATE_2(w[5], w[6], w[8])
+#define HQ_PIXEL22_4   HQ_INTERPOLATE_4(w[5], w[6], w[8])
+#define HQ_PIXEL22_5   HQ_INTERPOLATE_5(w[6], w[8])
+#define HQ_PIXEL22_C   w[5]
+
+#define HQ_trY 0x00000030
+#define HQ_trU 0x00000007
+#define HQ_trV 0x00000006
+
+#define HQ_YUVDIFF(y1,u1,v1,y2,u2,v2) \
+  ( ( ABS( y1 - y2 ) > HQ_trY ) || \
+    ( ABS( u1 - u2 ) > HQ_trU ) || \
+    ( ABS( v1 - v2 ) > HQ_trV ) )
 
 void 
 FUNCTION( scaler_Super2xSaI )( const libspectrum_byte *srcPtr,
@@ -1463,5 +1668,214 @@ FUNCTION( scaler_PalTV3x )( const libspectrum_byte *srcPtr,
     }
     p0 += nextlineSrc;
     q0 += (nextlineDst << 1) + nextlineDst;
+  }
+}
+
+#define prevline (-nextlineSrc)
+#define nextline nextlineSrc
+#define MOVE_B_TO_A(A,B) \
+		w[A] = w[B]; y[A] = y[B]; u[A] = u[B]; v[A] = v[B];
+#define MOVE_P_RIGHT \
+	MOVE_B_TO_A(1,2) \
+	MOVE_B_TO_A(4,5) \
+	MOVE_B_TO_A(7,8) \
+	MOVE_B_TO_A(2,3) \
+	MOVE_B_TO_A(5,6) \
+	MOVE_B_TO_A(8,9)
+
+void
+FUNCTION( scaler_HQ2x ) ( const libspectrum_byte *srcPtr,
+                          libspectrum_dword srcPitch,
+                          libspectrum_byte *dstPtr,
+                          libspectrum_dword dstPitch,
+                          int width, int height )
+{
+  int i, j, k, pattern;
+  int nextlineSrc = srcPitch / sizeof( scaler_data_type );
+  const scaler_data_type *p, *p0 = (const scaler_data_type *)srcPtr;
+  int nextlineDst = dstPitch / sizeof( scaler_data_type );
+  scaler_data_type *q, *q1, *qN, *qN1, *q0 = (scaler_data_type *)dstPtr;
+  libspectrum_qword w[10];
+  
+  libspectrum_byte  r, g, b;
+  libspectrum_signed_dword y[10], u[10], v[10];
+
+  /*   +----+----+----+
+       |    |    |    |
+       | w1 | w2 | w3 |
+       +----+----+----+
+       |    |    |    |
+       | w4 | w5 | w6 |
+       +----+----+----+
+       |    |    |    |
+       | w7 | w8 | w9 |
+       +----+----+----+ */
+  for( j = 0; j < height; j++ ) {
+    p = p0;
+    q = q0; q1 = q + 1;
+    qN = q + nextlineDst; qN1 = qN + 1;
+    w[2] = *(p + prevline);
+    w[5] = *p;
+    w[8] = *(p + nextline);
+    w[1] = *(p + prevline - 1);
+    w[4] = *(p - 1);
+    w[7] = *(p + nextline - 1);
+    w[3] = *(p + prevline + 1);
+    w[6] = *(p + 1);
+    w[9] = *(p + nextline + 1);
+    for( k = 1; k <= 9; k++ ) {
+#if SCALER_DATA_SIZE == 2
+      r = R_TO_R( w[k] );
+      g = G_TO_G( w[k] );
+      b = B_TO_B( w[k] );
+#else
+      r =  w[k] & redMask;
+      g = (w[k] & greenMask) >> 8;
+      b = (w[k] & blueMask) >> 16;
+#endif
+      y[k] = RGB_TO_Y( r, g, b );
+      u[k] = RGB_TO_U( r, g, b );
+      v[k] = RGB_TO_V( r, g, b );
+    }
+
+    for( i = 0; i < width; i++ ) {
+      pattern = 0;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[1], u[1], v[1] ) ) pattern |= 0x01;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[2], u[2], v[2] ) ) pattern |= 0x02;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[3], u[3], v[3] ) ) pattern |= 0x04;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[4], u[4], v[4] ) ) pattern |= 0x08;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[6], u[6], v[6] ) ) pattern |= 0x10;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[7], u[7], v[7] ) ) pattern |= 0x20;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[8], u[8], v[8] ) ) pattern |= 0x40;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[9], u[9], v[9] ) ) pattern |= 0x80;
+
+#include "scaler_hq2x.c"
+
+      p++;
+      q  += 2; q1  += 2;
+      qN += 2; qN1 += 2;
+      MOVE_P_RIGHT
+      w[3] = *(p + prevline + 1);
+      w[6] = *(p + 1);
+      w[9] = *(p + nextline + 1);
+      for( k = 3; k <= 9; k += 3 ) {
+#if SCALER_DATA_SIZE == 2
+        r = R_TO_R( w[k] );
+        g = G_TO_G( w[k] );
+        b = B_TO_B( w[k] );
+#else
+        r =   w[k] & redMask;
+        g = ( w[k] & greenMask ) >> 8;
+        b = ( w[k] & blueMask  ) >> 16;
+#endif
+        y[k] = RGB_TO_Y( r, g, b );
+        u[k] = RGB_TO_U( r, g, b );
+        v[k] = RGB_TO_V( r, g, b );
+      }
+    }
+    p0 += nextlineSrc;
+    q0 += nextlineDst << 1;
+  }
+}
+
+void
+FUNCTION( scaler_HQ3x ) ( const libspectrum_byte *srcPtr,
+                          libspectrum_dword srcPitch,
+                          libspectrum_byte *dstPtr,
+                          libspectrum_dword dstPitch,
+                          int width, int height )
+{
+  int i, j, k, pattern;
+  int nextlineSrc = srcPitch / sizeof( scaler_data_type );
+  const scaler_data_type *p, *p0 = (const scaler_data_type *)srcPtr;
+  int nextlineDst = dstPitch / sizeof( scaler_data_type );
+  scaler_data_type *q, *qN, *qNN, *q1, *qN1, *qNN1, *q2, *qN2, *qNN2, 
+		   *q0 = (scaler_data_type *)dstPtr;
+  libspectrum_qword w[10];
+  
+  libspectrum_byte  r, g, b;
+  libspectrum_signed_dword y[10], u[10], v[10];
+
+  /*   +----+----+----+
+       |    |    |    |
+       | w1 | w2 | w3 |
+       +----+----+----+
+       |    |    |    |
+       | w4 | w5 | w6 |
+       +----+----+----+
+       |    |    |    |
+       | w7 | w8 | w9 |
+       +----+----+----+ */
+  for( j = 0; j < height; j++ ) {
+    if( j == height - 1 ) nextline = 0;
+
+    p = p0;
+    q = q0;
+    q1 = q + 1; q2 = q + 2;
+    qN = q + nextlineDst; qN1 = qN + 1; qN2 = qN + 2;
+    qNN = qN + nextlineDst;  qNN1 = qNN + 1; qNN2 = qNN + 2;
+
+    w[2] = *(p + prevline);
+    w[5] = *p;
+    w[8] = *(p + nextline);
+    w[1] = *(p + prevline - 1);
+    w[4] = *(p - 1);
+    w[7] = *(p + nextline - 1);
+    w[3] = *(p + prevline + 1);
+    w[6] = *(p + 1);
+    w[9] = *(p + nextline + 1);
+    for( k = 1; k <= 9; k++ ) {
+#if SCALER_DATA_SIZE == 2
+      r = R_TO_R( w[k] );
+      g = G_TO_G( w[k] );
+      b = B_TO_B( w[k] );
+#else
+      r =  w[k] & redMask;
+      g = (w[k] & greenMask) >> 8;
+      b = (w[k] & blueMask) >> 16;
+#endif
+      y[k] = RGB_TO_Y( r, g, b );
+      u[k] = RGB_TO_U( r, g, b );
+      v[k] = RGB_TO_V( r, g, b );
+    }
+
+    for( i = 0; i < width; i++ ) {
+      pattern = 0;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[1], u[1], v[1] ) ) pattern |= 0x01;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[2], u[2], v[2] ) ) pattern |= 0x02;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[3], u[3], v[3] ) ) pattern |= 0x04;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[4], u[4], v[4] ) ) pattern |= 0x08;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[6], u[6], v[6] ) ) pattern |= 0x10;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[7], u[7], v[7] ) ) pattern |= 0x20;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[8], u[8], v[8] ) ) pattern |= 0x40;
+      if( HQ_YUVDIFF( y[5], u[5], v[5], y[9], u[9], v[9] ) ) pattern |= 0x80;
+
+#include "scaler_hq3x.c"
+
+      p++;
+      q   += 3; q1   += 3; q2   += 3;
+      qN  += 3; qN1  += 3; qN2  += 3;
+      qNN += 3; qNN1 += 3; qNN2 += 3;
+      MOVE_P_RIGHT
+      w[3] = *(p + prevline + 1);
+      w[6] = *(p + 1);
+      w[9] = *(p + nextline + 1);
+      for( k = 3; k <= 9; k += 3 ) {
+#if SCALER_DATA_SIZE == 2
+        r = R_TO_R( w[k] );
+        g = G_TO_G( w[k] );
+        b = B_TO_B( w[k] );
+#else
+        r =   w[k] & redMask;
+        g = ( w[k] & greenMask ) >> 8;
+        b = ( w[k] & blueMask  ) >> 16;
+#endif
+        y[k] = RGB_TO_Y( r, g, b );
+        u[k] = RGB_TO_U( r, g, b );
+        v[k] = RGB_TO_V( r, g, b );
+      }
+    }
+    p0 += nextlineSrc;
+    q0 += ( nextlineDst << 1 ) + nextlineDst;
   }
 }

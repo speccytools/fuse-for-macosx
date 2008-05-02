@@ -2,6 +2,9 @@
  * Copyright (C) 2002-2003 The ScummVM project, Fredrick Meunier and
  *			   Philip Kendall
  *
+ * HQ2x and HQ3x scalers taken from HiEnd3D Demos (http://www.hiend3d.com)
+ * Copyright (C) 2003 MaxSt ( maxst@hiend3d.com )
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -43,6 +46,8 @@ typedef enum scaler_type {
   SCALER_PALTV,
   SCALER_PALTV2X,
   SCALER_PALTV3X,
+  SCALER_HQ2X,
+  SCALER_HQ3X,
 
   SCALER_NUM		/* End marker; do not remove */
 } scaler_type;

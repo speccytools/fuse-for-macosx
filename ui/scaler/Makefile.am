@@ -40,4 +40,4 @@ scalers32.o: scalers.c
 
 noinst_HEADERS = scaler.h scaler_internals.h
 
-EXTRA_DIST = scalers.c
+EXTRA_DIST = scalers.c scaler_hq2x.c scaler_hq3x.c
