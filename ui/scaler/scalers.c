@@ -124,8 +124,8 @@ scaler_select_bitformat( libspectrum_dword BitFormat )
     green6bit = 0;
     redMask   = 0x0000001F;
     greenMask = 0x000003E0;
-    green8_Mask = 0x000001F0;
-    green16_Mask = 0x000003E0;
+    green8_Mask = 0x00001F00;
+    green16_Mask = 0x00003E00;
     blueMask  = 0x00007C00;
     dotmatrix = dotmatrix_555;
     break;
@@ -162,7 +162,7 @@ static const libspectrum_dword redMask =   0xFF000000;
 static const libspectrum_dword greenMask = 0x00FF0000;
 static const libspectrum_dword blueMask =  0x0000FF00;
 static const libspectrum_dword green8_Mask = 0x008F0700;
-static const libspectrum_dword green8_Mask = 0x000FF000;
+static const libspectrum_dword green16_Mask = 0x000FF000;
 
 static const libspectrum_dword dotmatrix[16] = {
   0x003F0000, 0x00003F00, 0x3F000000, 0x00000000,

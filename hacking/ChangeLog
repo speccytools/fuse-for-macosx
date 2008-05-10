@@ -2640,3 +2640,5 @@
          scaler_internals.h,scalers.c},ui/sdl/sdldisplay.c,
          ui/win32/win32display.c,ui/xlib/xdisplay.c: add HQ2x and HQ3x scalers
          (patch #1952304) (Gergely Szasz).
+20080511 ui/scaler/scalers.c: fix green8_Mask and green16_Mask for 555 16 bit
+         graphics modes and for 888 32 bit big endian graphics modes (Fred).
