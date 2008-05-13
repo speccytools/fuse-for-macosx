@@ -2642,3 +2642,5 @@
          (patch #1952304) (Gergely Szasz).
 20080511 ui/scaler/scalers.c: fix green8_Mask and green16_Mask for 555 16 bit
          graphics modes and for 888 32 bit big endian graphics modes (Fred).
+20080513 ui/fb/fbdisplay.c: ensure framebuffer display is restored on all
+         errors (patch #1912101).
