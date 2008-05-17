@@ -29,6 +29,7 @@
 
 #include "fuse.h"
 #include "machine.h"
+#include "mempool.h"
 #include "settings.h"
 #include "ula.h"
 
@@ -196,6 +197,58 @@ floating_bus_test( void )
   return error;
 }
 
+#define TEST_ASSERT(x) do { if( !(x) ) { printf("Test assertion failed at %s:%d: %s\n", __FILE__, __LINE__, #x ); return 1; } } while( 0 )
+
+static int
+mempool_test( void )
+{
+  int pool1, pool2;
+
+  TEST_ASSERT( mempool_get_pools() == 0 );
+
+  pool1 = mempool_register_pool();
+
+  TEST_ASSERT( mempool_get_pools() == 1 );
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+
+  mempool_alloc( pool1, 23 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
+
+  mempool_alloc( pool1, 42 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 2 );
+
+  mempool_free( pool1 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+
+  pool2 = mempool_register_pool();
+
+  TEST_ASSERT( mempool_get_pools() == 2 );
+  TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+
+  mempool_alloc( pool1, 23 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+
+  mempool_alloc( pool2, 42 );
+  
+  TEST_ASSERT( mempool_get_pool_size( pool2 ) == 1 );
+
+  mempool_free( pool2 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 1 );
+  TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+  
+  mempool_free( pool1 );
+
+  TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
+  TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
+
+  return 0;
+}
+
 int
 unittests_run( void )
 {
@@ -203,6 +256,7 @@ unittests_run( void )
 
   r += contention_test();
   r += floating_bus_test();
+  r += mempool_test();
 
   return r;
 }

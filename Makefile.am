@@ -72,6 +72,7 @@ fuse_SOURCES = ay.c \
 	loader.c \
 	machine.c \
 	memory.c \
+	mempool.c \
 	menu.c \
 	module.c \
 	periph.c \

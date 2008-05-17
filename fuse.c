@@ -175,6 +175,8 @@ int main(int argc, char **argv)
 
 }
 
+#include "mempool.h"
+
 static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
@@ -250,6 +252,7 @@ static int fuse_init(int argc, char **argv)
   if( !geteuid() ) { setuid( getuid() ); }
 #endif				/* #ifdef HAVE_GETEUID */
 
+  if( mempool_init() ) return 1;
   if( memory_init() ) return 1;
 
   if( debugger_init() ) return 1;
@@ -300,7 +303,6 @@ static int fuse_init(int argc, char **argv)
   fuse_emulation_paused = 0;
 
   return 0;
-
 }
 
 static

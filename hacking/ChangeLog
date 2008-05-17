@@ -2644,3 +2644,5 @@
          graphics modes and for 888 32 bit big endian graphics modes (Fred).
 20080513 ui/fb/fbdisplay.c: ensure framebuffer display is restored on all
          errors (patch #1912101).
+20080517 Makefile.am,fuse.c,mempool.[ch],unittests/unittests.c: add simple
+	 memory pool code.
