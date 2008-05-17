@@ -2647,3 +2647,5 @@
 20080517 Makefile.am,fuse.c,mempool.[ch],unittests/unittests.c: add simple
 	 memory pool code.
 20080518 screenshot.c: missed file from patch #1952304 (Gergely Szasz).
+20080518 machines/specplus3.h: remove reference to old specplus3_disk_present
+         (Fred).
