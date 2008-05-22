@@ -23,7 +23,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libwidget.a
 

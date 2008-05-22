@@ -37,6 +37,7 @@
 #include <sys/ioctl.h>
 #include <string.h>
 
+#include "fbdisplay.h"
 #include "fuse.h"
 #include "display.h"
 #include "screenshot.h"

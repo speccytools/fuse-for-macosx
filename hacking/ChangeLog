@@ -2649,3 +2649,5 @@
 20080518 screenshot.c: missed file from patch #1952304 (Gergely Szasz).
 20080518 machines/specplus3.h: remove reference to old specplus3_disk_present
          (Fred).
+20080522 ui/{fb/fbdisplay.c,widget/Makefile.am}: fix compilation failures
+	 (Stuart).
