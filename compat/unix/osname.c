@@ -38,9 +38,9 @@ int compat_osname( char *buffer, size_t length )
   int error;
 
   error = uname( &osname );
-  if( error ) {
-    ui_error( UI_ERROR_ERROR, "error getting system information: %s",
-	      strerror( errno ) );
+  if( error < 0 ) {
+    ui_error( UI_ERROR_ERROR, "error getting system information: %d %d %s",
+	      error, errno, strerror( errno ) );
     return 1;
   }
 

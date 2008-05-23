@@ -2651,3 +2651,5 @@
          (Fred).
 20080522 ui/{fb/fbdisplay.c,widget/Makefile.am}: fix compilation failures
 	 (Stuart).
+20080523 compat/unix/osname.c: uname() returns a positive integer on success
+         on OpenSolaris (thanks, Andrew Owen) (Fred).
