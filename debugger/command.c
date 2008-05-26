@@ -1,5 +1,5 @@
 /* command.c: Parse a debugger command
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -31,6 +31,7 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
+#include "mempool.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -63,6 +64,9 @@ debugger_command_evaluate( const char *command )
     
   /* Parse the command */
   yyparse();
+
+  /* And free any memory we allocated while parsing */
+  mempool_free( debugger_memory_pool );
 
   ui_debugger_update();
 

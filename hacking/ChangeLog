@@ -2653,3 +2653,6 @@
 	 (Stuart).
 20080523 compat/unix/osname.c: uname() returns a positive integer on success
          on OpenSolaris (thanks, Andrew Owen) (Fred).
+20080526 debugger/{breakpoint.c,command.c,commandy.y,debugger.c,
+	 debugger_internals.h,expression.c}: ensure memory is not leaked when
+	 parsing expressions.

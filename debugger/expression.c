@@ -1,5 +1,5 @@
 /* expression.c: A numeric expression
-   Copyright (c) 2003 Philip Kendall
+   Copyright (c) 2003-2008 Philip Kendall
 
    $Id$
 
@@ -30,6 +30,7 @@
 
 #include "debugger_internals.h"
 #include "fuse.h"
+#include "mempool.h"
 #include "ui/ui.h"
 
 typedef enum expression_type {
@@ -141,11 +142,11 @@ binaryop_precedence( int operation )
 }
 
 debugger_expression*
-debugger_expression_new_number( libspectrum_dword number )
+debugger_expression_new_number( libspectrum_dword number, int pool )
 {
   debugger_expression *exp;
 
-  exp = malloc( sizeof( debugger_expression ) );
+  exp = mempool_alloc( pool, sizeof( *exp ) );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -159,11 +160,11 @@ debugger_expression_new_number( libspectrum_dword number )
 }
 
 debugger_expression*
-debugger_expression_new_register( int which )
+debugger_expression_new_register( int which, int pool )
 {
   debugger_expression *exp;
 
-  exp = malloc( sizeof( debugger_expression ) );
+  exp = mempool_alloc( pool, sizeof( *exp ) );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -178,11 +179,11 @@ debugger_expression_new_register( int which )
 
 debugger_expression*
 debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
-				  debugger_expression *operand2 )
+				  debugger_expression *operand2, int pool )
 {
   debugger_expression *exp;
 
-  exp = malloc( sizeof( debugger_expression ) );
+  exp = mempool_alloc( pool, sizeof( *exp ) );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -200,11 +201,12 @@ debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 
 
 debugger_expression*
-debugger_expression_new_unaryop( int operation, debugger_expression *operand )
+debugger_expression_new_unaryop( int operation, debugger_expression *operand,
+				 int pool )
 {
   debugger_expression *exp;
 
-  exp = malloc( sizeof( debugger_expression ) );
+  exp = mempool_alloc( pool, sizeof( *exp ) );
   if( !exp ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return NULL;
@@ -241,6 +243,57 @@ debugger_expression_delete( debugger_expression *exp )
   }
     
   free( exp );
+}
+
+debugger_expression*
+debugger_expression_copy( debugger_expression *src )
+{
+  debugger_expression *dest;
+
+  dest = malloc( sizeof( *dest ) );
+  if( !dest ) return NULL;
+
+  dest->type = src->type;
+  dest->precedence = src->precedence;
+
+  switch( dest->type ) {
+
+  case DEBUGGER_EXPRESSION_TYPE_INTEGER:
+    dest->types.integer = src->types.integer;
+    break;
+
+  case DEBUGGER_EXPRESSION_TYPE_REGISTER:
+    dest->types.reg = src->types.reg;
+    break;
+
+  case DEBUGGER_EXPRESSION_TYPE_UNARYOP:
+    dest->types.unaryop.operation = src->types.unaryop.operation;
+    dest->types.unaryop.op = debugger_expression_copy( src->types.unaryop.op );
+    if( !dest->types.unaryop.op ) {
+      free( dest );
+      return NULL;
+    }
+    break;
+
+  case DEBUGGER_EXPRESSION_TYPE_BINARYOP:
+    dest->types.binaryop.operation = src->types.binaryop.operation;
+    dest->types.binaryop.op1 =
+      debugger_expression_copy( src->types.binaryop.op1 );
+    if( !dest->types.binaryop.op1 ) {
+      free( dest );
+      return NULL;
+    }
+    dest->types.binaryop.op2 =
+      debugger_expression_copy( src->types.binaryop.op2 );
+    if( !dest->types.binaryop.op2 ) {
+      debugger_expression_delete( dest->types.binaryop.op1 );
+      free( dest );
+      return NULL;
+    }
+    break;
+  }
+
+  return dest;
 }
 
 libspectrum_dword

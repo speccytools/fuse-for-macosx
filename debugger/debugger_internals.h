@@ -1,5 +1,5 @@
 /* debugger_internals.h: The internals of Fuse's monitor/debugger
-   Copyright (c) 2002-2003 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -27,6 +27,9 @@
 #define FUSE_DEBUGGER_INTERNALS_H
 
 #include "debugger.h"
+
+/* Memory pool used by the lexer and parser */
+extern int debugger_memory_pool;
 
 int debugger_breakpoint_remove( size_t id );
 int debugger_breakpoint_remove_all( void );
@@ -71,14 +74,15 @@ typedef enum debugger_token {
 /* Numeric expression stuff */
 
 debugger_expression*
-debugger_expression_new_number( libspectrum_dword number );
-debugger_expression* debugger_expression_new_register( int which );
+debugger_expression_new_number( libspectrum_dword number, int pool );
+debugger_expression* debugger_expression_new_register( int which, int pool );
 debugger_expression*
-debugger_expression_new_unaryop( int operation, debugger_expression *operand );
+debugger_expression_new_unaryop( int operation, debugger_expression *operand, int pool );
 debugger_expression*
 debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
-				  debugger_expression *operand2 );
+				  debugger_expression *operand2, int pool );
 
+debugger_expression* debugger_expression_copy( debugger_expression *src );
 void debugger_expression_delete( debugger_expression* expression );
 
 libspectrum_dword

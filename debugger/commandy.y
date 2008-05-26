@@ -1,5 +1,5 @@
 /* commandy.y: Parse a debugger command
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -204,63 +204,63 @@ expressionornull:   /* empty */ { $$ = NULL; }
 number:   expression { $$ = debugger_expression_evaluate( $1 ); }
 ;
 
-expression:   NUMBER { $$ = debugger_expression_new_number( $1 );
+expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_pool );
 		       if( !$$ ) YYABORT;
 		     }
-	    | DEBUGGER_REGISTER { $$ = debugger_expression_new_register( $1 );
+	    | DEBUGGER_REGISTER { $$ = debugger_expression_new_register( $1, debugger_memory_pool );
 			 if( !$$ ) YYABORT;
 		       }
 	    | '(' expression ')' { $$ = $2; }
 	    | '+' expression %prec NEGATE { $$ = $2; }
 	    | '-' expression %prec NEGATE {
-	        $$ = debugger_expression_new_unaryop( '-', $2 );
+	        $$ = debugger_expression_new_unaryop( '-', $2, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | NEGATE expression {
-	        $$ = debugger_expression_new_unaryop( $1, $2 );
+	        $$ = debugger_expression_new_unaryop( $1, $2, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression '+' expression {
-	        $$ = debugger_expression_new_binaryop( '+', $1, $3 );
+	        $$ = debugger_expression_new_binaryop( '+', $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression '-' expression {
-	        $$ = debugger_expression_new_binaryop( '-', $1, $3 );
+	        $$ = debugger_expression_new_binaryop( '-', $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression TIMES_DIVIDE expression {
-	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
+	        $$ = debugger_expression_new_binaryop( $2, $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression EQUALITY expression {
-	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
+	        $$ = debugger_expression_new_binaryop( $2, $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression COMPARISON expression {
-	        $$ = debugger_expression_new_binaryop( $2, $1, $3 );
+	        $$ = debugger_expression_new_binaryop( $2, $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression '&' expression {
-	        $$ = debugger_expression_new_binaryop( '&', $1, $3 );
+	        $$ = debugger_expression_new_binaryop( '&', $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression '^' expression {
-	        $$ = debugger_expression_new_binaryop( '^', $1, $3 );
+	        $$ = debugger_expression_new_binaryop( '^', $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression '|' expression {
-	        $$ = debugger_expression_new_binaryop( '|', $1, $3 );
+	        $$ = debugger_expression_new_binaryop( '|', $1, $3, debugger_memory_pool );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression LOGICAL_AND expression {
 	        $$ = debugger_expression_new_binaryop(
-                  DEBUGGER_TOKEN_LOGICAL_AND, $1, $3
+		  DEBUGGER_TOKEN_LOGICAL_AND, $1, $3, debugger_memory_pool
                 );
 		if( !$$ ) YYABORT;
 	      }
 	    | expression LOGICAL_OR expression {
 	        $$ = debugger_expression_new_binaryop(
-		  DEBUGGER_TOKEN_LOGICAL_OR, $1, $3
+		  DEBUGGER_TOKEN_LOGICAL_OR, $1, $3, debugger_memory_pool
 		);
 		if( !$$ ) YYABORT;
 	      }

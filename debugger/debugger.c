@@ -1,5 +1,5 @@
 /* debugger.c: Fuse's monitor/debugger
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -30,6 +30,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "memory.h"
+#include "mempool.h"
 #include "periph.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
@@ -41,11 +42,18 @@ enum debugger_mode_t debugger_mode;
 /* Which base should we display things in */
 int debugger_output_base;
 
+/* Memory pool used by the lexer and parser */
+int debugger_memory_pool;
+
 int
 debugger_init( void )
 {
   debugger_breakpoints = NULL;
   debugger_output_base = 16;
+
+  debugger_memory_pool = mempool_register_pool();
+  if( debugger_memory_pool == -1 ) return 1;
+  
   return debugger_reset();
 }
 

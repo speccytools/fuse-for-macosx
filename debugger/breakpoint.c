@@ -1,5 +1,5 @@
 /* breakpoint.c: a debugger breakpoint
-   Copyright (c) 2002-2007 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -158,7 +158,7 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
 {
   debugger_breakpoint *bp;
 
-  bp = malloc( sizeof( debugger_breakpoint ) );
+  bp = malloc( sizeof( *bp ) );
   if( !bp ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
     return 1;
@@ -167,7 +167,15 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
   bp->id = next_breakpoint_id++; bp->type = type;
   bp->value = value;
   bp->ignore = ignore; bp->life = life;
-  bp->condition = condition;
+  if( bp->condition ) {
+    bp->condition = debugger_expression_copy( condition );
+    if( !bp->condition ) {
+      free( bp );
+      return 1;
+    }
+  } else {
+    bp->condition = NULL;
+  }
 
   debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
 
@@ -447,7 +455,7 @@ debugger_breakpoint_clear( libspectrum_word address )
 
     found++;
 
-    free( ptr->data );
+    free_breakpoint( ptr->data, NULL );
 
     debugger_breakpoints = g_slist_remove( debugger_breakpoints, ptr->data );
     if( debugger_mode == DEBUGGER_MODE_ACTIVE && !debugger_breakpoints )
