@@ -1,5 +1,5 @@
 /* debugger.h: Fuse's monitor/debugger
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -71,5 +71,11 @@ int debugger_command_evaluate( const char *command );
 /* Get a deparsed expression */
 int debugger_expression_deparse( char *buffer, size_t length,
 				 const debugger_expression *exp );
+
+/* Register an event type with the debugger */
+int debugger_event_register( const char *type, const char *detail );
+
+/* Fire off a debugger event */
+void debugger_event( int event_code );
 
 #endif				/* #ifndef FUSE_DEBUGGER_H */

@@ -2656,3 +2656,8 @@
 20080526 debugger/{breakpoint.c,command.c,commandy.y,debugger.c,
 	 debugger_internals.h,expression.c}: ensure memory is not leaked when
 	 parsing expressions.
+20080526 debugger/{Makefile.am,breakpoint.c,breakpoint.h,commandl.l,commandy.y,
+	 debugger.c,debugger.h,debugger_internals.h,event.c},mempool.c,
+	 mempool.h,tape.c,ui/gtk/debugger.c: add "debugger events" where the
+	 debugger can stop when certain events happen. So far, only "tape
+	 playing" implemented.

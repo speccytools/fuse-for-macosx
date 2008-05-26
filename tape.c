@@ -1,5 +1,5 @@
 /* tape.c: tape handling routines
-   Copyright (c) 1999-2005 Philip Kendall, Darren Salt, Witold Filipczyk
+   Copyright (c) 1999-2008 Philip Kendall, Darren Salt, Witold Filipczyk
 
    $Id$
 
@@ -32,6 +32,7 @@
 
 #include <libspectrum.h>
 
+#include "debugger/debugger.h"
 #include "disk/beta.h"
 #include "event.h"
 #include "fuse.h"
@@ -66,6 +67,12 @@ static int tape_autoplay;
 /* Is there a high input to the EAR socket? */
 int tape_microphone;
 
+/* Debugger events */
+static const char *event_type_string = "tape";
+
+static const char *play_event_detail_string = "play";
+static int play_event;
+
 /* Function prototypes */
 
 static int tape_autoload( libspectrum_machine hardware );
@@ -82,6 +89,10 @@ int tape_init( void )
 
   error = libspectrum_tape_alloc( &tape );
   if( !tape ) return error;
+
+  play_event = debugger_event_register( event_type_string,
+					play_event_detail_string );
+  if( play_event == -1 ) return 1;
 
   tape_modified = 0;
 
@@ -611,6 +622,8 @@ tape_play( int autoplay )
   loader_tape_play();
 
   error = tape_next_edge( tstates ); if( error ) return error;
+
+  debugger_event( play_event );
 
   return 0;
 }

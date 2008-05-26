@@ -48,13 +48,21 @@ int debugger_memory_pool;
 int
 debugger_init( void )
 {
+  int error;
+
   debugger_breakpoints = NULL;
   debugger_output_base = 16;
 
   debugger_memory_pool = mempool_register_pool();
   if( debugger_memory_pool == -1 ) return 1;
-  
-  return debugger_reset();
+
+  error = debugger_event_init();
+  if( error ) return error;
+
+  error = debugger_reset();
+  if( error ) return error;
+
+  return 0;
 }
 
 int

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2004 Philip Kendall
+## Copyright (c) 2001-2008 Philip Kendall
 
 ## $Id$
 
@@ -35,6 +35,7 @@ libdebugger_a_SOURCES = breakpoint.c \
 			commandy.y \
 			debugger.c \
 			disassemble.c \
+			event.c \
 			expression.c
 
 commandl.c: commandy.c

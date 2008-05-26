@@ -48,6 +48,8 @@
   int reg;
 
   libspectrum_dword integer;
+  char *string;
+
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
   struct { int value1; libspectrum_word value2; } pair;
@@ -75,6 +77,7 @@
 %token		 CONTINUE
 %token		 DEBUGGER_DELETE
 %token		 DISASSEMBLE
+%token		 EVENT
 %token		 EXIT
 %token		 FINISH
 %token		 IF
@@ -92,6 +95,8 @@
 %token <reg>	 DEBUGGER_REGISTER
 
 %token <integer> NUMBER
+
+%token <string>	 STRING
 
 %token		 DEBUGGER_ERROR
 
@@ -148,6 +153,10 @@ command:   BASE number { debugger_output_base = $2; }
 	 | breakpointlife TIME number optionalcondition {
 	     debugger_breakpoint_add_time( DEBUGGER_BREAKPOINT_TYPE_TIME,
 					   $3, 0, $1, $4 );
+	   }
+	 | breakpointlife EVENT STRING ':' STRING optionalcondition {
+	     debugger_breakpoint_add_event( DEBUGGER_BREAKPOINT_TYPE_EVENT,
+					    $3, $5, 0, $1, $6 );
 	   }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
 	 | CONDITION NUMBER expressionornull {

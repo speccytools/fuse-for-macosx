@@ -43,11 +43,11 @@ static size_t next_breakpoint_id;
 
 /* Textual representations of the breakpoint types and lifetimes */
 const char *debugger_breakpoint_type_text[] = {
-  "Execute", "Read", "Write", "Port Read", "Port Write", "Time",
+  "Execute", "Read", "Write", "Port Read", "Port Write", "Time", "Event",
 };
 
 const char debugger_breakpoint_type_abbr[][4] = {
-  "Exe", "Rd", "Wr", "PtR", "PtW", "Tm",
+  "Exe", "Rd", "Wr", "PtR", "PtW", "Tm", "Ev",
 };
 
 const char *debugger_breakpoint_life_text[] = {
@@ -151,6 +151,38 @@ debugger_breakpoint_add_time( debugger_breakpoint_type type,
   return breakpoint_add( type, value, ignore, life, condition );
 }
 
+int
+debugger_breakpoint_add_event( debugger_breakpoint_type type,
+			       const char *type_string, const char *detail,
+			       size_t ignore, debugger_breakpoint_life life,
+			       debugger_expression *condition )
+{
+  /* TODO: check that the "type_string:detail" pair is registered
+     before allowing the breakpoint to be set */
+
+  debugger_breakpoint_value value;
+
+  switch( type ) {
+  case DEBUGGER_BREAKPOINT_TYPE_EVENT:
+    break;
+
+  default:
+    ui_error( UI_ERROR_ERROR, "%s given type %d", __func__, type );
+    fuse_abort();
+  }
+
+  value.event.detail = NULL;
+  value.event.type = strdup( type_string );
+  value.event.detail = strdup( detail );
+  if( !value.event.type || !value.event.detail ) {
+    free( value.event.type );
+    free( value.event.detail );
+    return 1;
+  }
+
+  return breakpoint_add( type, value, ignore, life, condition );
+}
+
 static int
 breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
 		size_t ignore, debugger_breakpoint_life life,
@@ -167,7 +199,7 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
   bp->id = next_breakpoint_id++; bp->type = type;
   bp->value = value;
   bp->ignore = ignore; bp->life = life;
-  if( bp->condition ) {
+  if( condition ) {
     bp->condition = debugger_expression_copy( condition );
     if( !bp->condition ) {
       free( bp );
@@ -510,6 +542,22 @@ static void
 free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
 {
   debugger_breakpoint *bp = data;
+
+  switch( bp->type ) {
+  case DEBUGGER_BREAKPOINT_TYPE_EVENT:
+    free( bp->value.event.type );
+    free( bp->value.event.detail );
+    break;
+
+  case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
+  case DEBUGGER_BREAKPOINT_TYPE_READ:
+  case DEBUGGER_BREAKPOINT_TYPE_WRITE:
+  case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
+  case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
+  case DEBUGGER_BREAKPOINT_TYPE_TIME:
+    /* No action needed */
+    break;
+  }
 
   if( bp->condition ) debugger_expression_delete( bp->condition );
 

@@ -1,5 +1,5 @@
 /* commandl.l: Debugger command lexical scanner
-   Copyright (c) 2002 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -31,6 +31,7 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
+#include "mempool.h"
 
 #include "commandy.h"
 
@@ -56,6 +57,7 @@ cl|cle|clea|clear { return CLEAR; }
 del|dele|delet|delete { return DEBUGGER_DELETE; }
 di|dis|disa|disas|disass|disasse|disassm|disassmb|diasassmbl|disassemble {
 	                                                  return DISASSEMBLE; }
+ev|eve|even|event { return EVENT; }
 ex|exi|exit { return EXIT; }
 fi|fin|fini|finis|finish { return FINISH; }
 if { return IF; }
@@ -126,6 +128,8 @@ ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 {DIGIT}+	{ yylval.integer = atoi( yytext ); return NUMBER; }
 
 [cdrx]{DIGIT}+	{ yylval.integer = debugger_page_hash( yytext ); return PAGE; }
+
+[a-z]+		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
 
 [ \n]+		/* Swallow whitespace */
 

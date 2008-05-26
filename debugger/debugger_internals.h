@@ -88,4 +88,8 @@ void debugger_expression_delete( debugger_expression* expression );
 libspectrum_dword
 debugger_expression_evaluate( debugger_expression* expression );
 
+/* Event handling */
+
+int debugger_event_init( void );
+
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */

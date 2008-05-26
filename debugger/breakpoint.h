@@ -1,5 +1,5 @@
 /* breakpoint.h: a debugger breakpoint
-   Copyright (c) 2002-2004 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -34,6 +34,7 @@ typedef enum debugger_breakpoint_type {
   DEBUGGER_BREAKPOINT_TYPE_PORT_READ,
   DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE,
   DEBUGGER_BREAKPOINT_TYPE_TIME,
+  DEBUGGER_BREAKPOINT_TYPE_EVENT,
 } debugger_breakpoint_type;
 
 extern const char *debugger_breakpoint_type_text[];
@@ -71,11 +72,17 @@ typedef struct debugger_breakpoint_port {
 
 } debugger_breakpoint_port;
 
+typedef struct debugger_event_t {
+  char *type;
+  char *detail;
+} debugger_event_t;
+
 typedef union debugger_breakpoint_value {
 
   debugger_breakpoint_address address;
   debugger_breakpoint_port port;
   libspectrum_dword tstates;
+  debugger_event_t event;
 
 } debugger_breakpoint_value;
 
@@ -115,6 +122,12 @@ debugger_breakpoint_add_port(
 int
 debugger_breakpoint_add_time(
   debugger_breakpoint_type type, libspectrum_dword tstates,
+  size_t ignore, debugger_breakpoint_life life, debugger_expression *condition
+);
+
+int
+debugger_breakpoint_add_event(
+  debugger_breakpoint_type type, const char *type_string, const char *detail,
   size_t ignore, debugger_breakpoint_life life, debugger_expression *condition
 );
 

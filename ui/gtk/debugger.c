@@ -1,5 +1,5 @@
 /* debugger.c: the GTK+ debugger
-   Copyright (c) 2002-2005 Philip Kendall
+   Copyright (c) 2002-2008 Philip Kendall
 
    $Id$
 
@@ -821,6 +821,11 @@ update_breakpoints( void )
 
     case DEBUGGER_BREAKPOINT_TYPE_TIME:
       snprintf( breakpoint_text[2], 40, "%5d", bp->value.tstates );
+      break;
+
+    case DEBUGGER_BREAKPOINT_TYPE_EVENT:
+      snprintf( breakpoint_text[2], 40, "%s:%s", bp->value.event.type,
+		bp->value.event.detail );
       break;
 
     }
