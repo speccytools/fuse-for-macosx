@@ -66,6 +66,29 @@ debugger_event_register( const char *type, const char *detail )
   return registered_events->len - 1;
 }
 
+static int
+event_matches( debugger_event_t *event, const char *type, const char *detail )
+{
+  if( strcasecmp( type, event->type ) ) return 0;
+  if( strcmp( detail, "*" ) == 0 ) return 1;
+  return strcasecmp( detail, event->detail ) == 0;
+}
+
+int
+debugger_event_is_registered( const char *type, const char *detail )
+{
+  size_t i;
+
+  for( i = 0; i < registered_events->len; i++ ) {
+    debugger_event_t event =
+      g_array_index( registered_events, debugger_event_t, i );
+
+    if( event_matches( &event, type, detail ) ) return 1;
+  }
+
+  return 0;
+}
+
 void
 debugger_event( int event_code )
 {
@@ -84,12 +107,9 @@ debugger_event( int event_code )
     debugger_breakpoint *bp = ptr->data;
     if( bp->type != DEBUGGER_BREAKPOINT_TYPE_EVENT ) continue;
 
-    if( strcasecmp( bp->value.event.type, event.type ) == 0 ) {
-      if( ( strcmp( bp->value.event.detail, "*" ) == 0 )               ||
-	  ( strcasecmp( bp->value.event.detail, event.detail ) == 0 )    ) {
+    if( event_matches( &bp->value.event, event.type, event.detail ) ) {
       debugger_mode = DEBUGGER_MODE_HALTED;
       return;
-      }
     }
   }
 }

@@ -157,9 +157,6 @@ debugger_breakpoint_add_event( debugger_breakpoint_type type,
 			       size_t ignore, debugger_breakpoint_life life,
 			       debugger_expression *condition )
 {
-  /* TODO: check that the "type_string:detail" pair is registered
-     before allowing the breakpoint to be set */
-
   debugger_breakpoint_value value;
 
   switch( type ) {
@@ -169,6 +166,12 @@ debugger_breakpoint_add_event( debugger_breakpoint_type type,
   default:
     ui_error( UI_ERROR_ERROR, "%s given type %d", __func__, type );
     fuse_abort();
+  }
+
+  if( !debugger_event_is_registered( type_string, detail ) ) {
+    ui_error( UI_ERROR_WARNING, "Event type %s:%s not known", type_string,
+              detail );
+    return 1;
   }
 
   value.event.detail = NULL;

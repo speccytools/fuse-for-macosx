@@ -91,5 +91,6 @@ debugger_expression_evaluate( debugger_expression* expression );
 /* Event handling */
 
 int debugger_event_init( void );
+int debugger_event_is_registered( const char *type, const char *detail );
 
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */

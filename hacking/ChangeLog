@@ -2661,3 +2661,5 @@
 	 mempool.h,tape.c,ui/gtk/debugger.c: add "debugger events" where the
 	 debugger can stop when certain events happen. So far, only "tape
 	 playing" implemented.
+20080527 debugger/{breakpoint.c,debugger_internals.h,event.c}: allow event
+         breakpoints to be set only if the appropriate event is registered.
