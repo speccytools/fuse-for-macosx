@@ -227,19 +227,22 @@ sub ini_ind ($) {
 
     my( $opcode ) = @_;
 
-    my $modifier = ( $opcode eq 'INI' ? '++' : '--' );
+    my $modifier = ( $opcode eq 'INI' ? '+' : '-' );
 
     print << "CODE";
       {
-	libspectrum_word initemp;
+	libspectrum_byte initemp, initemp2;
 
 	contend_read_no_mreq( IR, 1 );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
-	B--; HL$modifier;
-	F = ( initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
-	/* C,H and P/V flags not implemented */
+        B--; HL$modifier$modifier;
+        initemp2 = initemp + C $modifier 1;
+	F = ( initemp & 0x80 ? FLAG_N : 0 ) |
+            ( ( initemp2 < initemp ) ? FLAG_H | FLAG_C : 0 ) |
+            ( parity_table[ ( initemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
+            sz53_table[B];
       }
 CODE
 }
@@ -248,19 +251,22 @@ sub inir_indr ($) {
 
     my( $opcode ) = @_;
 
-    my $modifier = ( $opcode eq 'INIR' ? '++' : '--' );
+    my $modifier = ( $opcode eq 'INIR' ? '+' : '-' );
 
     print << "CODE";
       {
-	libspectrum_word initemp;
+	libspectrum_byte initemp, initemp2;
 
 	contend_read_no_mreq( IR, 1 );
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
-	B--;
-	F = ( initemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
-	/* C,H and P/V flags not implemented */
+	B--; HL$modifier$modifier;
+        initemp2 = initemp + C $modifier 1;
+	F = ( initemp & 0x80 ? FLAG_N : 0 ) |
+            ( ( initemp2 < initemp ) ? FLAG_H | FLAG_C : 0 ) |
+            ( parity_table[ ( initemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
+            sz53_table[B];
 
 	if( B ) {
 	  contend_write_no_mreq( HL, 1 ); contend_write_no_mreq( HL, 1 );
@@ -268,7 +274,6 @@ sub inir_indr ($) {
 	  contend_write_no_mreq( HL, 1 );
 	  PC -= 2;
 	}
-	HL$modifier;
       }
 CODE
 }
@@ -328,7 +333,7 @@ sub otir_otdr ($) {
 
     print << "CODE";
       {
-	libspectrum_word outitemp;
+	libspectrum_byte outitemp, outitemp2;
 
 	contend_read_no_mreq( IR, 1 );
 	outitemp = readbyte( HL );
@@ -336,8 +341,11 @@ sub otir_otdr ($) {
 	writeport(BC,outitemp);
 
 	HL$modifier;
-	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
-	/* C,H and P/V flags not implemented */
+        outitemp2 = outitemp + L;
+	F = ( outitemp & 0x80 ? FLAG_N : 0 ) |
+            ( ( outitemp2 < outitemp ) ? FLAG_H | FLAG_C : 0 ) |
+            ( parity_table[ ( outitemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
+            sz53_table[B];
 
 	if( B ) {
 	  contend_read_no_mreq( BC, 1 ); contend_read_no_mreq( BC, 1 );
@@ -357,7 +365,7 @@ sub outi_outd ($) {
 
     print << "CODE";
       {
-	libspectrum_word outitemp;
+	libspectrum_byte outitemp, outitemp2;
 
 	contend_read_no_mreq( IR, 1 );
 	outitemp = readbyte( HL );
@@ -365,8 +373,11 @@ sub outi_outd ($) {
 	writeport(BC,outitemp);
 
 	HL$modifier;
-	F = (outitemp & 0x80 ? FLAG_N : 0 ) | sz53_table[B];
-	/* C,H and P/V flags not implemented */
+        outitemp2 = outitemp + L;
+	F = ( outitemp & 0x80 ? FLAG_N : 0 ) |
+            ( ( outitemp2 < outitemp ) ? FLAG_H | FLAG_C : 0 ) |
+            ( parity_table[ ( outitemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
+            sz53_table[B];
       }
 CODE
 }

@@ -2663,3 +2663,4 @@
 	 playing" implemented.
 20080527 debugger/{breakpoint.c,debugger_internals.h,event.c}: allow event
          breakpoints to be set only if the appropriate event is registered.
+20080528 z80/z80.pl: emulate C, H and P/V on repeated I/O instructions.
