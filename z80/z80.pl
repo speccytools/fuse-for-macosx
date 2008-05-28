@@ -261,7 +261,7 @@ sub inir_indr ($) {
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
-	B--; HL$modifier$modifier;
+	B--;
         initemp2 = initemp + C $modifier 1;
 	F = ( initemp & 0x80 ? FLAG_N : 0 ) |
             ( ( initemp2 < initemp ) ? FLAG_H | FLAG_C : 0 ) |
@@ -274,7 +274,8 @@ sub inir_indr ($) {
 	  contend_write_no_mreq( HL, 1 );
 	  PC -= 2;
 	}
-      }
+        HL$modifier$modifier;
+    }
 CODE
 }
 
