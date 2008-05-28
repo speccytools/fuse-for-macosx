@@ -2668,3 +2668,5 @@
 20080528 unittests/unittests.c: fix warning (Stuart).
 20080528 disk/beta.c,ui/widget/pokefinder.c: make code C89 compatible with
          code from fuzegiz (thanks, sweetlilmr) (Fred).
+20080528 mempool.c,debugger/event.c: add <string.h> for string prototypes
+         (Fred).
