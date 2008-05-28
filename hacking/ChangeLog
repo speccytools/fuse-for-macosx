@@ -2666,3 +2666,5 @@
 20080528 z80/z80.pl: emulate C, H and P/V on repeated I/O instructions.
 20080528 z80/z80.pl: can't modify HL until contention has happened.
 20080528 unittests/unittests.c: fix warning (Stuart).
+20080528 disk/beta.c,ui/widget/pokefinder.c: make code C89 compatible with
+         code from fuzegiz (thanks, sweetlilmr) (Fred).

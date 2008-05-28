@@ -459,6 +459,7 @@ beta_disk_eject( beta_drive_number which, int write )
   } else {
   
     if( d->disk.dirty ) {
+      ui_confirm_save_t confirm;
 
       switch( which ) {
 	case BETA_DRIVE_A: drive = 'A'; break;
@@ -468,7 +469,7 @@ beta_disk_eject( beta_drive_number which, int write )
 	default: drive = '?'; break;
       }
 
-      ui_confirm_save_t confirm = ui_confirm_save(
+      confirm = ui_confirm_save(
 	"Disk in Beta drive %c: has been modified.\n"
 	"Do you want to save it?",
 	drive

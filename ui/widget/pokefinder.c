@@ -220,7 +220,17 @@ widget_pokefinder_keyhandler( input_key key )
   case INPUT_KEY_Home:	scroll( -20 ); break;
   case INPUT_KEY_End:	scroll(  20 ); break;
 
-  case INPUT_KEY_0 ... INPUT_KEY_9: /* Value alteration */
+  /* Value alteration */
+  case INPUT_KEY_0:
+  case INPUT_KEY_1:
+  case INPUT_KEY_2:
+  case INPUT_KEY_3:
+  case INPUT_KEY_4:
+  case INPUT_KEY_5:
+  case INPUT_KEY_6:
+  case INPUT_KEY_7:
+  case INPUT_KEY_8:
+  case INPUT_KEY_9:
     value = (value % 100) * 10 + key - INPUT_KEY_0;
     display_value();
     break;
