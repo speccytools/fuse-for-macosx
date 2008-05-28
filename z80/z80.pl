@@ -275,7 +275,7 @@ sub inir_indr ($) {
 	  PC -= 2;
 	}
         HL$modifier$modifier;
-    }
+      }
 CODE
 }
 
