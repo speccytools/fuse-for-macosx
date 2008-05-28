@@ -252,7 +252,7 @@ mempool_test( void )
 int
 unittests_run( void )
 {
-  int r;
+  int r = 0;
 
   r += contention_test();
   r += floating_bus_test();
