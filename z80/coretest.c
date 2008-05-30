@@ -187,7 +187,7 @@ readport( libspectrum_word port )
 
   contend_port_postio( port );
 
-  return 0xff;
+  return ( port >> 8 );
 }
 
 void
