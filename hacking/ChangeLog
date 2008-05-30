@@ -2670,3 +2670,5 @@
          code from fuzegiz (thanks, sweetlilmr) (Fred).
 20080528 mempool.c,debugger/event.c: add <string.h> for string prototypes
          (Fred).
+20085029 z80/tests/tests.expected: update tests for improved repeated
+         I/O instruction emulation.
