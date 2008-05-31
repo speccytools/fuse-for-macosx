@@ -181,13 +181,15 @@ contend_port_postio( libspectrum_word port )
 libspectrum_byte
 readport( libspectrum_word port )
 {
+  libspectrum_byte r = port >> 8;
+
   contend_port_preio( port );
 
-  printf( "%5d PR %04x %02x\n", tstates, port, 0xff );
+  printf( "%5d PR %04x %02x\n", tstates, port, r );
 
   contend_port_postio( port );
 
-  return ( port >> 8 );
+  return r;
 }
 
 void

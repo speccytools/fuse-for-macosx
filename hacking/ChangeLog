@@ -2674,3 +2674,8 @@
          I/O instruction emulation.
 20080529 z80/{coretest.c,tests/tests.expected}: change coretest driver to
          make fake IO ports return different values.
+20080530 z80/{coretest.c,tests/tests.expected}: change the value printed
+	 as well as the value returned.
+
+
+	
