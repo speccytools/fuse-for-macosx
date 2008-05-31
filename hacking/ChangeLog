@@ -2676,6 +2676,5 @@
          make fake IO ports return different values.
 20080530 z80/{coretest.c,tests/tests.expected}: change the value printed
 	 as well as the value returned.
-
-
-	
+20080530 z80/tests/{tests.expected,tests.in}: add new tests for improved
+	 {IN,OUT}[DI] flag emulation.
