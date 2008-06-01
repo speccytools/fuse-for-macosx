@@ -60,6 +60,10 @@ typedef struct periph_private_t {
 static GSList *peripherals = NULL;
 static int last_id = 0;
 
+/* The strings used for debugger events */
+static const char *page_event_string = "page",
+  *unpage_event_string = "unpage";
+
 static gint find_by_id( gconstpointer data, gconstpointer id );
 static void free_peripheral( gpointer data, gpointer user_data );
 
@@ -477,4 +481,15 @@ periph_update( void )
   update_ide_menu();
   if1_update_menu();
   machine_current->memory_map();
+}
+
+int
+periph_register_paging_events( const char *type_string, int *page_event,
+			       int *unpage_event )
+{
+  *page_event = debugger_event_register( type_string, page_event_string );
+  *unpage_event = debugger_event_register( type_string, unpage_event_string );
+  if( *page_event == -1 || *unpage_event == -1 ) return 1;
+
+  return 0;
 }

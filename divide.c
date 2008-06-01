@@ -1,5 +1,5 @@
 /* divide.c: DivIDE interface routines
-   Copyright (c) 2005 Matthew Westcott
+   Copyright (c) 2005-2008 Matthew Westcott, Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 
 #include <string.h>
 
+#include "debugger/debugger.h"
 #include "ide.h"
 #include "machine.h"
 #include "module.h"
@@ -93,6 +94,10 @@ static module_info_t divide_module_info = {
 
 };
 
+/* Debugger events */
+static const char *event_type_string = "divide";
+static int page_event, unpage_event;
+
 /* Housekeeping functions */
 
 int
@@ -123,6 +128,10 @@ divide_init( void )
   }
 
   module_register( &divide_module_info );
+
+  if( periph_register_paging_events( event_type_string, &page_event,
+				     &unpage_event ) )
+    return 1;
 
   return error;
 }
@@ -316,6 +325,8 @@ divide_page( void )
   divide_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+
+  debugger_event( page_event );
 }
 
 static void
@@ -324,6 +335,8 @@ divide_unpage( void )
   divide_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+
+  debugger_event( unpage_event );
 }
 
 void

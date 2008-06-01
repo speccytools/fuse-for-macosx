@@ -55,6 +55,10 @@ int periph_register_n( const periph_t *peripherals_list, size_t n );
 int periph_set_active( int id, int active );
 void periph_clear( void );
 
+/* Register debugger page/unpage events for a peripheral */
+int periph_register_paging_events( const char *type_string, int *page_event,
+				   int *unpage_event );
+
 /*
  * The actual routines to read and write a port
  */

@@ -70,8 +70,9 @@ int tape_microphone;
 /* Debugger events */
 static const char *event_type_string = "tape";
 
-static const char *play_event_detail_string = "play";
-static int play_event;
+static const char *play_event_detail_string = "play",
+  *stop_event_detail_string = "stop";
+static int play_event, stop_event = -1;
 
 /* Function prototypes */
 
@@ -92,7 +93,9 @@ int tape_init( void )
 
   play_event = debugger_event_register( event_type_string,
 					play_event_detail_string );
-  if( play_event == -1 ) return 1;
+  stop_event = debugger_event_register( event_type_string,
+					stop_event_detail_string );
+  if( play_event == -1 || stop_event == -1 ) return 1;
 
   tape_modified = 0;
 
@@ -664,6 +667,8 @@ int tape_stop( void )
 
     event_remove_type( EVENT_TYPE_EDGE );
   }
+
+  if( stop_event != -1 ) debugger_event( stop_event );
 
   return 0;
 }

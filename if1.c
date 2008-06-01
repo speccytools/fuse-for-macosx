@@ -1,5 +1,5 @@
 /* if1.c: Interface I handling routines
-   Copyright (c) 2004-2007 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2008 Gergely Szasz, Philip Kendall
 
    $Id$
 
@@ -34,6 +34,7 @@
 #include <unistd.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "if1.h"
 #include "machine.h"
 #include "memory.h"
@@ -214,6 +215,10 @@ const periph_t if1_peripherals[] = {
 const size_t if1_peripherals_count =
   sizeof( if1_peripherals ) / sizeof( periph_t );
 
+/* Debugger events */
+static const char *event_type_string = "if1";
+static int page_event, unpage_event;
+
 static void
 update_menu( enum if1_menu_item what )
 {
@@ -321,6 +326,10 @@ if1_init( void )
 
   module_register( &if1_module_info );
 
+  if( periph_register_paging_events( event_type_string, &page_event,
+				     &unpage_event ) )
+    return 1;
+
   return 0;
 }
 
@@ -384,6 +393,8 @@ if1_page( void )
   if1_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+
+  debugger_event( page_event );
 }
 
 void
@@ -392,6 +403,8 @@ if1_unpage( void )
   if1_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+
+  debugger_event( unpage_event );
 }
 
 void
