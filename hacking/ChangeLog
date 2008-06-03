@@ -2680,3 +2680,5 @@
 	 {IN,OUT}[DI] flag emulation.
 20080601 divide.c,if1.c,periph.c,periph.h,tape.c,zxatasp.c,zxcf.c: add
 	 debugger events for tape stop and peripheral page/unpage.
+20080603 unittests/unittests.c: mempool unit test was failing as the
+         debugger had created a memory pool.

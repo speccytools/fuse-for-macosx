@@ -203,12 +203,11 @@ static int
 mempool_test( void )
 {
   int pool1, pool2;
-
-  TEST_ASSERT( mempool_get_pools() == 0 );
+  int initial_pools = mempool_get_pools();
 
   pool1 = mempool_register_pool();
 
-  TEST_ASSERT( mempool_get_pools() == 1 );
+  TEST_ASSERT( mempool_get_pools() == initial_pools + 1 );
   TEST_ASSERT( mempool_get_pool_size( pool1 ) == 0 );
 
   mempool_alloc( pool1, 23 );
@@ -225,7 +224,7 @@ mempool_test( void )
 
   pool2 = mempool_register_pool();
 
-  TEST_ASSERT( mempool_get_pools() == 2 );
+  TEST_ASSERT( mempool_get_pools() == initial_pools + 2 );
   TEST_ASSERT( mempool_get_pool_size( pool2 ) == 0 );
 
   mempool_alloc( pool1, 23 );
