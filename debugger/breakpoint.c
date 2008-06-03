@@ -339,6 +339,22 @@ debugger_breakpoint_decode_page( char *buffer, size_t n, int page )
   return buffer;
 }
 
+int
+debugger_breakpoint_trigger( debugger_breakpoint *bp )
+{
+  if( bp->ignore ) { bp->ignore--; return 0; }
+
+  if( bp->condition && !debugger_expression_evaluate( bp->condition ) )
+    return 0;
+
+  if( bp->life == DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) {
+    debugger_breakpoints = g_slist_remove( debugger_breakpoints, bp );
+    free( bp );
+  }
+
+  return 1;
+}
+
 /* Check whether 'bp' should trigger if we're looking for a breakpoint
    of 'type' with parameter 'value'. Returns non-zero if we should trigger */
 static int
@@ -384,17 +400,7 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
 
   }
 
-  if( bp->ignore ) { bp->ignore--; return 0; }
-
-  if( bp->condition && !debugger_expression_evaluate( bp->condition ) )
-    return 0;
-
-  if( bp->life == DEBUGGER_BREAKPOINT_LIFE_ONESHOT ) {
-    debugger_breakpoints = g_slist_remove( debugger_breakpoints, bp );
-    free( bp );
-  }
-
-  return 1;
+  return debugger_breakpoint_trigger( bp );
 }
 
 struct remove_t {

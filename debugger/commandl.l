@@ -131,7 +131,9 @@ ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 
 [a-z]+		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
 
-[ \n]+		/* Swallow whitespace */
+\n		{ return '\n'; }
+
+[ ]+		/* Swallow whitespace */
 
 .		{ if( 0 ) unput( '\0' ); /* Prevent warning about yyunput
 					    being defined and not used */

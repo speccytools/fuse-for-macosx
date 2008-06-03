@@ -38,6 +38,8 @@ int debugger_breakpoint_exit( void );
 int debugger_breakpoint_ignore( size_t id, size_t ignore );
 int debugger_breakpoint_set_condition( size_t id,
 				       debugger_expression *condition );
+int debugger_breakpoint_trigger( debugger_breakpoint *bp );
+
 int debugger_poke( libspectrum_word address, libspectrum_byte value );
 int debugger_port_write( libspectrum_word address, libspectrum_byte value );
 

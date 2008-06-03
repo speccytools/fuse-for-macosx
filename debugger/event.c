@@ -109,9 +109,9 @@ debugger_event( int event_code )
     debugger_breakpoint *bp = ptr->data;
     if( bp->type != DEBUGGER_BREAKPOINT_TYPE_EVENT ) continue;
 
-    if( event_matches( &bp->value.event, event.type, event.detail ) ) {
+    if( event_matches( &bp->value.event, event.type, event.detail ) &&
+        debugger_breakpoint_trigger( bp ) ) {
       debugger_mode = DEBUGGER_MODE_HALTED;
-      return;
     }
   }
 }

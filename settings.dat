@@ -196,3 +196,5 @@ rom_spec_se_1, string, "se-1.rom",
 rom_interface_i, string, "if1-2.rom",
 rom_plusd, string, "plusd.rom",
 rom_beta128, string, "trdos.rom",
+
+debugger_command, string, NULL

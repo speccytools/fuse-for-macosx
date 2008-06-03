@@ -58,6 +58,8 @@
 
 }
 
+%debug
+
 /* Tokens as returned from the Flex scanner (commandl.l) */
 
 /* Some tokens are named DEBUGGER_* to avoid clashes with <windows.h> */
@@ -137,6 +139,7 @@
 input:	 /* empty */
        | command
        | error
+       | input '\n' command
 ;
 
 command:   BASE number { debugger_output_base = $2; }

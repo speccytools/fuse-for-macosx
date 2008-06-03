@@ -2682,3 +2682,9 @@
 	 debugger events for tape stop and peripheral page/unpage.
 20080603 unittests/unittests.c: mempool unit test was failing as the
          debugger had created a memory pool.
+20080603 debugger/{breakpoint.c,commandl.l,commandy.y,debugger_internals.h,
+	 event.c},fuse.c,settings.dat: allow debugger commands to be
+	 specified on the command line. A side-effect is allowing multiple
+	 debugger commands separated by newlines in one call to the parser,
+	 and also fix the fact that event breakpoints didn't pay attention
+	 to ignore counts, conditions or lifetime.

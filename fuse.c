@@ -298,6 +298,9 @@ static int fuse_init(int argc, char **argv)
   if( parse_nonoption_args( argc, argv, first_arg, &start_files ) ) return 1;
   if( do_start_files( &start_files ) ) return 1;
 
+  /* Must do this after all subsytems are initialised */
+  debugger_command_evaluate( settings_current.debugger_command );
+
   if( ui_mouse_present ) ui_mouse_grabbed = ui_mouse_grab( 1 );
 
   fuse_emulation_paused = 0;
