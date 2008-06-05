@@ -2688,3 +2688,5 @@
 	 debugger commands separated by newlines in one call to the parser,
 	 and also fix the fact that event breakpoints didn't pay attention
 	 to ignore counts, conditions or lifetime.
+20080604 debugger/commandl.l: allow event strings to include numbers
+         (necessary for if1 events to work...)

@@ -129,7 +129,7 @@ ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 
 [cdrx]{DIGIT}+	{ yylval.integer = debugger_page_hash( yytext ); return PAGE; }
 
-[a-z]+		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
+[a-z][a-z0-9]+	{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
 
 \n		{ return '\n'; }
 
