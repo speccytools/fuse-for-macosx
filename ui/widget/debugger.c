@@ -467,6 +467,10 @@ static void display_breakpts( void )
     case DEBUGGER_BREAKPOINT_TYPE_TIME:
       sprintf( pbuf, "%5d", bp->value.tstates );
       break;
+
+    case DEBUGGER_BREAKPOINT_TYPE_EVENT:
+      sprintf( pbuf, "%s:%s", bp->value.event.type, bp->value.event.detail );
+      break;
     }
     widget_printstring( LC(10), LR(i), 6, pbuf );
 
