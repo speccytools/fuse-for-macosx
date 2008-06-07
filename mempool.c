@@ -33,6 +33,7 @@
 
 #include <libspectrum.h>
 
+#include "fuse.h"
 #include "mempool.h"
 
 static GArray *memory_pools;
@@ -43,7 +44,10 @@ int
 mempool_init( void )
 {
   memory_pools = g_array_new( FALSE, FALSE, sizeof( GArray* ) );
-  if( !memory_pools ) return 1;
+  if( !memory_pools ) {
+    fprintf( stderr, "%s: error initialising memory pools\n", fuse_progname );
+    return 1;
+  }
 
   return 0;
 }

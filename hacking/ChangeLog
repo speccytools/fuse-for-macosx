@@ -2691,3 +2691,4 @@
 20080604 debugger/commandl.l: allow event strings to include numbers
          (necessary for if1 events to work...)
 20080606 ui/widget/debugger.c: handle event breakpoints in display.
+20080607 mempool.c: print error message if we couldn't initialise pools.
