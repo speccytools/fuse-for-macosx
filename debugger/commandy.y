@@ -33,6 +33,7 @@
 
 #include "debugger.h"
 #include "debugger_internals.h"
+#include "mempool.h"
 #include "ui/ui.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -75,10 +76,12 @@
 %token		 BREAK
 %token		 TBREAK
 %token		 CLEAR
+%token           COMMANDS
 %token		 CONDITION
 %token		 CONTINUE
 %token		 DEBUGGER_DELETE
 %token		 DISASSEMBLE
+%token           DEBUGGER_END
 %token		 EVENT
 %token		 EXIT
 %token		 FINISH
@@ -116,6 +119,9 @@
 
 %type  <exp>     expressionornull
 %type  <exp>     expression;
+
+%type  <string>  debuggercommand
+%type  <string>  debuggercommands
 
 /* Operator precedences */
 
@@ -162,6 +168,7 @@ command:   BASE number { debugger_output_base = $2; }
 					    $3, $5, 0, $1, $6 );
 	   }
 	 | CLEAR numberorpc { debugger_breakpoint_clear( $2 ); }
+	 | COMMANDS number '\n' debuggercommands DEBUGGER_END { debugger_breakpoint_set_commands( $2, $4 ); }
 	 | CONDITION NUMBER expressionornull {
 	     debugger_breakpoint_set_condition( $2, $3 );
            }
@@ -277,5 +284,13 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_
 		if( !$$ ) YYABORT;
 	      }
 ;
+
+debuggercommands:   debuggercommand { $$ = $1; }
+                  | debuggercommands debuggercommand {
+                      $$ = mempool_alloc( debugger_memory_pool, strlen( $1 ) + strlen( $2 ) + 2 );
+                      sprintf( $$, "%s\n%s", $1, $2 );
+                    }
+
+debuggercommand: STRING '\n'
 
 %%

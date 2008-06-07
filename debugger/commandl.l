@@ -47,11 +47,14 @@ HEX	[0-9a-f]
 
 %option caseless
 
+%x COMMANDSTATE1 COMMANDSTATE2
+
 %%
 
 ba|bas|base { return BASE; }
 br|bre|brea|break|breakp|breakpo|breakpoi|breakpoin|breakpoint { return BREAK;}
 co|con|cont|contin|continu|continue { return CONTINUE; }
+com|comm|comma|comman|command|commands { BEGIN(COMMANDSTATE1); return COMMANDS; }
 cond|condi|condit|conditi|conditio|condition { return CONDITION; }
 cl|cle|clea|clear { return CLEAR; }
 del|dele|delet|delete { return DEBUGGER_DELETE; }
@@ -121,11 +124,19 @@ sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 
 ":"		{ return ':'; }
 
+<INITIAL,COMMANDSTATE1>{
+
 ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
+		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 		  return NUMBER; }
 0x{HEX}+	{ yylval.integer = strtol( yytext+2, NULL, 16 );
+		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 	          return NUMBER; }
-{DIGIT}+	{ yylval.integer = atoi( yytext ); return NUMBER; }
+{DIGIT}+	{ yylval.integer = atoi( yytext );
+		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
+		  return NUMBER; }
+
+}
 
 [cdrx]{DIGIT}+	{ yylval.integer = debugger_page_hash( yytext ); return PAGE; }
 
@@ -138,3 +149,15 @@ ${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
 .		{ if( 0 ) unput( '\0' ); /* Prevent warning about yyunput
 					    being defined and not used */
 		  return DEBUGGER_ERROR; }
+
+ /* Debugger command parsing */
+
+<COMMANDSTATE2>{
+
+end             { BEGIN(INITIAL); return DEBUGGER_END; }
+
+[^\n]*          { yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
+\n              { return '\n'; }
+
+}
+

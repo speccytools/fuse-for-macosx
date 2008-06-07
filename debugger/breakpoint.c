@@ -212,6 +212,8 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
     bp->condition = NULL;
   }
 
+  bp->commands = NULL;
+
   debugger_breakpoints = g_slist_append( debugger_breakpoints, bp );
 
   if( debugger_mode == DEBUGGER_MODE_INACTIVE )
@@ -246,6 +248,7 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 
       if( breakpoint_check( bp, type, value ) ) {
 	debugger_mode = DEBUGGER_MODE_HALTED;
+	debugger_command_evaluate( bp->commands );
 	return 1;
       }
 
@@ -569,6 +572,7 @@ free_breakpoint( gpointer data, gpointer user_data GCC_UNUSED )
   }
 
   if( bp->condition ) debugger_expression_delete( bp->condition );
+  if( bp->commands ) free( bp->commands );
 
   free( bp );
 }
@@ -597,6 +601,19 @@ debugger_breakpoint_set_condition( size_t id, debugger_expression *condition )
   if( bp->condition ) debugger_expression_delete( bp->condition );
 
   bp->condition = condition;
+
+  return 0;
+}
+
+int
+debugger_breakpoint_set_commands( size_t id, const char *commands )
+{
+  debugger_breakpoint *bp = get_breakpoint_by_id( id );
+  if( !bp ) return 1;
+
+  free( bp->commands );
+  bp->commands = strdup( commands );
+  if( !bp->commands ) return 1;
 
   return 0;
 }

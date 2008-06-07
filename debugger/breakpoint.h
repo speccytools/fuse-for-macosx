@@ -99,6 +99,9 @@ typedef struct debugger_breakpoint {
   debugger_breakpoint_life life;
   debugger_expression *condition; /* Conditional expression to activate this
 				     breakpoint */
+
+  char *commands;
+
 } debugger_breakpoint;
 
 /* The current breakpoints */

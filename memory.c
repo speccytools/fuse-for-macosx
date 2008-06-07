@@ -191,9 +191,8 @@ readbyte( libspectrum_word address )
   bank = address >> 13;
   mapping = &memory_map_read[ bank ];
 
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE )
+    debugger_check( DEBUGGER_BREAKPOINT_TYPE_READ, address );
 
   if( mapping->contended ) tstates += ula_contention[ tstates ];
   tstates += 3;
@@ -210,9 +209,8 @@ writebyte( libspectrum_word address, libspectrum_byte b )
   bank = address >> 13;
   mapping = &memory_map_write[ bank ];
 
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE )
+    debugger_check( DEBUGGER_BREAKPOINT_TYPE_WRITE, address );
 
   if( mapping->contended ) tstates += ula_contention[ tstates ];
 

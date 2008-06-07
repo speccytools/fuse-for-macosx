@@ -195,9 +195,8 @@ readport_internal( libspectrum_word port )
   struct peripheral_data_t callback_info;
 
   /* Trigger the debugger if wanted */
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_READ, port ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE )
+    debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_READ, port );
 
   /* If we're doing RZX playback, get a byte from the RZX file */
   if( rzx_playback ) {
@@ -265,9 +264,8 @@ writeport_internal( libspectrum_word port, libspectrum_byte b )
   struct peripheral_data_t callback_info;
 
   /* Trigger the debugger if wanted */
-  if( debugger_mode != DEBUGGER_MODE_INACTIVE &&
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, port ) )
-    debugger_mode = DEBUGGER_MODE_HALTED;
+  if( debugger_mode != DEBUGGER_MODE_INACTIVE )
+    debugger_check( DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE, port );
 
   callback_info.port = port;
   callback_info.value = b;

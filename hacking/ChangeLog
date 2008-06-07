@@ -2692,3 +2692,6 @@
          (necessary for if1 events to work...)
 20080606 ui/widget/debugger.c: handle event breakpoints in display.
 20080607 mempool.c: print error message if we couldn't initialise pools.
+20080607 debugger/{breakpoint.c,breakpoint.h,commandl.l,commandy.y,
+	 debugger_internals.h,event.c},memory.c,periph.c,ui/gtk/debugger.c:
+	 add facility to run debugger commands when a breakpoint is hit.

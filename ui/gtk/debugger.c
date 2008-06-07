@@ -253,8 +253,10 @@ ui_debugger_deactivate( int interruptable )
 {
   if( debugger_active ) deactivate_debugger();
 
-  gtk_widget_set_sensitive( continue_button, !interruptable );
-  gtk_widget_set_sensitive( break_button,     interruptable );
+  if( dialog_created ) {
+    gtk_widget_set_sensitive( continue_button, !interruptable );
+    gtk_widget_set_sensitive( break_button,     interruptable );
+  }
 
   return 0;
 }

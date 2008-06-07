@@ -112,6 +112,7 @@ debugger_event( int event_code )
     if( event_matches( &bp->value.event, event.type, event.detail ) &&
         debugger_breakpoint_trigger( bp ) ) {
       debugger_mode = DEBUGGER_MODE_HALTED;
+      debugger_command_evaluate( bp->commands );
     }
   }
 }
