@@ -2697,3 +2697,5 @@
 	 add facility to run debugger commands when a breakpoint is hit.
 20080608 debugger/{Makefile.am,commandl.l,commandy.y,debugger.c,
 	 debugger_internals.h,expression.c}: add numeric debugger variables
+20080608 debugger/debugger.c: a breakpoint command could have disabled the
+	 debugger before the UI is brought up.

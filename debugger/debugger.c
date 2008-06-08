@@ -88,6 +88,9 @@ debugger_end( void )
 int
 debugger_trap( void )
 {
+  /* A breakpoint command could have deactivated the debugger */
+  if( debugger_mode != DEBUGGER_MODE_HALTED ) return 0;
+
   return ui_debugger_activate();
 }
 
