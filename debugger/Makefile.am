@@ -36,7 +36,8 @@ libdebugger_a_SOURCES = breakpoint.c \
 			debugger.c \
 			disassemble.c \
 			event.c \
-			expression.c
+			expression.c \
+			variable.c
 
 commandl.c: commandy.c
 commandy.h: commandy.c

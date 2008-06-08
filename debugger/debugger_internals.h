@@ -84,6 +84,8 @@ debugger_expression_new_unaryop( int operation, debugger_expression *operand, in
 debugger_expression*
 debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 				  debugger_expression *operand2, int pool );
+debugger_expression*
+debugger_expression_new_variable( const char *name, int pool );
 
 debugger_expression* debugger_expression_copy( debugger_expression *src );
 void debugger_expression_delete( debugger_expression* expression );
@@ -95,5 +97,11 @@ debugger_expression_evaluate( debugger_expression* expression );
 
 int debugger_event_init( void );
 int debugger_event_is_registered( const char *type, const char *detail );
+
+/* Variables handling */
+
+int debugger_variable_init( void );
+void debugger_variable_set( const char *name, libspectrum_dword value );
+libspectrum_dword debugger_variable_get( const char *name );
 
 #endif				/* #ifndef FUSE_DEBUGGER_INTERNALS_H */

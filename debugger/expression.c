@@ -39,6 +39,7 @@ typedef enum expression_type {
   DEBUGGER_EXPRESSION_TYPE_REGISTER,
   DEBUGGER_EXPRESSION_TYPE_UNARYOP,
   DEBUGGER_EXPRESSION_TYPE_BINARYOP,
+  DEBUGGER_EXPRESSION_TYPE_VARIABLE,
 
 } expression_type;
 
@@ -85,6 +86,7 @@ struct debugger_expression {
     int reg;
     struct unaryop_type unaryop;
     struct binaryop_type binaryop;
+    char *variable;
   } types;
 
 };
@@ -221,6 +223,28 @@ debugger_expression_new_unaryop( int operation, debugger_expression *operand,
   return exp;
 }
 
+debugger_expression*
+debugger_expression_new_variable( const char *name, int pool )
+{
+  debugger_expression *exp;
+
+  exp = mempool_alloc( pool, sizeof( *exp ) );
+  if( !exp ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return NULL;
+  }
+
+  exp->type = DEBUGGER_EXPRESSION_TYPE_VARIABLE;
+  exp->precedence = PRECEDENCE_ATOMIC;
+
+  exp->types.variable = mempool_strdup( pool, name );
+  if( !exp->types.variable ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+    return NULL;
+  }
+
+  return exp;
+}
 
 void
 debugger_expression_delete( debugger_expression *exp )
@@ -240,6 +264,9 @@ debugger_expression_delete( debugger_expression *exp )
     debugger_expression_delete( exp->types.binaryop.op2 );
     break;
 
+  case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
+    free( exp->types.variable );
+    break;
   }
     
   free( exp );
@@ -291,6 +318,15 @@ debugger_expression_copy( debugger_expression *src )
       return NULL;
     }
     break;
+
+  case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
+    dest->types.variable = strdup( src->types.variable );
+    if( !dest->types.variable ) {
+      free( dest );
+      return NULL;
+    }
+    break;
+
   }
 
   return dest;
@@ -312,6 +348,9 @@ debugger_expression_evaluate( debugger_expression *exp )
 
   case DEBUGGER_EXPRESSION_TYPE_BINARYOP:
     return evaluate_binaryop( &( exp->types.binaryop ) );
+
+  case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
+    return debugger_variable_get( exp->types.variable );
 
   }
 
@@ -419,6 +458,10 @@ debugger_expression_deparse( char *buffer, size_t length,
 
   case DEBUGGER_EXPRESSION_TYPE_BINARYOP:
     return deparse_binaryop( buffer, length, &( exp->types.binaryop ) );
+
+  case DEBUGGER_EXPRESSION_TYPE_VARIABLE:
+    snprintf( buffer, length, "$%s", exp->types.variable );
+    return 0;
 
   }
 

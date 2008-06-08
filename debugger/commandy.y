@@ -90,6 +90,7 @@
 %token		 NEXT
 %token		 DEBUGGER_OUT
 %token		 PORT
+%token		 DEBUGGER_PRINT
 %token		 READ
 %token		 SET
 %token		 STEP
@@ -102,6 +103,7 @@
 %token <integer> NUMBER
 
 %token <string>	 STRING
+%token <string>	 VARIABLE
 
 %token		 DEBUGGER_ERROR
 
@@ -183,8 +185,10 @@ command:   BASE number { debugger_output_base = $2; }
 	   }
 	 | NEXT	    { debugger_next(); }
 	 | DEBUGGER_OUT number NUMBER { debugger_port_write( $2, $3 ); }
+	 | DEBUGGER_PRINT number { printf( "0x%x\n", $2 ); }
 	 | SET NUMBER number { debugger_poke( $2, $3 ); }
 	 | SET DEBUGGER_REGISTER number { debugger_register_set( $2, $3 ); }
+	 | SET VARIABLE number { debugger_variable_set( $2, $3 ); }
 	 | STEP	    { debugger_step(); }
 ;
 
@@ -227,6 +231,9 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_
 		       if( !$$ ) YYABORT;
 		     }
 	    | DEBUGGER_REGISTER { $$ = debugger_expression_new_register( $1, debugger_memory_pool );
+			 if( !$$ ) YYABORT;
+		       }
+	    | VARIABLE { $$ = debugger_expression_new_variable( $1, debugger_memory_pool );
 			 if( !$$ ) YYABORT;
 		       }
 	    | '(' expression ')' { $$ = $2; }

@@ -2695,3 +2695,5 @@
 20080607 debugger/{breakpoint.c,breakpoint.h,commandl.l,commandy.y,
 	 debugger_internals.h,event.c},memory.c,periph.c,ui/gtk/debugger.c:
 	 add facility to run debugger commands when a breakpoint is hit.
+20080608 debugger/{Makefile.am,commandl.l,commandy.y,debugger.c,
+	 debugger_internals.h,expression.c}: add numeric debugger variables

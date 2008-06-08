@@ -42,8 +42,7 @@
 
 %}
 
-DIGIT	[0-9]
-HEX	[0-9a-f]
+ID	[a-z][a-z0-9]+
 
 %option caseless
 
@@ -69,6 +68,7 @@ n|ne|nex|next { return NEXT; }
 o|ou|out { return DEBUGGER_OUT; }	/* Different name to avoid clashing
 					   with OUT from z80/z80_macros.h */
 p|po|por|port { return PORT; }
+pr|pri|prin|print { return DEBUGGER_PRINT; }
 r|re|rea|read { return READ; }
 se|set { return SET; }
 s|st|ste|step { return STEP; }
@@ -126,21 +126,22 @@ sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 
 <INITIAL,COMMANDSTATE1>{
 
-${HEX}+		{ yylval.integer = strtol( yytext+1, NULL, 16 );
+$[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 		  return NUMBER; }
-0x{HEX}+	{ yylval.integer = strtol( yytext+2, NULL, 16 );
+0x[[:xdigit:]]+	{ yylval.integer = strtol( yytext+2, NULL, 16 );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 	          return NUMBER; }
-{DIGIT}+	{ yylval.integer = atoi( yytext );
+[[:digit:]]+	{ yylval.integer = atoi( yytext );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 		  return NUMBER; }
 
 }
 
-[cdrx]{DIGIT}+	{ yylval.integer = debugger_page_hash( yytext ); return PAGE; }
+[cdrx][[:digit:]]+ { yylval.integer = debugger_page_hash( yytext ); return PAGE; }
 
-[a-z][a-z0-9]+	{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
+{ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
+${ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext + 1 ); return VARIABLE; }
 
 \n		{ return '\n'; }
 
@@ -160,4 +161,3 @@ end             { BEGIN(INITIAL); return DEBUGGER_END; }
 \n              { return '\n'; }
 
 }
-

@@ -59,6 +59,9 @@ debugger_init( void )
   error = debugger_event_init();
   if( error ) return error;
 
+  error = debugger_variable_init();
+  if( error ) return error;
+
   error = debugger_reset();
   if( error ) return error;
 
