@@ -2699,3 +2699,5 @@
 	 debugger_internals.h,expression.c}: add numeric debugger variables
 20080608 debugger/debugger.c: a breakpoint command could have disabled the
 	 debugger before the UI is brought up.
+20080608 debugger/{breakpoint.c,debugger.c}: ensure the commands for all
+	 breakpoints are run; also move previous fix.

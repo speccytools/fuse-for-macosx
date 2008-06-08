@@ -249,16 +249,17 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
       if( breakpoint_check( bp, type, value ) ) {
 	debugger_mode = DEBUGGER_MODE_HALTED;
 	debugger_command_evaluate( bp->commands );
-	return 1;
       }
 
     }
-    return 0;
+    break;
 
   case DEBUGGER_MODE_HALTED: return 1;
 
   }
-  return 0;	/* Keep gcc happy */
+
+  /* Debugger mode could have been reset by a breakpoint command */
+  return ( debugger_mode == DEBUGGER_MODE_HALTED );
 }
 
 static int
