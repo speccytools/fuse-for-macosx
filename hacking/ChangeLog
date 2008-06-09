@@ -2702,3 +2702,5 @@
 20080608 debugger/{breakpoint.c,debugger.c}: ensure the commands for all
 	 breakpoints are run; also move previous fix.
 20080609 debugger/variable.c: add forgotten file.
+20080609 debugger/breakpoint.c: must copy expression when setting a
+         breakpoint condition.
