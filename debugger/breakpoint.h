@@ -72,6 +72,11 @@ typedef struct debugger_breakpoint_port {
 
 } debugger_breakpoint_port;
 
+typedef struct debugger_breakpoint_time {
+  libspectrum_dword tstates;
+  int triggered;
+} debugger_breakpoint_time;
+
 typedef struct debugger_event_t {
   char *type;
   char *detail;
@@ -81,7 +86,7 @@ typedef union debugger_breakpoint_value {
 
   debugger_breakpoint_address address;
   debugger_breakpoint_port port;
-  libspectrum_dword tstates;
+  debugger_breakpoint_time time;
   debugger_event_t event;
 
 } debugger_breakpoint_value;

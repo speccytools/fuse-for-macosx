@@ -146,7 +146,7 @@ debugger_breakpoint_add_time( debugger_breakpoint_type type,
     fuse_abort();
   }
 
-  value.tstates = tstates;
+  value.time.tstates = tstates;
 
   return breakpoint_add( type, value, ignore, life, condition );
 }
@@ -224,7 +224,7 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
   if( type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
     int error;
 
-    error = event_add( value.tstates, EVENT_TYPE_BREAKPOINT );
+    error = event_add( value.time.tstates, EVENT_TYPE_BREAKPOINT );
     if( error ) return error;
   }
 
@@ -356,6 +356,9 @@ debugger_breakpoint_trigger( debugger_breakpoint *bp )
     free( bp );
   }
 
+  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME )
+    bp->value.time.triggered = 1;
+
   return 1;
 }
 
@@ -395,7 +398,7 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
 
     /* Timed breakpoints trigger if we're past the relevant time */
   case DEBUGGER_BREAKPOINT_TYPE_TIME:
-    if( bp->value.tstates > tstates ) return 0;
+    if( bp->value.time.triggered || bp->value.time.tstates > tstates ) return 0;
     break;
 
   default:
@@ -431,7 +434,7 @@ debugger_breakpoint_remove( size_t id )
 
     struct remove_t remove;
 
-    remove.tstates = bp->value.tstates;
+    remove.tstates = bp->value.time.tstates;
     remove.done = 0;
 
     event_foreach( remove_time, &remove );
@@ -634,6 +637,8 @@ add_time_event( gpointer data, gpointer user_data GCC_UNUSED )
 {
   debugger_breakpoint *bp = data;
 
-  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME )
-    event_add( bp->value.tstates, EVENT_TYPE_BREAKPOINT );
+  if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
+    bp->value.time.triggered = 0;
+    event_add( bp->value.time.tstates, EVENT_TYPE_BREAKPOINT );
+  }
 }

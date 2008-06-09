@@ -2704,3 +2704,5 @@
 20080609 debugger/variable.c: add forgotten file.
 20080609 debugger/breakpoint.c: must copy expression when setting a
          breakpoint condition.
+20080609 debugger/breakpoint.[ch],ui/gtk/debugger.c: multiple time breakpoints
+         didn't work properly.

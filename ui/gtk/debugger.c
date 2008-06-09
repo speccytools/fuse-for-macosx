@@ -822,7 +822,7 @@ update_breakpoints( void )
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_TIME:
-      snprintf( breakpoint_text[2], 40, "%5d", bp->value.tstates );
+      snprintf( breakpoint_text[2], 40, "%5d", bp->value.time.tstates );
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_EVENT:
