@@ -2707,3 +2707,5 @@
 20080609 debugger/breakpoint.[ch],ui/gtk/debugger.c: multiple time breakpoints
          didn't work properly.
 20080610 debugger/breakpoint.c: add <string.h> for string prototypes (Fred).
+20080610 ui/widget/debugger.c: fix widget debugger for multiple time
+         breakpoints (Fred).

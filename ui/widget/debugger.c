@@ -465,7 +465,7 @@ static void display_breakpts( void )
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_TIME:
-      sprintf( pbuf, "%5d", bp->value.tstates );
+      sprintf( pbuf, "%5d", bp->value.time.tstates );
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_EVENT:
