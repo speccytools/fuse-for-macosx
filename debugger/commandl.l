@@ -46,7 +46,8 @@ ID	[a-z][a-z0-9]+
 
 %option caseless
 
-%x COMMANDSTATE1 COMMANDSTATE2
+%s COMMANDSTATE1
+%x COMMANDSTATE2
 
 %%
 
@@ -124,8 +125,6 @@ sp|pc|ix|iy { yylval.reg = debugger_register_hash( yytext );
 
 ":"		{ return ':'; }
 
-<INITIAL,COMMANDSTATE1>{
-
 $[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 		  return NUMBER; }
@@ -135,8 +134,6 @@ $[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
 [[:digit:]]+	{ yylval.integer = atoi( yytext );
 		  if( YY_START == COMMANDSTATE1 ) BEGIN( COMMANDSTATE2 );
 		  return NUMBER; }
-
-}
 
 [cdrx][[:digit:]]+ { yylval.integer = debugger_page_hash( yytext ); return PAGE; }
 

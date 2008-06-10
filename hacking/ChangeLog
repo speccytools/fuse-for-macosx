@@ -2709,3 +2709,5 @@
 20080610 debugger/breakpoint.c: add <string.h> for string prototypes (Fred).
 20080610 ui/widget/debugger.c: fix widget debugger for multiple time
          breakpoints (Fred).
+20080610 debugger/commandl.l: much better to have COMMANDSTATE1 as an
+         inclusive start condition.
