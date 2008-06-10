@@ -36,9 +36,11 @@
 #include "widget.h"
 
 /* The default colours used in the widget */
-#define WIDGET_COLOUR_DISABLED   0	/* Black */
-#define WIDGET_COLOUR_BACKGROUND 1	/* Blue */
-#define WIDGET_COLOUR_FOREGROUND 7	/* White */
+#define WIDGET_COLOUR_DISABLED   1	/* Blue */
+#define WIDGET_COLOUR_BACKGROUND 15	/* Bright White */
+#define WIDGET_COLOUR_FOREGROUND 0	/* Black */
+#define WIDGET_COLOUR_HIGHLIGHT  13	/* Cyan */
+#define WIDGET_COLOUR_TITLE      WIDGET_COLOUR_BACKGROUND
 
 /* The ways of finishing a widget */
 typedef enum widget_finish_state {
@@ -62,7 +64,13 @@ int widget_end_all( widget_finish_state state );
 int widget_timer_init( void );
 int widget_timer_end( void );
 
+void widget_putpixel( int x, int y, int colour );
 void widget_rectangle( int x, int y, int w, int h, int col );
+void widget_draw_line_horiz( int x, int y, int length, int colour );
+void widget_draw_line_vert( int x, int y, int length, int colour );
+void widget_draw_rectangle_outline( int x, int y, int w, int h, int colour );
+void widget_draw_rectangle_solid( int x, int y, int w, int h, int colour );
+void widget_draw_rectangle_outline_rounded( int x, int y, int w, int h, int colour );
 int widget_printstring( int x, int y, int col, const char *s );
 int widget_printstring_fixed( int x, int y, int col, const char *s );
 void widget_printchar_fixed( int x, int y, int col, int c );
@@ -77,6 +85,8 @@ size_t widget_charwidth( int c );
 
 void widget_up_arrow( int x, int y, int colour );
 void widget_down_arrow( int x, int y, int colour );
+void widget_draw_submenu_arrow(int x, int y, int colour);
+void widget_print_checkbox( int x, int y, int value );
 
 extern widget_finish_state widget_finished;
 

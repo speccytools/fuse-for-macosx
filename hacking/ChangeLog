@@ -2711,3 +2711,8 @@
          breakpoints (Fred).
 20080610 debugger/commandl.l: much better to have COMMANDSTATE1 as an
          inclusive start condition.
+20080610 ui/{fb/fbdisplay.c,sdl/sdldisplay.c,svga/svgadisplay.c,uidisplay.h,
+         widget/{browse.c,debugger.c,error.c,filesel.c,menu.c,options.pl,
+         pokefinder.c,query.c,roms.c,select.c,text.c,widget.[ch],
+         widget_internals.h,xlib/xdisplay.c}: modify widget UI to have a
+         Spectrum 128 style look and feel based on FuseX (Fred).

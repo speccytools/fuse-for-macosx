@@ -367,3 +367,17 @@ int svgadisplay_end( void )
   vga_setmode( TEXT );
   return 0;
 }
+
+void
+uidisplay_frame_save( void )
+{
+  /* FIXME: Save current framebuffer state as the widget UI wants to scribble
+     in here */
+}
+
+void
+uidisplay_frame_restore( void )
+{
+  /* FIXME: Restore saved framebuffer state as the widget UI wants to draw a
+     new menu */
+}

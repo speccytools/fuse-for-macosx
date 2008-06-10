@@ -45,6 +45,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #ifdef USE_WIDGET
 
 #include <stdio.h>
+#include <string.h>
 
 #include "display.h"
 #include "fuse.h"
@@ -52,6 +53,93 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "periph.h"
 #include "widget_internals.h"
 #include "ui/uidisplay.h"
+
+/* General functions used by the options dialogs */
+settings_info widget_options_settings;
+int widget_options_print_option( int number, const char* string, int value );
+int widget_options_print_value( int number, int value );
+int widget_options_print_entry( int number, const char *prefix, int value,
+				const char *suffix );
+
+static int widget_options_print_label( int number, const char *string );
+static int widget_options_print_data( int number, const char *string );
+
+int widget_options_print_option( int number, const char* string, int value )
+{
+  widget_options_print_label( number, string );
+  widget_options_print_value( number, value );
+  return 0;
+}
+
+static int widget_options_print_label( int number, const char *string )
+{
+  char buffer[128];
+  size_t l, w;
+
+  snprintf( buffer, sizeof( buffer ), "%s", string );
+  l = strlen( buffer );
+
+  if( l >= sizeof( buffer ) )
+    l = sizeof( buffer ) - 1;
+  while( ( w = widget_substringwidth( string, l ) ) >= 224 )
+    --l;
+  buffer[l] = '\\0';
+  w = widget_printstring( 17, number*8+24, WIDGET_COLOUR_FOREGROUND, buffer )
+      - 1;
+  while ((w += 3) < 240)
+    widget_putpixel (w, number*8+31, 0);
+  return 0;
+}
+
+int widget_options_print_value( int number, int value )
+{
+  widget_rectangle( 233, number * 8 + 24, 7, 8, WIDGET_COLOUR_BACKGROUND );
+  widget_print_checkbox( 233, number * 8 + 24, value );
+  widget_display_rasters( number * 8 + 24, 8 );
+  return 0;
+}
+
+static int widget_options_print_data( int number, const char *string )
+{
+  size_t width = widget_stringwidth( string );
+  widget_rectangle( 240 - width - 2, number * 8 + 24, width + 2, 8,
+  		    WIDGET_COLOUR_BACKGROUND );
+  widget_printstring( 240 - width, number * 8 + 24,
+		      WIDGET_COLOUR_FOREGROUND, string );
+  widget_display_rasters( number * 8 + 24, 8 );
+
+  return 0;
+}
+
+int
+widget_options_print_entry( int number, const char *prefix, int value,
+			    const char *suffix )
+{
+  char buffer[128];
+  widget_options_print_label( number, prefix );
+  snprintf( buffer, sizeof( buffer ), "%d %s", value, suffix );
+  return widget_options_print_data( number, buffer );
+}
+
+int widget_options_finish( widget_finish_state finished )
+{
+  int error;
+
+  /* If we exited normally, actually set the options */
+  if( finished == WIDGET_FINISHED_OK ) {
+    error = settings_copy( &settings_current, &widget_options_settings );
+    settings_free( &widget_options_settings );
+    memset( &widget_options_settings, 0, sizeof( settings_info ) );
+    if( error ) return error;
+
+    /* Bring the peripherals list into sync with the new options */
+    periph_update();
+    /* make the needed UI changes */
+    uidisplay_hotswap_gfx_mode();
+  }
+
+  return 0;
+}
 
 CODE
 
@@ -86,12 +174,12 @@ static int widget_$_->{name}_show_all( settings_info *show )
 
 CODE
 
-    print "  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, \"$_->{title}\" );\n\n";
+    print "  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, \"$_->{title}\" );\n\n";
 
     my $which = 0;
     foreach my $widget ( @{ $_->{widgets} } ) {
 
-	$widget->{text} =~ s/\((.)\)/\\012$1\\011/;
+	$widget->{text} =~ s/\((.)\)/\\012$1\\001/;
 
 	if( $widget->{type} eq "Checkbox" ) {
 

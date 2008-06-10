@@ -412,6 +412,29 @@ uidisplay_hotswap_gfx_mode( void )
   return 0;
 }
 
+SDL_Surface *saved = NULL;
+
+void
+uidisplay_frame_save( void )
+{
+  if( saved ) {
+    SDL_FreeSurface( saved );
+    saved = NULL;
+  }
+
+  saved = SDL_ConvertSurface( tmp_screen, tmp_screen->format,
+                              SDL_SWSURFACE );
+}
+
+void
+uidisplay_frame_restore( void )
+{
+  if( saved ) {
+    SDL_BlitSurface( saved, NULL, tmp_screen, NULL );
+    sdldisplay_force_full_refresh = 1;
+  }
+}
+
 static void
 sdl_blit_icon( SDL_Surface **icon,
                SDL_Rect *r, Uint32 tmp_screen_pitch,
@@ -768,11 +791,18 @@ int
 uidisplay_end( void )
 {
   int i;
+
   display_ui_initialised = 0;
+
   if ( tmp_screen ) {
     free( tmp_screen->pixels );
     SDL_FreeSurface( tmp_screen ); tmp_screen = NULL;
   }
+
+  if( saved ) {
+    SDL_FreeSurface( saved ); saved = NULL;
+  }
+
   for( i=0; i<2; i++ ) {
     if ( red_cassette[i] ) {
       SDL_FreeSurface( red_cassette[i] ); red_cassette[i] = NULL;
@@ -793,6 +823,7 @@ uidisplay_end( void )
       SDL_FreeSurface( green_disk[i] ); green_disk[i] = NULL;
     }
   }
+
   return 0;
 }
 

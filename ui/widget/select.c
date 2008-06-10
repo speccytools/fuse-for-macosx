@@ -41,9 +41,9 @@ static void print_item (int index, int colour)
 {
   char key[] = "\x0A ";
   key[1] = 'A' + index;
-  widget_printstring_right( 24, index*8+28, colour, key );
-  widget_printstring( 25, index*8+28, colour, ": " );
-  widget_printstring( 25 + widget_stringwidth (": "), index*8+28,
+  widget_printstring_right( 24, index*8+24, colour, key );
+  widget_printstring( 25, index*8+24, colour, ": " );
+  widget_printstring( 25 + widget_stringwidth (": "), index*8+24,
 				   colour, options[index]);
 }
 
@@ -68,15 +68,13 @@ widget_select_draw( void *data )
   /* Blank the main display area */
   widget_dialog_with_border( 1, 2, 30, count + 2 );
 
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
+  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, title );
 
   for( i = 0; i < count; i++ ) {
     if( i == highlight_line ) {
-      widget_rectangle( 2*8, i*8+28, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
-      print_item( i, WIDGET_COLOUR_BACKGROUND );
-    } else {
-      print_item( i, WIDGET_COLOUR_FOREGROUND );
+      widget_rectangle( 1*8+1, i*8+24, 30*8-2, 1*8, WIDGET_COLOUR_HIGHLIGHT );
     }
+    print_item( i, WIDGET_COLOUR_FOREGROUND );
   }
 
   widget_display_lines( 2, count + 2 );
@@ -132,7 +130,7 @@ widget_select_keyhandler( input_key key )
     ) {
     
     /* Remove the old highlight */
-    widget_rectangle( 2*8, highlight_line*8+28, 28*8, 1*8,
+    widget_rectangle( 1*8+1, highlight_line*8+24, 30*8-2, 1*8,
 		      WIDGET_COLOUR_BACKGROUND );
     print_item( highlight_line, WIDGET_COLOUR_FOREGROUND );
 
@@ -143,9 +141,9 @@ widget_select_keyhandler( input_key key )
       highlight_line = key - INPUT_KEY_a;
     }
     
-    widget_rectangle( 2*8, highlight_line*8+28, 28*8, 1*8,
-		      WIDGET_COLOUR_FOREGROUND );
-    print_item( highlight_line, WIDGET_COLOUR_BACKGROUND );
+    widget_rectangle( 1*8+1, highlight_line*8+24, 30*8-2, 1*8,
+                      WIDGET_COLOUR_HIGHLIGHT );
+    print_item( highlight_line, WIDGET_COLOUR_FOREGROUND );
 
     widget_display_lines( 2, count + 2 );
   }

@@ -72,17 +72,17 @@ widget_roms_draw( void *data )
   rom_count = info->count;
 
   /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, rom_count + 3 );
+  widget_dialog_with_border( 1, 2, 30, rom_count + 2 );
 
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, info->title );
-  widget_display_lines( 2, 1 );
+  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, info->title );
+  widget_display_lines( 2, rom_count + 2 );
 
   for( i=0; i < info->count; i++ ) {
 
     snprintf( buffer, sizeof( buffer ), "ROM %d:", i );
     key[1] = 'A' + i;
-    widget_printstring_right( 24, i*8+28, WIDGET_COLOUR_FOREGROUND, key );
-    widget_printstring( 28, i*8+28, WIDGET_COLOUR_FOREGROUND, buffer );
+    widget_printstring_right( 24, i*8+24, WIDGET_COLOUR_FOREGROUND, key );
+    widget_printstring( 28, i*8+24, WIDGET_COLOUR_FOREGROUND, buffer );
 
     print_rom( i );
   }
@@ -100,11 +100,11 @@ print_rom( int which )
   while( widget_stringwidth( setting ) >= 232 - 68 )
     ++setting;
 
-  widget_rectangle( 68, which * 8 + 28, 232 - 68, 8,
+  widget_rectangle( 68, which * 8 + 24, 232 - 68, 8,
 		    WIDGET_COLOUR_BACKGROUND );
-  widget_printstring (68, which * 8 + 28,
+  widget_printstring (68, which * 8 + 24,
 				   WIDGET_COLOUR_FOREGROUND, setting );
-  widget_display_rasters( which * 8 + 28, 8 );
+  widget_display_rasters( which * 8 + 24, 8 );
 }
 
 void

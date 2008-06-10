@@ -125,25 +125,25 @@ int widget_debugger_draw( void *data )
 
   widget_printstring( LC(0), LR(9) - 4, 6, state[debugger_mode] );
   widget_printstring( LC(10), LR(9) - 4, 6,
-		      "\012S\011ingle step  \012C\011ontinue  Co\012m\011mand" );
+		      "\022S\021ingle step  \022C\021ontinue  Co\022m\021mand" );
 
   x = LC(-1);
   if( display != DB_REGISTERS )
-    x = widget_printstring( x + 8, LR(10), 7, "\012R\011egs" );
+    x = widget_printstring( x + 8, LR(10), 7, "\022R\021egs" );
   if( display != DB_BYTES )
-    x = widget_printstring( x + 8, LR(10), 7, "\012B\011ytes" );
+    x = widget_printstring( x + 8, LR(10), 7, "\022B\021ytes" );
   if( display != DB_TEXT )
-    x = widget_printstring( x + 8, LR(10), 7, "\012T\011ext" );
+    x = widget_printstring( x + 8, LR(10), 7, "\022T\021ext" );
   if( display != DB_DISASM )
-    x = widget_printstring( x + 8, LR(10), 7, "\012D\011isasm" );
+    x = widget_printstring( x + 8, LR(10), 7, "\022D\021isasm" );
   if( display != DB_BREAKPT )
-    x = widget_printstring( x + 8, LR(10), 7, "Brea\012k\011pts" );
+    x = widget_printstring( x + 8, LR(10), 7, "Brea\022k\021pts" );
 
   widget_printstring_right( LC(25) + 4, LR(10), 5, "PC" );
   sprintf( pbuf, "%04X", PC );
   widget_printstring_fixed( LC(26) / 8, LR(10) / 8, 7, pbuf );
 
-  widget_printstring_right( LR(35) + 4, LR(10), 5, "Bas\012e\011" );
+  widget_printstring_right( LR(35) + 4, LR(10), 5, "Bas\022e\021" );
   sprintf( pbuf, "%d", debugger_output_base );
   widget_printstring( LR(36), LR(10), 7, pbuf );
 

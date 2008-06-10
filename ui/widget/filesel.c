@@ -471,7 +471,7 @@ widget_filesel_draw( void *data )
   top_left_file = 0;
 
   /* Create the dialog box */
-  error = widget_dialog_with_border( 1, 2, 30, 21 );
+  error = widget_dialog_with_border( 1, 2, 30, 22 );
   if( error ) {
     if( directory ) free( directory );
     return error; 
@@ -565,18 +565,18 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   int error;
 
   /* Give us a clean box to start with */
-  error = widget_dialog( 1, 2, 30, 21 );
+  error = widget_dialog_with_border( 1, 2, 30, 22 );
   if( error ) return error;
 
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
+  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, title );
   if( widget_stringwidth( dir ) > 223 ) {
     char buffer[128];
     int prefix = widget_stringwidth( "..." ) + 1;
     while( widget_stringwidth( dir ) > 223 - prefix ) dir++;
     snprintf( buffer, sizeof( buffer ), "...%s", dir );
-    widget_print_title( 28, WIDGET_COLOUR_FOREGROUND, buffer );  
+    widget_print_title( 24, WIDGET_COLOUR_FOREGROUND, buffer );  
   } else {
-    widget_print_title( 28, WIDGET_COLOUR_FOREGROUND, dir );
+    widget_print_title( 24, WIDGET_COLOUR_FOREGROUND, dir );
   }
 
   if( top_left ) widget_up_arrow( 1, 5, WIDGET_COLOUR_FOREGROUND );
@@ -594,16 +594,16 @@ static int widget_print_all_filenames( struct widget_dirent **filenames, int n,
   if( is_saving )
   {
     widget_printstring( 12, 22 * 8, WIDGET_COLOUR_FOREGROUND,
-				     "\012RETURN\011 = select" );
+				     "\012RETURN\001 = select" );
     widget_printstring_right( 244, 22 * 8, WIDGET_COLOUR_FOREGROUND,
-					   "\012TAB\011 = enter name" );
+					   "\012TAB\001 = enter name" );
   }
 
   if( i < n )
     widget_down_arrow( 1, is_saving ? 20 : 22, WIDGET_COLOUR_FOREGROUND );
 
   /* Display that lot */
-  widget_display_lines( 2, 21 );
+  widget_display_lines( 2, 22 );
 
   return 0;
 }
@@ -623,10 +623,9 @@ static int widget_print_filename( struct widget_dirent *filename, int position,
   int x = (position & 1) ? 132 : 16,
       y = 40 + (position >> 1) * 8;
 
-  int foreground = inverted ? WIDGET_COLOUR_BACKGROUND
-                            : WIDGET_COLOUR_FOREGROUND,
+  int foreground = WIDGET_COLOUR_FOREGROUND,
 
-      background = inverted ? WIDGET_COLOUR_FOREGROUND
+      background = inverted ? WIDGET_COLOUR_HIGHLIGHT
                             : WIDGET_COLOUR_BACKGROUND;
 
   widget_rectangle( x, y, FILENAME_WIDTH, 8, background );

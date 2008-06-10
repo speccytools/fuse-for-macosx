@@ -499,3 +499,17 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
     fbdisplay_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
   }
 }
+
+void
+uidisplay_frame_save( void )
+{
+  /* FIXME: Save current framebuffer state as the widget UI wants to scribble
+     in here */
+}
+
+void
+uidisplay_frame_restore( void )
+{
+  /* FIXME: Restore saved framebuffer state as the widget UI wants to draw a
+     new menu */
+}

@@ -65,27 +65,27 @@ int widget_error_draw( void *data )
 
   switch( error_info->severity ) {
   case UI_ERROR_INFO:
-    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Info" );
+    widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, "Info" );
     break;
   case UI_ERROR_WARNING:
-    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Warning" );
+    widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, "Warning" );
     break;
   case UI_ERROR_ERROR:
-    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Error" );
+    widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, "Error" );
     break;
   default:
-    widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "(Unknown message)" );
+    widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, "(Unknown message)" );
     break;
   }
 
   for( i=0; i<count; i++ ) {
-    widget_printstring( 17, i*8+28, WIDGET_COLOUR_FOREGROUND, lines[i] );
+    widget_printstring( 17, i*8+24, WIDGET_COLOUR_FOREGROUND, lines[i] );
     free( lines[i] );
   }
 
   free( lines );
 
-  widget_display_lines( 2, count + 4 );
+  widget_display_lines( 2, count + 3 );
 
   return 0;
 }

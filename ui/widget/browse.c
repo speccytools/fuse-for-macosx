@@ -66,7 +66,7 @@ widget_browse_draw( void *data GCC_UNUSED )
 
   widget_dialog_with_border( 1, 2, 30, 20 );
 
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, "Browse Tape" );
+  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, "Browse Tape" );
   widget_display_lines( 2, 1 );
 
   highlight = tape_get_current_block();
@@ -107,25 +107,24 @@ show_blocks( void )
     numpos = 40;
   }
 
-  widget_rectangle( 2*8, 4*8, 28*8, 18*8, WIDGET_COLOUR_BACKGROUND );
+  widget_rectangle( 9, 2*8, 30*8-2, 19*8, WIDGET_COLOUR_BACKGROUND );
 
   for( i = 0, ptr = g_slist_nth( blocks, top_line );
        i < 18 && ptr;
        i++, ptr = ptr->next ) {
 
-    int colour = ( top_line + i == highlight )
-		 ? WIDGET_COLOUR_BACKGROUND : WIDGET_COLOUR_FOREGROUND;
+    int colour = WIDGET_COLOUR_FOREGROUND;
 
     if( top_line + i == highlight )
-      widget_rectangle( 16, i*8+32, 28*8, 1*8, WIDGET_COLOUR_FOREGROUND );
+      widget_rectangle( 9, i*8+24, 30*8-2, 1*8, WIDGET_COLOUR_HIGHLIGHT );
 
     sprintf( buffer, "%lu", (unsigned long)( top_line + i + 1 ) );
-    widget_printstring_right( numpos, i*8+32, colour, buffer );
+    widget_printstring_right( numpos, i*8+24, colour, buffer );
     snprintf( buffer, sizeof( buffer ), ": %s", (char *)ptr->data );
-    widget_printstring( numpos + 1, i*8+32, colour, buffer );
+    widget_printstring( numpos + 1, i*8+24, colour, buffer );
   }
 
-  widget_display_lines( 4, 18 );
+  widget_display_lines( 3, 19 );
 }
 
 void

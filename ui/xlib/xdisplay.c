@@ -97,6 +97,11 @@ static libspectrum_word
 static const ptrdiff_t scaled_pitch =
   3 * DISPLAY_SCREEN_WIDTH * 2;
 
+/* A scaled copy of the image displayed on the Spectrum's screen */
+static libspectrum_word
+  rgb_image_backup[2 * ( DISPLAY_SCREEN_HEIGHT + 4 )][2 * ( DISPLAY_SCREEN_WIDTH  + 3 )];
+static const int rgb_backup_pitch = 2 * ( DISPLAY_SCREEN_WIDTH + 3 );
+
 static unsigned long colours[128];
 static int colours_allocated = 0;
 
@@ -736,6 +741,19 @@ uidisplay_frame_end( void )
     xdisplay_update_rect( r->x, r->y, r->w, r->h );
   num_rects = 0;
   xdisplay_force_full_refresh = 0;
+}
+
+void
+uidisplay_frame_save( void )
+{
+  memcpy( rgb_image_backup, rgb_image, sizeof( rgb_image ) );
+}
+
+void
+uidisplay_frame_restore( void )
+{
+  memcpy( rgb_image, rgb_image_backup, sizeof( rgb_image ) );
+  xdisplay_update_rect( 0, 0, image_width, image_height );
 }
 
 void

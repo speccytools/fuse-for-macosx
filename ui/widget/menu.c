@@ -48,29 +48,22 @@
 #include "ui/uidisplay.h"
 #include "utils.h"
 #include "widget_internals.h"
+#include "widget.h"
 
 widget_menu_entry *menu;
+static size_t highlight_line = 0;
+static size_t count;
 
-int widget_menu_draw( void *data )
+void
+print_items( void )
 {
-  widget_menu_entry *ptr;
-  size_t menu_entries, i, height = 0;
+  int i;
   char buffer[128];
+  size_t height = 24;
+  int width = widget_calculate_menu_width(menu);
+  int menu_left_edge_x = (DISPLAY_WIDTH_COLS/2-width/2)*8+1;
 
-  menu = (widget_menu_entry*)data;
-
-  /* How many menu items do we have? */
-  for( ptr = &menu[1]; ptr->text; ptr++ )
-    height += ptr->text[0] ? 2 : 1;
-  menu_entries = ptr - &menu[1];
-
-  widget_dialog_with_border( 1, 2, 30, 2 + height / 2 );
-
-  snprintf( buffer, sizeof( buffer ), "\x0A%s", menu->text );
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, buffer );
-
-  height = 28;
-  for( i = 0; i < menu_entries; i++ ) {
+  for( i = 0; i < count; i++ ) {
     int colour;
     if( !menu[i+1].text[0] ) { height += 4; continue; }
 
@@ -78,12 +71,51 @@ int widget_menu_draw( void *data )
     colour = menu[i+1].inactive ?
 	     WIDGET_COLOUR_DISABLED :
 	     WIDGET_COLOUR_FOREGROUND;
-    widget_printstring( 17, height, colour, buffer );
+
+    if( i == highlight_line ) {
+      widget_rectangle( menu_left_edge_x, i*8+24, width*8-2, 1*8,
+                        WIDGET_COLOUR_HIGHLIGHT );
+    } else {
+      widget_rectangle( menu_left_edge_x, i*8+24, width*8-2, 1*8,
+                        WIDGET_COLOUR_BACKGROUND );
+    }
+
+    widget_printstring( menu_left_edge_x+8, height, colour, buffer );
+
+    if( menu[i+1].submenu ) {
+      widget_draw_submenu_arrow(DISPLAY_BORDER_ASPECT_WIDTH+menu_left_edge_x+
+                                width*8-9, i*8+49, colour);
+    }
+
     height += 8;
   }
 
-  widget_display_lines( 2, menu_entries + 2 );
+  widget_display_lines( 2, count + 2 );
+}
 
+int widget_menu_draw( void *data )
+{
+  widget_menu_entry *ptr;
+  size_t menu_entries, width, height = 0;
+  int menu_left_edge_x;
+  char buffer[128];
+  highlight_line = 0;
+
+  menu = (widget_menu_entry*)data;
+
+  /* How many menu items do we have? */
+  for( ptr = &menu[1]; ptr->text; ptr++ )
+    height += ptr->text[0] ? 2 : 1;
+  menu_entries = ptr - &menu[1];
+  count = menu_entries;
+  width = widget_calculate_menu_width(menu);
+  menu_left_edge_x = DISPLAY_WIDTH_COLS/2-width/2;
+  widget_dialog_with_border( menu_left_edge_x, 2, width, 2 + height / 2 );
+
+  snprintf( buffer, sizeof( buffer ), "%s", menu->text );
+  widget_printstring( menu_left_edge_x*8+2, 16, WIDGET_COLOUR_TITLE, buffer );
+
+  print_items();
   return 0;
 }
 
@@ -91,6 +123,8 @@ void
 widget_menu_keyhandler( input_key key )
 {
   widget_menu_entry *ptr;
+  int new_highlight_line = 0;
+  int cursor_pressed = 0;
 
   switch( key ) {
 
@@ -105,21 +139,50 @@ widget_menu_keyhandler( input_key key )
     return;
 
   case INPUT_KEY_Return:
-    widget_end_widget( WIDGET_FINISHED_OK );
+    ptr=&menu[1 + highlight_line];
+    if(!ptr->inactive) {
+      if( ptr->submenu ) {
+        widget_do( WIDGET_TYPE_MENU, ptr->submenu );
+      } else {
+        ptr->callback( ptr->action );
+      }
+    }
     return;
+
+  case INPUT_KEY_Up:
+  case INPUT_KEY_7:
+    if ( highlight_line ) {
+      new_highlight_line = highlight_line - 1;
+      cursor_pressed = 1;
+    }
+    break;
+
+  case INPUT_KEY_Down:
+  case INPUT_KEY_6:
+    if ( highlight_line + 1 < (ptrdiff_t)count ) {
+      new_highlight_line = highlight_line + 1;
+      cursor_pressed = 1;
+    }
+    break;
 
   default:	/* Keep gcc happy */
     break;
 
   }
 
+  if( cursor_pressed ) {
+    highlight_line = new_highlight_line;
+    print_items();
+    return;
+  }
+
   for( ptr=&menu[1]; ptr->text; ptr++ ) {
     if( !ptr->inactive && key == ptr->key ) {
 
       if( ptr->submenu ) {
-	widget_do( WIDGET_TYPE_MENU, ptr->submenu );
+        widget_do( WIDGET_TYPE_MENU, ptr->submenu );
       } else {
-	ptr->callback( ptr->action );
+        ptr->callback( ptr->action );
       }
 
       break;

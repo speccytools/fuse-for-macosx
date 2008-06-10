@@ -96,6 +96,9 @@ typedef struct widget_menu_entry {
 /* The main menu as activated with F1 */
 extern widget_menu_entry widget_menu[];
 
+/* Get the maximum menu width to use in pixels */
+int widget_calculate_menu_width( widget_menu_entry *menu );
+
 /* The name returned from the file selector */
 extern char* widget_filesel_name;
 

@@ -55,7 +55,7 @@ widget_text_draw( void *data )
 
   widget_dialog_with_border( 1, 2, 30, 3 );
 
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
+  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, title );
   widget_printstring_right( 12, 28, 5, "[" );
   widget_printstring( 244, 28, 5, "]" );
 

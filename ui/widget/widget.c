@@ -54,8 +54,6 @@
 #include <windows.h>
 #endif
 
-static void widget_putpixel( int x, int y, int colour );
-
 /* Bitmap font storage */
 typedef struct {
   libspectrum_byte bitmap[15], left, width, defined;
@@ -203,8 +201,8 @@ widget_printstring( int x, int y, int col, const char *s )
 
   while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
 	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
-    if( c && c < 9 ) { col = c - 1; continue; }
-    if( c < 18 ) { shadow = c - 9; continue; }
+    if( c && c < 17 ) { col = c - 1; continue; }
+    if( c < 26 ) { shadow = c - 17; continue; }
 
     if( shadow && col ) {
       printchar( x - 1, y,     shadow - 1, c );
@@ -212,7 +210,7 @@ widget_printstring( int x, int y, int col, const char *s )
       printchar( x,     y - 1, shadow - 1, c );
       printchar( x,     y + 1, shadow - 1, c );
       printchar( x + 1, y + 1, shadow - 1, c );
-      x = printchar( x, y, col ^ 8, c );
+      x = printchar( x, y, (col & 7) ^ 8, c );
     } else
       x = printchar( x, y, col, c );
   }
@@ -312,9 +310,89 @@ void widget_rectangle( int x, int y, int w, int h, int col )
         widget_putpixel( x + mx, y + my, col );
 }
 
+void
+widget_draw_line_horiz(int x, int y, int length, int colour )
+{
+  int i;
+
+  for (i=0; i<length; i++) {
+    uidisplay_putpixel( x+i, y, colour );
+  }
+}
+
+void
+widget_draw_line_vert(int x, int y, int length, int colour )
+{
+  int i;
+
+  for (i=0; i<length; i++) {
+    uidisplay_putpixel( x, y+i, colour );
+  }
+}
+
+void
+widget_draw_rectangle_outline(int x, int y, int w, int h, int colour )
+{
+  widget_draw_line_horiz( x, y, w, colour );
+  widget_draw_line_horiz( x, y+h-1, w, colour );
+  widget_draw_line_vert( x, y, h, colour );
+  widget_draw_line_vert( x+w-1, y, h, colour );
+}   
+
+void
+widget_draw_rectangle_solid( int x, int y, int w, int h, int colour )
+{
+  int v, p;
+
+  if( y < 0 ) {
+    h = y + h;
+    y = 0;
+  }
+
+  if( x < 0 ) {
+    w = x + w;
+    x = 0;
+  }
+
+  /* clip rectangle to screen edges */
+  if( x + w > DISPLAY_SCREEN_WIDTH - 1 )
+    w = DISPLAY_SCREEN_WIDTH - x;
+
+  if( y + h > DISPLAY_SCREEN_HEIGHT - 1 )
+    h = DISPLAY_SCREEN_HEIGHT - y;
+
+  for (v=0; v<h; v++) {
+    for (p=0; p<w; p++) {
+        uidisplay_putpixel( x+p, y+v, colour );
+    }
+  }
+}
+
+void
+widget_draw_rectangle_outline_rounded( int x, int y, int w, int h, int colour )
+{
+  widget_draw_line_horiz( x+1, y, w-2, colour );
+  widget_draw_line_horiz( x+1, y+h-1, w-2, colour );
+  widget_draw_line_vert( x, y+1, h-2, colour );
+  widget_draw_line_vert( x+w-1, y+1, h-2, colour );
+
+  uidisplay_putpixel( x+1, y+h-2, colour );
+  uidisplay_putpixel( x+1, y+1, colour );
+  uidisplay_putpixel( x+w-2, y+1, colour );
+  uidisplay_putpixel( x+w-2, y+h-2, colour );
+}
+
+void
+widget_draw_submenu_arrow(int x, int y, int colour)
+{
+  widget_draw_line_vert(x + 2, y, 6, colour);
+  widget_draw_line_vert(x + 3, y + 1, 4, colour);
+  widget_draw_line_vert(x + 4, y + 2, 2, colour);
+}
+
 void widget_print_checkbox( int x, int y, int value )
 {
-    static const int CHECK_COLOR=7;
+    static const int CHECK_COLOR=4;
     int z;
 
     y += 2;
@@ -339,7 +417,7 @@ void
 widget_up_arrow( int x, int y, int colour )
 {
   int i, j;
-  x = x * 8;
+  x = x * 8 + 1;
   y = y * 8 + 7;
   for( j = 6; j; --j ) {
     for( i = (j + 1) / 2; i < 4; ++i ) {
@@ -353,7 +431,7 @@ void
 widget_down_arrow( int x, int y, int colour )
 {
   int i, j;
-  x = x * 8;
+  x = x * 8 + 1;
   y = y * 8;
   for( j = 6; j; --j ) {
     for( i = (j + 1) / 2; i < 4; ++i ) {
@@ -423,12 +501,16 @@ int widget_do( widget_type which, void *data )
   /* If we don't have a UI yet, we can't output widgets */
   if( !display_ui_initialised ) return 1;
 
+  if( widget_level == -1 ) uidisplay_frame_save();
+
   /* We're now one widget level deeper */
   widget_level++;
 
   /* Store what type of widget we are and what data we were given */
   widget_return[widget_level].type = which;
   widget_return[widget_level].data = data;
+
+  uidisplay_frame_restore();
 
   /* Draw this widget */
   error = widget_data[ which ].draw( data );
@@ -451,6 +533,8 @@ int widget_do( widget_type which, void *data )
   if( widget_data[which].finish ) {
     widget_data[which].finish( widget_return[widget_level].finished );
   }
+
+  uidisplay_frame_restore();
 
   /* Now return to the previous widget level */
   widget_level--;
@@ -508,130 +592,73 @@ int widget_dialog( int x, int y, int width, int height )
   return 0;
 }
 
+void
+widget_draw_speccy_rainbow_bar(int x, int y)
+{
+  int i = 0;
+  int cur_x = x - 8;
+
+  for (i = 0; i < 8; i++) {
+    widget_draw_line_horiz(cur_x, y + i, 8, 10);       /* bright red */
+    widget_draw_line_horiz(cur_x + 8, y + i, 8, 14);   /* bright yellow */
+    widget_draw_line_horiz(cur_x + 16, y + i, 8, 12);  /* bright green */
+    widget_draw_line_horiz(cur_x + 24, y + i, 8, 13);  /* bright cyan */
+    cur_x--;
+  }
+}
+
+const int menu_vert_external_margin = 8;
+
+int
+widget_calculate_menu_width(widget_menu_entry *menu)
+{
+  widget_menu_entry *ptr;
+  int max_width=0;
+
+  if (!menu) {
+    return 64;
+  }
+
+  max_width = widget_stringwidth( menu->text )+5*8;
+
+  for( ptr = &menu[1]; ptr->text; ptr++ ) {
+    int total_width = widget_stringwidth(ptr->text)+8;
+
+    if( ptr->submenu ) {
+      total_width += 3*8;
+    }
+
+    if (total_width > max_width)
+      max_width = total_width;
+  }
+
+  return (max_width+menu_vert_external_margin*2)/8;
+}
+
+
 int widget_dialog_with_border( int x, int y, int width, int height )
 {
-  int i;
+  int ink = WIDGET_COLOUR_FOREGROUND;
+  int paper = WIDGET_COLOUR_BACKGROUND;
 
-  widget_rectangle( 8*x-5, 8*y, 8*width+10, 8*height, WIDGET_COLOUR_BACKGROUND );
+  x += DISPLAY_BORDER_WIDTH_COLS;
+  y += DISPLAY_BORDER_HEIGHT_COLS;
 
-  for( i = 0; i < 5; ++i) {
-    widget_rectangle (8*x+i-5, 8*y-i-1, 8*width+10-2*i, 1, WIDGET_COLOUR_BACKGROUND );
-    widget_rectangle (8*x+i-5, 8*(y+height)+i, 8*width+10-2*i, 1, WIDGET_COLOUR_BACKGROUND );
-  }
+  widget_draw_rectangle_solid(8*x + 1, 8*y + 1, 8*width - 2,
+                              8*height - 2, paper);
+  widget_draw_rectangle_solid(8*x + 1, 8*y + 1, 8*width - 2, 7*1, ink);
+  widget_draw_rectangle_outline_rounded(8*x, 8*y, 8*width, 8*height, ink);
 
-  for( i=(8*x)-1; i<(8*(x+width))+1; i++ ) {
-    widget_putpixel( i, 8 *   y            - 4, WIDGET_COLOUR_FOREGROUND );
-    widget_putpixel( i, 8 * ( y + height ) + 3, WIDGET_COLOUR_FOREGROUND );
-  }
-
-  for( i=(8*y)-1; i<(8*(y+height))+1; i++ ) {
-    widget_putpixel( 8 *   x           - 4, i, WIDGET_COLOUR_FOREGROUND );
-    widget_putpixel( 8 * ( x + width ) + 3, i, WIDGET_COLOUR_FOREGROUND );
-  }
-
-  for( i=0; i<2; i++ ) {
-    widget_putpixel( 8 *   x           - 3 + i, 8 *   y            - 2 - i,
-		     WIDGET_COLOUR_FOREGROUND );
-    widget_putpixel( 8 * ( x + width ) + 2 - i, 8 *   y            - 2 - i,
-		     WIDGET_COLOUR_FOREGROUND );
-    widget_putpixel( 8 *   x           - 3 + i, 8 * ( y + height ) + 1 + i,
-		     WIDGET_COLOUR_FOREGROUND );
-    widget_putpixel( 8 * ( x + width ) + 2 - i, 8 * ( y + height ) + 1 + i,
-		     WIDGET_COLOUR_FOREGROUND );
-  }
-
-  widget_display_lines( y-1, height+2 );
+  widget_draw_speccy_rainbow_bar(8*x + 8*width - 32, 8*y);
 
   return 0;
 }
 
-static void
+void
 widget_putpixel( int x, int y, int colour )
 {
   uidisplay_putpixel( x + DISPLAY_BORDER_ASPECT_WIDTH, y + DISPLAY_BORDER_HEIGHT,
                       colour );
-}
-
-/* General functions used by the options dialogs */
-
-static int widget_options_print_label( int number, const char *string );
-static int widget_options_print_data( int number, const char *string );
-
-int widget_options_print_option( int number, const char* string, int value )
-{
-  widget_options_print_label( number, string );
-  widget_options_print_value( number, value );
-  return 0;
-}
-
-static int widget_options_print_label( int number, const char *string )
-{
-  char buffer[128];
-  size_t l, w;
-
-  snprintf( buffer, sizeof( buffer ), "%s", string );
-  l = strlen( buffer );
-
-  if( l >= sizeof( buffer ) )
-    l = sizeof( buffer ) - 1;
-  while( ( w = widget_substringwidth( string, l ) ) >= 224 )
-    --l;
-  buffer[l] = '\0';
-  w = widget_printstring( 17, number*8+28, WIDGET_COLOUR_FOREGROUND, buffer )
-      - 1;
-  while ((w += 3) < 240)
-    widget_putpixel (w, number*8+35, 0);
-  return 0;
-}
-
-int widget_options_print_value( int number, int value )
-{
-  widget_rectangle( 233, number * 8 + 28, 7, 8, WIDGET_COLOUR_BACKGROUND );
-  widget_print_checkbox( 233, number * 8 + 28, value );
-  widget_display_rasters( number * 8 + 28, 8 );
-  return 0;
-}
-
-static int widget_options_print_data( int number, const char *string )
-{
-  size_t width = widget_stringwidth( string );
-  widget_rectangle( 240 - width - 2, number * 8 + 28, width + 2, 8,
-  		    WIDGET_COLOUR_BACKGROUND );
-  widget_printstring( 240 - width, number * 8 + 28,
-		      WIDGET_COLOUR_FOREGROUND, string );
-  widget_display_rasters( number * 8 + 28, 8 );
-
-  return 0;
-}
-
-int
-widget_options_print_entry( int number, const char *prefix, int value,
-			    const char *suffix )
-{
-  char buffer[128];
-  widget_options_print_label( number, prefix );
-  snprintf( buffer, sizeof( buffer ), "%d %s", value, suffix );
-  return widget_options_print_data( number, buffer );
-}
-
-int widget_options_finish( widget_finish_state finished )
-{
-  int error;
-
-  /* If we exited normally, actually set the options */
-  if( finished == WIDGET_FINISHED_OK ) {
-    error = settings_copy( &settings_current, &widget_options_settings );
-    settings_free( &widget_options_settings );
-    memset( &widget_options_settings, 0, sizeof( settings_info ) );
-    if( error ) return error;
-
-    /* Bring the peripherals list into sync with the new options */
-    periph_update();
-    /* make the needed UI changes */
-    uidisplay_hotswap_gfx_mode();
-  }
-
-  return 0;
 }
 
 /* The widgets actually available. Make sure the order here matches the

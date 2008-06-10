@@ -45,20 +45,20 @@ internal_query_draw( int save, const char *data )
   if( split_message( data, &lines, &count, 28 ) )
     return 1;
 
-  widget_dialog_with_border( 1, 2, 30, count + 3 );
-  widget_print_title( 16, WIDGET_COLOUR_FOREGROUND, title );
+  widget_dialog_with_border( 1, 2, 30, count + 4 );
+  widget_printstring( 9, 16, WIDGET_COLOUR_TITLE, title );
   for( i = 0; i < count; ++i ) {
-    widget_printstring( 17, i*8+28, WIDGET_COLOUR_FOREGROUND, lines[i] );
+    widget_printstring( 17, i*8+24, WIDGET_COLOUR_FOREGROUND, lines[i] );
     free( lines[i] );
   }
   free( lines );
   
   widget_printstring_right(
-    240, i*8+28, 5, save ? "\012S\011ave  \012D\011on't save  \012C\011ancel"
-                         : "\012Y\011es  \012N\011o"
+    240, i*8+28, 5, save ? "\012S\001ave  \012D\001on't save  \010C\001ancel"
+                         : "\012Y\001es  \012N\001o"
   );
 
-  widget_display_lines( 2, count + 5 );
+  widget_display_lines( 2, count + 6 );
 
   return 0;
 }
