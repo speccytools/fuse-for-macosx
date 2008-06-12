@@ -2718,3 +2718,5 @@
          Spectrum 128 style look and feel based on FuseX (Fred).
 20080612 ui/widget/{widget_internals.h,widget.c,options.pl}: allow options
          dialogs to be navigated by cursor keys (Fred).
+20080613 debugger/{expression.c,variable.c}: add <string.h> for string
+         prototypes (Fred).
