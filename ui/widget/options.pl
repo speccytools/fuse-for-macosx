@@ -54,6 +54,67 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "widget_internals.h"
 #include "ui/uidisplay.h"
 
+/* A generic click function */
+typedef void (*widget_option_click_fn)( void );
+typedef void (*widget_option_draw_fn)( settings_info *show );
+
+/* A general menu */
+typedef struct widget_option_entry {
+  int index;
+  input_key key;		/* Which key to activate this option */
+
+  widget_option_click_fn click;
+  widget_option_draw_fn draw;
+} widget_option_entry;
+
+CODE
+
+foreach( @dialogs ) {
+    foreach my $widget ( @{ $_->{widgets} } ) {
+	if( $widget->{type} eq "Checkbox" or $widget->{type} eq "Entry" ) {
+	    print << "CODE";
+static void widget_$widget->{value}_click( void );
+static void widget_option_$widget->{value}_draw( settings_info *show );
+CODE
+	} else {
+	    die "Unknown type `$widget->{type}'";
+	}
+    }
+}
+
+foreach( @dialogs ) {
+
+    print << "CODE";
+
+static widget_option_entry options_$_->{name}\[\] = \{
+CODE
+
+    my $which = 0;
+    foreach my $widget ( @{ $_->{widgets} } ) {
+
+	if( $widget->{type} eq "Checkbox" or $widget->{type} eq "Entry" ) {
+
+	    print << "CODE";
+  \{ $which, $widget->{key}, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+CODE
+	} else {
+	    die "Unknown type `$widget->{type}'";
+	}
+
+	$which++;
+    }
+
+    print << "CODE";
+  \{ -1 \}
+\};
+CODE
+
+}
+
+print << "CODE";
+
+static size_t highlight_line = 0;
+
 /* General functions used by the options dialogs */
 settings_info widget_options_settings;
 int widget_options_print_option( int number, const char* string, int value );
@@ -75,6 +136,10 @@ static int widget_options_print_label( int number, const char *string )
 {
   char buffer[128];
   size_t l, w;
+  int colour = WIDGET_COLOUR_BACKGROUND;
+
+  if( number == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
+  widget_rectangle( 9, number*8+24, 30*8-2, 1*8, colour );
 
   snprintf( buffer, sizeof( buffer ), "%s", string );
   l = strlen( buffer );
@@ -93,17 +158,23 @@ static int widget_options_print_label( int number, const char *string )
 
 int widget_options_print_value( int number, int value )
 {
-  widget_rectangle( 233, number * 8 + 24, 7, 8, WIDGET_COLOUR_BACKGROUND );
-  widget_print_checkbox( 233, number * 8 + 24, value );
+  int colour = WIDGET_COLOUR_BACKGROUND;
+
+  if( number == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
+  widget_rectangle( 233, number * 8 + 24, 7, 8, colour );
+  widget_print_checkbox( 233, number * 8 + 24, colour, value );
   widget_display_rasters( number * 8 + 24, 8 );
   return 0;
 }
 
 static int widget_options_print_data( int number, const char *string )
 {
+  int colour = WIDGET_COLOUR_BACKGROUND;
+
+  if( number == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
   size_t width = widget_stringwidth( string );
   widget_rectangle( 240 - width - 2, number * 8 + 24, width + 2, 8,
-  		    WIDGET_COLOUR_BACKGROUND );
+  		    colour );
   widget_printstring( 240 - width, number * 8 + 24,
 		      WIDGET_COLOUR_FOREGROUND, string );
   widget_display_rasters( number * 8 + 24, 8 );
@@ -153,6 +224,7 @@ static int widget_$_->{name}_show_all( settings_info *show );
 int widget_$_->{name}_draw( void *data GCC_UNUSED )
 {
   int error;
+  highlight_line = 0;
   
   /* Get a copy of the current settings */
   error = settings_copy( &widget_options_settings, &settings_current );
@@ -170,49 +242,100 @@ int widget_$_->{name}_draw( void *data GCC_UNUSED )
 
 static int widget_$_->{name}_show_all( settings_info *show )
 \{
-  int error;
+  widget_option_entry *ptr;
 
 CODE
 
-    print "  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, \"$_->{title}\" );\n\n";
+  my $title = $_->{title};
+  $title =~ s/\\0[01][12]//g;
+
+    print << "CODE";
+  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, \"$title\" );
+
+  for( ptr=&options_$_->{name}\[0\]; ptr->index != -1; ptr++ ) \{
+    ptr->draw( show );
+  \}
+
+  return 0;
+\}
+
+CODE
 
     my $which = 0;
     foreach my $widget ( @{ $_->{widgets} } ) {
 
-	$widget->{text} =~ s/\((.)\)/\\012$1\\001/;
-
 	if( $widget->{type} eq "Checkbox" ) {
 
 	    print << "CODE";
-  error = widget_options_print_option( $which, "$widget->{text}",
-				       show->$widget->{value} );
-  if( error ) return error;
+static void
+widget_$widget->{value}_click( void )
+\{
+  widget_options_settings.$widget->{value} = ! widget_options_settings.$widget->{value};
+\}
 
 CODE
 	} elsif( $widget->{type} eq "Entry" ) {
 
+	    my $title = $widget->{text};
+            $title =~ s/\((.)\)/$1/;
+
 	    print << "CODE";
-  error = widget_options_print_entry( $which, "$widget->{text}",
-				      show->$widget->{value},
-				      "$widget->{data2}" );
-  if( error ) return error;
+static void
+widget_$widget->{value}_click( void )
+\{
+  int error;
+  widget_text_t text_data;
+
+  text_data.title = "$title";
+  text_data.allow = WIDGET_INPUT_DIGIT;
+  snprintf( text_data.text, 40, "%d",
+            widget_options_settings.$widget->{value} );
+  error = widget_do( WIDGET_TYPE_TEXT, &text_data );
+\}
+
 CODE
 	} else {
 	    die "Unknown type `$widget->{type}'";
 	}
 
-        $which++;
-    }
-        
-    print << "CODE";
-  return 0;
+        $widget->{text} =~ s/\((.)\)/\\012$1\\001/;
+
+	if( $widget->{type} eq "Checkbox" ) {
+
+	    print << "CODE";
+static void
+widget_option_$widget->{value}_draw( settings_info *show )
+\{
+  widget_options_print_option( $which, "$widget->{text}", show->$widget->{value} );
 \}
 
+CODE
+	} elsif( $widget->{type} eq "Entry" ) {
+
+	    print << "CODE";
+static void
+widget_option_$widget->{value}_draw( settings_info *show )
+\{
+  widget_options_print_entry( $which, "$widget->{text}", show->$widget->{value},
+                              "$widget->{data2}" );
+\}
+
+CODE
+	} else {
+	    die "Unknown type `$widget->{type}'";
+	}
+
+	$which++;
+    }
+
+    print << "CODE";
 void
 widget_$_->{name}_keyhandler( input_key key )
 \{
-  int error;
   widget_text_t text_data;
+  int new_highlight_line = 0;
+  int cursor_pressed = 0;
+  widget_option_entry *ptr;
 
   text_data = text_data;	/* Keep gcc happy */
 
@@ -229,64 +352,60 @@ widget_$_->{name}_keyhandler( input_key key )
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
 
-CODE
-
-    $which = 0;
-    foreach my $widget ( @{ $_->{widgets} } ) {
-
-	if( $widget->{type} eq "Checkbox" ) {
-
-	    print << "CODE";
-  case $widget->{key}:
-    widget_options_settings.$widget->{value} = ! widget_options_settings.$widget->{value};
-    error = widget_options_print_value( $which, widget_options_settings.$widget->{value} );
-    if( error ) return;
+  case INPUT_KEY_Up:
+  case INPUT_KEY_7:
+    if ( highlight_line ) {
+      new_highlight_line = highlight_line - 1;
+      cursor_pressed = 1;
+    }
     break;
 
-CODE
-	} elsif( $widget->{type} eq "Entry" ) {
-
-	    my $title = $widget->{text};
-
-	    $title =~ s/\\01[12]//g;
-
-	    print << "CODE";
-  case $widget->{key}:
-    text_data.title = "$title";
-    text_data.allow = WIDGET_INPUT_DIGIT;
-    snprintf( text_data.text, 40, "%d",
-	      widget_options_settings.$widget->{value} );
-    error = widget_do( WIDGET_TYPE_TEXT, &text_data ); if( error ) return;
-    if( widget_text_text ) {
-      widget_options_settings.$widget->{value} = atoi( widget_text_text );
-      error = widget_options_print_entry(
-        $which, "$widget->{text}",
-	widget_options_settings.$widget->{value}, "$widget->{data2}"
-      );
+  case INPUT_KEY_Down:
+  case INPUT_KEY_6:
+    if ( highlight_line + 1 < $count ) {
+      new_highlight_line = highlight_line + 1;
+      cursor_pressed = 1;
     }
-	    
     break;
 
-CODE
-	} else {
-	    die "Unknown type `$widget->{type}'";
-	}
+  case INPUT_KEY_space:
+  case INPUT_KEY_0:
+    options_$_->{name}\[highlight_line\].click();
+    options_$_->{name}\[highlight_line\].draw( &widget_options_settings );
+    return;
+    break;
 
-	$which++;
-    }
-
-    print "  case INPUT_KEY_Return:\n";
-    print << "CODE";
+  case INPUT_KEY_Return:
     widget_end_all( WIDGET_FINISHED_OK );
 CODE
     print "    $_->{posthook}();\n" if $_->{posthook};
     print << "CODE";
     display_refresh_all();
+    return;
     break;
 
   default:	/* Keep gcc happy */
     break;
 
+  \}
+
+  if( cursor_pressed ) \{
+    int old_highlight_line = highlight_line;
+    highlight_line = new_highlight_line;
+    options_$_->{name}\[old_highlight_line\].draw( &widget_options_settings );
+    options_$_->{name}\[highlight_line\].draw( &widget_options_settings );
+    return;
+  \}
+
+  for( ptr=&options_$_->{name}\[0\]; ptr->index != -1; ptr++ ) \{
+    if( key == ptr->key ) \{
+      int old_highlight_line = highlight_line;
+      ptr->click();
+      highlight_line = ptr->index;
+      options_$_->{name}\[old_highlight_line\].draw( &widget_options_settings );
+      ptr->draw( &widget_options_settings );
+      break;
+    \}
   \}
 \}
 CODE

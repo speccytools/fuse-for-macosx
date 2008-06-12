@@ -2716,3 +2716,5 @@
          pokefinder.c,query.c,roms.c,select.c,text.c,widget.[ch],
          widget_internals.h,xlib/xdisplay.c}: modify widget UI to have a
          Spectrum 128 style look and feel based on FuseX (Fred).
+20080612 ui/widget/{widget_internals.h,widget.c,options.pl}: allow options
+         dialogs to be navigated by cursor keys (Fred).

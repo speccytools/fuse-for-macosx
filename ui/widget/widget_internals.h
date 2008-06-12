@@ -86,7 +86,7 @@ size_t widget_charwidth( int c );
 void widget_up_arrow( int x, int y, int colour );
 void widget_down_arrow( int x, int y, int colour );
 void widget_draw_submenu_arrow(int x, int y, int colour);
-void widget_print_checkbox( int x, int y, int value );
+void widget_print_checkbox( int x, int y, int colour, int value );
 
 extern widget_finish_state widget_finished;
 

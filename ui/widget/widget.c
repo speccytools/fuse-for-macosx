@@ -390,16 +390,16 @@ widget_draw_submenu_arrow(int x, int y, int colour)
   widget_draw_line_vert(x + 4, y + 2, 2, colour);
 }
 
-void widget_print_checkbox( int x, int y, int value )
+void widget_print_checkbox( int x, int y, int colour, int value )
 {
     static const int CHECK_COLOR=4;
     int z;
 
     y += 2;
     x += 6;
-    widget_rectangle( x, y - 1, 3, 3, WIDGET_COLOUR_BACKGROUND );
+    widget_rectangle( x, y - 1, 3, 3, colour );
     widget_rectangle( x - 5, y, 5, 5, 0 );
-    widget_rectangle( x - 4, y + 1, 3, 3, WIDGET_COLOUR_BACKGROUND );
+    widget_rectangle( x - 4, y + 1, 3, 3, colour );
     if( value ) {	/* checked */
       for( z = -1; z < 3; z++ ) {
         widget_putpixel( x - z, y + z, CHECK_COLOR );
