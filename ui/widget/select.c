@@ -37,20 +37,41 @@ const char **options;
 static size_t count;
 static int *result;
 
-static void print_item (int index, int colour)
+static void print_item (int left_edge, int width, int index, int colour)
 {
   char key[] = "\x0A ";
   key[1] = 'A' + index;
-  widget_printstring_right( 24, index*8+24, colour, key );
-  widget_printstring( 25, index*8+24, colour, ": " );
-  widget_printstring( 25 + widget_stringwidth (": "), index*8+24,
-				   colour, options[index]);
+  left_edge = ( left_edge + 1 ) * 8 + 1;
+  left_edge = widget_printstring( left_edge, index * 8 + 24, colour, key );
+  left_edge = widget_printstring( left_edge + 1, index * 8 + 24, colour, ": " );
+  widget_printstring( left_edge + 1, index * 8 + 24, colour, options[index] );
+}
+
+const int select_vert_external_margin = 8;
+
+static int
+widget_calculate_select_width( const char* title )
+{
+  int i;
+  int max_width = widget_stringwidth( title )+5*8;
+  /* Leave room for the option labels we'll be adding */
+  int label_width = widget_stringwidth( "A: " );
+
+  for( i = 0; i < count; i++ ) {
+    int total_width = label_width + widget_stringwidth( options[i] ) + 3 * 8;
+    if( total_width > max_width )
+      max_width = total_width;
+  }
+
+  return ( max_width + select_vert_external_margin * 2 ) / 8;
 }
 
 int
 widget_select_draw( void *data )
 {
   int i;
+  size_t width;
+  int menu_left_edge_x;
 
   if( data ) {
 
@@ -65,16 +86,19 @@ widget_select_draw( void *data )
 
   }
 
-  /* Blank the main display area */
-  widget_dialog_with_border( 1, 2, 30, count + 2 );
+  width = widget_calculate_select_width( title );
+  menu_left_edge_x = DISPLAY_WIDTH_COLS/2-width/2;
 
-  widget_printstring( 10, 16, WIDGET_COLOUR_TITLE, title );
+  /* Blank the main display area */
+  widget_dialog_with_border( menu_left_edge_x, 2, width, count + 2 );
+
+  widget_printstring( menu_left_edge_x*8+2, 16, WIDGET_COLOUR_TITLE, title );
 
   for( i = 0; i < count; i++ ) {
     if( i == highlight_line ) {
-      widget_rectangle( 1*8+1, i*8+24, 30*8-2, 1*8, WIDGET_COLOUR_HIGHLIGHT );
+      widget_rectangle( menu_left_edge_x*8+1, i*8+24, width*8-2, 1*8, WIDGET_COLOUR_HIGHLIGHT );
     }
-    print_item( i, WIDGET_COLOUR_FOREGROUND );
+    print_item( menu_left_edge_x, width, i, WIDGET_COLOUR_FOREGROUND );
   }
 
   widget_display_lines( 2, count + 2 );
@@ -87,6 +111,9 @@ widget_select_keyhandler( input_key key )
 {
   int new_highlight_line = 0;
   int cursor_pressed = 0;
+  size_t width = widget_calculate_select_width( title );
+  int menu_left_edge_x = DISPLAY_WIDTH_COLS/2-width/2;
+
   switch( key ) {
 
 #if 0
@@ -130,9 +157,10 @@ widget_select_keyhandler( input_key key )
     ) {
     
     /* Remove the old highlight */
-    widget_rectangle( 1*8+1, highlight_line*8+24, 30*8-2, 1*8,
-		      WIDGET_COLOUR_BACKGROUND );
-    print_item( highlight_line, WIDGET_COLOUR_FOREGROUND );
+    widget_rectangle( menu_left_edge_x * 8 + 1, highlight_line * 8 + 24,
+                      width * 8 - 2, 1 * 8, WIDGET_COLOUR_BACKGROUND );
+    print_item( menu_left_edge_x, width, highlight_line,
+                WIDGET_COLOUR_FOREGROUND );
 
     /*  draw the new one */
     if( cursor_pressed ) {
@@ -141,9 +169,9 @@ widget_select_keyhandler( input_key key )
       highlight_line = key - INPUT_KEY_a;
     }
     
-    widget_rectangle( 1*8+1, highlight_line*8+24, 30*8-2, 1*8,
-                      WIDGET_COLOUR_HIGHLIGHT );
-    print_item( highlight_line, WIDGET_COLOUR_FOREGROUND );
+    widget_rectangle( menu_left_edge_x * 8 + 1, highlight_line * 8 + 24,
+                      width * 8 - 2, 1 * 8, WIDGET_COLOUR_HIGHLIGHT );
+    print_item( menu_left_edge_x, width, highlight_line, WIDGET_COLOUR_FOREGROUND );
 
     widget_display_lines( 2, count + 2 );
   }

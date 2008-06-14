@@ -2725,3 +2725,5 @@
 20080614 ui/options.dat: make blocks plural (Fred).
 20080614 ui/widget/options.pl: make a better stab at accounting for entry
          text length (Fred).
+20080614 ui/widget/select.c: make select widgets size themselves a bit
+         better too (Fred).
