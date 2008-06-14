@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # options.pl: generate options dialog boxes
-# Copyright (c) 2001-2004 Philip Kendall
+# Copyright (c) 2001-2008 Philip Kendall, Fredrick Meunier
 
 # $Id$
 
@@ -65,6 +65,7 @@ typedef struct widget_option_entry {
   int index;
   const char *text;
   input_key key;		/* Which key to activate this option */
+  const char *suffix;
 
   widget_option_click_fn click;
   widget_option_draw_fn draw;
@@ -98,10 +99,15 @@ CODE
         my $text = $widget->{text};
         $text =~ s/\((.)\)/\\012$1\\001/;
 
-	if( $widget->{type} eq "Checkbox" or $widget->{type} eq "Entry" ) {
+	if( $widget->{type} eq "Checkbox" ) {
 
 	    print << "CODE";
-  \{ $which, "$text", $widget->{key}, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+  \{ $which, "$text", $widget->{key}, NULL, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+CODE
+        } elsif( $widget->{type} eq "Entry" ) {
+
+	    print << "CODE";
+  \{ $which, "$text", $widget->{key}, "$widget->{data2}", widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
 CODE
 	} else {
 	    die "Unknown type `$widget->{type}'";
@@ -159,7 +165,7 @@ widget_options_print_label( int left_edge, int width, int number, const char *st
   buffer[l] = '\\0';
   w = widget_printstring( left_edge*8+8, number*8+24, WIDGET_COLOUR_FOREGROUND, buffer )
       - 1;
-  while ((w += 3) < (left_edge+width)*8-2)
+  while ((w += 3) < (left_edge+width-1)*8-2)
     widget_putpixel (w, number*8+31, 0);
   return 0;
 }
@@ -168,11 +174,13 @@ int
 widget_options_print_value( int left_edge, int width, int number, int value )
 {
   int colour = WIDGET_COLOUR_BACKGROUND;
+  int x = (left_edge+width-2)*8-2;
+  int y = number * 8 + 24;
 
   if( number == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
-  widget_rectangle( (left_edge+width)*8-8-2, number * 8 + 24, 8, 8, colour );
-  widget_print_checkbox( (left_edge+width)*8-8-2, number * 8 + 24, colour, value );
-  widget_display_rasters( number * 8 + 24, 8 );
+  widget_rectangle( x, y, 8, 8, colour );
+  widget_print_checkbox( x, y, colour, value );
+  widget_display_rasters( y, 8 );
   return 0;
 }
 
@@ -180,14 +188,14 @@ static int
 widget_options_print_data( int left_edge, int menu_width, int number, const char *string )
 {
   int colour = WIDGET_COLOUR_BACKGROUND;
+  size_t width = widget_stringwidth( string );
+  int x = (left_edge + menu_width-1)*8 - width - 2;
+  int y = number * 8 + 24;
 
   if( number == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
-  size_t width = widget_stringwidth( string );
-  widget_rectangle( (left_edge + menu_width)*8 - width - 2, number * 8 + 24, width, 8,
-  		    colour );
-  widget_printstring( (left_edge + menu_width)*8 - width - 2, number * 8 + 24,
-		      WIDGET_COLOUR_FOREGROUND, string );
-  widget_display_rasters( number * 8 + 24, 8 );
+  widget_rectangle( x, y, width, 8, colour );
+  widget_printstring( x, y, WIDGET_COLOUR_FOREGROUND, string );
+  widget_display_rasters( y, 8 );
 
   return 0;
 }
@@ -238,7 +246,11 @@ widget_calculate_option_width(widget_option_entry *menu)
   max_width = widget_stringwidth( menu->text )+5*8;
 
   for( ptr = &menu[1]; ptr->text; ptr++ ) {
-    int total_width = widget_stringwidth(ptr->text)+16;
+    int total_width = widget_stringwidth(ptr->text)+3*8;
+
+    /* If this is a number format, leave room for 4 digits as well as the
+       text */
+    if( ptr->suffix ) total_width += widget_stringwidth(ptr->suffix)+4*8;
 
     if (total_width > max_width)
       max_width = total_width;
@@ -280,11 +292,6 @@ widget_$_->{name}_show_all( settings_info *show )
   widget_option_entry *ptr;
   int menu_width = widget_calculate_option_width( options_$_->{name} );
   int menu_left_edge_x;
-CODE
-
-# Allow space for microdrive block length
-print "  menu_width += widget_stringwidth( '180 block' );" if $_->{name} eq "General";
-    print << "CODE";
 
   menu_left_edge_x = DISPLAY_WIDTH_COLS/2-menu_width/2;
 
