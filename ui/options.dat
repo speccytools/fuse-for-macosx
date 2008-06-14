@@ -11,7 +11,7 @@ Checkbox, (A)uto-load media, auto_load, INPUT_KEY_a
 Checkbox, Use .s(l)t traps, slt_traps, INPUT_KEY_l
 Checkbox, Allow (w)rites to ROM, writable_roms, INPUT_KEY_w
 Checkbox, A(u)to-save settings, autosave_settings, INPUT_KEY_u
-Entry, (M)DR cartridge len, mdr_len, INPUT_KEY_m, 3, block
+Entry, (M)DR cartridge len, mdr_len, INPUT_KEY_m, 3, blocks
 Checkbox, Random len(g)th MDR cartridge, mdr_random_len, INPUT_KEY_g
 Checkbox, RS-232 (h)andshake, rs232_handshake, INPUT_KEY_h
 #ifdef BUILD_WITH_SNET

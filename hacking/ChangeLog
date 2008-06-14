@@ -2722,3 +2722,4 @@
          prototypes (Fred).
 20080614 ui/widget/{options.pl,widget_internals.h}: try to have widget
          options size themselves a little better (Fred).
+20080614 ui/options.dat: make blocks plural (Fred).
