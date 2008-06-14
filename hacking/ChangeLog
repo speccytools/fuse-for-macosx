@@ -2720,3 +2720,5 @@
          dialogs to be navigated by cursor keys (Fred).
 20080613 debugger/{expression.c,variable.c}: add <string.h> for string
          prototypes (Fred).
+20080614 ui/widget/{options.pl,widget_internals.h}: try to have widget
+         options size themselves a little better (Fred).

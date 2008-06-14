@@ -202,12 +202,7 @@ int widget_text_finish( widget_finish_state finished );
 
 extern char *widget_text_text;	/* The returned text */
 
-/* General functions used by options dialogs */
-extern settings_info widget_options_settings;
-int widget_options_print_option( int number, const char* string, int value );
-int widget_options_print_value( int number, int value );
-int widget_options_print_entry( int number, const char *prefix, int value,
-				const char *suffix );
+/* The options widgets */
 int widget_options_finish( widget_finish_state finished );
 
 /* The error widget */
