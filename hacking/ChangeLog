@@ -2734,3 +2734,4 @@
          (patch #1991755) (Gergely Szasz).
 20080614 ui/xlib/xui.c: use XCheckMaskEvent() instead of XCheckIfEvent() with
          an empty test (patch #1991780) (Gergely Szasz).
+20080614 menu_data.dat: ROM shortcut key for TS2068 doesn't work (Fred).
