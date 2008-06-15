@@ -2732,3 +2732,5 @@
 20080614 ui/widget/options.pl: fix widget number entry options (Fred).
 20080614 ui/widget/memory.c: fix the widget memory browse display
          (patch #1991755) (Gergely Szasz).
+20080614 ui/xlib/xui.c: use XCheckMaskEvent() instead of XCheckIfEvent() with
+         an empty test (patch #1991780) (Gergely Szasz).
