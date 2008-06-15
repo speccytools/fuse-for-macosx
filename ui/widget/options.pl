@@ -62,8 +62,8 @@ typedef void (*widget_option_draw_fn)( int left_edge, int width, struct widget_o
 
 /* A general menu */
 typedef struct widget_option_entry {
-  int index;
   const char *text;
+  int index;
   input_key key;		/* Which key to activate this option */
   const char *suffix;
 
@@ -88,9 +88,13 @@ CODE
 
 foreach( @dialogs ) {
 
+  my $title = $_->{title};
+  $title =~ s/\\0[01][12]//g;
+
     print << "CODE";
 
 static widget_option_entry options_$_->{name}\[\] = \{
+  \{ "$_->{title}" \},
 CODE
 
     my $which = 0;
@@ -102,12 +106,12 @@ CODE
 	if( $widget->{type} eq "Checkbox" ) {
 
 	    print << "CODE";
-  \{ $which, "$text", $widget->{key}, NULL, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+  \{ "$text", $which, $widget->{key}, NULL, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
 CODE
         } elsif( $widget->{type} eq "Entry" ) {
 
 	    print << "CODE";
-  \{ $which, "$text", $widget->{key}, "$widget->{data2}", widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+  \{ "$text", $which, $widget->{key}, "$widget->{data2}", widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
 CODE
 	} else {
 	    die "Unknown type `$widget->{type}'";
@@ -117,7 +121,7 @@ CODE
     }
 
     print << "CODE";
-  \{ -1 \}
+  \{ NULL \}
 \};
 CODE
 
@@ -136,6 +140,35 @@ int widget_options_print_entry( int left_edge, int width, int number, const char
 
 static int widget_options_print_label( int left_edge, int width, int number, const char *string );
 static int widget_options_print_data( int left_edge, int menu_width, int number, const char *string );
+static int widget_calculate_option_width(widget_option_entry *menu);
+
+static int
+widget_options_show_all( widget_option_entry *options, settings_info *show )
+\{
+  widget_option_entry *ptr;
+  size_t height = 0;
+  int menu_width = widget_calculate_option_width( options );
+  int menu_left_edge_x;
+
+  /* How many options do we have? */
+  for( ptr = &options[1]; ptr->text; ptr++ )
+    height ++;
+
+  menu_left_edge_x = DISPLAY_WIDTH_COLS/2-menu_width/2;
+
+  /* Draw the dialog box */
+  widget_dialog_with_border( menu_left_edge_x, 2, menu_width, 2 + height );
+
+  widget_printstring( menu_left_edge_x*8+2, 16, WIDGET_COLOUR_TITLE, options->text );
+
+  for( ptr = &options[1]; ptr->text; ptr++ ) {
+    ptr->draw( menu_left_edge_x, menu_width, ptr, show );
+  }
+
+  widget_display_lines( 2, 2 + height );
+
+  return 0;
+\}
 
 int
 widget_options_print_option( int left_edge, int width, int number, const char* string, int value )
@@ -233,7 +266,7 @@ widget_options_finish( widget_finish_state finished )
 
 const int options_vert_external_margin = 8;
 
-int
+static int
 widget_calculate_option_width(widget_option_entry *menu)
 {
   widget_option_entry *ptr;
@@ -266,7 +299,6 @@ foreach( @dialogs ) {
     my $count = @{ $_->{widgets} };
 
     print << "CODE";
-static int widget_$_->{name}_show_all( settings_info *show );
 
 int
 widget_$_->{name}_draw( void *data GCC_UNUSED )
@@ -278,40 +310,11 @@ widget_$_->{name}_draw( void *data GCC_UNUSED )
   error = settings_copy( &widget_options_settings, &settings_current );
   if( error ) { settings_free( &widget_options_settings ); return error; }
 
-  error = widget_$_->{name}_show_all( &widget_options_settings );
+  error = widget_options_show_all( options_$_->{name}, &widget_options_settings );
   if( error ) { settings_free( &widget_options_settings ); return error; }
-
-  widget_display_lines( 2, 2 + $count );
 
   return 0;
 }
-
-static int
-widget_$_->{name}_show_all( settings_info *show )
-\{
-  widget_option_entry *ptr;
-  int menu_width = widget_calculate_option_width( options_$_->{name} );
-  int menu_left_edge_x;
-
-  menu_left_edge_x = DISPLAY_WIDTH_COLS/2-menu_width/2;
-
-  /* Draw the dialog box */
-  widget_dialog_with_border( menu_left_edge_x, 2, menu_width, 2 + $count );
-
-CODE
-
-  my $title = $_->{title};
-  $title =~ s/\\0[01][12]//g;
-
-    print << "CODE";
-  widget_printstring( menu_left_edge_x*8+2, 16, WIDGET_COLOUR_TITLE, \"$title\" );
-
-  for( ptr=&options_$_->{name}\[0\]; ptr->index != -1; ptr++ ) \{
-    ptr->draw( menu_left_edge_x, menu_width, ptr, show );
-  \}
-
-  return 0;
-\}
 
 CODE
 
@@ -370,8 +373,8 @@ CODE
 static void
 widget_option_$widget->{value}_draw( int left_edge, int width, struct widget_option_entry *menu, settings_info *show )
 \{
-  widget_options_print_entry( left_edge, width, menu->index, "$widget->{text}", show->$widget->{value},
-                              "$widget->{data2}" );
+  widget_options_print_entry( left_edge, width, menu->index, menu->text, show->$widget->{value},
+                              menu->suffix );
 \}
 
 CODE
@@ -426,8 +429,8 @@ widget_$_->{name}_keyhandler( input_key key )
 
   case INPUT_KEY_space:
   case INPUT_KEY_0:
-    options_$_->{name}\[highlight_line\].click();
-    options_$_->{name}\[highlight_line\].draw( menu_left_edge_x, menu_width, options_$_->{name} + highlight_line, &widget_options_settings );
+    options_$_->{name}\[highlight_line+1\].click();
+    options_$_->{name}\[highlight_line+1\].draw( menu_left_edge_x, menu_width, options_$_->{name} + highlight_line + 1, &widget_options_settings );
     return;
     break;
 
@@ -448,17 +451,17 @@ CODE
   if( cursor_pressed ) \{
     int old_highlight_line = highlight_line;
     highlight_line = new_highlight_line;
-    options_$_->{name}\[old_highlight_line\].draw( menu_left_edge_x, menu_width, options_$_->{name} + old_highlight_line, &widget_options_settings );
-    options_$_->{name}\[highlight_line\].draw( menu_left_edge_x, menu_width, options_$_->{name} + highlight_line, &widget_options_settings );
+    options_$_->{name}\[old_highlight_line+1\].draw( menu_left_edge_x, menu_width, options_$_->{name} + old_highlight_line + 1, &widget_options_settings );
+    options_$_->{name}\[highlight_line+1\].draw( menu_left_edge_x, menu_width, options_$_->{name} + highlight_line + 1, &widget_options_settings );
     return;
   \}
 
-  for( ptr=&options_$_->{name}\[0\]; ptr->index != -1; ptr++ ) \{
+  for( ptr=&options_$_->{name}\[1\]; ptr->text != NULL; ptr++ ) \{
     if( key == ptr->key ) \{
       int old_highlight_line = highlight_line;
       ptr->click();
       highlight_line = ptr->index;
-      options_$_->{name}\[old_highlight_line\].draw( menu_left_edge_x, menu_width, options_$_->{name} + old_highlight_line, &widget_options_settings );
+      options_$_->{name}\[old_highlight_line+1\].draw( menu_left_edge_x, menu_width, options_$_->{name} + old_highlight_line + 1, &widget_options_settings );
       ptr->draw( menu_left_edge_x, menu_width, ptr, &widget_options_settings );
       break;
     \}

@@ -2727,3 +2727,5 @@
          text length (Fred).
 20080614 ui/widget/select.c: make select widgets size themselves a bit
          better too (Fred).
+20080614 ui/widget/options.pl: move to a single generic options menu draw
+         function (Fred).
