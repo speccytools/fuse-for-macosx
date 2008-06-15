@@ -348,6 +348,10 @@ widget_$widget->{value}_click( void )
   snprintf( text_data.text, 40, "%d",
             widget_options_settings.$widget->{value} );
   error = widget_do( WIDGET_TYPE_TEXT, &text_data );
+
+  if( widget_text_text ) \{
+    widget_options_settings.$widget->{value} = atoi( widget_text_text );
+  \}
 \}
 
 CODE
