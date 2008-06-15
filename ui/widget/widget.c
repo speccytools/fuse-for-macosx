@@ -201,8 +201,11 @@ widget_printstring( int x, int y, int col, const char *s )
 
   while( x < 256 + DISPLAY_BORDER_ASPECT_WIDTH
 	 && ( c = *(libspectrum_byte *)s++ ) != 0 ) {
-    if( c && c < 17 ) { col = c - 1; continue; }
-    if( c < 26 ) { shadow = c - 17; continue; }
+    if( col == WIDGET_COLOUR_DISABLED && c < 26 ) continue;
+    if( col != WIDGET_COLOUR_DISABLED ) {
+      if( c && c < 17 ) { col = c - 1; continue; }
+      if( c < 26 ) { shadow = c - 17; continue; }
+    }
 
     if( shadow && col ) {
       printchar( x - 1, y,     shadow - 1, c );

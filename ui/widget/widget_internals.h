@@ -36,7 +36,7 @@
 #include "widget.h"
 
 /* The default colours used in the widget */
-#define WIDGET_COLOUR_DISABLED   1	/* Blue */
+#define WIDGET_COLOUR_DISABLED   7	/* White */
 #define WIDGET_COLOUR_BACKGROUND 15	/* Bright White */
 #define WIDGET_COLOUR_FOREGROUND 0	/* Black */
 #define WIDGET_COLOUR_HIGHLIGHT  13	/* Cyan */
