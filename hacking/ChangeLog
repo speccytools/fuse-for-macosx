@@ -2730,3 +2730,5 @@
 20080614 ui/widget/options.pl: move to a single generic options menu draw
          function (Fred).
 20080614 ui/widget/options.pl: fix widget number entry options (Fred).
+20080614 ui/widget/memory.c: fix the widget memory browse display
+         (patch #1991755) (Gergely Szasz).

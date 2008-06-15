@@ -50,12 +50,12 @@ widget_memory_draw( void *data )
   widget_rectangle( LC(0), LR(16) + 2, 320, 1, 7 );
 
   for( y = 0; y < 16; ++y ) {
-    libspectrum_word addr = memaddr + y * 7;
+    libspectrum_word addr = memaddr + y * 8;
 
-    sprintf( pbuf, "%04X:", memaddr );
+    sprintf( pbuf, "%04X:", addr );
     widget_printstring_right( LC(5) - 4, LR(y), 5, pbuf );
 
-    for( x = 0; x < 7; ++x ) {
+    for( x = 0; x < 8; ++x ) {
       libspectrum_byte b = readbyte_internal( addr + x );
 
       widget_printchar_fixed( LC(x + 29) / 8, LR(y) / 8, 7 - (y & 1), b );
