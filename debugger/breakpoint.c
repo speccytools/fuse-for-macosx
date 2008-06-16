@@ -225,7 +225,7 @@ breakpoint_add( debugger_breakpoint_type type, debugger_breakpoint_value value,
   if( type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
     int error;
 
-    error = event_add( value.time.tstates, EVENT_TYPE_BREAKPOINT );
+    error = event_add( value.time.tstates, debugger_breakpoint_event );
     if( error ) return error;
   }
 
@@ -481,9 +481,9 @@ remove_time( gpointer data, gpointer user_data )
 
   if( remove->done ) return;
 
-  if( event->type == EVENT_TYPE_BREAKPOINT &&
+  if( event->type == debugger_breakpoint_event &&
       event->tstates == remove->tstates ) {
-    event->type = EVENT_TYPE_NULL;
+    event->type = event_type_null;
     remove->done = 1;
   }
 }
@@ -640,6 +640,13 @@ add_time_event( gpointer data, gpointer user_data GCC_UNUSED )
 
   if( bp->type == DEBUGGER_BREAKPOINT_TYPE_TIME ) {
     bp->value.time.triggered = 0;
-    event_add( bp->value.time.tstates, EVENT_TYPE_BREAKPOINT );
+    event_add( bp->value.time.tstates, debugger_breakpoint_event );
   }
+}
+
+void
+debugger_breakpoint_time_fn( libspectrum_dword tstates, int type GCC_UNUSED,
+                             void *user_data GCC_UNUSED )
+{
+  debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );
 }

@@ -142,6 +142,8 @@ typedef struct wd_fdc {
 
 } wd_fdc;
 
+int wd_fdc_init_events( void );
+
 /* allocate an fdc */
 wd_fdc *wd_fdc_alloc_fdc( wd_type_t type, int hlt_time, unsigned int flags );
 void wd_fdc_master_reset( wd_fdc *f );
@@ -163,7 +165,5 @@ void wd_fdc_reset_intrq( wd_fdc *f );
 void wd_fdc_set_datarq( wd_fdc *f );
 void wd_fdc_reset_datarq( wd_fdc *f );
 void wd_fdc_set_hlt( wd_fdc *f, int hlt );
-
-int wd_fdc_event( libspectrum_dword last_tstates, event_type event, void *user_data );
 
 #endif                  /* #ifndef FUSE_WD_FDC_H */

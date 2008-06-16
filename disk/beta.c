@@ -60,6 +60,8 @@ int beta_builtin = 0;
 
 static int beta_index_pulse = 0;
 
+static int index_event;
+
 #define BETA_NUM_DRIVES 4
 
 static wd_fdc *beta_fdc;
@@ -81,6 +83,8 @@ static void beta_memory_map( void );
 static void beta_enabled_snapshot( libspectrum_snap *snap );
 static void beta_from_snapshot( libspectrum_snap *snap );
 static void beta_to_snapshot( libspectrum_snap *snap );
+static void beta_event_index( libspectrum_dword last_tstates, int type,
+			      void *user_data );
 
 static module_info_t beta_module_info = {
 
@@ -150,6 +154,9 @@ beta_init( void )
   beta_fdc->set_datarq = NULL;
   beta_fdc->reset_datarq = NULL;
 
+  index_event = event_register( beta_event_index, "Beta disk index" );
+  if( index_event == -1 ) return 1;
+
   module_register( &beta_module_info );
 
   return 0;
@@ -161,7 +168,7 @@ beta_reset( int hard_reset GCC_UNUSED )
   int i;
   wd_fdc_drive *d;
 
-  event_remove_type( EVENT_TYPE_BETA_INDEX );
+  event_remove_type( index_event );
 
   if( !periph_beta128_active ) {
     beta_active = 0;
@@ -214,7 +221,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 
   beta_select_drive( 0 );
   machine_current->memory_map();
-  beta_event_index( 0 );
+  beta_event_index( 0, 0, NULL );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
@@ -527,8 +534,8 @@ beta_disk_write( beta_drive_number which, const char *filename )
   return 0;
 }
 
-int
-beta_event_index( libspectrum_dword last_tstates )
+static void
+beta_event_index( libspectrum_dword last_tstates, int type, void *user_data )
 {
   int error;
   int next_tstates;
@@ -548,10 +555,8 @@ beta_event_index( libspectrum_dword last_tstates )
   }
   next_tstates = ( beta_index_pulse ? 10 : 190 ) *
     machine_current->timings.processor_speed / 1000;
-  error = event_add( last_tstates + next_tstates, EVENT_TYPE_BETA_INDEX );
-  if( error )
-    return error;
-  return 0;
+  error = event_add( last_tstates + next_tstates, index_event );
+  if( error ) return;
 }
 
 static void

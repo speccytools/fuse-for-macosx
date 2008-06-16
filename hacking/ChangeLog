@@ -2737,3 +2737,10 @@
 20080614 menu_data.dat: ROM shortcut key for TS2068 doesn't work (Fred).
 20080614 ui/widget/{widget_internals.h,widget.c}: fix disabled widget menu
          entries (thanks, Phil) (Fred).
+20080616 debugger/{breakpoint.c,debugger.c,debugger_internals.h},
+         disk/{beta.[ch],fdd.[ch],plusd.[ch],upd_fdc.[ch],wd_fdc.[ch]},
+         event.[ch],fuse.c,loader.c,machine.c,menu.c,periph.c,profile.c,
+         rzx.[ch],spectrum.[ch],tape.[ch],timer/timer.[ch],ui/gtk/debugger.c,
+         z80/{coretest.c,z80.[ch],z80.pl,z80_ops.c}: refactor the event
+         architecture so that modules register their own events with the
+         event system (patch #1991683).

@@ -47,6 +47,7 @@
 #include "dck.h"
 #include "debugger/debugger.h"
 #include "disk/beta.h"
+#include "disk/fdd.h"
 #include "display.h"
 #include "divide.h"
 #include "event.h"
@@ -257,11 +258,13 @@ static int fuse_init(int argc, char **argv)
 
   if( debugger_init() ) return 1;
 
+  if( spectrum_init() ) return 1;
   if( printer_init() ) return 1;
   if( rzx_init() ) return 1;
   if( psg_init() ) return 1;
   if( beta_init() ) return 1;
   if( plusd_init() ) return 1;
+  if( fdd_init_events() ) return 1;
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
@@ -277,7 +280,7 @@ static int fuse_init(int argc, char **argv)
 
   error = pokefinder_clear(); if( error ) return error;
 
-  z80_init();
+  if( z80_init() ) return 1;
 
   if( timer_init() ) return 1;
 

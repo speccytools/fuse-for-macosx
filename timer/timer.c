@@ -56,6 +56,11 @@ static timer_type start_time;
 
 static const int TEN_MS = 10;
 
+int timer_event;
+
+static void timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
+			 void *user_data GCC_UNUSED );
+
 int
 timer_estimate_speed( void )
 {
@@ -112,7 +117,10 @@ timer_init( void )
 {
   int error = timer_get_real_time( &start_time ); if( error ) return error;
 
-  error = event_add( 0, EVENT_TYPE_TIMER );
+  timer_event = event_register( timer_frame, "Timer" );
+  if( timer_event == -1 ) return 1;
+
+  error = event_add( 0, timer_event );
   if( error ) return error;
 
   return 0;
@@ -121,7 +129,7 @@ timer_init( void )
 int
 timer_end( void )
 {
-  return event_remove_type( EVENT_TYPE_TIMER );
+  return event_remove_type( timer_event );
 }
 
 #ifdef SOUND_FIFO
@@ -146,7 +154,7 @@ timer_frame_callback_sound( libspectrum_dword last_tstates )
   }
 
   if( event_add( last_tstates + machine_current->timings.tstates_per_frame,
-                 EVENT_TYPE_TIMER ) )
+                 timer_event ) )
     return 1;
 
   return 0;
@@ -159,7 +167,7 @@ static int
 timer_frame_callback_sound( libspectrum_dword last_tstates )
 {
   if( event_add( last_tstates + machine_current->timings.tstates_per_frame,
-                 EVENT_TYPE_TIMER ) )
+                 timer_event ) )
     return 1;
 
   return 0;
@@ -167,8 +175,9 @@ timer_frame_callback_sound( libspectrum_dword last_tstates )
   
 #endif                          /* #ifdef SOUND_FIFO */
 
-int
-timer_frame( libspectrum_dword last_tstates )
+static void
+timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
+	     void *user_data GCC_UNUSED )
 {
   int error;
   timer_type current_time;
@@ -178,8 +187,10 @@ timer_frame( libspectrum_dword last_tstates )
 		  settings_current.emulation_speed ) / 100.0;
   long tstates;
 
-  if( sound_enabled )
-    return timer_frame_callback_sound( last_tstates );
+  if( sound_enabled ) {
+    timer_frame_callback_sound( last_tstates );
+    return;
+  }
 
   /* If we're fastloading, just schedule another check in a frame's time
      and do nothing else */
@@ -188,14 +199,13 @@ timer_frame( libspectrum_dword last_tstates )
     libspectrum_dword next_check_time =
       last_tstates + machine_current->timings.tstates_per_frame;
 
-    if( event_add( next_check_time, EVENT_TYPE_TIMER ) )
-      return 1;
+    if( event_add( next_check_time, timer_event ) ) return;
 
   } else {
 
     while( 1 ) {
 
-      error = timer_get_real_time( &current_time ); if( error ) return 1;
+      error = timer_get_real_time( &current_time ); if( error ) return;
       
       difference = timer_get_time_difference( &current_time, &start_time );
 
@@ -208,7 +218,7 @@ timer_frame( libspectrum_dword last_tstates )
 
     }
 
-    error = timer_get_real_time( &current_time ); if( error ) return 1;
+    error = timer_get_real_time( &current_time ); if( error ) return;
     
     difference = timer_get_time_difference( &current_time, &start_time );
   
@@ -216,12 +226,10 @@ timer_frame( libspectrum_dword last_tstates )
 		machine_current->timings.processor_speed
 		) * speed + 0.5;
   
-    if( event_add( last_tstates + tstates, EVENT_TYPE_TIMER ) ) return 1;
+    if( event_add( last_tstates + tstates, timer_event ) ) return;
 
     start_time = current_time;
     timer_add_time_difference( &start_time, TEN_MS );
 
   }
-
-  return 0;
 }

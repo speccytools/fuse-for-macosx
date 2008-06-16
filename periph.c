@@ -210,7 +210,7 @@ readport_internal( libspectrum_word port )
 
       /* Add a null event to mean we pick up the RZX state change in
 	 z80_do_opcodes() */
-      event_add( tstates, EVENT_TYPE_NULL );
+      event_add( tstates, event_type_null );
       return readport_internal( port );
     }
 

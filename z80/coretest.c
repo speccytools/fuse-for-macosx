@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "event.h"
 #include "module.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -438,6 +439,14 @@ beta_unpage( void )
   abort();
 }
 
+int spectrum_frame_event = 0;
+
+int
+event_register( event_fn_t fn GCC_UNUSED, const char *string GCC_UNUSED )
+{
+  abort();
+}
+
 int plusd_available = 0;
 int plusd_active = 0;
 
@@ -461,6 +470,12 @@ if1_unpage( void )
 
 void
 divide_set_automap( int state GCC_UNUSED )
+{
+  abort();
+}
+
+int
+rzx_frame( void )
 {
   abort();
 }

@@ -168,6 +168,8 @@ typedef struct upd_fdc {
 
 } upd_fdc;
 
+int upd_fdc_init_events( void );
+
 /* allocate an fdc */
 upd_fdc *upd_fdc_alloc_fdc( upd_type_t type, upd_clock_t clock );
 void upd_fdc_master_reset( upd_fdc *f );
@@ -176,7 +178,5 @@ libspectrum_byte upd_fdc_read_status( upd_fdc *f );
 
 libspectrum_byte upd_fdc_read_data( upd_fdc *f );
 void upd_fdc_write_data( upd_fdc *f, libspectrum_byte b );
-
-int upd_fdc_event( libspectrum_dword last_tstates, event_type event, void *user_data );
 
 #endif                  /* #ifndef FUSE_UPD_FDC_H */

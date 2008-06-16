@@ -29,6 +29,8 @@
 
 #include "bitmap.h"
 #include "compat.h"
+#include "disk/upd_fdc.h"
+#include "disk/wd_fdc.h"
 #include "event.h"
 #include "fdd.h"
 #include "machine.h"
@@ -45,6 +47,28 @@ static const char *fdd_error[] = {
 
   "unknown error code"			/* will be the last */
 };
+
+static void
+fdd_event( libspectrum_dword last_tstates, int event, void *user_data );
+
+static int motor_event;
+
+int
+fdd_init_events( void )
+{
+  int error;
+
+  motor_event = event_register( fdd_event, "FDD motor on" );
+  if( motor_event == -1 ) return 1;
+
+  error = upd_fdc_init_events();
+  if( error ) return error;
+
+  error = wd_fdc_init_events();
+  if( error ) return error;
+
+  return 0;
+}
 
 const char *
 fdd_strerror( int error )
@@ -135,15 +159,15 @@ fdd_motoron( fdd_t *d, int on )
     Note: Pre-ready is the state that at least one INDEX
 	pulse has been detected after item iii) is satisfied
   */
-  event_remove_type( EVENT_TYPE_FDD_MOTOR );		/* remove pending motor-on event */
+  event_remove_type( motor_event );		/* remove pending motor-on event */
   if( on ) {
     event_add_with_data( tstates + 4 *			/* 2 revolution: 2 * 200 / 1000 */
 			 machine_current->timings.processor_speed / 10,
-			 EVENT_TYPE_FDD_MOTOR, d );
+			 motor_event, d );
   } else {
     event_add_with_data( tstates + 2 *			/* 1 revolution */
 			 machine_current->timings.processor_speed / 10,
-			 EVENT_TYPE_FDD_MOTOR, d );
+			 motor_event, d );
   }
 }
 
@@ -308,11 +332,10 @@ fdd_wait_index_hole( fdd_t *d )
   d->index = 1;
 }
 
-int
-fdd_event( libspectrum_dword last_tstates GCC_UNUSED, event_type event,
-	      void *user_data ) 
+static void
+fdd_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
+           void *user_data ) 
 {
   fdd_t *d = user_data;
   d->ready = ( d->motoron & d->loaded );	/* 0x01 & 0x01 */
-  return 0;
 }

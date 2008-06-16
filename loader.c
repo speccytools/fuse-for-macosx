@@ -85,8 +85,8 @@ do_acceleration( void )
     z80.pc.b.l = readbyte_internal( z80.sp.w++ );
     z80.pc.b.h = readbyte_internal( z80.sp.w++ );
 
-    event_remove_type( EVENT_TYPE_EDGE );
-    tape_next_edge( tstates );
+    event_remove_type( tape_edge_event );
+    tape_next_edge( tstates, 0, NULL );
 
     successive_reads = 0;
   }

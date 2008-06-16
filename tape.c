@@ -74,6 +74,10 @@ static const char *play_event_detail_string = "play",
   *stop_event_detail_string = "stop";
 static int play_event, stop_event = -1;
 
+/* Spectrum events */
+int tape_edge_event;
+static int record_event;
+
 /* Function prototypes */
 
 static int tape_autoload( libspectrum_machine hardware );
@@ -81,6 +85,9 @@ static int trap_load_block( libspectrum_tape_block *block );
 static int tape_play( int autoplay );
 static int trap_check_rom( void );
 static void make_name( unsigned char *name, const unsigned char *data );
+static void
+tape_event_record_sample( libspectrum_dword last_tstates, int type,
+			  void *user_data );
 
 /* Function definitions */
 
@@ -96,6 +103,13 @@ int tape_init( void )
   stop_event = debugger_event_register( event_type_string,
 					stop_event_detail_string );
   if( play_event == -1 || stop_event == -1 ) return 1;
+
+  tape_edge_event = event_register( tape_next_edge, "Tape edge" );
+  if( tape_edge_event == -1 ) return 1;
+
+  record_event = event_register( tape_event_record_sample,
+				 "Tape sample record" );
+  if( record_event == -1 ) return 1;
 
   tape_modified = 0;
 
@@ -601,8 +615,6 @@ tape_play( int autoplay )
 {
   libspectrum_tape_block* block;
 
-  int error;
-
   if( !libspectrum_tape_present( tape ) ) return 1;
   
   block = libspectrum_tape_current_block( tape );
@@ -624,7 +636,7 @@ tape_play( int autoplay )
 
   loader_tape_play();
 
-  error = tape_next_edge( tstates ); if( error ) return error;
+  tape_next_edge( tstates, 0, NULL );
 
   debugger_event( play_event );
 
@@ -665,7 +677,7 @@ int tape_stop( void )
       timer_estimate_reset();
     }
 
-    event_remove_type( EVENT_TYPE_EDGE );
+    event_remove_type( tape_edge_event );
   }
 
   if( stop_event != -1 ) debugger_event( stop_event );
@@ -709,7 +721,7 @@ tape_record_start( void )
   /* start scheduling events that record into a buffer that we
      start allocating here */
   error = event_add( tstates + rec_state.tstates_per_sample,
-                     EVENT_TYPE_TAPE_RECORD );
+                     record_event );
   if( error ) return error;
 
   rec_state.last_level = ula_tape_level();
@@ -742,7 +754,8 @@ write_rec_buffer( libspectrum_byte *tape_buffer,
 }
 
 void
-tape_event_record_sample( libspectrum_dword last_tstates )
+tape_event_record_sample( libspectrum_dword last_tstates, int type,
+			  void *user_data )
 {
   int error;
 
@@ -767,7 +780,7 @@ tape_event_record_sample( libspectrum_dword last_tstates )
 
   /* schedule next timer */
   error = event_add( last_tstates + rec_state.tstates_per_sample,
-                     EVENT_TYPE_TAPE_RECORD );
+                     record_event );
   if( error ) {
     ui_error( UI_ERROR_ERROR,
               "tape_event_record_sample: error scheduling next event" );
@@ -787,7 +800,7 @@ tape_record_stop( void )
 
   /* stop scheduling events and turn buffer into a block and
      pop into the current tape */
-  error = event_remove_type( EVENT_TYPE_TAPE_RECORD );
+  error = event_remove_type( record_event );
   if( error ) return error;
 
   error = libspectrum_tape_block_alloc( &block,
@@ -821,22 +834,22 @@ tape_record_stop( void )
   return 0;
 }
 
-int
-tape_next_edge( libspectrum_dword last_tstates )
+void
+tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
 {
-  int error; libspectrum_error libspec_error;
+  libspectrum_error libspec_error;
   libspectrum_tape_block *block;
 
   libspectrum_dword edge_tstates;
   int flags;
 
   /* If the tape's not playing, just return */
-  if( ! tape_playing ) return 0;
+  if( ! tape_playing ) return;
 
   /* Get the time until the next edge */
   libspec_error = libspectrum_tape_get_next_edge( &edge_tstates, &flags,
 						  tape );
-  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;
+  if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return;
 
   /* Invert the microphone state */
   if( edge_tstates || ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ) {
@@ -867,8 +880,8 @@ tape_next_edge( libspectrum_dword last_tstates )
       )
     )
   {
-    error = tape_stop(); if( error ) return error;
-    return 0;
+    tape_stop();
+    return;
   }
 
   /* If that was the end of a block, update the browser */
@@ -883,8 +896,8 @@ tape_next_edge( libspectrum_dword last_tstates )
     if( tape_autoplay && settings_current.tape_traps &&
 	libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
       ) {
-      error = tape_stop(); if( error ) return error;
-      return 0;
+      tape_stop();
+      return;
     }
   }
 
@@ -892,13 +905,10 @@ tape_next_edge( libspectrum_dword last_tstates )
      should occur 'edge_tstates' after the last edge, not after the
      current time (these will be slightly different as we only process
      events between instructions). */
-  error = event_add( last_tstates + edge_tstates, EVENT_TYPE_EDGE );
-  if( error ) return error;
+  if( event_add( last_tstates + edge_tstates, tape_edge_event ) ) return;
 
   /* Store length flags for acceleration purposes */
   loader_set_acceleration_flags( flags );
-
-  return 0;
 }
 
 /* Call a user-supplied function for every block in the current tape */

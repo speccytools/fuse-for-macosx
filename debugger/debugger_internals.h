@@ -31,6 +31,11 @@
 /* Memory pool used by the lexer and parser */
 extern int debugger_memory_pool;
 
+/* The event type used to trigger time breakpoints */
+extern int debugger_breakpoint_event;
+
+void debugger_breakpoint_time_fn( libspectrum_dword tstates, int type, void *user_data );
+
 int debugger_breakpoint_remove( size_t id );
 int debugger_breakpoint_remove_all( void );
 int debugger_breakpoint_clear( libspectrum_word address );

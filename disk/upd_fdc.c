@@ -92,6 +92,26 @@ static upd_cmd_t cmd[] = {/*    mask  value  cmd / res length */
   { UPD_CMD_INVALID,		0x00, 0x00, 0x00, 0x01 },
 };
 
+static int fdc_event, head_event, timeout_event;
+
+static void
+upd_fdc_event( libspectrum_dword last_tstates, int event, void *user_data );
+
+int
+upd_fdc_init_events( void )
+{
+  fdc_event = event_register( upd_fdc_event, "UPD FDC event" );
+  if( fdc_event == -1 ) return 1;
+
+  head_event = event_register( upd_fdc_event, "UPD FDC head (un)load" );
+  if( fdc_event == -1 ) return 1;
+
+  timeout_event = event_register( upd_fdc_event, "UPD FDC timeout" );
+  if( timeout_event == -1 ) return 1;
+
+  return 0;
+}
+
 static void
 cmd_identify( upd_fdc *f )
 {
@@ -391,11 +411,11 @@ cmd_result( upd_fdc *f )
     f->main_status &= ~UPD_FDC_MAIN_DATADIR;
     f->main_status &= ~UPD_FDC_MAIN_BUSY;
   }
-  event_remove_type( EVENT_TYPE_UPD_FDC_TIMEOUT );		/* remove timeouts... */
+  event_remove_type( timeout_event );		/* remove timeouts... */
   if( f->head_load && f->cmd->id <= UPD_CMD_READ_ID ) {
     event_add_with_data( tstates + f->hut_time * 
 			 machine_current->timings.processor_speed / 1000,
-			 EVENT_TYPE_UPD_FDC_HEAD, f );
+			 head_event, f );
   }
 }
 
@@ -442,7 +462,7 @@ seek_step( upd_fdc *f )
   if( f->main_status & 0x0f ) {		/* there is at least one active seek */
     event_add_with_data( tstates + f->stp_rate * 
 			 machine_current->timings.processor_speed / 1000,
-			 EVENT_TYPE_UPD_FDC, f );
+			 fdc_event, f );
   }
   return;
 }
@@ -466,7 +486,7 @@ start_read_id( upd_fdc *f )
     if( i > 0 ) {
       event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			 machine_current->timings.processor_speed / 1000,
-			 EVENT_TYPE_UPD_FDC, f );
+			 fdc_event, f );
       return;
     }
   }
@@ -504,7 +524,7 @@ start_read_diag( upd_fdc *f )
     if( i > 0 ) {
       event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			 machine_current->timings.processor_speed / 1000,
-			 EVENT_TYPE_UPD_FDC, f );
+			 fdc_event, f );
       return;
     }
   }
@@ -532,10 +552,10 @@ start_read_diag( upd_fdc *f )
 
   f->main_status |= UPD_FDC_MAIN_DATAREQ | UPD_FDC_MAIN_DATA_READ;
   f->data_offset = 0;
-  event_remove_type( EVENT_TYPE_UPD_FDC_TIMEOUT );
+  event_remove_type( timeout_event );
   event_add_with_data( tstates + 4 *			/* 2 revolution: 2 * 200 / 1000  */
 		       machine_current->timings.processor_speed / 10,
-		       EVENT_TYPE_UPD_FDC_TIMEOUT, f );
+		       timeout_event, f );
   return;
 
 abort_read_diag:
@@ -574,7 +594,7 @@ multi_track_next:
       if( i > 0 ) {
         event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			     machine_current->timings.processor_speed / 1000,
-			     EVENT_TYPE_UPD_FDC, f );
+			     fdc_event, f );
         return;
       }
     }
@@ -632,10 +652,10 @@ abort_read_data:
   if( f->cmd->id != UPD_CMD_SCAN )
     f->main_status |= UPD_FDC_MAIN_DATA_READ;
   f->data_offset = 0;
-  event_remove_type( EVENT_TYPE_UPD_FDC_TIMEOUT );
+  event_remove_type( timeout_event );
   event_add_with_data( tstates + 4 *			/* 2 revolution: 2 * 200 / 1000  */
 		       machine_current->timings.processor_speed / 10,
-		       EVENT_TYPE_UPD_FDC_TIMEOUT, f );
+		       timeout_event, f );
 }
 
 static void
@@ -667,7 +687,7 @@ multi_track_next:
       if( i > 0 ) {
         event_add_with_data( tstates + i *		/* i * 1/20 revolution */
 			     machine_current->timings.processor_speed / 1000,
-			     EVENT_TYPE_UPD_FDC, f );
+			     fdc_event, f );
         return;
       }
     }
@@ -722,10 +742,10 @@ abort_write_data:
   }
   f->main_status |= UPD_FDC_MAIN_DATAREQ | UPD_FDC_MAIN_DATA_WRITE;
   f->data_offset = 0;
-  event_remove_type( EVENT_TYPE_UPD_FDC_TIMEOUT );
+  event_remove_type( timeout_event );
   event_add_with_data( tstates + 4 *			/* 2 revolution: 2 * 200 / 1000 */
 		       machine_current->timings.processor_speed / 10,
-		       EVENT_TYPE_UPD_FDC_TIMEOUT, f );
+		       timeout_event, f );
 }
 
 static void
@@ -764,13 +784,13 @@ start_write_id( upd_fdc *f )
   f->data_offset = 0;
   event_add_with_data( tstates + 2 *			/* 1/10 revolution: 1 * 200 / 1000 */
 		       machine_current->timings.processor_speed / 100,
-		       EVENT_TYPE_UPD_FDC_TIMEOUT, f );
+		       timeout_event, f );
 }
 
 static void
 head_load( upd_fdc *f )
 {
-  event_remove_type( EVENT_TYPE_UPD_FDC_HEAD );
+  event_remove_type( head_event );
   if( f->head_load ) {		/* head already loaded */
     if( f->cmd->id == UPD_CMD_READ_DATA || f->cmd->id == UPD_CMD_SCAN )
       start_read_data( f );
@@ -790,27 +810,27 @@ head_load( upd_fdc *f )
     f->head_load = 1;
     event_add_with_data( tstates + f->hld_time * 
 			 machine_current->timings.processor_speed / 1000,
-			 EVENT_TYPE_UPD_FDC, f );
+			 fdc_event, f );
   }
 }
 
-int
-upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, event_type event,
-	      void *user_data ) 
+static void
+upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
+	       void *user_data ) 
 {
   upd_fdc *f = user_data;
 
-  if( event == EVENT_TYPE_UPD_FDC_TIMEOUT ) {
+  if( event == timeout_event ) {
     f->status_register[0] |= UPD_FDC_ST0_INT_ABNORM;
     f->status_register[1] |= UPD_FDC_ST1_OVERRUN;
     cmd_result( f );
-    return 0;
+    return;
   }
 
-  if( event == EVENT_TYPE_UPD_FDC_HEAD ) {
+  if( event == head_event ) {
     fdd_head_load( &f->current_drive->fdd, 0 );
     f->head_load = 0;
-    return 0;
+    return;
   }
   
   if( f->read_id ) {
@@ -838,7 +858,8 @@ upd_fdc_event( libspectrum_dword last_tstates GCC_UNUSED, event_type event,
     fdd_wait_index_hole( &f->current_drive->fdd );		/* start writing from index hole */
     start_write_id( f );
   }
-  return 0;
+
+  return;
 }
 
 libspectrum_byte
@@ -960,7 +981,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       f->data_register[f->data_offset + 5] = data;	/* read id fields */
       f->data_offset++;
       if( f->data_offset == 4 ) {			/* C, H, R, N done => format track */
-	event_remove_type( EVENT_TYPE_UPD_FDC_TIMEOUT );
+	event_remove_type( timeout_event );
 
         d->fdd.data = 0x00;
         for( i = f->mf ? 12 : 6; i > 0; i-- )	/* write 6/12 zero */
@@ -1034,7 +1055,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       }
       event_add_with_data( tstates + 2 *		/* 1/10 revolution: 1 * 200 / 1000 */
 		       machine_current->timings.processor_speed / 100,
-		       EVENT_TYPE_UPD_FDC_TIMEOUT, f );
+		       timeout_event, f );
       return;
     } else if( f->cmd->id == UPD_CMD_WRITE_DATA ) {		/* WRITE DATA */
       f->data_offset++;

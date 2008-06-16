@@ -46,6 +46,8 @@ int plusd_active = 0;
 
 static int plusd_index_pulse;
 
+static int index_event;
+
 #define PLUSD_NUM_DRIVES 2
 
 static wd_fdc *plusd_fdc;
@@ -58,6 +60,8 @@ static void plusd_memory_map( void );
 static void plusd_enabled_snapshot( libspectrum_snap *snap );
 static void plusd_from_snapshot( libspectrum_snap *snap );
 static void plusd_to_snapshot( libspectrum_snap *snap );
+static void plusd_event_index( libspectrum_dword last_tstates, int type,
+			       void *user_data );
 
 static module_info_t plusd_module_info = {
 
@@ -140,6 +144,8 @@ plusd_init( void )
   plusd_fdc->reset_datarq = NULL;
   plusd_fdc->iface = NULL;
 
+  index_event = event_register( plusd_event_index, "+D index" );
+
   module_register( &plusd_module_info );
 
   return 0;
@@ -154,7 +160,7 @@ plusd_reset( int hard_reset )
   plusd_active = 0;
   plusd_available = 0;
 
-  event_remove_type( EVENT_TYPE_PLUSD_INDEX );
+  event_remove_type( index_event );
 
   if( !periph_plusd_active )
     return;
@@ -202,7 +208,7 @@ plusd_reset( int hard_reset )
   plusd_fdc->current_drive = &plusd_drives[ 0 ];
   fdd_select( &plusd_drives[ 0 ].fdd, 1 );
   machine_current->memory_map();
-  plusd_event_index( 0 );
+  plusd_event_index( 0, index_event, NULL );
 
   ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
 }
@@ -509,10 +515,10 @@ plusd_disk_write( plusd_drive_number which, const char *filename )
   return 0;
 }
 
-int
-plusd_event_index( libspectrum_dword last_tstates )
+static void
+plusd_event_index( libspectrum_dword last_tstates, int type GCC_UNUSED,
+                   void *user_data GCC_UNUSED )
 {
-  int error;
   int next_tstates;
   int i;
 
@@ -528,10 +534,7 @@ plusd_event_index( libspectrum_dword last_tstates )
   }
   next_tstates = ( plusd_index_pulse ? 10 : 190 ) *
     machine_current->timings.processor_speed / 1000;
-  error = event_add( last_tstates + next_tstates, EVENT_TYPE_PLUSD_INDEX );
-  if( error )
-    return error;
-  return 0;
+  event_add( last_tstates + next_tstates, index_event );
 }
 
 static libspectrum_byte *

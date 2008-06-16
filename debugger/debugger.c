@@ -45,6 +45,9 @@ int debugger_output_base;
 /* Memory pool used by the lexer and parser */
 int debugger_memory_pool;
 
+/* The event type used for time breakpoints */
+int debugger_breakpoint_event;
+
 int
 debugger_init( void )
 {
@@ -55,6 +58,9 @@ debugger_init( void )
 
   debugger_memory_pool = mempool_register_pool();
   if( debugger_memory_pool == -1 ) return 1;
+
+  debugger_breakpoint_event = event_register( debugger_breakpoint_time_fn, "Breakpoint" );
+  if( debugger_breakpoint_event == -1 ) return 1;
 
   error = debugger_event_init();
   if( error ) return error;

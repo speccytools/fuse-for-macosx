@@ -39,10 +39,10 @@ float timer_get_time_difference( timer_type *a, timer_type *b );
 
 int timer_init(void);
 void timer_sleep_ms( int ms );
-int timer_frame( libspectrum_dword last_tstates );
 int timer_end(void);
 
 extern float current_speed;
+extern int timer_event;
 
 /* Internal routines */
 

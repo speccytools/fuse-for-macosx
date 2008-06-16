@@ -1,5 +1,5 @@
 /* event.c: Routines needed for dealing with the event list
-   Copyright (c) 2000-2004 Philip Kendall
+   Copyright (c) 2000-2008 Philip Kendall
 
    $Id$
 
@@ -25,95 +25,66 @@
 
 #include <config.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <libspectrum.h>
 
-#include "debugger/debugger.h"
-#include "disk/beta.h"
-#include "disk/fdd.h"
-#include "disk/upd_fdc.h"
-#include "disk/wd_fdc.h"
-#include "display.h"
 #include "event.h"
-#include "fuse.h"
-#include "machine.h"
-#include "psg.h"
-#include "rzx.h"
-#include "tape.h"
-#include "timer/timer.h"
 #include "ui/ui.h"
-#include "ui/uijoystick.h"
-#include "spectrum.h"
-#include "z80/z80.h"
 
 /* A large value to mean `no events due' */
-const libspectrum_dword event_no_events = 0xffffffff;
+static const libspectrum_dword event_no_events = 0xffffffff;
 
 /* When will the next event happen? */
 libspectrum_dword event_next_event;
 
 /* The actual list of events */
-static GSList* event_list;
+static GSList *event_list = NULL;
 
 /* An event ready to be reused */
-static event_t *event_free;
+static event_t *event_free = NULL;
 
-/* Comparison function so events stay in t-state order */
-static gint event_add_cmp( gconstpointer a, gconstpointer b );
+/* A null event */
+int event_type_null;
 
-/* User function for event_interrupt(...) */
-void event_reduce_tstates(gpointer data,gpointer user_data);
+typedef struct event_descriptor_t {
+  event_fn_t fn;
+  char *description;
+} event_descriptor_t; 
 
-/* Make the event have no effect if it matches the given type */
-static void set_event_null( gpointer data, gpointer user_data );
+static GArray *registered_events;
 
-/* Free the memory used by a specific entry */
-void event_free_entry(gpointer data, gpointer user_data);
-
-/* Force events between now and the next interrupt to happen */
-static int event_force_events( void );
-
-/* Set up the event list */
-int event_init(void)
-{
-  event_list=NULL;
-  event_free=NULL;
-  event_next_event=event_no_events;
-  return 0;
-}
-
-/* Add an event at the correct place in the event list */
 int
-event_add_with_data( libspectrum_dword event_time, event_type type,
-		     void *user_data )
+event_init( void )
 {
-  event_t *ptr;
-
-  if( event_free ) {
-    ptr=event_free;
-    event_free=NULL;
-  } else {
-    ptr=malloc(sizeof(event_t));
-    if(!ptr) return 1;
+  registered_events = g_array_new( FALSE, FALSE, sizeof( event_descriptor_t ) );
+  if( !registered_events ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+    return 1;
   }
 
-  ptr->tstates= event_time;
-  ptr->type=type;
-  ptr->user_data = user_data;
+  event_type_null = event_register( NULL, "[Deleted event]" );
+  if( event_type_null == -1 ) return 1;
 
-  if( event_time < event_next_event ) {
-    event_next_event = event_time;
-    event_list=g_slist_prepend(event_list,(gpointer)ptr);
-  } else {
-    event_list=g_slist_insert_sorted(event_list,(gpointer)ptr,event_add_cmp);
-  }
-
+  event_next_event = event_no_events;
   return 0;
 }
 
-/* Comparison function so events stay in t-state and event type order */
+int
+event_register( event_fn_t fn, const char *description )
+{
+  event_descriptor_t descriptor;
+
+  descriptor.fn = fn;
+  descriptor.description = strdup( description );
+  if( !descriptor.description ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+    return -1;
+  }
+
+  g_array_append_val( registered_events, descriptor );
+
+  return registered_events->len - 1;
+}
+
 static gint
 event_add_cmp( gconstpointer a1, gconstpointer b1 )
 {
@@ -123,169 +94,92 @@ event_add_cmp( gconstpointer a1, gconstpointer b1 )
 		                  : a->type - b->type;
 }
 
+/* Add an event at the correct place in the event list */
+int
+event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
+{
+  event_t *ptr;
+
+  if( event_free ) {
+    ptr = event_free;
+    event_free = NULL;
+  } else {
+    ptr = malloc( sizeof( *ptr ) );
+    if( !ptr ) return 1;
+  }
+
+  ptr->tstates = event_time;
+  ptr->type =type;
+  ptr->user_data = user_data;
+
+  if( event_time < event_next_event ) {
+    event_next_event = event_time;
+    event_list = g_slist_prepend( event_list, ptr );
+  } else {
+    event_list = g_slist_insert_sorted( event_list, ptr, event_add_cmp );
+  }
+
+  return 0;
+}
+
 /* Do all events which have passed */
-int event_do_events(void)
+int
+event_do_events( void )
 {
   event_t *ptr;
 
   while(event_next_event <= tstates) {
-    ptr= ( (event_t*) (event_list->data) );
+    ptr = event_list->data;
+    event_descriptor_t descriptor =
+      g_array_index( registered_events, event_descriptor_t, ptr->type );
 
     /* Remove the event from the list *before* processing */
-    event_list=g_slist_remove(event_list,ptr);
+    event_list = g_slist_remove( event_list, ptr );
 
     if( event_list == NULL ) {
       event_next_event = event_no_events;
     } else {
-      event_next_event= ( (event_t*) (event_list->data) ) -> tstates;
+      event_next_event = ((event_t*)(event_list->data))->tstates;
     }
 
-    switch(ptr->type) {
+    if( descriptor.fn ) descriptor.fn( ptr->tstates, ptr->type, ptr->user_data );
 
-    case EVENT_TYPE_EDGE: tape_next_edge( ptr->tstates ); break;
-
-    case EVENT_TYPE_TIMER:
-      timer_frame( ptr->tstates );
-      break;
-
-    case EVENT_TYPE_FRAME:
-      if( rzx_playback ) event_force_events();
-      rzx_frame();
-      psg_frame();
-      spectrum_frame();
-      z80_interrupt();
-      ui_joystick_poll();
-      timer_estimate_speed();
-      debugger_add_time_events();
-      ui_event();
-      ui_error_frame();
-      break;
-
-    case EVENT_TYPE_INTERRUPT:
-      /* Retriggered interrupt; firstly, ignore if we're doing RZX playback
-	 as all interrupts are generated by the RZX code */
-      if( rzx_playback ) break;
-      /* Otherwise, see if we actually accept an interrupt. If we do and
-	 we're doing RZX recording, store a frame */
-      if( z80_interrupt() ) rzx_frame();
-      break;
-
-    case EVENT_TYPE_NMI: z80_nmi(); break;
-    case EVENT_TYPE_NULL: /* Do nothing */ break;
-
-    case EVENT_TYPE_BETA_INDEX:
-      beta_event_index( ptr->tstates );
-      break;
-
-    case EVENT_TYPE_PLUSD_INDEX:
-      plusd_event_index( ptr->tstates );
-      break;
-
-    case EVENT_TYPE_WD_FDC:
-    case EVENT_TYPE_WD_FDC_MOTOR_OFF:
-    case EVENT_TYPE_WD_FDC_TIMEOUT:
-      wd_fdc_event( ptr->tstates, ptr->type, ptr->user_data );
-      break;
-
-    case EVENT_TYPE_UPD_FDC:
-    case EVENT_TYPE_UPD_FDC_HEAD:
-    case EVENT_TYPE_UPD_FDC_TIMEOUT:
-      upd_fdc_event( ptr->tstates, ptr->type, ptr->user_data );
-      break;
-
-    case EVENT_TYPE_FDD_MOTOR:
-      fdd_event( ptr->tstates, ptr->type, ptr->user_data );
-      break;
-
-    case EVENT_TYPE_BREAKPOINT:
-      debugger_check( DEBUGGER_BREAKPOINT_TYPE_TIME, 0 );
-      break;
-
-    case EVENT_TYPE_TAPE_RECORD:
-      tape_event_record_sample( ptr->tstates );
-      break;
-
-    case EVENT_TYPE_RZX_SENTINEL:
-      rzx_sentinel();
-      break;
-
-    }
     if( event_free ) {
       free( ptr );
     } else {
-      event_free=ptr;
+      event_free = ptr;
     }
   }
 
   return 0;
+}
+
+static void
+event_reduce_tstates( gpointer data, gpointer user_data )
+{
+  event_t *ptr = data;
+  libspectrum_dword *tstates_per_frame = user_data;
+
+  ptr->tstates -= *tstates_per_frame;
 }
 
 /* Called at end of frame to reduce T-state count of all entries */
 int
 event_frame( libspectrum_dword tstates_per_frame )
 {
-  g_slist_foreach(event_list, event_reduce_tstates, &tstates_per_frame );
+  g_slist_foreach( event_list, event_reduce_tstates, &tstates_per_frame );
 
-  if( event_list == NULL ) {
-    event_next_event = event_no_events;
-  } else {
-    event_next_event= ( (event_t*) (event_list->data) ) -> tstates;
-  }
+  event_next_event = event_list ?
+    ((event_t*)(event_list->data))->tstates : event_no_events;
 
   return 0;
-}
-
-/* User function for event_interrupt(...) */
-void event_reduce_tstates(gpointer data,gpointer user_data)
-{
-  event_t *ptr=(event_t*)data;
-  libspectrum_dword *tstates_per_frame = (libspectrum_dword*)user_data;
-
-  ptr->tstates -= (*tstates_per_frame) ;
-}
-
-/* Remove all events of a specific type from the stack */
-int
-event_remove_type( event_type type )
-{
-  /* FIXME: this is an ugly hack. Just set all events of the given
-     type to be of a null type, meaning they do nothing */
-  g_slist_foreach( event_list, set_event_null, &type );
-  return 0;
-}
-
-static void set_event_null( gpointer data, gpointer user_data )
-{
-  event_t *ptr = (event_t*)data;
-  event_type type = *(event_type*)user_data;
-
-  if( ptr->type == type ) ptr->type = EVENT_TYPE_NULL;
-}
-
-/* Clear the event stack */
-int event_reset(void)
-{
-  g_slist_foreach(event_list,event_free_entry,NULL);
-  g_slist_free(event_list);
-  event_list=NULL;
-  event_next_event=event_no_events;
-  if( event_free ) free( event_free );
-  event_free=NULL;
-  return 0;
-}
-
-/* Free the memory used by a specific entry */
-void
-event_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
-{
-  event_t *ptr=(event_t*)data;
-  free(ptr);
 }
 
 /* Do all events that would happen between the current time and when
    the next interrupt will occur; called only when RZX playback is in
    effect */
-static int event_force_events( void )
+int
+event_force_events( void )
 {
   while( event_next_event < machine_current->timings.tstates_per_frame ) {
 
@@ -300,47 +194,64 @@ static int event_force_events( void )
   return 0;
 }
 
+static void
+set_event_null( gpointer data, gpointer user_data )
+{
+  event_t *ptr = data;
+  int *type = user_data;
+
+  if( ptr->type == *type ) ptr->type = event_type_null;
+}
+
+/* Remove all events of a specific type from the stack */
+int
+event_remove_type( int type )
+{
+  g_slist_foreach( event_list, set_event_null, &type );
+  return 0;
+}
+
+/* Free the memory used by a specific entry */
+static void
+event_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
+{
+  free( data );
+}
+
+/* Clear the event stack */
+int
+event_reset( void )
+{
+  g_slist_foreach( event_list, event_free_entry, NULL );
+  g_slist_free( event_list );
+  event_list = NULL;
+
+  event_next_event = event_no_events;
+
+  free( event_free );
+  event_free = NULL;
+
+  return 0;
+}
+
 /* Call a user-supplied function for every event in the current list */
 int
-event_foreach( void (*function)( gpointer data, gpointer user_data),
-	       gpointer user_data )
+event_foreach( GFunc function, gpointer user_data )
 {
   g_slist_foreach( event_list, function, user_data );
   return 0;
 }
 
 /* A textual representation of each event type */
-const char *
-event_name( event_type type )
+const char*
+event_name( int type )
 {
-  switch( type ) {
-
-  case EVENT_TYPE_EDGE: return "Tape edge";
-  case EVENT_TYPE_FRAME: return "End of frame";
-  case EVENT_TYPE_INTERRUPT: return "Retriggered interrupt";
-  case EVENT_TYPE_NMI: return "Non-maskable interrupt";
-  case EVENT_TYPE_NULL: return "[Deleted event]";
-  case EVENT_TYPE_BETA_INDEX: return "Beta disk index";
-  case EVENT_TYPE_PLUSD_INDEX: return "+D index";
-  case EVENT_TYPE_BREAKPOINT: return "Breakpoint";
-  case EVENT_TYPE_TIMER: return "Timer";
-  case EVENT_TYPE_TAPE_RECORD: return "Tape sample record";
-  case EVENT_TYPE_RZX_SENTINEL: return "RZX sentinel";
-  case EVENT_TYPE_WD_FDC: return "WD FDC event";
-  case EVENT_TYPE_WD_FDC_MOTOR_OFF: return "WD FDC motor off";
-  case EVENT_TYPE_WD_FDC_TIMEOUT: return "WD FDC timeout";
-  case EVENT_TYPE_UPD_FDC: return "UPD FDC event";
-  case EVENT_TYPE_UPD_FDC_HEAD: return "UPD FDC head (un)load";
-  case EVENT_TYPE_UPD_FDC_TIMEOUT: return "UPD FDC timeout";
-  case EVENT_TYPE_FDD_MOTOR: return "FDD motor on";
-
-  }
-
-  return "[Unknown event type]";
+  return g_array_index( registered_events, event_descriptor_t, type ).description;
 }
 
 /* Tidy-up function called at end of emulation */
-int event_end(void)
+int
+event_end( void )
 {
   return event_reset();
 }

@@ -102,6 +102,9 @@ typedef struct fdd_t {
 
 } fdd_t;
 
+/* initialize the event codes */
+int fdd_init_events( void );
+
 const char *fdd_strerror( int error );
 /* initialize the fdd_t struct, and set fdd_heads and cylinders (e.g. 2/83 ) */
 int fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls );
@@ -131,7 +134,5 @@ int fdd_read_write_data( fdd_t *d, fdd_write_t write );
 void fdd_wrprot( fdd_t *d, int wrprot );
 /* to reach index hole */
 void fdd_wait_index_hole( fdd_t *d );
-/* to emulate spin up time */
-int fdd_event( libspectrum_dword last_tstates, event_type event, void *user_data );
 
 #endif 	/* FUSE_FDD_H */

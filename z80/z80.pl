@@ -565,7 +565,7 @@ sub opcode_EI (@) {
 	 accepted after the next instruction */
       IFF1 = IFF2 = 1;
       z80.interrupts_enabled_at = tstates;
-      event_add( tstates + 1, EVENT_TYPE_INTERRUPT );
+      event_add( tstates + 1, z80_interrupt_event );
 EI
 }
 

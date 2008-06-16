@@ -43,6 +43,7 @@
 #include "snapshot.h"
 #include "sound.h"
 #include "tape.h"
+#include "timer/timer.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "ula.h"
@@ -208,8 +209,8 @@ machine_select_machine( fuse_machine_info *machine )
 
   /* Reset the event stack */
   event_reset();
-  if( event_add( 0, EVENT_TYPE_TIMER ) ) return 1;
-  if( event_add( machine->timings.tstates_per_frame, EVENT_TYPE_FRAME ) )
+  if( event_add( 0, timer_event ) ) return 1;
+  if( event_add( machine->timings.tstates_per_frame, spectrum_frame_event ) )
     return 1;
 
   sound_end();

@@ -47,6 +47,7 @@
 #include "ui/ui.h"
 #include "utils.h"
 #include "ui/widget/widget.h"
+#include "z80/z80.h"
 #include "zxatasp.h"
 #include "zxcf.h"
 
@@ -273,7 +274,7 @@ MENU_CALLBACK( menu_machine_profiler_stop )
 MENU_CALLBACK( menu_machine_nmi )
 {
   WIDGET_END;
-  event_add( 0, EVENT_TYPE_NMI );
+  event_add( 0, z80_nmi_event );
 }
 
 MENU_CALLBACK( menu_media_tape_open )

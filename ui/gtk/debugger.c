@@ -900,7 +900,7 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
   char *event_text[2] = { &buffer[0], &buffer[40] };
 
   /* Skip events which have been removed */
-  if( ptr->type == EVENT_TYPE_NULL ) return;
+  if( ptr->type == event_type_null ) return;
 
   snprintf( event_text[0], 40, "%d", ptr->tstates );
   strncpy( event_text[1], event_name( ptr->type ), 40 );

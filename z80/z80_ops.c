@@ -142,7 +142,7 @@ z80_do_opcodes( void )
     CHECK( rzx, rzx_playback )
 
     if( R + rzx_instructions_offset >= rzx_instruction_count ) {
-      event_add( tstates, EVENT_TYPE_FRAME );
+      event_add( tstates, spectrum_frame_event );
       break;		/* And break out of the execution loop to let
 			   the interrupt happen */
     }

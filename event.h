@@ -39,32 +39,11 @@ typedef struct event_t {
   void *user_data;
 } event_t;
 
-/* The various types of event which can occur */
-typedef enum event_type {
+/* A null event type */
+extern int event_type_null;
 
-  EVENT_TYPE_BREAKPOINT,
-  EVENT_TYPE_EDGE,
-  EVENT_TYPE_FRAME,
-  EVENT_TYPE_INTERRUPT,
-  EVENT_TYPE_NMI,
-  EVENT_TYPE_NULL,
-  EVENT_TYPE_RZX_SENTINEL,
-  EVENT_TYPE_BETA_INDEX,
-  EVENT_TYPE_TIMER,
-  EVENT_TYPE_TAPE_RECORD,
-  EVENT_TYPE_PLUSD_INDEX,
-  EVENT_TYPE_WD_FDC,
-  EVENT_TYPE_WD_FDC_MOTOR_OFF,
-  EVENT_TYPE_WD_FDC_TIMEOUT,
-  EVENT_TYPE_UPD_FDC,
-  EVENT_TYPE_UPD_FDC_HEAD,
-  EVENT_TYPE_UPD_FDC_TIMEOUT,
-  EVENT_TYPE_FDD_MOTOR,
-
-} event_type;
-
-/* A large value to mean `no events due' */
-extern const libspectrum_dword event_no_events;
+/* The function to be called when an event occurs */
+typedef void (*event_fn_t)( libspectrum_dword tstates, int type, void *user_data );
 
 /* When will the next event happen? */
 extern libspectrum_dword event_next_event;
@@ -72,12 +51,15 @@ extern libspectrum_dword event_next_event;
 /* Set up the event list */
 int event_init(void);
 
+/* Register a new event type */
+int event_register( event_fn_t fn, const char *description );
+
 /* Add an event at the correct place in the event list */
-int event_add_with_data( libspectrum_dword event_time, event_type type,
+int event_add_with_data( libspectrum_dword event_time, int type,
 			 void *user_data );
 
 static inline int
-event_add( libspectrum_dword event_time, event_type type )
+event_add( libspectrum_dword event_time, int type )
 {
   return event_add_with_data( event_time, type, NULL );
 }
@@ -88,18 +70,20 @@ int event_do_events(void);
 /* Called at end of frame to reduce T-state count of all entries */
 int event_frame( libspectrum_dword tstates_per_frame );
 
+/* Force all events between now and the next interrupt to happen */
+int event_force_events( void );
+
 /* Remove all events of a specific type from the stack */
-int event_remove_type( event_type type );
+int event_remove_type( int type );
 
 /* Clear the event stack */
 int event_reset(void);
 
 /* Call a user-supplied function for every event in the current list */
-int event_foreach( void (*function)( gpointer data, gpointer user_data ),
-		   gpointer user_data );
+int event_foreach( GFunc function, gpointer user_data );
 
 /* A textual representation of each event type */
-const char *event_name( event_type type );
+const char *event_name( int type );
 
 /* Called on exit to clean up */
 int event_end(void);
