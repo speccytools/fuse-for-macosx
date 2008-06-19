@@ -2744,3 +2744,4 @@
          z80/{coretest.c,z80.[ch],z80.pl,z80_ops.c}: refactor the event
          architecture so that modules register their own events with the
          event system (patch #1991683).
+20080619 event.c: add missing #include <string.h>.
