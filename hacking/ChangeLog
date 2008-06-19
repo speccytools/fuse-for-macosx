@@ -2745,3 +2745,4 @@
          architecture so that modules register their own events with the
          event system (patch #1991683).
 20080619 event.c: add missing #include <string.h>.
+20080619 ui/gtk/gtkkeyboard.c: remove X dependency for unshifting keys.

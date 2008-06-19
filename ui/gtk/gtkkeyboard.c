@@ -1,5 +1,5 @@
 /* gtkkeyboard.c: GTK+ routines for dealing with the keyboard
-   Copyright (c) 2000-2003 Philip Kendall, Russell Marks
+   Copyright (c) 2000-2008 Philip Kendall, Russell Marks
 
    $Id$
 
@@ -25,8 +25,8 @@
 
 #include <config.h>
 
+#include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
-#include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
 #include "compat.h"
@@ -35,10 +35,30 @@
 #include "keyboard.h"
 #include "ui/ui.h"
 
-static guint gtkkeyboard_unshift_keysym(guint keysym);
+/* Given a hardware keycode, return the keyval which would have been returned if
+   the key were unshifted */
+static guint
+unshift_keysym( guint keycode )
+{
+  GdkKeymapKey *maps;
+  guint *keyvals, i, r = GDK_VoidSymbol;
+  gint count;
+
+  gdk_keymap_get_entries_for_keycode( NULL, keycode, &maps, &keyvals, &count );
+
+  for( i = 0; i < count; i++ )
+    if( maps[i].group == 0 && maps[i].level == 0 ) {
+      r = keyvals[i];
+      break;
+    }
+
+  g_free( keyvals ); g_free( maps );
+
+  return r;
+}
 
 static void
-get_keysyms( input_event_t *event, guint keysym )
+get_keysyms( input_event_t *event, guint keycode, guint keysym )
 {
   guint unshifted;
 
@@ -46,7 +66,7 @@ get_keysyms( input_event_t *event, guint keysym )
      but we may as well set it up anyway as we've got it */
   event->types.key.native_key = keysyms_remap( keysym );
 
-  unshifted = gtkkeyboard_unshift_keysym( keysym );
+  unshifted = unshift_keysym( keycode );
   event->types.key.spectrum_key = keysyms_remap( unshifted );
 }
 
@@ -60,7 +80,7 @@ gtkkeyboard_keypress( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
     ui_mouse_suspend();
 
   fuse_event.type = INPUT_EVENT_KEYPRESS;
-  get_keysyms( &fuse_event, event->key.keyval );
+  get_keysyms( &fuse_event, event->key.hardware_keycode, event->key.keyval );
 
   return input_event( &fuse_event );
 
@@ -74,20 +94,7 @@ gtkkeyboard_keyrelease( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
   input_event_t fuse_event;
 
   fuse_event.type = INPUT_EVENT_KEYRELEASE;
-  get_keysyms( &fuse_event, event->key.keyval );
+  get_keysyms( &fuse_event, event->key.hardware_keycode, event->key.keyval );
 
   return input_event( &fuse_event );
-}
-
-/* Given a keysym, return the keysym which would have been returned if
-   the key where unshifted */
-static guint gtkkeyboard_unshift_keysym(guint keysym)
-{
-  /* Oh boy is this ugly! There are better ways of doing this (see
-     http://mail.gnome.org/archives/gtk-app-devel-list/2000-December/msg00261.html
-     and followups). However, this will do until that functionality is
-     incorporated into GTK 2.0 */
-  return XKeycodeToKeysym(gdk_display,
-			  XKeysymToKeycode(gdk_display,keysym),
-			  0);
 }
