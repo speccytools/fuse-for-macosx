@@ -33,6 +33,7 @@
 #include <windows.h>
 #endif				/* #ifdef WIN32 */
 
+#include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
 #include "machine.h"
@@ -94,6 +95,12 @@ libspectrum_rzx_dsa_key rzx_key = {
    a competition mode RZX file */
 static const float SPEED_TOLERANCE = 5;
 
+/* Debugger events */
+static const char *event_type_string = "rzx";
+static const char *end_event_detail_string = "end";
+
+int end_event;
+
 static int start_playback( libspectrum_rzx *rzx );
 static int recording_frame( void );
 static int playback_frame( void );
@@ -112,6 +119,9 @@ int rzx_init( void )
 
   sentinel_event = event_register( rzx_sentinel, "RZX sentinel" );
   if( sentinel_event == -1 ) return 1;
+
+  end_event = debugger_event_register( event_type_string, end_event_detail_string );
+  if( end_event == -1 ) return 1;
 
   return 0;
 }
@@ -346,6 +356,8 @@ int rzx_stop_playback( int add_interrupt )
 
   libspec_error = libspectrum_rzx_free( rzx );
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return libspec_error;
+
+  debugger_event( end_event );
 
   return 0;
 }  
