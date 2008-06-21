@@ -178,5 +178,9 @@ void
 debugger_exit_emulator( void )
 {
   fuse_exiting = 1;
+
+  /* Ensure we break out of the main Z80 loop immediately */
+  event_add( 0, event_type_null );
+
   debugger_run();
 }
