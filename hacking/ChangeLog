@@ -2747,3 +2747,4 @@
 20080619 event.c: add missing #include <string.h>.
 20080619 ui/gtk/gtkkeyboard.c: remove X dependency for unshifting keys.
 20080619 rzx.c: add debugger event for end of RZX playback.
+20080621 debugger/breakpoint.c: don't try copying an empty condition.

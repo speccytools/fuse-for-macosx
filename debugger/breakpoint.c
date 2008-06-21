@@ -605,8 +605,12 @@ debugger_breakpoint_set_condition( size_t id, debugger_expression *condition )
 
   if( bp->condition ) debugger_expression_delete( bp->condition );
 
-  bp->condition = debugger_expression_copy( condition );
-  if( !bp->condition ) return 1;
+  if( condition ) {
+    bp->condition = debugger_expression_copy( condition );
+    if( !bp->condition ) return 1;
+  } else {
+    bp->condition = NULL;
+  }
 
   return 0;
 }
