@@ -1,5 +1,5 @@
 /* query.c: The query widgets
-   Copyright (c) 2004 Darren Salt
+   Copyright (c) 2004-2008 Darren Salt, Fredrick Meunier
 
    $Id$
 
@@ -36,29 +36,136 @@ widget_query_t widget_query;
 
 static const char *title = "Fuse - Confirm";
 
-static int
-internal_query_draw( int save, const char *data )
+struct widget_query_entry;
+
+/* A generic click function */
+typedef void (*widget_query_click_fn)( void );
+
+/* A general menu */
+typedef struct widget_query_entry {
+  const char *text;
+  int index;
+  input_key key;		/* Which key to activate this query */
+
+  widget_query_click_fn click;
+} widget_query_entry;
+
+static void widget_save_click( void );
+static void widget_dont_save_click( void );
+static void widget_cancel_click( void );
+static void widget_yes_click( void );
+static void widget_no_click( void );
+static void widget_query_line_draw( int left_edge, int width,
+                                    struct widget_query_entry *menu,
+                                    const char *label );
+
+static widget_query_entry query_save[] = {
+  { "\012S\001ave", 0, INPUT_KEY_s, widget_save_click },
+  { "\012D\001on't save", 1, INPUT_KEY_d, widget_dont_save_click },
+  { "\010C\001ancel", 2, INPUT_KEY_c, widget_cancel_click },
+  { NULL }
+};
+
+static widget_query_entry query_confirm[] = {
+  { "\012Y\001es", 0, INPUT_KEY_y, widget_yes_click },
+  { "\012N\001o", 1, INPUT_KEY_n, widget_no_click },
+  { NULL }
+};
+
+static void
+widget_save_click( void )
 {
-  char **lines;
-  size_t i, count;
+  widget_query.save = UI_CONFIRM_SAVE_SAVE;
+}
 
-  if( split_message( data, &lines, &count, 28 ) )
-    return 1;
+static void
+widget_dont_save_click( void )
+{
+  widget_query.save = UI_CONFIRM_SAVE_CANCEL;
+}
 
-  widget_dialog_with_border( 1, 2, 30, count + 4 );
-  widget_printstring( 9, 16, WIDGET_COLOUR_TITLE, title );
-  for( i = 0; i < count; ++i ) {
-    widget_printstring( 17, i*8+24, WIDGET_COLOUR_FOREGROUND, lines[i] );
-    free( lines[i] );
+static void
+widget_cancel_click( void )
+{
+  widget_query.save = UI_CONFIRM_SAVE_DONTSAVE;
+}
+
+static void
+widget_yes_click( void )
+{
+  widget_query.confirm = 1;
+}
+
+static void
+widget_no_click( void )
+{
+  widget_query.confirm = 0;
+}
+
+static size_t highlight_line = 0;
+
+static void
+widget_query_line_draw( int left_edge, int width, struct widget_query_entry *menu,
+                        const char *label )
+{
+  int colour = WIDGET_COLOUR_BACKGROUND;
+  int y = menu->index * 8 + 24;
+
+  if( menu->index == highlight_line ) colour = WIDGET_COLOUR_HIGHLIGHT;
+  widget_rectangle( left_edge*8+1, y, width*8-2, 1*8, colour );
+  widget_printstring( left_edge*8+8, y, WIDGET_COLOUR_FOREGROUND,
+                      menu->text );
+  widget_display_rasters( y, 8 );
+}
+
+const int query_vert_external_margin = 8;
+
+static int
+widget_calculate_query_width( const char *title, widget_query_entry *menu )
+{
+  widget_query_entry *ptr;
+  int max_width=0;
+
+  if (!menu) {
+    return 64;
   }
-  free( lines );
-  
-  widget_printstring_right(
-    240, i*8+28, 5, save ? "\012S\001ave  \012D\001on't save  \010C\001ancel"
-                         : "\012Y\001es  \012N\001o"
-  );
 
-  widget_display_lines( 2, count + 6 );
+  max_width = widget_stringwidth( title )+5*8;
+
+  for( ptr = menu; ptr->text; ptr++ ) {
+    int total_width = widget_stringwidth( ptr->text )+3*8;
+
+    if (total_width > max_width)
+      max_width = total_width;
+  }
+
+  return ( max_width + query_vert_external_margin * 2 ) / 8;
+}
+
+static int
+internal_query_draw( widget_query_entry *query, int save, const char *data )
+{
+  widget_query_entry *ptr;
+  size_t height = 0;
+  int menu_width = widget_calculate_query_width( title, query );
+  int menu_left_edge_x;
+
+  /* How many options do we have? */
+  for( ptr = query; ptr->text; ptr++ )
+    height ++;
+
+  menu_left_edge_x = DISPLAY_WIDTH_COLS/2-menu_width/2;
+
+  /* Draw the dialog box */
+  widget_dialog_with_border( menu_left_edge_x, 2, menu_width, 2 + height );
+
+  widget_printstring( menu_left_edge_x*8+2, 16, WIDGET_COLOUR_TITLE, title );
+
+  for( ptr = query; ptr->text; ptr++ ) {
+    widget_query_line_draw( menu_left_edge_x, menu_width, ptr, ptr->text );
+  }
+
+  widget_display_lines( 2, 2 + height );
 
   return 0;
 }
@@ -66,51 +173,107 @@ internal_query_draw( int save, const char *data )
 int
 widget_query_draw( void *data )
 {
-  return internal_query_draw( 0, (const char *) data );
+  highlight_line = 0;
+  return internal_query_draw( query_confirm, 0, (const char *) data );
 }
 
 int
 widget_query_save_draw( void *data )
 {
-  return internal_query_draw( 1, (const char *) data );
+  highlight_line = 0;
+  return internal_query_draw( query_save, 1, (const char *) data );
+}
+
+void
+widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
+                                 input_key key )
+{
+  int new_highlight_line = 0;
+  int cursor_pressed = 0;
+  widget_query_entry *ptr;
+  int menu_width = widget_calculate_query_width( title, query );
+  int menu_left_edge_x = DISPLAY_WIDTH_COLS/2-menu_width/2;
+
+  switch( key ) {
+
+#if 0
+  case INPUT_KEY_Resize:	/* Fake keypress used on window resize */
+    widget_dialog_with_border( 1, 2, 30, 2 + 20 );
+    widget_general_show_all( &widget_options_settings );
+    break;
+#endif
+    
+  case INPUT_KEY_Escape:
+    widget_end_widget( WIDGET_FINISHED_CANCEL );
+    break;
+
+  case INPUT_KEY_Up:
+  case INPUT_KEY_7:
+    if ( highlight_line ) {
+      new_highlight_line = highlight_line - 1;
+      cursor_pressed = 1;
+    }
+    break;
+
+  case INPUT_KEY_Down:
+  case INPUT_KEY_6:
+    if ( highlight_line < num_entries - 2 ) {
+      new_highlight_line = highlight_line + 1;
+      cursor_pressed = 1;
+    }
+    break;
+
+  case INPUT_KEY_Return:
+    query[highlight_line].click();
+    widget_end_all( WIDGET_FINISHED_OK );
+    display_refresh_all();
+    return;
+    break;
+
+  default:	/* Keep gcc happy */
+    break;
+
+  }
+
+  if( cursor_pressed ) {
+    int old_highlight_line = highlight_line;
+    highlight_line = new_highlight_line;
+    widget_query_line_draw( menu_left_edge_x, menu_width,
+                            query + old_highlight_line,
+                            query[old_highlight_line].text );
+    widget_query_line_draw( menu_left_edge_x, menu_width,
+                            query + highlight_line,
+                            query[highlight_line].text );
+    return;
+  }
+
+  for( ptr=query; ptr->text != NULL; ptr++ ) {
+    if( key == ptr->key ) {
+      int old_highlight_line = highlight_line;
+      ptr->click();
+      highlight_line = ptr->index;
+      widget_query_line_draw( menu_left_edge_x, menu_width,
+                              query + old_highlight_line,
+                              query[old_highlight_line].text );
+      widget_query_line_draw( menu_left_edge_x, menu_width, ptr,
+                              query[highlight_line].text );
+      break;
+    }
+  }
 }
 
 void
 widget_query_keyhandler( input_key key )
 {
-  switch( key ) {
-  case INPUT_KEY_Return:
-  case INPUT_KEY_y:
-    widget_query.confirm = 1;
-    widget_end_widget( WIDGET_FINISHED_OK );
-    break;
-  case INPUT_KEY_Escape:
-  case INPUT_KEY_n:
-    widget_query.confirm = 0;
-    widget_end_widget( WIDGET_FINISHED_CANCEL );
-    break;
-  default:;
-  }
+  widget_query_generic_keyhandler( query_confirm,
+                                   sizeof(query_confirm)/sizeof(widget_query_entry),
+                                   key );
 }
 
 void
 widget_query_save_keyhandler( input_key key )
 {
-  switch( key ) {
-  case INPUT_KEY_Return:
-  case INPUT_KEY_s:
-    widget_query.save = UI_CONFIRM_SAVE_SAVE;
-    widget_end_widget( WIDGET_FINISHED_OK );
-    break;
-  case INPUT_KEY_Escape:
-  case INPUT_KEY_c:
-    widget_query.save = UI_CONFIRM_SAVE_CANCEL;
-    widget_end_widget( WIDGET_FINISHED_CANCEL );
-    break;
-  case INPUT_KEY_d:
-    widget_query.save = UI_CONFIRM_SAVE_DONTSAVE;
-    widget_end_widget( WIDGET_FINISHED_OK );
-    break;
-  default:;
-  }
+  widget_query_generic_keyhandler( query_save,
+                                   sizeof(query_save)/sizeof(widget_query_entry),
+                                   key );
 }

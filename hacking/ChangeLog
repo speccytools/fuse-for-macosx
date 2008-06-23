@@ -2757,3 +2757,5 @@
 20080623 compat/{unix/file.c,wii/file.c},utils.c: don't produce an error
 	 message if opening a file failed as this can be a normal result.
 20080623 utils.c: call the right function when reading a file.
+20080624 ui/widget/query.c: make widget queries navigable keyboardlessly
+         (Fred).
