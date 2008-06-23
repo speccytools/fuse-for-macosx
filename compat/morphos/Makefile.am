@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2007 Philip Kendall
+## Copyright (c) 2007-2008 Philip Kendall
 
 ## $Id$
 
@@ -27,7 +27,8 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libcompatos.a
 
-libcompatos_a_SOURCES = osname.c \
+libcompatos_a_SOURCES = ../unix/file.c \
+			osname.c \
 			../amiga/paths.c
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@

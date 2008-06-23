@@ -1,5 +1,5 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2005 Philip Kendall
+   Copyright (c) 1999-2008 Philip Kendall
 
    $Id$
 
@@ -26,16 +26,10 @@
 #include <config.h>
 
 #include <errno.h>
-#include <fcntl.h>
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
 #endif				/* #ifdef HAVE_LIBGEN_H */
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <ui/ui.h>
 #include <unistd.h>
 
@@ -194,14 +188,14 @@ utils_open_file( const char *filename, int autoload,
 int
 utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 {
-  int fd;
+  compat_fd fd;
 
   char path[ PATH_MAX ];
   path_context ctx;
 
   /* If given an absolute path, just look there */
   if( compat_is_absolute_path( filename ) )
-    return open( filename, O_RDONLY | O_BINARY );
+    return compat_file_open( filename, 0 );
 
   /* Otherwise look in some likely locations */
   init_path_context( &ctx, type );
@@ -212,8 +206,8 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 #else
     snprintf( path, PATH_MAX, "%s" FUSE_DIR_SEP_STR "%s", ctx.path, filename );
 #endif
-    fd = open( path, O_RDONLY | O_BINARY );
-    if( fd != -1 ) return fd;
+    fd = compat_file_open( path, 0 );
+    if( fd != COMPAT_FILE_OPEN_FAILED ) return fd;
 
   }
 
@@ -329,36 +323,28 @@ get_next_path( path_context *ctx )
 int
 utils_read_file( const char *filename, utils_file *file )
 {
-  int fd;
+  compat_fd fd;
 
   int error;
 
-  fd = open( filename, O_RDONLY | O_BINARY );
-  if( fd == -1 ) {
+  fd = compat_file_open( filename, 0 );
+  if( fd == COMPAT_FILE_OPEN_FAILED ) {
     ui_error( UI_ERROR_ERROR, "couldn't open '%s': %s", filename,
 	      strerror( errno ) );
     return 1;
   }
 
-  error = utils_read_fd( fd, filename, file );
+  error = compat_file_read( fd, file );
   if( error ) return error;
 
   return 0;
 }
 
 int
-utils_read_fd( int fd, const char *filename, utils_file *file )
+utils_read_fd( compat_fd fd, const char *filename, utils_file *file )
 {
-  struct stat file_info;
-
-  if( fstat( fd, &file_info) ) {
-    ui_error( UI_ERROR_ERROR, "Couldn't stat '%s': %s", filename,
-	      strerror( errno ) );
-    close(fd);
-    return 1;
-  }
-
-  file->length = file_info.st_size;
+  file->length = compat_file_get_length( fd );
+  if( file->length == -1 ) return 1;
 
   file->buffer = malloc( file->length );
   if( !file->buffer ) {
@@ -366,15 +352,13 @@ utils_read_fd( int fd, const char *filename, utils_file *file )
     return 1;
   }
 
-  if( read( fd, file->buffer, file->length ) != file->length ) {
-    ui_error( UI_ERROR_ERROR, "Error reading from '%s': %s", filename,
-	      strerror( errno ) );
+  if( compat_file_read( fd, file ) ) {
     free( file->buffer );
-    close( fd );
+    compat_file_close( fd );
     return 1;
   }
 
-  if( close(fd) ) {
+  if( compat_file_close( fd ) ) {
     ui_error( UI_ERROR_ERROR, "Couldn't close '%s': %s", filename,
 	      strerror( errno ) );
     free( file->buffer );
@@ -395,27 +379,17 @@ utils_close_file( utils_file *file )
 int utils_write_file( const char *filename, const unsigned char *buffer,
 		      size_t length )
 {
-  FILE *f;
+  compat_fd fd;
 
-  f=fopen( filename, "wb" );
-  if(!f) { 
-    ui_error( UI_ERROR_ERROR, "error opening '%s': %s", filename,
-	      strerror( errno ) );
-    return 1;
-  }
-	    
-  if( fwrite( buffer, 1, length, f ) != length ) {
-    ui_error( UI_ERROR_ERROR, "error writing to '%s': %s", filename,
-	      strerror( errno ) );
-    fclose(f);
+  fd = compat_file_open( filename, 1 );
+  if( fd == COMPAT_FILE_OPEN_FAILED ) return 1;
+
+  if( compat_file_write( fd, buffer, length ) ) {
+    compat_file_close( fd );
     return 1;
   }
 
-  if( fclose( f ) ) {
-    ui_error( UI_ERROR_ERROR, "error closing '%s': %s", filename,
-	      strerror( errno ) );
-    return 1;
-  }
+  if( compat_file_close( fd ) ) return 1;
 
   return 0;
 }

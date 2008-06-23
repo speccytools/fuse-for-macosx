@@ -2750,3 +2750,7 @@
 20080621 debugger/breakpoint.c: don't try copying an empty condition.
 20080621 debugger/debugger.c: when exiting, quit the main emulation loop
 	 immediately.
+20080623 compat/{amiga/Makefile.am,morphos/Makefile.am,unix/{Makefile.am,
+         file.c},wii/{Makefile.am,file.c},win32/Makefile.am},compat.h,if1.c,
+         utils.c: factor out low-level file handling into compat/<os>/file.c;
+         needed for Wii port.
