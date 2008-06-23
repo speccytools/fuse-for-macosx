@@ -334,7 +334,7 @@ utils_read_file( const char *filename, utils_file *file )
     return 1;
   }
 
-  error = compat_file_read( fd, file );
+  error = utils_read_fd( fd, filename, file );
   if( error ) return error;
 
   return 0;
