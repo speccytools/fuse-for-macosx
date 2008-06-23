@@ -2754,3 +2754,5 @@
          file.c},wii/{Makefile.am,file.c},win32/Makefile.am},compat.h,if1.c,
          utils.c: factor out low-level file handling into compat/<os>/file.c;
          needed for Wii port.
+20080623 compat/{unix/file.c,wii/file.c},utils.c: don't produce an error
+	 message if opening a file failed as this can be a normal result.

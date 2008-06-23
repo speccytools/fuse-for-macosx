@@ -47,13 +47,7 @@ compat_fd
 compat_file_open( const char *path, int write )
 {
   int flags = write ? O_WRONLY | O_CREAT : O_RDONLY;
-  compat_fd r;
-  flags |= O_BINARY;
-  r = open( path, flags );
-  if( r == COMPAT_FILE_OPEN_FAILED ) {
-    ui_error( UI_ERROR_ERROR, "failed to open `%s': %s", path, strerror( errno ) );
-  }
-  return r;
+  return open( path, flags );
 }
 
 off_t

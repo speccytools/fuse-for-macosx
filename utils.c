@@ -382,7 +382,11 @@ int utils_write_file( const char *filename, const unsigned char *buffer,
   compat_fd fd;
 
   fd = compat_file_open( filename, 1 );
-  if( fd == COMPAT_FILE_OPEN_FAILED ) return 1;
+  if( fd == COMPAT_FILE_OPEN_FAILED ) {
+    ui_error( UI_ERROR_ERROR, "couldn't open `%s' for writing: %s\n",
+    	      filename, strerror( errno ) );
+    return 1;
+  }
 
   if( compat_file_write( fd, buffer, length ) ) {
     compat_file_close( fd );

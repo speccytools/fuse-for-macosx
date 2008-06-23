@@ -39,12 +39,7 @@ const compat_fd COMPAT_FILE_OPEN_FAILED = NULL;
 compat_fd
 compat_file_open( const char *path, int write )
 {
-  compat_fd r;
-  r = fopen( path, write ? "w" : "r" );
-  if( r == COMPAT_FILE_OPEN_FAILED ) {
-    ui_error( UI_ERROR_ERROR, "failed to open `%s': %s", path, strerror( errno ) );
-  }
-  return r;
+  return fopen( path, write ? "w" : "r" );
 }
 
 off_t
