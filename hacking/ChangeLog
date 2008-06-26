@@ -2761,3 +2761,5 @@
          (Fred).
 20080626 menu.c,ui/{gtk/gtkui.c,widget/menu.c,win32/win32ui.c}: amalgamate
          triplicated functions (patch #1991628) (Gergely Szasz).
+20080626 compat/unix/file.c: add <string.h> for strerror prototypes, printf
+         warning fixes too (Fred).

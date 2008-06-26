@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -72,8 +73,8 @@ compat_file_read( compat_fd fd, utils_file *file )
       ui_error( UI_ERROR_ERROR, "error reading file: %s", strerror( errno ) );
     } else {
       ui_error( UI_ERROR_ERROR,
-                "error reading file: expected %d bytes, but read only %d",
-                file->length, bytes );
+                "error reading file: expected %ld bytes, but read only %ld",
+                (unsigned long)file->length, (unsigned long)bytes );
     }
     return 1;
   }
@@ -90,8 +91,8 @@ compat_file_write( compat_fd fd, const unsigned char *buffer, size_t length )
       ui_error( UI_ERROR_ERROR, "error writing file: %s", strerror( errno ) );
     } else {
       ui_error( UI_ERROR_ERROR,
-                "error writing file: expected %d bytes, but wrote only %d",
-                length, bytes );
+                "error writing file: expected %ld bytes, but wrote only %ld",
+                (unsigned long)length, (unsigned long)bytes );
     }
     return 1;
   }
