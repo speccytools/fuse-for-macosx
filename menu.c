@@ -613,6 +613,187 @@ MENU_CALLBACK( menu_media_ide_divide_writeprotect )
   WIDGET_END;
 }
 
+MENU_CALLBACK( menu_file_savesnapshot )
+{
+  char *filename;
+
+  WIDGET_END;
+
+  fuse_emulation_pause();
+
+  filename = ui_get_save_filename( "Fuse - Save Snapshot" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  snapshot_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK( menu_file_savescreenasscr )
+{
+  char *filename;
+
+  WIDGET_END;
+
+  fuse_emulation_pause();
+
+  filename = ui_get_save_filename( "Fuse - Save Screenshot as SCR" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_scr_write( filename );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+#ifdef USE_LIBPNG
+
+MENU_CALLBACK( menu_file_savescreenaspng )
+{
+  scaler_type scaler;
+  char *filename;
+
+  WIDGET_END;
+
+  fuse_emulation_pause();
+
+  scaler = menu_get_scaler( screenshot_available_scalers );
+  if( scaler == SCALER_NUM ) {
+    fuse_emulation_unpause();
+    return;
+  }
+
+  filename =
+    ui_get_save_filename( "Fuse - Save Screenshot as PNG" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_write( filename, scaler );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+#endif
+
+MENU_CALLBACK( menu_file_movies_recordmovieasscr )
+{
+  char *filename;
+
+  WIDGET_END;
+  
+  fuse_emulation_pause();
+
+  filename = ui_get_save_filename( "Fuse - Record Movie as SCR" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
+            filename );
+
+  screenshot_movie_record = 1;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+
+#ifdef USE_LIBPNG
+MENU_CALLBACK( menu_file_movies_recordmovieaspng )
+{
+  scaler_type scaler;
+  char *filename;
+
+  WIDGET_END;
+
+  fuse_emulation_pause();
+
+  scaler = menu_get_scaler( screenshot_available_scalers );
+  if( scaler == SCALER_NUM ) {
+    fuse_emulation_unpause();
+    return;
+  }
+
+  filename = ui_get_save_filename( "Fuse - Save Screenshot as PNG" );
+  if( !filename ) { fuse_emulation_unpause(); return; }
+
+  screenshot_write( filename, scaler );
+
+  free( filename );
+
+  fuse_emulation_unpause();
+}
+#endif
+
+MENU_CALLBACK( menu_file_recording_record )
+{
+  char *recording;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  recording = ui_get_save_filename( "Fuse - Start Recording" );
+  if( !recording ) { fuse_emulation_unpause(); return; }
+
+  rzx_start_recording( recording, 1 );
+
+  free( recording );
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK( menu_file_recording_recordfromsnapshot )
+{
+  char *snap, *recording;
+
+  if( rzx_playback || rzx_recording ) return;
+
+  fuse_emulation_pause();
+
+  snap = ui_get_open_filename( "Fuse - Load Snapshot " );
+  if( !snap ) { fuse_emulation_unpause(); return; }
+
+  recording = ui_get_save_filename( "Fuse - Start Recording" );
+  if( !recording ) { free( snap ); fuse_emulation_unpause(); return; }
+
+  if( snapshot_read( snap ) ) {
+    free( snap ); free( recording ); fuse_emulation_unpause(); return;
+  }
+
+  rzx_start_recording( recording, settings_current.embed_snapshot );
+
+  free( recording );
+
+  display_refresh_all();
+
+  fuse_emulation_unpause();
+}
+
+MENU_CALLBACK( menu_file_aylogging_record )
+{
+  char *psgfile;
+
+  if( psg_recording ) return;
+
+  fuse_emulation_pause();
+
+  psgfile = ui_get_save_filename( "Fuse - Start AY Log" );
+  if( !psgfile ) { fuse_emulation_unpause(); return; }
+
+  psg_start_recording( psgfile );
+
+  free( psgfile );
+
+  display_refresh_all();
+
+  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 1 );
+
+  fuse_emulation_unpause();
+}
+
 int
 menu_open_snap( void )
 {
