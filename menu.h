@@ -47,6 +47,8 @@
 
 #endif			/* #ifdef UI_GTK */
 
+#define MENU_DETAIL( name ) const char* name( void )
+
 /*
  * Things defined in menu.c
  */
@@ -63,6 +65,7 @@ MENU_CALLBACK( menu_file_movies_stopmovierecording );
 
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select );
 MENU_CALLBACK( menu_options_filter );
+MENU_DETAIL( menu_filter_detail );
 MENU_CALLBACK( menu_options_save );
 
 MENU_CALLBACK( menu_machine_profiler_start );
@@ -127,10 +130,14 @@ MENU_CALLBACK( menu_options_sound );
 MENU_CALLBACK( menu_options_peripherals );
 MENU_CALLBACK( menu_options_rzx );
 MENU_CALLBACK_WITH_ACTION( menu_options_joysticks_select );
+MENU_DETAIL( menu_keyboard_joystick_detail );
+MENU_DETAIL( menu_joystick_1_detail );
+MENU_DETAIL( menu_joystick_2_detail );
 
 MENU_CALLBACK( menu_machine_pause );
 MENU_CALLBACK( menu_machine_reset );
 MENU_CALLBACK( menu_machine_select );
+MENU_DETAIL( menu_machine_detail );
 MENU_CALLBACK( menu_machine_debugger );
 MENU_CALLBACK( menu_machine_pokefinder );
 MENU_CALLBACK( menu_machine_memorybrowser );

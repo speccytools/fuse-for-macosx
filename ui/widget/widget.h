@@ -80,6 +80,9 @@ extern widget_keyhandler_fn widget_keyhandler;
 /* A generic callback function */
 typedef void (*widget_menu_callback_fn)( int action );
 
+/* A generic menu detail callback function */
+typedef const char* (*widget_menu_detail_callback_fn)( void );
+
 /* A general menu */
 typedef struct widget_menu_entry {
   const char *text;		/* Menu entry text */
@@ -87,6 +90,7 @@ typedef struct widget_menu_entry {
 
   struct widget_menu_entry *submenu;
   widget_menu_callback_fn callback;
+  widget_menu_detail_callback_fn detail;
 
   int action;
   int inactive;

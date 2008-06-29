@@ -2764,3 +2764,5 @@
 20080626 compat/unix/file.c: add <string.h> for strerror prototypes, printf
          warning fixes too (Fred).
 20080629 utils.c: add <string.h> for strncpy prototype (Fred).
+20080629 menu.[ch],menu_data.[dat|pl],ui/widget/{menu.c,widget.[ch]}: add
+         optional detail to menus showing current option selected (Fred).

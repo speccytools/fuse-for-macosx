@@ -631,6 +631,9 @@ widget_calculate_menu_width(widget_menu_entry *menu)
       total_width += 3*8;
     }
 
+    /* If this has extra details, leave room for the extra text */
+    if( ptr->detail ) total_width += widget_stringwidth( ptr->detail() )+2*8;
+
     if (total_width > max_width)
       max_width = total_width;
   }

@@ -35,6 +35,7 @@
 #include "fuse.h"
 #include "if1.h"
 #include "if2.h"
+#include "joystick.h"
 #include "menu.h"
 #include "profile.h"
 #include "psg.h"
@@ -46,6 +47,7 @@
 #include "tape.h"
 #include "ui/ui.h"
 #include "utils.h"
+#include "ui/scaler/scaler.h"
 #include "ui/widget/widget.h"
 #include "z80/z80.h"
 #include "zxatasp.h"
@@ -886,4 +888,34 @@ menu_select_roms( libspectrum_machine machine, size_t start, size_t n )
 {
   return menu_select_roms_with_title( libspectrum_machine_name( machine ),
 				      start, n );
+}
+
+const char*
+menu_machine_detail( void )
+{
+  return libspectrum_machine_name( machine_current->machine );
+}
+
+const char*
+menu_filter_detail( void )
+{
+  return scaler_name(current_scaler);
+}
+
+const char*
+menu_keyboard_joystick_detail( void )
+{
+  return joystick_name[ settings_current.joystick_keyboard_output ];
+}
+
+const char*
+menu_joystick_1_detail( void )
+{
+  return joystick_name[ settings_current.joystick_1_output ];
+}
+
+const char*
+menu_joystick_2_detail( void )
+{
+  return joystick_name[ settings_current.joystick_2_output ];
 }

@@ -75,7 +75,7 @@ while(<>) {
 
     chomp;
 
-    my( $path, $type, $hotkey, $function, $action ) = split /\s*,\s*/;
+    my( $path, $type, $hotkey, $function, $detail, $action ) = split /\s*,\s*/;
 
     my @segments = split '/', $path;
 
@@ -98,6 +98,8 @@ while(<>) {
 	$entry->{action} = $action if $action;
 
     }
+
+    $entry->{detail} = $detail if $detail;
 
     push @$walk, $entry;
 
@@ -191,12 +193,14 @@ sub _dump_widget ($$) {
 
 	my $cname = cname( $name );
 	
+        my $detail = $item->{detail} || "NULL";
+
 	if( $item->{submenu} ) {
-	    $s .= "${path}_$cname, NULL, 0";
+	    $s .= "${path}_$cname, NULL, $detail, 0";
 	    _dump_widget( $item, "${path}_$cname" );
 	} else {
 	    my $function = $item->{function} || "${path}_$cname";
-	    $s .= "NULL, $function, " . ( $item->{action} || 0 );
+	    $s .= "NULL, $function, $detail, " . ( $item->{action} || 0 );
 	}
 
 	$s .= " },\n";

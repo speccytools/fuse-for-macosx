@@ -73,10 +73,10 @@ print_items( void )
 	     WIDGET_COLOUR_FOREGROUND;
 
     if( i == highlight_line ) {
-      widget_rectangle( menu_left_edge_x, i*8+24, width*8-2, 1*8,
+      widget_rectangle( menu_left_edge_x, height, width*8-2, 1*8,
                         WIDGET_COLOUR_HIGHLIGHT );
     } else {
-      widget_rectangle( menu_left_edge_x, i*8+24, width*8-2, 1*8,
+      widget_rectangle( menu_left_edge_x, height, width*8-2, 1*8,
                         WIDGET_COLOUR_BACKGROUND );
     }
 
@@ -85,6 +85,12 @@ print_items( void )
     if( menu[i+1].submenu ) {
       widget_draw_submenu_arrow(DISPLAY_BORDER_ASPECT_WIDTH+menu_left_edge_x+
                                 width*8-9, i*8+49, colour);
+    }
+
+    if( menu[i+1].detail ) {
+      size_t detail_width = widget_stringwidth( menu[i+1].detail() );
+      int x = menu_left_edge_x + (width-1)*8 - detail_width - 2;
+      widget_printstring( x, height, WIDGET_COLOUR_DISABLED, menu[i+1].detail() );
     }
 
     height += 8;
