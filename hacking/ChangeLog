@@ -2763,3 +2763,4 @@
          triplicated functions (patch #1991628) (Gergely Szasz).
 20080626 compat/unix/file.c: add <string.h> for strerror prototypes, printf
          warning fixes too (Fred).
+20080629 utils.c: add <string.h> for strncpy prototype (Fred).

@@ -29,6 +29,7 @@
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
 #endif				/* #ifdef HAVE_LIBGEN_H */
+#include <string.h>
 #include <sys/stat.h>
 #include <ui/ui.h>
 #include <unistd.h>
