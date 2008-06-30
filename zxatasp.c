@@ -156,7 +156,7 @@ static module_info_t zxatasp_module_info = {
 int
 zxatasp_init( void )
 {
-  int error;
+  int error = 0;
 
   zxatasp_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   zxatasp_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );

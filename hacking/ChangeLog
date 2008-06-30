@@ -2769,3 +2769,4 @@
 20080630 dck.c,divide.c,fuse.c,if1.c,menu.c,rzx.c,simpleide.c,snapshot.c,
 	 tape.c,zxatasp.c,zxcf.c: handle new allocator returns object
 	 style API from libspectrum.
+20080630 zxatasp.c: intialise error before returning it (Fred).
