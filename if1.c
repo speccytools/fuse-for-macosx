@@ -299,7 +299,7 @@ if1_init( void )
   if1_ula.esc_in = 0; /* empty */
 
   for( m = 0; m < 8; m++ ) {
-    libspectrum_microdrive_alloc( &( microdrive[m].cartridge ) );
+    microdrive[m].cartridge = libspectrum_microdrive_alloc();
     microdrive[m].inserted = 0;
     microdrive[m].modified = 0;
   }

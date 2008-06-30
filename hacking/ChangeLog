@@ -2766,3 +2766,6 @@
 20080629 utils.c: add <string.h> for strncpy prototype (Fred).
 20080629 menu.[ch],menu_data.[dat|pl],ui/widget/{menu.c,widget.[ch]}: add
          optional detail to menus showing current option selected (Fred).
+20080630 dck.c,divide.c,fuse.c,if1.c,menu.c,rzx.c,simpleide.c,snapshot.c,
+	 tape.c,zxatasp.c,zxcf.c: handle new allocator returns object
+	 style API from libspectrum.

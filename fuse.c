@@ -331,7 +331,7 @@ int creator_init( void )
   sys_error = compat_osname( osname, sizeof( osname ) );
   if( sys_error ) return 1;
 
-  libspectrum_creator_alloc( &fuse_creator );
+  fuse_creator = libspectrum_creator_alloc();
 
   error = libspectrum_creator_set_program( fuse_creator, "Fuse" );
   if( error ) { libspectrum_creator_free( fuse_creator ); return error; }
