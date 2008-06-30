@@ -93,10 +93,7 @@ tape_event_record_sample( libspectrum_dword last_tstates, int type,
 
 int tape_init( void )
 {
-  libspectrum_error error;
-
-  error = libspectrum_tape_alloc( &tape );
-  if( !tape ) return error;
+  libspectrum_tape_alloc( &tape );
 
   play_event = debugger_event_register( event_type_string,
 					play_event_detail_string );
@@ -510,8 +507,7 @@ int tape_save_trap( void )
   if( ! trap_check_rom() ) return 3;
 
   /* Get a new block to store this data in */
-  error = libspectrum_tape_block_alloc( &block, LIBSPECTRUM_TAPE_BLOCK_ROM );
-  if( error ) return error;
+  libspectrum_tape_block_alloc( &block, LIBSPECTRUM_TAPE_BLOCK_ROM );
   
   /* The +2 here is for the flag and parity bytes */
   length = DE + 2;
@@ -803,9 +799,7 @@ tape_record_stop( void )
   error = event_remove_type( record_event );
   if( error ) return error;
 
-  error = libspectrum_tape_block_alloc( &block,
-                                        LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE );
-  if( error ) return error;
+  libspectrum_tape_block_alloc( &block, LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE );
 
   libspectrum_tape_block_set_scale( block, rec_state.tstates_per_sample );
   libspectrum_tape_block_set_data_length( block, rec_state.tape_buffer_used );

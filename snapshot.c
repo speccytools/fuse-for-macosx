@@ -52,7 +52,7 @@ int snapshot_read( const char *filename )
   libspectrum_snap *snap;
   int error;
 
-  error = libspectrum_snap_alloc( &snap ); if( error ) return error;
+  libspectrum_snap_alloc( &snap );
 
   error = utils_read_file( filename, &file );
   if( error ) { libspectrum_snap_free( snap ); return error; }
@@ -83,7 +83,7 @@ snapshot_read_buffer( const unsigned char *buffer, size_t length,
 {
   libspectrum_snap *snap; int error;
 
-  error = libspectrum_snap_alloc( &snap ); if( error ) return error;
+  libspectrum_snap_alloc( &snap );
 
   error = libspectrum_snap_read( snap, buffer, length, type, NULL );
   if( error ) { libspectrum_snap_free( snap ); return error; }
@@ -175,7 +175,7 @@ int snapshot_write( const char *filename )
   if( class != LIBSPECTRUM_CLASS_SNAPSHOT || type == LIBSPECTRUM_ID_UNKNOWN )
     type = LIBSPECTRUM_ID_SNAPSHOT_SZX;
 
-  error = libspectrum_snap_alloc( &snap ); if( error ) return error;
+  libspectrum_snap_alloc( &snap );
 
   error = snapshot_copy_to( snap );
   if( error ) { libspectrum_snap_free( snap ); return error; }

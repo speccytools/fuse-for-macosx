@@ -105,10 +105,8 @@ divide_init( void )
 {
   int error;
 
-  error = libspectrum_ide_alloc( &divide_idechn0, LIBSPECTRUM_IDE_DATA16 );
-  if( error ) return error;
-  error = libspectrum_ide_alloc( &divide_idechn1, LIBSPECTRUM_IDE_DATA16 );
-  if( error ) return error;
+  libspectrum_ide_alloc( &divide_idechn0, LIBSPECTRUM_IDE_DATA16 );
+  libspectrum_ide_alloc( &divide_idechn1, LIBSPECTRUM_IDE_DATA16 );
   
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT, 0 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT, 0 );
@@ -133,7 +131,7 @@ divide_init( void )
 				     &unpage_event ) )
     return 1;
 
-  return error;
+  return 0;
 }
 
 int

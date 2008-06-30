@@ -72,8 +72,7 @@ simpleide_init( void )
 {
   int error;
 
-  error = libspectrum_ide_alloc( &simpleide_idechn, LIBSPECTRUM_IDE_DATA8 );
-  if( error ) return error;
+  libspectrum_ide_alloc( &simpleide_idechn, LIBSPECTRUM_IDE_DATA8 );
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT, 0 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_SLAVE_EJECT, 0 );

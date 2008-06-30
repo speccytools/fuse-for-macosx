@@ -299,9 +299,7 @@ if1_init( void )
   if1_ula.esc_in = 0; /* empty */
 
   for( m = 0; m < 8; m++ ) {
-    libspectrum_error error =
-      libspectrum_microdrive_alloc( &( microdrive[m].cartridge ) );
-    if( error ) return error;
+    libspectrum_microdrive_alloc( &( microdrive[m].cartridge ) );
     microdrive[m].inserted = 0;
     microdrive[m].modified = 0;
   }
@@ -1194,9 +1192,8 @@ if1_mdr_write( int which, const char *filename )
 {
   microdrive_t *mdr = &microdrive[which];  
   
-  if( libspectrum_microdrive_mdr_write( mdr->cartridge, &mdr->file.buffer,
-					  &mdr->file.length ) )
-    return 1;
+  libspectrum_microdrive_mdr_write( mdr->cartridge, &mdr->file.buffer,
+			            &mdr->file.length );
     
   if( utils_write_file( filename, mdr->file.buffer, mdr->file.length ) )
     return 1;

@@ -102,8 +102,7 @@ zxcf_init( void )
 
   last_memctl = 0x00;
                                 
-  error = libspectrum_ide_alloc( &zxcf_idechn, LIBSPECTRUM_IDE_DATA16 );
-  if( error ) return error;
+  libspectrum_ide_alloc( &zxcf_idechn, LIBSPECTRUM_IDE_DATA16 );
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT, 0 );
 

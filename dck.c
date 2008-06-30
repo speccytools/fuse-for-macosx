@@ -99,7 +99,7 @@ dck_reset( void )
     return 0;
   }
 
-  error = libspectrum_dck_alloc( &dck ); if( error ) return error;
+  libspectrum_dck_alloc( &dck );
 
   error = utils_read_file( settings_current.dck_file, &file );
   if( error ) { libspectrum_dck_free( dck, 0 ); return error; }
