@@ -498,7 +498,7 @@ int tape_save_trap( void )
   libspectrum_byte parity, *data;
   size_t length;
 
-  int i; libspectrum_error error;
+  int i;
 
   /* Do nothing if tape traps aren't active */
   if( !settings_current.tape_traps || tape_recording ) return 2;
@@ -532,9 +532,7 @@ int tape_save_trap( void )
   /* Give a 1 second pause after this block */
   libspectrum_tape_block_set_pause( block, 1000 );
 
-  /* Add the block to the current tape file */
-  error = libspectrum_tape_append_block( tape, block );
-  if( error ) return error;
+  libspectrum_tape_append_block( tape, block );
 
   tape_modified = 1;
   ui_tape_browser_update( UI_TAPE_BROWSER_NEW_BLOCK, block );
@@ -804,13 +802,7 @@ tape_record_stop( void )
   libspectrum_tape_block_set_data_length( block, rec_state.tape_buffer_used );
   libspectrum_tape_block_set_data( block, rec_state.tape_buffer );
 
-  /* Finally, put the block into the block list */
-  error = libspectrum_tape_append_block( tape, block );
-  if( error ) {
-    free( rec_state.tape_buffer );
-    libspectrum_tape_block_free( block );
-    return error;
-  }
+  libspectrum_tape_append_block( tape, block );
 
   rec_state.tape_buffer = NULL;
   rec_state.tape_buffer_size = 0;

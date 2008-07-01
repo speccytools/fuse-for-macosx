@@ -2770,3 +2770,4 @@
 	 tape.c,zxatasp.c,zxcf.c: handle new allocator returns object
 	 style API from libspectrum.
 20080630 zxatasp.c: intialise error before returning it (Fred).
+20080701 tape.c: one more function that can no longer error.
