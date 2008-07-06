@@ -40,6 +40,8 @@
   if( !debugger_command_input( buf, &result, max_size ) ) result = YY_NULL; \
 }
 
+#define YY_NO_INPUT
+
 %}
 
 ID	[a-z][a-z0-9]+
