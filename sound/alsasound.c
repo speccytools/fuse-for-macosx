@@ -317,19 +317,26 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     avail_min = exact_periodsize >> 1;
   if( snd_pcm_sw_params_set_avail_min( pcm_handle,
 		    sw_params, avail_min ) < 0 ) {
+#if SND_LIB_VERSION < 0x10010
     if( ( err = snd_pcm_sw_params_set_sleep_min( pcm_handle,
     		    sw_params, 1 ) ) < 0 ) {
 	fprintf( stderr, "Unable to set minimal sleep 1 for %s: %s\n", pcm_name,
               snd_strerror ( err ) );
     }
+#else
+    fprintf( stderr, "Unable to set avail min %s: %s\n", pcm_name,
+    	     snd_strerror( err ) );
+#endif
   }
 
+#if SND_LIB_VERSION < 0x10010
   if( ( err = snd_pcm_sw_params_set_xfer_align( pcm_handle, sw_params, 1 ) ) < 0 ) {
     ui_error( UI_ERROR_ERROR,"couldn't set xfer_allign on %s: %s", pcm_name,
               snd_strerror ( err ) );
     init_running = 0;
     return 1;
   }
+#endif
   
   if( ( err = snd_pcm_sw_params( pcm_handle, sw_params ) ) < 0 ) {
     ui_error( UI_ERROR_ERROR,"couldn't set sw_params on %s: %s", pcm_name,
