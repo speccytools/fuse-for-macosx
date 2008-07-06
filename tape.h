@@ -55,6 +55,7 @@ void tape_next_edge( libspectrum_dword last_tstates, int type,
 
 int tape_stop( void );
 int tape_is_playing( void );
+int tape_present( void );
 
 int tape_record_start( void );
 int tape_record_stop( void );

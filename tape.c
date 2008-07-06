@@ -684,6 +684,12 @@ tape_is_playing( void )
   return tape_playing;
 }
 
+int
+tape_present( void )
+{
+  return libspectrum_tape_present( tape );
+}
+
 typedef struct
 {
   libspectrum_byte *tape_buffer;

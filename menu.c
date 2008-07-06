@@ -918,3 +918,12 @@ menu_joystick_2_detail( void )
 {
   return joystick_name[ settings_current.joystick_2_output ];
 }
+
+const char*
+menu_tape_detail( void )
+{
+  if( !tape_present() ) return "Not inserted";
+
+  if( tape_is_playing() ) return "Playing";
+  else return "Stopped";
+}

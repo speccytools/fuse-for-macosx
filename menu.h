@@ -80,6 +80,7 @@ MENU_CALLBACK( menu_media_tape_clear );
 MENU_CALLBACK( menu_media_tape_write );
 MENU_CALLBACK( menu_media_tape_recordstart );
 MENU_CALLBACK( menu_media_tape_recordstop );
+MENU_DETAIL( menu_tape_detail );
 
 MENU_CALLBACK_WITH_ACTION( menu_media_insert_new );
 MENU_CALLBACK_WITH_ACTION( menu_media_insert );
