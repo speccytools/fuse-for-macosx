@@ -2776,3 +2776,4 @@
 	 #1916457) (Gergely Szasz).
 20080706 menu.[ch],menu_data.dat,tape.[ch]: add some detail text for the tape
          branch for the Widget UI ala FuseX (thanks, crabfists) (Fred).
+20080715 PORTING: add document on what you can and cannot do with Fuse's code.
