@@ -682,8 +682,12 @@ update_breakpoints()
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_TIME:
-      _sntprintf( breakpoint_text[2], 40, "%5d", bp->value.tstates );
+      _sntprintf( breakpoint_text[2], 40, "%5d", bp->value.time.tstates );
       break;
+      
+    case DEBUGGER_BREAKPOINT_TYPE_EVENT:
+      _sntprintf( breakpoint_text[2], 40, "%s:%s", bp->value.event.type,
+                  bp->value.event.detail );
 
     }
 
@@ -781,7 +785,7 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
   lvi.mask = LVIF_TEXT;
 
   /* Skip events which have been removed */
-  if( ptr->type == EVENT_TYPE_NULL ) return;
+  if( ptr->type == event_type_null ) return;
 
   _sntprintf( event_text[0], 40, "%d", ptr->tstates );
   /* FIXME: event_name() is not unicode compliant */
