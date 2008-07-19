@@ -26,6 +26,14 @@ What Fuse does have:
 * Emulation of the DivIDE, Interface I, Kempston mouse, Spectrum +3e,
   ZXATASP, ZXCF, Beta 128 and +D interfaces.
 
+Help! <xyz> doesn't work
+------------------------
+
+If you're having a problem using/running/building Fuse, the two places
+you're most likely to get help are the development mailing list
+<fuse-emulator-devel@lists.sf.net> or the official forums at
+<http://sourceforge.net/forum/?group_id=91293>.
+
 What you'll need to run Fuse
 ----------------------------
 

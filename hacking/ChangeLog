@@ -2779,3 +2779,5 @@
 20080715 PORTING: add document on what you can and cannot do with Fuse's code.
 20080717 ui/win32/debugger.c: Win32: accommodation for the new event
 	 architecture (Marek).
+20080719 README,fuse.c: try and direct support requests to locations seen
+	 by more people than just me.
