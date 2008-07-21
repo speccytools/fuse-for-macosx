@@ -35,7 +35,6 @@ libuiwin32_a_SOURCES = binary.c \
 		       browse.rc \
 		       debugger.c \
 		       debugger.rc \
-		       error.c \
 		       keysyms.c \
 		       memorybrowser.c \
 		       memorybrowser.rc \

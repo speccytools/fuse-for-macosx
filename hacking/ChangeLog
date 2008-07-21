@@ -2781,3 +2781,5 @@
 	 architecture (Marek).
 20080719 README,fuse.c: try and direct support requests to locations seen
 	 by more people than just me.
+20080721 ui/win32/{win32ui.c,error.c,Makefile.am}: Win32: Integrated
+	 ui_error_specific into win32ui.c similarly to gtk ui (Marek).

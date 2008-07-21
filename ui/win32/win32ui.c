@@ -389,6 +389,40 @@ ui_end( void )
   return 0;
 }
 
+int
+ui_error_specific( ui_error_level severity, const char *message )
+{
+  /* finish - can ui be not initialized? */
+  UINT mtype;
+  HWND hWnd;
+
+  fuse_emulation_pause();
+
+  hWnd = GetActiveWindow();
+
+  switch( severity ) {
+
+  case UI_ERROR_INFO:
+    MessageBox( hWnd, message, "Fuse - Info", MB_ICONINFORMATION | MB_OK );
+    break;
+  case UI_ERROR_WARNING:
+    MessageBox( hWnd, message, "Fuse - Warning", MB_ICONWARNING | MB_OK );
+    break;
+  case UI_ERROR_ERROR:
+    MessageBox( hWnd, message, "Fuse - Error", MB_ICONERROR | MB_OK );
+    break;
+  default:
+    MessageBox( hWnd, message, "Fuse - (Unknown Error Level)",
+                MB_ICONINFORMATION | MB_OK );
+    break;
+
+  }
+
+  fuse_emulation_unpause();
+
+  return 0;
+}
+
 void
 win32_verror( int is_error )
 {
