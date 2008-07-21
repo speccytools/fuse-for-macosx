@@ -66,18 +66,6 @@ selector_dialog( win32ui_select_info *items );
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
-static int
-win32ui_confirm( const char *string )
-{
-  int result;
-
-  fuse_emulation_pause();
-  result = MessageBox( fuse_hWnd, string, "Fuse - Confirm",
-                       MB_YESNO|MB_ICONQUESTION ) == IDYES;
-  fuse_emulation_unpause();
-  return result;
-}
-
 static void
 handle_drop( HDROP hDrop )
 {
@@ -587,13 +575,6 @@ char *
 ui_get_save_filename( const char *title )
 {
   return win32ui_get_filename( title, 1 );
-}
-
-ui_confirm_save_t
-ui_confirm_save_specific( const char *message )
-{
-  STUB;
-  return UI_CONFIRM_SAVE_CANCEL;
 }
 
 ui_confirm_joystick_t

@@ -68,6 +68,12 @@ void win32mouse_position( LPARAM lParam );
 void win32mouse_button( int button, int down );
 
 /*
+ * General user interface routines (win32ui.c)
+ */
+
+int win32ui_confirm( const char *string );
+
+/*
  * Dialog box reset
  */
 

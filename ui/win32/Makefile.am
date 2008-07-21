@@ -33,6 +33,7 @@ libuiwin32_a_SOURCES = binary.c \
 		       binary.rc \
 		       browse.c \
 		       browse.rc \
+		       confirm.c \
 		       debugger.c \
 		       debugger.rc \
 		       keysyms.c \
