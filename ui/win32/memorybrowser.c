@@ -35,23 +35,23 @@
 
 #include "memorybrowser.h"
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 memorybrowser_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-void
+static void
 memorybrowser_init( HWND hwndDlg );
 
 /* helper constants for memory listview's scrollbar */
-const int memorysb_min = 0x0000;
-const int memorysb_max = 0xffff;
-const int memorysb_step = 0x10;
-const int memorysb_page_inc = 0xa0;
-const int memorysb_page_size = 0x13f;
+static const int memorysb_min = 0x0000;
+static const int memorysb_max = 0xffff;
+static const int memorysb_step = 0x10;
+static const int memorysb_page_inc = 0xa0;
+static const int memorysb_page_size = 0x13f;
 
 /* listview monospaced font */
-HFONT hfont;
+static HFONT hfont;
 
-void
+static void
 update_display( HWND hwndDlg, libspectrum_word base )
 {
   size_t i, j;
@@ -98,7 +98,7 @@ update_display( HWND hwndDlg, libspectrum_word base )
   }
 }
 
-void
+static void
 scroller( HWND hwndDlg, WPARAM scroll_command )
 {
   libspectrum_word base;
@@ -159,7 +159,7 @@ menu_machine_memorybrowser()
   return;
 }
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 memorybrowser_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
   switch( uMsg )
@@ -202,7 +202,7 @@ memorybrowser_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   return FALSE;
 }
 
-void
+static void
 memorybrowser_init( HWND hwndDlg )
 {
   size_t i;

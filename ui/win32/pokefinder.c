@@ -34,20 +34,20 @@
 #include "ui/ui.h"
 #include "win32internals.h"
 
-void win32ui_pokefinder_incremented();
-void win32ui_pokefinder_decremented();
-void win32ui_pokefinder_search();
-void win32ui_pokefinder_reset();
-void win32ui_pokefinder_close();
-void update_pokefinder( void );
-void possible_click( LPNMITEMACTIVATE lpnmitem );
+static void win32ui_pokefinder_incremented();
+static void win32ui_pokefinder_decremented();
+static void win32ui_pokefinder_search();
+static void win32ui_pokefinder_reset();
+static void win32ui_pokefinder_close();
+static void update_pokefinder( void );
+static void possible_click( LPNMITEMACTIVATE lpnmitem );
 
 #define MAX_POSSIBLE 20
 
 int possible_page[ MAX_POSSIBLE ];
 libspectrum_word possible_offset[ MAX_POSSIBLE ];
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 win32ui_pokefinder_proc( HWND hWnd, UINT msg,
                 WPARAM wParam, LPARAM lParam )
 {
@@ -85,7 +85,7 @@ win32ui_pokefinder_proc( HWND hWnd, UINT msg,
   return FALSE;
 }
 
-void
+static void
 update_pokefinder( void )
 {
   size_t page, offset;
@@ -186,21 +186,21 @@ menu_machine_pokefinder( int action )
   update_pokefinder();
 }
 
-void
+static void
 win32ui_pokefinder_incremented()
 {
   pokefinder_incremented();
   update_pokefinder();
 }
 
-void
+static void
 win32ui_pokefinder_decremented()
 {
   pokefinder_decremented();
   update_pokefinder();
 }
 
-void
+static void
 win32ui_pokefinder_search()
 {
   long value;
@@ -236,21 +236,21 @@ win32ui_pokefinder_search()
   update_pokefinder();
 }
 
-void
+static void
 win32ui_pokefinder_reset()
 {
   pokefinder_clear();
   update_pokefinder();
 }
 
-void
+static void
 win32ui_pokefinder_close()
 {
   DestroyWindow( fuse_hPFWnd );
   fuse_hPFWnd = NULL;
 }
 
-void
+static void
 possible_click( LPNMITEMACTIVATE lpnmitem )
 {
   /* FIXME: implement equivalent of GTK's select-via-keyboard to enter here */

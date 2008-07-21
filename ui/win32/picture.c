@@ -38,14 +38,14 @@
 static void *picture;
 static const int picture_pitch = DISPLAY_ASPECT_WIDTH * 4;
 
-HWND hDialogPicture = NULL;
-utils_file screen;
-HBITMAP picture_BMP;
+static HWND hDialogPicture = NULL;
+static utils_file screen;
+static HBITMAP picture_BMP;
 
 static int read_screen( const char *filename, utils_file *screen );
 static void draw_screen( libspectrum_byte *screen, int border );
 
-LRESULT WINAPI picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+static LRESULT WINAPI picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 int
 win32ui_picture( const char *filename, int border )
@@ -99,7 +99,7 @@ win32ui_picture( const char *filename, int border )
   return 0;
 }
 
-LRESULT WINAPI
+static LRESULT WINAPI
 picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {

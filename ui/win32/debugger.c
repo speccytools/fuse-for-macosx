@@ -72,62 +72,62 @@ typedef enum debugger_pane {
   DEBUGGER_PANE_END		/* End marker */
 } debugger_pane;
 
-int create_dialog( void );
-int hide_hidden_panes( void );
-void get_pane_menu_item( debugger_pane pane );
-void get_pane( debugger_pane pane );
-int create_menu_bar( void );
-void toggle_display( void );
+static int create_dialog( void );
+static int hide_hidden_panes( void );
+static void get_pane_menu_item( debugger_pane pane );
+static void get_pane( debugger_pane pane );
+static int create_menu_bar( void );
+static void toggle_display( void );
 /* int create_register_display( void ); this function is handled by rc */
 /* int create_memory_map( void ); this function is handled by rc */
-int create_breakpoints();
-int create_disassembly();
-int create_stack_display();
-void stack_click( LPNMITEMACTIVATE lpnmitem );
-int create_events();
-void events_click( LPNMITEMACTIVATE lpnmitem );
+static int create_breakpoints();
+static int create_disassembly();
+static int create_stack_display();
+static void stack_click( LPNMITEMACTIVATE lpnmitem );
+static int create_events();
+static void events_click( LPNMITEMACTIVATE lpnmitem );
 /* int create_command_entry( void ); this function is handled by rc */
 /* int create_buttons( void ); this function is handled by rc */
 
-int activate_debugger( void );
-int update_memory_map( void );
-int update_breakpoints();
-int update_disassembly();
-int update_events( void );
-void add_event( gpointer data, gpointer user_data GCC_UNUSED );
-int deactivate_debugger( void );
+static int activate_debugger( void );
+static int update_memory_map( void );
+static int update_breakpoints();
+static int update_disassembly();
+static int update_events( void );
+static void add_event( gpointer data, gpointer user_data GCC_UNUSED );
+static int deactivate_debugger( void );
 
-void move_disassembly( WPARAM scroll_command );
+static void move_disassembly( WPARAM scroll_command );
 
-void evaluate_command();
-void win32ui_debugger_done_step();
-void win32ui_debugger_done_continue();
-void win32ui_debugger_break();
-void delete_dialog();
-void win32ui_debugger_done_close();
-INT_PTR CALLBACK win32ui_debugger_proc( HWND hWnd, UINT msg,
-                                        WPARAM wParam, LPARAM lParam );
+static void evaluate_command();
+static void win32ui_debugger_done_step();
+static void win32ui_debugger_done_continue();
+static void win32ui_debugger_break();
+static void delete_dialog();
+static void win32ui_debugger_done_close();
+static INT_PTR CALLBACK win32ui_debugger_proc( HWND hWnd, UINT msg,
+                                               WPARAM wParam, LPARAM lParam );
 
 /* The top line of the current disassembly */
-libspectrum_word disassembly_top;
+static libspectrum_word disassembly_top;
 
 /* helper constants for disassembly listview's scrollbar */
-const int disassembly_min = 0x0000;
-const int disassembly_max = 0xffff;
-const int disassembly_page = 20;
+static const int disassembly_min = 0x0000;
+static const int disassembly_max = 0xffff;
+static const int disassembly_page = 20;
 
 /* Is the debugger window active (as opposed to the debugger itself)? */
-int debugger_active;
+static int debugger_active;
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
-const TCHAR*
+static const TCHAR*
 format_8_bit( void )
 {
   return debugger_output_base == 10 ? TEXT( "%3d" ) : TEXT( "0x%02X" );
 }
 
-const TCHAR*
+static const TCHAR*
 format_16_bit( void )
 {
   return debugger_output_base == 10 ? TEXT( "%5d" ) : TEXT( "0x%04X" );
@@ -152,21 +152,21 @@ ui_debugger_activate( void )
   return 0;
 }
 
-int
+static int
 hide_hidden_panes( void ) /* FIXME: implement */
 {
   STUB;
   return 0;
 }
 
-void
+static void
 get_pane_menu_item( debugger_pane pane ) /* FIXME: implement */
 {
   STUB;
   return;
 }
 
-void
+static void
 get_pane( debugger_pane pane ) /* FIXME: implement */
 {
   STUB;
@@ -186,7 +186,7 @@ ui_debugger_deactivate( int interruptable )
   return 0;
 }
 
-int
+static int
 create_dialog() /* FIXME: implement */
 {
   int error;
@@ -222,20 +222,20 @@ create_dialog() /* FIXME: implement */
   return 0;
 }
 
-int
+static int
 create_menu_bar( void ) /* FIXME: implement */
 {
   STUB;
   return 0;
 }
 
-void
+static void
 toggle_display( void ) /* FIXME: implement */
 {
   STUB;
 }
 
-int
+static int
 create_breakpoints()
 {
   size_t i;
@@ -267,7 +267,7 @@ create_breakpoints()
   return 0;
 }
 
-int
+static int
 create_disassembly()
 {
   size_t i;
@@ -312,7 +312,7 @@ create_disassembly()
   return 0;
 }
 
-int
+static int
 create_stack_display()
 {
   size_t i;
@@ -344,7 +344,7 @@ create_stack_display()
   return 0;
 }
 
-void
+static void
 stack_click( LPNMITEMACTIVATE lpnmitem )
 {
   libspectrum_word address, destination;
@@ -367,7 +367,7 @@ stack_click( LPNMITEMACTIVATE lpnmitem )
   debugger_run();
 }
 
-int
+static int
 create_events()
 {
   size_t i;
@@ -399,7 +399,7 @@ create_events()
   return 0;
 }
 
-void
+static void
 events_click( LPNMITEMACTIVATE lpnmitem )
 {
   int got_text, error, row;
@@ -430,7 +430,7 @@ events_click( LPNMITEMACTIVATE lpnmitem )
   debugger_run();
 }
 
-int
+static int
 activate_debugger( void ) /* FIXME: implement */
 {
   debugger_active = 1;
@@ -599,7 +599,7 @@ ui_debugger_update( void )
   return 0;
 }
 
-int
+static int
 update_memory_map( void )
 {
   /* FIXME combine _TEXT_ and _REG_ objects, and apply monospace font */
@@ -632,7 +632,7 @@ update_memory_map( void )
   return 0;
 }
 
-int
+static int
 update_breakpoints()
 {
   /* FIXME: review this function for unicode compatibility */
@@ -720,7 +720,7 @@ update_breakpoints()
   return 0;
 }
 
-int
+static int
 update_disassembly()
 {
   size_t i, length; libspectrum_word address;
@@ -761,7 +761,7 @@ update_disassembly()
   return 0;
 }
 
-int
+static int
 update_events( void )
 {
   /* clear the listview */
@@ -773,7 +773,7 @@ update_events( void )
   return 0;
 }
 
-void
+static void
 add_event( gpointer data, gpointer user_data GCC_UNUSED )
 {
   event_t *ptr = data;
@@ -804,7 +804,7 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
                       ( LPARAM ) &lvi );
 }
 
-int
+static int
 deactivate_debugger( void ) /* FIXME: implement */
 {
   /* FIXME: call gtk_main_quit() equivalent here */
@@ -827,7 +827,7 @@ ui_debugger_disassemble( libspectrum_word address )
 }
 
 /* Called when the disassembly scrollbar is moved */
-void
+static void
 move_disassembly( WPARAM scroll_command )
 {
   SCROLLINFO si;
@@ -904,7 +904,7 @@ move_disassembly( WPARAM scroll_command )
 }
 
 /* Evaluate the command currently in the entry box */
-void
+static void
 evaluate_command()
 {
   TCHAR *buffer;
@@ -934,19 +934,19 @@ evaluate_command()
   free( buffer );
 }
 
-void
+static void
 win32ui_debugger_done_step()
 {
   debugger_step();
 }
 
-void
+static void
 win32ui_debugger_done_continue()
 {
   debugger_run();
 }
 
-void
+static void
 win32ui_debugger_break()
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
@@ -955,7 +955,7 @@ win32ui_debugger_break()
   EnableWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_BTN_BREAK ), FALSE );
 }
 
-void
+static void
 win32ui_debugger_done_close() /* FIXME: implement */
 {
   delete_dialog();
@@ -963,7 +963,7 @@ win32ui_debugger_done_close() /* FIXME: implement */
   win32ui_debugger_done_continue();
 }
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 win32ui_debugger_proc( HWND hWnd, UINT msg,
                        WPARAM wParam, LPARAM lParam )
 {
@@ -1014,7 +1014,7 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
   return FALSE;
 }
 
-void
+static void
 delete_dialog() /* FIXME: implement */
 {
   DestroyWindow( fuse_hDBGWnd );

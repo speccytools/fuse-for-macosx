@@ -61,12 +61,12 @@ typedef struct win32ui_select_info {
 
 } win32ui_select_info;
 
-int
+static int
 selector_dialog( win32ui_select_info *items );
 
 #define STUB do { printf("STUB: %s()\n", __func__); fflush(stdout); } while(0)
 
-int
+static int
 win32ui_confirm( const char *string )
 {
   int result;
@@ -78,7 +78,7 @@ win32ui_confirm( const char *string )
   return result;
 }
 
-void
+static void
 handle_drop( HDROP hDrop )
 {
   size_t bufsize;
@@ -104,7 +104,7 @@ handle_drop( HDROP hDrop )
   DragFinish( hDrop );
 }
 
-LRESULT WINAPI
+static LRESULT WINAPI
 MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
@@ -532,7 +532,7 @@ menu_get_scaler( scaler_available_fn selector )
   return selected_scaler;
 }
 
-char *
+static char *
 win32ui_get_filename( const char *title, int is_saving )
 {
   OPENFILENAME ofn;
@@ -663,7 +663,7 @@ menu_help_keyboard( int action )
   win32ui_picture( "keyboard.scr", 0 );
 }
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
   int i, pos_y;
@@ -772,7 +772,7 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   return FALSE;
 }
 
-int
+static int
 selector_dialog( win32ui_select_info *items )
 {
   /* selector_dialog will display a modal dialog, with a list of grouped

@@ -47,13 +47,13 @@ struct binary_info {
   void (*on_execute)( HWND hwndDlg, LONG user_data );
 };
 
-void change_load_filename( HWND hwndDlg, LONG user_data );
-void load_data( HWND hwndDlg, LONG user_data );
+static void change_load_filename( HWND hwndDlg, LONG user_data );
+static void load_data( HWND hwndDlg, LONG user_data );
 
-void change_save_filename();
-void save_data( HWND hwndDlg, LONG user_data );
+static void change_save_filename();
+static void save_data( HWND hwndDlg, LONG user_data );
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 binarydata_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 void
@@ -89,7 +89,7 @@ menu_file_loadbinarydata( int action )
   fuse_emulation_unpause();
 }
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 binarydata_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
   struct binary_info *info = NULL;  
@@ -139,7 +139,7 @@ binarydata_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   return FALSE;
 }
 
-void
+static void
 change_load_filename( HWND hwndDlg, LONG user_data )
 {
   struct binary_info *info = ( struct binary_info * ) user_data;
@@ -174,7 +174,7 @@ change_load_filename( HWND hwndDlg, LONG user_data )
                       0, ( LPARAM ) buffer );
 }
 
-void
+static void
 load_data( HWND hwndDlg, LONG user_data )
 {
   struct binary_info *info = ( struct binary_info * )user_data;
@@ -253,7 +253,7 @@ menu_file_savebinarydata( int action )
   fuse_emulation_unpause();
 }
 
-void
+static void
 change_save_filename( HWND hwndDlg, LONG user_data )
 {
   struct binary_info *info = ( struct binary_info * ) user_data;
@@ -270,7 +270,7 @@ change_save_filename( HWND hwndDlg, LONG user_data )
                       0, ( LPARAM ) new_filename );
 }
 
-void
+static void
 save_data( HWND hwndDlg, LONG user_data )
 {
   struct binary_info *info = ( struct binary_info * ) user_data;

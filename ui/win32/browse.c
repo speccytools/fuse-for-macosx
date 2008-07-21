@@ -38,10 +38,10 @@
 
 #include "browse.h"
 
-INT_PTR CALLBACK dialog_proc( HWND hwndDlg, UINT uMsg,
-                              WPARAM wParam, LPARAM lParam );
-void add_block_details( libspectrum_tape_block *block, void *user_data );
-void select_row( LPNMITEMACTIVATE lpnmitem );
+static INT_PTR CALLBACK dialog_proc( HWND hwndDlg, UINT uMsg,
+                                     WPARAM wParam, LPARAM lParam );
+static void add_block_details( libspectrum_tape_block *block, void *user_data );
+static void select_row( LPNMITEMACTIVATE lpnmitem );
 
 static HWND dialog;             /* The dialog box itself */
 
@@ -123,7 +123,7 @@ dialog_init( HWND hwndDlg )
   dialog_created = 1;
 }
 
-INT_PTR CALLBACK
+static INT_PTR CALLBACK
 dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 /* FIXME: implement resizing the dialog */
@@ -198,7 +198,7 @@ ui_tape_browser_update( ui_tape_browser_update_type change GCC_UNUSED,
   return 0;
 }
 
-void
+static void
 add_block_details( libspectrum_tape_block *block, void *user_data )
 {
   TCHAR buffer[256];
@@ -228,7 +228,7 @@ add_block_details( libspectrum_tape_block *block, void *user_data )
 }
 
 /* Called when a row is selected */
-void
+static void
 select_row( LPNMITEMACTIVATE lpnmitem )
 {
   int current_block, row;

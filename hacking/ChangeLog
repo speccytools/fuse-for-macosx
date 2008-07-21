@@ -1,4 +1,4 @@
-20030505 snapshot.c: use the fully encapsulated libspectrum_snap
+snapshot.c: use the fully encapsulated libspectrum_snap
 	 implementation
 20030506 ui/gtk/options.pl: make 'cancel via Escape' GTK+ 2.0 compatible
 	 (Matthew Westcott)
@@ -2783,3 +2783,6 @@
 	 by more people than just me.
 20080721 ui/win32/{win32ui.c,error.c,Makefile.am}: Win32: Integrated
 	 ui_error_specific into win32ui.c similarly to gtk ui (Marek).
+20080721 ui/win32/{win32ui.c,memorybrowser.c,binary.c,debugger.c,win32display.c,
+	 browse.c,picture.c,roms.c,pokefinder.c}: Win32: make functions and
+	 variables static wherever applicable (Marek).

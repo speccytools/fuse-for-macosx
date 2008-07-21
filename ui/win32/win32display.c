@@ -53,22 +53,22 @@ ptrdiff_t win32display_pitch = DISPLAY_SCREEN_WIDTH *
 
 /* An RGB image of the Spectrum screen; slightly bigger than the real
    screen to handle the smoothing filters which read around each pixel */
-char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
-                            ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
+static char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
+                               ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
 
-const int rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
+static const int rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 BITMAPINFO fuse_BMI;
 HBITMAP fuse_BMP;
 
 /* The scaled image */
-char scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
+static char scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
                             (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
-const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
+static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 
 void *win32_pixdata;
 
-const unsigned char rgb_colours[16][3] = {
+static const unsigned char rgb_colours[16][3] = {
 
   {   0,   0,   0 },
   {   0,   0, 192 },
@@ -90,7 +90,7 @@ const unsigned char rgb_colours[16][3] = {
 };
 
 libspectrum_dword win32display_colours[16];
-libspectrum_dword bw_colours[16];
+static libspectrum_dword bw_colours[16];
 
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int win32display_current_size=1;

@@ -42,8 +42,7 @@ static INT_PTR CALLBACK roms_proc( HWND hwndDlg, UINT uMsg,
                                    WPARAM wParam, LPARAM lParam );
 static void roms_init( HWND hwndDlg, LPARAM lParam );
 
-/* FIXME: review all the win32 function and change them to static whenever
-          possible, use GWL_USERDATA whenever more suitable, and use
+/* FIXME: use GWL_USERDATA whenever more suitable, and use
           MapDialogRect whenever drawing the interface at runtime (options
           dialog for example */
 
