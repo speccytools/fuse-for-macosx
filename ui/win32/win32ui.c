@@ -61,6 +61,8 @@ typedef struct win32ui_select_info {
 
 } win32ui_select_info;
 
+static BOOL win32ui_make_menu( void );
+
 static int
 selector_dialog( win32ui_select_info *items );
 
@@ -333,10 +335,26 @@ ui_init( int *argc, char ***argv )
 {
   if( win32display_init() ) return 1;
   win32statusbar_set_visibility( settings_current.statusbar );
+  
+  win32ui_make_menu();
 
   ui_mouse_present = 1;
 
   return 0;
+}
+
+static BOOL
+win32ui_make_menu( void )
+{
+  /* Start various menus in the 'off' state */
+  ui_menu_activate( UI_MENU_ITEM_AY_LOGGING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING, 0 );
+  ui_menu_activate( UI_MENU_ITEM_RECORDING_ROLLBACK, 0 );
+  ui_menu_activate( UI_MENU_ITEM_TAPE_RECORDING, 0 );
+
+  return FALSE;
 }
 
 int
@@ -584,11 +602,53 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   return UI_CONFIRM_JOYSTICK_NONE;
 }
 
+static int
+set_active( HMENU menu, const char *path, int active )
+{
+  int i, menu_count;
+  char menu_text[255];
+  MENUITEMINFO mii;
+  
+  if( *path == '/' ) path++;
+
+  menu_count = GetMenuItemCount( menu );
+  for( i = 0; i < menu_count; i++ ) {
+
+    if( GetMenuString( menu, i, menu_text, 255, MF_BYPOSITION ) == 0 ) return 1;
+
+    const char *p = menu_text, *q = path;
+
+    /* Compare the two strings, but skip hotkey-delimiter characters */
+    /* Anything after \t is a shortcut key on Win32 */
+    do {
+      if( *p == '&' ) p++;
+      if( ! *p || *p == '\t' || *p != *q ) break;
+      p++; q++;
+    } while( 1 );
+
+    if( *p && *p != '\t' ) continue;		/* not matched */
+
+    /* match, but with a submenu */
+    if( *q == '/' ) return set_active( GetSubMenu( menu, i ), q, active );
+
+    if( *q ) continue;		/* not matched */
+
+    /* we have a match */
+    mii.fState = active ? MFS_ENABLED : MFS_DISABLED;
+    mii.fMask = MIIM_STATE;
+    mii.cbSize = sizeof( MENUITEMINFO );
+    SetMenuItemInfo( menu, i, TRUE, &mii );
+
+    return 0;
+  }
+
+  return 1;
+}
+
 int
 ui_menu_item_set_active( const char *path, int active )
 {
-  /* STUB; */
-  return 1;
+  return set_active( GetMenu( fuse_hWnd ), path, active );
 }
 
 void
@@ -596,6 +656,9 @@ menu_file_exit( int action )
 {
  /* FIXME: this should really be sending WM_CLOSE, not duplicate code */
   if( win32ui_confirm( "Exit Fuse?" ) ) {
+
+    if( menu_check_media_changed() ) return;
+
     DestroyWindow(fuse_hWnd);
   }
 }

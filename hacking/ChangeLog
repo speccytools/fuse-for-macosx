@@ -2793,3 +2793,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 Win32 (Marek).
 20080721 disk/upd_fdc.c: allow EDSK images with large sector sizes to work
          (patch #2024218) (Gergely Szasz) (thanks, Simon Owen).
+20080722 ui/win32/win32ui.c: Win32: implemented win32ui_make_menu and
+	 ui_menu_item_set_active functions (Marek).
