@@ -111,9 +111,7 @@ MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       break;
 
     case WM_CLOSE:
-      if( win32ui_confirm( "Exit Fuse?" ) ) {
-        DestroyWindow(hWnd);
-      }
+      menu_file_exit( 0 );
       break;
 
     case WM_KEYDOWN:
@@ -691,13 +689,13 @@ menu_machine_pause( int action )
 void
 menu_machine_reset( int action )
 {
-  if( win32ui_confirm( "Reset?" ) ) {
-    if( machine_reset( 0 ) ) {
-      ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
+  int hard_reset = action;
+  
+  if( win32ui_confirm( "Reset?" ) && machine_reset( hard_reset ) ) {
+    ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
 
-      /* FIXME: abort() seems a bit extreme here, but it'll do for now */
-      fuse_abort();
-    }
+    /* FIXME: abort() seems a bit extreme here, but it'll do for now */
+    fuse_abort();
   }
 }
 
