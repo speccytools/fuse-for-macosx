@@ -2789,3 +2789,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080721 ui/win32/{win32ui.c,win32internals.h,confirm.c,Makefile.am}: Win32:
 	 fixed confirmation dialog box and moved it to confirm.c similarly to
 	 gtk ui (Marek).
+20080721 compat/unix/file.c: Win32: applied a minor fix to compat_file_open for
+	 Win32 (Marek).
