@@ -32,6 +32,8 @@
 #include "ui/ui.h"
 #include "upd_fdc.h"
 
+#define MAX_SIZE_CODE 8
+
 static const int UPD_FDC_MAIN_DRV_0_SEEK = 0x01;
 static const int UPD_FDC_MAIN_DRV_1_SEEK = 0x02;
 static const int UPD_FDC_MAIN_DRV_2_SEEK = 0x04;
@@ -224,7 +226,7 @@ read_id( upd_fdc *f )
     f->id_sector = d->fdd.data;
     fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
     if( d->fdd.index ) f->rev--;
-    f->id_length = d->fdd.data > 6 ? 6 : d->fdd.data;
+    f->id_length = d->fdd.data > MAX_SIZE_CODE ? MAX_SIZE_CODE : d->fdd.data;
     f->sector_length = 0x80 << f->id_length; 
     fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
     if( d->fdd.index ) f->rev--;
@@ -1280,7 +1282,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       }
     /* EOSpeedlock hack */
 
-      f->rlen = 0x80 << ( f->data_register[4] > 6 ? 6 : f->data_register[4] );
+      f->rlen = 0x80 << ( f->data_register[4] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[4] );
       if( f->data_register[4] == 0 && f->data_register[7] < 128 )
         f->rlen = f->data_register[7];
       f->first_rw = 1;		/* always read at least one sector */
@@ -1288,7 +1290,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
       return;
       break;
     case UPD_CMD_READ_DIAG:		/* READ TRACK */
-      f->rlen = 0x80 << ( f->data_register[4] > 6 ? 6 : f->data_register[4] );
+      f->rlen = 0x80 << ( f->data_register[4] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[4] );
       if( f->data_register[4] == 0 && f->data_register[7] < 128 )
         f->rlen = f->data_register[7];
       head_load( f );
@@ -1302,7 +1304,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 	terminated = 1;
         break;
       }
-      f->rlen = 0x80 << ( f->data_register[4] > 6 ? 6 : f->data_register[4] );
+      f->rlen = 0x80 << ( f->data_register[4] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[4] );
       if( f->data_register[4] == 0 && f->data_register[7] < 128 )
         f->rlen = f->data_register[7];
       f->first_rw = 1;		/* always write at least one sector */
@@ -1316,7 +1318,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 	terminated = 1;
         break;
       }
-      f->rlen = 0x80 << ( f->data_register[1] > 6 ? 6 : f->data_register[1] ); /* max 8192 byte/sector */
+      f->rlen = 0x80 << ( f->data_register[1] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[1] ); /* max 8192 byte/sector */
       head_load( f );
       return;
       break;
@@ -1325,7 +1327,7 @@ upd_fdc_write_data( upd_fdc *f, libspectrum_byte data )
 		( f->command_register & 0x0c ) >> 2 == 0x03 ? UPD_SCAN_HI :
 							     UPD_SCAN_LO;
 
-      f->rlen = 0x80 << ( f->data_register[4] > 6 ? 6 : f->data_register[4] );
+      f->rlen = 0x80 << ( f->data_register[4] > MAX_SIZE_CODE ? MAX_SIZE_CODE : f->data_register[4] );
       head_load( f );
       return;
       break;

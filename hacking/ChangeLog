@@ -2791,3 +2791,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 gtk ui (Marek).
 20080721 compat/unix/file.c: Win32: applied a minor fix to compat_file_open for
 	 Win32 (Marek).
+20080721 disk/upd_fdc.c: allow EDSK images with large sector sizes to work
+         (patch #2024218) (Gergely Szasz) (thanks, Simon Owen).
