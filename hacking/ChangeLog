@@ -2797,3 +2797,9 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 ui_menu_item_set_active functions (Marek).
 20080722 ui/win32/win32ui.c: Win32: Minor fixes to how reset menu and window
 	 close event are handled (Marek).
+20080723 menu_data.pl,ui/win32/{win32ui.c,debugger.c,win32internals.h,
+	 win32display.c,win32display.h,picture.c,win32keyboard.c,options.pl,
+	 Makefile.am,win32keyboard.h}: Win32: Refactored win32 ui code to
+	 resemble gtk ui, applied minor fixes: fixed debugger's Break button,
+	 added static wherever applicable to options*.pl, fixed compiler
+	 warnings in ui_error_specific and win32ui_picture functions (Marek).

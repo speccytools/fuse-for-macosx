@@ -36,6 +36,7 @@ libuiwin32_a_SOURCES = binary.c \
 		       confirm.c \
 		       debugger.c \
 		       debugger.rc \
+		       fileselector.c \
 		       keysyms.c \
 		       memorybrowser.c \
 		       memorybrowser.rc \
@@ -102,10 +103,8 @@ noinst_HEADERS = binary.h \
 		 roms.h \
 		 memorybrowser.h \
 		 menu_data.h \
-		 win32display.h \
 		 win32internals.h \
-		 win32joystick.h \
-		 win32keyboard.h
+		 win32joystick.h
 
 CLEANFILES = keysyms.c \
 	     menu_data.c \

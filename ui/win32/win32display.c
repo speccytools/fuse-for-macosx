@@ -31,8 +31,6 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 #include "ui/scaler/scaler.h"
-#include "win32keyboard.h"
-#include "win32display.h"
 #include "win32internals.h"
 
 /* The size of a 1x1 image in units of
@@ -42,7 +40,6 @@ int image_scale;
 /* The height and width of a 1x1 image in pixels */
 int image_width, image_height;
 
-int fuse_nCmdShow;
 
 /* A copy of every pixel on the screen, replaceable by plotting directly into
    rgb_image below */
@@ -53,20 +50,20 @@ ptrdiff_t win32display_pitch = DISPLAY_SCREEN_WIDTH *
 
 /* An RGB image of the Spectrum screen; slightly bigger than the real
    screen to handle the smoothing filters which read around each pixel */
-static char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
-                               ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
-
+static unsigned char rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
+                                        ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
 static const int rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
-BITMAPINFO fuse_BMI;
-HBITMAP fuse_BMP;
-
 /* The scaled image */
-static char scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
-                            (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
+static unsigned char scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
+                                  (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
 static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 
-void *win32_pixdata;
+/* Win32 specific variables */
+static void *win32_pixdata;
+static BITMAPINFO fuse_BMI;
+static HBITMAP fuse_BMP;
+int fuse_nCmdShow;
 
 static const unsigned char rgb_colours[16][3] = {
 
@@ -99,9 +96,9 @@ int win32display_sizechanged = 0;
 static int newsize;
 
 static int init_colours( void );
+static void win32display_area(int x, int y, int width, int height);
 static int register_scalers( void );
 static int register_scalers_noresize( void );
-static void win32display_area(int x, int y, int width, int height);
 
 static void win32display_setsize( void );
 
@@ -270,13 +267,14 @@ win32display_setsize()
 int
 uidisplay_init( int width, int height )
 {
+  int error;
+
   image_width = width; image_height = height;
   image_scale = width / DISPLAY_ASPECT_WIDTH;
 
+  error = register_scalers(); if( error ) return error;
+
   /* resize */
-
-  register_scalers();
-
   win32display_current_size = image_scale;
   win32display_setsize();
 
@@ -366,34 +364,74 @@ register_scalers( void )
 {
   scaler_register_clear();
 
-  scaler_register( SCALER_NORMAL );
-  scaler_register( SCALER_DOUBLESIZE );
-  scaler_register( SCALER_TRIPLESIZE );
-  scaler_register( SCALER_2XSAI );
-  scaler_register( SCALER_SUPER2XSAI );
-  scaler_register( SCALER_SUPEREAGLE );
-  scaler_register( SCALER_ADVMAME2X );
-  scaler_register( SCALER_ADVMAME3X );
-  scaler_register( SCALER_DOTMATRIX );
-  scaler_register( SCALER_PALTV );
-  if( machine_current->timex ) {
-    scaler_register( SCALER_HALF );
-    scaler_register( SCALER_HALFSKIP );
-    scaler_register( SCALER_TIMEXTV );
-    scaler_register( SCALER_TIMEX1_5X );
-  } else {
-    scaler_register( SCALER_TV2X );
-    scaler_register( SCALER_TV3X );
-    scaler_register( SCALER_PALTV2X );
-    scaler_register( SCALER_PALTV3X );
+  switch( win32display_current_size ) {
+
+  case 1:
+
+    switch( image_scale ) {
+    case 1:
+      scaler_register( SCALER_NORMAL );
+      scaler_register( SCALER_PALTV );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_NORMAL );
+      return 0;
+    case 2:
+      scaler_register( SCALER_HALF );
+      scaler_register( SCALER_HALFSKIP );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_HALF );
+      return 0;
+    }
+
+  case 2:
+
+    switch( image_scale ) {
+    case 1:
+      scaler_register( SCALER_DOUBLESIZE );
+      scaler_register( SCALER_TV2X );
+      scaler_register( SCALER_ADVMAME2X );
+      scaler_register( SCALER_2XSAI );
+      scaler_register( SCALER_SUPER2XSAI );
+      scaler_register( SCALER_SUPEREAGLE );
+      scaler_register( SCALER_DOTMATRIX );
+      scaler_register( SCALER_PALTV2X );
+      scaler_register( SCALER_HQ2X );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_DOUBLESIZE );
+      return 0;
+    case 2:
+      scaler_register( SCALER_NORMAL );
+      scaler_register( SCALER_TIMEXTV );
+      scaler_register( SCALER_PALTV );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_NORMAL );
+      return 0;
+    }
+
+  case 3:
+
+    switch( image_scale ) {
+    case 1:
+      scaler_register( SCALER_TRIPLESIZE );
+      scaler_register( SCALER_TV3X );
+      scaler_register( SCALER_ADVMAME3X );
+      scaler_register( SCALER_PALTV3X );
+      scaler_register( SCALER_HQ3X );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_TRIPLESIZE );
+      return 0;
+    case 2:
+      scaler_register( SCALER_TIMEX1_5X );
+      if( !scaler_is_supported( current_scaler ) )
+	scaler_select_scaler( SCALER_TIMEX1_5X );
+      return 0;
+    }
+
   }
 
-  if( scaler_is_supported( current_scaler ) ) {
-    scaler_select_scaler( current_scaler );
-  } else {
-    scaler_select_scaler( SCALER_NORMAL );
-  }
-  return 0;
+  ui_error( UI_ERROR_ERROR, "Unknown display size/image size %d/%d",
+	    win32display_current_size, image_scale );
+  return 1;
 }
 
 void
@@ -486,6 +524,12 @@ uidisplay_end( void )
   return 0;
 }
 
+int
+win32display_end( void )
+{
+  return 0;
+}
+
 /* Set one pixel in the display */
 void
 uidisplay_putpixel( int x, int y, int colour )
@@ -570,10 +614,4 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
     win32display_image[y][x+14] = ( data & 0x0002 ) ? ink : paper;
     win32display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
   }
-}
-
-int
-win32display_end( void )
-{
-  return 0;
 }

@@ -28,7 +28,6 @@
 #include "ui/ui.h"
 #include "utils.h"
 #include "win32internals.h"
-#include "win32display.h"
 
 #include <windows.h>
 
@@ -52,7 +51,7 @@ win32ui_picture( const char *filename, int border )
 {
   if (!hDialogPicture) {
     hDialogPicture = CreateDialog( fuse_hInstance,
-                                   MAKEINTRESOURCE( "IDD_PICTURE" ),
+                                   MAKEINTRESOURCE( IDD_PICTURE ),
                                    fuse_hWnd, (DLGPROC)picture_wnd_proc);
 
     BITMAPINFO picture_BMI;

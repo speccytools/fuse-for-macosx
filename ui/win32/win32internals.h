@@ -31,6 +31,8 @@
 #include <commdlg.h>
 #include <shellapi.h>
 
+#include <libspectrum.h>
+
 #define ID_STATUSBAR 900
 
 /* window handler */
@@ -48,17 +50,33 @@ HWND fuse_hPFWnd;
 /* debugger window handle */
 HWND fuse_hDBGWnd;
 
-/* status bar functions */
-void win32statusbar_create();
-int win32statusbar_set_visibility( int visible );
-void win32statusbar_redraw( HWND hWnd, LPARAM lParam );
-void win32statusbar_resize( HWND hWnd );
+/*
+ * Display routines (win32display.c)
+ */
 
-void win32_verror( int is_error );
+/* The colour palette in use */
+extern libspectrum_dword win32display_colours[16];
 
-void handle_menu( DWORD cmd, HWND okno );
+int win32display_init( void );
+int win32display_end( void );
 
-int win32ui_picture( const char *filename, int border );
+/* Below variables and functions are shared
+   between win32display.c and win32ui.c */
+extern int fuse_nCmdShow;
+
+extern int win32display_sizechanged;
+
+void win32display_resize( int size );
+void win32display_resize_update( void );
+
+void blit( void );
+
+/*
+ * Keyboard routines (win32keyboard.c)
+ */
+
+void win32keyboard_keypress( WPARAM wParam, LPARAM lParam );
+void win32keyboard_keyrelease( WPARAM wParam, LPARAM lParam );
 
 /*
  * Mouse routines (win32mouse.c)
@@ -72,6 +90,21 @@ void win32mouse_button( int button, int down );
  */
 
 int win32ui_confirm( const char *string );
+
+int win32ui_picture( const char *filename, int border );
+
+void handle_menu( DWORD cmd, HWND okno );
+
+void win32_verror( int is_error );
+
+/*
+ * Statusbar routines (statusbar.c)
+ */
+
+void win32statusbar_create();
+int win32statusbar_set_visibility( int visible );
+void win32statusbar_redraw( HWND hWnd, LPARAM lParam );
+void win32statusbar_resize( HWND hWnd );
 
 /*
  * Dialog box reset

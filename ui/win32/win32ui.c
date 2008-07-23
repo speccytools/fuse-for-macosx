@@ -42,16 +42,17 @@
 #include "ui/uijoystick.h"
 #include "utils.h"
 #include "win32internals.h"
-#include "win32keyboard.h"
-#include "win32display.h"
 
 HACCEL hAccels;
 
 HFONT h_ms_font = NULL; /* machine select dialog's font object */
 
+/* True if we were paused via the Machine/Pause menu item */
 int paused = 0;
 int size_paused = 0;
 
+/* Structure used by the radio button selection widgets (eg the
+   graphics filter selectors and Machine/Select) */
 typedef struct win32ui_select_info {
 
   int length;
@@ -95,7 +96,7 @@ handle_drop( HDROP hDrop )
 }
 
 static LRESULT WINAPI
-MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
     case WM_CREATE:
@@ -293,7 +294,7 @@ WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
   if( !hPrevInstance ) {
     wc.lpszClassName = "Fuse";
-    wc.lpfnWndProc = MainWndProc;
+    wc.lpfnWndProc = fuse_window_proc;
     wc.style = CS_OWNDC;
     wc.hInstance = hInstance;
     wc.hIcon = LoadIcon( hInstance, "win32_icon" );
@@ -325,17 +326,17 @@ WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
   DragAcceptFiles( fuse_hWnd, TRUE );
 
   return fuse_main(__argc, __argv);
-  /* finish - how do deal with returning wParam */
+  /* FIXME: how do deal with returning wParam */
 }
 
 int
 ui_init( int *argc, char ***argv )
 {
+  win32ui_make_menu();
+
   if( win32display_init() ) return 1;
   win32statusbar_set_visibility( settings_current.statusbar );
   
-  win32ui_make_menu();
-
   ui_mouse_present = 1;
 
   return 0;
@@ -393,11 +394,11 @@ ui_end( void )
   return 0;
 }
 
+/* Create a dialog box with the given error message */
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
   /* finish - can ui be not initialized? */
-  UINT mtype;
   HWND hWnd;
 
   fuse_emulation_pause();
@@ -427,54 +428,21 @@ ui_error_specific( ui_error_level severity, const char *message )
   return 0;
 }
 
+/* Called by the menu when File/Exit selected */
 void
-win32_verror( int is_error )
+menu_file_exit( int action )
 {
-  if( !is_error ) return;
+ /* FIXME: this should really be sending WM_CLOSE, not duplicate code */
+  if( win32ui_confirm( "Exit Fuse?" ) ) {
 
-  DWORD last_error;
-  static LPVOID err_msg;
-  last_error = GetLastError();
-  FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                 FORMAT_MESSAGE_FROM_SYSTEM,
-                 NULL, last_error, LANG_USER_DEFAULT,
-                 (LPTSTR) &err_msg, 0, NULL );
-  MessageBox( fuse_hWnd, err_msg, "Error", MB_OK );
+    if( menu_check_media_changed() ) return;
+
+    DestroyWindow(fuse_hWnd);
+  }
 }
 
-void
-menu_machine_debugger( int action )
-{
-  debugger_mode = DEBUGGER_MODE_HALTED;
-  if( paused ) ui_debugger_activate();
-}
-
-int
-ui_joystick_init( void )
-{
-  STUB;
-  return 0;
-}
-
-void
-ui_joystick_end( void )
-{
-  STUB;
-}
-
-void
-ui_joystick_poll( void )
-{
-  /* STUB; */
-}
-
-int
-ui_widgets_reset( void )
-{
-  win32ui_pokefinder_clear();
-  return 0;
-}
-
+/* Select a graphics filter from those for which `available' returns
+   true */
 scaler_type
 menu_get_scaler( scaler_available_fn selector )
 {
@@ -536,70 +504,109 @@ menu_get_scaler( scaler_available_fn selector )
   return selected_scaler;
 }
 
-static char *
-win32ui_get_filename( const char *title, int is_saving )
+/* Machine/Pause */
+void
+menu_machine_pause( int action )
 {
-  OPENFILENAME ofn;
-  char szFile[512];
-  int result;
+  int error;
 
-  memset( &ofn, 0, sizeof( ofn ) );
-  szFile[0] = '\0';
-
-  ofn.lStructSize = sizeof( ofn );
-  ofn.hwndOwner = fuse_hWnd;
-  ofn.lpstrFilter = "All Files\0*.*\0\0";
-  ofn.lpstrCustomFilter = NULL;
-  ofn.nFilterIndex = 0;
-  ofn.lpstrFile = szFile;
-  ofn.nMaxFile = sizeof( szFile );
-  ofn.lpstrFileTitle = NULL;
-  ofn.lpstrInitialDir = NULL;
-  ofn.lpstrTitle = title;
-  ofn.Flags = /* OFN_DONTADDTORECENT | */ OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
-  if( is_saving ) {
-    ofn.Flags |= OFN_OVERWRITEPROMPT | OFN_NOREADONLYRETURN;
+  if( paused ) {
+    paused = 0;
+    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
+                         UI_STATUSBAR_STATE_INACTIVE );
+    timer_estimate_reset();
+    fuse_emulation_unpause();
   } else {
-    ofn.Flags |= OFN_FILEMUSTEXIST;
-  }
-  ofn.nFileOffset = 0;
-  ofn.nFileExtension = 0;
-  ofn.lpstrDefExt = NULL;
-/* ofn.pvReserved = NULL; */
-/* ofn.FlagsEx = 0; */
 
-  if( is_saving ) {
-    result = GetSaveFileName( &ofn );
-  } else {
-    result = GetOpenFileName( &ofn );
-  }
+    /* Stop recording any competition mode RZX file */
+    if( rzx_recording && rzx_competition_mode ) {
+      ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
+      error = rzx_stop_recording(); if( error ) return;
+    }
 
-  if( !result ) {
-    return NULL;
-  } else {
-    return strdup( ofn.lpstrFile );
+    paused = 1;
+    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
+    fuse_emulation_pause();
   }
 }
 
-char *
-ui_get_open_filename( const char *title )
+/* Called by the menu when Machine/Reset selected */
+void
+menu_machine_reset( int action )
 {
-  return win32ui_get_filename( title, 0 );
+  int hard_reset = action;
+  
+  if( win32ui_confirm( "Reset?" ) && machine_reset( hard_reset ) ) {
+    ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
+
+    /* FIXME: abort() seems a bit extreme here, but it'll do for now */
+    fuse_abort();
+  }
 }
 
-char *
-ui_get_save_filename( const char *title )
+/* Called by the menu when Machine/Select selected */
+void
+menu_machine_select( int action )
 {
-  return win32ui_get_filename( title, 1 );
+  /* FIXME: choosing spectrum SE crashes Fuse sound_frame () at sound.c:477 "ay_change[f].ofs = ( ay_change[f].tstates * sfreq ) / cpufreq;" */
+  /* FIXME: choosing some Timexes crashes (win32) fuse as well */
+
+  int selected_machine;
+  win32ui_select_info items;
+  int i;
+
+  /* Stop emulation */
+  fuse_emulation_pause();
+
+  /* Populate win32ui_select_info */
+  items.dialog_title = TEXT( "Fuse - Select Machine" );
+  items.labels = malloc( machine_count * sizeof( char * ) );
+  items.length = machine_count; 
+
+  for( i=0; i<machine_count; i++ ) {
+
+    items.labels[i] = libspectrum_machine_name( machine_types[i]->machine );
+
+    if( machine_current == machine_types[i] ) {
+      items.selected = i;
+    }
+  }
+
+  /* start the machine select dialog box */
+  selected_machine = selector_dialog( &items );
+  
+  if( machine_types[ selected_machine ] != machine_current ) {
+    machine_select( machine_types[ selected_machine ]->machine );
+  }
+
+  free( items.labels );
+
+  /* Resume emulation */
+  fuse_emulation_unpause();
 }
 
-ui_confirm_joystick_t
-ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
+void
+menu_machine_debugger( int action )
 {
-  STUB;
-  return UI_CONFIRM_JOYSTICK_NONE;
+  debugger_mode = DEBUGGER_MODE_HALTED;
+  if( paused ) ui_debugger_activate();
 }
 
+/* Called on machine selection */
+int
+ui_widgets_reset( void )
+{
+  win32ui_pokefinder_clear();
+  return 0;
+}
+
+void
+menu_help_keyboard( int action )
+{
+  win32ui_picture( "keyboard.scr", 0 );
+}
+
+/* Functions to activate and deactivate certain menu items */
 static int
 set_active( HMENU menu, const char *path, int active )
 {
@@ -649,60 +656,30 @@ ui_menu_item_set_active( const char *path, int active )
   return set_active( GetMenu( fuse_hWnd ), path, active );
 }
 
-void
-menu_file_exit( int action )
+ui_confirm_joystick_t
+ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
- /* FIXME: this should really be sending WM_CLOSE, not duplicate code */
-  if( win32ui_confirm( "Exit Fuse?" ) ) {
+  STUB;
+  return UI_CONFIRM_JOYSTICK_NONE;
+}
 
-    if( menu_check_media_changed() ) return;
-
-    DestroyWindow(fuse_hWnd);
-  }
+int
+ui_joystick_init( void )
+{
+  STUB;
+  return 0;
 }
 
 void
-menu_machine_pause( int action )
+ui_joystick_end( void )
 {
-  int error;
-
-  if( paused ) {
-    paused = 0;
-    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
-                         UI_STATUSBAR_STATE_INACTIVE );
-    timer_estimate_reset();
-    fuse_emulation_unpause();
-  } else {
-
-    /* Stop recording any competition mode RZX file */
-    if( rzx_recording && rzx_competition_mode ) {
-      ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
-      error = rzx_stop_recording(); if( error ) return;
-    }
-
-    paused = 1;
-    ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
-    fuse_emulation_pause();
-  }
+  STUB;
 }
 
 void
-menu_machine_reset( int action )
+ui_joystick_poll( void )
 {
-  int hard_reset = action;
-  
-  if( win32ui_confirm( "Reset?" ) && machine_reset( hard_reset ) ) {
-    ui_error( UI_ERROR_ERROR, "couldn't reset machine: giving up!" );
-
-    /* FIXME: abort() seems a bit extreme here, but it'll do for now */
-    fuse_abort();
-  }
-}
-
-void
-menu_help_keyboard( int action )
-{
-  win32ui_picture( "keyboard.scr", 0 );
+  /* STUB; */
 }
 
 static INT_PTR CALLBACK
@@ -830,41 +807,16 @@ selector_dialog( win32ui_select_info *items )
 }
 
 void
-menu_machine_select( int action )
+win32_verror( int is_error )
 {
-  /* FIXME: choosing spectrum SE crashes Fuse sound_frame () at sound.c:477 "ay_change[f].ofs = ( ay_change[f].tstates * sfreq ) / cpufreq;" */
-  /* FIXME: choosing some Timexes crashes (win32) fuse as well */
+  if( !is_error ) return;
 
-  int selected_machine;
-  win32ui_select_info items;
-  int i;
-
-  /* Stop emulation */
-  fuse_emulation_pause();
-
-  /* Populate win32ui_select_info */
-  items.dialog_title = TEXT( "Fuse - Select Machine" );
-  items.labels = malloc( machine_count * sizeof( char * ) );
-  items.length = machine_count; 
-
-  for( i=0; i<machine_count; i++ ) {
-
-    items.labels[i] = libspectrum_machine_name( machine_types[i]->machine );
-
-    if( machine_current == machine_types[i] ) {
-      items.selected = i;
-    }
-  }
-
-  /* start the machine select dialog box */
-  selected_machine = selector_dialog( &items );
-  
-  if( machine_types[ selected_machine ] != machine_current ) {
-    machine_select( machine_types[ selected_machine ]->machine );
-  }
-
-  free( items.labels );
-
-  /* Resume emulation */
-  fuse_emulation_unpause();
+  DWORD last_error;
+  static LPVOID err_msg;
+  last_error = GetLastError();
+  FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                 FORMAT_MESSAGE_FROM_SYSTEM,
+                 NULL, last_error, LANG_USER_DEFAULT,
+                 (LPTSTR) &err_msg, 0, NULL );
+  MessageBox( fuse_hWnd, err_msg, "Error", MB_OK );
 }

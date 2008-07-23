@@ -277,7 +277,7 @@ sub dump_win32 ($$) {
 	print << "CODE";
 #include "menu_data.h"
 
-void handle_menu( DWORD cmd, HWND okno )
+void handle_menu( DWORD cmd, HWND window )
 {
   switch( cmd )
   {

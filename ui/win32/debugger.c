@@ -76,7 +76,7 @@ static int create_dialog( void );
 static int hide_hidden_panes( void );
 static void get_pane_menu_item( debugger_pane pane );
 static void get_pane( debugger_pane pane );
-static int create_menu_bar( void );
+/* static int create_menu_bar( void ); this function is handled by rc */
 static void toggle_display( void );
 /* int create_register_display( void ); this function is handled by rc */
 /* int create_memory_map( void ); this function is handled by rc */
@@ -219,13 +219,6 @@ create_dialog() /* FIXME: implement */
   } else {
     SetActiveWindow( fuse_hDBGWnd );
   }
-  return 0;
-}
-
-static int
-create_menu_bar( void ) /* FIXME: implement */
-{
-  STUB;
   return 0;
 }
 
@@ -977,6 +970,9 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
           return TRUE;
         case IDC_DBG_BTN_CONT:
           win32ui_debugger_done_continue();
+          return TRUE;
+        case IDC_DBG_BTN_BREAK:
+          win32ui_debugger_break();
           return TRUE;
         case IDC_DBG_BTN_STEP:
           win32ui_debugger_done_step();

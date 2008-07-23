@@ -38,7 +38,7 @@
 #include "spectrum.h"
 #include "tape.h"
 #include "utils.h"
-#include "win32keyboard.h"
+#include "win32internals.h"
 
 void
 win32keyboard_keypress( WPARAM wParam, LPARAM lParam )

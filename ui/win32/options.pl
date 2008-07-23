@@ -59,7 +59,7 @@ foreach( @dialogs ) {
 
 print << "CODE";
 
-BOOL CALLBACK
+static BOOL CALLBACK
 menu_options_$_->{name}_proc( HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   char buffer[80];
