@@ -2803,3 +2803,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 resemble gtk ui, applied minor fixes: fixed debugger's Break button,
 	 added static wherever applicable to options*.pl, fixed compiler
 	 warnings in ui_error_specific and win32ui_picture functions (Marek).
+20080723 ui/win32/fileselector.c: Win32: Added fileselector.c to win32 ui as
+	 part of refactoring the ui (Marek).
