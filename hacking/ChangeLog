@@ -2805,3 +2805,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 warnings in ui_error_specific and win32ui_picture functions (Marek).
 20080723 ui/win32/fileselector.c: Win32: Added fileselector.c to win32 ui as
 	 part of refactoring the ui (Marek).
+20080724 ui/win32/win32ui.c: Win32: continuing refactoring: moved WM_SIZE
+	 handler into a new function win32ui_window_resize, and WM_SIZING
+	 handler into a new function win32ui_window_resizing (Marek).

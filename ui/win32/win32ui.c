@@ -63,6 +63,8 @@ typedef struct win32ui_select_info {
 } win32ui_select_info;
 
 static BOOL win32ui_make_menu( void );
+static int win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
+static int win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
 
 static int
 selector_dialog( win32ui_select_info *items );
@@ -133,88 +135,10 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       break;
 
     case WM_SIZING:
-    {
-      RECT *selr, wr, cr , statr;
-      int width, height, size, w_ofs, h_ofs;
-
-      selr = (RECT *)lParam;
-      GetWindowRect( fuse_hWnd, &wr );
-      GetClientRect( fuse_hWnd, &cr );
-      GetClientRect( fuse_hStatusWindow, &statr );
-
-      w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
-      h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top )
-              + ( statr.bottom - statr.top );
-
-      width = selr->right - selr->left + DISPLAY_ASPECT_WIDTH / 2;
-      height = selr->bottom - selr->top + DISPLAY_SCREEN_HEIGHT / 2;
-
-      width -= w_ofs; height -= h_ofs;
-      width /= DISPLAY_ASPECT_WIDTH; height /= DISPLAY_SCREEN_HEIGHT;
-
-      if( wParam == WMSZ_LEFT || wParam == WMSZ_RIGHT ) {
-        height = width;
-      } else if( wParam == WMSZ_TOP || wParam == WMSZ_BOTTOM ) {
-        width = height;
-      } else if( width < 1 || height < 1 ) {
-        width = 1; height = 1;
-      }
-
-      if( width > 3 ) {
-        width = 3;
-      }
-      if( height > 3 ) {
-        height = 3;
-      }
-
-      if( width < height ) {
-        height = width;
-      } else {
-        width = height;
-      }
-      size = width;
-
-      width *= DISPLAY_ASPECT_WIDTH; height *= DISPLAY_SCREEN_HEIGHT;
-      width += w_ofs; height += h_ofs;
-
-      if( wParam == WMSZ_TOP ||
-          wParam == WMSZ_TOPLEFT ||
-          wParam == WMSZ_TOPRIGHT ) {
-        selr->top = selr->bottom - height;
-      } else {
-        selr->bottom = selr->top + height;
-      }
-      if( wParam == WMSZ_LEFT ||
-          wParam == WMSZ_TOPLEFT ||
-          wParam == WMSZ_BOTTOMLEFT ) {
-        selr->left = selr->right - width;
-      } else {
-        selr->right = selr->left + width;
-      }
-      win32display_resize( size );
-
-      return TRUE;
-    }
+      return win32ui_window_resizing( hWnd, wParam, lParam );
 
     case WM_SIZE:
-      if( win32display_sizechanged )
-        win32display_resize_update();
-      /* FIXME: statusbar needs to be accounted for in size */
-      SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
-      if( wParam == SIZE_MINIMIZED ) {
-        if( !size_paused ) {
-          size_paused = 1;
-          fuse_emulation_pause();
-        }
-      } else {
-        if( size_paused ) {
-          size_paused = 0;
-          fuse_emulation_unpause();
-        }
-      }
-
-      win32statusbar_resize( hWnd );
-      return 0;
+      return win32ui_window_resize( hWnd, wParam, lParam );
 
     case WM_DRAWITEM:
       if( wParam == ID_STATUSBAR ) {
@@ -819,4 +743,97 @@ win32_verror( int is_error )
                  NULL, last_error, LANG_USER_DEFAULT,
                  (LPTSTR) &err_msg, 0, NULL );
   MessageBox( fuse_hWnd, err_msg, "Error", MB_OK );
+}
+
+/* Handler for the main window's WM_SIZE notification */
+static int
+win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
+{
+  if( win32display_sizechanged )
+    win32display_resize_update();
+
+  /* FIXME: statusbar needs to be accounted for in size */
+  SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
+
+  if( wParam == SIZE_MINIMIZED ) {
+    if( !size_paused ) {
+      size_paused = 1;
+      fuse_emulation_pause();
+    }
+  } else {
+    if( size_paused ) {
+      size_paused = 0;
+      fuse_emulation_unpause();
+    }
+  }
+
+  win32statusbar_resize( hWnd );
+  return 0;
+}
+
+/* Handler for the main window's WM_SIZING notification.
+   The handler is an equivalent of setting window geometry in GTK */
+static int
+win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
+{
+  RECT *selr, wr, cr , statr;
+  int width, height, size, w_ofs, h_ofs;
+
+  selr = (RECT *)lParam;
+  GetWindowRect( fuse_hWnd, &wr );
+  GetClientRect( fuse_hWnd, &cr );
+  GetClientRect( fuse_hStatusWindow, &statr );
+
+  w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
+  h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top )
+          + ( statr.bottom - statr.top );
+
+  width = selr->right - selr->left + DISPLAY_ASPECT_WIDTH / 2;
+  height = selr->bottom - selr->top + DISPLAY_SCREEN_HEIGHT / 2;
+
+  width -= w_ofs; height -= h_ofs;
+  width /= DISPLAY_ASPECT_WIDTH; height /= DISPLAY_SCREEN_HEIGHT;
+
+  if( wParam == WMSZ_LEFT || wParam == WMSZ_RIGHT ) {
+    height = width;
+  } else if( wParam == WMSZ_TOP || wParam == WMSZ_BOTTOM ) {
+    width = height;
+  } else if( width < 1 || height < 1 ) {
+    width = 1; height = 1;
+  }
+
+  if( width > 3 ) {
+    width = 3;
+  }
+  if( height > 3 ) {
+    height = 3;
+  }
+
+  if( width < height ) {
+    height = width;
+  } else {
+    width = height;
+  }
+  size = width;
+
+  width *= DISPLAY_ASPECT_WIDTH; height *= DISPLAY_SCREEN_HEIGHT;
+  width += w_ofs; height += h_ofs;
+
+  if( wParam == WMSZ_TOP ||
+      wParam == WMSZ_TOPLEFT ||
+      wParam == WMSZ_TOPRIGHT ) {
+    selr->top = selr->bottom - height;
+  } else {
+    selr->bottom = selr->top + height;
+  }
+  if( wParam == WMSZ_LEFT ||
+      wParam == WMSZ_TOPLEFT ||
+      wParam == WMSZ_BOTTOMLEFT ) {
+    selr->left = selr->right - width;
+  } else {
+    selr->right = selr->left + width;
+  }
+  win32display_resize( size );
+
+  return TRUE;
 }
