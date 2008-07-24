@@ -2814,3 +2814,10 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 win32display_drawing_area_resize(), overwritten the contents of
 	 win32display_drawing_area_resize() with the contents of gtk ui's
 	 drawing_area_resize() (Marek).
+20080724 ui/win32/{win32ui.c,win32internals.h,win32display.c}: Win32: win32 ui
+	 refactoring continued: added static wherever applicable, moved
+	 WM_PAINT handler into a new function win32ui_window_paint, moved
+	 WM_CREATE handler into ui_init, moved most of WinMain into ui_init,
+	 changed uidisplay_init be exactly the same one as on gtk ui, changes
+	 to win32display_area to have more similar structure to that of gtk
+	 ui's (Marek).

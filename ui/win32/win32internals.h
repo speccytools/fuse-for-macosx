@@ -62,8 +62,8 @@ int win32display_end( void );
 
 /* Below variables and functions are shared
    between win32display.c and win32ui.c */
-extern int fuse_nCmdShow;
 
+void win32display_area(int x, int y, int width, int height);
 int win32display_drawing_area_resize( int width, int height );
 
 void blit( void );

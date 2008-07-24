@@ -63,7 +63,6 @@ static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 static void *win32_pixdata;
 static BITMAPINFO fuse_BMI;
 static HBITMAP fuse_BMP;
-int fuse_nCmdShow;
 
 static const unsigned char rgb_colours[16][3] = {
 
@@ -93,7 +92,6 @@ static libspectrum_dword bw_colours[16];
 static int win32display_current_size=1;
 
 static int init_colours( void );
-static void win32display_area(int x, int y, int width, int height);
 static int register_scalers( void );
 static int register_scalers_noresize( void );
 
@@ -265,12 +263,6 @@ uidisplay_init( int width, int height )
   image_scale = width / DISPLAY_ASPECT_WIDTH;
 
   error = register_scalers(); if( error ) return error;
-
-  /* resize */
-  win32display_current_size = image_scale;
-  win32display_setsize();
-
-  ShowWindow( fuse_hWnd, fuse_nCmdShow );
 
   display_refresh_all();
   return 0;
@@ -473,7 +465,7 @@ uidisplay_area( int x, int y, int w, int h )
   win32display_area( scaled_x, scaled_y, w, h );
 }
 
-static void
+void
 win32display_area(int x, int y, int width, int height)
 {
   int disp_x,disp_y;
@@ -490,6 +482,7 @@ win32display_area(int x, int y, int width, int height)
       pixdata[ ofs + 3 ] = 0; /* unused */
     }
   }
+  blit();
 }
 
 int

@@ -43,13 +43,23 @@
 #include "utils.h"
 #include "win32internals.h"
 
-HACCEL hAccels;
+/* fuse_hPrevInstance is needed only to register window class */
+static HINSTANCE fuse_hPrevInstance;
 
-HFONT h_ms_font = NULL; /* machine select dialog's font object */
+/* specifies how the main window should be shown: minimized, maximized, etc */
+static int fuse_nCmdShow;
+
+/* handle to accelartors/keyboard shortcuts */
+static HACCEL hAccels;
+
+/* machine select dialog's font object */
+static HFONT h_ms_font = NULL;
 
 /* True if we were paused via the Machine/Pause menu item */
-int paused = 0;
-int size_paused = 0;
+static int paused = 0;
+
+/* this helps pause fuse while the main window is minimized */
+static int size_paused = 0;
 
 /* Structure used by the radio button selection widgets (eg the
    graphics filter selectors and Machine/Select) */
@@ -63,6 +73,7 @@ typedef struct win32ui_select_info {
 } win32ui_select_info;
 
 static BOOL win32ui_make_menu( void );
+static int win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
 
@@ -101,10 +112,6 @@ static LRESULT WINAPI
 fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
-    case WM_CREATE:
-      win32statusbar_create( hWnd );
-      break;
-
     case WM_COMMAND:
       handle_menu( LOWORD( wParam ), hWnd );
       break;
@@ -126,13 +133,7 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       break;
 
     case WM_PAINT:
-      if( display_ui_initialised ) {
-        PAINTSTRUCT ps;
-        BeginPaint( hWnd, &ps );
-        blit();
-        EndPaint( hWnd, &ps );
-      }
-      break;
+      return win32ui_window_paint( hWnd, wParam, lParam ); 
 
     case WM_SIZING:
       return win32ui_window_resizing( hWnd, wParam, lParam );
@@ -214,14 +215,27 @@ int WINAPI
 WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
          int nCmdShow )
 {
+  /* remember those values for window creation in ui_init */
+  fuse_hInstance = hInstance;
+  fuse_nCmdShow = nCmdShow;
+  fuse_hPrevInstance = hPrevInstance;
+
+  return fuse_main(__argc, __argv);
+  /* FIXME: how do deal with returning wParam */
+}
+
+int
+ui_init( int *argc, char ***argv )
+{
+  /* register window class */
   WNDCLASS wc;
 
-  if( !hPrevInstance ) {
+  if( !fuse_hPrevInstance ) {
     wc.lpszClassName = "Fuse";
     wc.lpfnWndProc = fuse_window_proc;
     wc.style = CS_OWNDC;
-    wc.hInstance = hInstance;
-    wc.hIcon = LoadIcon( hInstance, "win32_icon" );
+    wc.hInstance = fuse_hInstance;
+    wc.hIcon = LoadIcon( fuse_hInstance, "win32_icon" );
     wc.hCursor = LoadCursor( NULL, IDC_ARROW );
     wc.hbrBackground = (HBRUSH)( COLOR_WINDOW+1 );
     wc.lpszMenuName = "win32_menu";
@@ -232,33 +246,50 @@ WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
       return 0;
   }
 
-  fuse_hInstance = hInstance;
-
+  /* create the window */
   fuse_hWnd = CreateWindow( "Fuse", "Fuse", WS_OVERLAPPED | WS_CAPTION |
     WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_CLIPCHILDREN,
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-    NULL, NULL, hInstance, NULL );
+    NULL, NULL, fuse_hInstance, NULL );
 
   /* init windows controls such as the status bar */
   InitCommonControls();
 
-  fuse_nCmdShow = nCmdShow;
-  UpdateWindow( fuse_hWnd );
-
-  hAccels = LoadAccelerators( fuse_hInstance, "win32_accel" );
-
-  DragAcceptFiles( fuse_hWnd, TRUE );
-
-  return fuse_main(__argc, __argv);
-  /* FIXME: how do deal with returning wParam */
-}
-
-int
-ui_init( int *argc, char ***argv )
-{
+  /* menu is created in rc file, but we still need to set initial state */
   win32ui_make_menu();
 
+  /* load keyboard shortcuts */
+  hAccels = LoadAccelerators( fuse_hInstance, "win32_accel" );
+
+  /* status bar */
+  win32statusbar_create( fuse_hWnd );
+
+  /* set the initial size of the drawing area */
+  RECT wr, cr, statr;
+  int w_ofs, h_ofs;
+  
+  GetWindowRect( fuse_hWnd, &wr );
+  GetClientRect( fuse_hWnd, &cr );
+  GetClientRect( fuse_hStatusWindow, &statr );
+
+  w_ofs = ( wr.right - wr.left ) - ( cr.right - cr.left );
+  h_ofs = ( wr.bottom - wr.top ) - ( cr.bottom - cr.top )
+          + ( statr.bottom - statr.top );
+  MoveWindow( fuse_hWnd, wr.left, wr.top,
+              DISPLAY_ASPECT_WIDTH + w_ofs,
+              DISPLAY_SCREEN_HEIGHT + h_ofs,
+              FALSE );
+
+  /* init the display area */
   if( win32display_init() ) return 1;
+
+  /* show the window finally */
+  ShowWindow( fuse_hWnd, fuse_nCmdShow );
+  UpdateWindow( fuse_hWnd );
+
+  /* window will accept dragging and dropping */
+  DragAcceptFiles( fuse_hWnd, TRUE );
+
   win32statusbar_set_visibility( settings_current.statusbar );
   
   ui_mouse_present = 1;
@@ -745,6 +776,26 @@ win32_verror( int is_error )
   MessageBox( fuse_hWnd, err_msg, "Error", MB_OK );
 }
 
+/* Handler for the main window's WM_PAINT notification.
+   The handler is an equivalent of GTK's expose_event */
+static int
+win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam )
+{
+  RECT cr;
+  PAINTSTRUCT ps;
+
+  GetClientRect( fuse_hWnd, &cr );
+
+  BeginPaint( hWnd, &ps );
+  win32display_area( cr.left,
+                     cr.top,
+                     cr.right - cr.left,
+                     cr.bottom - cr.top );
+  EndPaint( hWnd, &ps );
+
+  return 0;
+}
+
 /* Handler for the main window's WM_SIZE notification */
 static int
 win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
@@ -835,5 +886,7 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
     selr->right = selr->left + width;
   }
 
+  /* FIXME: function is defined to return int,
+            check which one does window proc expect */
   return TRUE;
 }
