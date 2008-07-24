@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include "display.h"
+#include "fuse.h"
 #include "machine.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -39,7 +40,6 @@ int image_scale;
 
 /* The height and width of a 1x1 image in pixels */
 int image_width, image_height;
-
 
 /* A copy of every pixel on the screen, replaceable by plotting directly into
    rgb_image below */
@@ -93,9 +93,6 @@ static int win32display_current_size=1;
 
 static int init_colours( void );
 static int register_scalers( void );
-static int register_scalers_noresize( void );
-
-static void win32display_setsize( void );
 
 void
 blit( void )
@@ -226,34 +223,6 @@ win32display_drawing_area_resize( int width, int height )
   return 0;
 }
         
-static void
-win32display_setsize()
-{
-  RECT rect, wrect, srect;
-  int statusbar_height;
-  int width = image_width;
-  int height = image_height;
-  float scale = (float)win32display_current_size / image_scale;
-
-  width *= scale;
-  height *= scale;
-
-  GetClientRect( fuse_hStatusWindow, &srect );
-  statusbar_height = srect.bottom - srect.top;
-
-  GetWindowRect( fuse_hWnd, &wrect );
-  GetClientRect( fuse_hWnd, &rect );
-  rect.right = rect.left + width;
-  rect.bottom = rect.top + height + statusbar_height;
-
-  AdjustWindowRect( &rect,
-    WS_CAPTION|WS_SYSMENU|WS_THICKFRAME|WS_MINIMIZEBOX,
-    TRUE );
-  /* 'rect' now holds the size of the window */
-  MoveWindow( fuse_hWnd, wrect.left, wrect.top,
-    rect.right - rect.left, rect.bottom - rect.top, TRUE );
-}
-
 int
 uidisplay_init( int width, int height )
 {
@@ -266,81 +235,6 @@ uidisplay_init( int width, int height )
 
   display_refresh_all();
   return 0;
-}
-
-static int
-register_scalers_noresize( void )
-{
-  scaler_register_clear();
-
-  switch( win32display_current_size ) {
-
-  case 1:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_NORMAL );
-      scaler_register( SCALER_PALTV );
-      if( !scaler_is_supported( current_scaler ) )
-        scaler_select_scaler( SCALER_NORMAL );
-      return 0;
-    case 2:
-      scaler_register( SCALER_HALF );
-      scaler_register( SCALER_HALFSKIP );
-      if( !scaler_is_supported( current_scaler ) )
-        scaler_select_scaler( SCALER_HALF );
-      return 0;
-    }
-
-  case 2:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_DOUBLESIZE );
-      scaler_register( SCALER_TV2X );
-      scaler_register( SCALER_ADVMAME2X );
-      scaler_register( SCALER_2XSAI );
-      scaler_register( SCALER_SUPER2XSAI );
-      scaler_register( SCALER_SUPEREAGLE );
-      scaler_register( SCALER_DOTMATRIX );
-      scaler_register( SCALER_PALTV2X );
-      scaler_register( SCALER_HQ2X );
-      if( !scaler_is_supported( current_scaler ) )
-        scaler_select_scaler( SCALER_DOUBLESIZE );
-      return 0;
-    case 2:
-      scaler_register( SCALER_NORMAL );
-      scaler_register( SCALER_TIMEXTV );
-      scaler_register( SCALER_PALTV );
-      if( !scaler_is_supported( current_scaler ) )
-        scaler_select_scaler( SCALER_NORMAL );
-      return 0;
-    }
-
-  case 3:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_TRIPLESIZE );
-      scaler_register( SCALER_TV3X );
-      scaler_register( SCALER_ADVMAME3X );
-      scaler_register( SCALER_PALTV3X );
-      scaler_register( SCALER_HQ3X );
-      if( !scaler_is_supported( current_scaler ) )
-        scaler_select_scaler( SCALER_TRIPLESIZE );
-      return 0;
-    case 2:
-      scaler_register( SCALER_TIMEX1_5X );
-      if( !scaler_is_supported( current_scaler ) )
-        scaler_select_scaler( SCALER_TIMEX1_5X );
-      return 0;
-    }
-
-  }
-
-  ui_error( UI_ERROR_ERROR, "Unknown display size/image size %d/%d",
-            win32display_current_size, image_scale );
-  return 1;
 }
 
 static int
@@ -488,17 +382,12 @@ win32display_area(int x, int y, int width, int height)
 int
 uidisplay_hotswap_gfx_mode( void )
 {
-/* TODO: pause hangs emulator
   fuse_emulation_pause();
-*/
-  win32display_current_size = scaler_get_scaling_factor( current_scaler ) * image_scale;
-  win32display_setsize();
 
   /* Redraw the entire screen... */
   display_refresh_all();
-/* TODO: pause hangs emulator
+
   fuse_emulation_unpause();
-*/
 
   return 0;
 }
