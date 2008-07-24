@@ -2808,3 +2808,9 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080724 ui/win32/win32ui.c: Win32: continuing refactoring: moved WM_SIZE
 	 handler into a new function win32ui_window_resize, and WM_SIZING
 	 handler into a new function win32ui_window_resizing (Marek).
+20080724 ui/win32/{win32ui.c,win32internals.h,win32display.c}: Win32:
+	 Refactored win32 ui sizing functions to resemble gtk ui: removed
+	 win32display_resize(), renamed win32display_resize_update() to
+	 win32display_drawing_area_resize(), overwritten the contents of
+	 win32display_drawing_area_resize() with the contents of gtk ui's
+	 drawing_area_resize() (Marek).

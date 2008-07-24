@@ -92,9 +92,6 @@ static libspectrum_dword bw_colours[16];
 /* The current size of the window (in units of DISPLAY_SCREEN_*) */
 static int win32display_current_size=1;
 
-int win32display_sizechanged = 0;
-static int newsize;
-
 static int init_colours( void );
 static void win32display_area(int x, int y, int width, int height);
 static int register_scalers( void );
@@ -209,33 +206,28 @@ init_colours( void )
   return 0;
 }
 
-void
-win32display_resize( int size )
+int
+win32display_drawing_area_resize( int width, int height )
 {
-  if( size == win32display_current_size ) return;
+  int size, error;
 
-  /* clear the back buffer */
-  memset( win32_pixdata, 0, 4 * 3 * DISPLAY_SCREEN_HEIGHT *
-                            (size_t)( 1.5 * DISPLAY_SCREEN_WIDTH ) );
+  size = width / DISPLAY_ASPECT_WIDTH;
+  if( size > height / DISPLAY_SCREEN_HEIGHT )
+    size = height / DISPLAY_SCREEN_HEIGHT;
 
-  newsize = size;
-  win32display_sizechanged = 1;
-}
+  /* If we're the same size as before, no need to do anything else */
+  if( size == win32display_current_size ) return 0;
 
-void
-win32display_resize_update( void )
-{
-  win32display_current_size = newsize;
+  win32display_current_size = size;
 
-  register_scalers_noresize();
+  error = register_scalers(); if( error ) return error;
 
+  memset( scaled_image, 0, sizeof( scaled_image ) );
   display_refresh_all();
 
-  /* redraw, as we pause during resizing */
-  uidisplay_area( 0, 0, image_width, image_height );
-  blit();
+  return 0;
 }
-
+        
 static void
 win32display_setsize()
 {

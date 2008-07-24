@@ -749,8 +749,9 @@ win32_verror( int is_error )
 static int
 win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
-  if( win32display_sizechanged )
-    win32display_resize_update();
+  RECT cr;
+  GetClientRect( fuse_hWnd, &cr );
+  win32display_drawing_area_resize( cr.right - cr.left, cr.bottom - cr.top );
 
   /* FIXME: statusbar needs to be accounted for in size */
   SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
@@ -833,7 +834,6 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
   } else {
     selr->right = selr->left + width;
   }
-  win32display_resize( size );
 
   return TRUE;
 }

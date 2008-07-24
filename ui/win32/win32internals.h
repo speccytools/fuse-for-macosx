@@ -64,10 +64,7 @@ int win32display_end( void );
    between win32display.c and win32ui.c */
 extern int fuse_nCmdShow;
 
-extern int win32display_sizechanged;
-
-void win32display_resize( int size );
-void win32display_resize_update( void );
+int win32display_drawing_area_resize( int width, int height );
 
 void blit( void );
 
