@@ -781,18 +781,7 @@ win32_verror( int is_error )
 static int
 win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
-  RECT cr;
-  PAINTSTRUCT ps;
-
-  GetClientRect( fuse_hWnd, &cr );
-
-  BeginPaint( hWnd, &ps );
-  win32display_area( cr.left,
-                     cr.top,
-                     cr.right - cr.left,
-                     cr.bottom - cr.top );
-  EndPaint( hWnd, &ps );
-
+  blit();
   return 0;
 }
 

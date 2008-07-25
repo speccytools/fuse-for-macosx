@@ -97,29 +97,24 @@ static int register_scalers( void );
 void
 blit( void )
 {
-  if( display_ui_initialised ) {
-    HDC dest_dc, src_dc;
-    RECT dest_rec;
-    HBITMAP src_bmp;
+  PAINTSTRUCT ps;
+  HDC dest_dc, src_dc;
+  RECT dest_rec;
+  HBITMAP src_bmp;
 
-    dest_dc = GetDC( fuse_hWnd );
-    GetClientRect( fuse_hWnd, &dest_rec );
+  dest_dc = BeginPaint( fuse_hWnd, &ps );
+  
+  GetClientRect( fuse_hWnd, &dest_rec );
 
-    src_dc = CreateCompatibleDC(0);
-    src_bmp = SelectObject( src_dc, fuse_BMP );
-    BitBlt( dest_dc, 0, 0, image_width * win32display_current_size,
-            image_height * win32display_current_size, src_dc, 0, 0, SRCCOPY );
-    SelectObject( src_dc, src_bmp );
-    DeleteObject( src_bmp );
-    DeleteDC( src_dc );
-    ReleaseDC( fuse_hWnd, dest_dc );
+  src_dc = CreateCompatibleDC(0);
+  src_bmp = SelectObject( src_dc, fuse_BMP );
+  BitBlt( dest_dc, 0, 0, image_width * win32display_current_size,
+          image_height * win32display_current_size, src_dc, 0, 0, SRCCOPY );
+  SelectObject( src_dc, src_bmp );
+  DeleteObject( src_bmp );
+  DeleteDC( src_dc );
 
-/* If BitBlt isn't available:
-  SetDIBitsToDevice( dc, 0, 0, dest_rec.right, dest_rec.bottom, 0, 0, 0,
-                       image_height + 100, win32_pixdata, &fuse_BMI,
-                       DIB_RGB_COLORS );
-*/
-  }
+  EndPaint( fuse_hWnd, &ps );
 }
 
 int
@@ -376,7 +371,7 @@ win32display_area(int x, int y, int width, int height)
       pixdata[ ofs + 3 ] = 0; /* unused */
     }
   }
-  blit();
+  RedrawWindow( fuse_hWnd, NULL, NULL, RDW_INTERNALPAINT );
 }
 
 int
@@ -401,6 +396,8 @@ uidisplay_end( void )
 int
 win32display_end( void )
 {
+  DeleteObject( fuse_BMP );
+        
   return 0;
 }
 
