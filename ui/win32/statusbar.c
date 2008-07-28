@@ -129,9 +129,9 @@ void
 win32statusbar_redraw( HWND hWnd, LPARAM lParam )
 {
   DRAWITEMSTRUCT* di;
-  HDC src_dc, dest_dc;
+  HDC src_dc, dest_dc, mask_dc;
   RECT rc_item;
-  HBITMAP src_bmp;
+  HBITMAP src_bmp, src_bmp_mask;
   BITMAP bmp;
   size_t i;
   
@@ -187,15 +187,34 @@ win32statusbar_redraw( HWND hWnd, LPARAM lParam )
     if( src_bmp != NULL ) {    
       icons_part_width += icons_part_margin;
 
+      /* create a bitmap mask on the fly */
       GetObject( src_bmp, sizeof( bmp ), &bmp );
+      src_bmp_mask = CreateBitmap( bmp.bmWidth, bmp.bmHeight, 1, 1, NULL );
       src_dc = CreateCompatibleDC( NULL );
+      mask_dc = CreateCompatibleDC( NULL );
+      SelectObject( src_dc, src_bmp );
+      SelectObject( mask_dc, src_bmp_mask );
+      SetBkColor( src_dc, RGB( 0, 0, 0 ) );
+      BitBlt( mask_dc, 0, 0, bmp.bmWidth, bmp.bmHeight, src_dc, 0, 0, SRCCOPY );
+      BitBlt( src_dc, 0, 0, bmp.bmWidth, bmp.bmHeight, mask_dc, 0, 0, SRCINVERT );
+      
+      /* blit the transparent icon onto the status bar */
+      SelectObject( mask_dc, src_bmp_mask );
+      BitBlt( dest_dc, rc_item.left + icons_part_width,
+              rc_item.top + ( icons_part_height - bmp.bmHeight )
+              - ( 2 * icons_part_margin ), 
+              bmp.bmWidth, bmp.bmHeight, mask_dc, 0, 0, SRCAND );
+
       SelectObject( src_dc, src_bmp );
       BitBlt( dest_dc, rc_item.left + icons_part_width,
-        rc_item.top + ( icons_part_height - bmp.bmHeight )
-        - ( 2 * icons_part_margin ), 
-        bmp.bmWidth, bmp.bmHeight, src_dc, 0, 0, SRCCOPY );
-      /* FIXME: make background color transparent */
+              rc_item.top + ( icons_part_height - bmp.bmHeight )
+              - ( 2 * icons_part_margin ), 
+              bmp.bmWidth, bmp.bmHeight, src_dc, 0, 0, SRCPAINT );
+
       DeleteDC( src_dc );
+      DeleteDC( mask_dc );
+      DeleteObject( src_bmp_mask );
+      
       icons_part_width += bmp.bmWidth;
     }
   }

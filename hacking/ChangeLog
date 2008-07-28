@@ -2828,3 +2828,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 handler, fixed crash when the screen is resized to 3x, fixed unclosed
 	 handle to the drawing area (Marek).
 20080728 utils.c: add missing return.
+20080728 ui/win32/statusbar.c: Win32: implemented transparency for the status
+	 bar icons (Marek).
