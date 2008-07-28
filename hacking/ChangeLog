@@ -2827,3 +2827,4 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080725 ui/win32/{win32ui.c,win32display.c}: Win32: Refactored WM_PAINT
 	 handler, fixed crash when the screen is resized to 3x, fixed unclosed
 	 handle to the drawing area (Marek).
+20080728 utils.c: add missing return.

@@ -419,6 +419,7 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
   if( *fd == -1 ) {
     ui_error( UI_ERROR_ERROR, "couldn't create temporary file: %s",
 	      strerror( errno ) );
+    return 1;
   }
 
   error = utils_read_file( filename, &file );
