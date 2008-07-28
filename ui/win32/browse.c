@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#define _WIN32_IE 0x400 /* needed by LPNMITEMACTIVATE (dbl click on listview) */
-
 #include <libspectrum.h>
 #include <tchar.h>
 #include <windows.h>
@@ -143,7 +141,7 @@ dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       break;
 
     case WM_COMMAND:
-      if( LOWORD( wParam ) == IDC_BROWSE_CLOSE ) {
+      if( LOWORD( wParam ) == IDCLOSE ) {
         ShowWindow( dialog, SW_HIDE );
         return TRUE;
       }

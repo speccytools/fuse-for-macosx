@@ -30,8 +30,6 @@
 #include <string.h>
 */
 
-#define _WIN32_IE 0x400 /* needed by LPNMITEMACTIVATE (dbl click on listview) */
-
 #include <libspectrum.h>
 #include <tchar.h>
 #include <windows.h>
@@ -965,7 +963,7 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
   switch( msg ) {
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
-        case IDC_DBG_BTN_CLOSE:
+        case IDCLOSE:
           win32ui_debugger_done_close();
           return TRUE;
         case IDC_DBG_BTN_CONT:

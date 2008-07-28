@@ -35,19 +35,10 @@
 #define IDC_DBG_BTN_EVAL		( IDD_DBG + 7 )
 #define IDC_DBG_GRP_MEMMAP		( IDD_DBG + 8 )
 #define IDC_DBG_BTN_STEP		( IDD_DBG + 9 )
-#if (WINVER >= 0x0500)
-#define IDC_DBG_BTN_CONT		IDCONTINUE
-#else
 #define IDC_DBG_BTN_CONT		( IDD_DBG + 10 )
-#endif
 #define IDC_DBG_BTN_BREAK		( IDD_DBG + 11 )
-#if (WINVER >= 0x0400)
-#define IDC_DBG_BTN_CLOSE		IDCLOSE
-#else
-#define IDC_DBG_BTN_CLOSE		( IDD_DBG + 12 )
-#endif
 
-#define IDC_DBG_MAP11			( IDD_DBG + 13 )
+#define IDC_DBG_MAP11			( IDD_DBG + 12 )
 #define IDC_DBG_MAP12			( IDC_DBG_MAP11 + 1 )
 #define IDC_DBG_MAP13			( IDC_DBG_MAP12 + 1 )
 #define IDC_DBG_MAP14			( IDC_DBG_MAP13 + 1 )

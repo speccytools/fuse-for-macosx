@@ -26,8 +26,3 @@
 #define IDD_BROWSE          1400
 #define IDC_BROWSE_LV       1401
 #define IDC_BROWSE_MODIFIED 1402
-#if (WINVER >= 0x0400)
-#define IDC_BROWSE_CLOSE    IDCLOSE
-#else
-#define IDC_BROWSE_CLOSE    1403
-#endif

@@ -37,7 +37,7 @@ BEGIN
                   | LVS_SINGLESEL | LVS_SHOWSELALWAYS,
                   0,0,225,120, WS_EX_CLIENTEDGE
   CTEXT           "Tape modified",IDC_BROWSE_MODIFIED,0,125,225,8,SS_CENTERIMAGE
-  DEFPUSHBUTTON   "&Close",IDC_BROWSE_CLOSE,175,135,50,14
+  DEFPUSHBUTTON   "&Close",IDCLOSE,175,135,50,14
 END
 
 win32bmp_tape_marker       BITMAP "ui/win32/icons/tape_marker.bmp"

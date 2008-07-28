@@ -23,7 +23,7 @@
 
 */
 
-#define _WIN32_IE 0x400 /* needed by LPNMITEMACTIVATE (dbl click on listview) */
+#include <config.h>
 
 #include <tchar.h>
 #include <windows.h>
@@ -54,7 +54,7 @@ win32ui_pokefinder_proc( HWND hWnd, UINT msg,
   switch( msg ) {
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
-        case IDC_PF_CLOSE:
+        case IDCLOSE:
           win32ui_pokefinder_close();
           return TRUE;
         case IDC_PF_INC:

@@ -26,8 +26,3 @@
 #define IDD_MEM				4000
 #define IDC_MEM_LV			4001
 #define IDC_MEM_SB			4002
-#if (WINVER >= 0x0400)
-#define IDC_MEM_BTN_CLOSE		IDCLOSE
-#else
-#define IDC_MEM_BTN_CLOSE		4003
-#endif

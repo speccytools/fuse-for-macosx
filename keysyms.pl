@@ -281,7 +281,15 @@ CODE
 if ( $ui eq 'win32' ) {
     # To allow VK_OEM_{COMMA,MINUS,PERIOD,PLUS} to be used, we must
     # define WINVER to be >= 0x0500 before we include <windows.h>
-    print "#define WINVER 0x0500\n"
+    # But instead of requiring Windows 2000 or later, it's better to
+    # define the missing values
+    print "#if ! (_WIN32_WINNT >= 0x0500)\n"
+        . "#define VK_OEM_PLUS     0xBB\n"
+        . "#define VK_OEM_COMMA    0xBC\n"
+        . "#define VK_OEM_MINUS    0xBD\n"
+        . "#define VK_OEM_PERIOD   0xBE\n"
+        . "#endif\n"
+        . "\n";
 }
 
 print << "CODE";

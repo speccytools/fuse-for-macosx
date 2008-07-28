@@ -25,9 +25,6 @@
 
 #include <config.h>
 
-#define _WIN32_IE 0x400 /* needed by LVM_GETSELECTIONMARK 
-                           (reading selection on listview) */
-
 #include <tchar.h>
 #include <windows.h>
 #include <commctrl.h> /* windows.h must be included prior to commctrl.h */

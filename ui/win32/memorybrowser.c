@@ -25,8 +25,6 @@
 
 #include <config.h>
 
-#define _WIN32_IE 0x0300 /* needed by LVM_SETEXTENDEDLISTVIEWSTYLE */
-
 #include <libspectrum.h>
 #include <tchar.h>
 
@@ -169,7 +167,7 @@ memorybrowser_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       return TRUE;
 
     case WM_COMMAND:
-      if( LOWORD( wParam ) == IDC_MEM_BTN_CLOSE ) {
+      if( LOWORD( wParam ) == IDCLOSE ) {
         EndDialog( hwndDlg, 0 );
         DeleteObject( hfont );
         hfont = NULL;

@@ -32,5 +32,5 @@ STYLE           DS_MODALFRAME | WS_POPUP | WS_CAPTION
                 | WS_SYSMENU
 CAPTION         "Fuse - Keyboard"
 BEGIN
-  DEFPUSHBUTTON "Close", ID_CLOSE, 108, 122, 50, 14
+  DEFPUSHBUTTON "Close", IDCLOSE, 108, 122, 50, 14
 END

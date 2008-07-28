@@ -119,7 +119,7 @@ picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
-        case ID_CLOSE:
+        case IDCLOSE:
         {
           hDialogPicture = NULL;
           DestroyWindow( hWnd );

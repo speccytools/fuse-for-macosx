@@ -2830,3 +2830,8 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080728 utils.c: add missing return.
 20080728 ui/win32/statusbar.c: Win32: implemented transparency for the status
 	 bar icons (Marek).
+20080728 configure.in,keysyms.pl,ui/win32/{browse.{c,h,rc},debugger.{c,h,rc},
+	 memorybrowser.{c,h,rc},picture.{c,h,rc},pokefinder.{c,h,rc},
+	 rollback.c}: Win32: moved Windows version requirement from being local
+	 to some units to be a fuse-wide requirement and adjusted the code
+	 accordingly (Marek).
