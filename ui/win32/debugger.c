@@ -72,10 +72,10 @@ typedef enum debugger_pane {
 
 static int create_dialog( void );
 static int hide_hidden_panes( void );
-static void get_pane_menu_item( debugger_pane pane );
-static void get_pane( debugger_pane pane );
+static UINT get_pane_menu_item( debugger_pane pane );
+static BOOL show_hide_pane( debugger_pane pane, int show );
 /* static int create_menu_bar( void ); this function is handled by rc */
-static void toggle_display( void );
+static void toggle_display( debugger_pane pane, UINT menu_item_id );
 /* int create_register_display( void ); this function is handled by rc */
 /* int create_memory_map( void ); this function is handled by rc */
 static int create_breakpoints();
@@ -136,7 +136,7 @@ ui_debugger_activate( void )
 {
   int error;
 
-  fuse_emulation_pause();
+/*  fuse_emulation_pause(); */ /* FIXME: this is the reason why fuse stays in memory */
 
   /* create_dialog will create the dialog or activate if it exists */
   if( create_dialog() ) return 1;
@@ -151,24 +151,107 @@ ui_debugger_activate( void )
 }
 
 static int
-hide_hidden_panes( void ) /* FIXME: implement */
+hide_hidden_panes( void )
 {
-  STUB;
+  debugger_pane i;
+  UINT checkitem;
+  MENUITEMINFO mii;
+
+  for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
+
+    checkitem = get_pane_menu_item( i ); if( !checkitem ) return 1;
+
+    mii.fMask = MIIM_STATE;
+    mii.cbSize = sizeof( MENUITEMINFO );
+    if( ! GetMenuItemInfo( GetMenu( fuse_hDBGWnd ), checkitem, FALSE, &mii ) )
+      return 1;
+    
+    if( mii.fState && MFS_CHECKED ) continue;
+
+    if( ! show_hide_pane( i, SW_HIDE ) ) return 1;
+  }
+
   return 0;
 }
 
-static void
-get_pane_menu_item( debugger_pane pane ) /* FIXME: implement */
+static UINT
+get_pane_menu_item( debugger_pane pane )
 {
-  STUB;
-  return;
+  UINT menu_item_id;
+
+  menu_item_id = 0;
+
+  switch( pane ) {
+  case DEBUGGER_PANE_REGISTERS: menu_item_id = IDM_DBG_REG; break;
+  case DEBUGGER_PANE_MEMORYMAP: menu_item_id = IDM_DBG_MEMMAP; break;
+  case DEBUGGER_PANE_BREAKPOINTS: menu_item_id = IDM_DBG_BPS; break;
+  case DEBUGGER_PANE_DISASSEMBLY: menu_item_id = IDM_DBG_DIS; break;
+  case DEBUGGER_PANE_STACK: menu_item_id = IDM_DBG_STACK; break;
+  case DEBUGGER_PANE_EVENTS: menu_item_id = IDM_DBG_EVENTS; break;
+
+  case DEBUGGER_PANE_END: break;
+  }
+
+  if( !menu_item_id ) {
+    ui_error( UI_ERROR_ERROR, "unknown debugger pane %u", pane );
+    return 0;
+  }
+
+  return menu_item_id;
 }
 
-static void
-get_pane( debugger_pane pane ) /* FIXME: implement */
+static BOOL
+show_hide_pane( debugger_pane pane, int show )
 {
-  STUB;
-  return;
+/* Instead of get_pane() and then hiding or showing the widget as it is done
+   in gtk ui, we need to show/hide multiple widgets, hence this combined
+   function.
+
+   show parameter needs to be SW_SHOW to reveal the pane,
+   or SW_HIDE to hide it.
+*/
+  /* FIXME: window needs to resize/collapse as panel are being hidden */
+  int i;
+        
+  switch( pane ) {
+    case DEBUGGER_PANE_REGISTERS:
+      for( i = IDC_DBG_REG_PC; i <= IDC_DBG_TEXT_T_STATES; i++ ) {
+        ShowWindow( GetDlgItem( fuse_hDBGWnd, i ), show );
+      }
+      return TRUE;
+  
+    case DEBUGGER_PANE_MEMORYMAP:
+      for( i = IDC_DBG_MAP11; i <= IDC_DBG_MAP84; i++ ) {
+        ShowWindow( GetDlgItem( fuse_hDBGWnd, i ), show );
+      }
+      ShowWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_GRP_MEMMAP ), show );
+      for( i = IDC_DBG_TEXT_ADDRESS; i <= IDC_DBG_TEXT_SOURCE; i++ ) {
+        ShowWindow( GetDlgItem( fuse_hDBGWnd, i ), show );
+      }
+      return TRUE;
+  
+    case DEBUGGER_PANE_BREAKPOINTS:
+      ShowWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_LV_BPS ), show );
+      return TRUE;
+  
+    case DEBUGGER_PANE_DISASSEMBLY:
+      ShowWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_LV_PC ), show );
+      ShowWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_SB_PC ), show );
+      return TRUE;
+  
+    case DEBUGGER_PANE_STACK:
+      ShowWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_LV_STACK ), show );
+      return TRUE;
+  
+    case DEBUGGER_PANE_EVENTS:
+      ShowWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_LV_EVENTS ), show );
+      return TRUE;
+  
+    case DEBUGGER_PANE_END: break;
+  }
+
+  ui_error( UI_ERROR_ERROR, "unknown debugger pane %u", pane );
+  return FALSE;
 }
 
 int
@@ -189,6 +272,7 @@ create_dialog() /* FIXME: implement */
 {
   int error;
   debugger_pane i;
+  MENUITEMINFO mii;  
 
   if ( fuse_hDBGWnd == NULL ) {
 
@@ -205,13 +289,15 @@ create_dialog() /* FIXME: implement */
 
     /* Initially, have all the panes visible */
     for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
-      
-    /*
-      GtkCheckMenuItem *check_item;
-  
+    
+      UINT check_item;
+
       check_item = get_pane_menu_item( i ); if( !check_item ) break;
-    */
-      /* FIXME: set the menu checkbox for pane( i ) */
+
+      mii.fMask = MIIM_STATE;
+      mii.fState = MFS_CHECKED;
+      mii.cbSize = sizeof( MENUITEMINFO );
+      SetMenuItemInfo( GetMenu( fuse_hDBGWnd ), check_item, FALSE, &mii );
     }
 
   } else {
@@ -221,9 +307,25 @@ create_dialog() /* FIXME: implement */
 }
 
 static void
-toggle_display( void ) /* FIXME: implement */
+toggle_display( debugger_pane pane, UINT menu_item_id )
 {
-  STUB;
+  MENUITEMINFO mii;
+        
+  mii.fMask = MIIM_STATE;
+  mii.cbSize = sizeof( MENUITEMINFO );
+  GetMenuItemInfo( GetMenu( fuse_hDBGWnd ), menu_item_id, FALSE, &mii );
+    
+  /* Windows doesn't automatically checks/unchecks
+     the menus when they're clicked */
+  if( mii.fState && MFS_CHECKED ) {
+    show_hide_pane( pane, SW_HIDE );
+    mii.fState = MFS_UNCHECKED;
+    SetMenuItemInfo( GetMenu( fuse_hDBGWnd ), menu_item_id, FALSE, &mii );
+  } else {
+    show_hide_pane( pane, SW_SHOW );
+    mii.fState = MFS_CHECKED;
+    SetMenuItemInfo( GetMenu( fuse_hDBGWnd ), menu_item_id, FALSE, &mii );
+  }
 }
 
 static int
@@ -800,7 +902,7 @@ deactivate_debugger( void ) /* FIXME: implement */
 {
   /* FIXME: call gtk_main_quit() equivalent here */
   debugger_active = 0;
-  fuse_emulation_unpause();
+/*  fuse_emulation_unpause(); */ /* FIXME: this is the reason why fuse stays in memory */
   return 0;
 }
 
@@ -978,6 +1080,26 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
         case IDC_DBG_BTN_EVAL:
           evaluate_command();
           return TRUE;
+
+        /* menus */
+        case IDM_DBG_REG:
+          toggle_display( DEBUGGER_PANE_REGISTERS, IDM_DBG_REG );
+          return 0;
+        case IDM_DBG_MEMMAP:
+          toggle_display( DEBUGGER_PANE_MEMORYMAP, IDM_DBG_MEMMAP );
+          return 0;
+        case IDM_DBG_BPS:
+          toggle_display( DEBUGGER_PANE_BREAKPOINTS, IDM_DBG_BPS );
+          return 0;
+        case IDM_DBG_DIS:
+          toggle_display( DEBUGGER_PANE_DISASSEMBLY, IDM_DBG_DIS );
+          return 0;
+        case IDM_DBG_STACK:
+          toggle_display( DEBUGGER_PANE_STACK, IDM_DBG_STACK );
+          return 0;
+        case IDM_DBG_EVENTS:
+          toggle_display( DEBUGGER_PANE_EVENTS, IDM_DBG_EVENTS );
+          return 0;
       }
       return FALSE;
     case WM_CLOSE:

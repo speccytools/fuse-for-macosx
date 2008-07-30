@@ -2835,3 +2835,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 rollback.c}: Win32: moved Windows version requirement from being local
 	 to some units to be a fuse-wide requirement and adjusted the code
 	 accordingly (Marek).
+20080730 ui/win32/debugger.{c,h}: Win32: implemented showing and hiding panes,
+	 without resizing for now (Marek).
