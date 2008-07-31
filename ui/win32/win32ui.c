@@ -55,6 +55,9 @@ static HACCEL hAccels;
 /* machine select dialog's font object */
 static HFONT h_ms_font = NULL;
 
+/* monospaced font to use with debugger and memory browser */
+static HFONT monospaced_font = NULL;
+
 /* True if we were paused via the Machine/Pause menu item */
 static int paused = 0;
 
@@ -346,6 +349,13 @@ ui_end( void )
   int error;
 
   error = win32display_end(); if( error ) return error;
+   
+  /* close the monospaced font handle */     
+  if( monospaced_font ) {
+    DeleteObject( monospaced_font );
+    monospaced_font = NULL;
+  }
+        
   return 0;
 }
 
@@ -636,6 +646,35 @@ ui_joystick_poll( void )
 {
   /* STUB; */
 }
+
+/*
+ * Font code
+ */
+
+int
+win32ui_get_monospaced_font( HFONT *font )
+{
+  if( ! monospaced_font ) {
+    *font = CreateFont( -11, 0, 0, 0, 400, FALSE, FALSE, FALSE, 0, 400, 2,
+                            1, 1, TEXT( "Courier New" ) );
+    if( !font ) {
+      ui_error( UI_ERROR_ERROR, "couldn't find a monospaced font" );
+      return 1;
+    }
+    monospaced_font = *font;
+  }
+  else {
+    *font = monospaced_font;
+  }
+
+  return 0;
+}
+
+void
+win32ui_set_font( HWND hDlg, int nIDDlgItem, HFONT font )
+{
+  SendDlgItemMessage( hDlg, nIDDlgItem , WM_SETFONT, (WPARAM) font, FALSE );
+}  
 
 static INT_PTR CALLBACK
 selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )

@@ -76,11 +76,11 @@ static UINT get_pane_menu_item( debugger_pane pane );
 static BOOL show_hide_pane( debugger_pane pane, int show );
 /* static int create_menu_bar( void ); this function is handled by rc */
 static void toggle_display( debugger_pane pane, UINT menu_item_id );
-/* int create_register_display( void ); this function is handled by rc */
+static int create_register_display( HFONT font );
 /* int create_memory_map( void ); this function is handled by rc */
 static int create_breakpoints();
-static int create_disassembly();
-static int create_stack_display();
+static int create_disassembly( HFONT font );
+static int create_stack_display( HFONT font );
 static void stack_click( LPNMITEMACTIVATE lpnmitem );
 static int create_events();
 static void events_click( LPNMITEMACTIVATE lpnmitem );
@@ -97,12 +97,12 @@ static int deactivate_debugger( void );
 
 static void move_disassembly( WPARAM scroll_command );
 
-static void evaluate_command();
-static void win32ui_debugger_done_step();
-static void win32ui_debugger_done_continue();
+static void evaluate_command( void );
+static void win32ui_debugger_done_step( void );
+static void win32ui_debugger_done_continue( void );
 static void win32ui_debugger_break();
-static void delete_dialog();
-static void win32ui_debugger_done_close();
+static void delete_dialog( void );
+static void win32ui_debugger_done_close( void );
 static INT_PTR CALLBACK win32ui_debugger_proc( HWND hWnd, UINT msg,
                                                WPARAM wParam, LPARAM lParam );
 
@@ -113,6 +113,9 @@ static libspectrum_word disassembly_top;
 static const int disassembly_min = 0x0000;
 static const int disassembly_max = 0xffff;
 static const int disassembly_page = 20;
+
+/* Have we created the above yet? */
+static int dialog_created = 0;
 
 /* Is the debugger window active (as opposed to the debugger itself)? */
 static int debugger_active;
@@ -139,8 +142,9 @@ ui_debugger_activate( void )
 /*  fuse_emulation_pause(); */ /* FIXME: this is the reason why fuse stays in memory */
 
   /* create_dialog will create the dialog or activate if it exists */
-  if( create_dialog() ) return 1;
-
+  if( !dialog_created ) if( create_dialog() ) return 1;
+        
+  ShowWindow( fuse_hDBGWnd, SW_SHOW );
   error = hide_hidden_panes(); if( error ) return error;
   
   EnableWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_BTN_CONT ), TRUE);
@@ -215,19 +219,16 @@ show_hide_pane( debugger_pane pane, int show )
         
   switch( pane ) {
     case DEBUGGER_PANE_REGISTERS:
-      for( i = IDC_DBG_REG_PC; i <= IDC_DBG_TEXT_T_STATES; i++ ) {
+      for( i = IDC_DBG_REG_PC; i <= IDC_DBG_REG_IM; i++ ) {
         ShowWindow( GetDlgItem( fuse_hDBGWnd, i ), show );
       }
       return TRUE;
   
     case DEBUGGER_PANE_MEMORYMAP:
-      for( i = IDC_DBG_MAP11; i <= IDC_DBG_MAP84; i++ ) {
+      for( i = IDC_DBG_MAP11; i <= IDC_DBG_TEXT_CONTENDED; i++ ) {
         ShowWindow( GetDlgItem( fuse_hDBGWnd, i ), show );
       }
       ShowWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_GRP_MEMMAP ), show );
-      for( i = IDC_DBG_TEXT_ADDRESS; i <= IDC_DBG_TEXT_SOURCE; i++ ) {
-        ShowWindow( GetDlgItem( fuse_hDBGWnd, i ), show );
-      }
       return TRUE;
   
     case DEBUGGER_PANE_BREAKPOINTS:
@@ -259,50 +260,57 @@ ui_debugger_deactivate( int interruptable )
 {
   if( debugger_active ) deactivate_debugger();
 
-  EnableWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_BTN_CONT ),
-                !interruptable ? TRUE : FALSE );
-  EnableWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_BTN_BREAK ), 
-                interruptable ? TRUE : FALSE );
+  if( dialog_created ) {
+    EnableWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_BTN_CONT ),
+                  !interruptable ? TRUE : FALSE );
+    EnableWindow( GetDlgItem( fuse_hDBGWnd, IDC_DBG_BTN_BREAK ), 
+                  interruptable ? TRUE : FALSE );
+  }
 
   return 0;
 }
 
 static int
-create_dialog() /* FIXME: implement */
+create_dialog()
 {
   int error;
   debugger_pane i;
   MENUITEMINFO mii;  
 
-  if ( fuse_hDBGWnd == NULL ) {
+  HFONT font;
 
-    fuse_hDBGWnd = CreateDialog( fuse_hInstance, MAKEINTRESOURCE( IDD_DBG ),
-      fuse_hWnd, (DLGPROC) win32ui_debugger_proc );
+  error = win32ui_get_monospaced_font( &font ); if( error ) return error;
 
-    error = create_breakpoints(); if( error ) return error;
+  fuse_hDBGWnd = CreateDialog( fuse_hInstance, MAKEINTRESOURCE( IDD_DBG ),
+                               fuse_hWnd, win32ui_debugger_proc );
 
-    error = create_disassembly(); if( error ) return error;
+  /* The main display areas */
+  error = create_register_display( font );
+  if( error ) return error;
 
-    error = create_stack_display(); if( error ) return error;
+  error = create_breakpoints(); if( error ) return error;
 
-    error = create_events(); if( error ) return error;
+  error = create_disassembly( font ); if( error ) return error;
 
-    /* Initially, have all the panes visible */
-    for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
-    
-      UINT check_item;
+  error = create_stack_display( font ); if( error ) return error;
 
-      check_item = get_pane_menu_item( i ); if( !check_item ) break;
+  error = create_events(); if( error ) return error;
 
-      mii.fMask = MIIM_STATE;
-      mii.fState = MFS_CHECKED;
-      mii.cbSize = sizeof( MENUITEMINFO );
-      SetMenuItemInfo( GetMenu( fuse_hDBGWnd ), check_item, FALSE, &mii );
-    }
+  /* Initially, have all the panes visible */
+  for( i = DEBUGGER_PANE_BEGIN; i < DEBUGGER_PANE_END; i++ ) {
+  
+    UINT check_item;
 
-  } else {
-    SetActiveWindow( fuse_hDBGWnd );
+    check_item = get_pane_menu_item( i ); if( !check_item ) break;
+
+    mii.fMask = MIIM_STATE;
+    mii.fState = MFS_CHECKED;
+    mii.cbSize = sizeof( MENUITEMINFO );
+    SetMenuItemInfo( GetMenu( fuse_hDBGWnd ), check_item, FALSE, &mii );
   }
+
+  dialog_created = 1;
+
   return 0;
 }
 
@@ -326,6 +334,19 @@ toggle_display( debugger_pane pane, UINT menu_item_id )
     mii.fState = MFS_CHECKED;
     SetMenuItemInfo( GetMenu( fuse_hDBGWnd ), menu_item_id, FALSE, &mii );
   }
+}
+
+static int
+create_register_display( HFONT font )
+{
+  /* this display is created in rc, just set the monospaced font */
+  size_t i;
+
+  for( i = 0; i < 18; i++ ) {
+    win32ui_set_font( fuse_hDBGWnd, IDC_DBG_REG_PC + i, font );
+  }
+
+  return 0;
 }
 
 static int
@@ -361,7 +382,7 @@ create_breakpoints()
 }
 
 static int
-create_disassembly()
+create_disassembly( HFONT font )
 {
   size_t i;
 
@@ -383,13 +404,16 @@ create_disassembly()
   lvc.fmt = LVCFMT_LEFT;
 
   for( i = 0; i < 2; i++ ) {
-    if( i != 0 )
+    if( i != 0 ) {
       lvc.mask |= LVCF_SUBITEM;
-    lvc.cx = 60;
+    }
+    lvc.cx = ( i == 0 ) ? 65 : 125;
     lvc.pszText = disassembly_titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
+  
+  win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_PC, font );
   
   /* The disassembly scrollbar */
   SCROLLINFO si;
@@ -406,7 +430,7 @@ create_disassembly()
 }
 
 static int
-create_stack_display()
+create_stack_display( HFONT font )
 {
   size_t i;
   
@@ -424,16 +448,19 @@ create_stack_display()
   LVCOLUMN lvc;
   lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
   lvc.fmt = LVCFMT_LEFT;
-  lvc.cx = 45;
 
   for( i = 0; i < 2; i++ ) {
     if( i != 0 )
       lvc.mask |= LVCF_SUBITEM;
+    lvc.cx = ( i == 0 ) ? 65 : 55;
+
     lvc.pszText = stack_titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
   }
   
+  win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_STACK, font );
+
   return 0;
 }
 
@@ -479,11 +506,11 @@ create_events()
   LVCOLUMN lvc;
   lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
   lvc.fmt = LVCFMT_LEFT;
-  lvc.cx = 50;
 
   for( i = 0; i < 2; i++ ) {
     if( i != 0 )
       lvc.mask |= LVCF_SUBITEM;
+    lvc.cx = ( i == 0 )? 40 : 75;
     lvc.pszText = titles[i];
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_EVENTS, LVM_INSERTCOLUMN, i,
                         ( LPARAM ) &lvc );
@@ -524,7 +551,7 @@ events_click( LPNMITEMACTIVATE lpnmitem )
 }
 
 static int
-activate_debugger( void ) /* FIXME: implement */
+activate_debugger( void )
 {
   debugger_active = 1;
 
@@ -559,44 +586,39 @@ ui_debugger_update( void )
 				    &HL, &HL_, &IX, &IY,
 				  };
 
-  if( fuse_hDBGWnd == NULL ) return 0;
+  if( !dialog_created ) return 0;
 
   /* FIXME: verify all functions below are unicode compliant */
   for( i = 0; i < 12; i++ ) {
-/* FIXME: should we implement it as one label similarily to GTK?
     _sntprintf( buffer, 5, "%3s ", register_name[i] );
     _sntprintf( &buffer[4], 76, format_16_bit(), *value_ptr[i] );
-*/
-    _sntprintf( buffer, 76, format_16_bit(), *value_ptr[i] );
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_PC + i, 
                         WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
   }
 
-  _sntprintf( buffer, 76, format_8_bit(), I );
+  _tcscpy( buffer, TEXT( "  I   " ) );
+  _sntprintf( &buffer[6], 76, format_8_bit(), I );
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_I,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
-  _sntprintf( buffer, 80, format_8_bit(), ( R & 0x7f ) | ( R7 & 0x80 ) );
+  _tcscpy( buffer, TEXT( "  R   " ) );
+  _sntprintf( &buffer[6], 80, format_8_bit(), ( R & 0x7f ) | ( R7 & 0x80 ) );
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_R,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
-  _sntprintf( buffer, 80, "%5d", tstates );
+  /* FIXME: doesnt' look like T-states fits in with monospaced font? */
+  _sntprintf( buffer, 80, TEXT( "T-states %5d" ), tstates );
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_T_STATES,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
-  _sntprintf( buffer, 80, "%d", IM );
+  _sntprintf( buffer, 80, TEXT( "  IM %d\r\nIFF1 %d\r\nIFF2 %d" ),
+              IM, IFF1, IFF2 );
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_IM,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
-  _sntprintf( buffer, 80, "%d", IFF1 );
-  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_IFF1,
-                      WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
-  _sntprintf( buffer, 80, "%d", IFF2 );
-  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_IFF2,
-                      WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
-  strcpy( buffer, "SZ5H3PNC\r\n" ); /* FIXME: \r\n doesn't do the magic here */
-  for( i = 0; i < 8; i++ ) buffer[i+9] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
-  buffer[17] = '\0';
-  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_SZ5H3PNC,
+  _tcscpy( buffer, TEXT( "SZ5H3PNC\r\n" ) );
+  for( i = 0; i < 8; i++ ) buffer[i+10] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
+  buffer[18] = '\0';
+  SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_FLAGS,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
   capabilities = libspectrum_machine_capabilities( machine_current->machine );
@@ -605,21 +627,21 @@ ui_debugger_update( void )
   _sntprintf( buffer, 1024, format_string, ula_last_byte() );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
-    _stprintf( format_string, "\n    AY %s", format_8_bit() );
+    _stprintf( format_string, "\r\n    AY %s", format_8_bit() );
     length = _tcslen( buffer );
     _sntprintf( &buffer[length], 1024-length, format_string,
 	        machine_current->ay.current_register );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) {
-    _stprintf( format_string, "\n128Mem %s", format_8_bit() );
+    _stprintf( format_string, "\r\n128Mem %s", format_8_bit() );
     length = _tcslen( buffer );
     _sntprintf( &buffer[length], 1024-length, format_string,
 	        machine_current->ram.last_byte );
   }
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_PLUS3_MEMORY ) {
-    _stprintf( format_string, "\n+3 Mem %s", format_8_bit() );
+    _stprintf( format_string, "\r\n+3 Mem %s", format_8_bit() );
     length = _tcslen( buffer );
     _sntprintf( &buffer[length], 1024-length, format_string,
 	        machine_current->ram.last_byte2 );
@@ -628,7 +650,7 @@ ui_debugger_update( void )
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO  ||
       capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ||
       capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY       ) {
-    _stprintf( format_string, "\nTmxDec %s", format_8_bit() );
+    _stprintf( format_string, "\r\nTmxDec %s", format_8_bit() );
     length = _tcslen( buffer );
     _sntprintf( &buffer[length], 1024-length, format_string,
 	        scld_last_dec.byte );
@@ -636,13 +658,13 @@ ui_debugger_update( void )
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY ||
       capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY       ) {
-    _stprintf( format_string, "\nTmxHsr %s", format_8_bit() );
+    _stprintf( format_string, "\r\nTmxHsr %s", format_8_bit() );
     length = _tcslen( buffer );
     _sntprintf( &buffer[length], 1024-length, format_string, scld_last_hsr );
   }
 
   if( settings_current.zxcf_active ) {
-    _stprintf( format_string, "\n  ZXCF %s", format_8_bit() );
+    _stprintf( format_string, "\r\n  ZXCF %s", format_8_bit() );
     length = _tcslen( buffer );
     _sntprintf( &buffer[length], 1024-length, format_string,
 	        zxcf_last_memctl() );
@@ -695,7 +717,6 @@ ui_debugger_update( void )
 static int
 update_memory_map( void )
 {
-  /* FIXME combine _TEXT_ and _REG_ objects, and apply monospace font */
   size_t i;
   TCHAR buffer[ 40 ];
 
@@ -706,7 +727,7 @@ update_memory_map( void )
                         WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
 
     /* FIXME: memory_bank_name is not unicode */
-    _sntprintf( buffer, 40, "%s %d", memory_bank_name( &memory_map_read[i] ),
+    _sntprintf( buffer, 40, TEXT( "%s %d" ), memory_bank_name( &memory_map_read[i] ),
 	        memory_map_read[i].page_num );
     SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + 1, 
                         WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
@@ -898,7 +919,7 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
 }
 
 static int
-deactivate_debugger( void ) /* FIXME: implement */
+deactivate_debugger( void )
 {
   /* FIXME: call gtk_main_quit() equivalent here */
   debugger_active = 0;
@@ -998,7 +1019,7 @@ move_disassembly( WPARAM scroll_command )
 
 /* Evaluate the command currently in the entry box */
 static void
-evaluate_command()
+evaluate_command( void )
 {
   TCHAR *buffer;
   int buffer_size; 
@@ -1028,19 +1049,19 @@ evaluate_command()
 }
 
 static void
-win32ui_debugger_done_step()
+win32ui_debugger_done_step( void )
 {
   debugger_step();
 }
 
 static void
-win32ui_debugger_done_continue()
+win32ui_debugger_done_continue( void )
 {
   debugger_run();
 }
 
 static void
-win32ui_debugger_break()
+win32ui_debugger_break( void )
 {
   debugger_mode = DEBUGGER_MODE_HALTED;
 
@@ -1049,10 +1070,15 @@ win32ui_debugger_break()
 }
 
 static void
-win32ui_debugger_done_close() /* FIXME: implement */
+delete_dialog( void )
 {
-  delete_dialog();
-  
+  win32ui_debugger_done_close();
+}
+
+static void
+win32ui_debugger_done_close( void )
+{
+  ShowWindow( fuse_hDBGWnd, SW_HIDE );
   win32ui_debugger_done_continue();
 }
 
@@ -1129,13 +1155,3 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
   }
   return FALSE;
 }
-
-static void
-delete_dialog() /* FIXME: implement */
-{
-  DestroyWindow( fuse_hDBGWnd );
-  
-  fuse_hDBGWnd = NULL;
-}
-
-

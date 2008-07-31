@@ -2837,3 +2837,7 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 accordingly (Marek).
 20080730 ui/win32/debugger.{c,h}: Win32: implemented showing and hiding panes,
 	 without resizing for now (Marek).
+20080731 ui/win32/{win32ui.c,debugger.{c,h,rc},win32internals.h}: Win32:
+	 partially redesigned the debugger window to make the structure similar
+	 to gtk ui, implemented monospaced font code, which is used by debugger
+	 only for now (Marek).
