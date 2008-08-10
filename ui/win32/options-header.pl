@@ -48,7 +48,7 @@ my $optnum = 3000;
 foreach( @dialogs ) {
 
     my $optname = uc( "OPT_$_->{name}" );
-    printf "#define IDG_%s %s\n", $optname, $optnum++;
+    printf "#define IDD_%s %s\n", $optname, $optnum++;
 
     foreach my $widget ( @{ $_->{widgets} } ) {
 

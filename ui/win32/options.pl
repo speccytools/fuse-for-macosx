@@ -156,7 +156,7 @@ menu_options_$_->{name}( int action )
 {
   fuse_emulation_pause();
 
-  DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDG_$optname ),
+  DialogBox( fuse_hInstance, MAKEINTRESOURCE( IDD_$optname ),
              fuse_hWnd, (DLGPROC) menu_options_$_->{name}_proc );
 
   fuse_emulation_unpause();

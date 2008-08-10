@@ -75,7 +75,7 @@ foreach( @dialogs ) {
    
     print << "CODE";
 
-IDG_$optname DIALOGEX 6,5,160,$y
+IDD_$optname DIALOGEX 6,5,160,$y
   CAPTION "Fuse - $_->{title}"
   FONT 8,"Ms Shell Dlg 2",400,0,1
   STYLE WS_POPUP | WS_CAPTION | WS_BORDER | WS_SYSMENU
