@@ -205,6 +205,8 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     /* prevent the cursor from being redrawn if fuse has grabbed the mouse */
       if( ui_mouse_grabbed )
         return TRUE;
+      else
+        return( DefWindowProc( hWnd, msg, wParam, lParam ) );
 
     default:
       return( DefWindowProc( hWnd, msg, wParam, lParam ) );

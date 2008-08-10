@@ -2841,3 +2841,7 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 partially redesigned the debugger window to make the structure similar
 	 to gtk ui, implemented monospaced font code, which is used by debugger
 	 only for now (Marek).
+20080810 ui/win32/win32ui.c: Win32: modified the procedure preventing to draw
+	 the mouse cursor if it's 'grabbed' to explictly call default window
+	 procedure if the the mouse cursor is not grabbed, to avoid any
+	 confussion (Marek).
