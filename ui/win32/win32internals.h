@@ -97,6 +97,10 @@ void handle_menu( DWORD cmd, HWND okno );
 
 void win32_verror( int is_error );
 
+void win32ui_process_messages( int process_queue_once );
+
+#define WM_USER_EXIT_PROCESS_MESSAGES WM_USER
+
 /*
  * Statusbar routines (statusbar.c)
  */

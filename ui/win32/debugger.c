@@ -139,7 +139,7 @@ ui_debugger_activate( void )
 {
   int error;
 
-/*  fuse_emulation_pause(); */ /* FIXME: this is the reason why fuse stays in memory */
+  fuse_emulation_pause();
 
   /* create_dialog will create the dialog or activate if it exists */
   if( !dialog_created ) if( create_dialog() ) return 1;
@@ -558,7 +558,7 @@ activate_debugger( void )
   ui_debugger_disassemble( PC );
   ui_debugger_update();
 
-  /* FIXME: call gtk_main() requivalent here */
+  win32ui_process_messages( 0 );
   return 0;
 }
 
@@ -921,9 +921,9 @@ add_event( gpointer data, gpointer user_data GCC_UNUSED )
 static int
 deactivate_debugger( void )
 {
-  /* FIXME: call gtk_main_quit() equivalent here */
+  PostMessage( fuse_hWnd, WM_USER_EXIT_PROCESS_MESSAGES, 0, 0 );
   debugger_active = 0;
-/*  fuse_emulation_unpause(); */ /* FIXME: this is the reason why fuse stays in memory */
+  fuse_emulation_unpause();
   return 0;
 }
 
@@ -1086,8 +1086,6 @@ static INT_PTR CALLBACK
 win32ui_debugger_proc( HWND hWnd, UINT msg,
                        WPARAM wParam, LPARAM lParam )
 {
-/* FIXME: for whatever reason fuse.exe stays in memory after it was closed
-          if debugger was used */
   switch( msg ) {
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {

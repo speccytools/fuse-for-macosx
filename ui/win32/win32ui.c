@@ -319,30 +319,9 @@ win32ui_make_menu( void )
 int
 ui_event( void )
 {
-  MSG msg;
-
-  do {
-
-    /* Process messages */
-    while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
-      if( !IsDialogMessage( fuse_hPFWnd, &msg  ) &&
-          !IsDialogMessage( fuse_hDBGWnd, &msg ) ) {
-        if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
-          if( msg.message == WM_QUIT ) break;
-          /* finish - set exit flag somewhere */
-          TranslateMessage( &msg );
-          DispatchMessage( &msg );
-        }
-      }
-    }
-
-    if( fuse_emulation_paused )
-      Sleep( 25 );
-
-  } while( fuse_emulation_paused );
+  win32ui_process_messages( 1 );
 
   return 0;
-  /* finish - somwhere there should be return msg.wParam */
 }
 
 int
@@ -482,7 +461,7 @@ menu_machine_pause( int action )
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED,
                          UI_STATUSBAR_STATE_INACTIVE );
     timer_estimate_reset();
-    fuse_emulation_unpause();
+    PostMessage( fuse_hWnd, WM_USER_EXIT_PROCESS_MESSAGES, 0, 0 );
   } else {
 
     /* Stop recording any competition mode RZX file */
@@ -493,7 +472,7 @@ menu_machine_pause( int action )
 
     paused = 1;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
-    fuse_emulation_pause();
+    win32ui_process_messages( 0 );
   }
 }
 
@@ -919,4 +898,41 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
   /* FIXME: function is defined to return int,
             check which one does window proc expect */
   return TRUE;
+}
+
+/* win32ui_process_messages() is an equivalent of gtk's gtk_main(),
+ * it processes messages until it receives WM_USER_EXIT_PROCESS_MESSAGES
+ * message, which should be sent using:
+ * PostMessage( fuse_hWnd, WM_USER_EXIT_PROCESS_MESSAGES, 0, 0 );
+ * ( equivalent of gtk_main_quit() );
+ * With process_queue_once = 1 it checks for messages pending for fuse 
+ *   window, processes them and exists.
+ * With process_queue_once = 0 it processes the messages until it receives
+ *   WM_USER_EXIT_PROCESS_MESSAGES message.
+ */
+void
+win32ui_process_messages( int process_queue_once )
+{
+  MSG msg;
+
+  while( 1 ) {
+    while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
+      /* FIXME: rethink this loop, IsDialogMessage in particular */
+      if( !IsDialogMessage( fuse_hPFWnd, &msg  ) &&
+          !IsDialogMessage( fuse_hDBGWnd, &msg ) ) {
+        if( !TranslateAccelerator( fuse_hWnd, hAccels, &msg ) ) {
+          if( ( LOWORD( msg.message ) == WM_QUIT ) ||
+              ( LOWORD( msg.message ) == WM_USER_EXIT_PROCESS_MESSAGES ) )
+            return;
+          /* FIXME: set exit flag somewhere */
+          TranslateMessage( &msg );
+          DispatchMessage( &msg );
+        }
+      }
+    }
+    if( process_queue_once ) return;
+    
+    WaitMessage();
+  }
+  /* FIXME: somewhere there should be return msg.wParam */
 }

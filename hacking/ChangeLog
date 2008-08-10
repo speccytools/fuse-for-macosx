@@ -2845,3 +2845,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 the mouse cursor if it's 'grabbed' to explictly call default window
 	 procedure if the the mouse cursor is not grabbed, to avoid any
 	 confussion (Marek).
+20080810 ui/win32/{win32ui.c,debugger.c,win32internals.h}: Win32: fixed the
+	 pause/unpause routines by introducing win32ui_process_messages - an
+	 equivalent of gtk's gtk_main (Marek).
