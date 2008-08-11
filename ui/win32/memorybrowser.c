@@ -46,9 +46,6 @@ static const int memorysb_step = 0x10;
 static const int memorysb_page_inc = 0xa0;
 static const int memorysb_page_size = 0x13f;
 
-/* listview monospaced font */
-static HFONT hfont;
-
 static void
 update_display( HWND hwndDlg, libspectrum_word base )
 {
@@ -169,16 +166,12 @@ memorybrowser_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
     case WM_COMMAND:
       if( LOWORD( wParam ) == IDCLOSE ) {
         EndDialog( hwndDlg, 0 );
-        DeleteObject( hfont );
-        hfont = NULL;
         return TRUE;
       }
       return FALSE;
 
     case WM_CLOSE: {
       EndDialog( hwndDlg, 0 );
-      DeleteObject( hfont );
-      hfont = NULL;
       return TRUE;
     }
 
@@ -204,9 +197,13 @@ static void
 memorybrowser_init( HWND hwndDlg )
 {
   size_t i;
+  int error;
+  HFONT font;
 
   TCHAR *titles[] = { "Address", "Hex", "Data" };
   int column_widths[] = { 62, 348, 124 };
+
+  error = win32ui_get_monospaced_font( &font ); if( error ) return;
 
   /* set extended listview style to select full row, when an item is selected */
   DWORD lv_ext_style;
@@ -243,10 +240,8 @@ memorybrowser_init( HWND hwndDlg )
           reveals address 0x0000 */
   
   /* set font of the listview to monospaced one */
-  hfont = CreateFont( -11, 0, 0, 0, 400, FALSE, FALSE, FALSE, 0, 400, 2,
-                            1, 1, TEXT( "Courier New" ) );
   SendDlgItemMessage( hwndDlg, IDC_MEM_LV , WM_SETFONT,
-                      (WPARAM) hfont, FALSE );
+                      (WPARAM) font, FALSE );
 
   update_display( hwndDlg, 0x0000 );
 }

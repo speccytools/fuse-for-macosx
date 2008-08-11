@@ -2851,3 +2851,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080810 ui/win32/{options,options-resource,options-header}.pl: Win32: renamed
 	 options dialogs from IDG_* to IDD_* to follow the naming convention
 	 (Marek).
+20080811 ui/win32/memorybrowser.c: Win32: made the memory browser dialog use
+	 the win32ui_get_monospaced_font function (Marek).
