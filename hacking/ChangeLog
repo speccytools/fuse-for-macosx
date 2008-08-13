@@ -2853,3 +2853,7 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 (Marek).
 20080811 ui/win32/memorybrowser.c: Win32: made the memory browser dialog use
 	 the win32ui_get_monospaced_font function (Marek).
+20080812 configure.in: Win32: Added version requirement for DirectX sound
+	 interface. The module needs version DirectX 7 or higher. This also
+	 stops all the redefinition errors happening without this requirement
+	 (Marek).

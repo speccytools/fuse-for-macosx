@@ -365,7 +365,8 @@ dnl Check if DirectSound is available
 AC_CHECK_HEADER(
   dsound.h,
   [dxsound_available=yes],
-  [AC_MSG_WARN(dsound.h not found - no DirectSound output)]
+  [AC_MSG_WARN(dsound.h not found - no DirectSound output)],
+  [#define DIRECTSOUND_VERSION 0x0700]
 )
 
 dnl Check if MS Windows Multimedia API sound is available
@@ -407,6 +408,7 @@ AC_MSG_CHECKING(which sound routines to use)
 if test "$dxsound_available" = yes; then
   SOUND_LIBADD='dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
   AC_MSG_RESULT(DirectX)
+  AC_DEFINE([DIRECTSOUND_VERSION], 0x0700, [DirectX 7 or higher is required])
 elif test "$win32sound_available" = yes; then
   SOUND_LIBADD='win32sound.$(OBJEXT)' SOUND_LIBS='-lwinmm'
   AC_MSG_RESULT(win32sound)
