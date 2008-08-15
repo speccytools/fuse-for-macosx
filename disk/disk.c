@@ -667,6 +667,9 @@ alloc_uncompress_buffer( unsigned char **buffer, int length )
 }
 
 /* open a disk image */
+#define GEOM_CHECK \
+    if( d->sides < 1 || d->sides > 2 || \
+       d->cylinders < 1 || d->cylinders > 85 ) return d->status = DISK_GEOM
 
 static int
 open_udi( FILE *file, disk_t *d )
@@ -675,7 +678,8 @@ open_udi( FILE *file, disk_t *d )
 
   d->sides = head[10] + 1;
   d->cylinders = head[9] + 1;
-  d->density = DISK_DENS_AUTO;;
+  GEOM_CHECK;
+  d->density = DISK_DENS_AUTO;
   fseek( file, 16, SEEK_SET );
   d->bpt = 0;
 
@@ -786,6 +790,7 @@ open_sad( FILE *file, disk_t *d, int preindex )
   fseek( file, 22, SEEK_SET );
   d->sides = head[18];
   d->cylinders = head[19];
+  GEOM_CHECK;
   sectors = head[20];
   seclen = head[21] * 64;
 
@@ -848,6 +853,7 @@ open_fdi( FILE *file, disk_t *d, int preindex )
   d->wrprot = head[0x03] == 1 ? 1 : 0;
   d->sides = head[0x06] + 256 * head[0x07];
   d->cylinders = head[0x04] + 256 * head[0x05];
+  GEOM_CHECK;
   data_offset = head[0x0a] + 256 * head[0x0b];
   h = 0x0e + head[0x0c] + 256 * head[0x0d];		/* save head start */
   head_offset = h;
@@ -942,6 +948,7 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 
   d->sides = head[0x31];
   d->cylinders = head[0x30];				/* maximum number of tracks */
+  GEOM_CHECK;
   for( i = 0; i < d->sides*d->cylinders; i++ ) {
       /* sometimes in the header there are more track than in the file */
     if( fread( head, 1, 1, file ) != 1 && feof( file ) ) {
@@ -1032,6 +1039,9 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       idlen = 0x80 << head[ 0x1b + 8 * j ];		/* sector length from ID */
       
       trlen += seclen;
+      if( idlen == 0 || idlen > ( 0x80 << 0x08 ) )      /* error in sector length code -> ignore */
+        idlen = seclen;
+
       if( seclen > idlen && seclen % idlen )		/* seclen != N * len */
 	return d->status = DISK_OPEN;
 

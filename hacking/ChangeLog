@@ -2857,3 +2857,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 interface. The module needs version DirectX 7 or higher. This also
 	 stops all the redefinition errors happening without this requirement
 	 (Marek).
+20080815 disk/disk.c: add sanity checks for disk geometry (fixes bug #2051291)
+         (Gergely Szasz).
