@@ -204,11 +204,13 @@ widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
 #endif
     
   case INPUT_KEY_Escape:
+  case INPUT_JOYSTICK_FIRE_2:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
 
   case INPUT_KEY_Up:
   case INPUT_KEY_7:
+  case INPUT_JOYSTICK_UP:
     if ( highlight_line ) {
       new_highlight_line = highlight_line - 1;
       cursor_pressed = 1;
@@ -217,6 +219,7 @@ widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
 
   case INPUT_KEY_Down:
   case INPUT_KEY_6:
+  case INPUT_JOYSTICK_DOWN:
     if ( highlight_line < num_entries - 2 ) {
       new_highlight_line = highlight_line + 1;
       cursor_pressed = 1;
@@ -224,6 +227,7 @@ widget_query_generic_keyhandler( widget_query_entry *query, int num_entries,
     break;
 
   case INPUT_KEY_Return:
+  case INPUT_JOYSTICK_FIRE_1:
     query[highlight_line].click();
     widget_end_all( WIDGET_FINISHED_OK );
     display_refresh_all();

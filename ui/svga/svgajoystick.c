@@ -97,8 +97,7 @@ ui_joystick_end( void )
 }
 
 static void
-do_axis( int which, int position, input_joystick_button negative,
-	 input_joystick_button positive )
+do_axis( int which, int position, input_key negative, input_key positive )
 {
   input_event_t event1, event2;
 

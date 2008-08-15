@@ -53,10 +53,12 @@ widget_picture_keyhandler( input_key key )
 #endif
     
   case INPUT_KEY_Escape:
+  case INPUT_JOYSTICK_FIRE_2:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
 
   case INPUT_KEY_Return:
+  case INPUT_JOYSTICK_FIRE_1:
     widget_end_all( WIDGET_FINISHED_OK );
     break;
 

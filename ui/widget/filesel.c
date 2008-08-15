@@ -804,30 +804,35 @@ widget_filesel_keyhandler( input_key key )
 #endif
     
   case INPUT_KEY_Escape:
+  case INPUT_JOYSTICK_FIRE_2:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     break;
   
   case INPUT_KEY_Left:
   case INPUT_KEY_5:
   case INPUT_KEY_h:
+  case INPUT_JOYSTICK_LEFT:
     if( current_file > 0                 ) new_current_file--;
     break;
 
   case INPUT_KEY_Down:
   case INPUT_KEY_6:
   case INPUT_KEY_j:
+  case INPUT_JOYSTICK_DOWN:
     if( current_file+2 < widget_numfiles ) new_current_file += 2;
     break;
 
   case INPUT_KEY_Up:
   case INPUT_KEY_7:		/* Up */
   case INPUT_KEY_k:
+  case INPUT_JOYSTICK_UP:
     if( current_file > 1                 ) new_current_file -= 2;
     break;
 
   case INPUT_KEY_Right:
   case INPUT_KEY_8:
   case INPUT_KEY_l:
+  case INPUT_JOYSTICK_RIGHT:
     if( current_file < widget_numfiles-1 ) new_current_file++;
     break;
 
@@ -890,6 +895,7 @@ widget_filesel_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Return:
+  case INPUT_JOYSTICK_FIRE_1:
 #ifdef WIN32
     if( is_drivesel ) {
       widget_filesel_chdrv();

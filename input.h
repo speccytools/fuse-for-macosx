@@ -168,18 +168,7 @@ typedef enum input_key {
   INPUT_KEY_Hyper_R,
   INPUT_KEY_Mode_switch,
 
-} input_key;
-
-typedef struct input_event_key_t {
-
-  input_key native_key;
-  input_key spectrum_key;
-
-} input_event_key_t;
-
-typedef enum input_joystick_button {
-
-  INPUT_JOYSTICK_UP = 0,
+  INPUT_JOYSTICK_UP = 0x1100,
   INPUT_JOYSTICK_DOWN,
   INPUT_JOYSTICK_LEFT,
   INPUT_JOYSTICK_RIGHT,
@@ -195,12 +184,19 @@ typedef enum input_joystick_button {
   INPUT_JOYSTICK_FIRE_9,
   INPUT_JOYSTICK_FIRE_10,
 
-} input_joystick_button;
+} input_key;
+
+typedef struct input_event_key_t {
+
+  input_key native_key;
+  input_key spectrum_key;
+
+} input_event_key_t;
 
 typedef struct input_event_joystick_t {
 
   int which;
-  input_joystick_button button;
+  input_key button;
 
 } input_event_joystick_t;
 

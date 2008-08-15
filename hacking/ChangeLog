@@ -2859,3 +2859,7 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 (Marek).
 20080815 disk/disk.c: add sanity checks for disk geometry (fixes bug #2051291)
          (Gergely Szasz).
+20080815 input.[ch],ui/sdl/sdljoystick.c,ui/svga/svgajoystick.c,
+         ui/uijoystick.c,ui/widget/{browse.c,filesel.c,menu.c,options.pl,
+         picture.c,query.c,select.c}: unify input_joystick_button and input_key
+         and allow widget UI to be controlled by joystick (Fred).

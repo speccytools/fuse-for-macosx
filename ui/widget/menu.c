@@ -141,10 +141,12 @@ widget_menu_keyhandler( input_key key )
 #endif
     
   case INPUT_KEY_Escape:
+  case INPUT_JOYSTICK_FIRE_2:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
   case INPUT_KEY_Return:
+  case INPUT_JOYSTICK_FIRE_1:
     ptr=&menu[1 + highlight_line];
     if(!ptr->inactive) {
       if( ptr->submenu ) {
@@ -157,6 +159,7 @@ widget_menu_keyhandler( input_key key )
 
   case INPUT_KEY_Up:
   case INPUT_KEY_7:
+  case INPUT_JOYSTICK_UP:
     if ( highlight_line ) {
       new_highlight_line = highlight_line - 1;
       cursor_pressed = 1;
@@ -165,6 +168,7 @@ widget_menu_keyhandler( input_key key )
 
   case INPUT_KEY_Down:
   case INPUT_KEY_6:
+  case INPUT_JOYSTICK_DOWN:
     if ( highlight_line + 1 < (ptrdiff_t)count ) {
       new_highlight_line = highlight_line + 1;
       cursor_pressed = 1;

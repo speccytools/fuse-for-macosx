@@ -209,7 +209,7 @@ keyrelease( const input_event_key_t *event )
 }
 
 static keyboard_key_name
-get_fire_button_key( int which, input_joystick_button button )
+get_fire_button_key( int which, input_key button )
 {
   switch( which ) {
 
@@ -256,6 +256,24 @@ static int
 do_joystick( const input_event_joystick_t *joystick_event, int press )
 {
   int which;
+
+#ifdef USE_WIDGET
+  if( widget_level >= 0 ) {
+    if( press ) widget_keyhandler( joystick_event->button );
+    return 0;
+  }
+
+  switch( joystick_event->button ) {
+  case INPUT_JOYSTICK_FIRE_2:
+    fuse_emulation_pause();
+    widget_do( WIDGET_TYPE_MENU, &widget_menu );
+    fuse_emulation_unpause();
+    break;
+
+  default: break;		/* Remove gcc warning */
+
+  }
+#endif				/* #ifdef USE_WIDGET */
 
   which = joystick_event->which;
 

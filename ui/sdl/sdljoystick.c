@@ -45,8 +45,8 @@
 static SDL_Joystick *joystick1 = NULL;
 static SDL_Joystick *joystick2 = NULL;
 
-static void do_axis( int which, Sint16 value, input_joystick_button negative,
-		     input_joystick_button positive );
+static void do_axis( int which, Sint16 value, input_key negative,
+		     input_key positive );
 
 int
 ui_joystick_init( void )
@@ -145,8 +145,7 @@ sdljoystick_axismove( SDL_JoyAxisEvent *axisevent )
 }
 
 static void
-do_axis( int which, Sint16 value,
-	 input_joystick_button negative, input_joystick_button positive )
+do_axis( int which, Sint16 value, input_key negative, input_key positive )
 {
   input_event_t event1, event2;
 

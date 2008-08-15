@@ -139,12 +139,14 @@ widget_browse_keyhandler( input_key key )
 #endif
 
   case INPUT_KEY_Escape:
+  case INPUT_JOYSTICK_FIRE_2:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     return;
 
   case INPUT_KEY_Down:
   case INPUT_KEY_6:
   case INPUT_KEY_j:
+  case INPUT_JOYSTICK_DOWN:
     if( highlight < block_count - 1 ) {
       highlight++;
       if( highlight >= top_line + 18 ) top_line += 18;
@@ -155,6 +157,7 @@ widget_browse_keyhandler( input_key key )
   case INPUT_KEY_Up:
   case INPUT_KEY_7:
   case INPUT_KEY_k:
+  case INPUT_JOYSTICK_UP:
     if( highlight > 0 ) { 
       highlight--;
       if( highlight < top_line )
@@ -195,6 +198,7 @@ widget_browse_keyhandler( input_key key )
     break;
 
   case INPUT_KEY_Return:
+  case INPUT_JOYSTICK_FIRE_1:
     widget_end_widget( WIDGET_FINISHED_OK );
     return;
 

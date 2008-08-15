@@ -62,9 +62,8 @@
 static js_data_struct jsd[2];
 
 static void poll_joystick( int which );
-static void do_axis( int which, double position,
-		     input_joystick_button negative,
-		     input_joystick_button positive );
+static void do_axis( int which, double position, input_key negative,
+		     input_key positive );
 
 static int
 init_stick( int which, const char *const device,
@@ -224,8 +223,7 @@ poll_joystick( int which )
 }
 
 static void
-do_axis( int which, double position, input_joystick_button negative,
-	 input_joystick_button positive )
+do_axis( int which, double position, input_key negative, input_key positive )
 {
   input_event_t event1, event2;
 
