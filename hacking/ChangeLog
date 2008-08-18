@@ -2863,3 +2863,4 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          ui/uijoystick.c,ui/widget/{browse.c,filesel.c,menu.c,options.pl,
          picture.c,query.c,select.c}: unify input_joystick_button and input_key
          and allow widget UI to be controlled by joystick (Fred).
+20080818 z80/coretest.c: don't abort on startup.

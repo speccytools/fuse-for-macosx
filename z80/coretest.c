@@ -444,7 +444,7 @@ int spectrum_frame_event = 0;
 int
 event_register( event_fn_t fn GCC_UNUSED, const char *string GCC_UNUSED )
 {
-  abort();
+  return 0;
 }
 
 int plusd_available = 0;
