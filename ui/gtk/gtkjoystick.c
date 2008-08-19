@@ -41,6 +41,7 @@
 
 struct button_info {
   int *setting;
+  char name[80];
   GtkWidget *label;
   keyboard_key_name key;
 };
@@ -127,7 +128,6 @@ menu_options_joysticks_select( gpointer callback_data GCC_UNUSED,
 {
   GtkWidget *dialog, *hbox, *vbox;
   struct joystick_info info;
-  char buffer[ 80 ];
   size_t i;
 
   fuse_emulation_pause();
@@ -155,8 +155,7 @@ menu_options_joysticks_select( gpointer callback_data GCC_UNUSED,
     
     for( j = i; j < i + 5; j++ )
       if( info.button[j].setting ) {
-	snprintf( buffer, 80, "Button %lu", (unsigned long)j + 1 );
-	create_fire_button_selector( buffer, &( info.button[j] ),
+	create_fire_button_selector( info.button[j].name, &( info.button[j] ),
 				     GTK_BOX( vbox ) );
       }
   }
@@ -189,6 +188,8 @@ setup_info( struct joystick_info *info, int callback_action )
     info->button[7].setting = &( settings_current.joystick_1_fire_8  );
     info->button[8].setting = &( settings_current.joystick_1_fire_9  );
     info->button[9].setting = &( settings_current.joystick_1_fire_10 );
+    for( i = 0; i < 10; i++ )
+      snprintf( info->button[i].name, 80, "Button %lu", (unsigned long)i + 1 );
     break;
 
   case 2:
@@ -203,11 +204,23 @@ setup_info( struct joystick_info *info, int callback_action )
     info->button[7].setting = &( settings_current.joystick_2_fire_8  );
     info->button[8].setting = &( settings_current.joystick_2_fire_9  );
     info->button[9].setting = &( settings_current.joystick_2_fire_10 );
+    for( i = 0; i < 10; i++ )
+      snprintf( info->button[i].name, 80, "Button %lu", (unsigned long)i + 1 );
     break;
 
   case 3:
     info->type = &( settings_current.joystick_keyboard_output );
-    for( i = 0; i < 10; i++ ) info->button[i].setting = NULL;
+    info->button[0].setting = &( settings_current.joystick_keyboard_up  );
+    snprintf( info->button[0].name, 80, "Button for UP" );
+    info->button[1].setting = &( settings_current.joystick_keyboard_down  );
+    snprintf( info->button[1].name, 80, "Button for DOWN" );
+    info->button[2].setting = &( settings_current.joystick_keyboard_left  );
+    snprintf( info->button[2].name, 80, "Button for LEFT" );
+    info->button[3].setting = &( settings_current.joystick_keyboard_right  );
+    snprintf( info->button[3].name, 80, "Button for RIGHT" );
+    info->button[4].setting = &( settings_current.joystick_keyboard_fire  );
+    snprintf( info->button[4].name, 80, "Button for FIRE" );
+    for( i = 5; i < 10; i++ ) info->button[i].setting = NULL;
     break;
 
   }

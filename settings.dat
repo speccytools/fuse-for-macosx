@@ -102,6 +102,11 @@ joystick_2_fire_8, numeric, 4096
 joystick_2_fire_9, numeric, 4096
 joystick_2_fire_10, numeric, 4096
 joystick_keyboard_output, numeric, 0
+joystick_keyboard_up, numeric, 113
+joystick_keyboard_down, numeric, 97
+joystick_keyboard_left, numeric, 111
+joystick_keyboard_right, numeric, 112
+joystick_keyboard_fire, numeric, 32
 
 rzx_compression, boolean, 1,, compress-rzx
 competition_mode, boolean, 0

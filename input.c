@@ -85,27 +85,21 @@ keypress( const input_event_key_t *event )
   }
 
   swallow = 0;
-  /* Joystick emulation via QAOP<space> */
-  switch( event->spectrum_key ) {
-
-  case INPUT_KEY_q:
+  /* Joystick emulation via keyboard keys */
+  if ( event->spectrum_key == settings_current.joystick_keyboard_up ) {
     swallow = joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_UP   , 1 );
-    break;
-  case INPUT_KEY_a:
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_down ) {
     swallow = joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_DOWN , 1 );
-    break;
-  case INPUT_KEY_o:
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_left ) {
     swallow = joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_LEFT , 1 );
-    break;
-  case INPUT_KEY_p:
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_right ) {
     swallow = joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_RIGHT, 1 );
-    break;
-  case INPUT_KEY_space:
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_fire ) {
     swallow = joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_FIRE , 1 );
-    break;
-
-  default: break;		/* Remove warning */
-
   }
 
   if( swallow ) return 0;
@@ -188,21 +182,21 @@ keyrelease( const input_event_key_t *event )
     keyboard_release( ptr->key2 );
   }
 
-  /* Joystick emulation via QAOP<space> */
-  switch( event->spectrum_key ) {
-
-  case INPUT_KEY_q:
-    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_UP   , 0 ); break;
-  case INPUT_KEY_a:
-    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_DOWN , 0 ); break;
-  case INPUT_KEY_o:
-    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_LEFT , 0 ); break;
-  case INPUT_KEY_p:
-    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_RIGHT, 0 ); break;
-  case INPUT_KEY_space:
-    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_FIRE , 0 ); break;
-
-  default: break;		/* Remove warning */
+  /* Joystick emulation via keyboard keys */
+  if( event->spectrum_key == settings_current.joystick_keyboard_up ) {
+    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_UP   , 0 );
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_down ) {
+    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_DOWN , 0 );
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_left ) {
+    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_LEFT , 0 );
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_right ) {
+    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_RIGHT, 0 );
+  }
+  else if( event->spectrum_key == settings_current.joystick_keyboard_fire ) {
+    joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_FIRE , 0 );
   }
 
   return 0;

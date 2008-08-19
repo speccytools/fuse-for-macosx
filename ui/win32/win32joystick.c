@@ -47,7 +47,10 @@
 
 struct button_info {
   int *setting;
-  HWND label;
+  TCHAR name[80];
+  HWND label; /* this is the label on the button */
+  HWND static_label; /* this is the label on the static */
+  HWND frame; 
   keyboard_key_name key;
 };
 
@@ -66,7 +69,8 @@ static void dialog_init( HWND hwndDlg, struct joystick_info *info );
 static void create_joystick_type_selector( struct joystick_info *info,
 					   HWND hwndDlg );
 static void
-create_fire_button_selector( struct button_info *info, HWND hwndDlg );
+create_fire_button_selector( const TCHAR *title, struct button_info *info,
+                             HWND hwndDlg );
 static void set_key_text( HWND hlabel, keyboard_key_name key );
 static void joystick_done( LONG user_data );
 static void show_key_selection_popoup( HWND hwndDlg, LPARAM lParam );
@@ -139,16 +143,22 @@ dialog_init( HWND hwndDlg, struct joystick_info *info )
     
     info->button[i].label = GetDlgItem( hwndDlg,
                                        IDC_JOYSTICKS_BUTTON_BUTTON1 + i );
+    info->button[i].static_label = GetDlgItem( hwndDlg,
+                                       IDC_JOYSTICKS_STATIC_BUTTON1 + i );
+    info->button[i].frame = GetDlgItem( hwndDlg,
+                                       IDC_JOYSTICKS_GROUP_BUTTON1 + i );
     if( info->button[i].setting ) {
-      create_fire_button_selector( &( info->button[i] ), hwndDlg );
+      create_fire_button_selector( info->button[i].name, &( info->button[i] ),
+                                   hwndDlg );
     }
     else {
       /* disable the button configuration part of the dialog */
       SendMessage( info->button[i].label, WM_SETTEXT,
                    0, ( LPARAM ) TEXT( "N/A" ) );
+      SendMessage( info->button[i].static_label, WM_SETTEXT,
+                   0, ( LPARAM ) TEXT( "N/A" ) );
       EnableWindow( info->button[i].label, FALSE );
-      EnableWindow( GetDlgItem( hwndDlg,
-                                IDC_JOYSTICKS_STATIC_BUTTON1 + i ), FALSE );
+      EnableWindow( info->button[i].static_label, FALSE );
       EnableWindow( GetDlgItem( hwndDlg,
                                 IDC_JOYSTICKS_GROUP_BUTTON1 + i ), FALSE );
     }
@@ -174,6 +184,9 @@ setup_info( struct joystick_info *info, int action )
     info->button[7].setting = &( settings_current.joystick_1_fire_8  );
     info->button[8].setting = &( settings_current.joystick_1_fire_9  );
     info->button[9].setting = &( settings_current.joystick_1_fire_10 );
+    for( i = 0; i < 10; i++ )
+      _sntprintf( info->button[i].name, 80, "Button %lu",
+                  (unsigned long)i + 1 );
     break;
 
   case 2:
@@ -188,11 +201,24 @@ setup_info( struct joystick_info *info, int action )
     info->button[7].setting = &( settings_current.joystick_2_fire_8  );
     info->button[8].setting = &( settings_current.joystick_2_fire_9  );
     info->button[9].setting = &( settings_current.joystick_2_fire_10 );
+    for( i = 0; i < 10; i++ )
+      _sntprintf( info->button[i].name, 80, "Button %lu",
+                  (unsigned long)i + 1 );
     break;
 
   case 3:
     info->type = &( settings_current.joystick_keyboard_output );
-    for( i = 0; i < 10; i++ ) info->button[i].setting = NULL;
+    info->button[0].setting = &( settings_current.joystick_keyboard_up  );
+    _sntprintf( info->button[0].name, 80, "Button for UP" );
+    info->button[1].setting = &( settings_current.joystick_keyboard_down  );
+    _sntprintf( info->button[1].name, 80, "Button for DOWN" );
+    info->button[2].setting = &( settings_current.joystick_keyboard_left  );
+    _sntprintf( info->button[2].name, 80, "Button for LEFT" );
+    info->button[3].setting = &( settings_current.joystick_keyboard_right  );
+    _sntprintf( info->button[3].name, 80, "Button for RIGHT" );
+    info->button[4].setting = &( settings_current.joystick_keyboard_fire  );
+    _sntprintf( info->button[4].name, 80, "Button for FIRE" );
+    for( i = 5; i < 10; i++ ) info->button[i].setting = NULL;
     break;
 
   }
@@ -235,10 +261,13 @@ create_joystick_type_selector( struct joystick_info *info, HWND hwndDlg )
 }
 
 static void
-create_fire_button_selector( struct button_info *info, HWND hwndDlg )
+create_fire_button_selector( const TCHAR *title, struct button_info *info,
+                             HWND hwndDlg )
 {
+  SendMessage( info->frame, WM_SETTEXT, 0, ( LPARAM ) title );
   info->key = *info->setting;
   set_key_text( info->label, info->key );
+  set_key_text( info->static_label, info->key );
 
   SetWindowLong( info->label, GWL_USERDATA, ( LONG ) info );
 }
@@ -303,5 +332,6 @@ show_key_selection_popoup( HWND hwndDlg, LPARAM lParam )
     else
       info->key = KEYBOARD_NONE;
     set_key_text( info->label, info->key );
+    set_key_text( info->static_label, info->key );
   }
 }

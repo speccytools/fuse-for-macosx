@@ -2864,3 +2864,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          picture.c,query.c,select.c}: unify input_joystick_button and input_key
          and allow widget UI to be controlled by joystick (Fred).
 20080818 z80/coretest.c: don't abort on startup.
+20080819 settings.dat,input.c,ui/win32/win32joystick.c,ui/gtk/gtkjoystick.c:
+	 Added ability to define the keyboard joystick emulation keys (Marek).
