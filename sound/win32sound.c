@@ -31,19 +31,19 @@
 #include "sound.h"
 #include "ui/ui.h"
 
-HWAVEOUT hwaveout;
-WAVEHDR wavehdr[2];
-HANDLE sem_sound_done;
-CRITICAL_SECTION sound_lock;
+static HWAVEOUT hwaveout;
+static WAVEHDR wavehdr[2];
+static HANDLE sem_sound_done;
+static CRITICAL_SECTION sound_lock;
 
-int buffer_size;
-void *buffers[2];
-int buffer_used[2];
-int current_buffer;
+static int buffer_size;
+static void *buffers[2];
+static int buffer_used[2];
+static int current_buffer;
 
 static int sixteenbit;
 
-void
+static void
 sound_display_mmresult( char *func, MMRESULT result );
 
 static void CALLBACK
@@ -54,10 +54,6 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 {
   WAVEFORMATEX pcmwf; /* waveformat struct */
   MMRESULT result;
-
-  /* FIXME: those 2 values shouldn't be forced by sound device */
-  settings_current.sound_freq = 44100;
-  settings_current.sound_force_8bit = 0;
 
   /* create wave format description */
   memset( &pcmwf, 0, sizeof( WAVEFORMATEX ) );
@@ -81,20 +77,16 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
                         &pcmwf, ( DWORD_PTR ) sound_callback, 0,
                         CALLBACK_FUNCTION );
   if( result != MMSYSERR_NOERROR )
-  {
     sound_display_mmresult( "waveOutOpen", result );
-  }
 
   buffer_size = 10000;
   buffers[0] = malloc( buffer_size );
-  if( buffers[0] == 0 )
-  {
+  if( buffers[0] == 0 ) {
     settings_current.sound = 0;
     return 1;
   }
   buffers[1] = malloc( buffer_size );
-  if( buffers[1] == 0 )
-  {
+  if( buffers[1] == 0 ) {
     settings_current.sound = 0;
     free( buffers[0] );
     return 1;
@@ -125,22 +117,16 @@ sound_lowlevel_end( void )
   }
 
   /* unprepare wave headers */
-  if( wavehdr[ 0 ].dwFlags & WHDR_PREPARED )
-  {
+  if( wavehdr[ 0 ].dwFlags & WHDR_PREPARED ) {
     result = waveOutUnprepareHeader( hwaveout, &wavehdr[ 0 ], sizeof( WAVEHDR ) );
     if( result != MMSYSERR_NOERROR )
-    {
       sound_display_mmresult( "waveOutUnprepareHeader", result );
-    }
   }
   
-  if( wavehdr[ 1 ].dwFlags & WHDR_PREPARED )
-  {
+  if( wavehdr[ 1 ].dwFlags & WHDR_PREPARED ) {
     result = waveOutUnprepareHeader( hwaveout, &wavehdr[ 1 ], sizeof( WAVEHDR ) );
     if( result != MMSYSERR_NOERROR )
-    {
       sound_display_mmresult( "waveOutUnprepareHeader", result );
-    }
   }
 
   /* close the device */
@@ -160,32 +146,40 @@ sound_lowlevel_end( void )
 void
 sound_lowlevel_frame( libspectrum_signed_word *data, int len )
 {
+  static unsigned char buf8[4096];
   MMRESULT result;
 
   /* Convert to bytes */
-  libspectrum_signed_byte* bytes = (libspectrum_signed_byte*) data;
+  unsigned char *bytes = (unsigned char *) data;
   len <<= 1;
+  if( !sixteenbit ) {
+    libspectrum_signed_word *src;
+    unsigned char *dst;
+    int f;
+
+    src = data; dst = buf8;
+    len >>= 1;
+    /* TODO: confirm byteorder on IA64 */
+    for( f = 0; f < len; f++ )
+      *dst++ = 128 + (int)( (*src++) / 256 );
+
+    bytes = buf8;
+  }
   
-  if( len > buffer_size )
-  {
+  if( len > buffer_size ) {
     ui_error( UI_ERROR_WARNING, "%s: requested wave size exceeds the buffer size", __func__ );
     return;
   }
 
   /* wait for the buffer to finish playing */
   if( buffer_used[ current_buffer ] > 0 )
-  {
     WaitForSingleObject( sem_sound_done, INFINITE );
-  }
   
   /* unprepare the header if it's prepared */
-  if( wavehdr[ current_buffer ].dwFlags & WHDR_PREPARED )
-  {
+  if( wavehdr[ current_buffer ].dwFlags & WHDR_PREPARED ) {
     result = waveOutUnprepareHeader( hwaveout, &wavehdr[ current_buffer ], sizeof( WAVEHDR ) );
     if( result != MMSYSERR_NOERROR )
-    {
       sound_display_mmresult( "waveOutUnprepareHeader", result );
-    }
   }
   
   /* copy the new wave into the buffer */
@@ -198,32 +192,26 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
   wavehdr[ current_buffer ].dwLoops |= WHDR_BEGINLOOP | WHDR_ENDLOOP;
 
   result = waveOutPrepareHeader( hwaveout, &wavehdr[ current_buffer ], sizeof( WAVEHDR ) );
-  if( result != MMSYSERR_NOERROR ) {
+  if( result != MMSYSERR_NOERROR )
     sound_display_mmresult( "waveOutPrepareHeader", result );
-  }
 
   /* play */
   result = waveOutWrite( hwaveout, &wavehdr[ current_buffer ], sizeof( WAVEHDR ) );
   if( result != MMSYSERR_NOERROR )
-  {
     sound_display_mmresult( "waveOutWrite", result );
-  }
   
   /* FIXME this could be done way easier */
   current_buffer++;
   if( current_buffer == 2 )
-  {
     current_buffer = 0;
-  }
 }
 
-void
+static void
 sound_display_mmresult( char *func, MMRESULT result )
 {
   char *mmresult;
 
-  switch ( result )
-  {
+  switch ( result ) {
     case WAVERR_BADFORMAT:     mmresult = "WAVERR_BADFORMAT"; break;
     case WAVERR_SYNC:          mmresult = "WAVERR_SYNC"; break;
     case WAVERR_STILLPLAYING:  mmresult = "WAVERR_STILLPLAYING"; break;
@@ -242,8 +230,7 @@ sound_display_mmresult( char *func, MMRESULT result )
 static void CALLBACK
 sound_callback( HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
-  if( uMsg == WOM_DONE )
-  {
+  if( uMsg == WOM_DONE ) {
     EnterCriticalSection( &sound_lock );
     ReleaseSemaphore( sem_sound_done, 1, NULL );
     LeaveCriticalSection( &sound_lock );

@@ -2868,3 +2868,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 Added ability to define the keyboard joystick emulation keys (Marek).
 20080819 sound/dxsound.c: Win32 DirectX sound: Added static keyword where
 	 applicable (Marek).
+20080819 sound/win32sound.c: Win32 mmsystem sound: Added support for 8 bit
+	 sound, applied static keyword where applicable, applied coding style
+	 fixes (Marek).
