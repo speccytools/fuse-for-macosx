@@ -36,10 +36,10 @@
 /* same as for SDL Sound */
 #define MAX_AUDIO_BUFFER 8192*5
 
-LPDIRECTSOUND lpDS; /* DirectSound object */
-LPDIRECTSOUNDBUFFER lpDSBuffer; /* sound buffer */
+static LPDIRECTSOUND lpDS; /* DirectSound object */
+static LPDIRECTSOUNDBUFFER lpDSBuffer; /* sound buffer */
 
-DWORD nextpos; /* next position in circular buffer */
+static DWORD nextpos; /* next position in circular buffer */
 
 static int sixteenbit;
 

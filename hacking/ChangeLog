@@ -2866,3 +2866,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080818 z80/coretest.c: don't abort on startup.
 20080819 settings.dat,input.c,ui/win32/win32joystick.c,ui/gtk/gtkjoystick.c:
 	 Added ability to define the keyboard joystick emulation keys (Marek).
+20080819 sound/dxsound.c: Win32 DirectX sound: Added static keyword where
+	 applicable (Marek).
