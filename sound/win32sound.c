@@ -36,10 +36,13 @@ static WAVEHDR wavehdr[2];
 static HANDLE sem_sound_done;
 static CRITICAL_SECTION sound_lock;
 
-static int buffer_size;
+#define BUFFER_SIZE 4096
+
 static void *buffers[2];
 static int buffer_used[2];
 static int current_buffer;
+static char buffer1[ BUFFER_SIZE ];
+static char buffer2[ BUFFER_SIZE ];
 
 static int sixteenbit;
 
@@ -79,18 +82,8 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   if( result != MMSYSERR_NOERROR )
     sound_display_mmresult( "waveOutOpen", result );
 
-  buffer_size = 10000;
-  buffers[0] = malloc( buffer_size );
-  if( buffers[0] == 0 ) {
-    settings_current.sound = 0;
-    return 1;
-  }
-  buffers[1] = malloc( buffer_size );
-  if( buffers[1] == 0 ) {
-    settings_current.sound = 0;
-    free( buffers[0] );
-    return 1;
-  }
+  buffers[0] = buffer1;
+  buffers[1] = buffer2;
   buffer_used[0] = 0;
   buffer_used[1] = 0;
   current_buffer = 0;
@@ -166,7 +159,7 @@ sound_lowlevel_frame( libspectrum_signed_word *data, int len )
     bytes = buf8;
   }
   
-  if( len > buffer_size ) {
+  if( len > BUFFER_SIZE ) {
     ui_error( UI_ERROR_WARNING, "%s: requested wave size exceeds the buffer size", __func__ );
     return;
   }

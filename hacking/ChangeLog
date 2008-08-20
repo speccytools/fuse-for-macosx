@@ -2871,3 +2871,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080819 sound/win32sound.c: Win32 mmsystem sound: Added support for 8 bit
 	 sound, applied static keyword where applicable, applied coding style
 	 fixes (Marek).
+20080819 sound/win32sound.c: Wi32 mmsystem sound: Changed buffer_size to be a
+	 macro instead of int, changed buffer memory allocation to static
+	 instead of dynamic (Marek).
