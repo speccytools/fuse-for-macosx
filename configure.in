@@ -405,16 +405,16 @@ dnl Decide which sound routines to use
 dnl
 
 AC_MSG_CHECKING(which sound routines to use)
-if test "$dxsound_available" = yes; then
+if test "$UI" = sdl; then
+  SOUND_LIBADD='sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+  AC_MSG_RESULT(SDL)
+elif test "$dxsound_available" = yes; then
   SOUND_LIBADD='dxsound.$(OBJEXT)' SOUND_LIBS='-ldsound -lole32 -ldxguid'
   AC_MSG_RESULT(DirectX)
   AC_DEFINE([DIRECTSOUND_VERSION], 0x0700, [DirectX 7 or higher is required])
 elif test "$win32sound_available" = yes; then
   SOUND_LIBADD='win32sound.$(OBJEXT)' SOUND_LIBS='-lwinmm'
   AC_MSG_RESULT(win32sound)
-elif test "$UI" = sdl; then
-  SOUND_LIBADD='sdlsound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
-  AC_MSG_RESULT(SDL)
 elif test "$alsa_available" = yes; then
   SOUND_LIBADD='alsasound.$(OBJEXT)' SOUND_LIBS='-lasound'
   AC_MSG_RESULT(ALSA)

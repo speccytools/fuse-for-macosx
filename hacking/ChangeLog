@@ -2874,3 +2874,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080819 sound/win32sound.c: Wi32 mmsystem sound: Changed buffer_size to be a
 	 macro instead of int, changed buffer memory allocation to static
 	 instead of dynamic (Marek).
+20080824 configure.in: Changed configure logic: if SDL ui is selected, choose
+	 SDL for sound over any other available sound API (Marek).
