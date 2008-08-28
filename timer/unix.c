@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/timeb.h>
 
 #include "timer.h"
 #include "ui/ui.h"
@@ -37,11 +38,23 @@ timer_get_real_time( timer_type *real_time )
 {
   int error;
 
+#if defined(UI_WII)
+  struct timespec tp;
+  error = clock_gettime(&tp);
+  if(error) {
+    ui_error( UI_ERROR_ERROR, "error getting time: %s", strerror( errno ) );
+    return 1;
+  }
+
+  real_time->tv_sec = tp.tv_sec;
+  real_time->tv_usec = tp.tv_nsec/1000;
+#else
   error = gettimeofday( real_time, NULL );
   if( error ) {
     ui_error( UI_ERROR_ERROR, "error getting time: %s", strerror( errno ) );
     return 1;
   }
+#endif
 
   return 0;
 }

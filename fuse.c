@@ -91,7 +91,7 @@
 char *fuse_progname;
 
 /* Which directory were we started in? */
-char fuse_directory[ PATH_MAX ];
+char fuse_directory[ 1024 ];
 
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;
@@ -188,10 +188,21 @@ static int fuse_init(int argc, char **argv)
      generator with the current time */
   srand( (unsigned)time( NULL ) );
 
-  fuse_progname=argv[0];
+  // Some platforms (e.g. Wii) might not have argc/argv.
+  if(argc > 0)
+    fuse_progname = argv[0];
+  else
+    fuse_progname = "fuse";
+  
   libspectrum_error_function = ui_libspectrum_error;
 
-  if( !getcwd( fuse_directory, PATH_MAX - 1 ) ) {
+#if defined(UI_WII)
+  // On Wii, init the display first so we have a way of
+  // outputting messages
+  if( display_init(&argc,&argv) ) return 1;
+#endif
+
+  if( !getcwd( fuse_directory, 1024 - 1 ) ) {
     ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
 	      strerror( errno ) );
     return 1;
@@ -232,8 +243,10 @@ static int fuse_init(int argc, char **argv)
 #endif				/* #ifdef USE_WIDGET */
 
   if( event_init() ) return 1;
-  
+
+#if !defined(UI_WII)
   if( display_init(&argc,&argv) ) return 1;
+#endif
 
   if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
     if( libspectrum_init() ) return 1;

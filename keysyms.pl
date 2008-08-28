@@ -34,7 +34,7 @@ my $ui = shift;
 $ui = 'gtk' unless defined $ui;
 
 die "$0: unrecognised user interface: $ui\n"
-  unless 0 < grep { $ui eq $_ } ( 'gtk', 'x', 'svga', 'fb', 'sdl', 'win32' );
+  unless 0 < grep { $ui eq $_ } ( 'gtk', 'x', 'svga', 'fb', 'sdl', 'win32', 'wii' );
 
 sub fb_keysym ($) {
 
@@ -44,6 +44,13 @@ sub fb_keysym ($) {
     substr( $keysym, 0, 4 ) = 'WIN' if substr( $keysym, 0, 5 ) eq 'META_';
 
     return $keysym;
+}
+
+sub wii_keysym ($) {
+    my $keysym = shift;
+
+    $keysym =~ tr/a-z/A-Z/;
+    return "WII_KEY_$keysym";
 }
 
 sub sdl_keysym ($) {
@@ -125,6 +132,19 @@ my %ui_data = (
 	          Mode_switch => 'MENU',
 	      },
 	      function => \&fb_keysym
+	    },
+
+    wii => { headers => [ 'ui/wii/wiikeysyms.h' ],
+	      # max_length not used
+	      skips => { map { $_ => 1 } ( 'numbersign',
+					   'Shift_L', 'Shift_R',
+					   'Control_L', 'Control_R',
+					   'Alt_L', 'Alt_R',
+					   'Meta_L', 'Meta_R',
+					   'Hyper_L','Hyper_R',
+					   'Super_L','Super_R',
+					   'Mode_switch' ) },
+	      function => \&wii_keysym
 	    },
 
     gtk  => { headers => [ 'gdk/gdkkeysyms.h' ],

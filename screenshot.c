@@ -297,7 +297,7 @@ screenshot_available_scalers( scaler_type scaler )
 
 #endif				/* #ifdef USE_LIBPNG */
 
-char screenshot_movie_name[PATH_MAX+1];
+char screenshot_movie_name[1024+1];
 char screenshot_movie_file[SCREENSHOT_MOVIE_FILE_MAX+1];
 long int screenshot_movie_frame = 0;
 int screenshot_movie_record = 0;

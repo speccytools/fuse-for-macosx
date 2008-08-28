@@ -148,6 +148,37 @@ if test -z "$UI"; then
   fi
 fi
 
+dnl Look for Wii interface (default = 0)
+if test -z "$UI"; then
+  AC_MSG_CHECKING(whether Wii UI requested)
+  AC_ARG_WITH(wii,
+  [  --with-wii               use Wii FB for user interface],
+  if test "$withval" = no; then wii=no; else wii=yes; fi,
+  wii=no)
+  AC_MSG_RESULT($wii)
+  if test "$wii" = yes; then
+    AC_DEFINE([UI_WII], 1, [Defined if Wii UI in use])
+    AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
+    UI=wii; WIDGET=widget;
+    UI_LIBS="ui/wii/libuiwii.a ui/widget/libwidget.a"
+    target_os=wii
+    dnl Look for libgpm (default=yes)
+    AC_MSG_CHECKING(whether gpm requested)
+    AC_ARG_WITH(gpm,
+    [  --without-gpm           don't use libgpm for e.g. Kempston mouse],
+    if test "$withval" = no; then gpm=no; else gpm=yes; fi,
+    gpm=yes)
+    AC_MSG_RESULT($gpm)
+    dnl Note: we use libdl to get libgpm at runtime
+    if test "$gpm" = yes; then
+      AC_CHECK_HEADER(gpm.h,
+		      UI_LIBS="$UI_LIBS -ldl";
+		      AC_DEFINE([HAVE_GPM_H], 1, [Defined if gpm in use]),
+		      AC_MSG_ERROR([libgpm not found]))
+    fi
+  fi
+fi
+
 dnl Look for SDL (default=no)
 if test -z "$UI"; then
   AC_MSG_CHECKING(whether SDL UI requested)
@@ -435,6 +466,9 @@ elif test "$ac_cv_header_sys_audioio_h" = yes; then
 elif test "$coreaudio_available" = yes; then
   SOUND_LIBADD='coreaudiosound.$(OBJEXT)' SOUND_LIBS='-framework CoreAudio -framework AudioUnit -framework CoreServices' sound_fifo=yes
   AC_MSG_RESULT(CoreAudio)
+elif test "$wii" = yes; then
+  SOUND_LIBADD='wiisound.$(OBJEXT)' SOUND_LIBS='' sound_fifo=yes
+  AC_MSG_RESULT(Wii)
 else
   SOUND_LIBADD='nullsound.$(OBJEXT)' SOUND_LIBS=''
   AC_MSG_RESULT(none)
@@ -585,6 +619,9 @@ case "$target_os" in
   mingw32*)
     COMPAT_OSNAME='win32'
     ;;
+  wii)
+    COMPAT_OSNAME='wii'
+    ;;
   *)
     COMPAT_OSNAME='unix'
     ;;
@@ -634,6 +671,7 @@ AC_OUTPUT(Makefile \
 compat/amiga/Makefile \
 compat/morphos/Makefile \
 compat/unix/Makefile \
+compat/wii/Makefile \
 compat/win32/Makefile \
 debugger/Makefile \
 disk/Makefile \
@@ -649,6 +687,7 @@ sound/Makefile \
 timer/Makefile \
 ui/Makefile \
 ui/fb/Makefile \
+ui/wii/Makefile \
 ui/gtk/Makefile \
 ui/svga/Makefile \
 ui/sdl/Makefile \

@@ -58,7 +58,7 @@ typedef struct path_context {
   int state;
 
   utils_aux_type type;
-  char path[ PATH_MAX ];
+  char path[ 1024 ];
 
 } path_context;
 
@@ -186,7 +186,7 @@ utils_open_file( const char *filename, int autoload,
 
 /* Find the auxiliary file called `filename'; returns a fd for the
    file on success, -1 if it couldn't find the file */
-int
+compat_fd
 utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 {
   compat_fd fd;
@@ -213,7 +213,7 @@ utils_find_auxiliary_file( const char *filename, utils_aux_type type )
   }
 
   /* Give up. Couldn't find this file */
-  return -1;
+  return COMPAT_FILE_OPEN_FAILED;
 }
 
 

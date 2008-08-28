@@ -1466,10 +1466,14 @@ disk_open( disk_t *d, const char *filename, int preindex )
       type = DISK_TRD;
   }
 
+#if defined(UI_WII) // Wii doesn't have access()
+  d->wrprot = 0;
+#else
   if( access( filename, W_OK ) == -1 )		/* file read only */
     d->wrprot = 1;
   else
     d->wrprot = 0;
+#endif
   
   switch ( type ) {
   case DISK_UDI:

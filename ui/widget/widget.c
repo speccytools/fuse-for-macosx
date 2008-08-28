@@ -54,6 +54,11 @@
 #include <windows.h>
 #endif
 
+#if defined(UI_WII)
+#include <gccore.h>
+#include <ogcsys.h>
+#endif
+
 /* Bitmap font storage */
 typedef struct {
   libspectrum_byte bitmap[15], left, width, defined;
@@ -93,19 +98,28 @@ settings_info widget_options_settings;
 
 static int widget_read_font( const char *filename )
 {
-  int fd;
+  FILE* fd;
   utils_file file;
   int error;
-  int i;
+  int i, l;
+
+  printf("Looking for font file %s\n", filename);
 
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_WIDGET );
-  if( fd == -1 ) {
+  if( fd == NULL ) {
     ui_error( UI_ERROR_ERROR, "couldn't find font file '%s'", filename );
     return 1;
   }
 
+  printf("Font file found, fd is %x\n", fd);
+
   error = utils_read_fd( fd, filename, &file );
-  if( error ) return error;
+  if( error )
+    {
+      printf("Couldn't read font\n");
+      
+      return error;
+    }
 
   i = 0;
   while( i < file.length ) {
@@ -664,7 +678,7 @@ void
 widget_putpixel( int x, int y, int colour )
 {
   uidisplay_putpixel( x + DISPLAY_BORDER_ASPECT_WIDTH, y + DISPLAY_BORDER_HEIGHT,
-                      colour );
+		     colour );
 }
 
 /* The widgets actually available. Make sure the order here matches the

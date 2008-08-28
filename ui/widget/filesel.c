@@ -27,7 +27,7 @@
 #include <config.h>
 
 #include <sys/types.h>
-#include <dirent.h>
+#include <sys/dir.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -92,7 +92,7 @@ static char *widget_get_filename( const char *title, int saving );
 static int widget_add_filename( int *allocated, int *number,
 				struct widget_dirent ***namelist, char *name );
 static void widget_scan( char *dir );
-static int widget_select_file( const struct dirent *dirent );
+static int widget_select_file( const char *path );
 static int widget_scan_compare( const widget_dirent **a,
 				const widget_dirent **b );
 
@@ -267,9 +267,9 @@ amiga_asl( char *title ) {
 #else /* ifdef AMIGA */
 
 static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
-			   int (*select_fn)(const struct dirent*) )
+			   int (*select_fn)(const char*) )
 {
-  DIR *directory; struct dirent *dirent;
+  DIR_ITER *directory; char path[1024]; struct stat fstat;
 
   int allocated, number;
   int i;
@@ -279,7 +279,7 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 
   allocated = 32; number = 0;
 
-  directory = opendir( dir );
+  directory = diropen( dir );
   if( !directory ) {
     free( *namelist );
     *namelist = NULL;
@@ -293,9 +293,12 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 
   while( 1 ) {
     errno = 0;
-    dirent = readdir( directory );
+    int next = dirnext(directory, path, &fstat);
 
-    if( !dirent ) {
+    if( next != 0 ) {
+#if defined UI_WII
+      break; // dirnext() sets errno to non-0 on end of listing
+#else
       if( errno == 0 ) {	/* End of directory */
 	break;
       } else {
@@ -305,26 +308,27 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
 	}
 	free( *namelist );
 	*namelist = NULL;
-	closedir( directory );
+	dirclose( directory );
 	return -1;
       }
+#endif
     }
 
-    if( select_fn( dirent ) ) {
+    if( select_fn( path ) ) {
 #ifdef WIN32
-      if( is_rootdir && !strcmp( dirent->d_name, ".." ) ) {
+      if( is_rootdir && !strcmp( path, ".." ) ) {
 	is_rootdir = 0;
       }
 #endif				/* #ifdef WIN32 */
       if( widget_add_filename( &allocated, &number, namelist,
-			       dirent->d_name ) ) {
-	closedir( directory );
+			       path ) ) {
+	dirclose( directory );
 	return -1;
       }
     }
   }
 
-  if( closedir( directory ) ) {
+  if( dirclose( directory ) ) {
     for( i=0; i<number; i++ ) {
       free( (*namelist)[i]->name );
       free( (*namelist)[i] );
@@ -420,8 +424,8 @@ static void widget_scan( char *dir )
 
 }
 
-static int widget_select_file(const struct dirent *dirent){
-  return( dirent->d_name && strcmp( dirent->d_name, "." ) );
+static int widget_select_file(const char *path){
+  return( path && strcmp( path, "." ) );
 }
 
 static int widget_scan_compare( const struct widget_dirent **a,
@@ -781,6 +785,14 @@ http://thread.gmane.org/gmane.comp.gnu.mingw.user/9197
 void
 widget_filesel_keyhandler( input_key key )
 {
+  // no files? nothing to do here
+  if(widget_numfiles == 0)
+    {
+      if(key == INPUT_KEY_Escape)
+	widget_end_widget(WIDGET_FINISHED_CANCEL);
+      return;
+    }
+  
 #if defined AMIGA || defined __MORPHOS__
   if( exit_all_widgets ) {
     widget_end_all( err );
@@ -838,8 +850,8 @@ widget_filesel_keyhandler( input_key key )
 
   case INPUT_KEY_Page_Up:
     new_current_file = ( current_file > PAGESIZE ) ?
-                       current_file - PAGESIZE     :
-                       0;
+		       current_file - PAGESIZE     :
+		       0;
     break;
 
   case INPUT_KEY_Page_Down:
@@ -897,16 +909,16 @@ widget_filesel_keyhandler( input_key key )
   case INPUT_KEY_Return:
   case INPUT_JOYSTICK_FIRE_1:
 #ifdef WIN32
-    if( is_drivesel ) {
-      widget_filesel_chdrv();
-    } else if( is_rootdir &&
-	       !strcmp( widget_filenames[ current_file ]->name, ".." ) ) {
-      widget_filesel_drvlist();
-    } else {
+	if( is_drivesel ) {
+	  widget_filesel_chdrv();
+	} else if( is_rootdir &&
+		   !strcmp( widget_filenames[ current_file ]->name, ".." ) ) {
+	  widget_filesel_drvlist();
+	} else {
 #endif				/* #ifdef WIN32 */
-      if( widget_filesel_chdir() ) return;
+	  if( widget_filesel_chdir() ) return;
 #ifdef WIN32
-    }
+	}
 #endif				/* #ifdef WIN32 */
     break;
 
@@ -924,7 +936,7 @@ widget_filesel_keyhandler( input_key key )
 #ifdef WIN32
   }
 #endif				/* #ifdef WIN32 */
-
+    
   /* If we moved the cursor */
   if( new_current_file != current_file ) {
 
