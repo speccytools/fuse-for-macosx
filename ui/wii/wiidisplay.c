@@ -428,3 +428,15 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
     display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
   }
 }
+
+void
+uidisplay_frame_save( void )
+{
+  /* FIXME: implement */
+}
+
+void
+uidisplay_frame_restore( void )
+{
+  /* FIXME: implement */
+}

@@ -51,7 +51,7 @@ wiimouse_init(void)
 {
   WPAD_Init();
   WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
-  WPAD_SetSleepTime(60);
+  WPAD_SetIdleTimeout(60);
 
   memset(&paddata, 0, sizeof(paddata));
   memset(&oldpaddata, 0, sizeof(oldpaddata));
@@ -131,7 +131,7 @@ mouse_update( void )
 	POST_KEYPRESS(INPUT_KEY_F1);
     }
 
-  WPAD_Read(0, &paddata);
+  WPAD_ReadEvent(0, &paddata);
 
   if(paddata.ir.state == 0)
     wiidisplay_showmouse(-1, -1);
