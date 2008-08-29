@@ -523,6 +523,9 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
   libspectrum_class_t class;
   int error;
 
+  /* No argv on the Wii. Just return */
+  return 0;
+
   for( i = first_arg; i < (size_t)argc; i++ ) {
 
     filename = argv[i];
