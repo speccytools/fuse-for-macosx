@@ -1,4 +1,4 @@
-/* sdl.c: SDL speed routines for Fuse
+/* win32.c: Win32 speed routines for Fuse
    Copyright (c) 1999-2007 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
    $Id$
@@ -25,18 +25,16 @@
 
 #include <config.h>
 
-#include <SDL.h>
-
-#include "timer.h"
+#include "compat.h"
 
 double
-timer_get_time( void );
+compat_timer_get_time( void )
 {
-  return SDL_GetTicks() / 1000.0;
+  return GetTickCount() / 1000.0;
 }
 
 void
-timer_sleep( int ms )
+compat_timer_sleep( int ms )
 {
-  SDL_Delay( ms );
+  Sleep( ms );
 }

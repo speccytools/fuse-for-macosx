@@ -29,61 +29,26 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "timer.h"
+#include "compat.h"
 #include "ui/ui.h"
 
-#ifdef UI_WII
-/* FIXME: where should we get this prototype from? */
-extern int clock_gettime(struct timespec *tp);
-#endif
-
-int
-timer_get_real_time( timer_type *real_time )
+double
+compat_timer_get_time( void )
 {
+  struct timeval tv;
   int error;
 
-#if defined(UI_WII)
-  struct timespec tp;
-  error = clock_gettime(&tp);
-  if(error) {
-    ui_error( UI_ERROR_ERROR, "error getting time: %s", strerror( errno ) );
-    return 1;
-  }
-
-  real_time->tv_sec = tp.tv_sec;
-  real_time->tv_usec = tp.tv_nsec/1000;
-#else
-  error = gettimeofday( real_time, NULL );
+  error = gettimeofday( &tv, NULL );
   if( error ) {
-    ui_error( UI_ERROR_ERROR, "error getting time: %s", strerror( errno ) );
-    return 1;
+    ui_error( UI_ERROR_ERROR, "%s: error getting time: %s", __func__, strerror( errno ) );
+    return -1;
   }
-#endif
 
-  return 0;
-}
-
-float
-timer_get_time_difference( timer_type *a, timer_type *b )
-{
-  return ( a->tv_sec - b->tv_sec ) + ( a->tv_usec - b->tv_usec ) / 1000000.0;
+  return tv.tv_sec + tv.tv_usec / 1000000.0;
 }
 
 void
-timer_add_time_difference( timer_type *a, long msec )
-{
-  a->tv_usec += msec * 1000;
-  if( a->tv_usec >= 1000000 ) {
-    a->tv_usec -= 1000000;
-    a->tv_sec += 1;
-  } else if( a->tv_usec < 0 ) {
-    a->tv_usec += 1000000;
-    a->tv_sec -= 1;
-  }
-}
-
-void
-timer_sleep_ms( int ms )
+compat_timer_sleep( int ms )
 {
   usleep( ms * 1000 );
 }

@@ -39,7 +39,7 @@ static int timer_frame_callback_sound( libspectrum_dword last_tstates );
  */
 
 /* The actual time at the end of each of the last 10 emulated seconds */
-static timer_type stored_times[10];
+static double stored_times[10];
 
 /* Which is the next entry in 'stored_times' that we will update */
 static size_t next_stored_time;
@@ -52,7 +52,7 @@ static int samples;
 
 float current_speed = 100.0;
 
-static timer_type start_time;
+static double start_time;
 
 static const int TEN_MS = 10;
 
@@ -64,13 +64,12 @@ static void timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
 int
 timer_estimate_speed( void )
 {
-  timer_type current_time;
-  float difference;
-  int error;
+  double current_time, difference;
 
   if( frames_until_update-- ) return 0;
 
-  error = timer_get_real_time( &current_time ); if( error ) return error;
+  current_time = timer_get_time();
+  if( current_time < 0 ) return 1;
 
   if( samples < 10 ) {
 
@@ -80,9 +79,7 @@ timer_estimate_speed( void )
 
   } else {
 
-    difference =
-      timer_get_time_difference( &current_time,
-				 &stored_times[ next_stored_time ] );
+    difference = ( current_time - stored_times[ next_stored_time ] ) / 1000.0;
     current_speed = 100 * ( 10.0 / difference );
 
   }
@@ -104,7 +101,7 @@ timer_estimate_speed( void )
 int
 timer_estimate_reset( void )
 {
-  int error = timer_get_real_time( &start_time ); if( error ) return error;
+  start_time = timer_get_time(); if( start_time < 0 ) return 1;
   samples = 0;
   next_stored_time = 0;
   frames_until_update = 0;
@@ -115,7 +112,9 @@ timer_estimate_reset( void )
 int
 timer_init( void )
 {
-  int error = timer_get_real_time( &start_time ); if( error ) return error;
+  int error;
+
+  start_time = timer_get_time(); if( start_time < 0 ) return 1;
 
   timer_event = event_register( timer_frame, "Timer" );
   if( timer_event == -1 ) return 1;
@@ -146,7 +145,7 @@ timer_frame_callback_sound( libspectrum_dword last_tstates )
 
     /* Sleep while fifo is full */
     if( sfifo_space( &sound_fifo ) < sound_framesiz ) {
-      timer_sleep_ms( TEN_MS );
+      timer_sleep( TEN_MS );
     } else {
       break;
     }
@@ -179,9 +178,7 @@ static void
 timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
 	     void *user_data GCC_UNUSED )
 {
-  int error;
-  timer_type current_time;
-  float difference;
+  double current_time, difference;
   float speed = ( settings_current.emulation_speed < 1 ?
 		  100                                  :
 		  settings_current.emulation_speed ) / 100.0;
@@ -205,31 +202,27 @@ timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
 
     while( 1 ) {
 
-      error = timer_get_real_time( &current_time ); if( error ) return;
-      
-      difference = timer_get_time_difference( &current_time, &start_time );
+      current_time = timer_get_time(); if( current_time < 0 ) return;
+      difference = ( current_time - start_time ) / 1000.0;
 
       /* Sleep while we are still 10ms ahead */
       if( difference < 0 ) {
-	timer_sleep_ms( TEN_MS );
+        timer_sleep( TEN_MS );
       } else {
 	break;
       }
 
     }
 
-    error = timer_get_real_time( &current_time ); if( error ) return;
-    
-    difference = timer_get_time_difference( &current_time, &start_time );
-  
+    current_time = timer_get_time(); if( current_time < 0 ) return;
+    difference = ( current_time - start_time ) / 1000.0;
+
     tstates = ( ( difference + TEN_MS / 1000.0 ) *
 		machine_current->timings.processor_speed
 		) * speed + 0.5;
   
     if( event_add( last_tstates + tstates, timer_event ) ) return;
 
-    start_time = current_time;
-    timer_add_time_difference( &start_time, TEN_MS );
-
+    start_time = current_time + TEN_MS / 1000.0;
   }
 }

@@ -25,18 +25,18 @@
 
 #include <config.h>
 
-#include <SDL.h>
-
+#include "compat.h"
 #include "timer.h"
 
 double
-timer_get_time( void );
+timer_get_time( void )
 {
-  return SDL_GetTicks() / 1000.0;
+  return compat_timer_get_time();
 }
 
 void
 timer_sleep( int ms )
 {
-  SDL_Delay( ms );
+  compat_timer_sleep( ms );
 }
+

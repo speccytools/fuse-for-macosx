@@ -31,9 +31,8 @@ noinst_LIBRARIES = libtimer.a
 
 libtimer_a_SOURCES = timer.c
 
-EXTRA_libtimer_a_SOURCES = sdl.c \
-			   unix.c \
-			   win32.c	
+EXTRA_libtimer_a_SOURCES = native.c \
+			   sdl.c
 
 libtimer_a_LIBADD = $(TIMER_LIBADD)
 libtimer_a_DEPENDENCIES = $(TIMER_LIBADD)

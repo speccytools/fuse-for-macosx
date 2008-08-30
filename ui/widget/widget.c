@@ -534,7 +534,7 @@ int widget_do( widget_type which, void *data )
   while( ! widget_return[widget_level].finished ) {
     
     /* Go to sleep for a bit */
-    timer_sleep_ms( 10 );
+    timer_sleep( 10 );
 
     /* Process any events */
     ui_event();

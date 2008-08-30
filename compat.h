@@ -66,6 +66,10 @@ int mkstemp( char *template );
 #define FUSE_DIR_SEP_STR "/"
 #endif
 
+#ifndef PATH_MAX
+#define PATH_MAX 1024
+#endif
+
 int compat_osname( char *buffer, size_t length );
 const char* compat_get_temp_path( void );
 const char* compat_get_home_path( void );
@@ -80,8 +84,9 @@ int compat_file_write( compat_fd fd, const unsigned char *buffer,
                        size_t length );
 int compat_file_close( compat_fd fd );
 
-#ifndef PATH_MAX
-#define PATH_MAX 1024
-#endif
+/* Timing routines */
+
+double compat_timer_get_time( void );
+void compat_timer_sleep( int ms );
 
 #endif				/* #ifndef FUSE_COMPAT_H */

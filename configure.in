@@ -555,29 +555,12 @@ dnl Work out which timer routines to use
 AC_MSG_CHECKING(which timer routines to use)
 if test "$UI" = sdl; then
   TIMER_LIBADD='sdl.$(OBJEXT)'
-  timer_header='<SDL.h>'
-  timer_type='Uint32'
   AC_MSG_RESULT(SDL)
 else
-  case "$target_os" in
-    mingw32*)
-      TIMER_LIBADD='win32.$(OBJEXT)'
-      timer_header='<windows.h>'
-      timer_type='DWORD'
-      AC_MSG_RESULT(Win32)
-      ;;
-    *)
-      TIMER_LIBADD='unix.$(OBJEXT)'
-      timer_header='<sys/time.h>'
-      timer_type='struct timeval'
-      AC_MSG_RESULT(unix)
-      ;;
-  esac
+  TIMER_LIBADD='native.$(OBJEXT)'
+  AC_MSG_RESULT(native)
 fi
-
 AC_SUBST(TIMER_LIBADD)
-AC_DEFINE_UNQUOTED([TIMER_HEADER], $timer_header, [The header needed to define the timer type])
-AC_DEFINE_UNQUOTED([TIMER_TYPE], $timer_type, [The type needed for the timer routines])
 
 dnl Work out which standard routines we're missing
 AC_MSG_CHECKING(which standard routines we're missing)

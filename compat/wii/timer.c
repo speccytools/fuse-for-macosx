@@ -1,4 +1,4 @@
-/* win32.c: Win32 speed routines for Fuse
+/* unix.c: UNIX speed routines for Fuse
    Copyright (c) 1999-2007 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
    $Id$
@@ -25,30 +25,33 @@
 
 #include <config.h>
 
-#include "timer.h"
+#include <errno.h>
+#include <string.h>
+#include <unistd.h>
 
-int
-timer_get_real_time( timer_type *real_time )
+#include "compat.h"
+#include "ui/ui.h"
+
+/* FIXME: where should we get this prototype from? */
+extern int clock_gettime(struct timespec *tp);
+
+double
+compat_timer_get_time( void )
 {
-  *real_time = GetTickCount();
+  int error;
+  struct timespec tp;
 
-  return 0;
-}
+  error = clock_gettime(&tp);
+  if( error ) {
+    ui_error( UI_ERROR_ERROR, "%s: error getting time: %s", __func__, strerror( errno ) );
+    return -1;
+  }
 
-float
-timer_get_time_difference( timer_type *a, timer_type *b )
-{
-  return ( (long)*a - (long)*b ) / 1000.0;
+  return tp.tv_sec + tp.tv_nsec / 1000000000.0;
 }
 
 void
-timer_add_time_difference( timer_type *a, long msec )
+compat_timer_sleep( int ms )
 {
-  *a += msec;
-}
-
-void
-timer_sleep_ms( int ms )
-{
-  Sleep( ms );
+  usleep( ms * 1000 );
 }
