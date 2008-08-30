@@ -58,7 +58,7 @@ typedef struct path_context {
   int state;
 
   utils_aux_type type;
-  char path[ 1024 ];
+  char path[ PATH_MAX ];
 
 } path_context;
 

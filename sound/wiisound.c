@@ -21,13 +21,14 @@
 
 #include <config.h>
 
+#include <string.h>
+#include <unistd.h>
+
 #include "fuse.h"
 #include "sfifo.h"
 
 #include <gccore.h>
 #include <ogc/audio.h>
-
-//#define DISPLAY_AUDIO
 
 #ifndef MIN
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
@@ -49,7 +50,7 @@ static void sound_dmacallback(void)
   dmalen = MIN(BUFSIZE, sfifo_used(&sound_fifo));
   sfifo_read(&sound_fifo, dmabuf, dmalen);
   DCFlushRange(dmabuf, dmalen);
-  AUDIO_InitDMA(dmabuf, dmalen);
+  AUDIO_InitDMA((u32)dmabuf, dmalen);
   AUDIO_StartDMA();
 }
 
@@ -79,7 +80,7 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
 #if !defined(DISPLAY_AUDIO)
   AUDIO_RegisterDMACallback(sound_dmacallback);
   memset(dmabuf, 0, BUFSIZE);
-  AUDIO_InitDMA(dmabuf, BUFSIZE);
+  AUDIO_InitDMA((u32)dmabuf, BUFSIZE);
   DCFlushRange(dmabuf, dmalen);
   AUDIO_StartDMA();
 #endif

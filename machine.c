@@ -290,11 +290,12 @@ machine_load_rom_bank_from_file( memory_page* bank_map, size_t which,
                                  int page_num, const char *filename,
                                  size_t expected_length, int custom )
 {
-  int fd, error;
+  compat_fd fd;
+  int error;
   utils_file rom;
 
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_ROM );
-  if( fd == -1 ) {
+  if( fd == COMPAT_FILE_OPEN_FAILED ) {
     ui_error( UI_ERROR_ERROR, "couldn't find ROM '%s'", filename );
     return 1;
   }

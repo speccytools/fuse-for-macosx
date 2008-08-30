@@ -98,28 +98,22 @@ settings_info widget_options_settings;
 
 static int widget_read_font( const char *filename )
 {
-  FILE* fd;
+  compat_fd fd;
   utils_file file;
   int error;
-  int i, l;
-
-  printf("Looking for font file %s\n", filename);
+  int i;
 
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_WIDGET );
-  if( fd == NULL ) {
+  if( fd == COMPAT_FILE_OPEN_FAILED ) {
     ui_error( UI_ERROR_ERROR, "couldn't find font file '%s'", filename );
     return 1;
   }
 
-  printf("Font file found, fd is %x\n", fd);
-
   error = utils_read_fd( fd, filename, &file );
   if( error )
-    {
-      printf("Couldn't read font\n");
-      
-      return error;
-    }
+  {
+    return error;
+  }
 
   i = 0;
   while( i < file.length ) {

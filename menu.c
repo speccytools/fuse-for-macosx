@@ -690,7 +690,7 @@ MENU_CALLBACK( menu_file_movies_recordmovieasscr )
   filename = ui_get_save_filename( "Fuse - Record Movie as SCR" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  snprintf( screenshot_movie_file, 1024-SCREENSHOT_MOVIE_FILE_MAX, "%s",
+  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
             filename );
 
   screenshot_movie_record = 1;

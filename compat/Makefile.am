@@ -26,6 +26,7 @@ AM_CPPFLAGS += -I$(srcdir)/compat
 DIST_SUBDIRS += compat/amiga \
 	       compat/morphos \
 	       compat/unix \
+	       compat/wii \
 	       compat/win32
 
 EXTRA_fuse_SOURCES += compat/dirname.c \

@@ -91,7 +91,7 @@
 char *fuse_progname;
 
 /* Which directory were we started in? */
-char fuse_directory[ 1024 ];
+char fuse_directory[ PATH_MAX ];
 
 /* A flag to say when we want to exit the emulator */
 int fuse_exiting;
@@ -202,7 +202,7 @@ static int fuse_init(int argc, char **argv)
   if( display_init(&argc,&argv) ) return 1;
 #endif
 
-  if( !getcwd( fuse_directory, 1024 - 1 ) ) {
+  if( !getcwd( fuse_directory, PATH_MAX - 1 ) ) {
     ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
 	      strerror( errno ) );
     return 1;

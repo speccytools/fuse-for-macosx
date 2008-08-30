@@ -28,10 +28,14 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/timeb.h>
 
 #include "timer.h"
 #include "ui/ui.h"
+
+#ifdef UI_WII
+/* FIXME: where should we get this prototype from? */
+extern int clock_gettime(struct timespec *tp);
+#endif
 
 int
 timer_get_real_time( timer_type *real_time )

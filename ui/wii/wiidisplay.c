@@ -31,6 +31,7 @@
 #include <stdlib.h>
 
 // wii includes
+#include <fat.h>
 #include <gccore.h>
 #include <ogcsys.h>
 
