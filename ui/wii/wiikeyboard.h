@@ -1,7 +1,7 @@
 /* wiikeyboard.h: routines for dealing with the Wii USB keyboard
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: fbkeyboard.h 2889 2007-05-26 17:45:08Z zubzero $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@
 
 */
 
-#ifndef FUSE_FBKEYBOARD_H
-#define FUSE_FBKEYBOARD_H
+#ifndef FUSE_WIIKEYBOARD_H
+#define FUSE_WIIKEYBOARD_H
 
-int wiikeyboard_init(void);
+int wiikeyboard_init( void );
 
-int wiikeyboard_keypress(int keysym);
-void wiikeyboard_keyrelease(int keysym);
+int wiikeyboard_keypress( int keysym );
+void wiikeyboard_keyrelease( int keysym );
 
-int wiikeyboard_end(void);
+int wiikeyboard_end( void );
 
-void keyboard_update(void);
+void keyboard_update( void );
 
-#endif			/* #ifndef FUSE_FBKEYBOARD_H */
+#endif			/* #ifndef FUSE_WIIKEYBOARD_H */

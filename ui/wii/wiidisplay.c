@@ -1,7 +1,7 @@
 /* wiidisplay.c: Routines for dealing with the Wii's framebuffer display
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-// wii includes
+/* Wii includes */
 #include <fat.h>
 #include <gccore.h>
 #include <ogcsys.h>
@@ -59,24 +59,24 @@ typedef struct {
 } rgb_t;
 
 rgb_t spectrum_colors[16] = {
-  // no bright
-  {0, 0, 0},       // BLACK
-  {0, 0, 192},     // BLUE
-  {192, 0, 0},     // RED
-  {192, 0, 192},   // MAGENTA
-  {0, 192, 0},     // GREEN
-  {0, 192, 192},   // CYAN
-  {192, 192, 0},   // YELLOW
-  {192, 192, 192}, // WHITE
-  // bright
-  {0, 0, 0},       // BLACK
-  {0, 0, 255},     // BLUE
-  {255, 0, 0},     // RED
-  {255, 0, 255},   // MAGENTA
-  {0, 255, 0},     // GREEN
-  {0, 255, 255},   // CYAN
-  {255, 255, 0},   // YELLOW
-  {255, 255, 255}, // WHITE
+  /* no bright */
+  {0, 0, 0},       /* BLACK */
+  {0, 0, 192},     /* BLUE */
+  {192, 0, 0},     /* RED */
+  {192, 0, 192},   /* MAGENTA */
+  {0, 192, 0},     /* GREEN */
+  {0, 192, 192},   /* CYAN */
+  {192, 192, 0},   /* YELLOW */
+  {192, 192, 192}, /* WHITE */
+  /* bright */
+  {0, 0, 0},       /* BLACK */
+  {0, 0, 255},     /* BLUE */
+  {255, 0, 0},     /* RED */
+  {255, 0, 255},   /* MAGENTA */
+  {0, 255, 0},     /* GREEN */
+  {0, 255, 255},   /* CYAN */
+  {255, 255, 0},   /* YELLOW */
+  {255, 255, 255}, /* WHITE */
 };
   
 u32 palette[16][16];
@@ -188,12 +188,10 @@ int wiidisplay_init(void)
   VIDEO_SetBlack(FALSE);
   VIDEO_Flush();
 
-  printf("Console initialized.\n");
-    
   VIDEO_WaitVSync();
   if(rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-  fatInitDefault(); // doesn't really belong in display init, but...
+  fatInitDefault(); /* FIXME: doesn't belong in display init */
   
   return 0;
 }
@@ -213,121 +211,100 @@ uidisplay_frame_end( void )
   return;
 }
 
-void wiidisplay_showmouse(float x, float y)
+void wiidisplay_showmouse( float x, float y )
 {
   int c, r;
 
-  if(!fuse_emulation_paused) return;
+  if( !fuse_emulation_paused ) return;
 
   int mousenewx = x*(DISPLAY_SCREEN_WIDTH/2-MOUSESIZEX);
   int mousenewy = y*(DISPLAY_SCREEN_HEIGHT-MOUSESIZEY);
 
-  // if we had no old mouse and have no new mouse, forget it 
-  if((mousex <= 0 || mousey <= 0) &&
-     (mousenewx <= 0 || mousenewy <= 0)) return;
+  /* if we had no old mouse and have no new mouse, forget it */
+  if( (mousex <= 0 || mousey <= 0) &&
+      (mousenewx <= 0 || mousenewy <= 0) ) return;
 
-  // if we had a mouse pos before, put mousecache at old position into
-  // picture 
-  if(mousex > 0 && mousey > 0)
-    {
-      for(r=0; r<MOUSESIZEY; r++)
-	for(c=0; c<MOUSESIZEX; c++)
-	  {
-	    put_pixel(c+mousex, r+mousey, mousecache[r][c], 1);
-	  }
+  /* if we had a mouse pos before, put mousecache at old position into
+     picture  */
+  if( mousex > 0 && mousey > 0 ) {
+    for( r=0; r<MOUSESIZEY; r++ )
+      for( c=0; c<MOUSESIZEX; c++ )
+	put_pixel( c+mousex, r+mousey, mousecache[r][c], 1 );
+  }
+  uidisplay_area( mousex, mousey, MOUSESIZEX, MOUSESIZEY );
+
+  /* if we don't have a new mouse, remember that state and leave */
+  if( mousenewx <= 0 || mousenewy <= 0 ) {
+    mousex = mousenewx; mousey = mousenewy;
+    return;
+  }
+
+  /* we had an old mouse and have a new one. read mouse cache from the
+     picture and draw mouse cursor. */
+  for( r=0; r<MOUSESIZEY; r++ )
+    for( c=0; c<MOUSESIZEX; c++ ) {
+      /* put picture at new position into mouse cache */
+      mousecache[r][c] = get_pixel( c+mousenewx, r+mousenewy );
+      /* put mouse cursor into picture */
+      if( mousecursor[r][c] != 0xff )
+	put_pixel( mousenewx+c, mousenewy+r, mousecursor[r][c], 1 );
     }
-  uidisplay_area(mousex, mousey, MOUSESIZEX, MOUSESIZEY);
-
-  // if we don't have a new mouse, remember that state and leave
-  if(mousenewx <= 0 || mousenewy <= 0)
-    {
-      mousex = mousenewx; mousey = mousenewy;
-      return;
-    }
-
-  // we had an old mouse and have a new one. read mouse cache from the
-  // picture and draw mouse cursor.
-  for(r=0; r<MOUSESIZEY; r++)
-    for(c=0; c<MOUSESIZEX; c++)
-      {
-	// put picture at new position into mouse cache
-	mousecache[r][c] = get_pixel(c+mousenewx, r+mousenewy);
-	// put mouse cursor into picture
-	if(mousecursor[r][c] != 0xff)
-	  put_pixel(mousenewx+c, mousenewy+r, mousecursor[r][c], 1);
-      }
   mousex = mousenewx; mousey = mousenewy;
-  uidisplay_area(mousex, mousey, MOUSESIZEX, MOUSESIZEY);
+  uidisplay_area( mousex, mousey, MOUSESIZEX, MOUSESIZEY );
 }
 
 void
-uidisplay_area(int x, int start, int width, int height)
+uidisplay_area( int x, int start, int width, int height )
 {
   int y, i;
 
   int ystart = (rmode->xfbHeight - 2*DISPLAY_SCREEN_HEIGHT)/4;
 
-#if 0
-  printf("ystart: %d dsh: %d xfbh: %d\n", ystart, DISPLAY_SCREEN_HEIGHT,
-	 rmode->xfbHeight);
-  for(i=0; i<200; i++) VIDEO_WaitVSync();
-  exit(0);
-#endif
-
   u32 *dest;
 
-  if(needsclear)
-    {
-      for(y=0; y<rmode->xfbHeight; y++)
-	{
-	  for(i=0, dest = xfb + y*rmode->fbWidth/2;
-	      i<rmode->fbWidth; i+=2, dest++)
-	    *dest = palette[0][0];
-	}
-      needsclear = 0;
+  if( needsclear ) {
+    for( y=0; y<rmode->xfbHeight; y++ ) {
+      for( i=0, dest = xfb + y*rmode->fbWidth/2;
+           i<rmode->fbWidth;
+	   i+=2, dest++ )
+      *dest = palette[0][0];
     }
+    needsclear = 0;
+  }
 
-  if(x%2)
-    {
-      x -= 1;
-      width += 1;
-    }
+  if( x%2 ) {
+    x -= 1;
+    width += 1;
+  }
   
-  for(y=start; y<start+height; y++)
-    {
-      // FIXME: Black-and-white only      
-      if(hires)
-	{
-	  for(i=0, dest = xfb + 2*(y+ystart)*rmode->fbWidth/2 + x/2;
-	      i < width; i+=2, dest++)
-	    {
-	      *dest = palette[display_image[y][x+i]][display_image[y][x+i+1]];
-	    }
-	  for(i=0, dest = xfb + (2*(y+ystart) + 1)*rmode->fbWidth/2 + x/2;
-	      i < width; i+=2, dest++)
-	    {
-	      *dest = palette[display_image[y][x+i]][display_image[y][x+i+1]];
-	    }
-	}
-      else
-	{
-	  for(i=0, dest = xfb + 2*(y+ystart)*rmode->fbWidth/2 + x;
-	      i < width; i+=2, dest++)
-	    {
-	      *dest = palette[display_image[y][x+i]][display_image[y][x+i]];
-	      dest++;
-	      *dest = palette[display_image[y][x+i+1]][display_image[y][x+i+1]];
-	    }
-	  for(i=0, dest = xfb + (2*(y+ystart) + 1)*rmode->fbWidth/2 + x;
-	      i < width; i+=2, dest++)
-	    {
-	      *dest = palette[display_image[y][x+i]][display_image[y][x+i]];
-	      dest++;
-	      *dest = palette[display_image[y][x+i+1]][display_image[y][x+i+1]];
-	    }
-	}
-      
+  for( y=start; y<start+height; y++ ) {
+    /* FIXME: Black-and-white only */
+    if(hires) {
+      for( i=0, dest = xfb + 2*(y+ystart)*rmode->fbWidth/2 + x/2;
+           i < width;
+	   i+=2, dest++ )
+        *dest = palette[display_image[y][x+i]][display_image[y][x+i+1]];
+      for( i=0, dest = xfb + (2*(y+ystart) + 1)*rmode->fbWidth/2 + x/2;
+	   i < width;
+	   i+=2, dest++ )
+	*dest = palette[display_image[y][x+i]][display_image[y][x+i+1]];
+    } else {
+      for( i=0, dest = xfb + 2*(y+ystart)*rmode->fbWidth/2 + x;
+	   i < width;
+	   i+=2, dest++ ) {
+	*dest = palette[display_image[y][x+i]][display_image[y][x+i]];
+	dest++;
+	*dest = palette[display_image[y][x+i+1]][display_image[y][x+i+1]];
+      }
+      for( i=0, dest = xfb + (2*(y+ystart) + 1)*rmode->fbWidth/2 + x;
+	   i < width;
+	   i+=2, dest++ ) {
+	*dest = palette[display_image[y][x+i]][display_image[y][x+i]];
+	dest++;
+	*dest = palette[display_image[y][x+i+1]][display_image[y][x+i+1]];
+      }
     }
+  }
 }
 
 int
@@ -345,7 +322,7 @@ wiidisplay_end( void )
 
 /* Set one pixel in the display */
 void
-uidisplay_putpixel(int x, int y, int colour)
+uidisplay_putpixel( int x, int y, int colour )
 {
   put_pixel(x, y, colour, 0);
 }
@@ -354,7 +331,7 @@ uidisplay_putpixel(int x, int y, int colour)
    colour `paper' to the screen at ( (8*x) , y ) */
 void
 uidisplay_plot8( int x, int y, libspectrum_byte data,
-                libspectrum_byte ink, libspectrum_byte paper )
+                 libspectrum_byte ink, libspectrum_byte paper )
 {
   x <<= 3;
 
@@ -381,12 +358,6 @@ uidisplay_plot8( int x, int y, libspectrum_byte data,
       display_image[y][x+15] = ( data & 0x01 ) ? ink : paper;
     }
   } else {
-    if(y >= 2*DISPLAY_SCREEN_HEIGHT ||
-       x+7 >= DISPLAY_SCREEN_WIDTH)
-      {
-	printf("Error: %d,%d out of bounds", x, y);
-	return;
-      }
     display_image[y][x+ 0] = ( data & 0x80 ) ? ink : paper;
     display_image[y][x+ 1] = ( data & 0x40 ) ? ink : paper;
     display_image[y][x+ 2] = ( data & 0x20 ) ? ink : paper;
@@ -402,32 +373,10 @@ uidisplay_plot8( int x, int y, libspectrum_byte data,
    colour `paper' to the screen at ( (16*x) , y ) */
 void
 uidisplay_plot16( int x, int y, libspectrum_word data,
-                 libspectrum_byte ink, libspectrum_byte paper )
+                  libspectrum_byte ink, libspectrum_byte paper )
 {
-  printf("plot8\n");
+  /* FIXME: what should this do? */
   return;
-
-  int i;
-  x <<= 4; y <<= 1;
-
-  for( i=0; i<2; i++,y++ ) {
-    display_image[y][x+ 0] = ( data & 0x8000 ) ? ink : paper;
-    display_image[y][x+ 1] = ( data & 0x4000 ) ? ink : paper;
-    display_image[y][x+ 2] = ( data & 0x2000 ) ? ink : paper;
-    display_image[y][x+ 3] = ( data & 0x1000 ) ? ink : paper;
-    display_image[y][x+ 4] = ( data & 0x0800 ) ? ink : paper;
-    display_image[y][x+ 5] = ( data & 0x0400 ) ? ink : paper;
-    display_image[y][x+ 6] = ( data & 0x0200 ) ? ink : paper;
-    display_image[y][x+ 7] = ( data & 0x0100 ) ? ink : paper;
-    display_image[y][x+ 8] = ( data & 0x0080 ) ? ink : paper;
-    display_image[y][x+ 9] = ( data & 0x0040 ) ? ink : paper;
-    display_image[y][x+10] = ( data & 0x0020 ) ? ink : paper;
-    display_image[y][x+11] = ( data & 0x0010 ) ? ink : paper;
-    display_image[y][x+12] = ( data & 0x0008 ) ? ink : paper;
-    display_image[y][x+13] = ( data & 0x0004 ) ? ink : paper;
-    display_image[y][x+14] = ( data & 0x0002 ) ? ink : paper;
-    display_image[y][x+15] = ( data & 0x0001 ) ? ink : paper;
-  }
 }
 
 void

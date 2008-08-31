@@ -2,7 +2,7 @@
 
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,26 +34,29 @@
 #include <wiiuse/wpad.h>
 
 typedef enum {
-  WII_JOYSTICK_SIDEWAYS_RH, // sideways config (fire on the right)
-  WII_JOYSTICK_SIDEWAYS_LH, // sideways config (fire on the left)
-  WII_JOYSTICK_NUNCHUK,     // nunchuk for directions, A+B for fire
-  WII_JOYSTICK_CLASSIC,     // classic controller
+  WII_JOYSTICK_SIDEWAYS_RH, /* sideways config (fire on the right) */
+  WII_JOYSTICK_SIDEWAYS_LH, /* sideways config (fire on the left) */
+  WII_JOYSTICK_NUNCHUK,     /* nunchuk for directions, A+B for fire */
+  WII_JOYSTICK_CLASSIC,     /* classic controller */
 } WiiJoystickConfig;
 
-int ui_joystick_init(void)
+int
+ui_joystick_init( void )
 {
   return 4;
 }
 
-void ui_joystick_end()
+void
+ui_joystick_end( void )
 {
 }
 
-void ui_joystick_poll()
+void
+ui_joystick_poll( void )
 {
   input_event_t fuse_event;
 
-  if(fuse_emulation_paused) return;
+  if( fuse_emulation_paused ) return;
 
 #define POST_JOYPRESS(number, pressed) do {	  \
     fuse_event.type = INPUT_EVENT_JOYSTICK_PRESS; \
@@ -72,31 +75,31 @@ void ui_joystick_poll()
   u32 btnsdown = WPAD_ButtonsDown(0);
   u32 btnsup = WPAD_ButtonsUp(0);
   
-  if(btnsdown & WPAD_BUTTON_LEFT)
-    POST_JOYPRESS(0, INPUT_JOYSTICK_DOWN);
-  if(btnsdown & WPAD_BUTTON_RIGHT)
-    POST_JOYPRESS(0, INPUT_JOYSTICK_UP);
-  if(btnsdown & WPAD_BUTTON_UP)
-    POST_JOYPRESS(0, INPUT_JOYSTICK_LEFT);
-  if(btnsdown & WPAD_BUTTON_DOWN)
-    POST_JOYPRESS(0, INPUT_JOYSTICK_RIGHT);
+  if( btnsdown & WPAD_BUTTON_LEFT )
+    POST_JOYPRESS( 0, INPUT_JOYSTICK_DOWN );
+  if( btnsdown & WPAD_BUTTON_RIGHT )
+    POST_JOYPRESS( 0, INPUT_JOYSTICK_UP );
+  if( btnsdown & WPAD_BUTTON_UP )
+    POST_JOYPRESS( 0, INPUT_JOYSTICK_LEFT );
+  if( btnsdown & WPAD_BUTTON_DOWN )
+    POST_JOYPRESS( 0, INPUT_JOYSTICK_RIGHT );
 
-  if(btnsdown & WPAD_BUTTON_1)
-    POST_JOYPRESS(0, INPUT_JOYSTICK_FIRE_1);
-  if(btnsdown & WPAD_BUTTON_2)
-    POST_JOYPRESS(0, INPUT_JOYSTICK_FIRE_2);
+  if( btnsdown & WPAD_BUTTON_1 )
+    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_1 );
+  if( btnsdown & WPAD_BUTTON_2 )
+    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_2 );
 
-  if(btnsup & WPAD_BUTTON_LEFT)
-    POST_JOYRELEASE(0, INPUT_JOYSTICK_DOWN);
-  if(btnsup & WPAD_BUTTON_RIGHT)
-    POST_JOYRELEASE(0, INPUT_JOYSTICK_UP);
-  if(btnsup & WPAD_BUTTON_UP)
-    POST_JOYRELEASE(0, INPUT_JOYSTICK_LEFT);
-  if(btnsup & WPAD_BUTTON_DOWN)
-    POST_JOYRELEASE(0, INPUT_JOYSTICK_RIGHT);
+  if( btnsup & WPAD_BUTTON_LEFT )
+    POST_JOYRELEASE( 0, INPUT_JOYSTICK_DOWN );
+  if( btnsup & WPAD_BUTTON_RIGHT )
+    POST_JOYRELEASE( 0, INPUT_JOYSTICK_UP );
+  if( btnsup & WPAD_BUTTON_UP )
+    POST_JOYRELEASE( 0, INPUT_JOYSTICK_LEFT );
+  if( btnsup & WPAD_BUTTON_DOWN )
+    POST_JOYRELEASE( 0, INPUT_JOYSTICK_RIGHT );
 
-  if(btnsup & WPAD_BUTTON_1)
-    POST_JOYRELEASE(0, INPUT_JOYSTICK_FIRE_1);
-  if(btnsup & WPAD_BUTTON_2)
-    POST_JOYRELEASE(0, INPUT_JOYSTICK_FIRE_2);
+  if( btnsup & WPAD_BUTTON_1 )
+    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_1 );
+  if( btnsup & WPAD_BUTTON_2 )
+    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_2 );
 }

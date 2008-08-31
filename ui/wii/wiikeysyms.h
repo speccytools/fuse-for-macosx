@@ -1,7 +1,7 @@
 /* wiikeysyms.h: routines for dealing with the Wii USB keyboard
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: fbkeyboard.h 2889 2007-05-26 17:45:08Z zubzero $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@
 
 */
 
-#if !defined(WIIKEYSYMS_H)
-#define WIIKEYSYMS_H
+#ifndef FUSE_WIIKEYSYMS_H
+#define FUSE_WIIKEYSYMS_H
 
-// definitions taken from http://wiibrew.org/wiki//dev/usb/kbd
+/* definitions taken from http://wiibrew.org/wiki//dev/usb/kbd */
 
 #define WII_KEY_TAB 0x2b
 #define WII_KEY_RETURN 0x28
@@ -106,4 +106,4 @@
 #define WII_KEY_F11 0x44
 #define WII_KEY_F12 0x45
 
-#endif
+#endif			/* #ifndef FUSE_WIIKEYSYMS_H */

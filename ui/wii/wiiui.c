@@ -1,7 +1,7 @@
 /* wiiui.h: routines for dealing with the Wii FB UI
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: fbkeyboard.h 2889 2007-05-26 17:45:08Z zubzero $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,16 +36,16 @@
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
 
-static void wii_end(void);
+static void wii_end( void );
 
 int
-ui_init(int *argc, char ***argv)
+ui_init( int *argc, char ***argv )
 {
   int error;
 
-  error = atexit(wii_end);
+  error = atexit( wii_end );
   if( error ) {
-    ui_error( UI_ERROR_ERROR, "ui_init: couldn't set atexit function" );
+    ui_error( UI_ERROR_ERROR, "%s: couldn't set atexit function", __func__ );
     return 1;
   }
   
@@ -59,7 +59,8 @@ ui_init(int *argc, char ***argv)
   return 0;
 }
 
-int ui_event()
+int
+ui_event( void )
 {
   keyboard_update();
   mouse_update();
@@ -77,9 +78,9 @@ int ui_end(void)
   return 0;
 }
 
-static void wii_end(void)
+static void
+wii_end( void )
 {
   wiikeyboard_end();
   uidisplay_end();
 }
-

@@ -1,7 +1,7 @@
 /* wiimouse.c: routines for dealing with the Wiimote as a mouse
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: fbkeyboard.h 2889 2007-05-26 17:45:08Z zubzero $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,31 +47,30 @@ static WPADData paddata;
 static WPADData oldpaddata;
 
 int
-wiimouse_init(void)
+wiimouse_init( void )
 {
   WPAD_Init();
-  WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
-  WPAD_SetIdleTimeout(60);
+  WPAD_SetDataFormat( WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR );
+  WPAD_SetIdleTimeout( 60 );
 
-  memset(&paddata, 0, sizeof(paddata));
-  memset(&oldpaddata, 0, sizeof(oldpaddata));
+  memset( &paddata, 0, sizeof(paddata) );
+  memset( &oldpaddata, 0, sizeof(oldpaddata) );
   ui_mouse_present = 1;
   return 0;
 }
 
 int
-wiimouse_end(void)
+wiimouse_end( void )
 {
   return 0;
 }
 
 void
-wiimouse_get_position(int* x, int* y)
+wiimouse_get_position( int *x, int *y )
 {
-  if(paddata.ir.state == 0)
-    {
-      *x = *y = -1;
-    }
+  if( paddata.ir.state == 0 ) {
+    *x = *y = -1;
+  }
 
   *x = paddata.ir.x;
   *y = paddata.ir.y;
@@ -80,12 +79,12 @@ wiimouse_get_position(int* x, int* y)
 void
 mouse_update( void )
 {
-  // do this ONLY here. wiijoystick depends on it as well, but
-  // mouse_update is called regardless of whether the emulation is
-  // running or not, ui_joystick_poll only if running. So we do this
-  // here and risk lagging 1 frame behind on the joystick
-  // FIXME: A function that does this only once depending on the
-  // current frame counter would be better
+  /* do this ONLY here. wiijoystick depends on it as well, but
+     mouse_update is called regardless of whether the emulation is
+     running or not, ui_joystick_poll only if running. So we do this
+     here and risk lagging 1 frame behind on the joystick
+     FIXME: A function that does this only once depending on the
+     current frame counter would be better */
   WPAD_ScanPads();
 
 #define POST_KEYPRESS(pressed) do {		\
@@ -104,39 +103,36 @@ mouse_update( void )
     input_event(&fuse_event); \
   } while(0)
 
-  // we don't bother with key releases here; this is only for entering
-  // and/or using the menu, which seems to at best disregard
-  // keyreleases and at worst react badly to them.
+  /* we don't bother with key releases here; this is only for entering
+     and/or using the menu, which seems to at best disregard
+     keyreleases and at worst react badly to them. */
 
-  if(fuse_emulation_paused)
-    {
-      if(WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME)
-	POST_KEYPRESS(INPUT_KEY_Escape);
-      else if(WPAD_ButtonsDown(0) & WPAD_BUTTON_DOWN)
-	POST_KEYPRESS(INPUT_KEY_Down);
-      else if(WPAD_ButtonsDown(0) & WPAD_BUTTON_UP)
-	POST_KEYPRESS(INPUT_KEY_Up);
-      else if(WPAD_ButtonsDown(0) & WPAD_BUTTON_LEFT)
-	POST_KEYPRESS(INPUT_KEY_Left);
-      else if(WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT)
-	POST_KEYPRESS(INPUT_KEY_Right);
-      else if(WPAD_ButtonsDown(0) & WPAD_BUTTON_A)
-	POST_KEYPRESS(INPUT_KEY_Return);
-      else if(WPAD_ButtonsDown(0) & WPAD_BUTTON_B)
-	POST_KEYPRESS(INPUT_KEY_Escape);
-    }
+  if(fuse_emulation_paused) {
+    if( WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME )
+      POST_KEYPRESS( INPUT_KEY_Escape );
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_DOWN )
+      POST_KEYPRESS( INPUT_KEY_Down );
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_UP )
+      POST_KEYPRESS(INPUT_KEY_Up);
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_LEFT )
+      POST_KEYPRESS(INPUT_KEY_Left);
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT )
+      POST_KEYPRESS(INPUT_KEY_Right);
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_A )
+      POST_KEYPRESS(INPUT_KEY_Return);
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_B )
+      POST_KEYPRESS(INPUT_KEY_Escape);
+  } else {
+    if( WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME )
+      POST_KEYPRESS(INPUT_KEY_F1);
+  }
+
+  WPAD_ReadEvent( 0, &paddata );
+
+  if( paddata.ir.state == 0 )
+    wiidisplay_showmouse( -1, -1 );
   else
-    {
-      if(WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME)
-	POST_KEYPRESS(INPUT_KEY_F1);
-    }
-
-  WPAD_ReadEvent(0, &paddata);
-
-  if(paddata.ir.state == 0)
-    wiidisplay_showmouse(-1, -1);
-  else
-    wiidisplay_showmouse(paddata.ir.x/560.0f, paddata.ir.y/420.0f);  
+    wiidisplay_showmouse( paddata.ir.x/560.0f, paddata.ir.y/420.0f );  
 }
 
 int

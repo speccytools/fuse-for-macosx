@@ -1,7 +1,7 @@
 /* wiimouse.h: routines for dealing with the Wiimote as a mouse
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: fbkeyboard.h 2889 2007-05-26 17:45:08Z zubzero $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,15 +26,10 @@
 #ifndef FUSE_WIIMOUSE_H
 #define FUSE_WIIMOUSE_H
 
-/* system includes */
-/* (none) */
+int wiimouse_init( void );
+int wiimouse_end( void );
+void wiimouse_get_position( int *x, int *y );
 
-/* my includes */
-/* (none) */
-
-int wiimouse_init(void);
-int wiimouse_end(void);
-void mouse_update(void);
-void wiimouse_get_position(int* x, int* y);
+void mouse_update( void );
 
 #endif /* FUSE_WIIMOUSE_H */

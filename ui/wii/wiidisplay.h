@@ -1,7 +1,7 @@
 /* wiidisplay.h: Routines for dealing with the wii's framebuffer display
    Copyright (c) 2008 Bjoern Giesler
 
-   $Id: $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,6 @@
 int wiidisplay_init( void );
 int wiidisplay_end( void );
 
-void wiidisplay_showmouse(float mousex, float mousey);
+void wiidisplay_showmouse( float mousex, float mousey );
 
 #endif			/* #ifndef FUSE_WIIDISPLAY_H */
