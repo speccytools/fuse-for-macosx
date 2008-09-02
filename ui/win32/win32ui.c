@@ -839,24 +839,25 @@ win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam )
 static int
 win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
-  win32display_drawing_area_resize( LOWORD( lParam ), HIWORD( lParam ) );
-
-  /* FIXME: statusbar needs to be accounted for in size */
-  SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
-
   if( wParam == SIZE_MINIMIZED ) {
     if( !size_paused ) {
       size_paused = 1;
       fuse_emulation_pause();
     }
   } else {
+    win32display_drawing_area_resize( LOWORD( lParam ), HIWORD( lParam ) );
+
+    /* FIXME: statusbar needs to be accounted for in size */
+    SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
+
     if( size_paused ) {
       size_paused = 0;
       fuse_emulation_unpause();
     }
+
+    win32statusbar_resize( hWnd, wParam, lParam );
   }
 
-  win32statusbar_resize( hWnd, wParam, lParam );
   return 0;
 }
 

@@ -2880,3 +2880,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 WM_SIZE handlers by getting rid of GetClientRect (Marek).
 20080902 ui/win32/win32ui.c: Win32: Implemented gain and lose focus handlers
 	 similiarly to gtk ui (Marek).
+20080902 ui/win32/win32ui.c: Win32: Fixed an error message occurring when
+	 window is being minimized (Unknown display size/image size 0/1)
+	 (Marek).
