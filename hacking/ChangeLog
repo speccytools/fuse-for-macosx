@@ -2876,3 +2876,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 instead of dynamic (Marek).
 20080824 configure.in: Changed configure logic: if SDL ui is selected, choose
 	 SDL for sound over any other available sound API (Marek).
+20080901 ui/win32/{win32ui.c,win32internals.h,statusbar.c}: Win32: Simplified
+	 WM_SIZE handlers by getting rid of GetClientRect (Marek).

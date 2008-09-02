@@ -108,7 +108,7 @@ void win32ui_process_messages( int process_queue_once );
 void win32statusbar_create();
 int win32statusbar_set_visibility( int visible );
 void win32statusbar_redraw( HWND hWnd, LPARAM lParam );
-void win32statusbar_resize( HWND hWnd );
+void win32statusbar_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
 
 /*
  * Dialog box reset
