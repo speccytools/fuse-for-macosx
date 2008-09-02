@@ -28,6 +28,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "keyboard.h"
 #include "menu.h"
 #include "menu_data.h"
 #include "psg.h"
@@ -76,6 +77,10 @@ typedef struct win32ui_select_info {
 } win32ui_select_info;
 
 static BOOL win32ui_make_menu( void );
+
+static int win32ui_lose_focus( HWND hWnd, WPARAM wParam, LPARAM lParam );
+static int win32ui_gain_focus( HWND hWnd, WPARAM wParam, LPARAM lParam );
+
 static int win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
@@ -207,6 +212,14 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         return TRUE;
       else
         return( DefWindowProc( hWnd, msg, wParam, lParam ) );
+
+    case WM_ACTIVATE:
+      if( ( LOWORD( wParam ) == WA_ACTIVE ) ||
+          ( LOWORD( wParam ) == WA_CLICKACTIVE ) )
+        return win32ui_gain_focus( hWnd, wParam, lParam );
+      else if( LOWORD( wParam ) == WA_INACTIVE )
+        return win32ui_lose_focus( hWnd, wParam, lParam );
+      break;
 
     default:
       return( DefWindowProc( hWnd, msg, wParam, lParam ) );
@@ -371,6 +384,23 @@ ui_error_specific( ui_error_level severity, const char *message )
 
   fuse_emulation_unpause();
 
+  return 0;
+}
+
+/* The callbacks used by various routines */
+
+static int
+win32ui_lose_focus( HWND hWnd, WPARAM wParam, LPARAM lParam )
+{
+  keyboard_release_all();
+  ui_mouse_suspend();
+  return 0;
+}
+
+static int
+win32ui_gain_focus( HWND hWnd, WPARAM wParam, LPARAM lParam )
+{
+  ui_mouse_resume();
   return 0;
 }
 
