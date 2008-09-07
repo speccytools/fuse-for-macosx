@@ -95,7 +95,7 @@ static int update_events( void );
 static void add_event( gpointer data, gpointer user_data GCC_UNUSED );
 static int deactivate_debugger( void );
 
-static void move_disassembly( WPARAM scroll_command );
+static int move_disassembly( WPARAM scroll_command );
 
 static void evaluate_command( void );
 static void win32ui_debugger_done_step( void );
@@ -941,7 +941,7 @@ ui_debugger_disassemble( libspectrum_word address )
 }
 
 /* Called when the disassembly scrollbar is moved */
-static void
+static int
 move_disassembly( WPARAM scroll_command )
 {
   SCROLLINFO si;
@@ -975,6 +975,8 @@ move_disassembly( WPARAM scroll_command )
     case SB_THUMBTRACK:
       value = HIWORD( scroll_command );
       break;
+    default:
+      return 1;
   }
   if( value > disassembly_max ) value = disassembly_max;
   if( value < disassembly_min ) value = disassembly_min;
@@ -1015,6 +1017,8 @@ move_disassembly( WPARAM scroll_command )
 
   /* And update the disassembly if the debugger is active */
   if( debugger_active ) update_disassembly();
+        
+  return 0;
 }
 
 /* Evaluate the command currently in the entry box */
@@ -1091,19 +1095,19 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
       switch( LOWORD( wParam ) ) {
         case IDCLOSE:
           win32ui_debugger_done_close();
-          return TRUE;
+          return 0;
         case IDC_DBG_BTN_CONT:
           win32ui_debugger_done_continue();
-          return TRUE;
+          return 0;
         case IDC_DBG_BTN_BREAK:
           win32ui_debugger_break();
-          return TRUE;
+          return 0;
         case IDC_DBG_BTN_STEP:
           win32ui_debugger_done_step();
-          return TRUE;
+          return 0;
         case IDC_DBG_BTN_EVAL:
           evaluate_command();
-          return TRUE;
+          return 0;
 
         /* menus */
         case IDM_DBG_REG:
@@ -1125,10 +1129,12 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
           toggle_display( DEBUGGER_PANE_EVENTS, IDM_DBG_EVENTS );
           return 0;
       }
-      return FALSE;
+      break;
+
     case WM_CLOSE:
       delete_dialog();
-      return TRUE;
+      return 0;
+
     case WM_NOTIFY:
       switch ( ( ( LPNMHDR ) lParam )->code ) {
 
@@ -1137,19 +1143,19 @@ win32ui_debugger_proc( HWND hWnd, UINT msg,
 
             case IDC_DBG_LV_EVENTS:
               events_click( ( LPNMITEMACTIVATE ) lParam );
-              return TRUE;
+              return 0;
             case IDC_DBG_LV_STACK:
               stack_click( ( LPNMITEMACTIVATE ) lParam );
-              return TRUE;
+              return 0;
           }
       }
-      return FALSE;
+      break;
+
     case WM_VSCROLL:
-      if( ( HWND ) lParam != NULL ) {
-        move_disassembly( wParam );
-        return 0;
-      }
-      return FALSE;
+      if( ( HWND ) lParam != NULL )
+        if( ! move_disassembly( wParam ) )
+          return 0;
+      break;
   }
   return FALSE;
 }

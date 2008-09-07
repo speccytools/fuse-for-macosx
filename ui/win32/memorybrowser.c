@@ -93,7 +93,7 @@ update_display( HWND hwndDlg, libspectrum_word base )
   }
 }
 
-static void
+static int
 scroller( HWND hwndDlg, WPARAM scroll_command )
 {
   libspectrum_word base;
@@ -129,6 +129,8 @@ scroller( HWND hwndDlg, WPARAM scroll_command )
     case SB_THUMBTRACK:
       value = HIWORD( scroll_command );
       break;
+    default:
+      return 1;
   }
   if( value > memorysb_max ) value = memorysb_max;
   if( value < memorysb_min ) value = memorysb_min;
@@ -144,6 +146,8 @@ scroller( HWND hwndDlg, WPARAM scroll_command )
   SetScrollInfo( GetDlgItem( hwndDlg, IDC_MEM_SB ), SB_CTL, &si, TRUE );
   
   update_display( hwndDlg, base );
+  
+  return 0;
 }
 
 void
@@ -166,21 +170,21 @@ memorybrowser_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
     case WM_COMMAND:
       if( LOWORD( wParam ) == IDCLOSE ) {
         EndDialog( hwndDlg, 0 );
-        return TRUE;
+        return 0;
       }
-      return FALSE;
+      break;
 
     case WM_CLOSE: {
       EndDialog( hwndDlg, 0 );
-      return TRUE;
+      return 0;
     }
 
     case WM_VSCROLL:
       if( ( HWND ) lParam != NULL ) {
-        scroller( hwndDlg, wParam );
-        return 0;
+        if( ! scroller( hwndDlg, wParam ) )
+          return 0;
       }
-      return FALSE;
+      break;
       
     case WM_MOUSEWHEEL:
 /* FIXME: when one of the lines in the listview is selected,

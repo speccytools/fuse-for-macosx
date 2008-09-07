@@ -100,8 +100,9 @@ CODE
 
 print << "CODE";
 
-      return TRUE;
+      return FALSE;
     }
+
     case WM_COMMAND:
       switch( LOWORD( wParam ) )
       {
@@ -137,16 +138,18 @@ CODE
           display_refresh_all();
 
 	  EndDialog( hwndDlg, 0 );
-	  return TRUE;
+	  return 0;
 	}
+
 	case IDCANCEL:
 	  EndDialog( hwndDlg, 0 );
-	  return TRUE;
+	  return 0;
       }
-      return FALSE;
+      break;
+
     case WM_CLOSE:
       EndDialog( hwndDlg, 0 );
-      return TRUE;
+      return 0;
   }
   return FALSE;
 }

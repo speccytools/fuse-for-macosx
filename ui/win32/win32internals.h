@@ -93,7 +93,7 @@ int win32ui_picture( const char *filename, int border );
 int win32ui_get_monospaced_font( HFONT *font );
 void win32ui_set_font( HWND hDlg, int nIDDlgItem, HFONT font );
 
-void handle_menu( DWORD cmd, HWND okno );
+int handle_menu( DWORD cmd, HWND okno );
 
 void win32_verror( int is_error );
 

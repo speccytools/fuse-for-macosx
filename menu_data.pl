@@ -277,7 +277,7 @@ sub dump_win32 ($$) {
 	print << "CODE";
 #include "menu_data.h"
 
-void handle_menu( DWORD cmd, HWND window )
+int handle_menu( DWORD cmd, HWND window )
 {
   switch( cmd )
   {
@@ -301,6 +301,7 @@ CODE
 
     if( $mode eq 'c' ) {
 	print << "CODE";
+    return 1;
   }
 }
 CODE
@@ -365,7 +366,7 @@ sub _dump_win32 ($$$$) {
 	        my $function = $item->{function} || "${path}_$cname";
 		print "    case $idmname:\n";
 		print "      $function( " . ( $item->{action} || 0 ) . " ); "
-		      . "break;\n";
+		      . "return 0;\n";
 	    } elsif( $mode eq 'rc' ) {
 		my $hotkey;
 		if( $item->{hotkey} ) {

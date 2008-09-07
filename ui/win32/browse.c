@@ -135,7 +135,7 @@ dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       if( ( ( LPNMHDR ) lParam )->code == NM_DBLCLK ) {
         if( ( ( LPNMHDR ) lParam )->idFrom == IDC_BROWSE_LV ) {
           select_row( ( LPNMITEMACTIVATE ) lParam );
-          return TRUE;
+          return 0;
         }
       }
       break;
@@ -143,7 +143,7 @@ dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
     case WM_COMMAND:
       if( LOWORD( wParam ) == IDCLOSE ) {
         ShowWindow( dialog, SW_HIDE );
-        return TRUE;
+        return 0;
       }
       break;
 

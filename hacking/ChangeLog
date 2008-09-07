@@ -2883,3 +2883,8 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20080902 ui/win32/win32ui.c: Win32: Fixed an error message occurring when
 	 window is being minimized (Unknown display size/image size 0/1)
 	 (Marek).
+20080906 menu_data.pl,ui/win32/{win32ui.c,memorybrowser.c,debugger.c,
+	 win32internals.h,browse.c,picture.c,options.pl,pokefinder.c}: Win32:
+	 Reviewed and fixed all the return codes for all window message handles
+	 fixed selector dialog problem where cancelling the dialog would result
+	 in choosing option 0 (Marek).

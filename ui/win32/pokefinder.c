@@ -52,35 +52,38 @@ win32ui_pokefinder_proc( HWND hWnd, UINT msg,
                 WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
+
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
         case IDCLOSE:
           win32ui_pokefinder_close();
-          return TRUE;
+          return 0;
         case IDC_PF_INC:
           win32ui_pokefinder_incremented();
-          return TRUE;
+          return 0;
         case IDC_PF_DEC:
           win32ui_pokefinder_decremented();
-          return TRUE;
+          return 0;
         case IDC_PF_SEARCH:
           win32ui_pokefinder_search();
-          return TRUE;
+          return 0;
         case IDC_PF_RESET:
           win32ui_pokefinder_reset();
-          return TRUE;
+          return 0;
       }
-      return FALSE;
+      break;
+
     case WM_CLOSE:
       win32ui_pokefinder_close();
-      return TRUE;
+      return 0;
+
     case WM_NOTIFY:
       switch ( ( ( LPNMHDR ) lParam )->code ) {
         case NM_DBLCLK:
           possible_click( ( LPNMITEMACTIVATE ) lParam );
-          return TRUE;
+          return 0; /* "The return value for this notification is not used." */
       }
-      return FALSE;      
+      break;      
   }
   return FALSE;
 }

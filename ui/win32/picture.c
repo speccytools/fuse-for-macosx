@@ -114,7 +114,7 @@ picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
       EndPaint( hWnd, &ps );
       DeleteDC( pic_dc );
-      break;
+      return 0;
     }
 
     case WM_COMMAND:
@@ -123,15 +123,16 @@ picture_wnd_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         {
           hDialogPicture = NULL;
           DestroyWindow( hWnd );
-          break;
+          return 0;
         }
       }
+      break;
 
     case WM_CLOSE:
     {
       hDialogPicture = NULL;
       DestroyWindow( hWnd );
-      break;
+      return 0;
     }
   }
   return FALSE;

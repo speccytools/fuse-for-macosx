@@ -83,7 +83,7 @@ static int win32ui_gain_focus( HWND hWnd, WPARAM wParam, LPARAM lParam );
 
 static int win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
-static int win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
+static BOOL win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
 
 static int
 selector_dialog( win32ui_select_info *items );
@@ -121,39 +121,47 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
     case WM_COMMAND:
-      handle_menu( LOWORD( wParam ), hWnd );
+      if( ! handle_menu( LOWORD( wParam ), hWnd ) )
+        return 0;
       break;
 
     case WM_DROPFILES:
       handle_drop( ( HDROP )wParam );
-      break;
+      return 0;
 
     case WM_CLOSE:
       menu_file_exit( 0 );
-      break;
+      return 0;
 
     case WM_KEYDOWN:
       win32keyboard_keypress( wParam, lParam );
-      break;
+      return 0;
 
     case WM_KEYUP:
       win32keyboard_keyrelease( wParam, lParam );
-      break;
+      return 0;
 
     case WM_PAINT:
-      return win32ui_window_paint( hWnd, wParam, lParam ); 
+      if( ! win32ui_window_paint( hWnd, wParam, lParam ) )
+        return 0;
+      break;
 
     case WM_SIZING:
-      return win32ui_window_resizing( hWnd, wParam, lParam );
+      if( win32ui_window_resizing( hWnd, wParam, lParam ) )
+        return TRUE;
+      break;
 
     case WM_SIZE:
-      return win32ui_window_resize( hWnd, wParam, lParam );
+      if( ! win32ui_window_resize( hWnd, wParam, lParam ) )
+        return 0;
+      break;
 
     case WM_DRAWITEM:
       if( wParam == ID_STATUSBAR ) {
         win32statusbar_redraw( hWnd, lParam );
         return TRUE;
       }
+      break;
 
     case WM_DESTROY:
       fuse_exiting = 1;
@@ -162,20 +170,20 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       /* Stop the paused state to allow us to exit (occurs from main
          emulation loop) */
       if( paused ) menu_machine_pause( 0 );
-      break;
+      return 0;
 
     case WM_ENTERMENULOOP:
     case WM_ENTERSIZEMOVE:
     {
       fuse_emulation_pause();
-      break;
+      return 0;
     }
 
     case WM_EXITMENULOOP:
     case WM_EXITSIZEMOVE:
     {
       fuse_emulation_unpause();
-      break;
+      return 0;
     }
     
     case WM_LBUTTONUP:
@@ -220,12 +228,9 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       else if( LOWORD( wParam ) == WA_INACTIVE )
         return win32ui_lose_focus( hWnd, wParam, lParam );
       break;
-
-    default:
-      return( DefWindowProc( hWnd, msg, wParam, lParam ) );
   }
 
-  return 0;
+  return( DefWindowProc( hWnd, msg, wParam, lParam ) );
 }
 
 /* this is where windows program begins */
@@ -697,7 +702,6 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   switch( uMsg )
   {
     case WM_INITDIALOG: 
-    {
       /* items are passed to WM_INITDIALOG as lParam */
       items = ( win32ui_select_info * ) lParam;
       
@@ -720,6 +724,8 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
         if( i == items->selected ) {
           SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), BM_SETCHECK,
                               BST_CHECKED, 0 );
+          /* remember the default item, and return it in case of cancelling */
+          SetWindowLong( hwndDlg, GWL_USERDATA, i );
         }
 
         pos_y += 16;
@@ -746,16 +752,14 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y,
                     SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
       
-      return TRUE;
-    }
+      return FALSE;
+
     case WM_SETFONT:
-    {
       h_ms_font = (HFONT) wParam;
-      return TRUE;
-    }
+      return 0; /* "This message does not return a value." */
+
     case WM_COMMAND:
-    {
-      if ( HIWORD( wParam ) != BN_CLICKED ) return 0;
+      if ( HIWORD( wParam ) != BN_CLICKED ) break;
 
       /* service OK and Cancel buttons */
       switch LOWORD( wParam )
@@ -769,29 +773,25 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
             if( SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), 
                                     BM_GETCHECK, 0, 0 ) == BST_CHECKED ) {
               EndDialog( hwndDlg, i );
-              return TRUE;
+              return 0;
             }
             i++;
           }
-          return FALSE; /* program should never reach here */
+          break; /* program should never reach here */
         }
         case IDCANCEL:
-        {
-          EndDialog( hwndDlg, 0 );
-          return TRUE;
-        }
+          EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
+          return 0;
       }
       /* service clicking radiobuttons */
       /* FIXME should also be checking if wParam < offset + radio count */
-      if( LOWORD( wParam ) >= IDC_SELECT_OFFSET ) {
-        return TRUE;
-      }
-    }
+      if( LOWORD( wParam ) >= IDC_SELECT_OFFSET )
+        return 0;
+      break;
+
     case WM_DESTROY:
-    {
-      EndDialog( hwndDlg, 0 );
-      return TRUE;
-    }
+      EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
+      return 0;
   }
   return FALSE;
 }
@@ -863,7 +863,7 @@ win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 
 /* Handler for the main window's WM_SIZING notification.
    The handler is an equivalent of setting window geometry in GTK */
-static int
+static BOOL
 win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
   RECT *selr, wr, cr , statr;
@@ -924,8 +924,6 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
     selr->right = selr->left + width;
   }
 
-  /* FIXME: function is defined to return int,
-            check which one does window proc expect */
   return TRUE;
 }
 
