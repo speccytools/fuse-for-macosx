@@ -301,8 +301,8 @@ CODE
 
     if( $mode eq 'c' ) {
 	print << "CODE";
-    return 1;
   }
+  return 1;
 }
 CODE
     } elsif( $mode eq 'rc' ) {
