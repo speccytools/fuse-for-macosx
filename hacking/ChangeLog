@@ -2890,3 +2890,8 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 in choosing option 0 (Marek).
 20080906 menu_data.pl: Win32: Minor fix to the menu handling code - moved
 	 return into proper place (Marek).
+20080910 ui/win32/{roms.rc,win32joystick.rc,pokefinder.rc,options-resource.pl,
+	 browse.rc,picture.rc,memorybrowser.rc,binary.rc,debugger.rc,
+	 rollback.rc,select_template.rc}: Win32: Changed style for all dialogs
+	 to make those dialogs show on the taskbar, converted
+	 select_template.rc from DOS to UNIX (Marek).
