@@ -48,7 +48,7 @@ compat_fd
 compat_file_open( const char *path, int write )
 {
   int flags = write ? O_WRONLY | O_CREAT | O_BINARY : O_RDONLY | O_BINARY;
-  return open( path, flags );
+  return open( path, flags, 0666 );
 }
 
 off_t
