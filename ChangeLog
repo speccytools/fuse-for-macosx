@@ -1,3 +1,53 @@
+2008-11-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 0.10.0 released
+
+        * New upd765 FDC emulation; all known +3 DSK images now work (Gergely
+          Szasz; thanks to Simon Owen for expert technical advice).
+        * Loading acceleration (Philip Kendall).
+        * Many improvements to Win32 UI (mostly Marek Januszewski).
+        * Improved widget UI, with look and feel borrowed from that in FuseX
+          (Fredrick Meunier; thanks, crabfists).
+
+        * Emulation core improvements:
+          * New --late-timings option to emulate machines with 1 tstate
+            later timings (Philip Kendall)
+          * Reading from the 128K's memory control port causes that byte to
+            be written back to the port (Philip Kendall; thanks, Marat
+            Fayzullin).
+          * NMI causes Z80 to unHALT (Philip Kendall; thanks, Simon Owen).
+          * Emulate C, H and P/V flags on repeated IO instructions (Philip
+            Kendall).
+          * Fix crash when using Interface 1 on unoptimised Fuse builds
+            (Philip Kendall).
+
+        * Debugger improvements:
+          * Debugger events to allow the debugger to stop when various
+            Spectrum-level events happen (Philip Kendall).
+          * Allow debugger commands to be run when a breakpoint is hit.
+            No UI for this at present, but can be set from the command line.
+            (Philip Kendall).
+          * Command to exit emulator (Philip Kendall).
+          * Make time breakpoints work properly when more than one is present
+            (Philip Kendall).
+
+        * Miscellaneous improvements:
+          * Loader detection now works with the Digital Integration loader
+            (Philip Kendall).
+          * New HQ2X and HQ3x scalers (Gergely Szasz).
+          * Revert Pentagon 128 to being the "base" machine without extra
+            ROMs (Fredrick Meunier).
+          * Updated +3e ROMs (Fredrick Meunier; thanks, Garry Lancaster).
+          * Allow DivIDE, custom ROMs, Kempston mouse status and Simple 8-bit
+            IDE interface to be saved in snapshots (Fredrick Meunier).
+          * Better (but probably not perfect) TS2068 contention (Philip
+            Kendall).
+          * OpenSolaris compilation fixes (Fredrick Meunier; thanks, Andrew
+            Owen).
+          * C89 compatibility fixes (Fredrick Meunier; thanks, sweetlilmr).
+          * Remove GTK+'s build explicit dependency on Xlib (Philip Kendall).
+          * Minor AmigaOS improvements (Chris Young).
+
 2008-01-05  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
 	* Fuse 0.9.0 released

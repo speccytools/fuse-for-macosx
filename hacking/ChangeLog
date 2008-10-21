@@ -2899,3 +2899,4 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          for writing (fixes bug #2146742) (thanks, Cygnus) (Fred).
 20081021 z80/tests/README: small documentation update (patch #2183257)
          (Matthew Westcott).
+20081021 ChangeLog: update for 0.10.0 release.
