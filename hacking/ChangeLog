@@ -2897,3 +2897,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 select_template.rc from DOS to UNIX (Marek).
 20081006 compat/unix/file.c: make sure mode is specified when opening a file
          for writing (fixes bug #2146742) (thanks, Cygnus) (Fred).
+20081021 z80/tests/README: small documentation update (patch #2183257)
+         (Matthew Westcott).
