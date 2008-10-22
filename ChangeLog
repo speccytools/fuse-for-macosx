@@ -5,6 +5,7 @@
         * New upd765 FDC emulation; all known +3 DSK images now work (Gergely
           Szasz; thanks to Simon Owen for expert technical advice).
         * Loading acceleration (Philip Kendall).
+	* Automatic saves while using RZX recording (Philip Kendall).
         * Many improvements to Win32 UI (mostly Marek Januszewski).
         * Improved widget UI, with look and feel borrowed from that in FuseX
           (Fredrick Meunier; thanks, crabfists).

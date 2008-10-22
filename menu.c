@@ -93,7 +93,7 @@ MENU_CALLBACK( menu_file_recording_insertsnapshot )
   error = snapshot_copy_to( snap );
   if( error ) { libspectrum_snap_free( snap ); return; }
 
-  libspectrum_rzx_add_snap( rzx, snap );
+  libspectrum_rzx_add_snap( rzx, snap, 0 );
 
   libspectrum_rzx_start_input( rzx, tstates );
 }

@@ -2900,3 +2900,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081021 z80/tests/README: small documentation update (patch #2183257)
          (Matthew Westcott).
 20081021 ChangeLog: update for 0.10.0 release.
+20081022 menu.c,rzx.c,settings.dat,ui/options.dat: support for autosaves
+	 when using RZX recording.

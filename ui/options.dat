@@ -48,6 +48,7 @@ Posthook, periph_update
 
 rzx
 RZX Options
+Checkbox, Create (a)utosaves, rzx_autosaves, INPUT_KEY_a
 Checkbox, (C)ompress RZX data, rzx_compression, INPUT_KEY_c
 Checkbox, C(o)mpetition mode, competition_mode, INPUT_KEY_o
 Entry, Co(m)petition code, competition_code, INPUT_KEY_m, 8,
