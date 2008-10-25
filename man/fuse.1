@@ -80,6 +80,17 @@ or
 .\" the options list is in alphabetical order by long option name (or
 .\" short option name if none).
 .\"
+.I \-\-accelerate\-loader
+.RS
+Specify whether Fuse should attempt to accelerate tape loaders by "short
+circuiting" the loading loop. This will in general speed up loading, but
+may cause some loaders to fail. (Enabled by default, but you can use
+.RI ` \-\-no\-accelerate\-loader '
+to disable). The same as the General Options dialog's
+.I "Accelerate loaders"
+option.
+.RE
+.PP
 .I \-\-aspect\-hint
 .RS
 Specify whether the GTK+ and Xlib user interfaces should `hint' to the
@@ -115,6 +126,14 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
+.I \-\-beeper\-stereo
+.RS
+Specify whether fake stereo should be added to the emulation of the
+Spectrum beeper. Same as the Sound Options dialog's
+.I "Beeper pseudo-stereo"
+option.
+.RE
+.PP
 .I \-\-beta128
 .RS
 Emulate a Beta 128 interface. Same as the Peripherals Options dialog's
@@ -122,12 +141,9 @@ Emulate a Beta 128 interface. Same as the Peripherals Options dialog's
 option.
 .RE
 .PP
-.I \-\-beeper\-stereo
 .RS
-Specify whether fake stereo should be added to the emulation of the
-Spectrum beeper. Same as the Sound Options dialog's
-.I "Beeper pseudo-stereo"
-option.
+.I \-\-betadisk
+Specify a Betadisk image to load.
 .RE
 .PP
 .I \-\-bw\-tv
@@ -178,6 +194,15 @@ same as the General Options dialog's
 option.
 .RE
 .PP
+.I "\-\-debugger\-command string"
+.RS
+Specify a debugger command to be run before emulator startup. This can
+be used to set breakpoints or the like. Currently, this is the only
+method to input multi-line debugger commands. (See the
+.B "MONITOR/DEBUGGER"
+section for more information).
+.RE
+.PP
 .I "\-\-detect\-loader"
 .RS
 Specify whether Fuse should attempt to detect when the tape is being
@@ -189,10 +214,40 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
+.I \-\-divide
+.RS
+Emulate the DivIDE interface. The same as the Peripherals Options
+dialog's
+.I "DivIDE interface"
+option.
+.RE
+.PP
+.I "\-\-divide\-masterfile file"
+.br
+.I "\-\-divide\-slavefile file"
+.RS
+Specify an IDE image to be loaded into the DivIDE's emulated master
+and slave drives respectively.
+.RE
+.PP
+.I \-\-divide\-write\-protect
+.RS
+Specify that the emulated DivIDE's write protect jumper should be
+considered set. The same as the Peripherals Options dialog's
+.I "DivIDE write protect"
+option.
+.RE
+.PP
 .I "\-\-dock file"
 .RS
 Insert the specified file into the emulated Timex 2068 variant dock;
 also select the TC2068 on startup if available.
+.RE
+.PP
+.I "\-\-doublescan\-mode"
+.RS
+Specify the the framebuffer UI should attempt to use a double scan mode
+(where each line is displayed twice).
 .RE
 .PP
 .I "\-\-embed\-snapshot"
@@ -291,7 +346,9 @@ option.
 .PP
 .I \-\-interface2
 .RS
-Emulate a Sinclair Interface II. Same as the Peripherals Options dialog's
+Emulate a Sinclair Interface II. (Enabled by default, but you can use
+.RI ` \-\-no\-interface2 '
+to disable). Same as the Peripherals Options dialog's
 .I "Interface II"
 option.
 .RE
@@ -326,6 +383,16 @@ or
 .RI ` /dev/js1 "'."
 .RE
 .PP
+.I \-\-joystick-prompt
+.RS
+If this option is specified, Fuse Fuse will prompt you which form of
+joystick emulation you wish to use when loading a snapshot. No prompt
+will be issued if the configuration in the snapshot matches what you
+are currently using. The same as the General Options dialog's
+.I "Snap joystick prompt"
+option.
+.RE
+.PP
 .I \-\-kempston
 .RS
 Emulate a Kempston joystick. Same as the Peripherals Options dialog's
@@ -337,6 +404,16 @@ option.
 .RS
 Emulate a Kempston mouse. Same as the Peripherals Options dialog's
 .I "Kempston mouse"
+option.
+.RE
+.PP
+.I \-\-late\-timings
+.RS
+It has been observed that some real Spectrums run such that the screen
+is rendered one tstate later than on other real hardware. This option
+specifies that Fuse should emulate such a machine. Same as the General
+Options dialog's
+.I "Late timings"
 option.
 .RE
 .PP
@@ -574,6 +651,16 @@ Specify the communication channels (FIFO or file) to be used for
 Interface I RS-232 emulation as RxD and TxD wire. See also the
 .RI ` \-\-rs232\-handshake '
 options.
+.RE
+.PP
+.I \-\-rzx-autosaves
+.RS
+Specify that, while recording an RZX file, Fuse should automatically add
+a snapshot to the recording stream every 5 seconds. (Default to on, but
+you can use
+.RI ` \-\-no-rzx-autosaves '
+to disable). Same as the RZX Options dialog's "Create autosaves" option;
+see there for more details.
 .RE
 .PP
 .I \-\-separation
@@ -1453,6 +1540,14 @@ If set, Fuse will prompt you which physical joystick or keyboard you want
 to connect to the joystick interface enabled in the snapshot unless it
 already matches your current configuration.
 .RE
+.PP
+.I "Late timings"
+.RS
+If selected, Fuse will cause all screen-related timings (for example,
+when the screen is rendered and when memory contention occurs) to be
+one tstate later than "normal", an effect which is present on some real
+hardware.
+.RE
 .RE
 .PP
 .I "Options, Sound..."
@@ -1676,6 +1771,20 @@ confirms any changes, and
 .I Esc
 aborts). Note that any changed settings only apply to the
 currently-running Fuse.
+.PP
+.I "Create autosaves"
+.RS
+If this option is selected, Fuse will add a snapshot into the recording
+stream every 5 seconds while creating an RZX file, thus enabling the
+rollback facilities to be used without having to explicitly add
+snapshots into the stream. Older snapshots will be pruned from the
+stream to keep the file size and number of snapshots down: each snapshot
+up to 15 seconds will be kept, then one snapshot every 15 seconds until
+one minute, then one snapshot every minute until 5 minutes, and then one
+snapshot every 5 minutes. Note that this "pruning" applies only to
+automatically inserted snapshots: snapshots manually inserted into the
+stream will never be pruned.
+.RE
 .PP
 .I "Compress RZX data"
 .RS
@@ -1960,11 +2069,11 @@ offering a more powerful firmware.
 .RS
 Another Russian clone of the Spectrum. Some details can be found
 at
-.IR "http://www.worldofspectrum.org/rusfaq/index.html" , like all the
-Russian clones they they have built in 3.5" disk drives, accessed via
-the Beta 128 disk interface and TR-DOS (the Technology Research Disk
-Operating System). The most important distinction from the Pentagon
-128k and similar machines is the display timing details.
+.IR "http://www.worldofspectrum.org/rusfaq/index.html" ,
+like all the Russian clones they they have built in 3.5" disk drives,
+accessed via the Beta 128 disk interface and TR-DOS (the Technology
+Research Disk Operating System). The most important distinction from
+the Pentagon 128k and similar machines is the display timing details.
 .RE
 .PP
 .I "Spectrum SE"
@@ -3319,7 +3428,8 @@ warnings. This is a GTK+ bug (#144427), which is fixed in GTK+ 2.4.4.
 .PP
 The libao file output devices not work properly with the GTK+ UI.
 No error reporting, but the created file does not contain any sound data.
-If you use a `weak' machine alsa09 make a lot of click and pop with
+If you use a `weak' machine alsa09 makes a lot of clicks and pops and
+will output
 .RI ` "ALSA: underrun, at least 0ms." '
 error messages.
 .\"
