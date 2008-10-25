@@ -3008,9 +3008,63 @@ br{eakpoint} ti{me}
 .RS
 Set a breakpoint to occur
 .I time
-tstates after the start of the current frame, assuming
+tstates after the start of the every frame, assuming
 .I condition
 evaluates true (if one is given).
+.RE
+.PP
+br{eakpoint} ev{ent}
+.IR area : detail " [" condition ]
+.RS
+Set a breakpoint to occur when the event specified by
+.IR area : detail
+occurs and
+.I condition
+evaluates to true. The events which can be caught are:
+.PP
+divide:page
+.br
+divide:unpage
+.RS
+The DivIDE interface is paged into or out of memory respectively
+.RE
+.br
+if1:page
+.br
+if1:unpage
+.RS
+The Interface 1 shadow ROM is paged into or out of memory
+.RE
+.br
+rzx:end
+.RS
+An RZX recording finishes playing
+.RE
+.br
+tape:play
+.br
+tape:stop
+.RS
+The emulated tape starts or stops playing
+.RE
+.br
+zxcf:page
+.br
+zxcf:unpage
+.RS
+The ZXCF interface is paged into or out of memory
+.RE
+.br
+zxatasp:page
+.br
+zxatasp:unpage
+.RS
+The ZXATASP interface is paged into or out of memory
+.RE
+.PP
+In all cases, the event can be specified as
+.IR area :*
+to catch all events from that area.
 .RE
 .PP
 cl{ear}
@@ -3021,6 +3075,25 @@ Remove all breakpoints at
 or the current value of PC if
 .I address
 is omitted. Port read/write breakpoints are unaffected.
+.RE
+.PP
+com{mmands}
+.I id <newline>
+.br
+.I <debugger command> <newline>
+.br
+.I <debugger command> <newline>
+.br
+.I ...
+.br
+end
+.RS
+Set things such that the specified debugger commands will be
+automatically executed when breakpoint
+.I id
+is triggered. There is currently no user interface for entering
+multi-line debugger commands, so the only way to specify this command is
+on the command-line via the \-\-debugger\-command option.
 .RE
 .PP
 cond{ition}
@@ -3057,6 +3130,11 @@ di{sassemble}
 .RS
 Set the centre panel disassembly to begin at
 .IR address .
+.RE
+.PP
+ex{it}
+.RS
+Exit the emulator immediately.
 .RE
 .PP
 fi{nish}
