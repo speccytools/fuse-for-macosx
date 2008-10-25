@@ -3404,8 +3404,9 @@ DISCiPLE/+D file formats.
 .RE
 .PP
 .I .SAD
+.I .SDF
 .RS
-For compatibility with SAM Coup\('e disk images using this format.
+For compatibility with SAM Coup\('e disk images using these formats.
 Note that SAM Coup\('e `.DSK' images share the same format as `.MGT'.
 .RE
 .PP
@@ -3438,11 +3439,6 @@ section and the CPCEMU manual section 7.7.1
 .I http://www.cpc-emu.org/linux/cpcemu_e.txt
 .RE
 .PP
-.I .SDF
-.RS
-TODO
-.RE
-.PP
 Fuse supports most of them for writing:
 .I .UDI .FDI .MGT .IMG .SAD .TRD .SCL .DSK
 (only the old CPC format).
@@ -3472,9 +3468,7 @@ recording files can be read from files compressed with
 or
 .IR gzip (3)
 just as if they were uncompressed.
-.I libdsk
-provides an equivalent functionality for +3 images if available,
-but there is currently no support for reading compressed +D or Beta
+There is currently no support for reading compressed +3, +D or Beta
 disk images.
 .\"
 .\"------------------------------------------------------------------

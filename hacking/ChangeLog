@@ -2904,3 +2904,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 when using RZX recording.
 20081024 man/fuse.1: update. Still TODO: debugger updates.
 20081024 man/fuse.1: debugger updates.
+20081024 man/fuse.1: minor update for disk formats and compressed disk images
+         (Fred).
