@@ -380,7 +380,7 @@ AC_CHECK_HEADER(
 dnl Check if libsamplerate is available
 AC_MSG_CHECKING(whether libsamplerate support requested)
   AC_ARG_WITH(libsamplerate,
-  [  --without-libsamplerate use libsamplerate],
+  [  --without-libsamplerate don't use libsamplerate],
   if test "$withval" = no; then libsamplerate=no; else libsamplerate=yes; fi,
   libsamplerate=yes)
 AC_MSG_RESULT($libsamplerate)

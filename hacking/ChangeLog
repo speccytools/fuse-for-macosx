@@ -2906,3 +2906,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081024 man/fuse.1: debugger updates.
 20081024 man/fuse.1: minor update for disk formats and compressed disk images
          (Fred).
+20081028 configure.in: Fixed a typo in the configure script
+	 (was '--without-libsamplerate use libsamplerate') (Marek).
