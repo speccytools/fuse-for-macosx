@@ -751,6 +751,10 @@ static int fuse_end(void)
      set from memory for the text output */
   printer_end();
 
+  /* also required before memory is deallocated on Fuse for OS X where
+     settings need to look up machine names etc. */
+  settings_end();
+
   psg_end();
   rzx_end();
   debugger_end();
@@ -773,8 +777,6 @@ static int fuse_end(void)
 #ifdef USE_WIDGET
   widget_end();
 #endif                          /* #ifdef USE_WIDGET */
-
-  settings_end();
 
   libspectrum_creator_free( fuse_creator );
 

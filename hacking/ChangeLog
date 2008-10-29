@@ -2908,3 +2908,7 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          (Fred).
 20081028 configure.in: Fixed a typo in the configure script
 	 (was '--without-libsamplerate use libsamplerate') (Marek).
+20081029 fuse.c: move up settings_end to happen just after printer_end for
+         simmilar reasons - on OS X settings_end refers to machine and other
+         entries, so must be complete before deallocating the machine arrays
+         (Fred).
