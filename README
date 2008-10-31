@@ -5,8 +5,9 @@ Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
 unsurprisingly, an emulator of the ZX Spectrum (a popular 1980s home
 computer, especially in the UK) for Unix. However, it has now also
 been ported to Mac OS X, which may or may not count as a Unix variant
-depending on your advocacy position and emulates some of the
-better-known ZX Spectrum clones as well.
+depending on your advocacy position and Windows which definitely isn't
+a Unix variant. Fuse also emulates some of the better-known ZX Spectrum
+clones as well.
 
 What Fuse does have:
 
@@ -15,7 +16,7 @@ What Fuse does have:
   Pentagon 128, "512" (Pentagon 128 with extra memory) and 1024 and
   Scorpion ZS 256 emulation.
 * Runs at true Speccy speed on any computer you're likely to try it on.
-* Support for loading from .tzx files.
+* Support for loading from .tzx files, including accelerated loading.
 * Sound (on systems supporting the Open Sound System, SDL, or OpenBSD/
   Solaris's /dev/audio).
 * Emulation of most of the common joysticks used on the Spectrum
