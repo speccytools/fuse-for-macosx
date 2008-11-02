@@ -165,7 +165,7 @@ fdd_motoron( fdd_t *d, int on )
 			 machine_current->timings.processor_speed / 10,
 			 motor_event, d );
   } else {
-    event_add_with_data( tstates + 2 *			/* 1 revolution */
+    event_add_with_data( tstates + 3 *			/* 1.5 revolution */
 			 machine_current->timings.processor_speed / 10,
 			 motor_event, d );
   }

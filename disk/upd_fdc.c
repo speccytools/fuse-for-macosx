@@ -187,7 +187,7 @@ read_id( upd_fdc *f )
     			      UPD_FDC_ST1_NO_DATA );
   f->id_mark = UPD_FDC_AM_NONE;
   i = f->rev;
-  while( i == f->rev ) {
+  while( i == f->rev && d->fdd.ready ) {
     fdd_read_write_data( &d->fdd, FDD_READ ); if( d->fdd.index ) f->rev--;
     crc_preset( f );
     if( f->mf ) {	/* double density (MFM) */
@@ -242,6 +242,7 @@ read_id( upd_fdc *f )
       return 0;		/* found and OK */
     }
   }
+  if(!d->fdd.ready) f->rev = 0;
   f->status_register[1] |= UPD_FDC_ST1_MISSING_AM | UPD_FDC_ST1_NO_DATA;	/*FIXME _NO_DATA? */
   return 2;		/* not found */
 }
