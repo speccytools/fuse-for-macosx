@@ -2916,3 +2916,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081102 disk/{fdd.c,upd_fdc.c}: stop hang if asked for index hole when disk
          motor is off, and change spindown time so that The Running Man disk
          works (bug #2212424) (Gergely Szasz; thanks, Mark Woodmass).
+20081102 ui/win32/win32ui.c: Win32: Made ui_error_specific function work
+	 similarly to the gtk ui equivalent (Marek).
