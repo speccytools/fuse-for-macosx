@@ -27,17 +27,12 @@
 
 #include <config.h>
 
-#if !defined USE_JOYSTICK || defined HAVE_JSW_H
-#include "../uijoystick.c"
-#else
-  /* FIXME: implement win32 joystick using mmsystem, not jsw */
-#endif
-
 #include <tchar.h>
 #include <windows.h>
 
 #include "fuse.h"
 #include "joystick.h"
+#include "input.h"
 #include "keyboard.h"
 #include "menu.h"
 #include "settings.h"
@@ -45,6 +40,126 @@
 
 #include "win32joystick.h"
 
+#if !defined USE_JOYSTICK || defined HAVE_JSW_H
+
+#include "../uijoystick.c"
+
+#else /* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
+
+/* Functions to handle Joystick events */
+#include "ui/ui.h"
+#include "ui/uijoystick.h"
+
+static void do_axis( int which, WORD value,
+                     input_key negative, input_key positive );
+
+int
+ui_joystick_init( void )
+{
+  int retval;
+  JOYINFO joyinfo;
+
+  retval = joyGetNumDevs();
+
+  if( retval >= 2 ) {
+
+    retval = 2;
+
+    if( joyGetPos( JOYSTICKID2, &joyinfo ) == JOYERR_UNPLUGGED ) {
+      ui_error( UI_ERROR_ERROR, "failed to initialise joystick 2" );
+      return 0;
+    }
+  }
+
+  if( retval > 0 ) {
+
+    if( joyGetPos( JOYSTICKID1, &joyinfo ) == JOYERR_UNPLUGGED ) {
+      ui_error( UI_ERROR_ERROR, "failed to initialise joystick 1" );
+      return 0;
+    }
+  }
+
+  return retval;
+}
+
+void
+ui_joystick_poll( void )
+{
+  /* No action needed; joysticks already handled by the Window messages
+     sent by mmsystem */
+}
+
+void
+win32joystick_buttonevent( int which_joystick, int button_down,
+                           unsigned int wParam )
+{
+  input_event_t event;
+  int button = 0;
+  
+  if( wParam & JOY_BUTTON1 ) button = INPUT_JOYSTICK_FIRE_1;
+  else if( wParam & JOY_BUTTON2 ) button = INPUT_JOYSTICK_FIRE_2;
+  else if( wParam & JOY_BUTTON3 ) button = INPUT_JOYSTICK_FIRE_3;
+  else if( wParam & JOY_BUTTON4 ) button = INPUT_JOYSTICK_FIRE_4;
+  else if( wParam & JOY_BUTTON5 ) button = INPUT_JOYSTICK_FIRE_5;
+  else if( wParam & JOY_BUTTON6 ) button = INPUT_JOYSTICK_FIRE_6;
+  else if( wParam & JOY_BUTTON7 ) button = INPUT_JOYSTICK_FIRE_7;
+  else if( wParam & JOY_BUTTON8 ) button = INPUT_JOYSTICK_FIRE_8;
+  else if( wParam & JOY_BUTTON9 ) button = INPUT_JOYSTICK_FIRE_9;
+  else if( wParam & JOY_BUTTON10 ) button = INPUT_JOYSTICK_FIRE_10;
+  else return; /* Fuse supports up to 10 joystick buttons */
+ 
+  event.types.joystick.which = which_joystick; 
+  event.type = button_down
+               ? INPUT_EVENT_JOYSTICK_PRESS : INPUT_EVENT_JOYSTICK_RELEASE;
+  event.types.joystick.button = button;
+  input_event( &event );
+}
+
+void
+win32joystick_move( int which_joystick, unsigned short pos_x,
+                    unsigned short pos_y )
+{
+  do_axis( which_joystick, pos_x,
+    INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
+  do_axis( which_joystick, pos_y,
+    INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
+}
+
+static void
+do_axis( int which, WORD value, input_key negative, input_key positive )
+{
+  input_event_t event1, event2;
+
+  event1.types.joystick.which = event2.types.joystick.which = which;
+
+  event1.types.joystick.button = negative;
+  event2.types.joystick.button = positive;
+
+  /* MS Windows sends a value between 0 and 65535, hopefully those will work */
+  if( value > 49152 ) {
+    event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+    event2.type = INPUT_EVENT_JOYSTICK_PRESS;
+  } else if( value < 16384 ) {
+    event1.type = INPUT_EVENT_JOYSTICK_PRESS;
+    event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  } else {
+    event1.type = INPUT_EVENT_JOYSTICK_RELEASE;
+    event2.type = INPUT_EVENT_JOYSTICK_RELEASE;
+  }
+
+  input_event( &event1 );
+  input_event( &event2 );
+}
+
+void
+ui_joystick_end( void )
+{
+  /* Initialization and unitialization is handled by MS Windows */
+}
+
+#endif /* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
+
+/* Win32 UI functions to handle Joystick options menus */
 struct button_info {
   int *setting;
   TCHAR name[80];

@@ -62,3 +62,15 @@
 #define IDC_JOYSTICKS_BUTTON_BUTTON10 ( IDC_JOYSTICKS_BUTTON_BUTTON9 + 1 )
 
 #define IDR_JOYSTICKS_POPUP           ( IDC_JOYSTICKS_BUTTON_BUTTON10 + 1 )
+
+/*
+   win32joystick_buttonevent parameters:
+   which_joystick = 0 => JOYSTICK1
+   which_joystick = 1 => JOYSTICK2
+   button_down = 1 => button pressed
+   button_down = 0 => button released
+*/
+void win32joystick_buttonevent( int which_joystick, int button_down,
+                                unsigned int wParam );
+void win32joystick_move( int which_joystick,
+                         unsigned short pos_x, unsigned short pos_y );

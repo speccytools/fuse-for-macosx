@@ -28,6 +28,7 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "joystick.h"
 #include "keyboard.h"
 #include "menu.h"
 #include "menu_data.h"
@@ -40,9 +41,9 @@
 #include "tape.h"
 #include "timer/timer.h"
 #include "ui/ui.h"
-#include "ui/uijoystick.h"
 #include "utils.h"
 #include "win32internals.h"
+#include "win32joystick.h"
 
 /* fuse_hPrevInstance is needed only to register window class */
 static HINSTANCE fuse_hPrevInstance;
@@ -120,6 +121,20 @@ static LRESULT WINAPI
 fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
+
+#if defined USE_JOYSTICK && !defined HAVE_JSW_H
+
+    case WM_CREATE:
+      if( joysticks_supported > 0 )
+        if( joySetCapture( hWnd, JOYSTICKID1, 0, FALSE ) )
+          ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 1" );
+      if( joysticks_supported > 1 )
+        if( joySetCapture( hWnd, JOYSTICKID2, 0, FALSE ) )
+          ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 2" );
+      break;      
+
+#endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
+
     case WM_COMMAND:
       if( ! handle_menu( LOWORD( wParam ), hWnd ) )
         return 0;
@@ -228,8 +243,36 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       else if( LOWORD( wParam ) == WA_INACTIVE )
         return win32ui_lose_focus( hWnd, wParam, lParam );
       break;
-  }
 
+#if defined USE_JOYSTICK && !defined HAVE_JSW_H
+
+    case MM_JOY1BUTTONDOWN:
+      win32joystick_buttonevent( 0, 1, wParam );
+      break;
+
+    case MM_JOY1BUTTONUP:
+      win32joystick_buttonevent( 0, 0, wParam );
+      break;
+
+    case MM_JOY2BUTTONDOWN:
+      win32joystick_buttonevent( 1, 1, wParam );
+      break;
+
+    case MM_JOY2BUTTONUP:
+      win32joystick_buttonevent( 1, 0, wParam );
+      break;
+
+    case MM_JOY1MOVE:
+      win32joystick_move( 0, LOWORD( lParam ), HIWORD( lParam ) );
+      break;
+
+    case MM_JOY2MOVE:
+      win32joystick_move( 1, LOWORD( lParam ), HIWORD( lParam ) );
+      break;
+
+#endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
+
+  }
   return( DefWindowProc( hWnd, msg, wParam, lParam ) );
 }
 
@@ -636,25 +679,6 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
   STUB;
   return UI_CONFIRM_JOYSTICK_NONE;
-}
-
-int
-ui_joystick_init( void )
-{
-  STUB;
-  return 0;
-}
-
-void
-ui_joystick_end( void )
-{
-  STUB;
-}
-
-void
-ui_joystick_poll( void )
-{
-  /* STUB; */
 }
 
 /*

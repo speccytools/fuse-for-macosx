@@ -2918,3 +2918,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          works (bug #2212424) (Gergely Szasz; thanks, Mark Woodmass).
 20081102 ui/win32/win32ui.c: Win32: Made ui_error_specific function work
 	 similarly to the gtk ui equivalent (Marek).
+20081102 ui/win32/{win32ui.c,win32internals.h,win32joystick.[ch}: Win32:
+	 Implemented joystick handling using mmsystem API (and tested using PPJoy
+	 joystick emulator, hope it works with real hardware) (Marek).
