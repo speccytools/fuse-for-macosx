@@ -2922,3 +2922,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 Implemented joystick handling using mmsystem API (and tested using PPJoy
 	 joystick emulator, hope it works with real hardware) (Marek).
 20081108 disk/disk.c: prevent array overrun (bug #2240211) (Gergely Szasz).
+20081108 disk/disk.c,fuse.c,utils.c: use libspectrum's ability to
+         identify more disk image formats (patch #2233744) (Gergely Szasz).

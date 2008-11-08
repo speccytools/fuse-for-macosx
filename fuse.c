@@ -554,6 +554,23 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_DISK_TRDOS:
       start_files->disk_beta = filename; break;
 
+    case LIBSPECTRUM_CLASS_DISK_GENERIC:
+      if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PLUS2A )
+        start_files->disk_plus3 = filename;
+      else if( machine_current->machine == LIBSPECTRUM_MACHINE_PENT ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT512 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT1024 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
+        start_files->disk_beta = filename; 
+      else {
+        if( periph_beta128_active )
+          start_files->disk_beta = filename; 
+        else if( periph_plusd_active )
+          start_files->disk_plusd = filename;
+      }
+      break;
+
     case LIBSPECTRUM_CLASS_RECORDING:
       start_files->playback = filename; break;
 

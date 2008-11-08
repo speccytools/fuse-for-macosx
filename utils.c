@@ -134,6 +134,22 @@ utils_open_file( const char *filename, int autoload,
     error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
     break;
 
+  case LIBSPECTRUM_CLASS_DISK_GENERIC:
+    if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ||
+        machine_current->machine == LIBSPECTRUM_MACHINE_PLUS2A )
+      error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename, autoload );
+    else if( machine_current->machine == LIBSPECTRUM_MACHINE_PENT ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT512 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT1024 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
+      error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
+    else
+      if( periph_beta128_active )
+        error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
+      else if( periph_plusd_active )
+        error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
+    break;
+
   case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:
     error = if2_insert( filename );
     break;
