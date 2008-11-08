@@ -944,7 +944,7 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 {
   int i, j, seclen, idlen, gap;
   int bpt, max_bpt = 0, trlen;
-  int fix[42], plus3_fix;
+  int fix[84], plus3_fix;
 
   d->sides = head[0x31];
   d->cylinders = head[0x30];				/* maximum number of tracks */
@@ -963,7 +963,7 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
     					    GAP_MINIMAL_MFM;
     plus3_fix = trlen = 0;
     while( i < head[0x10] * d->sides + head[0x11] ) {
-      if( i < 42 ) fix[i] = 0;
+      if( i < 84 ) fix[i] = 0;
       i++;
     }
     bpt = postindex_len( d, gap ) +
@@ -975,7 +975,7 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
 				    : 0x80 << head[ 0x1b + 8 * j ];
       bpt += calc_sectorlen( gap == GAP_MINIMAL_MFM ? 1 : 0, seclen, gap );
       trlen += seclen;
-      if( i < 42 && d->flag & DISK_FLAG_PLUS3_CPC ) {
+      if( i < 84 && d->flag & DISK_FLAG_PLUS3_CPC ) {
         if( j == 0 && head[ 0x1b + 8 * j ] == 6 && seclen > 6144 )
 	  plus3_fix = 4;
         else if( j == 0 && head[ 0x1b + 8 * j ] == 6 )
@@ -998,7 +998,7 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       if( seclen == 0x80 )		/* every 128byte length sector padded */
 	fseek( file, 0x80, SEEK_CUR );
     }
-    if( i < 42 ) {
+    if( i < 84 ) {
       fix[i] = plus3_fix;
       if( fix[i] == 4 )      bpt = 6500;/* Type 1 variant DD+ (e.g. Coin Op Hits) */
       else if( fix[i] != 0 ) bpt = 6250;/* we assume a standard DD track */
@@ -1045,7 +1045,7 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
       if( seclen > idlen && seclen % idlen )		/* seclen != N * len */
 	return d->status = DISK_OPEN;
 
-      if( fix[i] == 2 && j == 0 ) {	/* repositionate the dummy track  */
+      if( i < 84 && fix[i] == 2 && j == 0 ) {	/* repositionate the dummy track  */
         d->i = 8;
       }
       id_add( d, head[ 0x19 + 8 * j ], head[ 0x18 + 8 * j ],
@@ -1053,22 +1053,22 @@ open_cpc( FILE *file, disk_t *d, disk_type_t type, int preindex )
                   head[ 0x1c + 8 * j ] & 0x20 && !( head[ 0x1d + 8 * j ] & 0x20 ) ? 
                   CRC_ERROR : CRC_OK );
 
-      if( fix[i] == 1 && j == 0 ) {	/* 6144 */
+      if( i < 84 && fix[i] == 1 && j == 0 ) {	/* 6144 */
         data_add( d, file, NULL, seclen, 
     		head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
 		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?
 		CRC_ERROR : CRC_OK, 0x00 );
-      } else if( fix[i] == 2 && j == 0 ) {	/* 6144, 10x512 */
+      } else if( i < 84 && fix[i] == 2 && j == 0 ) {	/* 6144, 10x512 */
         datamark_add( d, head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap );
         gap_add( d, 2, gap );
         fseek( file, seclen, SEEK_CUR );
-      } else if( fix[i] == 3 ) {	/* 128, 256, 512, ... 4096k */
+      } else if( i < 84 && fix[i] == 3 ) {	/* 128, 256, 512, ... 4096k */
         data_add( d, file, NULL, 128, 
     		head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
 		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?
 		CRC_ERROR : CRC_OK, 0x00 );
         fseek( file, seclen - 128, SEEK_CUR );
-      } else if( fix[i] == 4 ) {	/* Nx8192 (max 6384 byte ) */
+      } else if( i < 84 && fix[i] == 4 ) {	/* Nx8192 (max 6384 byte ) */
         data_add( d, file, NULL, 6384,
     		head[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap, 
 		head[ 0x1c + 8 * j ] & 0x20 && head[ 0x1d + 8 * j ] & 0x20 ?

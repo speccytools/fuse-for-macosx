@@ -2921,3 +2921,4 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081102 ui/win32/{win32ui.c,win32internals.h,win32joystick.[ch}: Win32:
 	 Implemented joystick handling using mmsystem API (and tested using PPJoy
 	 joystick emulator, hope it works with real hardware) (Marek).
+20081108 disk/disk.c: prevent array overrun (bug #2240211) (Gergely Szasz).
