@@ -996,6 +996,10 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
       if( i < 84 ) fix[i] = 0;
       i++;
     }
+    if( i >= d->sides*d->cylinders || 
+	i != buff[0x10] * d->sides + buff[0x11] )	/* problem with track idx. */
+      return d->status = DISK_OPEN;
+
     bpt = postindex_len( d, gap ) +
 	    ( preindex ? preindex_len( d, gap ) : 0 ) +
 		( gap == GAP_MINIMAL_MFM ? 6 : 3 );	/* gap4 */
