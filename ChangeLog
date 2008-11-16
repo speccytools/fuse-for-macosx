@@ -16,6 +16,8 @@
           * Reading from the 128K's memory control port causes that byte to
             be written back to the port (Philip Kendall; thanks, Marat
             Fayzullin).
+	  * Reading the AY data port on the +2A/+3 is the same as reading
+	    the register port (Philip Kendall; thanks, Mark Woodmass).
           * NMI causes Z80 to unHALT (Philip Kendall; thanks, Simon Owen).
           * Emulate C, H and P/V flags on repeated IO instructions (Philip
             Kendall).

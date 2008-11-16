@@ -44,7 +44,7 @@ static const periph_t peripherals[] = {
   { 0x0001, 0x0000, ula_read, ula_write },
   { 0x00e0, 0x0000, joystick_kempston_read, NULL },
   { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, NULL, ay_dataport_write },
+  { 0xc002, 0x8000, ay_registerport_read, ay_dataport_write },
   { 0xc002, 0x4000, NULL, spec128_memoryport_write },
   { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
   { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
