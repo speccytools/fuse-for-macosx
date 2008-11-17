@@ -2930,3 +2930,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081116 ChangeLog,machines/{specplus2a.c,specplus3.c}: reading from the
 	 AY data port on the +2A/+3 is the same as reading from the
          register port (thanks, Mark Woodmass).
+20081118 rzx.c: don't autosave rzx snapshots when we are recording in compo
+         mode (Fred).

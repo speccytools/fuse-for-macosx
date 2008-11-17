@@ -474,7 +474,8 @@ static int recording_frame( void )
 
   }
 
-  if( settings_current.rzx_autosaves ) autosave_frame();
+  if( !rzx_competition_mode && settings_current.rzx_autosaves )
+    autosave_frame();
 
   return 0;
 }
