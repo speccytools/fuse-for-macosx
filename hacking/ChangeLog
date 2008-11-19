@@ -2932,3 +2932,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          register port (thanks, Mark Woodmass).
 20081118 rzx.c: don't autosave rzx snapshots when we are recording in compo
          mode (Fred).
+20081119 disk/{disk.c,upd_fdc.c}: fix READ_DIAG emlation bugs to support
+         LERM Plus-3-Mate (fixes bug #2312217) (Gergely Szasz).

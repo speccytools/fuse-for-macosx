@@ -905,15 +905,18 @@ upd_fdc_read_data( upd_fdc *f )
 	f->data_offset++;
       }
     }
-    if( f->data_offset == f->sector_length ) {	/* read the CRC */
+    if( ( f->cmd->id == UPD_CMD_READ_DIAG && f->data_offset == f->rlen ) ||
+	( f->cmd->id == UPD_CMD_READ_DATA && f->data_offset == f->sector_length ) ) {	/* read the CRC */
       fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
       fdd_read_write_data( &d->fdd, FDD_READ ); crc_add( f, d );
       if( f->crc != 0x000 ) {
 	f->status_register[2] |= UPD_FDC_ST2_DATA_ERROR;
 	f->status_register[1] |= UPD_FDC_ST1_CRC_ERROR;
-	f->status_register[0] |= UPD_FDC_ST0_INT_ABNORM;
-        cmd_result( f );			/* set up result phase */
-    	return r;
+	if( f->cmd->id == UPD_CMD_READ_DATA ) {		/* READ DIAG not aborted! */
+	  f->status_register[0] |= UPD_FDC_ST0_INT_ABNORM;
+	  cmd_result( f );			/* set up result phase */
+	  return r;
+        }
       }
 	
       if( f->cmd->id == UPD_CMD_READ_DATA ) {
