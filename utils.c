@@ -159,7 +159,10 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
-    error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
+    if( !( machine_current->capabilities &
+	   LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
+      error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
+    }
     error = dck_insert( filename );
     break;
 

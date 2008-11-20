@@ -2936,3 +2936,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          LERM Plus-3-Mate (fixes bug #2312217) (Gergely Szasz).
 20081120 compat/amiga/paths.c: implement compat_is_absolute_path for Amiga
          (final part of patch #1712260) (Chris Young).
+20081120 utils.c: don't switch machine on autoloading a Timex dock cart if we
+         can already support them (Fred).
