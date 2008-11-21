@@ -1016,8 +1016,11 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 				      256 * buff[ 0x1f + 8 * j ]
 				    : 0x80 << buff[ 0x1b + 8 * j ];
       idlen = 0x80 << buff[ 0x1b + 8 * j ];	/* sector length from ID */
-      bpt += calc_sectorlen( gap == GAP_MINIMAL_MFM ? 1 : 0, idlen, gap );
-      trlen += seclen;
+      if( idlen != 0 && idlen <= ( 0x80 << 0x08 ) && 		/* idlen is o.k. */
+          seclen > idlen && seclen % idlen )			/* seclen != N * len */
+	return d->status = DISK_OPEN;
+
+      bpt += calc_sectorlen( gap == GAP_MINIMAL_MFM ? 1 : 0, seclen > idlen ? idlen : seclen, gap );
       if( i < 84 && d->flag & DISK_FLAG_PLUS3_CPC ) {
         if( j == 0 && buff[ 0x1b + 8 * j ] == 6 && seclen > 6144 )
 	  plus3_fix = CPC_ISSUE_4;
@@ -1043,6 +1046,7 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 		 buff[ 0x1b + 8 * j ] != 2 - ( j & 1 ) )
 	  plus3_fix = CPC_ISSUE_NONE;
       }
+      trlen += seclen;
       if( seclen == 0x80 )		/* every 128byte length sector padded */
 	sector_pad++;
     }
@@ -1086,9 +1090,6 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
       trlen += seclen;
       if( idlen == 0 || idlen > ( 0x80 << 0x08 ) )      /* error in sector length code -> ignore */
         idlen = seclen;
-
-      if( seclen > idlen && seclen % idlen )		/* seclen != N * len */
-	return d->status = DISK_OPEN;
 
       if( i < 84 && fix[i] == 2 && j == 0 ) {	/* repositionate the dummy track  */
         d->i = 8;

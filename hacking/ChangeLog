@@ -2938,3 +2938,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          (final part of patch #1712260) (Chris Young).
 20081120 utils.c: don't switch machine on autoloading a Timex dock cart if we
          can already support them (Fred).
+20081122 disk/disk.c: fix a track length calculation bug (more of bug #2312217)
+         (Gergely Szasz).
