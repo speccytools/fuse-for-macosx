@@ -1080,14 +1080,13 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
     if( preindex)
       preindex_add( d, gap );
     postindex_add( d, gap );
-    trlen = 0;
+
     for( j = 0; j < hdrb[0x15]; j++ ) {			/* each sector */
       seclen = d->type == DISK_ECPC ? hdrb[ 0x1e + 8 * j ] +	/* data length in sector */
 				      256 * hdrb[ 0x1f + 8 * j ]
 				    : 0x80 << hdrb[ 0x1b + 8 * j ];
       idlen = 0x80 << hdrb[ 0x1b + 8 * j ];		/* sector length from ID */
 
-      trlen += seclen;
       if( idlen == 0 || idlen > ( 0x80 << 0x08 ) )      /* error in sector length code -> ignore */
         idlen = seclen;
 
@@ -1139,11 +1138,11 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 		hdrb[ 0x1d + 8 * j ] & 0x40 ? DDAM : NO_DDAM, gap,
 		hdrb[ 0x1c + 8 * j ] & 0x20 && hdrb[ 0x1d + 8 * j ] & 0x20 ?
 		CRC_ERROR : CRC_OK, 0x00 );
-      }
-      if( seclen > idlen ) {		/* weak sector with multiple copy  */
-        buffer->index +=( seclen / ( 0x80 << hdrb[ 0x1b + 8 * j ] ) - 1 ) *
-				   ( 0x80 << hdrb[ 0x1b + 8 * j ] );
+        if( seclen > idlen ) {		/* weak sector with multiple copy  */
+          buffer->index +=( seclen / ( 0x80 << hdrb[ 0x1b + 8 * j ] ) - 1 ) *
+				     ( 0x80 << hdrb[ 0x1b + 8 * j ] );
 					/* ( ( N * len ) / len - 1 ) * len */
+        }
       }
       if( seclen == 0x80 )		/* every 128byte length sector padded */
 	buffer->index += 0x80;

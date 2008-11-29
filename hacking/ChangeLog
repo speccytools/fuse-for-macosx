@@ -2941,3 +2941,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081122 disk/disk.c: fix a track length calculation bug (more of bug #2312217)
          (Gergely Szasz).
 20081125 scld.c: fix loading of dock/exrom information from snapshots (Fred).
+20081129 disk/disk.c: limit weak sector handling to fix Coin-Op Hits (more of
+         bug #2312217) (Gergely Szasz).
