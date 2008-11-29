@@ -1030,7 +1030,8 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
 		 buff[ 0x18 + 8 * j ] == j && buff[ 0x19 + 8 * j ] == j &&
 		 buff[ 0x1a + 8 * j ] == j && buff[ 0x1b + 8 * j ] == j ) 
 	  plus3_fix = CPC_ISSUE_3;
-	else if( j == 1 && plus3_fix == 1 && buff[ 0x1b + 8 * j ] == 2 )
+	else if( j == 1 && plus3_fix == CPC_ISSUE_1 &&
+                 buff[ 0x1b + 8 * j ] == 2 )
 	  plus3_fix = CPC_ISSUE_2;
 	else if( i == 38 && j == 0 && buff[ 0x1b + 8 * j ] == 2 )
 	  plus3_fix = CPC_ISSUE_5;
