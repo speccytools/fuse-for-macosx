@@ -63,6 +63,15 @@ typedef enum debugger_pane {
 
 } debugger_pane;
 
+/* The columns used in the events pane */
+
+enum {
+  EVENTS_COLUMN_TIME,
+  EVENTS_COLUMN_TYPE,
+  
+  EVENTS_COLUMN_COUNT
+};
+
 static int create_dialog( void );
 static int hide_hidden_panes( void );
 static GtkCheckMenuItem* get_pane_menu_item( debugger_pane pane );
@@ -77,9 +86,9 @@ static int create_disassembly( GtkBox *parent, gtkui_font font );
 static int create_stack_display( GtkBox *parent, gtkui_font font );
 static void stack_click( GtkCList *clist, gint row, gint column,
 			 GdkEventButton *event, gpointer user_data );
-static int create_events( GtkBox *parent );
-static void events_click( GtkCList *clist, gint row, gint column,
-			  GdkEventButton *event, gpointer user_data );
+static void create_events( GtkBox *parent );
+static void events_activate( GtkTreeView *tree_view, GtkTreePath *path,
+			     GtkTreeViewColumn *column, gpointer user_data );
 static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group );
 
@@ -87,7 +96,7 @@ static int activate_debugger( void );
 static int update_memory_map( void );
 static int update_breakpoints( void );
 static int update_disassembly( void );
-static int update_events( void );
+static void update_events( void );
 static void add_event( gpointer data, gpointer user_data );
 static int deactivate_debugger( void );
 
@@ -113,6 +122,8 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *disassembly,				/* The actual disassembly widget */
   *stack,				/* The stack display */
   *events;				/* The events display */
+
+static GtkListStore *events_model;	/* The events model */
 
 static GtkObject *disassembly_scrollbar_adjustment;
 
@@ -310,7 +321,7 @@ create_dialog( void )
   error = create_stack_display( GTK_BOX( hbox ), font );
   if( error ) return error;
 
-  error = create_events( GTK_BOX( hbox ) ); if( error ) return error;
+  create_events( GTK_BOX( hbox ) );
 
   error = create_command_entry( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
 				accel_group );
@@ -517,49 +528,50 @@ stack_click( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
   debugger_run();
 }
 
-static int
+static void
 create_events( GtkBox *parent )
 {
+  char *titles[] = { "Time", "Type" };
   size_t i;
-  gchar *titles[] = { "Time", "Type" };
 
-  events = gtk_clist_new_with_titles( 2, titles );
-  gtk_clist_column_titles_passive( GTK_CLIST( events ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( events ), i, TRUE );
+  events_model =
+    gtk_list_store_new( EVENTS_COLUMN_COUNT, G_TYPE_INT, G_TYPE_STRING );
+
+  events = gtk_tree_view_new_with_model( GTK_TREE_MODEL( events_model ) );
+
+  for( i = 0; i < EVENTS_COLUMN_COUNT; i++ ) {
+    GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[0], renderer, "text", i, NULL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( events ), column );
+  }
+
   gtk_box_pack_start( parent, events, TRUE, TRUE, 5 );
 
-  gtk_signal_connect( GTK_OBJECT( events ), "select-row",
-		      GTK_SIGNAL_FUNC( events_click ), NULL );
-
-  return 0;
+  g_signal_connect( G_OBJECT( events ), "row-activated", G_CALLBACK( events_activate ), NULL );
 }
 
 static void
-events_click( GtkCList *clist, gint row, gint column GCC_UNUSED,
-	      GdkEventButton *event, gpointer user_data GCC_UNUSED )
+events_activate( GtkTreeView *tree_view, GtkTreePath *path,
+	         GtkTreeViewColumn *column GCC_UNUSED,
+		 gpointer user_data GCC_UNUSED )
 {
-  int got_text, error;
-  gchar *buffer;
-  libspectrum_dword tstates;
+  GtkTreeIter it;
+  GtkTreeModel *model = gtk_tree_view_get_model( tree_view );
 
-  /* Ignore events which aren't double-clicks or select-via-keyboard */
-  if( event && event->type != GDK_2BUTTON_PRESS ) return;
+  if( model && gtk_tree_model_get_iter( model, &it, path ) ) {
+    libspectrum_dword event_tstates;
+    int error;
 
-  got_text = gtk_clist_get_text( clist, row, 0, &buffer );
-  if( !got_text ) {
-    ui_error( UI_ERROR_ERROR, "couldn't get text for row %d", row );
-    return;
+    gtk_tree_model_get( model, &it, EVENTS_COLUMN_TIME, &event_tstates, -1 );
+
+    error = debugger_breakpoint_add_time(
+      DEBUGGER_BREAKPOINT_TYPE_TIME, event_tstates, 0,
+      DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
+    );
+    if( error ) return;
+
+    debugger_run();
   }
-
-  tstates = atoi( buffer );
-  error = debugger_breakpoint_add_time(
-    DEBUGGER_BREAKPOINT_TYPE_TIME, tstates, 0,
-    DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
-  );
-  if( error ) return;
-
-  debugger_run();
 }
 
 static int
@@ -747,7 +759,7 @@ ui_debugger_update( void )
   gtk_clist_thaw( GTK_CLIST( stack ) );
 
   /* And the events display */
-  error = update_events(); if( error ) return error;
+  update_events();
 
   return 0;
 }
@@ -878,34 +890,23 @@ update_disassembly( void )
   return 0;
 }
 
-static int
+static void
 update_events( void )
 {
-  gtk_clist_freeze( GTK_CLIST( events ) );
-  gtk_clist_clear( GTK_CLIST( events ) );
-
+  gtk_list_store_clear( events_model );
   event_foreach( add_event, NULL );
-
-  gtk_clist_thaw( GTK_CLIST( events ) );
-
-  return 0;
 }
 
 static void
 add_event( gpointer data, gpointer user_data GCC_UNUSED )
 {
   event_t *ptr = data;
+  GtkTreeIter it;
 
-  char buffer[80];
-  char *event_text[2] = { &buffer[0], &buffer[40] };
-
-  /* Skip events which have been removed */
-  if( ptr->type == event_type_null ) return;
-
-  snprintf( event_text[0], 40, "%d", ptr->tstates );
-  strncpy( event_text[1], event_name( ptr->type ), 40 );
-
-  gtk_clist_append( GTK_CLIST( events ), event_text );
+  if( ptr->type != event_type_null ) {
+    gtk_list_store_append( events_model, &it );
+    gtk_list_store_set( events_model, &it, EVENTS_COLUMN_TIME, ptr->tstates, EVENTS_COLUMN_TYPE, event_name( ptr->type ), -1 );
+  }
 }
 
 static int
