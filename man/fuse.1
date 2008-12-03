@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
 .\" fuse.1: Fuse man page
-.\" Copyright (c) 2001-2007 Russell Marks, Philip Kendall, Darren Salt,
+.\" Copyright (c) 2001-2008 Russell Marks, Philip Kendall, Darren Salt,
 .\"                         Fredrick Meunier, Stuart Brady
 .\"
 .\" This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "5th January, 2008" "Version 0.9.0" "Emulators"
+.TH fuse 1 "3rd December, 2008" "Version 0.10.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3174,6 +3174,14 @@ to IO port
 .IR port .
 .RE
 .PP
+pr{int}
+.I expression
+.RS
+Print the value of
+.I expression
+to standard output.
+.RE
+.PP
 se{t}
 .I address value
 .RS
@@ -3188,6 +3196,16 @@ se{t}
 .RS
 Set the value of the Z80 register
 .I register
+to
+.IR value .
+.RE
+.PP
+se{t}
+.RI $ variable
+.I value
+.RS
+Set the value of the debugger variable
+.I variable
 to
 .IR value .
 .RE
@@ -3236,12 +3254,12 @@ expects a breakpoint id, you can instead use a numeric expression,
 which uses a restricted version of C's syntax; exactly the same syntax
 is used for conditional breakpoints, with `0' being false and any
 other value being true. In numeric expressions, you can use integer
-constants (all calculations is done in integers), register names
-(which simply evaluate to the value of the register), parentheses, the
-standard four numeric operations (`+', `\-', `*' and `/'), the
-(non-)equality operators `==' and `!=', the comparison operators `>',
-`<', `>=' and `<=', bitwise and (`&'), or (`|') and exclusive or (`^')
-and logical and (`&&') and or (`||').
+constants (all calculations are done in integers), register names
+(which simply evaluate to the value of the register), debugger
+variables, parentheses, the standard four numeric operations (`+',
+`\-', `*' and `/'), the (non-)equality operators `==' and `!=', the
+comparison operators `>', `<', `>=' and `<=', bitwise and (`&'), or
+(`|') and exclusive or (`^') and logical and (`&&') and or (`||').
 .\"
 .\"------------------------------------------------------------------
 .\"

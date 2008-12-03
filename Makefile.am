@@ -173,6 +173,7 @@ noinst_HEADERS = ay.h \
 	loader.h \
 	machine.h \
 	memory.h \
+	mempool.h \
 	menu.h \
 	module.h \
 	periph.h \

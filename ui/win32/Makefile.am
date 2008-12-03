@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2001-2004 Philip Kendall
+## Copyright (c) 2001-2008 Philip Kendall
 
 ## $Id$
 
@@ -103,6 +103,8 @@ noinst_HEADERS = binary.h \
 		 roms.h \
 		 memorybrowser.h \
 		 menu_data.h \
+		 options.pl \
+		 options-resource.pl \
 		 win32internals.h \
 		 win32joystick.h
 

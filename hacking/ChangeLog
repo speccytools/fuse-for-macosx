@@ -2927,9 +2927,15 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081109 hacking/cvs-tags: document 0.10.0 branch.
 20081109 disk/disk.c: stop buffer overrun from malformed .dsk (fixes bug
 	 #2248067) (Gergely Szasz).
+20081115 man/fuse.1: add debugger variables and print command
+	 (Release-0_10_0-branch).
+20081115 Makefile.am,hacking/Makefile.am,ui/win32/Makefile.am: make sure
+	 all files are distributed (Release-0_10_0-branch).
 20081116 ChangeLog,machines/{specplus2a.c,specplus3.c}: reading from the
 	 AY data port on the +2A/+3 is the same as reading from the
          register port (thanks, Mark Woodmass).
+20081117 configure.in: bump version number for 0.10.0-pre1 release
+	 (Release_0_10_0-branch).
 20081118 rzx.c: don't autosave rzx snapshots when we are recording in compo
          mode (Fred).
 20081119 disk/{disk.c,upd_fdc.c}: fix READ_DIAG emlation bugs to support
@@ -2945,5 +2951,11 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          bug #2312217) (Gergely Szasz).
 20081129 disk/disk.c: one instance of plus3_fix wasn't updated (thanks, Stuart
          Brady) (Fred).
+20081129 configure.in,man/fuse.1,README: final tweaks for 0.10.0 release
+	 (Release_0_10_0-branch).
+20081201 fuse.c: update libspectrum version needed (Release_0_10_0-branch).
 20081202 ui/gtk/debugger.c: begin replacing the deprecated GtkCList interface
 	 with GtkTreeView/GtkTreeModel.
+20081203 configure.in,fuse.c,hacking/{ChangeLog,Makefile.am},Makefile.am,
+	 man/fuse.1,README,ui/win32/Makefile.am: merge Release_0_10_0-branch
+	 changes onto trunk.
