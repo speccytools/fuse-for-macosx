@@ -63,6 +63,16 @@ typedef enum debugger_pane {
 
 } debugger_pane;
 
+/* The columns used in the stack pane */
+
+enum {
+  STACK_COLUMN_ADDRESS,
+  STACK_COLUMN_VALUE_TEXT,
+  STACK_COLUMN_VALUE_INT,
+
+  STACK_COLUMN_COUNT
+};
+
 /* The columns used in the events pane */
 
 enum {
@@ -83,9 +93,9 @@ static int create_register_display( GtkBox *parent, gtkui_font font );
 static int create_memory_map( GtkBox *parent );
 static int create_breakpoints( GtkBox *parent );
 static int create_disassembly( GtkBox *parent, gtkui_font font );
-static int create_stack_display( GtkBox *parent, gtkui_font font );
-static void stack_click( GtkCList *clist, gint row, gint column,
-			 GdkEventButton *event, gpointer user_data );
+static void create_stack_display( GtkBox *parent, gtkui_font font );
+static void stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
+			    GtkTreeViewColumn *column, gpointer user_data );
 static void create_events( GtkBox *parent );
 static void events_activate( GtkTreeView *tree_view, GtkTreePath *path,
 			     GtkTreeViewColumn *column, gpointer user_data );
@@ -123,7 +133,7 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *stack,				/* The stack display */
   *events;				/* The events display */
 
-static GtkListStore *events_model;	/* The events model */
+static GtkListStore *stack_model, *events_model;
 
 static GtkObject *disassembly_scrollbar_adjustment;
 
@@ -315,12 +325,8 @@ create_dialog( void )
 
   error = create_breakpoints( GTK_BOX( vbox ) ); if( error ) return error;
 
-  error = create_disassembly( GTK_BOX( hbox ), font );
-  if( error ) return error;
-
-  error = create_stack_display( GTK_BOX( hbox ), font );
-  if( error ) return error;
-
+  create_disassembly( GTK_BOX( hbox ), font );
+  create_stack_display( GTK_BOX( hbox ), font );
   create_events( GTK_BOX( hbox ) );
 
   error = create_command_entry( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
@@ -449,7 +455,7 @@ create_breakpoints( GtkBox *parent )
   return 0;
 }
 
-static int
+static void
 create_disassembly( GtkBox *parent, gtkui_font font )
 {
   size_t i;
@@ -485,53 +491,58 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   return 0;
 }
 
-static int
+static void
 create_stack_display( GtkBox *parent, gtkui_font font )
 {
   size_t i;
-  gchar *stack_titles[] = { "Address", "Value" };
+  const gchar *titles[] = { "Address", "Instruction" };
+  
+  stack_model =
+    gtk_list_store_new( STACK_COLUMN_COUNT, G_TYPE_STRING, G_TYPE_STRING,
+			G_TYPE_INT );
 
-  stack = gtk_clist_new_with_titles( 2, stack_titles );
-  gtkui_set_font( stack, font );
-  gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
+  stack = gtk_tree_view_new_with_model( GTK_TREE_MODEL( stack_model ) );
+
+  for( i = 0; i < 2; i++ ) {
+    GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[i], renderer, "text", i, NULL );
+    g_object_set( G_OBJECT( renderer ), "font-desc", font, "height", 18, NULL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( stack ), column );
+  }
+
   gtk_box_pack_start( parent, stack, TRUE, TRUE, 5 );
 
-  gtk_signal_connect( GTK_OBJECT( stack ), "select-row",
-		      GTK_SIGNAL_FUNC( stack_click ), NULL );
-
-  return 0;
+  g_signal_connect( G_OBJECT( stack ), "row-activated", G_CALLBACK( stack_activate ), NULL );
 }
 
 static void
-stack_click( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
-	     GdkEventButton *event, gpointer user_data GCC_UNUSED )
+stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
+	        GtkTreeViewColumn *column GCC_UNUSED,
+		gpointer user_data GCC_UNUSED )
 {
-  libspectrum_word address, destination;
-  int error;
+  GtkTreeIter it;
+  GtkTreeModel *model = gtk_tree_view_get_model( tree_view );
 
-  /* Ignore events which aren't double-clicks or select-via-keyboard */
-  if( event && event->type != GDK_2BUTTON_PRESS ) return;
+  if( model && gtk_tree_model_get_iter( model, &it, path ) ) {
+    gint address;
+    int error;
 
-  address = SP + ( 19 - row ) * 2;
+    gtk_tree_model_get( model, &it, STACK_COLUMN_VALUE_INT, &address, -1 );
 
-  destination =
-    readbyte_internal( address ) + readbyte_internal( address + 1 ) * 0x100;
+    error = debugger_breakpoint_add_address(
+      DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, address, 0,
+      DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
+    );
+    if( error ) return;
 
-  error = debugger_breakpoint_add_address(
-    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, destination, 0,
-    DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
-  );
-  if( error ) return;
-
-  debugger_run();
+    debugger_run();
+  }
 }
 
 static void
 create_events( GtkBox *parent )
 {
-  char *titles[] = { "Time", "Type" };
+  const gchar *titles[] = { "Time", "Type" };
   size_t i;
 
   events_model =
@@ -541,7 +552,7 @@ create_events( GtkBox *parent )
 
   for( i = 0; i < EVENTS_COLUMN_COUNT; i++ ) {
     GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
-    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[0], renderer, "text", i, NULL );
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[i], renderer, "text", i, NULL );
     gtk_tree_view_append_column( GTK_TREE_VIEW( events ), column );
   }
 
@@ -641,7 +652,7 @@ ui_debugger_update( void )
 {
   size_t i;
   char buffer[1024], format_string[1024];
-  gchar *disassembly_text[2] = { &buffer[0], &buffer[40] };
+  gchar buffer1[80], buffer2[80];
   libspectrum_word address;
   int capabilities; size_t length;
   int error;
@@ -743,20 +754,21 @@ ui_debugger_update( void )
   error = update_disassembly(); if( error ) return error;
 
   /* And the stack display */
-  gtk_clist_freeze( GTK_CLIST( stack ) );
-  gtk_clist_clear( GTK_CLIST( stack ) );
+  gtk_list_store_clear( stack_model );
 
   for( i = 0, address = SP + 38; i < 20; i++, address -= 2 ) {
+
+    GtkTreeIter it;
     
     libspectrum_word contents = readbyte_internal( address ) +
 				0x100 * readbyte_internal( address + 1 );
 
-    snprintf( disassembly_text[0], 40, format_16_bit(), address );
-    snprintf( disassembly_text[1], 40, format_16_bit(), contents );
-    gtk_clist_append( GTK_CLIST( stack ), disassembly_text );
-  }
+    snprintf( buffer1, sizeof( buffer1 ), format_16_bit(), address );
+    snprintf( buffer2, sizeof( buffer2 ), format_16_bit(), contents );
 
-  gtk_clist_thaw( GTK_CLIST( stack ) );
+    gtk_list_store_append( stack_model, &it );
+    gtk_list_store_set( stack_model, &it, STACK_COLUMN_ADDRESS, buffer1, STACK_COLUMN_VALUE_TEXT, buffer2, STACK_COLUMN_VALUE_INT, (gint)contents, -1 );
+  }
 
   /* And the events display */
   update_events();
