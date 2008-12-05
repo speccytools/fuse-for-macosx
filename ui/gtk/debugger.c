@@ -63,6 +63,15 @@ typedef enum debugger_pane {
 
 } debugger_pane;
 
+/* The columns used in the disassembly pane */
+
+enum {
+  DISASSEMBLY_COLUMN_ADDRESS,
+  DISASSEMBLY_COLUMN_INSTRUCTION,
+
+  DISASSEMBLY_COLUMN_COUNT
+};
+
 /* The columns used in the stack pane */
 
 enum {
@@ -78,7 +87,7 @@ enum {
 enum {
   EVENTS_COLUMN_TIME,
   EVENTS_COLUMN_TYPE,
-  
+
   EVENTS_COLUMN_COUNT
 };
 
@@ -92,7 +101,7 @@ static void toggle_display( gpointer callback_data, guint callback_action,
 static int create_register_display( GtkBox *parent, gtkui_font font );
 static int create_memory_map( GtkBox *parent );
 static int create_breakpoints( GtkBox *parent );
-static int create_disassembly( GtkBox *parent, gtkui_font font );
+static void create_disassembly( GtkBox *parent, gtkui_font font );
 static void create_stack_display( GtkBox *parent, gtkui_font font );
 static void stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
 			    GtkTreeViewColumn *column, gpointer user_data );
@@ -105,7 +114,7 @@ static int create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group );
 static int activate_debugger( void );
 static int update_memory_map( void );
 static int update_breakpoints( void );
-static int update_disassembly( void );
+static void update_disassembly( void );
 static void update_events( void );
 static void add_event( gpointer data, gpointer user_data );
 static int deactivate_debugger( void );
@@ -133,7 +142,7 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *stack,				/* The stack display */
   *events;				/* The events display */
 
-static GtkListStore *stack_model, *events_model;
+static GtkListStore *disassembly_model, *stack_model, *events_model;
 
 static GtkObject *disassembly_scrollbar_adjustment;
 
@@ -461,18 +470,24 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   size_t i;
 
   GtkWidget *scrollbar;
-  gchar *disassembly_titles[] = { "Address", "Instruction" };
+  const gchar *titles[] = { "Address", "Instruction" };
 
   /* A box to hold the disassembly listing and the scrollbar */
   disassembly_box = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( parent, disassembly_box );
 
-  /* The disassembly CList itself */
-  disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
-  gtkui_set_font( disassembly, font );
-  gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( disassembly ), i, TRUE );
+  /* The disassembly itself */
+  disassembly_model =
+    gtk_list_store_new( DISASSEMBLY_COLUMN_COUNT, G_TYPE_STRING, G_TYPE_STRING );
+
+  disassembly = gtk_tree_view_new_with_model( GTK_TREE_MODEL( disassembly_model ) );
+  for( i = 0; i < DISASSEMBLY_COLUMN_COUNT; i++ ) {
+    GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[i], renderer, "text", i, NULL );
+    g_object_set( G_OBJECT( renderer ), "font-desc", font, "height", 18, NULL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( disassembly ), column );
+  }
+
   gtk_box_pack_start_defaults( GTK_BOX( disassembly_box ), disassembly );
 
   /* The disassembly scrollbar */
@@ -484,11 +499,10 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
   gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
-
+/*
   gtkui_scroll_connect( GTK_CLIST( disassembly ),
 			GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
-
-  return 0;
+*/
 }
 
 static void
@@ -750,8 +764,7 @@ ui_debugger_update( void )
 
   error = update_breakpoints(); if( error ) return error;
 
-  /* Update the disassembly */
-  error = update_disassembly(); if( error ) return error;
+  update_disassembly();
 
   /* And the stack display */
   gtk_list_store_clear( stack_model );
@@ -873,33 +886,31 @@ update_breakpoints( void )
   return 0;
 }
 
-static int
+static void
 update_disassembly( void )
 {
-  size_t i, length; libspectrum_word address;
-  char buffer[80];
-  char *disassembly_text[2] = { &buffer[0], &buffer[40] };
+  size_t i; libspectrum_word address;
+  GtkTreeIter it;
 
-  gtk_clist_freeze( GTK_CLIST( disassembly ) );
-  gtk_clist_clear( GTK_CLIST( disassembly ) );
+  gtk_list_store_clear( disassembly_model );
 
   for( i = 0, address = disassembly_top; i < 20; i++ ) {
-    int l;
-    snprintf( disassembly_text[0], 40, format_16_bit(), address );
-    debugger_disassemble( disassembly_text[1], 40, &length, address );
+    size_t l, length;
+    char buffer1[40], buffer2[40];
+
+    snprintf( buffer1, sizeof( buffer1 ), format_16_bit(), address );
+    debugger_disassemble( buffer2, sizeof( buffer2 ), &length, address );
 
     /* pad to 16 characters (long instruction) to avoid varying width */
-    l = strlen( disassembly_text[1] );
-    while( l < 16 ) disassembly_text[1][l++] = ' ';
-    disassembly_text[1][l] = 0;
+    l = strlen( buffer2 );
+    while( l < 16 ) buffer2[l++] = ' ';
+    buffer2[l] = 0;
+
+    gtk_list_store_append( disassembly_model, &it );
+    gtk_list_store_set( disassembly_model, &it, DISASSEMBLY_COLUMN_ADDRESS, buffer1, DISASSEMBLY_COLUMN_INSTRUCTION, buffer2, -1 );
 
     address += length;
-
-    gtk_clist_append( GTK_CLIST( disassembly ), disassembly_text );
   }
-  gtk_clist_thaw( GTK_CLIST( disassembly ) );
-
-  return 0;
 }
 
 static void
