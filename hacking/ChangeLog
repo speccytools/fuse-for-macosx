@@ -2960,3 +2960,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 man/fuse.1,README,ui/win32/Makefile.am: merge Release_0_10_0-branch
 	 changes onto trunk.
 20081206 ui/fb/Makefile.am: distribute fbmouse.h (thanks, rkd77) (Fred).
+20081210 Makefile.am,compat/unix/file.c: must open files for writing with
+         O_TRUNC to ensure that any old data is cleared out. Also fix a
+         dependency problem (thanks, Matthew Westcott).

@@ -134,6 +134,7 @@ compat/@COMPAT_OSNAME@/libcompatos.a \
 @WINDRES_OBJ@
 
 fuse_DEPENDENCIES = @UI_LIBS@ \
+                    compat/@COMPAT_OSNAME@/libcompatos.a
 		    disk/libdisk.a \
 		    debugger/libdebugger.a \
 		    machines/libmachines.a \
