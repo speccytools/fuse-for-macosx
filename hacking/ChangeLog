@@ -2963,3 +2963,4 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081210 Makefile.am,compat/unix/file.c: must open files for writing with
          O_TRUNC to ensure that any old data is cleared out. Also fix a
          dependency problem (thanks, Matthew Westcott).
+20081210 ChangeLog,configure.in,man/fuse.1,README: update for 0.10.0.1 release.

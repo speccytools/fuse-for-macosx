@@ -1,4 +1,14 @@
-2008-11-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+2008-12-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 0.10.0.1 released
+
+	* Writing files would not truncate the file at the correct point,
+	  leading to corrupt files when overwriting an existing file
+	  (Philip Kendall; thanks, Matthew Westcott).
+
+	* Distribute ui/fb/fbmouse.h (Fredrick Meunier; thanks, rkd77).
+
+2008-12-03  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 0.10.0 released
 
