@@ -93,40 +93,6 @@ snapshot_read_buffer( const unsigned char *buffer, size_t length,
   return 0;
 }
 
-static int
-try_fallback_machine( libspectrum_machine machine )
-{
-  int error;
-
-  /* If we failed on a +3 or +3e snapshot, try falling back to +2A (in
-     case we were compiled without lib765) */
-  if( machine == LIBSPECTRUM_MACHINE_PLUS3  ||
-      machine == LIBSPECTRUM_MACHINE_PLUS3E    ) {
-
-    error = machine_select( LIBSPECTRUM_MACHINE_PLUS2A );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR,
-		"Loading a %s snapshot, but neither that nor %s available",
-		libspectrum_machine_name( machine ),
-		libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )    );
-      return 1;
-    } else {
-      ui_error( UI_ERROR_WARNING,
-		"Loading a %s snapshot, but that's not available. "
-		"Using %s instead",
-		libspectrum_machine_name( machine ),
-		libspectrum_machine_name( LIBSPECTRUM_MACHINE_PLUS2A )  );
-    }
-
-  } else {			/* Not trying a +3 or +3e snapshot */
-    ui_error( UI_ERROR_ERROR,
-	      "Loading a %s snapshot, but that's not available",
-	      libspectrum_machine_name( machine ) );
-  }
-  
-  return 0;
-}
-
 int
 snapshot_copy_from( libspectrum_snap *snap )
 {
@@ -140,7 +106,9 @@ snapshot_copy_from( libspectrum_snap *snap )
   if( machine != machine_current->machine ) {
     error = machine_select( machine );
     if( error ) {
-      error = try_fallback_machine( machine ); if( error ) return error;
+      ui_error( UI_ERROR_ERROR,
+		"Loading a %s snapshot, but that's not available",
+		libspectrum_machine_name( machine ) );
     }
   } else {
     machine_reset( 0 );

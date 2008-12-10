@@ -2965,3 +2965,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
          dependency problem (thanks, Matthew Westcott).
 20081210 ChangeLog,configure.in,man/fuse.1,README: update for 0.10.0.1 release.
 20081210 ui/gtk/debugger.c: final bit of GtkCList removal from this file.
+20081210 snapshot.c: remove fallback from +3/+3e to +2A as +3 will now
+	 always be available.
