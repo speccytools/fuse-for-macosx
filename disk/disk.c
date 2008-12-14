@@ -993,7 +993,7 @@ open_cpc( buffer_t *buffer, disk_t *d, int preindex )
       break;
     }
     if( buffavail( buffer ) < 256 ||
-	memcmp( buff, "Track-Info\r\n", 12 ) )		/* check track header */
+	memcmp( buff, "Track-Info", 10 ) )		/* check track header */
       return d->status = DISK_OPEN;
 
     gap = (unsigned char)buff[0x16] == 0xff ? GAP_MINIMAL_FM :
