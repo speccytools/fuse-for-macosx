@@ -2971,3 +2971,4 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 Owen).
 20081214 README,configure.in: remove --with-local-prefix as we no longer use
          lib765 or libdsk (Fred).
+20081215 ui/widget/options-header.pl: remove unnecessary use directive (Fred).
