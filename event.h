@@ -76,6 +76,9 @@ int event_force_events( void );
 /* Remove all events of a specific type from the stack */
 int event_remove_type( int type );
 
+/* Remove all events of a specific type and user data from the stack */
+int event_remove_type_user_data( int type, gpointer user_data );
+
 /* Clear the event stack */
 int event_reset(void);
 

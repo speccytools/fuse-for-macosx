@@ -135,7 +135,7 @@ fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls )
   d->fdd_heads = heads;
   d->fdd_cylinders = cyls;
 
-  return d->status = DISK_OK;
+  return d->status = FDD_OK;
 }
 
 void
@@ -159,7 +159,7 @@ fdd_motoron( fdd_t *d, int on )
     Note: Pre-ready is the state that at least one INDEX
 	pulse has been detected after item iii) is satisfied
   */
-  event_remove_type( motor_event );		/* remove pending motor-on event */
+  event_remove_type_user_data( motor_event, d );		/* remove pending motor-on event for *this* drive */
   if( on ) {
     event_add_with_data( tstates + 4 *			/* 2 revolution: 2 * 200 / 1000 */
 			 machine_current->timings.processor_speed / 10,
@@ -222,7 +222,7 @@ fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
     fdd_head_load( d, 1 );
 
   fdd_set_data( d, FDD_LOAD_FACT );
-  return d->status = DISK_OK;
+  return d->status = FDD_OK;
 }
 
 void
