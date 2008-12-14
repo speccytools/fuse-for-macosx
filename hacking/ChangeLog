@@ -2969,3 +2969,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 always be available.
 20081214 disk/disk.c: relax "Track-Info" check (Gergely Szasz; thanks, Simon
 	 Owen).
+20081214 README,configure.in: remove --with-local-prefix as the removal as we
+         no longer use lib765 or libdsk (Fred).
