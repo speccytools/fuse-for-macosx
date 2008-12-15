@@ -2974,3 +2974,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081215 ui/widget/options-header.pl: remove unnecessary use directive (Fred).
 20081215 event.[ch],disk/fdd.c: fix issue with FDD motor events preventing
          both +3 disk drives from being used (bug #2424700) (Gergely Szasz).
+20081215 event.[ch],rzx.c,spectrum.c,tape.c,timer/timer.[ch]: tidy new event
+	 removal function a bit, and make functions which can't error return
+	 void.

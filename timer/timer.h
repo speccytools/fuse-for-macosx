@@ -39,7 +39,7 @@ float timer_get_time_difference( timer_type *a, timer_type *b );
 
 int timer_init(void);
 void timer_sleep_ms( int ms );
-int timer_end(void);
+void timer_end( void );
 
 extern float current_speed;
 extern int timer_event;

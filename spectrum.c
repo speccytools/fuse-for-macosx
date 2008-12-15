@@ -95,7 +95,6 @@ int
 spectrum_frame( void )
 {
   libspectrum_dword frame_length;
-  int error;
 
   /* Reduce the t-state count of both the processor and all the events
      scheduled to occur. Done slightly differently if RZX playback is
@@ -103,7 +102,7 @@ spectrum_frame( void )
   frame_length = rzx_playback ? tstates
 			      : machine_current->timings.tstates_per_frame;
 
-  error = event_frame( frame_length ); if( error ) return error;
+  event_frame( frame_length );
   tstates -= frame_length;
   if( z80.interrupts_enabled_at >= 0 )
     z80.interrupts_enabled_at -= frame_length;

@@ -126,10 +126,10 @@ timer_init( void )
   return 0;
 }
 
-int
+void
 timer_end( void )
 {
-  return event_remove_type( timer_event );
+  event_remove_type( timer_event );
 }
 
 #ifdef SOUND_FIFO
