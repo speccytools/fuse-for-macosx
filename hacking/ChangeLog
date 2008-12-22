@@ -2977,3 +2977,5 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081215 event.[ch],rzx.c,spectrum.c,tape.c,timer/timer.[ch]: tidy new event
 	 removal function a bit, and make functions which can't error return
 	 void.
+20081222 menu_data.dat,menu.h,ui/gtk/gtkui.c,ui/widget/menu.c: add Help/About
+         dialog box (Alberto Garcia/Philip Kendall).

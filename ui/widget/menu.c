@@ -428,6 +428,13 @@ menu_help_keyboard( int action )
   if( utils_close_file( &file ) ) return;
 }
 
+void
+menu_help_about( int action )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+  ui_error( UI_ERROR_INFO, "Free Unix Spectrum Emulator (Fuse) %s (c) 1999-2008 Philip Kendall and others. See http://fuse-emulator.sf.net/ for details.", VERSION );
+}
+
 static int
 set_active( struct widget_menu_entry *menu, const char *path, int active )
 {

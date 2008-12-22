@@ -144,6 +144,7 @@ MENU_CALLBACK( menu_machine_pokefinder );
 MENU_CALLBACK( menu_machine_memorybrowser );
 
 MENU_CALLBACK( menu_help_keyboard );
+MENU_CALLBACK( menu_help_about );
 
 /* Called from elsewhere (generally from one of the routines defined
    in menu.c) */

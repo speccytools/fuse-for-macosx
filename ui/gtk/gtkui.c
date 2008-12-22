@@ -598,6 +598,18 @@ menu_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   gtkui_picture( "keyboard.scr", 0 );
 }
 
+void
+menu_help_about( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  gtk_show_about_dialog( GTK_WINDOW( gtkui_window ),
+                         "name", "Fuse",
+                         "comments", "The Free Unix Spectrum Emulator",
+                         "copyright", "(c) 1999-2008 Philip Kendall and others.",
+                         "version", VERSION,
+                         "website", "http://fuse-emulator.sourceforge.net/",
+                         NULL );
+}
+
 /* Generic `tidy-up' callback */
 void
 gtkui_destroy_widget_and_quit( GtkWidget *widget, gpointer data GCC_UNUSED )
