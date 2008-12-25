@@ -2979,3 +2979,4 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 void.
 20081222 menu_data.dat,menu.h,ui/gtk/gtkui.c,ui/widget/menu.c: add Help/About
          dialog box (Alberto Garcia/Philip Kendall).
+20081225 ui/widget/query.c: make "Don't Save" return the correct enum (Fred).
