@@ -27,24 +27,13 @@
 
 #include <libspectrum.h>
 
-#include "ay.h"
-#include "disk/beta.h"
-#include "disk/plusd.h"
 #include "fuse.h"
-#include "if2.h"
-#include "joystick.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
-#include "scld.h"
-#include "slt.h"
 #include "snapshot.h"
 #include "ui/ui.h"
-#include "ula.h"
 #include "utils.h"
-#include "z80/z80.h"
-#include "zxatasp.h"
-#include "zxcf.h"
 
 int snapshot_read( const char *filename )
 {

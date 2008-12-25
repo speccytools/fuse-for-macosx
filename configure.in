@@ -630,6 +630,7 @@ compat/win32/Makefile \
 debugger/Makefile \
 disk/Makefile \
 hacking/Makefile \
+ide/Makefile \
 lib/Makefile \
 machines/Makefile \
 man/Makefile \

@@ -42,7 +42,6 @@
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "ui/uidisplay.h"

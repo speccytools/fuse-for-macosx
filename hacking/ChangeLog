@@ -2983,3 +2983,9 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081225 disk/plusd.c: support +D switching between the two drives when the
          motor on signal is 'ON' as when copying between drives (fixes bug
          #2465540) (Gergely Szasz).
+20081226 Makefile.am,compat/wii,configure.in,fuse.c,ide/{Makefile.am,
+         divide.[ch],ide.[ch],simpleide.[ch],zxatasp.[ch],zxcf.[ch]},menu.c,
+         periph.c,snapshot.c,ui/gtk/{debugger.c,gtkui.c},
+         ui/widget/{debugger.c,menu.c},ui/win32/debugger.c,utils.c,
+         z80/z80_ops.c: move ide related files to their own sub-directory
+         (Fred).

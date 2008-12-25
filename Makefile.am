@@ -29,6 +29,7 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  debugger \
 	  disk \
 	  hacking \
+	  ide \
 	  lib \
 	  machines \
 	  man \
@@ -44,6 +45,7 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 DIST_SUBDIRS = debugger \
 	       disk \
 	       hacking \
+	       ide \
 	       lib \
 	       machines \
 	       man \
@@ -59,10 +61,8 @@ DIST_SUBDIRS = debugger \
 fuse_SOURCES = ay.c \
 	dck.c \
 	display.c \
-	divide.c \
 	event.c \
 	fuse.c \
-	ide.c \
 	if1.c \
 	if2.c \
 	input.c \
@@ -83,7 +83,6 @@ fuse_SOURCES = ay.c \
 	scld.c \
 	screenshot.c \
 	settings.c \
-	simpleide.c \
 	slt.c \
 	snapshot.c \
 	sound.c \
@@ -93,9 +92,7 @@ fuse_SOURCES = ay.c \
 	uidisplay.c \
 	ula.c \
 	utils.c \
-	windres.rc \
-	zxatasp.c \
-	zxcf.c
+	windres.rc
 
 if COMPAT_DIRNAME
 fuse_SOURCES += compat/dirname.c
@@ -113,14 +110,15 @@ EXTRA_fuse_SOURCES = windres.rc
 
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
-machines/libmachines.a \
+debugger/libdebugger.a \
 disk/libdisk.a \
+ide/libide.a \
+machines/libmachines.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
+timer/libtimer.a \
 ui/scaler/libscaler.a \
 unittests/libunittests.a \
-debugger/libdebugger.a \
-timer/libtimer.a \
 z80/libz80.a \
 @LIBSPEC_LIBS@ \
 @GLIB_LIBS@ \
@@ -137,6 +135,7 @@ fuse_DEPENDENCIES = @UI_LIBS@ \
                     compat/@COMPAT_OSNAME@/libcompatos.a
 		    disk/libdisk.a \
 		    debugger/libdebugger.a \
+		    ide/libide.a \
 		    machines/libmachines.a \
 		    sound/libsound.a \
 		    unittests/libunittests.a\
@@ -162,10 +161,8 @@ noinst_HEADERS = ay.h \
 	compat.h \
 	dck.h \
 	display.h \
-	divide.h \
 	event.h \
 	fuse.h \
-	ide.h \
 	if1.h \
 	if2.h \
 	input.h \
@@ -182,7 +179,6 @@ noinst_HEADERS = ay.h \
 	rzx.h \
 	screenshot.h \
 	settings.h \
-	simpleide.h \
 	slt.h \
 	snapshot.h \
 	sound.h \
@@ -193,9 +189,7 @@ noinst_HEADERS = ay.h \
 	printer.h \
 	profile.h \
 	scld.h \
-	ula.h \
-	zxatasp.h \
-	zxcf.h
+	ula.h
 
 EXTRA_DIST = AUTHORS \
 	     README \

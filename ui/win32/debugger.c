@@ -37,6 +37,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
+#include "ide/zxcf.h"
 #include "scld.h"
 #include "settings.h"
 #include "ui/ui.h"
@@ -44,7 +45,6 @@
 #include "win32internals.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
-#include "zxcf.h"
 
 #include "debugger.h"
 

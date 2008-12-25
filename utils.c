@@ -38,20 +38,20 @@
 
 #include "dck.h"
 #include "disk/beta.h"
-#include "divide.h"
 #include "fuse.h"
+#include "ide/divide.h"
+#include "ide/simpleide.h"
+#include "ide/zxatasp.h"
+#include "ide/zxcf.h"
 #include "if1.h"
 #include "if2.h"
 #include "machines/specplus3.h"
 #include "memory.h"
 #include "rzx.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "utils.h"
-#include "zxatasp.h"
-#include "zxcf.h"
 
 typedef struct path_context {
 

@@ -37,6 +37,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "gtkinternals.h"
+#include "ide/zxcf.h"
 #include "machine.h"
 #include "memory.h"
 #include "scld.h"
@@ -45,7 +46,6 @@
 #include "ula.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
-#include "zxcf.h"
 
 /* The various debugger panes */
 typedef enum debugger_pane {
