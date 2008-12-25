@@ -2980,3 +2980,6 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 20081222 menu_data.dat,menu.h,ui/gtk/gtkui.c,ui/widget/menu.c: add Help/About
          dialog box (Alberto Garcia/Philip Kendall).
 20081225 ui/widget/query.c: make "Don't Save" return the correct enum (Fred).
+20081225 disk/plusd.c: support +D switching between the two drives when the
+         motor on signal is 'ON' as when copying between drives (fixes bug
+         #2465540) (Gergely Szasz).
