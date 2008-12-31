@@ -1,4 +1,4 @@
-snapshot.c: use the fully encapsulated libspectrum_snap
+20030505 snapshot.c: use the fully encapsulated libspectrum_snap
 	 implementation
 20030506 ui/gtk/options.pl: make 'cancel via Escape' GTK+ 2.0 compatible
 	 (Matthew Westcott)
