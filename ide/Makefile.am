@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## Copyright (c) 2008 Fredrick Meunier
 
-## $Id: Makefile.am 3584 2008-03-25 10:27:30Z fredm $
+## $Id$
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by

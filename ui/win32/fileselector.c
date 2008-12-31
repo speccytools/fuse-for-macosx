@@ -1,7 +1,7 @@
 /* fileselector.c: Win32 fileselector routines
    Copyright (c) 2008 Marek Januszewski
 
-   $Id: fileselector.c 3504 2008-02-02 22:18:32Z pak21 $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
