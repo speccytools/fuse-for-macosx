@@ -10,7 +10,7 @@ Then, use this configure line:
 ./configure --target=powerpc-gekko --host=powerpc-gekko \
 	    --with-wii \
 	    --without-libxml2 --without-libiconv --without-gpm \
-	    --without-x --without-glib \
+	    --without-x --without-glib --without-libsamplerate \
 	    CFLAGS="-I$DEVKITPPC/include -I$DEVKITPRO/libogc/include" \
 	    LDFLAGS="-g -mrvl -mcpu=750 -meabi -mhard-float \
                      -Wl,-Map,fuse.elf.map -L$DEVKITPPC/lib \
