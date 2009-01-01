@@ -38,20 +38,20 @@
 #include "debugger/debugger.h"
 #include "fuse.h"
 #include "gtkinternals.h"
+#include "ide/simpleide.h"
+#include "ide/zxatasp.h"
+#include "ide/zxcf.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "machines/specplus3.h"
 #include "menu.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "snapshot.h"
-#include "machines/specplus3.h"
 #include "timer/timer.h"
 #include "ui/ui.h"
-#include "zxatasp.h"
-#include "zxcf.h"
 
 /* The main Fuse window */
 GtkWidget *gtkui_window;
@@ -596,6 +596,18 @@ void
 menu_help_keyboard( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
 {
   gtkui_picture( "keyboard.scr", 0 );
+}
+
+void
+menu_help_about( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
+{
+  gtk_show_about_dialog( GTK_WINDOW( gtkui_window ),
+                         "name", "Fuse",
+                         "comments", "The Free Unix Spectrum Emulator",
+                         "copyright", "(c) 1999-2008 Philip Kendall and others.",
+                         "version", VERSION,
+                         "website", "http://fuse-emulator.sourceforge.net/",
+                         NULL );
 }
 
 /* Generic `tidy-up' callback */

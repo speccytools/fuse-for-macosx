@@ -31,6 +31,10 @@
 #include <commdlg.h>
 #include <shellapi.h>
 
+/* FIXME: this should be included as part of windows.h, but is not
+          because WIN32_LEAN_AND_MEAN is defined along the way somewhere */
+#include <mmsystem.h>
+
 #include <libspectrum.h>
 
 #define ID_STATUSBAR 900
@@ -93,7 +97,7 @@ int win32ui_picture( const char *filename, int border );
 int win32ui_get_monospaced_font( HFONT *font );
 void win32ui_set_font( HWND hDlg, int nIDDlgItem, HFONT font );
 
-void handle_menu( DWORD cmd, HWND okno );
+int handle_menu( DWORD cmd, HWND okno );
 
 void win32_verror( int is_error );
 
@@ -108,7 +112,7 @@ void win32ui_process_messages( int process_queue_once );
 void win32statusbar_create();
 int win32statusbar_set_visibility( int visible );
 void win32statusbar_redraw( HWND hWnd, LPARAM lParam );
-void win32statusbar_resize( HWND hWnd );
+void win32statusbar_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
 
 /*
  * Dialog box reset

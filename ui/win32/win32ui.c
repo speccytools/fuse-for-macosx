@@ -28,6 +28,8 @@
 #include "debugger/debugger.h"
 #include "display.h"
 #include "fuse.h"
+#include "joystick.h"
+#include "keyboard.h"
 #include "menu.h"
 #include "menu_data.h"
 #include "psg.h"
@@ -39,9 +41,9 @@
 #include "tape.h"
 #include "timer/timer.h"
 #include "ui/ui.h"
-#include "ui/uijoystick.h"
 #include "utils.h"
 #include "win32internals.h"
+#include "win32joystick.h"
 
 /* fuse_hPrevInstance is needed only to register window class */
 static HINSTANCE fuse_hPrevInstance;
@@ -76,9 +78,13 @@ typedef struct win32ui_select_info {
 } win32ui_select_info;
 
 static BOOL win32ui_make_menu( void );
+
+static int win32ui_lose_focus( HWND hWnd, WPARAM wParam, LPARAM lParam );
+static int win32ui_gain_focus( HWND hWnd, WPARAM wParam, LPARAM lParam );
+
 static int win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam );
 static int win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam );
-static int win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
+static BOOL win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam );
 
 static int
 selector_dialog( win32ui_select_info *items );
@@ -115,40 +121,62 @@ static LRESULT WINAPI
 fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
+
+#if defined USE_JOYSTICK && !defined HAVE_JSW_H
+
+    case WM_CREATE:
+      if( joysticks_supported > 0 )
+        if( joySetCapture( hWnd, JOYSTICKID1, 0, FALSE ) )
+          ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 1" );
+      if( joysticks_supported > 1 )
+        if( joySetCapture( hWnd, JOYSTICKID2, 0, FALSE ) )
+          ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 2" );
+      break;      
+
+#endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
+
     case WM_COMMAND:
-      handle_menu( LOWORD( wParam ), hWnd );
+      if( ! handle_menu( LOWORD( wParam ), hWnd ) )
+        return 0;
       break;
 
     case WM_DROPFILES:
       handle_drop( ( HDROP )wParam );
-      break;
+      return 0;
 
     case WM_CLOSE:
       menu_file_exit( 0 );
-      break;
+      return 0;
 
     case WM_KEYDOWN:
       win32keyboard_keypress( wParam, lParam );
-      break;
+      return 0;
 
     case WM_KEYUP:
       win32keyboard_keyrelease( wParam, lParam );
-      break;
+      return 0;
 
     case WM_PAINT:
-      return win32ui_window_paint( hWnd, wParam, lParam ); 
+      if( ! win32ui_window_paint( hWnd, wParam, lParam ) )
+        return 0;
+      break;
 
     case WM_SIZING:
-      return win32ui_window_resizing( hWnd, wParam, lParam );
+      if( win32ui_window_resizing( hWnd, wParam, lParam ) )
+        return TRUE;
+      break;
 
     case WM_SIZE:
-      return win32ui_window_resize( hWnd, wParam, lParam );
+      if( ! win32ui_window_resize( hWnd, wParam, lParam ) )
+        return 0;
+      break;
 
     case WM_DRAWITEM:
       if( wParam == ID_STATUSBAR ) {
         win32statusbar_redraw( hWnd, lParam );
         return TRUE;
       }
+      break;
 
     case WM_DESTROY:
       fuse_exiting = 1;
@@ -157,20 +185,20 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       /* Stop the paused state to allow us to exit (occurs from main
          emulation loop) */
       if( paused ) menu_machine_pause( 0 );
-      break;
+      return 0;
 
     case WM_ENTERMENULOOP:
     case WM_ENTERSIZEMOVE:
     {
       fuse_emulation_pause();
-      break;
+      return 0;
     }
 
     case WM_EXITMENULOOP:
     case WM_EXITSIZEMOVE:
     {
       fuse_emulation_unpause();
-      break;
+      return 0;
     }
     
     case WM_LBUTTONUP:
@@ -208,11 +236,44 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
       else
         return( DefWindowProc( hWnd, msg, wParam, lParam ) );
 
-    default:
-      return( DefWindowProc( hWnd, msg, wParam, lParam ) );
-  }
+    case WM_ACTIVATE:
+      if( ( LOWORD( wParam ) == WA_ACTIVE ) ||
+          ( LOWORD( wParam ) == WA_CLICKACTIVE ) )
+        return win32ui_gain_focus( hWnd, wParam, lParam );
+      else if( LOWORD( wParam ) == WA_INACTIVE )
+        return win32ui_lose_focus( hWnd, wParam, lParam );
+      break;
 
-  return 0;
+#if defined USE_JOYSTICK && !defined HAVE_JSW_H
+
+    case MM_JOY1BUTTONDOWN:
+      win32joystick_buttonevent( 0, 1, wParam );
+      break;
+
+    case MM_JOY1BUTTONUP:
+      win32joystick_buttonevent( 0, 0, wParam );
+      break;
+
+    case MM_JOY2BUTTONDOWN:
+      win32joystick_buttonevent( 1, 1, wParam );
+      break;
+
+    case MM_JOY2BUTTONUP:
+      win32joystick_buttonevent( 1, 0, wParam );
+      break;
+
+    case MM_JOY1MOVE:
+      win32joystick_move( 0, LOWORD( lParam ), HIWORD( lParam ) );
+      break;
+
+    case MM_JOY2MOVE:
+      win32joystick_move( 1, LOWORD( lParam ), HIWORD( lParam ) );
+      break;
+
+#endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
+
+  }
+  return( DefWindowProc( hWnd, msg, wParam, lParam ) );
 }
 
 /* this is where windows program begins */
@@ -344,33 +405,44 @@ ui_end( void )
 int
 ui_error_specific( ui_error_level severity, const char *message )
 {
-  /* finish - can ui be not initialized? */
-  HWND hWnd;
-
-  fuse_emulation_pause();
-
-  hWnd = GetActiveWindow();
+  /* If we don't have a UI yet, we can't output widgets */
+  if( !display_ui_initialised ) return 0;
 
   switch( severity ) {
 
   case UI_ERROR_INFO:
-    MessageBox( hWnd, message, "Fuse - Info", MB_ICONINFORMATION | MB_OK );
+    MessageBox( fuse_hWnd, message, "Fuse - Info", MB_ICONINFORMATION | MB_OK );
     break;
   case UI_ERROR_WARNING:
-    MessageBox( hWnd, message, "Fuse - Warning", MB_ICONWARNING | MB_OK );
+    MessageBox( fuse_hWnd, message, "Fuse - Warning", MB_ICONWARNING | MB_OK );
     break;
   case UI_ERROR_ERROR:
-    MessageBox( hWnd, message, "Fuse - Error", MB_ICONERROR | MB_OK );
+    MessageBox( fuse_hWnd, message, "Fuse - Error", MB_ICONERROR | MB_OK );
     break;
   default:
-    MessageBox( hWnd, message, "Fuse - (Unknown Error Level)",
+    MessageBox( fuse_hWnd, message, "Fuse - (Unknown Error Level)",
                 MB_ICONINFORMATION | MB_OK );
     break;
 
   }
 
-  fuse_emulation_unpause();
+  return 0;
+}
 
+/* The callbacks used by various routines */
+
+static int
+win32ui_lose_focus( HWND hWnd, WPARAM wParam, LPARAM lParam )
+{
+  keyboard_release_all();
+  ui_mouse_suspend();
+  return 0;
+}
+
+static int
+win32ui_gain_focus( HWND hWnd, WPARAM wParam, LPARAM lParam )
+{
+  ui_mouse_resume();
   return 0;
 }
 
@@ -609,25 +681,6 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   return UI_CONFIRM_JOYSTICK_NONE;
 }
 
-int
-ui_joystick_init( void )
-{
-  STUB;
-  return 0;
-}
-
-void
-ui_joystick_end( void )
-{
-  STUB;
-}
-
-void
-ui_joystick_poll( void )
-{
-  /* STUB; */
-}
-
 /*
  * Font code
  */
@@ -667,7 +720,6 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
   switch( uMsg )
   {
     case WM_INITDIALOG: 
-    {
       /* items are passed to WM_INITDIALOG as lParam */
       items = ( win32ui_select_info * ) lParam;
       
@@ -690,6 +742,8 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
         if( i == items->selected ) {
           SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), BM_SETCHECK,
                               BST_CHECKED, 0 );
+          /* remember the default item, and return it in case of cancelling */
+          SetWindowLong( hwndDlg, GWL_USERDATA, i );
         }
 
         pos_y += 16;
@@ -716,16 +770,14 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
       SetWindowPos( hwndDlg, NULL, 0, 0, 177, pos_y,
                     SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
       
-      return TRUE;
-    }
+      return FALSE;
+
     case WM_SETFONT:
-    {
       h_ms_font = (HFONT) wParam;
-      return TRUE;
-    }
+      return 0; /* "This message does not return a value." */
+
     case WM_COMMAND:
-    {
-      if ( HIWORD( wParam ) != BN_CLICKED ) return 0;
+      if ( HIWORD( wParam ) != BN_CLICKED ) break;
 
       /* service OK and Cancel buttons */
       switch LOWORD( wParam )
@@ -739,29 +791,25 @@ selector_dialog_proc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
             if( SendDlgItemMessage( hwndDlg, ( IDC_SELECT_OFFSET + i ), 
                                     BM_GETCHECK, 0, 0 ) == BST_CHECKED ) {
               EndDialog( hwndDlg, i );
-              return TRUE;
+              return 0;
             }
             i++;
           }
-          return FALSE; /* program should never reach here */
+          break; /* program should never reach here */
         }
         case IDCANCEL:
-        {
-          EndDialog( hwndDlg, 0 );
-          return TRUE;
-        }
+          EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
+          return 0;
       }
       /* service clicking radiobuttons */
       /* FIXME should also be checking if wParam < offset + radio count */
-      if( LOWORD( wParam ) >= IDC_SELECT_OFFSET ) {
-        return TRUE;
-      }
-    }
+      if( LOWORD( wParam ) >= IDC_SELECT_OFFSET )
+        return 0;
+      break;
+
     case WM_DESTROY:
-    {
-      EndDialog( hwndDlg, 0 );
-      return TRUE;
-    }
+      EndDialog( hwndDlg, GetWindowLong( hwndDlg, GWL_USERDATA ) );
+      return 0;
   }
   return FALSE;
 }
@@ -809,32 +857,31 @@ win32ui_window_paint( HWND hWnd, WPARAM wParam, LPARAM lParam )
 static int
 win32ui_window_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
-  RECT cr;
-  GetClientRect( fuse_hWnd, &cr );
-  win32display_drawing_area_resize( cr.right - cr.left, cr.bottom - cr.top );
-
-  /* FIXME: statusbar needs to be accounted for in size */
-  SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
-
   if( wParam == SIZE_MINIMIZED ) {
     if( !size_paused ) {
       size_paused = 1;
       fuse_emulation_pause();
     }
   } else {
+    win32display_drawing_area_resize( LOWORD( lParam ), HIWORD( lParam ) );
+
+    /* FIXME: statusbar needs to be accounted for in size */
+    SendMessage( fuse_hStatusWindow, WM_SIZE, wParam, lParam );
+
     if( size_paused ) {
       size_paused = 0;
       fuse_emulation_unpause();
     }
+
+    win32statusbar_resize( hWnd, wParam, lParam );
   }
 
-  win32statusbar_resize( hWnd );
   return 0;
 }
 
 /* Handler for the main window's WM_SIZING notification.
    The handler is an equivalent of setting window geometry in GTK */
-static int
+static BOOL
 win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
   RECT *selr, wr, cr , statr;
@@ -895,8 +942,6 @@ win32ui_window_resizing( HWND hWnd, WPARAM wParam, LPARAM lParam )
     selr->right = selr->left + width;
   }
 
-  /* FIXME: function is defined to return int,
-            check which one does window proc expect */
   return TRUE;
 }
 

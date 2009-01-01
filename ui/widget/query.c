@@ -81,7 +81,7 @@ widget_save_click( void )
 static void
 widget_dont_save_click( void )
 {
-  widget_query.save = UI_CONFIRM_SAVE_CANCEL;
+  widget_query.save = UI_CONFIRM_SAVE_DONTSAVE;
 }
 
 static void

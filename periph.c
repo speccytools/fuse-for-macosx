@@ -28,8 +28,11 @@
 #include <libspectrum.h>
 
 #include "debugger/debugger.h"
-#include "divide.h"
 #include "event.h"
+#include "ide/divide.h"
+#include "ide/simpleide.h"
+#include "ide/zxatasp.h"
+#include "ide/zxcf.h"
 #include "if1.h"
 #include "if2.h"
 #include "joystick.h"
@@ -37,11 +40,8 @@
 #include "periph.h"
 #include "rzx.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "ui/ui.h"
 #include "ula.h"
-#include "zxatasp.h"
-#include "zxcf.h"
 
 /*
  * General peripheral list handling routines

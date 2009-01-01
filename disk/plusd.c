@@ -306,7 +306,14 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   }
   fdd_select( &plusd_drives[ (!drive) ].fdd, 0 );
   fdd_select( &plusd_drives[ drive ].fdd, 1 );
-  plusd_fdc->current_drive = &plusd_drives[ drive ];
+
+  if( plusd_fdc->current_drive != &plusd_drives[ drive ] ) {
+    if( plusd_fdc->current_drive->fdd.motoron ) {            /* swap motoron */
+      fdd_motoron( &plusd_drives[ (!drive) ].fdd, 0 );
+      fdd_motoron( &plusd_drives[ drive ].fdd, 1 );
+    }
+    plusd_fdc->current_drive = &plusd_drives[ drive ];
+  }
 
   printer_parallel_strobe_write( b & 0x40 );
 }

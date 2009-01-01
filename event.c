@@ -166,21 +166,19 @@ event_reduce_tstates( gpointer data, gpointer user_data )
 }
 
 /* Called at end of frame to reduce T-state count of all entries */
-int
+void
 event_frame( libspectrum_dword tstates_per_frame )
 {
   g_slist_foreach( event_list, event_reduce_tstates, &tstates_per_frame );
 
   event_next_event = event_list ?
     ((event_t*)(event_list->data))->tstates : event_no_events;
-
-  return 0;
 }
 
 /* Do all events that would happen between the current time and when
    the next interrupt will occur; called only when RZX playback is in
    effect */
-int
+void
 event_force_events( void )
 {
   while( event_next_event < machine_current->timings.tstates_per_frame ) {
@@ -192,8 +190,6 @@ event_force_events( void )
     event_do_events();
 
   }
-
-  return 0;
 }
 
 static void
@@ -205,12 +201,32 @@ set_event_null( gpointer data, gpointer user_data )
   if( ptr->type == *type ) ptr->type = event_type_null;
 }
 
+static void
+set_event_null_with_user_data( gpointer data, gpointer user_data )
+{
+  event_t *event = data;
+  event_t *template = user_data;
+
+  if( event->type == template->type && event->user_data == template->user_data )
+    event->type = event_type_null;
+}
+
 /* Remove all events of a specific type from the stack */
-int
+void
 event_remove_type( int type )
 {
   g_slist_foreach( event_list, set_event_null, &type );
-  return 0;
+}
+
+/* Remove all events of a specific type and user data from the stack */
+void
+event_remove_type_user_data( int type, gpointer user_data )
+{
+  event_t template;
+
+  template.type = type;
+  template.user_data = user_data;
+  g_slist_foreach( event_list, set_event_null_with_user_data, &template );
 }
 
 /* Free the memory used by a specific entry */
@@ -221,7 +237,7 @@ event_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
 }
 
 /* Clear the event stack */
-int
+void
 event_reset( void )
 {
   g_slist_foreach( event_list, event_free_entry, NULL );
@@ -232,16 +248,13 @@ event_reset( void )
 
   free( event_free );
   event_free = NULL;
-
-  return 0;
 }
 
 /* Call a user-supplied function for every event in the current list */
-int
+void
 event_foreach( GFunc function, gpointer user_data )
 {
   g_slist_foreach( event_list, function, user_data );
-  return 0;
 }
 
 /* A textual representation of each event type */
@@ -252,7 +265,7 @@ event_name( int type )
 }
 
 /* Tidy-up function called at end of emulation */
-int
+void
 event_end( void )
 {
   return event_reset();

@@ -1,7 +1,7 @@
 /* confirm.c: Confirmation dialog box
    Copyright (c) 2008 Marek Januszewski
 
-   $Id: confirm.c 3288 2007-11-09 18:12:45Z zubzero $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

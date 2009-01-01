@@ -338,3 +338,4 @@ Media/IDE/DivIDE/Slave/_Eject, Item,, menu_media_ide_eject,, 7
 
 _Help, Branch
 Help/_Keyboard..., Item
+Help/_About..., Item

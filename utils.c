@@ -38,20 +38,20 @@
 
 #include "dck.h"
 #include "disk/beta.h"
-#include "divide.h"
 #include "fuse.h"
+#include "ide/divide.h"
+#include "ide/simpleide.h"
+#include "ide/zxatasp.h"
+#include "ide/zxcf.h"
 #include "if1.h"
 #include "if2.h"
 #include "machines/specplus3.h"
 #include "memory.h"
 #include "rzx.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "utils.h"
-#include "zxatasp.h"
-#include "zxcf.h"
 
 typedef struct path_context {
 
@@ -134,6 +134,22 @@ utils_open_file( const char *filename, int autoload,
     error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
     break;
 
+  case LIBSPECTRUM_CLASS_DISK_GENERIC:
+    if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ||
+        machine_current->machine == LIBSPECTRUM_MACHINE_PLUS2A )
+      error = specplus3_disk_insert( SPECPLUS3_DRIVE_A, filename, autoload );
+    else if( machine_current->machine == LIBSPECTRUM_MACHINE_PENT ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT512 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT1024 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
+      error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
+    else
+      if( periph_beta128_active )
+        error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
+      else if( periph_plusd_active )
+        error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
+    break;
+
   case LIBSPECTRUM_CLASS_CARTRIDGE_IF2:
     error = if2_insert( filename );
     break;
@@ -143,7 +159,10 @@ utils_open_file( const char *filename, int autoload,
     break;
 
   case LIBSPECTRUM_CLASS_CARTRIDGE_TIMEX:
-    error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
+    if( !( machine_current->capabilities &
+	   LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK ) ) {
+      error = machine_select( LIBSPECTRUM_MACHINE_TC2068 ); if( error ) break;
+    }
     error = dck_insert( filename );
     break;
 

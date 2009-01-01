@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2002-2008 Philip Kendall
+## Copyright (c) 2008 Fredrick Meunier
 
 ## $Id$
 
@@ -23,5 +23,20 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = coding_style.txt cvs-tags implementation_notes.txt \
-	tc2048_tech_notes.txt ui.txt
+AM_CPPFLAGS = -I$(srcdir)/..
+
+noinst_LIBRARIES = libide.a
+
+INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@
+
+libide_a_SOURCES = divide.c \
+		   ide.c \
+		   simpleide.c \
+		   zxatasp.c \
+		   zxcf.c
+
+noinst_HEADERS = divide.h \
+		 ide.h \
+		 simpleide.h \
+		 zxatasp.h \
+		 zxcf.h

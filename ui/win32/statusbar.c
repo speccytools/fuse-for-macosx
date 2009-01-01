@@ -228,16 +228,13 @@ win32statusbar_redraw( HWND hWnd, LPARAM lParam )
 }
 
 void
-win32statusbar_resize( HWND hWnd )
+win32statusbar_resize( HWND hWnd, WPARAM wParam, LPARAM lParam )
 {
   const int speed_bar_width = 70;
   
   /* divide status bar */
-  RECT rect;
-  GetClientRect( hWnd, &rect );
-  
   int parts[3];
-  parts[0] = rect.right - rect.left - icons_part_width - speed_bar_width;
+  parts[0] = LOWORD( lParam ) - icons_part_width - speed_bar_width;
   parts[1] = parts[0] + icons_part_width;
   parts[2] = parts[1] + speed_bar_width;
   SendMessage( fuse_hStatusWindow, SB_SETPARTS, 3, ( LPARAM ) &parts );

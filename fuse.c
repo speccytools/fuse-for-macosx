@@ -49,14 +49,17 @@
 #include "disk/beta.h"
 #include "disk/fdd.h"
 #include "display.h"
-#include "divide.h"
 #include "event.h"
 #include "fuse.h"
+#include "ide/divide.h"
+#include "ide/simpleide.h"
+#include "ide/zxatasp.h"
+#include "ide/zxcf.h"
 #include "if1.h"
 #include "if2.h"
 #include "joystick.h"
-#include "keyboard.h"
 #include "kempmouse.h"
+#include "keyboard.h"
 #include "machine.h"
 #include "memory.h"
 #include "pokefinder/pokefinder.h"
@@ -66,20 +69,17 @@
 #include "rzx.h"
 #include "scld.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "slt.h"
 #include "snapshot.h"
 #include "sound.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "timer/timer.h"
-#include "ui/ui.h"
 #include "ui/scaler/scaler.h"
+#include "ui/ui.h"
 #include "ula.h"
 #include "unittests/unittests.h"
 #include "utils.h"
-#include "zxatasp.h"
-#include "zxcf.h"
 
 #ifdef USE_WIDGET
 #include "ui/widget/widget.h"
@@ -103,7 +103,7 @@ int fuse_emulation_paused;
 libspectrum_creator *fuse_creator;
 
 /* The earliest version of libspectrum we need */
-static const char *LIBSPECTRUM_MIN_VERSION = "0.2.0.1";
+static const char *LIBSPECTRUM_MIN_VERSION = "0.5.0";
 
 /* The various types of file we may want to run on startup */
 typedef struct start_files_t {
@@ -570,6 +570,23 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_DISK_TRDOS:
       start_files->disk_beta = filename; break;
 
+    case LIBSPECTRUM_CLASS_DISK_GENERIC:
+      if( machine_current->machine == LIBSPECTRUM_MACHINE_PLUS3 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PLUS2A )
+        start_files->disk_plus3 = filename;
+      else if( machine_current->machine == LIBSPECTRUM_MACHINE_PENT ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT512 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_PENT1024 ||
+          machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
+        start_files->disk_beta = filename; 
+      else {
+        if( periph_beta128_active )
+          start_files->disk_beta = filename; 
+        else if( periph_plusd_active )
+          start_files->disk_plusd = filename;
+      }
+      break;
+
     case LIBSPECTRUM_CLASS_RECORDING:
       start_files->playback = filename; break;
 
@@ -767,6 +784,10 @@ static int fuse_end(void)
      set from memory for the text output */
   printer_end();
 
+  /* also required before memory is deallocated on Fuse for OS X where
+     settings need to look up machine names etc. */
+  settings_end();
+
   psg_end();
   rzx_end();
   debugger_end();
@@ -789,8 +810,6 @@ static int fuse_end(void)
 #ifdef USE_WIDGET
   widget_end();
 #endif                          /* #ifdef USE_WIDGET */
-
-  settings_end();
 
   libspectrum_creator_free( fuse_creator );
 

@@ -1,4 +1,4 @@
-snapshot.c: use the fully encapsulated libspectrum_snap
+20030505 snapshot.c: use the fully encapsulated libspectrum_snap
 	 implementation
 20030506 ui/gtk/options.pl: make 'cancel via Escape' GTK+ 2.0 compatible
 	 (Matthew Westcott)
@@ -2876,3 +2876,114 @@ snapshot.c: use the fully encapsulated libspectrum_snap
 	 instead of dynamic (Marek).
 20080824 configure.in: Changed configure logic: if SDL ui is selected, choose
 	 SDL for sound over any other available sound API (Marek).
+20080901 ui/win32/{win32ui.c,win32internals.h,statusbar.c}: Win32: Simplified
+	 WM_SIZE handlers by getting rid of GetClientRect (Marek).
+20080902 ui/win32/win32ui.c: Win32: Implemented gain and lose focus handlers
+	 similiarly to gtk ui (Marek).
+20080902 ui/win32/win32ui.c: Win32: Fixed an error message occurring when
+	 window is being minimized (Unknown display size/image size 0/1)
+	 (Marek).
+20080906 menu_data.pl,ui/win32/{win32ui.c,memorybrowser.c,debugger.c,
+	 win32internals.h,browse.c,picture.c,options.pl,pokefinder.c}: Win32:
+	 Reviewed and fixed all the return codes for all window message handles
+	 fixed selector dialog problem where cancelling the dialog would result
+	 in choosing option 0 (Marek).
+20080906 menu_data.pl: Win32: Minor fix to the menu handling code - moved
+	 return into proper place (Marek).
+20080910 ui/win32/{roms.rc,win32joystick.rc,pokefinder.rc,options-resource.pl,
+	 browse.rc,picture.rc,memorybrowser.rc,binary.rc,debugger.rc,
+	 rollback.rc,select_template.rc}: Win32: Changed style for all dialogs
+	 to make those dialogs show on the taskbar, converted
+	 select_template.rc from DOS to UNIX (Marek).
+20081006 compat/unix/file.c: make sure mode is specified when opening a file
+         for writing (fixes bug #2146742) (thanks, Cygnus) (Fred).
+20081021 z80/tests/README: small documentation update (patch #2183257)
+         (Matthew Westcott).
+20081021 ChangeLog: update for 0.10.0 release.
+20081022 menu.c,rzx.c,settings.dat,ui/options.dat: support for autosaves
+	 when using RZX recording.
+20081024 man/fuse.1: update. Still TODO: debugger updates.
+20081024 man/fuse.1: debugger updates.
+20081024 man/fuse.1: minor update for disk formats and compressed disk images
+         (Fred).
+20081028 configure.in: Fixed a typo in the configure script
+	 (was '--without-libsamplerate use libsamplerate') (Marek).
+20081029 fuse.c: move up settings_end to happen just after printer_end for
+         similar reasons - on OS X settings_end refers to machine and other
+         entries, so must be complete before deallocating the machine arrays
+         (Fred).
+20081031 README: small update for 0.10.0.
+20081102 disk/{fdd.c,upd_fdc.c}: stop hang if asked for index hole when disk
+         motor is off, and change spindown time so that The Running Man disk
+         works (bug #2212424) (Gergely Szasz; thanks, Mark Woodmass).
+20081102 ui/win32/win32ui.c: Win32: Made ui_error_specific function work
+	 similarly to the gtk ui equivalent (Marek).
+20081102 ui/win32/{win32ui.c,win32internals.h,win32joystick.[ch}: Win32:
+	 Implemented joystick handling using mmsystem API (and tested using PPJoy
+	 joystick emulator, hope it works with real hardware) (Marek).
+20081108 disk/disk.c: prevent array overrun (bug #2240211) (Gergely Szasz).
+20081108 disk/disk.c,fuse.c,utils.c: use libspectrum's ability to
+         identify more disk image formats (patch #2233744) (Gergely Szasz).
+20081109 hacking/cvs-tags: document 0.10.0 branch.
+20081109 disk/disk.c: stop buffer overrun from malformed .dsk (fixes bug
+	 #2248067) (Gergely Szasz).
+20081115 man/fuse.1: add debugger variables and print command
+	 (Release-0_10_0-branch).
+20081115 Makefile.am,hacking/Makefile.am,ui/win32/Makefile.am: make sure
+	 all files are distributed (Release-0_10_0-branch).
+20081116 ChangeLog,machines/{specplus2a.c,specplus3.c}: reading from the
+	 AY data port on the +2A/+3 is the same as reading from the
+         register port (thanks, Mark Woodmass).
+20081117 configure.in: bump version number for 0.10.0-pre1 release
+	 (Release_0_10_0-branch).
+20081118 rzx.c: don't autosave rzx snapshots when we are recording in compo
+         mode (Fred).
+20081119 disk/{disk.c,upd_fdc.c}: fix READ_DIAG emlation bugs to support
+         LERM Plus-3-Mate (fixes bug #2312217) (Gergely Szasz).
+20081120 compat/amiga/paths.c: implement compat_is_absolute_path for Amiga
+         (final part of patch #1712260) (Chris Young).
+20081120 utils.c: don't switch machine on autoloading a Timex dock cart if we
+         can already support them (Fred).
+20081122 disk/disk.c: fix a track length calculation bug (more of bug #2312217)
+         (Gergely Szasz).
+20081125 scld.c: fix loading of dock/exrom information from snapshots (Fred).
+20081129 disk/disk.c: limit weak sector handling to fix Coin-Op Hits (more of
+         bug #2312217) (Gergely Szasz).
+20081129 disk/disk.c: one instance of plus3_fix wasn't updated (thanks, Stuart
+         Brady) (Fred).
+20081129 configure.in,man/fuse.1,README: final tweaks for 0.10.0 release
+	 (Release_0_10_0-branch).
+20081201 fuse.c: update libspectrum version needed (Release_0_10_0-branch).
+20081202 ui/gtk/debugger.c: begin replacing the deprecated GtkCList interface
+	 with GtkTreeView/GtkTreeModel.
+20081203 configure.in,fuse.c,hacking/{ChangeLog,Makefile.am},Makefile.am,
+	 man/fuse.1,README,ui/win32/Makefile.am: merge Release_0_10_0-branch
+	 changes onto trunk.
+20081206 ui/fb/Makefile.am: distribute fbmouse.h (thanks, rkd77) (Fred).
+20081210 Makefile.am,compat/unix/file.c: must open files for writing with
+         O_TRUNC to ensure that any old data is cleared out. Also fix a
+         dependency problem (thanks, Matthew Westcott).
+20081210 ChangeLog,configure.in,man/fuse.1,README: update for 0.10.0.1 release.
+20081210 ui/gtk/debugger.c: final bit of GtkCList removal from this file.
+20081210 snapshot.c: remove fallback from +3/+3e to +2A as +3 will now
+	 always be available.
+20081214 disk/disk.c: relax "Track-Info" check (Gergely Szasz; thanks, Simon
+	 Owen).
+20081215 ui/widget/options-header.pl: remove unnecessary use directive (Fred).
+20081215 event.[ch],disk/fdd.c: fix issue with FDD motor events preventing
+         both +3 disk drives from being used (bug #2424700) (Gergely Szasz).
+20081215 event.[ch],rzx.c,spectrum.c,tape.c,timer/timer.[ch]: tidy new event
+	 removal function a bit, and make functions which can't error return
+	 void.
+20081222 menu_data.dat,menu.h,ui/gtk/gtkui.c,ui/widget/menu.c: add Help/About
+         dialog box (Alberto Garcia/Philip Kendall).
+20081225 ui/widget/query.c: make "Don't Save" return the correct enum (Fred).
+20081225 disk/plusd.c: support +D switching between the two drives when the
+         motor on signal is 'ON' as when copying between drives (fixes bug
+         #2465540) (Gergely Szasz).
+20081226 Makefile.am,compat/wii,configure.in,fuse.c,ide/{Makefile.am,
+         divide.[ch],ide.[ch],simpleide.[ch],zxatasp.[ch],zxcf.[ch]},menu.c,
+         periph.c,snapshot.c,ui/gtk/{debugger.c,gtkui.c},
+         ui/widget/{debugger.c,menu.c},ui/win32/debugger.c,utils.c,
+         z80/z80_ops.c: move ide related files to their own sub-directory
+         (Fred).

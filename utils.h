@@ -26,8 +26,6 @@
 #ifndef FUSE_UTILS_H
 #define FUSE_UTILS_H
 
-#include "compat.h"
-
 #include <libspectrum.h>
 
 typedef struct utils_file {
@@ -37,6 +35,8 @@ typedef struct utils_file {
 
 } utils_file;
 
+#include "compat.h"
+
 /* The types of auxiliary file we can look for */
 typedef enum utils_aux_type {
 
@@ -45,12 +45,6 @@ typedef enum utils_aux_type {
   UTILS_AUXILIARY_WIDGET,	/* Something from the widget/ directory */
 
 } utils_aux_type;
-
-#ifndef UI_WII
-typedef int compat_fd;
-#else                           /* #ifndef UI_WII */
-typedef FILE* compat_fd;
-#endif                          /* #ifndef UI_WII */
 
 int utils_open_file( const char *filename, int autoload,
 		     libspectrum_id_t *type );

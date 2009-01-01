@@ -8,10 +8,12 @@ Each test has the format:
 
 <arbitrary test description>
 AF BC DE HL AF' BC' DE' HL' IX IY SP PC
-I R IFF1 IFF2 <halted> <tstates>
+I R IFF1 IFF2 IM <halted> <tstates>
 
 <halted> specifies whether the Z80 is halted.
-<tstates> specifies the number of tstates to run the test for.
+<tstates> specifies the number of tstates to run the test for, in
+  decimal; the number actually executed may be higher, as the final
+  instruction is allowed to complete.
 
 Then followed by lines specifying the initial memory setup. Each has
 the format:

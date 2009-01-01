@@ -42,6 +42,7 @@ keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl fb $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = fbdisplay.h \
-	         fbkeyboard.h
+	         fbkeyboard.h \
+	         fbmouse.h
 
 CLEANFILES = keysyms.c

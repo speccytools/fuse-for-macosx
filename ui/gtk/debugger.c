@@ -37,6 +37,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "gtkinternals.h"
+#include "ide/zxcf.h"
 #include "machine.h"
 #include "memory.h"
 #include "scld.h"
@@ -45,7 +46,6 @@
 #include "ula.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
-#include "zxcf.h"
 
 /* The various debugger panes */
 typedef enum debugger_pane {
@@ -63,6 +63,47 @@ typedef enum debugger_pane {
 
 } debugger_pane;
 
+/* The columns used in the breakpoints pane */
+
+enum {
+  BREAKPOINTS_COLUMN_ID,
+  BREAKPOINTS_COLUMN_TYPE,
+  BREAKPOINTS_COLUMN_VALUE,
+  BREAKPOINTS_COLUMN_IGNORE,
+  BREAKPOINTS_COLUMN_LIFE,
+  BREAKPOINTS_COLUMN_CONDITION,
+
+  BREAKPOINTS_COLUMN_COUNT
+};
+
+/* The columns used in the disassembly pane */
+
+enum {
+  DISASSEMBLY_COLUMN_ADDRESS,
+  DISASSEMBLY_COLUMN_INSTRUCTION,
+
+  DISASSEMBLY_COLUMN_COUNT
+};
+
+/* The columns used in the stack pane */
+
+enum {
+  STACK_COLUMN_ADDRESS,
+  STACK_COLUMN_VALUE_TEXT,
+  STACK_COLUMN_VALUE_INT,
+
+  STACK_COLUMN_COUNT
+};
+
+/* The columns used in the events pane */
+
+enum {
+  EVENTS_COLUMN_TIME,
+  EVENTS_COLUMN_TYPE,
+
+  EVENTS_COLUMN_COUNT
+};
+
 static int create_dialog( void );
 static int hide_hidden_panes( void );
 static GtkCheckMenuItem* get_pane_menu_item( debugger_pane pane );
@@ -72,22 +113,22 @@ static void toggle_display( gpointer callback_data, guint callback_action,
 			    GtkWidget *widget );
 static int create_register_display( GtkBox *parent, gtkui_font font );
 static int create_memory_map( GtkBox *parent );
-static int create_breakpoints( GtkBox *parent );
-static int create_disassembly( GtkBox *parent, gtkui_font font );
-static int create_stack_display( GtkBox *parent, gtkui_font font );
-static void stack_click( GtkCList *clist, gint row, gint column,
-			 GdkEventButton *event, gpointer user_data );
-static int create_events( GtkBox *parent );
-static void events_click( GtkCList *clist, gint row, gint column,
-			  GdkEventButton *event, gpointer user_data );
+static void create_breakpoints( GtkBox *parent );
+static void create_disassembly( GtkBox *parent, gtkui_font font );
+static void create_stack_display( GtkBox *parent, gtkui_font font );
+static void stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
+			    GtkTreeViewColumn *column, gpointer user_data );
+static void create_events( GtkBox *parent );
+static void events_activate( GtkTreeView *tree_view, GtkTreePath *path,
+			     GtkTreeViewColumn *column, gpointer user_data );
 static int create_command_entry( GtkBox *parent, GtkAccelGroup *accel_group );
 static int create_buttons( GtkDialog *parent, GtkAccelGroup *accel_group );
 
 static int activate_debugger( void );
 static int update_memory_map( void );
-static int update_breakpoints( void );
-static int update_disassembly( void );
-static int update_events( void );
+static void update_breakpoints( void );
+static void update_disassembly( void );
+static void update_events( void );
 static void add_event( gpointer data, gpointer user_data );
 static int deactivate_debugger( void );
 
@@ -113,6 +154,9 @@ static GtkWidget *dialog,		/* The debugger dialog box */
   *disassembly,				/* The actual disassembly widget */
   *stack,				/* The stack display */
   *events;				/* The events display */
+
+static GtkListStore *breakpoints_model, *disassembly_model, *stack_model,
+  *events_model;
 
 static GtkObject *disassembly_scrollbar_adjustment;
 
@@ -302,15 +346,10 @@ create_dialog( void )
 
   error = create_memory_map( GTK_BOX( hbox2 ) ); if( error ) return error;
 
-  error = create_breakpoints( GTK_BOX( vbox ) ); if( error ) return error;
-
-  error = create_disassembly( GTK_BOX( hbox ), font );
-  if( error ) return error;
-
-  error = create_stack_display( GTK_BOX( hbox ), font );
-  if( error ) return error;
-
-  error = create_events( GTK_BOX( hbox ) ); if( error ) return error;
+  create_breakpoints( GTK_BOX( vbox ) );
+  create_disassembly( GTK_BOX( hbox ), font );
+  create_stack_display( GTK_BOX( hbox ), font );
+  create_events( GTK_BOX( hbox ) );
 
   error = create_command_entry( GTK_BOX( GTK_DIALOG( dialog )->vbox ),
 				accel_group );
@@ -421,41 +460,50 @@ create_memory_map( GtkBox *parent )
   return 0;
 }
 
-static int
+static void
 create_breakpoints( GtkBox *parent )
 {
   size_t i;
 
-  gchar *breakpoint_titles[] = { "ID", "Type", "Value", "Ignore", "Life",
-				 "Condition" };
+  gchar *titles[] = { "ID", "Type", "Value", "Ignore", "Life",
+		      "Condition" };
 
-  breakpoints = gtk_clist_new_with_titles( 6, breakpoint_titles );
-  gtk_clist_column_titles_passive( GTK_CLIST( breakpoints ) );
-  for( i = 0; i < 6; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( breakpoints ), i, TRUE );
+  breakpoints_model = gtk_list_store_new( BREAKPOINTS_COLUMN_COUNT, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING );
+
+  breakpoints = gtk_tree_view_new_with_model( GTK_TREE_MODEL( breakpoints_model ) );
+  for( i = 0; i < BREAKPOINTS_COLUMN_COUNT; i++ ) {
+    GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[i], renderer, "text", i, NULL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( breakpoints ), column );
+  }
+
   gtk_box_pack_start_defaults( parent, breakpoints );
-
-  return 0;
 }
 
-static int
+static void
 create_disassembly( GtkBox *parent, gtkui_font font )
 {
   size_t i;
 
   GtkWidget *scrollbar;
-  gchar *disassembly_titles[] = { "Address", "Instruction" };
+  const gchar *titles[] = { "Address", "Instruction" };
 
   /* A box to hold the disassembly listing and the scrollbar */
   disassembly_box = gtk_hbox_new( FALSE, 0 );
   gtk_box_pack_start_defaults( parent, disassembly_box );
 
-  /* The disassembly CList itself */
-  disassembly = gtk_clist_new_with_titles( 2, disassembly_titles );
-  gtkui_set_font( disassembly, font );
-  gtk_clist_column_titles_passive( GTK_CLIST( disassembly ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( disassembly ), i, TRUE );
+  /* The disassembly itself */
+  disassembly_model =
+    gtk_list_store_new( DISASSEMBLY_COLUMN_COUNT, G_TYPE_STRING, G_TYPE_STRING );
+
+  disassembly = gtk_tree_view_new_with_model( GTK_TREE_MODEL( disassembly_model ) );
+  for( i = 0; i < DISASSEMBLY_COLUMN_COUNT; i++ ) {
+    GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[i], renderer, "text", i, NULL );
+    g_object_set( G_OBJECT( renderer ), "font-desc", font, "height", 18, NULL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( disassembly ), column );
+  }
+
   gtk_box_pack_start_defaults( GTK_BOX( disassembly_box ), disassembly );
 
   /* The disassembly scrollbar */
@@ -467,99 +515,104 @@ create_disassembly( GtkBox *parent, gtkui_font font )
   scrollbar =
     gtk_vscrollbar_new( GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
   gtk_box_pack_start( GTK_BOX( disassembly_box ), scrollbar, FALSE, FALSE, 0 );
-
+/*
   gtkui_scroll_connect( GTK_CLIST( disassembly ),
 			GTK_ADJUSTMENT( disassembly_scrollbar_adjustment ) );
-
-  return 0;
+*/
 }
 
-static int
+static void
 create_stack_display( GtkBox *parent, gtkui_font font )
 {
   size_t i;
-  gchar *stack_titles[] = { "Address", "Value" };
+  const gchar *titles[] = { "Address", "Instruction" };
+  
+  stack_model =
+    gtk_list_store_new( STACK_COLUMN_COUNT, G_TYPE_STRING, G_TYPE_STRING,
+			G_TYPE_INT );
 
-  stack = gtk_clist_new_with_titles( 2, stack_titles );
-  gtkui_set_font( stack, font );
-  gtk_clist_column_titles_passive( GTK_CLIST( stack ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( stack ), i, TRUE );
-  gtk_box_pack_start( parent, stack, TRUE, TRUE, 5 );
+  stack = gtk_tree_view_new_with_model( GTK_TREE_MODEL( stack_model ) );
 
-  gtk_signal_connect( GTK_OBJECT( stack ), "select-row",
-		      GTK_SIGNAL_FUNC( stack_click ), NULL );
-
-  return 0;
-}
-
-static void
-stack_click( GtkCList *clist GCC_UNUSED, gint row, gint column GCC_UNUSED,
-	     GdkEventButton *event, gpointer user_data GCC_UNUSED )
-{
-  libspectrum_word address, destination;
-  int error;
-
-  /* Ignore events which aren't double-clicks or select-via-keyboard */
-  if( event && event->type != GDK_2BUTTON_PRESS ) return;
-
-  address = SP + ( 19 - row ) * 2;
-
-  destination =
-    readbyte_internal( address ) + readbyte_internal( address + 1 ) * 0x100;
-
-  error = debugger_breakpoint_add_address(
-    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, destination, 0,
-    DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
-  );
-  if( error ) return;
-
-  debugger_run();
-}
-
-static int
-create_events( GtkBox *parent )
-{
-  size_t i;
-  gchar *titles[] = { "Time", "Type" };
-
-  events = gtk_clist_new_with_titles( 2, titles );
-  gtk_clist_column_titles_passive( GTK_CLIST( events ) );
-  for( i = 0; i < 2; i++ )
-    gtk_clist_set_column_auto_resize( GTK_CLIST( events ), i, TRUE );
-  gtk_box_pack_start( parent, events, TRUE, TRUE, 5 );
-
-  gtk_signal_connect( GTK_OBJECT( events ), "select-row",
-		      GTK_SIGNAL_FUNC( events_click ), NULL );
-
-  return 0;
-}
-
-static void
-events_click( GtkCList *clist, gint row, gint column GCC_UNUSED,
-	      GdkEventButton *event, gpointer user_data GCC_UNUSED )
-{
-  int got_text, error;
-  gchar *buffer;
-  libspectrum_dword tstates;
-
-  /* Ignore events which aren't double-clicks or select-via-keyboard */
-  if( event && event->type != GDK_2BUTTON_PRESS ) return;
-
-  got_text = gtk_clist_get_text( clist, row, 0, &buffer );
-  if( !got_text ) {
-    ui_error( UI_ERROR_ERROR, "couldn't get text for row %d", row );
-    return;
+  for( i = 0; i < 2; i++ ) {
+    GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[i], renderer, "text", i, NULL );
+    g_object_set( G_OBJECT( renderer ), "font-desc", font, "height", 18, NULL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( stack ), column );
   }
 
-  tstates = atoi( buffer );
-  error = debugger_breakpoint_add_time(
-    DEBUGGER_BREAKPOINT_TYPE_TIME, tstates, 0,
-    DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
-  );
-  if( error ) return;
+  gtk_box_pack_start( parent, stack, TRUE, TRUE, 5 );
 
-  debugger_run();
+  g_signal_connect( G_OBJECT( stack ), "row-activated", G_CALLBACK( stack_activate ), NULL );
+}
+
+static void
+stack_activate( GtkTreeView *tree_view, GtkTreePath *path,
+	        GtkTreeViewColumn *column GCC_UNUSED,
+		gpointer user_data GCC_UNUSED )
+{
+  GtkTreeIter it;
+  GtkTreeModel *model = gtk_tree_view_get_model( tree_view );
+
+  if( model && gtk_tree_model_get_iter( model, &it, path ) ) {
+    gint address;
+    int error;
+
+    gtk_tree_model_get( model, &it, STACK_COLUMN_VALUE_INT, &address, -1 );
+
+    error = debugger_breakpoint_add_address(
+      DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, address, 0,
+      DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
+    );
+    if( error ) return;
+
+    debugger_run();
+  }
+}
+
+static void
+create_events( GtkBox *parent )
+{
+  const gchar *titles[] = { "Time", "Type" };
+  size_t i;
+
+  events_model =
+    gtk_list_store_new( EVENTS_COLUMN_COUNT, G_TYPE_INT, G_TYPE_STRING );
+
+  events = gtk_tree_view_new_with_model( GTK_TREE_MODEL( events_model ) );
+
+  for( i = 0; i < EVENTS_COLUMN_COUNT; i++ ) {
+    GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes( titles[i], renderer, "text", i, NULL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( events ), column );
+  }
+
+  gtk_box_pack_start( parent, events, TRUE, TRUE, 5 );
+
+  g_signal_connect( G_OBJECT( events ), "row-activated", G_CALLBACK( events_activate ), NULL );
+}
+
+static void
+events_activate( GtkTreeView *tree_view, GtkTreePath *path,
+	         GtkTreeViewColumn *column GCC_UNUSED,
+		 gpointer user_data GCC_UNUSED )
+{
+  GtkTreeIter it;
+  GtkTreeModel *model = gtk_tree_view_get_model( tree_view );
+
+  if( model && gtk_tree_model_get_iter( model, &it, path ) ) {
+    libspectrum_dword event_tstates;
+    int error;
+
+    gtk_tree_model_get( model, &it, EVENTS_COLUMN_TIME, &event_tstates, -1 );
+
+    error = debugger_breakpoint_add_time(
+      DEBUGGER_BREAKPOINT_TYPE_TIME, event_tstates, 0,
+      DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
+    );
+    if( error ) return;
+
+    debugger_run();
+  }
 }
 
 static int
@@ -629,7 +682,7 @@ ui_debugger_update( void )
 {
   size_t i;
   char buffer[1024], format_string[1024];
-  gchar *disassembly_text[2] = { &buffer[0], &buffer[40] };
+  gchar buffer1[80], buffer2[80];
   libspectrum_word address;
   int capabilities; size_t length;
   int error;
@@ -725,29 +778,28 @@ ui_debugger_update( void )
   /* Update the memory map display */
   error = update_memory_map(); if( error ) return error;
 
-  error = update_breakpoints(); if( error ) return error;
-
-  /* Update the disassembly */
-  error = update_disassembly(); if( error ) return error;
+  update_breakpoints();
+  update_disassembly();
 
   /* And the stack display */
-  gtk_clist_freeze( GTK_CLIST( stack ) );
-  gtk_clist_clear( GTK_CLIST( stack ) );
+  gtk_list_store_clear( stack_model );
 
   for( i = 0, address = SP + 38; i < 20; i++, address -= 2 ) {
+
+    GtkTreeIter it;
     
     libspectrum_word contents = readbyte_internal( address ) +
 				0x100 * readbyte_internal( address + 1 );
 
-    snprintf( disassembly_text[0], 40, format_16_bit(), address );
-    snprintf( disassembly_text[1], 40, format_16_bit(), contents );
-    gtk_clist_append( GTK_CLIST( stack ), disassembly_text );
+    snprintf( buffer1, sizeof( buffer1 ), format_16_bit(), address );
+    snprintf( buffer2, sizeof( buffer2 ), format_16_bit(), contents );
+
+    gtk_list_store_append( stack_model, &it );
+    gtk_list_store_set( stack_model, &it, STACK_COLUMN_ADDRESS, buffer1, STACK_COLUMN_VALUE_TEXT, buffer2, STACK_COLUMN_VALUE_INT, (gint)contents, -1 );
   }
 
-  gtk_clist_thaw( GTK_CLIST( stack ) );
-
   /* And the events display */
-  error = update_events(); if( error ) return error;
+  update_events();
 
   return 0;
 }
@@ -777,26 +829,18 @@ update_memory_map( void )
   return 0;
 }
 
-static int
+static void
 update_breakpoints( void )
 {
-  gchar buffer[ 1024 ],
-    *breakpoint_text[6] = { &buffer[  0], &buffer[ 40], &buffer[80],
-			    &buffer[120], &buffer[160], &buffer[200] };
   GSList *ptr;
-  char format_string[ 1024 ], page[ 1024 ];
 
-  /* Create the breakpoint list */
-  gtk_clist_freeze( GTK_CLIST( breakpoints ) );
-  gtk_clist_clear( GTK_CLIST( breakpoints ) );
+  gtk_list_store_clear( breakpoints_model );
 
   for( ptr = debugger_breakpoints; ptr; ptr = ptr->next ) {
 
     debugger_breakpoint *bp = ptr->data;
-
-    snprintf( breakpoint_text[0], 40, "%lu", (unsigned long)bp->id );
-    snprintf( breakpoint_text[1], 40, "%s",
-	      debugger_breakpoint_type_text[ bp->type ] );
+    GtkTreeIter it;
+    gchar buffer[40], page[40], format_string[40];
 
     switch( bp->type ) {
 
@@ -804,108 +848,101 @@ update_breakpoints( void )
     case DEBUGGER_BREAKPOINT_TYPE_READ:
     case DEBUGGER_BREAKPOINT_TYPE_WRITE:
       if( bp->value.address.page == -1 ) {
-	snprintf( breakpoint_text[2], 40, format_16_bit(),
+	snprintf( buffer, sizeof( buffer ), format_16_bit(),
 		  bp->value.address.offset );
       } else {
-	debugger_breakpoint_decode_page( page, 1024, bp->value.address.page );
-	snprintf( format_string, 1024, "%%s:%s", format_16_bit() );
-	snprintf( breakpoint_text[2], 40, format_string, page,
+	debugger_breakpoint_decode_page( page, sizeof( page ),
+					 bp->value.address.page );
+	snprintf( format_string, sizeof( format_string ), "%%s:%s",
+		  format_16_bit() );
+	snprintf( buffer, sizeof( buffer ), format_string, page,
 		  bp->value.address.offset );
       }
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_PORT_READ:
     case DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE:
-      sprintf( format_string, "%s:%s", format_16_bit(), format_16_bit() );
-      snprintf( breakpoint_text[2], 40, format_string,
-		bp->value.port.mask, bp->value.port.port );
+      snprintf( format_string, sizeof( format_string ), "%s:%s",
+		format_16_bit(), format_16_bit() );
+      snprintf( buffer, sizeof( buffer ), format_string, bp->value.port.mask,
+		bp->value.port.port );
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_TIME:
-      snprintf( breakpoint_text[2], 40, "%5d", bp->value.time.tstates );
+      snprintf( buffer, sizeof( buffer ), "%5d", bp->value.time.tstates );
       break;
 
     case DEBUGGER_BREAKPOINT_TYPE_EVENT:
-      snprintf( breakpoint_text[2], 40, "%s:%s", bp->value.event.type,
+      snprintf( buffer, sizeof( buffer ), "%s:%s", bp->value.event.type,
 		bp->value.event.detail );
       break;
 
     }
 
-    snprintf( breakpoint_text[3], 40, "%lu", (unsigned long)bp->ignore );
-    snprintf( breakpoint_text[4], 40, "%s",
-	      debugger_breakpoint_life_text[ bp->life ] );
+    gtk_list_store_append( breakpoints_model, &it );
+    gtk_list_store_set(
+      breakpoints_model, &it,
+      BREAKPOINTS_COLUMN_ID, bp->id,
+      BREAKPOINTS_COLUMN_TYPE, debugger_breakpoint_type_text[ bp->type ],
+      BREAKPOINTS_COLUMN_VALUE, buffer,
+      BREAKPOINTS_COLUMN_IGNORE, bp->ignore,
+      BREAKPOINTS_COLUMN_LIFE, debugger_breakpoint_life_text[ bp->life ],
+      -1
+    );
+
     if( bp->condition ) {
-      debugger_expression_deparse( breakpoint_text[5], 80, bp->condition );
-    } else {
-      strcpy( breakpoint_text[5], "" );
+      gchar buffer2[80];
+      debugger_expression_deparse( buffer2, sizeof( buffer2 ), bp->condition );
+      gtk_list_store_set( breakpoints_model, &it, BREAKPOINTS_COLUMN_CONDITION, buffer2, -1 );
     }
 
-    gtk_clist_append( GTK_CLIST( breakpoints ), breakpoint_text );
   }
-
-  gtk_clist_thaw( GTK_CLIST( breakpoints ) );
-
-  return 0;
 }
 
-static int
+static void
 update_disassembly( void )
 {
-  size_t i, length; libspectrum_word address;
-  char buffer[80];
-  char *disassembly_text[2] = { &buffer[0], &buffer[40] };
+  size_t i; libspectrum_word address;
+  GtkTreeIter it;
 
-  gtk_clist_freeze( GTK_CLIST( disassembly ) );
-  gtk_clist_clear( GTK_CLIST( disassembly ) );
+  gtk_list_store_clear( disassembly_model );
 
   for( i = 0, address = disassembly_top; i < 20; i++ ) {
-    int l;
-    snprintf( disassembly_text[0], 40, format_16_bit(), address );
-    debugger_disassemble( disassembly_text[1], 40, &length, address );
+    size_t l, length;
+    char buffer1[40], buffer2[40];
+
+    snprintf( buffer1, sizeof( buffer1 ), format_16_bit(), address );
+    debugger_disassemble( buffer2, sizeof( buffer2 ), &length, address );
 
     /* pad to 16 characters (long instruction) to avoid varying width */
-    l = strlen( disassembly_text[1] );
-    while( l < 16 ) disassembly_text[1][l++] = ' ';
-    disassembly_text[1][l] = 0;
+    l = strlen( buffer2 );
+    while( l < 16 ) buffer2[l++] = ' ';
+    buffer2[l] = 0;
+
+    gtk_list_store_append( disassembly_model, &it );
+    gtk_list_store_set( disassembly_model, &it, DISASSEMBLY_COLUMN_ADDRESS, buffer1, DISASSEMBLY_COLUMN_INSTRUCTION, buffer2, -1 );
 
     address += length;
-
-    gtk_clist_append( GTK_CLIST( disassembly ), disassembly_text );
   }
-  gtk_clist_thaw( GTK_CLIST( disassembly ) );
-
-  return 0;
 }
 
-static int
+static void
 update_events( void )
 {
-  gtk_clist_freeze( GTK_CLIST( events ) );
-  gtk_clist_clear( GTK_CLIST( events ) );
-
+  gtk_list_store_clear( events_model );
   event_foreach( add_event, NULL );
-
-  gtk_clist_thaw( GTK_CLIST( events ) );
-
-  return 0;
 }
 
 static void
 add_event( gpointer data, gpointer user_data GCC_UNUSED )
 {
   event_t *ptr = data;
+  GtkTreeIter it;
 
-  char buffer[80];
-  char *event_text[2] = { &buffer[0], &buffer[40] };
-
-  /* Skip events which have been removed */
-  if( ptr->type == event_type_null ) return;
-
-  snprintf( event_text[0], 40, "%d", ptr->tstates );
-  strncpy( event_text[1], event_name( ptr->type ), 40 );
-
-  gtk_clist_append( GTK_CLIST( events ), event_text );
+  if( ptr->type != event_type_null ) {
+    gtk_list_store_append( events_model, &it );
+    gtk_list_store_set( events_model, &it, EVENTS_COLUMN_TIME, ptr->tstates, EVENTS_COLUMN_TYPE, event_name( ptr->type ), -1 );
+  }
 }
 
 static int

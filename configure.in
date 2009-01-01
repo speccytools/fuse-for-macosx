@@ -24,7 +24,7 @@ AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 
 dnl Use automake to produce `Makefile.in'
-AM_INIT_AUTOMAKE(fuse, 0.9.0)
+AM_INIT_AUTOMAKE(fuse, 0.10.0.1)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -411,7 +411,7 @@ AC_CHECK_HEADER(
 dnl Check if libsamplerate is available
 AC_MSG_CHECKING(whether libsamplerate support requested)
   AC_ARG_WITH(libsamplerate,
-  [  --without-libsamplerate use libsamplerate],
+  [  --without-libsamplerate don't use libsamplerate],
   if test "$withval" = no; then libsamplerate=no; else libsamplerate=yes; fi,
   libsamplerate=yes)
 AC_MSG_RESULT($libsamplerate)
@@ -659,6 +659,7 @@ compat/win32/Makefile \
 debugger/Makefile \
 disk/Makefile \
 hacking/Makefile \
+ide/Makefile \
 lib/Makefile \
 machines/Makefile \
 man/Makefile \

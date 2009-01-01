@@ -42,7 +42,6 @@
 #include "rzx.h"
 #include "screenshot.h"
 #include "settings.h"
-#include "simpleide.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "ui/uidisplay.h"
@@ -427,6 +426,13 @@ menu_help_keyboard( int action )
   widget_do( WIDGET_TYPE_PICTURE, &info );
 
   if( utils_close_file( &file ) ) return;
+}
+
+void
+menu_help_about( int action )
+{
+  widget_end_all( WIDGET_FINISHED_OK );
+  ui_error( UI_ERROR_INFO, "Free Unix Spectrum Emulator (Fuse) %s (c) 1999-2008 Philip Kendall and others. See http://fuse-emulator.sf.net/ for details.", VERSION );
 }
 
 static int

@@ -790,7 +790,6 @@ int
 tape_record_stop( void )
 {
   libspectrum_tape_block* block;
-  int error;
 
   /* put last sample into the recording buffer */
   rec_state.tape_buffer_used = write_rec_buffer( rec_state.tape_buffer,
@@ -799,8 +798,7 @@ tape_record_stop( void )
 
   /* stop scheduling events and turn buffer into a block and
      pop into the current tape */
-  error = event_remove_type( record_event );
-  if( error ) return error;
+  event_remove_type( record_event );
 
   block = libspectrum_tape_block_alloc( LIBSPECTRUM_TAPE_BLOCK_RLE_PULSE );
 

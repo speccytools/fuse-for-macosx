@@ -26,7 +26,14 @@
 #ifndef FUSE_COMPAT_H
 #define FUSE_COMPAT_H
 
+#include <stdio.h>
 #include <stdlib.h>
+
+#ifndef UI_WII
+typedef int compat_fd;
+#else                           /* #ifndef UI_WII */
+typedef FILE* compat_fd;
+#endif                          /* #ifndef UI_WII */
 
 #include "utils.h"
 
