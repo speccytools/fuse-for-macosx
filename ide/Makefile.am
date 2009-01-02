@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I$(srcdir)/..
 
 noinst_LIBRARIES = libide.a
 
-INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@
+INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 libide_a_SOURCES = divide.c \
 		   ide.c \
