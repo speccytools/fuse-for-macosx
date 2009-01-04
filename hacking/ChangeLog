@@ -2987,3 +2987,5 @@
          ui/widget/{debugger.c,menu.c},ui/win32/debugger.c,utils.c,
          z80/z80_ops.c: move ide related files to their own sub-directory
          (Fred).
+20090102 ide/Makefile.am: ensure we pick up glib in GTK+ builds.
+20090102 fuse.c: update copyright date.
