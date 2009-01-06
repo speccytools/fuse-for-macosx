@@ -1,7 +1,7 @@
-/* timer.h: Speed routines for Fuse
-   Copyright (c) 1999-2008 Philip Kendall
+/* timer.c: Win32 speed routines for Fuse
+   Copyright (c) 1999-2008 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
-   $Id$
+   $Id: timer.c 3763 2008-08-30 15:11:14Z pak21 $
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,18 @@
 
 */
 
-#ifndef FUSE_TIMER_H
-#define FUSE_TIMER_H
+#include <config.h>
 
-#include <libspectrum.h>
+#include "compat.h"
 
-int timer_estimate_reset( void );
-int timer_estimate_speed( void );
+double
+compat_timer_get_time( void )
+{
+  return GetTickCount() / 1000.0;
+}
 
-int timer_init(void);
-void timer_end( void );
-
-extern float current_speed;
-extern int timer_event;
-
-/* Internal routines */
-
-double timer_get_time( void );
-void timer_sleep( int ms );
-
-#endif			/* #ifndef FUSE_TIMER_H */
+void
+compat_timer_sleep( int ms )
+{
+  Sleep( ms );
+}

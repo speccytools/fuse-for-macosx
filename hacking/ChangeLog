@@ -2989,3 +2989,8 @@
          (Fred).
 20090102 ide/Makefile.am: ensure we pick up glib in GTK+ builds.
 20090102 fuse.c: update copyright date.
+20090106 compat.h,compat/{amiga/Makefile.am,morphos/Makefile.am,
+         unix/{Makefile.am,timer.c},win32/{Makefile.am,timer.c}},configure.in,
+         hacking/timer.txt,Makefile.am,timer/{Makefile.am,native.c,sdl.c,
+         timer.c,timer.h,unix.c,win32.c},ui/widget/widget.c: move better
+         abstraction of timer routines from the Wii branch.

@@ -1,7 +1,7 @@
-/* timer.h: Speed routines for Fuse
-   Copyright (c) 1999-2008 Philip Kendall
+/* native.c: native speed routines for Fuse
+   Copyright (c) 1999-2008 Philip Kendall, Marek Januszewski, Fredrick Meunier
 
-   $Id$
+   $Id: native.c 3763 2008-08-30 15:11:14Z pak21 $
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,20 @@
 
 */
 
-#ifndef FUSE_TIMER_H
-#define FUSE_TIMER_H
+#include <config.h>
 
-#include <libspectrum.h>
+#include "compat.h"
+#include "timer.h"
 
-int timer_estimate_reset( void );
-int timer_estimate_speed( void );
+double
+timer_get_time( void )
+{
+  return compat_timer_get_time();
+}
 
-int timer_init(void);
-void timer_end( void );
+void
+timer_sleep( int ms )
+{
+  compat_timer_sleep( ms );
+}
 
-extern float current_speed;
-extern int timer_event;
-
-/* Internal routines */
-
-double timer_get_time( void );
-void timer_sleep( int ms );
-
-#endif			/* #ifndef FUSE_TIMER_H */

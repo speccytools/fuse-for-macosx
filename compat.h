@@ -86,4 +86,9 @@ int compat_file_write( compat_fd fd, const unsigned char *buffer,
                        size_t length );
 int compat_file_close( compat_fd fd );
 
+/* Timing routines */
+
+double compat_timer_get_time( void );
+void compat_timer_sleep( int ms );
+
 #endif				/* #ifndef FUSE_COMPAT_H */

@@ -1,25 +1,17 @@
 What you need to implement for Fuse's timing routines
 =====================================================
 
-Fuse's timing routines require four functions to be implemented, and
-'timer_type' to be defined in timer.h as a type appropriate for the
-platform in question.
+If you're using SDL as the user interface, Fuse will use SDL's timing routines
+and no further implementation is required.
 
-* int timer_get_real_time( timer_type *real_time )
+If you're not using SDL, two routines are required:
 
-Set the implementation-dependant time structure real_time to the current
-time. Return zero on success and non-zero on error.
+* double compat_timer_get_time( void )
 
-* float timer_get_time_difference( timer_type *a, timer_type *b )
+Return the number of seconds since an arbitrary epoch, or a value < 0 if
+the time could not be determined.
 
-Return a float representing the difference between the implementation-dependant
-time structures a and b in seconds.
-
-* void timer_add_time_difference( timer_type *a, long msec )
-
-Add msec milliseconds to the implementation-dependant time structure a.
-
-* void timer_sleep_ms( int ms )
+* void compat_timer_sleep( int ms )
 
 Cause Fuse to go to sleep for the given number of milliseconds.
 
