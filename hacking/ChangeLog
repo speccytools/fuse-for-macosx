@@ -3001,3 +3001,4 @@
 20090107 compat.h,compat/unix/{dir.c,file.c},machine.c,utils.[ch]:
          utils_find_auxiliary_file needs to return a compat_fd, not an int
          (from Wii branch).
+20090107 utils.h: fix utils_read_fd prototype (from Wii branch).

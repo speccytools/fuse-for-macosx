@@ -50,7 +50,7 @@ int utils_open_file( const char *filename, int autoload,
 		     libspectrum_id_t *type );
 compat_fd utils_find_auxiliary_file( const char *filename, utils_aux_type type );
 int utils_read_file( const char *filename, utils_file *file );
-int utils_read_fd( int fd, const char *filename, utils_file *file );
+int utils_read_fd( compat_fd fd, const char *filename, utils_file *file );
 int utils_close_file( utils_file *file );
 
 int utils_write_file( const char *filename, const unsigned char *buffer,
