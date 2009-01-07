@@ -28,14 +28,14 @@
 
 #include <libspectrum.h>
 
+#include "compat.h"
+
 typedef struct utils_file {
 
   unsigned char *buffer;
   size_t length;
 
 } utils_file;
-
-#include "compat.h"
 
 /* The types of auxiliary file we can look for */
 typedef enum utils_aux_type {

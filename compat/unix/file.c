@@ -34,6 +34,7 @@
 
 #include "compat.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 /* Certain brain damaged operating systems (DOS/Windows) treat text
    and binary files different in open(2) and need to be given the
