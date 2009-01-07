@@ -2989,3 +2989,7 @@
          (Fred).
 20090102 ide/Makefile.am: ensure we pick up glib in GTK+ builds.
 20090102 fuse.c: update copyright date.
+20090107 Makefile.am,compat.h,compat/{amiga/Makefile.am,morphos/Makefile.am,
+         unix/{Makefile.am,dir.c},win32/Makefile.am},ui/widget/filesel.c:
+         add compatibility layer for directory reading routines (needed for
+         Wii port).

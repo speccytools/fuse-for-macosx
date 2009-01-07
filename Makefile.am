@@ -131,16 +131,20 @@ z80/libz80.a \
 compat/@COMPAT_OSNAME@/libcompatos.a \
 @WINDRES_OBJ@
 
-fuse_DEPENDENCIES = @UI_LIBS@ \
-                    compat/@COMPAT_OSNAME@/libcompatos.a
-		    disk/libdisk.a \
-		    debugger/libdebugger.a \
-		    ide/libide.a \
-		    machines/libmachines.a \
-		    sound/libsound.a \
-		    unittests/libunittests.a\
-		    z80/libz80.a \
-		    @WINDRES_OBJ@
+fuse_DEPENDENCIES = debugger/libdebugger.a \
+@UI_LIBS@ \
+debugger/libdebugger.a \
+disk/libdisk.a \
+ide/libide.a \
+machines/libmachines.a \
+pokefinder/libpokefinder.a \
+sound/libsound.a \
+timer/libtimer.a \
+ui/scaler/libscaler.a \
+unittests/libunittests.a \
+z80/libz80.a \
+compat/@COMPAT_OSNAME@/libcompatos.a \
+@WINDRES_OBJ@
 
 BUILT_SOURCES = settings.c settings.h
 

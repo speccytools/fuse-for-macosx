@@ -27,7 +27,8 @@ AM_CPPFLAGS = -I$(srcdir)/../..
 
 noinst_LIBRARIES = libcompatos.a
 
-libcompatos_a_SOURCES = file.c \
+libcompatos_a_SOURCES = dir.c \
+			file.c \
 			osname.c \
 			paths.c \
 			timer.c
