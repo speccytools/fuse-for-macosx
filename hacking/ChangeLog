@@ -2994,3 +2994,7 @@
          hacking/timer.txt,Makefile.am,timer/{Makefile.am,native.c,sdl.c,
          timer.c,timer.h,unix.c,win32.c},ui/widget/widget.c: move better
          abstraction of timer routines from the Wii branch.
+20090107 Makefile.am,compat.h,compat/{amiga/Makefile.am,morphos/Makefile.am,
+         unix/{Makefile.am,dir.c},win32/Makefile.am},ui/widget/filesel.c:
+         add compatibility layer for directory reading routines (needed for
+         Wii port).

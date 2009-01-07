@@ -26,7 +26,9 @@
 #ifndef FUSE_COMPAT_H
 #define FUSE_COMPAT_H
 
+#include <dirent.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 #include <utils.h>
 
@@ -73,11 +75,15 @@ int compat_is_absolute_path( const char *path );
 
 #ifndef UI_WII
 typedef int compat_fd;
+typedef DIR* compat_dir;
 #else                           /* #ifndef UI_WII */
 typedef FILE* compat_fd;
+typedef DIR_ITER* compat_dir;
 #endif                          /* #ifndef UI_WII */
 
 extern const compat_fd COMPAT_FILE_OPEN_FAILED;
+
+/* File handling */
 
 compat_fd compat_file_open( const char *path, int write );
 off_t compat_file_get_length( compat_fd fd );
@@ -85,6 +91,19 @@ int compat_file_read( compat_fd fd, utils_file *file );
 int compat_file_write( compat_fd fd, const unsigned char *buffer,
                        size_t length );
 int compat_file_close( compat_fd fd );
+
+/* Directory handling */
+
+typedef enum compat_dir_result_t {
+  COMPAT_DIR_RESULT_OK,
+  COMPAT_DIR_RESULT_END,
+  COMPAT_DIR_RESULT_ERROR,
+} compat_dir_result_t;
+
+compat_dir compat_opendir( const char *path );
+compat_dir_result_t compat_readdir( compat_dir directory, char *name,
+				    size_t length );
+int compat_closedir( compat_dir directory );
 
 /* Timing routines */
 

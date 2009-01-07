@@ -92,7 +92,7 @@ static char *widget_get_filename( const char *title, int saving );
 static int widget_add_filename( int *allocated, int *number,
 				struct widget_dirent ***namelist, char *name );
 static void widget_scan( char *dir );
-static int widget_select_file( const struct dirent *dirent );
+static int widget_select_file( const char *name );
 static int widget_scan_compare( const widget_dirent **a,
 				const widget_dirent **b );
 
@@ -267,19 +267,20 @@ amiga_asl( char *title ) {
 #else /* ifdef AMIGA */
 
 static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
-			   int (*select_fn)(const struct dirent*) )
+			   int (*select_fn)(const char*) )
 {
-  DIR *directory; struct dirent *dirent;
+  compat_dir directory;
 
   int allocated, number;
   int i;
+  int done = 0;
 
   *namelist = malloc( 32 * sizeof(**namelist) );
   if( !*namelist ) return -1;
 
   allocated = 32; number = 0;
 
-  directory = opendir( dir );
+  directory = compat_opendir( dir );
   if( !directory ) {
     free( *namelist );
     *namelist = NULL;
@@ -291,40 +292,44 @@ static int widget_scandir( const char *dir, struct widget_dirent ***namelist,
   is_rootdir = 1;
 #endif				/* #ifdef WIN32 */
 
-  while( 1 ) {
-    errno = 0;
-    dirent = readdir( directory );
+  while( !done ) {
+    char name[ NAME_MAX + 1 ];
+    compat_dir_result_t result = compat_readdir( directory, name, sizeof( name ) );
 
-    if( !dirent ) {
-      if( errno == 0 ) {	/* End of directory */
-	break;
-      } else {
-	for( i=0; i<number; i++ ) {
-	  free( (*namelist)[i]->name );
-	  free( (*namelist)[i] );
-	}
-	free( *namelist );
-	*namelist = NULL;
-	closedir( directory );
-	return -1;
-      }
-    }
-
-    if( select_fn( dirent ) ) {
+    switch( result )
+    {
+    case COMPAT_DIR_RESULT_OK:
+      if( select_fn( name ) ) {
 #ifdef WIN32
-      if( is_rootdir && !strcmp( dirent->d_name, ".." ) ) {
-	is_rootdir = 0;
-      }
+        if( is_rootdir && !strcmp( name, ".." ) ) {
+          is_rootdir = 0;
+        }
 #endif				/* #ifdef WIN32 */
-      if( widget_add_filename( &allocated, &number, namelist,
-			       dirent->d_name ) ) {
-	closedir( directory );
-	return -1;
+        if( widget_add_filename( &allocated, &number, namelist, name ) ) {
+          compat_closedir( directory );
+          return -1;
+        }
       }
+      break;
+
+    case COMPAT_DIR_RESULT_END:
+      done = 1;
+      break;
+
+    case COMPAT_DIR_RESULT_ERROR:
+      for( i=0; i<number; i++ ) {
+        free( (*namelist)[i]->name );
+        free( (*namelist)[i] );
+      }
+      free( *namelist );
+      *namelist = NULL;
+      compat_closedir( directory );
+      return -1;
     }
+
   }
 
-  if( closedir( directory ) ) {
+  if( compat_closedir( directory ) ) {
     for( i=0; i<number; i++ ) {
       free( (*namelist)[i]->name );
       free( (*namelist)[i] );
@@ -420,8 +425,10 @@ static void widget_scan( char *dir )
 
 }
 
-static int widget_select_file(const struct dirent *dirent){
-  return( dirent->d_name && strcmp( dirent->d_name, "." ) );
+static int
+widget_select_file( const char *name )
+{
+  return( name && strcmp( name, "." ) );
 }
 
 static int widget_scan_compare( const struct widget_dirent **a,
