@@ -30,8 +30,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#include <utils.h>
-
 /* Remove the gcc-specific incantations if we're not using gcc */
 #ifdef __GNUC__
 
@@ -85,9 +83,11 @@ extern const compat_fd COMPAT_FILE_OPEN_FAILED;
 
 /* File handling */
 
+struct utils_file;
+
 compat_fd compat_file_open( const char *path, int write );
 off_t compat_file_get_length( compat_fd fd );
-int compat_file_read( compat_fd fd, utils_file *file );
+int compat_file_read( compat_fd fd, struct utils_file *file );
 int compat_file_write( compat_fd fd, const unsigned char *buffer,
                        size_t length );
 int compat_file_close( compat_fd fd );

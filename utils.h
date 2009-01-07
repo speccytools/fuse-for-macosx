@@ -28,6 +28,8 @@
 
 #include <libspectrum.h>
 
+#include "compat.h"
+
 typedef struct utils_file {
 
   unsigned char *buffer;
@@ -46,7 +48,7 @@ typedef enum utils_aux_type {
 
 int utils_open_file( const char *filename, int autoload,
 		     libspectrum_id_t *type );
-int utils_find_auxiliary_file( const char *filename, utils_aux_type type );
+compat_fd utils_find_auxiliary_file( const char *filename, utils_aux_type type );
 int utils_read_file( const char *filename, utils_file *file );
 int utils_read_fd( int fd, const char *filename, utils_file *file );
 int utils_close_file( utils_file *file );
