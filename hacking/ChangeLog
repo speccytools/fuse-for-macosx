@@ -3002,3 +3002,6 @@
          utils_find_auxiliary_file needs to return a compat_fd, not an int
          (from Wii branch).
 20090107 utils.h: fix utils_read_fd prototype (from Wii branch).
+20090109 loader.c: don't call readbyte_internal macro with an argument that
+	 has side effects (fixes accelerated loaders with gcc 3.x; thanks,
+	 Carlos Almeida, Alberto Garcia and Alexander Yurchenko).
