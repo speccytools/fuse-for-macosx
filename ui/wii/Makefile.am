@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## Copyright (c) 2001-2009 Philip Kendall, Bjoern Giesler
 
-## $Id: Makefile.am 3153 2007-09-05 15:57:59Z zubzero $
+## $Id$
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by

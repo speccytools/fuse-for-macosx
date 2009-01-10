@@ -1,7 +1,7 @@
 /* osname.c: Get a representation of the OS we're running on
    Copyright (c) 1999-2009 Philip Kendall, Bjoern Giesler
 
-   $Id: osname.c 3115 2007-08-19 02:49:14Z fredm $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

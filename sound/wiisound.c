@@ -1,7 +1,7 @@
 /* wiisound.c: Wii sound routines
    Copyright (c) 2008-2009 Bjoern Giesler, Philip Kendall
 
-   $Id: nullsound.c 3115 2007-08-19 02:49:14Z fredm $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
