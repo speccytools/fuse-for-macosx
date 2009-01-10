@@ -123,6 +123,36 @@ Building the OS X version of Fuse
 The native Cocoa port by Fredrick Meunier <fredm@spamcop.net> comes as
 a set of Xcode projects for libgcrypt, libspectrum and Fuse itself.
 
+Building the Wii version of Fuse
+--------------------------------
+
+You'll need to have the standard Wii homebrew toolchain installed; see
+eg <http://wiibrew.org/wiki/DevkitPro> for some information on setting
+this up.
+
+After that, make sure the dev tools are in your path (export
+PATH=$PATH:$DEVKITPPC/bin) and that a Wii version of libspectrum has been
+built and installed.
+
+Then, use this configure line:
+
+./configure --target=powerpc-gekko --host=powerpc-gekko \
+	    --with-wii \
+	    --without-libxml2 --without-libiconv --without-gpm \
+	    --without-x --without-glib --without-libsamplerate \
+	    CFLAGS="-g -I$DEVKITPPC/include -I$DEVKITPRO/libogc/include" \
+	    LDFLAGS="-g -mrvl -mcpu=750 -meabi -mhard-float \
+                     -Wl,-Map,fuse.elf.map -L$DEVKITPPC/lib \
+                     -L$DEVKITPRO/libogc/lib/wii" \
+            LIBS="-lfat -lwiiuse -lbte -logc -lm"
+
+Finally, to build, use this line:
+
+EXEEXT=".elf" make -e
+
+This should build fuse.elf, which you can run on your Wii via the usual
+methods.
+
 Closing comments
 ----------------
 

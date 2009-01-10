@@ -188,8 +188,19 @@ static int fuse_init(int argc, char **argv)
      generator with the current time */
   srand( (unsigned)time( NULL ) );
 
-  fuse_progname=argv[0];
+  /* Some platforms (e.g. Wii) do not have argc/argv */
+  if(argc > 0)
+    fuse_progname = argv[0];
+  else
+    fuse_progname = "fuse";
+  
   libspectrum_error_function = ui_libspectrum_error;
+
+#ifdef UI_WII
+  /* On the Wii, init the display first so we have a way of outputting
+     messages */
+  if( display_init(&argc,&argv) ) return 1;
+#endif
 
   if( !getcwd( fuse_directory, PATH_MAX - 1 ) ) {
     ui_error( UI_ERROR_ERROR, "error getting current working directory: %s",
@@ -233,7 +244,9 @@ static int fuse_init(int argc, char **argv)
 
   if( event_init() ) return 1;
   
+#ifndef UI_WII
   if( display_init(&argc,&argv) ) return 1;
+#endif
 
   if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
     if( libspectrum_init() ) return 1;
@@ -509,6 +522,11 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
   libspectrum_id_t type;
   libspectrum_class_t class;
   int error;
+
+#ifdef UI_WII
+  /* No argv on the Wii. Just return */
+  return 0;
+#endif
 
   for( i = first_arg; i < (size_t)argc; i++ ) {
 

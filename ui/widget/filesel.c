@@ -27,7 +27,6 @@
 #include <config.h>
 
 #include <sys/types.h>
-#include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -753,7 +752,10 @@ widget_filesel_chdir( void )
     widget_end_widget( WIDGET_FINISHED_CANCEL );
     return 1;
   }
+#ifndef UI_WII
+  /* Wii getcwd() already has the slash on the end */
   strcat( fn, FUSE_DIR_SEP_STR );
+#endif				/* #ifndef UI_WII */
   strcat( fn, widget_filenames[ current_file ]->name );
 
 /*
@@ -788,6 +790,12 @@ http://thread.gmane.org/gmane.comp.gnu.mingw.user/9197
 void
 widget_filesel_keyhandler( input_key key )
 {
+  /* If there are no files (possible on the Wii), can't really do anything */
+  if( widget_numfiles == 0 ) {
+    if( key == INPUT_KEY_Escape ) widget_end_widget( WIDGET_FINISHED_CANCEL );
+    return;
+  }
+  
 #if defined AMIGA || defined __MORPHOS__
   if( exit_all_widgets ) {
     widget_end_all( err );

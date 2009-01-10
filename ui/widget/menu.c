@@ -396,14 +396,15 @@ menu_media_tape_browse( int action )
 void
 menu_help_keyboard( int action )
 {
-  int error, fd;
+  int error;
+  compat_fd fd;
   utils_file file;
   widget_picture_data info;
 
   static const char *filename = "keyboard.scr";
 
   fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
-  if( fd == -1 ) {
+  if( fd == COMPAT_FILE_OPEN_FAILED ) {
     ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
 	      filename );
     return;

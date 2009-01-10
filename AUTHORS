@@ -41,6 +41,8 @@ Fuse has been brought to you by:
 * Gergely Szasz: Interface I/microdrive emulation, the 'movie' code and the
   ao sound driver.
 
+* Bjoern Giesler: the original Wii port.
+
 * Philip Kendall: everything else.
 
 $Id$

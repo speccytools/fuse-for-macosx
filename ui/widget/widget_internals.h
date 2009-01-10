@@ -27,7 +27,6 @@
 #define FUSE_WIDGET_INTERNALS_H
 
 #include <sys/types.h>
-#include <dirent.h>
 #include <stdlib.h>
 
 #include <libspectrum.h>

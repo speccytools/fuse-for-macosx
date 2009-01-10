@@ -326,6 +326,10 @@ static int
 settings_command_line( settings_info *settings, int *first_arg,
                        int argc, char **argv )
 {
+#ifdef UI_WII
+  /* No argv on the Wii. Just return */
+  return 0;
+#endif
 
 #if !defined AMIGA && !defined __MORPHOS__
 

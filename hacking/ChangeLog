@@ -3005,3 +3005,10 @@
 20090109 loader.c: don't call readbyte_internal macro with an argument that
 	 has side effects (fixes accelerated loaders with gcc 3.x; thanks,
 	 Carlos Almeida, Alberto Garcia and Alexander Yurchenko).
+20090110 AUTHORS,compat.h,compat/{Makefile.am,wii/{file.c,osname.c,paths.c,
+	 timer.c}},configure.in,disk/disk.c,fuse.c,keysyms.pl,menu_data.dat,
+	 README,settings.pl,sound/wiisound.c,tape.c,ui/{Makefile.am,
+	 widget/{filesel.c,menu.c,widget.c,widget_internals.h},
+	 wii/{Makefile.am,wiidisplay.[ch],wiijoystick.c,wiikeyboard.[ch],
+	 wiikeysyms.h,wiimouse.[ch],wiiui.c}},utils.c: merge Wii port to
+	 trunk (Bjoern Giesler/Philip Kendall).

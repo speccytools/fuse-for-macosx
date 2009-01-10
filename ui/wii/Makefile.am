@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2003-2007 Philip Kendall
+## Copyright (c) 2001-2009 Philip Kendall, Bjoern Giesler
 
-## $Id$
+## $Id: Makefile.am 3153 2007-09-05 15:57:59Z zubzero $
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -19,19 +19,29 @@
 ##
 ## Author contact information:
 ##
-## E-mail: philip-fuse@shadowmagic.org.uk
+## E-mail: bjoern@giesler.de
 
-AM_CPPFLAGS += -I$(srcdir)/compat
+AUTOMAKE_OPTIONS = foreign
 
-DIST_SUBDIRS += compat/amiga \
-	       compat/morphos \
-	       compat/unix \
-	       compat/wii \
-	       compat/win32
+AM_CPPFLAGS = -I$(srcdir)/../..
 
-EXTRA_fuse_SOURCES += compat/dirname.c \
-		compat/getopt.c \
-		compat/getopt1.c \
-		compat/mkstemp.c
+noinst_LIBRARIES = libuiwii.a
 
-noinst_HEADERS += compat/getopt.h
+INCLUDES = @GLIB_CFLAGS@ @LIBSPEC_CFLAGS@
+
+libuiwii_a_SOURCES = wiidisplay.c \
+		    wiijoystick.c \
+	 	    wiikeyboard.c \
+	 	    wiimouse.c \
+		    wiiui.c \
+		    keysyms.c
+
+BUILT_SOURCES = keysyms.c
+
+keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
+	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl wii $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
+
+noinst_HEADERS = wiidisplay.h \
+	         wiikeyboard.h
+
+CLEANFILES = keysyms.c

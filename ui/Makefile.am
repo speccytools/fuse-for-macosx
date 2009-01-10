@@ -33,6 +33,7 @@ DIST_SUBDIRS = fb \
 	       sdl \
 	       svga \
 	       widget \
+	       wii \
 	       win32 \
 	       xlib
 

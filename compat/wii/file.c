@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #include "compat.h"
+#include "utils.h"
 #include "ui/ui.h"
 
 const compat_fd COMPAT_FILE_OPEN_FAILED = NULL;

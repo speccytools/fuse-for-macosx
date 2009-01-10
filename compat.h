@@ -26,6 +26,7 @@
 #ifndef FUSE_COMPAT_H
 #define FUSE_COMPAT_H
 
+#include <stdio.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -64,6 +65,10 @@ int mkstemp( char *template );
 #else
 #define FUSE_DIR_SEP_CHR '/'
 #define FUSE_DIR_SEP_STR "/"
+#endif
+
+#ifndef PATH_MAX
+#define PATH_MAX 1024
 #endif
 
 int compat_osname( char *buffer, size_t length );

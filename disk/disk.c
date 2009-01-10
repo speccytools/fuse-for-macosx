@@ -1457,10 +1457,14 @@ disk_open( disk_t *d, const char *filename, int preindex )
   libspectrum_id_t type;
   int error;
 
+#ifdef UI_WII		/* Wii doesn't have access() */
+  d->wrprot = 0;
+#else			/* #ifdef UI_WII */
   if( access( filename, W_OK ) == -1 )		/* file read only */
     d->wrprot = 1;
   else
     d->wrprot = 0;
+#endif			/* #ifdef UI_WII */
 
   if( utils_read_file( filename, &buffer.file ) )
     return d->status = DISK_OPEN;
