@@ -3014,3 +3014,7 @@
 	 trunk (Bjoern Giesler/Philip Kendall).
 20090111 configure.in: Wii: Modified configure script so that USE_JOYSTICK is
 	 always defined if Wii ui is used (Marek).
+20090111 ui/wii/wiimouse.c: Wii: Made wii remote arrows send joystick key codes
+	 instead of cursor key codes to the menu since widget now support
+	 joystick a little better. This fixed inability to check the checkboxes
+	 in the menu (Marek).
