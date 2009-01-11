@@ -3012,3 +3012,5 @@
 	 wii/{Makefile.am,wiidisplay.[ch],wiijoystick.c,wiikeyboard.[ch],
 	 wiikeysyms.h,wiimouse.[ch],wiiui.c}},utils.c: merge Wii port to
 	 trunk (Bjoern Giesler/Philip Kendall).
+20090111 configure.in: Wii: Modified configure script so that USE_JOYSTICK is
+	 always defined if Wii ui is used (Marek).

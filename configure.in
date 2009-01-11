@@ -159,6 +159,7 @@ if test -z "$UI"; then
   if test "$wii" = yes; then
     AC_DEFINE([UI_WII], 1, [Defined if Wii UI in use])
     AC_DEFINE([USE_WIDGET], 1, [Defined if we're using a widget-based UI])
+    AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
     UI=wii; WIDGET=widget;
     UI_LIBS="ui/wii/libuiwii.a ui/widget/libwidget.a"
     target_os=wii
