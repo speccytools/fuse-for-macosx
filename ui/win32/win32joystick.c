@@ -1,4 +1,4 @@
-/* gtkjoystick.c: Joystick emulation
+/* win32joystick.c: Joystick emulation
    Copyright (c) 2003-2008 Darren Salt, Philip Kendall, Marek Januszewski
 
    $Id$

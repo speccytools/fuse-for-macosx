@@ -3025,3 +3025,5 @@
 	 code (Marek).
 20090112 ui/win32/{installer/{Makefile.am,fuse.nsi},Makefile.am}: Win32: Added
 	 NSIS (nsis.sf.net) installer script (Marek).
+20090112 ui/win32/win32joystick.c: Win32: Small correction to the file's header
+	 info (Marek).
