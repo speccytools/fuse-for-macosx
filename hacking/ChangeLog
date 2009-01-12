@@ -3018,3 +3018,5 @@
 	 instead of cursor key codes to the menu since widget now support
 	 joystick a little better. This fixed inability to check the checkboxes
 	 in the menu (Marek).
+20090112 ui/win32/win32ui.c: Win32: Created a simple Help->About message box
+	 (Marek).

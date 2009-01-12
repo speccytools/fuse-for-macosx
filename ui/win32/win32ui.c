@@ -624,6 +624,14 @@ menu_help_keyboard( int action )
   win32ui_picture( "keyboard.scr", 0 );
 }
 
+void
+menu_help_about( int action )
+{
+  /* TODO: create a help about window that's more similar to GTK,
+           with a clickable link to the website. */
+  ui_error( UI_ERROR_INFO, "Free Unix Spectrum Emulator (Fuse) %s (c) 1999-2008 Philip Kendall and others. See http://fuse-emulator.sf.net/ for details.", VERSION );
+}
+
 /* Functions to activate and deactivate certain menu items */
 static int
 set_active( HMENU menu, const char *path, int active )
