@@ -3027,3 +3027,5 @@
 	 NSIS (nsis.sf.net) installer script (Marek).
 20090112 ui/win32/win32joystick.c: Win32: Small correction to the file's header
 	 info (Marek).
+20090112 ui/win32/installer/fuse.nsi: Win32: Added information and license to
+	 the header of the NSIS installer script (Marek).
