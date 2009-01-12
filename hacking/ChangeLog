@@ -3021,3 +3021,5 @@
 20090112 ui/win32/win32ui.c: Win32: Created a simple Help->About message box
 	 (Marek).
 20090112 compat/win32/timer.c: Win32: Added missing include (Marek).
+20090112 configure.in: Win32: Added missing library link needed by the joystick
+	 code (Marek).
