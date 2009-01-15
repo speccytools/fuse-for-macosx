@@ -680,6 +680,7 @@ ui/scaler/Makefile \
 ui/widget/Makefile \
 ui/win32/Makefile \
 ui/win32/icons/Makefile \
+ui/win32/installer/Makefile \
 ui/xlib/Makefile \
 unittests/Makefile \
 z80/Makefile \
