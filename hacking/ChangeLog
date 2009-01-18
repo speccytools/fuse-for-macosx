@@ -3031,3 +3031,6 @@
 	 the header of the NSIS installer script (Marek).
 20090114 configure.in,ui/win32/{Makefile.am,icons/Makefile.am}: Win32: Fixed
 	 autotools scripts so that 'make dist' works properly for win32 ui (Marek).
+20090118 ui/wii/wiimouse.c: Wii: Changed menu navigation so that it's navigated
+	 using wii remote in horizontal position, consistently to how wii
+	 remote is used during emulation (Marek).

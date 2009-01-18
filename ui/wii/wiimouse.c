@@ -109,13 +109,13 @@ mouse_update( void )
     if( WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME )
       POST_KEYPRESS( INPUT_KEY_Escape );
     else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_DOWN )
-      POST_KEYPRESS( INPUT_JOYSTICK_DOWN );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_UP )
-      POST_KEYPRESS( INPUT_JOYSTICK_UP );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_LEFT )
-      POST_KEYPRESS( INPUT_JOYSTICK_LEFT );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT )
       POST_KEYPRESS( INPUT_JOYSTICK_RIGHT );
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_UP )
+      POST_KEYPRESS( INPUT_JOYSTICK_LEFT );
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_LEFT )
+      POST_KEYPRESS( INPUT_JOYSTICK_DOWN );
+    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT )
+      POST_KEYPRESS( INPUT_JOYSTICK_UP );
     else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_1 )
       POST_KEYPRESS( INPUT_JOYSTICK_FIRE_1 );
     else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_2 )
