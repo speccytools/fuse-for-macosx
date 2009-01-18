@@ -42,6 +42,7 @@ keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl wii $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = wiidisplay.h \
-	         wiikeyboard.h
+	         wiikeyboard.h \
+	         wiikeysyms.h
 
 CLEANFILES = keysyms.c

@@ -3034,3 +3034,5 @@
 20090118 ui/wii/wiimouse.c: Wii: Changed menu navigation so that it's navigated
 	 using wii remote in horizontal position, consistently to how wii
 	 remote is used during emulation (Marek).
+20090118 ui/wii/Makefile.am: Wii: Added wiikeysyms.h to the autotools script
+	 (Marek).
