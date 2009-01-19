@@ -3036,3 +3036,6 @@
 	 remote is used during emulation (Marek).
 20090118 ui/wii/Makefile.am: Wii: Added wiikeysyms.h to the autotools script
 	 (Marek).
+20090118 compat/wii/paths.c: Wii: Changed the home path location to absolute
+	 path, since the relative doesn't seem to work when saving settings
+	 (Marek).

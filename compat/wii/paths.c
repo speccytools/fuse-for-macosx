@@ -39,7 +39,7 @@ compat_get_temp_path( void )
 const char*
 compat_get_home_path( void )
 {
-  return ".";
+  return "sd:/apps/fuse";
 }
 
 int
