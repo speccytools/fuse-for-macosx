@@ -3039,3 +3039,6 @@
 20090118 compat/wii/paths.c: Wii: Changed the home path location to absolute
 	 path, since the relative doesn't seem to work when saving settings
 	 (Marek).
+20090122 ui/widget/filesel.c: Widget: Fixed potential problem with length of
+	 dirent.d_name and made windows version use constant FILENAME_MAX
+	 instead of NAME_MAX (Marek).
