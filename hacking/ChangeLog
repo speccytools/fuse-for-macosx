@@ -3042,3 +3042,5 @@
 20090122 ui/widget/filesel.c: Widget: Fixed potential problem with length of
 	 dirent.d_name and made windows version use constant FILENAME_MAX
 	 instead of NAME_MAX (Marek).
+20090124 ui/widget/menu.c: Widget: Added capability to define joystick buttons
+	 (Marek).
