@@ -3044,3 +3044,5 @@
 	 instead of NAME_MAX (Marek).
 20090124 ui/widget/menu.c: Widget: Added capability to define joystick buttons
 	 (Marek).
+20090126 input.c,ui/wii/wiijoystick.c: Wii: Added support for configuring A, B,
+	 Plus and Minus Wii Remote keys (Marek).

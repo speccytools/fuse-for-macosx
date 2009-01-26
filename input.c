@@ -257,6 +257,7 @@ do_joystick( const input_event_joystick_t *joystick_event, int press )
     return 0;
   }
 
+#ifndef UI_WII /* Home button opens the menu on Wii */
   switch( joystick_event->button ) {
   case INPUT_JOYSTICK_FIRE_2:
     fuse_emulation_pause();
@@ -267,6 +268,8 @@ do_joystick( const input_event_joystick_t *joystick_event, int press )
   default: break;		/* Remove gcc warning */
 
   }
+#endif  /* #ifndef UI_WII */
+
 #endif				/* #ifdef USE_WIDGET */
 
   which = joystick_event->which;
