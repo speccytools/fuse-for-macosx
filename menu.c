@@ -704,23 +704,26 @@ MENU_CALLBACK( menu_file_movies_recordmovieasscr )
 #ifdef USE_LIBPNG
 MENU_CALLBACK( menu_file_movies_recordmovieaspng )
 {
-  scaler_type scaler;
   char *filename;
 
   WIDGET_END;
 
   fuse_emulation_pause();
 
-  scaler = menu_get_scaler( screenshot_available_scalers );
-  if( scaler == SCALER_NUM ) {
+  screenshot_movie_scaler = menu_get_scaler( screenshot_available_scalers );
+  if( screenshot_movie_scaler == SCALER_NUM ) {
     fuse_emulation_unpause();
     return;
   }
 
-  filename = ui_get_save_filename( "Fuse - Save Screenshot as PNG" );
+  filename = ui_get_save_filename( "Fuse - Record Movie as PNG" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  screenshot_write( filename, scaler );
+  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
+            filename );
+
+  screenshot_movie_record = 2;
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
 
   free( filename );
 

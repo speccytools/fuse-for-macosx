@@ -3046,3 +3046,4 @@
 	 (Marek).
 20090126 input.c,ui/wii/wiijoystick.c: Wii: Added support for configuring A, B,
 	 Plus and Minus Wii Remote keys (Marek).
+20090202 menu.c: fix saving PNG movies (fixes bug #2551259) (Gergely Szasz).
