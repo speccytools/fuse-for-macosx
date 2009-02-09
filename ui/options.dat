@@ -31,6 +31,7 @@ peripherals
 Peripheral Options
 Checkbox, (K)empston joystick, joy_kempston, INPUT_KEY_k
 Checkbox, Kempston (m)ouse, kempston_mouse, INPUT_KEY_m
+Checkbox, (S)wap mouse buttons, mouse_swap_buttons, INPUT_KEY_s
 Checkbox, Inter(f)ace I, interface1, INPUT_KEY_f
 Checkbox, (I)nterface II, interface2, INPUT_KEY_i
 Checkbox, Emulate (p)rinters, printer, INPUT_KEY_p

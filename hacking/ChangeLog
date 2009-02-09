@@ -3047,3 +3047,7 @@
 20090126 input.c,ui/wii/wiijoystick.c: Wii: Added support for configuring A, B,
 	 Plus and Minus Wii Remote keys (Marek).
 20090202 menu.c: fix saving PNG movies (fixes bug #2551259) (Gergely Szasz).
+20090210 settings.dat,ui.c,ui/options.dat: allow user to swap Kempston mouse
+         buttons as some combinations of physical hardware and spectrum
+         software make it hard to use the standard mapping e.g. right clicking
+         and moving the cursor on Mac notebooks (thanks, Andrew Owen) (Fred).

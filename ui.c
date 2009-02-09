@@ -161,10 +161,16 @@ ui_mouse_button( int button, int down )
 {
   if( !ui_mouse_grabbed && !mouse_grab_suspended ) button = 2;
 
+  int kempston_button = !settings_current.mouse_swap_buttons;
+
   /* Possibly we'll end up handling _more_ than one mouse interface... */
   switch( button ) {
-  case 1: if( ui_mouse_grabbed ) kempmouse_update( 0, 0, 1, down ); break;
-  case 3: if( ui_mouse_grabbed ) kempmouse_update( 0, 0, 0, down ); break;
+  case 1:
+    if( ui_mouse_grabbed ) kempmouse_update( 0, 0, kempston_button, down );
+    break;
+  case 3:
+    if( ui_mouse_grabbed ) kempmouse_update( 0, 0, !kempston_button, down );
+    break;
   case 2:
     if( ui_mouse_present && settings_current.kempston_mouse
 	&& !down && !mouse_grab_suspended )
