@@ -3051,3 +3051,5 @@
          buttons as some combinations of physical hardware and spectrum
          software make it hard to use the standard mapping e.g. right clicking
          and moving the cursor on Mac notebooks (thanks, Andrew Owen) (Fred).
+20090211 compat/unix/timer.c: added include <sys/time.h> for gettimeofday
+         (Fred).
