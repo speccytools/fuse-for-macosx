@@ -41,6 +41,7 @@
 #include "display.h"
 #include "machine.h"
 #include "ui/uidisplay.h"
+#include "joystick.h"
 #include "keyboard.h"
 #include "options.h"
 #include "periph.h"
@@ -735,13 +736,6 @@ ui_get_rollback_point( GSList *points )
   return -1;
 }
 
-static const char *joystick_connection[] = {
-  "None",
-  "Keyboard",
-  "Joystick 1",
-  "Joystick 2",
-};
-
 ui_confirm_joystick_t
 ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 {
@@ -756,8 +750,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
 
   info.title = title;
   info.options = joystick_connection;
-  info.count = sizeof( joystick_connection    ) /
-	       sizeof( joystick_connection[0] );
+  info.count = JOYSTICK_CONN_COUNT;
   info.current = UI_CONFIRM_JOYSTICK_NONE;
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );

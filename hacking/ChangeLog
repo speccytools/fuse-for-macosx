@@ -3053,3 +3053,5 @@
          and moving the cursor on Mac notebooks (thanks, Andrew Owen) (Fred).
 20090211 compat/unix/timer.c: added include <sys/time.h> for gettimeofday
          (Fred).
+20090211 joystick.[ch],ui/gtk/gtkui.c,ui/widget/widget.c: remove duplication of
+         joystick_connection array (patch #1991669) (Gergely Szasz).

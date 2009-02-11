@@ -41,6 +41,7 @@
 #include "ide/simpleide.h"
 #include "ide/zxatasp.h"
 #include "ide/zxcf.h"
+#include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "machines/specplus3.h"
@@ -644,23 +645,13 @@ ui_menu_item_set_active( const char *path, int active )
   return 0;
 }
 
-static const char *joystick_connection[] = {
-  "None",
-  "Keyboard",
-  "Joystick 1",
-  "Joystick 2",
-};
-
-static const size_t joystick_connection_size =
-  sizeof( joystick_connection ) / sizeof( joystick_connection[0] );
-
 static void
 confirm_joystick_done( GtkWidget *widget GCC_UNUSED, gpointer user_data )
 {
   int i;
   gtkui_select_info *ptr = user_data;
 
-  for( i = 0; i < joystick_connection_size; i++ ) {
+  for( i = 0; i < JOYSTICK_CONN_COUNT; i++ ) {
 
     GtkToggleButton *button = GTK_TOGGLE_BUTTON( ptr->buttons[ i ] );
 
@@ -687,7 +678,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
   
   /* Some space to store the radio buttons in */
   dialog.buttons =
-    malloc( joystick_connection_size * sizeof( *dialog.buttons ) );
+    malloc( JOYSTICK_CONN_COUNT * sizeof( *dialog.buttons ) );
   if( !dialog.buttons ) {
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return UI_CONFIRM_JOYSTICK_NONE;
@@ -701,7 +692,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
 	    libspectrum_joystick_name( libspectrum_type ) );
   dialog.dialog = gtkstock_dialog_new( title, NULL );
 
-  for( i = 0; i < joystick_connection_size; i++ ) {
+  for( i = 0; i < JOYSTICK_CONN_COUNT; i++ ) {
 
     GtkWidget **button = &( dialog.buttons[ i ] );
 

@@ -76,6 +76,13 @@ const char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
   "Timex 1", "Timex 2"
 };
 
+const char *joystick_connection[ JOYSTICK_CONN_COUNT ] = {
+  "None",
+  "Keyboard",
+  "Joystick 1",
+  "Joystick 2",
+};
+
 static void joystick_from_snapshot( libspectrum_snap *snap );
 static void joystick_to_snapshot( libspectrum_snap *snap );
 
