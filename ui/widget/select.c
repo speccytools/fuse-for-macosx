@@ -150,6 +150,20 @@ widget_select_keyhandler( input_key key )
     }
     break;
 
+  case INPUT_KEY_Home:
+    if ( highlight_line ) {
+      new_highlight_line = 0;
+      cursor_pressed = 1;
+    }
+    break;
+
+  case INPUT_KEY_End:
+    if ( highlight_line + 2 < (ptrdiff_t)count ) {
+      new_highlight_line = (ptrdiff_t)count - 1;
+      cursor_pressed = 1;
+    }
+    break;
+
   default:	/* Keep gcc happy */
     break;
 

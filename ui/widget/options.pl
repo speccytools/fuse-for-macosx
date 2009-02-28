@@ -434,6 +434,20 @@ widget_$_->{name}_keyhandler( input_key key )
     }
     break;
 
+  case INPUT_KEY_Home:
+    if ( highlight_line ) {
+      new_highlight_line = 0;
+      cursor_pressed = 1;
+    }
+    break;
+
+  case INPUT_KEY_End:
+    if ( highlight_line + 2 < $count ) {
+      new_highlight_line = $count - 1;
+      cursor_pressed = 1;
+    }
+    break;
+
   case INPUT_KEY_space:
   case INPUT_KEY_0:
   case INPUT_JOYSTICK_RIGHT:
