@@ -3061,3 +3061,6 @@
 20090303 perl/cpp-perl.pl: extend cpp-perl.pl to handle all of #ifdef; #ifndef;
          #if defined; #if ! defined; #elif defined; #elif !defined; #else;
          #undef; #define (fixes bug #2065518) (Gergely Szasz).
+20090304 disk/disk.[ch],machines/specplus3.c: preformat new disks on +3 to
+         allow format command on +3 to work  (fixes bug #2602397) (Gergely
+         Szasz).

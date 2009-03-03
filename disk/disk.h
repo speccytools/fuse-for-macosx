@@ -122,6 +122,9 @@ int disk_open( disk_t *d, const char *filename, int preindex );
    UDI.
 */
 int disk_write( disk_t *d, const char *filename );
+/* format disk to plus3 accept for formatting
+*/
+int disk_preformat( disk_t *d );
 /* close a disk and free buffers
 */
 void disk_close( disk_t *d );

@@ -404,6 +404,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
     }
   } else {
     error = disk_new( &d->disk, 1, 40, DISK_DENS_AUTO, DISK_UDI );	/* 1 side 40 track */
+    disk_preformat( &d->disk );						/* pre-format disk for +3 */
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
 				disk_strerror( error ) );
