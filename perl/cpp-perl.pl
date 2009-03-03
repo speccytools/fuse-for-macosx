@@ -3,7 +3,7 @@
 # cpp-perl.pl: trivial preprocessor with just about enough intelligence
 # to parse config.h
 
-# Copyright (c) 2004 Philip Kendall
+# Copyright (c) 2004,2008 Philip Kendall, Gergely Szasz
 
 # $Id$
 
@@ -32,46 +32,85 @@ use IO::File;
 
 my %defines;
 my @conditions;
+my $condition;
 
 sub parse_file ($;$) {
     my( $filename, $inhibit ) = @_;
 
+    $condition = undef;
+
     $inhibit ||= 0;
 
     my $fh = new IO::File( '<' . $filename )
-	or die "Couldn't open '$filename': $!";
+        or die "Couldn't open '$filename': $!";
 
     while( <$fh> ) {
 
-	if( /^#define ([[:alnum:]_]+) (.*)$/ ) {
-	    $defines{$1} = $2;
-	    next;
-	}
+        if( not defined $condition ) {
+            $condition = 1;
+            foreach ( @conditions ) {
+                $condition = ( $condition and $_ );
+            }
+        }
 
-	if( /^#ifdef ([[:alnum:]_]+)/ ) {
-	    push @conditions, $conditions[-1] && defined $defines{$1};
-	    next;
-	}
+        if( /^#\s*define\s+([[:alnum:]_]+)\s+(.*)\s*$/ ) {
+            $defines{$1} = $2 if $condition;
+            next;
+        }
 
-	if( /^#ifndef ([[:alnum:]_]+)/ ) {
-	    push @conditions, $conditions[-1] && not defined $defines{$1};
-	    next;
-	}
+        if( /^#\s*undef\s+([[:alnum:]_]+)\s*$/ ) {
+            delete $defines{$1} if $condition;
+            next;
+        }
 
-	if( /^#endif/ ) {
-	    pop @conditions;
-	    next;
-	}
+        if( /^#\s*ifdef\s+([[:alnum:]_]+)/ or
+            /^#\s*if\s+defined\s+([[:alnum:]_]+)/ ) {
+            push @conditions, defined $defines{$1};
+            $condition = undef;
+            next;
+        }
 
-	s/^#.*$//;
+        if( /^#\s*ifndef\s+([[:alnum:]_]+)/ or
+            /^#\s*if\s+!\s*defined\s+([[:alnum:]_]+)/ ) {
+            push @conditions, not defined $defines{$1};
+            $condition = undef;
+            next;
+        }
+       
+        if( /^#\s*else/ ) {
+            $conditions[-1] = not $conditions[-1];
+            $condition = undef;
+            next;
+        }
+       
+        if( /^#\s*elif\s+defined\s+([[:alnum:]_]+)/ ) {
+            $conditions[-1] = $conditions[-1] ? not $conditions[-1] :
+                                defined $defines{$1};
+            $condition = undef;
+            next;
+        }
+       
+        if( /^#\s*elif\s+!\s*defined\s+([[:alnum:]_]+)/ ) {
+            $conditions[-1] = $conditions[-1] ? not $conditions[-1] :
+                                not defined $defines{$1};
+            $condition = undef;
+            next;
+        }
+       
+        if( /^#\s*endif/ ) {
+            pop @conditions;
+            $condition = undef;
+            next;
+        }
+
+        s/^#.*$//;
 
 
-	print if $conditions[-1] and not $inhibit;
+        print if $condition and not $inhibit;
     }
 }
-	
+        
 die "$0: usage: $0 /path/to/config.h /path/to/data/file\n" unless @ARGV == 2;
 
-push @conditions, 1;
 parse_file( $ARGV[0], 1 );
 parse_file( $ARGV[1] ); 

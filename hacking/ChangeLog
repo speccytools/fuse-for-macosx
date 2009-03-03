@@ -3058,3 +3058,6 @@
 20090301 options.pl,select.c: allow the use of the home and end keys in option
          and selection dialogs in the widget UIs (patch #2637459) (Gergely
          Szasz).
+20090303 perl/cpp-perl.pl: extend cpp-perl.pl to handle all of #ifdef; #ifndef;
+         #if defined; #if ! defined; #elif defined; #elif !defined; #else;
+         #undef; #define (fixes bug #2065518) (Gergely Szasz).
