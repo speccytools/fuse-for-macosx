@@ -266,7 +266,7 @@ possible_click( LPNMITEMACTIVATE lpnmitem )
   row = lpnmitem->iItem;
   
   error = debugger_breakpoint_add_address(
-    DEBUGGER_BREAKPOINT_TYPE_WRITE, possible_page[ row ],
+    DEBUGGER_BREAKPOINT_TYPE_WRITE, possible_page[ row ] + 1,
     possible_offset[ row ], 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL
   );
   if( error ) return;

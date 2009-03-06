@@ -3064,3 +3064,5 @@
 20090304 disk/disk.[ch],machines/specplus3.c: preformat new disks on +3 to
          allow format command on +3 to work  (fixes bug #2602397) (Gergely
          Szasz).
+20090306 ui/{gtk,win32}/pokefinder.c: Win32,GTK: Fixed Poke Finder passing the
+         wrong page for the possible found location to the debugger (Marek).
