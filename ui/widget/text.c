@@ -59,7 +59,7 @@ widget_text_draw( void *data )
   widget_printstring_right( 12, 28, 5, "[" );
   widget_printstring( 244, 28, 5, "]" );
 
-  widget_display_lines( 2, 2 );
+  widget_display_lines( 2, 3 );
 
   return widget_text_draw_text();
 }

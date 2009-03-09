@@ -3066,3 +3066,4 @@
          Szasz).
 20090306 ui/{gtk,win32}/pokefinder.c: Win32,GTK: Fixed Poke Finder passing the
          wrong page for the possible found location to the debugger (Marek).
+20090309 ui/widget/text.c: fix display of widget text entry boxes (Fred).
