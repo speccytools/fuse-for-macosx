@@ -74,6 +74,7 @@ typedef struct widget_option_entry {
 CODE
 
 foreach( @dialogs ) {
+    print "static int  widget_$_->{name}_running = 0;\n";
     foreach my $widget ( @{ $_->{widgets} } ) {
 	if( $widget->{type} eq "Checkbox" or $widget->{type} eq "Entry" ) {
 	    print << "CODE";
@@ -246,20 +247,19 @@ widget_options_print_entry( int left_edge, int width, int number, const char *pr
 int
 widget_options_finish( widget_finish_state finished )
 {
-  int error;
+  int error = 0;
 
   /* If we exited normally, actually set the options */
   if( finished == WIDGET_FINISHED_OK ) {
     error = settings_copy( &settings_current, &widget_options_settings );
-    settings_free( &widget_options_settings );
-    memset( &widget_options_settings, 0, sizeof( settings_info ) );
-    if( error ) return error;
-
     /* Bring the peripherals list into sync with the new options */
     periph_update();
     /* make the needed UI changes */
     uidisplay_hotswap_gfx_mode();
   }
+  settings_free( &widget_options_settings );
+  memset( &widget_options_settings, 0, sizeof( settings_info ) );
+  if( error ) return error;
 
   return 0;
 }
@@ -304,11 +304,14 @@ int
 widget_$_->{name}_draw( void *data GCC_UNUSED )
 {
   int error;
-  highlight_line = 0;
-  
-  /* Get a copy of the current settings */
-  error = settings_copy( &widget_options_settings, &settings_current );
-  if( error ) { settings_free( &widget_options_settings ); return error; }
+
+  if( !widget_$_->{name}_running ) {		/* we want to copy settings, only when start up */
+    highlight_line = 0;
+    /* Get a copy of the current settings */
+    error = settings_copy( &widget_options_settings, &settings_current );
+    if( error ) { settings_free( &widget_options_settings ); return error; }
+    widget_$_->{name}_running = 1;
+  }
 
   error = widget_options_show_all( options_$_->{name}, &widget_options_settings );
   if( error ) { settings_free( &widget_options_settings ); return error; }
@@ -414,6 +417,7 @@ widget_$_->{name}_keyhandler( input_key key )
   case INPUT_KEY_Escape:
   case INPUT_JOYSTICK_FIRE_2:
     widget_end_widget( WIDGET_FINISHED_CANCEL );
+    widget_$_->{name}_running = 0;
     break;
 
   case INPUT_KEY_Up:
@@ -459,6 +463,7 @@ widget_$_->{name}_keyhandler( input_key key )
   case INPUT_KEY_Return:
   case INPUT_JOYSTICK_FIRE_1:
     widget_end_all( WIDGET_FINISHED_OK );
+    widget_$_->{name}_running = 0;
 CODE
     print "    $_->{posthook}();\n" if $_->{posthook};
     print << "CODE";
