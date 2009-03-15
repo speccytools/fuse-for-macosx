@@ -167,6 +167,7 @@ typedef struct widget_select_t {
   size_t current;	/* Which option starts active? */
 
   int result;		/* What was selected? ( -1 if dialog cancelled ) */
+  int finish_all;	/* close all widget or not */
 
 } widget_select_t;
 

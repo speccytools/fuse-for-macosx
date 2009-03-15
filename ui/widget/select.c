@@ -34,6 +34,7 @@ static size_t highlight_line;
 
 const char *title;
 const char **options;
+static int finish_all;
 static size_t count;
 static int *result;
 
@@ -81,6 +82,7 @@ widget_select_draw( void *data )
     options = ptr->options;
     count = ptr->count;
     result = &( ptr->result );
+    finish_all = ptr->finish_all;
 
     highlight_line = ptr->current;
 
@@ -199,7 +201,8 @@ int widget_select_finish( widget_finish_state finished )
 {
   if( finished == WIDGET_FINISHED_OK ) {
     *result = highlight_line;
-    widget_end_all( WIDGET_FINISHED_OK );
+    if( finish_all )
+      widget_end_all( WIDGET_FINISHED_OK );
   } else {
     *result = -1;
   }

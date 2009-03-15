@@ -59,6 +59,7 @@ CODE
     foreach my $widget ( @{ $_->{widgets} } ) {
 
 	if( $widget->{type} eq "Checkbox" or
+	    $widget->{type} eq "Combo" or
 	    $widget->{type} eq "Entry"       ) {
 	    print "  GtkWidget *$widget->{value};\n";
 	} else {

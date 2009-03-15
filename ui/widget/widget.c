@@ -752,6 +752,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type, int inputs )
   info.options = joystick_connection;
   info.count = JOYSTICK_CONN_COUNT;
   info.current = UI_CONFIRM_JOYSTICK_NONE;
+  info.finish_all = 1;
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );
   if( error ) return UI_CONFIRM_JOYSTICK_NONE;

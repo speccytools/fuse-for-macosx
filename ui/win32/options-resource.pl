@@ -60,6 +60,8 @@ foreach( @dialogs ) {
 	    $buffer .= sprintf "  EDITTEXT IDC_%s_%s,70,$y,85,10\n",
 		$optname, uc( $widget->{value} );
 	    $y += 12;
+	} elsif( $widget->{type} eq "Combo" ) {
+	    ;	/* not implemented yet */
 	} else {
 	    die "Unknown type '$widget->{type}'";
 	}

@@ -60,6 +60,8 @@ foreach( @dialogs ) {
 		$optname, uc( $widget->{value} ), $optnum++;
 	    printf "#define IDC_%s_LABEL_%s %s\n",
 		$optname, uc( $widget->{value} ), $optnum++;
+	} elsif( $widget->{type} eq "Combo" ) {
+	    print STDERR "'Combo' - not implemented yet..\n";
 	} else {
 	    die "Unknown type '$widget->{type}'";
 	}

@@ -386,6 +386,7 @@ menu_get_scaler( scaler_available_fn selector )
   info.title = "Select scaler";
   info.options = options;
   info.count = count;
+  info.finish_all = 1;
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );
   if( error ) return SCALER_NUM;
@@ -577,6 +578,7 @@ menu_machine_select( int action )
   info.title = "Select machine";
   info.options = (const char**)options;
   info.count = machine_count;
+  info.finish_all = 1;
 
   error = widget_do( WIDGET_TYPE_SELECT, &info );
   free( buffer ); free( options );
