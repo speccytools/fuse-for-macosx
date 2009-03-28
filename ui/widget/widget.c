@@ -692,6 +692,7 @@ widget_t widget_data[] = {
 			                      widget_peripherals_keyhandler },
   { widget_query_draw,    NULL,			 widget_query_keyhandler    },
   { widget_query_save_draw,NULL,		 widget_query_save_keyhandler },
+  { widget_diskoptions_draw, widget_options_finish, widget_diskoptions_keyhandler  },
 };
 
 #ifndef UI_SDL

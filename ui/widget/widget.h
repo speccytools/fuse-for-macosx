@@ -58,7 +58,7 @@ typedef enum widget_type {
   WIDGET_TYPE_PERIPHERALS,	/* Peripherals options */
   WIDGET_TYPE_QUERY,		/* Query (yes/no) */
   WIDGET_TYPE_QUERY_SAVE,	/* Query (save/don't save/cancel) */
-
+  WIDGET_TYPE_DISKOPTIONS,	/* Disk options widget */
 } widget_type;
 
 /* Activate a widget */

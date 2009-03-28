@@ -83,8 +83,7 @@ specplus3e_reset( void )
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_update();
-
-  upd_fdc_master_reset( specplus3_fdc );
+  specplus3_765_reset();
   specplus3_menu_items();
 
   return 0;

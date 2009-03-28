@@ -33,6 +33,7 @@ use Fuse::Dialog;
 die "No data file specified" unless @ARGV;
 
 my %combo_sets;
+my %combo_default;
 my @dialogs = Fuse::Dialog::read( shift @ARGV );
 
 print Fuse::GPL( 'options.c: options dialog boxes',
@@ -67,26 +68,27 @@ typedef struct widget_option_entry {
   int index;
   input_key key;		/* Which key to activate this option */
   const char *suffix;
+  const char **options;
 
   widget_option_click_fn click;
   widget_option_draw_fn draw;
 } widget_option_entry;
 
 static void
-widget_combo_click( const char *title, const char **options, int count, char **current )
+widget_combo_click( const char *title, const char **options, char **current )
 \{
   int error, i;
   widget_select_t sel;
 
   sel.title = title;
   sel.options = options;
-  sel.count = count;
   sel.current = 0;
   sel.finish_all = 0;
-  for( i = 0; i < count; i++ ) {
+  for( i = 0; options[i] != NULL; i++ ) {
     if( !strcmp( options[ i ], *current ) )
       sel.current = i;
   }
+  sel.count = i;
 
   error = widget_do( WIDGET_TYPE_SELECT, &sel );
 
@@ -103,6 +105,14 @@ foreach( @dialogs ) {
 	if( $widget->{type} eq "Combo" ) {
 	    my $n = 0;
 
+	    foreach( split /\|/, $widget->{data1} ) {
+		if( s/^\*// ) {
+		    $combo_default{$widget->{value}} = $n;
+		}
+		$n++;
+	    }
+	    $widget->{data1} =~ s/^\*//;
+	    $widget->{data1} =~ s/\|\*/|/;
 	    if( not exists( $combo_sets{$widget->{data1}} ) ) {
 		$combo_sets{$widget->{data1}} = "widget_$widget->{value}_combo";
 
@@ -110,7 +120,6 @@ foreach( @dialogs ) {
 static const char *widget_$widget->{value}_combo[] = {
 CODE
 		foreach( split /\|/, $widget->{data1} ) {
-		    $n++;
 		    print << "CODE";
   "$_",
 CODE
@@ -118,13 +127,11 @@ CODE
 		print << "CODE";
   NULL
 };
-static int widget_$widget->{value}_combo_count = $n;
 
 CODE
 	    } else {
 		print << "CODE";
 \#define widget_$widget->{value}_combo $combo_sets{$widget->{data1}}
-\#define widget_$widget->{value}_combo_count $combo_sets{$widget->{data1}}_count
 
 CODE
 	    }
@@ -166,17 +173,17 @@ CODE
 	if( $widget->{type} eq "Checkbox" ) {
 
 	    print << "CODE";
-  \{ "$text", $which, $widget->{key}, NULL, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+  \{ "$text", $which, $widget->{key}, NULL, NULL, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
 CODE
         } elsif( $widget->{type} eq "Entry" ) {
 
 	    print << "CODE";
-  \{ "$text", $which, $widget->{key}, "$widget->{data2}", widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+  \{ "$text", $which, $widget->{key}, "$widget->{data2}", NULL, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
 CODE
         } elsif( $widget->{type} eq "Combo" ) {
 
 	    print << "CODE";
-  \{ "$text", $which, $widget->{key}, (const char *)widget_$widget->{value}_combo, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
+  \{ "$text", $which, $widget->{key}, NULL, widget_$widget->{value}_combo, widget_$widget->{value}_click, widget_option_$widget->{value}_draw \},
 CODE
 	} else {
 	    die "Unknown type `$widget->{type}'";
@@ -203,7 +210,7 @@ int widget_options_print_value( int left_edge, int width, int number, int value 
 int widget_options_print_entry( int left_edge, int width, int number, const char *prefix, int value,
 				const char *suffix );
 int widget_options_print_combo( int left_edge, int width, int number, const char *prefix,
-				const char *options, const char *value );
+				const char *options, const char *value, int def );
 
 static int widget_options_print_label( int left_edge, int width, int number, const char *string );
 static int widget_options_print_data( int left_edge, int menu_width, int number, const char *string, int tcolor );
@@ -312,14 +319,14 @@ widget_options_print_entry( int left_edge, int width, int number, const char *pr
 
 int
 widget_options_print_combo( int left_edge, int width, int number, const char *prefix,
-			    const char *option, const char *value )
+			    const char *option, const char *value, int def )
 {
   int i = 0;
   const char **opt, *c;
   char buffer[64];
 
   opt = (const char **)option;
-  c = opt[ 0 ];
+  c = opt[ def ];
   while( opt[ i ] != NULL ) {
     if( !strcmp( opt[ i ], value ) )
       c = opt[ i ];
@@ -370,6 +377,16 @@ widget_calculate_option_width(widget_option_entry *menu)
     /* If this is a number format, leave room for 4 digits as well as the
        text */
     if( ptr->suffix ) total_width += widget_stringwidth(ptr->suffix)+4*8;
+    if( ptr->options ) {
+      int combo_width = 0;
+      const char **options = ptr->options;
+      while( *options != NULL ) {
+        if( combo_width < widget_stringwidth( *options ) )
+          combo_width = widget_stringwidth( *options );
+        options++;
+      }
+      total_width += combo_width;
+    }
 
     if (total_width > max_width)
       max_width = total_width;
@@ -453,7 +470,7 @@ CODE
 static void
 widget_$widget->{value}_click( void )
 \{
-  widget_combo_click( "$title", widget_$widget->{value}_combo, widget_$widget->{value}_combo_count, &widget_options_settings.$widget->{value} );
+  widget_combo_click( "$title", widget_$widget->{value}_combo, &widget_options_settings.$widget->{value} );
 \}
 
 CODE
@@ -490,8 +507,8 @@ CODE
 static void
 widget_option_$widget->{value}_draw( int left_edge, int width, struct widget_option_entry *menu, settings_info *show )
 \{
-  widget_options_print_combo( left_edge, width, menu->index, menu->text, menu->suffix,
-			      show->$widget->{value} );
+  widget_options_print_combo( left_edge, width, menu->index, menu->text, menu->options,
+			      show->$widget->{value}, $combo_default{$widget->{value}} );
 \}
 
 CODE

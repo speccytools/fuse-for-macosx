@@ -438,6 +438,12 @@ menu_options_rzx( int action )
 }
 
 void
+menu_options_diskoptions( int action )
+{
+  widget_do( WIDGET_TYPE_DISKOPTIONS, NULL );
+}
+
+void
 menu_options_joysticks_select( int action )
 {
   int error, i;

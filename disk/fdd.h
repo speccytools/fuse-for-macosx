@@ -36,12 +36,14 @@ typedef enum fdd_error_t {
   FDD_GEOM,
   FDD_DATA,
   FDD_RDONLY,
+  FDD_NONE,		/* FDD not exist (disabled) */
   
   FDD_LAST_ERROR,
 } fdd_error_t;
 
 typedef enum fdd_type_t {
-  FDD_SHUGART = 0,		/* head load when selected */
+  FDD_TYPE_NONE = 0,	/* FDD not exist/disabled */
+  FDD_SHUGART,		/* head load when selected */
   /* 
      .. In a single drive system (program shunt position
         "MX" shorted), with program shunt position "HL"
@@ -102,12 +104,28 @@ typedef struct fdd_t {
 
 } fdd_t;
 
+typedef struct fdd_params_t {
+  char *name;
+  int enabled;
+  int auto_geom;
+  int heads;
+  int cylinders;
+} fdd_params_t;
+
+typedef enum fdd_drive_type_t {
+  FDD_DRIVE_PLUS_3 = 0,		/* +3 built-in drive */
+  FDD_DRIVE_BETA128,		/* beta128 first drive */
+  FDD_DRIVE_PLUS_D,		/* +D first drive */
+  FDD_DRIVE_GENERIC,
+} fdd_drive_type_t;
+
+
 /* initialize the event codes */
 int fdd_init_events( void );
 
 const char *fdd_strerror( int error );
 /* initialize the fdd_t struct, and set fdd_heads and cylinders (e.g. 2/83 ) */
-int fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls );
+int fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit );
 /* load the given disk into the fdd. if upsidedown = 1, floppy upsidedown in drive :) */
 int fdd_load( fdd_t *d, disk_t *disk, int upsidedown );
 /* unload the disk from fdd */
@@ -134,5 +152,7 @@ int fdd_read_write_data( fdd_t *d, fdd_write_t write );
 void fdd_wrprot( fdd_t *d, int wrprot );
 /* to reach index hole */
 void fdd_wait_index_hole( fdd_t *d );
+/* to get drive parameters from setting string */
+const fdd_params_t *fdd_get_params( const char *name, fdd_drive_type_t drive );
 
 #endif 	/* FUSE_FDD_H */

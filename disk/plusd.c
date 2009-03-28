@@ -131,7 +131,7 @@ plusd_init( void )
 
   for( i = 0; i < PLUSD_NUM_DRIVES; i++ ) {
     d = &plusd_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, 0, 0 );	/* drive geometry 'autodetect' */
+    fdd_init( &d->fdd, FDD_SHUGART, 0, 0, 0 );	/* drive geometry 'autodetect' */
     d->disk.flag = DISK_FLAG_NONE;
   }
 
@@ -156,6 +156,7 @@ plusd_reset( int hard_reset )
 {
   int i;
   wd_fdc_drive *d;
+  const fdd_params_t *dt;
 
   plusd_active = 0;
   plusd_available = 0;
@@ -196,14 +197,25 @@ plusd_reset( int hard_reset )
   }
 
   /* We can eject disks only if they are currently present */
+  dt = fdd_get_params( settings_current.drive_plusd1_type, FDD_DRIVE_PLUS_D );
+  fdd_init( &plusd_drives[ PLUSD_DRIVE_1 ].fdd, FDD_SHUGART,
+	    dt->heads, dt->cylinders, 1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_1 ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
 		    !plusd_drives[ PLUSD_DRIVE_1 ].fdd.wrprot );
+
+
+  dt = fdd_get_params( settings_current.drive_plusd2_type, FDD_DRIVE_GENERIC );
+  fdd_init( &plusd_drives[ PLUSD_DRIVE_2 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
+	    dt->heads, dt->cylinders, 1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_2 ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
 		    !plusd_drives[ PLUSD_DRIVE_2 ].fdd.wrprot );
+
 
   plusd_fdc->current_drive = &plusd_drives[ 0 ];
   fdd_select( &plusd_drives[ 0 ].fdd, 1 );
@@ -366,6 +378,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 {
   int error;
   wd_fdc_drive *d;
+  const fdd_params_t *dt;
 
   if( which >= PLUSD_NUM_DRIVES ) {
     ui_error( UI_ERROR_ERROR, "plusd_disk_insert: unknown drive %d",
@@ -389,7 +402,16 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
       return 1;
     }
   } else {
-    error = disk_new( &d->disk, 2, 80, DISK_DENS_AUTO, DISK_UDI );
+    switch( which ) {
+    case 0:
+      dt = fdd_get_params( settings_current.drive_plusd1_type, FDD_DRIVE_PLUS_D );
+      break;
+    case 1:
+    default:
+      dt = fdd_get_params( settings_current.drive_plusd2_type, FDD_DRIVE_GENERIC );
+      break;
+    }
+    error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
 				disk_strerror( error ) );

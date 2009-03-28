@@ -52,6 +52,7 @@
 #include "ula.h"
 #include "if1.h"
 #include "utils.h"
+#include "disk/fdd.h"
 #include "disk/upd_fdc.h"
 
 static int normal_memory_map( int rom, int page );
@@ -123,7 +124,7 @@ specplus3_765_init( void )
 {
   int i;
   upd_fdc_drive *d;
-  
+
   specplus3_fdc = upd_fdc_alloc_fdc( UPD765A, UPD_CLOCK_4MHZ );
   /*!!!! the plus3 only use the US0 pin to select drives,
    so drive 2 := drive 0 and drive 3 := drive 1 !!!!*/
@@ -134,13 +135,31 @@ specplus3_765_init( void )
 
   for( i = 0; i < SPECPLUS3_NUM_DRIVES; i++ ) {
     d = &specplus3_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, 0, 0 );		/* drive geometry 'autodetect' */
     d->disk.flag = DISK_FLAG_PLUS3_CPC;
   }
+					/* builtin drive 1 head 42 track */
+  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART, 1, 42, 0 );
+  fdd_init( &specplus3_drives[ 1 ].fdd, FDD_SHUGART, 0, 0, 0 );	/* drive geometry 'autodetect' */
   specplus3_fdc->set_intrq = NULL;
   specplus3_fdc->reset_intrq = NULL;
   specplus3_fdc->set_datarq = NULL;
   specplus3_fdc->reset_datarq = NULL;
+
+}
+
+void
+specplus3_765_reset( void )
+{
+  const fdd_params_t *dt;
+
+  upd_fdc_master_reset( specplus3_fdc );
+  dt = fdd_get_params( settings_current.drive_plus3a_type, FDD_DRIVE_PLUS_3 );
+  fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART,
+	    dt->heads, dt->cylinders, 1 );
+
+  dt = fdd_get_params( settings_current.drive_plus3b_type, FDD_DRIVE_GENERIC );
+  fdd_init( &specplus3_drives[ 1 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
+	    dt->heads, dt->cylinders, 1 );
 }
 
 static int
@@ -168,8 +187,7 @@ specplus3_reset( void )
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_update();
-
-  upd_fdc_master_reset( specplus3_fdc );
+  specplus3_765_reset();
   specplus3_menu_items();
 
   return 0;
@@ -341,11 +359,16 @@ specplus3_memory_map( void )
 void
 specplus3_menu_items( void )
 {
+  const fdd_params_t *dt;
+
   /* We can eject disks only if they are currently present */
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
 		    specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_WP_SET,
 		    !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.wrprot );
+
+  dt = fdd_get_params( settings_current.drive_plus3b_type, FDD_DRIVE_GENERIC );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
 		    specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_WP_SET,
@@ -380,6 +403,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
 {
   int error;
   upd_fdc_drive *d;
+  const fdd_params_t *dt;
 
   if( which >= SPECPLUS3_NUM_DRIVES ) {
     ui_error( UI_ERROR_ERROR, "specplus3_disk_insert: unknown drive %d",
@@ -403,7 +427,16 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
       return 1;
     }
   } else {
-    error = disk_new( &d->disk, 1, 40, DISK_DENS_AUTO, DISK_UDI );	/* 1 side 40 track */
+    switch( which ) {
+    case 0:
+      dt = fdd_get_params( settings_current.drive_plus3a_type, FDD_DRIVE_PLUS_3 );
+      break;
+    case 1:
+    default:
+      dt = fdd_get_params( settings_current.drive_plus3b_type, FDD_DRIVE_GENERIC );
+      break;
+    }
+    error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );
     disk_preformat( &d->disk );						/* pre-format disk for +3 */
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",

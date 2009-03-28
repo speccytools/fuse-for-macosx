@@ -38,6 +38,7 @@ int specplus3_port_from_ula( libspectrum_word port );
 
 int specplus3_init( fuse_machine_info *machine );
 void specplus3_765_init( void );
+void specplus3_765_reset( void );
 
 int specplus3_plus2a_common_reset( void );
 void specplus3_fdc_reset( void );

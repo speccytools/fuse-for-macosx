@@ -99,6 +99,8 @@ Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
 Options/_Filter..., Item,,, menu_filter_detail
 #endif
 
+Options/_Disk options..., Item
+
 #ifdef HAVE_LIB_XML2
 Options/separator, Separator
 Options/S_ave, Item

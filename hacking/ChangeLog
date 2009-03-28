@@ -3074,3 +3074,9 @@
          ui/win32/{options-resource.pl,options-header.pl}: add a new "Combo"
          type for options entry, for a selection from a defined list (patch
          #2637346) (Gergely Szasz).
+20090329 disk/{beta.c,fdd.[ch],plusd.c},machines/{specplus3.[ch},specplus3e.c},
+         menu.h,menu_data.dat,settings.dat,ui.c,ui/gtk/options.pl,
+         ui/{options.dat,ui.h},ui/widget/{menu.c,options.pl,widget.[ch]}:
+         allow the configuration of the drives attached to the various disk
+         interfaces (part of patch #2030341, also resolves feature request
+         #1724331) (Gergely Szasz).

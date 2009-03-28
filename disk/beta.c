@@ -143,7 +143,7 @@ beta_init( void )
 
   for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
     d = &beta_drives[ i ];
-    fdd_init( &d->fdd, FDD_SHUGART, 0, 0 );	/* drive geometry 'autodetect' */
+    fdd_init( &d->fdd, FDD_SHUGART, 0, 0, 0 );	/* drive geometry 'autodetect' */
     d->disk.flag = DISK_FLAG_NONE;
   }
   beta_select_drive( 0 );
@@ -167,6 +167,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 {
   int i;
   wd_fdc_drive *d;
+  const fdd_params_t *dt;
 
   event_remove_type( index_event );
 
@@ -202,22 +203,45 @@ beta_reset( int hard_reset GCC_UNUSED )
   }
 
   /* We can eject disks only if they are currently present */
+  dt = fdd_get_params( settings_current.drive_beta128a_type, FDD_DRIVE_BETA128 );
+  fdd_init( &beta_drives[ BETA_DRIVE_A ].fdd, FDD_SHUGART,
+	    dt->heads, dt->cylinders, 1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
 		    beta_drives[ BETA_DRIVE_A ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
 		    !beta_drives[ BETA_DRIVE_A ].fdd.wrprot );
+
+
+  dt = fdd_get_params( settings_current.drive_beta128b_type, FDD_DRIVE_GENERIC );
+  fdd_init( &beta_drives[ BETA_DRIVE_B ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
+	    dt->heads, dt->cylinders, 1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
 		    beta_drives[ BETA_DRIVE_B ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
 		    !beta_drives[ BETA_DRIVE_B ].fdd.wrprot );
+
+
+  dt = fdd_get_params( settings_current.drive_beta128c_type, FDD_DRIVE_GENERIC );
+  fdd_init( &beta_drives[ BETA_DRIVE_C ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
+	    dt->heads, dt->cylinders, 1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
 		    beta_drives[ BETA_DRIVE_C ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
 		    !beta_drives[ BETA_DRIVE_C ].fdd.wrprot );
+
+
+  dt = fdd_get_params( settings_current.drive_beta128d_type, FDD_DRIVE_GENERIC );
+  fdd_init( &beta_drives[ BETA_DRIVE_D ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
+	    dt->heads, dt->cylinders, 1 );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
 		    beta_drives[ BETA_DRIVE_D ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
 		    !beta_drives[ BETA_DRIVE_D ].fdd.wrprot );
+
 
   beta_select_drive( 0 );
   machine_current->memory_map();
@@ -342,6 +366,7 @@ beta_disk_insert( beta_drive_number which, const char *filename,
 {
   int error;
   wd_fdc_drive *d;
+  const fdd_params_t *dt;
 
   if( which >= BETA_NUM_DRIVES ) {
     ui_error( UI_ERROR_ERROR, "beta_disk_insert: unknown drive %d",
@@ -365,7 +390,22 @@ beta_disk_insert( beta_drive_number which, const char *filename,
       return 1;
     }
   } else {
-    error = disk_new( &d->disk, 2, 80, DISK_DENS_AUTO, DISK_UDI );
+    switch( which ) {
+    case 0:
+      dt = fdd_get_params( settings_current.drive_beta128a_type, FDD_DRIVE_BETA128 );
+      break;
+    case 1:
+      dt = fdd_get_params( settings_current.drive_beta128b_type, FDD_DRIVE_GENERIC );
+      break;
+    case 2:
+      dt = fdd_get_params( settings_current.drive_beta128c_type, FDD_DRIVE_GENERIC );
+      break;
+    case 3:
+    default:
+      dt = fdd_get_params( settings_current.drive_beta128d_type, FDD_DRIVE_GENERIC );
+      break;
+    }
+    error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
 				disk_strerror( d->disk.status ) );

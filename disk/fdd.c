@@ -44,6 +44,7 @@ static const char *fdd_error[] = {
   "OK",
   "invalid disk geometry",
   "read only disk",
+  "disk not exist (disabled)",
 
   "unknown error code"			/* will be the last */
 };
@@ -119,12 +120,17 @@ fdd_set_data( fdd_t *d, int fact )
 
 /* initialise fdd */
 int
-fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls )
+fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit )
 {
+  int upsidedown = d->upsidedown;
+  disk_t *disk = d->disk;
+  
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = 0;
   d->upsidedown = d->unreadable = d->loaded = d->auto_geom = d->selected = 0;
-  d->index = d->tr00 = d->wrprot = 1;
-  d->disk = NULL;
+  if( type == FDD_TYPE_NONE )
+    d->index = d->tr00 = d->wrprot = 0;
+  else
+    d->index = d->tr00 = d->wrprot = 1;
   d->type = type;
 
   if( heads < 0 || heads > 2 || cyls < 0 || cyls > 83 )
@@ -134,6 +140,11 @@ fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls )
     d->auto_geom = 1;
   d->fdd_heads = heads;
   d->fdd_cylinders = cyls;
+  if( reinit && disk ) {
+    fdd_unload( d );
+    fdd_load( d, disk, upsidedown );
+  } else
+    d->disk = NULL;
 
   return d->status = FDD_OK;
 }
@@ -202,6 +213,9 @@ fdd_select( fdd_t *d, int select )
 int
 fdd_load( fdd_t *d, disk_t *disk, int upsidedown )
 {
+  if( d->type == FDD_TYPE_NONE )
+    return d->status = FDD_NONE;
+
   if( disk->sides < 0 || disk->sides > 2 ||
       disk->cylinders < 0 || disk->cylinders > 83 )
     return d->status = FDD_GEOM;
@@ -338,4 +352,27 @@ fdd_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
 {
   fdd_t *d = user_data;
   d->ready = ( d->motoron & d->loaded );	/* 0x01 & 0x01 */
+}
+
+const fdd_params_t *
+fdd_get_params( const char *name, fdd_drive_type_t drive )
+{
+  int i;
+  const fdd_params_t fdd_params[] = {
+    { "Disabled", 0, 0, 0, 0 },
+    { "Auto", 1, 1, 0, 0 },
+    { "Single-sided 40 track", 1, 0, 1, 42 },
+    { "Double-sided 80 track", 1, 0, 2, 42 },
+    { "Single-sided 40 track", 1, 0, 1, 83 },
+    { "Double-sided 80 track", 1, 0, 2, 83 }
+  };
+
+  for( i = 0; i < sizeof( fdd_params ) / sizeof( fdd_params[0] ); i++ ) {
+    if( !strcmp( fdd_params[i].name, name ) && (
+		  ( ( drive == FDD_DRIVE_PLUS_3 || 
+		      drive != FDD_DRIVE_GENERIC ) && i > 0 ) ||	/* BETA128 A and +D 1 => from Auto */
+		    drive == FDD_DRIVE_GENERIC ) )			/* generic => all */
+      return &fdd_params[i];
+  }
+  return ( drive == FDD_DRIVE_PLUS_3 ? &fdd_params[2] : &fdd_params[5] );	/* SS 3" or DS 3.5" */
 }

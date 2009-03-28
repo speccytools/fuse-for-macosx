@@ -130,6 +130,7 @@ MENU_CALLBACK( menu_options_general );
 MENU_CALLBACK( menu_options_sound );
 MENU_CALLBACK( menu_options_peripherals );
 MENU_CALLBACK( menu_options_rzx );
+MENU_CALLBACK( menu_options_diskoptions );
 MENU_CALLBACK_WITH_ACTION( menu_options_joysticks_select );
 MENU_DETAIL( menu_keyboard_joystick_detail );
 MENU_DETAIL( menu_joystick_1_detail );

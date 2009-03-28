@@ -33,6 +33,7 @@ die "No data file specified" unless @ARGV;
 my @dialogs = Fuse::Dialog::read( shift @ARGV );
 
 my %combo_sets;
+my %combo_default;
 
 print Fuse::GPL( 'options.c: options dialog boxes',
 		 '2001-2004 Philip Kendall' ) . << "CODE";
@@ -71,6 +72,15 @@ foreach( @dialogs ) {
 	    if( $type eq "Combo" ) {
 		my $n = 0;
 
+		foreach( split( /\|/, $widget->{data1} ) ) {
+		    if( /^\*/ ) {
+			$combo_default{$widget->{value}} = $n;
+		    }
+		    $n++;
+		}
+		$n = 0;
+		$widget->{data1} =~ s/^\*//;
+		$widget->{data1} =~ s/\|\*/|/;
 		if( not exists( $combo_sets{$widget->{data1}} ) ) {
 		    $combo_sets{$widget->{data1}} = "$_->{name}_$widget->{value}_combo";
 
@@ -180,8 +190,10 @@ CODE
   combo = gtk_combo_box_new_text();
   for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
     gtk_combo_box_append_text( GTK_COMBO_BOX( combo ), $_->{name}_$widget->{value}_combo[i] );
-    if( i == 0 || 	/* set default */
-	!strcmp( settings_current.$widget->{value}, $_->{name}_$widget->{value}_combo[i] ) ) {
+  }
+  gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), $combo_default{$widget->{value}} );
+  for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
+    if( !strcmp( settings_current.$widget->{value}, $_->{name}_$widget->{value}_combo[i] ) ) {
       gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), i );
     }
   }
