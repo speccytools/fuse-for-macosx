@@ -430,7 +430,7 @@ static void fuse_show_help( void )
    "--record <filename>    Record to RZX file <filename>.\n"
    "--snapshot <filename>  Load snapshot <filename>.\n"
    "--speed <percentage>   How fast should emulation run?\n"
-   "--svga-mode <mode>     Which mode should be used for SVGAlib?\n"
+   "--fb-mode <mode>       Which mode should be used for FB?\n"
    "--tape <filename>      Open tape file <filename>.\n"
    "--version              Print version number and exit.\n\n" );
 }

@@ -1032,29 +1032,45 @@ from being able resize the window away from square.
 .PP
 .I "\-v mode"
 .br
-.I "\-\-svgamode mode"
+.I "\-\-fbmode mode"
 .RS
-Specify which mode to use for the SVGAlib and FB UIs. Available values for
+Specify which mode to use for the FB UI. Available values for
 .I mode
 are `320' (which corresponds to a 320x240x256 mode), the default and
 `640' (a 640x480x256 mode).
+.RE
+.PP
+.I "\-\-svga\-modes mode1,mode2,mode3"
+.RS
+Specify which SVGA mode to use for the SVGAlib UI at different screen
+sizes. Available values for
+.I mode1, mode2 and mode3
+are listed in a table, when Fuse called with
+.I "\-\-svga\-modes list"
+command line option.
+When user select a not available mode for a size, Fuse just ignore
+and try to find the best mode for it. e.g. with
+.I "\-\-svga\-modes 0,0,12"
+Fuse use the specified 1024x768@256 SVGA mode for triple size filters,
+but select SVGA modes automatically for normal or double size filters.
+The above mode number is just an example, and mode numbers and their
+meanings may vary graphics card by graphics card.
 .RE
 .PP
 .I "\-D mode"
 .br
 .I "\-\-doublescan\-mode mode"
 .RS
-Specify whether to use doublescan modes in the SVGAlib and FB UIs.
+Specify whether to use doublescan modes in the FB UI.
 Available values for
 .I mode
 are 0, 1 and 2. 0 means `never doublescan' (use 640x480 at either 72\ Hz or
 60\ Hz), whereas 1 and 2 both mean `try to use doublescan' and will fall back
-on the 640x480 modes. These latter two are treated identically for SVGA, but
-for FB, they differ: 1 selects 72\ Hz modes (the same size and shape as your
+on the 640x480 modes. 1 selects 72\ Hz modes (the same size and shape as your
 typical 640x480), and 2 selects 60\ Hz modes (overscan).
 .br
 If your monitor displays a blank screen when using 1 or 2, press F10 then
-try a different option or say `\-\-svgamode 640'.
+try a different option or say `\-\-fbmode 640'.
 .RE
 .PP
 .I "\-t file"
@@ -2593,11 +2609,10 @@ emulating machine's monitor. These filters can be used to do various
 forms of smoothing, emulation of TV scanlines and various other
 possibilities. Support for graphics filters varies between the
 different user interfaces, but there are two general classes: the GTK+,
-Xlib and SDL user interfaces (and the saving of .png screenshots) support
-`interpolating' filters which use a palette larger than the Spectrum's
-16 colours, while the SVGAlib user interface supports only
-`non-interpolating' filters. The framebuffer user interface currently
-does not support filters at all.
+Xlib, SVGAlib and SDL user interfaces (and the saving of .png
+screenshots) support `interpolating' filters which use a palette larger
+than the Spectrum's 16 colours, while the framebuffer user interface
+currently does not support filters at all.
 .PP
 A further complication arises due to the fact that the Timex machines
 have their high-resolution video mode with twice the horizontal

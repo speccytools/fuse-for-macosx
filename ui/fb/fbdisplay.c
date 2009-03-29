@@ -277,7 +277,7 @@ fb_set_mode( void )
 
   /* First, try to use our preferred mode */
   for( i=0; fb_modes[i].xres; i++ )
-    if( fb_modes[i].xres == settings_current.svga_mode )
+    if( fb_modes[i].xres == settings_current.fb_mode )
       if( !fb_select_mode( fb_modes + i ) )
 	return 0;
 

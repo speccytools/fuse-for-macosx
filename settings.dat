@@ -155,7 +155,8 @@ printer_text_filename, string, "printout.txt",, textfile
 
 aspect_hint, boolean, 1
 strict_aspect_hint, boolean, 0
-svga_mode, numeric, 320, 'v', svgamode
+fb_mode, numeric, 320, 'v', fbmode
+svga_modes, string, NULL
 doublescan_mode, numeric, 1, 'D', doublescan-mode
 
 start_scaler_mode, string, "normal", 'g', graphics-filter

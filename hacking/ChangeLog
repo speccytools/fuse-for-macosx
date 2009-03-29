@@ -3080,3 +3080,6 @@
          allow the configuration of the drives attached to the various disk
          interfaces (part of patch #2030341, also resolves feature request
          #1724331) (Gergely Szasz).
+20090329 man/fuse.1,fuse.c,settings.dat,ui/fb/fbdisplay.c,ui/svga/svgadisplay.c:
+         add support for the full range of bit depths and the full range of
+         scalers to the SVGA UI (patch #1745520) (Gergely Szasz).
