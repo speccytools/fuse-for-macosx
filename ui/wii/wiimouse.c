@@ -137,9 +137,9 @@ mouse_update( void )
         POST_KEYPRESS( INPUT_JOYSTICK_DOWN );
       else if( wm_down & WPAD_BUTTON_RIGHT )
         POST_KEYPRESS( INPUT_JOYSTICK_UP );
-      else if( ( wm_down & WPAD_BUTTON_A ) || ( wm_down & WPAD_BUTTON_1 ) )
+      else if( ( wm_down & WPAD_BUTTON_A ) || ( wm_down & WPAD_BUTTON_2 ) )
         POST_KEYPRESS( INPUT_JOYSTICK_FIRE_1 );
-      else if( ( wm_down & WPAD_BUTTON_B ) || ( wm_down & WPAD_BUTTON_2 )
+      else if( ( wm_down & WPAD_BUTTON_B ) || ( wm_down & WPAD_BUTTON_1 )
            || ( wm_down & WPAD_BUTTON_HOME ) )
         POST_KEYPRESS( INPUT_JOYSTICK_FIRE_2 );
   

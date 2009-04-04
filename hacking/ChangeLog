@@ -3087,3 +3087,5 @@
 	 (Marek).
 20090404 ui/widget/menu.c,ui/wii/{wiimouse.c,wiijoystick.c}: Wii: Added nunchuck
 	 support (Marek).
+20090404 ui/wii/wiimouse.c: Wii: Swapped the functions of 1 and 2 Wii remote
+	 buttons in the menu (Marek).
