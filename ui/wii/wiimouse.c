@@ -83,6 +83,12 @@ mouse_update( void )
      here and risk lagging 1 frame behind on the joystick
      FIXME: A function that does this only once depending on the
      current frame counter would be better */
+
+  int ctrlr; /* Which controller */
+  u32 wm_down; /* Wii Remote buttons */
+  
+  WPADData *wpad;
+
   WPAD_ScanPads();
 
 #define POST_KEYPRESS(pressed) do {		\
@@ -101,32 +107,41 @@ mouse_update( void )
     input_event(&fuse_event); \
   } while(0)
 
-  /* we don't bother with key releases here; this is only for entering
-     and/or using the menu, which seems to at best disregard
-     keyreleases and at worst react badly to them. */
+  for( ctrlr = 0; ctrlr < 2; ctrlr++ ) {
 
-  if(fuse_emulation_paused) {
-    if( WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME )
-      POST_KEYPRESS( INPUT_KEY_Escape );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_DOWN )
-      POST_KEYPRESS( INPUT_JOYSTICK_RIGHT );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_UP )
-      POST_KEYPRESS( INPUT_JOYSTICK_LEFT );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_LEFT )
-      POST_KEYPRESS( INPUT_JOYSTICK_DOWN );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_RIGHT )
-      POST_KEYPRESS( INPUT_JOYSTICK_UP );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_1 )
-      POST_KEYPRESS( INPUT_JOYSTICK_FIRE_1 );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_2 )
-      POST_KEYPRESS( INPUT_JOYSTICK_FIRE_2 );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_A )
-      POST_KEYPRESS( INPUT_KEY_Return );
-    else if( WPAD_ButtonsDown(0) & WPAD_BUTTON_B )
-      POST_KEYPRESS( INPUT_KEY_Escape );
-  } else {
-    if( WPAD_ButtonsDown(0) & WPAD_BUTTON_HOME )
-      POST_KEYPRESS(INPUT_KEY_F1);
+    wpad = WPAD_Data( ctrlr );
+    if( !wpad ) continue;
+
+    wm_down = wpad->btns_d;
+  
+    /* we don't bother with key releases here; this is only for entering
+       and/or using the menu, which seems to at best disregard
+       keyreleases and at worst react badly to them. */
+  
+    if(fuse_emulation_paused) {
+      if( wm_down & WPAD_BUTTON_HOME )
+        POST_KEYPRESS( INPUT_KEY_Escape );
+      else if( wm_down & WPAD_BUTTON_DOWN )
+        POST_KEYPRESS( INPUT_JOYSTICK_RIGHT );
+      else if( wm_down & WPAD_BUTTON_UP )
+        POST_KEYPRESS( INPUT_JOYSTICK_LEFT );
+      else if( wm_down & WPAD_BUTTON_LEFT )
+        POST_KEYPRESS( INPUT_JOYSTICK_DOWN );
+      else if( wm_down & WPAD_BUTTON_RIGHT )
+        POST_KEYPRESS( INPUT_JOYSTICK_UP );
+      else if( wm_down & WPAD_BUTTON_1 )
+        POST_KEYPRESS( INPUT_JOYSTICK_FIRE_1 );
+      else if( wm_down & WPAD_BUTTON_2 )
+        POST_KEYPRESS( INPUT_JOYSTICK_FIRE_2 );
+      else if( wm_down & WPAD_BUTTON_A )
+        POST_KEYPRESS( INPUT_KEY_Return );
+      else if( wm_down & WPAD_BUTTON_B )
+        POST_KEYPRESS( INPUT_KEY_Escape );
+  
+    } else {
+      if( wm_down & WPAD_BUTTON_HOME )
+        POST_KEYPRESS(INPUT_KEY_F1);
+    }
   }
 
   WPAD_ReadEvent( 0, &paddata );

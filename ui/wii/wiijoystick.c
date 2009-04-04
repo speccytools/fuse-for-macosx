@@ -54,6 +54,10 @@ void
 ui_joystick_poll( void )
 {
   input_event_t fuse_event;
+  int ctrlr; /* Which controller */
+  u32 wm_down; /* Wii Remote buttons that are down */
+  u32 wm_up; /* Wii Remote buttons that are up */
+  WPADData *wpad;
 
   if( fuse_emulation_paused ) return;
 
@@ -71,52 +75,58 @@ ui_joystick_poll( void )
     input_event(&fuse_event); \
   } while(0)
 
-  u32 btnsdown = WPAD_ButtonsDown(0);
-  u32 btnsup = WPAD_ButtonsUp(0);
+  for( ctrlr = 0; ctrlr < 2; ctrlr++ ) {
+
+    wpad = WPAD_Data( ctrlr );
+    if( !wpad ) continue;
   
-  if( btnsdown & WPAD_BUTTON_LEFT )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_DOWN );
-  if( btnsdown & WPAD_BUTTON_RIGHT )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_UP );
-  if( btnsdown & WPAD_BUTTON_UP )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_LEFT );
-  if( btnsdown & WPAD_BUTTON_DOWN )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_RIGHT );
-
-  if( btnsdown & WPAD_BUTTON_1 )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_1 );
-  if( btnsdown & WPAD_BUTTON_2 )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_2 );
-
-  if( btnsdown & WPAD_BUTTON_A )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_3 );
-  if( btnsdown & WPAD_BUTTON_B )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_4 );
-  if( btnsdown & WPAD_BUTTON_PLUS )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_5 );
-  if( btnsdown & WPAD_BUTTON_MINUS )
-    POST_JOYPRESS( 0, INPUT_JOYSTICK_FIRE_6 );
-
-  if( btnsup & WPAD_BUTTON_LEFT )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_DOWN );
-  if( btnsup & WPAD_BUTTON_RIGHT )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_UP );
-  if( btnsup & WPAD_BUTTON_UP )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_LEFT );
-  if( btnsup & WPAD_BUTTON_DOWN )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_RIGHT );
-
-  if( btnsup & WPAD_BUTTON_1 )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_1 );
-  if( btnsup & WPAD_BUTTON_2 )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_2 );
-
-  if( btnsup & WPAD_BUTTON_A )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_3 );
-  if( btnsup & WPAD_BUTTON_B )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_4 );
-  if( btnsup & WPAD_BUTTON_PLUS )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_5 );
-  if( btnsup & WPAD_BUTTON_MINUS )
-    POST_JOYRELEASE( 0, INPUT_JOYSTICK_FIRE_6 );
+    wm_down = wpad->btns_d;
+    wm_up = wpad->btns_u;
+  
+    if( wm_down & WPAD_BUTTON_LEFT )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_DOWN );
+    if( wm_down & WPAD_BUTTON_RIGHT )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_UP );
+    if( wm_down & WPAD_BUTTON_UP )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_LEFT );
+    if( wm_down & WPAD_BUTTON_DOWN )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_RIGHT );
+  
+    if( wm_down & WPAD_BUTTON_1 )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_FIRE_1 );
+    if( wm_down & WPAD_BUTTON_2 )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_FIRE_2 );
+  
+    if( wm_down & WPAD_BUTTON_A )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_FIRE_3 );
+    if( wm_down & WPAD_BUTTON_B )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_FIRE_4 );
+    if( wm_down & WPAD_BUTTON_PLUS )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_FIRE_5 );
+    if( wm_down & WPAD_BUTTON_MINUS )
+      POST_JOYPRESS( ctrlr, INPUT_JOYSTICK_FIRE_6 );
+  
+    if( wm_up & WPAD_BUTTON_LEFT )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_DOWN );
+    if( wm_up & WPAD_BUTTON_RIGHT )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_UP );
+    if( wm_up & WPAD_BUTTON_UP )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_LEFT );
+    if( wm_up & WPAD_BUTTON_DOWN )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_RIGHT );
+  
+    if( wm_up & WPAD_BUTTON_1 )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_FIRE_1 );
+    if( wm_up & WPAD_BUTTON_2 )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_FIRE_2 );
+  
+    if( wm_up & WPAD_BUTTON_A )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_FIRE_3 );
+    if( wm_up & WPAD_BUTTON_B )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_FIRE_4 );
+    if( wm_up & WPAD_BUTTON_PLUS )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_FIRE_5 );
+    if( wm_up & WPAD_BUTTON_MINUS )
+      POST_JOYRELEASE( ctrlr, INPUT_JOYSTICK_FIRE_6 );
+  }
 }

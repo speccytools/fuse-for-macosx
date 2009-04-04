@@ -3083,3 +3083,5 @@
 20090329 man/fuse.1,fuse.c,settings.dat,ui/fb/fbdisplay.c,ui/svga/svgadisplay.c:
          add support for the full range of bit depths and the full range of
          scalers to the SVGA UI (patch #1745520) (Gergely Szasz).
+20090403 ui/wii/{wiimouse.c,wiijoystick.c}: Wii: Added support for 2 controllers
+	 (Marek).
