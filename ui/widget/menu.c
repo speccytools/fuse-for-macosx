@@ -155,9 +155,9 @@ SUBMENU_KEY_SELECTIONS( 4 )
 SUBMENU_KEY_SELECTIONS( 5 )
 #ifdef USE_JOYSTICK
 SUBMENU_KEY_SELECTIONS( 6 )
-#ifndef UI_WII
 SUBMENU_KEY_SELECTIONS( 7 )
 SUBMENU_KEY_SELECTIONS( 8 )
+#ifndef UI_WII
 SUBMENU_KEY_SELECTIONS( 9 )
 SUBMENU_KEY_SELECTIONS( 10 )
 #endif  /* #ifndef UI_WII */
@@ -184,6 +184,8 @@ static widget_menu_entry submenu_joystick_buttons[] = {
   { "Button \012B\011", INPUT_KEY_b, submenu_select_key_for_button_4, NULL, get_key_name_for_button_4, 0 },
   { "Button \012P\011lus", INPUT_KEY_p, submenu_select_key_for_button_5, NULL, get_key_name_for_button_5, 0 },
   { "Button \012M\011inus", INPUT_KEY_m, submenu_select_key_for_button_6, NULL, get_key_name_for_button_6, 0 },
+  { "Button \012Z\011 on Nunchuck", INPUT_KEY_z, submenu_select_key_for_button_7, NULL, get_key_name_for_button_7, 0 },
+  { "Button \012C\011 on Nunchuck", INPUT_KEY_c, submenu_select_key_for_button_8, NULL, get_key_name_for_button_8, 0 },
 #endif  /* #ifndef UI_WII */
   { NULL }
 };
