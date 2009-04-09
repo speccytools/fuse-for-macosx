@@ -3089,3 +3089,5 @@
 	 support (Marek).
 20090404 ui/wii/wiimouse.c: Wii: Swapped the functions of 1 and 2 Wii remote
 	 buttons in the menu (Marek).
+20090408 menu_data.dat,ui/wii/wiidisplay.c: Wii: Implemented scalers/filters
+	 (Marek).

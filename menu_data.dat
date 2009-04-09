@@ -95,9 +95,7 @@ Options/Select ROMs/Interface _I..., Item,, menu_options_selectroms_select,, 16
 Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select,, 17
 Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
 
-#ifndef UI_WII
 Options/_Filter..., Item,,, menu_filter_detail
-#endif
 
 Options/_Disk options..., Item
 
