@@ -3091,3 +3091,4 @@
 	 buttons in the menu (Marek).
 20090408 menu_data.dat,ui/wii/wiidisplay.c: Wii: Implemented scalers/filters
 	 (Marek).
+20090414 disk/fdd.c: fix warning.

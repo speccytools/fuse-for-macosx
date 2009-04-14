@@ -358,7 +358,7 @@ const fdd_params_t *
 fdd_get_params( const char *name, fdd_drive_type_t drive )
 {
   int i;
-  const fdd_params_t fdd_params[] = {
+  static const fdd_params_t fdd_params[] = {
     { "Disabled", 0, 0, 0, 0 },
     { "Auto", 1, 1, 0, 0 },
     { "Single-sided 40 track", 1, 0, 1, 42 },
