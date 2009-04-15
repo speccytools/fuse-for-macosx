@@ -53,6 +53,7 @@
 #include "wd_fdc.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
+#include "options.h"	/* needed for get combo options */
 
 int beta_available = 0;
 int beta_active = 0;
@@ -203,7 +204,7 @@ beta_reset( int hard_reset GCC_UNUSED )
   }
 
   /* We can eject disks only if they are currently present */
-  dt = fdd_get_params( settings_current.drive_beta128a_type, FDD_DRIVE_BETA128 );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128a_type() + 1 ];	/* +1 => there is no `Disabled' */
   fdd_init( &beta_drives[ BETA_DRIVE_A ].fdd, FDD_SHUGART,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A, dt->enabled );
@@ -213,7 +214,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 		    !beta_drives[ BETA_DRIVE_A ].fdd.wrprot );
 
 
-  dt = fdd_get_params( settings_current.drive_beta128b_type, FDD_DRIVE_GENERIC );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128b_type() ];
   fdd_init( &beta_drives[ BETA_DRIVE_B ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B, dt->enabled );
@@ -223,7 +224,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 		    !beta_drives[ BETA_DRIVE_B ].fdd.wrprot );
 
 
-  dt = fdd_get_params( settings_current.drive_beta128c_type, FDD_DRIVE_GENERIC );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128c_type() ];
   fdd_init( &beta_drives[ BETA_DRIVE_C ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C, dt->enabled );
@@ -233,7 +234,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 		    !beta_drives[ BETA_DRIVE_C ].fdd.wrprot );
 
 
-  dt = fdd_get_params( settings_current.drive_beta128d_type, FDD_DRIVE_GENERIC );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128d_type() ];
   fdd_init( &beta_drives[ BETA_DRIVE_D ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D, dt->enabled );
@@ -392,17 +393,17 @@ beta_disk_insert( beta_drive_number which, const char *filename,
   } else {
     switch( which ) {
     case 0:
-      dt = fdd_get_params( settings_current.drive_beta128a_type, FDD_DRIVE_BETA128 );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128a_type() + 1 ];	/* +1 => there is no `Disabled' */
       break;
     case 1:
-      dt = fdd_get_params( settings_current.drive_beta128b_type, FDD_DRIVE_GENERIC );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128b_type() ];
       break;
     case 2:
-      dt = fdd_get_params( settings_current.drive_beta128c_type, FDD_DRIVE_GENERIC );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128c_type() ];
       break;
     case 3:
     default:
-      dt = fdd_get_params( settings_current.drive_beta128d_type, FDD_DRIVE_GENERIC );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_beta128d_type() ];
       break;
     }
     error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );

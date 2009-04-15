@@ -105,20 +105,12 @@ typedef struct fdd_t {
 } fdd_t;
 
 typedef struct fdd_params_t {
-  char *name;
   int enabled;
-  int auto_geom;
   int heads;
   int cylinders;
 } fdd_params_t;
 
-typedef enum fdd_drive_type_t {
-  FDD_DRIVE_PLUS_3 = 0,		/* +3 built-in drive */
-  FDD_DRIVE_BETA128,		/* beta128 first drive */
-  FDD_DRIVE_PLUS_D,		/* +D first drive */
-  FDD_DRIVE_GENERIC,
-} fdd_drive_type_t;
-
+extern const fdd_params_t fdd_params[];
 
 /* initialize the event codes */
 int fdd_init_events( void );
@@ -152,7 +144,5 @@ int fdd_read_write_data( fdd_t *d, fdd_write_t write );
 void fdd_wrprot( fdd_t *d, int wrprot );
 /* to reach index hole */
 void fdd_wait_index_hole( fdd_t *d );
-/* to get drive parameters from setting string */
-const fdd_params_t *fdd_get_params( const char *name, fdd_drive_type_t drive );
 
 #endif 	/* FUSE_FDD_H */

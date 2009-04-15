@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "ui/ui.h"
 #include "wd_fdc.h"
+#include "options.h"	/* needed for get combo options */
 
 int plusd_available = 0;
 int plusd_active = 0;
@@ -197,7 +198,7 @@ plusd_reset( int hard_reset )
   }
 
   /* We can eject disks only if they are currently present */
-  dt = fdd_get_params( settings_current.drive_plusd1_type, FDD_DRIVE_PLUS_D );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_plusd1_type() + 1 ];	/* +1 => there is no `Disabled' */
   fdd_init( &plusd_drives[ PLUSD_DRIVE_1 ].fdd, FDD_SHUGART,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1, dt->enabled );
@@ -207,7 +208,7 @@ plusd_reset( int hard_reset )
 		    !plusd_drives[ PLUSD_DRIVE_1 ].fdd.wrprot );
 
 
-  dt = fdd_get_params( settings_current.drive_plusd2_type, FDD_DRIVE_GENERIC );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_plusd2_type() ];
   fdd_init( &plusd_drives[ PLUSD_DRIVE_2 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2, dt->enabled );
@@ -404,11 +405,11 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   } else {
     switch( which ) {
     case 0:
-      dt = fdd_get_params( settings_current.drive_plusd1_type, FDD_DRIVE_PLUS_D );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_plusd1_type() + 1 ];	/* +1 => there is no `Disabled' */
       break;
     case 1:
     default:
-      dt = fdd_get_params( settings_current.drive_plusd2_type, FDD_DRIVE_GENERIC );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_plusd2_type() ];
       break;
     }
     error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );

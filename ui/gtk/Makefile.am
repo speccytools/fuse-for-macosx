@@ -56,7 +56,7 @@ libuigtk_la_LIBADD = @GTK_LIBS@ -lX11
 BUILT_SOURCES = keysyms.c \
 		menu_data.c \
 		options.c \
-		options.h
+		options_internals.h
 
 keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
 	@PERL@ -I$(srcdir)/../../perl $(srcdir)/../../keysyms.pl gtk $(srcdir)/../../keysyms.dat > $@.tmp && mv $@.tmp $@
@@ -67,15 +67,15 @@ menu_data.c: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(src
 options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
 	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
 
-options.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+options_internals.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
 	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
 
 noinst_HEADERS = gtkinternals.h \
-		 options.h \
+		 options_internals.h \
 		 options.pl \
 		 options-header.pl
 
 CLEANFILES = keysyms.c \
 	     menu_data.c \
 	     options.c \
-	     options.h
+	     options_internals.h

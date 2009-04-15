@@ -43,7 +43,7 @@
 #include "ui/uidisplay.h"
 #include "joystick.h"
 #include "keyboard.h"
-#include "options.h"
+#include "options_internals.h"
 #include "periph.h"
 #include "pokefinder/pokefinder.h"
 #include "screenshot.h"

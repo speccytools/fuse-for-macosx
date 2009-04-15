@@ -67,7 +67,7 @@ BUILT_SOURCES = keysyms.c \
 		menu_data.rc \
 		menu_data.h \
 		options.c \
-		options.h \
+		options_internals.h \
 		options.rc
 
 keysyms.c: $(srcdir)/../../keysyms.pl $(srcdir)/../../keysyms.dat
@@ -85,7 +85,7 @@ menu_data.rc: $(srcdir)/../../perl/cpp-perl.pl $(srcdir)/../../menu_data.pl $(sr
 options.c: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
 	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options.pl - > $@.tmp && mv $@.tmp $@
 
-options.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
+options_internals.h: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-header.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
 	@PERL@ $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/../../ui/options.dat | @PERL@ -I$(srcdir)/../../perl $(srcdir)/options-header.pl - > $@.tmp && mv $@.tmp $@
 
 options.rc: $(srcdir)/../../perl/cpp-perl.pl ../../config.h $(srcdir)/options-resource.pl $(srcdir)/../../ui/options.dat $(srcdir)/../../perl/Fuse.pm $(srcdir)/../../perl/Fuse/Dialog.pm
@@ -108,7 +108,7 @@ noinst_HEADERS = binary.h \
 		 select_template.h \
 		 memorybrowser.h \
 		 menu_data.h \
-		 options.h \
+		 options_internals.h \
 		 options.pl \
 		 options-header.pl \
 		 options-resource.pl \
@@ -120,5 +120,5 @@ CLEANFILES = keysyms.c \
 	     menu_data.h \
 	     menu_data.rc \
 	     options.c \
-	     options.h \
+	     options_internals.h \
 	     options.rc

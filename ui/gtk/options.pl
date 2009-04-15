@@ -55,9 +55,19 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 #include "display.h"
 #include "fuse.h"
 #include "gtkinternals.h"
-#include "options.h"
+#include "options_internals.h"
 #include "periph.h"
 #include "settings.h"
+
+static int
+option_enumerate_combo( char **options, char *value, guint count, int def ) {
+  int i;
+  for( i = 0; i < count; i++) {
+    if( !strcmp( value, options[ i ] ) )
+      return i;
+  }
+  return def;
+}
 
 CODE
 
@@ -107,6 +117,16 @@ CODE
 
 CODE
 		}
+		print << "CODE";
+int
+option_enumerate_$_->{name}_$widget->{value}() {
+  return option_enumerate_combo( $_->{name}_$widget->{value}_combo,
+				 settings_current.$widget->{value},
+				 $_->{name}_$widget->{value}_combo_count,
+				 $combo_default{$widget->{value}} );
+}
+
+CODE
 	    }
 	}
     }

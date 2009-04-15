@@ -3092,3 +3092,9 @@
 20090408 menu_data.dat,ui/wii/wiidisplay.c: Wii: Implemented scalers/filters
 	 (Marek).
 20090414 disk/fdd.c: fix warning.
+20090415 Makefile.am,configure.in,disk/{beta.c,fdd.[ch],plusd.c},
+         machines/specplus3.c,menu_data.pl,
+         ui/gtk/{Makefile.am,options-header.pl,options.pl},
+         ui/widget/{Makefile.am,options-header.pl,options.pl,widget.c},
+         ui/win32/{Makefile.am,options-header.pl}: enumerate combo box options
+         to eliminate duplicated strings (patch #2722074) (Gergely Szasz).

@@ -259,6 +259,7 @@ fi
 AC_SUBST(UI)
 AC_SUBST(UI_LIBS)
 AC_SUBST(WIDGET)
+AM_CONDITIONAL(WIDGET, test x$WIDGET != x)
 
 # If we're not using GTK+, must either find glib or use the replacement
 # (as supplied by libspectrum)

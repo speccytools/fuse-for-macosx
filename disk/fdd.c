@@ -49,6 +49,14 @@ static const char *fdd_error[] = {
   "unknown error code"			/* will be the last */
 };
 
+const fdd_params_t fdd_params[] = {
+  { 0, 0, 0 },		/* Disabled */
+  { 1, 1, 42 },		/* Single-sided 40 track */
+  { 1, 2, 42 },		/* Double-sided 80 track */
+  { 1, 1, 83 },		/* Single-sided 40 track */
+  { 1, 2, 83 }		/* Double-sided 80 track */
+};
+
 static void
 fdd_event( libspectrum_dword last_tstates, int event, void *user_data );
 
@@ -352,27 +360,4 @@ fdd_event( libspectrum_dword last_tstates GCC_UNUSED, int event,
 {
   fdd_t *d = user_data;
   d->ready = ( d->motoron & d->loaded );	/* 0x01 & 0x01 */
-}
-
-const fdd_params_t *
-fdd_get_params( const char *name, fdd_drive_type_t drive )
-{
-  int i;
-  static const fdd_params_t fdd_params[] = {
-    { "Disabled", 0, 0, 0, 0 },
-    { "Auto", 1, 1, 0, 0 },
-    { "Single-sided 40 track", 1, 0, 1, 42 },
-    { "Double-sided 80 track", 1, 0, 2, 42 },
-    { "Single-sided 40 track", 1, 0, 1, 83 },
-    { "Double-sided 80 track", 1, 0, 2, 83 }
-  };
-
-  for( i = 0; i < sizeof( fdd_params ) / sizeof( fdd_params[0] ); i++ ) {
-    if( !strcmp( fdd_params[i].name, name ) && (
-		  ( ( drive == FDD_DRIVE_PLUS_3 || 
-		      drive != FDD_DRIVE_GENERIC ) && i > 0 ) ||	/* BETA128 A and +D 1 => from Auto */
-		    drive == FDD_DRIVE_GENERIC ) )			/* generic => all */
-      return &fdd_params[i];
-  }
-  return ( drive == FDD_DRIVE_PLUS_3 ? &fdd_params[2] : &fdd_params[5] );	/* SS 3" or DS 3.5" */
 }

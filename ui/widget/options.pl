@@ -51,9 +51,9 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include "display.h"
 #include "fuse.h"
-#include "options.h"
+#include "options_internals.h"
 #include "periph.h"
-#include "widget_internals.h"
+#include "ui/widget/widget_internals.h"
 #include "ui/uidisplay.h"
 
 struct widget_option_entry;
@@ -98,6 +98,16 @@ widget_combo_click( const char *title, const char **options, char **current )
   \}
 \}
 
+static int
+option_enumerate_combo( const char **options, char *value, int def ) {
+  int i;
+  for( i = 0; options[i] != NULL; i++) {
+    if( !strcmp( value, options[ i ] ) )
+      return i;
+  }
+  return def;
+}
+
 CODE
 
 foreach( @dialogs ) {
@@ -135,6 +145,15 @@ CODE
 
 CODE
 	    }
+		print << "CODE";
+int
+option_enumerate_$_->{name}_$widget->{value}() {
+  return option_enumerate_combo( widget_$widget->{value}_combo,
+				 settings_current.$widget->{value},
+				 $combo_default{$widget->{value}} );
+}
+
+CODE
 	}
     }
 }
@@ -210,7 +229,7 @@ int widget_options_print_value( int left_edge, int width, int number, int value 
 int widget_options_print_entry( int left_edge, int width, int number, const char *prefix, int value,
 				const char *suffix );
 int widget_options_print_combo( int left_edge, int width, int number, const char *prefix,
-				const char *options, const char *value, int def );
+				const char **options, const char *value, int def );
 
 static int widget_options_print_label( int left_edge, int width, int number, const char *string );
 static int widget_options_print_data( int left_edge, int menu_width, int number, const char *string, int tcolor );
@@ -319,17 +338,16 @@ widget_options_print_entry( int left_edge, int width, int number, const char *pr
 
 int
 widget_options_print_combo( int left_edge, int width, int number, const char *prefix,
-			    const char *option, const char *value, int def )
+			    const char **option, const char *value, int def )
 {
   int i = 0;
-  const char **opt, *c;
+  const char *c;
   char buffer[64];
 
-  opt = (const char **)option;
-  c = opt[ def ];
-  while( opt[ i ] != NULL ) {
-    if( !strcmp( opt[ i ], value ) )
-      c = opt[ i ];
+  c = option[ def ];
+  while( option[ i ] != NULL ) {
+    if( !strcmp( option[ i ], value ) )
+      c = option[ i ];
     i++;
   }
   widget_options_print_label( left_edge, width, number, prefix );

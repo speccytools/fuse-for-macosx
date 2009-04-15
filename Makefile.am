@@ -146,7 +146,7 @@ z80/libz80.a \
 compat/@COMPAT_OSNAME@/libcompatos.a \
 @WINDRES_OBJ@
 
-BUILT_SOURCES = settings.c settings.h
+BUILT_SOURCES = options.h settings.c settings.h
 
 windres.o: windres.rc winfuse.ico
 	@WINDRES@ -I$(srcdir) -I. $(srcdir)/windres.rc windres.o
@@ -156,6 +156,14 @@ settings.c: settings.pl settings.dat
 
 settings.h: settings-header.pl settings.dat
 	@PERL@ -I$(srcdir)/perl $(srcdir)/settings-header.pl $(srcdir)/settings.dat > $@.tmp && mv $@.tmp $@
+
+if WIDGET
+options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@WIDGET@/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | @PERL@ -I$(srcdir)/perl $(srcdir)/ui/@WIDGET@/options-header.pl - public > $@.tmp && mv $@.tmp $@
+else
+options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@UI@/options-header.pl $(srcdir)/ui/options.dat $(srcdir)/perl/Fuse.pm $(srcdir)/perl/Fuse/Dialog.pm
+	@PERL@ $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/options.dat | @PERL@ -I$(srcdir)/perl $(srcdir)/ui/@UI@/options-header.pl - public > $@.tmp && mv $@.tmp $@
+endif
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
 @XML_CFLAGS@ @SAMPLERATE_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@
@@ -190,6 +198,7 @@ noinst_HEADERS = ay.h \
 	tape.h \
 	utils.h \
 	joystick.h \
+	options.h \
 	printer.h \
 	profile.h \
 	scld.h \
@@ -207,7 +216,8 @@ EXTRA_DIST = AUTHORS \
 	     settings.dat \
 	     winfuse.ico
 
-CLEANFILES = settings.c \
+CLEANFILES = options.h \
+	     settings.c \
 	     settings.h
 
 AM_CPPFLAGS =

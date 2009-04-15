@@ -54,6 +54,7 @@
 #include "utils.h"
 #include "disk/fdd.h"
 #include "disk/upd_fdc.h"
+#include "options.h"	/* needed for get combo options */
 
 static int normal_memory_map( int rom, int page );
 static int special_memory_map( int which );
@@ -153,11 +154,11 @@ specplus3_765_reset( void )
   const fdd_params_t *dt;
 
   upd_fdc_master_reset( specplus3_fdc );
-  dt = fdd_get_params( settings_current.drive_plus3a_type, FDD_DRIVE_PLUS_3 );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3a_type() + 1 ];	/* +1 => there is no `Disabled' */
   fdd_init( &specplus3_drives[ 0 ].fdd, FDD_SHUGART,
 	    dt->heads, dt->cylinders, 1 );
 
-  dt = fdd_get_params( settings_current.drive_plus3b_type, FDD_DRIVE_GENERIC );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
   fdd_init( &specplus3_drives[ 1 ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
 }
@@ -367,7 +368,7 @@ specplus3_menu_items( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_WP_SET,
 		    !specplus3_drives[ SPECPLUS3_DRIVE_A ].fdd.wrprot );
 
-  dt = fdd_get_params( settings_current.drive_plus3b_type, FDD_DRIVE_GENERIC );
+  dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
 		    specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.loaded );
@@ -429,11 +430,11 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
   } else {
     switch( which ) {
     case 0:
-      dt = fdd_get_params( settings_current.drive_plus3a_type, FDD_DRIVE_PLUS_3 );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3a_type() + 1 ];	/* +1 => there is no `Disabled' */
       break;
     case 1:
     default:
-      dt = fdd_get_params( settings_current.drive_plus3b_type, FDD_DRIVE_GENERIC );
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_plus3b_type() ];
       break;
     }
     error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );

@@ -147,7 +147,7 @@ sub dump_widget ($) {
 
     print << "HEADERS";
 #include "input.h"
-#include "options.h"
+#include "options_internals.h"
 #include "widget_internals.h"
 
 HEADERS
