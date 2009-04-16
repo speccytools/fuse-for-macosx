@@ -3098,3 +3098,5 @@
          ui/widget/{Makefile.am,options-header.pl,options.pl,widget.c},
          ui/win32/{Makefile.am,options-header.pl}: enumerate combo box options
          to eliminate duplicated strings (patch #2722074) (Gergely Szasz).
+20090416 ui/widget/options.pl: have current option selected when entering a
+         combo selection screen (more from patch #2722074) (Gergely Szasz).

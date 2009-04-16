@@ -75,14 +75,14 @@ typedef struct widget_option_entry {
 } widget_option_entry;
 
 static void
-widget_combo_click( const char *title, const char **options, char **current )
+widget_combo_click( const char *title, const char **options, char **current, int def )
 \{
   int error, i;
   widget_select_t sel;
 
   sel.title = title;
   sel.options = options;
-  sel.current = 0;
+  sel.current = def;
   sel.finish_all = 0;
   for( i = 0; options[i] != NULL; i++ ) {
     if( !strcmp( options[ i ], *current ) )
@@ -93,7 +93,7 @@ widget_combo_click( const char *title, const char **options, char **current )
   error = widget_do( WIDGET_TYPE_SELECT, &sel );
 
   if( !error && sel.result >= 0 ) \{
-    free( *current );
+    if( *current ) free( *current );
     *current = strdup( options[ sel.result ] );
   \}
 \}
@@ -488,7 +488,9 @@ CODE
 static void
 widget_$widget->{value}_click( void )
 \{
-  widget_combo_click( "$title", widget_$widget->{value}_combo, &widget_options_settings.$widget->{value} );
+  widget_combo_click( "$title", widget_$widget->{value}_combo,
+				&widget_options_settings.$widget->{value},
+				$combo_default{$widget->{value}} );
 \}
 
 CODE
