@@ -144,5 +144,7 @@ int fdd_read_write_data( fdd_t *d, fdd_write_t write );
 void fdd_wrprot( fdd_t *d, int wrprot );
 /* to reach index hole */
 void fdd_wait_index_hole( fdd_t *d );
+/* set floppy position ( upsidedown or not )*/
+void fdd_flip( fdd_t *d, int upsidedown );
 
 #endif 	/* FUSE_FDD_H */

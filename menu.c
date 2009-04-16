@@ -40,6 +40,7 @@
 #include "if2.h"
 #include "joystick.h"
 #include "menu.h"
+#include "machines/specplus3.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
@@ -452,7 +453,30 @@ MENU_CALLBACK_WITH_ACTION( menu_media_eject )
     if1_mdr_eject( which, write );
     break;
   }
+}
 
+MENU_CALLBACK_WITH_ACTION( menu_media_flip )
+{
+  int which, type, flip;
+  
+  WIDGET_END;
+
+  action--;
+  which = action & 0x0f;
+  type = ( action & 0xf0 ) >> 4;
+  flip = !!( action & 0x100 );
+
+  switch( type ) {
+  case 0:
+    specplus3_disk_flip( which, flip );
+    break;
+  case 1:
+    beta_disk_flip( which, flip );
+    break;
+  case 2:
+    plusd_disk_flip( which, flip );
+    break;
+  }
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
@@ -929,4 +953,87 @@ menu_tape_detail( void )
 
   if( tape_is_playing() ) return "Playing";
   else return "Stopped";
+}
+
+static const char *disk_detail_str[] = {
+  "Inserted",
+  "Inserted WP",
+  "Inserted UD",
+  "Inserted WP,UD",
+  "Not inserted",
+};
+
+static const char*
+menu_disk_detail( fdd_t *f )
+{
+  int i = 0;
+
+  if( !f->loaded ) return disk_detail_str[4];
+  if( f->wrprot ) i = 1;
+  if( f->upsidedown ) i += 2;
+  return disk_detail_str[i];
+}
+
+const char*
+menu_plus3a_detail( void )
+{
+  fdd_t *f = specplus3_get_fdd( SPECPLUS3_DRIVE_A );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_plus3b_detail( void )
+{
+  fdd_t *f = specplus3_get_fdd( SPECPLUS3_DRIVE_B );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_beta128a_detail( void )
+{
+  fdd_t *f = beta_get_fdd( BETA_DRIVE_A );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_beta128b_detail( void )
+{
+  fdd_t *f = beta_get_fdd( BETA_DRIVE_B );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_beta128c_detail( void )
+{
+  fdd_t *f = beta_get_fdd( BETA_DRIVE_C );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_beta128d_detail( void )
+{
+  fdd_t *f = beta_get_fdd( BETA_DRIVE_D );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_plusd1_detail( void )
+{
+  fdd_t *f = plusd_get_fdd( PLUSD_DRIVE_1 );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_plusd2_detail( void )
+{
+  fdd_t *f = plusd_get_fdd( PLUSD_DRIVE_2 );
+
+  return menu_disk_detail( f );
 }

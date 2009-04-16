@@ -727,6 +727,13 @@ ui_confirm_save_specific( const char *message )
 {
   if( widget_do( WIDGET_TYPE_QUERY_SAVE, (void *) message ) )
     return UI_CONFIRM_SAVE_CANCEL;
+  return widget_query.confirm;
+}
+
+int
+ui_query( const char *message )
+{
+  widget_do( WIDGET_TYPE_QUERY, (void *) message );
   return widget_query.save;
 }
 

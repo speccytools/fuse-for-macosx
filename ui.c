@@ -325,7 +325,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
     "/Media/Disk/+3/Drive A:/Eject",
     "/Media/Disk/+3/Drive A:/Eject and write...", 0,
+    "/Media/Disk/+3/Drive A:/Flip disk", 0,
     "/Media/Disk/+3/Drive A:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_FLIP_SET,
+    "/Media/Disk/+3/Drive A:/Flip disk/Turn upside down",
+    "/Media/Disk/+3/Drive A:/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_WP_SET,
     "/Media/Disk/+3/Drive A:/Write protect/Enable",
@@ -336,7 +341,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
     "/Media/Disk/+3/Drive B:/Eject",
     "/Media/Disk/+3/Drive B:/Eject and write...", 0,
+    "/Media/Disk/+3/Drive B:/Flip disk", 0,
     "/Media/Disk/+3/Drive B:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_FLIP_SET,
+    "/Media/Disk/+3/Drive B:/Flip disk/Turn upside down",
+    "/Media/Disk/+3/Drive B:/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_WP_SET,
     "/Media/Disk/+3/Drive B:/Write protect/Enable",
@@ -349,7 +359,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
     "/Media/Disk/Beta/Drive A:/Eject",
     "/Media/Disk/Beta/Drive A:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive A:/Flip disk", 0,
     "/Media/Disk/Beta/Drive A:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_A_FLIP_SET,
+    "/Media/Disk/Beta/Drive A:/Flip disk/Turn upside down",
+    "/Media/Disk/Beta/Drive A:/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
     "/Media/Disk/Beta/Drive A:/Write protect/Enable",
@@ -360,7 +375,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
     "/Media/Disk/Beta/Drive B:/Eject",
     "/Media/Disk/Beta/Drive B:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive B:/Flip disk", 0,
     "/Media/Disk/Beta/Drive B:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_B_FLIP_SET,
+    "/Media/Disk/Beta/Drive B:/Flip disk/Turn upside down",
+    "/Media/Disk/Beta/Drive B:/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
     "/Media/Disk/Beta/Drive B:/Write protect/Enable",
@@ -371,7 +391,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
     "/Media/Disk/Beta/Drive C:/Eject",
     "/Media/Disk/Beta/Drive C:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive C:/Flip disk", 0,
     "/Media/Disk/Beta/Drive C:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_C_FLIP_SET,
+    "/Media/Disk/Beta/Drive C:/Flip disk/Turn upside down",
+    "/Media/Disk/Beta/Drive C:/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
     "/Media/Disk/Beta/Drive C:/Write protect/Enable",
@@ -382,7 +407,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
     "/Media/Disk/Beta/Drive D:/Eject",
     "/Media/Disk/Beta/Drive D:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive D:/Flip disk", 0,
     "/Media/Disk/Beta/Drive D:/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_BETA_D_FLIP_SET,
+    "/Media/Disk/Beta/Drive D:/Flip disk/Turn upside down",
+    "/Media/Disk/Beta/Drive D:/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
     "/Media/Disk/Beta/Drive D:/Write protect/Enable",
@@ -395,7 +425,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
     "/Media/Disk/+D/Drive 1/Eject",
     "/Media/Disk/+D/Drive 1/Eject and write...", 0,
+    "/Media/Disk/+D/Drive 1/Flip disk", 0,
     "/Media/Disk/+D/Drive 1/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_FLIP_SET,
+    "/Media/Disk/+D/Drive 1/Flip disk/Turn upside down",
+    "/Media/Disk/+D/Drive 1/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
     "/Media/Disk/+D/Drive 1/Write protect/Enable",
@@ -406,7 +441,12 @@ static const struct menu_item_entries menu_item_lookup[] = {
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
     "/Media/Disk/+D/Drive 2/Eject",
     "/Media/Disk/+D/Drive 2/Eject and write...", 0,
+    "/Media/Disk/+D/Drive 2/Flip disk", 0,
     "/Media/Disk/+D/Drive 2/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_FLIP_SET,
+    "/Media/Disk/+D/Drive 2/Flip disk/Turn upside down",
+    "/Media/Disk/+D/Drive 2/Flip disk/Turn back", 1 },
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
     "/Media/Disk/+D/Drive 2/Write protect/Enable",

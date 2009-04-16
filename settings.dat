@@ -214,4 +214,7 @@ drive_beta128d_type, string, ""
 drive_plusd1_type, string, ""
 drive_plusd2_type, string, ""
 
+disk_try_merge, string, ""
+disk_ask_merge, boolean, 1
+
 debugger_command, string, NULL

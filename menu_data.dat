@@ -224,71 +224,95 @@ Media/Interface I/Sinclair NET/_Unplug, Item,, menu_media_if1_rs232,, 0x13
 Media/_Disk, Branch
 
 Media/Disk/+_3, Branch
-Media/Disk/+3/Drive _A:, Branch
+Media/Disk/+3/Drive _A:, Branch,,,menu_plus3a_detail
 Media/Disk/+3/Drive A:/Insert _New, Item,, menu_media_insert_new,, 0x01
 Media/Disk/+3/Drive A:/_Insert..., Item,, menu_media_insert,, 0x01
 Media/Disk/+3/Drive A:/_Eject, Item,, menu_media_eject,, 0x01
 Media/Disk/+3/Drive A:/Eject and _write..., Item,, menu_media_eject,, 0x101
+Media/Disk/+3/Drive A:/_Flip disk, Branch
+Media/Disk/+3/Drive A:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x101
+Media/Disk/+3/Drive A:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x001
 Media/Disk/+3/Drive A:/Write _protect, Branch
 Media/Disk/+3/Drive A:/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x101
 Media/Disk/+3/Drive A:/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x001
-Media/Disk/+3/Drive _B:, Branch
+Media/Disk/+3/Drive _B:, Branch,,,menu_plus3b_detail
 Media/Disk/+3/Drive B:/Insert _New, Item,, menu_media_insert_new,, 0x02
 Media/Disk/+3/Drive B:/_Insert..., Item,, menu_media_insert,, 0x02
 Media/Disk/+3/Drive B:/_Eject, Item,, menu_media_eject,, 0x02
 Media/Disk/+3/Drive B:/Eject and _write..., Item,, menu_media_eject,, 0x102
+Media/Disk/+3/Drive B:/_Flip disk, Branch
+Media/Disk/+3/Drive B:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x102
+Media/Disk/+3/Drive B:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x002
 Media/Disk/+3/Drive B:/Write _protect, Branch
 Media/Disk/+3/Drive B:/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x102
 Media/Disk/+3/Drive B:/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x002
 
 Media/Disk/_Beta, Branch
-Media/Disk/Beta/Drive _A:, Branch
+Media/Disk/Beta/Drive _A:, Branch,,,menu_beta128a_detail
 Media/Disk/Beta/Drive A:/Insert _New, Item,, menu_media_insert_new,, 0x11
 Media/Disk/Beta/Drive A:/_Insert..., Item,, menu_media_insert,, 0x11
 Media/Disk/Beta/Drive A:/_Eject, Item,, menu_media_eject,, 0x11
 Media/Disk/Beta/Drive A:/Eject and _write..., Item,, menu_media_eject,, 0x111
+Media/Disk/Beta/Drive A:/_Flip disk, Branch
+Media/Disk/Beta/Drive A:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x111
+Media/Disk/Beta/Drive A:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x011
 Media/Disk/Beta/Drive A:/Write _protect, Branch
 Media/Disk/Beta/Drive A:/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x111
 Media/Disk/Beta/Drive A:/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x011
-Media/Disk/Beta/Drive _B:, Branch
+Media/Disk/Beta/Drive _B:, Branch,,,menu_beta128b_detail
 Media/Disk/Beta/Drive B:/Insert _New, Item,, menu_media_insert_new,, 0x12
 Media/Disk/Beta/Drive B:/_Insert..., Item,, menu_media_insert,, 0x12
 Media/Disk/Beta/Drive B:/_Eject, Item,, menu_media_eject,, 0x012
 Media/Disk/Beta/Drive B:/Eject and _write..., Item,, menu_media_eject,, 0x112
+Media/Disk/Beta/Drive B:/_Flip disk, Branch
+Media/Disk/Beta/Drive B:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x112
+Media/Disk/Beta/Drive B:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x012
 Media/Disk/Beta/Drive B:/Write _protect, Branch
 Media/Disk/Beta/Drive B:/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x112
 Media/Disk/Beta/Drive B:/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x012
-Media/Disk/Beta/Drive _C:, Branch
+Media/Disk/Beta/Drive _C:, Branch,,,menu_beta128c_detail
 Media/Disk/Beta/Drive C:/Insert _New, Item,, menu_media_insert_new,, 0x13
 Media/Disk/Beta/Drive C:/_Insert..., Item,, menu_media_insert,, 0x13
 Media/Disk/Beta/Drive C:/_Eject, Item,, menu_media_eject,, 0x013
 Media/Disk/Beta/Drive C:/Eject and _write..., Item,, menu_media_eject,, 0x113
+Media/Disk/Beta/Drive C:/_Flip disk, Branch
+Media/Disk/Beta/Drive C:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x113
+Media/Disk/Beta/Drive C:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x013
 Media/Disk/Beta/Drive C:/Write _protect, Branch
 Media/Disk/Beta/Drive C:/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x113
 Media/Disk/Beta/Drive C:/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x013
-Media/Disk/Beta/Drive _D:, Branch
+Media/Disk/Beta/Drive _D:, Branch,,,menu_beta128d_detail
 Media/Disk/Beta/Drive D:/Insert _New, Item,, menu_media_insert_new,, 0x14
 Media/Disk/Beta/Drive D:/_Insert..., Item,, menu_media_insert,, 0x14
 Media/Disk/Beta/Drive D:/_Eject, Item,, menu_media_eject,, 0x014
 Media/Disk/Beta/Drive D:/Eject and _write..., Item,, menu_media_eject,, 0x114
+Media/Disk/Beta/Drive D:/_Flip disk, Branch
+Media/Disk/Beta/Drive D:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x114
+Media/Disk/Beta/Drive D:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x014
 Media/Disk/Beta/Drive D:/Write _protect, Branch
 Media/Disk/Beta/Drive D:/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x114
 Media/Disk/Beta/Drive D:/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x014
 
 Media/Disk/+_D, Branch
-Media/Disk/+D/Drive _1, Branch
+Media/Disk/+D/Drive _1, Branch,,,menu_plusd1_detail
 Media/Disk/+D/Drive 1/Insert _New, Item,, menu_media_insert_new,, 0x21
 Media/Disk/+D/Drive 1/_Insert..., Item,, menu_media_insert,, 0x21
 Media/Disk/+D/Drive 1/_Eject, Item,, menu_media_eject,, 0x021
 Media/Disk/+D/Drive 1/Eject and _write..., Item,, menu_media_eject,, 0x121
+Media/Disk/+D/Drive 1/_Flip disk, Branch
+Media/Disk/+D/Drive 1/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x121
+Media/Disk/+D/Drive 1/Flip disk/Turn _back, Item,, menu_media_flip,, 0x021
 Media/Disk/+D/Drive 1/Write _protect, Branch
 Media/Disk/+D/Drive 1/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x121
 Media/Disk/+D/Drive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x021
-Media/Disk/+D/Drive _2, Branch
+Media/Disk/+D/Drive _2, Branch,,,menu_plusd2_detail
 Media/Disk/+D/Drive 2/Insert _New, Item,, menu_media_insert_new,, 0x22
 Media/Disk/+D/Drive 2/_Insert..., Item,, menu_media_insert,, 0x22
 Media/Disk/+D/Drive 2/_Eject, Item,, menu_media_eject,, 0x022
 Media/Disk/+D/Drive 2/Eject and _write..., Item,, menu_media_eject,, 0x122
+Media/Disk/+D/Drive 2/_Flip disk, Branch
+Media/Disk/+D/Drive 2/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x122
+Media/Disk/+D/Drive 2/Flip disk/Turn _back, Item,, menu_media_flip,, 0x022
 Media/Disk/+D/Drive 2/Write _protect, Branch
 Media/Disk/+D/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x122
 Media/Disk/+D/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x022

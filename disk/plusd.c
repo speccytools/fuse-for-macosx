@@ -42,6 +42,9 @@
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
+#define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
+				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
+
 int plusd_available = 0;
 int plusd_active = 0;
 
@@ -204,6 +207,8 @@ plusd_reset( int hard_reset )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_1 ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_FLIP_SET,
+		    !plusd_drives[ PLUSD_DRIVE_1 ].fdd.upsidedown );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
 		    !plusd_drives[ PLUSD_DRIVE_1 ].fdd.wrprot );
 
@@ -214,6 +219,8 @@ plusd_reset( int hard_reset )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
 		    plusd_drives[ PLUSD_DRIVE_2 ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_FLIP_SET,
+		    !plusd_drives[ PLUSD_DRIVE_2 ].fdd.upsidedown );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
 		    !plusd_drives[ PLUSD_DRIVE_2 ].fdd.wrprot );
 
@@ -396,7 +403,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   }
 
   if( filename ) {
-    error = disk_open( &d->disk, filename, 0 );
+    error = disk_open( &d->disk, filename, 0, DISK_TRY_MERGE( d->fdd.fdd_heads ) );
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
 				disk_strerror( error ) );
@@ -426,11 +433,15 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   switch( which ) {
   case PLUSD_DRIVE_1:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_FLIP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_1 ].fdd.upsidedown );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_WP_SET,
 		      !plusd_drives[ PLUSD_DRIVE_1 ].fdd.wrprot );
     break;
   case PLUSD_DRIVE_2:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_FLIP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_2 ].fdd.upsidedown );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_WP_SET,
 		      !plusd_drives[ PLUSD_DRIVE_2 ].fdd.wrprot );
     break;
@@ -499,6 +510,35 @@ plusd_disk_eject( plusd_drive_number which, int write )
 }
 
 int
+plusd_disk_flip( plusd_drive_number which, int flip )
+{
+  wd_fdc_drive *d;
+
+  if( which >= PLUSD_NUM_DRIVES )
+    return 1;
+
+  d = &plusd_drives[ which ];
+
+  if( !d->fdd.loaded )
+    return 1;
+
+  fdd_flip( &d->fdd, flip );
+
+  /* Update the 'write flip' menu item */
+  switch( which ) {
+  case PLUSD_DRIVE_1:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_FLIP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_1 ].fdd.upsidedown );
+    break;
+  case PLUSD_DRIVE_2:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_FLIP_SET,
+		      !plusd_drives[ PLUSD_DRIVE_2 ].fdd.upsidedown );
+    break;
+  }
+  return 0;
+}
+
+int
 plusd_disk_writeprotect( plusd_drive_number which, int wrprot )
 {
   wd_fdc_drive *d;
@@ -543,6 +583,12 @@ plusd_disk_write( plusd_drive_number which, const char *filename )
   }
 
   return 0;
+}
+
+fdd_t *
+plusd_get_fdd( plusd_drive_number which )
+{
+  return &( plusd_drives[ which ].fdd );
 }
 
 static void

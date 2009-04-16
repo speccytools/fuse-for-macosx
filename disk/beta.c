@@ -55,6 +55,9 @@
 #include "z80/z80_macros.h"
 #include "options.h"	/* needed for get combo options */
 
+#define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
+				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
+
 int beta_available = 0;
 int beta_active = 0;
 int beta_builtin = 0;
@@ -210,6 +213,8 @@ beta_reset( int hard_reset GCC_UNUSED )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A, dt->enabled );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
 		    beta_drives[ BETA_DRIVE_A ].fdd.loaded );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_FLIP_SET,
+		    !beta_drives[ BETA_DRIVE_A ].fdd.upsidedown );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
 		    !beta_drives[ BETA_DRIVE_A ].fdd.wrprot );
 
@@ -218,6 +223,8 @@ beta_reset( int hard_reset GCC_UNUSED )
   fdd_init( &beta_drives[ BETA_DRIVE_B ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B, dt->enabled );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_FLIP_SET,
+		    !beta_drives[ BETA_DRIVE_B ].fdd.upsidedown );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
 		    beta_drives[ BETA_DRIVE_B ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
@@ -228,6 +235,8 @@ beta_reset( int hard_reset GCC_UNUSED )
   fdd_init( &beta_drives[ BETA_DRIVE_C ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C, dt->enabled );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_FLIP_SET,
+		    !beta_drives[ BETA_DRIVE_C ].fdd.upsidedown );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
 		    beta_drives[ BETA_DRIVE_C ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
@@ -238,6 +247,8 @@ beta_reset( int hard_reset GCC_UNUSED )
   fdd_init( &beta_drives[ BETA_DRIVE_D ].fdd, dt->enabled ? FDD_SHUGART : FDD_TYPE_NONE,
 	    dt->heads, dt->cylinders, 1 );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D, dt->enabled );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_FLIP_SET,
+		    !beta_drives[ BETA_DRIVE_D ].fdd.upsidedown );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
 		    beta_drives[ BETA_DRIVE_D ].fdd.loaded );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
@@ -384,7 +395,7 @@ beta_disk_insert( beta_drive_number which, const char *filename,
   }
 
   if( filename ) {
-    error = disk_open( &d->disk, filename, 0 );
+    error = disk_open( &d->disk, filename, 0, DISK_TRY_MERGE( d->fdd.fdd_heads ) );
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to open disk image: %s",
 				disk_strerror( d->disk.status ) );
@@ -420,21 +431,29 @@ beta_disk_insert( beta_drive_number which, const char *filename,
   switch( which ) {
   case BETA_DRIVE_A:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_A ].fdd.upsidedown );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_WP_SET,
 		      !beta_drives[ BETA_DRIVE_A ].fdd.wrprot );
     break;
   case BETA_DRIVE_B:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_B ].fdd.upsidedown );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_WP_SET,
 		      !beta_drives[ BETA_DRIVE_B ].fdd.wrprot );
     break;
   case BETA_DRIVE_C:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_C ].fdd.upsidedown );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_WP_SET,
 		      !beta_drives[ BETA_DRIVE_C ].fdd.wrprot );
     break;
   case BETA_DRIVE_D:
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT, 1 );
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_D ].fdd.upsidedown );
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_WP_SET,
 		      !beta_drives[ BETA_DRIVE_D ].fdd.wrprot );
     break;
@@ -446,6 +465,43 @@ beta_disk_insert( beta_drive_number which, const char *filename,
     beta_page();
   }
 
+  return 0;
+}
+
+int
+beta_disk_flip( beta_drive_number which, int flip )
+{
+  wd_fdc_drive *d;
+
+  if( which >= BETA_NUM_DRIVES )
+    return 1;
+
+  d = &beta_drives[ which ];
+
+  if( !d->fdd.loaded )
+    return 1;
+
+  fdd_flip( &d->fdd, flip );
+
+  /* Set the 'flip' item */
+  switch( which ) {
+  case BETA_DRIVE_A:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_A_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_A ].fdd.upsidedown );
+    break;
+  case BETA_DRIVE_B:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_B_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_B ].fdd.upsidedown );
+    break;
+  case BETA_DRIVE_C:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_C_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_C ].fdd.upsidedown );
+    break;
+  case BETA_DRIVE_D:
+    ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA_D_FLIP_SET,
+		      !beta_drives[ BETA_DRIVE_D ].fdd.upsidedown );
+    break;
+  }
   return 0;
 }
 
@@ -573,6 +629,12 @@ beta_disk_write( beta_drive_number which, const char *filename )
   }
 
   return 0;
+}
+
+fdd_t *
+beta_get_fdd( beta_drive_number which )
+{
+  return &( beta_drives[ which ].fdd );
 }
 
 static void

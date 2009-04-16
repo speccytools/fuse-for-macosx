@@ -335,6 +335,15 @@ fdd_read_write_data( fdd_t *d, fdd_write_t write )
   return d->status = FDD_OK;
 }
 
+void fdd_flip( fdd_t *d, int upsidedown )
+{
+  if( !d->loaded )
+    return;
+
+  d->upsidedown = upsidedown > 0 ? 1 : 0;
+  fdd_set_data( d, FDD_LOAD_FACT );
+}
+
 void
 fdd_wrprot( fdd_t *d, int wrprot )
 {

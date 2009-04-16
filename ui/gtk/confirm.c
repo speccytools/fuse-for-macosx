@@ -114,6 +114,12 @@ ui_confirm_save_specific( const char *message )
   return confirm;
 }
 
+int
+ui_query( const char *message )
+{
+  return gtkui_confirm( message );
+}
+
 static void
 set_save( GtkButton *button GCC_UNUSED, gpointer user_data )
 {

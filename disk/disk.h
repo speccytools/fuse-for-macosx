@@ -30,6 +30,7 @@
 
 static const unsigned int DISK_FLAG_NONE = 0x00;
 static const unsigned int DISK_FLAG_PLUS3_CPC = 0x01;	/* try to fix some CPC issue */
+static const unsigned int DISK_FLAG_OPEN_DS = 0x02;	/* try to open the other side too */
 
 typedef enum disk_error_t {
   DISK_OK = 0,
@@ -115,7 +116,11 @@ int disk_new( disk_t *d, int sides, int cylinders, disk_dens_t dens, disk_type_t
    this time only .mgt(.dsk)/.img/.udi and CPC/extended CPC file format
    supported
 */
-int disk_open( disk_t *d, const char *filename, int preindex );
+int disk_open( disk_t *d, const char *filename, int preindex, int disk_merge );
+/* merge two one sided disk (d1, d2) to a two sided one (d),
+   after merge closes d1 and d2
+*/
+int disk_merge_sides( disk_t *d, disk_t *d1, disk_t *d2, int autofill );
 /* write a disk image file (from the disk buffer). the d->type
    gives the format of file. if it DISK_TYPE_AUTO, disk_write
    try to guess from the file name (extension). if fail save as

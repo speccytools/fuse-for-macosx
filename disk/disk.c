@@ -35,6 +35,8 @@
 #include "bitmap.h"
 #include "crc.h"
 #include "disk.h"
+#include "settings.h"
+#include "ui/ui.h"
 #include "utils.h"
 
 /* The ordering of these strings must match the order of the 
@@ -1466,7 +1468,7 @@ open_td0( buffer_t *buffer, disk_t *d, int preindex )
  * if preindex != 0 we generate preindex gap if needed
  */
 int
-disk_open( disk_t *d, const char *filename, int preindex )
+disk_open2( disk_t *d, const char *filename, int preindex )
 {
   buffer_t buffer;
   libspectrum_id_t type;
@@ -1540,6 +1542,134 @@ disk_open( disk_t *d, const char *filename, int preindex )
   utils_close_file( &buffer.file );
   d->dirty = 0;
   return d->status = DISK_OK;
+}
+
+/*--------------------- other fuctions -----------------------*/
+
+/* create a two sided disk (d) from two one sided (d1 and d2) */
+int
+disk_merge_sides( disk_t *d, disk_t *d1, disk_t *d2, int autofill )
+{
+  int i;
+  int clen;
+
+  if( d1->sides != 1 || d2->sides != 1 ||
+      d1->bpt != d2->bpt ||
+      ( autofill < 0 && d1->cylinders != d2->cylinders ) )
+    return DISK_GEOM;
+
+  d->wrprot = 0;
+  d->dirty = 0;
+  d->sides = 2;
+  d->type = d1->type;
+  d->cylinders = d2->cylinders > d1->cylinders ? d2->cylinders : d1->cylinders;
+  d->bpt = d1->bpt;
+  d->density = DISK_DENS_AUTO;
+
+  if( disk_alloc( d ) != DISK_OK )
+    return d->status;
+
+  clen = d->bpt / 8 + ( d->bpt % 8 ? 1 : 0 );
+  d->track = d->data;
+  d1->track = d1->data;
+  d2->track = d2->data;
+  for( i = 0; i < d->cylinders; i++ ) {
+    if( i < d1->cylinders )
+      memcpy( d->track, d1->track, d->tlen );
+    else {
+      memset( d->track, d->bpt, autofill & 0xff );		/* fill data */
+      memset( d->track + d->bpt, clen, 0x00 );			/* no clock marks */
+    }
+    d->track = d->track + d->tlen;
+    d1->track = d1->track + d1->tlen;
+    if( i < d2->cylinders )
+      memcpy( d->track, d2->track, d->tlen );
+    else {
+      memset( d->track, d->bpt, autofill & 0xff );		/* fill data */
+      memset( d->track + d->bpt, clen, 0x00 );			/* no clock marks */
+    }
+    d->track = d->track + d->tlen;
+    d2->track = d2->track + d2->tlen;
+  }
+  disk_close( d1 );
+  disk_close( d2 );
+  return d->status = DISK_OK;
+}
+
+int
+disk_open( disk_t *d, const char *filename, int preindex, int merge_disks )
+{
+  char *filename2;
+  char c = ' ';
+  int l, g = 0, pos = 0;
+  disk_t d1, d2;
+
+  if( filename == NULL || *filename == '\0' )
+    return d->status = DISK_OPEN;
+
+  l = strlen( filename );
+
+  if( !merge_disks || l < 7 )	/* if we do not want to open two separated disk image as one double sided disk */
+    return disk_open2( d, filename, preindex );
+
+  filename2 = (char *)filename + ( l - 1 );
+  while( l ) {				/* [Ss]ide[ _][abAB12][ _.] */
+    if( g == 0 && ( *filename2 == '.' || *filename2 == '_' ||
+		    *filename2 == ' ' ) ) {
+      g++;
+    } else if( g == 1 && ( *filename2 == '1' || *filename2 == 'a' ||
+			   *filename2 == 'A' ) ) {
+      g++;
+      pos = filename2 - filename;
+      c = *filename2 + 1;		/* 1->2, a->b, A->B */
+    } else if( g == 1 && ( *filename2 == '2' || *filename2 == 'b' ||
+			   *filename2 == 'B' ) ) {
+      g++;
+      pos = filename2 - filename;
+      c = *filename2 - 1;		/* 2->1, b->a, B->A */
+    } else if( g == 2 && ( *filename2 == '_' || *filename2 == ' ' ) ) {
+      g++;
+    } else if( g == 3 && l >= 5 && ( !memcmp( filename2 - 3, "Side", 4 ) ||
+				     !memcmp( filename2 - 3, "side", 4 ) ) ) {
+      g++;
+      break;
+    } else {
+      g = 0;
+    }
+    l--;
+    filename2--;
+  }
+  if( g != 4 )
+    return d->status = disk_open2( d, filename, preindex );
+  d1.data = NULL; d1.flag = d->flag;
+  d2.data = NULL; d2.flag = d->flag;
+  filename2 = strdup( filename );
+  *(filename2 + pos) = c;
+  if( filename2 == NULL ) {
+    fprintf( stderr, "out of memory in merge disk files\n" );
+    return d->status = DISK_OPEN;
+  }
+
+  if( settings_current.disk_ask_merge &&
+      !ui_query( "Try to merge 'B' side of this disk?" ) ) {
+    free( filename2 );
+    return d->status = disk_open2( d, filename, preindex );
+  }
+
+  if( disk_open2( &d2, filename2, preindex ) ) {
+    return d->status = disk_open2( d, filename, preindex );
+  }
+
+  if( disk_open2( &d1, filename, preindex ) )
+    return d->status = d1.status;
+
+  if( disk_merge_sides( d, &d1, &d2, 0x00 ) ) {
+    disk_close( &d2 );
+    *d = d1;
+  }
+/*  fprintf( stderr, "`%s' and `%s' merged\n", filename, filename2 ); */
+  free( filename2 );
+  return d->status;
 }
 
 /*--------------------- start of write section ----------------*/

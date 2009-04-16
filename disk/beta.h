@@ -31,6 +31,7 @@
 #include <libspectrum.h>
 
 #include "periph.h"
+#include "disk/fdd.h"
 
 extern int beta_available;  /* Is the Beta disk interface available for use? */
 extern int beta_active;     /* Is the Beta disk interface enabled? */
@@ -72,7 +73,9 @@ typedef enum beta_drive_number {
 int beta_disk_insert( beta_drive_number which, const char *filename,
                        int autoload );
 int beta_disk_eject( beta_drive_number which, int write );
+int beta_disk_flip( beta_drive_number which, int flip );
 int beta_disk_writeprotect( beta_drive_number which, int wrprot );
 int beta_disk_write( beta_drive_number which, const char *filename );
+fdd_t *beta_get_fdd( beta_drive_number which );
 
 #endif                  /* #ifndef FUSE_BETA_H */
