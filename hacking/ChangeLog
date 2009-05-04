@@ -3106,3 +3106,5 @@
          drive images in single sided drives and for automatically merging both
          both drive images where they are named with the text
          [Ss]ide[ _][abAB12] (patch #2726922) (Gergely Szasz).
+20090504 ui/uijoystick.c: poll_joystick() should fire an input_event for each
+         button (fixes bug #2784357) (Anonymous).

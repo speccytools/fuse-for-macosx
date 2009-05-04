@@ -217,9 +217,10 @@ poll_joystick( int which )
     }
 
     event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + i;
+
+    input_event( &event );
   }
 
-  input_event( &event );
 }
 
 static void
