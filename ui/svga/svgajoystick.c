@@ -53,6 +53,8 @@
 static int sticks = 0;
 static int buttons[2];
 
+static void joy_handler( int ev, int number, char value, int which );
+
 static int
 init_stick( int which )
 {
@@ -78,6 +80,8 @@ init_stick( int which )
 int
 ui_joystick_init( void )
 {
+  int i;
+
   /* If we can't init the first, don't try the second */
   if( init_stick( 0 ) ) {
     sticks = 0;
@@ -85,6 +89,10 @@ ui_joystick_init( void )
     sticks = 1;
   } else {
     sticks = 2;
+  }
+
+  for( i = 0; i < sticks; i++ ) {
+    joystick_sethandler( i, joy_handler );
   }
 
   return sticks;
@@ -116,33 +124,35 @@ do_axis( int which, int position, input_key negative, input_key positive )
 }
 
 static void
-do_buttons( int which )
+joy_handler( int ev, int number, char value, int which )
 {
   input_event_t event;
-  int i;
 
-  event.types.joystick.which = which;
-  for( i = 0; i < buttons[which]; i++ ) {
-    event.type = joystick_getbutton( which, i )
+  switch ( ev ) {
+  case JOY_EVENTAXIS:
+    if( number == 0 )
+      do_axis( which, value, INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
+    else if( number == 1 )
+      do_axis( which, value, INPUT_JOYSTICK_UP, INPUT_JOYSTICK_DOWN );
+    break;
+  case JOY_EVENTBUTTONDOWN:
+  case JOY_EVENTBUTTONUP:
+    if( number >= buttons[which] ) return;
+    event.types.joystick.which = which;
+    event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + number;
+    event.type = ( ev == JOY_EVENTBUTTONDOWN )
                ? INPUT_EVENT_JOYSTICK_PRESS
                : INPUT_EVENT_JOYSTICK_RELEASE;
-    event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + i;
     input_event( &event );
+    break;
+  default:
+    break;
   }
 }
 
 void
 ui_joystick_poll( void )
 {
-  int i;
-
-  joystick_update();
-
-  for( i = 0; i < sticks; i++ ) {
-    do_axis( i, joystick_x( i ), INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
-    do_axis( i, joystick_y( i ), INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
-    do_buttons( i );
-  }
 }
 
 #endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */

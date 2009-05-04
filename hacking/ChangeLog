@@ -3108,3 +3108,6 @@
          [Ss]ide[ _][abAB12] (patch #2726922) (Gergely Szasz).
 20090504 ui/uijoystick.c: poll_joystick() should fire an input_event for each
          button (fixes bug #2784357) (Anonymous).
+20090504 input.c,ui/svga/{svgaui.c,svgajoystick.c}: switch SVGA joystick code
+         from the polling interface to the event interface (patch #2785333)
+         (Anonymous).

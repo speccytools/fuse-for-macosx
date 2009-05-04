@@ -28,6 +28,11 @@
 #include <stdio.h>
 
 #include <vga.h>
+
+#if defined USE_JOYSTICK && !defined HAVE_JSW_H
+#include <vgajoystick.h>
+#endif
+
 #include <vgakeyboard.h>
 #include <vgamouse.h>
 
@@ -69,6 +74,9 @@ ui_event( void )
 
   keyboard_update();
   mouse_update();
+#if defined USE_JOYSTICK && !defined HAVE_JSW_H
+  joystick_update();
+#endif
 
   x = mouse_getx();
   y = mouse_gety();
