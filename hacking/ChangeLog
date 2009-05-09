@@ -3111,3 +3111,6 @@
 20090504 input.c,ui/svga/{svgaui.c,svgajoystick.c}: switch SVGA joystick code
          from the polling interface to the event interface (patch #2785333)
          (Anonymous).
+20090509 settings.dat,settings.pl,ui/gtk/options.pl,ui/widget/options.pl:
+         defend against segfaults when trying to deal with empty options XML
+         elements (thanks, Anonymous from patch #2788548) (Fred).

@@ -62,9 +62,11 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 static int
 option_enumerate_combo( char **options, char *value, guint count, int def ) {
   int i;
-  for( i = 0; i < count; i++) {
-    if( !strcmp( value, options[ i ] ) )
-      return i;
+  if( value != NULL ) {
+    for( i = 0; i < count; i++) {
+      if( !strcmp( value, options[ i ] ) )
+        return i;
+    }
   }
   return def;
 }
@@ -212,9 +214,11 @@ CODE
     gtk_combo_box_append_text( GTK_COMBO_BOX( combo ), $_->{name}_$widget->{value}_combo[i] );
   }
   gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), $combo_default{$widget->{value}} );
-  for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
-    if( !strcmp( settings_current.$widget->{value}, $_->{name}_$widget->{value}_combo[i] ) ) {
-      gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), i );
+  if( settings_current.$widget->{value} != NULL ) {
+    for( i = 0; i < $_->{name}_$widget->{value}_combo_count; i++ ) {
+      if( !strcmp( settings_current.$widget->{value}, $_->{name}_$widget->{value}_combo[i] ) ) {
+        gtk_combo_box_set_active( GTK_COMBO_BOX( combo ), i );
+      }
     }
   }
 

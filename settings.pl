@@ -224,8 +224,10 @@ foreach my $name ( sort keys %options ) {
 	print << "CODE";
     if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
       xmlstring = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
-      settings->$name = atoi( (char*)xmlstring );
-      xmlFree( xmlstring );
+      if( xmlstring ) {
+        settings->$name = atoi( (char*)xmlstring );
+        xmlFree( xmlstring );
+      }
     } else
 CODE
 
@@ -234,9 +236,11 @@ CODE
 	    print << "CODE";
     if( !strcmp( (const char*)node->name, "$options{$name}->{configfile}" ) ) {
       xmlstring = xmlNodeListGetString( doc, node->xmlChildrenNode, 1 );
-      free( settings->$name );
-      settings->$name = strdup( (char*)xmlstring );
-      xmlFree( xmlstring );
+      if( xmlstring ) {
+        free( settings->$name );
+        settings->$name = strdup( (char*)xmlstring );
+        xmlFree( xmlstring );
+      }
     } else
 CODE
 

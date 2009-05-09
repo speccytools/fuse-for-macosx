@@ -101,9 +101,11 @@ widget_combo_click( const char *title, const char **options, char **current, int
 static int
 option_enumerate_combo( const char **options, char *value, int def ) {
   int i;
-  for( i = 0; options[i] != NULL; i++) {
-    if( !strcmp( value, options[ i ] ) )
-      return i;
+  if( value != NULL ) {
+    for( i = 0; options[i] != NULL; i++) {
+      if( !strcmp( value, options[ i ] ) )
+        return i;
+    }
   }
   return def;
 }
@@ -345,10 +347,12 @@ widget_options_print_combo( int left_edge, int width, int number, const char *pr
   char buffer[64];
 
   c = option[ def ];
-  while( option[ i ] != NULL ) {
-    if( !strcmp( option[ i ], value ) )
-      c = option[ i ];
-    i++;
+  if( value != NULL ) {
+    while( option[ i ] != NULL ) {
+      if( !strcmp( option[ i ], value ) )
+        c = option[ i ];
+      i++;
+    }
   }
   widget_options_print_label( left_edge, width, number, prefix );
   snprintf( buffer, sizeof( buffer ), "%s", c );

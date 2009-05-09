@@ -205,16 +205,16 @@ rom_interface_i, string, "if1-2.rom",
 rom_plusd, string, "plusd.rom",
 rom_beta128, string, "trdos.rom",
 
-drive_plus3a_type, string, ""
-drive_plus3b_type, string, ""
-drive_beta128a_type, string, ""
-drive_beta128b_type, string, ""
-drive_beta128c_type, string, ""
-drive_beta128d_type, string, ""
-drive_plusd1_type, string, ""
-drive_plusd2_type, string, ""
+drive_plus3a_type, string, NULL
+drive_plus3b_type, string, NULL
+drive_beta128a_type, string, NULL
+drive_beta128b_type, string, NULL
+drive_beta128c_type, string, NULL
+drive_beta128d_type, string, NULL
+drive_plusd1_type, string, NULL
+drive_plusd2_type, string, NULL
 
-disk_try_merge, string, ""
+disk_try_merge, string, NULL
 disk_ask_merge, boolean, 1
 
 debugger_command, string, NULL
