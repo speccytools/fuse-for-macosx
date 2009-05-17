@@ -3062,7 +3062,7 @@
          #if defined; #if ! defined; #elif defined; #elif !defined; #else;
          #undef; #define (fixes bug #2065518) (Gergely Szasz).
 20090304 disk/disk.[ch],machines/specplus3.c: preformat new disks on +3 to
-         allow format command on +3 to work  (fixes bug #2602397) (Gergely
+         allow format command on +3 to work (fixes bug #2602397) (Gergely
          Szasz).
 20090306 ui/{gtk,win32}/pokefinder.c: Win32,GTK: Fixed Poke Finder passing the
          wrong page for the possible found location to the debugger (Marek).
@@ -3114,3 +3114,4 @@
 20090509 settings.dat,settings.pl,ui/gtk/options.pl,ui/widget/options.pl:
          defend against segfaults when trying to deal with empty options XML
          elements (thanks, Anonymous from patch #2788548) (Fred).
+20090518 ui/gtk/options.pl: add <string.h> for strcmp (Fred).

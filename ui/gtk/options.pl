@@ -47,6 +47,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
