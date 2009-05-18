@@ -57,12 +57,12 @@ ptrdiff_t gtkdisplay_pitch = DISPLAY_SCREEN_WIDTH * sizeof( libspectrum_word );
 /* An RGB image of the Spectrum screen; slightly bigger than the real
    screen to handle the smoothing filters which read around each pixel */
 static guchar rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
-		                 ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
+                                 ( DISPLAY_SCREEN_WIDTH  + 3 )   ];
 static const gint rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
 static guchar scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
-			    (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
+                            (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
 static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
 
 /* The colour palette */
@@ -96,38 +96,14 @@ static int gtkdisplay_current_size=1;
 
 static int init_colours( void );
 static void gtkdisplay_area(int x, int y, int width, int height);
-static int register_scalers( void );
+static void register_scalers( void );
 
 /* Callbacks */
 
 static gint gtkdisplay_expose(GtkWidget *widget, GdkEvent *event,
-			      gpointer data);
+                              gpointer data);
 static gint drawing_area_resize_callback( GtkWidget *widget, GdkEvent *event,
-					  gpointer data );
-
-int
-gtkdisplay_init( void )
-{
-  int x, y, error;
-  libspectrum_dword black;
-
-  gtk_signal_connect( GTK_OBJECT(gtkui_drawing_area), "expose_event", 
-		      GTK_SIGNAL_FUNC(gtkdisplay_expose), NULL);
-  gtk_signal_connect( GTK_OBJECT(gtkui_drawing_area), "configure_event", 
-		      GTK_SIGNAL_FUNC( drawing_area_resize_callback ), NULL);
-
-  error = init_colours(); if( error ) return error;
-
-  black = settings_current.bw_tv ? bw_colours[0] : gtkdisplay_colours[0];
-
-  for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
-    for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
-      *(libspectrum_dword*)( rgb_image + y * rgb_pitch + 4 * x ) = black;
-
-  display_ui_initialised = 1;
-
-  return 0;
-}
+                                          gpointer data );
 
 static int
 init_colours( void )
@@ -151,12 +127,12 @@ init_colours( void )
     gtkdisplay_colours[i] =  red << 24 | green << 16 | blue << 8;
             bw_colours[i] = grey << 24 |  grey << 16 | grey << 8;
 
-#else				/* #ifdef WORDS_BIGENDIAN */
+#else                           /* #ifdef WORDS_BIGENDIAN */
 
     gtkdisplay_colours[i] =  red | green << 8 | blue << 16;
             bw_colours[i] = grey |  grey << 8 | grey << 16;
 
-#endif				/* #ifdef WORDS_BIGENDIAN */
+#endif                          /* #ifdef WORDS_BIGENDIAN */
 
   }
 
@@ -164,17 +140,35 @@ init_colours( void )
 }
 
 int
-
 uidisplay_init( int width, int height )
 {
-  int error;
+  int x, y, error;
+  libspectrum_dword black;
+
+  gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "expose_event",
+                      GTK_SIGNAL_FUNC(gtkdisplay_expose ), NULL );
+  gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "configure_event",
+                      GTK_SIGNAL_FUNC( drawing_area_resize_callback ), NULL );
+
+  error = init_colours(); if( error ) return error;
+
+  black = settings_current.bw_tv ? bw_colours[0] : gtkdisplay_colours[0];
+
+  for( y = 0; y < DISPLAY_SCREEN_HEIGHT + 4; y++ )
+    for( x = 0; x < DISPLAY_SCREEN_WIDTH + 3; x++ )
+      *(libspectrum_dword*)( rgb_image + y * rgb_pitch + 4 * x ) = black;
 
   image_width = width; image_height = height;
   image_scale = width / DISPLAY_ASPECT_WIDTH;
 
-  error = register_scalers(); if( error ) return error;
+  register_scalers();
 
   display_refresh_all();
+
+  if ( scaler_select_scaler( current_scaler ) )
+        scaler_select_scaler( SCALER_NORMAL );
+
+  display_ui_initialised = 1;
 
   return 0;
 }
@@ -182,7 +176,7 @@ uidisplay_init( int width, int height )
 static int
 drawing_area_resize( int width, int height )
 {
-  int size, error;
+  int size;
 
   size = width / DISPLAY_ASPECT_WIDTH;
   if( size > height / DISPLAY_SCREEN_HEIGHT )
@@ -193,7 +187,7 @@ drawing_area_resize( int width, int height )
 
   gtkdisplay_current_size = size;
 
-  error = register_scalers(); if( error ) return error;
+  register_scalers();
 
   memset( scaled_image, 0, sizeof( scaled_image ) );
   display_refresh_all();
@@ -201,83 +195,44 @@ drawing_area_resize( int width, int height )
   return 0;
 }
 
-static int
+static void
 register_scalers( void )
 {
   scaler_register_clear();
 
-  switch( gtkdisplay_current_size ) {
-
-  case 1:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_NORMAL );
-      scaler_register( SCALER_PALTV );
-      if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_NORMAL );
-      return 0;
-    case 2:
-      scaler_register( SCALER_HALF );
-      scaler_register( SCALER_HALFSKIP );
-      if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_HALF );
-      return 0;
-    }
-
-  case 2:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_DOUBLESIZE );
-      scaler_register( SCALER_TV2X );
-      scaler_register( SCALER_ADVMAME2X );
-      scaler_register( SCALER_2XSAI );
-      scaler_register( SCALER_SUPER2XSAI );
-      scaler_register( SCALER_SUPEREAGLE );
-      scaler_register( SCALER_DOTMATRIX );
-      scaler_register( SCALER_PALTV2X );
-      scaler_register( SCALER_HQ2X );
-      if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_DOUBLESIZE );
-      return 0;
-    case 2:
-      scaler_register( SCALER_NORMAL );
-      scaler_register( SCALER_TIMEXTV );
-      scaler_register( SCALER_PALTV );
-      if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_NORMAL );
-      return 0;
-    }
-
-  case 3:
-
-    switch( image_scale ) {
-    case 1:
-      scaler_register( SCALER_TRIPLESIZE );
-      scaler_register( SCALER_TV3X );
-      scaler_register( SCALER_ADVMAME3X );
-      scaler_register( SCALER_PALTV3X );
-      scaler_register( SCALER_HQ3X );
-      if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_TRIPLESIZE );
-      return 0;
-    case 2:
-      scaler_register( SCALER_TIMEX1_5X );
-      if( !scaler_is_supported( current_scaler ) )
-	scaler_select_scaler( SCALER_TIMEX1_5X );
-      return 0;
-    }
-
+  if( machine_current->timex ) {
+    scaler_register( SCALER_HALF );
+    scaler_register( SCALER_HALFSKIP );
+    scaler_register( SCALER_TIMEXTV );
+    scaler_register( SCALER_TIMEX1_5X );
+  } else {
+    scaler_register( SCALER_TV2X );
+    scaler_register( SCALER_TV3X );
+    scaler_register( SCALER_PALTV2X );
+    scaler_register( SCALER_PALTV3X );
+    scaler_register( SCALER_HQ2X );
+    scaler_register( SCALER_HQ3X );
+    scaler_register( SCALER_ADVMAME2X );
+    scaler_register( SCALER_ADVMAME3X );
+    scaler_register( SCALER_2XSAI );
+    scaler_register( SCALER_SUPER2XSAI );
+    scaler_register( SCALER_SUPEREAGLE );
+    scaler_register( SCALER_DOTMATRIX );
   }
+  scaler_register( SCALER_NORMAL );
+  scaler_register( SCALER_PALTV );
+  scaler_register( SCALER_DOUBLESIZE );
+  scaler_register( SCALER_TRIPLESIZE );
 
-  ui_error( UI_ERROR_ERROR, "Unknown display size/image size %d/%d",
-	    gtkdisplay_current_size, image_scale );
-  return 1;
+  if( scaler_is_supported( current_scaler ) ) {
+    scaler_select_scaler( current_scaler );
+  } else {
+    scaler_select_scaler( SCALER_NORMAL );
+  }
 }
 
 void
-uidisplay_frame_end( void ) 
+uidisplay_frame_end( void )
 {
   return;
 }
@@ -313,9 +268,9 @@ uidisplay_area( int x, int y, int w, int h )
 
   /* Create scaled image */
   scaler_proc32( &rgb_image[ ( y + 2 ) * rgb_pitch + 4 * ( x + 1 ) ],
-		 rgb_pitch,
-		 &scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
-		 scaled_pitch, w, h );
+                 rgb_pitch,
+                 &scaled_image[ scaled_y * scaled_pitch + 4 * scaled_x ],
+                 scaled_pitch, w, h );
 
   w *= scale; h *= scale;
 
@@ -326,16 +281,60 @@ uidisplay_area( int x, int y, int w, int h )
 static void gtkdisplay_area(int x, int y, int width, int height)
 {
   gdk_draw_rgb_32_image( gtkui_drawing_area->window,
-			 gtkui_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
-			 x, y, width, height, GDK_RGB_DITHER_NONE,
-			 &scaled_image[ y * scaled_pitch + 4 * x ],
-			 scaled_pitch );
+                         gtkui_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
+                         x, y, width, height, GDK_RGB_DITHER_NONE,
+                         &scaled_image[ y * scaled_pitch + 4 * x ],
+                         scaled_pitch );
 }
 
 int
 uidisplay_hotswap_gfx_mode( void )
 {
+  GdkGeometry geometry;
+  GdkWindowHints hints;
+  float scale;
+
   fuse_emulation_pause();
+
+  scale = scaler_get_scaling_factor( current_scaler );
+
+  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
+          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
+
+  geometry.min_width = DISPLAY_ASPECT_WIDTH;
+  geometry.min_height = DISPLAY_SCREEN_HEIGHT;
+  geometry.max_width = 3 * DISPLAY_ASPECT_WIDTH;
+  geometry.max_height = 3 * DISPLAY_SCREEN_HEIGHT;
+  geometry.base_width = scale * image_width;
+  geometry.base_height = scale * image_height;
+  geometry.width_inc = DISPLAY_ASPECT_WIDTH;
+  geometry.height_inc = DISPLAY_SCREEN_HEIGHT;
+
+  if( settings_current.aspect_hint ) {
+    hints |= GDK_HINT_ASPECT;
+    if( settings_current.strict_aspect_hint ) {
+      geometry.min_aspect = geometry.max_aspect =
+        (float)DISPLAY_ASPECT_WIDTH / DISPLAY_SCREEN_HEIGHT;
+    } else {
+      geometry.min_aspect = 1.2;
+      geometry.max_aspect = 1.5;
+    }
+  }
+
+  gtk_window_set_geometry_hints( GTK_WINDOW( gtkui_window ),
+                                 GTK_WIDGET( gtkui_drawing_area ),
+                                 &geometry, hints );
+
+  gtk_window_set_default_size( GTK_WINDOW( gtkui_window ),
+                               scale * image_width, scale * image_height );
+
+  gtk_drawing_area_size( GTK_DRAWING_AREA( gtkui_drawing_area ),
+                         scale * image_width, scale * image_height );
+
+  drawing_area_resize( scale * image_width, scale * image_height );
+ 
+  gtk_window_resize( GTK_WINDOW( gtkui_window ), scale * image_width,
+                     scale * image_height );
 
   /* Redraw the entire screen... */
   display_refresh_all();
@@ -347,12 +346,6 @@ uidisplay_hotswap_gfx_mode( void )
 
 int
 uidisplay_end( void )
-{
-  return 0;
-}
-
-int
-gtkdisplay_end( void )
 {
   return 0;
 }
@@ -376,7 +369,7 @@ uidisplay_putpixel( int x, int y, int colour )
    colour `paper' to the screen at ( (8*x) , y ) */
 void
 uidisplay_plot8( int x, int y, libspectrum_byte data,
-                libspectrum_byte ink, libspectrum_byte paper )
+                 libspectrum_byte ink, libspectrum_byte paper )
 {
   x <<= 3;
 
@@ -448,17 +441,17 @@ uidisplay_plot16( int x, int y, libspectrum_word data,
 /* Called by gtkui_drawing_area on "expose_event" */
 static gint
 gtkdisplay_expose( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
-		   gpointer data GCC_UNUSED )
+                   gpointer data GCC_UNUSED )
 {
   gtkdisplay_area(event->expose.area.x, event->expose.area.y,
-		  event->expose.area.width, event->expose.area.height);
+                  event->expose.area.width, event->expose.area.height);
   return TRUE;
 }
 
 /* Called by gtkui_drawing_area on "configure_event" */
 static gint
 drawing_area_resize_callback( GtkWidget *widget GCC_UNUSED, GdkEvent *event,
-			      gpointer data GCC_UNUSED )
+                              gpointer data GCC_UNUSED )
 {
   drawing_area_resize( event->configure.width, event->configure.height );
   return TRUE;

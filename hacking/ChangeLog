@@ -3115,3 +3115,6 @@
          defend against segfaults when trying to deal with empty options XML
          elements (thanks, Anonymous from patch #2788548) (Fred).
 20090518 ui/gtk/options.pl: add <string.h> for strcmp (Fred).
+20090518 man/fuse.1,ui/gtk/{gtkinternals.h,gtkdisplay.c,gtkui.c}: allow scalers
+         to set window size in GTK+ UI (patch #2790063 rkd77 and Fred, also
+         resolves feature requests #1841504 and #1729198).

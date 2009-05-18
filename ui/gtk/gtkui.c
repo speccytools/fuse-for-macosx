@@ -107,8 +107,6 @@ ui_init( int *argc, char ***argv )
 {
   GtkWidget *box, *menu_bar;
   GtkAccelGroup *accel_group;
-  GdkGeometry geometry;
-  GdkWindowHints hints;
 
   gtk_init(argc,argv);
 
@@ -121,9 +119,6 @@ ui_init( int *argc, char ***argv )
 
   gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
   gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
-
-  gtk_window_set_default_size( GTK_WINDOW(gtkui_window),
-			       DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
 
   gtk_signal_connect(GTK_OBJECT(gtkui_window), "delete-event",
 		     GTK_SIGNAL_FUNC(gtkui_delete), NULL);
@@ -147,15 +142,13 @@ ui_init( int *argc, char ***argv )
 
   gtk_window_add_accel_group( GTK_WINDOW(gtkui_window), accel_group );
   gtk_box_pack_start( GTK_BOX(box), menu_bar, FALSE, FALSE, 0 );
-  
+
   gtkui_drawing_area = gtk_drawing_area_new();
   if(!gtkui_drawing_area) {
     fprintf(stderr,"%s: couldn't create drawing area at %s:%d\n",
 	    fuse_progname,__FILE__,__LINE__);
     return 1;
   }
-  gtk_drawing_area_size( GTK_DRAWING_AREA(gtkui_drawing_area),
-			 DISPLAY_ASPECT_WIDTH, DISPLAY_SCREEN_HEIGHT );
 
   gtk_widget_add_events( GTK_WIDGET( gtkui_drawing_area ),
     GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK );
@@ -170,35 +163,6 @@ ui_init( int *argc, char ***argv )
 
   /* Create the statusbar */
   gtkstatusbar_create( GTK_BOX( box ) );
-
-  hints = GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE |
-          GDK_HINT_BASE_SIZE | GDK_HINT_RESIZE_INC;
-
-  geometry.min_width = DISPLAY_ASPECT_WIDTH;
-  geometry.min_height = DISPLAY_SCREEN_HEIGHT;
-  geometry.max_width = 3 * DISPLAY_ASPECT_WIDTH;
-  geometry.max_height = 3 * DISPLAY_SCREEN_HEIGHT;
-  geometry.base_width = 0;
-  geometry.base_height = 0;
-  geometry.width_inc = DISPLAY_ASPECT_WIDTH;
-  geometry.height_inc = DISPLAY_SCREEN_HEIGHT;
-
-  if( settings_current.aspect_hint ) {
-    hints |= GDK_HINT_ASPECT;
-    if( settings_current.strict_aspect_hint ) {
-      geometry.min_aspect = geometry.max_aspect =
-	(float)DISPLAY_ASPECT_WIDTH / DISPLAY_SCREEN_HEIGHT;
-    } else {
-      geometry.min_aspect = 1.2;
-      geometry.max_aspect = 1.5;
-    }
-  }
-
-  gtk_window_set_geometry_hints( GTK_WINDOW(gtkui_window),
-				 GTK_WIDGET(gtkui_drawing_area),
-				 &geometry, hints );
-
-  if( gtkdisplay_init() ) return 1;
 
   gtk_widget_show_all( gtkui_window );
   gtkstatusbar_set_visibility( settings_current.statusbar );
@@ -271,18 +235,9 @@ int ui_event(void)
 int ui_end(void)
 {
   int error;
-  
+
   /* Don't display the window whilst doing all this! */
-  gtk_widget_hide(gtkui_window);
-
-  /* Tidy up the low-level stuff */
-  error = gtkdisplay_end(); if( error ) return error;
-
-  /* Now free up the window itself */
-/*    XDestroyWindow(display,mainWindow); */
-
-  /* And disconnect from the X server */
-/*    XCloseDisplay(display); */
+  gtk_widget_hide( gtkui_window );
 
   return 0;
 }
@@ -330,7 +285,7 @@ ui_error_specific( ui_error_level severity, const char *message )
 
   return 0;
 }
-  
+
 /* The callbacks used by various routines */
 
 static gboolean
@@ -391,7 +346,7 @@ menu_get_scaler( scaler_available_fn selector )
 
   /* No scaler currently selected */
   dialog.selected = SCALER_NUM;
-  
+
   /* Some space to store the radio buttons in */
   dialog.buttons = malloc( SCALER_NUM * sizeof(GtkWidget* ) );
   if( dialog.buttons == NULL ) {
@@ -481,7 +436,7 @@ menu_machine_pause( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
       ui_error( UI_ERROR_INFO, "Stopping competition mode RZX recording" );
       error = rzx_stop_recording(); if( error ) return;
     }
-      
+
     paused = 1;
     ui_statusbar_update( UI_STATUSBAR_ITEM_PAUSED, UI_STATUSBAR_STATE_ACTIVE );
     gtk_main();
@@ -510,7 +465,7 @@ menu_machine_select( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   gtkui_select_info dialog;
 
   int i;
-  
+
   /* Some space to store the radio buttons in */
   dialog.buttons = malloc( machine_count * sizeof(GtkWidget* ) );
   if( dialog.buttons == NULL ) {
@@ -675,7 +630,7 @@ ui_confirm_joystick( libspectrum_joystick libspectrum_type,
   GSList *group = NULL;
 
   if( !settings_current.joy_prompt ) return UI_CONFIRM_JOYSTICK_NONE;
-  
+
   /* Some space to store the radio buttons in */
   dialog.buttons =
     malloc( JOYSTICK_CONN_COUNT * sizeof( *dialog.buttons ) );
@@ -748,7 +703,7 @@ void
 gtkui_set_font( GtkWidget *widget, gtkui_font font )
 {
   gtk_widget_modify_font( widget, font );
-}  
+}
 
 static void
 key_scroll_event( GtkCList *clist GCC_UNUSED, GtkScrollType scroll,

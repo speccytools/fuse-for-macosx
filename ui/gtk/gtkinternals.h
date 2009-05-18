@@ -36,9 +36,6 @@
 /* The colour palette in use */
 extern libspectrum_dword gtkdisplay_colours[ 16 ];
 
-int gtkdisplay_init( void );
-int gtkdisplay_end( void );
-
 /*
  * Keyboard routines (gtkkeyboard.c)
  */
