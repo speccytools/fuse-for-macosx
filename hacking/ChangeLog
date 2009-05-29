@@ -3123,3 +3123,5 @@
          tape.c,ui/options.dat,ula.c: switch from libsamplerate to Blip_Buffer
          (by Shay Green) for alias noise reduction for beeper and AY (Fred).
 20090530 ui/gtk/gtkui.c: remove unused variable (Fred).
+20090530 timer/timer.c: fixes for speed estimation (part of patch #2688741)
+         (Gergely Szasz)

@@ -78,7 +78,8 @@ timer_estimate_speed( void )
     current_speed = settings_current.emulation_speed;
 
   } else {
-    current_speed = 10 * ( current_time - stored_times[ next_stored_time ] );
+    current_speed = 10 * 100 /
+                      ( current_time - stored_times[ next_stored_time ] );
   }
 
   ui_statusbar_update_speed( current_speed );
@@ -176,9 +177,6 @@ timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
 	     void *user_data GCC_UNUSED )
 {
   double current_time, difference;
-  float speed = ( settings_current.emulation_speed < 1 ?
-		  100                                  :
-		  settings_current.emulation_speed ) / 100.0;
   long tstates;
 
   if( sound_enabled ) {
@@ -197,10 +195,14 @@ timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
 
   } else {
 
+    float speed = ( settings_current.emulation_speed < 1 ?
+                    1.0                                  :
+                    settings_current.emulation_speed ) / 100.0;
+
     while( 1 ) {
 
       current_time = timer_get_time(); if( current_time < 0 ) return;
-      difference = ( current_time - start_time ) / 1000.0;
+      difference = current_time - start_time;
 
       /* Sleep while we are still 10ms ahead */
       if( difference < 0 ) {
@@ -212,7 +214,7 @@ timer_frame( libspectrum_dword last_tstates, int event GCC_UNUSED,
     }
 
     current_time = timer_get_time(); if( current_time < 0 ) return;
-    difference = ( current_time - start_time ) / 1000.0;
+    difference = current_time - start_time;
 
     tstates = ( ( difference + TEN_MS / 1000.0 ) *
 		machine_current->timings.processor_speed
