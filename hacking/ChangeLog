@@ -3122,3 +3122,4 @@
          settings.dat,sound.[c|cpp|h],sound/{Blip_Buffer.[cpp|h],Makefile.am},
          tape.c,ui/options.dat,ula.c: switch from libsamplerate to Blip_Buffer
          (by Shay Green) for alias noise reduction for beeper and AY (Fred).
+20090530 ui/gtk/gtkui.c: remove unused variable (Fred).

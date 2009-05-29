@@ -179,10 +179,11 @@ gtkui_menu_deactivate( GtkMenuShell *menu GCC_UNUSED,
   ui_mouse_resume();
 }
 
-static gboolean gtkui_make_menu(GtkAccelGroup **accel_group,
-				GtkWidget **menu_bar,
-				GtkItemFactoryEntry *menu_data,
-				guint menu_data_size)
+static gboolean
+gtkui_make_menu(GtkAccelGroup **accel_group,
+                GtkWidget **menu_bar,
+                GtkItemFactoryEntry *menu_data,
+                guint menu_data_size)
 {
   *accel_group = gtk_accel_group_new();
   menu_factory = gtk_item_factory_new( GTK_TYPE_MENU_BAR, "<main>",
@@ -218,24 +219,25 @@ gtkui_popup_menu_pos( GtkMenu *menu GCC_UNUSED, gint *xp, gint *yp,
 }
 
 /* Popup main menu, as invoked by F1. */
-void gtkui_popup_menu(void)
+void
+gtkui_popup_menu(void)
 {
   gtk_menu_popup( GTK_MENU(gtkui_menu_popup), NULL, NULL,
 		  (GtkMenuPositionFunc)gtkui_popup_menu_pos, NULL,
 		  0, 0 );
 }
 
-int ui_event(void)
+int
+ui_event(void)
 {
   while(gtk_events_pending())
     gtk_main_iteration();
   return 0;
 }
 
-int ui_end(void)
+int
+ui_end(void)
 {
-  int error;
-
   /* Don't display the window whilst doing all this! */
   gtk_widget_hide( gtkui_window );
 
