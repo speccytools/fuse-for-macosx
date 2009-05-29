@@ -55,8 +55,6 @@ Optional:
   * libpng: the ability to save screenshots
   * libxml2: the ability to load and save Fuse's current configuration
   * zlib: support for compressed RZX files
-  * samplerate: support for better beeper sound quality; get it from
-    http://www.mega-nerd.com/SRC/
 
 If you've used Fuse prior to version 0.5.0, note that the external
 utilities (tzxlist, etc) are now available separately from Fuse
@@ -139,7 +137,7 @@ Then, use this configure line:
 ./configure --target=powerpc-gekko --host=powerpc-gekko \
 	    --with-wii \
 	    --without-libxml2 --without-libiconv --without-gpm \
-	    --without-x --without-glib --without-libsamplerate \
+	    --without-x --without-glib \
 	    CFLAGS="-g -I$DEVKITPPC/include -I$DEVKITPRO/libogc/include" \
 	    LDFLAGS="-g -mrvl -mcpu=750 -meabi -mhard-float \
                      -Wl,-Map,fuse.elf.map -L$DEVKITPPC/lib \

@@ -85,7 +85,7 @@ fuse_SOURCES = ay.c \
 	settings.c \
 	slt.c \
 	snapshot.c \
-	sound.c \
+	sound.cpp \
 	spectrum.c \
 	tape.c \
 	ui.c \
@@ -124,7 +124,6 @@ z80/libz80.a \
 @GLIB_LIBS@ \
 @PNG_LIBS@ \
 @SOUND_LIBS@ \
-@SAMPLERATE_LIBS@ \
 @SDL_LIBS@ \
 @X_LIBS@ \
 @XML_LIBS@ \
@@ -166,7 +165,7 @@ options.h: $(srcdir)/perl/cpp-perl.pl config.h $(srcdir)/ui/@UI@/options-header.
 endif
 
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
-@XML_CFLAGS@ @SAMPLERATE_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@
+@XML_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@
 
 noinst_HEADERS = ay.h \
 	bitmap.h \

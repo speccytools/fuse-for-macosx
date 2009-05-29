@@ -28,6 +28,7 @@ AM_INIT_AUTOMAKE(fuse, 0.10.0.1)
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_RANLIB
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
@@ -409,22 +410,6 @@ AC_CHECK_HEADER(
   [AC_MSG_WARN(mmsystem.h not found - no MS Windows Multimedia API sound output)],
   [#include <windows.h>]
 )
-
-dnl Check if libsamplerate is available
-AC_MSG_CHECKING(whether libsamplerate support requested)
-  AC_ARG_WITH(libsamplerate,
-  [  --without-libsamplerate don't use libsamplerate],
-  if test "$withval" = no; then libsamplerate=no; else libsamplerate=yes; fi,
-  libsamplerate=yes)
-AC_MSG_RESULT($libsamplerate)
-if test "$libsamplerate" = yes; then
-  PKG_CHECK_MODULES(SAMPLERATE, samplerate >= 0.1.0,
-                    AC_DEFINE([HAVE_SAMPLERATE],1,[Define to 1 if you have libsamplerate.]),
-                    [AC_MSG_NOTICE([libsamplerate not present.])])
-fi
-
-AC_SUBST(SAMPLERATE_CFLAGS)
-AC_SUBST(SAMPLERATE_LIBS)
 
 dnl Check if CoreAudio is available
 AC_CHECK_HEADER(

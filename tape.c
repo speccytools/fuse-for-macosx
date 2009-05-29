@@ -114,7 +114,6 @@ int tape_init( void )
      so we can't update the statusbar */
   tape_playing = 0;
   tape_microphone = 0;
-  if( settings_current.sound_load ) sound_beeper( 1, tape_microphone );
   return 0;
 }
 
@@ -620,10 +619,6 @@ tape_play( int autoplay )
   /* Update the status bar */
   ui_statusbar_update( UI_STATUSBAR_ITEM_TAPE, UI_STATUSBAR_STATE_ACTIVE );
 
-  /* Timex machines have no loading noise */
-  if( ( !( machine_current->timex ) ) && settings_current.sound_load )
-    sound_beeper( 1, tape_microphone );
-
   /* If we're fastloading, turn sound off */
   if( settings_current.fastload ) sound_pause();
 
@@ -852,10 +847,6 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
     } else {
       tape_microphone = !tape_microphone;
     }
-
-    /* Timex machines have no loading noise */
-    if( !machine_current->timex && settings_current.sound_load )
-      sound_beeper( 1, tape_microphone );
   }
 
   /* If we've been requested to stop the tape, do so and then

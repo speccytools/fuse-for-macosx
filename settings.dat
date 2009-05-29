@@ -73,10 +73,11 @@ sound_device, string, NULL, 'd'
 sound, boolean, 1
 sound_load, boolean, 1,, loading-sound
 stereo_ay, boolean, 0,, separation
-stereo_beeper, boolean, 0,, beeper-stereo
 sound_force_8bit, boolean, 0
 sound_freq, numeric, 32000, 'f'
-sound_hifi, boolean, 0
+speaker_type, string, NULL
+volume_ay, numeric, 100
+volume_beeper, numeric, 100
 
 joystick_1, string, NULL, 'j'
 joystick_1_output, numeric, 0

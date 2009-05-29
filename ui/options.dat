@@ -60,11 +60,10 @@ Sound Options
 Checkbox, (S)ound enabled, sound, INPUT_KEY_s
 Checkbox, (L)oading sound, sound_load, INPUT_KEY_l
 Checkbox, (A)Y stereo separation, stereo_ay, INPUT_KEY_a
-Checkbox, (B)eeper pseudo-stereo, stereo_beeper, INPUT_KEY_b
 Checkbox, (F)orce 8-bit, sound_force_8bit, INPUT_KEY_f
-#ifdef HAVE_SAMPLERATE 
-Checkbox, (H)i-fi beeper, sound_hifi, INPUT_KEY_h
-#endif /* #ifdef HAVE_SAMPLERATE */
+Combo, Speaker (t)ype, speaker_type, INPUT_KEY_t, *Default|TV speaker|Beeper
+Entry, A(Y) volume, volume_ay, INPUT_KEY_y, 3, %
+Entry, B(e)eper volume, volume_beeper, INPUT_KEY_e, 3, %
 
 diskoptions
 Drives Setup

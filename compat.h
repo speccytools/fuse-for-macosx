@@ -55,7 +55,7 @@ char *dirname( char *path );
 #endif				/* #ifndef HAVE_GETOPT_LONG */
 
 #ifndef HAVE_MKSTEMP
-int mkstemp( char *template );
+int mkstemp( char *templ );
 #endif				/* #ifndef HAVE_MKSTEMP */
 
 /* That which separates components in a path name */

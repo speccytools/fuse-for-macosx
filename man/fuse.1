@@ -126,14 +126,6 @@ to disable). Same as the General Options dialog's
 option.
 .RE
 .PP
-.I \-\-beeper\-stereo
-.RS
-Specify whether fake stereo should be added to the emulation of the
-Spectrum beeper. Same as the Sound Options dialog's
-.I "Beeper pseudo-stereo"
-option.
-.RE
-.PP
 .I \-\-beta128
 .RS
 Emulate a Beta 128 interface. Same as the Peripherals Options dialog's
@@ -728,12 +720,27 @@ Sound Options dialog's
 option.
 .RE
 .PP
-.I \-\-sound\-hifi
+.I "\-\-speaker\-type type"
 .RS
-Use higher fidelity sound generation to improve the reproduction of
-some multi-channel beeper tunes by reducing aliasing noise (e.g.
-Fairlight 2). Same as the Sound Options dialog's
-.I "Hi-fi beeper"
+Select the output speaker emulation, type can be one of Default,
+TV speaker, or Beeper. Same as the Sound Options dialog's
+.I "Speaker type"
+option.
+.RE
+.PP
+.I "\-\-volume\-ay volume"
+.RS
+Sets the relative volume of the AY-3-8912 chip from a range of
+0-100%. Same as the Sound Options dialog's
+.I "AY volume"
+option.
+.RE
+.PP
+.I "\-\-volume\-beeper volume"
+.RS
+Sets the relative volume of the beeper from a range of 0-100%.
+Same as the Sound Options dialog's
+.I "Beeper volume"
 option.
 .RE
 .PP
@@ -1595,18 +1602,8 @@ noise entirely.
 .RS
 By default, the sound output is mono, since this is all you got from
 an unmodified Spectrum. But enabling this option gives you so-called
-ACB stereo (for sound from the 128's AY-3-8912 sound chip). This
-actually works a little better than ACB stereo modifications for the
-machine itself, since it uses stereo positioning rather than simply
-playing on one channel only.
-.RE
-.PP
-.I "Beeper pseudo-stereo"
-.RS
-The Spectrum beeper is inherently mono, but enabling this option adds
-a simple fake-stereo effect. While the slight echo involved can
-sometimes make beeper noise sound worse, in many cases it gives an
-acceptable result.
+ACB stereo (for sound from the 128 and other clone's AY-3-8912 sound
+chip).
 .RE
 .PP
 .I "Force 8-bit"
@@ -1617,11 +1614,24 @@ available then there will be no sound at all, so it's best not to use
 this option unless you have a specific need for it.
 .RE
 .PP
-.I "Hi-fi beeper"
+.I "Speaker type"
 .RS
-Use higher fidelity sound generation to improve the reproduction of
-some multi-channel beeper tunes by reducing aliasing noise (e.g.
-Fairlight 2).
+This option allows the emualtion of the sound output system to be
+modified. Different choices of speaker limit the bass and treble
+response that can be produced from the machine. Choose between a
+default speaker, a "TV" type speaker that has weaker bass response
+and a small beeper type speaker that significantly limits bass and
+treble response.
+.RE
+.PP
+.I "AY volume"
+.RE
+Sets the relative volume of the AY-3-8912 chip from a range of 0-100%.
+.RS
+.PP
+.I "Beeper volume"
+.RS
+Sets the relative volume of the beeper from a range of 0-100%.
 .RE
 .RE
 .PP
