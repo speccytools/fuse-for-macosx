@@ -801,14 +801,14 @@ display_set_hires_border( int colour )
 static void
 set_border( int y, int start, int end, int colour )
 {
-  libspectrum_dword chunk_detail = 0x000000ff | colour << 8;
+  libspectrum_dword chunk_detail = colour << 11;
   int index = start + y * DISPLAY_SCREEN_WIDTH_COLS;
 
   for( ; start < end; start++ ) {
     /* Draw it if it is different to what was there last time - we know that
     data and mode will have been the same */
     if( display_last_screen[ index ] != chunk_detail ) {
-      uidisplay_plot8( start, y, 0xff, colour, 0 );
+      uidisplay_plot8( start, y, 0x00, 0, colour );
 
       /* Update last display record */
       display_last_screen[ index ] = chunk_detail;

@@ -3128,3 +3128,6 @@
 20090530 configure.in: try harder to find libpng (Fred).
 20090530 ui/gtk/gtkdisplay.c: don't allow double or triple size filters for the
          Timex machines (Fred).
+20090530 display.c: fix border colour recorded in display_last_screen so it
+         can handle bright borders like in Timex HiRes mode (fixes bug
+         #2788244) (Fred).
