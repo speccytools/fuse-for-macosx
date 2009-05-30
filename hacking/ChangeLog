@@ -3126,3 +3126,5 @@
 20090530 timer/timer.c: fixes for speed estimation (part of patch #2688741)
          (Gergely Szasz)
 20090530 configure.in: try harder to find libpng (Fred).
+20090530 ui/gtk/gtkdisplay.c: don't allow double or triple size filters for the
+         Timex machines (Fred).

@@ -206,6 +206,8 @@ register_scalers( void )
     scaler_register( SCALER_TIMEXTV );
     scaler_register( SCALER_TIMEX1_5X );
   } else {
+    scaler_register( SCALER_DOUBLESIZE );
+    scaler_register( SCALER_TRIPLESIZE );
     scaler_register( SCALER_TV2X );
     scaler_register( SCALER_TV3X );
     scaler_register( SCALER_PALTV2X );
@@ -221,8 +223,6 @@ register_scalers( void )
   }
   scaler_register( SCALER_NORMAL );
   scaler_register( SCALER_PALTV );
-  scaler_register( SCALER_DOUBLESIZE );
-  scaler_register( SCALER_TRIPLESIZE );
 
   if( scaler_is_supported( current_scaler ) ) {
     scaler_select_scaler( current_scaler );
