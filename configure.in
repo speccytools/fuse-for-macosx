@@ -348,16 +348,40 @@ AC_LINK_FILES([
 	lib/tape_ts2068.szx])
 
 dnl Check if a version of libpng which supplies png_write_png is available
+AC_PATH_PROG([LIBPNG12_CONFIG], [libpng12-config])
+AC_PATH_PROG([LIBPNG_CONFIG], [libpng-config])
+if test -n "$LIBPNG12_CONFIG"; then
+  PNG_CFLAGS=`libpng12-config --cflags`
+  PNG_LIBS=`libpng12-config --ldflags`
+  PNG_LIBS=`echo " $PNG_LIBS" | sed 's/ -l[[^ ]][[^ ]]*//g'`
+elif test -n "$LIBPNG_CONFIG"; then
+  PNG_CFLAGS=`libpng-config --cflags`
+  PNG_LIBS=`libpng-config --ldflags`
+  PNG_LIBS=`echo " $PNG_LIBS" | sed 's/ -l[[^ ]][[^ ]]*//g'`
+fi
+
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
+ac_save_LDFLAGS="$LDFLAGS"
+LDFLAGS="$PNG_LIBS $LDFLAGS"
+
 AC_CHECK_LIB( png, png_write_png,
   [AC_CHECK_HEADER(
     png.h,
-    [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-    [AC_MSG_WARN(png.h not found - saving screenshots disabled)]
+    [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng])],
+    [AC_CHECK_HEADERS(libpng/png.h,
+                 [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
+                  AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng])],
+                 [AC_MSG_WARN(png.h not found - saving screenshots disabled)
+                  PNG_LIBS='']
+    )],
   )],
-  [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)],
-  [-lm -lz]
+  [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
+   PNG_LIBS='']
 )
 AC_SUBST(PNG_LIBS)
+
+LDFLAGS="$ac_save_LDFLAGS"
 
 dnl Check if a version of libasound which supplies pcm is available
 AC_MSG_CHECKING(whether ALSA requested)
