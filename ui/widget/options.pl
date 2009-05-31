@@ -85,8 +85,8 @@ widget_combo_click( const char *title, const char **options, char **current, int
   sel.current = def;
   sel.finish_all = 0;
   for( i = 0; options[i] != NULL; i++ ) {
-    if( !strcmp( options[ i ], *current ) )
-      sel.current = i;
+    if( *current != NULL && !strcmp( options[ i ], *current ) )
+        sel.current = i;
   }
   sel.count = i;
 
