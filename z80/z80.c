@@ -208,8 +208,7 @@ z80_nmi( libspectrum_dword tstates, int type, void *user_data )
     /* Page in ROM 2 */
     writeport_internal( 0x1ffd, machine_current->ram.last_byte2 | 0x02 );
 
-  } else if( machine_current->capabilities &
-	     LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) {
+  } else if( beta_available ) {
 
     /* Page in TR-DOS ROM */
     beta_page();

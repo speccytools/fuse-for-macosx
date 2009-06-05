@@ -505,6 +505,9 @@ static fuse_machine_info dummy_machine;
 
 settings_info settings_current;
 
+libspectrum_word beta_pc_mask;
+libspectrum_word beta_pc_value;
+
 /* Initialise the dummy variables such that we're running on a clean a
    machine as possible */
 static int
@@ -524,6 +527,8 @@ init_dummies( void )
   scld_last_dec.name.intdisable = 0;
   settings_current.slt_traps = 0;
   settings_current.divide_enabled = 0;
+  beta_pc_mask = 0xfe00;
+  beta_pc_value = 0x3c00;
 
   return 0;
 }

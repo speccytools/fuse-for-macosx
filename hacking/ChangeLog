@@ -3134,3 +3134,6 @@
 20090531 ui/widget/options.pl: fix options widget drawing bug in segfault
          protection (Fred).
 20090531 configure.in: seem to be trying too hard to find libpng (Fred).
+20090605 disk/{beta.[ch]},machines/{spec48.c,tc2048.c},man/fuse.1,
+         z80/{coretest.c,z80.c,z80_ops.c}: enable Beta 128 interface in 48K and
+         TC2048 machines (thanks, Omikron) (Fred).

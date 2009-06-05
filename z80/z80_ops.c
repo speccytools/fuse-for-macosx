@@ -159,13 +159,16 @@ z80_do_opcodes( void )
 
     CHECK( beta, beta_available )
 
+#define NOT_128_TYPE_OR_IS_48_TYPE ( !( machine_current->capabilities & \
+            LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) || \
+            machine_current->ram.current_rom )
+
     if( beta_active ) {
-      if( machine_current->ram.current_rom &&
-	  PC >= 16384 ) {
+      if( NOT_128_TYPE_OR_IS_48_TYPE && PC >= 16384 ) {
 	beta_unpage();
       }
-    } else if( ( PC & 0xff00 ) == 0x3d00 &&
-	       machine_current->ram.current_rom ) {
+    } else if( ( PC & beta_pc_mask ) == beta_pc_value &&
+               NOT_128_TYPE_OR_IS_48_TYPE ) {
       beta_page();
     }
 

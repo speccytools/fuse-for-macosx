@@ -37,6 +37,9 @@ extern int beta_available;  /* Is the Beta disk interface available for use? */
 extern int beta_active;     /* Is the Beta disk interface enabled? */
 extern int beta_builtin;    /* Is the Beta disk interface built-in? */
 
+extern libspectrum_word beta_pc_mask; /* Bits to mask in PC for enable check */
+extern libspectrum_word beta_pc_value; /* Value to compare masked PC against */
+
 extern const periph_t beta_peripherals[];
 extern const size_t beta_peripherals_count;
 

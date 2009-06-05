@@ -619,7 +619,7 @@ the Interface I ROM
 .RI ( if1\-2.rom ),
 the +D ROM
 .RI ( plusd.rom ),
-and the TR-DOS ROM for Beta 128 emulation with the 128K or +2
+and the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ).
 The names in brackets denote the defaults.
 .RE
@@ -3382,7 +3382,8 @@ Fuse supports both the `CPCEMU' and `EXTENDED' formats.
 .SH BETA 128 EMULATION
 .PP
 Fuse supports .SCL and .TRD images in its Pentagon and Scorpion
-emulation, and also under 128K and +2 (but not +2A) emulation if the
+emulation, and also under 48K, TC2048, 128K and +2 (but not +2A)
+emulation if the
 .I Beta 128 interface
 option from the
 .I "Options, Peripherals..."
@@ -3467,8 +3468,8 @@ A simple archive format for TR-DOS disk files.
 .PP
 .I .TD0
 .RS
-Teledisk image format; Fuse supports only files not created with
-"Advanced Compression". Detailed description found in
+Teledisk image format; Fuse supports only files which do not use the
+"Advanced Compression" option. Detailed description found in
 .I http://www.classiccmp.org/dunfield/img/td0notes.txt
 and
 .I http://www.fpns.net/willy/wteledsk.htm
@@ -3483,7 +3484,7 @@ section and the CPCEMU manual section 7.7.1
 .I http://www.cpc-emu.org/linux/cpcemu_e.txt
 .RE
 .PP
-Fuse supports most of them for writing:
+Fuse supports most of the above formats for writing:
 .I .UDI .FDI .MGT .IMG .SAD .TRD .SCL .DSK
 (only the old CPC format).
 .br
@@ -3495,7 +3496,7 @@ There is a
 .I .LOG
 ` image ' format for debugging purpose. This is a plain text file
 contains three dump of the loaded disk image at different details.
-Not all image format can store all disk image. 
+Not all image formats can store all disk images. 
 You cannot save a disk image with an inappropriate format
 that loses some information (e.g. variable track length or
 sector length).
@@ -3519,7 +3520,7 @@ disk images.
 .\"
 .SH BUGS
 Selecting a startup filter doesn't work properly with user interfaces
-other than SDL.
+other than SDL and GTK+.
 .PP
 Attempting to replay an RZX file without an embedded snapshot from the
 command-line doesn't work if you do `./fuse

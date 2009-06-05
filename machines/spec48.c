@@ -29,6 +29,7 @@
 
 #include <libspectrum.h>
 
+#include "disk/beta.h"
 #include "joystick.h"
 #include "machine.h"
 #include "memory.h"
@@ -95,7 +96,11 @@ spec48_reset( void )
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
   periph_update();
+
+  periph_register_beta128();
+  beta_builtin = 0;
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;

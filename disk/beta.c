@@ -62,6 +62,9 @@ int beta_available = 0;
 int beta_active = 0;
 int beta_builtin = 0;
 
+libspectrum_word beta_pc_mask;
+libspectrum_word beta_pc_value;
+
 static int beta_index_pulse = 0;
 
 static int index_event;
@@ -141,7 +144,7 @@ beta_init( void )
 {
   int i;
   wd_fdc_drive *d;
-  
+
   beta_fdc = wd_fdc_alloc_fdc( FD1793, 0, WD_FLAG_BETA128 );
   beta_fdc->current_drive = NULL;
 
@@ -183,6 +186,9 @@ beta_reset( int hard_reset GCC_UNUSED )
 
   beta_available = 1;
 
+  beta_pc_mask = 0xff00;
+  beta_pc_value = 0x3d00;
+  
   wd_fdc_master_reset( beta_fdc );
 
   for( i = 0; i < BETA_NUM_DRIVES; i++ ) {
@@ -204,6 +210,17 @@ beta_reset( int hard_reset GCC_UNUSED )
     memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
     beta_active = 0;
+
+    if( !( machine_current->capabilities &
+           LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) ) {
+      beta_pc_mask = 0xfe00;
+      beta_pc_value = 0x3c00;
+
+      /* For 48K type machines, the Beta 128 is supposed to be configured
+         to start with the Beta ROM paged in (System switch in centre position)
+         */
+      beta_page();
+    }
   }
 
   /* We can eject disks only if they are currently present */
