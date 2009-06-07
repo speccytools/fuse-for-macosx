@@ -1,5 +1,5 @@
-/* ay.h: AY-8-3912 routines
-   Copyright (c) 1999-2009 Philip Kendall
+/* fuller.h: Routines for handling the Fuller Box
+   Copyright (c) 2007-2009 Stuart Brady, Fredrick Meunier
 
    $Id$
 
@@ -19,29 +19,22 @@
 
    Author contact information:
 
-   E-mail: philip-fuse@shadowmagic.org.uk
+   Philip: philip-fuse@shadowmagic.org.uk
+
+   Stuart: sdbrady@ntlworld.com
 
 */
 
-#ifndef FUSE_AY_H
-#define FUSE_AY_H
+#ifndef FUSE_FULLER_H
+#define FUSE_FULLER_H
 
 #include <libspectrum.h>
 
-#define AY_REGISTERS 16
+#include "periph.h"
 
-typedef struct ayinfo {
-  int current_register;
-  libspectrum_byte registers[ AY_REGISTERS ];
-} ayinfo;
+extern const periph_t fuller_peripherals[];
+extern const size_t fuller_peripherals_count;
 
-int ay_init( void );
+int fuller_init( void );
 
-libspectrum_byte ay_registerport_read( libspectrum_word port, int *attached );
-void ay_registerport_write( libspectrum_word port, libspectrum_byte b );
-
-void ay_dataport_write( libspectrum_word port, libspectrum_byte b );
-
-void ay_state_from_snapshot( libspectrum_snap *snap );
-
-#endif			/* #ifndef FUSE_AY_H */
+#endif				/* #ifndef FUSE_FULLER_H */

@@ -82,7 +82,6 @@ kempmouse_init( void )
   return 0;
 }
 
-
 void
 kempmouse_update( int dx, int dy, int btn, int down )
 {

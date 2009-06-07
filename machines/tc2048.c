@@ -1,6 +1,6 @@
 /* tc2048.c: Timex TC2048 specific routines
    Copyright (c) 1999-2005 Philip Kendall
-   Copyright (c) 2002-2004 Fredrick Meunier
+   Copyright (c) 2002-2009 Fredrick Meunier
 
    $Id$
 
@@ -117,6 +117,7 @@ tc2048_reset( void )
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   periph_register_beta128();

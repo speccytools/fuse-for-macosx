@@ -65,6 +65,7 @@ static const keyboard_key_name sinclair2_key[5] =
 static libspectrum_byte kempston_value;
 static libspectrum_byte timex1_value;
 static libspectrum_byte timex2_value;
+static libspectrum_byte fuller_value;
 
 /* The names of the joysticks we can emulate. Order must correspond to
    that of joystick.h:joystick_type_t */
@@ -73,7 +74,8 @@ const char *joystick_name[ JOYSTICK_TYPE_COUNT ] = {
   "Cursor",
   "Kempston",
   "Sinclair 1", "Sinclair 2",
-  "Timex 1", "Timex 2"
+  "Timex 1", "Timex 2",
+  "Fuller"
 };
 
 const char *joystick_connection[ JOYSTICK_CONN_COUNT ] = {
@@ -103,6 +105,7 @@ fuse_joystick_init (void)
 {
   joysticks_supported = ui_joystick_init();
   kempston_value = timex1_value = timex2_value = 0x00;
+  fuller_value = 0xff;
 
   module_register( &joystick_module_info );
 }
@@ -179,6 +182,14 @@ joystick_press( int which, joystick_button button, int press )
     }
     return 1;
 
+  case JOYSTICK_TYPE_FULLER:
+    if( press ) {
+      fuller_value &= ~timex_mask[ button ];
+    } else {
+      fuller_value |=  timex_mask[ button ];
+    }
+    return 1;
+
   case JOYSTICK_TYPE_NONE: return 0;
   }
 
@@ -203,6 +214,16 @@ libspectrum_byte
 joystick_timex_read( libspectrum_word port GCC_UNUSED, libspectrum_byte which )
 {
   return which ? timex2_value : timex1_value;
+}
+
+libspectrum_byte
+joystick_fuller_read( libspectrum_word port GCC_UNUSED, int *attached )
+{
+  if( !periph_fuller_active ) return 0xff;
+
+  *attached = 1;
+
+  return fuller_value;
 }
 
 static void
@@ -233,6 +254,8 @@ joystick_from_snapshot( libspectrum_snap *snap )
       fuse_type = JOYSTICK_TYPE_TIMEX_2;
       break;
     case LIBSPECTRUM_JOYSTICK_FULLER:
+      fuse_type = JOYSTICK_TYPE_FULLER;
+      break;
     default:
       ui_error( UI_ERROR_INFO, "Ignoring unsupported joystick in snapshot %s", 
         libspectrum_joystick_name( libspectrum_snap_joystick_list( snap, i ) ));
@@ -292,6 +315,9 @@ add_joystick( libspectrum_snap *snap, joystick_type_t fuse_type, int inputs )
     break;
   case JOYSTICK_TYPE_TIMEX_2:
     libspectrum_type = LIBSPECTRUM_JOYSTICK_TIMEX_2;
+    break;
+  case JOYSTICK_TYPE_FULLER:
+    libspectrum_type = LIBSPECTRUM_JOYSTICK_FULLER;
     break;
   
   case JOYSTICK_TYPE_NONE:

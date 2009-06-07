@@ -1,5 +1,5 @@
 /* ay.c: AY-8-3912 routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2009 Philip Kendall
 
    $Id$
 
@@ -131,22 +131,26 @@ ay_dataport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
   if( current == 14 ) printer_serial_write( b );
 }
 
-static void
-ay_from_snapshot( libspectrum_snap *snap )
+void
+ay_state_from_snapshot( libspectrum_snap *snap )
 {
   size_t i;
 
+  ay_registerport_write( 0xfffd,
+                         libspectrum_snap_out_ay_registerport( snap ) );
+
+  for( i = 0; i < AY_REGISTERS; i++ ) {
+    machine_current->ay.registers[i] =
+      libspectrum_snap_ay_registers( snap, i );
+    sound_ay_write( i, machine_current->ay.registers[i], 0 );
+  }
+}
+
+static void
+ay_from_snapshot( libspectrum_snap *snap )
+{
   if( machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) {
-
-    ay_registerport_write( 0xfffd,
-			   libspectrum_snap_out_ay_registerport( snap ) );
-
-    for( i = 0; i < AY_REGISTERS; i++ ) {
-      machine_current->ay.registers[i] =
-	libspectrum_snap_ay_registers( snap, i );
-      sound_ay_write( i, machine_current->ay.registers[i], 0 );
-    }
-
+    ay_state_from_snapshot( snap );
   }
 }
 

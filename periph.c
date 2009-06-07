@@ -1,5 +1,5 @@
 /* periph.c: code for handling peripherals
-   Copyright (c) 2005-2007 Philip Kendall
+   Copyright (c) 2005-2009 Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 
 #include "debugger/debugger.h"
 #include "event.h"
+#include "fuller.h"
 #include "ide/divide.h"
 #include "ide/simpleide.h"
 #include "ide/zxatasp.h"
@@ -322,6 +323,12 @@ periph_present beta128_present;
 /* Is the Beta 128 currently active */
 int periph_beta128_active;
 
+/* What sort of Fuller Box does the current machine have */
+periph_present fuller_present;
+
+/* Is the Fuller Box currently active */
+int periph_fuller_active;
+
 int
 periph_setup( const periph_t *peripherals_list, size_t n )
 {
@@ -348,6 +355,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   interface2_present = PERIPH_PRESENT_NEVER;
   plusd_present = PERIPH_PRESENT_NEVER;
   beta128_present = PERIPH_PRESENT_NEVER;
+  fuller_present = PERIPH_PRESENT_NEVER;
 
   return 0;
 }
@@ -380,6 +388,11 @@ periph_setup_beta128( periph_present present ) {
 void
 periph_register_beta128( void ) {
   periph_register_n( beta_peripherals, beta_peripherals_count );
+}
+
+void
+periph_setup_fuller( periph_present present ) {
+  fuller_present = present;
 }
 
 static void
@@ -473,6 +486,17 @@ periph_update( void )
     } else {
       if(  ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_release( 1 );
     }
+  }
+
+  switch( fuller_present ) {
+  case PERIPH_PRESENT_NEVER: periph_fuller_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_fuller_active = settings_current.fuller; break;
+  case PERIPH_PRESENT_ALWAYS: periph_fuller_active = 1; break;
+  }
+
+  if( periph_fuller_active ) {
+    periph_register_n( fuller_peripherals, fuller_peripherals_count );
   }
 
   update_cartridge_menu();

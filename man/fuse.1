@@ -273,6 +273,13 @@ support a single frequency or a limited range (e.g.
 48\ kHz or up to 22\ kHz).
 .RE
 .PP
+.I "\-\-fuller"
+.RS
+Emulate a Fuller Box interface. Same as the Peripherals Options dialog's
+.I "Fuller Box"
+option.
+.RE
+.PP
 .I "\-\-full\-screen"
 .RS
 Specify whether Fuse should run in full screen mode.
@@ -1676,6 +1683,13 @@ it will fall back to built-in PS/2 mouse support. In this mode, it tries
 it successfully opens one. The first of these is preferred since (at least on
 Linux, with a 2.6-series kernel) any type of mouse can be used and any
 connected mouse may be used.
+.RE
+.PP
+.I "Fuller Box"
+.RS
+If this option is selected, Fuse will emulate a Fuller Box AY sound and
+joystick interface. This emulation is only available for the 16k, 48k and
+TC2048 machines.
 .RE
 .PP
 .I "Interface I"

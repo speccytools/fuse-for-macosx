@@ -1,5 +1,5 @@
 /* spec16.c: Spectrum 16K specific routines
-   Copyright (c) 1999-2007 Philip Kendall
+   Copyright (c) 1999-2009 Philip Kendall
 
    $Id$
 
@@ -101,6 +101,7 @@ spec16_reset( void )
   periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   /* ROM 0, RAM 5, nothing, nothing */

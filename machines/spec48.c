@@ -1,5 +1,5 @@
 /* spec48.c: Spectrum 48K specific routines
-   Copyright (c) 1999-2007 Philip Kendall
+   Copyright (c) 1999-2009 Philip Kendall
 
    $Id$
 
@@ -97,6 +97,7 @@ spec48_reset( void )
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   periph_register_beta128();

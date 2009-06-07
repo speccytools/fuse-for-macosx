@@ -1,5 +1,5 @@
 # Process this file with automake to produce Makefile.in
-## Copyright (c) 1999-2008 Philip Kendall
+## Copyright (c) 1999-2009 Philip Kendall
 
 ## $Id$
 
@@ -62,6 +62,7 @@ fuse_SOURCES = ay.c \
 	dck.c \
 	display.c \
 	event.c \
+	fuller.c \
 	fuse.c \
 	if1.c \
 	if2.c \
@@ -173,6 +174,7 @@ noinst_HEADERS = ay.h \
 	dck.h \
 	display.h \
 	event.h \
+	fuller.h \
 	fuse.h \
 	if1.h \
 	if2.h \

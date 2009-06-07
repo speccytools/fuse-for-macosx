@@ -3137,3 +3137,7 @@
 20090605 disk/{beta.[ch]},machines/{spec48.c,tc2048.c},man/fuse.1,
          z80/{coretest.c,z80.c,z80_ops.c}: enable Beta 128 interface in 48K and
          TC2048 machines (thanks, Omikron) (Fred).
+20090608 Makefile.am,ay.[ch],fuller.[ch],fuse.c,joystick.[ch],kempmouse.c,
+         machines/{spec16.c,spec48.c,tc2048.c},man/fuse.1,periph.[ch],
+         settings.dat,sound.cpp,ui/options.dat: add emulation of the Fuller Box
+         (feature request #1764994) (Stuart & Fred).

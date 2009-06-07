@@ -49,10 +49,11 @@ typedef enum joystick_type_t {
   JOYSTICK_TYPE_SINCLAIR_2,
   JOYSTICK_TYPE_TIMEX_1,
   JOYSTICK_TYPE_TIMEX_2,
+  JOYSTICK_TYPE_FULLER,
 
 } joystick_type_t;
 
-#define JOYSTICK_TYPE_COUNT 7
+#define JOYSTICK_TYPE_COUNT 8
 
 extern const char *joystick_name[];
 extern const char *joystick_connection[];
@@ -77,5 +78,7 @@ libspectrum_byte joystick_kempston_read ( libspectrum_word port,
 					  int *attached );
 libspectrum_byte joystick_timex_read ( libspectrum_word port,
 				       libspectrum_byte which );
+libspectrum_byte joystick_fuller_read ( libspectrum_word port,
+					int *attached );
 
 #endif			/* #ifndef FUSE_JOYSTICK_H */

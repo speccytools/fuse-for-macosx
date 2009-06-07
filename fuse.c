@@ -50,6 +50,7 @@
 #include "disk/fdd.h"
 #include "display.h"
 #include "event.h"
+#include "fuller.h"
 #include "fuse.h"
 #include "ide/divide.h"
 #include "ide/simpleide.h"
@@ -290,6 +291,7 @@ static int fuse_init(int argc, char **argv)
   if( slt_init() ) return 1;
   if( profile_init() ) return 1;
   if( kempmouse_init() ) return 1;
+  if( fuller_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 
