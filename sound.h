@@ -36,6 +36,7 @@ void sound_ay_write( int reg, int val, libspectrum_dword now );
 void sound_ay_reset( void );
 void sound_frame( void );
 void sound_beeper( int on );
+libspectrum_dword sound_get_effective_processor_speed( void );
 
 extern int sound_enabled;
 extern int sound_enabled_ever;

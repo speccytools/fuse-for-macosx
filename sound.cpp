@@ -115,12 +115,23 @@ sound_get_volume( int volume )
   return volume / 100.0;
 }
 
+/* Returns the emulation speed adjusted processor speed */
+libspectrum_dword
+sound_get_effective_processor_speed( void )
+{
+  return machine_current->timings.processor_speed / 100 * 
+           settings_current.emulation_speed;
+}
+
 bool
 sound_init_blip( Blip_Buffer **buf, fuse_synth **synth )
 {
   *buf = new Blip_Buffer();
-  (*buf)->clock_rate( machine_current->timings.processor_speed );
-  if ( (*buf)->set_sample_rate( settings_current.sound_freq ) ) {
+  (*buf)->clock_rate( sound_get_effective_processor_speed() );
+  /* Allow up to 1s of playback buffer - this allows us to cope with slowing
+     down to 2% of speed where a single Speccy frame generates just under 1s
+     of sound */
+  if ( (*buf)->set_sample_rate( settings_current.sound_freq, 1000 ) ) {
     sound_end();
     ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
     return false;
@@ -172,8 +183,12 @@ sound_init( const char *device )
   int ret;
   float hz;
 
+  /* Allow sound as long as emulation speed is greater than 2%
+     (less than that and a single Speccy frame generates more
+     than a seconds worth of sound which is bigger than the
+     maximum Blip_Buffer of 1 second) */
   if( !( !sound_enabled && settings_current.sound &&
-	 settings_current.emulation_speed == 100 ) )
+         settings_current.emulation_speed > 1 ) )
     return;
 
   sound_stereo_ay = settings_current.stereo_ay;
@@ -245,10 +260,14 @@ sound_init( const char *device )
 
   sound_channels = ( sound_stereo ? 2 : 1 );
 
-  hz = ( float ) machine_current->timings.processor_speed /
-    machine_current->timings.tstates_per_frame;
+  /* Adjust relative processor speed to deal with adjusting sound generation
+     frequency against emulation speed (more flexible than adjusting generated
+     sample rate) */
+  hz = ( float )sound_get_effective_processor_speed() /
+                machine_current->timings.tstates_per_frame;
 
-  sound_framesiz = ( float ) settings_current.sound_freq / hz;
+  /* Size of audio data we will get from running a single Spectrum frame */
+  sound_framesiz = ( float )settings_current.sound_freq / hz;
   sound_framesiz++;
 
   samples = (blip_sample_t *)calloc( sound_framesiz * sound_channels,

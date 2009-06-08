@@ -3141,3 +3141,5 @@
          machines/{spec16.c,spec48.c,tc2048.c},man/fuse.1,periph.[ch],
          settings.dat,sound.cpp,ui/options.dat: add emulation of the Fuller Box
          (feature request #1764994) (Stuart & Fred).
+20090608 sound.[cpp|h],sound/{alsasound.c,coreaudiosound.c,sdlsound.c}: allow
+         sound to run from 2% speed up (patch #2799477) (Fred).

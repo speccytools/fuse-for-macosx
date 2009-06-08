@@ -83,14 +83,18 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
   requested.format = AUDIO_S16SYS;
   requested.callback = sdlwrite;
 
-  hz = (float)machine_current->timings.processor_speed /
+  /* Adjust relative processor speed to deal with adjusting sound generation
+     frequency against emulation speed (more flexible than adjusting generated
+     sample rate) */
+  hz = (float)sound_get_effective_processor_speed() /
               machine_current->timings.tstates_per_frame;
+  /* Amount of audio data we will accumulate before yielding back to the OS.
+     Not much point having more than 100Hz playback, we probably get
+     downgraded by the OS as being a hog too (unlimited Hz limits playback
+     speed to about 2000% on my Mac, 100Hz allows up to 5000% for me) */
+  if( hz > 100.0 ) hz = 100.0;
   sound_framesiz = *freqptr / hz;
-#if !defined AMIGA && !defined __MORPHOS__
-  requested.samples = pow(2.0, floor(log2(sound_framesiz)));
-#else			/* #if !defined AMIGA && !defined __MORPHOS__ */
   requested.samples = sound_framesiz;
-#endif			/* #if !defined AMIGA && !defined __MORPHOS__ */
 
   if ( SDL_OpenAudio( &requested, &received ) < 0 ) {
     settings_current.sound = 0;
@@ -107,15 +111,8 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     SDL_CloseAudio();
 
     requested.freq = *freqptr;
-
-    hz = (float)machine_current->timings.processor_speed /
-                machine_current->timings.tstates_per_frame;
     sound_framesiz = *freqptr / hz;
-#if !defined AMIGA && !defined __MORPHOS__   
-    requested.samples = pow(2.0, floor(log2(sound_framesiz)));
-#else			/* #if !defined AMIGA && !defined __MORPHOS__ */
     requested.samples = sound_framesiz;
-#endif			/* #if !defined AMIGA && !defined __MORPHOS__ */
 
     if( SDL_OpenAudio( &requested, NULL ) < 0 ) {
       settings_current.sound = 0;
@@ -127,8 +124,6 @@ sound_lowlevel_init( const char *device, int *freqptr, int *stereoptr )
     *stereoptr = received.channels == 1 ? 0 : 1;
   }
 
-  hz = (float)machine_current->timings.processor_speed /
-              machine_current->timings.tstates_per_frame;
   sound_framesiz = *freqptr / hz;
   sound_framesiz <<= 1;
 
