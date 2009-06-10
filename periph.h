@@ -101,6 +101,9 @@ extern int periph_beta128_active;
 /* Is the Fuller Box active */
 extern int periph_fuller_active;
 
+/* Is the Melodik active */
+extern int periph_melodik_active;
+
 int periph_setup( const periph_t *peripherals_list, size_t n );
 void periph_setup_kempston( periph_present present );
 void periph_setup_interface1( periph_present present );
@@ -108,6 +111,7 @@ void periph_setup_interface2( periph_present present );
 void periph_setup_plusd( periph_present present );
 void periph_setup_beta128( periph_present present );
 void periph_setup_fuller( periph_present present );
+void periph_setup_melodik( periph_present present );
 void periph_update( void );
 
 void periph_register_beta128( void );

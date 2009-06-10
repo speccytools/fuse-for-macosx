@@ -69,6 +69,7 @@ beta128, boolean, 0
 late_timings, boolean, 0
 unittests, boolean, 0
 fuller, boolean, 0
+melodik, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1

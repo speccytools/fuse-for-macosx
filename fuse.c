@@ -62,6 +62,7 @@
 #include "kempmouse.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "melodik.h"
 #include "memory.h"
 #include "pokefinder/pokefinder.h"
 #include "printer.h"
@@ -292,6 +293,7 @@ static int fuse_init(int argc, char **argv)
   if( profile_init() ) return 1;
   if( kempmouse_init() ) return 1;
   if( fuller_init() ) return 1;
+  if( melodik_init() ) return 1;
 
   error = pokefinder_clear(); if( error ) return error;
 

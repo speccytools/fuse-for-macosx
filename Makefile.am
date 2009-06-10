@@ -72,6 +72,7 @@ fuse_SOURCES = ay.c \
 	keyboard.c \
 	loader.c \
 	machine.c \
+	melodik.c \
 	memory.c \
 	mempool.c \
 	menu.c \
@@ -183,6 +184,7 @@ noinst_HEADERS = ay.h \
 	kempmouse.h \
 	loader.h \
 	machine.h \
+	melodik.h \
 	memory.h \
 	mempool.h \
 	menu.h \

@@ -33,8 +33,6 @@
 #include "compat.h"
 #include "fuller.h"
 #include "joystick.h"
-#include "machine.h"
-#include "memory.h"
 #include "module.h"
 #include "periph.h"
 #include "settings.h"

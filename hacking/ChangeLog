@@ -3143,3 +3143,8 @@
          (feature request #1764994) (Stuart & Fred).
 20090608 sound.[cpp|h],sound/{alsasound.c,coreaudiosound.c,sdlsound.c}: allow
          sound to run from 2% speed up (patch #2799477) (Fred).
+20090610 Makefile.am,ay.[ch],fuse.c,joystick.[ch],kempmouse.c,
+         machines/{spec16.c,spec48.c,tc2048.c},man/fuse.1,melodik.[ch],
+         periph.[ch],settings.dat,sound.cpp,ui/options.dat: add emulation of
+         the Melodik and similar AY interfaces (feature request #1841501)
+         (Fred).

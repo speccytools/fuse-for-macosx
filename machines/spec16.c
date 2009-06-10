@@ -102,6 +102,7 @@ spec16_reset( void )
   periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_melodik( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   /* ROM 0, RAM 5, nothing, nothing */

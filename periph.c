@@ -38,6 +38,7 @@
 #include "if2.h"
 #include "joystick.h"
 #include "kempmouse.h"
+#include "melodik.h"
 #include "periph.h"
 #include "rzx.h"
 #include "settings.h"
@@ -329,6 +330,12 @@ periph_present fuller_present;
 /* Is the Fuller Box currently active */
 int periph_fuller_active;
 
+/* What sort of Melodik does the current machine have */
+periph_present melodik_present;
+
+/* Is the Melodik currently active */
+int periph_melodik_active;
+
 int
 periph_setup( const periph_t *peripherals_list, size_t n )
 {
@@ -356,6 +363,7 @@ periph_setup( const periph_t *peripherals_list, size_t n )
   plusd_present = PERIPH_PRESENT_NEVER;
   beta128_present = PERIPH_PRESENT_NEVER;
   fuller_present = PERIPH_PRESENT_NEVER;
+  melodik_present = PERIPH_PRESENT_NEVER;
 
   return 0;
 }
@@ -393,6 +401,11 @@ periph_register_beta128( void ) {
 void
 periph_setup_fuller( periph_present present ) {
   fuller_present = present;
+}
+
+void
+periph_setup_melodik( periph_present present ) {
+  melodik_present = present;
 }
 
 static void
@@ -497,6 +510,17 @@ periph_update( void )
 
   if( periph_fuller_active ) {
     periph_register_n( fuller_peripherals, fuller_peripherals_count );
+  }
+
+  switch( melodik_present ) {
+  case PERIPH_PRESENT_NEVER: periph_melodik_active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    periph_melodik_active = settings_current.melodik; break;
+  case PERIPH_PRESENT_ALWAYS: periph_melodik_active = 1; break;
+  }
+
+  if( periph_melodik_active ) {
+    periph_register_n( melodik_peripherals, melodik_peripherals_count );
   }
 
   update_cartridge_menu();

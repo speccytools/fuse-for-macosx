@@ -118,6 +118,7 @@ tc2048_reset( void )
   periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
   periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
   periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_melodik( PERIPH_PRESENT_OPTIONAL );
   periph_update();
 
   periph_register_beta128();
