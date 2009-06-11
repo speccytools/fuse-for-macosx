@@ -379,8 +379,8 @@ sound_ay_overlay( void )
   unsigned int tone_count, noise_count;
 
   /* If no AY chip, don't produce any AY sound (!) */
-  if( !(periph_fuller_active || periph_melodik_active) && 
-      ( !machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) )
+  if( !( periph_fuller_active || periph_melodik_active ||
+         machine_current->capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_AY ) )
     return;
 
   for( f = 0; f < machine_current->timings.tstates_per_frame;
