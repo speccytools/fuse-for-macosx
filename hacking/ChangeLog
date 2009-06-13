@@ -3149,3 +3149,4 @@
          the Melodik and similar AY interfaces (feature request #1841501)
          (Fred).
 20090611 sound.cpp: correct AY capability check (thanks, Stuary Brady) (Fred).
+20090613 sound.cpp: ACB stereo fixes (Fred).

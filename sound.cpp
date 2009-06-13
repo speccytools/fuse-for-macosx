@@ -245,12 +245,14 @@ sound_init( const char *device )
       ay_a_synth_r = new fuse_synth();
       ay_a_synth_r->volume( sound_get_volume( settings_current.volume_ay ) );
       ay_a_synth_r->output( right_buf );
+      ay_a_synth_r->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
 
       ay_b_synth->output( left_buf );
 
       ay_b_synth_r = new fuse_synth();
       ay_b_synth_r->volume( sound_get_volume( settings_current.volume_ay ) );
       ay_b_synth_r->output( right_buf );
+      ay_b_synth_r->treble_eq( speaker_type[ option_enumerate_sound_speaker_type() ].treble );
     }
   } else {
     ay_b_synth->output( left_buf );
@@ -375,7 +377,7 @@ sound_ay_overlay( void )
   int changes_left = ay_change_count;
   int reg, r;
   int chan1, chan2, chan3;
-  int last_chan1, last_chan2, last_chan3;
+  int last_chan1 = 0, last_chan2 = 0, last_chan3 = 0;
   unsigned int tone_count, noise_count;
 
   /* If no AY chip, don't produce any AY sound (!) */
@@ -530,12 +532,12 @@ sound_ay_overlay( void )
     }
     if( last_chan2 != chan2 ) {
       ay_b_synth->update( f, chan2 );
-      if( ay_b_synth_r ) ay_b_synth_r->update( f, chan1 );
+      if( ay_b_synth_r ) ay_b_synth_r->update( f, chan2 );
       last_chan2 = chan2;
     }
     if( last_chan3 != chan3 ) {
       ay_c_synth->update( f, chan3 );
-      if( ay_c_synth_r ) ay_c_synth_r->update( f, chan1 );
+      if( ay_c_synth_r ) ay_c_synth_r->update( f, chan3 );
       last_chan3 = chan3;
     }
 
