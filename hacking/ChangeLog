@@ -3150,3 +3150,6 @@
          (Fred).
 20090611 sound.cpp: correct AY capability check (thanks, Stuary Brady) (Fred).
 20090613 sound.cpp: ACB stereo fixes (Fred).
+20090613 man/fuse.1,sound.cpp,ui/options.dat: tweak sound output options based
+         on listening tests against real hardware, narrow options to a default
+         similar to MIC output and one similar to the internal beeper (Fred).
