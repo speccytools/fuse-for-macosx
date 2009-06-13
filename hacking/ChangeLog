@@ -3153,3 +3153,5 @@
 20090613 man/fuse.1,sound.cpp,ui/options.dat: tweak sound output options based
          on listening tests against real hardware, narrow options to a default
          similar to MIC output and one similar to the internal beeper (Fred).
+20090613 disk/disk.c: support non-standard TRD images with 41-83 tracks per
+         side (fixes bug #2805766) (Gergely Szasz).

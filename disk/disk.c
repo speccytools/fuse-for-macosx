@@ -871,6 +871,13 @@ open_trd( buffer_t *buffer, disk_t *d )
   /* guess geometry of disk */
   d->sides =  buff[227] & 0x08 ? 1 : 2;
   d->cylinders = buff[227] & 0x01 ? 40 : 80;
+  /* we have more tracks then on a standard disk... */
+  if( buffer->file.length > d->sides * d->cylinders * 16 * 256 ) {
+    for( i = d->cylinders + 1; i < 83; i++ ) {
+      if( d->sides * i * 16 * 256 >= buffer->file.length ) break;
+    }
+    d->cylinders = i;
+  }
   sectors = 16; seclen = 256;
 
   /* create a DD disk */
