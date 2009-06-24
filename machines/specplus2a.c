@@ -34,6 +34,7 @@
 #include "printer.h"
 #include "settings.h"
 #include "spec128.h"
+#include "spec48.h"
 #include "specplus3.h"
 #include "ula.h"
 #include "if1.h"
@@ -73,7 +74,6 @@ specplus2a_init( fuse_machine_info *machine )
   machine->memory_map = specplus3_memory_map;
 
   return 0;
-
 }
 
 static int
@@ -101,6 +101,8 @@ specplus2a_reset( void )
   if( error ) return error;
   periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
   periph_update();
+
+  spec48_common_display_setup();
 
   return 0;
 }

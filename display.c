@@ -121,6 +121,9 @@ struct border_change_t {
   int colour;
 };
 
+display_dirty_fn display_dirty;
+display_write_if_dirty_fn display_write_if_dirty;
+
 static struct border_change_t border_change_end_sentinel =
   { DISPLAY_SCREEN_WIDTH_COLS, DISPLAY_SCREEN_HEIGHT - 1, 0 };
 
@@ -135,8 +138,6 @@ static void display_get_attr( int x, int y,
 
 static int add_rectangle( int y, int x, int w );
 static int end_line( int y );
-
-static void display_dirty_flashing(void);
 
 static int border_changes_last = 0;
 static struct border_change_t *border_changes = NULL;
@@ -388,7 +389,7 @@ end_line( int y )
 /* Mark as 'dirty' the pixels which have been changed by a write to
    'offset' within the RAM page containing the screen */
 void
-display_dirty( libspectrum_word offset )
+display_dirty_timex( libspectrum_word offset )
 {
   switch ( scld_last_dec.mask.scrnmode ) {
 
@@ -428,6 +429,29 @@ display_dirty( libspectrum_word offset )
       if( offset >= 0x2000 && offset < 0x3800 )
 	display_dirty8( offset - ALTDFILE_OFFSET );
       break;
+  }
+}
+
+void
+display_dirty_pentagon_16_col( libspectrum_word offset )
+{
+  /* The only relevant sections of the page will be the two 6144 byte sections
+     separated by ALTDFILE_OFFSET, which have the same display offset */
+  if( offset >= 0x2000 ) offset -= ALTDFILE_OFFSET;
+  /* No attributes are relevent in this mode */
+  if( offset <  0x1800 ) {		/* 0x1800 = first attributes byte */
+    display_dirty8( offset );
+  }
+}
+
+void
+display_dirty_sinclair( libspectrum_word offset )
+{
+  if( offset >= 0x1b00 ) return;
+  if( offset <  0x1800 ) {		/* 0x1800 = first attributes byte */
+    display_dirty8( offset );
+  } else {
+    display_dirty64( offset );
   }
 }
 
@@ -493,14 +517,14 @@ update_dirty_rects( void )
   error = end_line( DISPLAY_SCREEN_HEIGHT ); if( error ) return;
 }
 
-static void
-write_if_dirty( int x, int y )
+void
+display_write_if_dirty_timex( int x, int y )
 {
   int beam_x, beam_y;
   int index;
   libspectrum_word offset;
   libspectrum_byte *screen;
-  libspectrum_dword data, data2;
+  libspectrum_byte data, data2;
   libspectrum_dword mode_data;
   libspectrum_dword last_chunk_detail;
 
@@ -561,6 +585,122 @@ write_if_dirty( int x, int y )
   }
 }
 
+void
+pentagon_16c_get_colour( libspectrum_byte data, libspectrum_byte *colour1,
+                         libspectrum_byte *colour2 )
+{
+  *colour1 = (data & 0x07) + ( (data & 0x40) >> 3 );
+  *colour2 = ( (data & 0x38) >> 3 ) + ( (data & 0x80) >> 4 );
+}
+
+/* In this mode we need to gather the pixel information for the 8 pixels to
+   be displayed, if current screen is 5 we need to read from pages 5 and 4,
+   and if current screen is 7 we need to read from pages 7 and 6. */
+void
+display_write_if_dirty_pentagon_16_col( int x, int y )
+{
+  int beam_x, beam_y;
+  int index;
+  libspectrum_word offset;
+  libspectrum_byte *screen;
+  libspectrum_byte data1, data2, data3, data4;
+  libspectrum_dword last_chunk_detail;
+  libspectrum_byte colour1, colour2;
+
+  /* We need to read the pixels from the appropriate two pages and write them
+     out to the frame buffer */
+  int memory_screen_page_1 = 5;
+  int memory_screen_page_2 = 4;
+
+  if( memory_current_screen == 7 ) {
+    memory_screen_page_1 = 7;
+    memory_screen_page_2 = 6;
+  }
+
+  beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+  beam_y = y + DISPLAY_BORDER_HEIGHT;
+  offset = display_get_addr( x, y );
+
+  /* Read byte, atrr/byte, and screen mode */
+  screen = RAM[ memory_screen_page_1 ];
+  data2 = screen[ offset ];
+  data4 = screen[ offset + ALTDFILE_OFFSET ];
+  screen = RAM[ memory_screen_page_2 ];
+  data1 = screen[ offset ];
+  data3 = screen[ offset + ALTDFILE_OFFSET ];
+
+  /* This is a bit of a cheat - we'd normally encode the screen mode in here
+     as well to support screen mode mixing. I doubt there is much call for
+     mixing 16 colour mode with other modes so will assume that as long as
+     we are in 16 colour mode the screen we draw is in that mode as it seems
+     a shame to chuck more memory at supporting just this obscure mode */
+  last_chunk_detail = (data4 << 24) | (data3 << 16) | (data2 << 8) | data1;
+
+  /* And draw it if it is different to what was there last time */
+  index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+
+  if( display_last_screen[ index ] != last_chunk_detail ) {
+    /* Print pixel 1 & 2 from screen_page_2 base, pixel 3 & 4 from
+       screen_page_1 base, pixel 5 & 6 from screen_page_2 ALTDFILE_OFFSET,
+       pixel 7 & 8 from screen_page_1 ALTDFILE_OFFSET */
+
+    int draw_x = beam_x << 3;
+    pentagon_16c_get_colour( data1, &colour1, &colour2 );
+    uidisplay_putpixel( draw_x++, beam_y, colour1 );
+    uidisplay_putpixel( draw_x++, beam_y, colour2 );
+    pentagon_16c_get_colour( data2, &colour1, &colour2 );
+    uidisplay_putpixel( draw_x++, beam_y, colour1 );
+    uidisplay_putpixel( draw_x++, beam_y, colour2 );
+    pentagon_16c_get_colour( data3, &colour1, &colour2 );
+    uidisplay_putpixel( draw_x++, beam_y, colour1 );
+    uidisplay_putpixel( draw_x++, beam_y, colour2 );
+    pentagon_16c_get_colour( data4, &colour1, &colour2 );
+    uidisplay_putpixel( draw_x++, beam_y, colour1 );
+    uidisplay_putpixel( draw_x  , beam_y, colour2 );
+
+    /* Update last display record */
+    display_last_screen[ index ] = last_chunk_detail;
+
+    /* And now mark it dirty */
+    display_is_dirty[ beam_y ] |= ( (libspectrum_qword)1 << beam_x );
+  }
+}
+
+void
+display_write_if_dirty_sinclair( int x, int y )
+{
+  int beam_x, beam_y;
+  int index;
+  libspectrum_word offset;
+  libspectrum_byte *screen;
+  libspectrum_byte data, data2;
+  libspectrum_dword last_chunk_detail;
+
+  beam_x = x + DISPLAY_BORDER_WIDTH_COLS;
+  beam_y = y + DISPLAY_BORDER_HEIGHT;
+  offset = display_get_addr( x, y );
+
+  /* Read byte, atrr/byte, and screen mode */
+  screen = RAM[ memory_current_screen ];
+  data = screen[ offset ];
+  data2 = display_get_attr_byte( x, y );
+
+  last_chunk_detail = (display_flash_reversed << 24) | (data2 << 8) | data;
+  /* And draw it if it is different to what was there last time */
+  index = beam_x + beam_y * DISPLAY_SCREEN_WIDTH_COLS;
+  if( display_last_screen[ index ] != last_chunk_detail ) {
+    libspectrum_byte ink, paper;
+    display_parse_attr( data2, &ink, &paper );
+    uidisplay_plot8( beam_x, beam_y, data, ink, paper );
+
+    /* Update last display record */
+    display_last_screen[ index ] = last_chunk_detail;
+
+    /* And now mark it dirty */
+    display_is_dirty[ beam_y ] |= ( (libspectrum_qword)1 << beam_x );
+  }
+}
+
 /* Plot any dirty data from ( x, y ) to ( end, y ) of the critical
    region to the drawing region */
 static void
@@ -606,7 +746,7 @@ copy_critical_region_line( int y, int x, int end )
        drawing area along the way */
     do {
 
-      write_if_dirty( x, y );
+      display_write_if_dirty( x, y );
 
       dirty >>= 1;
       x++;
@@ -987,7 +1127,10 @@ display_frame( void )
   return 0;
 }
 
-static void display_dirty_flashing(void)
+display_dirty_flashing_fn display_dirty_flashing;
+
+void
+display_dirty_flashing_timex(void)
 {
   libspectrum_word offset;
   libspectrum_byte *screen, attr;
@@ -1011,12 +1154,30 @@ static void display_dirty_flashing(void)
 
     } else { /* Standard Speccy screen */
 
-      for( offset = 0x1800; offset < 0x1b00; offset++ ) {
-        attr = screen[ offset ];
-        if( attr & 0x80 ) display_dirty64( offset );
-      }
+      display_dirty_flashing_sinclair();
 
     }
+  }
+}
+
+void
+display_dirty_flashing_pentagon_16_col(void)
+{
+  /* No flash attribute in 16 colour mode */
+}
+
+void
+display_dirty_flashing_sinclair(void)
+{
+  libspectrum_word offset;
+  libspectrum_byte *screen, attr;
+
+  screen = RAM[ memory_current_screen ];
+  
+  /* Standard Speccy screen */
+  for( offset = 0x1800; offset < 0x1b00; offset++ ) {
+    attr = screen[ offset ];
+    if( attr & 0x80 ) display_dirty64( offset );
   }
 }
 

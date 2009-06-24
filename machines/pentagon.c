@@ -38,6 +38,7 @@
 #include "pentagon.h"
 #include "periph.h"
 #include "settings.h"
+#include "spec48.h"
 #include "spec128.h"
 #include "ula.h"
 
@@ -149,6 +150,8 @@ pentagon_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
+
+  spec48_common_display_setup();
 
   return 0;
 }

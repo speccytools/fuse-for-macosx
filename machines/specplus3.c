@@ -46,6 +46,7 @@
 #include "settings.h"
 #include "snapshot.h"
 #include "spec128.h"
+#include "spec48.h"
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -120,7 +121,6 @@ int specplus3_init( fuse_machine_info *machine )
   machine->memory_map = specplus3_memory_map;
 
   return 0;
-
 }
 
 void
@@ -193,6 +193,8 @@ specplus3_reset( void )
   periph_update();
   specplus3_765_reset();
   specplus3_menu_items();
+
+  spec48_common_display_setup();
 
   return 0;
 }

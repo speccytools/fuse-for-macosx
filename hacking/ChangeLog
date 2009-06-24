@@ -3155,3 +3155,8 @@
          similar to MIC output and one similar to the internal beeper (Fred).
 20090613 disk/disk.c: support non-standard TRD images with 41-83 tracks per
          side (fixes bug #2805766) (Gergely Szasz).
+20090625 display.[ch],machines/{pentagon.c,pentagon1024.c,pentagon512.c,
+         scorpion.c,spec128.c,spec16.c,spec48.[ch],spec_se.c,specplus2.c,
+         specplus2a.c,specplus3.c,specplus3e.c,tc2048.c,tc2068.[ch]},
+         memory.[ch]: add support for Pentagon 1024SL v2.2 16 colour mode
+         (Fred).

@@ -75,7 +75,28 @@ extern libspectrum_word display_attr_start[ DISPLAY_HEIGHT ];
 int display_init(int *argc, char ***argv);
 void display_line(void);
 
-void display_dirty( libspectrum_word offset );
+typedef void (*display_dirty_fn)( libspectrum_word offset );
+/* Function to use to mark as 'dirty' the pixels which have been changed by a
+   write to 'offset' within the RAM page containing the screen */
+extern display_dirty_fn display_dirty;
+void display_dirty_timex( libspectrum_word offset );
+void display_dirty_pentagon_16_col( libspectrum_word offset );
+void display_dirty_sinclair( libspectrum_word offset );
+
+typedef void (*display_write_if_dirty_fn)( int x, int y );
+/* Function to write a dirty 8x1 chunk of pixels to the display */
+extern display_write_if_dirty_fn display_write_if_dirty;
+void display_write_if_dirty_timex( int x, int y );
+void display_write_if_dirty_pentagon_16_col( int x, int y );
+void display_write_if_dirty_sinclair( int x, int y );
+
+typedef void (*display_dirty_flashing_fn)(void);
+/* Function to dirty the pixels which are changed by virtue of having a flash
+   attribute */
+extern display_dirty_flashing_fn display_dirty_flashing;
+void display_dirty_flashing_timex(void);
+void display_dirty_flashing_pentagon_16_col(void);
+void display_dirty_flashing_sinclair(void);
 
 void display_parse_attr( libspectrum_byte attr, libspectrum_byte *ink,
 			 libspectrum_byte *paper );

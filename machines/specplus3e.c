@@ -29,6 +29,7 @@
 #include "machines.h"
 #include "periph.h"
 #include "settings.h"
+#include "spec48.h"
 #include "specplus3.h"
 #include "ui/ui.h"
 
@@ -85,6 +86,8 @@ specplus3e_reset( void )
   periph_update();
   specplus3_765_reset();
   specplus3_menu_items();
+
+  spec48_common_display_setup();
 
   return 0;
 }

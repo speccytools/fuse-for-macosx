@@ -42,6 +42,7 @@
 #include "settings.h"
 #include "scorpion.h"
 #include "spec128.h"
+#include "spec48.h"
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ula.h"
@@ -124,6 +125,8 @@ scorpion_reset(void)
 
   beta_builtin = 1;
   beta_active = 0;
+
+  spec48_common_display_setup();
 
   return 0;
 }

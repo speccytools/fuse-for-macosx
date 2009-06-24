@@ -97,7 +97,6 @@ int tc2048_init( fuse_machine_info *machine )
   machine->memory_map = tc2068_memory_map;
 
   return 0;
-
 }
 
 static int

@@ -38,6 +38,7 @@
 #include "periph.h"
 #include "settings.h"
 #include "spec128.h"
+#include "spec48.h"
 #include "ula.h"
 
 static int pentagon1024_reset( void );
@@ -124,6 +125,8 @@ pentagon1024_reset(void)
   for( i = 16; i < 128; i++ )
     memory_map_ram[i].writable = 1;
 
+  spec48_common_display_setup();
+
   return 0;
 }
 
@@ -147,6 +150,14 @@ pentagon1024_v22_memoryport_write( libspectrum_word port GCC_UNUSED,
   if( machine_current->ram.locked ) return;
 
   machine_current->ram.last_byte2 = b;
+  if( b & 0x01 ) {
+    display_dirty = display_dirty_pentagon_16_col;
+    display_write_if_dirty = display_write_if_dirty_pentagon_16_col;
+    display_dirty_flashing = display_dirty_flashing_pentagon_16_col;
+    memory_display_dirty = memory_display_dirty_pentagon_16_col;
+  } else {
+    spec48_common_display_setup();
+  }
   machine_current->memory_map();
 }
 

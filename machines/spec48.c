@@ -78,7 +78,6 @@ int spec48_init( fuse_machine_info *machine )
   machine->memory_map = spec48_memory_map;
 
   return 0;
-
 }
 
 static int
@@ -107,7 +106,19 @@ spec48_reset( void )
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
 
+  spec48_common_display_setup();
+
   return spec48_common_reset();
+}
+
+void
+spec48_common_display_setup( void )
+{
+  display_dirty = display_dirty_sinclair;
+  display_write_if_dirty = display_write_if_dirty_sinclair;
+  display_dirty_flashing = display_dirty_flashing_sinclair;
+
+  memory_display_dirty = memory_display_dirty_sinclair;
 }
 
 int

@@ -200,6 +200,8 @@ spec_se_reset( void )
   scld_dec_write( 0x00ff, 0x00 );
   scld_hsr_write( 0x00f4, 0x00 );
 
+  tc2068_tc2048_common_display_setup();
+
   return 0;
 }
 
@@ -241,4 +243,3 @@ spec_se_memoryport_write( libspectrum_word port GCC_UNUSED,
 
   machine_current->memory_map();
 }
-

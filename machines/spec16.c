@@ -82,7 +82,6 @@ int spec16_init( fuse_machine_info *machine )
   machine->memory_map = spec48_memory_map;
 
   return 0;
-
 }
 
 static int
@@ -126,6 +125,8 @@ spec16_reset( void )
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
+
+  spec48_common_display_setup();
 
   return 0;
 }

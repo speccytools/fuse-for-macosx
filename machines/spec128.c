@@ -74,7 +74,6 @@ int spec128_init( fuse_machine_info *machine )
   machine->memory_map = spec128_memory_map;
 
   return 0;
-
 }
 
 static int
@@ -104,6 +103,8 @@ spec128_reset( void )
 
   periph_register_beta128();
   beta_builtin = 0;
+
+  spec48_common_display_setup();
 
   return 0;
 }

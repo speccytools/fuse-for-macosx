@@ -42,6 +42,7 @@
 #include "periph.h"
 #include "settings.h"
 #include "spec128.h"
+#include "spec48.h"
 #include "ula.h"
 
 static int pentagon_reset( void );
@@ -107,6 +108,8 @@ pentagon_reset(void)
   /* Mark the least 384K as present/writeable */
   for( i = 16; i < 64; i++ )
     memory_map_ram[i].writable = 1;
+
+  spec48_common_display_setup();
 
   return 0;
 }
