@@ -76,11 +76,11 @@ const char* compat_get_temp_path( void );
 const char* compat_get_home_path( void );
 int compat_is_absolute_path( const char *path );
 
+typedef FILE* compat_fd;
+
 #ifndef UI_WII
-typedef int compat_fd;
 typedef DIR* compat_dir;
 #else                           /* #ifndef UI_WII */
-typedef FILE* compat_fd;
 typedef DIR_ITER* compat_dir;
 #endif                          /* #ifndef UI_WII */
 
