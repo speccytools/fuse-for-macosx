@@ -3160,6 +3160,7 @@
          specplus2a.c,specplus3.c,specplus3e.c,tc2048.c,tc2068.[ch]},
          memory.[ch]: add support for Pentagon 1024SL v2.2 16 colour mode
          (Fred).
-20090625 compat.h,compat/unix/file.c,compat/wii/{Makefile.am,file.c}: switch
+20090627 compat.h,compat/unix/file.c,compat/wii/{Makefile.am,file.c}: switch
          UNIX file compat routines to use the C standard file I/O, switch Wii
          to use the UNIX file routines (patch #2808481) (Gergely Szasz).
+20090627 display.c: mark pentagon_16c_get_colour as inline and static (Fred).

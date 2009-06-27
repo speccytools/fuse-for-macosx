@@ -585,7 +585,7 @@ display_write_if_dirty_timex( int x, int y )
   }
 }
 
-void
+inline static void
 pentagon_16c_get_colour( libspectrum_byte data, libspectrum_byte *colour1,
                          libspectrum_byte *colour2 )
 {
