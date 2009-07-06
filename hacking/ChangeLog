@@ -3164,3 +3164,5 @@
          UNIX file compat routines to use the C standard file I/O, switch Wii
          to use the UNIX file routines (patch #2808481) (Gergely Szasz).
 20090627 display.c: mark pentagon_16c_get_colour as inline and static (Fred).
+20090706 machines/pentagon1024.c: initialise memory port before doing
+         periph_update as that triggers a memory map call (Fred).

@@ -109,21 +109,21 @@ pentagon1024_reset(void)
   error = spec128_common_reset( 0 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
-  if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
-  periph_update();
-
-  beta_builtin = 1;
-  beta_active = 1;
-
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
 
   /* Mark the least 896K as present/writeable */
   for( i = 16; i < 128; i++ )
     memory_map_ram[i].writable = 1;
+
+  beta_builtin = 1;
+  beta_active = 1;
+
+  error = periph_setup( peripherals, peripherals_count );
+  if( error ) return error;
+  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_setup_beta128( PERIPH_PRESENT_ALWAYS );
+  periph_update();
 
   spec48_common_display_setup();
 
