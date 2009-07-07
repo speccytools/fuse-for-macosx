@@ -3166,3 +3166,4 @@
 20090627 display.c: mark pentagon_16c_get_colour as inline and static (Fred).
 20090706 machines/pentagon1024.c: initialise memory port before doing
          periph_update as that triggers a memory map call (Fred).
+20090707 AUTHORS: Add Shay Green (Fred).

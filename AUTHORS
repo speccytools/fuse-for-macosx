@@ -9,8 +9,8 @@ Fuse has been brought to you by:
 
 * Ian Collier: the original ZX Printer emulation (for xz80).
 
-* John Elliott: for lib765, which provides Fuse's emulation of the +3's
-  FDC, and libdsk which provides support for more disk image formats:
+* John Elliott: for lib765, which provided Fuse's original emulation of the
+  +3's FDC, and libdsk which provided support for more disk image formats:
   see http://www.seasip.demon.co.uk/Unix/LibDsk/
 
 * Darren Salt: the original versions of the code for +3 emulation,
@@ -42,6 +42,8 @@ Fuse has been brought to you by:
   ao sound driver.
 
 * Bjoern Giesler: the original Wii port.
+
+* Shay Green: the Blip_Buffer band pass filter for beeper and AY output.
 
 * Philip Kendall: everything else.
 
