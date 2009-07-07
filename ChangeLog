@@ -1,3 +1,41 @@
+2009-xx-xx  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse ?.??.? released
+
+        FIXME: Just a start, mostly changes visible on Fuse for OS X at the
+        moment
+        * Wii support.
+        * Many improvements to Win32 UI (Marek Januszewski).
+        * Add support for flipping disk images in single sided drives (Gergely
+          Szasz).
+        * Add support for automatically merging both both disk images where
+          they are in separate files named with the text [Ss]ide[ _][abAB12]
+          (Gergely Szasz).
+        * Switch to using Blip_Buffer (by Shay Green) for improved beeper and
+          AY output (Fredrick Meunier).
+        * Allow beeper and AY volumes to be set (Fredrick Meunier).
+        * Enable Beta 128 interface in 48K and TC2048 machines (thanks,
+          Omikron) (Fredrick Meunier).
+        * Add emulation of the Fuller Audio Box (Stuart Brady & Fredrick
+          Meunier).
+        * Allow sound to run from 2% speed up (Fredrick Meunier).
+        * Add emulation of the Melodik and similar 48K-compatible AY interfaces
+          that use the 128K sound ports (Fredrick Meunier).
+        * Add support for Pentagon 1024SL v2.2 16 colour mode (Fredrick
+          Meunier).
+
+        * Miscellaneous improvements:
+          * Preformat new disks on +3 to allow the format command on +3 to work
+            (Gergely Szasz).
+          * Support non-standard TRD images with 41-83 tracks per side (Gergely
+            Szasz).
+          * Allow user to swap Kempston mouse buttons as some combinations of
+            physical hardware and Spectrum software make it hard to use the
+            standard mapping e.g. right clicking and moving the cursor on Mac
+            notebooks (thanks, Andrew Owen) (Fredrick Meunier).
+          * Fixes for speed estimation (Gergely Szasz).
+          * Fix border colour in Timex HiRes screenshots (Fredrick Meunier).
+
 2008-12-10  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 0.10.0.1 released

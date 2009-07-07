@@ -3167,3 +3167,5 @@
 20090706 machines/pentagon1024.c: initialise memory port before doing
          periph_update as that triggers a memory map call (Fred).
 20090707 AUTHORS: Add Shay Green (Fred).
+20090707 ChangeLog: chuck in a few entries as we go, mostly OS X port visible
+         items at the moment (Fred).
