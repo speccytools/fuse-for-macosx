@@ -3169,3 +3169,6 @@
 20090707 AUTHORS: Add Shay Green (Fred).
 20090707 ChangeLog: chuck in a few entries as we go, mostly OS X port visible
          items at the moment (Fred).
+20090710 disk/{fdd.c,wd_fdc.c}: save disk selected status over reset and
+         reset motor or head when resetting WD FDC to fix Mr Gluck ROM handling
+         on reset with a disk present (patch #2819220) (Gergely Szasz).

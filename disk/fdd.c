@@ -131,6 +131,7 @@ int
 fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit )
 {
   int upsidedown = d->upsidedown;
+  int selected = d->selected;
   disk_t *disk = d->disk;
   
   d->fdd_heads = d->fdd_cylinders = d->c_head = d->c_cylinder = 0;
@@ -148,6 +149,7 @@ fdd_init( fdd_t *d, fdd_type_t type, int heads, int cyls, int reinit )
     d->auto_geom = 1;
   d->fdd_heads = heads;
   d->fdd_cylinders = cyls;
+  if( reinit ) d->selected = selected;
   if( reinit && disk ) {
     fdd_unload( d );
     fdd_load( d, disk, upsidedown );

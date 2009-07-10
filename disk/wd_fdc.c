@@ -74,6 +74,12 @@ wd_fdc_master_reset( wd_fdc *f )
   f->spin_cycles = 0;
   f->direction = 0;
   f->head_load = 0;
+  if( d ) {
+    if( f->flags & WD_FLAG_BETA128 )
+      fdd_motoron( &d->fdd, 0 );
+    else
+      fdd_head_load( &d->fdd, 0 );
+  }
   f->read_id = 0;
   if( f->hlt_time > 0 ) f->hlt = 0;
   f->intrq = 0;
