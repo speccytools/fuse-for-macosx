@@ -569,6 +569,7 @@ calc_sectorlen( int mfm, int sector_length, int gaptype )
 
 #define NO_INTERLEAVE 1
 #define INTERLEAVE_2 2
+#define INTERLEAVE_OPUS 13
 #define NO_PREINDEX 0
 #define PREINDEX 1
 
@@ -593,15 +594,18 @@ trackgen( disk_t *d, buffer_t *buffer, int head, int track,
   idx = d->i;
   pos = i = 0;
   for( s = sector_base; s < sector_base + sectors; s++ ) {
-    d->i = idx + ( pos + i ) * slen;
+    d->i = idx + pos * slen;
     if( id_add( d, head, track, s, sector_length >> 8, gap, CRC_OK ) )
       return 1;
     if( data_add( d, buffer, NULL, sector_length, NO_DDAM, gap, CRC_OK, autofill ) )
       return 1;
     pos += interleave;
-    if( pos >= sectors ) {
-      pos = 0;
-      i++;
+    if( pos >= sectors ) {	/* wrap around */
+      pos -= sectors;
+      if( pos <= i ) {		/* we fill this pos already */
+        pos++;			/* skip one more pos */
+        i++;
+      }
     }
   }
   d->i = idx + sectors * slen;
@@ -790,7 +794,7 @@ open_mgt_img( buffer_t *buffer, disk_t *d )
   buffer->index = 0;
 
   /* guess geometry of disk:
-   * 2*80*10*512, 1*80*10*512 or 1*40*10*512 */
+   * 2*80*10*512, 1*80*10*512, 1*40*10*512, 1*40*18*256 or 2*40*18*256 */
   if( buffer->file.length == 2*80*10*512 ) {
     d->sides = 2; d->cylinders = 80; sectors = 10; seclen = 512;
   } else if( buffer->file.length == 1*80*10*512 ) {
@@ -799,6 +803,10 @@ open_mgt_img( buffer_t *buffer, disk_t *d )
     d->sides = 1; d->cylinders = 80; sectors = 10; seclen = 512;
   } else if( buffer->file.length == 1*40*10*512 ) {
     d->sides = 1; d->cylinders = 40; sectors = 10; seclen = 512;
+  } else if( buffer->file.length == 1*40*18*256 ) {
+    d->sides = 1; d->cylinders = 40; sectors = 18; seclen = 256;
+  } else if( buffer->file.length == 2*40*18*256 ) {
+    d->sides = 2; d->cylinders = 40; sectors = 18; seclen = 256;
   } else {
     return d->status = DISK_GEOM;
   }
@@ -816,10 +824,11 @@ open_mgt_img( buffer_t *buffer, disk_t *d )
 	  return d->status = DISK_GEOM;
       }
     }
-  } else {			/* MGT alt */
+  } else {			/* MGT / OPD alt */
     for( i = 0; i < d->sides * d->cylinders; i++ ) {
-      if( trackgen( d, buffer, i % 2, i / 2, 1, sectors, seclen,
-		    NO_PREINDEX, GAP_MGT_PLUSD, NO_INTERLEAVE, NO_AUTOFILL ) )
+      if( trackgen( d, buffer, i % 2, i / 2, d->type == DISK_MGT ? 1 : 0, sectors, seclen,
+		    NO_PREINDEX, GAP_MGT_PLUSD,
+		    d->type == DISK_MGT ? NO_INTERLEAVE : INTERLEAVE_OPUS, NO_AUTOFILL ) )
 	return d->status = DISK_GEOM;
     }
   }
@@ -1504,8 +1513,10 @@ disk_open2( disk_t *d, const char *filename, int preindex )
     d->type = DISK_UDI;
     open_udi( &buffer, d );
     break;
+  case LIBSPECTRUM_ID_DISK_OPD:
+    d->type = DISK_OPD;
   case LIBSPECTRUM_ID_DISK_MGT:
-    d->type = DISK_MGT;
+    if( d->type == DISK_TYPE_NONE) d->type = DISK_MGT;
   case LIBSPECTRUM_ID_DISK_IMG:
     if( d->type == DISK_TYPE_NONE) d->type = DISK_IMG;
     open_mgt_img( &buffer, d );
