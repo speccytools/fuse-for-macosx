@@ -252,6 +252,7 @@ saverawtrack( disk_t *d, FILE *file, int head, int track  )
 #define DISK_MFM_VARI 16
 #define DISK_DDAM 32
 #define DISK_CORRUPT_SECTOR 64
+#define DISK_UNFORMATTED_TRACK 128
 
 static int
 guess_track_geom( disk_t *d, int head, int track, int *sector_base,
@@ -295,7 +296,7 @@ guess_track_geom( disk_t *d, int head, int track, int *sector_base,
 
 static int
 check_disk_geom( disk_t *d, int *sector_base, int *sectors,
-		 int *seclen, int *mfm )
+		 int *seclen, int *mfm, int *unf )
 {
   int h, t, s, slen, sbase, m;
   int r = 0;
@@ -306,6 +307,7 @@ check_disk_geom( disk_t *d, int *sector_base, int *sectors,
   *sectors = -1;
   *seclen = -1;
   *mfm = -1;
+  *unf = -1;
   for( t = 0; t < d->cylinders; t++ ) {
     for( h = 0; h < d->sides; h++ ) {
       r |= guess_track_geom( d, h, t, &sbase, &s, &slen, &m );
@@ -317,6 +319,12 @@ check_disk_geom( disk_t *d, int *sector_base, int *sectors,
 	*seclen = slen;
       if( *mfm == -1 )
 	*mfm = m;
+      if( sbase == -1 ) {		/* unformatted */
+        if( *unf == -1 && h > 0 ) *unf = -2;
+        if( *unf == -1 ) *unf = t;
+        continue;
+      }
+      if( *unf > -1 ) *unf = -2;
       if( sbase != *sector_base ) {
 	r |= DISK_SBASE_VARI;
 	if( sbase < *sector_base )
@@ -338,6 +346,11 @@ check_disk_geom( disk_t *d, int *sector_base, int *sectors,
       }
     }
   }
+  if( *unf == -2 ) {
+    r |= DISK_UNFORMATTED_TRACK;
+    *unf = -1;
+  }
+
   return r;
 }
 
@@ -787,7 +800,7 @@ open_udi( buffer_t *buffer, disk_t *d )
 }
 
 static int
-open_mgt_img( buffer_t *buffer, disk_t *d )
+open_mgt_img_opd( buffer_t *buffer, disk_t *d )
 {
   int i, j, sectors, seclen;
 
@@ -1519,7 +1532,7 @@ disk_open2( disk_t *d, const char *filename, int preindex )
     if( d->type == DISK_TYPE_NONE) d->type = DISK_MGT;
   case LIBSPECTRUM_ID_DISK_IMG:
     if( d->type == DISK_TYPE_NONE) d->type = DISK_IMG;
-    open_mgt_img( &buffer, d );
+    open_mgt_img_opd( &buffer, d );
     break;
   case LIBSPECTRUM_ID_DISK_SAD:
     d->type = DISK_SAD;
@@ -1744,25 +1757,31 @@ write_udi( FILE *file, disk_t *d )
 }
 
 static int
-write_img_mgt( FILE *file, disk_t *d )
+write_img_mgt_opd( FILE *file, disk_t *d )
 {
-  int i, j, sbase, sectors, seclen, mfm;
+  int i, j, sbase, sectors, seclen, mfm, cyl;
 
-  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm ) ||
-      sbase != 1 || seclen != 2 || sectors != 10 )
+  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm, &cyl ) ||
+      ( d->type != DISK_OPD && ( sbase != 1 || seclen != 2 || sectors != 10 ) ) ||
+      ( d->type == DISK_OPD && ( sbase != 0 || seclen != 1 || sectors != 18 ) ) )
+    return d->status = DISK_GEOM;
+
+  if( cyl == -1 ) cyl = d->cylinders;
+  if( cyl != 40 && cyl != 80 )
     return d->status = DISK_GEOM;
 
   if( d->type == DISK_IMG ) {	/* out-out */
     for( j = 0; j < d->sides; j++ ) {
-      for( i = 0; i < d->cylinders; i++ ) {
+      for( i = 0; i < cyl; i++ ) {
 	if( savetrack( d, file, j, i, 1, sectors, seclen ) )
 	  return d->status = DISK_GEOM;
       }
     }
   } else {			/* alt */
-    for( i = 0; i < d->cylinders; i++ ) {	/* MGT */
+    for( i = 0; i < cyl; i++ ) {	/* MGT */
       for( j = 0; j < d->sides; j++ ) {
-	if( savetrack( d, file, j, i, 1, sectors, seclen ) )
+	if( savetrack( d, file, j, i, d->type == DISK_MGT ? 1 : 0,
+	    sectors, seclen ) )
 	  return d->status = DISK_GEOM;
       }
     }
@@ -1773,12 +1792,14 @@ write_img_mgt( FILE *file, disk_t *d )
 static int
 write_trd( FILE *file, disk_t *d )
 {
-  int i, j, sbase, sectors, seclen, mfm;
+  int i, j, sbase, sectors, seclen, mfm, cyl;
 
-  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm ) ||
+  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm, &cyl ) ||
       sbase != 1 || seclen != 1 || sectors != 16 )
     return d->status = DISK_GEOM;
-  for( i = 0; i < d->cylinders; i++ ) {
+
+  if( cyl == -1 ) cyl = d->cylinders;
+  for( i = 0; i < cyl; i++ ) {
     for( j = 0; j < d->sides; j++ ) {
       if( savetrack( d, file, j, i, 1, sectors, seclen ) )
 	return d->status = DISK_GEOM;
@@ -1790,21 +1811,22 @@ write_trd( FILE *file, disk_t *d )
 static int
 write_sad( FILE *file, disk_t *d )
 {
-  int i, j, sbase, sectors, seclen, mfm;
+  int i, j, sbase, sectors, seclen, mfm, cyl;
 
-  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm ) || sbase != 1 )
+  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm, &cyl ) || sbase != 1 )
     return d->status = DISK_GEOM;
 
+  if( cyl == -1 ) cyl = d->cylinders;
   memcpy( head, "Aley's disk backup", 18 );
   head[18] = d->sides;
-  head[19] = d->cylinders;
+  head[19] = cyl;
   head[20] = sectors;
   head[21] = seclen * 4;
   if( fwrite( head, 22, 1, file ) != 1 )	/* SAD head */
     return d->status = DISK_WRPART;
 
   for( j = 0; j < d->sides; j++ ) {	/* OUT-OUT */
-    for( i = 0; i < d->cylinders; i++ ) {
+    for( i = 0; i < cyl; i++ ) {
       if( savetrack( d, file, j, i, 1, sectors, seclen ) )
 	return d->status = DISK_GEOM;
     }
@@ -1905,19 +1927,21 @@ write_fdi( FILE *file, disk_t *d )
 static int
 write_cpc( FILE *file, disk_t *d )
 {
-  int i, j, k, sbase, sectors, seclen, mfm;
+  int i, j, k, sbase, sectors, seclen, mfm, cyl;
   int h, t, s, b;
   size_t len;
 
-  i = check_disk_geom( d, &sbase, &sectors, &seclen, &mfm );
+  i = check_disk_geom( d, &sbase, &sectors, &seclen, &mfm, &cyl );
   if( i & DISK_SECLEN_VARI || i & DISK_SPT_VARI )
     return d->status = DISK_GEOM;
 
   if( i & DISK_MFM_VARI )
     mfm = -1;
+  if( cyl == -1 ) cyl = d->cylinders;
+
   memset( head, 0, 256 );
   memcpy( head, "MV - CPCEMU Disk-File\r\nDisk-Info\r\n", 34 );
-  head[0x30] = d->cylinders;
+  head[0x30] = cyl;
   head[0x31] = d->sides;
   len = sectors * ( 0x80 << seclen ) + 256;
   head[0x32] = len & 0xff;
@@ -1927,7 +1951,7 @@ write_cpc( FILE *file, disk_t *d )
 
   memset( head, 0, 256 );
   memcpy( head, "Track-Info\r\n", 12 );
-  for( i = 0; i < d->cylinders; i++ ) {
+  for( i = 0; i < cyl; i++ ) {
     for( j = 0; j < d->sides; j++ ) {
       d->track = d->data + ( ( d->sides * i + j ) * d->tlen );
       d->clocks = d->track + d->bpt;
@@ -1963,11 +1987,11 @@ write_cpc( FILE *file, disk_t *d )
 static int
 write_scl( FILE *file, disk_t *d )
 {
-  int i, j, k, l, t, s, sbase, sectors, seclen, mfm, del;
+  int i, j, k, l, t, s, sbase, sectors, seclen, mfm, del, cyl;
   int entries;
   libspectrum_dword sum = 597;		/* sum of "SINCLAIR" */
 
-  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm ) ||
+  if( check_disk_geom( d, &sbase, &sectors, &seclen, &mfm, &cyl ) ||
       sbase != 1 || seclen != 1 || sectors != 16 )
     return d->status = DISK_GEOM;
 
@@ -2181,6 +2205,8 @@ disk_write( disk_t *d, const char *filename )
       d->type = DISK_CPC;				/* ALT side */
     else if( !strcasecmp( ext, ".mgt" ) )
       d->type = DISK_MGT;				/* ALT side */
+    else if( !strcasecmp( ext, ".opd" ) || !strcasecmp( ext, ".opu" ) )
+      d->type = DISK_OPD;				/* ALT side */
     else if( !strcasecmp( ext, ".img" ) )		/* out-out */
       d->type = DISK_IMG;
     else if( !strcasecmp( ext, ".trd" ) )		/* ALT */
@@ -2203,7 +2229,8 @@ disk_write( disk_t *d, const char *filename )
     break;
   case DISK_IMG:
   case DISK_MGT:
-    write_img_mgt( file, d );
+  case DISK_OPD:
+    write_img_mgt_opd( file, d );
     break;
   case DISK_TRD:
     write_trd( file, d );
