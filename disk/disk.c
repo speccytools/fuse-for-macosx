@@ -800,7 +800,7 @@ open_udi( buffer_t *buffer, disk_t *d )
 }
 
 static int
-open_mgt_img_opd( buffer_t *buffer, disk_t *d )
+open_img_mgt_opd( buffer_t *buffer, disk_t *d )
 {
   int i, j, sectors, seclen;
 
@@ -838,11 +838,13 @@ open_mgt_img_opd( buffer_t *buffer, disk_t *d )
       }
     }
   } else {			/* MGT / OPD alt */
-    for( i = 0; i < d->sides * d->cylinders; i++ ) {
-      if( trackgen( d, buffer, i % 2, i / 2, d->type == DISK_MGT ? 1 : 0, sectors, seclen,
-		    NO_PREINDEX, GAP_MGT_PLUSD,
-		    d->type == DISK_MGT ? NO_INTERLEAVE : INTERLEAVE_OPUS, NO_AUTOFILL ) )
-	return d->status = DISK_GEOM;
+    for( i = 0; i < d->cylinders; i++ ) {
+      for( j = 0; j < d->sides; j++ ) {
+        if( trackgen( d, buffer, j, i, d->type == DISK_MGT ? 1 : 0, sectors, seclen,
+		      NO_PREINDEX, GAP_MGT_PLUSD,
+		      d->type == DISK_MGT ? NO_INTERLEAVE : INTERLEAVE_OPUS, NO_AUTOFILL ) )
+	  return d->status = DISK_GEOM;
+      }
     }
   }
 
@@ -1532,7 +1534,7 @@ disk_open2( disk_t *d, const char *filename, int preindex )
     if( d->type == DISK_TYPE_NONE) d->type = DISK_MGT;
   case LIBSPECTRUM_ID_DISK_IMG:
     if( d->type == DISK_TYPE_NONE) d->type = DISK_IMG;
-    open_mgt_img_opd( &buffer, d );
+    open_img_mgt_opd( &buffer, d );
     break;
   case LIBSPECTRUM_ID_DISK_SAD:
     d->type = DISK_SAD;
