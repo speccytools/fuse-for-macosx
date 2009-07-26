@@ -1,6 +1,6 @@
 /* opus.c: Routines for handling the Opus Discovery interface
-   Copyright (c) 1999-2007 Stuart Brady, Fredrick Meunier, Philip Kendall,
-   Dmitry Sanarin, Darren Salt
+   Copyright (c) 1999-2009 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Dmitry Sanarin, Darren Salt, Michael D Wynne, Gergely Szasz
 
    $Id: opus.c 4012 2009-04-16 12:42:14Z fredm $
 
@@ -106,7 +106,6 @@ opus_memory_map( void )
 static void
 opus_set_datarq( struct wd_fdc *f )
 {
-//fprintf(stderr,"opus_set_datarq()\n");
   event_add( 0, z80_nmi_event );
 }
 
@@ -223,15 +222,19 @@ opus_end( void )
   opus_available = 0;
 }
 
-// opus_6821_access( reg, data, dir )
-//
-// reg - register to access:
-//
-// data - if dir = 1 the value being written else ignored
-//
-// dir - direction of data. 0 = read, 1 = write
-//
-// returns: value of refister if dir = 0 else 0
+/*
+ * opus_6821_access( reg, data, dir )
+ *
+ * reg - register to access:
+ *
+ * data - if dir = 1 the value being written else ignored
+ *
+ * dir - direction of data. 0 = read, 1 = write
+ *
+ * returns: value of register if dir = 0 else 0
+ *
+ * Mostly borrowed from EightyOne - A Windows ZX80/81/clone emulator
+ */
 static libspectrum_byte data_reg_a, data_dir_a, control_a;
 static libspectrum_byte data_reg_b, data_dir_b, control_b;
 
@@ -241,7 +244,6 @@ opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
 {
   int drive, side;
   int i;
-//fprintf(stderr,"opus_6821_access( %x, %x, %x )\n", reg, data, dir );
 
   switch( reg & 0x03 ) {
   case 0:
@@ -249,14 +251,13 @@ opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
       if( control_a & 0x04 ) {
         data_reg_a = data;
 
-        // if it's in a read state change to none?
         drive = ( data & 0x02 ) == 2 ? 1 : 0;
         side = ( data & 0x10 )>>4 ? 1 : 0;
-//fprintf(stderr,"opus_6821_access():drive:%d:side:%d\n", drive, side );
 
         for( i = 0; i < OPUS_NUM_DRIVES; i++ ) {
           fdd_set_head( &opus_drives[ i ].fdd, side );
         }
+
         fdd_select( &opus_drives[ (!drive) ].fdd, 0 );
         fdd_select( &opus_drives[ drive ].fdd, 1 );
 
@@ -272,10 +273,11 @@ opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
       }
     } else {
       if( control_a & 0x04 ) {
+        /* printer never busy (bit 6) */
         data_reg_a &= ~0x40;
-        // printer never busy (bit 6)
-        // data_reg_a |= ((~PrinterBusy())&0x40)<<6;
         return data_reg_a;
+      } else {
+        return data_dir_a;
       }
     }
     break;
@@ -283,7 +285,8 @@ opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
     if( dir ) {
       control_a = data;
     } else {
-      return control_a;
+      /* Always return bit 6 set to ACK parallel port actions */
+      return control_a | 0x40;
     }
     break;
   case 2:
@@ -291,6 +294,9 @@ opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
       if( control_b & 0x04 ) {
         data_reg_b = data;
         printer_parallel_write( 0x00, data );
+        /* Don't worry about emulating the strobes from the ROM, they are
+           all bound up with checking current printer busy status which we
+           don't emulate, so just send the char now */
         printer_parallel_strobe_write( 0 );
         printer_parallel_strobe_write( 1 );
         printer_parallel_strobe_write( 0 );
@@ -554,28 +560,23 @@ libspectrum_byte
 opus_read( libspectrum_word address )
 {
   libspectrum_byte data = 0xff;
-//fprintf(stderr,"opus_read( %x )\n", address);
 
-  if( address >= 0x3800 ) data = 0xff; // Undefined on Opus
-  else if( address >= 0x3000 )         // 6821 PIA
+  if( address >= 0x3800 ) data = 0xff; /* Undefined on Opus */
+  else if( address >= 0x3000 )         /* 6821 PIA */
     data = opus_6821_access( address, 0, 0 );
-  else if( address >= 0x2800 ) {       // WD1770 FDC
+  else if( address >= 0x2800 ) {       /* WD1770 FDC */
     switch( address & 0x03 ) {
     case 0:
       data = wd_fdc_sr_read( opus_fdc );
-//fprintf(stderr,"wd_fdc_sr_read():%x\n", data);
       break;
     case 1:
       data = wd_fdc_tr_read( opus_fdc );
-fprintf(stderr,"wd_fdc_tr_read():%x\n", data);
       break;
     case 2:
       data = wd_fdc_sec_read( opus_fdc );
-fprintf(stderr,"wd_fdc_sec_read():%x\n", data);
       break;
     case 3:
       data = wd_fdc_dr_read( opus_fdc );
-//fprintf(stderr,"wd_fdc_dr_read():%x\n", data);
       break;
     }
   }
@@ -589,25 +590,20 @@ opus_write( libspectrum_word address, libspectrum_byte b )
   if( address < 0x2000 ) return;
   if( address >= 0x3800 ) return;
 
-//fprintf(stderr,"opus_write( %x, %x )\n", address, b);
   if( address >= 0x3000 ) {
     opus_6821_access( address, b, 1 );
   } else if( address >= 0x2800 ) {
     switch( address & 0x03 ) {
     case 0:
-fprintf(stderr,"wd_fdc_cr_write( %x )\n", b);
       wd_fdc_cr_write( opus_fdc, b );
       break;
     case 1:
-fprintf(stderr,"wd_fdc_tr_write( %x )\n", b);
       wd_fdc_tr_write( opus_fdc, b );
       break;
     case 2:
-fprintf(stderr,"wd_fdc_sec_write( %x )\n", b);
       wd_fdc_sec_write( opus_fdc, b );
       break;
     case 3:
-//fprintf(stderr,"wd_fdc_dr_write( %x )\n", b);
       wd_fdc_dr_write( opus_fdc, b );
       break;
     }
