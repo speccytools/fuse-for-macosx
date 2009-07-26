@@ -79,7 +79,7 @@ Combo, Beta 128 Drive (D), drive_beta128d_type, INPUT_KEY_d, Disabled|Single-sid
 Combo, +D Drive (1), drive_plusd1_type, INPUT_KEY_1, Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, +D Drive (2), drive_plusd2_type, INPUT_KEY_2, Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|*Double-sided 80 track
 Combo, Opus Drive (1), drive_opus1_type, INPUT_KEY_1, *Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
-Combo, Opus Drive (2), drive_opus2_type, INPUT_KEY_2, *Disabled|Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
+Combo, Opus Drive (2), drive_opus2_type, INPUT_KEY_2, Disabled|*Single-sided 40 track|Double-sided 40 track|Single-sided 80 track|Double-sided 80 track
 Combo, (T)ry merge 'B' side of disks, disk_try_merge, INPUT_KEY_t, Never|*With single-sided drives|Always
 Checkbox, Con(f)irm merge disk sides, disk_ask_merge, INPUT_KEY_f
 
