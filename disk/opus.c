@@ -58,7 +58,7 @@ static int index_event;
 static wd_fdc *opus_fdc;
 static wd_fdc_drive opus_drives[ OPUS_NUM_DRIVES ];
 
-static libspectrum_byte opus_ram[ 0x2000 ];
+static libspectrum_byte opus_ram[ 0x800 ];
 
 static void opus_reset( int hard_reset );
 static void opus_memory_map( void );
@@ -172,7 +172,7 @@ opus_reset( int hard_reset )
   opus_index_pulse = 0;
 
   if( hard_reset )
-    memset( opus_ram, 0, 0x2000 );
+    memset( opus_ram, 0, 0x800 );
 
   wd_fdc_master_reset( opus_fdc );
 
@@ -238,7 +238,7 @@ opus_end( void )
 static libspectrum_byte data_reg_a, data_dir_a, control_a;
 static libspectrum_byte data_reg_b, data_dir_b, control_b;
 
-libspectrum_byte
+static libspectrum_byte
 opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
                   libspectrum_byte dir )
 {
@@ -355,7 +355,8 @@ opus_disk_insert( opus_drive_number which, const char *filename,
   } else {
     switch( which ) {
     case 0:
-      dt = &fdd_params[ option_enumerate_diskoptions_drive_opus1_type() + 1 ];	/* +1 => there is no `Disabled' */
+      /* +1 => there is no `Disabled' */
+      dt = &fdd_params[ option_enumerate_diskoptions_drive_opus1_type() + 1 ];
       break;
     case 1:
     default:
@@ -628,16 +629,13 @@ alloc_and_copy_page( libspectrum_byte* source_page )
 static void
 opus_enabled_snapshot( libspectrum_snap *snap )
 {
-#if 0
   if( libspectrum_snap_opus_active( snap ) )
     settings_current.opus = 1;
-#endif
 }
 
 static void
 opus_from_snapshot( libspectrum_snap *snap )
 {
-#if 0
   if( !libspectrum_snap_opus_active( snap ) ) return;
 
   if( libspectrum_snap_opus_custom_rom( snap ) &&
@@ -651,30 +649,39 @@ opus_from_snapshot( libspectrum_snap *snap )
 
   if( libspectrum_snap_opus_ram( snap, 0 ) ) {
     memcpy( opus_ram,
-            libspectrum_snap_opus_ram( snap, 0 ), 0x2000 );
+            libspectrum_snap_opus_ram( snap, 0 ), 0x800 );
   }
 
-  opus_fdc->direction = libspectrum_snap_beta_direction( snap );
+  /* ignore drive count for now, there will be an issue with loading snaps where
+     drives have been disabled
+  libspectrum_snap_opus_drive_count( snap )
+   */
 
-  opus_cr_write ( 0x00e3, libspectrum_snap_opus_status ( snap ) );
-  opus_tr_write ( 0x00eb, libspectrum_snap_opus_track  ( snap ) );
-  opus_sec_write( 0x00f3, libspectrum_snap_opus_sector ( snap ) );
-  opus_dr_write ( 0x00fb, libspectrum_snap_opus_data   ( snap ) );
-  opus_cn_write ( 0x00ef, libspectrum_snap_opus_control( snap ) );
+  opus_fdc->direction = libspectrum_snap_opus_direction( snap );
+
+  wd_fdc_cr_write ( opus_fdc, libspectrum_snap_opus_status ( snap ) );
+  wd_fdc_tr_write ( opus_fdc, libspectrum_snap_opus_track  ( snap ) );
+  wd_fdc_sec_write( opus_fdc, libspectrum_snap_opus_sector ( snap ) );
+  wd_fdc_dr_write ( opus_fdc, libspectrum_snap_opus_data   ( snap ) );
+  data_reg_a = libspectrum_snap_opus_data_reg_a( snap );
+  data_dir_a = libspectrum_snap_opus_data_dir_a( snap );
+  control_a  = libspectrum_snap_opus_control_a ( snap );
+  data_reg_b = libspectrum_snap_opus_data_reg_b( snap );
+  data_dir_b = libspectrum_snap_opus_data_dir_b( snap );
+  control_b  = libspectrum_snap_opus_control_b ( snap );
 
   if( libspectrum_snap_opus_paged( snap ) ) {
     opus_page();
   } else {
     opus_unpage();
   }
-#endif
 }
 
 static void
 opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
 {
-#if 0
   libspectrum_byte *buffer;
+  int drive_count = 0;
 
   if( !periph_opus_active ) return;
 
@@ -690,12 +697,20 @@ opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   if( !buffer ) return;
   libspectrum_snap_set_opus_ram( snap, 0, buffer );
 
-  libspectrum_snap_set_opus_paged ( snap, opus_active );
-  libspectrum_snap_set_opus_direction( snap, opus_fdc->direction );
-  libspectrum_snap_set_opus_status( snap, opus_fdc->status_register );
-  libspectrum_snap_set_opus_track ( snap, opus_fdc->track_register );
-  libspectrum_snap_set_opus_sector( snap, opus_fdc->sector_register );
-  libspectrum_snap_set_opus_data  ( snap, opus_fdc->data_register );
-  libspectrum_snap_set_opus_control( snap, opus_control_register );
-#endif
+  drive_count++; /* Drive 1 is not removable */
+  if( option_enumerate_diskoptions_drive_opus2_type() > 0 ) drive_count++;
+  libspectrum_snap_set_opus_drive_count( snap, drive_count );
+
+  libspectrum_snap_set_opus_paged     ( snap, opus_active );
+  libspectrum_snap_set_opus_direction ( snap, opus_fdc->direction );
+  libspectrum_snap_set_opus_status    ( snap, opus_fdc->status_register );
+  libspectrum_snap_set_opus_track     ( snap, opus_fdc->track_register );
+  libspectrum_snap_set_opus_sector    ( snap, opus_fdc->sector_register );
+  libspectrum_snap_set_opus_data      ( snap, opus_fdc->data_register );
+  libspectrum_snap_set_opus_data_reg_a( snap, data_reg_a );
+  libspectrum_snap_set_opus_data_dir_a( snap, data_dir_a );
+  libspectrum_snap_set_opus_control_a ( snap, control_a );
+  libspectrum_snap_set_opus_data_reg_b( snap, data_reg_b );
+  libspectrum_snap_set_opus_data_dir_b( snap, data_dir_b );
+  libspectrum_snap_set_opus_control_b ( snap, control_b );
 }
