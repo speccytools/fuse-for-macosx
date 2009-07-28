@@ -1,5 +1,5 @@
 /* opus.h: Routines for handling the Opus Discovery interface
-   Copyright (c) 2005-2007 Stuart Brady
+   Copyright (c) 2005-2009 Stuart Brady, Fredrick Meunier
 
    $Id: opus.h 4012 2009-04-16 12:42:14Z fredm $
 
