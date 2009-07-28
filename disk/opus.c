@@ -60,6 +60,10 @@ static wd_fdc_drive opus_drives[ OPUS_NUM_DRIVES ];
 
 static libspectrum_byte opus_ram[ 0x800 ];
 
+/* 6821 PIA internal registers */
+static libspectrum_byte data_reg_a, data_dir_a, control_a;
+static libspectrum_byte data_reg_b, data_dir_b, control_b;
+
 static void opus_reset( int hard_reset );
 static void opus_memory_map( void );
 static void opus_enabled_snapshot( libspectrum_snap *snap );
@@ -168,6 +172,13 @@ opus_reset( int hard_reset )
   memory_map_romcs[ 0 ].writable = 0;
   memory_map_romcs[ 1 ].writable = 1;
 
+  data_reg_a = 0;
+  data_dir_a = 0;
+  control_a  = 0;
+  data_reg_b = 0;
+  data_dir_b = 0;
+  control_b  = 0;
+
   opus_available = 1;
   opus_index_pulse = 0;
 
@@ -235,8 +246,6 @@ opus_end( void )
  *
  * Mostly borrowed from EightyOne - A Windows ZX80/81/clone emulator
  */
-static libspectrum_byte data_reg_a, data_dir_a, control_a;
-static libspectrum_byte data_reg_b, data_dir_b, control_b;
 
 static libspectrum_byte
 opus_6821_access( libspectrum_byte reg, libspectrum_byte data,
