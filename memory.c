@@ -189,11 +189,6 @@ readbyte( libspectrum_word address )
   libspectrum_word bank;
   memory_page *mapping;
 
-  if( opus_active && address >= 0x2800 && address < 0x3800 ) {
-    tstates += 3;
-    return opus_read( address );
-  }
-
   bank = address >> 13;
   mapping = &memory_map_read[ bank ];
 
@@ -202,6 +197,9 @@ readbyte( libspectrum_word address )
 
   if( mapping->contended ) tstates += ula_contention[ tstates ];
   tstates += 3;
+
+  if( opus_active && address >= 0x2800 && address < 0x3800 )
+    return opus_read( address );
 
   return mapping->page[ address & 0x1fff ];
 }
