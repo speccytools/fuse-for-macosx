@@ -49,8 +49,8 @@ win32_icon ICON "winfuse.ico"
 
 /* VERSIONINFO specs: http://msdn.microsoft.com/en-us/library/aa381058%28VS.85%29.aspx */
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    	0,10,0,1
-PRODUCTVERSION 	0,10,0,1
+FILEVERSION    	VERSION_WIN32
+PRODUCTVERSION 	VERSION_WIN32
 FILEFLAGSMASK  	VS_FFI_FILEFLAGSMASK
 FILEFLAGS      	0x0L
 FILEOS         	VOS__WINDOWS32
@@ -62,10 +62,11 @@ BEGIN
     BLOCK "040904B0"
     BEGIN
       VALUE "CompanyName",      "\0"
-      VALUE "FileDescription",  "Fuse\n"
+      VALUE "FileDescription",  "Fuse\0"
       VALUE "FileVersion",      VERSION##"\0"
-      VALUE "InternalName",     "Fuse\n"
+      VALUE "InternalName",     "Fuse\0"
       VALUE "LegalCopyright",   "Copyright (c) 1999-2009 Philip Kendall and others; see the file 'AUTHORS' for more details.\0"
+      VALUE "License",          "Fuse is licensed under the GNU General Public License, version 2 or later\0"
       VALUE "OriginalFilename", "fuse.exe\0"
       VALUE "ProductName",      "Fuse - the Free Unix Spectrum Emulator\0"
       VALUE "ProductVersion",   VERSION##"\0"
