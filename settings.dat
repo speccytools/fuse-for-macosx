@@ -65,6 +65,9 @@ interface2, boolean, 1
 snapsasz80, null, 0
 opus, boolean, 0
 pal_tv2x, boolean, 0
+movie_sound, numeric, 1
+movie_compr, numeric, -1
+movie_start, string, NULL
 plusd, boolean, 0
 beta128, boolean, 0
 late_timings, boolean, 0

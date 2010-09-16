@@ -217,11 +217,8 @@ struct menu_item_entries {
 
 static const struct menu_item_entries menu_item_lookup[] = {
 
-  { UI_MENU_ITEM_FILE_MOVIES_RECORDING, "/File/Movies/Stop Movie Recording",
-    "/File/Movies/Record Movie as SCR...", 1,
-#ifdef USE_LIBPNG
-    "/File/Movies/Record Movie as PNG...", 1,
-#endif
+  { UI_MENU_ITEM_FILE_MOVIE_RECORDING, "/File/Movie/Stop",
+    "/File/Movie/Record...", 1,
   },
   
   { UI_MENU_ITEM_MACHINE_PROFILER, "/Machine/Profiler/Stop",

@@ -23,7 +23,23 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-bin_PROGRAMS = fuse
+bin_PROGRAMS = fuse fmfconv
+
+fmfconv_SOURCES = fmfconv.c \
+		  fmfconv_ff.c \
+		  fmfconv_yuv.c \
+		  fmfconv_ppm.c \
+		  fmfconv_wav.c \
+		  fmfconv_au.c \
+		  fmfconv_aiff.c
+
+if COMPAT_GETOPT
+fmfconv_SOURCES += compat/getopt.c compat/getopt1.c
+endif
+
+fmfconv_LDADD = @FFMPEG_LIBS@
+
+fmfconv_DEPENDENCIES = compat/@COMPAT_OSNAME@/libcompatos.a
 
 SUBDIRS = @COMPAT_SUBDIR@ \
 	  debugger \
@@ -76,6 +92,7 @@ fuse_SOURCES = ay.c \
 	memory.c \
 	mempool.c \
 	menu.c \
+	movie.c \
 	module.c \
 	periph.c \
 	printer.c \
@@ -189,6 +206,8 @@ noinst_HEADERS = ay.h \
 	memory.h \
 	mempool.h \
 	menu.h \
+	movie.h \
+	movie_tables.h \
 	module.h \
 	periph.h \
 	psg.h \
@@ -207,7 +226,9 @@ noinst_HEADERS = ay.h \
 	printer.h \
 	profile.h \
 	scld.h \
-	ula.h
+	ula.h \
+	\
+	fmfconv.h
 
 EXTRA_DIST = AUTHORS \
 	     README \

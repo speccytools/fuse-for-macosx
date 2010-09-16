@@ -476,6 +476,37 @@ option.
 Specify Interface I Microdrive cartridge files to open.
 .RE
 .PP
+.I \-\-movie-start filename
+.RS
+With this command line option, Fuse start movie recording as started.
+So you can make recordings from the "beginning".
+See also the
+.B "MOVIE RECORDING"
+section
+.RE
+.PP
+.I \-\-movie-compr level
+.RS
+if Fuse compiled with Zlib support, this option you can set the compression
+level from 1 to 9. 0 switch off the Zlib compression.
+.br
+See also the
+.B "MOVIE RECORDING"
+section
+
+.RE
+.PP
+.I \-\-movie-sound type
+.RS
+Set sound encoding in recorded movie file. Type can be 0, 1 or 2.
+0 means signed 16 bit PCM encoding. 1 means u-Law and 2 means a-Law
+encoding scheme.
+.br
+See also the
+.B "MOVIE RECORDING"
+section
+.RE
+.PP
 .I \-\-opus
 .RS
 Emulate a Opus Discovery interface. Same as the Peripherals Options dialog's
@@ -1401,25 +1432,20 @@ Save the current screen as a PNG file. You will be prompted for a
 filename to save the screenshot to.
 .RE
 .PP
-.I "File, Movies, Record Movie as SCR..."
+.I "File, Movies, Record..."
 .RS
-Start recording a `movie' as a series of SCR screenshots. You will be
-prompted for a filename, and the screenshots will then be saved to
-.RI ` <name>\-frame\-000000000.scr "', `" <name>\-frame\-000000001.scr '
-and so on.
+Fuse can record movie (video and audio) into a file with special format.
+This file later converted to a common video file format with
+.I fmfconv
+utility.
+You will be prompted for a filename to save video. Please see
+.B "MOVIE RECORDING"
+section.
 .RE
 .PP
-.I "File, Movies, Record Movie as PNG..."
+.I "File, Movies, Stop"
 .RS
-Start recording a `movie' as a series of PNG images. The filenames used will be the same as for the SCR movie, but with a
-.RI ` .png '
-extension instead of
-.RI ` .scr '.
-.RE
-.PP
-.I "File, Movies, Stop Movie Recording"
-.RS
-Stop any movie recording which is currently in progress.
+Stop movie recording which is currently in progress.
 .RE
 .PP
 .I "File, Load Binary Data..."
@@ -2046,6 +2072,7 @@ section for more details.
 .RS
 Switch Fuse between full screen and windowed mode.
 This menu is only available under the SDL UI.
+.RE
 .PP
 .I "Options, Save"
 .RS
@@ -3635,6 +3662,67 @@ present, and can save back weak sector data to UDI image format.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH MOVIE RECORDING
+.PP
+Fuse can save movie with sound in a specific file format (FMF).
+This recording is very fast, and has a moderate size, but you need a specific
+program to convert into regular video and/or audio file.
+There are two command line options to set some parameters of the recorded file.
+If Fuse compiled with Zlib support,
+.I \-\-movie\-compr
+option set the compression level from 1 to 9. 0 switch off the Zlib compression.
+By default Fuse use Zlib default compression level (6).
+Higher compression ratio need higher processing power, so if you find that movie
+recording slow down emulation you can try to switch of compresion with level 0.
+With
+.I \-\-movie-sound
+option you can select recorded sound format (encoding). You can select signed
+16bit PCM (0), u-Law (1) or A-Law (2). By default Fuse record u-Law encoded sound.
+u-Law and A-Law use 8bit signed numbers for each sample but the dynamic range only
+14 and 13 bit respectively.
+.br
+Note: the encoding scheme cannot influence sound sampling frequency.
+.PP
+Fuse record every displayed frame, so by default the recorded file has about
+50 video frame per one second. A standard video has about 24-30/s framerate, so
+if you set 
+.I "Options/General/Frame rate 1:n"
+or the equivalent
+.I \-\-rate
+command line option to 2 than recording frame rate reduces about 25/s. The
+exact frame rate depends on the Z80 clock frequency which varying on emulated
+machine by machine.
+.br
+Note: You can see all of the "gfx" effects only if Fuse frame rate option
+set to 1, but most of the cases you can safely use 2.
+.PP
+The recorded sound sampling rate and the channel number is equal with the
+Fuse generated sound sampling rate (32000 Hz by default) and channel
+number (mono by default). The common sampling frequencies in
+standard video files are 44100 Hz and 48000 Hz. If you use
+.I \-\-sound\-freq
+command line option you can record sound on 44100Hz or even 48000Hz.
+.br
+You can record stereo sound if use
+.I "AY stereo separation"
+or the equivalent
+.I \-\-separation
+command line switch.
+.PP
+You can use
+.I fmfconv
+to convert recorded movie file into a standard video file.
+.PP
+.B Examples
+.PP
+.B fuse --movie-start --rate 2 --sound-freq 44100 --separation
+.B --movie-sound 0 enigma.fmf
+.PP
+start video recording about 25/s video frame rate and 44100Hz sampling
+frequency stereo signed 16bit PCM sound.
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH COMPRESSED FILES
 .PP
 Assuming the appropriate libraries were available when
@@ -3691,6 +3779,7 @@ error messages.
 .\"
 .SH SEE ALSO
 .IR bzip2 "(3),"
+.IR fmfconv "(1)"
 .IR fuse\-utils "(1),"
 .IR gzip "(3),"
 .IR libspectrum "(3),"

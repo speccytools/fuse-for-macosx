@@ -41,6 +41,7 @@
 #include "if2.h"
 #include "joystick.h"
 #include "menu.h"
+#include "movie.h"
 #include "machines/specplus3.h"
 #include "profile.h"
 #include "psg.h"
@@ -183,12 +184,11 @@ MENU_CALLBACK( menu_file_openscrscreenshot )
   fuse_emulation_unpause();
 }
 
-MENU_CALLBACK( menu_file_movies_stopmovierecording )
+MENU_CALLBACK( menu_file_movie_stop )
 {
   ui_widget_finish();
 
-  screenshot_movie_record = 0;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 0 );
+  movie_stop();
 }
 
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
@@ -719,30 +719,7 @@ MENU_CALLBACK( menu_file_savescreenaspng )
 }
 #endif
 
-MENU_CALLBACK( menu_file_movies_recordmovieasscr )
-{
-  char *filename;
-
-  ui_widget_finish();
-  
-  fuse_emulation_pause();
-
-  filename = ui_get_save_filename( "Fuse - Record Movie as SCR" );
-  if( !filename ) { fuse_emulation_unpause(); return; }
-
-  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
-            filename );
-
-  screenshot_movie_record = 1;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
-
-  free( filename );
-
-  fuse_emulation_unpause();
-}
-
-#ifdef USE_LIBPNG
-MENU_CALLBACK( menu_file_movies_recordmovieaspng )
+MENU_CALLBACK( menu_file_movie_record )
 {
   char *filename;
 
@@ -750,26 +727,14 @@ MENU_CALLBACK( menu_file_movies_recordmovieaspng )
 
   fuse_emulation_pause();
 
-  screenshot_movie_scaler = menu_get_scaler( screenshot_available_scalers );
-  if( screenshot_movie_scaler == SCALER_NUM ) {
-    fuse_emulation_unpause();
-    return;
-  }
-
-  filename = ui_get_save_filename( "Fuse - Record Movie as PNG" );
+  filename = ui_get_save_filename( "Fuse - Record Movie File" );
   if( !filename ) { fuse_emulation_unpause(); return; }
 
-  snprintf( screenshot_movie_file, PATH_MAX-SCREENSHOT_MOVIE_FILE_MAX, "%s",
-            filename );
-
-  screenshot_movie_record = 2;
-  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIES_RECORDING, 1 );
-
+  movie_start( filename );
   free( filename );
 
   fuse_emulation_unpause();
 }
-#endif
 
 MENU_CALLBACK( menu_file_recording_record )
 {

@@ -23,6 +23,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-man_MANS = fuse.1
+man_MANS = fuse.1 fmfconv.1
 
 EXTRA_DIST = $(man_MANS)
