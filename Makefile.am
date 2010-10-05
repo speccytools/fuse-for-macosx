@@ -28,6 +28,7 @@ bin_PROGRAMS = fuse fmfconv
 fmfconv_SOURCES = fmfconv.c \
 		  fmfconv_ff.c \
 		  fmfconv_yuv.c \
+		  fmfconv_scr.c \
 		  fmfconv_ppm.c \
 		  fmfconv_wav.c \
 		  fmfconv_au.c \

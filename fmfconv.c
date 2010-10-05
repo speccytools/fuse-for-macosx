@@ -100,7 +100,7 @@ char *out_nmbr = NULL;		/* start of number */
 char *out_next = NULL;		/* multiple out filename next name */
 
 unsigned long long int cut_frm = 0, cut__to = 0;
-type_t cut_f_t, cut_t_t, cut_cmd = TYPE_NOCUT;
+type_t cut_f_t, cut_t_t, cut_cmd = TYPE_NONE;
 char *out_cut = NULL;
 
 int inp_ftell = 0;
@@ -112,18 +112,19 @@ unsigned long long int input_last_no = 0;	/* number of files (input) - 1 */
 int inp_fps = 50000;
 long int inp_drop_value = 0;
 
-int machine_timing[] = {		/* timing constants for different machines */
+int machine_timing[] = {                /* timing constants for different machines */
   50080, 50021, 60115, 50000, 59651
 };
 
 int machine_ftime[] = {
-  19968, 19992, 16635, 20000,
+  19968, 19992, 16635, 20000, 16764
 };
 
 char *machine_name[] = {
  "ZX Spectrum 16K/48K, Timex TC2048/2068, Scorpion. Spectrum SE",
  "ZX Spectrum 128K/+2/+2A/+3/+3E",
  "Timex TS2068", "Pentagon 128K/256K/512K"
+ "ZX Spectrum 48K (NTSC)"
 };
 
 #define SCR_PITCH 40
@@ -193,6 +194,8 @@ libspectrum_signed_word ulaw_table[256] = { ULAW_TAB };
 libspectrum_signed_word alaw_table[256] = { ALAW_TAB };
 
 libspectrum_byte fhead[32];		/* fmf file/frame/slice header */
+
+void close_out( void );
 
 #define FBUFF_SIZE 32
 libspectrum_byte fbuff[FBUFF_SIZE];		/* file buffer used for check file type... */
@@ -435,7 +438,7 @@ inp_get_next_cut( void )
     *(tmp++) = '\0';	/*Ok, we start the first intervall */
 
   mns = strchr( out_cut, '-' );	/* ff[:ss] */
-  if( !mns ) {
+  if( !mns ) {	/* there is no '-' one frame/sec cut out*/
     if( ( err = inp_get_cut_value( out_cut, &cut_frm, &cut_f_t ) ) ) return err;
     cut__to = cut_frm; cut_t_t = cut_f_t;
     cut_cmd = TYPE_CUT;
@@ -443,15 +446,15 @@ inp_get_next_cut( void )
     cut_frm = 0; cut_f_t = TYPE_FRAME;
     if( ( err = inp_get_cut_value( out_cut + 1, &cut__to, &cut_t_t ) ) ) return err;
     cut_cmd = TYPE_CUT;
-  } else {
+  } else {	/* xx-xx or xx- */
     mns++;
     if( ( err = inp_get_cut_value( out_cut, &cut_frm, &cut_f_t ) ) ) return err;
     if( *mns == '\0' ) {	/* xxx- */
-      if( ( err = inp_get_cut_value( out_cut + 1, &cut_frm, &cut_f_t ) ) ) return err;
+/*      if( ( err = inp_get_cut_value( out_cut + 1, &cut_frm, &cut_f_t ) ) ) return err; */
       cut__to = 0;
       cut_cmd = TYPE_CUTFROM;
     } else {
-      if( ( err = inp_get_cut_value( mns, &cut_frm, &cut_f_t ) ) ) return err;		/* xxx-yyy */
+      if( ( err = inp_get_cut_value( mns, &cut__to, &cut_t_t ) ) ) return err;		/* xxx-yyy */
       cut_cmd = TYPE_CUT;
     }
   }
@@ -473,6 +476,7 @@ parse_outname()
   char c1[2], c2[2];
   int n, len;
 
+  perc = f;
   out_orig = out_name;
   while( f && *f ) {
     while( ( perc = strchr( f, '%' ) ) != NULL && 
@@ -555,6 +559,7 @@ open_out()
   ext_t out_ext_tab[] = {
     { TYPE_YUV,  "yuv" },
     { TYPE_YUV,  "y4m" },
+    { TYPE_SCR,  "scr"  },
     { TYPE_PPM,  "ppm"  },
     { TYPE_PPM,  "pnm"  },
     { TYPE_PNG,  "png" },
@@ -590,8 +595,8 @@ open_out()
       }
     }
   }
-  if( out_name && ( out_t >= TYPE_SCR || out_t <= TYPE_JPEG ) && 
-      ( err = next_outname() ) ) return err;
+  if( out_name && ( out_t >= TYPE_SCR && out_t <= TYPE_JPEG ) && 
+      ( err = next_outname() ) > 0 ) return err;
 
   if( out_name
 #ifdef USE_FFMPEG
@@ -611,7 +616,7 @@ open_out()
     out_name = "(-=stdout=-)";
   }
 
-  if( !( out_t >= TYPE_SCR || out_t <= TYPE_JPEG ) ) {
+  if( !( out_t >= TYPE_SCR && out_t <= TYPE_JPEG ) ) {
     printi( 0, "open_out(): Output file (%s) opened as %s file.\n", out_name,
 		out_tstr[out_t - TYPE_SCR] );
   } else {
@@ -776,7 +781,7 @@ check_fmf_head()
     printe( "Unknown Screen$ type '%d', sorry...\n", fhead[5] );
     return ERR_CORRUPT_INP;
   }
-  if( fhead[6] < 'A' || fhead[6] > 'D' ) {
+  if( fhead[6] < 'A' || fhead[6] > 'E' ) {
     printe( "Unknown Machine type '%d', sorry...\n", fhead[6] );
     return ERR_CORRUPT_INP;
   }
@@ -841,7 +846,7 @@ fmf_read_frame_head()
     printe( "Unknown Screen$ type '%d', sorry...\n", fhead[1] );
     return ERR_CORRUPT_INP;
   }
-  if( fhead[2] < 'A' || fhead[2] > 'D' ) {
+  if( fhead[2] < 'A' || fhead[2] > 'E' ) {
     printe( "Unknown Machine type '%d', sorry...\n", fhead[2] );
     return ERR_CORRUPT_INP;
   }
@@ -1206,6 +1211,18 @@ out_write_frame()
     drop_no++;
     printi( 2, "out_write_frame(): drop this frame.\n" );
   }
+
+  if( cut_cmd != TYPE_NONE ) {
+    if( cut_cmd == TYPE_CUT && ( cut_t_t == TYPE_FRAME ? frame_no > cut__to : time_sec > cut__to ) )
+      inp_get_next_cut();
+    if( ( cut_f_t == TYPE_FRAME ? frame_no >= cut_frm : time_sec >= cut_frm ) &&
+	( cut_cmd == TYPE_CUTFROM || ( cut_t_t == TYPE_FRAME ? frame_no <= cut__to : time_sec <= cut__to ) ) ) {
+      drop_no++;
+      printi( 2, "out_write_frame(): cut this frame.\n" );
+      return 0;
+    }
+  }
+
   while( frm_fps <= 0 ) {
     if( n > 1 ) {		/* we have to add sound in more part */
     } else {
@@ -1224,11 +1241,17 @@ out_write_frame()
     } else if( out_t == TYPE_FFMPEG ) {
       if( ( err = out_write_ffmpeg() ) ) return err;
 #endif
+    } else if( out_t == TYPE_SCR ) {
+      if( ( err = out_write_scr() ) ) return err;
     } else if( out_t == TYPE_PPM ) {
       if( ( err = out_write_ppm() ) ) return err;
     }
     frm_fps += inp_fps;
     output_no++;
+    if( ( out_t >= TYPE_SCR && out_t <= TYPE_JPEG ) ) {
+      close_out();
+      open_out();
+    }
   }
   frm_fps -= out_fps;
 
@@ -1288,7 +1311,7 @@ print_help ()
 	  "                                 (e.g.: -f 29.97 or -f 30000/1001)\n"
 	  "  -g --progress <form>         Show progress, where <form> is one of '%%', 'bar'\n"
 	  "                                 'frame' or 'time'. frame and time similar to bar\n"
-	  "                                 just show movie seconds or frame number too."
+	  "                                 just show movie seconds or frame number too.\n"
 	  "  -C --out-cut <cut>           Leave out the comma delimited 'cut' ranges\n"
 	  "                                 e.g.: 100-200,300,500,1:11-2:22 cut the frames\n"
 	  "                                 100-200, 300, 500 and frames from 1min 11sec to\n"
@@ -1738,15 +1761,10 @@ main( int argc, char *argv[] )
       do_now = DO_SLICE;
       break;
     case DO_FRAME:
-    case DO_LAST_FRAME:
       if( out_t != TYPE_NONE ) {
-        if( ( out_t >= TYPE_SCR || out_t <= TYPE_JPEG ) && frame_no ) {
-          close_out();
-          open_out();
-        }
         out_write_frame();
       }
-
+    case DO_LAST_FRAME:
       if( inp_t == TYPE_FMF ) {
         if( do_now == DO_LAST_FRAME ) {
           fread_buff( fhead, 1, INTO_BUFF );	/* check concatenation */
@@ -1769,6 +1787,7 @@ main( int argc, char *argv[] )
     if( prg_t != TYPE_NONE && frame_no % 11 == 0 ) print_progress( 0 );
   }
   if( prg_t != TYPE_NONE ) print_progress( 1 ); /* update progress */
+  if( ( out_t >= TYPE_SCR && out_t <= TYPE_JPEG ) && out_name ) unlink( out_name );
   close_snd();				/* close snd file */
   close_out();				/* close out file */
   if( prg_t != TYPE_NONE ) fprintf( stderr, "\n" );

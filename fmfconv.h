@@ -1,7 +1,7 @@
 /* fmfconv.h: Convert .fmf movie files
    Copyright (c) 2004-2005 Gergely Szasz
 
-   $Id: $
+   $Id: fmfconv.h,v 1.2 2010/09/27 11:44:50 gergely Exp $
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -132,6 +132,8 @@ extern int snd_rte, snd_chn, snd_fsz, snd_len;	/* sound rate (Hz), sound channel
 extern int snd_header_ok;			/* sound header ok? */
 extern int snd_little_endian;
 
+extern libspectrum_byte zxscr[];		/* 2x 40x240 bitmap1 bitmap2 */
+extern libspectrum_byte attrs[];		/* 40x240 attrib */
 extern libspectrum_byte pix_rgb[];		/* other view of data */
 extern libspectrum_byte *pix_yuv[];		/* other view of data */
 extern int yuv_ylen, yuv_uvlen;
@@ -144,6 +146,7 @@ void pcm_swap_endian( void );	/* buff == sound */
 
 int out_write_yuv( void );
 
+int out_write_scr( void );
 int out_write_ppm( void );
 
 int snd_write_wav( void );
