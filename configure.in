@@ -72,41 +72,6 @@ AC_INLINE
 dnl Checks for library functions.
 AC_CHECK_FUNCS(dirname geteuid getopt_long mkstemp fsync)
 
-dnl Check for zlib (the UNIX version is called z, Win32 zdll)
-AC_MSG_CHECKING(whether to use zlib)
-AC_ARG_WITH(zlib,
-[  --without-zlib          don't use zlib],
-if test "$withval" = no; then zlib=no; else zlib=yes; fi,
-zlib=yes)
-AC_MSG_RESULT($zlib)
-if test "$zlib" = yes; then
-  AC_CHECK_HEADERS(
-    zlib.h,
-    AC_SEARCH_LIBS(compress2, z zdll)
-  )
-fi
-
-dnl Check for ffmpeg libs
-AC_MSG_CHECKING(whether ffmpeg movie recording requested)
-AC_ARG_WITH(ffmpeg,
-  [  --with-ffmpeg            use ffmpeg for movie converting],
-  if test "$withval" = no; then ffmpeglib=no; else ffmpeglib=yes; fi,
-  ffmpeglib=yes
-)
-AC_MSG_RESULT($ffmpeglib)
-if test "$ffmpeglib" = yes; then
-  AC_CHECK_HEADERS(
-    libavformat/avformat.h libswscale/swscale.h,
-    FFMPEG_LIBS="-lavformat -lavcodec -lswscale",
-    FFMPEG_LIBS=''; break
-  )
-  if test "x$FFMPEG_LIBS" != "x"
-  then
-    AC_SUBST(FFMPEG_LIBS)
-    AC_DEFINE([USE_FFMPEG], 1, [Defined if ffmpeg available and requested])
-  fi
-fi
-
 dnl Allow the user to say that various libraries are in one place
 AC_ARG_WITH(local-prefix,
 [  --with-local-prefix=PFX local libraries installed in PFX (optional)],
