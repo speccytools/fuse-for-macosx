@@ -129,6 +129,7 @@ MENU_CALLBACK( menu_options_general );
 MENU_CALLBACK( menu_options_sound );
 MENU_CALLBACK( menu_options_peripherals );
 MENU_CALLBACK( menu_options_rzx );
+MENU_CALLBACK( menu_options_movie );
 MENU_CALLBACK( menu_options_diskoptions );
 MENU_DETAIL( menu_plus3a_detail );
 MENU_DETAIL( menu_plus3b_detail );

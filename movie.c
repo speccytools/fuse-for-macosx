@@ -41,6 +41,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "movie_tables.h"
+#include "options.h"
 #include "screenshot.h"
 #include "settings.h"
 #include "scld.h"
@@ -133,7 +134,6 @@ static unsigned char zbuf_o[ZBUF_SIZE];
 #endif	/* HAVE_ZLIB_H */
 
 static unsigned char alaw_table[2048 + 1] = { ALAW_ENC_TAB };
-static unsigned char ulaw_table[8192 + 1] = { ULAW_ENC_TAB };
 
 static char
 get_timing()
@@ -298,15 +298,11 @@ movie_start_fmf( char *name )
   fwrite( "FMF_V1e", 7, 1, of );	/* write magic header Fuse Movie File*/
 #endif	/* WORDS_BIGENDIAN */
 #ifdef HAVE_ZLIB_H
-  if( settings_current.movie_compr == 0 ) {
+  if( option_enumerate_movie_movie_compr() == 0 ) {
     fmf_compr = 0;
     fwrite( "U", 1, 1, of );		/* not compressed */
   } else {
-    if( settings_current.movie_compr < Z_NO_COMPRESSION || 
-	settings_current.movie_compr > Z_BEST_COMPRESSION )
-      fmf_compr = Z_DEFAULT_COMPRESSION;
-    else
-      fmf_compr = settings_current.movie_compr;
+    fmf_compr = Z_DEFAULT_COMPRESSION;
     fwrite( "Z", 1, 1, of );		/* compressed */
   }
   if( fmf_compr != 0 ) {
@@ -384,8 +380,7 @@ movie_init_sound( int f, int s )
 {
 /* initialise sound format */
   if( format == '?' )
-    format = settings_current.movie_sound == 1 ? 'U' : ( 
-		settings_current.movie_sound == 2 ? 'A' : 'P' );
+    format = option_enumerate_movie_movie_compr() == 2 ? 'A' : 'P';
   freq = f;
   stereo = ( s ? 'S' : 'M' );
   framesiz = ( s ? 2 : 1 ) * ( format == 'P' ? 2 : 1 );
@@ -400,26 +395,6 @@ write_alaw( libspectrum_signed_word *buff, int len )
       sbuff[i++] = alaw_table[*buff >> 4];
     else
       sbuff[i++] = 0x7f & alaw_table [- *buff >> 4];
-    buff++;
-    if( i == 4096 ) {
-      i = 0;
-      fwrite_compr( sbuff, 4096, 1, of );	/* write frame */
-    }
-  }
-  if( i )
-    fwrite_compr( sbuff, i, 1, of );	/* write remaind */
-}
-
-static inline void
-write_ulaw( libspectrum_signed_word *buff, int len )
-{
-  int i = 0;
-
-  while( len-- ) {  
-    if( *buff >= 0)
-      sbuff[i++] = ulaw_table[*buff >> 2];
-    else
-      sbuff[i++] = 0x7f & ulaw_table [- *buff >> 2];
     buff++;
     if( i == 4096 ) {
       i = 0;
@@ -446,8 +421,6 @@ add_sound( libspectrum_signed_word *buff, int len )
   fwrite_compr( head, 7, 1, of );	/* Sound frame */
   if( format == 'P' )
     fwrite_compr( buff, len * framesiz , 1, of );	/* write frame */
-  else if( format == 'U' )
-    write_ulaw( buff, len * framesiz );
   else if( format == 'A' )
     write_alaw( buff, len * framesiz );
 }

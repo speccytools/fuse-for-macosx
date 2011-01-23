@@ -64,6 +64,7 @@ Options/_General..., Item, F4
 Options/_Sound..., Item
 Options/_Peripherals..., Item
 Options/_RZX..., Item
+Options/_Movie..., Item
 
 Options/_Joysticks, Branch
 #ifdef USE_JOYSTICK
