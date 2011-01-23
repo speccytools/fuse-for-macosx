@@ -1,5 +1,5 @@
 /* movie.c: Routines for creating 'movie' with border
-   Copyright (c) 2006 Gergely Szasz
+   Copyright (c) 2006-2011 Gergely Szasz
 
    $Id$
 
@@ -26,6 +26,7 @@
 
 #include <config.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -50,67 +51,67 @@
 #undef MOVIE_DEBUG_PRINT
 
 /*
-    FMF - Fuse Movie File
+  FMF - Fuse Movie File
 
-    Fuse Movie File:
-      File Header:
-	off  len  data          description
-	0    4    "FMF_"	Magic header
-	4    2    "V1"		Version
-	6    1    <e|E>		Endianness (e - little / E- big)
-	7    1    <U|Z>		Compression ( U - uncompressed / Z - zlib compressed )
-	8    1    #		Frame rate ( 1:# )
-	9    1    <$|R|C|X>	Screen type
-	10   1    <A|B|C|D|E>	timing code
-	11   1    <P|U|A>	Sound encoding
-	12   2    Freq		Sound freq in Hz
-	14   1    <S|M>		Sound stereo / mono
-	15   1    "\n"		padding (<new line>)
+  Fuse Movie File:
+    File Header:
+      off  len  data          description
+      0    4    "FMF_"	Magic header
+      4    2    "V1"		Version
+      6    1    <e|E>		Endianness (e - little / E- big)
+      7    1    <U|Z>		Compression ( U - uncompressed / Z - zlib compressed )
+      8    1    #		Frame rate ( 1:# )
+      9    1    <$|R|C|X>	Screen type
+      10   1    <A|B|C|D|E>	timing code
+      11   1    <P|U|A>	Sound encoding
+      12   2    Freq		Sound freq in Hz
+      14   1    <S|M>		Sound stereo / mono
+      15   1    "\n"		padding (<new line>)
 
-		e.g. FMF_V1eZ\001$AU\000\175M	-> little endian compressed normal screen, 48k timing, u-Law mono 32000Hz sound
-      Data
-      Frame data header
-	off  len  data          description
-	0    1    <$|S|N|X>     Data chunk type
+    e.g. FMF_V1eZ\001$AU\000\175M	-> little endian compressed normal screen, 48k timing, u-Law mono 32000Hz sound
+    Data
+    Frame data header
+      off  len  data          description
+      0    1    <$|S|N|X>     Data chunk type
 
-	$ -> screen area (slice)
-	off  len  data          description
-	0    1    x		X coord (0-39)
-	1    2    y		Y coord (0-239)
-	3    1    w		width (1-40)
-	4    2    h		height (1-240)
-	6    ?    runlength encoded data bytes
-		  bitmap1; attrib1		ZX$/TX$/HiCol ($/X/C)
-		  bitmap1; bitmap2; attrib	HiR	(R)
-		  runlength encoding:
-		    abcdefghbb#gg# -> two identical byte plus len code a #+2 len
+      $ -> screen area (slice)
+      off  len  data          description
+      0    1    x		X coord (0-39)
+      1    2    y		Y coord (0-239)
+      3    1    w		width (1-40)
+      4    2    h		height (1-240)
+      6    ?    runlength encoded data bytes
+                bitmap1; attrib1		ZX$/TX$/HiCol ($/X/C)
+                bitmap1; bitmap2; attrib	HiR	(R)
+                runlength encoding:
+                  abcdefghbb#gg# -> two identical byte plus len code a #+2 len
 
-	S -> sound chunk
-	off  len  data          description
-	0    1    <P|U|A>	sound encoding type P-> 16bit signed PCM, U -> u-Law, A -> A-Law
-	1    2    Freq		sound freq in Hz
-	3    1    <S|M>		channels S-> stereo, M-> mono
-	4    2    length-1	length in frames (0-65535) -> 1-65536 sound frame
+      S -> sound chunk
+      off  len  data          description
+      0    1    <P|U|A>	sound encoding type P-> 16bit signed PCM, U -> u-Law, A -> A-Law
+      1    2    Freq		sound freq in Hz
+      3    1    <S|M>		channels S-> stereo, M-> mono
+      4    2    length-1	length in frames (0-65535) -> 1-65536 sound frame
 
-	N -> New Frame
-	off  len  data          description
-	0    1    #		frame rate 1:#	(1:1 -> ~50/s, 1:2 -> ~25/a ...)
-	1    1    <$|R|C|X>	screen type $ - standard screen,
-					    R - HiRes,
-					    C - HiColor,
-					    X - standard screen on Timex (double size)
-	2    1    <A|B|C|D>	frame timing code A - 16, 48, TC2048, TC2068, Scorpion, SE
-						  B - 128, +2, +2A, +3, +3E
-						  C - TS2068
-						  D - Pentagon
-						  E - 48 NTSC
-	In a frame there are no, one or several screen rectangle, changed from
-	the previouse frame.
+      N -> New Frame
+      off  len  data          description
+      0    1    #		frame rate 1:#	(1:1 -> ~50/s, 1:2 -> ~25/a ...)
+      1    1    <$|R|C|X>	screen type $ - standard screen,
+                                          R - HiRes,
+                                          C - HiColor,
+                                          X - standard screen on Timex (double size)
+      2    1    <A|B|C|D>	frame timing code A - 16, 48, TC2048, TC2068, Scorpion, SE
+                                                B - 128, +2, +2A, +3, +3E
+                                                C - TS2068
+                                                D - Pentagon
+                                                E - 48 NTSC
+      In a frame there are no, one or several screen rectangle, changed from
+      the previouse frame.
 
-	X -> End of recording
-	off  len  data          description
-	There is no any data... It mark the end of the last frame. So we can concat several FMF file
-	without any problem...
+      X -> End of recording
+      off  len  data          description
+      There is no any data... It mark the end of the last frame. So we can
+      concat several FMF file without any problem...
 */
 
 int movie_recording = 0;
@@ -125,12 +126,12 @@ static char stereo = 'M';
 static char format = '?';
 static int framesiz = 4;
 
-static libspectrum_byte sbuff[4096];
+static libspectrum_byte sbuff[ 4096 ];
 #ifdef HAVE_ZLIB_H
 #define ZBUF_SIZE 8192
 static int fmf_compr = -1;
 static z_stream zstream;
-static unsigned char zbuf_o[ZBUF_SIZE];
+static unsigned char zbuf_o[ ZBUF_SIZE ];
 #endif	/* HAVE_ZLIB_H */
 
 static unsigned char alaw_table[2048 + 1] = { ALAW_ENC_TAB };
@@ -218,7 +219,7 @@ movie_compress_area( int x, int y, int w, int h, int s )
 {
   libspectrum_dword *dpoint, *dline;
   libspectrum_byte d, d1, *b;
-  libspectrum_byte buff[960];
+  libspectrum_byte buff[ 960 ];
   int w0, h0, l;
 
   dline = &display_last_screen[x + 40 * y];
@@ -259,6 +260,7 @@ movie_compress_area( int x, int y, int w, int h, int s )
     fwrite_compr( buff, b - buff, 1, of );
   }
 }
+
 /* Fetch pixel (x, y). On a Timex this will be a point on a 640x480 canvas,
    on a Sinclair/Amstrad/Russian clone this will be a point on a 320x240
    canvas */
@@ -289,13 +291,15 @@ movie_add_area( int x, int y, int w, int h )
 static void
 movie_start_fmf( char *name )
 {
-  if( ( of = fopen(name, "wb") ) == NULL ) {	/* trunc old file ? or append ?*/
-    /*** FIXME error handling */
+  if( ( of = fopen(name, "wb") ) == NULL ) {  /* trunc old file ? or append ? */
+    ui_error( UI_ERROR_ERROR, "error opening movie file '%s': %s", name,
+              strerror( errno ) );
+    return;
   }
 #ifdef WORDS_BIGENDIAN
-  fwrite( "FMF_V1E", 7, 1, of );	/* write magic header Fuse Movie File*/
+  fwrite( "FMF_V1E", 7, 1, of );	/* write magic header Fuse Movie File */
 #else	/* WORDS_BIGENDIAN */
-  fwrite( "FMF_V1e", 7, 1, of );	/* write magic header Fuse Movie File*/
+  fwrite( "FMF_V1e", 7, 1, of );	/* write magic header Fuse Movie File */
 #endif	/* WORDS_BIGENDIAN */
 #ifdef HAVE_ZLIB_H
   if( option_enumerate_movie_movie_compr() == 0 ) {
@@ -329,7 +333,7 @@ movie_start_fmf( char *name )
 }
 
 void
-movie_start( char *name, int type )	/* some init, open file (name)*/
+movie_start( char *name )	/* some init, open file (name)*/
 {
   frame_no = slice_no = 0;
   if( name == NULL || *name == '\0' )
@@ -347,6 +351,7 @@ movie_stop( void )
 
   fwrite_compr( "X", 1, 1, of );	/* End of Recording! */
 #ifdef HAVE_ZLIB_H
+  {
     int s;
 
     if( fmf_compr != 0 ) {		/* close zlib */
@@ -361,18 +366,18 @@ movie_stop( void )
       deflateEnd( &zstream );
       fmf_compr = -1;
     }
+  }
 #endif	/* HAVE_ZLIB_H */
-    format = '?';
-    if( of ) {
-      fclose( of );
-      of = NULL;
-    }
+  format = '?';
+  if( of ) {
+    fclose( of );
+    of = NULL;
+  }
 #ifdef MOVIE_DEBUG_PRINT
   fprintf( stderr, "Debug movie: saved %d.%d frame(.slice)\n", frame_no, slice_no );
 #endif 	/* MOVIE_DEBUG_PRINT */
   movie_recording = 0;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIE_RECORDING, 0 );
-
 }
 
 void
@@ -408,7 +413,6 @@ write_alaw( libspectrum_signed_word *buff, int len )
 static void
 add_sound( libspectrum_signed_word *buff, int len )
 {
-
   head[0] = 'S';	/* sound frame */
   head[1] = format;	/* sound format */
   head[2] = freq & 0xff;
@@ -438,7 +442,7 @@ movie_add_sound( libspectrum_signed_word *buff, int len )
 void
 movie_start_frame( void )
 {
-		/* $ - ZX$, T - TX$, C - HiCol, R - HiRes */
+  /* $ - ZX$, T - TX$, C - HiCol, R - HiRes */
   head[0] = 'N';
   head[1] = settings_current.frame_rate;
   head[2] = get_screentype();
@@ -450,6 +454,7 @@ movie_start_frame( void )
 void
 movie_init()
 {
-  if( settings_current.movie_start )		/* start movie recording if user requested... */
-    movie_start( settings_current.movie_start, 3 );
+  /* start movie recording if user requested... */
+  if( settings_current.movie_start )
+    movie_start( settings_current.movie_start );
 }
