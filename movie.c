@@ -115,6 +115,7 @@
 */
 
 int movie_recording = 0;
+static int movie_paused = 0;
 
 static int frame_no, slice_no;
 
@@ -135,6 +136,8 @@ static unsigned char zbuf_o[ ZBUF_SIZE ];
 #endif	/* HAVE_ZLIB_H */
 
 static unsigned char alaw_table[2048 + 1] = { ALAW_ENC_TAB };
+
+void movie_start_frame( void );
 
 static char
 get_timing()
@@ -225,7 +228,7 @@ movie_compress_area( int x, int y, int w, int h, int s )
   dline = &display_last_screen[x + 40 * y];
   b = buff; l = -1;
   d1 = ( ( *dline >> s ) & 0xff ) + 1;		/* *d1 != dpoint :-) */
-  
+
   for( h0 = h; h0 > 0; h0--, dline += 40 ) {
     dpoint = dline;
     for( w0 = w; w0 > 0; w0--, dpoint++) {
@@ -272,6 +275,10 @@ movie_compress_area( int x, int y, int w, int h, int s )
 void
 movie_add_area( int x, int y, int w, int h )
 {
+  if( movie_paused ) {
+    movie_start_frame();
+    return;
+  }
   head[0] = '$';			/* RLE compressed data... */
   head[1] = x;
   head[2] = y & 0xff;
@@ -342,6 +349,7 @@ movie_start( char *name )	/* some init, open file (name)*/
   movie_start_fmf( name );
   movie_recording = 1;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIE_RECORDING, 1 );
+  ui_menu_activate( UI_MENU_ITEM_FILE_MOVIE_PAUSE, 1 );
 }
 
 void
@@ -378,6 +386,22 @@ movie_stop( void )
 #endif 	/* MOVIE_DEBUG_PRINT */
   movie_recording = 0;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIE_RECORDING, 0 );
+}
+
+void
+movie_pause( void )
+{
+  if( !movie_paused && !movie_recording ) return;
+
+  if( movie_recording ) {
+    movie_recording = 0;
+    movie_paused = 1;
+    ui_menu_activate( UI_MENU_ITEM_FILE_MOVIE_PAUSE, 0 );
+  } else {
+    movie_recording = 1;
+    movie_paused = 1;
+    ui_menu_activate( UI_MENU_ITEM_FILE_MOVIE_PAUSE, 1 );
+  }
 }
 
 void
@@ -449,6 +473,10 @@ movie_start_frame( void )
   head[3] = get_timing();
   fwrite_compr( head, 4, 1, of );	/* New frame! */
   frame_no++;
+  if( movie_paused ) {
+    movie_paused = 0;
+    movie_add_area( 0, 0, 40, 240 );
+  }
 }
 
 void

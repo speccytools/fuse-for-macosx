@@ -32,6 +32,7 @@ extern int movie_recording;
 void movie_init( void );
 void movie_start( char *name );
 void movie_stop( void );
+void movie_pause( void );
 void movie_add_area( int x, int y, int w, int h );
 void movie_start_frame( void );
 void movie_init_sound( int freq, int stereo );

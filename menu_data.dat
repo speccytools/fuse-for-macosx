@@ -48,6 +48,8 @@ File/Save S_creen as PNG..., Item
 
 File/_Movie, Branch
 File/Movie/_Record..., Item
+File/Movie/_Pause, Item
+File/Movie/_Continue, Item,, menu_file_movie_pause
 File/Movie/_Stop, Item
 
 #ifndef USE_WIDGET

@@ -218,7 +218,13 @@ struct menu_item_entries {
 static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_FILE_MOVIE_RECORDING, "/File/Movie/Stop",
+    "/File/Movie/Pause", 0,
+    "/File/Movie/Continue", 0,
     "/File/Movie/Record...", 1,
+  },
+  
+  { UI_MENU_ITEM_FILE_MOVIE_PAUSE, "/File/Movie/Pause",
+    "/File/Movie/Continue", 1,
   },
   
   { UI_MENU_ITEM_MACHINE_PROFILER, "/Machine/Profiler/Stop",

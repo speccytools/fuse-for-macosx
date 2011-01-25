@@ -191,6 +191,13 @@ MENU_CALLBACK( menu_file_movie_stop )
   movie_stop();
 }
 
+MENU_CALLBACK( menu_file_movie_pause )
+{
+  ui_widget_finish();
+
+  movie_pause();
+}
+
 MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
 {
   switch( action ) {
