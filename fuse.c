@@ -76,6 +76,7 @@
 #include "peripherals/printer.h"
 #include "peripherals/scld.h"
 #include "peripherals/speccyboot.h"
+#include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
 #include "pokefinder/pokefinder.h"
 #include "profile.h"
@@ -304,6 +305,7 @@ static int fuse_init(int argc, char **argv)
   if( melodik_init() ) return 1;
   if( speccyboot_init() ) return 1;
   if( specdrum_init() ) return 1;
+  if( spectranet_init() ) return 1;
   machines_periph_init();
 
   error = pokefinder_clear(); if( error ) return error;
