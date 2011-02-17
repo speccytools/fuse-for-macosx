@@ -184,7 +184,7 @@ sound_init( const char *device )
      (less than that and a single Speccy frame generates more
      than a seconds worth of sound which is bigger than the
      maximum Blip_Buffer of 1 second) */
-  if( !( !sound_enabled && settings_current.sound &&
+  if( !( !sound_enabled && (settings_current.sound || movie_recording) &&
          settings_current.emulation_speed > 1 ) )
     return;
 
@@ -194,13 +194,12 @@ sound_init( const char *device )
   if( sound_stereo_ay )
     sound_stereo = 1;
 
-  ret =
-    sound_lowlevel_init( device, &settings_current.sound_freq, &sound_stereo );
-
-  if( ret )
+  if( settings_current.sound &&
+      sound_lowlevel_init( device, &settings_current.sound_freq,
+                           &sound_stereo ) )
     return;
 
-/* initialize movie settings... */
+  /* initialize movie settings... */
   movie_init_sound( settings_current.sound_freq, sound_stereo );
 
   if( !sound_init_blip(&left_buf, &left_beeper_synth) ) return;
@@ -309,7 +308,8 @@ sound_end( void )
     delete_Blip_Synth( &ay_b_synth_r );
     delete_Blip_Synth( &ay_c_synth_r );
 
-    sound_lowlevel_end();
+    if( settings_current.sound ) 
+      sound_lowlevel_end();
     free( samples );
     sound_enabled = 0;
   }
@@ -620,7 +620,8 @@ sound_frame( void )
     count = blip_buffer_read_samples( left_buf, samples, sound_framesiz, BLIP_BUFFER_DEF_STEREO );
   }
 
-  sound_lowlevel_frame( samples, count );
+  if( settings_current.sound ) 
+    sound_lowlevel_frame( samples, count );
 
   if( movie_recording )
       movie_add_sound( samples, count );
