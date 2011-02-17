@@ -3664,37 +3664,31 @@ present, and can save back weak sector data to UDI image format.
 .\"
 .SH MOVIE RECORDING
 .PP
-Fuse can save movie with sound in a specific file format (FMF).
-This recording is very fast, and has a moderate size, but you need a specific
-program to convert into regular video and/or audio file.
-There are two command line options to set some parameters of the recorded file.
-If Fuse compiled with Zlib support,
+Fuse can save movies with sound in a specific file format (FMF).
+This recording is very fast, and has a moderate size, but you need to use
+the fmfconv program in fuse-utils to convert into regular video and/or audio
+files.
+The
 .I \-\-movie\-compr
-option set the compression level from 1 to 9. 0 switch off the Zlib compression.
-By default Fuse use Zlib default compression level (6).
-Higher compression ratio need higher processing power, so if you find that movie
-recording slow down emulation you can try to switch of compresion with level 0.
-With
-.I \-\-movie-sound
-option you can select recorded sound format (encoding). You can select signed
-16bit PCM (0), u-Law (1) or A-Law (2). By default Fuse record u-Law encoded sound.
-u-Law and A-Law use 8bit signed numbers for each sample but the dynamic range only
-14 and 13 bit respectively.
-.br
-Note: the encoding scheme cannot influence sound sampling frequency.
+option allows you to set the compression level to None, Lossless or High. If
+Zlib is not available, only None is valid. The default when Zlib is available
+is Lossless.
+Recording a movie may slow down emulation, if you experience performance
+problems, you can try to set compression to None.
 .PP
-Fuse record every displayed frame, so by default the recorded file has about
-50 video frame per one second. A standard video has about 24-30/s framerate, so
+Fuse records every displayed frame, so by default the recorded file has about
+50 video frame per second. A standard video has about 24-30/s framerate, so
 if you set 
 .I "Options/General/Frame rate 1:n"
 or the equivalent
 .I \-\-rate
 command line option to 2 than recording frame rate reduces about 25/s. The
-exact frame rate depends on the Z80 clock frequency which varying on emulated
-machine by machine.
+exact frame rate depends on the Z80 clock frequency which varying on the
+specific emulated machine.
 .br
 Note: You can see all of the "gfx" effects only if Fuse frame rate option
-set to 1, but most of the cases you can safely use 2.
+set to 1, but most of the cases you can safely use 2. Also, movie recording
+stops if the emulated machine is changed.
 .PP
 The recorded sound sampling rate and the channel number is equal with the
 Fuse generated sound sampling rate (32000 Hz by default) and channel
@@ -3715,11 +3709,10 @@ to convert recorded movie file into a standard video file.
 .PP
 .B Examples
 .PP
-.B fuse --movie-start --rate 2 --sound-freq 44100 --separation
-.B --movie-sound 0 enigma.fmf
+.B fuse --movie-start --rate 2 --sound-freq 44100 --separation enigma.fmf
 .PP
 start video recording about 25/s video frame rate and 44100Hz sampling
-frequency stereo signed 16bit PCM sound.
+frequency stereo sound default compression level.
 .\"
 .\"------------------------------------------------------------------
 .\"

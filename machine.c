@@ -39,6 +39,7 @@
 #include "machines/tc2068.h"
 #include "memory.h"
 #include "module.h"
+#include "movie.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "sound.h"
@@ -140,6 +141,10 @@ machine_select( libspectrum_machine type )
 {
   int i;
   int error;
+
+  /* We don't want to have to deal with screen size changes in the movie code
+     and recording movies where we change machines seems pretty obscure */
+  movie_stop();
 
   for( i=0; i < machine_count; i++ ) {
     if( machine_types[i]->machine == type ) {
