@@ -147,7 +147,7 @@ opus_init( void )
   index_event = event_register( opus_event_index, "Opus index" );
 
   module_register( &opus_module_info );
-  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].source = MEMORY_SOURCE_OPUS;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 

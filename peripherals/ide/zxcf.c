@@ -123,7 +123,7 @@ zxcf_init( void )
   }
 
   module_register( &zxcf_module_info );
-  for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+  for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].source = MEMORY_SOURCE_ZXCF;
 
   periph_register( PERIPH_TYPE_ZXCF, &zxcf_periph );
   if( periph_register_paging_events( event_type_string, &page_event,

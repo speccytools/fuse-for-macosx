@@ -30,23 +30,32 @@
 
 #include "spectrum.h"
 
-typedef enum memory_bank {
-
-  MEMORY_BANK_NONE,
-
-  MEMORY_BANK_HOME,
-  MEMORY_BANK_DOCK,
-  MEMORY_BANK_EXROM,
-  MEMORY_BANK_ROMCS,
-  
-} memory_bank;
-
 typedef enum memory_page_source {
 
+  MEMORY_SOURCE_UNKNOWN = 0,
+
+  /* Old values; deprecated */
   MEMORY_SOURCE_SYSTEM,
   MEMORY_SOURCE_CARTRIDGE,
   MEMORY_SOURCE_PERIPHERAL,
   MEMORY_SOURCE_CUSTOMROM,
+
+  /* New values */
+  MEMORY_SOURCE_NONE, /* No memory attached here */
+
+  MEMORY_SOURCE_BETA, /* Beta128 interface */
+  MEMORY_SOURCE_DIVIDE, /* DivIDE interface */
+  MEMORY_SOURCE_DOCK, /* Timex dock */
+  MEMORY_SOURCE_EXROM, /* Timex EXROM */
+  MEMORY_SOURCE_IF1, /* Interface 1 */
+  MEMORY_SOURCE_IF2, /* Interface 2 */
+  MEMORY_SOURCE_OPUS, /* Opus interface */
+  MEMORY_SOURCE_PLUSD, /* +D interface */
+  MEMORY_SOURCE_RAM,  /* Normal system RAM */
+  MEMORY_SOURCE_ROM,  /* Normal system ROM */
+  MEMORY_SOURCE_SPECCYBOOT,  /* SpeccyBoot interface */
+  MEMORY_SOURCE_ZXATASP,  /* ZXATASP interface */
+  MEMORY_SOURCE_ZXCF,  /* ZXCF interface */
   
 } memory_page_source;
 
@@ -56,11 +65,9 @@ typedef struct memory_page {
   int writable;			/* Can we write to this data? */
   int contended;		/* Are reads/writes to this page contended? */
 
-  memory_bank bank;		/* Which bank is mapped in here */
-  int page_num;			/* Which page from the bank */
-  libspectrum_word offset;	/* How far into the page this chunk starts */
-
   memory_page_source source;	/* Where did this page come from? */
+  int page_num;			/* Which page from the source */
+  libspectrum_word offset;	/* How far into the page this chunk starts */
 
 } memory_page;
 

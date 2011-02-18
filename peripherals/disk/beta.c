@@ -172,7 +172,7 @@ beta_init( void )
   if( index_event == -1 ) return 1;
 
   module_register( &beta_module_info );
-  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].source = MEMORY_SOURCE_BETA;
 
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 

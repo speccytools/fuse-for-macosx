@@ -135,7 +135,7 @@ divide_init( void )
   }
 
   module_register( &divide_module_info );
-  for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+  for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].source = MEMORY_SOURCE_DIVIDE;
 
   periph_register( PERIPH_TYPE_DIVIDE, &divide_periph );
   if( periph_register_paging_events( event_type_string, &page_event,

@@ -188,7 +188,7 @@ speccyboot_init( void )
 
   module_register( &speccyboot_module_info );
 
-  speccyboot_memory_map_romcs.bank = MEMORY_BANK_ROMCS;
+  speccyboot_memory_map_romcs.source = MEMORY_SOURCE_SPECCYBOOT;
 
   periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
 

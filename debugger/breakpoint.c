@@ -273,8 +273,8 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
 static int
 encode_bank_and_page( debugger_breakpoint_type type, libspectrum_word address )
 {
-  memory_page *read_write, *page;
-  breakpoint_page_offset offset;
+  /* MEMORYTODO: make this work for other memory sources */
+  memory_page *read_write;
 
   switch( type ) {
   case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
@@ -292,19 +292,7 @@ encode_bank_and_page( debugger_breakpoint_type type, libspectrum_word address )
     return -1;
   }
 
-  page = &read_write[ address >> 13 ];
-
-  switch( page->bank ) {
-  case MEMORY_BANK_HOME:
-    offset = page->writable ? BREAKPOINT_PAGE_RAM : BREAKPOINT_PAGE_ROM;
-    break;
-  case MEMORY_BANK_DOCK: offset = BREAKPOINT_PAGE_DOCK; break;
-  case MEMORY_BANK_EXROM: offset = BREAKPOINT_PAGE_EXROM; break;
-  case MEMORY_BANK_ROMCS: offset = BREAKPOINT_PAGE_ROMCS; break;
-  default: return -1;
-  }
-
-  return offset + page->page_num;
+  return read_write[ address >> 13 ].page_num;
 }
 
 int

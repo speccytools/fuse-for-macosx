@@ -144,17 +144,15 @@ spec_se_reset( void )
   for( i = 0; i < 8; i++ ) {
 
     timex_dock[i] = memory_map_ram[ i + 18 ];
-    timex_dock[i].bank = MEMORY_BANK_DOCK;
     timex_dock[i].page_num = i;
     timex_dock[i].contended = 0;
-    timex_dock[i].source = MEMORY_SOURCE_SYSTEM;
+    timex_dock[i].source = MEMORY_SOURCE_DOCK;
     memory_map_dock[i] = &timex_dock[i];
 
     timex_exrom[i] = memory_map_ram[ i + 26 ];
-    timex_exrom[i].bank = MEMORY_BANK_EXROM;
     timex_exrom[i].page_num = i;
     timex_exrom[i].contended = 0;
-    timex_exrom[i].source = MEMORY_SOURCE_SYSTEM;
+    timex_exrom[i].source = MEMORY_SOURCE_EXROM;
     memory_map_exrom[i] = &timex_exrom[i];
   }
 

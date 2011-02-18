@@ -105,9 +105,8 @@ memory_init( void )
 
     mapping1->page = NULL;
     mapping1->writable = 0;
-    mapping1->bank = MEMORY_BANK_HOME;
     mapping1->page_num = i;
-    mapping1->source = MEMORY_SOURCE_SYSTEM;
+    mapping1->source = MEMORY_SOURCE_ROM;
 
   }
 
@@ -120,13 +119,12 @@ memory_init( void )
     mapping2->page = &RAM[i][ MEMORY_PAGE_SIZE ];
 
     mapping1->writable = mapping2->writable = 0;
-    mapping1->bank = mapping2->bank = MEMORY_BANK_HOME;
     mapping1->page_num = mapping2->page_num = i;
 
     mapping1->offset = 0x0000;
     mapping2->offset = MEMORY_PAGE_SIZE;
 
-    mapping1->source = mapping2->source = MEMORY_SOURCE_SYSTEM;
+    mapping1->source = mapping2->source = MEMORY_SOURCE_RAM;
   }
 
   /* Just initialise these with something */
@@ -197,15 +195,8 @@ memory_pool_free( void )
 const char*
 memory_bank_name( memory_page *page )
 {
-  switch( page->bank ) {
-  case MEMORY_BANK_NONE: return "Empty";
-  case MEMORY_BANK_HOME: return page->writable ? "RAM" : "ROM";
-  case MEMORY_BANK_DOCK: return "Dock";
-  case MEMORY_BANK_EXROM: return "Exrom";
-  case MEMORY_BANK_ROMCS: return "Chip Select";
-  }
-
-  return "[Undefined]";
+  /* MEMORYTODO: make this work again */
+  return "TODO";
 }
 
 libspectrum_byte
@@ -266,7 +257,7 @@ memory_display_dirty_pentagon_16_col( libspectrum_word address,
      page 5 and 4 (if screen 1 is in use), and page 7 & 6 (if screen 2 is in
      use) and both the standard and ALTDFILE areas of those pages
    */
-  if( mapping->bank == MEMORY_BANK_HOME && 
+  if( mapping->source == MEMORY_SOURCE_RAM && 
       ( ( memory_current_screen  == 5 &&
           ( mapping->page_num == 5 || mapping->page_num == 4 ) ) ||
         ( memory_current_screen  == 7 &&
@@ -289,7 +280,7 @@ memory_display_dirty_sinclair( libspectrum_word address, libspectrum_byte b ) \
 
   /* If this is a write to the current screen (and it actually changes
      the destination), redraw that bit */
-  if( mapping->bank == MEMORY_BANK_HOME && 
+  if( mapping->source == MEMORY_SOURCE_RAM && 
       mapping->page_num == memory_current_screen &&
       ( offset2 & memory_screen_mask ) < 0x1b00 &&
       memory[ offset ] != b )
@@ -307,7 +298,7 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
     opus_write( address, b );
   } else if( mapping->writable ||
-             (mapping->bank != MEMORY_BANK_NONE &&
+             (mapping->source != MEMORY_SOURCE_NONE &&
               settings_current.writable_roms) ) {
     libspectrum_word offset = address & 0x1fff;
     libspectrum_byte *memory = mapping->page;

@@ -161,7 +161,7 @@ plusd_init( void )
   index_event = event_register( plusd_event_index, "+D index" );
 
   module_register( &plusd_module_info );
-  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].source = MEMORY_SOURCE_PLUSD;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 

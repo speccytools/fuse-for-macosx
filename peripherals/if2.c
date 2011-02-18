@@ -70,7 +70,7 @@ if2_init( void )
   int i;
 
   module_register( &if2_module_info );
-  for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+  for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].source = MEMORY_SOURCE_IF2;
 
   periph_register( PERIPH_TYPE_INTERFACE2, &if2_periph );
 
