@@ -37,6 +37,7 @@
 #include "peripherals/disk/plusd.h"
 #include "peripherals/ide/divide.h"
 #include "peripherals/if1.h"
+#include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
 #include "profile.h"
 #include "rzx.h"
@@ -197,6 +198,16 @@ z80_do_opcodes( void )
       divide_set_automap( 1 );
     }
     
+    END_CHECK
+
+    CHECK( spectranet, spectranet_available )
+
+    if( PC == 0x0008 ) {
+      spectranet_page();
+    } else if( PC == 0x007c ) {
+      spectranet_unpage();
+    }
+
     END_CHECK
 
   opcode_delay:

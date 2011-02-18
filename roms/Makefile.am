@@ -36,7 +36,8 @@ ROMS =  128-0.rom 128-1.rom \
 	se-0.rom se-1.rom \
 	if1-1.rom if1-2.rom \
 	plusd.rom \
-        speccyboot-1.4.rom
+        speccyboot-1.4.rom \
+        spectranet.rom
 
 pkgdata_DATA = $(ROMS)
 

@@ -27,5 +27,9 @@
 #define FUSE_SPECTRANET_H
 
 int spectranet_init( void );
+void spectranet_page( void );
+void spectranet_unpage( void );
+
+extern int spectranet_available;
 
 #endif /* #ifndef FUSE_SPECTRANET_H */

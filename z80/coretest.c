@@ -489,6 +489,20 @@ divide_set_automap( int state GCC_UNUSED )
   abort();
 }
 
+int spectranet_available = 0;
+
+void
+spectranet_page( void )
+{
+  abort();
+}
+
+void
+spectranet_unpage( void )
+{
+  abort();
+}
+
 int
 rzx_frame( void )
 {

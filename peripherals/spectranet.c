@@ -1,5 +1,4 @@
 /* spectranet.c: Spectranet emulation
-   
    Copyright (c) 2011 Philip Kendall
    
    $Id$
@@ -42,20 +41,53 @@ static memory_page spectranet_map[2];
 static libspectrum_byte *spectranet_memory[ SPECTRANET_PAGES ];
 static int spectranet_memory_allocated = 0;
 
+int spectranet_available = 0;
 static int spectranet_paged;
 
-static void
-spectranet_reset( int hard_reset GCC_UNUSED )
+void
+spectranet_page( void )
 {
   spectranet_paged = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
 }
 
+void
+spectranet_unpage( void )
+{
+  spectranet_paged = 0;
+  machine_current->ram.romcs = 0;
+  machine_current->memory_map();
+}
+
+static void
+spectranet_reset( int hard_reset GCC_UNUSED )
+{
+  if( !periph_is_active( PERIPH_TYPE_SPECTRANET ) )
+    return;
+
+  spectranet_available = 0;
+  spectranet_paged = 1;
+
+  if( machine_load_rom_bank( spectranet_map, 0, 0,
+			     settings_current.rom_spectranet,
+			     settings_default.rom_spectranet,
+			     0x2000 ) ) {
+    settings_current.spectranet = 0;
+    periph_activate_type( PERIPH_TYPE_SPECTRANET, 0 );
+    return;
+  }
+
+  machine_current->ram.romcs = 1;
+  machine_current->memory_map();
+
+  spectranet_available = 1;
+}
+
 static void
 spectranet_memory_map( void )
 {
-  if ( !spectranet_paged ) return;
+  if( !spectranet_paged ) return;
 
   memory_map_read[0] = memory_map_write[0] = spectranet_map[0];
   memory_map_read[1] = memory_map_write[1] = spectranet_map[1];
@@ -85,8 +117,37 @@ static module_info_t spectranet_module_info = {
   NULL
 };
 
-/* TODO: add actual ports here */
+static void
+spectranet_page_a( libspectrum_word port, libspectrum_byte data )
+{
+}
+
+static void
+spectranet_page_b( libspectrum_word port, libspectrum_byte data )
+{
+}
+
+static void
+spectranet_trap( libspectrum_word port, libspectrum_byte data )
+{
+}
+
+static libspectrum_byte
+spectranet_control_read( libspectrum_word port, int *attached )
+{
+  return 0xff;
+}
+
+static void
+spectranet_control_write( libspectrum_word port, libspectrum_byte data )
+{
+}
+
 static const periph_port_t spectranet_ports[] = {
+  { 0xffff, 0x003b, NULL, spectranet_page_a },
+  { 0xffff, 0x013b, NULL, spectranet_page_b },
+  { 0xffff, 0x023b, NULL, spectranet_trap },
+  { 0xffff, 0x033b, spectranet_control_read, spectranet_control_write },
   { 0, 0, NULL, NULL }
 };
 
@@ -106,8 +167,8 @@ spectranet_init( void )
   for( i = 0; i < 2; i++ ) {
     memory_page *page = &spectranet_map[i];
 
-    page->writable = 1;
-    page->contended = 1;
+    page->writable = (i != 0);
+    page->contended = 0;
     page->bank = MEMORY_BANK_ROMCS;
     page->page_num = i;
     page->offset = 0;
