@@ -381,30 +381,27 @@ write_rom_to_snap( libspectrum_snap *snap, int *current_rom_num,
   *current_rom = NULL;
 }
 
-/* Look at all ROM entries, to see if any are marked as
-   MEMORY_SOURCE_CUSTOMROM */
+/* Look at all ROM entries, to see if any are marked as being custom ROMs */
 int
 memory_custom_rom( void )
 {
   size_t i;
 
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
-    if( memory_map_rom[ i ].source == MEMORY_SOURCE_CUSTOMROM ) return 1;
-  }
+  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ )
+    if( memory_map_rom[ i ].save_to_snapshot )
+      return 1;
 
   return 0;
 }
 
-/* Reset all ROM entries to MEMORY_SOURCE_SYSTEM in case any were marked as
-   MEMORY_SOURCE_CUSTOMROM last reset */
+/* Reset all ROM entries to being non-custom ROMs */
 void
 memory_reset( void )
 {
   size_t i;
 
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
-    memory_map_rom[ i ].source = MEMORY_SOURCE_SYSTEM;
-  }
+  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ )
+    memory_map_rom[ i ].save_to_snapshot = 0;
 }
 
 static void

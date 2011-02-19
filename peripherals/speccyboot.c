@@ -98,7 +98,6 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
                               settings_default.rom_speccyboot, 0x2000 ) )
     return;
 
-  speccyboot_memory_map_romcs.source = MEMORY_SOURCE_PERIPHERAL;
   speccyboot_memory_map_romcs.writable = 0;
 
   out_register_state = 0xff;  /* force transitions to low */

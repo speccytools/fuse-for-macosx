@@ -191,10 +191,7 @@ plusd_reset( int hard_reset )
     return;
   }
 
-  plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
   plusd_memory_map_romcs[1].page = plusd_ram;
-  plusd_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
 
@@ -685,7 +682,7 @@ plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   buffer = alloc_and_copy_page( plusd_memory_map_romcs[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_plusd_rom( snap, 0, buffer );
-  if( plusd_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+  if( plusd_memory_map_romcs[0].save_to_snapshot )
     libspectrum_snap_set_plusd_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( plusd_ram );

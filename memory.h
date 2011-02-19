@@ -34,13 +34,6 @@ typedef enum memory_page_source {
 
   MEMORY_SOURCE_UNKNOWN = 0,
 
-  /* Old values; deprecated */
-  MEMORY_SOURCE_SYSTEM,
-  MEMORY_SOURCE_CARTRIDGE,
-  MEMORY_SOURCE_PERIPHERAL,
-  MEMORY_SOURCE_CUSTOMROM,
-
-  /* New values */
   MEMORY_SOURCE_NONE, /* No memory attached here */
 
   MEMORY_SOURCE_BETA, /* Beta128 interface */
@@ -56,7 +49,7 @@ typedef enum memory_page_source {
   MEMORY_SOURCE_SPECCYBOOT,  /* SpeccyBoot interface */
   MEMORY_SOURCE_ZXATASP,  /* ZXATASP interface */
   MEMORY_SOURCE_ZXCF,  /* ZXCF interface */
-  
+
 } memory_page_source;
 
 typedef struct memory_page {
@@ -66,6 +59,10 @@ typedef struct memory_page {
   int contended;		/* Are reads/writes to this page contended? */
 
   memory_page_source source;	/* Where did this page come from? */
+  int save_to_snapshot;         /* Set if this page should be saved snapshots
+                                   (set only if this page would not normally be
+                                    saved; things like RAM are always saved) */
+
   int page_num;			/* Which page from the source */
   libspectrum_word offset;	/* How far into the page this chunk starts */
 

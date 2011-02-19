@@ -177,10 +177,7 @@ opus_reset( int hard_reset )
     return;
   }
 
-  opus_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
   opus_memory_map_romcs[1].page = opus_ram;
-  opus_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
 
@@ -720,7 +717,7 @@ opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   buffer = alloc_and_copy_page( opus_memory_map_romcs[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_opus_rom( snap, 0, buffer );
-  if( opus_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+  if( opus_memory_map_romcs[0].save_to_snapshot )
     libspectrum_snap_set_opus_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( opus_ram );

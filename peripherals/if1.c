@@ -377,8 +377,6 @@ if1_reset( int hard_reset GCC_UNUSED )
     return;
   }
 
-  if1_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
   machine_current->ram.romcs = 0;
   
   if1_ula.cts = 2;		/* force to emit first out if raw */
@@ -465,10 +463,10 @@ if1_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_interface1_paged ( snap, if1_active );
   libspectrum_snap_set_interface1_drive_count( snap, 8 );
 
-  if( if1_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+  if( if1_memory_map_romcs[0].save_to_snapshot ) {
     size_t rom_length = MEMORY_PAGE_SIZE;
 
-    if( if1_memory_map_romcs[1].source == MEMORY_SOURCE_CUSTOMROM ) {
+    if( if1_memory_map_romcs[1].save_to_snapshot ) {
       rom_length <<= 1;
     }
 

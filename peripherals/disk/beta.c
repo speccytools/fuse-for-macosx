@@ -222,9 +222,6 @@ beta_reset( int hard_reset GCC_UNUSED )
     beta_memory_map_romcs[ 0 ].writable = 0;
     beta_memory_map_romcs[ 1 ].writable = 0;
 
-    beta_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-    beta_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
-
     beta_active = 0;
 
     if( !( machine_current->capabilities &
@@ -755,7 +752,7 @@ beta_to_snapshot( libspectrum_snap *snap )
 
   libspectrum_snap_set_beta_active( snap, 1 );
 
-  if( beta_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+  if( beta_memory_map_romcs[0].save_to_snapshot ) {
     size_t rom_length = MEMORY_PAGE_SIZE * 2;
 
     buffer = malloc( rom_length );
