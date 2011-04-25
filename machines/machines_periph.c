@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include "fuse.h"
+#include "machines_periph.h"
 #include "pentagon.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
@@ -33,7 +34,7 @@
 #include "specplus3.h"
 #include "tc2068.h"
 
-void
+static void
 spec_se_memoryport_write( libspectrum_word port GCC_UNUSED,
 			  libspectrum_byte b )
 {
@@ -162,7 +163,7 @@ base_peripherals( void )
 }
 
 /* Peripherals available on the 48K and 128K */
-void
+static void
 base_peripherals_48_128( void )
 {
   base_peripherals();
@@ -182,6 +183,7 @@ machines_periph_48( void )
   base_peripherals_48_128();
   periph_set_present( PERIPH_TYPE_FULLER, PERIPH_PRESENT_OPTIONAL );
   periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_OPTIONAL );
+  periph_set_present( PERIPH_TYPE_DISCIPLE, PERIPH_PRESENT_OPTIONAL );
 }
 
 /* The set of peripherals available on the 128K and similar machines */

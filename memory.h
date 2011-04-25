@@ -76,7 +76,7 @@ extern memory_page memory_map_write[8];
 
 /* 8 8Kb memory chunks accessible by the Z80 for normal RAM (home) and
    the Timex Dock and Exrom */
-extern memory_page *memory_map_home[8];
+//extern memory_page *memory_map_home[8];
 extern memory_page *memory_map_dock[8];
 extern memory_page *memory_map_exrom[8];
 

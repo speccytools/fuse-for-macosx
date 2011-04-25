@@ -51,6 +51,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include "display.h"
 #include "fuse.h"
+#include "options.h"
 #include "options_internals.h"
 #include "periph.h"
 #include "ui/widget/widget_internals.h"
@@ -149,7 +150,7 @@ CODE
 	    }
 		print << "CODE";
 int
-option_enumerate_$_->{name}_$widget->{value}() {
+option_enumerate_$_->{name}_$widget->{value}( void ) {
   return option_enumerate_combo( widget_$widget->{value}_combo,
 				 settings_current.$widget->{value},
 				 $combo_default{$widget->{value}} );

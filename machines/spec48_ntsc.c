@@ -1,7 +1,7 @@
 /* spec48_ntsc.c: NTSC Spectrum 48K specific routines
    Copyright (c) 1999-2011 Philip Kendall
 
-   $Id: spec48.c 3566 2008-03-18 12:59:16Z pak21 $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "machine.h"
+#include "machines.h"
 #include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"

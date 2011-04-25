@@ -60,9 +60,9 @@ static guchar rgb_image[ 4 * 2 * ( DISPLAY_SCREEN_HEIGHT + 4 ) *
 static const gint rgb_pitch = ( DISPLAY_SCREEN_WIDTH + 3 ) * 4;
 
 /* The scaled image */
-static guchar scaled_image[ 4 * 3 * DISPLAY_SCREEN_HEIGHT *
-                            (size_t)(1.5 * DISPLAY_SCREEN_WIDTH) ];
-static const ptrdiff_t scaled_pitch = 4 * 1.5 * DISPLAY_SCREEN_WIDTH;
+static guchar scaled_image[ 3 * DISPLAY_SCREEN_HEIGHT *
+                            6 * DISPLAY_SCREEN_WIDTH ];
+static const ptrdiff_t scaled_pitch = 6 * DISPLAY_SCREEN_WIDTH;
 
 /* The colour palette */
 static const guchar rgb_colours[16][3] = {
@@ -144,6 +144,7 @@ uidisplay_init( int width, int height )
 {
   int x, y, error;
   libspectrum_dword black;
+  const char *machine_name;
 
   gtk_signal_connect( GTK_OBJECT( gtkui_drawing_area ), "expose_event",
                       GTK_SIGNAL_FUNC(gtkdisplay_expose ), NULL );
@@ -169,6 +170,9 @@ uidisplay_init( int width, int height )
         scaler_select_scaler( SCALER_NORMAL );
 
   gtkdisplay_load_gfx_mode();
+
+  machine_name = libspectrum_machine_name( machine_current->machine );
+  gtkstatusbar_update_machine( machine_name );
 
   display_ui_initialised = 1;
 

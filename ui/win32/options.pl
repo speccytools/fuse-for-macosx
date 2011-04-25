@@ -48,13 +48,15 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include "display.h"
 #include "fuse.h"
+#include "options.h"
 #include "options_internals.h"
 #include "periph.h"
 #include "settings.h"
 #include "win32internals.h"
 
 static int
-option_enumerate_combo( char **options, char *value, int count, int def ) {
+option_enumerate_combo( const char **options, char *value, int count,
+			int def ) {
   int i;
   if( value != NULL ) {
     for( i = 0; i < count; i++) {
@@ -92,7 +94,7 @@ foreach( @dialogs ) {
 
 		    print << "CODE";
 
-static char * $_->{name}_$widget->{value}_combo[] = {
+static const char *$_->{name}_$widget->{value}_combo[] = {
 CODE
 		    foreach( split( /\|/, $widget->{data1} ) ) {
 			print << "CODE";
@@ -115,7 +117,7 @@ CODE
 		}
 		print << "CODE";
 int
-option_enumerate_$_->{name}_$widget->{value}() {
+option_enumerate_$_->{name}_$widget->{value}( void ) {
   return option_enumerate_combo( $_->{name}_$widget->{value}_combo,
 				 settings_current.$widget->{value},
 				 $_->{name}_$widget->{value}_combo_count,

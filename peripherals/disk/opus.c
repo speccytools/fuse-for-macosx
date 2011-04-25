@@ -2,7 +2,7 @@
    Copyright (c) 1999-2009 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Dmitry Sanarin, Darren Salt, Michael D Wynne, Gergely Szasz
 
-   $Id: opus.c 4012 2009-04-16 12:42:14Z fredm $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
    Philip: philip-fuse@shadowmagic.org.uk
 
-   Stuart: sdbrady@ntlworld.com
+   Stuart: stuart.brady@gmail.com
 
 */
 
@@ -361,7 +361,7 @@ opus_disk_insert( opus_drive_number which, const char *filename,
   /* Eject any disk already in the drive */
   if( d->fdd.loaded ) {
     /* Abort the insert if we want to keep the current disk */
-    if( opus_disk_eject( which, 0 ) ) return 0;
+    if( opus_disk_eject( which ) ) return 0;
   }
 
   if( filename ) {
@@ -418,7 +418,7 @@ opus_disk_insert( opus_drive_number which, const char *filename,
 }
 
 int
-opus_disk_eject( opus_drive_number which, int saveas )
+opus_disk_eject( opus_drive_number which )
 {
   wd_fdc_drive *d;
 
@@ -430,33 +430,23 @@ opus_disk_eject( opus_drive_number which, int saveas )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+  if( d->disk.dirty ) {
 
-    if( d->disk.filename == NULL ) saveas = 1;
-    if( ui_opus_disk_write( which, 2 - saveas ) ) return 1;
-    d->disk.dirty = 0;
-    return 0;
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Disk in Opus Discovery drive %c has been modified.\n"
+      "Do you want to save it?",
+      which == OPUS_DRIVE_1 ? '1' : '2'
+    );
 
-  } else {
+    switch( confirm ) {
 
-    if( d->disk.dirty ) {
+    case UI_CONFIRM_SAVE_SAVE:
+      if( opus_disk_save( which, 0 ) ) return 1;	/* first save */
+      break;
 
-      ui_confirm_save_t confirm = ui_confirm_save(
-	"Disk in Opus Discovery drive %c has been modified.\n"
-	"Do you want to save it?",
-	which == OPUS_DRIVE_1 ? '1' : '2'
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( opus_disk_eject( which, 2 ) ) return 1;	/* first save */
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -472,6 +462,25 @@ opus_disk_eject( opus_drive_number which, int saveas )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS_2_EJECT, 0 );
     break;
   }
+  return 0;
+}
+
+int
+opus_disk_save( opus_drive_number which, int saveas )
+{
+  wd_fdc_drive *d;
+
+  if( which >= OPUS_NUM_DRIVES )
+    return 1;
+
+  d = &opus_drives[ which ];
+
+  if( d->disk.type == DISK_TYPE_NONE )
+    return 0;
+
+  if( d->disk.filename == NULL ) saveas = 1;
+  if( ui_opus_disk_write( which, saveas ) ) return 1;
+  d->disk.dirty = 0;
   return 0;
 }
 
@@ -705,7 +714,7 @@ opus_from_snapshot( libspectrum_snap *snap )
 }
 
 static void
-opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
+opus_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
   int drive_count = 0;

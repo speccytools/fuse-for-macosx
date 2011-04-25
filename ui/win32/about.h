@@ -1,5 +1,5 @@
-/* bitmap.h: Bitmap routines
-   Copyright (c) 2007 Stuart Brady
+/* about.h: about dialog box
+   Copyright (c) 2011 Philip Kendall
 
    $Id$
 
@@ -19,31 +19,12 @@
 
    Author contact information:
 
-   Philip: philip-fuse@shadowmagic.org.uk
-
-   Stuart: stuart.brady@gmail.com
+   E-mail: philip-fuse@shadowmagic.org.uk
 
 */
 
-#ifndef FUSE_BITMAP_H
-#define FUSE_BITMAP_H
-
-inline static void
-bitmap_set( libspectrum_byte *b, const size_t n )
-{
-  b[ n / 8 ] |= ( 1 << ( n % 8 ) );
-}
-
-inline static void
-bitmap_reset( libspectrum_byte *b, const size_t n )
-{
-  b[ n / 8 ] &= ~( 1 << ( n % 8 ) );
-}
-
-inline static int
-bitmap_test( const libspectrum_byte *b, const size_t n )
-{
-  return b[ n / 8 ] & ( 1 << ( n % 8 ) );
-}
-
-#endif			/* #ifndef FUSE_BITMAP_H */
+#define IDD_ABOUT                  1800
+#define IDC_ABOUT_STATIC_VERSION   1801
+#define IDC_ABOUT_STATIC_NAME      1802
+#define IDC_ABOUT_STATIC_COPYRIGHT 1802
+#define IDC_ABOUT_STATIC_WEBSITE   1804

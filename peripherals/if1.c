@@ -636,7 +636,7 @@ port_ctr_in( void )
 */
 
 static int
-read_rs232()
+read_rs232( void )
 {
   if( if1_ula.rs232_buffer <= 0xff ) {	/* we read from the buffer */
     if1_ula.data_in = if1_ula.rs232_buffer;
@@ -1114,7 +1114,7 @@ if1_mdr_insert( int which, const char *filename )
   /* Eject any cartridge already in the drive */
   if( mdr->inserted ) {
     /* Abort the insert if we want to keep the current cartridge */
-    if( if1_mdr_eject( which, 0 ) ) return 0;
+    if( if1_mdr_eject( which ) ) return 0;
   }
 
   if( filename == NULL ) {	/* insert new unformatted cartridge */
@@ -1151,7 +1151,7 @@ if1_mdr_insert( int which, const char *filename )
 }
 
 int
-if1_mdr_eject( int which, int saveas )
+if1_mdr_eject( int which )
 {
   microdrive_t *mdr;
 
@@ -1163,33 +1163,23 @@ if1_mdr_eject( int which, int saveas )
   if( !mdr->inserted )
     return 0;
 
-  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+  if( mdr->modified ) {
 
-    if( mdr->filename == NULL ) saveas = 1;
-    if( ui_mdr_write( which, 2 - saveas ) ) return 1;
-    mdr->modified = 0;
-    return 0;
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Cartridge in Microdrive %i has been modified.\n"
+      "Do you want to save it?",
+      which + 1
+    );
 
-  } else {
+    switch( confirm ) {
 
-    if( mdr->modified ) {
+    case UI_CONFIRM_SAVE_SAVE:
+      if( if1_mdr_save( which, 0 ) ) return 1;	/* first save */
+      break;
 
-      ui_confirm_save_t confirm = ui_confirm_save(
-	"Cartridge in Microdrive %i has been modified.\n"
-	"Do you want to save it?",
-	which + 1
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( if1_mdr_eject( which, 2 ) ) return 1;	/* first save */
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -1200,6 +1190,25 @@ if1_mdr_eject( int which, int saveas )
   }
 
   update_menu( UMENU_MDRV1 + which );
+  return 0;
+}
+
+int
+if1_mdr_save( int which, int saveas )
+{
+  microdrive_t *mdr;
+
+  if( which >= 8 )
+    return 1;
+
+  mdr = &microdrive[ which ];
+
+  if( !mdr->inserted )
+    return 0;
+
+  if( mdr->filename == NULL ) saveas = 1;
+  if( ui_mdr_write( which, saveas ) ) return 1;
+  mdr->modified = 0;
   return 0;
 }
 
