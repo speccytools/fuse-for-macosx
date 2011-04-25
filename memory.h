@@ -37,6 +37,7 @@ typedef enum memory_page_source {
   MEMORY_SOURCE_NONE, /* No memory attached here */
 
   MEMORY_SOURCE_BETA, /* Beta128 interface */
+  MEMORY_SOURCE_DISCIPLE, /* Disciple interface */
   MEMORY_SOURCE_DIVIDE, /* DivIDE interface */
   MEMORY_SOURCE_DOCK, /* Timex dock */
   MEMORY_SOURCE_EXROM, /* Timex EXROM */
@@ -76,7 +77,7 @@ extern memory_page memory_map_write[8];
 
 /* 8 8Kb memory chunks accessible by the Z80 for normal RAM (home) and
    the Timex Dock and Exrom */
-//extern memory_page *memory_map_home[8];
+extern memory_page *memory_map_home[8];
 extern memory_page *memory_map_dock[8];
 extern memory_page *memory_map_exrom[8];
 

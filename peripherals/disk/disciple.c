@@ -177,7 +177,7 @@ disciple_init( void )
 
   module_register( &disciple_module_info );
   for( i = 0; i < 3; i++ )
-    disciple_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+    disciple_memory_map_romcs[i].source = MEMORY_SOURCE_DISCIPLE;
 
   periph_register( PERIPH_TYPE_DISCIPLE, &disciple_periph );
 
@@ -207,11 +207,7 @@ disciple_reset( int hard_reset )
     return;
   }
 
-  disciple_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-  disciple_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
-
   disciple_memory_map_romcs[2].page = disciple_ram;
-  disciple_memory_map_romcs[2].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 1;
 
