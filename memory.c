@@ -195,8 +195,27 @@ memory_pool_free( void )
 const char*
 memory_bank_name( memory_page *page )
 {
-  /* MEMORYTODO: make this work again */
-  return "TODO";
+  switch( page->source ) {
+  case MEMORY_SOURCE_UNKNOWN: return "Unknown";
+  case MEMORY_SOURCE_NONE: return "None";
+  case MEMORY_SOURCE_BETA: return "Beta128";
+  case MEMORY_SOURCE_DISCIPLE: return "DISCiPLE";
+  case MEMORY_SOURCE_DIVIDE: return "DivIDE";
+  case MEMORY_SOURCE_DOCK: return "Dock";
+  case MEMORY_SOURCE_EXROM: return "EXROM";
+  case MEMORY_SOURCE_IF1: return "Interface 1";
+  case MEMORY_SOURCE_IF2: return "Interface 2";
+  case MEMORY_SOURCE_OPUS: return "Opus";
+  case MEMORY_SOURCE_PLUSD: return "+D";
+  case MEMORY_SOURCE_RAM: return "RAM";
+  case MEMORY_SOURCE_ROM: return "ROM";
+  case MEMORY_SOURCE_SPECCYBOOT: return "SpeccyBoot";
+  case MEMORY_SOURCE_ZXATASP: return "ZXATASP";
+  case MEMORY_SOURCE_ZXCF: return "ZXCF";
+  default:
+    ui_error( UI_ERROR_ERROR, "Unknown bank source %d at %s:%d", page->source, __FILE__, __LINE__ );
+    fuse_abort();
+  }
 }
 
 libspectrum_byte
