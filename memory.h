@@ -32,6 +32,10 @@
 
 typedef enum memory_page_source {
 
+  /* Used by the debugger to specify an absolute address, rather than memory
+     from a specific source */ 
+  MEMORY_SOURCE_ANY = -1,
+
   MEMORY_SOURCE_UNKNOWN = 0,
 
   MEMORY_SOURCE_NONE, /* No memory attached here */

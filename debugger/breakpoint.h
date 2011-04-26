@@ -26,6 +26,8 @@
 #ifndef FUSE_DEBUGGER_BREAKPOINT_H
 #define FUSE_DEBUGGER_BREAKPOINT_H
 
+#include "memory.h"
+
 /* Types of breakpoint */
 typedef enum debugger_breakpoint_type {
   DEBUGGER_BREAKPOINT_TYPE_EXECUTE,
@@ -51,19 +53,19 @@ extern const char debugger_breakpoint_life_abbr[][5];
 
 typedef struct debugger_breakpoint_address {
 
+  /* Which memory device we are interested in. MEMORY_SOURCE_ANY for an
+     absolute address */
+  memory_page_source source;
+
+  /* The page number from the source we are interested in. Not used for
+     MEMORY_SOURCE_ANY */
   int page;
+
+  /* The offset within the page, or the absolute address for
+     MEMORY_SOURCE_ANY */
   libspectrum_word offset;
 
 } debugger_breakpoint_address;
-
-/* Offsets used to encode various bank types in the above 'page' variable */
-typedef enum breakpoint_page_offset {
-  BREAKPOINT_PAGE_RAM = 0,
-  BREAKPOINT_PAGE_ROM = 32,
-  BREAKPOINT_PAGE_DOCK = 40,
-  BREAKPOINT_PAGE_EXROM = 48,
-  BREAKPOINT_PAGE_ROMCS = 56,
-} breakpoint_page_offset;
 
 typedef struct debugger_breakpoint_port {
 

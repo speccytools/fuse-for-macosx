@@ -298,44 +298,15 @@ encode_bank_and_page( debugger_breakpoint_type type, libspectrum_word address )
 int
 debugger_page_hash( const char *text )
 {
-  int offset;
-
-  switch( tolower( (unsigned char)text[0] ) ) {
-    
-  case 'c': offset = BREAKPOINT_PAGE_ROMCS; break;
-  case 'd': offset = BREAKPOINT_PAGE_DOCK; break;
-  case 'r': offset = BREAKPOINT_PAGE_ROM; break;
-  case 'x': offset = BREAKPOINT_PAGE_EXROM; break;
-
-  default:
-    ui_error( UI_ERROR_ERROR,
-	      "%s:debugger_page_hash: unknown page letter '%c'", __FILE__,
-	      text[0] );
-    fuse_abort();
-  }
-
-  offset += atoi( &text[1] );
-
-  return offset;
+  /* MEMORYTODO: make this work */
+  return MEMORY_SOURCE_ANY;
 }
 
 char*
 debugger_breakpoint_decode_page( char *buffer, size_t n, int page )
 {
-  if( page >= BREAKPOINT_PAGE_ROMCS ) {
-    snprintf( buffer, n, "C%d", page - BREAKPOINT_PAGE_ROMCS );
-  } else if( page >= BREAKPOINT_PAGE_EXROM ) {
-    snprintf( buffer, n, "X%d", page - BREAKPOINT_PAGE_EXROM );
-  } else if( page >= BREAKPOINT_PAGE_DOCK ) {
-    snprintf( buffer, n, "D%d", page - BREAKPOINT_PAGE_DOCK );
-  } else if( page >= BREAKPOINT_PAGE_ROM ) {
-    snprintf( buffer, n, "R%d", page - BREAKPOINT_PAGE_ROM );
-  } else if( page >= BREAKPOINT_PAGE_RAM ) {
-    snprintf( buffer, n, "%d", page - BREAKPOINT_PAGE_RAM );
-  } else {
-    snprintf( buffer, n, "[Unknown page %d]", page );
-  }
-
+  /* MEMORYTODO: make this work */
+  snprintf( buffer, n, "%d", page );
   return buffer;
 }
 
