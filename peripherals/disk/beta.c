@@ -151,6 +151,7 @@ beta_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int beta_source;
 
   beta_fdc = wd_fdc_alloc_fdc( FD1793, 0, WD_FLAG_BETA128 );
   beta_fdc->current_drive = NULL;
@@ -172,7 +173,9 @@ beta_init( void )
   if( index_event == -1 ) return 1;
 
   module_register( &beta_module_info );
-  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].source = MEMORY_SOURCE_BETA;
+
+  beta_source = memory_source_register( "Betadisk" );
+  for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].source = beta_source;
 
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 

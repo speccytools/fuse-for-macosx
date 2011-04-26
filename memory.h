@@ -30,32 +30,16 @@
 
 #include "spectrum.h"
 
-typedef enum memory_page_source {
+/* Register a new memory source */
+int memory_source_register( const char *description );
 
-  /* Used by the debugger to specify an absolute address, rather than memory
-     from a specific source */ 
-  MEMORY_SOURCE_ANY = -1,
-
-  MEMORY_SOURCE_UNKNOWN = 0,
-
-  MEMORY_SOURCE_NONE, /* No memory attached here */
-
-  MEMORY_SOURCE_BETA, /* Beta128 interface */
-  MEMORY_SOURCE_DISCIPLE, /* Disciple interface */
-  MEMORY_SOURCE_DIVIDE, /* DivIDE interface */
-  MEMORY_SOURCE_DOCK, /* Timex dock */
-  MEMORY_SOURCE_EXROM, /* Timex EXROM */
-  MEMORY_SOURCE_IF1, /* Interface 1 */
-  MEMORY_SOURCE_IF2, /* Interface 2 */
-  MEMORY_SOURCE_OPUS, /* Opus interface */
-  MEMORY_SOURCE_PLUSD, /* +D interface */
-  MEMORY_SOURCE_RAM,  /* Normal system RAM */
-  MEMORY_SOURCE_ROM,  /* Normal system ROM */
-  MEMORY_SOURCE_SPECCYBOOT,  /* SpeccyBoot interface */
-  MEMORY_SOURCE_ZXATASP,  /* ZXATASP interface */
-  MEMORY_SOURCE_ZXCF,  /* ZXCF interface */
-
-} memory_page_source;
+/* Pre-created memory sources */
+extern int memory_source_rom; /* System ROM */
+extern int memory_source_ram; /* System RAM */
+extern int memory_source_dock; /* Timex DOCK */
+extern int memory_source_exrom; /* Timex EXROM */
+extern int memory_source_any; /* Used by the debugger to signify an absolute address */
+extern int memory_source_none; /* No memory attached here */
 
 typedef struct memory_page {
 
@@ -63,7 +47,7 @@ typedef struct memory_page {
   int writable;			/* Can we write to this data? */
   int contended;		/* Are reads/writes to this page contended? */
 
-  memory_page_source source;	/* Where did this page come from? */
+  int source;	                /* Where did this page come from? */
   int save_to_snapshot;         /* Set if this page should be saved snapshots
                                    (set only if this page would not normally be
                                     saved; things like RAM are always saved) */

@@ -41,6 +41,17 @@
 #include "spectrum.h"
 #include "ui/ui.h"
 
+/* The various sources of memory available to us */
+static GArray *memory_sources;
+
+/* Some "well-known" memory sources */
+int memory_source_rom; /* System ROM */
+int memory_source_ram; /* System RAM */
+int memory_source_dock; /* Timex DOCK */
+int memory_source_exrom; /* Timex EXROM */
+int memory_source_any; /* Used by the debugger to signify an absolute address */
+int memory_source_none; /* No memory attached here */
+
 /* Each 8Kb RAM chunk accessible by the Z80 */
 memory_page memory_map_read[8];
 memory_page memory_map_write[8];
@@ -96,6 +107,17 @@ memory_init( void )
   size_t i;
   memory_page *mapping1, *mapping2;
 
+  memory_sources = g_array_new( FALSE, FALSE, sizeof( const char* ) );
+  if( !memory_sources ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+    fuse_abort();
+  }
+
+  memory_source_rom = memory_source_register( "ROM" );
+  memory_source_ram = memory_source_register( "RAM" );
+  memory_source_any = memory_source_register( "Absolute address" );
+  memory_source_none = memory_source_register( "None" );
+
   /* Nothing in the memory pool as yet */
   pool = NULL;
 
@@ -106,7 +128,7 @@ memory_init( void )
     mapping1->page = NULL;
     mapping1->writable = 0;
     mapping1->page_num = i;
-    mapping1->source = MEMORY_SOURCE_ROM;
+    mapping1->source = memory_source_rom;
 
   }
 
@@ -124,7 +146,7 @@ memory_init( void )
     mapping1->offset = 0x0000;
     mapping2->offset = MEMORY_PAGE_SIZE;
 
-    mapping1->source = mapping2->source = MEMORY_SOURCE_RAM;
+    mapping1->source = mapping2->source = memory_source_ram;
   }
 
   /* Just initialise these with something */
@@ -135,6 +157,20 @@ memory_init( void )
   module_register( &memory_module_info );
 
   return 0;
+}
+
+int
+memory_source_register( const char *description )
+{
+  const char *copy = strdup( description );
+  if( !copy ) {
+    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+    fuse_abort();
+  }
+
+  g_array_append_val( memory_sources, copy );
+
+  return memory_sources->len - 1;
 }
 
 /* Allocate some memory from the pool */
@@ -195,27 +231,7 @@ memory_pool_free( void )
 const char*
 memory_bank_name( memory_page *page )
 {
-  switch( page->source ) {
-  case MEMORY_SOURCE_UNKNOWN: return "Unknown";
-  case MEMORY_SOURCE_NONE: return "None";
-  case MEMORY_SOURCE_BETA: return "Beta128";
-  case MEMORY_SOURCE_DISCIPLE: return "DISCiPLE";
-  case MEMORY_SOURCE_DIVIDE: return "DivIDE";
-  case MEMORY_SOURCE_DOCK: return "Dock";
-  case MEMORY_SOURCE_EXROM: return "EXROM";
-  case MEMORY_SOURCE_IF1: return "Interface 1";
-  case MEMORY_SOURCE_IF2: return "Interface 2";
-  case MEMORY_SOURCE_OPUS: return "Opus";
-  case MEMORY_SOURCE_PLUSD: return "+D";
-  case MEMORY_SOURCE_RAM: return "RAM";
-  case MEMORY_SOURCE_ROM: return "ROM";
-  case MEMORY_SOURCE_SPECCYBOOT: return "SpeccyBoot";
-  case MEMORY_SOURCE_ZXATASP: return "ZXATASP";
-  case MEMORY_SOURCE_ZXCF: return "ZXCF";
-  default:
-    ui_error( UI_ERROR_ERROR, "Unknown bank source %d at %s:%d", page->source, __FILE__, __LINE__ );
-    fuse_abort();
-  }
+  return g_array_index( memory_sources, const char*, page->source );
 }
 
 libspectrum_byte
@@ -276,7 +292,7 @@ memory_display_dirty_pentagon_16_col( libspectrum_word address,
      page 5 and 4 (if screen 1 is in use), and page 7 & 6 (if screen 2 is in
      use) and both the standard and ALTDFILE areas of those pages
    */
-  if( mapping->source == MEMORY_SOURCE_RAM && 
+  if( mapping->source == memory_source_ram && 
       ( ( memory_current_screen  == 5 &&
           ( mapping->page_num == 5 || mapping->page_num == 4 ) ) ||
         ( memory_current_screen  == 7 &&
@@ -299,7 +315,7 @@ memory_display_dirty_sinclair( libspectrum_word address, libspectrum_byte b ) \
 
   /* If this is a write to the current screen (and it actually changes
      the destination), redraw that bit */
-  if( mapping->source == MEMORY_SOURCE_RAM && 
+  if( mapping->source == memory_source_ram && 
       mapping->page_num == memory_current_screen &&
       ( offset2 & memory_screen_mask ) < 0x1b00 &&
       memory[ offset ] != b )
@@ -317,7 +333,7 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
     opus_write( address, b );
   } else if( mapping->writable ||
-             (mapping->source != MEMORY_SOURCE_NONE &&
+             (mapping->source != memory_source_none &&
               settings_current.writable_roms) ) {
     libspectrum_word offset = address & 0x1fff;
     libspectrum_byte *memory = mapping->page;

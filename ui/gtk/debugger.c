@@ -847,7 +847,7 @@ update_breakpoints( void )
     case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
     case DEBUGGER_BREAKPOINT_TYPE_READ:
     case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-      if( bp->value.address.page == -1 ) {
+      if( bp->value.address.page == memory_source_any ) {
 	snprintf( buffer, sizeof( buffer ), format_16_bit(),
 		  bp->value.address.offset );
       } else {

@@ -54,7 +54,7 @@
   debugger_breakpoint_type bptype;
   debugger_breakpoint_life bplife;
   struct { libspectrum_word mask, value; } port;
-  struct { memory_page_source source; int page; int offset; } location;
+  struct { int source; int page; int offset; } location;
 
   debugger_expression* exp;
 
@@ -153,7 +153,7 @@ input:	 /* empty */
 command:   BASE number { debugger_output_base = $2; }
 	 | breakpointlife breakpointtype breakpointlocation optionalcondition {
              /* MEMORYTODO: make this work for all page types */
-             debugger_breakpoint_add_address( $2, MEMORY_SOURCE_ANY, $3.offset, 0, $1,
+             debugger_breakpoint_add_address( $2, memory_source_any, $3.offset, 0, $1,
 					      $4 );
 	   }
 	 | breakpointlife PORT portbreakpointtype breakpointport optionalcondition {
@@ -205,7 +205,7 @@ breakpointport:   number { $$.mask = 0; $$.value = $1; }
 		| number ':' number { $$.mask = $1; $$.value = $3; }
 ;
 
-breakpointlocation:   numberorpc { $$.source = MEMORY_SOURCE_ANY; $$.offset = $1; }
+breakpointlocation:   numberorpc { $$.source = memory_source_any; $$.offset = $1; }
                     | STRING ':' number ':' number { $$.source = debugger_page_hash( $1 ); $$.page = $3; $$.offset = $5; }
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }

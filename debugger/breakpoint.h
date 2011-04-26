@@ -53,9 +53,9 @@ extern const char debugger_breakpoint_life_abbr[][5];
 
 typedef struct debugger_breakpoint_address {
 
-  /* Which memory device we are interested in. MEMORY_SOURCE_ANY for an
+  /* Which memory device we are interested in. memory_source_any for an
      absolute address */
-  memory_page_source source;
+  int source;
 
   /* The page number from the source we are interested in. Not used for
      MEMORY_SOURCE_ANY */

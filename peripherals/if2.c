@@ -68,9 +68,12 @@ int
 if2_init( void )
 {
   int i;
+  int if2_source;
 
   module_register( &if2_module_info );
-  for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].source = MEMORY_SOURCE_IF2;
+
+  if2_source = memory_source_register( "If2" );
+  for( i = 0; i < 2; i++ ) if2_memory_map_romcs[i].source = if2_source;
 
   periph_register( PERIPH_TYPE_INTERFACE2, &if2_periph );
 

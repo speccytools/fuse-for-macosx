@@ -293,6 +293,7 @@ int
 if1_init( void )
 {
   int m, i;
+  int if1_source;
 
   if1_ula.fd_r = -1;
   if1_ula.fd_t = -1;
@@ -330,7 +331,9 @@ if1_init( void )
   }
 
   module_register( &if1_module_info );
-  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].source = MEMORY_SOURCE_IF1;
+
+  if1_source = memory_source_register( "If1" );
+  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].source = if1_source;
 
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   if( periph_register_paging_events( event_type_string, &page_event,

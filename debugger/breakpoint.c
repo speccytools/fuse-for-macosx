@@ -299,7 +299,7 @@ int
 debugger_page_hash( const char *text )
 {
   /* MEMORYTODO: make this work */
-  return MEMORY_SOURCE_ANY;
+  return memory_source_any;
 }
 
 char*
@@ -342,9 +342,9 @@ breakpoint_check( debugger_breakpoint *bp, debugger_breakpoint_type type,
 
     page = bp->value.address.page;
 
-    /* If page == -1, value must match exactly; otherwise, the page and
+    /* If page == memory_source_any, value must match exactly; otherwise, the page and
        the offset must match */
-    if( page == -1 ) {
+    if( page == memory_source_any ) {
       if( bp->value.address.offset != value ) return 0;
     } else {
       if( page != encode_bank_and_page( type, value ) ) return 0;

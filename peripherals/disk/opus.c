@@ -126,6 +126,7 @@ opus_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int opus_source;
 
   opus_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_OPUS );
 
@@ -147,7 +148,9 @@ opus_init( void )
   index_event = event_register( opus_event_index, "Opus index" );
 
   module_register( &opus_module_info );
-  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].source = MEMORY_SOURCE_OPUS;
+
+  opus_source = memory_source_register( "Opus") ;
+  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].source = opus_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 

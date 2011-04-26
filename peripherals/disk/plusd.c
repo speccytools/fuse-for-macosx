@@ -140,6 +140,7 @@ plusd_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int plusd_source;
 
   plusd_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
@@ -161,7 +162,9 @@ plusd_init( void )
   index_event = event_register( plusd_event_index, "+D index" );
 
   module_register( &plusd_module_info );
-  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].source = MEMORY_SOURCE_PLUSD;
+
+  plusd_source = memory_source_register( "PlusD" );
+  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].source = plusd_source;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
