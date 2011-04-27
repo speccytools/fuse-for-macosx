@@ -1,5 +1,5 @@
 /* breakpoint.h: a debugger breakpoint
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -119,7 +119,7 @@ int debugger_check( debugger_breakpoint_type type, libspectrum_dword value );
 /* Add a new breakpoint */
 int
 debugger_breakpoint_add_address(
-  debugger_breakpoint_type type, int page, libspectrum_word offset,
+  debugger_breakpoint_type type, int source, int page, libspectrum_word offset,
   size_t ignore, debugger_breakpoint_life life, debugger_expression *condition
 );
 
@@ -144,8 +144,5 @@ debugger_breakpoint_add_event(
 /* Add events corresponding to all the time breakpoints to happen
    during this frame */
 int debugger_add_time_events( void );
-
-char*
-debugger_breakpoint_decode_page( char *buffer, size_t n, int page );
 
 #endif				/* #ifndef FUSE_DEBUGGER_BREAKPOINT_H */

@@ -1,5 +1,5 @@
 /* commandy.y: Parse a debugger command
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -152,9 +152,8 @@ input:	 /* empty */
 
 command:   BASE number { debugger_output_base = $2; }
 	 | breakpointlife breakpointtype breakpointlocation optionalcondition {
-             /* MEMORYTODO: make this work for all page types */
-             debugger_breakpoint_add_address( $2, memory_source_any, $3.offset, 0, $1,
-					      $4 );
+             debugger_breakpoint_add_address( $2, $3.source, $3.page, $3.offset,
+                                              0, $1, $4 );
 	   }
 	 | breakpointlife PORT portbreakpointtype breakpointport optionalcondition {
 	     int mask = $4.mask;
@@ -206,7 +205,17 @@ breakpointport:   number { $$.mask = 0; $$.value = $1; }
 ;
 
 breakpointlocation:   numberorpc { $$.source = memory_source_any; $$.offset = $1; }
-                    | STRING ':' number ':' number { $$.source = debugger_page_hash( $1 ); $$.page = $3; $$.offset = $5; }
+                    | STRING ':' number ':' number {
+                        $$.source = memory_source_find( $1 );
+                        if( $$.source == -1 ) {
+                          char buffer[80];
+                          snprintf( buffer, 80, "unknown memory source \"%s\"", $1 );
+                          yyerror( buffer );
+                          YYERROR;
+                        }
+                        $$.page = $3;
+                        $$.offset = $5;
+                      }
 
 portbreakpointtype:   READ  { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_READ; }
 		    | WRITE { $$ = DEBUGGER_BREAKPOINT_TYPE_PORT_WRITE; }

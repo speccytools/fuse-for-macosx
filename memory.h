@@ -1,5 +1,5 @@
 /* memory.h: memory access routines
-   Copyright (c) 2003-2004 Philip Kendall
+   Copyright (c) 2003-2011 Philip Kendall
 
    $Id$
 
@@ -32,6 +32,12 @@
 
 /* Register a new memory source */
 int memory_source_register( const char *description );
+
+/* Get the description for a given source */
+const char *memory_source_description( int source );
+
+/* Get the source for a given description */
+int memory_source_find( const char *description );
 
 /* Pre-created memory sources */
 extern int memory_source_rom; /* System ROM */
@@ -83,8 +89,6 @@ libspectrum_byte *memory_pool_allocate( size_t length );
 libspectrum_byte *memory_pool_allocate_persistent( size_t length,
                                                    int persistent );
 void memory_pool_free( void );
-
-const char *memory_bank_name( memory_page *page );
 
 /* Map in alternate bank if ROMCS is set */
 void memory_romcs_map( void );

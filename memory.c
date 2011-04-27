@@ -1,5 +1,5 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -173,7 +173,29 @@ memory_source_register( const char *description )
   return memory_sources->len - 1;
 }
 
+const char*
+memory_source_description( int source )
+{
+  return g_array_index( memory_sources, const char*, source );
+}
+
 /* Allocate some memory from the pool */
+int
+memory_source_find( const char *description )
+{
+  int i, source = -1;
+
+  for( i = 0; i < memory_sources->len; i++ ) {
+    const char *found = g_array_index( memory_sources, const char*, i );
+    if( !strcasecmp( description, found ) ) {
+      source = i;
+      break;
+    }
+  }
+
+  return source;
+}
+
 libspectrum_byte*
 memory_pool_allocate( size_t length )
 {
@@ -226,12 +248,6 @@ memory_pool_free( void )
     free( entry->memory );
     pool = g_slist_remove( pool, entry );
   }
-}
-
-const char*
-memory_bank_name( memory_page *page )
-{
-  return g_array_index( memory_sources, const char*, page->source );
 }
 
 libspectrum_byte
