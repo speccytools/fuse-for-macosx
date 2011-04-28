@@ -35,5 +35,5 @@ void movie_stop( void );
 void movie_pause( void );
 void movie_add_area( int x, int y, int w, int h );
 void movie_start_frame( void );
-void movie_init_sound( int freq, int stereo );
+void movie_init_sound( int f, int s );
 void movie_add_sound( libspectrum_signed_word *buf, int len );

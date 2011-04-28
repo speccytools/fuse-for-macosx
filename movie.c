@@ -138,6 +138,7 @@ static unsigned char zbuf_o[ ZBUF_SIZE ];
 static unsigned char alaw_table[2048 + 1] = { ALAW_ENC_TAB };
 
 void movie_start_frame( void );
+void movie_init_sound( int f, int s );
 
 static char
 get_timing()
@@ -243,7 +244,7 @@ movie_compress_area( int x, int y, int w, int h, int s )
 	if( l == 255 ) {		/* close run, and may start a new? */
 	  *b++ = l; *b++ = d; l = -1;
 	} else {
-    	  l++;
+	  l++;
 	}
       } else {
         *b++ = d;
@@ -327,6 +328,7 @@ movie_start_fmf( char *name )
 #else	/* HAVE_ZLIB_H */
   fwrite( "U", 1, 1, of );		/* cannot be compressed */
 #endif	/* HAVE_ZLIB_H */
+  movie_init_sound( settings_current.sound_freq, settings_current.stereo_ay );
   head[0] = settings_current.frame_rate;
   head[1] = get_screentype();
   head[2] = get_timing();
@@ -412,7 +414,7 @@ movie_init_sound( int f, int s )
     format = option_enumerate_movie_movie_compr() == 2 ? 'A' : 'P';
   freq = f;
   stereo = ( s ? 'S' : 'M' );
-  framesiz = ( s ? 2 : 1 ) * ( format == 'P' ? 2 : 1 );
+  framesiz = ( stereo == 'S' ? 2 : 1 ) * ( format == 'P' ? 2 : 1 );
 }
 
 static inline void
@@ -457,9 +459,15 @@ void
 movie_add_sound( libspectrum_signed_word *buff, int len )
 {
   while( len ) {
-    add_sound( buff, len > 65536 ? 65536 : len );
-    buff += len > 65536 ? 65536 : len;
-    len -= len > 65536 ? 65536 : len;
+    if( stereo == 'S' ) {
+      add_sound( buff, len > 131072 ? 65536 : len >> 1 );
+      buff += len > 131072 ? 131072 : len;
+      len -= len > 131072 ? 131072 : len;
+    } else {
+      add_sound( buff, len > 65536 ? 65536 : len );
+      buff += len > 65536 ? 65536 : len;
+      len -= len > 65536 ? 65536 : len;
+    }
   }
 }
 
