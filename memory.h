@@ -63,17 +63,28 @@ typedef struct memory_page {
 
 } memory_page;
 
-#define MEMORY_PAGE_SIZE 0x2000
+/* A memory page will be 1 << (this many) bytes in size */
+#define MEMORY_PAGE_SIZE_LOGARITHM 13
 
-/* Each 8Kb RAM chunk accessible by the Z80 */
-extern memory_page memory_map_read[8];
-extern memory_page memory_map_write[8];
+/* The actual size of a memory page */
+#define MEMORY_PAGE_SIZE ( 1 << MEMORY_PAGE_SIZE_LOGARITHM )
 
-/* 8 8Kb memory chunks accessible by the Z80 for normal RAM (home) and
+/* The mask to use to select the bits within a page */
+#define MEMORY_PAGE_SIZE_MASK ( MEMORY_PAGE_SIZE - 1 )
+
+/* The number of memory pages in 64K
+   This calculation is equivalent to 2^16 / MEMORY_PAGE_SIZE */
+#define MEMORY_PAGES_IN_64K ( 1 << ( 16 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
+/* Each RAM chunk accessible by the Z80 */
+extern memory_page memory_map_read[MEMORY_PAGES_IN_64K];
+extern memory_page memory_map_write[MEMORY_PAGES_IN_64K];
+
+/* Memory chunks accessible by the Z80 for normal RAM (home) and
    the Timex Dock and Exrom */
-extern memory_page *memory_map_home[8];
-extern memory_page *memory_map_dock[8];
-extern memory_page *memory_map_exrom[8];
+extern memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
+extern memory_page *memory_map_dock[MEMORY_PAGES_IN_64K];
+extern memory_page *memory_map_exrom[MEMORY_PAGES_IN_64K];
 
 extern memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
 extern memory_page memory_map_rom[ 8];
@@ -108,7 +119,7 @@ libspectrum_byte readbyte( libspectrum_word address );
 #ifndef CORETEST
 
 #define readbyte_internal( address ) \
-  memory_map_read[ (libspectrum_word)(address) >> 13 ].page[ (address) & 0x1fff ]
+  memory_map_read[ (libspectrum_word)(address) >> MEMORY_PAGE_SIZE_LOGARITHM ].page[ (address) & MEMORY_PAGE_SIZE_MASK ]
 
 #else				/* #ifndef CORETEST */
 

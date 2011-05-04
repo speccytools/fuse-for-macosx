@@ -52,15 +52,15 @@ int memory_source_exrom; /* Timex EXROM */
 int memory_source_any; /* Used by the debugger to signify an absolute address */
 int memory_source_none; /* No memory attached here */
 
-/* Each 8Kb RAM chunk accessible by the Z80 */
-memory_page memory_map_read[8];
-memory_page memory_map_write[8];
+/* Each RAM chunk accessible by the Z80 */
+memory_page memory_map_read[MEMORY_PAGES_IN_64K];
+memory_page memory_map_write[MEMORY_PAGES_IN_64K];
 
 /* Mappings for the 'home' (normal ROM/RAM) pages, the Timex DOCK and
    the Timex EXROM */
-memory_page *memory_map_home[8];
-memory_page *memory_map_dock[8];
-memory_page *memory_map_exrom[8];
+memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
+memory_page *memory_map_dock[MEMORY_PAGES_IN_64K];
+memory_page *memory_map_exrom[MEMORY_PAGES_IN_64K];
 
 /* Standard mappings for the 'normal' RAM */
 memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
@@ -256,7 +256,7 @@ readbyte( libspectrum_word address )
   libspectrum_word bank;
   memory_page *mapping;
 
-  bank = address >> 13;
+  bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   mapping = &memory_map_read[ bank ];
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE )
@@ -268,7 +268,7 @@ readbyte( libspectrum_word address )
   if( opus_active && address >= 0x2800 && address < 0x3800 )
     return opus_read( address );
 
-  return mapping->page[ address & 0x1fff ];
+  return mapping->page[ address & MEMORY_PAGE_SIZE_MASK ];
 }
 
 void
@@ -277,7 +277,7 @@ writebyte( libspectrum_word address, libspectrum_byte b )
   libspectrum_word bank;
   memory_page *mapping;
 
-  bank = address >> 13;
+  bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   mapping = &memory_map_write[ bank ];
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE )
@@ -294,9 +294,9 @@ void
 memory_display_dirty_pentagon_16_col( libspectrum_word address,
                                       libspectrum_byte b )
 {
-  libspectrum_word bank = address >> 13;
+  libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
-  libspectrum_word offset = address & 0x1fff;
+  libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
   libspectrum_byte *memory = mapping->page;
 
   /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
@@ -321,9 +321,9 @@ memory_display_dirty_pentagon_16_col( libspectrum_word address,
 void
 memory_display_dirty_sinclair( libspectrum_word address, libspectrum_byte b ) \
 {
-  libspectrum_word bank = address >> 13;
+  libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
-  libspectrum_word offset = address & 0x1fff;
+  libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
   libspectrum_byte *memory = mapping->page;
 
   /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
@@ -343,7 +343,7 @@ memory_display_dirty_fn memory_display_dirty;
 void
 writebyte_internal( libspectrum_word address, libspectrum_byte b )
 {
-  libspectrum_word bank = address >> 13;
+  libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
 
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
@@ -351,7 +351,7 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
   } else if( mapping->writable ||
              (mapping->source != memory_source_none &&
               settings_current.writable_roms) ) {
-    libspectrum_word offset = address & 0x1fff;
+    libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
     libspectrum_byte *memory = mapping->page;
 
     memory_display_dirty( address, b );

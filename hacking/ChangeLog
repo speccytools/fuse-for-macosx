@@ -3629,3 +3629,5 @@
          along with older autotools (patch #3295662) (thanks, Tomáš Franke)
          (Sergio Baldoví)
 20110504 tape.c: fix warnings.
+20110505 memory.[ch],peripherals/ula.c: first bits of general memory page
+         sizing.
