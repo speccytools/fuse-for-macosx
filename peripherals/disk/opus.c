@@ -2,7 +2,7 @@
    Copyright (c) 1999-2009 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Dmitry Sanarin, Darren Salt, Michael D Wynne, Gergely Szasz
 
-   $Id: opus.c 4012 2009-04-16 12:42:14Z fredm $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
    Philip: philip-fuse@shadowmagic.org.uk
 
-   Stuart: sdbrady@ntlworld.com
+   Stuart: stuart.brady@gmail.com
 
 */
 
@@ -126,6 +126,7 @@ opus_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int opus_source;
 
   opus_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_OPUS );
 
@@ -147,7 +148,9 @@ opus_init( void )
   index_event = event_register( opus_event_index, "Opus index" );
 
   module_register( &opus_module_info );
-  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  opus_source = memory_source_register( "Opus") ;
+  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].source = opus_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 
@@ -177,10 +180,7 @@ opus_reset( int hard_reset )
     return;
   }
 
-  opus_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
   opus_memory_map_romcs[1].page = opus_ram;
-  opus_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
 
@@ -364,7 +364,7 @@ opus_disk_insert( opus_drive_number which, const char *filename,
   /* Eject any disk already in the drive */
   if( d->fdd.loaded ) {
     /* Abort the insert if we want to keep the current disk */
-    if( opus_disk_eject( which, 0 ) ) return 0;
+    if( opus_disk_eject( which ) ) return 0;
   }
 
   if( filename ) {
@@ -421,7 +421,7 @@ opus_disk_insert( opus_drive_number which, const char *filename,
 }
 
 int
-opus_disk_eject( opus_drive_number which, int saveas )
+opus_disk_eject( opus_drive_number which )
 {
   wd_fdc_drive *d;
 
@@ -433,33 +433,23 @@ opus_disk_eject( opus_drive_number which, int saveas )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+  if( d->disk.dirty ) {
 
-    if( d->disk.filename == NULL ) saveas = 1;
-    if( ui_opus_disk_write( which, 2 - saveas ) ) return 1;
-    d->disk.dirty = 0;
-    return 0;
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Disk in Opus Discovery drive %c has been modified.\n"
+      "Do you want to save it?",
+      which == OPUS_DRIVE_1 ? '1' : '2'
+    );
 
-  } else {
+    switch( confirm ) {
 
-    if( d->disk.dirty ) {
+    case UI_CONFIRM_SAVE_SAVE:
+      if( opus_disk_save( which, 0 ) ) return 1;	/* first save */
+      break;
 
-      ui_confirm_save_t confirm = ui_confirm_save(
-	"Disk in Opus Discovery drive %c has been modified.\n"
-	"Do you want to save it?",
-	which == OPUS_DRIVE_1 ? '1' : '2'
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( opus_disk_eject( which, 2 ) ) return 1;	/* first save */
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -475,6 +465,25 @@ opus_disk_eject( opus_drive_number which, int saveas )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS_2_EJECT, 0 );
     break;
   }
+  return 0;
+}
+
+int
+opus_disk_save( opus_drive_number which, int saveas )
+{
+  wd_fdc_drive *d;
+
+  if( which >= OPUS_NUM_DRIVES )
+    return 1;
+
+  d = &opus_drives[ which ];
+
+  if( d->disk.type == DISK_TYPE_NONE )
+    return 0;
+
+  if( d->disk.filename == NULL ) saveas = 1;
+  if( ui_opus_disk_write( which, saveas ) ) return 1;
+  d->disk.dirty = 0;
   return 0;
 }
 
@@ -708,7 +717,7 @@ opus_from_snapshot( libspectrum_snap *snap )
 }
 
 static void
-opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
+opus_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
   int drive_count = 0;
@@ -720,7 +729,7 @@ opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   buffer = alloc_and_copy_page( opus_memory_map_romcs[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_opus_rom( snap, 0, buffer );
-  if( opus_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+  if( opus_memory_map_romcs[0].save_to_snapshot )
     libspectrum_snap_set_opus_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( opus_ram );

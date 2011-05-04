@@ -22,7 +22,7 @@
 
    Philip: philip-fuse@shadowmagic.org.uk
 
-   Stuart: sdbrady@ntlworld.com
+   Stuart: stuart.brady@gmail.com
 
 */
 
@@ -140,6 +140,7 @@ plusd_init( void )
 {
   int i;
   wd_fdc_drive *d;
+  int plusd_source;
 
   plusd_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_NONE );
 
@@ -161,7 +162,9 @@ plusd_init( void )
   index_event = event_register( plusd_event_index, "+D index" );
 
   module_register( &plusd_module_info );
-  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  plusd_source = memory_source_register( "PlusD" );
+  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].source = plusd_source;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
@@ -191,10 +194,7 @@ plusd_reset( int hard_reset )
     return;
   }
 
-  plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
-
   plusd_memory_map_romcs[1].page = plusd_ram;
-  plusd_memory_map_romcs[1].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
 
@@ -388,7 +388,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
   /* Eject any disk already in the drive */
   if( d->fdd.loaded ) {
     /* Abort the insert if we want to keep the current disk */
-    if( plusd_disk_eject( which, 0 ) ) return 0;
+    if( plusd_disk_eject( which ) ) return 0;
   }
 
   if( filename ) {
@@ -444,7 +444,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 }
 
 int
-plusd_disk_eject( plusd_drive_number which, int saveas )
+plusd_disk_eject( plusd_drive_number which )
 {
   wd_fdc_drive *d;
 
@@ -456,33 +456,23 @@ plusd_disk_eject( plusd_drive_number which, int saveas )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+  if( d->disk.dirty ) {
 
-    if( d->disk.filename == NULL ) saveas = 1;
-    if( ui_plusd_disk_write( which, 2 - saveas ) ) return 1;
-    d->disk.dirty = 0;
-    return 0;
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Disk in +D drive %c has been modified.\n"
+      "Do you want to save it?",
+      which == PLUSD_DRIVE_1 ? '1' : '2'
+    );
 
-  } else {
+    switch( confirm ) {
 
-    if( d->disk.dirty ) {
+    case UI_CONFIRM_SAVE_SAVE:
+      if( plusd_disk_save( which, 0 ) ) return 1;	/* first save */
+      break;
 
-      ui_confirm_save_t confirm = ui_confirm_save(
-	"Disk in +D drive %c has been modified.\n"
-	"Do you want to save it?",
-	which == PLUSD_DRIVE_1 ? '1' : '2'
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( plusd_disk_eject( which, 2 ) ) return 1;	/* first save */
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -498,6 +488,25 @@ plusd_disk_eject( plusd_drive_number which, int saveas )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT, 0 );
     break;
   }
+  return 0;
+}
+
+int
+plusd_disk_save( plusd_drive_number which, int saveas )
+{
+  wd_fdc_drive *d;
+
+  if( which >= PLUSD_NUM_DRIVES )
+    return 1;
+
+  d = &plusd_drives[ which ];
+
+  if( d->disk.type == DISK_TYPE_NONE )
+    return 0;
+
+  if( d->disk.filename == NULL ) saveas = 1;
+  if( ui_plusd_disk_write( which, saveas ) ) return 1;
+  d->disk.dirty = 0;
   return 0;
 }
 
@@ -673,7 +682,7 @@ plusd_from_snapshot( libspectrum_snap *snap )
 }
 
 static void
-plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
+plusd_to_snapshot( libspectrum_snap *snap )
 {
   libspectrum_byte *buffer;
   int drive_count = 0;
@@ -685,7 +694,7 @@ plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   buffer = alloc_and_copy_page( plusd_memory_map_romcs[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_plusd_rom( snap, 0, buffer );
-  if( plusd_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM )
+  if( plusd_memory_map_romcs[0].save_to_snapshot )
     libspectrum_snap_set_plusd_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( plusd_ram );

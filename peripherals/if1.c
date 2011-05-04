@@ -293,6 +293,7 @@ int
 if1_init( void )
 {
   int m, i;
+  int if1_source;
 
   if1_ula.fd_r = -1;
   if1_ula.fd_t = -1;
@@ -330,7 +331,9 @@ if1_init( void )
   }
 
   module_register( &if1_module_info );
-  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
+
+  if1_source = memory_source_register( "If1" );
+  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].source = if1_source;
 
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
@@ -376,8 +379,6 @@ if1_reset( int hard_reset GCC_UNUSED )
     periph_activate_type( PERIPH_TYPE_INTERFACE1, 0 );
     return;
   }
-
-  if1_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
   machine_current->ram.romcs = 0;
   
@@ -465,10 +466,10 @@ if1_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_interface1_paged ( snap, if1_active );
   libspectrum_snap_set_interface1_drive_count( snap, 8 );
 
-  if( if1_memory_map_romcs[0].source == MEMORY_SOURCE_CUSTOMROM ) {
+  if( if1_memory_map_romcs[0].save_to_snapshot ) {
     size_t rom_length = MEMORY_PAGE_SIZE;
 
-    if( if1_memory_map_romcs[1].source == MEMORY_SOURCE_CUSTOMROM ) {
+    if( if1_memory_map_romcs[1].save_to_snapshot ) {
       rom_length <<= 1;
     }
 
@@ -638,7 +639,7 @@ port_ctr_in( void )
 */
 
 static int
-read_rs232()
+read_rs232( void )
 {
   if( if1_ula.rs232_buffer <= 0xff ) {	/* we read from the buffer */
     if1_ula.data_in = if1_ula.rs232_buffer;
@@ -1116,7 +1117,7 @@ if1_mdr_insert( int which, const char *filename )
   /* Eject any cartridge already in the drive */
   if( mdr->inserted ) {
     /* Abort the insert if we want to keep the current cartridge */
-    if( if1_mdr_eject( which, 0 ) ) return 0;
+    if( if1_mdr_eject( which ) ) return 0;
   }
 
   if( filename == NULL ) {	/* insert new unformatted cartridge */
@@ -1153,7 +1154,7 @@ if1_mdr_insert( int which, const char *filename )
 }
 
 int
-if1_mdr_eject( int which, int saveas )
+if1_mdr_eject( int which )
 {
   microdrive_t *mdr;
 
@@ -1165,33 +1166,23 @@ if1_mdr_eject( int which, int saveas )
   if( !mdr->inserted )
     return 0;
 
-  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+  if( mdr->modified ) {
 
-    if( mdr->filename == NULL ) saveas = 1;
-    if( ui_mdr_write( which, 2 - saveas ) ) return 1;
-    mdr->modified = 0;
-    return 0;
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Cartridge in Microdrive %i has been modified.\n"
+      "Do you want to save it?",
+      which + 1
+    );
 
-  } else {
+    switch( confirm ) {
 
-    if( mdr->modified ) {
+    case UI_CONFIRM_SAVE_SAVE:
+      if( if1_mdr_save( which, 0 ) ) return 1;	/* first save */
+      break;
 
-      ui_confirm_save_t confirm = ui_confirm_save(
-	"Cartridge in Microdrive %i has been modified.\n"
-	"Do you want to save it?",
-	which + 1
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( if1_mdr_eject( which, 2 ) ) return 1;	/* first save */
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -1202,6 +1193,25 @@ if1_mdr_eject( int which, int saveas )
   }
 
   update_menu( UMENU_MDRV1 + which );
+  return 0;
+}
+
+int
+if1_mdr_save( int which, int saveas )
+{
+  microdrive_t *mdr;
+
+  if( which >= 8 )
+    return 1;
+
+  mdr = &microdrive[ which ];
+
+  if( !mdr->inserted )
+    return 0;
+
+  if( mdr->filename == NULL ) saveas = 1;
+  if( ui_mdr_write( which, saveas ) ) return 1;
+  mdr->modified = 0;
   return 0;
 }
 

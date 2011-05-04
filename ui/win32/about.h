@@ -1,5 +1,5 @@
-/* xjoystick.c: Joystick emulation
-   Copyright (c) 2003 Darren Salt
+/* about.h: about dialog box
+   Copyright (c) 2011 Philip Kendall
 
    $Id$
 
@@ -21,19 +21,10 @@
 
    E-mail: philip-fuse@shadowmagic.org.uk
 
-   Darren: linux@youmustbejoking.demon.co.uk
-
 */
 
-#include <config.h>
-#include "peripherals/joystick.h"
-
-#if !defined USE_JOYSTICK || defined HAVE_JSW_H
-/* Fake joystick, or override UI-specific handling */
-#include "../uijoystick.c"
-
-#else			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
-
-#include "../sdl/sdljoystick.c"
-
-#endif
+#define IDD_ABOUT                  1800
+#define IDC_ABOUT_STATIC_VERSION   1801
+#define IDC_ABOUT_STATIC_NAME      1802
+#define IDC_ABOUT_STATIC_COPYRIGHT 1802
+#define IDC_ABOUT_STATIC_WEBSITE   1804
