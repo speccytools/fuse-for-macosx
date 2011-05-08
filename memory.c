@@ -63,12 +63,10 @@ memory_page *memory_map_dock[MEMORY_PAGES_IN_64K];
 memory_page *memory_map_exrom[MEMORY_PAGES_IN_64K];
 
 /* Standard mappings for the 'normal' RAM */
-memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
-
-#define SPECTRUM_ROM_PAGES 4
+memory_page memory_map_ram[SPECTRUM_RAM_PAGES * MEMORY_PAGES_IN_16K];
 
 /* Standard mappings for the ROMs */
-memory_page memory_map_rom[ 2 * SPECTRUM_ROM_PAGES ];
+memory_page memory_map_rom[SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K];
 
 /* Some allocated memory */
 typedef struct memory_pool_entry_t {
@@ -104,14 +102,9 @@ static module_info_t memory_module_info = {
 int
 memory_init( void )
 {
-  size_t i;
-  memory_page *mapping1, *mapping2;
+  size_t i, j;
 
   memory_sources = g_array_new( FALSE, FALSE, sizeof( const char* ) );
-  if( !memory_sources ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
-    fuse_abort();
-  }
 
   memory_source_rom = memory_source_register( "ROM" );
   memory_source_ram = memory_source_register( "RAM" );
@@ -121,36 +114,24 @@ memory_init( void )
   /* Nothing in the memory pool as yet */
   pool = NULL;
 
-  for( i = 0; i < 8; i++ ) {
-
-    mapping1 = &memory_map_rom[ i ];
-
-    mapping1->page = NULL;
-    mapping1->writable = 0;
-    mapping1->page_num = i;
-    mapping1->source = memory_source_rom;
-
-  }
-
-  for( i = 0; i < SPECTRUM_RAM_PAGES; i++ ) {
-
-    mapping1 = &memory_map_ram[ 2 * i     ];
-    mapping2 = &memory_map_ram[ 2 * i + 1 ];
-
-    mapping1->page = &RAM[i][ 0x0000 ];
-    mapping2->page = &RAM[i][ MEMORY_PAGE_SIZE ];
-
-    mapping1->writable = mapping2->writable = 0;
-    mapping1->page_num = mapping2->page_num = i;
-
-    mapping1->offset = 0x0000;
-    mapping2->offset = MEMORY_PAGE_SIZE;
-
-    mapping1->source = mapping2->source = memory_source_ram;
-  }
+  for( i = 0; i < SPECTRUM_ROM_PAGES; i++ )
+    for( j = 0; j < MEMORY_PAGES_IN_16K; j++ ) {
+      memory_page *page = &memory_map_rom[i * MEMORY_PAGES_IN_16K + j];
+      page->writable = 0;
+      page->source = memory_source_rom;
+    }
+    
+  for( i = 0; i < SPECTRUM_RAM_PAGES; i++ )
+    for( j = 0; j < MEMORY_PAGES_IN_16K; j++ ) {
+      memory_page *page = &memory_map_ram[i * MEMORY_PAGES_IN_16K + j];
+      page->page = &RAM[i][j * MEMORY_PAGE_SIZE];
+      page->page_num = i;
+      page->offset = j * MEMORY_PAGE_SIZE;
+      page->source = memory_source_ram;
+    }
 
   /* Just initialise these with something */
-  for( i = 0; i < 8; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_home[i] = memory_map_dock[i] = memory_map_exrom[i] =
       &memory_map_ram[0];
 
@@ -247,6 +228,21 @@ memory_pool_free( void )
     memory_pool_entry_t *entry = ptr->data;
     free( entry->memory );
     pool = g_slist_remove( pool, entry );
+  }
+}
+
+/* Map 16K of memory */
+void
+memory_map_16k( libspectrum_word address, memory_page *source, int page_num,
+  int writable, int contended )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
+    memory_page *page = &source[ page_num * MEMORY_PAGES_IN_16K + i ];
+    page->writable = writable;
+    page->contended = contended;
+    memory_map_home[ ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i ] = page;
   }
 }
 
@@ -438,7 +434,7 @@ memory_custom_rom( void )
 {
   size_t i;
 
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ )
+  for( i = 0; i < SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K; i++ )
     if( memory_map_rom[ i ].save_to_snapshot )
       return 1;
 
@@ -451,7 +447,7 @@ memory_reset( void )
 {
   size_t i;
 
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ )
+  for( i = 0; i < SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K; i++ )
     memory_map_rom[ i ].save_to_snapshot = 0;
 }
 
@@ -470,7 +466,7 @@ memory_rom_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_custom_rom( snap, 1 );
 
   /* write all ROMs to the snap */
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
+  for( i = 0; i < SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K; i++ ) {
     if( memory_map_rom[ i ].page ) {
       if( current_page_num != memory_map_rom[ i ].page_num ) {
         if( current_rom )

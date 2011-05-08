@@ -1,5 +1,5 @@
 /* machine.h: Routines for handling the various machine types
-   Copyright (c) 1999-2008 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -31,9 +31,9 @@
 #include <libspectrum.h>
 
 #include "display.h"
-#include "memory.h"
 #include "peripherals/ay.h"
 #include "peripherals/specdrum.h"
+#include "spectrum.h"
 
 typedef libspectrum_byte (*spectrum_unattached_port_fn)( void );
 

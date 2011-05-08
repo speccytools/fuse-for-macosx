@@ -107,31 +107,16 @@ spec48_common_reset( void )
 {
   size_t i;
 
-  /* ROM 0, RAM 5, RAM 2, RAM 0 */
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
+  /* 0x0000: ROM 0, not writable, not contended */
+  memory_map_16k( 0x0000, memory_map_rom, 0, 0, 0 );
+  /* 0x4000: RAM 5, writable, contended */
+  memory_map_16k( 0x4000, memory_map_ram, 5, 1, 1 );
+  /* 0x8000: RAM 2, writable, not contended */
+  memory_map_16k( 0x8000, memory_map_ram, 2, 1, 0 );
+  /* 0xc000: RAM 0, writable, not contended */
+  memory_map_16k( 0xc000, memory_map_ram, 0, 1, 0 );
 
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
-
-  memory_map_home[6] = &memory_map_ram[ 0];
-  memory_map_home[7] = &memory_map_ram[ 1];
-
-  /* 0x4000 - 0x7fff contended */
-  memory_map_home[2]->contended = memory_map_home[3]->contended = 1;
-
-  /* 0x8000 - 0xffff not contended */
-  memory_map_home[ 4]->contended = memory_map_home[ 5]->contended = 0;
-  memory_map_home[ 6]->contended = memory_map_home[ 7]->contended = 0;
-
-  /* Mark as present/writeable */
-  for( i = 2; i < 8; ++i )
-    memory_map_home[i]->writable = 1;
-
-  for( i = 0; i < 8; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   return 0;

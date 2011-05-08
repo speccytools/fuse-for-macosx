@@ -28,8 +28,6 @@
 
 #include <libspectrum.h>
 
-#include "spectrum.h"
-
 /* Register a new memory source */
 int memory_source_register( const char *description );
 
@@ -63,7 +61,9 @@ typedef struct memory_page {
 
 } memory_page;
 
-/* A memory page will be 1 << (this many) bytes in size */
+/* A memory page will be 1 << (this many) bytes in size
+   ie 12 => 4 Kb, 13 => 8 Kb, 14 => 16 Kb
+ */
 #define MEMORY_PAGE_SIZE_LOGARITHM 13
 
 /* The actual size of a memory page */
@@ -76,6 +76,9 @@ typedef struct memory_page {
    This calculation is equivalent to 2^16 / MEMORY_PAGE_SIZE */
 #define MEMORY_PAGES_IN_64K ( 1 << ( 16 - MEMORY_PAGE_SIZE_LOGARITHM ) )
 
+/* The number of memory pages in 16K */
+#define MEMORY_PAGES_IN_16K ( 1 << ( 14 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
 /* Each RAM chunk accessible by the Z80 */
 extern memory_page memory_map_read[MEMORY_PAGES_IN_64K];
 extern memory_page memory_map_write[MEMORY_PAGES_IN_64K];
@@ -86,8 +89,14 @@ extern memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
 extern memory_page *memory_map_dock[MEMORY_PAGES_IN_64K];
 extern memory_page *memory_map_exrom[MEMORY_PAGES_IN_64K];
 
-extern memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
-extern memory_page memory_map_rom[ 8];
+/* The number of 16Kb RAM pages we support: 1040 Kb needed for the Pentagon 1024 */
+#define SPECTRUM_RAM_PAGES 65
+
+/* The maximum number of 16Kb ROMs we support */
+#define SPECTRUM_ROM_PAGES 4
+
+extern memory_page memory_map_ram[SPECTRUM_RAM_PAGES * MEMORY_PAGES_IN_16K];
+extern memory_page memory_map_rom[SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K];
 
 /* Which RAM page contains the current screen */
 extern int memory_current_screen;
@@ -110,6 +119,10 @@ int memory_custom_rom( void );
 /* Reset any memory configuration that may have changed in the machine
    configuration */
 void memory_reset( void );
+
+/* Map 16K of memory */
+void memory_map_16k( libspectrum_word address, memory_page *source,
+  int page_num, int writable, int contended );
 
 libspectrum_byte readbyte( libspectrum_word address );
 

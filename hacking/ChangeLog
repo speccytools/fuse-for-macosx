@@ -3631,3 +3631,5 @@
 20110504 tape.c: fix warnings.
 20110505 memory.[ch],peripherals/ula.c: first bits of general memory page
          sizing.
+20110508 memory.[ch],machine.h,machines/spec48.c,spectrum.h,z80/z80_macros.h:
+         base 48K Spectrum working with a page size of 4Kb.
