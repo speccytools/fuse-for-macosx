@@ -214,7 +214,7 @@ beta_reset( int hard_reset GCC_UNUSED )
   }
 
   if( !beta_builtin ) {
-    if( machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
+    if( machine_load_rom_bank( beta_memory_map_romcs, 0,
 			       settings_current.rom_beta128,
 			       settings_default.rom_beta128, 0x4000 ) ) {
       beta_active = 0;
@@ -743,10 +743,9 @@ beta_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_beta_custom_rom( snap ) &&
       libspectrum_snap_beta_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             beta_memory_map_romcs, 0, 0,
+                             beta_memory_map_romcs, 0,
                              libspectrum_snap_beta_rom( snap, 0 ),
-                             MEMORY_PAGE_SIZE * 2,
-                             1 ) )
+                             0x4000, 1 ) )
     return;
 
   /* ignore drive count for now, there will be an issue with loading snaps where

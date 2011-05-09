@@ -68,10 +68,10 @@ spec128_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_128_0,
+  error = machine_load_rom( 0, settings_current.rom_128_0,
                             settings_default.rom_128_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_128_1,
+  error = machine_load_rom( 1, settings_current.rom_128_1,
                             settings_default.rom_128_1, 0x4000 );
   if( error ) return error;
 
@@ -136,16 +136,14 @@ spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
 void
 spec128_select_rom( int rom )
 {
-  memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
-  memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
+  memory_map_16k( 0x0000, memory_map_rom, rom );
   machine_current->ram.current_rom = rom;
 }
 
 void
 spec128_select_page( int page )
 {
-  memory_map_home[6] = &memory_map_ram[ 2 * page     ];
-  memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
+  memory_map_16k( 0xc000, memory_map_ram, page );
   machine_current->ram.current_page = page;
 }
 
@@ -170,7 +168,7 @@ spec128_memory_map( void )
   spec128_select_rom( rom );
   spec128_select_page( page );
 
-  for( i = 0; i < 8; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();

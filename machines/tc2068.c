@@ -121,10 +121,10 @@ tc2068_reset( void )
   size_t i;
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_tc2068_0,
+  error = machine_load_rom( 0, settings_current.rom_tc2068_0,
                             settings_default.rom_tc2068_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, -1, settings_current.rom_tc2068_1,
+  error = machine_load_rom( 1, settings_current.rom_tc2068_1,
                             settings_default.rom_tc2068_1, 0x2000 );
   if( error ) return error;
 

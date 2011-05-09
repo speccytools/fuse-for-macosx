@@ -1,5 +1,5 @@
 /* opus.c: Routines for handling the Opus Discovery interface
-   Copyright (c) 1999-2009 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 1999-2011 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Dmitry Sanarin, Darren Salt, Michael D Wynne, Gergely Szasz
 
    $Id$
@@ -172,7 +172,7 @@ opus_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_OPUS ) )
     return;
 
-  if( machine_load_rom_bank( opus_memory_map_romcs, 0, 0,
+  if( machine_load_rom_bank( opus_memory_map_romcs, 0,
                              settings_current.rom_opus,
                              settings_default.rom_opus, 0x2000 ) ) {
     settings_current.opus = 0;
@@ -680,10 +680,9 @@ opus_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_opus_custom_rom( snap ) &&
       libspectrum_snap_opus_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             opus_memory_map_romcs, 0, 0,
+                             opus_memory_map_romcs, 0,
                              libspectrum_snap_opus_rom( snap, 0 ),
-                             MEMORY_PAGE_SIZE,
-                             1 ) )
+                             0x2000, 1 ) )
     return;
 
   if( libspectrum_snap_opus_ram( snap, 0 ) ) {

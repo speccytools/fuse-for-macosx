@@ -200,7 +200,6 @@ memory_pool_allocate_persistent( size_t length, int persistent )
   entry = malloc( sizeof( *entry ) );
   if( !entry ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    free( memory );
     fuse_abort();
   }
 
@@ -413,11 +412,9 @@ memory_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_custom_rom( snap ) ) {
     for( i = 0; i < libspectrum_snap_custom_rom_pages( snap ) && i < 4; i++ ) {
       if( libspectrum_snap_roms( snap, i ) ) {
-        machine_load_rom_bank_from_buffer(
-                                         memory_map_rom, i * 2,
-                                         i, libspectrum_snap_roms( snap, i ),
-                                         libspectrum_snap_rom_length( snap, i ),
-                                         1 );
+        machine_load_rom_bank_from_buffer( memory_map_rom, i,
+          libspectrum_snap_roms( snap, i ),
+          libspectrum_snap_rom_length( snap, i ), 1 );
       }
     }
 

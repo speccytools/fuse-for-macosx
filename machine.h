@@ -98,14 +98,12 @@ int machine_select( libspectrum_machine type );
 int machine_select_id( const char *id );
 const char* machine_get_id( libspectrum_machine type );
 
-int machine_load_rom_bank_from_buffer( memory_page* bank_map, size_t which,
-                                       int page_num, unsigned char *buffer,
-                                       size_t length, int custom );
-int machine_load_rom_bank( memory_page* bank_map, size_t which, int page_num,
-                           const char *filename, const char *fallback,
-                           size_t expected_length );
-int machine_load_rom( size_t which, int page_num, const char *filename,
-                      const char *fallback, size_t expected_length );
+int machine_load_rom_bank_from_buffer( memory_page* bank_map, int page_num,
+  unsigned char *buffer, size_t length, int custom );
+int machine_load_rom_bank( memory_page* bank_map, int page_num,
+  const char *filename, const char *fallback, size_t expected_length );
+int machine_load_rom( int page_num, const char *filename, const char *fallback,
+  size_t expected_length );
 
 int machine_reset( int hard_reset );
 int machine_end( void );

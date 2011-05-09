@@ -3635,3 +3635,9 @@
          base 48K Spectrum working with a page size of 4Kb.
 20110509 machine.c,machines/{spec128.c,spec48.c},memory.[ch]: get 128K machine
          working working with 8Kb pages again.
+20110509 machine.[ch],machines/{pentagon1024.c,pentagon512.c,pentagon.c,
+         scorpion.c,spec128.c,spec16.c,spec48.c,spec48_ntsc.c,specplus2a.c,
+         specplus2.c,specplus3.c,specplus3e.c,spec_se.c,tc2048.c,tc2068.c,
+         ts2068.c},memory.[ch], peripherals/{disk/beta.c,disciple.c,opus.c,
+         plusd.c},if1.c,if2.c,speccyboot.c}: get 128K machine working with 4Kb
+         pages.

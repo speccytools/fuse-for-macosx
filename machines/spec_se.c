@@ -1,9 +1,5 @@
 /* spec_se.c: ZX Spectrum SE specific routines
-   Copyright (c) 2003 Darren Salt
-   Copyright (c) 2004 Fredrick Meunier, Philip Kendall
-   Based on tc2048.c
-   Copyright (c) 1999-2002 Philip Kendall
-   Copyright (c) 2002-2003 Fredrick Meunier
+   Copyright (c) 1999-2011 Fredrick Meunier, Philip Kendall, Darren Salt
 
    $Id$
 
@@ -105,10 +101,10 @@ spec_se_reset( void )
 
   error = dock_exrom_reset(); if( error ) return error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_spec_se_0,
+  error = machine_load_rom( 0, settings_current.rom_spec_se_0,
                             settings_default.rom_spec_se_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_spec_se_1,
+  error = machine_load_rom( 1, settings_current.rom_spec_se_1,
                             settings_default.rom_spec_se_1, 0x4000 );
   if( error ) return error;
 

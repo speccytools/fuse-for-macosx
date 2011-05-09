@@ -1,5 +1,5 @@
 /* scld.c: Routines for handling the Timex SCLD
-   Copyright (c) 2002-2006 Fredrick Meunier, Philip Kendall, Witold Filipczyk
+   Copyright (c) 2002-2011 Fredrick Meunier, Philip Kendall, Witold Filipczyk
 
    $Id$
 

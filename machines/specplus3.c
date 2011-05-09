@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2007 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -151,16 +151,16 @@ specplus3_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus3_0,
+  error = machine_load_rom( 0, settings_current.rom_plus3_0,
                             settings_default.rom_plus3_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus3_1,
+  error = machine_load_rom( 1, settings_current.rom_plus3_1,
                             settings_default.rom_plus3_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_plus3_2,
+  error = machine_load_rom( 2, settings_current.rom_plus3_2,
                             settings_default.rom_plus3_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 6, 3, settings_current.rom_plus3_3,
+  error = machine_load_rom( 3, settings_current.rom_plus3_3,
                             settings_default.rom_plus3_3, 0x4000 );
   if( error ) return error;
 
