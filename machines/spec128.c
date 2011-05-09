@@ -103,31 +103,19 @@ spec128_common_reset( int contention )
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
 
-  /* ROM 0, RAM 5, RAM 2, RAM 0 */
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
-
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
-
-  memory_map_home[6] = &memory_map_ram[ 0];
-  memory_map_home[7] = &memory_map_ram[ 1];
-
-  /* Mark as present/writeable */
-  for( i = 0; i < 16; i++ )
-    memory_map_ram[i].writable = 1;
-
   /* Odd pages contended on the 128K/+2; the loop is up to 16 to
      ensure all of the Scorpion's 256Kb RAM is not contended */
   for( i = 0; i < 16; i++ )
-    memory_map_ram[ 2 * i     ].contended =
-      memory_map_ram[ 2 * i + 1 ].contended = i & 1 ? contention : 0;
+    memory_ram_set_16k_contention( i, i & 1 ? contention : 0 );
 
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
+  /* 0x0000: ROM 0 */
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  /* 0x4000: RAM 5 */
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  /* 0x8000: RAM 2 */
+  memory_map_16k( 0x8000, memory_map_ram, 2 );
+  /* 0xc000: RAM 0 */
+  memory_map_16k( 0xc000, memory_map_ram, 0 );
 
   return 0;
 }

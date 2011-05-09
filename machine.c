@@ -1,5 +1,5 @@
 /* machine.c: Routines for handling the various machine types
-   Copyright (c) 1999-2008 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -200,7 +200,7 @@ machine_get_id( libspectrum_machine type )
 static int
 machine_select_machine( fuse_machine_info *machine )
 {
-  int width, height, i;
+  int width, height;
   int capabilities;
 
   machine_current = machine;
@@ -233,12 +233,6 @@ machine_select_machine( fuse_machine_info *machine )
   if( uidisplay_init( width, height ) ) return 1;
 
   sound_init( settings_current.sound_device );
-
-  /* Mark RAM as not-present/read-only. The machine's reset function will
-   * mark available pages as present/writeable.
-   */
-  for( i = 0; i < 2 * SPECTRUM_RAM_PAGES; i++ )
-    memory_map_ram[i].writable = 0;
 
   /* Do a hard reset */
   if( machine_reset( 1 ) ) return 1;

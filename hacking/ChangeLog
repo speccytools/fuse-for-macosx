@@ -3633,3 +3633,5 @@
          sizing.
 20110508 memory.[ch],machine.h,machines/spec48.c,spectrum.h,z80/z80_macros.h:
          base 48K Spectrum working with a page size of 4Kb.
+20110509 machine.c,machines/{spec128.c,spec48.c},memory.[ch]: get 128K machine
+         working working with 8Kb pages again.

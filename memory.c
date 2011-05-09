@@ -118,6 +118,7 @@ memory_init( void )
     for( j = 0; j < MEMORY_PAGES_IN_16K; j++ ) {
       memory_page *page = &memory_map_rom[i * MEMORY_PAGES_IN_16K + j];
       page->writable = 0;
+      page->contended = 0;
       page->source = memory_source_rom;
     }
     
@@ -127,6 +128,7 @@ memory_init( void )
       page->page = &RAM[i][j * MEMORY_PAGE_SIZE];
       page->page_num = i;
       page->offset = j * MEMORY_PAGE_SIZE;
+      page->writable = 1;
       page->source = memory_source_ram;
     }
 
@@ -231,19 +233,25 @@ memory_pool_free( void )
   }
 }
 
-/* Map 16K of memory */
+/* Set contention for 16K of RAM */
 void
-memory_map_16k( libspectrum_word address, memory_page *source, int page_num,
-  int writable, int contended )
+memory_ram_set_16k_contention( int page_num, int contended )
 {
   int i;
 
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
-    memory_page *page = &source[ page_num * MEMORY_PAGES_IN_16K + i ];
-    page->writable = writable;
-    page->contended = contended;
-    memory_map_home[ ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i ] = page;
-  }
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_ram[ page_num * MEMORY_PAGES_IN_16K + i ].contended = contended;
+}
+
+/* Map 16K of memory */
+void
+memory_map_16k( libspectrum_word address, memory_page *source, int page_num )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_home[ ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i ] =
+      &source[ page_num * MEMORY_PAGES_IN_16K + i ];
 }
 
 libspectrum_byte

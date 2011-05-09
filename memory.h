@@ -120,9 +120,12 @@ int memory_custom_rom( void );
    configuration */
 void memory_reset( void );
 
+/* Set contention for 16K of RAM */
+void memory_ram_set_16k_contention( int page_num, int contended );
+
 /* Map 16K of memory */
 void memory_map_16k( libspectrum_word address, memory_page *source,
-  int page_num, int writable, int contended );
+  int page_num );
 
 libspectrum_byte readbyte( libspectrum_word address );
 

@@ -107,14 +107,17 @@ spec48_common_reset( void )
 {
   size_t i;
 
-  /* 0x0000: ROM 0, not writable, not contended */
-  memory_map_16k( 0x0000, memory_map_rom, 0, 0, 0 );
-  /* 0x4000: RAM 5, writable, contended */
-  memory_map_16k( 0x4000, memory_map_ram, 5, 1, 1 );
-  /* 0x8000: RAM 2, writable, not contended */
-  memory_map_16k( 0x8000, memory_map_ram, 2, 1, 0 );
-  /* 0xc000: RAM 0, writable, not contended */
-  memory_map_16k( 0xc000, memory_map_ram, 0, 1, 0 );
+  /* 0x0000: ROM 0 */
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  /* 0x4000: RAM 5, contended */
+  memory_ram_set_16k_contention( 5, 1 );
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  /* 0x8000: RAM 2, not contended */
+  memory_ram_set_16k_contention( 2, 0 );
+  memory_map_16k( 0x8000, memory_map_ram, 2 );
+  /* 0xc000: RAM 0, not contended */
+  memory_ram_set_16k_contention( 0, 0 );
+  memory_map_16k( 0xc000, memory_map_ram, 0 );
 
   for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
