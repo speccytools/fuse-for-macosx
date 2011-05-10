@@ -3647,3 +3647,4 @@
          port 0xbffd on +2A/+3 was lost in peripheral refactoring (thanks,
          fusetest).
 20110510 machines/specplus3.c: get +3 to work with a page size of 4Kb.
+20110511 machines/spec16.c: get 16K Spectrum working with a page size of 4Kb.
