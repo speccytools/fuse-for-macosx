@@ -3650,3 +3650,4 @@
 20110511 machines/spec16.c: get 16K Spectrum working with a page size of 4Kb.
 20110515 machines/tc2048.c,memory.h,peripherals/scld.[ch]: get TC2048 working
          with a page size of 4Kb.
+20110515 memory.h: back out accidental commit of page size change.
