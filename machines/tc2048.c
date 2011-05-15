@@ -108,7 +108,7 @@ tc2048_reset( void )
 
   beta_builtin = 0;
 
-  for( i = 0; i < 8; i++ ) {
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
 
     timex_dock[i] = fake_mapping;
     timex_dock[i].page_num = i;

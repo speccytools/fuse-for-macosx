@@ -64,7 +64,7 @@ typedef struct memory_page {
 /* A memory page will be 1 << (this many) bytes in size
    ie 12 => 4 Kb, 13 => 8 Kb, 14 => 16 Kb
  */
-#define MEMORY_PAGE_SIZE_LOGARITHM 13
+#define MEMORY_PAGE_SIZE_LOGARITHM 12
 
 /* The actual size of a memory page */
 #define MEMORY_PAGE_SIZE ( 1 << MEMORY_PAGE_SIZE_LOGARITHM )

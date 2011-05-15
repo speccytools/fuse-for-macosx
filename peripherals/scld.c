@@ -47,8 +47,8 @@ scld scld_last_dec;                 /* The last byte sent to Timex DEC port */
 
 libspectrum_byte scld_last_hsr = 0; /* The last byte sent to Timex HSR port */
 
-memory_page timex_exrom[8];
-memory_page timex_dock[8];
+memory_page timex_exrom[MEMORY_PAGES_IN_64K];
+memory_page timex_dock[MEMORY_PAGES_IN_64K];
 
 static void scld_reset( int hard_reset );
 static void scld_from_snapshot( libspectrum_snap *snap );
@@ -187,12 +187,11 @@ scld_memory_map( void )
   exrom_dock =
     scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
 
-  for( i = 0; i < 8; i++ ) {
-    if( scld_last_hsr & ( 1 << i ) ) {
-      memory_map_read[i] = memory_map_write[i] = *exrom_dock[i];
-    } else {
-      memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
-    }
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
+    int chunk = i >> (13 - MEMORY_PAGE_SIZE_LOGARITHM);
+    int use_exrom = scld_last_hsr & (1 << chunk);
+    memory_map_read[i] = memory_map_write[i] =
+      use_exrom ? *exrom_dock[i] : *memory_map_home[i];
   }
 }
 
