@@ -223,7 +223,7 @@ scld_from_snapshot( libspectrum_snap *snap )
 
   if( capabilities & ( LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_MEMORY |
       LIBSPECTRUM_MACHINE_CAPABILITY_SE_MEMORY ) )
-    scld_hsr_write( 0x00fd, libspectrum_snap_out_scld_hsr( snap ) );
+    scld_hsr_write( 0x00f4, libspectrum_snap_out_scld_hsr( snap ) );
 
   if( capabilities & LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_VIDEO )
     scld_dec_write( 0x00ff, libspectrum_snap_out_scld_dec( snap ) );

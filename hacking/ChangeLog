@@ -3651,3 +3651,5 @@
 20110515 machines/tc2048.c,memory.h,peripherals/scld.[ch]: get TC2048 working
          with a page size of 4Kb.
 20110515 memory.h: back out accidental commit of page size change.
+20110515 scld.c: use right port number when restoring SCLD state from snapshot
+         (makes no functional difference as we ignore the port number anyway).
