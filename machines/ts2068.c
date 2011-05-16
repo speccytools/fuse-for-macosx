@@ -67,7 +67,7 @@ ts2068_init( fuse_machine_info *machine )
 static int
 ts2068_reset( void )
 {
-  size_t i;
+  size_t i, j;
   int error;
 
   error = machine_load_rom( 0, settings_current.rom_ts2068_0,
@@ -85,17 +85,22 @@ ts2068_reset( void )
 
   periph_update();
 
-  for( i = 0; i < 8; i++ ) {
+  for( i = 0; i < 8; i++ )
+    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+      memory_page *dock_page, *exrom_page;
+      
+      dock_page = &timex_dock[i * MEMORY_PAGES_IN_8K + j];
+      *dock_page = tc2068_empty_mapping[j];
+      dock_page->page_num = i;
 
-    timex_dock[i] = fake_mapping;
-    timex_dock[i].page_num = i;
+      exrom_page = &timex_exrom[i * MEMORY_PAGES_IN_8K + j];
+      *exrom_page = memory_map_rom[MEMORY_PAGES_IN_16K + j];
+      exrom_page->page_num = i;
+    }
+
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
     memory_map_dock[i] = &timex_dock[i];
-
-    timex_exrom[i] = memory_map_rom[2];
-    timex_exrom[i].source = memory_source_exrom;
-    timex_exrom[i].page_num = i;
     memory_map_exrom[i] = &timex_exrom[i];
-
   }
 
   error = dck_reset();
