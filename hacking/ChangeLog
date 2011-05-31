@@ -3647,7 +3647,11 @@
          port 0xbffd on +2A/+3 was lost in peripheral refactoring (thanks,
          fusetest).
 20110510 machines/specplus3.c: get +3 to work with a page size of 4Kb.
+20110511 compat/unix/tuntap.c: add missing #include <string.h>.
 20110511 machines/spec16.c: get 16K Spectrum working with a page size of 4Kb.
+20110514 tape.c: add case for set signal level block (Fred).
+20110514 tape.c: we want to allow 0 tstate blocks to twiddle the mic to
+         accomodate the set signal level block (Fred).
 20110515 machines/tc2048.c,memory.h,peripherals/scld.[ch]: get TC2048 working
          with a page size of 4Kb.
 20110515 memory.h: back out accidental commit of page size change.
@@ -3655,3 +3659,5 @@
          (makes no functional difference as we ignore the port number anyway).
 20110516 machines/{tc2048.c,tc2068.[ch],ts2068.c},memory.h: get TC/TS2068
          working with 4Kb pages.
+20110531 peripherals/dck.c: ensure pages loaded from .dck files get saved back
+         into snapshots.
