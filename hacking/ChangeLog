@@ -3661,3 +3661,5 @@
          working with 4Kb pages.
 20110531 peripherals/dck.c: ensure pages loaded from .dck files get saved back
          into snapshots.
+20110601 peripherals/{dck.c,scld.c}: make .dck files and snapshots containing
+         DOCK/EXROM work with 4Kb pages.
