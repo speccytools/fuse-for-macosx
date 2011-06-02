@@ -130,10 +130,9 @@ if2_reset( int hard_reset GCC_UNUSED )
 
   if ( !periph_is_active( PERIPH_TYPE_INTERFACE2 ) ) return;
 
-  if ( machine_load_rom_bank( if2_memory_map_romcs, 0, 0,
+  if ( machine_load_rom_bank( if2_memory_map_romcs, 0,
 			      settings_current.if2_file,
-			      NULL,
-			      2 * MEMORY_PAGE_SIZE ) )
+			      NULL, 0x4000 ) )
     return;
 
   machine_current->ram.romcs = 1;

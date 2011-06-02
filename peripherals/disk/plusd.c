@@ -1,5 +1,5 @@
 /* plusd.c: Routines for handling the +D interface
-   Copyright (c) 1999-2007 Stuart Brady, Fredrick Meunier, Philip Kendall,
+   Copyright (c) 1999-2011 Stuart Brady, Fredrick Meunier, Philip Kendall,
    Dmitry Sanarin, Darren Salt
 
    $Id$
@@ -186,7 +186,7 @@ plusd_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_PLUSD ) )
     return;
 
-  if( machine_load_rom_bank( plusd_memory_map_romcs, 0, 0,
+  if( machine_load_rom_bank( plusd_memory_map_romcs, 0,
 			     settings_current.rom_plusd,
 			     settings_default.rom_plusd, 0x2000 ) ) {
     settings_current.plusd = 0;
@@ -650,10 +650,9 @@ plusd_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_plusd_custom_rom( snap ) &&
       libspectrum_snap_plusd_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             plusd_memory_map_romcs, 0, 0,
+                             plusd_memory_map_romcs, 0,
                              libspectrum_snap_plusd_rom( snap, 0 ),
-                             MEMORY_PAGE_SIZE,
-                             1 ) )
+                             0x2000, 1 ) )
     return;
 
   if( libspectrum_snap_plusd_ram( snap, 0 ) ) {

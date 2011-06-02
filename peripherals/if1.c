@@ -371,10 +371,10 @@ if1_reset( int hard_reset GCC_UNUSED )
 
   if( !periph_is_active( PERIPH_TYPE_INTERFACE1 ) ) return;
 
-  if( machine_load_rom_bank( if1_memory_map_romcs, 0, 0,
+  if( machine_load_rom_bank( if1_memory_map_romcs, 0,
 			     settings_current.rom_interface_i,
 			     settings_default.rom_interface_i,
-			     MEMORY_PAGE_SIZE ) ) {
+			     0x2000 ) ) {
     settings_current.interface1 = 0;
     periph_activate_type( PERIPH_TYPE_INTERFACE1, 0 );
     return;
@@ -442,7 +442,7 @@ if1_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_interface1_custom_rom( snap ) &&
       libspectrum_snap_interface1_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             if1_memory_map_romcs, 0, 0,
+                             if1_memory_map_romcs, 0,
                              libspectrum_snap_interface1_rom( snap, 0 ),
                              libspectrum_snap_interface1_rom_length( snap, 0 ),
                              1 ) )

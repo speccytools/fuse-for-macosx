@@ -1,7 +1,7 @@
 /* speccyboot.c: SpeccyBoot Ethernet emulation
    See http://speccyboot.sourceforge.net/
    
-   Copyright (c) 2009-2010 Patrik Persson, Philip Kendall
+   Copyright (c) 2009-2011 Patrik Persson, Philip Kendall
    
    $Id$
    
@@ -93,7 +93,7 @@ speccyboot_reset( int hard_reset GCC_UNUSED )
 {
   static int tap_opened = 0;
 
-  if ( machine_load_rom_bank( &speccyboot_memory_map_romcs, 0, 0,
+  if ( machine_load_rom_bank( &speccyboot_memory_map_romcs, 0,
                               settings_current.rom_speccyboot,
                               settings_default.rom_speccyboot, 0x2000 ) )
     return;

@@ -202,7 +202,7 @@ disciple_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_DISCIPLE ) )
     return;
 
-  if( machine_load_rom_bank( disciple_memory_map_romcs, 0, 0,
+  if( machine_load_rom_bank( disciple_memory_map_romcs, 0,
 			     settings_current.rom_disciple,
 			     settings_default.rom_disciple, 0x4000 ) ) {
     settings_current.disciple = 0;
