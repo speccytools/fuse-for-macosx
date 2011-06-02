@@ -72,7 +72,7 @@ scorpion_init( fuse_machine_info *machine )
 int
 scorpion_reset(void)
 {
-  int i, error;
+  int error;
 
   error = machine_load_rom( 0, settings_current.rom_scorpion_0,
                             settings_default.rom_scorpion_0, 0x4000 );
@@ -93,10 +93,6 @@ scorpion_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
-
-  /* Mark the second 128K as present/writeable */
-  for( i = 16; i < 32; i++ )
-    memory_map_ram[i].writable = 1;
 
   periph_clear();
   machines_periph_pentagon();
@@ -152,7 +148,7 @@ scorpion_memory_map( void )
   spec128_select_page( page );
   machine_current->ram.current_page = page;
 
-  for( i = 0; i < 8; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();

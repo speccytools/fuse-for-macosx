@@ -69,7 +69,6 @@ static int
 pentagon1024_reset(void)
 {
   int error;
-  int i;
 
   error = machine_load_rom( 0, settings_current.rom_pentagon1024_0,
                             settings_default.rom_pentagon1024_0, 0x4000 );
@@ -90,10 +89,6 @@ pentagon1024_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
-
-  /* Mark the last 896K as present/writeable */
-  for( i = 16; i < 128; i++ )
-    memory_map_ram[i].writable = 1;
 
   beta_builtin = 1;
   beta_active = 1;
@@ -183,7 +178,7 @@ static int pentagon1024_memory_map( void )
   spec128_select_page( page );
   machine_current->ram.current_page = page;
 
-  for( i = 0; i < 8; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();

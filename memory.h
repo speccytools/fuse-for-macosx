@@ -130,6 +130,9 @@ void memory_ram_set_16k_contention( int page_num, int contended );
 void memory_map_16k( libspectrum_word address, memory_page *source,
   int page_num );
 
+/* Page in from /ROMCS */
+void memory_map_romcs( memory_page *source );
+
 libspectrum_byte readbyte( libspectrum_word address );
 
 /* Use a macro for performance in the main core, but a function for

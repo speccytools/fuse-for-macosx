@@ -73,7 +73,6 @@ static int
 pentagon_reset(void)
 {
   int error;
-  int i;
 
   error = machine_load_rom( 0, settings_current.rom_pentagon512_0,
                             settings_default.rom_pentagon512_0, 0x4000 );
@@ -105,10 +104,6 @@ pentagon_reset(void)
 
   machine_current->ram.last_byte2 = 0;
   machine_current->ram.special = 0;
-
-  /* Mark the least 384K as present/writeable */
-  for( i = 16; i < 64; i++ )
-    memory_map_ram[i].writable = 1;
 
   spec48_common_display_setup();
 
@@ -145,7 +140,7 @@ pentagon_memory_map( void )
   spec128_select_page( page );
   machine_current->ram.current_page = page;
 
-  for( i = 0; i < 8; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
     memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();

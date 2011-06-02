@@ -3663,3 +3663,6 @@
          into snapshots.
 20110601 peripherals/{dck.c,scld.c}: make .dck files and snapshots containing
          DOCK/EXROM work with 4Kb pages.
+20110602 machines/{pentagon1024.c,pentagon512.c,scorpion.c},memory.[ch],
+         peripherals/disk/beta.[ch]: get Russian machines working with 4Kb
+         pages.

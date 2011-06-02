@@ -253,6 +253,16 @@ memory_map_16k( libspectrum_word address, memory_page *source, int page_num )
       &source[ page_num * MEMORY_PAGES_IN_16K + i ];
 }
 
+/* Page in from /ROMCS */
+void
+memory_map_romcs( memory_page *source )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_read[i] = memory_map_write[i] = source[i];
+}
+
 libspectrum_byte
 readbyte( libspectrum_word address )
 {
