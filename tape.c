@@ -835,7 +835,10 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
   if( libspec_error != LIBSPECTRUM_ERROR_NONE ) return;
 
   /* Invert the microphone state */
-  if( edge_tstates || ( flags & LIBSPECTRUM_TAPE_FLAGS_STOP ) ) {
+  if( edge_tstates ||
+      ( flags & ( LIBSPECTRUM_TAPE_FLAGS_STOP |
+                  LIBSPECTRUM_TAPE_FLAGS_LEVEL_LOW |
+                  LIBSPECTRUM_TAPE_FLAGS_LEVEL_HIGH ) ) ) {
 
     if( flags & LIBSPECTRUM_TAPE_FLAGS_NO_EDGE ) {
       /* Do nothing */
@@ -951,6 +954,7 @@ tape_block_details( char *buffer, size_t length,
   case LIBSPECTRUM_TAPE_BLOCK_TURBO:
   case LIBSPECTRUM_TAPE_BLOCK_PURE_DATA:
   case LIBSPECTRUM_TAPE_BLOCK_RAW_DATA:
+  case LIBSPECTRUM_TAPE_BLOCK_DATA_BLOCK:
     snprintf( buffer, length, "%lu bytes",
 	      (unsigned long)libspectrum_tape_block_data_length( block ) );
     break;
@@ -961,6 +965,7 @@ tape_block_details( char *buffer, size_t length,
     break;
 
   case LIBSPECTRUM_TAPE_BLOCK_PULSES:
+  case LIBSPECTRUM_TAPE_BLOCK_PULSE_SEQUENCE:
     snprintf( buffer, length, "%lu pulses",
 	      (unsigned long)libspectrum_tape_block_count( block ) );
     break;
@@ -1008,6 +1013,7 @@ tape_block_details( char *buffer, size_t length,
   case LIBSPECTRUM_TAPE_BLOCK_GROUP_END:
   case LIBSPECTRUM_TAPE_BLOCK_LOOP_END:
   case LIBSPECTRUM_TAPE_BLOCK_STOP48:
+  case LIBSPECTRUM_TAPE_BLOCK_SET_SIGNAL_LEVEL:
   case LIBSPECTRUM_TAPE_BLOCK_ARCHIVE_INFO:
   case LIBSPECTRUM_TAPE_BLOCK_HARDWARE:
   case LIBSPECTRUM_TAPE_BLOCK_CONCAT:
