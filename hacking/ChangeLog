@@ -3668,3 +3668,4 @@
          pages.
 20110604 memory.h,peripherals/spectranet.c: Spectranet code now at least does
          something.
+20110604 machines/spec48.c: one 8Kb page assumption still remained.
