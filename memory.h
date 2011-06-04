@@ -64,7 +64,7 @@ typedef struct memory_page {
 /* A memory page will be 1 << (this many) bytes in size
    ie 12 => 4 Kb, 13 => 8 Kb, 14 => 16 Kb
  */
-#define MEMORY_PAGE_SIZE_LOGARITHM 13
+#define MEMORY_PAGE_SIZE_LOGARITHM 12
 
 /* The actual size of a memory page */
 #define MEMORY_PAGE_SIZE ( 1 << MEMORY_PAGE_SIZE_LOGARITHM )
@@ -81,6 +81,9 @@ typedef struct memory_page {
 
 /* The number of memory pages in 8K */
 #define MEMORY_PAGES_IN_8K ( 1 << ( 13 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
+/* The number of memory pages in 4K */
+#define MEMORY_PAGES_IN_4K ( 1 << ( 12 - MEMORY_PAGE_SIZE_LOGARITHM ) )
 
 /* Each RAM chunk accessible by the Z80 */
 extern memory_page memory_map_read[MEMORY_PAGES_IN_64K];
