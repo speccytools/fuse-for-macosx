@@ -26,6 +26,7 @@
 #include "config.h"
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -53,20 +54,32 @@ static int spectranet_paged;
 
 static int spectranet_source;
 
+/* Debugger events */
+static const char *event_type_string = "spectranet";
+static int page_event, unpage_event;
+
 void
 spectranet_page( void )
 {
+  if( spectranet_paged )
+    return;
+
   spectranet_paged = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
 }
 
 void
 spectranet_unpage( void )
 {
+  if( !spectranet_paged )
+    return;
+
   spectranet_paged = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 static void
@@ -235,5 +248,9 @@ spectranet_init( void )
   module_register( &spectranet_module_info );
   spectranet_source = memory_source_register( "Spectranet" );
   periph_register( PERIPH_TYPE_SPECTRANET, &spectranet_periph );
+  if( periph_register_paging_events( event_type_string, &page_event,
+				     &unpage_event ) )
+    return 1;
+
   return 0;
 }
