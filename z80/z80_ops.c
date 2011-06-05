@@ -209,13 +209,10 @@ z80_do_opcodes( void )
     
     END_CHECK
 
-    CHECK( spectranet, spectranet_available )
+    CHECK( spectranet_page, spectranet_available )
 
-    if( PC == 0x0008 ) {
+    if( PC == 0x0008 || ((PC & 0xfff8) == 0x3ff8) )
       spectranet_page();
-    } else if( PC == 0x007c ) {
-      spectranet_unpage();
-    }
 
     END_CHECK
 
@@ -263,6 +260,13 @@ z80_do_opcodes( void )
     } else if( PC == 0x0008 || PC == 0x0048 || PC == 0x1708 ) {
       opus_page();
     }
+
+    END_CHECK
+
+    CHECK( spectranet_unpage, spectranet_available )
+
+    if( PC == 0x007c )
+      spectranet_unpage();
 
     END_CHECK
 

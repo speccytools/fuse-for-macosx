@@ -3669,3 +3669,5 @@
 20110604 memory.h,peripherals/spectranet.c: Spectranet code now at least does
          something.
 20110604 machines/spec48.c: one 8Kb page assumption still remained.
+20110605 z80/{z80_checks.h,z80_ops.c}: add 0x3ff8 to 0x3fff trap, and move
+         0x007c trap to the right place.
