@@ -36,6 +36,7 @@
 #include "memory.h"
 #include "module.h"
 #include "peripherals/disk/opus.h"
+#include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
 #include "settings.h"
 #include "spectrum.h"
@@ -281,6 +282,13 @@ readbyte( libspectrum_word address )
   if( opus_active && address >= 0x2800 && address < 0x3800 )
     return opus_read( address );
 
+  if( spectranet_paged ) {
+    if( spectranet_w5100_paged_a && address >= 0x1000 && address < 0x2000 )
+      return spectranet_w5100_read( address - 0x1000 );
+    if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 )
+      return spectranet_w5100_read( address - 0x2000 );
+  }
+
   return mapping->page[ address & MEMORY_PAGE_SIZE_MASK ];
 }
 
@@ -358,6 +366,17 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 {
   libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
+
+  if( spectranet_paged ) {
+    if( spectranet_w5100_paged_a && address >= 0x1000 && address < 0x2000 ) {
+      spectranet_w5100_write( address - 0x1000, b );
+      return;
+    }
+    if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 ) {
+      spectranet_w5100_write( address - 0x2000, b );
+      return;
+    }
+  }
 
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
     opus_write( address, b );

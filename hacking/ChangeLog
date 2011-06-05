@@ -3673,3 +3673,5 @@
          0x007c trap to the right place.
 20110605 peripherals/spectranet.c: implement debugger events for Spectranet
          being (un)paged.
+20110605 memory.c,peripherals/{nic/{Makefile.am,w5100.[ch]},spectranet.[ch]}:
+         add stub W5100 emulation.

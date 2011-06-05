@@ -1,40 +1,42 @@
-/* spectranet.h: Spectranet emulation
+/* w5100.c: Wiznet W5100 emulation
+   
+   Emulates a minimal subset of the Wiznet W5100 TCP/IP controller.
+
    Copyright (c) 2011 Philip Kendall
-
+   
    $Id$
-
+   
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation, Inc.,
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
+   
    Author contact information:
-
+   
    E-mail: philip-fuse@shadowmagic.org.uk
-
+ 
 */
 
-#ifndef FUSE_SPECTRANET_H
-#define FUSE_SPECTRANET_H
+#ifndef FUSE_W5100_H
+#define FUSE_W5100_H
 
-int spectranet_init( void );
-void spectranet_page( void );
-void spectranet_unpage( void );
+#include <libspectrum.h>
 
-libspectrum_byte spectranet_w5100_read( libspectrum_word address );
-void spectranet_w5100_write( libspectrum_word address, libspectrum_byte b );
+typedef struct nic_w5100_t nic_w5100_t;
 
-extern int spectranet_available;
-extern int spectranet_paged;
-extern int spectranet_w5100_paged_a, spectranet_w5100_paged_b;
+nic_w5100_t* nic_w5100_alloc( void );
+void nic_w5100_free( nic_w5100_t *self );
 
-#endif /* #ifndef FUSE_SPECTRANET_H */
+libspectrum_byte nic_w5100_read( nic_w5100_t *self, libspectrum_word reg);
+void nic_w5100_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b );
+
+#endif                          /* #ifndef FUSE_W5100_H */

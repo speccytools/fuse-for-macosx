@@ -30,6 +30,7 @@
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
+#include "nic/w5100.h"
 #include "periph.h"
 #include "settings.h"
 
@@ -49,8 +50,11 @@ static memory_page spectranet_full_map[SPECTRANET_PAGES * MEMORY_PAGES_IN_4K];
 static memory_page spectranet_current_map[MEMORY_PAGES_IN_16K];
 static int spectranet_memory_allocated = 0;
 
+static nic_w5100_t *w5100;
+
 int spectranet_available = 0;
-static int spectranet_paged;
+int spectranet_paged;
+int spectranet_w5100_paged_a = 0, spectranet_w5100_paged_b = 0;
 
 static int spectranet_source;
 
@@ -86,10 +90,17 @@ static void
 spectranet_map_page( int dest, int source )
 {
   int i;
+  int w5100_page = source >= 0x40 && source < 0x48;
 
   for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
     spectranet_current_map[dest * MEMORY_PAGES_IN_4K + i] =
       spectranet_full_map[source * MEMORY_PAGES_IN_4K + i];
+
+  switch( dest )
+  {
+    case 1: spectranet_w5100_paged_a = w5100_page; break;
+    case 2: spectranet_w5100_paged_b = w5100_page; break;
+  }
 }
 
 static void
@@ -159,20 +170,6 @@ spectranet_activate( void )
         page->offset = j * MEMORY_PAGE_SIZE;
         page->page = fake_bank + page->offset;
       }
-
-    /* Pages 0x00 to 0x1f is the ROM, which is loaded on reset */
-
-    libspectrum_byte *w5100_buffer =
-      memory_pool_allocate_persistent( SPECTRANET_BUFFER_LENGTH, 1 );
-
-    for( i = 0; i < SPECTRANET_BUFFER_LENGTH / SPECTRANET_PAGE_LENGTH; i++ ) {
-      int base = (SPECTRANET_BUFFER_BASE + i) * MEMORY_PAGES_IN_4K;
-      for( j = 0; j < MEMORY_PAGES_IN_4K; j++ ) {
-        memory_page *page = &spectranet_full_map[base + j];
-        page->writable = 1;
-        page->page = w5100_buffer + (i * MEMORY_PAGES_IN_4K + j) * MEMORY_PAGE_SIZE;
-      }
-    }
 
     libspectrum_byte *ram =
       memory_pool_allocate_persistent( SPECTRANET_RAM_LENGTH, 1 );
@@ -252,5 +249,21 @@ spectranet_init( void )
 				     &unpage_event ) )
     return 1;
 
+  w5100 = nic_w5100_alloc();
+
   return 0;
 }
+
+libspectrum_byte
+spectranet_w5100_read( libspectrum_word reg )
+{
+  return nic_w5100_read( w5100, reg );
+}
+
+void
+spectranet_w5100_write( libspectrum_word reg, libspectrum_byte b )
+{
+  nic_w5100_write( w5100, reg, b );
+}
+
+
