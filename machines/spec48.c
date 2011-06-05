@@ -128,9 +128,11 @@ spec48_common_reset( void )
 int
 spec48_memory_map( void )
 {
+  int i;
+
   /* By default, 0x0000 to 0x3fff come from the home bank */
-  memory_map_read[0] = memory_map_write[0] = *memory_map_home[0];
-  memory_map_read[1] = memory_map_write[1] = *memory_map_home[1];
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 
