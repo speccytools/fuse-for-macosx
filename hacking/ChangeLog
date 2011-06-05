@@ -3670,3 +3670,5 @@
 20110605 machine.c,peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
          peripherals/speccyboot.c: set 'writable = 0' when loading ROM images
          rather than setting it explicitly (Stuart).
+20110606 memory.[ch],peripherals/disk/opus.c: guard against overrun of Opus RAM
+         buffer by increasing the amount allocated (Stuart).

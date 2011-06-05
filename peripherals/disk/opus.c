@@ -46,8 +46,15 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page opus_memory_map_romcs[2];
+#if MEMORY_PAGE_SIZE > 0x800
+#warning "Memory page size too large for correct Opus RAM size"
+#endif
+#define OPUS_RAM_PAGES ( 0x800 / MEMORY_PAGE_SIZE ? \
+			 0x800 / MEMORY_PAGE_SIZE : 1 )
+
+/* Two memory chunks accessible by the Z80 when /ROMCS is low */
+static memory_page opus_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
+static memory_page opus_memory_map_romcs_ram[ OPUS_RAM_PAGES ];
 
 int opus_available = 0;
 int opus_active = 0;
@@ -61,7 +68,7 @@ static int index_event;
 static wd_fdc *opus_fdc;
 static wd_fdc_drive opus_drives[ OPUS_NUM_DRIVES ];
 
-static libspectrum_byte opus_ram[ 0x800 ];
+static libspectrum_byte opus_ram[ OPUS_RAM_PAGES * MEMORY_PAGE_SIZE ];
 
 /* 6821 PIA internal registers */
 static libspectrum_byte data_reg_a, data_dir_a, control_a;
@@ -109,10 +116,15 @@ opus_unpage( void )
 static void
 opus_memory_map( void )
 {
+  int i;
+
   if( !opus_active ) return;
 
-  memory_map_read[ 0 ] = memory_map_write[ 0 ] = opus_memory_map_romcs[ 0 ];
-  memory_map_read[ 1 ] = memory_map_write[ 1 ] = opus_memory_map_romcs[ 1 ];
+  memory_map_romcs_8k( 0x0000, opus_memory_map_romcs_rom );
+
+  for( i = 0; i < OPUS_RAM_PAGES; i++ )
+    memory_map_read[ i ] = memory_map_write[ i ] =
+      opus_memory_map_romcs_ram[ i ];
 }
 
 static void
@@ -150,7 +162,10 @@ opus_init( void )
   module_register( &opus_module_info );
 
   opus_source = memory_source_register( "Opus") ;
-  for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].source = opus_source;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    opus_memory_map_romcs_rom[i].source = opus_source;
+  for( i = 0; i < OPUS_RAM_PAGES; i++ )
+    opus_memory_map_romcs_ram[i].source = opus_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 
@@ -172,7 +187,7 @@ opus_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_OPUS ) )
     return;
 
-  if( machine_load_rom_bank( opus_memory_map_romcs, 0,
+  if( machine_load_rom_bank( opus_memory_map_romcs_rom, 0,
                              settings_current.rom_opus,
                              settings_default.rom_opus, 0x2000 ) ) {
     settings_current.opus = 0;
@@ -180,11 +195,17 @@ opus_reset( int hard_reset )
     return;
   }
 
-  opus_memory_map_romcs[1].page = opus_ram;
+  for( i = 0; i < OPUS_RAM_PAGES; i++ ) {
+    struct memory_page *page =
+      &opus_memory_map_romcs_ram[ i ];
+    page->page = opus_ram + i * MEMORY_PAGE_SIZE;
+    page->offset = i * MEMORY_PAGE_SIZE;
+  }
 
   machine_current->ram.romcs = 0;
 
-  opus_memory_map_romcs[ 1 ].writable = 1;
+  for( i = 0; i < OPUS_RAM_PAGES; i++ )
+    opus_memory_map_romcs_ram[ i ].writable = 1;
 
   data_reg_a = 0;
   data_dir_a = 0;
@@ -679,7 +700,7 @@ opus_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_opus_custom_rom( snap ) &&
       libspectrum_snap_opus_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             opus_memory_map_romcs, 0,
+                             opus_memory_map_romcs_rom, 0,
                              libspectrum_snap_opus_rom( snap, 0 ),
                              0x2000, 1 ) )
     return;
@@ -724,10 +745,10 @@ opus_to_snapshot( libspectrum_snap *snap )
 
   libspectrum_snap_set_opus_active( snap, 1 );
 
-  buffer = alloc_and_copy_page( opus_memory_map_romcs[0].page );
+  buffer = alloc_and_copy_page( opus_memory_map_romcs_rom[0].page );
   if( !buffer ) return;
   libspectrum_snap_set_opus_rom( snap, 0, buffer );
-  if( opus_memory_map_romcs[0].save_to_snapshot )
+  if( opus_memory_map_romcs_rom[0].save_to_snapshot )
     libspectrum_snap_set_opus_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( opus_ram );
