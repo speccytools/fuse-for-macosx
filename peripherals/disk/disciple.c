@@ -214,8 +214,6 @@ disciple_reset( int hard_reset )
 
   machine_current->ram.romcs = 1;
 
-  disciple_memory_map_romcs[ 0 ].writable = 0;
-  disciple_memory_map_romcs[ 1 ].writable = 0;
   disciple_memory_map_romcs[ 2 ].writable = 1;
 
   disciple_available = 1;

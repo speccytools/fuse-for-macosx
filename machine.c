@@ -264,6 +264,7 @@ machine_load_rom_bank_from_buffer( memory_page* bank_map, int page_num,
     page->offset = offset;
     page->page_num = page_num;
     page->page = data + offset;
+    page->writable = 0;
     page->save_to_snapshot = custom;
   }
 

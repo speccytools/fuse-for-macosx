@@ -184,7 +184,6 @@ opus_reset( int hard_reset )
 
   machine_current->ram.romcs = 0;
 
-  opus_memory_map_romcs[ 0 ].writable = 0;
   opus_memory_map_romcs[ 1 ].writable = 1;
 
   data_reg_a = 0;

@@ -3667,3 +3667,6 @@
          peripherals/disk/beta.[ch]: get Russian machines working with 4Kb
          pages.
 20110604 machines/spec48.c: one 8Kb page assumption still remained.
+20110605 machine.c,peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
+         peripherals/speccyboot.c: set 'writable = 0' when loading ROM images
+         rather than setting it explicitly (Stuart).

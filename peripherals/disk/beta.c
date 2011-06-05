@@ -223,9 +223,6 @@ beta_reset( int hard_reset GCC_UNUSED )
       return;
     }
 
-    beta_memory_map_romcs[ 0 ].writable = 0;
-    beta_memory_map_romcs[ 1 ].writable = 0;
-
     beta_active = 0;
 
     if( !( machine_current->capabilities &
