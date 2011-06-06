@@ -3675,3 +3675,4 @@
 20110606 peripherals/{disk/{beta.[ch],disciple.c,plusd.c},ide/{divide.c,
          zxatasp.c,zxcf.c},if1.c,if2.c,speccyboot.c}: allow page sizes other
          than 8KB (Stuart).
+20110606 memory.h: switch to 4Kb page size.
