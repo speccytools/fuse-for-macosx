@@ -3677,3 +3677,5 @@
          add stub W5100 emulation.
 20110606 z80/z80.c: Spectranet should page in on NMI (patch #3312599)
          (Guesser).
+20110606 peripherals/spectranet.c,roms/{README.copyright,spectranet.rom}: add
+         full Spectranet ROM (patch 3312600) (Guesser).
