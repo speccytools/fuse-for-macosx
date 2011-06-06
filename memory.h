@@ -136,6 +136,9 @@ void memory_map_16k( libspectrum_word address, memory_page *source,
 /* Page in from /ROMCS */
 void memory_map_romcs( memory_page *source );
 
+/* Page in 8K from /ROMCS */
+void memory_map_romcs_8k( libspectrum_word address, memory_page *source );
+
 libspectrum_byte readbyte( libspectrum_word address );
 
 /* Use a macro for performance in the main core, but a function for

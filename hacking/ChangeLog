@@ -3666,6 +3666,7 @@
 20110602 machines/{pentagon1024.c,pentagon512.c,scorpion.c},memory.[ch],
          peripherals/disk/beta.[ch]: get Russian machines working with 4Kb
          pages.
+<<<<<<< .working
 20110604 memory.h,peripherals/spectranet.c: Spectranet code now at least does
          something.
 20110604 machines/spec48.c: one 8Kb page assumption still remained.
@@ -3673,9 +3674,21 @@
          0x007c trap to the right place.
 20110605 peripherals/spectranet.c: implement debugger events for Spectranet
          being (un)paged.
+20110605 machine.c,peripherals/disk/{beta.c,disciple.c,opus.c,plusd.c},
+         peripherals/speccyboot.c: set 'writable = 0' when loading ROM images
+         rather than setting it explicitly (Stuart).
 20110605 memory.c,peripherals/{nic/{Makefile.am,w5100.[ch]},spectranet.[ch]}:
          add stub W5100 emulation.
+20110606 memory.[ch],peripherals/disk/opus.c: guard against overrun of Opus RAM
+         buffer by increasing the amount allocated (Stuart).
+20110606 peripherals/{disk/{beta.[ch],disciple.c,plusd.c},ide/{divide.c,
+         zxatasp.c,zxcf.c},if1.c,if2.c,speccyboot.c}: allow page sizes other
+         than 8KB (Stuart).
 20110606 z80/z80.c: Spectranet should page in on NMI (patch #3312599)
          (Guesser).
 20110606 peripherals/spectranet.c,roms/{README.copyright,spectranet.rom}: add
          full Spectranet ROM (patch 3312600) (Guesser).
+20110606 memory.h: switch to 4Kb page size.
+20110606 z80/coretest.c: fix for 4Kb page size (patch #3312596) (Guesser).
+20110606 ui/win32/{debugger.c,pokefinder.c,pokefinder.rc}: fix Win32 build
+         (Sergio Baldoví)

@@ -154,8 +154,8 @@ RS232:
     every other 0x00 + 0x## are discarded
 */
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page if1_memory_map_romcs[2];
+/* One 8KB memory chunk accessible by the Z80 when /ROMCS is low */
+static memory_page if1_memory_map_romcs[MEMORY_PAGES_IN_8K];
 
 /* IF1 paged out ROM activated? */
 int if1_active = 0;
@@ -333,7 +333,8 @@ if1_init( void )
   module_register( &if1_module_info );
 
   if1_source = memory_source_register( "If1" );
-  for( i = 0; i < 2; i++ ) if1_memory_map_romcs[i].source = if1_source;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    if1_memory_map_romcs[i].source = if1_source;
 
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
@@ -424,7 +425,7 @@ if1_memory_map( void )
 {
   if( !if1_active ) return;
 
-  memory_map_read[0] = memory_map_write[0] = if1_memory_map_romcs[0];
+  memory_map_romcs_8k( 0x0000, if1_memory_map_romcs );
 }
 
 static void
