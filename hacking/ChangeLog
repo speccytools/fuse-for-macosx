@@ -3676,3 +3676,4 @@
          zxatasp.c,zxcf.c},if1.c,if2.c,speccyboot.c}: allow page sizes other
          than 8KB (Stuart).
 20110606 memory.h: switch to 4Kb page size.
+20110606 z80/coretest.c: fix for 4Kb page size (patch #3312596) (Guesser).

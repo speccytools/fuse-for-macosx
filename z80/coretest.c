@@ -390,8 +390,8 @@ enum debugger_mode_t debugger_mode;
 
 libspectrum_byte **ROM = NULL;
 memory_page memory_map[8];
-memory_page *memory_map_home[8];
-memory_page memory_map_rom[8];
+memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
+memory_page memory_map_rom[SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K];
 int memory_contended[8] = { 1 };
 libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 int profile_active = 0;
