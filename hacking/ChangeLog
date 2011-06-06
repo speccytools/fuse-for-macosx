@@ -3675,3 +3675,5 @@
          being (un)paged.
 20110605 memory.c,peripherals/{nic/{Makefile.am,w5100.[ch]},spectranet.[ch]}:
          add stub W5100 emulation.
+20110606 z80/z80.c: Spectranet should page in on NMI (patch #3312599)
+         (Guesser).
