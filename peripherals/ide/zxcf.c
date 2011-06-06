@@ -39,8 +39,8 @@
 #include "ui/ui.h"
 #include "zxcf.h"
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page zxcf_memory_map_romcs[2];
+/* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
+static memory_page zxcf_memory_map_romcs[MEMORY_PAGES_IN_16K];
 
 /*
   TBD: Allow memory size selection (128K/512K/1024K)
@@ -126,7 +126,8 @@ zxcf_init( void )
   module_register( &zxcf_module_info );
 
   zxcf_source = memory_source_register( "ZXCF" );
-  for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].source = zxcf_source;
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    zxcf_memory_map_romcs[i].source = zxcf_source;
 
   periph_register( PERIPH_TYPE_ZXCF, &zxcf_periph );
   if( periph_register_paging_events( event_type_string, &page_event,
@@ -200,10 +201,10 @@ set_zxcf_bank( int bank )
   memory_page *page;
   size_t i, offset;
 
-  for( i = 0; i < 2; i++ ) {
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
 
     page = &zxcf_memory_map_romcs[i];
-    offset = i & 1 ? MEMORY_PAGE_SIZE : 0x0000;
+    offset = i * MEMORY_PAGE_SIZE;
     
     page->page = &ZXCFMEM[ bank ][ offset ];
     page->writable = zxcf_writeenable;
@@ -274,15 +275,17 @@ zxcf_ide_write( libspectrum_word port, libspectrum_byte data )
 static void
 zxcf_memory_map( void )
 {
+  int i;
+
   if( !settings_current.zxcf_active ) return;
 
   if( !settings_current.zxcf_upload ) {
-    memory_map_read[0] = zxcf_memory_map_romcs[0];
-    memory_map_read[1] = zxcf_memory_map_romcs[1];
+    for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+      memory_map_read[i] = zxcf_memory_map_romcs[i];
   }
 
-  memory_map_write[0] = zxcf_memory_map_romcs[0];
-  memory_map_write[1] = zxcf_memory_map_romcs[1];
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_write[i] = zxcf_memory_map_romcs[i];
 }
 
 static void

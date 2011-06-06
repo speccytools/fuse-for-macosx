@@ -3672,3 +3672,6 @@
          rather than setting it explicitly (Stuart).
 20110606 memory.[ch],peripherals/disk/opus.c: guard against overrun of Opus RAM
          buffer by increasing the amount allocated (Stuart).
+20110606 peripherals/{disk/{beta.[ch],disciple.c,plusd.c},ide/{divide.c,
+         zxatasp.c,zxcf.c},if1.c,if2.c,speccyboot.c}: allow page sizes other
+         than 8KB (Stuart).

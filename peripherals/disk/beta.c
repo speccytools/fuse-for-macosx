@@ -57,7 +57,7 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
+/* A 16KB memory chunk accessible by the Z80 when /ROMCS is low */
 memory_page beta_memory_map_romcs[MEMORY_PAGES_IN_16K];
 
 int beta_available = 0;
@@ -174,7 +174,8 @@ beta_init( void )
   module_register( &beta_module_info );
 
   beta_source = memory_source_register( "Betadisk" );
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) beta_memory_map_romcs[i].source = beta_source;
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    beta_memory_map_romcs[i].source = beta_source;
 
   periph_register( PERIPH_TYPE_BETA128, &beta_peripheral );
 

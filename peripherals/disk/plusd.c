@@ -45,8 +45,9 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
-/* Two 8Kb memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page plusd_memory_map_romcs[2];
+/* Two 8KB memory chunks accessible by the Z80 when /ROMCS is low */
+static memory_page plusd_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
+static memory_page plusd_memory_map_romcs_ram[ MEMORY_PAGES_IN_8K ];
 
 int plusd_available = 0;
 int plusd_active = 0;
@@ -105,8 +106,8 @@ plusd_memory_map( void )
 {
   if( !plusd_active ) return;
 
-  memory_map_read[ 0 ] = memory_map_write[ 0 ] = plusd_memory_map_romcs[ 0 ];
-  memory_map_read[ 1 ] = memory_map_write[ 1 ] = plusd_memory_map_romcs[ 1 ];
+  memory_map_romcs_8k( 0x0000, plusd_memory_map_romcs_rom );
+  memory_map_romcs_8k( 0x2000, plusd_memory_map_romcs_ram );
 }
 
 static const periph_port_t plusd_ports[] = {
@@ -164,7 +165,10 @@ plusd_init( void )
   module_register( &plusd_module_info );
 
   plusd_source = memory_source_register( "PlusD" );
-  for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].source = plusd_source;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    plusd_memory_map_romcs_rom[ i ].source = plusd_source;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    plusd_memory_map_romcs_ram[ i ].source = plusd_source;
 
   periph_register( PERIPH_TYPE_PLUSD, &plusd_periph );
 
@@ -186,7 +190,7 @@ plusd_reset( int hard_reset )
   if( !periph_is_active( PERIPH_TYPE_PLUSD ) )
     return;
 
-  if( machine_load_rom_bank( plusd_memory_map_romcs, 0,
+  if( machine_load_rom_bank( plusd_memory_map_romcs_rom, 0,
 			     settings_current.rom_plusd,
 			     settings_default.rom_plusd, 0x2000 ) ) {
     settings_current.plusd = 0;
@@ -194,11 +198,13 @@ plusd_reset( int hard_reset )
     return;
   }
 
-  plusd_memory_map_romcs[1].page = plusd_ram;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    plusd_memory_map_romcs_ram[ i ].page = &plusd_ram[ i * MEMORY_PAGE_SIZE ];
 
   machine_current->ram.romcs = 0;
 
-  plusd_memory_map_romcs[ 1 ].writable = 1;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    plusd_memory_map_romcs_ram[ i ].writable = 1;
 
   plusd_available = 1;
   plusd_active = 1;
@@ -649,7 +655,7 @@ plusd_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_plusd_custom_rom( snap ) &&
       libspectrum_snap_plusd_rom( snap, 0 ) &&
       machine_load_rom_bank_from_buffer(
-                             plusd_memory_map_romcs, 0,
+                             plusd_memory_map_romcs_rom, 0,
                              libspectrum_snap_plusd_rom( snap, 0 ),
                              0x2000, 1 ) )
     return;
@@ -689,10 +695,10 @@ plusd_to_snapshot( libspectrum_snap *snap )
 
   libspectrum_snap_set_plusd_active( snap, 1 );
 
-  buffer = alloc_and_copy_page( plusd_memory_map_romcs[0].page );
+  buffer = alloc_and_copy_page( plusd_memory_map_romcs_rom[ 0 ].page );
   if( !buffer ) return;
   libspectrum_snap_set_plusd_rom( snap, 0, buffer );
-  if( plusd_memory_map_romcs[0].save_to_snapshot )
+  if( plusd_memory_map_romcs_rom[ 0 ].save_to_snapshot )
     libspectrum_snap_set_plusd_custom_rom( snap, 1 );
 
   buffer = alloc_and_copy_page( plusd_ram );
