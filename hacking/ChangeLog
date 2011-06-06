@@ -3677,3 +3677,5 @@
          than 8KB (Stuart).
 20110606 memory.h: switch to 4Kb page size.
 20110606 z80/coretest.c: fix for 4Kb page size (patch #3312596) (Guesser).
+20110606 ui/win32/{debugger.c,pokefinder.c,pokefinder.rc}: fix Win32 build
+         (Sergio Baldoví)

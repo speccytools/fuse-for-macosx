@@ -46,9 +46,11 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
+/*
 #if MEMORY_PAGE_SIZE > 0x800
 #warning "Memory page size too large for correct Opus RAM size"
 #endif
+*/
 #define OPUS_RAM_PAGES ( 0x800 / MEMORY_PAGE_SIZE ? \
 			 0x800 / MEMORY_PAGE_SIZE : 1 )
 
