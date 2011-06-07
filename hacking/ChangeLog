@@ -3692,3 +3692,9 @@
 20110606 z80/coretest.c: fix for 4Kb page size (patch #3312596) (Guesser).
 20110606 ui/win32/{debugger.c,pokefinder.c,pokefinder.rc}: fix Win32 build
          (Sergio Baldoví)
+20110607 configure.in,Makefile.am,memory.c,peripherals/{Makefile.am,
+         flash/{am29f010.[ch],Makefile.am},spectranet.[ch]},
+         roms/{Makefile.am,README.copyright,spectranet.rom},settings.dat,
+         ui/options.dat,z80/{z80.c,z80_checks.h,z80_ops.c}: add emulation
+         of the AMD AM29F010 flash (modified from patch #3313062) (Guesser
+         and Phil).

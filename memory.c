@@ -377,8 +377,11 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
 {
   libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
-
+  
   if( spectranet_paged ) {
+    /* all writes need to be parsed by the flash rom emulation */
+    spectranet_flash_rom_write(address, b);
+    
     if( spectranet_w5100_paged_a && address >= 0x1000 && address < 0x2000 ) {
       spectranet_w5100_write( address - 0x1000, b );
       return;

@@ -52,6 +52,8 @@ Checkbox, Beta 128 (a)uto-boot in 48K machines, beta128_48boot, INPUT_KEY_a
 Checkbox, Opus Discovery in(t)erface, opus, INPUT_KEY_t
 Checkbox, S(p)eccyBoot interface, speccyboot, INPUT_KEY_p
 Checkbox, Spec(D)rum interface, specdrum, INPUT_KEY_d
+Checkbox, Spectranet, spectranet
+Checkbox, Spectanet disable, spectranet_disable
 Posthook, periph_update
 
 rzx

@@ -214,7 +214,7 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
     /* Page in TR-DOS ROM */
     beta_page();
   } else if( spectranet_available ) {
-
+    
     /* Page in spectranet */
     spectranet_page();
   }

@@ -27,6 +27,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "flash/am29f010.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -51,6 +52,7 @@ static memory_page spectranet_current_map[MEMORY_PAGES_IN_16K];
 static int spectranet_memory_allocated = 0;
 
 static nic_w5100_t *w5100;
+static flash_am29f010_t *flash_rom;
 
 int spectranet_available = 0;
 int spectranet_paged;
@@ -106,27 +108,11 @@ spectranet_map_page( int dest, int source )
 static void
 spectranet_reset( int hard_reset GCC_UNUSED )
 {
-  int i, j;
-
   if( !periph_is_active( PERIPH_TYPE_SPECTRANET ) )
     return;
 
   spectranet_available = 0;
-  spectranet_paged = 1;
-
-  if( machine_load_rom_bank( spectranet_full_map, 0,
-			     settings_current.rom_spectranet,
-			     settings_default.rom_spectranet,
-			     SPECTRANET_ROM_LENGTH ) ) {
-    settings_current.spectranet = 0;
-    periph_activate_type( PERIPH_TYPE_SPECTRANET, 0 );
-    return;
-  }
-
-  /* machine_load_rom_bank() assumes 16K pages, so we have to fix things up */
-  for( i = 0; i < SPECTRANET_ROM_LENGTH / SPECTRANET_PAGE_LENGTH; i++ )
-    for( j = 0; j < MEMORY_PAGES_IN_4K; j++ )
-      spectranet_full_map[i * MEMORY_PAGES_IN_4K + j].page_num = i;
+  spectranet_paged = !settings_current.spectranet_disable;
 
   spectranet_map_page( 0, 0x00 ); /* 0x0000 to 0x0fff is always chip 0, page 0 */
   spectranet_map_page( 1, 0xff ); /* And map something into 0x1000 to 0x1fff */
@@ -171,6 +157,25 @@ spectranet_activate( void )
         page->page = fake_bank + page->offset;
       }
 
+    /* Pages 0x00 to 0x1f are the flash ROM */
+    libspectrum_byte *rom =
+      memory_pool_allocate_persistent( SPECTRANET_ROM_LENGTH, 1 );
+    memset( rom, 0xff, SPECTRANET_ROM_LENGTH );
+
+    for( i = 0; i < SPECTRANET_ROM_LENGTH / SPECTRANET_PAGE_LENGTH; i++ ) {
+      int base = (SPECTRANET_ROM_BASE + i) * MEMORY_PAGES_IN_4K;
+      for( j = 0; j < MEMORY_PAGES_IN_4K; j++ ) {
+        memory_page *page = &spectranet_full_map[base + j];
+        page->page = rom + (i * MEMORY_PAGES_IN_4K + j) * MEMORY_PAGE_SIZE;
+      }
+    }
+
+    flash_am29f010_init( flash_rom, rom );
+
+    /* Pages 0x40 to 0x47 are the W5100 registers - handled in readbyte()
+       and writebyte() */
+
+    /* Pages 0xc0 to 0xff are the RAM */
     libspectrum_byte *ram =
       memory_pool_allocate_persistent( SPECTRANET_RAM_LENGTH, 1 );
 
@@ -223,6 +228,10 @@ spectranet_control_read( libspectrum_word port, int *attached )
 static void
 spectranet_control_write( libspectrum_word port, libspectrum_byte data )
 {
+  if( data & 0x01 )
+    spectranet_page();
+  else
+    spectranet_unpage();
 }
 
 static const periph_port_t spectranet_ports[] = {
@@ -250,6 +259,7 @@ spectranet_init( void )
     return 1;
 
   w5100 = nic_w5100_alloc();
+  flash_rom = flash_am29f010_alloc();
 
   return 0;
 }
@@ -266,4 +276,17 @@ spectranet_w5100_write( libspectrum_word reg, libspectrum_byte b )
   nic_w5100_write( w5100, reg, b );
 }
 
+void
+spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b )
+{
+  int pageb_page = spectranet_current_map[2 * MEMORY_PAGES_IN_4K].page_num;
+  
+  if( pageb_page < SPECTRANET_ROM_LENGTH / SPECTRANET_PAGE_LENGTH ) {
+    /* Which 16Kb flash page are we accessing */
+    int flash_page = pageb_page / 4;
+    /* And at what offset into that page */
+    libspectrum_word flash_address = (pageb_page % 4) * SPECTRANET_PAGE_LENGTH + (address & 0xfff);
+    flash_am29f010_write( flash_rom, flash_page, flash_address, b );
+  }
+}
 

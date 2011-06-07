@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2011 Philip Kendall
+## Copyright (c) 2010 Philip Kendall
 
 ## $Id$
 
@@ -23,46 +23,14 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/../..
 
-SUBDIRS = \
-  disk \
-  flash \
-  ide \
-  nic
-
-noinst_LIBRARIES = libperipherals.a
+noinst_LIBRARIES = libflash.a
 
 INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
-libperipherals_a_SOURCES = \
-  ay.c \
-  dck.c \
-  fuller.c \
-  if1.c \
-  if2.c \
-  joystick.c \
-  kempmouse.c \
-  melodik.c \
-  printer.c \
-  scld.c \
-  speccyboot.c \
-  specdrum.c \
-  spectranet.c \
-  ula.c
+libflash_a_SOURCES = \
+  am29f010.c
 
 noinst_HEADERS = \
-  ay.h \
-  dck.h \
-  fuller.h \
-  if1.h \
-  if2.h \
-  joystick.h \
-  kempmouse.h \
-  melodik.h \
-  printer.h \
-  scld.h \
-  speccyboot.h \
-  specdrum.h \
-  spectranet.h \
-  ula.h
+  am29f010.h

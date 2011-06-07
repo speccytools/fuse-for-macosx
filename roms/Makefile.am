@@ -32,8 +32,7 @@ ROMS =  128-0.rom 128-1.rom \
 	tc2068-0.rom tc2068-1.rom \
 	se-0.rom se-1.rom \
 	plusd.rom \
-        speccyboot-1.4.rom \
-        spectranet.rom
+        speccyboot-1.4.rom
 
 pkgdata_DATA = $(ROMS)
 
