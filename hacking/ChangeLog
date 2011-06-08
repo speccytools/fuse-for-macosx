@@ -3666,7 +3666,6 @@
 20110602 machines/{pentagon1024.c,pentagon512.c,scorpion.c},memory.[ch],
          peripherals/disk/beta.[ch]: get Russian machines working with 4Kb
          pages.
-<<<<<<< .working
 20110604 memory.h,peripherals/spectranet.c: Spectranet code now at least does
          something.
 20110604 machines/spec48.c: one 8Kb page assumption still remained.
@@ -3698,3 +3697,4 @@
          ui/options.dat,z80/{z80.c,z80_checks.h,z80_ops.c}: add emulation
          of the AMD AM29F010 flash (modified from patch #3313062) (Guesser
          and Phil).
+20110608 peripherals/spectranet.c: beginnings of Spectranet snapshot support.

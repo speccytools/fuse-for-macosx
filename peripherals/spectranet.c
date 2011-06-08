@@ -192,12 +192,39 @@ spectranet_activate( void )
   }
 }
 
+static void
+spectranet_enabled_snapshot( libspectrum_snap *snap )
+{
+  if( libspectrum_snap_spectranet_active( snap ) ) {
+    settings_current.spectranet = 1;
+    settings_current.spectranet_disable = 
+      libspectrum_snap_spectranet_all_traps_disabled( snap );
+  }
+}
+
+static void
+spectranet_from_snapshot( libspectrum_snap *snap )
+{
+  if( periph_is_active( PERIPH_TYPE_SPECTRANET ) ) {
+    /* TODO: stuff */
+  }
+}
+
+static void
+spectranet_to_snapshot( libspectrum_snap *snap )
+{
+  int active = periph_is_active( PERIPH_TYPE_SPECTRANET );
+  libspectrum_snap_set_spectranet_active( snap, active );
+  libspectrum_snap_set_spectranet_all_traps_disabled( snap,
+    settings_current.spectranet_disable );
+}
+
 static module_info_t spectranet_module_info = {
   spectranet_reset,
   spectranet_memory_map,
-  NULL,
-  NULL,
-  NULL
+  spectranet_enabled_snapshot,
+  spectranet_from_snapshot,
+  spectranet_to_snapshot
 };
 
 static void
