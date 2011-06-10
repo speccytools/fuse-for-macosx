@@ -206,6 +206,9 @@ spectranet_from_snapshot( libspectrum_snap *snap )
 {
   if( periph_is_active( PERIPH_TYPE_SPECTRANET ) ) {
 
+    settings_current.spectranet_disable =
+      libspectrum_snap_spectranet_all_traps_disabled( snap );
+
     spectranet_map_page( 1, libspectrum_snap_spectranet_page_a( snap ) );
     spectranet_map_page( 2, libspectrum_snap_spectranet_page_b( snap ) );
     memory_map_romcs( spectranet_current_map );

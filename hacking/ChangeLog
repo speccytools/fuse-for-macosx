@@ -3700,3 +3700,5 @@
 20110608 peripherals/spectranet.c: beginnings of Spectranet snapshot support.
 20110610 peripherals/spectranet.c: pretty much working Spectranet snapshot
          support.
+20110610 peripherals/spectranet.c: remember to restore Spectranet disabled
+         state when restoring from snapshot (thanks, Guesser).
