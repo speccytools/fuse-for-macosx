@@ -3698,3 +3698,5 @@
          of the AMD AM29F010 flash (modified from patch #3313062) (Guesser
          and Phil).
 20110608 peripherals/spectranet.c: beginnings of Spectranet snapshot support.
+20110610 peripherals/spectranet.c: pretty much working Spectranet snapshot
+         support.

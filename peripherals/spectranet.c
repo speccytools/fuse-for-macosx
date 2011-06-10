@@ -33,7 +33,9 @@
 #include "module.h"
 #include "nic/w5100.h"
 #include "periph.h"
+#include "peripherals/ula.h"
 #include "settings.h"
+#include "ui/ui.h"
 
 #define SPECTRANET_PAGES 256
 #define SPECTRANET_PAGE_LENGTH 0x1000
@@ -195,28 +197,70 @@ spectranet_activate( void )
 static void
 spectranet_enabled_snapshot( libspectrum_snap *snap )
 {
-  if( libspectrum_snap_spectranet_active( snap ) ) {
+  if( libspectrum_snap_spectranet_active( snap ) )
     settings_current.spectranet = 1;
-    settings_current.spectranet_disable = 
-      libspectrum_snap_spectranet_all_traps_disabled( snap );
-  }
 }
 
 static void
 spectranet_from_snapshot( libspectrum_snap *snap )
 {
   if( periph_is_active( PERIPH_TYPE_SPECTRANET ) ) {
-    /* TODO: stuff */
+
+    spectranet_map_page( 1, libspectrum_snap_spectranet_page_a( snap ) );
+    spectranet_map_page( 2, libspectrum_snap_spectranet_page_b( snap ) );
+    memory_map_romcs( spectranet_current_map );
+
+    if( libspectrum_snap_spectranet_paged( snap ) )
+      spectranet_page();
+    else
+      spectranet_unpage();
+
+    memcpy(
+      spectranet_full_map[SPECTRANET_ROM_BASE * MEMORY_PAGES_IN_4K].page,
+      libspectrum_snap_spectranet_flash( snap, 0 ), SPECTRANET_ROM_LENGTH );
+    memcpy(
+      spectranet_full_map[SPECTRANET_RAM_BASE * MEMORY_PAGES_IN_4K].page,
+      libspectrum_snap_spectranet_ram( snap, 0 ), SPECTRANET_RAM_LENGTH );
   }
 }
 
 static void
 spectranet_to_snapshot( libspectrum_snap *snap )
 {
+  libspectrum_byte *snap_buffer, *src;
+
   int active = periph_is_active( PERIPH_TYPE_SPECTRANET );
   libspectrum_snap_set_spectranet_active( snap, active );
+
+  if( !active )
+    return;
+
   libspectrum_snap_set_spectranet_all_traps_disabled( snap,
     settings_current.spectranet_disable );
+  libspectrum_snap_set_spectranet_page_a(
+    snap, spectranet_current_map[1 * MEMORY_PAGES_IN_4K].page_num );
+  libspectrum_snap_set_spectranet_page_b(
+    snap, spectranet_current_map[2 * MEMORY_PAGES_IN_4K].page_num );
+
+  snap_buffer = malloc( SPECTRANET_ROM_LENGTH * sizeof( libspectrum_byte ) );
+  if( !snap_buffer ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    return;
+  }
+
+  src = spectranet_full_map[SPECTRANET_ROM_BASE * MEMORY_PAGES_IN_4K].page;
+  memcpy( snap_buffer, src, SPECTRANET_ROM_LENGTH );
+  libspectrum_snap_set_spectranet_flash( snap, 0, snap_buffer );
+
+  snap_buffer = malloc( SPECTRANET_RAM_LENGTH * sizeof( libspectrum_byte ) );
+  if( !snap_buffer ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    return;
+  }
+
+  src = spectranet_full_map[SPECTRANET_RAM_BASE * MEMORY_PAGES_IN_4K].page;
+  memcpy( snap_buffer, src, SPECTRANET_RAM_LENGTH );
+  libspectrum_snap_set_spectranet_ram( snap, 0, snap_buffer );
 }
 
 static module_info_t spectranet_module_info = {
@@ -249,7 +293,7 @@ spectranet_trap( libspectrum_word port, libspectrum_byte data )
 static libspectrum_byte
 spectranet_control_read( libspectrum_word port, int *attached )
 {
-  return 0xff;
+  return ula_last_byte() & 0x07;
 }
 
 static void
