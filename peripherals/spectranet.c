@@ -60,6 +60,15 @@ int spectranet_available = 0;
 int spectranet_paged;
 int spectranet_w5100_paged_a = 0, spectranet_w5100_paged_b = 0;
 
+/* Whether the programmable trap is active */
+int spectranet_programmable_trap_active;
+
+/* Where the programmable trap will trigger if active */
+libspectrum_word spectranet_programmable_trap;
+
+/* True if the next write to 0x023b will set the MSB of the programmable trap */
+static int trap_write_msb;
+
 static int spectranet_source;
 
 /* Debugger events */
@@ -108,23 +117,32 @@ spectranet_map_page( int dest, int source )
 }
 
 static void
-spectranet_reset( int hard_reset GCC_UNUSED )
+spectranet_hard_reset( void )
+{
+  spectranet_map_page( 1, 0xff ); /* Map something into 0x1000 to 0x1fff */
+  spectranet_map_page( 2, 0xff ); /* And 0x2000 to 0x2fff */
+
+  spectranet_programmable_trap = 0x0000;
+  spectranet_programmable_trap_active = 0;
+  trap_write_msb = 0;
+}  
+
+static void
+spectranet_reset( int hard_reset )
 {
   if( !periph_is_active( PERIPH_TYPE_SPECTRANET ) )
     return;
 
-  spectranet_available = 0;
+  spectranet_available = 1;
   spectranet_paged = !settings_current.spectranet_disable;
 
-  spectranet_map_page( 0, 0x00 ); /* 0x0000 to 0x0fff is always chip 0, page 0 */
-  spectranet_map_page( 1, 0xff ); /* And map something into 0x1000 to 0x1fff */
-  spectranet_map_page( 2, 0xff ); /* And 0x2000 to 0x2fff */
-  spectranet_map_page( 3, 0xc0 ); /* 0x3000 to 0x3fff is always chip 3, page 0 */
+  if( hard_reset )
+    spectranet_hard_reset();
 
-  machine_current->ram.romcs = 1;
-  machine_current->memory_map();
-
-  spectranet_available = 1;
+  if( spectranet_paged ) {
+    machine_current->ram.romcs = 1;
+    machine_current->memory_map();
+  }
 }
 
 static void
@@ -191,6 +209,11 @@ spectranet_activate( void )
     }
 
     spectranet_memory_allocated = 1;
+
+    spectranet_map_page( 0, 0x00 );
+    spectranet_map_page( 3, 0xc0 );
+
+    spectranet_hard_reset();
   }
 }
 
@@ -206,15 +229,23 @@ spectranet_from_snapshot( libspectrum_snap *snap )
 {
   if( periph_is_active( PERIPH_TYPE_SPECTRANET ) ) {
 
+    spectranet_programmable_trap =
+      libspectrum_snap_spectranet_programmable_trap( snap );
+    spectranet_programmable_trap_active = 
+      libspectrum_snap_spectranet_programmable_trap_active( snap );
+    trap_write_msb =
+      libspectrum_snap_spectranet_programmable_trap_msb( snap );
+
     settings_current.spectranet_disable =
       libspectrum_snap_spectranet_all_traps_disabled( snap );
 
     spectranet_map_page( 1, libspectrum_snap_spectranet_page_a( snap ) );
     spectranet_map_page( 2, libspectrum_snap_spectranet_page_b( snap ) );
-    memory_map_romcs( spectranet_current_map );
 
-    if( libspectrum_snap_spectranet_paged( snap ) )
+    if( libspectrum_snap_spectranet_paged( snap ) ) {
       spectranet_page();
+      memory_map_romcs( spectranet_current_map );
+    }
     else
       spectranet_unpage();
 
@@ -237,6 +268,12 @@ spectranet_to_snapshot( libspectrum_snap *snap )
 
   if( !active )
     return;
+
+  libspectrum_snap_set_spectranet_programmable_trap( snap,
+    spectranet_programmable_trap );
+  libspectrum_snap_set_spectranet_programmable_trap_active( snap,
+    spectranet_programmable_trap_active );
+  libspectrum_snap_set_spectranet_programmable_trap_msb( snap, trap_write_msb );
 
   libspectrum_snap_set_spectranet_all_traps_disabled( snap,
     settings_current.spectranet_disable );
@@ -291,12 +328,24 @@ spectranet_page_b( libspectrum_word port, libspectrum_byte data )
 static void
 spectranet_trap( libspectrum_word port, libspectrum_byte data )
 {
+  if( trap_write_msb )
+    spectranet_programmable_trap =
+      (spectranet_programmable_trap & 0x00ff) | (data << 8);
+  else
+    spectranet_programmable_trap =
+      (spectranet_programmable_trap & 0xff00) | data;
+
+  trap_write_msb = !trap_write_msb;
 }
 
 static libspectrum_byte
 spectranet_control_read( libspectrum_word port, int *attached )
 {
-  return ula_last_byte() & 0x07;
+  *attached = 1;
+
+  return 
+    (ula_last_byte() & 0x07) |
+    (spectranet_programmable_trap_active ? 0x08 : 0x00);
 }
 
 static void
@@ -306,6 +355,8 @@ spectranet_control_write( libspectrum_word port, libspectrum_byte data )
     spectranet_page();
   else
     spectranet_unpage();
+
+  spectranet_programmable_trap_active = data & 0x08;
 }
 
 static const periph_port_t spectranet_ports[] = {

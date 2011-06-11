@@ -214,6 +214,10 @@ z80_do_opcodes( void )
     if( PC == 0x0008 || ((PC & 0xfff8) == 0x3ff8) )
       spectranet_page();
 
+    if( PC == spectranet_programmable_trap &&
+      spectranet_programmable_trap_active )
+      event_add( 0, z80_nmi_event );
+
     END_CHECK
 
   opcode_delay:

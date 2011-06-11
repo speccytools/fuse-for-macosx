@@ -3702,3 +3702,5 @@
          support.
 20110610 peripherals/spectranet.c: remember to restore Spectranet disabled
          state when restoring from snapshot (thanks, Guesser).
+20110611 peripherals/spectranet.[ch],z80/{coretest.c,z80_ops.c}: implement
+         Spectranet programmable trap support.

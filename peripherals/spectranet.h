@@ -37,5 +37,7 @@ void spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b );
 extern int spectranet_available;
 extern int spectranet_paged;
 extern int spectranet_w5100_paged_a, spectranet_w5100_paged_b;
+extern int spectranet_programmable_trap_active;
+extern int spectranet_programmable_trap;
 
 #endif /* #ifndef FUSE_SPECTRANET_H */

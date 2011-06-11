@@ -546,6 +546,9 @@ settings_info settings_current;
 libspectrum_word beta_pc_mask;
 libspectrum_word beta_pc_value;
 
+int spectranet_programmable_trap_active;
+libspectrum_word spectranet_programmable_trap;
+
 /* Initialise the dummy variables such that we're running on a clean a
    machine as possible */
 static int
@@ -567,6 +570,8 @@ init_dummies( void )
   settings_current.divide_enabled = 0;
   beta_pc_mask = 0xfe00;
   beta_pc_value = 0x3c00;
+  spectranet_programmable_trap_active = 0;
+  spectranet_programmable_trap = 0x0000;
 
   return 0;
 }
