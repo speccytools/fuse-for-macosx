@@ -341,11 +341,17 @@ spectranet_trap( libspectrum_word port, libspectrum_byte data )
 static libspectrum_byte
 spectranet_control_read( libspectrum_word port, int *attached )
 {
+  libspectrum_byte b = ula_last_byte() & 0x07;
+  if( spectranet_programmable_trap_active )
+    b |= 0x08;
+  if( ( machine_current->capabilities &
+    LIBSPECTRUM_MACHINE_CAPABILITY_128_MEMORY ) &&
+    machine_current->ram.last_byte & 0x08 )
+    b |= 0x10;
+
   *attached = 1;
 
-  return 
-    (ula_last_byte() & 0x07) |
-    (spectranet_programmable_trap_active ? 0x08 : 0x00);
+  return b;
 }
 
 static void

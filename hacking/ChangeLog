@@ -3704,3 +3704,5 @@
          state when restoring from snapshot (thanks, Guesser).
 20110611 peripherals/spectranet.[ch],z80/{coretest.c,z80_ops.c}: implement
          Spectranet programmable trap support.
+20110611 peripherals/spectranet.c: implement the shadow screen bit when reading
+         from port 0x033b.
