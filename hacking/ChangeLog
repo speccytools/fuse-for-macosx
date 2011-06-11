@@ -3708,3 +3708,4 @@
          from port 0x033b.
 20110611 peripherals/nic/w5100.c: very slightly less stubby W5100
          implementation.
+20110611 peripherals/spectranet.c: remember to set paged state in snapshot!

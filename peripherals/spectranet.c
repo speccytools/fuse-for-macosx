@@ -269,6 +269,7 @@ spectranet_to_snapshot( libspectrum_snap *snap )
   if( !active )
     return;
 
+  libspectrum_snap_set_spectranet_paged( snap, spectranet_paged );
   libspectrum_snap_set_spectranet_programmable_trap( snap,
     spectranet_programmable_trap );
   libspectrum_snap_set_spectranet_programmable_trap_active( snap,
