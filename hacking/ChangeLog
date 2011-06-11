@@ -3706,3 +3706,5 @@
          Spectranet programmable trap support.
 20110611 peripherals/spectranet.c: implement the shadow screen bit when reading
          from port 0x033b.
+20110611 peripherals/nic/w5100.c: very slightly less stubby W5100
+         implementation.
