@@ -3709,3 +3709,5 @@
 20110611 peripherals/nic/w5100.c: very slightly less stubby W5100
          implementation.
 20110611 peripherals/spectranet.c: remember to set paged state in snapshot!
+20110613 peripherals/flash/am29f010.c: ensure flash locations > 64Kb can be
+         written to.

@@ -46,10 +46,6 @@ struct flash_am29f010_t {
   libspectrum_byte *memory;
 };
 
-static void flash_am29f010_chip_erase( flash_am29f010_t *self );
-static void flash_am29f010_sector_erase( flash_am29f010_t *self, libspectrum_byte page );
-static void flash_am29f010_program( flash_am29f010_t *self, libspectrum_byte page, libspectrum_word address, libspectrum_byte b );
-
 flash_am29f010_t*
 flash_am29f010_alloc( void )
 {
@@ -86,11 +82,11 @@ flash_am29f010_sector_erase( flash_am29f010_t *self, libspectrum_byte page )
   memset( self->memory + ( page * SIZE_OF_FLASH_PAGE ), 0xff, SIZE_OF_FLASH_PAGE );
 }
 
-void
+static void
 flash_am29f010_program( flash_am29f010_t *self, libspectrum_byte page, libspectrum_word address, libspectrum_byte b )
 {
-  libspectrum_word flash_address = page * SIZE_OF_FLASH_PAGE + address;
-  self->memory[ flash_address ] = b;
+  libspectrum_dword flash_offset = page * SIZE_OF_FLASH_PAGE + address;
+  self->memory[ flash_offset ] = b;
 }
 
 void
