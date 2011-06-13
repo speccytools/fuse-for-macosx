@@ -295,9 +295,9 @@ readbyte( libspectrum_word address )
 
   if( spectranet_paged ) {
     if( spectranet_w5100_paged_a && address >= 0x1000 && address < 0x2000 )
-      return spectranet_w5100_read( address - 0x1000 );
+      return spectranet_w5100_read( mapping, address );
     if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 )
-      return spectranet_w5100_read( address - 0x2000 );
+      return spectranet_w5100_read( mapping, address );
   }
 
   return mapping->page[ address & MEMORY_PAGE_SIZE_MASK ];
@@ -383,11 +383,11 @@ writebyte_internal( libspectrum_word address, libspectrum_byte b )
     spectranet_flash_rom_write(address, b);
     
     if( spectranet_w5100_paged_a && address >= 0x1000 && address < 0x2000 ) {
-      spectranet_w5100_write( address - 0x1000, b );
+      spectranet_w5100_write( mapping, address, b );
       return;
     }
     if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 ) {
-      spectranet_w5100_write( address - 0x2000, b );
+      spectranet_w5100_write( mapping, address, b );
       return;
     }
   }

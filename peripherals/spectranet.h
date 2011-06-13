@@ -30,8 +30,8 @@ int spectranet_init( void );
 void spectranet_page( void );
 void spectranet_unpage( void );
 
-libspectrum_byte spectranet_w5100_read( libspectrum_word address );
-void spectranet_w5100_write( libspectrum_word address, libspectrum_byte b );
+libspectrum_byte spectranet_w5100_read( memory_page *page, libspectrum_word address );
+void spectranet_w5100_write( memory_page *page, libspectrum_word address, libspectrum_byte b );
 void spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b );
 
 extern int spectranet_available;

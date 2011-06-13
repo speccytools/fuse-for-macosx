@@ -396,16 +396,26 @@ spectranet_init( void )
   return 0;
 }
 
-libspectrum_byte
-spectranet_w5100_read( libspectrum_word reg )
+static libspectrum_word
+get_w5100_register( memory_page *page, libspectrum_word address )
 {
-  return nic_w5100_read( w5100, reg );
+  libspectrum_word base_address =
+    ( page->page_num - SPECTRANET_BUFFER_BASE ) * SPECTRANET_PAGE_LENGTH;
+  return base_address + ( address & 0xfff );
+}
+
+
+libspectrum_byte
+spectranet_w5100_read( memory_page *page, libspectrum_word address )
+{
+  return nic_w5100_read( w5100, get_w5100_register( page, address ) );
 }
 
 void
-spectranet_w5100_write( libspectrum_word reg, libspectrum_byte b )
+spectranet_w5100_write( memory_page *page, libspectrum_word address, libspectrum_byte b )
 {
-  nic_w5100_write( w5100, reg, b );
+  address &= 0xfff;
+  nic_w5100_write( w5100, get_w5100_register( page, address ), b );
 }
 
 void
