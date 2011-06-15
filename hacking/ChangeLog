@@ -3713,3 +3713,4 @@
          written to.
 20110613 memory.c,peripherals/{nic/w5100.c,spectranet.[ch]}: even less stubby
          W5100 emulation.
+20110615 peripherals/nic/w5100.c: Spectranet can now make a DNS query!
