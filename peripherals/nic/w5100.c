@@ -164,6 +164,7 @@ struct nic_w5100_t {
   nic_w5100_socket_t socket[4];
 
   pthread_t thread;         /* Thread for doing I/O */
+  sig_atomic_t stop_io_thread; /* Flag to stop I/O thread */
   int pipe_read;            /* Pipe for waking I/O thread */
   int pipe_write;
 };
@@ -220,7 +221,7 @@ w5100_io_thread( void *arg )
   nic_w5100_t *self = arg;
   int i;
 
-  while( 1 ) {
+  while( !self->stop_io_thread ) {
     fd_set readfds, writefds;
     int max_fd = self->pipe_read;
 
@@ -392,6 +393,8 @@ nic_w5100_alloc( void )
   self->pipe_read = pipefd[0];
   self->pipe_write = pipefd[1];
 
+  self->stop_io_thread = 0;
+
   error = pthread_create( &self->thread, NULL, w5100_io_thread, self );
   if( error ) {
     ui_error( UI_ERROR_ERROR, "w5100: error %d creating thread", error );
@@ -418,7 +421,10 @@ nic_w5100_free( nic_w5100_t *self )
 {
   int i;
 
-  pthread_cancel( self->thread );
+  self->stop_io_thread = 1;
+  w5100_wake_io_thread( self );
+
+  pthread_join( self->thread, NULL );
 
   for( i = 0; i < 4; i++ )
     w5100_socket_free( &self->socket[i] );
