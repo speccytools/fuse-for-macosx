@@ -3715,3 +3715,5 @@
          W5100 emulation.
 20110615 peripherals/nic/w5100.c: Spectranet can now make a DNS query!
 20110616 peripherals/nic/w5100.c: stop potential deadlock when freeing W5100.
+20110616 peripherals/nic/w5100.c: ensure we don't read more bytes than are free
+         in our rx buffer.

@@ -278,6 +278,7 @@ w5100_io_thread( void *arg )
 
       if( FD_ISSET( socket->fd, &readfds ) ) {
         libspectrum_byte buffer[0x800];
+        int bytes_free = 0x800 - socket->rx_rsr;
         ssize_t bytes_read;
         struct sockaddr_in sa;
         socklen_t sa_length = sizeof(sa);
@@ -287,7 +288,7 @@ w5100_io_thread( void *arg )
         sa.sin_family = AF_INET;
         memcpy( &sa.sin_port, socket->port, 2 );
         sa.sin_addr.s_addr = htonl(INADDR_ANY);
-        bytes_read = recvfrom( socket->fd, buffer + 8, 0x800 - 8, 0, (struct sockaddr*)&sa, &sa_length );
+        bytes_read = recvfrom( socket->fd, buffer + 8, bytes_free - 8, 0, (struct sockaddr*)&sa, &sa_length );
         printf("w5100: read 0x%03x bytes from socket %d\n", (int)bytes_read, socket->id);
 
         if( bytes_read != -1 ) {
@@ -302,7 +303,7 @@ w5100_io_thread( void *arg )
 
           bytes_read += 8;
 
-          socket->rx_rsr = bytes_read;
+          socket->rx_rsr += bytes_read;
           socket->old_rx_rd = socket->rx_rd;
           socket->ir |= 1 << 2;
 
@@ -687,9 +688,12 @@ w5100_socket_recv( nic_w5100_socket_t *socket )
 {
   if( socket->mode == W5100_SOCKET_MODE_UDP &&
     socket->state == W5100_SOCKET_STATE_UDP ) {
+    w5100_socket_acquire_lock( socket );
     socket->rx_rsr -= socket->rx_rd - socket->old_rx_rd;
+    socket->old_rx_rd = socket->rx_rd;
     if( socket->rx_rsr != 0 )
       socket->ir |= 1 << 2;
+    w5100_socket_release_lock( socket );
   }
 }
 
