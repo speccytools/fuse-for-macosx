@@ -89,13 +89,7 @@ nic_w5100_socket_reset( nic_w5100_socket_t *socket )
   socket->rx_rsr = 0;
   socket->rx_rd = 0;
 
-  if( socket->fd != -1 ) {
-    w5100_socket_acquire_lock( socket );
-    close( socket->fd );
-    socket->fd = -1;
-    socket->write_pending = 0;
-    w5100_socket_release_lock( socket );
-  }
+  nic_w5100_socket_free( socket );
 }
 
 void
@@ -105,6 +99,7 @@ nic_w5100_socket_free( nic_w5100_socket_t *socket )
     w5100_socket_acquire_lock( socket );
     close( socket->fd );
     socket->fd = -1;
+    socket->ok_for_io = 0;
     socket->write_pending = 0;
     w5100_socket_release_lock( socket );
   }
@@ -176,6 +171,7 @@ w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
     w5100_socket_acquire_lock( socket );
     close( socket->fd );
     socket->fd = -1;
+    socket->ok_for_io = 0;
     socket->state = W5100_SOCKET_STATE_CLOSED;
     w5100_socket_release_lock( socket );
     nic_w5100_wake_io_thread( self );
@@ -368,7 +364,7 @@ nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
 {
   w5100_socket_acquire_lock( socket );
 
-  socket->io_fd = socket->fd;
+  socket->ok_for_io = 1;
 
   if( socket->fd != -1 ) {
     FD_SET( socket->fd, readfds );
@@ -471,9 +467,9 @@ nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
 {
   w5100_socket_acquire_lock( socket );
 
-  /* Process only if we're an open socket, and our fd hasn't changed since
-     we started the select() */
-  if( socket->fd != -1 && socket->fd == socket->io_fd ) {
+  /* Process only if we're an open socket, and we haven't been closed and
+     re-opened since the select() started */
+  if( socket->fd != -1 && socket->ok_for_io ) {
     if( FD_ISSET( socket->fd, &readfds ) )
       w5100_socket_process_read( socket );
 

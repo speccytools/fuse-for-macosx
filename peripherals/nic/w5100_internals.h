@@ -99,8 +99,12 @@ typedef struct nic_w5100_socket_t {
   /* Host properties */
 
   int fd;                   /* Socket file descriptor */
-  int io_fd;                /* Temporary copy of fd used during IO */
   int write_pending;        /* True if we're waiting to write data on this socket */
+
+  /* Flag used to indicate that a socket has been closed since we started
+     waiting for it in a select() call and therefore the socket should no
+     longer be used */
+  int ok_for_io;
 
   pthread_mutex_t lock;     /* Mutex for this socket */
 
