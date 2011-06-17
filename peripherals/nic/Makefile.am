@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-## Copyright (c) 2010 Philip Kendall
+## Copyright (c) 2010-2011 Philip Kendall
 
 ## $Id$
 
@@ -31,8 +31,10 @@ INCLUDES = @LIBSPEC_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@
 
 libnic_a_SOURCES = \
   enc28j60.c \
-  w5100.c
+  w5100.c \
+  w5100_socket.c
 
 noinst_HEADERS = \
   enc28j60.h \
-  w5100.h
+  w5100.h \
+  w5100_internals.h

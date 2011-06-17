@@ -3717,3 +3717,5 @@
 20110616 peripherals/nic/w5100.c: stop potential deadlock when freeing W5100.
 20110616 peripherals/nic/w5100.c: ensure we don't read more bytes than are free
          in our rx buffer.
+20110617 peripherals/nic/{Makefile.am,w5100.c,w5100_internals.h,
+         w5100_socket.c}: split W5100 socket code out into a separate file.
