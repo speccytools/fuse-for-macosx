@@ -191,7 +191,7 @@ w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
 }
 
 static void
-w5100_socket_recv( nic_w5100_socket_t *socket )
+w5100_socket_recv( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->mode == W5100_SOCKET_MODE_UDP &&
     socket->state == W5100_SOCKET_STATE_UDP ) {
@@ -201,6 +201,7 @@ w5100_socket_recv( nic_w5100_socket_t *socket )
     if( socket->rx_rsr != 0 )
       socket->ir |= 1 << 2;
     w5100_socket_release_lock( socket );
+    nic_w5100_wake_io_thread( self );
   }
 }
 
@@ -220,7 +221,7 @@ w5100_write_socket_cr( nic_w5100_t *self, nic_w5100_socket_t *socket, libspectru
       w5100_socket_send( self, socket );
       break;
     case W5100_SOCKET_COMMAND_RECV:
-      w5100_socket_recv( socket );
+      w5100_socket_recv( self, socket );
       break;
     default:
       printf("w5100: unknown command 0x%02x sent to socket %d\n", b, socket->id);
@@ -364,16 +365,23 @@ nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
 {
   w5100_socket_acquire_lock( socket );
 
-  socket->ok_for_io = 1;
-
   if( socket->fd != -1 ) {
-    FD_SET( socket->fd, readfds );
-    if( socket->fd > *max_fd )
-      *max_fd = socket->fd;
-    printf("w5100: checking for read on socket %d with fd %d; max fd %d\n", socket->id, socket->fd, *max_fd);
+    socket->ok_for_io = 1;
+
+    /* The socket must have at least 9 bytes of spare buffer space (8 byte UDP
+       header and 1 byte of actual data), otherwise we'll have nowhere to put
+       the actual data */
+    if( 0x800 - socket->rx_rsr >= 9 ) {
+      FD_SET( socket->fd, readfds );
+      if( socket->fd > *max_fd )
+        *max_fd = socket->fd;
+      printf("w5100: checking for read on socket %d with fd %d; max fd %d\n", socket->id, socket->fd, *max_fd);
+    }
 
     if( socket->write_pending ) {
       FD_SET( socket->fd, writefds );
+      if( socket->fd > *max_fd )
+        *max_fd = socket->fd;
       printf("w5100: write pending on socket %d with fd %d; max fd %d\n", socket->id, socket->fd, *max_fd);
     }
   }

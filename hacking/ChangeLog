@@ -3728,3 +3728,5 @@
 20110617 peripherals/nic/w5100_socket.c: socket->old_rx_rd is updated by RECV
          command, not by new data becoming available. It should be initialised,
          though.
+20110617 peripherals/nic/w5100_socker.c: don't read from sockets that have no
+         buffer space left to put the data into.
