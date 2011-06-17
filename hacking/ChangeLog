@@ -3719,3 +3719,5 @@
          in our rx buffer.
 20110617 peripherals/nic/{Makefile.am,w5100.c,w5100_internals.h,
          w5100_socket.c}: split W5100 socket code out into a separate file.
+20110617 peripherals/nic/w5100_socket.c: don't process closed sockets (thanks,
+         Winston).

@@ -471,8 +471,9 @@ nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
 {
   w5100_socket_acquire_lock( socket );
 
-  /* Process only if our fd hasn't changed since we started the select() */
-  if( socket->fd == socket->io_fd ) {
+  /* Process only if we're an open socket, and our fd hasn't changed since
+     we started the select() */
+  if( socket->fd != -1 && socket->fd == socket->io_fd ) {
     if( FD_ISSET( socket->fd, &readfds ) )
       w5100_socket_process_read( socket );
 
