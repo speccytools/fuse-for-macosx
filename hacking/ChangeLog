@@ -3725,3 +3725,6 @@
          changes around the select() call could miss the case of a socket being
          closed and re-opened with the same fd, so move to explicit
          invalidation instead.
+20110617 peripherals/nic/w5100_socket.c: socket->old_rx_rd is updated by RECV
+         command, not by new data becoming available. It should be initialised,
+         though.

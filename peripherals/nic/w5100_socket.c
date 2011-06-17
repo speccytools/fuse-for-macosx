@@ -87,7 +87,7 @@ nic_w5100_socket_reset( nic_w5100_socket_t *socket )
   memset( socket->dport, 0, sizeof( socket->dport ) );
   socket->tx_rr = socket->tx_wr = 0;
   socket->rx_rsr = 0;
-  socket->rx_rd = 0;
+  socket->old_rx_rd = socket->rx_rd = 0;
 
   nic_w5100_socket_free( socket );
 }
@@ -411,7 +411,6 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
     bytes_read += 8;
 
     socket->rx_rsr += bytes_read;
-    socket->old_rx_rd = socket->rx_rd;
     socket->ir |= 1 << 2;
 
     if( offset + bytes_read <= 0x800 ) {
