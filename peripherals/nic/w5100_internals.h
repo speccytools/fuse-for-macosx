@@ -33,10 +33,15 @@ typedef enum w5100_socket_mode {
   W5100_SOCKET_MODE_CLOSED = 0x00,
   W5100_SOCKET_MODE_TCP,
   W5100_SOCKET_MODE_UDP,
+  W5100_SOCKET_MODE_IPRAW,
+  W5100_SOCKET_MODE_MACRAW,
+  W5100_SOCKET_MODE_PPPOE,
 } w5100_socket_mode;
 
 typedef enum w5100_socket_state {
   W5100_SOCKET_STATE_CLOSED = 0x00,
+
+  W5100_SOCKET_STATE_INIT = 0x13,
 
   W5100_SOCKET_STATE_UDP = 0x22,
 } w5100_socket_state;
@@ -76,6 +81,8 @@ typedef struct nic_w5100_socket_t {
   /* W5100 properties */
 
   w5100_socket_mode mode;
+  libspectrum_byte flags;
+
   w5100_socket_state state;
 
   libspectrum_byte ir;      /* Interrupt register */

@@ -53,6 +53,7 @@ nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
   socket->id = which;
   socket->mode = W5100_SOCKET_MODE_CLOSED;
   socket->state = W5100_SOCKET_STATE_CLOSED;
+  socket->fd = -1;
   pthread_mutex_init( &socket->lock, NULL );
 }
 
@@ -110,11 +111,32 @@ w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
 {
   printf("w5100: writing 0x%02x to S%d_MR\n", b, socket->id);
 
-  if( b <= 0x02 )
-    socket->mode = b;
-  else {
-    socket->mode = W5100_SOCKET_MODE_CLOSED;
-    printf("w5100: unsupported value 0x%02x written to S%d_MR\n", b, socket->id);
+  w5100_socket_mode mode = b & 0x0f;
+  libspectrum_byte flags = b & 0xf0;
+
+  switch( mode ) {
+    case W5100_SOCKET_MODE_CLOSED:
+      socket->mode = mode;
+      break;
+    case W5100_SOCKET_MODE_TCP:
+      /* We support only "disable no delayed ACK" */
+      if( flags != 0x20 )
+        printf("w5100: unsupported flags 0x%02x set for TCP mode on socket %d\n", b & 0xf0, socket->id);
+      socket->mode = mode;
+      break;
+    case W5100_SOCKET_MODE_UDP:
+      /* We don't support multicast */
+      if( flags != 0x00 )
+        printf("w5100: unsupported flags 0x%02x set for UDP mode on socket %d\n", b & 0xf0, socket->id);
+      socket->mode = mode;
+      break;
+    case W5100_SOCKET_MODE_IPRAW:
+    case W5100_SOCKET_MODE_MACRAW:
+    case W5100_SOCKET_MODE_PPPOE:
+    default:
+      printf("w5100: unsupported mode 0x%02x set on socket %d\n", b, socket->id);
+      socket->mode = W5100_SOCKET_MODE_CLOSED;
+      break;
   }
 }
 
@@ -123,10 +145,7 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
 {
   if( socket_obj->mode == W5100_SOCKET_MODE_UDP &&
     socket_obj->state == W5100_SOCKET_STATE_CLOSED ) {
-
     nic_w5100_socket_reset( socket_obj );
-
-    socket_obj->state = W5100_SOCKET_STATE_UDP;
 
     w5100_socket_acquire_lock( socket_obj );
     socket_obj->fd = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
@@ -137,7 +156,24 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
     }
     w5100_socket_release_lock( socket_obj );
 
-    printf("w5100: opened fd %d for socket %d\n", socket_obj->fd, socket_obj->id);
+    socket_obj->state = W5100_SOCKET_STATE_UDP;
+    printf("w5100: opened UDP fd %d for socket %d\n", socket_obj->fd, socket_obj->id);
+  }
+  else if( socket_obj->mode == W5100_SOCKET_MODE_TCP &&
+    socket_obj->state == W5100_SOCKET_STATE_CLOSED ) {
+    nic_w5100_socket_reset( socket_obj );
+
+    w5100_socket_acquire_lock( socket_obj );
+    socket_obj->fd = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
+    if( socket_obj->fd == -1 ) {
+      printf("w5100: failed to open TCP socket for socket %d; errno = %d\n", socket_obj->id, errno);
+      w5100_socket_release_lock( socket_obj );
+      return;
+    }
+    w5100_socket_release_lock( socket_obj );
+
+    socket_obj->state = W5100_SOCKET_STATE_INIT;
+    printf("w5100: opened TCP fd %d for socket %d\n", socket_obj->fd, socket_obj->id);
   }
 }
 
@@ -368,10 +404,13 @@ nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
   if( socket->fd != -1 ) {
     socket->ok_for_io = 1;
 
-    /* The socket must have at least 9 bytes of spare buffer space (8 byte UDP
-       header and 1 byte of actual data), otherwise we'll have nowhere to put
-       the actual data */
-    if( 0x800 - socket->rx_rsr >= 9 ) {
+    /* We can process a UDP read if we're in a UDP state and there are at least
+       9 bytes free in our buffer (8 byte UDP header and 1 byte of actual
+       data). */
+    int udp_read = socket->state == W5100_SOCKET_STATE_UDP &&
+      0x800 - socket->rx_rsr >= 9;
+
+    if( udp_read ) {
       FD_SET( socket->fd, readfds );
       if( socket->fd > *max_fd )
         *max_fd = socket->fd;
