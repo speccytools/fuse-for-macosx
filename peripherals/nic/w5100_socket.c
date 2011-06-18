@@ -407,7 +407,7 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   printf("w5100: read 0x%03x bytes from socket %d\n", (int)bytes_read, socket->id);
 
   if( bytes_read != -1 ) {
-    int offset = socket->rx_rd & 0x7ff;
+    int offset = (socket->old_rx_rd + socket->rx_rsr) & 0x7ff;
     libspectrum_byte *dest = &socket->rx_buffer[offset];
 
     /* Add the W5100's UDP header */
