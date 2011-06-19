@@ -3736,3 +3736,5 @@
          so we don't try and close() uninitialised values (thanks, valgrind).
 20110619 peripherals/nic/w5100_socket.c: ensure that socket->ok_for_io is
          initialised (thanks, Winston and valgrind).
+20110619 peripherals/nic/w5100_socket.c: ensure that Spectranet-side sockets
+         are properly cleared out on reset.

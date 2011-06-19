@@ -51,8 +51,6 @@ void
 nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
 {
   socket->id = which;
-  socket->mode = W5100_SOCKET_MODE_CLOSED;
-  socket->state = W5100_SOCKET_STATE_CLOSED;
   socket->fd = -1;
   socket->ok_for_io = 0;
   pthread_mutex_init( &socket->lock, NULL );
@@ -80,8 +78,8 @@ w5100_socket_release_lock( nic_w5100_socket_t *socket )
   }
 }
 
-void
-nic_w5100_socket_reset( nic_w5100_socket_t *socket )
+static void
+w5100_socket_clean( nic_w5100_socket_t *socket )
 {
   socket->ir = 0;
   memset( socket->port, 0, sizeof( socket->port ) );
@@ -92,6 +90,16 @@ nic_w5100_socket_reset( nic_w5100_socket_t *socket )
   socket->old_rx_rd = socket->rx_rd = 0;
 
   nic_w5100_socket_free( socket );
+}
+
+void
+nic_w5100_socket_reset( nic_w5100_socket_t *socket )
+{
+  socket->mode = W5100_SOCKET_MODE_CLOSED;
+  socket->flags = 0;
+  socket->state = W5100_SOCKET_STATE_CLOSED;
+
+  w5100_socket_clean( socket );
 }
 
 void
@@ -117,28 +125,32 @@ w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
 
   switch( mode ) {
     case W5100_SOCKET_MODE_CLOSED:
-      socket->mode = mode;
       break;
     case W5100_SOCKET_MODE_TCP:
       /* We support only "disable no delayed ACK" */
-      if( flags != 0x20 )
+      if( flags != 0x20 ) {
         printf("w5100: unsupported flags 0x%02x set for TCP mode on socket %d\n", b & 0xf0, socket->id);
-      socket->mode = mode;
+        flags = 0x20;
+      }
       break;
     case W5100_SOCKET_MODE_UDP:
       /* We don't support multicast */
-      if( flags != 0x00 )
+      if( flags != 0x00 ) {
         printf("w5100: unsupported flags 0x%02x set for UDP mode on socket %d\n", b & 0xf0, socket->id);
-      socket->mode = mode;
+        flags = 0;
+      }
       break;
     case W5100_SOCKET_MODE_IPRAW:
     case W5100_SOCKET_MODE_MACRAW:
     case W5100_SOCKET_MODE_PPPOE:
     default:
       printf("w5100: unsupported mode 0x%02x set on socket %d\n", b, socket->id);
-      socket->mode = W5100_SOCKET_MODE_CLOSED;
+      mode = W5100_SOCKET_MODE_CLOSED;
       break;
   }
+
+  socket->mode = mode;
+  socket->flags = flags;
 }
 
 static void
@@ -146,7 +158,7 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
 {
   if( socket_obj->mode == W5100_SOCKET_MODE_UDP &&
     socket_obj->state == W5100_SOCKET_STATE_CLOSED ) {
-    nic_w5100_socket_reset( socket_obj );
+    w5100_socket_clean( socket_obj );
 
     w5100_socket_acquire_lock( socket_obj );
     socket_obj->fd = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
@@ -162,7 +174,7 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
   }
   else if( socket_obj->mode == W5100_SOCKET_MODE_TCP &&
     socket_obj->state == W5100_SOCKET_STATE_CLOSED ) {
-    nic_w5100_socket_reset( socket_obj );
+    w5100_socket_clean( socket_obj );
 
     w5100_socket_acquire_lock( socket_obj );
     socket_obj->fd = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
