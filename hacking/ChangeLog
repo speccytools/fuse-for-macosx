@@ -3738,3 +3738,5 @@
          initialised (thanks, Winston and valgrind).
 20110619 peripherals/nic/w5100_socket.c: ensure that Spectranet-side sockets
          are properly cleared out on reset.
+20110619 peripherals/spectranet.c: implement "deny downstream A15" lack of
+         support.

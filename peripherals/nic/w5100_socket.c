@@ -199,6 +199,8 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
   memcpy( &sa.sin_port, socket->port, 2 );
   memcpy( &sa.sin_addr.s_addr, self->sip, 4 );
 
+  printf("w5100: binding socket %d to port %d\n", socket->id, ntohs(sa.sin_port));
+
   w5100_socket_acquire_lock( socket );
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
     printf("w5100: failed to bind socket %d; errno = %d\n", socket->id, errno);

@@ -275,9 +275,11 @@ spectranet_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_spectranet_programmable_trap_active( snap,
     spectranet_programmable_trap_active );
   libspectrum_snap_set_spectranet_programmable_trap_msb( snap, trap_write_msb );
+  libspectrum_snap_set_spectranet_deny_downstream_a15( snap, 0 );
 
   libspectrum_snap_set_spectranet_all_traps_disabled( snap,
     settings_current.spectranet_disable );
+  libspectrum_snap_set_spectranet_rst8_trap_disabled( snap, 0 );
   libspectrum_snap_set_spectranet_page_a(
     snap, spectranet_current_map[1 * MEMORY_PAGES_IN_4K].page_num );
   libspectrum_snap_set_spectranet_page_b(
