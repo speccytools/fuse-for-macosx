@@ -52,6 +52,7 @@ nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
 {
   socket->id = which;
   socket->fd = -1;
+  socket->socket_bound = 0;
   socket->ok_for_io = 0;
   pthread_mutex_init( &socket->lock, NULL );
 }
@@ -109,6 +110,7 @@ nic_w5100_socket_free( nic_w5100_socket_t *socket )
     w5100_socket_acquire_lock( socket );
     close( socket->fd );
     socket->fd = -1;
+    socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->write_pending = 0;
     w5100_socket_release_lock( socket );
@@ -199,17 +201,13 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
   memcpy( &sa.sin_port, socket->port, 2 );
   memcpy( &sa.sin_addr.s_addr, self->sip, 4 );
 
-  w5100_socket_acquire_lock( socket );
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
     printf("w5100: failed to bind socket %d; errno = %d\n", socket->id, errno);
     w5100_socket_release_lock( socket );
     return;
   }
-  w5100_socket_release_lock( socket );
 
-  nic_w5100_wake_io_thread( self );
-
-  printf("w5100: successfully bound socket %d\n", socket->id);
+  printf("w5100: successfully bound socket %d to port 0x%04x\n", socket->id, ntohs(sa.sin_port) );
 }
 
 static void
@@ -220,6 +218,7 @@ w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
     w5100_socket_acquire_lock( socket );
     close( socket->fd );
     socket->fd = -1;
+    socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->state = W5100_SOCKET_STATE_CLOSED;
     w5100_socket_release_lock( socket );
@@ -233,6 +232,8 @@ w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
   if( socket->mode == W5100_SOCKET_MODE_UDP &&
     socket->state == W5100_SOCKET_STATE_UDP ) {
     w5100_socket_acquire_lock( socket );
+    if( !socket->socket_bound )
+      w5100_socket_bind_port( self, socket );
     socket->write_pending = 1;
     w5100_socket_release_lock( socket );
     nic_w5100_wake_io_thread( self );
@@ -356,8 +357,6 @@ nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byt
     case W5100_SOCKET_PORT0: case W5100_SOCKET_PORT1:
       printf("w5100: writing 0x%02x to S%d_PORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_PORT0);
       socket->port[socket_reg - W5100_SOCKET_PORT0] = b;
-      if( socket_reg == W5100_SOCKET_PORT0 )
-        w5100_socket_bind_port( self, socket );
       break;
     case W5100_SOCKET_DIPR0: case W5100_SOCKET_DIPR1: case W5100_SOCKET_DIPR2: case W5100_SOCKET_DIPR3:
       printf("w5100: writing 0x%02x to S%d_DIPR%d\n", b, socket->id, socket_reg - W5100_SOCKET_DIPR0);
