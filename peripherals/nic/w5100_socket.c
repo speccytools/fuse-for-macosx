@@ -54,6 +54,7 @@ nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
   socket->mode = W5100_SOCKET_MODE_CLOSED;
   socket->state = W5100_SOCKET_STATE_CLOSED;
   socket->fd = -1;
+  socket->ok_for_io = 0;
   pthread_mutex_init( &socket->lock, NULL );
 }
 

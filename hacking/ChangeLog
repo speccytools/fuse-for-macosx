@@ -3734,3 +3734,5 @@
          space in the case of multiple reads.
 20110618 peripherals/nic/w5100_socket.c: ensure that socket->fd is initialised
          so we don't try and close() uninitialised values (thanks, valgrind).
+20110619 peripherals/nic/w5100_socket.c: ensure that socket->ok_for_io is
+         initialised (thanks, Winston and valgrind).
