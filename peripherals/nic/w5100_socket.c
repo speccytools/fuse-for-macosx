@@ -197,6 +197,7 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   struct sockaddr_in sa;
 
+  memset( &sa, 0, sizeof(sa) );
   sa.sin_family = AF_INET;
   memcpy( &sa.sin_port, socket->port, 2 );
   memcpy( &sa.sin_addr.s_addr, self->sip, 4 );
@@ -451,6 +452,7 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
 
   printf("w5100: reading from socket %d\n", socket->id);
 
+  memset( &sa, 0, sizeof(sa) );
   sa.sin_family = AF_INET;
   memcpy( &sa.sin_port, socket->port, 2 );
   sa.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -501,6 +503,7 @@ w5100_socket_process_write( nic_w5100_socket_t *socket )
 
   printf("w5100: writing to socket %d\n", socket->id);
 
+  memset( &sa, 0, sizeof(sa) );
   sa.sin_family = AF_INET;
   memcpy( &sa.sin_port, socket->dport, 2 );
   memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );

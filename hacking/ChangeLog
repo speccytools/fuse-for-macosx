@@ -3745,3 +3745,5 @@
          written to to prevent multiple bind attempts. Also deals with the
          problem of the bytes of PORT being written to in different orders in
          different bits of the Spectranet code.
+20110619 peripherals/nic/w5100_socket.c: ensure all sockaddr_in structures are
+         zeroed before use.
