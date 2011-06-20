@@ -42,6 +42,8 @@
 
 enum w5100_socket_command {
   W5100_SOCKET_COMMAND_OPEN = 0x01,
+  W5100_SOCKET_COMMAND_CONNECT = 0x04,
+  W5100_SOCKET_COMMAND_DISCON = 0x08,
   W5100_SOCKET_COMMAND_CLOSE = 0x10,
   W5100_SOCKET_COMMAND_SEND = 0x20,
   W5100_SOCKET_COMMAND_RECV = 0x40,
@@ -212,29 +214,78 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
 }
 
 static void
+w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
+{
+  if( socket->state == W5100_SOCKET_STATE_INIT ) {
+    struct sockaddr_in sa;
+    
+    w5100_socket_acquire_lock( socket );
+    if( !socket->socket_bound )
+      w5100_socket_bind_port( self, socket );
+
+    memset( &sa, 0, sizeof(sa) );
+    sa.sin_family = AF_INET;
+    memcpy( &sa.sin_port, socket->dport, 2 );
+    memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
+
+    if( connect( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
+      printf("w5100: failed to connect socket %d to 0x%08x:0x%04x; errno = %d\n", socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port), errno);
+      socket->ir |= 1 << 3;
+      socket->state = W5100_SOCKET_STATE_CLOSED;
+      w5100_socket_release_lock( socket );
+      return;
+    }
+
+    socket->ir |= 1 << 0;
+    socket->state = W5100_SOCKET_STATE_ESTABLISHED;
+
+    w5100_socket_release_lock( socket );
+  }
+}
+
+static void
+w5100_socket_discon( nic_w5100_t *self, nic_w5100_socket_t *socket )
+{
+  if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
+    w5100_socket_acquire_lock( socket );
+    socket->ir |= 1 << 1;
+    socket->state = W5100_SOCKET_STATE_CLOSED;
+    w5100_socket_release_lock( socket );
+    nic_w5100_wake_io_thread( self );
+
+    printf("w5100: disconnected socket %d\n", socket->id);
+  }
+}
+
+static void
 w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
-  if( socket->mode == W5100_SOCKET_MODE_UDP &&
-    socket->state == W5100_SOCKET_STATE_UDP ) {
-    w5100_socket_acquire_lock( socket );
+  w5100_socket_acquire_lock( socket );
+  if( socket->fd != -1 ) {
     close( socket->fd );
     socket->fd = -1;
     socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->state = W5100_SOCKET_STATE_CLOSED;
-    w5100_socket_release_lock( socket );
     nic_w5100_wake_io_thread( self );
+    printf("w5100: closed socket %d\n", socket->id);
   }
+  w5100_socket_release_lock( socket );
 }
 
 static void
 w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
-  if( socket->mode == W5100_SOCKET_MODE_UDP &&
-    socket->state == W5100_SOCKET_STATE_UDP ) {
+  if( socket->state == W5100_SOCKET_STATE_UDP ) {
     w5100_socket_acquire_lock( socket );
     if( !socket->socket_bound )
       w5100_socket_bind_port( self, socket );
+    socket->write_pending = 1;
+    w5100_socket_release_lock( socket );
+    nic_w5100_wake_io_thread( self );
+  }
+  else if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
+    w5100_socket_acquire_lock( socket );
     socket->write_pending = 1;
     w5100_socket_release_lock( socket );
     nic_w5100_wake_io_thread( self );
@@ -244,8 +295,7 @@ w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
 static void
 w5100_socket_recv( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
-  if( socket->mode == W5100_SOCKET_MODE_UDP &&
-    socket->state == W5100_SOCKET_STATE_UDP ) {
+  if( socket->state == W5100_SOCKET_STATE_UDP ) {
     w5100_socket_acquire_lock( socket );
     socket->rx_rsr -= socket->rx_rd - socket->old_rx_rd;
     socket->old_rx_rd = socket->rx_rd;
@@ -264,6 +314,12 @@ w5100_write_socket_cr( nic_w5100_t *self, nic_w5100_socket_t *socket, libspectru
   switch( b ) {
     case W5100_SOCKET_COMMAND_OPEN:
       w5100_socket_open( socket );
+      break;
+    case W5100_SOCKET_COMMAND_CONNECT:
+      w5100_socket_connect( self, socket );
+      break;
+    case W5100_SOCKET_COMMAND_DISCON:
+      w5100_socket_discon( self, socket );
       break;
     case W5100_SOCKET_COMMAND_CLOSE:
       w5100_socket_close( self, socket );
@@ -415,15 +471,19 @@ nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
   w5100_socket_acquire_lock( socket );
 
   if( socket->fd != -1 ) {
-    socket->ok_for_io = 1;
-
     /* We can process a UDP read if we're in a UDP state and there are at least
        9 bytes free in our buffer (8 byte UDP header and 1 byte of actual
        data). */
     int udp_read = socket->state == W5100_SOCKET_STATE_UDP &&
       0x800 - socket->rx_rsr >= 9;
+    /* We can process a TCP read if we're in the established state and have
+       any room in our buffer (no header necessary for TCP). */
+    int tcp_read = socket->state == W5100_SOCKET_STATE_ESTABLISHED &&
+      0x800 - socket->rx_rsr >= 1;
 
-    if( udp_read ) {
+    socket->ok_for_io = 1;
+
+    if( udp_read || tcp_read ) {
       FD_SET( socket->fd, readfds );
       if( socket->fd > *max_fd )
         *max_fd = socket->fd;
@@ -491,7 +551,6 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
 static void
 w5100_socket_process_write( nic_w5100_socket_t *socket )
 {
-  struct sockaddr_in sa;
   ssize_t bytes_sent;
   int offset = socket->tx_rr & 0x7ff;
   libspectrum_word length = socket->tx_wr - socket->tx_rr;
@@ -501,25 +560,47 @@ w5100_socket_process_write( nic_w5100_socket_t *socket )
   if( offset + length > 0x800 )
     length = 0x800 - offset;
 
-  printf("w5100: writing to socket %d\n", socket->id);
+  if( socket->mode == W5100_SOCKET_MODE_UDP &&
+    socket->state == W5100_SOCKET_STATE_UDP ) {
+    struct sockaddr_in sa;
 
-  memset( &sa, 0, sizeof(sa) );
-  sa.sin_family = AF_INET;
-  memcpy( &sa.sin_port, socket->dport, 2 );
-  memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
+    printf("w5100: writing to UDP socket %d\n", socket->id);
 
-  bytes_sent = sendto( socket->fd, data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
-  printf("w5100: sent 0x%03x bytes of %d to socket %d\n", (int)bytes_sent, length, socket->id);
+    memset( &sa, 0, sizeof(sa) );
+    sa.sin_family = AF_INET;
+    memcpy( &sa.sin_port, socket->dport, 2 );
+    memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
-  if( bytes_sent != -1 ) {
-    socket->tx_rr += bytes_sent;
-    if( socket->tx_rr == socket->tx_wr ) {
-      socket->write_pending = 0;
-      socket->ir |= 1 << 4;
+    bytes_sent = sendto( socket->fd, data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
+    printf("w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n", (int)bytes_sent, length, socket->id);
+
+    if( bytes_sent != -1 ) {
+      socket->tx_rr += bytes_sent;
+      if( socket->tx_rr == socket->tx_wr ) {
+        socket->write_pending = 0;
+        socket->ir |= 1 << 4;
+      }
     }
+    else
+      printf("w5100: error %d writing to UDP socket %d\n", errno, socket->id);
   }
-  else
-    printf("w5100: error %d writing to socket %d\n", errno, socket->id);
+  else if( socket->mode == W5100_SOCKET_MODE_TCP &&
+    socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
+    printf("w5100: writing to TCP socket %d\n", socket->id);
+
+    bytes_sent = send( socket->fd, data, length, 0 );
+    printf("w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n", (int)bytes_sent, length, socket->id);
+
+    if( bytes_sent != -1 ) {
+      socket->tx_rr += bytes_sent;
+      if( socket->tx_rr == socket->tx_wr ) {
+        socket->write_pending = 0;
+        socket->ir |= 1 << 4;
+      }
+    }
+    else
+      printf("w5100: error %d writing to TCP socket %d\n", errno, socket->id);
+  }
 }
 
 void
