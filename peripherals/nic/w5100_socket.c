@@ -570,13 +570,18 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   libspectrum_word length = socket->datagram_lengths[0];
   libspectrum_byte *data = &socket->tx_buffer[ offset ];
   struct sockaddr_in sa;
+  libspectrum_byte buffer[0x800];
 
   printf("w5100: writing to UDP socket %d\n", socket->id);
 
-  /* If the data wraps round the write buffer, write it in two chunks */
-  /* FIXME: this is the wrong thing to do! */
-  if( offset + length > 0x800 )
-    length = 0x800 - offset;
+  /* If the data wraps round the write buffer, we need to coalesce it into
+     one chunk for the call to sendto() */
+  if( offset + length > 0x800 ) {
+    int first_chunk = 0x800 - offset;
+    memcpy( buffer, data, first_chunk );
+    memcpy( buffer + first_chunk, socket->tx_buffer, length - first_chunk );
+    data = buffer;
+  }
 
   memset( &sa, 0, sizeof(sa) );
   sa.sin_family = AF_INET;

@@ -3754,3 +3754,5 @@
 20110621 peripherals/nic/{w5100_internals.h,w5100_socket.c}: multiple datagrams
          should not be combined in one sendto() call (thanks, Guesser and Chris
          Cowley).
+20110621 peripherals/nic/w5100_socket.c: ensure that UDP datagrams which wrap
+         around the transmit buffer are not split into two.
