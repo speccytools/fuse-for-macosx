@@ -227,6 +227,9 @@ spectranet_enabled_snapshot( libspectrum_snap *snap )
 static void
 spectranet_from_snapshot( libspectrum_snap *snap )
 {
+  if( !libspectrum_snap_spectranet_active( snap ) )
+    return;
+
   if( periph_is_active( PERIPH_TYPE_SPECTRANET ) ) {
 
     spectranet_programmable_trap =

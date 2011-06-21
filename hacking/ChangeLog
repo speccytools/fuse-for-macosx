@@ -3756,3 +3756,5 @@
          Cowley).
 20110621 peripherals/nic/w5100_socket.c: ensure that UDP datagrams which wrap
          around the transmit buffer are not split into two.
+20110621 peripherals/spectranet.c: don't try and load Spectranet data from a
+         snapshot which doesn't contain it (thanks, Winston).
