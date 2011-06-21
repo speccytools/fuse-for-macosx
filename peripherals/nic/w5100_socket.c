@@ -92,6 +92,9 @@ w5100_socket_clean( nic_w5100_socket_t *socket )
   socket->rx_rsr = 0;
   socket->old_rx_rd = socket->rx_rd = 0;
 
+  socket->last_send = 0;
+  socket->datagram_count = 0;
+
   nic_w5100_socket_free( socket );
 }
 
@@ -210,6 +213,7 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
     return;
   }
 
+  socket->socket_bound = 1;
   printf("w5100: successfully bound socket %d to port 0x%04x\n", socket->id, ntohs(sa.sin_port) );
 }
 
@@ -280,6 +284,9 @@ w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
     w5100_socket_acquire_lock( socket );
     if( !socket->socket_bound )
       w5100_socket_bind_port( self, socket );
+    socket->datagram_lengths[socket->datagram_count++] =
+      socket->tx_wr - socket->last_send;
+    socket->last_send = socket->tx_wr;
     socket->write_pending = 1;
     w5100_socket_release_lock( socket );
     nic_w5100_wake_io_thread( self );
@@ -424,11 +431,11 @@ nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byt
       socket->dport[socket_reg - W5100_SOCKET_DPORT0] = b;
       break;
     case W5100_SOCKET_TX_WR0:
-      printf("w5100: writing 0x%02x to S%d_WR0\n", b, socket->id);
+      printf("w5100: writing 0x%02x to S%d_TX_WR0\n", b, socket->id);
       socket->tx_wr = (socket->tx_wr & 0xff) | (b << 8);
       break;
     case W5100_SOCKET_TX_WR1:
-      printf("w5100: writing 0x%02x to S%d_WR1\n", b, socket->id);
+      printf("w5100: writing 0x%02x to S%d_TX_WR1\n", b, socket->id);
       socket->tx_wr = (socket->tx_wr & 0xff00) | b;
       break;
     case W5100_SOCKET_RX_RD0:
@@ -556,58 +563,72 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
 }
 
 static void
-w5100_socket_process_write( nic_w5100_socket_t *socket )
+w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
+{
+  ssize_t bytes_sent;
+  int offset = socket->tx_rr & 0x7ff;
+  libspectrum_word length = socket->datagram_lengths[0];
+  libspectrum_byte *data = &socket->tx_buffer[ offset ];
+  struct sockaddr_in sa;
+
+  printf("w5100: writing to UDP socket %d\n", socket->id);
+
+  /* If the data wraps round the write buffer, write it in two chunks */
+  /* FIXME: this is the wrong thing to do! */
+  if( offset + length > 0x800 )
+    length = 0x800 - offset;
+
+  memset( &sa, 0, sizeof(sa) );
+  sa.sin_family = AF_INET;
+  memcpy( &sa.sin_port, socket->dport, 2 );
+  memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
+
+  bytes_sent = sendto( socket->fd, data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
+  printf("w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n", (int)bytes_sent, length, socket->id);
+
+  if( bytes_sent == length ) {
+    if( --socket->datagram_count )
+      memmove( socket->datagram_lengths, &socket->datagram_lengths[1],
+        0x1f * sizeof(int) );
+
+    socket->tx_rr += bytes_sent;
+    if( socket->tx_rr == socket->tx_wr ) {
+      socket->write_pending = 0;
+      socket->ir |= 1 << 4;
+    }
+  }
+  else if( bytes_sent != -1 )
+    printf("w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id);
+  else
+    printf("w5100: error %d writing to UDP socket %d\n", errno, socket->id);
+}
+
+static void
+w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
 {
   ssize_t bytes_sent;
   int offset = socket->tx_rr & 0x7ff;
   libspectrum_word length = socket->tx_wr - socket->tx_rr;
   libspectrum_byte *data = &socket->tx_buffer[ offset ];
 
+  printf("w5100: writing to TCP socket %d\n", socket->id);
+
   /* If the data wraps round the write buffer, write it in two chunks */
   if( offset + length > 0x800 )
     length = 0x800 - offset;
 
-  if( socket->mode == W5100_SOCKET_MODE_UDP &&
-    socket->state == W5100_SOCKET_STATE_UDP ) {
-    struct sockaddr_in sa;
+  bytes_sent = send( socket->fd, data, length, 0 );
+  printf("w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n", (int)bytes_sent, length, socket->id);
 
-    printf("w5100: writing to UDP socket %d\n", socket->id);
-
-    memset( &sa, 0, sizeof(sa) );
-    sa.sin_family = AF_INET;
-    memcpy( &sa.sin_port, socket->dport, 2 );
-    memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
-
-    bytes_sent = sendto( socket->fd, data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
-    printf("w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n", (int)bytes_sent, length, socket->id);
-
-    if( bytes_sent != -1 ) {
-      socket->tx_rr += bytes_sent;
-      if( socket->tx_rr == socket->tx_wr ) {
-        socket->write_pending = 0;
-        socket->ir |= 1 << 4;
-      }
+  if( bytes_sent != -1 ) {
+    socket->tx_rr += bytes_sent;
+    if( socket->tx_rr == socket->tx_wr ) {
+      socket->write_pending = 0;
+      socket->ir |= 1 << 4;
     }
-    else
-      printf("w5100: error %d writing to UDP socket %d\n", errno, socket->id);
   }
-  else if( socket->mode == W5100_SOCKET_MODE_TCP &&
-    socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
-    printf("w5100: writing to TCP socket %d\n", socket->id);
-
-    bytes_sent = send( socket->fd, data, length, 0 );
-    printf("w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n", (int)bytes_sent, length, socket->id);
-
-    if( bytes_sent != -1 ) {
-      socket->tx_rr += bytes_sent;
-      if( socket->tx_rr == socket->tx_wr ) {
-        socket->write_pending = 0;
-        socket->ir |= 1 << 4;
-      }
-    }
-    else
-      printf("w5100: error %d writing to TCP socket %d\n", errno, socket->id);
-  }
+  else
+    printf("w5100: error %d writing to TCP socket %d\n", errno, socket->id);
 }
 
 void
@@ -622,8 +643,14 @@ nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
     if( FD_ISSET( socket->fd, &readfds ) )
       w5100_socket_process_read( socket );
 
-    if( FD_ISSET( socket->fd, &writefds ) )
-      w5100_socket_process_write( socket );
+    if( FD_ISSET( socket->fd, &writefds ) ) {
+      if( socket->state == W5100_SOCKET_STATE_UDP ) {
+        w5100_socket_process_udp_write( socket );
+      }
+      else if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
+        w5100_socket_process_tcp_write( socket );
+      }
+    }
   }
 
   w5100_socket_release_lock( socket );

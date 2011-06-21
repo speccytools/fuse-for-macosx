@@ -110,6 +110,10 @@ typedef struct nic_w5100_socket_t {
   int socket_bound;         /* True once we've bound the socket to a port */
   int write_pending;        /* True if we're waiting to write data on this socket */
 
+  int last_send;            /* The value of Sn_TX_WR when the SEND command was last sent */
+  int datagram_lengths[0x20]; /* The lengths of datagrams to be sent */
+  int datagram_count;
+
   /* Flag used to indicate that a socket has been closed since we started
      waiting for it in a select() call and therefore the socket should no
      longer be used */
