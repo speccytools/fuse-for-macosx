@@ -3747,5 +3747,7 @@
          different bits of the Spectranet code.
 20110620 peripherals/nic/w5100_socket.c: ensure all sockaddr_in structures are
          zeroed before use.
-20110619 peripherals/nic/{w5100_internals.h,w5100_socket.c}: implement TCP
+20110620 peripherals/nic/{w5100_internals.h,w5100_socket.c}: implement TCP
          client mode.
+20110621 peripherals/nic/w5100_socket.c: don't add the UDP header to TCP
+         data.

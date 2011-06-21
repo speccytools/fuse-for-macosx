@@ -508,28 +508,35 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   int bytes_free = 0x800 - socket->rx_rsr;
   ssize_t bytes_read;
   struct sockaddr_in sa;
-  socklen_t sa_length = sizeof(sa);
 
   printf("w5100: reading from socket %d\n", socket->id);
 
-  memset( &sa, 0, sizeof(sa) );
-  sa.sin_family = AF_INET;
-  memcpy( &sa.sin_port, socket->port, 2 );
-  sa.sin_addr.s_addr = htonl(INADDR_ANY);
-  bytes_read = recvfrom( socket->fd, buffer + 8, bytes_free - 8, 0, (struct sockaddr*)&sa, &sa_length );
-  printf("w5100: read 0x%03x bytes from socket %d\n", (int)bytes_read, socket->id);
+  if( socket->state == W5100_SOCKET_STATE_UDP ) {
+    socklen_t sa_length = sizeof(sa);
+    memset( &sa, 0, sizeof(sa) );
+    sa.sin_family = AF_INET;
+    memcpy( &sa.sin_port, socket->port, 2 );
+    sa.sin_addr.s_addr = htonl(INADDR_ANY);
+    bytes_read = recvfrom( socket->fd, buffer + 8, bytes_free - 8, 0, (struct sockaddr*)&sa, &sa_length );
+    printf("w5100: read 0x%03x bytes from UDP socket %d\n", (int)bytes_read, socket->id);
+  }
+  else {
+    bytes_read = recv( socket->fd, buffer, bytes_free, 0 );
+    printf("w5100: read 0x%03x bytes from TCP socket %d\n", (int)bytes_read, socket->id);
+  }
 
   if( bytes_read != -1 ) {
     int offset = (socket->old_rx_rd + socket->rx_rsr) & 0x7ff;
     libspectrum_byte *dest = &socket->rx_buffer[offset];
 
-    /* Add the W5100's UDP header */
-    memcpy( buffer, &sa.sin_addr.s_addr, 4 );
-    memcpy( buffer + 4, &sa.sin_port, 2 );
-    buffer[6] = (bytes_read >> 8) & 0xff;
-    buffer[7] = bytes_read & 0xff;
-
-    bytes_read += 8;
+    if( socket->state == W5100_SOCKET_STATE_UDP ) {
+      /* Add the W5100's UDP header */
+      memcpy( buffer, &sa.sin_addr.s_addr, 4 );
+      memcpy( buffer + 4, &sa.sin_port, 2 );
+      buffer[6] = (bytes_read >> 8) & 0xff;
+      buffer[7] = bytes_read & 0xff;
+      bytes_read += 8;
+    }
 
     socket->rx_rsr += bytes_read;
     socket->ir |= 1 << 2;
