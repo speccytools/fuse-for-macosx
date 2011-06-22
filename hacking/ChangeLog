@@ -3758,3 +3758,5 @@
          around the transmit buffer are not split into two.
 20110621 peripherals/spectranet.c: don't try and load Spectranet data from a
          snapshot which doesn't contain it (thanks, Winston).
+20110622 peripherals/nic/w5100_socket.c: remember to implement RECV for TCP
+         sockets (thanks, Guesser).

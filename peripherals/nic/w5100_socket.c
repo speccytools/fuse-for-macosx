@@ -302,7 +302,8 @@ w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
 static void
 w5100_socket_recv( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
-  if( socket->state == W5100_SOCKET_STATE_UDP ) {
+  if( socket->state == W5100_SOCKET_STATE_UDP ||
+    socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
     w5100_socket_acquire_lock( socket );
     socket->rx_rsr -= socket->rx_rd - socket->old_rx_rd;
     socket->old_rx_rd = socket->rx_rd;
