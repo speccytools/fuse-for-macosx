@@ -58,6 +58,7 @@ static flash_am29f010_t *flash_rom;
 
 int spectranet_available = 0;
 int spectranet_paged;
+int spectranet_paged_via_io;
 int spectranet_w5100_paged_a = 0, spectranet_w5100_paged_b = 0;
 
 /* Whether the programmable trap is active */
@@ -76,12 +77,13 @@ static const char *event_type_string = "spectranet";
 static int page_event, unpage_event;
 
 void
-spectranet_page( void )
+spectranet_page( int via_io )
 {
   if( spectranet_paged )
     return;
 
   spectranet_paged = 1;
+  spectranet_paged_via_io = via_io;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
   debugger_event( page_event );
@@ -94,6 +96,7 @@ spectranet_unpage( void )
     return;
 
   spectranet_paged = 0;
+  spectranet_paged_via_io = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
   debugger_event( unpage_event );
@@ -246,7 +249,7 @@ spectranet_from_snapshot( libspectrum_snap *snap )
     spectranet_map_page( 2, libspectrum_snap_spectranet_page_b( snap ) );
 
     if( libspectrum_snap_spectranet_paged( snap ) ) {
-      spectranet_page();
+      spectranet_page( libspectrum_snap_spectranet_paged_via_io( snap ) );
       memory_map_romcs( spectranet_current_map );
     }
     else
@@ -364,8 +367,8 @@ static void
 spectranet_control_write( libspectrum_word port, libspectrum_byte data )
 {
   if( data & 0x01 )
-    spectranet_page();
-  else
+    spectranet_page( 1 );
+  else if( spectranet_paged_via_io )
     spectranet_unpage();
 
   spectranet_programmable_trap_active = data & 0x08;

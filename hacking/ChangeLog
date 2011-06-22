@@ -3760,3 +3760,5 @@
          snapshot which doesn't contain it (thanks, Winston).
 20110622 peripherals/nic/w5100_socket.c: remember to implement RECV for TCP
          sockets (thanks, Guesser).
+20110622 hacking/ChangeLog,peripherals/spectranet.[ch],z80/{z80.c,z80_ops.c}:
+         implement Spectranet "paged via IO port" flag.

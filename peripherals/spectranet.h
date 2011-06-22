@@ -27,7 +27,7 @@
 #define FUSE_SPECTRANET_H
 
 int spectranet_init( void );
-void spectranet_page( void );
+void spectranet_page( int via_io );
 void spectranet_unpage( void );
 
 libspectrum_byte spectranet_w5100_read( memory_page *page, libspectrum_word address );

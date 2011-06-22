@@ -216,10 +216,8 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
   } else if( spectranet_available ) {
     
     /* Page in spectranet */
-    spectranet_page();
+    spectranet_page( 0 );
   }
-
-
 
   /* FIXME: how is R affected? */
 
