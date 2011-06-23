@@ -324,3 +324,30 @@ nic_w5100_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b )
   else
     printf("w5100: writing 0x%02x to unsupported register 0x%03x\n", b, reg);
 }
+
+void
+nic_w5100_from_snapshot( nic_w5100_t *self, libspectrum_byte *data )
+{
+  int i;
+
+  for( i = 0; i < 0x30; i++ )
+    nic_w5100_write( self, i, data[i] );
+}
+
+libspectrum_byte*
+nic_w5100_to_snapshot( nic_w5100_t *self )
+{
+  libspectrum_byte *data = malloc( 0x30 * sizeof(*data) );
+  int i;
+
+  if( !data ) {
+    ui_error( UI_ERROR_ERROR, "%s:%d: out of memory\n", __FILE__, __LINE__ );
+    fuse_abort();
+  }
+
+  for( i = 0; i < 0x30; i++ )
+    data[i] = nic_w5100_read( self, i );
+
+  return data;
+}
+

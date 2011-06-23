@@ -3760,5 +3760,7 @@
          snapshot which doesn't contain it (thanks, Winston).
 20110622 peripherals/nic/w5100_socket.c: remember to implement RECV for TCP
          sockets (thanks, Guesser).
-20110622 hacking/ChangeLog,peripherals/spectranet.[ch],z80/{z80.c,z80_ops.c}:
-         implement Spectranet "paged via IO port" flag.
+20110622 peripherals/spectranet.[ch],z80/{z80.c,z80_ops.c}: implement
+         Spectranet "paged via IO port" flag (thanks, Winston).
+20110623 peripherals/{spectranet.c,nic/w5100.[ch]}: store core W5100 state in
+         snapshots.

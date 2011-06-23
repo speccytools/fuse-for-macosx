@@ -255,6 +255,9 @@ spectranet_from_snapshot( libspectrum_snap *snap )
     else
       spectranet_unpage();
 
+    nic_w5100_from_snapshot( w5100,
+      libspectrum_snap_spectranet_w5100( snap, 0 ) );
+
     memcpy(
       spectranet_full_map[SPECTRANET_ROM_BASE * MEMORY_PAGES_IN_4K].page,
       libspectrum_snap_spectranet_flash( snap, 0 ), SPECTRANET_ROM_LENGTH );
@@ -290,6 +293,9 @@ spectranet_to_snapshot( libspectrum_snap *snap )
     snap, spectranet_current_map[1 * MEMORY_PAGES_IN_4K].page_num );
   libspectrum_snap_set_spectranet_page_b(
     snap, spectranet_current_map[2 * MEMORY_PAGES_IN_4K].page_num );
+
+  libspectrum_snap_set_spectranet_w5100( snap, 0,
+    nic_w5100_to_snapshot( w5100 ) );
 
   snap_buffer = malloc( SPECTRANET_ROM_LENGTH * sizeof( libspectrum_byte ) );
   if( !snap_buffer ) {

@@ -39,4 +39,7 @@ void nic_w5100_free( nic_w5100_t *self );
 libspectrum_byte nic_w5100_read( nic_w5100_t *self, libspectrum_word reg);
 void nic_w5100_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byte b );
 
+void nic_w5100_from_snapshot( nic_w5100_t *self, libspectrum_byte *data );
+libspectrum_byte* nic_w5100_to_snapshot( nic_w5100_t *self );
+
 #endif                          /* #ifndef FUSE_W5100_H */
