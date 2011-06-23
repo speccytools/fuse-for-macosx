@@ -3764,3 +3764,6 @@
          Spectranet "paged via IO port" flag (thanks, Winston).
 20110623 peripherals/{spectranet.c,nic/w5100.[ch]}: store core W5100 state in
          snapshots.
+20110623 peripherals/nic/w5100_socket.c: add string.h for memset prototype and
+         add some more verbose error logging and bind information to help with
+         debugging (Fred).
