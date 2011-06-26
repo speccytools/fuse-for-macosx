@@ -212,7 +212,6 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
   printf("w5100: attempting to bind socket IP %s\n", inet_ntoa(sa.sin_addr));
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
     printf("w5100: failed to bind socket %d; errno = %d : %s\n", socket->id, errno, strerror(errno));
-    w5100_socket_release_lock( socket );
     return;
   }
 

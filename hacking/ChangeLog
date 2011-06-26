@@ -3767,3 +3767,5 @@
 20110623 peripherals/nic/w5100_socket.c: add string.h for memset prototype and
          add some more verbose error logging and bind information to help with
          debugging (Fred).
+20110626 peripherals/nic/w5100_socket.c: don't double release the lock if a
+         bind() call fails (thanks, Sergio Baldoví).
