@@ -523,10 +523,6 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
 
   if( socket->state == W5100_SOCKET_STATE_UDP ) {
     socklen_t sa_length = sizeof(sa);
-    memset( &sa, 0, sizeof(sa) );
-    sa.sin_family = AF_INET;
-    memcpy( &sa.sin_port, socket->port, 2 );
-    sa.sin_addr.s_addr = htonl(INADDR_ANY);
     bytes_read = recvfrom( socket->fd, buffer + 8, bytes_free - 8, 0, (struct sockaddr*)&sa, &sa_length );
     printf("w5100: read 0x%03x bytes from UDP socket %d\n", (int)bytes_read, socket->id);
   }

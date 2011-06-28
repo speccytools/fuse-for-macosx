@@ -3771,3 +3771,5 @@
          bind() call fails (thanks, Sergio Baldoví).
 20110628 peripherals/{spectranet.c,nic/w5100.[ch]}: reset the W5100 when the
          Spectranet is reset.
+20110628 peripherals/nic/w5100_socket.c: don't need to set the sockaddr when
+         reading from a socket.
