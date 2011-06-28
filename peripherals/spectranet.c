@@ -146,6 +146,8 @@ spectranet_reset( int hard_reset )
     machine_current->ram.romcs = 1;
     machine_current->memory_map();
   }
+
+  nic_w5100_reset( w5100 );
 }
 
 static void

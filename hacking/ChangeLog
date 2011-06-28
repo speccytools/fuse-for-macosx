@@ -3769,3 +3769,5 @@
          debugging (Fred).
 20110626 peripherals/nic/w5100_socket.c: don't double release the lock if a
          bind() call fails (thanks, Sergio Baldoví).
+20110628 peripherals/{spectranet.c,nic/w5100.[ch]}: reset the W5100 when the
+         Spectranet is reset.

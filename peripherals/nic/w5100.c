@@ -71,8 +71,8 @@ enum w5100_registers {
   W5100_TMSR,
 };
 
-static void
-w5100_reset( nic_w5100_t *self )
+void
+nic_w5100_reset( nic_w5100_t *self )
 {
   size_t i;
 
@@ -148,7 +148,7 @@ nic_w5100_alloc( void )
   for( i = 0; i < 4; i++ )
     nic_w5100_socket_init( &self->socket[i], i );
 
-  w5100_reset( self );
+  nic_w5100_reset( self );
 
   error = pipe( pipefd );
   if( error ) {
@@ -252,7 +252,7 @@ w5100_write_mr( nic_w5100_t *self, libspectrum_byte b )
   printf("w5100: writing 0x%02x to MR\n", b);
 
   if( b & 0x80 )
-    w5100_reset( self );
+    nic_w5100_reset( self );
 
   if( b & 0x7f )
     printf("w5100: unsupported value 0x%02x written to MR\n", b);
