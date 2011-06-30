@@ -133,7 +133,7 @@ w5100_io_thread( void *arg )
       /* Do nothing - just loop again */
     }
     else {
-      printf("w5100: select returned unexpected errno %d\n", errno);
+      printf("w5100: select returned unexpected errno %d: %s\n", errno, strerror(errno));
     }
   }
 

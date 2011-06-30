@@ -172,7 +172,7 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
     w5100_socket_acquire_lock( socket_obj );
     socket_obj->fd = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
     if( socket_obj->fd == -1 ) {
-      printf("w5100: failed to open UDP socket for socket %d; errno = %d : %s\n", socket_obj->id, errno, strerror(errno));
+      printf("w5100: failed to open UDP socket for socket %d; errno = %d: %s\n", socket_obj->id, errno, strerror(errno));
       w5100_socket_release_lock( socket_obj );
       return;
     }
@@ -188,7 +188,7 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
     w5100_socket_acquire_lock( socket_obj );
     socket_obj->fd = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
     if( socket_obj->fd == -1 ) {
-      printf("w5100: failed to open TCP socket for socket %d; errno = %d : %s\n", socket_obj->id, errno, strerror(errno));
+      printf("w5100: failed to open TCP socket for socket %d; errno = %d: %s\n", socket_obj->id, errno, strerror(errno));
       w5100_socket_release_lock( socket_obj );
       return;
     }
@@ -199,7 +199,7 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
   }
 }
 
-static void
+static int
 w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   struct sockaddr_in sa;
@@ -211,12 +211,16 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
 
   printf("w5100: attempting to bind socket IP %s\n", inet_ntoa(sa.sin_addr));
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-    printf("w5100: failed to bind socket %d; errno = %d : %s\n", socket->id, errno, strerror(errno));
-    return;
+    printf("w5100: failed to bind socket %d; errno = %d: %s\n", socket->id, errno, strerror(errno));
+    socket->ir |= 1 << 3;
+    socket->state = W5100_SOCKET_STATE_CLOSED;
+    return -1;
   }
 
   socket->socket_bound = 1;
-  printf("w5100: successfully bound socket %d to port 0x%04x\n", socket->id, ntohs(sa.sin_port) );
+  printf("w5100: successfully bound socket %d to port 0x%04x\n", socket->id, ntohs(sa.sin_port));
+
+  return 0;
 }
 
 static void
@@ -227,7 +231,10 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
     
     w5100_socket_acquire_lock( socket );
     if( !socket->socket_bound )
-      w5100_socket_bind_port( self, socket );
+      if( w5100_socket_bind_port( self, socket ) ) {
+        w5100_socket_release_lock( socket );
+        return;
+      }
 
     memset( &sa, 0, sizeof(sa) );
     sa.sin_family = AF_INET;
@@ -235,7 +242,7 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
     memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
     if( connect( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-      printf("w5100: failed to connect socket %d to 0x%08x:0x%04x; errno = %d : %s\n", socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port), errno, strerror(errno));
+      printf("w5100: failed to connect socket %d to 0x%08x:0x%04x; errno = %d: %s\n", socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port), errno, strerror(errno));
       socket->ir |= 1 << 3;
       socket->state = W5100_SOCKET_STATE_CLOSED;
       w5100_socket_release_lock( socket );
@@ -284,8 +291,13 @@ w5100_socket_send( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   if( socket->state == W5100_SOCKET_STATE_UDP ) {
     w5100_socket_acquire_lock( socket );
+
     if( !socket->socket_bound )
-      w5100_socket_bind_port( self, socket );
+      if( w5100_socket_bind_port( self, socket ) ) {
+        w5100_socket_release_lock( socket );
+        return;
+      }
+
     socket->datagram_lengths[socket->datagram_count++] =
       socket->tx_wr - socket->last_send;
     socket->last_send = socket->tx_wr;
@@ -557,7 +569,7 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
     }
   }
   else {
-    printf("w5100: error %d reading from socket %d : %s\n", errno, socket->id, strerror(errno));
+    printf("w5100: error %d reading from socket %d: %s\n", errno, socket->id, strerror(errno));
   }
 }
 
@@ -604,7 +616,7 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   else if( bytes_sent != -1 )
     printf("w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id);
   else
-    printf("w5100: error %d writing to UDP socket %d : %s\n", errno, socket->id, strerror(errno));
+    printf("w5100: error %d writing to UDP socket %d: %s\n", errno, socket->id, strerror(errno));
 }
 
 static void
@@ -632,7 +644,7 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
     }
   }
   else
-    printf("w5100: error %d writing to TCP socket %d : %s\n", errno, socket->id, strerror(errno));
+    printf("w5100: error %d writing to TCP socket %d: %s\n", errno, socket->id, strerror(errno));
 }
 
 void
