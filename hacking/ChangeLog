@@ -3773,3 +3773,7 @@
          Spectranet is reset.
 20110628 peripherals/nic/w5100_socket.c: don't need to set the sockaddr when
          reading from a socket.
+20110630 peripherals/w5100.c: check the return code from select(). Also
+         catch the case when a socket is closed between being added to the
+         set and the select call, when select will fail with EBADF (thanks,
+         Winston).

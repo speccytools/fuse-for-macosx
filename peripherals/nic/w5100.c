@@ -95,6 +95,7 @@ w5100_io_thread( void *arg )
 
   while( !self->stop_io_thread ) {
     fd_set readfds, writefds;
+    int active;
     int max_fd = self->pipe_read;
 
     FD_ZERO( &readfds );
@@ -106,20 +107,34 @@ w5100_io_thread( void *arg )
       nic_w5100_socket_add_to_sets( &self->socket[i], &readfds, &writefds,
         &max_fd );
 
+    /* Note that if a socket is closed between when we added it to the sets
+       above and when we call select() below, it will cause the select to fail
+       with EBADF. We catch this and just run around the loop again - the
+       offending socket will not be added to the sets again as it's now been
+       closed */
+
     printf("w5100: io thread select\n");
 
-    select( max_fd + 1, &readfds, &writefds, NULL, NULL );
+    active = select( max_fd + 1, &readfds, &writefds, NULL, NULL );
 
-    printf("w5100: io thread wake\n");
+    printf("w5100: io thread wake; %d active\n", active);
 
-    if( FD_ISSET( self->pipe_read, &readfds ) ) {
-      char bitbucket;
-      printf("w5100: discarding pipe data\n");
-      read( self->pipe_read, &bitbucket, 1 );
+    if( active != -1 ) {
+      if( FD_ISSET( self->pipe_read, &readfds ) ) {
+        char bitbucket;
+        printf("w5100: discarding pipe data\n");
+        read( self->pipe_read, &bitbucket, 1 );
+      }
+
+      for( i = 0; i < 4; i++ )
+        nic_w5100_socket_process_io( &self->socket[i], readfds, writefds );
     }
-
-    for( i = 0; i < 4; i++ )
-      nic_w5100_socket_process_io( &self->socket[i], readfds, writefds );
+    else if( errno == EBADF ) {
+      /* Do nothing - just loop again */
+    }
+    else {
+      printf("w5100: select returned unexpected errno %d\n", errno);
+    }
   }
 
   return NULL;
