@@ -176,6 +176,7 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
     int protocol = tcp ? IPPROTO_TCP : IPPROTO_UDP;
     const char *description = tcp ? "TCP" : "UDP";
     int final_state = tcp ? W5100_SOCKET_STATE_INIT : W5100_SOCKET_STATE_UDP;
+    int one = 1;
 
     w5100_socket_clean( socket_obj );
 
@@ -185,6 +186,12 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
       w5100_socket_release_lock( socket_obj );
       return;
     }
+
+    if( setsockopt( socket_obj->fd, SOL_SOCKET, SO_REUSEADDR, &one,
+      sizeof(one) ) == -1 ) {
+      printf("w5100: failed to set SO_REUSEADDR on socket %d; error = %d: %s\n", socket_obj->id, errno, strerror(errno));
+    }
+
     socket_obj->state = final_state;
 
     printf("w5100: opened %s fd %d for socket %d\n", description, socket_obj->fd, socket_obj->id);

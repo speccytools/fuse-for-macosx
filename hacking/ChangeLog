@@ -3781,3 +3781,4 @@
          fails.
 20110630 peripherals/nic/w5100_socket.c: remove duplicated code when opening a
          new socket.
+20110630 peripherals/nic/w5100_socket.c: set SO_REUSEADDR on new sockets.
