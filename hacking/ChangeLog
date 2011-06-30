@@ -3782,3 +3782,5 @@
 20110630 peripherals/nic/w5100_socket.c: remove duplicated code when opening a
          new socket.
 20110630 peripherals/nic/w5100_socket.c: set SO_REUSEADDR on new sockets.
+20110630 peripherals/nic/{w5100_internals.h,w5100_socket.c}: handle EOF on TCP
+         sockets.

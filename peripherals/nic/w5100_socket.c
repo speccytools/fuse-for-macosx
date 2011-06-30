@@ -260,7 +260,8 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
 static void
 w5100_socket_discon( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
-  if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ) {
+  if( socket->state == W5100_SOCKET_STATE_ESTABLISHED ||
+    socket->state == W5100_SOCKET_STATE_CLOSE_WAIT ) {
     w5100_socket_acquire_lock( socket );
     socket->ir |= 1 << 1;
     socket->state = W5100_SOCKET_STATE_CLOSED;
@@ -532,23 +533,25 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   ssize_t bytes_read;
   struct sockaddr_in sa;
 
+  int udp = socket->state == W5100_SOCKET_STATE_UDP;
+  const char *description = udp ? "UDP" : "TCP";
+
   printf("w5100: reading from socket %d\n", socket->id);
 
-  if( socket->state == W5100_SOCKET_STATE_UDP ) {
+  if( udp ) {
     socklen_t sa_length = sizeof(sa);
     bytes_read = recvfrom( socket->fd, buffer + 8, bytes_free - 8, 0, (struct sockaddr*)&sa, &sa_length );
-    printf("w5100: read 0x%03x bytes from UDP socket %d\n", (int)bytes_read, socket->id);
   }
-  else {
+  else
     bytes_read = recv( socket->fd, buffer, bytes_free, 0 );
-    printf("w5100: read 0x%03x bytes from TCP socket %d\n", (int)bytes_read, socket->id);
-  }
 
-  if( bytes_read != -1 ) {
+  printf("w5100: read 0x%03x bytes from %s socket %d\n", (int)bytes_read, description, socket->id);
+
+  if( bytes_read > 0 || (udp && bytes_read == 0) ) {
     int offset = (socket->old_rx_rd + socket->rx_rsr) & 0x7ff;
     libspectrum_byte *dest = &socket->rx_buffer[offset];
 
-    if( socket->state == W5100_SOCKET_STATE_UDP ) {
+    if( udp ) {
       /* Add the W5100's UDP header */
       memcpy( buffer, &sa.sin_addr.s_addr, 4 );
       memcpy( buffer + 4, &sa.sin_port, 2 );
@@ -569,8 +572,12 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
       memcpy( socket->rx_buffer, buffer + first_chunk, bytes_read - first_chunk );
     }
   }
+  else if( bytes_read == 0 ) {  /* TCP */
+    socket->state = W5100_SOCKET_STATE_CLOSE_WAIT;
+    printf("w5100: EOF on %s socket %d; errno = %d: %s\n", description, socket->id, errno, strerror(errno));
+  }
   else {
-    printf("w5100: error %d reading from socket %d: %s\n", errno, socket->id, strerror(errno));
+    printf("w5100: error %d reading from %s socket %d: %s\n", errno, description, socket->id, strerror(errno));
   }
 }
 
