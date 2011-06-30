@@ -165,38 +165,32 @@ w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
 static void
 w5100_socket_open( nic_w5100_socket_t *socket_obj )
 {
-  if( socket_obj->mode == W5100_SOCKET_MODE_UDP &&
+  w5100_socket_acquire_lock( socket_obj );
+
+  if( ( socket_obj->mode == W5100_SOCKET_MODE_UDP ||
+      socket_obj->mode == W5100_SOCKET_MODE_TCP ) &&
     socket_obj->state == W5100_SOCKET_STATE_CLOSED ) {
+
+    int tcp = socket_obj->mode == W5100_SOCKET_MODE_TCP;
+    int type = tcp ? SOCK_STREAM : SOCK_DGRAM;
+    int protocol = tcp ? IPPROTO_TCP : IPPROTO_UDP;
+    const char *description = tcp ? "TCP" : "UDP";
+    int final_state = tcp ? W5100_SOCKET_STATE_INIT : W5100_SOCKET_STATE_UDP;
+
     w5100_socket_clean( socket_obj );
 
-    w5100_socket_acquire_lock( socket_obj );
-    socket_obj->fd = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+    socket_obj->fd = socket( AF_INET, type, protocol );
     if( socket_obj->fd == -1 ) {
-      printf("w5100: failed to open UDP socket for socket %d; errno = %d: %s\n", socket_obj->id, errno, strerror(errno));
+      printf("w5100: failed to open %s socket for socket %d; errno = %d: %s\n", description, socket_obj->id, errno, strerror(errno));
       w5100_socket_release_lock( socket_obj );
       return;
     }
-    w5100_socket_release_lock( socket_obj );
+    socket_obj->state = final_state;
 
-    socket_obj->state = W5100_SOCKET_STATE_UDP;
-    printf("w5100: opened UDP fd %d for socket %d\n", socket_obj->fd, socket_obj->id);
+    printf("w5100: opened %s fd %d for socket %d\n", description, socket_obj->fd, socket_obj->id);
   }
-  else if( socket_obj->mode == W5100_SOCKET_MODE_TCP &&
-    socket_obj->state == W5100_SOCKET_STATE_CLOSED ) {
-    w5100_socket_clean( socket_obj );
 
-    w5100_socket_acquire_lock( socket_obj );
-    socket_obj->fd = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-    if( socket_obj->fd == -1 ) {
-      printf("w5100: failed to open TCP socket for socket %d; errno = %d: %s\n", socket_obj->id, errno, strerror(errno));
-      w5100_socket_release_lock( socket_obj );
-      return;
-    }
-    w5100_socket_release_lock( socket_obj );
-
-    socket_obj->state = W5100_SOCKET_STATE_INIT;
-    printf("w5100: opened TCP fd %d for socket %d\n", socket_obj->fd, socket_obj->id);
-  }
+  w5100_socket_release_lock( socket_obj );
 }
 
 static int

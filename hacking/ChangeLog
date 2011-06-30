@@ -3779,3 +3779,5 @@
          Winston).
 20110630 peripherals/nic/w5100_socket.c: abort connection if the bind call
          fails.
+20110630 peripherals/nic/w5100_socket.c: remove duplicated code when opening a
+         new socket.
