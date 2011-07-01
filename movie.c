@@ -410,9 +410,8 @@ movie_pause( void )
 void
 movie_init_sound( int f, int s )
 {
-/* initialise sound format */
-  if( format == '?' )
-    format = option_enumerate_movie_movie_compr() == 2 ? 'A' : 'P';
+  /* initialise sound format */
+  format = option_enumerate_movie_movie_compr() == 2 ? 'A' : 'P';
   freq = f;
   stereo = ( s ? 'S' : 'M' );
   framesiz = ( stereo == 'S' ? 2 : 1 ) * ( format == 'P' ? 2 : 1 );
