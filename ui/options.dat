@@ -91,3 +91,4 @@ Combo, Movie (c)ompression, movie_compr, INPUT_KEY_c, None|*Lossless|High
 #else
 Combo, Movie (c)ompression, movie_compr, INPUT_KEY_c, *None
 #endif
+Checkbox, (S)top recording after RZX ends, movie_stop_after_rzx, INPUT_KEY_S
