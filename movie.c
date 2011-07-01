@@ -357,7 +357,7 @@ movie_start( char *name )	/* some init, open file (name)*/
 void
 movie_stop( void )
 {
-  if( !movie_recording ) return;
+  if( !movie_paused && !movie_recording ) return;
 
   fwrite_compr( "X", 1, 1, of );	/* End of Recording! */
 #ifdef HAVE_ZLIB_H
@@ -387,6 +387,7 @@ movie_stop( void )
   fprintf( stderr, "Debug movie: saved %d.%d frame(.slice)\n", frame_no, slice_no );
 #endif 	/* MOVIE_DEBUG_PRINT */
   movie_recording = 0;
+  movie_paused = 0;
   ui_menu_activate( UI_MENU_ITEM_FILE_MOVIE_RECORDING, 0 );
 }
 

@@ -221,6 +221,7 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/File/Movie/Pause", 0,
     "/File/Movie/Continue", 0,
     "/File/Movie/Record...", 1,
+    "/File/Movie/Record from RZX...", 1
   },
   
   { UI_MENU_ITEM_FILE_MOVIE_PAUSE, "/File/Movie/Pause",

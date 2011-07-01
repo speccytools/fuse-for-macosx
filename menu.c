@@ -743,6 +743,39 @@ MENU_CALLBACK( menu_file_movie_record )
   fuse_emulation_unpause();
 }
 
+MENU_CALLBACK( menu_file_movie_record_recordfromrzx )
+{
+  char *rzx_file, *fmf_file;
+
+  ui_widget_finish();
+
+  if( rzx_playback || rzx_recording || movie_recording ) return;
+
+  fuse_emulation_pause();
+
+  rzx_file = ui_get_open_filename( "Fuse - Load RZX" );
+  if( !rzx_file ) { fuse_emulation_unpause(); return; }
+
+  rzx_start_playback( rzx_file, 1 );
+  free( rzx_file );
+  display_refresh_all();
+
+  if( rzx_playback ) {
+    fmf_file = ui_get_save_filename( "Fuse - Record Movie File" );
+    if( !fmf_file ) { 
+      rzx_stop_playback( 1 );
+      fuse_emulation_unpause();
+      return;
+    }
+
+    movie_start( fmf_file );
+    free( fmf_file );
+    ui_menu_activate( UI_MENU_ITEM_RECORDING, 1 );
+  }
+
+  fuse_emulation_unpause();
+}
+
 MENU_CALLBACK( menu_file_recording_record )
 {
   char *recording;

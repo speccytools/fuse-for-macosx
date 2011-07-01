@@ -125,6 +125,7 @@ MENU_CALLBACK( menu_file_savescreenasscr );
 MENU_CALLBACK( menu_file_savescreenaspng );
 
 MENU_CALLBACK( menu_file_movie_record );
+MENU_CALLBACK( menu_file_movie_record_recordfromrzx );
 
 MENU_CALLBACK( menu_options_general );
 MENU_CALLBACK( menu_options_sound );
