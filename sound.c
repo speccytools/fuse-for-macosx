@@ -44,7 +44,6 @@
 int sound_enabled = 0;		/* Are we currently using the sound card */
 int sound_enabled_ever = 0;	/* if it's *ever* been in use; see
 				   sound_ay_write() and sound_ay_reset() */
-int sound_stereo = 0;		/* true for stereo *output sample* (only) */
 int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
 
 /* assume all three tone channels together match the beeper volume (ish).
@@ -177,7 +176,6 @@ sound_ay_init( void )
 void
 sound_init( const char *device )
 {
-  int ret;
   float hz;
 
   /* Allow sound as long as emulation speed is greater than 2%
@@ -188,19 +186,17 @@ sound_init( const char *device )
          settings_current.emulation_speed > 1 ) )
     return;
 
-  sound_stereo_ay = settings_current.stereo_ay;
-
   /* only try for stereo if we need it */
-  if( sound_stereo_ay )
-    sound_stereo = 1;
+  sound_stereo_ay = settings_current.stereo_ay;
 
   if( settings_current.sound &&
       sound_lowlevel_init( device, &settings_current.sound_freq,
-                           &sound_stereo ) )
+                           &sound_stereo_ay ) )
     return;
 
   if( !sound_init_blip(&left_buf, &left_beeper_synth) ) return;
-  if( sound_stereo && !sound_init_blip(&right_buf, &right_beeper_synth) ) return;
+  if( sound_stereo_ay && !sound_init_blip(&right_buf, &right_beeper_synth) )
+    return;
 
   ay_a_synth = new_Blip_Synth();
   blip_synth_set_volume( ay_a_synth, sound_get_volume( settings_current.volume_ay) );
@@ -221,42 +217,25 @@ sound_init( const char *device )
    * settings in settings_current though, which is why we make copies
    * rather than using the real ones).
    */
-  if( !sound_stereo ) {
-    sound_stereo_ay = 0;
-  }
 
   ay_a_synth_r = NULL;
   ay_b_synth_r = NULL;
   ay_c_synth_r = NULL;
 
-  if( sound_stereo ) {
+  if( sound_stereo_ay ) {
     ay_c_synth_r = new_Blip_Synth();
     blip_synth_set_volume( ay_c_synth_r, sound_get_volume( settings_current.volume_ay ) );
     blip_synth_set_output( ay_c_synth_r, right_buf );
 
-    if( sound_stereo_ay ) {
-      /* stereo with ACB stereo. */
-      blip_synth_set_output( ay_b_synth, right_buf );
-    } else {
-      ay_a_synth_r = new_Blip_Synth();
-      blip_synth_set_volume( ay_a_synth_r, sound_get_volume( settings_current.volume_ay ) );
-      blip_synth_set_output( ay_a_synth_r, right_buf );
-      blip_synth_set_treble_eq( ay_a_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
-
-      blip_synth_set_output( ay_b_synth, left_buf );
-
-      ay_b_synth_r = new_Blip_Synth();
-      blip_synth_set_volume( ay_b_synth_r, sound_get_volume( settings_current.volume_ay ) );
-      blip_synth_set_output( ay_b_synth_r, right_buf );
-      blip_synth_set_treble_eq( ay_b_synth_r, speaker_type[ option_enumerate_sound_speaker_type() ].treble );
-    }
+    /* stereo with ACB stereo. */
+    blip_synth_set_output( ay_b_synth, right_buf );
   } else {
     blip_synth_set_output( ay_b_synth, left_buf );
   }
 
   sound_enabled = sound_enabled_ever = 1;
 
-  sound_channels = ( sound_stereo ? 2 : 1 );
+  sound_channels = ( sound_stereo_ay ? 2 : 1 );
 
   /* Adjust relative processor speed to deal with adjusting sound generation
      frequency against emulation speed (more flexible than adjusting generated
@@ -271,7 +250,7 @@ sound_init( const char *device )
   samples = (blip_sample_t *)calloc( sound_framesiz * sound_channels,
                                      sizeof(blip_sample_t) );
   /* initialize movie settings... */
-  movie_init_sound( settings_current.sound_freq, sound_stereo );
+  movie_init_sound( settings_current.sound_freq, sound_stereo_ay );
 
 }
 
@@ -608,7 +587,7 @@ sound_frame( void )
 
   blip_buffer_end_frame( left_buf, machine_current->timings.tstates_per_frame );
 
-  if( sound_stereo ) {
+  if( sound_stereo_ay ) {
     blip_buffer_end_frame( right_buf, machine_current->timings.tstates_per_frame );
 
     /* Read left channel into even samples, right channel into odd samples:
@@ -649,7 +628,7 @@ sound_beeper( int on )
   val = -beeper_ampl[3] + ampl*2;
 
   blip_synth_update( left_beeper_synth, tstates, val );
-  if( sound_stereo ) {
+  if( sound_stereo_ay ) {
     blip_synth_update( right_beeper_synth, tstates, val );
   }
 }
