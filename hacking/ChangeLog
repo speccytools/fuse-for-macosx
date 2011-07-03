@@ -3784,3 +3784,5 @@
 20110630 peripherals/nic/w5100_socket.c: set SO_REUSEADDR on new sockets.
 20110630 peripherals/nic/{w5100_internals.h,w5100_socket.c}: handle EOF on TCP
          sockets.
+20110703 peripherals/nic/{w5100_internals.h,w5100_socket.c}: handle TCP server
+         mode.
