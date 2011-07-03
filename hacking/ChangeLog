@@ -3786,3 +3786,5 @@
          sockets.
 20110703 peripherals/nic/{w5100_internals.h,w5100_socket.c}: handle TCP server
          mode.
+20110703 fuse.c,peripherals/{nic/w5100.c,spectranet.[ch]}: clean up Spectranet
+         on exit (Sergio Baldoví).

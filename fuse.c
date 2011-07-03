@@ -831,6 +831,7 @@ static int fuse_end(void)
   opus_end();
   plusd_end();
   disciple_end();
+  spectranet_end();
 
   machine_end();
 

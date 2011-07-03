@@ -412,6 +412,13 @@ spectranet_init( void )
   return 0;
 }
 
+void
+spectranet_end( void )
+{
+  nic_w5100_free( w5100 );
+  flash_am29f010_free( flash_rom );
+}
+
 static libspectrum_word
 get_w5100_register( memory_page *page, libspectrum_word address )
 {
@@ -447,4 +454,3 @@ spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b )
     flash_am29f010_write( flash_rom, flash_page, flash_address, b );
   }
 }
-
