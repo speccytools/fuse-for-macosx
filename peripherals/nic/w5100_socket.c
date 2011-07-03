@@ -29,7 +29,6 @@
 #include "config.h"
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <string.h>
@@ -56,7 +55,7 @@ void
 nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
 {
   socket->id = which;
-  socket->fd = -1;
+  socket->fd = compat_socket_invalid;
   socket->socket_bound = 0;
   socket->ok_for_io = 0;
   pthread_mutex_init( &socket->lock, NULL );
@@ -114,10 +113,10 @@ nic_w5100_socket_reset( nic_w5100_socket_t *socket )
 void
 nic_w5100_socket_free( nic_w5100_socket_t *socket )
 {
-  if( socket->fd != -1 ) {
+  if( socket->fd != compat_socket_invalid ) {
     w5100_socket_acquire_lock( socket );
     close( socket->fd );
-    socket->fd = -1;
+    socket->fd = compat_socket_invalid;
     socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->write_pending = 0;
@@ -182,15 +181,15 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
     w5100_socket_clean( socket_obj );
 
     socket_obj->fd = socket( AF_INET, type, protocol );
-    if( socket_obj->fd == -1 ) {
-      printf("w5100: failed to open %s socket for socket %d; errno = %d: %s\n", description, socket_obj->id, errno, strerror(errno));
+    if( socket_obj->fd == compat_socket_invalid ) {
+      printf("w5100: failed to open %s socket for socket %d; errno %d: %s\n", description, socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
       w5100_socket_release_lock( socket_obj );
       return;
     }
 
     if( setsockopt( socket_obj->fd, SOL_SOCKET, SO_REUSEADDR, &one,
       sizeof(one) ) == -1 ) {
-      printf("w5100: failed to set SO_REUSEADDR on socket %d; error = %d: %s\n", socket_obj->id, errno, strerror(errno));
+      printf("w5100: failed to set SO_REUSEADDR on socket %d; errno %d: %s\n", socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
     }
 
     socket_obj->state = final_state;
@@ -213,7 +212,7 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
 
   printf("w5100: attempting to bind socket %d to %s:%d\n", socket->id, inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-    printf("w5100: failed to bind socket %d; errno = %d: %s\n", socket->id, errno, strerror(errno));
+    printf("w5100: failed to bind socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
     socket->ir |= 1 << 3;
     socket->state = W5100_SOCKET_STATE_CLOSED;
     return -1;
@@ -238,7 +237,7 @@ w5100_socket_listen( nic_w5100_t *self, nic_w5100_socket_t *socket )
       }
 
     if( listen( socket->fd, 1 ) == -1 ) {
-      printf("w5100: failed to listen on socket %d; errno %d: %s\n", socket->id, errno, strerror(errno));
+      printf("w5100: failed to listen on socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
       w5100_socket_release_lock( socket );
       return;
     }
@@ -272,7 +271,7 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
     memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
     if( connect( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-      printf("w5100: failed to connect socket %d to 0x%08x:0x%04x; errno = %d: %s\n", socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port), errno, strerror(errno));
+      printf("w5100: failed to connect socket %d to 0x%08x:0x%04x; errno %d: %s\n", socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port), compat_socket_get_error(), strerror(compat_socket_get_error()));
       socket->ir |= 1 << 3;
       socket->state = W5100_SOCKET_STATE_CLOSED;
       w5100_socket_release_lock( socket );
@@ -305,9 +304,9 @@ static void
 w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
 {
   w5100_socket_acquire_lock( socket );
-  if( socket->fd != -1 ) {
+  if( socket->fd != compat_socket_invalid ) {
     close( socket->fd );
-    socket->fd = -1;
+    socket->fd = compat_socket_invalid;
     socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->state = W5100_SOCKET_STATE_CLOSED;
@@ -526,7 +525,7 @@ nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
 {
   w5100_socket_acquire_lock( socket );
 
-  if( socket->fd != -1 ) {
+  if( socket->fd != compat_socket_invalid ) {
     /* We can process a UDP read if we're in a UDP state and there are at least
        9 bytes free in our buffer (8 byte UDP header and 1 byte of actual
        data). */
@@ -567,8 +566,8 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
   int new_fd;
 
   new_fd = accept( socket->fd, (struct sockaddr*)&sa, &sa_length );
-  if( new_fd == -1 ) {
-    printf("w5100: error from accept on socket %d; errno %d: %s\n", socket->id, errno, strerror(errno));
+  if( new_fd == compat_socket_invalid ) {
+    printf("w5100: error from accept on socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
     return;
   }
 
@@ -596,10 +595,11 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
 
   if( udp ) {
     socklen_t sa_length = sizeof(sa);
-    bytes_read = recvfrom( socket->fd, buffer + 8, bytes_free - 8, 0, (struct sockaddr*)&sa, &sa_length );
+    bytes_read = recvfrom( socket->fd, (char*)buffer + 8, bytes_free - 8, 0,
+      (struct sockaddr*)&sa, &sa_length );
   }
   else
-    bytes_read = recv( socket->fd, buffer, bytes_free, 0 );
+    bytes_read = recv( socket->fd, (char*)buffer, bytes_free, 0 );
 
   printf("w5100: read 0x%03x bytes from %s socket %d\n", (int)bytes_read, description, socket->id);
 
@@ -630,10 +630,10 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   }
   else if( bytes_read == 0 ) {  /* TCP */
     socket->state = W5100_SOCKET_STATE_CLOSE_WAIT;
-    printf("w5100: EOF on %s socket %d; errno = %d: %s\n", description, socket->id, errno, strerror(errno));
+    printf("w5100: EOF on %s socket %d; errno %d: %s\n", description, socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
   }
   else {
-    printf("w5100: error %d reading from %s socket %d: %s\n", errno, description, socket->id, strerror(errno));
+    printf("w5100: error %d reading from %s socket %d: %s\n", compat_socket_get_error(), description, socket->id, strerror(compat_socket_get_error()));
   }
 }
 
@@ -663,7 +663,7 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   memcpy( &sa.sin_port, socket->dport, 2 );
   memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
-  bytes_sent = sendto( socket->fd, data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
+  bytes_sent = sendto( socket->fd, (const char*)data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
   printf("w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n", (int)bytes_sent, length, socket->id);
 
   if( bytes_sent == length ) {
@@ -680,7 +680,7 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   else if( bytes_sent != -1 )
     printf("w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id);
   else
-    printf("w5100: error %d writing to UDP socket %d: %s\n", errno, socket->id, strerror(errno));
+    printf("w5100: error %d writing to UDP socket %d: %s\n", compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()));
 }
 
 static void
@@ -697,7 +697,7 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
   if( offset + length > 0x800 )
     length = 0x800 - offset;
 
-  bytes_sent = send( socket->fd, data, length, 0 );
+  bytes_sent = send( socket->fd, (const char*)data, length, 0 );
   printf("w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n", (int)bytes_sent, length, socket->id);
 
   if( bytes_sent != -1 ) {
@@ -708,7 +708,7 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
     }
   }
   else
-    printf("w5100: error %d writing to TCP socket %d: %s\n", errno, socket->id, strerror(errno));
+    printf("w5100: error %d writing to TCP socket %d: %s\n", compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()));
 }
 
 void
@@ -719,7 +719,7 @@ nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
 
   /* Process only if we're an open socket, and we haven't been closed and
      re-opened since the select() started */
-  if( socket->fd != -1 && socket->ok_for_io ) {
+  if( socket->fd != compat_socket_invalid && socket->ok_for_io ) {
     if( FD_ISSET( socket->fd, &readfds ) ) {
       if( socket->state == W5100_SOCKET_STATE_LISTEN )
         w5100_socket_process_accept( socket );

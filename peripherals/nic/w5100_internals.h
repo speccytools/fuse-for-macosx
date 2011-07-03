@@ -108,7 +108,7 @@ typedef struct nic_w5100_socket_t {
 
   /* Host properties */
 
-  int fd;                   /* Socket file descriptor */
+  compat_socket_t fd;       /* Socket file descriptor */
   int socket_bound;         /* True once we've bound the socket to a port */
   int write_pending;        /* True if we're waiting to write data on this socket */
 

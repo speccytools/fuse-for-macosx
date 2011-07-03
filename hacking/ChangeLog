@@ -3788,3 +3788,7 @@
          mode.
 20110703 fuse.c,peripherals/{nic/w5100.c,spectranet.[ch]}: clean up Spectranet
          on exit (Sergio Baldoví).
+20110703 compat.h,compat/{unix/Makefile.am,socket.c},win32/{Makefile.am,
+         socket.c},configure.in,peripherals/nic/{w5100_internals.h,
+         w5100_socket.c}: first bits of Win32 compatability layer
+         (Sergio Baldoví/Phil)
