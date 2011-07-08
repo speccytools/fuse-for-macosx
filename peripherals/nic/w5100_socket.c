@@ -97,31 +97,27 @@ w5100_socket_clean( nic_w5100_socket_t *socket )
   socket->last_send = 0;
   socket->datagram_count = 0;
 
-  nic_w5100_socket_free( socket );
-}
-
-void
-nic_w5100_socket_reset( nic_w5100_socket_t *socket )
-{
-  socket->mode = W5100_SOCKET_MODE_CLOSED;
-  socket->flags = 0;
-  socket->state = W5100_SOCKET_STATE_CLOSED;
-
-  w5100_socket_clean( socket );
-}
-
-void
-nic_w5100_socket_free( nic_w5100_socket_t *socket )
-{
   if( socket->fd != compat_socket_invalid ) {
-    w5100_socket_acquire_lock( socket );
     close( socket->fd );
     socket->fd = compat_socket_invalid;
     socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->write_pending = 0;
-    w5100_socket_release_lock( socket );
   }
+}
+
+void
+nic_w5100_socket_reset( nic_w5100_socket_t *socket )
+{
+  w5100_socket_acquire_lock( socket );
+
+  socket->mode = W5100_SOCKET_MODE_CLOSED;
+  socket->flags = 0;
+  socket->state = W5100_SOCKET_STATE_CLOSED;
+
+  w5100_socket_clean( socket );
+
+  w5100_socket_release_lock( socket );
 }
 
 static void
