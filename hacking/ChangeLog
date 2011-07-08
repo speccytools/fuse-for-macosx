@@ -3792,6 +3792,6 @@
          socket.c},configure.in,peripherals/nic/{w5100_internals.h,
          w5100_socket.c}: first bits of Win32 compatability layer
          (Sergio Baldoví/Phil)
-20110703 peripherals/nic/{w5100.c,w5100_internals.h,w5100_socket.c}: ensure we
+20110708 peripherals/nic/{w5100.c,w5100_internals.h,w5100_socket.c}: ensure we
          don't acquire a lock recursively, thus avoiding deadlock (thanks,
          Winston).
