@@ -85,7 +85,7 @@ snapshot_read_buffer( const unsigned char *buffer, size_t length,
 int
 snapshot_copy_from( libspectrum_snap *snap )
 {
-  int capabilities, error;
+  int error;
   libspectrum_machine machine;
 
   module_snapshot_enabled( snap );
@@ -102,8 +102,6 @@ snapshot_copy_from( libspectrum_snap *snap )
   } else {
     machine_reset( 0 );
   }
-
-  capabilities = machine_current->capabilities;
 
   module_snapshot_from( snap );
 
@@ -136,6 +134,7 @@ int snapshot_write( const char *filename )
 
   flags = 0;
   length = 0;
+  buffer = NULL;
   error = libspectrum_snap_write( &buffer, &length, &flags, snap, type,
 				  fuse_creator, 0 );
   if( error ) { libspectrum_snap_free( snap ); return error; }

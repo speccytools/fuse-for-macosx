@@ -986,7 +986,7 @@ static int
 open_udi( buffer_t *buffer, disk_t *d )
 {
   int i, bpt, ttyp, tlen, error;
-  size_t clen, eof;
+  size_t eof;
   libspectrum_dword crc;
 
   crc = ~(libspectrum_dword) 0;
@@ -1057,9 +1057,8 @@ open_udi( buffer_t *buffer, disk_t *d )
     DISK_SET_TRACK_IDX( d, i );
     ttyp = buff[0];
     bpt = buff[1] + 256 * buff[2];		/* current track len... */
-    clen = DISK_CLEN( bpt );
 
-    memset( d->track, d->bpt, 0x4e );		/* fillup */
+    memset( d->track, 0x4e, d->bpt );		/* fillup */
 						/* read track + clocks */
     if( ttyp == 0x83 ) {			/* multiple read */
       i--;					/* not a real track */

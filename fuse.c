@@ -79,6 +79,7 @@
 #include "peripherals/spectranet.h"
 #include "peripherals/ula.h"
 #include "pokefinder/pokefinder.h"
+#include "pokefinder/pokemem.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
@@ -556,7 +557,10 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 
     error = libspectrum_identify_file_with_class( &type, &class, filename,
 						  file.buffer, file.length );
-    if( error ) return error;
+    if( error ) {
+      utils_close_file( &file );
+      return error;
+    }
 
     switch( class ) {
 
@@ -631,6 +635,12 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_TAPE:
       start_files->tape = filename; break;
 
+    case LIBSPECTRUM_CLASS_AUXILIARY:
+      if( type == LIBSPECTRUM_ID_AUX_POK ) {
+        pokemem_set_pokfile( filename );
+      }
+      break;
+
     case LIBSPECTRUM_CLASS_UNKNOWN:
       ui_error( UI_ERROR_WARNING, "couldn't identify '%s'; ignoring it",
 		filename );
@@ -642,6 +652,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       break;
 
     }
+
+    utils_close_file( &file );
   }
 
   return 0;
@@ -841,6 +853,9 @@ static int fuse_end(void)
   event_end();
   fuse_joystick_end();
   ui_end();
+  memory_end();
+  mempool_end();
+  pokemem_end();
 
   libspectrum_creator_free( fuse_creator );
 

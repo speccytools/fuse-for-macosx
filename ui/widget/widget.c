@@ -500,6 +500,11 @@ int widget_do( widget_type which, void *data )
   /* If we don't have a UI yet, we can't output widgets */
   if( !display_ui_initialised ) return 1;
 
+  if( which == WIDGET_TYPE_QUERY && !settings_current.confirm_actions ) {
+    widget_query.confirm = 1;
+    return 0;
+  }
+
   if( ui_widget_level == -1 ) uidisplay_frame_save();
 
   /* We're now one widget level deeper */
@@ -681,6 +686,7 @@ widget_t widget_data[] = {
   { widget_text_draw,	  widget_text_finish,	 widget_text_keyhandler     },
   { widget_debugger_draw, NULL,			 widget_debugger_keyhandler },
   { widget_pokefinder_draw, NULL,		 widget_pokefinder_keyhandler },
+  { widget_pokemem_draw, widget_pokemem_finish,	widget_pokemem_keyhandler },
   { widget_memory_draw,   NULL,			 widget_memory_keyhandler   },
   { widget_roms_draw,     widget_roms_finish,	 widget_roms_keyhandler     },
   { widget_peripherals_draw, widget_options_finish,
@@ -720,6 +726,8 @@ ui_tape_browser_update( ui_tape_browser_update_type change,
 ui_confirm_save_t
 ui_confirm_save_specific( const char *message )
 {
+  if( !settings_current.confirm_actions ) return UI_CONFIRM_SAVE_DONTSAVE;
+
   if( widget_do( WIDGET_TYPE_QUERY_SAVE, (void *) message ) )
     return UI_CONFIRM_SAVE_CANCEL;
   return widget_query.confirm;

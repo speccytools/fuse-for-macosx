@@ -1,5 +1,5 @@
-/* mempool.c: pooled system memory
-   Copyright (c) 2008 Philip Kendall
+/* pokemem.h: Win32 interface to the poke memory
+   Copyright (c) 2011 Philip Kendall, Sergio Baldoví
 
    $Id$
 
@@ -23,21 +23,14 @@
 
 */
 
-#ifndef FUSE_MEMPOOL_H
-#define FUSE_MEMPOOL_H
-
-extern const int MEMPOOL_UNTRACKED;
-
-int mempool_init( void );
-int mempool_register_pool( void );
-void* mempool_alloc( int pool, size_t size );
-char* mempool_strdup( int pool, const char *string );
-void mempool_free( int pool );
-void mempool_end( void );
-
-/* Unit test helper routines */
-
-int mempool_get_pools( void );
-int mempool_get_pool_size( int pool );
-
-#endif				/* #ifndef FUSE_MEMPOOL_H */
+#define IDD_POKEMEM       1900
+#define IDC_PM_BANK       1901
+#define IDC_PM_BANK_EDIT  1902
+#define IDC_PM_ADDRESS    1903
+#define IDC_PM_ADDR_EDIT  1904
+#define IDC_PM_VALUE      1905
+#define IDC_PM_VALUE_EDIT 1906
+#define IDC_PM_ADD        1907
+#define IDC_PM_ACTIVE_POK 1908
+#define IDC_PM_LIST       1909
+#define IDC_PM_LIST_EDIT  1910
