@@ -37,6 +37,7 @@ libwidget_a_SOURCES = \
 	menu_data.c \
 	options.c \
 	picture.c \
+	pokemem.c \
 	pokefinder.c \
 	query.c \
 	roms.c \
@@ -73,5 +74,5 @@ EXTRA_DIST = mkfusefont.pl \
 
 CLEANFILES = menu_data.c \
 	     options.c \
-	     options.h \
+	     options_internals.h \
 	     fuse.font

@@ -426,6 +426,7 @@ if1_memory_map( void )
   if( !if1_active ) return;
 
   memory_map_romcs_8k( 0x0000, if1_memory_map_romcs );
+  memory_map_read[1] = memory_map_write[1] = if1_memory_map_romcs[0];
 }
 
 static void
