@@ -123,7 +123,7 @@ nic_w5100_socket_reset( nic_w5100_socket_t *socket )
 static void
 w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
 {
-  printf("w5100: writing 0x%02x to S%d_MR\n", b, socket->id);
+  nic_w5100_debug( "w5100: writing 0x%02x to S%d_MR\n", b, socket->id );
 
   w5100_socket_mode mode = b & 0x0f;
   libspectrum_byte flags = b & 0xf0;
@@ -134,14 +134,14 @@ w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
     case W5100_SOCKET_MODE_TCP:
       /* We support only "disable no delayed ACK" */
       if( flags != 0x20 ) {
-        printf("w5100: unsupported flags 0x%02x set for TCP mode on socket %d\n", b & 0xf0, socket->id);
+        ui_error( UI_ERROR_WARNING, "w5100: unsupported flags 0x%02x set for TCP mode on socket %d\n", b & 0xf0, socket->id );
         flags = 0x20;
       }
       break;
     case W5100_SOCKET_MODE_UDP:
       /* We don't support multicast */
       if( flags != 0x00 ) {
-        printf("w5100: unsupported flags 0x%02x set for UDP mode on socket %d\n", b & 0xf0, socket->id);
+        ui_error( UI_ERROR_WARNING, "w5100: unsupported flags 0x%02x set for UDP mode on socket %d\n", b & 0xf0, socket->id );
         flags = 0;
       }
       break;
@@ -149,7 +149,7 @@ w5100_write_socket_mr( nic_w5100_socket_t *socket, libspectrum_byte b )
     case W5100_SOCKET_MODE_MACRAW:
     case W5100_SOCKET_MODE_PPPOE:
     default:
-      printf("w5100: unsupported mode 0x%02x set on socket %d\n", b, socket->id);
+      ui_error( UI_ERROR_WARNING, "w5100: unsupported mode 0x%02x set on socket %d\n", b, socket->id );
       mode = W5100_SOCKET_MODE_CLOSED;
       break;
   }
@@ -178,19 +178,21 @@ w5100_socket_open( nic_w5100_socket_t *socket_obj )
 
     socket_obj->fd = socket( AF_INET, type, protocol );
     if( socket_obj->fd == compat_socket_invalid ) {
-      printf("w5100: failed to open %s socket for socket %d; errno %d: %s\n", description, socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
+      ui_error( UI_ERROR_ERROR, "w5100: failed to open %s socket for socket %d; errno %d: %s\n",
+                description, socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
       w5100_socket_release_lock( socket_obj );
       return;
     }
 
     if( setsockopt( socket_obj->fd, SOL_SOCKET, SO_REUSEADDR, &one,
       sizeof(one) ) == -1 ) {
-      printf("w5100: failed to set SO_REUSEADDR on socket %d; errno %d: %s\n", socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
+      ui_error( UI_ERROR_ERROR, "w5100: failed to set SO_REUSEADDR on socket %d; errno %d: %s\n",
+                socket_obj->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
     }
 
     socket_obj->state = final_state;
 
-    printf("w5100: opened %s fd %d for socket %d\n", description, socket_obj->fd, socket_obj->id);
+    nic_w5100_debug( "w5100: opened %s fd %d for socket %d\n", description, socket_obj->fd, socket_obj->id );
   }
 
   w5100_socket_release_lock( socket_obj );
@@ -206,16 +208,17 @@ w5100_socket_bind_port( nic_w5100_t *self, nic_w5100_socket_t *socket )
   memcpy( &sa.sin_port, socket->port, 2 );
   memcpy( &sa.sin_addr.s_addr, self->sip, 4 );
 
-  printf("w5100: attempting to bind socket %d to %s:%d\n", socket->id, inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
+  nic_w5100_debug( "w5100: attempting to bind socket %d to %s:%d\n", socket->id, inet_ntoa(sa.sin_addr), ntohs(sa.sin_port) );
   if( bind( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-    printf("w5100: failed to bind socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
+    ui_error( UI_ERROR_ERROR, "w5100: failed to bind socket %d; errno %d: %s\n",
+              socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
     socket->ir |= 1 << 3;
     socket->state = W5100_SOCKET_STATE_CLOSED;
     return -1;
   }
 
   socket->socket_bound = 1;
-  printf("w5100: successfully bound socket %d\n", socket->id);
+  nic_w5100_debug( "w5100: successfully bound socket %d\n", socket->id );
 
   return 0;
 }
@@ -233,14 +236,15 @@ w5100_socket_listen( nic_w5100_t *self, nic_w5100_socket_t *socket )
       }
 
     if( listen( socket->fd, 1 ) == -1 ) {
-      printf("w5100: failed to listen on socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
+      ui_error( UI_ERROR_ERROR, "w5100: failed to listen on socket %d; errno %d: %s\n",
+                socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
       w5100_socket_release_lock( socket );
       return;
     }
 
     socket->state = W5100_SOCKET_STATE_LISTEN;
 
-    printf("w5100: listening on socket %d\n", socket->id);
+    nic_w5100_debug( "w5100: listening on socket %d\n", socket->id );
 
     w5100_socket_release_lock( socket );
 
@@ -267,7 +271,9 @@ w5100_socket_connect( nic_w5100_t *self, nic_w5100_socket_t *socket )
     memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
     if( connect( socket->fd, (struct sockaddr*)&sa, sizeof(sa) ) == -1 ) {
-      printf("w5100: failed to connect socket %d to 0x%08x:0x%04x; errno %d: %s\n", socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port), compat_socket_get_error(), strerror(compat_socket_get_error()));
+      ui_error( UI_ERROR_ERROR, "w5100: failed to connect socket %d to 0x%08x:0x%04x; errno %d: %s\n",
+                socket->id, ntohl(sa.sin_addr.s_addr), ntohs(sa.sin_port),
+                compat_socket_get_error(), strerror(compat_socket_get_error()) );
       socket->ir |= 1 << 3;
       socket->state = W5100_SOCKET_STATE_CLOSED;
       w5100_socket_release_lock( socket );
@@ -292,7 +298,7 @@ w5100_socket_discon( nic_w5100_t *self, nic_w5100_socket_t *socket )
     w5100_socket_release_lock( socket );
     nic_w5100_wake_io_thread( self );
 
-    printf("w5100: disconnected socket %d\n", socket->id);
+    nic_w5100_debug( "w5100: disconnected socket %d\n", socket->id );
   }
 }
 
@@ -307,7 +313,7 @@ w5100_socket_close( nic_w5100_t *self, nic_w5100_socket_t *socket )
     socket->ok_for_io = 0;
     socket->state = W5100_SOCKET_STATE_CLOSED;
     nic_w5100_wake_io_thread( self );
-    printf("w5100: closed socket %d\n", socket->id);
+    nic_w5100_debug( "w5100: closed socket %d\n", socket->id );
   }
   w5100_socket_release_lock( socket );
 }
@@ -357,7 +363,7 @@ w5100_socket_recv( nic_w5100_t *self, nic_w5100_socket_t *socket )
 static void
 w5100_write_socket_cr( nic_w5100_t *self, nic_w5100_socket_t *socket, libspectrum_byte b )
 {
-  printf("w5100: writing 0x%02x to S%d_CR\n", b, socket->id);
+  nic_w5100_debug( "w5100: writing 0x%02x to S%d_CR\n", b, socket->id );
 
   switch( b ) {
     case W5100_SOCKET_COMMAND_OPEN:
@@ -382,7 +388,7 @@ w5100_write_socket_cr( nic_w5100_t *self, nic_w5100_socket_t *socket, libspectru
       w5100_socket_recv( self, socket );
       break;
     default:
-      printf("w5100: unknown command 0x%02x sent to socket %d\n", b, socket->id);
+      ui_error( UI_ERROR_WARNING, "w5100: unknown command 0x%02x sent to socket %d\n", b, socket->id );
       break;
   }
 }
@@ -398,49 +404,49 @@ nic_w5100_socket_read( nic_w5100_t *self, libspectrum_word reg )
   switch( socket_reg ) {
     case W5100_SOCKET_MR:
       b = socket->mode;
-      printf("w5100: reading 0x%02x from S%d_MR\n", b, socket->id);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_MR\n", b, socket->id );
       break;
     case W5100_SOCKET_IR:
       b = socket->ir;
-      printf("w5100: reading 0x%02x from S%d_IR\n", b, socket->id);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_IR\n", b, socket->id );
       break;
     case W5100_SOCKET_SR:
       b = socket->state;
-      printf("w5100: reading 0x%02x from S%d_SR\n", b, socket->id);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_SR\n", b, socket->id );
       break;
     case W5100_SOCKET_PORT0: case W5100_SOCKET_PORT1:
       b = socket->port[socket_reg - W5100_SOCKET_PORT0];
-      printf("w5100: reading 0x%02x from S%d_PORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_PORT0);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_PORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_PORT0 );
       break;
     case W5100_SOCKET_TX_FSR0: case W5100_SOCKET_TX_FSR1:
       reg_offset = socket_reg - W5100_SOCKET_TX_FSR0;
       fsr = 0x0800 - (socket->tx_wr - socket->tx_rr);
       b = ( fsr >> ( 8 * ( 1 - reg_offset ) ) ) & 0xff;
-      printf("w5100: reading 0x%02x from S%d_TX_FSR%d\n", b, socket->id, reg_offset);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_TX_FSR%d\n", b, socket->id, reg_offset );
       break;
     case W5100_SOCKET_TX_RR0: case W5100_SOCKET_TX_RR1:
       reg_offset = socket_reg - W5100_SOCKET_TX_RR0;
       b = ( socket->tx_rr >> ( 8 * ( 1 - reg_offset ) ) ) & 0xff;
-      printf("w5100: reading 0x%02x from S%d_TX_RR%d\n", b, socket->id, reg_offset);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_TX_RR%d\n", b, socket->id, reg_offset );
       break;
     case W5100_SOCKET_TX_WR0: case W5100_SOCKET_TX_WR1:
       reg_offset = socket_reg - W5100_SOCKET_TX_WR0;
       b = ( socket->tx_wr >> ( 8 * ( 1 - reg_offset ) ) ) & 0xff;
-      printf("w5100: reading 0x%02x from S%d_TX_WR%d\n", b, socket->id, reg_offset);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_TX_WR%d\n", b, socket->id, reg_offset );
       break;
     case W5100_SOCKET_RX_RSR0: case W5100_SOCKET_RX_RSR1:
       reg_offset = socket_reg - W5100_SOCKET_RX_RSR0;
       b = ( socket->rx_rsr >> ( 8 * ( 1 - reg_offset ) ) ) & 0xff;
-      printf("w5100: reading 0x%02x from S%d_RX_RSR%d\n", b, socket->id, reg_offset);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_RX_RSR%d\n", b, socket->id, reg_offset );
       break;
     case W5100_SOCKET_RX_RD0: case W5100_SOCKET_RX_RD1:
       reg_offset = socket_reg - W5100_SOCKET_RX_RD0;
       b = ( socket->rx_rd >> ( 8 * ( 1 - reg_offset ) ) ) & 0xff;
-      printf("w5100: reading 0x%02x from S%d_RX_RD%d\n", b, socket->id, reg_offset);
+      nic_w5100_debug( "w5100: reading 0x%02x from S%d_RX_RD%d\n", b, socket->id, reg_offset );
       break;
     default:
       b = 0xff;
-      printf("w5100: reading 0x%02x from unsupported register 0x%03x\n", b, reg );
+      ui_error( UI_ERROR_WARNING, "w5100: reading 0x%02x from unsupported register 0x%03x\n", b, reg );
       break;
   }
   return b;
@@ -459,39 +465,39 @@ nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byt
       w5100_write_socket_cr( self, socket, b );
       break;
     case W5100_SOCKET_IR:
-      printf("w5100: writing 0x%02x to S%d_IR\n", b, socket->id);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_IR\n", b, socket->id );
       socket->ir &= ~b;
       break;
     case W5100_SOCKET_PORT0: case W5100_SOCKET_PORT1:
-      printf("w5100: writing 0x%02x to S%d_PORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_PORT0);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_PORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_PORT0 );
       socket->port[socket_reg - W5100_SOCKET_PORT0] = b;
       break;
     case W5100_SOCKET_DIPR0: case W5100_SOCKET_DIPR1: case W5100_SOCKET_DIPR2: case W5100_SOCKET_DIPR3:
-      printf("w5100: writing 0x%02x to S%d_DIPR%d\n", b, socket->id, socket_reg - W5100_SOCKET_DIPR0);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_DIPR%d\n", b, socket->id, socket_reg - W5100_SOCKET_DIPR0 );
       socket->dip[socket_reg - W5100_SOCKET_DIPR0] = b;
       break;
     case W5100_SOCKET_DPORT0: case W5100_SOCKET_DPORT1:
-      printf("w5100: writing 0x%02x to S%d_DPORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_DPORT0);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_DPORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_DPORT0 );
       socket->dport[socket_reg - W5100_SOCKET_DPORT0] = b;
       break;
     case W5100_SOCKET_TX_WR0:
-      printf("w5100: writing 0x%02x to S%d_TX_WR0\n", b, socket->id);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_TX_WR0\n", b, socket->id );
       socket->tx_wr = (socket->tx_wr & 0xff) | (b << 8);
       break;
     case W5100_SOCKET_TX_WR1:
-      printf("w5100: writing 0x%02x to S%d_TX_WR1\n", b, socket->id);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_TX_WR1\n", b, socket->id );
       socket->tx_wr = (socket->tx_wr & 0xff00) | b;
       break;
     case W5100_SOCKET_RX_RD0:
-      printf("w5100: writing 0x%02x to S%d_RX_RD0\n", b, socket->id);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_RX_RD0\n", b, socket->id );
       socket->rx_rd = (socket->rx_rd & 0xff) | (b << 8);
       break;
     case W5100_SOCKET_RX_RD1:
-      printf("w5100: writing 0x%02x to S%d_RX_RD1\n", b, socket->id);
+      nic_w5100_debug( "w5100: writing 0x%02x to S%d_RX_RD1\n", b, socket->id );
       socket->rx_rd = (socket->rx_rd & 0xff00) | b;
       break;
     default:
-      printf("w5100: writing 0x%02x to unsupported register 0x%03x\n", b, reg);
+      ui_error( UI_ERROR_WARNING, "w5100: writing 0x%02x to unsupported register 0x%03x\n", b, reg );
       break;
   }
 }
@@ -502,7 +508,7 @@ nic_w5100_socket_read_rx_buffer( nic_w5100_t *self, libspectrum_word reg )
   nic_w5100_socket_t *socket = &self->socket[(reg - 0x6000) / 0x0800];
   int offset = reg & 0x7ff;
   libspectrum_byte b = socket->rx_buffer[offset];
-  printf("w5100: reading 0x%02x from socket %d rx buffer offset 0x%03x\n", b, socket->id, offset);
+  nic_w5100_debug( "w5100: reading 0x%02x from socket %d rx buffer offset 0x%03x\n", b, socket->id, offset );
   return b;
 }
 
@@ -511,7 +517,7 @@ nic_w5100_socket_write_tx_buffer( nic_w5100_t *self, libspectrum_word reg, libsp
 {
   nic_w5100_socket_t *socket = &self->socket[(reg - 0x4000) / 0x0800];
   int offset = reg & 0x7ff;
-  printf("w5100: writing 0x%02x to socket %d tx buffer offset 0x%03x\n", b, socket->id, offset);
+  nic_w5100_debug( "w5100: writing 0x%02x to socket %d tx buffer offset 0x%03x\n", b, socket->id, offset );
   socket->tx_buffer[offset] = b;
 }
 
@@ -540,14 +546,14 @@ nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
       FD_SET( socket->fd, readfds );
       if( socket->fd > *max_fd )
         *max_fd = socket->fd;
-      printf("w5100: checking for read on socket %d with fd %d; max fd %d\n", socket->id, socket->fd, *max_fd);
+      nic_w5100_debug( "w5100: checking for read on socket %d with fd %d; max fd %d\n", socket->id, socket->fd, *max_fd );
     }
 
     if( socket->write_pending ) {
       FD_SET( socket->fd, writefds );
       if( socket->fd > *max_fd )
         *max_fd = socket->fd;
-      printf("w5100: write pending on socket %d with fd %d; max fd %d\n", socket->id, socket->fd, *max_fd);
+      nic_w5100_debug( "w5100: write pending on socket %d with fd %d; max fd %d\n", socket->id, socket->fd, *max_fd );
     }
   }
 
@@ -563,14 +569,15 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
 
   new_fd = accept( socket->fd, (struct sockaddr*)&sa, &sa_length );
   if( new_fd == compat_socket_invalid ) {
-    printf("w5100: error from accept on socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
+    ui_error( UI_ERROR_ERROR, "w5100: error from accept on socket %d; errno %d: %s\n",
+              socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
     return;
   }
 
-  printf("w5100: accepted connection from %s:%d on socket %d\n", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), socket->id);
+  nic_w5100_debug( "w5100: accepted connection from %s:%d on socket %d\n", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), socket->id );
 
   if( close( socket->fd ) == -1 )
-    printf("w5100: error attempting to close fd %d for socket %d\n", socket->fd, socket->id);
+    ui_error( UI_ERROR_ERROR, "w5100: error attempting to close fd %d for socket %d\n", socket->fd, socket->id );
 
   socket->fd = new_fd;
   socket->state = W5100_SOCKET_STATE_ESTABLISHED;
@@ -587,7 +594,7 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   int udp = socket->state == W5100_SOCKET_STATE_UDP;
   const char *description = udp ? "UDP" : "TCP";
 
-  printf("w5100: reading from socket %d\n", socket->id);
+  nic_w5100_debug( "w5100: reading from socket %d\n", socket->id );
 
   if( udp ) {
     socklen_t sa_length = sizeof(sa);
@@ -597,7 +604,7 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   else
     bytes_read = recv( socket->fd, (char*)buffer, bytes_free, 0 );
 
-  printf("w5100: read 0x%03x bytes from %s socket %d\n", (int)bytes_read, description, socket->id);
+  nic_w5100_debug( "w5100: read 0x%03x bytes from %s socket %d\n", (int)bytes_read, description, socket->id );
 
   if( bytes_read > 0 || (udp && bytes_read == 0) ) {
     int offset = (socket->old_rx_rd + socket->rx_rsr) & 0x7ff;
@@ -626,10 +633,12 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
   }
   else if( bytes_read == 0 ) {  /* TCP */
     socket->state = W5100_SOCKET_STATE_CLOSE_WAIT;
-    printf("w5100: EOF on %s socket %d; errno %d: %s\n", description, socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()));
+    nic_w5100_debug( "w5100: EOF on %s socket %d; errno %d: %s\n",
+                     description, socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
   }
   else {
-    printf("w5100: error %d reading from %s socket %d: %s\n", compat_socket_get_error(), description, socket->id, strerror(compat_socket_get_error()));
+    ui_error( UI_ERROR_ERROR, "w5100: error %d reading from %s socket %d: %s\n",
+              compat_socket_get_error(), description, socket->id, strerror(compat_socket_get_error()) );
   }
 }
 
@@ -643,7 +652,7 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   struct sockaddr_in sa;
   libspectrum_byte buffer[0x800];
 
-  printf("w5100: writing to UDP socket %d\n", socket->id);
+  nic_w5100_debug( "w5100: writing to UDP socket %d\n", socket->id );
 
   /* If the data wraps round the write buffer, we need to coalesce it into
      one chunk for the call to sendto() */
@@ -660,7 +669,7 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
   memcpy( &sa.sin_addr.s_addr, socket->dip, 4 );
 
   bytes_sent = sendto( socket->fd, (const char*)data, length, 0, (struct sockaddr*)&sa, sizeof(sa) );
-  printf("w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n", (int)bytes_sent, length, socket->id);
+  nic_w5100_debug( "w5100: sent 0x%03x bytes of 0x%03x to UDP socket %d\n", (int)bytes_sent, length, socket->id );
 
   if( bytes_sent == length ) {
     if( --socket->datagram_count )
@@ -674,9 +683,10 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
     }
   }
   else if( bytes_sent != -1 )
-    printf("w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id);
+    ui_error( UI_ERROR_ERROR, "w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id);
   else
-    printf("w5100: error %d writing to UDP socket %d: %s\n", compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()));
+    ui_error( UI_ERROR_ERROR, "w5100: error %d writing to UDP socket %d: %s\n",
+              compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()) );
 }
 
 static void
@@ -687,14 +697,14 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
   libspectrum_word length = socket->tx_wr - socket->tx_rr;
   libspectrum_byte *data = &socket->tx_buffer[ offset ];
 
-  printf("w5100: writing to TCP socket %d\n", socket->id);
+  nic_w5100_debug( "w5100: writing to TCP socket %d\n", socket->id );
 
   /* If the data wraps round the write buffer, write it in two chunks */
   if( offset + length > 0x800 )
     length = 0x800 - offset;
 
   bytes_sent = send( socket->fd, (const char*)data, length, 0 );
-  printf("w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n", (int)bytes_sent, length, socket->id);
+  nic_w5100_debug( "w5100: sent 0x%03x bytes of 0x%03x to TCP socket %d\n", (int)bytes_sent, length, socket->id );
 
   if( bytes_sent != -1 ) {
     socket->tx_rr += bytes_sent;
@@ -704,7 +714,8 @@ w5100_socket_process_tcp_write( nic_w5100_socket_t *socket )
     }
   }
   else
-    printf("w5100: error %d writing to TCP socket %d: %s\n", compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()));
+    nic_w5100_debug( "w5100: error %d writing to TCP socket %d: %s\n",
+                     compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()) );
 }
 
 void

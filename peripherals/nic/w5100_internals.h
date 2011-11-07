@@ -157,4 +157,11 @@ void nic_w5100_socket_add_to_sets( nic_w5100_socket_t *socket, fd_set *readfds,
 void nic_w5100_socket_process_io( nic_w5100_socket_t *socket, fd_set readfds,
   fd_set writefds );
 
+/* Debug routines */
+
+/* Define this to spew debugging info to stdout */
+#define W5100_DEBUG 0
+
+void nic_w5100_debug( const char *format, ... );
+
 #endif                          /* #ifndef FUSE_W5100_H */

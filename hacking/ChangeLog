@@ -3843,3 +3843,5 @@
          (Simon Owen).
 20111106 peripherals/disk/{disk.c,wd_fdc.c},snapshot.c,ui/gtk/options.pl:
          remove unused variables (thanks, gcc 4.6).
+20111107 peripherals/nic/{w5100_internals.h,w5100_socket.c,w5100.c}: stop
+         dumping lots of stuff to stdout.
