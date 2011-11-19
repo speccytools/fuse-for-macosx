@@ -229,10 +229,10 @@ static void
 special_memory_map( int which )
 {
   switch( which ) {
-  case 0: select_special_map( 0, 1, 2, 3 );
-  case 1: select_special_map( 4, 5, 6, 7 );
-  case 2: select_special_map( 4, 5, 6, 3 );
-  case 3: select_special_map( 4, 7, 6, 3 );
+  case 0: select_special_map( 0, 1, 2, 3 ); break;
+  case 1: select_special_map( 4, 5, 6, 7 ); break;
+  case 2: select_special_map( 4, 5, 6, 3 ); break;
+  case 3: select_special_map( 4, 7, 6, 3 ); break;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown +3 special configuration %d", which );
