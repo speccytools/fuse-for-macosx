@@ -3845,3 +3845,21 @@
          remove unused variables (thanks, gcc 4.6).
 20111107 peripherals/nic/{w5100_internals.h,w5100_socket.c,w5100.c}: stop
          dumping lots of stuff to stdout.
+20111108 unittests/unittests.c: beginnings of a paging unit test.
+20111114 unittests/unittests.c: add 48K and +2A/+3 paging unit tests.
+20111114 machines/pentagon1024.c: Pentagon1024 does not have 128K-style memory
+         paging (as paging is not locked on a write of 0x20 unless the
+         secondary port has been written to as well).
+20111114 unittests/unittests.c: add Pentagon paging tests.
+20111114 unittests/unittests.c: get more test coverage by using
+         writeport_internal rather than explicit function calls.
+20111114 unittests/unittests.c: add TC2068 paging test.
+20111117 unittests/unittests.c: update expected TS2068 contention result after
+         TS2068 timing change in libspectrum change r3854.
+20111118 unittests/unittests.c: add TC2048 paging test.
+20111118 machines/spec_se.c: Spectrum SE does not have 128K-style memory paging
+         as "port 0x7ffd" is fully decoded.
+20111118 memory.c: assign memory_source_dock and memory_source_exrom.
+20111118 unittests/unittests.c: add Spectrum SE paging test.
+20111119 unittests/unittests.c: add Scorpion paging test.
+20111119 unittests/unittests.c: add 48K NTSC contention/floating bus results.
