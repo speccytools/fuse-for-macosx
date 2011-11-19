@@ -135,8 +135,7 @@ scorpion_memory_map( void )
   machine_current->ram.current_rom = rom;
 
   if( machine_current->ram.last_byte2 & 0x01 ) {
-    memory_map_home[0] = &memory_map_ram[ 0 ];
-    memory_map_home[1] = &memory_map_ram[ 1 ];
+    memory_map_16k( 0x0000, memory_map_ram, 0 );
     machine_current->ram.special = 1;
   } else {
     spec128_select_rom( rom );
