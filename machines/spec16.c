@@ -89,7 +89,6 @@ static int
 spec16_reset( void )
 {
   int error;
-  size_t i;
 
   error = machine_load_rom( 0, settings_current.rom_16, 
                             settings_default.rom_16, 0x4000 );
@@ -108,9 +107,6 @@ spec16_reset( void )
   memory_map_16k( 0x4000, memory_map_ram, 5 );
   memory_map_16k( 0x8000, empty_mapping, 0 );
   memory_map_16k( 0xc000, empty_mapping, 0 );
-
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;

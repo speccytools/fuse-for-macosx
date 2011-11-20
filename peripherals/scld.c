@@ -182,21 +182,20 @@ void
 scld_memory_map( void )
 {
   int i;
-  memory_page **exrom_dock;
+  memory_page *exrom_dock;
   
   exrom_dock =
-    scld_last_dec.name.altmembank ? memory_map_exrom : memory_map_dock;
+    scld_last_dec.name.altmembank ? timex_exrom : timex_dock;
 
   for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
     int chunk = i >> (13 - MEMORY_PAGE_SIZE_LOGARITHM);
-    int use_exrom = scld_last_hsr & (1 << chunk);
-    memory_map_read[i] = memory_map_write[i] =
-      use_exrom ? *exrom_dock[i] : *memory_map_home[i];
+    if( scld_last_hsr & (1 << chunk) )
+      memory_map_read[i] = memory_map_write[i] = exrom_dock[i];
   }
 }
 
 static void
-scld_dock_exrom_from_snapshot( memory_page **dest, int page_num, int writable,
+scld_dock_exrom_from_snapshot( memory_page *dest, int page_num, int writable,
                                void *source )
 {
   int i;
@@ -205,7 +204,7 @@ scld_dock_exrom_from_snapshot( memory_page **dest, int page_num, int writable,
   memcpy( data, source, 0x2000 );
 
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    memory_page *page = dest[ page_num * MEMORY_PAGES_IN_8K + i ];
+    memory_page *page = &dest[ page_num * MEMORY_PAGES_IN_8K + i ];
     page->offset = i * MEMORY_PAGE_SIZE;
     page->page_num = page_num;
     page->writable = writable;
@@ -234,12 +233,12 @@ scld_from_snapshot( libspectrum_snap *snap )
     for( i = 0; i < 8; i++ ) {
 
       if( libspectrum_snap_dock_cart( snap, i ) )
-        scld_dock_exrom_from_snapshot( memory_map_dock, i,
+        scld_dock_exrom_from_snapshot( timex_dock, i,
           libspectrum_snap_dock_ram( snap, i ),
           libspectrum_snap_dock_cart( snap, i ) );
 
       if( libspectrum_snap_exrom_cart( snap, i ) )
-        scld_dock_exrom_from_snapshot( memory_map_exrom, i,
+        scld_dock_exrom_from_snapshot( timex_exrom, i,
           libspectrum_snap_exrom_ram( snap, i ),
           libspectrum_snap_exrom_cart( snap, i ) );
 
@@ -268,8 +267,8 @@ scld_to_snapshot( libspectrum_snap *snap )
 
     for( i = 0; i < 8; i++ ) {
 
-      memory_page *exrom_base = memory_map_exrom[i * MEMORY_PAGES_IN_8K],
-        *dock_base = memory_map_dock[i * MEMORY_PAGES_IN_8K];
+      memory_page *exrom_base = &timex_exrom[i * MEMORY_PAGES_IN_8K],
+        *dock_base = &timex_dock[i * MEMORY_PAGES_IN_8K];
       int j;
 
       /* In theory, Fuse could somehow have set up a memory map in which the

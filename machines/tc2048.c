@@ -121,10 +121,5 @@ tc2048_reset( void )
       exrom_page->page_num = i;
     }
 
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
-    memory_map_dock[i] = &timex_dock[i];
-    memory_map_exrom[i] = &timex_exrom[i];
-  }
-
   return tc2068_tc2048_common_reset();
 }

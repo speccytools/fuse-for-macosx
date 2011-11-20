@@ -116,18 +116,24 @@ dck_reset( void )
   }
 
   while( dck->dck[num_block] != NULL ) {
-    memory_page **bank;
+    memory_page *bank;
     int i;
 
     switch( dck->dck[num_block]->bank ) {
     case LIBSPECTRUM_DCK_BANK_HOME:
+      /* FIXME: make this work again */
+      ui_error( UI_ERROR_INFO, "%s:%d: HOME bank unsupported", __FILE__, __LINE__ );
+      libspectrum_dck_free( dck, 0 );
+      return 1;
+      /* Used to say:
       bank = memory_map_home;
       break;
+      */
     case LIBSPECTRUM_DCK_BANK_DOCK:
-      bank = memory_map_dock;
+      bank = timex_dock;
       break;
     case LIBSPECTRUM_DCK_BANK_EXROM:
-      bank = memory_map_exrom;
+      bank = timex_exrom;
       break;
     default:
       ui_error( UI_ERROR_INFO, "Sorry, bank ID %i is unsupported",
@@ -150,7 +156,7 @@ dck_reset( void )
         data = memory_pool_allocate( 0x2000 );
 	memcpy( data, dck->dck[num_block]->pages[i], 0x2000 );
         for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
-          memory_page *page = bank[i * MEMORY_PAGES_IN_8K + j];
+          memory_page *page = &bank[i * MEMORY_PAGES_IN_8K + j];
           page->offset = j * MEMORY_PAGE_SIZE;
           page->writable = 0;
           page->save_to_snapshot = 1;
@@ -167,13 +173,13 @@ dck_reset( void )
 	   contents in */
         if( dck->dck[num_block]->bank == LIBSPECTRUM_DCK_BANK_HOME && i>1 ) {
           for( j = 0; j < MEMORY_PAGES_IN_8K; j++ )
-            memcpy( bank[i * MEMORY_PAGES_IN_8K + j],
+            memcpy( &bank[i * MEMORY_PAGES_IN_8K + j],
               dck->dck[num_block]->pages[i], MEMORY_PAGE_SIZE );
         } else {
           data = memory_pool_allocate( 0x2000 );
           memcpy( data, dck->dck[num_block]->pages[i], 0x2000 );
           for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
-            memory_page *page = bank[i * MEMORY_PAGES_IN_8K + j];
+            memory_page *page = &bank[i * MEMORY_PAGES_IN_8K + j];
             page->offset = j * MEMORY_PAGE_SIZE;
             page->writable = 1;
             page->save_to_snapshot = 1;

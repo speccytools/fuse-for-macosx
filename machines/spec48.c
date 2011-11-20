@@ -105,8 +105,6 @@ spec48_common_display_setup( void )
 int
 spec48_common_reset( void )
 {
-  size_t i;
-
   /* 0x0000: ROM 0 */
   memory_map_16k( 0x0000, memory_map_rom, 0 );
   /* 0x4000: RAM 5, contended */
@@ -119,22 +117,12 @@ spec48_common_reset( void )
   memory_ram_set_16k_contention( 0, 0 );
   memory_map_16k( 0xc000, memory_map_ram, 0 );
 
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
-
   return 0;
 }
 
 int
 spec48_memory_map( void )
 {
-  int i;
-
-  /* By default, 0x0000 to 0x3fff come from the home bank */
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
-
   memory_romcs_map();
-
   return 0;
 }

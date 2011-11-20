@@ -282,7 +282,6 @@ int
 specplus3_memory_map( void )
 {
   int page, rom, screen;
-  size_t i;
 
   page = machine_current->ram.last_byte & 0x07;
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
@@ -315,9 +314,6 @@ specplus3_memory_map( void )
 
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom  = rom;
-
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 

@@ -3867,3 +3867,9 @@
 20111119 machines/scorpion.c: fix all RAM mode (thanks, unittests).
 20111119 machines/pentagon1024.c: fix all RAM mode (thanks, unittests).
 20111120 ui/scaler/scalers.c: remove unused variable (thanks, gcc 4.6).
+20111120 machines/{pentagon1024.c,pentagon512.c,scorpion.c,spec128.c,spec16.c,
+         spec48.c,specplus3.c,spec_se.c,tc2048.c,tc2068.c,ts2068.c},memory.[ch],
+         peripherals/{dck.c,scld.c}: a fairly brute-force removal of the almost
+         unnecessary memory_map_{home,dock,exrom} layer. The only thing that
+         this makes hard is .dck files containing a "HOME" chunk - will worry
+         about that later.

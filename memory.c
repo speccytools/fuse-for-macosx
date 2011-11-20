@@ -57,12 +57,6 @@ int memory_source_none; /* No memory attached here */
 memory_page memory_map_read[MEMORY_PAGES_IN_64K];
 memory_page memory_map_write[MEMORY_PAGES_IN_64K];
 
-/* Mappings for the 'home' (normal ROM/RAM) pages, the Timex DOCK and
-   the Timex EXROM */
-memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
-memory_page *memory_map_dock[MEMORY_PAGES_IN_64K];
-memory_page *memory_map_exrom[MEMORY_PAGES_IN_64K];
-
 /* Standard mappings for the 'normal' RAM */
 memory_page memory_map_ram[SPECTRUM_RAM_PAGES * MEMORY_PAGES_IN_16K];
 
@@ -134,11 +128,6 @@ memory_init( void )
       page->writable = 1;
       page->source = memory_source_ram;
     }
-
-  /* Just initialise these with something */
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
-    memory_map_home[i] = memory_map_dock[i] = memory_map_exrom[i] =
-      &memory_map_ram[0];
 
   module_register( &memory_module_info );
 
@@ -286,9 +275,11 @@ memory_map_16k( libspectrum_word address, memory_page *source, int page_num )
 {
   int i;
 
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-    memory_map_home[ ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i ] =
-      &source[ page_num * MEMORY_PAGES_IN_16K + i ];
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
+    int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
+    memory_map_read[ page ] = source[ page_num * MEMORY_PAGES_IN_16K + i ];
+    memory_map_write[ page ] = source[ page_num * MEMORY_PAGES_IN_16K + i ];
+  }
 }
 
 /* Page in from /ROMCS */

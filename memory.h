@@ -89,12 +89,6 @@ typedef struct memory_page {
 extern memory_page memory_map_read[MEMORY_PAGES_IN_64K];
 extern memory_page memory_map_write[MEMORY_PAGES_IN_64K];
 
-/* Memory chunks accessible by the Z80 for normal RAM (home) and
-   the Timex Dock and Exrom */
-extern memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
-extern memory_page *memory_map_dock[MEMORY_PAGES_IN_64K];
-extern memory_page *memory_map_exrom[MEMORY_PAGES_IN_64K];
-
 /* The number of 16Kb RAM pages we support: 1040 Kb needed for the Pentagon 1024 */
 #define SPECTRUM_RAM_PAGES 65
 
