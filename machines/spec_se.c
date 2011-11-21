@@ -147,19 +147,16 @@ spec_se_reset( void )
 
   /* The dock and exrom aren't cleared by the reset routine, so do
      so manually (only really necessary to keep snapshot sizes down) */
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
+  for( i = 0; i < 8; i++ ) {
     memset( timex_dock[i].page,  0, MEMORY_PAGE_SIZE );
     memset( timex_exrom[i].page, 0, MEMORY_PAGE_SIZE );
   }
 
   /* RAM pages 1, 3, 5 and 7 contended */
-#if 0
-  for( i = 0; i < 8; i++ ) 
-    memory_map_ram[ 2 * i ].contended =
-      memory_map_ram[ 2 * i + 1 ].contended = i & 1;
-#endif
+  for( i = 0; i < 8; i++ )
+    memory_ram_set_16k_contention( i, i & 1 );
 
-  machine_current->ram.locked=0;
+  machine_current->ram.locked = 0;
   machine_current->ram.last_byte = 0;
 
   machine_current->ram.current_page=0;
