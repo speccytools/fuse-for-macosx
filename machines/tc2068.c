@@ -183,6 +183,12 @@ tc2068_tc2048_common_reset( void )
 int
 tc2068_memory_map( void )
 {
+  /* Start by mapping in the default configuration */
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  memory_map_16k( 0x8000, memory_map_ram, 2 );
+  memory_map_16k( 0xc000, memory_map_ram, 0 );
+
   scld_memory_map();
 
   memory_romcs_map();
