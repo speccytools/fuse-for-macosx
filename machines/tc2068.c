@@ -154,6 +154,7 @@ tc2068_reset( void )
 
       exrom_page = &timex_exrom[i * MEMORY_PAGES_IN_8K + j];
       *exrom_page = memory_map_rom[MEMORY_PAGES_IN_16K + j];
+      exrom_page->source = memory_source_exrom;
       exrom_page->page_num = i;
     }
 

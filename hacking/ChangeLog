@@ -3874,3 +3874,4 @@
          this makes hard is .dck files containing a "HOME" chunk - will worry
          about that later.
 20111121 machines/tc2068.c: start fixing Timex paging.
+20111121 machines/{tc2068.c,ts2068.c}: more Timex paging fixes.
