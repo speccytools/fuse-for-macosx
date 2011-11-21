@@ -3875,3 +3875,4 @@
          about that later.
 20111121 machines/tc2068.c: start fixing Timex paging.
 20111121 machines/{tc2068.c,ts2068.c}: more Timex paging fixes.
+20111121 machines/spec_se: mostly fix Spectrum SE paging.

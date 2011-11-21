@@ -85,7 +85,7 @@ int
 spec_se_reset( void )
 {
   int error;
-  size_t i;
+  size_t i, j;
 
   error = dock_exrom_reset(); if( error ) return error;
 
@@ -122,21 +122,27 @@ spec_se_reset( void )
 
   periph_update();
 
-  /* Mark as present/writeable */
-  for( i = 0; i < 34; ++i )
-    memory_map_ram[i].writable = 1;
+  for( i = 0; i < 8; i++ ) {
 
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
+    libspectrum_byte *dock_ram = memory_pool_allocate( 0x2000 );
+    libspectrum_byte *exrom_ram = memory_pool_allocate( 0x2000 );
 
-    timex_dock[i] = memory_map_ram[ i + 18 ];
-    timex_dock[i].page_num = i;
-    timex_dock[i].contended = 0;
-    timex_dock[i].source = memory_source_dock;
+    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
 
-    timex_exrom[i] = memory_map_ram[ i + 26 ];
-    timex_exrom[i].page_num = i;
-    timex_exrom[i].contended = 0;
-    timex_exrom[i].source = memory_source_exrom;
+      int page_num = i * MEMORY_PAGES_IN_8K + j;
+
+      timex_dock[page_num].page = dock_ram + j * MEMORY_PAGE_SIZE;
+      timex_dock[page_num].offset = j * MEMORY_PAGE_SIZE;
+      timex_dock[page_num].page_num = i;
+      timex_dock[page_num].contended = 0;
+      timex_dock[page_num].source = memory_source_dock;
+
+      timex_exrom[page_num].page = exrom_ram + j * MEMORY_PAGE_SIZE;
+      timex_exrom[page_num].offset = j * MEMORY_PAGE_SIZE;
+      timex_exrom[page_num].page_num = i;
+      timex_exrom[page_num].contended = 0;
+      timex_exrom[page_num].source = memory_source_exrom;
+    }
   }
 
   /* The dock and exrom aren't cleared by the reset routine, so do
@@ -176,8 +182,13 @@ spec_se_memory_map( void )
 {
   memory_page *exrom_dock;
 
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  memory_map_16k( 0x8000, memory_map_ram, 8 );
+  memory_map_16k( 0xc000, memory_map_ram, 0 );
+
   /* Spectrum SE memory paging is just a combination of the 128K
-     0x7ffd and TimexDOCK/EXROM paging schemes with one exception */
+     0x7ffd and Timex DOCK/EXROM paging schemes with one exception */
   spec128_memory_map();
   scld_memory_map();
 
