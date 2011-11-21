@@ -201,10 +201,10 @@ spec_se_memory_map( void )
       scld_last_dec.name.altmembank ? timex_exrom : timex_dock;
 
     if( scld_last_hsr & ( 1 << 2 ) )
-      memory_map_read[6] = memory_map_write[6] = exrom_dock[6];
+      memory_map_8k( 0xc000, exrom_dock, 6 );
 
     if( scld_last_hsr & ( 1 << 3 ) )
-      memory_map_read[7] = memory_map_write[7] = exrom_dock[7];
+      memory_map_8k( 0xe000, exrom_dock, 7 );
   }
 
   memory_romcs_map();

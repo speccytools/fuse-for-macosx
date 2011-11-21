@@ -282,6 +282,19 @@ memory_map_16k( libspectrum_word address, memory_page *source, int page_num )
   }
 }
 
+/* Map 8K of memory */
+void
+memory_map_8k( libspectrum_word address, memory_page *source, int page_num )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
+    memory_map_read[ page ] = source[ page_num * MEMORY_PAGES_IN_8K + i ];
+    memory_map_write[ page ] = source[ page_num * MEMORY_PAGES_IN_8K + i ];
+  }
+}
+
 /* Page in from /ROMCS */
 void
 memory_map_romcs( memory_page *source )

@@ -187,11 +187,9 @@ scld_memory_map( void )
   exrom_dock =
     scld_last_dec.name.altmembank ? timex_exrom : timex_dock;
 
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
-    int chunk = i >> (13 - MEMORY_PAGE_SIZE_LOGARITHM);
-    if( scld_last_hsr & (1 << chunk) )
-      memory_map_read[i] = memory_map_write[i] = exrom_dock[i];
-  }
+  for( i = 0; i < 8; i++ )
+    if( scld_last_hsr & (1 << i) )
+      memory_map_8k( i * 0x2000, exrom_dock, i );
 }
 
 static void
