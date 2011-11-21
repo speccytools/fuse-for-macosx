@@ -147,7 +147,7 @@ spec_se_reset( void )
 
   /* The dock and exrom aren't cleared by the reset routine, so do
      so manually (only really necessary to keep snapshot sizes down) */
-  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ ) {
     memset( timex_dock[i].page,  0, MEMORY_PAGE_SIZE );
     memset( timex_exrom[i].page, 0, MEMORY_PAGE_SIZE );
   }

@@ -3880,3 +3880,4 @@
          Spectrum SE paging.
 20111121 machines/spec_se.c: ensure Spectrum SE has contended RAM.
 20111121 machines/spec_se.c: revert unintended half of last change.
+20111121 machines/spec_se.c: add missing brace (thanks, Guesser).
