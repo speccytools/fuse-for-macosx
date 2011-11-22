@@ -123,6 +123,7 @@ spec48_common_reset( void )
 int
 spec48_memory_map( void )
 {
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
   memory_romcs_map();
   return 0;
 }

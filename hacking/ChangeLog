@@ -3881,3 +3881,5 @@
 20111121 machines/spec_se.c: ensure Spectrum SE has contended RAM.
 20111121 machines/spec_se.c: revert unintended half of last change.
 20111121 machines/spec_se.c: add missing brace (thanks, Guesser).
+20111122 machines/spec48.c: ensure the ROM is paged back in when a device stops
+         asserting /ROMCS (thanks, Guesser).
