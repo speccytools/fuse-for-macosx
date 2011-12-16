@@ -3881,5 +3881,26 @@
 20111121 machines/spec_se.c: ensure Spectrum SE has contended RAM.
 20111121 machines/spec_se.c: revert unintended half of last change.
 20111121 machines/spec_se.c: add missing brace (thanks, Guesser).
+20111121 peripherals/if1.[ch],unittests/unittests.[ch]: add If1 unit test.
 20111122 machines/spec48.c: ensure the ROM is paged back in when a device stops
          asserting /ROMCS (thanks, Guesser).
+20111122 peripherals/if1.c,unittests/unittests.[ch]: ensure that we get the
+         expected pages after the If1 has paged out again.
+20111122 peripherals/if2.[ch],unittests/unittests.[ch]: add If2 unit test.
+20111125 peripherals/speccyboot.[ch],unittests/unittests.c: add SpeccyBoot
+         unit test.
+20111125 peripherals/disk/beta.[ch],unittests/unittests.c: add Beta disk unit
+         test.
+20111125 peripherals/disk/disciple.[ch],unittests/unittests.c: ensure DISCiPLE
+         page numbers are set correctly, and add DISCiPLE unit test.
+20111126 peripherals/disk/opus.[ch],unittests/unittests.c: add Opus unit test.
+20111126 peripherals/disk/plusd.[ch],unittests/unittests.c: add +D unit test.
+20111127 peripherals/disk/disciple.c: introduce an explicit split between the
+         DISCiPLE ROM and RAM.
+20111127 peripherals/disk/disciple.c: fix typo.
+20111127 peripherals/ide/divide.[ch],unittests/unittests.c: refactor DivIDE
+         paging code such that a unit test can be written for it, and then
+         write said unit test.
+20111128 peripherals/ide/zxatasp.[ch],unittests/unittests.c: add ZXATASP unit
+         test.
+20111216 peripherals/ide/zxcf.[ch],unittests/unittests.c: add ZXCF unit test.

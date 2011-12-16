@@ -39,6 +39,7 @@
 #include "peripherals/printer.h"
 #include "settings.h"
 #include "ui/ui.h"
+#include "unittests/unittests.h"
 #include "wd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 #include "z80/z80.h"
@@ -53,6 +54,7 @@
 */
 #define OPUS_RAM_PAGES ( 0x800 / MEMORY_PAGE_SIZE ? \
 			 0x800 / MEMORY_PAGE_SIZE : 1 )
+static int opus_memory_source;
 
 /* Two memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page opus_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
@@ -140,7 +142,6 @@ opus_init( void )
 {
   int i;
   wd_fdc_drive *d;
-  int opus_source;
 
   opus_fdc = wd_fdc_alloc_fdc( WD1770, 0, WD_FLAG_OPUS );
 
@@ -163,11 +164,11 @@ opus_init( void )
 
   module_register( &opus_module_info );
 
-  opus_source = memory_source_register( "Opus") ;
+  opus_memory_source = memory_source_register( "Opus" );
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    opus_memory_map_romcs_rom[i].source = opus_source;
+    opus_memory_map_romcs_rom[i].source = opus_memory_source;
   for( i = 0; i < OPUS_RAM_PAGES; i++ )
-    opus_memory_map_romcs_ram[i].source = opus_source;
+    opus_memory_map_romcs_ram[i].source = opus_memory_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 
@@ -774,3 +775,23 @@ opus_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_opus_data_dir_b( snap, data_dir_b );
   libspectrum_snap_set_opus_control_b ( snap, control_b );
 }
+
+int
+opus_unittest( void )
+{
+  int r = 0;
+
+  opus_page();
+
+  r += unittests_assert_16k_page( 0x0000, opus_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  opus_unpage();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
+}
+

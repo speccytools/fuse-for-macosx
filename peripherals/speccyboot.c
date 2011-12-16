@@ -34,6 +34,7 @@
 #include "module.h"
 #include "periph.h"
 #include "settings.h"
+#include "unittests/unittests.h"
 
 #include "speccyboot.h"
 
@@ -78,6 +79,7 @@ static const periph_t speccyboot_periph = {
  * ------------------------------------------------------------------------ */
 
 static int speccyboot_rom_active = 0;  /* SpeccyBoot ROM paged in? */
+static int speccyboot_memory_source;
 static memory_page speccyboot_memory_map_romcs[ MEMORY_PAGES_IN_8K ];
 
 static void
@@ -174,7 +176,6 @@ int
 speccyboot_init( void )
 {
   int i;
-  int speccyboot_source;
 
   nic = nic_enc28j60_alloc();
 
@@ -188,12 +189,33 @@ speccyboot_init( void )
 
   module_register( &speccyboot_module_info );
 
-  speccyboot_source = memory_source_register( "SpeccyBoot" );
-
+  speccyboot_memory_source = memory_source_register( "SpeccyBoot" );
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    speccyboot_memory_map_romcs[i].source = speccyboot_source;
+    speccyboot_memory_map_romcs[i].source = speccyboot_memory_source;
 
   periph_register( PERIPH_TYPE_SPECCYBOOT, &speccyboot_periph );
 
   return 0;
+}
+
+int
+speccyboot_unittest( void )
+{
+  int r = 0;
+
+  speccyboot_rom_active = 1;
+  speccyboot_memory_map();
+
+  r += unittests_assert_8k_page( 0x0000, speccyboot_memory_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, memory_source_rom, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  speccyboot_rom_active = 0;
+  machine_current->memory_map();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
 }
