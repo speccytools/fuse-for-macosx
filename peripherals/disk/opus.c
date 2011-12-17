@@ -47,13 +47,15 @@
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
-/*
-#if MEMORY_PAGE_SIZE > 0x800
-#warning "Memory page size too large for correct Opus RAM size"
-#endif
-*/
-#define OPUS_RAM_PAGES ( 0x800 / MEMORY_PAGE_SIZE ? \
-			 0x800 / MEMORY_PAGE_SIZE : 1 )
+/* FIXME: this is wrong. Opus has only 2 Kb of RAM, but we can't handle
+   anything less than our page size */
+#define OPUS_RAM_SIZE 0x1000
+
+#define OPUS_RAM_PAGES ( OPUS_RAM_SIZE / MEMORY_PAGE_SIZE \
+  ? OPUS_RAM_SIZE / MEMORY_PAGE_SIZE : 1 )
+
+#define TRUE_OPUS_RAM_SIZE 0x800
+
 static int opus_rom_memory_source, opus_ram_memory_source;
 
 /* Two memory chunks accessible by the Z80 when /ROMCS is low */
@@ -72,7 +74,7 @@ static int index_event;
 static wd_fdc *opus_fdc;
 static wd_fdc_drive opus_drives[ OPUS_NUM_DRIVES ];
 
-static libspectrum_byte opus_ram[ OPUS_RAM_PAGES * MEMORY_PAGE_SIZE ];
+static libspectrum_byte opus_ram[ OPUS_RAM_SIZE ];
 
 /* 6821 PIA internal registers */
 static libspectrum_byte data_reg_a, data_dir_a, control_a;
@@ -123,12 +125,7 @@ opus_memory_map( void )
   if( !opus_active ) return;
 
   memory_map_romcs_8k( 0x0000, opus_memory_map_romcs_rom );
-
-  /* FIXME: this is not the right thing to do at all
-  for( i = 0; i < OPUS_RAM_PAGES; i++ )
-    memory_map_read[ i ] = memory_map_write[ i ] =
-      opus_memory_map_romcs_ram[ i ];
-  */
+  memory_map_romcs_4k( 0x2000, opus_memory_map_romcs_ram );
 }
 
 static void
@@ -222,7 +219,7 @@ opus_reset( int hard_reset )
   opus_index_pulse = 0;
 
   if( hard_reset )
-    memset( opus_ram, 0, 0x800 );
+    memset( opus_ram, 0, TRUE_OPUS_RAM_SIZE );
 
   wd_fdc_master_reset( opus_fdc );
 
@@ -711,7 +708,7 @@ opus_from_snapshot( libspectrum_snap *snap )
 
   if( libspectrum_snap_opus_ram( snap, 0 ) ) {
     memcpy( opus_ram,
-            libspectrum_snap_opus_ram( snap, 0 ), 0x800 );
+            libspectrum_snap_opus_ram( snap, 0 ), TRUE_OPUS_RAM_SIZE );
   }
 
   /* ignore drive count for now, there will be an issue with loading snaps where
@@ -785,7 +782,8 @@ opus_unittest( void )
   opus_page();
 
   r += unittests_assert_8k_page( 0x0000, opus_rom_memory_source, 0 );
-  r += unittests_assert_8k_page( 0x2000, opus_ram_memory_source, 0 );
+  r += unittests_assert_4k_page( 0x2000, opus_ram_memory_source, 0 );
+  r += unittests_assert_4k_page( 0x3000, memory_source_rom, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );

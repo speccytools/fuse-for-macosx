@@ -316,6 +316,17 @@ memory_map_romcs_8k( libspectrum_word address, memory_page *source )
     memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
 }
 
+/* Page in 4K from /ROMCS */
+void
+memory_map_romcs_4k( libspectrum_word address, memory_page *source )
+{
+  int i, start;
+
+  start = address >> MEMORY_PAGE_SIZE_LOGARITHM;
+  for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
+    memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
+}
+
 libspectrum_byte
 readbyte( libspectrum_word address )
 {
