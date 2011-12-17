@@ -3905,3 +3905,4 @@
          test.
 20111216 peripherals/ide/zxcf.[ch],unittests/unittests.c: add ZXCF unit test.
 20111217 peripherals/if1.c: fix paging for 4K page size (thanks, unittests).
+20111217 peripherals/disk/opus.c: make Opus paging less wrong.

@@ -54,7 +54,7 @@
 */
 #define OPUS_RAM_PAGES ( 0x800 / MEMORY_PAGE_SIZE ? \
 			 0x800 / MEMORY_PAGE_SIZE : 1 )
-static int opus_memory_source;
+static int opus_rom_memory_source, opus_ram_memory_source;
 
 /* Two memory chunks accessible by the Z80 when /ROMCS is low */
 static memory_page opus_memory_map_romcs_rom[ MEMORY_PAGES_IN_8K ];
@@ -120,15 +120,15 @@ opus_unpage( void )
 static void
 opus_memory_map( void )
 {
-  int i;
-
   if( !opus_active ) return;
 
   memory_map_romcs_8k( 0x0000, opus_memory_map_romcs_rom );
 
+  /* FIXME: this is not the right thing to do at all
   for( i = 0; i < OPUS_RAM_PAGES; i++ )
     memory_map_read[ i ] = memory_map_write[ i ] =
       opus_memory_map_romcs_ram[ i ];
+  */
 }
 
 static void
@@ -164,11 +164,12 @@ opus_init( void )
 
   module_register( &opus_module_info );
 
-  opus_memory_source = memory_source_register( "Opus" );
+  opus_rom_memory_source = memory_source_register( "Opus ROM" );
+  opus_ram_memory_source = memory_source_register( "Opus RAM" );
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    opus_memory_map_romcs_rom[i].source = opus_memory_source;
+    opus_memory_map_romcs_rom[i].source = opus_rom_memory_source;
   for( i = 0; i < OPUS_RAM_PAGES; i++ )
-    opus_memory_map_romcs_ram[i].source = opus_memory_source;
+    opus_memory_map_romcs_ram[i].source = opus_ram_memory_source;
 
   periph_register( PERIPH_TYPE_OPUS, &opus_periph );
 
@@ -783,7 +784,8 @@ opus_unittest( void )
 
   opus_page();
 
-  r += unittests_assert_16k_page( 0x0000, opus_memory_source, 0 );
+  r += unittests_assert_8k_page( 0x0000, opus_rom_memory_source, 0 );
+  r += unittests_assert_8k_page( 0x2000, opus_ram_memory_source, 0 );
   r += unittests_assert_16k_ram_page( 0x4000, 5 );
   r += unittests_assert_16k_ram_page( 0x8000, 2 );
   r += unittests_assert_16k_ram_page( 0xc000, 0 );
