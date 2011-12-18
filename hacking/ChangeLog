@@ -3910,3 +3910,5 @@
          Opus paging arguably even less wrong. It's still not right, though.
 20111218 menu_data.dat,menu.h,ui/{options.dat,widget/{menu.c,widget.[ch]}}:
          peripherals menu had become insanely big; split it in two.
+20111218 peripherals/ide/divide.c: fix paging for 4K page size (thanks,
+         unittests).
