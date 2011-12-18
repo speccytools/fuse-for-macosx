@@ -3908,3 +3908,5 @@
 20111217 peripherals/disk/opus.c: make Opus paging less wrong.
 20111217 memory.[ch],peripherals/disk/opus.c,unittests/unittests.[ch]: make
          Opus paging arguably even less wrong. It's still not right, though.
+20111218 menu_data.dat,menu.h,ui/{options.dat,widget/{menu.c,widget.[ch]}}:
+         peripherals menu had become insanely big; split it in two.
