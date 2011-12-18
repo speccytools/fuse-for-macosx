@@ -442,7 +442,7 @@ set_zxatasp_bank( int bank )
   memory_page *page;
   size_t i, offset;
 
-  for( i = 0; i < 2; i++ ) {
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
 
     page = &zxatasp_memory_map_romcs[i];
     offset = i * MEMORY_PAGE_SIZE;
