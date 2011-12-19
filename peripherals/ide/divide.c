@@ -499,7 +499,7 @@ divide_activate( void )
 
     divide_eprom = memory_pool_allocate_persistent( DIVIDE_PAGE_LENGTH, 1 );
     for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-      memory_page *page = &divide_memory_map_eprom;
+      memory_page *page = &divide_memory_map_eprom[i];
       page->page = divide_eprom + i * MEMORY_PAGE_SIZE;
       page->offset = i * MEMORY_PAGE_SIZE;
     }

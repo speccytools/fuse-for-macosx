@@ -3914,3 +3914,4 @@
          unittests).
 20111218 peripherals/ide/zxatasp.c: fix paging for 4K page size (thanks,
          unittests). All unit tests now pass.
+20111219 peripherals/ide/divide.c: access the correct object.
