@@ -67,9 +67,6 @@ static const periph_t divide_periph = {
 static const libspectrum_byte DIVIDE_CONTROL_CONMEM = 0x80;
 static const libspectrum_byte DIVIDE_CONTROL_MAPRAM = 0x40;
 
-/* Two 8KB memory chunks accessible by the Z80 when /ROMCS is low */
-static memory_page divide_memory_map_romcs[ 2 ][ MEMORY_PAGES_IN_8K ];
-
 int divide_automapping_enabled = 0;
 int divide_active = 0;
 static libspectrum_byte divide_control;
