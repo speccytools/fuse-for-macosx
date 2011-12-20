@@ -1,0 +1,27 @@
+Some peripheral smoke tests:
+
+ZXATASP
+
+* Acquire the ResiDOS ZXATASP installer from
+  http://www.worldofspectrum.org/residos/downloads.html
+* Uncompress lib/tests/idedos-success.hdf.bz2
+* Start fuse as
+  ./fuse --zxatasp --zxatasp-upload --zxatasp-masterfile idedos-success.hdf ResiDOS-ZXATASP-2.25.tap
+* Follow prompts until the Spectrum resets. You should see
+  "Unit 0: IDEDOS-formatted", "Logical units: 0", "Mapped drives: A" and
+  "Default: 0A"
+* Enter LOAD %"success"
+* You should see "Congraturation! You sucsess!"
+
+ZXCF
+
+* Acquire the ResiDOS ZXCF installer from
+  http://www.worldofspectrum.org/residos/downloads.html
+* Uncompress lib/tests/idedos-success.hdf.bz2
+* Start fuse as
+  ./fuse --zxcf --zxcf-upload --zxcf-cffile idedos-success.hdf ResiDOS-ZXCF-2.25.tap
+* Follow prompts until the Spectrum resets. You should see
+  "Unit 0: IDEDOS-formatted", "Logical units: 0", "Mapped drives: A" and
+  "Default: 0A"
+* Enter LOAD %"success"
+* You should see "Congraturation! You sucsess!"

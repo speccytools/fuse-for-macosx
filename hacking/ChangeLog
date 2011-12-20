@@ -3918,3 +3918,6 @@
 20111219 compat/unix/file.c,peripherals/ide/divide.c: fix warnings.
 20111220 fuse.c,utils.[ch]: make selecting IDE files from the command-line
 	 work properly.
+20111220 hacking/{Makefile.am,peripheral_tests.txt},lib/{Makefile.am,
+	 tests/idedos-success.hdf.bz2}: add some trivial peripheral smoke
+	 tests.
