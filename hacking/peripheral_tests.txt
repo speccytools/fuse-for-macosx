@@ -1,5 +1,18 @@
 Some peripheral smoke tests:
 
+DivIDE
+
+* Acquire the FATware installer from http://baze.au.com/divide/
+* Uncompress lib/tests/fatware-success.hdf.bz2
+* Start fuse as
+  ./fuse --divide --divide-masterfile fatware-success.hdf FATware-0-12.tap
+* Follow prompts; the "JP2 (E) jumper" is the DivIDE write protect option.
+* When rebooting, you should see "0 Created by hdfmonkey  LBA"
+* Fire an NMI; you should see a file selector with "SUCCESS.TAP" highlighted
+* Press Enter and then LOAD ""
+* You should see "Program: success",
+  followed by "Congraturation! You sucsess!"
+
 ZXATASP
 
 * Acquire the ResiDOS ZXATASP installer from

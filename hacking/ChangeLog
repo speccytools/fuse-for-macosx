@@ -3921,3 +3921,5 @@
 20111220 hacking/{Makefile.am,peripheral_tests.txt},lib/{Makefile.am,
 	 tests/idedos-success.hdf.bz2}: add some trivial peripheral smoke
 	 tests.
+20111220 hacking/peripheral_tests.txt,lib/{Makefile.am,
+         tests/fatware-success.hdf.bz2}: add DivIDE smoke test.

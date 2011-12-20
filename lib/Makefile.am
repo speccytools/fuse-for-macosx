@@ -61,6 +61,7 @@ EXTRA_DIST = $(FILES) \
 	compressed/tape_scorpion.szx \
 	compressed/tape_se.szx \
 	compressed/tape_ts2068.szx \
+ 	tests/fatware-success.hdf.bz2 \
  	tests/idedos-success.hdf.bz2 \
 	uncompressed/disk_plus3.szx \
 	uncompressed/tape_128.szx \
