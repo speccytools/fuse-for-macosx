@@ -3916,3 +3916,5 @@
          unittests). All unit tests now pass.
 20111219 peripherals/ide/divide.c: access the correct object.
 20111219 compat/unix/file.c,peripherals/ide/divide.c: fix warnings.
+20111220 fuse.c,utils.[ch]: make selecting IDE files from the command-line
+	 work properly.

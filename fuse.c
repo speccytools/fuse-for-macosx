@@ -508,16 +508,22 @@ setup_start_files( start_files_t *start_files )
   start_files->snapshot = settings_current.snapshot;
   start_files->tape = settings_current.tape_file;
 
-  start_files->simpleide_master = settings_current.simpleide_master_file;
-  start_files->simpleide_slave  = settings_current.simpleide_slave_file;
+  start_files->simpleide_master =
+    utils_safe_strdup( settings_current.simpleide_master_file );
+  start_files->simpleide_slave = 
+    utils_safe_strdup( settings_current.simpleide_slave_file );
 
-  start_files->zxatasp_master = settings_current.zxatasp_master_file;
-  start_files->zxatasp_slave  = settings_current.zxatasp_slave_file;
+  start_files->zxatasp_master =
+    utils_safe_strdup( settings_current.zxatasp_master_file );
+  start_files->zxatasp_slave =
+    utils_safe_strdup( settings_current.zxatasp_slave_file );
 
-  start_files->zxcf = settings_current.zxcf_pri_file;
+  start_files->zxcf = utils_safe_strdup( settings_current.zxcf_pri_file );
 
-  start_files->divide_master = settings_current.divide_master_file;
-  start_files->divide_slave  = settings_current.divide_slave_file;
+  start_files->divide_master =
+    utils_safe_strdup( settings_current.divide_master_file );
+  start_files->divide_slave =
+    utils_safe_strdup( settings_current.divide_slave_file );
 
   start_files->mdr[0] = settings_current.mdr_file;
   start_files->mdr[1] = settings_current.mdr_file2;
