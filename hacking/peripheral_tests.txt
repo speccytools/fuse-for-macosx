@@ -13,6 +13,12 @@ DivIDE
 * You should see "Program: success",
   followed by "Congraturation! You sucsess!"
 
+Interface 1
+
+* Start fuse as ./fuse --interface1 --microdrive-file lib/tests/success.mdr
+* Enter LOAD *"m";1;"Success"
+* You should see "Congraturation! You sucsess!"
+
 ZXATASP
 
 * Acquire the ResiDOS ZXATASP installer from
