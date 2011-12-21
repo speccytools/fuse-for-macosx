@@ -25,6 +25,12 @@ Interface 1
 * Enter LOAD *"m";1;"Success"
 * You should see "Congraturation! You sucsess!"
 
+Opus
+
+* Start fuse as ./fuse --opus --opusdisk lib/tests/success.opd
+* Enter LOAD *"m";1;"success"
+* You should see "Congraturation! You sucsess!"
+
 ZXATASP
 
 * Acquire the ResiDOS ZXATASP installer from

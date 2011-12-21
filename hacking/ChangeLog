@@ -3927,3 +3927,5 @@
          Interface I smoke test.
 20111221 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.udi}: add
 	 Beta Disk smoke test.
+20111221 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.opd}: add
+	 Opus smoke test.
