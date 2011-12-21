@@ -3923,5 +3923,7 @@
 	 tests.
 20111220 hacking/peripheral_tests.txt,lib/{Makefile.am,
          tests/fatware-success.hdf.bz2}: add DivIDE smoke test.
-20111220 hacking/peripheral_tests.txt,lib/Makefile.am,tests/success.mdr}: add
+20111220 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.mdr}: add
          Interface I smoke test.
+20111221 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.udi}: add
+	 Beta Disk smoke test.

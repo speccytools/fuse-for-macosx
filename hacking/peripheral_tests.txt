@@ -1,5 +1,11 @@
 Some peripheral smoke tests:
 
+Beta Disk
+
+* Start fuse as ./fuse --beta128 --betadisk lib/tests/success.udi
+* At the A> prompt, enter LOAD "success"
+* You should see "Congraturation! You sucsess!"
+
 DivIDE
 
 * Acquire the FATware installer from http://baze.au.com/divide/

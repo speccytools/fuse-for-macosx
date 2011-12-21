@@ -64,6 +64,7 @@ EXTRA_DIST = $(FILES) \
  	tests/fatware-success.hdf.bz2 \
  	tests/idedos-success.hdf.bz2 \
         tests/success.mdr \
+	tests/success.udi \
 	uncompressed/disk_plus3.szx \
 	uncompressed/tape_128.szx \
 	uncompressed/tape_16.szx \
