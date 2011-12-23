@@ -6,6 +6,18 @@ Beta Disk
 * At the A> prompt, enter LOAD "success"
 * You should see "Congraturation! You sucsess!"
 
++D
+
+* Acquire the +D system tape from
+  ftp://ftp.worldofspectrum.org/pub/sinclair/utils/PlusDSystemTape.tzx.zip
+* Uncompress lib/tests/success.mgt.bz2
+* Start fuse as
+  ./fuse --plusd --plusddisk lib/tests/success.mgt PlusDSystemTape.tzx
+* Hit <Break>
+* Enter NEW
+* Enter LOAD d1"Success"
+* You should see "Congraturation! You sucsess!"
+
 DivIDE
 
 * Acquire the FATware installer from http://baze.au.com/divide/

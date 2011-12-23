@@ -3929,3 +3929,5 @@
 	 Beta Disk smoke test.
 20111221 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.opd}: add
 	 Opus smoke test.
+20111223 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.mgt.bz2}:
+	 add +D smoke test (Stuart).
