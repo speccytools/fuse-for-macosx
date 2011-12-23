@@ -133,7 +133,7 @@ w5100_io_thread( void *arg )
       /* Do nothing - just loop again */
     }
     else {
-      ui_error( UI_ERROR_ERROR, "w5100: select returned unexpected errno %d: %s\n", errno, strerror(errno) );
+      nic_w5100_debug( "w5100: select returned unexpected errno %d: %s\n", errno, strerror(errno) );
     }
   }
 

@@ -77,8 +77,7 @@ w5100_socket_release_lock( nic_w5100_socket_t *socket )
 {
   int error = pthread_mutex_unlock( &socket->lock );
   if( error ) {
-    ui_error( UI_ERROR_ERROR, "%s:%d: error %d unlocking mutex for socket %d\n",
-      __FILE__, __LINE__, error, socket->id );
+    nic_w5100_debug( "%s:%d: error %d unlocking mutex for socket %d\n", __FILE__, __LINE__, error, socket->id );
     fuse_abort();
   }
 }
@@ -569,15 +568,14 @@ w5100_socket_process_accept( nic_w5100_socket_t *socket )
 
   new_fd = accept( socket->fd, (struct sockaddr*)&sa, &sa_length );
   if( new_fd == compat_socket_invalid ) {
-    ui_error( UI_ERROR_ERROR, "w5100: error from accept on socket %d; errno %d: %s\n",
-              socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
+    nic_w5100_debug( "w5100: error from accept on socket %d; errno %d: %s\n", socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
     return;
   }
 
   nic_w5100_debug( "w5100: accepted connection from %s:%d on socket %d\n", inet_ntoa(sa.sin_addr), ntohs(sa.sin_port), socket->id );
 
   if( close( socket->fd ) == -1 )
-    ui_error( UI_ERROR_ERROR, "w5100: error attempting to close fd %d for socket %d\n", socket->fd, socket->id );
+    nic_w5100_debug( "w5100: error attempting to close fd %d for socket %d\n", socket->fd, socket->id );
 
   socket->fd = new_fd;
   socket->state = W5100_SOCKET_STATE_ESTABLISHED;
@@ -637,8 +635,7 @@ w5100_socket_process_read( nic_w5100_socket_t *socket )
                      description, socket->id, compat_socket_get_error(), strerror(compat_socket_get_error()) );
   }
   else {
-    ui_error( UI_ERROR_ERROR, "w5100: error %d reading from %s socket %d: %s\n",
-              compat_socket_get_error(), description, socket->id, strerror(compat_socket_get_error()) );
+    nic_w5100_debug( "w5100: error %d reading from %s socket %d: %s\n", compat_socket_get_error(), description, socket->id, strerror(compat_socket_get_error()) );
   }
 }
 
@@ -683,10 +680,9 @@ w5100_socket_process_udp_write( nic_w5100_socket_t *socket )
     }
   }
   else if( bytes_sent != -1 )
-    ui_error( UI_ERROR_ERROR, "w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id);
+    nic_w5100_debug( "w5100: didn't manage to send full datagram to UDP socket %d?\n", socket->id );
   else
-    ui_error( UI_ERROR_ERROR, "w5100: error %d writing to UDP socket %d: %s\n",
-              compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()) );
+    nic_w5100_debug( "w5100: error %d writing to UDP socket %d: %s\n", compat_socket_get_error(), socket->id, strerror(compat_socket_get_error()) );
 }
 
 static void

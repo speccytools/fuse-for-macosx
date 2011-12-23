@@ -3931,3 +3931,6 @@
 	 Opus smoke test.
 20111223 hacking/peripheral_tests.txt,lib/{Makefile.am,tests/success.mgt.bz2}:
 	 add +D smoke test (Stuart).
+20111223 peripherals/nic/{w5100.c,w5100_socket.c}: things on the socket thread
+         can't call ui_error as X11 doesn't like that being called from a
+         different thread.
