@@ -3934,3 +3934,5 @@
 20111223 peripherals/nic/{w5100.c,w5100_socket.c}: things on the socket thread
          can't call ui_error as X11 doesn't like that being called from a
          different thread.
+20111223 hacking/valgrind.supp: add valgrind suppressions file for third party
+         libraries.
