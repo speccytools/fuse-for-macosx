@@ -3936,3 +3936,6 @@
          different thread.
 20111223 hacking/valgrind.supp: add valgrind suppressions file for third party
          libraries.
+20111223 peripherals/nic/{w5100_internals.h,w5100_socket.c}: make UDP servers
+         bind to the right port (Phil/Sergio).
+         

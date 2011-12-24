@@ -81,6 +81,8 @@ enum w5100_socket_registers {
 
 typedef struct nic_w5100_socket_t {
 
+  int id; /* For debug use only */
+
   /* W5100 properties */
 
   w5100_socket_mode mode;
@@ -109,6 +111,7 @@ typedef struct nic_w5100_socket_t {
   /* Host properties */
 
   compat_socket_t fd;       /* Socket file descriptor */
+  int bind_count;           /* Number of writes to the Sn_PORTx registers we've received */
   int socket_bound;         /* True once we've bound the socket to a port */
   int write_pending;        /* True if we're waiting to write data on this socket */
 
@@ -123,7 +126,6 @@ typedef struct nic_w5100_socket_t {
 
   pthread_mutex_t lock;     /* Mutex for this socket */
 
-  int id; /* For debug use only. Remove when no longer needed */
 } nic_w5100_socket_t;
 
 struct nic_w5100_t {

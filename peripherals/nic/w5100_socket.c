@@ -56,6 +56,7 @@ nic_w5100_socket_init( nic_w5100_socket_t *socket, int which )
 {
   socket->id = which;
   socket->fd = compat_socket_invalid;
+  socket->bind_count = 0;
   socket->socket_bound = 0;
   socket->ok_for_io = 0;
   pthread_mutex_init( &socket->lock, NULL );
@@ -99,6 +100,7 @@ w5100_socket_clean( nic_w5100_socket_t *socket )
   if( socket->fd != compat_socket_invalid ) {
     close( socket->fd );
     socket->fd = compat_socket_invalid;
+    socket->bind_count = 0;
     socket->socket_bound = 0;
     socket->ok_for_io = 0;
     socket->write_pending = 0;
@@ -392,6 +394,25 @@ w5100_write_socket_cr( nic_w5100_t *self, nic_w5100_socket_t *socket, libspectru
   }
 }
 
+static void
+w5100_write_socket_port( nic_w5100_t *self, nic_w5100_socket_t *socket, int which, libspectrum_byte b )
+{
+  nic_w5100_debug( "w5100: writing 0x%02x to S%d_PORT%d\n", b, socket->id, which );
+  socket->port[which] = b;
+  if( ++socket->bind_count == 2 ) {
+    if( socket->state == W5100_SOCKET_STATE_UDP && !socket->socket_bound ) {
+      w5100_socket_acquire_lock( socket );
+      if( w5100_socket_bind_port( self, socket ) ) {
+        w5100_socket_release_lock( socket );
+        socket->bind_count = 0;
+      }
+      w5100_socket_release_lock( socket );
+      nic_w5100_wake_io_thread( self );
+    }
+    socket->bind_count = 0;
+  }
+}
+
 libspectrum_byte
 nic_w5100_socket_read( nic_w5100_t *self, libspectrum_word reg )
 {
@@ -468,8 +489,7 @@ nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byt
       socket->ir &= ~b;
       break;
     case W5100_SOCKET_PORT0: case W5100_SOCKET_PORT1:
-      nic_w5100_debug( "w5100: writing 0x%02x to S%d_PORT%d\n", b, socket->id, socket_reg - W5100_SOCKET_PORT0 );
-      socket->port[socket_reg - W5100_SOCKET_PORT0] = b;
+      w5100_write_socket_port( self, socket, socket_reg - W5100_SOCKET_PORT0, b );
       break;
     case W5100_SOCKET_DIPR0: case W5100_SOCKET_DIPR1: case W5100_SOCKET_DIPR2: case W5100_SOCKET_DIPR3:
       nic_w5100_debug( "w5100: writing 0x%02x to S%d_DIPR%d\n", b, socket->id, socket_reg - W5100_SOCKET_DIPR0 );
@@ -499,6 +519,9 @@ nic_w5100_socket_write( nic_w5100_t *self, libspectrum_word reg, libspectrum_byt
       ui_error( UI_ERROR_WARNING, "w5100: writing 0x%02x to unsupported register 0x%03x\n", b, reg );
       break;
   }
+
+  if( socket_reg != W5100_SOCKET_PORT0 && socket_reg != W5100_SOCKET_PORT1 )
+    socket->bind_count = 0;
 }
 
 libspectrum_byte
