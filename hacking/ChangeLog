@@ -3938,4 +3938,5 @@
          libraries.
 20111223 peripherals/nic/{w5100_internals.h,w5100_socket.c}: make UDP servers
          bind to the right port (Phil/Sergio).
-         
+20120103 ui/gtk/debugger.c: combine identical lines in the GTK+ debugger memory
+         map, so we don't display 16 lines if we don't need to.
