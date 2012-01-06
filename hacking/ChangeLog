@@ -3940,3 +3940,5 @@
          bind to the right port (Phil/Sergio).
 20120103 ui/gtk/debugger.c: combine identical lines in the GTK+ debugger memory
          map, so we don't display 16 lines if we don't need to.
+20120106 peripherals/flash: add .deps and Makefile to the ignore property
+         (Fred).
