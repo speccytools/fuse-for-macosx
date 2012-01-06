@@ -3942,3 +3942,4 @@
          map, so we don't display 16 lines if we don't need to.
 20120106 peripherals/flash: add .deps and Makefile to the ignore property
          (Fred).
+20120106 README: add suggested compiler for Mac OS X (Fred).
