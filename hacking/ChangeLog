@@ -3938,6 +3938,15 @@
          libraries.
 20111223 peripherals/nic/{w5100_internals.h,w5100_socket.c}: make UDP servers
          bind to the right port (Phil/Sergio).
+20111230 ui/sdl/sdldisplay.c: modify sdldisplay_find_best_fullscreen_scaler()
+         to prevent the search for a suitable fullscreen scaler from becoming
+         recursive when there is only one high resolution mode available
+         (thanks, Phil Reynolds and Sergio Baldoví) (Fred).
+20111230 ui/sdl/sdljoystick.c: shutdown the SDL library properly when using
+         SDL joystick support with GTK+ etc. (fixes bug #3467162) (Sergio
+         Baldoví).
+20120103 configure.in: prefer use of SDL joystick code over libjsw which is
+         not maintained (patch #3467163) (Sergio Baldoví).
 20120103 ui/gtk/debugger.c: combine identical lines in the GTK+ debugger memory
          map, so we don't display 16 lines if we don't need to.
 20120106 peripherals/flash: add .deps and Makefile to the ignore property
