@@ -3943,3 +3943,5 @@
 20120106 peripherals/flash: add .deps and Makefile to the ignore property
          (Fred).
 20120106 README: add suggested compiler for Mac OS X (Fred).
+20120109 debugger/breakpoint.c: return the correct page when trying to match
+	 breakpoints (fixes bug #3470425).
