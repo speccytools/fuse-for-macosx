@@ -3945,3 +3945,4 @@
 20120106 README: add suggested compiler for Mac OS X (Fred).
 20120109 debugger/breakpoint.c: return the correct page when trying to match
 	 breakpoints (fixes bug #3470425).
+20120109 debugger/breakpoint.c: remove debugging code.

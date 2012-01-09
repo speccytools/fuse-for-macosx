@@ -240,10 +240,6 @@ debugger_check( debugger_breakpoint_type type, libspectrum_dword value )
   GSList *ptr; debugger_breakpoint *bp;
   GSList *ptr_next;
 
-  if( type == DEBUGGER_BREAKPOINT_TYPE_READ && value == 0xc000 ) {
-    ptr = debugger_breakpoints;
-  }
-
   switch( debugger_mode ) {
 
   case DEBUGGER_MODE_INACTIVE: return 0;
