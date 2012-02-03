@@ -45,7 +45,7 @@ int sound_enabled = 0;		/* Are we currently using the sound card */
 
 static int sound_enabled_ever = 0; /* whether sound has *ever* been in use; see
 				      sound_ay_write() and sound_ay_reset() */
-int sound_stereo_ay = 0;	/* local copy of settings_current.stereo_ay */
+int sound_stereo_ay = SOUND_STEREO_AY_NONE; /* local copy of settings_current.stereo_ay */
 
 /* assume all three tone channels together match the beeper volume (ish).
  * Must be <=127 for all channels; 50+2+(24*3) = 124.
@@ -279,7 +279,8 @@ sound_init( const char *device )
     blip_synth_set_output( *ay_right_synth, right_buf );
 
     *ay_mid_synth_r = new_Blip_Synth();
-    blip_synth_set_volume( *ay_mid_synth_r, sound_get_volume( settings_current.volume_ay ) );
+    blip_synth_set_volume( *ay_mid_synth_r,
+                           sound_get_volume( settings_current.volume_ay ) );
     blip_synth_set_output( *ay_mid_synth_r, right_buf );
     blip_synth_set_treble_eq( *ay_mid_synth_r, treble );
   }
