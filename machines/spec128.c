@@ -1,5 +1,5 @@
 /* spec128.c: Spectrum 128K specific routines
-   Copyright (c) 1999-2007 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -29,31 +29,18 @@
 
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "compat.h"
-#include "disk/beta.h"
-#include "joystick.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
+#include "peripherals/disk/beta.h"
 #include "settings.h"
 #include "spec128.h"
 #include "spec48.h"
-#include "ula.h"
-#include "if1.h"
+#include "specplus3.h"
 
 static int spec128_reset( void );
-
-const periph_t spec128_peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
-  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, NULL, ay_dataport_write },
-  { 0x8002, 0x0000, NULL, spec128_memoryport_write },
-};
-
-const size_t spec128_peripherals_count =
-  sizeof( spec128_peripherals ) / sizeof( periph_t );
 
 int spec128_init( fuse_machine_info *machine )
 {
@@ -66,6 +53,7 @@ int spec128_init( fuse_machine_info *machine )
   machine->ram.port_from_ula	     = spec48_port_from_ula;
   machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
+  machine->ram.valid_pages	     = 8;
 
   machine->unattached_port = spectrum_unattached_port;
 
@@ -81,28 +69,20 @@ spec128_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_128_0,
+  error = machine_load_rom( 0, settings_current.rom_128_0,
                             settings_default.rom_128_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_128_1,
+  error = machine_load_rom( 1, settings_current.rom_128_1,
                             settings_default.rom_128_1, 0x4000 );
-  if( error ) return error;
-
-  error = periph_setup( spec128_peripherals, spec128_peripherals_count );
   if( error ) return error;
 
   error = spec128_common_reset( 1 );
   if( error ) return error;
 
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_opus( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
+  periph_clear();
+  machines_periph_128();
   periph_update();
 
-  periph_register_beta128();
   beta_builtin = 0;
 
   spec48_common_display_setup();
@@ -124,31 +104,19 @@ spec128_common_reset( int contention )
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;
 
-  /* ROM 0, RAM 5, RAM 2, RAM 0 */
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
-
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
-
-  memory_map_home[6] = &memory_map_ram[ 0];
-  memory_map_home[7] = &memory_map_ram[ 1];
-
-  /* Mark as present/writeable */
-  for( i = 0; i < 16; i++ )
-    memory_map_ram[i].writable = 1;
-
   /* Odd pages contended on the 128K/+2; the loop is up to 16 to
      ensure all of the Scorpion's 256Kb RAM is not contended */
   for( i = 0; i < 16; i++ )
-    memory_map_ram[ 2 * i     ].contended =
-      memory_map_ram[ 2 * i + 1 ].contended = i & 1 ? contention : 0;
+    memory_ram_set_16k_contention( i, i & 1 ? contention : 0 );
 
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
+  /* 0x0000: ROM 0 */
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  /* 0x4000: RAM 5 */
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  /* 0x8000: RAM 2 */
+  memory_map_16k( 0x8000, memory_map_ram, 2 );
+  /* 0xc000: RAM 0 */
+  memory_map_16k( 0xc000, memory_map_ram, 0 );
 
   return 0;
 }
@@ -169,16 +137,14 @@ spec128_memoryport_write( libspectrum_word port GCC_UNUSED,
 void
 spec128_select_rom( int rom )
 {
-  memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
-  memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
+  memory_map_16k( 0x0000, memory_map_rom, rom );
   machine_current->ram.current_rom = rom;
 }
 
 void
 spec128_select_page( int page )
 {
-  memory_map_home[6] = &memory_map_ram[ 2 * page     ];
-  memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
+  memory_map_16k( 0xc000, memory_map_ram, page );
   machine_current->ram.current_page = page;
 }
 
@@ -186,7 +152,6 @@ int
 spec128_memory_map( void )
 {
   int page, screen, rom;
-  size_t i;
 
   page = machine_current->ram.last_byte & 0x07;
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
@@ -202,9 +167,6 @@ spec128_memory_map( void )
 
   spec128_select_rom( rom );
   spec128_select_page( page );
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
 
   memory_romcs_map();
 

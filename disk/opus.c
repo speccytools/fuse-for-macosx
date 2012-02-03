@@ -144,6 +144,8 @@ opus_init( void )
   module_register( &opus_module_info );
   for( i = 0; i < 2; i++ ) opus_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_OPUS, &settings_current.opus, NULL );
+
   return 0;
 }
 
@@ -159,12 +161,16 @@ opus_reset( int hard_reset )
 
   event_remove_type( index_event );
 
-  if( !periph_opus_active )
+  if( !periph_is_active( PERIPH_TYPE_OPUS ) )
     return;
 
-  machine_load_rom_bank( opus_memory_map_romcs, 0, 0,
-			 settings_current.rom_opus,
-			 settings_default.rom_opus, 0x2000 );
+  if( machine_load_rom_bank( opus_memory_map_romcs, 0, 0,
+                             settings_current.rom_opus,
+                             settings_default.rom_opus, 0x2000 ) ) {
+    settings_current.opus = 0;
+    periph_activate_type( PERIPH_TYPE_OPUS, 0 );
+    return;
+  }
 
   opus_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
@@ -410,7 +416,7 @@ opus_disk_insert( opus_drive_number which, const char *filename,
 }
 
 int
-opus_disk_eject( opus_drive_number which, int write )
+opus_disk_eject( opus_drive_number which, int saveas )
 {
   wd_fdc_drive *d;
 
@@ -422,9 +428,12 @@ opus_disk_eject( opus_drive_number which, int write )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( write ) {
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
 
-    if( ui_opus_disk_write( which ) ) return 1;
+    if( d->disk.filename == NULL ) saveas = 1;
+    if( ui_opus_disk_write( which, 2 - saveas ) ) return 1;
+    d->disk.dirty = 0;
+    return 0;
 
   } else {
 
@@ -439,7 +448,7 @@ opus_disk_eject( opus_drive_number which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_opus_disk_write( which ) ) return 1;
+	if( opus_disk_eject( which, 2 ) ) return 1;	/* first save */
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -529,6 +538,7 @@ opus_disk_write( opus_drive_number which, const char *filename )
   int error;
   
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename;	/* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
@@ -537,6 +547,10 @@ opus_disk_write( opus_drive_number which, const char *filename )
     return 1;
   }
 
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = strdup( filename );
+  }
   return 0;
 }
 
@@ -694,7 +708,7 @@ opus_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   libspectrum_byte *buffer;
   int drive_count = 0;
 
-  if( !periph_opus_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_OPUS ) ) return;
 
   libspectrum_snap_set_opus_active( snap, 1 );
 

@@ -28,21 +28,23 @@
 #include <stdio.h>
 
 #include "debugger/debugger.h"
-#include "disk/beta.h"
-#include "disk/opus.h"
-#include "disk/plusd.h"
 #include "event.h"
-#include "ide/divide.h"
 #include "machine.h"
 #include "memory.h"
 #include "periph.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/disk/disciple.h"
+#include "peripherals/disk/opus.h"
+#include "peripherals/disk/plusd.h"
+#include "peripherals/ide/divide.h"
+#include "peripherals/if1.h"
+#include "peripherals/spectranet.h"
+#include "peripherals/ula.h"
 #include "profile.h"
 #include "rzx.h"
-#include "if1.h"
 #include "settings.h"
 #include "slt.h"
 #include "tape.h"
-#include "ula.h"
 #include "z80.h"
 
 #include "z80_macros.h"
@@ -183,6 +185,14 @@ z80_do_opcodes( void )
 
     END_CHECK
 
+    CHECK( disciple, disciple_available )
+
+    if( PC == 0x0001 || PC == 0x0008 || PC == 0x0066 || PC == 0x028e ) {
+      disciple_page();
+    }
+
+    END_CHECK
+
     CHECK( if1p, if1_available )
 
     if( PC == 0x0008 || PC == 0x1708 ) {
@@ -197,6 +207,17 @@ z80_do_opcodes( void )
       divide_set_automap( 1 );
     }
     
+    END_CHECK
+
+    CHECK( spectranet_page, spectranet_available && !settings_current.spectranet_disable )
+
+    if( PC == 0x0008 || ((PC & 0xfff8) == 0x3ff8) )
+      spectranet_page( 0 );
+
+    if( PC == spectranet_programmable_trap &&
+      spectranet_programmable_trap_active )
+      event_add( 0, z80_nmi_event );
+
     END_CHECK
 
   opcode_delay:
@@ -243,6 +264,13 @@ z80_do_opcodes( void )
     } else if( PC == 0x0008 || PC == 0x0048 || PC == 0x1708 ) {
       opus_page();
     }
+
+    END_CHECK
+
+    CHECK( spectranet_unpage, spectranet_available )
+
+    if( PC == 0x007c )
+      spectranet_unpage();
 
     END_CHECK
 

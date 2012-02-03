@@ -81,15 +81,13 @@ static void zxatasp_writeide( libspectrum_ide_channel *chn,
 
 /* Data */
 
-const periph_t zxatasp_peripherals[] = {
+static const periph_t zxatasp_peripherals[] = {
   { 0x039f, 0x009f, zxatasp_portA_read, zxatasp_portA_write },
   { 0x039f, 0x019f, zxatasp_portB_read, zxatasp_portB_write },
   { 0x039f, 0x029f, zxatasp_portC_read, zxatasp_portC_write },
   { 0x039f, 0x039f, zxatasp_control_read, zxatasp_control_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t zxatasp_peripherals_count =
-  sizeof( zxatasp_peripherals ) / sizeof( periph_t );
 
 static libspectrum_byte zxatasp_control;
 static libspectrum_byte zxatasp_portA;
@@ -184,6 +182,8 @@ zxatasp_init( void )
   module_register( &zxatasp_module_info );
   for( i = 0; i < 2; i++ ) zxatasp_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_ZXATASP, &settings_current.zxatasp_active,
+                        zxatasp_peripherals );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;
@@ -282,8 +282,6 @@ zxatasp_eject( libspectrum_ide_unit unit )
 libspectrum_byte
 zxatasp_portA_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !settings_current.zxatasp_active ) return 0xff;
-  
   *attached = 1;
   
   return zxatasp_portA;
@@ -292,16 +290,12 @@ zxatasp_portA_read( libspectrum_word port GCC_UNUSED, int *attached )
 static void
 zxatasp_portA_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  if( !settings_current.zxatasp_active ) return;
-  
   if( !( zxatasp_control & MC8255_PORT_A_IO ) ) zxatasp_portA = data;
 }
 
 libspectrum_byte
 zxatasp_portB_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !settings_current.zxatasp_active ) return 0xff;
-  
   *attached = 1;
   
   return zxatasp_portB;
@@ -310,16 +304,12 @@ zxatasp_portB_read( libspectrum_word port GCC_UNUSED, int *attached )
 static void
 zxatasp_portB_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  if( !settings_current.zxatasp_active ) return;
-  
   if( !( zxatasp_control & MC8255_PORT_B_IO ) ) zxatasp_portB = data;
 }
 
 libspectrum_byte
 zxatasp_portC_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !settings_current.zxatasp_active ) return 0xff;
-  
   *attached = 1;
   
   return zxatasp_portC;
@@ -331,8 +321,6 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
   libspectrum_byte oldC = zxatasp_portC;
   libspectrum_byte newC;
   
-  if( !settings_current.zxatasp_active ) return;
-
   /* Determine new port C value, dependent on I/O modes */
   newC = ( zxatasp_control & MC8255_PORT_C_LOW_IO )
             ? ( oldC & 0x0f ) : ( data & 0x0f );
@@ -394,8 +382,6 @@ zxatasp_portC_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 libspectrum_byte
 zxatasp_control_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !settings_current.zxatasp_active ) return 0xff;
-  
   *attached = 1;
   
   return zxatasp_control;
@@ -404,8 +390,6 @@ zxatasp_control_read( libspectrum_word port GCC_UNUSED, int *attached )
 static void
 zxatasp_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
-  if( !settings_current.zxatasp_active ) return;
-  
   if( data & MC8255_SETMODE ) {
     /* Set the control word and reset the ports */
     zxatasp_control = data;

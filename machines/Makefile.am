@@ -29,7 +29,8 @@ INCLUDES = @LIBSPEC_CFLAGS@ @GTK_CFLAGS@ @GLIB_CFLAGS@
 
 noinst_LIBRARIES = libmachines.a
 
-libmachines_a_SOURCES = pentagon.c \
+libmachines_a_SOURCES = machines_periph.c \
+                        pentagon.c \
 			pentagon512.c \
 			pentagon1024.c \
 			scorpion.c \
@@ -47,6 +48,7 @@ libmachines_a_SOURCES = pentagon.c \
 			ts2068.c
 
 noinst_HEADERS = machines.h \
+		 machines_periph.h \
 		 pentagon.h \
 		 scorpion.h \
 		 spec128.h \

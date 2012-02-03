@@ -29,16 +29,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "dck.h"
 #include "debugger/debugger.h"
-#include "disk/beta.h"
 #include "event.h"
 #include "fuse.h"
-#include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "machines/specplus3.h"
 #include "menu.h"
+#include "peripherals/dck.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/joystick.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
@@ -423,9 +423,15 @@ menu_options_general( int action )
 }
 
 void
-menu_options_peripherals( int action )
+menu_options_peripherals_general( int action )
 {
-  widget_do( WIDGET_TYPE_PERIPHERALS, NULL );
+  widget_do( WIDGET_TYPE_PERIPHERALS_GENERAL, NULL );
+}
+
+void
+menu_options_peripherals_disk( int action )
+{
+  widget_do( WIDGET_TYPE_PERIPHERALS_DISK, NULL );
 }
 
 void
@@ -608,6 +614,12 @@ menu_machine_debugger( int action )
 }
 
 void
+menu_machine_pokememory( int action )
+{
+  widget_do( WIDGET_TYPE_POKEMEM, NULL );
+}
+
+void
 menu_machine_pokefinder( int action )
 {
   widget_do( WIDGET_TYPE_POKEFINDER, NULL );
@@ -628,43 +640,29 @@ menu_media_tape_browse( int action )
 void
 menu_help_keyboard( int action )
 {
-  int error;
-  compat_fd fd;
-  utils_file file;
+  utils_file screen;
   widget_picture_data info;
 
   static const char *filename = "keyboard.scr";
 
-  fd = utils_find_auxiliary_file( filename, UTILS_AUXILIARY_LIB );
-  if( fd == COMPAT_FILE_OPEN_FAILED ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find keyboard picture ('%s')",
-	      filename );
-    return;
-  }
-  
-  error = utils_read_fd( fd, filename, &file ); if( error ) return;
-
-  if( file.length != 6912 ) {
-    ui_error( UI_ERROR_ERROR, "keyboard picture ('%s') is not 6912 bytes long",
-	      filename );
-    utils_close_file( &file );
+  if( utils_read_screen( filename, &screen ) ) {
     return;
   }
 
   info.filename = filename;
-  info.screen = file.buffer;
+  info.screen = screen.buffer;
   info.border = 0;
 
   widget_do( WIDGET_TYPE_PICTURE, &info );
 
-  if( utils_close_file( &file ) ) return;
+  utils_close_file( &screen );
 }
 
 void
 menu_help_about( int action )
 {
   widget_end_all( WIDGET_FINISHED_OK );
-  ui_error( UI_ERROR_INFO, "Free Unix Spectrum Emulator (Fuse) %s (c) 1999-2008 Philip Kendall and others. See http://fuse-emulator.sf.net/ for details.", VERSION );
+  ui_error( UI_ERROR_INFO, "Free Unix Spectrum Emulator (Fuse) %s (c) 1999-2011 Philip Kendall and others. See http://fuse-emulator.sf.net/ for details.", VERSION );
 }
 
 static int

@@ -1,5 +1,5 @@
 /* beta.c: Routines for handling the Beta disk interface
-   Copyright (c) 2004-2008 Stuart Brady
+   Copyright (c) 2004-2011 Stuart Brady, Philip Kendall
 
    $Id$
 
@@ -19,8 +19,7 @@
 
    Author contact information:
 
-   Philip: pak21-fuse@srcf.ucam.org
-   Postal address: 15 Crescent Road, Wokingham, Berks, RG40 2DB, England
+   Philip: philip-fuse@shadowmagic.org.uk
 
    Stuart: sdbrady@ntlworld.com
 
@@ -79,16 +78,14 @@ static int index_event;
 static wd_fdc *beta_fdc;
 static wd_fdc_drive beta_drives[ BETA_NUM_DRIVES ];
 
-const periph_t beta_peripherals[] = {
+static const periph_t beta_peripherals[] = {
   { 0x00ff, 0x001f, beta_sr_read, beta_cr_write },
   { 0x00ff, 0x003f, beta_tr_read, beta_tr_write },
   { 0x00ff, 0x005f, beta_sec_read, beta_sec_write },
   { 0x00ff, 0x007f, beta_dr_read, beta_dr_write },
   { 0x00ff, 0x00ff, beta_sp_read, beta_sp_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t beta_peripherals_count =
-  sizeof( beta_peripherals ) / sizeof( periph_t );
 
 static void beta_reset( int hard_reset );
 static void beta_memory_map( void );
@@ -172,6 +169,9 @@ beta_init( void )
   module_register( &beta_module_info );
   for( i = 0; i < 2; i++ ) beta_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_BETA128, &settings_current.beta128,
+                        beta_peripherals );
+
   return 0;
 }
 
@@ -184,7 +184,7 @@ beta_reset( int hard_reset GCC_UNUSED )
 
   event_remove_type( index_event );
 
-  if( !periph_beta128_active ) {
+  if( !periph_is_active( PERIPH_TYPE_BETA128 ) ) {
     beta_active = 0;
     beta_available = 0;
     return;
@@ -205,9 +205,15 @@ beta_reset( int hard_reset GCC_UNUSED )
   }
 
   if( !beta_builtin ) {
-    machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
-			   settings_current.rom_beta128,
-			   settings_default.rom_beta128, 0x4000 );
+    if( machine_load_rom_bank( beta_memory_map_romcs, 0, 0,
+			       settings_current.rom_beta128,
+			       settings_default.rom_beta128, 0x4000 ) ) {
+      beta_active = 0;
+      beta_available = 0;
+      periph_activate_type( PERIPH_TYPE_BETA128, 0 );
+      settings_current.beta128 = 0;
+      return;
+    }
 
     beta_memory_map_romcs[ 0 ].writable = 0;
     beta_memory_map_romcs[ 1 ].writable = 0;
@@ -564,25 +570,28 @@ beta_disk_writeprotect( beta_drive_number which, int wrprot )
 }
 
 int
-beta_disk_eject( beta_drive_number which, int write )
+beta_disk_eject( beta_drive_number which, int saveas )
 {
   wd_fdc_drive *d;
   char drive;
-  
+
   if( which >= BETA_NUM_DRIVES )
     return 1;
-    
+
   d = &beta_drives[ which ];
-  
+
   if( !d->fdd.loaded )
     return 0;
-    
-  if( write ) {
-  
-    if( ui_beta_disk_write( which ) ) return 1;
+
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
+
+    if( d->disk.filename == NULL ) saveas = 1;
+    if( ui_beta_disk_write( which, 2 - saveas ) ) return 1;
+    d->disk.dirty = 0;
+    return 0;
 
   } else {
-  
+
     if( d->disk.dirty ) {
       ui_confirm_save_t confirm;
 
@@ -603,7 +612,7 @@ beta_disk_eject( beta_drive_number which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_beta_disk_write( which ) ) return 1;
+	if( beta_disk_eject( which, 2 ) ) return 1;	/* first save */
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -641,6 +650,7 @@ beta_disk_write( beta_drive_number which, const char *filename )
   int error;
 
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename;	/* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
@@ -649,6 +659,10 @@ beta_disk_write( beta_drive_number which, const char *filename )
     return 1;
   }
 
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = strdup( filename );
+  }
   return 0;
 }
 
@@ -733,7 +747,7 @@ beta_to_snapshot( libspectrum_snap *snap )
   libspectrum_byte *buffer;
   int drive_count = 0;
 
-  if( !periph_beta128_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_BETA128 ) ) return;
 
   libspectrum_snap_set_beta_active( snap, 1 );
 

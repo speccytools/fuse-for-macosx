@@ -65,7 +65,11 @@ File/E_xit..., Item, F10
 _Options, Branch
 Options/_General..., Item, F4
 Options/_Sound..., Item
-Options/_Peripherals..., Item
+
+Options/_Peripherals, Branch
+Options/Peripherals/_General..., Item
+Options/Peripherals/_Disk..., Item
+
 Options/_RZX..., Item
 Options/_Movie..., Item
 
@@ -95,6 +99,7 @@ Options/Select ROMs/Spectrum _SE..., Item,, menu_options_selectroms_select,, 15
 Options/Select ROMs/Interface _I..., Item,, menu_options_selectroms_select,, 16
 Options/Select ROMs/_Beta 128..., Item,, menu_options_selectroms_select,, 17
 Options/Select ROMs/+_D..., Item,, menu_options_selectroms_select,, 18
+Options/Select ROMs/Specc_yBoot..., Item,, menu_options_selectroms_select,, 19
 
 Options/_Filter..., Item,,, menu_filter_detail
 
@@ -118,6 +123,7 @@ Machine/_Hard reset..., Item,, menu_machine_reset,, 1
 Machine/_Select..., Item, F9,, menu_machine_detail
 Machine/_Debugger..., Item
 Machine/P_oke Finder..., Item
+Machine/Po_ke Memory..., Item
 Machine/_Memory Browser..., Item
 
 Machine/Pro_filer, Branch
@@ -143,8 +149,9 @@ Media/_Interface I, Branch
 Media/Interface I/Microdrive _1, Branch
 Media/Interface I/Microdrive 1/Insert _New, Item,, menu_media_insert_new,, 0x31
 Media/Interface I/Microdrive 1/_Insert..., Item,, menu_media_insert,, 0x31
-Media/Interface I/Microdrive 1/_Eject, Item,, menu_media_eject,, 0x031
-Media/Interface I/Microdrive 1/Eject and _write..., Item,, menu_media_eject,, 0x131
+Media/Interface I/Microdrive 1/_Eject, Item,, menu_media_eject,, 0x31
+Media/Interface I/Microdrive 1/_Save, Item,, menu_media_save,, 0x031
+Media/Interface I/Microdrive 1/Save _As..., Item,, menu_media_save,, 0x131
 Media/Interface I/Microdrive 1/Write _protect, Branch
 Media/Interface I/Microdrive 1/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x131
 Media/Interface I/Microdrive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x031
@@ -152,8 +159,9 @@ Media/Interface I/Microdrive 1/Write protect/_Disable, Item,, menu_media_writepr
 Media/Interface I/Microdrive _2, Branch
 Media/Interface I/Microdrive 2/Insert _New, Item,, menu_media_insert_new,, 0x32
 Media/Interface I/Microdrive 2/_Insert..., Item,, menu_media_insert,, 0x32
-Media/Interface I/Microdrive 2/_Eject, Item,, menu_media_eject,, 0x032
-Media/Interface I/Microdrive 2/Eject and _write..., Item,, menu_media_eject,, 0x132
+Media/Interface I/Microdrive 2/_Eject, Item,, menu_media_eject,, 0x32
+Media/Interface I/Microdrive 2/_Save, Item,, menu_media_save,, 0x032
+Media/Interface I/Microdrive 2/Save _As..., Item,, menu_media_save,, 0x132
 Media/Interface I/Microdrive 2/Write _protect, Branch
 Media/Interface I/Microdrive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x132
 Media/Interface I/Microdrive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x032
@@ -161,8 +169,9 @@ Media/Interface I/Microdrive 2/Write protect/_Disable, Item,, menu_media_writepr
 Media/Interface I/Microdrive _3, Branch
 Media/Interface I/Microdrive 3/Insert _New, Item,, menu_media_insert_new,, 0x33
 Media/Interface I/Microdrive 3/_Insert..., Item,, menu_media_insert,, 0x33
-Media/Interface I/Microdrive 3/_Eject, Item,, menu_media_eject,, 0x033
-Media/Interface I/Microdrive 3/Eject and _write..., Item,, menu_media_eject,, 0x133
+Media/Interface I/Microdrive 3/_Eject, Item,, menu_media_eject,, 0x33
+Media/Interface I/Microdrive 3/_Save, Item,, menu_media_save,, 0x033
+Media/Interface I/Microdrive 3/Save _As..., Item,, menu_media_save,, 0x133
 Media/Interface I/Microdrive 3/Write _protect, Branch
 Media/Interface I/Microdrive 3/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x133
 Media/Interface I/Microdrive 3/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x033
@@ -170,8 +179,9 @@ Media/Interface I/Microdrive 3/Write protect/_Disable, Item,, menu_media_writepr
 Media/Interface I/Microdrive _4, Branch
 Media/Interface I/Microdrive 4/Insert _New, Item,, menu_media_insert_new,, 0x34
 Media/Interface I/Microdrive 4/_Insert..., Item,, menu_media_insert,, 0x34
-Media/Interface I/Microdrive 4/_Eject, Item,, menu_media_eject,, 0x034
-Media/Interface I/Microdrive 4/Eject and _write..., Item,, menu_media_eject,, 0x134
+Media/Interface I/Microdrive 4/_Eject, Item,, menu_media_eject,, 0x34
+Media/Interface I/Microdrive 4/_Save, Item,, menu_media_save,, 0x034
+Media/Interface I/Microdrive 4/Save _As..., Item,, menu_media_save,, 0x134
 Media/Interface I/Microdrive 4/Write _protect, Branch
 Media/Interface I/Microdrive 4/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x134
 Media/Interface I/Microdrive 4/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x034
@@ -179,8 +189,9 @@ Media/Interface I/Microdrive 4/Write protect/_Disable, Item,, menu_media_writepr
 Media/Interface I/Microdrive _5, Branch
 Media/Interface I/Microdrive 5/Insert _New, Item,, menu_media_insert_new,, 0x35
 Media/Interface I/Microdrive 5/_Insert..., Item,, menu_media_insert,, 0x35
-Media/Interface I/Microdrive 5/_Eject, Item,, menu_media_eject,, 0x035
-Media/Interface I/Microdrive 5/Eject and _write..., Item,, menu_media_eject,, 0x135
+Media/Interface I/Microdrive 5/_Eject, Item,, menu_media_eject,, 0x35
+Media/Interface I/Microdrive 5/_Save, Item,, menu_media_save,, 0x035
+Media/Interface I/Microdrive 5/Save _As..., Item,, menu_media_save,, 0x135
 Media/Interface I/Microdrive 5/Write _protect, Branch
 Media/Interface I/Microdrive 5/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x135
 Media/Interface I/Microdrive 5/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x035
@@ -188,8 +199,9 @@ Media/Interface I/Microdrive 5/Write protect/_Disable, Item,, menu_media_writepr
 Media/Interface I/Microdrive _6, Branch
 Media/Interface I/Microdrive 6/Insert _New, Item,, menu_media_insert_new,, 0x36
 Media/Interface I/Microdrive 6/_Insert..., Item,, menu_media_insert,, 0x36
-Media/Interface I/Microdrive 6/_Eject, Item,, menu_media_eject,, 0x036
-Media/Interface I/Microdrive 6/Eject and _write..., Item,, menu_media_eject,, 0x136
+Media/Interface I/Microdrive 6/_Eject, Item,, menu_media_eject,, 0x36
+Media/Interface I/Microdrive 6/_Save, Item,, menu_media_save,, 0x036
+Media/Interface I/Microdrive 6/Save _As..., Item,, menu_media_save,, 0x136
 Media/Interface I/Microdrive 6/Write _protect, Branch
 Media/Interface I/Microdrive 6/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x136
 Media/Interface I/Microdrive 6/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x036
@@ -197,8 +209,9 @@ Media/Interface I/Microdrive 6/Write protect/_Disable, Item,, menu_media_writepr
 Media/Interface I/Microdrive _7, Branch
 Media/Interface I/Microdrive 7/Insert _New, Item,, menu_media_insert_new,, 0x37
 Media/Interface I/Microdrive 7/_Insert..., Item,, menu_media_insert,, 0x37
-Media/Interface I/Microdrive 7/_Eject, Item,, menu_media_eject,, 0x037
-Media/Interface I/Microdrive 7/Eject and _write..., Item,, menu_media_eject,, 0x137
+Media/Interface I/Microdrive 7/_Eject, Item,, menu_media_eject,, 0x37
+Media/Interface I/Microdrive 7/_Save, Item,, menu_media_save,, 0x037
+Media/Interface I/Microdrive 7/Save _As..., Item,, menu_media_save,, 0x137
 Media/Interface I/Microdrive 7/Write _protect, Branch
 Media/Interface I/Microdrive 7/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x137
 Media/Interface I/Microdrive 7/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x037
@@ -206,8 +219,9 @@ Media/Interface I/Microdrive 7/Write protect/_Disable, Item,, menu_media_writepr
 Media/Interface I/Microdrive _8, Branch
 Media/Interface I/Microdrive 8/Insert _New, Item,, menu_media_insert_new,, 0x38
 Media/Interface I/Microdrive 8/_Insert..., Item,, menu_media_insert,, 0x38
-Media/Interface I/Microdrive 8/_Eject, Item,, menu_media_eject,, 0x038
-Media/Interface I/Microdrive 8/Eject and _write..., Item,, menu_media_eject,, 0x138
+Media/Interface I/Microdrive 8/_Eject, Item,, menu_media_eject,, 0x38
+Media/Interface I/Microdrive 8/_Save, Item,, menu_media_save,, 0x038
+Media/Interface I/Microdrive 8/Save _As..., Item,, menu_media_save,, 0x138
 Media/Interface I/Microdrive 8/Write _protect, Branch
 Media/Interface I/Microdrive 8/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x138
 Media/Interface I/Microdrive 8/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x038
@@ -231,7 +245,8 @@ Media/Disk/+3/Drive _A:, Branch,,,menu_plus3a_detail
 Media/Disk/+3/Drive A:/Insert _New, Item,, menu_media_insert_new,, 0x01
 Media/Disk/+3/Drive A:/_Insert..., Item,, menu_media_insert,, 0x01
 Media/Disk/+3/Drive A:/_Eject, Item,, menu_media_eject,, 0x01
-Media/Disk/+3/Drive A:/Eject and _write..., Item,, menu_media_eject,, 0x101
+Media/Disk/+3/Drive A:/_Save, Item,, menu_media_save,, 0x001
+Media/Disk/+3/Drive A:/Save _As..., Item,, menu_media_save,, 0x101
 Media/Disk/+3/Drive A:/_Flip disk, Branch
 Media/Disk/+3/Drive A:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x101
 Media/Disk/+3/Drive A:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x001
@@ -242,7 +257,8 @@ Media/Disk/+3/Drive _B:, Branch,,,menu_plus3b_detail
 Media/Disk/+3/Drive B:/Insert _New, Item,, menu_media_insert_new,, 0x02
 Media/Disk/+3/Drive B:/_Insert..., Item,, menu_media_insert,, 0x02
 Media/Disk/+3/Drive B:/_Eject, Item,, menu_media_eject,, 0x02
-Media/Disk/+3/Drive B:/Eject and _write..., Item,, menu_media_eject,, 0x102
+Media/Disk/+3/Drive B:/_Save, Item,, menu_media_save,, 0x002
+Media/Disk/+3/Drive B:/Save _As..., Item,, menu_media_save,, 0x102
 Media/Disk/+3/Drive B:/_Flip disk, Branch
 Media/Disk/+3/Drive B:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x102
 Media/Disk/+3/Drive B:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x002
@@ -255,7 +271,8 @@ Media/Disk/Beta/Drive _A:, Branch,,,menu_beta128a_detail
 Media/Disk/Beta/Drive A:/Insert _New, Item,, menu_media_insert_new,, 0x11
 Media/Disk/Beta/Drive A:/_Insert..., Item,, menu_media_insert,, 0x11
 Media/Disk/Beta/Drive A:/_Eject, Item,, menu_media_eject,, 0x11
-Media/Disk/Beta/Drive A:/Eject and _write..., Item,, menu_media_eject,, 0x111
+Media/Disk/Beta/Drive A:/_Save, Item,, menu_media_save,, 0x011
+Media/Disk/Beta/Drive A:/Save _As..., Item,, menu_media_save,, 0x111
 Media/Disk/Beta/Drive A:/_Flip disk, Branch
 Media/Disk/Beta/Drive A:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x111
 Media/Disk/Beta/Drive A:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x011
@@ -265,8 +282,9 @@ Media/Disk/Beta/Drive A:/Write protect/_Disable, Item,, menu_media_writeprotect,
 Media/Disk/Beta/Drive _B:, Branch,,,menu_beta128b_detail
 Media/Disk/Beta/Drive B:/Insert _New, Item,, menu_media_insert_new,, 0x12
 Media/Disk/Beta/Drive B:/_Insert..., Item,, menu_media_insert,, 0x12
-Media/Disk/Beta/Drive B:/_Eject, Item,, menu_media_eject,, 0x012
-Media/Disk/Beta/Drive B:/Eject and _write..., Item,, menu_media_eject,, 0x112
+Media/Disk/Beta/Drive B:/_Eject, Item,, menu_media_eject,, 0x12
+Media/Disk/Beta/Drive B:/_Save, Item,, menu_media_save,, 0x012
+Media/Disk/Beta/Drive B:/Save _As..., Item,, menu_media_save,, 0x112
 Media/Disk/Beta/Drive B:/_Flip disk, Branch
 Media/Disk/Beta/Drive B:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x112
 Media/Disk/Beta/Drive B:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x012
@@ -276,8 +294,9 @@ Media/Disk/Beta/Drive B:/Write protect/_Disable, Item,, menu_media_writeprotect,
 Media/Disk/Beta/Drive _C:, Branch,,,menu_beta128c_detail
 Media/Disk/Beta/Drive C:/Insert _New, Item,, menu_media_insert_new,, 0x13
 Media/Disk/Beta/Drive C:/_Insert..., Item,, menu_media_insert,, 0x13
-Media/Disk/Beta/Drive C:/_Eject, Item,, menu_media_eject,, 0x013
-Media/Disk/Beta/Drive C:/Eject and _write..., Item,, menu_media_eject,, 0x113
+Media/Disk/Beta/Drive C:/_Eject, Item,, menu_media_eject,, 0x13
+Media/Disk/Beta/Drive C:/_Save, Item,, menu_media_save,, 0x013
+Media/Disk/Beta/Drive C:/Save _As..., Item,, menu_media_save,, 0x113
 Media/Disk/Beta/Drive C:/_Flip disk, Branch
 Media/Disk/Beta/Drive C:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x113
 Media/Disk/Beta/Drive C:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x013
@@ -287,8 +306,9 @@ Media/Disk/Beta/Drive C:/Write protect/_Disable, Item,, menu_media_writeprotect,
 Media/Disk/Beta/Drive _D:, Branch,,,menu_beta128d_detail
 Media/Disk/Beta/Drive D:/Insert _New, Item,, menu_media_insert_new,, 0x14
 Media/Disk/Beta/Drive D:/_Insert..., Item,, menu_media_insert,, 0x14
-Media/Disk/Beta/Drive D:/_Eject, Item,, menu_media_eject,, 0x014
-Media/Disk/Beta/Drive D:/Eject and _write..., Item,, menu_media_eject,, 0x114
+Media/Disk/Beta/Drive D:/_Eject, Item,, menu_media_eject,, 0x14
+Media/Disk/Beta/Drive D:/_Save, Item,, menu_media_save,, 0x014
+Media/Disk/Beta/Drive D:/Save _As..., Item,, menu_media_save,, 0x114
 Media/Disk/Beta/Drive D:/_Flip disk, Branch
 Media/Disk/Beta/Drive D:/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x114
 Media/Disk/Beta/Drive D:/Flip disk/Turn _back, Item,, menu_media_flip,, 0x014
@@ -300,8 +320,9 @@ Media/Disk/+_D, Branch
 Media/Disk/+D/Drive _1, Branch,,,menu_plusd1_detail
 Media/Disk/+D/Drive 1/Insert _New, Item,, menu_media_insert_new,, 0x21
 Media/Disk/+D/Drive 1/_Insert..., Item,, menu_media_insert,, 0x21
-Media/Disk/+D/Drive 1/_Eject, Item,, menu_media_eject,, 0x021
-Media/Disk/+D/Drive 1/Eject and _write..., Item,, menu_media_eject,, 0x121
+Media/Disk/+D/Drive 1/_Eject, Item,, menu_media_eject,, 0x21
+Media/Disk/+D/Drive 1/_Save, Item,, menu_media_save,, 0x021
+Media/Disk/+D/Drive 1/Save _As..., Item,, menu_media_save,, 0x121
 Media/Disk/+D/Drive 1/_Flip disk, Branch
 Media/Disk/+D/Drive 1/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x121
 Media/Disk/+D/Drive 1/Flip disk/Turn _back, Item,, menu_media_flip,, 0x021
@@ -311,8 +332,9 @@ Media/Disk/+D/Drive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0
 Media/Disk/+D/Drive _2, Branch,,,menu_plusd2_detail
 Media/Disk/+D/Drive 2/Insert _New, Item,, menu_media_insert_new,, 0x22
 Media/Disk/+D/Drive 2/_Insert..., Item,, menu_media_insert,, 0x22
-Media/Disk/+D/Drive 2/_Eject, Item,, menu_media_eject,, 0x022
-Media/Disk/+D/Drive 2/Eject and _write..., Item,, menu_media_eject,, 0x122
+Media/Disk/+D/Drive 2/_Eject, Item,, menu_media_eject,, 0x22
+Media/Disk/+D/Drive 2/_Save, Item,, menu_media_save,, 0x022
+Media/Disk/+D/Drive 2/Save _As..., Item,, menu_media_save,, 0x122
 Media/Disk/+D/Drive 2/_Flip disk, Branch
 Media/Disk/+D/Drive 2/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x122
 Media/Disk/+D/Drive 2/Flip disk/Turn _back, Item,, menu_media_flip,, 0x022
@@ -320,12 +342,39 @@ Media/Disk/+D/Drive 2/Write _protect, Branch
 Media/Disk/+D/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x122
 Media/Disk/+D/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x022
 
+Media/Disk/DISC_iPLE, Branch
+Media/Disk/DISCiPLE/Drive _1, Branch,,,menu_disciple1_detail
+Media/Disk/DISCiPLE/Drive 1/Insert _New, Item,, menu_media_insert_new,, 0x51
+Media/Disk/DISCiPLE/Drive 1/_Insert..., Item,, menu_media_insert,, 0x51
+Media/Disk/DISCiPLE/Drive 1/_Eject, Item,, menu_media_eject,, 0x51
+Media/Disk/DISCiPLE/Drive 1/_Save, Item,, menu_media_save,, 0x051
+Media/Disk/DISCiPLE/Drive 1/Save _As..., Item,, menu_media_save,, 0x151
+Media/Disk/DISCiPLE/Drive 1/_Flip disk, Branch
+Media/Disk/DISCiPLE/Drive 1/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x151
+Media/Disk/DISCiPLE/Drive 1/Flip disk/Turn _back, Item,, menu_media_flip,, 0x051
+Media/Disk/DISCiPLE/Drive 1/Write _protect, Branch
+Media/Disk/DISCiPLE/Drive 1/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x151
+Media/Disk/DISCiPLE/Drive 1/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x051
+Media/Disk/DISCiPLE/Drive _2, Branch,,,menu_disciple2_detail
+Media/Disk/DISCiPLE/Drive 2/Insert _New, Item,, menu_media_insert_new,, 0x52
+Media/Disk/DISCiPLE/Drive 2/_Insert..., Item,, menu_media_insert,, 0x52
+Media/Disk/DISCiPLE/Drive 2/_Eject, Item,, menu_media_eject,, 0x52
+Media/Disk/DISCiPLE/Drive 2/_Save, Item,, menu_media_save,, 0x052
+Media/Disk/DISCiPLE/Drive 2/Save _As..., Item,, menu_media_save,, 0x152
+Media/Disk/DISCiPLE/Drive 2/_Flip disk, Branch
+Media/Disk/DISCiPLE/Drive 2/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x152
+Media/Disk/DISCiPLE/Drive 2/Flip disk/Turn _back, Item,, menu_media_flip,, 0x052
+Media/Disk/DISCiPLE/Drive 2/Write _protect, Branch
+Media/Disk/DISCiPLE/Drive 2/Write protect/_Enable, Item,, menu_media_writeprotect,, 0x152
+Media/Disk/DISCiPLE/Drive 2/Write protect/_Disable, Item,, menu_media_writeprotect,, 0x052
+
 Media/Disk/_Opus, Branch
 Media/Disk/Opus/Drive _1, Branch,,,menu_opus1_detail
 Media/Disk/Opus/Drive 1/Insert _New, Item,, menu_media_insert_new,, 0x41
 Media/Disk/Opus/Drive 1/_Insert..., Item,, menu_media_insert,, 0x41
-Media/Disk/Opus/Drive 1/_Eject, Item,, menu_media_eject,, 0x041
-Media/Disk/Opus/Drive 1/Eject and _write..., Item,, menu_media_eject,, 0x141
+Media/Disk/Opus/Drive 1/_Eject, Item,, menu_media_eject,, 0x41
+Media/Disk/Opus/Drive 1/_Save, Item,, menu_media_save,, 0x041
+Media/Disk/Opus/Drive 1/Save _As..., Item,, menu_media_save,, 0x141
 Media/Disk/Opus/Drive 1/_Flip disk, Branch
 Media/Disk/Opus/Drive 1/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x141
 Media/Disk/Opus/Drive 1/Flip disk/Turn _back, Item,, menu_media_flip,, 0x041
@@ -335,8 +384,9 @@ Media/Disk/Opus/Drive 1/Write protect/_Disable, Item,, menu_media_writeprotect,,
 Media/Disk/Opus/Drive _2, Branch,,,menu_opus2_detail
 Media/Disk/Opus/Drive 2/Insert _New, Item,, menu_media_insert_new,, 0x42
 Media/Disk/Opus/Drive 2/_Insert..., Item,, menu_media_insert,, 0x42
-Media/Disk/Opus/Drive 2/_Eject, Item,, menu_media_eject,, 0x042
-Media/Disk/Opus/Drive 2/Eject and _write..., Item,, menu_media_eject,, 0x142
+Media/Disk/Opus/Drive 2/_Eject, Item,, menu_media_eject,, 0x42
+Media/Disk/Opus/Drive 2/_Save, Item,, menu_media_save,, 0x042
+Media/Disk/Opus/Drive 2/Save _As..., Item,, menu_media_save,, 0x142
 Media/Disk/Opus/Drive 2/_Flip disk, Branch
 Media/Disk/Opus/Drive 2/Flip disk/Turn _upside down, Item,, menu_media_flip,, 0x142
 Media/Disk/Opus/Drive 2/Flip disk/Turn _back, Item,, menu_media_flip,, 0x042

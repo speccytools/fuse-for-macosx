@@ -36,16 +36,14 @@
 #include "debugger_internals.h"
 #include "fuse.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 static GArray *registered_events;
 
-int
+void
 debugger_event_init( void )
 {
   registered_events = g_array_new( FALSE, FALSE, sizeof( debugger_event_t ) );
-  if( !registered_events ) return 1;
-
-  return 0;
 }
 
 int
@@ -53,15 +51,8 @@ debugger_event_register( const char *type, const char *detail )
 {
   debugger_event_t event;
 
-  event.detail = NULL;
-  event.type = strdup( type );
-  event.detail = strdup( detail );
-  if( !event.type || !event.detail ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
-    free( event.type );
-    free( event.detail );
-    return -1;
-  }
+  event.type = utils_safe_strdup( type );
+  event.detail = utils_safe_strdup( detail );
 
   g_array_append_val( registered_events, event );
 
@@ -115,4 +106,23 @@ debugger_event( int event_code )
       debugger_command_evaluate( bp->commands );
     }
   }
+}
+
+/* Tidy-up function called at end of emulation */
+void
+debugger_event_end( void )
+{
+  int i;
+  debugger_event_t event;
+
+  if( !registered_events ) return;
+
+  for( i = 0; i < registered_events->len; i++ ) {
+    event = g_array_index( registered_events, debugger_event_t, i );
+    free( event.detail );
+    free( event.type );
+  }
+
+  g_array_free( registered_events, TRUE );
+  registered_events = NULL;
 }

@@ -53,7 +53,13 @@ ui_joystick_init( void )
 {
   int error, retval;
 
+#ifdef UI_SDL
   error = SDL_InitSubSystem( SDL_INIT_JOYSTICK );
+#else
+  /* Other UIs could handle joysticks by the SDL library */
+  error = SDL_Init(SDL_INIT_JOYSTICK|SDL_INIT_VIDEO);
+#endif
+
   if ( error ) {
     ui_error( UI_ERROR_ERROR, "failed to initialise joystick subsystem" );
     return 0;
@@ -100,8 +106,29 @@ ui_joystick_init( void )
 void
 ui_joystick_poll( void )
 {
-  /* No action needed; joysticks already handled by the SDL events
+  /* No action needed in SDL UI; joysticks already handled by the SDL events
      system */
+
+#ifndef UI_SDL
+  SDL_Event event;
+
+  while( SDL_PollEvent( &event ) ) {
+    switch( event.type ) {
+    case SDL_JOYBUTTONDOWN:
+      sdljoystick_buttonpress( &(event.jbutton) );
+      break;
+    case SDL_JOYBUTTONUP:
+      sdljoystick_buttonrelease( &(event.jbutton) );
+      break;
+    case SDL_JOYAXISMOTION:
+      sdljoystick_axismove( &(event.jaxis) );
+      break;
+    default:
+      break;
+    }
+  }
+#endif
+
 }
 
 static void
@@ -111,7 +138,7 @@ button_action( SDL_JoyButtonEvent *buttonevent, input_event_type type )
   input_event_t event;
   
   button = buttonevent->button;
-  if( button > 10 ) return;	/* We support 'only' 10 fire buttons */
+  if( button > 9 ) return;	/* We support 'only' 10 fire buttons */
 
   event.type = type;
   event.types.joystick.which = buttonevent->which;
@@ -182,7 +209,11 @@ ui_joystick_end( void )
 
   }
 
+#ifdef UI_SDL
   SDL_QuitSubSystem( SDL_INIT_JOYSTICK );
+#else
+  SDL_Quit();
+#endif
 }
 
 #endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */

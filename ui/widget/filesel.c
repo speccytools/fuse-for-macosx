@@ -64,6 +64,9 @@ struct Library *ExecBase;
 
 
 int err = 0;
+
+char *amiga_asl( char *title, BOOL is_saving );
+
 #endif /* ifdef AMIGA */
 
 struct widget_dirent **widget_filenames; /* Filenames in the current
@@ -132,11 +135,8 @@ widget_get_filename( const char *title, int saving )
     wtype = WIDGET_TYPE_FILESELECTOR;
   }
   widget_do( wtype, &data );
-  if( widget_filesel_name ) {
-    filename = strdup( widget_filesel_name );
-    if( !filename )
-      ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-  }
+  if( widget_filesel_name )
+    filename = utils_safe_strdup( widget_filesel_name );
 
   return filename;
   
@@ -145,13 +145,21 @@ widget_get_filename( const char *title, int saving )
 char *
 ui_get_open_filename( const char *title )
 {
+#if !defined AMIGA && !defined __MORPHOS__
   return widget_get_filename( title, 0 );
+#else
+  return amiga_asl( title, FALSE );
+#endif
 }
 
 char *
 ui_get_save_filename( const char *title )
 {
+#if !defined AMIGA && !defined __MORPHOS__
   return widget_get_filename( title, 1 );
+#else
+  return amiga_asl( title, TRUE );
+#endif
 }
 
 static int widget_add_filename( int *allocated, int *number,
@@ -207,8 +215,8 @@ static int widget_add_filename( int *allocated, int *number,
 }
 
 #if defined AMIGA || defined __MORPHOS__
-static char *
-amiga_asl( char *title ) {
+char *
+amiga_asl( char *title, BOOL is_saving ) {
   char *filename;
   struct FileRequester *filereq;
 
@@ -243,7 +251,7 @@ amiga_asl( char *title ) {
 #else				/* #ifndef __MORPHOS__ */
         AddPart( filename, filereq->fr_File, 1024 );
 #endif				/* #ifndef __MORPHOS__ */
-        widget_filesel_name = strdup( filename );
+        widget_filesel_name = utils_safe_strdup( filename );
 #ifndef __MORPHOS__
         IExec->FreeVec( filename );
 #else				/* #ifndef __MORPHOS__ */
@@ -499,8 +507,7 @@ widget_filesel_draw( void *data )
   /* Show all the filenames */
   widget_print_all_filenames( widget_filenames, widget_numfiles,
 			      top_left_file, current_file, directory );
-#else  /* ifndef AMIGA */
-  amiga_asl(title);
+
 #endif /* ifndef AMIGA */
 
   return 0;
@@ -901,11 +908,7 @@ widget_filesel_keyhandler( input_key key )
         strcat( fn, FUSE_DIR_SEP_STR );
         strcat( fn, widget_text_text );
       } else {						/* absolute name */
-	fn = strdup( widget_text_text );
-        if( !fn ) {
-	  widget_end_widget( WIDGET_FINISHED_CANCEL );
-	  return;
-        }
+	fn = utils_safe_strdup( widget_text_text );
       }
       widget_filesel_name = fn;
       if( exit_all_widgets ) {

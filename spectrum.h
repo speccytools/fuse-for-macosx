@@ -1,5 +1,5 @@
 /* spectrum.h: Spectrum 48K specific routines
-   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -30,14 +30,13 @@
 
 #include <libspectrum.h>
 
+#include "memory.h"
+
 /* How many tstates have elapsed since the last interrupt? (or more
    precisely, since the ULA last pulled the /INT line to the Z80 low) */
 extern libspectrum_dword tstates;
 
 /* Things relating to memory */
-
-/* For the Pentagon 1024 we need 1040 KB of RAM */
-#define SPECTRUM_RAM_PAGES 65
 
 extern libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 
@@ -67,6 +66,8 @@ typedef struct spectrum_raminfo {
 
   int romcs;			/* Is the /ROMCS line low? */
 
+  int valid_pages;		/* Available RAM */
+
 } spectrum_raminfo;
 
 libspectrum_byte spectrum_contend_delay_none( libspectrum_dword time );
@@ -80,7 +81,7 @@ libspectrum_byte spectrum_unattached_port_none( void );
 
 extern int spectrum_frame_event;
 
-int spectrum_init( void );
+void spectrum_init( void );
 int spectrum_frame( void );
 
 #endif			/* #ifndef FUSE_SPECTRUM_H */

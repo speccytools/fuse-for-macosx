@@ -1,5 +1,5 @@
 /* specplus2.c: Spectrum +2 specific routines
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -29,9 +29,10 @@
 
 #include <libspectrum.h>
 
-#include "disk/beta.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "machines.h"
+#include "peripherals/disk/beta.h"
 #include "settings.h"
 #include "spec128.h"
 #include "spec48.h"
@@ -51,6 +52,7 @@ int specplus2_init( fuse_machine_info *machine )
   machine->ram.port_from_ula	     = spec48_port_from_ula;
   machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
+  machine->ram.valid_pages	     = 8;
 
   machine->unattached_port = spectrum_unattached_port;
 
@@ -66,27 +68,20 @@ specplus2_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus2_0,
+  error = machine_load_rom( 0, settings_current.rom_plus2_0,
                             settings_default.rom_plus2_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus2_1,
+  error = machine_load_rom( 1, settings_current.rom_plus2_1,
                             settings_default.rom_plus2_1, 0x4000 );
   if( error ) return error;
 
   error = spec128_common_reset( 1 );
   if( error ) return error;
 
-  error = periph_setup( spec128_peripherals, spec128_peripherals_count );
-  if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_opus( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
+  periph_clear();
+  machines_periph_128();
   periph_update();
 
-  periph_register_beta128();
   beta_builtin = 0;
 
   spec48_common_display_setup();

@@ -27,8 +27,8 @@
 
 #include "fuse.h"
 #include "input.h"
-#include "joystick.h"
 #include "keyboard.h"
+#include "peripherals/joystick.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
@@ -200,7 +200,7 @@ do_joystick( const input_event_joystick_t *joystick_event, int press )
 #ifndef GEKKO /* Home button opens the menu on Wii */
   switch( joystick_event->button ) {
   case INPUT_JOYSTICK_FIRE_2:
-    if( press ) ui_widget_keyhandler( INPUT_KEY_F1 );
+    if( press ) ui_popup_menu( INPUT_KEY_F1 );
     break;
 
   default: break;		/* Remove gcc warning */

@@ -50,13 +50,11 @@ static libspectrum_ide_register port_to_ide_register( libspectrum_byte port );
 
 /* Data */
 
-const periph_t divide_peripherals[] = {
+static const periph_t divide_peripherals[] = {
   { 0x00e3, 0x00a3, divide_ide_read, divide_ide_write },
   { 0x00ff, 0x00e3, NULL, divide_control_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t divide_peripherals_count =
-  sizeof( divide_peripherals ) / sizeof( periph_t );
 
 static const libspectrum_byte DIVIDE_CONTROL_CONMEM = 0x80;
 static const libspectrum_byte DIVIDE_CONTROL_MAPRAM = 0x40;
@@ -131,6 +129,8 @@ divide_init( void )
   module_register( &divide_module_info );
   for( i = 0; i < 2; i++ ) divide_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_DIVIDE, &settings_current.divide_enabled,
+                        divide_peripherals );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;
@@ -257,7 +257,6 @@ libspectrum_byte
 divide_ide_read( libspectrum_word port, int *attached )
 {
   int ide_register;
-  if( !settings_current.divide_enabled ) return 0xff;
 
   *attached = 1;
   ide_register = port_to_ide_register( port );
@@ -269,7 +268,6 @@ static void
 divide_ide_write( libspectrum_word port, libspectrum_byte data )
 {
   int ide_register;
-  if( !settings_current.divide_enabled ) return;
   
   ide_register = port_to_ide_register( port );
   
@@ -281,8 +279,6 @@ divide_control_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   int old_mapram;
 
-  if( !settings_current.divide_enabled ) return;
-  
   /* MAPRAM bit cannot be reset, only set */
   old_mapram = divide_control & DIVIDE_CONTROL_MAPRAM;
   divide_control_write_internal( data | old_mapram );

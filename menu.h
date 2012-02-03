@@ -87,6 +87,7 @@ MENU_DETAIL( menu_tape_detail );
 MENU_CALLBACK_WITH_ACTION( menu_media_insert_new );
 MENU_CALLBACK_WITH_ACTION( menu_media_insert );
 MENU_CALLBACK_WITH_ACTION( menu_media_eject );
+MENU_CALLBACK_WITH_ACTION( menu_media_save );
 MENU_CALLBACK_WITH_ACTION( menu_media_flip );
 MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect );
 
@@ -129,7 +130,8 @@ MENU_CALLBACK( menu_file_movie_record_recordfromrzx );
 
 MENU_CALLBACK( menu_options_general );
 MENU_CALLBACK( menu_options_sound );
-MENU_CALLBACK( menu_options_peripherals );
+MENU_CALLBACK( menu_options_peripherals_general );
+MENU_CALLBACK( menu_options_peripherals_disk );
 MENU_CALLBACK( menu_options_rzx );
 MENU_CALLBACK( menu_options_movie );
 MENU_CALLBACK( menu_options_diskoptions );
@@ -143,6 +145,8 @@ MENU_DETAIL( menu_opus1_detail );
 MENU_DETAIL( menu_opus2_detail );
 MENU_DETAIL( menu_plusd1_detail );
 MENU_DETAIL( menu_plusd2_detail );
+MENU_DETAIL( menu_disciple1_detail );
+MENU_DETAIL( menu_disciple2_detail );
 MENU_CALLBACK_WITH_ACTION( menu_options_joysticks_select );
 MENU_DETAIL( menu_keyboard_joystick_detail );
 MENU_DETAIL( menu_joystick_1_detail );
@@ -154,6 +158,7 @@ MENU_CALLBACK( menu_machine_select );
 MENU_DETAIL( menu_machine_detail );
 MENU_CALLBACK( menu_machine_debugger );
 MENU_CALLBACK( menu_machine_pokefinder );
+MENU_CALLBACK( menu_machine_pokememory );
 MENU_CALLBACK( menu_machine_memorybrowser );
 
 MENU_CALLBACK( menu_help_keyboard );

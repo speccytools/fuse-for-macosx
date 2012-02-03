@@ -59,13 +59,11 @@ static void zxcf_ide_write( libspectrum_word port, libspectrum_byte data );
 
 /* Data */
 
-const periph_t zxcf_peripherals[] = {
+static const periph_t zxcf_peripherals[] = {
   { 0x10f4, 0x10b4, zxcf_memctl_read, zxcf_memctl_write },
   { 0x10f4, 0x00b4, zxcf_ide_read, zxcf_ide_write },
+  { 0, 0, NULL, NULL }
 };
-
-const size_t zxcf_peripherals_count =
-  sizeof( zxcf_peripherals ) / sizeof( periph_t );
 
 static int zxcf_writeenable;
 
@@ -119,6 +117,8 @@ zxcf_init( void )
   module_register( &zxcf_module_info );
   for( i = 0; i < 2; i++ ) zxcf_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_ZXCF, &settings_current.zxcf_active,
+                        zxcf_peripherals );
   if( periph_register_paging_events( event_type_string, &page_event,
 				     &unpage_event ) )
     return 1;
@@ -209,8 +209,6 @@ set_zxcf_bank( int bank )
 static libspectrum_byte
 zxcf_memctl_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !settings_current.zxcf_active ) return 0xff;
-
   *attached = 1;
 
   return 0xff;
@@ -220,8 +218,6 @@ static void
 zxcf_memctl_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   int was_paged = machine_current->ram.romcs;
-
-  if( !settings_current.zxcf_active ) return;
 
   last_memctl = data;
 
@@ -251,8 +247,6 @@ zxcf_ide_read( libspectrum_word port, int *attached )
 {
   libspectrum_ide_register idereg = ( port >> 8 ) & 0x07;
   
-  if( !settings_current.zxcf_active ) return 0xff;
-
   *attached = 1;
 
   return libspectrum_ide_read( zxcf_idechn, idereg ); 
@@ -263,8 +257,6 @@ zxcf_ide_write( libspectrum_word port, libspectrum_byte data )
 {
   libspectrum_ide_register idereg;
   
-  if( !settings_current.zxcf_active ) return;
-
   idereg = ( port >> 8 ) & 0x07;
   libspectrum_ide_write( zxcf_idechn, idereg, data ); 
 }

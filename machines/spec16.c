@@ -1,5 +1,5 @@
 /* spec16.c: Spectrum 16K specific routines
-   Copyright (c) 1999-2009 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -30,30 +30,18 @@
 
 #include <libspectrum.h>
 
-#include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
-#include "printer.h"
 #include "settings.h"
 #include "spec48.h"
-#include "ula.h"
-#include "if1.h"
 
 static int spec16_reset( void );
 
-static libspectrum_byte empty_chunk[ MEMORY_PAGE_SIZE ];
-static memory_page empty_mapping;
-
-static const periph_t peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
-  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
+static memory_page empty_mapping[MEMORY_PAGES_IN_16K];
+static int empty_mapping_allocated = 0;
 
 int spec16_init( fuse_machine_info *machine )
 {
@@ -66,14 +54,7 @@ int spec16_init( fuse_machine_info *machine )
   machine->ram.port_from_ula  = spec48_port_from_ula;
   machine->ram.contend_delay  = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
-
-  memset( empty_chunk, 0xff, MEMORY_PAGE_SIZE );
-
-  empty_mapping.page = empty_chunk;
-  empty_mapping.writable = 0;
-  empty_mapping.contended = 0;
-  empty_mapping.bank = MEMORY_BANK_NONE;
-  empty_mapping.source = MEMORY_SOURCE_SYSTEM;
+  machine->ram.valid_pages    = 1;
 
   machine->unattached_port = spectrum_unattached_port;
 
@@ -84,46 +65,49 @@ int spec16_init( fuse_machine_info *machine )
   return 0;
 }
 
+static void
+ensure_empty_mapping( void )
+{
+  int i;
+
+  if( empty_mapping_allocated ) return;
+
+  libspectrum_byte *empty_chunk = memory_pool_allocate_persistent( 0x4000, 1 );
+  memset( empty_chunk, 0xff, 0x4000 );
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
+    memory_page *page = &empty_mapping[i];
+    page->page = empty_chunk + i * MEMORY_PAGE_SIZE;
+    page->writable = 0;
+    page->contended = 0;
+    page->source = memory_source_none;
+  }
+
+  empty_mapping_allocated = 1;
+}
+
 static int
 spec16_reset( void )
 {
   int error;
-  size_t i;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_16, 
+  error = machine_load_rom( 0, settings_current.rom_16, 
                             settings_default.rom_16, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
-  if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_opus( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_melodik( PERIPH_PRESENT_OPTIONAL );
+  ensure_empty_mapping();
+
+  periph_clear();
+  machines_periph_48();
   periph_update();
 
-  /* ROM 0, RAM 5, nothing, nothing */
-  memory_map_home[0] = &memory_map_rom[ 0];
-  memory_map_home[1] = &memory_map_rom[ 1];
+  /* The one RAM page is contended */
+  memory_ram_set_16k_contention( 5, 1 );
 
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
-  memory_map_home[4] = memory_map_home[5] = &empty_mapping;
-  memory_map_home[6] = memory_map_home[7] = &empty_mapping;
-
-  /* The RAM page is present/writable and contended */
-  for( i = 2; i <= 3; i++ ) {
-    memory_map_home[ i ]->writable = 1;
-    memory_map_home[ i ]->contended = 1;
-  }
-
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
+  memory_map_16k( 0x0000, memory_map_rom, 0 );
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
+  memory_map_16k( 0x8000, empty_mapping, 0 );
+  memory_map_16k( 0xc000, empty_mapping, 0 );
 
   memory_current_screen = 5;
   memory_screen_mask = 0xffff;

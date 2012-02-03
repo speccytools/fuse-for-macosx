@@ -1,5 +1,5 @@
 /* memory.h: memory access routines
-   Copyright (c) 2003-2004 Philip Kendall
+   Copyright (c) 2003-2011 Philip Kendall
 
    $Id$
 
@@ -28,27 +28,22 @@
 
 #include <libspectrum.h>
 
-#include "spectrum.h"
+/* Register a new memory source */
+int memory_source_register( const char *description );
 
-typedef enum memory_bank {
+/* Get the description for a given source */
+const char *memory_source_description( int source );
 
-  MEMORY_BANK_NONE,
+/* Get the source for a given description */
+int memory_source_find( const char *description );
 
-  MEMORY_BANK_HOME,
-  MEMORY_BANK_DOCK,
-  MEMORY_BANK_EXROM,
-  MEMORY_BANK_ROMCS,
-  
-} memory_bank;
-
-typedef enum memory_page_source {
-
-  MEMORY_SOURCE_SYSTEM,
-  MEMORY_SOURCE_CARTRIDGE,
-  MEMORY_SOURCE_PERIPHERAL,
-  MEMORY_SOURCE_CUSTOMROM,
-  
-} memory_page_source;
+/* Pre-created memory sources */
+extern int memory_source_rom; /* System ROM */
+extern int memory_source_ram; /* System RAM */
+extern int memory_source_dock; /* Timex DOCK */
+extern int memory_source_exrom; /* Timex EXROM */
+extern int memory_source_any; /* Used by the debugger to signify an absolute address */
+extern int memory_source_none; /* No memory attached here */
 
 typedef struct memory_page {
 
@@ -56,28 +51,52 @@ typedef struct memory_page {
   int writable;			/* Can we write to this data? */
   int contended;		/* Are reads/writes to this page contended? */
 
-  memory_bank bank;		/* Which bank is mapped in here */
-  int page_num;			/* Which page from the bank */
-  libspectrum_word offset;	/* How far into the page this chunk starts */
+  int source;	                /* Where did this page come from? */
+  int save_to_snapshot;         /* Set if this page should be saved snapshots
+                                   (set only if this page would not normally be
+                                    saved; things like RAM are always saved) */
 
-  memory_page_source source;	/* Where did this page come from? */
+  int page_num;			/* Which page from the source */
+  libspectrum_word offset;	/* How far into the page this chunk starts */
 
 } memory_page;
 
-#define MEMORY_PAGE_SIZE 0x2000
+/* A memory page will be 1 << (this many) bytes in size
+   ie 12 => 4 Kb, 13 => 8 Kb, 14 => 16 Kb
+ */
+#define MEMORY_PAGE_SIZE_LOGARITHM 12
 
-/* Each 8Kb RAM chunk accessible by the Z80 */
-extern memory_page memory_map_read[8];
-extern memory_page memory_map_write[8];
+/* The actual size of a memory page */
+#define MEMORY_PAGE_SIZE ( 1 << MEMORY_PAGE_SIZE_LOGARITHM )
 
-/* 8 8Kb memory chunks accessible by the Z80 for normal RAM (home) and
-   the Timex Dock and Exrom */
-extern memory_page *memory_map_home[8];
-extern memory_page *memory_map_dock[8];
-extern memory_page *memory_map_exrom[8];
+/* The mask to use to select the bits within a page */
+#define MEMORY_PAGE_SIZE_MASK ( MEMORY_PAGE_SIZE - 1 )
 
-extern memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
-extern memory_page memory_map_rom[ 8];
+/* The number of memory pages in 64K
+   This calculation is equivalent to 2^16 / MEMORY_PAGE_SIZE */
+#define MEMORY_PAGES_IN_64K ( 1 << ( 16 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
+/* The number of memory pages in 16K */
+#define MEMORY_PAGES_IN_16K ( 1 << ( 14 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
+/* The number of memory pages in 8K */
+#define MEMORY_PAGES_IN_8K ( 1 << ( 13 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
+/* The number of memory pages in 4K */
+#define MEMORY_PAGES_IN_4K ( 1 << ( 12 - MEMORY_PAGE_SIZE_LOGARITHM ) )
+
+/* Each RAM chunk accessible by the Z80 */
+extern memory_page memory_map_read[MEMORY_PAGES_IN_64K];
+extern memory_page memory_map_write[MEMORY_PAGES_IN_64K];
+
+/* The number of 16Kb RAM pages we support: 1040 Kb needed for the Pentagon 1024 */
+#define SPECTRUM_RAM_PAGES 65
+
+/* The maximum number of 16Kb ROMs we support */
+#define SPECTRUM_ROM_PAGES 4
+
+extern memory_page memory_map_ram[SPECTRUM_RAM_PAGES * MEMORY_PAGES_IN_16K];
+extern memory_page memory_map_rom[SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K];
 
 /* Which RAM page contains the current screen */
 extern int memory_current_screen;
@@ -85,17 +104,42 @@ extern int memory_current_screen;
 /* Which bits to look at when working out where the screen is */
 extern libspectrum_word memory_screen_mask;
 
-int memory_init( void );
+void memory_init( void );
+void memory_end( void );
 libspectrum_byte *memory_pool_allocate( size_t length );
+libspectrum_byte *memory_pool_allocate_persistent( size_t length,
+                                                   int persistent );
 void memory_pool_free( void );
-
-const char *memory_bank_name( memory_page *page );
 
 /* Map in alternate bank if ROMCS is set */
 void memory_romcs_map( void );
 
 /* Have we loaded any custom ROMs? */
 int memory_custom_rom( void );
+
+/* Reset any memory configuration that may have changed in the machine
+   configuration */
+void memory_reset( void );
+
+/* Set contention for 16K of RAM */
+void memory_ram_set_16k_contention( int page_num, int contended );
+
+/* Map 16K of memory */
+void memory_map_16k( libspectrum_word address, memory_page *source,
+  int page_num );
+
+/* Map 8K of memory */
+void memory_map_8k( libspectrum_word address, memory_page *source,
+  int page_num );
+
+/* Page in from /ROMCS */
+void memory_map_romcs( memory_page *source );
+
+/* Page in 8K from /ROMCS */
+void memory_map_romcs_8k( libspectrum_word address, memory_page *source );
+
+/* Page in 4K from /ROMCS */
+void memory_map_romcs_4k( libspectrum_word address, memory_page *source );
 
 libspectrum_byte readbyte( libspectrum_word address );
 
@@ -105,7 +149,7 @@ libspectrum_byte readbyte( libspectrum_word address );
 #ifndef CORETEST
 
 #define readbyte_internal( address ) \
-  memory_map_read[ (libspectrum_word)(address) >> 13 ].page[ (address) & 0x1fff ]
+  memory_map_read[ (libspectrum_word)(address) >> MEMORY_PAGE_SIZE_LOGARITHM ].page[ (address) & MEMORY_PAGE_SIZE_MASK ]
 
 #else				/* #ifndef CORETEST */
 

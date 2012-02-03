@@ -27,22 +27,23 @@
 
 #include <libspectrum.h>
 
-#include "dck.h"
-#include "disk/beta.h"
-#include "disk/opus.h"
-#include "disk/plusd.h"
 #include "event.h"
 #include "fuse.h"
-#include "ide/divide.h"
-#include "ide/simpleide.h"
-#include "ide/zxatasp.h"
-#include "ide/zxcf.h"
-#include "if1.h"
-#include "if2.h"
-#include "joystick.h"
 #include "menu.h"
 #include "movie.h"
 #include "machines/specplus3.h"
+#include "peripherals/dck.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/disk/disciple.h"
+#include "peripherals/disk/opus.h"
+#include "peripherals/disk/plusd.h"
+#include "peripherals/ide/divide.h"
+#include "peripherals/ide/simpleide.h"
+#include "peripherals/ide/zxatasp.h"
+#include "peripherals/ide/zxcf.h"
+#include "peripherals/if1.h"
+#include "peripherals/if2.h"
+#include "peripherals/joystick.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
@@ -221,6 +222,7 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_select )
   case 16: menu_select_roms_with_title( "Interface I",     40, 1 ); return;
   case 17: menu_select_roms_with_title( "Beta 128",        41, 1 ); return;
   case 18: menu_select_roms_with_title( "+D",              42, 1 ); return;
+  case 19: menu_select_roms_with_title( "SpeccyBoot",      43, 1 ); return;
 
   }
 
@@ -382,6 +384,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert_new )
   case 4:
     opus_disk_insert( which, NULL, 0 );
     break;
+  case 5:
+    disciple_disk_insert( which, NULL, 0 );
+    break;
   }
 }
 
@@ -413,6 +418,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   case 4:
     snprintf( title, 80, "Fuse - Insert Opus Disk %i", which + 1 );
     break;
+  case 5:
+    snprintf( title, 80, "Fuse - Insert DISCiPLE Disk %i", which + 1 );
+    break;
   default:
     return;
   }
@@ -435,6 +443,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
   case 4:
     opus_disk_insert( which, filename, 0 );
     break;
+  case 5:
+    disciple_disk_insert( which, filename, 0 );
+    break;
   }
 
   free( filename );
@@ -444,30 +455,65 @@ MENU_CALLBACK_WITH_ACTION( menu_media_insert )
 
 MENU_CALLBACK_WITH_ACTION( menu_media_eject )
 {
-  int which, write, type;
+  int which, type;
 
   ui_widget_finish();
 
   action--;
   which = action & 0x00f;
   type = ( action & 0x0f0 ) >> 4;
-  write = !!( action & 0x100 );
 
   switch( type ) {
   case 0:
-    specplus3_disk_eject( which, write );
+    specplus3_disk_eject( which );
     break;
   case 1:
-    beta_disk_eject( which, write );
+    beta_disk_eject( which );
     break;
   case 2:
-    plusd_disk_eject( which, write );
+    plusd_disk_eject( which );
     break;
   case 3:
-    if1_mdr_eject( which, write );
+    if1_mdr_eject( which );
     break;
   case 4:
-    opus_disk_eject( which, write );
+    opus_disk_eject( which );
+    break;
+  case 5:
+    disciple_disk_eject( which );
+    break;
+  }
+}
+
+MENU_CALLBACK_WITH_ACTION( menu_media_save )
+{
+  int which, saveas, type;
+
+  ui_widget_finish();
+
+  action--;
+  which = action & 0x00f;
+  type = ( action & 0x0f0 ) >> 4;
+  saveas = ( action & 0xf00 ) >> 8;
+
+  switch( type ) {
+  case 0:
+    specplus3_disk_save( which, saveas );
+    break;
+  case 1:
+    beta_disk_save( which, saveas );
+    break;
+  case 2:
+    plusd_disk_save( which, saveas );
+    break;
+  case 3:
+    if1_mdr_save( which, saveas );
+    break;
+  case 4:
+    opus_disk_save( which, saveas );
+    break;
+  case 5:
+    disciple_disk_save( which, saveas );
     break;
   }
 }
@@ -493,8 +539,12 @@ MENU_CALLBACK_WITH_ACTION( menu_media_flip )
   case 2:
     plusd_disk_flip( which, flip );
     break;
+  /* No flip option for IF1 */
   case 4:
     opus_disk_flip( which, flip );
+    break;
+  case 5:
+    disciple_disk_flip( which, flip );
     break;
   }
 }
@@ -525,6 +575,9 @@ MENU_CALLBACK_WITH_ACTION( menu_media_writeprotect )
     break;
   case 4:
     opus_disk_writeprotect( which, wrprot );
+    break;
+  case 5:
+    disciple_disk_writeprotect( which, wrprot );
     break;
   }
 
@@ -850,38 +903,44 @@ menu_check_media_changed( void )
 
   confirm = tape_close(); if( confirm ) return 1;
 
-  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A, 0 );
+  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_A );
   if( confirm ) return 1;
 
-  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B, 0 );
+  confirm = specplus3_disk_eject( SPECPLUS3_DRIVE_B );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_A, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_A );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_B, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_B );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_C, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_C );
   if( confirm ) return 1;
 
-  confirm = beta_disk_eject( BETA_DRIVE_D, 0 );
+  confirm = beta_disk_eject( BETA_DRIVE_D );
   if( confirm ) return 1;
 
-  confirm = opus_disk_eject( OPUS_DRIVE_1, 0 );
+  confirm = opus_disk_eject( OPUS_DRIVE_1 );
   if( confirm ) return 1;
 
-  confirm = opus_disk_eject( OPUS_DRIVE_2, 0 );
+  confirm = opus_disk_eject( OPUS_DRIVE_2 );
   if( confirm ) return 1;
 
-  confirm = plusd_disk_eject( PLUSD_DRIVE_1, 0 );
+  confirm = plusd_disk_eject( PLUSD_DRIVE_1 );
   if( confirm ) return 1;
 
-  confirm = plusd_disk_eject( PLUSD_DRIVE_2, 0 );
+  confirm = plusd_disk_eject( PLUSD_DRIVE_2 );
+  if( confirm ) return 1;
+
+  confirm = disciple_disk_eject( DISCIPLE_DRIVE_1 );
+  if( confirm ) return 1;
+
+  confirm = disciple_disk_eject( DISCIPLE_DRIVE_2 );
   if( confirm ) return 1;
 
   for( i = 0; i < 8; i++ ) {
-    confirm = if1_mdr_eject( i, 0 );
+    confirm = if1_mdr_eject( i );
     if( confirm ) return 1;
   }
 
@@ -1063,6 +1122,22 @@ const char*
 menu_plusd2_detail( void )
 {
   fdd_t *f = plusd_get_fdd( PLUSD_DRIVE_2 );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_disciple1_detail( void )
+{
+  fdd_t *f = disciple_get_fdd( DISCIPLE_DRIVE_1 );
+
+  return menu_disk_detail( f );
+}
+
+const char*
+menu_disciple2_detail( void )
+{
+  fdd_t *f = disciple_get_fdd( DISCIPLE_DRIVE_2 );
 
   return menu_disk_detail( f );
 }

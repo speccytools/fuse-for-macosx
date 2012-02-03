@@ -30,7 +30,9 @@
 #include <libspectrum.h>
 
 #include "event.h"
+#include "fuse.h"
 #include "ui/ui.h"
+#include "utils.h"
 
 /* A large value to mean `no events due' */
 static const libspectrum_dword event_no_events = 0xffffffff;
@@ -54,20 +56,14 @@ typedef struct event_descriptor_t {
 
 static GArray *registered_events;
 
-int
+void
 event_init( void )
 {
   registered_events = g_array_new( FALSE, FALSE, sizeof( event_descriptor_t ) );
-  if( !registered_events ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
-    return 1;
-  }
 
   event_type_null = event_register( NULL, "[Deleted event]" );
-  if( event_type_null == -1 ) return 1;
 
   event_next_event = event_no_events;
-  return 0;
 }
 
 int
@@ -76,11 +72,7 @@ event_register( event_fn_t fn, const char *description )
   event_descriptor_t descriptor;
 
   descriptor.fn = fn;
-  descriptor.description = strdup( description );
-  if( !descriptor.description ) {
-    ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
-    return -1;
-  }
+  descriptor.description = utils_safe_strdup( description );
 
   g_array_append_val( registered_events, descriptor );
 
@@ -97,7 +89,7 @@ event_add_cmp( gconstpointer a1, gconstpointer b1 )
 }
 
 /* Add an event at the correct place in the event list */
-int
+void
 event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
 {
   event_t *ptr;
@@ -107,7 +99,10 @@ event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
     event_free = NULL;
   } else {
     ptr = malloc( sizeof( *ptr ) );
-    if( !ptr ) return 1;
+    if( !ptr ) {
+      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d", __FILE__, __LINE__ );
+      fuse_abort();
+    }
   }
 
   ptr->tstates = event_time;
@@ -120,8 +115,6 @@ event_add_with_data( libspectrum_dword event_time, int type, void *user_data )
   } else {
     event_list = g_slist_insert_sorted( event_list, ptr, event_add_cmp );
   }
-
-  return 0;
 }
 
 /* Do all events which have passed */
@@ -264,9 +257,27 @@ event_name( int type )
   return g_array_index( registered_events, event_descriptor_t, type ).description;
 }
 
+void
+registered_events_free( void )
+{
+  int i;
+  event_descriptor_t descriptor;
+
+  if( !registered_events ) return;
+
+  for( i = 0; i < registered_events->len; i++ ) {
+    descriptor = g_array_index( registered_events, event_descriptor_t, i );
+    free( descriptor.description );
+  }
+
+  g_array_free( registered_events, TRUE );
+  registered_events = NULL;
+}
+
 /* Tidy-up function called at end of emulation */
 void
 event_end( void )
 {
-  return event_reset();
+  event_reset();
+  registered_events_free();
 }

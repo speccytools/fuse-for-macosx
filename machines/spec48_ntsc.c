@@ -1,7 +1,7 @@
 /* spec48_ntsc.c: NTSC Spectrum 48K specific routines
-   Copyright (c) 1999-2009 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
-   $Id: spec48.c 3566 2008-03-18 12:59:16Z pak21 $
+   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,27 +29,16 @@
 
 #include <libspectrum.h>
 
-#include "joystick.h"
 #include "machine.h"
+#include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
-#include "printer.h"
 #include "settings.h"
 #include "spec48.h"
 #include "spectrum.h"
-#include "ula.h"
-#include "if1.h"
 
 static int spec48_ntsc_reset( void );
-
-static const periph_t peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
-  { 0x0004, 0x0000, printer_zxp_read, printer_zxp_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
 
 int spec48_ntsc_init( fuse_machine_info *machine )
 {
@@ -62,6 +51,7 @@ int spec48_ntsc_init( fuse_machine_info *machine )
   machine->ram.port_from_ula         = spec48_port_from_ula;
   machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
+  machine->ram.valid_pages	     = 3;
 
   machine->unattached_port = spectrum_unattached_port;
 
@@ -78,20 +68,12 @@ spec48_ntsc_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_48,
+  error = machine_load_rom( 0, settings_current.rom_48,
                             settings_default.rom_48, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
-  if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_opus( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_melodik( PERIPH_PRESENT_OPTIONAL );
+  periph_clear();
+  machines_periph_48();
   periph_update();
 
   memory_current_screen = 5;

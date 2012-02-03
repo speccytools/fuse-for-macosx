@@ -1,5 +1,5 @@
-The Free Unix Spectrum Emulator (Fuse) 0.10.0.2
-===============================================
+The Free Unix Spectrum Emulator (Fuse) 1.0.0
+============================================
 
 Fuse (the Free Unix Spectrum Emulator) was originally, and somewhat
 unsurprisingly, an emulator of the ZX Spectrum (a popular 1980s home
@@ -64,6 +64,8 @@ Mac OS X
 
 * Either the native port by Fredrick Meunier, or the original version
   will compile on OS X 10.3 (Panther) or later.
+* On Mac OS X Lion you will need to use clang as gcc-llvm-4.2.1 fails to
+  correctly compile z80_ops.c.
 
 Windows
 
@@ -90,7 +92,7 @@ of things; however, it isn't necessary as libspectrum provides
 replacements for all the routines used by Fuse.
 
 Another useful option is `--with-local-prefix=DIRECTORY' which allows
-you to specify that you have some the the libraries needed by Fuse in
+you to specify that you have some of the libraries needed by Fuse in
 `<DIRECTORY>/lib' and the necessary header files in
 `<DIRECTORY>/include'. If you specify the `--prefix' option to tell
 Fuse to install itself somewhere other than in /usr/local, that
@@ -209,11 +211,11 @@ http://lists.sourceforge.net/lists/listinfo/fuse-emulator-devel
 and the Fuse project page on SourceForge,
 http://sourceforge.net/projects/fuse-emulator/
 
-If you're interested in more general Speccy related discussions, visit
-the Usenet group 'comp.sys.sinclair', but do read the FAQ
-( http://www.worldofspectrum.org/faq/index.html ) first!
+For Spectrum discussions not directly related to Fuse, visit either the
+Usenet newsgroup `comp.sys.sinclair' or the World of Spectrum forums
+<http://www.worldofspectrum.org/forums/>.
 
 Philip Kendall <philip-fuse@shadowmagic.org.uk>
-14 January 2009
+16 December 2010
 
 $Id$

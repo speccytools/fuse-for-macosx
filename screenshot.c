@@ -33,14 +33,13 @@
 
 #include "display.h"
 #include "machine.h"
+#include "peripherals/scld.h"
 #include "screenshot.h"
-#include "scld.h"
 #include "settings.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
 #include "utils.h"
 
-#define STANDARD_SCR_SIZE 6912
 #define MONO_BITMAP_SIZE 6144
 #define HICOLOUR_SCR_SIZE (2 * MONO_BITMAP_SIZE)
 #define HIRES_ATTR HICOLOUR_SCR_SIZE
@@ -49,6 +48,9 @@
 #ifdef USE_LIBPNG
 
 #include <png.h>
+#ifdef HAVE_ZLIB_H
+#include <zlib.h>
+#endif				/* #ifdef HAVE_ZLIB_H */
 
 static int get_rgb32_data( libspectrum_byte *rgb32_data, size_t stride,
 			   size_t height, size_t width );

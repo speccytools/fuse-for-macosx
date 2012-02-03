@@ -1,5 +1,5 @@
 /* memory.c: Routines for accessing memory
-   Copyright (c) 1999-2004 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -31,33 +31,44 @@
 
 #include "debugger/debugger.h"
 #include "display.h"
-#include "disk/opus.h"
 #include "fuse.h"
 #include "machines/spec128.h"
 #include "memory.h"
 #include "module.h"
+#include "peripherals/disk/opus.h"
+#include "peripherals/spectranet.h"
+#include "peripherals/ula.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "ui/ui.h"
-#include "ula.h"
+#include "utils.h"
 
-/* Each 8Kb RAM chunk accessible by the Z80 */
-memory_page memory_map_read[8];
-memory_page memory_map_write[8];
+/* The various sources of memory available to us */
+static GArray *memory_sources;
 
-/* Mappings for the 'home' (normal ROM/RAM) pages, the Timex DOCK and
-   the Timex EXROM */
-memory_page *memory_map_home[8];
-memory_page *memory_map_dock[8];
-memory_page *memory_map_exrom[8];
+/* Some "well-known" memory sources */
+int memory_source_rom; /* System ROM */
+int memory_source_ram; /* System RAM */
+int memory_source_dock; /* Timex DOCK */
+int memory_source_exrom; /* Timex EXROM */
+int memory_source_any; /* Used by the debugger to signify an absolute address */
+int memory_source_none; /* No memory attached here */
+
+/* Each RAM chunk accessible by the Z80 */
+memory_page memory_map_read[MEMORY_PAGES_IN_64K];
+memory_page memory_map_write[MEMORY_PAGES_IN_64K];
 
 /* Standard mappings for the 'normal' RAM */
-memory_page memory_map_ram[ 2 * SPECTRUM_RAM_PAGES ];
-
-#define SPECTRUM_ROM_PAGES 4
+memory_page memory_map_ram[SPECTRUM_RAM_PAGES * MEMORY_PAGES_IN_16K];
 
 /* Standard mappings for the ROMs */
-memory_page memory_map_rom[ 2 * SPECTRUM_ROM_PAGES ];
+memory_page memory_map_rom[SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K];
+
+/* Some allocated memory */
+typedef struct memory_pool_entry_t {
+  int persistent;
+  libspectrum_byte *memory;
+} memory_pool_entry_t;
 
 /* All the memory we've allocated for this machine */
 static GSList *pool;
@@ -84,98 +95,231 @@ static module_info_t memory_module_info = {
 /* Set up the information about the normal page mappings.
    Memory contention and usable pages vary from machine to machine and must
    be set in the appropriate _reset function */
-int
+void
 memory_init( void )
 {
-  size_t i;
-  memory_page *mapping1, *mapping2;
+  size_t i, j;
+
+  memory_sources = g_array_new( FALSE, FALSE, sizeof( const char* ) );
+
+  memory_source_rom = memory_source_register( "ROM" );
+  memory_source_ram = memory_source_register( "RAM" );
+  memory_source_dock = memory_source_register( "Timex Dock" );
+  memory_source_exrom = memory_source_register( "Timex EXROM" );
+  memory_source_any = memory_source_register( "Absolute address" );
+  memory_source_none = memory_source_register( "None" );
 
   /* Nothing in the memory pool as yet */
   pool = NULL;
 
-  for( i = 0; i < 8; i++ ) {
-
-    mapping1 = &memory_map_rom[ i ];
-
-    mapping1->page = NULL;
-    mapping1->writable = 0;
-    mapping1->bank = MEMORY_BANK_HOME;
-    mapping1->page_num = i;
-    mapping1->source = MEMORY_SOURCE_SYSTEM;
-
-  }
-
-  for( i = 0; i < SPECTRUM_RAM_PAGES; i++ ) {
-
-    mapping1 = &memory_map_ram[ 2 * i     ];
-    mapping2 = &memory_map_ram[ 2 * i + 1 ];
-
-    mapping1->page = &RAM[i][ 0x0000 ];
-    mapping2->page = &RAM[i][ MEMORY_PAGE_SIZE ];
-
-    mapping1->writable = mapping2->writable = 0;
-    mapping1->bank = mapping2->bank = MEMORY_BANK_HOME;
-    mapping1->page_num = mapping2->page_num = i;
-
-    mapping1->offset = 0x0000;
-    mapping2->offset = MEMORY_PAGE_SIZE;
-
-    mapping1->source = mapping2->source = MEMORY_SOURCE_SYSTEM;
-  }
-
-  /* Just initialise these with something */
-  for( i = 0; i < 8; i++ )
-    memory_map_home[i] = memory_map_dock[i] = memory_map_exrom[i] =
-      &memory_map_ram[0];
+  for( i = 0; i < SPECTRUM_ROM_PAGES; i++ )
+    for( j = 0; j < MEMORY_PAGES_IN_16K; j++ ) {
+      memory_page *page = &memory_map_rom[i * MEMORY_PAGES_IN_16K + j];
+      page->writable = 0;
+      page->contended = 0;
+      page->source = memory_source_rom;
+    }
+    
+  for( i = 0; i < SPECTRUM_RAM_PAGES; i++ )
+    for( j = 0; j < MEMORY_PAGES_IN_16K; j++ ) {
+      memory_page *page = &memory_map_ram[i * MEMORY_PAGES_IN_16K + j];
+      page->page = &RAM[i][j * MEMORY_PAGE_SIZE];
+      page->page_num = i;
+      page->offset = j * MEMORY_PAGE_SIZE;
+      page->writable = 1;
+      page->source = memory_source_ram;
+    }
 
   module_register( &memory_module_info );
+}
 
-  return 0;
+static void
+memory_pool_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
+{
+  memory_pool_entry_t *entry = data;
+  free( entry->memory );
+  free( entry );
+}
+
+/* Tidy-up function called at end of emulation */
+void
+memory_end( void )
+{
+  int i;
+  char *description;
+
+  /* Free all the memory we've allocated for this machine */
+  if( pool ) {
+    g_slist_foreach( pool, memory_pool_free_entry, NULL );
+    g_slist_free( pool );
+    pool = NULL;
+  }
+
+  /* Free memory source types */
+  if( memory_sources ) {
+    for( i = 0; i < memory_sources->len; i++ ) {
+      description = g_array_index( memory_sources, char *, i );
+      free( description );
+    }
+
+    g_array_free( memory_sources, TRUE );
+    memory_sources = NULL;
+  }
+}
+
+int
+memory_source_register( const char *description )
+{
+  const char *copy = utils_safe_strdup( description );
+
+  g_array_append_val( memory_sources, copy );
+
+  return memory_sources->len - 1;
+}
+
+const char*
+memory_source_description( int source )
+{
+  return g_array_index( memory_sources, const char*, source );
+}
+
+int
+memory_source_find( const char *description )
+{
+  int i, source = -1;
+
+  for( i = 0; i < memory_sources->len; i++ ) {
+    const char *found = g_array_index( memory_sources, const char*, i );
+    if( !strcasecmp( description, found ) ) {
+      source = i;
+      break;
+    }
+  }
+
+  return source;
 }
 
 /* Allocate some memory from the pool */
 libspectrum_byte*
 memory_pool_allocate( size_t length )
 {
-  libspectrum_byte *ptr;
+  return memory_pool_allocate_persistent( length, 0 );
+}
 
-  ptr = malloc( length * sizeof( libspectrum_byte ) );
-  if( !ptr ) {
+libspectrum_byte*
+memory_pool_allocate_persistent( size_t length, int persistent )
+{
+  memory_pool_entry_t *entry;
+  libspectrum_byte *memory;
+
+  memory = malloc( length * sizeof( *memory ) );
+  if( !memory ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return NULL;
+    fuse_abort();
   }
 
-  pool = g_slist_prepend( pool, ptr );
+  entry = malloc( sizeof( *entry ) );
+  if( !entry ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    fuse_abort();
+  }
 
-  return ptr;
+  entry->persistent = persistent;
+  entry->memory = memory;
+
+  pool = g_slist_prepend( pool, entry );
+
+  return memory;
 }
 
-static void
-free_memory( gpointer data, gpointer user_data GCC_UNUSED )
+static gint
+find_non_persistent( gconstpointer data, gconstpointer user_data GCC_UNUSED )
 {
-  free( data );
+  const memory_pool_entry_t *entry = data;
+  return entry->persistent;
 }
 
+/* Free all non-persistent memory in the pool */
 void
 memory_pool_free( void )
 {
-  g_slist_foreach( pool, free_memory, NULL );
-  g_slist_free( pool );
-  pool = NULL;
+  GSList *ptr;
+
+  while( ( ptr = g_slist_find_custom( pool, NULL, find_non_persistent ) ) != NULL )
+  {
+    memory_pool_entry_t *entry = ptr->data;
+    free( entry->memory );
+    pool = g_slist_remove( pool, entry );
+    free( entry );
+  }
 }
 
-const char*
-memory_bank_name( memory_page *page )
+/* Set contention for 16K of RAM */
+void
+memory_ram_set_16k_contention( int page_num, int contended )
 {
-  switch( page->bank ) {
-  case MEMORY_BANK_NONE: return "Empty";
-  case MEMORY_BANK_HOME: return page->writable ? "RAM" : "ROM";
-  case MEMORY_BANK_DOCK: return "Dock";
-  case MEMORY_BANK_EXROM: return "Exrom";
-  case MEMORY_BANK_ROMCS: return "Chip Select";
-  }
+  int i;
 
-  return "[Undefined]";
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_ram[ page_num * MEMORY_PAGES_IN_16K + i ].contended = contended;
+}
+
+/* Map 16K of memory */
+void
+memory_map_16k( libspectrum_word address, memory_page *source, int page_num )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
+    int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
+    memory_map_read[ page ] = source[ page_num * MEMORY_PAGES_IN_16K + i ];
+    memory_map_write[ page ] = source[ page_num * MEMORY_PAGES_IN_16K + i ];
+  }
+}
+
+/* Map 8K of memory */
+void
+memory_map_8k( libspectrum_word address, memory_page *source, int page_num )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+    int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
+    memory_map_read[ page ] = source[ page_num * MEMORY_PAGES_IN_8K + i ];
+    memory_map_write[ page ] = source[ page_num * MEMORY_PAGES_IN_8K + i ];
+  }
+}
+
+/* Page in from /ROMCS */
+void
+memory_map_romcs( memory_page *source )
+{
+  int i;
+
+  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
+    memory_map_read[i] = memory_map_write[i] = source[i];
+}
+
+/* Page in 8K from /ROMCS */
+void
+memory_map_romcs_8k( libspectrum_word address, memory_page *source )
+{
+  int i, start;
+
+  start = address >> MEMORY_PAGE_SIZE_LOGARITHM;
+  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
+    memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
+}
+
+/* Page in 4K from /ROMCS */
+void
+memory_map_romcs_4k( libspectrum_word address, memory_page *source )
+{
+  int i, start;
+
+  start = address >> MEMORY_PAGE_SIZE_LOGARITHM;
+  for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
+    memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
 }
 
 libspectrum_byte
@@ -184,7 +328,7 @@ readbyte( libspectrum_word address )
   libspectrum_word bank;
   memory_page *mapping;
 
-  bank = address >> 13;
+  bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   mapping = &memory_map_read[ bank ];
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE )
@@ -196,7 +340,14 @@ readbyte( libspectrum_word address )
   if( opus_active && address >= 0x2800 && address < 0x3800 )
     return opus_read( address );
 
-  return mapping->page[ address & 0x1fff ];
+  if( spectranet_paged ) {
+    if( spectranet_w5100_paged_a && address >= 0x1000 && address < 0x2000 )
+      return spectranet_w5100_read( mapping, address );
+    if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 )
+      return spectranet_w5100_read( mapping, address );
+  }
+
+  return mapping->page[ address & MEMORY_PAGE_SIZE_MASK ];
 }
 
 void
@@ -205,7 +356,7 @@ writebyte( libspectrum_word address, libspectrum_byte b )
   libspectrum_word bank;
   memory_page *mapping;
 
-  bank = address >> 13;
+  bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   mapping = &memory_map_write[ bank ];
 
   if( debugger_mode != DEBUGGER_MODE_INACTIVE )
@@ -222,9 +373,9 @@ void
 memory_display_dirty_pentagon_16_col( libspectrum_word address,
                                       libspectrum_byte b )
 {
-  libspectrum_word bank = address >> 13;
+  libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
-  libspectrum_word offset = address & 0x1fff;
+  libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
   libspectrum_byte *memory = mapping->page;
 
   /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
@@ -236,7 +387,7 @@ memory_display_dirty_pentagon_16_col( libspectrum_word address,
      page 5 and 4 (if screen 1 is in use), and page 7 & 6 (if screen 2 is in
      use) and both the standard and ALTDFILE areas of those pages
    */
-  if( mapping->bank == MEMORY_BANK_HOME && 
+  if( mapping->source == memory_source_ram && 
       ( ( memory_current_screen  == 5 &&
           ( mapping->page_num == 5 || mapping->page_num == 4 ) ) ||
         ( memory_current_screen  == 7 &&
@@ -249,9 +400,9 @@ memory_display_dirty_pentagon_16_col( libspectrum_word address,
 void
 memory_display_dirty_sinclair( libspectrum_word address, libspectrum_byte b ) \
 {
-  libspectrum_word bank = address >> 13;
+  libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
-  libspectrum_word offset = address & 0x1fff;
+  libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
   libspectrum_byte *memory = mapping->page;
 
   /* The offset into the 16Kb RAM page (as opposed to the 8Kb chunk) */
@@ -259,7 +410,7 @@ memory_display_dirty_sinclair( libspectrum_word address, libspectrum_byte b ) \
 
   /* If this is a write to the current screen (and it actually changes
      the destination), redraw that bit */
-  if( mapping->bank == MEMORY_BANK_HOME && 
+  if( mapping->source == memory_source_ram && 
       mapping->page_num == memory_current_screen &&
       ( offset2 & memory_screen_mask ) < 0x1b00 &&
       memory[ offset ] != b )
@@ -271,13 +422,29 @@ memory_display_dirty_fn memory_display_dirty;
 void
 writebyte_internal( libspectrum_word address, libspectrum_byte b )
 {
-  libspectrum_word bank = address >> 13;
+  libspectrum_word bank = address >> MEMORY_PAGE_SIZE_LOGARITHM;
   memory_page *mapping = &memory_map_write[ bank ];
+  
+  if( spectranet_paged ) {
+    /* all writes need to be parsed by the flash rom emulation */
+    spectranet_flash_rom_write(address, b);
+    
+    if( spectranet_w5100_paged_a && address >= 0x1000 && address < 0x2000 ) {
+      spectranet_w5100_write( mapping, address, b );
+      return;
+    }
+    if( spectranet_w5100_paged_b && address >= 0x2000 && address < 0x3000 ) {
+      spectranet_w5100_write( mapping, address, b );
+      return;
+    }
+  }
 
   if( opus_active && address >= 0x2800 && address < 0x3800 ) {
     opus_write( address, b );
-  } else if( mapping->writable || settings_current.writable_roms ) {
-    libspectrum_word offset = address & 0x1fff;
+  } else if( mapping->writable ||
+             (mapping->source != memory_source_none &&
+              settings_current.writable_roms) ) {
+    libspectrum_word offset = address & MEMORY_PAGE_SIZE_MASK;
     libspectrum_byte *memory = mapping->page;
 
     memory_display_dirty( address, b );
@@ -335,11 +502,9 @@ memory_from_snapshot( libspectrum_snap *snap )
   if( libspectrum_snap_custom_rom( snap ) ) {
     for( i = 0; i < libspectrum_snap_custom_rom_pages( snap ) && i < 4; i++ ) {
       if( libspectrum_snap_roms( snap, i ) ) {
-        machine_load_rom_bank_from_buffer(
-                                         memory_map_rom, i * 2,
-                                         i, libspectrum_snap_roms( snap, i ),
-                                         libspectrum_snap_rom_length( snap, i ),
-                                         1 );
+        machine_load_rom_bank_from_buffer( memory_map_rom, i,
+          libspectrum_snap_roms( snap, i ),
+          libspectrum_snap_rom_length( snap, i ), 1 );
       }
     }
 
@@ -358,18 +523,27 @@ write_rom_to_snap( libspectrum_snap *snap, int *current_rom_num,
   *current_rom = NULL;
 }
 
-/* Look at all ROM entries, to see if any are marked as
-   MEMORY_SOURCE_CUSTOMROM */
+/* Look at all ROM entries, to see if any are marked as being custom ROMs */
 int
 memory_custom_rom( void )
 {
   size_t i;
 
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
-    if( memory_map_rom[ i ].source == MEMORY_SOURCE_CUSTOMROM ) return 1;
-  }
+  for( i = 0; i < SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K; i++ )
+    if( memory_map_rom[ i ].save_to_snapshot )
+      return 1;
 
   return 0;
+}
+
+/* Reset all ROM entries to being non-custom ROMs */
+void
+memory_reset( void )
+{
+  size_t i;
+
+  for( i = 0; i < SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K; i++ )
+    memory_map_rom[ i ].save_to_snapshot = 0;
 }
 
 static void
@@ -387,7 +561,7 @@ memory_rom_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_custom_rom( snap, 1 );
 
   /* write all ROMs to the snap */
-  for( i = 0; i < 2 * SPECTRUM_ROM_PAGES; i++ ) {
+  for( i = 0; i < SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K; i++ ) {
     if( memory_map_rom[ i ].page ) {
       if( current_page_num != memory_map_rom[ i ].page_num ) {
         if( current_rom )

@@ -41,10 +41,6 @@ libspectrum_byte tc2068_ay_dataport_read( libspectrum_word port,
 
 int tc2068_memory_map( void );
 
-extern libspectrum_byte fake_bank[ MEMORY_PAGE_SIZE ];
-extern memory_page fake_mapping;
-
-extern const periph_t tc2068_peripherals[];
-extern const size_t tc2068_peripherals_count;
+extern memory_page tc2068_empty_mapping[MEMORY_PAGES_IN_8K];
 
 #endif			/* #ifndef FUSE_TS2068_H */

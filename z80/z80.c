@@ -29,8 +29,9 @@
 #include "fuse.h"
 #include "memory.h"
 #include "module.h"
+#include "peripherals/scld.h"
+#include "peripherals/spectranet.h"
 #include "rzx.h"
-#include "scld.h"
 #include "spectrum.h"
 #include "ui/ui.h"
 #include "z80.h"
@@ -91,21 +92,16 @@ z80_interrupt_event_fn( libspectrum_dword tstates, int type, void *user_data )
 }
 
 /* Set up the z80 emulation */
-int
+void
 z80_init( void )
 {
   z80_init_tables();
 
   z80_interrupt_event = event_register( z80_interrupt_event_fn,
 					"Retriggered interrupt" );
-  if( z80_interrupt_event == -1 ) return 1;
-
   z80_nmi_event = event_register( z80_nmi, "Non-maskable interrupt" );
-  if( z80_nmi_event == -1 ) return 1;
 
   module_register( &z80_module_info );
-
-  return 0;
 }
 
 /* Initalise the tables used to set flags */
@@ -212,6 +208,10 @@ z80_nmi( libspectrum_dword ts, int type, void *user_data )
 
     /* Page in TR-DOS ROM */
     beta_page();
+  } else if( spectranet_available ) {
+    
+    /* Page in spectranet */
+    spectranet_page( 0 );
   }
 
   /* FIXME: how is R affected? */

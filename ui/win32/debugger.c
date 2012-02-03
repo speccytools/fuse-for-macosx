@@ -37,11 +37,11 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
-#include "ide/zxcf.h"
-#include "scld.h"
 #include "settings.h"
+#include "peripherals/ide/zxcf.h"
+#include "peripherals/scld.h"
+#include "peripherals/ula.h"
 #include "ui/ui.h"
-#include "ula.h"
 #include "win32internals.h"
 #include "z80/z80.h"
 #include "z80/z80_macros.h"
@@ -78,20 +78,20 @@ static BOOL show_hide_pane( debugger_pane pane, int show );
 static void toggle_display( debugger_pane pane, UINT menu_item_id );
 static int create_register_display( HFONT font );
 /* int create_memory_map( void ); this function is handled by rc */
-static int create_breakpoints();
+static int create_breakpoints( void );
 static int create_disassembly( HFONT font );
 static int create_stack_display( HFONT font );
 static void stack_click( LPNMITEMACTIVATE lpnmitem );
-static int create_events();
+static int create_events( void );
 static void events_click( LPNMITEMACTIVATE lpnmitem );
 /* int create_command_entry( void ); this function is handled by rc */
 /* int create_buttons( void ); this function is handled by rc */
 
 static int activate_debugger( void );
-static int update_memory_map( void );
-static int update_breakpoints();
-static int update_disassembly();
-static int update_events( void );
+static void update_memory_map( void );
+static void update_breakpoints( void );
+static void update_disassembly( void );
+static void update_events( void );
 static void add_event( gpointer data, gpointer user_data GCC_UNUSED );
 static int deactivate_debugger( void );
 
@@ -100,7 +100,7 @@ static int move_disassembly( WPARAM scroll_command );
 static void evaluate_command( void );
 static void win32ui_debugger_done_step( void );
 static void win32ui_debugger_done_continue( void );
-static void win32ui_debugger_break();
+static void win32ui_debugger_break( void );
 static void delete_dialog( void );
 static void win32ui_debugger_done_close( void );
 static INT_PTR CALLBACK win32ui_debugger_proc( HWND hWnd, UINT msg,
@@ -112,7 +112,9 @@ static libspectrum_word disassembly_top;
 /* helper constants for disassembly listview's scrollbar */
 static const int disassembly_min = 0x0000;
 static const int disassembly_max = 0xffff;
-static const int disassembly_page = 20;
+static const float disassembly_step = 0.5;
+/* Visual styles could change visible rows */
+static unsigned int disassembly_page = 20;
 
 /* Have we created the above yet? */
 static int dialog_created = 0;
@@ -414,7 +416,11 @@ create_disassembly( HFONT font )
   }
   
   win32ui_set_font( fuse_hDBGWnd, IDC_DBG_LV_PC, font );
-  
+
+  /* Recalculate visible rows, Visual Styles could change rows height */
+  disassembly_page = SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_PC,
+                                         LVM_GETCOUNTPERPAGE, 0, 0 );
+
   /* The disassembly scrollbar */
   SCROLLINFO si;
   si.cbSize = sizeof(si); 
@@ -479,7 +485,7 @@ stack_click( LPNMITEMACTIVATE lpnmitem )
     readbyte_internal( address ) + readbyte_internal( address + 1 ) * 0x100;
 
   error = debugger_breakpoint_add_address(
-    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, -1, destination, 0,
+    DEBUGGER_BREAKPOINT_TYPE_EXECUTE, memory_source_any, 0, address, 0,
     DEBUGGER_BREAKPOINT_LIFE_ONESHOT, NULL
   );
   if( error ) return;
@@ -571,7 +577,6 @@ ui_debugger_update( void )
   TCHAR *disassembly_text[2] = { &buffer[0], &buffer[40] };
   libspectrum_word address;
   int capabilities; size_t length;
-  int error;
 
   const char *register_name[] = { TEXT( "PC" ), TEXT( "SP" ),
 				  TEXT( "AF" ), TEXT( "AF'" ),
@@ -606,7 +611,6 @@ ui_debugger_update( void )
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_R,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
-  /* FIXME: doesnt' look like T-states fits in with monospaced font? */
   _sntprintf( buffer, 80, TEXT( "T-states %5d" ), tstates );
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_T_STATES,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
@@ -673,13 +677,9 @@ ui_debugger_update( void )
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_REG_ULA,
                       WM_SETTEXT, (WPARAM) 0, (LPARAM) buffer );
 
-  /* Update the memory map display */
-  error = update_memory_map(); if( error ) return error;
-
-  error = update_breakpoints(); if( error ) return error;
-
-  /* Update the disassembly */
-  error = update_disassembly(); if( error ) return error;
+  update_memory_map();
+  update_breakpoints();
+  update_disassembly();
 
   /* And the stack display */
   SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_LV_STACK,
@@ -709,52 +709,84 @@ ui_debugger_update( void )
   }
 
   /* And the events display */
-  error = update_events(); if( error ) return error;
+  update_events();
 
   return 0;
 }
 
-static int
+static void
 update_memory_map( void )
 {
-  size_t i;
   TCHAR buffer[ 40 ];
+  int source, page_num, writable, contended;
+  libspectrum_word offset;
+  size_t i, j, block, row;
 
-  for( i = 0; i < 8; i++ ) {
+  source = page_num = writable = contended = -1;
+  offset = 0;
+  row = 0;
 
-    _sntprintf( buffer, 40, format_16_bit(), (unsigned)i * 0x2000 );
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ), 
-                        WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
+  for( block = 0; block < MEMORY_PAGES_IN_64K && row < 8; block++ ) {
+    memory_page *page = &memory_map_read[block];
 
-    /* FIXME: memory_bank_name is not unicode */
-    _sntprintf( buffer, 40, TEXT( "%s %d" ), memory_bank_name( &memory_map_read[i] ),
-	        memory_map_read[i].page_num );
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + 1, 
-                        WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
+    if( page->source != source ||
+      page->page_num != page_num ||
+      page->offset != offset ||
+      page->writable != writable ||
+      page->contended != contended ) {
 
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + 2, 
-                        WM_SETTEXT, (WPARAM) 0,
-                        ( LPARAM ) ( memory_map_read[i].writable
-                        ? TEXT( "Y" ) : TEXT( "N" ) ) );
+      _sntprintf( buffer, 40, format_16_bit(), (unsigned)block * 0x1000 );
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ), 
+                          WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
 
-    SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + 2, 
-                        WM_SETTEXT, (WPARAM) 0,
-                        ( LPARAM ) ( memory_map_read[i].contended
-                        ? TEXT( "Y" ) : TEXT( "N" ) ) );
+      /* FIXME: memory_source_description is not unicode */
+      _snprintf( buffer, 40, TEXT( "%s %d" ),
+                 memory_source_description( page->source ), page->page_num );
+
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ) + 1,
+                          WM_SETTEXT, ( WPARAM ) 0, ( LPARAM ) buffer );
+
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ) + 2,
+                          WM_SETTEXT, (WPARAM) 0,
+                          ( LPARAM ) ( page->writable
+                          ? TEXT( "Y" ) : TEXT( "N" ) ) );
+
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( row * 4 ) + 3,
+                          WM_SETTEXT, (WPARAM) 0,
+                          ( LPARAM ) ( page->contended
+                          ? TEXT( "Y" ) : TEXT( "N" ) ) );
+      row++;
+
+      source = page->source;
+      page_num = page->page_num;
+      writable = page->writable;
+      contended = page->contended;
+      offset = page->offset;
+    }
+
+    /* We expect the next page to have an increased offset */
+    offset += MEMORY_PAGE_SIZE;
   }
 
-  return 0;
+  /* Hide unused rows */
+  for( i = row; i < 8; i++ ) {
+    for( j = 0; j < 4; j++ ) {
+      SendDlgItemMessage( fuse_hDBGWnd, IDC_DBG_MAP11 + ( i * 4 ) + j,
+                          WM_SETTEXT, (WPARAM) 0, (LPARAM) NULL );
+    }
+  }
+
 }
 
-static int
-update_breakpoints()
+static void
+update_breakpoints( void )
 {
   /* FIXME: review this function for unicode compatibility */
   TCHAR buffer[ 1024 ],
     *breakpoint_text[6] = { &buffer[  0], &buffer[ 40], &buffer[80],
 			    &buffer[120], &buffer[160], &buffer[200] };
   GSList *ptr;
-  TCHAR format_string[ 1024 ], page[ 1024 ];
+  TCHAR format_string[ 1024 ];
 
   LV_ITEM lvi;
   lvi.mask = LVIF_TEXT;
@@ -777,14 +809,15 @@ update_breakpoints()
     case DEBUGGER_BREAKPOINT_TYPE_EXECUTE:
     case DEBUGGER_BREAKPOINT_TYPE_READ:
     case DEBUGGER_BREAKPOINT_TYPE_WRITE:
-      if( bp->value.address.page == -1 ) {
-	_sntprintf( breakpoint_text[2], 40, format_16_bit(),
-		    bp->value.address.offset );
+      if( bp->value.address.source == memory_source_any ) {
+        _sntprintf( breakpoint_text[2], 40, format_16_bit(),
+        bp->value.address.offset );
       } else {
-	debugger_breakpoint_decode_page( page, 1024, bp->value.address.page );
-	_sntprintf( format_string, 1024, "%%s:%s", format_16_bit() );
-	_sntprintf( breakpoint_text[2], 40, format_string, page,
-		    bp->value.address.offset );
+        snprintf( format_string, 1024, "%%s:%s:%s",
+                  format_16_bit(), format_16_bit() );
+        snprintf( breakpoint_text[2], 40, format_string,
+                  memory_source_description( bp->value.address.source ),
+                  bp->value.address.page, bp->value.address.offset );
       }
       break;
 
@@ -830,11 +863,9 @@ update_breakpoints()
                             ( LPARAM ) &lvi );
     }
   }
-
-  return 0;
 }
 
-static int
+static void
 update_disassembly()
 {
   size_t i, length; libspectrum_word address;
@@ -847,7 +878,7 @@ update_disassembly()
   LV_ITEM lvi;
   lvi.mask = LVIF_TEXT;
 
-  for( i = 0, address = disassembly_top; i < 20; i++ ) {
+  for( i = 0, address = disassembly_top; i < disassembly_page; i++ ) {
     int l;
     _sntprintf( disassembly_text[0], 40, format_16_bit(), address );
     debugger_disassemble( disassembly_text[1], 40, &length, address );
@@ -872,10 +903,9 @@ update_disassembly()
                         ( LPARAM ) &lvi );
   }
 
-  return 0;
 }
 
-static int
+static void
 update_events( void )
 {
   /* clear the listview */
@@ -883,8 +913,6 @@ update_events( void )
                       LVM_DELETEALLITEMS, 0, 0 );
 
   event_foreach( add_event, NULL );
-
-  return 0;
 }
 
 static void
@@ -949,7 +977,7 @@ move_disassembly( WPARAM scroll_command )
   si.fMask = SIF_POS; 
   GetScrollInfo( GetDlgItem( fuse_hDBGWnd, IDC_DBG_SB_PC ), SB_CTL, &si );
 
-  int value = si.nPos;
+  float value = si.nPos;
   
   /* in Windows we have to read the command and scroll the scrollbar manually */
   switch( LOWORD( scroll_command ) ) {
@@ -960,10 +988,10 @@ move_disassembly( WPARAM scroll_command )
       value = disassembly_min;
       break;
     case SB_LINEDOWN:
-      value++;
+      value += disassembly_step;
       break;
     case SB_LINEUP:
-      value--;
+      value -= disassembly_step;
       break;
     case SB_PAGEUP:
       value -= disassembly_page;
@@ -1087,13 +1115,14 @@ win32ui_debugger_done_close( void )
 }
 
 static INT_PTR CALLBACK
-win32ui_debugger_proc( HWND hWnd, UINT msg,
+win32ui_debugger_proc( HWND hWnd GCC_UNUSED, UINT msg,
                        WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
         case IDCLOSE:
+        case IDCANCEL:
           win32ui_debugger_done_close();
           return 0;
         case IDC_DBG_BTN_CONT:

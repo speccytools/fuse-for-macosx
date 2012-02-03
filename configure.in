@@ -23,7 +23,7 @@ AC_INIT(fuse.c)
 AM_CONFIG_HEADER(config.h)
 AC_CANONICAL_SYSTEM
 
-define(FUSE_VERSION, [0.10.0.2])
+define(FUSE_VERSION, [1.0.0])
 
 dnl Use automake to produce `Makefile.in'
 AM_INIT_AUTOMAKE(fuse, FUSE_VERSION)
@@ -38,14 +38,27 @@ AC_PROG_YACC
 AC_PROG_LIBTOOL
 
 dnl Check for Win32 resource tool
-AC_CHECK_TOOL(WINDRES, windres, no)
-AC_SUBST(WINDRES)
-if test "$WINDRES" != no; then
-  WINDRES_OBJ="windres.o"
-  AC_DEFINE([VERSION_WIN32], [translit(FUSE_VERSION, [.], [,])], [Define version information for win32 executable])
+AC_MSG_CHECKING(whether to use windres)
+AC_ARG_WITH(windres,
+[  --without-windres       don't use windres],
+if test "$withval" = no; then windres=no; else windres=yes; fi,
+windres=yes)
+AC_MSG_RESULT($windres)
+if test "$windres" = yes; then
+  AC_CHECK_TOOL(WINDRES, windres, no)
+  AC_SUBST(WINDRES)
+  if test "$WINDRES" != no; then
+    WINDRES_OBJ="windres.o"
+    define(FUSE_FULL_VERSION,
+           [ifelse(translit(FUSE_VERSION, [0-9]), [.], [FUSE_VERSION[.0.0]],
+                   translit(FUSE_VERSION, [0-9]), [..], [FUSE_VERSION[.0]],
+                   [FUSE_VERSION])])dnl
+    AC_DEFINE([VERSION_WIN32], [translit(FUSE_FULL_VERSION, [.], [,])], [Define version information for win32 executable])
+    FUSE_FULL[]_VERSION=FUSE_FULL_VERSION
+    AC_SUBST(FUSE_FULL[]_VERSION)
+  fi
 fi
 AC_SUBST(WINDRES_OBJ)
-AM_SUBST_NOTMAKE(WINDRES_OBJ)
 
 dnl Generate commandy.h
 YFLAGS="$YFLAGS -d"
@@ -62,7 +75,8 @@ AC_CHECK_HEADERS(
   strings.h \
   sys/soundcard.h \
   sys/audio.h \
-  sys/audioio.h
+  sys/audioio.h \
+  zlib.h
 )
 
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -96,7 +110,7 @@ win32=no)
 AC_MSG_RESULT($win32)
 if test "$win32" = yes; then
   AC_CHECK_HEADER(windows.h,
-                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm";
+                  LIBS="$LIBS -mwindows -lcomctl32 -lwinmm -lpthread -lws2_32";
                   AC_DEFINE([UI_WIN32], 1, [Defined if Win32 UI in use])
                   AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
                   AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
@@ -213,9 +227,9 @@ if test -z "$UI"; then
   gtk=yes)
   AC_MSG_RESULT($gtk)
   if test "$gtk" = yes; then
-    AM_PATH_GTK_2_0(2.0.0,
+    AM_PATH_GTK_2_0(2.18.0,
 		AC_DEFINE([UI_GTK], 1,
-		          [Defined if GTK+ UI (either 1.2 or 2.x) is in use])
+		          [Defined if GTK+ UI 2.x is in use])
 		AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
 	        UI=gtk; UI_LIBS="ui/gtk/libuigtk.la",
 		AC_MSG_WARN([GTK+ not found. Reverting to Xlib]))
@@ -251,7 +265,11 @@ if test -z "$UI"; then
   fi
 
   dnl Check for the MIT-SHM extension
-  AC_CHECK_HEADERS( X11/extensions/XShm.h )
+  AC_CHECK_HEADERS( X11/extensions/XShm.h,,,[[
+	#include <sys/ipc.h>
+	#include <sys/shm.h>
+	#include <X11/Xlib.h>
+	]])
   AC_CHECK_LIB( Xext, XShmAttach, LIBS="$LIBS -lXext" )
 
   AC_DEFINE([UI_X], 1, [Defined if Xlib UI in use])
@@ -275,21 +293,12 @@ if test "$UI" != gtk; then
   glib=yes)
   AC_MSG_RESULT($glib)
   if test "$glib" = yes; then
-    glib2=no
     AM_PATH_GLIB_2_0(
-      2.0.0,
-      glib2=yes
+      2.20.0,
       AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
       LIBS="$LIBS `pkg-config --libs glib-2.0`",
+      AC_MSG_WARN(glib not found - using libspectrum's replacement)
     )
-    if test "$glib2" = no; then
-      AM_PATH_GLIB(
-        1.2.0,
-        AC_DEFINE([HAVE_LIB_GLIB], 1, [Defined if we've got glib])
-        LIBS="$LIBS `glib-config --libs`",
-        AC_MSG_WARN(glib not found - using libspectrum's replacement)
-      )
-    fi
   fi
 fi
 
@@ -373,32 +382,34 @@ if test "$libpng" = yes; then
   if test -n "$LIBPNG_CONFIG"; then
     PNG_CFLAGS=`libpng-config --cflags`
     PNG_LIBS=`libpng-config --ldflags`
-    PNG_LIBS=`echo " $PNG_LIBS" | sed 's/ -l[[^ ]][[^ ]]*//g'`
+    AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng])
+  else
+    ac_save_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
+    ac_save_LDFLAGS="$LDFLAGS"
+    LDFLAGS="$PNG_LIBS $LDFLAGS"
+
+    AC_CHECK_LIB( png, png_write_png,
+      [AC_CHECK_HEADER(
+        png.h,
+        [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
+        [AC_CHECK_HEADERS(libpng/png.h,
+                     [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
+                      AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
+                     [AC_MSG_WARN(png.h not found - saving screenshots disabled)
+                      PNG_LIBS='']
+        )],
+      )],
+      [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
+       PNG_LIBS='']
+    )
+
+    CPPFLAGS="$ac_save_CPPFLAGS"
+    LDFLAGS="$ac_save_LDFLAGS"
   fi
 
-  ac_save_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
-  ac_save_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$PNG_LIBS $LDFLAGS"
-
-  AC_CHECK_LIB( png, png_write_png,
-    [AC_CHECK_HEADER(
-      png.h,
-      [AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-      [AC_CHECK_HEADERS(libpng/png.h,
-                   [CPPFLAGS="$ac_save_CPPFLAGS $PNG_CFLAGS/libpng"
-                    AC_DEFINE([USE_LIBPNG], 1, [Defined if we're going to be using the installed libpng]) PNG_LIBS='-lpng -lm -lz'],
-                   [AC_MSG_WARN(png.h not found - saving screenshots disabled)
-                    PNG_LIBS='']
-      )],
-    )],
-    [AC_MSG_WARN(png_write_png not found - saving screenshots disabled)
-     PNG_LIBS='']
-  )
   AC_SUBST(PNG_LIBS)
 fi
-
-LDFLAGS="$ac_save_LDFLAGS"
 
 dnl Check if a version of libasound which supplies pcm is available
 AC_MSG_CHECKING(whether ALSA requested)
@@ -541,15 +552,39 @@ if test "$stick" = yes; then
       dnl Libraries such as svgalib provide their own joystick code.
       AC_MSG_CHECKING([whether to use $UI's joystick support])
       AC_ARG_ENABLE(ui-joystick,
-      [  --enable-ui-joystick    use UI-specific joystick code (where supported)],
+      AS_HELP_STRING([--disable-ui-joystick], [use libjsw joystick code (where supported)]),
       if test "$enableval" = no; then libjsw=yes; else libjsw=no; fi,
       libjsw=no)
       if test "$libjsw" = yes; then
-	AC_MSG_RESULT([no, use libjsw])
+        AC_MSG_RESULT([no, use libjsw])
       else
-	AC_MSG_RESULT(yes)
-	AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
+        AC_MSG_RESULT(yes)
+        AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks])
       fi
+      ;;
+    gtk|xlib)
+      dnl These UIs could use SDL library for handling joysticks
+      AC_MSG_CHECKING([whether to use $UI's joystick support])
+      AC_ARG_ENABLE(ui-joystick,
+      AS_HELP_STRING([--disable-ui-joystick], [use libjsw joystick code (where supported)]),
+      if test "$enableval" = no; then libjsw=yes; else libjsw=no; fi,
+      libjsw=no)
+      if test "$libjsw" = yes; then
+        AC_MSG_RESULT([no, use libjsw])
+      else
+        AC_MSG_RESULT(yes)
+        SDL_VERSION=1.2.4
+        AM_PATH_SDL($SDL_VERSION,		    
+          LIBS="$LIBS `sdl-config --libs`"
+          CPPFLAGS="$CPPFLAGS `sdl-config --cflags`"
+          AC_DEFINE([USE_JOYSTICK], 1, [Defined if we're using hardware joysticks]),
+          AC_MSG_WARN([SDL version $SDL_VERSION not found - joystick support disabled]))
+      fi
+      ;;
+    wii)
+      dnl Wii UI check this elsewhere
+      AC_MSG_RESULT(yes)
+      libjsw=no
       ;;
     *)
       dnl Our only option is libjsw.
@@ -589,6 +624,24 @@ else
   AC_MSG_RESULT(native)
 fi
 AC_SUBST(TIMER_LIBADD)
+
+dnl See if Linux TAP devices are supported
+AC_MSG_CHECKING(whether Linux TAP devices are supported)
+ac_save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $LIBSPEC_CFLAGS"
+AC_TRY_COMPILE([
+    #include <linux/if_tun.h>
+    #include <net/if.h>
+    #include <sys/ioctl.h>
+  ],[
+    int test1 = IFF_TAP | IFF_NO_PI;
+    int test2 = TUNSETIFF;
+  ],
+  AC_DEFINE([LINUX_TAP], 1, [Define to 1 if Linux TAP devices are supported.])
+  AC_MSG_RESULT(yes),
+  AC_MSG_RESULT(no))
+
+CPPFLAGS="$ac_save_CPPFLAGS"
 
 dnl Work out which standard routines we're missing
 AC_MSG_CHECKING(which standard routines we're missing)
@@ -685,12 +738,15 @@ compat/unix/Makefile \
 compat/wii/Makefile \
 compat/win32/Makefile \
 debugger/Makefile \
-disk/Makefile \
 hacking/Makefile \
-ide/Makefile \
 lib/Makefile \
 machines/Makefile \
 man/Makefile \
+peripherals/Makefile \
+peripherals/disk/Makefile \
+peripherals/ide/Makefile \
+peripherals/nic/Makefile \
+peripherals/flash/Makefile \
 perl/Makefile \
 perl/Fuse/Makefile \
 pokefinder/Makefile \
@@ -705,6 +761,7 @@ ui/svga/Makefile \
 ui/sdl/Makefile \
 ui/scaler/Makefile \
 ui/widget/Makefile \
+ui/win32/fuse.manifest \
 ui/win32/Makefile \
 ui/win32/icons/Makefile \
 ui/win32/installer/Makefile \

@@ -34,65 +34,101 @@
 #include "ui/ui.h"
 #include "win32internals.h"
 
-static void win32ui_pokefinder_incremented();
-static void win32ui_pokefinder_decremented();
-static void win32ui_pokefinder_search();
-static void win32ui_pokefinder_reset();
-static void win32ui_pokefinder_close();
-static void update_pokefinder( void );
+void menu_machine_pokefinder( int action );
+void move_button( int button, int dlg_height );
 static void possible_click( LPNMITEMACTIVATE lpnmitem );
+static void update_pokefinder( void );
+static void win32ui_pokefinder_incremented( void );
+static void win32ui_pokefinder_decremented( void );
+static void win32ui_pokefinder_search( void );
+static void win32ui_pokefinder_reset( void );
+static void win32ui_pokefinder_close( void );
 
 #define MAX_POSSIBLE 20
 
 int possible_page[ MAX_POSSIBLE ];
 libspectrum_word possible_offset[ MAX_POSSIBLE ];
+int initial_width = 0;
+int initial_height = 0;
+HWND lv_hWnd = NULL;
+int lv_width = 0;
 
 static INT_PTR CALLBACK
-win32ui_pokefinder_proc( HWND hWnd, UINT msg,
+win32ui_pokefinder_proc( HWND hWnd GCC_UNUSED, UINT msg,
                 WPARAM wParam, LPARAM lParam )
 {
+  int height;
+
   switch( msg ) {
 
     case WM_COMMAND:
       switch( LOWORD( wParam ) ) {
         case IDCLOSE:
+        case IDCANCEL:
           win32ui_pokefinder_close();
-          return 0;
+          return TRUE;
         case IDC_PF_INC:
           win32ui_pokefinder_incremented();
-          return 0;
+          return TRUE;
         case IDC_PF_DEC:
           win32ui_pokefinder_decremented();
-          return 0;
+          return TRUE;
         case IDC_PF_SEARCH:
           win32ui_pokefinder_search();
-          return 0;
+          return TRUE;
         case IDC_PF_RESET:
           win32ui_pokefinder_reset();
-          return 0;
+          return TRUE;
       }
       break;
 
+    case WM_SIZE:
+      height = HIWORD( lParam );
+      move_button( IDC_PF_INC, height );
+      move_button( IDC_PF_DEC, height );
+      move_button( IDC_PF_SEARCH, height );
+      move_button( IDC_PF_RESET, height );
+      move_button( IDCLOSE, height );
+      return TRUE;
+	
     case WM_CLOSE:
       win32ui_pokefinder_close();
-      return 0;
+      return TRUE;
 
     case WM_NOTIFY:
       switch ( ( ( LPNMHDR ) lParam )->code ) {
         case NM_DBLCLK:
           possible_click( ( LPNMITEMACTIVATE ) lParam );
-          return 0; /* "The return value for this notification is not used." */
+          return TRUE; /* The return value for this notification is not used */
       }
       break;      
   }
   return FALSE;
 }
 
+void
+move_button( int button, int dlg_height )
+{
+  HWND ctrl_hWnd;
+  RECT rect;
+  int x, y;
+
+  ctrl_hWnd = GetDlgItem( fuse_hPFWnd, button );
+  GetWindowRect( ctrl_hWnd, &rect );
+  MapWindowPoints( 0, fuse_hPFWnd, (POINT *)&rect, 2 );
+  x = rect.left;
+  y = dlg_height - ( rect.bottom - rect.top ) - 10;
+  SetWindowPos( ctrl_hWnd, 0, x, y, 0, 0,
+                SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
+}
+
 static void
 update_pokefinder( void )
 {
-  size_t page, offset;
+  size_t page, offset, bank, bank_offset;
   TCHAR buffer[256], *possible_text[2] = { &buffer[0], &buffer[128] };
+  int rcx, rcy;
+  DWORD dw_res;
 
   /* clear the listview */
   SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST, LVM_DELETEALLITEMS, 0, 0 );
@@ -106,16 +142,20 @@ update_pokefinder( void )
 
     size_t which = 0;
 
-    for( page = 0; page < 2 * SPECTRUM_RAM_PAGES; page++ )
-      for( offset = 0; offset < 0x2000; offset++ )
-	if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
+    for( page = 0; page < MEMORY_PAGES_IN_16K * SPECTRUM_RAM_PAGES; page++ ) {
+      memory_page *mapping = &memory_map_ram[page];
+      bank = mapping->page_num;
 
-	  possible_page[ which ] = page / 2;
-	  possible_offset[ which ] = offset + 8192 * (page & 1);
+      for( offset = 0; offset < MEMORY_PAGE_SIZE; offset++ )
+	if( ! (pokefinder_impossible[page][offset/8] & 1 << (offset & 7)) ) {
+	  bank_offset = mapping->offset + offset;
+
+	  possible_page[ which ] = bank;
+	  possible_offset[ which ] = bank_offset;
 	  which++;
 	
-	  _sntprintf( possible_text[0], 128, "%d", (unsigned)page );
-	  _sntprintf( possible_text[1], 128, "0x%04X", (unsigned)offset );
+	  _sntprintf( possible_text[0], 128, "%d", (unsigned)bank );
+	  _sntprintf( possible_text[1], 128, "0x%04X", (unsigned)bank_offset );
 
           /* set new count of items */
           SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST, LVM_SETITEMCOUNT,
@@ -134,23 +174,45 @@ update_pokefinder( void )
 
           i++;
         }
+    }
 
     /* show the listview */
-    ShowWindow( GetDlgItem( fuse_hPFWnd, IDC_PF_LIST ), SW_SHOW );
-    
+    ShowWindow( lv_hWnd, SW_SHOW );
+
+    /* change the size of the listview */
+    dw_res = SendMessage( lv_hWnd, LVM_APPROXIMATEVIEWRECT, pokefinder_count,
+                          MAKELPARAM( -1, -1 ) );
+    rcx = lv_width; /* same width */
+    rcy = HIWORD( dw_res );
+    SetWindowPos( lv_hWnd, NULL, 0, 0, rcx, rcy,
+                  SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+
+    rcx = initial_width;
+    rcy += initial_height + 10;
   } else {
     /* hide the listview */
-    ShowWindow( GetDlgItem( fuse_hPFWnd, IDC_PF_LIST ), SW_HIDE );
+    ShowWindow( lv_hWnd, SW_HIDE );
+
+    rcx = initial_width;
+    rcy = initial_height;
   }
 
+  /* change the size of the dialog */
+  SetWindowPos( fuse_hPFWnd, NULL, 0, 0, rcx, rcy,
+                SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
+
   /* print possible locations */
-  _sntprintf( buffer, 256, "Possible locations: %d\n", pokefinder_count );
-  SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LOCATIONS, WM_SETTEXT, 0, (LPARAM) buffer );
+  _sntprintf( buffer, 256, "Possible locations: %d", pokefinder_count );
+  SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LOCATIONS, WM_SETTEXT, 0,
+                      (LPARAM) buffer );
 }
 
 void
-menu_machine_pokefinder( int action )
+menu_machine_pokefinder( int action GCC_UNUSED )
 {
+  RECT rect;
+  int cx;
+
   if (fuse_hPFWnd == NULL) {
     /* FIXME: Implement accelerators for this dialog */
     fuse_hPFWnd = CreateDialog( fuse_hInstance,
@@ -162,7 +224,13 @@ menu_machine_pokefinder( int action )
       return;
     }
 
-    /* set extended listview style to select full row, when an item is selected */
+    /* store initial dialog dimensions */
+    GetWindowRect( fuse_hPFWnd, &rect );
+    initial_width = rect.right - rect.left;
+    initial_height = rect.bottom - rect.top;
+
+    /* set extended listview style to select full row, when an item
+       is selected */
     DWORD lv_ext_style;
     lv_ext_style = SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST,
                                        LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0 ); 
@@ -170,19 +238,29 @@ menu_machine_pokefinder( int action )
     SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST,
                         LVM_SETEXTENDEDLISTVIEWSTYLE, 0, lv_ext_style ); 
 
+    /* calculate columns width */
+    lv_hWnd = GetDlgItem( fuse_hPFWnd, IDC_PF_LIST );
+    GetClientRect( lv_hWnd, &rect );
+    cx = rect.right - rect.left;
+    cx >>= 1;
+
     /* create columns */
     LVCOLUMN lvc;
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT ;
     lvc.fmt = LVCFMT_LEFT;
-    lvc.cx = 114;
+    lvc.cx = cx;
     lvc.pszText = TEXT( "Page" );
     SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST, LVM_INSERTCOLUMN, 0,
                         ( LPARAM ) &lvc );
     lvc.mask |= LVCF_SUBITEM;
-    lvc.cx = 114;
+    lvc.cx = cx;
     lvc.pszText = TEXT( "Offset" );
     SendDlgItemMessage( fuse_hPFWnd, IDC_PF_LIST, LVM_INSERTCOLUMN, 1,
                         ( LPARAM ) &lvc );
+
+    /* store listview width */
+    GetWindowRect( lv_hWnd, &rect );
+    lv_width = rect.right - rect.left;
   } else {
     SetActiveWindow( fuse_hPFWnd );
   }
@@ -266,7 +344,7 @@ possible_click( LPNMITEMACTIVATE lpnmitem )
   row = lpnmitem->iItem;
   
   error = debugger_breakpoint_add_address(
-    DEBUGGER_BREAKPOINT_TYPE_WRITE, possible_page[ row ] + 1,
+    DEBUGGER_BREAKPOINT_TYPE_WRITE, memory_source_ram, possible_page[ row ],
     possible_offset[ row ], 0, DEBUGGER_BREAKPOINT_LIFE_PERMANENT, NULL
   );
   if( error ) return;

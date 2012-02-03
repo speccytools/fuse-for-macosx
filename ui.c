@@ -33,8 +33,8 @@
 #include <libspectrum.h>
 
 #include "fuse.h"
-#include "if1.h"
-#include "kempmouse.h"
+#include "peripherals/if1.h"
+#include "peripherals/kempmouse.h"
 #include "settings.h"
 #include "tape.h"
 #include "ui/ui.h"
@@ -242,7 +242,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M1_EJECT,
     "/Media/Interface I/Microdrive 1/Eject",
-    "/Media/Interface I/Microdrive 1/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 1/Save As...", 0,
+    "/Media/Interface I/Microdrive 1/Save", 0,
     "/Media/Interface I/Microdrive 1/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M1_WP_SET,
@@ -251,7 +252,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M2_EJECT,
     "/Media/Interface I/Microdrive 2/Eject",
-    "/Media/Interface I/Microdrive 2/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 2/Save As...", 0,
+    "/Media/Interface I/Microdrive 2/Save", 0,
     "/Media/Interface I/Microdrive 2/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M2_WP_SET,
@@ -260,7 +262,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M3_EJECT,
     "/Media/Interface I/Microdrive 3/Eject",
-    "/Media/Interface I/Microdrive 3/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 3/Save As...", 0,
+    "/Media/Interface I/Microdrive 3/Save", 0,
     "/Media/Interface I/Microdrive 3/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M3_WP_SET,
@@ -269,7 +272,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M4_EJECT,
     "/Media/Interface I/Microdrive 4/Eject",
-    "/Media/Interface I/Microdrive 4/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 4/Save As...", 0,
+    "/Media/Interface I/Microdrive 4/Save", 0,
     "/Media/Interface I/Microdrive 4/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M4_WP_SET,
@@ -278,7 +282,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M5_EJECT,
     "/Media/Interface I/Microdrive 5/Eject",
-    "/Media/Interface I/Microdrive 5/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 5/Save As...", 0,
+    "/Media/Interface I/Microdrive 5/Save", 0,
     "/Media/Interface I/Microdrive 5/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M5_WP_SET,
@@ -287,7 +292,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M6_EJECT,
     "/Media/Interface I/Microdrive 6/Eject",
-    "/Media/Interface I/Microdrive 6/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 6/Save As...", 0,
+    "/Media/Interface I/Microdrive 6/Save", 0,
     "/Media/Interface I/Microdrive 6/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M6_WP_SET,
@@ -296,7 +302,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M7_EJECT,
     "/Media/Interface I/Microdrive 7/Eject",
-    "/Media/Interface I/Microdrive 7/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 7/Save As...", 0,
+    "/Media/Interface I/Microdrive 7/Save", 0,
     "/Media/Interface I/Microdrive 7/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M7_WP_SET,
@@ -305,7 +312,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_IF1_M8_EJECT,
     "/Media/Interface I/Microdrive 8/Eject",
-    "/Media/Interface I/Microdrive 8/Eject and write...", 0,
+    "/Media/Interface I/Microdrive 8/Save As...", 0,
+    "/Media/Interface I/Microdrive 8/Save", 0,
     "/Media/Interface I/Microdrive 8/Write protect", 0 },
 
   { UI_MENU_ITEM_MEDIA_IF1_M8_WP_SET,
@@ -332,7 +340,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUS3_A_EJECT,
     "/Media/Disk/+3/Drive A:/Eject",
-    "/Media/Disk/+3/Drive A:/Eject and write...", 0,
+    "/Media/Disk/+3/Drive A:/Save As...", 0,
+    "/Media/Disk/+3/Drive A:/Save", 0,
     "/Media/Disk/+3/Drive A:/Flip disk", 0,
     "/Media/Disk/+3/Drive A:/Write protect", 0 },
 
@@ -348,7 +357,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT,
     "/Media/Disk/+3/Drive B:/Eject",
-    "/Media/Disk/+3/Drive B:/Eject and write...", 0,
+    "/Media/Disk/+3/Drive B:/Save As...", 0,
+    "/Media/Disk/+3/Drive B:/Save", 0,
     "/Media/Disk/+3/Drive B:/Flip disk", 0,
     "/Media/Disk/+3/Drive B:/Write protect", 0 },
 
@@ -366,7 +376,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_A_EJECT,
     "/Media/Disk/Beta/Drive A:/Eject",
-    "/Media/Disk/Beta/Drive A:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive A:/Save As...", 0,
+    "/Media/Disk/Beta/Drive A:/Save", 0,
     "/Media/Disk/Beta/Drive A:/Flip disk", 0,
     "/Media/Disk/Beta/Drive A:/Write protect", 0 },
 
@@ -382,7 +393,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_B_EJECT,
     "/Media/Disk/Beta/Drive B:/Eject",
-    "/Media/Disk/Beta/Drive B:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive B:/Save As...", 0,
+    "/Media/Disk/Beta/Drive B:/Save", 0,
     "/Media/Disk/Beta/Drive B:/Flip disk", 0,
     "/Media/Disk/Beta/Drive B:/Write protect", 0 },
 
@@ -398,7 +410,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_C_EJECT,
     "/Media/Disk/Beta/Drive C:/Eject",
-    "/Media/Disk/Beta/Drive C:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive C:/Save As...", 0,
+    "/Media/Disk/Beta/Drive C:/Save", 0,
     "/Media/Disk/Beta/Drive C:/Flip disk", 0,
     "/Media/Disk/Beta/Drive C:/Write protect", 0 },
 
@@ -414,7 +427,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_BETA_D_EJECT,
     "/Media/Disk/Beta/Drive D:/Eject",
-    "/Media/Disk/Beta/Drive D:/Eject and write...", 0,
+    "/Media/Disk/Beta/Drive D:/Save As...", 0,
+    "/Media/Disk/Beta/Drive D:/Save", 0,
     "/Media/Disk/Beta/Drive D:/Flip disk", 0,
     "/Media/Disk/Beta/Drive D:/Write protect", 0 },
 
@@ -432,7 +446,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_1_EJECT,
     "/Media/Disk/+D/Drive 1/Eject",
-    "/Media/Disk/+D/Drive 1/Eject and write...", 0,
+    "/Media/Disk/+D/Drive 1/Save As...", 0,
+    "/Media/Disk/+D/Drive 1/Save", 0,
     "/Media/Disk/+D/Drive 1/Flip disk", 0,
     "/Media/Disk/+D/Drive 1/Write protect", 0 },
 
@@ -448,7 +463,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_PLUSD_2_EJECT,
     "/Media/Disk/+D/Drive 2/Eject",
-    "/Media/Disk/+D/Drive 2/Eject and write...", 0,
+    "/Media/Disk/+D/Drive 2/Save As...", 0,
+    "/Media/Disk/+D/Drive 2/Save", 0,
     "/Media/Disk/+D/Drive 2/Flip disk", 0,
     "/Media/Disk/+D/Drive 2/Write protect", 0 },
 
@@ -460,13 +476,50 @@ static const struct menu_item_entries menu_item_lookup[] = {
     "/Media/Disk/+D/Drive 2/Write protect/Enable",
     "/Media/Disk/+D/Drive 2/Write protect/Disable", 1 },
 
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE, "/Media/Disk/DISCiPLE" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1, "/Media/Disk/DISCiPLE/Drive 1" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_EJECT,
+    "/Media/Disk/DISCiPLE/Drive 1/Eject",
+    "/Media/Disk/DISCiPLE/Drive 1/Save As...", 0,
+    "/Media/Disk/DISCiPLE/Drive 1/Save", 0,
+    "/Media/Disk/DISCiPLE/Drive 1/Flip disk", 0,
+    "/Media/Disk/DISCiPLE/Drive 1/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_FLIP_SET,
+    "/Media/Disk/DISCiPLE/Drive 1/Flip disk/Turn upside down",
+    "/Media/Disk/DISCiPLE/Drive 1/Flip disk/Turn back", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_1_WP_SET,
+    "/Media/Disk/DISCiPLE/Drive 1/Write protect/Enable",
+    "/Media/Disk/DISCiPLE/Drive 1/Write protect/Disable", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2, "/Media/Disk/DISCiPLE/Drive 2" },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_EJECT,
+    "/Media/Disk/DISCiPLE/Drive 2/Eject",
+    "/Media/Disk/DISCiPLE/Drive 2/Save As...", 0,
+    "/Media/Disk/DISCiPLE/Drive 2/Save", 0,
+    "/Media/Disk/DISCiPLE/Drive 2/Flip disk", 0,
+    "/Media/Disk/DISCiPLE/Drive 2/Write protect", 0 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_FLIP_SET,
+    "/Media/Disk/DISCiPLE/Drive 2/Flip disk/Turn upside down",
+    "/Media/Disk/DISCiPLE/Drive 2/Flip disk/Turn back", 1 },
+
+  { UI_MENU_ITEM_MEDIA_DISK_DISCIPLE_2_WP_SET,
+    "/Media/Disk/DISCiPLE/Drive 2/Write protect/Enable",
+    "/Media/Disk/DISCiPLE/Drive 2/Write protect/Disable", 1 },
+
   { UI_MENU_ITEM_MEDIA_DISK_OPUS, "/Media/Disk/Opus" },
 
   { UI_MENU_ITEM_MEDIA_DISK_OPUS_1, "/Media/Disk/Opus/Drive 1" },
 
   { UI_MENU_ITEM_MEDIA_DISK_OPUS_1_EJECT,
     "/Media/Disk/Opus/Drive 1/Eject",
-    "/Media/Disk/Opus/Drive 1/Eject and write...", 0,
+    "/Media/Disk/Opus/Drive 1/Save As...", 0,
+    "/Media/Disk/Opus/Drive 1/Save", 0,
     "/Media/Disk/Opus/Drive 1/Flip disk", 0,
     "/Media/Disk/Opus/Drive 1/Write protect", 0 },
 
@@ -482,7 +535,8 @@ static const struct menu_item_entries menu_item_lookup[] = {
 
   { UI_MENU_ITEM_MEDIA_DISK_OPUS_2_EJECT,
     "/Media/Disk/Opus/Drive 2/Eject",
-    "/Media/Disk/Opus/Drive 2/Eject and write...", 0,
+    "/Media/Disk/Opus/Drive 2/Save As...", 0,
+    "/Media/Disk/Opus/Drive 2/Save", 0,
     "/Media/Disk/Opus/Drive 2/Flip disk", 0,
     "/Media/Disk/Opus/Drive 2/Write protect", 0 },
 
@@ -599,7 +653,7 @@ ui_menu_activate( ui_menu_item item, int active )
 void
 ui_menu_disk_update( void )
 {
-  int plus3, beta, plusd, opus;
+  int plus3, beta, plusd, opus, disciple;
   int capabilities;
 
   capabilities = machine_current->capabilities;
@@ -609,8 +663,9 @@ ui_menu_disk_update( void )
   beta = beta_available;
   opus = opus_available;
   plusd = plusd_available;
+  disciple = disciple_available;
 
-  if( plus3 || beta || opus || plusd ) {
+  if( plus3 || beta || opus || plusd || disciple ) {
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK, 1 );
     ui_statusbar_update( UI_STATUSBAR_ITEM_DISK, UI_STATUSBAR_STATE_INACTIVE );
   } else {
@@ -623,6 +678,7 @@ ui_menu_disk_update( void )
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_BETA, beta );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_OPUS, opus );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUSD, plusd );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_DISCIPLE, disciple );
 }
 
 int
@@ -645,9 +701,10 @@ ui_tape_write( void )
 }
 
 int
-ui_plus3_disk_write( specplus3_drive_number which )
+ui_plus3_disk_write( specplus3_drive_number which, int saveas )
 {
-  char drive, *filename, title[80];
+  int err;
+  char drive, *filename = NULL, title[80];
 
   switch( which ) {
     case SPECPLUS3_DRIVE_A: drive = 'A'; break;
@@ -659,22 +716,24 @@ ui_plus3_disk_write( specplus3_drive_number which )
 
   snprintf( title, 80, "Fuse - Write +3 Disk %c:", drive );
 
-  filename = ui_get_save_filename( title );
-  if( !filename ) { fuse_emulation_unpause(); return 1; }
+  if( saveas ) {
+    filename = ui_get_save_filename( title );
+    if( !filename ) { fuse_emulation_unpause(); return 1; }
+  }
+  err = specplus3_disk_write( which, filename );
 
-  specplus3_disk_write( which, filename );
-
-  free( filename );
+  if( saveas ) free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
-ui_beta_disk_write( beta_drive_number which )
+ui_beta_disk_write( beta_drive_number which, int saveas )
 {
-  char drive, *filename, title[80];
+  int err;
+  char drive, *filename = NULL, title[80];
 
   switch( which ) {
     case BETA_DRIVE_A: drive = 'A'; break;
@@ -688,22 +747,25 @@ ui_beta_disk_write( beta_drive_number which )
 
   snprintf( title, 80, "Fuse - Write Beta Disk %c:", drive );
 
-  filename = ui_get_save_filename( title );
-  if( !filename ) { fuse_emulation_unpause(); return 1; }
+  if( saveas ) {
+    filename = ui_get_save_filename( title );
+    if( !filename ) { fuse_emulation_unpause(); return 1; }
+  }
 
-  beta_disk_write( which, filename );
+  err = beta_disk_write( which, filename );
 
-  free( filename );
+  if( saveas ) free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
-ui_opus_disk_write( opus_drive_number which )
+ui_opus_disk_write( opus_drive_number which, int saveas )
 {
-  char drive, *filename, title[80];
+  int err;
+  char drive, *filename = NULL, title[80];
 
   switch( which ) {
     case OPUS_DRIVE_1: drive = '1'; break;
@@ -715,22 +777,25 @@ ui_opus_disk_write( opus_drive_number which )
 
   snprintf( title, 80, "Fuse - Write Opus Disk %c", drive );
 
-  filename = ui_get_save_filename( title );
-  if( !filename ) { fuse_emulation_unpause(); return 1; }
+  if( saveas ) {
+    filename = ui_get_save_filename( title );
+    if( !filename ) { fuse_emulation_unpause(); return 1; }
+  }
 
-  opus_disk_write( which, filename );
+  err = opus_disk_write( which, filename );
 
-  free( filename );
+  if( saveas ) free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
-ui_plusd_disk_write( plusd_drive_number which )
+ui_plusd_disk_write( plusd_drive_number which, int saveas )
 {
-  char drive, *filename, title[80];
+  int err;
+  char drive, *filename = NULL, title[80];
 
   switch( which ) {
     case PLUSD_DRIVE_1: drive = '1'; break;
@@ -742,37 +807,72 @@ ui_plusd_disk_write( plusd_drive_number which )
 
   snprintf( title, 80, "Fuse - Write +D Disk %c", drive );
 
-  filename = ui_get_save_filename( title );
-  if( !filename ) { fuse_emulation_unpause(); return 1; }
+  if( saveas ) {
+    filename = ui_get_save_filename( title );
+    if( !filename ) { fuse_emulation_unpause(); return 1; }
+  }
 
-  plusd_disk_write( which, filename );
+  err = plusd_disk_write( which, filename );
 
-  free( filename );
+  if( saveas ) free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 int
-ui_mdr_write( int which )
+ui_disciple_disk_write( disciple_drive_number which, int saveas )
 {
-  char *filename, title[80];
+  int err;
+  char drive, *filename = NULL, title[80];
+
+  switch( which ) {
+    case PLUSD_DRIVE_1: drive = '1'; break;
+    case PLUSD_DRIVE_2: drive = '2'; break;
+    default: drive = '?'; break;
+  }
+
+  fuse_emulation_pause();
+
+  snprintf( title, 80, "Fuse - Write DISCiPLE Disk %c", drive );
+
+  if( saveas ) {
+    filename = ui_get_save_filename( title );
+    if( !filename ) { fuse_emulation_unpause(); return 1; }
+  }
+
+  err = disciple_disk_write( which, filename );
+
+  if( saveas ) free( filename );
+
+  fuse_emulation_unpause();
+
+  return err;
+}
+
+int
+ui_mdr_write( int which, int saveas )
+{
+  int err;
+  char *filename = NULL, title[80];
 
   fuse_emulation_pause();
 
   snprintf( title, 80, "Fuse - Write Microdrive Cartridge %i", which + 1 );
 
-  filename = ui_get_save_filename( title );
-  if( !filename ) { fuse_emulation_unpause(); return 1; }
+  if( saveas ) {
+    filename = ui_get_save_filename( title );
+    if( !filename ) { fuse_emulation_unpause(); return 1; }
+  }
 
-  if1_mdr_write( which, filename );
+  err = if1_mdr_write( which, filename );
 
-  free( filename );
+  if( saveas ) free( filename );
 
   fuse_emulation_unpause();
 
-  return 0;
+  return err;
 }
 
 #ifdef USE_WIDGET

@@ -50,9 +50,11 @@ typedef enum widget_type {
   WIDGET_TYPE_TEXT,		/* Text entry widget */
   WIDGET_TYPE_DEBUGGER,		/* Debugger widget */
   WIDGET_TYPE_POKEFINDER,	/* Poke finder widget */
+  WIDGET_TYPE_POKEMEM,  	/* Poke memory widget */
   WIDGET_TYPE_MEMORYBROWSER,	/* Memory browser widget */
   WIDGET_TYPE_ROM,		/* ROM selector widget */
-  WIDGET_TYPE_PERIPHERALS,	/* Peripherals options */
+  WIDGET_TYPE_PERIPHERALS_GENERAL, /* General peripherals options */
+  WIDGET_TYPE_PERIPHERALS_DISK, /* Disk peripherals options */
   WIDGET_TYPE_QUERY,		/* Query (yes/no) */
   WIDGET_TYPE_QUERY_SAVE,	/* Query (save/don't save/cancel) */
   WIDGET_TYPE_DISKOPTIONS,	/* Disk options widget */

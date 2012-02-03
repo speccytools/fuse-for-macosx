@@ -1,5 +1,5 @@
 /* debugger_internals.h: The internals of Fuse's monitor/debugger
-   Copyright (c) 2002-2008 Philip Kendall
+   Copyright (c) 2002-2011 Philip Kendall
 
    $Id$
 
@@ -59,7 +59,6 @@ void debugger_exit_emulator( void );
 /* Utility functions called by the flex scanner */
 
 int debugger_command_input( char *buf, int *result, int max_size );
-int debugger_page_hash( const char *text );
 int yylex( void );
 void yyerror( const char *s );
 
@@ -100,12 +99,13 @@ debugger_expression_evaluate( debugger_expression* expression );
 
 /* Event handling */
 
-int debugger_event_init( void );
+void debugger_event_init( void );
 int debugger_event_is_registered( const char *type, const char *detail );
+void debugger_event_end( void );
 
 /* Variables handling */
 
-int debugger_variable_init( void );
+void debugger_variable_init( void );
 void debugger_variable_set( const char *name, libspectrum_dword value );
 libspectrum_dword debugger_variable_get( const char *name );
 

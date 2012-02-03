@@ -51,6 +51,7 @@ print Fuse::GPL( 'options.c: options dialog boxes',
 
 #include "display.h"
 #include "fuse.h"
+#include "options.h"
 #include "options_internals.h"
 #include "periph.h"
 #include "ui/widget/widget_internals.h"
@@ -149,7 +150,7 @@ CODE
 	    }
 		print << "CODE";
 int
-option_enumerate_$_->{name}_$widget->{value}() {
+option_enumerate_$_->{name}_$widget->{value}( void ) {
   return option_enumerate_combo( widget_$widget->{value}_combo,
 				 settings_current.$widget->{value},
 				 $combo_default{$widget->{value}} );
@@ -468,14 +469,13 @@ CODE
 static void
 widget_$widget->{value}_click( void )
 \{
-  int error;
   widget_text_t text_data;
 
   text_data.title = "$title";
   text_data.allow = WIDGET_INPUT_DIGIT;
   snprintf( text_data.text, 40, "%d",
             widget_options_settings.$widget->{value} );
-  error = widget_do( WIDGET_TYPE_TEXT, &text_data );
+  widget_do( WIDGET_TYPE_TEXT, &text_data );
 
   if( widget_text_text ) \{
     widget_options_settings.$widget->{value} = atoi( widget_text_text );

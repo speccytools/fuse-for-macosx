@@ -1,6 +1,5 @@
 /* tc2048.c: Timex TC2048 specific routines
-   Copyright (c) 1999-2005 Philip Kendall
-   Copyright (c) 2002-2009 Fredrick Meunier
+   Copyright (c) 1999-2011 Philip Kendall, Fredrick Meunier
 
    $Id$
 
@@ -30,37 +29,18 @@
 
 #include <libspectrum.h>
 
-#include "disk/beta.h"
-#include "joystick.h"
 #include "machine.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
-#include "printer.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/scld.h"
 #include "settings.h"
-#include "scld.h"
 #include "spec48.h"
 #include "tc2068.h"
-#include "ula.h"
-#include "if1.h"
 
 static int tc2048_reset( void );
-
-static const periph_t peripherals[] = {
-  { 0x0020, 0x0000, joystick_kempston_read, NULL },
-  { 0x00ff, 0x00f4, scld_hsr_read, scld_hsr_write },
-
-  /* TS2040/Alphacom printer */
-  { 0x00ff, 0x00fb, printer_zxp_read, printer_zxp_write },
-
-  /* Lower 8 bits of Timex ports are fully decoded */
-  { 0x00ff, 0x00fe, ula_read, ula_write },
-
-  { 0x00ff, 0x00ff, scld_dec_read, scld_dec_write },
-};
-
-static const size_t peripherals_count =
-  sizeof( peripherals ) / sizeof( periph_t );
 
 int
 tc2048_port_from_ula( libspectrum_word port )
@@ -82,13 +62,7 @@ int tc2048_init( fuse_machine_info *machine )
   machine->ram.port_from_ula	     = tc2048_port_from_ula;
   machine->ram.contend_delay	     = spectrum_contend_delay_65432100;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_65432100;
-
-  memset( fake_bank, 0xff, MEMORY_PAGE_SIZE );
-
-  fake_mapping.page = fake_bank;
-  fake_mapping.writable = 0;
-  fake_mapping.contended = 0;
-  fake_mapping.offset = 0x0000;
+  machine->ram.valid_pages	     = 3;
 
   machine->unattached_port = spectrum_unattached_port_none;
 
@@ -102,43 +76,51 @@ int tc2048_init( fuse_machine_info *machine )
 static int
 tc2048_reset( void )
 {
-  size_t i;
+  size_t i, j;
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_tc2048,
+  error = machine_load_rom( 0, settings_current.rom_tc2048,
                             settings_default.rom_tc2048, 0x4000 );
   if( error ) return error;
 
-  error = periph_setup( peripherals, peripherals_count );
-  if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_ALWAYS );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface2( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_opus( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_plusd( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_beta128( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_fuller( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_melodik( PERIPH_PRESENT_OPTIONAL );
+  periph_clear();
+  machines_periph_48();
+
+  /* ULA uses full decoding */
+  periph_set_present( PERIPH_TYPE_ULA, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_ULA_FULL_DECODE, PERIPH_PRESENT_ALWAYS );
+
+  /* As does the ZX Printer */
+  periph_set_present( PERIPH_TYPE_ZXPRINTER, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_ZXPRINTER_FULL_DECODE, PERIPH_PRESENT_OPTIONAL );
+
+  /* SCLD always present */
+  periph_set_present( PERIPH_TYPE_SCLD, PERIPH_PRESENT_ALWAYS );
+
+  /* TC2048 has a built-in Kempston joystick, which uses the "loose"
+     decoding */
+  periph_set_present( PERIPH_TYPE_KEMPSTON, PERIPH_PRESENT_NEVER );
+  periph_set_present( PERIPH_TYPE_KEMPSTON_LOOSE, PERIPH_PRESENT_ALWAYS );
+
+  /* SpeccyBoot doesn't seem to work on the TC2048 */
+  periph_set_present( PERIPH_TYPE_SPECCYBOOT, PERIPH_PRESENT_NEVER );
+
   periph_update();
 
-  periph_register_beta128();
   beta_builtin = 0;
 
-  for( i = 0; i < 8; i++ ) {
+  for( i = 0; i < 8; i++ )
+    for( j = 0; j < MEMORY_PAGES_IN_8K; j++ ) {
+      memory_page *dock_page, *exrom_page;
+      
+      dock_page = &timex_dock[i * MEMORY_PAGES_IN_8K + j];
+      *dock_page = tc2068_empty_mapping[j];
+      dock_page->page_num = i;
 
-    timex_dock[i] = fake_mapping;
-    timex_dock[i].bank= MEMORY_BANK_DOCK;
-    timex_dock[i].page_num = i;
-    timex_dock[i].source= MEMORY_SOURCE_SYSTEM;
-    memory_map_dock[i] = &timex_dock[i];
-
-    timex_exrom[i] = fake_mapping;
-    timex_exrom[i].bank = MEMORY_BANK_EXROM;
-    timex_exrom[i].page_num = i;
-    timex_exrom[i].source= MEMORY_SOURCE_SYSTEM;
-    memory_map_exrom[i] = &timex_exrom[i];
-
-  }
+      exrom_page = &timex_exrom[i * MEMORY_PAGES_IN_8K + j];
+      *exrom_page = tc2068_empty_mapping[j];
+      exrom_page->page_num = i;
+    }
 
   return tc2068_tc2048_common_reset();
 }

@@ -49,7 +49,8 @@ static GtkWidget
   *mouse_status,	/* Have we grabbed the mouse? */
   *pause_status,	/* Is emulation paused (via the menu option)? */
   *tape_status,		/* Is the tape running? */
-  *speed_status;	/* How fast are we running? */
+  *speed_status,	/* How fast are we running? */
+  *machine_name;	/* What machine is being emulated? */
 
 int
 gtkstatusbar_create( GtkBox *parent )
@@ -97,6 +98,7 @@ gtkstatusbar_create( GtkBox *parent )
 					   NULL, gtkpixmap_mouse_active );
 
   speed_status = gtk_label_new( "100%" );
+  gtk_label_set_width_chars( GTK_LABEL( speed_status ), 8 );
   gtk_box_pack_end( GTK_BOX( status_bar ), speed_status, FALSE, FALSE, 0 );
 
   separator = gtk_vseparator_new();
@@ -121,6 +123,9 @@ gtkstatusbar_create( GtkBox *parent )
   separator = gtk_vseparator_new();
   gtk_box_pack_end( GTK_BOX( status_bar ), separator, FALSE, FALSE, 0 );
 
+  machine_name = gtk_label_new( NULL );
+  gtk_box_pack_start( GTK_BOX( status_bar ), machine_name, FALSE, FALSE, 0 );
+
   return 0;
 }
 
@@ -134,6 +139,12 @@ gtkstatusbar_set_visibility( int visible )
   }
 
   return 0;
+}
+
+void
+gtkstatusbar_update_machine( const char *name )
+{
+  gtk_label_set( GTK_LABEL( machine_name ), name );
 }
 
 int

@@ -1,5 +1,5 @@
 /* periph.c: code for handling peripherals
-   Copyright (c) 2005-2009 Philip Kendall
+   Copyright (c) 2005-2011 Philip Kendall
 
    $Id$
 
@@ -29,137 +29,186 @@
 
 #include "debugger/debugger.h"
 #include "event.h"
-#include "fuller.h"
-#include "disk/opus.h"
-#include "ide/divide.h"
-#include "ide/simpleide.h"
-#include "ide/zxatasp.h"
-#include "ide/zxcf.h"
-#include "if1.h"
-#include "if2.h"
-#include "joystick.h"
-#include "kempmouse.h"
-#include "melodik.h"
+#include "fuse.h"
 #include "periph.h"
+#include "peripherals/if1.h"
+#include "peripherals/ula.h"
 #include "rzx.h"
 #include "settings.h"
 #include "ui/ui.h"
-#include "ula.h"
 
 /*
  * General peripheral list handling routines
  */
 
-/* Full information about a peripheral */
 typedef struct periph_private_t {
-
-  int id;
-  int active;
-
-  periph_t peripheral;
-
+  /* Can this peripheral ever be present on the currently emulated machine? */
+  periph_present present;
+  /* Is this peripheral currently active? */
+  int active; 
+  /* The actual peripheral data */
+  const periph_t *periph;
 } periph_private_t;
 
-static GSList *peripherals = NULL;
-static int last_id = 0;
+/* All the peripherals we know about */
+static GHashTable *peripherals = NULL;
+
+/* Wrapper to pair up a port response with the peripheral it came from */
+typedef struct periph_port_private_t {
+  /* The peripheral this came from */
+  periph_type type;
+  /* The port response */
+  periph_port_t port;
+} periph_port_private_t;
+
+/* The list of currently active ports */
+static GSList *ports = NULL;
 
 /* The strings used for debugger events */
 static const char *page_event_string = "page",
   *unpage_event_string = "unpage";
 
-static gint find_by_id( gconstpointer data, gconstpointer id );
-static void free_peripheral( gpointer data, gpointer user_data );
-
-/* Register a peripheral. Returns -1 on error or a peripheral ID if
-   successful */
-int
-periph_register( const periph_t *peripheral )
+/* Place one port response in the list of currently active ones */
+static void
+port_register( periph_type type, const periph_port_t *port )
 {
-  periph_private_t *private;
+  periph_port_private_t *private;
 
-  private = malloc( sizeof( periph_private_t ) );
+  private = malloc( sizeof( *private ) );
   if( !private ) {
     ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return -1;
+    fuse_abort();
   }
 
-  private->id = last_id++;
-  private->active = 1;
-  private->peripheral = *peripheral;
+  private->type = type;
+  private->port = *port;
 
-  peripherals = g_slist_append( peripherals, private );
-
-  return private->id;
+  ports = g_slist_append( ports, private );
 }
 
-/* Register many peripherals */
-int
-periph_register_n( const periph_t *peripherals_list, size_t n )
+/* Register a peripheral with the system */
+void
+periph_register( periph_type type, const periph_t *periph )
 {
-  const periph_t *ptr;
+  if( !peripherals )
+    peripherals = g_hash_table_new( NULL, NULL );
 
-  for( ptr = peripherals_list; n--; ptr++ ) {
-    int id;
-    id = periph_register( ptr ); if( id == -1 ) return -1;
+  periph_private_t *private = malloc( sizeof( *private ) );
+  if( !private ) {
+    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
+    fuse_abort();
   }
 
-  return 0;
+  private->present = PERIPH_PRESENT_NEVER;
+  private->active = 0;
+  private->periph = periph;
+
+  g_hash_table_insert( peripherals, GINT_TO_POINTER( type ), private );
 }
 
-/* (De)activate a specific peripheral */
-int
-periph_set_active( int id, int active )
+/* Get the data about one peripheral */
+static gint
+find_by_type( gconstpointer data, gconstpointer user_data )
 {
-  GSList *ptr;
-  periph_private_t *private;
+  const periph_port_private_t *periph = data;
+  periph_type type = GPOINTER_TO_INT( user_data );
+  return periph->type - type;
+}
 
-  ptr = g_slist_find_custom( peripherals, &id, find_by_id );
-  if( !ptr ) {
-    ui_error( UI_ERROR_ERROR, "couldn't find peripheral ID %d", id );
-    return 1;
-  }
+/* Set whether a peripheral can be present on this machine or not */
+void
+periph_set_present( periph_type type, periph_present present )
+{
+  periph_private_t *type_data = g_hash_table_lookup( peripherals, GINT_TO_POINTER( type ) );
+  if( type_data ) type_data->present = present;
+}
 
-  private = ptr->data;
+/* Mark a specific peripheral as (in)active */
+void
+periph_activate_type( periph_type type, int active )
+{
+  periph_private_t *private = g_hash_table_lookup( peripherals, GINT_TO_POINTER( type ) );
+  if( !private || private->active == active ) return;
 
   private->active = active;
 
-  return 0;
+  if( active ) {
+    const periph_port_t *ptr;
+    if( private->periph->activate )
+      private->periph->activate();
+    for( ptr = private->periph->ports; ptr && ptr->mask != 0; ptr++ )
+      port_register( type, ptr );
+  } else {
+    GSList *found;
+    while( ( found = g_slist_find_custom( ports, GINT_TO_POINTER( type ), find_by_type ) ) != NULL )
+      ports = g_slist_remove( ports, found->data );
+  }
 }
 
-static gint
-find_by_id( gconstpointer data, gconstpointer user_data )
+/* Is a specific peripheral active at the moment? */
+int
+periph_is_active( periph_type type )
 {
-  const periph_private_t *private = data;
-  int id = *(const int*)user_data;
-
-  return private->id - id;
+  periph_private_t *type_data = g_hash_table_lookup( peripherals, GINT_TO_POINTER( type ) );
+  return type_data ? type_data->active : 0;
 }
 
-/* Clear all peripherals */
-void
-periph_clear( void )
+/* Work out whether a peripheral is present on this machine, and mark it
+   (in)active as appropriate */
+static void
+set_activity( gpointer key, gpointer value, gpointer user_data )
 {
-  g_slist_foreach( peripherals, free_peripheral, NULL );
-  g_slist_free( peripherals );
-  peripherals = NULL;
+  periph_type type = GPOINTER_TO_INT( key );
+  periph_private_t *private = value;
+  int active = 0;
 
-  last_id = 0;
+  switch ( private->present ) {
+  case PERIPH_PRESENT_NEVER: active = 0; break;
+  case PERIPH_PRESENT_OPTIONAL:
+    active = private->periph->option ? *(private->periph->option) : 0; break;
+  case PERIPH_PRESENT_ALWAYS: active = 1; break;
+  }
+
+  periph_activate_type( type, active );
 }
 
+/* Free the memory used by a peripheral-port response pair */
 static void
 free_peripheral( gpointer data, gpointer user_data GCC_UNUSED )
 {
-  periph_t *private = data;
-
+  periph_port_private_t *private = data;
   free( private );
+}
+
+/* Make a peripheral as being never present on this machine */
+static void
+set_type_inactive( gpointer key, gpointer value, gpointer user_data )
+{
+  periph_private_t *type_data = value;
+  type_data->present = PERIPH_PRESENT_NEVER;
+  type_data->active = 0;
+}
+
+/* Mark all peripherals as being never present on this machine */
+static void
+set_types_inactive( void )
+{
+  g_hash_table_foreach( peripherals, set_type_inactive, NULL );
+}
+
+/* Empty out the list of peripherals */
+void
+periph_clear( void )
+{
+  g_slist_foreach( ports, free_peripheral, NULL );
+  g_slist_free( ports );
+  ports = NULL;
+  set_types_inactive();
 }
 
 /*
  * The actual routines to read and write a port
  */
-
-static void read_peripheral( gpointer data, gpointer user_data );
-static void write_peripheral( gpointer data, gpointer user_data );
 
 /* Internal type used for passing to read_peripheral and write_peripheral */
 struct peripheral_data_t {
@@ -170,6 +219,7 @@ struct peripheral_data_t {
   libspectrum_byte value;
 };
 
+/* Read a byte from a port, taking the appropriate time */
 libspectrum_byte
 readport( libspectrum_word port )
 {
@@ -188,10 +238,26 @@ readport( libspectrum_word port )
 
   tstates++;
 
-
   return b;
 }
 
+/* Read a byte from a specific port response */
+static void
+read_peripheral( gpointer data, gpointer user_data )
+{
+  periph_port_private_t *private = data;
+  struct peripheral_data_t *callback_info = user_data;
+
+  periph_port_t *port = &( private->port );
+
+  if( port->read &&
+      ( ( callback_info->port & port->mask ) == port->value ) ) {
+    callback_info->value &= port->read( callback_info->port,
+					&( callback_info->attached ) );
+  }
+}
+
+/* Read a byte from a port, taking no time */
 libspectrum_byte
 readport_internal( libspectrum_word port )
 {
@@ -225,7 +291,7 @@ readport_internal( libspectrum_word port )
   callback_info.attached = 0;
   callback_info.value = 0xff;
 
-  g_slist_foreach( peripherals, read_peripheral, &callback_info );
+  g_slist_foreach( ports, read_peripheral, &callback_info );
 
   if( !callback_info.attached )
     callback_info.value = machine_current->unattached_port();
@@ -236,23 +302,7 @@ readport_internal( libspectrum_word port )
   return callback_info.value;
 }
 
-static void
-read_peripheral( gpointer data, gpointer user_data )
-{
-  periph_private_t *private = data;
-  struct peripheral_data_t *callback_info = user_data;
-
-  periph_t *peripheral;
-
-  peripheral = &( private->peripheral );
-
-  if( private->active && peripheral->read &&
-      ( ( callback_info->port & peripheral->mask ) == peripheral->value ) ) {
-    callback_info->value &= peripheral->read( callback_info->port,
-					      &( callback_info->attached ) );
-  }
-}
-
+/* Write a byte to a port, taking the appropriate time */
 void
 writeport( libspectrum_word port, libspectrum_byte b )
 {
@@ -261,6 +311,21 @@ writeport( libspectrum_word port, libspectrum_byte b )
   ula_contend_port_late( port ); tstates++;
 }
 
+/* Write a byte to a specific port response */
+static void
+write_peripheral( gpointer data, gpointer user_data )
+{
+  periph_port_private_t *private = data;
+  struct peripheral_data_t *callback_info = user_data;
+
+  periph_port_t *port = &( private->port );
+  
+  if( port->write &&
+      ( ( callback_info->port & port->mask ) == port->value ) )
+    port->write( callback_info->port, callback_info->value );
+}
+
+/* Write a byte to a port, taking no time */
 void
 writeport_internal( libspectrum_word port, libspectrum_byte b )
 {
@@ -273,167 +338,27 @@ writeport_internal( libspectrum_word port, libspectrum_byte b )
   callback_info.port = port;
   callback_info.value = b;
   
-  g_slist_foreach( peripherals, write_peripheral, &callback_info );
-}
-
-static void
-write_peripheral( gpointer data, gpointer user_data )
-{
-  periph_private_t *private = data;
-  struct peripheral_data_t *callback_info = user_data;
-
-  periph_t *peripheral;
-
-  peripheral = &( private->peripheral );
-  
-  if( private->active && peripheral->write &&
-      ( ( callback_info->port & peripheral->mask ) == peripheral->value ) )
-    peripheral->write( callback_info->port, callback_info->value );
+  g_slist_foreach( ports, write_peripheral, &callback_info );
 }
 
 /*
  * The more Fuse-specific peripheral handling routines
  */
 
-/* What sort of Kempston interface does the current machine have */
-static periph_present kempston_present;
-
-/* Is the Kempston interface currently active */
-int periph_kempston_active;
-
-/* What sort of Interface I does the current machine have */
-periph_present interface1_present;
-
-/* Is the Interface I currently active */
-int periph_interface1_active;
-
-/* What sort of Interface II does the current machine have */
-periph_present interface2_present;
-
-/* Is the Interface II currently active */
-int periph_interface2_active;
-
-/* What sort of +D interface does the current machine have */
-periph_present plusd_present;
-
-/* Is the +D currently active */
-int periph_plusd_active;
-
-/* What sort of Beta 128 interface does the current machine have */
-periph_present beta128_present;
-
-/* Is the Beta 128 currently active */
-int periph_beta128_active;
-
-/* What sort of Opus interface does the current machine have */
-periph_present opus_present;
-
-/* Is the Opus currently active */
-int periph_opus_active;
-
-/* What sort of Fuller Box does the current machine have */
-periph_present fuller_present;
-
-/* Is the Fuller Box currently active */
-int periph_fuller_active;
-
-/* What sort of Melodik does the current machine have */
-periph_present melodik_present;
-
-/* Is the Melodik currently active */
-int periph_melodik_active;
-
-int
-periph_setup( const periph_t *peripherals_list, size_t n )
-{
-  int error;
-
-  periph_clear();
-
-  error =
-    periph_register_n( simpleide_peripherals, simpleide_peripherals_count );
-  if( error ) return error;
-
-  periph_register_n( zxatasp_peripherals, zxatasp_peripherals_count );
-  periph_register_n( zxcf_peripherals, zxcf_peripherals_count );
-  periph_register_n( divide_peripherals, divide_peripherals_count );
-  periph_register_n( plusd_peripherals, plusd_peripherals_count );
-  periph_register_n( if1_peripherals, if1_peripherals_count );
-
-  periph_register_n( kempmouse_peripherals, kempmouse_peripherals_count );
-
-  error = periph_register_n( peripherals_list, n ); if( error ) return error;
-
-  kempston_present = PERIPH_PRESENT_NEVER;
-  interface1_present = PERIPH_PRESENT_NEVER;
-  interface2_present = PERIPH_PRESENT_NEVER;
-  plusd_present = PERIPH_PRESENT_NEVER;
-  beta128_present = PERIPH_PRESENT_NEVER;
-  opus_present = PERIPH_PRESENT_NEVER;
-  fuller_present = PERIPH_PRESENT_NEVER;
-  melodik_present = PERIPH_PRESENT_NEVER;
-
-  return 0;
-}
-
-void
-periph_setup_kempston( periph_present present ) {
-  kempston_present = present;
-}
-
-void
-periph_setup_interface1( periph_present present ) {
-  interface1_present = present;
-}
-
-void
-periph_setup_interface2( periph_present present ) {
-  interface2_present = present;
-}
-
-void
-periph_setup_plusd( periph_present present ) {
-  plusd_present = present;
-}
-
-void
-periph_setup_beta128( periph_present present ) {
-  beta128_present = present;
-}
-
-void
-periph_register_beta128( void ) {
-  periph_register_n( beta_peripherals, beta_peripherals_count );
-}
-
-void
-periph_setup_opus( periph_present present ) {
-  opus_present = present;
-}
-
-void
-periph_setup_fuller( periph_present present ) {
-  fuller_present = present;
-}
-
-void
-periph_setup_melodik( periph_present present ) {
-  melodik_present = present;
-}
-
 static void
 update_cartridge_menu( void )
 {
-  int cartridge, dock;
+  int cartridge, dock, if2;
 
   dock = machine_current->capabilities &
          LIBSPECTRUM_MACHINE_CAPABILITY_TIMEX_DOCK;
+  if2 = periph_is_active( PERIPH_TYPE_INTERFACE2 );
 
-  cartridge = dock || periph_interface2_active;
+  cartridge = dock || if2;
 
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE, cartridge );
   ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_DOCK, dock );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, periph_interface2_active );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2, if2 );
 }
 
 static void
@@ -458,61 +383,6 @@ update_ide_menu( void )
 void
 periph_update( void )
 {
-  switch( kempston_present ) {
-  case PERIPH_PRESENT_NEVER: periph_kempston_active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_kempston_active = settings_current.joy_kempston; break;
-  case PERIPH_PRESENT_ALWAYS: periph_kempston_active = 1; break;
-  }
-
-  switch( interface1_present ) {
-  case PERIPH_PRESENT_NEVER: periph_interface1_active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_interface1_active = settings_current.interface1; break;
-  case PERIPH_PRESENT_ALWAYS: periph_interface1_active = 1; break;
-  }
-
-  switch( interface2_present ) {
-
-  case PERIPH_PRESENT_NEVER:
-    periph_interface2_active = 0;
-    break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_interface2_active = settings_current.interface2;
-    break;
-  case PERIPH_PRESENT_ALWAYS:
-    periph_interface2_active = 1;
-    break;
-
-  }
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1,
-		    periph_interface1_active );
-
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
-		    periph_interface2_active );
-
-  switch( plusd_present ) {
-  case PERIPH_PRESENT_NEVER: periph_plusd_active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_plusd_active = settings_current.plusd; break;
-  case PERIPH_PRESENT_ALWAYS: periph_plusd_active = 1; break;
-  }
-
-  switch( beta128_present ) {
-  case PERIPH_PRESENT_NEVER: periph_beta128_active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_beta128_active = settings_current.beta128; break;
-  case PERIPH_PRESENT_ALWAYS: periph_beta128_active = 1;
-    break;
-  }
-
-  switch( opus_present ) {
-  case PERIPH_PRESENT_NEVER: periph_opus_active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_opus_active = settings_current.opus; break;
-  case PERIPH_PRESENT_ALWAYS: periph_opus_active = 1; break;
-  }
-
   if( ui_mouse_present ) {
     if( settings_current.kempston_mouse ) {
       if( !ui_mouse_grabbed ) ui_mouse_grabbed = ui_mouse_grab( 1 );
@@ -521,27 +391,12 @@ periph_update( void )
     }
   }
 
-  switch( fuller_present ) {
-  case PERIPH_PRESENT_NEVER: periph_fuller_active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_fuller_active = settings_current.fuller; break;
-  case PERIPH_PRESENT_ALWAYS: periph_fuller_active = 1; break;
-  }
+  g_hash_table_foreach( peripherals, set_activity, NULL );
 
-  if( periph_fuller_active ) {
-    periph_register_n( fuller_peripherals, fuller_peripherals_count );
-  }
-
-  switch( melodik_present ) {
-  case PERIPH_PRESENT_NEVER: periph_melodik_active = 0; break;
-  case PERIPH_PRESENT_OPTIONAL:
-    periph_melodik_active = settings_current.melodik; break;
-  case PERIPH_PRESENT_ALWAYS: periph_melodik_active = 1; break;
-  }
-
-  if( periph_melodik_active ) {
-    periph_register_n( melodik_peripherals, melodik_peripherals_count );
-  }
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_IF1,
+		    periph_is_active( PERIPH_TYPE_INTERFACE1 ) );
+  ui_menu_activate( UI_MENU_ITEM_MEDIA_CARTRIDGE_IF2,
+		    periph_is_active( PERIPH_TYPE_INTERFACE2 ) );
 
   update_cartridge_menu();
   update_ide_menu();
@@ -550,13 +405,11 @@ periph_update( void )
   machine_current->memory_map();
 }
 
-int
+/* Register debugger page/unpage events for a peripheral */
+void
 periph_register_paging_events( const char *type_string, int *page_event,
 			       int *unpage_event )
 {
   *page_event = debugger_event_register( type_string, page_event_string );
   *unpage_event = debugger_event_register( type_string, unpage_event_string );
-  if( *page_event == -1 || *unpage_event == -1 ) return 1;
-
-  return 0;
 }

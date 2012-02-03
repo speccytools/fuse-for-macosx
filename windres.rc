@@ -31,6 +31,7 @@ win32_icon ICON "winfuse.ico"
 
 #ifdef UI_WIN32
 
+#include "ui/win32/about.rc"            /* reserved ids: 1800 - 1899 */
 #include "ui/win32/binary.rc"           /* reserved ids: 1300 - 1399 */
 #include "ui/win32/browse.rc"           /* reserved ids: 1400 - 1499 */
 #include "ui/win32/debugger.rc"         /* reserved ids: 2000 - 2099 */
@@ -39,6 +40,7 @@ win32_icon ICON "winfuse.ico"
 #include "ui/win32/options.rc"          /* reserved ids: 3000 - 3099 */
 #include "ui/win32/picture.rc"          /* reserved ids: 1200 - 1299 */
 #include "ui/win32/pokefinder.rc"       /* reserved ids: 1500 - 1599 */
+#include "ui/win32/pokemem.rc"          /* reserved ids: 1900 - 1999 */
 #include "ui/win32/rollback.rc"         /* reserved ids: 1600 - 1699 */
 #include "ui/win32/roms.rc"             /* reserved ids: 1100 - 1199 */
 #include "ui/win32/select_template.rc"  /* reserved ids: 1000 - 1099 */
@@ -65,7 +67,7 @@ BEGIN
       VALUE "FileDescription",  "Fuse\0"
       VALUE "FileVersion",      VERSION##"\0"
       VALUE "InternalName",     "Fuse\0"
-      VALUE "LegalCopyright",   "Copyright (c) 1999-2009 Philip Kendall and others; see the file 'AUTHORS' for more details.\0"
+      VALUE "LegalCopyright",   "Copyright (c) 1999-2011 Philip Kendall and others; see the file 'AUTHORS' for more details.\0"
       VALUE "License",          "Fuse is licensed under the GNU General Public License, version 2 or later\0"
       VALUE "OriginalFilename", "fuse.exe\0"
       VALUE "ProductName",      "Fuse - the Free Unix Spectrum Emulator\0"
@@ -79,3 +81,8 @@ BEGIN
   END
 END
 
+/* Reference a manifest for visual styles. It must happen at the end.
+   Visual Studio generates the manifest automatically */
+#ifdef __GNUC__
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "ui/win32/fuse.manifest"
+#endif

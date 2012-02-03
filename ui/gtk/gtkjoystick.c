@@ -32,12 +32,20 @@
 #include "compat.h"
 #include "fuse.h"
 #include "gtkinternals.h"
-#include "joystick.h"
 #include "keyboard.h"
+#include "peripherals/joystick.h"
 #include "menu.h"
 #include "settings.h"
 
+#if !defined USE_JOYSTICK || defined HAVE_JSW_H
+/* Fake joystick, or override UI-specific handling */
 #include "../uijoystick.c"
+
+#else			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
+
+#include "../sdl/sdljoystick.c"
+
+#endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
 
 struct button_info {
   int *setting;

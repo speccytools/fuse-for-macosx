@@ -27,6 +27,7 @@
 
 #include <windows.h>
 
+#include "utils.h"
 #include "win32internals.h"
 
 /* FIXME: remember the last directory when opening/saving
@@ -74,7 +75,7 @@ run_dialog( const char *title, int is_saving )
   if( !result ) {
     return NULL;
   } else {
-    return strdup( ofn.lpstrFile );
+    return utils_safe_strdup( ofn.lpstrFile );
   }
 }
 

@@ -69,21 +69,28 @@ movie_compr, string, NULL
 movie_start, string, NULL
 movie_stop_after_rzx, boolean, 1
 plusd, boolean, 0
+disciple, boolean, 0
 beta128, boolean, 0
+beta128_48boot, boolean, 1
 late_timings, boolean, 0
 unittests, boolean, 0
 fuller, boolean, 0
 melodik, boolean, 0
+speccyboot, boolean, 0
+specdrum, boolean, 0
+spectranet, boolean, 0
+spectranet_disable, boolean, 0
 
 sound_device, string, NULL, 'd'
 sound, boolean, 1
 sound_load, boolean, 1,, loading-sound
-stereo_ay, boolean, 0,, separation
+stereo_ay, string, NULL,, separation
 sound_force_8bit, boolean, 0
 sound_freq, numeric, 32000, 'f'
 speaker_type, string, NULL
 volume_ay, numeric, 100
 volume_beeper, numeric, 100
+volume_specdrum, numeric, 100
 
 joystick_1, string, NULL, 'j'
 joystick_1_output, numeric, 0
@@ -130,6 +137,7 @@ opusdisk_file, string, NULL,, opusdisk
 playback_file, string, NULL, 'p', playback, playbackfile
 plus3disk_file, string, NULL,, plus3disk
 plusddisk_file, string, NULL,, plusddisk
+discipledisk_file, string, NULL,, discipledisk
 betadisk_file, string, NULL,, betadisk
 dck_file, string, NULL,, dock
 if2_file, string, NULL,, if2cart
@@ -168,6 +176,8 @@ svga_modes, string, NULL
 doublescan_mode, numeric, 1, 'D', doublescan-mode
 
 start_scaler_mode, string, "normal", 'g', graphics-filter
+
+speccyboot_tap, string, "tap0",
 
 rom_16, string, "48.rom",
 rom_48, string, "48.rom",
@@ -209,10 +219,13 @@ rom_scorpion_2, string, "256s-2.rom",
 rom_scorpion_3, string, "256s-3.rom",
 rom_spec_se_0, string, "se-0.rom",
 rom_spec_se_1, string, "se-1.rom",
+rom_speccyboot, string, "speccyboot-1.4.rom",
 rom_interface_i, string, "if1-2.rom",
 rom_opus, string, "opus.rom",
 rom_plusd, string, "plusd.rom",
+rom_disciple, string, "disciple.rom",
 rom_beta128, string, "trdos.rom",
+rom_spectranet, string, "spectranet.rom"
 
 drive_plus3a_type, string, NULL
 drive_plus3b_type, string, NULL
@@ -223,6 +236,8 @@ drive_beta128c_type, string, NULL
 drive_beta128d_type, string, NULL
 drive_plusd1_type, string, NULL
 drive_plusd2_type, string, NULL
+drive_disciple1_type, string, NULL
+drive_disciple2_type, string, NULL
 drive_opus1_type, string, NULL
 drive_opus2_type, string, NULL
 drive_40_max_track, numeric, 42

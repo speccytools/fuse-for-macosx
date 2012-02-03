@@ -1,5 +1,5 @@
 /* utils.c: some useful helper functions
-   Copyright (c) 1999-2008 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall
 
    $Id$
 
@@ -36,18 +36,19 @@
 
 #include <libspectrum.h>
 
-#include "dck.h"
-#include "disk/beta.h"
 #include "fuse.h"
-#include "ide/divide.h"
-#include "ide/simpleide.h"
-#include "ide/zxatasp.h"
-#include "ide/zxcf.h"
-#include "if1.h"
-#include "if2.h"
 #include "machines/specplus3.h"
 #include "memory.h"
+#include "peripherals/dck.h"
+#include "peripherals/ide/divide.h"
+#include "peripherals/ide/simpleide.h"
+#include "peripherals/ide/zxatasp.h"
+#include "peripherals/ide/zxcf.h"
+#include "peripherals/if1.h"
+#include "peripherals/if2.h"
+#include "pokefinder/pokemem.h"
 #include "rzx.h"
+#include "screenshot.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
@@ -64,6 +65,8 @@ typedef struct path_context {
 
 static void init_path_context( path_context *ctx, utils_aux_type type );
 static int get_next_path( path_context *ctx );
+
+static int networking_init_count = 0;
 
 /* Open `filename' and do something sensible with it; autoload tapes
    if `autoload' is true and return the type of file found in `type' */
@@ -105,11 +108,13 @@ utils_open_file( const char *filename, int autoload,
 
   case LIBSPECTRUM_CLASS_SNAPSHOT:
     error = snapshot_read_buffer( file.buffer, file.length, type );
+    pokemem_find_pokfile( filename );
     break;
 
   case LIBSPECTRUM_CLASS_TAPE:
     error = tape_read_buffer( file.buffer, file.length, type, filename,
 			      autoload );
+    pokemem_find_pokfile( filename );
     break;
 
   case LIBSPECTRUM_CLASS_DISK_PLUS3:
@@ -135,7 +140,7 @@ utils_open_file( const char *filename, int autoload,
 
     if( !( machine_current->capabilities &
 	   LIBSPECTRUM_MACHINE_CAPABILITY_TRDOS_DISK ) &&
-        !periph_beta128_active ) {
+        !periph_is_active( PERIPH_TYPE_BETA128 ) ) {
       error = machine_select( LIBSPECTRUM_MACHINE_PENT ); if( error ) break;
     }
 
@@ -152,9 +157,9 @@ utils_open_file( const char *filename, int autoload,
           machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
       error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
     else
-      if( periph_beta128_active )
+      if( periph_is_active( PERIPH_TYPE_BETA128 ) )
         error = beta_disk_insert( BETA_DRIVE_A, filename, autoload );
-      else if( periph_plusd_active )
+      else if( periph_is_active( PERIPH_TYPE_PLUSD ) )
         error = plusd_disk_insert( PLUSD_DRIVE_1, filename, autoload );
     break;
 
@@ -196,6 +201,12 @@ utils_open_file( const char *filename, int autoload,
     
     break;
 
+  case LIBSPECTRUM_CLASS_AUXILIARY:
+    if( type == LIBSPECTRUM_ID_AUX_POK ) {
+      ui_pokemem_selector( filename );
+    }
+    break;
+
   default:
     ui_error( UI_ERROR_ERROR, "utils_open_file: unknown class %d", type );
     error = 1;
@@ -204,7 +215,7 @@ utils_open_file( const char *filename, int autoload,
 
   if( error ) { utils_close_file( &file ); return error; }
 
-  if( utils_close_file( &file ) ) return 1;
+  utils_close_file( &file );
 
   if( type_ptr ) *type_ptr = type;
 
@@ -228,7 +239,7 @@ utils_open_snap( void )
 
 /* Find the auxiliary file called `filename'; returns a fd for the
    file on success, -1 if it couldn't find the file */
-compat_fd
+static compat_fd
 utils_find_auxiliary_file( const char *filename, utils_aux_type type )
 {
   compat_fd fd;
@@ -304,7 +315,8 @@ init_path_context( path_context *ctx, utils_aux_type type )
 static int
 get_next_path( path_context *ctx )
 {
-  char buffer[ PATH_MAX ], *path_segment, *path2;
+  char buffer[ PATH_MAX ];
+  const char *path_segment, *path2;
 
   switch( (ctx->state)++ ) {
 
@@ -415,12 +427,10 @@ utils_read_fd( compat_fd fd, const char *filename, utils_file *file )
   return 0;
 }
 
-int
+void
 utils_close_file( utils_file *file )
 {
   free( file->buffer );
-
-  return 0;
 }
 
 int utils_write_file( const char *filename, const unsigned char *buffer,
@@ -486,8 +496,81 @@ utils_make_temp_file( int *fd, char *tempfilename, const char *filename,
     return 1;
   }
 
-  error = utils_close_file( &file );
-  if( error ) { close( *fd ); unlink( tempfilename ); return error; }
+  utils_close_file( &file );
 
   return 0;
 }
+
+int
+utils_read_auxiliary_file( const char *filename, utils_file *file,
+                           utils_aux_type type )
+{
+  int error;
+  compat_fd fd;
+
+  fd = utils_find_auxiliary_file( filename, type );
+  if( fd == COMPAT_FILE_OPEN_FAILED ) return -1;
+
+  error = utils_read_fd( fd, filename, file );
+  if( error ) return error;
+
+  return 0;
+
+}
+
+int
+utils_read_screen( const char *filename, utils_file *screen )
+{
+  int error;
+
+  error = utils_read_auxiliary_file( filename, screen, UTILS_AUXILIARY_LIB );
+  if( error == -1 ) {
+    ui_error( UI_ERROR_ERROR, "couldn't find screen picture ('%s')",
+	      filename );
+    return 1;
+  }
+
+  if( error ) return error;
+
+  if( screen->length != STANDARD_SCR_SIZE ) {
+    utils_close_file( screen );
+    ui_error( UI_ERROR_ERROR, "screen picture ('%s') is not %d bytes long",
+	      filename, STANDARD_SCR_SIZE );
+    return 1;
+  }
+
+  return 0;
+}
+
+char*
+utils_safe_strdup( const char *src )
+{
+  char *dest = NULL;
+  if( src ) {
+    dest = strdup( src );
+    if( !dest ) {
+      ui_error( UI_ERROR_ERROR, "out of memory at %s:%d\n", __FILE__, __LINE__ );
+      fuse_abort();
+    }
+  }
+  return dest;
+}
+
+void
+utils_networking_init( void )
+{
+  if( !networking_init_count )
+    compat_socket_networking_init();
+
+  networking_init_count++;
+}
+
+void
+utils_networking_end( void )
+{
+  networking_init_count--;
+
+  if( !networking_init_count )
+    compat_socket_networking_end();
+}
+

@@ -38,14 +38,14 @@
 #include "debugger/debugger.h"
 #include "fuse.h"
 #include "gtkinternals.h"
-#include "ide/simpleide.h"
-#include "ide/zxatasp.h"
-#include "ide/zxcf.h"
-#include "joystick.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "machines/specplus3.h"
 #include "menu.h"
+#include "peripherals/ide/simpleide.h"
+#include "peripherals/ide/zxatasp.h"
+#include "peripherals/ide/zxcf.h"
+#include "peripherals/joystick.h"
 #include "psg.h"
 #include "rzx.h"
 #include "screenshot.h"
@@ -144,6 +144,7 @@ ui_init( int *argc, char ***argv )
 {
   GtkWidget *box, *menu_bar;
   GtkAccelGroup *accel_group;
+  GtkSettings *settings;
 
   gtk_init(argc,argv);
 
@@ -154,6 +155,8 @@ ui_init( int *argc, char ***argv )
 
   gtkui_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+  settings = gtk_widget_get_settings( GTK_WIDGET( gtkui_window ) );
+  g_object_set( settings, "gtk-menu-bar-accel", "F1", NULL );
   gtk_window_set_title( GTK_WINDOW(gtkui_window), "Fuse" );
   gtk_window_set_wmclass( GTK_WINDOW(gtkui_window), fuse_progname, "Fuse" );
 
@@ -175,8 +178,9 @@ ui_init( int *argc, char ***argv )
                      GTK_DEST_DEFAULT_ALL,
                      drag_types,
                      G_N_ELEMENTS( drag_types ),
-                     GDK_ACTION_COPY | GDK_ACTION_PRIVATE );
-                     /* GDK_ACTION_PRIVATE alone DNW with ROX-Filer */
+                     GDK_ACTION_COPY | GDK_ACTION_PRIVATE | GDK_ACTION_MOVE );
+                     /* GDK_ACTION_PRIVATE alone DNW with ROX-Filer,
+                        GDK_ACTION_MOVE allow DnD from KDE */
 
   gtk_signal_connect( GTK_OBJECT( gtkui_window ), "drag-data-received",
 		      GTK_SIGNAL_FUNC( gtkui_drag_data_received ), NULL );
@@ -609,7 +613,7 @@ menu_help_about( GtkWidget *widget GCC_UNUSED, gpointer data GCC_UNUSED )
   gtk_show_about_dialog( GTK_WINDOW( gtkui_window ),
                          "name", "Fuse",
                          "comments", "The Free Unix Spectrum Emulator",
-                         "copyright", "(c) 1999-2008 Philip Kendall and others.",
+                         "copyright", "(c) 1999-2011 Philip Kendall and others.",
                          "version", VERSION,
                          "website", "http://fuse-emulator.sourceforge.net/",
                          NULL );

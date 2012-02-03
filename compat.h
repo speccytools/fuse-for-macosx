@@ -31,6 +31,10 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+#ifdef WIN32
+#include <winsock2.h>
+#endif
+
 /* Remove the gcc-specific incantations if we're not using gcc */
 #ifdef __GNUC__
 
@@ -96,6 +100,7 @@ int compat_file_read( compat_fd fd, struct utils_file *file );
 int compat_file_write( compat_fd fd, const unsigned char *buffer,
                        size_t length );
 int compat_file_close( compat_fd fd );
+int compat_file_exists( const char *path );
 
 /* Directory handling */
 
@@ -114,5 +119,35 @@ int compat_closedir( compat_dir directory );
 
 double compat_timer_get_time( void );
 void compat_timer_sleep( int ms );
+
+/* TUN/TAP handling */
+
+int compat_get_tap( const char *interface_name );
+
+/* Socket handling */
+
+#ifndef WIN32
+typedef int compat_socket_t;
+#else                           /* #ifndef WIN32 */
+typedef SOCKET compat_socket_t;
+#endif
+
+extern const compat_socket_t compat_socket_invalid;
+extern const int compat_socket_EBADF;
+
+void compat_socket_networking_init( void );
+void compat_socket_networking_end( void );
+
+int compat_socket_close( compat_socket_t fd );
+int compat_socket_get_error( void );
+const char *compat_socket_get_strerror( void );
+
+typedef struct compat_socket_selfpipe_t compat_socket_selfpipe_t;
+
+compat_socket_selfpipe_t* compat_socket_selfpipe_alloc( void );
+void compat_socket_selfpipe_free( compat_socket_selfpipe_t *self );
+compat_socket_t compat_socket_selfpipe_get_read_fd( compat_socket_selfpipe_t *self );
+void compat_socket_selfpipe_wake( compat_socket_selfpipe_t *self );
+void compat_socket_selfpipe_discard_data( compat_socket_selfpipe_t *self );
 
 #endif				/* #ifndef FUSE_COMPAT_H */

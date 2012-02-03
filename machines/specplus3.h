@@ -30,10 +30,7 @@
 
 #include "machine.h"
 #include "periph.h"
-#include "disk/fdd.h"
-
-extern const periph_t specplus3_peripherals[];
-extern const size_t specplus3_peripherals_count;
+#include "peripherals/disk/fdd.h"
 
 int specplus3_port_from_ula( libspectrum_word port );
 
@@ -50,6 +47,10 @@ int specplus3_shutdown( void );
 void specplus3_memoryport_write( libspectrum_word port, libspectrum_byte b );
 void specplus3_memoryport2_write( libspectrum_word port, libspectrum_byte b );
 
+libspectrum_byte specplus3_fdc_status( libspectrum_word port, int *attached );
+libspectrum_byte specplus3_fdc_read( libspectrum_word port, int *attached );
+void specplus3_fdc_write( libspectrum_word port, libspectrum_byte data );
+
 int specplus3_memory_map( void );
 
 typedef enum specplus3_drive_number {
@@ -59,7 +60,8 @@ typedef enum specplus3_drive_number {
 
 int specplus3_disk_insert( specplus3_drive_number which, const char *filename,
                            int autoload );
-int specplus3_disk_eject( specplus3_drive_number which, int save );
+int specplus3_disk_eject( specplus3_drive_number which );
+int specplus3_disk_save( specplus3_drive_number which, int saveas );
 int specplus3_disk_write( specplus3_drive_number which, const char *filename );
 int specplus3_disk_flip( specplus3_drive_number which, int flip );
 int specplus3_disk_writeprotect( specplus3_drive_number which, int wp );

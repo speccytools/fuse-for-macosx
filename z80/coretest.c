@@ -360,7 +360,7 @@ ui_error( ui_error_level severity GCC_UNUSED, const char *format, ... )
 
 #include "debugger/debugger.h"
 #include "machine.h"
-#include "scld.h"
+#include "peripherals/scld.h"
 #include "settings.h"
 
 libspectrum_byte *slt[256];
@@ -390,8 +390,8 @@ enum debugger_mode_t debugger_mode;
 
 libspectrum_byte **ROM = NULL;
 memory_page memory_map[8];
-memory_page *memory_map_home[8];
-memory_page memory_map_rom[8];
+memory_page *memory_map_home[MEMORY_PAGES_IN_64K];
+memory_page memory_map_rom[SPECTRUM_ROM_PAGES * MEMORY_PAGES_IN_16K];
 int memory_contended[8] = { 1 };
 libspectrum_byte spectrum_contention[ 80000 ] = { 0 };
 int profile_active = 0;
@@ -471,6 +471,15 @@ plusd_page( void )
   abort();
 }
 
+int disciple_available = 0;
+int disciple_active = 0;
+
+void
+disciple_page( void )
+{
+  abort();
+}
+
 void
 if1_page( void )
 {
@@ -489,6 +498,20 @@ divide_set_automap( int state GCC_UNUSED )
   abort();
 }
 
+int spectranet_available = 0;
+
+void
+spectranet_page( void )
+{
+  abort();
+}
+
+void
+spectranet_unpage( void )
+{
+  abort();
+}
+
 int
 rzx_frame( void )
 {
@@ -501,12 +524,11 @@ writeport_internal( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNU
   abort();
 }
 
-int
+void
 event_add_with_data( libspectrum_dword event_time GCC_UNUSED,
 		     int type GCC_UNUSED, void *user_data GCC_UNUSED )
 {
   /* Do nothing */
-  return 0;
 }
 
 int
@@ -522,6 +544,9 @@ settings_info settings_current;
 
 libspectrum_word beta_pc_mask;
 libspectrum_word beta_pc_value;
+
+int spectranet_programmable_trap_active;
+libspectrum_word spectranet_programmable_trap;
 
 /* Initialise the dummy variables such that we're running on a clean a
    machine as possible */
@@ -544,6 +569,8 @@ init_dummies( void )
   settings_current.divide_enabled = 0;
   beta_pc_mask = 0xfe00;
   beta_pc_value = 0x3c00;
+  spectranet_programmable_trap_active = 0;
+  spectranet_programmable_trap = 0x0000;
 
   return 0;
 }

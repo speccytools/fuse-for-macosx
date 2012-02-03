@@ -43,9 +43,10 @@
 #include "machine.h"
 #include "movie_tables.h"
 #include "options.h"
+#include "peripherals/scld.h"
 #include "screenshot.h"
 #include "settings.h"
-#include "scld.h"
+#include "sound.h"
 #include "ui/ui.h"
 
 #undef MOVIE_DEBUG_PRINT
@@ -328,7 +329,8 @@ movie_start_fmf( char *name )
 #else	/* HAVE_ZLIB_H */
   fwrite( "U", 1, 1, of );		/* cannot be compressed */
 #endif	/* HAVE_ZLIB_H */
-  movie_init_sound( settings_current.sound_freq, settings_current.stereo_ay );
+  movie_init_sound( settings_current.sound_freq,
+                    sound_stereo_ay != SOUND_STEREO_AY_NONE );
   head[0] = settings_current.frame_rate;
   head[1] = get_screentype();
   head[2] = get_timing();

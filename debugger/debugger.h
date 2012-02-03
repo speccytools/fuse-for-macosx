@@ -49,8 +49,8 @@ extern enum debugger_mode_t debugger_mode;
 /* Which base should we display things in */
 extern int debugger_output_base;
 
-int debugger_init( void );
-int debugger_reset( void );
+void debugger_init( void );
+void debugger_reset( void );
 
 int debugger_end( void );
 
@@ -66,7 +66,7 @@ void debugger_disassemble( char *buffer, size_t buflen, size_t *length,
 			   libspectrum_word address );
 
 /* Evaluate a debugger command */
-int debugger_command_evaluate( const char *command );
+void debugger_command_evaluate( const char *command );
 
 /* Get a deparsed expression */
 int debugger_expression_deparse( char *buffer, size_t length,

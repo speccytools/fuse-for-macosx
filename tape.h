@@ -28,7 +28,7 @@
 
 #include <libspectrum.h>
 
-int tape_init( void );
+void tape_init( void );
 
 int tape_open( const char *filename, int autoload );
 
@@ -57,7 +57,7 @@ int tape_stop( void );
 int tape_is_playing( void );
 int tape_present( void );
 
-int tape_record_start( void );
+void tape_record_start( void );
 int tape_record_stop( void );
 
 /* Call a user-supplied function for every block in the current tape */

@@ -27,12 +27,11 @@ bin_PROGRAMS = fuse
 
 SUBDIRS = @COMPAT_SUBDIR@ \
 	  debugger \
-	  disk \
 	  hacking \
-	  ide \
 	  lib \
 	  machines \
 	  man \
+          peripherals \
 	  perl \
 	  pokefinder \
 	  roms \
@@ -43,12 +42,11 @@ SUBDIRS = @COMPAT_SUBDIR@ \
 	  z80
 
 DIST_SUBDIRS = debugger \
-	       disk \
 	       hacking \
-	       ide \
 	       lib \
 	       machines \
 	       man \
+               peripherals \
 	       perl \
 	       pokefinder \
 	       roms \
@@ -58,33 +56,23 @@ DIST_SUBDIRS = debugger \
 	       unittests \
 	       z80
 
-fuse_SOURCES = ay.c \
-	dck.c \
-	display.c \
+fuse_SOURCES = display.c \
 	event.c \
-	fuller.c \
 	fuse.c \
-	if1.c \
-	if2.c \
 	input.c \
-	joystick.c \
-	kempmouse.c \
 	keyboard.c \
 	loader.c \
 	machine.c \
-	melodik.c \
 	memory.c \
 	mempool.c \
 	menu.c \
 	movie.c \
 	module.c \
 	periph.c \
-	printer.c \
 	profile.c \
 	psg.c \
 	rectangle.c \
 	rzx.c \
-	scld.c \
 	screenshot.c \
 	settings.c \
 	slt.c \
@@ -94,7 +82,6 @@ fuse_SOURCES = ay.c \
 	tape.c \
 	ui.c \
 	uidisplay.c \
-	ula.c \
 	utils.c \
 	windres.rc
 
@@ -115,9 +102,12 @@ EXTRA_fuse_SOURCES = windres.rc
 fuse_LDADD = debugger/libdebugger.a \
 @UI_LIBS@ \
 debugger/libdebugger.a \
-disk/libdisk.a \
-ide/libide.a \
 machines/libmachines.a \
+peripherals/libperipherals.a \
+peripherals/disk/libdisk.a \
+peripherals/flash/libflash.a \
+peripherals/ide/libide.a \
+peripherals/nic/libnic.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
 timer/libtimer.a \
@@ -137,9 +127,12 @@ compat/@COMPAT_OSNAME@/libcompatos.a \
 fuse_DEPENDENCIES = debugger/libdebugger.a \
 @UI_LIBS@ \
 debugger/libdebugger.a \
-disk/libdisk.a \
-ide/libide.a \
 machines/libmachines.a \
+peripherals/libperipherals.a \
+peripherals/disk/libdisk.a \
+peripherals/flash/libflash.a \
+peripherals/ide/libide.a \
+peripherals/nic/libnic.a \
 pokefinder/libpokefinder.a \
 sound/libsound.a \
 timer/libtimer.a \
@@ -171,22 +164,15 @@ endif
 INCLUDES = @GLIB_CFLAGS@ @GTK_CFLAGS@ @LIBSPEC_CFLAGS@ \
 @XML_CFLAGS@ -DFUSEDATADIR="\"${pkgdatadir}\"" @SDL_CFLAGS@
 
-noinst_HEADERS = ay.h \
-	bitmap.h \
+noinst_HEADERS = bitmap.h \
 	compat.h \
-	dck.h \
 	display.h \
 	event.h \
-	fuller.h \
 	fuse.h \
-	if1.h \
-	if2.h \
 	input.h \
 	keyboard.h \
-	kempmouse.h \
 	loader.h \
 	machine.h \
-	melodik.h \
 	memory.h \
 	mempool.h \
 	menu.h \
@@ -205,12 +191,8 @@ noinst_HEADERS = ay.h \
 	spectrum.h \
 	tape.h \
 	utils.h \
-	joystick.h \
 	options.h \
-	printer.h \
-	profile.h \
-	scld.h \
-	ula.h
+	profile.h
 
 EXTRA_DIST = AUTHORS \
 	     README \

@@ -28,11 +28,12 @@
 
 extern const int MEMPOOL_UNTRACKED;
 
-int mempool_init( void );
+void mempool_init( void );
 int mempool_register_pool( void );
 void* mempool_alloc( int pool, size_t size );
 char* mempool_strdup( int pool, const char *string );
 void mempool_free( int pool );
+void mempool_end( void );
 
 /* Unit test helper routines */
 

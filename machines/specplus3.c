@@ -1,5 +1,5 @@
 /* specplus3.c: Spectrum +2A/+3 specific routines
-   Copyright (c) 1999-2007 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -35,14 +35,15 @@
 
 #include <libspectrum.h>
 
-#include "ay.h"
 #include "compat.h"
 #include "fuse.h"
-#include "joystick.h"
 #include "machine.h"
+#include "machines_periph.h"
 #include "memory.h"
 #include "periph.h"
-#include "printer.h"
+#include "peripherals/disk/fdd.h"
+#include "peripherals/disk/upd_fdc.h"
+#include "peripherals/printer.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "spec128.h"
@@ -50,43 +51,17 @@
 #include "specplus3.h"
 #include "spectrum.h"
 #include "ui/ui.h"
-#include "ula.h"
-#include "if1.h"
 #include "utils.h"
-#include "disk/fdd.h"
-#include "disk/upd_fdc.h"
 #include "options.h"	/* needed for get combo options */
 
 #define DISK_TRY_MERGE(heads) ( option_enumerate_diskoptions_disk_try_merge() == 2 || \
 				( option_enumerate_diskoptions_disk_try_merge() == 1 && heads == 1 ) )
 
 static int normal_memory_map( int rom, int page );
-static int special_memory_map( int which );
-static int select_special_map( int page1, int page2, int page3, int page4 );
-
-static libspectrum_byte specplus3_fdc_status( libspectrum_word port,
-					      int *attached );
-static libspectrum_byte specplus3_fdc_read( libspectrum_word port,
-					    int *attached );
-static void specplus3_fdc_write( libspectrum_word port,
-				 libspectrum_byte data );
+static void special_memory_map( int which );
+static void select_special_map( int page1, int page2, int page3, int page4 );
 
 static int specplus3_reset( void );
-
-const periph_t specplus3_peripherals[] = {
-  { 0x0001, 0x0000, ula_read, ula_write },
-  { 0x00e0, 0x0000, joystick_kempston_read, NULL },
-  { 0xc002, 0xc000, ay_registerport_read, ay_registerport_write },
-  { 0xc002, 0x8000, ay_registerport_read, ay_dataport_write },
-  { 0xc002, 0x4000, NULL, spec128_memoryport_write },
-  { 0xf002, 0x3000, specplus3_fdc_read, specplus3_fdc_write },
-  { 0xf002, 0x2000, specplus3_fdc_status, NULL },
-  { 0xf002, 0x1000, NULL, specplus3_memoryport2_write },
-  { 0xf002, 0x0000, printer_parallel_read, printer_parallel_write },
-};
-
-const size_t specplus3_peripherals_count =
-  sizeof( specplus3_peripherals ) / sizeof( periph_t );
 
 #define SPECPLUS3_NUM_DRIVES 2
 upd_fdc *specplus3_fdc;
@@ -110,6 +85,7 @@ int specplus3_init( fuse_machine_info *machine )
   machine->ram.port_from_ula	     = specplus3_port_from_ula;
   machine->ram.contend_delay	     = spectrum_contend_delay_76543210;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
+  machine->ram.valid_pages	     = 8;
 
   machine->unattached_port = spectrum_unattached_port_none;
 
@@ -176,26 +152,29 @@ specplus3_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus3_0,
+  error = machine_load_rom( 0, settings_current.rom_plus3_0,
                             settings_default.rom_plus3_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus3_1,
+  error = machine_load_rom( 1, settings_current.rom_plus3_1,
                             settings_default.rom_plus3_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_plus3_2,
+  error = machine_load_rom( 2, settings_current.rom_plus3_2,
                             settings_default.rom_plus3_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 6, 3, settings_current.rom_plus3_3,
+  error = machine_load_rom( 3, settings_current.rom_plus3_3,
                             settings_default.rom_plus3_3, 0x4000 );
   if( error ) return error;
 
   error = specplus3_plus2a_common_reset();
   if( error ) return error;
 
-  error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
-  if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
+  periph_clear();
+  machines_periph_plus3();
+
+  periph_set_present( PERIPH_TYPE_UPD765, PERIPH_PRESENT_ALWAYS );
+
   periph_update();
+
   specplus3_765_reset();
   specplus3_menu_items();
 
@@ -220,17 +199,12 @@ specplus3_plus2a_common_reset( void )
   memory_screen_mask = 0xffff;
 
   /* All memory comes from the home bank */
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i].bank = memory_map_write[i].bank = MEMORY_BANK_HOME;
+  for( i = 0; i < MEMORY_PAGES_IN_64K; i++ )
+    memory_map_read[i].source = memory_map_write[i].source = memory_source_ram;
 
   /* RAM pages 4, 5, 6 and 7 contended */
   for( i = 0; i < 8; i++ )
-    memory_map_ram[ 2 * i     ].contended =
-      memory_map_ram[ 2 * i + 1 ].contended = i & 4;
-
-  /* Mark as present/writeable */
-  for( i = 0; i < 16; i++ )
-    memory_map_ram[i].writable = 1;
+    memory_ram_set_16k_contention( i, i >= 4 );
 
   error = normal_memory_map( 0, 0 ); if( error ) return error;
 
@@ -241,55 +215,39 @@ static int
 normal_memory_map( int rom, int page )
 {
   /* ROM as specified */
-  memory_map_home[0] = &memory_map_rom[ 2 * rom     ];
-  memory_map_home[1] = &memory_map_rom[ 2 * rom + 1 ];
-
+  memory_map_16k( 0x0000, memory_map_rom, rom );
   /* RAM 5 */
-  memory_map_home[2] = &memory_map_ram[10];
-  memory_map_home[3] = &memory_map_ram[11];
-
+  memory_map_16k( 0x4000, memory_map_ram, 5 );
   /* RAM 2 */
-  memory_map_home[4] = &memory_map_ram[ 4];
-  memory_map_home[5] = &memory_map_ram[ 5];
-
-  /* RAM as specified */
-  memory_map_home[6] = &memory_map_ram[ 2 * page     ];
-  memory_map_home[7] = &memory_map_ram[ 2 * page + 1 ];
+  memory_map_16k( 0x8000, memory_map_ram, 2 );
+  /* RAM 0 */
+  memory_map_16k( 0xc000, memory_map_ram, page );
 
   return 0;
 }
 
-static int
+static void
 special_memory_map( int which )
 {
   switch( which ) {
-  case 0: return select_special_map( 0, 1, 2, 3 );
-  case 1: return select_special_map( 4, 5, 6, 7 );
-  case 2: return select_special_map( 4, 5, 6, 3 );
-  case 3: return select_special_map( 4, 7, 6, 3 );
+  case 0: select_special_map( 0, 1, 2, 3 ); break;
+  case 1: select_special_map( 4, 5, 6, 7 ); break;
+  case 2: select_special_map( 4, 5, 6, 3 ); break;
+  case 3: select_special_map( 4, 7, 6, 3 ); break;
 
   default:
     ui_error( UI_ERROR_ERROR, "unknown +3 special configuration %d", which );
-    return 1;
+    fuse_abort();
   }
 }
 
-static int
+static void
 select_special_map( int page1, int page2, int page3, int page4 )
 {
-  memory_map_home[0] = &memory_map_ram[ 2 * page1     ];
-  memory_map_home[1] = &memory_map_ram[ 2 * page1 + 1 ];
-
-  memory_map_home[2] = &memory_map_ram[ 2 * page2     ];
-  memory_map_home[3] = &memory_map_ram[ 2 * page2 + 1 ];
-
-  memory_map_home[4] = &memory_map_ram[ 2 * page3     ];
-  memory_map_home[5] = &memory_map_ram[ 2 * page3 + 1 ];
-
-  memory_map_home[6] = &memory_map_ram[ 2 * page4     ];
-  memory_map_home[7] = &memory_map_ram[ 2 * page4 + 1 ];
-
-  return 0;
+  memory_map_16k( 0x0000, memory_map_ram, page1 );
+  memory_map_16k( 0x4000, memory_map_ram, page2 );
+  memory_map_16k( 0x8000, memory_map_ram, page3 );
+  memory_map_16k( 0xc000, memory_map_ram, page4 );
 }
 
 void
@@ -325,7 +283,6 @@ int
 specplus3_memory_map( void )
 {
   int page, rom, screen;
-  size_t i;
 
   page = machine_current->ram.last_byte & 0x07;
   screen = ( machine_current->ram.last_byte & 0x08 ) ? 7 : 5;
@@ -359,9 +316,6 @@ specplus3_memory_map( void )
   machine_current->ram.current_page = page;
   machine_current->ram.current_rom  = rom;
 
-  for( i = 0; i < 8; i++ )
-    memory_map_read[i] = memory_map_write[i] = *memory_map_home[i];
-
   memory_romcs_map();
 
   return 0;
@@ -390,21 +344,21 @@ specplus3_menu_items( void )
 		    !specplus3_drives[ SPECPLUS3_DRIVE_B ].fdd.wrprot );
 }
 
-static libspectrum_byte
+libspectrum_byte
 specplus3_fdc_status( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return upd_fdc_read_status( specplus3_fdc );
 }
 
-static libspectrum_byte
+libspectrum_byte
 specplus3_fdc_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
   *attached = 1;
   return upd_fdc_read_data( specplus3_fdc );
 }
 
-static void
+void
 specplus3_fdc_write( libspectrum_word port GCC_UNUSED, libspectrum_byte data )
 {
   upd_fdc_write_data( specplus3_fdc, data );
@@ -431,7 +385,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
   /* Eject any disk already in the drive */
   if( d->fdd.loaded ) {
     /* Abort the insert if we want to keep the current disk */
-    if( specplus3_disk_eject( which, 0 ) ) return 0;
+    if( specplus3_disk_eject( which ) ) return 0;
   }
 
   if( filename ) {
@@ -452,7 +406,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
       break;
     }
     error = disk_new( &d->disk, dt->heads, dt->cylinders, DISK_DENS_AUTO, DISK_UDI );
-    disk_preformat( &d->disk );						/* pre-format disk for +3 */
+    disk_preformat( &d->disk );			/* pre-format disk for +3 */
     if( error != DISK_OK ) {
       ui_error( UI_ERROR_ERROR, "Failed to create disk image: %s",
 				disk_strerror( error ) );
@@ -488,7 +442,7 @@ specplus3_disk_insert( specplus3_drive_number which, const char *filename,
 }
 
 int
-specplus3_disk_eject( specplus3_drive_number which, int write )
+specplus3_disk_eject( specplus3_drive_number which )
 {
   upd_fdc_drive *d;
 
@@ -500,30 +454,23 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( write ) {
+  if( d->disk.dirty ) {
 
-    if( ui_plus3_disk_write( which ) ) return 1;
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "Disk in drive %c has been modified.\n"
+      "Do you want to save it?",
+      which == SPECPLUS3_DRIVE_A ? 'A' : 'B'
+    );
 
-  } else {
+    switch( confirm ) {
 
-    if( d->disk.dirty ) {
+    case UI_CONFIRM_SAVE_SAVE:
+      if( specplus3_disk_save( which, 0 ) ) return 1;   /* first save it...*/
+      break;
 
-      ui_confirm_save_t confirm = ui_confirm_save(
-	"Disk in drive %c has been modified.\n"
-	"Do you want to save it?",
-	which == SPECPLUS3_DRIVE_A ? 'A' : 'B'
-      );
+    case UI_CONFIRM_SAVE_DONTSAVE: break;
+    case UI_CONFIRM_SAVE_CANCEL: return 1;
 
-      switch( confirm ) {
-
-      case UI_CONFIRM_SAVE_SAVE:
-	if( ui_plus3_disk_write( which ) ) return 1;
-	break;
-
-      case UI_CONFIRM_SAVE_DONTSAVE: break;
-      case UI_CONFIRM_SAVE_CANCEL: return 1;
-
-      }
     }
   }
 
@@ -539,6 +486,25 @@ specplus3_disk_eject( specplus3_drive_number which, int write )
     ui_menu_activate( UI_MENU_ITEM_MEDIA_DISK_PLUS3_B_EJECT, 0 );
     break;
   }
+  return 0;
+}
+
+int
+specplus3_disk_save( specplus3_drive_number which, int saveas )
+{
+  upd_fdc_drive *d;
+
+  if( which >= SPECPLUS3_NUM_DRIVES )
+    return 1;
+
+  d = &specplus3_drives[ which ];
+
+  if( d->disk.type == DISK_TYPE_NONE )
+    return 0;
+
+  if( d->disk.filename == NULL ) saveas = 1;
+  if( ui_plus3_disk_write( which, saveas ) ) return 1;
+  d->disk.dirty = 0;
   return 0;
 }
 
@@ -605,8 +571,9 @@ specplus3_disk_write( specplus3_drive_number which, const char *filename )
 {
   upd_fdc_drive *d = &specplus3_drives[ which ];
   int error;
-  
+
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename; /* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
@@ -615,6 +582,10 @@ specplus3_disk_write( specplus3_drive_number which, const char *filename )
     return 1;
   }
 
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = utils_safe_strdup( filename );
+  }
   return 0;
 }
 

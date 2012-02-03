@@ -1,5 +1,5 @@
 /* specplus3e.c: Spectrum +3e specific routines
-   Copyright (c) 1999-2004 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
 
    $Id$
 
@@ -25,9 +25,10 @@
 
 #include <config.h>
 
-#include "disk/upd_fdc.h"
 #include "machines.h"
+#include "machines_periph.h"
 #include "periph.h"
+#include "peripherals/disk/upd_fdc.h"
 #include "settings.h"
 #include "spec48.h"
 #include "specplus3.h"
@@ -48,6 +49,7 @@ specplus3e_init( fuse_machine_info *machine )
   machine->ram.port_from_ula	     = specplus3_port_from_ula;
   machine->ram.contend_delay	     = spectrum_contend_delay_76543210;
   machine->ram.contend_delay_no_mreq = spectrum_contend_delay_none;
+  machine->ram.valid_pages	     = 8;
 
   machine->unattached_port = spectrum_unattached_port_none;
 
@@ -63,27 +65,29 @@ specplus3e_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, 0, settings_current.rom_plus3e_0,
+  error = machine_load_rom( 0, settings_current.rom_plus3e_0,
                             settings_default.rom_plus3e_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 2, 1, settings_current.rom_plus3e_1,
+  error = machine_load_rom( 1, settings_current.rom_plus3e_1,
                             settings_default.rom_plus3e_1, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 4, 2, settings_current.rom_plus3e_2,
+  error = machine_load_rom( 2, settings_current.rom_plus3e_2,
                             settings_default.rom_plus3e_2, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 6, 3, settings_current.rom_plus3e_3,
+  error = machine_load_rom( 3, settings_current.rom_plus3e_3,
                             settings_default.rom_plus3e_3, 0x4000 );
   if( error ) return error;
 
   error = specplus3_plus2a_common_reset();
   if( error ) return error;
 
-  error = periph_setup( specplus3_peripherals, specplus3_peripherals_count );
-  if( error ) return error;
-  periph_setup_kempston( PERIPH_PRESENT_OPTIONAL );
-  periph_setup_interface1( PERIPH_PRESENT_OPTIONAL );
+  periph_clear();
+  machines_periph_plus3();
+
+  periph_set_present( PERIPH_TYPE_UPD765, PERIPH_PRESENT_ALWAYS );
+
   periph_update();
+
   specplus3_765_reset();
   specplus3_menu_items();
 

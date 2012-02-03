@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\"
 .\" fuse.1: Fuse man page
-.\" Copyright (c) 2001-2008 Russell Marks, Philip Kendall, Darren Salt,
+.\" Copyright (c) 2001-2010 Russell Marks, Philip Kendall, Darren Salt,
 .\"                         Fredrick Meunier, Stuart Brady
 .\"
 .\" This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "14th January, 2009" "Version 0.10.0.2" "Emulators"
+.TH fuse 1 "16th December, 2010" "Version 1.0.0" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -54,11 +54,13 @@ The emulator can load any of the formats supported by
 virtual-tape files. Saving to SZX, Z80 and SNA snapshots and TZX and
 TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
-the old DAT-file variant is not. DSK disk images are supported when
-emulating a +3, TRD and SCL disk images are supported when emulating
-a Pentagon or Scorpion and DCK cartridge images are supported when
-emulating a Timex 2068 variant. Interface II ROM cartridges are also
-supported.
+the old DAT-file variant is not. DSK, UDI, FDI, TR0, SDF, MGT, IMG, 
+SAD, TRD, SCL and OPD disk images are supported when a disk interface
+is being emulated, including the integrated disk drives on +3, 
+Pentagon or Scorpion machines as well as the +D, DISCiPLE,
+Opus Discovery and Beta 128 interfaces. DCK cartridge images are
+supported when emulating a Timex 2068 variant. Interface II ROM
+cartridges are also supported.
 .PP
 Finally, there is also support for reading and writing the RZX input recording
 format.
@@ -141,9 +143,9 @@ Specify a Betadisk image to load.
 .I \-\-bw\-tv
 .RS
 Specify whether the display should simulate a colour or black and
-white television. This option is effective under the GTK+, Xlib and SDL
-user interfaces: the others will always simulate a colour TV. The same
-as the General Options dialog's
+white television. This option is effective under the GTK+, Win32, Xlib
+and SDL user interfaces: the others will always simulate a colour TV.
+The same as the General Options dialog's
 .I "Black and white TV"
 option.
 .RE
@@ -180,7 +182,7 @@ Specify whether `dangerous' actions (those which could cause data
 loss, for example resetting the Spectrum) require confirmation before
 occurring. (Enabled by default, but you can use
 .RI ` \-\-no\-confirm\-actions '
-to disable). This option is effective under the GTK+ UI, and is the
+to disable). This option is effective under the GTK+ and Win32 UIs, and is the
 same as the General Options dialog's
 .I "Confirm actions"
 option.
@@ -203,6 +205,13 @@ automatically. (Enabled by default, but you can use
 .RI ` \-\-no\-detect\-loader '
 to disable). Same as the General Options dialog's
 .I "Detect loaders"
+option.
+.RE
+.PP
+.I \-\-disciple
+.RS
+Emulate a DISCiPLE interface. Same as the Peripherals Options dialog's
+.I "DISCiPLE interface"
 option.
 .RE
 .PP
@@ -238,7 +247,7 @@ also select the TC2068 on startup if available.
 .PP
 .I "\-\-doublescan\-mode"
 .RS
-Specify the the framebuffer UI should attempt to use a double scan mode
+Specify that the framebuffer UI should attempt to use a double scan mode
 (where each line is displayed twice).
 .RE
 .PP
@@ -384,7 +393,7 @@ or
 .PP
 .I \-\-joystick-prompt
 .RS
-If this option is specified, Fuse Fuse will prompt you which form of
+If this option is specified, then Fuse will prompt you which form of
 joystick emulation you wish to use when loading a snapshot. No prompt
 will be issued if the configuration in the snapshot matches what you
 are currently using. The same as the General Options dialog's
@@ -435,6 +444,7 @@ Specify machine type to emulate initially. The default is
 a 48K Spectrum. The available options are
 .IR 16 ,
 .IR 48 ,
+.IR 48_ntsc,
 .IR 128 ,
 .IR plus2 ,
 .IR plus2a ,
@@ -445,8 +455,9 @@ a 48K Spectrum. The available options are
 .IR pentagon ,
 .IR pentagon512 ,
 .IR pentagon1024 ,
+.IR scorpion
 and
-.IR scorpion .
+.IR se .
 .RE
 .PP
 .I "\-\-melodik"
@@ -673,7 +684,11 @@ Specify an RZX file to begin recording to.
 .br
 .I "\-\-rom\-plusd file"
 .br
+.I "\-\-rom\-disciple file"
+.br
 .I "\-\-rom\-beta128 file"
+.br
+.I "\-\-rom\-speccyboot file"
 .RS
 Specify the file to be used for ROM(s) used for each machine. The
 options respectively refer to the 16K Spectrum
@@ -704,11 +719,17 @@ the Interface I ROM
 .RI ( if1\-2.rom ),
 the Opus Discovery ROM
 .RI ( opus.rom ),
+the DISCiPLE ROM
+.RI ( disciple.rom ),
 the +D ROM
 .RI ( plusd.rom ),
-and the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
-.RI ( trdos.rom ).
-The names in brackets denote the defaults.
+the TR-DOS ROM for Beta 128 emulation with the 48K, TC2048, 128K or +2
+.RI ( trdos.rom ),
+and the SpeccyBoot ROM
+.RI ( speccyboot-1.4.rom ).
+The names in brackets denote the defaults. Note that not all these ROMs
+are supplied with Fuse - you must supply your own copies of those which
+are not.
 .RE
 .PP
 .I \-\-no\-rs232\-handshake
@@ -809,10 +830,23 @@ option.
 .PP
 .I "\-\-speaker\-type type"
 .RS
-Select the output speaker emulation, type can be TV speaker or Beeper.
-Same as the Sound Options dialog's
+Select the output speaker emulation, type can be TV speaker, Beeper
+or Unfiltered. Same as the Sound Options dialog's
 .I "Speaker type"
 option.
+.RE
+.PP
+.I "\-\-speccyboot"
+.RS
+Emulate a SpeccyBoot Ethernet interface. Same as the Peripherals Options dialog's
+.I "SpeccyBoot"
+option. See the SpeccyBoot web page at http://speccyboot.sourceforge.net/ for
+full details on the SpeccyBoot.
+.RE
+.PP
+.I "\-\-speccyboot-tap device"
+.RS
+Specify the TAP device to use for SpeccyBoot emulation.
 .RE
 .PP
 .I "\-\-volume\-ay volume"
@@ -905,7 +939,7 @@ Advanced Linux Sound Architecture version 0.9+
 .RI dev= string
 .br
 .RI ` string '
-specfies the ALSA device e.g. hw:1.2
+specifies the ALSA device e.g. hw:1.2
 .IP \[bu]
 .RI buffer_time= num
 .br
@@ -1104,7 +1138,7 @@ option.
 .PP
 .I "\-\-statusbar"
 .RS
-For the GTK+ UI, enables the statusbar beneath the display. For the
+For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
 SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. Same as the General Options dialog's
 .I "Show statusbar"
@@ -1289,10 +1323,10 @@ section for details.
 .\"
 .SH "THE VARIOUS FRONT-ENDS"
 Fuse supports various front-ends, or UIs (user interfaces). The usual
-one is GTK+-based, but there are also SDL, Xlib, SVGAlib and
+one is GTK+-based, but there are also SDL, Win32, Xlib, SVGAlib and
 framebuffer ones.
 .PP
-The important difference to note is that the GTK+ version uses
+The important difference to note is that GTK+ and Win32 versions uses
 `native' dialog boxes etc. (behaving like a fairly normal GUI-based
 program) while the others use an alternative, Fuse-specific `widget
 UI'. This latter front-end is easily spotted by the way it uses the
@@ -1307,8 +1341,8 @@ Spectrum's keyboard, the primary way of controlling Fuse itself
 (rather than the emulated machine) is via the menus. There are also
 function key shortcuts for some menu options.
 .PP
-In the GTK+ version, the menu bar is always visible at the top of the
-Fuse window. You can click on a menu name to pop it up. Alternatively,
+In the GTK+ and Win32 version, the menu bar is always visible at the top
+of the Fuse window. You can click on a menu name to pop it up. Alternatively,
 you can press
 .I F1
 to display a pop-up version of the menu bar, which you can then
@@ -1412,7 +1446,7 @@ Stop any currently-recording/playing RZX file.
 .PP
 .I "File, AY Logging, Record..."
 .RS
-Start recording the bytes output via the AY-3-8192 sound chip to a PSG
+Start recording the bytes output via the AY-3-8912 sound chip to a PSG
 file. You will be prompted for a filename to save the recording to.
 .RE
 .PP
@@ -1613,7 +1647,7 @@ options.
 .I "Black and white TV"
 .RS
 This option allows you to choose whether to simulate a colour or black
-and white television. This is effective only under the GTK+, Xlib and
+and white television. This is effective only under the GTK+, Win32, Xlib and
 SDL user interfaces: the others will always simulate a colour TV.
 .RE
 .PP
@@ -1633,7 +1667,7 @@ occurring.
 .PP
 .I "Show statusbar"
 .RS
-For the GTK+ UI, enables the statusbar beneath the display. For the
+For the GTK+ and Win32 UI, enables the statusbar beneath the display. For the
 SDL UI, enables the status icons showing whether the disk and tape are
 being accessed. This option has no effect for the other user
 interfaces.
@@ -1702,13 +1736,14 @@ This option allows the emulation of the sound output system to be
 modified. Different choices of speaker limit the bass and treble
 response that can be produced from the machine. Choose between a
 "TV" type speaker and a small beeper type speaker that significantly
-limits bass and treble response.
+limits bass and treble response. Choose "Unfiltered" to get
+unmodified (but less accurate) sound output.
 .RE
 .PP
 .I "AY volume"
-.RE
-Sets the relative volume of the AY-3-8912 chip from a range of 0-100%.
 .RS
+Sets the relative volume of the AY-3-8912 chip from a range of 0-100%.
+.RE
 .PP
 .I "Beeper volume"
 .RS
@@ -1878,6 +1913,13 @@ section for more details.
 .RS
 If this option is selected, Fuse will emulate the +D interface.  See the
 .B "+D EMULATION"
+section for more details.
+.RE
+.PP
+.I "DISCiPLE interface"
+.RS
+If this option is selected, Fuse will emulate the DISCiPLE interface.  See the
+.B "DISCiPLE EMULATION"
 section for more details.
 .RE
 .PP
@@ -2103,7 +2145,7 @@ by hand if you really want to.
 .I "Machine, Pause"
 .RS
 Pause or unpause emulation. This option is available only under the
-GTK+ UI; to pause the other user interfaces, simply press F1 to bring
+GTK+ and Win32 UIs; to pause the other user interfaces, simply press F1 to bring
 up the main menu.
 .RE
 .PP
@@ -2112,14 +2154,14 @@ up the main menu.
 .I "Machine, Reset"
 .RS
 Reset the emulated Spectrum. Again, you get a chance to cancel this if
-you're using the GTK+ UI.
+you're using the GTK+ or Win32 UIs.
 .RE
 .PP
 .I "Machine, Hard reset"
 .RS
 Reset the emulated Spectrum. A hard reset is equivalent to turning the
 Spectrum's power off, and then turning it back on. Again, you get a
-chance to cancel this if you're using the GTK+ UI.
+chance to cancel this if you're using the GTK+ or Win32 UIs.
 .RE
 .PP
 .I F9
@@ -2140,6 +2182,12 @@ and
 .RS
 The original machines as released by Sinclair in 1982 with 16 or 48K
 of RAM respectively.
+.RE
+.PP
+.I "Spectrum 48K (NTSC)"
+.RS
+The NTSC 48K machine released in limited numbers in parts of South 
+America.
 .RE
 .PP
 .I "Spectrum 128K"
@@ -2207,8 +2255,8 @@ offering a more powerful firmware.
 .RS
 Another Russian clone of the Spectrum. Some details can be found
 at
-.IR "http://www.worldofspectrum.org/rusfaq/index.html" ,
-like all the Russian clones they they have built in 3.5" disk drives,
+.IR "http://www.worldofspectrum.org/rusfaq/index.html" .
+Like all the Russian clones, they have built in 3.5" disk drives,
 accessed via the Beta 128 disk interface and TR-DOS (the Technology
 Research Disk Operating System). The most important distinction from
 the Pentagon 128k and similar machines is the display timing details.
@@ -2249,10 +2297,15 @@ you close the window.
 .RS
 Sends a non-maskable interrupt to the emulated Spectrum. Due to a typo
 in the standard 48K ROM, this will cause a reset, but modified ROMs are 
-available which make use of this feature. When the +D is emulated, this
-is used to access the +D's screenshot and snapshot features (see the
+available which make use of this feature. When the +D (or DISCiPLE) is
+emulated, this is used to access the +D (or DISCiPLE)'s screenshot and
+snapshot features (see the
 .B "+D EMULATION"
-section below).
+and
+.B "DISCiPLE EMULATION"
+sections below).  Note that GDOS on the DISCiPLE contains a bug which
+causes corruption of saved snapshots, and a failure to return from the
+NMI menu correctly.  This bug is not present in G+DOS on the +D.
 .RE
 .PP
 .I F7
@@ -2365,8 +2418,7 @@ Virtual Microdrive images are accessible only when the Interface I is
 active from the
 .I "Options, Peripherals"
 menu. Note that any changes to the Microdrive image will not be
-written to the file on disk until the appropriate `eject and write'
-option is used.
+written to the file on disk until the appropriate save option is used.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Insert New"
@@ -2387,10 +2439,15 @@ Eject the Microdrive image in Microdrive 1. If the image has been
 modified, you will be asked as to whether you want any changes saved.
 .RE
 .PP
-.I "Media, Interface I, Microdrive 1, Eject and write..."
+.I "Media, Interface I, Microdrive 1, Save"
 .RS
-Write the Microdrive image in Microdrive 1 to a file, and then eject
-the image.  You will be prompted for a filename.
+Save the Microdrive image in Microdrive 1.
+.RE
+.PP
+.I "Media, Interface I, Microdrive 1, Save as..."
+.RS
+Write the Microdrive image in Microdrive 1 to a file. You will be 
+prompted for a filename.
 .RE
 .PP
 .I "Media, Interface I, Microdrive 1, Write protect, Enable"
@@ -2435,14 +2492,15 @@ as the RS-232 TxD or RxD wire.
 .I "Media, Disk"
 .RS
 Virtual floppy disk images are accessible when emulating a +3, +3e,
-Pentagon or Scorpion, or when the Beta 128, Opus Discovery or +D interface
-options are enabled and a machine compatible with the chosen interface is
-selected. (See
+Pentagon or Scorpion, or when the Beta 128, Opus Discovery, +D or
+DISCiPLE interface options are enabled and a machine compatible with
+the chosen interface is selected. (See
 .BR "THE .DSK FORMAT" ,
 .B "BETA 128 EMULATION"
 .B "OPUS DISCOVERY EMULATION"
-and
 .B "+D EMULATION"
+and
+.B "DISCiPLE EMULATION"
 sections below for notes on the file formats supported).
 .PP
 Once again, any changes made to a disk image will not affect the file
@@ -2453,21 +2511,26 @@ Fuse.
 .PP
 .I "Media, Disk, +3, Drive A:, Insert..."
 .RS
-Select a disk-image file to read/write in the +3's emulated drive
+Insert a disk-image file to read/write in the +3's emulated drive
 A:.
 .RE
 .PP
 .I "Media, Disk, +3, Drive A:, Eject"
 .RS
-Deselect the disk image currently in the +3's emulated drive A: \- or
+Eject the disk image currently in the +3's emulated drive A: \- or
 from the emulated machine's perspective, eject it. Note that any
 changes made to the image will not be saved.
 .RE
 .PP
-.I "Media, Disk, +3, Drive A:, Eject and write..."
+.I "Media, Disk, +3, Drive A:, Save"
 .RS
-Deselect the disk image currently in the +3's drive A: and write the
-current state of the disk to a file. You will be prompted for a filename.
+Save the disk image currently in the +3's drive A:.
+.RE
+.PP
+.I "Media, Disk, +3, Drive A:, Save as..."
+.RS
+Save the current state of the disk image currently in the +3's 
+drive A: to a file. You will be prompted for a filename.
 .RE
 .PP
 .I "Media, Disk, +3, Drive B:, Insert..."
@@ -2481,7 +2544,12 @@ second 3" drive.
 As above, but for drive B:.
 .RE
 .PP
-.I "Media, Disk, +3, Drive B:, Eject and write"
+.I "Media, Disk, +3, Drive B:, Save"
+.RS
+As above, but for drive B:.
+.RE
+.PP
+.I "Media, Disk, +3, Drive B:, Save as..."
 .RS
 As above, but for drive B:.
 .RE
@@ -2495,7 +2563,9 @@ Insert a new (unformatted) disk into the emulated Beta drive A:.
 .br
 .I "Media, Disk, Beta, Drive A:, Eject"
 .br
-.I "Media, Disk, Beta, Drive A:, Eject and write..."
+.I "Media, Disk, Beta, Drive A:, Save"
+.br
+.I "Media, Disk, Beta, Drive A:, Save as..."
 .RS
 As above, but for the emulated Beta disk drive A:.
 .RE
@@ -2525,7 +2595,9 @@ As above, but for the remaining emulated Beta disk interface drives.
 .br
 .I "Media, Disk, Opus, Drive 1, Eject"
 .br
-.I "Media, Disk, Opus, Drive 1, Eject and write..."
+.I "Media, Disk, Opus, Drive 1, Save"
+.br
+.I "Media, Disk, Opus, Drive 1, Save as..."
 .br
 .I "Media, Disk, Opus, Drive 1, Write protect, Enable"
 .br
@@ -2542,7 +2614,9 @@ As above, but for the emulated Opus Discovery drives.
 .br
 .I "Media, Disk, +D, Drive 1, Eject"
 .br
-.I "Media, Disk, +D, Drive 1, Eject and write..."
+.I "Media, Disk, +D, Drive 1, Save"
+.br
+.I "Media, Disk, +D, Drive 1, Save as..."
 .br
 .I "Media, Disk, +D, Drive 1, Write protect, Enable"
 .br
@@ -2551,6 +2625,25 @@ As above, but for the emulated Opus Discovery drives.
 .I "Media, Disk, +D, Drive 2, ..."
 .RS
 As above, but for the emulated +D drives.
+.RE
+.PP
+.I "Media, Disk, DISCiPLE, Drive 1, Insert New"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Insert..."
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Eject"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Save"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Save as..."
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Write protect, Enable"
+.br
+.I "Media, Disk, DISCiPLE, Drive 1, Write protect, Disable"
+.br
+.I "Media, Disk, DISCiPLE, Drive 2, ..."
+.RS
+As above, but for the emulated DISCiPLE drives.
 .RE
 .PP
 .I "Media, Cartridge, Timex Dock, Insert..."
@@ -2659,7 +2752,7 @@ entries above, but for the two channels of the DivIDE interface.
 .RS
 Display a diagram showing the Spectrum keyboard, and the various
 keywords that can be generated with each key from (48K) BASIC. Under
-the GTK+ UI, this will appear in a separate window and emulation
+the GTK+ and Win32 UIs, this will appear in a separate window and emulation
 continues. With the other UIs, the picture remains onscreen (and the
 emulator paused) until you press
 .I Esc
@@ -2727,7 +2820,7 @@ section below.
 .\"
 .SH "DISPLAY SIZE"
 Some of Fuse's UIs allow resizing of the emulated Spectrum's display.
-For the window-based ones (GTK+ and Xlib), you can resize the window
+For the window-based ones (GTK+, Win32 and Xlib), you can resize the window
 by, well, resizing it. :\-) Exactly how this works depends on your
 window manager; you may have to make the window over twice the width
 and height of the original size before it actually scales up. Fuse
@@ -2750,7 +2843,7 @@ emulating machine's monitor. These filters can be used to do various
 forms of smoothing, emulation of TV scanlines and various other
 possibilities. Support for graphics filters varies between the
 different user interfaces, but there are two general classes: the GTK+,
-Xlib, SVGAlib and SDL user interfaces (and the saving of .png
+Win32, Xlib, SVGAlib and SDL user interfaces (and the saving of .png
 screenshots) support `interpolating' filters which use a palette larger
 than the Spectrum's 16 colours, while the framebuffer user interface
 currently does not support filters at all.
@@ -2761,8 +2854,8 @@ resolution. To deal with this, Fuse treats these machines as having a
 `normal' display size which is twice the size of a normal Spectrum's
 screen, leading to a different set of filters being available for
 these machines. Note that any of the double or triple-sizing filters
-are available for Timex machines only when using the SDL or GTK+ user
-interfaces.
+are available for Timex machines only when using the SDL, Win32 or GTK+
+user interfaces.
 .PP
 The available filters, along with their short name used to select them
 from the command line, are:
@@ -2794,7 +2887,7 @@ Scale the displayed screen up to double size.
 .IR "Triple size " ( 3x )
 .RS
 Scale the displayed screen up to triple size. Available only with the
-GTK+, Xlib and SDL user interfaces or when saving screenshots of
+GTK+, Win32, Xlib and SDL user interfaces or when saving screenshots of
 non-Timex machines.
 .RE
 .PP
@@ -2819,7 +2912,7 @@ diagonal lines.
 Very similar to
 .IR AdvMAME2x ,
 except that it triples the size of the displayed screen. Available
-only with the GTK+, Xlib and SDL user interfaces or when saving
+only with the GTK+, Win32, Xlib and SDL user interfaces or when saving
 screenshots of non-Timex machines.
 .RE
 .PP
@@ -2858,8 +2951,8 @@ display.
 .RS
 An interpolating Timex-specific filter which scales the Timex screen
 up to 1.5x its usual size (which is therefore 3x the size of a
-`normal' Spectrum screen). Available only for the GTK+ and SDL user
-interfaces or when saving screenshots.
+`normal' Spectrum screen). Available only for the GTK+, Win32 and SDL
+user interfaces or when saving screenshots.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -2894,9 +2987,9 @@ Serial printer (text-only)
 .IR +2A ", " +3
 Parallel printer (text-only)
 .PP
-If Opus Discovery or +D emulation is in use and printer emulation is enabled,
-text-only emulation of the disk interface's parallel printer interface is
-provided.
+If Opus Discovery, +D or DISCiPLE emulation is in use and printer
+emulation is enabled, text-only emulation of the disk interface's
+parallel printer interface is provided.
 .PP
 Any printout is appended to one (or both) of two files, depending on
 the printer \- these default to
@@ -3378,7 +3471,7 @@ t{breakpoint}
 .RI [ options ]
 .RS
 This is the same as the `breakpoint' command in its various forms,
-except that that breakpoint is temporary: it will trigger once and
+except that the breakpoint is temporary: it will trigger once and
 once only, and then be removed.
 .RE
 .PP
@@ -3388,7 +3481,7 @@ a
 .RI ` page : offset '
 combination, which refers to a location
 .I offset
-bytes into into memory bank
+bytes into memory bank
 .IR page ,
 independent of where that bank is currently paged into memory. RAM
 pages are indicated simply by an integer, while ROMs are prefixed by
@@ -3497,8 +3590,8 @@ lives.
 .SH THE .DSK FORMAT
 .PP
 In general, disk images for the +3 Spectrum are thought of as being in
-DSK format. However, this is actually an slight oversimplification;
-there in in fact
+DSK format. However, this is actually a slight oversimplification;
+there are in fact
 .I two
 similar, but not identical, DSK formats. (The difference can be seen
 by doing `head \-1
@@ -3512,13 +3605,16 @@ Fuse supports both the `CPCEMU' and `EXTENDED' formats.
 .\"
 .SH BETA 128 EMULATION
 .PP
-Fuse supports .SCL and .TRD images in its Pentagon and Scorpion
+Fuse supports Betadisk emulation in its Pentagon and Scorpion
 emulation, and also under 48K, TC2048, 128K and +2 (but not +2A)
 emulation if the
 .I Beta 128 interface
 option from the
 .I "Options, Peripherals..."
 dialog is enabled.
+See the
+.B "DISK FILE FORMATS"
+section for more details on supported disk file formats.
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -3526,7 +3622,9 @@ dialog is enabled.
 .PP
 By default, Fuse emulates the Opus Discovery interface with the optional 2k RAM
 expansion and a second 40 track single sided disk drive.
-Fuse supports .OPD and .OPU images in its Opus Discovery emulation. The Opus
+See the
+.B "DISK FILE FORMATS"
+section for mode details on supported disk file formats. The Opus
 Discovery's printer port is also emulated for output only. (See the
 .B "PRINTER EMULATION"                                             
 section for more details.) The Opus Discovery may only be
@@ -3537,7 +3635,9 @@ use the same syntax as Interface I and Microdrives.
 .\"
 .SH +D EMULATION
 .PP
-Fuse supports .MGT and .IMG images in its +D emulation. The +D's
+Fuse supports emulating the +D disk and printer interface. See the
+.B "DISK FILE FORMATS"
+section for mode details on supported disk file formats. The +D's
 printer port is emulated. (See the
 .B "PRINTER EMULATION"                                             
 section for more details.) The +D may only be
@@ -3563,9 +3663,43 @@ if printer emulation is enabled.
 .\"
 .\"------------------------------------------------------------------
 .\"
+.SH DISCiPLE EMULATION
+.PP
+Fuse supports emulating the DISCiPLE disk and printer interface, although
+it does not currently support emulation of the Sinclair Network, or
+support emulation of a DISCiPLE attached to a 128K machine. See the
+.B "DISK FILE FORMATS"
+section for mode details on supported disk file formats, which are the
+same as for +D emulation as described above. The DISCiPLE's
+printer port is emulated. (See the
+.B "PRINTER EMULATION"                                             
+section for more details.) The DISCiPLE may only be
+used with 48K emulation at present.  To access disks, you will first
+need to load GDOS, by inserting a disk containing the DOS file (SYS) and
+entering "RUN".  Once DOS is loaded, you can load to/from DISCiPLE disks
+by prefixing filenames with
+.RI `d n '
+where
+.RI ` n '
+is the number of the drive in use.  For example,
+.RI ` "LOAD d1\(dqmyfile\(dq" '
+would load the file named `myfile' from the emulated drive 1.
+Microdrive syntax may also be used.
+.PP
+Snapshots can be saved in the same manner as with the +D as described
+above, but note that GDOS on the DISCiPLE contains a bug which causes
+corruption in any saved snapshots, and incorrect restoration of saved
+snapshots, even if saved on a +D.  This bug is not present in G+DOS
+on the +D.  (Note: this was caused by saving/restoring the AF register
+twice in the NMI handler, where both AF and the AF\(aq shadow register
+should have been saved/restored.)
+.\"
+.\"------------------------------------------------------------------
+.\"
 .SH DISK FILE FORMATS
 .PP
-Fuse supports several disk image formats in its +D and Beta 128 emulation.
+Fuse supports several disk image formats in its +D, DISCiPLE and
+Beta 128 emulation.
 .PP
 For reading:
 .PP
@@ -3737,21 +3871,14 @@ recording files can be read from files compressed with
 or
 .IR gzip (3)
 just as if they were uncompressed.
-There is currently no support for reading compressed +3, +D or Beta
-disk images.
+There is currently no support for reading compressed +3, DISCiPLE/+D
+or Beta disk images.
 .\"
 .\"------------------------------------------------------------------
 .\"
 .SH BUGS
 Selecting a startup filter doesn't work properly with user interfaces
-other than SDL and GTK+.
-.PP
-Attempting to replay an RZX file without an embedded snapshot from the
-command-line doesn't work if you do `./fuse
-.IR "rzxfile snapshot" '.
-`./fuse
-.IR "snapshot rzxfile" '
-does work though, so use that instead.
+other than SDL, Win32 and GTK+.
 .PP
 Changing virtual consoles when using SVGAlib for joystick support
 causes Fuse to exit. If this is a problem, compile Fuse with the
@@ -3840,8 +3967,8 @@ Matthew Westcott wrote the AY logging code and the DivIDE emulation.
 Marek Januszewski wrote various bits of code to make Fuse work under
 Win32, including the DirectDraw user interface.
 .PP
-Stuart Brady wrote the +D emulation, Scorpion emulation and the HP-UX
-sound code.
+Stuart Brady wrote the DISCiPLE and +D emulation, Scorpion emulation
+and the HP-UX sound code.
 .PP
 Garry Lancaster wrote the 8-bit IDE, ZXATASP and ZXCF interface
 emulations.
@@ -3853,3 +3980,5 @@ improvements to the widget code.
 .PP
 Michael D Wynne wrote the original Opus disk interface emulation
 (for EightyOne).
+.PP
+Patrik Persson wrote the SpeccyBoot emulation.

@@ -16,6 +16,7 @@
 /configure
 /depcomp
 /fuse
+/fuse.dSYM
 /fuse.exe
 /install-sh
 /libtool

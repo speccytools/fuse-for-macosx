@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2009 Philip Kendall
+   Copyright (c) 1999-2011 Philip Kendall and others
 
    $Id$
 
@@ -39,42 +39,51 @@
 
 #include <unistd.h>
 
-#ifdef UI_SDL
+/* We need to include SDL.h on Mac O X and Windows to do some magic
+   bootstrapping by redefining main. As we now allow SDL joystick code to be
+   used in the GTK+ and Xlib UIs we need to also do the magic when that code is
+   in use, feel free to look away for the next line */
+#if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) )
 #include <SDL.h>		/* Needed on MacOS X and Windows */
-#endif				/* #ifdef UI_SDL */
+#endif /* #if defined UI_SDL || (defined USE_JOYSTICK && !defined HAVE_JSW_H && (defined UI_X || defined UI_GTK) ) */
 
 #ifdef GEKKO
 #include <fat.h>
 #endif				/* #ifdef GEKKO */
 
-#include "ay.h"
-#include "dck.h"
 #include "debugger/debugger.h"
-#include "disk/beta.h"
-#include "disk/fdd.h"
 #include "display.h"
 #include "event.h"
-#include "fuller.h"
 #include "fuse.h"
-#include "ide/divide.h"
-#include "ide/simpleide.h"
-#include "ide/zxatasp.h"
-#include "ide/zxcf.h"
-#include "if1.h"
-#include "if2.h"
-#include "joystick.h"
-#include "kempmouse.h"
 #include "keyboard.h"
 #include "machine.h"
-#include "melodik.h"
+#include "machines/machines_periph.h"
 #include "memory.h"
 #include "movie.h"
-#include "pokefinder/pokefinder.h"
-#include "printer.h"
+#include "mempool.h"
+#include "peripherals/ay.h"
+#include "peripherals/dck.h"
+#include "peripherals/disk/beta.h"
+#include "peripherals/disk/fdd.h"
+#include "peripherals/fuller.h"
+#include "peripherals/ide/divide.h"
+#include "peripherals/ide/simpleide.h"
+#include "peripherals/ide/zxatasp.h"
+#include "peripherals/ide/zxcf.h"
+#include "peripherals/joystick.h"
+#include "peripherals/if1.h"
+#include "peripherals/if2.h"
+#include "peripherals/kempmouse.h"
+#include "peripherals/melodik.h"
+#include "peripherals/printer.h"
+#include "peripherals/scld.h"
+#include "peripherals/speccyboot.h"
+#include "peripherals/spectranet.h"
+#include "peripherals/ula.h"
+#include "pokefinder/pokemem.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
-#include "scld.h"
 #include "settings.h"
 #include "slt.h"
 #include "snapshot.h"
@@ -84,7 +93,6 @@
 #include "timer/timer.h"
 #include "ui/scaler/scaler.h"
 #include "ui/ui.h"
-#include "ula.h"
 #include "unittests/unittests.h"
 #include "utils.h"
 
@@ -184,8 +192,6 @@ int main(int argc, char **argv)
 
 }
 
-#include "mempool.h"
-
 static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
@@ -227,11 +233,7 @@ static int fuse_init(int argc, char **argv)
     return 0;
   }
 
-  start_scaler = strdup( settings_current.start_scaler_mode );
-  if( !start_scaler ) {
-    ui_error( UI_ERROR_ERROR, "Out of memory at %s:%d", __FILE__, __LINE__ );
-    return 1;
-  }
+  start_scaler = utils_safe_strdup( settings_current.start_scaler_mode );
 
   /* Windows will create a console for our output if there isn't one already,
    * so we don't display the copyright message on Win32. */
@@ -246,7 +248,7 @@ static int fuse_init(int argc, char **argv)
   fuse_joystick_init ();
   fuse_keyboard_init();
 
-  if( event_init() ) return 1;
+  event_init();
   
 #ifndef GEKKO
   if( display_init(&argc,&argv) ) return 1;
@@ -270,37 +272,40 @@ static int fuse_init(int argc, char **argv)
   if( !geteuid() ) { setuid( getuid() ); }
 #endif				/* #ifdef HAVE_GETEUID */
 
-  if( mempool_init() ) return 1;
-  if( memory_init() ) return 1;
+  mempool_init();
+  memory_init();
 
-  if( debugger_init() ) return 1;
+  debugger_init();
 
-  if( spectrum_init() ) return 1;
-  if( printer_init() ) return 1;
-  if( rzx_init() ) return 1;
-  if( psg_init() ) return 1;
-  if( beta_init() ) return 1;
-  if( opus_init() ) return 1;
-  if( plusd_init() ) return 1;
-  if( fdd_init_events() ) return 1;
+  spectrum_init();
+  printer_init();
+  rzx_init();
+  psg_init();
+  beta_init();
+  opus_init();
+  plusd_init();
+  disciple_init();
+  fdd_init_events();
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
-  if( if1_init() ) return 1;
-  if( if2_init() ) return 1;
+  if1_init();
+  if2_init();
   if( divide_init() ) return 1;
-  if( scld_init() ) return 1;
-  if( ula_init() ) return 1;
-  if( ay_init() ) return 1;
-  if( slt_init() ) return 1;
-  if( profile_init() ) return 1;
-  if( kempmouse_init() ) return 1;
-  if( fuller_init() ) return 1;
-  if( melodik_init() ) return 1;
+  scld_init();
+  ula_init();
+  ay_init();
+  slt_init();
+  profile_init();
+  kempmouse_init();
+  fuller_init();
+  melodik_init();
+  speccyboot_init();
+  specdrum_init();
+  spectranet_init();
+  machines_periph_init();
 
-  error = pokefinder_clear(); if( error ) return error;
-
-  if( z80_init() ) return 1;
+  z80_init();
 
   if( timer_init() ) return 1;
 
@@ -312,7 +317,7 @@ static int fuse_init(int argc, char **argv)
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
 
-  error = tape_init(); if( error ) return error;
+  tape_init();
 
   error = scaler_select_id( start_scaler ); free( start_scaler );
   if( error ) return error;
@@ -395,7 +400,7 @@ static void fuse_show_copyright(void)
   printf( "\n" );
   fuse_show_version();
   printf(
-   "Copyright (c) 1999-2009 Philip Kendall and others; see the file\n"
+   "Copyright (c) 1999-2011 Philip Kendall and others; see the file\n"
    "'AUTHORS' for more details.\n"
    "\n"
    "For help, please mail <fuse-emulator-devel@lists.sf.net> or use\n"
@@ -497,16 +502,22 @@ setup_start_files( start_files_t *start_files )
   start_files->snapshot = settings_current.snapshot;
   start_files->tape = settings_current.tape_file;
 
-  start_files->simpleide_master = settings_current.simpleide_master_file;
-  start_files->simpleide_slave  = settings_current.simpleide_slave_file;
+  start_files->simpleide_master =
+    utils_safe_strdup( settings_current.simpleide_master_file );
+  start_files->simpleide_slave = 
+    utils_safe_strdup( settings_current.simpleide_slave_file );
 
-  start_files->zxatasp_master = settings_current.zxatasp_master_file;
-  start_files->zxatasp_slave  = settings_current.zxatasp_slave_file;
+  start_files->zxatasp_master =
+    utils_safe_strdup( settings_current.zxatasp_master_file );
+  start_files->zxatasp_slave =
+    utils_safe_strdup( settings_current.zxatasp_slave_file );
 
-  start_files->zxcf = settings_current.zxcf_pri_file;
+  start_files->zxcf = utils_safe_strdup( settings_current.zxcf_pri_file );
 
-  start_files->divide_master = settings_current.divide_master_file;
-  start_files->divide_slave  = settings_current.divide_slave_file;
+  start_files->divide_master =
+    utils_safe_strdup( settings_current.divide_master_file );
+  start_files->divide_slave =
+    utils_safe_strdup( settings_current.divide_slave_file );
 
   start_files->mdr[0] = settings_current.mdr_file;
   start_files->mdr[1] = settings_current.mdr_file2;
@@ -546,7 +557,10 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
 
     error = libspectrum_identify_file_with_class( &type, &class, filename,
 						  file.buffer, file.length );
-    if( error ) return error;
+    if( error ) {
+      utils_close_file( &file );
+      return error;
+    }
 
     switch( class ) {
 
@@ -594,11 +608,11 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
           machine_current->machine == LIBSPECTRUM_MACHINE_SCORP )
         start_files->disk_beta = filename; 
       else {
-        if( periph_beta128_active )
+        if( periph_is_active( PERIPH_TYPE_BETA128 ) )
           start_files->disk_beta = filename; 
-        else if( periph_plusd_active )
+        else if( periph_is_active( PERIPH_TYPE_PLUSD ) )
           start_files->disk_plusd = filename;
-        else if( periph_opus_active )
+        else if( periph_is_active( PERIPH_TYPE_OPUS ) )
           start_files->disk_opus = filename;
       }
       break;
@@ -621,6 +635,12 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
     case LIBSPECTRUM_CLASS_TAPE:
       start_files->tape = filename; break;
 
+    case LIBSPECTRUM_CLASS_AUXILIARY:
+      if( type == LIBSPECTRUM_ID_AUX_POK ) {
+        pokemem_set_pokfile( filename );
+      }
+      break;
+
     case LIBSPECTRUM_CLASS_UNKNOWN:
       ui_error( UI_ERROR_WARNING, "couldn't identify '%s'; ignoring it",
 		filename );
@@ -632,6 +652,8 @@ parse_nonoption_args( int argc, char **argv, int first_arg,
       break;
 
     }
+
+    utils_close_file( &file );
   }
 
   return 0;
@@ -821,6 +843,8 @@ static int fuse_end(void)
   divide_end();
   opus_end();
   plusd_end();
+  disciple_end();
+  spectranet_end();
 
   machine_end();
 
@@ -830,6 +854,9 @@ static int fuse_end(void)
   event_end();
   fuse_joystick_end();
   ui_end();
+  memory_end();
+  mempool_end();
+  pokemem_end();
 
   libspectrum_creator_free( fuse_creator );
 

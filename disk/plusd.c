@@ -107,7 +107,7 @@ plusd_memory_map( void )
   memory_map_read[ 1 ] = memory_map_write[ 1 ] = plusd_memory_map_romcs[ 1 ];
 }
 
-const periph_t plusd_peripherals[] = {
+static const periph_t plusd_peripherals[] = {
   /* ---- ---- 1110 0011 */
   { 0x00ff, 0x00e3, plusd_sr_read, plusd_cr_write },
   /* ---- ---- 1110 1011 */
@@ -123,10 +123,9 @@ const periph_t plusd_peripherals[] = {
   { 0x00ff, 0x00e7, plusd_mem_read, plusd_mem_write },
   /* 0000 0000 1111 0111 */
   { 0x00ff, 0x00f7, plusd_printer_read, plusd_printer_write },
-};
 
-const size_t plusd_peripherals_count =
-  sizeof( plusd_peripherals ) / sizeof( periph_t );
+  { 0, 0, NULL, NULL }
+};
 
 int
 plusd_init( void )
@@ -156,6 +155,9 @@ plusd_init( void )
   module_register( &plusd_module_info );
   for( i = 0; i < 2; i++ ) plusd_memory_map_romcs[i].bank = MEMORY_BANK_ROMCS;
 
+  periph_register_type( PERIPH_TYPE_PLUSD, &settings_current.plusd,
+                        plusd_peripherals );
+
   return 0;
 }
 
@@ -171,12 +173,16 @@ plusd_reset( int hard_reset )
 
   event_remove_type( index_event );
 
-  if( !periph_plusd_active )
+  if( !periph_is_active( PERIPH_TYPE_PLUSD ) )
     return;
 
-  machine_load_rom_bank( plusd_memory_map_romcs, 0, 0,
-			 settings_current.rom_plusd,
-			 settings_default.rom_plusd, 0x2000 );
+  if( machine_load_rom_bank( plusd_memory_map_romcs, 0, 0,
+			     settings_current.rom_plusd,
+			     settings_default.rom_plusd, 0x2000 ) ) {
+    settings_current.plusd = 0;
+    periph_activate_type( PERIPH_TYPE_PLUSD, 0 );
+    return;
+  }
 
   plusd_memory_map_romcs[0].source = MEMORY_SOURCE_PERIPHERAL;
 
@@ -244,8 +250,6 @@ plusd_end( void )
 libspectrum_byte
 plusd_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_sr_read( plusd_fdc );
 }
@@ -253,16 +257,12 @@ plusd_sr_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_cr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_cr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
 plusd_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_tr_read( plusd_fdc );
 }
@@ -270,16 +270,12 @@ plusd_tr_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_tr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_tr_write( plusd_fdc, b );
 }
 
 libspectrum_byte
 plusd_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_sec_read( plusd_fdc );
 }
@@ -287,16 +283,12 @@ plusd_sec_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_sec_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_sec_write( plusd_fdc, b );
 }
 
 libspectrum_byte
 plusd_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
   return wd_fdc_dr_read( plusd_fdc );
 }
@@ -304,8 +296,6 @@ plusd_dr_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_dr_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   wd_fdc_dr_write( plusd_fdc, b );
 }
 
@@ -314,8 +304,6 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
   int drive, side;
   int i;
-
-  if( !plusd_available ) return;
 
   plusd_control_register = b;
 
@@ -343,8 +331,6 @@ plusd_cn_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 libspectrum_byte
 plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 {
-  if( !plusd_available ) return 0xff;
-
   /* should we set *attached = 1? */
 
   plusd_page();
@@ -354,16 +340,12 @@ plusd_mem_read( libspectrum_word port GCC_UNUSED, int *attached GCC_UNUSED )
 void
 plusd_mem_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b GCC_UNUSED )
 {
-  if( !plusd_available ) return;
-
   plusd_unpage();
 }
 
 libspectrum_byte
 plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
 {
-  if( !plusd_available ) return 0xff;
-
   *attached = 1;
 
   /* bit 7 = busy. other bits high? */
@@ -377,8 +359,6 @@ plusd_printer_read( libspectrum_word port GCC_UNUSED, int *attached )
 void
 plusd_printer_write( libspectrum_word port, libspectrum_byte b )
 {
-  if( !plusd_available ) return;
-
   printer_parallel_write( port, b );
 }
 
@@ -457,7 +437,7 @@ plusd_disk_insert( plusd_drive_number which, const char *filename,
 }
 
 int
-plusd_disk_eject( plusd_drive_number which, int write )
+plusd_disk_eject( plusd_drive_number which, int saveas )
 {
   wd_fdc_drive *d;
 
@@ -469,9 +449,12 @@ plusd_disk_eject( plusd_drive_number which, int write )
   if( d->disk.type == DISK_TYPE_NONE )
     return 0;
 
-  if( write ) {
+  if( saveas ) {	/* 1 -> save as.., 2 -> save */
 
-    if( ui_plusd_disk_write( which ) ) return 1;
+    if( d->disk.filename == NULL ) saveas = 1;
+    if( ui_plusd_disk_write( which, 2 - saveas ) ) return 1;
+    d->disk.dirty = 0;
+    return 0;
 
   } else {
 
@@ -486,7 +469,7 @@ plusd_disk_eject( plusd_drive_number which, int write )
       switch( confirm ) {
 
       case UI_CONFIRM_SAVE_SAVE:
-	if( ui_plusd_disk_write( which ) ) return 1;
+	if( plusd_disk_eject( which, 2 ) ) return 1;	/* first save */
 	break;
 
       case UI_CONFIRM_SAVE_DONTSAVE: break;
@@ -569,19 +552,25 @@ plusd_disk_writeprotect( plusd_drive_number which, int wrprot )
   return 0;
 }
 
+/***TODO most part of the next routine could be move to a common place... */
 int
 plusd_disk_write( plusd_drive_number which, const char *filename )
 {
   wd_fdc_drive *d = &plusd_drives[ which ];
   int error;
-  
+
   d->disk.type = DISK_TYPE_NONE;
+  if( filename == NULL ) filename = d->disk.filename;	/* write over original file */
   error = disk_write( &d->disk, filename );
 
   if( error != DISK_OK ) {
     ui_error( UI_ERROR_ERROR, "couldn't write '%s' file: %s", filename,
 	      disk_strerror( error ) );
     return 1;
+  }
+  if( d->disk.filename && strcmp( filename, d->disk.filename ) ) {
+    free( d->disk.filename );
+    d->disk.filename = strdup( filename );
   }
 
   return 0;
@@ -682,7 +671,7 @@ plusd_to_snapshot( libspectrum_snap *snap GCC_UNUSED )
   libspectrum_byte *buffer;
   int drive_count = 0;
 
-  if( !periph_plusd_active ) return;
+  if( !periph_is_active( PERIPH_TYPE_PLUSD ) ) return;
 
   libspectrum_snap_set_plusd_active( snap, 1 );
 
