@@ -1,3 +1,5 @@
 /.deps
+/fuse.desktop
+/fuse.xml
 /Makefile
 /Makefile.in
