@@ -1,5 +1,3 @@
-/*.a
 /.deps
-/Makefile
-/Makefile.in
+/.dirstamp
 /keysyms.c

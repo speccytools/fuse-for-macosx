@@ -1,4 +1,2 @@
 /.deps
-/Makefile
-/Makefile.in
-/libunittests.a
+/.dirstamp

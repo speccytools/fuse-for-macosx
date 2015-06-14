@@ -1,7 +1,5 @@
-/*.a
 /.deps
-/Makefile
-/Makefile.in
+/.dirstamp
 /fuse.manifest
 /keysyms.c
 /menu_data.c

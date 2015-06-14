@@ -1,11 +1,9 @@
 /.deps
+/.dirstamp
 /.libs
-/Makefile
-/Makefile.in
 /coretest
 /coretest.exe
 /coretest.out
-/libz80.a
 /opcodes_base.c
 /tests.actual
 /z80_cb.c

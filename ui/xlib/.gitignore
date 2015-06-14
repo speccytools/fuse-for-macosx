@@ -1,6 +1,4 @@
-/*.a
 /.deps
-/Makefile
-/Makefile.in
+/.dirstamp
 /keysyms.c
 /xpixmaps.c

@@ -1,9 +1,5 @@
-/*.la
-/*.lo
 /.deps
-/.libs
-/Makefile
-/Makefile.in
+/.dirstamp
 /keysyms.c
 /menu_data.c
 /menu_data.ui

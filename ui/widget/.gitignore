@@ -1,7 +1,5 @@
-/*.a
 /.deps
-/Makefile
-/Makefile.in
+/.dirstamp
 /fuse.font
 /menu_data.c
 /options.c
