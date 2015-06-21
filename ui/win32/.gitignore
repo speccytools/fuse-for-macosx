@@ -1,6 +1,5 @@
 /.deps
 /.dirstamp
-/fuse.manifest
 /keysyms.c
 /menu_data.c
 /menu_data.h
