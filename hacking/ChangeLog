@@ -5125,3 +5125,6 @@
          snapshots (patch #364) (Fred).
 20160517 periph.[ch],unittests/unittests.c: add unit tests for combining
          floating bus and peripherals (Phil).
+20160517 debugger/{commandl.l,commandy.y,debugger_internals.h,expression.c}:
+         add ability to dereference debugger expressions (feature request #97)
+         (Phil).
