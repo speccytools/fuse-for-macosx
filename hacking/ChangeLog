@@ -5128,3 +5128,5 @@
 20160517 debugger/{commandl.l,commandy.y,debugger_internals.h,expression.c}:
          add ability to dereference debugger expressions (feature request #97)
          (Phil).
+20160517 man/fuse.1: document debugger dereference ability (feature request
+         #97) (Phil).
