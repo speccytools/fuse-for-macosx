@@ -54,7 +54,7 @@ TAP tape files is supported. The SLT extension to the Z80 format is
 partly supported (enough for multi-load games); however, loading of
 the old DAT-file variant is not.
 .PP
-DSK, UDI, FDI, TR0, SDF, MGT, IMG, D40, D80, SAD, TRD, SCL and OPD
+DSK, UDI, FDI, TD0, MGT, IMG, D40, D80, SAD, TRD, SCL and OPD
 disk images are supported when a disk interface is being emulated,
 including the integrated disk drives on +3, Pentagon or Scorpion
 machines as well as the +D, DISCiPLE, Opus Discovery, Beta\ 128 and
@@ -4178,9 +4178,14 @@ pane shows where the Spectrum's 64K memory map (the
 .RI ` W? '
 and
 .RI ` C? '
-indicate whether each 8K chunk is writable or contended respectively),
-and the next a disassembly, which by default starts at the current
-program counter, although this can be modified either by the
+indicate whether each displayed chunk is writable or contended respectively).
+Fuse tracks the memory mapping of the overall address space in 2KB chunks but 
+will summarise the mapped pages where they are part of the same page of the 
+underlying memory source (e.g. 8KB page sizes in the Spectrum 128K and 4KB 
+pages in the Timex clones' DOCK and EXROM banks).
+.PP
+The next pane to the right has a disassembly, which by default starts 
+at the current program counter, although this can be modified either by the
 `disassemble' command (see below) or by dragging the scrollbar next to
 it. The next pane shows the current stack, and the final pane any
 `events' which are due to occur and could affect emulation. Any of
@@ -4313,6 +4318,13 @@ rzx:end
 An RZX recording finishes playing
 .RE
 .br
+spectranet:page
+.br
+spectranet:unpage
+.RS
+The Spectranet interface is paged into or out of memory
+.RE
+.br
 tape:play
 .br
 tape:stop
@@ -4320,18 +4332,18 @@ tape:stop
 The emulated tape starts or stops playing
 .RE
 .br
-zxcf:page
-.br
-zxcf:unpage
-.RS
-The ZXCF interface is paged into or out of memory
-.RE
-.br
 zxatasp:page
 .br
 zxatasp:unpage
 .RS
 The ZXATASP interface is paged into or out of memory
+.RE
+.br
+zxcf:page
+.br
+zxcf:unpage
+.RS
+The ZXCF interface is paged into or out of memory
 .RE
 .PP
 In all cases, the event can be specified as
@@ -4866,7 +4878,6 @@ DISCiPLE/+D file formats.
 .RE
 .PP
 .I .SAD
-.I .SDF
 .RS
 For compatibility with SAM Coup\('e disk images using these formats.
 Note that SAM Coup\('e `.DSK' images share the same format as `.MGT'.

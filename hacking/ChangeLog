@@ -5130,3 +5130,26 @@
          (Phil).
 20160517 man/fuse.1: document debugger dereference ability (feature request
          #97) (Phil).
+20160519 roms/se-[01].rom: update to correct SE ROMs v4.07 (thanks, Andrew Owen)
+         (Sergio).
+20160519 fuse.c: update help info and remove obsolete options (Sergio).
+20160519 man/fuse.1,peripherals/disk/disk.h: remove references to SDF disk image
+         format (Sergio).
+20160521 configure.ac: CentOS 7 autotools complains that we need AM_PROG_CC_C_O
+         for compat subdir Makefile.am inclusion (Fred).
+20160521 peripherals/disk/{beta.c,opus.c,plusd.c},peripherals/{if1.c,if2.c}: fix
+         snapshot saving/loading for 2KB memory page size. Also make IF1 only
+         save or load 8KB of ROM as that is what the hardware and our emulation
+         support (patch #366) (Fred).
+20160521 man/fuse.1: first attempt to document debugger memory pane behaviour
+         (fixes bug #347) (Fred).
+20160521 pokefinder/pokemem.c: deactivate all active pokes before clearing them
+         (patch #367) (BogDan Vatra).
+20160522 ui/gtk/{gtkdisplay.c,gtkinternals.h,gtkui.c,statusbar.c}: change the 
+         resizing method for GTK+ UI (fixes bug #344) (thanks, Alberto Garcia)
+         (Sergio).
+20160523 man/fuse.1: document Spectranet debugging events and order ZXCF events
+         (Sergio).
+20160523 machine.c: clearing pokes also undoes their effect on memory, so should
+         be done before the machine's RAM reset is done (see: patch #367)
+         (thanks, Sergio) (Fred).
