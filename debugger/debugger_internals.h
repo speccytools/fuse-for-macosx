@@ -1,5 +1,5 @@
 /* debugger_internals.h: The internals of Fuse's monitor/debugger
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
 
    $Id$
 
@@ -92,6 +92,9 @@ debugger_expression*
 debugger_expression_new_binaryop( int operation, debugger_expression *operand1,
 				  debugger_expression *operand2, int pool );
 debugger_expression*
+debugger_expression_new_system_variable( const char *type, const char *detail,
+                                         int pool );
+debugger_expression*
 debugger_expression_new_variable( const char *name, int pool );
 
 debugger_expression* debugger_expression_copy( debugger_expression *src );
@@ -105,6 +108,15 @@ debugger_expression_evaluate( debugger_expression* expression );
 void debugger_event_init( void );
 int debugger_event_is_registered( const char *type, const char *detail );
 void debugger_event_end( void );
+
+/* System variables handling */
+
+void debugger_system_variable_init( void );
+void debugger_system_variable_end( void );
+int debugger_system_variable_is_registered( const char *type, const char *detail );
+libspectrum_dword debugger_system_variable_get( const char *type, const char *detail );
+void debugger_system_variable_set( const char *type, const char *detail,
+                                   libspectrum_dword value );
 
 /* Variables handling */
 

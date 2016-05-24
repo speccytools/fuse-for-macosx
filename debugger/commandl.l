@@ -1,5 +1,5 @@
 /* commandl.l: Debugger command lexical scanner
-   Copyright (c) 2002-2013 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
    Copyright (c) 2015 Sergio Baldoví
 
    $Id$
@@ -148,6 +148,7 @@ $[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
 
 {ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext ); return STRING; }
 ${ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext + 1 ); return VARIABLE; }
+\%{ID}          { yylval.string = mempool_strdup( debugger_memory_pool, yytext + 1 ); return SYSVAR; }
 
 \n		{ return '\n'; }
 

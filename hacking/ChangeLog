@@ -5157,3 +5157,7 @@
          format (Sergio).
 20160523 compat.h,settings.pl: use Windows line endings for plain text settings
          (Sergio).
+20160524 debugger/{Makefile.am,commandl.l,commandy.y,debugger.[ch],
+         debugger_internals.h,expression.c,system_variable.c},peripherals/ay.c:
+         first cut at implementing registration for debugger system variables.
+         (Phil).
