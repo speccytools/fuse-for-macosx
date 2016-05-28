@@ -5161,3 +5161,4 @@
          debugger_internals.h,expression.c,system_variable.c},peripherals/ay.c:
          first cut at implementing registration for debugger system variables.
          (Phil).
+20160528 deugger/system_variable.c: include file (thanks, Fred) (Phil).
