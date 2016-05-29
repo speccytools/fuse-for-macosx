@@ -86,25 +86,24 @@ find_system_variable( const char *type, const char *detail, system_variable_t *o
 
     if( system_variable_matches( &sysvar, type, detail ) ) {
       if( out != NULL ) *out = sysvar;
-      return 1;
+      return i;
     }
   }
 
-  return 0;
+  return -1;
 }
 
 int
-debugger_system_variable_is_registered( const char *type, const char *detail )
+debugger_system_variable_find( const char *type, const char *detail )
 {
   return find_system_variable( type, detail, NULL );
 }
 
 libspectrum_dword
-debugger_system_variable_get( const char *type, const char *detail )
+debugger_system_variable_get( int system_variable )
 {
-  system_variable_t sysvar;
-
-  find_system_variable( type, detail, &sysvar );
+  system_variable_t sysvar =
+    g_array_index( system_variables, system_variable_t, system_variable );
 
   return sysvar.get();
 }
@@ -113,11 +112,26 @@ void
 debugger_system_variable_set( const char *type, const char *detail,
                               libspectrum_dword value )
 {
+  int index;
   system_variable_t sysvar;
 
-  find_system_variable( type, detail, &sysvar );
+  index = find_system_variable( type, detail, &sysvar );
+  if( index == -1 ) {
+    ui_error( UI_ERROR_ERROR, "Unknown system variable %%%s:%s", type, detail );
+    return;
+  }
 
   sysvar.set( value );
+}
+
+void
+debugger_system_variable_text( char *buffer, size_t length,
+                               int system_variable )
+{
+  system_variable_t sysvar =
+    g_array_index( system_variables, system_variable_t, system_variable );
+
+  snprintf( buffer, length, "%s:%s", sysvar.type, sysvar.detail );
 }
 
 /* Tidy-up function called at end of emulation */

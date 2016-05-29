@@ -113,10 +113,12 @@ void debugger_event_end( void );
 
 void debugger_system_variable_init( void );
 void debugger_system_variable_end( void );
-int debugger_system_variable_is_registered( const char *type, const char *detail );
-libspectrum_dword debugger_system_variable_get( const char *type, const char *detail );
+int debugger_system_variable_find( const char *type, const char *detail );
+libspectrum_dword debugger_system_variable_get( int system_variable );
 void debugger_system_variable_set( const char *type, const char *detail,
                                    libspectrum_dword value );
+void debugger_system_variable_text( char *buffer, size_t length,
+                                    int system_variable );
 
 /* Variables handling */
 
