@@ -26,6 +26,7 @@
 
 #include <libspectrum.h>
 
+#include "debugger/debugger.h"
 #include "event.h"
 #include "fuse.h"
 #include "memory.h"
@@ -83,6 +84,13 @@ static module_info_t z80_module_info = {
 
 };
 
+/* Debugger system variables */
+static const char * const debugger_type_string = "z80";
+static const char * const af_detail_string = "raf";
+static const char * const bc_detail_string = "rbc";
+static const char * const de_detail_string = "rde";
+static const char * const hl_detail_string = "rhl";
+
 static void
 z80_interrupt_event_fn( libspectrum_dword event_tstates, int type,
                         void *user_data )
@@ -96,6 +104,29 @@ z80_interrupt_event_fn( libspectrum_dword event_tstates, int type,
   if( z80_interrupt() ) rzx_frame();
 }
 
+/* Debugger system variable callbacks */
+
+#define DEBUGGER_GET(reg) static libspectrum_dword \
+get_##reg( void ) \
+{ \
+  return reg; \
+}
+
+#define DEBUGGER_SET(reg) static void \
+set_##reg( libspectrum_dword value ) \
+{ \
+  reg = value; \
+}
+
+DEBUGGER_GET(AF)
+DEBUGGER_SET(AF)
+DEBUGGER_GET(BC)
+DEBUGGER_SET(BC)
+DEBUGGER_GET(DE)
+DEBUGGER_SET(DE)
+DEBUGGER_GET(HL)
+DEBUGGER_SET(HL)
+
 /* Set up the z80 emulation */
 void
 z80_init( void )
@@ -108,6 +139,11 @@ z80_init( void )
   z80_nmos_iff2_event = event_register( NULL, "IFF2 update dummy event" );
 
   module_register( &z80_module_info );
+
+  debugger_system_variable_register( debugger_type_string, af_detail_string, get_AF, set_AF );
+  debugger_system_variable_register( debugger_type_string, bc_detail_string, get_BC, set_BC );
+  debugger_system_variable_register( debugger_type_string, de_detail_string, get_DE, set_DE );
+  debugger_system_variable_register( debugger_type_string, hl_detail_string, get_HL, set_HL );
 }
 
 /* Initalise the tables used to set flags */

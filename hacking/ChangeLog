@@ -5230,4 +5230,6 @@
 20160606 ChangeLog,README,configure.ac,man/fuse.1: update release dates and mark
          this release as 1.2.0 (Fred).
 20160607 debugger/{commandl.l,commandy.y,system_variable.c}: remove the need
-         for "%" when accessing system variables.
+         for "%" when accessing system variables (Phil).
+20160607 z80/{coretest.c,z80.c}: begin adding Z80 registers as debugger
+         variables (Phil).
