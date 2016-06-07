@@ -47,7 +47,7 @@
 
 %}
 
-ID	[a-z]([a-z0-9]|\\[ ])+
+ID	[a-z]([a-z0-9]|\\[ ])*
 
 %option caseless
 
@@ -161,7 +161,6 @@ $[[:xdigit:]]+	{ yylval.integer = strtol( yytext+1, NULL, 16 );
   return STRING; }
 
 ${ID}		{ yylval.string = mempool_strdup( debugger_memory_pool, yytext + 1 ); return VARIABLE; }
-\%{ID}          { yylval.string = mempool_strdup( debugger_memory_pool, yytext + 1 ); return SYSVAR; }
 
 \n		{ return '\n'; }
 

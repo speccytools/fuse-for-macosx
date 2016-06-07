@@ -117,7 +117,7 @@ debugger_system_variable_set( const char *type, const char *detail,
 
   index = find_system_variable( type, detail, &sysvar );
   if( index == -1 ) {
-    ui_error( UI_ERROR_ERROR, "Unknown system variable %%%s:%s", type, detail );
+    ui_error( UI_ERROR_ERROR, "Unknown system variable %s:%s", type, detail );
     return;
   }
 

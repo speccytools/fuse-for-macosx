@@ -103,7 +103,6 @@
 %token <integer> NUMBER
 
 %token <string>	 STRING
-%token <string>  SYSVAR
 %token <string>	 VARIABLE
 
 %token		 DEBUGGER_ERROR
@@ -193,7 +192,7 @@ command:   BASE number { debugger_output_base = $2; }
 	 | SET NUMBER number { debugger_poke( $2, $3 ); }
 	 | SET DEBUGGER_REGISTER number { debugger_register_set( $2, $3 ); }
 	 | SET VARIABLE number { debugger_variable_set( $2, $3 ); }
-         | SET SYSVAR ':' STRING number { debugger_system_variable_set( $2, $4, $5 ); }
+         | SET STRING ':' STRING number { debugger_system_variable_set( $2, $4, $5 ); }
 	 | STEP	    { debugger_step(); }
 ;
 
@@ -248,7 +247,7 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_
 	    | DEBUGGER_REGISTER { $$ = debugger_expression_new_register( $1, debugger_memory_pool );
 			 if( !$$ ) YYABORT;
 		       }
-            | SYSVAR ':' STRING { $$ = debugger_expression_new_system_variable( $1, $3, debugger_memory_pool );
+            | STRING ':' STRING { $$ = debugger_expression_new_system_variable( $1, $3, debugger_memory_pool );
                                   if( !$$ ) YYABORT;
                                 }
 	    | VARIABLE { $$ = debugger_expression_new_variable( $1, debugger_memory_pool );
