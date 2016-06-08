@@ -5239,3 +5239,4 @@
 20160608 debugger/{command.c,commandy.y,debugger.c,debugger_internals.h,
          expression.c}: make register access just an alias for the appropriate
          system variable (Phil).
+20160608 z80/z80.c: expose all Z80 registers as system variables (Phil).
