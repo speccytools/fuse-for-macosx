@@ -83,22 +83,9 @@ t|tb|tbr|tbre|tbrea|tbreak|tbreakp|tbreakpo|tbreakpoi|tbreakpoin|tbreakpoint {
 ti|tim|time { return TIME; }
 w|wr|wri|writ|write { return WRITE; }
 
-a|b|c|d|e|f|h|l { yylval.reg = debugger_register_hash( yytext );
-		  return DEBUGGER_REGISTER; }
-
-"a'"|"b'"|"c'"|"d'"|"e'"|"f'"|"h'"|"l'" {
-                             yylval.reg = debugger_register_hash( yytext );
-			     return DEBUGGER_REGISTER; }
-
-af|bc|de|hl|"af\'"|"bc\'"|"de\'"|"hl\'" {
-                             yylval.reg = debugger_register_hash( yytext );
-			     return DEBUGGER_REGISTER; }
-
-sp|pc|ix|iy|i|r { yylval.reg = debugger_register_hash( yytext );
-	      return DEBUGGER_REGISTER; }
-
-im|iff1|iff2 { yylval.reg = debugger_register_hash( yytext );
-	      return DEBUGGER_REGISTER; }
+a|b|c|d|e|f|h|l|af|bc|de|hl|sp|pc|ix|iy|i|r|im|iff1|iff2|"a'"|"b'"|"c'"|"d'"|"e'"|"f'"|"h'"|"l'"|"af\'"|"bc\'"|"de\'"|"hl\'" {
+  yylval.string = mempool_strdup( debugger_memory_pool, yytext );
+  return DEBUGGER_REGISTER; }
 
 "("		{ return '('; }
 ")"		{ return ')'; }

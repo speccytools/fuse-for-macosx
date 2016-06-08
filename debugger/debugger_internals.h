@@ -51,7 +51,7 @@ int debugger_port_write( libspectrum_word address, libspectrum_byte value );
 
 int debugger_register_hash( const char *reg );
 libspectrum_word debugger_register_get( int which );
-void debugger_register_set( int which, libspectrum_word value );
+void debugger_register_set( const char *which, libspectrum_word value );
 const char* debugger_register_text( int which );
 
 void debugger_exit_emulator( void );
@@ -85,7 +85,7 @@ typedef enum debugger_token {
 
 debugger_expression*
 debugger_expression_new_number( libspectrum_dword number, int pool );
-debugger_expression* debugger_expression_new_register( int which, int pool );
+debugger_expression* debugger_expression_new_register( const char *which, int pool );
 debugger_expression*
 debugger_expression_new_unaryop( int operation, debugger_expression *operand, int pool );
 debugger_expression*

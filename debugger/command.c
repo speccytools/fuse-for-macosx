@@ -204,9 +204,11 @@ debugger_register_get( int which )
 
 /* Set the value of a register */
 void
-debugger_register_set( int which, libspectrum_word value )
+debugger_register_set( const char *which, libspectrum_word value )
 {
-  switch( which ) {
+  int hash = debugger_register_hash( which );
+
+  switch( hash ) {
 
     /* 8-bit registers */
     case 0x0061: A = value; break;
@@ -250,7 +252,7 @@ debugger_register_set( int which, libspectrum_word value )
     case 0x69666632: IFF2 = !!value; break;
 
   default:
-    ui_error( UI_ERROR_ERROR, "attempt to set unknown register '%d'", which );
+    ui_error( UI_ERROR_ERROR, "attempt to set unknown register '%s'", which );
     break;
   }
 }

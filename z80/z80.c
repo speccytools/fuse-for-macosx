@@ -86,10 +86,10 @@ static module_info_t z80_module_info = {
 
 /* Debugger system variables */
 static const char * const debugger_type_string = "z80";
-static const char * const af_detail_string = "raf";
-static const char * const bc_detail_string = "rbc";
-static const char * const de_detail_string = "rde";
-static const char * const hl_detail_string = "rhl";
+static const char * const af_detail_string = "af";
+static const char * const bc_detail_string = "bc";
+static const char * const de_detail_string = "de";
+static const char * const hl_detail_string = "hl";
 
 static void
 z80_interrupt_event_fn( libspectrum_dword event_tstates, int type,

@@ -166,7 +166,7 @@ debugger_expression_new_number( libspectrum_dword number, int pool )
 }
 
 debugger_expression*
-debugger_expression_new_register( int which, int pool )
+debugger_expression_new_register( const char *which, int pool )
 {
   debugger_expression *exp;
 
@@ -174,7 +174,7 @@ debugger_expression_new_register( int which, int pool )
 
   exp->type = DEBUGGER_EXPRESSION_TYPE_REGISTER;
   exp->precedence = PRECEDENCE_ATOMIC;
-  exp->types.reg = which;
+  exp->types.reg = debugger_register_hash( which );
 
   return exp;
 }
@@ -224,7 +224,7 @@ debugger_expression_new_system_variable( const char *type, const char *detail,
 
   system_variable = debugger_system_variable_find( type, detail );
   if( system_variable == -1 ) {
-    ui_error( UI_ERROR_WARNING, "System variable %%%s:%s not known", type,
+    ui_error( UI_ERROR_WARNING, "System variable %s:%s not known", type,
               detail );
     return NULL;
   }

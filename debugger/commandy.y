@@ -47,7 +47,6 @@
 %union {
 
   int token;
-  int reg;
 
   libspectrum_dword integer;
   char *string;
@@ -98,7 +97,7 @@
 %token		 TIME
 %token		 WRITE
 
-%token <reg>	 DEBUGGER_REGISTER
+%token <string>	 DEBUGGER_REGISTER
 
 %token <integer> NUMBER
 
@@ -193,6 +192,9 @@ command:   BASE number { debugger_output_base = $2; }
 	 | SET DEBUGGER_REGISTER number { debugger_register_set( $2, $3 ); }
 	 | SET VARIABLE number { debugger_variable_set( $2, $3 ); }
          | SET STRING ':' STRING number { debugger_system_variable_set( $2, $4, $5 ); }
+         /* Temporary hack while we deprecate the old unprefixed style
+            of register access */
+         | SET STRING ':' DEBUGGER_REGISTER number { debugger_system_variable_set( $2, $4, $5 ); }
 	 | STEP	    { debugger_step(); }
 ;
 
@@ -250,6 +252,11 @@ expression:   NUMBER { $$ = debugger_expression_new_number( $1, debugger_memory_
             | STRING ':' STRING { $$ = debugger_expression_new_system_variable( $1, $3, debugger_memory_pool );
                                   if( !$$ ) YYABORT;
                                 }
+            /* Temporary hack while we deprecate the old unprefixed style
+               of register access */
+            | STRING ':' DEBUGGER_REGISTER { $$ = debugger_expression_new_system_variable( $1, $3, debugger_memory_pool );
+                                             if( !$$ ) YYABORT;
+                                           }
 	    | VARIABLE { $$ = debugger_expression_new_variable( $1, debugger_memory_pool );
 			 if( !$$ ) YYABORT;
 		       }

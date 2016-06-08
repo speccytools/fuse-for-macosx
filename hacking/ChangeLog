@@ -5233,3 +5233,7 @@
          for "%" when accessing system variables (Phil).
 20160607 z80/{coretest.c,z80.c}: begin adding Z80 registers as debugger
          variables (Phil).
+20160608 debugger/{command.c,commandl.l,commandy.y,debugger_internals.h,
+         expression.c},z80/z80.c: allow register names to be used as variable
+         names (Phil).
+
