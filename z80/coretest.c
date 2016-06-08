@@ -607,6 +607,11 @@ module_register( module_info_t *module GCC_UNUSED )
   return 0;
 }
 
+void
+z80_debugger_variables_init( void )
+{
+}
+
 fuse_machine_info *machine_current;
 static fuse_machine_info dummy_machine;
 
