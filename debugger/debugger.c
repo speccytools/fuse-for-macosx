@@ -48,6 +48,9 @@ int debugger_memory_pool;
 /* The event type used for time breakpoints */
 int debugger_breakpoint_event;
 
+/* The system variable type used for Z80 registers */
+const char *debugger_z80_system_variable_type = "z80";
+
 void
 debugger_init( void )
 {

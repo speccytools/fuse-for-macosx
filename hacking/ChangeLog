@@ -5236,4 +5236,6 @@
 20160608 debugger/{command.c,commandl.l,commandy.y,debugger_internals.h,
          expression.c},z80/z80.c: allow register names to be used as variable
          names (Phil).
-
+20160608 debugger/{command.c,commandy.y,debugger.c,debugger_internals.h,
+         expression.c}: make register access just an alias for the appropriate
+         system variable (Phil).
