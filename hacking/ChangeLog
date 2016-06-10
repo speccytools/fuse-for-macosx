@@ -5243,3 +5243,4 @@
 20160608 z80/{Makefile.am,coretest.c,z80.c,z80_debugger_variables.c,
          z80_internals.h}: move debugger variable setup to separate file
          (Phil).
+20160610 man/fuse.1: document new debugger variables syntax (Phil).
