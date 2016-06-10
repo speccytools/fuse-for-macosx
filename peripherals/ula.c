@@ -30,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "keyboard.h"
 #include "loader.h"
 #include "machine.h"
@@ -90,6 +91,17 @@ static const periph_t ula_periph_full_decode = {
   /* .activate = */ NULL,
 };
 
+/* Debugger system variables */
+static const char * const debugger_type_string = "ula";
+static const char * const last_byte_detail_string = "last";
+
+/* Adapter just to get the return type to be what the debugger is expecting */
+static libspectrum_dword
+get_last_byte( void )
+{
+  return ula_last_byte();
+}
+
 void
 ula_init( void )
 {
@@ -97,6 +109,9 @@ ula_init( void )
 
   periph_register( PERIPH_TYPE_ULA, &ula_periph );
   periph_register( PERIPH_TYPE_ULA_FULL_DECODE, &ula_periph_full_decode );
+
+  debugger_system_variable_register(
+    debugger_type_string, last_byte_detail_string, get_last_byte, NULL );
 
   ula_default_value = 0xff;
 }

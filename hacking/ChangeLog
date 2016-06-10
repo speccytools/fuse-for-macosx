@@ -5244,3 +5244,5 @@
          z80_internals.h}: move debugger variable setup to separate file
          (Phil).
 20160610 man/fuse.1: document new debugger variables syntax (Phil).
+20160610 debugger/system_variable.c,man/fuse.1,peripherals/ula.c: expose last
+         byte written to the ULA as a debugger system variable (Phil).

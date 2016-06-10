@@ -4507,6 +4507,17 @@ to
 .IR value .
 .RE
 .PP
+se{t}
+.IR area : detail
+.I value
+.RS
+Set the value of the system variable
+.IR area : detail
+to
+.IR value .
+The available system variables are listed below.
+.RE
+.PP
 s{tep}
 .RS
 Equivalent to the
@@ -4579,12 +4590,17 @@ Square brackets (`[' and `]') can be used to dereference a value; for
 example `[0x4000]' will give the value of the first byte of the screen.
 .PP
 System variables are specified via an
-.RI ` area : offset '
+.RI ` area : detail '
 syntax. The available system variables are:
 .PP
 ay:current
 .RS
 The current AY-3-8912 register.
+.RE
+ula:last
+.RS
+The last byte written to the ULA. Note that this variable can only
+be read, not written to.
 .RE
 z80:
 .I register name

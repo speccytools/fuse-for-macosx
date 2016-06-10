@@ -121,6 +121,12 @@ debugger_system_variable_set( const char *type, const char *detail,
     return;
   }
 
+  if (sysvar.set == NULL) {
+    ui_error( UI_ERROR_ERROR, "System variable %s:%s cannot be set", type,
+              detail );
+    return;
+  }
+
   sysvar.set( value );
 }
 
