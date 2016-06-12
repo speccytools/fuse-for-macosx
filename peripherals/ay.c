@@ -176,7 +176,7 @@ ay_registerport_read( libspectrum_word port GCC_UNUSED, libspectrum_byte *attach
 void
 ay_registerport_write( libspectrum_word port GCC_UNUSED, libspectrum_byte b )
 {
-  machine_current->ay.current_register = (b & 15);
+  set_current_register( b );
 }
 
 /* What happens when the AY data port (traditionally 0xbffd on the 128K
