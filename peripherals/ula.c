@@ -34,6 +34,7 @@
 #include "keyboard.h"
 #include "loader.h"
 #include "machine.h"
+#include "machines/spec128.h"
 #include "module.h"
 #include "periph.h"
 #include "settings.h"
@@ -95,6 +96,7 @@ static const periph_t ula_periph_full_decode = {
 static const char * const debugger_type_string = "ula";
 static const char * const last_byte_detail_string = "last";
 static const char * const tstates_detail_string = "tstates";
+static const char * const mem7ffd_detail_string = "mem7ffd";
 
 /* Adapter just to get the return type to be what the debugger is expecting */
 static libspectrum_dword
@@ -115,6 +117,18 @@ set_tstates( libspectrum_dword value )
   tstates = value;
 }
 
+static libspectrum_dword
+get_7ffd( void )
+{
+  return machine_current->ram.last_byte;
+}
+
+static void
+set_7ffd( libspectrum_dword value )
+{
+  spec128_memoryport_write( 0, value );
+}
+
 void
 ula_init( void )
 {
@@ -127,6 +141,8 @@ ula_init( void )
     debugger_type_string, last_byte_detail_string, get_last_byte, NULL );
   debugger_system_variable_register(
     debugger_type_string, tstates_detail_string, get_tstates, set_tstates );
+  debugger_system_variable_register(
+    debugger_type_string, mem7ffd_detail_string, get_7ffd, set_7ffd );
 
   ula_default_value = 0xff;
 }
