@@ -94,12 +94,25 @@ static const periph_t ula_periph_full_decode = {
 /* Debugger system variables */
 static const char * const debugger_type_string = "ula";
 static const char * const last_byte_detail_string = "last";
+static const char * const tstates_detail_string = "tstates";
 
 /* Adapter just to get the return type to be what the debugger is expecting */
 static libspectrum_dword
 get_last_byte( void )
 {
   return ula_last_byte();
+}
+
+static libspectrum_dword
+get_tstates( void )
+{
+  return tstates;
+}
+
+static void
+set_tstates( libspectrum_dword value )
+{
+  tstates = value;
 }
 
 void
@@ -112,6 +125,8 @@ ula_init( void )
 
   debugger_system_variable_register(
     debugger_type_string, last_byte_detail_string, get_last_byte, NULL );
+  debugger_system_variable_register(
+    debugger_type_string, tstates_detail_string, get_tstates, set_tstates );
 
   ula_default_value = 0xff;
 }
