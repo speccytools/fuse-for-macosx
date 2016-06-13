@@ -171,43 +171,76 @@ set_IFF2( libspectrum_dword value )
 void
 z80_debugger_variables_init( void )
 {
-  debugger_system_variable_register( debugger_type_string, a_detail_string, get_A, set_A );
-  debugger_system_variable_register( debugger_type_string, b_detail_string, get_B, set_B );
-  debugger_system_variable_register( debugger_type_string, c_detail_string, get_C, set_C );
-  debugger_system_variable_register( debugger_type_string, d_detail_string, get_D, set_D );
-  debugger_system_variable_register( debugger_type_string, e_detail_string, get_E, set_E );
-  debugger_system_variable_register( debugger_type_string, f_detail_string, get_F, set_F );
-  debugger_system_variable_register( debugger_type_string, h_detail_string, get_H, set_H );
-  debugger_system_variable_register( debugger_type_string, l_detail_string, get_L, set_L );
+  debugger_system_variable_register( debugger_type_string, a_detail_string,
+                                     get_A, set_A );
+  debugger_system_variable_register( debugger_type_string, b_detail_string,
+                                     get_B, set_B );
+  debugger_system_variable_register( debugger_type_string, c_detail_string,
+                                     get_C, set_C );
+  debugger_system_variable_register( debugger_type_string, d_detail_string, 
+                                     get_D, set_D );
+  debugger_system_variable_register( debugger_type_string, e_detail_string, 
+                                     get_E, set_E );
+  debugger_system_variable_register( debugger_type_string, f_detail_string, 
+                                     get_F, set_F );
+  debugger_system_variable_register( debugger_type_string, h_detail_string, 
+                                     get_H, set_H );
+  debugger_system_variable_register( debugger_type_string, l_detail_string, 
+                                     get_L, set_L );
   
-  debugger_system_variable_register( debugger_type_string, a__detail_string, get_A_, set_A_ );
-  debugger_system_variable_register( debugger_type_string, b__detail_string, get_B_, set_B_ );
-  debugger_system_variable_register( debugger_type_string, c__detail_string, get_C_, set_C_ );
-  debugger_system_variable_register( debugger_type_string, d__detail_string, get_D_, set_D_ );
-  debugger_system_variable_register( debugger_type_string, e__detail_string, get_E_, set_E_ );
-  debugger_system_variable_register( debugger_type_string, f__detail_string, get_F_, set_F_ );
-  debugger_system_variable_register( debugger_type_string, h__detail_string, get_H_, set_H_ );
-  debugger_system_variable_register( debugger_type_string, l__detail_string, get_L_, set_L_ );
+  debugger_system_variable_register( debugger_type_string, a__detail_string, 
+                                     get_A_, set_A_ );
+  debugger_system_variable_register( debugger_type_string, b__detail_string, 
+                                     get_B_, set_B_ );
+  debugger_system_variable_register( debugger_type_string, c__detail_string, 
+                                     get_C_, set_C_ );
+  debugger_system_variable_register( debugger_type_string, d__detail_string, 
+                                     get_D_, set_D_ );
+  debugger_system_variable_register( debugger_type_string, e__detail_string, 
+                                     get_E_, set_E_ );
+  debugger_system_variable_register( debugger_type_string, f__detail_string, 
+                                     get_F_, set_F_ );
+  debugger_system_variable_register( debugger_type_string, h__detail_string, 
+                                     get_H_, set_H_ );
+  debugger_system_variable_register( debugger_type_string, l__detail_string, 
+                                     get_L_, set_L_ );
   
-  debugger_system_variable_register( debugger_type_string, af_detail_string, get_AF, set_AF );
-  debugger_system_variable_register( debugger_type_string, bc_detail_string, get_BC, set_BC );
-  debugger_system_variable_register( debugger_type_string, de_detail_string, get_DE, set_DE );
-  debugger_system_variable_register( debugger_type_string, hl_detail_string, get_HL, set_HL );
+  debugger_system_variable_register( debugger_type_string, af_detail_string, 
+                                     get_AF, set_AF );
+  debugger_system_variable_register( debugger_type_string, bc_detail_string, 
+                                     get_BC, set_BC );
+  debugger_system_variable_register( debugger_type_string, de_detail_string, 
+                                     get_DE, set_DE );
+  debugger_system_variable_register( debugger_type_string, hl_detail_string, 
+                                     get_HL, set_HL );
 
-  debugger_system_variable_register( debugger_type_string, af__detail_string, get_AF_, set_AF_ );
-  debugger_system_variable_register( debugger_type_string, bc__detail_string, get_BC_, set_BC_ );
-  debugger_system_variable_register( debugger_type_string, de__detail_string, get_DE_, set_DE_ );
-  debugger_system_variable_register( debugger_type_string, hl__detail_string, get_HL_, set_HL_ );
+  debugger_system_variable_register( debugger_type_string, af__detail_string, 
+                                     get_AF_, set_AF_ );
+  debugger_system_variable_register( debugger_type_string, bc__detail_string, 
+                                     get_BC_, set_BC_ );
+  debugger_system_variable_register( debugger_type_string, de__detail_string, 
+                                     get_DE_, set_DE_ );
+  debugger_system_variable_register( debugger_type_string, hl__detail_string, 
+                                     get_HL_, set_HL_ );
 
-  debugger_system_variable_register( debugger_type_string, sp_detail_string, get_SP, set_SP );
-  debugger_system_variable_register( debugger_type_string, pc_detail_string, get_PC, set_PC );
-  debugger_system_variable_register( debugger_type_string, ix_detail_string, get_IX, set_IX );
-  debugger_system_variable_register( debugger_type_string, iy_detail_string, get_IY, set_IY );
+  debugger_system_variable_register( debugger_type_string, sp_detail_string, 
+                                     get_SP, set_SP );
+  debugger_system_variable_register( debugger_type_string, pc_detail_string, 
+                                     get_PC, set_PC );
+  debugger_system_variable_register( debugger_type_string, ix_detail_string, 
+                                     get_IX, set_IX );
+  debugger_system_variable_register( debugger_type_string, iy_detail_string, 
+                                     get_IY, set_IY );
   
-  debugger_system_variable_register( debugger_type_string, i_detail_string, get_I, set_I );
-  debugger_system_variable_register( debugger_type_string, r_detail_string, get_R, set_R );
+  debugger_system_variable_register( debugger_type_string, i_detail_string, 
+                                     get_I, set_I );
+  debugger_system_variable_register( debugger_type_string, r_detail_string, 
+                                     get_R, set_R );
 
-  debugger_system_variable_register( debugger_type_string, im_detail_string, get_IM, set_IM );
-  debugger_system_variable_register( debugger_type_string, iff1_detail_string, get_IFF1, set_IFF1 );
-  debugger_system_variable_register( debugger_type_string, iff2_detail_string, get_IFF2, set_IFF2 );
+  debugger_system_variable_register( debugger_type_string, im_detail_string, 
+                                     get_IM, set_IM );
+  debugger_system_variable_register( debugger_type_string, iff1_detail_string, 
+                                     get_IFF1, set_IFF1 );
+  debugger_system_variable_register( debugger_type_string, iff2_detail_string, 
+                                     get_IFF2, set_IFF2 );
 }
