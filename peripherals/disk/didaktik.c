@@ -33,6 +33,7 @@
 #include <string.h>
 
 #include "compat.h"
+#include "debugger/debugger.h"
 #include "didaktik.h"
 #include "machine.h"
 #include "module.h"
@@ -125,12 +126,17 @@ static const periph_t didaktik_periph = {
   /* .activate = */ NULL,
 };
 
+/* Debugger events */
+static const char * const event_type_string = "didaktik80";
+static int page_event, unpage_event;
+
 void
 didaktik80_page( void )
 {
   didaktik80_active = 1;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
 }
 
 void
@@ -139,6 +145,7 @@ didaktik80_unpage( void )
   didaktik80_active = 0;
   machine_current->ram.romcs = 0;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 static void
@@ -206,6 +213,9 @@ didaktik80_init( void )
     didaktik_ui_drives[ i ].fdd = &didaktik_drives[ i ];
     ui_media_drive_register( &didaktik_ui_drives[ i ] );
   }
+
+  periph_register_paging_events( event_type_string, &page_event,
+                                 &unpage_event );
 }
 
 static void
@@ -368,6 +378,28 @@ fdd_t *
 didaktik80_get_fdd( didaktik80_drive_number which )
 {
   return &( didaktik_drives[ which ] );
+}
+
+int
+didaktik80_unittest( void )
+{
+  int r = 0;
+
+  didaktik80_page();
+
+  r += unittests_assert_8k_page( 0x0000, didaktik_rom_memory_source, 0 );
+  r += unittests_assert_4k_page( 0x2000, didaktik_rom_memory_source, 0 );
+  r += unittests_assert_2k_page( 0x3000, didaktik_rom_memory_source, 0 );
+  r += unittests_assert_2k_page( 0x3800, didaktik_ram_memory_source, 0 );
+  r += unittests_assert_16k_ram_page( 0x4000, 5 );
+  r += unittests_assert_16k_ram_page( 0x8000, 2 );
+  r += unittests_assert_16k_ram_page( 0xc000, 0 );
+
+  didaktik80_unpage();
+
+  r += unittests_paging_test_48( 2 );
+
+  return r;
 }
 
 static int

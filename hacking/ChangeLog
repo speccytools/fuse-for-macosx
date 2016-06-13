@@ -5233,6 +5233,8 @@
          for "%" when accessing system variables (Phil).
 20160607 z80/{coretest.c,z80.c}: begin adding Z80 registers as debugger
          variables (Phil).
+20160608 data/fuse.desktop.in: update Name entry and add GenericName and
+         Keywords entries in .desktop file (patch #369) (Alberto Garcia).
 20160608 debugger/{command.c,commandl.l,commandy.y,debugger_internals.h,
          expression.c},z80/z80.c: allow register names to be used as variable
          names (Phil).
@@ -5243,9 +5245,20 @@
 20160608 z80/{Makefile.am,coretest.c,z80.c,z80_debugger_variables.c,
          z80_internals.h}: move debugger variable setup to separate file
          (Phil).
+20160609 sound/alsasound.c: avoid redefinition of NDEBUG (Sergio).
+20160609 compat/{Makefile.am,mkstemp.c},configure.ac,utils.[ch]: remove
+         utils_make_temp_file() and mkstemp() as they are no longer used (thanks
+         Phil) (Fred).
 20160610 man/fuse.1: document new debugger variables syntax (Phil).
 20160610 debugger/system_variable.c,man/fuse.1,peripherals/ula.c: expose last
          byte written to the ULA as a debugger system variable (Phil).
+20160611 peripherals/disk/didaktik.c,unittests/unittests.c: add Didaktik 80 unit
+         test (Sergio).
+20160611 debugger/event.c: make breakpoints on events honour lifetime (Sergio).
+20160611 man/fuse.1,peripherals/{disk/{beta.c,didaktik.c,disciple.c,opus.c,
+         plusd.c}},speccyboot.c}: extend breakpoints on paging events to more
+         peripherals: Beta 128, +D, Didaktik 80, DISCiPLE, Opus Discovery and
+         SpeccyBoot (Sergio).
 20160612 man/fuse.1,peripherals/ula.c,spectrum.c: expose tstates since
          interrupt as a debugger system variable (Phil).
 20160612 peripherals/ay.c: remove duplicated code (Phil).
