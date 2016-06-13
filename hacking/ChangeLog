@@ -5251,3 +5251,5 @@
 20160612 peripherals/ay.c: remove duplicated code (Phil).
 20160612 man/fuse.1,peripherals/ula.c: expose primary memory control port as
          a debugger system variable (Phil).
+20160613 man/fuse.1,peripherals/ula.c: expose secondary memory control port as
+         a debugger system variable (Phil).
