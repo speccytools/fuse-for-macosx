@@ -45,6 +45,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "event.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "settings.h"
@@ -150,7 +151,7 @@ beta_select_drive( int i )
   }
 }
 
-void
+static void
 beta_init( void )
 {
   int i;
@@ -187,6 +188,16 @@ beta_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+}
+
+void
+beta_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_BETA, dependencies,
+                            dependency_count, beta_init );
 }
 
 static void

@@ -35,6 +35,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "disciple.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "peripherals/printer.h"
@@ -191,7 +192,7 @@ static const periph_t disciple_periph = {
   /* .activate = */ disciple_activate,
 };
 
-void
+static void
 disciple_init( void )
 {
   int i;
@@ -239,6 +240,16 @@ disciple_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+}
+
+void
+disciple_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_DISCIPLE, dependencies,
+                            dependency_count, disciple_init );
 }
 
 static void

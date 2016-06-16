@@ -34,6 +34,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "peripherals/printer.h"
@@ -159,7 +160,7 @@ static const periph_t plusd_periph = {
   /* .activate = */ plusd_activate,
 };
 
-void
+static void
 plusd_init( void )
 {
   int i;
@@ -198,6 +199,16 @@ plusd_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+}
+
+void
+plusd_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_PLUSD, dependencies,
+                            dependency_count, plusd_init );
 }
 
 static void

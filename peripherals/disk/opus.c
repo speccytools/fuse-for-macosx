@@ -34,6 +34,7 @@
 
 #include "compat.h"
 #include "debugger/debugger.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "opus.h"
@@ -132,7 +133,7 @@ opus_set_datarq( struct wd_fdc *f )
   event_add( 0, z80_nmi_event );
 }
 
-void
+static void
 opus_init( void )
 {
   int i;
@@ -171,6 +172,16 @@ opus_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+}
+
+void
+opus_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_OPUS, dependencies,
+                            dependency_count, opus_init );
 }
 
 static void

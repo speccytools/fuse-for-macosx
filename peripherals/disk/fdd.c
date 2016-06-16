@@ -1,5 +1,5 @@
 /* fdd.c: Routines for emulating floppy disk drives
-   Copyright (c) 2007-2016 Gergely Szasz
+   Copyright (c) 2007-2016 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 BogDan Vatra
 
@@ -33,6 +33,7 @@
 #include "compat.h"
 #include "event.h"
 #include "fdd.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "spectrum.h"
 #include "settings.h"
@@ -76,7 +77,7 @@ static int index_event;
 
 static int fdd_motor = 0; /* to manage 'disk' icon */
 
-void
+static void
 fdd_init_events( void )
 {
   motor_event = event_register( fdd_event, "FDD motor on" );
@@ -84,6 +85,13 @@ fdd_init_events( void )
 
   upd_fdc_init_events();
   wd_fdc_init_events();
+}
+
+void
+fdd_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_FDD,
+                                            fdd_init_events );
 }
 
 const char *

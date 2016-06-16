@@ -5235,3 +5235,8 @@
          plusd.c}},speccyboot.c}: extend breakpoints on paging events to more
          peripherals: Beta 128, +D, Didaktik 80, DISCiPLE, Opus Discovery and
          SpeccyBoot (Sergio).
+20160616 Makefile.am,debugger/debugger.[ch],fuse.c,infrastructure/{Makefile.am,
+         startup_manager.[ch]},peripherals/{disk/{beta.[ch],didaktik.[ch],
+         disciple.[ch],fdd.[ch],opus.[ch],plusd.[ch]},if1.[ch],if2.[ch],
+         printer.[ch]},psg.[ch],rzx.[ch],spectrum.[ch]}: initial work on a
+         startup manager to automatically handle dependency issues (Phil).

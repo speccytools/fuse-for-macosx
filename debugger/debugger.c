@@ -1,5 +1,5 @@
 /* debugger.c: Fuse's monitor/debugger
-   Copyright (c) 2002-2011 Philip Kendall
+   Copyright (c) 2002-2016 Philip Kendall
 
    $Id$
 
@@ -29,6 +29,7 @@
 #include "debugger_internals.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "memory.h"
 #include "mempool.h"
 #include "periph.h"
@@ -48,7 +49,7 @@ int debugger_memory_pool;
 /* The event type used for time breakpoints */
 int debugger_breakpoint_event;
 
-void
+static void
 debugger_init( void )
 {
   debugger_breakpoints = NULL;
@@ -62,6 +63,13 @@ debugger_init( void )
   debugger_variable_init();
   debugger_reset();
 }
+
+void
+debugger_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_DEBUGGER,
+                                            debugger_init );
+}  
 
 void
 debugger_reset( void )

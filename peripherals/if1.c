@@ -1,5 +1,5 @@
 /* if1.c: Interface 1 handling routines
-   Copyright (c) 2004-2015 Gergely Szasz, Philip Kendall
+   Copyright (c) 2004-2016 Gergely Szasz, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -37,6 +37,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "if1.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -302,7 +303,7 @@ update_menu( enum if1_menu_item what )
   }
 }
 
-void
+static void
 if1_init( void )
 {
   int m, i;
@@ -351,6 +352,16 @@ if1_init( void )
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   periph_register_paging_events( event_type_string, &page_event,
 				 &unpage_event );
+}
+
+void
+if1_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_IF1, dependencies,
+                            dependency_count, if1_init );
 }
 
 libspectrum_error

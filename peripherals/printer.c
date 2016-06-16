@@ -1,5 +1,5 @@
 /* printer.c: Printer support
-   Copyright (c) 2001-2004 Ian Collier, Russell Marks, Philip Kendall
+   Copyright (c) 2001-2016 Ian Collier, Russell Marks, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2015 Fredrick Meunier
    Copyright (c) 2016 Sergio Baldoví
@@ -37,6 +37,7 @@
 #include <ctype.h>
 
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -708,16 +709,22 @@ if(!settings_current.printer)
 parallel_data=b;
 }
 
-
-void printer_init(void)
+static void
+printer_init( void )
 {
-printer_graphics_enabled=printer_text_enabled=1;
-printer_graphics_file=printer_text_file=NULL;
+  printer_graphics_enabled=printer_text_enabled = 1;
+  printer_graphics_file=printer_text_file = NULL;
 
-printer_zxp_init();
-printer_text_init();
+  printer_zxp_init();
+  printer_text_init();
 }
 
+void
+printer_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_PRINTER,
+                                            printer_init );
+}
 
 void printer_end(void)
 {

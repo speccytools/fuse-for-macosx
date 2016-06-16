@@ -1,5 +1,5 @@
 /* if2.c: Interface 2 cartridge handling routines
-   Copyright (c) 2003-2015 Darren Salt, Fredrick Meunier, Philip Kendall
+   Copyright (c) 2003-2016 Darren Salt, Fredrick Meunier, Philip Kendall
 
    $Id$
 
@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include "if2.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -70,7 +71,7 @@ static const periph_t if2_periph = {
   /* .activate = */ NULL,
 };
 
-void
+static void
 if2_init( void )
 {
   int i;
@@ -83,6 +84,13 @@ if2_init( void )
     if2_memory_map_romcs[i].source = if2_source;
 
   periph_register( PERIPH_TYPE_INTERFACE2, &if2_periph );
+}
+
+void
+if2_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_IF2,
+                                            if2_init );
 }
 
 int

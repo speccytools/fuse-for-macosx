@@ -1,5 +1,5 @@
 /* fuse.c: The Free Unix Spectrum Emulator
-   Copyright (c) 1999-2015 Philip Kendall and others
+   Copyright (c) 1999-2016 Philip Kendall and others
 
    $Id$
 
@@ -59,6 +59,7 @@
 #include "display.h"
 #include "event.h"
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "keyboard.h"
 #include "machine.h"
 #include "machines/machines_periph.h"
@@ -199,6 +200,29 @@ int main(int argc, char **argv)
 
 }
 
+static int
+run_startup_manager()
+{
+  startup_manager_init();
+
+  /* Get every module to register its init function */
+  beta_register_startup();
+  debugger_register_startup();
+  didaktik80_register_startup();
+  disciple_register_startup();
+  fdd_register_startup();
+  if1_register_startup();
+  if2_register_startup();
+  opus_register_startup();
+  plusd_register_startup();
+  psg_register_startup();
+  printer_register_startup();
+  rzx_register_startup();
+  spectrum_register_startup();
+
+  return startup_manager_run();
+}
+
 static int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
@@ -285,23 +309,11 @@ static int fuse_init(int argc, char **argv)
 LIBXML_TEST_VERSION
 #endif
 
-  debugger_init();
+  if( run_startup_manager() ) return 1;
 
-  spectrum_init();
-  printer_init();
-  rzx_init();
-  psg_init();
-  beta_init();
-  opus_init();
-  plusd_init();
-  didaktik80_init();
-  disciple_init();
-  fdd_init_events();
   if( simpleide_init() ) return 1;
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
-  if1_init();
-  if2_init();
   if( divide_init() ) return 1;
   scld_init();
   ula_init();

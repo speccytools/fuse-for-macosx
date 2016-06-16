@@ -1,5 +1,5 @@
 /* psg.c: recording AY chip output to .psg files
-   Copyright (c) 2003 Matthew Westcott, Philip Kendall
+   Copyright (c) 2003-2016 Matthew Westcott, Philip Kendall
 
    $Id$
 
@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 
+#include "infrastructure/startup_manager.h"
 #include "psg.h"
 #include "ui/ui.h"
 
@@ -45,10 +46,17 @@ static FILE *psg_file;
 
 static int write_frame_separator( void );
 
-void
+static void
 psg_init( void )
 {
   psg_recording = 0;
+}
+
+void
+psg_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_PSG,
+                                            psg_init );
 }
 
 int
