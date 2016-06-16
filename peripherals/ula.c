@@ -1,5 +1,5 @@
 /* ula.c: ULA routines
-   Copyright (c) 1999-2011 Philip Kendall, Darren Salt
+   Copyright (c) 1999-2016 Philip Kendall, Darren Salt
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Fredrick Meunier
 
@@ -31,6 +31,7 @@
 
 #include "compat.h"
 #include "keyboard.h"
+#include "infrastructure/startup_manager.h"
 #include "loader.h"
 #include "machine.h"
 #include "module.h"
@@ -90,7 +91,7 @@ static const periph_t ula_periph_full_decode = {
   /* .activate = */ NULL,
 };
 
-void
+static void
 ula_init( void )
 {
   module_register( &ula_module_info );
@@ -99,6 +100,13 @@ ula_init( void )
   periph_register( PERIPH_TYPE_ULA_FULL_DECODE, &ula_periph_full_decode );
 
   ula_default_value = 0xff;
+}
+
+void
+ula_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_ULA,
+                                            ula_init );
 }
 
 static libspectrum_byte

@@ -5240,3 +5240,8 @@
          disciple.[ch],fdd.[ch],opus.[ch],plusd.[ch]},if1.[ch],if2.[ch],
          printer.[ch]},psg.[ch],rzx.[ch],spectrum.[ch]}: initial work on a
          startup manager to automatically handle dependency issues (Phil).
+20160616 fuse.c,infrastructure/startup_manager.h,machines/machines_periph.[ch],
+         peripherals/{ay.[ch],fuller.[ch],kempmouse.[ch],melodik.[ch],
+         scld.[ch],speccyboot.[ch],specdrum.[ch],spectranet.[ch],ula.[ch],
+         usource.[ch]},profile.[ch],slt.[ch]: move more initialisation routines
+         into startup manager (Phil).

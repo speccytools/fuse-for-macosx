@@ -1,5 +1,5 @@
 /* ay.c: AY-8-3912 routines
-   Copyright (c) 1999-2009 Philip Kendall
+   Copyright (c) 1999-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include "compat.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "periph.h"
@@ -111,7 +112,7 @@ static periph_t ay_periph_timex = {
   /* .activate = */ NULL,
 };
 
-void
+static void
 ay_init( void )
 {
   module_register( &ay_module_info );
@@ -119,6 +120,13 @@ ay_init( void )
   periph_register( PERIPH_TYPE_AY_PLUS3, &ay_periph_plus3 );
   periph_register( PERIPH_TYPE_AY_FULL_DECODE, &ay_periph_full_decode );
   periph_register( PERIPH_TYPE_AY_TIMEX, &ay_periph_timex );
+}
+
+void
+ay_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_AY,
+                                            ay_init );
 }
 
 static void

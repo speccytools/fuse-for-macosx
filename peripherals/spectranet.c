@@ -1,5 +1,5 @@
 /* spectranet.c: Spectranet emulation
-   Copyright (c) 2011-2015 Philip Kendall
+   Copyright (c) 2011-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
    
    $Id$
@@ -31,6 +31,7 @@
 #include "compat.h"
 #include "debugger/debugger.h"
 #include "flash/am29f010.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -441,7 +442,7 @@ static const periph_t spectranet_periph = {
   /* .activate = */ spectranet_activate,
 };
 
-void
+static void
 spectranet_init( void )
 {
   module_register( &spectranet_module_info );
@@ -452,6 +453,16 @@ spectranet_init( void )
 
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
+}
+
+void
+spectranet_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_SPECTRANET, dependencies,
+                            dependency_count, spectranet_init );
 }
 
 void
@@ -502,7 +513,7 @@ spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b )
 /* No spectranet support */
 
 void
-spectranet_init( void )
+spectranet_register_startup( void )
 {
 }
 

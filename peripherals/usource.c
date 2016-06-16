@@ -1,5 +1,5 @@
 /* usource.c: Routines for handling the Currah uSource interface
-   Copyright (c) 2007,2011,2015 Stuart Brady
+   Copyright (c) 2007-2016 Stuart Brady, Philip Kendall
    Copyright (c) 2016 Fredrick Meunier
 
    $Id$
@@ -33,6 +33,7 @@
 #include <libspectrum.h>
 
 #include "compat.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -83,7 +84,7 @@ static const periph_t usource_periph = {
   /* .activate = */ NULL,
 };
 
-int
+void
 usource_init( void )
 {
   int i;
@@ -95,8 +96,13 @@ usource_init( void )
     usource_memory_map_romcs[i].source = usource_memory_source;
 
   periph_register( PERIPH_TYPE_USOURCE, &usource_periph );
+}
 
-  return 0;
+void
+usource_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_USOURCE,
+                                            usource_init );
 }
 
 void

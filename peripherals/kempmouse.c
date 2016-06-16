@@ -1,5 +1,5 @@
 /* kempmouse.c: Kempston mouse emulation
-   Copyright (c) 2004-2008 Darren Salt, Fredrick Meunier
+   Copyright (c) 2004-2016 Darren Salt, Fredrick Meunier, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 
@@ -29,6 +29,7 @@
 
 #include <libspectrum.h>
 
+#include "infrastructure/startup_manager.h"
 #include "kempmouse.h"
 #include "module.h"
 #include "periph.h"
@@ -79,11 +80,18 @@ static const periph_t kempmouse_periph = {
   /* .activate = */ NULL,
 };
 
-void
+static void
 kempmouse_init( void )
 {
   module_register( &kempmouse_module_info );
   periph_register( PERIPH_TYPE_KEMPSTON_MOUSE, &kempmouse_periph );
+}
+
+void
+kempmouse_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_KEMPMOUSE,
+                                            kempmouse_init );
 }
 
 void

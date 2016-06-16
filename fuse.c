@@ -206,19 +206,32 @@ run_startup_manager()
   startup_manager_init();
 
   /* Get every module to register its init function */
+  ay_register_startup();
   beta_register_startup();
   debugger_register_startup();
   didaktik80_register_startup();
   disciple_register_startup();
   fdd_register_startup();
+  fuller_register_startup();
   if1_register_startup();
   if2_register_startup();
+  kempmouse_register_startup();
+  machines_periph_register_startup();
+  melodik_register_startup();
   opus_register_startup();
   plusd_register_startup();
-  psg_register_startup();
   printer_register_startup();
+  profile_register_startup();
+  psg_register_startup();
   rzx_register_startup();
+  scld_register_startup();
+  slt_register_startup();
+  speccyboot_register_startup();
+  specdrum_register_startup();
+  spectranet_register_startup();
   spectrum_register_startup();
+  ula_register_startup();
+  usource_register_startup();
 
   return startup_manager_run();
 }
@@ -315,19 +328,6 @@ LIBXML_TEST_VERSION
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
   if( divide_init() ) return 1;
-  scld_init();
-  ula_init();
-  ay_init();
-  slt_init();
-  profile_init();
-  kempmouse_init();
-  fuller_init();
-  melodik_init();
-  speccyboot_init();
-  specdrum_init();
-  spectranet_init();
-  usource_init();
-  machines_periph_init();
 
   z80_init();
 
