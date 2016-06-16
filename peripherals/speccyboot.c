@@ -241,7 +241,10 @@ speccyboot_init( void )
 void
 speccyboot_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+  };
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECCYBOOT, dependencies,

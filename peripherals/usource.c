@@ -101,8 +101,11 @@ usource_init( void )
 void
 usource_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_USOURCE,
-                                            usource_init );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMORY };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_USOURCE, dependencies,
+                            dependency_count, usource_init );
 }
 
 void

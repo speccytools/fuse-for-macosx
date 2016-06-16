@@ -5245,3 +5245,7 @@
          scld.[ch],speccyboot.[ch],specdrum.[ch],spectranet.[ch],ula.[ch],
          usource.[ch]},profile.[ch],slt.[ch]: move more initialisation routines
          into startup manager (Phil).
+20160616 fuse.c,infrastructure/startup_manager.[ch],memory.[ch],
+         peripherals/{disk/{beta.c,didaktik.c,disciple.c,opus.c,plusd.c},
+         if1.c,if2.c,speccyboot.c,spectranet.c,usource.c}: add memory subsystem
+         into startup manager (Phil).

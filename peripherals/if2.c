@@ -89,8 +89,11 @@ if2_init( void )
 void
 if2_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_IF2,
-                                            if2_init );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMORY };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_IF2, dependencies,
+                            dependency_count, if2_init );
 }
 
 int
