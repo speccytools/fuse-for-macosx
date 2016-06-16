@@ -219,6 +219,7 @@ run_startup_manager()
   machines_periph_register_startup();
   melodik_register_startup();
   memory_register_startup();
+  mempool_register_startup();
   opus_register_startup();
   plusd_register_startup();
   printer_register_startup();
@@ -319,8 +320,6 @@ static int fuse_init(int argc, char **argv)
 #ifdef HAVE_LIB_XML2
 LIBXML_TEST_VERSION
 #endif
-
-  mempool_init();
 
   if( run_startup_manager() ) return 1;
 

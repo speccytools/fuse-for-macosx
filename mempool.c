@@ -1,5 +1,5 @@
 /* mempool.c: pooled system memory
-   Copyright (c) 2008-2015 Philip Kendall
+   Copyright (c) 2008-2016 Philip Kendall
 
    $Id$
 
@@ -34,16 +34,24 @@
 #include <libspectrum.h>
 
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "mempool.h"
 
 static GArray *memory_pools;
 
 const int MEMPOOL_UNTRACKED = -1;
 
-void
+static void
 mempool_init( void )
 {
   memory_pools = g_array_new( FALSE, FALSE, sizeof( GArray* ) );
+}
+
+void
+mempool_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MEMPOOL,
+                                            mempool_init );
 }
 
 int

@@ -1,5 +1,5 @@
 /* mempool.c: pooled system memory
-   Copyright (c) 2008-2015 Philip Kendall
+   Copyright (c) 2008-2016 Philip Kendall
 
    $Id$
 
@@ -28,7 +28,7 @@
 
 extern const int MEMPOOL_UNTRACKED;
 
-void mempool_init( void );
+void mempool_register_startup( void );
 int mempool_register_pool( void );
 void* mempool_malloc( int pool, size_t size );
 void* mempool_malloc_n( int pool, size_t nmemb, size_t size );

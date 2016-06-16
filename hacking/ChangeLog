@@ -5249,3 +5249,5 @@
          peripherals/{disk/{beta.c,didaktik.c,disciple.c,opus.c,plusd.c},
          if1.c,if2.c,speccyboot.c,spectranet.c,usource.c}: add memory subsystem
          into startup manager (Phil).
+20160616 debugger/debugger.c,fuse.c,infrastructure/startup_manager.h,
+         mempool.[ch]: add memory pool subsystem into startup manager (Phil).
