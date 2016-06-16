@@ -5251,3 +5251,5 @@
          into startup manager (Phil).
 20160616 debugger/debugger.c,fuse.c,infrastructure/startup_manager.h,
          mempool.[ch]: add memory pool subsystem into startup manager (Phil).
+20160616 fuse.c,infrastructure/startup_manager.h,z80/{coretest.c,z80.[ch]}:
+         add Z80 subsystem into startup manager (Phil).

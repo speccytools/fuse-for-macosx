@@ -57,6 +57,7 @@ typedef enum startup_manager_module {
   STARTUP_MANAGER_MODULE_SPECTRUM,
   STARTUP_MANAGER_MODULE_ULA,
   STARTUP_MANAGER_MODULE_USOURCE,
+  STARTUP_MANAGER_MODULE_Z80,
  
 } startup_manager_module;
 

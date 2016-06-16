@@ -47,6 +47,7 @@
 #include "tape.h"
 
 #include "event.h"
+#include "infrastructure/startup_manager.h"
 #include "module.h"
 #include "spectrum.h"
 #include "ui/ui.h"
@@ -565,6 +566,12 @@ int
 spectranet_nmi_flipflop( void )
 {
   return 0;
+}
+
+void
+startup_manager_register_no_dependencies( startup_manager_module module,
+                                          startup_manager_fn init_fn )
+{
 }
 
 int svg_capture_active = 0;     /* SVG capture enabled? */

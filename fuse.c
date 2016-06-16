@@ -234,6 +234,7 @@ run_startup_manager()
   spectrum_register_startup();
   ula_register_startup();
   usource_register_startup();
+  z80_register_startup();
 
   return startup_manager_run();
 }
@@ -327,8 +328,6 @@ LIBXML_TEST_VERSION
   if( zxatasp_init() ) return 1;
   if( zxcf_init() ) return 1;
   if( divide_init() ) return 1;
-
-  z80_init();
 
   if( timer_init() ) return 1;
 
