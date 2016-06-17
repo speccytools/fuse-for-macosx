@@ -49,7 +49,7 @@ int debugger_memory_pool;
 /* The event type used for time breakpoints */
 int debugger_breakpoint_event;
 
-static void
+static int
 debugger_init( void )
 {
   debugger_breakpoints = NULL;
@@ -62,6 +62,8 @@ debugger_init( void )
   debugger_event_init();
   debugger_variable_init();
   debugger_reset();
+
+  return 0;
 }
 
 void

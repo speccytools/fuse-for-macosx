@@ -153,7 +153,7 @@ static const periph_t pentagon1024_memory = {
   NULL
 };
 
-static void
+static int
 machines_periph_init( void )
 {
   periph_register( PERIPH_TYPE_128_MEMORY, &spec128_memory );
@@ -164,6 +164,8 @@ machines_periph_init( void )
   periph_register( PERIPH_TYPE_BETA128_PENTAGON, &beta128_pentagon );
   periph_register( PERIPH_TYPE_BETA128_PENTAGON_LATE, &beta128_pentagon_late );
   periph_register( PERIPH_TYPE_PENTAGON1024_MEMORY, &pentagon1024_memory );
+
+  return 0;
 }
 
 void

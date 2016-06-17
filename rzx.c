@@ -120,7 +120,7 @@ static void rzx_sentinel( libspectrum_dword ts, int type,
 
 static int sentinel_event;
 
-static void
+static int
 rzx_init( void )
 {
   rzx_recording = rzx_playback = 0;
@@ -131,6 +131,8 @@ rzx_init( void )
   sentinel_event = event_register( rzx_sentinel, "RZX sentinel" );
 
   end_event = debugger_event_register( event_type_string, end_event_detail_string );
+
+  return 0;
 }
 
 void

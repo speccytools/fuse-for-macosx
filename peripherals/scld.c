@@ -83,11 +83,13 @@ static const periph_t scld_periph = {
   /* .activate = */ NULL,
 };
 
-static void
+static int
 scld_init( void )
 {
   module_register( &scld_module_info );
   periph_register( PERIPH_TYPE_SCLD, &scld_periph );
+
+  return 0;
 }
 
 void

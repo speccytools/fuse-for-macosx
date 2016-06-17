@@ -442,7 +442,7 @@ static const periph_t spectranet_periph = {
   /* .activate = */ spectranet_activate,
 };
 
-static void
+static int
 spectranet_init( void )
 {
   module_register( &spectranet_module_info );
@@ -453,6 +453,8 @@ spectranet_init( void )
 
   w5100 = nic_w5100_alloc();
   flash_rom = flash_am29f010_alloc();
+
+  return 0;
 }
 
 void

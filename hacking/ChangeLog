@@ -5253,3 +5253,9 @@
          mempool.[ch]: add memory pool subsystem into startup manager (Phil).
 20160616 fuse.c,infrastructure/startup_manager.h,z80/{coretest.c,z80.[ch]}:
          add Z80 subsystem into startup manager (Phil).
+20160617 debugger/debugger.c,infrastructure/startup_manager.[ch],
+         machines/machines_periph.c,memory.c,mempool.c,peripherals/{ay.c,
+         disk/{beta.c,didaktik.c,disciple.c,fdd.c,opus.c,plusd.c},fuller.c,
+         if1.c,if2.c,kempmouse.c,melodik.c,printer.c,scld.c,speccyboot.c,
+         spectranet.c,ula.c,usource.c},profile.c,psg.c,rzx.c,slt.c,spectrum.c,
+         z80/z80.[ch]: make all init functions return a value (Phil).

@@ -71,7 +71,7 @@ static const periph_t if2_periph = {
   /* .activate = */ NULL,
 };
 
-static void
+static int
 if2_init( void )
 {
   int i;
@@ -84,6 +84,8 @@ if2_init( void )
     if2_memory_map_romcs[i].source = if2_source;
 
   periph_register( PERIPH_TYPE_INTERFACE2, &if2_periph );
+
+  return 0;
 }
 
 void

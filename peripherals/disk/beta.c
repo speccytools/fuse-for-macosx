@@ -151,7 +151,7 @@ beta_select_drive( int i )
   }
 }
 
-static void
+static int
 beta_init( void )
 {
   int i;
@@ -188,6 +188,8 @@ beta_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
 void

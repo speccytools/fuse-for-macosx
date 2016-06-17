@@ -84,11 +84,13 @@ melodik_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_melodik_active( snap, active );
 }
 
-static void
+static int
 melodik_init( void )
 {
   module_register( &melodik_module_info );
   periph_register( PERIPH_TYPE_MELODIK, &melodik_periph );
+
+  return 0;
 }
 
 void

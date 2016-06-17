@@ -98,7 +98,7 @@ z80_interrupt_event_fn( libspectrum_dword event_tstates, int type,
 }
 
 /* Set up the z80 emulation */
-void
+int
 z80_init( void )
 {
   z80_init_tables();
@@ -109,6 +109,8 @@ z80_init( void )
   z80_nmos_iff2_event = event_register( NULL, "IFF2 update dummy event" );
 
   module_register( &z80_module_info );
+
+  return 0;
 }
 
 void

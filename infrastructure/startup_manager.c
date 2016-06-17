@@ -102,6 +102,7 @@ startup_manager_run( void )
 {
   int progress_made;
   guint i;
+  int error;
 
   /* Loop until we can't make any more progress; this will either be because
      we've called every function (good!) or because there's a logical error
@@ -117,7 +118,8 @@ startup_manager_run( void )
       if( registered_module->dependencies->len == 0 ) {
         printf("Running startup module %d\n", registered_module->module );
 
-        registered_module->init_fn();
+        error = registered_module->init_fn();
+        if( error ) return error;
 
         remove_dependency( registered_module->module );
 

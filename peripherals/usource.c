@@ -84,7 +84,7 @@ static const periph_t usource_periph = {
   /* .activate = */ NULL,
 };
 
-void
+static int
 usource_init( void )
 {
   int i;
@@ -96,6 +96,8 @@ usource_init( void )
     usource_memory_map_romcs[i].source = usource_memory_source;
 
   periph_register( PERIPH_TYPE_USOURCE, &usource_periph );
+
+  return 0;
 }
 
 void

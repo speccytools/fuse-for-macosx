@@ -41,10 +41,12 @@ static GArray *memory_pools;
 
 const int MEMPOOL_UNTRACKED = -1;
 
-static void
+static int
 mempool_init( void )
 {
   memory_pools = g_array_new( FALSE, FALSE, sizeof( GArray* ) );
+
+  return 0;
 }
 
 void

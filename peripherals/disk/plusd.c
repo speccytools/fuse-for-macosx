@@ -160,7 +160,7 @@ static const periph_t plusd_periph = {
   /* .activate = */ plusd_activate,
 };
 
-static void
+static int
 plusd_init( void )
 {
   int i;
@@ -199,6 +199,8 @@ plusd_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
 void

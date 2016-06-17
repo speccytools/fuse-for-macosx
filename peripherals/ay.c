@@ -112,7 +112,7 @@ static periph_t ay_periph_timex = {
   /* .activate = */ NULL,
 };
 
-static void
+static int
 ay_init( void )
 {
   module_register( &ay_module_info );
@@ -120,6 +120,8 @@ ay_init( void )
   periph_register( PERIPH_TYPE_AY_PLUS3, &ay_periph_plus3 );
   periph_register( PERIPH_TYPE_AY_FULL_DECODE, &ay_periph_full_decode );
   periph_register( PERIPH_TYPE_AY_TIMEX, &ay_periph_timex );
+
+  return 0;
 }
 
 void

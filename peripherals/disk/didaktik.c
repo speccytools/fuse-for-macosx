@@ -176,7 +176,7 @@ didaktik_set_intrq( struct wd_fdc *f )
     event_add( 0, z80_nmi_event );
 }
 
-static void
+static int
 didaktik80_init( void )
 {
   int i;
@@ -217,6 +217,8 @@ didaktik80_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
 void

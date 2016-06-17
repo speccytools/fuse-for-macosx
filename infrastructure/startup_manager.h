@@ -62,7 +62,7 @@ typedef enum startup_manager_module {
 } startup_manager_module;
 
 /* Callback for each module's init function */
-typedef void (*startup_manager_fn)( void );
+typedef int (*startup_manager_fn)( void );
 
 /* Initialise the startup manager itself */
 void startup_manager_init( void );

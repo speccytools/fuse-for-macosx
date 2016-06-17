@@ -60,10 +60,12 @@ static module_info_t slt_module_info = {
 
 };
 
-static void
+static int
 slt_init( void )
 {
   module_register( &slt_module_info );
+
+  return 0;
 }
 
 void

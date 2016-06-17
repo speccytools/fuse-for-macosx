@@ -303,7 +303,7 @@ update_menu( enum if1_menu_item what )
   }
 }
 
-static void
+static int
 if1_init( void )
 {
   int m, i;
@@ -352,6 +352,8 @@ if1_init( void )
   periph_register( PERIPH_TYPE_INTERFACE1, &if1_periph );
   periph_register_paging_events( event_type_string, &page_event,
 				 &unpage_event );
+
+  return 0;
 }
 
 void

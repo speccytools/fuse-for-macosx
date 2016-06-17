@@ -219,7 +219,7 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED,
   out_register_state = val;
 }
 
-static void
+static int
 speccyboot_init( void )
 {
   int i;
@@ -236,6 +236,8 @@ speccyboot_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
 void

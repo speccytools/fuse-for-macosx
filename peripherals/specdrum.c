@@ -67,11 +67,13 @@ static const periph_t specdrum_periph = {
   /* .activate = */ NULL,
 };
 
-static void
+static int
 specdrum_init( void )
 {
   module_register( &specdrum_module_info );
   periph_register( PERIPH_TYPE_SPECDRUM, &specdrum_periph );
+
+  return 0;
 }
 
 void

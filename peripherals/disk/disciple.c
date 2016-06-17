@@ -192,7 +192,7 @@ static const periph_t disciple_periph = {
   /* .activate = */ disciple_activate,
 };
 
-static void
+static int
 disciple_init( void )
 {
   int i;
@@ -240,6 +240,8 @@ disciple_init( void )
 
   periph_register_paging_events( event_type_string, &page_event,
                                  &unpage_event );
+
+  return 0;
 }
 
 void

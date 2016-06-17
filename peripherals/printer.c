@@ -709,7 +709,7 @@ if(!settings_current.printer)
 parallel_data=b;
 }
 
-static void
+static int
 printer_init( void )
 {
   printer_graphics_enabled=printer_text_enabled = 1;
@@ -717,6 +717,8 @@ printer_init( void )
 
   printer_zxp_init();
   printer_text_init();
+
+  return 0;
 }
 
 void

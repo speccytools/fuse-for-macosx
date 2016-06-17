@@ -77,7 +77,7 @@ static int index_event;
 
 static int fdd_motor = 0; /* to manage 'disk' icon */
 
-static void
+static int
 fdd_init_events( void )
 {
   motor_event = event_register( fdd_event, "FDD motor on" );
@@ -85,6 +85,8 @@ fdd_init_events( void )
 
   upd_fdc_init_events();
   wd_fdc_init_events();
+
+  return 0;
 }
 
 void

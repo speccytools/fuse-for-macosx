@@ -91,7 +91,7 @@ static const periph_t ula_periph_full_decode = {
   /* .activate = */ NULL,
 };
 
-static void
+static int
 ula_init( void )
 {
   module_register( &ula_module_info );
@@ -100,6 +100,8 @@ ula_init( void )
   periph_register( PERIPH_TYPE_ULA_FULL_DECODE, &ula_periph_full_decode );
 
   ula_default_value = 0xff;
+
+  return 0;
 }
 
 void

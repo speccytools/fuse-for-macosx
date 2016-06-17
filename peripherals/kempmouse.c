@@ -80,11 +80,13 @@ static const periph_t kempmouse_periph = {
   /* .activate = */ NULL,
 };
 
-static void
+static int
 kempmouse_init( void )
 {
   module_register( &kempmouse_module_info );
   periph_register( PERIPH_TYPE_KEMPSTON_MOUSE, &kempmouse_periph );
+
+  return 0;
 }
 
 void
