@@ -92,7 +92,7 @@ extern int machine_count;		/* of which there are this many */
 
 extern fuse_machine_info *machine_current;	/* The currently selected machine */
 
-int machine_init_machines( void );
+void machine_register_startup( void );
 
 int machine_select( libspectrum_machine type );
 int machine_select_id( const char *id );

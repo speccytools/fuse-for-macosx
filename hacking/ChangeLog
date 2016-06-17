@@ -5264,3 +5264,5 @@
          add IDE interfaces into startup manager (Phil).
 20160617 fuse.c,infrastructure/startup_manager.h,timer/timer.[ch]: add timer
          subsystem into startup manager (Phil).
+20160617 fuse.c,infrastructure/startup_manager.h,machine.[ch]: add machine
+         subsystem into startup manager (Phil).

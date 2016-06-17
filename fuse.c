@@ -217,6 +217,7 @@ run_startup_manager()
   if1_register_startup();
   if2_register_startup();
   kempmouse_register_startup();
+  machine_register_startup();
   machines_periph_register_startup();
   melodik_register_startup();
   memory_register_startup();
@@ -328,9 +329,6 @@ LIBXML_TEST_VERSION
 #endif
 
   if( run_startup_manager() ) return 1;
-
-  error = machine_init_machines();
-  if( error ) return error;
 
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
