@@ -5266,3 +5266,5 @@
          subsystem into startup manager (Phil).
 20160617 fuse.c,infrastructure/startup_manager.h,machine.[ch]: add machine
          subsystem into startup manager (Phil).
+20160617 fuse.c,infrastructure/startup_manager.h,tape.[ch]: add tape subsystem
+         into startup manager (Phil).

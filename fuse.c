@@ -235,6 +235,7 @@ run_startup_manager()
   specdrum_register_startup();
   spectranet_register_startup();
   spectrum_register_startup();
+  tape_register_startup();
   timer_register_startup();
   ula_register_startup();
   usource_register_startup();
@@ -332,8 +333,6 @@ LIBXML_TEST_VERSION
 
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
-
-  tape_init();
 
   error = scaler_select_id( start_scaler ); libspectrum_free( start_scaler );
   if( error ) return error;
