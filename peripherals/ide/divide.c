@@ -1,5 +1,5 @@
 /* divide.c: DivIDE interface routines
-   Copyright (c) 2005-2015 Matthew Westcott, Philip Kendall
+   Copyright (c) 2005-2016 Matthew Westcott, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -32,6 +32,7 @@
 
 #include "debugger/debugger.h"
 #include "ide.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "module.h"
 #include "periph.h"
@@ -113,7 +114,7 @@ static int page_event, unpage_event;
 
 /* Housekeeping functions */
 
-int
+static int
 divide_init( void )
 {
   int error, i, j;
@@ -162,6 +163,19 @@ divide_init( void )
                                  &unpage_event );
 
   return 0;
+}
+
+void
+divide_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+  };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_DIVIDE, dependencies,
+                            dependency_count, divide_init );
 }
 
 int

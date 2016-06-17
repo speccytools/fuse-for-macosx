@@ -26,7 +26,7 @@
 
 #include <libspectrum.h>
 
-int simpleide_init( void );
+void simpleide_register_startup( void );
 int simpleide_end( void );
 void simpleide_reset( int hard_reset );
 int simpleide_insert( const char *filename, libspectrum_ide_unit unit );

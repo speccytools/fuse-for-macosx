@@ -29,7 +29,7 @@
 
 #include <libspectrum.h>
 
-int zxcf_init( void );
+void zxcf_register_startup( void );
 int zxcf_end( void );
 int zxcf_insert( const char *filename );
 int zxcf_commit( void );

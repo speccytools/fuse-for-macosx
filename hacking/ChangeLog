@@ -5259,3 +5259,6 @@
          if1.c,if2.c,kempmouse.c,melodik.c,printer.c,scld.c,speccyboot.c,
          spectranet.c,ula.c,usource.c},profile.c,psg.c,rzx.c,slt.c,spectrum.c,
          z80/z80.[ch]: make all init functions return a value (Phil).
+20160617 fuse.c,infrastructure/startup_manager.[ch],
+         peripherals/ide/{divide.[ch],simpleide.[ch],zxatasp.[ch],zxcf.[ch]}:
+         add IDE interfaces into startup manager (Phil).

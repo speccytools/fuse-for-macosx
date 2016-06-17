@@ -1,5 +1,5 @@
 /* zxatasp.c: ZXATASP interface routines
-   Copyright (c) 2003-2015 Garry Lancaster and Philip Kendall
+   Copyright (c) 2003-2016 Garry Lancaster, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 
@@ -33,6 +33,7 @@
 
 #include "debugger/debugger.h"
 #include "ide.h"
+#include "infrastructure/startup_manager.h"
 #include "machine.h"
 #include "memory.h"
 #include "module.h"
@@ -168,7 +169,7 @@ static module_info_t zxatasp_module_info = {
 
 /* Housekeeping functions */
 
-int
+static int
 zxatasp_init( void )
 {
   int error, i;
@@ -204,6 +205,19 @@ zxatasp_init( void )
 				 &unpage_event );
 
   return 0;
+}
+
+void
+zxatasp_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+  };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_ZXATASP, dependencies,
+                            dependency_count, zxatasp_init );
 }
 
 int

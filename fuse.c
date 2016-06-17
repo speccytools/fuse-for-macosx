@@ -211,6 +211,7 @@ run_startup_manager()
   debugger_register_startup();
   didaktik80_register_startup();
   disciple_register_startup();
+  divide_register_startup();
   fdd_register_startup();
   fuller_register_startup();
   if1_register_startup();
@@ -227,6 +228,7 @@ run_startup_manager()
   psg_register_startup();
   rzx_register_startup();
   scld_register_startup();
+  simpleide_register_startup();
   slt_register_startup();
   speccyboot_register_startup();
   specdrum_register_startup();
@@ -235,6 +237,8 @@ run_startup_manager()
   ula_register_startup();
   usource_register_startup();
   z80_register_startup();
+  zxatasp_register_startup();
+  zxcf_register_startup();
 
   return startup_manager_run();
 }
@@ -323,11 +327,6 @@ LIBXML_TEST_VERSION
 #endif
 
   if( run_startup_manager() ) return 1;
-
-  if( simpleide_init() ) return 1;
-  if( zxatasp_init() ) return 1;
-  if( zxcf_init() ) return 1;
-  if( divide_init() ) return 1;
 
   if( timer_init() ) return 1;
 

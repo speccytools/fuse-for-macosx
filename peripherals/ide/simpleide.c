@@ -1,7 +1,5 @@
 /* simpleide.c: Simple 8-bit IDE interface routines
-   Copyright (c) 2003-2004 Garry Lancaster,
-		 2004 Philip Kendall,
-		 2008 Fredrick Meunier
+   Copyright (c) 2003-2016 Garry Lancaster, Philip Kendall, Fredrick Meunier
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 
@@ -32,6 +30,7 @@
 #include <libspectrum.h>
 
 #include "ide.h"
+#include "infrastructure/startup_manager.h"
 #include "module.h"
 #include "periph.h"
 #include "settings.h"
@@ -74,7 +73,7 @@ static module_info_t simpleide_module_info = {
 
 /* Housekeeping functions */
 
-int
+static int
 simpleide_init( void )
 {
   int error;
@@ -102,6 +101,13 @@ simpleide_init( void )
   periph_register( PERIPH_TYPE_SIMPLEIDE, &simpleide_periph );
 
   return 0;
+}
+
+void
+simpleide_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SIMPLEIDE,
+                                            simpleide_init );
 }
 
 int
