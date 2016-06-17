@@ -5262,3 +5262,5 @@
 20160617 fuse.c,infrastructure/startup_manager.[ch],
          peripherals/ide/{divide.[ch],simpleide.[ch],zxatasp.[ch],zxcf.[ch]}:
          add IDE interfaces into startup manager (Phil).
+20160617 fuse.c,infrastructure/startup_manager.h,timer/timer.[ch]: add timer
+         subsystem into startup manager (Phil).

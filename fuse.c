@@ -234,6 +234,7 @@ run_startup_manager()
   specdrum_register_startup();
   spectranet_register_startup();
   spectrum_register_startup();
+  timer_register_startup();
   ula_register_startup();
   usource_register_startup();
   z80_register_startup();
@@ -327,10 +328,6 @@ LIBXML_TEST_VERSION
 #endif
 
   if( run_startup_manager() ) return 1;
-
-  if( timer_init() ) return 1;
-
-  error = timer_estimate_reset(); if( error ) return error;
 
   error = machine_init_machines();
   if( error ) return error;
