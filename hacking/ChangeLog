@@ -5268,3 +5268,5 @@
          subsystem into startup manager (Phil).
 20160617 fuse.c,infrastructure/startup_manager.h,tape.[ch]: add tape subsystem
          into startup manager (Phil).
+20160618 fuse.c,infrastructure/startup_manager.h: add creator block
+         initialisation into startup manager (Phil).

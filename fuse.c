@@ -148,7 +148,8 @@ typedef struct start_files_t {
 
 static int fuse_init(int argc, char **argv);
 
-static int creator_init( void );
+static void creator_register_startup( void );
+
 static void fuse_show_copyright(void);
 static void fuse_show_version( void );
 static void fuse_show_help( void );
@@ -208,6 +209,7 @@ run_startup_manager()
   /* Get every module to register its init function */
   ay_register_startup();
   beta_register_startup();
+  creator_register_startup();
   debugger_register_startup();
   didaktik80_register_startup();
   disciple_register_startup();
@@ -310,10 +312,6 @@ static int fuse_init(int argc, char **argv)
     return 1;
   }
 
-  /* Must be called after libspectrum_init() so we can get the gcrypt
-     version */
-  if( creator_init() ) return 1;
-
 #ifdef HAVE_GETEUID
   /* Drop root privs if we have them */
   if( !geteuid() ) {
@@ -403,6 +401,13 @@ int creator_init( void )
   }
 
   return 0;
+}
+
+static void
+creator_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_CREATOR,
+                                            creator_init );
 }
 
 static void fuse_show_copyright(void)
