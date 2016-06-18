@@ -44,7 +44,6 @@ extern int disciple_available;  /* Is the DISCiPLE available for use? */
 extern int disciple_active;     /* DISCiPLE enabled? */
 
 void disciple_register_startup( void );
-void disciple_end( void );
 
 void disciple_page( void );
 void disciple_unpage( void );

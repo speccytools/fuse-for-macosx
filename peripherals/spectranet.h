@@ -27,7 +27,6 @@
 #define FUSE_SPECTRANET_H
 
 void spectranet_register_startup( void );
-void spectranet_end( void );
 void spectranet_page( int via_io );
 void spectranet_nmi( void );
 void spectranet_unpage( void );

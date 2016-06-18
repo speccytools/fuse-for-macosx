@@ -103,17 +103,17 @@ simpleide_init( void )
   return 0;
 }
 
+static void
+simpleide_end( void )
+{
+  libspectrum_ide_free( simpleide_idechn );
+}
+
 void
 simpleide_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SIMPLEIDE,
-                                            simpleide_init );
-}
-
-int
-simpleide_end( void )
-{
-  return libspectrum_ide_free( simpleide_idechn );
+                                            simpleide_init, simpleide_end );
 }
 
 void

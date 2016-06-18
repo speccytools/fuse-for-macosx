@@ -176,6 +176,13 @@ opus_init( void )
   return 0;
 }
 
+static void
+opus_end( void )
+{
+  opus_available = 0;
+  libspectrum_free( opus_fdc );
+}
+
 void
 opus_register_startup( void )
 {
@@ -186,7 +193,7 @@ opus_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_OPUS, dependencies,
-                            dependency_count, opus_init );
+                            dependency_count, opus_init, opus_end );
 }
 
 static void
@@ -243,13 +250,6 @@ opus_reset( int hard_reset )
   opus_fdc->current_drive = &opus_drives[ 0 ];
   fdd_select( &opus_drives[ 0 ], 1 );
   machine_current->memory_map();
-}
-
-void
-opus_end( void )
-{
-  opus_available = 0;
-  libspectrum_free( opus_fdc );
 }
 
 /*

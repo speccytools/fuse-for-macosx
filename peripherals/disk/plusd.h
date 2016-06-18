@@ -44,7 +44,6 @@ extern int plusd_available;  /* Is the +D available for use? */
 extern int plusd_active;     /* +D enabled? */
 
 void plusd_register_startup( void );
-void plusd_end( void );
 
 void plusd_page( void );
 void plusd_unpage( void );

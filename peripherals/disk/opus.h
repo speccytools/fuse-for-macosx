@@ -44,7 +44,6 @@ extern int opus_available;  /* Is the Opus available for use? */
 extern int opus_active;     /* Opus enabled? */
 
 void opus_register_startup( void );
-void opus_end( void );
 
 void opus_page( void );
 void opus_unpage( void );

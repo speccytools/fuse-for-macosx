@@ -139,13 +139,6 @@ memory_init( void )
   return 0;
 }
 
-void
-memory_register_startup( void )
-{
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MEMORY,
-                                            memory_init );
-}
-
 static void
 memory_pool_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
 {
@@ -155,7 +148,7 @@ memory_pool_free_entry( gpointer data, gpointer user_data GCC_UNUSED )
 }
 
 /* Tidy-up function called at end of emulation */
-void
+static void
 memory_end( void )
 {
   int i;
@@ -178,6 +171,13 @@ memory_end( void )
     g_array_free( memory_sources, TRUE );
     memory_sources = NULL;
   }
+}
+
+void
+memory_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MEMORY,
+                                            memory_init, memory_end );
 }
 
 int

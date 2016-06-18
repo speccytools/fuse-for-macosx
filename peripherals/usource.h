@@ -32,7 +32,6 @@ extern int usource_active;
 extern int usource_available;
 
 void usource_register_startup( void );
-void usource_end( void );
 
 void usource_toggle( void );
 

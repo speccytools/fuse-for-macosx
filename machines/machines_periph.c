@@ -172,7 +172,7 @@ void
 machines_periph_register_startup( void )
 {
   startup_manager_register_no_dependencies(
-    STARTUP_MANAGER_MODULE_MACHINES_PERIPH, machines_periph_init
+    STARTUP_MANAGER_MODULE_MACHINES_PERIPH, machines_periph_init, NULL
   );
 }
 

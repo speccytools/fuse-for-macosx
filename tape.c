@@ -119,6 +119,13 @@ tape_init( void )
   return 0;
 }
 
+static void
+tape_end( void )
+{
+  libspectrum_tape_free( tape );
+  tape = NULL;
+}
+
 void
 tape_register_startup( void )
 {
@@ -126,14 +133,7 @@ tape_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_TAPE, dependencies,
-                            dependency_count, tape_init );
-}
-
-void
-tape_end( void )
-{
-  libspectrum_tape_free( tape );
-  tape = NULL;
+                            dependency_count, tape_init, tape_end );
 }
 
 int tape_open( const char *filename, int autoload )

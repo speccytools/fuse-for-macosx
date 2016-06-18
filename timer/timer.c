@@ -121,17 +121,17 @@ timer_init( void )
   return timer_estimate_reset();
 }
 
+static void
+timer_end( void )
+{
+  event_remove_type( timer_event );
+}
+
 void
 timer_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_TIMER,
-                                            timer_init );
-}
-
-void
-timer_end( void )
-{
-  event_remove_type( timer_event );
+                                            timer_init, timer_end );
 }
 
 #ifdef SOUND_FIFO

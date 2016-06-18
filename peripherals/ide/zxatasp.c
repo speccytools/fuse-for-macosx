@@ -207,6 +207,13 @@ zxatasp_init( void )
   return 0;
 }
 
+static void
+zxatasp_end( void )
+{
+  libspectrum_ide_free( zxatasp_idechn0 );
+  libspectrum_ide_free( zxatasp_idechn1 );
+}
+
 void
 zxatasp_register_startup( void )
 {
@@ -217,18 +224,7 @@ zxatasp_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_ZXATASP, dependencies,
-                            dependency_count, zxatasp_init );
-}
-
-int
-zxatasp_end( void )
-{
-  int error;
-  
-  error = libspectrum_ide_free( zxatasp_idechn0 );
-  error = libspectrum_ide_free( zxatasp_idechn1 ) || error;
-
-  return error;
+                            dependency_count, zxatasp_init, zxatasp_end );
 }
 
 static void

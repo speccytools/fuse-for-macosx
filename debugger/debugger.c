@@ -67,30 +67,28 @@ debugger_init( void )
 }
 
 void
-debugger_register_startup( void )
-{
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMPOOL };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
-  startup_manager_register( STARTUP_MANAGER_MODULE_DEBUGGER, dependencies,
-                            dependency_count, debugger_init );
-}
-
-void
 debugger_reset( void )
 {
   debugger_breakpoint_remove_all();
   debugger_mode = DEBUGGER_MODE_INACTIVE;
 }
 
-int
+static void
 debugger_end( void )
 {
   debugger_breakpoint_remove_all();
   debugger_variable_end();
   debugger_event_end();
+}
 
-  return 0;
+void
+debugger_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMPOOL };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_DEBUGGER, dependencies,
+                            dependency_count, debugger_init, debugger_end );
 }
 
 /* Activate the debugger */

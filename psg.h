@@ -40,6 +40,4 @@ int psg_frame( void );
 
 int psg_write_register( libspectrum_byte reg, libspectrum_byte value );
 
-int psg_end( void );
-
 #endif			/* #ifndef FUSE_PSG_H */

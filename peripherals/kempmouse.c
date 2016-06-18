@@ -93,7 +93,7 @@ void
 kempmouse_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_KEMPMOUSE,
-                                            kempmouse_init );
+                                            kempmouse_init, NULL );
 }
 
 void

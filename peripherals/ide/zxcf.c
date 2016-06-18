@@ -142,6 +142,12 @@ zxcf_init( void )
   return 0;
 }
 
+static void
+zxcf_end( void )
+{
+  libspectrum_ide_free( zxcf_idechn );
+}
+
 void
 zxcf_register_startup( void )
 {
@@ -152,13 +158,7 @@ zxcf_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_ZXCF, dependencies,
-                            dependency_count, zxcf_init );
-}
-
-int
-zxcf_end( void )
-{
-  return libspectrum_ide_free( zxcf_idechn );
+                            dependency_count, zxcf_init, zxcf_end );
 }
 
 static void

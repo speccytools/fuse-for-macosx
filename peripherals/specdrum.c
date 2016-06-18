@@ -80,7 +80,7 @@ void
 specdrum_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SPECDRUM,
-                                            specdrum_init );
+                                            specdrum_init, NULL );
 }
 
 static void

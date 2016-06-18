@@ -49,13 +49,6 @@ mempool_init( void )
   return 0;
 }
 
-void
-mempool_register_startup( void )
-{
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MEMPOOL,
-                                            mempool_init );
-}
-
 int
 mempool_register_pool( void )
 {
@@ -127,7 +120,7 @@ mempool_free( int pool )
 }
 
 /* Tidy-up function called at end of emulation */
-void
+static void
 mempool_end( void )
 {
   int i;
@@ -143,6 +136,13 @@ mempool_end( void )
 
   g_array_free( memory_pools, TRUE );
   memory_pools = NULL;
+}
+
+void
+mempool_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MEMPOOL,
+                                            mempool_init, mempool_end );
 }
 
 /* Unit test helper routines */

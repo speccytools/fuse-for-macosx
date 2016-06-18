@@ -5270,3 +5270,12 @@
          into startup manager (Phil).
 20160618 fuse.c,infrastructure/startup_manager.h: add creator block
          initialisation into startup manager (Phil).
+20160618 debugger/debugger.[ch],fuse.c,infrastructure/startup_manager.[ch],
+         machine.[ch],machines/machines_periph.c,memory.[ch],mempool.[ch],
+         peripherals/{ay.c,disk/{beta.[ch],didaktik.[ch],disciple.[ch],fdd.c,
+         opus.[ch],plusd.[ch]},fuller.c,ide/{divide.[ch],simpleide.[ch],
+         zxatasp.[ch],zxcf.[ch]},if1.[ch],if2.c,kempmouse.c,melodik.c,
+         printer.[ch],scld.c,speccyboot.[ch],spectranet.[ch],ula.c,
+         usource.[ch]},profile.c,psg.[ch],rzx.[ch],slt.c,spectrum.c,tape.[ch],
+         timer/timer.[ch],z80/{coretest.c,z80.c}: use startup manager for end
+         functions as well (Phil).

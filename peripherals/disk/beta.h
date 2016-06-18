@@ -46,8 +46,6 @@ extern libspectrum_word beta_pc_value; /* Value to compare masked PC against */
 
 void beta_register_startup( void );
 
-void beta_end( void );
-
 void beta_page( void );
 void beta_unpage( void );
 

@@ -203,6 +203,13 @@ plusd_init( void )
   return 0;
 }
 
+static void
+plusd_end( void )
+{
+  plusd_available = 0;
+  libspectrum_free( plusd_fdc );
+}
+
 void
 plusd_register_startup( void )
 {
@@ -213,7 +220,7 @@ plusd_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_PLUSD, dependencies,
-                            dependency_count, plusd_init );
+                            dependency_count, plusd_init, plusd_end );
 }
 
 static void
@@ -260,13 +267,6 @@ plusd_reset( int hard_reset )
   fdd_select( &plusd_drives[ 0 ], 1 );
   machine_current->memory_map();
 
-}
-
-void
-plusd_end( void )
-{
-  plusd_available = 0;
-  libspectrum_free( plusd_fdc );
 }
 
 static libspectrum_byte

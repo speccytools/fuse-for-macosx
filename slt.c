@@ -72,7 +72,7 @@ void
 slt_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SLT,
-                                            slt_init );
+                                            slt_init, NULL );
 }
 
 int

@@ -165,6 +165,13 @@ divide_init( void )
   return 0;
 }
 
+static void
+divide_end( void )
+{
+  libspectrum_ide_free( divide_idechn0 );
+  libspectrum_ide_free( divide_idechn1 );
+}
+
 void
 divide_register_startup( void )
 {
@@ -175,18 +182,7 @@ divide_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_DIVIDE, dependencies,
-                            dependency_count, divide_init );
-}
-
-int
-divide_end( void )
-{
-  int error;
-  
-  error = libspectrum_ide_free( divide_idechn0 );
-  error = libspectrum_ide_free( divide_idechn1 ) || error;
-
-  return error;
+                            dependency_count, divide_init, divide_end );
 }
 
 /* DivIDE does not page in immediately on a reset condition (we do that by

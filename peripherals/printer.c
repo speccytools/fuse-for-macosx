@@ -721,17 +721,18 @@ printer_init( void )
   return 0;
 }
 
+static void
+printer_end( void )
+{
+  printer_text_end();
+  printer_zxp_end();
+}
+
 void
 printer_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_PRINTER,
-                                            printer_init );
-}
-
-void printer_end(void)
-{
-printer_text_end();
-printer_zxp_end();
+                                            printer_init, printer_end );
 }
 
 static void zx_printer_snapshot_enabled( libspectrum_snap *snap )

@@ -76,8 +76,6 @@ int rzx_frame( void );
 
 int rzx_store_byte( libspectrum_byte value );
 
-int rzx_end( void );
-
 int rzx_rollback( void );
 
 int rzx_rollback_to( void );

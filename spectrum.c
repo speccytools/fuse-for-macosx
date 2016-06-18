@@ -95,7 +95,7 @@ void
 spectrum_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SPECTRUM,
-                                            spectrum_init );
+                                            spectrum_init, NULL );
 }
 
 int

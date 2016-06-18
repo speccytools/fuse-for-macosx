@@ -457,6 +457,13 @@ spectranet_init( void )
   return 0;
 }
 
+static void
+spectranet_end( void )
+{
+  nic_w5100_free( w5100 );
+  flash_am29f010_free( flash_rom );
+}
+
 void
 spectranet_register_startup( void )
 {
@@ -467,14 +474,7 @@ spectranet_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECTRANET, dependencies,
-                            dependency_count, spectranet_init );
-}
-
-void
-spectranet_end( void )
-{
-  nic_w5100_free( w5100 );
-  flash_am29f010_free( flash_rom );
+                            dependency_count, spectranet_init, spectranet_end );
 }
 
 static libspectrum_word
@@ -519,11 +519,6 @@ spectranet_flash_rom_write( libspectrum_word address, libspectrum_byte b )
 
 void
 spectranet_register_startup( void )
-{
-}
-
-void
-spectranet_end( void )
 {
 }
 

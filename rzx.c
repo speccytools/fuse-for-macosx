@@ -135,16 +135,6 @@ rzx_init( void )
   return 0;
 }
 
-void
-rzx_register_startup( void )
-{
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
-  startup_manager_register( STARTUP_MANAGER_MODULE_RZX, dependencies,
-                            dependency_count, rzx_init );
-}
-
 static int
 rzx_add_snap( libspectrum_rzx *to_rzx, int automatic )
 {
@@ -754,12 +744,21 @@ int rzx_store_byte( libspectrum_byte value )
   return 0;
 }
 
-int rzx_end( void )
+static void
+rzx_end( void )
 {
-  if( rzx_recording ) return rzx_stop_recording();
-  if( rzx_playback  ) return rzx_stop_playback( 0 );
+  if( rzx_recording ) rzx_stop_recording();
+  if( rzx_playback  ) rzx_stop_playback( 0 );
+}
 
-  return 0;
+void
+rzx_register_startup( void )
+{
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_RZX, dependencies,
+                            dependency_count, rzx_init, rzx_end );
 }
 
 static GSList*

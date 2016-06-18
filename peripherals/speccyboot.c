@@ -240,6 +240,12 @@ speccyboot_init( void )
   return 0;
 }
 
+static void
+speccyboot_end( void )
+{
+  nic_enc28j60_free( nic );
+}
+
 void
 speccyboot_register_startup( void )
 {
@@ -250,13 +256,7 @@ speccyboot_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECCYBOOT, dependencies,
-                            dependency_count, speccyboot_init );
-}
-
-void
-speccyboot_end( void )
-{
-  nic_enc28j60_free( nic );
+                            dependency_count, speccyboot_init, speccyboot_end );
 }
 
 int

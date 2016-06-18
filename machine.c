@@ -130,13 +130,6 @@ static int machine_add_machine( int (*init_function)( fuse_machine_info *machine
   return 0;
 }
 
-void
-machine_register_startup( void )
-{
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MACHINE,
-                                            machine_init_machines );
-}
-
 int
 machine_select( libspectrum_machine type )
 {
@@ -428,7 +421,8 @@ machine_set_variable_timings( fuse_machine_info *machine )
   }
 }
 
-int machine_end( void )
+static void
+machine_end( void )
 {
   int i;
 
@@ -438,6 +432,11 @@ int machine_end( void )
   }
 
   libspectrum_free( machine_types );
+}
 
-  return 0;
+void
+machine_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MACHINE,
+                                            machine_init_machines, machine_end );
 }

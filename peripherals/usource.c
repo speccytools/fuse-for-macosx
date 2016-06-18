@@ -100,6 +100,12 @@ usource_init( void )
   return 0;
 }
 
+static void
+usource_end( void )
+{
+  usource_available = 0;
+}
+
 void
 usource_register_startup( void )
 {
@@ -107,13 +113,7 @@ usource_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_USOURCE, dependencies,
-                            dependency_count, usource_init );
-}
-
-void
-usource_end( void )
-{
-  usource_available = 0;
+                            dependency_count, usource_init, usource_end );
 }
 
 static void

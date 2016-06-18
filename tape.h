@@ -30,7 +30,6 @@
 #include <libspectrum.h>
 
 void tape_register_startup( void );
-void tape_end( void );
 
 int tape_open( const char *filename, int autoload );
 

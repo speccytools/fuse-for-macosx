@@ -37,22 +37,28 @@
 typedef struct registered_module_t {
   startup_manager_module module;
   GArray *dependencies;
-  startup_manager_fn init_fn;
+  startup_manager_init_fn init_fn;
+  startup_manager_end_fn end_fn;
 } registered_module_t;
 
 static GArray *registered_modules;
+
+static GArray *end_functions;
 
 void
 startup_manager_init( void )
 {
   registered_modules =
     g_array_new( FALSE, FALSE, sizeof( registered_module_t ) );
+  end_functions =
+    g_array_new( FALSE, FALSE, sizeof( startup_manager_end_fn ) );
 }
 
 void
 startup_manager_register(
   startup_manager_module module, startup_manager_module *dependencies,
-  size_t dependency_count, startup_manager_fn init_fn )
+  size_t dependency_count, startup_manager_init_fn init_fn,
+  startup_manager_end_fn end_fn )
 {
   registered_module_t registered_module;
 
@@ -63,15 +69,17 @@ startup_manager_register(
   g_array_append_vals( registered_module.dependencies, dependencies,
                        dependency_count );
   registered_module.init_fn = init_fn;
+  registered_module.end_fn = end_fn;
 
   g_array_append_val( registered_modules, registered_module );
 }
 
 void
 startup_manager_register_no_dependencies( startup_manager_module module,
-                                          startup_manager_fn init_fn )
+                                          startup_manager_init_fn init_fn,
+                                          startup_manager_end_fn end_fn )
 {
-  startup_manager_register( module, NULL, 0, init_fn );
+  startup_manager_register( module, NULL, 0, init_fn, end_fn );
 }
 
 static void
@@ -121,6 +129,9 @@ startup_manager_run( void )
         error = registered_module->init_fn();
         if( error ) return error;
 
+        if( registered_module->end_fn != NULL )
+          g_array_append_val( end_functions, registered_module->end_fn );
+
         remove_dependency( registered_module->module );
 
         g_array_free( registered_module->dependencies, TRUE );
@@ -145,4 +156,18 @@ startup_manager_run( void )
   }
 
   return 0;
+}
+
+void
+startup_manager_run_end( void )
+{
+  guint i;
+
+  for( i = end_functions->len; i-- != 0; )
+  {
+    startup_manager_end_fn end_fn = 
+      g_array_index( end_functions, startup_manager_end_fn, i );
+
+    end_fn();
+  }
 }

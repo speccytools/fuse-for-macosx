@@ -106,6 +106,5 @@ int machine_load_rom( int page_num, const char *filename, const char *fallback,
   size_t expected_length );
 
 int machine_reset( int hard_reset );
-int machine_end( void );
 
 #endif			/* #ifndef FUSE_MACHINE_H */

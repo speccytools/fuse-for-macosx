@@ -96,7 +96,7 @@ void
 scld_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SCLD,
-                                            scld_init );
+                                            scld_init, NULL );
 }
 
 static libspectrum_byte

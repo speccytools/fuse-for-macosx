@@ -404,10 +404,16 @@ int creator_init( void )
 }
 
 static void
+creator_end( void )
+{
+  libspectrum_creator_free( fuse_creator );
+}
+
+static void
 creator_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_CREATOR,
-                                            creator_init );
+                                            creator_init, creator_end );
 }
 
 static void fuse_show_copyright(void)
@@ -863,35 +869,12 @@ do_start_files( start_files_t *start_files )
 static int fuse_end(void)
 {
   movie_stop();		/* stop movie recording */
-  /* Must happen before memory is deallocated as we read the character
-     set from memory for the text output */
-  printer_end();
 
   /* also required before memory is deallocated on Fuse for OS X where
      settings need to look up machine names etc. */
   settings_end();
 
-  psg_end();
-  rzx_end();
-  tape_end();
-  debugger_end();
-  simpleide_end();
-  zxatasp_end();
-  zxcf_end();
-  if1_end();
-  divide_end();
-  beta_end();
-  opus_end();
-  plusd_end();
-  didaktik80_end();
-  disciple_end();
-  spectranet_end();
-  speccyboot_end();
-  usource_end();
-
-  machine_end();
-
-  timer_end();
+  startup_manager_run_end();
 
   sound_end();
   event_end();
@@ -900,14 +883,11 @@ static int fuse_end(void)
   fuse_joystick_end();
   ui_end();
   ui_media_drive_end();
-  memory_end();
-  mempool_end();
   module_end();
   pokemem_end();
 
   svg_capture_end();
 
-  libspectrum_creator_free( fuse_creator );
   libspectrum_end();
 
   return 0;

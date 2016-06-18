@@ -54,13 +54,6 @@ psg_init( void )
   return 0;
 }
 
-void
-psg_register_startup( void )
-{
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_PSG,
-                                            psg_init );
-}
-
 int
 psg_start_recording( const char *filename )
 {
@@ -173,9 +166,15 @@ psg_write_register( libspectrum_byte reg, libspectrum_byte value )
   return 0;
 }
 
-int
+static void
 psg_end( void )
 {
-  if( psg_recording ) return psg_stop_recording();
-  return 0;
+  if( psg_recording ) psg_stop_recording();
+}
+
+void
+psg_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_PSG,
+                                            psg_init, psg_end );
 }

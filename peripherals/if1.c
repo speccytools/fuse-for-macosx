@@ -356,6 +356,18 @@ if1_init( void )
   return 0;
 }
 
+static void
+if1_end( void )
+{
+  int m;
+
+  for( m = 0; m < 8; m++ ) {
+    libspectrum_error error =
+      libspectrum_microdrive_free( microdrive[m].cartridge );
+    if( error ) return;
+  }
+}
+
 void
 if1_register_startup( void )
 {
@@ -366,21 +378,7 @@ if1_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_IF1, dependencies,
-                            dependency_count, if1_init );
-}
-
-libspectrum_error
-if1_end( void )
-{
-  int m;
-
-  for( m = 0; m < 8; m++ ) {
-    libspectrum_error error =
-      libspectrum_microdrive_free( microdrive[m].cartridge );
-    if( error ) return error;
-  }
-
-  return LIBSPECTRUM_ERROR_NONE;
+                            dependency_count, if1_init, if1_end );
 }
 
 void

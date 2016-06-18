@@ -97,5 +97,5 @@ void
 melodik_register_startup( void )
 {
   startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MELODIK,
-                                            melodik_init );
+                                            melodik_init, NULL );
 }

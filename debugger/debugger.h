@@ -53,8 +53,6 @@ void debugger_register_startup( void );
 
 void debugger_reset( void );
 
-int debugger_end( void );
-
 int debugger_trap( void );	/* Activate the debugger */
 
 int debugger_step( void );	/* Single step */

@@ -221,19 +221,6 @@ didaktik80_init( void )
   return 0;
 }
 
-void
-didaktik80_register_startup( void )
-{
-  startup_manager_module dependencies[] = {
-    STARTUP_MANAGER_MODULE_DEBUGGER,
-    STARTUP_MANAGER_MODULE_MEMORY,
-  };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
-  startup_manager_register( STARTUP_MANAGER_MODULE_DIDAKTIK, dependencies,
-                            dependency_count, didaktik80_init );
-}
-
 static void
 didaktik_reset( int hard_reset )
 {
@@ -288,11 +275,24 @@ didaktik_reset( int hard_reset )
 
 }
 
-void
+static void
 didaktik80_end( void )
 {
   didaktik80_available = 0;
   libspectrum_free( didaktik_fdc );
+}
+
+void
+didaktik80_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+  };
+  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
+
+  startup_manager_register( STARTUP_MANAGER_MODULE_DIDAKTIK, dependencies,
+                            dependency_count, didaktik80_init, didaktik80_end );
 }
 
 static libspectrum_byte

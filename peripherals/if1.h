@@ -34,7 +34,6 @@ extern int if1_active;
 extern int if1_available;
 
 void if1_register_startup( void );
-libspectrum_error if1_end( void );
 
 void if1_page( void );
 void if1_unpage( void );

@@ -244,6 +244,13 @@ disciple_init( void )
   return 0;
 }
 
+static void
+disciple_end( void )
+{
+  disciple_available = 0;
+  libspectrum_free( disciple_fdc );
+}
+
 void
 disciple_register_startup( void )
 {
@@ -254,7 +261,7 @@ disciple_register_startup( void )
   size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
 
   startup_manager_register( STARTUP_MANAGER_MODULE_DISCIPLE, dependencies,
-                            dependency_count, disciple_init );
+                            dependency_count, disciple_init, disciple_end );
 }
 
 static void
@@ -314,13 +321,6 @@ disciple_inhibit( void )
 {
   /* TODO: check how this affects the hardware */
   disciple_inhibited = 1;
-}
-
-void
-disciple_end( void )
-{
-  disciple_available = 0;
-  libspectrum_free( disciple_fdc );
 }
 
 static libspectrum_byte
