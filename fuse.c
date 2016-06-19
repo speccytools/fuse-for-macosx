@@ -233,6 +233,7 @@ run_startup_manager()
   scld_register_startup();
   simpleide_register_startup();
   slt_register_startup();
+  sound_register_startup();
   speccyboot_register_startup();
   specdrum_register_startup();
   spectranet_register_startup();
@@ -876,7 +877,6 @@ static int fuse_end(void)
 
   startup_manager_run_end();
 
-  sound_end();
   event_end();
   periph_end();
   fuse_keyboard_end();

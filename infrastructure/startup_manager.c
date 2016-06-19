@@ -126,10 +126,12 @@ startup_manager_run( void )
       if( registered_module->dependencies->len == 0 ) {
         printf("Running startup module %d\n", registered_module->module );
 
-        error = registered_module->init_fn();
-        if( error ) return error;
+        if( registered_module->init_fn ) {
+          error = registered_module->init_fn();
+          if( error ) return error;
+        }
 
-        if( registered_module->end_fn != NULL )
+        if( registered_module->end_fn )
           g_array_append_val( end_functions, registered_module->end_fn );
 
         remove_dependency( registered_module->module );

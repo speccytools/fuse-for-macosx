@@ -5285,3 +5285,6 @@
          opus.c,plusd.c},ide/{divide.c,zxatasp.c,zxcf.c},if1.c,if2.c,printer.c,
          speccyboot.c,spectranet.c,usource.c},rzx.c,tape.c: use ARRAY_SIZE
          macro (thanks, Sergio) (Phil).
+20160619 fuse.c,infrastructure/startup_manager.[ch],sound.[ch]: add sound
+         module to startup manager; modules with no init function are now
+         supported (Phil).
