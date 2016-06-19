@@ -375,10 +375,8 @@ if1_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_IF1, dependencies,
-                            dependency_count, if1_init, if1_end );
+                            ARRAY_SIZE( dependencies ), if1_init, if1_end );
 }
 
 void

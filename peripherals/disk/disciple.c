@@ -258,10 +258,9 @@ disciple_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_DISCIPLE, dependencies,
-                            dependency_count, disciple_init, disciple_end );
+                            ARRAY_SIZE( dependencies ), disciple_init,
+                            disciple_end );
 }
 
 static void

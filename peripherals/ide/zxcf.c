@@ -155,10 +155,8 @@ zxcf_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_ZXCF, dependencies,
-                            dependency_count, zxcf_init, zxcf_end );
+                            ARRAY_SIZE( dependencies ), zxcf_init, zxcf_end );
 }
 
 static void

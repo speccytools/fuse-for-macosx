@@ -190,10 +190,8 @@ opus_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_OPUS, dependencies,
-                            dependency_count, opus_init, opus_end );
+                            ARRAY_SIZE( dependencies ), opus_init, opus_end );
 }
 
 static void

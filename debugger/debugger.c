@@ -85,10 +85,9 @@ void
 debugger_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMPOOL };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_DEBUGGER, dependencies,
-                            dependency_count, debugger_init, debugger_end );
+                            ARRAY_SIZE( dependencies ), debugger_init,
+                            debugger_end );
 }
 
 /* Activate the debugger */

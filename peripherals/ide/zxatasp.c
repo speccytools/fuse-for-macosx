@@ -221,10 +221,9 @@ zxatasp_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_ZXATASP, dependencies,
-                            dependency_count, zxatasp_init, zxatasp_end );
+                            ARRAY_SIZE( dependencies ), zxatasp_init,
+                            zxatasp_end );
 }
 
 static void

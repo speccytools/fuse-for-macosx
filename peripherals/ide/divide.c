@@ -179,10 +179,9 @@ divide_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_DIVIDE, dependencies,
-                            dependency_count, divide_init, divide_end );
+                            ARRAY_SIZE( dependencies ), divide_init,
+                            divide_end );
 }
 
 /* DivIDE does not page in immediately on a reset condition (we do that by

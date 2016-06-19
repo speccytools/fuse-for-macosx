@@ -732,10 +732,9 @@ void
 printer_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MACHINE };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_PRINTER, dependencies,
-                            dependency_count, printer_init, printer_end );
+                            ARRAY_SIZE( dependencies ), printer_init,
+                            printer_end );
 }
 
 static void zx_printer_snapshot_enabled( libspectrum_snap *snap )

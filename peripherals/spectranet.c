@@ -471,10 +471,9 @@ spectranet_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECTRANET, dependencies,
-                            dependency_count, spectranet_init, spectranet_end );
+                            ARRAY_SIZE( dependencies ), spectranet_init,
+                            spectranet_end );
 }
 
 static libspectrum_word

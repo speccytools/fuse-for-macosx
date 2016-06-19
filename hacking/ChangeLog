@@ -5281,3 +5281,7 @@
          functions as well (Phil).
 20160619 peripherals/printer.c,rzx.c: {printer,rzx}_end end the machine
          subsystem still running, so add a dependency (thanks, Sergio) (Phil).
+20160619 debugger/debugger.c,peripherals/{disk/{beta.c,didaktik.c,disciple.c,
+         opus.c,plusd.c},ide/{divide.c,zxatasp.c,zxcf.c},if1.c,if2.c,printer.c,
+         speccyboot.c,spectranet.c,usource.c},rzx.c,tape.c: use ARRAY_SIZE
+         macro (thanks, Sergio) (Phil).

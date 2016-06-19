@@ -289,10 +289,9 @@ didaktik80_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_DIDAKTIK, dependencies,
-                            dependency_count, didaktik80_init, didaktik80_end );
+                            ARRAY_SIZE( dependencies ), didaktik80_init,
+                            didaktik80_end );
 }
 
 static libspectrum_byte

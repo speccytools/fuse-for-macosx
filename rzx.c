@@ -758,10 +758,8 @@ rzx_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MACHINE,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_RZX, dependencies,
-                            dependency_count, rzx_init, rzx_end );
+                            ARRAY_SIZE( dependencies ), rzx_init, rzx_end );
 }
 
 static GSList*

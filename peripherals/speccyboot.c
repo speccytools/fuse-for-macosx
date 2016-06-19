@@ -253,10 +253,9 @@ speccyboot_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECCYBOOT, dependencies,
-                            dependency_count, speccyboot_init, speccyboot_end );
+                            ARRAY_SIZE( dependencies ), speccyboot_init,
+                            speccyboot_end );
 }
 
 int

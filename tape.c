@@ -130,10 +130,8 @@ void
 tape_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_TAPE, dependencies,
-                            dependency_count, tape_init, tape_end );
+                            ARRAY_SIZE( dependencies ), tape_init, tape_end );
 }
 
 int tape_open( const char *filename, int autoload )

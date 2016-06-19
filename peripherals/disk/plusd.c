@@ -217,10 +217,8 @@ plusd_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
   };
-  size_t dependency_count = sizeof( dependencies ) / sizeof( dependencies[0] );
-
   startup_manager_register( STARTUP_MANAGER_MODULE_PLUSD, dependencies,
-                            dependency_count, plusd_init, plusd_end );
+                            ARRAY_SIZE( dependencies ), plusd_init, plusd_end );
 }
 
 static void
