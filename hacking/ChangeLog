@@ -5279,3 +5279,5 @@
          usource.[ch]},profile.c,psg.[ch],rzx.[ch],slt.c,spectrum.c,tape.[ch],
          timer/timer.[ch],z80/{coretest.c,z80.c}: use startup manager for end
          functions as well (Phil).
+20160619 peripherals/printer.c,rzx.c: {printer,rzx}_end end the machine
+         subsystem still running, so add a dependency (thanks, Sergio) (Phil).
