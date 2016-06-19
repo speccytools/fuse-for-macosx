@@ -756,6 +756,7 @@ rzx_register_startup( void )
 {
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_EVENT,
     STARTUP_MANAGER_MODULE_MACHINE,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_RZX, dependencies,

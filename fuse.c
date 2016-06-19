@@ -214,6 +214,7 @@ run_startup_manager()
   didaktik80_register_startup();
   disciple_register_startup();
   divide_register_startup();
+  event_register_startup();
   fdd_register_startup();
   fuller_register_startup();
   if1_register_startup();
@@ -298,8 +299,6 @@ static int fuse_init(int argc, char **argv)
   fuse_joystick_init ();
   fuse_keyboard_init();
 
-  event_init();
-  
 #ifndef GEKKO
   if( display_init(&argc,&argv) ) return 1;
 #endif
@@ -877,7 +876,6 @@ static int fuse_end(void)
 
   startup_manager_run_end();
 
-  event_end();
   periph_end();
   fuse_keyboard_end();
   fuse_joystick_end();

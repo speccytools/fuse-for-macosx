@@ -84,7 +84,10 @@ debugger_end( void )
 void
 debugger_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMPOOL };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_MEMPOOL,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_DEBUGGER, dependencies,
                             ARRAY_SIZE( dependencies ), debugger_init,
                             debugger_end );

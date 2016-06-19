@@ -129,7 +129,10 @@ tape_end( void )
 void
 tape_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_DEBUGGER };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_EVENT,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_TAPE, dependencies,
                             ARRAY_SIZE( dependencies ), tape_init, tape_end );
 }

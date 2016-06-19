@@ -130,8 +130,9 @@ timer_end( void )
 void
 timer_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_TIMER,
-                                            timer_init, timer_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_EVENT };
+  startup_manager_register( STARTUP_MANAGER_MODULE_TIMER, dependencies,
+                            ARRAY_SIZE( dependencies ), timer_init, timer_end );
 }
 
 #ifdef SOUND_FIFO

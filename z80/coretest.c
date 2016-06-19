@@ -569,9 +569,9 @@ spectranet_nmi_flipflop( void )
 }
 
 void
-startup_manager_register_no_dependencies( startup_manager_module module,
-                                          startup_manager_init_fn init_fn,
-                                          startup_manager_end_fn end_fn )
+startup_manager_register( startup_manager_module module,
+  startup_manager_module *dependencies, size_t dependency_count,
+  startup_manager_init_fn init_fn, startup_manager_end_fn end_fn )
 {
 }
 

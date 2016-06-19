@@ -92,8 +92,10 @@ fdd_init_events( void )
 void
 fdd_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_FDD,
-                                            fdd_init_events, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_EVENT };
+  startup_manager_register( STARTUP_MANAGER_MODULE_FDD, dependencies,
+                            ARRAY_SIZE( dependencies ), fdd_init_events,
+                            NULL );
 }
 
 const char *

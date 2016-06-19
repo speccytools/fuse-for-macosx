@@ -32,7 +32,6 @@
 #include <string.h>
 
 #include "display.h"
-#include "event.h"
 #include "fuse.h"
 #include "machine.h"
 #include "movie.h"
