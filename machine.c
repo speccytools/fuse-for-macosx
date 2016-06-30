@@ -437,6 +437,8 @@ machine_end( void )
 void
 machine_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MACHINE,
-                                            machine_init_machines, machine_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MACHINE, dependencies,
+                            ARRAY_SIZE( dependencies ), machine_init_machines,
+                            machine_end );
 }

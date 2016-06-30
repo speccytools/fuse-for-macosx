@@ -130,7 +130,10 @@ timer_end( void )
 void
 timer_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_EVENT };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_TIMER, dependencies,
                             ARRAY_SIZE( dependencies ), timer_init, timer_end );
 }

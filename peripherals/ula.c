@@ -107,8 +107,9 @@ ula_init( void )
 void
 ula_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_ULA,
-                                            ula_init, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_ULA, dependencies,
+                            ARRAY_SIZE( dependencies ), ula_init, NULL );
 }
 
 static libspectrum_byte

@@ -189,6 +189,7 @@ opus_register_startup( void )
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_OPUS, dependencies,
                             ARRAY_SIZE( dependencies ), opus_init, opus_end );

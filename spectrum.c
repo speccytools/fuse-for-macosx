@@ -94,7 +94,10 @@ spectrum_init( void )
 void
 spectrum_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_EVENT };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECTRUM, dependencies,
                             ARRAY_SIZE( dependencies ), spectrum_init, NULL );
 }

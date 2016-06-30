@@ -374,6 +374,7 @@ if1_register_startup( void )
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_IF1, dependencies,
                             ARRAY_SIZE( dependencies ), if1_init, if1_end );

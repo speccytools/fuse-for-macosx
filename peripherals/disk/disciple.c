@@ -257,6 +257,7 @@ disciple_register_startup( void )
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_DISCIPLE, dependencies,
                             ARRAY_SIZE( dependencies ), disciple_init,

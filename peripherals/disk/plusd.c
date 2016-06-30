@@ -216,6 +216,7 @@ plusd_register_startup( void )
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_PLUSD, dependencies,
                             ARRAY_SIZE( dependencies ), plusd_init, plusd_end );

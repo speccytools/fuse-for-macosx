@@ -171,9 +171,10 @@ machines_periph_init( void )
 void
 machines_periph_register_startup( void )
 {
-  startup_manager_register_no_dependencies(
-    STARTUP_MANAGER_MODULE_MACHINES_PERIPH, machines_periph_init, NULL
-  );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MACHINES_PERIPH,
+                            dependencies, ARRAY_SIZE( dependencies ),
+                            machines_periph_init, NULL );
 }
 
 /* Peripherals generally available on all machines; the Timex machines and

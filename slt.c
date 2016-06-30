@@ -71,8 +71,9 @@ slt_init( void )
 void
 slt_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SLT,
-                                            slt_init, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SLT, dependencies,
+                            ARRAY_SIZE( dependencies ), slt_init, NULL );
 }
 
 int

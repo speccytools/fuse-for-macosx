@@ -731,7 +731,10 @@ printer_end( void )
 void
 printer_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MACHINE };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_MACHINE,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_PRINTER, dependencies,
                             ARRAY_SIZE( dependencies ), printer_init,
                             printer_end );

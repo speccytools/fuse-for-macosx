@@ -212,10 +212,37 @@ libxml2_init()
 }
 
 static void
-libxml2_register_startup()
+libxml2_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_LIBXML2,
-                                            libxml2_init, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_LIBXML2, dependencies,
+                            ARRAY_SIZE( dependencies ), libxml2_init, NULL );
+}
+
+static int
+setuid_init( void )
+{
+#ifdef HAVE_GETEUID
+  int error;
+
+  /* Drop root privs if we have them */
+  if( !geteuid() ) {
+    error = setuid( getuid() );
+    if( error ) {
+      ui_error( UI_ERROR_ERROR, "Could not drop root privileges" );
+      return 1;
+    }
+  }
+#endif				/* #ifdef HAVE_GETEUID */
+
+  return 0;
+}
+
+static void
+setuid_register_startup()
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SETUID,
+                                            setuid_init, NULL );
 }
 
 static int
@@ -250,6 +277,7 @@ run_startup_manager()
   psg_register_startup();
   rzx_register_startup();
   scld_register_startup();
+  setuid_register_startup();
   simpleide_register_startup();
   slt_register_startup();
   sound_register_startup();
@@ -329,17 +357,6 @@ static int fuse_init(int argc, char **argv)
 	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
     return 1;
   }
-
-#ifdef HAVE_GETEUID
-  /* Drop root privs if we have them */
-  if( !geteuid() ) {
-    error = setuid( getuid() );
-    if( error ) {
-      ui_error( UI_ERROR_ERROR, "Could not drop root privileges" );
-      return 1;
-    }
-  }
-#endif				/* #ifdef HAVE_GETEUID */
 
   if( run_startup_manager() ) return 1;
 
@@ -426,8 +443,10 @@ creator_end( void )
 static void
 creator_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_CREATOR,
-                                            creator_init, creator_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_CREATOR, dependencies,
+                            ARRAY_SIZE( dependencies ), creator_init,
+                            creator_end );
 }
 
 static void fuse_show_copyright(void)

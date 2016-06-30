@@ -97,6 +97,7 @@ fuller_init( void )
 void
 fuller_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_FULLER,
-                                            fuller_init, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_FULLER, dependencies,
+                            ARRAY_SIZE( dependencies ), fuller_init, NULL );
 }

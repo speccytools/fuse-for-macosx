@@ -112,8 +112,10 @@ simpleide_end( void )
 void
 simpleide_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SIMPLEIDE,
-                                            simpleide_init, simpleide_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SIMPLEIDE, dependencies,
+                            ARRAY_SIZE( dependencies ), simpleide_init,
+                            simpleide_end );
 }
 
 void

@@ -176,8 +176,10 @@ memory_end( void )
 void
 memory_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MEMORY,
-                                            memory_init, memory_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MEMORY, dependencies,
+                            ARRAY_SIZE( dependencies ), memory_init,
+                            memory_end );
 }
 
 int

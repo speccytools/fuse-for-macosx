@@ -91,7 +91,10 @@ if2_init( void )
 void
 if2_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMORY };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_IF2, dependencies,
                             ARRAY_SIZE( dependencies ), if2_init, NULL );
 }

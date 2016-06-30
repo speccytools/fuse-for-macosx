@@ -175,6 +175,7 @@ psg_end( void )
 void
 psg_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_PSG,
-                                            psg_init, psg_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_PSG, dependencies,
+                            ARRAY_SIZE( dependencies ), psg_init, psg_end );
 }

@@ -116,7 +116,10 @@ z80_init( void )
 void
 z80_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_EVENT };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_Z80, dependencies,
                             ARRAY_SIZE( dependencies ), z80_init, NULL );
 }

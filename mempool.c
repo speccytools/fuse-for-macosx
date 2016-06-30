@@ -141,8 +141,10 @@ mempool_end( void )
 void
 mempool_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_MEMPOOL,
-                                            mempool_init, mempool_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MEMPOOL, dependencies,
+                            ARRAY_SIZE( dependencies ), mempool_init,
+                            mempool_end );
 }
 
 /* Unit test helper routines */

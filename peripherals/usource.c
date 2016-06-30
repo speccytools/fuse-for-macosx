@@ -109,7 +109,10 @@ usource_end( void )
 void
 usource_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_MEMORY };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_USOURCE, dependencies,
                             ARRAY_SIZE( dependencies ), usource_init,
                             usource_end );

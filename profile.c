@@ -67,8 +67,9 @@ profile_init( void )
 void
 profile_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_PROFILE,
-                                            profile_init, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_PROFILE, dependencies,
+                            ARRAY_SIZE( dependencies ), profile_init, NULL );
 }
 
 static void

@@ -758,6 +758,7 @@ rzx_register_startup( void )
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_EVENT,
     STARTUP_MANAGER_MODULE_MACHINE,
+    STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_RZX, dependencies,
                             ARRAY_SIZE( dependencies ), rzx_init, rzx_end );

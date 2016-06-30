@@ -79,8 +79,9 @@ specdrum_init( void )
 void
 specdrum_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SPECDRUM,
-                                            specdrum_init, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SPECDRUM, dependencies,
+                            ARRAY_SIZE( dependencies ), specdrum_init, NULL );
 }
 
 static void

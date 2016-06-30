@@ -285,6 +285,8 @@ event_end( void )
 void
 event_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_EVENT,
-                                            event_init, event_end );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_EVENT, dependencies,
+                            ARRAY_SIZE( dependencies ), event_init,
+                            event_end );
 }

@@ -127,8 +127,9 @@ ay_init( void )
 void
 ay_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_AY,
-                                            ay_init, NULL );
+  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_register( STARTUP_MANAGER_MODULE_AY, dependencies,
+                            ARRAY_SIZE( dependencies ), ay_init, NULL );
 }
 
 static void

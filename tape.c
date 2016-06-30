@@ -132,6 +132,7 @@ tape_register_startup( void )
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
     STARTUP_MANAGER_MODULE_EVENT,
+    STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_TAPE, dependencies,
                             ARRAY_SIZE( dependencies ), tape_init, tape_end );
