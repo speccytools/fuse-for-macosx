@@ -5302,3 +5302,5 @@
          spectranet.c,ula.c,usource.c},profile.c,psg.c,rzx.c,slt.c,sound.c,
          spectrum.c,tape.c,timer/timer.c,z80/z80.c: make every startup module
          dependent on setuid() having been called (Phil).
+20160630 fuse.c,infrastructure/startup_manager.h: add libspectrum init to the
+         startup manager (Phil).

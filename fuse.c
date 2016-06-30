@@ -202,7 +202,29 @@ int main(int argc, char **argv)
 }
 
 static int
-libxml2_init()
+fuse_libspectrum_init( void )
+{
+  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
+    if( libspectrum_init() ) return 1;
+  } else {
+    ui_error( UI_ERROR_ERROR,
+              "libspectrum version %s found, but %s required",
+	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
+    return 1;
+  }
+
+  return 0;
+}
+
+static void
+libspectrum_register_startup( void )
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_LIBSPECTRUM,
+                                            fuse_libspectrum_init, NULL );
+}
+
+static int
+libxml2_init( void )
 {
 #ifdef HAVE_LIB_XML2
   LIBXML_TEST_VERSION
@@ -241,8 +263,11 @@ setuid_init( void )
 static void
 setuid_register_startup()
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_SETUID,
-                                            setuid_init, NULL );
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_LIBSPECTRUM
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_SETUID, dependencies,
+                            ARRAY_SIZE( dependencies ), setuid_init, NULL );
 }
 
 static int
@@ -264,6 +289,7 @@ run_startup_manager()
   if1_register_startup();
   if2_register_startup();
   kempmouse_register_startup();
+  libspectrum_register_startup();
   libxml2_register_startup();
   machine_register_startup();
   machines_periph_register_startup();
@@ -348,15 +374,6 @@ static int fuse_init(int argc, char **argv)
 #ifndef GEKKO
   if( display_init(&argc,&argv) ) return 1;
 #endif
-
-  if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
-    if( libspectrum_init() ) return 1;
-  } else {
-    ui_error( UI_ERROR_ERROR,
-              "libspectrum version %s found, but %s required",
-	      libspectrum_version(), LIBSPECTRUM_MIN_VERSION );
-    return 1;
-  }
 
   if( run_startup_manager() ) return 1;
 
