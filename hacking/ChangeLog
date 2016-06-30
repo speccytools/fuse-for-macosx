@@ -5292,3 +5292,5 @@
          infrastructure/startup_manager.h,peripherals/disk/fdd.c,rzx.c,
          spectrum.c,tape.c,timer/timer.c,z80/{coretest.c,z80.c}: add event
          subsystem into startup manager (Phil).
+20160630 fuse.c,infrastructure/startup_manager.h: move libxml2 init into
+         startup manager (Phil).

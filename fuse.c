@@ -202,6 +202,23 @@ int main(int argc, char **argv)
 }
 
 static int
+libxml2_init()
+{
+#ifdef HAVE_LIB_XML2
+  LIBXML_TEST_VERSION
+#endif
+
+  return 0;
+}
+
+static void
+libxml2_register_startup()
+{
+  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_LIBXML2,
+                                            libxml2_init, NULL );
+}
+
+static int
 run_startup_manager()
 {
   startup_manager_init();
@@ -220,6 +237,7 @@ run_startup_manager()
   if1_register_startup();
   if2_register_startup();
   kempmouse_register_startup();
+  libxml2_register_startup();
   machine_register_startup();
   machines_periph_register_startup();
   melodik_register_startup();
@@ -322,10 +340,6 @@ static int fuse_init(int argc, char **argv)
     }
   }
 #endif				/* #ifdef HAVE_GETEUID */
-
-#ifdef HAVE_LIB_XML2
-LIBXML_TEST_VERSION
-#endif
 
   if( run_startup_manager() ) return 1;
 
