@@ -5267,3 +5267,5 @@
 20160613 man/fuse.1,peripherals/ula.c: expose secondary memory control port as
          a debugger system variable (Phil).
 20160613 z80/z80_debugger_variables.c: split long lines (thanks, Fred) (Phil).
+20160626 ui/widget/{menu.c,query.c}: fix crash on widget UIs when hitting the
+         close icon on the title bar several times (fixes bug #351) (Sergio).
