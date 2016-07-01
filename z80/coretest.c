@@ -425,6 +425,13 @@ debugger_check( debugger_breakpoint_type type GCC_UNUSED, libspectrum_dword valu
   abort();
 }
 
+void debugger_system_variable_register(
+  const char *type, const char *detail,
+  debugger_get_system_variable_fn_t get,
+  debugger_set_system_variable_fn_t set )
+{
+}
+
 int
 debugger_trap( void )
 {
@@ -606,6 +613,11 @@ int
 module_register( module_info_t *module GCC_UNUSED )
 {
   return 0;
+}
+
+void
+z80_debugger_variables_init( void )
+{
 }
 
 fuse_machine_info *machine_current;
