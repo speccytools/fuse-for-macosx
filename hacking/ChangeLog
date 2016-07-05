@@ -5324,6 +5324,8 @@
          infrastructure/startup_manager.h,peripherals/disk/fdd.c,rzx.c,
          spectrum.c,tape.c,timer/timer.c,z80/{coretest.c,z80.c}: add event
          subsystem into startup manager (Phil).
+20160626 ui/widget/{menu.c,query.c}: fix crash on widget UIs when hitting the
+         close icon on the title bar several times (fixes bug #351) (Sergio).
 20160630 fuse.c,infrastructure/startup_manager.h: move libxml2 init into
          startup manager (Phil).
 20160630 debugger/debugger.c,event.c,fuse.c,infrastructure/startup_manager.h,
@@ -5336,5 +5338,6 @@
          dependent on setuid() having been called (Phil).
 20160630 fuse.c,infrastructure/startup_manager.h: add libspectrum init to the
          startup manager (Phil).
-20160626 ui/widget/{menu.c,query.c}: fix crash on widget UIs when hitting the
-         close icon on the title bar several times (fixes bug #351) (Sergio).
+20160705 fuse.c,infrastructure/startup_manager.h,settings-header.pl,
+         settings.pl: move settings_end into the startup manager, including
+         OS X conditional dependency (Phil).

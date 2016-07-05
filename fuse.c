@@ -303,6 +303,7 @@ run_startup_manager()
   psg_register_startup();
   rzx_register_startup();
   scld_register_startup();
+  settings_register_startup();
   setuid_register_startup();
   simpleide_register_startup();
   slt_register_startup();
@@ -919,10 +920,6 @@ do_start_files( start_files_t *start_files )
 static int fuse_end(void)
 {
   movie_stop();		/* stop movie recording */
-
-  /* also required before memory is deallocated on Fuse for OS X where
-     settings need to look up machine names etc. */
-  settings_end();
 
   startup_manager_run_end();
 
