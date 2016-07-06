@@ -53,7 +53,7 @@ int debugger_breakpoint_event;
 const char *debugger_z80_system_variable_type = "z80";
 
 static int
-debugger_init( void )
+debugger_init( void *context )
 {
   debugger_breakpoints = NULL;
   debugger_output_base = 16;
@@ -95,7 +95,7 @@ debugger_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_DEBUGGER, dependencies,
-                            ARRAY_SIZE( dependencies ), debugger_init,
+                            ARRAY_SIZE( dependencies ), debugger_init, NULL,
                             debugger_end );
 }
 

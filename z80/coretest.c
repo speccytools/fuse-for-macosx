@@ -94,7 +94,7 @@ main( int argc, char **argv )
   if( init_dummies() ) return 1;
 
   /* Initialise the tables used by the Z80 core */
-  z80_init();
+  z80_init( NULL );
 
   f = fopen( testsfile, "r" );
   if( !f ) {
@@ -578,7 +578,8 @@ spectranet_nmi_flipflop( void )
 void
 startup_manager_register( startup_manager_module module,
   startup_manager_module *dependencies, size_t dependency_count,
-  startup_manager_init_fn init_fn, startup_manager_end_fn end_fn )
+  startup_manager_init_fn init_fn, void *init_context,
+  startup_manager_end_fn end_fn )
 {
 }
 

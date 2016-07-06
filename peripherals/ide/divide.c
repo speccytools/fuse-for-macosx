@@ -115,7 +115,7 @@ static int page_event, unpage_event;
 /* Housekeeping functions */
 
 static int
-divide_init( void )
+divide_init( void *context )
 {
   int error, i, j;
 
@@ -177,11 +177,12 @@ divide_register_startup( void )
 {
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_DISPLAY,
     STARTUP_MANAGER_MODULE_MEMORY,
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_DIVIDE, dependencies,
-                            ARRAY_SIZE( dependencies ), divide_init,
+                            ARRAY_SIZE( dependencies ), divide_init, NULL,
                             divide_end );
 }
 

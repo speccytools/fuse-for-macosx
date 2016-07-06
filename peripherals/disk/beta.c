@@ -152,7 +152,7 @@ beta_select_drive( int i )
 }
 
 static int
-beta_init( void )
+beta_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -266,7 +266,8 @@ beta_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_BETA, dependencies,
-                            ARRAY_SIZE( dependencies ), beta_init, beta_end );
+                            ARRAY_SIZE( dependencies ), beta_init, NULL,
+                            beta_end );
 }
 
 libspectrum_byte

@@ -80,7 +80,7 @@ spectrum_frame_event_fn( libspectrum_dword last_tstates, int type,
 }
 
 static int
-spectrum_init( void )
+spectrum_init( void *context )
 {
   spectrum_frame_event = event_register( spectrum_frame_event_fn,
 					 "End of frame" );
@@ -96,7 +96,8 @@ spectrum_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECTRUM, dependencies,
-                            ARRAY_SIZE( dependencies ), spectrum_init, NULL );
+                            ARRAY_SIZE( dependencies ), spectrum_init, NULL, 
+                            NULL );
 }
 
 int

@@ -161,7 +161,7 @@ static const periph_t plusd_periph = {
 };
 
 static int
-plusd_init( void )
+plusd_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -219,7 +219,8 @@ plusd_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_PLUSD, dependencies,
-                            ARRAY_SIZE( dependencies ), plusd_init, plusd_end );
+                            ARRAY_SIZE( dependencies ), plusd_init, NULL,
+                            plusd_end );
 }
 
 static void

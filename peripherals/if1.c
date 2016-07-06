@@ -304,7 +304,7 @@ update_menu( enum if1_menu_item what )
 }
 
 static int
-if1_init( void )
+if1_init( void *context )
 {
   int m, i;
 
@@ -377,7 +377,8 @@ if1_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_IF1, dependencies,
-                            ARRAY_SIZE( dependencies ), if1_init, if1_end );
+                            ARRAY_SIZE( dependencies ), if1_init, NULL,
+                            if1_end );
 }
 
 void

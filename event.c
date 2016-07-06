@@ -58,7 +58,7 @@ typedef struct event_descriptor_t {
 static GArray *registered_events;
 
 static int
-event_init( void )
+event_init( void *context )
 {
   registered_events = g_array_new( FALSE, FALSE, sizeof( event_descriptor_t ) );
 
@@ -287,6 +287,6 @@ event_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_EVENT, dependencies,
-                            ARRAY_SIZE( dependencies ), event_init,
+                            ARRAY_SIZE( dependencies ), event_init, NULL,
                             event_end );
 }

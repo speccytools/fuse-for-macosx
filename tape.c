@@ -95,7 +95,7 @@ static void tape_stop_mic_off( libspectrum_dword last_tstates, int type,
 /* Function definitions */
 
 static int
-tape_init( void )
+tape_init( void *context )
 {
   tape = libspectrum_tape_alloc();
 
@@ -135,7 +135,8 @@ tape_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_TAPE, dependencies,
-                            ARRAY_SIZE( dependencies ), tape_init, tape_end );
+                            ARRAY_SIZE( dependencies ), tape_init, NULL,
+                            tape_end );
 }
 
 int tape_open( const char *filename, int autoload )

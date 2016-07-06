@@ -220,7 +220,7 @@ speccyboot_register_write( libspectrum_word port GCC_UNUSED,
 }
 
 static int
-speccyboot_init( void )
+speccyboot_init( void *context )
 {
   int i;
 
@@ -255,7 +255,7 @@ speccyboot_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECCYBOOT, dependencies,
-                            ARRAY_SIZE( dependencies ), speccyboot_init,
+                            ARRAY_SIZE( dependencies ), speccyboot_init, NULL,
                             speccyboot_end );
 }
 
@@ -284,12 +284,7 @@ speccyboot_unittest( void )
 /* No speccyboot support */
 
 void
-speccyboot_init( void )
-{
-}
-
-void
-speccyboot_end( void )
+speccyboot_register_startup( void )
 {
 }
 

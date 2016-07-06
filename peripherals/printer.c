@@ -710,7 +710,7 @@ parallel_data=b;
 }
 
 static int
-printer_init( void )
+printer_init( void *context )
 {
   printer_graphics_enabled=printer_text_enabled = 1;
   printer_graphics_file=printer_text_file = NULL;
@@ -736,7 +736,7 @@ printer_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_PRINTER, dependencies,
-                            ARRAY_SIZE( dependencies ), printer_init,
+                            ARRAY_SIZE( dependencies ), printer_init, NULL,
                             printer_end );
 }
 

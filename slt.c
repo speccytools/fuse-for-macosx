@@ -61,7 +61,7 @@ static module_info_t slt_module_info = {
 };
 
 static int
-slt_init( void )
+slt_init( void *context )
 {
   module_register( &slt_module_info );
 
@@ -73,7 +73,7 @@ slt_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_SLT, dependencies,
-                            ARRAY_SIZE( dependencies ), slt_init, NULL );
+                            ARRAY_SIZE( dependencies ), slt_init, NULL, NULL );
 }
 
 int

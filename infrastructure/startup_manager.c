@@ -38,6 +38,7 @@ typedef struct registered_module_t {
   startup_manager_module module;
   GArray *dependencies;
   startup_manager_init_fn init_fn;
+  void *init_context;
   startup_manager_end_fn end_fn;
 } registered_module_t;
 
@@ -58,7 +59,7 @@ void
 startup_manager_register(
   startup_manager_module module, startup_manager_module *dependencies,
   size_t dependency_count, startup_manager_init_fn init_fn,
-  startup_manager_end_fn end_fn )
+  void *init_context, startup_manager_end_fn end_fn )
 {
   registered_module_t registered_module;
 
@@ -69,17 +70,18 @@ startup_manager_register(
   g_array_append_vals( registered_module.dependencies, dependencies,
                        dependency_count );
   registered_module.init_fn = init_fn;
+  registered_module.init_context = init_context;
   registered_module.end_fn = end_fn;
 
   g_array_append_val( registered_modules, registered_module );
 }
 
 void
-startup_manager_register_no_dependencies( startup_manager_module module,
-                                          startup_manager_init_fn init_fn,
-                                          startup_manager_end_fn end_fn )
+startup_manager_register_no_dependencies(
+  startup_manager_module module, startup_manager_init_fn init_fn,
+  void *init_context, startup_manager_end_fn end_fn )
 {
-  startup_manager_register( module, NULL, 0, init_fn, end_fn );
+  startup_manager_register( module, NULL, 0, init_fn, init_context, end_fn );
 }
 
 static void
@@ -127,7 +129,9 @@ startup_manager_run( void )
         printf("Running startup module %d\n", registered_module->module );
 
         if( registered_module->init_fn ) {
-          error = registered_module->init_fn();
+          error = registered_module->init_fn(
+            registered_module->init_context
+          );
           if( error ) return error;
         }
 

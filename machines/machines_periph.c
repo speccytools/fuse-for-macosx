@@ -154,7 +154,7 @@ static const periph_t pentagon1024_memory = {
 };
 
 static int
-machines_periph_init( void )
+machines_periph_init( void *context )
 {
   periph_register( PERIPH_TYPE_128_MEMORY, &spec128_memory );
   periph_register( PERIPH_TYPE_PLUS3_MEMORY, &plus3_memory );
@@ -174,7 +174,7 @@ machines_periph_register_startup( void )
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_MACHINES_PERIPH,
                             dependencies, ARRAY_SIZE( dependencies ),
-                            machines_periph_init, NULL );
+                            machines_periph_init, NULL, NULL );
 }
 
 /* Peripherals generally available on all machines; the Timex machines and

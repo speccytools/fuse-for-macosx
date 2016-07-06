@@ -112,7 +112,7 @@ static int page_event, unpage_event;
 /* Housekeeping functions */
 
 static int
-zxcf_init( void )
+zxcf_init( void *context )
 {
   int error, i;
 
@@ -153,11 +153,13 @@ zxcf_register_startup( void )
 {
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_DISPLAY,
     STARTUP_MANAGER_MODULE_MEMORY,
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_ZXCF, dependencies,
-                            ARRAY_SIZE( dependencies ), zxcf_init, zxcf_end );
+                            ARRAY_SIZE( dependencies ), zxcf_init, NULL,
+                            zxcf_end );
 }
 
 static void

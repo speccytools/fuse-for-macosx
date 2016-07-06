@@ -103,7 +103,7 @@ z80_interrupt_event_fn( libspectrum_dword event_tstates, int type,
 
 /* Set up the z80 emulation */
 int
-z80_init( void )
+z80_init( void *context )
 {
   z80_init_tables();
 
@@ -128,7 +128,7 @@ z80_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_Z80, dependencies,
-                            ARRAY_SIZE( dependencies ), z80_init, NULL );
+                            ARRAY_SIZE( dependencies ), z80_init, NULL, NULL );
 }
 
 /* Initalise the tables used to set flags */

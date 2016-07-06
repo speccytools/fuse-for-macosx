@@ -72,7 +72,7 @@ static const periph_t if2_periph = {
 };
 
 static int
-if2_init( void )
+if2_init( void *context )
 {
   int i;
   int if2_source;
@@ -96,7 +96,7 @@ if2_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_IF2, dependencies,
-                            ARRAY_SIZE( dependencies ), if2_init, NULL );
+                            ARRAY_SIZE( dependencies ), if2_init, NULL, NULL );
 }
 
 int

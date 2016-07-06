@@ -345,7 +345,7 @@ sound_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_SOUND, dependencies,
-                            ARRAY_SIZE( dependencies ), NULL, sound_end );
+                            ARRAY_SIZE( dependencies ), NULL, NULL, sound_end );
 }
 
 static inline void

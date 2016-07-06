@@ -121,7 +121,7 @@ static void rzx_sentinel( libspectrum_dword ts, int type,
 static int sentinel_event;
 
 static int
-rzx_init( void )
+rzx_init( void *context )
 {
   rzx_recording = rzx_playback = 0;
 
@@ -761,7 +761,8 @@ rzx_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_RZX, dependencies,
-                            ARRAY_SIZE( dependencies ), rzx_init, rzx_end );
+                            ARRAY_SIZE( dependencies ), rzx_init, NULL,
+                            rzx_end );
 }
 
 static GSList*

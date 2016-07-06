@@ -35,6 +35,7 @@ typedef enum startup_manager_module {
   STARTUP_MANAGER_MODULE_DEBUGGER,
   STARTUP_MANAGER_MODULE_DIDAKTIK,
   STARTUP_MANAGER_MODULE_DISCIPLE,
+  STARTUP_MANAGER_MODULE_DISPLAY,
   STARTUP_MANAGER_MODULE_DIVIDE,
   STARTUP_MANAGER_MODULE_EVENT,
   STARTUP_MANAGER_MODULE_FDD,
@@ -76,7 +77,7 @@ typedef enum startup_manager_module {
 } startup_manager_module;
 
 /* Callback for each module's init function */
-typedef int (*startup_manager_init_fn)( void );
+typedef int (*startup_manager_init_fn)( void *context );
 
 /* Callback for each module's end function */
 typedef void (*startup_manager_end_fn)( void );
@@ -88,12 +89,12 @@ void startup_manager_init( void );
 void startup_manager_register(
   startup_manager_module module, startup_manager_module *dependencies,
   size_t dependency_count, startup_manager_init_fn init_fn,
-  startup_manager_end_fn end_fn );
+  void *init_context, startup_manager_end_fn end_fn );
 
 /* Register an module with no dependencies with the startup manager */
 void startup_manager_register_no_dependencies(
   startup_manager_module module, startup_manager_init_fn init_fn,
-  startup_manager_end_fn end_fn );
+  void *init_context, startup_manager_end_fn end_fn );
 
 /* Run all the registered init functions in the right order */
 int startup_manager_run( void );

@@ -193,7 +193,7 @@ static const periph_t disciple_periph = {
 };
 
 static int
-disciple_init( void )
+disciple_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -260,7 +260,7 @@ disciple_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_DISCIPLE, dependencies,
-                            ARRAY_SIZE( dependencies ), disciple_init,
+                            ARRAY_SIZE( dependencies ), disciple_init, NULL,
                             disciple_end );
 }
 

@@ -74,7 +74,7 @@ static module_info_t simpleide_module_info = {
 /* Housekeeping functions */
 
 static int
-simpleide_init( void )
+simpleide_init( void *context )
 {
   int error;
 
@@ -112,9 +112,12 @@ simpleide_end( void )
 void
 simpleide_register_startup( void )
 {
-  startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DISPLAY,
+    STARTUP_MANAGER_MODULE_SETUID
+  };
   startup_manager_register( STARTUP_MANAGER_MODULE_SIMPLEIDE, dependencies,
-                            ARRAY_SIZE( dependencies ), simpleide_init,
+                            ARRAY_SIZE( dependencies ), simpleide_init, NULL,
                             simpleide_end );
 }
 

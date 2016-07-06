@@ -57,7 +57,7 @@ static module_info_t profile_module_info = {
 };
 
 static int
-profile_init( void )
+profile_init( void *context )
 {
   module_register( &profile_module_info );
 
@@ -69,7 +69,8 @@ profile_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_PROFILE, dependencies,
-                            ARRAY_SIZE( dependencies ), profile_init, NULL );
+                            ARRAY_SIZE( dependencies ), profile_init, NULL,
+                            NULL );
 }
 
 static void

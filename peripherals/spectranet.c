@@ -443,7 +443,7 @@ static const periph_t spectranet_periph = {
 };
 
 static int
-spectranet_init( void )
+spectranet_init( void *context )
 {
   module_register( &spectranet_module_info );
   spectranet_source = memory_source_register( "Spectranet" );
@@ -473,7 +473,7 @@ spectranet_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECTRANET, dependencies,
-                            ARRAY_SIZE( dependencies ), spectranet_init,
+                            ARRAY_SIZE( dependencies ), spectranet_init, NULL,
                             spectranet_end );
 }
 

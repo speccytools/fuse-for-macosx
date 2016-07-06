@@ -100,7 +100,7 @@ static module_info_t memory_module_info = {
    Memory contention and usable pages vary from machine to machine and must
    be set in the appropriate _reset function */
 static int
-memory_init( void )
+memory_init( void *context )
 {
   size_t i, j;
 
@@ -178,7 +178,7 @@ memory_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_MEMORY, dependencies,
-                            ARRAY_SIZE( dependencies ), memory_init,
+                            ARRAY_SIZE( dependencies ), memory_init, NULL,
                             memory_end );
 }
 

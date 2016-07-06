@@ -65,7 +65,7 @@ static void machine_set_const_timings( fuse_machine_info *machine );
 static void machine_set_variable_timings( fuse_machine_info *machine );
 
 static int
-machine_init_machines( void )
+machine_init_machines( void *context )
 {
   int error;
 
@@ -440,5 +440,5 @@ machine_register_startup( void )
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_MACHINE, dependencies,
                             ARRAY_SIZE( dependencies ), machine_init_machines,
-                            machine_end );
+                            NULL, machine_end );
 }

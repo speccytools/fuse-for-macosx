@@ -84,7 +84,7 @@ static const periph_t scld_periph = {
 };
 
 static int
-scld_init( void )
+scld_init( void *context )
 {
   module_register( &scld_module_info );
   periph_register( PERIPH_TYPE_SCLD, &scld_periph );
@@ -97,7 +97,8 @@ scld_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_SCLD, dependencies,
-                            ARRAY_SIZE( dependencies ), scld_init, NULL );
+                            ARRAY_SIZE( dependencies ), scld_init, NULL,
+                            NULL );
 }
 
 static libspectrum_byte

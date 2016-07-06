@@ -177,7 +177,7 @@ didaktik_set_intrq( struct wd_fdc *f )
 }
 
 static int
-didaktik80_init( void )
+didaktik80_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -291,7 +291,7 @@ didaktik80_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_DIDAKTIK, dependencies,
-                            ARRAY_SIZE( dependencies ), didaktik80_init,
+                            ARRAY_SIZE( dependencies ), didaktik80_init, NULL,
                             didaktik80_end );
 }
 

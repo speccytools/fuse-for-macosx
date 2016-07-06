@@ -81,7 +81,7 @@ static const periph_t kempmouse_periph = {
 };
 
 static int
-kempmouse_init( void )
+kempmouse_init( void *context )
 {
   module_register( &kempmouse_module_info );
   periph_register( PERIPH_TYPE_KEMPSTON_MOUSE, &kempmouse_periph );
@@ -94,7 +94,8 @@ kempmouse_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_KEMPMOUSE, dependencies,
-                            ARRAY_SIZE( dependencies ), kempmouse_init, NULL );
+                            ARRAY_SIZE( dependencies ), kempmouse_init, NULL,
+                            NULL );
 }
 
 void

@@ -85,7 +85,7 @@ melodik_to_snapshot( libspectrum_snap *snap )
 }
 
 static int
-melodik_init( void )
+melodik_init( void *context )
 {
   module_register( &melodik_module_info );
   periph_register( PERIPH_TYPE_MELODIK, &melodik_periph );
@@ -98,5 +98,6 @@ melodik_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_MELODIK, dependencies,
-                            ARRAY_SIZE( dependencies ), melodik_init, NULL );
+                            ARRAY_SIZE( dependencies ), melodik_init, NULL,
+                            NULL );
 }

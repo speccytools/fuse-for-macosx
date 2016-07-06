@@ -134,7 +134,7 @@ opus_set_datarq( struct wd_fdc *f )
 }
 
 static int
-opus_init( void )
+opus_init( void *context )
 {
   int i;
   fdd_t *d;
@@ -192,7 +192,8 @@ opus_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_OPUS, dependencies,
-                            ARRAY_SIZE( dependencies ), opus_init, opus_end );
+                            ARRAY_SIZE( dependencies ), opus_init, NULL,
+                            opus_end );
 }
 
 static void

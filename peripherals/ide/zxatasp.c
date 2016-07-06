@@ -170,7 +170,7 @@ static module_info_t zxatasp_module_info = {
 /* Housekeeping functions */
 
 static int
-zxatasp_init( void )
+zxatasp_init( void *context )
 {
   int error, i;
 
@@ -219,11 +219,12 @@ zxatasp_register_startup( void )
 {
   startup_manager_module dependencies[] = {
     STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_DISPLAY,
     STARTUP_MANAGER_MODULE_MEMORY,
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_ZXATASP, dependencies,
-                            ARRAY_SIZE( dependencies ), zxatasp_init,
+                            ARRAY_SIZE( dependencies ), zxatasp_init, NULL,
                             zxatasp_end );
 }
 

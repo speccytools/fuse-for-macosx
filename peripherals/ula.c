@@ -145,7 +145,7 @@ set_1ffd( libspectrum_dword value )
 }
 
 static int
-ula_init( void )
+ula_init( void *context )
 {
   module_register( &ula_module_info );
 
@@ -174,7 +174,8 @@ ula_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_ULA, dependencies,
-                            ARRAY_SIZE( dependencies ), ula_init, NULL );
+                            ARRAY_SIZE( dependencies ), ula_init, NULL,
+                            NULL );
 }
 
 static libspectrum_byte

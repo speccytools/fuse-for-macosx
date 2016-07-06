@@ -829,7 +829,8 @@ settings_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_SETTINGS_END, dependencies,
-                            ARRAY_SIZE( dependencies ), NULL, settings_end );
+                            ARRAY_SIZE( dependencies ), NULL, NULL,
+                            settings_end );
 }
 
 CODE

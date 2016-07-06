@@ -120,7 +120,7 @@ static const char * const debugger_type_string = "ay";
 static const char * const current_register_detail_string = "current";
 
 static int
-ay_init( void )
+ay_init( void *context )
 {
   module_register( &ay_module_info );
   periph_register( PERIPH_TYPE_AY, &ay_periph );
@@ -143,7 +143,7 @@ ay_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_AY, dependencies,
-                            ARRAY_SIZE( dependencies ), ay_init, NULL );
+                            ARRAY_SIZE( dependencies ), ay_init, NULL, NULL );
 }
 
 static void

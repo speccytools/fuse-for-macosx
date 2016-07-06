@@ -110,7 +110,7 @@ timer_estimate_reset( void )
 }
 
 static int
-timer_init( void )
+timer_init( void *context )
 {
   start_time = timer_get_time(); if( start_time < 0 ) return 1;
 
@@ -135,7 +135,8 @@ timer_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_TIMER, dependencies,
-                            ARRAY_SIZE( dependencies ), timer_init, timer_end );
+                            ARRAY_SIZE( dependencies ), timer_init, NULL,
+                            timer_end );
 }
 
 #ifdef SOUND_FIFO

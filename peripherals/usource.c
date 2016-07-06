@@ -85,7 +85,7 @@ static const periph_t usource_periph = {
 };
 
 static int
-usource_init( void )
+usource_init( void *context )
 {
   int i;
 
@@ -114,7 +114,7 @@ usource_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_USOURCE, dependencies,
-                            ARRAY_SIZE( dependencies ), usource_init,
+                            ARRAY_SIZE( dependencies ), usource_init, NULL,
                             usource_end );
 }
 

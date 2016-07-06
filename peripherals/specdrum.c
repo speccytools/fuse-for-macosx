@@ -68,7 +68,7 @@ static const periph_t specdrum_periph = {
 };
 
 static int
-specdrum_init( void )
+specdrum_init( void *context )
 {
   module_register( &specdrum_module_info );
   periph_register( PERIPH_TYPE_SPECDRUM, &specdrum_periph );
@@ -81,7 +81,8 @@ specdrum_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_SPECDRUM, dependencies,
-                            ARRAY_SIZE( dependencies ), specdrum_init, NULL );
+                            ARRAY_SIZE( dependencies ), specdrum_init, NULL,
+                            NULL );
 }
 
 static void

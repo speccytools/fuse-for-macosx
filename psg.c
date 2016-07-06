@@ -47,7 +47,7 @@ static FILE *psg_file;
 static int write_frame_separator( void );
 
 static int
-psg_init( void )
+psg_init( void *context )
 {
   psg_recording = 0;
 
@@ -177,5 +177,6 @@ psg_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_PSG, dependencies,
-                            ARRAY_SIZE( dependencies ), psg_init, psg_end );
+                            ARRAY_SIZE( dependencies ), psg_init, NULL,
+                            psg_end );
 }

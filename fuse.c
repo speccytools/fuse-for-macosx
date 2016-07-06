@@ -146,6 +146,9 @@ typedef struct start_files_t {
 
 } start_files_t;
 
+/* Context for the display startup routine */
+static display_startup_context display_context;
+
 static int fuse_init(int argc, char **argv);
 
 static void creator_register_startup( void );
@@ -202,7 +205,7 @@ int main(int argc, char **argv)
 }
 
 static int
-fuse_libspectrum_init( void )
+fuse_libspectrum_init( void *context )
 {
   if( libspectrum_check_version( LIBSPECTRUM_MIN_VERSION ) ) {
     if( libspectrum_init() ) return 1;
@@ -219,12 +222,16 @@ fuse_libspectrum_init( void )
 static void
 libspectrum_register_startup( void )
 {
-  startup_manager_register_no_dependencies( STARTUP_MANAGER_MODULE_LIBSPECTRUM,
-                                            fuse_libspectrum_init, NULL );
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DISPLAY
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_LIBSPECTRUM, dependencies,
+                            ARRAY_SIZE( dependencies ), fuse_libspectrum_init,
+                            NULL, NULL );
 }
 
 static int
-libxml2_init( void )
+libxml2_init( void *context )
 {
 #ifdef HAVE_LIB_XML2
   LIBXML_TEST_VERSION
@@ -238,11 +245,12 @@ libxml2_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_LIBXML2, dependencies,
-                            ARRAY_SIZE( dependencies ), libxml2_init, NULL );
+                            ARRAY_SIZE( dependencies ), libxml2_init, NULL,
+                            NULL );
 }
 
 static int
-setuid_init( void )
+setuid_init( void *context )
 {
 #ifdef HAVE_GETEUID
   int error;
@@ -264,16 +272,21 @@ static void
 setuid_register_startup()
 {
   startup_manager_module dependencies[] = {
-    STARTUP_MANAGER_MODULE_LIBSPECTRUM
+    STARTUP_MANAGER_MODULE_DISPLAY,
+    STARTUP_MANAGER_MODULE_LIBSPECTRUM,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_SETUID, dependencies,
-                            ARRAY_SIZE( dependencies ), setuid_init, NULL );
+                            ARRAY_SIZE( dependencies ), setuid_init, NULL,
+                            NULL );
 }
 
 static int
-run_startup_manager()
+run_startup_manager( int *argc, char ***argv )
 {
   startup_manager_init();
+
+  display_context.argc = argc;
+  display_context.argv = argv;
 
   /* Get every module to register its init function */
   ay_register_startup();
@@ -282,6 +295,7 @@ run_startup_manager()
   debugger_register_startup();
   didaktik80_register_startup();
   disciple_register_startup();
+  display_register_startup( &display_context );
   divide_register_startup();
   event_register_startup();
   fdd_register_startup();
@@ -369,14 +383,10 @@ static int fuse_init(int argc, char **argv)
      what */
   /* FIXME FIXME 20030407: really do this soon. This is getting *far* too
      hairy */
-  fuse_joystick_init ();
+  fuse_joystick_init();
   fuse_keyboard_init();
 
-#ifndef GEKKO
-  if( display_init(&argc,&argv) ) return 1;
-#endif
-
-  if( run_startup_manager() ) return 1;
+  if( run_startup_manager( &argc, &argv ) ) return 1;
 
   error = machine_select_id( settings_current.start_machine );
   if( error ) return error;
@@ -399,8 +409,8 @@ static int fuse_init(int argc, char **argv)
   return 0;
 }
 
-static
-int creator_init( void )
+static int
+creator_init( void *context )
 {
   size_t i;
   unsigned int version[4] = { 0, 0, 0, 0 };
@@ -463,7 +473,7 @@ creator_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_CREATOR, dependencies,
-                            ARRAY_SIZE( dependencies ), creator_init,
+                            ARRAY_SIZE( dependencies ), creator_init, NULL,
                             creator_end );
 }
 

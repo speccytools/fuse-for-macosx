@@ -42,7 +42,7 @@ static GArray *memory_pools;
 const int MEMPOOL_UNTRACKED = -1;
 
 static int
-mempool_init( void )
+mempool_init( void *context )
 {
   memory_pools = g_array_new( FALSE, FALSE, sizeof( GArray* ) );
 
@@ -143,7 +143,7 @@ mempool_register_startup( void )
 {
   startup_manager_module dependencies[] = { STARTUP_MANAGER_MODULE_SETUID };
   startup_manager_register( STARTUP_MANAGER_MODULE_MEMPOOL, dependencies,
-                            ARRAY_SIZE( dependencies ), mempool_init,
+                            ARRAY_SIZE( dependencies ), mempool_init, NULL,
                             mempool_end );
 }
 

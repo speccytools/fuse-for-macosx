@@ -78,7 +78,7 @@ static int index_event;
 static int fdd_motor = 0; /* to manage 'disk' icon */
 
 static int
-fdd_init_events( void )
+fdd_init_events( void *context )
 {
   motor_event = event_register( fdd_event, "FDD motor on" );
   index_event = event_register( fdd_event, "FDD index" );
@@ -97,7 +97,7 @@ fdd_register_startup( void )
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_FDD, dependencies,
-                            ARRAY_SIZE( dependencies ), fdd_init_events,
+                            ARRAY_SIZE( dependencies ), fdd_init_events, NULL,
                             NULL );
 }
 
