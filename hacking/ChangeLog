@@ -5350,3 +5350,5 @@
          usource.c},profile.c,psg.c,rzx.c,settings.pl,slt.c,sound.c,spectrum.c,
          tape.c,timer/timer.c,z80/{coretest.c,z80.c,z80.h}: add display
          initialisation to the startup manager (Phil).
+20160706 settings.pl: remove OS X conditional code; will be maintained in the
+         OS X port (thanks, Fred) (Phil).

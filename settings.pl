@@ -823,9 +823,7 @@ settings_register_startup( void )
   startup_manager_module dependencies[] = {
   /* Fuse for OS X requires that settings_end is called before memory is
      deallocated as settings need to look up machine names etc */
-#if defined __APPLE__ && defined __MACH__
-    STARTUP_MANAGER_MODULE_MEMORY,
-#endif                          /* if defined __APPLE__ && defined __MACH__ */
+    /* STARTUP_MANAGER_MODULE_MEMORY, */
     STARTUP_MANAGER_MODULE_SETUID,
   };
   startup_manager_register( STARTUP_MANAGER_MODULE_SETTINGS_END, dependencies,
