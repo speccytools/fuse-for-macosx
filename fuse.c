@@ -379,10 +379,6 @@ static int fuse_init(int argc, char **argv)
   fuse_show_copyright();
 #endif
 
-  /* FIXME: order of these initialisation calls. Work out what depends on
-     what */
-  /* FIXME FIXME 20030407: really do this soon. This is getting *far* too
-     hairy */
   fuse_joystick_init();
   fuse_keyboard_init();
 

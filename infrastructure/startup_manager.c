@@ -99,7 +99,6 @@ remove_dependency( startup_manager_module module )
         g_array_index( dependencies, startup_manager_module, j );
 
       if( dependency == module ) {
-        printf("Removing dependency %d from module %d\n", module, registered_module->module);
         g_array_remove_index_fast( dependencies, j );
         break;
       }
@@ -126,7 +125,6 @@ startup_manager_run( void )
         &g_array_index( registered_modules, registered_module_t, i );
 
       if( registered_module->dependencies->len == 0 ) {
-        printf("Running startup module %d\n", registered_module->module );
 
         if( registered_module->init_fn ) {
           error = registered_module->init_fn(
@@ -145,13 +143,9 @@ startup_manager_run( void )
 
         progress_made = 1;
       } else {
-        printf("Module %d has %d unsatisfied dependencies\n", registered_module->module, registered_module->dependencies->len);
         i++;
       }
     }
-
-    printf("End of array; progress_made = %d, modules_remaining = %d\n", progress_made, registered_modules->len);
-
   } while( progress_made && registered_modules->len );
 
   /* If there are still any modules left to be called, then that's bad */
