@@ -5338,6 +5338,9 @@
          dependent on setuid() having been called (Phil).
 20160630 fuse.c,infrastructure/startup_manager.h: add libspectrum init to the
          startup manager (Phil).
+20160705 tape.c: make sure we don't lose a tape edge when we pause and restart
+         tapes and delete lingering MIC off events when we restart a tape (fixes
+         bug #354) (thanks, Lee Tonks and windale) (Fred).
 20160705 fuse.c,infrastructure/startup_manager.h,settings-header.pl,
          settings.pl: move settings_end into the startup manager, including
          OS X conditional dependency (Phil).
@@ -5354,3 +5357,4 @@
          OS X port (thanks, Fred) (Phil).
 20160706 fuse.c,infrastructure/startup_manager.c: final tidy-ups: remove debug
          printf calls and FIXME comments (Phil).
+20160707 man/fuse.1: document unittests option (fixes bug #326) (Sergio).
