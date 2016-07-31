@@ -302,7 +302,9 @@ run_startup_manager( int *argc, char ***argv )
   fuller_register_startup();
   if1_register_startup();
   if2_register_startup();
+  joystick_register_startup();
   kempmouse_register_startup();
+  keyboard_register_startup();
   libspectrum_register_startup();
   libxml2_register_startup();
   machine_register_startup();
@@ -378,9 +380,6 @@ static int fuse_init(int argc, char **argv)
 #ifndef WIN32
   fuse_show_copyright();
 #endif
-
-  fuse_joystick_init();
-  fuse_keyboard_init();
 
   if( run_startup_manager( &argc, &argv ) ) return 1;
 
@@ -930,8 +929,6 @@ static int fuse_end(void)
   startup_manager_run_end();
 
   periph_end();
-  fuse_keyboard_end();
-  fuse_joystick_end();
   ui_end();
   ui_media_drive_end();
   module_end();

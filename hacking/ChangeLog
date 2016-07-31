@@ -5378,3 +5378,6 @@
          deprecated Carbon APIs (Fred).
 20160731 Makefile.am,m4/glib-2.0.m4: remove the unused (since r5349) glib-2.0.m4
          file (from patch #375) (Alberto Garcia).
+20160731 fuse.c,infrastructure/startup_manager.h,keyboard.[ch],
+         peripherals/joystick.[ch]: move keyboard and joystick initialisation
+         into the startup manager (Phil).

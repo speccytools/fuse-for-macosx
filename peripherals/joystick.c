@@ -1,5 +1,5 @@
 /* joystick.c: Joystick emulation support
-   Copyright (c) 2001-2011 Russell Marks, Darren Salt, Philip Kendall
+   Copyright (c) 2001-2016 Russell Marks, Darren Salt, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -29,6 +29,7 @@
 #include <libspectrum.h>
 
 #include "fuse.h"
+#include "infrastructure/startup_manager.h"
 #include "joystick.h"
 #include "keyboard.h"
 #include "module.h"
@@ -124,8 +125,8 @@ static const periph_t kempston_loose_periph = {
 
 /* Init/shutdown functions. Errors aren't important here */
 
-void
-fuse_joystick_init (void)
+int
+joystick_init( void *context )
 {
   joysticks_supported = ui_joystick_init();
   kempston_value = timex1_value = timex2_value = 0x00;
@@ -134,12 +135,26 @@ fuse_joystick_init (void)
   module_register( &joystick_module_info );
   periph_register( PERIPH_TYPE_KEMPSTON, &kempston_strict_periph );
   periph_register( PERIPH_TYPE_KEMPSTON_LOOSE, &kempston_loose_periph );
+
+  return 0;
 }
 
 void
-fuse_joystick_end (void)
+joystick_end( void )
 {
   ui_joystick_end();
+}
+
+void
+joystick_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_LIBSPECTRUM,
+    STARTUP_MANAGER_MODULE_SETUID
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_JOYSTICK, dependencies,
+                            ARRAY_SIZE( dependencies ), joystick_init,
+                            joystick_end, NULL );
 }
 
 int
