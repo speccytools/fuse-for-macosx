@@ -61,170 +61,6 @@ input_event( const input_event_t *event )
 
 }
 
-static const char* keyname( input_key k ) {
-    switch ( k ) {
-      case INPUT_KEY_NONE: return "INPUT_KEY_NONE";
-      case INPUT_KEY_Tab: return "INPUT_KEY_Tab";
-      case INPUT_KEY_Return: return "INPUT_KEY_Return";
-      case INPUT_KEY_Escape: return "INPUT_KEY_Escape";
-      case INPUT_KEY_space: return "INPUT_KEY_space";
-      case INPUT_KEY_exclam: return "INPUT_KEY_exclam";
-      case INPUT_KEY_numbersign: return "INPUT_KEY_numbersign";
-      case INPUT_KEY_dollar: return "INPUT_KEY_dollar";
-      case INPUT_KEY_ampersand: return "INPUT_KEY_ampersand";
-      case INPUT_KEY_apostrophe: return "INPUT_KEY_apostrophe";
-      case INPUT_KEY_parenleft: return "INPUT_KEY_parenleft";
-      case INPUT_KEY_parenright: return "INPUT_KEY_parenright";
-      case INPUT_KEY_asterisk: return "INPUT_KEY_asterisk";
-      case INPUT_KEY_plus: return "INPUT_KEY_plus";
-      case INPUT_KEY_comma: return "INPUT_KEY_comma";
-      case INPUT_KEY_minus: return "INPUT_KEY_minus";
-      case INPUT_KEY_period: return "INPUT_KEY_period";
-      case INPUT_KEY_slash: return "INPUT_KEY_slash";
-      case INPUT_KEY_0: return "INPUT_KEY_0";
-      case INPUT_KEY_1: return "INPUT_KEY_1";
-      case INPUT_KEY_2: return "INPUT_KEY_2";
-      case INPUT_KEY_3: return "INPUT_KEY_3";
-      case INPUT_KEY_4: return "INPUT_KEY_4";
-      case INPUT_KEY_5: return "INPUT_KEY_5";
-      case INPUT_KEY_6: return "INPUT_KEY_6";
-      case INPUT_KEY_7: return "INPUT_KEY_7";
-      case INPUT_KEY_8: return "INPUT_KEY_8";
-      case INPUT_KEY_9: return "INPUT_KEY_9";
-      case INPUT_KEY_colon: return "INPUT_KEY_colon";
-      case INPUT_KEY_semicolon: return "INPUT_KEY_semicolon";
-      case INPUT_KEY_less: return "INPUT_KEY_less";
-      case INPUT_KEY_equal: return "INPUT_KEY_equal";
-      case INPUT_KEY_greater: return "INPUT_KEY_greater";
-      case INPUT_KEY_A: return "INPUT_KEY_A";
-      case INPUT_KEY_B: return "INPUT_KEY_B";
-      case INPUT_KEY_C: return "INPUT_KEY_C";
-      case INPUT_KEY_D: return "INPUT_KEY_D";
-      case INPUT_KEY_E: return "INPUT_KEY_E";
-      case INPUT_KEY_F: return "INPUT_KEY_F";
-      case INPUT_KEY_G: return "INPUT_KEY_G";
-      case INPUT_KEY_H: return "INPUT_KEY_H";
-      case INPUT_KEY_I: return "INPUT_KEY_I";
-      case INPUT_KEY_J: return "INPUT_KEY_J";
-      case INPUT_KEY_K: return "INPUT_KEY_K";
-      case INPUT_KEY_L: return "INPUT_KEY_L";
-      case INPUT_KEY_M: return "INPUT_KEY_M";
-      case INPUT_KEY_N: return "INPUT_KEY_N";
-      case INPUT_KEY_O: return "INPUT_KEY_O";
-      case INPUT_KEY_P: return "INPUT_KEY_P";
-      case INPUT_KEY_Q: return "INPUT_KEY_Q";
-      case INPUT_KEY_R: return "INPUT_KEY_R";
-      case INPUT_KEY_S: return "INPUT_KEY_S";
-      case INPUT_KEY_T: return "INPUT_KEY_T";
-      case INPUT_KEY_U: return "INPUT_KEY_U";
-      case INPUT_KEY_V: return "INPUT_KEY_V";
-      case INPUT_KEY_W: return "INPUT_KEY_W";
-      case INPUT_KEY_X: return "INPUT_KEY_X";
-      case INPUT_KEY_Y: return "INPUT_KEY_Y";
-      case INPUT_KEY_Z: return "INPUT_KEY_Z";
-      case INPUT_KEY_bracketleft: return "INPUT_KEY_bracketleft";
-      case INPUT_KEY_bracketright: return "INPUT_KEY_bracketright";
-      case INPUT_KEY_asciicircum: return "INPUT_KEY_asciicircum";
-//    case INPUT_KEY_dead_circumflex: return "INPUT_KEY_dead_circumflex";
-      case INPUT_KEY_a: return "INPUT_KEY_a";
-      case INPUT_KEY_b: return "INPUT_KEY_b";
-      case INPUT_KEY_c: return "INPUT_KEY_c";
-      case INPUT_KEY_d: return "INPUT_KEY_d";
-      case INPUT_KEY_e: return "INPUT_KEY_e";
-      case INPUT_KEY_f: return "INPUT_KEY_f";
-      case INPUT_KEY_g: return "INPUT_KEY_g";
-      case INPUT_KEY_h: return "INPUT_KEY_h";
-      case INPUT_KEY_i: return "INPUT_KEY_i";
-      case INPUT_KEY_j: return "INPUT_KEY_j";
-      case INPUT_KEY_k: return "INPUT_KEY_k";
-      case INPUT_KEY_l: return "INPUT_KEY_l";
-      case INPUT_KEY_m: return "INPUT_KEY_m";
-      case INPUT_KEY_n: return "INPUT_KEY_n";
-      case INPUT_KEY_o: return "INPUT_KEY_o";
-      case INPUT_KEY_p: return "INPUT_KEY_p";
-      case INPUT_KEY_q: return "INPUT_KEY_q";
-      case INPUT_KEY_r: return "INPUT_KEY_r";
-      case INPUT_KEY_s: return "INPUT_KEY_s";
-      case INPUT_KEY_t: return "INPUT_KEY_t";
-      case INPUT_KEY_u: return "INPUT_KEY_u";
-      case INPUT_KEY_v: return "INPUT_KEY_v";
-      case INPUT_KEY_w: return "INPUT_KEY_w";
-      case INPUT_KEY_x: return "INPUT_KEY_x";
-      case INPUT_KEY_y: return "INPUT_KEY_y";
-      case INPUT_KEY_z: return "INPUT_KEY_z";
-      case INPUT_KEY_bar: return "INPUT_KEY_bar";
-      case INPUT_KEY_BackSpace: return "INPUT_KEY_BackSpace";
-      case INPUT_KEY_KP_Enter: return "INPUT_KEY_KP_Enter";
-      case INPUT_KEY_Up: return "INPUT_KEY_Up";
-      case INPUT_KEY_Down: return "INPUT_KEY_Down";
-      case INPUT_KEY_Left: return "INPUT_KEY_Left";
-      case INPUT_KEY_Right: return "INPUT_KEY_Right";
-      case INPUT_KEY_Insert: return "INPUT_KEY_Insert";
-      case INPUT_KEY_Delete: return "INPUT_KEY_Delete";
-      case INPUT_KEY_Home: return "INPUT_KEY_Home";
-      case INPUT_KEY_End: return "INPUT_KEY_End";
-      case INPUT_KEY_Page_Up: return "INPUT_KEY_Page_Up";
-      case INPUT_KEY_Page_Down: return "INPUT_KEY_Page_Down";
-      case INPUT_KEY_Caps_Lock: return "INPUT_KEY_Caps_Lock";
-      case INPUT_KEY_F1: return "INPUT_KEY_F1";
-      case INPUT_KEY_F2: return "INPUT_KEY_F2";
-      case INPUT_KEY_F3: return "INPUT_KEY_F3";
-      case INPUT_KEY_F4: return "INPUT_KEY_F4";
-      case INPUT_KEY_F5: return "INPUT_KEY_F5";
-      case INPUT_KEY_F6: return "INPUT_KEY_F6";
-      case INPUT_KEY_F7: return "INPUT_KEY_F7";
-      case INPUT_KEY_F8: return "INPUT_KEY_F8";
-      case INPUT_KEY_F9: return "INPUT_KEY_F9";
-      case INPUT_KEY_F10: return "INPUT_KEY_F10";
-      case INPUT_KEY_F11: return "INPUT_KEY_F11";
-      case INPUT_KEY_F12: return "INPUT_KEY_F12";
-      case INPUT_KEY_Shift_L: return "INPUT_KEY_Shift_L";
-      case INPUT_KEY_Shift_R: return "INPUT_KEY_Shift_R";
-      case INPUT_KEY_Control_L: return "INPUT_KEY_Control_L";
-      case INPUT_KEY_Control_R: return "INPUT_KEY_Control_R";
-      case INPUT_KEY_Alt_L: return "INPUT_KEY_Alt_L";
-      case INPUT_KEY_Alt_R: return "INPUT_KEY_Alt_R";
-      case INPUT_KEY_Meta_L: return "INPUT_KEY_Meta_L";
-      case INPUT_KEY_Meta_R: return "INPUT_KEY_Meta_R";
-      case INPUT_KEY_Super_L: return "INPUT_KEY_Super_L";
-      case INPUT_KEY_Super_R: return "INPUT_KEY_Super_R";
-      case INPUT_KEY_Hyper_L: return "INPUT_KEY_Hyper_L";
-      case INPUT_KEY_Hyper_R: return "INPUT_KEY_Hyper_R";
-      case INPUT_KEY_Mode_switch: return "INPUT_KEY_Mode_switch";
-      case INPUT_JOYSTICK_UP: return "INPUT_JOYSTICK_UP";
-      case INPUT_JOYSTICK_DOWN: return "INPUT_JOYSTICK_DOWN";
-      case INPUT_JOYSTICK_LEFT: return "INPUT_JOYSTICK_LEFT";
-      case INPUT_JOYSTICK_RIGHT: return "INPUT_JOYSTICK_RIGHT";
-      case INPUT_JOYSTICK_FIRE_1: return "INPUT_JOYSTICK_FIRE_1";
-      case INPUT_JOYSTICK_FIRE_2: return "INPUT_JOYSTICK_FIRE_2";
-      case INPUT_JOYSTICK_FIRE_3: return "INPUT_JOYSTICK_FIRE_3";
-      case INPUT_JOYSTICK_FIRE_4: return "INPUT_JOYSTICK_FIRE_4";
-      case INPUT_JOYSTICK_FIRE_5: return "INPUT_JOYSTICK_FIRE_5";
-      case INPUT_JOYSTICK_FIRE_6: return "INPUT_JOYSTICK_FIRE_6";
-      case INPUT_JOYSTICK_FIRE_7: return "INPUT_JOYSTICK_FIRE_7";
-      case INPUT_JOYSTICK_FIRE_8: return "INPUT_JOYSTICK_FIRE_8";
-      case INPUT_JOYSTICK_FIRE_9: return "INPUT_JOYSTICK_FIRE_9";
-      case INPUT_JOYSTICK_FIRE_10: return "INPUT_JOYSTICK_FIRE_10";
-      case INPUT_JOYSTICK_FIRE_11: return "INPUT_JOYSTICK_FIRE_11";
-      case INPUT_JOYSTICK_FIRE_12: return "INPUT_JOYSTICK_FIRE_12";
-      case INPUT_JOYSTICK_FIRE_13: return "INPUT_JOYSTICK_FIRE_13";
-      case INPUT_JOYSTICK_FIRE_14: return "INPUT_JOYSTICK_FIRE_14";
-      case INPUT_JOYSTICK_FIRE_15: return "INPUT_JOYSTICK_FIRE_15";
-      default: return 0;
-    }
-}
-
-static void
-keyname_print( char* buf, size_t bufsz, input_key k ) {
-    const char* s = keyname( k );
-    if ( s ) {
-        snprintf( buf, bufsz, "%s (code %d, asc '%c')", s, (int) k, (int)(k>=32&&k<=126?k:'.') );
-    }
-    else {
-        snprintf( buf, bufsz, "key code %d, asc '%c'", (int) k, (int)(k>=32&&k<=126?k:'.') );
-    }
-}
-
 static int rzx_is_downkey( int code ) {
     switch ( code ) {
         case INPUT_KEY_a:                                   return INPUT_KEY_1;
@@ -384,12 +220,6 @@ keypress( const input_event_key_t *event )
 
   if( swallow ) return 0;
 
-  /*
-  char tmp[256];
-  keyname_print( tmp, sizeof(tmp), event->spectrum_key );
-  printf( "keypress(): %s\n", tmp );
-  */
-
   input_key kout = (input_key) 0; int kflg = 0;
   rzx_press( event->spectrum_key, &kout, &kflg );
   if ( kflg & RZXF_RELEASED ) {
@@ -407,15 +237,6 @@ keypress( const input_event_key_t *event )
       }
   }
 
-  /*
-  ptr = keyboard_get_spectrum_keys( event->spectrum_key );
-
-  if( ptr ) {
-    keyboard_press( ptr->key1 );
-    keyboard_press( ptr->key2 );
-  }
-  */
-
   ui_popup_menu( event->native_key );
 
   return 0;
@@ -424,21 +245,6 @@ keypress( const input_event_key_t *event )
 static int
 keyrelease( const input_event_key_t *event )
 {
-  const keyboard_spectrum_keys_t *ptr;
-
-  /*
-  char tmp[256];
-  keyname_print( tmp, sizeof(tmp), event->spectrum_key );
-  printf( "keyrelease(): %s\n", tmp );
-
-  ptr = keyboard_get_spectrum_keys( event->spectrum_key );
-
-  if( ptr ) {
-    keyboard_release( ptr->key1 );
-    keyboard_release( ptr->key2 );
-  }
-  */
-
   /* Joystick emulation via keyboard keys */
   if( event->spectrum_key == settings_current.joystick_keyboard_up ) {
     joystick_press( JOYSTICK_KEYBOARD, JOYSTICK_BUTTON_UP   , 0 );

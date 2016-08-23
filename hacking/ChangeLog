@@ -5419,3 +5419,4 @@
 20160823 display.c,peripherals/disk/upd_fdc.c: fix compilation warnings (Phil).
 20160823 input.[ch],keysyms.dat,keysyms.pl: integrate initial Recreated ZX
          Spectrum patch (Sergio and ekkehard).
+20160823 input.c,keysyms.dat: remove unused code (Phil).
