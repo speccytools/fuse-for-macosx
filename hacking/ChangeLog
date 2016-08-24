@@ -5420,3 +5420,5 @@
 20160823 input.[ch],keysyms.dat,keysyms.pl: integrate initial Recreated ZX
          Spectrum patch (Sergio and ekkehard).
 20160823 input.c,keysyms.dat: remove unused code (Phil).
+20160825 input.c,man/fuse.1,settings.dat,ui/options.dat: add option to enable
+         the support of Recreated ZX Spectrum (Sergio).
