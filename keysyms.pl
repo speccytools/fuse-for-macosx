@@ -246,6 +246,7 @@ my %ui_data = (
 					   'dollar','less','greater','exclam',
 					   'ampersand','parenleft','parenright',
 					   'asterisk','plus','colon','bar',
+					   'bracketleft','bracketright',
 					   'asciicircum','dead_circumflex',
 					   'A' .. 'Z' ) },
 	      translations => { 
