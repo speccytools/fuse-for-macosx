@@ -142,7 +142,7 @@ get_IM( void )
 static void
 set_IM( libspectrum_dword value )
 {
-  if( value >= 0 && value <= 2 ) IM = value;
+  if( value <= 2 ) IM = value;
 }
 
 static libspectrum_dword

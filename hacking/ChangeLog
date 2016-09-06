@@ -5421,3 +5421,4 @@
          widgets on win32 UI (Sergio).
 20160828 peripherals/disk/disk.c: mark position_context_save() and
          position_context_restore() as static (Fred).
+20160906 z80/z80_debugger_variables.c: remove tautological comparison (Fred).
