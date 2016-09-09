@@ -5417,8 +5417,18 @@
 20160823 ui/win32/options.pl: set the length of text entry widgets on win32 UI
          (Sergio).
 20160823 display.c,peripherals/disk/upd_fdc.c: fix compilation warnings (Phil).
+20160823 input.[ch],keysyms.dat,keysyms.pl: integrate initial Recreated ZX
+         Spectrum patch (Sergio and ekkehard).
+20160823 input.c,keysyms.dat: remove unused code (Phil).
+20160825 input.c,man/fuse.1,settings.dat,ui/options.dat: add option to enable
+         the support of Recreated ZX Spectrum (Sergio).
+20160825 keysyms.pl: support (hopefully) Recreated ZX Spectrum on win32 UI
+         (Sergio).
 20160828 ui/win32/options-resource.pl: set the digit filter for text entry
          widgets on win32 UI (Sergio).
 20160828 peripherals/disk/disk.c: mark position_context_save() and
          position_context_restore() as static (Fred).
 20160906 z80/z80_debugger_variables.c: remove tautological comparison (Fred).
+20160909 man/fuse.1: fix typos in Recreated ZX Spectrum option (Sergio).
+20160909 data/shell-completion/bash/fuse: update shell completion with Recreated
+         ZX Spectrum option (Sergio).

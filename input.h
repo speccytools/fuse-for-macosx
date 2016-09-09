@@ -107,7 +107,9 @@ typedef enum input_key {
   INPUT_KEY_X,
   INPUT_KEY_Y,
   INPUT_KEY_Z,
+  INPUT_KEY_bracketleft,
 
+  INPUT_KEY_bracketright = 0x5d,
   INPUT_KEY_asciicircum = 0x5e,
   INPUT_KEY_dead_circumflex = 0x5e,
 

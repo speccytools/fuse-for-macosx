@@ -220,7 +220,7 @@ _fuse()
             --no-melodik --no-mouse-swap-buttons
             --no-movie-stop-after-rzx --no-opus --no-pal-tv2x
             --no-plus3-detect-speedlock --no-plusd --no-printer
-            --no-raw-s-net --no-rs232-handshake
+            --no-raw-s-net --no-recreated-spectrum --no-rs232-handshake
             --no-rzx-autosaves --no-simpleide --no-slt --no-sound
             --no-sound-force-8bit --no-speccyboot --no-specdrum
             --no-spectranet --no-spectranet-disable --no-statusbar
@@ -229,7 +229,8 @@ _fuse()
             --no-zxatasp-write-protect --no-zxcf --no-zxcf-upload
             --no-zxprinter --opus --opusdisk --pal-tv2x --playback
             --plus3-detect-speedlock --plus3disk --plusd --plusddisk
-            --printer --rate --raw-s-net --record --rom-128-0 --rom-128-1
+            --printer --rate --raw-s-net --record --recreated-spectrum
+            --rom-128-0 --rom-128-1
             --rom-16 --rom-48 --rom-beta128 --rom-didaktik80 --rom-disciple
             --rom-interface-1 --rom-opus
             --rom-pentagon-0 --rom-pentagon-1 --rom-pentagon-2
