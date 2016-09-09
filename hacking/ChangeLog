@@ -5424,3 +5424,4 @@
          the support of Recreated ZX Spectrum (Sergio).
 20160825 keysyms.pl: support (hopefully) Recreated ZX Spectrum on win32 UI
          (Sergio).
+20160909 man/fuse.1: fix typos in Recreated ZX Spectrum option (Sergio).
