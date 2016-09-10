@@ -157,16 +157,17 @@ my %ui_data = (
     	    },
 
     sdl  => { headers => [ 'SDL.h' ],
-	      max_length => 15,
+	      max_length => 18,
 	      skips => { map { $_ => 1 } ( 'Hyper_L','Hyper_R','Caps_Lock',
-                         'A' .. 'Z', 'bar', 'dead_circumflex' ) },
+                         'A' .. 'Z', 'asciitilde', 'bar', 'dead_circumflex',
+                         'braceleft', 'braceright', 'percent' ) },
 	      unicode_skips => { map { $_ => 1 } qw( Hyper_L Hyper_R Caps_Lock
                          Escape F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12
                          BackSpace Tab Caps_Lock Return Shift_L Shift_R
                          Control_L Control_R Alt_L Alt_R Meta_L Meta_R
                          Super_L Super_R Mode_switch Up Down Left Right
                          Insert Delete Home End Page_Up Page_Down KP_Enter
-                         bracketleft bracketright dead_circumflex ) },
+                         dead_circumflex ) },
 	      translations => {
 		  apostrophe  => 'QUOTE',
 		  asciicircum => 'CARET',
@@ -190,8 +191,18 @@ my %ui_data = (
                   numbersign  => '#',
                   ampersand   => "&",
                   apostrophe  => "'",
+                  asciitilde  => "~",
+                  at          => "@",
+                  backslash   => "\\\\",
+                  braceleft   => "{",
+                  braceright  => "}",
+                  bracketleft => "[",
+                  bracketright => "]",
                   parenleft   => "(",
                   parenright  => ")",
+                  percent     => "%",
+                  question    => "?",
+                  quotedbl    => '\\"',
                   asterisk    => "*",
                   plus        => "+",
                   comma       => ',',
@@ -205,6 +216,7 @@ my %ui_data = (
                   greater     => '>',
                   asciicircum => '^',
                   bar         => '|',
+                  underscore  => '_',
 	      },
 	      function => \&sdl_keysym,
 	      unicode_function => \&sdl_unicode_keysym,
@@ -246,8 +258,9 @@ my %ui_data = (
 					   'dollar','less','greater','exclam',
 					   'ampersand','parenleft','parenright',
 					   'asterisk','plus','colon','bar',
-					   'bracketleft','bracketright',
-					   'asciicircum','dead_circumflex',
+					   'braceleft','braceright','bracketleft','bracketright',
+					   'asciicircum','dead_circumflex','asciitilde','at',
+					   'backslash','percent','question','quotedbl','underscore',
 					   'A' .. 'Z' ) },
 	      translations => { 
 		  numbersign  => 'OEM_5',
@@ -379,13 +392,13 @@ foreach( @keys ) {
 	for( my $i = 0; $i <= $#cooked_keysyms; $i++ ) {
 	    next unless defined $cooked_keysyms[$i] and
 			$cooked_keysyms[$i] eq $ui_keysym;
-	    printf "  { %3i, INPUT_KEY_%-11s },\n", $i, $keysym;
+	    printf "  { %3i, INPUT_KEY_%-12s },\n", $i, $keysym;
 	    last;
 	}
 
     } else {
 
-	printf "  { %-$ui_data{$ui}{max_length}s INPUT_KEY_%-11s },\n",
+	printf "  { %-$ui_data{$ui}{max_length}s INPUT_KEY_%-12s },\n",
             "$ui_keysym,", $keysym;
 
     }
@@ -421,7 +434,7 @@ print "\nkeysyms_map_t unicode_keysyms_map[] = {\n\n";
 
         $ui_keysym = $ui_data{$ui}{unicode_function}->( $ui_keysym );
 
-	printf "  { %-$ui_data{$ui}{max_length}s INPUT_KEY_%-11s },\n",
+	printf "  { %-$ui_data{$ui}{max_length}s INPUT_KEY_%-12s },\n",
             "$ui_keysym,", $keysym;
 
     }

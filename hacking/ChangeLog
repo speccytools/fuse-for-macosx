@@ -5432,3 +5432,5 @@
 20160909 man/fuse.1: fix typos in Recreated ZX Spectrum option (Sergio).
 20160909 data/shell-completion/bash/fuse: update shell completion with Recreated
          ZX Spectrum option (Sergio).
+20160910 input.h,keysyms.dat,keysyms.pl: allow the use of ~@\[]{}%?"_ symbol
+         characters in widget UIs (Sergio).
