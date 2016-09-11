@@ -259,19 +259,13 @@ my %ui_data = (
 					   'ampersand','parenleft','parenright',
 					   'asterisk','plus','colon','bar',
 					   'braceleft','braceright','bracketleft','bracketright',
-					   'asciicircum','dead_circumflex','asciitilde','at',
-					   'backslash','percent','question','quotedbl','underscore',
+					   'apostrophe','asciicircum','dead_circumflex','asciitilde',
+					   'at','backslash','comma','equal','minus','numbersign',
+					   'percent','period','question','quotedbl',
+					   'semicolon','slash','underscore',
 					   'A' .. 'Z' ) },
 	      translations => { 
-		  numbersign  => 'OEM_5',
-		  apostrophe  => 'OEM_7',
-		  comma       => 'OEM_COMMA',
-		  minus       => 'OEM_MINUS',
-		  period      => 'OEM_PERIOD',
-		  slash       => 'OEM_2',
 		  BackSpace   => 'BACK',
-		  semicolon   => 'OEM_1',
-		  equal       => 'OEM_PLUS',
 		  Page_Up     => 'PRIOR',
 		  Page_Down   => 'NEXT',
 		  Caps_Lock   => 'CAPITAL',
@@ -440,6 +434,37 @@ print "\nkeysyms_map_t unicode_keysyms_map[] = {\n\n";
     }
 
 print << "CODE";
+
+  { 0, 0 }			/* End marker: DO NOT MOVE! */
+
+};
+
+CODE
+}
+
+if( $ui eq 'win32' ) {
+
+print << "CODE";
+keysyms_map_t oem_keysyms_map[] = {
+
+  { '&',             INPUT_KEY_ampersand    },
+  { '\\'',            INPUT_KEY_apostrophe   },
+  { '*',             INPUT_KEY_asterisk     },
+  { ':',             INPUT_KEY_colon        },
+  { ',',             INPUT_KEY_comma        },
+  { '\$',             INPUT_KEY_dollar       },
+  { '=',             INPUT_KEY_equal        },
+  { '!',             INPUT_KEY_exclam       },
+  { '>',             INPUT_KEY_greater      },
+  { '<',             INPUT_KEY_less         },
+  { '-',             INPUT_KEY_minus        },
+  { '#',             INPUT_KEY_numbersign   },
+  { '(',             INPUT_KEY_parenleft    },
+  { ')',             INPUT_KEY_parenright   },
+  { '.',             INPUT_KEY_period       },
+  { '+',             INPUT_KEY_plus         },
+  { ';',             INPUT_KEY_semicolon    },
+  { '/',             INPUT_KEY_slash        },
 
   { 0, 0 }			/* End marker: DO NOT MOVE! */
 

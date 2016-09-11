@@ -5434,3 +5434,6 @@
          ZX Spectrum option (Sergio).
 20160910 input.h,keysyms.dat,keysyms.pl: allow the use of ~@\[]{}%?"_ symbol
          characters in widget UIs (Sergio).
+20160911 keyboard.c,keysyms.pl,ui/win32/{win32internals.h,win32keyboard.c,
+         win32ui.c}: map non-alphanumeric keys to appropriate spectrum
+         characters on win32 UI (fixes bug #361) (thanks, Lee Tonks) (Sergio).

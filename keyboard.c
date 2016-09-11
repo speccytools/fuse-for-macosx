@@ -106,6 +106,14 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_slash,       { KEYBOARD_v,     KEYBOARD_Symbol } },
   { INPUT_KEY_Shift_R,     { KEYBOARD_NONE,  KEYBOARD_Caps   } },
 
+  { INPUT_KEY_asterisk,    { KEYBOARD_b,     KEYBOARD_Symbol } },
+  { INPUT_KEY_dollar,      { KEYBOARD_4,     KEYBOARD_Symbol } },
+  { INPUT_KEY_exclam,      { KEYBOARD_1,     KEYBOARD_Symbol } },
+  { INPUT_KEY_less,        { KEYBOARD_r,     KEYBOARD_Symbol } },
+  { INPUT_KEY_parenright,  { KEYBOARD_9,     KEYBOARD_Symbol } },
+  { INPUT_KEY_colon,       { KEYBOARD_z,     KEYBOARD_Symbol } },
+  { INPUT_KEY_plus,        { KEYBOARD_k,     KEYBOARD_Symbol } },
+
   { INPUT_KEY_Control_L,   { KEYBOARD_NONE,  KEYBOARD_Symbol } },
   { INPUT_KEY_Alt_L,       { KEYBOARD_NONE,  KEYBOARD_Symbol } },
   { INPUT_KEY_Meta_L,      { KEYBOARD_NONE,  KEYBOARD_Symbol } },

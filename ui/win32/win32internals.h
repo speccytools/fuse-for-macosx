@@ -87,6 +87,8 @@ void blit( void );
  * Keyboard routines (win32keyboard.c)
  */
 
+void win32keyboard_init( void );
+void win32keyboard_end( void );
 void win32keyboard_keypress( WPARAM wParam, LPARAM lParam );
 void win32keyboard_keyrelease( WPARAM wParam, LPARAM lParam );
 
