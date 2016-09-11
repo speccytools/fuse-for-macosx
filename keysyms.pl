@@ -449,7 +449,15 @@ keysyms_map_t oem_keysyms_map[] = {
 
   { '&',             INPUT_KEY_ampersand    },
   { '\\'',            INPUT_KEY_apostrophe   },
+  { '~',             INPUT_KEY_asciitilde   },
   { '*',             INPUT_KEY_asterisk     },
+  { '\@',             INPUT_KEY_at           },
+  { '\\\\',            INPUT_KEY_backslash    },
+  { '|',             INPUT_KEY_bar          },
+  { '{',             INPUT_KEY_braceleft    },
+  { '}',             INPUT_KEY_braceright   },
+  { '[',             INPUT_KEY_bracketleft  },
+  { ']',             INPUT_KEY_bracketright },
   { ':',             INPUT_KEY_colon        },
   { ',',             INPUT_KEY_comma        },
   { '\$',             INPUT_KEY_dollar       },
@@ -461,10 +469,14 @@ keysyms_map_t oem_keysyms_map[] = {
   { '#',             INPUT_KEY_numbersign   },
   { '(',             INPUT_KEY_parenleft    },
   { ')',             INPUT_KEY_parenright   },
+  { '%',             INPUT_KEY_percent      },
   { '.',             INPUT_KEY_period       },
   { '+',             INPUT_KEY_plus         },
+  { '?',             INPUT_KEY_question     },
+  { '"',             INPUT_KEY_quotedbl     },
   { ';',             INPUT_KEY_semicolon    },
   { '/',             INPUT_KEY_slash        },
+  { '_',             INPUT_KEY_underscore   },
 
   { 0, 0 }			/* End marker: DO NOT MOVE! */
 
