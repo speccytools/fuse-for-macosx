@@ -5439,3 +5439,4 @@
          characters on win32 UI (fixes bug #361) (thanks, Lee Tonks) (Sergio).
 20160911 keysyms.pl: detect more non-alphanumeric keys on win32 UI (more from
          patches #358) (thanks, thrice) (Sergio).
+20160920 man/fuse.1,plus3e-[012].rom: update to v1.43 of the +3e ROMs (Sergio).
