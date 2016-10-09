@@ -29,6 +29,12 @@
 #include <stdlib.h>
 #include <windows.h>
 
+#ifdef HAVE_LIB_GLIB
+#include <glib.h>
+#endif				/* #ifdef HAVE_LIB_GLIB */
+
+#include <libspectrum.h>
+
 #include "display.h"
 #include "fuse.h"
 #include "keyboard.h"

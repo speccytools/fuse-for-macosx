@@ -5442,3 +5442,5 @@
 20160920 man/fuse.1,plus3e-[012].rom: update to v1.43 of the +3e ROMs (Sergio).
 20160920 peripherals/disk/beta.c: reset machine when auto-loading TRD/SCL disks
          (fixes bug #358) (thanks, BogDan Vatra and Fred) (Sergio).
+20161009 ui/win32/win32keyboard.c: must explicitly include glib.h as it is no
+         longer pulled in by libspectrum (fixes bug #362) (Guesser).
