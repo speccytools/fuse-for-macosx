@@ -724,7 +724,7 @@ AC_MSG_RESULT($libxml2)
 if test "$libxml2" = yes; then
   PKG_CHECK_MODULES(
     [XML],
-    [libxml-2.0],
+    [libxml-2.0 >= 2.6.0],
     [AC_DEFINE([HAVE_LIB_XML2], 1, [Defined if we've got libxml2])],
     [AC_MSG_WARN([libxml2 not found - config file will use ini format])
      libxml2="no"]

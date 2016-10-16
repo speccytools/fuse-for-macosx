@@ -5444,3 +5444,5 @@
          (fixes bug #358) (thanks, BogDan Vatra and Fred) (Sergio).
 20161009 ui/win32/win32keyboard.c: must explicitly include glib.h as it is no
          longer pulled in by libspectrum (fixes bug #362) (Guesser).
+20161016 configure.ac,settings.pl: use xmlReadFile() from libxml2 instead of
+         xmlParseFile() (patch #381) (Sergio).

@@ -181,7 +181,7 @@ read_config_file( settings_info *settings )
       return 0;
   }
 
-  doc = xmlParseFile( path );
+  doc = xmlReadFile( path, NULL, 0 );
   if( !doc ) {
     ui_error( UI_ERROR_ERROR, "error reading config file" );
     return 1;
