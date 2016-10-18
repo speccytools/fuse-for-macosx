@@ -1,3 +1,25 @@
+2016-10-02  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.0 released.
+
+        * New features:
+          * Recreated ZX Spectrum Bluetooth keyboard support (thanks, thrice,
+            Philip Kendall and Sergio Baldoví) (Ekkehard Morgenstern).
+
+        * Emulation core improvements:
+          * Reset machine when auto-loading TRD/SCL disks (thanks, BogDan Vatra
+            and Fredrick Meunier) (Sergio Baldoví).
+
+        * Machine specific improvements:
+          * Update +3e ROMs to v1.43 (Sergio Baldoví; thanks, Garry Lancaster).
+
+        * Miscellaneous improvements:
+          * WidgetUI: Add About Fuse dialog with less cluttered text (Sergio
+            Baldoví).
+          * Print summary of enabled features when building Fuse (Alberto
+            Garcia).
+          * Various minor bugfixes.
+
 2016-08-21  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.2.2 released.

@@ -5442,7 +5442,13 @@
 20160920 man/fuse.1,plus3e-[012].rom: update to v1.43 of the +3e ROMs (Sergio).
 20160920 peripherals/disk/beta.c: reset machine when auto-loading TRD/SCL disks
          (fixes bug #358) (thanks, BogDan Vatra and Fred) (Sergio).
+20160924 ChangeLog,README,configure.ac,man/fuse.1: bump versions to 1.3.0
+         (Fred).
+20160924 ChangeLog: tweak thanks for Recreated ZX feature and fix typo (Sergio).
+20161002 ChangeLog,README,man/fuse.1: update release dates for 1.3.0 (Fred).
 20161009 ui/win32/win32keyboard.c: must explicitly include glib.h as it is no
          longer pulled in by libspectrum (fixes bug #362) (Guesser).
 20161016 configure.ac,settings.pl: use xmlReadFile() from libxml2 instead of
          xmlParseFile() (patch #381) (Sergio).
+20161018 ChangeLog,README,configure.ac,man/fuse.1: merge changes from 1.3.0
+         release (Fred).
