@@ -14,5 +14,3 @@ the time could not be determined.
 * void compat_timer_sleep( int ms )
 
 Cause Fuse to go to sleep for the given number of milliseconds.
-
-$Id$

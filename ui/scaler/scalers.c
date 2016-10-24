@@ -1,8 +1,6 @@
 /* scalers.c: the actual graphics scalers
  * Copyright (C) 2003-2015 Fredrick Meunier, Philip Kendall, Gergely Szasz
  *
- * $Id$
- * 
  * Originally taken from ScummVM - Scumm Interpreter
  * Copyright (C) 2001  Ludvig Strigeus
  * Copyright (C) 2001-2003 The ScummVM project
