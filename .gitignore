@@ -48,6 +48,7 @@
 /stamp-h
 /stamp-h1
 /stamp-h.in
+tags
 /ui/fb/keysyms.c
 /ui/gtk/keysyms.c
 /ui/gtk/menu_data.c
