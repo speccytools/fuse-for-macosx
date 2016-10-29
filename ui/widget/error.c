@@ -104,7 +104,8 @@ split_message( const char *message, char ***lines, size_t *count,
   while( *ptr ) {
 
     /* Skip any whitespace */
-    while( *ptr && isspace( *ptr ) ) ptr++; message = ptr;
+    while( *ptr && isspace( *ptr ) ) ptr++;
+    message = ptr;
 
     /* Find end of word */
     while( *ptr && !isspace( *ptr ) ) ptr++;
