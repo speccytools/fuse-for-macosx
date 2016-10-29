@@ -844,8 +844,8 @@ case "$host_os" in
     ;;
   mingw32*)
     COMPAT_OSNAME='win32'
-    AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
-    AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
+    AC_DEFINE([WINVER], 0x0500, [Minimal supported version of Windows is 2000])
+    AC_DEFINE([_WIN32_IE], 0x501, [Internet Explorer 5.01 or higher is required])
     AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
     ;;
   wii)
