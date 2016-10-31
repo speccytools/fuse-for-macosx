@@ -277,10 +277,16 @@ fdd_load( fdd_t *d, int upsidedown )
     d->fdd_heads = d->disk.sides;		/* 1 or 2 */
   if( d->auto_geom )
     d->fdd_cylinders = d->disk.cylinders > settings_current.drive_40_max_track ?
-				settings_current.drive_80_max_track : settings_current.drive_40_max_track;
+				settings_current.drive_80_max_track :
+                                settings_current.drive_40_max_track;
 
-  if( d->disk.cylinders > d->fdd_cylinders + FDD_TRACK_TRESHOLD )
+  if( d->disk.cylinders > d->fdd_cylinders + FDD_TRACK_TRESHOLD ) {
     d->unreadable = 1;
+    ui_error( UI_ERROR_WARNING,
+              "This %d track disk image is incompatible with the configured "
+              "%d track drive. Use disk options to select a compatible drive.",
+              d->disk.cylinders, d->fdd_cylinders );
+  }
 
   d->upsidedown = upsidedown > 0 ? 1 : 0;
   d->wrprot = d->disk.wrprot;		/* write protect */
