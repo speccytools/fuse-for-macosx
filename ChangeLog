@@ -1,3 +1,17 @@
+2016-11-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.1 released.
+
+        * Emulation core improvements:
+          * Warn on inserting large disk image (thanks, Stefano Bodrato)
+            (Fredrick Meunier)
+
+        * Miscellaneous improvements:
+          * Win32: Re-enable standard output for Windows builds (Sergio
+            Baldoví).
+          * Win32: Minimum supported OS is now Windows 2000 (Sergio Baldoví).
+          * Various minor bugfixes.
+
 2016-10-02  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.0 released.
