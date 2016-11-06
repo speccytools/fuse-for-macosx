@@ -247,10 +247,13 @@ section "!Fuse Core Files (required)" SecCore
     File "COPYING.txt"
     File "fuse.exe"
     File "fuse.html"
+    File /nonfatal "LICENSES.txt"
     File /nonfatal "manual*.png"
     File "README.txt"
     File /nonfatal "README-win32.txt"
     File "*.dll"
+    SetOutPath $INSTDIR\3rd-party
+    File /nonfatal "3rd-party\*"
     SetOutPath $INSTDIR\lib
     File "lib\*"
     SetOutPath "$INSTDIR\roms"
