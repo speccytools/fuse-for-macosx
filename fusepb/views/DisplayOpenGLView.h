@@ -18,7 +18,6 @@
    Author contact information:
 
    E-mail: fredm@spamcop.net
-   Postal address: 3/66 Roslyn Gardens, Ruscutters Bay, NSW 2011, Australia
 
 */
 
