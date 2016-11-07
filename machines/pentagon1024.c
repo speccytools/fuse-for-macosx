@@ -2,8 +2,6 @@
                   be a post-1996 Pentagon (a 1024k v2.2 1024SL?).
    Copyright (c) 1999-2011 Philip Kendall and Fredrick Meunier
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or

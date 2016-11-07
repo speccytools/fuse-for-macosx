@@ -1,5 +1,4 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl $Id$
 
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -20,12 +19,12 @@ dnl
 dnl E-mail: philip-fuse@shadowmagic.org.uk
 
 dnl Package version
-m4_define([fuse_version], [1.3.0])
+m4_define([fuse_version], [1.3.1])
 
 dnl Product full version
 m4_define([fuse_major_version], [1])
 m4_define([fuse_minor_version], [3])
-m4_define([fuse_micro_version], [0])
+m4_define([fuse_micro_version], [1])
 m4_define([fuse_nano_version],  [0])
 m4_define([fuse_full_version], [fuse_major_version.fuse_minor_version.fuse_micro_version.fuse_nano_version])
 m4_define([fuse_rc_version], [fuse_major_version,fuse_minor_version,fuse_micro_version,fuse_nano_version])
@@ -845,8 +844,8 @@ case "$host_os" in
     ;;
   mingw32*)
     COMPAT_OSNAME='win32'
-    AC_DEFINE([WINVER], 0x0400, [Minimal supported version of Windows is 95 or NT4])
-    AC_DEFINE([_WIN32_IE], 0x400, [Internet Explorer is 4.0 or higher is required])
+    AC_DEFINE([WINVER], 0x0500, [Minimal supported version of Windows is 2000])
+    AC_DEFINE([_WIN32_IE], 0x501, [Internet Explorer 5.01 or higher is required])
     AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Exclude rarely used stuff from Windows headers <windows.h>])
     ;;
   wii)

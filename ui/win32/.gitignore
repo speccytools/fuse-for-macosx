@@ -1,9 +1,0 @@
-/.deps
-/.dirstamp
-/keysyms.c
-/menu_data.c
-/menu_data.h
-/menu_data.rc
-/options.c
-/options.rc
-/options_internals.h

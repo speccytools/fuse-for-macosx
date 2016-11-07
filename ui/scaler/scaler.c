@@ -2,8 +2,6 @@
  * Copyright (C) 2003 Fredrick Meunier, Philip Kendall
  * Copyright (c) 2015 Sergio Baldoví
  * 
- * $Id$
- *
  * Originally taken from ScummVM - Scumm Interpreter
  * Copyright (C) 2001  Ludvig Strigeus
  * Copyright (C) 2001/2002 The ScummVM project

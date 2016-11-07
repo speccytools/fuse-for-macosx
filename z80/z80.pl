@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
 # z80.pl: generate C code for Z80 opcodes
-# $Id$
 
 # Copyright (c) 1999-2015 Philip Kendall
 

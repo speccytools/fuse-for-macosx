@@ -1,8 +1,6 @@
 /* gtkkeyboard.c: GTK+ routines for dealing with the keyboard
    Copyright (c) 2000-2008 Philip Kendall, Russell Marks
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
