@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <!-- AppleSegStart="Movies -->
+    <title>Compressed Files</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="Compressed
+        Files"></a><!-- AppleSegDescription="This section describes Fuses support of movies." --></font>
+    <div class="refsect1" xml:lang="en" lang="en">
+      <h2><font face="Lucida Grande,Helvetica,Arial">Movie Recording<br>
+        </font></h2>
+    </div>
+    <p>
+      <font face="Lucida Grande,Helvetica,Arial">Fuse can save movies
+        with sound in a specific file format (FMF). This recording is
+        very fast and has a moderate size, but you need to use the
+        fmfconv program in fuse&#8208;utils to convert the format into regular
+        video and/or audio file. The Movie Compression Level preference
+        allows you to set the compression level to None, Lossless or
+        High. The default is Lossless.&nbsp; Recording a movie may slow
+        down emulation, if you experience performance problems, you can
+        try to set compression to None.<br>
+        <br>
+        Fuse records every displayed frame, so by default the recorded
+        file has about 50 video frames per second. A standard&nbsp;
+        video has about&nbsp; 24&#8208;30 frames per second framerate,&nbsp;
+        so if you set the Frame rate 1:n preference to 2 than recording
+        frame rate is reduced to about 25/s. The exact frame rate
+        depends on the Z80 clock frequency which varies depending on the
+        specific emulated machine.<br>
+        Note: You can see all of the Spectrum graphics effects (for
+        example those in scene demos) only if the Fuse frame rate option
+        is set to 1, but in most cases like game software you can safely
+        use a setting of 2. Also, movie recording stops if the emulated
+        machine is changed while recording is in progress.<br>
+        <br>
+        The recorded number of channels matches the sound preferences
+        which is set to mono by default. You can record stereo sound if
+        you use the AY stereo separation preference.<br>
+        <br>
+        You can use the fmfconv program from the fuse-utils package to
+        convert a FMF-format recorded movie file into a standard video
+        file.</font></p>
+    <!-- AppleSegEnd -->
+  </body>
+</html>

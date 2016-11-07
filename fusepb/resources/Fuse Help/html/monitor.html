@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=windows-1252">
+    <!-- AppleSegStart="Monitor/Debugger" -->
+    <title>Monitor/Debugger</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a
+        name="Monitor/Debugger"></a><!-- AppleSegDescription="This section describes the Fuse machine code monitor and debugger." --></font>
+    <div class="refsect1" xml:lang="en" lang="en">
+      <h2><font face="Lucida Grande,Helvetica,Arial">Monitor/Debugger</font></h2>
+    </div>
+    <p> <font face="Lucida Grande,Helvetica,Arial">Fuse features a
+        moderately powerful, completely transparent monitor/debugger,
+        which can be activated via the <span class="emphasis"><em>Machine,
+
+            Debugger...</em></span> menu option. A debugger window will
+        appear, showing the current state of the emulated machine: the
+        top-left `pane' shows the current state of the Z80 and the last
+        bytes written to any emulated peripherals. The bottom-left pane
+        lists any active breakpoints. Moving right, the next pane shows
+        a disassembly, which by default starts at the current program
+        counter, although this can be modified either by the
+        `disassemble' command (see below) or by dragging the scrollbar
+        next to it. The next pane shows the current stack, and the next
+        pane has any `events' which are due to occur and could affect
+        emulation. Below the events pane is the Spectrum's 64K memory
+        map (the <span class="emphasis"><em>W?</em></span> and <span
+          class="emphasis"><em>C?</em></span> indicate whether each
+        displayed chunk is writable or contended respectively). Fuse
+        tracks the memory mapping of the overall address space in 2KB
+        chunks but will summarise the mapped pages where they are part
+        of the same page of the underlying memory source (e.g. 8KB page
+        sizes in the Spectrum 128K and 4KB pages in the Timex clones'
+        DOCK and EXROM banks). Below the displays are an entry box for
+        debugger commands, and five buttons for controlling the
+        debugger:</font></p>
+    <p> <span class="emphasis"><font face="Lucida
+          Grande,Helvetica,Arial"><em>Evaluate</em></font></span> <font
+        face="Lucida Grande,Helvetica,Arial">Evaluate the command
+        currently in the entry box.</font></p>
+    <p> <span class="emphasis"><font face="Lucida
+          Grande,Helvetica,Arial"><em>Single Step</em></font></span> <font
+        face="Lucida Grande,Helvetica,Arial">Run precisely one Z80
+        opcode and then stop emulation again.</font></p>
+    <p> <span class="emphasis"><font face="Lucida
+          Grande,Helvetica,Arial"><em>Continue</em></font></span> <font
+        face="Lucida Grande,Helvetica,Arial">Restart emulation, but
+        leave the debugger window open. Note that the debugger window
+        will not be updated while emulation is running.</font></p>
+    <p> <span class="emphasis"><font face="Lucida
+          Grande,Helvetica,Arial"><em>Break</em></font></span> <font
+        face="Lucida Grande,Helvetica,Arial">Stop emulation and return
+        to the debugger.</font></p>
+    <p> <span class="emphasis"><font face="Lucida
+          Grande,Helvetica,Arial"><em>Close</em></font></span> <font
+        face="Lucida Grande,Helvetica,Arial">Close the debugger window
+        and restart emulation.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">Double-clicking on
+        an entry in the stack pane will cause emulation to run until the
+        program counter reaches the value stored at that address, while
+        double-clicking on an entry in the `events' pane will cause
+        emulation to run until that time is reached.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">The main power of
+        the debugger is via the commands entered into the entry box,
+        which are similar in nature (but definitely not identical to or
+        as powerful as) to those in the <em><span class="citerefentry">gdb</span></em>
+        debugger. In general, the debugger is case-insensitive, and
+        numbers will be interpreted as decimal, unless prefixed by
+        either `<span class="emphasis"><em>0x</em></span>' or `<span
+          class="emphasis"><em>$</em></span>' when they will be
+        interpreted as hex. Each command can be abbreviated to the
+        portion not in curly braces.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">ba{se} <span
+          class="emphasis"><em>number</em></span> Change the debugger
+        window to displaying output in base <span class="emphasis"><em>number</em></span>.
+        Available values are 10 (decimal) or 16 (hex).</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">br{eakpoint} [<span
+          class="emphasis"><em>address</em></span>] [if <span
+          class="emphasis"><em>condition</em></span>] Set a breakpoint
+        to stop emulation and return to the debugger whenever an opcode
+        is executed at <span class="emphasis"><em>address</em></span>
+        and <span class="emphasis"><em>condition</em></span> evaluates
+        true. If <span class="emphasis"><em>address</em></span> is
+        omitted, it defaults to the current value of PC.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">br{eakpoint} p{ort}
+        (r{ead}|w{rite}) <span class="emphasis"><em>port</em></span>
+        [if <span class="emphasis"><em>condition</em></span>] Set a
+        breakpoint to trigger whenever IO port <span class="emphasis"><em>port</em></span>
+        is read from or written to and <span class="emphasis"><em>condition</em></span>
+        evaluates true.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">br{eakpoint}
+        (r{ead}|w{rite}) [<span class="emphasis"><em>address</em></span>]
+        [if <span class="emphasis"><em>condition</em></span>] Set a
+        breakpoint to trigger whenever memory location <span
+          class="emphasis"><em>address</em></span> is read from (other
+        than via an opcode fetch) or written to and <span
+          class="emphasis"><em>condition</em></span> evaluates true. <span
+          class="emphasis"><em>Address</em></span> again defaults to the
+        current value of PC if omitted.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">br{eakpoint} ti{me}
+        <span class="emphasis"><em>time</em></span> [if <span
+          class="emphasis"><em>condition</em></span>] Set a breakpoint
+        to occur <span class="emphasis"><em>time</em></span> tstates
+        after the start of every frame, assuming <span class="emphasis"><em>condition</em></span>
+        evaluates true (if one is given).</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">br{eakpoint} ev{ent} <span
+          class="emphasis"><em>area</em></span>:<span class="emphasis"><em>detail</em></span>
+        [if <span class="emphasis"><em>condition</em></span>] Set a
+        breakpoint to occur when the event specified by <span
+          class="emphasis"><em>area</em></span> <span class="emphasis"><em>detail</em></span>
+        occurs and <span class="emphasis"><em>condition</em></span>
+        evaluates to true. The events which can be caught are:</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">beta128:page <br>
+        beta128:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The Beta 128 interface is paged into or
+        out of memory respectively.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">didaktik80:page <br>
+        didaktik80:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The Didaktik 80 interface is paged into
+        or out of memory respectively.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">disciple:page <br>
+        disciple:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The DISCiPLE interface is paged into or
+        out of memory respectively.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">divide:page <br>
+        divide:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The DivIDE interface is paged into or
+        out of memory respectively.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">if1:page <br>
+        if1:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The Interface 1 shadow ROM is paged into
+        or out of memory.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">opus:page <br>
+        opus:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The Opus Discovery is paged into or out
+        of memory respectively.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">plusd:page <br>
+        plusd:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The +D interface is paged into or out of
+        memory respectively.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">speccyboot:page <br>
+        speccyboot:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The SpeccyBoot interface is paged into
+        or out of memory.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">spectranet:page <br>
+        spectranet:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The Spectranet interface is paged into
+        or out of memory.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">rzx:end</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">An RZX recording finishes playing.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">tape:play <br>
+        tape:stop</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The emulated tape starts or stops
+        playing.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">zxatasp:page <br>
+        zxatasp:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The ZXATASP interface is paged into or
+        out of memory.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">zxcf:page <br>
+        zxcf:unpage</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The ZXCF interface is paged into or out
+        of memory.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">In all cases, the
+        event can be specified as <i>area</i>:* to catch all events
+        from that area.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">cl{ear} [<span
+          class="emphasis"><em>address</em></span>] Remove all
+        breakpoints at <span class="emphasis"><em>address</em></span>
+        or the current value of PC if <span class="emphasis"><em>address</em></span>
+        is omitted. Port read/write breakpoints are unaffected.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">cond{ition} <span
+          class="emphasis"><em>id</em></span> [<span class="emphasis"><em>condition</em></span>]
+        Set breakpoint <span class="emphasis"><em>id</em></span> to
+        trigger only when <span class="emphasis"><em>condition</em></span>
+        is true, or unconditionally if <span class="emphasis"><em>condition</em></span>
+        is omitted.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">co{ntinue}
+        Equivalent to the <span class="emphasis"><em>Continue</em></span>
+        button.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">del{ete} [<span
+          class="emphasis"><em>id</em></span>] Remove breakpoint <span
+          class="emphasis"><em>id</em></span>, or all breakpoints if <span
+          class="emphasis"><em>id</em></span> is omitted.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">di{sassemble} <span
+          class="emphasis"><em>address</em></span> Set the centre panel
+        disassembly to begin at <span class="emphasis"><em>address</em></span>.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">fi{nish} Exit from
+        the current CALL or equivalent. This isn't infallible: it works
+        by setting a temporary breakpoint at the current contents of the
+        stack pointer, so will not function correctly if the code
+        returns to some other point or plays with its stack in other
+        ways. Also, setting this breakpoint doesn't disable other
+        breakpoints, which may trigger before this one. In that case,
+        the temporary breakpoint remains, and the `continue' command can
+        be used to return to it.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">i{gnore} <span
+          class="emphasis"><em>id count</em></span> Do not trigger the
+        next <span class="emphasis"><em>count</em></span> times that
+        breakpoint <span class="emphasis"><em>id</em></span> would have
+        triggered.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">n{ext} Step to the
+        opcode following the current one. As with the `finish' command,
+        this works by setting a temporary breakpoint at the next opcode,
+        so is not infalliable.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">o{ut} <span
+          class="emphasis"><em>port value</em></span> Write <span
+          class="emphasis"><em>value</em></span> to IO port <span
+          class="emphasis"><em>port</em></span>.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">se{t} <span
+          class="emphasis"><em>address value</em></span> Poke <span
+          class="emphasis"><em>value</em></span> into memory at <span
+          class="emphasis"><em>address</em></span>.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">se{t} <span
+          class="emphasis"><em>register value</em></span> Set the value
+        of the Z80 register <span class="emphasis"><em>register</em></span>
+        to <span class="emphasis"><em>value</em></span>.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">se{t} <span
+          style="font-style: italic;">mode</span><span class="emphasis"><em>
+            value</em></span> Set the interrupt mode or interrupt flip
+        flops (im, iff1 or iff2)</font><font face="Lucida
+        Grande,Helvetica,Arial"> to <span class="emphasis"><em>value</em></span>.</font><font
+        face="Lucida Grande,Helvetica,Arial"> If the im mode is not 0, 1
+        or 2 it will be ignored, while non-zero iff values will be
+        converted to one.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">se{t} <span
+          class="emphasis"><em>$variable value</em></span> Set the value
+        of the debugger variable <span class="emphasis"><em>variable</em></span>
+        to <span class="emphasis"><em>value</em></span>.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">se{t} <span
+          class="emphasis"><em>area:detail value</em></span> Set the
+        value of the system variable <span class="emphasis"><em>area :
+            detail</em></span> to <span class="emphasis"><em>value</em></span>.</font><font
+        face="Lucida Grande,Helvetica,Arial"> The available system
+        variables are listed below.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">s{tep} Equivalent to
+        the <span class="emphasis"><em>Single Step</em></span> button.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">t{breakpoint} [<span
+          class="emphasis"><em>options</em></span>] This is the same as
+        the `breakpoint' command in its various forms, except that the
+        breakpoint is temporary: it will trigger once and once only, and
+        then be removed.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">Addresses can be
+        specified in one of two forms: either an absolute addresses,
+        specifed by an integer in the range 0x0000 to 0xFFFF or as a `<span
+          class="emphasis"><em>source</em></span>:<span class="emphasis"><em>page</em></span>:<span
+          class="emphasis"> <em>offset</em></span> ' combination, which
+        refers to a location <span class="emphasis"><em>offset</em></span>
+        bytes into the memory bank <span class="emphasis"><em>page</em></span>,
+        independent of where that bank is currently paged into memory.
+        RAM and ROM pages are indicated, respectively, by `<span
+          style="font-style: italic;">RAM</span>' and `<span
+          style="font-style: italic;">ROM</span>' sources (e.g. offset
+        0x1234 in ROM 1 is specified as `<span style="font-style:
+          italic;">ROM:1:0x1234</span>'). Other available sources are: `<span
+          style="font-style: italic;">Betadisk</span>', `<span
+          style="font-style: italic;">"Didaktik 80 RAM"</span>', `<span
+          style="font-style: italic;">"Didaktik 80 ROM"</span>', `<span
+          style="font-style: italic;">"DISCiPLE RAM"</span>', `<span
+          style="font-style: italic;">"DISCiPLE ROM"</span>', `<span
+          style="font-style: italic;">"DivIDE EPROM"</span>', `<span
+          style="font-style: italic;">"DivIDE RAM"</span>', `<span
+          style="font-style: italic;">If1</span>', `<span
+          style="font-style: italic;">If2</span>', `<span
+          style="font-style: italic;">"Opus RAM"</span>', `<span
+          style="font-style: italic;">"Opus ROM"</span>', `<span
+          style="font-style: italic;">PlusD RAM</span>', `<span
+          style="font-style: italic;">PlusD ROM</span>', `<span
+          style="font-style: italic;">SpeccyBoot</span>', `<span
+          style="font-style: italic;">Spectranet</span>', `<span
+          style="font-style: italic;">"Timex Dock"</span>', `<span
+          style="font-style: italic;">"Timex EXROM"</span>', `<span
+          style="font-style: italic;">ZXATASP</span>' and `<span
+          style="font-style: italic;">ZXCF</span>'. <br>
+        Please, note that spaces in memory sources should be escaped,
+        e.g.,`break Didaktik\ 80\ ROM:0:0x1234'. The 48K machines are
+        treated as having a permanent mapping of page 5 at 0x4000, page
+        2 at 0x8000 and page 0 at 0xC000; the 16K Spectrum is treated as
+        having page 5 at 0x4000 and no page at 0x8000 and 0xC000.</font></p>
+    <p> <font face="Lucida Grande,Helvetica,Arial">Anywhere the
+        debugger is expecting a numeric value, except where it expects a
+        breakpoint id, you can instead use a numeric expression, which
+        uses a restricted version of C's syntax; exactly the same syntax
+        is used for conditional breakpoints, with `0' being false and
+        any other value being true. In numeric expressions, you can use
+        integer constants (all calculations are done in integers),
+        system variables, debugger variables, parentheses, the standard
+        four numeric operations (`+', `-', `*' and `/'), the
+        (non-)equality operators `==' and `!=', the comparision
+        operators `&gt;', `&lt;', `&gt;=' and `&lt;=', bitwise and
+        (`&amp;'), or (`|') and exclusive or (`^') and logical and
+        (`&amp;&amp;') and or (`||').<br>
+      </font></p>
+    <font face="Lucida Grande,Helvetica,Arial"> </font>
+    <p><font face="Lucida Grande,Helvetica,Arial"> System variables are
+        specified via an ‘area:detail’ syntax. The available system
+        variables are:<br>
+      </font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">ay:current</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The current AY&#8208;3&#8208;8912 register.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial">ula:last</font></font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The last byte written to the ULA. Note
+        that this variable can only be read, not written to.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial">ula:mem1ffd</font></font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The last byte written to memory control
+        port used by the ZX Spectrum +2A/3; normally addressed at
+        0x1ffd, hence the name.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial">ula:mem7ffd</font></font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The last byte written to primary memory
+        control port used by the ZX Spectrum 128 and later; normally
+        addressed at 0x7ffd, hence the name.</font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial">ula:tstates</font></font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The number of tstates since the last
+        interrupt.<br>
+      </font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">z80: <span class="emphasis"><em>register
+
+            name</em></span></font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The value of the specified register.
+        Both 8&#8208;bit registers and 16&#8208;bit register pairs are supported.<br>
+      </font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">z80:im</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">The current interrupt mode of the Z80.<br>
+      </font></p>
+    <p style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">z80:iff1 <br>
+        z80:iff2</font></p>
+    <p style="margin-left: 80px;"><font face="Lucida
+        Grande,Helvetica,Arial">1 if the specified interrupt flip&#8208;flop
+        is currently set, or 0 if it is not set.<br>
+      </font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">The Z80 registers,
+        interrupt mode and interrupt flip&#8208;flops can also be specified
+        without the ‘z80:’ prefix, but this syntax is deprecated and
+        will be removed in Fuse 1.4.</font></p>
+    <!-- AppleSegEnd -->
+  </body>
+</html>

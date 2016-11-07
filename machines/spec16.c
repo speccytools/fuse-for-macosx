@@ -93,8 +93,8 @@ spec16_reset( void )
 {
   int error;
 
-  error = machine_load_rom( 0, settings_current.rom_16, 
-                            settings_default.rom_16, 0x4000 );
+  error = machine_load_rom( 0, settings_current.rom_16_0, 
+                            settings_default.rom_16_0, 0x4000 );
   if( error ) return error;
 
   ensure_empty_mapping();

@@ -27,6 +27,7 @@
 #define FUSE_FUSE_H
 
 #include <limits.h>
+#include <sys/syslimits.h>
 
 #include <libspectrum.h>
 
@@ -45,6 +46,11 @@ int fuse_main(int argc, char **argv);
 #endif
 
 void fuse_abort( void ) GCC_NORETURN;	/* Emergency shutdown */
+
+int fuse_init(int argc, char **argv);
+
+int fuse_end(void);                     /* Tidy-up function called at end of
+                                           emulation */
 
 extern libspectrum_creator *fuse_creator; /* Creator information for file
 					     formats which support this */

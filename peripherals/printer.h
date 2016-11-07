@@ -33,5 +33,9 @@ void printer_serial_write( libspectrum_byte b );
 void printer_parallel_strobe_write( int on );
 void printer_parallel_write( libspectrum_word port, libspectrum_byte b );
 void printer_register_startup( void );
+/* macOS: we want to be able to reset the printer path when preferences
+   change, so make printer_init() and printer_end() available */
+int printer_init( void *context );
+void printer_end( void );
 
 #endif				/* #ifndef FUSE_PRINTER_H */

@@ -48,6 +48,12 @@ typedef void (*event_fn_t)( libspectrum_dword tstates, int type, void *user_data
 /* When will the next event happen? */
 extern libspectrum_dword event_next_event;
 
+/* We are at the end of a frame */
+extern int event_frame_end;
+
+/* We've had a timer event */
+extern int event_timer;
+
 /* Register a new event type */
 int event_register( event_fn_t fn, const char *description );
 

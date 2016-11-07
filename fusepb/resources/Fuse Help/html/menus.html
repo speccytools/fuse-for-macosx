@@ -1,0 +1,904 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=windows-1252">
+    <!-- AppleSegStart="Menus And Keys" -->
+    <title>Menus And Keys</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="Menus And Keys"></a><!-- AppleSegDescription="This section describes the Fuse menus and options." --></font>
+    <div class="refsect1" xml:lang="en" lang="en">
+      <h2><font face="Lucida Grande,Helvetica,Arial">Menus And Keys</font></h2>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">Since many of the keys
+        available are devoted to emulation of the Spectrum's keyboard,
+        the primary way of controlling Fuse itself (rather than the
+        emulated machine) is via the menus. There are also shortcuts for
+        some menu options.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">Here's what the menu
+        options do, along with the shortcuts for those items which have
+        them:<br>
+      </font></p>
+    <table style="text-align: left; width: 100%;" cellpadding="2"
+      cellspacing="2">
+      <tbody>
+        <tr>
+          <th style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">MENU</font></th>
+          <th style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">SHORTCUT</font></th>
+          <th style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">DESCRIPTION</font></th>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt; Open
+                  File…</em></font></span></td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>&#8984;-O</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Open a Spectrum file. Snapshots
+              will be loaded into memory; tape images will be inserted
+              into the emulated tape deck, and if the <span
+                class="emphasis"><em>Auto-load tapes/disks</em></span>
+              option is set will begin loading. Opening a disk image or
+              a Timex dock image will cause the appropriate machine type
+              (+3, <font face="Lucida Grande,Helvetica,Arial">Sco<font
+                  face="Lucida Grande,Helvetica,Arial">r<font
+                    face="Lucida Grande,Helvetica,Arial">pion</font></font></font>
+              or TC2068) to be selected with the image inserted, and
+              disks will automatically load if the <span
+                class="emphasis"><em>Auto-load tapes/disks</em></span>
+              option is set.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt; Save
+                  Snapshot As…</em></font></span></td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Shift-&#8984;-S</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Save a snapshot (machine state,
+              memory contents, etc.). By default the file will be saved
+              in SZX format, you can also save in the Z80 or SNA formats
+              by selecting the appropriate format from the Format popup
+              button.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording, Record…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Start recording input to an RZX
+              file, initialised from the current emulation state.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Record from Snapshot…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Start recording input to an RZX
+              file, initialised from a snapshot. You will first be asked
+              for the snapshot to use and then for the file to save the
+              recording to.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Continue Recording…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Continue recording input into an
+              existing RZX file from the last recorded state. Finalised
+              recordings cannot be resumed. You will be prompted for the
+              recording to continue.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Insert Bookmark</em></font></span></td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>&#8984;-B</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Inserts a bookmark of the current
+              state into the RZX file. This can be used at a later point
+              to roll back to the inserted state by using one of the
+              commands below.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Go To Last Bookmark</em></font></span></td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>&#8984;-Z</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Rolls back the recording to the
+              point at which the previous bookmark was inserted.
+              Recording will continue from that point.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Go To Bookmark…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Roll back the recording to any
+              bookmark which has been inserted into the recording.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Play…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Playback recorded input from an
+              RZX file. This lets you replay keypresses recorded
+              previously. RZX files generally contain a snapshot with
+              the Spectrum's state at the start of the recording; if the
+              selected RZX file doesn't, you'll be prompted for a
+              snapshot to load as well.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Stop</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Stop any
+              currently-recording/playing RZX file.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Emulator Recording &gt; Finalise Recording…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Compact an RZX file. Any
+              interspersed snapshots will be removed and the recording
+              cannot be continued. All action replays submitted to the
+              RZX Archive should be finalised.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt; AY
+                  Sound Recording &gt; Record…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Start recording the bytes output
+              via the AY-3-8912 sound chip to a PSG file.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt; AY
+                  Sound Recording &gt; Stop</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Stop any current AY logging.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt; Open
+                  Screenshot…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Load an SCR screenshot
+              (essentially just a binary dump of the Spectrum's video
+              memory) onto the current screen. Fuse supports screenshots
+              saved in the Timex hi-colour and hi-res modes as well as
+              `normal' Spectrum screens, and will make a simple
+              conversion if a hi-colour or hi-res screenshot is loaded
+              onto a non-Timex machine.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt; Save
+                  Screenshot As…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Save a copy of whatever's
+              currently displayed on the Spectrum's screen as an SCR
+              file.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Export Screenshot…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Save the current screen as any
+              supported format (currently PNG, TIFF, BMP, JPG and GIF).</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Import Binary Data…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Load binary data from a file into
+              the Spectrum's memory. After selecting the file to load
+              data from, you can choose where to load the data and how
+              much data to load.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>File &gt;
+                  Export Binary Data…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Save an arbitrary chunk of the
+              Spectrum's memory to a file. Select the file you wish to
+              save to, followed by the location and length of data you
+              wish to save.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Machine &gt;
+                  Reset</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Reset the emulated Spectrum.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Machine &gt;
+                  Hard Reset</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Reset the emulated Spectrum. A
+              hard reset is equivalent to turning the Spectrum's power
+              off, and then turning it back on.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Machine &gt;
+                  Debugger</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Start the monitor/debugger. See
+              the <a href="monitor.html"><span class="emphasis"><em>Monitor/Debugger</em></span></a>
+              section for more information.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Machine &gt;
+                  POKE Finder</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Start the `poke finder'. See the <a
+                href="pokefinder.html"><span class="emphasis"><em>POKE
+                    Finder</em></span></a> section for more information.</font></td>
+        </tr>
+        <tr>
+          <td valign="top"><span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Machine &gt; POKEs/Cheats<br>
+                </em></font></span></td>
+          <td valign="top"><br>
+          </td>
+          <td valign="top"><font face="Lucida Grande,Helvetica,Arial">Allow
+              one to use multiface POKEs for things such as infinite
+              lives. See the <a href="pokememory.html"><span
+                  class="emphasis"><em>POKES/Cheats</em></span></a>
+              section for more information.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Machine &gt;
+                  Memory Browser</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Start the memory browser. It
+              should be fairly obvious what this does; perhaps the only
+              thing worth noting is that emulation is paused until you
+              close the window.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Machine &gt;
+                  NMI</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Sends a non-maskable interrupt to
+              the emulated Spectrum. Due to a typo in the standard 48K
+              ROM, this will cause a reset, but modified ROMs are
+              available which make use of this feature. When the +D (or
+              DISCiPLE) is emulated, this is used to access the +D (or
+              DISCiPLE)'s screenshot and snapshot features (see the </font><a
+              href="plusd.html"><font face="Lucida
+                Grande,Helvetica,Arial"><span class="emphasis"><em>+D
+                    Emulation</em></span></font></a><font face="Lucida
+              Grande,Helvetica,Arial"> and </font><a
+              href="disciple.html"><font face="Lucida
+                Grande,Helvetica,Arial"><span class="emphasis"><em>DISCIPLE
+
+
+                    Emulation</em></span></font></a><font face="Lucida
+              Grande,Helvetica,Arial"> sections for more information).
+              For the DISCiPLE, Caps Shift must be held down whilst
+              pressing the NMI button. Note that GDOS on the DISCiPLE
+              contains a bug which causes corruption of saved snapshots,
+              and a failure to return from the NMI menu correctly.&nbsp;
+              This bug is not present in G+DOS on the +D.<br>
+            </font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em><span
+                    class="emphasis"><font face="Lucida
+                      Grande,Helvetica,Arial"><em>Machine &gt; </em></font></span>Didaktik
+
+                  SNAP</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Presses the Didaktik 80 (or
+              Didaktik 40)<font face="Lucida Grande,Helvetica,Arial">'</font>s
+              `SNAP' button.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em><span
+                    class="emphasis"><font face="Lucida
+                      Grande,Helvetica,Arial"><em>Machine &gt; </em></font></span>Bind
+                  Keys to Joystick</em></font></span></td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>&#8984;-J</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is selected and the
+              Keyboard joystick is configured via the </font><font
+              face="Lucida Grande,Helvetica,Arial"><span
+                class="emphasis"><em>Preferences</em></span></font><font
+              face="Lucida Grande,Helvetica,Arial"><span
+                class="emphasis"><em>, Joysticks</em></span></font><font
+              face="Lucida Grande,Helvetica,Arial"> menu, the q, a, o,
+              p, and space keys will not have their normal effect and
+              will be used as the up, down, left, right and fire buttons
+              of the joystick respectively. This setting can be toggled
+              with <span class="emphasis"><em>&#8984;-J</em></span>.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Tape &gt; Open…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;">
+            <p><font face="Lucida Grande,Helvetica,Arial">Choose a PZX,
+                TAP or TZX virtual-tape file to load from. If <span
+                  class="emphasis"><em>Auto-load tapes/disks</em></span>
+                is set in the </font><font face="Lucida
+                Grande,Helvetica,Arial"><span class="emphasis"><em>Preferences,
+
+
+
+                    General</em></span></font><font face="Lucida
+                Grande,Helvetica,Arial"> dialog (as it is by default),
+                the tape will begin loading. Otherwise, you have to
+                start the load in the emulated machine (with LOAD "" or
+                the 128's Tape Loader option, though you may need to
+                reset first).</font></p>
+            <font face="Lucida Grande,Helvetica,Arial"> </font>
+            <p><font face="Lucida Grande,Helvetica,Arial"> </font><font
+                face="Lucida Grande,Helvetica,Arial">To <span
+                  class="emphasis"><em>guarantee</em></span> that TZX
+                files will load properly, you should select the file,
+                make sure tape-loading traps are disabled in the </font><font
+                face="Lucida Grande,Helvetica,Arial"><span
+                  class="emphasis"><em>Preferences, General</em></span></font><font
+                face="Lucida Grande,Helvetica,Arial"> dialog, then
+                select the <span class="emphasis"><em>Tape, Play</em></span>
+                option. That said, most TZXs will work with tape-loading
+                traps enabled (often quickly loading partway, then
+                loading the rest real-time), so you might want to try it
+                that way first.</font></p>
+          </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Tape &gt; Play</em></font></span>
+          </td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Start playing the PZX, TAP or TZX
+              file, if required. (Choosing the option again pauses
+              playback, and a further press resumes). To explain - if
+              tape-loading traps have been disabled (in the </font><font
+              face="Lucida Grande,Helvetica,Arial"><span
+                class="emphasis"><em>Preferences, General</em></span></font><font
+              face="Lucida Grande,Helvetica,Arial"> dialog), starting
+              the loading process in the emulated machine isn't enough.
+              You also have to `press play', so to speak :-), and this
+              is how you do that. You may also need to `press play' like
+              this in certain other circumstances, e.g. TZXs containing
+              multi-load games may have a stop-the-tape request (which
+              Fuse obeys).</font> </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Tape &gt; Browse</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Browse through the current tape. A
+              brief display of each of the data blocks on the current
+              tape will appear, from which you can select which block
+              Fuse will play next. Emulation will continue while the
+              browser is displayed; clicking on a block will select it
+              and `fast-foward' the virtual tape deck.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span><span
+              style="font-family: Lucida Grande,Helvetica,Arial;"><span
+                style="font-style: italic;"> </span></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Tape &gt; Rewind</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Rewind the current virtual tape,
+              so it can be read again from the beginning.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Tape &gt; Close</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Close the current virtual tape
+              file. This is particularly useful when you want a `clean
+              slate' to add newly-saved files to, before doing <span
+                class="emphasis"><em>Tape, Save As…</em></span></font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Tape &gt; Save As…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Write the current virtual-tape
+              contents to a TZX file. The virtual-tape contents are the
+              contents of the previously-loaded tape (if any has been
+              loaded since you last did a <span class="emphasis"><em>Tape,
+
+
+
+                  Close</em></span>), followed by anything you've saved
+              from the emulated machine since. These newly-saved files
+              are <span class="emphasis"><em>not</em></span> written to
+              any tape file until you choose this option!</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Microdrive</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Virtual Microdrive images are
+              accessible only when the Interface I is active from the </font><font
+              face="Lucida Grande,Helvetica,Arial"><span
+                class="emphasis"><em>Preferences</em></span></font><font
+              face="Lucida Grande,Helvetica,Arial"><span
+                class="emphasis"><em>, Peripherals</em></span></font><font
+              face="Lucida Grande,Helvetica,Arial"> menu. Note that any
+              changes to the Microdrive image will not be written to the
+              file on disk until the appropriate `eject and write'
+              option is used. Each Microdrive cartridge has it's own
+              version of the following menus:</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Microdrive 1 &gt; Insert New</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Insert a new (unformatted)
+              Microdrive cartridge into emulated Microdrive 1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Microdrive 1 &gt; Insert…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Select a Microdrive cartridge
+              image file to read/write</font><font face="Lucida
+              Grande,Helvetica,Arial"> into emulated Microdrive 1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Microdrive 1 &gt; Eject</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Eject the Microdrive image in
+              Microdrive 1. If the image has been modified, you will be
+              asked as to whether you want any changes saved.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Microdrive 1 &gt; Save</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Save the Microdrive image in
+              Microdrive 1</font><font face="Lucida
+              Grande,Helvetica,Arial">, and then eject the image</font><font
+              face="Lucida Grande,Helvetica,Arial">.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Microdrive 1 &gt; Save as…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Write the Microdrive image in
+              Microdrive 1 to a new file, and then eject the
+              image.&nbsp; You will be prompted for a filename.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Microdrive 1 &gt; Write
+                  protect &gt; Enable</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Enable the write protect tab for
+              the image in Microdrive 1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive<br>
+                </em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Virtual disk images are only
+              accessible when emulating a disk interface, +3, Pentagon
+              or Scorpion. If any of the disk options are selected while
+              emulating a +3, they refer to the +3's disk drives, which
+              both default to being the 3" type (in effect, the internal
+              drive plus an external FD-1). With the usual +3 format,
+              these have a capacity of 173K. If the Pentagon or Scorpion
+              is being emulated, these options refer to the Beta disk
+              drives. If any other machine is being emulated this menu
+              cannot be selected unless a disk interface like the Opus
+              Discovery, +D, DISCiPLE or Beta 128 is being emulated.
+              (See <a href="dsk.html"><span class="emphasis"><em>The
+                    .DSK Format</em></span></a> and <a
+                href="trdos.html"><span class="emphasis"><em>Beta Disk
+                    Formats</em></span></a> sections for notes on the
+              file formats supported).</font>
+            <p><font face="Lucida Grande,Helvetica,Arial">Note that
+                (since version 0.6.2), Fuse works with true virtual disk
+                images: any changes made to a disk image will not affect
+                the file which was `inserted' into the drive. If you do
+                want to keep any changes, use the appropriate `eject and
+                write' option before exiting Fuse.</font></p>
+          </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive A:</em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em> &gt; New</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Insert a new (unformatted) disk
+              cartridge into emulated drive A:/1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive A: &gt; Insert…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Select a disk-image file to
+              read/write in the&nbsp; emulated drive A:/1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive A: &gt; Eject</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Deselect the disk image currently
+              in the machine's drive A:/1 - or from the emulated
+              machine's perspective, eject it. Note that any changes
+              made to the image will not be saved.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive A: &gt; Save</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Deselect the disk image currently
+              in the machine's drive A:/1 and save the current state of
+              the disk.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive A: &gt; Save as…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Deselect the disk image currently
+              in the machine's drive A:/1 and save the current state of
+              the disk to a new file. </font><font face="Lucida
+              Grande,Helvetica,Arial">You will be prompted for a
+              filename.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive A: &gt; Flip</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Flip the disk image currently in
+              the machine's drive A:/1, only applicable for single sided
+              drives and two-sided disk images.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive A: &gt; Write Protect</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Enable the write protect tab for
+              the image in drive A:/1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive B:</em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em> &gt; New</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">As above, but for the machine's
+              drive B:/1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive B: &gt; Insert…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">As above, but for the machine's
+              drive B:/1.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; </em></font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive B: &gt; Eject</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">As above, but for drive B:/2.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;
+                  Drive B: &gt; Save</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">As above, but for
+                drive B:/2.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;
+                  Drive B: &gt; Save as…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">As above, but for
+                drive B:/2.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive B: &gt; Flip</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Flip the disk image currently in
+              the machine's drive B:/2, only applicable for single sided
+              drives and two-sided disk images.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;</em></font></span>
+            <span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Drive B: &gt; Write Protect</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Enable the write protect tab for
+              the image in drive B:/2.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;
+                  Cartridge &gt; Open…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">Insert a cartridge
+                into the Timex 2068 dock or Interface II </font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial">cartridge </font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial">slot. This will cause the
+                emulated machine to be reset.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt;
+                  Cartridge &gt; Close</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">Remove the
+                cartridge from the Timex 2068 dock</font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"> or Interface II </font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial">cartridge </font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial">slot</font></span><span
+              class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial">. This will cause the emulated
+                machine to be reset.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; IDE
+                  Master &gt; Insert…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">Connect an IDE hard
+                disk to the current IDE interface's master channel.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; IDE
+                  Master &gt; Commit</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">Cause any writes
+                which have been done to virtual hard disk attached to
+                the current IDE interface's master channel to be
+                committed to the real disk, such that they survive the
+                virtual disk being ejected.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; IDE
+                  Master &gt; Eject</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">Eject the virtual
+                hard disk from the current IDE interface's master
+                channel. Note that any writes to the virtual hard disk
+                will be lost unless the <span class="emphasis"><em>Media,
+
+
+                    IDE Master, Commit</em></span> option is used before
+                the disk is ejected.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; IDE
+                  Slave &gt; Insert…</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">The same as the <span
+                  class="emphasis"><em>Media, IDE Master</em></span>
+                entries above, but for the current IDE interface's slave
+                channel.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; IDE
+                  Slave &gt; Commit</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">The same as the <span
+                  class="emphasis"><em>Media, IDE Master</em></span>
+                entries above, but for the current IDE interface's slave
+                channel.</font></span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Media &gt; IDE
+                  Slave &gt; Eject</em></font></span></td>
+          <td style="vertical-align: top;"><br>
+          </td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial">The same as the <span
+                  class="emphasis"><em>Media, IDE Master</em></span>
+                entries above, but for the current IDE interface's slave
+                channel.</font></span></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- AppleSegEnd -->
+  </body>
+</html>

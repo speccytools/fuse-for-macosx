@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=ISO-8859-1">
+    <!-- AppleSegStart="Spectranet Emulation" -->
+    <title>Spectranet Emulation</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="Spectranet
+        Emulation"></a><!-- AppleSegDescription="This section describes the Spectranet interface emulation in Fuse." --></font>
+    <div class="refsect1" xml:lang="en" lang="en">
+      <h2><font face="Lucida Grande,Helvetica,Arial">Spectranet
+          Emulation</font></h2>
+    </div>
+    <p> <font face="Lucida Grande,Helvetica,Arial">The Spectranet is an
+        ethernet network interface for the ZX Spectrum. The interface
+        can be activated via the <span style="font-style: italic;">Spectranet</span></font><font
+        face="Lucida Grande,Helvetica,Arial"><span class="emphasis"><em></em></span></font><font
+        face="Lucida Grande,Helvetica,Arial"> option on the </font><a><font
+          face="Lucida Grande,Helvetica,Arial"><span class="emphasis"><em>Peripherals
+
+
+
+
+
+
+
+
+
+              preferences</em></span></font></a><font face="Lucida
+        Grande,Helvetica,Arial"> dialog, and the state of its </font><font
+        face="Lucida Grande,Helvetica,Arial">automatic page-in</font><font
+        face="Lucida Grande,Helvetica,Arial"> (disable)</font><font
+        face="Lucida Grande,Helvetica,Arial"> jumper</font><font
+        face="Lucida Grande,Helvetica,Arial"> controlled via the <span
+          style="font-style: italic;">Spectranet disable</span></font><font
+        face="Lucida Grande,Helvetica,Arial"> option. If you're going to
+        be using the Spectranet, you'll probably want one of the
+        firmwares available from the Spectranet <a
+          href="http://spectrum.alioth.net/doc/index.php/Main_Page">homepage</a>
+        which is also where you can find more information on using the
+        interface.<br>
+      </font></p>
+    <p>I<font face="Lucida Grande,Helvetica,Arial">nstalling the
+        Spectranet firmware on Fuse is slightly more complicated than on
+        a real machine, mostly because Fuse's emulation doesn't support
+        DHCP. These instructions are correct as of 2012-01-26 - if
+        you're using a later firmware than this, things may have changed
+        slightly.<br>
+        <br>
+        The first thing you will need to do is to obtain a copy of the
+        Spectranet installer as a .tap file (or similar). The installer
+        is available at the Spectranet <a
+          href="http://spectrum.alioth.net/doc/index.php/Spectranet_ROM_images">site</a>.<br>
+        <br>
+        Once you have a copy of the installer, start Fuse and tick </font><font
+        face="Lucida Grande,Helvetica,Arial">the <span
+          style="font-style: italic;">Spectranet</span></font><font
+        face="Lucida Grande,Helvetica,Arial"><span class="emphasis"><em></em></span></font><font
+        face="Lucida Grande,Helvetica,Arial"> and </font><font
+        face="Lucida Grande,Helvetica,Arial"><span style="font-style:
+          italic;">Spectranet disable</span></font><font face="Lucida
+        Grande,Helvetica,Arial"><span class="emphasis"><em></em></span></font>
+      <font face="Lucida Grande,Helvetica,Arial">options on the </font><a><font
+          face="Lucida Grande,Helvetica,Arial"><span class="emphasis"><em>Peripherals
+
+
+
+
+
+
+
+
+
+              preferences</em></span></font></a><font face="Lucida
+        Grande,Helvetica,Arial"> dialog</font><font face="Lucida
+        Grande,Helvetica,Arial">. Once that's done, open the installer
+        file (use the Media &gt; Tape &gt; Open&#8230; command rather than
+        File / Open&#8230; to prevent autoloading) and enter the following
+        commands from BASIC:<br>
+        <br>
+      </font><big><span style="font-family: monospace;">CLEAR 26999</span><br
+          style="font-family: monospace;">
+        <span style="font-family: monospace;">LOAD ""CODE</span><br
+          style="font-family: monospace;">
+        <span style="font-family: monospace;">RANDOMIZE USR 27000</span></big><font
+        face="Lucida Grande,Helvetica,Arial"><br>
+        <br>
+        The screen should turn blue and you'll see around 20 lines of
+        message appearing as the firmware is installed, starting with
+        "Erasing sector 0" and finishing with "Restoring page B", and
+        you'll get the familiar </font><big><span style="font-family:
+          monospace;">0 OK, 0: 1</span></big><font face="Lucida
+        Grande,Helvetica,Arial"> at the bottom of the screen.<br>
+        <br>
+        Now un</font><font face="Lucida Grande,Helvetica,Arial">tick </font><font
+        face="Lucida Grande,Helvetica,Arial">the<span style="font-style:
+          italic;"></span></font><font face="Lucida
+        Grande,Helvetica,Arial"> </font><font face="Lucida
+        Grande,Helvetica,Arial"><span style="font-style: italic;">Spectranet
+
+
+
+
+
+
+          disable</span></font><font face="Lucida
+        Grande,Helvetica,Arial"><span class="emphasis"><em></em></span></font>
+      <font face="Lucida Grande,Helvetica,Arial">option</font><font
+        face="Lucida Grande,Helvetica,Arial"> </font><font face="Lucida
+        Grande,Helvetica,Arial">on the </font><a><font face="Lucida
+          Grande,Helvetica,Arial"><span class="emphasis"><em>Peripherals
+              preferences</em></span></font></a><font face="Lucida
+        Grande,Helvetica,Arial"> dialog</font><font face="Lucida
+        Grande,Helvetica,Arial"> and reset the Spectrum. You should see
+        a very brief blue status screen, before the regular copyright
+        screen appears with some Spectranet information at the top -
+        there should be four status lines, starting with "Alioth
+        Spectranet" and ending with the Spectranet's IP address (which
+        will be 255.255.255.255 at this stage).<br>
+        <br>
+        Now, trigger an NMI (the Machine &gt; NMI menu option) and you
+        should get a white on blue Spectranet NMI menu with five
+        options.<br>
+        <br>
+        Select [A] Configure network settings - this should lead you to
+        another menu, which will scroll of the top of the screen; don't
+        worry about this for now.<br>
+        <br>
+        You'll now need to set various options:<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">[A] Enable/disable DHCP - select N</font><br>
+      <font face="Lucida Grande,Helvetica,Arial">[B] Change IP address -
+        enter the IP address of the machine you are running Fuse on.</font><br>
+      <font face="Lucida Grande,Helvetica,Arial">[C] Change netmask -
+        enter the appropriate netmask for the IP address you selected
+        above. If that doesn't mean anything to you, try 255.255.255.0</font><br>
+      <font face="Lucida Grande,Helvetica,Arial">[D] Change default
+        gateway - enter the appropriate gateway address. If you don't
+        know any better, enter the IP address of your router.</font><br>
+      <font face="Lucida Grande,Helvetica,Arial">[E] Change primary DNS
+        - enter the address of your DNS server. If you don't know any
+        better, use Google's public DNS server, 8.8.8.8.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">There is no need to
+        change options [F] or [G], but do select:<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">[H] Change hostname - enter a hostname
+        for the Spectranet-enabled machine. It doesn't really matter
+        what you enter here - it's mostly useful just to replace the
+        junk default name so you can see what you've entered for the
+        other settings.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">Your screen should now
+        look something like this:<br>
+        <br>
+      </font><big><span style="font-family: monospace;">Current
+          configuration</span><br style="font-family: monospace;">
+        <span style="font-family: monospace;">=====================</span><br
+          style="font-family: monospace;">
+        <span style="font-family: monospace;">Use
+          DHCP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : No</span><br
+          style="font-family: monospace;">
+        <span style="font-family: monospace;">IP
+          address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : 192.168.000.002</span><br
+          style="font-family: monospace;">
+        <span style="font-family: monospace;">Netmask&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+
+
+
+
+
+
+          : 255.255.255.000</span><br style="font-family: monospace;">
+        <span style="font-family: monospace;">Default gateway&nbsp; :
+          192.168.000.001</span><br style="font-family: monospace;">
+        <span style="font-family: monospace;">Primary
+          DNS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : 192.168.000.001</span><br
+          style="font-family: monospace;">
+        <span style="font-family: monospace;">Secondary
+          DNS&nbsp;&nbsp;&nbsp; : 255.255.255.255</span><br
+          style="font-family: monospace;">
+        <span style="font-family: monospace;">Hardware address :
+          FF:FF:FF:FF:FF:FF</span><br style="font-family: monospace;">
+        <span style="font-family: monospace;">Hostname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+
+
+
+
+
+
+          : fuse</span><br style="font-family: monospace;">
+        <br style="font-family: monospace;">
+        <span style="font-family: monospace;">&lt;menu options&gt;</span></big><font
+        face="Lucida Grande,Helvetica,Arial"><br>
+        <br>
+        If every looks correct, select [I] Save changes and exit (you'll
+        see a brief "Saving configuration..." message) followed by [E]
+        Exit, at which point you'll be returned to BASIC. Reset the
+        Spectrum again and you'll see the same four line status display,
+        but this time with your IP address on the last line.<br>
+      </font><br>
+      <font face="Lucida Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial">Now type the following commands:<br>
+        </font> <font face="Lucida Grande,Helvetica,Arial"><big><span
+              style="font-family: monospace;">%cfgnew<br>
+              %cfgcommit</span></big></font><big><br>
+        </big> </font> </p>
+    <p><font face="Lucida Grande,Helvetica,Arial">Which will show the
+        standard <font face="Lucida Grande,Helvetica,Arial"><big><span
+              style="font-family: monospace;">0 OK, 0:1</span></big></font>
+        at the bottom of the screen. </font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial"> Congratulations! You
+        have now installed the Spectranet firmware. To save having to go
+        through all that every time you start Fuse, save a .szx snapshot
+        at this point, and load that in every time you want to use the
+        Spectranet.</font></p>
+    <!-- AppleSegEnd -->
+  </body>
+</html>

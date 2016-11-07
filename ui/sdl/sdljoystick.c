@@ -22,29 +22,24 @@
 
    E-mail: philip-fuse@shadowmagic.org.uk
 
-   Fred: fredm@spamcop.net
-
 */
 
 #include <config.h>
 
-#if !defined USE_JOYSTICK || defined HAVE_JSW_H
-/* Fake joystick, or override UI-specific handling */
-#include "../uijoystick.c"
-
-#else			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */
-
 #include <SDL.h>
+#include <libspectrum.h>
 
 #include "compat.h"
 #include "input.h"
 #include "sdljoystick.h"
 #include "settings.h"
-#include "ui/ui.h"
+#include "ui.h"
 #include "ui/uijoystick.h"
 
 static SDL_Joystick *joystick1 = NULL;
+int joy1_num_axes = 0;
 static SDL_Joystick *joystick2 = NULL;
+int joy2_num_axes = 0;
 
 static void do_axis( int which, Sint16 value, input_key negative,
 		     input_key positive );
@@ -66,42 +61,31 @@ ui_joystick_init( void )
     return 0;
   }
 
-  retval = SDL_NumJoysticks();
-
-  if( retval >= 2 ) {
-
-    retval = 2;
-
-    if( ( joystick2 = SDL_JoystickOpen( 1 ) ) == NULL ) {
-      ui_error( UI_ERROR_ERROR, "failed to initialise joystick 2" );
+  if( settings_current.joy1_number ) {
+    if( ( joystick1 =
+            SDL_JoystickOpen( settings_current.joy1_number - 1) ) == NULL ) {
+      settings_current.joy1_number = 0;
       return 0;
     }
 
-    if( SDL_JoystickNumAxes( joystick2 ) < 2    ||
-        SDL_JoystickNumButtons( joystick2 ) < 1    ) {
-      ui_error( UI_ERROR_ERROR, "sorry, joystick 2 is inadequate!" );
-      return 0;
-    }
-
+    joy1_num_axes = SDL_JoystickNumAxes(joystick1);
   }
 
-  if( retval > 0 ) {
+  if( settings_current.joy2_number ) {
+    if( ( joystick2 =
+            SDL_JoystickOpen( settings_current.joy2_number - 1) ) == NULL ) {
+      settings_current.joy2_number = 0;
+      return 0;
+    }
 
-    if( ( joystick1 = SDL_JoystickOpen( 0 ) ) == NULL ) {
-      ui_error( UI_ERROR_ERROR, "failed to initialise joystick 1" );
-      return 0;
-    }
- 
-    if( SDL_JoystickNumAxes( joystick1 ) < 2    ||
-        SDL_JoystickNumButtons( joystick1 ) < 1    ) {
-      ui_error( UI_ERROR_ERROR, "sorry, joystick 1 is inadequate!" );
-      return 0;
-    }
+    joy2_num_axes = SDL_JoystickNumAxes(joystick2);
   }
 
-  SDL_JoystickEventState( SDL_ENABLE );
+  if( settings_current.joy1_number || settings_current.joy2_number ) {
+    SDL_JoystickEventState( SDL_ENABLE );
+  }
 
-  return retval;
+  return SDL_NumJoysticks();
 }
 
 void
@@ -140,9 +124,16 @@ button_action( SDL_JoyButtonEvent *buttonevent, input_event_type type )
   
   button = buttonevent->button;
   if( button >= NUM_JOY_BUTTONS ) return;	/* We support 'only' NUM_JOY_BUTTONS (15 as defined in ui/uijoystick.h) fire buttons */
+  
+  if( ( settings_current.joy1_number - 1) == buttonevent->which ) {
+    event.types.joystick.which = 0;
+  } else if( ( settings_current.joy2_number - 1) == buttonevent->which ) {
+    event.types.joystick.which = 1;
+  } else {
+    return;
+  }
 
   event.type = type;
-  event.types.joystick.which = buttonevent->which;
   event.types.joystick.button = INPUT_JOYSTICK_FIRE_1 + button;
 
   input_event( &event );
@@ -163,11 +154,35 @@ sdljoystick_buttonrelease( SDL_JoyButtonEvent *buttonevent )
 void
 sdljoystick_axismove( SDL_JoyAxisEvent *axisevent )
 {
+  int which, xaxis, yaxis;
+
+  if( ( settings_current.joy1_number - 1 ) == axisevent->which ) {
+    which = 0;
+    if( axisevent->axis == settings_current.joy1_xaxis ) {
+      xaxis = 0;
+    } else if( axisevent->axis == settings_current.joy1_yaxis ) {
+      yaxis = 1;
+    } else {
+      return;
+    }
+  } else if( ( settings_current.joy2_number - 1 ) == axisevent->which ) {
+    which = 1;
+    if( axisevent->axis == settings_current.joy2_xaxis ) {
+      xaxis = 0;
+    } else if( axisevent->axis == settings_current.joy2_yaxis ) {
+      yaxis = 1;
+    } else {
+      return;
+    }
+  } else {
+    return;
+  }
+
   if( axisevent->axis == 0 ) {
-    do_axis( axisevent->which, axisevent->value,
+    do_axis( which, axisevent->value,
 	     INPUT_JOYSTICK_LEFT, INPUT_JOYSTICK_RIGHT );
   } else if( axisevent->axis == 1 ) {
-    do_axis( axisevent->which, axisevent->value,
+    do_axis( which, axisevent->value,
 	     INPUT_JOYSTICK_UP,   INPUT_JOYSTICK_DOWN  );
   }
 }
@@ -216,5 +231,3 @@ ui_joystick_end( void )
   SDL_Quit();
 #endif
 }
-
-#endif			/* #if !defined USE_JOYSTICK || defined HAVE_JSW_H */

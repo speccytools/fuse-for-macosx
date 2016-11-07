@@ -33,26 +33,29 @@
 #include "fuse.h"
 #include "keyboard.h"
 #include "machine.h"
+#include "sdlkeyboard.h"
+#include "sdlui.h"
 #include "settings.h"
 #include "snapshot.h"
 #include "spectrum.h"
 #include "tape.h"
 #include "ui/ui.h"
 #include "utils.h"
-#include "sdlkeyboard.h"
 
-/* Map low byte of UCS-2(?) Unicode to Fuse input layer keysym for
-   upper case letters */
-extern const keysyms_map_t unicode_keysyms_map[];
+#include "FuseMenus.h"
 
+extern keysyms_map_t modifier_keysyms_map[];
+extern keysyms_map_t unicode_keysyms_map[];
+
+static GHashTable *modifier_keysyms_hash;
 static GHashTable *unicode_keysyms_hash;
 
 static input_key
-unicode_keysyms_remap( libspectrum_dword ui_keysym )
+other_keysyms_remap( libspectrum_dword ui_keysym, GHashTable *hash )
 {
   const input_key *ptr;
 
-  ptr = g_hash_table_lookup( unicode_keysyms_hash, &ui_keysym );
+  ptr = g_hash_table_lookup( hash, &ui_keysym );
 
   return ptr ? *ptr : INPUT_KEY_NONE;
 }
@@ -61,6 +64,12 @@ void
 sdlkeyboard_init(void)
 {
   keysyms_map_t *ptr3;
+
+  modifier_keysyms_hash = g_hash_table_new( g_int_hash, g_int_equal );
+
+  for( ptr3 = modifier_keysyms_map; ptr3->ui; ptr3++ )
+        g_hash_table_insert( modifier_keysyms_hash, &( ptr3->ui ),
+                             &( ptr3->fuse ) );
 
   unicode_keysyms_hash = g_hash_table_new( g_int_hash, g_int_equal );
 
@@ -75,13 +84,24 @@ void
 sdlkeyboard_end(void)
 {
   g_hash_table_destroy( unicode_keysyms_hash );
+  g_hash_table_destroy( modifier_keysyms_hash );
 }
+
+static int sdlkeyboard_caps_shift_pressed = 0;
+static int sdlkeyboard_symbol_shift_pressed = 0;
+static input_key unicode_keysym = INPUT_KEY_NONE;
 
 void
 sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
 {
-  input_key fuse_keysym, unicode_keysym;
+  input_key fuse_keysym;
   input_event_t fuse_event;
+  
+  /* Deal with the non-Speccy keys */
+  if( keyevent->keysym.sym == SDLK_ESCAPE && settings_current.full_screen ) {
+    settings_current.full_screen = 0;
+    return;
+  }
 
   fuse_keysym = keysyms_remap( keyevent->keysym.sym );
 
@@ -93,7 +113,34 @@ sdlkeyboard_keypress( SDL_KeyboardEvent *keyevent )
 
   if( fuse_keysym == INPUT_KEY_NONE && unicode_keysym == INPUT_KEY_NONE )
     return;
+  }
 
+  fuse_keysym = other_keysyms_remap( keyevent->keysym.sym,
+                                     modifier_keysyms_hash );
+  if( fuse_keysym == INPUT_KEY_NONE ) 
+    fuse_keysym = keysyms_remap( keyevent->keysym.scancode );
+  if( fuse_keysym == INPUT_KEY_NONE ) {
+    fuse_keysym = other_keysyms_remap( keyevent->keysym.unicode,
+                                       unicode_keysyms_hash );
+    if( fuse_keysym != INPUT_KEY_NONE ) {
+      unicode_keysym = fuse_keysym;
+
+      /* record current values of caps and symbol shift. We will temoprarily
+       * override these for the duration of the unicoded simulated keypresses
+       */
+      if( ( sdlkeyboard_caps_shift_pressed = keyboard_state( KEYBOARD_Caps ) ) )
+      {
+        keyboard_release( KEYBOARD_Caps );
+      }
+      if( ( sdlkeyboard_symbol_shift_pressed =
+            keyboard_state( KEYBOARD_Symbol ) ) ) {
+        keyboard_release( KEYBOARD_Symbol );
+      }
+    }
+  }
+  
+  if( fuse_keysym == INPUT_KEY_NONE ) return;
+  
   fuse_event.type = INPUT_EVENT_KEYPRESS;
   if( unicode_keysym == INPUT_KEY_NONE )
     fuse_event.types.key.native_key = fuse_keysym;
@@ -110,7 +157,25 @@ sdlkeyboard_keyrelease( SDL_KeyboardEvent *keyevent )
   input_key fuse_keysym;
   input_event_t fuse_event;
 
-  fuse_keysym = keysyms_remap( keyevent->keysym.sym );
+  fuse_keysym = other_keysyms_remap( keyevent->keysym.sym,
+                                     modifier_keysyms_hash );
+  if( fuse_keysym == INPUT_KEY_NONE ) {
+    fuse_keysym = keysyms_remap( keyevent->keysym.scancode );
+  }
+  if( fuse_keysym == INPUT_KEY_NONE ) {
+    fuse_keysym = other_keysyms_remap( keyevent->keysym.unicode,
+                                         unicode_keysyms_hash );
+    if( fuse_keysym != INPUT_KEY_NONE && unicode_keysym != INPUT_KEY_NONE ) {
+        input_key temp = fuse_keysym;
+        fuse_keysym = unicode_keysym;
+        unicode_keysym = temp;
+        sdlkeyboard_caps_shift_pressed = 0;
+        sdlkeyboard_symbol_shift_pressed = 0;
+    } else {
+      /* Unicode key released as normal */
+      unicode_keysym = INPUT_KEY_NONE;
+    }
+  }
 
   if( fuse_keysym == INPUT_KEY_NONE ) return;
 
@@ -122,4 +187,19 @@ sdlkeyboard_keyrelease( SDL_KeyboardEvent *keyevent )
   fuse_event.types.key.spectrum_key = fuse_keysym;
 
   input_event( &fuse_event );
+
+  if( sdlkeyboard_caps_shift_pressed )
+  {
+    sdlkeyboard_caps_shift_pressed = 0;
+    keyboard_press( KEYBOARD_Caps );
+  }
+  if( sdlkeyboard_symbol_shift_pressed ) {
+    sdlkeyboard_symbol_shift_pressed = 0;
+    keyboard_press( KEYBOARD_Symbol );
+  }
+  if( unicode_keysym != INPUT_KEY_NONE ) {
+    fuse_event.types.key.spectrum_key = unicode_keysym;
+    input_event( &fuse_event );
+    unicode_keysym = INPUT_KEY_NONE;
+  }
 }

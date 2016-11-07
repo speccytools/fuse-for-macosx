@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=ISO-8859-1">
+    <!-- AppleSegStart="Recording Preferences" -->
+    <title>Recording Preferences</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="Recording
+        Preferences"></a><!-- AppleSegDescription="This section describes the Fuse Recording preferences dialog." --></font>
+    <h2><font face="Lucida Grande,Helvetica,Arial"><span
+          style="font-style: italic;">Recording</span> preferences</font></h2>
+    <p><span class="emphasis"></span><font face="Lucida
+        Grande,Helvetica,Arial">Use the Recording pane of Fuse
+        preferences to configure how Fuse deals with RZX emulator input
+        recordings.</font></p>
+    <p><span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em></em></font></span></p>
+    <table style="text-align: left; width: 100%;" cellpadding="2"
+      cellspacing="2">
+      <tbody>
+        <tr>
+          <th style="vertical-align: top;"><font style="font-weight:
+              bold;" face="Lucida Grande,Helvetica,Arial">OPTION</font><br>
+          </th>
+          <th style="vertical-align: top;"><font style="font-weight:
+              bold;" face="Lucida Grande,Helvetica,Arial">DESCRIPTION</font><br>
+          </th>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Emulator
+                  recording create autosaves</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is selected, Fuse
+              will add a snapshot into the recording stream every 5
+              seconds while creating an RZX file, thus enabling the
+              rollback facilities to be used without having to
+              explicitly add snapshots into the stream. Older snapshots
+              will be pruned from the stream to keep the file size and
+              number of snapshots down: each snapshot up to 15 seconds
+              will be kept, then one snapshot every 15 seconds until one
+              minute, then one snapshot every minute until 5 minutes,
+              and then one snapshot every 5 minutes. Note that this
+              "pruning" applies only to automatically inserted
+              snapshots: snapshots manually inserted into the stream
+              will never be pruned.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Emulator
+                  recording always embed snapshot</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Specify whether a snapshot should
+              be embedded in an RZX file when recording is started from
+              an ex</font><font face="Lucida Grande,Helvetica,Arial">isting
+
+              snapshot.</font></td>
+        </tr>
+        <tr>
+          <td valign="top"><span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Emulator recording
+                  competition mode</em></font></span></td>
+          <td valign="top"><font face="Lucida Grande,Helvetica,Arial">Any
+
+              input recordings which are started when this option is
+              selected will be made in "competition mode". In essence,
+              this means that Fuse will act just like a real Spectrum
+              would: you can't load snapshots, pause the emulation in
+              any way, change the speed or anything that you couldn't do
+              on the real machine. If any of these things are attempted,
+              or if the emulated Fuse is running more than 5% faster or
+              slower than normal Spectrum speed, then the recording will
+              immediately be stopped.<br>
+              <br>
+              Recordings made with competition mode active will be
+              digitally signed, in theory to "certify" that it was made
+              with the above restrictions in place.<i> However, this
+                procedure is not secure</i><i> (and cannot be made so),
+                so the presence of any signature on an RZX</i><i> file
+                should not be taken as providing proof that it was made
+                with</i><i> competition mode active.</i> This feature is
+              included in Fuse solely as it was one of the requirements
+              for Fuse to be used in an on-line tournament.</font><font
+              face="Lucida Grande,Helvetica,Arial">.</font></td>
+        </tr>
+        <tr>
+          <td valign="top"><span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Emulator recording
+                  competition code</em></font></span></td>
+          <td valign="top"><font face="Lucida Grande,Helvetica,Arial">The
+
+              numeric code entered here will be written into any RZX
+              files made in competition mode. This is another feature
+              for on-line tournaments which can be used to "prove" that
+              the recording was made after a specific code was released.
+              If you're not playing in such a tournament, you can safely
+              ignore this option.</font></td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

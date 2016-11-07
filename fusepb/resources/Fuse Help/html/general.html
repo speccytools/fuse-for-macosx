@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=windows-1252">
+    <!-- AppleSegStart="General Preferences" -->
+    <title>General Preferences</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="General
+        Preferences"></a><!-- AppleSegDescription="This section describes the Fuse general preferences dialog." --></font>
+    <h2><font face="Lucida Grande,Helvetica,Arial"><span
+          style="font-style: italic;">General</span> preferences</font></h2>
+    <p><font face="Lucida Grande,Helvetica,Arial">The General pane of
+        Fuse preferences lets you configure miscellaneous Fuse options.<br>
+      </font></p>
+    <table style="text-align: left; width: 100%;" cellpadding="2"
+      cellspacing="2">
+      <tbody>
+        <tr>
+          <th style="vertical-align: top;"><font style="font-weight:
+              bold;" face="Lucida Grande,Helvetica,Arial">OPTION</font><br>
+          </th>
+          <th style="vertical-align: top;"><font style="font-weight:
+              bold;" face="Lucida Grande,Helvetica,Arial">DESCRIPTION</font><br>
+          </th>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Emulation speed</em></font></span></td>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em></em></font></span><font
+              face="Lucida Grande,Helvetica,Arial">Set how fast Fuse
+              will attempt to emulate the Spectrum, as a percentage of
+              the speed at which the real machine runs. If your machine
+              isn't fast enough to keep up with the requested speed,
+              Fuse will just run as fast as it can. Note that if the
+              emulation speed is 1%, no sound output will be produced.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Screen refresh
+                  rate</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Specify the frame rate, the ratio
+              of spectrum frame updates to real frame updates. This is
+              useful if your machine is having trouble keeping up with
+              the spectrum screen updates.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Use tape traps</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Ordinarily, Fuse intercepts calls
+              to the ROM tape-loading routine in order to load from tape
+              files more quickly when possible. But this can (rarely)
+              interfere with TZX loading; disabling this option avoids
+              the problem at the cost of slower (i.e. always real-time)
+              tape-loading. When tape-loading traps are disabled, you
+              need to start tape playback manually, by choosing the<span
+                class="emphasis"><em>Tape, Play</em></span> menu item.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Fast tape
+                  loading</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is enabled, then
+              Fuse will run at the fastest possible speed when the
+              virtual tape is playing, thus dramatically reducing the
+              time it takes to load programs. You may wish to disable
+              this option if you wish to stop the tape at a specific
+              point.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Accelerate
+                  loaders</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is enabled, then
+              Fuse will attempt to accelerate tape loaders by "short
+              circuiting" the loading loop. This will in general speed
+              up loading, but may cause some loaders to fail.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Detect tape
+                  loaders</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is enabled, Fuse
+              will attempt to detect when a loading routine is in
+              progress, and then automatically start the virtual tape to
+              load the program in. This is done by using a heuristic to
+              identify a loading routine, so is by no means infalliable,
+              but works in most cases.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Auto-load media</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">On many occasions when you open a
+              tape or disk file, it's because it's got a program in you
+              want to load and run. If this option is selected, this
+              will automatically happen for you when you open one of
+              these files using the </font><font face="Lucida
+              Grande,Helvetica,Arial"><span class="emphasis"><em>File,
+                  Open…</em></span></font><font face="Lucida
+              Grande,Helvetica,Arial"> menu option - you must then use
+              the Media menu to use tapes or disks for saving data to,
+              or for loading data into an already running program.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Show tape/disk
+                  status</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Enables the status icons showing
+              whether the disk and tape are being accessed.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Confirm actions</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Specify whether `dangerous'
+              actions (those which could cause data loss, for example
+              resetting the Spectrum) require confirmation before
+              occuring.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Issue 2
+                  keyboard</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Early versions of the Spectrum
+              used a different value for unused bits on the keyboard
+              input ports, and a few games depended on the old value of
+              these bits. Enabling this option switches to the old
+              value, to let you run those games.</font></td>
+        </tr>
+        <tr>
+          <td valign="top"><span class="emphasis"><font face="Lucida
+                Grande,Helvetica,Arial"><em>Use Recreated ZX Spectrum
+                  keyboard</em></font></span></td>
+          <td valign="top"><font face="Lucida Grande,Helvetica,Arial"><font
+                face="Lucida Grande,Helvetica,Arial">Enable the use of a
+                Recreated ZX Spectrum in game mode. This is a Bluetooth
+                keyboard in the shape of a 48K ZX Spectrum that can be paired
+                your Mac to give an authentic feeling of using a real ZX
+                Spectrum. While this mode is enabled, your Mac keyboard will
+                not give correct input to the emulator.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Late CPU
+                  timings</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If selected, Fuse will cause all
+              screen-related timings (for example, when the screen is
+              rendered and when memory contention occurs) to be one
+              tstate later than "normal", an effect which is present on
+              some real hardware.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Z80 is CMOS</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If selected, Fuse will emulate a
+              CMOS Z80, as opposed to an NMOS Z80. The undocumented `OUT
+              (C),0' instruction will be replaced with `OUT (C),255' and
+              emulation of a minor timing bug in the NMOS Z80's `LD A,I'
+              and `LD A,R' instructions will be disabled.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Allow writes to
+                  ROM</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is selected, Fuse
+              will happily allow programs to overwrite what would
+              normally be ROM. This probably isn't very useful in most
+              circumstances, especially as the 48K ROM overwrites parts
+              of itself.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Use .slt traps</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">The multi-load aspect of SLT files
+              requires a trap instruction to be supported. This
+              instruction is not generally used except for this trap,
+              but since it's not inconceivable that a program could be
+              wanting to use the real instruction instead, you can
+              choose whether to support the trap or not.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Set joysticks
+                  on snapshot load</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">Controls whether Fuse should allow
+              snapshot files to override your current joystick
+              configuration.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Reset
+                  Preferences</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">This causes all of Fuse's current
+              preferences to be discarded and replaced with the default
+              values as shipped.</font></td>
+        </tr>
+      </tbody>
+    </table>
+    <span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em></em></font></span>
+    <p><span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em></em></font></span>
+      <!-- AppleSegEnd --></p>
+  </body>
+</html>

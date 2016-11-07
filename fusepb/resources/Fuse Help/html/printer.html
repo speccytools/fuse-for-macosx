@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+<!-- AppleSegStart="Printer Emulation" -->
+  <title>Printer Emulation</title>
+</head>
+<body>
+<font face="Lucida Grande,Helvetica,Arial"><a name="Printer Emulation"></a><!-- AppleSegDescription="This section describes the printer emulation in Fuse." --></font>
+<div class="refsect1" xml:lang="en" lang="en">
+<h2><font face="Lucida Grande,Helvetica,Arial">Printer
+Emulation</font></h2>
+</div>
+<p>
+<font face="Lucida Grande,Helvetica,Arial">The various models of
+Spectrum supported a range of ways to connect
+printers, three of which are supported by Fuse. Different printers
+are made available for the different
+models:</font></p>
+<div class="variablelist">
+<dl>
+  <dt> <span class="term"><font face="Lucida Grande,Helvetica,Arial"><em>16</em>,
+
+
+    <span class="emphasis"><em>48</em></span>, <span class="emphasis"><em>TC2048</em></span>,
+
+
+    <span class="emphasis"><em>TC2068</em></span></font></span></dt>
+  <dd>
+    <p><font face="Lucida Grande,Helvetica,Arial"><em>ZX
+Printer</em></font></p>
+  </dd>
+  <dt> <span class="term"><font face="Lucida Grande,Helvetica,Arial"><em>128</em>
+, <span class="emphasis"><em>+2</em></span>, <span class="emphasis"><em>Pentagon</em></span></font></span></dt>
+  <dd>
+    <p><font face="Lucida Grande,Helvetica,Arial">Serial printer
+(text-only)</font></p>
+  </dd>
+  <dt> <span class="emphasis"><font
+ face="Lucida Grande,Helvetica,Arial"><em>+2A</em></font></span><font
+ face="Lucida Grande,Helvetica,Arial">, <span class="emphasis"><em>+3</em></span>
+    </font></dt>
+  <dd>
+    <p><font face="Lucida Grande,Helvetica,Arial">Parallel printer
+(text-only)</font></p>
+  </dd>
+</dl>
+</div>
+<p>
+<font face="Lucida Grande,Helvetica,Arial">If Opus Discovery, +D or
+DISCiPLE emulation is in use
+and printer emulation is enabled, text-only emulation of the disk
+interface's
+parallel printer interface is provided.</font></p>
+<p>
+<font face="Lucida Grande,Helvetica,Arial">Any printout is appended to
+one (or both) of two files, depending
+on the printer - these default to
+<span class="emphasis"><em>printout.txt</em></span> for text
+output, and <span class="emphasis"><em>printout.pbm</em></span> for
+graphics (PBM images are supported by most image viewers and
+converters). These names can be changed with the <span
+ style="font-style: italic;"></span><span class="emphasis"><em>Preferences,
+Peripherals</em></span> dialog. While the ZX Printer can
+<span class="emphasis"><em>only</em></span> output graphically,
+simulated text output is generated at the same time using a crude
+sort of OCR based on the current character set (a bit like using
+SCREEN$). There is currently no support for graphics when using the
+serial/parallel output, though any escape codes used will be
+`printed' faithfully.
+(!)</font></p>
+<p>
+<font face="Lucida Grande,Helvetica,Arial">By the way, it's not a good
+idea to modify the
+<span class="emphasis"><em>printout.pbm</em></span> file outside of
+Fuse if you want to continue appending to it. The header needs to
+have a certain layout for Fuse to be able to continue appending to
+it correctly, and the file will be overwritten if it can't be
+appended
+to.</font></p>
+<!-- AppleSegEnd -->
+</body>
+</html>

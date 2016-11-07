@@ -96,7 +96,10 @@ void machine_register_startup( void );
 
 int machine_select( libspectrum_machine type );
 int machine_select_id( const char *id );
+int machine_get_index( libspectrum_machine type );
 const char* machine_get_id( libspectrum_machine type );
+int machine_get_type( const char* id );
+fuse_machine_info *machine_get_machine_info( const char *id );
 
 int machine_load_rom_bank_from_buffer( memory_page* bank_map, int page_num,
   unsigned char *buffer, size_t length, int custom );

@@ -149,8 +149,6 @@ typedef struct start_files_t {
 /* Context for the display startup routine */
 static display_startup_context display_context;
 
-static int fuse_init(int argc, char **argv);
-
 static void creator_register_startup( void );
 
 static void fuse_show_copyright(void);
@@ -162,15 +160,13 @@ static int parse_nonoption_args( int argc, char **argv, int first_arg,
 				 start_files_t *start_files );
 static int do_start_files( start_files_t *start_files );
 
-static int fuse_end(void);
-
 #ifdef UI_WIN32
 int fuse_main(int argc, char **argv)
 #else
-int main(int argc, char **argv)
+int old_main(int argc, char **argv)
 #endif
 {
-  int r;
+  int r = 0;
 
 #ifdef WIN32
   SetErrorMode( SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX );
@@ -188,14 +184,8 @@ int main(int argc, char **argv)
   if( settings_current.show_help ||
       settings_current.show_version ) return 0;
 
-  if( settings_current.unittests ) {
-    r = unittests_run();
-  } else {
-    while( !fuse_exiting ) {
-      z80_do_opcodes();
-      event_do_events();
-    }
-    r = 0;
+  while( !fuse_exiting ) {
+    spectrum_do_frame();
   }
 
   fuse_end();
@@ -337,7 +327,7 @@ run_startup_manager( int *argc, char ***argv )
   return startup_manager_run();
 }
 
-static int fuse_init(int argc, char **argv)
+int fuse_init(int argc, char **argv)
 {
   int error, first_arg;
   char *start_scaler;
@@ -923,7 +913,7 @@ do_start_files( start_files_t *start_files )
 }
 
 /* Tidy-up function called at end of emulation */
-static int fuse_end(void)
+int fuse_end(void)
 {
   movie_stop();		/* stop movie recording */
 

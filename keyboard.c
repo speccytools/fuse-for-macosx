@@ -54,15 +54,21 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_Escape,      { KEYBOARD_1,     KEYBOARD_Caps   } },
   { INPUT_KEY_1,           { KEYBOARD_1,     KEYBOARD_NONE   } },
   { INPUT_KEY_2,           { KEYBOARD_2,     KEYBOARD_NONE   } },
+  { INPUT_KEY_at,          { KEYBOARD_2,     KEYBOARD_Symbol } },
   { INPUT_KEY_3,           { KEYBOARD_3,     KEYBOARD_NONE   } },
   { INPUT_KEY_4,           { KEYBOARD_4,     KEYBOARD_NONE   } },
   { INPUT_KEY_5,           { KEYBOARD_5,     KEYBOARD_NONE   } },
+  { INPUT_KEY_percent,     { KEYBOARD_5,     KEYBOARD_Symbol } },
   { INPUT_KEY_6,           { KEYBOARD_6,     KEYBOARD_NONE   } },
+  { INPUT_KEY_asciicircum, { KEYBOARD_h,     KEYBOARD_Symbol } },
   { INPUT_KEY_7,           { KEYBOARD_7,     KEYBOARD_NONE   } },
+  { INPUT_KEY_ampersand,   { KEYBOARD_6,     KEYBOARD_Symbol } },
   { INPUT_KEY_8,           { KEYBOARD_8,     KEYBOARD_NONE   } },
   { INPUT_KEY_9,           { KEYBOARD_9,     KEYBOARD_NONE   } },
+  { INPUT_KEY_parenleft,   { KEYBOARD_8,     KEYBOARD_Symbol } },
   { INPUT_KEY_0,           { KEYBOARD_0,     KEYBOARD_NONE   } },
   { INPUT_KEY_minus,       { KEYBOARD_j,     KEYBOARD_Symbol } },
+  { INPUT_KEY_underscore,  { KEYBOARD_0,     KEYBOARD_Symbol } },
   { INPUT_KEY_equal,       { KEYBOARD_l,     KEYBOARD_Symbol } },
   { INPUT_KEY_BackSpace,   { KEYBOARD_0,     KEYBOARD_Caps   } },
 
@@ -90,6 +96,7 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_l,           { KEYBOARD_l,     KEYBOARD_NONE   } },
   { INPUT_KEY_semicolon,   { KEYBOARD_o,     KEYBOARD_Symbol } },
   { INPUT_KEY_apostrophe,  { KEYBOARD_7,     KEYBOARD_Symbol } },
+  { INPUT_KEY_quotedbl,    { KEYBOARD_p,     KEYBOARD_Symbol } },
   { INPUT_KEY_numbersign,  { KEYBOARD_3,     KEYBOARD_Symbol } },
   { INPUT_KEY_Return,      { KEYBOARD_Enter, KEYBOARD_NONE   } },
 
@@ -103,7 +110,9 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_m,           { KEYBOARD_m,     KEYBOARD_NONE   } },
   { INPUT_KEY_comma,       { KEYBOARD_n,     KEYBOARD_Symbol } },
   { INPUT_KEY_period,      { KEYBOARD_m,     KEYBOARD_Symbol } },
+  { INPUT_KEY_greater,     { KEYBOARD_t,     KEYBOARD_Symbol } },
   { INPUT_KEY_slash,       { KEYBOARD_v,     KEYBOARD_Symbol } },
+  { INPUT_KEY_question,    { KEYBOARD_c,     KEYBOARD_Symbol } },
   { INPUT_KEY_Shift_R,     { KEYBOARD_NONE,  KEYBOARD_Caps   } },
 
   { INPUT_KEY_asterisk,    { KEYBOARD_b,     KEYBOARD_Symbol } },
@@ -292,7 +301,7 @@ void fuse_keyboard_init(void)
 
   keysyms_hash = g_hash_table_new( g_int_hash, g_int_equal );
 
-  for( ptr3 = keysyms_map; ptr3->ui; ptr3++ )
+  for( ptr3 = keysyms_map; ptr3->ui != 0xff; ptr3++ )
     g_hash_table_insert( keysyms_hash, &( ptr3->ui ), &( ptr3->fuse ) );
 
   key_text = g_hash_table_new( g_int_hash, g_int_equal );
@@ -331,6 +340,18 @@ keyboard_press( keyboard_key_name key )
   ptr = g_hash_table_lookup( keyboard_data, &key );
 
   if( ptr ) keyboard_return_values[ ptr->port ] &= ~( ptr->bit );
+}
+
+int
+keyboard_state( keyboard_key_name key )
+{
+  struct key_bit *ptr;
+
+  ptr = g_hash_table_lookup( keyboard_data, &key );
+
+  if( ptr ) return !( keyboard_return_values[ ptr->port ] & ptr->bit );
+
+  return 0;
 }
 
 void

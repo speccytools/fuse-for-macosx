@@ -57,6 +57,14 @@ typedef enum scaler_flags_t {
   SCALER_FLAGS_EXPAND      = 1 << 0,
 } scaler_flags_t;
 
+typedef enum scale_factor_t {
+  SCALE_FACTOR_HALF        = 1 << 0,
+  SCALE_FACTOR_ONE         = 1 << 1,
+  SCALE_FACTOR_TWO         = 1 << 2,
+  SCALE_FACTOR_THREE       = 1 << 3,
+  SCALE_FACTOR_ONE_HALF    = 1 << 4,
+} scale_factor_t;
+
 typedef void ScalerProc( const libspectrum_byte *srcPtr,
 			 libspectrum_dword srcPitch,
 			 libspectrum_byte *dstPtr, libspectrum_dword dstPitch,
@@ -75,11 +83,13 @@ extern int scalers_registered;
 typedef int (*scaler_available_fn)( scaler_type scaler );
 
 int scaler_select_id( const char *scaler_mode );
+int scaler_get_type( const char *scaler_mode );
 void scaler_register_clear( void );
 int scaler_select_scaler( scaler_type scaler );
 void scaler_register( scaler_type scaler );
 int scaler_is_supported( scaler_type scaler );
 const char *scaler_name( scaler_type scaler );
+const char *scaler_id( scaler_type scaler );
 ScalerProc *scaler_get_proc16( scaler_type scaler );
 ScalerProc *scaler_get_proc32( scaler_type scaler );
 scaler_flags_t scaler_get_flags( scaler_type scaler );

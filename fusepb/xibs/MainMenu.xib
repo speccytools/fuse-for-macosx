@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="346" id="881"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <menu title="SDLMain" systemMenu="main" id="29" userLabel="MainMenu">
+            <items>
+                <menuItem title="Fuse" id="56">
+                    <menu key="submenu" title="Fuse" systemMenu="apple" id="57">
+                        <items>
+                            <menuItem title="About Fuse" id="58">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="orderFrontStandardAboutPanel:" target="-2" id="142"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="196">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Preferences…" keyEquivalent="," id="828">
+                                <connections>
+                                    <action selector="showPreferencesPane:" target="346" id="830"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="829">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Hide Fuse" keyEquivalent="h" id="134">
+                                <connections>
+                                    <action selector="hide:" target="346" id="931"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hide Others" id="145">
+                                <connections>
+                                    <action selector="hideOtherApplications:" target="-2" id="146"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All" id="150">
+                                <connections>
+                                    <action selector="unhideAllApplications:" target="-2" id="153"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="149">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Quit Fuse" keyEquivalent="q" id="136">
+                                <connections>
+                                    <action selector="quit:" target="346" id="927"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="File" id="302">
+                    <menu key="submenu" title="File" id="305">
+                        <items>
+                            <menuItem title="Open File…" keyEquivalent="o" id="306">
+                                <connections>
+                                    <action selector="open:" target="346" id="347"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Open Recent" id="509">
+                                <menu key="submenu" title="Open Recent" id="510"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="297">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Save Snapshot As…" keyEquivalent="S" id="294">
+                                <connections>
+                                    <action selector="save_as:" target="346" id="368"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="296">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Emulator Recording" id="311">
+                                <menu key="submenu" title="Emulator Recording" id="312">
+                                    <items>
+                                        <menuItem title="Play…" tag="8" id="315">
+                                            <connections>
+                                                <action selector="rzx_play:" target="346" id="351"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="D8d-TR-Z1U"/>
+                                        <menuItem title="Record…" tag="6" id="313">
+                                            <connections>
+                                                <action selector="rzx_start:" target="346" id="349"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Record from Snapshot…" tag="7" id="314">
+                                            <connections>
+                                                <action selector="rzx_start_snap:" target="346" id="350"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Continue Recording…" tag="7" id="Huw-eV-Q5j">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="rzx_continue:" target="346" id="XXw-Hc-kq1"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Finalise Recording…" tag="7" id="q0M-eg-kS0">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="rzx_finalise:" target="346" id="tvB-uN-ZPV"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="dwd-xy-GaR"/>
+                                        <menuItem title="Stop" tag="9" id="316">
+                                            <connections>
+                                                <action selector="rzx_stop:" target="346" id="352"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="DgV-kI-9GB"/>
+                                        <menuItem title="Insert Bookmark" tag="17" keyEquivalent="b" id="776">
+                                            <connections>
+                                                <action selector="rzx_insert_snap:" target="346" id="825"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Go to Last Bookmark" tag="18" keyEquivalent="z" id="777">
+                                            <connections>
+                                                <action selector="rzx_rollback:" target="346" id="826"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Go to Bookmark…" tag="19" id="778">
+                                            <connections>
+                                                <action selector="showRollbackPane:" target="346" id="827"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="AY Sound Recording" id="494">
+                                <menu key="submenu" title="AY Sound Recording" id="495">
+                                    <items>
+                                        <menuItem title="Record…" tag="1" id="496">
+                                            <connections>
+                                                <action selector="psg_start:" target="346" id="498"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Stop" tag="3" id="497">
+                                            <connections>
+                                                <action selector="psg_stop:" target="346" id="499"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Movie Recording" id="1185">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Movie Recording" id="1186">
+                                    <items>
+                                        <menuItem title="Record…" tag="170" id="1187">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="movie_record:" target="346" id="1192"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Record From Emulator Recording…" tag="171" id="1189">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="movie_record_from_rzx:" target="346" id="1193"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Pause" tag="172" id="1191">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="movie_pause:" target="346" id="1194"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Stop" tag="173" id="1190">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="movie_stop:" target="346" id="1195"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="447">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Open Screenshot…" id="455">
+                                <connections>
+                                    <action selector="open_screen:" target="346" id="463"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save Screenshot As…" id="448">
+                                <connections>
+                                    <action selector="save_screen:" target="346" id="449"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Export Screenshot…" id="459">
+                                <connections>
+                                    <action selector="export_screen:" target="346" id="464"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="500">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Import Binary Data…" id="501">
+                                <connections>
+                                    <action selector="showLoadBinaryPane:" target="346" id="503"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Export Binary Data…" id="502">
+                                <connections>
+                                    <action selector="showSaveBinaryPane:" target="346" id="504"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="View" id="887">
+                    <menu key="submenu" title="View" id="888">
+                        <items>
+                            <menuItem title="Actual Size" keyEquivalent="0" id="889">
+                                <connections>
+                                    <action selector="zoom:" target="879" id="893"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom 1x" tag="1" keyEquivalent="1" id="890">
+                                <connections>
+                                    <action selector="zoom:" target="879" id="894"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom 2x" tag="2" keyEquivalent="2" id="891">
+                                <connections>
+                                    <action selector="zoom:" target="879" id="895"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom 3x" tag="3" keyEquivalent="3" id="892">
+                                <connections>
+                                    <action selector="zoom:" target="879" id="896"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom 4x" tag="4" keyEquivalent="4" id="1000">
+                                <connections>
+                                    <action selector="zoom:" target="879" id="1002"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom 5x" tag="5" keyEquivalent="5" id="1001">
+                                <connections>
+                                    <action selector="zoom:" target="879" id="1003"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Machine" id="322">
+                    <menu key="submenu" title="Machine" id="323">
+                        <items>
+                            <menuItem title="Pause" id="1016">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="pause:" target="346" id="1018"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1017"/>
+                            <menuItem title="NMI" id="457">
+                                <connections>
+                                    <action selector="nmi:" target="346" id="460"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Didaktik SNAP" tag="174" id="pU6-Mj-mxj">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="didaktik80_snap:" target="346" id="7LO-IE-qmx"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1015"/>
+                            <menuItem title="Debugger" id="458">
+                                <connections>
+                                    <action selector="cocoa_break:" target="346" id="466"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="POKE Finder" id="516">
+                                <connections>
+                                    <action selector="showPokeFinderPane:" target="346" id="518"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="POKEs/Cheats" id="1183">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showPokeMemoryPane:" target="346" id="1184"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Memory Browser" id="524">
+                                <connections>
+                                    <action selector="showMemoryBrowserPane:" target="346" id="525"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Profiler" id="850">
+                                <menu key="submenu" title="Profiler" id="851">
+                                    <items>
+                                        <menuItem title="Start" tag="70" id="852">
+                                            <connections>
+                                                <action selector="profiler_start:" target="346" id="854"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Stop" tag="71" id="853">
+                                            <connections>
+                                                <action selector="profiler_stop:" target="346" id="855"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Bind Keys to Joystick" keyEquivalent="j" id="965">
+                                <connections>
+                                    <action selector="joystick_keyboard:" target="346" id="967"/>
+                                    <binding destination="922" name="value" keyPath="values.keyboard" id="966"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="eIS-Nr-x4v"/>
+                            <menuItem title="Reset" id="324">
+                                <connections>
+                                    <action selector="reset:" target="346" id="353"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hard Reset" id="920">
+                                <connections>
+                                    <action selector="hard_reset:" target="346" id="921"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Media" id="528">
+                    <menu key="submenu" title="Media" id="527">
+                        <items>
+                            <menuItem title="Tape" id="538">
+                                <menu key="submenu" title="Tape" id="537">
+                                    <items>
+                                        <menuItem title="Open…" tag="72" id="539">
+                                            <connections>
+                                                <action selector="tape_open:" target="346" id="580"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Play" tag="73" keyEquivalent="p" id="536">
+                                            <connections>
+                                                <action selector="tape_play:" target="346" id="581"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Browse" id="533">
+                                            <connections>
+                                                <action selector="showTapeBrowserPane:" target="346" id="582"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Rewind" tag="74" id="534">
+                                            <connections>
+                                                <action selector="tape_rewind:" target="346" id="583"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Close" tag="75" id="532">
+                                            <connections>
+                                                <action selector="tape_clear:" target="346" id="584"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save As…" tag="76" id="535">
+                                            <connections>
+                                                <action selector="tape_write:" target="346" id="585"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Record" id="897">
+                                            <connections>
+                                                <action selector="tape_record:" target="346" id="899"/>
+                                                <binding destination="922" name="enabled" keyPath="values.tapetraps" id="925">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Drive A:" id="1078">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Drive A:" id="1079">
+                                    <items>
+                                        <menuItem title="New" id="1080">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_new_a:" target="346" id="1122"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Open…" id="1096">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_open_a:" target="346" id="1123"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Eject" tag="150" id="1097">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_eject_a:" target="346" id="1124"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save" tag="151" id="1098">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_save_a:" target="346" id="1175"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save as…" tag="154" id="1168">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_save_as_a:" target="346" id="1176"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Flip" tag="152" id="1099">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_flip_a:" target="346" id="1126"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Write Protect" tag="153" id="1100">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_write_protect_a:" target="346" id="1127"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Drive B:" id="1081">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Drive B:" id="1082">
+                                    <items>
+                                        <menuItem title="New" id="1083">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_new_b:" target="346" id="1128"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Open…" id="1101">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_open_b:" target="346" id="1129"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Eject" tag="160" id="1102">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_eject_b:" target="346" id="1130"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save" tag="161" id="1103">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_save_b:" target="346" id="1178"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save as…" tag="164" id="1169">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_save_as_b:" target="346" id="1177"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Flip" tag="162" id="1104">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_flip_b:" target="346" id="1132"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Write Protect" tag="163" id="1105">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="disk_write_protect_b:" target="346" id="1133"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Microdrive 1" id="1084">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Microdrive 1" id="1085">
+                                    <items>
+                                        <menuItem title="New" id="1086">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_insert_new:" target="346" id="1134"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Open…" id="1106">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_insert:" target="346" id="1135"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Eject" tag="32" id="1108">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_eject:" target="346" id="1136"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save" tag="33" id="1109">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_save:" target="346" id="1179"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save as…" tag="34" id="1171">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_save_as:" target="346" id="1180"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Write Protect" tag="35" id="1107">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_writep:" target="346" id="1138"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Microdrive 2" id="1087">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Microdrive 2" id="1088">
+                                    <items>
+                                        <menuItem title="New" id="1110">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_insert_new:" target="346" id="1139"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Open…" id="1089">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_insert:" target="346" id="1140"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Eject" tag="82" id="1111">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_eject:" target="346" id="1141"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save" tag="83" id="1112">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_save:" target="346" id="1181"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save as…" tag="84" id="1173">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_save_as:" target="346" id="1182"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Write Protect" tag="85" id="1113">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="mdr_writep:" target="346" id="1143"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="IDE Master" id="1090">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="IDE Master" id="1091">
+                                    <items>
+                                        <menuItem title="Open…" tag="41" id="1092">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="ide_insert:" target="346" id="1144"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save" tag="51" id="1114">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="ide_commit:" target="346" id="1145"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Close" tag="61" id="1115">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="ide_eject:" target="346" id="1146"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="IDE Slave" id="1093">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="IDE Slave" id="1094">
+                                    <items>
+                                        <menuItem title="Open…" tag="42" id="1095">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="ide_insert:" target="346" id="1147"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save" tag="52" id="1116">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="ide_commit:" target="346" id="1148"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Close" tag="62" id="1117">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="ide_eject:" target="346" id="1149"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Cartridge" id="1118">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Cartridge" id="1119">
+                                    <items>
+                                        <menuItem title="Open…" id="1120">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="cart_open:" target="346" id="1163"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Close" id="1121">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="cart_eject:" target="346" id="1164"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Window" id="284">
+                    <menu key="submenu" title="Window" systemMenu="window" id="285">
+                        <items>
+                            <menuItem title="Minimize" keyEquivalent="m" id="283">
+                                <connections>
+                                    <action selector="performMiniaturize:" target="-1" id="932"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Fullscreen" keyEquivalent="f" id="461">
+                                <connections>
+                                    <action selector="fullscreen:" target="879" id="883"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Help" id="103">
+                    <menu key="submenu" title="Help" id="106">
+                        <items>
+                            <menuItem title="Fuse Help" keyEquivalent="?" id="111">
+                                <connections>
+                                    <action selector="help:" target="346" id="930"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Keyboard" keyEquivalent="k" id="364">
+                                <connections>
+                                    <action selector="showKeyboardPane:" target="346" id="451"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+        </menu>
+        <customObject id="253" userLabel="Font Manager" customClass="NSFontManager"/>
+        <customObject id="346" userLabel="FuseController" customClass="FuseController">
+            <connections>
+                <outlet property="cartridge" destination="1118" id="1154"/>
+                <outlet property="diskA" destination="1078" id="1150"/>
+                <outlet property="diskB" destination="1081" id="1151"/>
+                <outlet property="diskFlipA" destination="1099" id="1157"/>
+                <outlet property="diskFlipB" destination="1104" id="1159"/>
+                <outlet property="diskWpA" destination="1100" id="1158"/>
+                <outlet property="diskWpB" destination="1105" id="1160"/>
+                <outlet property="ideMaster" destination="1090" id="1155"/>
+                <outlet property="ideSlave" destination="1093" id="1156"/>
+                <outlet property="if1Wp1" destination="1107" id="1161"/>
+                <outlet property="if1Wp2" destination="1113" id="1162"/>
+                <outlet property="mdr1" destination="1084" id="1152"/>
+                <outlet property="mdr2" destination="1087" id="1153"/>
+                <outlet property="pause" destination="1016" id="1020"/>
+                <outlet property="recentSnaps" destination="510" id="512"/>
+                <outlet property="tapePlay" destination="536" id="876"/>
+                <outlet property="tapeRecord" destination="897" id="898"/>
+                <outlet property="window" destination="877" id="880"/>
+            </connections>
+        </customObject>
+        <window title="Fuse" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="MainWindow" animationBehavior="default" id="877" userLabel="Window">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="496" y="324" width="320" height="240"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
+            <value key="minSize" type="size" width="213" height="107"/>
+            <view key="contentView" id="878">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="240"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <customView id="879" customClass="DisplayOpenGLView">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="240"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </customView>
+                </subviews>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="879" id="886"/>
+                <outlet property="initialFirstResponder" destination="879" id="882"/>
+            </connections>
+        </window>
+        <userDefaultsController representsSharedInstance="YES" id="922" userLabel="Shared Defaults"/>
+    </objects>
+</document>

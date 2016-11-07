@@ -100,6 +100,10 @@ utils_open_file( const char *filename, int autoload,
     error = rzx_start_playback_from_buffer( file.buffer, file.length );
     break;
 
+  case LIBSPECTRUM_CLASS_SCREENSHOT:
+    error = screenshot_scr_read( filename );
+    break;
+
   case LIBSPECTRUM_CLASS_SNAPSHOT:
     error = snapshot_read_buffer( file.buffer, file.length, type );
     pokemem_find_pokfile( filename );

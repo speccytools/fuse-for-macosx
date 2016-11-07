@@ -26,6 +26,11 @@
 #ifndef FUSE_SDLDISPLAY_H
 #define FUSE_SDLDISPLAY_H
 
+#include <SDL.h>
+
+#include "ui/ui.h"
+
 extern SDL_Surface *sdldisplay_gc;    /* Hardware screen */
+extern ui_statusbar_state sdl_disk_state, sdl_mdr_state, sdl_tape_state;
 
 #endif			/* #ifndef FUSE_SDLDISPLAY_H */

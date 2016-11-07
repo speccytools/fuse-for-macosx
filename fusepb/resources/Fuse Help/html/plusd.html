@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=ISO-8859-1">
+    <!-- AppleSegStart="+D Emulation" -->
+    <title>+D Emulation</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="+D EMULATION"></a><!-- AppleSegDescription="This section describes the +D interface emulation in Fuse." --></font>
+    <div class="refsect1" xml:lang="en" lang="en">
+      <h2><font face="Lucida Grande,Helvetica,Arial">+D Emulation</font></h2>
+    </div>
+    <p> <font face="Lucida Grande,Helvetica,Arial">Fuse supports
+        emulating the +D disk and printer interface. See the <font
+          face="Lucida Grande,Helvetica,Arial"><span class="emphasis"><em></em></span></font></font><font
+        face="Lucida Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial"><span class="emphasis"><em><font
+                face="Lucida Grande,Helvetica,Arial"><a
+                  href="formats.html">Disk File Formats</a></font></em></span></font>
+        section for more details on supported disk file formats.</font><font
+        face="Lucida Grande,Helvetica,Arial"> The +D's printer port is
+        emulated. (See the </font><font face="Lucida
+        Grande,Helvetica,Arial"><span class="emphasis"><em></em></span></font><font
+        face="Lucida Grande,Helvetica,Arial"><span class="emphasis"><em><font
+              face="Lucida Grande,Helvetica,Arial"><a
+                href="printer.html">Printer Emulation</a></font></em></span></font><font
+        face="Lucida Grande,Helvetica,Arial"> section for more details.)
+        The +D may only be used with 48K, 128K and +2 (not +2A)
+        emulation. To access disks, load G+DOS, by inserting a disk
+        containing the DOS file (+SYS) and entering "RUN". Once DOS is
+        loaded, you can load to/from +D disks by prefixing file names
+        with <span style="font-style: italic;">`d n</span>' where <span
+          style="font-style: italic;">` n '</span> is the number of the
+        drive in use.&nbsp; For example, `LOAD d1;"myfile"' would load
+        the file named `myfile' from the emulated drive 1. Microdrive
+        syntax may also be used.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">To save a snapshot,
+        choose the Machine &gt; NMI menu option, and then press `4' to
+        save a 48K snapshot, or `5' to save a 128K snapshot.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">When saving a 128K
+        snapshot, you must then press Y or N to indicate whether the
+        screen changed while saving the snapshot, to finish
+        saving.&nbsp; You can also choose `3' to save a screenshot to
+        disk.<br>
+        Holding Caps Shift together with any of these options will cause
+        the +D to save to the `other' drive to the one used last.<br>
+      </font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial">Options `1' and `2' allow screenshots
+          to be printed (in monochrome</font>, in normal and large
+        formats respectively) if printer emulation is enabled.&nbsp; For
+        saving and loading of snapshots, and saving of screenshots to
+        disk, G+DOS must be loaded first, but printing of screenshots
+        can be performed without loading G+DOS.<br>
+      </font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial"><font face="Lucida
+          Grande,Helvetica,Arial"> Finally, `X' will return from the NMI
+          menu.</font></font><font face="Lucida Grande,Helvetica,Arial"><!-- AppleSegEnd -->
+      </font></p>
+  </body>
+</html>

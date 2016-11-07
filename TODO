@@ -1,0 +1,23 @@
+TODO
+
+* Update What's new in help file
+* Fix html help cross references
+* Better show which machines are usable given ROM availability
+* Pentagon port #ff returning floating bus issues - it does it because the RusFAQ says so?
+* Collapse Media hierarchy, just have Tape, Disk A, Disk B, Master, Slave, Microdrive 1..4 etc.
+* Add TITLE tags to help files?
+* SZX ZX Printer block?
+* PAL Compsite emulation
+* Separate out sound buffer interleaving code to allow for the use of hardware etc.
+  sound mixing
+* Randomise FRAMES sys var after autoload snapshot loaded in order to try and
+  get less deterministic program behaviour after load is complete
+* Use sheets rather than modal dialogs (for Save As)
+* Allow Cmd-w to close as many windows as possible
+* Make border display/size optional
+* Make activity icons transparent
+* SZX +3 block - seems to be redundant?
+* Add QuickLook HTML view showing Title, etc. like QuickLook on MP3s
+* Pentagon border emulation?
+
+$Id: TODO 2026 2004-03-02 13:38:08Z pak21 $

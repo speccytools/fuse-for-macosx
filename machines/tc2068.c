@@ -137,11 +137,11 @@ tc2068_reset( void )
   size_t i, j;
   int error;
 
-  error = machine_load_rom( 0, settings_current.rom_tc2068_0,
-                            settings_default.rom_tc2068_0, 0x4000 );
+  error = machine_load_rom( 0, settings_current.rom_2068_0,
+                            settings_default.rom_2068_0, 0x4000 );
   if( error ) return error;
-  error = machine_load_rom( 1, settings_current.rom_tc2068_1,
-                            settings_default.rom_tc2068_1, 0x2000 );
+  error = machine_load_rom( 1, settings_current.rom_2068_1,
+                            settings_default.rom_2068_1, 0x2000 );
   if( error ) return error;
 
   /* 0x0000: ROM 0 */
@@ -165,7 +165,6 @@ tc2068_reset( void )
       memory_page *dock_page, *exrom_page;
       
       dock_page = &timex_dock[i * MEMORY_PAGES_IN_8K + j];
-      *dock_page = tc2068_empty_mapping[j];
       dock_page->page_num = i;
 
       exrom_page = &timex_exrom[i * MEMORY_PAGES_IN_8K + j];

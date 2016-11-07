@@ -84,4 +84,10 @@ extern int spectrum_frame_event;
 void spectrum_register_startup( void );
 int spectrum_frame( void );
 
+/* Do a single frame */
+void spectrum_do_frame(void);
+
+/* Run until the next timer event */
+void spectrum_do_timer( libspectrum_dword target_tstates );
+
 #endif			/* #ifndef FUSE_SPECTRUM_H */

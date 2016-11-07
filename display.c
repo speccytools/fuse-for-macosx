@@ -630,8 +630,8 @@ get_beam_position( int *x, int *y )
   else *x = 0;
 }
 
-void
-display_update_critical( int x, int y )
+inline static void
+update_critical_internal( int x, int y )
 {
   int beam_x, beam_y;
 
@@ -658,6 +658,12 @@ display_update_critical( int x, int y )
     copy_critical_region( beam_x, beam_y );
 }
 
+void
+display_update_critical( int x, int y )
+{
+  update_critical_internal( x, y );
+}
+
 /* Mark the 8-pixel chunk at (x,y) as maybe dirty and update the critical
    region as appropriate */
 static inline void
@@ -668,7 +674,7 @@ display_dirty_chunk( int x, int y )
   if(   y >  critical_region_y                             ||
       ( y == critical_region_y && x >= critical_region_x )    ) {
 
-    display_update_critical( x, y );
+    update_critical_internal( x, y );
   }
 
   display_maybe_dirty[y] |= ( (libspectrum_dword)1 << x );
@@ -696,16 +702,7 @@ display_dirty64( libspectrum_word offset )
   for( i = 0; i < 8; i++ ) display_dirty_chunk( x, y + i );
 }
 
-/* Get the attributes for the eight pixels starting at
-   ( (8*x) , y ) */
-static void
-display_get_attr( int x, int y,
-                  libspectrum_byte *ink, libspectrum_byte *paper )
-{
-  display_parse_attr( display_get_attr_byte( x, y ), ink, paper );
-}
-
-void
+inline void
 display_parse_attr( libspectrum_byte attr,
 		    libspectrum_byte *ink, libspectrum_byte *paper )
 {
@@ -716,6 +713,15 @@ display_parse_attr( libspectrum_byte attr,
     *ink= (attr & 0x07) + ( (attr & 0x40) >> 3 );
     *paper= (attr & ( 0x0f << 3 ) ) >> 3;
   }
+}
+
+/* Get the attributes for the eight pixels starting at
+   ( (8*x) , y ) */
+static void
+display_get_attr( int x, int y,
+                  libspectrum_byte *ink, libspectrum_byte *paper )
+{
+  display_parse_attr( display_get_attr_byte( x, y ), ink, paper );
 }
 
 static void

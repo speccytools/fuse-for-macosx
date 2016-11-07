@@ -79,8 +79,8 @@ tc2048_reset( void )
   size_t i, j;
   int error;
 
-  error = machine_load_rom( 0, settings_current.rom_tc2048,
-                            settings_default.rom_tc2048, 0x4000 );
+  error = machine_load_rom( 0, settings_current.rom_2048_0,
+                            settings_default.rom_2048_0, 0x4000 );
   if( error ) return error;
 
   /* 0x0000: ROM 0 */

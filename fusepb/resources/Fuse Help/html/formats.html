@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=ISO-8859-1">
+    <!-- AppleSegStart="Disk Formats" -->
+    <title>Disk Formats</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="Disk Formats"></a><!-- AppleSegDescription="This section describes the disk formats supported by Fuse." --></font>
+    <div class="refsect1" xml:lang="en" lang="en">
+      <h2><font face="Lucida Grande,Helvetica,Arial">Disk File Formats</font></h2>
+    </div>
+    <p> <font face="Lucida Grande,Helvetica,Arial">Fuse supports
+        several disk image formats in its +D, Didaktik, DISCiPLE, Opus
+        and Beta 128 emulation.<br>
+        The following are supported for reading:</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">.UDI<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">Ultra Disk Image; for specification
+        details please see <a
+          href="http://faqwiki.zxnet.co.uk/wiki/UDI_format">http://faqwiki.zxnet.co.uk/wiki/UDI_format</a>.</font><font
+        face="Lucida Grande,Helvetica,Arial"> This is the only image
+        format which can store all the relevant information</font><font
+        face="Lucida Grande,Helvetica,Arial"> of the recorded data on a
+        magnetic disk, so it can be used for any <span
+          style="font-style: italic;">non standard</span> disk format.
+        Fuse can store and read both MFM and FM formatted disk data
+        in/from this container.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.FDI<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">UKV Spectrum Debugger disk image format.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.MGT<br>
+        .IMG<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">DISCiPLE/+D file formats.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.SAD<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">For compatibility with SAM Coup&eacute; disk
+        images using these formats. Note that SAM Coup&eacute; `.DSK' images
+        share the same format as `.MGT'.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.D80<br>
+        .D40<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">Didaktik 80 and Didaktik 40 file
+        formats.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.TRD<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">TR-DOS disk image. TRD and SCL sectors
+        are loaded interleaved, therefore<font face="Lucida
+          Grande,Helvetica,Arial"> </font>you might experience problems
+        when <font face="Lucida Grande,Helvetica,Arial">these images
+          are used </font>with TR-DOS ROMs that use the turbo<font
+          face="Lucida Grande,Helvetica,Arial"> </font>format
+        (sequential sectors); for detailed information please see</font><br>
+      <a
+href="http://web.archive.org/web/20070808150548/http://www.ramsoft.bbk.org/tech/tr-info.zip"><font
+          face="Lucida Grande,Helvetica,Arial">http://web.archive.org/web/20070808150548/http://www.ramsoft.bbk.org/tech/tr-info.zip</font></a><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.SCL<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">A simple archive format for TR-DOS disk
+        files. For specification please see</font><br>
+      <a href="http://www.zx-modules.de/fileformats/sclformat.html"><font
+          face="Lucida Grande,Helvetica,Arial">http://www.zx-modules.de/fileformats/sclformat.html</font></a><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.TD0<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">Teledisk image format; Fuse supports
+        only files not created with "Advanced Compression". Detailed
+        description found in <a
+          href="http://www.classiccmp.org/dunfield/img54306/td0notes.txt"><span
+            style="text-decoration: underline;"></span>http://www.classiccmp.org/dunfield/img54306/td0notes.txt</a>
+        and <a
+href="https://web.archive.org/web/20130116072335/http://www.fpns.net/willy/wteledsk.htm">https://web.archive.org/web/20130116072335/http://www.fpns.net/willy/wteledsk.htm</a>.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.DSK<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">CPC disk image format; Fuse supports the
+        plain old and the new extended CPC format too. Further
+        information please see the </font><font face="Lucida
+        Grande,Helvetica,Arial"><span class="emphasis"><em>The .DSK
+            Format</em></span></font> <font face="Lucida
+        Grande,Helvetica,Arial">section and the CPCEMU manual section
+        7.7.1 <a href="http://www.cpc-emu.org/linux/cpcemu_e.txt">http://www.cpc-emu.org/linux/cpcemu_e.txt</a>
+        or <a href="http://www.cpctech.org.uk/docs/extdsk.html">http://www.cpctech.org.uk/docs/extdsk.html</a>.</font><br>
+    </div>
+    <p><font face="Lucida Grande,Helvetica,Arial">.OPD<br>
+        .OPU<br>
+      </font></p>
+    <div style="margin-left: 40px;"><font face="Lucida
+        Grande,Helvetica,Arial">Opus Discovery file formats.</font><br>
+    </div>
+    <br>
+    <p><font face="Lucida Grande,Helvetica,Arial">Fuse supports the <span
+          style="font-style: italic;">.UDI, .FDI, .MGT, .IMG, .SAD, .D80
+          .D40 .TRD, .SCL, .OPD, .OPU and .DSK</span> (only the old CPC
+        format)</font><font face="Lucida Grande,Helvetica,Arial">
+        formats for writing.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial"><span
+          style="font-style: italic;"></span></font><font face="Lucida
+        Grande,Helvetica,Arial">You can save disk images with any output
+        format, just select the appropriate type from the disk save
+        dialog.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">Not all image formats
+        can store all disk image information. You cannot save a disk
+        image with an inappropriate format that loses some information
+        (e.g. variable track length or sector length).<br>
+        <br>
+      </font></p>
+    <!-- AppleSegEnd -->
+  </body>
+</html>

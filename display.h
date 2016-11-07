@@ -107,7 +107,7 @@ void display_dirty_flashing_timex(void);
 void display_dirty_flashing_pentagon_16_col(void);
 void display_dirty_flashing_sinclair(void);
 
-void display_parse_attr( libspectrum_byte attr, libspectrum_byte *ink,
+inline void display_parse_attr( libspectrum_byte attr, libspectrum_byte *ink,
 			 libspectrum_byte *paper );
 
 void display_set_lores_border(int colour);

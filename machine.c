@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "FuseMenus.h"
 #include "event.h"
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"
@@ -108,7 +109,8 @@ machine_init_machines( void *context )
   return 0;
 }
 
-static int machine_add_machine( int (*init_function)( fuse_machine_info *machine ) )
+static int
+machine_add_machine( int (*init_function)( fuse_machine_info *machine ) )
 {
   fuse_machine_info *machine;
   int error;
@@ -185,13 +187,47 @@ int machine_select_id( const char *id )
   return 1;
 }
 
-const char*
-machine_get_id( libspectrum_machine type )
+int
+machine_get_index( libspectrum_machine type )
 {
   int i;
 
   for( i=0; i<machine_count; i++ )
-    if( machine_types[i]->machine == type ) return machine_types[i]->id;
+    if( machine_types[i]->machine == type ) return i;
+
+  return -1;
+}
+
+const char*
+machine_get_id( libspectrum_machine type )
+{
+  int i = machine_get_index( type );
+
+  return i == -1 ? NULL : machine_types[i]->id;
+}
+
+int
+machine_get_type( const char* id )
+{
+  fuse_machine_info* fmi = machine_get_machine_info( id );
+
+  if( fmi ) {
+    return fmi->machine;
+  }
+
+  return -1;
+}
+
+fuse_machine_info*
+machine_get_machine_info( const char *id )
+{
+  int i;
+
+  for( i=0; i < machine_count; i++ ) {
+    if( ! strcmp( machine_types[i]->id, id ) ) {
+      return machine_types[i];
+    }
+  }
 
   return NULL;
 }
@@ -352,6 +388,10 @@ machine_reset( int hard_reset )
   module_reset( hard_reset );
 
   error = machine_current->memory_map(); if( error ) return error;
+
+  /* Select 50 or 60 Hz emulation timer */
+  SetEmulationHz( (float)machine_current->timings.processor_speed /
+                  machine_current->timings.tstates_per_frame );
 
   /* Set up the contention array */
   for( i = 0; i < machine_current->timings.tstates_per_frame; i++ ) {

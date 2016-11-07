@@ -236,7 +236,7 @@ int rzx_stop_recording( void )
   return 0;
 }
 
-static libspectrum_snap*
+libspectrum_snap*
 rzx_get_initial_snapshot( void )
 {
   libspectrum_rzx_iterator it;
@@ -765,8 +765,8 @@ rzx_register_startup( void )
                             rzx_end );
 }
 
-static GSList*
-get_rollback_list( libspectrum_rzx *from_rzx )
+GSList*
+rzx_get_rollback_list( libspectrum_rzx *from_rzx )
 {
   libspectrum_rzx_iterator it;
   GSList *rollback_points;
@@ -804,8 +804,8 @@ get_rollback_list( libspectrum_rzx *from_rzx )
   return rollback_points;
 }
 
-static int
-start_after_rollback( libspectrum_snap *snap )
+int
+rzx_start_after_rollback( libspectrum_snap *snap )
 {
   int error;
 
@@ -832,7 +832,7 @@ rzx_rollback( void )
   error = libspectrum_rzx_rollback( rzx, &snap );
   if( error ) return error;
 
-  error = start_after_rollback( snap );
+  error = rzx_start_after_rollback( snap );
   if( error ) return error;
 
   return 0;
@@ -845,7 +845,7 @@ rzx_rollback_to( void )
   libspectrum_snap *snap;
   int which, error;
 
-  rollback_points = get_rollback_list( rzx );
+  rollback_points = rzx_get_rollback_list( rzx );
 
   which = ui_get_rollback_point( rollback_points );
 
@@ -854,7 +854,7 @@ rzx_rollback_to( void )
   error = libspectrum_rzx_rollback_to( rzx, &snap, which );
   if( error ) return error;
 
-  error = start_after_rollback( snap );
+  error = rzx_start_after_rollback( snap );
   if( error ) return error;
 
   return 0;

@@ -67,6 +67,12 @@ static void
 spectrum_frame_event_fn( libspectrum_dword last_tstates, int type,
 			 void *user_data )
 {
+  event_frame_end = 1;
+}
+
+static void
+spectrum_do_frame_end( void )
+{
   if( rzx_playback ) event_force_events();
   rzx_frame();
   psg_frame();
@@ -77,6 +83,7 @@ spectrum_frame_event_fn( libspectrum_dword last_tstates, int type,
   debugger_add_time_events();
   ui_event();
   ui_error_frame();
+  event_frame_end = 0;
 }
 
 static int
@@ -260,4 +267,30 @@ libspectrum_byte
 spectrum_unattached_port_none( void )
 {
   return 0xff;
+}
+
+/* Do a single frame */
+void
+spectrum_do_frame(void)
+{
+  while( !event_frame_end ) {
+    z80_do_opcodes();
+    event_do_events();
+  }
+  spectrum_do_frame_end();
+}
+
+/* Run until target_tstates */
+void
+spectrum_do_timer( libspectrum_dword target_tstates )
+{
+  event_timer=0;
+  event_add( target_tstates + tstates, timer_event );
+  while( !event_timer ) {
+    z80_do_opcodes();
+    event_do_events();
+    if( event_frame_end ) {
+      spectrum_do_frame_end();
+    }
+  }
 }

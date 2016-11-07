@@ -1,5 +1,5 @@
 /* sdlui.c: Routines for dealing with the SDL user interface
-   Copyright (c) 2000-2002 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
+   Copyright (c) 2000-2004 Philip Kendall, Matan Ziv-Av, Fredrick Meunier
    Copyright (c) 2015 Stuart Brady
 
    $Id$
@@ -33,10 +33,13 @@
 #include "fuse.h"
 #include "ui/ui.h"
 #include "ui/uidisplay.h"
+#include "pokefinder/pokefinder.h"
 #include "settings.h"
 #include "sdldisplay.h"
 #include "sdljoystick.h"
 #include "sdlkeyboard.h"
+#include "sdlui.h"
+#include "tape.h"
 #include "ui/scaler/scaler.h"
 #include "menu.h"
 
@@ -57,6 +60,10 @@ ui_init( int *argc, char ***argv )
 /* Comment out to Work around a bug in OS X 10.1 related to OpenGL in windowed
    mode */
   atexit(atexit_proc);
+
+  /* We seem to have a problem with 10.3.9 ppc platform support and Altivec
+     blitters, disable the blitters till the SDL folks have it in hand */
+  //setenv("SDL_ALTIVEC_BLIT_FEATURES", "0", 1);
 
   error = SDL_Init( SDL_INIT_VIDEO );
   if ( error )
@@ -123,11 +130,6 @@ ui_event( void )
     case SDL_VIDEOEXPOSE:
       display_refresh_all();
       break;
-    case SDL_ACTIVEEVENT:
-      if( event.active.state & SDL_APPINPUTFOCUS ) {
-	if( event.active.gain ) ui_mouse_resume(); else ui_mouse_suspend();
-      }
-      break;
     default:
       break;
     }
@@ -172,6 +174,7 @@ int
 ui_mouse_grab( int startup )
 {
   if( settings_current.full_screen ) {
+    SDL_ShowCursor( SDL_DISABLE );
     SDL_WarpMouse( 128, 128 );
     return 1;
   }
@@ -197,4 +200,16 @@ ui_mouse_release( int suspend )
   SDL_WM_GrabInput( SDL_GRAB_OFF );
   SDL_ShowCursor( SDL_ENABLE );
   return 0;
+}
+
+void
+sdlui_quit( void )
+{ 
+  int error;
+
+  if( sdlui_confirm( "Exit Fuse?" ) ) {
+    error = tape_close(); if( error ) return;
+
+    fuse_exiting = 1;
+  }
 }

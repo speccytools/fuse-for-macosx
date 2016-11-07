@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=ISO-8859-1">
+    <!-- AppleSegStart="Inputs Preferences" -->
+    <title>Preferences</title>
+  </head>
+  <body>
+    <font face="Lucida Grande,Helvetica,Arial"><a name="Inputs
+        Preferences"></a><!-- AppleSegDescription="This section describes the Fuse inputs preferences dialog." --></font>
+    <h2><font face="Lucida Grande,Helvetica,Arial"><span
+          style="font-style: italic;">Inputs</span> preferences</font></h2>
+    <p><font face="Lucida Grande,Helvetica,Arial">Fuse can emulate many
+        of the common types of joystick which were available for the
+        Spectrum. The input for these emulated joysticks can be taken
+        from real joysticks attached to the emulating machine, or from
+        the q, a, o, p, and space keys on the emulating machines
+        keyboard, configured via the <span class="emphasis"><em>Real
+            device</em></span> option. You can also configure which
+        joystick axes to use on gamepads with more than one
+        joystick/pad.<br>
+      </font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">Note that when using
+        the keyboard to emulate a joystick, the q, a, o, p, and space
+        keys will not have their normal effect (to avoid problems with
+        games which do things like use p for pause when using a
+        joystick). See also the <span class="emphasis"><em>Machine &gt;
+            Bind Keys to Joystick</em></span> option.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">Each of the joysticks
+        (including the `fake' keyboard joystick) can be configured to
+        emulate any one of the following joystick types:</font></p>
+    <p style="margin-left: 40px;"> <span class="emphasis"><font
+          face="Lucida Grande,Helvetica,Arial"><em>None</em></font></span>
+      <font face="Lucida Grande,Helvetica,Arial">No joystick: any input
+        will simply be ignored.</font></p>
+    <p style="margin-left: 40px;"> <span class="emphasis"><font
+          face="Lucida Grande,Helvetica,Arial"><em>Cursor</em></font></span>
+      <font face="Lucida Grande,Helvetica,Arial">A cursor joystick,
+        equivalent to pressing 5 (left), 6 (down), 7 (up), 8 (right),
+        and 0 (fire).</font></p>
+    <p style="margin-left: 40px;"> <span class="emphasis"><font
+          face="Lucida Grande,Helvetica,Arial"><em>Kempston</em></font></span>
+      <font face="Lucida Grande,Helvetica,Arial">A Kempston joystick,
+        read from input port 31. Note that the <span class="emphasis"><em>Peripherals
+
+
+            preferences &gt; Kempston interface</em></span> option must
+        also be set for the input to be recognised.</font></p>
+    <p style="margin-left: 40px;"> <span class="emphasis"><font
+          face="Lucida Grande,Helvetica,Arial"><em>Sinclair 1</em></font></span>
+      <span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Sinclair
+
+
+
+            2</em></font></span> <font face="Lucida
+        Grande,Helvetica,Arial">The `left' and `right' Sinclair
+        joysticks, equivalent to pressing 1 (left), 2 (right), 3 (down),
+        4 (up), and 5 (fire), or 6 (left), 7 (right), 8 (down), 9 (up),
+        and 0 (fire) respectively.</font></p>
+    <p style="margin-left: 40px;"> <span class="emphasis"><font
+          face="Lucida Grande,Helvetica,Arial"><em>Timex 1</em></font></span>
+      <span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Timex
+
+
+
+            2</em></font></span> <font face="Lucida
+        Grande,Helvetica,Arial">The `left' and `right' joysticks as
+        attached to the Timex 2068s built-in joystick interface.</font></p>
+    <p><font face="Lucida Grande,Helvetica,Arial">For the real
+        joysticks, it is also possible to configure what effect each
+        button on the joystick will have: this can be Joystick Fire,
+        equivalent to presing the emulated joystick's fire button,
+        Nothing, meaning to have no effect, or any Spectrum key, meaning
+        that pressing that button will be equivalent to pressing that
+        Spectrum key.<br>
+      </font></p>
+    <h3><font face="Lucida Grande,Helvetica,Arial">Other options</font></h3>
+    <table style="text-align: left; width: 100%;" cellpadding="2"
+      cellspacing="2">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top;"><font style="font-weight:
+              bold;" face="Lucida Grande,Helvetica,Arial">OPTION</font></td>
+          <td style="vertical-align: top;"><font style="font-weight:
+              bold;" face="Lucida Grande,Helvetica,Arial">DESCRIPTION</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Interface II</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is selected, Fuse
+              will emulate a cartridge port as found on the Interface
+              II. Cartridges can then be inserted and removed via the <span
+                class="emphasis"><em>Media &gt; Cartridge</em></span>
+              menu. Note that the Pentagon, Scorpion, Interface II,
+              ZXATASP and ZXCF all use the same hardware mechanism for
+              accessing some of their extended features, so only one of
+              these should be selected at once or unpredictable
+              behaviour will occur.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Kempston
+                  joystick interface</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is selected, Fuse
+              will emulate a Kempston joystick interface (probably the
+              most widely supported type on the Spectrum). Note that
+              this option is basically equivalent to plugging the
+              interface itself into a Spectrum, not to connecting a
+              joystick; this affects how the Spectrum responds to a read
+              of input port 31. To use a Kempston joystick in a game,
+              this option must be enabled, and you must also select a
+              Kempston joystick above.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Kempston mouse</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is selected, Fuse
+              will emulate a Kempston mouse interface. If you're using
+              Fuse full-screen, your mouse is automatically used as if
+              attached to the Kempston interface. Otherwise, you'll need
+              to click on the Spectrum display in order to tell Fuse to
+              grab the pointer (and make it invisible); to tell Fuse to
+              release it, press Escape.</font></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;"><span class="emphasis"><font
+                face="Lucida Grande,Helvetica,Arial"><em>Swap mouse
+                  buttons</em></font></span></td>
+          <td style="vertical-align: top;"><font face="Lucida
+              Grande,Helvetica,Arial">If this option is enabled, the
+              left and right mouse buttons will be swapped when
+              emulating a Kempston mouse.</font></td>
+        </tr>
+      </tbody>
+    </table>
+    <span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em></em></font></span>
+    <p><br>
+      <!-- AppleSegEnd --> </p>
+  </body>
+</html>

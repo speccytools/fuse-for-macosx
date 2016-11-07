@@ -75,7 +75,7 @@ int ui_debugger_activate( void );
 int ui_debugger_deactivate( int interruptable );
 int ui_debugger_update( void );
 int ui_debugger_disassemble( libspectrum_word address );
-void ui_breakpoints_updated();
+void ui_breakpoints_updated( void );
 
 /* Reset anything in the UI which needs to be reset on machine selection */
 int ui_widgets_reset( void );
@@ -121,6 +121,8 @@ int ui_mouse_release( int suspend ); /* UI: ungrab, return 0 if done */
 /* Write the current tape out */
 int ui_tape_write( void );
 
+/* Write a +3, Beta or +D disk out */
+int ui_disk_write( int which, int saveas );
 int ui_mdr_write( int which, int saveas );
 
 /* Get a rollback point from the given list */

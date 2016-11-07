@@ -80,4 +80,10 @@ int rzx_rollback( void );
 
 int rzx_rollback_to( void );
 
+int rzx_start_after_rollback( libspectrum_snap *snap );
+
+GSList* rzx_get_rollback_list( libspectrum_rzx *rzx );
+
+libspectrum_snap* rzx_get_initial_snapshot( void );
+
 #endif			/* #ifndef FUSE_RZX_H */

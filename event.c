@@ -41,6 +41,12 @@ static const libspectrum_dword event_no_events = 0xffffffff;
 /* When will the next event happen? */
 libspectrum_dword event_next_event;
 
+/* We are at the end of a frame */
+int event_frame_end;
+
+/* We've had a timer event */
+int event_timer;
+
 /* The actual list of events */
 static GSList *event_list = NULL;
 
@@ -65,6 +71,8 @@ event_init( void *context )
   event_type_null = event_register( NULL, "[Deleted event]" );
 
   event_next_event = event_no_events;
+  event_frame_end=0;
+  event_timer=0;
 
   return 0;
 }

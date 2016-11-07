@@ -64,7 +64,6 @@ ui_media_drive_end( void )
 }
 
 struct find_info {
-  int controller;
   int drive;
 };
 
@@ -74,15 +73,14 @@ find_drive( gconstpointer data, gconstpointer user_data )
   const ui_media_drive_info_t *drive = data;
   const struct find_info *info = user_data;
 
-  return !( drive->controller_index == info->controller &&
-            drive->drive_index == info->drive );
+  return !( drive->is_available && drive->is_available()
+            && drive->drive_index == info->drive );
 }
 
 ui_media_drive_info_t *
-ui_media_drive_find( int controller, int drive )
+ui_media_drive_find( int drive )
 {
   struct find_info info = {
-    /* .controller = */ controller,
     /* .drive = */ drive,
   };
   GSList *item;
@@ -149,13 +147,12 @@ ui_media_drive_update_menus( const ui_media_drive_info_t *drive,
     maybe_menu_activate( drive->menu_item_wp, !drive->fdd->wrprot );
 }
 
-
 int
-ui_media_drive_flip( int controller, int which, int flip )
+ui_media_drive_flip( int which, int flip )
 {
   ui_media_drive_info_t *drive;
 
-  drive = ui_media_drive_find( controller, which );
+  drive = ui_media_drive_find( which );
   if( !drive )
     return -1;
   if( !drive->fdd->loaded )
@@ -167,11 +164,11 @@ ui_media_drive_flip( int controller, int which, int flip )
 }
 
 int
-ui_media_drive_writeprotect( int controller, int which, int wrprot )
+ui_media_drive_writeprotect( int which, int wrprot )
 {
   ui_media_drive_info_t *drive;
 
-  drive = ui_media_drive_find( controller, which );
+  drive = ui_media_drive_find( which );
   if( !drive )
     return -1;
   if( !drive->fdd->loaded )
@@ -208,32 +205,14 @@ drive_disk_write( const ui_media_drive_info_t *drive, const char *filename )
 }
 
 
-static int
-drive_save( const ui_media_drive_info_t *drive, int saveas )
+int
+ui_media_drive_save_with_filename( const ui_media_drive_info_t *drive,
+                                   const char *filename )
 {
   int err;
-  char *filename = NULL, title[80];
-
-  if( drive->fdd->disk.type == DISK_TYPE_NONE )
-    return 0;
-  if( drive->fdd->disk.filename == NULL )
-    saveas = 1;
-
   fuse_emulation_pause();
 
-  snprintf( title, sizeof( title ), "Fuse - Write %s", drive->name );
-  if( saveas ) {
-    filename = ui_get_save_filename( title );
-    if( !filename ) {
-      fuse_emulation_unpause();
-      return 1;
-    }
-  }
-
   err = drive_disk_write( drive, filename );
-
-  if( saveas )
-    libspectrum_free( filename );
 
   fuse_emulation_unpause();
   if( err )
@@ -244,14 +223,9 @@ drive_save( const ui_media_drive_info_t *drive, int saveas )
 }
 
 int
-ui_media_drive_save( int controller, int which, int saveas )
+ui_media_drive_save( int which, int saveas )
 {
-  ui_media_drive_info_t *drive;
-
-  drive = ui_media_drive_find( controller, which );
-  if( !drive )
-    return -1;
-  return drive_save( drive, saveas );
+  return ui_disk_write( which, saveas );
 }
 
 static int
@@ -271,7 +245,7 @@ drive_eject( const ui_media_drive_info_t *drive )
     switch( confirm ) {
 
     case UI_CONFIRM_SAVE_SAVE:
-      if( drive_save( drive, 0 ) )
+      if( ui_disk_write( drive, 0 ) )
         return 1;   /* first save it...*/
       break;
 
@@ -288,11 +262,11 @@ drive_eject( const ui_media_drive_info_t *drive )
 }
 
 int
-ui_media_drive_eject( int controller, int which )
+ui_media_drive_eject( int which )
 {
   ui_media_drive_info_t *drive;
 
-  drive = ui_media_drive_find( controller, which );
+  drive = ui_media_drive_find( which );
   if( !drive )
     return -1;
   return drive_eject( drive );

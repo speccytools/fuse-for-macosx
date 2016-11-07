@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="SaveBinaryController">
+            <connections>
+                <outlet property="apply" destination="6" id="17"/>
+                <outlet property="file" destination="9" id="25"/>
+                <outlet property="length" destination="11" id="20"/>
+                <outlet property="start" destination="8" id="19"/>
+                <outlet property="window" destination="12" id="16"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <window title="Export Binary Data" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="12" userLabel="SaveBinary" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="121" y="430" width="591" height="162"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <value key="minSize" type="size" width="213" height="107"/>
+            <view key="contentView" id="14">
+                <rect key="frame" x="0.0" y="0.0" width="591" height="162"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <form verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="10">
+                        <rect key="frame" x="33" y="60" width="174" height="52"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        <size key="cellSize" width="174" height="22"/>
+                        <size key="intercellSpacing" width="1" height="8"/>
+                        <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="35">
+                            <font key="font" metaFont="system"/>
+                            <font key="titleFont" metaFont="system"/>
+                        </formCell>
+                        <cells>
+                            <column>
+                                <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Start:" id="8">
+                                    <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="36" customClass="NumberFormatter">
+                                        <real key="minimum" value="0.0"/>
+                                        <real key="maximum" value="65535"/>
+                                    </numberFormatter>
+                                    <font key="font" metaFont="system"/>
+                                    <font key="titleFont" metaFont="system"/>
+                                </formCell>
+                                <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="1" title="Length:" id="11">
+                                    <numberFormatter key="formatter" formatterBehavior="default10_4" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="37">
+                                        <real key="minimum" value="1"/>
+                                        <real key="maximum" value="65535"/>
+                                    </numberFormatter>
+                                    <font key="font" metaFont="system"/>
+                                    <font key="titleFont" metaFont="system"/>
+                                </formCell>
+                            </column>
+                        </cells>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="27"/>
+                        </connections>
+                    </form>
+                    <button verticalHuggingPriority="750" id="13">
+                        <rect key="frame" x="409" y="12" width="84" height="32"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="32">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="cancel:" target="-2" id="21"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" id="6">
+                        <rect key="frame" x="493" y="12" width="84" height="32"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="31">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="apply:" target="-2" id="22"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" id="15">
+                        <rect key="frame" x="477" y="112" width="100" height="32"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="33">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="chooseFile:" target="-2" id="23"/>
+                        </connections>
+                    </button>
+                    <form verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="5">
+                        <rect key="frame" x="20" y="120" width="455" height="22"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        <size key="cellSize" width="455" height="22"/>
+                        <size key="intercellSpacing" width="1" height="8"/>
+                        <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="34">
+                            <font key="font" metaFont="system"/>
+                            <font key="titleFont" metaFont="system"/>
+                        </formCell>
+                        <cells>
+                            <column>
+                                <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Filename:" id="9">
+                                    <font key="font" metaFont="system"/>
+                                    <font key="titleFont" metaFont="system"/>
+                                </formCell>
+                            </column>
+                        </cells>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="26"/>
+                            <outlet property="nextKeyView" destination="10" id="29"/>
+                        </connections>
+                    </form>
+                </subviews>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="28"/>
+            </connections>
+        </window>
+    </objects>
+</document>

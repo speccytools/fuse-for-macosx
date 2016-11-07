@@ -57,7 +57,7 @@ typedef struct ui_media_drive_info_t
 
 int ui_media_drive_register( ui_media_drive_info_t *drive );
 void ui_media_drive_end( void );
-ui_media_drive_info_t *ui_media_drive_find( int controller, int drive );
+ui_media_drive_info_t *ui_media_drive_find( int drive );
 
 #define UI_MEDIA_DRIVE_UPDATE_ALL	(~0)
 #define UI_MEDIA_DRIVE_UPDATE_TOP	(1 << 0)
@@ -73,10 +73,12 @@ int ui_media_drive_eject_all( void );
 
 int ui_media_drive_insert( const ui_media_drive_info_t *drive,
                            const char *filename, int autoload );
-int ui_media_drive_save( int controller, int which, int saveas );
-int ui_media_drive_eject( int controller, int which );
-int ui_media_drive_flip( int controller, int which, int flip );
-int ui_media_drive_writeprotect( int controller, int which, int wrprot );
+int ui_media_drive_save_with_filename( const ui_media_drive_info_t *drive,
+                                       const char *filename );
+int ui_media_drive_save( int which, int saveas );
+int ui_media_drive_eject( int which );
+int ui_media_drive_flip( int which, int flip );
+int ui_media_drive_writeprotect( int which, int wrprot );
 
 /* These are (also) used in media menu items */
 typedef enum ui_media_controller {

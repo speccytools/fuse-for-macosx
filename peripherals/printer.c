@@ -709,7 +709,9 @@ if(!settings_current.printer)
 parallel_data=b;
 }
 
-static int
+/* macOS: we want to be able to reset the printer path when preferences
+ change, so make printer_init() and printer_end() available */
+int
 printer_init( void *context )
 {
   printer_graphics_enabled=printer_text_enabled = 1;
@@ -721,7 +723,9 @@ printer_init( void *context )
   return 0;
 }
 
-static void
+/* macOS: we want to be able to reset the printer path when preferences
+ change, so make printer_init() and printer_end() available */
+void
 printer_end( void )
 {
   printer_text_end();

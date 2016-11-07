@@ -31,3 +31,11 @@
 /stamp-h.in
 /stamp-h1
 /ylwrap
+build
+project.xcworkspace
+xcuserdata
+fusepb/options.h
+fusepb/options.m
+fusepb/options_cocoa.h
+fusepb/settings.h
+fusepb/settings.m

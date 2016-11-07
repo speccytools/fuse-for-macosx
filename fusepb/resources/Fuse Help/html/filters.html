@@ -1,0 +1,129 @@
+<head>
+<!-- AppleSegStart="Graphics Filters" -->
+  <title>Graphics Filters</title>
+</head>
+<font face="Lucida Grande,Helvetica,Arial"><a name="Graphics Filters"></a><!-- AppleSegDescription="This section describes the graphics filters for Fuse." --></font>
+<div class="refsect1" xml:lang="en" lang="en">
+<h2><font face="Lucida Grande,Helvetica,Arial">Graphics
+Filters</font></h2>
+</div>
+<p>
+<font face="Lucida Grande,Helvetica,Arial">Fuse has the ability to
+apply essentially arbitrary filters between
+building its image of the Spectrum's screen, and displaying it on
+the emulating machine's monitor. These filters can be used to do
+various forms of smoothing, emulation of TV scanlines and various
+other
+possibilities.</font></p>
+<p>
+<font face="Lucida Grande,Helvetica,Arial">A complication arises due to
+the fact that the Timex machines have
+their high-resolution video mode with twice the horizontal
+resolution. To deal with this, Fuse treats these machines as having
+a `normal' display size which is twice the size of a normal
+Spectrum's screen, leading to a different set of filters being
+available for these
+machines.</font></p>
+<p>
+<font face="Lucida Grande,Helvetica,Arial">The available filters, along
+with their short name used to select
+them from the command line,
+are:</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Timex
+half</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">A Timex-machine specific
+filter which scales the screen down to
+half normal (Timex) size; that is, the same size as a normal
+Spectrum
+screen.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Normal</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">The simplest filter: just
+display one pixel for every pixel on the
+Spectrum's
+screen.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Double
+size</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">Scale the displayed screen
+up to double
+size.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Triple
+size</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">Scale the displayed screen
+up to triple
+size.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>2xSaI</em></font></span>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Super
+2xSaI</em></font></span>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>SuperEagle</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">Three interpolating filters
+which apply successively more
+smoothing. All three double the size of the displayed
+screen.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>AdvMAME2x</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">A double-sizing,
+non-interpolating filter which attempts to smooth
+diagonal lines.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>AdvMAME3x</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">Very similar to <span
+ class="emphasis"><em>AdvMAME2x</em></span>,
+except that it triples the size of the displayed
+screen.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>TV
+2x</em></font></span> <span class="emphasis"><font
+ face="Lucida Grande,Helvetica,Arial"><em>TV 3x</em></font></span><span
+ class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Timex
+TV</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">Three filters which attempt
+to emulate the effect of television scanlines. The first is a
+double-sizing filter for non-Timex machines, the second is a similar
+triple-sizing filter, while the last is a single-sizing filter for
+Timex machines (note that this means TV 2X and Timex TV produce the
+same size output).</font></p>
+<p><span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>PAL
+TV</em></font></span> <span class="emphasis"><font
+ face="Lucida Grande,Helvetica,Arial"><em>PAL TV 2x</em></font></span><span
+ class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>PAL
+TV 3x</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">Three filters which attempt
+to emulate the effect of the PAL TV system which layers a
+lower-resolution colour image over the top of a higher-resolution
+black-and-white image. The filters can also optionally add scanlines
+like the other TV series scalers.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Dot
+matrix</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">A double-sizing filter which
+emulates the effect of a dot-matrix
+display.</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>Timex
+1.5x</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">An interpolating
+Timex-specific filter which scales the Timex
+screen up to 1.5x its usual size (which is therefore 3x the size of
+a `normal' Spectrum
+screen).</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>HQ
+2x</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">A double-sizing,
+interpolating high-quality magnification filter by
+Maxim Stepin. You can find more information at
+<a href="http://www.hiend3d.com/hq3x.html">http://www.hiend3d.com/hq3x.html</a>.
+</font></p>
+<p>
+<span class="emphasis"><font face="Lucida Grande,Helvetica,Arial"><em>HQ
+3x</em></font></span>
+<font face="Lucida Grande,Helvetica,Arial">Very similar to <span
+ class="emphasis"><em>HQ 2x</em></span>,
+except that it triples the size of the displayed
+screen.</font></p>
+<!-- AppleSegEnd -->

@@ -94,6 +94,7 @@ void fuse_keyboard_init(void);
 void fuse_keyboard_end(void);
 libspectrum_byte keyboard_read( libspectrum_byte porth );
 void keyboard_press(keyboard_key_name key);
+int keyboard_state( keyboard_key_name key );
 void keyboard_release(keyboard_key_name key);
 int keyboard_release_all( void );
 

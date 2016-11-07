@@ -152,7 +152,10 @@ joystick_press( int which, joystick_button button, int press )
   case 1: type = settings_current.joystick_2_output; break;
 
   case JOYSTICK_KEYBOARD:
-    type = settings_current.joystick_keyboard_output; break;
+    type = settings_current.joy_keyboard ?
+                                    settings_current.joystick_keyboard_output :
+                                    JOYSTICK_TYPE_NONE;
+    break;
 
   default:
     return 0;

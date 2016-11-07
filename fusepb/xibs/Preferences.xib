@@ -1,0 +1,2006 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment version="1080" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <capability name="box content view" minToolsVersion="7.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="PreferencesController">
+            <connections>
+                <outlet property="externalSoundType" destination="1836" id="1841"/>
+                <outlet property="filterPrefsView" destination="1714" id="1775"/>
+                <outlet property="generalPrefsView" destination="1347" id="1773"/>
+                <outlet property="joysticksPrefsView" destination="1506" id="1774"/>
+                <outlet property="machinePrefsView" destination="1686" id="1776"/>
+                <outlet property="machineRomsController" destination="533" id="991"/>
+                <outlet property="massStorageType" destination="1446" id="1781"/>
+                <outlet property="peripheralsPrefsView" destination="1432" id="1777"/>
+                <outlet property="rom0Filename" destination="1628" id="1782"/>
+                <outlet property="rom1Filename" destination="1627" id="1783"/>
+                <outlet property="rom2Filename" destination="1629" id="1784"/>
+                <outlet property="rom3Filename" destination="1626" id="1785"/>
+                <outlet property="romPrefsView" destination="1582" id="1778"/>
+                <outlet property="rzxPrefsView" destination="1488" id="1779"/>
+                <outlet property="soundPrefsView" destination="1408" id="1780"/>
+                <outlet property="toolbar" destination="1279" id="1307"/>
+                <outlet property="window" destination="5" id="239"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="5" userLabel="Preferences" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="24" y="202" width="627" height="403"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
+            <value key="minSize" type="size" width="213" height="107"/>
+            <view key="contentView" id="6">
+                <rect key="frame" x="0.0" y="0.0" width="627" height="403"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </view>
+            <toolbar key="toolbar" implicitIdentifier="2B5EC7EB-5A6C-4F96-8405-91E5B21A019C" allowsUserCustomization="NO" showsBaselineSeparator="NO" displayMode="iconAndLabel" sizeMode="regular" id="1279">
+                <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="75749378-6992-4894-9B4C-43B464285D3E" label="General" paletteLabel="General" image="NSPreferencesGeneral" autovalidates="NO" id="1287">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1296"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="1D3C684F-4B0A-4828-ADF3-E4106D08C1CD" label="Sound" paletteLabel="Sound" tag="1" image="Sound" autovalidates="NO" id="1288">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1297"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="4F5A5E26-7A02-464D-80D8-F49DECE3E69B" label="Peripherals" paletteLabel="Peripherals" tag="2" image="Peripherals" autovalidates="NO" id="1289">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1298"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="BE697B6E-7F18-4D78-9F89-364AF4806055" label="Recording" paletteLabel="Recording" tag="3" image="RZX" autovalidates="NO" id="1290">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1299"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="F897F259-A5D7-4274-A9C8-9D7D7C86199E" label="Inputs" paletteLabel="Inputs" tag="4" image="qs2t_icon" autovalidates="NO" id="1291">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1300"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="D64DF5CD-B687-4DAB-8B9B-CB7BCB98DECE" label="ROM" paletteLabel="ROM" tag="5" image="Select_ROMs" autovalidates="NO" id="1292">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1301"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="FD445694-259E-4F31-A40E-117D01F46BB6" label="Machine" paletteLabel="Machine" tag="6" image="Machine" autovalidates="NO" id="1293">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1302"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="2C4BF74A-9900-4A0E-A2FC-50ADDA64B166" label="Video" paletteLabel="Video" tag="7" image="Graphics_Filter" autovalidates="NO" id="1294">
+                        <connections>
+                            <action selector="selectPrefPanel:" target="-2" id="1303"/>
+                        </connections>
+                    </toolbarItem>
+                </allowedToolbarItems>
+                <defaultToolbarItems>
+                    <toolbarItem reference="1287"/>
+                    <toolbarItem reference="1288"/>
+                    <toolbarItem reference="1289"/>
+                    <toolbarItem reference="1290"/>
+                    <toolbarItem reference="1291"/>
+                    <toolbarItem reference="1292"/>
+                    <toolbarItem reference="1293"/>
+                    <toolbarItem reference="1294"/>
+                </defaultToolbarItems>
+                <connections>
+                    <outlet property="delegate" destination="-2" id="1295"/>
+                </connections>
+            </toolbar>
+            <connections>
+                <outlet property="delegate" destination="-2" id="504"/>
+                <outlet property="initialFirstResponder" destination="6" id="1305"/>
+            </connections>
+        </window>
+        <customView id="1347" userLabel="General">
+            <rect key="frame" x="0.0" y="0.0" width="627" height="265"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button verticalHuggingPriority="750" id="931">
+                    <rect key="frame" x="461" y="12" width="152" height="32"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset Preferences" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1266">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetUserDefaults:" target="-2" id="932"/>
+                    </connections>
+                </button>
+                <button misplaced="YES" id="1348">
+                    <rect key="frame" x="293" y="129" width="151" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Late CPU timings" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1379">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.latetimings" id="1402"/>
+                    </connections>
+                </button>
+                <button misplaced="YES" id="Uch-Bs-QML">
+                    <rect key="frame" x="293" y="109" width="151" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Z80 is CMOS" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="qDh-Th-upD">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.z80iscmos" id="Rrn-66-hZP"/>
+                    </connections>
+                </button>
+                <button id="1349">
+                    <rect key="frame" x="119" y="129" width="170" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Accelerate tape loaders" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1378">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.accelerateloader" id="1392"/>
+                    </connections>
+                </button>
+                <button id="1350">
+                    <rect key="frame" x="119" y="109" width="145" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Detect tape loaders" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1377">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.detectloader" id="1394"/>
+                    </connections>
+                </button>
+                <button id="1351">
+                    <rect key="frame" x="119" y="149" width="131" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Fast tape loading" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1376">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.fastload" id="1786"/>
+                    </connections>
+                </button>
+                <button id="1356">
+                    <rect key="frame" x="119" y="169" width="113" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Use tape traps" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1367">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <connections>
+                            <binding destination="270" name="value" keyPath="values.tapetraps" id="1385"/>
+                        </connections>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.tapetraps" id="1788"/>
+                        <outlet property="nextKeyView" destination="1358" id="1381"/>
+                    </connections>
+                </button>
+                <button id="1358">
+                    <rect key="frame" x="119" y="89" width="165" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Auto-load media" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1365">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.autoload" id="1395"/>
+                    </connections>
+                </button>
+                <button id="1359">
+                    <rect key="frame" x="119" y="69" width="168" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Show tape/disk status" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1364">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.statusbar" id="1397"/>
+                    </connections>
+                </button>
+                <button id="1360">
+                    <rect key="frame" x="293" y="169" width="131" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Issue 2 keyboard" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1363">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.issue2" id="1401"/>
+                    </connections>
+                </button>
+                <button id="1361">
+                    <rect key="frame" x="119" y="49" width="123" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Confirm actions" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1362">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.confirmactions" id="1399"/>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NNe-bG-amc">
+                    <rect key="frame" x="167" y="230" width="112" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Emulation speed:" id="BoH-kb-bUl">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="V1D-ym-CTs">
+                    <rect key="frame" x="119" y="196" width="160" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Screen refresh rate (1:n):" id="69l-0C-1Jd">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" id="AQm-ut-oKC">
+                    <rect key="frame" x="285" y="228" width="116" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="8Rf-5o-m5G">
+                        <numberFormatter key="formatter" formatterBehavior="10_0" positiveFormat="#,##0%" negativeFormat="-#,##0.00" thousandSeparator="," id="jTc-rQ-dSN" customClass="NumberFormatter">
+                            <real key="minimum" value="1"/>
+                            <decimal key="maximum" value="NaN"/>
+                        </numberFormatter>
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.speed" id="zJq-NB-RjL"/>
+                    </connections>
+                </textField>
+                <textField verticalHuggingPriority="750" id="rJU-D7-OFM">
+                    <rect key="frame" x="285" y="194" width="116" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="5My-XZ-RQ4">
+                        <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" id="F1O-A5-msN" customClass="NumberFormatter">
+                            <real key="minimum" value="1"/>
+                            <real key="maximum" value="50"/>
+                        </numberFormatter>
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.rate" id="Zrv-JU-bcU"/>
+                    </connections>
+                </textField>
+                <button misplaced="YES" id="1354">
+                    <rect key="frame" x="293" y="89" width="151" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Allow writes to ROM" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1369">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.writableroms" id="1403"/>
+                    </connections>
+                </button>
+                <button misplaced="YES" id="1355">
+                    <rect key="frame" x="293" y="49" width="214" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Set joysticks on snapshot load" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1368">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.joyprompt" id="1407"/>
+                    </connections>
+                </button>
+                <button misplaced="YES" id="1357">
+                    <rect key="frame" x="293" y="69" width="105" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Use .slt traps" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1366">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.slttraps" id="1405"/>
+                        <outlet property="nextKeyView" destination="1354" id="1380"/>
+                    </connections>
+                </button>
+                <button misplaced="YES" id="Oae-GO-4G1">
+                    <rect key="frame" x="293" y="149" width="255" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Use Recreated ZX Spectrum keyboard" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="qRM-aw-x1T">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.recreatedspectrum" id="7OV-FA-rfE"/>
+                    </connections>
+                </button>
+            </subviews>
+        </customView>
+        <customView id="1408" userLabel="Sound">
+            <rect key="frame" x="0.0" y="0.0" width="627" height="256"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <popUpButton verticalHuggingPriority="750" id="1855">
+                    <rect key="frame" x="323" y="94" width="153" height="26"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1858" id="1856">
+                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="menu"/>
+                        <menu key="menu" title="OtherViews" id="1857">
+                            <items>
+                                <menuItem title="Item 1" state="on" id="1858"/>
+                                <menuItem title="Item 2" id="1859"/>
+                                <menuItem title="Item 3" id="1860"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <connections>
+                        <binding destination="1832" name="contentValues" keyPath="arrangedObjects" id="1861"/>
+                        <binding destination="270" name="selectedValue" keyPath="values.speakertype" previousBinding="1861" id="1864"/>
+                    </connections>
+                </popUpButton>
+                <textField verticalHuggingPriority="750" id="1862">
+                    <rect key="frame" x="215" y="93" width="101" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Speaker type" id="1863">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" id="1900">
+                    <rect key="frame" x="215" y="61" width="131" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="AY stereo mode" id="1901">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" id="1848">
+                    <rect key="frame" x="232" y="158" width="101" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="AY Volume" id="1849">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <slider verticalHuggingPriority="750" id="1847">
+                    <rect key="frame" x="360" y="158" width="115" height="25"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1850">
+                        <font key="font" size="12" name="Helvetica"/>
+                    </sliderCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.volumeay" id="1852"/>
+                    </connections>
+                </slider>
+                <textField verticalHuggingPriority="750" id="1413">
+                    <rect key="frame" x="232" y="190" width="101" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Beeper Volume" id="1418">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button id="1414">
+                    <rect key="frame" x="216" y="220" width="116" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Enabled" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1417">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.sound" id="1423"/>
+                    </connections>
+                </button>
+                <slider verticalHuggingPriority="750" id="1415">
+                    <rect key="frame" x="360" y="190" width="115" height="25"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1416">
+                        <font key="font" size="12" name="Helvetica"/>
+                    </sliderCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.volumebeeper" id="1846"/>
+                    </connections>
+                </slider>
+                <button id="1412">
+                    <rect key="frame" x="216" y="37" width="126" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Loading  sounds" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1419">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.loadingsound" id="1428"/>
+                    </connections>
+                </button>
+                <popUpButton verticalHuggingPriority="750" id="1883">
+                    <rect key="frame" x="323" y="61" width="153" height="26"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1886" id="1884">
+                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="menu"/>
+                        <menu key="menu" title="OtherViews" id="1885">
+                            <items>
+                                <menuItem title="Item 1" state="on" id="1886"/>
+                                <menuItem title="Item 2" id="1887"/>
+                                <menuItem title="Item 3" id="1888"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <connections>
+                        <binding destination="1889" name="contentValues" keyPath="arrangedObjects" id="1897"/>
+                        <binding destination="270" name="selectedValue" keyPath="values.separation" previousBinding="1897" id="1899"/>
+                    </connections>
+                </popUpButton>
+                <textField verticalHuggingPriority="750" id="1902">
+                    <rect key="frame" x="232" y="126" width="125" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="SpecDrum Volume" id="1905">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <slider verticalHuggingPriority="750" id="1903">
+                    <rect key="frame" x="360" y="126" width="115" height="25"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1904">
+                        <font key="font" size="12" name="Helvetica"/>
+                    </sliderCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.volumespecdrum" id="1907"/>
+                    </connections>
+                </slider>
+            </subviews>
+        </customView>
+        <customView id="1432" userLabel="Peripherals">
+            <rect key="frame" x="0.0" y="0.0" width="627" height="472"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <box autoresizesSubviews="NO" borderType="line" title="External sound interface" id="1833">
+                    <rect key="frame" x="398" y="334" width="212" height="118"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <view key="contentView" id="3G9-p5-WYZ">
+                        <rect key="frame" x="1" y="1" width="210" height="102"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="1836">
+                                <rect key="frame" x="18" y="14" width="92" height="78"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="92" height="18"/>
+                                <size key="intercellSpacing" width="4" height="2"/>
+                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="1839">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <cells>
+                                    <column>
+                                        <buttonCell type="radio" title="None" imagePosition="left" alignment="left" state="on" inset="2" id="1837">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="externalSoundTypeClicked:" target="-2" id="1842"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Fuller" imagePosition="left" alignment="left" tag="1" inset="2" id="1838">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="externalSoundTypeClicked:" target="-2" id="1843"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Melodik" imagePosition="left" alignment="left" tag="2" inset="2" id="1840">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="externalSoundTypeClicked:" target="-2" id="1844"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="SpecDrum" imagePosition="left" alignment="left" tag="3" inset="2" id="1908">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="externalSoundTypeClicked:" target="-2" id="1949"/>
+                                            </connections>
+                                        </buttonCell>
+                                    </column>
+                                </cells>
+                            </matrix>
+                        </subviews>
+                    </view>
+                </box>
+                <box title="Mass storage/ROM Interfaces" id="1434">
+                    <rect key="frame" x="18" y="154" width="378" height="298"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <view key="contentView" id="y0s-Gg-gqJ">
+                        <rect key="frame" x="2" y="2" width="374" height="281"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button id="1445">
+                                <rect key="frame" x="156" y="123" width="138" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="ZXCF upload" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1456">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.zxcfupload" id="1476"/>
+                                </connections>
+                            </button>
+                            <button id="1444">
+                                <rect key="frame" x="156" y="145" width="163" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="ZXATASP write protect" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1457">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.zxataspwriteprotect" id="1475"/>
+                                </connections>
+                            </button>
+                            <button id="1443">
+                                <rect key="frame" x="156" y="167" width="138" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="ZXATASP upload" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1458">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.zxataspupload" id="1474"/>
+                                </connections>
+                            </button>
+                            <button id="1442">
+                                <rect key="frame" x="156" y="211" width="163" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="DivIDE write protect" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1459">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.dividewriteprotect" id="1477"/>
+                                </connections>
+                            </button>
+                            <button id="1910">
+                                <rect key="frame" x="156" y="233" width="155" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Beta autoboot in 48K" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1911">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.beta12848boot" id="1913"/>
+                                </connections>
+                            </button>
+                            <button id="1954">
+                                <rect key="frame" x="156" y="255" width="154" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="+3 Detect Speedlock" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1955">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.plus3detectspeedlock" id="1957"/>
+                                </connections>
+                            </button>
+                            <form verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="1441">
+                                <rect key="frame" x="158" y="95" width="196" height="22"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="196" height="22"/>
+                                <size key="intercellSpacing" width="1" height="8"/>
+                                <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="1461">
+                                    <font key="font" metaFont="system"/>
+                                    <font key="titleFont" metaFont="system"/>
+                                </formCell>
+                                <cells>
+                                    <column>
+                                        <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="justified" title="MDR cartridge len:" id="1460">
+                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#" negativeFormat="#" usesGroupingSeparator="NO" paddingCharacter="*" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="1793" customClass="NumberFormatter">
+                                                <nil key="negativeInfinitySymbol"/>
+                                                <nil key="positiveInfinitySymbol"/>
+                                                <real key="minimum" value="1"/>
+                                            </numberFormatter>
+                                            <font key="font" metaFont="system"/>
+                                            <font key="titleFont" metaFont="system"/>
+                                            <connections>
+                                                <binding destination="270" name="value" keyPath="values.mdrlen" id="1478"/>
+                                            </connections>
+                                        </formCell>
+                                    </column>
+                                </cells>
+                            </form>
+                            <button id="1916">
+                                <rect key="frame" x="156" y="189" width="138" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Spectranet disable" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1917">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.spectranetdisable" id="1922"/>
+                                </connections>
+                            </button>
+                            <matrix verticalHuggingPriority="750" selectionByRect="NO" allowsEmptySelection="NO" autosizesCells="NO" id="1446">
+                                <rect key="frame" x="17" y="13" width="138" height="258"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                <size key="cellSize" width="138" height="18"/>
+                                <size key="intercellSpacing" width="4" height="2"/>
+                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="1455">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <cells>
+                                    <column>
+                                        <buttonCell type="radio" title="None" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="1447">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1823"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Interface 1" imagePosition="left" alignment="left" tag="1" inset="2" id="1448">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1824"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Simple 8-bit IDE" imagePosition="left" alignment="left" tag="2" inset="2" id="1449">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1825"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="ZXATASP interface" imagePosition="left" alignment="left" tag="3" inset="2" id="1450">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1826"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="ZXCF interface" imagePosition="left" alignment="left" tag="4" inset="2" id="1451">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1827"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="DivIDE" imagePosition="left" alignment="left" tag="5" inset="2" id="1452">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1828"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="+D" imagePosition="left" alignment="left" tag="6" inset="2" id="1453">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1829"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Beta 128" imagePosition="left" alignment="left" tag="7" inset="2" id="1454">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1830"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Opus Discovery" imagePosition="left" alignment="left" tag="8" inset="2" id="1880">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1881"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="DISCiPLE" imagePosition="left" alignment="left" tag="9" inset="2" id="1909">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1924"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Spectranet" imagePosition="left" alignment="left" tag="10" inset="2" id="1923">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="1925"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Didaktik 80" imagePosition="left" alignment="left" tag="11" inset="2" id="NEM-h4-5OZ">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="cie-qX-d57"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Currah µSource" imagePosition="left" alignment="left" tag="12" inset="2" id="4UJ-Mb-bdD">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="massStorageTypeClicked:" target="-2" id="ZIm-ih-xIE"/>
+                                            </connections>
+                                        </buttonCell>
+                                    </column>
+                                </cells>
+                            </matrix>
+                        </subviews>
+                    </view>
+                </box>
+                <box title="Printers" id="1433">
+                    <rect key="frame" x="17" y="16" width="591" height="134"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <view key="contentView" id="ojx-X9-Ioy">
+                        <rect key="frame" x="2" y="2" width="587" height="117"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button verticalHuggingPriority="750" tag="1" id="1466">
+                                <rect key="frame" x="476" y="6" width="100" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" borderStyle="border" tag="1" inset="2" id="1467">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chooseFile:" target="-2" id="1487"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" id="1465">
+                                <rect key="frame" x="476" y="36" width="100" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1468">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="chooseFile:" target="-2" id="1486"/>
+                                </connections>
+                            </button>
+                            <button id="1463">
+                                <rect key="frame" x="18" y="91" width="138" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Emulate printers" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1472">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.printer" id="1483"/>
+                                </connections>
+                            </button>
+                            <button id="1950">
+                                <rect key="frame" x="18" y="71" width="139" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="check" title="Emulate ZX Printer" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1951">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.zxprinter" id="1953"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Vg7-l5-Jxr">
+                                <rect key="frame" x="25" y="46" width="131" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Graphic Output File:" id="bvv-kb-cZ4">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ptU-fP-Mnq">
+                                <rect key="frame" x="47" y="16" width="109" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Text Output File:" id="0Dt-bm-EQa">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" id="LuR-Lj-xFi">
+                                <rect key="frame" x="157" y="44" width="317" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="xTs-kP-Vfd">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.graphicsfile" id="kps-HD-1Jz"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" id="YFe-FE-BDr">
+                                <rect key="frame" x="157" y="14" width="317" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="y2D-9H-b0V">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <binding destination="270" name="value" keyPath="values.textfile" id="k3o-QR-kcC"/>
+                                </connections>
+                            </textField>
+                        </subviews>
+                    </view>
+                </box>
+            </subviews>
+            <point key="canvasLocation" x="325.5" y="-570"/>
+        </customView>
+        <customView id="1488" userLabel="RZX">
+            <rect key="frame" x="0.0" y="0.0" width="627" height="146"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button id="1493">
+                    <rect key="frame" x="183" y="110" width="253" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Emulator recording create autosaves" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1494">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.rzxautosaves" id="1501"/>
+                    </connections>
+                </button>
+                <button id="FRq-w6-Idw">
+                    <rect key="frame" x="184" y="68" width="263" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Emulator recording competition mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="dW8-Us-i6I">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.competitionmode" id="zzE-Q2-FgL"/>
+                    </connections>
+                </button>
+                <button id="1489">
+                    <rect key="frame" x="183" y="90" width="298" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Emulator recording always embed snapshot" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1500">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.embedsnapshot" id="1505"/>
+                    </connections>
+                </button>
+                <popUpButton verticalHuggingPriority="750" id="1929">
+                    <rect key="frame" x="362" y="13" width="153" height="26"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1936" id="1932">
+                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="menu"/>
+                        <menu key="menu" title="OtherViews" id="1933">
+                            <items>
+                                <menuItem title="Item 1" state="on" id="1936"/>
+                                <menuItem title="Item 2" id="1935"/>
+                                <menuItem title="Item 3" id="1934"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <connections>
+                        <binding destination="1926" name="contentValues" keyPath="arrangedObjects" id="1939"/>
+                        <binding destination="270" name="selectedValue" keyPath="values.moviecompr" previousBinding="1939" id="1948"/>
+                    </connections>
+                </popUpButton>
+                <textField verticalHuggingPriority="750" id="1930">
+                    <rect key="frame" x="183" y="16" width="177" height="21"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Movie Compression Level" id="1931">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" id="I3r-Pl-MAf">
+                    <rect key="frame" x="429" y="43" width="83" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="fzK-PL-kaX">
+                        <numberFormatter key="formatter" formatterBehavior="default10_4" positiveFormat="#,##0.###" negativeFormat="#,##0.###" numberStyle="decimal" paddingCharacter="*" minimumIntegerDigits="1" maximumIntegerDigits="309" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="L6j-fI-9tx"/>
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.competitioncode" id="bZY-YP-trS"/>
+                    </connections>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="O78-AX-6Cd">
+                    <rect key="frame" x="184" y="45" width="239" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Emulator recording competition code" id="mIT-9v-7ht">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+        </customView>
+        <customView id="1506" userLabel="Joysticks">
+            <rect key="frame" x="0.0" y="0.0" width="630" height="381"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <box title="Keyboard" id="1509">
+                    <rect key="frame" x="73" y="288" width="481" height="73"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <view key="contentView" id="e3X-3f-W4t">
+                        <rect key="frame" x="2" y="2" width="477" height="53"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <popUpButton verticalHuggingPriority="750" id="1510">
+                                <rect key="frame" x="137" y="14" width="125" height="26"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1517" id="1513">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="OtherViews" id="1514">
+                                        <items>
+                                            <menuItem title="Item1" state="on" id="1517"/>
+                                            <menuItem title="Item2" id="1515"/>
+                                            <menuItem title="Item3" id="1516"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="796" name="content" keyPath="arrangedObjects" id="1556"/>
+                                    <binding destination="796" name="contentValues" keyPath="arrangedObjects.joystickName" previousBinding="1556" id="1558"/>
+                                    <binding destination="270" name="selectedIndex" keyPath="values.joystickkeyboardoutput" previousBinding="1558" id="1559"/>
+                                </connections>
+                            </popUpButton>
+                            <textField verticalHuggingPriority="750" id="1511">
+                                <rect key="frame" x="13" y="4" width="122" height="34"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="1512">
+                                    <font key="font" metaFont="system"/>
+                                    <string key="title">Emulated joystick:
+</string>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                    </view>
+                    <font key="titleFont" metaFont="system"/>
+                </box>
+                <box title="Joystick 1" id="1508">
+                    <rect key="frame" x="73" y="182" width="481" height="102"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <view key="contentView" id="iCW-jZ-kNN">
+                        <rect key="frame" x="2" y="2" width="477" height="82"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <popUpButton verticalHuggingPriority="750" id="1518">
+                                <rect key="frame" x="141" y="44" width="249" height="26"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1533" id="1531">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="OtherViews" id="1532">
+                                        <items>
+                                            <menuItem title="Item1" state="on" id="1533"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="845" name="content" keyPath="arrangedObjects" id="1567"/>
+                                    <binding destination="845" name="contentValues" keyPath="arrangedObjects.joystickName" previousBinding="1567" id="1568"/>
+                                    <binding destination="270" name="selectedIndex" keyPath="values.joy1num" previousBinding="1568" id="1569"/>
+                                </connections>
+                            </popUpButton>
+                            <popUpButton verticalHuggingPriority="750" id="1519">
+                                <rect key="frame" x="141" y="12" width="125" height="26"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1530" id="1526">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="OtherViews" id="1527">
+                                        <items>
+                                            <menuItem title="Item1" state="on" id="1530"/>
+                                            <menuItem title="Item2" id="1528"/>
+                                            <menuItem title="Item3" id="1529"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="796" name="content" keyPath="arrangedObjects" id="1571"/>
+                                    <binding destination="796" name="contentValues" keyPath="arrangedObjects.joystickName" previousBinding="1571" id="1574"/>
+                                    <binding destination="270" name="selectedIndex" keyPath="values.joystick1output" previousBinding="1574" id="1579"/>
+                                </connections>
+                            </popUpButton>
+                            <textField verticalHuggingPriority="750" id="1520">
+                                <rect key="frame" x="17" y="18" width="122" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Emulated joystick:" id="1525">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" id="1521">
+                                <rect key="frame" x="17" y="50" width="122" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Real device:" id="1524">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" tag="1" id="1522">
+                                <rect key="frame" x="389" y="40" width="76" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="push" title="Setup" bezelStyle="rounded" alignment="center" borderStyle="border" tag="1" inset="2" id="1523">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="setup:" target="-2" id="1570"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                    </view>
+                    <font key="titleFont" metaFont="system"/>
+                </box>
+                <box title="Joystick 2" id="1507">
+                    <rect key="frame" x="73" y="78" width="481" height="100"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <view key="contentView" id="c2z-Ze-SIE">
+                        <rect key="frame" x="2" y="2" width="477" height="80"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <popUpButton verticalHuggingPriority="750" id="1534">
+                                <rect key="frame" x="144" y="44" width="249" height="26"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1549" id="1547">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="OtherViews" id="1548">
+                                        <items>
+                                            <menuItem title="Item1" state="on" id="1549"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="845" name="content" keyPath="arrangedObjects" id="1576"/>
+                                    <binding destination="845" name="contentValues" keyPath="arrangedObjects.joystickName" previousBinding="1576" id="1578"/>
+                                </connections>
+                            </popUpButton>
+                            <popUpButton verticalHuggingPriority="750" id="1535">
+                                <rect key="frame" x="144" y="12" width="125" height="26"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1545" id="1542">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="OtherViews" id="1543">
+                                        <items>
+                                            <menuItem title="Item1" state="on" id="1545"/>
+                                            <menuItem title="Item2" id="1546"/>
+                                            <menuItem title="Item3" id="1544"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                                <connections>
+                                    <binding destination="796" name="content" keyPath="arrangedObjects" id="1572"/>
+                                    <binding destination="796" name="contentValues" keyPath="arrangedObjects.joystickName" previousBinding="1572" id="1575"/>
+                                    <binding destination="270" name="selectedIndex" keyPath="values.joystick2output" previousBinding="1575" id="1580"/>
+                                </connections>
+                            </popUpButton>
+                            <textField verticalHuggingPriority="750" id="1536">
+                                <rect key="frame" x="11" y="50" width="122" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Real device:" id="1541">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" id="1537">
+                                <rect key="frame" x="11" y="18" width="122" height="17"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Emulated joystick:" id="1540">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" tag="2" id="1538">
+                                <rect key="frame" x="392" y="40" width="76" height="32"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <buttonCell key="cell" type="push" title="Setup" bezelStyle="rounded" alignment="center" borderStyle="border" tag="2" inset="2" id="1539">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="setup:" target="-2" id="1581"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                    </view>
+                    <font key="titleFont" metaFont="system"/>
+                </box>
+                <button id="1435">
+                    <rect key="frame" x="74" y="18" width="187" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Kempston mouse" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1440">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.kempstonmouse" id="1480"/>
+                    </connections>
+                </button>
+                <button id="1876">
+                    <rect key="frame" x="213" y="18" width="154" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Swap mouse buttons" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1877">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.mouseswapbuttons" id="1879"/>
+                    </connections>
+                </button>
+                <button id="1437">
+                    <rect key="frame" x="74" y="38" width="198" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Kempston joystick interface" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1438">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.kempston" id="1479"/>
+                    </connections>
+                </button>
+                <button id="1436">
+                    <rect key="frame" x="74" y="58" width="138" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Interface 2" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1439">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.interface2" id="1482"/>
+                    </connections>
+                </button>
+            </subviews>
+        </customView>
+        <customView id="1582" userLabel="ROM">
+            <rect key="frame" x="0.0" y="0.0" width="627" height="343"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button verticalHuggingPriority="750" tag="2" id="1583">
+                    <rect key="frame" x="555" y="244" width="57" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="2" inset="2" id="1640">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetROMFile:" target="-2" id="1684"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom2" id="1678">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" id="1584">
+                    <rect key="frame" x="555" y="298" width="57" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="1639">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetROMFile:" target="-2" id="1682"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom0" id="1673">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" tag="3" id="1585">
+                    <rect key="frame" x="555" y="217" width="57" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="3" inset="2" id="1638">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetROMFile:" target="-2" id="1685"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom2" id="1681">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" tag="1" id="1586">
+                    <rect key="frame" x="555" y="271" width="57" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="1" inset="2" id="1637">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetROMFile:" target="-2" id="1683"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom1" id="1675">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1587">
+                    <rect key="frame" x="20" y="20" width="137" height="303"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <clipView key="contentView" id="RVo-Sg-mDk">
+                        <rect key="frame" x="1" y="0.0" width="135" height="302"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1631" id="1634">
+                                <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <size key="intercellSpacing" width="3" height="2"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                <tableColumns>
+                                    <tableColumn editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1635">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Machines">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" alignment="left" id="1636">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </textFieldCell>
+                                        <connections>
+                                            <binding destination="533" name="value" keyPath="arrangedObjects.machine.machineName" id="1822">
+                                                <dictionary key="options">
+                                                    <integer key="NSConditionallySetsEditable" value="1"/>
+                                                </dictionary>
+                                            </binding>
+                                        </connections>
+                                    </tableColumn>
+                                </tableColumns>
+                                <connections>
+                                    <binding destination="533" name="content" keyPath="arrangedObjects.machine.machineName" id="1819"/>
+                                    <binding destination="533" name="selectionIndexes" keyPath="selectionIndexes" previousBinding="1819" id="1820"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="1632">
+                        <rect key="frame" x="-100" y="-100" width="120" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="1633">
+                        <rect key="frame" x="-30" y="17" width="15" height="226"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <tableHeaderView key="headerView" id="1631">
+                        <rect key="frame" x="0.0" y="0.0" width="135" height="17"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </tableHeaderView>
+                </scrollView>
+                <button verticalHuggingPriority="750" tag="2" id="1588">
+                    <rect key="frame" x="480" y="244" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose…" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="2" inset="2" id="1630">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="chooseROMFile:" target="-2" id="1662"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom2" id="1669">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" id="1590">
+                    <rect key="frame" x="480" y="298" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose…" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="1624">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="chooseROMFile:" target="-2" id="1660"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom0" id="1665">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" tag="3" id="1591">
+                    <rect key="frame" x="480" y="217" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose…" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="3" inset="2" id="1623">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="chooseROMFile:" target="-2" id="1663"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom3" id="1671">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" tag="1" id="1592">
+                    <rect key="frame" x="480" y="271" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose…" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="1" inset="2" id="1622">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="chooseROMFile:" target="-2" id="1661"/>
+                        <binding destination="533" name="enabled" keyPath="selection.rom1" id="1667">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNotNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" tag="2" id="1593">
+                    <rect key="frame" x="386" y="395" width="55" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="2" inset="2" id="1621">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <button verticalHuggingPriority="750" id="1594">
+                    <rect key="frame" x="386" y="449" width="55" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="1620">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <button verticalHuggingPriority="750" tag="3" id="1595">
+                    <rect key="frame" x="386" y="368" width="55" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="3" inset="2" id="1619">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <button verticalHuggingPriority="750" tag="1" id="1596">
+                    <rect key="frame" x="386" y="422" width="55" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="1" inset="2" id="1618">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1597">
+                    <rect key="frame" x="-149" y="171" width="137" height="303"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <clipView key="contentView" id="7ih-tq-3PK">
+                        <rect key="frame" x="1" y="0.0" width="135" height="302"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1612" id="1615">
+                                <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <size key="intercellSpacing" width="3" height="2"/>
+                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                <tableColumns>
+                                    <tableColumn editable="NO" width="116.752" minWidth="57.752000000000002" maxWidth="1000" id="1616">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Machines">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" alignment="left" id="1617">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </textFieldCell>
+                                    </tableColumn>
+                                </tableColumns>
+                            </tableView>
+                        </subviews>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="1613">
+                        <rect key="frame" x="-100" y="-100" width="120" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="1614">
+                        <rect key="frame" x="-30" y="17" width="15" height="226"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <tableHeaderView key="headerView" id="1612">
+                        <rect key="frame" x="0.0" y="0.0" width="135" height="17"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </tableHeaderView>
+                </scrollView>
+                <button verticalHuggingPriority="750" tag="2" id="1598">
+                    <rect key="frame" x="311" y="395" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="2" inset="2" id="1611">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <form verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="1599">
+                    <rect key="frame" x="-4" y="374" width="312" height="100"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    <size key="cellSize" width="312" height="19"/>
+                    <size key="intercellSpacing" width="1" height="8"/>
+                    <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="1606">
+                        <font key="font" metaFont="smallSystem"/>
+                        <font key="titleFont" metaFont="smallSystem"/>
+                    </formCell>
+                    <cells>
+                        <column>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="ROM 0:" id="1609">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                            </formCell>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="1" title="ROM 1:" id="1608">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                            </formCell>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="2" title="ROM 2:" id="1610">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                            </formCell>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="3" title="ROM 3:" id="1607">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                            </formCell>
+                        </column>
+                    </cells>
+                </form>
+                <button verticalHuggingPriority="750" id="1600">
+                    <rect key="frame" x="311" y="449" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="1605">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <button verticalHuggingPriority="750" tag="3" id="1601">
+                    <rect key="frame" x="311" y="368" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="3" inset="2" id="1604">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <button verticalHuggingPriority="750" tag="1" id="1602">
+                    <rect key="frame" x="311" y="422" width="77" height="28"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Choose..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="1" inset="2" id="1603">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                </button>
+                <form verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="1589">
+                    <rect key="frame" x="165" y="222" width="312" height="100"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    <size key="cellSize" width="312" height="19"/>
+                    <size key="intercellSpacing" width="1" height="8"/>
+                    <formCell key="prototype" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="Field:" id="1625">
+                        <font key="font" metaFont="smallSystem"/>
+                        <font key="titleFont" metaFont="smallSystem"/>
+                    </formCell>
+                    <cells>
+                        <column>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" title="ROM 0:" id="1628">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                                <connections>
+                                    <binding destination="533" name="value" keyPath="selection.rom0" id="1644">
+                                        <dictionary key="options">
+                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="533" name="enabled" keyPath="selection.rom0" id="1652">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSIsNotNil</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </formCell>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="1" title="ROM 1:" id="1627">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                                <connections>
+                                    <binding destination="533" name="value" keyPath="selection.rom1" id="1646">
+                                        <dictionary key="options">
+                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="533" name="enabled" keyPath="selection.rom1" id="1655">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSIsNotNil</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </formCell>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="2" title="ROM 2:" id="1629">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                                <connections>
+                                    <binding destination="533" name="value" keyPath="selection.rom2" id="1648">
+                                        <dictionary key="options">
+                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="533" name="enabled" keyPath="selection.rom2" id="1657">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSIsNotNil</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </formCell>
+                            <formCell scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="justified" tag="3" title="ROM 3:" id="1626">
+                                <font key="font" metaFont="smallSystem"/>
+                                <font key="titleFont" metaFont="smallSystem"/>
+                                <connections>
+                                    <binding destination="533" name="enabled" keyPath="selection.rom2" id="1659">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSIsNotNil</string>
+                                        </dictionary>
+                                    </binding>
+                                    <binding destination="533" name="value" keyPath="selection.rom3" id="1650">
+                                        <dictionary key="options">
+                                            <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </formCell>
+                        </column>
+                    </cells>
+                </form>
+            </subviews>
+        </customView>
+        <customView id="1686" userLabel="Machine">
+            <rect key="frame" x="0.0" y="0.0" width="627" height="358"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="1687">
+                    <rect key="frame" x="246" y="20" width="200" height="318"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
+                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    <size key="cellSize" width="200" height="18"/>
+                    <size key="intercellSpacing" width="4" height="2"/>
+                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="1688">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <cells>
+                        <column>
+                            <buttonCell type="radio" title="Spectrum 16K" imagePosition="left" alignment="left" tag="8" inset="2" id="1703">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum 48K" imagePosition="left" alignment="left" inset="2" id="1702">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum 48K (NTSC)" imagePosition="left" alignment="left" tag="2" inset="2" id="1701">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum 128K" bezelStyle="regularSquare" imagePosition="left" alignment="left" tag="3" inset="2" id="1700">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum +2" imagePosition="left" alignment="left" tag="5" inset="2" id="1699">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum +2A" imagePosition="left" alignment="left" tag="6" inset="2" id="1698">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum +3" imagePosition="left" alignment="left" tag="11" inset="2" id="1697">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum +3e" imagePosition="left" alignment="left" tag="1" inset="2" id="1696">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Timex TC2048" imagePosition="left" alignment="left" state="on" tag="9" inset="2" id="1695">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Timex TC2068" imagePosition="left" alignment="left" tag="13" inset="2" id="1694">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Timex TS2068" imagePosition="left" alignment="left" tag="4" inset="2" id="1693">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Pentagon 128K" imagePosition="left" alignment="left" tag="14" inset="2" id="1692">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Pentagon 512K" imagePosition="left" alignment="left" tag="15" inset="2" id="1691">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Pentagon 1024K" imagePosition="left" alignment="left" tag="10" inset="2" id="1690">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Scorpion ZS 256" imagePosition="left" alignment="left" tag="12" inset="2" id="1689">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Spectrum SE" imagePosition="left" alignment="left" inset="2" id="1882">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                        </column>
+                    </cells>
+                    <connections>
+                        <binding destination="534" name="content" keyPath="arrangedObjects" id="1708"/>
+                        <binding destination="534" name="contentValues" keyPath="arrangedObjects.machineName" previousBinding="1708" id="1712"/>
+                        <binding destination="270" name="selectedIndex" keyPath="values.machine" previousBinding="1712" id="1713">
+                            <dictionary key="options">
+                                <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                <integer key="NSConditionallySetsEnabled" value="0"/>
+                                <string key="NSValueTransformerName">MachineNameToIdTransformer</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </matrix>
+            </subviews>
+        </customView>
+        <customView id="1714" userLabel="Graphics Filter">
+            <rect key="frame" x="0.0" y="0.0" width="627" height="278"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button id="1716">
+                    <rect key="frame" x="191" y="18" width="218" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Panoramic full screen " bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1739">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.fullscreenpanorama" id="1744"/>
+                    </connections>
+                </button>
+                <button id="1715">
+                    <rect key="frame" x="191" y="38" width="218" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Use scanlines in PAL TV filters" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1740">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.paltv2x" id="1743"/>
+                    </connections>
+                </button>
+                <button id="1717">
+                    <rect key="frame" x="191" y="78" width="86" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Bilinear" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1738">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.bilinear" id="1741"/>
+                    </connections>
+                </button>
+                <button id="1718">
+                    <rect key="frame" x="191" y="58" width="151" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Black and white TV" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1737">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.bwtv" id="1742"/>
+                    </connections>
+                </button>
+                <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1719">
+                    <rect key="frame" x="191" y="100" width="244" height="158"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    <size key="cellSize" width="120" height="18"/>
+                    <size key="intercellSpacing" width="4" height="2"/>
+                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="1720">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <cells>
+                        <column>
+                            <buttonCell type="radio" title="None" imagePosition="left" alignment="left" state="on" tag="2" inset="2" id="1736">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="2xSaI" imagePosition="left" alignment="left" tag="5" inset="2" id="1734">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1748">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Super 2xSaI" imagePosition="left" alignment="left" tag="6" inset="2" id="1732">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1750">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="SuperEagle" imagePosition="left" alignment="left" tag="7" inset="2" id="1730">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1752">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="AdvMAME 2x" imagePosition="left" alignment="left" tag="8" inset="2" id="1728">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1754">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="AdvMAME 3x" bezelStyle="regularSquare" imagePosition="left" alignment="left" tag="9" inset="2" id="1726">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1756">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="TV 2x" imagePosition="left" alignment="left" tag="10" inset="2" id="1735">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1758">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="TV 3x" imagePosition="left" alignment="left" tag="11" inset="2" id="1733">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1760">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                        </column>
+                        <column>
+                            <buttonCell type="radio" title="Timex TV" imagePosition="left" alignment="left" tag="12" inset="2" id="1731">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1772">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsEnabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="PAL TV" imagePosition="left" alignment="left" tag="15" inset="2" id="1722">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <buttonCell type="radio" title="PAL TV 2x" imagePosition="left" alignment="left" tag="16" inset="2" id="1724">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1762">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="PAL TV 3x" imagePosition="left" alignment="left" tag="17" inset="2" id="1723">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1764">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="HQ 2x" imagePosition="left" alignment="left" tag="18" inset="2" id="1729">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1766">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="HQ 3x" imagePosition="left" alignment="left" tag="19" inset="2" id="1727">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1768">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Dot Matrix" imagePosition="left" alignment="left" tag="13" inset="2" id="1725">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                                <connections>
+                                    <binding destination="270" name="enabled" keyPath="values.machine" id="1770">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">MachineTimexIsDisabled</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </buttonCell>
+                            <buttonCell type="radio" title="Radio" imagePosition="left" alignment="left" transparent="YES" inset="2" id="1721">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                        </column>
+                    </cells>
+                    <connections>
+                        <binding destination="270" name="selectedTag" keyPath="values.graphicsfilter" id="1746">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">ScalerNameToIdTransformer</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </matrix>
+            </subviews>
+        </customView>
+        <userDefaultsController representsSharedInstance="YES" id="270" userLabel="Shared Defaults"/>
+        <objectController id="315">
+            <declaredKeys>
+                <string>currentScaler</string>
+                <string>machine</string>
+                <string>simpleide</string>
+                <string>paltv2x</string>
+                <string>loadingsound</string>
+                <string>rom2</string>
+            </declaredKeys>
+            <connections>
+                <outlet property="content" destination="-2" id="316"/>
+            </connections>
+        </objectController>
+        <arrayController id="1831" userLabel="DiskTryMerge">
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="diskTryMerge" id="1865"/>
+            </connections>
+        </arrayController>
+        <arrayController clearsFilterPredicateOnInsertion="NO" id="796" userLabel="Joysticks">
+            <declaredKeys>
+                <string>joystickName</string>
+                <string>joystickType</string>
+            </declaredKeys>
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="joysticks" id="797"/>
+            </connections>
+        </arrayController>
+        <arrayController editable="NO" clearsFilterPredicateOnInsertion="NO" id="533" userLabel="MachineROMSController">
+            <declaredKeys>
+                <string>machine</string>
+                <string>rom0</string>
+                <string>rom1</string>
+                <string>rom2</string>
+                <string>rom3</string>
+                <string>machine.title</string>
+                <string>machine.name</string>
+                <string>machine.machineName</string>
+                <string>machine.machineType</string>
+            </declaredKeys>
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="machineRoms" id="682">
+                    <dictionary key="options">
+                        <integer key="NSConditionallySetsEditable" value="0"/>
+                        <integer key="NSRaisesForNotApplicableKeys" value="0"/>
+                    </dictionary>
+                </binding>
+            </connections>
+        </arrayController>
+        <arrayController clearsFilterPredicateOnInsertion="NO" id="534" userLabel="Machines">
+            <declaredKeys>
+                <string>machineName</string>
+                <string>machineType</string>
+            </declaredKeys>
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="machines" id="535"/>
+            </connections>
+        </arrayController>
+        <arrayController id="1926" userLabel="MovieCompression">
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="movieCompression" id="1947"/>
+            </connections>
+        </arrayController>
+        <arrayController clearsFilterPredicateOnInsertion="NO" id="845" userLabel="SDLJoysticks">
+            <declaredKeys>
+                <string>joystickName</string>
+                <string>joystickType</string>
+            </declaredKeys>
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="sdlJoysticks" id="846"/>
+            </connections>
+        </arrayController>
+        <arrayController id="1832" userLabel="SpeakerTypes">
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="speakerTypes" id="1854"/>
+            </connections>
+        </arrayController>
+        <arrayController id="1889" userLabel="StereoAY">
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="soundStereoAY" id="1894"/>
+            </connections>
+        </arrayController>
+    </objects>
+    <resources>
+        <image name="Graphics_Filter" width="32" height="32"/>
+        <image name="Machine" width="32.450702667236328" height="32.450702667236328"/>
+        <image name="NSPreferencesGeneral" width="32" height="32"/>
+        <image name="Peripherals" width="32.450702667236328" height="32.450702667236328"/>
+        <image name="RZX" width="32.450702667236328" height="32.450702667236328"/>
+        <image name="Select_ROMs" width="32.450702667236328" height="32.450702667236328"/>
+        <image name="Sound" width="32" height="32"/>
+        <image name="qs2t_icon" width="23" height="23"/>
+    </resources>
+</document>
