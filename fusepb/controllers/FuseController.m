@@ -174,6 +174,7 @@ const char* connection_names[] = {
 #define QZ_z      0x06
 #define QZ_b      0x0B
 #define QZ_q      0x0C
+#define QZ_r      0x0F
 #define QZ_o      0x1F
 #define QZ_p      0x23
 #define QZ_j      0x26
@@ -982,6 +983,12 @@ save_as_exit:
 {
   [[DisplayOpenGLView instance] joystickToggleKeyboard];
   [self releaseCmdKeys:@"j" withCode:QZ_j];
+}
+
+- (IBAction)keyboard_recreated:(id)sender
+{
+  [[DisplayOpenGLView instance] keyboardToggleRecreatedZXSpectrum];
+  [self releaseCmdKeys:@"r" withCode:QZ_r];
 }
 
 - (IBAction)tape_clear:(id)sender

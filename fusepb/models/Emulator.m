@@ -386,6 +386,11 @@ static Emulator *instance = nil;
   settings_current.joy_keyboard = !settings_current.joy_keyboard;
 }
 
+-(void) keyboardToggleRecreatedZXSpectrum
+{
+  settings_current.recreated_spectrum = !settings_current.recreated_spectrum;
+}
+
 -(int) rzxStartPlayback:(const char *)filename
 {
   return rzx_start_playback( filename, 0 );

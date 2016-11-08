@@ -139,6 +139,7 @@
 -(void) fullscreen;
 
 -(void) joystickToggleKeyboard;
+-(void) keyboardToggleRecreatedZXSpectrum;
 
 -(int) rzxStartPlayback:(const char *)filename;
 -(void) rzxInsertSnap;

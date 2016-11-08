@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
         <capability name="box content view" minToolsVersion="7.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="PreferencesController">
@@ -114,28 +115,6 @@
                     </buttonCell>
                     <connections>
                         <action selector="resetUserDefaults:" target="-2" id="932"/>
-                    </connections>
-                </button>
-                <button misplaced="YES" id="1348">
-                    <rect key="frame" x="293" y="129" width="151" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Late CPU timings" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1379">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.latetimings" id="1402"/>
-                    </connections>
-                </button>
-                <button misplaced="YES" id="Uch-Bs-QML">
-                    <rect key="frame" x="293" y="109" width="151" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Z80 is CMOS" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="qDh-Th-upD">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.z80iscmos" id="Rrn-66-hZP"/>
                     </connections>
                 </button>
                 <button id="1349">
@@ -280,8 +259,30 @@
                         <binding destination="270" name="value" keyPath="values.rate" id="Zrv-JU-bcU"/>
                     </connections>
                 </textField>
+                <button misplaced="YES" id="1348">
+                    <rect key="frame" x="293" y="149" width="151" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Late CPU timings" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1379">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.latetimings" id="1402"/>
+                    </connections>
+                </button>
+                <button misplaced="YES" id="Uch-Bs-QML">
+                    <rect key="frame" x="293" y="129" width="151" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Z80 is CMOS" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="qDh-Th-upD">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.z80iscmos" id="Rrn-66-hZP"/>
+                    </connections>
+                </button>
                 <button misplaced="YES" id="1354">
-                    <rect key="frame" x="293" y="89" width="151" height="18"/>
+                    <rect key="frame" x="293" y="109" width="151" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Allow writes to ROM" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1369">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -292,7 +293,7 @@
                     </connections>
                 </button>
                 <button misplaced="YES" id="1355">
-                    <rect key="frame" x="293" y="49" width="214" height="18"/>
+                    <rect key="frame" x="293" y="69" width="214" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Set joysticks on snapshot load" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1368">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -303,7 +304,7 @@
                     </connections>
                 </button>
                 <button misplaced="YES" id="1357">
-                    <rect key="frame" x="293" y="69" width="105" height="18"/>
+                    <rect key="frame" x="293" y="89" width="105" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Use .slt traps" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1366">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -312,17 +313,6 @@
                     <connections>
                         <binding destination="270" name="value" keyPath="values.slttraps" id="1405"/>
                         <outlet property="nextKeyView" destination="1354" id="1380"/>
-                    </connections>
-                </button>
-                <button misplaced="YES" id="Oae-GO-4G1">
-                    <rect key="frame" x="293" y="149" width="255" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Use Recreated ZX Spectrum keyboard" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="qRM-aw-x1T">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.recreatedspectrum" id="7OV-FA-rfE"/>
                     </connections>
                 </button>
             </subviews>
@@ -1366,14 +1356,6 @@
                         </binding>
                     </connections>
                 </button>
-                <button verticalHuggingPriority="750" tag="2" id="1593">
-                    <rect key="frame" x="386" y="395" width="55" height="28"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" tag="2" inset="2" id="1621">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                </button>
                 <button verticalHuggingPriority="750" id="1594">
                     <rect key="frame" x="386" y="449" width="55" height="28"/>
                     <autoresizingMask key="autoresizingMask"/>
@@ -1584,6 +1566,7 @@
                     </cells>
                 </form>
             </subviews>
+            <point key="canvasLocation" x="139.5" y="168.5"/>
         </customView>
         <customView id="1686" userLabel="Machine">
             <rect key="frame" x="0.0" y="0.0" width="627" height="358"/>
