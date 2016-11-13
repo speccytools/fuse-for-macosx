@@ -568,9 +568,9 @@
 	<key>CFBundleGetInfoString</key>
 	<string>Free Unix Spectrum Emulator</string>
 	<key>CFBundleHelpBookFolder</key>
-	<string>Fuse Help</string>
+	<string>$(PROJECT_NAME)Help.help</string>
 	<key>CFBundleHelpBookName</key>
-	<string>Fuse Help</string>
+	<string>net.sourceforge.projects.fuse-for-macosx.$(PROJECT_NAME:rfc1034identifier).help</string>
 	<key>CFBundleIconFile</key>
 	<string>Fuse</string>
 	<key>CFBundleIdentifier</key>
