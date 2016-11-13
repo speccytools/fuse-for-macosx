@@ -22,7 +22,7 @@
 
 !define FUSE_VERSION "@PACKAGE_VERSION@" ; could have letters like -RC1
 !define FUSE_FULL_VERSION "@FUSE_FULL_VERSION@" ; must have four numeric tokens
-!define DISPLAY_NAME "Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
+!define DISPLAY_NAME "the Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
 !define SETUP_FILENAME "@PACKAGE@-${FUSE_VERSION}-win32-setup"
 !define SETUP_FILE "${SETUP_FILENAME}.exe"
 !define HKLM_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse"
@@ -55,7 +55,10 @@ SetCompressor lzma
 ;--------------------------------
 ;Pages
 
+  !define MUI_LICENSEPAGE_BUTTON "Next >"
+  !define MUI_LICENSEPAGE_TEXT_BOTTOM "$(^Name) is released under the GNU General Public License (GPL). The license is provided here for information purposes only. $_CLICK"
   !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
+
   !define MUI_COMPONENTSPAGE_SMALLDESC
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
