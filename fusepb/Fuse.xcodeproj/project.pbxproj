@@ -19,7 +19,6 @@
 		B615BFE80B4261E50082D535 /* HIDJoysticks.m in Sources */ = {isa = PBXBuildFile; fileRef = B615BFE60B4261E50082D535 /* HIDJoysticks.m */; };
 		B61700F4163EAF8D00142336 /* PokeMemory.xib in Resources */ = {isa = PBXBuildFile; fileRef = B61700F3163EAF8D00142336 /* PokeMemory.xib */; };
 		B61700F7163EAFC600142336 /* PokeMemoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = B61700F6163EAFC600142336 /* PokeMemoryController.m */; };
-		B61F459309121DF100C8096C /* Fuse Help in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6F905ED05CDA24300C2F10D /* Fuse Help */; };
 		B61F459409121DF100C8096C /* disk_plus3.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F2076596C700DE7E81 /* disk_plus3.szx */; };
 		B61F459509121DF100C8096C /* tape_16.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F4076596FD00DE7E81 /* tape_16.szx */; };
 		B61F459609121DF100C8096C /* tape_48.szx in CopyFiles */ = {isa = PBXBuildFile; fileRef = B650C3F60765971300DE7E81 /* tape_48.szx */; };
@@ -362,7 +361,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				B61F459309121DF100C8096C /* Fuse Help in CopyFiles */,
 				B61F459409121DF100C8096C /* disk_plus3.szx in CopyFiles */,
 				B61F459509121DF100C8096C /* tape_16.szx in CopyFiles */,
 				B6BDE2D3125DF48000B81C58 /* tape_48_ntsc.szx in CopyFiles */,
@@ -751,7 +749,6 @@
 		B6F74F9704B855D40059D51C /* LoadBinaryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = LoadBinaryController.m; path = controllers/LoadBinaryController.m; sourceTree = "<group>"; };
 		B6F74F9C04B85B660059D51C /* SaveBinaryController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SaveBinaryController.h; path = controllers/SaveBinaryController.h; sourceTree = "<group>"; };
 		B6F74F9D04B85B660059D51C /* SaveBinaryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SaveBinaryController.m; path = controllers/SaveBinaryController.m; sourceTree = "<group>"; };
-		B6F905ED05CDA24300C2F10D /* Fuse Help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Fuse Help"; path = "resources/Fuse Help"; sourceTree = SOURCE_ROOT; };
 		B6FA759C0C1D7507007F5A10 /* audiofile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = audiofile.framework; path = ../../audiofile/build/Deployment/audiofile.framework; sourceTree = "<group>"; };
 		B6FD5C7A05A4F5B600A6C4FC /* utils.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = utils.h; path = ../utils.h; sourceTree = SOURCE_ROOT; };
 		B6FEA44B0444C2CC0013916D /* tc2068-0.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = "tc2068-0.rom"; path = "../roms/tc2068-0.rom"; sourceTree = SOURCE_ROOT; };
@@ -949,7 +946,6 @@
 				B665EE051052A2D100FCFED8 /* xibs */,
 				B61EEB950D1A917D006FEA80 /* FuseGenerator.qlgenerator */,
 				B64FEA96084F8EC300879389 /* FuseImporter.mdimporter */,
-				B6F905ED05CDA24300C2F10D /* Fuse Help */,
 				B643BB8C0403A0D300A864FD /* resources */,
 				F559854B0389210301A804BA /* snaps */,
 				F559854A038920FD01A804BA /* roms */,
@@ -2412,6 +2408,7 @@
 				B6D6704A1DD6CB6B0014914E /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
 		};
 /* End XCConfigurationList section */
 	};
