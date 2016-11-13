@@ -317,7 +317,7 @@ static void display_registers( void )
   widget_printstring_right( LC(12) - 4, LR(4), 5, "Tstates" );
   widget_printstring_fixed( LC(12) / 8, LR(4) / 8, 7, pbuf );
   for( i = 0; i < 8; ++i )
-    pbuf[i] = '0' + ( F >> i & 1 );
+    pbuf[i] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
   pbuf[8] = 0;
   widget_printstring_fixed( LC(20) / 8, LR(4) / 8, 7, pbuf );
 
