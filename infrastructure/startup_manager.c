@@ -54,6 +54,16 @@ startup_manager_init( void )
 }
 
 void
+startup_manager_end( void )
+{
+  g_array_free( registered_modules, TRUE );
+  registered_modules = NULL;
+
+  g_array_free( end_functions, TRUE );
+  end_functions = NULL;
+}
+
+void
 startup_manager_register(
   startup_manager_module module, startup_manager_module *dependencies,
   size_t dependency_count, startup_manager_init_fn init_fn,
@@ -168,4 +178,6 @@ startup_manager_run_end( void )
 
     end_fn();
   }
+
+  startup_manager_end();
 }
