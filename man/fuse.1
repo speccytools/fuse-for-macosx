@@ -23,7 +23,7 @@
 .\" E-mail: philip-fuse@shadowmagic.org.uk
 .\"
 .\"
-.TH fuse 1 "17th July, 2016" "Version 1.2.1" "Emulators"
+.TH fuse 1 "5th November, 2016" "Version 1.3.1" "Emulators"
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -68,9 +68,10 @@ format.
 See the
 .B "COMPRESSED FILES"
 section for details on reading files compressed with
-.IR bzip2 "(3)"
+.IR bzip2 "(3),"
+.IR gzip "(3)"
 or
-.IR gzip "(3)."
+.IR zip "(3)."
 .\"
 .\"------------------------------------------------------------------
 .\"
@@ -121,7 +122,8 @@ option.
 Specify whether tape and disk files should be automatically loaded
 when they are opened using the
 .I "File, Open..."
-menu option. (Enabled by default, but you can use
+menu option. In the case of TRD/SCL disk images, inserts also a boot
+loader file when none is available. (Enabled by default, but you can use
 .RB ` \-\-no\-auto\-load '
 to disable). Same as the Media Options dialog's
 .I "Auto-load media"
@@ -738,6 +740,17 @@ Emulate a Kempston mouse. Same as the General Peripherals Options dialog's
 option.
 .RE
 .PP
+.B \-\-keyboard\-arrows\-shifted
+.RS
+Treat the keyboard arrow keys as shifted like the ZX Spectrum+ keyboard's
+arrow keys or as unshifted like a cursor joystick that maps to the 5, 6, 7
+and 8 keys. (Enabled by default, but you can use
+.RB ` \-\-no\-keyboard\-arrows\-shifted '
+to disable). Same as the General Peripherals Options dialog's
+.I "Use shift with arrow keys"
+option.
+.RE
+.PP
 .B \-\-late\-timings
 .RS
 It has been observed that some real Spectrums run such that the screen
@@ -959,6 +972,15 @@ option.
 Specify an RZX file to begin recording to.
 .RE
 .PP
+.B \-\-recreated\-spectrum
+.RS
+Enable the use of a Recreated ZX Spectrum in `Layer A' (game) mode. This is a
+Bluetooth keyboard that can be paired to the device where Fuse is running. The
+same as the General Options dialog's
+.I "Recreated ZX Spectrum"
+option.
+.RE
+.PP
 .B \-\-rom\-16
 .I file
 .br
@@ -1093,6 +1115,8 @@ the four ROMs for the +2A
 .RI ( plus3\-0.rom ", " plus3\-1.rom ", " plus3\-2.rom " and " plus3\-3.rom ),
 the four ROMs for the +3
 .RI ( plus3\-0.rom ", " plus3\-1.rom ", " plus3\-2.rom " and " plus3\-3.rom ),
+the four enhanced ROMs for the +3e
+.RI ( plus3e\-0.rom ", " plus3e\-1.rom ", " plus3e\-2.rom " and " plus3e\-3.rom ),
 the TC2048 ROM
 .RI ( tc2048.rom ),
 the two ROMs for the TC2068
@@ -2113,6 +2137,20 @@ Early versions of the Spectrum used a different value for unused bits
 on the keyboard input ports, and a few games depended on the old value
 of these bits. Enabling this option switches to the old value, to let
 you run them.
+.RE
+.PP
+.I "Recreated ZX Spectrum"
+.RS
+Enable the use of a Recreated ZX Spectrum in `Layer A' (game) mode. This
+is a Bluetooth keyboard that can be paired to the device where Fuse is
+running.
+.RE
+.PP
+.I "Use shift with arrow keys"
+.RS
+Treat the keyboard arrow keys as shifted like the ZX Spectrum+ keyboard's
+arrow keys or as unshifted like a cursor joystick that maps to the 5, 6, 7
+and 8 keys.
 .RE
 .PP
 .I "Allow writes to ROM"
@@ -5006,7 +5044,9 @@ Didaktik 80 and Didaktik 40 file formats.
 .PP
 .I .TRD
 .RS
-TR-DOS disk image; for detailed information please see
+TR-DOS disk image. TRD and SCL sectors are loaded interleaved, therefore
+you might experience problems with TR\-DOS ROMs that use the turbo
+format (sequential sectors); for detailed information please see
 .I http://web.archive.org/web/20070808150548/http://www.ramsoft.bbk.org/tech/tr\-info.zip
 .RE
 .PP
@@ -5142,11 +5182,13 @@ frequency stereo sound default compression level.
 Assuming the appropriate libraries were available when
 .IR libspectrum (3)
 was compiled, snapshots, tape images, dock cartridges and input
-recording files can be read from files compressed with
-.IR bzip2 (3)
-or
+recording files (RZX) can be read from files compressed with
+.IR bzip2 "(3),"
 .IR gzip (3)
-just as if they were uncompressed.
+or
+.IR zip (3)
+just as if they were uncompressed. In the zip case, only the first
+supported file found inside the archive is loaded.
 There is currently no support for reading compressed +3, DISCiPLE/+D
 or Beta disk images.
 .\"
@@ -5185,7 +5227,8 @@ error messages.
 .IR libspectrum "(3),"
 .IR ogg123 "(1),"
 .IR xspect "(1),"
-.IR xzx "(1)."
+.IR xzx "(1),"
+.IR zip "(3)."
 .PP
 The comp.sys.sinclair Spectrum FAQ, at
 .br

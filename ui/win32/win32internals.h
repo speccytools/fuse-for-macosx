@@ -1,8 +1,6 @@
 /* win32internals.h: stuff internal to the Win32 UI
    Copyright (c) 2004 Marek Januszewski
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -87,6 +85,8 @@ void blit( void );
  * Keyboard routines (win32keyboard.c)
  */
 
+void win32keyboard_init( void );
+void win32keyboard_end( void );
 void win32keyboard_keypress( WPARAM wParam, LPARAM lParam );
 void win32keyboard_keyrelease( WPARAM wParam, LPARAM lParam );
 

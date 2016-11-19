@@ -2,8 +2,6 @@
    Copyright (c) 2000-2007 Philip Kendall
    Copyright (c) 2015-2016 Sergio Baldoví
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -43,6 +41,11 @@ static void add_filter_recording_files( GtkFileFilter *filter );
 static void add_filter_snapshot_files( GtkFileFilter *filter );
 static void add_filter_tape_files( GtkFileFilter *filter );
 
+#if defined LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION || \
+    defined LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+static void add_filter_compressed_files( GtkFileFilter *filter );
+#endif
+
 static char*
 run_dialog( const char *title, GtkFileChooserAction action )
 {
@@ -64,7 +67,8 @@ run_dialog( const char *title, GtkFileChooserAction action )
 
   gtk_dialog_set_default_response( GTK_DIALOG( dialog ), GTK_RESPONSE_ACCEPT );
 
-  /* TODO: select filter based on UI operation */
+  /* TODO: select filter based on UI operation (snapshot, recording, screenshot) */
+  /* TODO: custom filter based file action (open, save) */
   add_filter_defaults( dialog );
 
   if( current_folder )
@@ -107,6 +111,10 @@ add_filter_defaults( GtkWidget *file_chooser )
   filter = gtk_file_filter_new();
   gtk_file_filter_set_name( filter, "Supported Files" );
   add_filter_auxiliary_files( filter );
+#if defined LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION || \
+    defined LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+  add_filter_compressed_files( filter );
+#endif
   add_filter_disk_files( filter );
   add_filter_dock_files( filter );
   add_filter_harddisk_files( filter );
@@ -127,13 +135,21 @@ add_filter_defaults( GtkWidget *file_chooser )
   gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
 
   filter = gtk_file_filter_new();
-  gtk_file_filter_set_name( filter, "Disk Files" );
-  add_filter_disk_files( filter );
-  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
-
-  filter = gtk_file_filter_new();
   gtk_file_filter_set_name( filter, "Cartridge Files" );
   add_filter_dock_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+
+#if defined LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION || \
+    defined LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Compressed Files" );
+  add_filter_compressed_files( filter );
+  gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
+#endif
+
+  filter = gtk_file_filter_new();
+  gtk_file_filter_set_name( filter, "Disk Files" );
+  add_filter_disk_files( filter );
   gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( file_chooser ), filter );
 
   filter = gtk_file_filter_new();
@@ -169,13 +185,43 @@ add_filter_auxiliary_files( GtkFileFilter *filter )
   gtk_file_filter_add_pattern( filter, "*.log" );
   gtk_file_filter_add_pattern( filter, "*.pok" );
   gtk_file_filter_add_pattern( filter, "*.scr" );
-  gtk_file_filter_add_pattern( filter, "*.svg" );
 
   gtk_file_filter_add_pattern( filter, "*.LOG" );
   gtk_file_filter_add_pattern( filter, "*.POK" );
   gtk_file_filter_add_pattern( filter, "*.SCR" );
+
+#ifdef USE_LIBPNG
+  gtk_file_filter_add_pattern( filter, "*.png" );
+  gtk_file_filter_add_pattern( filter, "*.PNG" );
+#endif
+
+#ifdef HAVE_LIB_XML2
+  gtk_file_filter_add_pattern( filter, "*.svg" );
   gtk_file_filter_add_pattern( filter, "*.SVG" );
+#endif
 }
+
+
+#if defined LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION || \
+    defined LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+
+static void
+add_filter_compressed_files( GtkFileFilter *filter )
+{
+#ifdef LIBSPECTRUM_SUPPORTS_ZLIB_COMPRESSION
+  gtk_file_filter_add_pattern( filter, "*.gz" );
+  gtk_file_filter_add_pattern( filter, "*.GZ" );
+  gtk_file_filter_add_pattern( filter, "*.zip" );
+  gtk_file_filter_add_pattern( filter, "*.ZIP" );
+#endif
+
+#ifdef LIBSPECTRUM_SUPPORTS_BZ2_COMPRESSION
+  gtk_file_filter_add_pattern( filter, "*.bz2" );
+  gtk_file_filter_add_pattern( filter, "*.BZ2" );
+#endif
+}
+
+#endif
 
 static void
 add_filter_disk_files( GtkFileFilter *filter )

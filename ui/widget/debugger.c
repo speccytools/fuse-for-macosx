@@ -3,8 +3,6 @@
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 BogDan Vatra
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -218,6 +216,7 @@ void widget_debugger_keyhandler( input_key key )
 
       text_data.title = "Debugger command";
       text_data.allow = WIDGET_INPUT_ASCII;
+      text_data.max_length = 63;
       text_data.text[0] = 0;
       if( !widget_do_text( &text_data ) )
 	debugger_command_evaluate( widget_text_text );
@@ -318,7 +317,7 @@ static void display_registers( void )
   widget_printstring_right( LC(12) - 4, LR(4), 5, "Tstates" );
   widget_printstring_fixed( LC(12) / 8, LR(4) / 8, 7, pbuf );
   for( i = 0; i < 8; ++i )
-    pbuf[i] = '0' + ( F >> i & 1 );
+    pbuf[i] = ( F & ( 0x80 >> i ) ) ? '1' : '0';
   pbuf[8] = 0;
   widget_printstring_fixed( LC(20) / 8, LR(4) / 8, 7, pbuf );
 

@@ -1,8 +1,6 @@
 /* keyboard.c: Routines for dealing with the Spectrum's keyboard
    Copyright (c) 1999-2016 Philip Kendall
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -107,6 +105,14 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_slash,       { KEYBOARD_v,     KEYBOARD_Symbol } },
   { INPUT_KEY_Shift_R,     { KEYBOARD_NONE,  KEYBOARD_Caps   } },
 
+  { INPUT_KEY_asterisk,    { KEYBOARD_b,     KEYBOARD_Symbol } },
+  { INPUT_KEY_dollar,      { KEYBOARD_4,     KEYBOARD_Symbol } },
+  { INPUT_KEY_exclam,      { KEYBOARD_1,     KEYBOARD_Symbol } },
+  { INPUT_KEY_less,        { KEYBOARD_r,     KEYBOARD_Symbol } },
+  { INPUT_KEY_parenright,  { KEYBOARD_9,     KEYBOARD_Symbol } },
+  { INPUT_KEY_colon,       { KEYBOARD_z,     KEYBOARD_Symbol } },
+  { INPUT_KEY_plus,        { KEYBOARD_k,     KEYBOARD_Symbol } },
+
   { INPUT_KEY_Control_L,   { KEYBOARD_NONE,  KEYBOARD_Symbol } },
   { INPUT_KEY_Alt_L,       { KEYBOARD_NONE,  KEYBOARD_Symbol } },
   { INPUT_KEY_Meta_L,      { KEYBOARD_NONE,  KEYBOARD_Symbol } },
@@ -120,10 +126,10 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_Control_R,   { KEYBOARD_NONE,  KEYBOARD_Symbol } },
   { INPUT_KEY_Mode_switch, { KEYBOARD_NONE,  KEYBOARD_Symbol } },
 
-  { INPUT_KEY_Left,        { KEYBOARD_5,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Down,        { KEYBOARD_6,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_Caps   } },
+  { INPUT_KEY_Left,        { KEYBOARD_5,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Down,        { KEYBOARD_6,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_NONE   } },
 
   { INPUT_KEY_KP_Enter,    { KEYBOARD_Enter, KEYBOARD_NONE   } },
 

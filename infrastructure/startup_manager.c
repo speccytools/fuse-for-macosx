@@ -1,8 +1,6 @@
 /* startup_manager.c: handle Fuse's startup routines
    Copyright (c) 2016 Philip Kendall
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -53,6 +51,16 @@ startup_manager_init( void )
     g_array_new( FALSE, FALSE, sizeof( registered_module_t ) );
   end_functions =
     g_array_new( FALSE, FALSE, sizeof( startup_manager_end_fn ) );
+}
+
+void
+startup_manager_end( void )
+{
+  g_array_free( registered_modules, TRUE );
+  registered_modules = NULL;
+
+  g_array_free( end_functions, TRUE );
+  end_functions = NULL;
 }
 
 void
@@ -170,4 +178,6 @@ startup_manager_run_end( void )
 
     end_fn();
   }
+
+  startup_manager_end();
 }

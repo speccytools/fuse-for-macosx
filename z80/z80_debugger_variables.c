@@ -1,8 +1,6 @@
 /* z80_debugger_variables.c: routines to expose Z80 registers to the debugger
    Copyright (c) 2016 Philip Kendall
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -142,7 +140,7 @@ get_IM( void )
 static void
 set_IM( libspectrum_dword value )
 {
-  if( value >= 0 && value <= 2 ) IM = value;
+  if( value <= 2 ) IM = value;
 }
 
 static libspectrum_dword

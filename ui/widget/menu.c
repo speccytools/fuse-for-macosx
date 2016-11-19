@@ -2,8 +2,6 @@
    Copyright (c) 2001-2015 Philip Kendall
    Copyright (c) 2015 Sergio Baldoví
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -723,10 +721,7 @@ menu_help_keyboard( int action )
 void
 menu_help_about( int action )
 {
-  widget_end_all( WIDGET_FINISHED_OK );
-  ui_error( UI_ERROR_INFO,
-           "Free Unix Spectrum Emulator (Fuse) %s %s. See %s for details.",
-            VERSION, FUSE_COPYRIGHT, PACKAGE_URL );
+  widget_do_about();
 }
 
 static int

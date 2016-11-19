@@ -2,8 +2,6 @@
    Copyright (c) 1999-2015 Philip Kendall, Thomas Harte, Witold Filipczyk
                            and Fredrick Meunier
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -99,9 +97,6 @@ static libspectrum_qword display_all_dirty;
 
 /* Used to signify that we're redrawing the entire screen */
 static int display_redraw_all;
-
-/* Value used to signify a border line has more than one colour on it. */
-static const int display_border_mixed = 0xff;
 
 /* The last point at which we updated the screen display */
 int critical_region_x = 0, critical_region_y = 0;

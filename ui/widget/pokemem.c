@@ -2,8 +2,6 @@
    Copyright (c) 2011 Philip Kendall, Sergio Baldoví
    Copyright (c) 2015 Adrien Destugues
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -423,6 +421,7 @@ widget_pokemem_ask_value( trainer_t *trainer )
 
   text_data.title = "Enter trainer value";
   text_data.allow = WIDGET_INPUT_DIGIT;
+  text_data.max_length = 3;
   snprintf( text_data.text, sizeof( text_data.text ), "%d", trainer->value );
   widget_do_text( &text_data );
 
@@ -445,6 +444,7 @@ widget_pokemem_add_custom_poke( void )
   memset( &text_data, 0, sizeof( widget_text_t ) );
   text_data.title = "Enter bank (optional)";
   text_data.allow = WIDGET_INPUT_DIGIT;
+  text_data.max_length = 1;
   if( widget_do_text( &text_data ) ) return 1;
 
   if( !widget_text_text ) return 1;
@@ -461,6 +461,7 @@ widget_pokemem_add_custom_poke( void )
 
   /* Address */
   text_data.title = "Enter address / offset";
+  text_data.max_length = 5;
   if( widget_do_text( &text_data ) ) return 1;
 
   if( !widget_text_text ) return 1;
@@ -482,6 +483,7 @@ widget_pokemem_add_custom_poke( void )
 
   /* Value */
   text_data.title = "Enter value";
+  text_data.max_length = 3;
   if( widget_do_text( &text_data ) ) return 1;
 
   if( !widget_text_text ) return 1;

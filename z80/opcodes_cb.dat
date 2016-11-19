@@ -1,5 +1,4 @@
 # opcodes_cb: Z80 CBxx opcodes
-# $Id$
 
 0x00 RLC B
 0x01 RLC C

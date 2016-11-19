@@ -2,8 +2,6 @@
 ## Copyright (c) 2009 Marek Januszewski
 ## Copyright (c) 2016 Sergio Baldoví
 
-## $Id$
-
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation; either version 2 of the License, or
@@ -24,7 +22,7 @@
 
 !define FUSE_VERSION "@PACKAGE_VERSION@" ; could have letters like -RC1
 !define FUSE_FULL_VERSION "@FUSE_FULL_VERSION@" ; must have four numeric tokens
-!define DISPLAY_NAME "Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
+!define DISPLAY_NAME "the Free Unix Spectrum Emulator (Fuse) ${FUSE_VERSION}"
 !define SETUP_FILENAME "@PACKAGE@-${FUSE_VERSION}-win32-setup"
 !define SETUP_FILE "${SETUP_FILENAME}.exe"
 !define HKLM_REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Fuse"
@@ -57,7 +55,10 @@ SetCompressor lzma
 ;--------------------------------
 ;Pages
 
+  !define MUI_LICENSEPAGE_BUTTON "Next >"
+  !define MUI_LICENSEPAGE_TEXT_BOTTOM "$(^Name) is released under the GNU General Public License (GPL). The license is provided here for information purposes only. $_CLICK"
   !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
+
   !define MUI_COMPONENTSPAGE_SMALLDESC
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
@@ -249,10 +250,13 @@ section "!Fuse Core Files (required)" SecCore
     File "COPYING.txt"
     File "fuse.exe"
     File "fuse.html"
+    File /nonfatal "LICENSES.txt"
     File /nonfatal "manual*.png"
     File "README.txt"
     File /nonfatal "README-win32.txt"
     File "*.dll"
+    SetOutPath $INSTDIR\3rd-party
+    File /nonfatal "3rd-party\*"
     SetOutPath $INSTDIR\lib
     File "lib\*"
     SetOutPath "$INSTDIR\roms"

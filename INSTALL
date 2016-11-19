@@ -39,7 +39,7 @@ do this bit.
 
 Once you've got Fuse configured and built, read the man page :-)
 
-Note that if you're using version of Fuse from Subversion rather than
+Note that if you're using version of Fuse from Git rather than
 one of the released tarballs, you'll need to run `autogen.sh' before
 running 'configure' for the first time.
 
@@ -160,5 +160,3 @@ Note: you need `libspectrum-8.dll' and the `roms' directory and the `lib'
   Additional tools are required for the former rules: Info-Zip, p7zip and NSIS,
   respectively. That will make a temporary subdirectory (fuse-VERSION-win32)
   in the build directory and then will create a package.
-
-$Id$

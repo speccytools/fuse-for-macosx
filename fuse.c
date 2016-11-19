@@ -1,8 +1,6 @@
 /* fuse.c: The Free Unix Spectrum Emulator
    Copyright (c) 1999-2016 Philip Kendall and others
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -375,11 +373,7 @@ static int fuse_init(int argc, char **argv)
 
   start_scaler = utils_safe_strdup( settings_current.start_scaler_mode );
 
-  /* Windows will create a console for our output if there isn't one already,
-   * so we don't display the copyright message on Win32. */
-#ifndef WIN32
   fuse_show_copyright();
-#endif
 
   if( run_startup_manager( &argc, &argv ) ) return 1;
 

@@ -1,8 +1,6 @@
 Some brief instructions on adding another user interface to Fuse
 ================================================================
 
-Version: $Id$
-
 In order to add a new user interface (UI) to Fuse, you need to
 implement:
 

@@ -1,5 +1,4 @@
 # opcodes.base: unshifted Z80 opcodes
-# $Id$
 
 0x00 NOP
 0x01 LD BC,nnnn

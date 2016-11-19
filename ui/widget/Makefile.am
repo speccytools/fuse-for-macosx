@@ -2,8 +2,6 @@
 ## Copyright (c) 2001,2002 Philip Kendall
 ## Copyright (c) 2015 Sergio Baldoví
 
-## $Id$
-
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation; either version 2 of the License, or
@@ -36,6 +34,7 @@ endif
 CLEANFILES += $(ui_widget_built)
 
 ui_widget_files = \
+                  ui/widget/about.c \
                   ui/widget/browse.c \
                   ui/widget/debugger.c \
                   ui/widget/error.c \

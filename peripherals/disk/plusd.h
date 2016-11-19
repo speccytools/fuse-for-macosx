@@ -1,8 +1,6 @@
 /* plusd.h: Routines for handling the +D interface
    Copyright (c) 2005-2016 Stuart Brady, Philip Kendall
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -27,8 +25,6 @@
 
 #ifndef FUSE_PLUSD_H
 #define FUSE_PLUSD_H
-
-#include <config.h>
 
 typedef enum plusd_drive_number {
   PLUSD_DRIVE_1 = 0,

@@ -1,8 +1,6 @@
 /* disk.h: Routines for handling disk images
    Copyright (c) 2007-2015 Gergely Szasz
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -25,8 +23,6 @@
 
 #ifndef FUSE_DISK_H
 #define FUSE_DISK_H
-
-#include <config.h>
 
 static const unsigned int DISK_FLAG_NONE = 0x00;
 static const unsigned int DISK_FLAG_PLUS3_CPC = 0x01;	/* try to fix some CPC issue */
@@ -129,6 +125,14 @@ TRACK_LEN TYPE TRACK......DATA CLOCK..MARKS MF..MARKS WEAK..MARKS
 
 #define DISK_SET_TRACK( d, head, cyl ) \
    DISK_SET_TRACK_IDX( (d), (d)->sides * cyl + head )
+
+typedef struct disk_position_context_t {
+  libspectrum_byte *track;   /* current track data bytes */
+  libspectrum_byte *clocks;  /* clock marks bits */
+  libspectrum_byte *fm;      /* FM/MFM marks bits */
+  libspectrum_byte *weak;    /* weak marks bits/weak data */
+  int i;                     /* index for track and clocks */
+} disk_position_context_t;
 
 const char *disk_strerror( int error );
 /* create an unformatted disk sides -> (1/2) cylinders -> track/side,

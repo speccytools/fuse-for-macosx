@@ -3,8 +3,6 @@
    Copyright (c) 2015 Kirben
    Copyright (c) 2016 lordhoto
 
-   $Id$
-
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -381,6 +379,8 @@ ui_init( int *argc, char ***argv )
   /* init the display area */
   if( win32display_init() ) return 1;
 
+  win32keyboard_init();
+
   /* show the window finally */
   ShowWindow( fuse_hWnd, fuse_nCmdShow );
   UpdateWindow( fuse_hWnd );
@@ -422,8 +422,10 @@ ui_end( void )
 {
   int error;
 
+  win32keyboard_end();
+
   error = win32display_end(); if( error ) return error;
-   
+
   /* close the monospaced font handle */     
   if( monospaced_font ) {
     DeleteObject( monospaced_font );
