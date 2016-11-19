@@ -24,8 +24,6 @@
 #ifndef FUSE_DIDAKTIK80_H
 #define FUSE_DIDAKTIK80_H
 
-#include <config.h>
-
 #include <libspectrum.h>
 
 #include "fdd.h"
