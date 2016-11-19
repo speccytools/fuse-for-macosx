@@ -125,10 +125,10 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_Control_R,   { KEYBOARD_NONE,  KEYBOARD_Symbol } },
   { INPUT_KEY_Mode_switch, { KEYBOARD_NONE,  KEYBOARD_Symbol } },
 
-  { INPUT_KEY_Left,        { KEYBOARD_5,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Down,        { KEYBOARD_6,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_Caps   } },
+  { INPUT_KEY_Left,        { KEYBOARD_5,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Down,        { KEYBOARD_6,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_NONE   } },
 
   { INPUT_KEY_KP_Enter,    { KEYBOARD_Enter, KEYBOARD_NONE   } },
 

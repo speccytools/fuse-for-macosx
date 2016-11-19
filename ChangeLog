@@ -1,3 +1,14 @@
+2016-12-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.2 released.
+
+        * Emulation core improvements:
+          * Allow keyboard arrow keys to be used as a cursor joystick (thanks,
+            solaris104) (Fredrick Meunier)
+
+        * Miscellaneous improvements:
+          * Various minor bugfixes.
+
 2016-11-05  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.1 released.

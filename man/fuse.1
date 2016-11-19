@@ -740,6 +740,17 @@ Emulate a Kempston mouse. Same as the General Peripherals Options dialog's
 option.
 .RE
 .PP
+.B \-\-keyboard\-arrows\-shifted
+.RS
+Treat the keyboard arrow keys as shifted like the ZX Spectrum+ keyboard's
+arrow keys or as unshifted like a cursor joystick that maps to the 5, 6, 7
+and 8 keys. (Enabled by default, but you can use
+.RB ` \-\-no\-keyboard\-arrows\-shifted '
+to disable). Same as the General Peripherals Options dialog's
+.I "Use shift with arrow keys"
+option.
+.RE
+.PP
 .B \-\-late\-timings
 .RS
 It has been observed that some real Spectrums run such that the screen
@@ -2132,6 +2143,13 @@ you run them.
 .RS
 Enable the use of a Recreated ZX Spectrum. This is a Bluetooth keyboard
 that can be paired to the device where Fuse is running.
+.RE
+.PP
+.I "Use shift with arrow keys"
+.RS
+Treat the keyboard arrow keys as shifted like the ZX Spectrum+ keyboard's
+arrow keys or as unshifted like a cursor joystick that maps to the 5, 6, 7
+and 8 keys.
 .RE
 .PP
 .I "Allow writes to ROM"
