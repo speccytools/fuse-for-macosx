@@ -1678,8 +1678,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B6D670441DD6CB6B0014914E /* FuseHelp */,
 				B61F459009121DF100C8096C /* Fuse */,
+				B6D670441DD6CB6B0014914E /* FuseHelp */,
 			);
 		};
 /* End PBXProject section */
