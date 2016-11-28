@@ -7,6 +7,8 @@
             solaris104) (Fredrick Meunier)
 
         * Miscellaneous improvements:
+          * WidgetUI: Fix order of Z80 flags in debugger (thanks, Marcos
+            Cruz) (Sergio Baldoví).
           * Various minor bugfixes.
 
 2016-11-05  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
