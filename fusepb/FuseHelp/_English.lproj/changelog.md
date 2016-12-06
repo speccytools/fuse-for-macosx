@@ -1,9 +1,24 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.3.1 of the Fuse emulator.
+description: This section describes the changes for version 1.3.2 of the Fuse emulator.
 ---
 
-## What's new in Fuse For Mac OS X 1.3.1
+## What's new in Fuse for macOS 1.3.2
+
+### Emulation core improvements:
+* Allow keyboard arrow keys to be used as a cursor joystick (thanks,
+  solaris104) (Fredrick Meunier).
+* Limit sound generation to less than 500% speed (thanks, windale and
+  Sergio Baldoví) (Fredrick Meunier).
+
+### Miscellaneous improvements:
+* QuickLook Generator: speed improvements by enabling concurrent requests
+  (Fredrick Meunier).
+* New Fuse Help with improved organisation and cross-references (Fredrick Meunier).
+
+### Various other minor bugfixes.
+
+## What's new in Fuse for macOS 1.3.1
 
 ### Emulation core improvements:
 * Warn on inserting a disk image larger than the emulated drive (thanks,
