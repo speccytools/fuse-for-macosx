@@ -140,6 +140,7 @@
 
 -(void) joystickToggleKeyboard;
 -(void) keyboardToggleRecreatedZXSpectrum;
+-(void) keyboardToggleArrowsShifted;
 
 -(int) rzxStartPlayback:(const char *)filename;
 -(void) rzxInsertSnap;

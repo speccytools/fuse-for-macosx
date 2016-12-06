@@ -103,6 +103,7 @@
 - (IBAction)if2_open:(id)sender;
 - (IBAction)joystick_keyboard:(id)sender;
 - (IBAction)keyboard_recreated:(id)sender;
+- (IBAction)keyboard_arrows_shifted:(id)sender;
 - (IBAction)mdr_eject:(id)sender;
 - (IBAction)mdr_save:(id)sender;
 - (IBAction)mdr_save_as:(id)sender;

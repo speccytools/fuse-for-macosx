@@ -991,6 +991,11 @@ save_as_exit:
   [self releaseCmdKeys:@"r" withCode:QZ_r];
 }
 
+- (IBAction)keyboard_arrows_shifted:(id)sender
+{
+  [[DisplayOpenGLView instance] keyboardToggleArrowsShifted];
+}
+
 - (IBAction)tape_clear:(id)sender
 {
   [[DisplayOpenGLView instance] tapeClear];

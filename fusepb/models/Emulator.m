@@ -391,6 +391,11 @@ static Emulator *instance = nil;
   settings_current.recreated_spectrum = !settings_current.recreated_spectrum;
 }
 
+-(void) keyboardToggleArrowsShifted
+{
+  settings_current.keyboard_arrows_shifted = !settings_current.keyboard_arrows_shifted;
+}
+
 -(int) rzxStartPlayback:(const char *)filename
 {
   return rzx_start_playback( filename, 0 );

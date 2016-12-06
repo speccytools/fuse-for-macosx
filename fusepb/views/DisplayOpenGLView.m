@@ -843,6 +843,11 @@ static DisplayOpenGLView *instance = nil;
   [proxy_emulator keyboardToggleRecreatedZXSpectrum];
 }
 
+-(void) keyboardToggleArrowsShifted
+{
+  [proxy_emulator keyboardToggleArrowsShifted];
+}
+
 -(int) rzxStartPlayback:(const char *)filename
 {
   return [proxy_emulator rzxStartPlayback:filename];
