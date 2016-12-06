@@ -24,8 +24,6 @@
 #ifndef FUSE_TRDOS_H
 #define FUSE_TRDOS_H
 
-#include <config.h>
-
 #include <libspectrum.h>
 
 typedef struct trdos_spec_t {

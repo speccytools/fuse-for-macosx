@@ -175,8 +175,8 @@
   settings_get_rom_array( &settings_current, machineRoms );
   [machineRoms release];
 
-  fuse_joystick_end();
-  fuse_joystick_init();
+  joystick_end();
+  joystick_init( NULL );
 
   periph_posthook();
 

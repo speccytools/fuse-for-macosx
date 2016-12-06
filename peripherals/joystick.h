@@ -1,5 +1,5 @@
 /* joystick.h: Joystick emulation support
-   Copyright (c) 2001-2004 Russell Marks, Philip Kendall
+   Copyright (c) 2001-2016 Russell Marks, Philip Kendall
    Copyright (c) 2003 Darren Salt
    Copyright (c) 2015 Stuart Brady
 
@@ -31,9 +31,9 @@
 /* Number of joysticks known about & initialised */
 extern int joysticks_supported;
 
-/* Init/shutdown functions. Errors aren't important here */
-void fuse_joystick_init( void );
-void fuse_joystick_end( void );
+int joystick_init( void *context );
+void joystick_end( void );
+void joystick_register_startup( void );
 
 /* A constant to identify the joystick emulated via the keyboard */
 #define JOYSTICK_KEYBOARD 2

@@ -1,3 +1,21 @@
+2016-12-05  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.2 released.
+
+        * Emulation core improvements:
+          * Allow keyboard arrow keys to be used as a cursor joystick (thanks,
+            solaris104) (Fredrick Meunier)
+          * Limit sound generation to less than 500% speed (thanks, windale and
+            Sergio Baldoví) (Fredrick Meunier).
+
+        * Miscellaneous improvements:
+          * WidgetUI: Fix order of Z80 flags in debugger (thanks, Marcos
+            Cruz) (Sergio Baldoví).
+          * Win32: Limit sound generation from 50% to 300% to work around bugs
+            in the DirectSound driver (thanks, windale and Lee Tonks) (Fredrick
+            Meunier).
+          * Various minor bugfixes.
+
 2016-11-05  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.1 released.

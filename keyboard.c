@@ -1,5 +1,5 @@
 /* keyboard.c: Routines for dealing with the Spectrum's keyboard
-   Copyright (c) 1999-2013 Philip Kendall
+   Copyright (c) 1999-2016 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,8 +29,9 @@
 
 #include <libspectrum.h>
 
-#include "ui/ui.h"
+#include "infrastructure/startup_manager.h"
 #include "keyboard.h"
+#include "ui/ui.h"
 
 /* Bit masks for each of the eight keyboard half-rows; `AND' the selected
    ones of these to get the value to return
@@ -134,10 +135,10 @@ static struct spectrum_keys_wrapper spectrum_keys_table[] = {
   { INPUT_KEY_Control_R,   { KEYBOARD_NONE,  KEYBOARD_Symbol } },
   { INPUT_KEY_Mode_switch, { KEYBOARD_NONE,  KEYBOARD_Symbol } },
 
-  { INPUT_KEY_Left,        { KEYBOARD_5,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Down,        { KEYBOARD_6,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_Caps   } },
-  { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_Caps   } },
+  { INPUT_KEY_Left,        { KEYBOARD_5,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Down,        { KEYBOARD_6,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Up,          { KEYBOARD_7,     KEYBOARD_NONE   } },
+  { INPUT_KEY_Right,       { KEYBOARD_8,     KEYBOARD_NONE   } },
 
   { INPUT_KEY_KP_Enter,    { KEYBOARD_Enter, KEYBOARD_NONE   } },
 
@@ -275,9 +276,8 @@ struct key_text_t key_text_table[] = {
 
 static GHashTable *key_text;
 
-/* Called `fuse_keyboard_init' as svgalib pollutes the global namespace
-   with keyboard_init... */
-void fuse_keyboard_init(void)
+static int
+keyboard_init( void *context )
 {
   struct key_info *ptr;
   struct spectrum_keys_wrapper *ptr2;
@@ -307,14 +307,28 @@ void fuse_keyboard_init(void)
   for( ptr4 = key_text_table; ptr4->text != NULL; ptr4++ )
     g_hash_table_insert( key_text, &( ptr4->key ), &( ptr4->text ) );
 
+  return 0;
 }
 
-void fuse_keyboard_end(void)
+static void
+keyboard_end( void )
 {
   g_hash_table_destroy( keyboard_data );
   g_hash_table_destroy( spectrum_keys );
   g_hash_table_destroy( keysyms_hash );
   g_hash_table_destroy( key_text );
+}
+
+void
+keyboard_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_LIBSPECTRUM,
+    STARTUP_MANAGER_MODULE_SETUID
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_KEYBOARD, dependencies,
+                            ARRAY_SIZE( dependencies ), keyboard_init,
+                            keyboard_end, NULL );
 }
 
 libspectrum_byte

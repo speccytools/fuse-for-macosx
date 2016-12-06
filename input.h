@@ -21,8 +21,6 @@
 
 */
 
-#include <config.h>
-
 #ifndef FUSE_INPUT_H
 #define FUSE_INPUT_H
 

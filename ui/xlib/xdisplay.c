@@ -100,7 +100,6 @@ static const ptrdiff_t scaled_pitch =
 /* A scaled copy of the image displayed on the Spectrum's screen */
 static libspectrum_word
   rgb_image_backup[2 * ( DISPLAY_SCREEN_HEIGHT + 4 )][2 * ( DISPLAY_SCREEN_WIDTH  + 3 )];
-static const int rgb_backup_pitch = 2 * ( DISPLAY_SCREEN_WIDTH + 3 );
 
 static unsigned long colours[128];
 static int colours_allocated = 0;

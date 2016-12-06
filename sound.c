@@ -176,6 +176,23 @@ sound_ay_init( void )
   ay_change_count = 0;
 }
 
+#ifndef UI_WIN32
+#define MIN_SPEED_PERCENTAGE 2
+#define MAX_SPEED_PERCENTAGE 500
+#else                        /* #ifndef UI_WIN32 */
+/* We are limiting speed until bugs in the DirectSound driver are resolved, see
+   [bugs:#364] for more details */
+#define MIN_SPEED_PERCENTAGE 50
+#define MAX_SPEED_PERCENTAGE 300
+#endif                       /* #ifndef UI_WIN32 */
+
+static int
+is_in_sound_enabled_range( void )
+{
+  return settings_current.emulation_speed >= MIN_SPEED_PERCENTAGE &&
+    settings_current.emulation_speed <= MAX_SPEED_PERCENTAGE;
+}
+
 void
 sound_init( const char *device )
 {
@@ -191,7 +208,7 @@ sound_init( const char *device )
      than a seconds worth of sound which is bigger than the
      maximum Blip_Buffer of 1 second) */
   if( !( !sound_enabled && settings_current.sound &&
-         settings_current.emulation_speed > 1 ) )
+         is_in_sound_enabled_range() ) )
     return;
 
   /* only try for stereo if we need it */

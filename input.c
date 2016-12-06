@@ -59,6 +59,14 @@ input_event( const input_event_t *event )
 
 }
 
+static int
+use_shifted_arrow_keys( input_key keysym )
+{
+  return ( settings_current.keyboard_arrows_shifted &&
+           ( keysym == INPUT_KEY_Up || keysym == INPUT_KEY_Down ||
+             keysym == INPUT_KEY_Left || keysym == INPUT_KEY_Right ) );
+}
+
 static void
 send_keyboard_press( input_key keysym )
 {
@@ -69,6 +77,10 @@ send_keyboard_press( input_key keysym )
   if( ptr ) {
     keyboard_press( ptr->key1 );
     keyboard_press( ptr->key2 );
+  }
+
+  if( use_shifted_arrow_keys( keysym ) ) {
+    keyboard_press( KEYBOARD_Caps );
   }
 }
 
@@ -82,6 +94,10 @@ send_keyboard_release( input_key keysym )
   if( ptr ) {
     keyboard_release( ptr->key1 );
     keyboard_release( ptr->key2 );
+  }
+
+  if( use_shifted_arrow_keys( keysym ) ) {
+    keyboard_release( KEYBOARD_Caps );
   }
 }
 
