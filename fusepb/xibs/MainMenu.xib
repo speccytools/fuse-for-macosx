@@ -321,7 +321,7 @@
                                     <binding destination="922" name="value" keyPath="values.keyboard" id="966"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Use Shift with Arrow Keys" id="HVD-iV-22Y">
+                            <menuItem title="Use Shift with Cursor Keys" id="HVD-iV-22Y">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="keyboard_arrows_shifted:" target="346" id="Btx-5l-QE4"/>

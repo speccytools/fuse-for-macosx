@@ -13,7 +13,7 @@ KEY | EMULATION
 *Delete* | emulated as Caps-0 (Delete)
 *Esc* | emulated as Caps-1 (Edit)
 *Caps Lock* | emulated as Caps-2
-*Cursor keys* | emulated as Caps-5/6/7/8 (as appropriate)
+*Cursor keys* | emulated as 5/6/7/8 (with or without Caps) depending on the [Machine > Use Shift with Cursor Keys](menus.html) setting
 *Tab* | emulated as emulated as Caps Shift-Symbol Shift (Extended Mode)
 
 <br>
