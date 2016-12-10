@@ -32,7 +32,7 @@
 #include "machine.h"
 #include "machines.h"
 #include "machines_periph.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "pentagon.h"
 #include "peripherals/disk/beta.h"
 #include "settings.h"

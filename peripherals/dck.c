@@ -36,7 +36,7 @@
 
 #include "dck.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "settings.h"
 #include "scld.h"
 #include "ui/ui.h"

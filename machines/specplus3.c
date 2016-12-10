@@ -38,7 +38,7 @@
 #include "fuse.h"
 #include "machine.h"
 #include "machines_periph.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "periph.h"
 #include "peripherals/disk/fdd.h"
 #include "peripherals/disk/upd_fdc.h"

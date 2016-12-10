@@ -61,7 +61,7 @@
 #include "keyboard.h"
 #include "machine.h"
 #include "machines/machines_periph.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "movie.h"
 #include "mempool.h"

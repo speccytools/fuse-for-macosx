@@ -32,7 +32,7 @@ fuse_SOURCES = display.c \
 	keyboard.c \
 	loader.c \
 	machine.c \
-	memory.c \
+	memory_pages.c \
 	mempool.c \
 	menu.c \
 	movie.c \
@@ -100,7 +100,7 @@ noinst_HEADERS = bitmap.h \
 	keyboard.h \
 	loader.h \
 	machine.h \
-	memory.h \
+	memory_pages.h \
 	mempool.h \
 	menu.h \
 	movie.h \

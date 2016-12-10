@@ -33,7 +33,7 @@
 #include "machine.h"
 #include "machines.h"
 #include "machines_periph.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "peripherals/dck.h"
 #include "peripherals/scld.h"
 #include "snapshot.h"

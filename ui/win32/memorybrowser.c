@@ -29,7 +29,7 @@
 
 #include "compat.h"
 #include "fuse.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "win32internals.h"
 
 #include "memorybrowser.h"

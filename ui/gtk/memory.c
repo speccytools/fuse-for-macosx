@@ -34,7 +34,7 @@
 #include "fuse.h"
 #include "gtkcompat.h"
 #include "gtkinternals.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "menu.h"
 
 static libspectrum_word memaddr = 0x0000;

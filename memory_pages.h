@@ -1,4 +1,4 @@
-/* memory.h: memory access routines
+/* memory_pages.h: memory access routines
    Copyright (c) 2003-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
@@ -22,8 +22,8 @@
 
 */
 
-#ifndef FUSE_MEMORY_H
-#define FUSE_MEMORY_H
+#ifndef FUSE_MEMORY_PAGES_H
+#define FUSE_MEMORY_PAGES_H
 
 #include <libspectrum.h>
 
@@ -193,4 +193,4 @@ typedef enum trap_type {
 /* Check whether we're actually in the right ROM when a tape or other traps hit */
 extern int trap_check_rom( trap_type type );
 
-#endif				/* #ifndef FUSE_MEMORY_H */
+#endif				/* #ifndef FUSE_MEMORY_PAGES_H */

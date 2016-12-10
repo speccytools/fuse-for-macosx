@@ -31,7 +31,7 @@
 #include "flash/am29f010.h"
 #include "infrastructure/startup_manager.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "nic/w5100.h"
 #include "periph.h"

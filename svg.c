@@ -39,7 +39,7 @@
 #endif
 
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "svg.h"
 #include "ui/ui.h"
 #include "z80/z80.h"

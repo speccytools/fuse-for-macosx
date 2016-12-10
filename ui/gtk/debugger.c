@@ -41,7 +41,7 @@
 #include "gtkcompat.h"
 #include "gtkinternals.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "peripherals/ide/zxcf.h"
 #include "peripherals/scld.h"
 #include "peripherals/ula.h"

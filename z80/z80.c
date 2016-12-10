@@ -30,7 +30,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "peripherals/scld.h"
 #include "peripherals/spectranet.h"

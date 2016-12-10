@@ -34,7 +34,7 @@
 #include "debugger_internals.h"
 #include "event.h"
 #include "fuse.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "ui/ui.h"
 #include "utils.h"
 

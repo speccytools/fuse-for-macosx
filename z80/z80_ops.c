@@ -31,7 +31,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
 #include "peripherals/disk/didaktik.h"

@@ -25,7 +25,7 @@
 
 #include "event.h"
 #include "loader.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "tape.h"

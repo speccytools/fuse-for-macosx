@@ -28,7 +28,7 @@
 #include "event.h"
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "mempool.h"
 #include "periph.h"
 #include "ui/ui.h"

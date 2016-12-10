@@ -1,4 +1,4 @@
-/* memory.c: Routines for accessing memory
+/* memory_pages.c: Routines for accessing memory
    Copyright (c) 1999-2016 Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Fredrick Meunier
@@ -35,7 +35,7 @@
 #include "infrastructure/startup_manager.h"
 #include "machines/pentagon.h"
 #include "machines/spec128.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "peripherals/disk/opus.h"
 #include "peripherals/spectranet.h"
