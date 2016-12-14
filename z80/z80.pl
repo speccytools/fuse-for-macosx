@@ -483,7 +483,8 @@ sub opcode_BIT (@) {
       {
 	libspectrum_byte bytetemp = readbyte( tempaddr );
 	contend_read_no_mreq( tempaddr, 1 );
-	BIT_I( $bit, bytetemp, tempaddr );
+	z80.memptr.w = tempaddr;
+	BIT_MEMPTR( $bit, bytetemp );
       }
 BIT
     } else {
@@ -491,7 +492,7 @@ BIT
       {
 	libspectrum_byte bytetemp = readbyte( HL );
 	contend_read_no_mreq( HL, 1 );
-	BIT( $bit, bytetemp );
+	BIT_MEMPTR( $bit, bytetemp );
       }
 BIT
     }

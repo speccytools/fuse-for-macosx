@@ -280,6 +280,8 @@ read_test( FILE *f, libspectrum_dword *end_tstates )
   AF_ = af_; BC_ = bc_; DE_ = de_; HL_ = hl_;
   IX  = ix;  IY  = iy;  SP  = sp;  PC  = pc;
 
+  z80.memptr.w = 0; /* TODO: add MEMPTR to the input file format */
+
   if( fscanf( f, "%x %x %u %u %u %d %d", &i, &r, &iff1, &iff2, &im,
 	      &z80.halted, &end_tstates2 ) != 7 ) {
     fprintf( stderr, "%s: second registers line in `%s' corrupt\n", progname,
@@ -324,6 +326,7 @@ read_test( FILE *f, libspectrum_dword *end_tstates )
 static void
 dump_z80_state( void )
 {
+  /* TODO: add MEMPTR to output format */
   printf( "%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
 	  AF, BC, DE, HL, AF_, BC_, DE_, HL_, IX, IY, SP, PC );
   printf( "%02x %02x %d %d %d %d %d\n", I, ( R7 & 0x80 ) | ( R & 0x7f ),

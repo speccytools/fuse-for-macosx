@@ -164,6 +164,7 @@ z80_reset( int hard_reset )
     BC =DE =HL =0;
     BC_=DE_=HL_=0;
     IX=IY=0;
+    z80.memptr.w=0;	/* TODO: confirm if this happens on soft reset */
   }
 
   z80.interrupts_enabled_at = -1;
