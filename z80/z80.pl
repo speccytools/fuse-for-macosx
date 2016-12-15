@@ -805,6 +805,12 @@ LD
 	my $register = substr $dest, 1, 2;
 
 	if( length $src == 1 ) {
+	    if( $register eq 'BC' or $register eq 'DE' ) {
+	        print << "LD";
+      z80.memptr.b.l=$register+1;
+      z80.memptr.b.h=A;
+LD
+            }
 	    print << "LD";
       writebyte($register,$src);
 LD
