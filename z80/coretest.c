@@ -326,9 +326,8 @@ read_test( FILE *f, libspectrum_dword *end_tstates )
 static void
 dump_z80_state( void )
 {
-  /* TODO: add MEMPTR to output format */
-  printf( "%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
-	  AF, BC, DE, HL, AF_, BC_, DE_, HL_, IX, IY, SP, PC );
+  printf( "%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
+	  AF, BC, DE, HL, AF_, BC_, DE_, HL_, IX, IY, SP, PC, z80.memptr.w );
   printf( "%02x %02x %d %d %d %d %d\n", I, ( R7 & 0x80 ) | ( R & 0x7f ),
 	  IFF1, IFF2, IM, z80.halted, tstates );
 }
