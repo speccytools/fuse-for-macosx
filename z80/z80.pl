@@ -745,6 +745,11 @@ LD
 	    print "      $dest = readbyte( PC++ );\n";
 	} elsif( $src =~ /^\(..\)$/ ) {
 	    my $register = substr $src, 1, 2;
+	    if( $register eq 'BC' or $register eq 'DE') {
+	        print << "LD";
+      z80.memptr.w=$register+1;
+LD
+            }
 	    print << "LD";
       $dest=readbyte($register);
 LD
