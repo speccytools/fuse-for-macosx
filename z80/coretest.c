@@ -249,7 +249,7 @@ run_test( FILE *f )
 static int
 read_test( FILE *f, libspectrum_dword *end_tstates )
 {
-  unsigned af, bc, de, hl, af_, bc_, de_, hl_, ix, iy, sp, pc;
+  unsigned af, bc, de, hl, af_, bc_, de_, hl_, ix, iy, sp, pc, memptr;
   unsigned i, r, iff1, iff2, im;
   unsigned end_tstates2;
   unsigned address;
@@ -269,8 +269,9 @@ read_test( FILE *f, libspectrum_dword *end_tstates )
   } while( test_name[0] == '\n' );
 
   /* FIXME: how should we read/write our data types? */
-  if( fscanf( f, "%x %x %x %x %x %x %x %x %x %x %x %x", &af, &bc,
-	      &de, &hl, &af_, &bc_, &de_, &hl_, &ix, &iy, &sp, &pc ) != 12 ) {
+  if( fscanf( f, "%x %x %x %x %x %x %x %x %x %x %x %x %x", &af, &bc,
+	      &de, &hl, &af_, &bc_, &de_, &hl_, &ix, &iy, &sp, &pc,
+	      &memptr ) != 13 ) {
     fprintf( stderr, "%s: first registers line in `%s' corrupt\n", progname,
 	     testsfile );
     return 1;
@@ -279,8 +280,7 @@ read_test( FILE *f, libspectrum_dword *end_tstates )
   AF  = af;  BC  = bc;  DE  = de;  HL  = hl;
   AF_ = af_; BC_ = bc_; DE_ = de_; HL_ = hl_;
   IX  = ix;  IY  = iy;  SP  = sp;  PC  = pc;
-
-  z80.memptr.w = 0; /* TODO: add MEMPTR to the input file format */
+  z80.memptr.w = memptr;
 
   if( fscanf( f, "%x %x %u %u %u %d %d", &i, &r, &iff1, &iff2, &im,
 	      &z80.halted, &end_tstates2 ) != 7 ) {
