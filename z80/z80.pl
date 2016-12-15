@@ -816,6 +816,8 @@ LD
       {
 	libspectrum_word wordtemp = readbyte( PC++ );
 	wordtemp|=readbyte(PC++) << 8;
+	z80.memptr.b.l = wordtemp + 1;
+	z80.memptr.b.h = A;
 	writebyte(wordtemp,A);
       }
 LD
