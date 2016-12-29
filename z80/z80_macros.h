@@ -260,6 +260,7 @@ break
   ldtemp=readbyte(PC++);\
   ldtemp|=readbyte(PC++) << 8;\
   writebyte(ldtemp++,(regl));\
+  z80.memptr.w=ldtemp;\
   writebyte(ldtemp,(regh));\
   break;\
 }
