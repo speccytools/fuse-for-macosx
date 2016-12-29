@@ -152,6 +152,7 @@ void contend_write_no_mreq( libspectrum_word address, libspectrum_dword time );
   libspectrum_byte lookup = ( (        HL & 0x8800 ) >> 11 ) | \
 			    ( (   (value) & 0x8800 ) >> 10 ) | \
 			    ( ( add16temp & 0x8800 ) >>  9 );  \
+  z80.memptr.w=HL+1;\
   HL = add16temp;\
   F = ( add16temp & 0x10000 ? FLAG_C : 0 )|\
     overflow_add_table[lookup >> 4] |\
