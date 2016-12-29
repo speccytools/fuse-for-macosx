@@ -368,6 +368,7 @@ break
   libspectrum_byte lookup = ( (        HL & 0x8800 ) >> 11 ) | \
 			    ( (   (value) & 0x8800 ) >> 10 ) | \
 			    ( ( sub16temp & 0x8800 ) >>  9 );  \
+  z80.memptr.w=HL+1;\
   HL = sub16temp;\
   F = ( sub16temp & 0x10000 ? FLAG_C : 0 ) |\
     FLAG_N | overflow_sub_table[lookup >> 4] |\
