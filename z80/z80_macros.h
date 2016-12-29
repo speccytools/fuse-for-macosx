@@ -271,6 +271,7 @@ break
   ldtemp=readbyte(PC++);\
   ldtemp|=readbyte(PC++) << 8;\
   (regl)=readbyte(ldtemp++);\
+  z80.memptr.w=ldtemp;\
   (regh)=readbyte(ldtemp);\
   break;\
 }
