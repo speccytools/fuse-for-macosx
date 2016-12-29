@@ -758,7 +758,7 @@ LD
       {
 	z80.memptr.b.l = readbyte(PC++);
 	z80.memptr.b.h = readbyte(PC++);
-	A=readbyte(z80.memptr.w);
+	A=readbyte(z80.memptr.w++);
       }
 LD
         } elsif( $src eq '(REGISTER+dd)' ) {
