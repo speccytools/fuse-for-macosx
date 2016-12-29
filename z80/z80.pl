@@ -604,7 +604,8 @@ EX
 	writebyte( SP + 1, $high );
 	writebyte( SP,     $low  );
 	contend_write_no_mreq( SP, 1 ); contend_write_no_mreq( SP, 1 );
-	$low=bytetempl; $high=bytetemph;
+	$low=z80.memptr.b.l=bytetempl;
+	$high=z80.memptr.b.h=bytetemph;
       }
 EX
     } elsif( $arg1 eq 'DE' and $arg2 eq 'HL' ) {
