@@ -1003,6 +1003,7 @@ sub opcode_RLD (@) {
 	writebyte(HL, (bytetemp << 4 ) | ( A & 0x0f ) );
 	A = ( A & 0xf0 ) | ( bytetemp >> 4 );
 	F = ( F & FLAG_C ) | sz53p_table[A];
+	z80.memptr.w=HL+1;
       }
 RLD
 }
@@ -1039,6 +1040,7 @@ sub opcode_RRD (@) {
 	writebyte(HL,  ( A << 4 ) | ( bytetemp >> 4 ) );
 	A = ( A & 0xf0 ) | ( bytetemp & 0x0f );
 	F = ( F & FLAG_C ) | sz53p_table[A];
+	z80.memptr.w=HL+1;
       }
 RRD
 }
