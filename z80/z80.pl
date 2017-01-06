@@ -654,6 +654,7 @@ sub opcode_IN (@) {
 	libspectrum_word intemp;
 	intemp = readbyte( PC++ ) + ( A << 8 );
         A=readport( intemp );
+	/* TODO: is this correct if (nn) was 0xff? */
 	z80.memptr.w = intemp + 1;
       }
 IN
