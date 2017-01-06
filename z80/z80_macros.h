@@ -205,12 +205,9 @@ void contend_write_no_mreq( libspectrum_word address, libspectrum_dword time );
 
 #define CALL()\
 {\
-  libspectrum_byte calltempl, calltemph; \
-  calltempl=readbyte(PC++);\
-  calltemph=readbyte( PC ); \
   contend_read_no_mreq( PC, 1 ); PC++;\
   PUSH16(PCL,PCH);\
-  PCL=calltempl; PCH=calltemph;\
+  PC=z80.memptr.w;\
 }
 
 #define CP(value)\
@@ -280,9 +277,7 @@ break
 
 #define JP()\
 {\
-  libspectrum_word jptemp=PC; \
-  PCL=readbyte(jptemp++);\
-  PCH=readbyte(jptemp);\
+  PC=z80.memptr.w;\
 }
 
 #define JR()\

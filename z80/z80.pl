@@ -103,6 +103,11 @@ sub call_jp ($$$) {
 
     my( $opcode, $condition, $offset ) = @_;
 
+    print << "CALL";
+      z80.memptr.b.l = readbyte(PC++);
+      z80.memptr.b.h = readbyte(PC);
+CALL
+
     if( not defined $offset ) {
 	print "      $opcode();\n";
     } else {
@@ -116,7 +121,7 @@ sub call_jp ($$$) {
       if( $condition_string ) {
 	$opcode();
       } else {
-	contend_read( PC, 3 ); contend_read( PC + 1, 3 ); PC += 2;
+        PC++;
       }
 CALL
     }
