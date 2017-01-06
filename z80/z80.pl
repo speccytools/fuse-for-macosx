@@ -555,8 +555,8 @@ sub opcode_DJNZ (@) {
       } else {
 	/* TODO: should MEMPTR be set in this case? */
 	contend_read( PC, 3 );
+        PC++;
       }
-      PC++;
 DJNZ
 }
 
@@ -707,11 +707,10 @@ sub opcode_JR (@) {
       } else {
 	/* TODO: should MEMPTR be set in this case? */
         contend_read( PC, 3 );
+	PC++;
       }
 JR
     }
-
-    print "      PC++;\n";
 }
 
 sub opcode_LD (@) {
