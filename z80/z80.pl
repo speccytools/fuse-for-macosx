@@ -923,11 +923,13 @@ sub opcode_OUT (@) {
       }
 OUT
     } elsif( $port eq '(C)' and length $register == 1 ) {
+	# TODO: is MEMPTR set when using registers other than A?
 	if ( $register eq '0' ) {
 	    print "      writeport( BC, IS_CMOS ? 0xff : 0 );\n";
 	} else {
 	    print "      writeport( BC, $register );\n";
 	}
+	print "      z80.memptr.w = BC + 1;\n";
     }
 }
 
