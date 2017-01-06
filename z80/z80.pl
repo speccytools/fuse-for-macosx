@@ -914,9 +914,11 @@ sub opcode_OUT (@) {
 
     if( $port eq '(nn)' and $register eq 'A' ) {
 	print << "OUT";
-      { 
-	libspectrum_word outtemp;
-	outtemp = readbyte( PC++ ) + ( A << 8 );
+      {
+	libspectrum_byte nn = readbyte( PC++ );
+	libspectrum_word outtemp = nn | ( A << 8 );
+	z80.memptr.b.h = A;
+	z80.memptr.b.l = (nn + 1);
 	writeport( outtemp, A );
       }
 OUT
