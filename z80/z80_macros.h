@@ -351,6 +351,7 @@ break
 {\
   PUSH16(PCL,PCH);\
   PC=(value);\
+  z80.memptr.w=PC;\
 }
 
 #define SBC(value)\
