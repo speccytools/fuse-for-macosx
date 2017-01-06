@@ -553,6 +553,7 @@ sub opcode_DJNZ (@) {
       if(B) {
 	JR();
       } else {
+	/* TODO: should MEMPTR be set in this case? */
 	contend_read( PC, 3 );
       }
       PC++;
@@ -704,6 +705,7 @@ sub opcode_JR (@) {
       if( $condition_string ) {
         JR();
       } else {
+	/* TODO: should MEMPTR be set in this case? */
         contend_read( PC, 3 );
       }
 JR

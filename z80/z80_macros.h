@@ -292,6 +292,7 @@ break
   contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 ); \
   contend_read_no_mreq( PC, 1 ); \
   PC += jrtemp; \
+  z80.memptr.w = PC;\
 }
 
 #define OR(value)\
