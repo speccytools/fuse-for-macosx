@@ -242,6 +242,7 @@ break
 
 #define Z80_IN( reg, port )\
 {\
+  z80.memptr.w=port + 1;\
   (reg)=readport((port));\
   F = ( F & FLAG_C) | sz53p_table[(reg)];\
 }

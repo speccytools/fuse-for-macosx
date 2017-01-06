@@ -647,12 +647,14 @@ sub opcode_IN (@) {
 
     my( $register, $port ) = @_;
 
+    # TODO: is MEMPTR set for reading to registers *other* than A?
     if( $register eq 'A' and $port eq '(nn)' ) {
 	print << "IN";
-      { 
+      {
 	libspectrum_word intemp;
 	intemp = readbyte( PC++ ) + ( A << 8 );
         A=readport( intemp );
+	z80.memptr.w = intemp + 1;
       }
 IN
     } elsif( $register eq 'F' and $port eq '(C)' ) {
