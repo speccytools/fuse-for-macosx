@@ -317,6 +317,7 @@ break
 #define RET()\
 {\
   POP16(PCL,PCH);\
+  z80.memptr.w = PC;\
 }
 
 #define RL(value)\
