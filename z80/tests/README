@@ -51,8 +51,8 @@ the initial setup. Same format as for .in files.
 Why some specific tests are here
 ================================
 
-{02,0a,32}_1,edb[01289a]_[12],d3_4: check MEMPTR is set correctly after various
-                                    instructions.
+{02,0a,32}_1,edb[012389ab]_[12],d3_4:
+  check MEMPTR is set correctly after various instructions.
 
 37_{1,2,3}: check the behaviour of SCF with respect to bits 3 and 5
 	    (bug fixed on 20040225).
