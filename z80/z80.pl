@@ -373,7 +373,7 @@ sub outi_outd ($) {
 
     my( $opcode ) = @_;
 
-    my $modifier = ( $opcode eq 'OUTI' ? '++' : '--' );
+    my $modifier = ( $opcode eq 'OUTI' ? '+' : '-' );
 
     print << "CODE";
       {
@@ -382,9 +382,10 @@ sub outi_outd ($) {
 	contend_read_no_mreq( IR, 1 );
 	outitemp = readbyte( HL );
 	B--;	/* This does happen first, despite what the specs say */
+	z80.memptr.w = BC $modifier 1;
 	writeport(BC,outitemp);
 
-	HL$modifier;
+	HL$modifier$modifier;
         outitemp2 = outitemp + L;
 	F = ( outitemp & 0x80 ? FLAG_N : 0 ) |
             ( ( outitemp2 < outitemp ) ? FLAG_H | FLAG_C : 0 ) |
