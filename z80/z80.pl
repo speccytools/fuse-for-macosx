@@ -270,6 +270,7 @@ sub inir_indr ($) {
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
+	z80.memptr.w=BC $modifier 1;
 	B--;
         initemp2 = initemp + C $modifier 1;
 	F = ( initemp & 0x80 ? FLAG_N : 0 ) |
