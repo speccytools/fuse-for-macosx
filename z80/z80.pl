@@ -245,13 +245,13 @@ sub ini_ind ($) {
 	initemp = readport( BC );
 	writebyte( HL, initemp );
 
+	z80.memptr.w=BC $modifier 1;
         B--; HL$modifier$modifier;
         initemp2 = initemp + C $modifier 1;
 	F = ( initemp & 0x80 ? FLAG_N : 0 ) |
             ( ( initemp2 < initemp ) ? FLAG_H | FLAG_C : 0 ) |
             ( parity_table[ ( initemp2 & 0x07 ) ^ B ] ? FLAG_P : 0 ) |
             sz53_table[B];
-	z80.memptr.w=BC $modifier 1;
       }
 CODE
 }
