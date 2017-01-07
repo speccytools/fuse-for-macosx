@@ -233,6 +233,8 @@ z80_interrupt( void )
 	fuse_abort();
     }
 
+    z80.memptr.w = PC;
+
     return 1;			/* Accepted an interrupt */
 
   } else {
