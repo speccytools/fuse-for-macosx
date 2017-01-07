@@ -60,7 +60,8 @@ sub arithmetic_logical ($$$) {
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); PC++;
-	bytetemp = readbyte( REGISTER + (libspectrum_signed_byte)offset );
+	z80.memptr.w = REGISTER + (libspectrum_signed_byte)offset;
+	bytetemp = readbyte( z80.memptr.w );
 	$opcode(bytetemp);
       }
 CODE
