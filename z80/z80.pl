@@ -443,9 +443,9 @@ CODE
 	print << "CODE";
       {
 	libspectrum_byte bytetemp;
-	bytetemp = readbyte( tempaddr );
-	contend_read_no_mreq( tempaddr, 1 );
-	writebyte( tempaddr, bytetemp $operator $hex_mask );
+	bytetemp = readbyte( z80.memptr.w );
+	contend_read_no_mreq( z80.memptr.w, 1 );
+	writebyte( z80.memptr.w, bytetemp $operator $hex_mask );
       }
 CODE
     }
@@ -469,10 +469,10 @@ CODE
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "CODE";
       {
-	libspectrum_byte bytetemp = readbyte(tempaddr);
-	contend_read_no_mreq( tempaddr, 1 );
+	libspectrum_byte bytetemp = readbyte(z80.memptr.w);
+	contend_read_no_mreq( z80.memptr.w, 1 );
 	$opcode(bytetemp);
-	writebyte(tempaddr,bytetemp);
+	writebyte(z80.memptr.w,bytetemp);
       }
 CODE
     }
@@ -495,9 +495,8 @@ sub opcode_BIT (@) {
     } elsif( $register eq '(REGISTER+dd)' ) {
 	print << "BIT";
       {
-	libspectrum_byte bytetemp = readbyte( tempaddr );
-	contend_read_no_mreq( tempaddr, 1 );
-	z80.memptr.w = tempaddr;
+	libspectrum_byte bytetemp = readbyte( z80.memptr.w );
+	contend_read_no_mreq( z80.memptr.w, 1 );
 	BIT_MEMPTR( $bit, bytetemp );
       }
 BIT
@@ -1112,9 +1111,9 @@ sub opcode_shift (@) {
 
 	print << "shift";
       {
-	libspectrum_word tempaddr; libspectrum_byte opcode3;
+	libspectrum_byte opcode3;
 	contend_read( PC, 3 );
-	tempaddr =
+	z80.memptr.w =
 	    REGISTER + (libspectrum_signed_byte)readbyte_internal( PC );
 	PC++; contend_read( PC, 3 );
 	opcode3 = readbyte_internal( PC );
@@ -1124,7 +1123,7 @@ sub opcode_shift (@) {
 #include "z80_ddfdcb.c"
 	}
 #else			/* #ifdef HAVE_ENOUGH_MEMORY */
-	z80_ddfdcbxx(opcode3,tempaddr);
+	z80_ddfdcbxx(opcode3);
 #endif			/* #ifdef HAVE_ENOUGH_MEMORY */
       }
 shift
@@ -1231,18 +1230,18 @@ while(<>) {
 	    my $hexmask = res_set_hexmask( $opcode, $bit );
 
 	    print << "CODE";
-      $register = readbyte(tempaddr) $operator $hexmask;
-      contend_read_no_mreq( tempaddr, 1 );
-      writebyte(tempaddr, $register);
+      $register = readbyte(z80.memptr.w) $operator $hexmask;
+      contend_read_no_mreq( z80.memptr.w, 1 );
+      writebyte(z80.memptr.w, $register);
       break;
 CODE
 	} else {
 
 	    print << "CODE";
-      $register=readbyte(tempaddr);
-      contend_read_no_mreq( tempaddr, 1 );
+      $register=readbyte(z80.memptr.w);
+      contend_read_no_mreq( z80.memptr.w, 1 );
       $opcode($register);
-      writebyte(tempaddr, $register);
+      writebyte(z80.memptr.w, $register);
       break;
 CODE
 	}
