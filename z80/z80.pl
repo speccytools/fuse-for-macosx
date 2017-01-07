@@ -216,16 +216,15 @@ CODE
 	print << "CODE";
       {
 	libspectrum_byte offset, bytetemp;
-	libspectrum_word wordtemp;
 	offset = readbyte( PC );
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); PC++;
-	wordtemp = REGISTER + (libspectrum_signed_byte)offset;
-	bytetemp = readbyte( wordtemp );
-	contend_read_no_mreq( wordtemp, 1 );
+	z80.memptr.w = REGISTER + (libspectrum_signed_byte)offset;
+	bytetemp = readbyte( z80.memptr.w );
+	contend_read_no_mreq( z80.memptr.w, 1 );
 	$opcode(bytetemp);
-	writebyte(wordtemp,bytetemp);
+	writebyte(z80.memptr.w,bytetemp);
       }
 CODE
     }
