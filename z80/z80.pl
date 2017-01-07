@@ -324,6 +324,8 @@ sub ldir_lddr ($) {
 	  contend_write_no_mreq( DE, 1 ); contend_write_no_mreq( DE, 1 );
 	  contend_write_no_mreq( DE, 1 );
 	  PC-=2;
+	} else {
+	  z80.memptr.w = PC-2;
 	}
         HL$modifier; DE$modifier;
       }
