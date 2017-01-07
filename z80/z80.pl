@@ -866,24 +866,26 @@ LD
     } elsif( $dest eq '(REGISTER+dd)' ) {
 
 	if( length $src == 1 ) {
-	print << "LD";
+	  print << "LD";
       {
 	libspectrum_byte offset;
 	offset = readbyte( PC );
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); PC++;
-	writebyte( REGISTER + (libspectrum_signed_byte)offset, $src );
+	z80.memptr.w = REGISTER + (libspectrum_signed_byte)offset;
+	writebyte( z80.memptr.w, $src );
       }
 LD
         } elsif( $src eq 'nn' ) {
-	    print << "LD";
+	  print << "LD";
       {
 	libspectrum_byte offset, value;
 	offset = readbyte( PC++ );
 	value = readbyte( PC );
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 ); PC++;
-	writebyte( REGISTER + (libspectrum_signed_byte)offset, value );
+	z80.memptr.w = REGISTER + (libspectrum_signed_byte)offset;
+	writebyte( z80.memptr.w, value );
       }
 LD
         }
