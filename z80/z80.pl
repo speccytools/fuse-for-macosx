@@ -787,7 +787,8 @@ LD
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); contend_read_no_mreq( PC, 1 );
 	contend_read_no_mreq( PC, 1 ); PC++;
-	$dest = readbyte( REGISTER + (libspectrum_signed_byte)offset );
+	z80.memptr.w = REGISTER + (libspectrum_signed_byte)offset;
+	$dest = readbyte( z80.memptr.w );
       }
 LD
         }
