@@ -148,6 +148,7 @@ sub cpi_cpd ($) {
 	  ( bytetemp & FLAG_S );
 	if(F & FLAG_H) bytetemp--;
 	F |= ( bytetemp & FLAG_3 ) | ( (bytetemp&0x02) ? FLAG_5 : 0 );
+	z80.memptr.w$modifier;
       }
 CODE
 }
