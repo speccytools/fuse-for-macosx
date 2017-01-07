@@ -179,6 +179,9 @@ sub cpir_cpdr ($) {
 	  contend_read_no_mreq( HL, 1 ); contend_read_no_mreq( HL, 1 );
 	  contend_read_no_mreq( HL, 1 );
 	  PC-=2;
+	  z80.memptr.w = PC+1;
+	} else {
+	  z80.memptr.w$modifier;
 	}
 	HL$modifier;
       }
