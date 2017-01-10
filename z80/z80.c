@@ -304,6 +304,8 @@ z80_from_snapshot( libspectrum_snap *snap )
   IFF1 = libspectrum_snap_iff1( snap ); IFF2 = libspectrum_snap_iff2( snap );
   IM = libspectrum_snap_im( snap );
 
+  z80.memptr.w = libspectrum_snap_memptr( snap );
+
   z80.halted = libspectrum_snap_halted( snap );
 
   z80.interrupts_enabled_at =
@@ -328,6 +330,8 @@ z80_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_i  ( snap, I   );
   libspectrum_snap_set_r  ( snap, r_register );
   libspectrum_snap_set_sp ( snap, SP  ); libspectrum_snap_set_pc ( snap, PC  );
+
+  libspectrum_snap_set_memptr( snap, z80.memptr.w );
 
   libspectrum_snap_set_iff1( snap, IFF1 );
   libspectrum_snap_set_iff2( snap, IFF2 );
