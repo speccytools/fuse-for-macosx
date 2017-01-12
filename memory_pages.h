@@ -138,9 +138,17 @@ void memory_ram_set_16k_contention( int page_num, int contended );
 void memory_map_16k( libspectrum_word address, memory_page source[],
   int page_num );
 
+/* Map 16K of memory for either reading, writing or both */
+void memory_map_16k_read_write( libspectrum_word address, memory_page source[],
+  int page_num, int map_read, int map_write );
+
 /* Map 8K of memory */
 void memory_map_8k( libspectrum_word address, memory_page source[],
   int page_num );
+
+/* Map 8K of memory for either reading, writing or both */
+void memory_map_8k_read_write( libspectrum_word address, memory_page source[],
+  int page_num, int map_read, int map_write );
 
 /* Map one page of memory */
 void memory_map_page( memory_page *source[], int page_num );

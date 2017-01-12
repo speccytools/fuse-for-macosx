@@ -273,25 +273,39 @@ memory_ram_set_16k_contention( int page_num, int contended )
 void
 memory_map_16k( libspectrum_word address, memory_page source[], int page_num )
 {
-  int i;
+  memory_map_16k_read_write( address, source, page_num, 1, 1 );
+}
 
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ ) {
-    int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
-    memory_map_read[ page ] = memory_map_write[ page ] =
-      source[ page_num * MEMORY_PAGES_IN_16K + i ];
-  }
+/* Map 16K of memory for either reading, writing or both */
+void
+memory_map_16k_read_write( libspectrum_word address, memory_page source[],
+		           int page_num, int map_read, int map_write )
+{
+  memory_map_8k_read_write( address, source, page_num * 2, map_read,
+		            map_write );
+  memory_map_8k_read_write( address + 0x2000, source, page_num * 2 + 1,
+		            map_read, map_write );
 }
 
 /* Map 8K of memory */
 void
 memory_map_8k( libspectrum_word address, memory_page source[], int page_num )
 {
+  memory_map_8k_read_write( address, source, page_num, 1, 1 );
+}
+
+/* Map 8K of memory for either reading, writing or both */
+void
+memory_map_8k_read_write( libspectrum_word address, memory_page source[],
+		          int page_num, int map_read, int map_write )
+{
   int i;
 
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    int page = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
-    memory_map_read[ page ] = memory_map_write[ page ] =
-      source[ page_num * MEMORY_PAGES_IN_8K + i ];
+    int page_offset = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
+    memory_page *page = &source[ page_num * MEMORY_PAGES_IN_8K + i ];
+    if( map_read ) memory_map_read[ page_offset ] = *page;
+    if( map_write ) memory_map_write[ page_offset ] = *page;
   }
 }
 
