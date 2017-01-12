@@ -566,7 +566,6 @@ sub opcode_DJNZ (@) {
       if(B) {
 	JR();
       } else {
-	/* TODO: should MEMPTR be set in this case? */
 	contend_read( PC, 3 );
         PC++;
       }
@@ -655,7 +654,6 @@ sub opcode_IN (@) {
 
     my( $register, $port ) = @_;
 
-    # TODO: is MEMPTR set for reading to registers *other* than A?
     if( $register eq 'A' and $port eq '(nn)' ) {
 	print << "IN";
       {
@@ -721,7 +719,6 @@ sub opcode_JR (@) {
       if( $condition_string ) {
         JR();
       } else {
-	/* TODO: should MEMPTR be set in this case? */
         contend_read( PC, 3 );
 	PC++;
       }
@@ -934,7 +931,6 @@ sub opcode_OUT (@) {
       }
 OUT
     } elsif( $port eq '(C)' and length $register == 1 ) {
-	# TODO: is MEMPTR set when using registers other than A?
 	if ( $register eq '0' ) {
 	    print "      writeport( BC, IS_CMOS ? 0xff : 0 );\n";
 	} else {
