@@ -321,21 +321,14 @@ memory_map_page( memory_page *source[], int page_num )
 void
 memory_map_romcs_full( memory_page source[] )
 {
-  int i;
-
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-    memory_map_read[i] = memory_map_write[i] = source[i];
+  memory_map_16k( 0x0000, source, 0 );
 }
 
 /* Page in 8K from /ROMCS */
 void
 memory_map_romcs_8k( libspectrum_word address, memory_page source[] )
 {
-  int i, start;
-
-  start = address >> MEMORY_PAGE_SIZE_LOGARITHM;
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ )
-    memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
+  memory_map_8k( address, source, 0 );
 }
 
 /* Page in 4K from /ROMCS */
