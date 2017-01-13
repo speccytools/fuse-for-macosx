@@ -299,11 +299,21 @@ void
 memory_map_8k_read_write( libspectrum_word address, memory_page source[],
 		          int page_num, int map_read, int map_write )
 {
+  memory_map_4k_read_write( address, source, page_num * 2, map_read, map_write );
+  memory_map_4k_read_write( address + 0x1000, source, page_num * 2 + 1,
+		  	    map_read, map_write );
+}
+
+/* Map 4K of memory for either reading, writing or both */
+void
+memory_map_4k_read_write( libspectrum_word address, memory_page source[],
+		          int page_num, int map_read, int map_write )
+{
   int i;
 
-  for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
+  for( i = 0; i < MEMORY_PAGES_IN_4K; i++ ) {
     int page_offset = ( address >> MEMORY_PAGE_SIZE_LOGARITHM ) + i;
-    memory_page *page = &source[ page_num * MEMORY_PAGES_IN_8K + i ];
+    memory_page *page = &source[ page_num * MEMORY_PAGES_IN_4K + i ];
     if( map_read ) memory_map_read[ page_offset ] = *page;
     if( map_write ) memory_map_write[ page_offset ] = *page;
   }
@@ -335,11 +345,7 @@ memory_map_romcs_8k( libspectrum_word address, memory_page source[] )
 void
 memory_map_romcs_4k( libspectrum_word address, memory_page source[] )
 {
-  int i, start;
-
-  start = address >> MEMORY_PAGE_SIZE_LOGARITHM;
-  for( i = 0; i < MEMORY_PAGES_IN_4K; i++ )
-    memory_map_read[ start + i ] = memory_map_write[ start + i ] = source[ i ];
+  memory_map_4k_read_write( address, source, 0, 1, 1 );
 }
 
 /* Page in 2K from /ROMCS */
