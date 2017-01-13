@@ -154,6 +154,10 @@ void memory_map_8k_read_write( libspectrum_word address, memory_page source[],
 void memory_map_4k_read_write( libspectrum_word address, memory_page source[],
   int page_num, int map_read, int map_write );
 
+/* Map 2K of memory for either reading, writing or both */
+void memory_map_2k_read_write( libspectrum_word address, memory_page source[],
+  int page_num, int map_read, int map_write );
+
 /* Map one page of memory */
 void memory_map_page( memory_page *source[], int page_num );
 
