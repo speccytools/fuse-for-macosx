@@ -129,7 +129,7 @@ int
 simpleide_insert( const char *filename, libspectrum_ide_unit unit )
 {
   return ide_master_slave_insert(
-    simpleide_idechn, unit, filename, simpleide_commit,
+    simpleide_idechn, unit, filename,
     &settings_current.simpleide_master_file,
     UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT,
     &settings_current.simpleide_slave_file,
@@ -150,7 +150,7 @@ int
 simpleide_eject( libspectrum_ide_unit unit )
 {
   return ide_master_slave_eject(
-    simpleide_idechn, unit, simpleide_commit,
+    simpleide_idechn, unit,
     &settings_current.simpleide_master_file,
     UI_MENU_ITEM_MEDIA_IDE_SIMPLE8BIT_MASTER_EJECT,
     &settings_current.simpleide_slave_file,

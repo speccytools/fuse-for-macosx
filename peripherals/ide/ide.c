@@ -33,7 +33,6 @@ int
 ide_master_slave_insert(
   libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
   const char *filename,
-  int (*commit_fn)( libspectrum_ide_unit unit ),
   char **master_setting, ui_menu_item master_menu_item,
   char **slave_setting, ui_menu_item slave_menu_item )
 {
@@ -55,21 +54,19 @@ ide_master_slave_insert(
     default: return 1;
   }
 
-  return ide_insert( filename, channel, unit, commit_fn, setting, item );
+  return ide_insert( filename, channel, unit, setting, item );
 }
 
 int
 ide_insert( const char *filename, libspectrum_ide_channel *chn,
-	    libspectrum_ide_unit unit,
-	    int (*commit_fn)( libspectrum_ide_unit unit ), char **setting,
-	    ui_menu_item item )
+	    libspectrum_ide_unit unit, char **setting, ui_menu_item item )
 {
   int error;
 
   /* Remove any currently inserted disk; abort if we want to keep the current
      disk */
   if( *setting )
-    if( ide_eject( chn, unit, commit_fn, setting, item ) )
+    if( ide_eject( chn, unit, setting, item ) )
       return 0;
 
   settings_set_string( setting, filename );
@@ -85,7 +82,6 @@ ide_insert( const char *filename, libspectrum_ide_channel *chn,
 int
 ide_master_slave_eject(
   libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
-  int (*commit_fn)( libspectrum_ide_unit unit ),
   char **master_setting, ui_menu_item master_menu_item,
   char **slave_setting, ui_menu_item slave_menu_item )
 {
@@ -106,13 +102,12 @@ ide_master_slave_eject(
   default: return 1;
   }
 
-  return ide_eject( channel, unit, commit_fn, setting, item );
+  return ide_eject( channel, unit, setting, item );
 }
 
 int
 ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
-	   int (*commit_fn)( libspectrum_ide_unit unit ), char **setting,
-	   ui_menu_item item )
+	   char **setting, ui_menu_item item )
 {
   int error;
 
@@ -125,7 +120,7 @@ ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,
     switch( confirm ) {
 
     case UI_CONFIRM_SAVE_SAVE:
-      error = commit_fn( unit ); if( error ) return error;
+      error = libspectrum_ide_commit( chn, unit ); if( error ) return error;
       break;
 
     case UI_CONFIRM_SAVE_DONTSAVE: break;

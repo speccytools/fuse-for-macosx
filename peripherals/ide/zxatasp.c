@@ -248,7 +248,7 @@ int
 zxatasp_insert( const char *filename, libspectrum_ide_unit unit )
 {
   return ide_master_slave_insert(
-    zxatasp_idechn0, unit, filename, zxatasp_commit,
+    zxatasp_idechn0, unit, filename,
     &settings_current.zxatasp_master_file,
     UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
     &settings_current.zxatasp_slave_file,
@@ -269,7 +269,7 @@ int
 zxatasp_eject( libspectrum_ide_unit unit )
 {
   return ide_master_slave_eject(
-    zxatasp_idechn0, unit, zxatasp_commit,
+    zxatasp_idechn0, unit,
     &settings_current.zxatasp_master_file,
     UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
     &settings_current.zxatasp_slave_file,

@@ -174,23 +174,11 @@ zxcf_reset( int hard_reset GCC_UNUSED )
   libspectrum_ide_reset( zxcf_idechn );
 }
 
-static int
-zxcf_commit_wrapper( libspectrum_ide_unit unit )
-{
-  if( unit != LIBSPECTRUM_IDE_MASTER ) {
-    ui_error( UI_ERROR_ERROR, "%s:%d: unit is %d, not LIBSPECTRUM_IDE_MASTER",
-	      __FILE__, __LINE__, unit );
-    abort();
-  }
-
-  return zxcf_commit();
-}
-
 int
 zxcf_insert( const char *filename )
 {
   return ide_insert( filename, zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
-		     zxcf_commit_wrapper, &settings_current.zxcf_pri_file,
+		     &settings_current.zxcf_pri_file,
 		     UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT );
 }
 
@@ -207,7 +195,7 @@ zxcf_commit( void )
 int
 zxcf_eject( void )
 {
-  return ide_eject( zxcf_idechn, LIBSPECTRUM_IDE_MASTER, zxcf_commit_wrapper,
+  return ide_eject( zxcf_idechn, LIBSPECTRUM_IDE_MASTER,
 		    &settings_current.zxcf_pri_file,
 		    UI_MENU_ITEM_MEDIA_IDE_ZXCF_EJECT );
 }

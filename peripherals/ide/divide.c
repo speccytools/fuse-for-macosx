@@ -210,7 +210,7 @@ int
 divide_insert( const char *filename, libspectrum_ide_unit unit )
 {
   return ide_master_slave_insert(
-    divide_idechn0, unit, filename, divide_commit,
+    divide_idechn0, unit, filename,
     &settings_current.divide_master_file,
     UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT,
     &settings_current.divide_slave_file,
@@ -231,7 +231,7 @@ int
 divide_eject( libspectrum_ide_unit unit )
 {
   return ide_master_slave_eject(
-    divide_idechn0, unit, divide_commit,
+    divide_idechn0, unit,
     &settings_current.divide_master_file,
     UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT,
     &settings_current.divide_slave_file,
