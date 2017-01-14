@@ -1,5 +1,5 @@
 /* zxatasp.c: ZXATASP interface routines
-   Copyright (c) 2003-2016 Garry Lancaster, Philip Kendall
+   Copyright (c) 2003-2017 Garry Lancaster, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 
@@ -247,25 +247,12 @@ zxatasp_reset( int hard_reset GCC_UNUSED )
 int
 zxatasp_insert( const char *filename, libspectrum_ide_unit unit )
 {
-  char **setting;
-  ui_menu_item item;
-
-  switch( unit ) {
-  case LIBSPECTRUM_IDE_MASTER:
-    setting = &settings_current.zxatasp_master_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT;
-    break;
-    
-  case LIBSPECTRUM_IDE_SLAVE:
-    setting = &settings_current.zxatasp_slave_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT;
-    break;
-    
-  default: return 1;
-  }
-
-  return ide_insert( filename, zxatasp_idechn0, unit, zxatasp_commit, setting,
-		     item );
+  return ide_master_slave_insert(
+    zxatasp_idechn0, unit, filename, zxatasp_commit,
+    &settings_current.zxatasp_master_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
+    &settings_current.zxatasp_slave_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT );
 }
 
 int
@@ -281,24 +268,12 @@ zxatasp_commit( libspectrum_ide_unit unit )
 int
 zxatasp_eject( libspectrum_ide_unit unit )
 {
-  char **setting;
-  ui_menu_item item;
-
-  switch( unit ) {
-  case LIBSPECTRUM_IDE_MASTER:
-    setting = &settings_current.zxatasp_master_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT;
-    break;
-
-  case LIBSPECTRUM_IDE_SLAVE:
-    setting = &settings_current.zxatasp_slave_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT;
-    break;
-    
-  default: return 1;
-  }
-
-  return ide_eject( zxatasp_idechn0, unit, zxatasp_commit, setting, item );
+  return ide_master_slave_eject(
+    zxatasp_idechn0, unit, zxatasp_commit,
+    &settings_current.zxatasp_master_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
+    &settings_current.zxatasp_slave_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT );
 }
 
 /* Port read/writes */

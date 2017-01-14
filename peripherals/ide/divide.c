@@ -1,5 +1,5 @@
 /* divide.c: DivIDE interface routines
-   Copyright (c) 2005-2016 Matthew Westcott, Philip Kendall
+   Copyright (c) 2005-2017 Matthew Westcott, Philip Kendall
    Copyright (c) 2015 Stuart Brady
 
    This program is free software; you can redistribute it and/or modify
@@ -209,25 +209,12 @@ divide_reset( int hard_reset )
 int
 divide_insert( const char *filename, libspectrum_ide_unit unit )
 {
-  char **setting;
-  ui_menu_item item;
-
-  switch( unit ) {
-  case LIBSPECTRUM_IDE_MASTER:
-    setting = &settings_current.divide_master_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT;
-    break;
-    
-  case LIBSPECTRUM_IDE_SLAVE:
-    setting = &settings_current.divide_slave_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT;
-    break;
-    
-  default: return 1;
-  }
-
-  return ide_insert( filename, divide_idechn0, unit, divide_commit, setting,
-		     item );
+  return ide_master_slave_insert(
+    divide_idechn0, unit, filename, divide_commit,
+    &settings_current.divide_master_file,
+    UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT,
+    &settings_current.divide_slave_file,
+    UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT );
 }
 
 int
@@ -243,24 +230,12 @@ divide_commit( libspectrum_ide_unit unit )
 int
 divide_eject( libspectrum_ide_unit unit )
 {
-  char **setting;
-  ui_menu_item item;
-
-  switch( unit ) {
-  case LIBSPECTRUM_IDE_MASTER:
-    setting = &settings_current.divide_master_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT;
-    break;
-
-  case LIBSPECTRUM_IDE_SLAVE:
-    setting = &settings_current.divide_slave_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT;
-    break;
-    
-  default: return 1;
-  }
-
-  return ide_eject( divide_idechn0, unit, divide_commit, setting, item );
+  return ide_master_slave_eject(
+    divide_idechn0, unit, divide_commit,
+    &settings_current.divide_master_file,
+    UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT,
+    &settings_current.divide_slave_file,
+    UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT );
 }
 
 /* Port read/writes */

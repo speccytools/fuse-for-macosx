@@ -1,5 +1,5 @@
 /* ide.h: Generic routines shared between the various IDE devices
-   Copyright (c) 2005 Philip Kendall
+   Copyright (c) 2005-2017 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,10 +27,25 @@
 #include "ui/ui.h"
 
 int
+ide_master_slave_insert(
+  libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
+  const char *filename,
+  int (*commit_fn)( libspectrum_ide_unit unit ),
+  char **master_setting, ui_menu_item master_menu_item,
+  char **slave_setting, ui_menu_item slave_menu_item );
+
+int
 ide_insert( const char *filename, libspectrum_ide_channel *chn,
 	    libspectrum_ide_unit unit,
 	    int (*commit_fn)( libspectrum_ide_unit unit ), char **setting,
 	    ui_menu_item item );
+
+int
+ide_master_slave_eject(
+  libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
+  int (*commit_fn)( libspectrum_ide_unit unit ),
+  char **master_setting, ui_menu_item master_menu_item,
+  char **slave_setting, ui_menu_item slave_menu_item );
 
 int
 ide_eject( libspectrum_ide_channel *chn, libspectrum_ide_unit unit,

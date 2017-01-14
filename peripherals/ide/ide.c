@@ -1,5 +1,5 @@
 /* ide.c: Generic routines shared between the various IDE devices
-   Copyright (c) 2005 Philip Kendall
+   Copyright (c) 2005-2017 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,6 +30,35 @@
 #include "settings.h"
 
 int
+ide_master_slave_insert(
+  libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
+  const char *filename,
+  int (*commit_fn)( libspectrum_ide_unit unit ),
+  char **master_setting, ui_menu_item master_menu_item,
+  char **slave_setting, ui_menu_item slave_menu_item )
+{
+  char **setting;
+  ui_menu_item item;
+
+  switch( unit ) {
+
+  case LIBSPECTRUM_IDE_MASTER:
+    setting = master_setting;
+    item = master_menu_item;
+    break;
+
+  case LIBSPECTRUM_IDE_SLAVE:
+    setting = slave_setting;
+    item = slave_menu_item;
+    break;
+
+    default: return 1;
+  }
+
+  return ide_insert( filename, channel, unit, commit_fn, setting, item );
+}
+
+int
 ide_insert( const char *filename, libspectrum_ide_channel *chn,
 	    libspectrum_ide_unit unit,
 	    int (*commit_fn)( libspectrum_ide_unit unit ), char **setting,
@@ -51,6 +80,33 @@ ide_insert( const char *filename, libspectrum_ide_channel *chn,
   error = ui_menu_activate( item, 1 ); if( error ) return error;
 
   return 0;
+}
+
+int
+ide_master_slave_eject(
+  libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
+  int (*commit_fn)( libspectrum_ide_unit unit ),
+  char **master_setting, ui_menu_item master_menu_item,
+  char **slave_setting, ui_menu_item slave_menu_item )
+{
+  char **setting;
+  ui_menu_item item;
+
+  switch( unit ) {
+  case LIBSPECTRUM_IDE_MASTER:
+    setting = master_setting;
+    item = master_menu_item;
+    break;
+
+  case LIBSPECTRUM_IDE_SLAVE:
+    setting = slave_setting;
+    item = slave_menu_item;
+    break;
+
+  default: return 1;
+  }
+
+  return ide_eject( channel, unit, commit_fn, setting, item );
 }
 
 int
