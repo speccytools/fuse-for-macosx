@@ -174,23 +174,13 @@ zxatasp_init( void *context )
 
   zxatasp_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   zxatasp_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
-  
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT, 0 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT, 0 );
 
-  if( settings_current.zxatasp_master_file ) {
-    error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_MASTER,
-				    settings_current.zxatasp_master_file );
-    if( error ) return error;
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT, 1 );
-  }
-
-  if( settings_current.zxatasp_slave_file ) {
-    error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_SLAVE,
-				    settings_current.zxatasp_slave_file );
-    if( error ) return error;
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT, 1 );
-  }
+  error = ide_init( zxatasp_idechn0,
+                    settings_current.zxatasp_master_file,
+                    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
+                    settings_current.zxatasp_slave_file,
+                    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT );
+  if( error ) return error;
 
   module_register( &zxatasp_module_info );
 

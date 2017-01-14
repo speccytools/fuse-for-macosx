@@ -29,6 +29,42 @@
 #include "ui/ui.h"
 #include "settings.h"
 
+static int
+ide_insert_file( libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
+		 const char *filename, ui_menu_item menu_item )
+{
+  int error;
+
+  error = libspectrum_ide_insert( channel, unit, filename );
+  if( error ) return error;
+  return ui_menu_activate( menu_item, 1 );
+}
+
+int
+ide_init( libspectrum_ide_channel *channel,
+	  char *master_setting, ui_menu_item master_menu_item,
+	  char *slave_setting, ui_menu_item slave_menu_item )
+{
+  int error;
+
+  ui_menu_activate( master_menu_item, 0 );
+  ui_menu_activate( slave_menu_item, 0 );
+
+  if( master_setting ) {
+    error = ide_insert_file( channel, LIBSPECTRUM_IDE_MASTER, master_setting,
+		             master_menu_item );
+    if( error ) return error;
+  }
+
+  if( slave_menu_item ) {
+    error = ide_insert_file( channel, LIBSPECTRUM_IDE_SLAVE, slave_setting,
+                             slave_menu_item );
+    if( error ) return error;
+  }
+
+  return 0;
+}
+
 int
 ide_master_slave_insert(
   libspectrum_ide_channel *channel, libspectrum_ide_unit unit,
@@ -71,10 +107,8 @@ ide_insert( const char *filename, libspectrum_ide_channel *chn,
 
   settings_set_string( setting, filename );
 
-  error = libspectrum_ide_insert( chn, unit, filename );
+  error = ide_insert_file( chn, unit, filename, item );
   if( error ) return error;
-
-  error = ui_menu_activate( item, 1 ); if( error ) return error;
 
   return 0;
 }
