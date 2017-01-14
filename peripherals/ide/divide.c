@@ -120,9 +120,6 @@ divide_init( void *context )
   divide_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   divide_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT, 0 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_DIVIDE_SLAVE_EJECT, 0 );
-
   error = ide_init( divide_idechn0,
 		    settings_current.divide_master_file,
 		    UI_MENU_ITEM_MEDIA_IDE_DIVIDE_MASTER_EJECT,
