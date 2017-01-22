@@ -292,17 +292,12 @@ zxcf_ide_write( libspectrum_word port, libspectrum_byte data )
 static void
 zxcf_memory_map( void )
 {
-  int i;
+  int map_read;
 
   if( !settings_current.zxcf_active ) return;
 
-  if( !settings_current.zxcf_upload ) {
-    for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-      memory_map_read[i] = zxcf_memory_map_romcs[i];
-  }
-
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-    memory_map_write[i] = zxcf_memory_map_romcs[i];
+  map_read = !settings_current.zxcf_upload;
+  memory_map_16k_read_write( 0x0000, zxcf_memory_map_romcs, 0, map_read, 1 );
 }
 
 static void

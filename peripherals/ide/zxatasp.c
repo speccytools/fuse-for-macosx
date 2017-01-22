@@ -506,7 +506,7 @@ zxatasp_writeide(libspectrum_ide_channel *chn,
 static void
 zxatasp_memory_map( void )
 {
-  int i, writable;
+  int i, writable, map_read;
 
   if( !settings_current.zxatasp_active ) return;
 
@@ -520,12 +520,8 @@ zxatasp_memory_map( void )
   for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
     zxatasp_memory_map_romcs[i].writable = writable;
 
-  if( !settings_current.zxatasp_upload )
-    for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-      memory_map_read[i] = zxatasp_memory_map_romcs[i];
-
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-    memory_map_write[i] = zxatasp_memory_map_romcs[i];
+  map_read = !settings_current.zxatasp_upload;
+  memory_map_16k_read_write( 0x000, zxatasp_memory_map_romcs, 0, map_read, 1 );
 }
 
 static void
