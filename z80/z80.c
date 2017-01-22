@@ -164,6 +164,7 @@ z80_reset( int hard_reset )
     BC =DE =HL =0;
     BC_=DE_=HL_=0;
     IX=IY=0;
+    z80.memptr.w=0;	/* TODO: confirm if this happens on soft reset */
   }
 
   z80.interrupts_enabled_at = -1;
@@ -231,6 +232,8 @@ z80_interrupt( void )
 	ui_error( UI_ERROR_ERROR, "Unknown interrupt mode %d", IM );
 	fuse_abort();
     }
+
+    z80.memptr.w = PC;
 
     return 1;			/* Accepted an interrupt */
 
@@ -301,6 +304,8 @@ z80_from_snapshot( libspectrum_snap *snap )
   IFF1 = libspectrum_snap_iff1( snap ); IFF2 = libspectrum_snap_iff2( snap );
   IM = libspectrum_snap_im( snap );
 
+  z80.memptr.w = libspectrum_snap_memptr( snap );
+
   z80.halted = libspectrum_snap_halted( snap );
 
   z80.interrupts_enabled_at =
@@ -325,6 +330,8 @@ z80_to_snapshot( libspectrum_snap *snap )
   libspectrum_snap_set_i  ( snap, I   );
   libspectrum_snap_set_r  ( snap, r_register );
   libspectrum_snap_set_sp ( snap, SP  ); libspectrum_snap_set_pc ( snap, PC  );
+
+  libspectrum_snap_set_memptr( snap, z80.memptr.w );
 
   libspectrum_snap_set_iff1( snap, IFF1 );
   libspectrum_snap_set_iff2( snap, IFF2 );
