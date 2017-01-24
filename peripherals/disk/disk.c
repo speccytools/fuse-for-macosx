@@ -1,5 +1,5 @@
 /* disk.c: Routines for handling disk images
-   Copyright (c) 2007-2015 Gergely Szasz
+   Copyright (c) 2007-2017 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -768,7 +768,7 @@ disk_new( disk_t *d, int sides, int cylinders,
     return d->status;
 
   d->wrprot = 0;
-  d->dirty = 0;
+  d->dirty = 1;
   disk_update_tlens( d );
   return d->status = DISK_OK;
 }
