@@ -1,6 +1,6 @@
 /* uimedia.c: Disk media UI routines
    Copyright (c) 2013 Alex Badea
-   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2015-2017 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -212,8 +212,6 @@ drive_save( const ui_media_drive_info_t *drive, int saveas )
   int err;
   char *filename = NULL, title[80];
 
-  if( drive->fdd->disk.type == DISK_TYPE_NONE )
-    return 0;
   if( drive->fdd->disk.filename == NULL )
     saveas = 1;
 
@@ -255,7 +253,7 @@ ui_media_drive_save( int controller, int which, int saveas )
 static int
 drive_eject( const ui_media_drive_info_t *drive )
 {
-  if( !drive->fdd->loaded || drive->fdd->disk.type == DISK_TYPE_NONE )
+  if( !drive->fdd->loaded )
     return 0;
 
   if( drive->fdd->disk.dirty ) {
