@@ -3,9 +3,9 @@
         * Fuse 1.4.0 released.
 
         * Emulation core improvements:
-          * Add support for the hidden MEMPTR register (thanks, members of the
-            "Z80 Assembly Programming On The ZX Spectrum" Facebook group)
-            (Philip Kendall).
+          * Add support for the hidden MEMPTR register (thanks, Boo-boo,
+	    Vladimir Kladov and the members of the "Z80 Assembly Programming On
+	    The ZX Spectrum" Facebook group) (Philip Kendall).
           * Mark new disks as needing to be saved (Gergely Szasz).
           * Show more information on disk modification status in menus (Gergely
             Szasz).
