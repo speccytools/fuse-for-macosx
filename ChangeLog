@@ -1,6 +1,6 @@
 2017-01-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
-        * Fuse 1.4.0 released.
+        * Fuse 1.3.3 released.
 
         * Emulation core improvements:
           * Add support for the hidden MEMPTR register (thanks, Boo-boo,
