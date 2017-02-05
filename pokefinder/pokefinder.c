@@ -28,7 +28,7 @@
 #include <libspectrum.h>
 
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "pokefinder.h"
 #include "spectrum.h"
 

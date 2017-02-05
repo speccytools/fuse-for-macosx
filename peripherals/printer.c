@@ -37,7 +37,7 @@
 #include "fuse.h"
 #include "infrastructure/startup_manager.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "printer.h"
 #include "settings.h"

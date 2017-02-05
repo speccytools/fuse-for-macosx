@@ -1,3 +1,24 @@
+2017-01-31  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.3 released.
+
+        * Emulation core improvements:
+          * Add support for the hidden MEMPTR register (thanks, Boo-boo,
+	    Vladimir Kladov and the members of the "Z80 Assembly Programming On
+	    The ZX Spectrum" Facebook group) (Philip Kendall).
+          * Mark new disks as needing to be saved (Gergely Szasz).
+          * Show more information on disk modification status in menus (Gergely
+            Szasz).
+
+        * Miscellaneous improvements:
+          * Remove duplicated insert/eject code from DivIDE, Simple IDE and
+            ZXATASP interfaces (Philip Kendall).
+          * Improve IDE interface master/slave initialisation code (Philip
+            Kendall).
+          * Fix multiple save of disks (Gergely Szasz).
+          * Allow overwriting disk images (Gergely Szasz).
+          * Various minor bugfixes.
+
 2016-12-05  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.2 released.

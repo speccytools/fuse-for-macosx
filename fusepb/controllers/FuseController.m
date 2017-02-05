@@ -1,8 +1,6 @@
 /* FuseController.m: Routines for dealing with the Cocoa user interface
-   Copyright (c) 2000-2007 Philip Kendall, Russell Marks, Fredrick Meunier,
+   Copyright (c) 2000-2017 Philip Kendall, Russell Marks, Fredrick Meunier,
                            Mark Grebe <atarimac@cox.net>
-
-   $Id$
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -2439,7 +2437,6 @@ save_as_exit:
   drive_info = ui_media_drive_find( which );
   if( !drive_info )  { [[DisplayOpenGLView instance] unpause]; return 1; }
 
-  if( drive_info->fdd->disk.type == DISK_TYPE_NONE ) { [[DisplayOpenGLView instance] unpause]; return 1; }
   if( drive_info->fdd->disk.filename == NULL )
     saveas = YES;
   

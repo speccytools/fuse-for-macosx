@@ -1,5 +1,5 @@
 /* zxatasp.c: ZXATASP interface routines
-   Copyright (c) 2003-2016 Garry Lancaster, Philip Kendall
+   Copyright (c) 2003-2017 Garry Lancaster, Philip Kendall
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2016 Sergio Baldoví
 
@@ -33,7 +33,7 @@
 #include "ide.h"
 #include "infrastructure/startup_manager.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "periph.h"
 #include "settings.h"
@@ -174,23 +174,13 @@ zxatasp_init( void *context )
 
   zxatasp_idechn0 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
   zxatasp_idechn1 = libspectrum_ide_alloc( LIBSPECTRUM_IDE_DATA16 );
-  
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT, 0 );
-  ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT, 0 );
 
-  if( settings_current.zxatasp_master_file ) {
-    error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_MASTER,
-				    settings_current.zxatasp_master_file );
-    if( error ) return error;
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT, 1 );
-  }
-
-  if( settings_current.zxatasp_slave_file ) {
-    error = libspectrum_ide_insert( zxatasp_idechn0, LIBSPECTRUM_IDE_SLAVE,
-				    settings_current.zxatasp_slave_file );
-    if( error ) return error;
-    ui_menu_activate( UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT, 1 );
-  }
+  error = ide_init( zxatasp_idechn0,
+                    settings_current.zxatasp_master_file,
+                    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
+                    settings_current.zxatasp_slave_file,
+                    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT );
+  if( error ) return error;
 
   module_register( &zxatasp_module_info );
 
@@ -247,25 +237,12 @@ zxatasp_reset( int hard_reset GCC_UNUSED )
 int
 zxatasp_insert( const char *filename, libspectrum_ide_unit unit )
 {
-  char **setting;
-  ui_menu_item item;
-
-  switch( unit ) {
-  case LIBSPECTRUM_IDE_MASTER:
-    setting = &settings_current.zxatasp_master_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT;
-    break;
-    
-  case LIBSPECTRUM_IDE_SLAVE:
-    setting = &settings_current.zxatasp_slave_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT;
-    break;
-    
-  default: return 1;
-  }
-
-  return ide_insert( filename, zxatasp_idechn0, unit, zxatasp_commit, setting,
-		     item );
+  return ide_master_slave_insert(
+    zxatasp_idechn0, unit, filename,
+    &settings_current.zxatasp_master_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
+    &settings_current.zxatasp_slave_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT );
 }
 
 int
@@ -281,24 +258,12 @@ zxatasp_commit( libspectrum_ide_unit unit )
 int
 zxatasp_eject( libspectrum_ide_unit unit )
 {
-  char **setting;
-  ui_menu_item item;
-
-  switch( unit ) {
-  case LIBSPECTRUM_IDE_MASTER:
-    setting = &settings_current.zxatasp_master_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT;
-    break;
-
-  case LIBSPECTRUM_IDE_SLAVE:
-    setting = &settings_current.zxatasp_slave_file;
-    item = UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT;
-    break;
-    
-  default: return 1;
-  }
-
-  return ide_eject( zxatasp_idechn0, unit, zxatasp_commit, setting, item );
+  return ide_master_slave_eject(
+    zxatasp_idechn0, unit,
+    &settings_current.zxatasp_master_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_MASTER_EJECT,
+    &settings_current.zxatasp_slave_file,
+    UI_MENU_ITEM_MEDIA_IDE_ZXATASP_SLAVE_EJECT );
 }
 
 /* Port read/writes */
@@ -506,7 +471,7 @@ zxatasp_writeide(libspectrum_ide_channel *chn,
 static void
 zxatasp_memory_map( void )
 {
-  int i, writable;
+  int i, writable, map_read;
 
   if( !settings_current.zxatasp_active ) return;
 
@@ -520,12 +485,8 @@ zxatasp_memory_map( void )
   for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
     zxatasp_memory_map_romcs[i].writable = writable;
 
-  if( !settings_current.zxatasp_upload )
-    for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-      memory_map_read[i] = zxatasp_memory_map_romcs[i];
-
-  for( i = 0; i < MEMORY_PAGES_IN_16K; i++ )
-    memory_map_write[i] = zxatasp_memory_map_romcs[i];
+  map_read = !settings_current.zxatasp_upload;
+  memory_map_16k_read_write( 0x000, zxatasp_memory_map_romcs, 0, map_read, 1 );
 }
 
 static void

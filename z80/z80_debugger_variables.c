@@ -68,6 +68,9 @@ static const char * const iy_detail_string = "iy";
 static const char * const i_detail_string = "i";
 static const char * const r_detail_string = "r";
 
+static const char * const memptr_detail_string = "memptr";
+static const char * const wz_detail_string = "wz"; /* Synonym for MEMPTR */
+
 static const char * const im_detail_string = "im";
 static const char * const iff1_detail_string = "iff1";
 static const char * const iff2_detail_string = "iff2";
@@ -129,6 +132,18 @@ static void
 set_R( libspectrum_dword value )
 {
   R = R7 = value;
+}
+
+static libspectrum_dword
+get_memptr( void )
+{
+  return z80.memptr.w;
+}
+
+static void
+set_memptr( libspectrum_dword value )
+{
+  z80.memptr.w = value;
 }
 
 static libspectrum_dword
@@ -235,6 +250,12 @@ z80_debugger_variables_init( void )
                                      get_I, set_I );
   debugger_system_variable_register( debugger_type_string, r_detail_string, 
                                      get_R, set_R );
+
+  debugger_system_variable_register( debugger_type_string, memptr_detail_string,
+		  		     get_memptr, set_memptr );
+  /* WZ is a synonym for MEMPTR */
+  debugger_system_variable_register( debugger_type_string, wz_detail_string,
+		  		     get_memptr, set_memptr );
 
   debugger_system_variable_register( debugger_type_string, im_detail_string, 
                                      get_IM, set_IM );

@@ -40,7 +40,7 @@
 
 #include "fuse.h"
 #include "machines/specplus3.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "peripherals/dck.h"
 #include "peripherals/ide/divide.h"
 #include "peripherals/ide/simpleide.h"

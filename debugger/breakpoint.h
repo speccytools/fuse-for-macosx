@@ -25,7 +25,7 @@
 #ifndef FUSE_DEBUGGER_BREAKPOINT_H
 #define FUSE_DEBUGGER_BREAKPOINT_H
 
-#include "memory.h"
+#include "memory_pages.h"
 
 /* Types of breakpoint */
 typedef enum debugger_breakpoint_type {

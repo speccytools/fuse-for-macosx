@@ -28,7 +28,7 @@
 
 #include "compat.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "pokemem.h"
 #include "spectrum.h"
 #include "utils.h"

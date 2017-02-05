@@ -53,7 +53,7 @@
 /* FIXME: delete whatever is not needed
 
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 
  */
 

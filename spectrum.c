@@ -33,7 +33,7 @@
 #include "infrastructure/startup_manager.h"
 #include "loader.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "peripherals/printer.h"
 #include "psg.h"
 #include "profile.h"

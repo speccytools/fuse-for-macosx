@@ -31,7 +31,7 @@
 #include "debugger/debugger.h"
 #include "event.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "periph.h"
 #include "peripherals/disk/beta.h"
 #include "peripherals/disk/didaktik.h"
@@ -58,8 +58,7 @@ static int z80_cbxx( libspectrum_byte opcode2 );
 static int z80_ddxx( libspectrum_byte opcode2 );
 static int z80_edxx( libspectrum_byte opcode2 );
 static int z80_fdxx( libspectrum_byte opcode2 );
-static void z80_ddfdcbxx( libspectrum_byte opcode3,
-			  libspectrum_word tempaddr );
+static void z80_ddfdcbxx( libspectrum_byte opcode3 );
 #endif				/* #ifndef HAVE_ENOUGH_MEMORY */
 
 /* Certain features (eg RZX playback trigged interrupts, the debugger,
@@ -384,7 +383,7 @@ z80_fdxx( libspectrum_byte opcode2 )
 }
 
 static void
-z80_ddfdcbxx( libspectrum_byte opcode3, libspectrum_word tempaddr )
+z80_ddfdcbxx( libspectrum_byte opcode3 )
 {
   switch(opcode3) {
 #include "z80/z80_ddfdcb.c"

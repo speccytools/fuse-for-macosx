@@ -32,7 +32,7 @@
 
 #include "fuse.h"
 #include "gtkinternals.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "menu.h"
 #include "ui/ui.h"
 #include "utils.h"

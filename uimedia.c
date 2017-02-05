@@ -1,6 +1,6 @@
 /* uimedia.c: Disk media UI routines
    Copyright (c) 2013 Alex Badea
-   Copyright (c) 2015 Gergely Szasz
+   Copyright (c) 2015-2017 Gergely Szasz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -186,6 +186,27 @@ drive_disk_write( const ui_media_drive_info_t *drive, const char *filename )
   drive->fdd->disk.type = DISK_TYPE_NONE;
   if( filename == NULL )
     filename = drive->fdd->disk.filename; /* write over original file */
+  else if( compat_file_exists( filename ) ) {
+    const char *filename1 = strrchr( filename, FUSE_DIR_SEP_CHR );
+    filename1 = filename1 ? filename1 + 1 : filename;
+
+    ui_confirm_save_t confirm = ui_confirm_save(
+      "%s already exists.\n"
+      "Do you want to overwrite it?",
+      filename1
+    );
+
+    switch( confirm ) {
+
+    case UI_CONFIRM_SAVE_SAVE:
+      break;
+
+    case UI_CONFIRM_SAVE_DONTSAVE: return 2;
+    case UI_CONFIRM_SAVE_CANCEL: return -1;
+
+    }
+  }
+
   error = disk_write( &drive->fdd->disk, filename );
 
   if( error != DISK_OK ) {
@@ -229,7 +250,7 @@ ui_media_drive_save( int which, int saveas )
 static int
 drive_eject( const ui_media_drive_info_t *drive )
 {
-  if( !drive->fdd->loaded || drive->fdd->disk.type == DISK_TYPE_NONE )
+  if( !drive->fdd->loaded )
     return 0;
 
   if( drive->fdd->disk.dirty ) {

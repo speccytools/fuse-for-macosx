@@ -92,7 +92,6 @@
 		B61F465B09121DF100C8096C /* commandy.y in Sources */ = {isa = PBXBuildFile; fileRef = B68CB2BF03DD91ED00A804BA /* commandy.y */; };
 		B61F465C09121DF100C8096C /* debugger.c in Sources */ = {isa = PBXBuildFile; fileRef = B68CB2C403DD920300A804BA /* debugger.c */; };
 		B61F465D09121DF100C8096C /* disassemble.c in Sources */ = {isa = PBXBuildFile; fileRef = B68CB2C603DD920300A804BA /* disassemble.c */; };
-		B61F465E09121DF100C8096C /* memory.c in Sources */ = {isa = PBXBuildFile; fileRef = B68CB2CC03DD923C00A804BA /* memory.c */; };
 		B61F466009121DF100C8096C /* DebuggerController.m in Sources */ = {isa = PBXBuildFile; fileRef = B632C6AF03E5368700A864FD /* DebuggerController.m */; };
 		B61F466209121DF100C8096C /* FuseMenus.m in Sources */ = {isa = PBXBuildFile; fileRef = B66EA7840401075300A864FD /* FuseMenus.m */; };
 		B61F466309121DF100C8096C /* scaler.c in Sources */ = {isa = PBXBuildFile; fileRef = B63ABD8D042F175200A864FD /* scaler.c */; };
@@ -293,6 +292,7 @@
 		B6F048180952B5EC006D8005 /* snp.icns in Resources */ = {isa = PBXBuildFile; fileRef = B6F048160952B5EC006D8005 /* snp.icns */; };
 		B6F048190952B5EC006D8005 /* sp.icns in Resources */ = {isa = PBXBuildFile; fileRef = B6F048170952B5EC006D8005 /* sp.icns */; };
 		B6F0481B0952B5FD006D8005 /* zxs.icns in Resources */ = {isa = PBXBuildFile; fileRef = B6F0481A0952B5FD006D8005 /* zxs.icns */; };
+		B6F66E351E473D68005B270A /* memory_pages.c in Sources */ = {isa = PBXBuildFile; fileRef = B6F66E331E473D68005B270A /* memory_pages.c */; };
 		B6FA759D0C1D7507007F5A10 /* audiofile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; };
 		B6FA75C60C1D76A5007F5A10 /* audiofile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = B6FA759C0C1D7507007F5A10 /* audiofile.framework */; };
 /* End PBXBuildFile section */
@@ -544,7 +544,6 @@
 		B67F3CC407EE0A130045339F /* MachineNameToIdTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MachineNameToIdTransformer.m; path = transformers/MachineNameToIdTransformer.m; sourceTree = SOURCE_ROOT; };
 		B6825547091817F30014B5EE /* divide.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = divide.c; sourceTree = "<group>"; };
 		B6825548091817F30014B5EE /* divide.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = divide.h; sourceTree = "<group>"; };
-		B684A1950E93A88200A5B097 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
 		B684A1960E93A88200A5B097 /* mempool.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = mempool.c; sourceTree = "<group>"; };
 		B684A1970E93A88200A5B097 /* mempool.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = mempool.h; sourceTree = "<group>"; };
 		B684A19D0E93A8CD00A5B097 /* event.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = event.c; sourceTree = "<group>"; };
@@ -567,7 +566,6 @@
 		B68CB2C403DD920300A804BA /* debugger.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = debugger.c; path = ../debugger/debugger.c; sourceTree = "<group>"; };
 		B68CB2C503DD920300A804BA /* debugger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = debugger.h; path = ../debugger/debugger.h; sourceTree = "<group>"; };
 		B68CB2C603DD920300A804BA /* disassemble.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = disassemble.c; path = ../debugger/disassemble.c; sourceTree = "<group>"; };
-		B68CB2CC03DD923C00A804BA /* memory.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = memory.c; sourceTree = "<group>"; };
 		B69A00411723B8F300FF201C /* disciple.rom */ = {isa = PBXFileReference; lastKnownFileType = file; name = disciple.rom; path = ../roms/disciple.rom; sourceTree = SOURCE_ROOT; };
 		B69BE5321660DF5300C5D0CE /* socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = socket.c; sourceTree = "<group>"; };
 		B69BE5351660DF8B00C5D0CE /* movie_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = movie_tables.h; sourceTree = "<group>"; };
@@ -745,6 +743,8 @@
 		B6F060AB078FB63A00CD5D95 /* tc2068.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = tc2068.h; sourceTree = "<group>"; };
 		B6F06100078FC2C900CD5D95 /* sfifo.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = sfifo.c; path = ../sound/sfifo.c; sourceTree = SOURCE_ROOT; };
 		B6F06101078FC2C900CD5D95 /* sfifo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sfifo.h; path = ../sound/sfifo.h; sourceTree = SOURCE_ROOT; };
+		B6F66E331E473D68005B270A /* memory_pages.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = memory_pages.c; sourceTree = "<group>"; };
+		B6F66E341E473D68005B270A /* memory_pages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory_pages.h; sourceTree = "<group>"; };
 		B6F74F9604B855D40059D51C /* LoadBinaryController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = LoadBinaryController.h; path = controllers/LoadBinaryController.h; sourceTree = "<group>"; };
 		B6F74F9704B855D40059D51C /* LoadBinaryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = LoadBinaryController.m; path = controllers/LoadBinaryController.m; sourceTree = "<group>"; };
 		B6F74F9C04B85B660059D51C /* SaveBinaryController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SaveBinaryController.h; path = controllers/SaveBinaryController.h; sourceTree = "<group>"; };
@@ -1557,8 +1557,8 @@
 				B60B11F7059BC7E70048B64B /* machine.c */,
 				F55985EA038922ED01A804BA /* machine.h */,
 				B6AB348F0C3BC91A0005935E /* menu.h */,
-				B68CB2CC03DD923C00A804BA /* memory.c */,
-				B684A1950E93A88200A5B097 /* memory.h */,
+				B6F66E331E473D68005B270A /* memory_pages.c */,
+				B6F66E341E473D68005B270A /* memory_pages.h */,
 				B684A1960E93A88200A5B097 /* mempool.c */,
 				B684A1970E93A88200A5B097 /* mempool.h */,
 				B6CA2A210C33F8490003CF90 /* module.c */,
@@ -1844,7 +1844,6 @@
 				B61F465A09121DF100C8096C /* commandl.l in Sources */,
 				B61F465C09121DF100C8096C /* debugger.c in Sources */,
 				B61F465D09121DF100C8096C /* disassemble.c in Sources */,
-				B61F465E09121DF100C8096C /* memory.c in Sources */,
 				B61F466009121DF100C8096C /* DebuggerController.m in Sources */,
 				B61F466209121DF100C8096C /* FuseMenus.m in Sources */,
 				B61F466309121DF100C8096C /* scaler.c in Sources */,
@@ -1981,6 +1980,7 @@
 				B6E1F1AD14F653FB00600EB0 /* specdrum.c in Sources */,
 				B6E1F1B114F6555400600EB0 /* disciple.c in Sources */,
 				B61700F7163EAFC600142336 /* PokeMemoryController.m in Sources */,
+				B6F66E351E473D68005B270A /* memory_pages.c in Sources */,
 				B69BE5331660DF5300C5D0CE /* socket.c in Sources */,
 				B69BE5381660DF8B00C5D0CE /* movie.c in Sources */,
 				B69BE53C1660E01000C5D0CE /* am29f010.c in Sources */,

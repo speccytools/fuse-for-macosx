@@ -37,7 +37,7 @@
 #include "machines/spec48.h"
 #include "machines/specplus3.h"
 #include "machines/tc2068.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "movie.h"
 #include "peripherals/ula.h"

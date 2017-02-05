@@ -27,7 +27,7 @@
 
 #include "fuse.h"
 #include "machine.h"
-#include "memory.h"
+#include "memory_pages.h"
 #include "module.h"
 #include "settings.h"
 #include "snapshot.h"

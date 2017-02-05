@@ -44,6 +44,7 @@ typedef struct {
 			   so it can also act as an RZX instruction counter */
   libspectrum_byte r7;	/* The high bit of the R register */
   regpair sp,pc;
+  regpair memptr;	/* The hidden register */
   int iff2_read;
   libspectrum_byte iff1, iff2, im;
   int halted;
