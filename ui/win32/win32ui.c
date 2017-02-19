@@ -124,19 +124,6 @@ fuse_window_proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
   switch( msg ) {
 
-#if defined USE_JOYSTICK && !defined HAVE_JSW_H
-
-    case WM_CREATE:
-      if( joysticks_supported > 0 )
-        if( joySetCapture( hWnd, JOYSTICKID1, 0, FALSE ) )
-          ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 1" );
-      if( joysticks_supported > 1 )
-        if( joySetCapture( hWnd, JOYSTICKID2, 0, FALSE ) )
-          ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 2" );
-      break;      
-
-#endif			/* if defined USE_JOYSTICK && !defined HAVE_JSW_H */
-
     case WM_COMMAND:
       if( ! handle_menu( LOWORD( wParam ), hWnd ) )
         return 0;
