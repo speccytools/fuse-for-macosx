@@ -190,7 +190,7 @@ drive_disk_write( const ui_media_drive_info_t *drive, const char *filename )
   if( filename == NULL )
     filename = drive->fdd->disk.filename; /* write over original file */
   else if( compat_file_exists( filename ) ) {
-    const char *filename1 = rindex( filename, FUSE_DIR_SEP_CHR );
+    const char *filename1 = strrchr( filename, FUSE_DIR_SEP_CHR );
     filename1 = filename1 ? filename1 + 1 : filename;
 
     ui_confirm_save_t confirm = ui_confirm_save(
