@@ -1,3 +1,19 @@
+2017-03-??  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.4 released.
+
+        * Debugger improvements:
+          * Fix syntax for "breakpoint read" debugger command (thanks, Andy
+            Chadbourne) (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * Fix Z80 unit test 39 to test the right opcode (thanks, Gareth Adams)
+            (Philip Kendall).
+          * Win32: Fix joystick initialisation (thanks, Matthias and Алексей)
+            (Sergio Baldoví).
+          * Use power-of-2 sound buffers on FreeBSD (thanks, Rene Ladan)
+            (Fredrick Meunier).
+
 2017-01-31  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.3 released.
