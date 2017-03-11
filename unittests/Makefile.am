@@ -23,3 +23,10 @@
 fuse_SOURCES += unittests/unittests.c
 
 noinst_HEADERS += unittests/unittests.h
+
+## The display code tester
+
+noinst_PROGRAMS += unittests/displaytest
+
+unittests_displaytest_SOURCES = unittests/displaytest.c display.c
+unittests_displaytest_LDADD = $(LIBSPEC_LIBS) $(GLIB_LIBS)

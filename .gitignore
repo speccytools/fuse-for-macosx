@@ -97,6 +97,7 @@ tags
 /ui/win32/options.rc
 /ui/xlib/keysyms.c
 /ui/xlib/xpixmaps.c
+/unittests/displaytest
 /ylwrap
 /z80/coretest
 /z80/coretest.exe
