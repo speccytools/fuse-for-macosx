@@ -60,22 +60,32 @@ ui_joystick_init( void )
 
   retval = joyGetNumDevs();
 
+  if( retval > 0 ) {
+
+    if( joyGetPos( JOYSTICKID1, &joyinfo ) == JOYERR_NOERROR ) {
+      if( joySetCapture( fuse_hWnd, JOYSTICKID1, 0, FALSE ) != JOYERR_NOERROR ) {
+        ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 1" );
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+
+  }
+
   if( retval >= 2 ) {
 
     retval = 2;
 
-    if( joyGetPos( JOYSTICKID2, &joyinfo ) == JOYERR_UNPLUGGED ) {
-      ui_error( UI_ERROR_ERROR, "failed to initialise joystick 2" );
-      return 0;
+    if( joyGetPos( JOYSTICKID2, &joyinfo ) == JOYERR_NOERROR ) {
+      if( joySetCapture( fuse_hWnd, JOYSTICKID2, 0, FALSE ) != JOYERR_NOERROR ) {
+        ui_error( UI_ERROR_ERROR, "Couldn't start capture for joystick 2" );
+        return 1;
+      }
+    } else {
+      return 1;
     }
-  }
 
-  if( retval > 0 ) {
-
-    if( joyGetPos( JOYSTICKID1, &joyinfo ) == JOYERR_UNPLUGGED ) {
-      ui_error( UI_ERROR_ERROR, "failed to initialise joystick 1" );
-      return 0;
-    }
   }
 
   return retval;
