@@ -47,8 +47,8 @@ COMMAND | DESCRIPTION
 :--- | :---
 *ba{se} number* | Change the debugger window to displaying output in base number. Available values are 10 (decimal) or 16 (hex).
 *br{eakpoint} [address] [if condition]* | Set a breakpoint to stop emulation and return to the debugger whenever an opcode is executed at address and condition evaluates true. If address is omitted, it defaults to the current value of PC.
-br{eakpoint} p{ort} (r{ead}\|w{rite}) port [if condition] | Set a breakpoint to trigger whenever IO port port is read from or written to and condition evaluates true.
-br{eakpoint} (r{ead}\|w{rite}) [address] [if condition] | Set a breakpoint to trigger whenever memory location address is read from (other than via an opcode fetch) or written to and condition evaluates true. Address again defaults to the current value of PC if omitted.
+br{eakpoint} p{ort} (re{ad}\|w{rite}) port [if condition] | Set a breakpoint to trigger whenever IO port port is read from or written to and condition evaluates true.
+br{eakpoint} (re{ad}\|w{rite}) [address] [if condition] | Set a breakpoint to trigger whenever memory location address is read from (other than via an opcode fetch) or written to and condition evaluates true. Address again defaults to the current value of PC if omitted.
 *br{eakpoint} ti{me} time [if condition]* | Set a breakpoint to occur time tstates after the start of every frame, assuming condition evaluates true (if one is given).
 *br{eakpoint} ev{ent} area:detail [if condition]* | Set a breakpoint to occur when the event specified by area detail occurs and condition evaluates to true. The events which can be caught are listed below.
 *cl{ear} [address]* | Remove all breakpoints at address or the current value of PC if address is omitted. Port read/write breakpoints are unaffected.
