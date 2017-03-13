@@ -1,7 +1,13 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.3.3 of the Fuse emulator.
+description: This section describes the changes for version 1.3.4 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.3.4
+
+### Debugger improvements:
+* Fix syntax for "breakpoint read" debugger command in the manual (thanks, Andy
+  Chadbourne) (Sergio Baldoví).
 
 ## What's new in Fuse for macOS 1.3.3
 
