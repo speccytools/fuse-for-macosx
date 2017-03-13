@@ -42,16 +42,110 @@ libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 
 fuse_machine_info *machine_current;
 
-int
-main( int argc, char *argv[] )
+/* Various "mocks" for the UI code */
+
+typedef void (*plot8_fn_t)( int x, int y, libspectrum_byte data,
+                            libspectrum_byte ink, libspectrum_byte paper );
+
+static plot8_fn_t plot8_fn;
+
+static void
+plot8_null( int x, int y, libspectrum_byte data, libspectrum_byte ink,
+            libspectrum_byte paper )
 {
+  /* Do nothing */
+}
+
+static int plot8_count;
+
+static void
+plot8_count_fn( int x, int y, libspectrum_byte data, libspectrum_byte ink,
+                libspectrum_byte paper )
+{
+  plot8_count++;
+}
+
+/* Vector off to the "plot8" implementation for the current test */
+void
+uidisplay_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
+                 libspectrum_byte paper )
+{
+  plot8_fn( x, y, data, ink, paper );
+}
+
+/* Main program code */
+
+static void
+create_fake_machine( void )
+{
+  machine_current = libspectrum_malloc( sizeof( *machine_current ) );
+
+  machine_current->timex = 0;
+
+  display_write_if_dirty = display_write_if_dirty_sinclair;
+}
+
+static void
+test_before( void )
+{
+  plot8_fn = plot8_null;
+  display_frame();
+}
+
+static int
+no_write_if_data_unchanged( void )
+{
+  /* Arrange */
+  test_before();
+
+  plot8_fn = plot8_count_fn;
+  plot8_count = 0;
+
+  RAM[0][0] = 0;
+
+  /* Act */
+  display_write_if_dirty_sinclair( 0, 0 );
+
+  /* Assert */
+  if( plot8_count ) return 1;
+
   return 0;
 }
 
-/* A dummy UI */
+typedef int (*test_fn_t)( void );
+
+static test_fn_t tests[] = {
+  no_write_if_data_unchanged,
+  NULL
+};
 
 int
-ui_init(int *argc, char ***argv)
+main( int argc, char *argv[] )
+{
+  test_fn_t *test;
+
+  if( display_init( &argc, &argv ) ) {
+    fprintf( stderr, "Error from display_init()\n");
+    return 1;
+  }
+
+  create_fake_machine();
+
+  for( test = tests; *test; test++ ) {
+    int result = (*test)();
+    if( result ) {
+      fprintf( stderr, "Test failed\n" );
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+/* Dummy code for the rest of the UI */
+
+int
+ui_init( int *argc, char ***argv )
 {
   return 0;
 }
@@ -59,12 +153,6 @@ ui_init(int *argc, char ***argv)
 void uidisplay_area( int x, int y, int w, int h ) {}
 void uidisplay_frame_end( void ) {}
 void uidisplay_putpixel( int x, int y, int colour ) {}
-
-void
-uidisplay_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
-                 libspectrum_byte paper )
-{
-}
 
 void
 uidisplay_plot16( int x, int y, libspectrum_byte data, libspectrum_byte ink,
