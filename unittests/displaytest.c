@@ -58,11 +58,26 @@ plot8_null( int x, int y, libspectrum_byte data, libspectrum_byte ink,
 
 static int plot8_count;
 
+struct plot8_record_t {
+  int x;
+  int y;
+  libspectrum_byte data;
+  libspectrum_byte ink;
+  libspectrum_byte paper;
+};
+
+struct plot8_record_t plot8_last_write;
+
 static void
 plot8_count_fn( int x, int y, libspectrum_byte data, libspectrum_byte ink,
                 libspectrum_byte paper )
 {
   plot8_count++;
+  plot8_last_write.x = x;
+  plot8_last_write.y = y;
+  plot8_last_write.data = data;
+  plot8_last_write.ink = ink;
+  plot8_last_write.paper = paper;
 }
 
 /* Vector off to the "plot8" implementation for the current test */
@@ -112,10 +127,39 @@ no_write_if_data_unchanged( void )
   return 0;
 }
 
+static int
+write_called_for_new_data( void )
+{
+  /* Arrange */
+  test_before();
+
+  plot8_fn = plot8_count_fn;
+  plot8_count = 0;
+
+  RAM[0][0] = 1;
+  RAM[0][6144] = 2;
+
+  /* Act */
+  display_write_if_dirty_sinclair( 0, 0 );
+
+  /* Assert */
+  if( plot8_count != 1 ) return 1;
+  if( plot8_last_write.x != 4 ) return 1;
+  if( plot8_last_write.y != 24 ) return 1;
+  if( plot8_last_write.data != 1 ) return 1;
+  if( plot8_last_write.ink != 2 ) return 1;
+  if( plot8_last_write.paper != 0 ) return 1;
+  if( display_last_screen[ 964 ] != 0x201 ) return 1;
+  if( display_get_is_dirty( 24 ) != 0x10 ) return 1;
+
+  return 0;
+}
+
 typedef int (*test_fn_t)( void );
 
 static test_fn_t tests[] = {
   no_write_if_data_unchanged,
+  write_called_for_new_data,
   NULL
 };
 

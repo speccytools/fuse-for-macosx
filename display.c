@@ -1095,3 +1095,11 @@ display_getpixel( int x, int y )
 
   return paper;
 }
+
+/* Helper function to allow the unit tests to check display_is_dirty.
+   Shouldn't be called by anything outside the unit tests */
+libspectrum_qword
+display_get_is_dirty( int y )
+{
+  return display_is_dirty[y];
+}
