@@ -117,6 +117,7 @@ no_write_if_data_unchanged( void )
   plot8_count = 0;
 
   RAM[0][0] = 0;
+  RAM[0][6144] = 0;
 
   /* Act */
   display_write_if_dirty_sinclair( 0, 0 );
@@ -155,11 +156,40 @@ write_called_for_new_data( void )
   return 0;
 }
 
+static int
+write_reads_from_appropriate_x( void )
+{
+  /* Arrange */
+  test_before();
+
+  plot8_fn = plot8_count_fn;
+  plot8_count = 0;
+
+  RAM[0][31] = 0x12;
+  RAM[0][6144 + 31] = 0x34;
+
+  /* Act */
+  display_write_if_dirty_sinclair( 31, 0 );
+
+  /* Assert */
+  if( plot8_count != 1 ) return 1;
+  if( plot8_last_write.x != 35 ) return 1;
+  if( plot8_last_write.y != 24 ) return 1;
+  if( plot8_last_write.data != 0x12 ) return 1;
+  if( plot8_last_write.ink != 4 ) return 1;
+  if( plot8_last_write.paper != 6 ) return 1;
+  if( display_last_screen[ 995 ] != 0x3412 ) return 1;
+  if( display_get_is_dirty( 24 ) != (1L << 35) ) return 1;
+
+  return 0;
+}
+
 typedef int (*test_fn_t)( void );
 
 static test_fn_t tests[] = {
   no_write_if_data_unchanged,
   write_called_for_new_data,
+  write_reads_from_appropriate_x,
   NULL
 };
 
