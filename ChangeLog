@@ -3,11 +3,12 @@
         * Fuse 1.3.5 released.
 
         * Emulation core improvements:
+          * Disable tape traps when playing/recording RZX files (thanks,
+            windale) (Sergio Baldoví).
           * Fix typo in LOG disk format (Sergio Baldoví).
 
         * Miscellaneous improvements:
           * Replace old ticket numbers from Trac to Allura (Sergio Baldoví).
-          * Replace misplaced tabs (Sergio Baldoví).
           * WidgetUI: Fix memory leak in file selector (thanks, clang) (Sergio
             Baldoví).
           * Fix allocator sizeof operand mismatch and remove dead assignment
