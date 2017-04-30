@@ -1,7 +1,21 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.3.4 of the Fuse emulator.
+description: This section describes the changes for version 1.3.5 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.3.5
+
+### Emulation core improvements:
+* Disable tape traps when playing/recording RZX files (thanks, windale) (Sergio
+  Baldoví).
+* Silently skip PLTT blocks in SZX snapshots (thanks, windale) (Fredrick Meunier
+  and Sergio Baldoví).
+* Validate "used bits in last byte" field in TZX tapes (thanks, Nicholas Naime
+  and Fredrick Meunier) (Sergio Baldoví).
+* Fix the load of PZX tapes with malformed strings (thanks, Nicholas Naime)
+  (Sergio Baldoví).
+
+### Various other minor bugfixes.
 
 ## What's new in Fuse for macOS 1.3.4
 
@@ -37,7 +51,8 @@ description: This section describes the changes for version 1.3.4 of the Fuse em
 ### Miscellaneous improvements:
 * QuickLook Generator: speed improvements by enabling concurrent requests
   (Fredrick Meunier).
-* New Fuse Help with improved organisation and cross-references (Fredrick Meunier).
+* New Fuse Help with improved organisation and cross-references (Fredrick
+  Meunier).
 
 ### Various other minor bugfixes.
 
