@@ -87,8 +87,8 @@ profile_start( void )
   init_profiling_counters();
 
   /* Schedule an event to ensure that the main z80 emulation loop recognises
-     profiling is turned on; otherwise problems occur if we we started while
-     the debugger was active (bug #1530345) */
+     profiling is turned on; otherwise problems occur if we started while
+     the debugger was active (bug #54) */
   event_add( tstates, event_type_null );
 
   ui_menu_activate( UI_MENU_ITEM_MACHINE_PROFILER, 1 );

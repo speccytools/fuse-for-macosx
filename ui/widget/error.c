@@ -125,7 +125,7 @@ split_message( const char *message, char ***lines, size_t *count,
       /* If we've filled the screen, stop */
       if( *count == 18 ) return 0;
 
-      new_lines = realloc( (*lines), (*count + 1) * sizeof( char** ) );
+      new_lines = realloc( (*lines), (*count + 1) * sizeof( char* ) );
       if( new_lines == NULL ) {
 	for( i=0; i<*count; i++ ) free( (*lines)[i] );
 	if(*lines) free( (*lines) );
@@ -155,8 +155,6 @@ split_message( const char *message, char ***lines, size_t *count,
 
     }
 
-    message = ptr;
-    
   }
 
   return 0;

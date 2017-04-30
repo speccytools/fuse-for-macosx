@@ -364,8 +364,8 @@ pokemem_trainer_list_add( libspectrum_byte bank, libspectrum_word address,
 {
   char *title;
 
-  title = libspectrum_new( char, 17 );
-  snprintf( title, 17, "Custom %u,%u", address, value );
+  title = libspectrum_new( char, 19 );
+  snprintf( title, 19, "Custom %u,%u", address, value );
 
   /* Create trainer */
   current_trainer = libspectrum_new0( trainer_t, 1 );

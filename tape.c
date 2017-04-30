@@ -40,9 +40,9 @@
 #include "machine.h"
 #include "memory_pages.h"
 #include "peripherals/ula.h"
+#include "rzx.h"
 #include "settings.h"
 #include "sound.h"
-#include "settings.h"
 #include "snapshot.h"
 #include "tape.h"
 #include "timer/timer.h"
@@ -356,7 +356,9 @@ int tape_load_trap( void )
   int error;
 
   /* Do nothing if tape traps aren't active, or the tape is already playing */
-  if( !settings_current.tape_traps || tape_playing ) return 2;
+  if( !settings_current.tape_traps || tape_playing ||
+      rzx_playback || rzx_recording )
+    return 2;
 
   /* Do nothing if we're not in the correct ROM */
   if( !trap_check_rom( CHECK_TAPE_ROM ) ) return 3;
@@ -527,7 +529,9 @@ int tape_save_trap( void )
   int i;
 
   /* Do nothing if tape traps aren't active */
-  if( !settings_current.tape_traps || tape_recording ) return 2;
+  if( !settings_current.tape_traps || tape_recording ||
+      rzx_playback || rzx_recording )
+    return 2;
 
   /* Check we're in the right ROM */
   if( !trap_check_rom( CHECK_TAPE_ROM ) ) return 3;
@@ -863,8 +867,8 @@ tape_next_edge( libspectrum_dword last_tstates, int type, void *user_data )
        and the new block is a ROM loader, stop the tape and return
        without putting another event into the queue */
     block = libspectrum_tape_current_block( tape );
-    if( tape_autoplay && settings_current.tape_traps &&
-	libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
+    if( tape_autoplay && settings_current.tape_traps && !rzx_recording &&
+        libspectrum_tape_block_type( block ) == LIBSPECTRUM_TAPE_BLOCK_ROM
       ) {
       tape_stop();
       return;

@@ -1,3 +1,22 @@
+2017-04-28  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
+
+        * Fuse 1.3.5 released.
+
+        * Emulation core improvements:
+          * Disable tape traps when playing/recording RZX files (thanks,
+            windale) (Sergio Baldoví).
+
+        * Miscellaneous improvements:
+          * Fix typo in LOG disk format (Sergio Baldoví).
+          * Replace old ticket numbers from Trac to Allura (Sergio Baldoví).
+          * WidgetUI: Fix memory leak in file selector (thanks, clang) (Sergio
+            Baldoví).
+          * Fix allocator sizeof operand mismatch and remove dead assignment
+            (Sergio Baldoví).
+          * Remove prototypes of old plus3 disk functions (thanks, Andre
+            Leiradella) (Sergio Baldoví).
+          * Increase allocated memory to keep GCC7 happy (Sergio Baldoví).
+
 2017-03-07  Philip Kendall  <philip-fuse@shadowmagic.org.uk>
 
         * Fuse 1.3.4 released.
@@ -20,8 +39,8 @@
 
         * Emulation core improvements:
           * Add support for the hidden MEMPTR register (thanks, Boo-boo,
-	    Vladimir Kladov and the members of the "Z80 Assembly Programming On
-	    The ZX Spectrum" Facebook group) (Philip Kendall).
+            Vladimir Kladov and the members of the "Z80 Assembly Programming On
+            The ZX Spectrum" Facebook group) (Philip Kendall).
           * Mark new disks as needing to be saved (Gergely Szasz).
           * Show more information on disk modification status in menus (Gergely
             Szasz).
