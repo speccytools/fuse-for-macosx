@@ -26,6 +26,7 @@
 #include "event.h"
 #include "loader.h"
 #include "memory_pages.h"
+#include "rzx.h"
 #include "settings.h"
 #include "spectrum.h"
 #include "tape.h"
@@ -344,7 +345,8 @@ loader_detect_loader( void )
 
   }
 
-  if( settings_current.accelerate_loader && tape_is_playing() )
+  if( settings_current.accelerate_loader && tape_is_playing() &&
+      !rzx_recording )
     check_for_acceleration();
 
 }
