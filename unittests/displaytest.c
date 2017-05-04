@@ -25,6 +25,7 @@
 
 #include <libspectrum.h>
 
+#include "../compat.h"
 #include "../infrastructure/startup_manager.h"
 #include "../machine.h"
 #include "../memory_pages.h"
@@ -41,6 +42,9 @@ int memory_current_screen;
 libspectrum_byte RAM[ SPECTRUM_RAM_PAGES ][0x4000];
 
 fuse_machine_info *machine_current;
+
+const int LINE_TIME = 224;
+const int TOP_BORDER = 24;
 
 /* Various "mocks" for the UI code */
 
@@ -66,7 +70,7 @@ struct plot8_record_t {
   libspectrum_byte paper;
 };
 
-struct plot8_record_t plot8_last_write;
+static struct plot8_record_t plot8_last_write;
 
 static void
 plot8_count_fn( int x, int y, libspectrum_byte data, libspectrum_byte ink,
@@ -102,36 +106,61 @@ uidisplay_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
   plot8_fn( x, y, data, ink, paper );
 }
 
+static int write_if_dirty_count;
+static int write_if_dirty_last_x;
+static int write_if_dirty_last_y;
+
+static void
+write_if_dirty_count_fn( int x, int y )
+{
+  write_if_dirty_count++;
+  write_if_dirty_last_x = x;
+  write_if_dirty_last_y = y;
+}
+
 /* Main program code */
 
 static void
 create_fake_machine( void )
 {
+  size_t y;
+
   machine_current = libspectrum_malloc( sizeof( *machine_current ) );
 
   machine_current->timex = 0;
+  machine_current->timings.tstates_per_line = LINE_TIME;
 
-  display_write_if_dirty = display_write_if_dirty_sinclair;
+  for( y = 0; y < ARRAY_SIZE( machine_current->line_times ); y++ )
+    machine_current->line_times[y] = y * LINE_TIME;
+
   display_dirty_flashing = display_dirty_flashing_sinclair;
 }
 
 static void
 test_before( void )
 {
-  memset( display_last_screen, 0,
-          sizeof(display_last_screen) / sizeof(display_last_screen[0]) );
+  memset( RAM[0], 0, ARRAY_SIZE( RAM[0] ) );
+  memset( display_last_screen, 0, ARRAY_SIZE( display_last_screen ) );
+  display_clear_maybe_dirty();
+
   plot8_fn = plot8_null;
   display_reset_frame_count();
+  display_write_if_dirty = display_write_if_dirty_sinclair;
+
   display_frame();
+
+  plot8_fn = plot8_count_fn;
+  plot8_count = 0;
+
+  write_if_dirty_count = 0;
+  write_if_dirty_last_x = -1;
+  write_if_dirty_last_y = -1;
 }
 
 static int
 no_write_if_data_unchanged( void )
 {
   /* Arrange */
-  plot8_fn = plot8_count_fn;
-  plot8_count = 0;
-
   RAM[0][0] = 0;
   RAM[0][6144] = 0;
 
@@ -148,9 +177,6 @@ static int
 write_called_for_new_data( void )
 {
   /* Arrange */
-  plot8_fn = plot8_count_fn;
-  plot8_count = 0;
-
   RAM[0][0] = 0x01;
   RAM[0][6144] = 0x02;
 
@@ -169,9 +195,6 @@ static int
 write_reads_from_appropriate_x( void )
 {
   /* Arrange */
-  plot8_fn = plot8_count_fn;
-  plot8_count = 0;
-
   RAM[0][31] = 0x12;
   RAM[0][6144 + 31] = 0x34;
 
@@ -190,9 +213,6 @@ static int
 write_reads_from_appropriate_y( void )
 {
   /* Arrange */
-  plot8_fn = plot8_count_fn;
-  plot8_count = 0;
-
   RAM[0][32] = 0x56;
   RAM[0][6144 + 32] = 0x78;
 
@@ -211,9 +231,6 @@ static int
 flash_inverts_colours( void )
 {
   /* Arrange */
-  plot8_fn = plot8_count_fn;
-  plot8_count = 0;
-
   RAM[0][0] = 0x01;
   RAM[0][6144] = 0x02;
 
@@ -230,14 +247,92 @@ flash_inverts_colours( void )
   return 0;
 }
 
+static int
+no_write_if_nothing_dirty( void )
+{
+  /* Arrange */
+  tstates = (TOP_BORDER + 1) * LINE_TIME;
+  display_write_if_dirty = write_if_dirty_count_fn;
+
+  /* Act */
+  display_dirty_sinclair( 0x0000 );
+
+  /* Assert */
+  if( write_if_dirty_count ) return 1;
+
+  return 0;
+}
+
+static int
+write_if_dirty( void )
+{
+  /* Arrange */
+  tstates = (TOP_BORDER + 1) * LINE_TIME;
+  display_set_maybe_dirty( 0, 0x01 );
+  display_write_if_dirty = write_if_dirty_count_fn;
+
+  /* Act */
+  display_dirty_sinclair( 0x0000 );
+
+  /* Assert */
+  if( write_if_dirty_count != 1 ) return 1;
+  if( write_if_dirty_last_y != 0 ) return 1;
+  if( write_if_dirty_last_x != 0 ) return 1;
+
+  return 0;
+}
+
+static int
+no_write_if_dirty_area_ahead_of_beam( void )
+{
+  /* Arrange */
+  tstates = (TOP_BORDER + 1) * LINE_TIME;
+  display_set_maybe_dirty( 2, 0x01 );
+  display_write_if_dirty = write_if_dirty_count_fn;
+
+  /* Act */
+  display_dirty_sinclair( 0x0000 );
+
+  /* Assert */
+  if( write_if_dirty_count ) return 1;
+
+  return 0;
+}
+
+static int
+no_write_if_modified_area_ahead_of_critical_region( void )
+{
+  /* Arrange */
+  tstates = TOP_BORDER * LINE_TIME;
+  display_set_maybe_dirty( 0, 0x01 );
+  display_write_if_dirty = write_if_dirty_count_fn;
+
+  /* Act */
+  display_dirty_sinclair( 0x0020 );
+
+  /* Assert */
+  if( write_if_dirty_count ) return 1;
+
+  return 0;
+}
+
 typedef int (*test_fn_t)( void );
 
 static test_fn_t tests[] = {
+  /* display_write_if_dirty_sinclair() tests */
   no_write_if_data_unchanged,
   write_called_for_new_data,
   write_reads_from_appropriate_x,
   write_reads_from_appropriate_y,
   flash_inverts_colours,
+
+  /* display_dirty_sinclair() tests */
+  no_write_if_nothing_dirty,
+  write_if_dirty,
+  no_write_if_dirty_area_ahead_of_beam,
+  no_write_if_modified_area_ahead_of_critical_region,
+
+  /* End marker */
   NULL
 };
 

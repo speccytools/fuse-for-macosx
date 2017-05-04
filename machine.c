@@ -448,3 +448,9 @@ machine_register_startup( void )
                             ARRAY_SIZE( dependencies ), machine_init_machines,
                             NULL, machine_end );
 }
+
+/* Unit test helpers */
+void
+machine_set_timings( void )
+{
+}

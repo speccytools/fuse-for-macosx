@@ -128,6 +128,8 @@ void display_update_critical( int x, int y );
 /* Unit test helpers */
 void display_reset_frame_count( void );
 void display_set_flash_reversed( int reversed );
+void display_clear_maybe_dirty( void );
+void display_set_maybe_dirty( int y, libspectrum_qword dirty );
 libspectrum_qword display_get_is_dirty( int y );
 
 #endif			/* #ifndef FUSE_DISPLAY_H */

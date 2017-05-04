@@ -99,7 +99,7 @@ static libspectrum_qword display_all_dirty;
 static int display_redraw_all;
 
 /* The last point at which we updated the screen display */
-int critical_region_x = 0, critical_region_y = 0;
+static int critical_region_x = 0, critical_region_y = 0;
 
 /* The border colour changes which have occurred in this frame */
 struct border_change_t {
@@ -1110,6 +1110,18 @@ void
 display_set_flash_reversed( int reversed )
 {
   display_flash_reversed = reversed;
+}
+
+void
+display_clear_maybe_dirty( void )
+{
+  memset( display_maybe_dirty, 0, ARRAY_SIZE( display_maybe_dirty ) );
+}
+
+void
+display_set_maybe_dirty( int y, libspectrum_qword dirty )
+{
+  display_maybe_dirty[y] = dirty;
 }
 
 libspectrum_qword
