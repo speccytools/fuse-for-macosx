@@ -1096,8 +1096,22 @@ display_getpixel( int x, int y )
   return paper;
 }
 
-/* Helper function to allow the unit tests to check display_is_dirty.
+/* Helper functions for the unit tests
    Shouldn't be called by anything outside the unit tests */
+void
+display_reset_frame_count( void )
+{
+  /* We set the frame count to 31 so the next call to display_frame()
+     pushes us back to zero and resets display_flash_reversed */
+  display_frame_count = 31;
+}
+
+void
+display_set_flash_reversed( int reversed )
+{
+  display_flash_reversed = reversed;
+}
+
 libspectrum_qword
 display_get_is_dirty( int y )
 {

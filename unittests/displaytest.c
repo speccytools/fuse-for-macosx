@@ -112,12 +112,16 @@ create_fake_machine( void )
   machine_current->timex = 0;
 
   display_write_if_dirty = display_write_if_dirty_sinclair;
+  display_dirty_flashing = display_dirty_flashing_sinclair;
 }
 
 static void
 test_before( void )
 {
+  memset( display_last_screen, 0,
+          sizeof(display_last_screen) / sizeof(display_last_screen[0]) );
   plot8_fn = plot8_null;
+  display_reset_frame_count();
   display_frame();
 }
 
@@ -148,7 +152,7 @@ write_called_for_new_data( void )
   plot8_count = 0;
 
   RAM[0][0] = 0x01;
-  RAM[0][6144] = 2;
+  RAM[0][6144] = 0x02;
 
   /* Act */
   display_write_if_dirty_sinclair( 0, 0 );
@@ -203,6 +207,29 @@ write_reads_from_appropriate_y( void )
   return 0;
 }
 
+static int
+flash_inverts_colours( void )
+{
+  /* Arrange */
+  plot8_fn = plot8_count_fn;
+  plot8_count = 0;
+
+  RAM[0][0] = 0x01;
+  RAM[0][6144] = 0x02;
+
+  display_set_flash_reversed( 1 );
+
+  /* Act */
+  display_write_if_dirty_sinclair( 0, 0 );
+
+  /* Assert */
+  if( plot8_assert( 1, 4, 24, 0x01, 2, 0 ) ) return 1;
+  if( display_last_screen[ 964 ] != 0x01000201 ) return 1;
+  if( display_get_is_dirty( 24 ) != (1L << 4) ) return 1;
+
+  return 0;
+}
+
 typedef int (*test_fn_t)( void );
 
 static test_fn_t tests[] = {
@@ -210,6 +237,7 @@ static test_fn_t tests[] = {
   write_called_for_new_data,
   write_reads_from_appropriate_x,
   write_reads_from_appropriate_y,
+  flash_inverts_colours,
   NULL
 };
 
