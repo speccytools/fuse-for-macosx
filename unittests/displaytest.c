@@ -80,6 +80,20 @@ plot8_count_fn( int x, int y, libspectrum_byte data, libspectrum_byte ink,
   plot8_last_write.paper = paper;
 }
 
+static int
+plot8_assert( int count, int x, int y, libspectrum_byte data,
+              libspectrum_byte ink, libspectrum_byte paper )
+{
+  if( plot8_count != count ) return 1;
+  if( plot8_last_write.x != x ) return 1;
+  if( plot8_last_write.y != y ) return 1;
+  if( plot8_last_write.data != data ) return 1;
+  if( plot8_last_write.ink != ink ) return 1;
+  if( plot8_last_write.paper != paper ) return 1;
+
+  return 0;
+}
+
 /* Vector off to the "plot8" implementation for the current test */
 void
 uidisplay_plot8( int x, int y, libspectrum_byte data, libspectrum_byte ink,
@@ -111,8 +125,6 @@ static int
 no_write_if_data_unchanged( void )
 {
   /* Arrange */
-  test_before();
-
   plot8_fn = plot8_count_fn;
   plot8_count = 0;
 
@@ -132,26 +144,19 @@ static int
 write_called_for_new_data( void )
 {
   /* Arrange */
-  test_before();
-
   plot8_fn = plot8_count_fn;
   plot8_count = 0;
 
-  RAM[0][0] = 1;
+  RAM[0][0] = 0x01;
   RAM[0][6144] = 2;
 
   /* Act */
   display_write_if_dirty_sinclair( 0, 0 );
 
   /* Assert */
-  if( plot8_count != 1 ) return 1;
-  if( plot8_last_write.x != 4 ) return 1;
-  if( plot8_last_write.y != 24 ) return 1;
-  if( plot8_last_write.data != 1 ) return 1;
-  if( plot8_last_write.ink != 2 ) return 1;
-  if( plot8_last_write.paper != 0 ) return 1;
+  if( plot8_assert( 1, 4, 24, 0x01, 2, 0 ) ) return 1;
   if( display_last_screen[ 964 ] != 0x201 ) return 1;
-  if( display_get_is_dirty( 24 ) != 0x10 ) return 1;
+  if( display_get_is_dirty( 24 ) != (1L << 4) ) return 1;
 
   return 0;
 }
@@ -160,8 +165,6 @@ static int
 write_reads_from_appropriate_x( void )
 {
   /* Arrange */
-  test_before();
-
   plot8_fn = plot8_count_fn;
   plot8_count = 0;
 
@@ -172,14 +175,30 @@ write_reads_from_appropriate_x( void )
   display_write_if_dirty_sinclair( 31, 0 );
 
   /* Assert */
-  if( plot8_count != 1 ) return 1;
-  if( plot8_last_write.x != 35 ) return 1;
-  if( plot8_last_write.y != 24 ) return 1;
-  if( plot8_last_write.data != 0x12 ) return 1;
-  if( plot8_last_write.ink != 4 ) return 1;
-  if( plot8_last_write.paper != 6 ) return 1;
+  if( plot8_assert( 1, 35, 24, 0x12, 4, 6 ) ) return 1;
   if( display_last_screen[ 995 ] != 0x3412 ) return 1;
   if( display_get_is_dirty( 24 ) != (1L << 35) ) return 1;
+
+  return 0;
+}
+
+static int
+write_reads_from_appropriate_y( void )
+{
+  /* Arrange */
+  plot8_fn = plot8_count_fn;
+  plot8_count = 0;
+
+  RAM[0][32] = 0x56;
+  RAM[0][6144 + 32] = 0x78;
+
+  /* Act */
+  display_write_if_dirty_sinclair( 0, 8 );
+
+  /* Assert */
+  if( plot8_assert( 1, 4, 32, 0x56, 8, 15 ) ) return 1;
+  if( display_last_screen[ 1284 ] != 0x7856 ) return 1;
+  if( display_get_is_dirty( 32 ) != (1L << 4) ) return 1;
 
   return 0;
 }
@@ -190,6 +209,7 @@ static test_fn_t tests[] = {
   no_write_if_data_unchanged,
   write_called_for_new_data,
   write_reads_from_appropriate_x,
+  write_reads_from_appropriate_y,
   NULL
 };
 
@@ -206,6 +226,7 @@ main( int argc, char *argv[] )
   create_fake_machine();
 
   for( test = tests; *test; test++ ) {
+    test_before();
     int result = (*test)();
     if( result ) {
       fprintf( stderr, "Test failed\n" );
