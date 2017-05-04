@@ -1240,9 +1240,7 @@ save_as_exit:
 - savePanelAccessoryView
 {
   if (savePanelAccessoryView == nil) {
-    [[NSBundle mainBundle] loadNibNamed:@"SavePanelAccessoryView.nib"
-                                  owner:self
-                        topLevelObjects:nil];
+    [NSBundle loadNibNamed:@"SavePanelAccessoryView.nib" owner:self];
     [savePanelAccessoryView retain];
   }
   return savePanelAccessoryView;
@@ -2700,7 +2698,7 @@ cocoaui_savepanel_get_filename( NSString *title, NSArray *fileTypes )
   sPanel = [NSSavePanel savePanel];
 
   [sPanel setTitle:title];
-  [sPanel setAllowedFileTypes:[NSArray arrayWithObject:[fileTypes objectAtIndex:0]]];
+  [sPanel setAllowedFileTypes:fileTypes];
   [sPanel setCanSelectHiddenExtension:YES];
 
   if( [fileTypes count] > 1 ) {
