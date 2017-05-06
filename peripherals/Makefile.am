@@ -23,6 +23,7 @@
 
 fuse_SOURCES += \
                 peripherals/ay.c \
+                peripherals/covox.c \
                 peripherals/dck.c \
                 peripherals/fuller.c \
                 peripherals/if1.c \
@@ -67,6 +68,7 @@ endif
 
 noinst_HEADERS += \
                   peripherals/ay.h \
+                  peripherals/covox.h \
                   peripherals/dck.h \
                   peripherals/fuller.h \
                   peripherals/if1.h \

@@ -102,6 +102,8 @@ pentagon1024_reset(void)
   /* Later style Betadisk 128 interface */
   periph_set_present( PERIPH_TYPE_BETA128_PENTAGON_LATE, PERIPH_PRESENT_ALWAYS );
 
+  periph_set_present( PERIPH_TYPE_COVOX_FB, PERIPH_PRESENT_OPTIONAL );
+
   periph_update();
 
   spec48_common_display_setup();

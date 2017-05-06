@@ -103,6 +103,8 @@ scorpion_reset(void)
   /* Later style Betadisk 128 interface */
   periph_set_present( PERIPH_TYPE_BETA128_PENTAGON_LATE, PERIPH_PRESENT_ALWAYS );
 
+  periph_set_present( PERIPH_TYPE_COVOX_DD, PERIPH_PRESENT_OPTIONAL );
+
   periph_update();
 
   beta_builtin = 1;
