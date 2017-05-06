@@ -35,4 +35,4 @@ typedef struct specdrum_info {
 void specdrum_register_startup( void );
 void specdrum_write( libspectrum_word port, libspectrum_byte val );
 
-#endif                          /* #ifndef FUSE_SPECRUM_H */
+#endif                          /* #ifndef FUSE_SPECDRUM_H */
