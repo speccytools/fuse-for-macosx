@@ -159,7 +159,7 @@ _fuse()
         --joystick-keyboard-output|--joystick-keyboard-right| \
         --joystick-keyboard-up|--mdr-len|--rate|--snet|--sound-device|-d| \
         --sound-freq|-f|--speccyboot-tap|--speed|--svga-modes|--volume-ay| \
-        --volume-beeper|--volume-specdrum)
+        --volume-beeper|--volume-covox|--volume-specdrum)
             # argument required but no completions available
             return 0
             ;;
@@ -169,7 +169,7 @@ _fuse()
         COMPREPLY=( $( compgen -W '--accelerate-loader --aspect-hint
             --auto-load --autosave-settings --beta128 --beta128-48boot
             --betadisk --bw-tv --cmos-z80 --competition-code
-            --competition-mode --compress-rzx --confirm-actions
+            --competition-mode --compress-rzx --confirm-actions --covox
             --debugger-command --detect-loader --didaktik80
             --didaktik80disk --disciple --discipledisk --disk-ask-merge
             --disk-try-merge --divide --divide-masterfile
@@ -201,7 +201,8 @@ _fuse()
             --joystick-keyboard-down --joystick-keyboard-fire
             --joystick-keyboard-left --joystick-keyboard-output
             --joystick-keyboard-right --joystick-keyboard-up
-            --joystick-prompt --kempston --kempston-mouse --late-timings
+            --joystick-prompt --kempston --kempston-mouse
+            --keyboard-arrows-shifted --late-timings
             --loading-sound --machine --mdr-len --mdr-random-len --melodik
             --microdrive-file --microdrive-2-file --microdrive-3-file
             --microdrive-4-file --microdrive-5-file --microdrive-6-file
@@ -210,13 +211,14 @@ _fuse()
             --no-accelerate-loader --no-aspect-hint --no-auto-load
             --no-autosave-settings --no-beta128 --no-beta128-48boot
             --no-bw-tv --no-cmos-z80 --no-competition-mode
-            --no-compress-rzx --no-confirm-actions --no-detect-loader
+            --no-compress-rzx --no-confirm-actions --no-covox
+            --no-detect-loader
             --no-didaktik80 --no-disciple --no-disk-ask-merge
             --no-divide --no-divide-write-protect --no-embed-snapshot
             --no-fastload --no-fuller --no-full-screen --no-interface1
             --no-interface2 --no-issue2 --no-joystick-prompt
-            --no-kempston --no-kempston-mouse --no-late-timings
-            --no-loading-sound --no-mdr-random-len
+            --no-kempston --no-kempston-mouse --no-keyboard-arrows-shifted
+            --no-late-timings --no-loading-sound --no-mdr-random-len
             --no-melodik --no-mouse-swap-buttons
             --no-movie-stop-after-rzx --no-opus --no-pal-tv2x
             --no-plus3-detect-speedlock --no-plusd --no-printer
@@ -252,8 +254,8 @@ _fuse()
             --specdrum --spectranet --spectranet-disable --speed
             --statusbar --strict-aspect-hint --svga-modes --tape
             --textfile --traps --unittests --usource --version --volume-ay
-            --volume-beeper --volume-specdrum --writable-roms --zxatasp
-            --zxatasp-masterfile --zxatasp-slavefile --zxatasp-upload
+            --volume-beeper --volume-covox --volume-specdrum --writable-roms
+            --zxatasp --zxatasp-masterfile --zxatasp-slavefile --zxatasp-upload
             --zxatasp-write-protect --zxcf --zxcf-cffile --zxcf-upload
             --zxprinter' -- "$cur" ) )
     else
