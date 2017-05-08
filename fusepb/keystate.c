@@ -70,7 +70,7 @@ press_key( input_key keysym )
 {
   input_event_t fuse_event;
   fuse_event.type = INPUT_EVENT_KEYPRESS;
-  //fuse_event.types.key.native_key = fuse_keysym;
+  fuse_event.types.key.native_key = keysym;
   fuse_event.types.key.spectrum_key = keysym;
   input_event( &fuse_event );
 }
@@ -80,7 +80,7 @@ release_key( input_key keysym )
 {
   input_event_t fuse_event;
   fuse_event.type = INPUT_EVENT_KEYRELEASE;
-  //fuse_event.types.key.native_key = fuse_keysym;
+  fuse_event.types.key.native_key = keysym;
   fuse_event.types.key.spectrum_key = keysym;
   input_event( &fuse_event );
 }
