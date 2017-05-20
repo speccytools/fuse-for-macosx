@@ -1,5 +1,5 @@
 # settings.dat: configuration options for Fuse
-# Copyright (c) 2002-2015 Philip Kendall
+# Copyright (c) 2002-2017 Philip Kendall
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -242,6 +242,9 @@ rom_scorpion_3, string, "256s-3.rom",
 rom_spec_se_0, string, "se-0.rom",
 rom_spec_se_1, string, "se-1.rom",
 rom_interface_1, string, "if1-2.rom",,, rominterfacei
+rom_multiface1, string, "mf1.rom",
+rom_multiface128, string, "mf128.rom",
+rom_multiface3, string, "mfplus3.rom",
 rom_beta128, string, "trdos.rom",
 rom_plusd, string, "plusd.rom",
 rom_didaktik80, string, "didaktik80.rom",

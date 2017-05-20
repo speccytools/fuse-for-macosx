@@ -1,5 +1,5 @@
 /* coretest.c: Test program for Fuse's Z80 core
-   Copyright (c) 2003-2015 Philip Kendall
+   Copyright (c) 2003-2017 Philip Kendall
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -540,6 +540,7 @@ if1_unpage( void )
 
 int multiface_activated = 0;
 
+void
 multiface_setic8( void )
 {
   abort();

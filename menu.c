@@ -5,6 +5,7 @@
    Copyright (c) 2015 Stuart Brady
    Copyright (c) 2015-2017 Gergely Szasz
    Copyright (c) 2015 Stefano Bodrato
+   Copyright (c) 2017 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -277,8 +278,8 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select )
   case  7: menu_select_peripheral_roms( "Didaktik 80",     6, 1 ); return;
   case  8: menu_select_peripheral_roms( "DISCiPLE",        7, 1 ); return;
   case  9: menu_select_peripheral_roms( "Opus Discovery",  8, 1 ); return;
-  case  10: menu_select_peripheral_roms( "SpeccyBoot",     9, 1 ); return;
-  case  11: menu_select_peripheral_roms( "uSource",       10, 1 ); return;
+  case 10: menu_select_peripheral_roms( "SpeccyBoot",      9, 1 ); return;
+  case 11: menu_select_peripheral_roms( "uSource",        10, 1 ); return;
 
   }
 
@@ -347,7 +348,6 @@ MENU_CALLBACK( menu_machine_multifaceredbutton )
   ui_widget_finish();
   multiface_red_button();
 }
-
 
 MENU_CALLBACK( menu_media_tape_open )
 {

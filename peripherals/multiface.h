@@ -1,7 +1,6 @@
 /* multiface.c: Multiface 1/128/3 handling routines
    Copyright (c) 2005,2007 Gergely Szasz
-
-   $Id: $
+   Copyright (c) 2017 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,13 +25,12 @@
 #ifndef FUSE_MULTIFACE_H
 #define FUSE_MULTIFACE_H
 
-#include <libspectrum.h>
-
 extern int multiface_activated;		/* RED BUTTON PUSHED */
 extern int multiface_active;
 extern int multiface_available;
 
-int multiface_init( void );
+void multiface_register_startup( void );
+
 void multiface_status_update( void );
 
 void multiface_red_button( void );

@@ -1,7 +1,6 @@
 /* multiface.c: Multiface one/128/3 handling routines
    Copyright (c) 2005,2007 Gergely Szasz
-
-   $Id$
+   Copyright (c) 2017 Fredrick Meunier
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +33,7 @@
 #include <time.h>
 
 #include "event.h"
+#include "infrastructure/startup_manager.h"
 #include "multiface.h"
 #include "memory.h"
 #include "module.h"
@@ -95,6 +95,7 @@ static int multiface_rom_memory_source, multiface_ram_memory_source;
 static const char *event_type_string = "multiface";
 static int page_event, unpage_event;
 
+static int multiface_init( void* context );
 
 static void multiface_page( int idx );
 static void multiface_unpage( int idx );
@@ -159,8 +160,21 @@ static const periph_t multiface_periph_3 = {
   NULL
 };
 
+void
+multiface_register_startup( void )
+{
+  startup_manager_module dependencies[] = {
+    STARTUP_MANAGER_MODULE_DEBUGGER,
+    STARTUP_MANAGER_MODULE_MEMORY,
+    STARTUP_MANAGER_MODULE_SETUID,
+  };
+  startup_manager_register( STARTUP_MANAGER_MODULE_MULTIFACE, dependencies,
+                            ARRAY_SIZE( dependencies ), multiface_init, NULL,
+                            NULL );
+}
+
 int
-multiface_init( void )
+multiface_init( void* context )
 {
   int i;
 

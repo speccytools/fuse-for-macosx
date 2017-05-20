@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # settings.pl: generate settings.c from settings.dat
-# Copyright (c) 2002-2015 Philip Kendall
+# Copyright (c) 2002-2017 Philip Kendall
 # Copyright (c) 2016 BogDan Vatra
 
 # This program is free software; you can redistribute it and/or modify
@@ -761,13 +761,16 @@ settings_get_rom_setting( settings_info *settings, size_t which,
   } else {
     switch( which ) {
     case  0: return &( settings->rom_interface_1 );
-    case  1: return &( settings->rom_beta128 );
-    case  2: return &( settings->rom_plusd );
-    case  3: return &( settings->rom_didaktik80 );
-    case  4: return &( settings->rom_disciple );
-    case  5: return &( settings->rom_opus );
-    case  6: return &( settings->rom_speccyboot );
-    case  7: return &( settings->rom_usource );
+    case  1: return &( settings->rom_multiface1 );
+    case  2: return &( settings->rom_multiface128 );
+    case  3: return &( settings->rom_multiface3 );
+    case  4: return &( settings->rom_beta128 );
+    case  5: return &( settings->rom_plusd );
+    case  6: return &( settings->rom_didaktik80 );
+    case  7: return &( settings->rom_disciple );
+    case  8: return &( settings->rom_opus );
+    case  9: return &( settings->rom_speccyboot );
+    case 10: return &( settings->rom_usource );
     default: return NULL;
     }
   }
