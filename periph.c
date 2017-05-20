@@ -31,6 +31,7 @@
 #include "fuse.h"
 #include "periph.h"
 #include "peripherals/if1.h"
+#include "peripherals/multiface.h"
 #include "peripherals/ula.h"
 #include "rzx.h"
 #include "settings.h"
@@ -449,6 +450,7 @@ periph_update( void )
   update_cartridge_menu();
   update_ide_menu();
   if1_update_menu();
+  multiface_status_update();
   specplus3_765_update_fdd();
   machine_current->memory_map();
 

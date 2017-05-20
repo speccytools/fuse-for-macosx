@@ -538,6 +538,13 @@ if1_unpage( void )
   abort();
 }
 
+int multiface_activated = 0;
+
+multiface_setic8( void )
+{
+  abort();
+}
+
 void
 divide_set_automap( int state GCC_UNUSED )
 {

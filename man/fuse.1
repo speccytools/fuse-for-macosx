@@ -889,6 +889,27 @@ See also the
 section.
 .RE
 .PP
+.B \-\-multiface
+.RS
+Emulate a Romantic Robot's Multiface 1/128/+3 interface. Same as the General Peripherals Options dialog's
+.I "Multiface"
+option.
+.RE
+.PP
+.B \-\-multiface\-type
+.RS
+Specify the emulated Multiface type 1, 128 or 3 respectively. Same as the General Peripherals Options dialog's
+.I "Multiface type"
+option.
+.RE
+.PP
+.B \-\-multiface-stealth
+.RS
+Set Multiface stealth mode. Same as the General Peripherals Options dialog's
+.I "Stealth Multiface"
+option.
+.RE
+.PP
 .B \-\-opus
 .RS
 Emulate a Opus Discovery interface. Same as the Disk Peripherals Options dialog's
@@ -1161,6 +1182,15 @@ are not.
 .B \-\-rom\-disciple
 .I file
 .br
+.B \-\-rom\-multiface1
+.I file
+.br
+.B \-\-rom\-multiface128
+.I file
+.br
+.B \-\-rom\-multiface3
+.I file
+.br
 .B \-\-rom\-opus
 .I file
 .br
@@ -1174,6 +1204,12 @@ Specify the file to be used for ROM(s) used for each peripheral. The
 options respectively refer to
 the Interface\ 1 ROM
 .RI ( if1\-2.rom ),
+the Multiface\ 1 ROM
+.RI ( mf1.rom ),
+the Multiface\ 128 ROM
+.RI ( mf128.rom ),
+the Multiface\ +3 ROM
+.RI ( mfplus3.rom ),
 the TR-DOS ROM for Beta\ 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
 the +D ROM
@@ -2502,6 +2538,19 @@ menu. Note that the Pentagon, Scorpion, Interface\ 2, ZXATASP and ZXCF
 all use the same hardware mechanism for accessing some of their
 extended features, so only one of these should be selected at once or
 unpredictable behaviour will occur.
+.RE
+.PP
+.I "Multiface"
+.RS
+If this option is selected, Fuse will emulate the Romantic Robot's
+Multiface\ 1, 128 or +3. Multiface emulation avaliable for 16K, 48K
+Timex TC2048, 128K, +2, +2A, +3, +3E and SE machines.
+Multiface type can be selected via the
+.I "Multiface type"
+option.
+With the
+.I "Stealth Multiface"
+option we can set the "invisible" or "stealth" mode of Multiface.
 .RE
 .PP
 .I "Emulate printers"

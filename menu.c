@@ -48,6 +48,7 @@
 #include "peripherals/if1.h"
 #include "peripherals/if2.h"
 #include "peripherals/joystick.h"
+#include "peripherals/multiface.h"
 #include "profile.h"
 #include "psg.h"
 #include "rzx.h"
@@ -268,13 +269,16 @@ MENU_CALLBACK_WITH_ACTION( menu_options_selectroms_peripheral_select )
   switch( action ) {
 
   case  1: menu_select_peripheral_roms( "Interface 1",     0, 1 ); return;
-  case  2: menu_select_peripheral_roms( "Beta 128",        1, 1 ); return;
-  case  3: menu_select_peripheral_roms( "+D",              2, 1 ); return;
-  case  4: menu_select_peripheral_roms( "Didaktik 80",     3, 1 ); return;
-  case  5: menu_select_peripheral_roms( "DISCiPLE",        4, 1 ); return;
-  case  6: menu_select_peripheral_roms( "Opus Discovery",  5, 1 ); return;
-  case  7: menu_select_peripheral_roms( "SpeccyBoot",      6, 1 ); return;
-  case  8: menu_select_peripheral_roms( "uSource",         7, 1 ); return;
+  case  2: menu_select_peripheral_roms( "Multiface One",   1, 1 ); return;
+  case  3: menu_select_peripheral_roms( "Multiface One",   2, 1 ); return;
+  case  4: menu_select_peripheral_roms( "Multiface One",   3, 1 ); return;
+  case  5: menu_select_peripheral_roms( "Beta 128",        4, 1 ); return;
+  case  6: menu_select_peripheral_roms( "+D",              5, 1 ); return;
+  case  7: menu_select_peripheral_roms( "Didaktik 80",     6, 1 ); return;
+  case  8: menu_select_peripheral_roms( "DISCiPLE",        7, 1 ); return;
+  case  9: menu_select_peripheral_roms( "Opus Discovery",  8, 1 ); return;
+  case  10: menu_select_peripheral_roms( "SpeccyBoot",     9, 1 ); return;
+  case  11: menu_select_peripheral_roms( "uSource",       10, 1 ); return;
 
   }
 
@@ -337,6 +341,13 @@ MENU_CALLBACK( menu_machine_nmi )
   ui_widget_finish();
   event_add( 0, z80_nmi_event );
 }
+
+MENU_CALLBACK( menu_machine_multifaceredbutton )
+{
+  ui_widget_finish();
+  multiface_red_button();
+}
+
 
 MENU_CALLBACK( menu_media_tape_open )
 {
