@@ -889,23 +889,34 @@ See also the
 section.
 .RE
 .PP
-.B \-\-multiface
+.B \-\-multiface1
 .RS
-Emulate a Romantic Robot's Multiface 1/128/+3 interface. Same as the General Peripherals Options dialog's
-.I "Multiface"
+Emulate a Romantic Robot Multiface One interface. Same as the General
+Peripherals Options dialog's
+.I "Multiface One"
 option.
 .RE
 .PP
-.B \-\-multiface\-type
+.B \-\-multiface128
 .RS
-Specify the emulated Multiface type 1, 128 or 3 respectively. Same as the General Peripherals Options dialog's
-.I "Multiface type"
+Emulate a Romantic Robot Multiface\ 128 interface. Same as the General
+Peripherals Options dialog's
+.I "Multiface\ 128"
+option.
+.RE
+.PP
+.B \-\-multiface3
+.RS
+Emulate a Romantic Robot Multiface\ 3 interface. Same as the General
+Peripherals Options dialog's
+.I "Multiface\ 3"
 option.
 .RE
 .PP
 .B \-\-multiface-stealth
 .RS
-Set Multiface stealth mode. Same as the General Peripherals Options dialog's
+Set Multiface One/128/3 stealth mode. Same as the General Peripherals
+Options dialog's
 .I "Stealth Multiface"
 option.
 .RE
@@ -1204,12 +1215,6 @@ Specify the file to be used for ROM(s) used for each peripheral. The
 options respectively refer to
 the Interface\ 1 ROM
 .RI ( if1\-2.rom ),
-the Multiface\ 1 ROM
-.RI ( mf1.rom ),
-the Multiface\ 128 ROM
-.RI ( mf128.rom ),
-the Multiface\ +3 ROM
-.RI ( mfplus3.rom ),
 the TR-DOS ROM for Beta\ 128 emulation with the 48K, TC2048, 128K or +2
 .RI ( trdos.rom ),
 the +D ROM
@@ -1218,6 +1223,12 @@ the Didaktik\ 80 ROM
 .RI ( didaktik80.rom ),
 the DISCiPLE ROM
 .RI ( disciple.rom ),
+the Multiface\ One ROM
+.RI ( mf1.rom ),
+the Multiface\ 128 ROM
+.RI ( mf128.rom ),
+the Multiface\ 3 ROM
+.RI ( mfplus3.rom ),
 the Opus Discovery ROM
 .RI ( opus.rom ),
 the SpeccyBoot ROM
@@ -2540,17 +2551,27 @@ extended features, so only one of these should be selected at once or
 unpredictable behaviour will occur.
 .RE
 .PP
-.I "Multiface"
+.I "Multiface One"
 .RS
-If this option is selected, Fuse will emulate the Romantic Robot's
-Multiface\ 1, 128 or +3. Multiface emulation avaliable for 16K, 48K
-Timex TC2048, 128K, +2, +2A, +3, +3E and SE machines.
-Multiface type can be selected via the
-.I "Multiface type"
-option.
-With the
+If this option is selected, Fuse will emulate the Romantic Robot
+Multiface One. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
+.RE
+.PP
+.I "Multiface\ 128"
+.RS
+If this option is selected, Fuse will emulate the Romantic Robot
+Multiface\ 128. Available for 16K, 48K, Timex TC2048, 128K, +2 and SE machines.
+.RE
+.PP
+.I "Multiface\ 3"
+.RS
+If this option is selected, Fuse will emulate the Romantic Robot
+Multiface\ 3. Available for +2A, +3 and +3e machines.
+.RE
+.PP
 .I "Stealth Multiface"
-option we can set the "invisible" or "stealth" mode of Multiface.
+.RS
+This option controls the `invisible' or `stealth' mode of Multiface One/128/3.
 .RE
 .PP
 .I "Emulate printers"
