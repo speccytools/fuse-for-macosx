@@ -34,9 +34,9 @@
 
 #include "event.h"
 #include "infrastructure/startup_manager.h"
-#include "multiface.h"
 #include "memory.h"
 #include "module.h"
+#include "multiface.h"
 #include "options.h"
 #include "periph.h"
 #include "settings.h"
