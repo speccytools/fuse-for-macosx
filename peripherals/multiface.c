@@ -173,7 +173,7 @@ multiface_register_startup( void )
                             NULL );
 }
 
-int
+static int
 multiface_init( void* context )
 {
   int i;
