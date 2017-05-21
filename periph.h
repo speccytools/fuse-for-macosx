@@ -52,7 +52,7 @@ typedef enum periph_type {
   PERIPH_TYPE_INTERFACE2,     /* Interface 2 */
   PERIPH_TYPE_MULTIFACE_1,    /* Multiface 1 */
   PERIPH_TYPE_MULTIFACE_128,  /* Multiface 128 */
-  PERIPH_TYPE_MULTIFACE_3,    /* Multiface +3 */
+  PERIPH_TYPE_MULTIFACE_3,    /* Multiface 3 */
 
   /* A Kempston joystick which requires b5, b6 and b7 reset to be read */
   PERIPH_TYPE_KEMPSTON,

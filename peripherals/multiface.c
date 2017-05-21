@@ -398,7 +398,7 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
 
   *attached = 1;
 
-  /* Multiface +3 */
+  /* Multiface 3 */
   /* The MF3 user guide say nothing about paging memory :-( */
   /*  but in www.breezer.co.uk/spec/tech/hware.html I found: */
   /*  IN A, (191) -> page in, and IN A, (63) page out */
