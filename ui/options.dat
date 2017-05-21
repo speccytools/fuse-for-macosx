@@ -42,7 +42,7 @@ Checkbox, (F)uller Box, fuller, INPUT_KEY_f
 Checkbox, M(e)lodik, melodik, INPUT_KEY_e
 Checkbox, (I)nterface 1, interface1, INPUT_KEY_i
 Checkbox, In(t)erface 2, interface2, INPUT_KEY_t
-Checkbox, Multiface (O)ne, multiface1, INPUT_KEY_o
+Checkbox, Mu(l)tiface One, multiface1, INPUT_KEY_l
 Checkbox, Multiface 12(8), multiface128, INPUT_KEY_8
 Checkbox, Multiface (3), multiface3, INPUT_KEY_3
 Checkbox, Stealt(h) Multiface, multiface_stealth, INPUT_KEY_h
