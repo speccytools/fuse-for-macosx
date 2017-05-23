@@ -75,7 +75,7 @@ typedef struct multiface_t {
   int J2;			/* Jumper 2 to disable software paging, or
 				   the software on/off state for 128/3 */
   int J1;			/* Jumper 1 to disable joystick (always 0) */
-  periph_type type;			/* type of multiface: one/128/3 */
+  periph_type type;		/* type of multiface: one/128/3 */
   libspectrum_byte ram[8192];	/* 8k RAM */
   int *c_settings;		/* ptr to current_settings.multiface### */
   char **d_rom;
@@ -102,15 +102,20 @@ static void multiface_unpage( int idx );
 static void multiface_reset( int hard_reset );
 static void multiface_memory_map( void );
 
-static libspectrum_byte multiface_port_in1( libspectrum_word port, libspectrum_byte *attached );
-static libspectrum_byte multiface_port_in128( libspectrum_word port, libspectrum_byte *attached );
-static libspectrum_byte multiface_port_in3( libspectrum_word port, libspectrum_byte *attached );
+static libspectrum_byte multiface_port_in1( libspectrum_word port,
+                                            libspectrum_byte *attached );
+static libspectrum_byte multiface_port_in128( libspectrum_word port,
+                                              libspectrum_byte *attached );
+static libspectrum_byte multiface_port_in3( libspectrum_word port,
+                                            libspectrum_byte *attached );
 
 static void multiface_port_out1( libspectrum_word port, libspectrum_byte val );
-static void multiface_port_out128( libspectrum_word port, libspectrum_byte val );
+static void multiface_port_out128( libspectrum_word port,
+                                   libspectrum_byte val );
 static void multiface_port_out3( libspectrum_word port, libspectrum_byte val );
 
-static libspectrum_byte multiface_port_last_byte( libspectrum_word port, libspectrum_byte *attached );
+static libspectrum_byte multiface_port_last_byte( libspectrum_word port,
+                                                  libspectrum_byte *attached );
 
 static module_info_t multiface_module_info = {
   multiface_reset,
@@ -240,9 +245,7 @@ multiface_reset_real( int idx, int hard_reset )
 
   if( machine_load_rom_bank( multiface_memory_map_romcs_rom, 0,
                               *mf[idx].c_rom, *mf[idx].d_rom, 0x2000 ) )
-  {
     return;
-  }
 
   machine_current->ram.romcs = 0;
 
@@ -251,7 +254,8 @@ multiface_reset_real( int idx, int hard_reset )
         than have to works this stuff properly...
 */
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    multiface_memory_map_romcs_ram[ i ].page = &mf[idx].ram[ i * MEMORY_PAGE_SIZE ];
+    multiface_memory_map_romcs_ram[ i ].page =
+      &mf[idx].ram[ i * MEMORY_PAGE_SIZE ];
     multiface_memory_map_romcs_ram[ i ].writable = 1;
   }
 
@@ -264,7 +268,6 @@ multiface_reset_real( int idx, int hard_reset )
 static void
 multiface_reset( int hard_reset )
 {
-
   multiface_reset_real( MF_1, hard_reset );
   multiface_reset_real( MF_128, hard_reset );
   multiface_reset_real( MF_3, hard_reset );
@@ -421,7 +424,6 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
 static void
 multiface_port_out1( libspectrum_word port, libspectrum_byte val )
 {
-
   if( !IS( multiface_available, MF_1 ) ) return;
 
   /* MF one: out () */
@@ -520,7 +522,6 @@ multiface_unittest( void )
 
   return r;
 }
-
 
 /*
 static void
