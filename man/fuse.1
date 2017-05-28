@@ -915,7 +915,7 @@ option.
 .PP
 .B \-\-multiface-stealth
 .RS
-Set Multiface One/128/3 stealth mode. Same as the General Peripherals
+Set Multiface One stealth/invisible mode. Same as the General Peripherals
 Options dialog's
 .I "Stealth Multiface"
 option.
@@ -2571,7 +2571,8 @@ Multiface\ 3. Available for +2A, +3 and +3e machines.
 .PP
 .I "Stealth Multiface"
 .RS
-This option controls the `invisible' or `stealth' mode of Multiface One/128/3.
+This option controls the `invisible' or `stealth' mode of Multiface One,
+as the physical switch on the side of the interface.
 .RE
 .PP
 .I "Emulate printers"
@@ -3311,6 +3312,11 @@ pressing the NMI button.  For some UIs, this may be tricky, or even
 impossible to do.  Note that GDOS on the DISCiPLE contains a bug which
 causes corruption of saved snapshots, and a failure to return from the
 NMI menu correctly.  This bug is not present in G+DOS on the +D.
+.RE
+.PP
+.I "Machine, Multiface Red Button"
+.RS
+Presses the Multiface One/128/3 red button to active the interface.
 .RE
 .PP
 .I "Machine, Didaktik SNAP"
@@ -4480,6 +4486,13 @@ if1:page
 if1:unpage
 .RS
 The Interface\ 1 shadow ROM is paged into or out of memory.
+.RE
+.br
+multiface:page
+.br
+multiface:unpage
+.RS
+The Multiface One/128/3 is paged into or out of memory respectively.
 .RE
 .br
 opus:page
