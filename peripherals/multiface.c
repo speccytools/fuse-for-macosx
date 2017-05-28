@@ -255,9 +255,10 @@ multiface_reset_real( int idx, int hard_reset )
         than have to works this stuff properly...
 */
   for( i = 0; i < MEMORY_PAGES_IN_8K; i++ ) {
-    multiface_memory_map_romcs_ram[ i ].page =
-      &mf[idx].ram[ i * MEMORY_PAGE_SIZE ];
-    multiface_memory_map_romcs_ram[ i ].writable = 1;
+    struct memory_page *page = &multiface_memory_map_romcs_ram[ i ];
+    page->page = &mf[idx].ram[ i * MEMORY_PAGE_SIZE ];
+    page->offset = i * MEMORY_PAGE_SIZE;
+    page->writable = 1;
   }
 
   *mf[idx].c_settings = 1;
