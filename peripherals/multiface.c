@@ -96,7 +96,7 @@ static int multiface_rom_memory_source, multiface_ram_memory_source;
 static const char * const event_type_string = "multiface";
 static int page_event, unpage_event;
 
-static int multiface_init( void* context );
+static int multiface_init( void *context );
 
 static void multiface_page( int idx );
 static void multiface_unpage( int idx );
@@ -180,7 +180,7 @@ multiface_register_startup( void )
 }
 
 static int
-multiface_init( void* context )
+multiface_init( void *context )
 {
   int i;
 
@@ -214,7 +214,7 @@ multiface_init( void* context )
   periph_register( PERIPH_TYPE_MULTIFACE_128, &multiface_periph_128 );
   periph_register( PERIPH_TYPE_MULTIFACE_3, &multiface_periph_3 );
   periph_register_paging_events( event_type_string, &page_event,
-				 &unpage_event );
+                                 &unpage_event );
 
   return 0;
 }
@@ -226,8 +226,8 @@ multiface_reset_real( int idx, int hard_reset )
 
   multiface_unpage( idx );
 
-  SET( multiface_activated, idx, 0);
-  SET( multiface_available, idx, 0);
+  SET( multiface_activated, idx, 0 );
+  SET( multiface_available, idx, 0 );
 
   if( hard_reset ) memset( mf[idx].ram, 0, 8192 );
   if( !periph_is_active( mf[idx].type ) ) return;
@@ -245,7 +245,7 @@ multiface_reset_real( int idx, int hard_reset )
   periph_activate_type( mf[idx].type, 0 );
 
   if( machine_load_rom_bank( multiface_memory_map_romcs_rom, 0,
-                              *mf[idx].c_rom, *mf[idx].d_rom, 0x2000 ) )
+                             *mf[idx].c_rom, *mf[idx].d_rom, 0x2000 ) )
     return;
 
   machine_current->ram.romcs = 0;
@@ -418,9 +418,9 @@ multiface_port_in3( libspectrum_word port, libspectrum_byte *attached )
 
   a7 = port & 0x0080;
   if( a7 )			/* a7 == 1 */
-      multiface_unpage( MF_3 );
+    multiface_unpage( MF_3 );
   else
-      multiface_page( MF_3 );	/* a7 == 0 */
+    multiface_page( MF_3 );	/* a7 == 0 */
   mf[MF_3].IC8a_Q = ( !a7 );
   return ret;
 }
