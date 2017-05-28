@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "debugger/debugger.h"
 #include "event.h"
 #include "infrastructure/startup_manager.h"
 #include "memory.h"
@@ -92,7 +93,7 @@ int multiface_available = 0;
 static int multiface_rom_memory_source, multiface_ram_memory_source;
 
 /* Debugger events */
-static const char *event_type_string = "multiface";
+static const char * const event_type_string = "multiface";
 static int page_event, unpage_event;
 
 static int multiface_init( void* context );
@@ -306,6 +307,7 @@ multiface_page( int idx )
   romcs = machine_current->ram.romcs;
   machine_current->ram.romcs = 1;
   machine_current->memory_map();
+  debugger_event( page_event );
   if( mf[idx].type != PERIPH_TYPE_MULTIFACE_1 )
     mf[idx].J2 = 1;
 }
@@ -317,6 +319,7 @@ multiface_unpage( int idx )
   SET( multiface_active, idx, 0 );
   machine_current->ram.romcs = romcs;
   machine_current->memory_map();
+  debugger_event( unpage_event );
 }
 
 static void
