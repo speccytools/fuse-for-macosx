@@ -423,6 +423,7 @@
   settings_current.fuller = 0;
   settings_current.melodik = 0;
   settings_current.specdrum = 0;
+  settings_current.covox = 0;
 
   // Read external sound interface type box and set text boxes appropriately
   switch( [[externalSoundType selectedCell] tag] ) {
@@ -437,6 +438,9 @@
   case 3: // SpecDrum
     settings_current.specdrum = 1;
     break;
+  case 4: // Covox
+    settings_current.covox = 1;
+    break;
   default: // WTF?
     break;
   }
@@ -444,6 +448,7 @@
   [self setCurrentValue:settings_current.fuller forKey:@"fuller" inValues:currentValues];
   [self setCurrentValue:settings_current.melodik forKey:@"melodik" inValues:currentValues];
   [self setCurrentValue:settings_current.specdrum forKey:@"specdrum" inValues:currentValues];
+  [self setCurrentValue:settings_current.covox forKey:@"covox" inValues:currentValues];
 
   [currentValues synchronize];
 }

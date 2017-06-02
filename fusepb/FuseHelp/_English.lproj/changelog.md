@@ -1,7 +1,24 @@
 ---
 title: What's New In Fuse?
-description: This section describes the changes for version 1.3.5 of the Fuse emulator.
+description: This section describes the changes for version 1.3.6 of the Fuse emulator.
 ---
+
+## What's new in Fuse for macOS 1.3.6
+
+### Emulation core improvements:
+* Add Covox interface emulation (Fredrick Meunier).
+* Disable accelerate loader while recording RZX files (thanks, windale) (Sergio
+  Baldoví).
+* Fix releasing captured Kempston mouse (thanks, Robert Uttley) (Fredrick
+  Meunier).
+
+### Miscellaneous improvements:
+* Restored ability to select save formats (thanks, TomD) (Fredrick Meunier).
+* Work around invalid "used bits in last byte" field in TZX tapes (thanks,
+  Philip Kendall and Sergio Baldoví) (Fredrick Meunier).
+* Save SpecDrum level as unsigned in SZX snapshots (Sergio Baldoví).
+
+### Various other minor bugfixes.
 
 ## What's new in Fuse for macOS 1.3.5
 

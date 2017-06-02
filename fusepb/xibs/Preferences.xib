@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -209,7 +209,7 @@
                         <binding destination="270" name="value" keyPath="values.confirmactions" id="1399"/>
                     </connections>
                 </button>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NNe-bG-amc">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="NNe-bG-amc">
                     <rect key="frame" x="167" y="230" width="112" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Emulation speed:" id="BoH-kb-bUl">
@@ -218,7 +218,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="V1D-ym-CTs">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="V1D-ym-CTs">
                     <rect key="frame" x="119" y="196" width="160" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Screen refresh rate (1:n):" id="69l-0C-1Jd">
@@ -227,7 +227,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="AQm-ut-oKC">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="AQm-ut-oKC">
                     <rect key="frame" x="285" y="228" width="116" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="8Rf-5o-m5G">
@@ -243,7 +243,7 @@
                         <binding destination="270" name="value" keyPath="values.speed" id="zJq-NB-RjL"/>
                     </connections>
                 </textField>
-                <textField verticalHuggingPriority="750" id="rJU-D7-OFM">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="rJU-D7-OFM">
                     <rect key="frame" x="285" y="194" width="116" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="5My-XZ-RQ4">
@@ -317,12 +317,80 @@
                 </button>
             </subviews>
         </customView>
-        <customView id="1408" userLabel="Sound">
-            <rect key="frame" x="0.0" y="0.0" width="627" height="256"/>
+        <customView misplaced="YES" id="1408" userLabel="Sound">
+            <rect key="frame" x="0.0" y="0.0" width="628" height="272"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <popUpButton verticalHuggingPriority="750" id="1855">
-                    <rect key="frame" x="323" y="94" width="153" height="26"/>
+                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1848">
+                    <rect key="frame" x="233" y="174" width="101" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="AY Volume" id="1849">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <slider verticalHuggingPriority="750" misplaced="YES" id="1847">
+                    <rect key="frame" x="361" y="174" width="115" height="25"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1850">
+                        <font key="font" size="12" name="Helvetica"/>
+                    </sliderCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.volumeay" id="1852"/>
+                    </connections>
+                </slider>
+                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1413">
+                    <rect key="frame" x="233" y="206" width="101" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Beeper Volume" id="1418">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button misplaced="YES" id="1414">
+                    <rect key="frame" x="217" y="236" width="116" height="18"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="check" title="Enabled" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1417">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.sound" id="1423"/>
+                    </connections>
+                </button>
+                <slider verticalHuggingPriority="750" misplaced="YES" id="1415">
+                    <rect key="frame" x="361" y="206" width="115" height="25"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1416">
+                        <font key="font" size="12" name="Helvetica"/>
+                    </sliderCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.volumebeeper" id="1846"/>
+                    </connections>
+                </slider>
+                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="rtY-km-onC">
+                    <rect key="frame" x="233" y="143" width="125" height="24"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="SpecDrum Volume" id="zRw-eR-clg">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <slider verticalHuggingPriority="750" misplaced="YES" id="OMt-zm-rbb">
+                    <rect key="frame" x="361" y="143" width="115" height="25"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="UqA-7e-TQJ">
+                        <font key="font" size="12" name="Helvetica"/>
+                    </sliderCell>
+                    <connections>
+                        <binding destination="270" name="value" keyPath="values.volumespecdrum" id="hNg-JT-c68"/>
+                    </connections>
+                </slider>
+                <popUpButton verticalHuggingPriority="750" misplaced="YES" id="1855">
+                    <rect key="frame" x="324" y="79" width="153" height="26"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1858" id="1856">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -340,8 +408,8 @@
                         <binding destination="270" name="selectedValue" keyPath="values.speakertype" previousBinding="1861" id="1864"/>
                     </connections>
                 </popUpButton>
-                <textField verticalHuggingPriority="750" id="1862">
-                    <rect key="frame" x="215" y="93" width="101" height="24"/>
+                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1862">
+                    <rect key="frame" x="216" y="78" width="101" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Speaker type" id="1863">
                         <font key="font" metaFont="system"/>
@@ -349,8 +417,8 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1900">
-                    <rect key="frame" x="215" y="61" width="131" height="24"/>
+                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1900">
+                    <rect key="frame" x="216" y="46" width="131" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="AY stereo mode" id="1901">
                         <font key="font" metaFont="system"/>
@@ -358,57 +426,8 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="1848">
-                    <rect key="frame" x="232" y="158" width="101" height="24"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="AY Volume" id="1849">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <slider verticalHuggingPriority="750" id="1847">
-                    <rect key="frame" x="360" y="158" width="115" height="25"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1850">
-                        <font key="font" size="12" name="Helvetica"/>
-                    </sliderCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.volumeay" id="1852"/>
-                    </connections>
-                </slider>
-                <textField verticalHuggingPriority="750" id="1413">
-                    <rect key="frame" x="232" y="190" width="101" height="24"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Beeper Volume" id="1418">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button id="1414">
-                    <rect key="frame" x="216" y="220" width="116" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Enabled" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1417">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.sound" id="1423"/>
-                    </connections>
-                </button>
-                <slider verticalHuggingPriority="750" id="1415">
-                    <rect key="frame" x="360" y="190" width="115" height="25"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1416">
-                        <font key="font" size="12" name="Helvetica"/>
-                    </sliderCell>
-                    <connections>
-                        <binding destination="270" name="value" keyPath="values.volumebeeper" id="1846"/>
-                    </connections>
-                </slider>
-                <button id="1412">
-                    <rect key="frame" x="216" y="37" width="126" height="18"/>
+                <button misplaced="YES" id="1412">
+                    <rect key="frame" x="217" y="22" width="126" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <buttonCell key="cell" type="check" title="Loading  sounds" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1419">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -418,8 +437,8 @@
                         <binding destination="270" name="value" keyPath="values.loadingsound" id="1428"/>
                     </connections>
                 </button>
-                <popUpButton verticalHuggingPriority="750" id="1883">
-                    <rect key="frame" x="323" y="61" width="153" height="26"/>
+                <popUpButton verticalHuggingPriority="750" misplaced="YES" id="1883">
+                    <rect key="frame" x="324" y="46" width="153" height="26"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1886" id="1884">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -437,40 +456,41 @@
                         <binding destination="270" name="selectedValue" keyPath="values.separation" previousBinding="1897" id="1899"/>
                     </connections>
                 </popUpButton>
-                <textField verticalHuggingPriority="750" id="1902">
-                    <rect key="frame" x="232" y="126" width="125" height="24"/>
+                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1902">
+                    <rect key="frame" x="233" y="111" width="125" height="24"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="SpecDrum Volume" id="1905">
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Covox Volume" id="1905">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <slider verticalHuggingPriority="750" id="1903">
-                    <rect key="frame" x="360" y="126" width="115" height="25"/>
+                <slider verticalHuggingPriority="750" misplaced="YES" id="1903">
+                    <rect key="frame" x="361" y="111" width="115" height="25"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <sliderCell key="cell" alignment="left" maxValue="100" doubleValue="100" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="1904">
                         <font key="font" size="12" name="Helvetica"/>
                     </sliderCell>
                     <connections>
-                        <binding destination="270" name="value" keyPath="values.volumespecdrum" id="1907"/>
+                        <binding destination="270" name="value" keyPath="values.volumecovox" id="uIo-Hf-och"/>
                     </connections>
                 </slider>
             </subviews>
+            <point key="canvasLocation" x="132" y="885"/>
         </customView>
         <customView id="1432" userLabel="Peripherals">
             <rect key="frame" x="0.0" y="0.0" width="627" height="472"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <box autoresizesSubviews="NO" borderType="line" title="External sound interface" id="1833">
-                    <rect key="frame" x="398" y="334" width="212" height="118"/>
+                <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="External sound interface" id="1833">
+                    <rect key="frame" x="398" y="312" width="212" height="140"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="3G9-p5-WYZ">
-                        <rect key="frame" x="1" y="1" width="210" height="102"/>
+                        <rect key="frame" x="1" y="1" width="210" height="124"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="1836">
-                                <rect key="frame" x="18" y="14" width="92" height="78"/>
+                            <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" id="1836">
+                                <rect key="frame" x="20" y="15" width="92" height="98"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 <size key="cellSize" width="92" height="18"/>
@@ -507,6 +527,13 @@
                                             <font key="font" metaFont="system"/>
                                             <connections>
                                                 <action selector="externalSoundTypeClicked:" target="-2" id="1949"/>
+                                            </connections>
+                                        </buttonCell>
+                                        <buttonCell type="radio" title="Covox" imagePosition="left" alignment="left" tag="4" inset="2" id="gLz-Th-SHu">
+                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <connections>
+                                                <action selector="externalSoundTypeClicked:" target="-2" id="bXf-Sd-y1O"/>
                                             </connections>
                                         </buttonCell>
                                     </column>
@@ -786,7 +813,7 @@
                                     <binding destination="270" name="value" keyPath="values.zxprinter" id="1953"/>
                                 </connections>
                             </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Vg7-l5-Jxr">
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="Vg7-l5-Jxr">
                                 <rect key="frame" x="25" y="46" width="131" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Graphic Output File:" id="bvv-kb-cZ4">
@@ -795,7 +822,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ptU-fP-Mnq">
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="ptU-fP-Mnq">
                                 <rect key="frame" x="47" y="16" width="109" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Text Output File:" id="0Dt-bm-EQa">
@@ -804,7 +831,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" id="LuR-Lj-xFi">
+                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="LuR-Lj-xFi">
                                 <rect key="frame" x="157" y="44" width="317" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="xTs-kP-Vfd">
@@ -816,7 +843,7 @@
                                     <binding destination="270" name="value" keyPath="values.graphicsfile" id="kps-HD-1Jz"/>
                                 </connections>
                             </textField>
-                            <textField verticalHuggingPriority="750" id="YFe-FE-BDr">
+                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="YFe-FE-BDr">
                                 <rect key="frame" x="157" y="14" width="317" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="y2D-9H-b0V">
@@ -890,7 +917,7 @@
                         <binding destination="270" name="selectedValue" keyPath="values.moviecompr" previousBinding="1939" id="1948"/>
                     </connections>
                 </popUpButton>
-                <textField verticalHuggingPriority="750" id="1930">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1930">
                     <rect key="frame" x="183" y="16" width="177" height="21"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Movie Compression Level" id="1931">
@@ -899,7 +926,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="I3r-Pl-MAf">
+                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="I3r-Pl-MAf">
                     <rect key="frame" x="429" y="43" width="83" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="fzK-PL-kaX">
@@ -912,7 +939,7 @@
                         <binding destination="270" name="value" keyPath="values.competitioncode" id="bZY-YP-trS"/>
                     </connections>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="O78-AX-6Cd">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="O78-AX-6Cd">
                     <rect key="frame" x="184" y="45" width="239" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Emulator recording competition code" id="mIT-9v-7ht">
@@ -954,7 +981,7 @@
                                     <binding destination="270" name="selectedIndex" keyPath="values.joystickkeyboardoutput" previousBinding="1558" id="1559"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" id="1511">
+                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1511">
                                 <rect key="frame" x="13" y="4" width="122" height="34"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="1512">
@@ -1014,7 +1041,7 @@
                                     <binding destination="270" name="selectedIndex" keyPath="values.joystick1output" previousBinding="1574" id="1579"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" id="1520">
+                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1520">
                                 <rect key="frame" x="17" y="18" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Emulated joystick:" id="1525">
@@ -1023,7 +1050,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" id="1521">
+                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1521">
                                 <rect key="frame" x="17" y="50" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Real device:" id="1524">
@@ -1091,7 +1118,7 @@
                                     <binding destination="270" name="selectedIndex" keyPath="values.joystick2output" previousBinding="1575" id="1580"/>
                                 </connections>
                             </popUpButton>
-                            <textField verticalHuggingPriority="750" id="1536">
+                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1536">
                                 <rect key="frame" x="11" y="50" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Real device:" id="1541">
@@ -1100,7 +1127,7 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" id="1537">
+                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1537">
                                 <rect key="frame" x="11" y="18" width="122" height="17"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Emulated joystick:" id="1540">
@@ -1243,7 +1270,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="RVo-Sg-mDk">
                         <rect key="frame" x="1" y="0.0" width="135" height="302"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1631" id="1634">
                                 <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
@@ -1385,7 +1412,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="7ih-tq-3PK">
                         <rect key="frame" x="1" y="0.0" width="135" height="302"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" headerView="1612" id="1615">
                                 <rect key="frame" x="0.0" y="0.0" width="135" height="285"/>
