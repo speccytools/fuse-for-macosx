@@ -558,6 +558,8 @@
     value = 2;
   } else if ( settings_current.specdrum ) {
     value = 3;
+  } else if ( settings_current.covox ) {
+    value = 4;
   }
 
   [externalSoundType selectCellWithTag:value];
